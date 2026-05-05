@@ -2852,7 +2852,7 @@ NHMessageBox(HWND hWnd, LPCTSTR text, UINT type)
 {
     TCHAR title[MAX_LOADSTRING];
     if (program_state.exiting && !_tcscmp(text, TEXT("\n")))
-        text = TEXT("Press Enter to exit");
+        text = TEXT("終了するには Enter キーを押してください");
 
     LoadString(GetNHApp()->hApp, IDS_APP_TITLE_SHORT, title, MAX_LOADSTRING);
 
