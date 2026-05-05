@@ -107,7 +107,10 @@ windsound_achievement(schar ach1, schar ach2, int32_t repeat UNUSED)
     filename = base_soundname_to_filename(resourcename,
                                           buf, sizeof buf, findsound_approach);
     if (filename) {
-        (void) PlaySound(filename, NULL, fdwsound);
+        TCHAR wfilename[PATHLEN];
+        MultiByteToWideChar(GetACP(), 0, filename, -1, wfilename,
+                            SIZE(wfilename));
+        (void) PlaySound(wfilename, NULL, fdwsound);
     }
 }
 
@@ -146,7 +149,10 @@ windsound_soundeffect(char *desc UNUSED, int32_t seid, int32_t volume UNUSED)
     }
 
     if (filename) {
-        (void) PlaySound(filename, NULL, fdwsound);
+        TCHAR wfilename[PATHLEN];
+        MultiByteToWideChar(GetACP(), 0, filename, -1, wfilename,
+                            SIZE(wfilename));
+        (void) PlaySound(wfilename, NULL, fdwsound);
     }
 #endif
 }
@@ -228,7 +234,11 @@ windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume UNU
                                                buf, sizeof buf, findsound_approach);
                 if (i == (notecount - 1))
                     break;  /* drop out of for-loop and play it async below */
-                reslt = PlaySound(buf, NULL, fdwsound);
+                {
+                    TCHAR wbuf[PATHLEN];
+                    MultiByteToWideChar(GetACP(), 0, buf, -1, wbuf, SIZE(wbuf));
+                    reslt = PlaySound(wbuf, NULL, fdwsound);
+                }
             }
             c++;
         }
@@ -237,7 +247,11 @@ windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume UNU
     fdwsound |= SND_ASYNC;
     /* the final, or only, one is played ASYNC */
     maybe_preinsert_directory(findsound_approach, exedir, buf, sizeof buf);
-    reslt = PlaySound(buf, NULL, fdwsound);
+    {
+        TCHAR wbuf[PATHLEN];
+        MultiByteToWideChar(GetACP(), 0, buf, -1, wbuf, SIZE(wbuf));
+        reslt = PlaySound(wbuf, NULL, fdwsound);
+    }
     nhUse(filename);
     nhUse(reslt);
 #endif
@@ -247,7 +261,10 @@ static void
 windsound_play_usersound(char *filename, int32_t volume UNUSED, int32_t idx UNUSED)
 {
     /*    pline("play_usersound: %s (%d).", filename, volume); */
-    (void) sndPlaySound(filename, SND_ASYNC | SND_NODEFAULT | SND_FILENAME);
+    TCHAR wfilename[PATHLEN];
+    MultiByteToWideChar(GetACP(), 0, filename, -1, wfilename,
+                        SIZE(wfilename));
+    (void) sndPlaySound(wfilename, SND_ASYNC | SND_NODEFAULT | SND_FILENAME);
 }
 
 static void

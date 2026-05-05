@@ -132,7 +132,7 @@ mswin_init_map_window(void)
     }
 
     /* Set window caption */
-    SetWindowText(hWnd, "Map");
+    SetWindowText(hWnd, TEXT("Map"));
 
     mswin_apply_window_style(hWnd);
 
@@ -212,10 +212,13 @@ mswin_map_layout(HWND hWnd, LPSIZE map_size)
         } else {
             if (!data->bFitToScreenMode) {
                 lgfnt.lfPitchAndFamily = FIXED_PITCH; // pitch and family
-                NH_A2W(NHMAP_FONT_NAME, lgfnt.lfFaceName, LF_FACESIZE);
+                _tcsncpy(lgfnt.lfFaceName, NHMAP_FONT_NAME, LF_FACESIZE - 1);
+                lgfnt.lfFaceName[LF_FACESIZE - 1] = '\0';
             } else {
                 lgfnt.lfPitchAndFamily = DEFAULT_PITCH; // pitch and family
-                NH_A2W(NHMAP_TTFONT_NAME, lgfnt.lfFaceName, LF_FACESIZE);
+                _tcsncpy(lgfnt.lfFaceName, NHMAP_TTFONT_NAME,
+                         LF_FACESIZE - 1);
+                lgfnt.lfFaceName[LF_FACESIZE - 1] = '\0';
             }
         }
 

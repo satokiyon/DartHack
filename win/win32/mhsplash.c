@@ -189,7 +189,11 @@ mswin_display_splash_window(BOOL show_ver)
     }
 
     strbuf_nl_to_crlf(&strbuf);
-    SetWindowText(GetDlgItem(hWnd, IDC_EXTRAINFO), strbuf.str);
+    {
+        TCHAR wextra[QBUFSZ * 4];
+        NH_A2W(strbuf.str, wextra, SIZE(wextra));
+        SetWindowText(GetDlgItem(hWnd, IDC_EXTRAINFO), wextra);
+    }
     strbuf_empty(&strbuf);
     ShowWindow(hWnd, SW_SHOW);
 
@@ -254,9 +258,11 @@ NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         Sprintf(VersionString, "%d.%d.%d", VERSION_MAJOR, VERSION_MINOR,
                 PATCHLEVEL);
         OldFont = SelectObject(hdc, splashData->hFont);
-        DrawText(hdc, VersionString, strlen(VersionString), &rt,
+        TCHAR VersionText[256];
+        NH_A2W(VersionString, VersionText, SIZE(VersionText));
+        DrawText(hdc, VersionText, _tcslen(VersionText), &rt,
                  DT_LEFT | DT_NOPREFIX | DT_CALCRECT);
-        DrawText(hdc, VersionString, strlen(VersionString), &rt,
+        DrawText(hdc, VersionText, _tcslen(VersionText), &rt,
                  DT_LEFT | DT_NOPREFIX);
         EndPaint(hWnd, &ps);
         nhUse(OldFont);
