@@ -72,13 +72,13 @@
     <NMakeBuildCommandLine>echo ..\lib\ctags is already present</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>pushd $(vsDir)fetchctags %26%26 nmake -F fetchctags.nmake clean %26%26 popd</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>echo rebuilding $(vsDir)fetchctags </NMakeReBuildCommandLine>
-    <NMakePreprocessorDefinitions>_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>_DEBUG;UNICODE;_UNICODE;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <PropertyGroup Condition="!Exists('$(LibDir)ctags\ctags.exe')">
     <NMakeBuildCommandLine>pushd $(vsDir)fetchctags %26%26 nmake -F fetchctags.nmake %26%26 popd</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>pushd $(vsDir)fetchctags %26%26 nmake -F fetchctags.nmake clean %26%26 popd</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>pushd $(vsDir)fetchprereq %26%26 nmake -F fetchctags.nmake rebuild %26%26 popd</NMakeReBuildCommandLine>
-    <NMakePreprocessorDefinitions>_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>_DEBUG;UNICODE;_UNICODE;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
