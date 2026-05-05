@@ -183,7 +183,7 @@ mswin_display_splash_window(BOOL show_ver)
                     strbuf_append(&strbuf, line);
                 (void) fclose(nf);
             } else {
-                strbuf_append(&strbuf, "No news.");
+                strbuf_append(&strbuf, "お知らせはありません。");
             }
         }
     }

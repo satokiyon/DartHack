@@ -129,7 +129,7 @@ CAPTION "バージョン情報"
 FONT 8, "System"
 BEGIN
     LTEXT           "NetHack",IDC_ABOUT_VERSION,10,10,170,15,SS_NOPREFIX
-    LTEXT           "Copyright",IDC_ABOUT_COPYRIGHT,10,30,210,40
+    LTEXT           "著作権",IDC_ABOUT_COPYRIGHT,10,30,210,40
     DEFPUSHBUTTON   "OK",IDOK,195,6,30,11,WS_GROUP
 END
 
@@ -385,7 +385,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_APP_TITLE           "NetHack for Windows - Graphical Interface"
+    IDS_APP_TITLE           "NetHack for Windows - グラフィカル インターフェース"
     IDC_NETHACKW            "NETHACKW"
     IDS_APP_TITLE_SHORT     "NetHack for Windows"
 END
