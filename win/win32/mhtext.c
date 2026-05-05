@@ -49,7 +49,7 @@ mswin_init_text_window(void)
     }
 
     /* Set window caption */
-    SetWindowText(ret, TEXT("Text"));
+    SetWindowText(ret, TEXT("テキスト"));
 
     mswin_apply_window_style(ret);
 

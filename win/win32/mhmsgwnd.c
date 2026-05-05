@@ -107,7 +107,7 @@ mswin_init_message_window(void)
         panic("Cannot create message window");
 
     /* Set window caption */
-    SetWindowText(ret, TEXT("Messages"));
+    SetWindowText(ret, TEXT("メッセージ"));
 
     mswin_apply_window_style(ret);
 
@@ -258,7 +258,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
          *       newline is rendered on a new line.  This can cause a poor
          *       user experience when the user has set only a single text line
          *       for the message window.  In this case, the user will not see
-         *       any line other then the last line of text and the --MORE--
+         *       any line other then the last line of text and the --MORE-- 
          *       message thus missing any text that appears before the last
          *       embedded newline.  This does not meet the requirements of the
          *       message window.

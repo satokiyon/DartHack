@@ -126,7 +126,7 @@ mswin_init_menu_window(int type)
     }
 
     /* Set window caption */
-    SetWindowText(ret, TEXT("Menu/Text"));
+    SetWindowText(ret, TEXT("メニュー/テキスト"));
 
     mswin_apply_window_style(ret);
 
