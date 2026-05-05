@@ -23,7 +23,7 @@ LANGUAGE LANG_ENGLISH,SUBLANG_ENGLISH_US
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
+#pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -41,15 +41,15 @@ IDI_NETHACKW            ICON                    "NETHACK.ICO"
 
 IDC_NETHACKW MENU
 BEGIN
-    POPUP "&File"
+    POPUP "ファイル(&F)"
     BEGIN
-        MENUITEM "&Save and Exit",              IDM_SAVE
+        MENUITEM "保存して終了(&S)",              IDM_SAVE
         MENUITEM SEPARATOR
-        MENUITEM "&Quit",                       IDM_EXIT
+        MENUITEM "終了(&Q)",                       IDM_EXIT
     END
-    POPUP "&Map"
+    POPUP "マップ(&M)"
     BEGIN
-        MENUITEM "&0 - Use Tiles",              IDM_MAP_TILES
+        MENUITEM "&0 - タイル表示",              IDM_MAP_TILES
         MENUITEM "&1 - ASCII (4x6)",            IDM_MAP_ASCII4X6
         MENUITEM "&2 - ASCII (6x8)",            IDM_MAP_ASCII6X8
         MENUITEM "&3 - ASCII (8x8)",            IDM_MAP_ASCII8X8
@@ -60,21 +60,21 @@ BEGIN
         MENUITEM "&8 - ASCII (12x16)",          IDM_MAP_ASCII12X16
         MENUITEM "&9 - ASCII  (10x18)",         IDM_MAP_ASCII10X18
         MENUITEM SEPARATOR
-        MENUITEM "&Fit To Screen ",             IDM_MAP_FIT_TO_SCREEN
+        MENUITEM "画面に合わせる(&F)",             IDM_MAP_FIT_TO_SCREEN
         MENUITEM SEPARATOR
-        MENUITEM "&Copy To Clipboard (ASCII)",  IDM_SETTING_SCREEN_TO_CLIPBOARD
-        MENUITEM "&Save to File (ASCII)",       IDM_SETTING_SCREEN_TO_FILE
+        MENUITEM "クリップボードへコピー (ASCII)(&C)",  IDM_SETTING_SCREEN_TO_CLIPBOARD
+        MENUITEM "ファイルへ保存 (ASCII)(&S)",       IDM_SETTING_SCREEN_TO_FILE
     END
-    POPUP "Windows &Settings"
+    POPUP "ウィンドウ設定(&W)"
     BEGIN
-        MENUITEM "NetHack Mode",                IDM_NHMODE
+        MENUITEM "NetHack モード",                IDM_NHMODE
         MENUITEM SEPARATOR
-        MENUITEM "&Clear All Settings",         IDM_CLEARSETTINGS
+        MENUITEM "すべての設定をクリア(&C)",         IDM_CLEARSETTINGS
         MENUITEM SEPARATOR
-        MENUITEM "Auto &Arrange Windows",       IDM_SETTING_AUTOLAYOUT
-        MENUITEM "&Lock Windows",               IDM_SETTING_LOCKWINDOWS
+        MENUITEM "ウィンドウを自動整列(&A)",       IDM_SETTING_AUTOLAYOUT
+        MENUITEM "ウィンドウ位置を固定(&L)",               IDM_SETTING_LOCKWINDOWS
     END
-    POPUP "&Help"
+    POPUP "ヘルプ(&H)"
     // 5.0: HELP_LONG and HELP_OPTIONS_LONG both used to specify &L as their
     // accelator.  Typing 'L' or 'l' highlighted one of the two, then <enter>
     // would execute it or typing another 'l' or 'L' would unhighlight the
@@ -86,21 +86,21 @@ BEGIN
     // recent than this resource file.  The wizard mode one may need to
     // stay suppressed since it is conditional.
     BEGIN
-        MENUITEM "&About ...",                  IDM_ABOUT
-        MENUITEM "Long description of the &game", IDM_HELP_LONG
-        MENUITEM "List of &commands",           IDM_HELP_COMMANDS
-        MENUITEM "&History of NetHack",         IDM_HELP_HISTORY
-        MENUITEM "&Info on a display character", IDM_HELP_INFO_CHAR
-        MENUITEM "Info on what a given &key does", IDM_HELP_INFO_KEY
-        MENUITEM "List of game &options",       IDM_HELP_OPTIONS
-        MENUITEM "&Longer list of game options", IDM_HELP_OPTIONS_LONG
+        MENUITEM "バージョン情報(&A) ...",                  IDM_ABOUT
+        MENUITEM "ゲームの詳細説明(&G)", IDM_HELP_LONG
+        MENUITEM "コマンド一覧(&C)",           IDM_HELP_COMMANDS
+        MENUITEM "NetHack の歴史(&H)",         IDM_HELP_HISTORY
+        MENUITEM "表示文字の説明(&I)", IDM_HELP_INFO_CHAR
+        MENUITEM "キーの機能説明(&K)", IDM_HELP_INFO_KEY
+        MENUITEM "ゲームオプション一覧(&O)",       IDM_HELP_OPTIONS
+        MENUITEM "ゲームオプション詳細一覧(&L)", IDM_HELP_OPTIONS_LONG
 	// { dispfile_optmenu, "Using the %s command to set options." } //"'O'"
 	// { dokeylist, "Full list of keyboard commands." }
-        MENUITEM "List of e&xtended commands",  IDM_HELP_EXTCMD
+        MENUITEM "拡張コマンド一覧(&X)",  IDM_HELP_EXTCMD
 	// { domenucontrols, "List menu control keys." }
-        MENUITEM "The &NetHack license",        IDM_HELP_LICENSE
+        MENUITEM "NetHack ライセンス(&N)",        IDM_HELP_LICENSE
 	// { docontact, "Support information." }
-        MENUITEM "NetHack for &Windows help",   IDM_HELP_PORTHELP
+        MENUITEM "NetHack for Windows ヘルプ(&W)",   IDM_HELP_PORTHELP
 	// { dispfile_debughelp, "List of wizard-mode commands." }
     END
 END
@@ -125,7 +125,7 @@ END
 
 IDD_ABOUTBOX DIALOG 22, 17, 230, 75
 STYLE DS_SETFONT | DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
-CAPTION "About"
+CAPTION "バージョン情報"
 FONT 8, "System"
 BEGIN
     LTEXT           "NetHack",IDC_ABOUT_VERSION,10,10,170,15,SS_NOPREFIX
@@ -150,55 +150,55 @@ BEGIN
     LISTBOX         IDC_MENU_LIST,10,10,170,55,LBS_SORT | NOT WS_BORDER
     EDITTEXT        IDC_MENU_TEXT,10,70,170,60,ES_MULTILINE | ES_OEMCONVERT | ES_READONLY | NOT WS_BORDER | WS_VSCROLL | WS_HSCROLL | NOT WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,7,132,50,14,BS_FLAT | NOT WS_TABSTOP
-    PUSHBUTTON      "Cancel",IDCANCEL,130,132,50,14,BS_FLAT | NOT WS_TABSTOP
+    PUSHBUTTON      "キャンセル",IDCANCEL,130,132,50,14,BS_FLAT | NOT WS_TABSTOP
 END
 
 IDD_GETLIN DIALOG 0, 0, 131, 29
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Question?"
+CAPTION "質問"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,0,15,65,14
-    PUSHBUTTON      "Cancel",IDCANCEL,65,15,65,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,65,15,65,14
     EDITTEXT        IDC_GETLIN_EDIT,0,0,130,13,ES_AUTOHSCROLL
 END
 
 IDD_EXTCMD DIALOG 0, 0, 137, 117
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Extended Commands"
+CAPTION "拡張コマンド"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,80,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,80,24,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,80,24,50,14
     LISTBOX         IDC_EXTCMD_LIST,7,7,65,103,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_PLAYER_SELECTOR DIALOGEX 0, 0, 225, 212
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "What are you?"
+CAPTION "あなたは何者ですか？"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "Play",IDOK,12,192,54,14,WS_GROUP
-    PUSHBUTTON      "Quit",IDCANCEL,162,192,54,14,WS_GROUP
+    DEFPUSHBUTTON   "開始",IDOK,12,192,54,14,WS_GROUP
+    PUSHBUTTON      "終了",IDCANCEL,162,192,54,14,WS_GROUP
     EDITTEXT        IDC_PLSEL_NAME,12,12,105,12,ES_AUTOHSCROLL | ES_READONLY | WS_GROUP | NOT WS_TABSTOP
-    CONTROL         "Neutral",IDC_PLSEL_ALIGN_NEUTRAL,"Button",BS_AUTORADIOBUTTON,168,60,37,10
-    CONTROL         "Lawful",IDC_PLSEL_ALIGN_LAWFUL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,168,48,35,10
-    CONTROL         "Chaotic",IDC_PLSEL_ALIGN_CHAOTIC,"Button",BS_AUTORADIOBUTTON,168,72,38,10
-    CONTROL         "Male",IDC_PLSEL_GENDER_MALE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,168,108,30,10
-    CONTROL         "Female",IDC_PLSEL_GENDER_FEMALE,"Button",BS_AUTORADIOBUTTON,168,120,38,10
-    GROUPBOX        "Alignment",IDC_PLSEL_ALIGNMENT_GROUP,162,36,48,54
-    GROUPBOX        "Gender",IDC_PLSEL_GENDER_GROUP,162,96,48,42
-    GROUPBOX        "Role",IDC_PLSEL_ROLE_GROUP,6,36,72,150
-    GROUPBOX        "Race",IDC_PLSEL_RACE_GROUP,84,36,72,72
-    PUSHBUTTON      "Random",IDC_PLSEL_RANDOM,90,192,54,14,WS_GROUP
-    GROUPBOX        "Name",IDC_PLSEL_NAME_GROUP,6,0,120,30
+    CONTROL         "中立",IDC_PLSEL_ALIGN_NEUTRAL,"Button",BS_AUTORADIOBUTTON,168,60,37,10
+    CONTROL         "秩序",IDC_PLSEL_ALIGN_LAWFUL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,168,48,35,10
+    CONTROL         "混沌",IDC_PLSEL_ALIGN_CHAOTIC,"Button",BS_AUTORADIOBUTTON,168,72,38,10
+    CONTROL         "男性",IDC_PLSEL_GENDER_MALE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,168,108,30,10
+    CONTROL         "女性",IDC_PLSEL_GENDER_FEMALE,"Button",BS_AUTORADIOBUTTON,168,120,38,10
+    GROUPBOX        "属性",IDC_PLSEL_ALIGNMENT_GROUP,162,36,48,54
+    GROUPBOX        "性別",IDC_PLSEL_GENDER_GROUP,162,96,48,42
+    GROUPBOX        "職業",IDC_PLSEL_ROLE_GROUP,6,36,72,150
+    GROUPBOX        "種族",IDC_PLSEL_RACE_GROUP,84,36,72,72
+    PUSHBUTTON      "ランダム",IDC_PLSEL_RANDOM,90,192,54,14,WS_GROUP
+    GROUPBOX        "名前",IDC_PLSEL_NAME_GROUP,6,0,120,30
     CONTROL         "",IDC_PLSEL_ROLE_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDRAWFIXED | LVS_ALIGNLEFT | LVS_NOSCROLL | LVS_NOCOLUMNHEADER | WS_BORDER | WS_GROUP | WS_TABSTOP,12,48,60,130
     CONTROL         "",IDC_PLSEL_RACE_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDRAWFIXED | LVS_ALIGNLEFT | LVS_NOSCROLL | LVS_NOCOLUMNHEADER | WS_BORDER | WS_GROUP | WS_TABSTOP,90,48,60,51
 END
 
 IDD_NHRIP DIALOGEX 0, 0, 281, 209
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Here lies..."
+CAPTION "ここに眠る..."
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,82,188,50,14
@@ -206,7 +206,7 @@ END
 
 IDD_SPLASH DIALOG 0, 0, 281, 257
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Welcome to NetHack"
+CAPTION "NetHack へようこそ"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,224,236,50,14
