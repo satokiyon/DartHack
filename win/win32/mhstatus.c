@@ -124,7 +124,7 @@ mswin_init_status_window(void)
         panic("Cannot create status window");
 
     /* Set window caption */
-    SetWindowText(ret, "Status");
+    SetWindowText(ret, TEXT("Status"));
 
     /* create window data */
     data = (PNHStatusWindow) malloc(sizeof(NHStatusWindow));

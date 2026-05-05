@@ -126,7 +126,7 @@ mswin_init_menu_window(int type)
     }
 
     /* Set window caption */
-    SetWindowText(ret, "Menu/Text");
+    SetWindowText(ret, TEXT("Menu/Text"));
 
     mswin_apply_window_style(ret);
 
@@ -1814,4 +1814,3 @@ NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     else
         return 0;
 }
-/*-----------------------------------------------------------------------------*/

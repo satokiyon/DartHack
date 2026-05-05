@@ -98,6 +98,12 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     win10_init();
     early_init(0, NULL);  /* Change as needed to support CRASHREPORT */
 
+    /* emergency IO: panic()より前に必ず設定しておく */
+    windowprocs.win_raw_print = mswin_raw_print;
+    windowprocs.win_raw_print_bold = mswin_raw_print_bold;
+    windowprocs.win_nhgetch = mswin_nhgetch;
+    windowprocs.win_wait_synch = mswin_wait_synch;
+
     /* init application structure */
     _nethack_app.hApp = hInstance;
     _nethack_app.hAccelTable =
@@ -190,18 +196,19 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     argv[0] = strdup(NH_W2A(wbuf, buf, BUFSZ));
 
     if (argc == 2) {
-        TCHAR *savefile = strdup(argv[1]);
-        TCHAR *name;
-        for (p = savefile; *p && *p != '-'; p++)
+        char *savefile = strdup(argv[1]);
+        char *name;
+        char *dot;
+        for (name = savefile; *name && *name != '-'; name++)
             ;
-        if (*p) {
+        if (*name) {
             /* we found a '-' */
-            name = p + 1;
-            for (p = name; *p && *p != '.'; p++)
+            name = name + 1;
+            for (dot = name; *dot && *dot != '.'; dot++)
                 ;
-            if (*p) {
-                if (strcmp(p + 1, "NetHack-saved-game") == 0) {
-                    *p = '\0';
+            if (*dot) {
+                if (strcmp(dot + 1, "NetHack-saved-game") == 0) {
+                    *dot = '\0';
                     argv[1] = strdup("-u");
                     argv[2] = strdup(name);
                     argc = 3;
@@ -211,11 +218,6 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
         free(savefile);
     }
     GUILaunched = 1;
-    /* emergency IO */
-    windowprocs.win_raw_print = mswin_raw_print;
-    windowprocs.win_raw_print_bold = mswin_raw_print_bold;
-    windowprocs.win_nhgetch = mswin_nhgetch;
-    windowprocs.win_wait_synch = mswin_wait_synch;
 
     /* let nethackw_main do the argument processing */
     nethackw_main(argc, argv);
@@ -327,7 +329,7 @@ GetComCtlVersion(LPDWORD pdwMajor, LPDWORD pdwMinor)
     function a version marker in itself.
     */
     pDllGetVersion =
-        (DLLGETVERSIONPROC) GetProcAddress(hComCtl, TEXT("DllGetVersion"));
+        (DLLGETVERSIONPROC) GetProcAddress(hComCtl, "DllGetVersion");
     if (pDllGetVersion) {
         DLLVERSIONINFO dvi;
         ZeroMemory(&dvi, sizeof(dvi));

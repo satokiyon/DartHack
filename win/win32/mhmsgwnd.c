@@ -107,7 +107,7 @@ mswin_init_message_window(void)
         panic("Cannot create message window");
 
     /* Set window caption */
-    SetWindowText(ret, "Messages");
+    SetWindowText(ret, TEXT("Messages"));
 
     mswin_apply_window_style(ret);
 
@@ -826,9 +826,12 @@ can_append_text(HWND hWnd, int attr, const char *text)
     draw_rt.left += LINE_PADDING_LEFT(data);
     draw_rt.right -= LINE_PADDING_RIGHT(data);
     draw_rt.bottom = draw_rt.top; /* we only need width for the DrawText */
-    DrawText(hdc, tmptext, strlen(tmptext), &draw_rt,
-             DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
-
+    {
+        TCHAR wtmptext[MAXWINDOWTEXT + 1];
+        NH_A2W(tmptext, wtmptext, SIZE(wtmptext));
+        DrawText(hdc, wtmptext, _tcslen(wtmptext), &draw_rt,
+                 DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
+    }
     /* we will check against 1.5 of the font size in order to determine
        if the text is single-line or not - just to be on the safe size */
     retval = (draw_rt.bottom - draw_rt.top) < (data->yChar + data->yChar / 2);
@@ -882,9 +885,10 @@ more_prompt_check(HWND hWnd)
         if (i == 0)
             strcat(tmptext, MORE);
 
-        remaining_height -=
-            DrawText(hdc, tmptext, strlen(tmptext), &draw_rt,
-                     DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
+        TCHAR wtmptext[MAXWINDOWTEXT + 1];
+        NH_A2W(tmptext, wtmptext, SIZE(wtmptext));
+        DrawText(hdc, wtmptext, _tcslen(wtmptext), &draw_rt,
+                 DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
         if (remaining_height <= 0)
             break;
     }

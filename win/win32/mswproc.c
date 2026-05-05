@@ -357,8 +357,10 @@ prompt_for_player_selection(void)
 
         /* tty_putstr(BASE_WINDOW, 0, ""); */
         /* echoline = wins[BASE_WINDOW]->cury; */
-        box_result = NHMessageBox(NULL, prompt, MB_YESNOCANCEL | MB_DEFBUTTON1
-                                                    | MB_ICONQUESTION);
+        TCHAR wprompt[QBUFSZ];
+        box_result = NHMessageBox(NULL, NH_A2W(prompt, wprompt, SIZE(wprompt)),
+                                  MB_YESNOCANCEL | MB_DEFBUTTON1
+                                      | MB_ICONQUESTION);
         pick4u =
             (box_result == IDYES) ? 'y' : (box_result == IDNO) ? 'n' : '\033';
         /* tty_putstr(BASE_WINDOW, 0, prompt); */
@@ -1565,14 +1567,16 @@ mswin_yn_function(const char *question, const char *choices, char def)
         char *text =
             realloc(strdup(GetNHApp()->saved_text),
                     strlen(question) + strlen(GetNHApp()->saved_text) + 1);
+        TCHAR wprompt[BUFSZ];
         DWORD box_result;
         strcat(text, question);
         box_result =
-            NHMessageBox(NULL, NH_W2A(text, message, sizeof(message)),
+            NHMessageBox(NULL, NH_A2W(text, wprompt, BUFSZ),
                          MB_ICONQUESTION | MB_YESNOCANCEL
                              | ((def == 'y') ? MB_DEFBUTTON1
                                              : (def == 'n') ? MB_DEFBUTTON2
                                                             : MB_DEFBUTTON3));
+
         free(text);
         GetNHApp()->saved_text = strdup("");
         return box_result == IDYES ? 'y' : box_result == IDNO ? 'n' : '\033';
@@ -1607,7 +1611,7 @@ mswin_yn_function(const char *question, const char *choices, char def)
                 (WPARAM) MSNH_MSG_CARET, (LPARAM) &createcaret);
 
     mswin_clear_nhwindow(WIN_MESSAGE);
-    mswin_putstr(WIN_MESSAGE, ATR_BOLD, message);
+    mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, message, 0);
 
     /* Only here if main window is not present */
     ch = 0;
@@ -1767,7 +1771,8 @@ mswin_getlin(const char *question, char *input)
                         len--;
                     input[len] = '\0';
                 } else if (len>=(BUFSZ-1)) {
-                    PlaySound((LPCSTR)SND_ALIAS_SYSTEMEXCLAMATION, NULL, SND_ALIAS_ID|SND_ASYNC);
+                    PlaySound(TEXT("SystemExclamation"), NULL,
+                              SND_ALIAS | SND_ASYNC);
                 } else {
                     input[len++] = c;
                     input[len] = '\0';
@@ -2364,47 +2369,47 @@ logDebug(const char *fmt, ...)
 #endif
 
 /* Reading and writing settings from the registry. */
-#define CATEGORYKEY "Software"
-#define COMPANYKEY "NetHack"
-#define PRODUCTKEY "NetHack 5.0.0"
-#define SETTINGSKEY "Settings"
-#define MAINSHOWSTATEKEY "MainShowState"
-#define MAINMINXKEY "MainMinX"
-#define MAINMINYKEY "MainMinY"
-#define MAINMAXXKEY "MainMaxX"
-#define MAINMAXYKEY "MainMaxY"
-#define MAINLEFTKEY "MainLeft"
-#define MAINRIGHTKEY "MainRight"
-#define MAINTOPKEY "MainTop"
-#define MAINBOTTOMKEY "MainBottom"
-#define MAINAUTOLAYOUT "AutoLayout"
-#define MAPLEFT "MapLeft"
-#define MAPRIGHT "MapRight"
-#define MAPTOP "MapTop"
-#define MAPBOTTOM "MapBottom"
-#define MSGLEFT "MsgLeft"
-#define MSGRIGHT "MsgRight"
-#define MSGTOP "MsgTop"
-#define MSGBOTTOM "MsgBottom"
-#define STATUSLEFT "StatusLeft"
-#define STATUSRIGHT "StatusRight"
-#define STATUSTOP "StatusTop"
-#define STATUSBOTTOM "StatusBottom"
-#define MENULEFT "MenuLeft"
-#define MENURIGHT "MenuRight"
-#define MENUTOP "MenuTop"
-#define MENUBOTTOM "MenuBottom"
-#define TEXTLEFT "TextLeft"
-#define TEXTRIGHT "TextRight"
-#define TEXTTOP "TextTop"
-#define TEXTBOTTOM "TextBottom"
-#define INVENTLEFT "InventLeft"
-#define INVENTRIGHT "InventRight"
-#define INVENTTOP "InventTop"
-#define INVENTBOTTOM "InventBottom"
+#define CATEGORYKEY TEXT("Software")
+#define COMPANYKEY TEXT("NetHack")
+#define PRODUCTKEY TEXT("NetHack 5.0.0")
+#define SETTINGSKEY TEXT("Settings")
+#define MAINSHOWSTATEKEY TEXT("MainShowState")
+#define MAINMINXKEY TEXT("MainMinX")
+#define MAINMINYKEY TEXT("MainMinY")
+#define MAINMAXXKEY TEXT("MainMaxX")
+#define MAINMAXYKEY TEXT("MainMaxY")
+#define MAINLEFTKEY TEXT("MainLeft")
+#define MAINRIGHTKEY TEXT("MainRight")
+#define MAINTOPKEY TEXT("MainTop")
+#define MAINBOTTOMKEY TEXT("MainBottom")
+#define MAINAUTOLAYOUT TEXT("AutoLayout")
+#define MAPLEFT TEXT("MapLeft")
+#define MAPRIGHT TEXT("MapRight")
+#define MAPTOP TEXT("MapTop")
+#define MAPBOTTOM TEXT("MapBottom")
+#define MSGLEFT TEXT("MsgLeft")
+#define MSGRIGHT TEXT("MsgRight")
+#define MSGTOP TEXT("MsgTop")
+#define MSGBOTTOM TEXT("MsgBottom")
+#define STATUSLEFT TEXT("StatusLeft")
+#define STATUSRIGHT TEXT("StatusRight")
+#define STATUSTOP TEXT("StatusTop")
+#define STATUSBOTTOM TEXT("StatusBottom")
+#define MENULEFT TEXT("MenuLeft")
+#define MENURIGHT TEXT("MenuRight")
+#define MENUTOP TEXT("MenuTop")
+#define MENUBOTTOM TEXT("MenuBottom")
+#define TEXTLEFT TEXT("TextLeft")
+#define TEXTRIGHT TEXT("TextRight")
+#define TEXTTOP TEXT("TextTop")
+#define TEXTBOTTOM TEXT("TextBottom")
+#define INVENTLEFT TEXT("InventLeft")
+#define INVENTRIGHT TEXT("InventRight")
+#define INVENTTOP TEXT("InventTop")
+#define INVENTBOTTOM TEXT("InventBottom")
 
 /* #define all the subkeys here */
-#define INTFKEY "Interface"
+#define INTFKEY TEXT("Interface")
 
 void
 mswin_read_reg(void)
@@ -2412,7 +2417,7 @@ mswin_read_reg(void)
     HKEY key;
     DWORD size;
     DWORD safe_buf;
-    char keystring[MAX_PATH];
+    TCHAR keystring[MAX_PATH];
     int i;
     COLORREF default_mapcolors[CLR_MAX] = {
         RGB(0x55, 0x55, 0x55), /* CLR_BLACK */
@@ -2433,8 +2438,8 @@ mswin_read_reg(void)
         RGB(0xFF, 0xFF, 0xFF)  /* CLR_WHITE */
     };
 
-    sprintf(keystring, "%s\\%s\\%s\\%s", CATEGORYKEY, COMPANYKEY, PRODUCTKEY,
-            SETTINGSKEY);
+    _stprintf(keystring, TEXT("%s\\%s\\%s\\%s"), CATEGORYKEY, COMPANYKEY,
+              PRODUCTKEY, SETTINGSKEY);
 
     /* Set the defaults here. The very first time the app is started, nothing
        is
@@ -2499,9 +2504,10 @@ mswin_read_reg(void)
 
     for (i = 0; i < CLR_MAX; i++) {
         COLORREF cl;
-        char mapcolorkey[64];
-        sprintf(mapcolorkey, "MapColor%02d", i);
-        if (RegQueryValueEx(key, mapcolorkey, NULL, NULL, (BYTE *)&cl, &size) == ERROR_SUCCESS)
+        TCHAR mapcolorkey[64];
+        _stprintf(mapcolorkey, TEXT("MapColor%02d"), i);
+        if (RegQueryValueEx(key, mapcolorkey, NULL, NULL, (BYTE *)&cl, &size)
+            == ERROR_SUCCESS)
             GetNHApp()->regMapColors[i] = cl;
     }
 
@@ -2526,11 +2532,11 @@ mswin_write_reg(void)
     int i;
 
     if (GetNHApp()->saveRegistrySettings) {
-        char keystring[MAX_PATH];
+        TCHAR keystring[MAX_PATH];
         DWORD safe_buf;
 
-        sprintf(keystring, "%s\\%s\\%s\\%s", CATEGORYKEY, COMPANYKEY,
-                PRODUCTKEY, SETTINGSKEY);
+        _stprintf(keystring, TEXT("%s\\%s\\%s\\%s"), CATEGORYKEY, COMPANYKEY,
+                  PRODUCTKEY, SETTINGSKEY);
 
         if (RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_WRITE, &key)
             != ERROR_SUCCESS) {
@@ -2587,9 +2593,10 @@ mswin_write_reg(void)
 
         for (i = 0; i < CLR_MAX; i++) {
             COLORREF cl = GetNHApp()->regMapColors[i];
-            char mapcolorkey[64];
-            sprintf(mapcolorkey, "MapColor%02d", i);
-            RegSetValueEx(key, mapcolorkey, 0, REG_DWORD, (BYTE *)&cl, sizeof(DWORD));
+            TCHAR mapcolorkey[64];
+            _stprintf(mapcolorkey, TEXT("MapColor%02d"), i);
+            RegSetValueEx(key, mapcolorkey, 0, REG_DWORD, (BYTE *)&cl,
+                          sizeof(DWORD));
         }
 
         RegCloseKey(key);
@@ -2599,20 +2606,21 @@ mswin_write_reg(void)
 void
 mswin_destroy_reg(void)
 {
-    char keystring[MAX_PATH];
+    TCHAR keystring[MAX_PATH];
     HKEY key;
     DWORD nrsubkeys;
 
     /* Delete keys one by one, as NT does not delete trees */
-    sprintf(keystring, "%s\\%s\\%s\\%s", CATEGORYKEY, COMPANYKEY, PRODUCTKEY,
-            SETTINGSKEY);
+    _stprintf(keystring, TEXT("%s\\%s\\%s\\%s"), CATEGORYKEY, COMPANYKEY,
+              PRODUCTKEY, SETTINGSKEY);
     RegDeleteKey(HKEY_CURRENT_USER, keystring);
-    sprintf(keystring, "%s\\%s\\%s", CATEGORYKEY, COMPANYKEY, PRODUCTKEY);
+    _stprintf(keystring, TEXT("%s\\%s\\%s"), CATEGORYKEY, COMPANYKEY,
+              PRODUCTKEY);
     RegDeleteKey(HKEY_CURRENT_USER, keystring);
     /* The company key will also contain information about newer versions
        of nethack (e.g. a subkey called NetHack 4.0), so only delete that
        if it's empty now. */
-    sprintf(keystring, "%s\\%s", CATEGORYKEY, COMPANYKEY);
+    _stprintf(keystring, TEXT("%s\\%s"), CATEGORYKEY, COMPANYKEY);
     /* If we cannot open it, we probably cannot delete it either... Just
        go on and see what happens. */
     RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_READ, &key);
@@ -2843,8 +2851,8 @@ int
 NHMessageBox(HWND hWnd, LPCTSTR text, UINT type)
 {
     TCHAR title[MAX_LOADSTRING];
-    if (program_state.exiting && !strcmp(text, "\n"))
-        text = "Press Enter to exit";
+    if (program_state.exiting && !_tcscmp(text, TEXT("\n")))
+        text = TEXT("Press Enter to exit");
 
     LoadString(GetNHApp()->hApp, IDS_APP_TITLE_SHORT, title, MAX_LOADSTRING);
 
@@ -3021,7 +3029,6 @@ mswin_status_enablefield(int fieldidx, const char *nm, const char *fmt,
     if (field != NULL) {
         field->format = fmt;
         field->space_in_front = (fmt[0] == ' ');
-        if (field->space_in_front) field->format++;
         field->name = nm;
         field->enabled = enable;
 
@@ -3099,7 +3106,7 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percent, int color, u
                         BL_MASK_LEV             0x00000400L
                         BL_MASK_FLY             0x00000800L
                         BL_MASK_RIDE            0x00001000L
-                -- The value passed for BL_GOLD includes an encoded leading
+                -- The value passed for the BL_GOLD includes an encoded leading
                    symbol for GOLD "\GXXXXNNNN:nnn". If window port needs
                    textual gold amount without the leading "$:" the port will
                    have to skip past ':' in passed "ptr" for the BL_GOLD case.
