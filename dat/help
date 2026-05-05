@@ -1,19 +1,20 @@
-        Welcome to NetHack!                ( description of version 3.6 )
+File: ..\..\..\dat\help
+````````
+        NetHack へようこそ！            （バージョン 3.6 の説明）
 
-        NetHack is a Dungeons and Dragons like game where you (the adventurer)
-descend into the depths of the dungeon in search of the Amulet of Yendor,
-reputed to be hidden somewhere below the twentieth level.  You begin your
-adventure with a pet that can help you in many ways, and can be trained
-to do all sorts of things.  On the way you will find useful (or useless)
-items, quite possibly with magic properties, and assorted monsters.  You can
-attack a monster by trying to move onto the space a monster is on (but often
-it is much wiser to leave it alone).
+        NetHack は、あなた（冒険者）がイェンダーの魔除けを求めて
+ダンジョン深部へ潜っていく、Dungeons and Dragons 風のゲームです。
+魔除けは 20 階より下のどこかに隠されていると言われています。
+冒険は、さまざまな場面で助けてくれるペットとともに始まります。
+道中では便利な（あるいは役に立たない）アイテムや、魔法の性質を
+持つ品、そして多種多様なモンスターに出会います。モンスターのいる
+マスへ移動しようとすると攻撃しますが、状況によっては戦わずに
+やり過ごすほうが賢いこともあります。
 
-        Unlike most adventure games, which give you a verbal description of
-your location, NetHack gives you a visual image of the dungeon level you are
-on.
+        多くのアドベンチャーゲームは現在地を文章で説明しますが、
+NetHack では現在いる階層の見た目が画面に表示されます。
 
-        NetHack uses the following symbols:
+        NetHack では次の記号が使われます：
 
         - and |  The walls of a room, possibly also open doors or a grave.
         .        The floor of a room or a doorway.
