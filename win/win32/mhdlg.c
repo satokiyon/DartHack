@@ -17,6 +17,62 @@ void get_rect_size(RECT *rect, SIZE *size);
 void center_dialog(HWND dialog);
 void size_dialog(HWND dialog, SIZE new_client_size);
 
+static LPCWSTR
+plsel_localize_role(const char *role)
+{
+    if (!role)
+        return NULL;
+    if (!strcmp(role, "Archeologist"))
+        return L"\u8003\u53E4\u5B66\u8005";
+    if (!strcmp(role, "Barbarian"))
+        return L"\u91CE\u86EE\u4EBA";
+    if (!strcmp(role, "Caveman"))
+        return L"\u6D1E\u7A9F\u4EBA";
+    if (!strcmp(role, "Cavewoman"))
+        return L"\u6D1E\u7A9F\u5973\u6027";
+    if (!strcmp(role, "Healer"))
+        return L"\u7662\u3057\u624B";
+    if (!strcmp(role, "Knight"))
+        return L"\u9A0E\u58EB";
+    if (!strcmp(role, "Monk"))
+        return L"\u4FEE\u9053\u50E7";
+    if (!strcmp(role, "Priest"))
+        return L"\u53F8\u796D";
+    if (!strcmp(role, "Priestess"))
+        return L"\u5973\u53F8\u796D";
+    if (!strcmp(role, "Ranger"))
+        return L"\u91CE\u4F0F";
+    if (!strcmp(role, "Rogue"))
+        return L"\u76D7\u8CCA";
+    if (!strcmp(role, "Samurai"))
+        return L"\u4F8D";
+    if (!strcmp(role, "Tourist"))
+        return L"\u65C5\u884C\u8005";
+    if (!strcmp(role, "Valkyrie"))
+        return L"\u30EF\u30EB\u30AD\u30E5\u30FC\u30EC";
+    if (!strcmp(role, "Wizard"))
+        return L"\u9B54\u8853\u5E2B";
+    return NULL;
+}
+
+static LPCWSTR
+plsel_localize_race(const char *race)
+{
+    if (!race)
+        return NULL;
+    if (!strcmp(race, "human"))
+        return L"\u4EBA\u9593";
+    if (!strcmp(race, "elf"))
+        return L"\u30A8\u30EB\u30D5";
+    if (!strcmp(race, "dwarf"))
+        return L"\u30C9\u30EF\u30FC\u30D5";
+    if (!strcmp(race, "gnome"))
+        return L"\u30CE\u30FC\u30E0";
+    if (!strcmp(race, "orc"))
+        return L"\u30AA\u30FC\u30AF";
+    return NULL;
+}
+
 /*---------------------------------------------------------------*/
 /* data for getlin dialog */
 struct getlin_data {
@@ -999,6 +1055,8 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     int i = lpdis->itemID;
 
     const char * string;
+    LPCWSTR localized = NULL;
+    WCHAR wbuf[BUFSZ];
 
     boolean ok = TRUE;
     boolean selected;
@@ -1008,11 +1066,13 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
             string = roles[i].name.f;
         else
             string = roles[i].name.m;
+        localized = plsel_localize_role(string);
         selected = (flags.initrole == i);
     } else {
         assert(wParam == IDC_PLSEL_RACE_LIST);
         ok = ok_race(flags.initrole, i, ROLE_RANDOM, ROLE_RANDOM);
         string = races[i].noun;
+        localized = plsel_localize_race(string);
         selected = (flags.initrace == i);
     }
 
@@ -1034,8 +1094,13 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     FillRect(lpdis->hDC, &lpdis->rcItem, brush);
     RECT rect = lpdis->rcItem;
     rect.left += 5;
-    DrawTextA(lpdis->hDC, string, strlen(string), &rect,
-        DT_LEFT | DT_SINGLELINE | DT_VCENTER);
+
+    if (localized)
+        DrawTextW(lpdis->hDC, localized, (int) wcslen(localized), &rect,
+                  DT_LEFT | DT_SINGLELINE | DT_VCENTER);
+    else
+        DrawTextW(lpdis->hDC, NH_A2W(string, wbuf, BUFSZ), (int) wcslen(wbuf),
+                  &rect, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
 
     if (data->focus == control) {
         if (lpdis->itemState & LVIS_FOCUSED) {
