@@ -12,6 +12,7 @@ PNHWinApp GetNHApp(void);
 
 typedef struct mswin_nethack_text_window {
     TCHAR *window_text;
+    HFONT help_font;
 } NHTextWindow, *PNHTextWindow;
 
 static WNDPROC editControlWndProc = 0;
@@ -98,6 +99,19 @@ NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
 
         SendMessage(control, WM_SETFONT, (WPARAM) font->hFont, 0);
+        {
+            LOGFONT lf;
+            ZeroMemory(&lf, sizeof(lf));
+            if (GetObject(font->hFont, sizeof(lf), &lf)) {
+                lf.lfPitchAndFamily = FIXED_PITCH | FF_MODERN;
+                lf.lfFaceName[0] = 0;
+                NH_A2W("MS Gothic", lf.lfFaceName, LF_FACESIZE);
+                data->help_font = CreateFontIndirect(&lf);
+                if (data->help_font)
+                    SendMessage(control, WM_SETFONT, (WPARAM) data->help_font,
+                                0);
+            }
+        }
         ReleaseDC(control, hdc);
 
         /* subclass edit control */
@@ -173,6 +187,8 @@ NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (data) {
             if (data->window_text)
                 free(data->window_text);
+            if (data->help_font)
+                DeleteObject(data->help_font);
             free(data);
             SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) 0);
             windowdata[NHW_TEXT].address = 0;
