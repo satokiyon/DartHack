@@ -244,7 +244,7 @@ extern COLORREF message_fg_color;
 #define SYSCLR_TO_BRUSH(x) ((HBRUSH)(((intptr_t) x) + 1))
 
 /* unicode stuff */
-#define NH_CODEPAGE (SYMHANDLING(H_IBM) ? GetOEMCP() : GetACP())
+#define NH_CODEPAGE CP_UTF8
 #ifdef _UNICODE
 #define nh_stprintf swprintf
 #define NH_W2A(w, a, cb) \

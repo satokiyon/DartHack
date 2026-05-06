@@ -1,306 +1,306 @@
-NetHack �����t�@�C���i�����[�X 5.0�j
+NetHack 履歴ファイル（リリース 5.0）
 
-����A�薽�̎҂�B���ꂪ NetHack �̋N���ł���c�c
+見よ、定命の者よ。これが NetHack の起源である……
 
-Jay Fenlason �� Kenny Woodland�AMike Thome�AJon Payne �̋��͂𓾂āA
-�I���W�i���� Hack ���쐬�����B
+Jay Fenlason は Kenny Woodland、Mike Thome、Jon Payne の協力を得て、
+オリジナルの Hack を作成した。
 
-Andries Brouwer �� Stichting Mathematisch Centrum
-�i�� Centrum Wiskunde & Informatica�j�ݐЎ��ɑ�K�͂ȏ����������s���A
-Hack ��傫���قȂ�Q�[���֕ϖe�������B�ނ� UNIX(tm) �p�Ƃ���
-Hack �\�[�X�� Usenet �j���[�X�O���[�v net.sources
-�i��� comp.sources�j�֓��e���A1984 �N 12 ���� 1.0�A
-������ 1.0.1�A1.0.2�A�ŏI�I�� 1985 �N 7 ���� 1.0.3 �����J�����B
-�c�_�p�� net.games.hack�i��� rec.games.hack�A����Ɍ��
-rec.games.roguelike.nethack�j�����ꂽ�B
+Andries Brouwer は Stichting Mathematisch Centrum
+（現 Centrum Wiskunde & Informatica）在籍時に大規模な書き直しを行い、
+Hack を大きく異なるゲームへ変貌させた。彼は UNIX(tm) 用として
+Hack ソースを Usenet ニュースグループ net.sources
+（後の comp.sources）へ投稿し、1984 年 12 月に 1.0、
+続いて 1.0.1、1.0.2、最終的に 1985 年 7 月に 1.0.3 を公開した。
+議論用に net.games.hack（後の rec.games.hack、さらに後に
+rec.games.roguelike.nethack）が作られた。
 
-Don G. Kneller �� Hack 1.0.3 �� Microsoft(tm) C / MS-DOS(tm) �ֈڐA���A
-PC HACK 1.01e ���쐬�B1.03g �ł� DEC Rainbow �O���t�B�b�N�X�Ή���ǉ����A
-����ɏ��Ȃ��Ƃ� 4 �̔Łi3.0, 3.2, 3.51, 3.6�j���쐬����
-�i�����͋� Hack ���̔Ŕԍ��ł���ANetHack �̔Ŕԍ��ł͂Ȃ��j�B
+Don G. Kneller は Hack 1.0.3 を Microsoft(tm) C / MS-DOS(tm) へ移植し、
+PC HACK 1.01e を作成。1.03g では DEC Rainbow グラフィックス対応を追加し、
+さらに少なくとも 4 つの版（3.0, 3.2, 3.51, 3.6）を作成した
+（これらは旧 Hack 側の版番号であり、NetHack の版番号ではない）。
 
-R. Black �� PC HACK 3.51 �� Lattice(tm) C �� Atari 520/1040ST �ֈڐA���A
-ST Hack 1.03 ���쐬�����B
+R. Black は PC HACK 3.51 を Lattice(tm) C と Atari 520/1040ST へ移植し、
+ST Hack 1.03 を作成した。
 
-Mike Stephenson �͂���番��ł��ē������A�����̒ǉ��@�\����荞�݁A
-1987 �N�� NetHack 1.4 �����J�����B���̌�A�c��ȋ��͎҂ƂƂ���
-1.4 �̋����ƃf�o�b�O��i�߁A2.2 �� 2.3 �����J�����BHack ���l�A
-�\�[�X�� Usenet ���e�Ŕz�z����A�j���[�X�O���[�v������������
-ftp �� uucp �o�R�̊e��A�[�J�C�u�œ���\�������B
+Mike Stephenson はこれら分岐版を再統合し、多くの追加機能を取り込み、
+1987 年に NetHack 1.4 を公開した。その後、膨大な協力者とともに
+1.4 の強化とデバッグを進め、2.2 と 2.3 を公開した。Hack 同様、
+ソースは Usenet 投稿で配布され、ニュースグループから消えた後も
+ftp や uucp 経由の各種アーカイブで入手可能だった。
 
-���̌� Mike �͑�K�͂ȍĐ݌v���哱���AKen Arromdee�A
-Jean-Christophe Collet�ASteve Creps�AEric Hendrickson�A
-Izchak Miller�AEric S. Raymond�AJohn Rupley�AMike Threepoint�A
-Janet Walz �ƂƂ��� NetHack 3.0c �������������B
+その後 Mike は大規模な再設計を主導し、Ken Arromdee、
+Jean-Christophe Collet、Steve Creps、Eric Hendrickson、
+Izchak Miller、Eric S. Raymond、John Rupley、Mike Threepoint、
+Janet Walz とともに NetHack 3.0c を完成させた。
 
-NetHack 3.0 �� Eric R. Smith �ɂ�� Atari �ցA
-Timo Hakulinen �ɂ�� OS/2 �ցADavid Gentzel �ɂ�� VMS �ֈڐA���ꂽ�B
-���� 3 ���� Kevin Darcy �͌�ɊJ���`�[���։����A3.0 �n��
-�㑱�����𐶂ݏo�����B
+NetHack 3.0 は Eric R. Smith により Atari へ、
+Timo Hakulinen により OS/2 へ、David Gentzel により VMS へ移植された。
+この 3 名と Kevin Darcy は後に開発チームへ加わり、3.0 系の
+後続改訂を生み出した。
 
-Olaf Seibert �� NetHack 2.3 �� 3.0 �� Amiga �ֈڐA�����B
-Norm Meluch�AStephen Spackman�APierre Martineau ��
-PC NetHack 3.0 �̃I�[�o�[���C�R�[�h��݌v�B
-Johnny Lee �� NetHack 3.0 �� Macintosh �ֈڐA�����B
-�ނ�͑��� Dungeoneers �ƂƂ��� PC / Macintosh / Amiga �e�ڐA�ł�
-3.0 ����܂ŋ������������B
+Olaf Seibert は NetHack 2.3 と 3.0 を Amiga へ移植した。
+Norm Meluch、Stephen Spackman、Pierre Martineau は
+PC NetHack 3.0 のオーバーレイコードを設計。
+Johnny Lee は NetHack 3.0 を Macintosh へ移植した。
+彼らは他の Dungeoneers とともに PC / Macintosh / Amiga 各移植版を
+3.0 後期まで強化し続けた。
 
-3.0 �͔�r�I�Z���Ԃ� 10 �i�K�� patch-level �������d�˂��B
-������ 3.0a?3.0j�A3.0 patchlevel 1?10�A3.0pl1?pl10 �ƌĂ΂�A
-3.0.0 / 3.0.1 �̂悤�� 3 �����ԍ��� 3.1.0 ����g���n�߂��B
+3.0 は比較的短期間で 10 段階の patch-level 改訂を重ねた。
+当時は 3.0a?3.0j、3.0 patchlevel 1?10、3.0pl1?pl10 と呼ばれ、
+3.0.0 / 3.0.1 のような 3 成分番号は 3.1.0 から使われ始めた。
 
-Mike Stephenson �̎哱�AIzchak Miller �� Janet Walz �̒����̉��A
-Ken Arromdee�ADavid Cohrs�AJean-Christophe Collet�AKevin Darcy�A
-Matt Day�ATimo Hakulinen�ASteve Linhart�ADean Luick�APat Rankin�A
-Eric Raymond�AEric Smith ���܂ފJ���`�[���� 3.0 �̑�_�ȉ����ɒ���B
-�݌v�č\�z�Ǝ�v�R�[�h�̍Ď������s���A�����_���W�����A�V�\�������A
-�ʃN�G�X�g�A�V�G���h�Q�[���Ȃǂ�ǉ����� NetHack 3.1 �����A
-3.1.0 �� 1993 �N 1 ���Ɍ��J���ꂽ�B
+Mike Stephenson の主導、Izchak Miller と Janet Walz の調整の下、
+Ken Arromdee、David Cohrs、Jean-Christophe Collet、Kevin Darcy、
+Matt Day、Timo Hakulinen、Steve Linhart、Dean Luick、Pat Rankin、
+Eric Raymond、Eric Smith を含む開発チームは 3.0 の大胆な改訂に着手。
+設計再構築と主要コードの再実装を行い、複数ダンジョン、新表示方式、
+個別クエスト、新エンドゲームなどを追加して NetHack 3.1 を作り、
+3.1.0 は 1993 年 1 月に公開された。
 
-Ken Lorber�AGregg Wonderly�AGreg Olson �� Richard Addison�A
-Mike Passaretti�AOlaf Seibert �̋��͂𓾂� Amiga �� 3.1 ���J���B
+Ken Lorber、Gregg Wonderly、Greg Olson は Richard Addison、
+Mike Passaretti、Olaf Seibert の協力を得て Amiga 版 3.1 を開発。
 
-Norm Meluch �� Kevin Smolkowski �� Carl Schelin�A
-Stephen Spackman�ASteve VanDevender�APaul Winner �̋��͂𓾂�
-PC �� 3.1 ���ڐA�B
+Norm Meluch と Kevin Smolkowski は Carl Schelin、
+Stephen Spackman、Steve VanDevender、Paul Winner の協力を得て
+PC 版 3.1 を移植。
 
-Jon W{tte �� Hao-yang Wang �� Ross Brown�AMike Engber�A
-David Hairston�AMichael Hamel�AJonathan Handler�AJohnny Lee�A
-Tim Lennan�ARob Menke�AAndy Swanson �̋��͂𓾂�
-Macintosh �� 3.1�iMPW �����j���J���B���̐��ʂ���� Bart House ��
-Think C �ł�ǉ������B
+Jon W{tte と Hao-yang Wang は Ross Brown、Mike Engber、
+David Hairston、Michael Hamel、Jonathan Handler、Johnny Lee、
+Tim Lennan、Rob Menke、Andy Swanson の協力を得て
+Macintosh 版 3.1（MPW 向け）を開発。その成果を基に Bart House が
+Think C 版を追加した。
 
-Timo Hakulinen �� OS/2 �ցAEric Smith �� Atari �� 3.1 ���ڐA�B
-Pat Rankin �� Joshua Delahunty �̋��͂𓾂� VMS �ł�S���B
-Michael Allison �� Windows NT �ֈڐA�����B
+Timo Hakulinen は OS/2 へ、Eric Smith は Atari へ 3.1 を移植。
+Pat Rankin は Joshua Delahunty の協力を得て VMS 版を担当。
+Michael Allison は Windows NT へ移植した。
 
-Dean Luick �� David Cohrs �̋��͂𓾂� X11 �� 3.1 ���J���B
-�����}�b�v�̓e�L�X�g�`�悾�������Anh10.bdf �Ƃ����J�X�^�� X11 �t�H���g
-�i�����L���ɏ����ȉ摜�����蓖�Ă�j��C�ӗ��p�ł��A�^�C���̐�삯�ƂȂ����B
-����������͌ʃ����X�^�[/�ʕ��̂ł͂Ȃ��A�N���X�P�ʂ̒u���������B
+Dean Luick は David Cohrs の協力を得て X11 版 3.1 を開発。
+当初マップはテキスト描画だったが、nh10.bdf というカスタム X11 フォント
+（文字記号に小さな画像を割り当てる）を任意利用でき、タイルの先駆けとなった。
+ただしこれは個別モンスター/個別物体ではなく、クラス単位の置換だった。
 
-Warwick Allison �� Atari �����ɃO���t�B�J���\���ł��쐬���A
-���� "icons" �ƌĂ΂ꂽ�摜���ʃ����X�^�[/���̒P�ʂŎ��������B
-�ނ͂�����J���`�[���֒񋟂��A�`�[���͖��̂� "tiles" �ɉ��߂��B
-���̌�@�͑��Q�[���ɂ��L����ANetHack �̃^�C���Ή���
-��ɑ��v���b�g�t�H�[���i���� MS-DOS�A�ŏI�I�� Windows / Qt / X11�j�֊g�債���B
+Warwick Allison は Atari 向けにグラフィカル表示版を作成し、
+当時 "icons" と呼ばれた画像を個別モンスター/物体単位で実装した。
+彼はこれを開発チームへ提供し、チームは名称を "tiles" に改めた。
+この語法は他ゲームにも広がり、NetHack のタイル対応は
+後に他プラットフォーム（当初 MS-DOS、最終的に Windows / Qt / X11）へ拡大した。
 
-3.2 �J���`�[���iMichael Allison�AKen Arromdee�ADavid Cohrs�A
-Jessie Collet�ASteve Creps�AKevin Darcy�ATimo Hakulinen�A
-Steve Linhart�ADean Luick�APat Rankin�AEric Smith�A
-Mike Stephenson�AJanet Walz�APaul Winner�j��
-1996 �N 4 ���� 3.2.0 �����J�B
+3.2 開発チーム（Michael Allison、Ken Arromdee、David Cohrs、
+Jessie Collet、Steve Creps、Kevin Darcy、Timo Hakulinen、
+Steve Linhart、Dean Luick、Pat Rankin、Eric Smith、
+Mike Stephenson、Janet Walz、Paul Winner）は
+1996 年 4 月に 3.2.0 を公開。
 
-3.2 �͊J���`�[������ 10 ���N���L�O����łł���A
-1.3?3.2 �J�����Ԃ�ʂ��A������ 13 ���S���� 3.2 ��ƊJ�n���_��
-�ݐЂ��Ă����B3.1.3 �� 3.2.0 �̊Ԃɑn�݃����o�[ Dr. Izchak Miller ��
-���Ő������A���̔ł͊J���E�ڐA�`�[���ɂ��ނ֕�����ꂽ�B
+3.2 は開発チーム結成 10 周年を記念する版であり、
+1.3?3.2 開発期間を通じ、当初の 13 名全員が 3.2 作業開始時点で
+在籍していた。3.1.3 と 3.2.0 の間に創設メンバー Dr. Izchak Miller が
+癌で逝去し、この版は開発・移植チームにより彼へ捧げられた。
 
-3.2 �͉ߋ��ł����肵�Ă���A�����̃o�O�C���A���p��i�̔r���A
-�Q�[���o�����X�������s��ꂽ�B
+3.2 は過去版より安定しており、多数のバグ修正、悪用手段の排除、
+ゲームバランス調整が行われた。
 
-3.1?3.2 �̊��Ԃɂ͑����̈��D�Ƃ��Ǝ������������A
-�uvariant�v�Ƃ��Č��J�����B
+3.1?3.2 の期間には多くの愛好家が独自改造を加え、
+「variant」として公開した。
 
-Tom Proudfoot �� Yuval Oren �� NetHack++ ���쐬�������A
-C++ �ւ̕ϊ��łƌ�����ꂽ���� NetHack-- �։����B
-�Ɨ��� Stephen White �� NetHack Plus ���쐬�BTom Proudfoot ��
-��� NetHack Plus �� NetHack-- �𓝍����� SLASH ���쐬�B
-Larry Stewart-Zerba �� Warwick Allison �� Wizard Patch ��
-�����V�X�e�������P�BWarwick Allison �� Qt �C���^�[�t�F�[�X�ڐA���s�����B
+Tom Proudfoot と Yuval Oren は NetHack++ を作成したが、
+C++ への変換版と誤解されたため NetHack-- へ改名。
+独立に Stephen White が NetHack Plus を作成。Tom Proudfoot は
+後に NetHack Plus と NetHack-- を統合して SLASH を作成。
+Larry Stewart-Zerba と Warwick Allison は Wizard Patch で
+呪文システムを改善。Warwick Allison は Qt インターフェース移植も行った。
 
-Warren Cheung �� SLASH �� Wizard Patch �𓝍����� Slash'EM ���쐬���A
-Kevin Hugo �̋��͂ŋ@�\��ǉ��BKevin �͌�ɊJ���`�[���֎Q�����A
-���̐��ʂ̑����� 3.3 �֎�荞�񂾁B
+Warren Cheung は SLASH と Wizard Patch を統合して Slash'EM を作成し、
+Kevin Hugo の協力で機能を追加。Kevin は後に開発チームへ参加し、
+その成果の多くを 3.3 へ取り込んだ。
 
-3.2 �n�̍ŏI�X�V�� 3.2.3�i�o�O�C���Łj�ŁA
-2000 �N��蒼�O�� 1999 �N 12 ���� 3.3.0 �Ɠ������J���ꂽ�B
-�V�o�[�W���������݂������߁A3.2.3 �̓\�[�X�p�b�`�݂̂Ŕz�z����A
-�ʏ�̎��s�`���z�z�͍s���Ȃ������B
+3.2 系の最終更新は 3.2.3（バグ修正版）で、
+2000 年問題直前の 1999 年 12 月に 3.3.0 と同時公開された。
+新バージョンが存在したため、3.2.3 はソースパッチのみで配布され、
+通常の実行形式配布は行われなかった。
 
-�i�Â��ł̍ė��p����������l��: 3.2.3 ���O�ɂ� Y2K �o�O������B
-�n�C�X�R�A/���O�̔N�� 2 �������ŁA1999(99) �̎��� 2000 �� 100 �ɂȂ�A
-�o�͂͐������Ă��񐔂�����čēǍ��s�\�ƂȂ�A�X�R�A�o�^��
-�S�[�X�g/�����̍ė��p�Ɏx�Ⴊ�o��B�j
+（古い版の再利用を検討する人へ: 3.2.3 より前には Y2K バグがある。
+ハイスコア/ログの年が 2 桁書式で、1999(99) の次の 2000 が 100 になり、
+出力は成功しても列数がずれて再読込不能となり、スコア登録や
+ゴースト/像名の再利用に支障が出る。）
 
-3.3 �J���`�[���iMichael Allison�AKen Arromdee�ADavid Cohrs�A
-Jessie Collet�ASteve Creps�AKevin Darcy�ATimo Hakulinen�A
-Kevin Hugo�ASteve Linhart�AKen Lorber�ADean Luick�APat Rankin�A
-Eric Smith�AMike Stephenson�AJanet Walz�APaul Winner�j��
-1999 �N 12 ���� 3.3.0�A2000 �N 8 ���� 3.3.1 �����J�B
+3.3 開発チーム（Michael Allison、Ken Arromdee、David Cohrs、
+Jessie Collet、Steve Creps、Kevin Darcy、Timo Hakulinen、
+Kevin Hugo、Steve Linhart、Ken Lorber、Dean Luick、Pat Rankin、
+Eric Smith、Mike Stephenson、Janet Walz、Paul Winner）は
+1999 年 12 月に 3.3.0、2000 年 8 月に 3.3.1 を公開。
 
-3.3 �͑����̏������܂񂾁B�E�ƂƎ푰�𕪗������ŏ��̔łł���A
-Elf �N���X�͔p�~���� Elf �푰�ֈڍs�B�l�Ԃɉ����ăh���[�t�A
-�m�[���A�I�[�N���ǉ�����AMonk �� Ranger ���V�E�ƂƂ��ĎQ�����A
+3.3 は多くの初物を含んだ。職業と種族を分離した最初の版であり、
+Elf クラスは廃止され Elf 種族へ移行。人間に加えてドワーフ、
+ノーム、オークが追加され、Monk と Ranger も新職業として参加し、
 Archeologist/Barbarian/Caveman/Healer/Knight/Priest/Rogue/Samurai/
-Tourist/Valkyrie/Wizard �ƕ��񂾁B�R��V�X�e���������A
-�����ς݃o�O�ꗗ�̌��J Web �T�C�g�����������̔łł���B
-����ł� 3.3 �� 1 �N���ȏ�̈���^�p�ɑς����B
+Tourist/Valkyrie/Wizard と並んだ。騎乗システム初導入、
+発見済みバグ一覧の公開 Web サイト初導入もこの版である。
+それでも 3.3 は 1 年半以上の安定運用に耐えた。
 
-3.4 �J���`�[���͓��� Michael Allison�AKen Arromdee�ADavid Cohrs�A
-Jessie Collet�AKevin Hugo�AKen Lorber�ADean Luick�APat Rankin�A
-Mike Stephenson�AJanet Walz�APaul Winner �ō\������A
-3.4.0�i2002 �N 3 ���j���O�� Warwick Allison ���Q�������B
+3.4 開発チームは当初 Michael Allison、Ken Arromdee、David Cohrs、
+Jessie Collet、Kevin Hugo、Ken Lorber、Dean Luick、Pat Rankin、
+Mike Stephenson、Janet Walz、Paul Winner で構成され、
+3.4.0（2002 年 3 月）直前に Warwick Allison が参加した。
 
-3.3 ���l�A�e��v���b�g�t�H�[���ڐA�Ɩ{�֑̂����̍v�����������B
+3.3 同様、各種プラットフォーム移植と本体へ多くの貢献があった。
 
-Pat Rankin �� VMS �� 3.4 ���ێ��B
+Pat Rankin は VMS 版 3.4 を維持。
 
-Michael Allison �� MS-DOS �� 3.4 ���ێ��B
-Paul Winner �� Yitzhak Sapir �͎x����񋟁B
+Michael Allison は MS-DOS 版 3.4 を維持。
+Paul Winner と Yitzhak Sapir は支援を提供。
 
-Dean Luick�AMark Modrall�AKevin Hugo ��
-Macintosh �� 3.4 ���ێ��E�����B
+Dean Luick、Mark Modrall、Kevin Hugo は
+Macintosh 版 3.4 を維持・強化。
 
-Michael Allison�ADavid Cohrs�AAlex Kompel�ADion Nicolaas�A
-Yitzhak Sapir �� Windows �� 3.4 ���ێ��E�����B
-Alex Kompel �͐V���� Windows �O���t�B�J���C���^�[�t�F�[�X��񋟂��A
-����� 3.4.1 ���� Windows CE �ڐA���s�����B
+Michael Allison、David Cohrs、Alex Kompel、Dion Nicolaas、
+Yitzhak Sapir は Windows 版 3.4 を維持・強化。
+Alex Kompel は新しい Windows グラフィカルインターフェースを提供し、
+さらに 3.4.1 向け Windows CE 移植も行った。
 
-Ron Van Iwaarden �͒��N OS/2 �ł̗B��̃����e�i���������A
-2006 �N�����ɍŌ�� OS/2 �}�V�����̏�B���N NetHack ��
-OS/2 �ő������������тɐ[�����ӂ������B
+Ron Van Iwaarden は長年 OS/2 版の唯一のメンテナだったが、
+2006 年初頭に最後の OS/2 マシンが故障。長年 NetHack を
+OS/2 で存続させた功績に深い感謝を捧げる。
 
-Janne Salmijarvi �� Teemu Suikki �́AJanne �� 3.3.1 ��
-������������AAmiga �� 3.4 ���ێ��E�����B
+Janne Salmijarvi と Teemu Suikki は、Janne が 3.3.1 で
+復活させた後、Amiga 版 3.4 を維持・強化。
 
-Christian "Marvin" Bressler �� 3.3.1 �ŕ�����������A
-Atari �� 3.4 ���ێ��B
+Christian "Marvin" Bressler は 3.3.1 で復活させた後、
+Atari 版 3.4 を維持。
 
-2003 �N 12 ���� 3.4.3 ���J�͒��������[�X�󔒊��̎n�܂�ƂȂ����B
-3.4.3 �͔��Ɉ��肵�Ă���A10 �N�ȏ�ɂ킽��R�~���j�e�B��
-�y���܂ꂽ�B�J���`�[���͂��̊Ԃ����䗠�ŐÂ��ɊJ�����p�����A
-�������ɂ͐V���� variant �������o�ꂵ���B
-��\��Ƃ��� Derek S. Ray �� sporkhack�APatric Mueller �� unnethack�A
-Daniel Thaler �� Alex Smith �n���� nitrohack�A
-Tung Nguyen �� Dynahack ������B�������͌��݂��J���E�ێ�����Ă���B
+2003 年 12 月の 3.4.3 公開は長いリリース空白期の始まりとなった。
+3.4.3 は非常に安定しており、10 年以上にわたりコミュニティに
+楽しまれた。開発チームはその間も舞台裏で静かに開発を継続し、
+同時期には新たな variant も複数登場した。
+代表例として Derek S. Ray の sporkhack、Patric Mueller の unnethack、
+Daniel Thaler と Alex Smith 系統の nitrohack、
+Tung Nguyen の Dynahack がある。いくつかは現在も開発・維持されている。
 
-2014 �N 9 ���A�J�����R�[�h�̒��ԃX�i�b�v�V���b�g�����҂ɂ����J���ꂽ�B
-����͐������J�菇�i�\���ȃf�o�b�O�j���o�Ă��Ȃ��i�s���R�[�h���������߁A
-���Y�X�i�b�v�V���b�g�̔Ŕԍ��͌����łŎg��Ȃ����Ƃ����肳�ꂽ�B
-�����T�C�g nethack.org �ō��m����A
-3.4.4�A3.5�A3.5.0 �͑��݂��Ȃ����Ƃ��������ꂽ�B
+2014 年 9 月、開発中コードの中間スナップショットが他者により公開された。
+これは正式公開手順（十分なデバッグ）を経ていない進行中コードだったため、
+当該スナップショットの版番号は公式版で使わないことが決定された。
+公式サイト nethack.org で告知され、
+3.4.4、3.5、3.5.0 は存在しないことが明示された。
 
-2015 �N 1 ���ANetHack 3.6 �����[�X�������n�܂����B
+2015 年 1 月、NetHack 3.6 リリース準備が始まった。
 
-�ŏI�I�� 3.6.0 �ƂȂ�J�������̃`�[���́AWarwick Allison�A
-Michael Allison�AKen Arromdee�ADavid Cohrs�AJessie Collet�A
-Ken Lorber�ADean Luick�APat Rankin�AMike Stephenson�A
-Janet Walz�APaul Winner �ō\������A2015 �N������
-Sean Hunt�APasi Kallinen�ADerek S. Ray ����������B
+最終的に 3.6.0 となる開発初期のチームは、Warwick Allison、
+Michael Allison、Ken Arromdee、David Cohrs、Jessie Collet、
+Ken Lorber、Dean Luick、Pat Rankin、Mike Stephenson、
+Janet Walz、Paul Winner で構成され、2015 年初頭に
+Sean Hunt、Pasi Kallinen、Derek S. Ray が加わった。
 
-3.6.0 �J���I�Ղɂ́A�Q�[�����̐��X�̃��[���A�Ɗy�����֑傫�ȉe����
-�^������� Terry Pratchett ���������A3.6.0 �ł͔ނւ̒Ǔ��v�f���ǉ����ꂽ�B
+3.6.0 開発終盤には、ゲーム中の数々のユーモアと楽しさへ大きな影響を
+与えた作家 Terry Pratchett が逝去し、3.6.0 では彼への追悼要素が追加された。
 
-3.6.0 �� 2015 �N 12 ���Ɍ��J�B3.4.3 �ȍ~�̊J�����ʂƁA
-������Ă����R�~���j�e�B�p�b�`�̈ꕔ�𓝍����A�����̃o�O�C����
-�ꕔ�R�[�h�č\�����܂񂾁B
+3.6.0 は 2015 年 12 月に公開。3.4.3 以降の開発成果と、
+愛されてきたコミュニティパッチの一部を統合し、多数のバグ修正と
+一部コード再構成を含んだ。
 
-NetHack �J���`�[���ɉ��� Steve VanDevender �� Kevin Smolkowski �́A
-3.6 ���e�� UNIX ���œ��삵������悤�ɂ��AX11 �C���^�[�t�F�[�X���ێ������B
+NetHack 開発チームに加え Steve VanDevender と Kevin Smolkowski は、
+3.6 が各種 UNIX 環境で動作し続けるようにし、X11 インターフェースを維持した。
 
-Ken Lorber�AHaoyang Wang�APat Rankin�ADean Luick ��
-macOS ���� 3.6 �ڐA���ێ��B
+Ken Lorber、Haoyang Wang、Pat Rankin、Dean Luick は
+macOS 向け 3.6 移植を維持。
 
-Michael Allison�ADavid Cohrs�ABart House�APasi Kallinen�A
-Alex Kompel�ADion Nicolaas�ADerek S. Ray�AYitzhak Sapir ��
-Microsoft Windows ���� 3.6 �ڐA���ێ��B
+Michael Allison、David Cohrs、Bart House、Pasi Kallinen、
+Alex Kompel、Dion Nicolaas、Derek S. Ray、Yitzhak Sapir は
+Microsoft Windows 向け 3.6 移植を維持。
 
-Pat Rankin �̓A�N�Z�X����̒��� VMS �ڐA�ێ��ɐs�́B
-Kevin Smolkowski �� OpenVMS �ŐV�Łi���M�� V8.4�j�ɑ΂�
-Alpha / Integrity�iItanium / IA64�j�ōX�V�E���؂��s�����iVAX �͏����j�B
+Pat Rankin はアクセス制約の中で VMS 移植維持に尽力。
+Kevin Smolkowski は OpenVMS 最新版（執筆時 V8.4）に対し
+Alpha / Integrity（Itanium / IA64）で更新・検証を行った（VAX は除く）。
 
-Ray Chason �� 3.6 ���� MS-DOS �ڐA�𕜊������A�K�v�X�V��
-�R�~���j�e�B�֒񋟂����B
+Ray Chason は 3.6 向け MS-DOS 移植を復活させ、必要更新を
+コミュニティへ提供した。
 
-2018 �N 4 �����A3.6.0 �������S���̃o�O�C���ƐV�@�\���܂Ƃ߁A
-3.6.1 �Ƃ��Č��J�B���J���_�̊J���`�[���� Warwick Allison�A
-Michael Allison�AKen Arromdee�ADavid Cohrs�AJessie Collet�A
-Pasi Kallinen�AKen Lorber�ADean Luick�APatric Mueller�APat Rankin�A
-Derek S. Ray�AAlex Smith�AMike Stephenson�AJanet Walz�APaul Winner�B
+2018 年 4 月末、3.6.0 向け数百件のバグ修正と新機能をまとめ、
+3.6.1 として公開。公開時点の開発チームは Warwick Allison、
+Michael Allison、Ken Arromdee、David Cohrs、Jessie Collet、
+Pasi Kallinen、Ken Lorber、Dean Luick、Patric Mueller、Pat Rankin、
+Derek S. Ray、Alex Smith、Mike Stephenson、Janet Walz、Paul Winner。
 
-2019 �N 5 �����{�ɂ́A����� 320 ���̃o�O�C���A�@�\�����A
-�̗p���ꂽ curses �E�B���h�E�|�[�g���܂� 3.6.2 �����J�B
+2019 年 5 月初旬には、さらに 320 件のバグ修正、機能強化、
+採用された curses ウィンドウポートを含む 3.6.2 を公開。
 
-���N�ڐA�`�[���Ƃ��čv�����Ă��� Bart House �� 2019 �N 5 �����{�A
-�����ɊJ���`�[���֎Q���B
+長年移植チームとして貢献してきた Bart House は 2019 年 5 月下旬、
+正式に開発チームへ参加。
 
-3.6.3 �� 2019 �N 12 �� 5 �����J�B3.6.2 �ɑ΂��� 190 �����̃o�O�C�����܂ށB
+3.6.3 は 2019 年 12 月 5 日公開。3.6.2 に対する 190 件超のバグ修正を含む。
 
-3.6.4 �� 2019 �N 12 �� 18 �����J�B�Z�L�����e�B�C���Ə����̃o�O�C�����܂ށB
+3.6.4 は 2019 年 12 月 18 日公開。セキュリティ修正と少数のバグ修正を含む。
 
-3.6.5 �� 2020 �N 1 �� 27 �����J�B�����̃Z�L�����e�B�C����
-�����̃o�O�C�����܂ށB
+3.6.5 は 2020 年 1 月 27 日公開。複数のセキュリティ修正と
+少数のバグ修正を含む。
 
-3.6.6 �� 2020 �N 3 �� 8 �����J�B�Z�L�����e�B�C���ƃo�O�C�����܂ށB
+3.6.6 は 2020 年 3 月 8 日公開。セキュリティ修正とバグ修正を含む。
 
-3.6.7 �� 2023 �N 2 �� 16 �����J�B�Z�L�����e�B�C���ƃo�O�C�����܂ށB
+3.6.7 は 2023 年 2 月 16 日公開。セキュリティ修正とバグ修正を含む。
 
-3.6 �n�̎��ƂȂ郁�W���[�ł̊J���� 2015 �N�A3.6.0 ���J�O��ɊJ�n���ꂽ�B
-���̊J���� 2015?2023 �̊e 3.6 �����[�X�ƕ��s���Čp������A
-2026 �N 4 �����܂ő������B���߂āA�i�s���J���� GitHub ��
-SourceForge �Ō��J���L����ANetHack-3.7 work-in-progress (WIP)
-�̖��̂Ői�߂�ꂽ�i���Ŕԍ��͓������m��j�B
+3.6 系の次となるメジャー版の開発は 2015 年、3.6.0 公開前後に開始された。
+この開発は 2015?2023 の各 3.6 リリースと並行して継続され、
+2026 年 4 月末まで続いた。初めて、進行中開発は GitHub と
+SourceForge で公開共有され、NetHack-3.7 work-in-progress (WIP)
+の名称で進められた（次版番号は当初未確定）。
 
-���J�J���͑����̗��_�Ɖۑ�������炵���B�ύX��V�@�\�͑����Ɋϑ��E��]����A
-���ۂɕp�ɂɍs��ꂽ�BGitHub �� pull request �ɂ�蒼�ڍv�����e�ՂƂȂ�A
-���ɑ����̃o�O���������ꂽ�B���ׂĂ̍v���҂Ɋ��ӂ���B
+公開開発は多くの利点と課題をもたらした。変更や新機能は即座に観測・批評され、
+実際に頻繁に行われた。GitHub の pull request により直接貢献が容易となり、
+非常に多くのバグが解消された。すべての貢献者に感謝する。
 
-2026 �N�����A�J�����������J�����ɏ\�����肵���i�K�ŁA�J���`�[����
-�ύX�̎��Ɨʂ��ĕ]�������B���̌��ʁA���W���[���J�ɒl����Ɣ��f���A
-�Ŕԍ��� 5.0 �Ɍ���B4.0 �Ƃ����ꍇ�Ɋ��� variant �Ɛ�������
-�B�����E�����������Ӑ}���������B
+2026 年初頭、開発が公式公開検討に十分安定した段階で、開発チームは
+変更の質と量を再評価した。その結果、メジャー公開に値すると判断し、
+版番号は 5.0 に決定。4.0 とした場合に既存 variant と生じ得た
+曖昧さ・混乱を避ける意図もあった。
 
-NetHack 5.0.0 �� 2026 �N 5 �� 2 ���Ɍ��J���ꂽ�B
+NetHack 5.0.0 は 2026 年 5 月 2 日に公開された。
 
-NetHack 5.0.0 �̃\�[�X�� C99 �����֌����ĉ��C�E�ߑ㉻����A
-3100 �����̏C���E�ύX�E�@�\�X�V���܂񂾁B
+NetHack 5.0.0 のソースは C99 準拠へ向けて改修・近代化され、
+3100 件超の修正・変更・機能更新を含んだ。
 
-NetHack 5.0 �́A�]���ł� lex/yacc �x�[�X�K�w�E�_���W�����R���p�C����
-Lua �C���^�[�v���^�����֒u���������ŏ��̔łł���B
-NetHack 5.0.0 �ł̓N�G�X�g�e�L�X�g�ɂ� Lua ���g�p���Ă���B
-������������� Pasi Kallinen �̋ƐтɁA�J���`�[���ꓯ���ӈӂ�\����B
+NetHack 5.0 は、従来版の lex/yacc ベース階層・ダンジョンコンパイラを
+Lua インタープリタ方式へ置き換えた最初の版である。
+NetHack 5.0.0 ではクエストテキストにも Lua を使用している。
+これを実現した Pasi Kallinen の業績に、開発チーム一同が謝意を表する。
 
-NetHack 5.0 ���J���_�ŁA��������щߋ��̒��j�J�������o�[��
-Warwick Allison�AMichael Allison�AKen Arromdee�ADavid Cohrs�A
-Jessie Collet�ABart House�AKevin Hugo�APasi Kallinen�AKen Lorber�A
-Dean Luick�APat Rankin�ADerek S. Ray�AAlex Smith�APatric Mueller�A
-Mike Stephenson�AJanet Walz�APaul Winner�B
+NetHack 5.0 公開時点で、現役および過去の中核開発メンバーは
+Warwick Allison、Michael Allison、Ken Arromdee、David Cohrs、
+Jessie Collet、Bart House、Kevin Hugo、Pasi Kallinen、Ken Lorber、
+Dean Luick、Pat Rankin、Derek S. Ray、Alex Smith、Patric Mueller、
+Mike Stephenson、Janet Walz、Paul Winner。
 
-Ken Lorber�APat Rankin�APatrick Mueller�AMichael Allison ��
-macOS �� NetHack 5.0 �����삷��悤�x�������B
+Ken Lorber、Pat Rankin、Patrick Mueller、Michael Allison は
+macOS で NetHack 5.0 が動作するよう支援した。
 
-Ingo Paschke �͌�����ł̃N���X�R���p�C����p���A
-Amiga ���� NetHack 5.0 �ڐA�𕜊��B���ʂ����L���A
-���҂��e�Ղ� Amiga �� 5.0 �𐶐��ł���悤�ɂ����B
+Ingo Paschke は現代環境でのクロスコンパイルを用い、
+Amiga 向け NetHack 5.0 移植を復活。成果を共有し、
+他者も容易に Amiga 版 5.0 を生成できるようにした。
 
-Ray Chason �� NetHack 5.0 �� MS-DOS �|�[�g�ێ�̑啔����S���A
-curses �C���^�[�t�F�[�X�ڐA���s�����B
-Michael Allison �� 5.0 �{�̕ύX�� msdos �|�[�g�œ��삵������悤�ێ����A
-�N���X�R���p�C���̓��������̌p����e�Ղɂ����B
+Ray Chason は NetHack 5.0 の MS-DOS ポート保守の大部分を担い、
+curses インターフェース移植も行った。
+Michael Allison は 5.0 本体変更が msdos ポートで動作し続けるよう維持し、
+クロスコンパイルの導入がその継続を容易にした。
 
-NetHack 5.0 �J���J�n�i11 �N���O�j�ȍ~�AWindows �|�[�g�ւ̍v���҂ɂ�
-Michael Allison�ADavid Cohrs�ABart House�APasi Kallinen�A
-Alex Kompel�ADion Nicolaas�ADerek S. Ray�AYitzhak Sapir ���܂܂��B
+NetHack 5.0 開発開始（11 年超前）以降、Windows ポートへの貢献者には
+Michael Allison、David Cohrs、Bart House、Pasi Kallinen、
+Alex Kompel、Dion Nicolaas、Derek S. Ray、Yitzhak Sapir が含まれる。
 
-�J���`�[���͔߂��݂ƂƂ��ɁA�ߋ������ł� OS/2 �ŗB��̃����e�i������
-�� Ron Van Iwaarden �̍v�����L�����A�h�ӂ�\����B
+開発チームは悲しみとともに、過去複数版で OS/2 版唯一のメンテナだった
+故 Ron Van Iwaarden の貢献を記憶し、敬意を表する。
 
-���� NetHack �E�F�u�T�C�g�� Ken Lorber �ɂ��
-https://www.nethack.org/ �ňێ�����Ă���B
+公式 NetHack ウェブサイトは Ken Lorber により
+https://www.nethack.org/ で維持されている。
 
-NetHack �R�~���j�e�B���\���A���J�T�[�o nethack.alt.org ��񋟂���
-M. Drew Streib �� Pasi Kallinen �ɉ��߂Đ[�����ӂ���B
-hardfought.org ���x���� Keith Simpson �� Andy Thomson �ɂ����ӂ���B
-����� Junethack�AThe November NetHack Tournament�A
-���Ă� devnull.net�i���ݒ�~�����Y����Ȃ��j�ȂǔN������
-���ԂƘJ�͂𒍂������� Dungeoneers �S���֊��ӂ������B
+NetHack コミュニティを代表し、公開サーバ nethack.alt.org を提供した
+M. Drew Streib と Pasi Kallinen に改めて深く感謝する。
+hardfought.org を支える Keith Simpson と Andy Thomson にも感謝する。
+さらに Junethack、The November NetHack Tournament、
+かつての devnull.net（現在停止だが忘れられない）など年次大会へ
+時間と労力を注ぐ無名の Dungeoneers 全員へ感謝を捧げる。
 
                            - - - - - - - - - -
 
-���܁A�l�b�g�̂ǂ����ɂ������Ȑl�����A�Q�[�����P�Ɍq����
-���ɋ����[�������𑗂��Ă���B�J���`�[���͂Ƃ��ɁA
-���́g���������h�l�������̖��� Dungeoneers �ꗗ�Ƃ��ċL�^���Ă���:
+時折、ネットのどこかにいる奇特な人物が、ゲーム改善に繋がる
+非常に興味深い改造を送ってくる。開発チームはときに、
+その“悪名高き”人物たちの名を Dungeoneers 一覧として記録している:
 
     Adam Aronow               Irina Rempt-Drijfhout     Mike Gallop
     Alex Kompel               Izchak Miller             Mike Passaretti
