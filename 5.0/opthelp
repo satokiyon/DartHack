@@ -1,393 +1,359 @@
-Boolean options not under specific compile flags (with default values in []):
-(You can learn which options exist in your version by checking your current
-option setting, which is reached via the 'O' command.)
+特定のコンパイルフラグに依存しない真偽値オプション（既定値は [] 内）:
+（あなたのバージョンで利用可能なオプションは、'O' コマンドで開ける
+現在のオプション設定画面で確認できます。）
 
-acoustics      can your character hear anything                    [True]
-armorstatus    show extra status field summarizing worn armor     [False]
-autodescribe   describe the terrain under cursor                  [False]
-autodig        dig if moving and wielding digging tool            [False]
-autoopen       walking into a door attempts to open it             [True]
-autopickup     automatically pick up objects you move over         [True]
-autoquiver     when firing with an empty quiver, select some      [False]
-               suitable inventory weapon to fill the quiver
-BIOS           allow the use of IBM ROM BIOS calls                [False]
-blind          your character is permanently blind                [False]
-bones          allow loading bones files                           [True]
-clicklook      look at map by clicking right mouse button         [False]
-cmdassist      give help for errors on direction & other commands  [True]
-color          use different colors for objects on screen  [True for micros]
-confirm        ask before hitting tame or peaceful monsters        [True]
-dark_room      show floor not in sight in different color          [True]
-dropped_nopick exclude dropped objects from autopickup             [True]
-eight_bit_tty  send 8-bit characters straight to terminal         [False]
-extmenu        tty, curses: use menu for # (extended commands)    [False]
-               X11: menu has all commands (T) or traditional subset (F)
-female         deprecated; use compound option gender:female      [False]
-fixinv         try to retain the same letter for the same object   [True]
-force_invmenu  commands asking for inventory item show a menu     [False]
-goldX          when filtering objects by bless/curse state,       [False]
-               whether to classify gold as X (unknown) or U (uncursed)
-help           print all available info when using the / command   [True]
-herecmd_menu   show menu of some possible commands when clicking
-               on yourself or next to you with mouse              [False]
-hilite_pet     display pets in a highlighted manner               [False]
-hilite_pile    display item piles in a highlighted manner         [False]
-ignintr        ignore interrupt signal, including breaks          [False]
-implicit_uncursed  omit "uncursed" from inventory, if possible     [True]
-legacy         print introductory message                          [True]
-lit_corridor   show a dark corridor as lit if in sight            [False]
-lootabc        use a/b/c rather than o/i/b when looting           [False]
-mail           enable the mail daemon                              [True]
-mention_decor  give feedback when walking across stairs, altars,  [False]
-               fountains, and such even when not obscured by objects
-mention_walls  give feedback when walking against a wall          [False]
-menu_overlay   overlay menus on the screen and align to right      [True]
-menucolors     enable MENUCOLOR pattern matching to highlight     [False]
-               lines in object menus like inventory; might highlight with
-               bold, inverse, &c even when color is unavailable or toggled off
-nudist         start your character without armor                 [False]
-null           allow nulls to be sent to your terminal             [True]
-               try turning this option off (forcing NetHack to use its own
-               delay code) if moving objects seem to teleport across rooms
-pauper         start your character with no possessions           [False]
-perm_invent    keep inventory in a permanent window               [False]
-pickup_stolen  override pickup_types for stolen objects            [True]
-pickup_thrown  override pickup_types for thrown objects            [True]
-price_quotes   show remembered price quotes for unIDed items      [False]
-pushweapon     when wielding a new weapon, put your previously    [False]
-               wielded weapon into the secondary weapon slot
-quick_farsight usually skip the chance to browse the map when     [False]
-               randomly triggered clairvoyance takes place
-rawio          allow the use of raw I/O                           [False]
-reroll         allow rerolling of starting inventory              [False]
-rest_on_space  count the space bar as a rest character            [False]
-safe_pet       prevent you from (knowingly) attacking your pet(s)  [True]
-safe_wait      require use of 'm' prefix before '.' or 's' to      [True]
-               wait or search when adjacent to a hostile monster
-sanity_check   perform data sanity checks                         [False]
-showexp        display your accumulated experience points         [False]
-showrace       show yourself by your race rather than by role     [False]
-showvers       show version number on status lines                [False]
-silent         don't use your terminal's bell sound                [True]
-sortpack       group similar kinds of objects in inventory         [True]
-sparkle        display sparkly effect for resisted magical         [True]
-               attacks (e.g. fire attack on fire-resistant monster)
-standout       use standout mode for --More-- on messages         [False]
-status_updates update the status lines                             [True]
-terrainstatus  show extra status field describing current location  [False]
-time           display elapsed game time, in moves                [False]
-tips           show some helpful tips during gameplay              [True]
-tombstone      print tombstone when you die                        [True]
-toptenwin      print topten in a window rather than stdout        [False]
-travel         enables travelling via mouse click if supported;    [True]
-               can be toggled off to prevent mouse clicks on the map from
-               attempting to move the hero; does not affect travel via '_'
-use_darkgray   use bold black instead of blue for black glyphs.    [True]
-use_inverse    display detected monsters in highlighted manner    [False]
-verbose        print more commentary during the game               [True]
-weaponstatus   show extra status field listing wielded weapon(s)  [False]
-whatis_menu    show menu when getting a map location              [False]
-whatis_moveskip skip same glyphs when getting a map location      [False]
+acoustics      プレイヤーキャラクターが音を聞けるか                    [True]
+armorstatus    装備中の防具要約を追加ステータス欄に表示               [False]
+autodescribe   カーソル位置の地形を説明する                          [False]
+autodig        掘削道具を装備して移動したときに掘る                   [False]
+autoopen       ドアに向かって歩くと開けようとする                     [True]
+autopickup     上を通過した物を自動で拾う                             [True]
+autoquiver     矢筒が空で射撃したとき、適切な所持武器を選んで          [False]
+               矢筒に入れる
+BIOS           IBM ROM BIOS 呼び出しの使用を許可                      [False]
+blind          キャラクターを恒久的に盲目にする                       [False]
+bones          bones ファイルの読み込みを許可                          [True]
+clicklook      右クリックでマップを見る                                [False]
+cmdassist      方向やその他コマンドのエラー時に補助を出す               [True]
+color          画面上の物体を色分け表示する                  [micros では True]
+confirm        飼いならした/平和的なモンスターへの攻撃前に確認する       [True]
+dark_room      視界外の床を別の色で表示する                             [True]
+dropped_nopick 落とした物を自動拾い対象から除外する                    [True]
+eight_bit_tty  8ビット文字をそのまま端末へ送る                         [False]
+extmenu        tty/curses: #（拡張コマンド）にメニューを使う             [False]
+               X11: 全コマンドメニュー(T)か従来サブセット(F)
+female         非推奨; 複合オプション gender:female を使用              [False]
+fixinv         同じ物には同じ文字割り当てを維持するよう試みる             [True]
+force_invmenu  所持品を尋ねるコマンドでメニュー表示を使う               [False]
+goldX          祝福/呪い状態で物を絞り込む際、金を                      [False]
+               X(不明)扱いにするか U(無呪)扱いにするか
+help           / コマンド使用時に利用可能情報をすべて表示               [True]
+herecmd_menu   自分や隣接マスをマウスクリックしたとき、
+               実行候補コマンドのメニューを表示                         [False]
+hilite_pet     ペットを強調表示する                                    [False]
+hilite_pile    アイテムの山を強調表示する                              [False]
+ignintr        割り込み信号（Break 含む）を無視する                     [False]
+implicit_uncursed  可能なら所持品表示で "uncursed" を省略する           [True]
+legacy         導入メッセージを表示する                                 [True]
+lit_corridor   視界内の暗い通路を明るい通路として表示する               [False]
+lootabc        漁る際に o/i/b ではなく a/b/c を使う                     [False]
+mail           メールデーモンを有効化する                               [True]
+mention_decor  階段・祭壇・泉などを踏んだとき、物で隠れていなくても       [False]
+               通知する
+mention_walls  壁にぶつかって歩いたときに通知する                       [False]
+menu_overlay   メニューを画面に重ね、右寄せで表示する                   [True]
+menucolors     MENUCOLOR のパターン一致で強調表示を有効化               [False]
+               （所持品などのメニュー行）。色が使えない/無効でも
+               太字・反転などで強調される場合がある
+nudist         防具なしで開始する                                      [False]
+null           端末へ NUL 文字の送信を許可する                           [True]
+               部屋をまたぐ物体移動が瞬間移動のように見える場合は、
+               このオプションを Off にして（NetHack 独自遅延コードを使用）
+               みてください
+pauper         持ち物なしで開始する                                    [False]
+perm_invent    所持品を常設ウィンドウに表示し続ける                     [False]
+pickup_stolen  盗品に対して pickup_types 設定を上書きする               [True]
+pickup_thrown  投擲物に対して pickup_types 設定を上書きする             [True]
+price_quotes   未識別品に記憶済み価格情報を表示する                     [False]
+pushweapon     新しい武器を装備したとき、以前の主武器を                 [False]
+               副武器スロットへ入れる
+quick_farsight ランダム発動の千里眼時、マップ閲覧機会を通常は            [False]
+               スキップする
+rawio          raw I/O の使用を許可する                                [False]
+reroll         初期所持品の再抽選を許可する                            [False]
+rest_on_space  スペースキーを休憩文字として扱う                         [False]
+safe_pet       （認識して）自分のペットを攻撃しないようにする            [True]
+safe_wait      隣接に敵対モンスターがいるとき、'.' や 's' で待機/探索に    [True]
+               'm' 接頭辞を必須にする
+sanity_check   データ整合性チェックを実行する                           [False]
+showexp        累積経験点を表示する                                    [False]
+showrace       役職ではなく種族で自分を表示する                         [False]
+showvers       ステータス行にバージョン番号を表示する                   [False]
+silent         端末ベル音を鳴らさない                                   [True]
+sortpack       所持品内で同種の物をまとめる                             [True]
+sparkle        魔法攻撃を抵抗した際のきらめき効果を表示                 [True]
+               （例: 火炎耐性モンスターへの火炎攻撃）
+standout       メッセージの --More-- に強調表示モードを使う              [False]
+status_updates ステータス行を更新する                                   [True]
+terrainstatus  現在地を説明する追加ステータス欄を表示                   [False]
+time           経過ゲーム時間（ターン数）を表示する                     [False]
+tips           ゲーム中に役立つヒントを表示する                         [True]
+tombstone      死亡時に墓石を表示する                                   [True]
+toptenwin      top ten を stdout ではなくウィンドウ表示する              [False]
+travel         対応時はマウスクリック移動を有効化する                   [True]
+               Off にするとマップクリックで主人公が移動しないようにできる
+               （'_' による移動には影響しない）
+use_darkgray   黒グリフに青の代わりに太字黒を使う                      [True]
+use_inverse    検出したモンスターを強調表示する                         [False]
+verbose        ゲーム中の解説メッセージを増やす                         [True]
+weaponstatus   装備武器一覧の追加ステータス欄を表示                     [False]
+whatis_menu    マップ位置取得時にメニューを表示する                     [False]
+whatis_moveskip マップ位置取得時に同一グリフをスキップする              [False]
 
 
-There are further boolean options controlled by compilation flags.
+コンパイルフラグで制御される追加の真偽値オプションがあります。
 
-Boolean option if INSURANCE was set at compile time:
-checkpoint     save game state after each level change, for        [True]
-               possible recovery after program crash
+INSURANCE がコンパイル時に有効な場合の真偽値オプション:
+checkpoint     各階層移動後にゲーム状態を保存し、                       [True]
+               クラッシュ後の復旧可能性を高める
 
-Boolean option if NEWS was set at compile time:
-news           print any news from game administrator on startup   [True]
+コンパイル時に NEWS が有効な場合の真偽値オプション:
+news           起動時に管理者からのお知らせを表示する                  [True]
 
-Boolean option if SCORE_ON_BOTL was set at compile time:
-showscore      display your approximate accumulated score         [False]
+コンパイル時に SCORE_ON_BOTL が有効な場合の真偽値オプション:
+showscore      おおよその累積スコアを表示する                          [False]
 
-Boolean option if TIMED_DELAY was set at compile time (tty or curses only):
-timed_delay    on unix and VMS, use a timer instead of sending     [True]
-               extra screen output when attempting to pause for
-               display effect.  on MSDOS without the termcap
-               lib, whether or not to pause for visual effect.
+コンパイル時に TIMED_DELAY が有効な場合（tty/curses のみ）の真偽値オプション:
+timed_delay    unix/VMS では、表示効果待機時に追加画面出力の代わりに     [True]
+               タイマーを使う。MSDOS（termcapライブラリなし）では
+               表示効果待機を行うかどうかを制御する。
 
-Boolean option if ALTMETA was set at compile time:
-altmeta        For unix and VMS, treat two character sequence
-               "ESC c" as M-c (Meta+c, 8th bit set) when nethack  [False]
-               obtains a command from player's keyboard.
+コンパイル時に ALTMETA が有効な場合の真偽値オプション:
+altmeta        unix/VMS で、nethack がキーボード入力からコマンド取得時、
+               2文字列 "ESC c" を M-c（Meta+c、8ビット目セット）として [False]
+               扱う。
 
-Boolean option if TILES_IN_GLYPHMAP set at compile time (MSDOS):
-preload_tiles  control whether tiles get pre-loaded into RAM at    [True]
-               the start of the game.  Doing so enhances performance
-               of the tile graphics, but uses more memory.
+コンパイル時に TILES_IN_GLYPHMAP が有効な場合（MSDOS）の真偽値オプション:
+preload_tiles  ゲーム開始時にタイルを RAM へ事前読み込みするかを制御      [True]
+               する。タイル描画性能は向上するが、メモリ使用量は増える。
 
-Boolean option if TTY_TILES_ESCCODES was set at compile time (tty only):
-vt_tiledata    insert extra data escape code markers into output  [False]
+コンパイル時に TTY_TILES_ESCCODES が有効な場合（ttyのみ）の真偽値オプション:
+vt_tiledata    出力にタイルデータ用の追加エスケープマーカーを挿入する      [False]
 
-Boolean option if TTY_SOUND_ESCCODES was set at compile time (tty only):
-vt_sounddata   insert sound data escape code markers into output  [False]
+コンパイル時に TTY_SOUND_ESCCODES が有効な場合（ttyのみ）の真偽値オプション:
+vt_sounddata   出力にサウンドデータ用の追加エスケープマーカーを挿入する    [False]
 
-Boolean options which may be available depending upon which interfaces
-the program has been built to support.  If it supports multiple such,
-some of these may show as available for setting but not do anything if
-you happen to be using a different interface than the one(s) they're for:
-ascii_map      show map as text, forces tiles_map Off; Qt, X11
+プログラムが対応しているインターフェースに応じて利用可能になる
+真偽値オプションがあります。複数対応している場合、設定可能に見えても
+現在使用中のインターフェースでは効果がないものがあります:
+ascii_map      マップをテキスト表示し、tiles_map を Off にする; Qt, X11
 guicolor       curses
-hitpointbar    curses, tty, Windows GUI if statushilites enabled;
-               Qt without statushilites; X11 if 'fancy_status' disabled
-               (via X application defaults) and statushilities enabled
+hitpointbar    curses, tty, Windows GUI（statushilites有効時）;
+               Qt（statushilites無効時）; X11（'fancy_status'無効かつ
+               statushilities有効時）
 popup_dialog   curses, Qt, Windows GUI
-selectsaved    tty (Qt and Windows GUI do this unconditionally)
+selectsaved    tty（Qt と Windows GUI は常時この動作）
 splash_screen  curses, Qt, Windows GUI
-tiled_map      show map as tiles, forces ascii_map Off; Qt, X11
+tiled_map      マップをタイル表示し、ascii_map を Off にする; Qt, X11
 
-Boolean options available when running in debug mode (aka wizard mode):
-menu_tab_sep   menu formatting--do not touch
-monpolycontrol have player choose shape-changing monsters' new shapes
-montelecontrol let player choose destination for teleported monsters
-travel_debug   show state of travel pathfinding algorithm on the map
-wizweight      include item weights in inventory display
+デバッグモード（wizard mode）実行時に使える真偽値オプション:
+menu_tab_sep   メニュー整形用 -- 触らないこと
+monpolycontrol 変身モンスターの新しい姿をプレイヤーが選択する
+montelecontrol テレポートしたモンスターの移動先をプレイヤーが選択する
+travel_debug   移動経路探索アルゴリズムの状態をマップ上に表示する
+wizweight      所持品表示にアイテム重量を含める
 
-Any Boolean option can be set to True by including it among options being
-set, or negated (set to False) by prefixing its name with a '!' or 'no'.
-Alternatively, the compound option syntax can be used: 'optname:true' and
-'optname:false'.
+任意の真偽値オプションは、設定リストに含めると True にできます。
+'!' または 'no' を名前の前につけると否定（False）になります。
+あるいは複合オプション構文 'optname:true' / 'optname:false' も使えます。
 
  - - - - -
 
-Compound options are written as option_name:option_value.
+複合オプションは option_name:option_value の形式で記述します。
 
-Compound options which can be set during the game are:
+ゲーム中に設定できる複合オプション:
 
-autounlock    when attempting to open a locked door or loot     [Apply-Key]
-              a locked container, specifies an action to take: can be
-              None, or one or more of Untrap + Apply-Key + Kick + Force;
-              if Untrap is included, it will be handled first; the
-              others apply if you answer "no" to "check for traps?";
-              for "yes", it won't necessary find anything even when a
-              trap happens to be present and will use up the rest of
-              the current move regardless of whether it finds anything;
-              Kick is only useful for doors and Force is only useful for
-              containers; either will only be attempted if Untrap is
-              omitted or skipped and Apply-Key is omitted or you aren't
-              carrying an unlocking tool or you decline to use one
-boulder       override the default boulder symbol                       [`]
-crash_email   email address to use when filling in crash reports         []
-crash_name    name to use when filling in crash reports                  []
-crash_urlmax  length of longest url we can generate for a crash report   []
-disclose      the types of information you want         [ni na nv ng nc no]
-              offered at the end of the game
-              (space separated list of two-character values;
-              prefix: '+' always disclose, '-' never disclose,
-              'n' prompt with default "no", 'y' prompt with default "yes",
-              'a' prompt to select sorting order (for suffix 'v' only);
-              suffix: 'i' inventory, 'a' attributes, 'v' vanquished
-              monsters, 'g' genocided and extinct monsters, 'c' conduct
-              and achievements, 'o' dungeon overview)
-fruit         the name of a fruit you enjoy eating             [slime mold]
-              (basically a whimsy which NetHack uses from time to time).
-hilite_status specifies a rule for highlighting a status field           []
-              (multiple instances are allowed)
-menustyle     user interface for selection of multiple objects:      [Full]
-              Traditional -- prompt for classes of interest, then
-                             prompt item-by-item for those classes;
-              Combination -- prompt for classes of interest, then
-                             use a menu for choosing items;
-              Full        -- menu for classes of interest, then item menu;
-              Partial     -- skip class filtering, use menu of all items;
-              only the first letter ('T','C','F','P') matters
-              (With Traditional, many actions allow pseudo-class 'm' to
-              request a menu for choosing items: one-shot Combination.)
-menu_objsyms  whether to include object class symbols in menus:         [4]
-              0 - none    -- don't add object symbols to menus;
-              1 - headers -- append object class symbol to menu header lines;
-              2 - entries -- show object glyphs (same as class symbol
-                             for ASCII interfaces) on each menu entry line;
-              3 - both    -- 1 and 2 combined;
-              4 - conditional  -- as 2 but only if no headers are present;
-              5 - one-or-other -- 1 and 4 combined;
-              choices 0 and 1 should work with any interface; 2 through 5
-              are supported by tty and curses
-msg_window    behavior of ^P message recall for tty interface:          [s]
-              single      -- one message at a time
-              full        -- full window with all saved top line messages
-              reverse     -- full with messages printed most-recent-first
-              combination -- first two of consecutive ^P commands show
-                             single messages, third yields full set
-msg_window    behavior of ^P message recall for curses interface:       [r]
-              reverse     -- full window, most recent first
-              full        -- full with messages printed least recent first,
-                             initially positioned on last page to start
-                             with most recent messages in view
-number_pad    alphabetic versus numeric control over movement:          [0]
-               0 -- traditional hjkl + yubn movement (default);
-               1 -- digits control movement, for use with numeric keypad;
-               2 -- same as 1, but '5' works as 'g' prefix rather than 'G';
-               3 -- numeric for phone keypad (1,2,3 above, 7,8,9 below);
-               4 -- phone keypad (3) combined with '5' preference (2);
-              -1 -- "qwertz"; alphabetic movement but 'z' swapped with 'y'.
-              Setting number_pad (to a positive value) affects how all
-              digit keys are handled, not just those on numeric keypad.
-packorder     a list of default symbols for kinds of       [")[%?+!=/(*`0_]
-              objects that gives the order in which your inventory (and
-              some other things) gets shown if the 'sortpack' option is on
-              (If you specify only some kinds of items, the others from the
-              default order will be appended to the end.)
-paranoid_confirmation  space separated list    [paranoid_confirm:pray swim]
-              of situations where alternate prompting is desired
-              Confirm -- when requiring "yes", also require "no" to reject;
-                      also requires yes rather than y for pray, trap, Autoall
-              quit    -- yes vs y to confirm quitting or to enter explore mode
-              die     -- yes vs y to confirm dying (for explore or debug mode)
-              bones   -- yes vs y to confirm saving bones data in debug mode
-              attack  -- yes vs y to confirm attacking a peaceful monster
-              wand-break  -- yes vs y to confirm breaking a wand
-              eating  -- yes vs y to confirm whether to continue eating
-              Were-change -- yes vs y to confirm changing form due to
-                      lycanthropy when hero has polymorph control;
-              pray    -- y to confirm an attempt to pray; on by default
-              trap    -- y to enter a known trap unless it is harmless;
-              swim    -- require m prefix to move into water or lava when
-                      hero has seen it and isn't impaired; on by default;
-              AutoAll -- y to confirm if using menustyle:Full and choice 'A'
-                      in the object class filtering menu is selected;
-              Remove  -- always pick from inventory for 'R' and 'T' even when
-                      wearing just one applicable item to remove or take off
-perminv_mode  if the interface supports a persistent inventory window   [a]
-              and the perm_invent option is true, this controls what
-              will be shown:
-              none/off -- behave as if perm_invent is false
-              all/on   -- show inventory except for gold (default)
-              full     -- show inventory including gold
-              in-use   -- only show worn and wielded items
-              (the tty interface's optional perm_invent support includes
-              a couple of additional choices that vary all and full)
-pickup_burden when you pick up an item that exceeds this encumbrance    [S]
-              level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
-              or overLoaded), you will be asked if you want to continue.
-pickup_types  a list of default symbols for kinds of objects to          []
-              autopickup when that option is on; empty list means "all"
-pile_limit    for feedback when walking across floor objects,           [5]
-              threshold at which "there are objects here" is displayed
-              instead of listing them.  (0 means "always list objects.")
-runmode       controls how often the map window is updated for        [run]
-              multi-step movement (various running modes or travel command):
-              teleport -- don't update map until movement stops;
-              run      -- periodically update map (interval is seven steps);
-              walk     -- update map after every step;
-              crawl    -- like walk, but delay after making each step.
-              (This only affects screen display, not actual movement.)
-scores        the parts of the score list you wish    [!own/3 top/2 around]
-              to see when the game ends.  You choose a combination of
-              top scores, scores around the top scores, and all of your
-              own scores.
-sortdiscoveries preferred order when viewing list of discovered objects [o]
-              o -- in order of discovery within each class
-              s -- sortloot's "loot" order
-              c -- alphabetized within each class
-              a -- alphabetized across all classes
-sortloot      preferred order when examining a set of objects           [n]
-              none -- no sorting
-              loot -- sort piles of objects on floor and in containers
-              full -- 'loot' plus objects in inventory
-sortvanquished preferred order when viewing vanquished monsters list    [t]
-              t -- traditional, order by monster level
-              d -- order by monster difficulty rating
-              a -- alphabetical, first any unique monsters then others
-              c -- order by class, low to high level within each class
-              n -- order by count, high to low
-              z -- order by count, low to high
-statushilites whether to display status highlights (when non-zero) and  [0]
-              also how many turns to display temporary highlights (for
-              'up', 'down', and 'changed' hilite_status rules)
-statuslines   whether to use expanded (3) or condensed (2) status       [2]
-              (for tty and curses; 2 is traditional, 3 is recommended;
-              also for Qt, where 3 is traditional and 2 is recommended)
-suppress_alert disable various version-specific warnings about changes   []
-              in game play or the user interface, such as notification given
-              for the 'Q' command that quitting is now done via #quit
-              (e.g., use suppress_alert:3.3.1 to stop that and any other
-              notifications added in that version or earlier)
-versinfo      selects what information is displayed when showvers  [1 or 4]
-              is true (default depends on program development status)
-whatis_coord  controls whether to include map coordinates when          [n]
-              autodescribe is active for the '/' and ';' commands.
-              Value is the first letter of one of
-              compass      -- (relative to you; 'east' or '3s' or '2n,4w')
-              full compass -- ('east' or '3south' or '2north,4west')
-              map          -- <x,y>        (map column x=0 is not used)
-              screen       -- [row,column] (row is offset to match tty usage)
-              none         -- no coordinates shown.
-whatis_filter controls how to filter eligible map coordinates when      [n]
-              getting a map location for eg. the travel command.
-              Value is the one of
-              n - no filtering
-              v - locations in view only
-              a - locations in same area (room, corridor, etc)
+autounlock    施錠ドアを開ける、または施錠容器を漁る際に取る行動を [Apply-Key]
+              指定する。None、または Untrap + Apply-Key + Kick + Force
+              のうち1つ以上を指定可。Untrap を含む場合は最初に処理。
+              そのほかは "check for traps?" に "no" と答えた場合に実施。
+              "yes" の場合、罠があっても必ず見つかるわけではなく、
+              見つかったかどうかに関係なく現在ターンの残り行動を消費する。
+              Kick はドア向け、Force は容器向け。いずれも Untrap がない/
+              スキップされた、かつ Apply-Key がない、または解錠道具を
+              持っていない、または使用を拒否した場合に試行される
+boulder       既定の岩記号を上書きする                               [`]
+crash_email   クラッシュ報告記入時に使うメールアドレス                []
+crash_name    クラッシュ報告記入時に使う名前                          []
+crash_urlmax  生成可能なクラッシュ報告URLの最大長                     []
+disclose      ゲーム終了時に提示したい情報の種類         [ni na nv ng nc no]
+              （2文字値を空白区切りで指定。
+              接頭辞: '+' 常に表示、'-' 表示しない、
+              'n' 既定 "no" で確認、'y' 既定 "yes" で確認、
+              'a'（接尾辞 'v' のみ）並び順選択を確認;
+              接尾辞: 'i' 所持品, 'a' 能力値, 'v' 倒したモンスター,
+              'g' 絶滅/ジェノサイド, 'c' 行動制限と実績,
+              'o' ダンジョン概要）
+fruit         好きな果物の名前                               [slime mold]
+              （NetHack が時々使う遊び要素です）
+hilite_status ステータス欄強調表示ルールを指定                        []
+              （複数指定可）
+menustyle     複数オブジェクト選択時のUI方式:                     [Full]
+              Traditional -- 興味あるクラスを尋ね、続いて各項目を確認;
+              Combination -- クラスを尋ね、次にメニューで項目選択;
+              Full        -- クラス選択も項目選択もメニューで行う;
+              Partial     -- クラス絞り込みを省略し全項目メニューを使う;
+              先頭1文字（T/C/F/P）のみ有効
+              （Traditional では多くの操作で疑似クラス 'm' により
+              項目選択メニューを要求可能: 一時的 Combination）
+menu_objsyms  メニューにオブジェクトクラス記号を含めるか             [4]
+              0 - none    -- 記号を追加しない;
+              1 - headers -- ヘッダー行にクラス記号を付ける;
+              2 - entries -- 各項目行にグリフを表示（ASCII環境では
+                             クラス記号と同じ）;
+              3 - both    -- 1 と 2 の両方;
+              4 - conditional  -- 2 と同様だがヘッダーがない場合のみ;
+              5 - one-or-other -- 1 と 4 の組み合わせ;
+              0 と 1 は任意インターフェースで動作想定、2?5 は
+              tty と curses でサポート
+msg_window    tty インターフェースでの ^P メッセージ履歴表示動作:  [s]
+              single      -- 1メッセージずつ表示
+              full        -- 保存済み上段メッセージを全表示
+              reverse     -- 全表示（新しいものが先）
+              combination -- 連続 ^P の最初2回は single、3回目で full
+msg_window    curses インターフェースでの ^P メッセージ履歴表示:   [r]
+              reverse     -- 全表示（新しいものが先）
+              full        -- 全表示（古いものが先）。初期位置は末尾ページ
+                             で最新メッセージが見えるようにする
+number_pad    移動操作を英字にするか数字にするか:                   [0]
+               0 -- 伝統的な hjkl + yubn 移動（既定）;
+               1 -- 数字で移動（テンキー向け）;
+               2 -- 1と同じだが '5' は 'G' ではなく 'g' 接頭辞;
+               3 -- 電話配列向け数字移動（1,2,3 上 / 7,8,9 下）;
+               4 -- 3 に 2 の '5' 動作を組み合わせ;
+              -1 -- "qwertz"; 英字移動だが z と y を入れ替え。
+              number_pad を正値にするとテンキー以外の数字キー処理にも影響。
+packorder     sortpack が On のときの既定表示順を決める            [")[%?+!=/(*`0_]
+              オブジェクト種別記号リスト。所持品表示などに使われる。
+              一部のみ指定した場合、残りは既定順で末尾に追加される。
+paranoid_confirmation  代替確認を行いたい状況の空白区切りリスト
+                                 [paranoid_confirm:pray swim]
+              Confirm -- "yes" 必須確認時、拒否にも "no" を必須化;
+                      pray/trap/Autoall でも y ではなく yes を要求
+              quit    -- 終了や探索モード移行確認を yes vs y で行う
+              die     -- 死亡確認（探索/デバッグ）を yes vs y で行う
+              bones   -- デバッグモードの bones 保存確認を yes vs y
+              attack  -- 平和的モンスター攻撃確認を yes vs y
+              wand-break  -- 杖破壊確認を yes vs y
+              eating  -- 食事継続確認を yes vs y
+              Were-change -- 多形制御ありの人狼変身確認を yes vs y
+              pray    -- 祈り試行確認を y で行う（既定で有効）
+              trap    -- 無害でない既知罠への侵入を y で確認
+              swim    -- 視認済みの水/溶岩へ進入時、障害がなければ
+                      m 接頭辞を必須化（既定で有効）;
+              AutoAll -- menustyle:Full でクラス絞り込みメニューの
+                      'A' 選択時に y 確認を要求;
+              Remove  -- 'R' と 'T' で該当装備が1つでも常に所持品から
+                      外す対象を選択させる
+perminv_mode  インターフェースが常設所持品ウィンドウをサポートし [a]
+              perm_invent が true の場合、表示内容を制御:
+              none/off -- perm_invent が false のように振る舞う
+              all/on   -- 金を除く所持品を表示（既定）
+              full     -- 金を含む所持品を表示
+              in-use   -- 装備中・使用中アイテムのみ表示
+              （tty の任意 perm_invent には all/full 変種の追加選択肢あり）
+pickup_burden この負荷レベルを超える物を拾うときに確認する           [S]
+              （Unencumbered, Burdened, streSsed, straiNed, overTaxed,
+              overLoaded）
+pickup_types  autopickup が On のとき自動取得対象にする物種記号一覧    []
+              空リストは "すべて"
+pile_limit    床上アイテムを踏んだ際の表示閾値                         [5]
+              この値以上だと個別列挙ではなく
+              "there are objects here" を表示（0 は常に列挙）
+runmode       複数歩移動（走行/移動コマンド）時のマップ更新頻度        [run]
+              teleport -- 移動停止まで更新しない;
+              run      -- 定期更新（7歩間隔）;
+              walk     -- 毎歩更新;
+              crawl    -- walk 同様だが各歩後に遅延。
+              （画面表示のみへの影響で、実際の移動には影響しない）
+scores        ゲーム終了時に見たいスコア一覧の範囲  [!own/3 top/2 around]
+              上位スコア、上位周辺、自分のスコアの組み合わせを選ぶ。
+sortdiscoveries 発見済みオブジェクト一覧の表示順                     [o]
+              o -- 各クラス内で発見順
+              s -- sortloot の "loot" 順
+              c -- 各クラス内アルファベット順
+              a -- 全クラス横断アルファベット順
+sortloot      オブジェクト集合確認時の表示順                           [n]
+              none -- 並べ替えなし
+              loot -- 床・容器内の山を並べ替え
+              full -- loot + 所持品も並べ替え
+sortvanquished 倒したモンスター一覧の表示順                           [t]
+              t -- 伝統的（モンスターレベル順）
+              d -- 難易度評価順
+              a -- アルファベット順（ユニークを先に）
+              c -- クラス順（各クラス内は低→高レベル）
+              n -- 討伐数多→少
+              z -- 討伐数少→多
+statushilites ステータス強調表示を行うか（非0で有効）                [0]
+              および一時強調（up/down/changed ルール）の表示ターン数
+statuslines   拡張(3)か簡略(2)のステータス行を使うか                  [2]
+              （tty/curses: 2 が従来、3 推奨;
+              Qt: 3 が従来、2 推奨）
+suppress_alert ゲームプレイやUI変更に関するバージョン別警告を無効化   []
+              （例: 'Q' コマンドが #quit に変更された通知など）
+              （例: suppress_alert:3.3.1 でその版以前追加通知を停止）
+versinfo      showvers が true のとき表示する情報を選ぶ          [1 or 4]
+              （既定は開発状態に依存）
+whatis_coord  autodescribe 有効時に '/' と ';' コマンドで             [n]
+              マップ座標を含めるかを制御。
+              値は次の先頭文字:
+              compass      -- （自分基準。'east' や '3s' や '2n,4w'）
+              full compass -- （'east' や '3south' や '2north,4west'）
+              map          -- <x,y>（マップ列 x=0 は未使用）
+              screen       -- [row,column]（row は tty 表示に合わせ補正）
+              none         -- 座標を表示しない。
+whatis_filter たとえば移動コマンドでマップ位置取得時に、対象座標を      [n]
+              どう絞り込むかを制御。
+              値:
+              n - フィルタなし
+              v - 視界内のみ
+              a - 同一エリア（部屋・通路など）のみ
 
-Compound options which may be set only on startup are:
+起動時のみ設定できる複合オプション:
 
-align      Your starting alignment (lawful, neutral, chaotic,      [random]
-           or random).  Many roles restrict the choice to a subset.
-           You may specify just the first letter.
-catname    name of your starting pet if it is a kitten               [none]
-dogname    name of your starting pet if it is a little dog           [none]
-           Several roles who start with a dog have one whose name is
-           pre-set (for example, "Hachi" for Samurai), but that name
-           will be overridden if you specify dogname.
-gender     Your starting gender (male, female, or random).         [random]
-           You may specify just the first letter.  Although you can
-           still denote your gender using the old "male" and "female"
-           boolean options, the "gender" option will take precedence.
-horsename  name of your starting pet if it is a pony                 [none]
-menu_*     specify single character accelerators for menu commands.
-           Here is a list of all commands with their default keystroke
-           followed by a list of window-ports that implement them:
-           (t is tty, c is curses, w is Windows GUI, x is X11, q is Qt)
-           menu_first_page    jump to the first page in a menu     [^](tcwxq)
-           menu_last_page     jump to the last page in a menu      [|](tcwxq)
-           menu_next_page     advance to the next menu page        [>](tcwxq)
-           menu_previous_page back up to the previous menu page    [<](tcwxq)
-           menu_shift_left    pan view to left (perm_invent only)  [{](cx)
-           menu_shift_right   pan view to right (perm_invent only) [}](cx)
-           menu_select_all    select all items in a menu           [.](tcwxq)
-           menu_select_page   select all items on this menu page   [,](tcwq)
-           menu_deselect_all  deselect all items in a menu         [-](tcwxq)
-           menu_deselect_page deselect all items on this menu page [\](tcwq)
-           menu_invert_all    invert all items in a menu           [@](tcwxq)
-           menu_invert_page   invert all items on this menu page   [~](tcwq)
-           menu_search        prompt for target text and invert    [:](tcwxq)
+align      初期属性（lawful, neutral, chaotic, random）           [random]
+           多くの役職では選択肢が一部に制限されます。
+           先頭1文字のみ指定可能。
+catname    子猫で開始した場合のペット名                            [none]
+dogname    子犬で開始した場合のペット名                            [none]
+           犬で開始する一部役職には既定名（例: 侍の "Hachi"）が
+           ありますが、dogname を指定すると上書きされます。
+gender     初期性別（male, female, random）                      [random]
+           先頭1文字のみ指定可能。旧来の "male"/"female" 真偽値でも
+           指定できますが、"gender" が優先されます。
+horsename  ポニーで開始した場合のペット名                          [none]
+menu_*     メニューコマンド用の1文字アクセラレータを指定する。
+           以下に各コマンドの既定キーと対応ウィンドウポートを示す:
+           （t=tty, c=curses, w=Windows GUI, x=X11, q=Qt）
+           menu_first_page    メニュー先頭ページへ移動            [^](tcwxq)
+           menu_last_page     メニュー最終ページへ移動            [|](tcwxq)
+           menu_next_page     次ページへ進む                      [>](tcwxq)
+           menu_previous_page 前ページへ戻る                      [<](tcwxq)
+           menu_shift_left    左へ表示をパン（perm_invent のみ）   [{](cx)
+           menu_shift_right   右へ表示をパン（perm_invent のみ）  [}](cx)
+           menu_select_all    メニュー項目をすべて選択            [.](tcwxq)
+           menu_select_page   現在ページの項目をすべて選択        [,](tcwq)
+           menu_deselect_all  メニュー項目をすべて解除            [-](tcwxq)
+           menu_deselect_page 現在ページの選択をすべて解除        [\](tcwq)
+           menu_invert_all    すべての選択状態を反転              [@](tcwxq)
+           menu_invert_page   現在ページの選択状態を反転          [~](tcwq)
+           menu_search        文字列を入力し一致項目の選択を反転   [:](tcwxq)
                               items which match that
-msghistory number of top line messages to save                         [20]
-name       the name of your character      [defaults to username on multi-
-           user systems, asks "who are you?" on single-user systems or if
-           the username is classified as generic like "games"]
-           MS Windows is treated as single-user even though it supports
-           usernames.  If character name is specified on the command
-           line (typically via 'nethack -u myname' depending upon type
-           of system and method of access to it), that name overrides
-           'name' from your options.
-pettype    your preferred type of pet (cat, dog, horse, random,    [random]
-           or none), if your role allows more than one type (or if you
-           want to avoid a starting pet).  Most roles allow dog or cat
-           but not horse.  For roles which force a particular type,
-           pettype is ignored unless it specifies 'none'.
-playmode   normal play or non-scoring explore mode or debug mode   [normal]
-race       Your starting race (e.g., race:Human, race:Elf).        [random]
-           Most roles restrict race choice to a subset.
-role       Your starting role (e.g., role:Barbarian, role:Valk).   [random]
-           Although you can specify just the first letter(s), it will
-           choose only the first role it finds that matches; thus, it
-           is recommended that you spell out as much of the role name
-           as possible.  You can also still denote your role by
-           appending it to the "name" option (e.g., name:Vic-V), but
-           the "role" option will take precedence.
-windowtype windowing system to be used    [depends on operating system and
-           compile-time setup]    if more than one choice is available.
-           Some instances of the program support only one window-type;
-           when that is the case, you don't need to specify anything.
-           The list of supported window-types in your program can be
-           seen while the program is running by using the #version
-           command or from outside the program by examining the text file
-           named 'options' which is generated when building it.
+msghistory 上段メッセージの保存数                                   [20]
+name       キャラクター名                               [マルチユーザーでは
+           ユーザー名既定、シングルユーザーや generic 名（"games" 等）
+           では "who are you?" と問い合わせ]
+           MS Windows はユーザー名を持っていてもシングルユーザー扱い。
+           コマンドラインで名前指定（通常 'nethack -u myname'）した場合、
+           options の 'name' よりそちらが優先されます。
+pettype    希望する初期ペット種（cat, dog, horse, random, none） [random]
+           役職が複数種を許可する場合に有効（または初期ペットなし希望時）。
+           多くの役職は dog/cat 可、horse 不可。特定種固定役職では
+           pettype は 'none' 指定時以外無視されます。
+playmode   通常プレイ / 非採点探索モード / デバッグモード         [normal]
+race       初期種族（例: race:Human, race:Elf）                  [random]
+           多くの役職で選択肢が一部に制限されます。
+role       初期役職（例: role:Barbarian, role:Valk）             [random]
+           先頭文字だけでも指定できますが、最初に一致した役職のみ選ばれる
+           ため、できるだけ正式名を長く書くことを推奨します。
+           "name" へ接尾（例: name:Vic-V）でも指定可能ですが、
+           "role" オプションが優先されます。
+windowtype 使用するウィンドウシステム                 [OS とコンパイル設定依存]
+           複数候補がある場合に指定可能。
+           プログラムによっては1種類のみ対応で、その場合指定不要です。
+           対応 windowtype 一覧は実行中の #version コマンド、または
+           ビルド時生成される 'options' テキストファイルで確認できます。
 
-Some sample options lists are:
+オプションリスト例:
 !autopickup,!tombstone,name:Gandalf,scores:own/3 top/2 around
 female,nonews,dogname:Rover,rest_on_space,!verbose,menustyle:traditional

@@ -384,14 +384,18 @@ void port_insert_pastebuf(char *buf)
 
     /* cc = strlen(buf); */
     /* last arg=0 means "tell me the size of the buffer that I need" */
-    rc = MultiByteToWideChar(GetConsoleOutputCP(), 0, buf, -1, w2, 0);
+    rc = MultiByteToWideChar(CP_UTF8, 0, buf, -1, w2, 0);
+    if (!rc)
+        rc = MultiByteToWideChar(CP_ACP, 0, buf, -1, w2, 0);
     if (!rc) return;
 
     abytes = rc * sizeof(WCHAR);
     w = (WCHAR *)alloc(abytes);
     /* Housekeeping need: +free(w) */
 
-    rc = MultiByteToWideChar(GetConsoleOutputCP(), 0, buf, -1, w, rc);
+    rc = MultiByteToWideChar(CP_UTF8, 0, buf, -1, w, rc);
+    if (!rc)
+        rc = MultiByteToWideChar(CP_ACP, 0, buf, -1, w, rc);
     if (!rc) {
         free(w);
         return;
