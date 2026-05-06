@@ -15,18 +15,19 @@
 #endif
 
 /*
- * Borland C provides enough ANSI C compatibility in its Borland C++
- * mode to warrant this.  But it does not set __STDC__ unless it compiles
- * in its ANSI keywords only mode, which prevents use of <dos.h> and
- * far pointer use.
+ * Borland C は Borland C++ モードで十分な ANSI C 互換性を提供するので
+ * これを有効にする価値がある。ただし ANSI keywords only モードで
+ * コンパイルしない限り __STDC__ を設定しないため、そのモードでは
+ * <dos.h> や far pointer が使えなくなる。
  */
 #if (defined(__STDC__) || defined(__TURBOC__)) && !defined(NOTSTDC)
 #define NHSTDC
 #endif
 
 #if defined(ultrix) && defined(__STDC__) && !defined(__LANGUAGE_C)
-/* Ultrix seems to be in a constant state of flux.  This check attempts to
- * set up ansi compatibility if it wasn't set up correctly by the compiler.
+/* Ultrix は常に流動的な状態にあるようだ。この判定は、
+ * コンパイラが正しく設定しなかった場合に ANSI 互換性を
+ * 整えることを試みる。
  */
 #ifdef mips
 #define __mips mips
@@ -37,49 +38,48 @@
 #endif
 
 /*
- * ANSI X3J11 detection.
- * Makes substitutes for compatibility with the old C standard.
+ * ANSI X3J11 の検出。
+ * 古い C 規格との互換性のための代替を用意する。
  */
 
-/* Decide how to handle variable parameter lists:
- * USE_STDARG means use the ANSI <stdarg.h> facilities (only ANSI compilers
- * should do this, and only if the library supports it).
- * USE_VARARGS means use the <varargs.h> facilities.  Again, this should only
- * be done if the library supports it.  ANSI is *not* required for this.
- * Otherwise, the kludgy old methods are used.
+/* 可変引数リストの扱いを決める:
+ * USE_STDARG は ANSI の <stdarg.h> 機能を使うことを意味する
+ * （ANSI コンパイラのみ、かつライブラリが対応する場合のみ）。
+ * USE_VARARGS は <varargs.h> 機能を使うことを意味する。
+ * これもライブラリ対応時のみ使うべきで、ANSI は不要。
+ * それ以外では、古い不格好な方法を使う。
  */
 
-/* #define USE_VARARGS */ /* use <varargs.h> instead of <stdarg.h> */
-/* #define USE_OLDARGS */ /* don't use any variable argument facilities */
+/* #define USE_VARARGS */ /* <stdarg.h> の代わりに <varargs.h> を使う */
+/* #define USE_OLDARGS */ /* 可変引数機能を一切使わない */
 
-#if defined(apollo) /* Apollos have stdarg(3) but not stdarg.h */
+#if defined(apollo) /* Apollo には stdarg(3) はあるが stdarg.h はない */
 #define USE_VARARGS
 #endif
 
 #if !defined(USE_STDARG) && !defined(USE_VARARGS) && !defined(USE_OLDARGS)
-/* the old VARARGS and OLDARGS stuff is still here, but since we're
-   requiring C99 these days it's unlikely to be useful */
+/* 古い VARARGS と OLDARGS の仕組みはまだ残っているが、
+   今では C99 必須のため有用である可能性は低い */
 #define USE_STDARG
 #endif
 
-#ifdef NEED_VARARGS /* only define these if necessary */
+#ifdef NEED_VARARGS /* 必要な場合のみ定義する */
 /*
- * These changed in 3.6.0.  VA_END() provides a hidden
- * closing brace to complement VA_DECL()'s hidden opening brace, so code
- * started with VA_DECL() needs an extra opening brace to complement
- * the explicit final closing brace.  This was done so that the source
- * would look less strange, where VA_DECL() appeared to introduce a
- * function whose opening brace was missing; there are now visible and
- * invisible braces at beginning and end.  Sample usage:
- void foo VA_DECL(int, arg)  --macro expansion has a hidden opening brace
- {  --explicit opening brace (actually introduces a nested block)
+ * これらは 3.6.0 で変更された。VA_END() は VA_DECL() が隠しで
+ * 開く波括弧に対応する閉じ波括弧を提供するため、VA_DECL() で
+ * 始めたコードには、明示的な最後の閉じ波括弧に対応する追加の
+ * 開き波括弧が必要になる。これは、VA_DECL() が開き波括弧のない
+ * 関数を導入したように見えて不自然だったためで、現在は先頭と末尾に
+ * 見える/見えない波括弧がある。使用例:
+ void foo VA_DECL(int, arg)  --マクロ展開で隠し開き波括弧が入る
+ {  --明示的な開き波括弧（実際には入れ子ブロックを導入）
  VA_START(bar);
- ...code for foo...
- VA_END();  --expansion provides a closing brace for the nested block
- }  --closing brace, pairs with the hidden one in VA_DECL()
- * Reading the code--or using source browsing tools which match braces--
- * results in seeing a matched set of braces.  Usage of VA_END() is
- * potentially trickier, but nethack uses it in a straightforward manner.
+ ...foo のコード...
+ VA_END();  --展開で入れ子ブロック用の閉じ波括弧が入る
+ }  --この閉じ波括弧は VA_DECL() 内の隠し波括弧に対応
+ * コードを読む場合や波括弧対応を追うツールを使う場合でも、
+ * 対応した波括弧の組が見える。VA_END() の使用はやや厄介になりうるが、
+ * nethack では単純な形で使っている。
  */
 
 #ifdef USE_STDARG
@@ -101,7 +101,7 @@
     }
 #define VA_PASS1(a1) a1
 #if defined(ULTRIX_PROTO) && !defined(_VA_LIST_)
-#define _VA_LIST_ /* prevents multiple def in stdio.h */
+#define _VA_LIST_ /* stdio.h での多重定義を防ぐ */
 #endif
 #else
 
@@ -130,11 +130,11 @@
 
 /*USE_OLDARGS*/
 /*
- * CAVEAT:  passing double (including float promoted to double) will
- * almost certainly break this, as would any integer type bigger than
- * sizeof (char *).
- * NetHack avoids floating point, and any configuration able to use
- * 'long long int' or I64P32 or the like should be using USE_STDARG.
+ * 注意: double（float が昇格した double を含む）を渡すと
+ * ほぼ確実に壊れる。また sizeof(char *) より大きい整数型でも
+ * 同様である。
+ * NetHack は浮動小数点を避けており、'long long int' や
+ * I64P32 などを使える構成であれば USE_STDARG を使うべきである。
  */
 #ifndef VA_TYPE
 typedef const char *vA;
@@ -149,22 +149,22 @@ typedef const char *vA;
     {
 #define VA_START(x)
 #define VA_INIT(var1, typ1)
-/* This is inherently risky, and should only be attempted as a
-   very last resort; manipulating arguments which haven't actually
-   been passed may or may not cause severe trouble depending on
-   the function-calling/argument-passing mechanism being used.
+/* これは本質的に危険であり、本当に最後の手段としてのみ
+   試みるべきである。実際には渡されていない引数を操作することは、
+   使用中の関数呼び出し/引数受け渡し機構によっては重大な問題を
+   起こすことも起こさないこともある。
 
-   [nethack's core doesn't use VA_NEXT() so doesn't use VA_SHIFT()
-   either, and this definition is just retained for completeness.
-   lev_comp does use VA_NEXT(), but it passes all 'argX' arguments.
-   Note: as of 5.0.0, lev_comp doesn't exist anymore.]
+   [nethack 本体は VA_NEXT() を使わないので VA_SHIFT() も使わない。
+   この定義は完全性のために残してあるだけ。
+   lev_comp は VA_NEXT() を使うが、すべての 'argX' 引数を渡す。
+   注: 5.0.0 時点で lev_comp はもう存在しない。]
  */
 #define VA_SHIFT()                                                    \
     (arg1 = arg2, arg2 = arg3, arg3 = arg4, arg4 = arg5, arg5 = arg6, \
      arg6 = arg7, arg7 = arg8, arg8 = arg9, arg9 = 0)
 #define VA_NEXT(var1, typ1) ((var1 = (typ1) arg1), VA_SHIFT(), var1)
 #define VA_END() }
-/* needed in pline.c, where full number of arguments is known and expected */
+/* pline.c で必要。そこでは引数の総数が既知で期待通り */
 #define VA_PASS1(a1)                                                  \
     (vA) a1, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #endif
@@ -172,30 +172,31 @@ typedef const char *vA;
 
 #endif /* NEED_VARARGS */
 
-/* generic pointer, always a macro; genericptr_t is usually a typedef */
+/* 汎用ポインタ。常にマクロ; genericptr_t は通常 typedef */
 #define genericptr void *
 #ifndef genericptr_t
-typedef genericptr genericptr_t; /* (void *) or (char *) */
+typedef genericptr genericptr_t; /* (void *) または (char *) */
 #endif
 
 #ifndef NO_PTR_FMT
-/* We actually want to know which systems have an ANSI run-time library
- * to know which support the %p format for printing pointers.
- * Since we require C99 or later, assume the library supports it. */
+/* 実際には、どのシステムが ANSI 実行時ライブラリを持つかを知りたい。
+ * そうすればポインタ表示の %p 書式をサポートするか分かる。
+ * いまは C99 以降が必須なので、ライブラリは対応しているとみなす。 */
 #define HAS_PTR_FMT
 #endif
 
 /*
- * According to ANSI C, prototypes for old-style function definitions like
+ * ANSI C によれば、旧式関数定義のプロトタイプ
  *   int func(arg) short arg; { ... }
- * must specify widened arguments (char and short to int, float to double),
+ * では、引数は拡張後の型（char と short は int、float は double）を
+ * 指定しなければならない:
  *   int func(int);
- * same as how narrow arguments get passed when there is no prototype info.
- * However, various compilers accept shorter arguments (char, short, etc.)
- * in prototypes and do typechecking with them.  Therefore this mess to
- * allow the better typechecking while also allowing some prototypes for
- * the ANSI compilers so people quit trying to fix the prototypes to match
- * the standard and thus lose the typechecking.
+ * これはプロトタイプ情報が無いときに狭い型がどのように渡されるかと同じ。
+ * しかし多くのコンパイラは、プロトタイプで char や short などの
+ * 狭い型を受け入れ、それで型検査を行う。そこで、型検査を改善しつつ
+ * ANSI コンパイラ向けの一部プロトタイプも許し、標準に合わせて
+ * プロトタイプを「修正」して型検査を失うことがないよう、この面倒な
+ * 仕組みがある。
  */
 #if defined(MSDOS) && !defined(__GO32__)
 #define UNWIDENED_PROTOTYPES
@@ -244,8 +245,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 #endif
 
-/* These are used for arguments within VDECL prototype declarations.
- */
+/* これらは VDECL プロトタイプ宣言内の引数に使う。 */
 #ifdef UNWIDENED_PROTOTYPES
 #define CHAR_P char
 #define SCHAR_P schar
@@ -273,14 +273,12 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 #endif
 
-/* OBJ_P and MONST_P should _only_ be used for declaring function pointers.
- */
+/* OBJ_P と MONST_P は、関数ポインタ宣言にのみ使うこと。 */
 #if defined(ULTRIX_PROTO) && !defined(__STDC__)
-/* The ultrix 2.0 and 2.1 compilers (on Ultrix 4.0 and 4.2 respectively) can't
- * handle "struct obj *" constructs in prototypes.  Their bugs are different,
- * but both seem to work if we put "void*" in the prototype instead.  This
- * gives us minimal prototype checking but avoids the compiler bugs.
- */
+/* Ultrix 2.0 と 2.1 のコンパイラ（それぞれ Ultrix 4.0 と 4.2）では、
+ * プロトタイプ中の "struct obj *" 構文を扱えない。バグの内容は違うが、
+ * プロトタイプで "void*" を使うと両方とも動くようだ。
+ * これにより最小限のプロトタイプ検査は維持しつつ、コンパイラバグを回避する。 */
 #define OBJ_P void *
 #define MONST_P void *
 #else
@@ -307,17 +305,17 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 #endif
 
-/* MetaWare High-C defaults to unsigned chars */
-/* AIX 3.2 needs this also */
+/* MetaWare High-C の既定は unsigned char */
+/* AIX 3.2 でもこれが必要 */
 #if defined(__HC__) || defined(_AIX32)
 #undef signed
 #endif
 
 /*
- * Language
- * Standard
+ * 言語
+ * 標準
  *
- *          NetHack 5.0 range
+ *          NetHack 5.0 の対象範囲
  *         /
  *        /
  *   C2y X      NetHack 3.6 and earlier range
@@ -328,31 +326,29 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
  *   C89      X
  *
  *
- * The NetHack 5.0 source code currently makes use of the following
- * C99 (and above) language features:
+ * NetHack 5.0 のソースコードは現在、次の
+ * C99（およびそれ以降）の言語機能を使用している:
  *
- *     commas at the end of enumerator lists
- *     variable declarations in for loop initializers
- *     mixing declarations and code
- *     variadic macros
+ *     列挙子リスト末尾のカンマ
+ *     for ループ初期化部での変数宣言
+ *     宣言とコードの混在
+ *     可変長マクロ
  *     'long long'
  *
- * The NetHack 5.0 source code adheres to the following greater-than C99
- * language restrictions:
+ * NetHack 5.0 のソースコードは、C99 を超える次の
+ * 言語制約に従っている:
  *
- *     Removal of K&R function definitions
- *     Removal of implicit int
+ *     K&R 形式関数定義の廃止
+ *     暗黙の int の廃止
  */
 
 /*
- * Provide a shorthand way of checking for a certain C standard
- * in the NetHack header files by always setting NH_C to one
- * of three possible values (as of January 2025):
+ * NetHack ヘッダファイル内で特定の C 規格を簡潔に判定できるよう、
+ * NH_C を常に次の3値のいずれか（2025年1月時点）に設定する:
  *
- * NH_C >= 202300L     Being compiled under C23 or greater
- * NH_C >= 199900L     Being compiled under C99 or greater
- * NH_C >= 198900L     Being compiled under C89 or greater,
- *                     or C std could not be determined.
+ * NH_C >= 202300L     C23 以上でコンパイル中
+ * NH_C >= 199900L     C99 以上でコンパイル中
+ * NH_C >= 198900L     C89 以上、または C 規格を判定できなかった
  */
 #if defined(__STDC_VERSION__)
 #if (__STDC_VERSION__ >= 202000L)
@@ -367,10 +363,10 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #define NH_C 198900L
 #endif
 
-/* NH_C is now defined to 198900L or 199900L or 202300L */
+/* NH_C は 198900L または 199900L または 202300L に定義済み */
 
 #if NH_C >= 202300L
-/* Give first priority to standard */
+/* まず標準を最優先する */
 #ifndef __has_c_attribute
 #define __has_c_attribute(x) 0
 #endif
@@ -385,7 +381,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
  * fallthrough
  */
 #if __has_c_attribute(fallthrough)
-/* Standard attribute is available, use it. */
+/* 標準属性が利用可能なのでそれを使う。 */
 #define FALLTHROUGH [[fallthrough]]
 /* #warning [[fallthrough]] from C23 */
 #endif  /* __has_c_attribute(fallthrough) */
@@ -400,21 +396,21 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif  /* NH_C >= 202300L */
 
 /*
- * Compiler-specific
+ * コンパイラ固有
  */
 
 #ifdef __clang__
-/* clang's gcc emulation is sufficient for nethack's usage */
+/* clang の gcc エミュレーションは nethack の用途には十分 */
 #ifndef __GNUC__
 #define __GNUC__ 5 /* high enough for returns_nonnull */
 #endif
 #endif
 
 /*
- * gcc (and also clang which masquerades as__GNUC__==5 due to #define above)
+ * gcc（および #define 上で __GNUC__==5 を名乗る clang も含む）
  *
- * Allow gcc2 and above to check parameters of printf-like calls with
- * -Wformat; append this to a prototype declaration (see pline() in extern.h).
+ * -Wformat によって printf 風呼び出しの引数を検査できるようにする;
+ * これをプロトタイプ宣言へ付与する（extern.h の pline() を参照）。
  */
 #ifdef __GNUC__
 #if (__GNUC__ >= 2) && !defined(USE_OLDARGS)
@@ -442,7 +438,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #define NH_PRAGMA_MESSAGE 1
 #endif  /* __GNUC__ greater than or equal to 5 */
 #if (!defined(__linux__) && !defined(MACOS)) || defined(GCC_URWARN)
-/* disable gcc's __attribute__((__warn_unused_result__)) since explicitly
+ /* disable gcc's __attribute__((__warn_unused_result__)) since explicitly
    discarding the result by casting to (void) is not accepted as a 'use' */
 #define __warn_unused_result__ /*empty*/
 #define warn_unused_result /*empty*/
@@ -450,7 +446,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif  /* __GNUC__ || clang masquerading as __GNUC__==5 */
 
 /*
- * clang-specific
+ * clang 固有
  *
  */
 #if defined(__clang__)
@@ -468,7 +464,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif  /* __clang__ */
 
 /*
- * NONNULL args
+ * NONNULL 引数
  */
 #if defined(DO_DEFINE_NONNULLS) && !defined(NONNULLS_DEFINED)
 #define NONNULL __attribute__((returns_nonnull))
@@ -495,14 +491,14 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif  /* DO_DEFINE_NONNULLS && !NONNULLS_DEFINED */
 
 /*
- * Microsoft compiler
+ * Microsoft コンパイラ
  */
 #ifdef _MSC_VER
 #ifndef ATTRNORETURN
 #define ATTRNORETURN __declspec(noreturn)
 /* #warning ATTRNORETURN __declspec(noreturn) from _MSC_VER */
 #endif
-/* #pragma message is available */
+/* #pragma message が利用可能 */
 #define NH_PRAGMA_MESSAGE 1
 #endif  /* _MSC_VER */
 
@@ -510,7 +506,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #define UNUSED ATTRUNUSED
 #endif
 
-/* Fallback implementations */
+/* フォールバック実装 */
 #ifndef PRINTF_F
 #define PRINTF_F(f, v)
 #endif

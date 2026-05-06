@@ -5,37 +5,37 @@
 #ifndef TIMEOUT_H
 #define TIMEOUT_H
 
-/* generic timeout function */
+/* 汎用タイムアウト関数 */
 typedef void (*timeout_proc)(ANY_P *, long);
 
-/* kind of timer */
+/* タイマーの種類 */
 enum timer_type {
     TIMER_NONE = 0,
-    TIMER_LEVEL = 1,   /* event specific to level [melting ice] */
-    TIMER_GLOBAL = 2,  /* event follows current play [not used] */
-    TIMER_OBJECT = 3,  /* event follows an object [various] */
-    TIMER_MONSTER = 4, /* event follows a monster [not used] */
+    TIMER_LEVEL = 1,   /* 階層固有イベント [氷が溶ける] */
+    TIMER_GLOBAL = 2,  /* 現在のプレイに追随するイベント [未使用] */
+    TIMER_OBJECT = 3,  /* オブジェクトに追随するイベント [各種] */
+    TIMER_MONSTER = 4, /* モンスターに追随するイベント [未使用] */
     NUM_TIMER_KINDS    /* 5 */
 };
 
-/* save/restore timer ranges */
-#define RANGE_LEVEL 0  /* save/restore timers staying on level */
-#define RANGE_GLOBAL 1 /* save/restore timers following global play */
+/* セーブ/復元用タイマー範囲 */
+#define RANGE_LEVEL 0  /* その階層に留まるタイマーをセーブ/復元 */
+#define RANGE_GLOBAL 1 /* プレイ全体に追随するタイマーをセーブ/復元 */
 
 /*
- * Timeout functions.  Add an enum here, then put it in the table
- * in timeout.c.  "One more level of indirection will fix everything."
- * Also add it to timerstr[] in nhl_get_timertype(nhlua.c); the entries
- * there match these but are spelled differently.
+ * タイムアウト関数。
+ * ここへ enum を追加し、timeout.c のテーブルへも追加すること。
+ * "もう1段階の間接参照で全て解決する。"
+ * また nhl_get_timertype(nhlua.c) の timerstr[] にも追加すること。
+ * そちらの項目はこれらと対応するが綴りは異なる。
  *
- * Note:  if any are inserted, removed, or reordered then EDITLEVEL
- * needs to be incremented because timeout indices get written into save
- * and bones files if any timers are present while saving.  (Adding new
- * ones at the end isn't restricted this way since new indices won't be
- * present in old data.)
+ * 注意: 追加・削除・順序変更を行う場合、EDITLEVEL を増やす必要がある。
+ * タイマーが存在する状態で保存すると、timeout の添字が save と
+ * bones ファイルへ書き込まれるためである。（末尾への追加のみは、
+ * 新しい添字が古いデータに存在しないためこの制約を受けない。）
  */
 enum timeout_types {
-    ROT_ORGANIC = 0, /* for buried organics */
+    ROT_ORGANIC = 0, /* 埋まっている有機物用 */
     ROT_CORPSE,
     REVIVE_MON,
     ZOMBIFY_MON,
@@ -58,15 +58,15 @@ enum timeout_types {
                              || (ttype) == FIG_TRANSFORM \
                              || (ttype) == SHRINK_GLOB)
 
-/* used in timeout.c */
+/* timeout.c で使用 */
 typedef struct fe {
-    struct fe *next;          /* next item in chain */
-    long timeout;             /* when we time out */
-    unsigned long tid;        /* timer ID */
-    short kind;               /* kind of use */
-    short func_index;         /* what to call when we time out */
-    anything arg;             /* pointer to timeout argument */
-    Bitfield(needs_fixup, 1); /* does arg need to be patched? */
+    struct fe *next;          /* チェーン内の次要素 */
+    long timeout;             /* タイムアウト時刻 */
+    unsigned long tid;        /* タイマー ID */
+    short kind;               /* 用途の種類 */
+    short func_index;         /* タイムアウト時に呼び出す先 */
+    anything arg;             /* タイムアウト引数へのポインタ */
+    Bitfield(needs_fixup, 1); /* arg のパッチ適用が必要か */
 } timer_element;
 
 #endif /* TIMEOUT_H */

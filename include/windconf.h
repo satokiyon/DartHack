@@ -5,32 +5,30 @@
 #ifndef WINDCONF_H
 #define WINDCONF_H
 
-/* #define SHELL */    /* nt use of pcsys routines caused a hang */
+/* #define SHELL */    /* nt で pcsys ルーチンを使うとハングした */
 
-#define EXEPATH              /* Allow .exe location to be used as HACKDIR */
-#define TRADITIONAL_GLYPHMAP /* Store glyph mappings at level change time */
+#define EXEPATH              /* .exe の場所を HACKDIR として使えるようにする */
+#define TRADITIONAL_GLYPHMAP /* glyph マッピングを階層変更時に保存する */
 
-#define LAN_FEATURES /* Include code for lan-aware features. Untested in \
-                        3.4.0*/
+#define LAN_FEATURES /* LAN 対応機能のコードを含める。3.4.0 では未検証 */
 
-#define PC_LOCKING /* Prevent overwrites of aborted or in-progress games */
-/* without first receiving confirmation. */
+#define PC_LOCKING /* 中断済みまたは進行中ゲームの上書きを防ぐ */
+/* まず確認を取る。 */
 
-#define SELF_RECOVER /* Allow the game itself to recover from an aborted \
-                        game */
+#define SELF_RECOVER /* ゲーム自身が中断ゲームから復旧できるようにする */
 
-#define SYSCF                /* Use a global configuration */
-#define SYSCF_FILE "sysconf" /* Use a file to hold the SYSCF configuration */
+#define SYSCF                /* グローバル設定を使用 */
+#define SYSCF_FILE "sysconf" /* SYSCF 設定を保持するファイルを使用 */
 
 #ifdef DUMPLOG
 #define DUMPLOG_FILE "%TEMP%/nethack-%n-%d.log"
 #endif
 
-/*#define CHANGE_COLOR*/ /* allow palette changes */
+/*#define CHANGE_COLOR*/ /* パレット変更を許可 */
 
-#define QWERTZ_SUPPORT  /* when swap_yz is True, numpad 7 is 'z' not 'y' */
+#define QWERTZ_SUPPORT  /* swap_yz が True のとき、numpad 7 は 'y' でなく 'z' */
 
-#define OPTIONS_AT_RUNTIME  /* build info done at runtime not text file */
+#define OPTIONS_AT_RUNTIME  /* ビルド情報はテキストファイルでなく実行時生成 */
 
 #define EARLY_CONFIGFILE_PASS
 #define TTY_PERM_INVENT
@@ -41,25 +39,24 @@
 
 /*
  * -----------------------------------------------------------------
- *  The remaining code shouldn't need modification.
+ *  以降のコードは通常変更不要。
  * -----------------------------------------------------------------
  */
-/* #define SHORT_FILENAMES */ /* All NT filesystems support long names now
- */
+/* #define SHORT_FILENAMES */ /* すべての NT ファイルシステムは現在長い名前をサポート */
 
 #ifdef DLB
-#define VERSION_IN_DLB_FILENAME     /* Append version digits to nhdat */
+#define VERSION_IN_DLB_FILENAME     /* nhdat にバージョン番号を付加 */
 #endif
 
 #ifdef MICRO
-#undef MICRO /* never define this! */
+#undef MICRO /* これは決して定義しない! */
 #endif
 
-#define NOCWD_ASSUMPTIONS /* Always define this. There are assumptions that \
-                             it is defined for WIN32.                       \
-                             Allow paths to be specified for HACKDIR,       \
-                             LEVELDIR, SAVEDIR, BONESDIR, DATADIR,          \
-                             SCOREDIR, LOCKDIR, CONFIGDIR, and TROUBLEDIR */
+#define NOCWD_ASSUMPTIONS /* 常にこれを定義する。WIN32 では定義済み前提の \
+                             仮定が存在する。さらに HACKDIR, \
+                             LEVELDIR, SAVEDIR, BONESDIR, DATADIR, \
+                             SCOREDIR, LOCKDIR, CONFIGDIR, TROUBLEDIR へ \
+                             パス指定を許可する */
 #define NO_TERMS
 #define ASCIIGRAPH
 
@@ -71,20 +68,17 @@
 
 #define PORT_HELP "porthelp"
 
-#define PORT_DEBUG /* include ability to debug international keyboard issues \
-                      */
+#define PORT_DEBUG /* 国際キーボード問題をデバッグする機能を含める */
 
-#define RUNTIME_PORT_ID /* trigger run-time port identification for \
-                         * identification of exe CPU architecture   \
-                         */
+#define RUNTIME_PORT_ID /* 実行時ポート識別を有効化し、\
+                         * exe の CPU アーキテクチャ識別に使う */
 #define RUNTIME_PASTEBUF_SUPPORT
 
 
-#define SAFERHANGUP /* Define SAFERHANGUP to delay hangup processing   \
-                     * until the main command loop. 'safer' because it \
-                     * avoids certain cheats and also avoids losing    \
-                     * objects being thrown when the hangup occurs.    \
-                     */
+#define SAFERHANGUP /* SAFERHANGUP を定義するとハングアップ処理を \
+                     * メインコマンドループまで遅延する。これは \
+                     * いくつかの不正を防ぎ、ハングアップ時に \
+                     * 投げていた物品を失わないため、より安全。 */
 
 #define CONFIG_FILE ".nethackrc"
 #define CONFIG_TEMPLATE "nethackrc.template"
@@ -92,7 +86,7 @@
 #define SYMBOLS_TEMPLATE "symbols.template"
 #define GUIDEBOOK_FILE "Guidebook.txt"
 
-/* Stuff to help the user with some common, yet significant errors */
+/* よくあるが重大なユーザーエラーに対処するための補助 */
 #define INTERJECT_PANIC 0
 #define INTERJECTION_TYPES (INTERJECT_PANIC + 1)
 extern void interject_assistance(int, int, genericptr_t, genericptr_t);
@@ -101,7 +95,7 @@ extern char *windows_exepath(void);
 
 /*
  *===============================================
- * Compiler-specific adjustments
+ * コンパイラ固有の調整
  *===============================================
  */
 
@@ -122,7 +116,7 @@ extern char *windows_exepath(void);
 #define MD_USE_TMPFILE_S
 #define HAS_STDINT
 #if (_MSC_VER > 1000)
-/* Visual C 8 warning elimination */
+/* Visual C 8 警告の抑制 */
 #ifndef _CRT_SECURE_NO_DEPRECATE
 #define _CRT_SECURE_NO_DEPRECATE
 #endif
@@ -134,38 +128,37 @@ extern char *windows_exepath(void);
 #endif
 #pragma warning(disable : 4996) /* VC8 deprecation warnings */
 #pragma warning(disable : 4142) /* benign redefinition */
-#pragma warning(disable : 4267) /* conversion from 'size_t' to XX */
+#pragma warning(disable : 4267) /* 'size_t' から XX への変換 */
 #if (_MSC_VER > 1600)
-#pragma warning(disable : 4459) /* hide global declaration */
+#pragma warning(disable : 4459) /* グローバル宣言を隠す */
 #endif                          /* _MSC_VER > 1600 */
 #endif                          /* _MSC_VER > 1000 */
-#pragma warning(disable : 4761) /* integral size mismatch in arg; conv \
-                                   supp*/
+#pragma warning(disable : 4761) /* 引数で整数サイズ不一致; 変換抑制 */
 #ifdef YYPREFIX
 #pragma warning(disable : 4102) /* unreferenced label */
 #endif
 #ifdef __cplusplus
-/* suppress a warning in cppregex.cpp */
+/* cppregex.cpp の警告を抑制 */
 #pragma warning(disable : 4101) /* unreferenced local variable */
 #endif
 #ifndef HAS_STDINT_H
 #define HAS_STDINT_H    /* force include of stdint.h in integer.h */
 #endif
-/* Turn on some additional warnings */
+/* 追加の警告をいくつか有効化 */
 #pragma warning(3:4389)
 
-/* supply ssize_t */
+/* ssize_t を提供 */
 #include <BaseTsd.h>
 typedef SSIZE_T ssize_t;
 
 #endif /* _MSC_VER */
 
-/* The following is needed for prototypes of certain functions */
+/* 以下は特定関数のプロトタイプに必要 */
 #if defined(_MSC_VER)
-#include <process.h> /* Provides prototypes of exit(), spawn()      */
+#include <process.h> /* exit(), spawn() のプロトタイプを提供 */
 #endif
 
-#include <string.h> /* Provides prototypes of strncmpi(), etc.     */
+#include <string.h> /* strncmpi() などのプロトタイプを提供 */
 #ifdef STRNCMPI
 #define strncmpi(a, b, c) strnicmp(a, b, c)
 #endif
@@ -177,8 +170,8 @@ typedef SSIZE_T ssize_t;
 #undef random
 #endif
 
-#define PATHLEN BUFSZ  /* maximum pathlength */
-#define FILENAME BUFSZ /* maximum filename length (conservative) */
+#define PATHLEN BUFSZ  /* 最大パス長 */
+#define FILENAME BUFSZ /* 最大ファイル名長（保守的） */
 
 #if defined(_MAX_PATH) && defined(_MAX_FNAME)
 #if (_MAX_PATH < BUFSZ) && (_MAX_FNAME < BUFSZ)
@@ -192,7 +185,7 @@ typedef SSIZE_T ssize_t;
 #define NO_SIGNAL
 #define USE_STDARG
 
-/* Use the high quality random number routines. */
+/* 高品質乱数ルーチンを使用する。 */
 #ifdef USE_ISAAC64
 #undef RANDOM
 #else
@@ -200,13 +193,13 @@ typedef SSIZE_T ssize_t;
 #define Rand() random()
 #endif
 
-/* Fall back to C's if nothing else, but this really isn't acceptable */
+/* 他に何もなければ C 標準へフォールバックするが、本来これは望ましくない */
 #if !defined(USE_ISAAC64) && !defined(RANDOM)
 #define Rand() rand()
 #endif
 
 #include <sys/stat.h>
-#define FCMASK (_S_IREAD | _S_IWRITE) /* file creation mask */
+#define FCMASK (_S_IREAD | _S_IWRITE) /* ファイル作成マスク */
 #define regularize nt_regularize
 #define HLOCK "NHPERM"
 
@@ -220,10 +213,10 @@ typedef SSIZE_T ssize_t;
 #endif
 
 #if defined(DLB) || defined(_MSC_VER)
-#define FILENAME_CMP stricmp /* case insensitive */
+#define FILENAME_CMP stricmp /* 大文字小文字を区別しない */
 #endif
 
-/* this was part of the MICRO stuff in the past */
+/* これは以前は MICRO 関連の一部だった */
 extern const char *alllevels, *allbones;
 #define ABORT C('a')
 #define getuid() 1
@@ -254,7 +247,7 @@ open(const char _FAR *__path, int __access, ... /*unsigned mode*/);
 long _RTLENTRY _EXPFUNC lseek(int __handle, long __offset, int __fromwhere);
 int _RTLENTRY _EXPFUNC read(int __handle, void _FAR *__buf, unsigned __len);
 #endif
-#undef kbhit /* Use our special NT kbhit */
+#undef kbhit /* NT 用の特別な kbhit を使う */
 #define kbhit (*nt_kbhit)
 
 #ifdef LAN_FEATURES
@@ -262,7 +255,7 @@ int _RTLENTRY _EXPFUNC read(int __handle, void _FAR *__buf, unsigned __len);
 #endif
 
 #ifndef alloca
-#define ALLOCA_HACK /* used in util/panic.c */
+#define ALLOCA_HACK /* util/panic.c で使用 */
 #endif
 
 extern int set_win32_option(const char *, const char *);

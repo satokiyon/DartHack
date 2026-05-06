@@ -6,58 +6,58 @@
 #define SYS_H
 
 struct sysopt_s {
-    char *support; /* local support contact */
-    char *recover; /* how to run recover - may be overridden by win port */
-    char *wizards; /* space-separated list of usernames */
-    char *fmtd_wizard_list; /* formatted version of wizards; null or "one"
-                               or "one or two" or "one, two, or three", &c */
-    char *explorers;  /* like wizards, but for access to explore mode */
-    char *shellers;   /* like wizards, for ! command (-DSHELL); also ^Z */
-    char *genericusers; /* usernames that prompt for user name */
-    char *debugfiles; /* files to show debugplines in. '*' is all. */
+    char *support; /* ローカルサポート連絡先 */
+    char *recover; /* recover の実行方法 - win port により上書きされる可能性あり */
+    char *wizards; /* ユーザー名の空白区切り一覧 */
+    char *fmtd_wizard_list; /* wizards の整形版; null または "one"
+                               または "one or two" または "one, two, or three" など */
+    char *explorers;  /* wizards と同様だが explore モード用 */
+    char *shellers;   /* wizards と同様、! コマンド用 (-DSHELL); また ^Z */
+    char *genericusers; /* ユーザー名入力を促すユーザー名 */
+    char *debugfiles; /* debugpline を表示するファイル。'*' は全て。 */
     char *msghandler;
 #ifdef DUMPLOG
-    char *dumplogfile; /* where the dump file is saved */
+    char *dumplogfile; /* ダンプファイルの保存先 */
 #endif
-    int env_dbgfl;    /*  1: debugfiles comes from getenv("DEBUGFILES")
-                       *     so sysconf's DEBUGFILES shouldn't override it;
-                       *  0: getenv() hasn't been attempted yet;
-                       * -1: getenv() didn't find a value for DEBUGFILES.
+    int env_dbgfl;    /*  1: debugfiles は getenv("DEBUGFILES") 由来
+                       *     なので sysconf の DEBUGFILES で上書きしない;
+                       *  0: getenv() はまだ試行されていない;
+                       * -1: getenv() で DEBUGFILES の値が見つからなかった。
                        */
     int maxplayers;
     int seduce;
-    int check_save_uid; /* restoring savefile checks UID? */
-    int check_plname; /* use plname for checking wizards/explorers/shellers */
+    int check_save_uid; /* セーブ復元時に UID を確認するか? */
+    int check_plname; /* wizards/explorers/shellers 判定に plname を使う */
     int bones_pools;
-    long livelog; /* LL_foo events to livelog */
+    long livelog; /* livelog に記録する LL_foo イベント */
 
-    /* record file */
+    /* 記録ファイル */
     int persmax;
     int pers_is_uid;
     int entrymax;
     int pointsmin;
     int tt_oname_maxrank;
 
-    /* panic options */
+    /* panic オプション */
     char *gdbpath;
     char *greppath;
     char *crashreporturl;
     int panictrace_gdb;
     int panictrace_libc;
 
-    /* save and bones format */
-    int saveformat[2];    /* primary and onetime conversion */
-    int bonesformat[2];   /* primary and onetime conversion */
+    /* セーブおよび bones のフォーマット */
+    int saveformat[2];    /* 主形式と一回限り変換 */
+    int bonesformat[2];   /* 主形式と一回限り変換 */
 
-    /* enable accessibility options */
+    /* アクセシビリティオプションを有効化 */
     int accessibility;
 #ifdef WIN32
-    int portable_device_paths;  /* nethack config for a portable device */
+    int portable_device_paths;  /* ポータブルデバイス向け nethack 設定 */
 #endif
 
-    /* nethack's interactive help menu */
-    int hideusage;      /* 0: include 'command-line usage' entry in help menu;
-                         * 1: suppress it */
+    /* nethack の対話型ヘルプメニュー */
+    int hideusage;      /* 0: ヘルプメニューに「コマンドライン使用法」を含める;
+                         * 1: 非表示にする */
 };
 
 extern struct sysopt_s sysopt;
