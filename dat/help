@@ -1,5 +1,3 @@
-File: ..\..\..\dat\help
-````````
         NetHack へようこそ！            （バージョン 3.6 の説明）
 
         NetHack は、あなた（冒険者）がイェンダーの魔除けを求めて
@@ -16,200 +14,188 @@ NetHack では現在いる階層の見た目が画面に表示されます。
 
         NetHack では次の記号が使われます：
 
-        - and |  The walls of a room, possibly also open doors or a grave.
-        .        The floor of a room or a doorway.
-        #        A corridor, or iron bars, or a tree, or possibly a kitchen
-                 sink (if your dungeon has sinks), or a drawbridge.
-        >        Stairs down: a way to the next level.
-        <        Stairs up: a way to the previous level.
-        @        You (usually), or another human.
-        )        A weapon of some sort.
-        [        A suit or piece of armor.
-        %        Something edible (not necessarily healthy).
-        /        A wand.
-        =        A ring.
-        ?        A scroll.
-        !        A potion.
-        (        Some other useful object (pick-axe, key, lamp...)
-        $        A pile of gold.
-        *        A gem or rock (possibly valuable, possibly worthless).
-        +        A closed door, or a spellbook containing a spell
-                 you can learn.
-        ^        A trap (once you detect it).
-        "        An amulet, or a spider web.
-        0        An iron ball.
-        _        An altar, or an iron chain.
-        {        A fountain.
-        }        A pool of water or moat or a pool of lava.
-        \        An opulent throne.
-        `        A boulder or statue.
-        A to Z, a to z, and several others:  Monsters.
-        I        Invisible or unseen monster's last known location
+        - and |  部屋の壁。場合によっては開いた扉や墓石を表すこともあります。
+        .        部屋の床、または出入り口。
+        #        通路、鉄格子、木、（ダンジョンにあれば）流し台、
+                 または跳ね橋。
+        >        下り階段：次の階へ進む道。
+        <        上り階段：前の階へ戻る道。
+        @        あなた（通常）、または他の人間。
+        )        何らかの武器。
+        [        鎧一式、または防具の一部。
+        %        食べられるもの（健康に良いとは限りません）。
+        /        杖。
+        =        指輪。
+        ?        巻物。
+        !        薬。
+        (        その他の便利な道具（つるはし、鍵、ランプ など）。
+        $        金貨の山。
+        *        宝石または石（価値がある場合も、ない場合もある）。
+        +        閉じた扉、または習得可能な呪文が書かれた魔法書。
+        ^        罠（発見後）。
+        "        アミュレット、またはクモの巣。
+        0        鉄球。
+        _        祭壇、または鉄鎖。
+        {        噴水。
+        }        水場・堀、または溶岩だまり。
+        \        豪華な玉座。
+        `        岩、または石像。
+        A?Z、a?z、およびその他いくつか：モンスター。
+        I        透明または未視認モンスターの最後に確認された位置。
 
-                 You can find out what a symbol represents by typing
-                 '/' and following the directions to move the cursor
-                 to the symbol in question.  For instance, a 'd' may
-                 turn out to be a dog.
+                 記号の意味は '/' を押し、指示に従ってカーソルを
+                 対象の記号へ動かすと確認できます。たとえば 'd' は
+                 犬であることがあります。
 
 
-y k u   7 8 9   Move commands:
- \|/     \|/            yuhjklbn: go one step in specified direction
-h-.-l   4-.-6           YUHJKLBN: go in specified direction until you
- /|\     /|\                        hit a wall or run into something
-b j n   1 2 3           g<dir>:   run in direction <dir> until something
-      numberpad                     interesting is seen
-                        G<dir>,   same, except a branching corridor isn't
- <  up                  ^<dir>:     considered interesting (the ^ in this
-                                    case means the Control key, not a caret)
- >  down                m<dir>:   move without picking up objects
-                        F<dir>:   fight even if you don't sense a monster
-                If the number_pad option is set, the number keys move instead.
-                Depending on the platform, Shift number (on the numberpad),
-                Meta number, or Alt number will invoke the YUHJKLBN commands.
-                Control <dir> may or may not work when number_pad is enabled,
-                depending on the platform's capabilities.
-                Digit '5' acts as 'G' prefix, unless number_pad is set to 2
-                in which case it acts as 'g' instead.
-                If number_pad is set to 3, the roles of 1,2,3 and 7,8,9 are
-                reversed; when set to 4, behaves same as 3 combined with 2.
-                If number_pad is set to -1, alphabetic movement commands are
-                used but 'y' and 'z' are swapped.
+y k u   7 8 9   移動コマンド:
+ \|/     \|/            yuhjklbn: 指定方向へ1マス移動
+h-.-l   4-.-6           YUHJKLBN: 指定方向へ、壁に当たるか何かに
+ /|\     /|\                        ぶつかるまで進む
+b j n   1 2 3           g<dir>:   <dir> 方向へ、何か興味深いものを
+      numberpad                     見つけるまで進む
+                        G<dir>,   上と同じ。ただし分岐通路は
+ <  up                  ^<dir>:     「興味深いもの」に含めない
+                                    （この場合の ^ はキャレットではなく
+                                     Control キーの意味）
+ >  down                m<dir>:   アイテムを拾わずに移動
+                        F<dir>:   モンスターを感知していなくても攻撃
+                number_pad オプション有効時は数字キーで移動します。
+                環境によっては Shift+数字（テンキー）、
+                Meta+数字、Alt+数字で YUHJKLBN コマンドになります。
+                number_pad 有効時に Control+方向が使えるかは、
+                プラットフォームの機能に依存します。
+                数字キー '5' は通常 'G' 接頭辞として動作しますが、
+                number_pad=2 の場合は 'g' として動作します。
+                number_pad=3 では 1,2,3 と 7,8,9 の役割が入れ替わり、
+                number_pad=4 では 3 と 2 の組み合わせ動作になります。
+                number_pad=-1 では英字移動を使い、'y' と 'z' が入れ替わります。
 
-Commands:
-        NetHack knows the following commands:
-        ?       Help menu.
-        /       What-is, tell what a symbol represents.  You may choose to
-                specify a location or give a symbol argument.  Enabling the
-                autodescribe option will give information about the symbol
-                at each location you move the cursor onto.
-        &       Tell what a command does.
-        <       Go up a staircase (if you are standing on it).
-        >       Go down a staircase (if you are standing on it).
-        .       Rest, do nothing for one turn.
-        _       Travel via a shortest-path algorithm to a point on the map.
-        a       Apply (use) a tool (pick-axe, key, lamp...).
-        A       Remove all armor.
-        ^A      Redo the previous command.
-        c       Close a door.
-        C       Call (name) monster, individual object, or type of object.
-        d       Drop something.  d7a:  drop seven items of object a.
-        D       Drop multiple items.  This command is implemented in two
-                different ways.  One way is:
-                "D" displays a list of all of your items, from which you can
-                pick and choose what to drop.  A "+" next to an item means
-                that it will be dropped, a "-" means that it will not be
-                dropped.  Toggle an item to be selected/deselected by typing
-                the letter adjacent to its description.  Select all items
-                with "+", deselect all items with "=".  The <SPACEBAR> moves
-                you from one page of the listing to the next.
-                The other way is:
-                "D" will ask the question "What kinds of things do you want
-                to drop? [!%= au]".  You should type zero or more object
-                symbols possibly followed by 'a' and/or 'u'.
-                Da - drop all objects, without asking for confirmation.
-                Du - drop only unpaid objects (when in a shop).
-                D%u - drop only unpaid food.
-        ^D      Kick (for doors, usually).
-        e       Eat food.
-        E       Engrave a message on the floor.
-                E- - write in the dust with your fingers.
-        f       Fire ammunition from quiver.
-        F       Followed by direction, fight a monster (even if you don't
-                sense it).
-        i       Display your inventory.
-        I       Display selected parts of your inventory, as in
-                I* - list all gems in inventory.
-                Iu - list all unpaid items.
-                Ix - list all used up items that are on your shopping bill.
-                I$ - count your money.
-        o       Open a door.
-        O       Review current options and possibly change them.
-                A menu displaying the option settings will be displayed
-                and most can be changed by simply selecting their entry.
-                Options are usually set before the game with NETHACKOPTIONS
-                environment variable or via a configuration file (defaults.nh,
-                NetHack Defaults, nethack.cnf, ~/.nethackrc, etc.) rather
-                than with the 'O' command.
-        p       Pay your shopping bill.
-        P       Put on an accessory (ring, amulet, etc).
-        ^P      Repeat last message (subsequent ^P's repeat earlier messages).
-                The behavior can be varied via the msg_window option.
-        q       Drink (quaff) something (potion, water, etc).
-        Q       Select ammunition for quiver.
-        #quit   Exit the program without saving the current game.
-        r       Read a scroll or spellbook.
-        R       Remove an accessory (ring, amulet, etc).
-        ^R      Redraw the screen.
-        s       Search for secret doors and traps around you.
-        S       Save the game.  Also exits the program.
-                [To restore, just play again and use the same character name.]
-                [There is no "save current data but keep playing" capability.]
-        t       Throw an object or shoot a projectile.
-        T       Take off armor.
-        ^T      Teleport, if you are able.
-        v       Displays the version number.
-        V       Display a longer identification of the version, including the
-                history of the game.
-        w       Wield weapon.  w- means wield nothing, use bare hands.
-        W       Wear armor.
-        x       Swap wielded and secondary weapons.
-        X       Toggle two-weapon combat.
-        ^X      Show your attributes.
-        #explore  Switch to Explore Mode (aka Discovery Mode) where dying and
-                deleting the save file during restore can both be overridden.
-        z       Zap a wand.  (Use y instead of z if number_pad is -1.)
-        Z       Cast a spell.  (Use Y instead of Z if number_pad is -1.)
-        ^Z      Suspend the game.  (^Y instead of ^Z if number_pad is -1.)
-                [To resume, use the shell command 'fg'.]
-        :       Look at what is here.
-        ;       Look at what is somewhere else.
-        ,       Pick up some things.
-        @       Toggle the pickup option.
-        ^       Ask for the type of a trap you found earlier.
-        )       Tell what weapon you are wielding.
-        [       Tell what armor you are wearing.
-        =       Tell what rings you are wearing.
-        "       Tell what amulet you are wearing.
-        (       Tell what tools you are using.
-        *       Tell what equipment you are using; combines the preceding five.
-        $       Count your gold pieces.
-        +       List the spells you know; also rearrange them if desired.
-        \       Show what types of objects have been discovered.
-        `       Show discovered types for one class of objects.
-        !       Escape to a shell, if supported in your version and OS.
-                [To resume play, terminate the shell subprocess via 'exit'.]
-        #       Introduces one of the "extended" commands.  To get a list of
-                the commands you can use with "#" type "#?".  The extended
-                commands you can use depends upon what options the game was
-                compiled with, along with your class and what type of monster
-                you most closely resemble at a given moment.  If your keyboard
-                has a meta key (which, when pressed in combination with another
-                key, modifies it by setting the 'meta' (8th, or 'high') bit),
-                these extended commands can be invoked by meta-ing the first
-                letter of the command.  An alt key may have a similar effect.
+コマンド:
+        NetHack で使える主なコマンドは以下のとおりです。
+        ?       ヘルプメニュー。
+        /       その記号が何を表すかを調べる（What-is）。
+                位置指定または記号指定を選べます。autodescribe
+                オプションを有効にすると、カーソル移動先ごとに
+                記号情報が表示されます。
+        &       コマンドの説明を表示。
+        <       階段の上に立っている場合、上の階へ。
+        >       階段の上に立っている場合、下の階へ。
+        .       その場で1ターン休む。
+        _       最短経路アルゴリズムで地図上の地点へ移動。
+        a       道具を使う（つるはし、鍵、ランプ など）。
+        A       防具をすべて外す。
+        ^A      直前のコマンドを再実行。
+        c       扉を閉める。
+        C       モンスター、個別アイテム、またはアイテム種別に名前を付ける。
+        d       アイテムを落とす。d7a: a の品を 7 個落とす。
+        D       複数アイテムを落とす。実装は2通りあります。
+                1つ目:
+                "D" で所持品一覧が表示され、落とす物を選択できます。
+                "+" は落とす、"-" は落とさない。説明横の文字で
+                選択/解除を切り替えます。"+" で全選択、"=" で全解除。
+                <SPACEBAR> で次ページへ進みます。
+                2つ目:
+                "D" で "What kinds of things do you want to drop? [!%= au]"
+                と尋ねられます。アイテム記号を0個以上入力し、必要なら
+                'a' や 'u' を続けて指定します。
+                Da  - 確認なしで全アイテムを落とす。
+                Du  - 未払い品のみ落とす（店内）。
+                D%u - 未払いの食料のみ落とす。
+        ^D      蹴る（主に扉）。
+        e       食べる。
+        E       床に文字を刻む。
+                E- - 指でほこりに書く。
+        f       矢筒から弾を発射。
+        F       方向指定で攻撃（感知していなくても攻撃）。
+        i       所持品一覧を表示。
+        I       所持品の一部だけを表示。例:
+                I* - 宝石をすべて表示。
+                Iu - 未払い品をすべて表示。
+                Ix - 勘定書にある使用済み品を表示。
+                I$ - 所持金を数える。
+        o       扉を開ける。
+        O       現在のオプションを確認し、必要に応じて変更。
+                設定一覧メニューが表示され、多くは項目選択だけで
+                変更できます。通常は NETHACKOPTIONS 環境変数や
+                設定ファイル（defaults.nh、NetHack Defaults、
+                nethack.cnf、~/.nethackrc など）で事前設定します。
+        p       店の勘定を支払う。
+        P       装身具（指輪・アミュレット等）を装備。
+        ^P      直前メッセージを再表示（さらに ^P で過去へ遡る）。
+                挙動は msg_window オプションで変更可能。
+        q       飲む（薬、水 など）。
+        Q       矢筒に入れる弾を選択。
+        #quit   現在のゲームを保存せず終了。
+        r       巻物または魔法書を読む。
+        R       装身具（指輪・アミュレット等）を外す。
+        ^R      画面を再描画。
+        s       周囲の隠し扉や罠を探す。
+        S       ゲームを保存して終了。
+                [復帰するには再起動し、同じキャラクター名を使用します。]
+                [「保存だけして続行」はできません。]
+        t       物を投げる、または射撃する。
+        T       防具を脱ぐ。
+        ^T      可能ならテレポート。
+        v       バージョン番号を表示。
+        V       より詳細なバージョン情報（履歴を含む）を表示。
+        w       武器を装備。w- は素手にする。
+        W       防具を着る。
+        x       主武器と副武器を入れ替える。
+        X       二刀流のON/OFF切り替え。
+        ^X      能力値を表示。
+        #explore  Explore Mode（Discovery Mode）へ切り替え。
+                死亡時や復元時のセーブ削除を上書きできるモードです。
+        z       杖を振る（number_pad=-1 の場合は y）。
+        Z       呪文を唱える（number_pad=-1 の場合は Y）。
+        ^Z      ゲームを中断（number_pad=-1 の場合は ^Y）。
+                [復帰にはシェルで 'fg' を実行。]
+        :       足元を見る。
+        ;       離れた場所を見る。
+        ,       物を拾う。
+        @       自動拾い設定を切り替え。
+        ^       以前見つけた罠の種類を確認。
+        )       現在装備中の武器を表示。
+        [       現在着用中の防具を表示。
+        =       現在装備中の指輪を表示。
+        "       現在装備中のアミュレットを表示。
+        (       現在使用中の道具を表示。
+        *       現在使用中の装備一式を表示（上記5種をまとめて表示）。
+        $       所持金を数える。
+        +       習得済み呪文一覧を表示（必要なら並べ替えも可能）。
+        \       発見済みアイテム種別を表示。
+        `       1種類のアイテム分類について発見済み種別を表示。
+        !       シェルへ一時的に抜ける（対応版/OSのみ）。
+                [再開するには 'exit' でサブシェルを終了。]
+        #       「拡張コマンド」の導入記号。利用可能一覧は
+                "#?" で表示できます。使用可能な拡張コマンドは、
+                ビルド時オプション、あなたの職業、そしてその時点で
+                もっとも近い姿のモンスター種別などに依存します。
+                キーボードにメタキー（他キーと組み合わせると
+                'meta' ビットを立てるキー）があれば、拡張コマンドは
+                先頭文字をメタ化して呼び出せます。Alt キーが
+                同様の働きをする場合もあります。
 
-        If the "number_pad" option is on, some additional letter commands
-        are available:
+        "number_pad" オプションが有効な場合、追加で次の
+        文字コマンドが使えます:
 
-        h       displays the help menu, like '?'
-        j       Jump to another location.
-        k       Kick (for doors, usually).
-        l       Loot a box on the floor.
-        n       followed by number of times to repeat the next command.
-        N       Name a monster, an individual object, or a type of object.
-        u       Untrap a trapped object or door.
+        h       '?' と同じくヘルプメニューを表示。
+        j       別の場所へジャンプ。
+        k       蹴る（主に扉）。
+        l       床の箱をあさる。
+        n       続くコマンドの繰り返し回数を指定。
+        N       モンスター、個別アイテム、またはアイテム種別に命名。
+        u       罠付きの物体や扉の罠を解除。
 
-        You can put a number before a command to repeat it that many times,
-        as in "40." or "20s".  If you have the number_pad option set, you
-        must type 'n' to prefix the count, as in "n40." or "n20s".
+        コマンドの前に数字を置くと、その回数だけ繰り返します。
+        例: "40." や "20s"。number_pad が有効な場合は
+        "n40." や "n20s" のように 'n' を前置します。
 
 
-        Some information is displayed on the bottom line or perhaps in a
-        box, depending on the platform you are using.  You see your
-        attributes, your alignment, what dungeon level you are on, how many
-        hit points you have now (and will have when fully recovered), what
-        your armor class is (the lower the better), your experience level,
-        and the state of your stomach.  Optionally, you may or may not see
-        other information such as spell points, how much gold you have, etc.
+        一部情報は画面下部、または使用中プラットフォームに応じた
+        ボックス内に表示されます。能力値、属性、現在階層、現在HP
+        （および全快時HP）、AC（低いほど有利）、経験レベル、
+        空腹状態などが表示されます。設定によっては呪文ポイントや
+        所持金など、追加情報が表示される場合もあります。
 
-        Have Fun, and Happy Hacking!
+        楽しい冒険を。Happy Hacking!
