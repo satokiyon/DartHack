@@ -3,34 +3,33 @@
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* note for 3.1.0 and later: no longer manipulated by 'makedefs' */
+/* 3.1.0 以降の注記: もはや 'makedefs' では操作しない */
 
 #ifndef TRAP_H
 #define TRAP_H
 
 union vlaunchinfo {
-    short v_launch_otyp; /* type of object to be triggered */
-    coord v_launch2;     /* secondary launch point (for boulders) */
-    uchar v_conjoined;   /* conjoined pit locations */
-    short v_tnote;       /* boards: 12 notes        */
+    short v_launch_otyp; /* 発動対象オブジェクト型 */
+    coord v_launch2;     /* 第二発射地点（岩用） */
+    uchar v_conjoined;   /* 連結落とし穴位置 */
+    short v_tnote;       /* 板: 12 音階        */
 };
 
 struct trap {
     struct trap *ntrap;
     coordxy tx, ty;
-    d_level dst; /* destination for portals/holes/trapdoors */
+    d_level dst; /* ポータル/穴/落とし戸の遷移先 */
     coord launch;
-#define teledest launch /* x,y destination for teleport traps, if > 0 */
+#define teledest launch /* テレポート罠の x,y 遷移先（> 0 の場合） */
     Bitfield(ttyp, 5);
     Bitfield(tseen, 1);
     Bitfield(once, 1);
-    Bitfield(madeby_u, 1); /* So monsters may take offence when you trap
-                            * them.  Recognizing who made the trap isn't
-                            * completely unreasonable; everybody has
-                            * their own style.  This flag is also needed
-                            * when you untrap a monster.  It would be too
-                            * easy to make a monster peaceful if you could
-                            * set a trap for it and then untrap it. */
+    Bitfield(madeby_u, 1); /* あなたが仕掛けた罠でモンスターが怒るため
+                            * 誰が作った罠かを判別できるのは
+                            * 不自然ではない（癖がある）。このフラグは
+                            * モンスターを解除したときにも必要。
+                            * 仕掛けてから解除するだけで平和化できると
+                            * 簡単すぎるため。 */
     union vlaunchinfo vl;
 #define launch_otyp vl.v_launch_otyp
 #define launch2 vl.v_launch2
@@ -41,19 +40,19 @@ struct trap {
 #define newtrap() (struct trap *) alloc(sizeof(struct trap))
 #define dealloc_trap(trap) free((genericptr_t)(trap))
 
-/* reasons for statue animation */
+/* 石像アニメーションの理由 */
 #define ANIMATE_NORMAL 0
 #define ANIMATE_SHATTER 1
 #define ANIMATE_SPELL 2
 
-/* reasons for animate_statue's failure */
-#define AS_OK 0            /* didn't fail */
-#define AS_NO_MON 1        /* makemon failed */
-#define AS_MON_IS_UNIQUE 2 /* statue monster is unique */
+/* animate_statue の失敗理由 */
+#define AS_OK 0            /* 失敗していない */
+#define AS_NO_MON 1        /* makemon 失敗 */
+#define AS_MON_IS_UNIQUE 2 /* 石像モンスターが固有 */
 
-/* Note: if adding/removing a trap, adjust trap_engravings[] in mklev.c */
+/* 注: 罠を追加/削除する場合は mklev.c の trap_engravings[] も調整 */
 
-/* unconditional traps */
+/* 無条件トラップ */
 enum trap_types {
     ALL_TRAPS    = -1, /* mon_knows_traps(), mon_learns_traps() */
     NO_TRAP      =  0,
@@ -79,30 +78,30 @@ enum trap_types {
     MAGIC_TRAP   = 20,
     ANTI_MAGIC   = 21,
     POLY_TRAP    = 22,
-    VIBRATING_SQUARE = 23, /* not a trap but shown/remembered as if one
-                            * once it has been discovered */
+    VIBRATING_SQUARE = 23, /* 罠ではないが、発見後は罠同様に
+                            * 表示/記憶される */
 
-    /* trapped door and trapped chest aren't traps on the map, but they
-       might be shown/remembered as such after trap detection until hero
-       comes in view of them and sees the feature or object;
-       key-using or door-busting monsters who survive a door trap learn
-       to avoid other such doors [not implemented] */
-    TRAPPED_DOOR = 24, /* part of door; not present on map as a trap */
-    TRAPPED_CHEST = 25, /* part of object; not on map */
+    /* 仕掛け扉と仕掛け箱はマップ上の罠ではないが、罠検知後に
+       ヒーローが視認して機能/物体を確認するまで、罠として
+       表示/記憶されることがある。
+       鍵使用または破壊で生き残ったモンスターは同種扉を避ける
+       （未実装） */
+    TRAPPED_DOOR = 24, /* 扉の一部; マップ上に罠としては存在しない */
+    TRAPPED_CHEST = 25, /* オブジェクトの一部; マップ上にない */
 
     TRAPNUM = 26
 };
 
-/* some trap-related function return results */
+/* いくつかの罠関連関数の戻り値 */
 enum trap_result {
     Trap_Effect_Finished = 0,
     Trap_Is_Gone = 0,
     Trap_Caught_Mon = 1,
     Trap_Killed_Mon = 2,
-    Trap_Moved_Mon = 3, /* new location, or new level */
+    Trap_Moved_Mon = 3, /* 新しい場所、または新しいレベル */
 };
 
-/* return codes from immune_to_trap() */
+/* immune_to_trap() の戻り値 */
 enum trap_immunities {
     TRAP_NOT_IMMUNE = 0,
     TRAP_CLEARLY_IMMUNE = 1,
@@ -112,7 +111,7 @@ enum trap_immunities {
 
 #define is_pit(ttyp) ((ttyp) == PIT || (ttyp) == SPIKED_PIT)
 #define is_hole(ttyp)  ((ttyp) == HOLE || (ttyp) == TRAPDOOR)
-#define unhideable_trap(ttyp) ((ttyp) == HOLE) /* visible traps */
+#define unhideable_trap(ttyp) ((ttyp) == HOLE) /* 常に可視の罠 */
 #define undestroyable_trap(ttyp) ((ttyp) == MAGIC_PORTAL         \
                                   || (ttyp) == VIBRATING_SQUARE)
 #define is_magical_trap(ttyp) ((ttyp) == TELEP_TRAP     \
@@ -120,7 +119,7 @@ enum trap_immunities {
                                || (ttyp) == MAGIC_TRAP  \
                                || (ttyp) == ANTI_MAGIC  \
                                || (ttyp) == POLY_TRAP)
-/* "transportation" traps */
+/* 「移送」系トラップ */
 #define is_xport(ttyp) ((ttyp) >= TELEP_TRAP && (ttyp) <= MAGIC_PORTAL)
 #define fixed_tele_trap(t) ((t)->ttyp == TELEP_TRAP \
                             && isok((t)->teledest.x,(t)->teledest.y))

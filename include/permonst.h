@@ -11,30 +11,30 @@ enum monnums {
 #include "monsters.h"
 #undef MONS_ENUM
         NUMMONS,
-        NON_PM = -1,              /* "not a monster" */
-        LOW_PM = NON_PM + 1,      /* first monster in mons */
-        LEAVESTATUE = NON_PM - 1, /* leave statue instead of corpse;
-                                   * there are two lower values assigned
-                                   * in end.c so that (x == LEAVESTATUE)
-                                   * will test FALSE in bones.c:
-                                   *  (NON_PM - 2) for no corpse
-                                   *  (NON_PM - 3) for no corpse, no grave */
+        NON_PM = -1,              /* 「モンスターではない」 */
+        LOW_PM = NON_PM + 1,      /* mons 配列内の最初のモンスター */
+        LEAVESTATUE = NON_PM - 1, /* 死体の代わりに石像を残す;
+                                   * end.c ではさらに低い値が2つ使われ、
+                                   * bones.c で (x == LEAVESTATUE) が
+                                   * FALSE になるようにしている:
+                                   *  (NON_PM - 2) は死体なし
+                                   *  (NON_PM - 3) は死体なし・墓なし */
         HIGH_PM = NUMMONS - 1,
-        SPECIAL_PM = PM_LONG_WORM_TAIL  /* [normal] < ~ < [special] */
-                /* mons[SPECIAL_PM] through mons[NUMMONS-1], inclusive, are
-                   never generated randomly and cannot be polymorphed into */
+        SPECIAL_PM = PM_LONG_WORM_TAIL  /* [通常] < ~ < [特殊] */
+                /* mons[SPECIAL_PM] から mons[NUMMONS-1] までは
+                   ランダム生成されず、変身先にもならない */
 };
 
-/*     This structure covers all attack forms.
- *     aatyp is the gross attack type (eg. claw, bite, breath, ...)
- *     adtyp is the damage type (eg. physical, fire, cold, spell, ...)
- *     damn is the number of hit dice of damage from the attack.
- *     damd is the number of sides on each die.
+/*     この構造体はすべての攻撃形態を扱う。
+ *     aatyp は大まかな攻撃種別（例: 爪、噛みつき、ブレス、...）
+ *     adtyp はダメージ種別（例: 物理、火、冷気、呪文、...）
+ *     damn は攻撃ダメージのダイス個数。
+ *     damd は各ダイスの面数。
  *
- *     Some attacks can do no points of damage.  Additionally, some can
- *     have special effects *and* do damage as well.  If damn and damd
- *     are set, they may have a special meaning.  For example, if set
- *     for a blinding attack, they determine the amount of time blinded.
+ *     一部の攻撃はダメージ点を持たない。
+ *     また、特殊効果を持ちつつ同時にダメージを与えるものもある。
+ *     damn と damd が設定される場合、特別な意味を持つことがある。
+ *     例えば盲目化攻撃では、盲目時間の長さを決定する。
  */
 
 struct attack {
@@ -42,7 +42,7 @@ struct attack {
     uchar adtyp, damn, damd;
 };
 
-/*     Max # of attacks for any given monster.
+/*     任意モンスターが持ちうる攻撃数の上限。
  */
 
 #define NATTK 6
@@ -55,31 +55,31 @@ struct attack {
 
 struct permonst {
     const char *pmnames[NUM_MGENDERS];
-    const enum monnums pmidx;   /* mons array index aka PM_ identifier */
-    char mlet;                  /* symbol */
-    schar mlevel,               /* base monster level */
-        mmove,                  /* move speed */
-        ac,                     /* (base) armor class */
-        mr;                     /* (base) magic resistance */
-    aligntyp maligntyp;         /* basic monster alignment */
-    unsigned short geno;        /* creation/geno mask value */
-    struct attack mattk[NATTK]; /* attacks matrix */
-    unsigned cwt;               /* weight of corpse */
-    unsigned short cnutrit;     /* its nutritional value */
-    uchar msound;               /* noise it makes (6 bits) */
-    uchar msize;                /* physical size (3 bits) */
-    uchar mresists;             /* resistances */
-    uchar mconveys;             /* conveyed by eating */
-    unsigned long mflags1,      /* boolean bitflags */
-        mflags2;                /* more boolean bitflags */
-    unsigned short mflags3;     /* yet more boolean bitflags */
-    uchar difficulty;           /* toughness (formerly from  makedefs -m) */
-    uchar mcolor;               /* color to use */
+    const enum monnums pmidx;   /* mons 配列インデックス（PM_識別子） */
+    char mlet;                  /* シンボル */
+    schar mlevel,               /* 基本モンスターレベル */
+        mmove,                  /* 移動速度 */
+        ac,                     /* （基本）防御クラス */
+        mr;                     /* （基本）魔法抵抗 */
+    aligntyp maligntyp;         /* 基本属性 */
+    unsigned short geno;        /* 生成/絶滅マスク値 */
+    struct attack mattk[NATTK]; /* 攻撃行列 */
+    unsigned cwt;               /* 死体の重量 */
+    unsigned short cnutrit;     /* 栄養価 */
+    uchar msound;               /* 発する音（6ビット） */
+    uchar msize;                /* 物理サイズ（3ビット） */
+    uchar mresists;             /* 耐性 */
+    uchar mconveys;             /* 食べると得る耐性 */
+    unsigned long mflags1,      /* 真偽ビットフラグ */
+        mflags2;                /* 追加の真偽ビットフラグ */
+    unsigned short mflags3;     /* さらに追加の真偽ビットフラグ */
+    uchar difficulty;           /* 強さ（旧 makedefs -m 由来） */
+    uchar mcolor;               /* 使用する色 */
 };
 
 #define NORMAL_SPEED 12
 
-extern NEARDATA struct permonst mons[NUMMONS + 1]; /* the master list of
-                                                    * monster types */
+extern NEARDATA struct permonst mons[NUMMONS + 1]; /* モンスター種の
+                                                    * マスター一覧 */
 
 #endif /* PERMONST_H */

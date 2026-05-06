@@ -43,7 +43,7 @@ enum soundlib_ids {
 struct sound_procs {
     const char *soundname;
     enum soundlib_ids soundlib_id;
-    unsigned long sound_triggers; /* capabilities in the port */
+    unsigned long sound_triggers; /* このポートが持つ機能 */
     void (*sound_init_nhsound)(void);
     void (*sound_exit_nhsound)(const char *);
     void (*sound_achievement)(schar, schar, int32_t);
@@ -73,7 +73,7 @@ extern struct sound_procs sndprocs;
     #soundname, ((enum soundlib_ids) soundlib_##soundname)
 
 /*
- * Types of triggers
+ * トリガー種別
  */
 #define SOUND_TRIGGER_USERSOUNDS   0x0001L
 #define SOUND_TRIGGER_HEROMUSIC    0x0002L
@@ -81,11 +81,11 @@ extern struct sound_procs sndprocs;
 #define SOUND_TRIGGER_SOUNDEFFECTS 0x0008L
 #define SOUND_TRIGGER_AMBIENCE     0x0010L
 #define SOUND_TRIGGER_VERBAL       0x0020L
-                            /* 26 free bits */
+                            /* 未使用 26 ビット */
 
 extern struct sound_procs soundprocs;
 
-/* subset for NetHack */
+/* NetHack 用の部分集合 */
 enum instruments {
     ins_cello = 43, ins_orchestral_harp = 47, ins_choir_aahs = 53,
     ins_trumpet = 57, ins_trombone = 58, ins_french_horn = 61,
@@ -158,7 +158,7 @@ enum ambiences {
 
 enum voice_moreinfo {
     voice_nothing_special,
-    voice_audioassistant   = 0x0001,  /* accessibility */
+    voice_audioassistant   = 0x0001,  /* アクセシビリティ */
     voice_talking_artifact = 0x0002,
     voice_deity            = 0x0004,
     voice_oracle           = 0x0008,
@@ -172,16 +172,16 @@ enum achievements_arg2 {
 };
 
 /*
-Arguments for sound_achievement(schar arg1, schar arg2, int32_t aflags)
+sound_achievement(schar arg1, schar arg2, int32_t aflags) の引数
 
-Arguments for actual achievements, those in you.h,
-        arg1 = the achievement value.
-        arg2 = 0 (irrelevant).
-      aflags = 0 for first time, 1 for repeat.
+実績そのもの（you.h にあるもの）の場合:
+        arg1 = 実績値。
+        arg2 = 0（無関係）。
+      aflags = 初回は 0、再度なら 1。
 
-These next ones make use of arg2, and aflags may be
-filled with additional int values dependent on arg2.
-arg1 must always be 0 for these.
+次のものは arg2 を使用し、aflags には arg2 に応じた
+追加 int 値が入ることがある。
+これらでは arg1 は常に 0 でなければならない。
 
 SoundAchievement(0, sa2_splashscreen, 0);
 SoundAchievement(0, sa2_newgame_nosplash, 0);
@@ -196,7 +196,7 @@ SoundAchievement(0, sa2_xpleveldown, level);
         || defined(SND_LIB_SOUND_ESCCODES) || defined(SND_LIB_VISSOUND) \
         || defined(SND_LIB_WINDSOUND) || defined(SND_LIB_MACSOUND)
 
-/* shortcut for conditional code in other files */
+/* 他ファイル用の条件分岐ショートカット */
 #define SND_LIB_INTEGRATED
 
 #define Play_usersound(filename, vol, idx) \
@@ -213,7 +213,7 @@ SoundAchievement(0, sa2_xpleveldown, level);
             (*soundprocs.sound_soundeffect)(emptystr, (seid), (vol));         \
     } while(0)
 
-/* Player's perspective, not the hero's; no Deaf suppression */
+/* プレイヤー視点であり、ヒーロー視点ではない; Deaf 抑制なし */
 #define SoundeffectEvenIfDeaf(seid, vol) \
     do {                                                                      \
         if (iflags.sounds && !soundprocs.sound_soundeffect                    \
@@ -228,7 +228,7 @@ SoundAchievement(0, sa2_xpleveldown, level);
             (*soundprocs.sound_hero_playnotes)((instrument), (str), (vol));  \
     } while(0)
 
-/* Player's perspective, not the hero's; no Deaf suppression */
+/* プレイヤー視点であり、ヒーロー視点ではない; Deaf 抑制なし */
 #define SoundAchievement(arg1, arg2, avals) \
     do {                                                                      \
         if (iflags.sounds && soundprocs.sound_achievement                     \
@@ -236,7 +236,7 @@ SoundAchievement(0, sa2_xpleveldown, level);
             (*soundprocs.sound_achievement)((arg1), (arg2), (avals));         \
     } while(0)
 
-/* sound_speak is in sound.c */
+/* sound_speak は sound.c にある */
 #define SoundSpeak(text) \
     do {                                                                     \
         if ((gp.pline_flags & (PLINE_VERBALIZE | PLINE_SPEECH)) != 0         \
@@ -245,7 +245,7 @@ SoundAchievement(0, sa2_xpleveldown, level);
             sound_speak(text);                                               \
     } while(0)
 
-/* set_voice is in sound.c */
+/* set_voice は sound.c にある */
 #define SetVoice(mon, tone, vol, moreinfo) \
     do {                                                                     \
         set_voice(mon, tone, vol, moreinfo);                                 \
@@ -263,7 +263,7 @@ SoundAchievement(0, sa2_xpleveldown, level);
 #define VOICEONLY UNUSED
 #endif
 
-#else  /*  NO SOUNDLIB IS INTEGRATED AFTER THIS */
+#else  /* この先は統合サウンドライブラリなし */
 
 #ifdef SND_LIB_INTEGRATED
 #undef SND_LIB_INTEGRATED
@@ -286,7 +286,7 @@ SoundAchievement(0, sa2_xpleveldown, level);
 #endif
 #define VOICEONLY UNUSED
 
-#endif  /* No SOUNDLIB */
+#endif  /* サウンドライブラリなし */
 
 enum findsound_approaches {
     findsound_embedded,
@@ -294,10 +294,10 @@ enum findsound_approaches {
 };
 
 enum sound_file_flags {
-    sff_default,            /* add dir prefix + '/' + sound + suffix */
-    sff_base_only,          /* base sound name only, no dir, no suffix */
-    sff_havedir_append_rest, /* dir provided, append base sound name+suffix */
-    sff_baseknown_add_rest /* base is already known, add dir and suffix */
+    sff_default,            /* dir 接頭辞 + '/' + sound + 接尾辞を追加 */
+    sff_base_only,          /* 基本サウンド名のみ。dir も接尾辞もなし */
+    sff_havedir_append_rest, /* dir は与えられているので基本名+接尾辞を追加 */
+    sff_baseknown_add_rest /* 基本名は既知なので dir と接尾辞を追加 */
 };
 
 #endif /* SNDPROCS_H */

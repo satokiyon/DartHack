@@ -6,13 +6,13 @@
 #ifndef AMICONF_H
 #define AMICONF_H
 
-#undef abs /* avoid using macro form of abs */
+#undef abs /* abs のマクロ形式を使わない */
 #ifndef __SASC_60
-#undef min /* this gets redefined */
-#undef max /* this gets redefined */
+#undef min /* これは再定義される */
+#undef max /* これは再定義される */
 #endif
 
-#include <time.h> /* get time_t defined before use! */
+#include <time.h> /* 使用前に time_t を定義させる! */
 
 #ifdef CROSS_TO_AMIGA
 #include <stdlib.h>
@@ -23,15 +23,15 @@
 #include <proto/dos.h>
 #endif
 
-#ifdef __SASC_60    /* since SAS can prevent re-inclusion */
-#include <stdlib.h> /* general things, including builtins */
+#ifdef __SASC_60    /* SAS は再インクルード防止を行うため */
+#include <stdlib.h> /* ビルトインを含む一般的なもの */
 #include <string.h>
 #endif
 
 #ifdef AZTEC_50
 #include <stdlib.h>
-#define AZTEC_C_WORKAROUND /* Bug which turns up in sounds.c. Bummer... */
-#define NO_SIGNAL          /* 5.0 signal handling doesn't like SIGINT... */
+#define AZTEC_C_WORKAROUND /* sounds.c で発生するバグへの回避策。 */
+#define NO_SIGNAL          /* 5.0 のシグナル処理は SIGINT と相性が悪い... */
 #endif
 
 #ifdef _DCC
@@ -43,23 +43,23 @@
 typedef long off_t;
 #endif
 
-#define MICRO /* must be defined to allow some inclusions */
+#define MICRO /* 一部インクルードを許可するため定義必須 */
 
-#define NOCWD_ASSUMPTIONS /* Allow paths to be specified for HACKDIR, \
-                             LEVELDIR, SAVEDIR, BONESDIR, DATADIR,    \
-                             SCOREDIR, LOCKDIR, CONFIGDIR, and TROUBLEDIR */
+#define NOCWD_ASSUMPTIONS /* HACKDIR, LEVELDIR, SAVEDIR, BONESDIR, DATADIR, \
+                             SCOREDIR, LOCKDIR, CONFIGDIR, TROUBLEDIR に \
+                             パスを指定できるようにする */
 
 #define PATHLEN 130
 
-/* data librarian defs */
-#define DLBFILE "nhdat"   /* main library */
-/* nhsdat sound library not used in 5.0 */
+/* データライブラリアン定義 */
+#define DLBFILE "nhdat"   /* メインライブラリ */
+/* nhsdat サウンドライブラリは 5.0 では未使用 */
 #undef DLBFILE2
 
 #ifndef CROSS_TO_AMIGA
-#define FILENAME_CMP stricmp /* case insensitive */
+#define FILENAME_CMP stricmp /* 大文字小文字を区別しない */
 #else
-#define FILENAME_CMP strcmpi /* case insensitive */
+#define FILENAME_CMP strcmpi /* 大文字小文字を区別しない */
 #endif
 
 #ifndef __SASC_60
@@ -73,8 +73,8 @@ typedef long off_t;
 #endif
 #endif
 
-#define MFLOPPY /* You'll probably want this; provides assistance \
-                 * for typical personal computer configurations   \
+#define MFLOPPY /* 通常は有効推奨。典型的な個人PC構成向けの
+                 * 補助機能を提供する
                  */
 #ifndef CROSS_TO_AMIGA
 #define RANDOM
@@ -111,8 +111,8 @@ extern void ami_argset(int *, char *[]);
 extern void ami_mkargline(int *, char **[]);
 extern void ami_wininit_data(int);
 
-#define FromWBench 0 /* A hint for compiler ... */
-/* extern boolean FromWBench;	/* how were we run? */
+#define FromWBench 0 /* コンパイラ向けヒント ... */
+/* extern boolean FromWBench;  起動元情報 */
 extern int ami_argc;
 extern char **ami_argv;
 
@@ -126,7 +126,7 @@ extern char **ami_argv;
 
 #define remove(x) unlink(x)
 
-/* DICE wants rewind() to return void.	We want it to return int. */
+/* DICE では rewind() の戻り値が void になる。	こちらは int にしたい。 */
 #if defined(_DCC) || defined(__GNUC__)
 #define rewind(f) fseek(f, 0, 0)
 #endif
@@ -137,29 +137,29 @@ extern char *gets(char *);
 #endif
 
 /*
- * If AZTEC_C  we can't use the long cpath in vision.c....
+ * IF AZTEC_C  we can't use the long cpath in vision.c....
  */
 #ifdef AZTEC_C
 #undef MACRO_CPATH
 #endif
 
 /*
- *  (Possibly) configurable Amiga options:
+ * （場合により）設定可能な Amiga オプション:
  */
 
-#define HACKFONT  /* Use special hack.font */
-#ifndef CROSS_TO_AMIGA   /* issues with prototype and spawnl */
-#define SHELL  /* Have a shell escape command (!) */
+#define HACKFONT  /* 特殊な hack.font を使用 */
+#ifndef CROSS_TO_AMIGA   /* プロトタイプと spawnl の問題回避 */
+#define SHELL  /* シェルエスケープコマンド (!) を有効化 */
 #endif
-#define MAIL      /* Get mail at unexpected occasions */
-#define DEFAULT_ICON "NetHack:default.icon" /* private icon */
-#define AMIFLUSH /* toss typeahead (select flush in .cnf) */
-/* #define OPT_DISPMAP		/* enable fast_map option */
+#define MAIL      /* 予期しないタイミングでメールを受け取る */
+#define DEFAULT_ICON "NetHack:default.icon" /* 専用アイコン */
+#define AMIFLUSH /* 先行入力を破棄（.cnf の select flush） */
+/* #define OPT_DISPMAP */ /* fast_map オプションを有効化 */
 
-/* new window system options */
-/* WRONG - AMIGA_INTUITION should go away */
+/* 新しいウィンドウシステムオプション */
+/* 誤り - AMIGA_INTUITION は将来的に削除されるべき */
 #ifdef AMII_GRAPHICS
-#define AMIGA_INTUITION /* high power graphics interface (amii) */
+#define AMIGA_INTUITION /* 高機能グラフィックスインターフェース (amii) */
 #endif
 
 #define CHANGE_COLOR 1
@@ -180,7 +180,7 @@ typedef unsigned short AMII_COLOR_TYPE;
 #define ANSI_DEFAULT
 #endif
 
-extern int amibbs; /* BBS mode? */
+extern int amibbs; /* BBS モード? */
 
 #ifdef AMII_GRAPHICS
 extern int amii_numcolors;
@@ -195,16 +195,16 @@ void amii_setpens(int);
 struct ami_sysflags {
     char sysflagsid[10];
 #ifdef AMIFLUSH
-    boolean altmeta;  /* use ALT keys as META */
-    boolean amiflush; /* kill typeahead */
+    boolean altmeta;  /* ALT キーを META として使用 */
+    boolean amiflush; /* 先行入力を破棄 */
 #endif
 #ifdef AMII_GRAPHICS 
     int numcols;
-    unsigned short amii_dripens[20]; /* DrawInfo Pens currently there are 13 in v39 */
-    AMII_COLOR_TYPE amii_curmap[AMII_MAXCOLORS]; /* colormap */
+    unsigned short amii_dripens[20]; /* DrawInfo Pens（現状 v39 では 13） */
+    AMII_COLOR_TYPE amii_curmap[AMII_MAXCOLORS]; /* カラーマップ */
 #endif
 #ifdef OPT_DISPMAP
-    boolean fast_map; /* use optimized, less flexible map display */
+    boolean fast_map; /* 最適化された（柔軟性は低い）マップ表示を使用 */
 #endif
 #ifdef MFLOPPY
     boolean asksavedisk;

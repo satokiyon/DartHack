@@ -5,11 +5,11 @@
 #define WARNINGS_H
 
 /*
- * If ENABLE_WARNING_PRAGMAS is defined, the checks for various
- * compilers is activated.
+ * ENABLE_WARNING_PRAGMAS が定義されている場合、各種コンパイラ向けの
+ * 判定が有効になる。
  *
- * If a suitable compiler is found, STDC_Pragma_AVAILABLE will be defined.
- * When STDC_Pragma_AVAILABLE is not defined, these are defined as no-ops:
+ * 適切なコンパイラが見つかった場合、STDC_Pragma_AVAILABLE が定義される。
+ * STDC_Pragma_AVAILABLE が未定義の場合、以下は何もしない定義になる:
  *     DISABLE_WARNING_UNREACHABLE_CODE
  *     DISABLE_WARNING_CONDEXPR_IS_CONSTANT
  *     DISABLE_WARNING_FORMAT_NONLITERAL
@@ -55,8 +55,8 @@
 #define STDC_Pragma_AVAILABLE
 
 #elif defined(__GNUC__)
-/* unlike in clang, -Wunreachable-code does not function in later versions
-   of gcc [this may be an issue of requiring -O1 or higher] */
+/* clang とは異なり、gcc では後期バージョンで -Wunreachable-code が
+   機能しない（-O1 以上が必要な問題かもしれない） */
 #define DISABLE_WARNING_UNREACHABLE_CODE \
     _Pragma("GCC diagnostic push")                                      \
     _Pragma("GCC diagnostic ignored \"-Wunreachable-code\"")
@@ -86,7 +86,7 @@
 #define RESTORE_WARNING_UNREACHABLE_CODE _Pragma("warning( pop )")
 #define RESTORE_WARNINGS _Pragma("warning( pop )")
 #define STDC_Pragma_AVAILABLE
-#else  /* Visual Studio prior to 2019 below */
+#else  /* 2019 より前の Visual Studio */
 #define DISABLE_WARNING_UNREACHABLE_CODE \
     __pragma(warning(push))                                     \
     __pragma(warning(disable:4702))
@@ -101,9 +101,9 @@
 #define RESTORE_WARNING_UNREACHABLE_CODE __pragma(warning(pop))
 #define RESTORE_WARNINGS  __pragma(warning(pop))
 #define STDC_Pragma_AVAILABLE
-#endif /* vs2019 or vs2017 */
+#endif /* 2019 または 2017 */
 
-#endif /* various compiler detections */
+#endif /* 各種コンパイラ判定 */
 #endif /* ACTIVATE_WARNING_PRAGMAS */
 #else  /* DISABLE_WARNING_PRAGMAS */
 #if defined(STDC_Pragma_AVAILABLE)
