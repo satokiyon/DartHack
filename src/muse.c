@@ -783,7 +783,7 @@ mon_escape(struct monst *mtmp, boolean vismon)
         || (mtmp->iswiz && svc.context.no_of_wizards < 2))
         return 0;
     if (vismon)
-        pline_mon(mtmp, "%s escapes the dungeon!", Monnam(mtmp));
+        pline_mon(mtmp, "%sはダンジョンから逃げ出した!", Monnam(mtmp));
     mongone(mtmp);
     return 2;
 }
@@ -830,7 +830,7 @@ use_defensive(struct monst *mtmp)
         } else if (mtmp->mconf || mtmp->mstun) {
             mtmp->mconf = mtmp->mstun = 0;
             if (vismon)
-                pline_mon(mtmp, "%s seems steadier now.", Monnam(mtmp));
+                pline_mon(mtmp, "%sはいま少し落ち着いたようだった.", Monnam(mtmp));
         } else {
             impossible("No need for unicorn horn?");
         }
@@ -893,11 +893,11 @@ use_defensive(struct monst *mtmp)
             nlev = random_teleport_level();
             if (mon_has_amulet(mtmp) || In_endgame(&u.uz)) {
                 if (vismon)
-                    pline_mon(mtmp, "%s seems very disoriented for a moment.",
+                      pline_mon(mtmp, "%sは一瞬ひどく混乱したようだった.",
                           Monnam(mtmp));
             } else if (nlev == depth(&u.uz)) {
                 if (vismon)
-                    pline_mon(mtmp, "%s shudders for a moment.", Monnam(mtmp));
+                    pline_mon(mtmp, "%sは一瞬身震いした.", Monnam(mtmp));
             } else {
                 get_level(&flev, nlev);
                 migrate_to_level(mtmp, ledger_no(&flev), MIGR_RANDOM,
@@ -1084,7 +1084,7 @@ use_defensive(struct monst *mtmp)
                              (coord *) 0);
         } else {
             if (vismon)
-                pline_mon(mtmp, "%s escapes upstairs!", Monnam(mtmp));
+                pline_mon(mtmp, "%sは上の階へ逃げた!", Monnam(mtmp));
             migrate_to_level(mtmp, ledger_no(&(stway->tolev)),
                              MIGR_STAIRS_DOWN, (coord *) 0);
         }
@@ -1095,7 +1095,7 @@ use_defensive(struct monst *mtmp)
         if (!stway)
             return 0;
         if (vismon)
-            pline_mon(mtmp, "%s escapes downstairs!", Monnam(mtmp));
+            pline_mon(mtmp, "%sは下の階へ逃げた!", Monnam(mtmp));
         migrate_to_level(mtmp, ledger_no(&(stway->tolev)), MIGR_STAIRS_UP,
                          (coord *) 0);
         return 2;
@@ -1105,7 +1105,7 @@ use_defensive(struct monst *mtmp)
         if (!stway)
             return 0;
         if (vismon)
-            pline_mon(mtmp, "%s escapes up the ladder!", Monnam(mtmp));
+            pline_mon(mtmp, "%sははしごを上って逃げた!", Monnam(mtmp));
         migrate_to_level(mtmp, ledger_no(&(stway->tolev)), MIGR_LADDER_DOWN,
                          (coord *) 0);
         return 2;
@@ -1115,7 +1115,7 @@ use_defensive(struct monst *mtmp)
         if (!stway)
             return 0;
         if (vismon)
-            pline_mon(mtmp, "%s escapes down the ladder!", Monnam(mtmp));
+            pline_mon(mtmp, "%sははしごを下って逃げた!", Monnam(mtmp));
         migrate_to_level(mtmp, ledger_no(&(stway->tolev)), MIGR_LADDER_UP,
                          (coord *) 0);
         return 2;
@@ -1167,7 +1167,7 @@ use_defensive(struct monst *mtmp)
         if (!otmp->cursed && !mtmp->mcansee)
             mcureblindness(mtmp, vismon);
         if (vismon)
-            pline_mon(mtmp, "%s looks better.", Monnam(mtmp));
+            pline_mon(mtmp, "%sは少し回復したようだった.", Monnam(mtmp));
         if (oseen)
             makeknown(POT_HEALING);
         m_useup(mtmp, otmp);
@@ -1181,7 +1181,7 @@ use_defensive(struct monst *mtmp)
         if (!mtmp->mcansee)
             mcureblindness(mtmp, vismon);
         if (vismon)
-            pline_mon(mtmp, "%s looks much better.", Monnam(mtmp));
+            pline_mon(mtmp, "%sはかなり回復したようだった.", Monnam(mtmp));
         if (oseen)
             makeknown(POT_EXTRA_HEALING);
         m_useup(mtmp, otmp);
@@ -1196,7 +1196,7 @@ use_defensive(struct monst *mtmp)
         if (!mtmp->mcansee && otmp->otyp != POT_SICKNESS)
             mcureblindness(mtmp, vismon);
         if (vismon)
-            pline_mon(mtmp, "%s looks completely healed.", Monnam(mtmp));
+            pline_mon(mtmp, "%sは完全に回復したようだった.", Monnam(mtmp));
         if (oseen)
             makeknown(otmp->otyp);
         m_useup(mtmp, otmp);
@@ -1657,7 +1657,7 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
             /* for consistency with zap.c, don't identify */
             if (mtmp->ispriest && *in_rooms(mtmp->mx, mtmp->my, TEMPLE)) {
                 if (cansee(mtmp->mx, mtmp->my))
-                    pline_mon(mtmp, "%s resists the magic!", Monnam(mtmp));
+                    pline_mon(mtmp, "%sは魔法に抵抗した!", Monnam(mtmp));
             } else if (!tele_restrict(mtmp))
                 (void) rloc(mtmp, RLOC_MSG);
         }
@@ -1968,7 +1968,7 @@ use_offensive(struct monst *mtmp)
             if (vis)
                 pline_The("scroll erupts in a tower of flame!");
             shieldeff(mtmp->mx, mtmp->my);
-            pline_mon(mtmp, "%s is uninjured.", Monnam(mtmp));
+            pline_mon(mtmp, "%sは無傷だった.", Monnam(mtmp));
             (void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
             (void) destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
             (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
@@ -2422,7 +2422,7 @@ use_misc(struct monst *mtmp)
             } else {
  skipmsg:
                 if (vismon) {
-                    pline_mon(mtmp, "%s looks uneasy.", Monnam(mtmp));
+                    pline_mon(mtmp, "%sは不安そうに見えた.", Monnam(mtmp));
                     trycall(otmp);
                 }
                 m_useup(mtmp, otmp);
@@ -2430,7 +2430,7 @@ use_misc(struct monst *mtmp)
             }
         }
         if (vismon)
-            pline_mon(mtmp, "%s seems more experienced.", Monnam(mtmp));
+            pline_mon(mtmp, "%sはより経験を積んだようだった.", Monnam(mtmp));
         if (oseen)
             makeknown(POT_GAIN_LEVEL);
         m_useup(mtmp, otmp);
@@ -2511,7 +2511,7 @@ use_misc(struct monst *mtmp)
         mquaffmsg(mtmp, otmp);
         m_useup(mtmp, otmp);
         if (vismon)
-            pline_mon(mtmp, "%s suddenly mutates!", Monnam(mtmp));
+            pline_mon(mtmp, "%sは突然変異した!", Monnam(mtmp));
         (void) newcham(mtmp, muse_newcham_mon(mtmp), NC_SHOW_MSG);
         if (oseen)
             makeknown(POT_POLYMORPH);
@@ -2875,7 +2875,7 @@ mcureblindness(struct monst *mon, boolean verbos)
         mon->mcansee = 1;
         mon->mblinded = 0;
         if (verbos && haseyes(mon->data))
-            pline_mon(mon, "%s can see again.", Monnam(mon));
+            pline_mon(mon, "%sは再び見えるようになった.", Monnam(mon));
     }
 }
 
@@ -2943,7 +2943,7 @@ mon_consume_unstone(
         if (vis)
             pline_mon(mon, "%s has a very bad case of stomach acid.", Monnam(mon));
         if (DEADMONSTER(mon)) {
-            pline_mon(mon, "%s dies!", Monnam(mon));
+            pline_mon(mon, "%sは死んだ!", Monnam(mon));
             if (by_you)
                 /* hero gets credit (experience) and blame (possible loss
                    of alignment and/or luck and/or telepathy depending on
@@ -2959,13 +2959,13 @@ mon_consume_unstone(
             pline("What a pity - %s just ruined a future piece of art!",
                   mon_nam(mon));
         else
-            pline_mon(mon, "%s seems limber!", Monnam(mon));
+            pline_mon(mon, "%sは身軽になったようだった!", Monnam(mon));
     }
     if (lizard && (mon->mconf || mon->mstun)) {
         mon->mconf = 0;
         mon->mstun = 0;
         if (vis && !is_bat(mon->data) && mon->data != &mons[PM_STALKER])
-            pline_mon(mon, "%s seems steadier now.", Monnam(mon));
+            pline_mon(mon, "%sはいま少し落ち着いたようだった.", Monnam(mon));
     }
     if (mon->mtame && !mon->isminion && nutrit > 0) {
         struct edog *edog = EDOG(mon);

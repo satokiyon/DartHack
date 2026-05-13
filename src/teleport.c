@@ -2022,7 +2022,7 @@ mlevel_tele_trap(
                 assign_level(&tolevel, &valley_level);
             } else if (Is_botlevel(&u.uz)) {
                 if (in_sight && trap->tseen)
-                    pline_mon(mtmp, "%s avoids the %s.",
+                    pline_mon(mtmp, "%sは%sを避けた.",
                               Monnam(mtmp),
                              (tt == HOLE) ? "hole" : "trap");
                 return Trap_Effect_Finished;
@@ -2070,7 +2070,7 @@ mlevel_tele_trap(
                 nlev = random_teleport_level();
                 if (nlev == depth(&u.uz)) {
                     if (in_sight)
-                        pline_mon(mtmp, "%s shudders for a moment.",
+                        pline_mon(mtmp, "%sは一瞬身震いした.",
                                   Monnam(mtmp));
                     return Trap_Effect_Finished;
                 }
@@ -2082,10 +2082,10 @@ mlevel_tele_trap(
         }
 
         if (in_sight) {
-            pline_mon(mtmp, "Suddenly, %s %s.", mon_nam(mtmp),
-                     (tt == HOLE) ? "falls into a hole"
-                   : (tt == TRAPDOOR) ? "falls through a trap door"
-                   : "disappears out of sight");
+                        pline_mon(mtmp, "突然、%sは%s.", mon_nam(mtmp),
+                                         (tt == HOLE) ? "穴に落ちた"
+                                     : (tt == TRAPDOOR) ? "落とし戸を通って落ちた"
+                                     : "視界の外へ消えた");
             if (trap)
                 seetrap(trap);
         }

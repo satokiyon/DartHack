@@ -103,7 +103,7 @@ boulder_hits_pool(
                 pline("%s %s %s into the %s.", upstart(whobuf),
                       vtense(whobuf, "push"), the(xname(otmp)), what);
                 if (flags.verbose && !Blind)
-                    pline("Now you can cross it!");
+                    pline("これで渡れるようになった!");
                 /* no splashing in this case */
             }
         }
@@ -140,7 +140,7 @@ boulder_hits_pool(
                        "molten lava", KILLED_BY);
             } else if (!fills_up && flags.verbose
                        && (pushing ? !Blind : cansee(rx, ry))) {
-                pline("It sinks without a trace!");
+                pline("跡形もなく沈んだ!");
             }
         }
 
@@ -276,9 +276,9 @@ flooreffects(
         if ((Blind || (Levitation || Flying)) && !Deaf && u_at(x, y)) {
             if (!Underwater) {
                 if (weight(obj) > WT_SPLASH_THRESHOLD) {
-                    pline("Splash!");
+                    pline("ザブン!");
                 } else if (Levitation || Flying) {
-                    pline("Plop!");
+                    pline("ドボン!");
                 }
             }
             map_background(x, y, 0);
@@ -525,7 +525,7 @@ dosinkring(struct obj *obj)
               Hallucination ? makeplural(rndmonnam(NULL)) : "flies");
         break;
     case RIN_SHOCK_RESISTANCE:
-        pline("Static electricity surrounds the sink.");
+        pline("シンクの周りに静電気が発生した.");
         break;
     case RIN_CONFLICT:
         Soundeffect(se_drain_noises, 50);
@@ -570,7 +570,7 @@ dosinkring(struct obj *obj)
         break;
     case MEAT_RING:
         /* Not the same as aggravate monster; besides, it's obvious. */
-        pline("Several flies buzz around the sink.");
+        pline("ハエが数匹シンクの周りを飛び回った.");
         break;
     case RIN_TELEPORTATION:
         nosink = teleport_sink();
@@ -1241,10 +1241,10 @@ dodown(void)
     }
     if (on_level(&valley_level, &u.uz) && !u.uevent.gehennom_entered) {
         You("are standing at the gate to Gehennom.");
-        pline("Unspeakable cruelty and harm lurk down there.");
+        pline("口にできないほどの残虐さと害悪が下に潜んでいた.");
         if (y_n("Are you sure you want to enter?") != 'y')
             return ECMD_OK;
-        pline("So be it.");
+        pline("そうなのだ.");
         u.uevent.gehennom_entered = 1; /* don't ask again */
     }
 
@@ -1555,7 +1555,7 @@ goto_level(
             if (diff == 0)
                 assign_level(newlevel, &u.uz);
 
-            pline("A mysterious force momentarily surrounds you...");
+            pline("謎の力が一瞬あなたを包んだ...");
             /* each time it kicks in, the chance of doing so again may drop;
                that drops faster, on average, when being sent down farther so
                while the impact is reduced for everybody compared to earlier
@@ -1576,7 +1576,7 @@ goto_level(
      * (s)he has been given the go-ahead by the leader.
      */
     if (on_level(&u.uz, &qstart_level) && !newdungeon && !ok_to_quest()) {
-        pline("A mysterious force prevents you from descending.");
+        pline("謎の力があなたの下降を阻んだ.");
         return;
     }
 
@@ -1895,7 +1895,7 @@ goto_level(
         if (new || !svm.mvitals[PM_CROESUS].died) {
             You("have penetrated a high security area!");
             Soundeffect(se_alarm, 100);
-            pline("An alarm sounds!");
+            pline("警報が鳴り響いた!");
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
                 if (DEADMONSTER(mtmp))
                     continue;
@@ -2371,7 +2371,7 @@ wipeoff(void)
     incr_itimeout(&HBlinded, -ldelta); /*HBlinded -= min(BlindedTimeout,4L);*/
 
     if (!HBlinded) {
-        pline("You've got the glop off.");
+        pline("べとべとが取れた.");
         u.ucreamed = 0;
         if (!gulp_blnd_check()) {
             set_itimeout(&HBlinded, 1L);

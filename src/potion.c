@@ -277,7 +277,7 @@ make_blinded(long xtime, boolean talk)
     if (can_see_now && !u_could_see) { /* regaining sight */
         if (talk) {
             if (Hallucination)
-                pline("Far out!  Everything is all cosmic again!");
+                pline("すごい! すべてがまた宇宙的になった!");
             else
                 You("can see again.");
         }
@@ -300,9 +300,9 @@ make_blinded(long xtime, boolean talk)
     if (u_could_see && !can_see_now) { /* losing sight */
         if (talk) {
             if (Hallucination)
-                pline("Oh, bummer!  Everything is dark!  Help!");
+                pline("ああ、ついてない! すべてが暗くなった! 助けて!");
             else
-                pline("A cloud of darkness falls upon you.");
+                pline("暗闇の雲があなたに降りかかった.");
         }
         /* Before the hero goes blind, set the ball&chain variables. */
         if (Punished)
@@ -471,10 +471,10 @@ void
 self_invis_message(void)
 {
     pline("%s %s.",
-          Hallucination ? "Far out, man!  You"
-                        : "Gee!  All of a sudden, you",
-          See_invisible ? "can see right through yourself"
-                        : "can't see yourself");
+          Hallucination ? "すごい! あなたは"
+                        : "あれっ! 突然、あなたは",
+          See_invisible ? "自分の向こう側まで見通せる"
+                        : "自分の姿が見えない");
 }
 
 staticfn void
@@ -483,20 +483,20 @@ ghost_from_bottle(void)
     struct monst *mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, MM_NOMSG);
 
     if (!mtmp) {
-        pline("This bottle turns out to be empty.");
+        pline("この瓶は空だった.");
         return;
     }
     if (Blind) {
-        pline("As you open the bottle, %s emerges.", something);
+        pline("瓶を開けると、%sが現れた.", something);
         return;
     }
-    pline("As you open the bottle, an enormous %s emerges!",
+    pline("瓶を開けると、巨大な%sが現れた!",
           Hallucination ? rndmonnam(NULL) : (const char *) "ghost");
     if (flags.verbose)
-        You("are frightened to death, and unable to move.");
+        You("恐怖で動けなくなった.");
     nomul(-3);
     gm.multi_reason = "being frightened to death";
-    gn.nomovemsg = "You regain your composure.";
+    gn.nomovemsg = "ようやく落ち着きを取り戻した.";
 }
 
 /* getobj callback for object to drink from, which also does double duty as
@@ -528,7 +528,7 @@ dodrink(void)
     struct obj *otmp;
 
     if (Strangled) {
-        pline("If you can't breathe air, how can you drink liquid?");
+        pline("空気を吸えないのに、どうやって液体を飲めるのか?");
         return ECMD_OK;
     }
 
@@ -542,7 +542,7 @@ dodrink(void)
         if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
             /* not as low as floor level but similar restrictions apply */
             && can_reach_floor(FALSE)) {
-            if (y_n("Drink from the fountain?") == 'y') {
+            if (y_n("噴水から飲むか?") == 'y') {
                 drinkfountain();
                 return ECMD_TIME;
             }
@@ -552,7 +552,7 @@ dodrink(void)
         if (IS_SINK(levl[u.ux][u.uy].typ)
             /* not as low as floor level but similar restrictions apply */
             && can_reach_floor(FALSE)) {
-            if (y_n("Drink from the sink?") == 'y') {
+            if (y_n("流しから飲むか?") == 'y') {
                 drinksink();
                 return ECMD_TIME;
             }
@@ -560,8 +560,8 @@ dodrink(void)
         }
         /* Or are you surrounded by water? */
         if (Underwater && !u.uswallow) {
-            if (y_n("Drink the water around you?") == 'y') {
-                pline("Do you know what lives in this water?");
+            if (y_n("周囲の水を飲むか?") == 'y') {
+                pline("この水の中に何が住んでいるか知っているか?");
                 return ECMD_TIME;
             }
             ++drink_ok_extra;
@@ -626,8 +626,8 @@ dopotion(struct obj *otmp)
 
     if (gp.potion_nothing) {
         gp.potion_unkn++;
-        You("have a %s feeling for a moment, then it passes.",
-            Hallucination ? "normal" : "peculiar");
+        You("一瞬%s感じがしたが、すぐ収まった.",
+            Hallucination ? "普通の" : "妙な");
     }
     if (otmp->dknown && !objects[otmp->otyp].oc_name_known) {
         if (!gp.potion_unkn) {
@@ -647,7 +647,7 @@ peffect_restore_ability(struct obj *otmp)
 {
     gp.potion_unkn++;
     if (otmp->cursed) {
-        pline("Ulch!  This makes you feel mediocre!");
+        pline("うげっ! 凡庸な気分になった!");
         return;
     } else {
         int i, ii;
@@ -655,10 +655,10 @@ peffect_restore_ability(struct obj *otmp)
         /* unlike unicorn horn, overrides Fixed_abil;
            does not recover temporary strength loss due to hunger
            or temporary dexterity loss due to wounded legs */
-        pline("Wow!  This makes you feel %s!",
-              (!otmp->blessed) ? "good"
-              : unfixable_trouble_count(FALSE) ? "better"
-                : "great");
+                pline("おお! 気分が%sなった!",
+                            (!otmp->blessed) ? "良く"
+                            : unfixable_trouble_count(FALSE) ? "さらに良く"
+                                : "最高に");
         i = rn2(A_MAX); /* start at a random point */
         for (ii = 0; ii < A_MAX; ii++) {
             int lim = AMAX(i);
@@ -705,10 +705,10 @@ peffect_hallucination(struct obj *otmp)
                                            rn1(200, 600 - 300 * bcsign(otmp))),
                              TRUE, 0L);
     if ((otmp->blessed && !rn2(3)) || (!otmp->cursed && !rn2(6))) {
-        You("perceive yourself...");
+        You("自分自身を見つめた...");
         display_nhwindow(WIN_MESSAGE, FALSE);
         enlightenment(MAGICENLIGHTENMENT, ENL_GAMEINPROGRESS);
-        Your("awareness re-normalizes.");
+        Your("意識は平常に戻った.");
         exercise(A_WIS, TRUE);
     }
 }
@@ -717,7 +717,7 @@ staticfn void
 peffect_water(struct obj *otmp)
 {
     if (!otmp->blessed && !otmp->cursed) {
-        pline("This tastes like %s.", hliquid("water"));
+        pline("%sのような味がした.", hliquid("water"));
         u.uhunger += rnd(10);
         newuhs(FALSE);
         return;
@@ -726,7 +726,7 @@ peffect_water(struct obj *otmp)
     if (mon_hates_blessings(&gy.youmonst) /* undead or demon */
         || u.ualign.type == A_CHAOTIC) {
         if (otmp->blessed) {
-            pline("This burns like %s!", hliquid("acid"));
+            pline("これは%sのように焼けつく!", hliquid("acid"));
             exercise(A_CON, FALSE);
             if (ismnum(u.ulycn)) {
                 Your("affinity to %s disappears!",
@@ -738,7 +738,7 @@ peffect_water(struct obj *otmp)
             losehp(Maybe_Half_Phys(d(2, 6)), "potion of holy water",
                    KILLED_BY_AN);
         } else if (otmp->cursed) {
-            You_feel("quite proud of yourself.");
+            You_feel("かなり誇らしい気分になった.");
             healup(d(2, 6), 0, 0, 0);
             if (ismnum(u.ulycn) && !Upolyd)
                 you_were();
@@ -746,7 +746,7 @@ peffect_water(struct obj *otmp)
         }
     } else {
         if (otmp->blessed) {
-            You_feel("full of awe.");
+            You_feel("畏敬の念に満たされた.");
             make_sick(0L, (char *) 0, TRUE, SICK_ALL);
             exercise(A_WIS, TRUE);
             exercise(A_CON, TRUE);
@@ -755,11 +755,11 @@ peffect_water(struct obj *otmp)
             /* make_confused(0L, TRUE); */
         } else {
             if (u.ualign.type == A_LAWFUL) {
-                pline("This burns like %s!", hliquid("acid"));
+                pline("これは%sのように焼けつく!", hliquid("acid"));
                 losehp(Maybe_Half_Phys(d(2, 6)), "potion of unholy water",
                        KILLED_BY_AN);
             } else
-                You_feel("full of dread.");
+                You_feel("恐怖に満たされた.");
             if (ismnum(u.ulycn) && !Upolyd)
                 you_were();
             exercise(A_CON, FALSE);
@@ -771,9 +771,9 @@ staticfn void
 peffect_booze(struct obj *otmp)
 {
     gp.potion_unkn++;
-    pline("Ooph!  This tastes like %s%s!",
-          otmp->odiluted ? "watered down " : "",
-          Hallucination ? "dandelion wine" : "liquid fire");
+        pline("うぷっ! これは%s%sの味がした!",
+            otmp->odiluted ? "薄まった" : "",
+            Hallucination ? "たんぽぽワイン" : "液体の炎");
     if (!otmp->blessed) {
         /* booze hits harder if drinking on an empty stomach */
         make_confused(itimeout_incr(HConfusion, d(2 + u.uhs, 8)), FALSE);
@@ -785,9 +785,9 @@ peffect_booze(struct obj *otmp)
     newuhs(FALSE);
     exercise(A_WIS, FALSE);
     if (otmp->cursed) {
-        You("pass out.");
+        You("気を失った.");
         gm.multi = -rnd(15);
-        gn.nomovemsg = "You awake with a headache.";
+        gn.nomovemsg = "頭痛とともに目を覚ました.";
     }
 }
 
@@ -796,7 +796,7 @@ peffect_enlightenment(struct obj *otmp)
 {
     if (otmp->cursed) {
         gp.potion_unkn++;
-        You("have an uneasy feeling...");
+        You("不安な気分になった...");
         exercise(A_WIS, FALSE);
     } else {
         if (otmp->blessed) {
@@ -814,7 +814,7 @@ peffect_invisibility(struct obj *otmp)
 
     /* spell cannot penetrate mummy wrapping */
     if (is_spell && BInvis && uarmc->otyp == MUMMY_WRAPPING) {
-        You_feel("rather itchy under %s.", yname(uarmc));
+        You_feel("%sの下がむずむずした.", yname(uarmc));
         return;
     }
     if (Invis || Blind || BInvis) {
@@ -828,7 +828,7 @@ peffect_invisibility(struct obj *otmp)
         incr_itimeout(&HInvis, d(6 - 3 * bcsign(otmp), 100) + 100);
     newsym(u.ux, u.uy); /* update position */
     if (otmp->cursed) {
-        pline("For some reason, you feel your presence is known.");
+        pline("なぜか、自分の存在が知られたような気がした.");
         aggravate();
 
         /* doing this gives temporary invisibility, but removes permanent
@@ -845,14 +845,14 @@ peffect_see_invisible(struct obj *otmp)
 
     gp.potion_unkn++;
     if (otmp->cursed)
-        pline("Yecch!  This tastes %s.",
-              Hallucination ? "overripe" : "rotten");
+          pline("うえっ! これは%s味がした.",
+              Hallucination ? "熟れすぎた" : "腐った");
     else
         pline(
               Hallucination
-              ? "This tastes like 10%% real %s%s all-natural beverage."
-              : "This tastes like %s%s.",
-              otmp->odiluted ? "reconstituted " : "", fruitname(TRUE));
+              ? "これは天然果汁10%%入り%s%s飲料の味がした."
+              : "これは%s%sの味がした.",
+              otmp->odiluted ? "還元" : "", fruitname(TRUE));
     if (otmp->otyp == POT_FRUIT_JUICE) {
         u.uhunger += (otmp->odiluted ? 5 : 10) * (2 + bcsign(otmp));
         newuhs(FALSE);
@@ -872,7 +872,7 @@ peffect_see_invisible(struct obj *otmp)
     see_monsters();       /* see invisible monsters */
     newsym(u.ux, u.uy);   /* see yourself! */
     if (msg && !Blind) {  /* Blind possible if polymorphed */
-        You("can see through yourself, but you are visible!");
+        You("自分の向こう側まで見えるが、姿は見えている!");
         gp.potion_unkn--;
     }
 }
@@ -881,14 +881,14 @@ staticfn void
 peffect_paralysis(struct obj *otmp)
 {
     if (Free_action) {
-        You("stiffen momentarily.");
+        You("一瞬こわばった.");
     } else {
         if (Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))
-            You("are motionlessly suspended.");
+            You("空中で身動きできなくなった.");
         else if (u.usteed)
-            You("are frozen in place!");
+            You("その場で凍りついた!");
         else
-            Your("%s are frozen to the %s!", makeplural(body_part(FOOT)),
+            Your("%sは%sに貼りついて凍りついた!", makeplural(body_part(FOOT)),
                  surface(u.ux, u.uy));
         nomul(-(rn1(10, 25 - 12 * bcsign(otmp))));
         gm.multi_reason = "frozen by a potion";
@@ -902,9 +902,9 @@ peffect_sleeping(struct obj *otmp)
 {
     if (Sleep_resistance || Free_action) {
         monstseesu(M_SEEN_SLEEP);
-        You("yawn.");
+        You("あくびをした.");
     } else {
-        You("suddenly fall asleep!");
+        You("突然眠り込んだ!");
         monstunseesu(M_SEEN_SLEEP);
         fall_asleep(-rn1(10, 25 - 12 * bcsign(otmp)), TRUE);
     }
@@ -941,7 +941,7 @@ peffect_monster_detection(struct obj *otmp)
         if (!u.uswallow && !Underwater) {
             see_monsters();
             if (gp.potion_unkn)
-                You_feel("lonely.");
+                You_feel("孤独を感じた.");
             return 0;
         }
     }
@@ -963,19 +963,19 @@ peffect_object_detection(struct obj *otmp)
 staticfn void
 peffect_sickness(struct obj *otmp)
 {
-    pline("Yecch!  This stuff tastes like poison.");
+    pline("うえっ! これは毒のような味がした.");
     if (otmp->blessed) {
-        pline("(But in fact it was mildly stale %s.)", fruitname(TRUE));
+        pline("(実際は少し古くなった%sだった.)", fruitname(TRUE));
         if (!Role_if(PM_HEALER)) {
             /* NB: blessed otmp->fromsink is not possible */
             losehp(1, "mildly contaminated potion", KILLED_BY_AN);
         }
     } else {
         if (Poison_resistance)
-            pline("(But in fact it was biologically contaminated %s.)",
+            pline("(実際は生物汚染された%sだった.)",
                   fruitname(TRUE));
         if (Role_if(PM_HEALER)) {
-            pline("Fortunately, you have been immunized.");
+            pline("幸いにも、免疫があった.");
         } else {
             char contaminant[BUFSZ];
             int typ = rn2(A_MAX);
@@ -1005,7 +1005,7 @@ peffect_sickness(struct obj *otmp)
         }
     }
     if (Hallucination) {
-        You("are shocked back to your senses!");
+        You("正気に引き戻された!");
         (void) make_hallucinated(0L, FALSE, 0L);
     }
 }
@@ -1015,10 +1015,10 @@ peffect_confusion(struct obj *otmp)
 {
     if (!Confusion) {
         if (Hallucination) {
-            pline("What a trippy feeling!");
+            pline("なんとトリッキーな感覚だ!");
             gp.potion_unkn++;
         } else
-            pline("Huh, What?  Where am I?");
+            pline("えっ、なに? ここはどこだ?");
     } else
         gp.potion_nothing++;
     make_confused(itimeout_incr(HConfusion,
@@ -1030,7 +1030,7 @@ staticfn void
 peffect_gain_ability(struct obj *otmp)
 {
     if (otmp->cursed) {
-        pline("Ulch!  That potion tasted foul!");
+        pline("うげっ! そのポーションはひどい味だった!");
         gp.potion_unkn++;
     } else if (Fixed_abil) {
         gp.potion_nothing++;
@@ -1064,7 +1064,7 @@ peffect_speed(struct obj *otmp)
 
     /* non-cursed potion grants intrinsic speed */
     if (is_speed && !otmp->cursed && !(HFast & INTRINSIC)) {
-        Your("quickness feels very natural.");
+        Your("素早さはごく自然に感じられた.");
         HFast |= FROMOUTSIDE;
     }
 }
@@ -1097,14 +1097,14 @@ peffect_gain_level(struct obj *otmp)
                 newlev = depth(&u.uz) - 1;
                 get_level(&newlevel, newlev);
                 if (on_level(&newlevel, &u.uz)) {
-                    pline("It tasted bad.");
+                    pline("まずかった.");
                     return;
                 }
             }
-            You("rise up, through the %s!", ceiling(u.ux, u.uy));
+            You("%sを突き抜けて上昇した!", ceiling(u.ux, u.uy));
             goto_level(&newlevel, FALSE, FALSE, FALSE);
         } else {
-            You("have an uneasy feeling.");
+            You("不安な気分になった.");
         }
         return;
     }
@@ -1118,7 +1118,7 @@ peffect_gain_level(struct obj *otmp)
 staticfn void
 peffect_healing(struct obj *otmp)
 {
-    You_feel("better.");
+    You_feel("気分が良くなった.");
     healup(8 + d(4 + 2 * bcsign(otmp), 4), !otmp->cursed ? 1 : 0,
            !!otmp->blessed, !otmp->cursed);
     exercise(A_CON, TRUE);
@@ -1127,7 +1127,7 @@ peffect_healing(struct obj *otmp)
 staticfn void
 peffect_extra_healing(struct obj *otmp)
 {
-    You_feel("much better.");
+    You_feel("かなり気分が良くなった.");
     healup(16 + d(4 + 2 * bcsign(otmp), 8),
            otmp->blessed ? 5 : !otmp->cursed ? 2 : 0, !otmp->cursed,
            TRUE);
@@ -1143,7 +1143,7 @@ peffect_extra_healing(struct obj *otmp)
 staticfn void
 peffect_full_healing(struct obj *otmp)
 {
-    You_feel("completely healed.");
+    You_feel("完全に治った.");
     healup(400, 4 + 4 * bcsign(otmp), !otmp->cursed, TRUE);
     /* Restore one lost level if blessed */
     if (otmp->blessed && u.ulevel < u.ulevelmax) {
@@ -1228,7 +1228,7 @@ peffect_gain_energy(struct obj *otmp)
     if (otmp->cursed)
         You_feel("lackluster.");
     else
-        pline("Magical energies course through your body.");
+        pline("魔法のエネルギーが体を駆け巡った.");
 
     /* old: num = rnd(5) + 5 * otmp->blessed + 1;
      *      blessed:  +7..11 max & current (+9 avg)
@@ -1263,7 +1263,7 @@ peffect_oil(struct obj *otmp)
 
     if (otmp->lamplit) {
         if (likes_fire(gy.youmonst.data)) {
-            pline("Ahh, a refreshing drink.");
+            pline("ああ、さわやかな飲み物だった.");
             good_for_you = TRUE;
         } else {
             /*
@@ -1286,9 +1286,9 @@ peffect_oil(struct obj *otmp)
          */
         burn_away_slime();
     } else if (otmp->cursed) {
-        pline("This tastes like castor oil.");
+        pline("ひまし油のような味がした.");
     } else {
-        pline("That was smooth!");
+        pline("まろやかだった!");
     }
     exercise(A_WIS, good_for_you);
 }
@@ -1461,8 +1461,8 @@ void
 strange_feeling(struct obj *obj, const char *txt)
 {
     if (flags.beginner || !txt)
-        You("have a %s feeling for a moment, then it passes.",
-            Hallucination ? "normal" : "strange");
+        You("一瞬%s感じがしたが、すぐ収まった.",
+            Hallucination ? "普通の" : "奇妙な");
     else
         pline1(txt);
 
@@ -1945,7 +1945,7 @@ potionbreathe(struct obj *obj)
        naming opportunity in case potion was thrown at hero by a monster */
     switch (Half_gas_damage ? TOWEL : obj->otyp) {
     case TOWEL:
-        pline("Some vapor passes harmlessly around you.");
+        pline("蒸気がとくに影響なくあなたの周りを通り過ぎた.");
         break;
     case POT_RESTORE_ABILITY:
     case POT_GAIN_ABILITY:
@@ -2047,7 +2047,7 @@ potionbreathe(struct obj *obj)
             gn.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else
-            You("stiffen momentarily.");
+            You("一瞬こわばった.");
         break;
     case POT_SLEEPING:
         kn++;

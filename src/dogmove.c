@@ -333,7 +333,7 @@ dog_eat(struct monst *mtmp,
             /* edible item owned by shop has been thrown or kicked
                by hero and caught by tame or food-tameable monst */
             oprice = unpaid_cost(obj, COST_CONTENTS);
-            pline("That %s will cost you %ld %s.", objnambuf, oprice,
+                pline("その%sは%ld %sかかった.", objnambuf, oprice,
                   currency(oprice));
             /* m_consume_obj() -> delobj() -> obfree() will handle the shop
                billing update */
@@ -348,7 +348,7 @@ staticfn void
 dog_starve(struct monst *mtmp)
 {
     if (mtmp->mleashed && mtmp != u.usteed)
-        Your("leash goes slack.");
+        Your("綱がゆるんだ.");
     else if (cansee(mtmp->mx, mtmp->my))
         pline_mon(mtmp, "%s starves.", Monnam(mtmp));
     else
@@ -457,7 +457,7 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
                             char *otmpname = distant_name(otmp, doname);
 
                             if (flags.verbose)
-                                pline_xy(omx, omy, "%s picks up %s.",
+                                pline_xy(omx, omy, "%s\u306f%s\u3092\u62fe\u3063\u305f.",
                                       Monnam(mtmp), otmpname);
                         }
                         obj_extract_self(otmp);
@@ -1056,7 +1056,7 @@ dog_move(
     if (!Conflict && !mtmp->mconf
         && mtmp == u.ustuck && !sticks(gy.youmonst.data)) {
         unstuck(mtmp); /* swallowed case handled above */
-        You("get released!");
+        You("解放された!");
     }
 #endif
     allowflags = mon_allowflags(mtmp);
@@ -1525,7 +1525,7 @@ quickmimic(struct monst *mtmp)
         if (was_leashed
             && (M_AP_TYPE(mtmp) != M_AP_MONSTER
                 || !mnum_leashable(mtmp->mappearance))) {
-            Your("leash goes slack.");
+            Your("綱がゆるんだ.");
             m_unleash(mtmp, FALSE);
         }
         if (glyph_at(mtmp->mx, mtmp->my) != prev_glyph)
@@ -1534,7 +1534,7 @@ quickmimic(struct monst *mtmp)
                 (what != something) ? an(what) : what,
                 seeloc ? "appear" : "has appeared", buf);
         else
-            You("sense that %s feels rather %s-ish.", buf, what);
+            You("%sがやや%sっぽく感じられた.", buf, what);
 
         display_nhwindow(WIN_MAP, TRUE);
     }

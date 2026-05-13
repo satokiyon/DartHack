@@ -4,6 +4,7 @@
 
 #include "hack.h"
 #include "dlb.h"
+#include <locale.h>
 #ifdef TTY_GRAPHICS
 #include "wintty.h"
 #endif
@@ -1545,12 +1546,42 @@ genl_display_file(const char *fname, boolean complain)
         if (complain) /* send complaint to stdout rather than to stderr */
             fprintf(stdout, "\nCannot open \"%s\".\n", fname);
     } else {
+#ifdef WIN32
+        /* On Windows, ensure stdout is in UTF-8 mode for proper console output */
+        int orig_mode = -1;
+        int fd_stdout = _fileno(stdout);
+        char *orig_locale = NULL;
+        
+        if (fd_stdout >= 0) {
+            /* Set UTF-8 mode for console output. This ensures that UTF-8 encoded
+               text from data files like opthelp is displayed correctly. */
+            orig_mode = _setmode(fd_stdout, _O_U8TEXT);
+        }
+        
+        /* Set locale to UTF-8 to support proper character handling */
+        char *current_locale = setlocale(LC_ALL, NULL);
+        if (current_locale) {
+            orig_locale = dupstr(current_locale);
+        }
+        setlocale(LC_ALL, ".UTF-8");
+#endif
         /* straight copy to stdout, no pagination or other interaction */
         while (dlb_fgets(buf, BUFSZ, f)) {
             if (fputs(buf, stdout) < 0)
                 break;
         }
+        fflush(stdout);
         (void) dlb_fclose(f);
+#ifdef WIN32
+        /* Restore original mode and locale */
+        if (orig_locale) {
+            setlocale(LC_ALL, orig_locale);
+            free(orig_locale);
+        }
+        if (fd_stdout >= 0 && orig_mode >= 0) {
+            (void) _setmode(fd_stdout, orig_mode);
+        }
+#endif
     }
 }
 

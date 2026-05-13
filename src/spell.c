@@ -149,7 +149,7 @@ cursed_book(struct obj *bp)
         take_gold();
         break;
     case 4:
-        pline("These runes were just too much to comprehend.");
+        pline("このルーンは理解するには難しすぎた.");
         make_confused(HConfusion + rn1(7, 16), FALSE);
         break;
     case 5:
@@ -251,13 +251,13 @@ deadbook(struct obj *book2)
         }
 
         if (!u.uhave.bell || !u.uhave.menorah) {
-            pline("A chill runs down your %s.", body_part(SPINE));
+            pline("悪寒が%sを走り抜けた.", body_part(SPINE));
             if (!u.uhave.bell) {
                 Soundeffect(se_faint_chime, 30);
                 You_hear("a faint chime...");
             }
             if (!u.uhave.menorah)
-                pline("Vlad's doppelganger is amused.");
+                pline("ヴラドの分身は面白がっていた.");
             return;
         }
 
@@ -282,7 +282,7 @@ deadbook(struct obj *book2)
             pline_The("invocation fails!");
             /* this used to say "your artifacts" but the invocation tools
                are not artifacts */
-            pline("At least one of your relics is cursed...");
+            pline("少なくとも一つの遺物が呪われていた...");
         } else if (arti1_primed && arti2_primed) {
             unsigned soon = (unsigned) d(2, 6); /* time til next intervene() */
 
@@ -332,7 +332,7 @@ deadbook(struct obj *book2)
             pline_The("headstones in the cemetery begin to move!");
             break;
         default:
-            pline("Oh my!  Your name appears in the book!");
+            pline("おお! あなたの名前が本の中に現れた!");
         }
     }
     return;
@@ -399,7 +399,7 @@ learn(void)
     } else if (spellid(i) == booktype) {
         /* normal book can be read and re-read a total of 4 times */
         if (book->spestudied > MAX_SPELL_STUDY) {
-            pline("This spellbook is too faint to be read any more.");
+            pline("この魔法書はもう読めないほど薄くなってしまった.");
             book->otyp = booktype = SPE_BLANK_PAPER;
             faded_to_blank = TRUE;
             /* reset spestudied as if polymorph had taken place */
@@ -417,7 +417,7 @@ learn(void)
            one less reading is available than when re-learning */
         if (book->spestudied >= MAX_SPELL_STUDY) {
             /* pre-used due to being the product of polymorph */
-            pline("This spellbook is too faint to read even once.");
+            pline("この魔法書は一度も読めないほど薄かった.");
             book->otyp = booktype = SPE_BLANK_PAPER;
             faded_to_blank = TRUE;
             /* reset spestudied as if polymorph had taken place */
@@ -504,7 +504,7 @@ study_book(struct obj *spellbook)
     } else {
         /* KMH -- Simplified this code */
         if (booktype == SPE_BLANK_PAPER) {
-            pline("This spellbook is all blank.");
+            pline("この魔法書は真っ白だった.");
             makeknown(booktype);
             return 1;
         }
@@ -758,7 +758,7 @@ getspell(int *spell_no)
                 /* limit is mainly to prevent the fuzzer from getting stuck
                    since hangup should hit the 'quitchars' case; fuzzer
                    would too, but after an arbitrary number of attempts */
-                pline("That's enough tries.");
+            pline("もう十分試みた.");
                 return FALSE;
             }
             ilet = yn_function(qbuf, (char *) 0, '\0', TRUE);
@@ -1250,7 +1250,7 @@ spelleffects_check(int spell, int *res, int *energy)
      */
     if (spellknow(spell) <= 0) {
         Your("knowledge of this spell is twisted.");
-        pline("It invokes nightmarish images in your mind...");
+        pline("悪夢のようなイメージが心に浮かんだ...");
         spell_backfire(spell);
         u.uen -= rnd(*energy);
         if (u.uen < 0)
@@ -1658,14 +1658,14 @@ throwspell(void)
     struct monst *mtmp;
 
     if (u.uinwater) {
-        pline("You're joking!  In this weather?");
+        pline("冗談でしょ! この天気の中で?");
         return 0;
     } else if (Is_waterlevel(&u.uz)) {
         You("had better wait for the sun to come out.");
         return 0;
     }
 
-    pline("Where do you want to cast the spell?");
+    pline("呪文をどこに向けて唱えるか?");
     cc.x = u.ux;
     cc.y = u.uy;
     getpos_sethilite(display_spell_target_positions,
@@ -2060,7 +2060,7 @@ show_spells(void)
 {
     int unused = SPELLMENU_DUMP;
     if (spellid(0) == NO_SPELL) {
-        pline("You didn't know any spells.");
+        pline("呪文を何も知らなかった.");
         pline("%s", "");
     } else {
         pline("Spells:");

@@ -965,10 +965,13 @@ status_enlightenment(int mode, int final)
     /* not a traditional status but inherently obvious to player; more
        detail given below (attributes section) for magic enlightenment */
     if (Upolyd) {
-        Strcpy(buf, "transformed");
-        if (ugenocided())
-            Sprintf(eos(buf), " and %s %s inside",
-                    final ? "felt" : "feel", udeadinside());
+        Strcpy(buf, "変身していた");
+        if (ugenocided()) {
+            if (final)
+                Sprintf(eos(buf), "で、内側は%sようだった", udeadinside());
+            else
+                Sprintf(eos(buf), "で、内側は%sようだ", udeadinside());
+        }
         you_are(buf, "");
     }
     /* not a trouble, but we want to display riding status before maybe

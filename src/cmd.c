@@ -924,15 +924,15 @@ domonability(void)
                magical breathing */
             (void) split_mon(&gy.youmonst, (struct monst *) 0);
         } else {
-            There("is no fountain here.");
+            There("ここに泉はなかった.");
         }
     } else if (is_unicorn(uptr)) {
         use_unicorn_horn((struct obj **) 0);
         return ECMD_TIME;
     } else if (uptr->msound == MS_SHRIEK) {
-        You("shriek.");
+        You("叫んだ.");
         if (u.uburied)
-            pline("Unfortunately sound does not carry well through rock.");
+            pline("残念ながら、音は岩をよく通らなかった.");
         else
             aggravate();
     } else if (is_vampire(uptr) || is_vampshifter(&gy.youmonst)) {
@@ -941,9 +941,9 @@ domonability(void)
         (void) pet_ranged_attk(u.usteed, TRUE);
         return ECMD_TIME;
     } else if (Upolyd) {
-        pline("Any special ability you may have is purely reflexive.");
+        pline("持っている特殊能力は反射的なものに過ぎなかった.");
     } else {
-        You("don't have a special ability in your normal form!");
+        You("通常形態では特殊能力がなかった!");
     }
     return ECMD_OK;
 }
@@ -952,13 +952,13 @@ int
 enter_explore_mode(void)
 {
     if (discover) {
-        You("are already in explore mode.");
+        You("すでに探索モードだった.");
     } else {
         const char *oldmode = !wizard ? "normal game" : "debug mode";
 
         if (!authorize_explore_mode()) {
             if (!wizard) {
-                You("cannot access explore mode.");
+                You("探索モードに入れなかった.");
                 return ECMD_OK;
             } else {
                 pline(
@@ -966,17 +966,17 @@ enter_explore_mode(void)
                 /* keep going */
             }
         }
-        pline("Beware!  From explore mode there will be no return to %s,",
+          pline("注意!  探索モードに入ると%sへ戻れなかった,",
               oldmode);
         if (paranoid_query(ParanoidQuit,
                            "Do you want to enter explore mode?")) {
             discover = TRUE;
             wizard = FALSE;
             clear_nhwindow(WIN_MESSAGE);
-            You("are now in non-scoring explore mode.");
+            You("得点なしの探索モードになった.");
         } else {
             clear_nhwindow(WIN_MESSAGE);
-            pline("Continuing with %s.", oldmode);
+            pline("%sを続行した.", oldmode);
         }
     }
     return ECMD_OK;
@@ -1378,7 +1378,7 @@ dotoggleoption(void)
     if (gc.cmd_bind && gc.cmd_bind->param) {
         return toggle_bool_option(gc.cmd_bind->param);
     } else {
-        pline("Use #optionsfull to set any option instead.");
+        pline("代わりに #optionsfull で任意のオプションを設定できた.");
         return ECMD_OK;
     }
 }
@@ -2301,7 +2301,7 @@ handler_rebind_keys_add(boolean keyfirst)
     int clr = NO_COLOR;
 
     if (keyfirst) {
-        pline("Bind which key? ");
+        pline("どのキーに割り当てるか? ");
         key = pgetchar();
 
         if (!key || key == '\033')
@@ -2381,7 +2381,7 @@ handler_rebind_keys_add(boolean keyfirst)
         }
  bindit:
         if (!key) {
-            pline("Bind which key? ");
+            pline("どのキーに割り当てるか? ");
             key = pgetchar();
 
             if (!key || key == '\033')
@@ -2392,14 +2392,14 @@ handler_rebind_keys_add(boolean keyfirst)
 
         if (bind_key(key, cmdstr, TRUE)) {
             if (prevcmd && prevcmd->cmd != ec) {
-                pline("Changed key '%s' from \"%s\" to \"%s\".",
+                pline("キー '%s' の割り当てを \"%s\" から \"%s\" に変更した.",
                       key2txt(key, buf2), prevcmd->cmd->ef_txt, cmdstr);
             } else if (!prevcmd) {
-                pline("Bound key '%s' to \"%s\".",
+                pline("キー '%s' を \"%s\" に割り当てた.",
                       key2txt(key, buf2), cmdstr);
             }
         } else {
-            pline("Key binding failed?!");
+            pline("キー割り当てに失敗した?!");
         }
     }
 }
@@ -4106,7 +4106,7 @@ getdir(const char *s)
                     goto retry;
             }
             if (!did_help)
-                pline("What a strange direction!");
+                pline("なんと奇妙な方向だ!");
         }
         return 0;
     } else if (is_mov && !dxdy_moveok()) {
@@ -5330,7 +5330,7 @@ dotravel(void)
         }
         iflags.getloc_filter = gfilt;
     } else {
-        pline("Where do you want to travel to?");
+        pline("どこへ移動したいか?");
         if (getpos(&cc, TRUE, "the desired destination") < 0) {
             /* user pressed ESC */
             iflags.getloc_travelmode = FALSE;
@@ -5349,12 +5349,12 @@ dotravel_target(void)
 {
     if (!isok(iflags.travelcc.x, iflags.travelcc.y)) {
         /* assume <0,0>, the value assigned when travel reaches destination */
-        pline("No travel destination set.");
+        pline("移動先が設定されていなかった.");
         return ECMD_OK;
     } else if (u_at(iflags.travelcc.x, iflags.travelcc.y)) {
         /* maybe interrupted while traveling then just walked rest of way
            so destination hasn't been reset yet */
-        You("are already here.");
+        You("すでにここにいた.");
         iflags.travelcc.x = iflags.travelcc.y = 0;
         return ECMD_OK;
     }

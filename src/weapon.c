@@ -923,8 +923,8 @@ mon_wield_item(struct monst *mon)
                       mbodypart(mon, HAND));
             /* 3.6.3: artifact might be getting wielded by invisible monst */
             else if (cansee(mon->mx, mon->my))
-                pline("Light begins shining %s.",
-                      (mdistu(mon) <= 5 * 5) ? "nearby" : "in the distance");
+                    pline("光が%sで輝き始めた.",
+                        (mdistu(mon) <= 5 * 5) ? "近く" : "遠く");
         }
         obj->owornmask = W_WEP;
         return 1;
@@ -1308,7 +1308,7 @@ show_skills(void)
     winid win;
     menu_item *selected;
 
-    pline("Skills:");
+    pline("技能:");
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
     add_skills_to_menu(win, FALSE, FALSE);
