@@ -292,7 +292,7 @@ fatal_corpse_mistake(struct obj *obj, boolean remotely)
         return FALSE;
     }
 
-    pline("Touching %s is a fatal mistake.",
+    pline("%sに触れるのは致命的な間違いだった.",
           corpse_xname(obj, (const char *) 0, CXN_SINGULAR | CXN_ARTICLE));
     instapetrify(killer_xname(obj));
     return TRUE;
@@ -305,8 +305,8 @@ rider_corpse_revival(struct obj *obj, boolean remotely)
     if (!obj || obj->otyp != CORPSE || !is_rider(&mons[obj->corpsenm]))
         return FALSE;
 
-    pline("At your %s, the corpse suddenly moves...",
-          remotely ? "attempted acquisition" : "touch");
+        pline("%sとたん、その死体は突然動き出した...",
+            remotely ? "取ろうとした" : "触れた" );
     (void) revive_corpse(obj);
     exercise(A_WIS, FALSE);
     return TRUE;
@@ -1498,7 +1498,7 @@ query_category(
         free((genericptr_t) *pick_list), *pick_list = 0;
         /* the menu entry description is "Auto-select every relevant item"
            [not sure whether issuing a message here is a good idea...] */
-        pline("No relevant items selected.");
+        pline("関連するアイテムが選択されなかった.");
     }
  query_done:
     destroy_nhwindow(win);
@@ -2061,7 +2061,7 @@ able_to_loot(
         pline("Without limbs, you cannot %s anything.", verb);
         return FALSE;
     } else if (looting && !freehand()) {
-        pline("Without a free %s, you cannot loot anything.",
+          pline("空いた%sがなければ、何も略奪できなかった.",
               body_part(HAND));
         return FALSE;
     }
@@ -2106,7 +2106,7 @@ do_loot_cont(
         if (cobj->lknown)
             pline("%s is locked.", The(xname(cobj)));
         else
-            pline("Hmmm, %s turns out to be locked.", the(xname(cobj)));
+            pline("うーん、%sは施錠されていた.", the(xname(cobj)));
         cobj->lknown = 1;
 
         if (flags.autounlock) {
@@ -2151,7 +2151,7 @@ do_loot_cont(
         int tmp;
 
         You("carefully open %s...", the(xname(cobj)));
-        pline("It develops a huge set of teeth and bites you!");
+        pline("それは巨大な歯を生やしてあなたを噛んだ!");
         tmp = rnd(10);
         losehp(Maybe_Half_Phys(tmp), "carnivorous bag", KILLED_BY_AN);
         makeknown(BAG_OF_TRICKS);
@@ -2203,7 +2203,7 @@ doloot_core(void)
         if (rn2(6) && reverse_loot())
             return ECMD_TIME;
         if (rn2(2)) {
-            pline("Being confused, you find nothing to loot.");
+            pline("混乱して、略奪するものが見つからなかった.");
             return ECMD_TIME; /* costs a turn */
         }             /* else fallthrough to normal looting */
     }
@@ -2384,7 +2384,7 @@ reverse_loot(void)
         dropx(goldob);
         /* the dropped gold might have fallen to lower level */
         if (g_at(x, y))
-            pline("Ok, now there is loot here.");
+            pline("よし、ここに戦利品があった.");
     } else {
         /* find original coffers chest if present, otherwise use nearest */
         otmp = 0;
@@ -2414,7 +2414,7 @@ reverse_loot(void)
                    && (mon = makemon(courtmon(), x, y, NO_MM_FLAGS)) != 0) {
             freeinv(goldob);
             add_to_minv(mon, goldob);
-            pline("The exchequer accepts your contribution.");
+            pline("財務省はあなたの寄付を受け取った.");
             if (!rn2(10))
                 levl[x][y].looted = T_LOOTED;
         } else {
@@ -2568,7 +2568,7 @@ in_container(struct obj *obj)
         You("must be kidding.");
         return 0;
     } else if (obj == gc.current_container) {
-        pline("That would be an interesting topological exercise.");
+        pline("それは興味深いトポロジーの演習だっただろう.");
         return 0;
     } else if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
         Norep("You cannot %s %s you are wearing.",
@@ -3670,7 +3670,7 @@ dotip(void)
     else if (uarmh && cobj == uarmh)
         return tiphat() ? ECMD_TIME : ECMD_OK;
     else if (cobj->otyp == STATUE)
-        pline("Nothing interesting happens.");
+        pline("何も興味深いことは起きなかった.");
     else
         pline1(nothing_happens);
     return ECMD_OK;
@@ -3887,7 +3887,7 @@ tipcontainer_gettarget(
 
     if (n_conts < 1 || !u_handsy()) {
         if (n_conts >= 1)
-            pline("Tipping contents to floor only...");
+            pline("内容物を床にだけ傾けた...");
         *cancelled = FALSE;
         return (struct obj *) 0;
     }

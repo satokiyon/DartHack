@@ -24,7 +24,7 @@ ballrelease(boolean showmsg)
 {
     if (carried(uball) && !welded(uball)) {
         if (showmsg)
-            pline("Startled, you drop the iron ball.");
+            pline("驚いて、鉄球を落とした.");
         if (uwep == uball)
             setuwep((struct obj *) 0);
         if (uswapwep == uball)
@@ -53,15 +53,15 @@ ballfall(void)
     if (gets_hit) {
         int dmg = rn1(7, 25);
 
-        pline_The("iron ball falls on your %s.", body_part(HEAD));
+        pline_The("鉄球があなたの%sに落ちてきた.", body_part(HEAD));
         if (uarmh) {
             if (hard_helmet(uarmh)) {
-                pline("Fortunately, you are wearing a hard helmet.");
+                pline("幸運にも、頑丈なかぶとを身に着けていた.");
                 dmg = 3;
             } else if (flags.verbose)
-                pline("%s does not protect you.", Yname2(uarmh));
+                pline("%sでは身を守れなかった.", Yname2(uarmh));
         }
-        losehp(Maybe_Half_Phys(dmg), "crunched in the head by an iron ball",
+        losehp(Maybe_Half_Phys(dmg), "鉄球に頭を打ち砕かれた",
                NO_KILLER_PREFIX);
     }
 }
@@ -774,8 +774,8 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
  drag:
 
     if (near_capacity() > SLT_ENCUMBER && dist2(x, y, u.ux, u.uy) <= 2) {
-        You("cannot %sdrag the heavy iron ball.",
-            gi.invent ? "carry all that and also " : "");
+        You("重い鉄球を%s引きずれなかった.",
+            gi.invent ? "その荷物を抱えたままでは" : "");
         nomul(0);
         return FALSE;
     }
@@ -788,13 +788,13 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
         || ((t = t_at(uchain->ox, uchain->oy))
             && (is_pit(t->ttyp) || is_hole(t->ttyp)))) {
         if (Levitation) {
-            You_feel("a tug from the iron ball.");
+            You_feel("鉄球に引かれる感触がした.");
             if (t)
                 t->tseen = 1;
         } else {
             struct monst *victim;
 
-            You("are jerked back by the iron ball!");
+            You("鉄球に引き戻された!");
             if ((victim = m_at(uchain->ox, uchain->oy)) != 0) {
                 int tmp;
                 int dieroll = rnd(20);
@@ -889,7 +889,7 @@ drop_ball(coordxy x, coordxy y)
     }
 
     if (x != u.ux || y != u.uy) {
-        static const char pullmsg[] = "The ball pulls you out of the ";
+        static const char pullmsg[] = "鉄球があなたを";
         struct trap *t;
         long side;
 
@@ -897,27 +897,27 @@ drop_ball(coordxy x, coordxy y)
             && u.utraptype != TT_INFLOOR && u.utraptype != TT_BURIEDBALL) {
             switch (u.utraptype) {
             case TT_PIT:
-                pline("%s%s!", pullmsg, "pit");
+                pline("%s%sから引きずり出した!", pullmsg, "落とし穴");
                 break;
             case TT_WEB:
-                pline("%s%s!", pullmsg, "web");
+                pline("%s%sから引きずり出した!", pullmsg, "蜘蛛の巣");
                 Soundeffect(se_destroy_web, 30);
-                pline_The("web is destroyed!");
+                pline_The("蜘蛛の巣は壊れた!");
                 deltrap(t_at(u.ux, u.uy));
                 break;
             case TT_LAVA:
-                pline("%s%s!", pullmsg, hliquid("lava"));
+                pline("%s%sから引きずり出した!", pullmsg, hliquid("lava"));
                 break;
             case TT_BEARTRAP:
                 side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
-                pline("%s%s!", pullmsg, "bear trap");
+                pline("%s%sから引きずり出した!", pullmsg, "クマ罠");
                 set_wounded_legs(side, rn1(1000, 500));
                 if (!u.usteed) {
-                    Your("%s %s is severely damaged.",
-                         (side == LEFT_SIDE) ? "left" : "right",
+                    Your("%sの%sにひどい傷を負った.",
+                         (side == LEFT_SIDE) ? "左" : "右",
                          body_part(LEG));
                     losehp(Maybe_Half_Phys(2),
-                           "leg damage from being pulled out of a bear trap",
+                           "クマ罠から引きずり出されて脚を負傷した",
                            KILLED_BY);
                 }
                 break;
@@ -971,9 +971,9 @@ litter(void)
         nextobj = otmp->nobj;
         if (otmp != uball && rnd(capacity) <= (int) otmp->owt) {
             if (canletgo(otmp, "")) {
-                You("drop %s and %s %s down the stairs with you.",
-                    yname(otmp), (otmp->quan == 1L) ? "it" : "they",
-                    otense(otmp, "fall"));
+                You("階段を下るときに%sを落とし、%s%s.",
+                    yname(otmp), (otmp->quan == 1L) ? "それが" : "それらが",
+                    "一緒に落ちていった");
                 setnotworn(otmp);
                 freeinv(otmp);
                 hitfloor(otmp, FALSE);
@@ -999,31 +999,31 @@ drag_down(void)
     forward = carried(uball) && (uwep == uball || !uwep || !rn2(3));
 
     if (carried(uball) && !welded(uball))
-        You("lose your grip on the iron ball.");
+        You("鉄球を取り落とした.");
 
     cls();  /* previous level is still displayed although you
                went down the stairs. Avoids bug C343-20 */
 
     if (forward) {
         if (rn2(6)) {
-            pline_The("iron ball drags you downstairs!");
+            pline_The("鉄球に引きずられて階下へ落ちた!");
             losehp(Maybe_Half_Phys(rnd(6)),
-                   "dragged downstairs by an iron ball", NO_KILLER_PREFIX);
+                   "鉄球に引きずられて階下へ落ちた", NO_KILLER_PREFIX);
             litter();
         }
     } else {
         if (rn2(2)) {
             Soundeffect(se_iron_ball_hits_you, 25);
-            pline_The("iron ball smacks into you!");
-            losehp(Maybe_Half_Phys(rnd(20)), "iron ball collision",
+            pline_The("鉄球があなたに激突した!");
+            losehp(Maybe_Half_Phys(rnd(20)), "鉄球との衝突",
                    KILLED_BY_AN);
             exercise(A_STR, FALSE);
             dragchance -= 2;
         }
         if ((int) dragchance >= rnd(6)) {
-            pline_The("iron ball drags you downstairs!");
+            pline_The("鉄球に引きずられて階下へ落ちた!");
             losehp(Maybe_Half_Phys(rnd(3)),
-                   "dragged downstairs by an iron ball", NO_KILLER_PREFIX);
+                   "鉄球に引きずられて階下へ落ちた", NO_KILLER_PREFIX);
             exercise(A_STR, FALSE);
             litter();
         }

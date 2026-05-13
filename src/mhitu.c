@@ -91,10 +91,10 @@ missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
         map_invisible(mtmp->mx, mtmp->my);
 
     if (could_seduce(mtmp, &gy.youmonst, mattk) && !mtmp->mcan)
-        pline_mon(mtmp, "%s pretends to be friendly.", Monnam(mtmp));
+        pline_mon(mtmp, "%sは友好的なふりをした.", Monnam(mtmp));
     else
-        pline_mon(mtmp, "%s %smisses!", Monnam(mtmp),
-                  (nearmiss && flags.verbose) ? "just " : "");
+        pline_mon(mtmp, "%sは%s外した!", Monnam(mtmp),
+                  (nearmiss && flags.verbose) ? "かろうじて" : "");
 
     stop_occupation();
 }
@@ -164,9 +164,9 @@ u_slow_down(void)
 {
     HFast = 0L;
     if (!Fast)
-        You("slow down.");
+        You("遅くなった.");
     else /* speed boots */
-        Your("quickness feels less natural.");
+        Your("素早さが不自然に感じられなくなった.");
     exercise(A_DEX, FALSE);
 }
 
@@ -213,46 +213,46 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
                                  : "swings";
 
         if (compat) {
-            pline("%s tries to touch you and misses!", Monst_name);
+            pline("%sはあなたに触れようとして外した!", Monst_name);
         } else {
             switch (rn2(3)) {
             case 0:
-                pline("%s %s wildly and misses!", Monst_name, swings);
+                pline("%sは激しく%sが、外した!", Monst_name, swings);
                 break;
             case 1:
-                pline("%s attacks a spot beside you.", Monst_name);
+                pline("%sはあなたのすぐ脇を攻撃した.", Monst_name);
                 break;
             case 2:
-                pline("%s strikes at %s!", Monst_name,
+                pline("%sは%sを攻撃した!", Monst_name,
                       is_waterwall(mtmp->mux,mtmp->muy)
-                        ? "empty water"
-                        : "thin air");
+                        ? "空の水面"
+                        : "空気");
                 break;
             default:
-                pline("%s %s wildly!", Monst_name, swings);
+                pline("%sは激しく%s!", Monst_name, swings);
                 break;
             }
         }
     } else if (unotthere) { /* Displaced */
         /* give 'displaced' message even if hero is Blind */
         if (compat)
-            pline("%s smiles %s at your %sdisplaced image...", Monst_name,
-                  (compat == 2) ? "engagingly" : "seductively",
-                  Invis ? "invisible " : "");
+            pline("%sはあなたの%sずれた像に%s微笑みかけた...", Monst_name,
+                  Invis ? "見えない" : "",
+                  (compat == 2) ? "魅力的に" : "誘惑するように");
         else
-            pline("%s strikes at your %sdisplaced image and misses you!",
+            pline("%sはあなたの%sずれた像を攻撃したが、あなたには当たらない!",
                   /* Note:  if you're both invisible and displaced, only
                    * monsters which see invisible will attack your displaced
                    * image, since the displaced image is also invisible. */
-                  Monst_name, Invis ? "invisible " : "");
+                  Monst_name, Invis ? "見えない" : "");
 
     } else if (usubmerged) { /* Underwater */
         /* monsters may miss especially on water level where
            bubbles shake the player here and there */
         if (compat)
-            pline("%s reaches towards your distorted image.", Monst_name);
+            pline("%sはあなたのゆがんだ像へ手を伸ばした.", Monst_name);
         else
-            pline("%s is fooled by water reflections and misses!",
+            pline("%sは水面の反射に惑わされて外した!",
                   Monst_name);
 
     } else {
@@ -1736,7 +1736,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
                 break;
             }
             if (useeit)
-                pline_mon(mtmp, "%s is turned to stone!", Monnam(mtmp));
+                pline_mon(mtmp, "%sは石に変わった!", Monnam(mtmp));
             gs.stoned = TRUE;
             killed(mtmp);
 
@@ -2355,7 +2355,7 @@ staticfn int
 assess_dmg(struct monst *mtmp, int tmp)
 {
     if ((mtmp->mhp -= tmp) <= 0) {
-        pline_mon(mtmp, "%s dies!", Monnam(mtmp));
+        pline_mon(mtmp, "%sは死んだ!", Monnam(mtmp));
         xkilled(mtmp, XKILL_NOMSG);
         if (!DEADMONSTER(mtmp))
             return M_ATTK_HIT;
@@ -2469,7 +2469,7 @@ passiveum(
                      been told that hero has reverted to normal form */
                   !Upolyd ? "" : "your ", hliquid("acid"));
             if (resists_acid(mtmp)) {
-                pline_mon(mtmp, "%s is not affected.", Monnam(mtmp));
+                pline_mon(mtmp, "%sには効かない.", Monnam(mtmp));
                 tmp = 0;
             }
         } else
@@ -2496,7 +2496,7 @@ passiveum(
                 mon_to_stone(mtmp);
                 return 1;
             }
-            pline_mon(mtmp, "%s turns to stone!", Monnam(mtmp));
+            pline_mon(mtmp, "%sは石に変わった!", Monnam(mtmp));
             gs.stoned = 1;
             xkilled(mtmp, XKILL_NOMSG);
             if (!DEADMONSTER(mtmp))
@@ -2553,7 +2553,7 @@ passiveum(
                     }
                 }
             } else { /* gelatinous cube */
-                pline_mon(mtmp, "%s is frozen by you.", Monnam(mtmp));
+                pline_mon(mtmp, "%sはあなたに凍らされた.", Monnam(mtmp));
                 paralyze_monst(mtmp, tmp);
                 return M_ATTK_AGR_DONE;
             }
@@ -2561,12 +2561,12 @@ passiveum(
         case AD_COLD: /* Brown mold or blue jelly */
             if (resists_cold(mtmp)) {
                 shieldeff(mtmp->mx, mtmp->my);
-                pline_mon(mtmp, "%s is mildly chilly.", Monnam(mtmp));
+                pline_mon(mtmp, "%sは少し冷えた.", Monnam(mtmp));
                 golemeffects(mtmp, AD_COLD, tmp);
                 tmp = 0;
                 break;
             }
-            pline_mon(mtmp, "%s is suddenly very cold!", Monnam(mtmp));
+            pline_mon(mtmp, "%sは突然とても冷たくなった!", Monnam(mtmp));
             u.mh += (tmp + rn2(2)) / 2;
             if (u.mhmax < u.mh)
                 u.mhmax = u.mh;
@@ -2584,17 +2584,17 @@ passiveum(
         case AD_FIRE: /* Red mold */
             if (resists_fire(mtmp)) {
                 shieldeff(mtmp->mx, mtmp->my);
-                pline_mon(mtmp, "%s is mildly warm.", Monnam(mtmp));
+                pline_mon(mtmp, "%sは少し温まった.", Monnam(mtmp));
                 golemeffects(mtmp, AD_FIRE, tmp);
                 tmp = 0;
                 break;
             }
-            pline_mon(mtmp, "%s is suddenly very hot!", Monnam(mtmp));
+            pline_mon(mtmp, "%sは突然とても熱くなった!", Monnam(mtmp));
             break;
         case AD_ELEC:
             if (resists_elec(mtmp)) {
                 shieldeff(mtmp->mx, mtmp->my);
-                pline_mon(mtmp, "%s is slightly tingled.", Monnam(mtmp));
+                pline_mon(mtmp, "%sは少ししびれた.", Monnam(mtmp));
                 golemeffects(mtmp, AD_ELEC, tmp);
                 tmp = 0;
                 break;

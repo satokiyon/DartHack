@@ -509,7 +509,7 @@ intemple(int roomno)
             You_feel("like you are being watched.");
             break;
         case 2:
-            pline("A shiver runs down your %s.", body_part(SPINE));
+            pline("悪寒が%sを走り抜けた.", body_part(SPINE));
             break;
         default:
             break; /* no message; unfortunately there's no

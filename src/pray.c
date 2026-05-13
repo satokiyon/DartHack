@@ -541,7 +541,7 @@ fix_worst_trouble(int trouble)
     case TROUBLE_POISONED:
         /* override Fixed_abil; ignore items which confer that */
         if (Hallucination)
-            pline("There's a tiger in your tank.");
+            pline("タンクの中に虎がいた.");
         else
             You_feel("in good health again.");
         for (i = 0; i < A_MAX; i++) {
@@ -585,7 +585,7 @@ fix_worst_trouble(int trouble)
         make_confused(0L, TRUE);
         break;
     case TROUBLE_HALLUCINATION:
-        pline("Looks like you are back in Kansas.");
+        pline("カンザスに戻ってきたようだった.");
         (void) make_hallucinated(0L, FALSE, 0L);
         break;
     case TROUBLE_SADDLE:
@@ -612,7 +612,7 @@ god_zaps_you(aligntyp resp_god)
     if (u.uswallow) {
         pline(
           "Suddenly a bolt of lightning comes down at you from the heavens!");
-        pline("It strikes %s!", mon_nam(u.ustuck));
+        pline("%sを打ち抜いた!", mon_nam(u.ustuck));
         if (!resists_elec(u.ustuck)) {
             pline("%s fries to a crisp!", Monnam(u.ustuck));
             /* Yup, you get experience.  It takes guts to successfully
@@ -624,17 +624,17 @@ god_zaps_you(aligntyp resp_god)
         } else
             pline("%s seems unaffected.", Monnam(u.ustuck));
     } else {
-        pline("Suddenly, a bolt of lightning strikes you!");
+        pline("突然、雷があなたを直撃した!");
         if (Reflecting) {
             shieldeff(u.ux, u.uy);
             if (Blind)
-                pline("For some reason you're unaffected.");
+                pline("なぜか影響を受けなかった.");
             else
                 (void) ureflects("%s reflects from your %s.", "It");
             monstseesu(M_SEEN_REFL);
         } else if (Shock_resistance) {
             shieldeff(u.ux, u.uy);
-            pline("It seems not to affect you.");
+            pline("あなたには影響しなかったようだった.");
             monstseesu(M_SEEN_ELEC);
             monstunseesu(M_SEEN_REFL);
         } else {
@@ -1545,10 +1545,10 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
         /* Moloch's high altar at the bottom of Gehennom. */
         if (u.ualign.record > -99)
             u.ualign.record = -99;
-        pline("An invisible choir chants, and you are bathed in darkness...");
+        pline("見えない聖歌隊が詠唱し、あなたは暗闇に包まれた...");
         /*[apparently shrug/snarl can be sensed without being seen]*/
         pline("%s shrugs and retains dominion over %s,", Moloch, u_gname());
-        pline("then mercilessly snuffs out your life.");
+        pline("そして容赦なくあなたの命が消えた.");
         Sprintf(svk.killer.name, "%s indifference", s_suffix(Moloch));
         svk.killer.format = KILLED_BY;
         done(DIED);
@@ -1566,7 +1566,7 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
         pline("%s accepts your gift, and gains dominion over %s...",
               a_gname(), u_gname());
         pline("%s is enraged...", u_gname());
-        pline("Fortunately, %s permits you to live...", a_gname());
+        pline("幸いにも、%sはあなたが生きることを許してくれた...", a_gname());
         pline(cloud_of_smoke, hcolor(NH_ORANGE));
         done(ESCAPED);
         /*NOTREACHED*/
@@ -1574,7 +1574,7 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
         /* You've won the game!  Feedback-wise, it's a bit of a let down. */
         u.uevent.ascended = 1;
         adjalign(10);
-        pline("An invisible choir sings, and you are bathed in radiance...");
+        pline("見えない聖歌隊が歌い、あなたは光に包まれた...");
         godvoice(altaralign, "Mortal, thou hast done well!");
         display_nhwindow(WIN_MESSAGE, FALSE);
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
@@ -1618,7 +1618,7 @@ offer_fake_amulet(
     } else {
         /* don't you dare try to fool the gods */
         if (Deaf)
-            pline("Oh, no."); /* didn't hear thunderclap */
+            pline("ああ、なんてことだ.");
         change_luck(-3);
         adjalign(-1);
         u.ugangr += 3;
@@ -1684,7 +1684,7 @@ offer_different_alignment_altar(
                 && !p_coaligned(pri))
                 angry_priest();
         } else {
-            pline("Unluckily, you feel the power of %s decrease.", u_gname());
+            pline("不運にも、%sの力が弱まる感覚があった.", u_gname());
             change_luck(-1);
             exercise(A_WIS, FALSE);
             if (rnl(u.ulevel) > 6 && u.ualign.record > 0
@@ -1706,7 +1706,7 @@ sacrifice_your_race(
         You("find the idea very satisfying.");
         exercise(A_WIS, TRUE);
     } else if (u.ualign.type != A_CHAOTIC) {
-        pline("You'll regret this infamous offense!");
+        pline("この悪名高い侮辱を後悔することになった!");
         exercise(A_WIS, FALSE);
     }
 
@@ -1999,7 +1999,7 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
                && mtmp->mtame) {
             /* mtmp is a temporary pointer to a tame monster's attributes,
              * not a real monster */
-        pline("So this is how you repay loyalty?");
+        pline("これが忠誠に報いる方法なのか?");
         adjalign(-3);
         HAggravate_monster |= FROMOUTSIDE;
         offer_negative_valued(highaltar, altaralign);
@@ -2078,7 +2078,7 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
                     change_luck(1);
             } else {
                 if (Hallucination)
-                    pline("Overall, there is a smell of fried onions.");
+                    pline("全体的に、炒め玉ねぎの匂いがした.");
                 else
                     You("have a feeling of reconciliation.");
                 if ((int) u.uluck < 0)
@@ -2287,7 +2287,7 @@ prayer_done(void) /* M. Stephenson (1.0.3b) */
         exercise(A_WIS, FALSE);
         if (!Inhell) {
             /* hero's god[dess] seems to be keeping his/her head down */
-            pline("Nothing else happens."); /* not actually true... */
+            pline("それ以外は何も起こらなかった.");
             return 1;
         } /* else use regular Inhell result below */
     } else if (gp.p_type == -1) {
@@ -2359,7 +2359,7 @@ maybe_turn_mon_iter(struct monst *mtmp)
         mtmp->msleeping = 0;
         if (Confusion) {
             if (!turn_undead_msg_cnt++)
-                pline("Unfortunately, your voice falters.");
+                pline("残念ながら、声が震えてしまった.");
             mtmp->mflee = 0;
             mtmp->mfrozen = 0;
             mtmp->mcanmove = 1;
@@ -2442,7 +2442,7 @@ doturn(void)
          && (is_demon(gy.youmonst.data)
              || is_undead(gy.youmonst.data) || is_vampshifter(&gy.youmonst)))
         || u.ugangr > 6) { /* "Die, mortal!" */
-        pline("For some reason, %s seems to ignore you.", Gname);
+        pline("なぜか、%sはあなたを無視しているようだった.", Gname);
         aggravate();
         exercise(A_WIS, FALSE);
         return ECMD_TIME;
@@ -2455,7 +2455,7 @@ doturn(void)
         aggravate();
         return ECMD_TIME;
     }
-    pline("Calling upon %s, you chant an arcane formula.", Gname);
+    pline("%sに呼びかけ、神秘的な呪文を唱えた.", Gname);
     exercise(A_WIS, TRUE);
 
     /* note: does not perform unturn_dead() on victims' inventories */

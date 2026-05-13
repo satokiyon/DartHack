@@ -2757,7 +2757,7 @@ do_class_genocide(void)
                         u.mh = -1;
                         if (Unchanging) {
                             if (!feel_dead++)
-                                urgent_pline("You die.");
+                                urgent_pline("あなたは死んだ.");
                             /* finish genociding this class of
                                monsters before ultimately dying */
                             gameover = TRUE;
@@ -2771,10 +2771,11 @@ do_class_genocide(void)
                         u.uhp = -1;
                         if (Upolyd) {
                             if (!feel_dead++)
-                                You_feel("%s inside.", udeadinside());
+                                You_feel("内側が%sように感じた.",
+                                         udeadinside());
                         } else {
                             if (!feel_dead++)
-                                urgent_pline("You die.");
+                                urgent_pline("あなたは死んだ.");
                             gameover = TRUE;
                         }
                     }
@@ -2983,7 +2984,7 @@ do_genocide(
                KMH -- Unchanging prevents rehumanization. */
             if (Upolyd && ptr != gy.youmonst.data) {
                 delayed_killer(POLYMORPH, svk.killer.format, svk.killer.name);
-                You_feel("%s inside.", udeadinside());
+                You_feel("内側が%sように感じた.", udeadinside());
             } else {
                 done(GENOCIDED);
             }

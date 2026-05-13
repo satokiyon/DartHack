@@ -120,25 +120,25 @@ throw_obj(struct obj *obj, int shotlimit)
         goto unsplit_stack;
     }
     if (is_art(obj, ART_MJOLLNIR) && obj != uwep) {
-        pline("%s must be wielded before it can be thrown.", The(xname(obj)));
+        pline("%sは装備してからでないと投げられなかった.", The(xname(obj)));
         res = ECMD_OK;
         goto unsplit_stack;
     }
     if ((is_art(obj, ART_MJOLLNIR) && ACURR(A_STR) < STR19(25))
         || (obj->otyp == BOULDER && !throws_rocks(gy.youmonst.data))) {
-        pline("It's too heavy.");
+        pline("重すぎた.");
         res = ECMD_TIME;
         goto unsplit_stack;
     }
     if (!u.dx && !u.dy && !u.dz) {
-        You("cannot throw an object at yourself.");
+        You("自分に向かって物は投げられなかった.");
         res = ECMD_OK;
         goto unsplit_stack;
     }
     u_wipe_engr(2);
     if (!uarmg && obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])
         && !Stone_resistance) {
-        You("throw %s with your bare %s.",
+        You("素手の%sで%sを投げた.",
             corpse_xname(obj, (const char *) 0, CXN_PFX_THE),
             /* throwing with one hand, but pluralize since the
                expression "with your bare hands" sounds better */
@@ -242,7 +242,7 @@ throw_obj(struct obj *obj, int shotlimit)
        attempted to specify a count */
     if (multishot > 1 || shotlimit > 0) {
         /* "You shoot N arrows." or "You throw N daggers." */
-        You("%s %d %s.", gm.m_shot.s ? "shoot" : "throw",
+        You("%s %d %s.", gm.m_shot.s ? "撃った" : "投げた",
             multishot, /* (might be 1 if player gave shotlimit) */
             (multishot == 1) ? singular(obj, xname) : xname(obj));
     }
@@ -300,10 +300,10 @@ ok_to_throw(int *shotlimit_p) /* (see dothrow()) */
     gm.multi = 0; /* reset; it's been used up */
 
     if (notake(gy.youmonst.data)) {
-        You("are physically incapable of throwing or shooting anything.");
+        You("身体的に投擲も射撃もできなかった.");
         return FALSE;
     } else if (nohands(gy.youmonst.data)) {
-        You_cant("throw or shoot without hands."); /* not body_part(HAND) */
+        You_cant("手がなければ投げることも撃つこともできなかった."); /* not body_part(HAND) */
         return FALSE;
         /*[what about !freehand(), aside from cursed missile launcher?]*/
     }
@@ -524,7 +524,7 @@ dofire(void)
                 cmdq_add_ec(CQ_CANNED, dofire);
                 return ECMD_OK; /* haven't taken any time yet */
             } else {
-                You("have no ammunition readied.");
+                You("準備した弾薬がなかった.");
             }
         } else {
             autoquiver();
@@ -535,7 +535,7 @@ dofire(void)
                 prinv("You ready:", obj, 0L);
                 uquiver->owornmask |= W_QUIVER;
             } else {
-                You("have nothing appropriate for your quiver.");
+                You("矢筒に適したものが何もなかった.");
             }
         }
     }
@@ -591,10 +591,10 @@ endmultishot(boolean verbose)
 {
     if (gm.m_shot.i < gm.m_shot.n) {
         if (verbose && !svc.context.mon_moving) {
-            You("stop %s after the %d%s %s.",
-                gm.m_shot.s ? "firing" : "throwing",
+            You("%d%sの%sで%sのをやめた.",
                 gm.m_shot.i, ordin(gm.m_shot.i),
-                gm.m_shot.s ? "shot" : "toss");
+                gm.m_shot.s ? "射目" : "投目",
+                gm.m_shot.s ? "撃つ" : "投げる");
         }
         gm.m_shot.n = gm.m_shot.i; /* make current shot be the last */
     }
@@ -614,7 +614,6 @@ hitfloor(
     if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
         doaltarobj(obj);
     } else if (verbosely) {
-        const char *verb = (obj->otyp == WAN_STRIKING) ? "strike" : "hit";
         const char *surf = surface(u.ux, u.uy);
         struct trap *t = t_at(u.ux, u.uy);
 
@@ -623,20 +622,20 @@ hitfloor(
         if (t && t->tseen) {
             switch (t->ttyp) {
             case TRAPDOOR:
-                surf = "trap door";
+                surf = "落とし戸";
                 break;
             case HOLE:
-                surf = "edge of the hole";
+                surf = "穴の縁";
                 break;
             case PIT:
             case SPIKED_PIT:
-                surf = "edge of the pit";
+                surf = "落とし穴の縁";
                 break;
             default:
                 break;
             }
         }
-        pline("%s %s the %s.", Doname2(obj), otense(obj, verb), surf);
+        pline("%sが%sに当たった.", Doname2(obj), surf);
     }
 
     if (hero_breaks(obj, u.ux, u.uy, BRK_FROM_INV))
@@ -782,7 +781,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
     int ltyp, dmg = 0;
 
     if (!isok(x, y)) {
-        You_feel("the spirits holding you back.");
+        You_feel("霊たちに引き留められている気がした.");
         return FALSE;
     } else if (!in_out_region(x, y)) {
         return FALSE;
@@ -807,18 +806,18 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
                     : odoor_diag ? "bumping into a door frame"
                       : "bumping into a closed door";
             if (odoor_diag)
-                You("hit the door frame!");
-            pline("Ouch!");
+                You("扉の枠にぶつかった!");
+            pline("いてっ!");
         } else if (ltyp == IRONBARS) {
             why = "crashing into iron bars";
-            You("crash into some iron bars.  Ouch!");
+            You("鉄格子に激突した.  いてっ!");
         } else if ((obj = sobj_at(BOULDER, x, y)) != 0) {
             why = "bumping into a boulder";
-            You("bump into a %s.  Ouch!", xname(obj));
+            You("%sにぶつかった.  いてっ!", xname(obj));
         }  else if (!may_pass) {
             /* did we hit a no-dig non-wall position? */
             why = "touching the edge of the universe";
-            You("smack into something!");
+            You("何かにぶつかった!");
         } else if (diagonal
                    && bad_rock(gy.youmonst.data, u.ux, y)
                    && bad_rock(gy.youmonst.data, x, u.uy)) {
@@ -827,8 +826,8 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
 
             if (bigmonst(gy.youmonst.data) || too_much) {
                 why = "wedging into a narrow crevice";
-                You("%sget forcefully wedged into a crevice.",
-                    too_much ? "and all your belongings " : "");
+                You("%s強く押し込まれて裂け目にはまった.",
+                    too_much ? "荷物ごと" : "");
             }
         }
         if (why) {
@@ -860,9 +859,9 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
                          | AUGMENT_IT),
                         FALSE);
         if (!glyph_is_monster(glyph) && !glyph_is_invisible(glyph))
-            You("find %s by bumping into %s.", mnam, noit_mhim(mon));
+            You("%sにぶつかって%sの存在に気づいた.", noit_mhim(mon), mnam);
         else
-            You("bump into %s.", mnam);
+            You("%sにぶつかった.", mnam);
         wakeup(mon, FALSE);
         if (!canspotmon(mon))
             map_invisible(mon->mx, mon->my);
@@ -887,7 +886,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
         && bad_rock(gy.youmonst.data, x, u.uy)) {
         /* Move at a diagonal. */
         if (Sokoban) {
-            You("come to an abrupt halt!");
+            You("急に停止した!");
             return FALSE;
         }
     }
@@ -928,10 +927,10 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
             (void) drown();
             return FALSE;
         } else if (!Is_waterlevel(&u.uz) && !stopping_short) {
-            Norep("You move over %s.", an(is_moat(x, y) ? "moat" : "pool"));
+            Norep("%sの上を移動した.", an(is_moat(x, y) ? "堀" : "水たまり"));
         }
     } else if (is_lava(x, y) && !stopping_short) {
-        Norep("You move over some lava.");
+        Norep("溶岩の上を移動した.");
     }
 
     /* FIXME:
@@ -948,7 +947,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
             dotrap(ttmp, NO_TRAP_FLAGS);
             return FALSE;
         } else if (ttmp->ttyp == VIBRATING_SQUARE) {
-            pline("The ground vibrates as you pass it.");
+            pline("通り過ぎると地面が振動した.");
             dotrap(ttmp, NO_TRAP_FLAGS); /* doesn't print messages */
         } else if (ttmp->ttyp == FIRE_TRAP) {
             dotrap(ttmp, NO_TRAP_FLAGS);
@@ -961,7 +960,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
             return TRUE;
         } else {
             if (ttmp->tseen)
-                You("pass right over %s.", an(trapname(ttmp->ttyp, FALSE)));
+                You("%sの真上を通り過ぎた.", an(trapname(ttmp->ttyp, FALSE)));
         }
     }
     if (--*range < 0) /* make sure our range never goes negative */
@@ -1026,7 +1025,7 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
     }
     if ((mtmp = m_at(x, y)) != 0 && mtmp != mon) {
         if (canseemon(mon) || canseemon(mtmp))
-            pline("%s bumps into %s.", Monnam(mon), a_monnam(mtmp));
+            pline("%sが%sにぶつかった.", Monnam(mon), a_monnam(mtmp));
         wakeup(mtmp, !svc.context.mon_moving);
         /* check whether 'mon' is turned to stone by touching 'mtmp' */
         if (touch_petrifies(mtmp->data)
@@ -1042,7 +1041,7 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
         }
     } else if (u_at(x, y)) {
         /* a monster has caused 'mon' to hurtle against hero */
-        pline("%s bumps into you.", Some_Monnam(mon));
+        pline("%sがあなたにぶつかった.", Some_Monnam(mon));
         stop_occupation();
         /* check whether 'mon' is turned to stone by touching poly'd hero */
         if (Upolyd && touch_petrifies(gy.youmonst.data)
@@ -1088,16 +1087,16 @@ hurtle(int dx, int dy, int range, boolean verbose)
      * for diagonal movement, give the player a message and return.
      */
     if (Punished && !carried(uball)) {
-        You_feel("a tug from the iron ball.");
+        You_feel("鉄球に引かれる感触がした.");
         nomul(0);
         return;
     } else if (u.utrap) {
-        You("are anchored by the %s.",
-            (u.utraptype == TT_WEB) ? "web"
+                You("%sに足止めされていた.",
+                        (u.utraptype == TT_WEB) ? "蜘蛛の巣"
             : (u.utraptype == TT_LAVA) ? hliquid("lava")
               : (u.utraptype == TT_INFLOOR) ? surface(u.ux, u.uy)
-                : (u.utraptype == TT_BURIEDBALL) ? "buried ball"
-                  : "trap");
+                            : (u.utraptype == TT_BURIEDBALL) ? "埋まった鉄球"
+                                    : "罠");
         nomul(0);
         return;
     }
@@ -1113,8 +1112,8 @@ hurtle(int dx, int dy, int range, boolean verbose)
     gm.multi_reason = "moving through the air";
     gn.nomovemsg = ""; /* it just happens */
     if (verbose)
-        You("%s in the opposite direction.",
-            (range > 1) ? "hurtle" : "float");
+        You("反対方向へ%s.",
+            (range > 1) ? "吹き飛んだ" : "ふわりと流された");
     /* if we're in the midst of shooting multiple projectiles, stop */
     endmultishot(TRUE);
     uc.x = u.ux;
@@ -1141,7 +1140,7 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
      */
     if (mon->data->msize >= MZ_HUGE || mon == u.ustuck || mon->mtrapped) {
         if (canseemon(mon))
-            pline("%s doesn't budge!", Monnam(mon));
+            pline("%sはびくともしない!", Monnam(mon));
         return;
     }
 
@@ -1263,10 +1262,10 @@ toss_up(struct obj *obj, boolean hitsroof)
     /* note: obj->quan == 1 */
 
     if (!has_ceiling(&u.uz)) {
-        action = "flies up into"; /* into "the sky" or "the water above" */
+        action = "飛び上がって"; /* into "the sky" or "the water above" */
     } else if (hitsroof) {
         if (breaktest(obj)) {
-            pline("%s hits the %s.", Doname2(obj), ceiling(u.ux, u.uy));
+            pline("%sが%sに当たった.", Doname2(obj), ceiling(u.ux, u.uy));
             breakmsg(obj, !Blind);
             /* crackable armor will return True for breaktest() but will
                usually return False for breakobj() */
@@ -1277,11 +1276,11 @@ toss_up(struct obj *obj, boolean hitsroof)
             }
             return FALSE;
         }
-        action = "hits";
+        action = "ぶつかり";
     } else {
-        action = "almost hits";
+        action = "かすめ";
     }
-    pline("%s %s the %s, then falls back on top of your %s.", Doname2(obj),
+    pline("%sは%sを%s、あなたの%sの上に落ちてきた.", Doname2(obj),
           action, ceiling(u.ux, u.uy), body_part(HEAD));
 
     /* object now hits you */
@@ -1309,17 +1308,17 @@ toss_up(struct obj *obj, boolean hitsroof)
                 /* egg ends up "all over your face"; perhaps
                    visored helmet should still save you here */
                 if (uarmh)
-                    Your("%s fails to protect you.", helm_simple_name(uarmh));
+                    Your("%sでは身を守れなかった.", helm_simple_name(uarmh));
                 goto petrify;
             }
             FALLTHROUGH;
             /*FALLTHRU*/
         case CREAM_PIE:
         case BLINDING_VENOM:
-            pline("You've got it all over your %s!", body_part(FACE));
+            pline("%sじゅうにべったり付いた!", body_part(FACE));
             if (blindinc) {
                 if (otyp == BLINDING_VENOM && !Blind)
-                    pline("It blinds you!");
+                    pline("目がくらんだ!");
                 u.ucreamed += blindinc;
                 make_blinded(BlindedTimeout + (long) blindinc, FALSE);
                 if (!Blind)
@@ -1335,7 +1334,7 @@ toss_up(struct obj *obj, boolean hitsroof)
         hitfloor(obj, FALSE);
         gt.thrownobj = 0;
     } else if (harmless_missile(obj)) {
-        pline("It doesn't hurt.");
+        pline("痛みはなかった.");
         hitfloor(obj, FALSE);
         gt.thrownobj = 0;
     } else { /* neither potion nor other breaking object */
@@ -1384,16 +1383,16 @@ toss_up(struct obj *obj, boolean hitsroof)
             if ((less_damage && dmg < (Upolyd ? u.mh : u.uhp)) || harmless) {
                 if (!artimsg) {
                     if (!harmless) /* !harmless => less_damage here */
-                        pline("Fortunately, you are wearing a hard helmet.");
+                        pline("幸運にも、頑丈なかぶとを着けていた.");
                     else
-                        pline("Unfortunately, you are wearing %s.",
+                        pline("あいにく、%sを着けていた.",
                               an(helm_simple_name(uarmh))); /* helm or hat */
                 }
 
             /* helmet definitely protects you when it blocks petrification */
             } else if (!petrifier) {
                 if (flags.verbose)
-                    Your("%s does not protect you.", helm_simple_name(uarmh));
+                    Your("%sでは身を守れなかった.", helm_simple_name(uarmh));
             }
             /* stone missile against hero in xorn form would have been
                harmless, but hitting a worn helmet negates that */
@@ -1405,7 +1404,7 @@ toss_up(struct obj *obj, boolean hitsroof)
             svk.killer.format = KILLED_BY;
             /* what goes up... */
             Strcpy(svk.killer.name, "elementary physics");
-            You("turn to stone.");
+            You("石になった.");
             if (obj)
                 dropy(obj); /* bypass most of hitfloor() */
             gt.thrownobj = 0;  /* now either gone or on floor */
@@ -1413,7 +1412,7 @@ toss_up(struct obj *obj, boolean hitsroof)
             return obj ? TRUE : FALSE;
         }
         if (is_silver && Hate_silver)
-            pline_The("silver sears you!");
+            pline_The("銀があなたを焼いた!");
         if (harmless)
             hit(thesimpleoname(obj), &gy.youmonst, " but doesn't hurt.");
 
@@ -1527,13 +1526,13 @@ throwit(
         boolean slipok = TRUE;
 
         if (ammo_and_launcher(obj, uwep)) {
-            pline("%s!", Tobjnam(obj, "misfire"));
+            pline("%sは不発した!", Doname2(obj));
         } else {
             /* only slip if it's greased or meant to be thrown */
             if (obj->greased || throwing_weapon(obj))
                 /* BUG: this message is grammatically incorrect if obj has
                    a plural name; greased gloves or boots for instance. */
-                pline("%s as you throw it!", Tobjnam(obj, "slip"));
+                pline("投げたとたん、%sが手から滑った!", doname(obj));
             else
                 slipok = FALSE;
         }
@@ -1552,7 +1551,7 @@ throwit(
                    : (u.uhp < 10 && u.uhp != u.uhpmax))
         && obj->owt > (unsigned) ((Upolyd ? u.mh : u.uhp) * 2)
         && !Is_airlevel(&u.uz)) {
-        You("have so little stamina, %s drops from your grasp.",
+        You("体力が尽きかけて、%sを取り落とした.",
             the(xname(obj)));
         exercise(A_CON, FALSE);
         u.dx = u.dy = 0;
@@ -1582,7 +1581,7 @@ throwit(
                aklys must we wielded as primary to return when thrown */
             && iflags.returning_missile
             && !impaired) {
-            pline("%s the %s and returns to your hand!", Tobjnam(obj, "hit"),
+            pline("%s%sに当たり、手元に戻った!", Tobjnam(obj, "hit"),
                   ceiling(u.ux, u.uy));
             obj = return_throw_to_inv(obj, wep_mask, twoweap, oldslot);
         } else if (u.dz < 0) {
@@ -1640,7 +1639,7 @@ throwit(
                     range++;
             } else if (obj->oclass != GEM_CLASS) {
                 range /= 2;
-                pline("You aren't wielding %s, so you throw your %s by %s.",
+                    pline("%sを装備していないため、%sを%sで投げた.",
                       an(skill_name(weapon_type(obj))),
                       weapon_descr(obj),
                       body_part(HAND));
@@ -1715,7 +1714,7 @@ throwit(
                     sho_obj_return_to_u(obj); /* display its flight */
 
                 if (!impaired && rn2(100)) {
-                    pline("%s to your hand!", Tobjnam(obj, "return"));
+                    pline("%sが手元に戻った!", Doname2(obj));
                     obj = addinv_before(obj, oldslot);
                     encumber_msg();
                     /* addinv autoquivers an aklys if quiver is empty;
@@ -1730,16 +1729,16 @@ throwit(
                     int dmg = rn2(2);
 
                     if (!dmg) {
-                        pline(Blind ? "%s lands %s your %s."
-                                    : "%s back to you, landing %s your %s.",
-                              Blind ? Something : Tobjnam(obj, "return"),
-                              Levitation ? "beneath" : "at",
-                              makeplural(body_part(FOOT)));
+                        pline(Blind ? "%sあなたの%sに%s."
+                                                                : "%sが戻ってきて%sあなたの%sに落ちた.",
+                                                            Blind ? Something : Doname2(obj),
+                            Levitation ? "足元の下へ" : "ちょうど",
+                            makeplural(body_part(FOOT)));
                     } else {
                         dmg += rnd(3);
-                        pline(Blind ? "%s your %s!"
-                                    : "%s back toward you, hitting your %s!",
-                              Tobjnam(obj, Blind ? "hit" : "fly"),
+                                                pline(Blind ? "%sがあなたの%sに当たった!"
+                                                                : "%sが戻ってきてあなたの%sに当たった!",
+                                                            Blind ? Something : Doname2(obj),
                               body_part(ARM));
                         if (obj->oartifact)
                             (void) artifact_hit((struct monst *) 0,
@@ -1767,7 +1766,7 @@ throwit(
                    that slot is empty at the time; since hero will need to
                    explicitly rewield the weapon to get throw-and-return
                    capability back anyway, quivered or not shouldn't matter */
-                pline("%s to return!", Tobjnam(obj, "fail"));
+                pline("%sは戻るのに失敗した!", Doname2(obj));
 
                 if (u.uswallow) {
                     swallowit(obj);
@@ -1797,8 +1796,8 @@ throwit(
                 || (is_lava(gb.bhitpos.x, gb.bhitpos.y)
                     && !is_flammable(obj))) {
                 Soundeffect(se_splash, 50);
-                pline((weight(obj) > WT_SPLASH_THRESHOLD)
-                      ? "Splash!" : "Plop!");
+                    pline((weight(obj) > WT_SPLASH_THRESHOLD)
+                        ? "ばしゃん!" : "ぽちゃん!");
             }
         }
         if (flooreffects(obj, gb.bhitpos.x, gb.bhitpos.y, "fall")) {
@@ -1808,7 +1807,7 @@ throwit(
         obj_no_longer_held(obj);
         if (mon && mon->isshk && is_pick(obj)) {
             if (cansee(gb.bhitpos.x, gb.bhitpos.y))
-                pline("%s snatches up %s.", Monnam(mon), the(xname(obj)));
+                pline("%sが%sをひったくった.", Monnam(mon), the(xname(obj)));
             if (*u.ushops || obj->unpaid)
                 check_shop_obj(obj, gb.bhitpos.x, gb.bhitpos.y, FALSE);
             (void) mpickobj(mon, obj); /* may merge and free obj */
@@ -2090,10 +2089,10 @@ thitmonst(
             tmiss(obj, mon, FALSE);
             return 0;
         } else if (mon->mtame) {
-            pline("%s catches and drops %s.", Monnam(mon), the(xname(obj)));
+            pline("%sは%sを受け止めて落とした.", Monnam(mon), the(xname(obj)));
             return 0;
         } else {
-            pline("%s catches %s.", Monnam(mon), the(xname(obj)));
+            pline("%sは%sを受け止めた.", Monnam(mon), the(xname(obj)));
             return gem_accept(mon, obj);
         }
     }
@@ -2108,7 +2107,7 @@ thitmonst(
         mon->mstrategy &= ~STRAT_WAITMASK;
 
         if (mon->mcanmove) {
-            pline("%s catches %s.", Some_Monnam(mon), the(xname(obj)));
+            pline("%sは%sを受け止めた.", Some_Monnam(mon), the(xname(obj)));
             /* leader will keep tossed invocation item after you've done the
                invocation and it's become unnecessary for completion.. */
             if ((u.uevent.invoked && objects[obj->otyp].oc_unique
@@ -2121,10 +2120,10 @@ thitmonst(
                     /* just in case, identify the object so its name will
                        appear in the message */
                     fully_identify_obj(obj);
-                    verbalize("%s part in this is finished.",
+                    verbalize("%sの役目はここで終わった.",
                               s_suffix(The(xname(obj))));
                     verbalize(
-               "We will guard it in case it is ever needed again, %s forbid.",
+                "二度と必要にならないことを%sに祈りつつ、我らがこれを守る.",
                               align_gname(u.ualignbase[A_ORIGINAL]));
                 }
                 if (*u.ushops || obj->unpaid) /* not very likely... */
@@ -2136,8 +2135,8 @@ thitmonst(
                 boolean next2u = monnear(mon, u.ux, u.uy);
 
                 finish_quest(obj); /* acknowledge quest completion */
-                pline("%s %s %s back to you.", Some_Monnam(mon),
-                      (next2u ? "hands" : "tosses"), the(xname(obj)));
+                        pline("%sが%sで%sをあなたに返した.", Some_Monnam(mon),
+                            (next2u ? "手渡し" : "投げ返し"), the(xname(obj)));
                 if (!next2u)
                     sho_obj_return_to_u(obj);
                 obj = addinv(obj); /* back into your inventory */
@@ -2291,11 +2290,11 @@ thitmonst(
             }
         }
         Strcpy(trail,
-               digests(md) ? " entrails" : is_whirly(md) ? " currents" : "");
+             digests(md) ? "のはらわた" : is_whirly(md) ? "の渦流" : "");
         monname = mon_nam(mon);
         if (*trail)
             monname = s_suffix(monname);
-        pline("%s into %s%s.", Tobjnam(obj, "vanish"), monname, trail);
+        pline("%s%s%sの中へ消えた.", Tobjnam(obj, "vanish"), monname, trail);
     } else {
         tmiss(obj, mon, TRUE);
     }
@@ -2461,9 +2460,9 @@ release_camera_demon(struct obj *obj, coordxy x, coordxy y)
         && (mtmp = makemon(&mons[rn2(3) ? PM_HOMUNCULUS : PM_IMP], x, y,
                            MM_NOMSG)) != 0) {
         if (canspotmon(mtmp))
-            pline("%s is released!", Hallucination
+                pline("%sが解き放たれた!", Hallucination
                                          ? An(rndmonnam(NULL))
-                                         : "The picture-painting demon");
+                                         : "絵描きの悪魔");
         mtmp->mpeaceful = !obj->cursed;
         set_malign(mtmp);
     }
@@ -2505,7 +2504,7 @@ breakobj(
                 if (obj->otyp != POT_WATER && !Half_gas_damage) {
                     if (!breathless(gy.youmonst.data)) {
                         /* [what about "familiar odor" when known?] */
-                        You("smell a peculiar odor...");
+                        You("奇妙な匂いを嗅いだ...");
                     } else {
                         const char *eyes = body_part(EYE);
 
@@ -2627,27 +2626,26 @@ breakmsg(struct obj *obj, boolean in_view)
     case MIRROR:
     case CRYSTAL_BALL:
     case EXPENSIVE_CAMERA:
-        to_pieces = " into a thousand pieces";
+        to_pieces = "粉々に";
         FALLTHROUGH;
     /*FALLTHRU*/
     case POT_WATER: /* really, all potions */
         if (!in_view)
-            You_hear("%s shatter!", something);
+            You_hear("%sが砕ける音を聞いた!", something);
         else
-            pline("%s shatter%s%s!", Doname2(obj),
-                  (obj->quan == 1L) ? "s" : "", to_pieces);
+            pline("%sが砕け散った%s!", Doname2(obj), to_pieces);
         break;
     case EGG:
     case MELON:
-        pline("Splat!");
+            pline("べちゃっ!");
         break;
     case CREAM_PIE:
         if (in_view)
-            pline("What a mess!");
+            pline("ひどいありさまだ!");
         break;
     case ACID_VENOM:
     case BLINDING_VENOM:
-        pline("Splash!");
+        pline("ばしゃっ!");
         break;
     }
 }
@@ -2659,7 +2657,7 @@ throw_gold(struct obj *obj)
     struct monst *mon;
 
     if (!u.dx && !u.dy && !u.dz) {
-        You("cannot throw gold at yourself.");
+        You("自分に向かって金貨は投げられなかった.");
         /* If we tried to throw part of a stack, force it to merge back
            together (same as in throw_obj).  Essential for gold. */
         if (obj->o_id == svc.context.objsplit.parent_oid
@@ -2673,8 +2671,8 @@ throw_gold(struct obj *obj)
 
         if (digests(u.ustuck->data))
             /* note: s_suffix() returns a modifiable buffer */
-            swallower = strcat(s_suffix(swallower), " entrails");
-        pline_The("gold disappears into %s.", swallower);
+            swallower = strcat(s_suffix(swallower), "のはらわた");
+        pline_The("金貨は%sへ消えていった.", swallower);
         add_to_minv(u.ustuck, obj);
         return ECMD_TIME;
     }
@@ -2682,11 +2680,11 @@ throw_gold(struct obj *obj)
     if (u.dz) {
         if (u.dz < 0 && !Is_airlevel(&u.uz) && !Underwater
             && !Is_waterlevel(&u.uz)) {
-            pline_The("gold hits the %s, then falls back on top of your %s.",
+            pline_The("金貨は%sに当たり、あなたの%sの上へ落ちてきた.",
                       ceiling(u.ux, u.uy), body_part(HEAD));
             /* some self damage? */
             if (uarmh)
-                pline("Fortunately, you are wearing %s!",
+                pline("幸運にも、%sを着けていた!",
                       an(helm_simple_name(uarmh)));
         }
         gb.bhitpos.x = u.ux;
@@ -2721,7 +2719,7 @@ throw_gold(struct obj *obj)
     if (flooreffects(obj, gb.bhitpos.x, gb.bhitpos.y, "fall"))
         return ECMD_TIME;
     if (u.dz > 0)
-        pline_The("gold hits the %s.", surface(gb.bhitpos.x, gb.bhitpos.y));
+        pline_The("金貨は%sに当たった.", surface(gb.bhitpos.x, gb.bhitpos.y));
     place_object(obj, gb.bhitpos.x, gb.bhitpos.y);
     if (*u.ushops)
         sellobj(obj, gb.bhitpos.x, gb.bhitpos.y);

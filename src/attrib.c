@@ -8,17 +8,17 @@
 
 /* part of the output on gain or loss of attribute */
 static const char
-    *const plusattr[] = { "strong", "smart", "wise",
-                          "agile",  "tough", "charismatic" },
-    *const minusattr[] = { "weak",    "stupid",
-                           "foolish", "clumsy",
-                           "fragile", "repulsive" };
+    *const plusattr[] = { "力強く", "賢く", "思慮深く",
+                          "機敏に", "丈夫に", "魅力的に" },
+    *const minusattr[] = { "弱く",   "愚かに",
+                           "浅はかに", "不器用に",
+                           "脆く",   "不快に" };
 /* also used by enlightenment in insight.c for non-abbreviated status info */
 extern const char *const attrname[6];
 
 const char
-    *const attrname[] = { "strength", "intelligence", "wisdom",
-                          "dexterity", "constitution", "charisma" };
+    *const attrname[] = { "筋力", "知性", "知恵",
+                          "器用さ", "耐久力", "魅力" };
 
 static const struct innate {
     schar ulevel;
@@ -34,8 +34,8 @@ static const struct innate {
                  { 15, &(HStealth), "stealthy", "" },
                  { 0, 0, 0, 0 } },
 
-  cav_abil[] = { { 7, &(HFast), "quick", "slow" },
-                 { 15, &(HWarning), "sensitive", "" },
+    cav_abil[] = { { 7, &(HFast), "quick", "slow" },
+                                 { 15, &(HWarning), "sensitive", "" },
                  { 0, 0, 0, 0 } },
 
   hea_abil[] = { { 1, &(HPoison_resistance), "", "" },
@@ -57,8 +57,8 @@ static const struct innate {
                  { 17, &(HTeleport_control), "controlled", "uncontrolled" },
                  { 0, 0, 0, 0 } },
 
-  pri_abil[] = { { 15, &(HWarning), "sensitive", "" },
-                 { 20, &(HFire_resistance), "cool", "warmer" },
+    pri_abil[] = { { 15, &(HWarning), "sensitive", "" },
+                                 { 20, &(HFire_resistance), "cool", "warmer" },
                  { 0, 0, 0, 0 } },
 
   ran_abil[] = { { 1, &(HSearching), "", "" },
@@ -74,8 +74,8 @@ static const struct innate {
                  { 15, &(HStealth), "stealthy", "" },
                  { 0, 0, 0, 0 } },
 
-  tou_abil[] = { { 10, &(HSearching), "perceptive", "" },
-                 { 20, &(HPoison_resistance), "hardy", "" },
+    tou_abil[] = { { 10, &(HSearching), "perceptive", "" },
+                                 { 20, &(HPoison_resistance), "hardy", "" },
                  { 0, 0, 0, 0 } },
 
   val_abil[] = { { 1, &(HCold_resistance), "", "" },
@@ -83,8 +83,8 @@ static const struct innate {
                  { 7, &(HFast), "quick", "slow" },
                  { 0, 0, 0, 0 } },
 
-  wiz_abil[] = { { 15, &(HWarning), "sensitive", "" },
-                 { 17, &(HTeleport_control), "controlled", "uncontrolled" },
+    wiz_abil[] = { { 15, &(HWarning), "sensitive", "" },
+                                 { 17, &(HTeleport_control), "controlled", "uncontrolled" },
                  { 0, 0, 0, 0 } },
 
   /* Intrinsics conferred by race */
@@ -128,7 +128,7 @@ adjattrib(
 
     if ((ndx == A_INT || ndx == A_WIS) && uarmh && uarmh->otyp == DUNCE_CAP) {
         if (msgflg == 0)
-            Your("cap constricts briefly, then relaxes again.");
+            Your("帽子が一瞬きつく締まり、また緩んだ.");
         return FALSE;
     }
 
@@ -175,13 +175,13 @@ adjattrib(
     if (ACURR(ndx) == old_acurr) {
         if (msgflg == 0 && flags.verbose) {
             if (ABASE(ndx) == old_abase && AMAX(ndx) == old_amax) {
-                pline("You're %s as %s as you can get.",
-                      abonflg ? "currently" : "already", attrstr);
+                                pline("あなたは%s、これ以上%sにはなれない.",
+                                            abonflg ? "現時点で" : "すでに", attrstr);
             } else {
                 /* current stayed the same but base value changed, or
                    base is at minimum and reduction caused max to drop */
-                Your("innate %s has %s.", attrname[ndx],
-                     (incr > 0) ? "improved" : "declined");
+                     Your("生来の%sは%sした.", attrname[ndx],
+                            (incr > 0) ? "向上" : "低下");
             }
         }
         return FALSE;
@@ -192,7 +192,7 @@ adjattrib(
 
     disp.botl = TRUE;
     if (msgflg <= 0)
-        You_feel("%s%s!", (incr > 1 || incr < -1) ? "very " : "", attrstr);
+        You_feel("%s%s!", (incr > 1 || incr < -1) ? "とても" : "", attrstr);
     if (program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
         encumber_msg();
     return TRUE;
@@ -281,12 +281,12 @@ static const struct poison_effect_message {
     void (*delivery_func)(const char *, ...);
     const char *effect_msg;
 } poiseff[] = {
-    { You_feel, "weaker" },             /* A_STR */
-    { Your, "brain is on fire" },       /* A_INT */
-    { Your, "judgement is impaired" },  /* A_WIS */
-    { Your, "muscles won't obey you" }, /* A_DEX */
-    { You_feel, "very sick" },          /* A_CON */
-    { You, "break out in hives" }       /* A_CHA */
+    { You_feel, "弱くなった" },             /* A_STR */
+    { Your, "脳が焼けるように痛んだ" },       /* A_INT */
+    { Your, "判断力が鈍った" },              /* A_WIS */
+    { Your, "筋肉が言うことをきかなかった" }, /* A_DEX */
+    { You_feel, "ひどく気分が悪くなった" },   /* A_CON */
+    { You, "じんましんが出た" }             /* A_CHA */
 };
 
 /* feedback for attribute loss due to poisoning */
@@ -305,9 +305,9 @@ poisontell(int typ,         /* which attribute */
      * (dunce cap) is such that we don't need message fixups for them.
      */
     if (typ == A_STR && ACURR(A_STR) == STR19(25))
-        msg_txt = "innately weaker";
+        msg_txt = "生来の力が弱くなった";
     else if (typ == A_CON && ACURR(A_CON) == 25)
-        msg_txt = "sick inside";
+        msg_txt = "内側から気分が悪くなった";
 
     (*func)("%s%c", msg_txt, exclaim ? '!' : '.');
 }
@@ -338,7 +338,7 @@ poisoned(
     if (Poison_resistance) {
         if (blast)
             shieldeff(u.ux, u.uy);
-        pline_The("poison doesn't seem to affect you.");
+        pline_The("毒はあなたに効かなかったようだ.");
         return;
     }
 
@@ -366,7 +366,7 @@ poisoned(
         if (u.uhp <= loss) {
             u.uhp = -1;
             disp.botl = TRUE;
-            pline_The("poison was deadly...");
+            pline_The("毒は致命的だった...");
         } else {
             /* survived, but with severe reaction */
             int olduhp = u.uhp,
@@ -586,11 +586,11 @@ exerper(void)
 /* exercise/abuse text (must be in attribute order, not botl order);
    phrased as "You must have been [][0]." or "You haven't been [][1]." */
 static NEARDATA const char *const exertext[A_MAX][2] = {
-    { "exercising diligently", "exercising properly" },           /* Str */
+    { "熱心に鍛えていた", "きちんと鍛えていなかった" },           /* Str */
     { 0, 0 },                                                     /* Int */
-    { "very observant", "paying attention" },                     /* Wis */
-    { "working on your reflexes", "working on reflexes lately" }, /* Dex */
-    { "leading a healthy life-style", "watching your health" },   /* Con */
+    { "注意深く観察していた", "注意を払っていなかった" },           /* Wis */
+    { "反射神経を鍛えていた", "最近は反射神経を鍛えていなかった" }, /* Dex */
+    { "健康的に暮らしていた", "健康管理を怠っていた" },             /* Con */
     { 0, 0 },                                                     /* Cha */
 };
 
@@ -662,7 +662,7 @@ exerchk(void)
                 AEXE(i) = ax = 0;
                 /* then print an explanation */
                 You("%s %s.",
-                    (mod_val > 0) ? "must have been" : "haven't been",
+                    (mod_val > 0) ? "おそらく" : "最近は",
                     exertext[i][(mod_val > 0) ? 0 : 1]);
             }
  nextattrib:

@@ -55,7 +55,7 @@ mb_trapped(struct monst *mtmp, boolean canseeit)
 {
     if (flags.verbose) {
         if (canseeit && !Unaware)
-            pline_mon(mtmp, "KABOOM!!  You see a door explode.");
+            pline_mon(mtmp, "ドカーン!! 扉が爆発するのが見えた.");
         else if (!Deaf)
             You_hear("a %s explosion.",
                      (mdistu(mtmp) > 7 * 7) ? "distant" : "nearby");
@@ -118,7 +118,7 @@ mon_yells(struct monst *mon, const char *shout)
                                    : makeplural(mbodypart(mon, ARM)));
     } else {
         if (canspotmon(mon)) {
-            pline_mon(mon, "%s yells:", Amonnam(mon));
+            pline_mon(mon, "%sは叫んだ:", Amonnam(mon));
         } else {
             /* Soundeffect(se_someone_yells, 75); */
             You_hear("someone yell:");
@@ -490,12 +490,12 @@ monflee(
                sleep and temporary paralysis, so both conditions
                receive the same alternate message */
             if (!mtmp->mcanmove || !mtmp->data->mmove) {
-                pline_mon(mtmp, "%s seems to flinch.",
+                pline_mon(mtmp, "%sはひるんだようだ.",
                           Adjmonnam(mtmp, "immobile"));
             } else if (flees_light(mtmp)) {
                 if (Unaware) {
                     /* tell the player even if the hero is unconscious */
-                    pline_mon(mtmp, "%s is frightened.", Monnam(mtmp));
+                    pline_mon(mtmp, "%sはおびえた.", Monnam(mtmp));
                 } else if (rn2(10) || Deaf) {
                     /* via flees_light(), will always be either via uwep
                        (Sunsword) or uarm (gold dragon scales/mail) or both;
@@ -507,14 +507,14 @@ monflee(
                                          ? yname(uarm)
                                          : "[its imagination?]";
 
-                    pline_mon(mtmp, "%s flees from the painful light of %s.",
+                      pline_mon(mtmp, "%sは%sの苦痛な光から逃げた.",
                           Monnam(mtmp), lsrc);
                 } else {
                     SetVoice(mtmp, 0, 80, 0);
                     verbalize("Bright light!");
                 }
             } else {
-                pline_mon(mtmp, "%s turns to flee.", Monnam(mtmp));
+                pline_mon(mtmp, "%sは逃げ出そうとした.", Monnam(mtmp));
             }
         }
 
@@ -585,7 +585,7 @@ mind_blast(struct monst *mtmp)
     struct monst *m2, *nmon = (struct monst *) 0;
 
     if (canseemon(mtmp))
-        pline_mon(mtmp, "%s concentrates.", Monnam(mtmp));
+        pline_mon(mtmp, "%sは精神を集中させた.", Monnam(mtmp));
     if (mdistu(mtmp) > BOLT_LIM * BOLT_LIM) {
         You("sense a faint wave of psychic energy.");
         return;
@@ -1053,7 +1053,7 @@ boolean
 itsstuck(struct monst *mtmp)
 {
     if (sticks(gy.youmonst.data) && mtmp == u.ustuck && !u.uswallow) {
-        pline_mon(mtmp, "%s cannot escape from you!", Monnam(mtmp));
+        pline_mon(mtmp, "%sはあなたから逃げられなかった!", Monnam(mtmp));
         return TRUE;
     }
     return FALSE;
@@ -1564,7 +1564,7 @@ postmov(
                     Soundeffect(se_door_unlock_and_open, 50);
                     if (flags.verbose) {
                         if (canseeit && canspotmon(mtmp)) {
-                            pline_mon(mtmp, "%s unlocks and opens a door.",
+                            pline_mon(mtmp, "%sは鍵を開けて扉を開いた.",
                                   Monnam(mtmp));
                         } else if (canseeit) {
                             You_see("a door unlock and open.");
@@ -1582,7 +1582,7 @@ postmov(
                     Soundeffect(se_door_open, 100);
                     if (flags.verbose) {
                         if (canseeit && canspotmon(mtmp)) {
-                            pline_mon(mtmp, "%s opens a door.", Monnam(mtmp));
+                            pline_mon(mtmp, "%sは扉を開いた.", Monnam(mtmp));
                         } else if (canseeit) {
                             You_see("a door open.");
                         } else if (!Deaf) {
@@ -1606,7 +1606,7 @@ postmov(
                     Soundeffect(se_door_crash_open, 50);
                     if (flags.verbose) {
                         if (canseeit && canspotmon(mtmp)) {
-                            pline_mon(mtmp, "%s smashes down a door.",
+                            pline_mon(mtmp, "%sは扉を叩き壊した.",
                                       Monnam(mtmp));
                         } else if (canseeit) {
                             You_see("a door crash open.");
@@ -1629,7 +1629,7 @@ postmov(
                 && (dmgtype(ptr, AD_RUST) || dmgtype(ptr, AD_CORR)
                     || metallivorous(ptr))) {
                 if (canseemon(mtmp))
-                    pline_mon(mtmp, "%s eats through the iron bars.",
+                    pline_mon(mtmp, "%sは鉄格子を食い破った.",
                               Monnam(mtmp));
                 dissolve_bars(mtmp->mx, mtmp->my);
                 return MMOVE_DONE;

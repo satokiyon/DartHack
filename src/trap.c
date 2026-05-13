@@ -623,9 +623,9 @@ fall_through(
         feeltrap(t);
         if (!Sokoban && !(ftflags & TOOKPLUNGE)) {
             if (t->ttyp == TRAPDOOR)
-                pline("A trap door opens up under you!");
+                pline("足元の床に落とし戸が開いた!");
             else
-                pline("There's a gaping hole under you!");
+                pline("足元に大きな穴が開いている!");
         }
     } else
         pline_The("%s opens up under you!", surface(u.ux, u.uy));
@@ -1205,7 +1205,7 @@ trapeffect_arrow_trap(
         }
         trap->once = 1;
         seetrap(trap);
-        pline("An arrow shoots out at you!");
+        pline("矢が飛び出してきた!");
         otmp = t_missile(ARROW, trap);
         dam = dmgval(otmp, &gy.youmonst);
         if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
@@ -1268,7 +1268,7 @@ trapeffect_dart_trap(
         }
         trap->once = 1;
         seetrap(trap);
-        pline("A little dart shoots out at you!");
+        pline("小さな吹き矢が飛び出してきた!");
         otmp = t_missile(DART, trap);
         if (!rn2(6))
             otmp->opoisoned = 1;
@@ -1359,7 +1359,7 @@ trapeffect_rocktrap(
                     pline("%s does not protect you.", Yname2(uarmh));
                 }
             } else if (passes_rocks(gy.youmonst.data)) {
-                pline("It passes harmlessly through you.");
+                pline("それはあなたをすり抜け、害はない.");
                 harmless = TRUE;
             }
             if (!Blind)
@@ -1571,7 +1571,7 @@ trapeffect_slp_gas_trap(
             You("are enveloped in a cloud of gas!");
             monstseesu(M_SEEN_SLEEP);
         } else {
-            pline("A cloud of gas puts you to sleep!");
+            pline("ガスの雲で眠らされてしまった!");
             fall_asleep(-rnd(25), TRUE);
             monstunseesu(M_SEEN_SLEEP);
         }
