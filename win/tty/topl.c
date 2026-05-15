@@ -435,8 +435,6 @@ putsyms(const char *str)
             if (ulen > 1) {
                 const unsigned char *utf8cp = (const unsigned char *) str;
                 int width = utf8_char_display_width(utf8cp);
-                unsigned short chartype = utf8_char_chartype(utf8cp);
-                int curx_before = ttyDisplay->curx;
                 uint8 utf8seq[8];
                 int k;
 
@@ -450,12 +448,6 @@ putsyms(const char *str)
                 ttyDisplay->curx += width;
                 if (cw)
                     cw->curx = ttyDisplay->curx;
-#ifdef NH_WIN32_UTF8_TRACE
-                nh_win32_utf8_trace_front("topl.putsyms", utf8cp, ulen,
-                                          chartype, width, curx_before,
-                                          ttyDisplay->curx, ttyDisplay->cury,
-                                          "g_pututf8");
-#endif
                 continue;
             }
         }
