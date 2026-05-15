@@ -60,7 +60,7 @@ staticfn void wish_history_menu(char *);
 
 #define M_IN_WATER(ptr) ((ptr)->mlet == S_EEL || cant_drown(ptr))
 
-static const char are_blinded_by_the_flash[] = "are blinded by the flash!";
+static const char are_blinded_by_the_flash[] = "まばゆい閃光で目がくらんだ!";
 
 /*
  * A positive index means zapped/cast/breathed by hero.
@@ -69,19 +69,19 @@ static const char are_blinded_by_the_flash[] = "are blinded by the flash!";
  * use -39..-30 rather than -9..-0 because -0 is ambiguous (same as 0).
  */
 static const char *const flash_types[] = {
-    "magic missile", /* Wands must be 0-9 */
-    "bolt of fire", "bolt of cold", "sleep ray", "death ray",
-    "bolt of lightning", "", "", "", "",
+    "魔法の矢", /* Wands must be 0-9 */
+    "火炎の光線", "冷気の光線", "睡眠光線", "死の光線",
+    "電撃の光線", "", "", "", "",
 
-    "magic missile", /* Spell equivalents must be 10-19 */
-    "fireball", "cone of cold", "sleep ray", "finger of death",
-    "bolt of lightning", /* there is no spell, used for retribution */
+    "魔法の矢", /* Spell equivalents must be 10-19 */
+    "火の玉", "冷気の円錐", "睡眠光線", "死の指",
+    "電撃の光線", /* there is no spell, used for retribution */
     "", "", "", "",
 
-    "blast of missiles", /* Dragon breath equivalents 20-29*/
-    "blast of fire", "blast of frost", "blast of sleep gas",
-    "blast of disintegration", "blast of lightning",
-    "blast of poison gas", "blast of acid", "", ""
+    "魔法の矢の息", /* Dragon breath equivalents 20-29*/
+    "火炎の息", "氷結の息", "睡眠ガスの息",
+    "分解の息", "電撃の息",
+    "毒ガスの息", "酸の息", "", ""
 };
 
 /* convert monster zap/spell/breath value to hero zap/spell/breath value */
@@ -165,7 +165,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
     boolean dbldam = Role_if(PM_KNIGHT) && u.uhave.questart;
     boolean skilled_spell, helpful_gesture = FALSE;
     int dmg, otyp = otmp->otyp; /* otmp is not NULL */
-    const char *zap_type_text = "spell";
+    const char *zap_type_text = "呪文";
     struct obj *obj;
     boolean disguised_mimic = (mtmp->data->mlet == S_MIMIC
                                && M_AP_TYPE(mtmp) != M_AP_NOTHING);
@@ -187,7 +187,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
 
     switch (otyp) {
     case WAN_STRIKING:
-        zap_type_text = "wand";
+        zap_type_text = "杖";
         FALLTHROUGH;
     /*FALLTHRU*/
     case SPE_FORCE_BOLT:
@@ -356,14 +356,14 @@ bhitm(struct monst *mtmp, struct obj *otmp)
         Strcpy(nambuf, Monnam(mtmp));
         mon_set_minvis(mtmp, FALSE);
         if (!oldinvis && knowninvisible(mtmp)) {
-            pline("%s turns transparent!", nambuf);
+            pline("%sは透明になった!", nambuf);
             reveal_invis = TRUE;
             learn_it = TRUE;
         } else if (couldsee && !canseemon(mtmp)) {
             /* keep the immediate effects of make invisible and teleportation
                ambiguous by using the same message that's used if we
                teleported mtmp (and it ended up somewhere you can't see) */
-            pline("%s vanishes!", nambuf);
+            pline("%sは消えた!", nambuf);
         }
         break;
     }
@@ -422,10 +422,10 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             if (cansee(mtmp->mx, mtmp->my)) {
                 if (!canspotmon(mtmp))
                     Strcpy(buf, An(distant_name(obj, xname)));
-                pline("%s falls to the %s.", buf,
+                pline("%sは%sへ落ちた.", buf,
                       surface(mtmp->mx, mtmp->my));
             } else if (canspotmon(mtmp)) {
-                pline("%s falls off.", buf);
+                pline("%sは外れ落ちた.", buf);
             }
             mdrop_obj(mtmp, obj, FALSE);
         }
@@ -455,8 +455,8 @@ bhitm(struct monst *mtmp, struct obj *otmp)
                     } else
                         mimic_hit_msg(mtmp, otyp);
                 } else
-                    pline("%s looks%s better.", Monnam(mtmp),
-                          otyp == SPE_EXTRA_HEALING ? " much" : "");
+                      pline("%sは%s元気そうになった.", Monnam(mtmp),
+                          otyp == SPE_EXTRA_HEALING ? "ぐっと" : "");
             }
             if (mtmp->mtame && Role_if(PM_HEALER) && (delta > 0)) {
                 more_experienced(min(delta, healamt), 0);
@@ -495,11 +495,11 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             /* turn stone golem into flesh golem */
             if (monsndx(mtmp->data) == PM_STONE_GOLEM
                 && newcham(mtmp, &mons[PM_FLESH_GOLEM], NO_NC_FLAGS))
-                mesg = "turns to flesh!";
+                mesg = "肉体に変わった!";
             else if (monsndx(mtmp->data) == PM_FLESH_GOLEM)
-                mesg = "seems fleshier...";
+                mesg = "さらに肉っぽく見えた...";
             else
-                mesg = "looks rather fleshy for a moment.";
+                mesg = "しばらくの間、かなり肉っぽく見えた.";
 
             if (canseemon(mtmp))
                 pline("%s %s", name, mesg);
@@ -538,7 +538,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             } else {
                 mtmp->m_lev--;
                 if (canseemon(mtmp))
-                    pline("%sは突然弱くなったようだった!", Monnam(mtmp));
+                    pline("%sは突然弱くなった気がした!", Monnam(mtmp));
             }
         }
         break;
@@ -586,7 +586,7 @@ release_hold(void)
             if (!Blind)
                 pline("%sは口を開いた!", Monnam(mtmp));
             else
-                You_feel("a sudden rush of air!");
+                You_feel("突然、風が吹き抜けた気がした!");
         }
         /* gives "you get regurgitated" or "you get expelled from <mon>" */
         expels(mtmp, mtmp->data, TRUE);
@@ -597,14 +597,11 @@ release_hold(void)
         set_ustuck((struct monst *) 0);
         You("%sを放した.", mon_nam(mtmp));
     } else { /* held but not swallowed */
-        char relbuf[BUFSZ];
-
         unstuck(u.ustuck);
         if (!nohands(mtmp->data))
-            Sprintf(relbuf, "from %s grasp", s_suffix(mon_nam(mtmp)));
+            You("%sのつかみから解放された.", mon_nam(mtmp));
         else
-            Sprintf(relbuf, "by %s", mon_nam(mtmp));
-        You("%sから解放された.", relbuf);
+            You("%sの拘束から解放された.", mon_nam(mtmp));
     }
 }
 
@@ -1034,7 +1031,7 @@ revive(struct obj *corpse, boolean by_hero)
         if (cansee(x, y)) {
             char buf[BUFSZ];
 
-            Strcpy(buf, one_of ? "one of " : "");
+            Strcpy(buf, one_of ? "ひとつの " : "");
             /* shk_your: "the " or "your " or "<mon>'s " or "<Shk>'s ".
                If the result is "Shk's " then it will be ambiguous:
                is Shk the mon carrying it, or does Shk's shop own it?
@@ -1045,12 +1042,12 @@ revive(struct obj *corpse, boolean by_hero)
             Strcat(buf, corpse_xname(corpse, (const char *) 0, CXN_NO_PFX));
             if (one_of) /* could be simplified to ''corpse->quan = 1L;'' */
                 corpse->quan--;
-            pline("%s glows iridescently.", upstart(buf));
+            pline("%sは虹色に輝いた.", upstart(buf));
             iflags.last_msg = PLNMSG_OBJ_GLOWS; /* usually for BUC change */
         } else if (shkp) {
             /* need some prior description of the corpse since
                stolen_value() will refer to the object as "it" */
-            pline("死体が蓄生した.");
+            pline("死体がよみがえった.");
         }
         /* don't charge for shopkeeper's own corpse if we just revived him */
         if (shkp && mtmp != shkp)
@@ -1071,7 +1068,7 @@ revive(struct obj *corpse, boolean by_hero)
         ghost = find_mid(m_id, FM_FMON);
         if (ghost && ghost->data == &mons[PM_GHOST]) {
             if (canseemon(ghost))
-                pline("%s is suddenly drawn into its former body!",
+                pline("%sは突然かつての体へ引き込まれた!",
                       Monnam(ghost));
             /* transfer the ghost's inventory along with it */
             while ((otmp = ghost->minvent) != 0) {
@@ -1177,7 +1174,7 @@ unturn_dead(struct monst *mon)
             Strcpy(corpse, corpse_xname(otmp, (const char *) 0, CXN_NORMAL));
             /* shk_your/Shk_Your produces a value with a trailing space */
             if (otmp->quan > 1L) {
-                Strcpy(owner, "One of ");
+                Strcpy(owner, "ひとつの ");
                 (void) shk_your(eos(owner), otmp);
             } else
                 (void) Shk_Your(owner, otmp);
@@ -1200,16 +1197,17 @@ unturn_dead(struct monst *mon)
                    and owner names to say "It comes alive" [note: we did
                    earlier setup because corpse gets used up but need to
                    do the override here after revive() sets 'last_msg'] */
-                Strcpy(corpse, "It");
+                    Strcpy(corpse, "それ");
                 owner[0] = '\0';
             }
             if (youseeit)
-                pline("%s%s suddenly %s%s%s!", owner, corpse,
-                      nonliving(mtmp2->data) ? "reanimates" : "comes alive",
-                      different_type ? " as " : "",
-                      different_type ? an(mon_pmname(mtmp2)) : "");
+                    pline("%s%sが突然%s%s%s%s!", owner, corpse,
+                      nonliving(mtmp2->data) ? "再起動した" : "動き出した",
+                      different_type ? " (" : "",
+                        different_type ? an(mon_pmname(mtmp2)) : "",
+                        different_type ? ")" : "");
             else if (canseemon(mtmp2))
-                pline("%s suddenly appears!", Amonnam(mtmp2));
+                pline("%sが突然現れた!", Amonnam(mtmp2));
         } else {
             /* revival failed; corpse 'otmp' is intact */
             otmp->norevive = save_norevive ? 1 : 0;
@@ -1227,7 +1225,7 @@ unturn_you(void)
     (void) unturn_dead(&gy.youmonst); /* hit carried corpses and eggs */
 
     if (is_undead(gy.youmonst.data)) {
-        You_feel("frightened and %sstunned.", Stunned ? "even more " : "");
+        You_feel("恐ろしくて%sさらに気が遠くなった.", Stunned ? "いっそう " : "");
         make_stunned((HStun & TIMEOUT) + (long) rnd(30), FALSE);
     } else {
         You("恐怖に身震いした.");
@@ -1569,7 +1567,7 @@ create_polymon(struct obj *obj, int okind)
     case METAL:
     case MITHRIL:
         pm_index = PM_IRON_GOLEM;
-        material = "metal ";
+        material = "金属の";
         break;
     case COPPER:
     case SILVER:
@@ -1577,41 +1575,41 @@ create_polymon(struct obj *obj, int okind)
     case GEMSTONE:
     case MINERAL:
         pm_index = rn2(2) ? PM_STONE_GOLEM : PM_CLAY_GOLEM;
-        material = "lithic ";
+        material = "石質の";
         break;
     case 0:
     case FLESH:
         /* there is no flesh type, but all food is type 0, so we use it */
         pm_index = PM_FLESH_GOLEM;
-        material = "organic ";
+        material = "有機質の";
         break;
     case WOOD:
         pm_index = PM_WOOD_GOLEM;
-        material = "wood ";
+        material = "木製の";
         break;
     case LEATHER:
         pm_index = PM_LEATHER_GOLEM;
-        material = "leather ";
+        material = "革製の";
         break;
     case CLOTH:
         pm_index = PM_ROPE_GOLEM;
-        material = "cloth ";
+        material = "布製の";
         break;
     case BONE:
         pm_index = PM_SKELETON; /* nearest thing to "bone golem" */
-        material = "bony ";
+        material = "骨製の";
         break;
     case GOLD:
         pm_index = PM_GOLD_GOLEM;
-        material = "gold ";
+        material = "金製の";
         break;
     case GLASS:
         pm_index = PM_GLASS_GOLEM;
-        material = "glassy ";
+        material = "ガラス製の";
         break;
     case PAPER:
         pm_index = PM_PAPER_GOLEM;
-        material = "paper ";
+        material = "紙製の";
         break;
     default:
         /* if all else fails... */
@@ -1627,7 +1625,7 @@ create_polymon(struct obj *obj, int okind)
     polyuse(obj, okind, (int) mons[pm_index].cwt);
 
     if (mtmp && cansee(mtmp->mx, mtmp->my)) {
-        pline("Some %sobjects meld, and %s arises from the pile!", material,
+        pline("いくつかの%s物体が融合し、積み上がったものから%sが現れた!", material,
               a_monnam(mtmp));
     }
 }
@@ -1977,11 +1975,11 @@ poly_obj(struct obj *obj, int id)
                     && !costly_spot(u.ux, u.uy)) {
                     make_angry_shk(shkp, ox, oy);
                 } else {
-                    pline("%s gets angry!", Shknam(shkp));
+                    pline("%sは怒った!", Shknam(shkp));
                     hot_pursuit(shkp);
                 }
             } else
-                Norep("%s is furious!", Shknam(shkp));
+                Norep("%sは激怒した!", Shknam(shkp));
         }
     }
     delobj(obj);
@@ -2045,8 +2043,8 @@ stone_to_flesh_obj(struct obj *obj) /* nonnull */
                     else
                         delobj(obj);
                     if (cansee(mon->mx, mon->my))
-                        pline_The("figurine %sanimates!",
-                                  golem_xform ? "turns to flesh and " : "");
+                        pline_The("像は%s動き出した!",
+                                  golem_xform ? "肉体に変わって" : "");
                 }
             }
             if (mon) {
@@ -2103,9 +2101,9 @@ stone_to_flesh_obj(struct obj *obj) /* nonnull */
            non-eating, or something stranger) */
         if (Role_if(PM_MONK) || !u.uconduct.unvegetarian
             || !carnivorous(gy.youmonst.data))
-            Norep("You smell the odor of meat.");
+            Norep("肉のにおいがした.");
         else
-            Norep("You smell a delicious smell.");
+            Norep("おいしそうなにおいがした.");
     }
     newsym(oox, ooy);
     return res;
@@ -2230,21 +2228,21 @@ bhito(struct obj *obj, struct obj *otmp)
                        statues; plural handling here and the "empty" case
                        below are superfluous because containers don't stack */
                     if (obj->otrapped)
-                        pline("%s trapped!", Tobjnam(obj, "are"));
+                        pline("%sは罠付きだった!", Tobjnam(obj, "are"));
                     obj->tknown = 1;
                 }
 
                 if (!obj->cobj) {
-                    pline("%s empty.", Tobjnam(obj, "are"));
+                    pline("%sは空だった.", Tobjnam(obj, "are"));
                 } else if (SchroedingersBox(obj)) {
                     /* we don't want to force alive vs dead
                        determination for Schroedinger's Cat here,
                        so just make probing be inconclusive for it */
-                    You("aren't sure whether %s has %s or its corpse inside.",
+                    You("%sの中に%sがいるのか、その死体があるのかは確信できなかった.",
                         the(xname(obj)),
                         /* unfortunately, we can't tell whether rndmonnam()
                            picks a form which can't leave a corpse */
-                        an(Hallucination ? rndmonnam((char *) 0) : "cat"));
+                        Hallucination ? rndmonnam((char *) 0) : "猫");
                     obj->cknown = 0;
                 } else {
                     struct obj *o;
@@ -2280,19 +2278,19 @@ bhito(struct obj *obj, struct obj *otmp)
             if (obj->otyp == BOULDER) {
                 Soundeffect(se_crumbling_sound, 75);
                 if (cansee(obj->ox, obj->oy))
-                    pline_The("boulder falls apart.");
+                    pline_The("巨大な岩は砕け散った.");
                 else
-                    You_hear("a crumbling sound.");
+                    You_hear("崩れる音がした.");
                 fracture_rock(obj);
             } else if (obj->otyp == STATUE) {
                 if (break_statue(obj)) {
                     if (cansee(obj->ox, obj->oy)) {
                         if (Hallucination)
-                            pline_The("%s shatters.", rndmonnam(NULL));
+                            pline_The("%sは砕け散った.", rndmonnam(NULL));
                         else
-                            pline_The("statue shatters.");
+                            pline_The("像は砕け散った.");
                     } else
-                        You_hear("a crumbling sound.");
+                        You_hear("崩れる音がした.");
                 }
             } else {
                 int oox = obj->ox, ooy = obj->oy;
@@ -2356,34 +2354,30 @@ bhito(struct obj *obj, struct obj *otmp)
                 } else {
                     if (cansee(ox, oy)) {
                         if (canspotmon(mtmp)) {
-                            pline("%s is resurrected!",
+                            pline("%sはよみがえった!",
                                   upstart(noname_monnam(mtmp, ARTICLE_THE)));
                             learn_it = by_u ? TRUE : gz.zap_oseen;
                         } else {
                             /* saw corpse but don't see monster: maybe
                                mtmp is invisible, or has been placed at
                                a different spot than <ox,oy> */
-                            if (!type_is_pname(&mons[corpsenm]))
-                                corpsname = The(corpsname);
-                            pline("%s disappears.", corpsname);
+                            pline("%sは消えた.", corpsname);
                         }
                     } else {
                         /* couldn't see corpse's location */
                         if (Role_if(PM_HEALER) && !Deaf
                             && !nonliving(&mons[corpsenm])) {
-                            if (!type_is_pname(&mons[corpsenm]))
-                                corpsname = an(corpsname);
                             if (!Hallucination)
-                                You_hear("%s reviving.", corpsname);
+                                You_hear("%sがよみがえるのを聞いた.", corpsname);
                             else
-                                You_hear("a defibrillator.");
+                                You_hear("除細動器の音を聞いた.");
                             learn_it = by_u ? TRUE : gz.zap_oseen;
                         }
                         if (canspotmon(mtmp))
                             /* didn't see corpse but do see monster: it
                                has been placed somewhere other than <ox,oy>
                                or blind hero spots it with ESP */
-                            pline("%s appears.", Monnam(mtmp));
+                                pline("%sが現れた.", Monnam(mtmp));
                     }
                     if (learn_it)
                         exercise(A_WIS, TRUE);
@@ -2609,7 +2603,7 @@ backfire(struct obj *otmp)
     otmp->in_use = TRUE; /* in case losehp() is fatal */
     pline("%sが突然爆発した!", The(xname(otmp)));
     dmg = d(otmp->spe + 2, 6);
-    losehp(Maybe_Half_Phys(dmg), "exploding wand", KILLED_BY_AN);
+    losehp(Maybe_Half_Phys(dmg), "爆発した杖", KILLED_BY_AN);
     useupall(otmp);
 }
 
@@ -2658,8 +2652,8 @@ dozap(void)
         if ((damage = zapyourself(obj, TRUE)) != 0) {
             char buf[BUFSZ];
 
-            Sprintf(buf, "zapped %sself with %s",
-                    uhim(), killer_xname(obj));
+            Sprintf(buf, "%sで自分を撃った",
+                    killer_xname(obj));
             losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
         }
     } else {
@@ -2755,7 +2749,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         orig_dmg = d(12, 6);
         if (Fire_resistance) {
             shieldeff(u.ux, u.uy);
-            You_feel("rather warm.");
+            You_feel("かなり温かかった.");
             monstseesu(M_SEEN_FIRE);
             ugolemeffects(AD_FIRE, orig_dmg);
         } else {
@@ -2776,7 +2770,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         orig_dmg = d(12, 6);
         if (Cold_resistance) {
             shieldeff(u.ux, u.uy);
-            You_feel("a little chill.");
+            You_feel("少し冷たかった.");
             monstseesu(M_SEEN_COLD);
             ugolemeffects(AD_COLD, orig_dmg);
         } else {
@@ -2792,11 +2786,11 @@ zapyourself(struct obj *obj, boolean ordinary)
         learn_it = TRUE;
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
-            pline_The("missiles bounce!");
+            pline_The("魔法の矢を弾いた!");
             monstseesu(M_SEEN_MAGR);
         } else {
             damage = d(4, 6);
-            pline("马鹿者め！ 自分を擃いてしまった!");
+            pline("間抜け！ 自分を撃ってしまった!");
             monstunseesu(M_SEEN_MAGR);
         }
         break;
@@ -2830,7 +2824,7 @@ zapyourself(struct obj *obj, boolean ordinary)
 
         if (BInvis && uarmc->otyp == MUMMY_WRAPPING) {
             /* A mummy wrapping absorbs it and protects you */
-            You_feel("rather itchy under %s.", yname(uarmc));
+            You_feel("%sの下がかなりかゆかった.", yname(uarmc));
             break;
         }
         incr_itimeout(&HInvis, rn1(15, 31));
@@ -2886,17 +2880,17 @@ zapyourself(struct obj *obj, boolean ordinary)
     case SPE_FINGER_OF_DEATH:
         if (nonliving(gy.youmonst.data) || is_demon(gy.youmonst.data)) {
             pline((obj->otyp == WAN_DEATH)
-                      ? "The wand shoots an apparently harmless beam at you."
-                      : "You seem no deader than before.");
+                      ? "杖はあなたに一見無害な光線を放った."
+                      : "前より死んだ感じはしなかった.");
             break;
         }
         learn_it = TRUE;
-        Sprintf(svk.killer.name, "shot %sself with a death ray", uhim());
+        Strcpy(svk.killer.name, "死の光線を自分に撃った");
         svk.killer.format = NO_KILLER_PREFIX;
         /* probably don't need these to be urgent; player just gave input
            without subsequent opportunity to dismiss --More-- with ESC */
         urgent_pline("純粋なエネルギーで自分を照射してしまった!");
-        urgent_pline("死んだ.");
+        urgent_pline("あなたは死んだ.");
         /* They might survive with an amulet of life saving */
         done(DIED);
         break;
@@ -2910,7 +2904,8 @@ zapyourself(struct obj *obj, boolean ordinary)
         learn_it = TRUE; /* (no effect for spells...) */
         healup(d(6, obj->otyp == SPE_EXTRA_HEALING ? 8 : 4), 0, FALSE,
                (obj->blessed || obj->otyp == SPE_EXTRA_HEALING));
-        You_feel("%sbetter.", obj->otyp == SPE_EXTRA_HEALING ? "much " : "");
+         You_feel("%s回復した気がした.",
+               obj->otyp == SPE_EXTRA_HEALING ? "ずいぶん" : "");
         break;
     case WAN_LIGHT: /* (broken wand) */
         /* assert( !ordinary ); */
@@ -3044,11 +3039,11 @@ lightdamage(
            of death will always be "killed while stuck in creature form"] */
         if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS)
             ordinary = FALSE; /* say blasted rather than zapped */
-        how = (obj->oclass == SPBOOK_CLASS) ? "spell of light"
+        how = (obj->oclass == SPBOOK_CLASS) ? "光の呪文"
               : (!obj->oartifact) ? ansimpleoname(obj)
                 : bare_artifactname(obj);
-        Sprintf(buf, "%s %sself with %s", ordinary ? "zapped" : "blasted",
-                uhim(), how);
+        Sprintf(buf, "%sで自分を%s", how,
+                ordinary ? "撃った" : "吹き飛ばした");
         /* might rehumanize(); could be fatal, but only for Unchanging */
         losehp(Maybe_Half_Phys(dmg), buf, NO_KILLER_PREFIX);
     }
@@ -3151,8 +3146,8 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
              boolean allow_cancel_kill, boolean self_cancel)
 {
     static const char
-        writing_vanishes[] = "Some writing vanishes from %s head!",
-        your[] = "your"; /* should be extern */
+        writing_vanishes[] = "%sの頭から文字がいくつか消えた!",
+        your[] = "あなた"; /* should be extern */
     boolean youdefend = (mdef == &gy.youmonst);
 
     if (youdefend ? (!youattack && Antimagic)
@@ -3185,7 +3180,7 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
                 if (!Blind)
                     pline(writing_vanishes, your);
                 else /* note: "dark" rather than "heavy" is intentional... */
-                    You_feel("%s headed.", Hallucination ? "dark" : "light");
+                    You_feel("%sくらくらした.", Hallucination ? "目の前が暗くなって" : "軽く");
                 u.mh = 0; /* fatal; death handled by rehumanize() */
             }
             if (Unchanging && u.mh > 0)
@@ -3200,7 +3195,7 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
 
         if (mdef->data == &mons[PM_CLAY_GOLEM]) {
             if (canseemon(mdef))
-                pline(writing_vanishes, s_suffix(mon_nam(mdef)));
+                pline(writing_vanishes, mon_nam(mdef));
             /* !allow_cancel_kill is for Magicbane, where clay golem
                will be killed somewhere back up the call/return chain... */
             if (allow_cancel_kill) {
@@ -3248,7 +3243,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
             zap_map(x, y, obj);
             /*map_zapped = TRUE; // not needed due to early return*/
             if (ltyp == ICE || IS_FURNITURE(ltyp)) {
-                surf = "it";
+                surf = "その場所";
                 if (svl.lastseentyp[x][y] != rememberedltyp)
                     ptmp += 1;
             } else {
@@ -3276,7 +3271,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
                    /* can't use the stairs down to quest level 2 until
                       leader "unlocks" them; give feedback if you try */
                    && on_level(&u.uz, &qstart_level) && !ok_to_quest()) {
-            pline_The("stairs seem to ripple momentarily.");
+            pline_The("階段は一瞬ゆらめいたように見えた.");
             disclose = TRUE;
         }
         /* down will release you from bear trap or web */
@@ -3309,7 +3304,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
                    && !Is_qstart(&u.uz)) {
             int dmg;
             /* similar to zap_dig() */
-            pline("岩が%sから蔓落ち、あなたの%sに起ちた.",
+            pline("岩が%sから崩れ、あなたの%sに落ちた",
                   ceiling(x, y), body_part(HEAD));
             dmg = rnd(hard_helmet(uarmh) ? 2 : 6);
             losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
@@ -3324,11 +3319,11 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
             } else if (striking && ttmp->ttyp == TRAPDOOR) {
                 /* striking transforms trapdoor into hole */
                 if (Blind && !ttmp->tseen) {
-                    pline("%s beneath you shatters.", Something);
+                    pline("あなたの下の%sが砕けた.", Something);
                 } else if (!ttmp->tseen) { /* => !Blind */
-                    pline("落とし扈が下にあった！砕けてしまった.");
+                    pline("落とし罠が下にあった！砕けてしまった.");
                 } else {
-                    pline("下の落とし扈が砕けた.");
+                    pline("下の落とし罠が砕けた.");
                     disclose = TRUE;
                 }
                 ttmp->ttyp = HOLE;
@@ -3341,11 +3336,11 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
                 ttmp->ttyp = TRAPDOOR;
                 if (Blind || !ttmp->tseen) {
                     pline("%sが下で渦巻いた.",
-                          is_ice(x, y) ? "frost" : "dust");
+                          is_ice(x, y) ? "霜" : "ほこり");
                 } else {
                     ttmp->tseen = 1;
                     newsym(x, y);
-                    pline("落とし扈が下に現れた.");
+                    pline("落とし罠が下に現れた.");
                     disclose = TRUE;
                 }
                 /* hadn't fallen down hole; won't fall now */
@@ -3357,7 +3352,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
             || (Is_qstart(&u.uz) && u.dz < 0)) {
             pline1(nothing_happens);
         } else if (u.dz < 0) { /* we should do more... */
-            pline("血があなたの%sに滴り洎ちた.", body_part(FACE));
+            pline("血があなたの%sに滴り落ちた.", body_part(FACE));
         } else if (u.dz > 0 && !OBJ_AT(u.ux, u.uy)) {
             /*
             Print this message only if there wasn't an engraving
@@ -3367,10 +3362,12 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
             if (!(e && e->engr_type == ENGRAVE)) {
                 if (is_pool(u.ux, u.uy) || is_ice(u.ux, u.uy))
                     pline1(nothing_happens);
+                else if (Levitation)
+                    pline("%s血があなたの下で渦巻いた.",
+                          is_lava(u.ux, u.uy) ? "沸騰した" : "流れた");
                 else
-                    pline("Blood %ss %s your %s.",
-                          is_lava(u.ux, u.uy) ? "boil" : "pool",
-                          Levitation ? "beneath" : "at",
+                    pline("%s血があなたの%sにたまった.",
+                          is_lava(u.ux, u.uy) ? "沸騰した" : "流れた",
                           makeplural(body_part(FOOT)));
             }
         }
@@ -3422,7 +3419,7 @@ zapwrapup(void)
 {
     /* if do_osshock() set obj_zapped while polying, give a message now */
     if (go.obj_zapped)
-        You_feel("shuddering vibrations.");
+        You_feel("身震いするような振動を感じた.");
     go.obj_zapped = FALSE;
 }
 
@@ -3563,16 +3560,16 @@ hit(
                              && (cansee(gb.bhitpos.x, gb.bhitpos.y)
                                  || canspotmon(mtmp) || engulfing_u(mtmp))));
 
-    pline("%s %s %s%s", The(str), vtense(str, "hit"),
-          verbosely ? mon_nam(mtmp) : "it", force);
+    pline("%sは%sに当たった%s", The(str),
+          verbosely ? mon_nam(mtmp) : "何か", force);
 }
 
 void
 miss(const char *str, struct monst *mtmp)
 {
-    pline("%s %s %s.", The(str), vtense(str, "miss"),
+    pline("%sは%sに当たらなかった.", The(str),
           ((cansee(gb.bhitpos.x, gb.bhitpos.y) || canspotmon(mtmp))
-           && flags.verbose) ? mon_nam(mtmp) : "it");
+           && flags.verbose) ? mon_nam(mtmp) : "何か");
 }
 
 staticfn void
@@ -3668,8 +3665,8 @@ zap_map(
                 if (e->engr_type == ENGRAVE) {
                     /* only affects things in stone */
                     pline_The(Hallucination
-                                  ? "floor runs like butter!"
-                                  : "edges on the floor get smoother.");
+                                  ? "床がバターのようにとろけた!"
+                                  : "床の角がなめらかになった.");
                     wipe_engr_at(x, y, d(2, 4), TRUE);
                 }
                 break;
@@ -3787,7 +3784,7 @@ zap_map(
                 use_the = !hallu ? (ttmp->ttyp == VIBRATING_SQUARE
                                     && Invocation_lev(&u.uz))
                                  : !rn2(4);
-                You("find %s%c",
+                You("%sを見つけた%c",
                     use_the ? the(ttmpname) : an(ttmpname),
                     use_the ? '!' : '.');
                 learn_it = !hallu;
@@ -3929,7 +3926,7 @@ bhit(
             && (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
             && !rn2(3)) {
             if (cansee(x, y)) {
-                pline("%s gets stuck in a web!", Yname2(obj));
+                pline("%sはクモの巣に引っかかった!", Yname2(obj));
                 ttmp->tseen = TRUE;
                 newsym(x, y);
             }
@@ -3947,10 +3944,10 @@ bhit(
             if (is_pool(x, y) && !mtmp) {
                 in_skip = TRUE;
                 if (!Blind)
-                    pline("%s %s%s.", Yname2(obj), otense(obj, "skip"),
-                          skipcount ? " again" : "");
+                    pline("%sは水面を跳ねた%s.", Yname2(obj),
+                          skipcount ? " (再び)" : "");
                 else
-                    You_hear("%s skip.", yname(obj));
+                    You_hear("%sが水面を跳ねる音を聞いた.", yname(obj));
                 skipcount++;
             } else if (skiprange_start > skiprange_end + 1) {
                 --skiprange_start;
@@ -3963,8 +3960,7 @@ bhit(
                     skiprange(range, &skiprange_start, &skiprange_end);
             } else if (mtmp && M_IN_WATER(mtmp->data)) {
                 if (!Blind && canspotmon(mtmp))
-                    pline("%s %s over %s.", Yname2(obj), otense(obj, "pass"),
-                          mon_nam(mtmp));
+                    pline("%sは%sを飛び越えた.", Yname2(obj), mon_nam(mtmp));
                 mtmp = (struct monst *) 0;
             }
         }
@@ -4100,14 +4096,14 @@ bhit(
 
             if ((bobj = sobj_at(BOULDER, x, y)) != 0) {
                 if (cansee(x, y))
-                    pline("%s hits %s.", The(distant_name(obj, xname)),
+                    pline("%sは%sに当たった.", The(distant_name(obj, xname)),
                           an(xname(bobj)));
                 range = 0;
             } else if (obj == uball) {
                 if (!test_move(x - ddx, y - ddy, ddx, ddy, TEST_MOVE)) {
                     /* nb: it didn't hit anything directly */
                     if (cansee(x, y))
-                        pline("%s jerks to an abrupt halt.",
+                        pline("%sは急停止した.",
                               The(distant_name(obj, xname))); /* lame */
                     range = 0;
                 } else if (Sokoban && (t = t_at(x, y)) != 0
@@ -4210,7 +4206,7 @@ boomhit(struct obj *obj, int dx, int dy)
                 break;
             } else { /* we catch it */
                 tmp_at(DISP_END, 0);
-                You("み事にブーメランを捕まえた.");
+                You("みごとにブーメランをキャッチした.");
                 return &gy.youmonst;
             }
         }
@@ -4219,7 +4215,7 @@ boomhit(struct obj *obj, int dx, int dy)
         if (IS_SINK(levl[gb.bhitpos.x][gb.bhitpos.y].typ)) {
             Soundeffect(se_boomerang_klonk, 75);
             if (!Deaf)
-                pline("Klonk!");
+                pline("ガンッ!");
             wake_nearto(gb.bhitpos.x, gb.bhitpos.y, 20);
             break; /* boomerang falls on sink */
         }
@@ -4410,7 +4406,7 @@ zhitu(
     case ZT_MAGIC_MISSILE:
         if (Antimagic) {
             shieldeff(sx, sy);
-            pline_The("missiles bounce off!");
+            pline_The("魔法の矢を弾き返した!");
             monstseesu(M_SEEN_MAGR);
         } else {
             dam = d(nd, 6);
@@ -4422,7 +4418,7 @@ zhitu(
         orig_dam = d(nd, 6);
         if (Fire_resistance) {
             shieldeff(sx, sy);
-            You("爆炳を感じなかった!");
+            You("熱さを感じなかった!");
             monstseesu(M_SEEN_FIRE);
             ugolemeffects(AD_FIRE, orig_dam);
         } else {
@@ -4523,15 +4519,15 @@ zhitu(
             (void) destroy_items(&gy.youmonst, AD_ELEC, orig_dam);
         break;
     case ZT_POISON_GAS:
-        poisoned("blast", A_DEX, "poisoned blast", 15, FALSE);
+        poisoned("爆風", A_DEX, "毒の爆風", 15, FALSE);
         break;
     case ZT_ACID:
         if (Acid_resistance) {
-            pline_The("%s doesn't hurt.", hliquid("acid"));
+            pline_The("%sは痛くなかった.", hliquid("酸"));
             monstseesu(M_SEEN_ACID);
             dam = 0;
         } else {
-            pline_The("%s burns!", hliquid("acid"));
+            pline_The("%sで焼けつくようだった!", hliquid("酸"));
             dam = d(nd, 6);
             exercise(A_STR, FALSE);
             monstunseesu(M_SEEN_ACID);
@@ -4642,9 +4638,9 @@ burn_floor_objects(
                 cnt += delquan;
                 if (give_feedback) {
                     if (delquan > 1L)
-                        pline("%ld %s burn.", delquan, buf2);
+                        pline("%ld個の%sが燃えた.", delquan, buf2);
                     else
-                        pline("%s burns.", An(buf1));
+                        pline("%sが燃えた.", An(buf1));
                 }
             }
         }
@@ -4808,7 +4804,7 @@ dobuzz(
         if (!u.ustuck) {
             u.uswallow = 0;
         } else {
-            pline("%s rips into %s%s", The(flash_str(fltyp, FALSE)),
+            pline("%sは%sに食い込んだ%s", The(flash_str(fltyp, FALSE)),
                   mon_nam(u.ustuck), exclam(tmp));
             /* Using disintegration from the inside only makes a hole... */
             if (tmp == MAGIC_COOKIE)
@@ -4875,7 +4871,7 @@ dobuzz(
                         hit(flash_str(fltyp, FALSE), mon, exclam(0));
                         shieldeff(mon->mx, mon->my);
                         (void) mon_reflects(mon,
-                                            "But it reflects from %s %s!");
+                                            "%s%sで跳ね返った!");
                         gas_hit = FALSE;
                     }
                     dx = -dx;
@@ -4903,9 +4899,9 @@ dobuzz(
                         if (canseemon(mon)) {
                             hit(flash_str(fltyp, FALSE), mon, ".");
                             pline("%sは致命的な%sを吸収した!", Monnam(mon),
-                                  type == ZT_BREATH(ZT_DEATH) ? "blast"
-                                                              : "ray");
-                            pline("以前より強くなったようだった.");
+                                  type == ZT_BREATH(ZT_DEATH) ? "爆風"
+                                                              : "光線");
+                            pline("以前より強くなった気がした.");
                         }
                         break; /* Out of while loop */
                     }
@@ -4937,7 +4933,7 @@ dobuzz(
                         } else {
                             /* some armor was destroyed; no damage done */
                             if (canseemon(mon))
-                                pline("%s %s is disintegrated!",
+                                pline("%sの%sは分解された!",
                                       s_suffix(Monnam(mon)),
                                       distant_name(otmp, xname));
                             m_useup(mon, otmp);
@@ -4961,12 +4957,12 @@ dobuzz(
                 goto buzzmonst;
             } else if (!forcemiss && zap_hit((int) u.uac, 0)) {
                 range -= 2;
-                pline_dir(xytodir(-dx, -dy), "%s hits you!",
+                pline_dir(xytodir(-dx, -dy), "%sがあなたに命中した!",
                           The(flash_str(fltyp, FALSE)));
                 if (Reflecting) {
                     if (!Blind) {
-                        (void) ureflects("But %s reflects from your %s!",
-                                         "it");
+                        (void) ureflects("しかし%sはあなたの%sで跳ね返った!",
+                                         "それ");
                     } else
                     pline("なぜか影響を受けなかった.");
                     monstseesu(M_SEEN_REFL);
@@ -4981,7 +4977,7 @@ dobuzz(
                     monstunseesu(M_SEEN_REFL);
                 }
             } else if (!Blind) {
-                pline("%sがすぐそばを通り据ぎた!", The(flash_str(fltyp, FALSE)));
+                pline("%sがすぐそばを通り過ぎた!", The(flash_str(fltyp, FALSE)));
             } else if (damgtype == ZT_LIGHTNING) {
                 Your("%sがしびれた.", body_part(ARM));
             }
@@ -5006,7 +5002,7 @@ dobuzz(
             if ((--range > 0 && isok(lsx, lsy) && cansee(lsx, lsy))
                 || fireball) {
                 if (Is_airlevel(&u.uz)) { /* nothing to bounce off of */
-                    pline_The("%s vanishes into the aether!",
+                    pline_The("%sは虚空へ消えた!",
                               flash_str(fltyp, FALSE));
                     if (fireball)
                         type = ZT_WAND(ZT_FIRE); /* skip pending fireball */
@@ -5016,7 +5012,7 @@ dobuzz(
                     sy = lsy;
                     break; /* fireballs explode before the obstacle */
                 } else
-                    pline_The("%s bounces!", flash_str(fltyp, FALSE));
+                    pline_The("%sは跳ね返った!", flash_str(fltyp, FALSE));
             }
             bounce_dir(sx, sy, &dx, &dy, bchance);
             tmp_at(DISP_CHANGE, zapdir_to_glyph(dx, dy, hdmgtype));
@@ -5044,7 +5040,7 @@ melt_ice(coordxy x, coordxy y, const char *msg)
     struct monst *mtmp;
 
     if (!msg)
-        msg = "The ice crackles and melts.";
+        msg = "氷がパチパチと音を立てて溶けた.";
     if (lev->typ == DRAWBRIDGE_UP || lev->typ == DRAWBRIDGE_DOWN) {
         lev->drawbridgemask &= ~DB_ICE; /* revert to DB_MOAT */
     } else { /* lev->typ == ICE */
@@ -5063,7 +5059,7 @@ melt_ice(coordxy x, coordxy y, const char *msg)
         Norep("%s", msg);
     if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
         if (cansee(x, y))
-            pline("%s settles...", An(xname(otmp)));
+            pline("%sが落ち着いた...", An(xname(otmp)));
         do {
             obj_extract_self(otmp); /* boulder isn't being pushed */
             if (!boulder_hits_pool(otmp, x, y, FALSE))
@@ -5127,7 +5123,7 @@ melt_ice_away(anything *arg, long timeout UNUSED)
     y = (coordxy) (where & 0xFFFF);
     x = (coordxy) ((where >> 16) & 0xFFFF);
     /* melt_ice does newsym when appropriate */
-    melt_ice(x, y, "Some ice melts away.");
+    melt_ice(x, y, "氷がいくらか溶けた.");
     svc.context.mon_moving = save_mon_moving;
 }
 
@@ -5165,7 +5161,7 @@ zap_over_floor(
         if (t && t->ttyp == WEB) {
             /* a burning web is too flimsy to notice if you can't see it */
             if (see_it)
-                Norep("A web bursts into flames!");
+                Norep("クモの巣が燃え上がった!");
             (void) delfloortrap(t), t = (struct trap *) 0;
             if (see_it)
                 newsym(x, y);
@@ -5175,9 +5171,9 @@ zap_over_floor(
         } else if (is_pool(x, y)) {
             boolean on_water_level = Is_waterlevel(&u.uz), msggiven = FALSE;
             const char *msgtxt = (!Deaf)
-                                 ? "You hear hissing gas." /* Deaf-aware */
+                                                                 ? "シューッという気体の音が聞こえた." /* Deaf-aware */
                                  : (type >= 0)
-                                   ? "That seemed remarkably uneventful."
+                                                                     ? "驚くほど何も起こらなかったようだ."
                                    : (char *) 0;
 
             /* don't create steam clouds on Plane of Water; air bubble
@@ -5191,9 +5187,9 @@ zap_over_floor(
             if (lev->typ != POOL) { /* MOAT or DRAWBRIDGE_UP or WATER */
                 t = (struct trap *) 0;
                 if (on_water_level)
-                    msgtxt = (see_it || !Deaf) ? "Some water boils." : 0;
+                    msgtxt = (see_it || !Deaf) ? "水がいくらか沸騰した." : 0;
                 else if (see_it)
-                    msgtxt = "Some water evaporates.";
+                    msgtxt = "水がいくらか蒸発した.";
             } else {
                 rangemod -= 3;
                 lev->typ = ROOM, lev->flags = 0;
@@ -5201,7 +5197,7 @@ zap_over_floor(
                 /*if (t) -- this was before the vapor cloud was added --
                       t->tseen = 1;*/
                 if (see_it)
-                    msgtxt = "The water evaporates.";
+                    msgtxt = "水が蒸発した.";
             }
             if (msgtxt && !msggiven)
                 Norep("%s", msgtxt);
@@ -5245,10 +5241,10 @@ zap_over_floor(
                 /* For now, don't let WATER freeze. */
                 Soundeffect(se_soft_crackling, 100);
                 if (see_it)
-                    pline_The("%s freezes for a moment.",
-                              hliquid(lavawall ? "lava" : "water"));
+                    pline_The("%sは一瞬凍りついた.",
+                              hliquid(lavawall ? "溶岩" : "水"));
                 else
-                    You_hear("a soft crackling.");
+                    You_hear("ぱちぱちという小さな音がした.");
                 rangemod -= 1000; /* stop */
             } else {
                 char buf[BUFSZ];
@@ -5280,15 +5276,15 @@ zap_over_floor(
                 }
                 if (see_it) {
                     if (lava)
-                        Norep("The %s cools and solidifies.",
-                              hliquid("lava"));
+                        Norep("%sは冷えて固まった.",
+                              hliquid("溶岩"));
                     else if (moat)
-                        Norep("The %s is bridged with ice!", buf);
+                        Norep("%sは氷で橋渡しされた!", buf);
                     else
-                        Norep("The %s freezes.", hliquid("water"));
+                        Norep("%sは凍りついた.", hliquid("水"));
                     newsym(x, y);
                 } else if (!lava) {
-                    You_hear("a crackling sound.");
+                    You_hear("ぱちぱちという音がした.");
                 }
                 if (u_at(x, y)) {
                     if (u.uinwater) { /* not just `if (Underwater)' */
@@ -5350,15 +5346,15 @@ zap_over_floor(
                 break;
             if ((lev->wall_info & W_NONDIGGABLE) != 0) {
                 if (see_it)
-                    Norep("The %s %s somewhat but remain intact.",
+                    Norep("%sはやや%sが、無事だった.",
                           defsyms[S_bars].explanation,
-                          (damgtype == ZT_ACID) ? "corrode" : "melt");
+                          (damgtype == ZT_ACID) ? "腐食した" : "溶けた");
                 /* but nothing actually happens... */
             } else {
                 rangemod -= 3;
                 if (see_it)
-                    Norep("The %s %s.", defsyms[S_bars].explanation,
-                          (damgtype == ZT_ACID) ? "corrode away" : "melt");
+                    Norep("%sは%s.", defsyms[S_bars].explanation,
+                          (damgtype == ZT_ACID) ? "腐食して崩れた" : "溶けた");
                 dissolve_bars(x, y);
                 if (*in_rooms(x, y, SHOPBASE)) {
                     add_damage(x, y, (type >= 0) ? SHOP_BARS_COST : 0L);
@@ -5376,14 +5372,14 @@ zap_over_floor(
     /* set up zap text for possible door feedback; for exploding wand, we
        want "the blast" rather than "your blast" even if hero caused it */
     yourzap = (type >= 0 && !exploding_wand_typ);
-    zapverb = "blast"; /* breath attack or wand explosion */
+    zapverb = "爆風"; /* breath attack or wand explosion */
     if (!exploding_wand_typ) {
         int ztype = zaptype(type); /* 0..29 for both hero and monsters */
 
         if (ztype < ZT_SPELL(0))
-            zapverb = "bolt"; /* wand zap */
+            zapverb = "光線"; /* wand zap */
         else if (ztype < ZT_BREATH(0))
-            zapverb = "spell";
+            zapverb = "呪文";
     } else if (exploding_wand_typ == POT_OIL
                || exploding_wand_typ == SCR_FIRE) {
         /* breakobj() -> explode_oil() -> splatter_burning_oil()
@@ -5402,8 +5398,8 @@ zap_over_floor(
            (except on rogue level) */
         newsym(x, y);
         if (see_it)
-            pline("%s %s reveals a secret door.",
-                  yourzap ? "Your" : "The", zapverb);
+            pline("%s%sで隠し扉が現れた.",
+                  yourzap ? "あなたの" : "その", zapverb);
         else if (Is_rogue_level(&u.uz))
             draft_message(FALSE); /* "You feel a draft." (open doorway) */
     }
@@ -5417,26 +5413,26 @@ zap_over_floor(
         switch (damgtype) {
         case ZT_FIRE:
             new_doormask = D_NODOOR;
-            see_txt = "The door is consumed in flames!";
-            sense_txt = "smell smoke.";
+            see_txt = "扉は炎に包まれて燃え尽きた!";
+            sense_txt = "煙のにおいがした.";
             break;
         case ZT_COLD:
             new_doormask = D_NODOOR;
-            see_txt = "The door freezes and shatters!";
-            hear_txt = "a deep cracking sound.";
+            see_txt = "扉は凍って砕けた!";
+            hear_txt = "重いひび割れ音がした.";
             break;
         case ZT_DEATH:
             /* death spells/wands don't disintegrate */
             if (abs(type) != ZT_BREATH(ZT_DEATH))
                 goto def_case;
             new_doormask = D_NODOOR;
-            see_txt = "The door disintegrates!";
-            hear_txt = "crashing wood.";
+            see_txt = "扉は分解された!";
+            hear_txt = "木材が砕ける音がした.";
             break;
         case ZT_LIGHTNING:
             new_doormask = D_BROKEN;
-            see_txt = "The door splinters!";
-            hear_txt = "crackling.";
+            see_txt = "扉は裂けて壊れた!";
+            hear_txt = "バチバチという音がした.";
             break;
         default:
  def_case:
@@ -5444,8 +5440,8 @@ zap_over_floor(
                 /* Magical explosion from misc exploding wand */
                 if (exploding_wand_typ == WAN_STRIKING) {
                     new_doormask = D_BROKEN;
-                    see_txt = "The door crashes open!";
-                    sense_txt = "feel a burst of cool air.";
+                    see_txt = "扉は激しく開いた!";
+                    sense_txt = "冷たい空気が一気に吹き出したのを感じた.";
                     break;
                 }
             }
@@ -5454,12 +5450,12 @@ zap_over_floor(
                    inaccurate for an exploding wand since
                    other adjacent locations still get hit */
                 if (exploding_wand_typ)
-                    pline_The("door remains intact.");
+                    pline_The("扉は無事だった.");
                 else
-                    pline_The("door absorbs %s %s!", yourzap ? "your" : "the",
+                    pline_The("扉は%s%sを吸収した!", yourzap ? "あなたの" : "その",
                               zapverb);
             } else
-                You_feel("vibrations.");
+                You_feel("振動を感じた.");
             break;
         }
         if (new_doormask >= 0) { /* door gets broken */
@@ -5489,7 +5485,8 @@ zap_over_floor(
     if (OBJ_AT(x, y) && damgtype == ZT_FIRE)
         if (burn_floor_objects(x, y, FALSE, type > 0) && couldsee(x, y)) {
             newsym(x, y);
-            You("%s of smoke.", !Blind ? "see a puff" : "smell a whiff");
+            You("%s.", !Blind ? "煙がふわっと立つのを見た"
+                            : "煙のにおいをかいだ");
         }
     if (!ignoremon && (mon = m_at(x, y)) != 0)
         wakeup(mon, (type >= 0) ? TRUE : FALSE);
@@ -5596,7 +5593,7 @@ break_statue(struct obj *obj)
     }
     if (by_you && Role_if(PM_ARCHEOLOGIST)
         && (obj->spe & CORPSTAT_HISTORIC)) {
-        You_feel("guilty about damaging such a historic statue.");
+        You_feel("こんな由緒ある像を傷つけたことに罪悪感を覚えた.");
         adjalign(-1);
     }
     obj->spe = 0;
@@ -5777,13 +5774,13 @@ item_what(int dmgtyp)
  */
 const char *const destroy_strings[][3] = {
     /* also used in trap.c */
-    { "freezes and shatters", "freeze and shatter", "shattered potion" },
-    { "boils and explodes", "boil and explode", "boiling potion" },
-    { "ignites and explodes", "ignite and explode", "exploding potion" },
-    { "catches fire and burns", "catch fire and burn", "burning scroll" },
-    { "catches fire and burns", "", "burning book" },
-    { "turns to dust and vanishes", "", "" },
-    { "breaks apart and explodes", "", "exploding wand" },
+    { "凍って砕け散った", "凍って砕け散った", "shattered potion" },
+    { "沸騰して爆発した", "沸騰して爆発した", "boiling potion" },
+    { "引火して爆発した", "引火して爆発した", "exploding potion" },
+    { "燃え上がって灰になった", "燃え上がって灰になった", "burning scroll" },
+    { "燃え上がって灰になった", "", "burning book" },
+    { "塵になって消えた", "", "" },
+    { "砕けて爆発した", "", "exploding wand" },
 };
 
 /* guts of destroy_items();
@@ -5829,9 +5826,9 @@ maybe_destroy_item(
         if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
             skip = 1;
             if (u_carry ? !Blind : vis) {
-                pline("%s glows a strange %s, but remains intact.",
+                pline("%sは奇妙な%sに光ったが、無事だった.",
                       The(u_carry ? xname(obj) : distant_name(obj, xname)),
-                      hcolor("dark red"));
+                      hcolor("濃い赤"));
             }
             break;
         }
@@ -5901,11 +5898,11 @@ maybe_destroy_item(
             return 0;
 
         if (u_carry || vis) {
-            mult = (cnt == 1L) ? ((quan == 1L) ? "" /* 1 of 1 */
-                                  : "One of ")      /* 1 of N */
-                   : ((cnt < quan) ? "Some of "     /* n of N */
-                      : (quan == 2L) ? "Both of "   /* 2 of 2 */
-                        : "All of ");               /* N of N */
+                        mult = (cnt == 1L) ? ((quan == 1L) ? "" /* 1 of 1 */
+                                                                    : "1つの")        /* 1 of N */
+                                     : ((cnt < quan) ? "いくつかの"   /* n of N */
+                                            : (quan == 2L) ? "両方の"     /* 2 of 2 */
+                                                : "すべての");             /* N of N */
             pline("%s%s %s!", mult,
                   (cnt == 1L && quan == 1L) ? Yname2(obj) : yname(obj),
                   destroy_strings[dindx][(cnt > 1L)]);
@@ -6166,31 +6163,30 @@ wishcmdassist(int triesleft)
 {
     static NEARDATA const char *
         wishinfo[] = {
-  "Wish details:",
+  "願いの詳細:",
   "",
-  "Enter the name of an object, such as \"potion of monster detection\",",
-  "\"scroll labeled README\", \"elven mithril-coat\", or \"Grimtooth\"",
-  "(without the quotes).",
+  "\"potion of monster detection\" のように、物品名を入力する.",
+  "例: \"scroll labeled README\", \"elven mithril-coat\", \"Grimtooth\".",
+  "(引用符は入力しない).",
   "",
-  "For object types which come in stacks, you may specify a plural name",
-  "such as \"potions of healing\", or specify a count, such as \"1000 gold",
-  "pieces\", although that aspect of your wish might not be granted.",
+  "まとめて積まれる種類の物品は、複数形で指定できる.",
+  "\"potions of healing\" のように書くか、\"1000 gold pieces\" のように",
+  "個数を指定できるが、その部分の願いはかなわないこともある.",
   "",
-  "You may also specify various prefix values which might be used to",
-  "modify the item, such as \"uncursed\" or \"rustproof\" or \"+1\".",
-  "Most modifiers shown when viewing your inventory can be specified.",
+  "物品を修飾する接頭語も指定できる.",
+  "たとえば \"uncursed\" や \"rustproof\" や \"+1\" などだ.",
+  "所持品一覧で表示される修飾子の多くは指定できる.",
   "",
-  "You may specify 'nothing' to explicitly decline this wish.",
+  "この願いを明示的に辞退するには 'nothing' を指定できる.",
   0,
     },
-        preserve_wishless[] = "Doing so will preserve 'wishless' conduct.",
-        retry_info[] =
-                    "If you specify an unrecognized object name %s%s time%s,",
-        retry_too[] = "a randomly chosen item will be granted.",
+        preserve_wishless[] = "そうすると『願いなし』行状を維持できる.",
+        retry_info[] = "認識できない物品名をあと%s回入力すると,",
+        retry_too[] = "ランダムに選ばれた品物が与えられる.",
         suppress_cmdassist[] =
-            "(Suppress this assistance with !cmdassist in your config file.)",
-        *cardinals[] = { "zero",  "one",  "two", "three", "four", "five" },
-        too_many[] = "too many";
+            "(設定ファイルで !cmdassist にするとこの案内は表示されない).",
+        *cardinals[] = { "零", "一", "二", "三", "四", "五" },
+        too_many[] = "何度も";
     int i;
     winid win;
     char buf[BUFSZ];
@@ -6203,12 +6199,10 @@ wishcmdassist(int triesleft)
     if (!u.uconduct.wishes)
         putstr(win, 0, preserve_wishless);
     putstr(win, 0, "");
-    Sprintf(buf, retry_info,
-            (triesleft >= 0 && triesleft < SIZE(cardinals))
-               ? cardinals[triesleft]
-               : too_many,
-            (triesleft < MAXWISHTRY) ? " more" : "",
-            plur(triesleft));
+     Sprintf(buf, retry_info,
+                (triesleft >= 0 && triesleft < SIZE(cardinals))
+                    ? cardinals[triesleft]
+                    : too_many);
     putstr(win, 0, buf);
     putstr(win, 0, retry_too);
     putstr(win, 0, "");
@@ -6294,7 +6288,7 @@ wish_history_menu(char *buf)
         }
     }
 
-    end_menu(win, "Wish what?");
+    end_menu(win, "何を願う?");
     npick = select_menu(win, PICK_ONE, &picks);
     destroy_nhwindow(win);
     if (npick > 0) {
@@ -6326,9 +6320,9 @@ makewish(void)
     if (flags.verbose)
         You("アイテムを願うことができた.");
  retry:
-    Strcpy(promptbuf, "For what do you wish");
+    Strcpy(promptbuf, "何を願う");
     if (iflags.cmdassist && tries > 0)
-        Strcat(promptbuf, " (enter 'help' for assistance)");
+        Strcat(promptbuf, " ('help' と入力すると説明)");
     Strcat(promptbuf, "?");
 
     if (iflags.menu_requested && wish_history[0] && (tries == 0))
@@ -6401,22 +6395,18 @@ makewish(void)
     if (otmp->otyp == CORPSE && !u_safe_from_fatal_corpse(otmp, st_all))
         otmp->wishedfor = 1;
 
-    const char *verb = ((Is_airlevel(&u.uz) || u.uinwater)
-                        ? "slip"
-                        : (otmp->otyp == CORPSE && otmp->wishedfor)
-                          ? "materialize" : "drop"),
-               *oops_msg = (u.uswallow
-                            ? "Oops!  %s out of your reach!"
-                            : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
-                               || levl[u.ux][u.uy].typ < IRONBARS
-                               || levl[u.ux][u.uy].typ >= ICE)
-                               ? "Oops!  %s away from you!"
-                               : !(otmp->otyp == CORPSE && otmp->wishedfor)
-                                 ? "Oops!  %s to the floor!"
-                                 : "Careful! %s on the floor!");
+        const char *oops_msg = (u.uswallow
+                                                        ? "おっと! %sは手の届かない所へ行ってしまった!"
+                                                        : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
+                                                             || levl[u.ux][u.uy].typ < IRONBARS
+                                                             || levl[u.ux][u.uy].typ >= ICE)
+                                                             ? "おっと! %sはあなたから離れていった!"
+                                                             : !(otmp->otyp == CORPSE && otmp->wishedfor)
+                                                                 ? "おっと! %sは床に落ちた!"
+                                                                 : "注意! %sは床にある!");
 
-    /* The(aobjnam()) is safe since otmp is unidentified -dlc */
-    (void) hold_another_object(otmp, oops_msg, The(aobjnam(otmp, verb)),
+        /* Use object name directly to keep Japanese phrasing natural. */
+        (void) hold_another_object(otmp, oops_msg, The(xname(otmp)),
                                (const char *) 0);
     u.ublesscnt += rn1(100, 50); /* the gods take notice */
 }
@@ -6437,7 +6427,7 @@ flash_str(
         /* always return "blast of foo" for simplicity;
            this could be extended with hallucinatory rays, but probably
            not worth it at this time */
-        Sprintf(fltxt, "blast of %s", rnd_hallublast());
+        Sprintf(fltxt, "%sの爆風", rnd_hallublast());
     } else {
         Strcpy(fltxt, flash_types[typ]);
     }
