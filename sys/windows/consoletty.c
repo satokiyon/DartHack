@@ -757,257 +757,6 @@ nh_win32_is_wide_trailing_cell(const cell_t *back, COORD pos)
     return (nh_win32_cell_expected_width(prev) >= 2);
 }
 
-#ifdef NH_WIN32_UTF8_TRACE
-/* DEBUG_UTF8_TRACE: delete this block after UTF-8 diagnosis is complete. */
-static FILE *nh_utf8_trace_fp;
-static boolean nh_utf8_trace_failed;
-static unsigned long nh_utf8_trace_seq;
-static boolean nh_utf8_trace_checked;
-static boolean nh_utf8_trace_enabled = TRUE;
-
-static boolean
-nh_utf8_trace_env_enabled(void)
-{
-    char *trace_toggle;
-
-    if (nh_utf8_trace_checked)
-        return nh_utf8_trace_enabled;
-
-    trace_toggle = nh_getenv("NETHACK_UTF8_TRACE");
-    if (trace_toggle && *trace_toggle) {
-        if (!strcmpi(trace_toggle, "0")
-            || !strcmpi(trace_toggle, "off")
-            || !strcmpi(trace_toggle, "false")
-            || !strcmpi(trace_toggle, "no"))
-            nh_utf8_trace_enabled = FALSE;
-    }
-    nh_utf8_trace_checked = TRUE;
-    return nh_utf8_trace_enabled;
-}
-
-static unsigned long
-nh_utf8_trace_first_cp(const unsigned char *utf8str, int ulen)
-{
-    if (!utf8str || ulen <= 0)
-        return 0UL;
-    if (ulen == 1)
-        return (unsigned long) utf8str[0];
-    if (ulen >= 2 && (utf8str[0] & 0xE0U) == 0xC0U)
-        return (unsigned long) (((utf8str[0] & 0x1FU) << 6)
-                                | (utf8str[1] & 0x3FU));
-    if (ulen >= 3 && (utf8str[0] & 0xF0U) == 0xE0U)
-        return (unsigned long) (((utf8str[0] & 0x0FU) << 12)
-                                | ((utf8str[1] & 0x3FU) << 6)
-                                | (utf8str[2] & 0x3FU));
-    if (ulen >= 4 && (utf8str[0] & 0xF8U) == 0xF0U)
-        return (unsigned long) (((utf8str[0] & 0x07U) << 18)
-                                | ((utf8str[1] & 0x3FU) << 12)
-                                | ((utf8str[2] & 0x3FU) << 6)
-                                | (utf8str[3] & 0x3FU));
-    return 0UL;
-}
-
-static void
-nh_utf8_trace_hex(const unsigned char *buf, int len, char *dst, size_t dstsz)
-{
-    static const char hexdigits[] = "0123456789ABCDEF";
-    int i;
-    size_t pos = 0;
-
-    if (!dst || dstsz == 0)
-        return;
-    dst[0] = '\0';
-    if (!buf || len <= 0)
-        return;
-
-    for (i = 0; i < len; ++i) {
-        unsigned char c = buf[i];
-
-        if (pos + 3 >= dstsz)
-            break;
-        if (i > 0)
-            dst[pos++] = ' ';
-        dst[pos++] = hexdigits[(c >> 4) & 0x0FU];
-        dst[pos++] = hexdigits[c & 0x0FU];
-    }
-    dst[pos] = '\0';
-}
-
-static int
-nh_utf8_trace_expected_width(const cell_t *cell)
-{
-    return nh_win32_cell_expected_width(cell);
-}
-
-static FILE *
-nh_utf8_trace_stream(void)
-{
-    char *path;
-
-    if (nh_utf8_trace_failed)
-        return (FILE *) 0;
-    if (!nh_utf8_trace_env_enabled()) {
-        nh_utf8_trace_failed = TRUE;
-        return (FILE *) 0;
-    }
-    if (nh_utf8_trace_fp)
-        return nh_utf8_trace_fp;
-
-    path = nh_getenv("NETHACK_UTF8_TRACE_FILE");
-    if (!path || !*path)
-        path = "nethack_utf8_trace.tsv";
-
-    nh_utf8_trace_fp = fopen(path, "w");
-    if (!nh_utf8_trace_fp) {
-        nh_utf8_trace_failed = TRUE;
-        return (FILE *) 0;
-    }
-
-    (void) fprintf(nh_utf8_trace_fp,
-                   "seq\tevent\tsource\tx\ty\tapi\tcp\tulen\twidth"
-                   "\tchartype\tns\thw\tfw\thira\tideo\tbytes\tinfo\n");
-    (void) fflush(nh_utf8_trace_fp);
-    return nh_utf8_trace_fp;
-}
-
-void
-nh_win32_utf8_trace_front(const char *source, const unsigned char *utf8,
-                          int ulen, unsigned short chartype, int width,
-                          int curx_before, int curx_after, int cury,
-                          const char *callsite)
-{
-    FILE *fp = nh_utf8_trace_stream();
-    char hexbuf[32];
-    unsigned long cp;
-
-    if (!fp)
-        return;
-
-    nh_utf8_trace_hex(utf8, ulen, hexbuf, sizeof hexbuf);
-    cp = nh_utf8_trace_first_cp(utf8, ulen);
-
-    (void) fprintf(fp,
-                   "%lu\tFRONT\t%s\t%d->%d\t%d\t%s\tU+%04lX\t%d\t%d"
-                   "\t0x%04X\t%d\t%d\t%d\t%d\t%d\t%s\t-\n",
-                   ++nh_utf8_trace_seq,
-                   source ? source : "-",
-                   curx_before, curx_after,
-                   cury,
-                   callsite ? callsite : "-",
-                   cp,
-                   ulen,
-                   width,
-                   (unsigned) chartype,
-                   (chartype & 0x0001U) ? 1 : 0,
-                   (chartype & 0x0040U) ? 1 : 0,
-                   (chartype & 0x0080U) ? 1 : 0,
-                   (chartype & 0x0020U) ? 1 : 0,
-                   (chartype & 0x0100U) ? 1 : 0,
-                   hexbuf);
-    (void) fflush(fp);
-}
-
-static void
-nh_win32_utf8_trace_back(const char *source, const uint8 *utf8, WCHAR wch,
-                         int x, int y, WORD attr)
-{
-    FILE *fp = nh_utf8_trace_stream();
-    char hexbuf[32];
-    int ulen = 0;
-
-    if (!fp)
-        return;
-
-    if (utf8)
-        ulen = (int) strlen((const char *) utf8);
-    nh_utf8_trace_hex((const unsigned char *) utf8, ulen, hexbuf,
-                      sizeof hexbuf);
-
-    (void) fprintf(fp,
-                   "%lu\tBACK\t%s\t%d\t%d\tbuffer_write\tU+%04X\t%d\t-"
-                   "\t-\t-\t-\t-\t-\t-\t%s\tattr=0x%04X\n",
-                   ++nh_utf8_trace_seq,
-                   source ? source : "-",
-                   x, y,
-                   (unsigned) wch,
-                   ulen,
-                   hexbuf,
-                   (unsigned) attr);
-    (void) fflush(fp);
-}
-
-static void
-nh_win32_utf8_trace_flip(COORD pos, unsigned do_anything,
-                         unsigned did_anything, const cell_t *back,
-                         const cell_t *front, const char *api)
-{
-    FILE *fp = nh_utf8_trace_stream();
-    char back_hex[32], front_hex[32];
-
-    if (!fp)
-        return;
-
-    nh_utf8_trace_hex((const unsigned char *) back->utf8str,
-                      (int) strlen((const char *) back->utf8str),
-                      back_hex, sizeof back_hex);
-    nh_utf8_trace_hex((const unsigned char *) front->utf8str,
-                      (int) strlen((const char *) front->utf8str),
-                      front_hex, sizeof front_hex);
-
-    (void) fprintf(fp,
-                   "%lu\tFLIP\tback_buffer_flip\t%d\t%d\t%s\tU+%04X\t-\t-"
-                   "\t-\t-\t-\t-\t-\t-\t%s\t"
-                   "do=0x%02X,did=0x%02X,backW=U+%04X,frontW=U+%04X,"
-                   "backUtf8=%s,frontUtf8=%s\n",
-                   ++nh_utf8_trace_seq,
-                   pos.X, pos.Y,
-                   api ? api : "-",
-                   (unsigned) back->wcharacter,
-                   back_hex,
-                   do_anything,
-                   did_anything,
-                   (unsigned) back->wcharacter,
-                   (unsigned) front->wcharacter,
-                   back_hex,
-                   front_hex);
-    (void) fflush(fp);
-}
-
-static void
-nh_win32_utf8_trace_write_result(COORD start, COORD end,
-                                 const cell_t *back,
-                                 const char *api, DWORD out_count)
-{
-    FILE *fp = nh_utf8_trace_stream();
-    char back_hex[32];
-    int expected, actual;
-
-    if (!fp || !back)
-        return;
-
-    nh_utf8_trace_hex((const unsigned char *) back->utf8str,
-                      (int) strlen((const char *) back->utf8str),
-                      back_hex, sizeof back_hex);
-    expected = nh_utf8_trace_expected_width(back);
-    actual = (int) (end.Y - start.Y) * console.width
-             + (int) (end.X - start.X);
-
-    (void) fprintf(fp,
-                   "%lu\tWRITEPOS\tback_buffer_flip\t%d\t%d\t%s\t"
-                   "U+%04X\t-\t-\t-\t-\t-\t-\t-\t-\t%s\t"
-                   "sx=%d,sy=%d,ex=%d,ey=%d,expected=%d,actual=%d,out=%lu\n",
-                   ++nh_utf8_trace_seq,
-                   start.X, start.Y,
-                   api ? api : "-",
-                   (unsigned) back->wcharacter,
-                   back_hex,
-                   start.X, start.Y, end.X, end.Y,
-                   expected, actual,
-                   (unsigned long) out_count);
-    (void) fflush(fp);
-}
-#endif
-
 static void
 back_buffer_flip(void)
 {
@@ -1024,9 +773,6 @@ back_buffer_flip(void)
     for (pos.Y = 0; pos.Y < console.height; pos.Y++) {
         for (pos.X = 0; pos.X < console.width; pos.X++) {
             boolean pos_set = FALSE;
-#ifdef NH_WIN32_UTF8_TRACE
-            const char *content_api = (const char *) 0;
-#endif
             do_anything = did_anything = 0U;
             if (back->color24 != front->color24)
                 do_anything |= do_color24;
@@ -1108,39 +854,15 @@ back_buffer_flip(void)
                     || (do_anything & (do_wide_content | do_utf8_content))) {
 #ifdef UTF8_FROM_CORE
                     if (SYMHANDLING(H_UTF8) || !console.has_unicode) {
-                        CONSOLE_SCREEN_BUFFER_INFO csbi_after;
-                        COORD pos_after = pos;
-
                         WriteConsoleA(console.hConOut, (LPCSTR) back->utf8str,
                                       (int) strlen((char *) back->utf8str),
                                       &unused, NULL);
                         did_anything |= did_utf8_content;
-#ifdef NH_WIN32_UTF8_TRACE
-                        content_api = "WriteConsoleA";
-                        if (GetConsoleScreenBufferInfo(console.hConOut,
-                                                       &csbi_after))
-                            pos_after = csbi_after.dwCursorPosition;
-                        nh_win32_utf8_trace_write_result(pos, pos_after,
-                                                         back, content_api,
-                                                         unused);
-#endif
                     } else {
 #endif
-                    CONSOLE_SCREEN_BUFFER_INFO csbi_after;
-                    COORD pos_after = pos;
-
                     WriteConsoleW(console.hConOut, &back->wcharacter, 1,
                                   &unused, NULL);
                     did_anything |= did_wide_content;
-#ifdef NH_WIN32_UTF8_TRACE
-                    content_api = "WriteConsoleW";
-                    if (GetConsoleScreenBufferInfo(console.hConOut,
-                                                   &csbi_after))
-                        pos_after = csbi_after.dwCursorPosition;
-                    nh_win32_utf8_trace_write_result(pos, pos_after,
-                                                     back, content_api,
-                                                     unused);
-#endif
 #ifdef UTF8_FROM_CORE
                     }
 #endif
@@ -1152,11 +874,6 @@ back_buffer_flip(void)
                     pos_set = TRUE;
                 }
                 emit_return_to_default();
-#ifdef NH_WIN32_UTF8_TRACE
-                if (do_anything & (do_utf8_content | do_wide_content))
-                    nh_win32_utf8_trace_flip(pos, do_anything, did_anything,
-                                             back, front, content_api);
-#endif
                 *front = *back;
             }
             back++;
@@ -1400,12 +1117,6 @@ extern void set_emergency_io(void);
 void
 consoletty_exit(void)
 {
-#ifdef NH_WIN32_UTF8_TRACE
-    if (nh_utf8_trace_fp) {
-        (void) fclose(nh_utf8_trace_fp);
-        nh_utf8_trace_fp = (FILE *) 0;
-    }
-#endif
     free_custom_colors();
     free((genericptr_t) console.front_buffer);
     free((genericptr_t) console.back_buffer);
@@ -1789,10 +1500,6 @@ g_pututf8(uint8 *sequence)
     cell.wcharacter = (wcount > 0 && wch[0] != 0)
                         ? wch[0]
                         : (WCHAR) CONSOLE_CLEAR_CHARACTER;
-#ifdef NH_WIN32_UTF8_TRACE
-    nh_win32_utf8_trace_back("console.g_pututf8", sequence, cell.wcharacter,
-                             console.cursor.X, console.cursor.Y, cell.attr);
-#endif
 
     buffer_write(console.back_buffer, &cell, console.cursor);
 #endif /* UTF8_FROM_CORE */
