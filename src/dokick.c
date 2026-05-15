@@ -27,7 +27,7 @@ staticfn int kick_nondoor(coordxy, coordxy, int);
 staticfn void otransit_msg(struct obj *, boolean, boolean, long);
 staticfn void drop_to(coord *, schar, coordxy, coordxy) NONNULLARG1;
 
-static const char kick_passes_thru[] = "kick passes harmlessly through";
+static const char kick_passes_thru[] = "蹴りは何ともなく通り抜けた";
 
 /* kicking damage when not poly'd into a form with a kick attack */
 staticfn void
@@ -436,9 +436,9 @@ container_impact_dmg(
         otmp2 = otmp->nobj;
         if (objects[otmp->otyp].oc_material == GLASS
             && otmp->oclass != GEM_CLASS && !obj_resists(otmp, 33, 100)) {
-            result = "shatter";
+            result = "砕ける";
         } else if (otmp->otyp == EGG && !rn2(3)) {
-            result = "cracking";
+            result = "ひび割れる";
         }
         if (result) {
             if (otmp->otyp == MIRROR)
@@ -453,7 +453,7 @@ container_impact_dmg(
             } else {
                 Soundeffect(se_glass_shattering, 25);
             }
-            You_hear("a muffled %s.", result);
+            You_hear("くぐもった%s音が聞こえた.", result);
             if (costly) {
                 if (frominv && !otmp->unpaid)
                     otmp->no_charge = 1;
@@ -522,10 +522,10 @@ really_kick_object(coordxy x, coordxy y)
         if ((is_pit(trap->ttyp) && !Passes_walls) || trap->ttyp == WEB) {
             if (!trap->tseen)
                 find_trap(trap);
-            You_cant("kick %s that's in a %s!", something,
-                     Hallucination ? "tizzy"
-                         : (trap->ttyp == WEB) ? "web"
-                             : "pit");
+            You_cant("%sは%sの中にあって蹴れない!", something,
+                     Hallucination ? "目まい"
+                         : (trap->ttyp == WEB) ? "クモの巣"
+                             : "落とし穴");
             return 1;
         }
         if (trap->ttyp == STATUE_TRAP) {
@@ -542,7 +542,7 @@ really_kick_object(coordxy x, coordxy y)
     if (!uarmf && gk.kickedobj->otyp == CORPSE
         && touch_petrifies(&mons[gk.kickedobj->corpsenm])
         && !Stone_resistance) {
-        You("kick %s with your bare %s.",
+        You("%sを素足の%sで蹴った.",
             corpse_xname(gk.kickedobj, (const char *) 0, CXN_PFX_THE),
             makeplural(body_part(FOOT)));
         if (poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM)) {
@@ -609,7 +609,7 @@ really_kick_object(coordxy x, coordxy y)
                                              && gk.kickedobj->unpaid)));
     /* 5.0: give feedback about the item being kicked; some follow-on
        messages refer to "it" */
-    Norep("You kick %s.",
+    Norep("%sを蹴った.",
           !isgold ? singular(gk.kickedobj, doname) : doname(gk.kickedobj));
 
     if (IS_OBSTRUCTED(levl[x][y].typ) || closed_door(x, y)) {
@@ -618,16 +618,14 @@ really_kick_object(coordxy x, coordxy y)
             if (Blind)
                 pline("それは外れなかった.");
             else
-                pline("%s %sn't come loose.",
-                      The(distant_name(gk.kickedobj, xname)),
-                      otense(gk.kickedobj, "do"));
+                    pline("%sは外れなかった.",
+                        The(distant_name(gk.kickedobj, xname)));
             return (!rn2(3) || martial());
         }
         if (Blind)
             pline("それは外れた.");
         else
-            pline("%s %s loose.", The(distant_name(gk.kickedobj, xname)),
-                  otense(gk.kickedobj, "come"));
+            pline("%sは外れた.", The(distant_name(gk.kickedobj, xname)));
         obj_extract_self(gk.kickedobj);
         newsym(x, y);
         if (costly && (!costly_spot(u.ux, u.uy)
@@ -695,12 +693,12 @@ really_kick_object(coordxy x, coordxy y)
         } else {
             if (rn2(20)) {
                 static NEARDATA const char *const flyingcoinmsg[] = {
-                    "scatter the coins", "knock coins all over the place",
-                    "send coins flying in all directions",
+                    "金貨をまき散らした", "金貨をあたり一面に蹴り飛ばした",
+                    "金貨を四方八方に飛ばした",
                 };
 
                 if (!Deaf)
-                    pline1("Thwwpingg!");
+                    pline1("ヒュンッ!");
                 You("%s!", ROLL_FROM(flyingcoinmsg));
                 (void) scatter(x, y, rnd(3), VIS_EFFECTS | MAY_HIT,
                                gk.kickedobj);
@@ -1722,19 +1720,19 @@ ship_object(struct obj *otmp, coordxy x, coordxy y, boolean shop_floor_obj)
             || otmp->otyp == EXPENSIVE_CAMERA) {
             if (otmp->otyp == MIRROR)
                 change_luck(-2);
-            result = "crash";
+            result = "砕ける";
         } else {
             /* penalty for breaking eggs laid by you */
             if (otmp->otyp == EGG && otmp->spe && ismnum(otmp->corpsenm))
                 change_luck((schar) -min(otmp->quan, 5L));
-            result = "splat";
+            result = "潰れる";
         }
         if (otmp->otyp == EGG) {
             Soundeffect(se_egg_splatting, 25);
         } else {
             Soundeffect(se_glass_crashing, 25);
         }
-        You_hear("a muffled %s.", result);
+        You_hear("くぐもった%s音が聞こえた.", result);
         obj_extract_self(otmp);
         obfree(otmp, (struct obj *) 0);
         return TRUE;
@@ -1923,19 +1921,20 @@ otransit_msg(struct obj *otmp, boolean nodrop, boolean chainthere, long num)
         /* As of 3.6.2: use a separate buffer for the suffix to avoid risk of
            overrunning obuf[] (let pline() handle truncation if necessary) */
         if (num) { /* means: other objects are impacted */
-            Sprintf(xbuf, " %s %s object%s", otense(otmp, "hit"),
-                    (num == 1L) ? "another" : "other", (num > 1L) ? "s" : "");
+            if (num == 1L)
+                Sprintf(xbuf, " 別の物体に当たった");
+            else
+                Sprintf(xbuf, " %ld個の別の物体に当たった", num);
         } else { /* chain-only msg */
-            Sprintf(xbuf, " %s your chain", otense(otmp, "rattle"));
+            Sprintf(xbuf, " 鎖が鳴った");
         }
         if (nodrop)
             Sprintf(eos(xbuf), ".");
         else
-            Sprintf(eos(xbuf), " and %s %s.",
-                    otense(otmp, "fall"), gg.gate_str);
+            Sprintf(eos(xbuf), " そして%sへ落ちた.", gg.gate_str);
         pline("%s%s", obuf, xbuf);
     } else if (!nodrop)
-        pline("%s %s %s.", obuf, otense(otmp, "fall"), gg.gate_str);
+        pline("%sは%sへ落ちた.", obuf, gg.gate_str);
 }
 
 /* migration destination for objects which fall down to next level */
