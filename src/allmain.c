@@ -56,14 +56,14 @@ moveloop_preamble(boolean resuming)
     /* side-effects from the real world */
     flags.moonphase = phase_of_the_moon();
     if (flags.moonphase == FULL_MOON) {
-        You("今夜は満月なので運が良かった!");
+        You("ラッキー！今夜は満月だ!");
         change_luck(1);
     } else if (flags.moonphase == NEW_MOON) {
-        pline("気をつけろ!  今夜は新月だった.");
+        pline("気をつけろ!  今夜は新月だ.");
     }
     flags.friday13 = friday_13th();
     if (flags.friday13) {
-        pline("警戒しろ!  13日の金曜日には悪いことが起こり得た.");
+        pline("警戒しろ!  13日の金曜日には悪いことが起きやすい.");
         change_luck(-1);
     }
 
@@ -614,7 +614,7 @@ regen_pw(int wtcap)
             u.uen = u.uenmax;
         disp.botl = TRUE;
         if (u.uen == u.uenmax)
-            interrupt_multi("You feel full of energy.");
+            interrupt_multi("エネルギーが満ちあふれているのを感じた.");
     }
 }
 
@@ -911,7 +911,7 @@ welcome(boolean new_game) /* false => restoring an old game */
             (currentgend && gu.urole.name.f) ? gu.urole.name.f
                                              : gu.urole.name.m);
 
-    pline(new_game ? "%s %s、NetHackへようこそ! あなたは%sだった."
+    pline(new_game ? "%s %s、NetHackへようこそ! あなたは%sだ."
                    : "%s %s、%s、NetHackへ戻ってきた.",
           Hello((struct monst *) 0), svp.plname, buf);
 

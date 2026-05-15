@@ -172,16 +172,16 @@ do_write_config_file(void)
     char tmp[BUFSZ];
 
     if (!configfile[0]) {
-        pline("Strange, could not figure out config file name.");
+        pline("奇妙だが、設定ファイル名を特定できなかった.");
         return ECMD_OK;
     }
     if (flags.suppress_alert < FEATURE_NOTICE_VER(3,7,0)) {
-        pline("Warning: saveoptions is highly experimental!");
+        pline("警告: saveoptions はかなり実験的だ!");
         wait_synch();
-        pline("Some settings are not saved!");
+        pline("保存されない設定もある!");
         wait_synch();
-        pline("All manual customization and comments are removed"
-              " from the file!");
+        pline("手動でのカスタマイズとコメントはすべて"
+              "ファイルから削除される!");
         wait_synch();
     }
 #define overwrite_prompt "Overwrite config file %.*s?"
@@ -203,7 +203,7 @@ do_write_config_file(void)
         fclose(fp);
         strbuf_empty(&buf);
         if (wrote != len)
-            pline("An error occurred, wrote only partial data (%zu/%zu).",
+            pline("エラーが発生し、部分的なデータしか書き込めなかった (%zu/%zu).",
                   wrote, len);
     }
     return ECMD_OK;
