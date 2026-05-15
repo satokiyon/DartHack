@@ -3884,11 +3884,21 @@ selftouch(const char *arg)
 {
     char kbuf[BUFSZ];
     const char *corpse_pmname;
+    const char *jp_arg = arg;
+
+    if (!strcmp(arg, "You"))
+        jp_arg = "あなたは";
+    else if (!strcmp(arg, "Falling, you"))
+        jp_arg = "落下しながら、あなたは";
+    else if (!strcmp(arg, "As you fall, you"))
+        jp_arg = "落ちながら、あなたは";
+    else if (!strcmp(arg, "After losing your gloves, you"))
+        jp_arg = "手袋を失ったあと、あなたは";
 
     if (uwep && uwep->otyp == CORPSE && touch_petrifies(&mons[uwep->corpsenm])
         && !Stone_resistance) {
         corpse_pmname = obj_pmname(uwep);
-        pline("%s touch the %s corpse.", arg, corpse_pmname);
+        pline("%s%sの死体に触れた.", jp_arg, corpse_pmname);
         Sprintf(kbuf, "%s corpse", an(corpse_pmname));
         instapetrify(kbuf);
         /* life-saved; unwield the corpse if we can't handle it */
@@ -3900,7 +3910,7 @@ selftouch(const char *arg)
     if (u.twoweap && uswapwep && uswapwep->otyp == CORPSE
         && touch_petrifies(&mons[uswapwep->corpsenm]) && !Stone_resistance) {
         corpse_pmname = obj_pmname(uswapwep);
-        pline("%s touch the %s corpse.", arg, corpse_pmname);
+        pline("%s%sの死体に触れた.", jp_arg, corpse_pmname);
         Sprintf(kbuf, "%s corpse", an(corpse_pmname));
         instapetrify(kbuf);
         /* life-saved; unwield the corpse */

@@ -833,7 +833,7 @@ movobj(struct obj *obj, coordxy ox, coordxy oy)
 staticfn void
 dosinkfall(void)
 {
-    static const char fell_on_sink[] = "fell onto a sink";
+    static const char fell_on_sink[] = "流し台に落ちた";
     struct obj *obj;
     int dmg;
     boolean lev_boots = (uarmf && uarmf->otyp == LEVITATION_BOOTS),
@@ -847,8 +847,8 @@ dosinkfall(void)
                      && !(HFlying || EFlying)); /* BFlying */
 
     if (!ufall) {
-        You((innate_lev || blockd_lev) ? "wobble unsteadily for a moment."
-                                       : "gain control of your flight.");
+        You((innate_lev || blockd_lev) ? "ふらついたが、しばらくして落ち着いた."
+                           : "飛行を制御できるようになった.");
     } else {
         long save_ELev = ELevitation, save_HLev = HLevitation;
 
@@ -861,10 +861,10 @@ dosinkfall(void)
         dmg = rn1(8, 25 - (int) ACURR(A_CON));
         losehp(Maybe_Half_Phys(dmg), fell_on_sink, NO_KILLER_PREFIX);
         exercise(A_DEX, FALSE);
-        selftouch("Falling, you");
+        selftouch("落下しながら、あなたは");
         for (obj = svl.level.objects[u.ux][u.uy]; obj; obj = obj->nexthere)
             if (obj->oclass == WEAPON_CLASS || is_weptool(obj)) {
-                You("%sの上に倒れた.", doname(obj));
+                You("%sの上に倒れ込んだ.", doname(obj));
                 losehp(Maybe_Half_Phys(rnd(3)), fell_on_sink,
                        NO_KILLER_PREFIX);
                 exercise(A_CON, FALSE);
@@ -2227,7 +2227,7 @@ domove_swap_with_pet(
 staticfn boolean
 domove_fight_empty(coordxy x, coordxy y)
 {
-    static const char unknown_obstacle[] = "an unknown obstacle";
+    static const char unknown_obstacle[] = "正体不明の障害物";
     boolean off_edge = !isok(x, y);
     int glyph = !off_edge ? glyph_at(x, y) : GLYPH_UNEXPLORED;
 
@@ -2541,9 +2541,8 @@ avoid_trap_andor_region(coordxy x, coordxy y)
         /* we don't override confirmation for poison resistance since the
            region also hinders hero's vision even if/when no damage is done */
     ) {
-        Snprintf(qbuf, sizeof qbuf, "%s into that %s cloud?",
-                 u_locomotion("step"),
-                 (reg_damg(newreg) > 0) ? "poison gas" : "vapor");
+        Snprintf(qbuf, sizeof qbuf, "本当にその%sの雲へ入るか?",
+             (reg_damg(newreg) > 0) ? "毒ガス" : "蒸気");
         if (!paranoid_query(ParanoidConfirm, upstart(qbuf))) {
             nomul(0);
             svc.context.move = 0;
@@ -2567,9 +2566,9 @@ avoid_trap_andor_region(coordxy x, coordxy y)
         int traptype = (Hallucination ? rnd(TRAPNUM - 1) : (int) trap->ttyp);
         boolean into = into_vs_onto(traptype);
 
-        Snprintf(qbuf, sizeof qbuf, "Really %s %s that %s?",
-                 u_locomotion("step"), into ? "into" : "onto",
-                 defsyms[trap_to_defsym(traptype)].explanation);
+        Snprintf(qbuf, sizeof qbuf, "本当にその%sの%sへ進むか?",
+             defsyms[trap_to_defsym(traptype)].explanation,
+             into ? "中" : "上");
         /* handled like paranoid_confirm:pray; when paranoid_confirm:trap
            isn't set, don't ask at all but if it is set (checked above),
            ask via y/n if parnoid_confirm:confirm isn't also set or via
