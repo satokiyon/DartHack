@@ -87,7 +87,7 @@ des.object()
 des.object()
 des.object()
 -- Treasure?
-des.engraving({ type="engrave", text="X marks the spot." })
+des.engraving({ type="engrave", text="Xがここを示している." })
 des.engraving({ type="engrave", text="X marks the spot." })
 des.engraving({ type="engrave", text="X marks the spot." })
 des.engraving({ type="engrave", text="X marks the spot." })
