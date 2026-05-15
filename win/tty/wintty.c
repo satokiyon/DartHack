@@ -223,9 +223,47 @@ static void process_text_window(winid, struct WinDesc *);
 static tty_menu_item *reverse(tty_menu_item *);
 static const char *compress_str(const char *);
 #ifdef WIN32CON
+#define NH_C3_NONSPACING 0x0001U
+#define NH_C3_KATAKANA   0x0010U
+#define NH_C3_HIRAGANA   0x0020U
+#define NH_C3_HALFWIDTH  0x0040U
+#define NH_C3_FULLWIDTH  0x0080U
+#define NH_C3_IDEOGRAPH  0x0100U
+
 static int utf8_sequence_len(const unsigned char *);
+static unsigned short utf8_char_chartype(const unsigned char *);
 static int utf8_char_display_width(const unsigned char *);
-extern int __stdcall MultiByteToWideChar(unsigned int, unsigned long,
+static long utf8_text_wrap_index(const char *, int);
+#ifdef NH_WIN32_UTF8_TRACE
+static void nh_utf8_wrap_trace_log(const char *, const char *, long, int,
+                                   long, long);
+static void nh_utf8_render_trace_log(const char *, winid,
+                                     struct WinDesc *, long, int, int,
+                                     int, int, const char *);
+static boolean nh_utf8_trace_checked;
+static boolean nh_utf8_trace_enabled = TRUE;
+
+static boolean
+nh_utf8_trace_env_enabled(void)
+{
+    char *trace_toggle;
+
+    if (nh_utf8_trace_checked)
+        return nh_utf8_trace_enabled;
+
+    trace_toggle = nh_getenv("NETHACK_UTF8_TRACE");
+    if (trace_toggle && *trace_toggle) {
+        if (!strcmpi(trace_toggle, "0")
+            || !strcmpi(trace_toggle, "off")
+            || !strcmpi(trace_toggle, "false")
+            || !strcmpi(trace_toggle, "no"))
+            nh_utf8_trace_enabled = FALSE;
+    }
+    nh_utf8_trace_checked = TRUE;
+    return nh_utf8_trace_enabled;
+}
+#endif
+extern int __stdcall MultiByteToWideChar(unsigned int, unsigned long, 
                                          const char *, int, wchar_t *, int);
 extern int __stdcall GetStringTypeW(unsigned long, const wchar_t *, int,
                                     unsigned short *);
@@ -1783,13 +1821,32 @@ process_text_window(winid window, struct WinDesc *cw)
     int i, n, attr;
     boolean linestart;
     char *cp;
+#ifdef NH_WIN32_UTF8_TRACE
+    int clear_to_eol, line_screen_y, line_curx_before;
+    char *line_text;
+#endif
 
     for (n = 0, i = 0; i < cw->maxrow; i++) {
         HUPSKIP();
         if (!cw->offx && (n + cw->offy == ttyDisplay->rows - 1)) {
+#ifdef NH_WIN32_UTF8_TRACE
+            nh_utf8_render_trace_log("TEXT_PAGEBREAK_BEFORE_MORE",
+                                     window, cw, (long) i,
+                                     (int) (n + cw->offy), -1,
+                                     ttyDisplay->curx, ttyDisplay->curx,
+                                     (cw->data[i] ? &cw->data[i][1]
+                                                  : (char *) 0));
+#endif
             tty_curs(window, 1, n);
             cl_end();
             dmore(cw, quitchars);
+#ifdef NH_WIN32_UTF8_TRACE
+            nh_utf8_render_trace_log("TEXT_PAGEBREAK_AFTER_MORE",
+                                     window, cw, (long) i,
+                                     (int) (n + cw->offy), 1,
+                                     ttyDisplay->curx, ttyDisplay->curx,
+                                     (char *) 0);
+#endif
             if (morc == '\033') {
                 cw->flags |= WIN_CANCELLED;
                 break;
@@ -1797,16 +1854,50 @@ process_text_window(winid window, struct WinDesc *cw)
             if (cw->offy) {
                 tty_curs(window, 1, 0);
                 cl_eos();
+#ifdef NH_WIN32_UTF8_TRACE
+                nh_utf8_render_trace_log("TEXT_PAGE_CLEAR_CLEOS",
+                                         window, cw, (long) i,
+                                         ttyDisplay->cury, 1,
+                                         ttyDisplay->curx, ttyDisplay->curx,
+                                         (char *) 0);
+#endif
             } else
                 term_clear_screen();
+#ifdef NH_WIN32_UTF8_TRACE
+            if (!cw->offy)
+                nh_utf8_render_trace_log("TEXT_PAGE_CLEAR_SCREEN",
+                                         window, cw, (long) i,
+                                         ttyDisplay->cury, 1,
+                                         ttyDisplay->curx, ttyDisplay->curx,
+                                         (char *) 0);
+#endif
             n = 0;
         }
         tty_curs(window, 1, n++);
+#ifdef NH_WIN32_UTF8_TRACE
+        clear_to_eol = 0;
+#endif
 #ifdef H2344_BROKEN
         cl_end();
+#ifdef NH_WIN32_UTF8_TRACE
+        clear_to_eol = 1;
+#endif
 #else
         if (cw->offx)
             cl_end();
+#ifdef NH_WIN32_UTF8_TRACE
+        if (cw->offx)
+            clear_to_eol = 1;
+#endif
+#endif
+#ifdef NH_WIN32_UTF8_TRACE
+        line_screen_y = ttyDisplay->cury;
+        line_curx_before = ttyDisplay->curx;
+        line_text = (cw->data[i] ? &cw->data[i][1] : (char *) 0);
+        nh_utf8_render_trace_log("TEXT_LINE_BEGIN", window, cw, (long) i,
+                                 line_screen_y, clear_to_eol,
+                                 line_curx_before, line_curx_before,
+                                 line_text);
 #endif
         if (cw->data[i]) {
             attr = cw->data[i][0] - 1;
@@ -1848,8 +1939,11 @@ process_text_window(winid window, struct WinDesc *cw)
                         int ulen = utf8_sequence_len((const unsigned char *) cp);
 
                         if (ulen > 1) {
-                            int width = utf8_char_display_width(
-                                (const unsigned char *) cp);
+                            const unsigned char *utf8cp =
+                                (const unsigned char *) cp;
+                            int width = utf8_char_display_width(utf8cp);
+                            unsigned short chartype = utf8_char_chartype(utf8cp);
+                            int curx_before = ttyDisplay->curx;
                             uint8 utf8seq[8];
                             int k;
 
@@ -1862,6 +1956,13 @@ process_text_window(winid window, struct WinDesc *cw)
                                 g_pututf8(utf8seq);
                             cp += ulen;
                             ttyDisplay->curx += width;
+#ifdef NH_WIN32_UTF8_TRACE
+                            nh_win32_utf8_trace_front(
+                                "wintty.process_text_window", utf8cp, ulen,
+                                chartype, width, curx_before,
+                                ttyDisplay->curx, ttyDisplay->cury,
+                                "g_pututf8");
+#endif
                         } else if (SYMHANDLING(H_UTF8)) {
                             g_putch(*cp++);
                             ttyDisplay->curx++;
@@ -1885,8 +1986,11 @@ process_text_window(winid window, struct WinDesc *cw)
                     int ulen = utf8_sequence_len((const unsigned char *) cp);
 
                     if (ulen > 1) {
-                        int width = utf8_char_display_width(
-                            (const unsigned char *) cp);
+                        const unsigned char *utf8cp =
+                            (const unsigned char *) cp;
+                        int width = utf8_char_display_width(utf8cp);
+                        unsigned short chartype = utf8_char_chartype(utf8cp);
+                        int curx_before = ttyDisplay->curx;
                         uint8 utf8seq[8];
                         int k;
 
@@ -1899,6 +2003,12 @@ process_text_window(winid window, struct WinDesc *cw)
                             g_pututf8(utf8seq);
                         cp += ulen;
                         ttyDisplay->curx += width;
+#ifdef NH_WIN32_UTF8_TRACE
+                        nh_win32_utf8_trace_front(
+                            "wintty.process_text_window", utf8cp, ulen,
+                            chartype, width, curx_before, ttyDisplay->curx,
+                            ttyDisplay->cury, "g_pututf8");
+#endif
                     } else {
                         g_putch(*cp++);
                         end_glyphout();
@@ -1909,6 +2019,12 @@ process_text_window(winid window, struct WinDesc *cw)
 #endif /* WIN32CON */
             term_end_attr(attr);
         }
+#ifdef NH_WIN32_UTF8_TRACE
+        nh_utf8_render_trace_log("TEXT_LINE_END", window, cw, (long) i,
+                                 line_screen_y, clear_to_eol,
+                                 line_curx_before, ttyDisplay->curx,
+                                 line_text);
+#endif
     }
     if (i == cw->maxrow) {
 #ifdef H2344_BROKEN
@@ -1973,6 +2089,12 @@ tty_display_nhwindow(
         break;
     case NHW_TEXT:
         cw->maxcol = ttyDisplay->cols; /* force full-screen mode */
+#ifdef NH_WIN32_UTF8_TRACE
+        nh_utf8_render_trace_log("TEXT_DISPLAY_ENTER", window, cw,
+                                 -1L, ttyDisplay->cury, -1,
+                                 ttyDisplay->curx, ttyDisplay->curx,
+                                 (char *) 0);
+#endif
         FALLTHROUGH;
         /*FALLTHRU*/
     case NHW_MENU:
@@ -2008,12 +2130,33 @@ tty_display_nhwindow(
             if (cw->offy || iflags.menu_overlay) {
                 tty_curs(window, 1, 0);
                 cl_eos();
+#ifdef NH_WIN32_UTF8_TRACE
+                if (cw->type == NHW_TEXT)
+                    nh_utf8_render_trace_log("TEXT_DISPLAY_CLEOS", window,
+                                             cw, -1L, ttyDisplay->cury, 1,
+                                             ttyDisplay->curx,
+                                             ttyDisplay->curx, (char *) 0);
+#endif
             } else
                 term_clear_screen();
+#ifdef NH_WIN32_UTF8_TRACE
+            if (cw->type == NHW_TEXT && !(cw->offy || iflags.menu_overlay))
+                nh_utf8_render_trace_log("TEXT_DISPLAY_CLEAR_SCREEN",
+                                         window, cw, -1L, ttyDisplay->cury,
+                                         1, ttyDisplay->curx,
+                                         ttyDisplay->curx, (char *) 0);
+#endif
             ttyDisplay->toplin = TOPLINE_EMPTY;
         } else {
             if (WIN_MESSAGE != WIN_ERR)
                 tty_clear_nhwindow(WIN_MESSAGE);
+#ifdef NH_WIN32_UTF8_TRACE
+            if (cw->type == NHW_TEXT)
+                nh_utf8_render_trace_log("TEXT_DISPLAY_OVERLAY_KEEP",
+                                         window, cw, -1L, ttyDisplay->cury,
+                                         0, ttyDisplay->curx,
+                                         ttyDisplay->curx, (char *) 0);
+#endif
         }
 
         if (cw->data || !cw->maxrow)
@@ -2298,6 +2441,152 @@ compress_str(const char *str)
     return str;
 }
 
+#ifdef WIN32CON
+static long
+utf8_text_wrap_index(const char *str, int max_display_width)
+{
+    int display_width = 0;
+    long byte_index = 0L, last_break = -1L;
+
+    if (!str || max_display_width < 1)
+        return 0L;
+
+    while (str[byte_index] != '\0') {
+        const unsigned char *utf8cp = (const unsigned char *) &str[byte_index];
+        unsigned char uch = utf8cp[0];
+        int ulen = 1, ch_width = 1;
+
+        if (uch == ' ')
+            last_break = byte_index;
+        if (uch >= 0x80U) {
+            ulen = utf8_sequence_len(utf8cp);
+            if (ulen > 1)
+                ch_width = utf8_char_display_width(utf8cp);
+        }
+        if (display_width + ch_width > max_display_width) {
+            if (last_break >= 0L)
+                return last_break + 1L;
+            return (byte_index > 0L) ? byte_index : (long) ulen;
+        }
+        display_width += ch_width;
+        byte_index += (long) ulen;
+    }
+    return 0L;
+}
+
+#ifdef NH_WIN32_UTF8_TRACE
+static void
+nh_utf8_wrap_trace_log(const char *stage, const char *text, long wrap_index,
+                       int wrap_cols, long row, long source_len)
+{
+    static FILE *trace_fp;
+    static unsigned long trace_seq;
+    char *path;
+    long i;
+
+    if (!nh_utf8_trace_env_enabled())
+        return;
+
+    if (!trace_fp) {
+        path = nh_getenv("NETHACK_UTF8_WRAP_TRACE_FILE");
+        if (!path || !*path)
+            path = "nethack_utf8_wrap_trace.tsv";
+        trace_fp = fopen(path, "w");
+        if (!trace_fp)
+            return;
+        (void) fprintf(trace_fp,
+                       "seq\tstage\trow\twrap_cols\twrap_index\tsource_len"
+                       "\ttext\n");
+    }
+
+    (void) fprintf(trace_fp, "%lu\t%s\t%ld\t%d\t%ld\t%ld\t",
+                   ++trace_seq,
+                   stage ? stage : "-",
+                   row,
+                   wrap_cols,
+                   wrap_index,
+                   source_len);
+    if (text) {
+        for (i = 0; text[i] != '\0' && i < 240; ++i) {
+            unsigned char ch = (unsigned char) text[i];
+
+            if (ch == '\t')
+                (void) fputs("\\t", trace_fp);
+            else if (ch == '\n')
+                (void) fputs("\\n", trace_fp);
+            else if (ch == '\r')
+                (void) fputs("\\r", trace_fp);
+            else
+                (void) fputc((int) ch, trace_fp);
+        }
+    }
+    (void) fputc('\n', trace_fp);
+    (void) fflush(trace_fp);
+}
+
+static void
+nh_utf8_render_trace_log(const char *stage, winid window, struct WinDesc *cw,
+                         long row_idx, int screen_y, int clear_eol,
+                         int curx_before, int curx_after, const char *text)
+{
+    static FILE *trace_fp;
+    static unsigned long trace_seq;
+    char *path;
+    long i;
+
+    if (!nh_utf8_trace_env_enabled())
+        return;
+
+    if (!trace_fp) {
+        path = nh_getenv("NETHACK_UTF8_RENDER_TRACE_FILE");
+        if (!path || !*path)
+            path = "nethack_utf8_render_trace.tsv";
+        trace_fp = fopen(path, "w");
+        if (!trace_fp)
+            return;
+        (void) fprintf(trace_fp,
+                       "seq\tstage\twindow\twtype\toffx\toffy\tmaxrow"
+                       "\tmaxcol\trow\tscreen_y\tclear_eol\tcurx_before"
+                       "\tcurx_after\ttext_len\ttext\n");
+    }
+
+    (void) fprintf(trace_fp, "%lu\t%s\t%d\t%d\t%d\t%d\t%ld\t%ld\t%ld"
+                   "\t%d\t%d\t%d\t%d\t%ld\t",
+                   ++trace_seq,
+                   stage ? stage : "-",
+                   (int) window,
+                   cw ? cw->type : -1,
+                   cw ? cw->offx : -1,
+                   cw ? cw->offy : -1,
+                   cw ? cw->maxrow : -1L,
+                   cw ? cw->maxcol : -1L,
+                   row_idx,
+                   screen_y,
+                   clear_eol,
+                   curx_before,
+                   curx_after,
+                   text ? (long) strlen(text) : 0L);
+
+    if (text) {
+        for (i = 0; text[i] != '\0' && i < 240; ++i) {
+            unsigned char ch = (unsigned char) text[i];
+
+            if (ch == '\t')
+                (void) fputs("\\t", trace_fp);
+            else if (ch == '\n')
+                (void) fputs("\\n", trace_fp);
+            else if (ch == '\r')
+                (void) fputs("\\r", trace_fp);
+            else
+                (void) fputc((int) ch, trace_fp);
+        }
+    }
+    (void) fputc('\n', trace_fp);
+    (void) fflush(trace_fp);
+}
+#endif
+#endif
+
 void
 tty_putstr(winid window, int attr, const char *str)
 {
@@ -2440,6 +2729,11 @@ tty_putstr(winid window, int attr, const char *str)
         break;
     case NHW_MENU:
     case NHW_TEXT:
+#ifdef WIN32CON
+    {
+        long wrap_index = 0L;
+        int wrap_cols;
+#endif
 #ifdef H2344_BROKEN
         if (cw->type == NHW_TEXT
             && (cw->cury + cw->offy) == ttyDisplay->rows - 1)
@@ -2483,6 +2777,31 @@ tty_putstr(winid window, int attr, const char *str)
             cw->maxcol = n0;
         if (++cw->cury > cw->maxrow)
             cw->maxrow = cw->cury;
+#ifdef WIN32CON
+        if (cw->type == NHW_TEXT) {
+            wrap_cols = ((int) cw->cols > 1) ? (int) cw->cols - 1 : CO - 1;
+            if (wrap_cols < 1)
+                wrap_cols = 1;
+            wrap_index = utf8_text_wrap_index(str, wrap_cols);
+#ifdef NH_WIN32_UTF8_TRACE
+            nh_utf8_wrap_trace_log("NHW_TEXT_INPUT", str, wrap_index,
+                                   wrap_cols, cw->cury - 1, n0 - 1L);
+#endif
+            if (wrap_index > 0L) {
+                cw->data[cw->cury - 1][wrap_index + 1L] = '\0';
+#ifdef NH_WIN32_UTF8_TRACE
+                nh_utf8_wrap_trace_log("NHW_TEXT_HEAD",
+                                       &cw->data[cw->cury - 1][1],
+                                       wrap_index, wrap_cols,
+                                       cw->cury - 1, wrap_index);
+                nh_utf8_wrap_trace_log("NHW_TEXT_TAIL", &str[wrap_index],
+                                       wrap_index, wrap_cols,
+                                       cw->cury, n0 - 1L - wrap_index);
+#endif
+                tty_putstr(window, attr, &str[wrap_index]);
+            }
+        } else
+#endif
         if (n0 > CO) {
             /* attempt to break the line */
             for (i = CO - 1; i && str[i] != ' ' && str[i] != '\n';)
@@ -2492,6 +2811,9 @@ tty_putstr(winid window, int attr, const char *str)
                 tty_putstr(window, attr, &str[i]);
             }
         }
+#ifdef WIN32CON
+    }
+#endif
         break;
     }
     return;
@@ -3833,25 +4155,37 @@ utf8_sequence_len(const unsigned char *utf8str)
 static int
 utf8_char_display_width(const unsigned char *utf8str)
 {
+    unsigned short chartype = utf8_char_chartype(utf8str);
+
+    if (chartype & NH_C3_NONSPACING)
+        return 0;
+    /* GetStringTypeW() does not reliably set FULLWIDTH for all Japanese
+       scripts in this console environment, so treat the major script
+       classes we actually render as double-width too. */
+    if (chartype & (NH_C3_FULLWIDTH | NH_C3_KATAKANA
+                    | NH_C3_HIRAGANA | NH_C3_IDEOGRAPH))
+        return 2;
+    if (chartype & NH_C3_HALFWIDTH)
+        return 1;
+    return 1;
+}
+
+static unsigned short
+utf8_char_chartype(const unsigned char *utf8str)
+{
     wchar_t wch[2] = { 0, 0 };
     unsigned short chartype = 0;
     int ulen = utf8_sequence_len(utf8str);
 
     if (ulen <= 1)
-        return 1;
+        return 0;
     if (MultiByteToWideChar(65001U, 0x00000008UL,
                             (const char *) utf8str, ulen, wch, 1)
         != 1)
-        return 1;
-    if (GetStringTypeW(0x0004UL, wch, 1, &chartype)) {
-        if (chartype & 0x0001U)
-            return 0;
-        if (chartype & 0x0080U)
-            return 2;
-        if (chartype & 0x0040U)
-            return 1;
-    }
-    return 1;
+        return 0;
+    if (!GetStringTypeW(0x0004UL, wch, 1, &chartype))
+        return 0;
+    return chartype;
 }
 #endif
 
