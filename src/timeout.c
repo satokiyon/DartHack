@@ -345,8 +345,8 @@ sickness_dialogue(void)
 }
 
 static NEARDATA const char *const levi_texts[] = {
-    "You float slightly lower.",
-    "You wobble unsteadily %s the %s."
+    "少し低く浮かぶ.",
+    "%sでふらついた."
 };
 
 staticfn void
@@ -369,8 +369,7 @@ levitation_dialogue(void)
             boolean danger = (is_pool_or_lava(u.ux, u.uy)
                               && !Is_waterlevel(&u.uz));
 
-            urgent_pline(s, danger ? "over" : "in",
-                         danger ? surface(u.ux, u.uy) : "air");
+            urgent_pline(s, danger ? surface(u.ux, u.uy) : "空中");
         } else
             pline1(s);
         stop_occupation();
