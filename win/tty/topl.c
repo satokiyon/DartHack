@@ -12,9 +12,62 @@
 
 static void redotoplin(const char *);
 static void topl_putsym(char);
+#ifdef WIN32CON
+static int utf8_sequence_len(const unsigned char *);
+static int utf8_char_display_width(const unsigned char *);
+extern int __stdcall MultiByteToWideChar(unsigned int, unsigned long,
+                                         const char *, int, wchar_t *, int);
+extern int __stdcall GetStringTypeW(unsigned long, const wchar_t *, int,
+                                    unsigned short *);
+#endif
 static void removetopl(int);
 static void msghistory_snapshot(boolean);
 static void free_msghistory_snapshot(boolean);
+
+#ifdef WIN32CON
+static int
+utf8_sequence_len(const unsigned char *utf8str)
+{
+    unsigned char c = *utf8str;
+
+    if ((c & 0x80U) == 0)
+        return 1;
+    if ((c & 0xE0U) == 0xC0U && (utf8str[1] & 0xC0U) == 0x80U)
+        return 2;
+    if ((c & 0xF0U) == 0xE0U && (utf8str[1] & 0xC0U) == 0x80U
+        && (utf8str[2] & 0xC0U) == 0x80U)
+        return 3;
+    if ((c & 0xF8U) == 0xF0U && (utf8str[1] & 0xC0U) == 0x80U
+        && (utf8str[2] & 0xC0U) == 0x80U
+        && (utf8str[3] & 0xC0U) == 0x80U)
+        return 4;
+    return 1;
+}
+
+static int
+utf8_char_display_width(const unsigned char *utf8str)
+{
+    wchar_t wch[2] = { 0, 0 };
+    unsigned short chartype = 0;
+    int ulen = utf8_sequence_len(utf8str);
+
+    if (ulen <= 1)
+        return 1;
+    if (MultiByteToWideChar(65001U, 0x00000008UL,
+                            (const char *) utf8str, ulen, wch, 1)
+        != 1)
+        return 1;
+    if (GetStringTypeW(0x0004UL, wch, 1, &chartype)) {
+        if (chartype & 0x0001U)
+            return 0;
+        if (chartype & 0x0080U)
+            return 2;
+        if (chartype & 0x0040U)
+            return 1;
+    }
+    return 1;
+}
+#endif
 
 int
 tty_doprev_message(void)
@@ -346,8 +399,44 @@ topl_putsym(char c)
 void
 putsyms(const char *str)
 {
+#ifdef WIN32CON
+    struct WinDesc *cw = wins[WIN_MESSAGE];
+
+    while (*str) {
+        unsigned char uch = (unsigned char) *str;
+
+        if (uch < 0x80) {
+            topl_putsym(*str++);
+            continue;
+        }
+
+        {
+            int ulen = utf8_sequence_len((const unsigned char *) str);
+
+            if (ulen > 1) {
+                int width = utf8_char_display_width((const unsigned char *) str);
+                uint8 utf8seq[8];
+                int k;
+
+                if (width > 0 && ttyDisplay->curx + width > CO - 1)
+                    topl_putsym('\n');
+                for (k = 0; k < ulen && k < 7; ++k)
+                    utf8seq[k] = (uint8) str[k];
+                utf8seq[k] = '\0';
+                g_pututf8(utf8seq);
+                str += ulen;
+                ttyDisplay->curx += width;
+                if (cw)
+                    cw->curx = ttyDisplay->curx;
+                continue;
+            }
+        }
+        topl_putsym(*str++);
+    }
+#else
     while (*str)
         topl_putsym(*str++);
+#endif
 }
 
 static void

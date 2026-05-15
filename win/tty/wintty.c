@@ -222,6 +222,14 @@ static void process_menu_window(winid, struct WinDesc *);
 static void process_text_window(winid, struct WinDesc *);
 static tty_menu_item *reverse(tty_menu_item *);
 static const char *compress_str(const char *);
+#ifdef WIN32CON
+static int utf8_sequence_len(const unsigned char *);
+static int utf8_char_display_width(const unsigned char *);
+extern int __stdcall MultiByteToWideChar(unsigned int, unsigned long,
+                                         const char *, int, wchar_t *, int);
+extern int __stdcall GetStringTypeW(unsigned long, const wchar_t *, int,
+                                    unsigned short *);
+#endif
 #ifndef STATUS_HILITES
 static void tty_putsym(winid, int, int, char);
 #endif
@@ -1807,14 +1815,10 @@ process_text_window(winid window, struct WinDesc *cw)
                 ++ttyDisplay->curx;
             }
             term_start_attr(attr);
-            for (cp = &cw->data[i][1], linestart = TRUE;
 #ifndef WIN32CON
+            for (cp = &cw->data[i][1], linestart = TRUE;
                  *cp && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
                  cp++
-#else
-                 *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
-                 cp++, ttyDisplay->curx++
-#endif
                  ) {
                 /* message recall for msg_window:full/combination/reverse
                    might have output from '/' in it (see redotoplin()) */
@@ -1833,6 +1837,76 @@ process_text_window(winid window, struct WinDesc *cw)
                     (void) putchar(*cp);
                 }
             }
+#else  /* WIN32CON */
+            for (cp = &cw->data[i][1], linestart = TRUE;
+                 *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
+                 ) {
+                unsigned char uch = (unsigned char) *cp;
+
+                if (linestart) {
+                    if (uch >= 0x80) {
+                        int ulen = utf8_sequence_len((const unsigned char *) cp);
+
+                        if (ulen > 1) {
+                            int width = utf8_char_display_width(
+                                (const unsigned char *) cp);
+                            uint8 utf8seq[8];
+                            int k;
+
+                            for (k = 0; k < ulen && k < 7; ++k)
+                                utf8seq[k] = (uint8) cp[k];
+                            utf8seq[k] = '\0';
+                            if (!_isatty(_fileno(stdout)))
+                                (void) fwrite(utf8seq, 1, (size_t) ulen, stdout);
+                            else
+                                g_pututf8(utf8seq);
+                            cp += ulen;
+                            ttyDisplay->curx += width;
+                        } else if (SYMHANDLING(H_UTF8)) {
+                            g_putch(*cp++);
+                            ttyDisplay->curx++;
+                        } else {
+                            g_putch(*cp++);
+                            end_glyphout();
+                            ttyDisplay->curx++;
+                        }
+                    } else {
+                        g_putch(*cp++);
+                        ttyDisplay->curx++;
+                    }
+                    linestart = FALSE;
+                    continue;
+                }
+
+                if (uch < 0x80) {
+                    g_putch(*cp++);
+                    ttyDisplay->curx++;
+                } else {
+                    int ulen = utf8_sequence_len((const unsigned char *) cp);
+
+                    if (ulen > 1) {
+                        int width = utf8_char_display_width(
+                            (const unsigned char *) cp);
+                        uint8 utf8seq[8];
+                        int k;
+
+                        for (k = 0; k < ulen && k < 7; ++k)
+                            utf8seq[k] = (uint8) cp[k];
+                        utf8seq[k] = '\0';
+                        if (!_isatty(_fileno(stdout)))
+                            (void) fwrite(utf8seq, 1, (size_t) ulen, stdout);
+                        else
+                            g_pututf8(utf8seq);
+                        cp += ulen;
+                        ttyDisplay->curx += width;
+                    } else {
+                        g_putch(*cp++);
+                        end_glyphout();
+                        ttyDisplay->curx++;
+                    }
+                }
+            }
+#endif /* WIN32CON */
             term_end_attr(attr);
         }
     }
@@ -2496,10 +2570,8 @@ tty_display_file(
             while (dlb_fgets(buf, BUFSZ, f)) {
                 if ((cr = strchr(buf, '\n')) != 0)
                     *cr = 0;
-#ifdef MSDOS
                 if ((cr = strchr(buf, '\r')) != 0)
                     *cr = 0;
-#endif
                 if (strchr(buf, '\t') != 0)
                     (void) tabexpand(buf);
                 empty = FALSE;
@@ -3737,6 +3809,51 @@ end_glyphout(void)
         ttyDisplay->color = NO_COLOR;
     }
 }
+
+#ifdef WIN32CON
+static int
+utf8_sequence_len(const unsigned char *utf8str)
+{
+    unsigned char c = *utf8str;
+
+    if ((c & 0x80U) == 0)
+        return 1;
+    if ((c & 0xE0U) == 0xC0U && (utf8str[1] & 0xC0U) == 0x80U)
+        return 2;
+    if ((c & 0xF0U) == 0xE0U && (utf8str[1] & 0xC0U) == 0x80U
+        && (utf8str[2] & 0xC0U) == 0x80U)
+        return 3;
+    if ((c & 0xF8U) == 0xF0U && (utf8str[1] & 0xC0U) == 0x80U
+        && (utf8str[2] & 0xC0U) == 0x80U
+        && (utf8str[3] & 0xC0U) == 0x80U)
+        return 4;
+    return 1;
+}
+
+static int
+utf8_char_display_width(const unsigned char *utf8str)
+{
+    wchar_t wch[2] = { 0, 0 };
+    unsigned short chartype = 0;
+    int ulen = utf8_sequence_len(utf8str);
+
+    if (ulen <= 1)
+        return 1;
+    if (MultiByteToWideChar(65001U, 0x00000008UL,
+                            (const char *) utf8str, ulen, wch, 1)
+        != 1)
+        return 1;
+    if (GetStringTypeW(0x0004UL, wch, 1, &chartype)) {
+        if (chartype & 0x0001U)
+            return 0;
+        if (chartype & 0x0080U)
+            return 2;
+        if (chartype & 0x0040U)
+            return 1;
+    }
+    return 1;
+}
+#endif
 
 void
 g_putch(int in_ch)

@@ -726,8 +726,7 @@ back_buffer_flip(void)
                     do_anything |= do_wide_content;
             } else {
 #endif
-                if (back->utf8str[0] && front->utf8str[0]
-                    && strcmp((const char *) back->utf8str,
+                if (strcmp((const char *) back->utf8str,
                            (const char *) front->utf8str))
                     do_anything |= do_utf8_content;
 #ifdef UTF8_FROM_CORE
@@ -1411,14 +1410,25 @@ g_pututf8(uint8 *sequence)
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
 #ifdef UTF8_FROM_CORE
     set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
-    cell_t cell;
+    cell_t cell = clear_cell;
+    WCHAR wch[2] = { 0, 0 };
+    int wcount;
+
     cell.attr = console.attr;
     cell.colorseq = esc_seq_colors[console.current_nhcolor];
     cell.bkcolorseq = esc_seq_bkcolors[console.current_nhbkcolor];
     cell.color24 = console.color24 ? console.color24 : 0L;
-    cell.color256idx =console.color256idx ? console.color256idx : 0;
+    cell.color256idx = console.color256idx ? console.color256idx : 0;
     Snprintf((char *) cell.utf8str, sizeof cell.utf8str, "%s",
              (char *) sequence);
+
+    /* Keep non-UTF8 back-buffer path safe by always setting wcharacter. */
+    wcount = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR) sequence, -1,
+                                 wch, (int) SIZE(wch));
+    cell.wcharacter = (wcount > 0 && wch[0] != 0)
+                        ? wch[0]
+                        : (WCHAR) CONSOLE_CLEAR_CHARACTER;
+
     buffer_write(console.back_buffer, &cell, console.cursor);
 #endif /* UTF8_FROM_CORE */
 #endif
