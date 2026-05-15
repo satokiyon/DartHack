@@ -15,19 +15,36 @@
 PowerShell で以下を実行する。
 
 ```powershell
-$vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
-$vs = & $vswhere -latest -requires Microsoft.Component.MSBuild -property installationPath
-$devShell = Join-Path $vs 'Common7\Tools\Launch-VsDevShell.ps1'
-& $devShell -SkipAutomaticLocation -Arch amd64 -HostArch amd64 | Out-Null
+# VS DevShell を初期化してから msbuild を呼ぶ (通常 PowerShell では msbuild が PATH にない)
+Import-Module 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\Microsoft.VisualStudio.DevShell.dll'
+Enter-VsDevShell -VsInstallPath 'C:\Program Files\Microsoft Visual Studio\18\Community' -SkipAutomaticLocation -DevCmdArguments '-arch=x64 -host_arch=x64'
 
 Set-Location 'C:\Users\satok\NetHackJP'
-msbuild 'sys\windows\vs\NetHack.sln' '/t:NetHack;NetHackW' /p:Configuration=Debug /p:Platform=x64 /m /nologo /verbosity:minimal
+# PowerShell では ; がコマンド区切りになるため /t: の値を必ず引用する
+msbuild sys\windows\vs\NetHack.sln '/t:NetHack;NetHackW' /p:Configuration=Debug /p:Platform=x64 /m /nologo /verbosity:minimal
+```
+
+> **注意**: PowerShell では `/t:NetHack;NetHackW` の `;` がコマンド区切りに解釈されることがあるため、
+> `'/t:NetHack;NetHackW'` のようにシングルクォートで必ず引用する。
+
+### 代替: フルパス MSBuild 直接呼び出し (VS DevShell 不要)
+
+```powershell
+Set-Location 'C:\Users\satok\NetHackJP'
+& 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' `
+	sys\windows\vs\NetHack.sln '/t:NetHack;NetHackW' /p:Configuration=Release /p:Platform=x64
 ```
 
 ### 最低確認
 
 - Exit Code が `0` であること
-- `NetHack.exe` と `NetHackW.exe` の両方が生成されること
+- `binary\Debug\x64\NetHack.exe` と `NetHackW.exe` の両方が生成されること（Debug ビルドの場合）
+- `binary\Release\x64\NetHack.exe` と `NetHackW.exe`（Release ビルドの場合）
+
+### 注意事項
+
+- `NetHackW.exe` が起動中の状態でビルドすると `LNK1168` でリンク失敗する。翻訳確認のみなら `/t:NetHack` だけでもコンパイル検証できる。
+- `/t:Build` を使うと末尾の `package.vcxproj` で `nmake` 未検出 (MSB3073) になる場合がある。翻訳確認では `/t:NetHack;NetHackW` を使うこと。
 
 ## 3. 翻訳の基本方針
 
@@ -89,6 +106,25 @@ msbuild 'sys\windows\vs\NetHack.sln' '/t:NetHack;NetHackW' /p:Configuration=Debu
 3. 差分でフォーマット指定子の不変を確認する。
 4. ビルドを実行し、エラー/警告の増加を確認する。
 5. 必要ならプレイ中メッセージを目視確認する。
+
+## 10. sys/windows/consoletty.c の Unicode 対応注意点
+
+Win32 コンソール版の入力処理は Unicode ビルド (UNICODE マクロ定義) と密接に関係する。以下の点に注意する。
+
+### 修正済みの問題パターン（参考）
+
+| パターン | 問題 | 修正方針 |
+|---|---|---|
+| `CHAR ch2; ReadConsole(&ch2, 1, ...)` | Unicodeビルドでは `ReadConsole` → `ReadConsoleW` にマップされ 2バイトを 1バイトバッファに書き込む→スタック破壊 | `WCHAR wch2 = 0; ReadConsoleW(&wch2, 1, ...)` に変更 |
+| `unsigned char ch = uChar.AsciiChar` (processkeystroke系) | 日本語文字の低バイトが `< 32` になると制御コードと誤判定される | `int ch = (int)(unsigned short)uChar.UnicodeChar` に変更 |
+| `unsigned char ch = uChar.AsciiChar` (kbhit系) | 日本語文字が "Strange Key event" として誤 purge される恐れ | `WCHAR ch = uChar.UnicodeChar` に変更 |
+| `uChar.AsciiChar` で bogus_key 初期化 | Unicode ビルドでの明示性不足 | `uChar.UnicodeChar = (WCHAR) 0x0080` に変更 |
+
+### 新規修正時のルール
+
+- `ReadConsole` を使う箇所は **常に `ReadConsoleW` を明示的に呼び、バッファを `WCHAR` にする**。
+- `INPUT_RECORD.Event.KeyEvent.uChar` を参照する場合、**Unicodeビルドでは `UnicodeChar`** を使う。`AsciiChar` は低バイトの切り捨てになり、日本語文字で誤動作する。
+- `ReadConsoleInput` / `PeekConsoleInput` は Unicodeビルドで W 版が使われるため、`uChar.UnicodeChar` が正しく設定される。
 
 ## 8. 変更後チェック
 
