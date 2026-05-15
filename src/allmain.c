@@ -575,7 +575,7 @@ maybe_do_tutorial(void)
         assign_level(&u.ucamefrom, &u.uz);
         iflags.nofollowers = TRUE;
         schedule_goto(&sp->dlevel, UTOTYPE_NONE,
-                      "Entering the tutorial.", (char *) 0);
+                      "チュートリアルに入った.", (char *) 0);
         deferred_goto();
         vision_recalc(0);
         docrt();
@@ -911,8 +911,8 @@ welcome(boolean new_game) /* false => restoring an old game */
             (currentgend && gu.urole.name.f) ? gu.urole.name.f
                                              : gu.urole.name.m);
 
-    pline(new_game ? "%s %s, welcome to NetHack!  You are a%s."
-                   : "%s %s, the%s, welcome back to NetHack!",
+    pline(new_game ? "%s %s、NetHackへようこそ! あなたは%sだった."
+                   : "%s %s、%s、NetHackへ戻ってきた.",
           Hello((struct monst *) 0), svp.plname, buf);
 
     if (new_game) {
