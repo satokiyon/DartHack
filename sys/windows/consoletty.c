@@ -2852,7 +2852,7 @@ void set_altkeyhandling(const char *inName)
                 bogus_key.Event.KeyEvent.wRepeatCount = 1;
                 bogus_key.Event.KeyEvent.wVirtualKeyCode = 0;
                 bogus_key.Event.KeyEvent.wVirtualScanCode = 0;
-                bogus_key.Event.KeyEvent.uChar.AsciiChar = (uchar) 0x80;
+                bogus_key.Event.KeyEvent.uChar.UnicodeChar = (WCHAR) 0x0080;
                 bogus_key.Event.KeyEvent.dwControlKeyState = 0;
                 for (k = 0; k < SIZE(keypad); ++k) {
                     keypad[k] = ray_keypad[k];
@@ -2926,7 +2926,7 @@ default_processkeystroke(
 {
     int k = 0;
     int keycode, vk;
-    unsigned char ch, pre_ch;
+    int ch, pre_ch;
     unsigned short int scan;
     unsigned long shiftstate;
     int altseq = 0;
@@ -2941,7 +2941,7 @@ default_processkeystroke(
     }
 #endif
     shiftstate = 0L;
-    ch = pre_ch = ir->Event.KeyEvent.uChar.AsciiChar;
+    ch = pre_ch = (int)(unsigned short)ir->Event.KeyEvent.uChar.UnicodeChar;
     scan = ir->Event.KeyEvent.wVirtualScanCode;
     vk = ir->Event.KeyEvent.wVirtualKeyCode;
     keycode = MapVirtualKey(vk, 2);
@@ -3037,7 +3037,7 @@ default_kbhit(HANDLE hConIn, INPUT_RECORD *ir)
     int retval;   /* true =  "we had a match"        */
     DWORD count;
     unsigned short int scan;
-    unsigned char ch;
+    WCHAR ch;
     unsigned long shiftstate;
     int altseq = 0, keycode, vk;
     done = 0;
@@ -3047,7 +3047,7 @@ default_kbhit(HANDLE hConIn, INPUT_RECORD *ir)
         PeekConsoleInput(hConIn, ir, 1, &count);
         if (count > 0) {
             if (ir->EventType == KEY_EVENT && ir->Event.KeyEvent.bKeyDown) {
-                ch = ir->Event.KeyEvent.uChar.AsciiChar;
+                ch = ir->Event.KeyEvent.uChar.UnicodeChar;
                 scan = ir->Event.KeyEvent.wVirtualScanCode;
                 shiftstate = ir->Event.KeyEvent.dwControlKeyState;
                 vk = ir->Event.KeyEvent.wVirtualKeyCode;
@@ -3386,7 +3386,7 @@ int ray_processkeystroke(
     int portdebug)
 {
     int keycode, vk;
-    unsigned char ch, pre_ch;
+    int ch, pre_ch;
     unsigned short int scan;
     unsigned long shiftstate;
     int altseq = 0;
@@ -3402,7 +3402,7 @@ int ray_processkeystroke(
     }
 #endif
     shiftstate = 0L;
-    ch = pre_ch = ir->Event.KeyEvent.uChar.AsciiChar;
+    ch = pre_ch = (int)(unsigned short)ir->Event.KeyEvent.uChar.UnicodeChar;
     scan = ir->Event.KeyEvent.wVirtualScanCode;
     vk = ir->Event.KeyEvent.wVirtualKeyCode;
     keycode = MapVirtualKey(vk, 2);
@@ -3468,18 +3468,18 @@ int ray_processkeystroke(
     }
     /* Attempt to work better with international keyboards. */
     else {
-        CHAR ch2;
+        WCHAR wch2 = 0;
         DWORD written;
         /* The bogus_key guarantees that ReadConsole will return,
          * and does not itself do anything */
         WriteConsoleInput(hConIn, &bogus_key, 1, &written);
-        ReadConsole(hConIn, &ch2, 1, &count, NULL);
-        /* Prevent high characters from being interpreted as alt
+        ReadConsoleW(hConIn, &wch2, 1, &count, NULL);
+        /* Prevent non-ASCII characters from being interpreted as alt
          * sequences; also filter the bogus_key */
-        if (ch2 & 0x80)
+        if (wch2 > 0x7F)
             *valid = FALSE;
         else
-            ch = ch2;
+            ch = (unsigned char)wch2;
         if (ch == 0)
             *valid = FALSE;
     }
@@ -3506,14 +3506,18 @@ process_keystroke2(
     /* Use these values for the numeric keypad */
     static const char keypad_nums[] = "789-456+1230.";
 
-    unsigned char ch;
+    int ch;
     int vk;
     unsigned short int scan;
     unsigned long shiftstate;
     int altseq;
     DWORD count;
 
-    ch = ir->Event.KeyEvent.uChar.AsciiChar;
+#ifdef UNICODE
+    ch = (int)(unsigned short)ir->Event.KeyEvent.uChar.UnicodeChar;
+#else
+    ch = (unsigned char)ir->Event.KeyEvent.uChar.AsciiChar;
+#endif
     vk = ir->Event.KeyEvent.wVirtualKeyCode;
     scan = ir->Event.KeyEvent.wVirtualScanCode;
     shiftstate = ir->Event.KeyEvent.dwControlKeyState;
@@ -3553,9 +3557,9 @@ process_keystroke2(
     }
     /* Attempt to work better with international keyboards. */
     else {
-        CHAR ch2;
-        ReadConsole(hConIn, &ch2, 1, &count, NULL);
-        ch = ch2 & 0xFF;
+        WCHAR wch2 = 0;
+        ReadConsoleW(hConIn, &wch2, 1, &count, NULL);
+        ch = (int)(unsigned short)wch2;
         if (ch == 0)
             *valid = FALSE;
     }
@@ -3671,7 +3675,7 @@ ray_kbhit(
     int retval;   /* true =  "we had a match"        */
     DWORD count;
     unsigned short int scan;
-    unsigned char ch;
+    WCHAR ch;
     unsigned long shiftstate;
     int altseq = 0, keycode, vk;
 
@@ -3682,7 +3686,7 @@ ray_kbhit(
         PeekConsoleInput(hConIn, ir, 1, &count);
         if (count > 0) {
             if (ir->EventType == KEY_EVENT && ir->Event.KeyEvent.bKeyDown) {
-                ch = ir->Event.KeyEvent.uChar.AsciiChar;
+                ch = ir->Event.KeyEvent.uChar.UnicodeChar;
                 scan = ir->Event.KeyEvent.wVirtualScanCode;
                 shiftstate = ir->Event.KeyEvent.dwControlKeyState;
                 vk = ir->Event.KeyEvent.wVirtualKeyCode;
@@ -3746,7 +3750,7 @@ nh340_processkeystroke(
     int portdebug)
 {
     int keycode, vk;
-    unsigned char ch, pre_ch;
+    int ch, pre_ch;
     unsigned short int scan;
     unsigned long shiftstate;
     int altseq = 0;
@@ -3762,7 +3766,7 @@ nh340_processkeystroke(
 #endif
 
     shiftstate = 0L;
-    ch = pre_ch = ir->Event.KeyEvent.uChar.AsciiChar;
+    ch = pre_ch = (int)(unsigned short)ir->Event.KeyEvent.uChar.UnicodeChar;
     scan = ir->Event.KeyEvent.wVirtualScanCode;
     vk = ir->Event.KeyEvent.wVirtualKeyCode;
     keycode = MapVirtualKey(vk, 2);
@@ -3837,7 +3841,7 @@ nh340_kbhit(
     int retval;   /* true =  "we had a match"        */
     DWORD count;
     unsigned short int scan;
-    unsigned char ch;
+    WCHAR ch;
     unsigned long shiftstate;
     int altseq = 0, keycode, vk;
     done = 0;
@@ -3847,7 +3851,7 @@ nh340_kbhit(
         PeekConsoleInput(hConIn, ir, 1, &count);
         if (count > 0) {
             if (ir->EventType == KEY_EVENT && ir->Event.KeyEvent.bKeyDown) {
-                ch = ir->Event.KeyEvent.uChar.AsciiChar;
+                ch = ir->Event.KeyEvent.uChar.UnicodeChar;
                 scan = ir->Event.KeyEvent.wVirtualScanCode;
                 shiftstate = ir->Event.KeyEvent.dwControlKeyState;
                 vk = ir->Event.KeyEvent.wVirtualKeyCode;
