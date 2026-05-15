@@ -13,7 +13,15 @@
 static void redotoplin(const char *);
 static void topl_putsym(char);
 #ifdef WIN32CON
+#define NH_C3_NONSPACING 0x0001U
+#define NH_C3_KATAKANA   0x0010U
+#define NH_C3_HIRAGANA   0x0020U
+#define NH_C3_HALFWIDTH  0x0040U
+#define NH_C3_FULLWIDTH  0x0080U
+#define NH_C3_IDEOGRAPH  0x0100U
+
 static int utf8_sequence_len(const unsigned char *);
+static unsigned short utf8_char_chartype(const unsigned char *);
 static int utf8_char_display_width(const unsigned char *);
 extern int __stdcall MultiByteToWideChar(unsigned int, unsigned long,
                                          const char *, int, wchar_t *, int);
@@ -47,25 +55,36 @@ utf8_sequence_len(const unsigned char *utf8str)
 static int
 utf8_char_display_width(const unsigned char *utf8str)
 {
+    unsigned short chartype = utf8_char_chartype(utf8str);
+
+    if (chartype & NH_C3_NONSPACING)
+        return 0;
+    /* Match wintty.c so top-line messages and help text advance the cursor
+       consistently for Japanese full-width scripts. */
+    if (chartype & (NH_C3_FULLWIDTH | NH_C3_KATAKANA
+                    | NH_C3_HIRAGANA | NH_C3_IDEOGRAPH))
+        return 2;
+    if (chartype & NH_C3_HALFWIDTH)
+        return 1;
+    return 1;
+}
+
+static unsigned short
+utf8_char_chartype(const unsigned char *utf8str)
+{
     wchar_t wch[2] = { 0, 0 };
     unsigned short chartype = 0;
     int ulen = utf8_sequence_len(utf8str);
 
     if (ulen <= 1)
-        return 1;
+        return 0;
     if (MultiByteToWideChar(65001U, 0x00000008UL,
                             (const char *) utf8str, ulen, wch, 1)
         != 1)
-        return 1;
-    if (GetStringTypeW(0x0004UL, wch, 1, &chartype)) {
-        if (chartype & 0x0001U)
-            return 0;
-        if (chartype & 0x0080U)
-            return 2;
-        if (chartype & 0x0040U)
-            return 1;
-    }
-    return 1;
+        return 0;
+    if (!GetStringTypeW(0x0004UL, wch, 1, &chartype))
+        return 0;
+    return chartype;
 }
 #endif
 
@@ -414,7 +433,10 @@ putsyms(const char *str)
             int ulen = utf8_sequence_len((const unsigned char *) str);
 
             if (ulen > 1) {
-                int width = utf8_char_display_width((const unsigned char *) str);
+                const unsigned char *utf8cp = (const unsigned char *) str;
+                int width = utf8_char_display_width(utf8cp);
+                unsigned short chartype = utf8_char_chartype(utf8cp);
+                int curx_before = ttyDisplay->curx;
                 uint8 utf8seq[8];
                 int k;
 
@@ -428,6 +450,12 @@ putsyms(const char *str)
                 ttyDisplay->curx += width;
                 if (cw)
                     cw->curx = ttyDisplay->curx;
+#ifdef NH_WIN32_UTF8_TRACE
+                nh_win32_utf8_trace_front("topl.putsyms", utf8cp, ulen,
+                                          chartype, width, curx_before,
+                                          ttyDisplay->curx, ttyDisplay->cury,
+                                          "g_pututf8");
+#endif
                 continue;
             }
         }

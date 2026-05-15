@@ -5,6 +5,11 @@
 #ifndef WINTTY_H
 #define WINTTY_H
 
+#if defined(WIN32CON) && !defined(NH_WIN32_UTF8_TRACE)
+/* DEBUG_UTF8_TRACE: remove this define after UTF-8 diagnosis is complete. */
+#define NH_WIN32_UTF8_TRACE 1
+#endif
+
 #ifndef WINDOW_STRUCTS
 #define WINDOW_STRUCTS
 
@@ -216,6 +221,12 @@ extern void addtopl(const char *);
 extern void more(void);
 extern void update_topl(const char *);
 extern void putsyms(const char *);
+
+#if defined(WIN32CON) && defined(NH_WIN32_UTF8_TRACE)
+extern void nh_win32_utf8_trace_front(const char *, const unsigned char *, int,
+                                      unsigned short, int, int, int, int,
+                                      const char *);
+#endif
 
 /* ### wintty.c ### */
 
