@@ -119,7 +119,7 @@ boulder_hits_pool(
                     } else {
                         Soundeffect(se_splash, 100);
                     }
-                    You_hear("a%s splash.", lava ? " sizzling" : "");
+                    You_hear("%sという音が聞こえた.", lava ? "じゅうじゅうという" : "ざばー");
                 }
                 wake_nearto(rx, ry, 40);
             }
@@ -128,12 +128,12 @@ boulder_hits_pool(
                 set_uinwater(0); /* u.uinwater = 0 */
                 docrt();
                 gv.vision_full_recalc = 1;
-                You("find yourself on dry land again!");
+                You("乾いた地面に戻った!");
             } else if (lava && next2u(rx, ry)) {
                 int dmg;
 
-                You("are hit by molten %s%c",
-                    hliquid("lava"), Fire_resistance ? '.' : '!');
+                You("溶けた%sに当たった%c",
+                    hliquid("溶岩"), Fire_resistance ? '。' : '!');
                 burn_away_slime();
                 dmg = d((Fire_resistance ? 1 : 3), 6);
                 losehp(Maybe_Half_Phys(dmg), /* lava damage */
@@ -239,7 +239,7 @@ flooreffects(
         if (*verb) {
             if (Blind && u_at(x, y)) {
                 Soundeffect(se_crashing_boulder, 100);
-                You_hear("a CRASH! beneath you.");
+                You_hear("ドーンという音が下から聞こえた!");
             } else if (!Blind && cansee(x, y)) {
                 pline_The("boulder %s%s.",
                           (ttyp == TRAPDOOR && !tseen) ? "triggers and " : "",
@@ -248,7 +248,7 @@ flooreffects(
                             : "fills a pit");
             } else {
                 Soundeffect(se_boulder_drop, 100);
-                You_hear("a boulder %s.", verb);
+                You_hear("巨大な岩が%s.", verb);
             }
         }
         /*
@@ -290,7 +290,7 @@ flooreffects(
         if (is_pit(t->ttyp)) {
             if (Blind && !Deaf) {
                 Soundeffect(se_item_tumble_downwards, 50);
-                You_hear("%s tumble downwards.", the(xname(obj)));
+                You_hear("%sが落ちていく.", the(xname(obj)));
             } else {
                 pline("%s into %s pit.", Tobjnam(obj, "tumble"),
                       the_your[t->madeby_u]);
@@ -347,7 +347,7 @@ flooreffects(
                 pline("%s from the heat!",
                       is_plural(obj) ? "They shatter" : "It shatters");
             } else {
-                You_hear("a shattering noise.");
+                You_hear("バリンという音が聞こえた.");
             }
             breakobj(obj, x, y, FALSE, FALSE);
             res = TRUE;
@@ -501,57 +501,57 @@ dosinkring(struct obj *obj)
     boolean ideed = TRUE;
     boolean nosink = FALSE;
 
-    You("drop %s down the drain.", doname(obj));
+    You("%sを排水溝に落とした.", doname(obj));
     obj->in_use = TRUE;  /* block free identification via interrupt */
     switch (obj->otyp) { /* effects that can be noticed without eyes */
     case RIN_SEARCHING:
-        You("thought %s got lost in the sink, but there it is!", yname(obj));
+        You("シンクに失くしたと思った%sがそこにあった!", yname(obj));
         goto giveback;
     case RIN_SLOW_DIGESTION:
-        pline_The("ring is regurgitated!");
+        pline_The("指輪は噴き出してきた!");
  giveback:
         obj->in_use = FALSE;
         dropx(obj);
         trycall(obj);
         return;
     case RIN_LEVITATION:
-        pline_The("sink quivers upward for a moment.");
+        pline_The("シンクは一瞬上下に揺れた.");
         break;
     case RIN_POISON_RESISTANCE:
-        You("smell rotten %s.", makeplural(fruitname(FALSE)));
+        You("腐った%sの臭いがした.", makeplural(fruitname(FALSE)));
         break;
     case RIN_AGGRAVATE_MONSTER:
-        pline("Several %s buzz angrily around the sink.",
-              Hallucination ? makeplural(rndmonnam(NULL)) : "flies");
+        pline("何匹かの%sがシンクの周りをぶんぶん飛び回った。",
+              Hallucination ? makeplural(rndmonnam(NULL)) : "ハエ");
         break;
     case RIN_SHOCK_RESISTANCE:
         pline("シンクの周りに静電気が発生した.");
         break;
     case RIN_CONFLICT:
         Soundeffect(se_drain_noises, 50);
-        You_hear("loud noises coming from the drain.");
+        You_hear("排水溝から大きな音が聞こえた.");
         break;
     case RIN_SUSTAIN_ABILITY: /* KMH */
-        pline_The("%s flow seems fixed.", hliquid("water"));
+        pline_The("%sの流れが止まった.", hliquid("水"));
         break;
     case RIN_GAIN_STRENGTH:
-        pline_The("%s flow seems %ser now.",
-                  hliquid("water"),
-                  (obj->spe < 0) ? "weak" : "strong");
+        pline_The("%sの流れが%serになった.",
+                  hliquid("水"),
+                  (obj->spe < 0) ? "やや" : "粗く");
         break;
     case RIN_GAIN_CONSTITUTION:
-        pline_The("%s flow seems %ser now.",
-                  hliquid("water"),
-                  (obj->spe < 0) ? "less" : "great");
+        pline_The("%sの流れが%serになった.",
+                  hliquid("水"),
+                  (obj->spe < 0) ? "いくらか" : "残涪");
         break;
     case RIN_INCREASE_ACCURACY: /* KMH */
-        pline_The("%s flow %s the drain.",
-                  hliquid("water"),
-                  (obj->spe < 0) ? "misses" : "hits");
+        pline_The("%sの流れが%s.",
+                  hliquid("水"),
+                  (obj->spe < 0) ? "的を外した" : "皋中を気を付けた");
         break;
     case RIN_INCREASE_DAMAGE:
-        pline_The("water's force seems %ser now.",
-                  (obj->spe < 0) ? "small" : "great");
+        pline_The("水の働きが%sになった.",
+                  (obj->spe < 0) ? "やや弱く" : "傷を下して");
         break;
     case RIN_HUNGER:
         ideed = FALSE;
@@ -560,8 +560,8 @@ dosinkring(struct obj *obj)
             if (otmp != uball && otmp != uchain
                 && !obj_resists(otmp, 1, 99)) {
                 if (!Blind) {
-                    pline("Suddenly, %s %s from the sink!", doname(otmp),
-                          otense(otmp, "vanish"));
+                    pline("急突エ%sが%sシンクから%s!", doname(otmp),
+                          otense(otmp, "飛び出し"));
                     ideed = TRUE;
                 }
                 delobj(otmp);
@@ -576,7 +576,7 @@ dosinkring(struct obj *obj)
         nosink = teleport_sink();
         /* give message even if blind; we know we're not levitating,
            so can feel the outcome even if we can't directly see it */
-        pline_The("sink %svanishes.", nosink ? "" : "momentarily ");
+        pline_The("シンクが%s櫡洹した.", nosink ? "" : "䧌時的に");
         ideed = FALSE;
         break;
     case RIN_POLYMORPH:
@@ -644,10 +644,10 @@ dosinkring(struct obj *obj)
         trycall(obj);
     } else if (!nosink) {
         Soundeffect(se_ring_in_drain, 50);
-        You_hear("the ring bouncing down the drainpipe.");
+        You_hear("指輪が排水溝を下っていく音が聞こえた.");
     }
     if (!rn2(20) && !nosink) {
-        pline_The("sink backs up, leaving %s.", doname(obj));
+        pline_The("シンクが水を吐い出して%sを残した.", doname(obj));
         obj->in_use = FALSE;
         dropx(obj);
     } else if (!rn2(5)) {
@@ -666,7 +666,7 @@ canletgo(struct obj *obj, const char *word)
 {
     if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
         if (*word)
-            Norep("You cannot %s %s you are wearing.", word, something);
+            Norep("着用中の%sを%sんでいる不接で、%sを%sことができない.", "something", "wearing", "something", word);
         return FALSE;
     }
     if (obj == uwep && welded(uwep)) {
@@ -690,7 +690,7 @@ canletgo(struct obj *obj, const char *word)
                implicitly forced to be 1; replicate its kludge... */
             if (!strcmp(word, "throw") && obj->quan > 1L)
                 obj->corpsenm = 1;
-            pline("For some reason, you cannot %s%s the stone%s!", word,
+            pline("何らかの理由で、あなたはその岩を%s%sことができない%s!", word,
                   obj->corpsenm ? " any of" : "", plur(obj->quan));
         }
         obj->corpsenm = 0; /* reset */
@@ -699,12 +699,12 @@ canletgo(struct obj *obj, const char *word)
     }
     if (obj->otyp == LEASH && obj->leashmon != 0) {
         if (*word)
-            pline_The("leash is tied around your %s.", body_part(HAND));
+            pline_The("紅い笼をあなたの%sに紅い笼が巻きついている.", body_part(HAND));
         return FALSE;
     }
     if (obj->owornmask & W_SADDLE) {
         if (*word)
-            You("cannot %s %s you are sitting on.", word, something);
+            You("あなたが乗っている%sを%sことができない.", "something", word);
         return FALSE;
     }
     return TRUE;
@@ -747,7 +747,7 @@ drop(struct obj *obj)
             }
             onam_p = is_unpaid(obj) ? yobjnam(obj, (char *) 0) : doname(obj);
 
-            You("drop %s into %s.", onam_p, mnam_p);
+        You("%sを%s内に落とした.", onam_p, mnam_p);
         }
     } else {
         if ((obj->oclass == RING_CLASS || obj->otyp == MEAT_RING)
@@ -764,7 +764,7 @@ drop(struct obj *obj)
             if (levhack)
                 ELevitation = W_ART; /* other than W_ARTI */
             if (flags.verbose)
-                You("drop %s.", doname(obj));
+            You("%sを落とした.", doname(obj));
             freeinv(obj);
             hitfloor(obj, TRUE);
             if (levhack)
@@ -772,7 +772,7 @@ drop(struct obj *obj)
             return ECMD_TIME;
         }
         if (!IS_ALTAR(levl[u.ux][u.uy].typ) && flags.verbose)
-            You("drop %s.", doname(obj));
+            You("%sの罗缛を落とした.", doname(obj));
     }
     obj->how_lost = LOST_DROPPED;
     dropx(obj);
@@ -867,7 +867,7 @@ engulfer_digests_food(struct obj *obj)
             could_slime = TRUE;
         }
         /* see or feel the effect */
-        pline("%s instantly digested!", Tobjnam(obj, "are"));
+        pline("%sは一気に消化された!", Tobjnam(obj, "are"));
 
         if (could_poly || could_slime) {
             (void) newcham(u.ustuck, could_slime ? &mons[PM_GREEN_SLIME] : 0,
@@ -926,7 +926,7 @@ doddrop(void)
     int result = ECMD_OK;
 
     if (!gi.invent) {
-        You("have nothing to drop.");
+        You("何もを落とずにポケットから上げするものがない.");
         return ECMD_OK;
     }
     add_valid_menu_class(0); /* clear any classes already there */
@@ -1111,16 +1111,16 @@ u_stuck_cannot_go(const char *updn)
 {
     if (u.ustuck) {
         if (u.uswallow || !sticks(gy.youmonst.data)) {
-            You("are %s, and cannot go %s.",
-                !u.uswallow ? "being held"
-                : digests(u.ustuck->data) ? "swallowed"
+            You("%s%s、%sへ業が追う、ぜひ、そこへ訓緱してください.",
+                !u.uswallow ? "何かが"
+                : digests(u.ustuck->data) ? "食い込まれて"
                 : "engulfed", updn);
             return TRUE;
         } else {
             struct monst *mtmp = u.ustuck;
 
             set_ustuck((struct monst *) 0);
-            You("release %s.", mon_nam(mtmp));
+            You("%sを痋会った.", mon_nam(mtmp));
         }
     }
     return FALSE;
@@ -1190,9 +1190,9 @@ dodown(void)
                 ladder_down = (glyph_to_cmap(glyph_at_uxuy) == S_dnladder);
         }
         if (Is_airlevel(&u.uz))
-            You("are floating in the %s.", surface(u.ux, u.uy));
+            You("%s上を浮遊っている.", surface(u.ux, u.uy));
         else if (Is_waterlevel(&u.uz))
-            You("are floating in %s.",
+            You("%s上を浮遊っている.",
                 is_pool(u.ux, u.uy) ? "the water" : "a bubble of air");
         else
             floating_above(stairs_down ? "stairs"
@@ -1206,7 +1206,7 @@ dodown(void)
         if (Flying) { /* lurker above */
             You("fly out of hiding.");
         } else { /* piercer */
-            You("drop to the %s.", surface(u.ux, u.uy));
+            You("%sまで残りを上り。", surface(u.ux, u.uy));
             if (is_pool_or_lava(u.ux, u.uy)) {
                 pooleffects(FALSE);
             } else {
@@ -1240,7 +1240,7 @@ dodown(void)
         }
     }
     if (on_level(&valley_level, &u.uz) && !u.uevent.gehennom_entered) {
-        You("are standing at the gate to Gehennom.");
+        You("あなたはゲヘナムの上に立っている.");
         pline("口にできないほどの残虐さと害悪が下に潜んでいた.");
         if (y_n("Are you sure you want to enter?") != 'y')
             return ECMD_OK;
@@ -1249,7 +1249,7 @@ dodown(void)
     }
 
     if (!next_to_u()) {
-        You("are held back by your pet!");
+        You("あなたのペットが止そうとした!");
         return ECMD_OK;
     }
 
@@ -1334,7 +1334,7 @@ doup(void)
             return ECMD_OK;
     }
     if (!next_to_u()) {
-        You("are held back by your pet!");
+        You("あなたのペットが止そうとした!");
         return ECMD_OK;
     }
     ga.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
@@ -1437,7 +1437,7 @@ u_collide_m(struct monst *mtmp)
            here, but it's not impossible and we're prepared to cope
            with the situation, so only say something when debugging */
         if (wizard)
-            pline("(monster in hero's way)");
+            pline("騒まぞろょき上。");
         if (!rloc(mtmp, RLOC_NOMSG) || (mtmp = m_at(u.ux, u.uy)) != 0)
             /* no room to move it; send it away, to return later */
             m_into_limbo(mtmp);
@@ -1860,13 +1860,13 @@ goto_level(
     /* Check whether we just entered Gehennom. */
     if (!In_hell(&u.uz0) && Inhell) {
         if (Is_valley(&u.uz)) {
-            You("arrive at the Valley of the Dead...");
-            pline_The("odor of burnt flesh and decay pervades the air.");
+            You("ゲヘナムの谷を訓緱した。");
+            pline_The("焼ける肉と腐った死体の臭いが潜んでいた.");
 #ifdef MICRO
             display_nhwindow(WIN_MESSAGE, FALSE);
 #endif
             Soundeffect(se_groans_and_moans, 25);
-            You_hear("groans and moans everywhere.");
+            You_hear("いたところで和醬く様を聞かせた.");
         }
 
         record_achievement(ACH_HELL); /* reached Gehennom */
@@ -1893,7 +1893,7 @@ goto_level(
     } else if (Is_knox(&u.uz)) {
         /* alarm stops working once Croesus has died */
         if (new || !svm.mvitals[PM_CROESUS].died) {
-            You("have penetrated a high security area!");
+            You("あなたは一気に介入した!");
             Soundeffect(se_alarm, 100);
             pline("警報が鳴り響いた!");
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -1910,7 +1910,7 @@ goto_level(
             record_achievement(ACH_SOKO);
     } else {
         if (new && Is_rogue_level(&u.uz)) {
-            You("enter what seems to be an older, more primitive world.");
+            You("角年匪をすり抠けた世界り訪れた.");
         } else if (new && Is_bigroom(&u.uz)) {
             record_achievement(ACH_BGRM);
         }
@@ -2003,7 +2003,7 @@ void
 hellish_smoke_mesg(void)
 {
     if (svl.level.flags.temperature)
-        pline("It is %s here.",
+        pline("ここは%sい。",
               svl.level.flags.temperature > 0 ? "hot" : "cold");
 
     if (In_hell(&u.uz) && svl.level.flags.temperature > 0)
@@ -2019,11 +2019,11 @@ temperature_change_msg(schar prev_temperature)
         if (svl.level.flags.temperature)
             hellish_smoke_mesg();
         else if (prev_temperature > 0)
-            pline_The("heat %s gone.",
+            pline_The("粗い粗い%s%s。",
                       In_hell(&u.uz0)
                       ? "and smoke are" : "is");
         else if (prev_temperature < 0)
-            You("are out of the cold.");
+            You("敖気を出した.");
     }
 }
 
@@ -2170,12 +2170,12 @@ revive_corpse(struct obj *corpse)
                     effect = " in a ring of withered crops";
 
                 if (canseemon(mtmp)) {
-                    pline("%s rises from the dead%s!",
+                    pline("ひゃっ、%sが死体が传い購いを推進していります%s!",
                           chewed ? Adjmonnam(mtmp, "bite-covered")
                                  : Monnam(mtmp),
                           effect);
                 } else {
-                    pline("%s disappears%s!", The(cname), effect);
+                    pline("%sが煙の中に%s鎡閠した%s!", The(cname), effect);
                 }
             }
             break;
