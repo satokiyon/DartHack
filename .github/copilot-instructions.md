@@ -36,8 +36,11 @@
 - tree: 木
 - door: 扉
 - wall: 壁
+- Ranger: 野伏
 
 boulder と rock を同じ訳語にしない。
+
+JNetHack での翻訳例を参考にしつつ、上記の用語ルールを守ること。
 
 ## 5. 翻訳対象外ファイル
 
@@ -61,7 +64,11 @@ boulder と rock を同じ訳語にしない。
 - Windows では Developer PowerShell（VS DevShell）を使用して msbuild を実行する。
 - `NetHack.exe` と `NetHackW.exe` の生成を確認する。
 
-## 8. 参照先
+## 8. 使用できるスクリプトやコマンド
+- 文字列の検索にはgrepではなくagコマンドを使用する
+- スクリプトはbashではなく、Powershellやpythonを使用する
+
+## 9. 参照先
 
 詳細手順は以下を参照:
 
@@ -69,14 +76,14 @@ boulder と rock を同じ訳語にしない。
 - docs/message-translation-safety-checklist.md
 - docs/translation-glossary-quest.md
 
-## 9. 参考プロジェクト
+## 10. 参考プロジェクト
 - NetHack
  -- https://github.com/NetHack/NetHack
 
 - JNetHack
  -- https://github.com/jnethack/jnethack-release
 
-## 10. デバッグ実装の扱い
+## 11. デバッグ実装の扱い
 
 - 調査のためにトレース出力やデバッグ用フラグを追加することは許可する。
 - ただし原因切り分けと修正確認が完了したら、トレース出力処理・環境変数トグル・デバッグ用 define は必ず削除する。
