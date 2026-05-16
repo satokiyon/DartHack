@@ -969,7 +969,7 @@ fall_asleep(int how_long, boolean wakeup_msg)
 #endif
     /* early wakeup from combat won't be possible until next monster turn */
     u.usleep = svm.moves;
-    gn.nomovemsg = wakeup_msg ? "You wake up." : You_can_move_again;
+    gn.nomovemsg = wakeup_msg ? "あなたは目を覚ました." : You_can_move_again;
 }
 
 /* Attach an egg hatch timeout to the given egg.
