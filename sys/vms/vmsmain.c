@@ -494,7 +494,7 @@ wd_message(void)
         pline("Entering explore/discovery mode instead.");
         wizard = 0, discover = 1; /* (paranoia) */
     } else if (discover)
-        You("are in non-scoring explore/discovery mode.");
+        You("スコアが記録されない探索・探検モードだった。");
 }
 
 unsigned long
