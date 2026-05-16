@@ -32,19 +32,44 @@ git checkout -b upstream-base upstream/NetHack-5.0
 ```
 
 ### 同期手順
-本家の更新を `master` ブランチに取り込む手順です。
-1. **本家の最新を取得**:
-   ```bash
-   git checkout upstream-base
-   git pull upstream NetHack-5.0
-   ```
-2. **メインブランチに統合**:
-   ```bash
-   git checkout master
-   git merge upstream-base
-   ```
-3. **競合の解決とビルド確認**:
-   コンフリクトが発生した場合は慎重に解消し、必ずビルドと動作確認を行ってください。
+
+#### 1. 初期設定（初回のみ）
+本家のリポジトリを登録し、同期用のベースブランチを作成します。
+```powershell
+# 1. 本家リポジトリを upstream として登録
+git remote add upstream https://github.com/NetHack/NetHack.git
+
+# 2. 最新情報を取得
+git fetch upstream
+
+# 3. 本家の NetHack-5.0 ブランチをベースにしたブランチを作成
+git checkout -b upstream-base upstream/NetHack-5.0
+```
+
+#### 2. 定期的な同期（2回目以降）
+本家の更新を `main` ブランチに取り込むコマンド手順です。
+```powershell
+# 1. upstream-base を最新にする
+git switch upstream-base
+git pull upstream NetHack-5.0
+
+# 2. main に統合する
+git switch main
+git merge upstream-base
+
+# 3. コンフリクトが発生した場合の処理（VS Code等で解決後）
+# 競合箇所を手動修正し、全解決後に以下を実行
+# git add は個別に実行する（例: git add dat/history）
+git add <解決したファイル名>
+git commit -m "Merge branch 'upstream-base' into main"
+
+# 4. 確認とプッシュ
+# ビルドを行い、動作確認後に実行
+git push origin main
+
+# （補足）マージを中断して作業前の状態に戻す場合
+git merge --abort
+```
 
 ## 構成
 

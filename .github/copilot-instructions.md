@@ -85,7 +85,42 @@ boulder と rock を同じ訳語にしない。
 
 ## 11. アップストリーム同期
 
-- NetHack 本家（https://github.com/NetHack/NetHack）の更新を取り込む際は、直接 `master` に取り込まず、必ず `upstream-base` ブランチを経由すること。
+- NetHack 本家（https://github.com/NetHack/NetHack）の更新を取り込む際は、直接 `main` に取り込まず、必ず `upstream-base` ブランチを経由すること。
 - `upstream-base` は本家のコードを忠実に保持する。日本語版独自の修正（翻訳や表示改善）をこのブランチにコミットしてはならない。
-- `upstream-base` を `master` にマージする際に発生したコンフリクトは、日本語化の意図を汲みつつ、本家のロジック変更と整合性が取れるように解決する。
-- 同期後のビルドおよび動作確認を徹底する。
+
+### 11.1 初期設定（初回のみ）
+```powershell
+# 1. 本家リポジトリを upstream として登録
+git remote add upstream https://github.com/NetHack/NetHack.git
+
+# 2. 最新情報を取得
+git fetch upstream
+
+# 3. 本家の NetHack-5.0 ブランチをベースにしたブランチを作成
+git checkout -b upstream-base upstream/NetHack-5.0
+```
+
+### 11.2 定期的な同期（2回目以降）
+```powershell
+# 1. upstream-base を最新にする
+git switch upstream-base
+git pull upstream NetHack-5.0
+
+# 2. main に統合する
+git switch main
+git merge upstream-base
+
+# 3. コンフリクトが発生した場合の処理（VS Code等で解決後）
+# 競合箇所を手動修正し、全解決後に以下を実行
+# git add は個別に実行する（例: git add dat/history）
+git add <解決したファイル名>
+git commit -m "Merge branch 'upstream-base' into main"
+
+# 4. 確認とプッシュ
+# ビルドを行い、動作確認後に実行
+git push origin main
+
+# （補足）マージを中断して作業前の状態に戻す場合
+git merge --abort
+```
+- 同期後のビルドおよび動作確認を徹底すること。
