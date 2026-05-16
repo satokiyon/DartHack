@@ -578,8 +578,10 @@ pick_lock(
             if (is_drawbridge_wall(cc.x, cc.y) >= 0)
                 You("跳ね橋に鍵がないことを%s.",
                     Blind ? "感じた" : "見た");
+            else if (Blind)
+                You("そこに扉がないことを感じた.");
             else
-                You("そこに扉がないことを%s.", Blind ? "感じた" : "見た");
+                You("そこに扉が見当たらなかった.");
             return res;
         }
         switch (door->doormask) {
@@ -831,8 +833,10 @@ doopen_indir(coordxy x, coordxy y)
         else if (container_at(cc.x, cc.y, TRUE))
             pline("向こうに漁れそうなものが%s.",
                   Blind ? "ある気がした" : "あるように見えた");
+        else if (Blind)
+            You("そこに扉がないことを感じた.");
         else
-            You("そこに扉がないことを%s.", Blind ? "感じた" : "見た");
+            You("そこに扉が見当たらなかった.");
         return res;
     }
 
@@ -996,7 +1000,10 @@ doclose(void)
             There("跳ね橋を閉める明白な方法はなかった.");
         else {
  nodoor:
-            You("そこに扉がないことを%s.", Blind ? "感じた" : "見た");
+            if (Blind)
+                You("そこに扉がないことを感じた.");
+            else
+                You("そこに扉が見当たらなかった.");
         }
         return res;
     }

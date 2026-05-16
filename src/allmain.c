@@ -575,7 +575,7 @@ maybe_do_tutorial(void)
         assign_level(&u.ucamefrom, &u.uz);
         iflags.nofollowers = TRUE;
         schedule_goto(&sp->dlevel, UTOTYPE_NONE,
-                      "チュートリアルを開始した.", (char *) 0);
+                      "チュートリアルに入った.", (char *) 0);
         deferred_goto();
         vision_recalc(0);
         docrt();
