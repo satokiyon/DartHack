@@ -598,7 +598,7 @@ mattacku(struct monst *mtmp)
 
             obj = which_armor(mtmp, WORN_HELMET);
             if (hard_helmet(obj)) {
-                Your("blow glances off %s %s.", s_suffix(mon_nam(mtmp)),
+                Your("攻撃が%sの%sかろだった。", s_suffix(mon_nam(mtmp)),
                      helm_simple_name(obj));
             } else {
                 if (3 + find_mac(mtmp) <= rnd(20)) {
@@ -1474,7 +1474,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
                 long was_blinded = Blinded;
 
                 if (!Blinded)
-                    You_cant("see in here!");
+                    You_cant("ここでは見えなかった!");
                 make_blinded((long) tmp, FALSE);
                 if (!was_blinded && !Blind)
                     Your1(vision_clears);

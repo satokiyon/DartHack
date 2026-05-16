@@ -914,13 +914,13 @@ destroy_drawbridge(coordxy x, coordxy y)
                 pline_The("portcullis of the drawbridge falls into the %s!",
                           lava ? hliquid("lava") : "moat");
             else
-                You_hear("大きな*SPLASH*音が聞こえた!");  /* Deaf-aware */
+                You_hear("大きな水しぶきの音が聞こえた!");  /* Deaf-aware */
         } else {
             if (cansee(x, y) || u_at(x, y))
                 pline_The("drawbridge collapses into the %s!",
                           lava ? hliquid("lava") : "moat");
             else
-                You_hear("大きな*SPLASH*音が聞こえた!");  /* Deaf-aware */
+                You_hear("大きな水しぶきの音が聞こえた!");  /* Deaf-aware */
         }
         lev1->typ = lava ? LAVAPOOL : MOAT;
         lev1->drawbridgemask = 0;
@@ -934,7 +934,7 @@ destroy_drawbridge(coordxy x, coordxy y)
         if (cansee(x, y) || u_at(x, y))
             pline_The("drawbridge disintegrates!");
         else
-            You_hear("大きな*CRASH*音が聞こえた!");  /* Deaf-aware */
+            You_hear("大きな衝突音が聞こえた!");  /* Deaf-aware */
         lev1->typ = ((lev1->drawbridgemask & DB_ICE) ? ICE : ROOM);
         lev1->icedpool = ((lev1->drawbridgemask & DB_ICE) ? ICED_MOAT : 0);
     }

@@ -85,7 +85,7 @@ use_saddle(struct obj *otmp)
         return ECMD_TIME;
     }
     if (!can_saddle(mtmp)) {
-        You_cant("saddle such a creature.");
+        You_cant("そのような生物には鞍を置くことはできなかった。");
         return ECMD_TIME;
     }
 
@@ -246,7 +246,7 @@ mount_steed(
         return (FALSE);
     }
     if (!force && (near_capacity() > SLT_ENCUMBER)) {
-        You_cant("do that while carrying so much stuff.");
+        You_cant("そんなに荷物を運びながらではそれはできなかった。");
         return (FALSE);
     }
 
@@ -300,7 +300,7 @@ mount_steed(
     if (mtmp->mtrapped) {
         struct trap *t = t_at(mtmp->mx, mtmp->my);
 
-        You_cant("mount %s while %s's trapped in %s.", mon_nam(mtmp),
+        You_cant("%sに乗ることはできなかった。%sが%sに引っ掛かっている。", mon_nam(mtmp),
                  mhe(mtmp), an(trapname(t->ttyp, FALSE)));
         return (FALSE);
     }
@@ -315,12 +315,12 @@ mount_steed(
         return (FALSE);
     }
     if (!force && Underwater && !is_swimmer(ptr)) {
-        You_cant("ride that creature while under %s.",
+        You_cant("その生物に%sの中では乗ることはできなかった。",
                  hliquid("water"));
         return (FALSE);
     }
     if (!can_saddle(mtmp) || !can_ride(mtmp)) {
-        You_cant("ride such a creature.");
+        You_cant("そのような生物には乗ることはできなかった。");
         return FALSE;
     }
 

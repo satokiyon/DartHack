@@ -1179,11 +1179,11 @@ query_objlist(const char *qstr,        /* query string */
                 /* this isn't actually possible; fake item representing
                    hero is only included for look here (':'), not pickup,
                    and that's PICK_NONE so we can't get here from there */
-                You_cant("pick yourself up!");
+                You_cant("自分自身を拾い上げることはできなかった!");
                 continue;
             }
             if (engulfer_minvent && curr->owornmask != 0L) {
-                You_cant("pick %s up.", ysimple_name(curr));
+                You_cant("%sを拾い上げることはできなかった。", ysimple_name(curr));
                 continue;
             }
             if (mi->count == -1L || mi->count > curr->quan)
@@ -1821,7 +1821,7 @@ pickup_object(
         return 0;
     } else if (obj->where == OBJ_MINVENT && obj->owornmask != 0L
                && engulfing_u(obj->ocarry)) {
-        You_cant("pick %s up.", ysimple_name(obj));
+        You_cant("%sを拾い上げることはできなかった。", ysimple_name(obj));
         return 0;
     } else if (obj->oartifact && !touch_artifact(obj, &gy.youmonst)) {
         return 0;
@@ -2325,8 +2325,8 @@ doloot_core(void)
         if (!looted_mon) {
             if (!underfoot && container_at(cc.x, cc.y, FALSE)) {
                 if (mtmp) {
-                    You_cant("loot anything %sthere with %s in the way.",
-                             prev_inquiry ? "else " : "", mon_nam(mtmp));
+                    You_cant("%sが邪魔して、%sを奪うことはできなかった。",
+                             mon_nam(mtmp), prev_inquiry ? "他を" : "");
                     return (timepassed ? ECMD_TIME : ECMD_OK);
                 } else {
                     You("have to be at a container to loot it.");
@@ -2447,7 +2447,7 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
                          SUPPRESS_SADDLE, FALSE));
         if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y') {
             if (nolimbs(gy.youmonst.data)) {
-                You_cant("do that without limbs."); /* not body_part(HAND) */
+                You_cant("手足がなくてはそれはできなかった。"); /* not body_part(HAND) */
                 return 0;
             }
             if (otmp->cursed) {

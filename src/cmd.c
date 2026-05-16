@@ -480,7 +480,7 @@ can_do_extcmd(const struct ext_func_tab *extcmd)
         pline(unavailcmd, extcmd->ef_txt);
         return FALSE;
     } else if (u.uburied && !(ecflags & IFBURIED)) {
-        You_cant("do that while you are buried!");
+        You_cant("埋まっている間はそれはできなかった!");
         return FALSE;
     } else if (iflags.debug_fuzzer && (ecflags & NOFUZZERCMD)) {
         return FALSE;
@@ -3779,7 +3779,7 @@ rhack(int key)
                              & (DOMOVE_RUSH | DOMOVE_WALK)) != 0L)
                            && !svc.context.travel && !dxdy_moveok()) {
                     /* trying to move diagonally as a grid bug */
-                    You_cant("get there from here...");
+                    You_cant("そこへはそこからは行けなかった...");
                     reset_cmd_vars(TRUE);
                     return;
                 } else if ((gd.domove_attempting & DOMOVE_WALK) != 0L) {
@@ -4110,7 +4110,7 @@ getdir(const char *s)
         }
         return 0;
     } else if (is_mov && !dxdy_moveok()) {
-        You_cant("orient yourself that direction.");
+        You_cant("その方向に向きを定めることはできなかった。");
         return 0;
     }
     if (!u.dz)

@@ -1395,7 +1395,7 @@ uchangealign(
         u.ualign.type = (aligntyp) newalign;
         if (reason == A_CG_HELM_ON) {
             adjalign(-7); /* for abuse -- record will be cleared shortly */
-            Your("mind oscillates %s.", Hallucination ? "wildly" : "briefly");
+            Your("耳が%sに裏むきくっ呻なった。", Hallucination ? "髪を立てて" : "一瞬");
             make_confused(rn1(2, 3), FALSE);
             if (Is_astralevel(&u.uz) || ((unsigned) rn2(50) < u.ualign.abuse))
                 summon_furies(Is_astralevel(&u.uz) ? 0 : 1);
@@ -1403,9 +1403,9 @@ uchangealign(
             livelog_printf(LL_ALIGNMENT, "used a helm to turn %s",
                            aligns[1 - newalign].adj);
         } else if (reason == A_CG_HELM_OFF) {
-            Your("mind is %s.", Hallucination
-                                    ? "much of a muchness"
-                                    : "back in sync with your body");
+            Your("思慮が%s。", Hallucination
+                                    ? "変不長たり"
+                                    : "感覚が戻った");
         }
     }
     if (u.ualign.type != oldalign) {

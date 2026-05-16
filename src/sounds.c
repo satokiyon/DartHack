@@ -1266,7 +1266,7 @@ dochat(void)
         return ECMD_OK;
     }
     if (Strangled) {
-        You_cant("speak.  You're choking!");
+        You_cant("話すことはできなかった。喉が詰まっている!");
         return ECMD_OK;
     }
     if (u.uswallow) {

@@ -467,7 +467,7 @@ dosit(void)
         if (u.utrap) {
             exercise(A_WIS, FALSE); /* you're getting stuck longer */
             if (u.utraptype == TT_BEARTRAP) {
-                You_cant("sit down with your %s in the bear trap.",
+                You_cant("熊の罠に%sが引っ掛かっているので座ることはできなかった。",
                          body_part(FOOT));
                 u.utrap++;
             } else if (u.utraptype == TT_PIT) {
@@ -492,7 +492,7 @@ dosit(void)
                        KILLED_BY); /* lava damage */
             } else if (u.utraptype == TT_INFLOOR
                        || u.utraptype == TT_BURIEDBALL) {
-                You_cant("maneuver to sit!");
+                You_cant("座る体勢をとることはできなかった!");
                 u.utrap++;
             }
         } else {

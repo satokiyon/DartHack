@@ -765,7 +765,7 @@ do_play_instrument(struct obj *instr)
     boolean ok;
 
     if (Underwater) {
-        You_cant("play music underwater!");
+        You_cant("水中では音楽を奏でられなかった!");
         return ECMD_OK;
     } else if ((instr->otyp == WOODEN_FLUTE || instr->otyp == MAGIC_FLUTE
                 || instr->otyp == TOOLED_HORN || instr->otyp == FROST_HORN

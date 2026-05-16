@@ -1127,7 +1127,7 @@ hatch_egg(anything *arg, long timeout)
         case OBJ_FLOOR:
             if (cansee_hatchspot) {
                 knows_egg = TRUE;
-                You_see("%s hatch.", monnambuf);
+                You_see("%sがかえるのを見た.", monnambuf);
                 redraw = TRUE; /* update egg's map location */
             }
             break;
@@ -1146,7 +1146,7 @@ hatch_egg(anything *arg, long timeout)
                 } else {
                     Strcpy(carriedby, "thin air");
                 }
-                You_see("%s %s out of %s!", monnambuf,
+                You_see("%sが%sから%sへ出ているのを見た!", monnambuf,
                         locomotion(mon->data, "drop"), carriedby);
             }
             break;
@@ -1347,7 +1347,7 @@ see_lamp_flicker(struct obj *obj, const char *tailer)
         pline("%s flickers%s.", Yname2(obj), tailer);
         break;
     case OBJ_FLOOR:
-        You_see("%s flicker%s.", an(xname(obj)), tailer);
+        You_see("%sが%s点滅している.", an(xname(obj)), tailer);
         break;
     }
 }
@@ -1364,7 +1364,7 @@ lantern_message(struct obj *obj)
             pline("Batteries have not been invented yet.");
         break;
     case OBJ_FLOOR:
-        You_see("a lantern getting dim.");
+        You_see("ランプが暗くなっているのを見た.");
         break;
     case OBJ_MINVENT:
         pline("%s lantern is getting dim.", s_suffix(Monnam(obj->ocarry)));
@@ -1449,7 +1449,7 @@ burn_object(anything *arg, long timeout)
                 pline("%spotion of oil has burnt away.", whose);
                 break;
             case OBJ_FLOOR:
-                You_see("a burning potion of oil go out.");
+                You_see("燃えている油のポーションが消えるのを見た.");
                 need_newsym = TRUE;
                 break;
             }
@@ -1494,7 +1494,7 @@ burn_object(anything *arg, long timeout)
                         pline("%s seems about to go out.", Yname2(obj));
                         break;
                     case OBJ_FLOOR:
-                        You_see("%s about to go out.", an(xname(obj)));
+                        You_see("%sが消える寸前のを見た.", an(xname(obj)));
                         break;
                     }
                 }
@@ -1517,9 +1517,9 @@ burn_object(anything *arg, long timeout)
                     break;
                 case OBJ_FLOOR:
                     if (obj->otyp == BRASS_LANTERN)
-                        You_see("a lantern run out of power.");
+                        You_see("ランプの電池が切れるのを見た.");
                     else
-                        You_see("%s go out.", an(xname(obj)));
+                        You_see("%sが消えるのを見た.", an(xname(obj)));
                     break;
                 }
             }
@@ -1554,10 +1554,10 @@ burn_object(anything *arg, long timeout)
                           many ? "s are" : " is");
                     break;
                 case OBJ_FLOOR:
-                    You_see("%scandle%s getting short.",
-                            menorah ? "a candelabrum's " : many ? "some "
-                                                                : "a ",
-                            many ? "s" : "");
+                    You_see("%sのろうそく%sが短くなっているのを見た.",
+                            menorah ? "ろうそく台の" : many ? "いくつかの"
+                                                                : "一つの",
+                            many ? "たち" : "");
                     break;
                 }
             break;
@@ -1572,10 +1572,10 @@ burn_object(anything *arg, long timeout)
                           many ? "s" : "", many ? "" : "s");
                     break;
                 case OBJ_FLOOR:
-                    You_see("%scandle%s flame%s flicker low!",
-                            menorah ? "a candelabrum's " : many ? "some "
-                                                                : "a ",
-                            many ? "s'" : "'s", many ? "s" : "");
+                    You_see("%sのろうそく%sの炎%sが弱々しく点滅しているのを見た!",
+                            menorah ? "ろうそく台の" : many ? "いくつかの"
+                                                                : "一つの",
+                            many ? "たちの" : "の", many ? "たち" : "");
                     break;
                 }
             break;
@@ -1594,8 +1594,8 @@ burn_object(anything *arg, long timeout)
                               many ? "s die" : " dies");
                         break;
                     case OBJ_FLOOR:
-                        You_see("a candelabrum's flame%s die.",
-                                many ? "s" : "");
+                        You_see("ろうそく台の炎%sが消えるのを見た.",
+                                many ? "たち" : "");
                         break;
                     }
                 } else {
@@ -1614,7 +1614,7 @@ burn_object(anything *arg, long timeout)
                           You see some wax candles consumed!
                           You see a wax candle consumed!
                          */
-                        You_see("%s%s consumed!", many ? "some " : "",
+                        You_see("%s%sが燃え尽きるのを見た!", many ? "いくつかの" : "",
                                 many ? xname(obj) : an(xname(obj)));
                         need_newsym = TRUE;
                         break;
