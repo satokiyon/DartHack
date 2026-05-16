@@ -210,7 +210,7 @@ dowrite(struct obj *pen)
 
     if (i == SCR_BLANK_PAPER || i == SPE_BLANK_PAPER) {
         You_cant("write that!");
-        pline("It's obscene!");
+        pline("不劬的だ!");
         return ECMD_TIME;
     } else if (i == SPE_NOVEL) {
         boolean fanfic = !rn2(3), tearup = !rn2(3);

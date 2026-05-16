@@ -2280,7 +2280,7 @@ bhito(struct obj *obj, struct obj *otmp)
                 if (cansee(obj->ox, obj->oy))
                     pline_The("巨大な岩は砕け散った.");
                 else
-                    You_hear("崩れる音がした.");
+                    You_hear("崩れる音が聞こえた.");
                 fracture_rock(obj);
             } else if (obj->otyp == STATUE) {
                 if (break_statue(obj)) {
@@ -2290,7 +2290,7 @@ bhito(struct obj *obj, struct obj *otmp)
                         else
                             pline_The("像は砕け散った.");
                     } else
-                        You_hear("崩れる音がした.");
+                        You_hear("崩れる音が聞こえた.");
                 }
             } else {
                 int oox = obj->ox, ooy = obj->oy;
@@ -2368,9 +2368,9 @@ bhito(struct obj *obj, struct obj *otmp)
                         if (Role_if(PM_HEALER) && !Deaf
                             && !nonliving(&mons[corpsenm])) {
                             if (!Hallucination)
-                                You_hear("%sがよみがえるのを聞いた.", corpsname);
+                                You_hear("%sがよみがえるのが聞こえた.", corpsname);
                             else
-                                You_hear("除細動器の音を聞いた.");
+                                You_hear("除細動器の音が聞こえた.");
                             learn_it = by_u ? TRUE : gz.zap_oseen;
                         }
                         if (canspotmon(mtmp))
@@ -3947,7 +3947,7 @@ bhit(
                     pline("%sは水面を跳ねた%s.", Yname2(obj),
                           skipcount ? " (再び)" : "");
                 else
-                    You_hear("%sが水面を跳ねる音を聞いた.", yname(obj));
+                    You_hear("%sが水面を跳ねる音が聞こえた.", yname(obj));
                 skipcount++;
             } else if (skiprange_start > skiprange_end + 1) {
                 --skiprange_start;
@@ -5244,7 +5244,7 @@ zap_over_floor(
                     pline_The("%sは一瞬凍りついた.",
                               hliquid(lavawall ? "溶岩" : "水"));
                 else
-                    You_hear("ぱちぱちという小さな音がした.");
+                    You_hear("ぱちぱちという小さな音が聞こえた.");
                 rangemod -= 1000; /* stop */
             } else {
                 char buf[BUFSZ];
@@ -5284,7 +5284,7 @@ zap_over_floor(
                         Norep("%sは凍りついた.", hliquid("水"));
                     newsym(x, y);
                 } else if (!lava) {
-                    You_hear("ぱちぱちという音がした.");
+                    You_hear("ぱちぱちという小さな音が聞こえた.");
                 }
                 if (u_at(x, y)) {
                     if (u.uinwater) { /* not just `if (Underwater)' */

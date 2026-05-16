@@ -188,7 +188,7 @@ check_strangling(boolean on)
         if (Strangled && !can_be_strangled(&gy.youmonst)) {
             Strangled = 0L;
             disp.botl = TRUE;
-            You("are no longer being strangled.");
+            You("もう綒澠騙けた。");
         }
     }
 }
@@ -741,7 +741,7 @@ polymon(int mntmp)
     int mlvl, newMaxStr;
 
     if (svm.mvitals[mntmp].mvflags & G_GENOD) { /* allow G_EXTINCT */
-        You_feel("rather %s-ish.",
+        You_feel("少し%sっぽい気がした.",
                  pmname(&mons[mntmp], flags.female ? FEMALE : MALE));
         exercise(A_WIS, TRUE);
         return 0;

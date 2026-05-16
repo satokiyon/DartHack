@@ -3826,7 +3826,7 @@ pudding_merge_message(struct obj *otmp, struct obj *otmp2)
     if ((!Blind && visible) || inpack) {
         if (Hallucination) {
             if (onfloor) {
-                You_see("parts of the floor melting!");
+                You_see("床の一部が溶けるのを見た!");
             } else if (inpack) {
                 Your("pack reaches out and grabs something!");
             }
@@ -3844,7 +3844,7 @@ pudding_merge_message(struct obj *otmp, struct obj *otmp2)
         }
     } else {
         Soundeffect(se_faint_sloshing, 25);
-        You_hear("a faint sloshing sound.");
+        You_hear("かすかな水音が聞こえた.");
     }
 }
 

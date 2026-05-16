@@ -243,7 +243,7 @@ summon_minion(aligntyp alignment, boolean talk)
             if (!Deaf)
                 pline_The("voice of %s booms:", align_gname(alignment));
             else
-                You_feel("%s booming voice:",
+                You_feel("%sの轟く声を感じた:",
                          s_suffix(align_gname(alignment)));
             SetVoice(mon, 0, 80, 0);
             verbalize("Thou shalt pay for thine indiscretion!");
@@ -268,7 +268,7 @@ demon_talk(struct monst *mtmp)
         if (canspotmon(mtmp))
             pline("%s looks very angry.", Amonnam(mtmp));
         else
-            You_feel("tension building.");
+            You_feel("緊張が高まるのを感じた.");
         mtmp->mpeaceful = mtmp->mtame = 0;
         set_malign(mtmp);
         newsym(mtmp->mx, mtmp->my);
@@ -505,18 +505,18 @@ gain_guardian_angel(void)
                      message will be heard even if that fails) */
     if (Conflict) {
        if (!Deaf)
-            pline("A voice booms:");
+            pline("轟く声が響いた:");
         else
-            You_feel("a booming voice:");
+            You_feel("轟く声を感じた:");
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("Thy desire for conflict shall be fulfilled!");
         /* send in some hostile angels instead */
         lose_guardian_angel((struct monst *) 0);
     } else if (u.ualign.record > 8) { /* fervent */
         if (!Deaf)
-            pline("A voice whispers:");
+            pline("やわらかな声がささやいた:");
         else
-            You_feel("a soft voice:");
+            You_feel("やわらかな声を感じた:");
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("Thou hast been worthy of me!");
         mm.x = u.ux;
@@ -540,9 +540,9 @@ gain_guardian_angel(void)
             /* for 'hilite_pet'; after making tame, before next message */
             newsym(mtmp->mx, mtmp->my);
             if (!Blind)
-                pline("An angel appears near you.");
+                pline("あなたの近くに天使が現れた.");
             else
-                You_feel("the presence of a friendly angel near you.");
+                You_feel("近くに友好的な天使の気配を感じた.");
             /* make him strong enough vs. endgame foes */
             mtmp->m_lev = rn1(8, 15);
             mtmp->mhp = mtmp->mhpmax =

@@ -68,15 +68,15 @@ beehive_mon_sound(struct monst *mtmp)
         switch (rn2(2) + hallu) {
         case 0:
             Soundeffect(se_low_buzzing, 30);
-            You_hear("a low buzzing.");
+            You_hear("低いうなり音が聞こえた.");
             break;
         case 1:
             Soundeffect(se_angry_drone, 100);
-            You_hear("an angry drone.");
+            You_hear("怒った羽音が聞こえた.");
             break;
         case 2:
             Soundeffect(se_bees, 100);
-            You_hear("bees in your %sbonnet!",
+            You_hear("%s帽子の中で蜂が騒いでいる音が聞こえた!",
                      uarmh ? "" : "(nonexistent) ");
             break;
         }
@@ -254,11 +254,11 @@ dosounds(void)
                     != (ROOM_INDEX(sroom) + ROOMOFFSET)) {
                     if (gold_in_vault) {
                         You_hear(!hallu
-                                     ? "someone counting gold coins."
-                                     : "the quarterback calling the play.");
+                                     ? "誰かが金貨を数える音が聞こえた."
+                                     : "クォーターバックがプレーを指示する声が聞こえた.");
                     } else {
                         Soundeffect(se_someone_searching, 30);
-                        You_hear("someone searching.");
+                        You_hear("誰かが探し回る音が聞こえた.");
                     }
                     break;
                 }
@@ -267,10 +267,10 @@ dosounds(void)
                 /*FALLTHRU*/
             case 0:
                 Soundeffect(se_guards_footsteps, 30);
-                You_hear("the footsteps of a guard on patrol.");
+                You_hear("巡回中の衛兵の足音が聞こえた.");
                 break;
             case 2:
-                You_hear("Ebenezer Scrooge!");
+                You_hear("エベネーザ・スクルージ!");
                 break;
             }
         return;
@@ -1349,7 +1349,7 @@ dochat(void)
                    already been mapped as a wall */
                 ;
             } else if (!Hallucination) {
-                pline("It's like talking to a wall.");
+                pline("壁に話をしかけているようなものだ.");
             } else {
                 static const char *const walltalk[] = {
                     "gripes about its job.",

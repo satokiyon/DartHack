@@ -390,7 +390,7 @@ fix_worst_trouble(int trouble)
             Your("amulet vanishes!");
             useup(uamul);
         }
-        You("can breathe again.");
+        You("また息ができるようになった.");
         Strangled = 0;
         disp.botl = TRUE;
         break;
@@ -411,7 +411,7 @@ fix_worst_trouble(int trouble)
         disp.botl = TRUE;
         break;
     case TROUBLE_SICK:
-        You_feel("better.");
+        You_feel("気分がよくなった.");
         make_sick(0L, (char *) 0, FALSE, SICK_ALL);
         break;
     case TROUBLE_REGION:
@@ -422,7 +422,7 @@ fix_worst_trouble(int trouble)
         /* "fix all troubles" will keep trying if hero has
            5 or less hit points, so make sure they're always
            boosted to be more than that */
-        You_feel("much better.");
+        You_feel("ずっと気分がよくなった.");
         if (Upolyd) {
             maxhp = u.mhmax + rnd(5);
             setuhpmax(max(maxhp, 5 + 1), FALSE); /* acts as setmhmax() */
@@ -439,8 +439,8 @@ fix_worst_trouble(int trouble)
         break;
     case TROUBLE_COLLAPSING:
         /* override Fixed_abil; uncurse that if feasible */
-        You_feel("%sstronger.",
-                 (AMAX(A_STR) - ABASE(A_STR) > 6) ? "much " : "");
+        You_feel("%s力がみなぎった.",
+                 (AMAX(A_STR) - ABASE(A_STR) > 6) ? "とても" : "");
         ABASE(A_STR) = AMAX(A_STR);
         disp.botl = TRUE;
         if (Fixed_abil) {
@@ -473,7 +473,7 @@ fix_worst_trouble(int trouble)
             set_itimeout(&HPasses_walls, (long) (d(4, 4) + 4)); /* 8..20 */
             /* how else could you move between packed rocks or among
                lattice forming "solid" rock? */
-            You_feel("much slimmer.");
+                You_feel("体がずっと軽くなった.");
         }
         break;
     case TROUBLE_CURSED_LEVITATION:
@@ -543,7 +543,7 @@ fix_worst_trouble(int trouble)
         if (Hallucination)
             pline("タンクの中に虎がいた.");
         else
-            You_feel("in good health again.");
+            You_feel("再び健康になった気がした.");
         for (i = 0; i < A_MAX; i++) {
             if (ABASE(i) < AMAX(i)) {
                 ABASE(i) = AMAX(i);
@@ -725,8 +725,8 @@ angrygods(aligntyp resp_god)
     switch (rn2(maxanger)) {
     case 0:
     case 1:
-        You_feel("that %s is %s.", align_gname(resp_god),
-                 Hallucination ? "bummed" : "displeased");
+        You_feel("%sが%sと感じた.", align_gname(resp_god),
+                 Hallucination ? "しょんぼりしている" : "不機嫌だ");
         break;
     case 2:
     case 3:
@@ -985,7 +985,7 @@ gcrownu(void)
         unrestrict_weapon_skill(weapon_type(obj));
     } else if (class_gift == STRANGE_OBJECT) {
         /* opportunity knocked, but there was nobody home... */
-        You_feel("unworthy.");
+        You_feel("自分にはふさわしくないと感じた.");
     }
     update_inventory();
 
@@ -1074,12 +1074,12 @@ pleased(aligntyp g_align)
     int trouble = in_trouble(); /* what's your worst difficulty? */
     int pat_on_head = 0, kick_on_butt;
 
-    You_feel("that %s is %s.", align_gname(g_align),
+    You_feel("%sが%sと感じた.", align_gname(g_align),
              (u.ualign.record >= DEVOUT)
-                 ? Hallucination ? "pleased as punch" : "well-pleased"
+                 ? Hallucination ? "上機嫌だ" : "大いに満足している"
                  : (u.ualign.record >= STRIDENT)
-                       ? Hallucination ? "ticklish" : "pleased"
-                       : Hallucination ? "full" : "satisfied");
+                       ? Hallucination ? "くすぐったそうだ" : "満足している"
+                       : Hallucination ? "お腹いっぱいだ" : "満ち足りている");
 
     /* not your deity */
     if (on_altar() && gp.p_aligntyp != u.ualign.type) {
@@ -1183,7 +1183,7 @@ pleased(aligntyp g_align)
                               hcolor(NH_AMBER), repair_buf);
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
                     } else
-                        You_feel("the power of %s over %s.", u_gname(),
+                        You_feel("%sの力が%sに宿るのを感じた.", u_gname(),
                                  yname(uwep));
                     uncurse(uwep);
                     uwep->bknown = 1; /* ok to bypass set_bknown() */
@@ -1195,7 +1195,7 @@ pleased(aligntyp g_align)
                               an(hcolor(NH_LIGHT_BLUE)), repair_buf);
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
                     } else
-                        You_feel("the blessing of %s over %s.", u_gname(),
+                        You_feel("%sの祝福が%sに宿るのを感じた.", u_gname(),
                                  yname(uwep));
                     bless(uwep);
                     uwep->bknown = 1; /* ok to bypass set_bknown() */
@@ -1234,7 +1234,7 @@ pleased(aligntyp g_align)
                     break;
                 } else if (u.uevent.uheard_tune < 2) {
                     Soundeffect(se_divine_music, 50);
-                    You_hear("a divine music...");
+                    You_hear("神々しい音楽が聞こえた...");
                     pline("It sounds like:  \"%s\".", svt.tune);
                     u.uevent.uheard_tune++;
                     record_achievement(ACH_TUNE);
@@ -1245,7 +1245,7 @@ pleased(aligntyp g_align)
             /*FALLTHRU*/
         case 2:
             if (!Blind)
-                You("are surrounded by %s glow.", an(hcolor(NH_GOLDEN)));
+                You("%s光に包まれた.", an(hcolor(NH_GOLDEN)));
             /* if any levels have been lost (and not yet regained),
                treat this effect like blessed full healing */
             if (u.ulevel < u.ulevelmax) {
@@ -1285,9 +1285,9 @@ pleased(aligntyp g_align)
             int any = 0;
 
             if (Blind)
-                You_feel("the power of %s.", u_gname());
+                You_feel("%sの力を感じた.", u_gname());
             else
-                You("are surrounded by %s aura.", an(hcolor(NH_LIGHT_BLUE)));
+                You("%sオーラに包まれた.", an(hcolor(NH_LIGHT_BLUE)));
             for (otmp = gi.invent; otmp; otmp = nextobj) {
                 nextobj = otmp->nobj;
                 if (otmp->cursed
@@ -1489,12 +1489,12 @@ offer_too_soon(aligntyp altaralign)
         return;
     }
     You_feel("%s.", Hallucination
-                    ? "homesick"
+                    ? "望郷の念にかられた"
                     /* if on track, give a big hint */
                     : (altaralign == u.ualign.type)
-                        ? "an urge to return to the surface"
+                        ? "地上へ戻りたい衝動"
                         /* else headed towards celestial disgrace */
-                        : "ashamed");
+                        : "恥ずかしくなった");
 }
 
 void
@@ -1512,7 +1512,7 @@ desecrate_altar(boolean highaltar, aligntyp altaralign)
         adjalign(-20);
         u.ugangr += 5;
     }
-    You_feel("the air around you grow charged...");
+    You_feel("周囲の空気が張り詰めていくのを感じた...");
     pline("Suddenly, you realize that %s has noticed you...",
           align_gname(altaralign));
     Sprintf(gvbuf, "So, mortal!  You dare desecrate my %s!",
@@ -1609,7 +1609,7 @@ offer_fake_amulet(
         return;
     }
     Soundeffect(se_thunderclap, 100);
-    You_hear("a nearby thunderclap.");
+    You_hear("近くで雷鳴の響きが聞こえた.");
     if (!otmp->known) {
         You("realize you have made a %s.",
             Hallucination ? "boo-boo" : "mistake");
@@ -1662,7 +1662,7 @@ offer_different_alignment_altar(
             struct monst *pri;
             boolean shrine;
 
-            You_feel("the power of %s increase.", u_gname());
+            You_feel("%sの力が増したのを感じた.", u_gname());
             exercise(A_WIS, TRUE);
             change_luck(1);
             shrine = on_shrine();
@@ -1754,7 +1754,7 @@ sacrifice_your_race(
             You("have summoned %s!", dbuf);
             if (sgn(u.ualign.type) == sgn(dmon->data->maligntyp))
                 dmon->mpeaceful = TRUE;
-            You("are terrified, and unable to move.");
+            You("遁0下って動けなくなった.");
             nomul(-3);
             gm.multi_reason = "being terrified of a demon";
             gn.nomovemsg = 0;
@@ -1933,9 +1933,9 @@ eval_offering(struct obj *otmp, aligntyp altaralign)
              * it's a very good action.
              */
             if (u.ualign.record < ALIGNLIM)
-                You_feel("appropriately %s.", align_str(u.ualign.type));
+                You_feel("%sであることがふさわしいと感じた.", align_str(u.ualign.type));
             else
-                You_feel("you are thoroughly on the right path.");
+                You_feel("正しい道をしっかり歩んでいると感じた.");
             adjalign(5);
             value += 3;
         } else if (unicalign == u.ualign.type) {
@@ -2061,7 +2061,7 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
         if (value > -u.ualign.record)
             value = -u.ualign.record;
         adjalign(value);
-        You_feel("partially absolved.");
+        You_feel("いくらか赦された気がした.");
     } else if (u.ublesscnt > 0) {
         int saved_cnt = u.ublesscnt;
         u.ublesscnt -= ((value * (u.ualign.type == A_CHAOTIC ? 500 : 300))
@@ -2296,7 +2296,7 @@ prayer_done(void) /* M. Stephenson (1.0.3b) */
                  (alignment == A_LAWFUL)
                     ? "Vile creature, thou durst call upon me?"
                     : "Walk no more, perversion of nature!");
-        You_feel("like you are falling apart.");
+        You_feel("体がばらばらに崩れていくように感じた.");
         /* KMH -- Gods have mastery over unchanging */
         rehumanize();
         /* no Half_physical_damage adjustment here */

@@ -1510,7 +1510,7 @@ meatmetal(struct monst *mtmp)
                 } else {
                     if (flags.verbose) {
                         Soundeffect(se_crunching_sound, 50);
-                        You_hear("a crunching sound.");
+                        You_hear("バリバリとかみ砕く音が聞こえた.");
                     }
                 }
                 mtmp->meating = otmp->owt / 2 + 1;
@@ -1624,7 +1624,7 @@ meatobj(struct monst *mtmp) /* for gelatinous cubes */
             } else {
                 Soundeffect(se_slurping_sound, 30);
                 if (flags.verbose)
-                    You_hear("a slurping sound.");
+                    You_hear("ずるずるとすする音が聞こえた.");
             }
             m_consume_obj(mtmp, otmp);
             /* in case it polymorphed or died */
@@ -1642,8 +1642,8 @@ meatobj(struct monst *mtmp) /* for gelatinous cubes */
         if (cansee(mtmp->mx, mtmp->my) && flags.verbose && buf[0])
             pline1(buf);
         else if (flags.verbose)
-            You_hear("%s slurping sound%s.",
-                     (ecount == 1) ? "a" : "several", plur(ecount));
+            You_hear("%sずるずるとすする音が聞こえた.",
+                     (ecount == 1) ? "かすかな" : "いくつもの");
     }
     return (count > 0 || ecount > 0) ? 1 : 0;
 }
@@ -1703,7 +1703,7 @@ meatcorpse(
         } else {
             Soundeffect(se_masticating_sound, 50);
             if (flags.verbose)
-                You_hear("a masticating sound.");
+                You_hear("むしゃむしゃと食べる音が聞こえた.");
         }
 
         m_consume_obj(mtmp, otmp);
@@ -2947,18 +2947,17 @@ vamprises(struct monst *mtmp)
         /* revived vampire is in normal shape, so can't be amorphous; if on
            a closed door spot, destroy the door and if trapped, blow it up */
         if (closed_door(x, y)) {
-            static const char
-                door_smashed[] = "a door being smashed",
-                door_go_boom[] = "a door exploding";
             struct rm *door = &levl[x][y];
             boolean trapped = (door->doormask & D_TRAPPED) != 0,
                     seeit = cansee(x, y);
 
             set_msg_xy(x, y); /* You()/pline() will reset this */
             if (!seeit)
-                You_hear("%s.", trapped ? "an explosion" : door_smashed);
+                You_hear("%s.", trapped ? "爆発音が聞こえた"
+                                       : "扉が壊れる音が聞こえた");
             else if (!canspotmon(mtmp))
-                You_see("%s.", trapped ? door_go_boom : door_smashed);
+                You_see("%s.", trapped ? "扉が爆発するのを見た"
+                                      : "扉が壊れるのを見た");
             else if (!Unaware)
                 pline_The("door is smashed%s",
                           trapped ? " and it explodes!" : ".");
@@ -3216,7 +3215,7 @@ corpse_chance(
                     losehp(Maybe_Half_Phys(tmp), svk.killer.name,
                            KILLED_BY_AN);
                 } else {
-                    You_hear("an explosion.");
+                    You_hear("爆発音が聞こえた.");
                     magr->mhp -= tmp;
                     if (DEADMONSTER(magr))
                         mondied(magr);
@@ -3665,7 +3664,7 @@ xkilled(
         change_luck(-1);
     if (is_unicorn(mdat) && sgn(u.ualign.type) == sgn(mdat->maligntyp)) {
         change_luck(-5);
-        You_feel("guilty...");
+        You_feel("罪悪感を覚えた...");
     }
 
     /* give experience points */
@@ -3705,10 +3704,10 @@ xkilled(
         /* your god is mighty displeased... */
         if (!Hallucination) {
             Soundeffect(se_distant_thunder, 40);
-            You_hear("the rumble of distant thunder...");
+            You_hear("遠くで雷鳴がとどろくのが聞こえた...");
         } else {
             Soundeffect(se_applause, 40);
-            You_hear("the studio audience applaud!");
+            You_hear("観客席から湧いた拍手が聞こえた!");
         }
         if (!unique_corpstat(mdat)) {
             boolean mname = has_mgivenname(mtmp);
@@ -3885,7 +3884,7 @@ elemental_clog(struct monst *mon)
         m1 = m2 = m3 = m4 = m5 = zm = (struct monst *) 0;
         if (!msgmv || (svm.moves - msgmv) > 200L) {
             if (!msgmv || rn2(2))
-                You_feel("besieged.");
+                You_feel("包囲されている気がした.");
             msgmv = svm.moves;
         }
         /*
@@ -4268,7 +4267,7 @@ setmangry(struct monst *mtmp, boolean via_attack)
         /* only hypocritical if monster is vulnerable to Elbereth (or
            peaceful--not vulnerable but attacking it is hypocritical) */
         && (onscary(u.ux, u.uy, mtmp) || mtmp->mpeaceful)) {
-        You_feel("like a hypocrite.");
+        You_feel("偽善者になった気分だ.");
         /* AIS: Yes, I know alignment penalties and bonuses aren't balanced
            at the moment. This is about correct relative to other "small"
            penalties; it should be fairly large, as attacking while standing
@@ -5133,7 +5132,7 @@ wiz_force_cham_form(struct monst *mon)
             mndx = NON_PM;
         }
 
-        pline("It can't become that.");
+        pline("そりゃそうになれない.");
 #ifdef EDIT_GETLIN
         /* EDIT_GETLIN preloads the input buffer with the previous
            response but we shouldn't just keep repeating that if player
@@ -5749,9 +5748,9 @@ angry_guards(boolean silent)
                       (sct == 1) ? "An angry" : "Angry",
                       buf, vtense(buf, "are"));
             } else {
-                Strcpy(buf, (ct == 1) ? "a guard's" : "guards'");
                 Soundeffect(se_shrill_whistle, 100);
-                You_hear("the shrill sound of %s whistle%s.", buf, plur(ct));
+                You_hear("%s警笛が鋭く鳴るのが聞こえた.",
+                         (ct == 1) ? "見張りの" : "見張りたちの");
             }
         }
         return TRUE;
@@ -5806,13 +5805,13 @@ usmellmon(struct permonst *mdat)
         switch (mndx) {
         case PM_ROTHE:
         case PM_MINOTAUR:
-            You("notice a bovine smell.");
+            You("牛のようなにおいに気づいた.");
             msg_given = TRUE;
             break;
         case PM_CAVE_DWELLER:
         case PM_BARBARIAN:
         case PM_NEANDERTHAL:
-            You("smell body odor.");
+            You("体臭がした.");
             msg_given = TRUE;
             break;
         /*
@@ -5835,7 +5834,7 @@ usmellmon(struct permonst *mdat)
         case PM_WERERAT:
         case PM_WEREWOLF:
         case PM_OWLBEAR:
-            You("detect an odor reminiscent of an animal's den.");
+            You("獣の巣のようなにおいがした.");
             msg_given = TRUE;
             break;
         /*
@@ -5843,16 +5842,16 @@ usmellmon(struct permonst *mdat)
             break;
         */
         case PM_STEAM_VORTEX:
-            You("smell steam.");
+            You("蒸気のにおいがした.");
             msg_given = TRUE;
             break;
         case PM_GREEN_SLIME:
-            pline("%s stinks.", Something);
+            pline("%sはひどいにおいがした.", Something);
             msg_given = TRUE;
             break;
         case PM_VIOLET_FUNGUS:
         case PM_SHRIEKER:
-            You("smell mushrooms.");
+            You("きのこのにおいがした.");
             msg_given = TRUE;
             break;
         /* These are here to avoid triggering the
@@ -5870,35 +5869,35 @@ usmellmon(struct permonst *mdat)
         if (nonspecific)
             switch (mdat->mlet) {
             case S_DOG:
-                You("notice a dog smell.");
+                You("犬のにおいに気づいた.");
                 msg_given = TRUE;
                 break;
             case S_DRAGON:
-                You("smell a dragon!");
+                You("ドラゴンのにおいがした!");
                 msg_given = TRUE;
                 break;
             case S_FUNGUS:
-                pline("%s smells moldy.", Something);
+                pline("%sはかび臭かった.", Something);
                 msg_given = TRUE;
                 break;
             case S_UNICORN:
-                You("detect a%s odor reminiscent of a stable.",
-                    (mndx == PM_PONY) ? "n" : " strong");
+                You("%s厩舎のようなにおいがした.",
+                    (mndx == PM_PONY) ? "ほのかな" : "強い");
                 msg_given = TRUE;
                 break;
             case S_ZOMBIE:
-                You("smell rotting flesh.");
+                You("腐肉のにおいがした.");
                 msg_given = TRUE;
                 break;
             case S_EEL:
-                You("smell fish.");
+                You("魚のにおいがした.");
                 msg_given = TRUE;
                 break;
             case S_ORC:
                 if (maybe_polyd(is_orc(gy.youmonst.data), Race_if(PM_ORC)))
-                    You("notice an attractive smell.");
+                    You("魅力的なにおいに気づいた.");
                 else
-                    pline("A foul stench makes you feel a little nauseated.");
+                    pline("ひどい悪臭で少し吐き気がした.");
                 msg_given = TRUE;
                 break;
             default:

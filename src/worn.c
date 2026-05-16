@@ -1196,7 +1196,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
                     pline_mon(mon, "%s breaks out of %s armor!",
                               Monnam(mon), ppronoun);
                 else
-                    You_hear("a cracking sound.");
+                    You_hear("何かがひび割れる音が聞こえた.");
             }
             m_useup(mon, otmp);
         }
@@ -1214,7 +1214,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
                     pline_mon(mon, "%s %s tears apart!", s_suffix(Monnam(mon)),
                           cloak_simple_name(otmp));
                 else
-                    You_hear("a ripping sound.");
+                    You_hear("何かが裂ける音が聞こえた.");
                 m_useup(mon, otmp);
             }
         }
@@ -1223,7 +1223,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
                 pline_mon(mon, "%s shirt rips to shreds!",
                           s_suffix(Monnam(mon)));
             else
-                You_hear("a ripping sound.");
+                You_hear("何かが裂ける音が聞こえた.");
             m_useup(mon, otmp);
         }
     } else if (sliparm(mdat)) {
@@ -1236,7 +1236,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
                 pline_mon(mon, "%s armor falls around %s!",
                           s_suffix(Monnam(mon)), pronoun);
             else
-                You_hear("a thud.");
+                You_hear("何かがどさりと落ちる音が聞こえた.");
             m_lose_armor(mon, otmp, polyspot);
         }
         if ((otmp = which_armor(mon, W_ARMC)) != 0
@@ -1280,7 +1280,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
                 pline_mon(mon, "%s can no longer hold %s shield!",
                           Monnam(mon), ppronoun);
             else
-                You_hear("a clank.");
+                You_hear("がちゃんという音が聞こえた.");
             m_lose_armor(mon, otmp, polyspot);
         }
     }
@@ -1292,7 +1292,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
                 pline_mon(mon, "%s helmet falls to the %s!",
                           s_suffix(Monnam(mon)), surface(mon->mx, mon->my));
             else
-                You_hear("a clank.");
+                You_hear("がちゃんという音が聞こえた.");
             m_lose_armor(mon, otmp, polyspot);
         }
     }

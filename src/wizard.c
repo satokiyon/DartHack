@@ -790,7 +790,7 @@ intervene(void)
     switch (which) {
     case 0:
     case 1:
-        You_feel("vaguely nervous.");
+        You_feel("なんとなく不安になった.");
         break;
     case 2:
         if (!Blind)

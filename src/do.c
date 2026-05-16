@@ -245,7 +245,7 @@ flooreffects(
                             : "落とし穴を埋めた");
             } else {
                 Soundeffect(se_boulder_drop, 100);
-                You_hear("巨大な岩が%s.", verb);
+                You_hear("巨大な岩が%sのが聞こえた.", verb);
             }
         }
         /*
@@ -287,7 +287,7 @@ flooreffects(
         if (is_pit(t->ttyp)) {
             if (Blind && !Deaf) {
                 Soundeffect(se_item_tumble_downwards, 50);
-                You_hear("%sが落ちていく.", the(xname(obj)));
+                You_hear("%sが落ちていくのが聞こえた.", the(xname(obj)));
             } else {
                 pline("%sが%sの落とし穴へ転がり落ちた.", Tobjnam(obj, "tumble"),
                       the_your[t->madeby_u]);
@@ -2215,7 +2215,7 @@ revive_corpse(struct obj *corpse)
                     newsym(mtmp->mx, mtmp->my);
                 } else if (mdistu(mtmp) < 5*5) {
                     Soundeffect(se_scratching, 50);
-                    You_hear("ひっかくような音.");
+                    You_hear("ひっかくような音が聞こえた.");
                 }
                 fill_pit(mtmp->mx, mtmp->my);
                 break;

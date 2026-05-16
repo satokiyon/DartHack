@@ -95,7 +95,7 @@ make_confused(long xtime, boolean talk)
 
     if (!xtime && old) {
         if (talk)
-            You_feel("less %s now.", Hallucination ? "trippy" : "confused");
+            You_feel("いまは%sが和らいだ.", Hallucination ? "トリップ感" : "混乱");
     }
     if ((xtime && !old) || (!xtime && old))
         disp.botl = TRUE;
@@ -113,8 +113,8 @@ make_stunned(long xtime, boolean talk)
 
     if (!xtime && old) {
         if (talk)
-            You_feel("%s now.",
-                     Hallucination ? "less wobbly" : "a bit steadier");
+            You_feel("いまは%s.",
+                     Hallucination ? "ふらつきが収まった" : "少し足元が安定した");
     }
     if (xtime && !old) {
         if (talk) {
@@ -151,11 +151,11 @@ make_sick(long xtime,
             return;
         if (!old) {
             /* newly sick */
-            You_feel("deathly sick.");
+            You_feel("ひどく気分が悪くなった.");
         } else {
             /* already sick */
             if (talk)
-                You_feel("%s worse.", xtime <= Sick / 2L ? "much" : "even");
+                You_feel("%s悪化した.", xtime <= Sick / 2L ? "もっとひどく" : "さらに");
         }
         set_itimeout(&Sick, xtime);
         u.usick_type |= type;
@@ -165,11 +165,11 @@ make_sick(long xtime,
         u.usick_type &= ~type;
         if (u.usick_type) { /* only partly cured */
             if (talk)
-                You_feel("somewhat better.");
+                You_feel("少しよくなった.");
             set_itimeout(&Sick, Sick * 2); /* approximation */
         } else {
             if (talk)
-                You_feel("cured.  What a relief!");
+                You_feel("治った. 助かった!");
             Sick = 0L; /* set_itimeout(&Sick, 0L) */
         }
         disp.botl = TRUE;
@@ -251,7 +251,7 @@ make_vomiting(long xtime, boolean talk)
     disp.botl = TRUE;
     if (!xtime && old)
         if (talk)
-            You_feel("much less nauseated now.");
+            You_feel("吐き気がずいぶん治まった.");
 }
 
 static const char vismsg[] = "vision seems to %s for a moment but is %s now.";
@@ -1226,7 +1226,7 @@ peffect_gain_energy(struct obj *otmp)
     int num;
 
     if (otmp->cursed)
-        You_feel("lackluster.");
+        You_feel("気力が湧かなかった.");
     else
         pline("魔法のエネルギーが体を駆け巡った.");
 
@@ -1317,7 +1317,8 @@ peffect_acid(struct obj *otmp)
 staticfn void
 peffect_polymorph(struct obj *otmp)
 {
-    You_feel("a little %s.", Hallucination ? "normal" : "strange");
+    You_feel("%s.", Hallucination ? "少し普通に戻った気がした"
+                                 : "少し変な感じがした");
     if (!Unchanging) {
         if (!otmp->blessed || (u.umonnum != u.umonster))
             polyself(POLY_NOFLAGS);
@@ -1687,7 +1688,8 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                 explode_oil(obj, u.ux, u.uy);
             break;
         case POT_POLYMORPH:
-            You_feel("a little %s.", Hallucination ? "normal" : "strange");
+            You_feel("%s.", Hallucination ? "少し普通に戻った気がした"
+                                         : "少し変な感じがした");
             if (!Unchanging && !Antimagic)
                 polyself(POLY_NOFLAGS);
             break;
@@ -2027,7 +2029,7 @@ potionbreathe(struct obj *obj)
     case POT_CONFUSION:
     case POT_BOOZE:
         if (!Confusion)
-            You_feel("somewhat dizzy.");
+            You_feel("少しめまいがした.");
         make_confused(itimeout_incr(HConfusion, rnd(5)), FALSE);
         break;
     case POT_INVISIBILITY:
@@ -2052,7 +2054,7 @@ potionbreathe(struct obj *obj)
     case POT_SLEEPING:
         kn++;
         if (!Free_action && !Sleep_resistance) {
-            You_feel("rather tired.");
+            You_feel("かなり眠くなった.");
             nomul(-rnd(5));
             gm.multi_reason = "sleeping off a magical draught";
             gn.nomovemsg = You_can_move_again;
@@ -2071,7 +2073,7 @@ potionbreathe(struct obj *obj)
     case POT_BLINDNESS:
         if (!Blind && !Unaware) {
             kn++;
-            pline("It suddenly gets dark.");
+            pline("突然、一も見えなくなった.");
         }
         make_blinded(itimeout_incr(BlindedTimeout, rnd(5)), FALSE);
         if (!Blind && !Unaware)
@@ -2818,7 +2820,7 @@ djinni_from_bottle(struct obj *obj)
     int chance;
 
     if (!(mtmp = makemon(&mons[PM_DJINNI], u.ux, u.uy, MM_NOMSG))) {
-        pline("It turns out to be empty.");
+        pline("からっろだ.");
         return;
     }
 

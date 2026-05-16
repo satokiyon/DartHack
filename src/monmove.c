@@ -57,8 +57,8 @@ mb_trapped(struct monst *mtmp, boolean canseeit)
         if (canseeit && !Unaware)
             pline_mon(mtmp, "ドカーン!! 扉が爆発するのが見えた.");
         else if (!Deaf)
-            You_hear("a %s explosion.",
-                     (mdistu(mtmp) > 7 * 7) ? "distant" : "nearby");
+            You_hear("%s爆発音が聞こえた.",
+                     (mdistu(mtmp) > 7 * 7) ? "遠くで" : "近くで");
     }
     wake_nearto(mtmp->mx, mtmp->my, 7 * 7);
     mtmp->mstun = 1;
@@ -121,7 +121,7 @@ mon_yells(struct monst *mon, const char *shout)
             pline_mon(mon, "%sは叫んだ:", Amonnam(mon));
         } else {
             /* Soundeffect(se_someone_yells, 75); */
-            You_hear("someone yell:");
+            You_hear("誰かの叫び声が聞こえた:");
         }
         SetVoice(mon, 0, 80, 0);
         verbalize1(shout);
@@ -593,7 +593,7 @@ mind_blast(struct monst *mtmp)
     pline("A wave of psychic energy pours over you!");
     if (mtmp->mpeaceful
         && (!Conflict || resist_conflict(mtmp))) {
-        pline("It feels quite soothing.");
+        pline("安らぎを訓へられているような次第だ.");
     } else if (!u.uinvulnerable) {
         int dmg;
         boolean m_sen = sensemon(mtmp);
@@ -1567,9 +1567,9 @@ postmov(
                             pline_mon(mtmp, "%sは鍵を開けて扉を開いた.",
                                   Monnam(mtmp));
                         } else if (canseeit) {
-                            You_see("a door unlock and open.");
+                            You_see("扉の鍵が開いて開くのを見た.");
                         } else if (!Deaf) {
-                            You_hear("a door unlock and open.");
+                            You_hear("扉の鍵が開いて開く音が聞こえた.");
                         }
                     }
                 }
@@ -1584,9 +1584,9 @@ postmov(
                         if (canseeit && canspotmon(mtmp)) {
                             pline_mon(mtmp, "%sは扉を開いた.", Monnam(mtmp));
                         } else if (canseeit) {
-                            You_see("a door open.");
+                            You_see("扉が開くのを見た.");
                         } else if (!Deaf) {
-                            You_hear("a door open.");
+                            You_hear("扉が開く音が聞こえた.");
                         }
                     }
                 }
@@ -1609,9 +1609,9 @@ postmov(
                             pline_mon(mtmp, "%sは扉を叩き壊した.",
                                       Monnam(mtmp));
                         } else if (canseeit) {
-                            You_see("a door crash open.");
+                            You_see("扉が打ち破られて開くのを見た.");
                         } else if (!Deaf) {
-                            You_hear("a door crash open.");
+                            You_hear("扉が破壊されて開く音が聞こえた.");
                         }
                     }
                 }

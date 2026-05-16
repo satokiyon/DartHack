@@ -312,7 +312,7 @@ pluslvl(
     int hpinc, eninc;
 
     if (!incr)
-        You_feel("more experienced.");
+        You_feel("経験を積んだ気がした.");
 
     /* increase hit points (when polymorphed, do monster form first
        in order to retain normal human/whatever increase for later) */

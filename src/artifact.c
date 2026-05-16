@@ -1694,7 +1694,7 @@ artifact_hit(
             int oldhpmax = u.uhpmax;
 
             if (Blind) {
-                You_feel("an %s drain your %s!",
+                You_feel("%sがあなたの%sを吸い取るのを感じた!",
                          is_art(otmp, ART_STORMBRINGER)
                             ? "unholy blade"
                             : "object",
@@ -1762,7 +1762,7 @@ staticfn void
 nothing_special(struct obj *obj)
 {
     if (carried(obj))
-        You_feel("a surge of power, but nothing seems to happen.");
+    You_feel("力の奔流を感じたが、何も起こらなかった.");
 }
 
 staticfn int
@@ -1785,15 +1785,15 @@ invoke_healing(struct obj *obj)
     if (Upolyd)
         healamt = (u.mhmax + 1 - u.mh) / 2;
     if (healamt || Sick || Slimed || Blinded > creamed)
-        You_feel("better.");
+        You_feel("気分がよくなった.");
     if (healamt || Sick || Slimed || BlindedTimeout > creamed)
-        You_feel("%sbetter.",
+        You_feel("%s気分がよくなった.",
                  (!healamt && !Sick && !Slimed
                   /* when healing temporary blindness (aside from
                      goop covering face), might still be blind
                      due to PermaBlind or eyeless polymorph;
                      vary the message in that situation */
-                  && (HBlinded & ~TIMEOUT) != 0L) ? "slightly " : "");
+                  && (HBlinded & ~TIMEOUT) != 0L) ? "少し" : "");
     else {
         nothing_special(obj);
         return ECMD_TIME;
@@ -1826,7 +1826,7 @@ invoke_energy_boost(struct obj *obj)
     if (epboost) {
         u.uen += epboost;
         disp.botl = TRUE;
-        You_feel("re-energized.");
+        You_feel("活力が戻った.");
     } else {
         nothing_special(obj);
         return ECMD_TIME;
@@ -1919,12 +1919,12 @@ invoke_create_portal(struct obj *obj)
 
     if (u.uhave.amulet || In_endgame(&u.uz) || In_endgame(&newlev)
         || newlev.dnum == u.uz.dnum || !next_to_u()) {
-        You_feel("very disoriented for a moment.");
+        You_feel("一瞬ひどい目まいに襲われた.");
     } else {
         if (!Blind)
-            You("are surrounded by a shimmering sphere!");
+            You("慨輝く光り浪ばれた.");
         else
-            You_feel("weightless for a moment.");
+            You_feel("一瞬、体がふわりと浮いた気がした.");
         goto_level(&newlev, FALSE, FALSE, FALSE);
     }
     return ECMD_TIME;
@@ -2110,14 +2110,13 @@ arti_invoke_cost(struct obj *obj)
 
         if (pw_cost < 0 || u.uen < pw_cost) {
             /* the artifact is tired :-) */
-            You_feel("that %s %s ignoring you.", the(xname(obj)),
-                     otense(obj, "are"));
+            You_feel("%sに無視された気がした.", the(xname(obj)));
             /* and just got more so; patience is essential... */
             obj->age += (long) d(3, 10);
             return FALSE;
         } else {
             /* you pay invoke cost with your own magic */
-            You_feel("drained...");
+            You_feel("力が抜けていくのを感じた...");
             u.uen -= pw_cost;
             disp.botl = TRUE;
         }
@@ -2183,8 +2182,7 @@ arti_invoke(struct obj *obj)
         if (on && obj->age > svm.moves) {
             /* the artifact is tired :-) */
             u.uprops[oart->inv_prop].extrinsic ^= W_ARTI;
-            You_feel("that %s %s ignoring you.", the(xname(obj)),
-                     otense(obj, "are"));
+            You_feel("%sに無視された気がした.", the(xname(obj)));
             /* can't just keep repeatedly trying */
             obj->age += (long) d(3, 10);
             return ECMD_TIME;
@@ -2202,9 +2200,9 @@ arti_invoke(struct obj *obj)
         switch (oart->inv_prop) {
         case CONFLICT:
             if (on)
-                You_feel("like a rabble-rouser.");
+                You_feel("扇動者になった気分だ.");
             else
-                You_feel("the tension decrease around you.");
+                You_feel("周囲の緊張が和らぐのを感じた.");
             break;
         case LEVITATION:
             if (on) {

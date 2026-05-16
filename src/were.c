@@ -33,7 +33,7 @@ were_change(struct monst *mon)
                 }
                 if (howler) {
                     Soundeffect(se_canine_howl, 50);
-                    You_hear("a %s howling at the moon.", howler);
+                    You_hear("%sが月に向かって吠えるのが聞こえた.", howler);
                     wake_nearto(mon->mx, mon->my, 4 * 4);
                 }
             }
@@ -215,7 +215,7 @@ you_unwere(boolean purify)
     boolean controllable_poly = Polymorph_control && !(Stunned || Unaware);
 
     if (purify) {
-        You_feel("purified.");
+        You_feel("清められた気がした.");
         set_ulycn(NON_PM); /* cure lycanthropy */
     }
     if (!Unchanging && is_were(gy.youmonst.data)

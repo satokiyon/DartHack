@@ -1195,7 +1195,7 @@ trapeffect_arrow_trap(
     if (mtmp == &gy.youmonst) {
         if (trap->once && trap->tseen && !rn2(15)) {
             Soundeffect(se_loud_click, 100);
-            You_hear("大きなカチッという音がした!");
+            You_hear("大きなカチッという音が聞こえた!");
             deltrap(trap);
             newsym(u.ux, u.uy);
             return Trap_Is_Gone;
@@ -1258,7 +1258,7 @@ trapeffect_dart_trap(
 
         if (trap->once && trap->tseen && !rn2(15)) {
             Soundeffect(se_soft_click, 30);
-            You_hear("小さなカチッという音がした.");
+            You_hear("小さなカチッという音が聞こえた.");
             deltrap(trap);
             newsym(u.ux, u.uy);
             return Trap_Is_Gone;
@@ -3323,7 +3323,7 @@ launch_obj(
                 You_see("%sが転がり始めたのを見た.", an(xname(singleobj)));
             } else if (Hallucination) {
                 Soundeffect(se_someone_bowling, 60);
-                You_hear("誰かがボウリングしている音がした.");
+                You_hear("誰かがボウリングしている音が聞こえた.");
             } else {
                 Soundeffect(se_rumbling, 60);
                 You_hear("地鳴りが%sで聞こえた.", (distu(x1, y1) <= 4 * 4) ? "近く"
@@ -3472,7 +3472,7 @@ launch_obj(
                         pline_xy(x, y,
                                  "突然、転がる巨大な岩が消えた!");
                     else if (!Deaf)
-                        You_hear("地鳴りが急に止んだ.");
+                        You_hear("聞こえていた地鳴りが急に止んだ.");
                     singleobj->otrapped = 0;
                     if (t->ttyp == TELEP_TRAP) {
                         (void) rloco(singleobj);
@@ -4397,8 +4397,8 @@ domagictrap(void)
             pline("%sにぞくりと悪寒が走った!", body_part(SPINE));
             break;
         case 14:
-            You_hear(Hallucination ? "月があなたに向かって吠えている."
-                                   : "遠くで遠吠えがした.");
+            You_hear(Hallucination ? "月があなたに吠える声が聞こえた."
+                                   : "遠くで遠吠えが聞こえた.");
             break;
         case 15:
             if (on_level(&u.uz, &qstart_level))
@@ -6000,7 +6000,7 @@ untrap(
                     }
                     return help_monster_out(mtmp, ttmp);
                 default:
-                    You("%s罠は無効化できなかった.", !here ? "その" : "この");
+                    You("%s罠を無効化できなかった.", !here ? "その" : "この");
                     return 0;
                 }
             }

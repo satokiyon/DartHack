@@ -1390,7 +1390,7 @@ region_safety(void)
         if (region_danger()) {
             set_itimeout(&HMagical_breathing, (long) (d(4, 4) + 4));
             /* not already Breathless or wouldn't be in region danger */
-            You_feel("able to breathe.");
+            You_feel("息ができるようになった気がした.");
         }
     } else if (r) {
         remove_region(r);

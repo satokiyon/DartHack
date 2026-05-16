@@ -31,9 +31,9 @@ noises(struct monst *magr, struct attack *mattk)
     if (!Deaf && (farq != gf.far_noise || svm.moves - gn.noisetime > 10)) {
         gf.far_noise = farq;
         gn.noisetime = svm.moves;
-        You_hear("%s%s.",
-                 (mattk->aatyp == AT_EXPL) ? "an explosion" : "some noises",
-                 farq ? " in the distance" : "");
+        You_hear("%s%s聞こえた.",
+                 (mattk->aatyp == AT_EXPL) ? "爆発音が" : "物音が",
+                 farq ? "遠くで" : "");
     }
 }
 
@@ -1135,10 +1135,10 @@ mon_poly(struct monst *magr, struct monst *mdef, int dmg)
                 You("are subjected to a freakish metamorphosis.");
                 polyself(POLY_NOFLAGS);
             } else if (u.umonnum != u.ulycn) {
-                You_feel("an unnatural urge coming on.");
+                You_feel("不自然な衝動に駆られた.");
                 you_were();
             } else {
-                You_feel("a natural urge coming on.");
+                You_feel("自然な衝動に駆られた.");
                 you_unwere(FALSE);
             }
             dmg = 0;

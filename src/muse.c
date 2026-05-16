@@ -143,9 +143,9 @@ precheck(struct monst *mon, struct obj *obj)
                            ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
             Soundeffect(se_zap_then_explosion, 100);
-            You_hear("a zap and an explosion %s.",
-                     (mdistu(mon) <= range * range)
-                        ? "nearby" : "in the distance");
+                You_hear("%sで放射音と爆発音が聞こえた.",
+                            (mdistu(mon) <= range * range)
+                                ? "すぐ近く" : "遠く");
         }
         m_useup(mon, obj);
         mon->mhp -= dam;
@@ -176,8 +176,8 @@ mzapwand(
                        ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
         Soundeffect(se_zap, 100);
-        You_hear("a %s zap.", (mdistu(mtmp) <= range * range)
-                                 ? "nearby" : "distant");
+        You_hear("%sで放射音が聞こえた.", (mdistu(mtmp) <= range * range)
+                                 ? "近く" : "遠く");
         unknow_object(otmp); /* hero loses info when unseen obj is used */
     } else if (self) {
         pline("%s with %s!",
@@ -204,9 +204,9 @@ mplayhorn(
                        ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
         Soundeffect(se_horn_being_played, 50);
-        You_hear("a horn being played %s.",
+        You_hear("%sで角笛の音が聞こえた.",
                  (mdistu(mtmp) <= range * range)
-                    ? "nearby" : "in the distance");
+                    ? "近く" : "遠く");
         unknow_object(otmp); /* hero loses info when unseen obj is used */
     } else if (self) {
         observe_object(otmp);
@@ -275,10 +275,11 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
             map_invisible(mtmp->mx, mtmp->my);
         }
 
-        Snprintf(blindbuf, sizeof blindbuf, "reading %s", onambuf);
-        strsubst(blindbuf, "reading a scroll labeled",
-                 mtmp->mconf ? "attempting to incant" : "incant");
-        You_hear("%s %s.",
+        if (mtmp->mconf)
+            Snprintf(blindbuf, sizeof blindbuf, "%sを唱えようとしている", onambuf);
+        else
+            Snprintf(blindbuf, sizeof blindbuf, "%sを読んでいる", onambuf);
+        You_hear("%sが%sのが聞こえた.",
                  x_monnam(mtmp, ARTICLE_A, (char *) 0, mflags, FALSE),
                  blindbuf);
         if (tpindicator)
@@ -297,7 +298,7 @@ mquaffmsg(struct monst *mtmp, struct obj *otmp)
         pline_mon(mtmp, "%s drinks %s!", Monnam(mtmp), singular(otmp, doname));
     } else if (!Deaf) {
         Soundeffect(se_mon_chugging_potion, 25);
-        You_hear("a chugging sound.");
+        You_hear("ごくごくと飲む音が聞こえた.");
     }
 }
 
@@ -842,7 +843,7 @@ use_defensive(struct monst *mtmp)
             pline_mon(mtmp, "%s plays %s!", Monnam(mtmp), doname(otmp));
         } else if (!Deaf) {
             Soundeffect(se_bugle_playing_reveille, 100);
-            You_hear("a bugle playing reveille!");
+            You_hear("起床ラッパが鳴り響いた!");
         }
         awaken_soldiers(mtmp);
         return 2;
@@ -961,7 +962,7 @@ use_defensive(struct monst *mtmp)
                   is_flyer(mtmp->data) ? "dives" : "falls");
         } else if (!Deaf) {
             Soundeffect(se_crash_through_floor, 100);
-            You_hear("%s crash through the %s.", something,
+            You_hear("%sが%sを突き破る音が聞こえた.", something,
                      surface(mtmp->mx, mtmp->my));
         }
         fill_pit(mtmp->mx, mtmp->my);
@@ -1975,7 +1976,7 @@ use_offensive(struct monst *mtmp)
             ignite_items(mtmp->minvent);
             num = (2 * (rn1(3, 3) + 2 * bcsign(otmp)) + 1) / 3;
             if (Fire_resistance)
-                You("are not harmed.");
+                You("磨くごし接さん.");
             burn_away_slime();
             if (Half_spell_damage)
                 num = (num + 1) / 2;
@@ -2638,7 +2639,7 @@ you_aggravate(struct monst *mtmp)
 #endif
     show_glyph(mtmp->mx, mtmp->my, mon_to_glyph(mtmp, rn2_on_display_rng));
     display_self();
-    You_feel("aggravated at %s.", noit_mon_nam(mtmp));
+    You_feel("%sにいら立ちを覚えた.", noit_mon_nam(mtmp));
     display_nhwindow(WIN_MAP, TRUE);
     docrt();
     if (unconscious()) {
@@ -2932,8 +2933,8 @@ mon_consume_unstone(
               distant_name(obj, doname));
         obj->quan = save_quan;
     } else if (!Deaf)
-        You_hear("%s.",
-                 (obj->oclass == POTION_CLASS) ? "drinking" : "chewing");
+        You_hear("%s音が聞こえた.",
+                 (obj->oclass == POTION_CLASS) ? "飲み込む" : "噛み砕く");
 
     m_useup(mon, obj);
     /* obj is now gone */

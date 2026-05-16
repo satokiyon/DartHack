@@ -1520,7 +1520,7 @@ hmon_hitmon_poison(
         You("dishonorably use a poisoned weapon!");
         adjalign(-sgn(u.ualign.type));
     } else if (u.ualign.type == A_LAWFUL && u.ualign.record > -10) {
-        You_feel("like an evil coward for using a poisoned weapon.");
+        You_feel("毒武器を使う自分が卑劣に思えた.");
         adjalign(-1);
     }
     if (!permapoisoned(obj) && !rn2(nopoison)) {
@@ -3043,7 +3043,7 @@ mhitm_ad_curs(
             if (!Deaf) {
                 Soundeffect(se_laughter, 40);
                 if (Blind) {
-                    You_hear("laughter.");
+                    You_hear("笑い声が聞こえた.");
                 } else {
                     pline_mon(magr, "%s chuckles.", Monnam(magr));
                 }
@@ -3087,7 +3087,7 @@ mhitm_ad_curs(
             }
             if (!Deaf) {
                 if (!gv.vis)
-                    You_hear("laughter.");
+                    You_hear("笑い声が聞こえた.");
                 else if (canseemon(magr))
                     pline_mon(magr, "%s chuckles.", Monnam(magr));
             }
@@ -3867,7 +3867,7 @@ mhitm_ad_deth(
             FALLTHROUGH;
             /*FALLTHRU*/
         default: /* case 16: ... case 5: */
-            You_feel("your life force draining away...");
+            You_feel("生命力が吸い取られていくのを感じた...");
             mhm->permdmg = 1; /* actual damage done by caller */
             return;
         case 4:
@@ -4215,15 +4215,16 @@ mhitm_ad_ston(
         if (!rn2(3)) {
             if (magr->mcan) {
                 if (!Deaf)
-                    You_hear("a cough from %s!", mon_nam(magr));
+                        You_hear("%sのせき込みが聞こえた!", mon_nam(magr));
             } else {
                 if (Hallucination && !Blind) {
                     Soundeffect(se_cockatrice_hiss, 50);
-                    You_hear("hissing."); /* You_hear() deals with Deaf */
+                        You_hear("シューッという音が聞こえた."); /* You_hear() deals with Deaf */
                     pline("%s appears to be blowing you a kiss...",
                           Monnam(magr));
                 } else if (!Deaf) {
-                    You_hear("%s hissing!", s_suffix(mon_nam(magr)));
+                        You_hear("%sのシューッという音が聞こえた!",
+                                 s_suffix(mon_nam(magr)));
                 } else if (!Blind) {
                     pline("%s seems to grimace.", Monnam(magr));
                 }
@@ -4279,7 +4280,7 @@ mhitm_ad_were(
         if (!rn2(4) && u.ulycn == NON_PM
             && !Protection_from_shape_changers && !defends(AD_WERE, uwep)
             && !mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
-            urgent_pline("You feel feverish.");
+            urgent_pline("熱っぽくなった.");
             exercise(A_CON, FALSE);
             set_ulycn(monsndx(pa));
             retouch_equipment(2);
@@ -4867,7 +4868,7 @@ damageum(
             gm.mkcorpstat_norevive = troll_baned(mdef, uwep) ? TRUE : FALSE;
         /* (DEADMONSTER(mdef) and !mhm.damage => already killed) */
         if (mdef->mtame && !cansee(mdef->mx, mdef->my)) {
-            You_feel("embarrassed for a moment.");
+            You_feel("一瞬、気まずくなった.");
             if (mhm.damage)
                 xkilled(mdef, XKILL_NOMSG);
         } else if (!flags.verbose) {
@@ -5374,7 +5375,7 @@ mhitm_knockback(
               rn2(2) ? "forceful" : "powerful", rn2(2) ? "blow" : "strike");
     } else if (u_agr) {
         /* hero knocks unseen foe back; noticed by touch */
-        You_feel("%s be knocked %s!", some_mon_nam(mdef), knockedhow);
+        You_feel("%sが弾き飛ばされたのを感じた!", some_mon_nam(mdef));
     }
 
     if (u.ustuck && (u_def || u_agr))
@@ -5784,7 +5785,7 @@ hmonas(struct monst *mon)
                         && (mon->data->mlet == S_ZOMBIE
                             || mon->data->mlet == S_MUMMY)
                         && rn2(5) && !Sick_resistance) {
-                        You_feel("%ssick.", (Sick) ? "very " : "");
+                        You_feel("%s気分が悪くなった.", (Sick) ? "とても" : "");
                         mdamageu(mon, rnd(8));
                     }
                 }
@@ -6067,7 +6068,7 @@ passive(
             if (monnear(mon, u.ux, u.uy)) {
                 if (Cold_resistance) {
                     shieldeff(u.ux, u.uy);
-                    You_feel("a mild chill.");
+                    You_feel("ほのかな寒気を感じた.");
                     monstseesu(M_SEEN_COLD);
                     ugolemeffects(AD_COLD, tmp);
                     break;
@@ -6090,7 +6091,7 @@ passive(
             if (monnear(mon, u.ux, u.uy)) {
                 if (Fire_resistance) {
                     shieldeff(u.ux, u.uy);
-                    You_feel("mildly warm.");
+                    You_feel("ほのかに暖かく感じた.");
                     monstseesu(M_SEEN_FIRE);
                     ugolemeffects(AD_FIRE, tmp);
                     break;
@@ -6103,7 +6104,7 @@ passive(
         case AD_ELEC:
             if (Shock_resistance) {
                 shieldeff(u.ux, u.uy);
-                You_feel("a mild tingle.");
+                You_feel("ほのかなしびれを感じた.");
                 monstseesu(M_SEEN_ELEC);
                 ugolemeffects(AD_ELEC, tmp);
                 break;

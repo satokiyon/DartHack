@@ -581,7 +581,7 @@ pick_lock(
             else if (Blind)
                 You("そこに扉がないことを感じた.");
             else
-                You("そこに扉が見当たらなかった.");
+                You("そこに扉は見当たらなかった.");
             return res;
         }
         switch (door->doormask) {
@@ -836,7 +836,7 @@ doopen_indir(coordxy x, coordxy y)
         else if (Blind)
             You("そこに扉がないことを感じた.");
         else
-            You("そこに扉が見当たらなかった.");
+            You("そこに扉は見当たらなかった.");
         return res;
     }
 
@@ -1003,7 +1003,7 @@ doclose(void)
             if (Blind)
                 You("そこに扉がないことを感じた.");
             else
-                You("そこに扉が見当たらなかった.");
+                You("そこに扉は見当たらなかった.");
         }
         return res;
     }
@@ -1134,7 +1134,7 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
                       dustcloud);
             } else {
                 Soundeffect(se_swoosh, 25);
-                You_hear("シュッという音.");
+                You_hear("シュッという音が聞こえた.");
             }
             if (obstructed(x, y, mysterywand)) {
                 if (vis)
@@ -1213,7 +1213,7 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
                             pline("ドカーン!!  扉が爆発するのが見えた.");
                         } else if (!Deaf) {
                             Soundeffect(se_explosion, 75);
-                            You_hear("%s爆発音.",
+                            You_hear("%s爆発音が聞こえた.",
                                      (distu(x, y) > 7 * 7) ? "遠くの"
                                                            : "近くの");
                         }
