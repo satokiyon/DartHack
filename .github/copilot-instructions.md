@@ -69,13 +69,23 @@ boulder と rock を同じ訳語にしない。
 - docs/message-translation-safety-checklist.md
 - docs/translation-glossary-quest.md
 
-翻訳時の参考プロジェクト:
+## 9. 参考プロジェクト
+- NetHack
+ -- https://github.com/NetHack/NetHack
 
-- https://github.com/jnethack/jnethack-release
+- JNetHack
+ -- https://github.com/jnethack/jnethack-release
 
-## 9. デバッグ実装の扱い
+## 10. デバッグ実装の扱い
 
 - 調査のためにトレース出力やデバッグ用フラグを追加することは許可する。
 - ただし原因切り分けと修正確認が完了したら、トレース出力処理・環境変数トグル・デバッグ用 define は必ず削除する。
 - 恒久対策（表示ロジックの修正など）だけを残し、診断コードを本番運用コードに残さない。
 - 一時生成物（`*trace*.tsv`, `build*.log`, `output.txt`, 検証用メモ）はコミット対象外とする。
+
+## 11. アップストリーム同期
+
+- NetHack 本家（https://github.com/NetHack/NetHack）の更新を取り込む際は、直接 `master` に取り込まず、必ず `upstream-base` ブランチを経由すること。
+- `upstream-base` は本家のコードを忠実に保持する。日本語版独自の修正（翻訳や表示改善）をこのブランチにコミットしてはならない。
+- `upstream-base` を `master` にマージする際に発生したコンフリクトは、日本語化の意図を汲みつつ、本家のロジック変更と整合性が取れるように解決する。
+- 同期後のビルドおよび動作確認を徹底する。
