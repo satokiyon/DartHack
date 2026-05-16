@@ -1029,7 +1029,7 @@ test_move(
             }
             if (!(Passes_walls || passes_bars(gy.youmonst.data))) {
                 if (mode == DO_MOVE && flags.mention_walls)
-                    You("鉄格子を通り抜けなかった.");
+                    You("鉄格子を通り抜けられなかった.");
                 return FALSE;
             }
         } else if (tunnels(gy.youmonst.data)
@@ -1158,7 +1158,7 @@ test_move(
             return FALSE;
         case 2:
             if (mode == DO_MOVE)
-                You("荷物が多すぎて通り抜けなかった.");
+                You("荷物が多すぎて通り抜けられなかった.");
             return FALSE;
         case 1:
             if (mode == DO_MOVE)
@@ -1591,7 +1591,7 @@ trapmove(
         }
         if (--u.utrap) {
             if (flags.verbose) {
-                predicament = "巣に絡め取られていた";
+                predicament = "巣に絡め取られた";
                 if (u.usteed)
                     Norep("%sは%s.", upstart(steedname), predicament);
                 else
@@ -2134,7 +2134,7 @@ domove_swap_with_pet(
                && bad_rock(mtmp->data, u.ux0, y)
                && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
         /* can't swap places when pet won't fit thru the opening */
-        You("止まった.  %sは通り抜けなかった.", YMonnam(mtmp));
+        You("止まった.  %sは通り抜けられなかった.", YMonnam(mtmp));
         didnt_move = TRUE;
     } else if (mtmp->mpeaceful && mtmp->mtrapped) {
         /* all mtame are also mpeaceful, so this affects pets too */

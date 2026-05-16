@@ -3062,9 +3062,9 @@ staticfn char *
 trapnote(struct trap *trap, boolean noprefix)
 {
     static const char *const tnnames[] = {
-        "ド", "レ♭", "レ", "ミ♭",
-        "ミ", "ファ", "ファ♯", "ソ",
-        "ソ♯", "ラ", "シ♭", "シ",
+        "(ド♪)", "(レ♭♪)", "(レ♪)", "(ミ♭♪)",
+        "(ミ♪)", "(ファ♭)", "(ファ♪)", "(ソ♭)",
+        "(ソ♪)", "(ラ♭)", "(シ♭)", "(シ♪)",
     };
     static char tnbuf[12]; /* result buffer */
     const char *tn;
@@ -5649,7 +5649,7 @@ disarm_squeaky_board(struct trap *ttmp)
     boolean bad_tool;
     int fails;
 
-    obj = getobj("解除に使うもの", unsqueak_ok, GETOBJ_PROMPT);
+    obj = getobj("解除に使うものは", unsqueak_ok, GETOBJ_PROMPT);
     if (!obj)
         return 0;
 

@@ -531,23 +531,24 @@ dosinkring(struct obj *obj)
         pline_The("%sの流れが止まった.", hliquid("水"));
         break;
     case RIN_GAIN_STRENGTH:
-        pline_The("%sの流れが%serになった.",
+        pline_The("%sの流れが%sになった.",
                   hliquid("水"),
-                  (obj->spe < 0) ? "やや" : "粗く");
+                  (obj->spe < 0) ? "弱く" : "強く");
         break;
     case RIN_GAIN_CONSTITUTION:
-        pline_The("%sの流れが%serになった.",
+        pline_The("%sの流れが%sになった.",
                   hliquid("水"),
-                  (obj->spe < 0) ? "いくらか" : "残涪");
+                  (obj->spe < 0) ? "不安定に" : "安定して");
         break;
     case RIN_INCREASE_ACCURACY: /* KMH */
         pline_The("%sの流れが%s.",
                   hliquid("水"),
-                  (obj->spe < 0) ? "的を外した" : "皋中を気を付けた");
+                  (obj->spe < 0) ? "的を外れた" : "的に当たった");
         break;
     case RIN_INCREASE_DAMAGE:
-        pline_The("水の働きが%sになった.",
-                  (obj->spe < 0) ? "やや弱く" : "傷を下して");
+        pline_The("%sの勢いが%sになった.",
+                  hliquid("水"),
+                  (obj->spe < 0) ? "弱く" : "強く");
         break;
     case RIN_HUNGER:
         ideed = FALSE;
@@ -556,8 +557,7 @@ dosinkring(struct obj *obj)
             if (otmp != uball && otmp != uchain
                 && !obj_resists(otmp, 1, 99)) {
                 if (!Blind) {
-                    pline("急突エ%sが%sシンクから%s!", doname(otmp),
-                          otense(otmp, "飛び出し"));
+                    pline("突然%sがシンクから飛び出した!", doname(otmp));
                     ideed = TRUE;
                 }
                 delobj(otmp);
@@ -572,7 +572,7 @@ dosinkring(struct obj *obj)
         nosink = teleport_sink();
         /* give message even if blind; we know we're not levitating,
            so can feel the outcome even if we can't directly see it */
-        pline_The("シンクが%s櫡洹した.", nosink ? "" : "䧌時的に");
+        pline_The("シンクが%s消失した.", nosink ? "" : "一時的に");
         ideed = FALSE;
         break;
     case RIN_POLYMORPH:
@@ -766,7 +766,7 @@ drop(struct obj *obj)
             return ECMD_TIME;
         }
         if (!IS_ALTAR(levl[u.ux][u.uy].typ) && flags.verbose)
-            You("%sの罗缛を落とした.", doname(obj));
+            You("%sを落とした.", doname(obj));
     }
     obj->how_lost = LOST_DROPPED;
     dropx(obj);
@@ -920,7 +920,7 @@ doddrop(void)
     int result = ECMD_OK;
 
     if (!gi.invent) {
-        You("何もを落とずにポケットから上げするものがない.");
+        You("落とせるものを何も持っていない.");
         return ECMD_OK;
     }
     add_valid_menu_class(0); /* clear any classes already there */
@@ -1185,10 +1185,10 @@ dodown(void)
                 ladder_down = (glyph_to_cmap(glyph_at_uxuy) == S_dnladder);
         }
         if (Is_airlevel(&u.uz))
-            You("%s上を浮遊っている.", surface(u.ux, u.uy));
+            You("%sの上を浮遊している.", surface(u.ux, u.uy));
         else if (Is_waterlevel(&u.uz))
-            You("%s上を浮遊っている.",
-                is_pool(u.ux, u.uy) ? "水面" : "空気の泡の");
+            You("%sの上を浮遊している.",
+                is_pool(u.ux, u.uy) ? "水面" : "空気の泡");
         else
             floating_above(stairs_down ? "階段"
                            : ladder_down ? "はしご"
@@ -1201,7 +1201,7 @@ dodown(void)
         if (Flying) { /* lurker above */
             You("隠れ場所から飛び出した.");
         } else { /* piercer */
-            You("%sまで残りを上り。", surface(u.ux, u.uy));
+            You("%sまで泳ぎ登った。", surface(u.ux, u.uy));
             if (is_pool_or_lava(u.ux, u.uy)) {
                 pooleffects(FALSE);
             } else {
@@ -1430,7 +1430,7 @@ u_collide_m(struct monst *mtmp)
            here, but it's not impossible and we're prepared to cope
            with the situation, so only say something when debugging */
         if (wizard)
-            pline("騒まぞろょき上。");
+            pline("mnextoが失敗しました。");
         if (!rloc(mtmp, RLOC_NOMSG) || (mtmp = m_at(u.ux, u.uy)) != 0)
             /* no room to move it; send it away, to return later */
             m_into_limbo(mtmp);
@@ -1849,13 +1849,13 @@ goto_level(
     /* Check whether we just entered Gehennom. */
     if (!In_hell(&u.uz0) && Inhell) {
         if (Is_valley(&u.uz)) {
-            You("ゲヘナムの谷を訓緱した。");
+            You("ゲヘナの谷に入った。");
             pline_The("焼ける肉と腐った死体の臭いが潜んでいた.");
 #ifdef MICRO
             display_nhwindow(WIN_MESSAGE, FALSE);
 #endif
             Soundeffect(se_groans_and_moans, 25);
-            You_hear("いたところで和醬く様を聞かせた.");
+            You_hear("責め苦を受ける魂の叫びが聞こえた.");
         }
 
         record_achievement(ACH_HELL); /* reached Gehennom */
@@ -1899,7 +1899,7 @@ goto_level(
             record_achievement(ACH_SOKO);
     } else {
         if (new && Is_rogue_level(&u.uz)) {
-            You("角年匪をすり抠けた世界り訪れた.");
+            You("文字だけで構成された世界に足を踏み入れた.");
         } else if (new && Is_bigroom(&u.uz)) {
             record_achievement(ACH_BGRM);
         }
@@ -1997,7 +1997,7 @@ hellish_smoke_mesg(void)
 
     if (In_hell(&u.uz) && svl.level.flags.temperature > 0)
         You("煙の%sがする.",
-              olfaction(gy.youmonst.data) ? "匆い" : "気配");
+              olfaction(gy.youmonst.data) ? "匂い" : "気配");
 }
 
 /* give a message when the level temperature is different from previous */
@@ -2159,12 +2159,12 @@ revive_corpse(struct obj *corpse)
                     effect = " in a ring of withered crops";
 
                 if (canseemon(mtmp)) {
-                    pline("ひゃっ、%sが死体が传い購いを推進していります%s!",
+                    pline("うわっ、%sが死体から這い出してきた%s!",
                           chewed ? Adjmonnam(mtmp, "bite-covered")
                                  : Monnam(mtmp),
                           effect);
                 } else {
-                    pline("%sが煙の中に%s鎡閠した%s!", The(cname), effect);
+                    pline("%sは煙の中に%s消えた%s!", The(cname), effect);
                 }
             }
             break;
@@ -2190,10 +2190,10 @@ revive_corpse(struct obj *corpse)
             if (!container) {
                 impossible("reviving corpse from non-existent container");
             } else if (mcarry && canseemon(mcarry)) {
-                pline("%sが%sから連い出した!", mnam, yname(container));
+                pline("%sが%sから這い出した!", mnam, yname(container));
             } else if (container_where == OBJ_INVENT) {
                 Strcpy(sackname, an(xname(container)));
-                pline("%sがバッグの中の%sから連い出した!", mnam, sackname);
+                pline("%sがバッグの中の%sから這い出した!", mnam, sackname);
             } else if (container_where == OBJ_FLOOR
                        && cansee(corpsex, corpsey)) {
                 Strcpy(sackname, an(xname(container)));
