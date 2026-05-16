@@ -438,7 +438,7 @@ attempt_restore:
         if (dorecover(nhfp)) {
             resuming = TRUE; /* not starting new game */
             if (discover)
-                You("are in non-scoring discovery mode.");
+                You("スコアが記録されない探索モードだった。");
             if (discover || wizard) {
                 if (y_n("Do you want to keep the save file?") == 'n')
                     (void) delete_savefile();
@@ -469,7 +469,7 @@ attempt_restore:
         }
         newgame();
         if (discover)
-            You("are in non-scoring discovery mode.");
+            You("スコアが記録されない探索モードだった。");
     }
 
         // iflags.debug_fuzzer = TRUE;

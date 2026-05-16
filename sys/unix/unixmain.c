@@ -661,16 +661,16 @@ wd_message(void)
                   strchr(sysopt.wizards, ' ') ? "s" : "", tmp);
             free(tmp);
         } else {
-            You("cannot access debug (wizard) mode.");
+            You("デバッグモード（ウィザードモード）にはアクセスできなかった。");
         }
         wizard = FALSE; /* (paranoia) */
         if (!iflags.explore_error_flag)
             pline("Entering explore/discovery mode instead.");
     } else if (iflags.explore_error_flag) {
-        You("cannot access explore mode."); /* same as enter_explore_mode */
+        You("探索モードにはアクセスできなかった。"); /* same as enter_explore_mode */
         discover = iflags.deferred_X = FALSE; /* (more paranoia) */
     } else if (discover)
-        You("are in non-scoring explore/discovery mode.");
+        You("スコアが記録されない探索・探検モードだった。");
 }
 
 /*
