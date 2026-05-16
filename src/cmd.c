@@ -154,7 +154,7 @@ static const char *readchar_queue = "";
 
 /* for rejecting attempts to use wizard mode commands
  * Also used in wizcmds.c  */
-const char unavailcmd[] = "Unavailable command '%s'.";
+const char unavailcmd[] = "使えないコマンド '%s'.";
 
 /* for rejecting #if !SHELL, !SUSPEND */
 static const char cmdnotavail[] = "'%s' command not available.";
@@ -505,7 +505,7 @@ doextcmd(void)
         if (!can_do_extcmd(&extcmdlist[idx]))
             return ECMD_OK;
         if (iflags.menu_requested && !accept_menu_prefix(&extcmdlist[idx])) {
-            pline("'%s' prefix has no effect for the %s command.",
+            pline("'%s' 接頭辞は %s コマンドでは効果がなかった.",
                   visctrl(cmd_from_func(do_reqmenu)),
                   extcmdlist[idx].ef_txt);
             iflags.menu_requested = FALSE;
@@ -532,8 +532,8 @@ doc_extcmd_flagstr(
     if (!efp) {
         char qbuf[QBUFSZ];
 
-        add_menu_str(menuwin, "[A] Command autocompletes");
-        Sprintf(qbuf, "[m] Command accepts '%s' prefix",
+        add_menu_str(menuwin, "[A] コマンドは自動補完された.");
+        Sprintf(qbuf, "[m] コマンドは '%s' 接頭辞を受け付けた.",
                 visctrl(cmd_from_func(do_reqmenu)));
         add_menu_str(menuwin, qbuf);
         return (char *) 0;
@@ -570,8 +570,8 @@ doextlist(void)
     int n, pass;
     int menumode = 0, menushown[2], onelist = 0;
     boolean redisplay = TRUE, search = FALSE;
-    static const char *const headings[] = { "Extended commands",
-                                      "Debugging Extended Commands" };
+    static const char *const headings[] = { "拡張コマンド",
+                                      "デバッグ用拡張コマンド" };
     int clr = NO_COLOR;
 
     searchbuf[0] = '\0';
@@ -581,11 +581,11 @@ doextlist(void)
         redisplay = FALSE;
         any = cg.zeroany;
         start_menu(menuwin, MENU_BEHAVE_STANDARD);
-        add_menu_str(menuwin, "Extended Commands List");
+        add_menu_str(menuwin, "拡張コマンド一覧");
         add_menu_str(menuwin, "");
 
-        Sprintf(buf, "Switch to %s commands that don't autocomplete",
-                menumode ? "including" : "excluding");
+        Sprintf(buf, "自動補完されないコマンドを%s対象に切り替える",
+            menumode ? "含める" : "除外する");
         any.a_int = 1;
         add_menu(menuwin, &nul_glyphinfo, &any, 'a', 0, ATR_NONE, clr, buf,
                  MENU_ITEMFLAGS_NONE);
@@ -598,10 +598,10 @@ doextlist(void)
                having ':' as an explicit selector overrides the default
                menu behavior for it; we retain 's' as a group accelerator */
             add_menu(menuwin, &nul_glyphinfo, &any, ':', 's', ATR_NONE,
-                     clr, "Search extended commands",
+                     clr, "拡張コマンドを検索する",
                      MENU_ITEMFLAGS_NONE);
         } else {
-            Strcpy(buf, "Switch back from search");
+            Strcpy(buf, "検索をやめる");
             if (strlen(buf) + strlen(searchbuf) + strlen(" (\"\")") < QBUFSZ)
                 Sprintf(eos(buf), " (\"%s\")", searchbuf);
             any.a_int = 3;
@@ -616,8 +616,8 @@ doextlist(void)
         if (wizard) {
             any.a_int = 4;
             add_menu(menuwin, &nul_glyphinfo, &any, 'z', 0, ATR_NONE, clr,
-          onelist ? "Switch to showing debugging commands in separate section"
-       : "Switch to showing all alphabetically, including debugging commands",
+             onelist ? "デバッグ用コマンドを別枠で表示する"
+         : "デバッグ用コマンドを含め、すべてをアルファベット順で表示する",
                      MENU_ITEMFLAGS_NONE);
         }
         add_menu_str(menuwin, "");
@@ -685,7 +685,7 @@ doextlist(void)
                 add_menu_str(menuwin, "");
         }
         if (*searchbuf && !n)
-            add_menu_str(menuwin, "no matches");
+            add_menu_str(menuwin, "一致なし");
         else
             (void) doc_extcmd_flagstr(menuwin, (struct ext_func_tab *) 0);
 
@@ -718,7 +718,7 @@ doextlist(void)
             searchbuf[0] = '\0';
         }
         if (search) {
-            Strcpy(promptbuf, "Extended command list search phrase");
+            Strcpy(promptbuf, "拡張コマンド一覧の検索語");
             Strcat(promptbuf, "?");
             getlin(promptbuf, searchbuf);
             (void) mungspaces(searchbuf);
@@ -835,13 +835,13 @@ extcmd_via_menu(void)
             }
             prevaccelerator = accelerator;
             if (!acount || one_per_line) {
-                Sprintf(prompt, "%s%s [%s]", wastoolong ? "or " : "",
+                Sprintf(prompt, "%s%s [%s]", wastoolong ? "または " : "",
                         choices[i]->ef_txt, choices[i]->ef_desc);
             } else if (acount == 1) {
-                Sprintf(prompt, "%s%s or %s", wastoolong ? "or " : "",
+                Sprintf(prompt, "%s%s または %s", wastoolong ? "または " : "",
                         choices[i - 1]->ef_txt, choices[i]->ef_txt);
             } else {
-                Strcat(prompt, " or ");
+                Strcat(prompt, " または ");
                 Strcat(prompt, choices[i]->ef_txt);
             }
             ++acount;
@@ -894,7 +894,7 @@ domonability(void)
     char c = '\0';
 
     if (might_hide && webmaker(uptr)) {
-        c = yn_function("Hide [h] or spin a web [s]?",
+        c = yn_function("隠れる [h] か、クモの巣を張る [s] か?",
                         hidespinchars, 'q', TRUE);
         if (c == 'q' || c == '\033')
             return ECMD_OK;
@@ -954,7 +954,7 @@ enter_explore_mode(void)
     if (discover) {
         You("すでに探索モードだった.");
     } else {
-        const char *oldmode = !wizard ? "normal game" : "debug mode";
+        const char *oldmode = !wizard ? "通常のゲーム" : "デバッグモード";
 
         if (!authorize_explore_mode()) {
             if (!wizard) {
@@ -962,14 +962,14 @@ enter_explore_mode(void)
                 return ECMD_OK;
             } else {
                 pline(
-                 "Note: normally you wouldn't be allowed into explore mode.");
+                 "注意: 通常は探索モードに入れなかった.");
                 /* keep going */
             }
         }
-          pline("注意!  探索モードに入ると%sへ戻れなかった,",
+          pline("注意!  探索モードに入ると%sへ戻れなかった.",
               oldmode);
         if (paranoid_query(ParanoidQuit,
-                           "Do you want to enter explore mode?")) {
+                   "探索モードに入るか?")) {
             discover = TRUE;
             wizard = FALSE;
             clear_nhwindow(WIN_MESSAGE);
@@ -992,7 +992,7 @@ makemap_prepost(boolean pre, boolean wiztower)
         makemap_remove_mons();
         rm_mapseen(ledger_no(&u.uz)); /* discard overview info for level */
         {
-            static const char Unachieve[] = "%s achievement revoked.";
+            static const char Unachieve[] = "%s achievement が取り消された.";
 
             /* achievement tracking; if replacing a level that has a
                special prize, lose credit for previously finding it and
@@ -1070,17 +1070,17 @@ makemap_prepost(boolean pre, boolean wiztower)
    symbols and only the latter have easily accessible descriptions.
    Also used by wizcmds.c */
 const char *levltyp[MAX_TYPE + 2] = {
-    "stone", "vertical wall", "horizontal wall", "top-left corner wall",
-    "top-right corner wall", "bottom-left corner wall",
-    "bottom-right corner wall", "cross wall", "tee-up wall", "tee-down wall",
-    "tee-left wall", "tee-right wall", "drawbridge wall", "tree",
-    "secret door", "secret corridor", "pool", "moat", "water",
-    "drawbridge up", "lava pool", "lava wall", "iron bars", "door",
-    "corridor", "room", "stairs", "ladder", "fountain", "throne", "sink",
-    "grave", "altar", "ice", "drawbridge down", "air", "cloud",
+    "岩", "縦壁", "横壁", "左上角の壁",
+    "右上角の壁", "左下角の壁",
+    "右下角の壁", "交差壁", "上向きT字壁", "下向きT字壁",
+    "左向きT字壁", "右向きT字壁", "跳ね橋の壁", "木",
+    "隠し扉", "隠し通路", "池", "堀", "水",
+    "跳ね橋(上)", "溶岩池", "溶岩壁", "鉄格子", "扉",
+    "通路", "部屋", "階段", "はしご", "噴水", "玉座", "流し台",
+    "墓", "祭壇", "氷", "跳ね橋(下)", "空気", "雲",
     /* not a real terrain type, but used for undiggable stone
        by wiz_map_levltyp() */
-    "unreachable/undiggable",
+    "到達不能/掘削不能",
     /* padding in case the number of entries above is odd */
     ""
 };
@@ -1123,33 +1123,33 @@ doterrain(void)
     any = cg.zeroany;
     any.a_int = 1;
     add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-             "known map without monsters, objects, and traps",
+             "既知の地図からモンスター、物体、罠を除いたもの",
              MENU_ITEMFLAGS_SELECTED);
     any.a_int = 2;
     add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             clr, "known map without monsters and objects",
+             clr, "既知の地図からモンスターと物体を除いたもの",
              MENU_ITEMFLAGS_NONE);
     any.a_int = 3;
     add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             clr, "known map without monsters",
+             clr, "既知の地図からモンスターを除いたもの",
              MENU_ITEMFLAGS_NONE);
     if (discover || wizard) {
         any.a_int = 4;
         add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                 clr, "full map without monsters, objects, and traps",
+                 clr, "全地図からモンスター、物体、罠を除いたもの",
                  MENU_ITEMFLAGS_NONE);
         if (wizard) {
             any.a_int = 5;
             add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                     clr, "internal levl[][].typ codes in base-36",
+                     clr, "levl[][].typ の内部コードを36進で表示する",
                      MENU_ITEMFLAGS_NONE);
             any.a_int = 6;
             add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                     clr, "legend of base-36 levl[][].typ codes",
+                     clr, "levl[][].typ 36進コードの凡例",
                      MENU_ITEMFLAGS_NONE);
         }
     }
-    end_menu(men, "View which?");
+    end_menu(men, "どれを表示する?");
 
     n = select_menu(men, PICK_ONE, &sel);
     destroy_nhwindow(men);
@@ -1288,19 +1288,19 @@ lookaround_known_room(coordxy x, coordxy y)
     if (u_have_seen_whole_selection(sel)) {
         boolean u_in = (boolean) selection_getpoint(x, y, sel);
 
-        You("%s %s %s.",
-            u_at(x, y) && u_in && u_can_see_whole_selection(sel) ? "are in"
-            : (u_at(x, y)) ? "remember this as" : "remember that as",
+        You("%sを%s%sとして記憶した.",
+            u_at(x, y) && u_in && u_can_see_whole_selection(sel) ? "ここにいるのを" :
+            (u_at(x, y)) ? "これを" : "それを",
             an(selection_size_description(sel, qbuf)),
-            rmno >= 0 ? "room" : "area");
+            rmno >= 0 ? "部屋" : "領域");
     } else if (u_have_seen_bounds_selection(sel)) {
-        You("guess %s to be %s %s.",
-            u_at(x, y) ? "this" : "that",
+        You("%sを%s%sと推測した.",
+            u_at(x, y) ? "これ" : "それ",
             an(selection_size_description(sel, qbuf)),
-            rmno >= 0 ? "room" : "area");
+            rmno >= 0 ? "部屋" : "領域");
     } else {
-        You("can't guess the size of %s area.",
-            u_at(x, y) ? "this" : "that");
+        You("%sの大きさは推測できなかった.",
+            u_at(x, y) ? "この" : "その");
     }
     selection_free(sel, TRUE);
 }
@@ -1575,7 +1575,7 @@ int
 do_reqmenu(void)
 {
     if (iflags.menu_requested) {
-        Norep("Double %s prefix, canceled.",
+          Norep("%sの二重接頭辞を取り消した.",
               visctrl(cmd_from_func(do_reqmenu)));
         iflags.menu_requested = FALSE;
         return ECMD_CANCEL;
@@ -1590,7 +1590,7 @@ int
 do_rush(void)
 {
     if ((gd.domove_attempting & DOMOVE_RUSH)) {
-        Norep("Double rush prefix, canceled.");
+        Norep("rush 接頭辞の重複を取り消した.");
         svc.context.run = 0;
         gd.domove_attempting = 0;
         return ECMD_CANCEL;
@@ -1606,7 +1606,7 @@ int
 do_run(void)
 {
     if ((gd.domove_attempting & DOMOVE_RUSH)) {
-        Norep("Double run prefix, canceled.");
+        Norep("run 接頭辞の重複を取り消した.");
         svc.context.run = 0;
         gd.domove_attempting = 0;
         return ECMD_CANCEL;
@@ -1622,7 +1622,7 @@ int
 do_fight(void)
 {
     if (svc.context.forcefight) {
-        Norep("Double fight prefix, canceled.");
+        Norep("fight 接頭辞の重複を取り消した.");
         svc.context.forcefight = 0;
         gd.domove_attempting = 0;
         return ECMD_CANCEL;
@@ -1643,7 +1643,7 @@ do_repeat(void)
         struct _cmd_queue *repeat_copy;
 
         if (!cmdq_peek(CQ_REPEAT)) {
-            Norep("There is no command available to repeat.");
+            Norep("繰り返せるコマンドがなかった.");
             return ECMD_FAIL;
         }
         repeat_copy = cmdq_copy(CQ_REPEAT);
@@ -1665,395 +1665,395 @@ do_repeat(void)
    or control keystroke generally should not be; there are a few exceptions
    such as ^O/#overview and C/N/#name */
 struct ext_func_tab extcmdlist[] = {
-    { '#',    "#", "enter and perform an extended command",
+    { '#',    "#", "拡張コマンドを入力して実行する",
               doextcmd, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { M('?'), "?", "list all extended commands",
+    { M('?'), "?", "すべての拡張コマンドを一覧表示する",
               doextlist, IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX,
               NULL },
-    { M('a'), "adjust", "adjust inventory letters",
+    { M('a'), "adjust", "持ち物の英字割り当てを調整する",
               doorganize, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { M('A'), "annotate", "name current level",
+    { M('A'), "annotate", "現在の階に名前を付ける",
               donamelevel, IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
-    { 'a',    "apply", "apply (use) a tool (pick-axe, key, lamp...)",
+    { 'a',    "apply", "道具を使う (つるはし、鍵、ランプなど)",
               doapply, CMD_M_PREFIX, NULL },
-    { C('x'), "attributes", "show your attributes",
+    { C('x'), "attributes", "能力値を表示する",
               doattributes, IFBURIED | GENERALCMD, NULL },
-    { '@',    "autopickup", "toggle the 'autopickup' option on/off",
+    { '@',    "autopickup", "自動拾いオプションを切り替える",
               dotogglepickup, IFBURIED | GENERALCMD, NULL },
 #ifdef CRASHREPORT
-    { '\0',   "bugreport", "file a bug report",
+    { '\0',   "bugreport", "バグ報告を送る",
               dobugreport, GENERALCMD | NOFUZZERCMD, NULL },
 #endif
-    { 'C',    "call", "name a monster, specific object, or type of object",
+    { 'C',    "call", "モンスター、特定の物体、または物体の種類に名前を付ける",
               docallcmd, IFBURIED | GENERALCMD, NULL },
-    { 'Z',    "cast", "zap (cast) a spell",
+    { 'Z',    "cast", "呪文を唱える",
               docast, IFBURIED, NULL },
-    { M('c'), "chat", "talk to someone",
+    { M('c'), "chat", "誰かと会話する",
               dotalk, IFBURIED | AUTOCOMPLETE, NULL },
-    { 'v',    "chronicle", "show journal of major events",
+    { 'v',    "chronicle", "主な出来事の記録を表示する",
               do_gamelog, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { 'c',    "close", "close a door",
+    { 'c',    "close", "扉を閉める",
               doclose, 0, NULL },
-    { M('C'), "conduct", "list voluntary challenges you have maintained",
+    { M('C'), "conduct", "維持してきた任意チャレンジを一覧表示する",
               doconduct, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { '\0',   "debugfuzzer", "start the fuzz tester",
+    { '\0',   "debugfuzzer", "ファズテスターを開始する",
               wiz_fuzzer, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
-    { M('d'), "dip", "dip an object into something",
+    { M('d'), "dip", "物体を何かに浸す",
               dodip, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
-    { '>',    "down", "go down a staircase",
+     { '>',    "down", "階段を下りる",
               /* allows 'm' prefix (for move without autopickup) but not the
                  g/G/F movement modifiers; not flagged as MOVEMENTCMD because
                  that would suppress it from dokeylist output */
               dodown, CMD_M_PREFIX, NULL },
-    { 'd',    "drop", "drop an item",
+    { 'd',    "drop", "物品を落とす",
               dodrop, 0, NULL },
-    { 'D',    "droptype", "drop specific item types",
+    { 'D',    "droptype", "特定種類の物品を落とす",
               doddrop, 0, NULL },
-    { 'e',    "eat", "eat something",
+    { 'e',    "eat", "何かを食べる",
               doeat, CMD_M_PREFIX, NULL },
-    { 'E',    "engrave", "engrave writing on the floor",
+    { 'E',    "engrave", "床に文字を彫る",
               doengrave, 0, NULL },
-    { M('e'), "enhance", "advance or check weapon and spell skills",
+    { M('e'), "enhance", "武器と呪文の技能を上げるか確認する",
               enhance_weapon_skill, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
     /* #exploremode should be flagged AUTOCOMPETE but that would negatively
        impact frequently used #enhance by making #e become ambiguous */
-    { M('X'), "exploremode", "enter explore (discovery) mode",
+    { M('X'), "exploremode", "探索(発見)モードに入る",
               enter_explore_mode, IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
-    { 'F',    "fight", "prefix: force fight even if you don't see a monster",
+    { 'F',    "fight", "接頭辞: モンスターが見えなくても強制的に戦う",
               do_fight, PREFIXCMD, NULL },
-    { 'f',    "fire", "fire ammunition from quiver",
+    { 'f',    "fire", "矢筒にある矢を発射する",
               dofire, 0, NULL },
-    { M('f'), "force", "force a lock",
+    { M('f'), "force", "鍵をこじ開ける",
               doforce, AUTOCOMPLETE, NULL },
     { M('g'), "genocided",
-              "list monsters that have been genocided or become extinct",
+              "絶滅または根絶されたモンスターを一覧表示する",
               dogenocided,
               IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
-    { ';',    "glance", "show what type of thing a map symbol corresponds to",
+    { ';',    "glance", "地図記号が何を表すか表示する",
               doquickwhatis, IFBURIED | GENERALCMD, NULL },
-    { '?',    "help", "give a help message",
+    { '?',    "help", "ヘルプメッセージを表示する",
               dohelp, IFBURIED | GENERALCMD, NULL },
-    { '\0',   "herecmdmenu", "show menu of commands you can do here",
+    { '\0',   "herecmdmenu", "ここで使えるコマンドのメニューを表示する",
               doherecmdmenu, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { '\0',    "history", "show a summary of the game's development",
+    { '\0',    "history", "ゲーム開発の要約を表示する",
               dohistory, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { 'i',    "inventory", "show your inventory",
+    { 'i',    "inventory", "持ち物を表示する",
               ddoinv, IFBURIED | GENERALCMD, NULL },
-    { 'I',    "inventtype", "show inventory of one specific item class",
+    { 'I',    "inventtype", "特定の物品クラスの持ち物を表示する",
               dotypeinv, IFBURIED | GENERALCMD, NULL },
-    { M('i'), "invoke", "invoke an object's special powers",
+    { M('i'), "invoke", "物体の特殊能力を発動する",
               doinvoke, IFBURIED | AUTOCOMPLETE, NULL },
-    { M('j'), "jump", "jump to another location",
+    { M('j'), "jump", "別の場所に跳ぶ",
               dojump, AUTOCOMPLETE, NULL },
-    { C('d'), "kick", "kick something",
+    { C('d'), "kick", "何かを蹴る",
               dokick, 0, NULL },
-    { '\\',   "known", "show what object types have been discovered",
+    { '\\',   "known", "発見済みの物体種類を表示する",
               dodiscovered, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { '`',    "knownclass", "show discovered types for one class of objects",
+    { '`',    "knownclass", "1つの物体クラスについて発見済みの種類を表示する",
               doclassdisco, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "levelchange", "change experience level",
+    { '\0',   "levelchange", "経験レベルを変更する",
               wiz_level_change, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0',   "lightsources", "show mobile light sources",
+    { '\0',   "lightsources", "移動する光源を表示する",
               wiz_light_sources, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { ':',    "look", "look at what is here",
+    { ':',    "look", "ここにあるものを見る",
               dolook, IFBURIED, NULL },
-    { '\0',   "lookaround", "describe what you can see",
+    { '\0',   "lookaround", "見えるものを説明する",
               dolookaround, IFBURIED | GENERALCMD, NULL },
-    { M('l'), "loot", "loot a box on the floor",
+    { M('l'), "loot", "床の箱をあさる",
               doloot, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
     { '\0',   "migratemons",
 #ifdef DEBUG_MIGRATING_MONS
-              "show migrating monsters and migrate N random ones",
+              "移動中のモンスターを表示し、N体をランダムに移動させる",
 #else
-              "show migrating monsters",
+              "移動中のモンスターを表示する",
 #endif
               wiz_migrate_mons, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { M('m'), "monster", "use monster's special ability",
+    { M('m'), "monster", "モンスターの特殊能力を使う",
               domonability, IFBURIED | AUTOCOMPLETE, NULL },
-    { M('n'), "name", "same as call; name a monster or object or object type",
+    { M('n'), "name", "call と同じ; モンスター、物体、または物体の種類に名前を付ける",
               docallcmd, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { M('o'), "offer", "offer a sacrifice to the gods",
+    { M('o'), "offer", "神々に生け贄を捧げる",
               dosacrifice, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
-    { 'o',    "open", "open a door",
+    { 'o',    "open", "扉を開ける",
               doopen, 0, NULL },
     /* 'm #options' runs doset() */
-    { 'O',    "options", "show option settings",
+    { 'O',    "options", "オプション設定を表示する",
               doset_simple, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
     /* 'm #optionsfull' runs doset_simple() */
-    { '\0',   "optionsfull", "show all option settings, possibly change them",
+    { '\0',   "optionsfull", "すべてのオプション設定を表示し、必要なら変更する",
               doset, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
     /* #overview used to need autocomplete and has retained that even
        after being assigned to ^O [old wizard mode ^O is now #wizwhere];
        'm' prefix displays overview as a menu where player can choose a
        level to supply with an annotation */
-    { C('o'), "overview", "show a summary of the explored dungeon",
+    { C('o'), "overview", "探索済みダンジョンの要約を表示する",
               dooverview,
               IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
     /* [should #panic actually autocomplete?] */
-    { '\0',   "panic", "test panic routine (fatal to game)",
+    { '\0',   "panic", "panic ルーチンをテストする(ゲームに致命的)",
               wiz_panic, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { 'p',    "pay", "pay your shopping bill",
+    { 'p',    "pay", "買い物の請求を支払う",
               dopay, CMD_M_PREFIX, NULL },
-    { '|',    "perminv", "scroll persistent inventory display",
+    { '|',    "perminv", "固定持ち物表示をスクロールする",
               doperminv, IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
-    { ',',    "pickup", "pick up things at the current location",
+    { ',',    "pickup", "現在地の物を拾う",
               dopickup, CMD_M_PREFIX, NULL },
-    { '\0',   "polyself", "polymorph self",
+    { '\0',   "polyself", "自分を変身させる",
               wiz_polyself, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { M('p'), "pray", "pray to the gods for help",
+    { M('p'), "pray", "神々に助けを祈る",
               dopray, IFBURIED | AUTOCOMPLETE, NULL },
-    { C('p'), "prevmsg", "view recent game messages",
+    { C('p'), "prevmsg", "最近のゲームメッセージを見る",
               doprev_message, IFBURIED | GENERALCMD | CMD_INSANE, NULL },
-    { 'P',    "puton", "put on an accessory (ring, amulet, etc)",
+    { 'P',    "puton", "装身具(指輪、護符など)を着ける",
               doputon, 0, NULL },
-    { 'q',    "quaff", "quaff (drink) something",
+    { 'q',    "quaff", "何かを飲む",
               dodrink, CMD_M_PREFIX, NULL },
-    { '\0',   "quit", "exit without saving current game",
+    { '\0',   "quit", "現在のゲームを保存せずに終了する",
               done2, IFBURIED | AUTOCOMPLETE | GENERALCMD | NOFUZZERCMD,
               NULL },
-    { 'Q',    "quiver", "select ammunition for quiver",
+    { 'Q',    "quiver", "矢筒に入れる弾を選ぶ",
               dowieldquiver, 0, NULL },
-    { 'r',    "read", "read a scroll or spellbook",
+    { 'r',    "read", "巻物または魔法書を読む",
               doread, 0, NULL },
-    { C('r'), "redraw", "redraw screen",
+    { C('r'), "redraw", "画面を再描画する",
               doredraw, IFBURIED | GENERALCMD | CMD_INSANE, NULL },
-    { 'R',    "remove", "remove an accessory (ring, amulet, etc)",
+    { 'R',    "remove", "装身具(指輪、護符など)を外す",
               doremring, 0, NULL },
-    { C('a'), "repeat", "repeat a previous command",
+    { C('a'), "repeat", "前のコマンドを繰り返す",
               do_repeat, IFBURIED | GENERALCMD, NULL },
     /* "modify command" is a vague description for use as no-autopickup,
        no-attack movement as well as miscellaneous non-movement things;
        key2extcmddesc() constructs a more explicit two line description
        for display by the '&' command and expects to find "prefix:" as
        the start of the text here */
-    { 'm',    "reqmenu", "prefix: request menu or modify command",
+    { 'm',    "reqmenu", "接頭辞: メニューを要求するか、コマンドを修飾する",
               do_reqmenu, PREFIXCMD, NULL },
-    { C('_'), "retravel", "travel to previously selected travel location",
+    { C('_'), "retravel", "以前選んだ移動先へ再移動する",
               dotravel_target, 0, NULL },
-    { M('R'), "ride", "mount or dismount a saddled steed",
+    { M('R'), "ride", "鞍付きの騎乗生物に乗るか降りる",
               doride, AUTOCOMPLETE, NULL },
-    { M('r'), "rub", "rub a lamp or a stone",
+    { M('r'), "rub", "ランプか石をこする",
               dorub, AUTOCOMPLETE, NULL },
-    { 'G',    "run", "prefix: run until something interesting is seen",
+    { 'G',    "run", "接頭辞: 何か面白いものが見えるまで走る",
               do_run, PREFIXCMD, NULL },
-    { 'g',    "rush", "prefix: rush until something interesting is seen",
+    { 'g',    "rush", "接頭辞: 何か面白いものが見えるまで急ぐ",
               do_rush, PREFIXCMD, NULL },
-    { 'S',    "save", "save the game and exit",
+    { 'S',    "save", "ゲームを保存して終了する",
               dosave, IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
-    { '\0',   "saveoptions", "save the game configuration",
+    { '\0',   "saveoptions", "ゲーム設定を保存する",
               do_write_config_file,
               IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
-    { 's',    "search", "search for traps and secret doors",
+    { 's',    "search", "罠と隠し扉を探す",
               dosearch, IFBURIED | CMD_M_PREFIX, "searching" },
-    { '*',    "seeall", "show all equipment in use",
+    { '*',    "seeall", "使用中の装備をすべて表示する",
               doprinuse, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { AMULET_SYM, "seeamulet", "show the amulet currently worn",
+    { AMULET_SYM, "seeamulet", "現在着けている護符を表示する",
               dopramulet, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { ARMOR_SYM, "seearmor", "show the armor currently worn",
+    { ARMOR_SYM, "seearmor", "現在着ている鎧を表示する",
               doprarm, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { RING_SYM, "seerings", "show the ring(s) currently worn",
+    { RING_SYM, "seerings", "現在はめている指輪を表示する",
               doprring, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { TOOL_SYM, "seetools", "show the tools currently in use",
+    { TOOL_SYM, "seetools", "現在使用中の道具を表示する",
               doprtool, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { WEAPON_SYM, "seeweapon", "show the weapon currently wielded",
+    { WEAPON_SYM, "seeweapon", "現在構えている武器を表示する",
               doprwep, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
     { '!',    "shell",
-              "leave game to enter a sub-shell ('exit' to come back)",
+              "ゲームを離れてサブシェルに入る ('exit' で戻る)",
               dosh_core, (IFBURIED | GENERALCMD | NOFUZZERCMD
 #ifndef SHELL
                         | CMD_NOT_AVAILABLE
 #endif /* SHELL */
                         ), NULL },
     /* $ is like ),=,&c but is not included with *, so not called "seegold" */
-    { GOLD_SYM, "showgold", "show gold, possibly shop credit or debt",
+    { GOLD_SYM, "showgold", "所持金を表示する。店の信用貸しや借金を含む場合がある",
               doprgold, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { SPBOOK_SYM, "showspells", "list and reorder known spells",
+    { SPBOOK_SYM, "showspells", "既知の呪文を一覧表示し並べ替える",
               dovspell, IFBURIED | GENERALCMD, NULL },
-    { '^',    "showtrap", "describe an adjacent, discovered trap",
+    { '^',    "showtrap", "隣接する発見済みの罠を説明する",
               doidtrap, IFBURIED | GENERALCMD, NULL },
-    { M('s'), "sit", "sit down",
+    { M('s'), "sit", "座る",
               dosit, AUTOCOMPLETE, NULL },
-    { '\0',   "stats", "show memory statistics",
+    { '\0',   "stats", "メモリ統計を表示する",
               wiz_show_stats, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { C('z'), "suspend", "push game to background ('fg' to come back)",
+    { C('z'), "suspend", "ゲームをバックグラウンドに回す ('fg' で戻る)",
               dosuspend_core, (IFBURIED | GENERALCMD | NOFUZZERCMD
 #ifndef SUSPEND
                                | CMD_NOT_AVAILABLE
 #endif /* SUSPEND */
                                ), NULL },
-    { 'x',    "swap", "swap wielded and secondary weapons",
+    { 'x',    "swap", "手に持った武器と副武器を入れ替える",
               doswapweapon, 0, NULL },
-    { 'T',    "takeoff", "take off one piece of armor",
+    { 'T',    "takeoff", "鎧を1つ外す",
               dotakeoff, 0, NULL },
-    { 'A',    "takeoffall", "remove all armor",
+    { 'A',    "takeoffall", "鎧をすべて外す",
               doddoremarm, 0, NULL },
-    { C('t'), "teleport", "teleport around the level",
+    { C('t'), "teleport", "階層内を瞬間移動する",
               dotelecmd, IFBURIED | CMD_M_PREFIX, NULL },
     /* \177 == <del> aka <delete> aka <rubout>; some terminals have an
        option to swap it with <backspace> so if there's a key labeled
        <delete> it may or may not actually invoke the #terrain command */
     { '\177', "terrain",
-              "view map without monsters or objects obstructing it",
+              "モンスターや物体の邪魔がない地図を見る",
               doterrain, IFBURIED | GENERALCMD | AUTOCOMPLETE, NULL },
     { '\0',   "therecmdmenu",
-              "menu of commands you can do from here to adjacent spot",
+              "ここから隣接地点でできるコマンドのメニュー",
               dotherecmdmenu, AUTOCOMPLETE | GENERALCMD | MOUSECMD, NULL },
-    { 't',    "throw", "throw something",
+    { 't',    "throw", "何かを投げる",
               dothrow, 0, NULL },
-    { '\0',   "timeout", "look at timeout queue and hero's timed intrinsics",
+    { '\0',   "timeout", "タイムアウト待ち行列と英雄の時間制固有能力を見る",
               wiz_timeout_queue, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { M('T'), "tip", "empty a container",
+    { M('T'), "tip", "容器を空にする",
               dotip, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
-    { '\0',   "toggle", "toggle boolean option",
+    { '\0',   "toggle", "真偽値オプションを切り替える",
               dotoggleoption, IFBURIED | GENERALCMD | CMD_PARAM, NULL },
-    { '_',    "travel", "travel to a specific location on the map",
+    { '_',    "travel", "地図上の特定位置へ移動する",
               dotravel, CMD_M_PREFIX, NULL },
-    { M('t'), "turn", "turn undead away",
+    { M('t'), "turn", "アンデッドを追い払う",
               doturn, IFBURIED | AUTOCOMPLETE, NULL },
-    { 'X',    "twoweapon", "toggle two-weapon combat",
+    { 'X',    "twoweapon", "二刀流戦闘を切り替える",
               dotwoweapon, 0, NULL },
-    { M('u'), "untrap", "untrap something",
+    { M('u'), "untrap", "何かの罠を外す",
               dountrap, AUTOCOMPLETE, NULL },
-    { '<',    "up", "go up a staircase",
+    { '<',    "up", "階段を上る",
               /* (see comment for dodown() above */
               doup, CMD_M_PREFIX, NULL },
-    { M('V'), "vanquished", "list vanquished monsters",
+    { M('V'), "vanquished", "倒したモンスターを一覧表示する",
               dovanquished,
               IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
     { M('v'), "version",
-              "list compile time options for this version of NetHack",
+              "この NetHack のビルド時オプションを一覧表示する",
               doextversion, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { 'V',    "versionshort", "show version and date+time program was built",
+    { 'V',    "versionshort", "バージョンとビルド日時を表示する",
               doversion, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "vision", "show vision array",
+    { '\0',   "vision", "視界配列を表示する",
               wiz_show_vision, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '.',    "wait", "rest one move while doing nothing",
+    { '.',    "wait", "何もせず1ターン休む",
               donull, IFBURIED | CMD_M_PREFIX, "waiting" },
-    { 'W',    "wear", "wear a piece of armor",
+    { 'W',    "wear", "鎧を身に着ける",
               dowear, 0, NULL },
-    { '&',    "whatdoes", "tell what a command does",
+    { '&',    "whatdoes", "コマンドの働きを説明する",
               dowhatdoes, IFBURIED | GENERALCMD, NULL },
-    { '/',    "whatis", "show what type of thing a symbol corresponds to",
+    { '/',    "whatis", "記号が何を表すか表示する",
               dowhatis, IFBURIED | GENERALCMD, NULL },
-    { 'w',    "wield", "wield (put in use) a weapon",
+    { 'w',    "wield", "武器を装備する(使用状態にする)",
               dowield, 0, NULL },
-    { M('w'), "wipe", "wipe off your face",
+    { M('w'), "wipe", "顔をぬぐう",
               dowipe, AUTOCOMPLETE, NULL },
-    { '\0',   "wizborn", "show stats of monsters created",
+    { '\0',   "wizborn", "生成されたモンスターの統計を表示する",
               doborn, IFBURIED | WIZMODECMD, NULL },
 #ifdef DEBUG
-    { '\0',   "wizbury", "bury objs under and around you",
+    { '\0',   "wizbury", "自分の下と周囲の物体を埋める",
               wiz_debug_cmd_bury, IFBURIED | AUTOCOMPLETE | WIZMODECMD,
               NULL },
 #endif
-    { '\0',   "wizcast", "cast any spell",
+    { '\0',   "wizcast", "任意の呪文を唱える",
               dowizcast, IFBURIED | WIZMODECMD, NULL },
-    { '\0',   "wizcustom", "show customized glyphs",
+    { '\0',   "wizcustom", "カスタマイズされた文字記号を表示する",
               wiz_custom, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
-    { C('e'), "wizdetect", "reveal hidden things within a small radius",
+    { C('e'), "wizdetect", "小範囲内の隠れたものを明らかにする",
               wiz_detect, IFBURIED | WIZMODECMD, NULL },
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
-    { '\0',   "wizdispmacros", "validate the display macro ranges",
+    { '\0',   "wizdispmacros", "表示マクロ範囲を検証する",
               wiz_display_macros, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
 #endif
-    { '\0',   "wizfliplevel", "flip the level",
+    { '\0',   "wizfliplevel", "階層を反転する",
               wiz_flip_level, IFBURIED | WIZMODECMD, NULL },
-    { C('g'), "wizgenesis", "create a monster",
+    { C('g'), "wizgenesis", "モンスターを生成する",
               wiz_genesis, IFBURIED | WIZMODECMD, NULL },
-    { C('i'), "wizidentify", "identify all items in inventory",
+    { C('i'), "wizidentify", "持ち物の全アイテムを識別する",
               wiz_identify, IFBURIED | WIZMODECMD, NULL },
-    { '\0',   "wizintrinsic", "set an intrinsic",
+    { '\0',   "wizintrinsic", "固有能力を設定する",
               wiz_intrinsic, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0',   "wizkill", "slay a monster",
+    { '\0',   "wizkill", "モンスターを倒す",
               wiz_kill, (IFBURIED | AUTOCOMPLETE | WIZMODECMD
                          | CMD_M_PREFIX | NOFUZZERCMD), NULL },
-    { C('v'), "wizlevelport", "teleport to another level",
+    { C('v'), "wizlevelport", "別の階へテレポートする",
               wiz_level_tele, IFBURIED | WIZMODECMD | CMD_M_PREFIX, NULL },
-    { '\0',   "wizloaddes", "load and execute a des-file lua script",
+    { '\0',   "wizloaddes", "des ファイルの Lua スクリプトを読み込んで実行する",
               wiz_load_splua, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
-    { '\0',   "wizloadlua", "load and execute a lua script",
+    { '\0',   "wizloadlua", "Lua スクリプトを読み込んで実行する",
               wiz_load_lua, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
-    { '\0',   "wizobjprobs", "list object generation probabilities",
+    { '\0',   "wizobjprobs", "物体生成確率を一覧表示する",
               wiz_objprobs, IFBURIED | WIZMODECMD, NULL },
 #endif
-    { '\0',   "wizmakemap", "recreate the current level",
+    { '\0',   "wizmakemap", "現在の階層を再生成する",
               wiz_makemap, IFBURIED | WIZMODECMD, NULL },
-    { C('f'), "wizmap", "map the level",
+    { C('f'), "wizmap", "階層をマップ化する",
               wiz_map, IFBURIED | WIZMODECMD, NULL },
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
-    { '\0',   "wizmondiff", "validate the difficulty ratings of monsters",
+    { '\0',   "wizmondiff", "モンスターの難度評価を検証する",
               wiz_mon_diff, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
 #endif
-    { '\0',   "wizrumorcheck", "verify rumor boundaries",
+    { '\0',   "wizrumorcheck", "噂文の境界を検証する",
               wiz_rumor_check, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0',   "wizseenv", "show map locations' seen vectors",
+    { '\0',   "wizseenv", "地図位置の見えた方向ベクトルを表示する",
               wiz_show_seenv, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0', "wizshownhuuid", "show NHUUID for this game",
+    { '\0', "wizshownhuuid", "このゲームの NHUUID を表示する",
               wiz_show_nhuuid, AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0',   "wizsmell", "smell monster",
+    { '\0',   "wizsmell", "モンスターの匂いを嗅ぐ",
               wiz_smell, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0',   "wiztelekinesis", "telekinesis",
+    { '\0',   "wiztelekinesis", "念動力",
               wiz_telekinesis, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0',   "wizwhere", "show locations of special levels",
+    { '\0',   "wizwhere", "特別な階層の位置を表示する",
               wiz_where, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { C('w'), "wizwish", "wish for something",
+    { C('w'), "wizwish", "何かを願う",
               wiz_wish, IFBURIED | CMD_M_PREFIX | WIZMODECMD, NULL },
-    { '\0',   "wmode", "show wall modes",
+    { '\0',   "wmode", "壁モードを表示する",
               wiz_show_wmodes, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { 'z',    "zap", "zap a wand",
+    { 'z',    "zap", "魔法の杖を振る",
               dozap, 0, NULL },
     /* movement commands will be bound by reset_commands() */
     /* move or attack; accept m/g/G/F prefixes */
-    { '\0',   "movewest", "move west (screen left)",
+    { '\0',   "movewest", "西へ移動する(画面左)",
               do_move_west, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
-    { '\0',   "movenorthwest", "move northwest (screen upper left)",
+    { '\0',   "movenorthwest", "北西へ移動する(画面左上)",
               do_move_northwest, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
-    { '\0',   "movenorth", "move north (screen up)",
+    { '\0',   "movenorth", "北へ移動する(画面上)",
               do_move_north, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
-    { '\0',   "movenortheast", "move northeast (screen upper right)",
+    { '\0',   "movenortheast", "北東へ移動する(画面右上)",
               do_move_northeast, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
-    { '\0',   "moveeast", "move east (screen right)",
+    { '\0',   "moveeast", "東へ移動する(画面右)",
               do_move_east, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
-    { '\0',   "movesoutheast", "move southeast (screen lower right)",
+    { '\0',   "movesoutheast", "南東へ移動する(画面右下)",
               do_move_southeast, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
-    { '\0',   "movesouth", "move south (screen down)",
+    { '\0',   "movesouth", "南へ移動する(画面下)",
               do_move_south, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
-    { '\0',   "movesouthwest", "move southwest (screen lower left)",
+    { '\0',   "movesouthwest", "南西へ移動する(画面左下)",
               do_move_southwest, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
     /* rush; accept m prefix but not g/G/F */
-    { '\0',   "rushwest", "rush west (screen left)",
+    { '\0',   "rushwest", "西へ急ぐ(画面左)",
               do_rush_west, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "rushnorthwest", "rush northwest (screen upper left)",
+    { '\0',   "rushnorthwest", "北西へ急ぐ(画面左上)",
               do_rush_northwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "rushnorth", "rush north (screen up)",
+    { '\0',   "rushnorth", "北へ急ぐ(画面上)",
               do_rush_north, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "rushnortheast", "rush northeast (screen upper right)",
+    { '\0',   "rushnortheast", "北東へ急ぐ(画面右上)",
               do_rush_northeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "rusheast", "rush east (screen right)",
+    { '\0',   "rusheast", "東へ急ぐ(画面右)",
               do_rush_east, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "rushsoutheast", "rush southeast (screen lower right)",
+    { '\0',   "rushsoutheast", "南東へ急ぐ(画面右下)",
               do_rush_southeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "rushsouth", "rush south (screen down)",
+    { '\0',   "rushsouth", "南へ急ぐ(画面下)",
               do_rush_south, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "rushsouthwest", "rush southwest (screen lower left)",
+    { '\0',   "rushsouthwest", "南西へ急ぐ(画面左下)",
               do_rush_southwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     /* run; accept m prefix but not g/G/F */
-    { '\0',   "runwest", "run west (screen left)",
+    { '\0',   "runwest", "西へ走る(画面左)",
               do_run_west, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "runnorthwest", "run northwest (screen upper left)",
+    { '\0',   "runnorthwest", "北西へ走る(画面左上)",
               do_run_northwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "runnorth", "run north (screen up)",
+    { '\0',   "runnorth", "北へ走る(画面上)",
               do_run_north, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "runnortheast", "run northeast (screen upper right)",
+    { '\0',   "runnortheast", "北東へ走る(画面右上)",
               do_run_northeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "runeast", "run east (screen right)",
+    { '\0',   "runeast", "東へ走る(画面右)",
               do_run_east, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "runsoutheast", "run southeast (screen lower right)",
+    { '\0',   "runsoutheast", "南東へ走る(画面右下)",
               do_run_southeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "runsouth", "run south (screen down)",
+    { '\0',   "runsouth", "南へ走る(画面下)",
               do_run_south, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "runsouthwest", "run southwest (screen lower left)",
+    { '\0',   "runsouthwest", "南西へ走る(画面左下)",
               do_run_southwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
 
     /* internal commands: only used by game core, not available for user */
@@ -2088,9 +2088,9 @@ static const struct {
     const char *desc;
     boolean numpad;
 } misc_keys[] = {
-    { NHKF_ESC, "cancel current prompt or pending prefix", FALSE },
-    { NHKF_COUNT,
-      "Prefix: for digits when preceding a command with a count", TRUE },
+        { NHKF_ESC, "現在の入力や保留中の接頭辞を取り消す", FALSE },
+        { NHKF_COUNT,
+            "接頭辞: コマンドの前で数字を使う", TRUE },
     { 0, (const char *) 0, FALSE }
 };
 
@@ -2316,10 +2316,10 @@ handler_rebind_keys_add(boolean keyfirst)
         struct Cmd_bind *bind = cmdbind_get(key);
 
         if (bind && bind->cmd) {
-            Sprintf(buf, "Key '%s' is currently bound to \"%s\".",
+                Sprintf(buf, "キー '%s' は現在 \"%s\" に割り当てられている.",
                     key2txt(key, buf2), bind->cmd->ef_txt);
         } else {
-            Sprintf(buf, "Key '%s' is not bound to anything.",
+                Sprintf(buf, "キー '%s' は何にも割り当てられていない.",
                     key2txt(key, buf2));
         }
         add_menu_str(win, buf);
@@ -2328,7 +2328,7 @@ handler_rebind_keys_add(boolean keyfirst)
 
     any.a_int = -1;
     add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
-             "nothing: unbind the key",
+             "nothing: キーの割り当てを外す",
              MENU_ITEMFLAGS_NONE);
 
     add_menu_str(win, "");
@@ -2345,9 +2345,9 @@ handler_rebind_keys_add(boolean keyfirst)
              MENU_ITEMFLAGS_NONE);
     }
     if (key)
-        Sprintf(buf, "Bind '%s' to what command?", key2txt(key, buf2));
+        Sprintf(buf, "キー '%s' を何のコマンドに割り当てる?", key2txt(key, buf2));
     else
-        Sprintf(buf, "Bind what command?");
+        Sprintf(buf, "何のコマンドを割り当てる?");
     end_menu(win, buf);
     npick = select_menu(win, PICK_ONE, &picks);
     destroy_nhwindow(win);
@@ -2360,7 +2360,7 @@ handler_rebind_keys_add(boolean keyfirst)
 
         if (i == -1) {
             ec = NULL;
-            Strcat(cmdstr, "nothing");
+            Strcat(cmdstr, "割り当てなし");
             goto bindit;
         } else {
             ec = &extcmdlist[i-1];
@@ -2370,7 +2370,7 @@ handler_rebind_keys_add(boolean keyfirst)
                 char querybuf[BUFSZ];
 
                 parambuf[0] = '\0';
-                Sprintf(querybuf, "Command %s requires a parameter:", ec->ef_txt);
+                Sprintf(querybuf, "コマンド %s には引数が必要だ:", ec->ef_txt);
                 getlin(querybuf, parambuf);
                 (void) mungspaces(parambuf);
                 Snprintf(cmdstr, BUFSZ-1, "%s(%s)", ec->ef_txt, parambuf);
@@ -2420,16 +2420,16 @@ handler_rebind_keys(void)
 
     any.a_int = 1;
     add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
-             "bind key to a command", MENU_ITEMFLAGS_NONE);
+             "キーをコマンドに割り当てる", MENU_ITEMFLAGS_NONE);
     any.a_int = 2;
     add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
-             "bind command to a key", MENU_ITEMFLAGS_NONE);
+             "コマンドをキーに割り当てる", MENU_ITEMFLAGS_NONE);
     if (count_bind_keys()) {
         any.a_int = 3;
         add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
-                 "view changed key binds", MENU_ITEMFLAGS_NONE);
+                 "変更されたキー割り当てを表示する", MENU_ITEMFLAGS_NONE);
     }
-    end_menu(win, "Do what?");
+    end_menu(win, "何をするか?");
     npick = select_menu(win, PICK_ONE, &picks);
     destroy_nhwindow(win);
     if (npick > 0) {
@@ -2478,7 +2478,7 @@ handler_change_autocompletions(void)
                  MENU_ITEMFLAGS_NONE);
     }
 
-    end_menu(win, "Which commands autocomplete?");
+    end_menu(win, "どのコマンドを自動補完するか?");
     n = select_menu(win, PICK_ANY, &picks);
     if (n >= 0) {
         int j;
@@ -2571,20 +2571,20 @@ key2extcmddesc(uchar key)
        that match !number_pad movement (like 'j' for "jump") */
     key2cmdbuf[0] = '\0';
     if (movecmd(k = key, MV_WALK))
-        Strcpy(key2cmdbuf, "move"); /* "move or attack"? */
+        Strcpy(key2cmdbuf, "移動"); /* "move or attack"? */
     else if (movecmd(k = key, MV_RUSH))
-        Strcpy(key2cmdbuf, "rush");
+        Strcpy(key2cmdbuf, "急ぐ");
     else if (movecmd(k = key, MV_RUN))
-        Strcpy(key2cmdbuf, "run");
+        Strcpy(key2cmdbuf, "走る");
     if (digit(key) || (gc.Cmd.num_pad && digit(unmeta(key)))) {
         key2cmdbuf[0] = '\0';
         if (!gc.Cmd.num_pad)
-            Strcpy(key2cmdbuf, "start of, or continuation of, a count");
+            Strcpy(key2cmdbuf, "カウントの開始または継続");
         else if (key == '5' || key == M_5)
-            Sprintf(key2cmdbuf, "%s prefix",
-                    (!!gc.Cmd.pcHack_compat ^ (key == M_5)) ? "run" : "rush");
+                    Sprintf(key2cmdbuf, "%s 接頭辞",
+                        (!!gc.Cmd.pcHack_compat ^ (key == M_5)) ? "走る" : "急ぐ");
         else if (key == '0' || (gc.Cmd.pcHack_compat && key == M_0))
-            Strcpy(key2cmdbuf, "synonym for 'i'");
+            Strcpy(key2cmdbuf, "'i' の同義語");
         if (*key2cmdbuf)
             return key2cmdbuf;
     }
@@ -2606,12 +2606,12 @@ key2extcmddesc(uchar key)
            "prefix: request menu or modify command (#reqmenu)"
            with two-line "movement prefix:...\nnon-movement prefix:..." */
         if (!strncmpi(key2cmdbuf, "prefix:", 7) && !strcmpi(txt, "reqmenu"))
-            (void) strsubst(key2cmdbuf, "prefix:",
+                 (void) strsubst(key2cmdbuf, "prefix:",
                      /* relies on implicit concatenation of literal strings */
-                            "movement prefix:"
-                            " move without autopickup and without attacking"
+                        "移動用接頭辞:"
+                        " 自動拾いなし、攻撃なしで移動する"
                             "\n"
-                            "non-movement prefix:"); /* and rest of buf */
+                        "非移動用接頭辞:"); /* and rest of buf */
 
         /* another special case: 'txt' for '#' is "#" and showing that as
            "perform an extended command (##)" looks silly; strip "(##)" off */
@@ -2903,41 +2903,41 @@ dokeylist(void)
 
     datawin = create_nhwindow(NHW_TEXT);
     putstr(datawin, 0, "");
-    Sprintf(buf, "%7s %s", "", "    Full Current Key Bindings List");
+    Sprintf(buf, "%7s %s", "", "    現在のキー割り当て一覧");
     putstr(datawin, 0, buf);
     for (extcmd = extcmdlist; extcmd->ef_txt; ++extcmd)
         if (spkey_gap || !keylist_func_has_key(extcmd, keys_used)) {
             Sprintf(buf, "%7s %s", "",
-                               "(also commands with no key assignment)");
+                               "(キー未割り当てのコマンドも含む)");
             putstr(datawin, 0, buf);
             break;
         }
 
     /* directional keys */
     putstr(datawin, 0, "");
-    putstr(datawin, 0, "Directional keys:");
+    putstr(datawin, 0, "方向キー:");
     show_direction_keys(datawin, '.', FALSE); /* '.'==self in direct'n grid */
 
     if (!iflags.num_pad) {
         putstr(datawin, 0, "");
-        putstr(datawin, 0,
-     "Ctrl+<direction> will run in specified direction until something very");
-        Sprintf(buf, "%7s %s", "", "interesting is seen.");
+          putstr(datawin, 0,
+      "Ctrl+<方向> で、何かとても興味深いものが見えるまでその方向へ走る.");
+          Sprintf(buf, "%7s %s", "", "");
         putstr(datawin, 0, buf);
-        Strcpy(buf, "Shift"); /* append the rest below */
+        Strcpy(buf, "Shiftキー"); /* append the rest below */
     } else {
         /* num_pad */
         putstr(datawin, 0, "");
-        Strcpy(buf, "Meta"); /* append the rest next */
+        Strcpy(buf, "Metaキー"); /* append the rest next */
     }
-    Strcat(buf,
-          "+<direction> will run in specified direction until you encounter");
+        Strcat(buf,
+            "+<方向> で、障害物にぶつかるまでその方向へ走る.");
     putstr(datawin, 0, buf);
-    Sprintf(buf, "%7s %s", "", "an obstacle.");
+    Sprintf(buf, "%7s %s", "", "");
     putstr(datawin, 0, buf);
 
     putstr(datawin, 0, "");
-    putstr(datawin, 0, "Miscellaneous keys:");
+    putstr(datawin, 0, "その他のキー:");
     for (i = 0; misc_keys[i].desc; ++i) {
         if (misc_keys[i].numpad && !iflags.num_pad)
             continue;
@@ -3002,7 +3002,7 @@ dokeylist(void)
     if (wizard && keylist_putcmds(datawin, TRUE,
                                   WIZMODECMD, INTERNALCMD, keys_used)) {
         putstr(datawin, 0, "");
-        putstr(datawin, 0, "Debug mode commands:");
+        putstr(datawin, 0, "デバッグモードのコマンド:");
         (void) keylist_putcmds(datawin, FALSE,
                                WIZMODECMD, INTERNALCMD, keys_used);
     }
@@ -3227,7 +3227,7 @@ key2txt(uchar c, char *txt) /* sufficiently long buffer */
     /* should probably switch to "SPC", "ESC", "RET"
        since nethack's documentation uses ESC for <escape> */
     if (c == ' ')
-        Sprintf(txt, "<space>");
+        Sprintf(txt, "<スペース>");
     else if (c == '\033')
         Sprintf(txt, "<esc>"); /* "<escape>" won't fit */
     else if (c == '\n')
@@ -3696,7 +3696,7 @@ rhack(int key)
                 char pfxidx = cmd_from_func(prefix_seen->ef_funct);
                 const char *which = (pfxidx != 0) ? visctrl(pfxidx)
                                     : (prefix_seen->ef_funct == do_reqmenu)
-                                      ? "move-no-pickup or request-menu"
+                                      ? "移動のみ/要求メニュー"
                                       : prefix_seen->ef_txt;
 
                 /*
@@ -3706,8 +3706,8 @@ rhack(int key)
                  * the former call to help_dir() (for 'bad_command' below).
                  */
                 if (was_m_prefix) {
-                    custompline(SUPPRESS_HISTORY,
-                          "The %s command does not accept '%s' prefix.",
+                      custompline(SUPPRESS_HISTORY,
+                          "%sコマンドは '%s' 接頭辞を受け付けなかった.",
                           tlist->ef_txt, which);
                 } else {
                     uchar ch = tlist->key;
@@ -3715,9 +3715,9 @@ rhack(int key)
                             down = (ch == '>' || tlist->ef_funct == dodown);
 
                     pline(
-                "The '%s' prefix should be followed by a movement command%s.",
-                          which,
-                          (up || down) ? " other than up or down" : "");
+                    "'%s' 接頭辞のあとには移動コマンドを続ける必要があった%s.",
+                              which,
+                              (up || down) ? "(上下以外)" : "");
                 }
                 res = ECMD_FAIL;
                 prefix_seen = 0;
@@ -3831,7 +3831,7 @@ rhack(int key)
     }
 
     if (bad_command) {
-        custompline(SUPPRESS_HISTORY, "Unknown command '%s'.", visctrl(key));
+        custompline(SUPPRESS_HISTORY, "不明なコマンド '%s'.", visctrl(key));
         cmdq_clear(CQ_CANNED);
         cmdq_clear(CQ_REPEAT);
         iflags.sanity_no_check = iflags.sanity_check; /* skip sanity check */
@@ -3985,7 +3985,7 @@ getdir(const char *s)
     if (gi.in_doagain || *readchar_queue) {
         dirsym = readchar();
     } else {
-        dirsym = yn_function((s && *s != '^') ? s : "In what direction?",
+        dirsym = yn_function((s && *s != '^') ? s : "どの方向か?",
                              (char *) 0, '\0', FALSE);
 
         /* for the fuzzer, usually force the result to be a valid direction,
@@ -4045,7 +4045,7 @@ getdir(const char *s)
          * "," being left of ".".)
          */
         Sprintf(qbuf,
-            "desired location, then type '%s' for left click, '%s' for right",
+            "目的の場所を指定し、左クリックには '%s'、右クリックには '%s' を入力する.",
                 /* visctrl() cycles through several static buffers for its
                    return value so using two in the same expression is ok */
                 visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_Q]), /* ',' */
@@ -4214,7 +4214,7 @@ help_dir(
     if (!viawindow) {
         if (prefixhandling) {
             if (!*buf)
-                Sprintf(buf, "Invalid direction for '%s' prefix.",
+                Sprintf(buf, "'%s' 接頭辞に対する方向が不正だった.",
                         visctrl(spkey));
             pline("%s", buf);
             return TRUE;
@@ -4246,24 +4246,24 @@ help_dir(
         ctrl = (sym - 'A') + 1; /* 0-27 (note: 28-31 aren't applicable) */
         if ((explain = dowhatdoes_core(ctrl, buf2)) != 0
             && (!strchr(wiz_only_list, sym) || wizard)) {
-            Sprintf(buf, "Are you trying to use ^%c%s?", sym,
+            Sprintf(buf, "^%c%s を使おうとしていたか?", sym,
                     strchr(wiz_only_list, sym) ? ""
-                        : " as specified in the Guidebook");
+                        : " (Guidebook に記載された通り)");
             putstr(win, 0, buf);
             putstr(win, 0, "");
             putstr(win, 0, explain);
             putstr(win, 0, "");
             putstr(win, 0,
-                  "To use that command, hold down the <Ctrl> key as a shift");
-            Sprintf(buf, "and press the <%c> key.", sym);
+                "そのコマンドを使うには、<Ctrl> キーを押しながら");
+            Sprintf(buf, "<%c> キーを押したらよかった.", sym);
             putstr(win, 0, buf);
             putstr(win, 0, "");
         }
     }
 
-    Sprintf(buf, "Valid direction keys%s%s%s are:",
-            prefixhandling ? " to " : "", prefixhandling ? dothat : "",
-            NODIAG(u.umonnum) ? " in your current form" : "");
+        Sprintf(buf, "有効な方向キー%s%s%sは:",
+            prefixhandling ? " for " : "", prefixhandling ? dothat : "",
+            NODIAG(u.umonnum) ? " 現在の形態では" : "");
     putstr(win, 0, buf);
     show_direction_keys(win, !prefixhandling ? '.' : ' ', NODIAG(u.umonnum));
 
@@ -4273,12 +4273,12 @@ help_dir(
            given but we include up and down for 'm'+invalid_direction;
            self is excluded as a viable direction for every prefix */
         putstr(win, 0, "");
-        putstr(win, 0, "          <  up");
-        putstr(win, 0, "          >  down");
+        putstr(win, 0, "          <  上へ");
+        putstr(win, 0, "          >  下へ");
         if (!prefixhandling) {
             int selfi = gc.Cmd.num_pad ? NHKF_GETDIR_SELF2 : NHKF_GETDIR_SELF;
 
-            Sprintf(buf,   "       %4s  direct at yourself",
+                Sprintf(buf,   "       %4s  自分自身を直接指す",
                     visctrl(gc.Cmd.spkeys[selfi]));
             putstr(win, 0, buf);
         }
@@ -4287,8 +4287,8 @@ help_dir(
     if (msg) {
         /* non-null msg means that this wasn't an explicit user request */
         putstr(win, 0, "");
-        putstr(win, 0,
-               "(Suppress this message with !cmdassist in config file.)");
+         putstr(win, 0,
+             "(このメッセージは設定ファイルの !cmdassist で抑制できる.)");
     }
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
@@ -4444,29 +4444,29 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
         return K;
 
     if ((IS_FOUNTAIN(typ) || IS_SINK(typ)) && can_reach_floor(FALSE)) {
-        Sprintf(buf, "Drink from the %s",
+        Sprintf(buf, "%sから飲む",
                 defsyms[IS_FOUNTAIN(typ) ? S_fountain : S_sink].explanation);
         mcmd_addmenu(win, MCMD_QUAFF, buf), ++K;
     }
     if (IS_FOUNTAIN(typ) && can_reach_floor(FALSE))
-        mcmd_addmenu(win, MCMD_DIP, "Dip something into the fountain"), ++K;
+        mcmd_addmenu(win, MCMD_DIP, "何かを泉に浸す"), ++K;
     if (IS_THRONE(typ))
-        mcmd_addmenu(win, MCMD_SIT, "Sit on the throne"), ++K;
+        mcmd_addmenu(win, MCMD_SIT, "玉座に座る"), ++K;
     if (IS_ALTAR(typ))
-        mcmd_addmenu(win, MCMD_OFFER, "Sacrifice something on the altar"), ++K;
+        mcmd_addmenu(win, MCMD_OFFER, "何かを祭壇に捧げる"), ++K;
 
     if (stway && stway->up) {
-        Sprintf(buf, "Go up the %s",
-                stway->isladder ? "ladder" : "stairs");
+        Sprintf(buf, "%sを上る",
+            stway->isladder ? "はしご" : "階段");
         mcmd_addmenu(win, MCMD_UP, buf), ++K;
     }
     if (stway && !stway->up) {
-        Sprintf(buf, "Go down the %s",
-                stway->isladder ? "ladder" : "stairs");
+        Sprintf(buf, "%sを下る",
+            stway->isladder ? "はしご" : "階段");
         mcmd_addmenu(win, MCMD_DOWN, buf), ++K;
     }
     if (u.usteed) { /* another movement choice */
-        Sprintf(buf, "Dismount %s",
+        Sprintf(buf, "%sから降りる",
                 x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
                          SUPPRESS_SADDLE, FALSE));
         mcmd_addmenu(win, MCMD_DISMOUNT, buf), ++K;
@@ -4483,38 +4483,38 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
     if (OBJ_AT(x, y)) {
         struct obj *otmp = svl.level.objects[x][y];
 
-        Sprintf(buf, "Pick up %s", otmp->nexthere ? "items" : doname(otmp));
+        Sprintf(buf, "%sを拾う", otmp->nexthere ? "物品" : doname(otmp));
         mcmd_addmenu(win, MCMD_PICKUP, buf), ++K;
 
         if (Is_container(otmp)) {
-            Sprintf(buf, "Loot %s", doname(otmp));
+            Sprintf(buf, "%sをあさる", doname(otmp));
             mcmd_addmenu(win, MCMD_LOOT, buf), ++K;
 
-            Sprintf(buf, "Tip %s", doname(otmp));
+            Sprintf(buf, "%sを傾ける", doname(otmp));
             mcmd_addmenu(win, MCMD_TIP, buf), ++K;
         }
         if (otmp->oclass == FOOD_CLASS) {
-            Sprintf(buf, "Eat %s", doname(otmp));
+            Sprintf(buf, "%sを食べる", doname(otmp));
             mcmd_addmenu(win, MCMD_EAT, buf), ++K;
         }
     }
 
 
     if (gi.invent) {
-        mcmd_addmenu(win, MCMD_INVENTORY, "Inventory"), ++K;
-        mcmd_addmenu(win, MCMD_DROP, "Drop items"), ++K;
+        mcmd_addmenu(win, MCMD_INVENTORY, "持ち物を見る"), ++K;
+        mcmd_addmenu(win, MCMD_DROP, "物品を落とす"), ++K;
     }
-    mcmd_addmenu(win, MCMD_REST, "Rest one turn"), ++K;
-    mcmd_addmenu(win, MCMD_SEARCH, "Search around you"), ++K;
-    mcmd_addmenu(win, MCMD_LOOK_HERE, "Look at what is here"), ++K;
+    mcmd_addmenu(win, MCMD_REST, "1ターン休む"), ++K;
+    mcmd_addmenu(win, MCMD_SEARCH, "周囲を探す"), ++K;
+    mcmd_addmenu(win, MCMD_LOOK_HERE, "ここにあるものを見る"), ++K;
 
     if (num_spells() > 0)
-        mcmd_addmenu(win, MCMD_CAST_SPELL, "Cast a spell"), ++K;
+        mcmd_addmenu(win, MCMD_CAST_SPELL, "呪文を唱える"), ++K;
 
     if ((ttmp = t_at(x, y)) != 0 && ttmp->tseen) {
         if (ttmp->ttyp != VIBRATING_SQUARE)
             mcmd_addmenu(win, MCMD_UNTRAP_HERE,
-                         "Attempt to disarm trap"), ++K;
+                         "罠を解除しようとする"), ++K;
     }
     return K;
 }
@@ -4541,7 +4541,7 @@ there_cmd_menu_next2u(
         int dm = levl[x][y].doormask;
 
         if ((dm & (D_CLOSED | D_LOCKED))) {
-            mcmd_addmenu(win, MCMD_OPEN_DOOR, "Open the door"), ++K;
+            mcmd_addmenu(win, MCMD_OPEN_DOOR, "扉を開く"), ++K;
             /* unfortunately there's no lknown flag for doors to
                remember the locked/unlocked state */
             key_or_pick = (carrying(SKELETON_KEY) || carrying(LOCK_PICK));
@@ -4556,25 +4556,25 @@ there_cmd_menu_next2u(
             mcmd_addmenu(win, MCMD_UNTRAP_DOOR,
                          "Search the door for a trap"), ++K;
             /* [what about #force?] */
-            mcmd_addmenu(win, MCMD_KICK_DOOR, "Kick the door"), ++K;
+            mcmd_addmenu(win, MCMD_KICK_DOOR, "扉を蹴る"), ++K;
         } else if ((dm & D_ISOPEN) && (mod == CLICK_2)) {
-            mcmd_addmenu(win, MCMD_CLOSE_DOOR, "Close the door"), ++K;
+            mcmd_addmenu(win, MCMD_CLOSE_DOOR, "扉を閉じる"), ++K;
         }
     }
 
     if (typ <= SCORR)
-        mcmd_addmenu(win, MCMD_SEARCH, "Search for secret doors"), ++K;
+        mcmd_addmenu(win, MCMD_SEARCH, "隠し扉を探す"), ++K;
 
     if ((ttmp = t_at(x, y)) != 0 && ttmp->tseen) {
-        mcmd_addmenu(win, MCMD_LOOK_TRAP, "Examine trap"), ++K;
+        mcmd_addmenu(win, MCMD_LOOK_TRAP, "罠を調べる"), ++K;
         if (ttmp->ttyp != VIBRATING_SQUARE)
             mcmd_addmenu(win, MCMD_UNTRAP_TRAP,
-                                 "Attempt to disarm trap"), ++K;
-        mcmd_addmenu(win, MCMD_MOVE_DIR, "Move on the trap"), ++K;
+                                 "罠を解除しようとする"), ++K;
+        mcmd_addmenu(win, MCMD_MOVE_DIR, "罠の上を移動する"), ++K;
     }
 
     if (levl[x][y].glyph == objnum_to_glyph(BOULDER))
-        mcmd_addmenu(win, MCMD_MOVE_DIR, "Push the boulder"), ++K;
+        mcmd_addmenu(win, MCMD_MOVE_DIR, "巨大な岩を押す"), ++K;
 
     mtmp = m_at(x, y);
     if (mtmp && !canspotmon(mtmp))
@@ -4584,33 +4584,33 @@ there_cmd_menu_next2u(
                               SUPPRESS_SADDLE, FALSE);
 
         if (!u.usteed) {
-            Sprintf(buf, "Ride %s", mnam);
+            Sprintf(buf, "%sに乗る", mnam);
             mcmd_addmenu(win, MCMD_RIDE, buf), ++K;
         }
-        Sprintf(buf, "Remove saddle from %s", mnam);
+        Sprintf(buf, "%sから鞍を外す", mnam);
         mcmd_addmenu(win, MCMD_REMOVE_SADDLE, buf), ++K;
     }
     if (mtmp && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)
         && carrying(SADDLE)) {
-        Sprintf(buf, "Put saddle on %s", mon_nam(mtmp));
+        Sprintf(buf, "%sに鞍を付ける", mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_APPLY_SADDLE, buf), ++K;
     }
     if (mtmp && (mtmp->mpeaceful || mtmp->mtame)) {
-        Sprintf(buf, "Talk to %s", mon_nam(mtmp));
+        Sprintf(buf, "%sに話しかける", mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_TALK, buf), ++K;
 
-        Sprintf(buf, "Swap places with %s", mon_nam(mtmp));
+        Sprintf(buf, "%sと位置を入れ替える", mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_MOVE_DIR, buf), ++K;
 
         Sprintf(buf, "%s %s",
-                !has_mgivenname(mtmp) ? "Name" : "Rename",
+            !has_mgivenname(mtmp) ? "名前を付ける" : "名前を変更する",
                 mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_NAME, buf), ++K;
     }
 
     if ((mtmp && !(mtmp->mpeaceful || mtmp->mtame))
         || glyph_is_invisible(glyph_at(x, y))) {
-        Sprintf(buf, "Attack %s", mtmp ? mon_nam(mtmp) : "unseen creature");
+        Sprintf(buf, "%sを攻撃する", mtmp ? mon_nam(mtmp) : "見えない相手");
         mcmd_addmenu(win, MCMD_ATTACK_NEXT2U, buf), ++K;
         /* attacking overrides any other automatic action */
         *act = MCMD_ATTACK_NEXT2U;
@@ -4628,9 +4628,9 @@ there_cmd_menu_far(winid win, coordxy x, coordxy y, int mod)
     if (mod == CLICK_1) {
         if (linedup(u.ux, u.uy, x, y, 1)
             && dist2(u.ux, u.uy, x, y) < 18*18)
-            mcmd_addmenu(win, MCMD_THROW_OBJ, "Throw something"), ++K;
+            mcmd_addmenu(win, MCMD_THROW_OBJ, "何かを投げる"), ++K;
 
-        mcmd_addmenu(win, MCMD_TRAVEL, "Travel here"), ++K;
+        mcmd_addmenu(win, MCMD_TRAVEL, "ここに移動する"), ++K;
     }
     return K;
 }
@@ -4648,7 +4648,7 @@ there_cmd_menu_common(
         /* for self, only include "look at map symbol" if it isn't the
            ordinary hero symbol (steed, invisible w/o see invisible, ?) */
         if (!u_at(x, y) || Upolyd || glyph_at(x, y) != hero_glyph)
-            mcmd_addmenu(win, MCMD_LOOK_AT, "Look at map symbol"), ++K;
+            mcmd_addmenu(win, MCMD_LOOK_AT, "マップ記号を見る"), ++K;
     }
     return K;
 }
@@ -4880,7 +4880,7 @@ there_cmd_menu(coordxy x, coordxy y, int mod)
         act_on_act(act, dx, dy);
         return '\0';
     } else {
-        end_menu(win, "What do you want to do?");
+        end_menu(win, "何をしたいか?");
         npick = select_menu(win, PICK_ONE, &picks);
         ch = '\033';
     }
@@ -5430,19 +5430,19 @@ yn_function_menu(
 
         start_menu(win, MENU_BEHAVE_STANDARD);
         if (resp == rightleftchars) {
-            yn_func_menu_opt(win, 'r', "Right", def);
-            yn_func_menu_opt(win, 'l', "Left", def);
+            yn_func_menu_opt(win, 'r', "右", def);
+            yn_func_menu_opt(win, 'l', "左", def);
         } else if (resp == hidespinchars) {
-            yn_func_menu_opt(win, 'h', "Hide", def);
-            yn_func_menu_opt(win, 's', "Spin a web", def);
+            yn_func_menu_opt(win, 'h', "隠れる", def);
+            yn_func_menu_opt(win, 's', "クモの巣を張る", def);
         } else {
-            yn_func_menu_opt(win, 'y', "Yes", def);
-            yn_func_menu_opt(win, 'n', "No", def);
+            yn_func_menu_opt(win, 'y', "はい", def);
+            yn_func_menu_opt(win, 'n', "いいえ", def);
         }
         if (resp == ynaqchars)
-            yn_func_menu_opt(win, 'a', "All", def);
+            yn_func_menu_opt(win, 'a', "すべて", def);
         if (resp == ynqchars || resp == ynaqchars || resp == hidespinchars)
-            yn_func_menu_opt(win, 'q', "Quit", def);
+            yn_func_menu_opt(win, 'q', "終了", def);
         end_menu(win, query);
         n = select_menu(win, PICK_ONE, &sel);
         destroy_nhwindow(win);
