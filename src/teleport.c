@@ -863,7 +863,7 @@ scrolltele(struct obj *scroll)
         make_blinded(0L, FALSE);
 
     if ((u.uhave.amulet || On_W_tower_level(&u.uz)) && !rn2(3)) {
-        You_feel("disoriented for a moment.");
+        You_feel("一瞬、方向感覚を失った.");
         /* don't discover the scroll [at least not yet for wizard override];
            disorientation doesn't reveal that this is a teleport attempt */
         if (!wizard || y_n("Override?") != 'y')
@@ -1184,7 +1184,7 @@ level_tele(void)
     }
     if ((u.uhave.amulet || In_endgame(&u.uz) || In_sokoban(&u.uz))
         && !wizard) {
-        You_feel("very disoriented for a moment.");
+        You_feel("一瞬、ひどく方向感覚を失った.");
         return;
     }
     if ((Teleport_control && !Stunned) || wizard) {
@@ -1338,11 +1338,11 @@ level_tele(void)
             svk.killer.format = NO_KILLER_PREFIX;
             Strcpy(svk.killer.name, "went to heaven prematurely");
         } else if (newlev == -9) {
-            You_feel("deliriously happy.");
+            You_feel("有頂天になった.");
             pline("(In fact, you're on Cloud 9!)");
             display_nhwindow(WIN_MESSAGE, FALSE);
         } else
-            You("are now high above the clouds...");
+            You("今、囲空中速高速上昇中...");
 
         if (svk.killer.name[0]) {
             ; /* arrival in heaven is pending */
@@ -1467,7 +1467,7 @@ domagicportal(struct trap *ttmp)
      * next level, and thus losing the game
      */
     if (In_endgame(&u.uz) && !u.uhave.amulet) {
-        You_feel("dizzy for a moment, but nothing happens...");
+        You_feel("一瞬めまいがしたが、何も起こらなかった...");
         return;
     }
 
@@ -1502,7 +1502,7 @@ tele_trap(struct trap *trap)
     if (In_endgame(&u.uz) || Antimagic || noteleport_level(&gy.youmonst)) {
         if (Antimagic)
             shieldeff(u.ux, u.uy);
-        You_feel("a wrenching sensation.");
+        You_feel("引き裂かれるような感覚を覚えた.");
     } else if (!next_to_u()) {
         You1(shudder_for_moment);
     } else if (trap->once) {
@@ -1551,7 +1551,7 @@ level_tele_trap(struct trap *trap, unsigned int trflags)
         shieldeff(u.ux, u.uy);
     }
     if ((Antimagic && !intentional) || In_endgame(&u.uz)) {
-        You_feel("a wrenching sensation.");
+        You_feel("引き裂かれるような感覚を覚えた.");
         return;
     }
     deltrap(trap);
@@ -1561,7 +1561,7 @@ level_tele_trap(struct trap *trap, unsigned int trflags)
     if (Hallucination || Teleport_control)
         You("briefly feel %s.", Hallucination ? "oriented" : "centered");
     else
-        You_feel("%sdisoriented.", Confusion ? "even more " : "");
+        You_feel("%s方向感覚を失った.", Confusion ? "さらに" : "");
     /* magic portal traversal causes brief Stun; for level teleport, use
        confusion instead, and only when hero lacks control; do this after
        processing the level teleportation attempt because being confused

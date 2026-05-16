@@ -409,7 +409,7 @@ doread(void)
             /* we will be displaying a sentence; need ending punctuation */
             if (ln > 0 && !strchr(".!?", mesg[ln - 1]))
                 endpunct = ".";
-            pline("It reads:");
+            pline("次のように描書すれている:");
         }
         pline("\"%s\"%s", mesg, endpunct);
         return ECMD_TIME;
@@ -530,7 +530,7 @@ doread(void)
         if (Blind)
             You("feel the engraved signature:");
         else
-            pline("It is signed:");
+            pline("准胞を描書している:");
         pline("\"Odin.\"");
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
@@ -1407,7 +1407,7 @@ seffect_confuse_monster(struct obj **sobjp)
 
     if (gy.youmonst.data->mlet != S_HUMAN || scursed) {
         if (!HConfusion)
-            You_feel("confused.");
+            You_feel("混乱した.");
         make_confused(HConfusion + rnd(100), FALSE);
     } else if (confused) {
         if (!sblessed) {
@@ -1479,9 +1479,10 @@ seffect_scare_monster(struct obj **sobjp)
         } else {
             Soundeffect(se_maniacal_laughter, 50);
         }
-        You_hear("%s %s.", (confused || scursed) ? "sad wailing"
-                 : "maniacal laughter",
-                 !ct ? "in the distance" : "close by");
+        You_hear("%sが%sで聞こえた.",
+                 (confused || scursed) ? "悲しげな嘆き声"
+                                      : "狂気じみた笑い声",
+                 !ct ? "遠く" : "すぐ近く");
     }
 }
 
@@ -1798,10 +1799,10 @@ seffect_charging(struct obj **sobjp)
 
     if (confused) {
         if (scursed) {
-            You_feel("discharged.");
+            You_feel("力が抜けた.");
             u.uen = 0;
         } else {
-            You_feel("charged up!");
+            You_feel("魔力が満ちた!");
             u.uen += d(sblessed ? 6 : 4, 4);
             if (u.uen > u.uenmax) /* if current energy is already at   */
                 u.uenmax = u.uen; /* or near maximum, increase maximum */
@@ -1877,7 +1878,7 @@ seffect_fire(struct obj **sobjp)
                 pline("Oh, look, what a pretty fire in your %s.",
                       makeplural(body_part(HAND)));
             else
-                You_feel("a pleasant warmth in your %s.",
+                You_feel("%sに心地よいぬくもりを感じた.",
                          makeplural(body_part(HAND)));
         } else {
             monstunseesu(M_SEEN_FIRE);
@@ -1931,7 +1932,7 @@ seffect_earth(struct obj **sobjp)
 
         /* Identify the scroll */
         if (u.uswallow) {
-            You_hear("rumbling.");
+            You_hear("地鳴りが聞こえた.");
         } else {
             if (!avoid_ceiling(&u.uz)) {
                 pline_The("%s rumbles %s you!", ceiling(u.ux, u.uy),
@@ -1981,7 +1982,7 @@ seffect_punishment(struct obj **sobjp)
 
     gk.known = TRUE;
     if (confused || sblessed) {
-        You_feel("guilty.");
+        You_feel("罪悪感を覚えた.");
         return;
     }
     punish(sobj);
@@ -2362,7 +2363,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
             if (mtmp->minvis && !canspotmon(mtmp))
                 map_invisible(mtmp->mx, mtmp->my);
         } else if (engulfing_u(mtmp))
-            You_hear("something hit %s %s over your %s!",
+            You_hear("何かが%sの%s越しにあなたの%sへぶつかる音が聞こえた!",
                      s_suffix(mon_nam(mtmp)), mbodypart(mtmp, STOMACH),
                      body_part(HEAD));
 
@@ -2373,7 +2374,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
                     pline("Fortunately, %s is wearing a hard helmet.",
                           mon_nam(mtmp));
                 else if (!Deaf)
-                    You_hear("a clanging sound.");
+                    You_hear("金属がぶつかる甲高い音が聞こえた.");
                 if (mdmg > 2)
                     mdmg = 2;
             } else {

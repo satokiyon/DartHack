@@ -75,7 +75,7 @@ static NEARDATA const char kebabable[] = {
 staticfn void
 give_may_advance_msg(int skill)
 {
-    You_feel("more confident in your %sskills.",
+    You_feel("自分の%s技量に自信がついた.",
              (skill == P_NONE) ? ""
                  : (skill <= P_LAST_WEAPON) ? "weapon "
                      : (skill <= P_LAST_SPELL) ? "spell casting "
@@ -1396,7 +1396,7 @@ enhance_weapon_skill(void)
             for (n = i = 0; i < P_NUM_SKILLS; i++) {
                 if (can_advance(i, speedy)) {
                     if (!speedy)
-                        You_feel("you could be more dangerous!");
+                        You_feel("まだもっと危険になれそうな気がした!");
                     n++;
                     break;
                 }

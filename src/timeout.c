@@ -699,7 +699,7 @@ nh_timeout(void)
                     adjattrib(A_CON, -1, 1);
                     break;
                 }
-                urgent_pline("You die from your illness.");
+                urgent_pline("症息が原因で死んだ.");
                 if (kptr && kptr->name[0]) {
                     svk.killer.format = kptr->format;
                     Strcpy(svk.killer.name, kptr->name);
@@ -723,8 +723,8 @@ nh_timeout(void)
                 break;
             case FAST:
                 if (!Very_fast)
-                    You_feel("yourself slow down%s.",
-                             Fast ? " a bit" : "");
+                    You_feel("体の動きが%s遅くなった.",
+                             Fast ? "少し" : "");
                 break;
             case CONFUSION:
                 /* So make_confused works properly */
@@ -873,7 +873,7 @@ nh_timeout(void)
             case PASSES_WALLS:
                 if (!Passes_walls) {
                     if (stuck_in_wall())
-                        You_feel("hemmed in again.");
+                        You_feel("また身動きが取りづらくなった.");
                     else
                         pline("You're back to your %s self again.",
                               !Upolyd ? "normal" : "unusual");
@@ -1109,11 +1109,9 @@ hatch_egg(anything *arg, long timeout)
         case OBJ_INVENT:
             knows_egg = TRUE; /* true even if you are blind */
             if (!cansee_hatchspot)
-                You_feel("%s %s from your pack!", something,
-                         locomotion(mon->data, "drop"));
+                You_feel("荷物の中で%sが動くのを感じた!", something);
             else
-                You_see("%s %s out of your pack!", monnambuf,
-                        locomotion(mon->data, "drop"));
+                You_see("%sが荷物の中から飛び出した!", monnambuf);
             if (yours) {
                 pline("%s %s %s like \"%s%s\"",
                       siblings ? "Their" : "Its",
@@ -1887,7 +1885,7 @@ do_storms(void)
             gn.nomovemsg = 0;
         }
     } else
-        You_hear("a rumbling noise.");
+        You_hear("地鳴りのような音が聞こえた.");
 }
 
 /* -------------------------------------------------------------------------

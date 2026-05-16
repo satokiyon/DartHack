@@ -1516,7 +1516,7 @@ draft_message(boolean unexpected)
             /* U.S. classification system uses 1-A for eligible to serve
                and 4-F for ineligible due to physical or mental defect;
                some intermediate values exist but are rarely seen */
-            You_feel("like you are %s.",
+            You_feel("自分が%sだと感じた.",
                      (ACURR(A_STR) < 6 || ACURR(A_DEX) < 6
                       || ACURR(A_CON) < 6 || ACURR(A_CHA) < 6
                       || ACURR(A_INT) < 6 || ACURR(A_WIS) < 6) ? "4-F"
@@ -1528,7 +1528,7 @@ draft_message(boolean unexpected)
             /* "marching" is deliberately ambiguous; it might mean drills
                 after entering military service or mean engaging in protests */
             static const char *const draft_reaction[] = {
-                "enlisting", "marching", "protesting", "fleeing",
+                "入隊している", "行進している", "抗議している", "逃げ出している",
             };
             int dridx;
 
@@ -1537,7 +1537,7 @@ draft_message(boolean unexpected)
             if (u.ualign.record < STRIDENT)
                 /* L: +(0..2), N: +(-1..1), C: +(-2..0); all: 0..3 */
                 dridx += rn1(3, sgn(u.ualign.type) - 1);
-            You_feel("like %s.", draft_reaction[dridx]);
+            You_feel("自分が%sような気がした.", draft_reaction[dridx]);
         }
     }
 }

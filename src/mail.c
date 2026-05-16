@@ -646,8 +646,8 @@ read_simplemail(const char *mbox, boolean adminmsg)
             urgent_pline("The voice of %s booms through the caverns:",
                          curline);
         } else {
-            pline("This message is from '%s'.", curline);
-            pline("It reads:");
+            pline("この手紙は'%s'を送事者としている.", curline);
+            pline("後のように書かれている:");
         }
         pline("\"%s\"%s", msg, endpunct);
 
@@ -676,7 +676,7 @@ read_simplemail(const char *mbox, boolean adminmsg)
  bail:
     /* bail out _professionally_ */
     if (!adminmsg)
-        pline("It appears to be all gibberish.");
+        pline("もじゃもじゃ。");
 }
 
 #endif /* SIMPLE_MAIL */

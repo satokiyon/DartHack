@@ -352,8 +352,8 @@ dog_starve(struct monst *mtmp)
     else if (cansee(mtmp->mx, mtmp->my))
         pline_mon(mtmp, "%s starves.", Monnam(mtmp));
     else
-        You_feel("%s for a moment.",
-                    Hallucination ? "bummed" : "sad");
+        You_feel("一瞬%s気分になった.",
+                 Hallucination ? "がっかりした" : "悲しい");
     mondied(mtmp);
 }
 
@@ -382,7 +382,7 @@ dog_hunger(struct monst *mtmp, struct edog *edog)
             else if (couldsee(mtmp->mx, mtmp->my))
                 beg(mtmp);
             else
-                You_feel("worried about %s.", y_monnam(mtmp));
+                You_feel("%sのことが心配になった.", y_monnam(mtmp));
             stop_occupation();
         } else if (svm.moves > edog->hungrytime + DOG_STARVE
                    || DEADMONSTER(mtmp)) {
@@ -457,7 +457,7 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
                             char *otmpname = distant_name(otmp, doname);
 
                             if (flags.verbose)
-                                pline_xy(omx, omy, "%s\u306f%s\u3092\u62fe\u3063\u305f.",
+                                pline_xy(omx, omy, "%sは%sを拾った.",
                                       Monnam(mtmp), otmpname);
                         }
                         obj_extract_self(otmp);

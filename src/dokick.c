@@ -1136,7 +1136,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
         /* nothing, fruit or trouble? 75:23.5:1.5% */
         if (rn2(3)) {
             if (!rn2(6) && !(svm.mvitals[PM_KILLER_BEE].mvflags & G_GONE))
-                You_hear("低いうなり音を聞いた."); /* a warning */
+                You_hear("低いうなり音が聞こえた."); /* a warning */
             kick_ouch(x, y, "");
             return ECMD_TIME;
         }
@@ -1209,7 +1209,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
             Soundeffect(se_gushing_sound, 100);
             if (Blind) {
                 if (!Deaf)
-                    You_hear("噴き出す音を聞いた.");
+                    You_hear("噴き出す音が聞こえた.");
             } else {
                     pline("排水口から%sの粘液が噴き出した!",
                       hcolor(NH_BLACK));
@@ -1616,7 +1616,7 @@ impact_drop(
                 else
                     pline("\"%s、お前は盗人だ!\"", svp.plname);
             } else
-                You_hear("叫び声を聞いた, \"盗人だ!\"");
+                You_hear("叫び声が聞こえた, \"盗人だ!\"");
             hot_pursuit(shkp);
             (void) angry_guards(FALSE);
             return;

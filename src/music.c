@@ -266,7 +266,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
                     pline("%s falls into a chasm!", Monnam(mtmp));
                 } else if (humanoid(mtmp->data)) {
                     Soundeffect(se_scream, 50);
-                    You_hear("a scream!");
+                    You_hear("悲鳴が聞こえた!");
                 }
             }
             /* Falling is okay for falling down
@@ -276,7 +276,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
                 mtmp->mhp -= rnd(m_already_trapped ? 4 : 6);
                 if (DEADMONSTER(mtmp)) {
                     if (!cansee(x, y)) {
-                        pline("It is destroyed!");
+                        pline("たかがって不可観、一玬のうちに爆発した!");
                     } else {
                         You("destroy %s!",
                             mtmp->mtame
@@ -376,7 +376,7 @@ do_earthquake(int force)
                                   Amonnam(mtmp));
                         } else if (!is_flyer(mtmp->data)) {
                             Soundeffect(se_thump, 50);
-                            You_hear("a thump.");
+                            You_hear("どすんという音が聞こえた.");
                         }
                     }
                 }
@@ -557,13 +557,13 @@ do_improvisation(struct obj *instr)
         if (!Deaf)
             You("radiate an obnoxious droning sound.");
         else
-            You_feel("a monotonous vibration.");
+            You_feel("単調な振動を感じた.");
         break;
     case PLAY_CONFUSED:
         if (!Deaf)
             You("generate a raucous noise.");
         else
-            You_feel("a jarring vibration.");
+            You_feel("耳障りな振動を感じた.");
         break;
     case PLAY_HALLU:
         You("disseminate a kaleidoscopic display of floating butterflies.");
@@ -602,7 +602,8 @@ do_improvisation(struct obj *instr)
             pline("%s%s.", Tobjnam(instr, do_spec ? "trill" : "toot"),
                   same_old_song ? " a familiar tune" : "");
         else
-            You_feel("%s %s.", yname(instr), do_spec ? "trill" : "toot");
+            You_feel("%sが%s.", yname(instr),
+                     do_spec ? "軽やかに鳴っている" : "ぷーと鳴っている");
         Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
         if (do_spec)
             charm_snakes(u.ulevel * 3);
@@ -664,7 +665,7 @@ do_improvisation(struct obj *instr)
                   Tobjnam(instr, "produce"),
                   same_old_song ? " and familiar" : "");
         else
-            You_feel("very soothing vibrations.");
+            You_feel("とても心地よい振動を感じた.");
         Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
         charm_monsters((u.ulevel - 1) / 3 + 1);
         exercise(A_DEX, TRUE);
@@ -679,7 +680,7 @@ do_improvisation(struct obj *instr)
                     : (same_old_song) ? "twangs a familiar tune"
                       : "twangs");
         else
-            You_feel("soothing vibrations.");
+            You_feel("心地よい振動を感じた.");
         Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
         if (do_spec)
             calm_nymphs(u.ulevel * 3);
@@ -870,16 +871,15 @@ do_play_instrument(struct obj *instr)
                     if (gears) {
                         Soundeffect(se_tumbler_click, 50);
                         Soundeffect(se_gear_turn, 50);
-                        You_hear("%d tumbler%s click and %d gear%s turn.",
-                                 tumblers, plur(tumblers), gears,
-                                 plur(gears));
+                        You_hear("%d個のタンブラーがカチッと鳴り、%d個の歯車が回る音が聞こえた.",
+                                 tumblers, gears);
                     } else {
                         Soundeffect(se_tumbler_click, 50);
-                        You_hear("%d tumbler%s click.", tumblers,
-                                 plur(tumblers));
+                        You_hear("%d個のタンブラーがカチッと鳴る音が聞こえた.",
+                                 tumblers);
                     }
                 } else if (gears) {
-                    You_hear("%d gear%s turn.", gears, plur(gears));
+                    You_hear("%d個の歯車が回る音が聞こえた.", gears);
                     /* could only get `gears == 5' by playing five
                        correct notes followed by excess; otherwise,
                        tune would have matched above */

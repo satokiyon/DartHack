@@ -111,6 +111,59 @@ staticfn void postadjabil(long *) NONNULLARG1;
 staticfn const struct innate *role_abil(int);
 staticfn const struct innate *check_innate_abil(long *, long);
 staticfn int innately(long *);
+staticfn const char *innate_feel_text(const char *, boolean);
+
+staticfn const char *
+innate_feel_text(const char *token, boolean less)
+{
+    if (!token || !*token)
+        return "";
+
+    if (!strcmp(token, "stealthy"))
+        return less ? "前ほど気配を消せなくなった"
+                    : "気配が薄くなった";
+    if (!strcmp(token, "quick"))
+        return less ? "前ほど素早くなくなった"
+                    : "身のこなしが軽くなった";
+    if (!strcmp(token, "slow"))
+        return "動きが鈍くなった";
+    if (!strcmp(token, "sensitive"))
+        return less ? "前ほど危険に敏感でなくなった"
+                    : "危険に敏感になった";
+    if (!strcmp(token, "healthy"))
+        return less ? "前ほど丈夫ではなくなった"
+                    : "体が丈夫になった";
+    if (!strcmp(token, "perceptive"))
+        return less ? "前ほど勘が鋭くなくなった"
+                    : "勘が鋭くなった";
+    if (!strcmp(token, "unaware"))
+        return "鈍くなった";
+    if (!strcmp(token, "cool"))
+        return "涼しくなった";
+    if (!strcmp(token, "warmer"))
+        return "少し暑くなった";
+    if (!strcmp(token, "warm"))
+        return "暖かくなった";
+    if (!strcmp(token, "cooler"))
+        return "少し涼しくなった";
+    if (!strcmp(token, "insulated"))
+        return "電気を通しにくくなった";
+    if (!strcmp(token, "conductive"))
+        return "電気を通しやすくなった";
+    if (!strcmp(token, "controlled"))
+        return "うまく制御できそうな気がした";
+    if (!strcmp(token, "uncontrolled"))
+        return "制御しにくくなった";
+    if (!strcmp(token, "hardy"))
+        return less ? "前ほど頑丈ではなくなった"
+                    : "体が頑丈になった";
+    if (!strcmp(token, "awake"))
+        return "目がさえた";
+    if (!strcmp(token, "tired"))
+        return "少し眠くなった";
+
+    return token;
+}
 
 /* adjust an attribute; return TRUE if change is made, FALSE otherwise */
 boolean
@@ -1049,15 +1102,15 @@ adjabil(int oldlevel, int newlevel)
                 *(abil->ability) |= mask;
             if (!(*(abil->ability) & INTRINSIC & ~mask)) {
                 if (*(abil->gainstr))
-                    You_feel("%s!", abil->gainstr);
+                    You_feel("%s!", innate_feel_text(abil->gainstr, FALSE));
             }
         } else if (oldlevel >= abil->ulevel && newlevel < abil->ulevel) {
             *(abil->ability) &= ~mask;
             if (!(*(abil->ability) & INTRINSIC)) {
                 if (*(abil->losestr))
-                    You_feel("%s!", abil->losestr);
+                    You_feel("%s!", innate_feel_text(abil->losestr, FALSE));
                 else if (*(abil->gainstr))
-                    You_feel("less %s!", abil->gainstr);
+                    You_feel("%s!", innate_feel_text(abil->gainstr, TRUE));
             }
         }
         if (prevabil != *(abil->ability)) /* it changed */

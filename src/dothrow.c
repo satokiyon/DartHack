@@ -2631,7 +2631,7 @@ breakmsg(struct obj *obj, boolean in_view)
     /*FALLTHRU*/
     case POT_WATER: /* really, all potions */
         if (!in_view)
-            You_hear("%sが砕ける音を聞いた!", something);
+            You_hear("%sが砕けるのが聞こえた!", something);
         else
             pline("%sが砕け散った%s!", Doname2(obj), to_pieces);
         break;

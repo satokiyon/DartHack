@@ -618,7 +618,7 @@ do_entity(struct entity *etmp)
                           E_phrase(etmp, "are"));
                 } else if (!Deaf) {
                     Soundeffect(se_crushing_sound, 100);
-                    You_hear("a crushing sound.");
+                    You_hear("押し潰すような音が聞こえた.");
                 }
                 e_died(etmp,
                        XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG
@@ -725,7 +725,7 @@ do_entity(struct entity *etmp)
         if (is_pool(etmp->ex, etmp->ey) && !e_inview)
             if (!Deaf) {
                 Soundeffect(se_splash, 100);
-                You_hear("a splash.");
+                You_hear("水しぶきの音が聞こえた.");
             }
         if (e_survives_at(etmp, etmp->ex, etmp->ey)) {
             if (e_inview && !is_flyer(etmp->edata)
@@ -785,14 +785,14 @@ close_drawbridge(coordxy x, coordxy y)
     y2 = y;
     get_wall_for_db(&x2, &y2);
     if (cansee(x, y) || cansee(x2, y2)) {
-        You_see("a drawbridge %s up!",
+        You_see("跳ね橋が%sのを見た!",
                 (((u.ux == x || u.uy == y) && !Underwater)
                  || distu(x2, y2) < distu(x, y))
-                    ? "coming"
-                    : "going");
+                    ? "上がってくる"
+                    : "上がっていく");
     } else { /* "5 gears turn" for castle drawbridge tune */
         Soundeffect(se_chains_rattling_gears_turning, 75);
-        You_hear("chains rattling and gears turning.");
+        You_hear("鎖が鳴り、歯車が回る音が聞こえた.");
     }
     lev1->typ = DRAWBRIDGE_UP;
     lev2 = &levl[x2][y2];
@@ -815,7 +815,7 @@ close_drawbridge(coordxy x, coordxy y)
     do_entity(&(go.occupants[1]));
     if (OBJ_AT(x, y) && !Deaf) {
         Soundeffect(se_smashing_and_crushing, 75);
-        You_hear("smashing and crushing.");
+        You_hear("何かが砕けて押し潰される音が聞こえた.");
     }
     (void) revive_nasty(x, y, (char *) 0);
     (void) revive_nasty(x2, y2, (char *) 0);
@@ -850,11 +850,12 @@ open_drawbridge(coordxy x, coordxy y)
     y2 = y;
     get_wall_for_db(&x2, &y2);
     if (cansee(x, y) || cansee(x2, y2)) {
-        You_see("a drawbridge %s down!",
-                (distu(x2, y2) < distu(x, y)) ? "going" : "coming");
+        You_see("跳ね橋が%sのを見た!",
+                (distu(x2, y2) < distu(x, y)) ? "下がっていく"
+                                             : "下がってくる");
     } else { /* "5 gears turn" for castle drawbridge tune */
         Soundeffect(se_gears_turning_chains_rattling, 100);
-        You_hear("gears turning and chains rattling.");
+        You_hear("歯車が回り、鎖が鳴る音が聞こえた.");
     }
     lev1->typ = DRAWBRIDGE_DOWN;
     lev2 = &levl[x2][y2];
@@ -913,13 +914,13 @@ destroy_drawbridge(coordxy x, coordxy y)
                 pline_The("portcullis of the drawbridge falls into the %s!",
                           lava ? hliquid("lava") : "moat");
             else
-                You_hear("a loud *SPLASH*!");  /* Deaf-aware */
+                You_hear("大きな*SPLASH*音が聞こえた!");  /* Deaf-aware */
         } else {
             if (cansee(x, y) || u_at(x, y))
                 pline_The("drawbridge collapses into the %s!",
                           lava ? hliquid("lava") : "moat");
             else
-                You_hear("a loud *SPLASH*!");  /* Deaf-aware */
+                You_hear("大きな*SPLASH*音が聞こえた!");  /* Deaf-aware */
         }
         lev1->typ = lava ? LAVAPOOL : MOAT;
         lev1->drawbridgemask = 0;
@@ -933,7 +934,7 @@ destroy_drawbridge(coordxy x, coordxy y)
         if (cansee(x, y) || u_at(x, y))
             pline_The("drawbridge disintegrates!");
         else
-            You_hear("a loud *CRASH*!");  /* Deaf-aware */
+            You_hear("大きな*CRASH*音が聞こえた!");  /* Deaf-aware */
         lev1->typ = ((lev1->drawbridgemask & DB_ICE) ? ICE : ROOM);
         lev1->icedpool = ((lev1->drawbridgemask & DB_ICE) ? ICED_MOAT : 0);
     }
@@ -999,7 +1000,7 @@ destroy_drawbridge(coordxy x, coordxy y)
             } else {
                 if (!Deaf && !is_u(etmp1) && !is_pool(x, y)) {
                     Soundeffect(se_crushing_sound, 75);
-                    You_hear("a crushing sound.");
+                    You_hear("押し潰すような音が聞こえた.");
                 } else {
                     debugpline1("%s from shrapnel", E_phrase(etmp1, "die"));
                 }

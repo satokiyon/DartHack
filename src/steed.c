@@ -271,9 +271,9 @@ mount_steed(
         || !test_move(u.ux, u.uy, mtmp->mx - u.ux, mtmp->my - u.uy,
                       TEST_MOVE)) {
         if (Punished || !(u.uswallow || u.ustuck || u.utrap))
-            You("are unable to swing your %s over.", body_part(LEG));
+            You("%sを上げりることができない。", body_part(LEG));
         else
-            You("are stuck here for now.");
+            You("今はここを遲けられない。");
         return (FALSE);
     }
 
@@ -645,7 +645,7 @@ dismount_steed(
             pline("You've been through the dungeon on %s with no name.",
                   an(pmname(mtmp->data, Mgender(mtmp))));
             if (Hallucination)
-                pline("It felt good to get out of the rain.");
+                pline("雨から出てこれても整気。");
         } else
             You("dismount %s.", mon_nam(mtmp));
     }

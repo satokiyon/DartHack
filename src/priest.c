@@ -506,7 +506,7 @@ intemple(int roomno)
             You("have an eerie feeling...");
             break;
         case 1:
-            You_feel("like you are being watched.");
+            You_feel("誰かに見張られている気がした.");
             break;
         case 2:
             pline("悪寒が%sを走り抜けた.", body_part(SPINE));
@@ -529,7 +529,7 @@ intemple(int roomno)
             mtmp->mpeaceful = 0;
             set_malign(mtmp);
             if (flags.verbose)
-                You("are frightened to death, and unable to move.");
+                You("恐怖で、動けなくなった.");
             nomul(-3);
             gm.multi_reason = "being terrified of a ghost";
             gn.nomovemsg = "You regain your composure.";

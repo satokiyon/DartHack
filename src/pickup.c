@@ -727,7 +727,7 @@ pickup(int what) /* should be a long */
             check_here(FALSE);
             if (notake(gy.youmonst.data) && OBJ_AT(u.ux, u.uy)
                 && (autopickup || flags.pickup))
-                You("are physically incapable of picking anything up.");
+                You("何も拾い上げることができない。");
             return 0;
         }
 
@@ -2414,7 +2414,7 @@ reverse_loot(void)
                    && (mon = makemon(courtmon(), x, y, NO_MM_FLAGS)) != 0) {
             freeinv(goldob);
             add_to_minv(mon, goldob);
-            pline("財務省はあなたの寄付を受け取った.");
+            pline("金庫番はあなたの寄付を受け取った.");
             if (!rn2(10))
                 levl[x][y].looted = T_LOOTED;
         } else {

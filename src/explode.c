@@ -443,7 +443,7 @@ explode(
         }
         if (!Deaf && olet != SCROLL_CLASS) {
             Soundeffect(se_blast, 75);
-            You_hear("a blast.");
+            You_hear("爆発音が聞こえた.");
             didmsg = TRUE;
         }
     }
@@ -607,7 +607,7 @@ explode(
             burn_away_slime();
         if (Invulnerable) {
             damu = 0;
-            You("are unharmed!");
+            You("安蔿無傷だ.");
         } else if (adtyp == AD_PHYS || adtyp == AD_ACID)
             damu = Maybe_Half_Phys(damu);
         if (adtyp == AD_FIRE) {
@@ -667,7 +667,7 @@ explode(
                 }
                 if (iflags.last_msg == PLNMSG_CAUGHT_IN_EXPLOSION
                     || iflags.last_msg == PLNMSG_TOWER_OF_FLAME) /*seffects()*/
-                    pline("It is fatal.");
+                    pline("臈臬的な手残しだ.");
                 else
                     pline_The("%s is fatal.", str);
                 /* Known BUG: BURNING suppresses corpse in bones data,
@@ -778,7 +778,7 @@ scatter(
                     pline("%s apart.", Tobjnam(otmp, "break"));
                 } else {
                     Soundeffect(se_stone_breaking, 100);
-                    You_hear("stone breaking.");
+                    You_hear("石が砕ける音が聞こえた.");
                 }
                 fracture_rock(otmp);
                 place_object(otmp, sx, sy);
@@ -796,7 +796,7 @@ scatter(
                     pline("%s.", Tobjnam(otmp, "crumble"));
                 } else {
                     Soundeffect(se_stone_crumbling, 100);
-                    You_hear("stone crumbling.");
+                    You_hear("石が崩れる音が聞こえた.");
                 }
                 (void) break_statue(otmp);
                 place_object(otmp, sx, sy); /* put fragments on floor */

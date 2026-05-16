@@ -4568,7 +4568,7 @@ shk_fixes_damage(struct monst *shkp)
               shk_closeby ? "an incantation" : "something");
     } else if (!Deaf && shk_closeby) {
         Soundeffect(se_mutter_incantation, 100);
-        You_hear("someone muttering an incantation.");
+        You_hear("誰かが呪文をつぶやくのが聞こえた.");
     }
 
     (void) repair_damage(shkp, dam, FALSE);
@@ -4829,7 +4829,7 @@ repair_damage(
         newsym(x, y);
     } else if (IS_WALL(tmp_dam->typ)) {
         if (inside_shop(u.ux, u.uy) == ESHK(shkp)->shoproom)
-            You_feel("more claustrophobic than before.");
+            You_feel("さっきより閉塞感が強くなった.");
         else if (!Deaf && !rn2(10))
             Norep("The dungeon acoustics noticeably change.");
     }
@@ -5026,7 +5026,7 @@ shopdig(int fall)
         return;
     if (!inhishop(shkp)) {
         if (Role_if(PM_KNIGHT)) {
-            You_feel("like a common thief.");
+            You_feel("ただの盗人のような気がした.");
             adjalign(-sgn(u.ualign.type));
         }
         return;
@@ -5055,7 +5055,7 @@ shopdig(int fall)
             }
         }
         if (Role_if(PM_KNIGHT)) {
-            You_feel("like a common thief.");
+            You_feel("ただの盗人のような気がした.");
             adjalign(-sgn(u.ualign.type));
         }
     } else if (!um_dist(shkp->mx, shkp->my, 5)
@@ -5274,7 +5274,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
             if (!animal) {
                 if (!Deaf && !muteshk(shkp)) {
                     /* Soundeffect(se_angry_voice, 75); */
-                    You_hear("an angry voice:");
+                    You_hear("怒った声が聞こえた:");
                     SetVoice(shkp, 0, 80, 0);
                     verbalize("Out of my way, scum!");
                 }

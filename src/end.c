@@ -1030,7 +1030,7 @@ done(int how)
             svk.killer.name[0] = '\0';
         }
         if (wizard) {
-            You("are a very tricky wizard, it seems.");
+            You("弄しつらい㧨事をした。");
             svk.killer.format = KILLED_BY_AN; /* reset to 0 */
             return;
         }
@@ -1088,7 +1088,7 @@ done(int how)
         Your("medallion %s!", !Blind ? "begins to glow" : "feels warm");
         if (how == CHOKING)
             You("vomit ...");
-        You_feel("much better!");
+        You_feel("かなり気分がよくなった!");
         pline_The("medallion crumbles to dust!");
         if (uamul)
             useup(uamul);

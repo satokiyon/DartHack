@@ -106,22 +106,22 @@ thitu(
     if (u.uac + tlev <= (dieroll = rnd(20))) {
         ++gm.mesg_given;
         if (Blind || !flags.verbose) {
-            pline("It misses.");
+            pline("外れた.");
         } else if (u.uac + tlev <= dieroll - 2) {
             if (onm != onmbuf)
                 Strcpy(onmbuf, onm); /* [modifiable buffer for upstart()] */
             pline("%s %s you.", upstart(onmbuf), vtense(onmbuf, "miss"));
         } else
-            You("are almost hit by %s.", onm);
+            You("%sに当たりそうになった.", onm);
         return 0;
     } else {
         if (Blind || !flags.verbose)
-            You("are hit%s", exclam(dam));
+            You("攻撃を受けた%s", exclam(dam));
         else
-            You("are hit by %s%s", onm, exclam(dam));
+            You("%sの攻撃を受けた%s", onm, exclam(dam));
 
         if (is_acid && Acid_resistance) {
-            pline("It doesn't seem to hurt you.");
+            pline("それはあなたに効かないようだ.");
             monstseesu(M_SEEN_ACID);
         } else if (obj && stone_missile(obj)
                    && passes_rocks(gy.youmonst.data)) {
@@ -129,8 +129,8 @@ thitu(
                we avoid "passes through you" for horizontal flight path
                because missile stops and that wording would suggest that
                it should keep going */
-            pline("It %s you.",
-                  named ? "passes harmlessly through" : "doesn't harm");
+            pline("それはあなたに%s.",
+                named ? "何の害もなくすり抜けた" : "害を及ぼさなかった");
         } else if (obj && obj->oclass == POTION_CLASS) {
             /* an explosion which scatters objects might hit hero with one
                (potions deliberately thrown at hero are handled by m_throw) */
@@ -140,11 +140,11 @@ thitu(
             if (obj && objects[obj->otyp].oc_material == SILVER
                 && Hate_silver) {
                 /* extra damage already applied by dmgval() */
-                pline_The("silver sears your flesh!");
+                pline_The("銀があなたの肉を焼いた!");
                 exercise(A_CON, FALSE);
             }
             if (is_acid) {
-                pline("It burns!");
+                pline("焼けつく!");
                 monstunseesu(M_SEEN_ACID);
             }
             losehp(dam, knm, kprefix); /* acid damage */
@@ -352,7 +352,7 @@ ohitmon(
             if (vis)
                 miss(distant_name(otmp, mshot_xname), mtmp);
             else if (verbose && !gm.mtarget)
-                pline("It is missed.");
+                pline("外れた.");
         }
         if (!range) { /* Last position; object drops */
             (void) drop_throw(otmp, 0, mtmp->mx, mtmp->my);
@@ -403,14 +403,14 @@ ohitmon(
         if (otmp->opoisoned && is_poisonable(otmp)) {
             if (resists_poison(mtmp)) {
                 if (vis)
-                    pline_The("poison doesn't seem to affect %s.",
+                    pline_The("毒は%sに効かないようだ.",
                               mon_nam(mtmp));
             } else {
                 if (rn2(30)) {
                     damage += rnd(6);
                 } else {
                     if (vis)
-                        pline_The("poison was deadly...");
+                        pline_The("毒は致命的だった...");
                     damage = mtmp->mhp;
                 }
             }
@@ -425,7 +425,7 @@ ohitmon(
 
                 if (flesh) /* s_suffix returns a modifiable buffer */
                     m_name = strcat(s_suffix(m_name), " flesh");
-                pline_The("silver sears %s!", m_name);
+                pline_The("銀が%sを焼いた!", m_name);
             } else if (verbose && !gm.mtarget) {
                 pline("%s is seared!", flesh ? "Its flesh" : "It");
             }
@@ -433,12 +433,12 @@ ohitmon(
         if (otmp->otyp == ACID_VENOM && cansee(mtmp->mx, mtmp->my)) {
             if (resists_acid(mtmp)) {
                 if (vis || (verbose && !gm.mtarget))
-                    pline("%s is unaffected.", Monnam(mtmp));
+                    pline("%sは平然としていた.", Monnam(mtmp));
             } else {
                 if (vis)
                     pline_The("%s burns %s!", hliquid("acid"), mon_nam(mtmp));
                 else if (verbose && !gm.mtarget)
-                    pline("It is burned!");
+                    pline("焼けついた!");
             }
         }
         if (otmp->otyp == EGG && touch_petrifies(&mons[otmp->corpsenm])) {
@@ -513,12 +513,12 @@ ucatchgem(
              *mon_s_name = s_suffix(mon_nam(mon));
 
         if (gem->otyp >= FIRST_GLASS_GEM) {
-            You("catch the %s.", gem_xname);
-            You("are not interested in %s junk.", mon_s_name);
+            You("%sを受け止めた.", gem_xname);
+            You("%sがよこしたがらくたには興味がなかった.", mon_s_name);
             makeknown(gem->otyp);
             dropy(gem);
         } else {
-            You("accept %s gift in the spirit in which it was intended.",
+            You("%sの贈り物をその心づかいごと受け取った.",
                 mon_s_name);
             (void) hold_another_object(gem, "You catch, but drop, %s.",
                                        gem_xname, "You catch:");
@@ -760,9 +760,9 @@ m_throw(
                 blindinc = rnd(25);
                 if (singleobj->otyp == CREAM_PIE) {
                     if (!Blind)
-                        pline("Yecch!  You've been creamed.");
+                        pline("うわっ!  パイまみれになった.");
                     else
-                        pline("There's %s sticky all over your %s.",
+                        pline("%sがあなたの%s一面にべったり付いている.",
                               something, body_part(FACE));
                 } else if (singleobj->otyp == BLINDING_VENOM) {
                     const char *eyes = body_part(EYE);
@@ -771,7 +771,7 @@ m_throw(
                         eyes = makeplural(eyes);
                     /* venom in the eyes */
                     if (!Blind)
-                        pline_The("venom blinds you.");
+                        pline_The("毒液で目がくらんだ.");
                     else
                         Your("%s %s.", eyes, vtense(eyes, "sting"));
                 }
@@ -907,7 +907,8 @@ return_from_mtoss(
                           mlevitating ? "beneath" : "at", mhis(magr),
                           makeplural(mbodypart(magr, FOOT)));
                 } else if (!Deaf) {
-                    You_hear("%s land near %s.", Something, mon_nam(magr));
+                    You_hear("%sが%sの近くに落ちる音が聞こえた.",
+                             Something, mon_nam(magr));
                 }
             } else {
                 dmg += rnd(3);
@@ -916,8 +917,8 @@ return_from_mtoss(
                           Tobjnam(otmp, "fly"), mon_nam(magr),
                           mhis(magr), body_part(ARM));
                 } else if (!Deaf) {
-                    You_hear("%s hit %s with a thud!", something,
-                             mon_nam(magr));
+                    You_hear("%sが%sに鈍い音を立てて当たったのが聞こえた!",
+                             something, mon_nam(magr));
                 }
                 hits_thrower = TRUE;
             }
@@ -927,7 +928,7 @@ return_from_mtoss(
         /* it didn't make it back to thrower's location */
         if (tethered_weapon)
             tmp_at(DISP_END, 0);
-        You_hear("a loud snap!");
+        You_hear("大きな破裂音が聞こえた!");
         notcaught = TRUE;
     }
     if (otmp) {
@@ -1020,11 +1021,11 @@ spitmm(struct monst *mtmp, struct attack *mattk, struct monst *mtarg)
     if (mtmp->mcan) {
         if (!Deaf && mdistu(mtmp) < BOLT_LIM * BOLT_LIM) {
             if (canspotmon(mtmp)) {
-                pline("A dry rattle comes from %s throat.",
+                pline("%sの喉から乾いたがらがら声がした.",
                       s_suffix(mon_nam(mtmp)));
             } else {
                 Soundeffect(se_dry_throat_rattle, 50);
-                You_hear("a dry rattle nearby.");
+                You_hear("近くで乾いたがらがら音が聞こえた.");
             }
         }
         return M_ATTK_MISS;
@@ -1102,7 +1103,7 @@ breamm(struct monst *mtmp, struct attack *mattk, struct monst *mtarg)
                     pline("%s coughs.", Monnam(mtmp));
                 } else {
                     Soundeffect(se_cough, 100);
-                    You_hear("a cough.");
+                    You_hear("せき込む音が聞こえた.");
                 }
             }
             return M_ATTK_MISS;
@@ -1434,11 +1435,11 @@ hit_bars(
         /* breakage makes its own noises */
         if (obj_type == POT_ACID) {
             if (cansee(barsx, barsy) && !nodissolve) {
-                pline_The("iron bars are dissolved!");
+                    pline_The("鉄格子が溶けた!");
             } else {
                 Soundeffect(se_angry_snakes, 100);
-                You_hear(Hallucination ? "angry snakes!"
-                                       : "a hissing noise.");
+                    You_hear(Hallucination ? "怒った蛇たちの声が聞こえた!"
+                                           : "シューという音が聞こえた.");
             }
             if (!nodissolve)
                 dissolve_bars(barsx, barsy);
@@ -1483,7 +1484,7 @@ hit_bars(
             int chance = (melee_attk ? 40 : 60) - acurrstr() - spe;
 
             if (!rn2(max(2, chance))) {
-                You("break the bars apart!");
+                You("鉄格子を打ち壊した!");
                 dissolve_bars(barsx, barsy);
                 noise = noise * 2;
             }

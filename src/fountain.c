@@ -46,7 +46,7 @@ dowatersnakes(void)
                   Hallucination ? makeplural(rndmonnam(NULL)) : "蛇");
         } else {
             Soundeffect(se_snakes_hissing, 75);
-            You_hear("%sがシューシュー鳴くのを聞いた!", something);
+            You_hear("%sがシューシュー鳴くのが聞こえた!", something);
         }
         while (num-- > 0)
             if ((mtmp = makemon(&mons[PM_WATER_MOCCASIN], u.ux, u.uy,
@@ -101,7 +101,7 @@ dowaternymph(void)
         if (!Blind)
             You("%sを引き寄せた!", a_monnam(mtmp));
         else
-            You_hear("魅惑的な声を聞いた.");
+            You_hear("魅惑的な声が聞こえた.");
         mtmp->msleeping = 0;
         if (t_at(mtmp->mx, mtmp->my))
             (void) mintrap(mtmp, NO_TRAP_FLAGS);
@@ -111,7 +111,7 @@ dowaternymph(void)
         pline("大きな泡が水面まで上がってきて、はじけた.");
     } else {
         Soundeffect(se_loud_pop, 50);
-        You_hear("大きな破裂音を聞いた.");
+        You_hear("大きな破裂音が聞こえた.");
     }
 }
 
@@ -612,7 +612,7 @@ drinksink(void)
             pline("かなりおいしく感じた.");
             monstseesu(M_SEEN_FIRE);
         } else {
-            losehp(rnd(6), "煮えたぎる水をひと口すすった", KILLED_BY);
+            losehp(rnd(6), "煮えたぎる湯をひと口すすった", KILLED_BY);
             monstunseesu(M_SEEN_FIRE);
         }
         /* boiling water burns considered fire damage */
@@ -685,11 +685,11 @@ drinksink(void)
     /* more odd messages --JJB */
     case 11:
         Soundeffect(se_clanking_pipe, 50);
-        You_hear("配管の中からがちゃんがちゃんという音を聞いた...");
+        You_hear("配管の中からがちゃんがちゃんという音が聞こえた...");
         break;
     case 12:
         Soundeffect(se_sewer_song, 100);
-        You_hear("下水の奥から歌声の切れ端を聞いた...");
+        You_hear("下水の奥から歌声の切れ端が聞こえた...");
         break;
     case 13:
         pline("うっ、ひどい悪臭だ!");
@@ -756,7 +756,7 @@ dipsink(struct obj *obj)
         if (!Blind) {
             pline_The("排水口の詰まりが少し取れたようだ.");
         } else if (!Deaf) {
-            You_hear("ずずっという音を聞いた.");
+            You_hear("ずずっという音が聞こえた.");
         } else {
             pline1(nothing_seems_to_happen);
             try_call = FALSE;

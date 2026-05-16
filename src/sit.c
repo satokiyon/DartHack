@@ -25,7 +25,7 @@ take_gold(void)
         }
     }
     if (!lost_money) {
-        You_feel("a strange sensation.");
+        You_feel("奇妙な感覚を覚えた.");
     } else {
         You("notice you have no gold!");
         disp.botl = TRUE;
@@ -81,7 +81,7 @@ throne_sit_effect(void)
             exercise(A_CON, FALSE);
             break;
         case 4:
-            You_feel("much, much better!");
+            You_feel("とても気分がよくなった!");
             if (Upolyd) {
                 if (u.mh >= (u.mhmax - 5))
                     u.mhmax += 4;
@@ -104,7 +104,7 @@ throne_sit_effect(void)
             break;
         case 6:
             if (u.uluck + rn2(5) < 0) {
-                You_feel("your luck is changing.");
+                You_feel("運気が変わりつつある気がした.");
                 change_luck(1);
             } else
                 makewish();
@@ -184,10 +184,10 @@ throne_sit_effect(void)
             break;
         case 11:
             if (Luck < 0) {
-                You_feel("threatened.");
+                You_feel("脅かされている気がした.");
                 aggravate();
             } else {
-                You_feel("a wrenching sensation.");
+                You_feel("引き裂かれるような感覚を覚えた.");
                 tele(); /* teleport him */
             }
             break;
@@ -209,9 +209,9 @@ throne_sit_effect(void)
         }
     } else {
         if (is_prince(gy.youmonst.data) || u.uevent.uhand_of_elbereth)
-            You_feel("very comfortable here.");
+            You_feel("ここはとても居心地がよい.");
         else
-            You_feel("somehow out of place...");
+            You_feel("どうにも場違いな気がした...");
     }
 
     /* 5.0: when the random chance for removal is hit, ask for confirmation
@@ -290,7 +290,7 @@ special_throne_effect(int effect) {
         find_hell(&vs_level);
         vs_level.dlevel = svd.dungeons[vs_level.dnum].num_dunlevs - 1;
         if (u.uhave.amulet)
-            You_feel("extremely disoriented for a moment.");
+            You_feel("一瞬、ひどく方向感覚を失った.");
         else
             schedule_goto(
                 &vs_level, UTOTYPE_NONE, (char *) 0,
@@ -326,10 +326,10 @@ special_throne_effect(int effect) {
         /* polymorph effect (not blocked by magic resistance, but other things
            that protect from polymorphs work) */
         if (is_vampire(gy.youmonst.data)) {
-            You_feel("unworthy.");
+            You_feel("自分にはふさわしくないと感じた.");
         } else {
             pline("This throne was not meant for those such as you!");
-            You_feel("a change coming over you.");
+            You_feel("体に変化が訪れるのを感じた.");
             polyself(POLY_NOFLAGS);
         }
         break;
@@ -417,7 +417,7 @@ dosit(void)
         else if (Levitation)
             You("tumble in place.");
         else
-            You("are sitting on air.");
+            You("気がごみだ。");
         return ECMD_OK;
     } else if (u.ustuck && !sticks(gy.youmonst.data)) {
         /* holding monster is next to hero rather than beneath, but
@@ -452,7 +452,7 @@ dosit(void)
             else
                 You("sit on %s.", the(xname(obj)));
             if (obj->otyp == CORPSE && amorphous(&mons[obj->corpsenm]))
-                pline("It's squishy...");
+                pline("たとうやぐら。");
             else if (obj->otyp == CREAM_PIE) {
                  if (!Deaf) {
                    Soundeffect(se_squelch, 30);
@@ -649,7 +649,7 @@ attrcurse(void)
     case 1:
         if (HFire_resistance & INTRINSIC) {
             HFire_resistance &= ~INTRINSIC;
-            You_feel("warmer.");
+            You_feel("少し暖かく感じた.");
             ret = FIRE_RES;
             break;
         }
@@ -658,7 +658,7 @@ attrcurse(void)
     case 2:
         if (HTeleportation & INTRINSIC) {
             HTeleportation &= ~INTRINSIC;
-            You_feel("less jumpy.");
+            You_feel("びくびくしなくなった.");
             ret = TELEPORT;
             break;
         }
@@ -667,7 +667,7 @@ attrcurse(void)
     case 3:
         if (HPoison_resistance & INTRINSIC) {
             HPoison_resistance &= ~INTRINSIC;
-            You_feel("a little sick!");
+            You_feel("少し気分が悪くなった!");
             ret = POISON_RES;
             break;
         }
@@ -687,7 +687,7 @@ attrcurse(void)
     case 5:
         if (HCold_resistance & INTRINSIC) {
             HCold_resistance &= ~INTRINSIC;
-            You_feel("cooler.");
+            You_feel("少し涼しく感じた.");
             ret = COLD_RES;
             break;
         }
@@ -696,7 +696,7 @@ attrcurse(void)
     case 6:
         if (HInvis & INTRINSIC) {
             HInvis &= ~INTRINSIC;
-            You_feel("paranoid.");
+            You_feel("疑心暗鬼になった.");
             ret = INVIS;
             break;
         }
@@ -721,7 +721,7 @@ attrcurse(void)
     case 8:
         if (HFast & INTRINSIC) {
             HFast &= ~INTRINSIC;
-            You_feel("slower.");
+            You_feel("動きが遅くなった.");
             ret = FAST;
             break;
         }
@@ -730,7 +730,7 @@ attrcurse(void)
     case 9:
         if (HStealth & INTRINSIC) {
             HStealth &= ~INTRINSIC;
-            You_feel("clumsy.");
+            You_feel("不器用になった気がした.");
             ret = STEALTH;
             break;
         }
@@ -740,7 +740,7 @@ attrcurse(void)
         /* intrinsic protection is just disabled, not set back to 0 */
         if (HProtection & INTRINSIC) {
             HProtection &= ~INTRINSIC;
-            You_feel("vulnerable.");
+            You_feel("無防備になった気がした.");
             ret = PROTECTION;
             break;
         }
@@ -749,7 +749,7 @@ attrcurse(void)
     case 11:
         if (HAggravate_monster & INTRINSIC) {
             HAggravate_monster &= ~INTRINSIC;
-            You_feel("less attractive.");
+            You_feel("魅力が薄れた気がした.");
             ret = AGGRAVATE_MONSTER;
             break;
         }

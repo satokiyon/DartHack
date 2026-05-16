@@ -135,11 +135,11 @@ cursed_book(struct obj *bp)
 
     switch (rn2(lev)) {
     case 0:
-        You_feel("a wrenching sensation.");
+        You_feel("引き裂かれるような感覚に襲われた.");
         tele(); /* teleport him */
         break;
     case 1:
-        You_feel("threatened.");
+        You_feel("脅かされている気がした.");
         aggravate();
         break;
     case 2:
@@ -254,7 +254,7 @@ deadbook(struct obj *book2)
             pline("悪寒が%sを走り抜けた.", body_part(SPINE));
             if (!u.uhave.bell) {
                 Soundeffect(se_faint_chime, 30);
-                You_hear("a faint chime...");
+                You_hear("かすかな鐘の音が聞こえた...");
             }
             if (!u.uhave.menorah)
                 pline("ヴラドの分身は面白がっていた.");
@@ -688,10 +688,10 @@ rejectcasting(void)
 {
     /* rejections which take place before selecting a particular spell */
     if (Stunned) {
-        You("are too impaired to cast a spell.");
+        You("呼吸が整とわない。");
         return TRUE;
     } else if (!can_chant(&gy.youmonst)) {
-        You("are unable to chant the incantation.");
+        You("誃文を咩驡できない。");
         return TRUE;
     } else if (!freehand() && !(uwep && uwep->otyp == QUARTERSTAFF)) {
         /* Note: !freehand() occurs when weapon and shield (or two-handed
@@ -1288,7 +1288,7 @@ spelleffects_check(int spell, int *res, int *energy)
        the attempt may fail due to lack of energy after the draining, in
        which case a turn will be used up in addition to the energy loss */
     if (u.uhave.amulet && u.uen >= *energy) {
-        You_feel("the amulet draining your energy away.");
+        You_feel("護符に力を吸い取られていくのを感じた.");
         /* this used to be 'energy += rnd(2 * energy)' (without 'res'),
            so if amulet-induced cost was more than u.uen, nothing
            (except the "don't have enough energy" message) happened
