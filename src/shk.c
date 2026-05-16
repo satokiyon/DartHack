@@ -1785,7 +1785,7 @@ dopay(void)
     }
 
     if (!seensk) {
-        You_cant("see...");
+        You_cant("見えなかった...");
         return ECMD_OK;
     }
 

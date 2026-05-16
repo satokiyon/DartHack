@@ -1164,7 +1164,7 @@ dotele(
 void
 level_tele(void)
 {
-    static const char get_there_from[] = "get there from %s.";
+    static const char get_there_from[] = "そこへ%sから行くことはできなかった。";
     int newlev;
     d_level newlevel;
     const char *escape_by_flying = 0; /* when surviving dest of -N */

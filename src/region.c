@@ -466,8 +466,8 @@ run_regions(void)
         gg.gas_cloud_diss_within = FALSE;
     }
     if (gg.gas_cloud_diss_seen) {
-        You_see("%s gas cloud%s dissipate.",
-                (gg.gas_cloud_diss_seen == 1) ? "a" : "some",
+        You_see("%s%sガスの雲が消散しているのを見た.",
+                (gg.gas_cloud_diss_seen == 1) ? "一つの" : "いくつかの",
                 plur(gg.gas_cloud_diss_seen));
         gg.gas_cloud_diss_seen = 0;
     }

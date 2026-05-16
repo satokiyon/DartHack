@@ -696,8 +696,8 @@ wield_tool(struct obj *obj,
                    || strstri(what, "s of ") != 0);
 
     if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
-        You_cant("%s %s while wearing %s.", verb, yname(obj),
-                 more_than_1 ? "them" : "it");
+        You_cant("%s%sを着用している間、%sはできなかった。", verb, yname(obj),
+                 more_than_1 ? "それらは" : "それは");
         return FALSE;
     }
     if (uwep && welded(uwep)) {
@@ -717,7 +717,7 @@ wield_tool(struct obj *obj,
         return FALSE;
     }
     if (cantwield(gy.youmonst.data)) {
-        You_cant("hold %s strongly enough.", more_than_1 ? "them" : "it");
+        You_cant("%sをしっかりと握ることはできなかった。", more_than_1 ? "それらは" : "それは");
         return FALSE;
     }
     /* check shield */
@@ -764,7 +764,7 @@ can_twoweapon(void)
 
     if (!could_twoweap(gy.youmonst.data)) {
         if (Upolyd)
-            You_cant("use two weapons in your current form.");
+            You_cant("現在の姿では二つの武器を使うことはできなかった。");
         else
             pline("%s aren't able to use two weapons at once.",
                   makeplural((flags.female && gu.urole.name.f)
@@ -787,7 +787,7 @@ can_twoweapon(void)
         otmp = bimanual(uwep) ? uwep : uswapwep;
         pline("%s isn't one-handed.", Yname2(otmp));
     } else if (uarms) {
-        You_cant("use two weapons while wearing a shield.");
+        You_cant("盾を着用している間、二つの武器を使うことはできなかった。");
     } else if (uswapwep->oartifact) {
         pline("%s being held second to another weapon!",
               Yobjnam2(uswapwep, "resist"));

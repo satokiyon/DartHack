@@ -2218,10 +2218,10 @@ arti_invoke(struct obj *obj)
             }
             newsym(u.ux, u.uy);
             if (on)
-                Your("body takes on a %s transparency...",
-                     Hallucination ? "normal" : "strange");
+                Your("体を%sに透明にした...",
+                     Hallucination ? "速やか" : "変下はとになった");
             else
-                Your("body seems to unfade...");
+                Your("体が晴れが戻った...");
             break;
         }
     }
@@ -2527,8 +2527,8 @@ retouch_object(
 
         /* hero can't handle this object, but didn't get touch_artifact()'s
            "<obj> evades your grasp|control" message; give an alternate one */
-        You_cant("handle %s%s!", yname(obj),
-                 obj->owornmask ? " anymore" : "");
+        You_cant("%sを扱うことはできなかった%s!", yname(obj),
+                 obj->owornmask ? "もう" : "");
         /* also inflict damage unless touch_artifact() already did so */
         if (!touch_blasted) {
             const char *what = killer_xname(obj);

@@ -462,7 +462,7 @@ moverock_core(coordxy sx, coordxy sy)
                     deliver_part1 = TRUE;
                 } else {
                     Soundeffect(se_monster_behind_boulder, 50);
-                    You_hear("%sの向こうにモンスターがいるのを聞いた.",
+                    You_hear("%sの向こうにモンスターがいるのが聞こえた.",
                              the(xname(otmp)));
                     if (!Deaf)
                         deliver_part1 = TRUE;
@@ -4235,8 +4235,8 @@ maybe_wail(void)
         }
     } else {
         Soundeffect(se_wailing_of_the_banshee, 75);
-        You_hear(u.uhp == 1 ? "バンシーの嘆き声を聞いた..."
-                            : "クン・アンヌンの遠吠えを聞いた...");
+        You_hear(u.uhp == 1 ? "バンシーの嘆き声が聞こえた..."
+                            : "クン・アンヌンの遠吠えが聞こえた...");
     }
 }
 

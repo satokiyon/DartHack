@@ -2510,7 +2510,7 @@ breakobj(
 
                         if (eyecount(gy.youmonst.data) != 1)
                             eyes = makeplural(eyes);
-                        Your("%s %s.", eyes, vtense(eyes, "water"));
+                        Your("%sかろ水を流かした。", eyes);
                     }
                 }
                 potionbreathe(obj);

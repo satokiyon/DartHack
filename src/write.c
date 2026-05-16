@@ -209,7 +209,7 @@ dowrite(struct obj *pen)
  found:
 
     if (i == SCR_BLANK_PAPER || i == SPE_BLANK_PAPER) {
-        You_cant("write that!");
+        You_cant("それを書くことはできなかった!");
         pline("不劬的だ!");
         return ECMD_TIME;
     } else if (i == SPE_NOVEL) {

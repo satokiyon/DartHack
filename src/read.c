@@ -329,7 +329,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 int
 doread(void)
 {
-    static const char find_any_braille[] = "feel any Braille writing.";
+    static const char find_any_braille[] = "点字を感じることはできなかった。";
     struct obj *scroll;
     boolean confused, nodisappear;
     int otyp;
@@ -430,7 +430,7 @@ doread(void)
         if (scroll->o_id % 3) {
             /* no need to vary this when blind; "on this ___" is important
                because it suggests that there might be something on others */
-            You_cant("find anything to read on this %s.",
+            You_cant("この%sで読むものは何も見つけることはできなかった。",
                      simpleonames(scroll));
             return ECMD_OK;
         }

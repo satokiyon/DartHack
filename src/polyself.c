@@ -566,7 +566,7 @@ polyself(int psflags)
                 if (!class)
                     pline("I've never heard of such monsters.");
                 else
-                    You_cant("polymorph into any of those.");
+                    You_cant("そのいずれにもポリモーフすることはできなかった。");
             } else if (wizard && Upolyd
                        && (mntmp == u.umonster
                            /* "priest" and "priestess" match the monster
@@ -610,7 +610,7 @@ polyself(int psflags)
                     pm_name = the(pm_name);
                 else if (!type_is_pname(&mons[mntmp]))
                     pm_name = an(pm_name);
-                You_cant("polymorph into %s.", pm_name);
+                You_cant("%sにポリモーフすることはできなかった。", pm_name);
             } else
                 break;
         } while (--tryct > 0);
@@ -1423,7 +1423,7 @@ dobreathe(void)
     struct attack *mattk;
 
     if (Strangled) {
-        You_cant("breathe.  Sorry.");
+        You_cant("呼吸することはできなかった。申し訳ない。");
         return ECMD_OK;
     }
     if (u.uen < 15) {
@@ -1659,10 +1659,10 @@ dogaze(void)
     }
 
     if (Blind) {
-        You_cant("see anything to gaze at.");
+        You_cant("見つめるものが見えなかった。");
         return ECMD_OK;
     } else if (Hallucination) {
-        You_cant("gaze at anything you can see.");
+        You_cant("見えるものに見つめることはできなかった。");
         return ECMD_OK;
     }
     if (u.uen < 15) {
@@ -1680,7 +1680,7 @@ dogaze(void)
             if (Invis && !perceives(mtmp->data)) {
                 pline("%s seems not to notice your gaze.", Monnam(mtmp));
             } else if (mtmp->minvis && !See_invisible) {
-                You_cant("see where to gaze at %s.", Monnam(mtmp));
+                You_cant("%sをどこで見つめるのか見えなかった。", Monnam(mtmp));
             } else if (M_AP_TYPE(mtmp) == M_AP_FURNITURE
                        || M_AP_TYPE(mtmp) == M_AP_OBJECT) {
                 looked--;
@@ -1782,8 +1782,8 @@ dohide(void)
     /* can't hide while being held (or holding) or while trapped
        (except for floor hiders [trapper or mimic] in pits) */
     if (u.ustuck || (u.utrap && (u.utraptype != TT_PIT || on_ceiling))) {
-        You_cant("hide while you're %s.",
-                 !u.ustuck ? "trapped"
+        You_cant("隠れることはできなかった。%sているから。",
+                 !u.ustuck ? "引っ掛かっ"
                    : u.uswallow ? (digests(u.ustuck->data) ? "swallowed"
                                                            : "engulfed")
                      : !sticks(gy.youmonst.data) ? "being held"
