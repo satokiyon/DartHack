@@ -1025,7 +1025,7 @@ tty_number_pad(int state UNUSED)
 void
 term_shutdown(void)
 {
-    consoletty_exit();
+    console_exit();
 }
 
 #ifdef ASCIIGRAPH
@@ -1115,14 +1115,19 @@ consoletty_open(int mode UNUSED)
 extern void set_emergency_io(void);
 
 void
-consoletty_exit(void)
+console_exit(void)
 {
     free_custom_colors();
-    free((genericptr_t) console.front_buffer);
-    free((genericptr_t) console.back_buffer);
+    if (console.front_buffer)
+        free((genericptr_t) console.front_buffer);
+    if (console.back_buffer)
+        free((genericptr_t) console.back_buffer);
     console.front_buffer = console.back_buffer = 0;
-    free((genericptr_t) console.localestr);
-    free((genericptr_t) console.orig_localestr);
+    if (console.localestr)
+        free((genericptr_t) console.localestr), console.localestr = 0;
+    if (console.orig_localestr)
+        free((genericptr_t) console.orig_localestr),
+            console.orig_localestr = 0;
     set_emergency_io();
 }
 
@@ -2595,10 +2600,10 @@ void nethack_enter_consoletty(void)
     /* setup front and back buffers */
     int buffer_size_bytes = sizeof(cell_t) * console.buffer_size;
 
-    console.front_buffer = (cell_t *)malloc(buffer_size_bytes);
+    console.front_buffer = (cell_t *)alloc(buffer_size_bytes);
     buffer_fill_to_end(console.front_buffer, &undefined_cell, 0, 0);
 
-    console.back_buffer = (cell_t *)malloc(buffer_size_bytes);
+    console.back_buffer = (cell_t *)alloc(buffer_size_bytes);
     buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
 
     /* determine whether OS version has unicode support */
@@ -2718,6 +2723,18 @@ void nethack_enter_consoletty(void)
     console.current_nhcolor = NO_COLOR;
     console.is_ready = TRUE;
     nhUse(apisuccess);
+}
+
+int
+get_console_width(void)
+{
+    return console.width;
+}
+
+int
+get_console_height(void)
+{
+    return console.height;
 }
 
 RESTORE_WARNING_CONDEXPR_IS_CONSTANT

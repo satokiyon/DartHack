@@ -1,4 +1,4 @@
-/* NetHack 5.0	extern.h	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1523 $ */
+/* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -339,6 +339,7 @@ extern char *get_configfile(void);
 extern const char *get_default_configfile(void);
 extern void rcfile(void);
 extern void rcfile_interface_options(void);
+extern void rcfile_only_this_option(enum opt);
 extern void heed_all_config_statements(void);
 extern void disregard_all_config_statements(void);
 extern void heed_this_config_statement(int);
@@ -346,6 +347,14 @@ extern void disregard_this_config_statement(int);
 extern boolean config_unmatched_ignored(void);
 extern void clear_ignore_errors_on_unmatched(void);
 extern void set_ignore_errors_on_unmatched(void);
+extern void rcfile_only_this_statement(int);
+#ifdef WIN32
+extern boolean check_for_portable_config(void);
+#endif
+#ifdef MSWIN_GRAPHICS
+extern void disregard_some_mswin_options(void);
+extern void rcfile_only_some_mswin_options(void);
+#endif
 
 /* ### coloratt.c ### */
 
@@ -684,7 +693,8 @@ extern void free_mgivenname(struct monst *) NONNULLARG1;
 extern void new_oname(struct obj *, int) NONNULLARG1;
 extern void free_oname(struct obj *) NONNULLARG1;
 extern const char *safe_oname(struct obj *) NONNULLARG1;
-extern struct monst *christen_monst(struct monst *, const char *) NONNULLARG1;
+extern struct monst *christen_monst(struct monst *, const char *) NONNULL
+                                                                   NONNULLARG1;
 extern struct obj *oname(struct obj *, const char *, unsigned) NONNULLPTRS;
 extern boolean objtyp_is_callable(int);
 extern int name_ok(struct obj *);
@@ -986,7 +996,7 @@ extern void done1(int);
 extern int done2(void);
 extern void done_in_by(struct monst *, int) NONNULLARG1;
 extern void done_object_cleanup(void);
-extern void NH_abort(char *);
+extern void NH_abort(const char *);
 #endif /* !MAKEDEFS_C && MDLIB_C && !CPPREGEX_C */
 #if !defined(CPPREGEX_C)
 ATTRNORETURN extern void panic(const char *, ...) PRINTF_F(1, 2) NORETURN;
@@ -2022,6 +2032,10 @@ extern int win32_cr_helper(char, struct CRctxt *, void *, int);
 extern int win32_cr_gettrace(int, char *, int);
 extern int *win32_cr_shellexecute(const char *);
 # endif
+#ifdef MSWIN_GRAPHICS
+extern int get_approx_window_column_width(void);
+extern int get_approx_window_rows(void);
+#endif
 #endif /* WIN32 */
 
 #endif /* MICRO || WIN32 */
@@ -2171,7 +2185,9 @@ void console_g_putch(int in_ch);
 extern void set_output_mode(int);
 extern void synch_cursor(void);
 extern void nethack_enter_consoletty(void);
-extern void consoletty_exit(void);
+extern int get_console_width(void);
+extern int get_console_height(void);
+extern void console_exit(void);
 extern int set_keyhandling_via_option(void);
 #ifdef ENHANCED_SYMBOLS
 extern void tty_utf8graphics_fixup(void);

@@ -1,4 +1,4 @@
-/* NetHack 5.0	options.c	$NHDT-Date: 1737556914 2025/01/22 06:41:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.753 $ */
+/* NetHack 5.0	options.c	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.782 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -558,6 +558,7 @@ parseoptions(
         got_match = FALSE;
 
         if (allopt[i].pfx) {
+            assert(allopt[i].name != NULL);
             if (str_start_is(opts, allopt[i].name, TRUE)) {
                 matchidx = i;
                 got_match = pfx_match = TRUE;
@@ -7324,6 +7325,7 @@ void
 initoptions_finish(void)
 {   nhsym sym = 0;
 
+    disregard_this_option(opt_mention_decor);  /* defer this */
     rcfile();
 
     (void) fruitadd(svp.pl_fruit, (struct fruit *) 0);
@@ -10184,6 +10186,9 @@ heed_all_options(void)
 {
     int i;
 
+    /* ensure OPTIONS= lines are enabled */
+    heed_this_config_statement(0); /* index 0 == OPTIONS */
+
     for (i = 0; i < OPTCOUNT; i++)
         allopt[i].disregarded = FALSE;
 }
@@ -10200,6 +10205,9 @@ disregard_all_options(void)
 void
 heed_this_option(enum opt optidx)
 {
+    /* ensure OPTIONS= lines are enabled */
+    heed_this_config_statement(0);  /* index 0 == OPTIONS */
+
     if (optidx >= 0 && optidx < (enum opt) OPTCOUNT)
          allopt[optidx].disregarded = FALSE;
 }
