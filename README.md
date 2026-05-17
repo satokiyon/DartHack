@@ -65,7 +65,7 @@ git pull upstream NetHack-5.0
 
 # 2. main に統合する
 git switch main
-git merge upstream-base
+git git merge --no-commit --no-ff upstream-base
 
 # 3. コンフリクトが発生した場合の処理（VS Code等で解決後）
 # 競合箇所を手動修正し、全解決後に以下を実行
