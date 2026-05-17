@@ -797,9 +797,18 @@ back_buffer_flip(void)
 #endif
             if (console.has_unicode
                 && nh_win32_is_wide_trailing_cell(back, pos)) {
+                /* Keep trailing cell write-skipped, but leave front buffer in a
+                   "needs refresh" state so that when this position stops being a
+                   trailing half-cell, it will be actively cleared/repainted. */
+                front->wcharacter = 0;
+                front->utf8str[0] = (uint8) '\x7f';
+                front->utf8str[1] = (uint8) '\0';
                 /* Trailing cell is owned by previous wide glyph; writing
-                   a blank here can erase that glyph's right half. */
-                *front = *back;
+                   a blank here can erase that glyph's right half.
+                   Do not mirror this cell into front buffer here: the
+                   actual on-screen state is still owned by the previous
+                   wide glyph write, and forcing front=back can leave stale
+                   reverse-video halves when that glyph is later cleared. */
                 back++;
                 front++;
                 continue;
@@ -1488,8 +1497,10 @@ g_pututf8(uint8 *sequence)
 #ifdef UTF8_FROM_CORE
     set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
     cell_t cell = clear_cell;
+    COORD pos = console.cursor;
     WCHAR wch[2] = { 0, 0 };
     int wcount;
+    int width = 1;
 
     cell.attr = console.attr;
     cell.colorseq = esc_seq_colors[console.current_nhcolor];
@@ -1506,7 +1517,18 @@ g_pututf8(uint8 *sequence)
                         ? wch[0]
                         : (WCHAR) CONSOLE_CLEAR_CHARACTER;
 
-    buffer_write(console.back_buffer, &cell, console.cursor);
+    width = nh_win32_cell_expected_width(&cell);
+    buffer_write(console.back_buffer, &cell, pos);
+
+    /* Mark the trailing screen cell for full-width glyphs so stale
+       reverse-video attributes are not left behind in the back buffer. */
+    if (width > 1 && pos.X + 1 < console.width) {
+        cell_t trail = clear_cell;
+        COORD trail_pos = pos;
+
+        ++trail_pos.X;
+        buffer_write(console.back_buffer, &trail, trail_pos);
+    }
 #endif /* UTF8_FROM_CORE */
 #endif
 }

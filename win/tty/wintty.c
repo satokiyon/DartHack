@@ -233,6 +233,8 @@ static const char *compress_str(const char *);
 static int utf8_sequence_len(const unsigned char *);
 static unsigned short utf8_char_chartype(const unsigned char *);
 static int utf8_char_display_width(const unsigned char *);
+static int win32con_utf8_strlen_cells(const char *);
+static int win32con_putstr_utf8(const char *);
 static long utf8_text_wrap_index(const char *, int);
 extern int __stdcall MultiByteToWideChar(unsigned int, unsigned long, 
                                          const char *, int, wchar_t *, int);
@@ -994,8 +996,16 @@ erase_menu_or_text(
         } else if (clear) {
             term_clear_screen();
         } else {
+#ifdef WIN32CON
+            /* Win32 console keeps per-cell state for full-width rendering;
+               force clear then redraw to avoid stale reverse fragments. */
+            term_clear_screen();
             docrt();
             flush_screen(1);
+#else
+            docrt();
+            flush_screen(1);
+#endif
         }
     } else {
         docorner((int) cw->offx, cw->maxrow + 1, 0);
@@ -1182,8 +1192,12 @@ dmore(
              (int) ttyDisplay->cury);
     if (flags.standout)
         standoutbeg();
+#ifdef WIN32CON
+    (void) win32con_putstr_utf8(prompt);
+#else
     xputs(prompt);
     ttyDisplay->curx += strlen(prompt);
+#endif
     if (flags.standout)
         standoutend();
 
@@ -1473,13 +1487,9 @@ process_menu_window(winid window, struct WinDesc *cw)
                      * this.
                      */
                     for (n = 0, cp = curr->str;
-                         *cp &&
 #ifndef WIN32CON
-                            (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
-#else
-                            (int) ttyDisplay->curx < (int) ttyDisplay->cols;
-                         ttyDisplay->curx++,
-#endif
+                         *cp
+                            && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
                          cp++, n++) {
                         if (n == attr_n && (color != NO_COLOR
                                             || attr != ATR_NONE))
@@ -1504,6 +1514,67 @@ process_menu_window(winid window, struct WinDesc *cw)
                             (void) putchar(*cp);
                         }
                     } /* for *cp */
+#else  /* WIN32CON */
+                         *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
+                         n++) {
+                        if (n == attr_n && (color != NO_COLOR
+                                            || attr != ATR_NONE))
+                            toggle_menu_attr(TRUE, color, attr);
+                        if (n == 2 && curr->identifier.a_void != 0
+                            && curr->selected) {
+                            char c = (curr->count == -1L) ? '*' : '#';
+
+                            /* all selected: '*' vs count selected: '#' */
+                            g_putch(c);
+                            ++ttyDisplay->curx;
+                            ++cp;
+                        } else if (n == 2 && curr->identifier.a_void != 0
+                                   && show_obj_syms
+                                   && curr->glyphinfo.glyph != NO_GLYPH) {
+                            int gcolor = curr->glyphinfo.gm.sym.color;
+
+                            /* tty_print_glyph could be used, but is overkill
+                               and requires referencing the cursor location */
+                            toggle_menu_attr(TRUE, gcolor, ATR_NONE);
+                            g_putch(curr->glyphinfo.ttychar);
+                            toggle_menu_attr(FALSE, gcolor, ATR_NONE);
+                            ++ttyDisplay->curx;
+                            ++cp;
+                        } else {
+                            unsigned char uch = (unsigned char) *cp;
+
+                            if (uch < 0x80) {
+                                g_putch(*cp++);
+                                ++ttyDisplay->curx;
+                            } else {
+                                int ulen =
+                                    utf8_sequence_len((const unsigned char *) cp);
+
+                                if (ulen > 1) {
+                                    int width = utf8_char_display_width(
+                                        (const unsigned char *) cp);
+                                    uint8 utf8seq[8];
+                                    int k;
+
+                                    for (k = 0; k < ulen && k < 7; ++k)
+                                        utf8seq[k] = (uint8) cp[k];
+                                    utf8seq[k] = '\0';
+                                    if (!_isatty(_fileno(stdout)))
+                                        (void) fwrite(utf8seq, 1,
+                                                      (size_t) ulen, stdout);
+                                    else
+                                        g_pututf8(utf8seq);
+                                    cp += ulen;
+                                    ttyDisplay->curx += width;
+                                } else {
+                                    g_putch(*cp++);
+                                    end_glyphout();
+                                    ++ttyDisplay->curx;
+                                }
+                            }
+                        }
+                    } /* for *cp */
+#endif /* WIN32CON */
                     if (n > attr_n && (color != NO_COLOR || attr != ATR_NONE))
                         toggle_menu_attr(FALSE, color, attr);
                 } /* if npages > 0 */
@@ -1566,7 +1637,12 @@ process_menu_window(winid window, struct WinDesc *cw)
             dmore(cw, resp);
         } else {
             /* just put the cursor back... */
-            tty_curs(window, (int) strlen(cw->morestr) + 2, page_lines);
+            int morestr_cols = (int) strlen(cw->morestr);
+
+#ifdef WIN32CON
+            morestr_cols = win32con_utf8_strlen_cells(cw->morestr);
+#endif
+            tty_curs(window, morestr_cols + 2, page_lines);
             xwaitforspace(resp);
         }
 
@@ -2623,16 +2699,8 @@ tty_display_file(
             winid datawin = tty_create_nhwindow(NHW_TEXT);
             boolean empty = TRUE;
 
-            if (complain
-#ifndef NO_TERMS
-                && nh_CD
-#endif
-                ) {
-                /* attempt to scroll text below map window if there's room */
-                wins[datawin]->offy = wins[WIN_STATUS]->offy + StatusRows();
-                if ((int) wins[datawin]->offy + 12 > (int) ttyDisplay->rows)
-                    wins[datawin]->offy = 0;
-            }
+            /* Keep help/history text windows at the top of the screen. */
+            wins[datawin]->offy = 0;
             while (dlb_fgets(buf, BUFSZ, f)) {
                 if ((cr = strchr(buf, '\n')) != 0)
                     *cr = 0;
@@ -3912,6 +3980,74 @@ utf8_char_display_width(const unsigned char *utf8str)
     if (chartype & NH_C3_HALFWIDTH)
         return 1;
     return 1;
+}
+
+static int
+win32con_utf8_strlen_cells(const char *str)
+{
+    const unsigned char *cp = (const unsigned char *) str;
+    int total = 0;
+
+    if (!cp)
+        return 0;
+
+    while (*cp) {
+        if (*cp < 0x80U) {
+            ++total;
+            ++cp;
+        } else {
+            int ulen = utf8_sequence_len(cp);
+
+            if (ulen > 1) {
+                total += utf8_char_display_width(cp);
+                cp += ulen;
+            } else {
+                ++total;
+                ++cp;
+            }
+        }
+    }
+    return total;
+}
+
+static int
+win32con_putstr_utf8(const char *str)
+{
+    const unsigned char *cp = (const unsigned char *) str;
+    int total = 0;
+
+    if (!cp)
+        return 0;
+
+    while (*cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols) {
+        if (*cp < 0x80U) {
+            g_putch((int) *cp++);
+            ++ttyDisplay->curx;
+            ++total;
+        } else {
+            int ulen = utf8_sequence_len(cp);
+
+            if (ulen > 1) {
+                int width = utf8_char_display_width(cp);
+                uint8 utf8seq[8];
+                int k;
+
+                for (k = 0; k < ulen && k < 7; ++k)
+                    utf8seq[k] = (uint8) cp[k];
+                utf8seq[k] = '\0';
+                g_pututf8(utf8seq);
+                cp += ulen;
+                ttyDisplay->curx += width;
+                total += width;
+            } else {
+                g_putch((int) *cp++);
+                end_glyphout();
+                ++ttyDisplay->curx;
+                ++total;
+            }
+        }
+    }
+    return total;
 }
 
 static unsigned short
