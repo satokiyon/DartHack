@@ -1178,7 +1178,7 @@ rename_disco(void)
         }
     }
     if (ct == 0) {
-        You("haven't discovered anything yet...");
+        You("まだ何も発見していない...");
     } else if (mn == 0) {
         pline("None of your discoveries can be assigned names...");
     } else {

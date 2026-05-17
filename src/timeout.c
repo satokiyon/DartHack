@@ -693,7 +693,7 @@ nh_timeout(void)
                    but not other forms of illness */
                 if ((u.usick_type & SICK_NONVOMITABLE) == 0
                     && rn2(100) < ACURR(A_CON)) {
-                    You("have recovered from your illness.");
+                    You("病気から回復した.");
                     make_sick(0, NULL, FALSE, SICK_ALL);
                     exercise(A_CON, FALSE);
                     adjattrib(A_CON, -1, 1);
@@ -847,12 +847,12 @@ nh_timeout(void)
                    attempts fail to relocate hero; skip timeout message
                    if hero has acquired fire resistance in the meantime */
                 if (!Fire_resistance)
-                    Your("temporary ability to survive burning has ended.");
+                    Your("一時的な耐火能力は失われた.");
                 break;
             case WWALKING:
                 /* [see fire resistance] */
                 if (!Wwalking)
-                    Your("temporary ability to walk on liquid has ended.");
+                    Your("一時的な水上歩行能力は失われた.");
                 break;
             case DISPLACED:
                 if (!Displaced) /* give a message */
@@ -894,7 +894,7 @@ nh_timeout(void)
                 /* must be declining to die in explore|wizard mode;
                    treat like being cured of strangulation by prayer */
                 if (uamul && uamul->otyp == AMULET_OF_STRANGULATION) {
-                    Your("amulet vanishes!");
+                    Your("アミュレットは消えた!");
                     useup(uamul);
                 }
                 break;
@@ -912,7 +912,7 @@ nh_timeout(void)
                      */
                     if ((inv_weight() > (WT_NOISY_INV * -1))) {
                         if (!Deaf)
-                            You("make a lot of noise!");
+                            You("大きな音を立てた!");
                         wake_nearby(FALSE);
                     }
                 }
@@ -1279,7 +1279,7 @@ slip_or_trip(void)
             && ((saddle = which_armor(u.usteed, W_SADDLE)) == 0
                 || !saddle->cursed)
             && (!ice_only || !rn2(3))) {
-            You("lose your balance.");
+            You("バランスを崩した.");
             dismount_steed(DISMOUNT_FELL);
         } else if (!rn2(10 + ACURR(A_DEX))) {
             /* Maybe slip in a random direction.  This takes place after
@@ -1319,7 +1319,7 @@ slip_or_trip(void)
                    || !saddle->cursed) {
             switch (rn2(4)) {
             case 1:
-                Your("%s slip out of the stirrups.",
+                Your("%sが鐙から外れた.",
                      makeplural(body_part(FOOT)));
                 break;
             case 2:
@@ -1359,7 +1359,7 @@ lantern_message(struct obj *obj)
     /* from adventure */
     switch (obj->where) {
     case OBJ_INVENT:
-        Your("lantern is getting dim.");
+        Your("ランタンが暗くなってきた.");
         if (Hallucination)
             pline("Batteries have not been invented yet.");
         break;

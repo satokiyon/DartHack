@@ -198,7 +198,7 @@ pri_move(struct monst *priest)
         || (Conflict && !resist_conflict(priest))) {
         if (monnear(priest, u.ux, u.uy)) {
             if (Displaced)
-                Your("displaced image doesn't fool %s!", mon_nam(priest));
+                Your("変位した像では%sを欺けなかった!", mon_nam(priest));
             (void) mattacku(priest);
             return 0;
         } else if (strchr(u.urooms, temple)) {
@@ -503,7 +503,7 @@ intemple(int roomno)
 
         switch (rn2(4)) {
         case 0:
-            You("have an eerie feeling...");
+            You("不気味な感じがした...");
             break;
         case 1:
             You_feel("誰かに見張られている気がした.");

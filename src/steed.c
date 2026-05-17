@@ -331,8 +331,8 @@ mount_steed(
         return (FALSE);
     }
     if (!force && uarm && is_metallic(uarm) && greatest_erosion(uarm)) {
-        Your("%s armor is too stiff to be able to mount %s.",
-             uarm->oeroded ? "rusty" : "corroded", mon_nam(mtmp));
+           Your("%s鎧は硬すぎて%sに乗れない.",
+               uarm->oeroded ? "錆びた" : "腐食した", mon_nam(mtmp));
         return (FALSE);
     }
     if (!force
@@ -374,7 +374,7 @@ mount_steed(
 
         steed_vs_stealth();
         if (was_stealthy && !Stealth)
-            You("aren't stealthy anymore.");
+            You("もはや隠密ではなくなった.");
     }
     remove_monster(mtmp->mx, mtmp->my);
     teleds(mtmp->mx, mtmp->my, TELEDS_ALLOW_DRAG);
@@ -638,7 +638,7 @@ dismount_steed(
             return;
         }
         if (!have_spot) {
-            You("can't.  There isn't anywhere for you to stand.");
+            You("できなか;った。立つ場所がなかった.");
             return;
         }
         if (!has_mgivenname(mtmp)) {
@@ -662,7 +662,7 @@ dismount_steed(
 
         steed_vs_stealth();
         if (Stealth && !was_stealthy)
-            You("seem less noisy now.");
+            You("今は静かになったようだ.");
     }
 
     if (u.utraptype == TT_BEARTRAP

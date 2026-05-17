@@ -455,13 +455,13 @@ silver_sears(struct monst *magr UNUSED, struct monst *mdef,
            rtyp will always be STRANGE_OBJECT) even if both rings are known
            silver [see hmonas(uhitm.c) for explanation of 'multi_claw'] */
         both = ((ltyp == rtyp && l_dknown == r_dknown) || (l_ag && r_ag));
-        Sprintf(rings, "ring%s", both ? "s" : "");
-        Your("%s%s %s %s!",
-             (l_ag || r_ag) ? "silver "
-             : both ? ""
-               : ((silverhit & W_RINGL) != 0L) ? "left "
-                 : "right ",
-             rings, vtense(rings, "sear"), mon_nam(mdef));
+                Sprintf(rings, "指輪");
+                Your("%s%sが%sを焼いた!",
+                         (l_ag || r_ag) ? "銀の"
+                         : both ? ""
+                             : ((silverhit & W_RINGL) != 0L) ? "左の"
+                                 : "右の",
+                         rings, mon_nam(mdef));
     }
 }
 

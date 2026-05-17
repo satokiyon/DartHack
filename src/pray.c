@@ -354,7 +354,7 @@ fix_curse_trouble(struct obj *otmp, const char *what)
     }
     if (otmp == uarmg && Glib) {
         make_glib(0);
-        Your("%s are no longer slippery.", gloves_simple_name(uarmg));
+        Your("%sはもう滑らなくなった.", gloves_simple_name(uarmg));
         if (!otmp->cursed)
             return;
     }
@@ -387,7 +387,7 @@ fix_worst_trouble(int trouble)
         break;
     case TROUBLE_STRANGLED:
         if (uamul && uamul->otyp == AMULET_OF_STRANGULATION) {
-            Your("amulet vanishes!");
+            Your("アミュレットは消えた!");
             useup(uamul);
         }
         You("また息ができるようになった.");
@@ -406,7 +406,7 @@ fix_worst_trouble(int trouble)
         FALLTHROUGH;
         /* FALLTHRU*/
     case TROUBLE_HUNGRY:
-        Your("%s feels content.", body_part(STOMACH));
+        Your("%sは満たされた.", body_part(STOMACH));
         init_uhunger();
         disp.botl = TRUE;
         break;
@@ -461,7 +461,7 @@ fix_worst_trouble(int trouble)
     case TROUBLE_STUCK_IN_WALL:
         /* no control, but works on no-teleport levels */
         if (safe_teleds(TELEDS_NO_FLAGS)) {
-            Your("surroundings change.");
+            Your("周囲の様子が変わった.");
         } else {
             /* safe_teleds() couldn't find a safe place; perhaps the
                level is completely full.  As a last resort, confer
@@ -496,7 +496,7 @@ fix_worst_trouble(int trouble)
         }
         if (Upolyd && nohands(gy.youmonst.data)) {
             if (!Unchanging) {
-                Your("shape becomes uncertain.");
+                Your("姿があやふやになった.");
                 rehumanize(); /* "You return to {normal} form." */
             } else if ((otmp = unchanger()) != 0 && otmp->cursed) {
                 /* otmp is an amulet of unchanging */
@@ -517,7 +517,7 @@ fix_worst_trouble(int trouble)
     /*
      */
     case TROUBLE_PUNISHED:
-        Your("chain disappears.");
+        Your("鎖は消えた.");
         if (u.utrap && u.utraptype == TT_BURIEDBALL)
             buried_ball_to_freedom();
         else
@@ -903,7 +903,7 @@ gcrownu(void)
 
             Strcpy(lbuf, simpleonames(obj)); /* before transformation */
             if (!Blind)
-                Your("sword shines brightly for a moment.");
+                Your("剣が一瞬まばゆく輝いた.");
             obj = oname(obj, artiname(ART_EXCALIBUR),
                         ONAME_GIFT | ONAME_KNOW_ARTI);
             if (is_art(obj, ART_EXCALIBUR)) {
@@ -922,7 +922,7 @@ gcrownu(void)
         if (class_gift != STRANGE_OBJECT) {
             ; /* already got bonus above */
         } else if (obj && in_hand) {
-            Your("%s goes snicker-snack!", xname(obj));
+            Your("%sが鋭い音を立てた!", xname(obj));
             observe_object(obj);
         } else if (!already_exists) {
             obj = mksobj(LONG_SWORD, FALSE, FALSE);
@@ -948,7 +948,7 @@ gcrownu(void)
         if (class_gift != STRANGE_OBJECT) {
             ; /* already got bonus above */
         } else if (obj && in_hand) {
-            Your("%s hums ominously!", swordbuf);
+            Your("%sが不吉にうなった!", swordbuf);
             observe_object(obj);
         } else if (!already_exists) {
             obj = mksobj(RUNESWORD, FALSE, FALSE);
@@ -1045,10 +1045,10 @@ give_spell(void)
                 pline("Divine knowledge of %s fills your mind!  Spell '%c'.",
                       spe_name, spe_let);
             else
-                Your("knowledge of spell '%c' - %s is %s.",
+                 Your("呪文'%c' - %sの知識は%s.",
                      spe_let, spe_name,
-                     (spe_knowledge == spe_Forgotten) ? "restored"
-                                                      : "refreshed");
+                     (spe_knowledge == spe_Forgotten) ? "戻った"
+                                                : "新たになった");
         }
         obfree(otmp, (struct obj *) 0); /* discard the book */
     } else {
@@ -1448,25 +1448,25 @@ consume_offering(struct obj *otmp)
     if (Hallucination)
         switch (rn2(3)) {
         case 0:
-            Your("sacrifice sprouts wings and a propeller and roars away!");
+            Your("供物に翼とプロペラが生えて、うなりながら飛び去った!");
             break;
         case 1:
-            Your("sacrifice puffs up, swelling bigger and bigger, and pops!");
+            Your("供物はどんどん膨らみ、最後に破裂した!");
             break;
         case 2:
             Your(
-     "sacrifice collapses into a cloud of dancing particles and fades away!");
+     "供物は踊る粒子の雲へ崩れ、やがて消え去った!");
             break;
         }
     else if (Blind && u.ualign.type == A_LAWFUL)
-        Your("sacrifice disappears!");
+        Your("供物は消え去った!");
     else
-        Your("sacrifice is consumed in a %s!",
+        Your("供物は%sに包まれて消えた!",
              (u.ualign.type == A_LAWFUL)
-                ? "flash of light"
+                ? "閃光"
                 : (u.ualign.type == A_NEUTRAL)
-                    ? "plume of smoke"
-                    : "burst of flame");
+                    ? "煙の噴き上がり"
+                    : "炎の奔流");
     if (carried(otmp))
         useup(otmp);
     else
@@ -1703,7 +1703,7 @@ sacrifice_your_race(
     int pm;
 
     if (is_demon(gy.youmonst.data)) {
-        You("find the idea very satisfying.");
+        You("そのアイデアがとても満足のいくものだと思った.");
         exercise(A_WIS, TRUE);
     } else if (u.ualign.type != A_CHAOTIC) {
         pline("この悪名高い侮辱を後悔することになった!");
@@ -1862,7 +1862,7 @@ dosacrifice(void)
             (Levitation || Flying) ? "over" : "on");
         return ECMD_OK;
     } else if (Confusion || Stunned) {
-        You("are too impaired to perform the rite.");
+        You("状態が悪くて儀式を行えなかった.");
         return ECMD_OK;
     }
     highaltar = (levl[u.ux][u.uy].altarmask & AM_SANCTUM);
@@ -2053,7 +2053,7 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
             if (Hallucination)
                 pline_The("gods seem tall.");
             else
-                You("have a feeling of inadequacy.");
+                You("不十分な気持ちを覚えた.");
         }
     } else if (ugod_is_angry()) {
         if (value > MAXVALUE)
@@ -2073,14 +2073,14 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
                 if (Hallucination)
                     You("realize that the gods are not like you and I.");
                 else
-                    You("have a hopeful feeling.");
+                    You("希望のある気持ちを覚えた.");
                 if ((int) u.uluck < 0)
                     change_luck(1);
             } else {
                 if (Hallucination)
                     pline("全体的に、炒め玉ねぎの匂いがした.");
                 else
-                    You("have a feeling of reconciliation.");
+                    You("和解の気持ちを覚えた.");
                 if ((int) u.uluck < 0)
                     u.uluck = 0;
             }
@@ -2265,7 +2265,7 @@ dopray(void)
     if (gp.p_type == 3 && !Inhell) {
         /* if you've been true to your god you can't die while you pray */
         if (!Blind)
-            You("are surrounded by a shimmering light.");
+            You("きらめく光に包まれた.");
         u.uinvulnerable = TRUE;
     }
 
@@ -2420,7 +2420,7 @@ doturn(void)
         /* Try to use the "turn undead" spell. */
         if (known_spell(SPE_TURN_UNDEAD))
             return spelleffects(SPE_TURN_UNDEAD, FALSE, FALSE);
-        You("don't know how to turn undead!");
+        You("アンデッドの退散方法がわからなかった!");
         return ECMD_OK;
     }
     if (!u.uconduct.gnostic++)

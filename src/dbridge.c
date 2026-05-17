@@ -704,9 +704,9 @@ do_entity(struct entity *etmp)
 #endif
         if (e_inview) {
             if (is_u(etmp)) {
-                You("tumble towards the closed portcullis!");
+                You("閉じた跳ね格子に向かってころがった!");
                 if (automiss(etmp))
-                    You("pass through it!");
+                    You("その中をすり抜けた!");
                 else
                     pline_The("drawbridge closes in...");
             } else

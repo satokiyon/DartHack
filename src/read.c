@@ -364,7 +364,7 @@ doread(void)
     /* outrumor has its own blindness check */
     if (otyp == FORTUNE_COOKIE) {
         if (flags.verbose)
-            You("break up the cookie and throw away the pieces.");
+            You("クッキーを割って破片を捨てた.");
         outrumor(bcsign(scroll), BY_COOKIE);
         if (!Blind)
             if (!u.uconduct.literate++)
@@ -465,7 +465,7 @@ doread(void)
         };
 
         if (Blind) {
-            You("feel the embossed numbers:");
+            You("浮き彫りの数字を感じ取った:");
         } else {
             if (flags.verbose)
                 pline("It reads:");
@@ -517,9 +517,9 @@ doread(void)
         return ECMD_TIME;
     } else if (scroll->oclass == COIN_CLASS) {
         if (Blind)
-            You("feel the embossed words:");
+            You("浮き彫りの文字を感じ取った:");
         else if (flags.verbose)
-            You("read:");
+            You("読んだ:");
         pline("\"1 Zorkmid.  857 GUE.  In Frobs We Trust.\"");
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
@@ -528,7 +528,7 @@ doread(void)
         return ECMD_TIME;
     } else if (is_art(scroll, ART_ORB_OF_FATE)) {
         if (Blind)
-            You("feel the engraved signature:");
+            You("刻まれた署名を感じ取った:");
         else
             pline("准胞を描書している:");
         pline("\"Odin.\"");
@@ -860,7 +860,7 @@ recharge(struct obj *obj, int curse_bless)
                 /* previously recharged */
                 obj->recharged = 1; /* override increment done above */
                 if (obj->spe < 3)
-                    Your("marker seems permanently dried out.");
+                    Your("マーカーは完全に乾ききったようだ.");
                 else
                     pline1(nothing_happens);
             } else if (is_blessed) {
@@ -1000,7 +1000,7 @@ recharge(struct obj *obj, int curse_bless)
 
     } else {
  not_chargable:
-        You("have a feeling of loss.");
+        You("喪失感を覚えた.");
     }
 
     /* prevent enchantment from getting out of range */
@@ -1411,9 +1411,10 @@ seffect_confuse_monster(struct obj **sobjp)
         make_confused(HConfusion + rnd(100), FALSE);
     } else if (confused) {
         if (!sblessed) {
-            Your("%s begin to %s%s.", hands,
-                 altfeedback ? "tingle" : "glow ",
-                 altfeedback ? "" : hcolor(NH_PURPLE));
+            if (altfeedback)
+                Your("%sがむずむずし始めた.", hands);
+            else
+                Your("%sが%s色に光り始めた.", hands, hcolor(NH_PURPLE));
             make_confused(HConfusion + rnd(100), FALSE);
         } else {
             pline("A %s%s surrounds your %s.",
@@ -1427,20 +1428,19 @@ seffect_confuse_monster(struct obj **sobjp)
 
         if (!sblessed) {
             if (altfeedback)
-                Your("%s tingle%s.", hands, u.umconf ? " even more" : "");
+                Your("%sが%sむずむずした.", hands, u.umconf ? "さらに" : "");
             else if (!u.umconf)
-                Your("%s begin to glow %s.", hands, hcolor(NH_RED));
+                Your("%sが%s色に光り始めた.", hands, hcolor(NH_RED));
             else
-                pline_The("%s glow of your %s intensifies.", hcolor(NH_RED),
-                          hands);
+                pline("%sの%s色の輝きが増した.", hands, hcolor(NH_RED));
             incr += rnd(2);
         } else {
             if (altfeedback)
-                Your("%s tingle %s sharply.", hands,
-                     u.umconf ? "even more" : "very");
+                Your("%sが%s激しくむずむずした.", hands,
+                     u.umconf ? "さらに" : "非常に");
             else
-                Your("%s glow %s brilliant %s.", hands,
-                     u.umconf ? "an even more" : "a", hcolor(NH_RED));
+                Your("%sが%s鮮やかな%s色に光った.", hands,
+                     u.umconf ? "さらに" : "", hcolor(NH_RED));
             incr += rn1(8, 2);
         }
         /* after a while, repeated uses become less effective */
@@ -1644,7 +1644,7 @@ seffect_enchant_weapon(struct obj **sobjp)
         uwep->oerodeproof = 0; /* for messages */
         if (Blind) {
             uwep->rknown = FALSE;
-            Your("weapon feels warm for a moment.");
+            Your("武器が一瞬熱くなった.");
         } else {
             uwep->rknown = TRUE;
             pline("%s covered by a %s %s %s!", Yobjnam2(uwep, "are"),
@@ -1730,7 +1730,7 @@ seffect_genocide(struct obj **sobjp)
                              || objects[otyp].oc_name_known);
 
     if (!already_known)
-        You("have found a scroll of genocide!");
+        You("大量殺戮の巻物を発見した!");
     gk.known = TRUE;
     if (sblessed)
         do_class_genocide();
@@ -1836,7 +1836,7 @@ seffect_amnesia(struct obj **sobjp)
     gk.known = TRUE;
     forget((!sblessed ? ALL_SPELLS : 0));
     if (Hallucination) /* Ommmmmm! */
-        Your("mind releases itself from mundane concerns.");
+        Your("心は俗世のしがらみから解き放たれた.");
     else if (!strncmpi(svp.plname, "Maud", 4))
         pline("As your mind turns inward on itself,"
               " you forget everything else.");
@@ -1997,7 +1997,7 @@ seffect_stinking_cloud(struct obj **sobjp)
                              || objects[otyp].oc_name_known);
 
     if (!already_known)
-        You("have found a scroll of stinking cloud!");
+        You("悪臭の霧の巻物を発見した!");
     gk.known = TRUE;
     do_stinking_cloud(sobj, already_known);
 }
@@ -2006,7 +2006,7 @@ staticfn void
 seffect_blank_paper(struct obj **sobjp UNUSED)
 {
     if (Blind)
-        You("don't remember there being any magic words on this scroll.");
+        You("この巻物に魔法の言葉があった記憶がなかった.");
     else
         pline("This scroll seems to be blank.");
     gk.known = TRUE;
@@ -2073,7 +2073,7 @@ seffect_identify(struct obj **sobjp)
         /* scroll just identifies itself for any scroll read while confused
            or for cursed scroll read without knowing identify yet */
         if (confused || (scursed && !already_known))
-            You("identify this as an identify scroll.");
+            You("これが鑑定の巻物だとわかった.");
         else if (!already_known)
             pline("This is an identify scroll.");
         if (!already_known)
@@ -2111,11 +2111,11 @@ seffect_magic_mapping(struct obj **sobjp)
 
     if (is_scroll) {
         if (svl.level.flags.nommap) {
-            Your("mind is filled with crazy lines!");
+            Your("心がでたらめな線で埋め尽くされた!");
             if (Hallucination)
                 pline("Wow!  Modern art.");
             else
-                Your("%s spins in bewilderment.", body_part(HEAD));
+                Your("%sが混乱でぐるぐる回った.", body_part(HEAD));
             make_confused(HConfusion + rnd(30), FALSE);
             return;
         }
@@ -2135,7 +2135,7 @@ seffect_magic_mapping(struct obj **sobjp)
     }
 
     if (svl.level.flags.nommap) {
-        Your("%s spins as %s blocks the spell!", body_part(HEAD),
+        Your("%sが回転し、%sに呪文を阻まれた!", body_part(HEAD),
              something);
         make_confused(HConfusion + rnd(30), FALSE);
         return;
@@ -2538,7 +2538,7 @@ litroom(
             else if (u.uswallow)
                 pline("It seems even darker in here than before.");
             else
-                You("are surrounded by darkness!");
+                You("暗闇に包まれた!");
         }
     } else { /* on */
         if (blessed_effect) {
@@ -2702,7 +2702,7 @@ do_class_genocide(void)
             if (gonecnt)
                 pline("All such monsters are already nonexistent.");
             else if (immunecnt || class == S_invisible)
-                You("aren't permitted to genocide such monsters.");
+                You("そのようなモンスターを絶滅させることは許されなかった.");
             else if (wizard && buf[0] == '*') {
                 struct monst *mtmp, *mtmp2;
 
@@ -3029,9 +3029,9 @@ punish(struct obj *sobj)
 
     /* KMH -- Punishment is still okay when you are riding */
     if (!reuse_ball)
-        You("are being punished for your misbehavior!");
+        You("不行跡の罰を受けた!");
     if (Punished) {
-        Your("iron ball gets heavier.");
+        Your("鉄球が重くなった.");
         uball->owt += WT_IRON_BALL_INCR * (1 + cursed_levy);
         return;
     }

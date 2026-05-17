@@ -1701,7 +1701,7 @@ mime_action(const char *word)
     } else
         bp = buf;
 
-    You("mime %s%s%s something%s%s.", ing_suffix(bp),
+    You("何かを%s%s%sするふりをした%s%s.", bp,
         pfx ? " " : "", pfx ? pfx : "", sfx ? " " : "", sfx ? sfx : "");
 }
 
@@ -5246,7 +5246,7 @@ doorganize_core(struct obj *obj)
                 } else if (inv_cnt(FALSE) >= invlet_basic) {
                     (void) merged(&splitting, &obj); /* undo split */
                     /* "knapsack cannot accommodate any more items" */
-                    Your("pack is too full.");
+                    Your("荷物袋はいっぱいだった.");
                     return ECMD_OK;
                 } else {
                     bumped = otmp;

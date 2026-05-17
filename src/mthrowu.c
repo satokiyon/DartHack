@@ -773,7 +773,7 @@ m_throw(
                     if (!Blind)
                         pline_The("毒液で目がくらんだ.");
                     else
-                        Your("%s %s.", eyes, vtense(eyes, "sting"));
+                        Your("%sが痛んだ.", eyes);
                 }
             }
             if (hitu && singleobj->otyp == EGG) {

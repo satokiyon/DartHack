@@ -1676,8 +1676,8 @@ carry_count(struct obj *obj,            /* object to pick up... */
     /* we can carry qq of them */
     if (qq > 0) {
         if (qq < count)
-            You("can only %s %s of the %s %s.", verb,
-                (qq == 1L) ? "one" : "some", obj_nambuf, where);
+            You("%sの%sを%sしか%sことができなかった.",
+                where, obj_nambuf, (qq == 1L) ? "1つ" : "いくつか", verb);
         *wt_after = wt;
         return qq;
     }
@@ -1711,7 +1711,7 @@ lift_object(
     int result, old_wt, new_wt, prev_encumbr, next_encumbr;
 
     if (obj->otyp == BOULDER && Sokoban) {
-        You("cannot get your %s around this %s.", body_part(HAND),
+        You("%sでは%sをつかめなかった.", body_part(HAND),
             xname(obj));
         return -1;
     }
@@ -1728,8 +1728,8 @@ lift_object(
            [this was using simpleonames(obj) for shortest description, but
            that's suboptimal for loadstones because it omits user-assigned
            type name which is something of interest for gray stones] */
-        You("are carrying too much stuff to pick up %s %s.",
-            (obj->quan == 1L) ? "another" : "more", xname(obj));
+        You("荷物が多すぎて%s%sを持ち上げることができなかった.",
+            (obj->quan == 1L) ? "さらに" : "もっと", xname(obj));
         return -1;
     }
 
@@ -1746,10 +1746,10 @@ lift_object(
            we aren't limited by the 52 item limit for it, but caller and
            "grandcaller" aren't prepared to skip stuff and then pickup
            just gold, so the best we can do here is vary the message */
-        Your("knapsack cannot accommodate any more items%s.",
+        Your("背嚢にはこれ以上入らなかった%s.",
              /* floor follows by nexthere, otherwise container so by nobj */
              nxtobj(obj, GOLD_PIECE, (boolean) (obj->where == OBJ_FLOOR))
-                 ? " (except gold)" : "");
+                 ? " (金貨を除く)" : "");
         result = -1; /* nothing lifted */
     } else {
         result = 1;
@@ -1982,35 +1982,35 @@ encumber_msg(void)
     if (go.oldcap < newcap) {
         switch (newcap) {
         case 1:
-            Your("movements are slowed slightly because of your load.");
+            Your("動きは荷物のせいで少し鈍くなった.");
             break;
         case 2:
-            You("rebalance your load.  Movement is difficult.");
+            You("荷物のバランスを取り直した。移動が困難だ.");
             break;
         case 3:
-            You("%s under your heavy load.  Movement is very hard.",
-                stagger(gy.youmonst.data, "stagger"));
+            You("重い荷物で%s。移動がとても辛い.",
+                stagger(gy.youmonst.data, "よろめいた"));
             break;
         default:
-            You("%s move a handspan with this load!",
-                newcap == 4 ? "can barely" : "can't even");
+            You("この荷物では%s一歩も動けない!",
+                newcap == 4 ? "やっと" : "まったく");
             break;
         }
         disp.botl = TRUE;
     } else if (go.oldcap > newcap) {
         switch (newcap) {
         case 0:
-            Your("movements are now unencumbered.");
+            Your("動きはもう妨げられていなかった.");
             break;
         case 1:
-            Your("movements are only slowed slightly by your load.");
+            Your("動きは荷物のせいで少し鈍いだけだった.");
             break;
         case 2:
-            You("rebalance your load.  Movement is still difficult.");
+            You("荷物のバランスを取り直した。まだ移動が困難だ.");
             break;
         case 3:
-            You("%s under your load.  Movement is still very hard.",
-                stagger(gy.youmonst.data, "stagger"));
+            You("荷物で%s。まだ移動がとても辛い.",
+                stagger(gy.youmonst.data, "よろめいた"));
             break;
         }
         disp.botl = TRUE;
@@ -2054,8 +2054,8 @@ able_to_loot(
     } else if ((is_pool(x, y) && (looting || !Underwater)) || is_lava(x, y)) {
         /* at present, can't loot in water even when Underwater;
            can tip underwater, but not when over--or stuck in--lava */
-        You("cannot %s things that are deep in the %s.", verb,
-            hliquid(is_lava(x, y) ? "lava" : "water"));
+        You("深い%sの中のものを%sことはできなかった.",
+            hliquid(is_lava(x, y) ? "lava" : "water"), verb);
         return FALSE;
     } else if (nolimbs(gy.youmonst.data)) {
         pline("Without limbs, you cannot %s anything.", verb);
@@ -2150,7 +2150,7 @@ do_loot_cont(
     if (cobj->otyp == BAG_OF_TRICKS) {
         int tmp;
 
-        You("carefully open %s...", the(xname(cobj)));
+        You("慎重に%sを開けた...", the(xname(cobj)));
         pline("それは巨大な歯を生やしてあなたを噛んだ!");
         tmp = rnd(10);
         losehp(Maybe_Half_Phys(tmp), "carnivorous bag", KILLED_BY_AN);
@@ -2286,7 +2286,7 @@ doloot_core(void)
                 c = 'y';
         }
     } else if (IS_GRAVE(levl[cc.x][cc.y].typ)) {
-        You("need to dig up the grave to effectively loot it...");
+        You("うまく略奪するには墓を掘り起こす必要があった...");
     }
 
     /*
@@ -2329,12 +2329,11 @@ doloot_core(void)
                              mon_nam(mtmp), prev_inquiry ? "他を" : "");
                     return (timepassed ? ECMD_TIME : ECMD_OK);
                 } else {
-                    You("have to be at a container to loot it.");
+                    You("略奪するには入れ物のそばにいる必要があった.");
                 }
             } else {
-                You("%s %s%shere to loot.", dont_find_anything,
-                    (prev_inquiry || prev_loot) ? "else " : "",
-                    !underfoot ? "t" : "");
+                You("略奪できるものが%s見つからなかった.",
+                    (prev_inquiry || prev_loot) ? "他に" : "");
                 return (timepassed ? ECMD_TIME : ECMD_OK);
             }
         }
@@ -2451,7 +2450,7 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
                 return 0;
             }
             if (otmp->cursed) {
-                You("can't.  The saddle seems to be stuck to %s.",
+                You("できなかった。鞍が%sにくっついているようだ.",
                     x_monnam(mtmp, ARTICLE_THE, (char *) 0,
                              SUPPRESS_SADDLE, FALSE));
                 /* the attempt costs you time */
@@ -2459,7 +2458,7 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
             }
             extract_from_minvent(mtmp, otmp, TRUE, FALSE);
             if (flags.verbose)
-                You("take %s off of %s.",
+                You("%sを%sから取り外した.",
                     thesimpleoname(otmp), mon_nam(mtmp));
             otmp = hold_another_object(otmp, "You drop %s!", doname(otmp),
                                        (const char *) 0);
@@ -2565,7 +2564,7 @@ in_container(struct obj *obj)
         impossible("<in> no gc.current_container?");
         return 0;
     } else if (obj == uball || obj == uchain) {
-        You("must be kidding.");
+        You("冗談でしょう.");
         return 0;
     } else if (obj == gc.current_container) {
         pline("それは興味深いトポロジーの演習だっただろう.");
@@ -2617,7 +2616,7 @@ in_container(struct obj *obj)
         || (obj->otyp == STATUE && bigmonst(&mons[obj->corpsenm]))) {
         /* consumes multiple obufs but not enough to overwrite the result */
         Strcpy(buf, the(xname(obj)));
-        You("cannot fit %s into %s.", buf, the(xname(gc.current_container)));
+        You("%sを%sに入れることができなかった.", buf, the(xname(gc.current_container)));
         return 0;
     }
 
@@ -2850,10 +2849,10 @@ observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
             set_malign(livecat);
             if (givemsg) {
                 if (!canspotmon(livecat))
-                    You("think %s brushed your %s.", something,
+                    You("%sが%sに触れたような気がした.", something,
                         body_part(FOOT));
                 else
-                    pline("%s inside the box is still alive!",
+                      pline("箱の中の%sはまだ生きていた!",
                           Monnam(livecat));
             }
             (void) christen_monst(livecat, sc);
@@ -2874,8 +2873,8 @@ observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
     } else {
         box->spe = 0; /* now an ordinary box (with a cat corpse inside) */
         if (givemsg)
-            pline_The("%s inside the box is dead!",
-                      Hallucination ? rndmonnam((char *) 0) : "housecat");
+            pline("箱の中の%sは死んでいた!",
+                      Hallucination ? rndmonnam((char *) 0) : "イエネコ");
         if (deadcat) {
             /* set_corpsenm() will start the rot timer that was removed
                when makemon() created SchroedingersBox; start it from
@@ -2943,10 +2942,10 @@ boolean
 u_handsy(void)
 {
     if (nohands(gy.youmonst.data)) {
-        You("have no hands!"); /* not `body_part(HAND)' */
+        You("手がない!"); /* not `body_part(HAND)' */
         return FALSE;
     } else if (!freehand()) {
-        You("have no free %s.", body_part(HAND));
+        You("空いた%sがなかった.", body_part(HAND));
         return FALSE;
     }
     return TRUE;
@@ -2996,11 +2995,11 @@ use_container(
     if (obj->olocked) {
         pline("%s locked.", Tobjnam(obj, "are"));
         if (held)
-            You("must put it down to unlock.");
+            You("解錠するには地面に置く必要があった.");
         return ECMD_OK;
     } else if (obj->otrapped) {
         if (held)
-            You("open %s...", the(xname(obj)));
+            You("%sを開けた...", the(xname(obj)));
         (void) chest_trap(obj, HAND, FALSE);
         /* even if the trap fails, you've used up this turn */
         if (gm.multi >= 0) { /* in case we didn't become paralyzed */

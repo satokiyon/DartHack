@@ -326,7 +326,7 @@ deadbook(struct obj *book2)
     } else {
         switch (rn2(3)) {
         case 0:
-            Your("ancestors are annoyed with you!");
+            Your("祖先たちは怒っていた!");
             break;
         case 1:
             pline_The("headstones in the cemetery begin to move!");
@@ -405,8 +405,8 @@ learn(void)
             /* reset spestudied as if polymorph had taken place */
             book->spestudied = rn2(book->spestudied);
         } else {
-            Your("knowledge of %s is %s.", splname,
-                 spellknow(i) ? "keener" : "restored");
+              Your("%sに関する知識は%s.", splname,
+                  spellknow(i) ? "より鋭くなった" : "元に戻った");
             incrnknow(i, 1);
             book->spestudied++;
             exercise(A_WIS, TRUE); /* extra study */
@@ -701,7 +701,7 @@ rejectcasting(void)
          * But why isn't lack of free arms (for gesturing) an issue when
          * poly'd hero has no limbs?
          */
-        Your("arms are not free to cast!");
+        Your("腕がふさがっていて詠唱できなかった!");
         return TRUE;
     }
     return FALSE;
@@ -771,7 +771,7 @@ getspell(int *spell_no)
 
             idx = spell_let_to_idx(ilet);
             if (idx < 0 || idx >= nspells) {
-                You("don't know that spell.");
+                You("その呪文は知らなかった.");
                 continue; /* ask again */
             }
             *spell_no = idx;
@@ -1172,7 +1172,7 @@ cast_protection(void)
             u.usptime = u.uspmtime;
         find_ac();
     } else {
-        Your("skin feels warm for a moment.");
+        Your("肌が一瞬熱くなった.");
     }
 }
 
@@ -1249,7 +1249,7 @@ spelleffects_check(int spell, int *res, int *energy)
      * decrement of spell knowledge is done every turn.
      */
     if (spellknow(spell) <= 0) {
-        Your("knowledge of this spell is twisted.");
+        Your("この呪文の知識はねじ曲がっていた.");
         pline("悪夢のようなイメージが心に浮かんだ...");
         spell_backfire(spell);
         u.uen -= rnd(*energy);
@@ -1261,15 +1261,15 @@ spelleffects_check(int spell, int *res, int *energy)
     } else if (spellknow(spell) <= KEEN / 200) { /* 100 turns left */
         You("strain to recall the spell.");
     } else if (spellknow(spell) <= KEEN / 40) { /* 500 turns left */
-        You("have difficulty remembering the spell.");
+        You("呪文を思い出すのに苦労した.");
     } else if (spellknow(spell) <= KEEN / 20) { /* 1000 turns left */
-        Your("knowledge of this spell is growing faint.");
+        Your("この呪文の知識は薄れつつあった.");
     } else if (spellknow(spell) <= KEEN / 10) { /* 2000 turns left */
-        Your("recall of this spell is gradually fading.");
+        Your("この呪文の記憶は徐々に薄れていた.");
     }
 
     if (u.uhunger <= 10 && spellid(spell) != SPE_DETECT_FOOD) {
-        You("are too hungry to cast that spell.");
+        You("空腹すぎてその呪文を唱えられなかった.");
         *res = ECMD_OK;
         return TRUE;
     } else if (ACURR(A_STR) < 4 && spellid(spell) != SPE_RESTORE_ABILITY) {
@@ -1687,7 +1687,7 @@ throwspell(void)
     } else if (((cc.x != u.ux || cc.y != u.uy) && !cansee(cc.x, cc.y)
                 && (!(mtmp = m_at(cc.x, cc.y)) || !canspotmon(mtmp)))
                || IS_STWALL(levl[cc.x][cc.y].typ)) {
-        Your("mind fails to lock onto that location!");
+        Your("意識はその場所を捉えきれなかった!");
         return 0;
     }
 
@@ -2025,7 +2025,7 @@ dovspell(void)
     struct spell spl_tmp;
 
     if (spellid(0) == NO_SPELL) {
-        You("don't know any spells right now.");
+        You("今は呪文を知らなかった.");
     } else {
         while (dospellmenu("Currently known spells",
                            SPELLMENU_VIEW, &splnum)) {

@@ -203,7 +203,7 @@ money2u(struct monst *mon, long amount)
 
     if (!merge_choice(gi.invent, mongold)
             && inv_cnt(FALSE) >= invlet_basic) {
-        You("have no room for the gold!");
+        You("金を持つ余裕がなかった!");
         dropy(mongold);
     } else {
         addinv(mongold);
@@ -644,18 +644,18 @@ credit_report(struct monst *shkp, int idx, boolean silent)
 
     if (idx && !silent) {
         long amt = 0L;
-        const char *msg = "debt has increased";
+        const char *msg = "負債が増えた";
 
         if (credit_snap[NOW][0] < credit_snap[BEFORE][0]) {
             amt = credit_snap[BEFORE][0] - credit_snap[NOW][0];
-            msg = "credit has been reduced";
+            msg = "信用枠が減った";
         } else if (credit_snap[NOW][1] > credit_snap[BEFORE][1]) {
             amt = credit_snap[NOW][1] - credit_snap[BEFORE][1];
         } else if (credit_snap[NOW][2] > credit_snap[BEFORE][2]) {
             amt = credit_snap[NOW][2] - credit_snap[BEFORE][2];
         }
         if (amt)
-            Your("%s by %ld %s.", msg, amt, currency(amt));
+            Your("%s。%ld %s減った。", msg, amt, currency(amt));
 
     }
 }
@@ -693,7 +693,7 @@ rob_shop(struct monst *shkp)
     rouse_shk(shkp, TRUE);
     total = (addupbill(shkp) + eshkp->debit);
     if (eshkp->credit >= total) {
-        Your("credit of %ld %s is used to cover your shopping bill.",
+        Your("%ld %sの信用枠が買い物の請求に充てられた。",
              eshkp->credit, currency(eshkp->credit));
         total = 0L; /* credit gets cleared by setpaid() */
     } else {
@@ -1009,7 +1009,7 @@ shopper_financial_report(void)
 
     eshkp = this_shkp ? ESHK(this_shkp) : 0;
     if (eshkp && !(eshkp->credit || shop_debt(eshkp))) {
-        You("have no credit or debt in here.");
+        You("ここでのツケも信用もなかった.");
         this_shkp = 0; /* skip first pass */
     }
 
@@ -1026,11 +1026,11 @@ shopper_financial_report(void)
                     s_suffix(shkname(shkp)),
                     shtypes[eshkp->shoptype - SHOPBASE].name);
             else if (shkp == this_shkp)
-                You("have no credit in here.");
+                You("ここには信用がなかった.");
             if ((amt = shop_debt(eshkp)) != 0)
                 You("owe %s %ld %s.", shkname(shkp), amt, currency(amt));
             else if (shkp == this_shkp)
-                You("don't owe any gold here.");
+                You("ここでは金を借りていなかった.");
         }
 }
 
@@ -1825,7 +1825,7 @@ dopay(void)
             return ECMD_OK;
         }
         if (u_at(cx, cy)) {
-            You("are generous to yourself.");
+            You("自分自身に気前がよかった.");
             return ECMD_OK;
         }
         mtmp = m_at(cx, cy);
@@ -1977,7 +1977,7 @@ dopay(void)
                 eshkp->credit -= dtmp;
                 eshkp->debit = 0L;
                 eshkp->loan = 0L;
-                Your("debt is covered by your credit.");
+                Your("負債は信用枠で相殺された。");
             } else if (!eshkp->credit) {
                 money2mon(shkp, dtmp);
                 eshkp->debit = 0L;
@@ -3837,7 +3837,7 @@ stolen_value(
                         currency(ESHK(shkp)->credit));
                     return value;
                 } else if (!value) {
-                    You("have no credit remaining.");
+                    You("信用残高がなかった.");
                     return 0;
                 }
                 still = "still ";
@@ -3889,7 +3889,7 @@ donate_gold(
                 eshkp->loan = 0L;
         }
         eshkp->debit -= gltmp;
-        Your("debt is %spaid off.", eshkp->debit ? "partially " : "");
+        Your("負債は%s返済された。", eshkp->debit ? "一部" : "全額");
     } else {
         long delta = gltmp - eshkp->debit;
 
@@ -3897,7 +3897,7 @@ donate_gold(
         if (eshkp->debit) {
             eshkp->debit = 0L;
             eshkp->loan = 0L;
-            Your("debt is paid off.");
+            Your("負債は返済された。");
         }
         if (eshkp->credit == delta)
             You("have %sestablished %ld %s credit.",
@@ -4896,7 +4896,7 @@ shk_move(struct monst *shkp)
                                           || (omx == u.ux || omy == u.uy))) {
         if (ANGRY(shkp) || (Conflict && !resist_conflict(shkp))) {
             if (Displaced)
-                Your("displaced image doesn't fool %s!", shkname(shkp));
+                Your("変位した像では%sを欺けなかった!", shkname(shkp));
             (void) mattacku(shkp);
             return 0;
         }
@@ -5300,7 +5300,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
     }
 
     if (Invis)
-        Your("invisibility does not fool %s!", shkname(shkp));
+        Your("透明化しても%sは欺けなかった!", shkname(shkp));
     Sprintf(qbuf, "%sYou did %ld %s worth of damage!%s  Pay?",
             !animal ? cad(TRUE) : "", cost_of_damage,
             currency(cost_of_damage), !animal ? "\"" : "");
@@ -5764,18 +5764,18 @@ costly_gold(
     if (eshkp->credit >= amount) {
         if (!silent) {
             if (eshkp->credit > amount)
-                Your("credit is reduced by %ld %s.", amount, currency(amount));
+                Your("信用枠は%ld %s減った。", amount, currency(amount));
             else
-                Your("credit is erased.");
+                Your("信用枠は消えた。");
         }
         eshkp->credit -= amount;
     } else {
         delta = amount - eshkp->credit;
         if (!silent) {
             if (eshkp->credit)
-                Your("credit is erased.");
+                Your("信用枠は消えた。");
             if (eshkp->debit)
-                Your("debt increases by %ld %s.", delta, currency(delta));
+                Your("負債は%ld %s増えた。", delta, currency(delta));
             else
                 You("owe %s %ld %s.", shkname(shkp), delta, currency(delta));
         }
@@ -6055,7 +6055,7 @@ globby_bill_fixup(struct obj *obj_absorber, struct obj *obj_absorbed)
                 if (eshkp->debit) {
                     eshkp->debit = 0L;
                     eshkp->loan = 0L;
-                    Your("debt is paid off.");
+                    Your("負債は返済された。");
                 }
                 if (eshkp->credit == delta)
                     pline_The("%s established %ld %s credit.",

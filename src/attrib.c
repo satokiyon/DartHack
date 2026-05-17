@@ -1388,8 +1388,8 @@ uchangealign(
         /* worn helm of opposite alignment might block change */
         if (!uarmh || uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT)
             u.ualign.type = u.ualignbase[A_CURRENT];
-        You("have a %ssense of a new direction.",
-            (u.ualign.type != oldalign) ? "sudden " : "");
+        You("%s新しい方向への感覚を覚えた.",
+            (u.ualign.type != oldalign) ? "突然、" : "");
     } else {
         /* putting on or taking off a helm of opposite alignment */
         u.ualign.type = (aligntyp) newalign;

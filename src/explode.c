@@ -599,7 +599,7 @@ explode(
                 } while (*hallu_buf != lowc(*hallu_buf));
                 str = hallu_buf;
             }
-            You("are caught in the %s!", str);
+            You("%sに巻き込まれた!", str);
             iflags.last_msg = PLNMSG_CAUGHT_IN_EXPLOSION;
         }
         /* do property damage first, in case we end up leaving bones */

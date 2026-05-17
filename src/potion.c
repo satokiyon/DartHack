@@ -279,7 +279,7 @@ make_blinded(long xtime, boolean talk)
             if (Hallucination)
                 pline("すごい! すべてがまた宇宙的になった!");
             else
-                You("can see again.");
+                You("また見えるようになった.");
         }
     } else if (old && !xtime) {
         /* clearing temporary blindness without toggling blindness */
@@ -729,7 +729,7 @@ peffect_water(struct obj *otmp)
             pline("これは%sのように焼けつく!", hliquid("acid"));
             exercise(A_CON, FALSE);
             if (ismnum(u.ulycn)) {
-                Your("affinity to %s disappears!",
+                 Your("%sへの親和性は消えた!",
                      makeplural(mons[u.ulycn].pmnames[NEUTRAL]));
                 if (gy.youmonst.data == &mons[u.ulycn])
                     you_unwere(FALSE);
@@ -1959,7 +1959,7 @@ potionbreathe(struct obj *obj)
 
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
-                Your("%s %s!", eyes, vtense(eyes, "sting"));
+                Your("%sが痛んだ!", eyes);
             }
             break;
         } else {
@@ -2024,7 +2024,7 @@ potionbreathe(struct obj *obj)
         }
         break;
     case POT_HALLUCINATION:
-        You("have a momentary vision.");
+        You("一瞬、幻視を見た.");
         break;
     case POT_CONFUSION:
     case POT_BOOZE:
@@ -2066,7 +2066,7 @@ potionbreathe(struct obj *obj)
         break;
     case POT_SPEED:
         if (!Fast)
-            Your("knees seem more flexible now.");
+            Your("膝が前より柔らかく感じられた.");
         incr_itimeout(&HFast, rnd(5));
         exercise(A_DEX, TRUE);
         break;
@@ -2923,7 +2923,7 @@ speed_up(long duration)
    if (!Very_fast)
        You("are suddenly moving %sfaster.", Fast ? "" : "much ");
    else
-       Your("%s get new energy.", makeplural(body_part(LEG)));
+    Your("%sに新たな力がみなぎった.", makeplural(body_part(LEG)));
 
    exercise(A_DEX, TRUE);
    incr_itimeout(&HFast, duration);
