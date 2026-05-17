@@ -337,13 +337,13 @@ mattackm(
                                                       : ARTICLE_NONE);
                 if (!justone)
                     montype = makeplural(montype);
-                You("dream of %s.", montype);
+                You("%sの夢を見た。", montype);
             } else {
                 if (iflags.last_msg == PLNMSG_HIDE_UNDER
                     && mdef->m_id == gl.last_hider)
                     pline_mon(mdef, "%sは隠れ場所から現れた.", Monnam(mdef));
                 else if (mdef->m_id == gl.last_hider)
-                    You("notice %s.", mon_nam(mdef));
+                    You("%sに気づいた。", mon_nam(mdef));
                 else
                     pline("Suddenly, you notice %s.", a_monnam(mdef));
             }

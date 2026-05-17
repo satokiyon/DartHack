@@ -4776,7 +4776,7 @@ hideunder(struct monst *mtmp)
         u.uundetected = undetected ? 1 : 0;
 #if 0   /* feedback handled via #monster */
         if (undetected && !oldundeteced && seenobj)
-            You("hide under %s.", seenobj);
+            You("%sの下に隠れた.", seenobj);
 #endif
     } else {
         if (seeit)

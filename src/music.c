@@ -121,7 +121,7 @@ charm_snakes(int distance)
             newsym(mtmp->mx, mtmp->my);
             if (canseemon(mtmp)) {
                 if (!could_see_mon)
-                    You("notice %s, swaying with the music.", a_monnam(mtmp));
+                    You("%sが音楽に合わせて揺れているのに気づいた.", a_monnam(mtmp));
                 else
                     pline("%s freezes, then sways with the music%s.",
                           Monnam(mtmp),
@@ -278,7 +278,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
                     if (!cansee(x, y)) {
                         pline("たかがって不可観、一玬のうちに爆発した!");
                     } else {
-                        You("destroy %s!",
+                        You("%sを破壊した!",
                             mtmp->mtame
                              ? x_monnam(mtmp, ARTICLE_THE, "poor",
                                         has_mgivenname(mtmp)
@@ -309,7 +309,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
         } else if (!tu_pit || !u.utrap || u.utraptype != TT_PIT) {
             /* no pit here previously, or you were
                not in it even if there was */
-            You("fall into a chasm!");
+            You("裂け目に落ちた!");
             set_utrap(rn1(6, 2), TT_PIT);
             losehp(Maybe_Half_Phys(rnd(6)),
                    "fell into a chasm", NO_KILLER_PREFIX);
@@ -551,22 +551,22 @@ do_improvisation(struct obj *instr)
        now use a different verb here */
     switch (mode) {
     case PLAY_NORMAL:
-        You("start playing %s.", yname(instr));
+        You("%sを演奏し始めた.", yname(instr));
         break;
     case PLAY_STUNNED:
         if (!Deaf)
-            You("radiate an obnoxious droning sound.");
+            You("耳障りなうなり音を響かせた.");
         else
             You_feel("単調な振動を感じた.");
         break;
     case PLAY_CONFUSED:
         if (!Deaf)
-            You("generate a raucous noise.");
+            You("騒々しい音を立てた.");
         else
             You_feel("耳障りな振動を感じた.");
         break;
     case PLAY_HALLU:
-        You("disseminate a kaleidoscopic display of floating butterflies.");
+        You("万華鏡のような蝶の群れを宙にまき散らした.");
         break;
     /* TODO? give some or all of these combinations their own feedback;
        hallucination ones should reference senses other than hearing... */
@@ -639,20 +639,20 @@ do_improvisation(struct obj *instr)
         break;
     case TOOLED_HORN: /* Awaken or scare monsters */
         if (!Deaf)
-            You("produce a frightful, grave%s sound.",
-                same_old_song ? ", yet familiar," : "");
+            You("恐ろしく重々しい%s音を響かせた.",
+                same_old_song ? "どこか聞き覚えのある" : "");
         else
-            You("blow into the horn.");
+            You("角笛を吹き鳴らした.");
         Hero_playnotes(obj_to_instr(&itmp), improvisation, 80);
         awaken_monsters(u.ulevel * 30);
         exercise(A_WIS, FALSE);
         break;
     case BUGLE: /* Awaken & attract soldiers */
         if (!Deaf)
-            You("extract a loud%s noise from %s.",
-                same_old_song ? ", familiar" : "", yname(instr));
+            You("%sから大き%sな音を引き出した.",
+                same_old_song ? "どこか聞き覚えのある" : "", yname(instr));
         else
-            You("blow into the bugle.");
+            You("ラッパを吹き鳴らした.");
         Hero_playnotes(obj_to_instr(&itmp), improvisation, 80);
         awaken_soldiers(&gy.youmonst);
         exercise(A_WIS, FALSE);
@@ -693,7 +693,7 @@ do_improvisation(struct obj *instr)
            mundane is flagged */
         consume_obj_charge(instr, TRUE);
 
-        You("produce a heavy, thunderous rolling!");
+        You("重く雷鳴のような轟きを響かせた!");
         Hero_playnotes(obj_to_instr(&itmp), "C", 100);
         pline_The("entire %s is shaking around you!", generic_lvl_desc());
         do_earthquake((u.ulevel - 1) / 3 + 1);
@@ -704,12 +704,12 @@ do_improvisation(struct obj *instr)
     case LEATHER_DRUM: /* Awaken monsters */
         if (!mundane) {
             if (!Deaf) {
-                You("beat a %sdeafening row!",
+                You("%s耳をつんざく騒音をたたき出した!",
                     same_old_song ? "familiar " : "");
                 Hero_playnotes(obj_to_instr(&itmp), "CCC", 100);
                 incr_itimeout(&HDeaf, rn1(20, 30));
             } else {
-                You("pound on the drum.");
+                You("太鼓を激しく打ち鳴らした.");
             }
             exercise(A_WIS, FALSE);
         } else {
@@ -771,7 +771,7 @@ do_play_instrument(struct obj *instr)
                 || instr->otyp == TOOLED_HORN || instr->otyp == FROST_HORN
                 || instr->otyp == FIRE_HORN || instr->otyp == BUGLE)
                && !can_blow(&gy.youmonst)) {
-        You("are incapable of playing %s.", thesimpleoname(instr));
+        You("%sを演奏できなかった.", thesimpleoname(instr));
         return ECMD_OK;
     }
     if (instr->otyp != LEATHER_DRUM && instr->otyp != DRUM_OF_EARTHQUAKE

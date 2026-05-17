@@ -155,7 +155,7 @@ unstolenarm(void)
             break;
     gs.stealoid = 0;
     if (obj) {
-        You("finish taking off your %s.", armor_simple_name(obj));
+        You("%sを脱ぎ終わった。", armor_simple_name(obj));
     }
     return 0;
 }

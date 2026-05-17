@@ -16,7 +16,7 @@ staticfn void maybewakesteed(struct monst *);
 void
 rider_cant_reach(void)
 {
-    You("aren't skilled enough to reach from %s.", y_monnam(u.usteed));
+    You("%sの上から届くほどの技量はなかった.", y_monnam(u.usteed));
 }
 
 /*** Putting the saddle on ***/
@@ -67,7 +67,7 @@ use_saddle(struct obj *otmp)
     if (touch_petrifies(ptr) && !uarmg && !Stone_resistance) {
         char kbuf[BUFSZ];
 
-        You("touch %s.", mon_nam(mtmp));
+        You("%sに触れた.", mon_nam(mtmp));
         if (!(poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))) {
             Sprintf(kbuf, "attempting to saddle %s",
                     an(pmname(mtmp->data, Mgender(mtmp))));
@@ -127,7 +127,7 @@ use_saddle(struct obj *otmp)
 
     /* Make the attempt */
     if (rn2(100) < chance) {
-        You("put the saddle on %s.", mon_nam(mtmp));
+        You("%sに鞍を載せた.", mon_nam(mtmp));
         if (otmp->owornmask)
             remove_worn_item(otmp, FALSE);
         freeinv(otmp);
@@ -204,7 +204,7 @@ mount_steed(
 
     /* Sanity checks */
     if (u.usteed) {
-        You("are already riding %s.", mon_nam(u.usteed));
+        You("すでに%sに乗っていた.", mon_nam(u.usteed));
         return (FALSE);
     }
 
@@ -242,7 +242,7 @@ mount_steed(
                    || verysmall(gy.youmonst.data)
                    || bigmonst(gy.youmonst.data)
                    || slithy(gy.youmonst.data))) {
-        You("won't fit on a saddle.");
+        You("鞍には収まらなかった.");
         return (FALSE);
     }
     if (!force && (near_capacity() > SLT_ENCUMBER)) {
@@ -264,7 +264,7 @@ mount_steed(
            attempting to mount a tail segment when hero was not adjacent
            to worm's head could trigger an impossible() in worm_cross()
            called from test_move(), so handle not-on-head before that */
-        You("couldn't ride %s, let alone its tail.", a_monnam(mtmp));
+        You("%sどころかその尻尾にさえ乗れなかった.", a_monnam(mtmp));
         return FALSE;
     }
     if (u.uswallow || u.ustuck || u.utrap || Punished
@@ -288,7 +288,7 @@ mount_steed(
     if (touch_petrifies(ptr) && !Stone_resistance) {
         char kbuf[BUFSZ];
 
-        You("touch %s.", mon_nam(mtmp));
+        You("%sに触れた.", mon_nam(mtmp));
         Sprintf(kbuf, "attempting to ride %s",
                 an(pmname(mtmp->data, Mgender(mtmp))));
         instapetrify(kbuf);
@@ -327,7 +327,7 @@ mount_steed(
     /* Is the player impaired? */
     if (!force && !is_floater(ptr) && !is_flyer(ptr) && Levitation
         && !Lev_at_will) {
-        You("cannot reach %s.", mon_nam(mtmp));
+        You("%sに手が届かなかった.", mon_nam(mtmp));
         return (FALSE);
     }
     if (!force && uarm && is_metallic(uarm) && greatest_erosion(uarm)) {
@@ -343,7 +343,7 @@ mount_steed(
             pline("%s slips away from you.", Monnam(mtmp));
             return FALSE;
         }
-        You("slip while trying to get on %s.", mon_nam(mtmp));
+        You("%sに乗ろうとして滑った.", mon_nam(mtmp));
 
         Sprintf(buf, "slipped while mounting %s",
                 /* "a saddled mumak" or "a saddled pony called Dobbin" */
@@ -361,9 +361,9 @@ mount_steed(
         if (Levitation && !is_floater(ptr) && !is_flyer(ptr))
             /* Must have Lev_at_will at this point */
             pline("%s magically floats up!", Monnam(mtmp));
-        You("mount %s.", mon_nam(mtmp));
+        You("%sに乗った.", mon_nam(mtmp));
         if (Flying)
-            You("and %s take flight together.", mon_nam(mtmp));
+            You("%sとともに飛び立った.", mon_nam(mtmp));
     }
     /* setuwep handles polearms differently when you're mounted */
     if (uwep && is_pole(uwep))
@@ -616,7 +616,7 @@ dismount_steed(
         }
         break;
     case DISMOUNT_POLY:
-        You("can no longer ride %s.", mon_nam(u.usteed));
+        You("もう%sには乗れなかった.", mon_nam(u.usteed));
         if (!have_spot)
             have_spot = landing_spot(&cc, reason, 1);
         break;
@@ -632,8 +632,8 @@ dismount_steed(
     case DISMOUNT_BYCHOICE:
     default:
         if (otmp && otmp->cursed) {
-            You("can't.  The saddle %s cursed.",
-                otmp->bknown ? "is" : "seems to be");
+            You("無理だった。鞍は%s呪われていた.",
+                otmp->bknown ? "" : "どうやら");
             otmp->bknown = 1; /* ok to skip set_bknown() here */
             return;
         }
@@ -647,7 +647,7 @@ dismount_steed(
             if (Hallucination)
                 pline("雨から出てこれても整気。");
         } else
-            You("dismount %s.", mon_nam(mtmp));
+            You("%sから降りた.", mon_nam(mtmp));
     }
     /* While riding, Wounded_legs refers to the steed's legs;
        after dismounting, it reverts to the hero's legs. */
@@ -865,7 +865,7 @@ poly_steed(
                              SUPPRESS_SADDLE, FALSE));
         if (oldshape != steed->data)
             (void) strsubst(buf, "your ", "your new ");
-        You("adjust yourself in the saddle on %s.", buf);
+        You("%sの鞍の上で体勢を整えた.", buf);
 
         /* riding blocks stealth unless hero+steed fly */
         steed_vs_stealth();

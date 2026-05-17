@@ -95,7 +95,7 @@ morgue_mon_sound(struct monst *mtmp)
 
         switch (rn2(2) + hallu) {
         case 0:
-            You("suddenly realize it is unnaturally quiet.");
+            You("不自然なほど静かなことに突然気づいた.");
             break;
         case 1:
             pline_The("%s on the back of your %s %s up.", hair,
@@ -968,7 +968,7 @@ domonnoise(struct monst *mtmp)
     case MS_BONES:
         Soundeffect(se_bone_rattle, 60);
         pline("%s rattles noisily.", Monnam(mtmp));
-        You("freeze for a moment.");
+        You("一瞬体がすくんだ.");
         nomul(-2);
         gm.multi_reason = "scared by rattling";
         gn.nomovemsg = 0;
@@ -1314,7 +1314,7 @@ dochat(void)
          * 2 helmets, 2 amulets, 3 pairs of gloves or 6 rings as a marilith,
          * etc...  --KAA
         if (u.umonnum == PM_ETTIN) {
-            You("discover that your other head makes boring conversation.");
+            You("もう一つの頭との会話が退屈だと気づいた.");
             return 1;
         }
          */
@@ -1446,7 +1446,7 @@ tiphat(void)
     /* most helmets have a short wear/take-off delay and we could set
        'multi' to account for that, but we'll pretend that no extra time
        beyond the current move is necessary */
-    You("briefly doff your %s.", helm_simple_name(uarmh));
+    You("%sをいったん脱いだ.", helm_simple_name(uarmh));
 
     if (!u.dx && !u.dy) {
         if (u.usteed && u.dz > 0) {

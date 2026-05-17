@@ -543,8 +543,8 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
     /* this used to take place sooner, but if a --More-- prompt was issued
        then the old map display was shown instead of the new one */
     if (is_teleport && flags.verbose)
-        You("materialize in %s location!",
-            (nux == u.ux0 && nuy == u.uy0) ? "the same" : "a different");
+        You("%s場所に実体化した!",
+            (nux == u.ux0 && nuy == u.uy0) ? "同じ" : "別の");
     /* if terrain type changes, levitation or flying might become blocked
        or unblocked; might issue message, so do this after map+vision has
        been updated for new location instead of right after u_on_newpos() */
@@ -1259,7 +1259,7 @@ level_tele(void)
             You("%s in agony as your body begins to warp...",
                 is_silent(gy.youmonst.data) ? "writhe" : "scream");
             display_nhwindow(WIN_MESSAGE, FALSE);
-            You("cease to exist.");
+            You("存在が消え去った.");
             if (gi.invent)
                  Your("持ち物が%sにどさりと落ちた.",
                      surface(u.ux, u.uy));
@@ -1332,7 +1332,7 @@ level_tele(void)
             gi.in_mklev = FALSE;
         }
         if (newlev <= -10) {
-            You("arrive in heaven.");
+            You("天上界にたどり着いた.");
             SetVoice((struct monst *) 0, 0, 80, voice_deity);
             verbalize("Thou art early, but we'll admit thee.");
             svk.killer.format = NO_KILLER_PREFIX;
@@ -1352,7 +1352,7 @@ level_tele(void)
             escape_by_flying = "fly down to the ground";
         } else {
             pline("Unfortunately, you don't know how to fly.");
-            You("plummet a few thousand feet to your death.");
+            You("数千フィート落下して命を落とした.");
             Sprintf(svk.killer.name,
                     "teleported out of the dungeon and fell to %s death",
                     uhis());
@@ -1460,7 +1460,7 @@ domagicportal(struct trap *ttmp)
     if (!on_level(&u.uz, &u.uz0))
         return;
 
-    You("activated a magic portal!");
+    You("魔法のポータルを起動した!");
 
     /* prevent the poor shnook, whose amulet was stolen while in
      * the endgame, from accidently triggering the portal to the
@@ -1559,7 +1559,7 @@ level_tele_trap(struct trap *trap, unsigned int trflags)
     level_tele();
 
     if (Hallucination || Teleport_control)
-        You("briefly feel %s.", Hallucination ? "oriented" : "centered");
+        You("一瞬%s気分になった.", Hallucination ? "方向感覚が戻ったような" : "落ち着いた");
     else
         You_feel("%s方向感覚を失った.", Confusion ? "さらに" : "");
     /* magic portal traversal causes brief Stun; for level teleport, use
@@ -1708,7 +1708,7 @@ rloc_to_core(
         set_msg_xy(x, y);
         mtmp->mstrategy &= ~STRAT_APPEARMSG; /* one chance only */
         if (mtmp == u.ustuck && !u_at(u.ux0, u.uy0)) {
-            You("and %s teleport together.", mon_nam(mtmp));
+            You("%sと一緒にテレポートした.", mon_nam(mtmp));
         } else if (telemsg && (couldsee(x, y) || sensemon(mtmp))) {
             pline("%s vanishes and reappears%s.",
                   Monnam(mtmp),
@@ -2277,7 +2277,7 @@ u_teleport_mon(
         return FALSE;
     } else if (engulfing_u(mtmp) && noteleport_level(mtmp)) {
         if (give_feedback)
-            You("are no longer inside %s!", mon_nam(mtmp));
+            You("もう%sの中にはいなかった!", mon_nam(mtmp));
         unstuck(mtmp);
         if (!rloc(mtmp, RLOC_MSG))
             m_into_limbo(mtmp);

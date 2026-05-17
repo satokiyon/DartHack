@@ -157,12 +157,12 @@ is_pure(boolean talk)
 
     if (wizard && talk) {
         if (u.ualign.type != original_alignment) {
-            You("are currently %s instead of %s.", align_str(u.ualign.type),
+            You("今は%sで、元は%s.", align_str(u.ualign.type),
                 align_str(original_alignment));
         } else if (u.ualignbase[A_CURRENT] != original_alignment) {
-            You("have converted.");
+            You("改宗していた.");
         } else if (u.ualign.record < MIN_QUEST_ALIGN) {
-            You("are currently %d and require %d.", u.ualign.record,
+            You("現在%dで必要値は%d.", u.ualign.record,
                 MIN_QUEST_ALIGN);
             if (yn_function("adjust?", (char *) 0, 'y', TRUE) == 'y')
                 u.ualign.record = MIN_QUEST_ALIGN;

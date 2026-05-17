@@ -1320,11 +1320,11 @@ mon_break_armor(struct monst *mon, boolean polyspot)
             noride = TRUE;
     }
     if (noride || (mon == u.usteed && !can_ride(mon))) {
-        You("can no longer ride %s.", mon_nam(mon));
+        You("%sにもう乗っていられない。", mon_nam(mon));
         if (touch_petrifies(u.usteed->data) && !Stone_resistance && rnl(3)) {
             char buf[BUFSZ];
 
-            You("touch %s.", mon_nam(u.usteed));
+            You("%sに触れた。", mon_nam(u.usteed));
             Sprintf(buf, "falling off %s",
                     an(pmname(u.usteed->data, Mgender(u.usteed))));
             instapetrify(buf);

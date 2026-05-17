@@ -195,12 +195,12 @@ confused_book(struct obj *spellbook)
         pline(
          "Being confused you have difficulties in controlling your actions.");
         display_nhwindow(WIN_MESSAGE, FALSE);
-        You("accidentally tear the spellbook to pieces.");
+        You("うっかり魔法書を引き裂いてしまった.");
         trycall(spellbook);
         useup(spellbook);
         gone = TRUE;
     } else {
-        You("find yourself reading the %s line over and over again.",
+        You("%s行目を何度も繰り返し読んでしまった.",
             spellbook == svc.context.spbook.book ? "next" : "first");
     }
     return gone;
@@ -233,7 +233,7 @@ deadbook(struct obj *book2)
     struct monst *mtmp;
     coord mm;
 
-    You("turn the pages of the Book of the Dead...");
+    You("死者の書のページをめくった...");
     makeknown(SPE_BOOK_OF_THE_DEAD);
     observe_object(book2); /* in case blind now and hasn't been seen yet */
     /* KMH -- Need ->known to avoid "_a_ Book of the Dead" */
@@ -296,7 +296,7 @@ deadbook(struct obj *book2)
             if (!u.udg_cnt || u.udg_cnt > soon)
                 u.udg_cnt = soon;
         } else { /* at least one relic not prepared properly */
-            You("have a feeling that %s is amiss...", something);
+            You("%sがおかしい気がした...", something);
             goto raise_dead;
         }
         return;
@@ -306,7 +306,7 @@ deadbook(struct obj *book2)
     if (book2->cursed) {
  raise_dead:
 
-        You("raised the dead!");
+        You("死者を呼び覚ました!");
         /* first maybe place a dangerous adversary */
         if (!rn2(3) && ((mtmp = makemon(&mons[PM_MASTER_LICH], u.ux, u.uy,
                                         NO_MINVENT)) != 0
@@ -429,9 +429,9 @@ learn(void)
             book->spestudied++;
             if (!i)
                 /* first is always 'a', so no need to mention the letter */
-                You("learn %s.", splname);
+                You("%sを習得した.", splname);
             else
-                You("add %s to your repertoire, as '%c'.",
+                You("%sを呪文一覧に'%c'として加えた.",
                     splname, spellet(i));
         }
     }
@@ -498,9 +498,9 @@ study_book(struct obj *spellbook)
         /* handle the sequence: start reading, get interrupted, have
            svc.context.spbook.book become erased somehow, resume reading it */
         && booktype != SPE_BLANK_PAPER) {
-        You("continue your efforts to %s.",
-            (booktype == SPE_NOVEL) ? "read the novel"
-                                    : "memorize the spell");
+        You("引き続き%s試みた.",
+            (booktype == SPE_NOVEL) ? "小説を読むことを"
+                                    : "呪文を記憶することを");
     } else {
         /* KMH -- Simplified this code */
         if (booktype == SPE_BLANK_PAPER) {
@@ -563,7 +563,7 @@ study_book(struct obj *spellbook)
             if (spellid(i) == booktype || spellid(i) == NO_SPELL)
                 break;
         if (spellid(i) == booktype && spellknow(i) > KEEN / 10) {
-            You("know \"%s\" quite well already.",
+            You("\"%s\"はすでによく理解していた.",
                 OBJ_NAME(objects[booktype]));
             /* hero has just been told what spell this book is for; it may
                have been undiscovered if spell was learned via divine gift */
@@ -629,8 +629,8 @@ study_book(struct obj *spellbook)
         }
         spellbook->in_use = FALSE;
 
-        You("begin to %s the runes.",
-            spellbook->otyp == SPE_BOOK_OF_THE_DEAD ? "recite" : "memorize");
+        You("ルーンを%s始めた.",
+            spellbook->otyp == SPE_BOOK_OF_THE_DEAD ? "唱え" : "記憶し");
     }
 
     svc.context.spbook.book = spellbook;
@@ -720,7 +720,7 @@ getspell(int *spell_no)
 
     nspells = num_spells();
     if (!nspells) {
-        You("don't know any spells right now.");
+        You("今は呪文を何も知らなかった.");
         return FALSE;
     }
     if (rejectcasting())
@@ -1273,7 +1273,7 @@ spelleffects_check(int spell, int *res, int *energy)
         *res = ECMD_OK;
         return TRUE;
     } else if (ACURR(A_STR) < 4 && spellid(spell) != SPE_RESTORE_ABILITY) {
-        You("lack the strength to cast spells.");
+        You("呪文を唱えるだけの力が足りなかった.");
         *res = ECMD_OK;
         return TRUE;
     } else if (check_capacity(
@@ -1312,10 +1312,10 @@ spelleffects_check(int spell, int *res, int *energy)
          * isn't now (lost energy when losing levels or polymorphing into
          * new person or had some stripped away by traps or monsters).
          */
-        You("don't have enough energy to cast that spell%s.",
+                You("その呪文を唱えるための魔力が%s足りなかった.",
             (u.uen < u.uenmax) ? "" /* not at full energy => normal message */
-            : (*energy > u.uenpeak) ? " yet" /* haven't ever had enough */
-              : " anymore"); /* once had enough but have lost some since */
+                        : (*energy > u.uenpeak) ? "まだ" /* haven't ever had enough */
+                            : "もはや"); /* once had enough but have lost some since */
         return TRUE;
     } else {
         if (spellid(spell) != SPE_DETECT_FOOD) {
@@ -1370,7 +1370,7 @@ spelleffects_check(int spell, int *res, int *energy)
 
     chance = percent_success(spell);
     if (confused || (rnd(100) > chance)) {
-        You("fail to cast the spell correctly.");
+        You("呪文を正しく唱え損ねた.");
         u.uen -= *energy / 2;
         disp.botl = TRUE;
         *res = ECMD_TIME;
@@ -1561,7 +1561,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
          *  Sick +  Slimed -- You are no longer ill.  The slime disappears.
          */
         if (was_sick || !was_slimed)
-            You("are %s ill.", was_sick ? "no longer" : "not");
+            You("%s.", was_sick ? "もはや病気ではない" : "病気ではない");
         if (was_slimed)
             make_slimed(0L, "The slime disappears!");
         break;
@@ -1576,7 +1576,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
             do_vicinity_map(pseudo);
         /* at present, only one thing blocks clairvoyance */
         } else if (uarmh && uarmh->otyp == CORNUTHAUM)
-            You("sense a pointy hat on top of your %s.", body_part(HEAD));
+            You("%sの上にとがった帽子を感じた.", body_part(HEAD));
         break;
     case SPE_PROTECTION:
         cast_protection();
@@ -1661,7 +1661,7 @@ throwspell(void)
         pline("冗談でしょ! この天気の中で?");
         return 0;
     } else if (Is_waterlevel(&u.uz)) {
-        You("had better wait for the sun to come out.");
+        You("日が差すまで待った方がよさそうだ.");
         return 0;
     }
 

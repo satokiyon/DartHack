@@ -462,10 +462,10 @@ wiz_level_change(void)
         return ECMD_OK;
     }
     if (newlevel == u.ulevel) {
-        You("are already that experienced.");
+        You("すでにその経験値だった.");
     } else if (newlevel < u.ulevel) {
         if (u.ulevel == 1) {
-            You("are already as inexperienced as you can get.");
+            You("これ以上経験を下げることはできなかった.");
             return ECMD_OK;
         }
         if (newlevel < 1)
@@ -474,7 +474,7 @@ wiz_level_change(void)
             losexp("#levelchange");
     } else {
         if (u.ulevel >= MAXULEV) {
-            You("are already as experienced as you can get.");
+            You("これ以上経験を上げることはできなかった.");
             return ECMD_OK;
         }
         if (newlevel > MAXULEV)
@@ -893,11 +893,11 @@ wiz_smell(void)
     cc.x = u.ux;
     cc.y = u.uy;
     if (!olfaction(gy.youmonst.data)) {
-        You("are incapable of detecting odors in your present form.");
+        You("現在の姿では匂いを嗅ぎ分けられなかった.");
         return ECMD_OK;
     }
 
-    You("can move the cursor to a monster that you want to smell.");
+    You("匂いを嗅ぎたいモンスターへカーソルを動かせた.");
     do {
         pline("Pick a monster to smell.");
         ans = getpos(&cc, TRUE, "a monster");
@@ -923,14 +923,14 @@ wiz_smell(void)
         /* Is it a monster? */
         if (mptr) {
             if (is_you)
-                You("surreptitiously sniff under your %s.", body_part(ARM));
+                You("こっそり%sの下を嗅いだ.", body_part(ARM));
             if (!usmellmon(mptr))
                 pline("%s to not give off any smell.",
                       is_you ? "You seem" : "That monster seems");
             if (!glyph_is_monster(glyph))
                 map_invisible(cc.x, cc.y);
         } else {
-            You("don't smell any monster there.");
+            You("そこにはモンスターの匂いがしなかった.");
             if (glyph_is_invisible(glyph))
                 unmap_invisible(cc.x, cc.y);
         }

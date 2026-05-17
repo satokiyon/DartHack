@@ -673,7 +673,7 @@ god_zaps_you(aligntyp resp_god)
             fry_by_god(resp_god, TRUE);
             monstunseesu(M_SEEN_DISINT);
         } else {
-            You("bask in its %s glow for a minute...", NH_BLACK);
+            You("しばらく%sの輝きに包まれた...", NH_BLACK);
             godvoice(resp_god, "I believe it not!");
             monstseesu(M_SEEN_DISINT);
         }
@@ -1539,7 +1539,7 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
     else
         useupf(otmp, 1L);
 
-    You("offer the Amulet of Yendor to %s...", a_gname());
+    You("%sにイェンダーの魔除けを捧げた...", a_gname());
 
     if (altaralign == A_NONE) {
         /* Moloch's high altar at the bottom of Gehennom. */
@@ -1580,8 +1580,8 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize(
           "In return for thy service, I grant thee the gift of Immortality!");
-        You("ascend to the status of Demigod%s...",
-            flags.female ? "dess" : "");
+        You("%s半神の地位へ昇った...",
+            flags.female ? "女" : "");
         done(ASCENDED);
         /*NOTREACHED*/
     }
@@ -1611,8 +1611,8 @@ offer_fake_amulet(
     Soundeffect(se_thunderclap, 100);
     You_hear("近くで雷鳴の響きが聞こえた.");
     if (!otmp->known) {
-        You("realize you have made a %s.",
-            Hallucination ? "boo-boo" : "mistake");
+        You("%sをしでかしたと気づいた.",
+            Hallucination ? "大失敗" : "過ち");
         otmp->known = TRUE;
         change_luck(-1);
     } else {
@@ -1637,7 +1637,7 @@ offer_different_alignment_altar(
     if (ugod_is_angry() || (altaralign == A_NONE && Inhell)) {
         if (u.ualignbase[A_CURRENT] == u.ualignbase[A_ORIGINAL]
             && altaralign != A_NONE) {
-            You("have a strong feeling that %s is angry...", u_gname());
+            You("%sが怒っている気が強くした...", u_gname());
             consume_offering(otmp);
             pline("%s accepts your allegiance.", a_gname());
 
@@ -1657,7 +1657,7 @@ offer_different_alignment_altar(
         }
     } else {
         consume_offering(otmp);
-        You("sense a conflict between %s and %s.", u_gname(), a_gname());
+        You("%sと%sの対立を感じた.", u_gname(), a_gname());
         if (rn2(8 + u.ulevel) > 5) {
             struct monst *pri;
             boolean shrine;
@@ -1751,7 +1751,7 @@ sacrifice_your_race(
                 Strcpy(dbuf, "something dreadful");
             else
                 dmon->mstrategy &= ~STRAT_APPEARMSG;
-            You("have summoned %s!", dbuf);
+            You("%sを召喚した!", dbuf);
             if (sgn(u.ualign.type) == sgn(dmon->data->maligntyp))
                 dmon->mpeaceful = TRUE;
             You("遁0下って動けなくなった.");
@@ -1858,8 +1858,8 @@ dosacrifice(void)
     aligntyp altaralign = a_align(u.ux, u.uy);
 
     if (!on_altar() || u.uswallow) {
-        You("are not %s an altar.",
-            (Levitation || Flying) ? "over" : "on");
+        You("祭壇の%sにはいなかった.",
+            (Levitation || Flying) ? "上" : "上");
         return ECMD_OK;
     } else if (Confusion || Stunned) {
         You("状態が悪くて儀式を行えなかった.");
@@ -2071,7 +2071,7 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
         if (u.ublesscnt != saved_cnt) {
             if (u.ublesscnt) {
                 if (Hallucination)
-                    You("realize that the gods are not like you and I.");
+                    You("神々はあなたとは違う存在だと悟った.");
                 else
                     You("希望のある気持ちを覚えた.");
                 if ((int) u.uluck < 0)
@@ -2108,7 +2108,7 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
             u.uluck = 0;
         if (u.uluck != orig_luck) {
             if (Blind)
-                You("think %s brushed your %s.", something,
+                You("%sが%sに触れた気がした.", something,
                     body_part(FOOT));
             else
                 You(Hallucination
@@ -2137,7 +2137,7 @@ can_pray(boolean praying) /* false means no messages should be given */
     }
 
     if (praying)
-        You("begin praying to %s.", align_gname(gp.p_aligntyp));
+        You("%sへ祈り始めた.", align_gname(gp.p_aligntyp));
 
     if (u.ualign.type && u.ualign.type == -gp.p_aligntyp)
         alignment = -u.ualign.record; /* Opposite alignment altar */
@@ -2431,8 +2431,8 @@ doturn(void)
     /* [What about needing free hands (does #turn involve any gesturing)?] */
     if (!can_chant(&gy.youmonst)) {
         /* "evilness": "demons and undead" is too verbose and too precise */
-        You("are %s upon %s to turn aside evilness.",
-            Strangled ? "not able to call" : "incapable of calling", Gname);
+        You("邪悪を退けるために%s%sを呼びかけることができなかった.",
+            Strangled ? "" : "とても", Gname);
         /* violates agnosticism due to intent; conduct tracking is not
            supposed to affect play but we make an exception here:  use a
            move if this is the first time agnostic conduct has been broken */

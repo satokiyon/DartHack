@@ -89,7 +89,7 @@ mhitm_mgc_atk_negated(
         /* attack has been thwarted by negation, aka magical cancellation */
         if (verbosely) {
             if (mdef == &gy.youmonst)
-                You("avoid harm.");
+                You("危害を免れた.");
             else if (gv.vis && canseemon(mdef))
                 pline_mon(mdef, "%s avoids harm.", Monnam(mdef));
         }
@@ -337,11 +337,11 @@ check_caitiff(struct monst *mtmp)
         && !is_undead(mtmp->data)
         && (helpless(mtmp)
             || (mtmp->mflee && !mtmp->mavenge))) {
-        You("caitiff!");
+        You("卑怯者め!");
         adjalign(-1);
     } else if (Role_if(PM_SAMURAI) && mtmp->mpeaceful) {
         /* attacking peaceful creatures is bad for the samurai's giri */
-        You("dishonorably attack the innocent!");
+        You("卑劣にも無実の相手を攻撃した!");
         adjalign(-1);
     }
 }
@@ -497,7 +497,7 @@ do_attack(struct monst *mtmp)
                     monflee(mtmp, rnd(6), FALSE, FALSE);
                 Strcpy(buf, y_monnam(mtmp));
                 buf[0] = highc(buf[0]);
-                You("stop.  %s is in the way!", buf);
+                You("立ち止まった. %sが行く手を塞いでいた!", buf);
                 end_running(TRUE);
                 return TRUE;
             } else if (mtmp->mfrozen || helpless(mtmp)
@@ -540,11 +540,11 @@ do_attack(struct monst *mtmp)
         gu.unweapon = FALSE;
         if (flags.verbose) {
             if (uwep)
-                You("begin bashing monsters with %s.", yname(uwep));
+                You("%sでモンスターを打ち据え始めた.", yname(uwep));
             else if (!cantwield(gy.youmonst.data))
-                You("begin %s monsters with your %s %s.",
-                    ing_suffix(Role_if(PM_MONK) ? "strike" : "bash"),
-                    uarmg ? "gloved" : "bare", /* Del Lamb */
+                You("モンスターを%s始めた(%s %sで).",
+                    Role_if(PM_MONK) ? "殴打し" : "打ち据え",
+                    uarmg ? "手袋をした" : "素手の", /* Del Lamb */
                     makeplural(body_part(HAND)));
         }
     }
@@ -558,7 +558,7 @@ do_attack(struct monst *mtmp)
         && (m_move(mtmp, 0) == MMOVE_DIED /* it died */
             || mtmp->mx != u.ux + u.dx
             || mtmp->my != u.uy + u.dy)) { /* it moved */
-        You("miss wildly and stumble forwards.");
+        You("大きく外して前につんのめった.");
         return FALSE;
     }
 
@@ -960,7 +960,7 @@ hmon_hitmon_weapon_melee(
     } else if (Role_if(PM_ROGUE) && backstabbable(mon) && !Upolyd
                /* multi-shot throwing is too powerful here */
                && hmd->hand_to_hand) {
-        You("strike %s from behind!", mon_nam(mon));
+        You("%sを背後から打った!", mon_nam(mon));
         hmd->dmg += rnd(u.ulevel);
         hmd->hittxt = TRUE;
     } else if (hmd->dieroll == 2 && obj == uwep
@@ -1129,7 +1129,7 @@ hmon_hitmon_misc_obj(
         break;
     case MIRROR:
         if (breaktest(obj)) {
-            You("break %s.  That's bad luck!", ysimple_name(obj));
+            You("%sを壊してしまった. これは不吉だ!", ysimple_name(obj));
             change_luck(-2);
             useup(obj);
             obj = (struct obj *) 0;
@@ -1140,7 +1140,7 @@ hmon_hitmon_misc_obj(
         hmd->dmg = 1;
         break;
     case EXPENSIVE_CAMERA:
-        You("succeed in destroying %s.  Congratulations!",
+        You("%sの破壊に成功した. おめでとう!",
             ysimple_name(obj));
         release_camera_demon(obj, u.ux, u.uy);
         useup(obj);
@@ -1152,7 +1152,7 @@ hmon_hitmon_misc_obj(
         if (touch_petrifies(&mons[obj->corpsenm])) {
             hmd->dmg = 1;
             hmd->hittxt = TRUE;
-            You("hit %s with %s.", mon_nam(mon),
+            You("%sを%sで殴った.", mon_nam(mon),
                 corpse_xname(obj, (const char *) 0,
                              obj->dknown ? CXN_PFX_THE
                              : CXN_ARTICLE));
@@ -1226,7 +1226,7 @@ hmon_hitmon_misc_obj(
                     ? the(mons[mnum].pmnames[NEUTRAL])
                     : (cnt > 1L) ? "some" : "an";
 
-            You("hit %s with %s egg%s.", mon_nam(mon), eggp,
+            You("%sに%s個の卵%sをぶつけた.", mon_nam(mon), eggp,
                 plur(cnt));
             if (touch_petrifies(hmd->mdat) && !stale_egg(obj)) {
                 pline_The("egg%s %s alive any more...", plur(cnt),
@@ -1517,7 +1517,7 @@ hmon_hitmon_poison(
     if (nopoison < 2)
         nopoison = 2;
     if (Role_if(PM_SAMURAI)) {
-        You("dishonorably use a poisoned weapon!");
+        You("卑劣にも毒武器を使った!");
         adjalign(-sgn(u.ualign.type));
     } else if (u.ualign.type == A_LAWFUL && u.ualign.record > -10) {
         You_feel("毒武器を使う自分が卑劣に思えた.");
@@ -1544,7 +1544,7 @@ hmon_hitmon_jousting(
     struct obj *obj) /* lance; obj is not NULL */
 {
     hmd->dmg += d(2, (obj == uwep) ? 10 : 2); /* [was in dmgval()] */
-    You("joust %s%s", mon_nam(mon), canseemon(mon) ? exclam(hmd->dmg) : ".");
+    You("%sへ突撃した%s", mon_nam(mon), canseemon(mon) ? exclam(hmd->dmg) : ".");
     /* if this hit just broke the never-hit-with-wielded-weapon conduct
        (handled by caller...), give a livelog message for that now */
     if (u.uconduct.weaphit <= 1)
@@ -1646,7 +1646,7 @@ hmon_hitmon_msg_hit(
         if (hmd->thrown)
             hit(mshot_xname(obj), mon, exclam(hmd->dmg));
         else if (!flags.verbose)
-            You("hit it.");
+            You("それに当てた.");
         else /* hand_to_hand */
             You("%s %s%s",
                 (obj && (is_shield(obj)
@@ -2206,11 +2206,11 @@ steal_it(struct monst *mdef, struct attack *mattk)
            switch to dynamic pronoun */
         if (gender(mdef) == (int) u.mfemale
             && gy.youmonst.data->mlet == S_NYMPH)
-            You("charm %s.  %s gladly hands over %s%s possessions.",
+            You("%sを魅了した. %sは喜んで%sの所持品%sを差し出した.",
                 mon_nam(mdef), upstart(strcpy(heshe, mhe(mdef))),
-                !gold ? "" : "most of ", mhis(mdef));
+                !gold ? "" : "ほとんどの", mhis(mdef));
         else
-            You("seduce %s and %s starts to take off %s clothes.",
+            You("%sを誘惑し、%sは%sの服を脱ぎ始めた.",
                 mon_nam(mdef), mhe(mdef), mhis(mdef));
     }
 
@@ -2302,7 +2302,7 @@ mhitm_ad_rust(
             return;
         }
         if (completelyrusts(pd)) {
-            You("rust!");
+            You("錆びついた!");
             /* KMH -- this is okay with unchanging */
             rehumanize();
             return;
@@ -2380,7 +2380,7 @@ mhitm_ad_dcay(
         if (magr->mcan)
             return;
         if (completelyrots(pd)) {
-            You("rot!");
+            You("腐ってしまった!");
             /* KMH -- this is okay with unchanging */
             rehumanize();
             return;
@@ -2540,9 +2540,9 @@ mhitm_ad_fire(
                       !mlifesaver(mdef) ? "burns completely"
                                         : "is totally engulfed in flames");
             else
-                You("smell burning%s.",
-                    (pd == &mons[PM_PAPER_GOLEM]) ? " paper"
-                      : (pd == &mons[PM_STRAW_GOLEM]) ? " straw" : "");
+                You("焦げる匂い%sを感じた.",
+                                        (pd == &mons[PM_PAPER_GOLEM]) ? "紙"
+                                            : (pd == &mons[PM_STRAW_GOLEM]) ? "藁" : "");
             xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
             mhm->damage = 0;
             return;
@@ -2563,7 +2563,7 @@ mhitm_ad_fire(
         if (!mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             pline("You're %s!", on_fire(pd, mattk));
             if (completelyburns(pd)) { /* paper or straw golem */
-                You("go up in flames!");
+                You("燃え上がった!");
                 monstunseesu(M_SEEN_FIRE);
                 /* KMH -- this is okay with unchanging */
                 rehumanize();
@@ -2706,7 +2706,7 @@ mhitm_ad_elec(
         /* mhitu */
         hitmsg(magr, mattk);
         if (!mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
-            You("get zapped!");
+            You("電撃を受けた!");
             if (Shock_resistance) {
                 pline_The("zap doesn't shock you!");
                 monstseesu(M_SEEN_ELEC);
@@ -2804,7 +2804,7 @@ mhitm_ad_sgld(
                 addinv(mongold);
                     Your("財布が重くなった気がした.");
             } else {
-                You("grab %s's gold, but find no room in your knapsack.",
+                You("%sの金をつかんだが、背嚢に空きがなかった.",
                     mon_nam(mdef));
                 dropy(mongold);
             }
@@ -2886,7 +2886,7 @@ mhitm_ad_tlpt(
 
         hitmsg(magr, mattk);
         if (mhitm_mgc_atk_negated(magr, mdef, FALSE)) {
-            You("are not affected.");
+            You("影響を受けなかった.");
         } else {
             if (flags.verbose)
                 Your("位置感覚が突然%sあやふやになった!",
@@ -3029,7 +3029,7 @@ mhitm_ad_curs(
                 /* Don't return yet; keep hp<1 and mhm.damage=0 for pet msg */
             } else {
                 mdef->mcan = 1;
-                You("chuckle.");
+                You("くすくす笑った.");
             }
         }
         mhm->damage = 0;
@@ -3194,7 +3194,7 @@ mhitm_ad_drin(
             mhm->damage = 0;
             if (!Unchanging && pd == &mons[PM_GREEN_SLIME]) {
                 if (!Slimed) {
-                    You("suck in some slime and don't feel very well.");
+                    You("粘液を吸い込んで気分が悪くなった.");
                     make_slimed(10L, (char *) 0);
                 }
             }
@@ -3222,7 +3222,7 @@ mhitm_ad_drin(
         /* mhitu */
         hitmsg(magr, mattk);
         if (defends(AD_DRIN, uwep) || !has_head(pd)) {
-            You("don't seem harmed.");
+            You("傷ついてはいないようだった.");
             /* attacker should skip remaining AT_TENT+AD_DRIN attacks */
             gs.skipdrin = TRUE;
             /* Not clear what to do for green slimes */
@@ -3356,7 +3356,7 @@ mhitm_ad_wrap(
             } else if (u.ustuck == mdef && !tailmiss) {
                 /* Monsters don't wear amulets of magical breathing */
                 if (is_pool(u.ux, u.uy) && !cant_drown(pd)) {
-                    You("drown %s...", mon_nam(mdef));
+                    You("%sを溺れさせた...", mon_nam(mdef));
                     mhm->damage = mdef->mhp;
                 } else if (mattk->aatyp == AT_HUGS)
                     pline("%s is being crushed.", Monnam(mdef));
@@ -3364,10 +3364,10 @@ mhitm_ad_wrap(
                 mhm->damage = 0;
                 if (flags.verbose) {
                     if (coil && !tailmiss)
-                        You("brush against %s.", mon_nam(mdef));
+                        You("%sに触れた.", mon_nam(mdef));
                     else
-                        You("brush against %s %s.", s_suffix(mon_nam(mdef)),
-                            tailmiss ? "tail" : mbodypart(mdef, LEG));
+                        You("%s%sに触れた.", s_suffix(mon_nam(mdef)),
+                            tailmiss ? "尾" : mbodypart(mdef, LEG));
                 }
             }
         } else
@@ -3399,7 +3399,7 @@ mhitm_ad_wrap(
                             an(pmname(magr->data, Mgender(magr))));
                     done(DROWNING);
                 } else if (mattk->aatyp == AT_HUGS) {
-                    You("are being crushed.");
+                    You("押し潰されていた.");
                 }
             } else {
                 mhm->damage = 0;
@@ -3445,12 +3445,12 @@ mhitm_ad_plys(
         if (gm.multi >= 0 && !rn2(3)
             && !mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             if (Free_action) {
-                You("momentarily stiffen.");
+                You("一瞬体がこわばった.");
             } else {
                 if (Blind)
-                    You("are frozen!");
+                    You("凍りついた!");
                 else
-                    You("are frozen by %s!", mon_nam(magr));
+                    You("%sによって凍りついた!", mon_nam(magr));
                 gn.nomovemsg = You_can_move_again;
                 nomul(-rnd(10));
                 /* set gm.multi_reason;
@@ -3500,9 +3500,9 @@ mhitm_ad_slee(
             monstunseesu(M_SEEN_SLEEP);
             fall_asleep(-rnd(10), TRUE);
             if (Blind)
-                You("are put to sleep!");
+                You("眠らされた!");
             else
-                You("are put to sleep by %s!", mon_nam(magr));
+                You("%sに眠らされた!", mon_nam(magr));
         }
     } else {
         /* mhitm */
@@ -3537,7 +3537,7 @@ mhitm_ad_slim(
             if (!munslime(mdef, TRUE) && !DEADMONSTER(mdef)) {
                 /* this assumes newcham() won't fail; since hero has
                    a slime attack, green slimes haven't been geno'd */
-                You("turn %s into slime.", mon_nam(mdef));
+                You("%sをスライムに変えた.", mon_nam(mdef));
                 if (newcham(mdef, &mons[PM_GREEN_SLIME], NO_NC_FLAGS))
                     pd = mdef->data;
             }
@@ -3554,7 +3554,7 @@ mhitm_ad_slim(
         hitmsg(magr, mattk);
         if (negated) {
             if (!magr->mcan)
-                You("escape harm.");
+                You("危害を逃れた.");
             return;
         }
         if (flaming(pd)) {
@@ -3562,10 +3562,10 @@ mhitm_ad_slim(
             mhm->damage = 0;
         } else if (Unchanging || noncorporeal(pd)
                    || pd == &mons[PM_GREEN_SLIME]) {
-            You("are unaffected.");
+            You("まったく影響を受けなかった.");
             mhm->damage = 0;
         } else if (!Slimed) {
-            You("don't feel very well.");
+            You("ひどく気分が悪かった.");
             make_slimed(10L, (char *) 0);
             delayed_killer(SLIMED, KILLED_BY_AN,
                            pmname(magr->data, Mgender(magr)));
@@ -3703,9 +3703,9 @@ mhitm_ad_conf(
         if (!magr->mcan && !rn2(4) && !magr->mspec_used) {
             magr->mspec_used = magr->mspec_used + (mhm->damage + rn2(6));
             if (Confusion)
-                You("are getting even more confused.");
+                You("さらに混乱してきた.");
             else
-                You("are getting confused.");
+                You("混乱してきた.");
             make_confused(HConfusion + mhm->damage, FALSE);
         }
         mhm->damage = 0;
@@ -3753,7 +3753,7 @@ mhitm_ad_poly(
         if (Maybe_Half_Phys(mhm->damage) < (Upolyd ? u.mh : u.uhp)) {
             if (negated) {
                 if (magr->mcan)
-                    You("aren't transformed.");
+                    You("変身しなかった.");
             } else {
                 mhm->damage = mon_poly(magr, &gy.youmonst, mhm->damage);
                 mhm->hitflags |= M_ATTK_HIT;
@@ -4031,8 +4031,8 @@ mhitm_ad_phys(
                 }
             } else if (u.ustuck == magr) {
                 exercise(A_STR, FALSE);
-                You("are being %s.",
-                    (pa == &mons[PM_ROPE_GOLEM]) ? "choked" : "crushed");
+                You("%sれていた.",
+                    (pa == &mons[PM_ROPE_GOLEM]) ? "締め上げら" : "押し潰さ");
             }
         } else { /* hand to hand weapon */
             struct obj *otmp = MON_WEP(magr);
@@ -4100,7 +4100,7 @@ mhitm_ad_phys(
                     disp.botl = TRUE;
                     mhm->damage = 0; /* don't inflict more damage below */
                     if (cloneu())
-                        You("divide as %s hits you!", mon_nam(magr));
+                        You("%sに殴られて分裂した!", mon_nam(magr));
                 }
                 rustm(&gy.youmonst, otmp);
                 if (was_poisoned && gm.mhitu_dieroll <= 5) {
@@ -4871,7 +4871,7 @@ damageum(
             if (mhm.damage)
                 xkilled(mdef, XKILL_NOMSG);
         } else if (!flags.verbose) {
-            You("destroy it!");
+            You("それを破壊した!");
             if (mhm.damage)
                 xkilled(mdef, XKILL_NOMSG);
         } else if (mhm.damage) {
@@ -5063,7 +5063,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                 gm.mswallower = &gy.youmonst;
                 xkilled(mdef, XKILL_GIVEMSG | XKILL_NOCORPSE);
                 if (!DEADMONSTER(mdef)) { /* monster lifesaved */
-                    You("hurriedly regurgitate the sizzling in your %s.",
+                    You("%sで焼けつくそれを慌てて吐き戻した.",
                         body_part(STOMACH));
                 } else {
                     tmp = 1 + (pd->cwt >> 8);
@@ -5081,7 +5081,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                          * attacked (which uses his real location) or
                          * if his See_invisible wears off
                          */
-                        You("digest %s.", mon_nam(mdef));
+                        You("%sを消化した.", mon_nam(mdef));
                         if (Slow_digestion)
                             tmp *= 2;
                         nomul(-tmp);
@@ -5204,11 +5204,11 @@ missum(
         Your("鎧がかなり動きを妨げた...");
 
     if (could_seduce(&gy.youmonst, mdef, mattk))
-        You("pretend to be friendly to %s.", mon_nam(mdef));
+        You("%sに友好的なふりをした.", mon_nam(mdef));
     else if (canspotmon(mdef) && flags.verbose)
-        You("miss %s.", mon_nam(mdef));
+        You("%sを外した.", mon_nam(mdef));
     else
-        You("miss it.");
+        You("外した.");
     if (!helpless(mdef))
         wakeup(mdef, TRUE);
 }
@@ -5749,7 +5749,7 @@ hmonas(struct monst *mon)
                    "<u.ustuck> is no longer in your clutches" */
                 if (u.ustuck && u.ustuck != mon)
                     uunstick();
-                You("grab %s!", mon_nam(mon));
+                You("%sをつかんだ!", mon_nam(mon));
                 set_ustuck(mon);
                 if (silverhit && flags.verbose)
                     silver_sears(&gy.youmonst, mon, silverhit);
@@ -5761,7 +5761,7 @@ hmonas(struct monst *mon)
         case AT_EXPL: /* automatic hit if next to */
             dhit = -1;
             wakeup(mon, TRUE);
-            You("explode!");
+            You("爆発した!");
             sum[i] = explum(mon, mattk);
             break;
 
@@ -5905,9 +5905,9 @@ passive(
     case AD_ACID:
         if (mhitb && rn2(2)) {
             if (Blind || !flags.verbose)
-                You("are splashed!");
+                You("しぶきを浴びた!");
             else
-                You("are splashed by %s %s!", s_suffix(mon_nam(mon)),
+                You("%s%sを浴びた!", s_suffix(mon_nam(mon)),
                     hliquid("acid"));
 
             if (!Acid_resistance) {
@@ -5983,7 +5983,7 @@ passive(
             monstseesu(M_SEEN_MAGR);
             pline("A hail of magic missiles narrowly misses you!");
         } else {
-            You("are hit by magic missiles appearing from thin air!");
+            You("どこからともなく現れたマジックミサイルに当たった!");
             mdamageu(mon, tmp);
             monstunseesu(M_SEEN_MAGR);
         }
@@ -6034,10 +6034,10 @@ passive(
                               !rn2(2) ? "" : "rather ",
                               !rn2(2) ? "numb" : "stupefied");
                     } else if (Free_action) {
-                        You("momentarily stiffen under %s gaze!",
+                        You("%sの視線で一瞬体がこわばった!",
                             s_suffix(mon_nam(mon)));
                     } else {
-                        You("are frozen by %s gaze!", s_suffix(mon_nam(mon)));
+                        You("%sの視線で凍りついた!", s_suffix(mon_nam(mon)));
                         nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127);
                         /* set gm.multi_reason;
                            3.6.x used "frozen by a monster's gaze" */
@@ -6051,9 +6051,9 @@ passive(
                         change_luck(-1);
                 }
             } else if (Free_action) {
-                You("momentarily stiffen.");
+                You("一瞬体がこわばった.");
             } else { /* gelatinous cube */
-                You("are frozen by %s!", mon_nam(mon));
+                You("%sによって凍りついた!", mon_nam(mon));
                 gn.nomovemsg = You_can_move_again;
                 nomul(-tmp);
                 /* set gm.multi_reason;
@@ -6072,7 +6072,7 @@ passive(
                     break;
                 }
                 monstunseesu(M_SEEN_COLD);
-                You("are suddenly very cold!");
+                You("突然ひどく寒くなった!");
                 mdamageu(mon, tmp);
                 /* monster gets stronger with your heat! */
                 healmon(mon, (tmp + rn2(2)) / 2, (tmp + 1) / 2);
@@ -6095,7 +6095,7 @@ passive(
                     break;
                 }
                 monstunseesu(M_SEEN_FIRE);
-                You("are suddenly very hot!");
+                You("突然ひどく熱くなった!");
                 mdamageu(mon, tmp); /* fire damage */
             }
             break;
@@ -6108,7 +6108,7 @@ passive(
                 break;
             }
             monstunseesu(M_SEEN_ELEC);
-            You("are jolted with electricity!");
+            You("電撃でしびれた!");
             mdamageu(mon, tmp);
             break;
         default:
