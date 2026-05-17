@@ -205,7 +205,7 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
             if (mon->data == &mons[PM_SHADE] && !specialdmg) {
                 /* doesn't matter whether it would have hit or missed,
                    and shades have no passive counterattack */
-                Your("%s%sをけり抜けた。", kick_passes_thru, mon_nam(mon));
+                Your("%s%sをけり抜けた.", kick_passes_thru, mon_nam(mon));
                 break; /* skip any additional kicks */
             } else if (tmp > kickdieroll) {
                 You("%sを蹴った.", mon_nam(mon));

@@ -598,7 +598,7 @@ mattacku(struct monst *mtmp)
 
             obj = which_armor(mtmp, WORN_HELMET);
             if (hard_helmet(obj)) {
-                Your("攻撃が%sの%sかろだった。", s_suffix(mon_nam(mtmp)),
+                Your("攻撃は%sの%sで受け流された.", s_suffix(mon_nam(mtmp)),
                      helm_simple_name(obj));
             } else {
                 if (3 + find_mac(mtmp) <= rnd(20)) {
@@ -2195,7 +2195,7 @@ doseduce(struct monst *mon)
             disp.botl = TRUE;
             break;
         case 2:
-            Your("感覚が骐てた.");
+            Your("感覚が鈍くなった.");
             (void) adjattrib(A_WIS, -1, TRUE);
             exercise(A_WIS, FALSE);
             disp.botl = TRUE;

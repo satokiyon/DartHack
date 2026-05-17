@@ -655,7 +655,7 @@ credit_report(struct monst *shkp, int idx, boolean silent)
             amt = credit_snap[NOW][2] - credit_snap[BEFORE][2];
         }
         if (amt)
-            Your("%s。%ld %s減った。", msg, amt, currency(amt));
+            Your("%s. %ld %s減った.", msg, amt, currency(amt));
 
     }
 }
@@ -693,11 +693,11 @@ rob_shop(struct monst *shkp)
     rouse_shk(shkp, TRUE);
     total = (addupbill(shkp) + eshkp->debit);
     if (eshkp->credit >= total) {
-        Your("%ld %sの信用枠が買い物の請求に充てられた。",
+        Your("%ld %sの信用枠が買い物の請求に充てられた.",
              eshkp->credit, currency(eshkp->credit));
         total = 0L; /* credit gets cleared by setpaid() */
     } else {
-        You("escaped the shop without paying!");
+        You("支払いをせずに店を抜け出した!");
         total -= eshkp->credit;
     }
     setpaid(shkp);
@@ -706,7 +706,7 @@ rob_shop(struct monst *shkp)
 
     /* by this point, we know an actual robbery has taken place */
     eshkp->robbed += total;
-    You("stole %ld %s worth of merchandise.", total, currency(total));
+    You("商品を%ld %s分盗んだ.", total, currency(total));
     livelog_printf(LL_ACHIEVE, "stole %ld %s worth of merchandise from %s %s",
                    total, currency(total), s_suffix(shkname(shkp)),
                    shtypes[eshkp->shoptype - SHOPBASE].name);
@@ -1977,12 +1977,12 @@ dopay(void)
                 eshkp->credit -= dtmp;
                 eshkp->debit = 0L;
                 eshkp->loan = 0L;
-                Your("負債は信用枠で相殺された。");
+                Your("負債は信用枠で相殺された.");
             } else if (!eshkp->credit) {
                 money2mon(shkp, dtmp);
                 eshkp->debit = 0L;
                 eshkp->loan = 0L;
-                You("pay that debt.");
+                You("その借金を支払った.");
                 disp.botl = TRUE;
             } else {
                 dtmp -= eshkp->credit;
@@ -1990,8 +1990,8 @@ dopay(void)
                 money2mon(shkp, dtmp);
                 eshkp->debit = 0L;
                 eshkp->loan = 0L;
-                pline("That debt is partially offset by your credit.");
-                You("pay the remainder.");
+                pline("その借金は信用枠で一部相殺された.");
+                You("残りを支払った.");
                 disp.botl = TRUE;
             }
             paid = TRUE;
@@ -3328,7 +3328,7 @@ add_one_tobill(
         unbilled = TRUE;
     } else if (eshkp->billct == BILLSZ) {
         /* shk's bill is completely full */
-        You("got that for free!");
+        You("それは無料で手に入った!");
         unbilled = TRUE;
     }
     /* if not on any list (probably from bill_dummy_object() which creates
@@ -3506,7 +3506,7 @@ addtobill(
         return;
     } else if (ESHK(shkp)->billct == BILLSZ) {
         if (!silent)
-            You("got that for free!");
+            You("それは無料で手に入った!");
         return;
     }
 
@@ -3889,7 +3889,7 @@ donate_gold(
                 eshkp->loan = 0L;
         }
         eshkp->debit -= gltmp;
-        Your("負債は%s返済された。", eshkp->debit ? "一部" : "全額");
+        Your("負債は%s返済された.", eshkp->debit ? "一部" : "全額");
     } else {
         long delta = gltmp - eshkp->debit;
 
@@ -3897,7 +3897,7 @@ donate_gold(
         if (eshkp->debit) {
             eshkp->debit = 0L;
             eshkp->loan = 0L;
-            Your("負債は返済された。");
+            Your("負債は返済された.");
         }
         if (eshkp->credit == delta)
             You("have %sestablished %ld %s credit.",
@@ -5764,18 +5764,18 @@ costly_gold(
     if (eshkp->credit >= amount) {
         if (!silent) {
             if (eshkp->credit > amount)
-                Your("信用枠は%ld %s減った。", amount, currency(amount));
+                Your("信用枠は%ld %s減った.", amount, currency(amount));
             else
-                Your("信用枠は消えた。");
+                Your("信用枠は消えた.");
         }
         eshkp->credit -= amount;
     } else {
         delta = amount - eshkp->credit;
         if (!silent) {
             if (eshkp->credit)
-                Your("信用枠は消えた。");
+                Your("信用枠は消えた.");
             if (eshkp->debit)
-                Your("負債は%ld %s増えた。", delta, currency(delta));
+                Your("負債は%ld %s増えた.", delta, currency(delta));
             else
                 You("owe %s %ld %s.", shkname(shkp), delta, currency(delta));
         }
@@ -6055,7 +6055,7 @@ globby_bill_fixup(struct obj *obj_absorber, struct obj *obj_absorbed)
                 if (eshkp->debit) {
                     eshkp->debit = 0L;
                     eshkp->loan = 0L;
-                    Your("負債は返済された。");
+                    Your("負債は返済された.");
                 }
                 if (eshkp->credit == delta)
                     pline_The("%s established %ld %s credit.",

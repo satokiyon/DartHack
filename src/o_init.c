@@ -854,7 +854,7 @@ dodiscovered(void) /* free after Robert Viduya */
         }
     }
     if (ct == 0) {
-        You("haven't discovered anything yet...");
+        You("まだ何も発見していなかった...");
     } else {
         if (sorted_ct) {
             /* if we're alphabetizing by class, we've already shown the

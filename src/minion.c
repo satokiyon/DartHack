@@ -374,7 +374,7 @@ bribe(struct monst *mtmp, const char *prompt)
         You("try to shortchange %s, but fumble.", mon_nam(mtmp));
         return 0L;
     } else if (offer == 0L) {
-        You("refuse.");
+        You("断った.");
         return 0L;
     } else if (offer >= umoney) {
         You("give %s all your gold.", mon_nam(mtmp));

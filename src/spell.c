@@ -1259,13 +1259,13 @@ spelleffects_check(int spell, int *res, int *energy)
         *res = ECMD_TIME;
         return TRUE;
     } else if (spellknow(spell) <= KEEN / 200) { /* 100 turns left */
-        You("strain to recall the spell.");
+        Your("この呪文の記憶はもはや風前の灯火だ!");
     } else if (spellknow(spell) <= KEEN / 40) { /* 500 turns left */
-        You("呪文を思い出すのに苦労した.");
+        You("呪文の構成を思い出すのにひどく苦労した.");
     } else if (spellknow(spell) <= KEEN / 20) { /* 1000 turns left */
-        Your("この呪文の知識は薄れつつあった.");
+        Your("この呪文の知識はかなり薄れてきている.");
     } else if (spellknow(spell) <= KEEN / 10) { /* 2000 turns left */
-        Your("この呪文の記憶は徐々に薄れていた.");
+        Your("この呪文の記憶がおぼろげになり始めている.");
     }
 
     if (u.uhunger <= 10 && spellid(spell) != SPE_DETECT_FOOD) {
