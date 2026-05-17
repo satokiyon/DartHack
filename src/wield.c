@@ -144,9 +144,9 @@ cant_wield_corpse(struct obj *obj)
         return FALSE;
 
     /* Prevent wielding cockatrice when not wearing gloves --KAA */
-    You("wield %s in your bare %s.",
-        corpse_xname(obj, (const char *) 0, CXN_PFX_THE),
-        makeplural(body_part(HAND)));
+    You("素手の%sで%sを構えた.",
+        makeplural(body_part(HAND)),
+        corpse_xname(obj, (const char *) 0, CXN_PFX_THE));
     Sprintf(kbuf, "wielding %s bare-handed", killer_xname(obj));
     instapetrify(kbuf);
     return TRUE;
@@ -157,12 +157,12 @@ cant_wield_corpse(struct obj *obj)
 const char *
 empty_handed(void)
 {
-    return uarmg ? "empty handed" /* gloves imply hands */
+        return uarmg ? "手に何も持っていない" /* gloves imply hands */
            : humanoid(gy.youmonst.data)
              /* hands but no weapon and no gloves */
-             ? "bare handed"
+                         ? "素手だ"
                /* alternate phrasing for paws or lack of hands */
-               : "not wielding anything";
+                             : "何も構えていない";
 }
 
 staticfn int
@@ -175,18 +175,18 @@ ready_weapon(struct obj *wep)
     if (!wep) {
         /* No weapon */
         if (uwep) {
-            You("are %s.", empty_handed());
+            You("%s.", empty_handed());
             setuwep((struct obj *) 0);
             res = ECMD_TIME;
         } else
-            You("are already %s.", empty_handed());
+            You("すでに%s.", empty_handed());
     } else if (wep->otyp == CORPSE && cant_wield_corpse(wep)) {
         /* hero must have been life-saved to get here; use a turn */
         res = ECMD_TIME; /* corpse won't be wielded */
     } else if (uarms && bimanual(wep)) {
-        You("cannot wield a two-handed %s while wearing a shield.",
-            is_sword(wep) ? "sword" : wep->otyp == BATTLE_AXE ? "axe"
-                                                              : "weapon");
+        You("盾を装備したままでは両手用の%sを構えられなかった.",
+            is_sword(wep) ? "剣" : wep->otyp == BATTLE_AXE ? "斧"
+                                                              : "武器");
         res = ECMD_FAIL;
     } else if (!retouch_object(&wep, FALSE)) {
         res = ECMD_TIME; /* takes a turn even though it doesn't get wielded */
@@ -563,7 +563,7 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
         pline("That ammunition is already readied!");
         return ECMD_OK;
     } else if (newquiver->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
-        You("cannot %s that!", verb);
+        You("それを%sできなかった!", verb);
         return ECMD_OK;
     } else if (newquiver == uwep) {
         int weld_res = !uwep->bknown;
@@ -669,7 +669,7 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
        something we're wielding that's vulnerable to its damage) */
     res = 0;
     if (was_uwep) {
-        You("are now %s.", empty_handed());
+        You("今は%s.", empty_handed());
         res = 1;
     } else if (was_twoweap && !u.twoweap) {
         You("%s.", are_no_longer_twoweap);
@@ -722,8 +722,8 @@ wield_tool(struct obj *obj,
     }
     /* check shield */
     if (uarms && bimanual(obj)) {
-        You("cannot %s a two-handed %s while wearing a shield.", verb,
-            (obj->oclass == WEAPON_CLASS) ? "weapon" : "tool");
+        You("盾を装備したままでは両手用の%sを%sできなかった.",
+            (obj->oclass == WEAPON_CLASS) ? "武器" : "道具", verb);
         return FALSE;
     }
 
@@ -741,7 +741,7 @@ wield_tool(struct obj *obj,
             /* hope none of ready_weapon()'s early returns apply here... */
             (void) ready_weapon(obj);
         } else {
-            You("now wield %s.", doname(obj));
+            You("今は%sを構えた.", doname(obj));
             setuwep(obj);
         }
         if (flags.pushweapon && oldwep && uwep != oldwep)

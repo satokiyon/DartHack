@@ -240,7 +240,7 @@ query_classes(
                     if (*where)
                         There("are no %c's %s.", sym, where);
                     else
-                        You("have no %c's.", sym);
+                        You("%cは持っていなかった.", sym);
                     not_everything = TRUE;
                 }
             }
@@ -2417,7 +2417,7 @@ reverse_loot(void)
             if (!rn2(10))
                 levl[x][y].looted = T_LOOTED;
         } else {
-            You("drop %s.", doname(goldob));
+            You("%sを落とした.", doname(goldob));
             dropx(goldob);
         }
     }
@@ -2694,7 +2694,7 @@ in_container(struct obj *obj)
 
     if (gc.current_container) {
         Strcpy(buf, the(xname(gc.current_container)));
-        You("put %s into %s.", doname(obj), buf);
+        You("%sを%sへ入れた.", doname(obj), buf);
 
         /* gold in container always needs to be added to credit */
         if (floor_container && obj->oclass == COIN_CLASS)
@@ -3029,7 +3029,7 @@ use_container(
     if (cursed_mbag
         && (loss = boh_loss(gc.current_container, held)) != 0) {
         used = ECMD_TIME;
-        You("owe %ld %s for lost merchandise.", loss, currency(loss));
+        You("失われた商品について%ld %sの借りができた.", loss, currency(loss));
         gc.current_container->owt = weight(gc.current_container);
     }
     /* might put something in if carrying anything other than just the
@@ -3154,8 +3154,8 @@ use_container(
     }
 
     if ((loot_in || stash_one) && !inokay) {
-        You("don't have anything%s to %s.", gi.invent ? " else" : "",
-            stash_one ? "stash" : "put in");
+        You("%s%sものを持っていなかった.", gi.invent ? "ほかに" : "",
+            stash_one ? "しまう" : "入れる");
         loot_in = stash_one = FALSE;
     }
 
@@ -3827,7 +3827,7 @@ tipcontainer(struct obj *box) /* or bag */
                 iflags.suppress_price--; /* reset */
         }
         if (loss) /* magic bag lost some shop goods */
-            You("owe %ld %s for lost merchandise.", loss, currency(loss));
+            You("失われた商品について%ld %sの借りができた.", loss, currency(loss));
         box->owt = weight(box); /* mbag_item_gone() doesn't update this */
         if (targetbox)
             targetbox->owt = weight(targetbox);

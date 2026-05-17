@@ -986,7 +986,7 @@ enter_force_field(genericptr_t p1, genericptr_t p2)
 
     if (p2 == (genericptr_t) 0) { /* That means the player */
         if (!Blind)
-            You("bump into %s.  Ouch!",
+            You("%sにぶつかった。痛い!",
                 Hallucination ? "an invisible tree"
                               : "some kind of invisible wall");
         else
@@ -1117,7 +1117,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
         if (!Poison_resistance) {
             pline("%s is burning your %s!", Something,
                   makeplural(body_part(LUNG)));
-            You("cough and spit blood!");
+            You("せき込み、血を吐いた!");
             wake_nearto(u.ux, u.uy, 2);
             dam = Maybe_Half_Phys(rnd(dam) + 5);
             if (Half_gas_damage) /* worn towel */
@@ -1126,7 +1126,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
             monstunseesu(M_SEEN_POISON);
             return FALSE;
         } else {
-            You("cough!");
+            You("せき込んだ!");
             wake_nearto(u.ux, u.uy, 2);
             monstseesu(M_SEEN_POISON);
             return FALSE;
@@ -1195,11 +1195,11 @@ make_gas_cloud(
     add_region(cloud);
 
     if (!gi.in_mklev && !inside_cloud && is_hero_inside_gas_cloud()) {
-        You("are enveloped in a cloud of %s!",
+        You("%sの雲に包まれた!",
             /* FIXME: "steam" is wrong if this cloud is just the trail of
                a fog cloud's movement; changing to "vapor" would handle
                that but seems a step backward when it really is steam */
-            damage ? "noxious gas" : "steam");
+            damage ? "有毒ガス" : "蒸気");
         iflags.last_msg = PLNMSG_ENVELOPED_IN_GAS;
     }
 }

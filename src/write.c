@@ -85,7 +85,7 @@ dowrite(struct obj *pen)
     int spell_knowledge;
 
     if (nohands(gy.youmonst.data)) {
-        You("need hands to be able to write!");
+        You("書くには手が必要だった!");
         return ECMD_OK;
     } else if (Glib) {
         pline("%s from your %s.", Tobjnam(pen, "slip"),
@@ -105,7 +105,7 @@ dowrite(struct obj *pen)
                  : "scroll";
     if (Blind) {
         if (!paper->dknown) {
-            You("don't know whether that %s is blank or not.", typeword);
+            You("その%sが白紙かどうかわからなかった.", typeword);
             return ECMD_OK;
         } else if (paper->oclass == SPBOOK_CLASS) {
             /* can't write a magic book while blind */
@@ -225,9 +225,9 @@ dowrite(struct obj *pen)
                 !Hallucination ? "lame" : "awesome");
         }
         if (!tearup) {
-            You("give up on the idea.");
+            You("その考えをあきらめた.");
         } else {
-            You("tear it up.");
+            You("それを破り捨てた.");
             useup(paper);
         }
         return ECMD_TIME;
@@ -331,7 +331,7 @@ dowrite(struct obj *pen)
                 wipeout_text(namebuf, (6 + MAXULEV - u.ulevel) / 6, 0);
             } else
                 Sprintf(namebuf, "%s was here!", svp.plname);
-            You("write \"%s\" and the scroll disappears.", namebuf);
+            You("\"%s\"と書くと巻物は消えた.", namebuf);
             useup(paper);
         }
         obfree(new_obj, (struct obj *) 0);
@@ -345,7 +345,7 @@ dowrite(struct obj *pen)
            have passed the write-an-unknown scroll test
            above we can still fail this one, so it's doubly
            hard to write an unknown scroll while blind */
-        You("fail to write the scroll correctly and it disappears.");
+        You("巻物を正しく書けず、消えてしまった.");
         useup(paper);
         obfree(new_obj, (struct obj *) 0);
         return ECMD_TIME;

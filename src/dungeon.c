@@ -1559,7 +1559,7 @@ earth_sense(void)
 
     for (otmp = svl.level.buriedobjlist; otmp; otmp = otmp->nobj)
         if (u_at(otmp->ox, otmp->oy)) {
-            You("sense something below your %s.", makeplural(body_part(FOOT)));
+            You("%sの下に何かを感じた。", makeplural(body_part(FOOT)));
             return;
         }
 }
@@ -2491,7 +2491,7 @@ print_level_annotation(void)
     const char *annotation;
 
     if ((annotation = get_annotation(&u.uz)) != 0)
-        You("remember this level as %s.", annotation);
+        You("このレベルを%sと記していた。", annotation);
 }
 
 /* ask user to annotate level lev.

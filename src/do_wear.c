@@ -2835,13 +2835,14 @@ do_takeoff(void)
             if (was_twoweap)
                 You("もうどちらの武器も構えていない.");
             else
-                You("are %s.", empty_handed());
+                You("%s.", empty_handed());
         }
     } else if (doff->what == W_SWAPWEP) {
         setuswapwep((struct obj *) 0);
-        You("%sno longer %s.", was_twoweap ? "are " : "",
-            was_twoweap ? "wielding two weapons at once"
-                        : "have a second weapon readied");
+        if (was_twoweap)
+            You("もう二刀流ではない.");
+        else
+            You("もう予備の武器を準備していない.");
     } else if (doff->what == W_QUIVER) {
         setuqwep((struct obj *) 0);
         You("もう弾を準備していない.");

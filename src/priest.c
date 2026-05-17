@@ -525,7 +525,7 @@ intemple(int roomno)
                       ngen < 5 ? "n enormous" : "",
                       ngen < 10 ? '!' : '.');
             else
-                You("sense a presence close by!");
+                You("近くに何かの存在を感じた!");
             mtmp->mpeaceful = 0;
             set_malign(mtmp);
             if (flags.verbose)

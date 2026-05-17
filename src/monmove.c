@@ -587,7 +587,7 @@ mind_blast(struct monst *mtmp)
     if (canseemon(mtmp))
         pline_mon(mtmp, "%sは精神を集中させた.", Monnam(mtmp));
     if (mdistu(mtmp) > BOLT_LIM * BOLT_LIM) {
-        You("sense a faint wave of psychic energy.");
+        You("微かな精神波動を感じた。");
         return;
     }
     pline("A wave of psychic energy pours over you!");

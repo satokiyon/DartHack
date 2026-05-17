@@ -2314,7 +2314,7 @@ drop_boulder_on_player(
     otmp2->owt = weight(otmp2);
     if (!amorphous(gy.youmonst.data) && !Passes_walls
         && !noncorporeal(gy.youmonst.data) && !unsolid(gy.youmonst.data)) {
-        You("are hit by %s!", doname(otmp2));
+        You("%sに打たれた!", doname(otmp2));
         dmg = (int) (dmgval(otmp2, &gy.youmonst) * otmp2->quan);
         if (uarmh && helmet_protects) {
             if (hard_helmet(uarmh)) {
@@ -2804,8 +2804,8 @@ do_class_genocide(void)
                         if (i == PM_HIGH_CLERIC)
                             uniq = FALSE;
 
-                        You("aren't permitted to genocide %s%s.",
-                            (uniq && !named) ? "the " : "",
+                        You("%s%sの絶滅は許されていない。",
+                            (uniq && !named) ? "" : "",
                             (uniq || named) ? mons[i].pmnames[NEUTRAL] : nam);
                     }
                 }

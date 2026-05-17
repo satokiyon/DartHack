@@ -630,7 +630,7 @@ restgamestate(NHFILE *nhfp)
 #endif
     if (u.uhp <= 0 && (!Upolyd || u.mh <= 0)) {
         u.ux = u.uy = 0; /* affects pline() [hence You()] */
-        You("were not healthy enough to survive restoration.");
+        You("復旧に耐える体力がなかった。");
         /* wiz1_level.dlevel is used by mklev.c to see if lots of stuff is
          * uninitialized, so we only have to set it and not the other stuff.
          */
@@ -855,10 +855,10 @@ dorecover(NHFILE *nhfp)
         clear_nhwindow(WIN_MAP);
 #endif
     clear_nhwindow(WIN_MESSAGE);
-    You("return to level %d in %s%s.", depth(&u.uz),
+    You("ダンジョン%d階の%sに戻った%s。", depth(&u.uz),
         svd.dungeons[u.uz.dnum].dname,
-        flags.debug ? " while in debug mode"
-                    : flags.explore ? " while in explore mode" : "");
+        flags.debug ? "（デバッグモード中）"
+                    : flags.explore ? "（探索モード中）" : "");
     curs(WIN_MAP, 1, 1);
     dotcnt = 0;
     dotrow = 2;

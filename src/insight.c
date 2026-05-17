@@ -2075,7 +2075,7 @@ youhiding(boolean via_enlghtmt, /* enlightenment line vs topl message */
         you_are(buf, "");
     } else {
         /* for dohide(), when player uses '#monster' command */
-        You("are %s %s.", msgflag ? "already" : "now", buf);
+        You("%s%s状態になった。", msgflag ? "既に" : "今", buf);
     }
 }
 

@@ -1201,8 +1201,8 @@ skill_advance(int skill)
     P_SKILL(skill)++;
     u.skill_record[u.skills_advanced++] = skill;
     /* subtly change the advance message to indicate no more advancement */
-    You("are now %s skilled in %s.",
-        P_SKILL(skill) >= P_MAX_SKILL(skill) ? "most" : "more",
+    You("今、%s%sに熟練した。",
+        P_SKILL(skill) >= P_MAX_SKILL(skill) ? "最も" : "より",
         P_NAME(skill));
 
     /* wizards discover spellbook IDs depending on spell 'school' skill limits;
@@ -1508,8 +1508,9 @@ drain_weapon_skill(int n) /* number of skills to drain */
 
     for (skill = 0; skill < P_NUM_SKILLS; skill++)
         if (tmpskills[skill]) {
-            You("forget %syour training in %s.",
-                P_SKILL(skill) >= P_BASIC ? "some of " : "", P_NAME(skill));
+            You("%sの訓練%sを忘れた。",
+                P_NAME(skill),
+                P_SKILL(skill) >= P_BASIC ? "の一部を" : "");
         }
 }
 

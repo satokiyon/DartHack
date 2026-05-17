@@ -801,7 +801,7 @@ polymon(int mntmp)
                        ? "" : flags.female ? "female " : "male ");
     }
     Strcat(buf, pmname(&mons[mntmp], flags.female ? FEMALE : MALE));
-    You("%s %s!", (u.umonnum != mntmp) ? "turn into" : "feel like", an(buf));
+    You("%s %s!", (u.umonnum != mntmp) ? "変身する" : "気がした", an(buf));
 
     if (Stoned && poly_when_stoned(&mons[mntmp])) {
         /* poly_when_stoned already checked stone golem genocide */
@@ -1212,7 +1212,7 @@ break_armor(void)
             if (is_whirly(uptr))
                 Your("%sは支えを失って落ちた!", cloak_simple_name(otmp));
             else
-                You("shrink out of your %s!", cloak_simple_name(otmp));
+                You("%sがぶかぶかになって抜け落ちた!", cloak_simple_name(otmp));
             (void) Cloak_off();
             dropp(otmp);
         }
@@ -1248,7 +1248,7 @@ break_armor(void)
             if (donning(otmp))
                 cancel_don();
             /* Drop weapon along with gloves */
-            You("drop your gloves%s!", uwep ? " and weapon" : "");
+            You("手袋%sを落とした!", uwep ? "と武器" : "");
             drop_weapon(0);
             (void) Gloves_off();
             /* Glib manipulation (ends immediately) handled by Gloves_off */
@@ -1315,7 +1315,7 @@ drop_weapon(int alone)
             candropwep = canletgo(uwep, "");
             candropswapwep = !u.twoweap || canletgo(uswapwep, "");
             if (alone) {
-                what = (candropwep && candropswapwep) ? "drop" : "release";
+                what = (candropwep && candropswapwep) ? "落とす" : "手放す";
                 which = is_sword(uwep) ? "sword" : weapon_descr(uwep);
                 if (u.twoweap) {
                     whichtoo =
@@ -1326,8 +1326,8 @@ drop_weapon(int alone)
                 if (uwep->quan != 1L || u.twoweap)
                     which = makeplural(which);
 
-                You("find you must %s %s %s!", what,
-                    the_your[!!strncmp(which, "corpse", 6)], which);
+                You("%s%sを%s必要があることに気づいた!",
+                    the_your[!!strncmp(which, "corpse", 6)], which, what);
             }
             /* if either uwep or wielded uswapwep is flagged as 'in_use'
                then don't drop it or explicitly update inventory; leave
@@ -1408,7 +1408,7 @@ rehumanize(void)
     encumber_msg();
     update_inventory();
     if (was_flying && !Flying && u.usteed)
-        You("and %s return gently to the %s.",
+        You("そして%sと一緒にそっと%sへ戻った.",
             mon_nam(u.usteed), surface(u.ux, u.uy));
     retouch_equipment(2);
     if (!uarmg)
@@ -1879,7 +1879,7 @@ dopoly(void)
     if (is_vampire(gy.youmonst.data) || is_vampshifter(&gy.youmonst)) {
         polyself(POLY_MONSTER);
         if (savedat != gy.youmonst.data) {
-            You("transform into %s.",
+            You("%sへ変身した.",
                 an(pmname(gy.youmonst.data, Ugender)));
             newsym(u.ux, u.uy);
         }
@@ -1923,10 +1923,10 @@ domindblast(void)
                unless it will survive the psychic blast, otherwise hero
                would avoid the penalty for killing it while peaceful */
             wakeup(mtmp, (dmg > mtmp->mhp) ? TRUE : FALSE);
-            You("lock in on %s %s.", s_suffix(mon_nam(mtmp)),
-                u_sen ? "telepathy"
-                : telepathic(mtmp->data) ? "latent telepathy"
-                  : "mind");
+                        You("%sの%sを捉えた.", s_suffix(mon_nam(mtmp)),
+                                u_sen ? "テレパシー"
+                                : telepathic(mtmp->data) ? "潜在テレパシー"
+                                    : "精神");
             mtmp->mhp -= dmg;
             if (DEADMONSTER(mtmp))
                 killed(mtmp);

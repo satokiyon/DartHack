@@ -350,7 +350,7 @@ do_oname(struct obj *obj)
         } while (!strcmp(buf, bufcpy));
         pline("While engraving, your %s slips.", body_part(HAND));
         display_nhwindow(WIN_MESSAGE, FALSE);
-        You("engrave: \"%s\".", buf);
+        You("%sを刻んだ。", buf);
         /* violate illiteracy conduct since hero attempted to write
            a valid artifact name */
         u.uconduct.literate++;
@@ -745,8 +745,8 @@ namefloorobj(void)
         pline("%s %s can't be assigned a type name.",
               use_plural ? "Those" : "That", buf);
     } else if (!obj->dknown) {
-        You("don't know %s %s well enough to name %s.",
-            use_plural ? "those" : "that", buf, use_plural ? "them" : "it");
+        You("%sはまだ十分よく知らないため、%sと名付けられない。",
+            use_plural ? "それら" : "それ", buf);
     } else {
         docall(obj);
     }

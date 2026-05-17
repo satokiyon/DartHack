@@ -845,10 +845,10 @@ u_entered_shop(char *enterstring)
                       eshkp->visitct++ ? " again" : "",
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         } else {
-            You("enter %s %s%s!",
+            You("%sの%s%sに入った!",
                 s_suffix(shkname(shkp)),
                 shtypes[rt - SHOPBASE].name,
-                eshkp->visitct++ ? " again" : "");
+                eshkp->visitct++ ? "に再び" : "");
         }
     }
     /* can't do anything about blocking if teleported in */
@@ -1022,13 +1022,13 @@ shopper_financial_report(void)
                 continue;
             eshkp = ESHK(shkp);
             if ((amt = eshkp->credit) != 0)
-                You("have %ld %s credit at %s %s.", amt, currency(amt),
+                You("%ld %sの信用が%s %sにあった.", amt, currency(amt),
                     s_suffix(shkname(shkp)),
                     shtypes[eshkp->shoptype - SHOPBASE].name);
             else if (shkp == this_shkp)
                 You("ここには信用がなかった.");
             if ((amt = shop_debt(eshkp)) != 0)
-                You("owe %s %ld %s.", shkname(shkp), amt, currency(amt));
+                You("%sに%ld %sの借りがあった.", shkname(shkp), amt, currency(amt));
             else if (shkp == this_shkp)
                 You("ここでは金を借りていなかった.");
         }
@@ -1830,7 +1830,7 @@ dopay(void)
         }
         mtmp = m_at(cx, cy);
         if (!cansee(cx, cy) && (!mtmp || !canspotmon(mtmp))) {
-            You("can't %s anyone there.", !Blind ? "see" : "sense");
+            You("そこには誰も%sことができなかった.", !Blind ? "見る" : "感じる");
             return ECMD_OK;
         }
         if (!mtmp) {
@@ -1869,19 +1869,19 @@ dopay(void)
     if (shkp != resident && NOTANGRY(shkp)) {
         umoney = money_cnt(gi.invent);
         if (!ltmp) {
-            You("do not owe %s anything.", shkname(shkp));
+            You("%sには何も借りがなかった.", shkname(shkp));
         } else if (!umoney) {
             You("%shave no gold.", stashed_gold ? "seem to " : "");
             if (stashed_gold)
                 pline("But you have some gold stashed away.");
         } else {
             if (umoney > ltmp) {
-                You("give %s the %ld gold piece%s %s asked for.",
+                You("%sが求めた%ld枚の金貨%sを渡した.",
                     shkname(shkp), ltmp, plur(ltmp), noit_mhe(shkp));
                 pay(ltmp, shkp);
             } else {
-                You("give %s all your%s gold.", shkname(shkp),
-                    stashed_gold ? " openly kept" : "");
+                You("%sに手持ち%sの金をすべて渡した.", shkname(shkp),
+                    stashed_gold ? "見えている" : "");
                 pay(umoney, shkp);
                 if (stashed_gold)
                     pline("But you have hidden gold!");
@@ -1899,7 +1899,7 @@ dopay(void)
     if (!eshkp->billct && !eshkp->debit) {
         umoney = money_cnt(gi.invent);
         if (!ltmp && NOTANGRY(shkp)) {
-            You("do not owe %s anything.", shkname(shkp));
+            You("%sには何も借りがなかった.", shkname(shkp));
             if (!umoney)
                 pline(no_money, stashed_gold ? " seem to" : "");
         } else if (ltmp) {
@@ -1929,7 +1929,7 @@ dopay(void)
                     pline(not_enough_money, noit_mhim(shkp));
                 return ECMD_TIME;
             }
-            You("try to appease %s by giving %s 1000 gold pieces.",
+            You("%sをなだめようとして、%sに1000枚の金貨を渡した.",
                 canspotmon(shkp)
                     ? x_monnam(shkp, ARTICLE_THE, "angry", 0, FALSE)
                     : shkname(shkp),
@@ -2071,9 +2071,9 @@ pay_billed_items(
                         we can deduce that it is ibill[0] */
                      || ibill[0].usedup == UndisclosedContainer);
     if ((umoney + eshkp->credit) < cheapest_item(ibillct, ibill)) {
-        You("don't have enough gold to buy%s the item%s %s.",
-            more_than_one ? " any of" : "", plur(more_than_one ? 2 : 1),
-            (ebillct > 1) ? "you've picked" : "on your bill");
+        You("品物%s %sを買うには金が足りなかった%s.",
+            more_than_one ? "のどれか" : "", "",
+            (ebillct > 1) ? "(選んだ品物に)" : "(勘定書きの品物に)");
         if (stashed_gold)
             pline("Maybe you have some gold stashed away?");
         return TRUE;
@@ -2471,9 +2471,9 @@ insufficient_funds(
     }
     if (cost && umoney + ecredit < cost) {
         stashed_gold = hidden_gold(TRUE);
-        You("don't%s have gold%s enough to pay for %s.",
-            (stashed_gold > 0L) ? " seem to" : "",
-            (ecredit > 0L) ? " or credit" : "",
+        You("%s%sの支払いに足る金%sを持っていなかった.",
+            (stashed_gold > 0L) ? "どうやら" : "",
+            (ecredit > 0L) ? "や信用" : "",
             paydoname(item));
         return TRUE;
     }
@@ -3833,7 +3833,7 @@ stolen_value(
 
             if (credit_use) {
                 if (ESHK(shkp)->credit) {
-                    You("have %ld %s credit remaining.", ESHK(shkp)->credit,
+                    You("%ld %sの信用が残っていた.", ESHK(shkp)->credit,
                         currency(ESHK(shkp)->credit));
                     return value;
                 } else if (!value) {
@@ -3900,8 +3900,8 @@ donate_gold(
             Your("負債は返済された.");
         }
         if (eshkp->credit == delta)
-            You("have %sestablished %ld %s credit.",
-                !selling ? "re-" : "", delta, currency(delta));
+            You("%s信用を%ld %s分確立した.",
+                !selling ? "再び" : "", delta, currency(delta));
         else
             pline("%ld %s added%s to your credit; total is now %ld %s.",
                   delta, currency(delta), !selling ? " back" : "",
@@ -5777,7 +5777,7 @@ costly_gold(
             if (eshkp->debit)
                 Your("負債は%ld %s増えた.", delta, currency(delta));
             else
-                You("owe %s %ld %s.", shkname(shkp), delta, currency(delta));
+                You("%sに%ld %sの借りがあった.", shkname(shkp), delta, currency(delta));
         }
         eshkp->debit += delta;
         eshkp->loan += delta;

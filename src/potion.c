@@ -2919,7 +2919,7 @@ void
 speed_up(long duration)
 {
    if (!Very_fast)
-       You("are suddenly moving %sfaster.", Fast ? "" : "much ");
+       You("突然%s速く動けるようになった.", Fast ? "" : "ずっと");
    else
     Your("%sに新たな力がみなぎった.", makeplural(body_part(LEG)));
 

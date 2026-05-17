@@ -3772,7 +3772,7 @@ dounpaid(
                        : "on or under the floor";
 
         if (!count) {
-            You("aren't carrying any unpaid items but there %s %d %s.",
+            You("未払い品は持っていなかったが、そこに%s %d %sあった.",
                 floorverb, xtracount, where);
         } else {
             putstr(win, 0, "");
@@ -3999,7 +3999,7 @@ dotypeinv(void)
 
     if (traditional) {
         if (strchr(types, c) > strchr(types, '\033')) {
-            You("have no %sobjects%s.", before, after);
+            You("%s品物%sは持っていなかった.", before, after);
             goto doI_done;
         }
         gt.this_type = oclass; /* extra input for this_type_only() */
@@ -4187,7 +4187,7 @@ look_here(
 
         if (dfeature && !strncmp(dfeature, "altar ", 6)) {
             /* don't say "altar" twice, dfeature has more info */
-            You("try to feel what is here.");
+            You("ここに何があるか手探りした.");
         } else if (SURFACE_AT(u.ux, u.uy) == ICE) {
             /* using describe_decor() to handle ice is simpler than
                replicating it in the conditional message construction */
@@ -4195,7 +4195,7 @@ look_here(
                 force_decor(FALSE);
             /* plain "ice" if blind and levitating, otherwise "solid ice" &c;
               "There is [thin ]ice here.  You try to feel what is on it." */
-            You("try to feel what is on it.");
+            You("その上に何があるか手探りした.");
             skip_dfeature = TRUE; /* ice already described */
         } else {
             boolean cant_reach = !can_reach_floor(TRUE);
@@ -4204,7 +4204,7 @@ look_here(
                                            : "lying here on the ",
                        *onwhat = cant_reach ? "" : surf;
 
-            You("try to feel what is %s%s.", drift ? "floating here" : where,
+            You("%s%sにあるものを手探りした.", drift ? "ここに漂う" : where,
                 drift ? "" : onwhat);
 
             if (dfeature && !drift && !strcmp(dfeature, surf))
@@ -4349,8 +4349,8 @@ feel_cockatrice(struct obj *otmp, boolean force_touch)
         Strcpy(kbuf, corpse_xname(otmp, (const char *) 0, CXN_PFX_THE));
 
         if (poly_when_stoned(gy.youmonst.data))
-            You("touched %s with your bare %s.", kbuf,
-                makeplural(body_part(HAND)));
+            You("素手の%sで%sに触れた.",
+                makeplural(body_part(HAND)), kbuf);
         else
             pline("Touching %s is a fatal mistake...", kbuf);
         /* normalize body shape here; hand, not body_part(HAND) */
@@ -4550,7 +4550,7 @@ int
 doprwep(void)
 {
     if (!uwep) {
-        You("are %s.", empty_handed());
+        You("%s.", empty_handed());
     } else if (!iflags.menu_requested) {
         prinv((char *) 0, uwep, 0L);
         if (u.twoweap)
