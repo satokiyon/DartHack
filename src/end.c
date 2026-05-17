@@ -751,7 +751,7 @@ savelife(int how)
         expels(u.ustuck, u.ustuck->data, TRUE);
     } else if (u.ustuck) {
         if (Upolyd && sticks(gy.youmonst.data))
-            You("release %s.", mon_nam(u.ustuck));
+            You("%sを放した.", mon_nam(u.ustuck));
         else
             pline("%s releases you.", Monnam(u.ustuck));
         unstuck(u.ustuck);
@@ -1085,9 +1085,9 @@ done(int how)
         pline("But wait...");
         /* assumes that only one type of item confers LifeSaved property */
         makeknown(AMULET_OF_LIFE_SAVING);
-        Your("medallion %s!", !Blind ? "begins to glow" : "feels warm");
+        Your("%s!", !Blind ? "メダリオンが光り始めた" : "メダリオンが温かくなった");
         if (how == CHOKING)
-            You("vomit ...");
+            You("嘔吐した...");
         You_feel("かなり気分がよくなった!");
         pline_The("medallion crumbles to dust!");
         if (uamul)
@@ -1355,10 +1355,10 @@ really_done(int how)
         /* give this feedback even if bones aren't going to be created,
            so that its presence or absence doesn't tip off the player to
            new bones or their lack; it might be a lie if makemon fails */
-        Your("%s as %s...",
+        Your("%s、%sとして...",
              (u.ugrave_arise != PM_GREEN_SLIME)
-                 ? "body rises from the dead"
-                 : "revenant persists",
+                 ? "肉体が死からよみがえり"
+                 : "怨霊が消えずに残り",
              an(pmname(&mons[u.ugrave_arise], Ugender)));
         display_nhwindow(WIN_MESSAGE, FALSE);
     }

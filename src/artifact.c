@@ -1330,7 +1330,7 @@ Mb_hit(struct monst *magr, /* attacker */
                     if (u.uen > 0)
                         u.uen--;
                     disp.botl = TRUE;
-                    You("lose magical energy!");
+                    You("魔法のエネルギーを失った!");
                 }
             } else {
                 /* canceled shapeshifter/vamp may have changed forms, so
@@ -1345,7 +1345,7 @@ Mb_hit(struct monst *magr, /* attacker */
                         u.uenpeak = u.uenmax;
                     u.uen++;
                     disp.botl = TRUE;
-                    You("absorb magical energy!");
+                    You("魔法のエネルギーを吸収した!");
                 }
             }
         }
@@ -1361,7 +1361,7 @@ Mb_hit(struct monst *magr, /* attacker */
                 gn.nomovemsg = "";
                 if (magr && magr == u.ustuck && sticks(gy.youmonst.data)) {
                     set_ustuck((struct monst *) 0);
-                    You("release %s!", mon_nam(magr));
+                    You("%sを放した!", mon_nam(magr));
                 }
             }
         } else {
@@ -1552,7 +1552,7 @@ artifact_hit(
             wepdesc = "The razor-sharp blade";
             /* not really beheading, but so close, why add another SPFX */
             if (youattack && engulfing_u(mdef)) {
-                You("slice %s wide open!", mon_nam(mdef));
+                You("%sを真っ二つに切り裂いた!", mon_nam(mdef));
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
                 return TRUE;
             }
@@ -1563,7 +1563,7 @@ artifact_hit(
 
                 if (bigmonst(mdef->data)) {
                     if (youattack)
-                        You("slice deeply into %s!", mon_nam(mdef));
+                        You("%sを深く切り裂いた!", mon_nam(mdef));
                     else if (vis)
                         pline("%s cuts deeply into %s!", Monnam(magr),
                               hittee);

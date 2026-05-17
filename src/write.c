@@ -255,7 +255,7 @@ dowrite(struct obj *pen)
     /* see if there's enough ink */
     basecost = cost(new_obj);
     if (pen->spe < basecost / 2) {
-        Your("marker is too dry to write that!");
+        Your("マーカーは乾きすぎてそれは書けなかった!");
         obfree(new_obj, (struct obj *) 0);
         return ECMD_TIME;
     }
@@ -268,7 +268,7 @@ dowrite(struct obj *pen)
     /* dry out marker */
     if (pen->spe < actualcost) {
         pen->spe = 0;
-        Your("marker dries out!");
+        Your("マーカーは乾き切った!");
         /* scrolls disappear, spellbooks don't */
         if (paper->oclass == SPBOOK_CLASS) {
             pline_The("spellbook is left unfinished and your writing fades.");

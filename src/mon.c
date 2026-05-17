@@ -3097,7 +3097,7 @@ mondead(struct monst *mtmp)
         return;
 
     if (be_sad)
-        You("have a sad feeling for a moment, then it passes.");
+        You("しばらく悲しい気分になったが、それもやがて過ぎ去った.");
 
     if (mtmp->data == &mons[PM_STEAM_VORTEX])
         create_gas_cloud(mtmp->mx, mtmp->my, rn2(10) + 5, 0); /* harmless */
@@ -3560,7 +3560,7 @@ xkilled(
     }
 
     if (be_sad)
-        You("have a sad feeling for a moment, then it passes.");
+        You("しばらく悲しい気分になったが、それもやがて過ぎ去った.");
 
     mdat = mtmp->data; /* note: mondead can change mtmp->data */
     mndx = monsndx(mdat);

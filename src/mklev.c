@@ -2490,7 +2490,7 @@ mkinvokearea(void)
         nh_delay_output();
     }
 
-    You("are standing at the top of a stairwell leading down!");
+    You("下へ続く階段の一番上に立っていた!");
     mkstairs(u.ux, u.uy, 0, (struct mkroom *) 0, FALSE); /* down */
     newsym(u.ux, u.uy);
     gv.vision_full_recalc = 1; /* everything changed */

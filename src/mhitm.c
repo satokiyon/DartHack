@@ -1132,7 +1132,7 @@ mon_poly(struct monst *magr, struct monst *mdef, int dmg)
         } else {
             /* system shock might take place in polyself() */
             if (u.ulycn == NON_PM) {
-                You("are subjected to a freakish metamorphosis.");
+                You("奇妙な変身にさらされた.");
                 polyself(POLY_NOFLAGS);
             } else if (u.umonnum != u.ulycn) {
                 You_feel("不自然な衝動に駆られた.");

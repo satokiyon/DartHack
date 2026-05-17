@@ -126,7 +126,7 @@ use_towel(struct obj *obj)
         case 2:
             old = (Glib & TIMEOUT);
             make_glib((int) old + rn1(10, 3)); /* + 3..12 */
-            Your("%s %s!", makeplural(body_part(HAND)),
+            Your("%sが%s!", makeplural(body_part(HAND)),
                  (old ? "さらに汚れた" : "ぬるぬるになった"));
             if (is_wet_towel(obj))
                 dry_a_towel(obj, -1, drying_feedback);
@@ -3900,7 +3900,7 @@ do_break_wand(struct obj *obj)
         You_cant("手がないので%sを折れなかった!", yname(obj));
         return ECMD_OK;
     } else if (!freehand()) {
-        Your("%s are occupied!", makeplural(body_part(HAND)));
+        Your("%sはふさがっている!", makeplural(body_part(HAND)));
         return ECMD_OK;
     } else if (ACURR(A_STR) < (is_fragile ? 5 : 10)) {
         You("%sを折る力が足りなかった!", yname(obj));

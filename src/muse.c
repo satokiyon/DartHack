@@ -1946,7 +1946,7 @@ use_offensive(struct monst *mtmp)
         }
         gm.m_using = TRUE;
         if (!Blind && !resists_blnd(&gy.youmonst)) {
-            You("are blinded by the flash of light!");
+            You("閃光で目がくらんだ!");
             make_blinded(BlindedTimeout + (long) rnd(1 + 50), FALSE);
         }
         lightdamage(otmp, TRUE, 5);

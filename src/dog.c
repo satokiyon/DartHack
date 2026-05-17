@@ -191,7 +191,7 @@ make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
             reallytame = FALSE; /* not tame after all */
             if (chance == 2) {  /* hostile (cursed figurine) */
                 if (!quietly)
-                    You("get a bad feeling about this.");
+                    You("嫌な予感がした.");
                 mtmp->mpeaceful = 0;
                 set_malign(mtmp);
             }

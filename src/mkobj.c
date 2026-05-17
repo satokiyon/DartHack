@@ -3828,7 +3828,7 @@ pudding_merge_message(struct obj *otmp, struct obj *otmp2)
             if (onfloor) {
                 You_see("床の一部が溶けるのを見た!");
             } else if (inpack) {
-                Your("pack reaches out and grabs something!");
+                Your("背嚢が伸びて何かをつかんだ!");
             }
             /* even though we can see where they should be,
              * they'll be out of our view (minvent or container)

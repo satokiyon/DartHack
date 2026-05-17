@@ -800,7 +800,7 @@ teleport_pet(struct monst *mtmp, boolean force_it)
             yelp(mtmp);
             return FALSE;
         } else {
-            Your("leash goes slack.");
+            Your("綱がゆるんだ.");
  release_it:
             m_unleash(mtmp, FALSE);
             return TRUE;
@@ -1261,14 +1261,14 @@ level_tele(void)
             display_nhwindow(WIN_MESSAGE, FALSE);
             You("cease to exist.");
             if (gi.invent)
-                Your("possessions land on the %s with a thud.",
+                 Your("持ち物が%sにどさりと落ちた.",
                      surface(u.ux, u.uy));
             svk.killer.format = NO_KILLER_PREFIX;
             Strcpy(svk.killer.name, "committed suicide");
             done(DIED);
             pline("An energized cloud of dust begins to coalesce.");
-            Your("body rematerializes%s.",
-                 gi.invent ? ", and you gather up all your possessions" : "");
+              Your("体が再実体化した%s",
+                  gi.invent ? "。そして持ち物をすべて拾い集めた." : ".");
             return;
         }
 

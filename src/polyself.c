@@ -177,9 +177,8 @@ check_strangling(boolean on)
             && can_be_strangled(&gy.youmonst)) {
             Strangled = 6L;
             disp.botl = TRUE;
-            Your("%s %s your %s!", simpleonames(uamul),
-                 was_strangled ? "still constricts" : "begins constricting",
-                 body_part(NECK)); /* "throat" */
+              Your("%sが%sを%s!", simpleonames(uamul), body_part(NECK),
+                  was_strangled ? "まだ締めつけている" : "締めつけ始めた"); /* "throat" */
             makeknown(AMULET_OF_STRANGULATION);
         }
 
@@ -452,7 +451,7 @@ newman(void)
         livelog_newform(TRUE, oldgend, newgend);
 
     if (Slimed) {
-        Your("body transforms, but there is still slime on you.");
+        Your("体は変化したが、粘液はまだ残っている。");
         make_slimed(10L, (const char *) 0);
     }
 
@@ -645,7 +644,7 @@ polyself(int psflags)
                     /* tricky phrasing; dragon scale mail is singular, dragon
                        scales are plural (note: we don't use "set of scales",
                        which usually overrides the distinction, here) */
-                    Your("%s reverts to scales as you merge with them.", buf);
+                    Your("%sは融合に伴って鱗へ戻った。", buf);
                     /* uarm->spe enchantment remains unchanged;
                        re-converting scales to mail poses risk
                        of evaporation due to over enchanting */
@@ -1168,7 +1167,7 @@ break_armor(void)
             if (otmp->lamplit)
                 end_burn(otmp, FALSE);
 
-            You("break out of your armor!");
+            You("鎧を突き破った!");
             exercise(A_STR, FALSE);
             (void) Armor_gone();
             useup(otmp);
@@ -1178,7 +1177,7 @@ break_armor(void)
             && (otmp->otyp != MUMMY_WRAPPING || !WrappingAllowed(uptr))) {
             if (otmp->otyp == MUMMY_WRAPPING) {
                 /* doesn't have a clasp to break open */
-                Your("%s tears apart!", cloak_simple_name(otmp));
+                Your("%sは引き裂けた!", cloak_simple_name(otmp));
                 (void) Cloak_off();
                 useup(otmp);
             } else if (otmp->otyp == ALCHEMY_SMOCK) {
@@ -1192,14 +1191,14 @@ break_armor(void)
             }
         }
         if (uarmu) {
-            Your("shirt rips to shreds!");
+            Your("シャツはずたずたに裂けた!");
             useup(uarmu);
         }
     } else if (sliparm(uptr)) {
         if ((otmp = uarm) != 0 && racial_exception(&gy.youmonst, otmp) < 1) {
             if (donning(otmp))
                 cancel_don();
-            Your("armor falls around you!");
+            Your("鎧は体から外れて落ちた!");
             /* [note: _gone() instead of _off() dates to when life-saving
                could force fire resisting armor back on if hero burned in
                hell (3.0, predating Gehennom); the armor isn't actually
@@ -1211,7 +1210,7 @@ break_armor(void)
             /* mummy wrapping adapts to small and very big sizes */
             && (otmp->otyp != MUMMY_WRAPPING || !WrappingAllowed(uptr))) {
             if (is_whirly(uptr))
-                Your("%s falls, unsupported!", cloak_simple_name(otmp));
+                Your("%sは支えを失って落ちた!", cloak_simple_name(otmp));
             else
                 You("shrink out of your %s!", cloak_simple_name(otmp));
             (void) Cloak_off();
@@ -1219,7 +1218,7 @@ break_armor(void)
         }
         if ((otmp = uarmu) != 0) {
             if (is_whirly(uptr))
-                You("seep right through your shirt!");
+                You("シャツをすり抜けた!");
             else
                 You("become much too small for your shirt!");
             setworn((struct obj *) 0, otmp->owornmask & W_ARMU);
@@ -1233,12 +1232,11 @@ break_armor(void)
 
                 /* Future possibilities: This could damage/destroy helmet */
                 Sprintf(hornbuf, "horn%s", plur(num_horns(uptr)));
-                Your("%s %s through %s.", hornbuf, vtense(hornbuf, "pierce"),
-                     yname(otmp));
+                 Your("%sが%sを%s。", hornbuf, yname(otmp), "突き破った");
             } else {
                 if (donning(otmp))
                     cancel_don();
-                Your("%s falls to the %s!", helm_simple_name(otmp),
+                 Your("%sは%sへ落ちた!", helm_simple_name(otmp),
                      surface(u.ux, u.uy));
                 (void) Helmet_off();
                 dropp(otmp);
@@ -1257,14 +1255,14 @@ break_armor(void)
             dropp(otmp);
         }
         if ((otmp = uarms) != 0) {
-            You("can no longer hold your shield!");
+            You("盾を持てなくなった!");
             (void) Shield_off();
             dropp(otmp);
         }
         if ((otmp = uarmh) != 0) {
             if (donning(otmp))
                 cancel_don();
-            Your("%s falls to the %s!", helm_simple_name(otmp),
+              Your("%sは%sへ落ちた!", helm_simple_name(otmp),
                  surface(u.ux, u.uy));
             (void) Helmet_off();
             dropp(otmp);
@@ -1276,10 +1274,10 @@ break_armor(void)
             if (donning(otmp))
                 cancel_don();
             if (is_whirly(uptr))
-                Your("boots fall away!");
+                Your("ブーツは外れて落ちた!");
             else
-                Your("boots %s off your feet!",
-                     verysmall(uptr) ? "slide" : "are pushed");
+                 Your("ブーツは足から%s!",
+                     verysmall(uptr) ? "滑り落ちた" : "押し出された");
             (void) Boots_off();
             dropp(otmp);
         }
@@ -1294,7 +1292,7 @@ break_armor(void)
 
         if (!strncmp(eyewear, "pair of ", l = 8)) /* lenses */
             eyewear += l;
-        Your("%s %s off!", eyewear, vtense(eyewear, "fall"));
+        Your("%sは外れ落ちた!", eyewear);
         (void) Blindf_off((struct obj *) 0); /* Null: skip usual off mesg */
         dropp(otmp);
     }
@@ -1379,7 +1377,7 @@ rehumanize(void)
                be wearing an amulet of life-saving */
             return; /* don't rehumanize after all */
         } else if (uamul && uamul->otyp == AMULET_OF_UNCHANGING) {
-            Your("%s %s!", simpleonames(uamul), otense(uamul, "fail"));
+            Your("%sは効かなかった!", simpleonames(uamul));
             observe_object(uamul);
             makeknown(AMULET_OF_UNCHANGING);
         }
@@ -1397,7 +1395,7 @@ rehumanize(void)
     if (u.uhp < 1) {
         /* can only happen if some bit of code reduces u.uhp
            instead of u.mh while poly'd */
-        Your("old form was not healthy enough to survive.");
+        Your("元の姿は生き延びるには健全ではなかった。");
         Sprintf(svk.killer.name, "reverting to unhealthy %s form",
                 gu.urace.adj);
         svk.killer.format = KILLED_BY;
@@ -1427,7 +1425,7 @@ dobreathe(void)
         return ECMD_OK;
     }
     if (u.uen < 15) {
-        You("don't have enough energy to breathe!");
+        You("呼吸するだけのエネルギーがなかった!");
         return ECMD_OK;
     }
     u.uen -= 15;
@@ -1486,7 +1484,7 @@ doremove(void)
                       surface(u.ux, u.uy));
             return ECMD_OK;
         }
-        You("are not chained to anything!");
+        You("何にも鎖でつながれていなかった!");
         return ECMD_OK;
     }
     unpunish();
@@ -1546,7 +1544,7 @@ dospinweb(void)
         return ECMD_OK;
     }
     if (u.utrap) {
-        You("cannot spin webs while stuck in a trap.");
+        You("罠にはまっている間は蜘蛛の巣を張れなかった.");
         return ECMD_OK;
     }
     exercise(A_DEX, TRUE);
@@ -1568,10 +1566,10 @@ dospinweb(void)
         case LEVEL_TELEP:
         case MAGIC_PORTAL:
         case VIBRATING_SQUARE:
-            Your("webbing vanishes!");
+            Your("蜘蛛の巣は消え去った!");
             return ECMD_OK;
         case WEB:
-            You("make the web thicker.");
+            You("蜘蛛の巣を厚くした.");
             return ECMD_TIME;
         case HOLE:
         case TRAPDOOR:
@@ -1596,7 +1594,7 @@ dospinweb(void)
         case MAGIC_TRAP:
         case ANTI_MAGIC:
         case POLY_TRAP:
-            You("have triggered a trap!");
+            You("罠を作動させた!");
             dotrap(ttmp, NO_TRAP_FLAGS);
             return ECMD_TIME;
         default:
@@ -1605,8 +1603,8 @@ dospinweb(void)
         }
     } else if (On_stairs(x, y)) {
         /* cop out: don't let them hide the stairs */
-        Your("web fails to impede access to the %s.",
-             (levl[x][y].typ == STAIRS) ? "stairs" : "ladder");
+           Your("蜘蛛の巣では%sへの通行を妨げられなかった。",
+               (levl[x][y].typ == STAIRS) ? "階段" : "梯子");
         return ECMD_TIME;
     }
     ttmp = maketrap(x, y, WEB);
@@ -1706,7 +1704,7 @@ dogaze(void)
                  */
                 if (adtyp == AD_CONF) {
                     if (!mtmp->mconf)
-                        Your("gaze confuses %s!", mon_nam(mtmp));
+                        Your("視線で%sを混乱させた!", mon_nam(mtmp));
                     else
                         pline("%s is getting more and more confused.",
                               Monnam(mtmp));
@@ -1957,7 +1955,7 @@ skinback(boolean silently)
         int old_light = arti_light_radius(uskin);
 
         if (!silently)
-            Your("skin returns to its original form.");
+            Your("皮膚は元の姿に戻った。");
         uarm = uskin;
         uskin = (struct obj *) 0;
         /* undo save/restore hack */

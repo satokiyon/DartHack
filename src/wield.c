@@ -775,8 +775,7 @@ can_twoweapon(void)
         if (!uwep && !uswapwep)
             hand_s = makeplural(hand_s);
         /* "your hands are empty" or "your {left|right} hand is empty" */
-        Your("%s%s %s empty.", uwep ? "left " : uswapwep ? "right " : "",
-             hand_s, vtense(hand_s, "are"));
+        Your("%s%sが空だった.", uwep ? "左" : uswapwep ? "右" : "", hand_s);
     } else if (!TWOWEAPOK(uwep) || !TWOWEAPOK(uswapwep)) {
         otmp = !TWOWEAPOK(uwep) ? uwep : uswapwep;
         pline("%s %s suitable %s weapon%s.", Yname2(otmp),
@@ -826,7 +825,8 @@ drop_uswapwep(void)
     else
         /* already two-weaponing but can't anymore because uswapwep has
            become cursed */
-        Your("%s spasms and drops %s!", left_hand, yobjnam(obj, (char *) 0));
+          Your("%sがけいれんし、%sを落とした!", left_hand,
+                 yobjnam(obj, (char *) 0));
     dropx(obj);
 }
 
@@ -951,8 +951,8 @@ chwepon(struct obj *otmp, int amount)
     if (uwep->otyp == WORM_TOOTH && amount >= 0) {
         multiple = (uwep->quan > 1L);
         /* order: message, transformation, shop handling */
-        Your("%s %s much sharper now.", simpleonames(uwep),
-             multiple ? "fuse, and become" : "is");
+           Your("%sが%sさらに鋭くなった.", simpleonames(uwep),
+               multiple ? "融合して" : "");
         uwep->otyp = CRYSKNIFE;
         uwep->oerodeproof = 0;
         if (multiple) {
@@ -972,8 +972,8 @@ chwepon(struct obj *otmp, int amount)
     } else if (uwep->otyp == CRYSKNIFE && amount < 0) {
         multiple = (uwep->quan > 1L);
         /* order matters: message, shop handling, transformation */
-        Your("%s %s much duller now.", simpleonames(uwep),
-             multiple ? "fuse, and become" : "is");
+           Your("%sが%sずっと鈍くなった.", simpleonames(uwep),
+               multiple ? "融合して" : "");
         costly_alteration(uwep, COST_DEGRD); /* DECHNT? other? */
         uwep->otyp = WORM_TOOTH;
         uwep->oerodeproof = 0;
@@ -1034,8 +1034,8 @@ chwepon(struct obj *otmp, int amount)
      * spe dependent.  Give an obscure clue here.
      */
     if (u_wield_art(ART_MAGICBANE) && uwep->spe >= 0) {
-        Your("right %s %sches!", body_part(HAND),
-             (((amount > 1) && (uwep->spe > 1)) ? "flin" : "it"));
+           Your("右%sが%s.", body_part(HAND),
+               (((amount > 1) && (uwep->spe > 1)) ? "ひきつった" : "かゆくなった"));
     }
 
     /* an elven magic clue, cookie@keebler */

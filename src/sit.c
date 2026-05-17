@@ -27,7 +27,7 @@ take_gold(void)
     if (!lost_money) {
         You_feel("奇妙な感覚を覚えた.");
     } else {
-        You("notice you have no gold!");
+        You("金がないことに気づいた!");
         disp.botl = TRUE;
     }
 }
@@ -155,7 +155,7 @@ throne_sit_effect(void)
             } else {
                 /* avoid "vision clears" if hero can't see */
                 if (!Blind) {
-                    Your("vision becomes clear.");
+                    Your("視界は澄んだ.");
                 } else {
                     int num_of_eyes = eyecount(gy.youmonst.data);
                     const char *eye = body_part(EYE);
@@ -170,10 +170,10 @@ throne_sit_effect(void)
                         FALLTHROUGH;
                         /*FALLTHRU*/
                     case 1: /* one eye (Cyclops, floating eye) */
-                        Your("%s %s...", eye, vtense(eye, "tingle"));
+                        Your("%sがむずむずした...", eye);
                         break;
                     case 0: /* no eyes */
-                        You("have a very strange feeling in your %s.",
+                        You("%sに非常に奇妙な感覚を覚えた.",
                             body_part(HEAD));
                         break;
                     }
@@ -192,14 +192,14 @@ throne_sit_effect(void)
             }
             break;
         case 12:
-            You("are granted an insight!");
+            You("洞察を授かった!");
             if (gi.invent) {
                 /* rn2(5) agrees w/seffects() */
                 identify_pack(rn2(5), FALSE);
             }
             break;
         case 13:
-            Your("mind turns into a pretzel!");
+            Your("思考がこんがらがった!");
             make_confused((HConfusion & TIMEOUT) + (long) rn1(7, 16),
                           FALSE);
             break;
@@ -360,13 +360,13 @@ lay_an_egg(void)
     struct obj *uegg;
 
     if (!flags.female) {
-        pline("%s can't lay eggs!",
+          pline("%sは卵を産めない!",
               Hallucination
-              ? "You may think you are a platypus, but a male still"
-              : "Males");
+              ? "カモノハシだと思っているかもしれないが、雄には"
+              : "雄には");
         return ECMD_OK;
     } else if (u.uhunger < (int) objects[EGG].oc_nutrition) {
-        You("don't have enough energy to lay an egg.");
+        You("卵を産むだけのエネルギーがなかった.");
         return ECMD_OK;
     } else if (eggs_in_water(gy.youmonst.data)) {
         if (!(Underwater || Is_waterlevel(&u.uz))) {
@@ -376,7 +376,7 @@ lay_an_egg(void)
         if (Upolyd
             && (gy.youmonst.data == &mons[PM_GIANT_EEL]
                 || gy.youmonst.data == &mons[PM_ELECTRIC_EEL])) {
-            You("yearn for the Sargasso Sea.");
+            You("サルガッソー海に思いを馳せた.");
             return ECMD_OK;
         }
     }
@@ -388,7 +388,7 @@ lay_an_egg(void)
     set_corpsenm(uegg, egg_type_from_parent(u.umonnum, FALSE));
     uegg->known = 1;
     observe_object(uegg);
-    You("%s an egg.", eggs_in_water(gy.youmonst.data) ? "spawn" : "lay");
+    You("卵を%s.", eggs_in_water(gy.youmonst.data) ? "産みつけた" : "産んだ");
     dropy(uegg);
     stackobj(uegg);
     morehungry((int) objects[EGG].oc_nutrition);
@@ -399,12 +399,12 @@ lay_an_egg(void)
 int
 dosit(void)
 {
-    static const char sit_message[] = "sit on the %s.";
+    static const char sit_message[] = "%sの上に座った.";
     struct trap *trap = t_at(u.ux, u.uy);
     int typ = levl[u.ux][u.uy].typ;
 
     if (u.usteed) {
-        You("are already sitting on %s.", mon_nam(u.usteed));
+        You("すでに%sに乗っている.", mon_nam(u.usteed));
         return ECMD_OK;
     }
     if (u.uundetected && is_hider(gy.youmonst.data)
@@ -415,7 +415,7 @@ dosit(void)
         if (u.uswallow)
             There("are no seats in here!");
         else if (Levitation)
-            You("tumble in place.");
+            You("その場でひっくり返った.");
         else
             You("気がごみだ。");
         return ECMD_OK;
@@ -441,16 +441,16 @@ dosit(void)
 
         obj = svl.level.objects[u.ux][u.uy];
         if (gy.youmonst.data->mlet == S_DRAGON && obj->oclass == COIN_CLASS) {
-            You("coil up around your %shoard.",
+            You("%s宝の山を囲んで巻きついた.",
                 (obj->quan + money_cnt(gi.invent) < u.ulevel * 1000)
-                ? "meager " : "");
+                ? "わずかな" : "");
         } else if (obj->otyp == TOWEL) {
             pline("It's probably not a good time for a picnic...");
         } else {
             if (slithy(gy.youmonst.data))
-                You("coil up around %s.", the(xname(obj)));
+                You("%sを囲んで巻きついた.", the(xname(obj)));
             else
-                You("sit on %s.", the(xname(obj)));
+                You("%sの上に座った.", the(xname(obj)));
             if (obj->otyp == CORPSE && amorphous(&mons[obj->corpsenm]))
                 pline("たとうやぐら。");
             else if (obj->otyp == CREAM_PIE) {
@@ -472,19 +472,19 @@ dosit(void)
                 u.utrap++;
             } else if (u.utraptype == TT_PIT) {
                 if (trap && trap->ttyp == SPIKED_PIT) {
-                    You("sit down on a spike.  Ouch!");
+                    You("とげの上に座ってしまった。いたっ!");
                     losehp(Half_physical_damage ? rn2(2) : 1,
                            "sitting on an iron spike", KILLED_BY);
                     exercise(A_STR, FALSE);
                 } else
-                    You("sit down in the pit.");
+                    You("落とし穴の中に座った.");
                 u.utrap += rn2(5);
             } else if (u.utraptype == TT_WEB) {
-                You("sit in the spider web and get entangled further!");
+                You("蜘蛛の巣の中に座り、さらにからまってしまった!");
                 u.utrap += rn1(10, 5);
             } else if (u.utraptype == TT_LAVA) {
                 /* Must have fire resistance or they'd be dead already */
-                You("sit in the %s!", hliquid("lava"));
+                You("%sの中に座った!", hliquid("lava"));
                 if (Slimed)
                     burn_away_slime();
                 u.utrap += rnd(4);
@@ -499,7 +499,7 @@ dosit(void)
             /* when flying, "you land" might need some refinement; it sounds
                as if you're staying on the ground but you will immediately
                take off again unless you become stuck in a holding trap */
-            You("%s.", Flying ? "land" : "sit down");
+            You("%s.", Flying ? "着地した" : "座り込んだ");
             dotrap(trap, VIASITTING);
         }
     } else if ((Underwater || Is_waterlevel(&u.uz))
@@ -507,10 +507,10 @@ dosit(void)
         if (Is_waterlevel(&u.uz))
             There("are no cushions floating nearby.");
         else
-            You("sit down on the muddy bottom.");
+            You("泥だらけの底に座った.");
     } else if (is_pool(u.ux, u.uy) && !eggs_in_water(gy.youmonst.data)) {
  in_water:
-        You("sit in the %s.", hliquid("water"));
+        You("%sの中に座った.", hliquid("water"));
         if (Upolyd && u.umonnum == PM_GREMLIN) {
             if (split_mon(&gy.youmonst, (struct monst *) 0)) {
                 if (levl[u.ux][u.uy].typ == FOUNTAIN)
@@ -524,37 +524,37 @@ dosit(void)
                 (void) water_damage(uarm, "armor", TRUE);
         }
     } else if (IS_SINK(typ)) {
-        You(sit_message, defsyms[S_sink].explanation);
-        Your("%s gets wet.",
-             humanoid(gy.youmonst.data) ? "rump" : "underside");
+          You("流しの上に座った.");
+              Your("%sが濡れた.",
+               humanoid(gy.youmonst.data) ? "尻" : "腹側");
     } else if (IS_ALTAR(typ)) {
-        You(sit_message, defsyms[S_altar].explanation);
+        You("祭壇の上に座った.");
         altar_wrath(u.ux, u.uy);
     } else if (IS_GRAVE(typ)) {
-        You(sit_message, defsyms[S_grave].explanation);
+        You("墓の上に座った.");
     } else if (typ == STAIRS) {
-        You(sit_message, "stairs");
+        You("階段の上に座った.");
     } else if (typ == LADDER) {
-        You(sit_message, "ladder");
+        You("梯子の上に座った.");
     } else if (is_lava(u.ux, u.uy)) {
         /* must be WWalking */
-        You(sit_message, hliquid("lava"));
+        You("%sの上に座った.", hliquid("lava"));
         burn_away_slime();
         if (likes_lava(gy.youmonst.data)) {
-            pline_The("%s feels warm.", hliquid("lava"));
+            pline("%sは温かかった.", hliquid("lava"));
             return ECMD_TIME;
         }
-        pline_The("%s burns you!", hliquid("lava"));
+        pline("%sがあなたを焼いた!", hliquid("lava"));
         losehp(d((Fire_resistance ? 2 : 10), 10), /* lava damage */
                "sitting on lava", KILLED_BY);
     } else if (is_ice(u.ux, u.uy)) {
-        You(sit_message, defsyms[S_ice].explanation);
+        You("氷の上に座った.");
         if (!Cold_resistance)
-            pline_The("ice feels cold.");
+            pline("氷は冷たかった.");
     } else if (typ == DRAWBRIDGE_DOWN) {
-        You(sit_message, "drawbridge");
+        You("跳ね橋の上に座った.");
     } else if (IS_THRONE(typ)) {
-        You(sit_message, defsyms[S_throne].explanation);
+        You("玉座の上に座った.");
         throne_sit_effect();
     } else if (lays_eggs(gy.youmonst.data)) {
         return lay_an_egg();
@@ -678,7 +678,7 @@ attrcurse(void)
             HTelepat &= ~INTRINSIC;
             if (Blind && !Blind_telepat)
                 see_monsters(); /* Can't sense mons anymore! */
-            Your("senses fail!");
+            Your("感覚が鈍った!");
             ret = TELEPAT;
             break;
         }

@@ -298,13 +298,13 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
                things this way, entering the new pit below
                will override current trap anyway, but too
                late to get Lev and Fly handling. */
-            Your("chain breaks!");
+            Your("鎖が切れた!");
             reset_utrap(TRUE);
         }
         if (Levitation || Flying || is_clinger(gy.youmonst.data)) {
             if (!tu_pit) { /* no pit here previously */
                 pline("A chasm opens up under you!");
-                You("don't fall in!");
+                You("落ちなかった!");
             }
         } else if (!tu_pit || !u.utrap || u.utraptype != TT_PIT) {
             /* no pit here previously, or you were
@@ -320,7 +320,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
                      && (!(rnl(Role_if(PM_ARCHEOLOGIST) ? 3 : 9))
                          || ((ACURR(A_DEX) > 7) && rn2(5))));
 
-            You("are jostled around violently!");
+            You("激しく揺さぶられた!");
             set_utrap(rn1(6, 2), TT_PIT);
             losehp(Maybe_Half_Phys(rnd(keepfooting ? 2 : 4)),
                    "hurt in a chasm", NO_KILLER_PREFIX);

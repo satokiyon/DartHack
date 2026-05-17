@@ -454,7 +454,7 @@ mcast_destroy_armor(void)
         monstseesu(M_SEEN_MAGR);
         pline("力場があなたを包んだ!");
     } else if (!destroy_arm()) {
-        Your("skin itches.");
+        Your("肌がかゆくなった.");
     } else {
         /* monsters only realize you aren't magic-protected if armor is
            actually destroyed */
@@ -612,11 +612,11 @@ mcast_psi_bolt(int dmg)
     if (dmg <= 5)
         You("%sが少し痛んだ.", body_part(HEAD));
     else if (dmg <= 10)
-        Your("brain is on fire!");
+        Your("脳が焼けつくように痛んだ!");
     else if (dmg <= 20)
-        Your("%s suddenly aches painfully!", body_part(HEAD));
+        Your("%sが突然激しく痛んだ!", body_part(HEAD));
     else
-        Your("%s suddenly aches very painfully!", body_part(HEAD));
+        Your("%sが突然ものすごく痛んだ!", body_part(HEAD));
     return dmg;
 }
 
@@ -631,13 +631,13 @@ mcast_open_wounds(int dmg)
         monstunseesu(M_SEEN_MAGR);
     }
     if (dmg <= 5)
-        Your("skin itches badly for a moment.");
+        Your("肌が一瞬ひどくかゆくなった.");
     else if (dmg <= 10)
         pline("体に傷が現れた!");
     else if (dmg <= 20)
         pline("体にひどい傷が現れた!");
     else
-        Your("body is covered with painful wounds!");
+        Your("全身が痛む傷で覆われた!");
     return dmg;
 }
 

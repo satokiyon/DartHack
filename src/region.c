@@ -1111,7 +1111,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
         if (m_poisongas_ok(&gy.youmonst) == M_POISONGAS_OK)
             return FALSE;
         if (!Blind) {
-            Your("%s sting.", makeplural(body_part(EYE)));
+            Your("%sが痛んだ.", makeplural(body_part(EYE)));
             make_blinded(1L, FALSE);
         }
         if (!Poison_resistance) {

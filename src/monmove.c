@@ -366,7 +366,7 @@ release_hero(struct monst *mon)
             expels(mon, mon->data, TRUE);
         } else if (!sticks(gy.youmonst.data)) {
             unstuck(mon); /* let go */
-            You("get released!");
+            You("放された!");
         }
     }
 }

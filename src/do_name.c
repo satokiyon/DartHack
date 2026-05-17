@@ -205,7 +205,7 @@ do_mgivenname(void)
     boolean do_swallow = FALSE;
 
     if (Hallucination) {
-        You("would never recognize it anyway.");
+        You("どうせ認識できないだろう.");
         return;
     }
     cc.x = u.ux;
@@ -577,10 +577,10 @@ docallcmd(void)
             (void) xname(obj);
 
             if (!obj->dknown) {
-                You("would never recognize another one.");
+                You("別のものをもう一度認識できるわけがなかった.");
 #if 0
             } else if (call_ok(obj) == GETOBJ_EXCLUDE) {
-                You("know those as well as you ever will.");
+                You("それについてはすでに十分知っている.");
 #endif
             } else {
                 docall(obj);
