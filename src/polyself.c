@@ -451,7 +451,7 @@ newman(void)
         livelog_newform(TRUE, oldgend, newgend);
 
     if (Slimed) {
-        Your("体は変化したが、粘液はまだ残っている。");
+        Your("体は変化したが、粘液はまだ残っている.");
         make_slimed(10L, (const char *) 0);
     }
 
@@ -480,7 +480,7 @@ polyself(int psflags)
             controllable_poly = Polymorph_control && !(Stunned || Unaware);
 
     if (Unchanging) {
-        You("fail to transform!");
+        You("変身に失敗した!");
         return;
     }
     /* being Stunned|Unaware doesn't negate this aspect of Poly_control */
@@ -635,7 +635,7 @@ polyself(int psflags)
                 /* allow G_EXTINCT */
                 if (Is_dragon_scales(uarm)) {
                     /* dragon scales remain intact as uskin */
-                    You("merge with your scaly armor.");
+                    You("鱗の鎧と融合した.");
                 } else { /* dragon scale mail reverts to scales */
                     /* similar to noarmor(invent.c),
                        shorten to "<color> scale mail" */
@@ -644,7 +644,7 @@ polyself(int psflags)
                     /* tricky phrasing; dragon scale mail is singular, dragon
                        scales are plural (note: we don't use "set of scales",
                        which usually overrides the distinction, here) */
-                    Your("%sは融合に伴って鱗へ戻った。", buf);
+                    Your("%sは融合に伴って鱗へ戻った.", buf);
                     /* uarm->spe enchantment remains unchanged;
                        re-converting scales to mail poses risk
                        of evaporation due to over enchanting */
@@ -836,7 +836,7 @@ polymon(int mntmp)
     }
     if (Sick_resistance && Sick) {
         make_sick(0L, (char *) 0, FALSE, SICK_ALL);
-        You("no longer feel sick.");
+        You("もう気分は悪くなかった.");
     }
     if (Slimed) {
         if (flaming(gy.youmonst.data)) {
@@ -989,10 +989,10 @@ polymon(int mntmp)
     if (amorphous(gy.youmonst.data) || is_whirly(gy.youmonst.data)
         || unsolid(gy.youmonst.data)) {
         if (Punished) {
-            You("slip out of the iron chain.");
+            You("鉄の鎖からすり抜けた.");
             unpunish();
         } else if (u.utrap && u.utraptype == TT_BURIEDBALL) {
-            You("slip free of the buried ball and chain.");
+            You("埋まった鉄球と鎖からすり抜けた.");
             buried_ball_to_freedom();
         }
     }
@@ -1001,13 +1001,13 @@ polymon(int mntmp)
             || unsolid(gy.youmonst.data)
             || (gy.youmonst.data->msize <= MZ_SMALL
                 && u.utraptype == TT_BEARTRAP))) {
-        You("are no longer stuck in the %s.",
+        You("もう%sにはまっていなかった.",
             u.utraptype == TT_WEB ? "web" : "bear trap");
         /* probably should burn webs too if PM_FIRE_ELEMENTAL */
         reset_utrap(TRUE);
     }
     if (webmaker(gy.youmonst.data) && u.utrap && u.utraptype == TT_WEB) {
-        You("orient yourself on the web.");
+        You("蜘蛛の巣の上で体勢を立て直した.");
         reset_utrap(TRUE);
     }
     check_strangling(TRUE); /* maybe start strangling */
@@ -1220,7 +1220,7 @@ break_armor(void)
             if (is_whirly(uptr))
                 You("シャツをすり抜けた!");
             else
-                You("become much too small for your shirt!");
+                You("シャツには大きさが合わなくなった!");
             setworn((struct obj *) 0, otmp->owornmask & W_ARMU);
             dropp(otmp);
         }
@@ -1232,7 +1232,7 @@ break_armor(void)
 
                 /* Future possibilities: This could damage/destroy helmet */
                 Sprintf(hornbuf, "horn%s", plur(num_horns(uptr)));
-                 Your("%sが%sを%s。", hornbuf, yname(otmp), "突き破った");
+                 Your("%sが%sを%s.", hornbuf, yname(otmp), "突き破った");
             } else {
                 if (donning(otmp))
                     cancel_don();
@@ -1395,7 +1395,7 @@ rehumanize(void)
     if (u.uhp < 1) {
         /* can only happen if some bit of code reduces u.uhp
            instead of u.mh while poly'd */
-        Your("元の姿は生き延びるには健全ではなかった。");
+        Your("元の姿は生き延びるには健全ではなかった.");
         Sprintf(svk.killer.name, "reverting to unhealthy %s form",
                 gu.urace.adj);
         svk.killer.format = KILLED_BY;
@@ -1503,12 +1503,12 @@ dospinweb(void)
        webmaker and a flyer, but with the advent of amulet of flying that
        became a possibility; at present hero can spin a web while flying] */
     if (Levitation || reject_terrain) {
-        You("must be on %s ground to spin a web.",
-            reject_terrain ? "solid" : "the");
+        You("蜘蛛の巣を張るには%s地面にいる必要があった.",
+            reject_terrain ? "しっかりした" : "その");
         return ECMD_OK;
     }
     if (u.uswallow) {
-        You("release web fluid inside %s.", mon_nam(u.ustuck));
+        You("%sの中で蜘蛛の糸を吐き出した.", mon_nam(u.ustuck));
         if (is_animal(u.ustuck->data)) {
             expels(u.ustuck, u.ustuck->data, TRUE);
             return ECMD_OK;
@@ -1552,7 +1552,7 @@ dospinweb(void)
         switch (ttmp->ttyp) {
         case PIT:
         case SPIKED_PIT:
-            You("spin a web, covering up the pit.");
+            You("蜘蛛の巣を張って落とし穴を塞いだ.");
             deltrap(ttmp);
             bury_objs(x, y);
             newsym(x, y);
@@ -1573,13 +1573,13 @@ dospinweb(void)
             return ECMD_TIME;
         case HOLE:
         case TRAPDOOR:
-            You("web over the %s.",
+            You("%sを蜘蛛の巣で塞いだ.",
                 (ttmp->ttyp == TRAPDOOR) ? "trap door" : "hole");
             deltrap(ttmp);
             newsym(x, y);
             return ECMD_TIME;
         case ROLLING_BOULDER_TRAP:
-            You("spin a web, jamming the trigger.");
+            You("蜘蛛の巣を張って仕掛けを詰まらせた.");
             deltrap(ttmp);
             newsym(x, y);
             return ECMD_TIME;
@@ -1603,13 +1603,13 @@ dospinweb(void)
         }
     } else if (On_stairs(x, y)) {
         /* cop out: don't let them hide the stairs */
-           Your("蜘蛛の巣では%sへの通行を妨げられなかった。",
+           Your("蜘蛛の巣では%sへの通行を妨げられなかった.",
                (levl[x][y].typ == STAIRS) ? "階段" : "梯子");
         return ECMD_TIME;
     }
     ttmp = maketrap(x, y, WEB);
     if (ttmp) {
-        You("spin a web.");
+        You("蜘蛛の巣を張った.");
         ttmp->madeby_u = 1;
         feeltrap(ttmp);
         if (*in_rooms(x, y, SHOPBASE))
@@ -1623,16 +1623,16 @@ dosummon(void)
 {
     int placeholder;
     if (u.uen < 10) {
-        You("lack the energy to send forth a call for help!");
+        You("助けを呼ぶ力が足りなかった!");
         return ECMD_OK;
     }
     u.uen -= 10;
     disp.botl = TRUE;
 
-    You("call upon your brethren for help!");
+    You("仲間に助けを求めた!");
     exercise(A_WIS, TRUE);
     if (!were_summon(gy.youmonst.data, TRUE, &placeholder, (char *) 0))
-        pline("But none arrive.");
+        pline("だが、誰も来なかった.");
     return ECMD_TIME;
 }
 
@@ -1664,7 +1664,7 @@ dogaze(void)
         return ECMD_OK;
     }
     if (u.uen < 15) {
-        You("lack the energy to use your special gaze!");
+        You("特殊な視線を使う力が足りなかった!");
         return ECMD_OK;
     }
     u.uen -= 15;
@@ -1676,7 +1676,7 @@ dogaze(void)
         if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)) {
             looked++;
             if (Invis && !perceives(mtmp->data)) {
-                pline("%s seems not to notice your gaze.", Monnam(mtmp));
+                pline("%sはあなたの視線に気づかないようだ.", Monnam(mtmp));
             } else if (mtmp->minvis && !See_invisible) {
                 You_cant("%sをどこで見つめるのか見えなかった。", Monnam(mtmp));
             } else if (M_AP_TYPE(mtmp) == M_AP_FURNITURE
@@ -1684,12 +1684,12 @@ dogaze(void)
                 looked--;
                 continue;
             } else if (flags.safe_dog && mtmp->mtame && !Confusion) {
-                You("avoid gazing at %s.", y_monnam(mtmp));
+                You("%sを見つめるのを避けた.", y_monnam(mtmp));
             } else {
                 if (flags.confirm && mtmp->mpeaceful && !Confusion) {
-                    Sprintf(qbuf, "Really %s %s?",
-                            (adtyp == AD_CONF) ? "confuse" : "attack",
-                            mon_nam(mtmp));
+                    Sprintf(qbuf, "本当に%sを%sする?",
+                            mon_nam(mtmp),
+                            (adtyp == AD_CONF) ? "混乱" : "攻撃");
                     if (y_n(qbuf) != 'y')
                         continue;
                 }
@@ -1706,15 +1706,15 @@ dogaze(void)
                     if (!mtmp->mconf)
                         Your("視線で%sを混乱させた!", mon_nam(mtmp));
                     else
-                        pline("%s is getting more and more confused.",
+                        pline("%sはますます混乱した.",
                               Monnam(mtmp));
                     mtmp->mconf = 1;
                 } else if (adtyp == AD_FIRE) {
                     int dmg = d(2, 6), orig_dmg = dmg, lev = (int) u.ulevel;
 
-                    You("attack %s with a fiery gaze!", mon_nam(mtmp));
+                    You("炎の視線で%sを攻撃した!", mon_nam(mtmp));
                     if (resists_fire(mtmp)) {
-                        pline_The("fire doesn't burn %s!", mon_nam(mtmp));
+                        pline_The("炎は%sを燃やせなかった!", mon_nam(mtmp));
                         dmg = 0;
                     }
                     if (lev > rn2(20)) {
@@ -1734,7 +1734,7 @@ dogaze(void)
 
                 if (mtmp->data == &mons[PM_FLOATING_EYE] && !mtmp->mcan) {
                     if (!Free_action) {
-                        You("are frozen by %s gaze!",
+                        You("%sの視線で凍りついた!",
                             s_suffix(mon_nam(mtmp)));
                         nomul((u.ulevel > 6 || rn2(4))
                                   ? -d((int) mtmp->m_lev + 1,
@@ -1744,7 +1744,7 @@ dogaze(void)
                         gn.nomovemsg = 0;
                         return ECMD_TIME;
                     } else
-                        You("stiffen momentarily under %s gaze.",
+                        You("%sの視線で一瞬体がこわばった.",
                             s_suffix(mon_nam(mtmp)));
                 }
                 /* Technically this one shouldn't affect you at all because
@@ -1753,7 +1753,7 @@ dogaze(void)
                  * effect would be too weird.
                  */
                 if (mtmp->data == &mons[PM_MEDUSA] && !mtmp->mcan) {
-                    pline("Gazing at the awake %s is not a very good idea.",
+                    pline("目覚めた%sを見つめるのは得策ではなかった.",
                           l_monnam(mtmp));
                     /* as if gazing at a sleeping anything is fruitful... */
                     urgent_pline("You turn to stone...");
@@ -1766,7 +1766,7 @@ dogaze(void)
         }
     }
     if (!looked)
-        You("gaze at no place in particular.");
+        You("特に何もない場所を見つめた.");
     return ECMD_TIME;
 }
 
@@ -1895,13 +1895,13 @@ domindblast(void)
     int dmg;
 
     if (u.uen < 10) {
-        You("concentrate but lack the energy to maintain doing so.");
+        You("集中しようとしたが、維持する力が足りなかった.");
         return ECMD_OK;
     }
     u.uen -= 10;
     disp.botl = TRUE;
 
-    You("concentrate.");
+    You("集中した.");
     pline("A wave of psychic energy pours out.");
     for (mtmp = fmon; mtmp; mtmp = nmon) {
         int u_sen;
@@ -1955,7 +1955,7 @@ skinback(boolean silently)
         int old_light = arti_light_radius(uskin);
 
         if (!silently)
-            Your("皮膚は元の姿に戻った。");
+            Your("皮膚は元の姿に戻った.");
         uarm = uskin;
         uskin = (struct obj *) 0;
         /* undo save/restore hack */

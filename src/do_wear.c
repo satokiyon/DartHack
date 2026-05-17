@@ -1143,7 +1143,7 @@ Amulet_off(void)
             Strangled = 0L;
             disp.botl = TRUE;
             if (Breathless)
-                Your("%sを絞められていない。", body_part(NECK));
+                Your("%sを絞められていない.", body_part(NECK));
             else
                 You("息がずっと楽になった!");
             mkn = TRUE;
@@ -1401,7 +1401,7 @@ Ring_off_or_gone(struct obj *obj, boolean gone)
     case RIN_INVISIBILITY:
         if (!Invis && !BInvis && !Blind) {
             newsym(u.ux, u.uy);
-            Your("体が晴れが戻った%s。",
+            Your("体が%s見えるようになった.",
                  See_invisible ? "完全に" : "模糊的に");
             learnring(obj, TRUE);
         }
@@ -2125,14 +2125,14 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
                        || u.utraptype == TT_BURIEDBALL)) {
             if (u.utraptype == TT_BEARTRAP) {
                 if (noisy)
-                    Your("%sが引っかかっている。", body_part(FOOT));
+                    Your("%sが引っかかっている.", body_part(FOOT));
             } else if (u.utraptype == TT_INFLOOR || u.utraptype == TT_LAVA) {
                 if (noisy)
-                    Your("%sが%sに螺め込まれた。",
+                    Your("%sが%sに引っかかっている!",
                          makeplural(body_part(FOOT)), surface(u.ux, u.uy));
             } else { /*TT_BURIEDBALL*/
                 if (noisy)
-                    Your("%sが埋わった鼓に統かれている。",
+                    Your("%sは埋まった鉄球につながれている!",
                          body_part(LEG));
             }
             err++;
@@ -2152,7 +2152,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
             /* prevent slippery bare fingers from transferring to
                gloved fingers */
             if (noisy)
-                Your("%sが満艦して%sを着りにくい。",
+                Your("%sは滑りすぎて%sをはめられない.",
                      fingers_or_gloves(FALSE), gloves_simple_name(otmp));
             err++;
         } else
@@ -2185,7 +2185,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
             err++;
         } else if (uarm) {
             if (noisy)
-                already_wearing("some armor");
+                already_wearing("鎧");
             err++;
         } else
             *mask = W_ARM;
@@ -2291,7 +2291,7 @@ accessory_or_armor_on(struct obj *obj)
             }
             if (uarmg && Glib) {
                 Your(
-              "%s are too slippery to remove, so you cannot put on the ring.",
+                            "%sは滑りすぎて外せないため、指輪をはめられなかった.",
                      gloves_simple_name(uarmg));
                 return ECMD_TIME; /* always uses move */
             }
@@ -2320,7 +2320,7 @@ accessory_or_armor_on(struct obj *obj)
             }
         } else if (amulet) {
             if (uamul) {
-                already_wearing("an amulet");
+                already_wearing("アミュレット");
                 return ECMD_OK;
             }
         } else if (eyewear) {
@@ -2331,18 +2331,18 @@ accessory_or_armor_on(struct obj *obj)
 
             if (ublindf) {
                 if (ublindf->otyp == TOWEL)
-                    Your("%sはもうタオルで覚っている。",
+                    Your("%sはもうタオルで覆っている.",
                          body_part(FACE));
                 else if (ublindf->otyp == BLINDFOLD) {
                     if (obj->otyp == LENSES)
-                        already_wearing2("lenses", "a blindfold");
+                        already_wearing2("レンズ", "目隠し");
                     else
-                        already_wearing("a blindfold");
+                        already_wearing("目隠し");
                 } else if (ublindf->otyp == LENSES) {
                     if (obj->otyp == BLINDFOLD)
-                        already_wearing2("a blindfold", "some lenses");
+                        already_wearing2("目隠し", "レンズ");
                     else
-                        already_wearing("some lenses");
+                        already_wearing("レンズ");
                 } else {
                     already_wearing(something); /* ??? */
                 }
@@ -2461,10 +2461,9 @@ doputon(void)
     if (uleft && uright && uamul && ublindf
         && uarm && uarmu && uarmc && uarmh && uarms && uarmg && uarmf) {
         /* 'P' message doesn't mention armor */
-        Your("%s%sはいっぱいで、これ以上に%sを着けない。",
-             humanoid(gy.youmonst.data) ? "紅指-" : "",
-             fingers_or_gloves(FALSE),
-             (ublindf->otyp == LENSES) ? "some lenses" : "a blindfold");
+           Your("%sがいっぱいで、これ以上%sを着けられない.",
+               fingers_or_gloves(FALSE),
+               (ublindf->otyp == LENSES) ? "レンズ" : "目隠し");
         return ECMD_OK;
     }
     otmp = getobj("put on", puton_ok, GETOBJ_NOFLAGS);
@@ -2549,8 +2548,7 @@ glibr(void)
 
     if (!uarmg && (leftfall || rightfall) && !nolimbs(gy.youmonst.data)) {
         /* changed so cursed rings don't fall off, GAN 10/30/86 */
-        Your("%sが%sかろぞろた。",
-             (leftfall && rightfall) ? "指輪" : "指輪",
+        Your("指輪が%sから滑り落ちた.",
              (leftfall && rightfall) ? fingers_or_gloves(FALSE)
                                      : body_part(FINGER));
         xfl++;
@@ -2580,8 +2578,8 @@ glibr(void)
             otherwep = makeplural(otherwep);
         hand = body_part(HAND);
         which = URIGHTY ? "左" : "右";  /* text for the off hand */
-        Your("%sも%s%sかろ水を吐いた%s。", otherwep, xfl ? "並んで" : "",
-             otense(otmp, "slip"), which);
+           Your("%sが%s%s%sから滑り落ちた.", otherwep, xfl ? "さらに" : "", which,
+               hand);
         xfl++;
         wastwoweap = TRUE;
         setuswapwep((struct obj *) 0); /* clears u.twoweap */

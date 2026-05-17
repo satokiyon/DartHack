@@ -60,8 +60,8 @@ enum checkfileflags {
     chkfilIaCheck  = 4,
 };
 
-static const char invisexplain[] = "remembered, unseen, creature",
-           altinvisexplain[] = "unseen creature"; /* for clairvoyance */
+static const char invisexplain[] = "記憶にある、姿の見えない怪物",
+           altinvisexplain[] = "姿の見えない怪物"; /* for clairvoyance */
 
 /* Returns "true" for characters that could represent a monster's stomach. */
 staticfn boolean
@@ -81,7 +81,7 @@ is_swallow_sym(int c)
 staticfn int
 append_str(char *buf, const char *new_str)
 {
-    static const char sep[] = " or ";
+    static const char sep[] = "、または";
     size_t oldlen, space_left;
 
     if (strstri(buf, new_str))
@@ -113,22 +113,22 @@ self_lookat(char *outbuf)
     race[0] = '\0';
     if (!Upolyd)
         Sprintf(race, "%s ", gu.urace.adj);
-    Sprintf(outbuf, "%s%s%s called %s",
+    Sprintf(outbuf, "%s%s%s、名は%s",
             /* being blinded may hide invisibility from self */
-            (Invis && (senseself() || !Blind)) ? "invisible " : "", race,
+            (Invis && (senseself() || !Blind)) ? "透明な" : "", race,
             pmname(&mons[u.umonnum], Ugender), svp.plname);
     if (u.usteed)
-        Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
+        Sprintf(eos(outbuf), "、%sに騎乗していた", y_monnam(u.usteed));
     if (u.uundetected || (Upolyd && U_AP_TYPE)
         || visible_region_at(u.ux, u.uy))
         mhidden_description(&gy.youmonst,
                             MHID_PREFIX | MHID_ARTICLE | MHID_REGION,
                             eos(outbuf));
     if (Punished)
-        Sprintf(eos(outbuf), ", chained to %s",
-                uball ? ansimpleoname(uball) : "nothing?");
+        Sprintf(eos(outbuf), "、%sに鎖で繋がれていた",
+                uball ? ansimpleoname(uball) : "何か");
     if (u.utrap) /* bear trap, pit, web, in-floor, in-lava, tethered */
-        Sprintf(eos(outbuf), ", %s", trap_predicament(trapbuf, 0, FALSE));
+        Sprintf(eos(outbuf), "、%s", trap_predicament(trapbuf, 0, FALSE));
     return outbuf;
 }
 
@@ -172,9 +172,9 @@ trap_description(char *outbuf, int tnum, coordxy x, coordxy y)
      * traps now (defined trap types but not part of ftrap chain).
      */
     if (trapped_chest_at(tnum, x, y))
-        Strcpy(outbuf, "trapped chest"); /* might actually be a large box */
+        Strcpy(outbuf, "罠のかかった箱"); /* might actually be a large box */
     else if (trapped_door_at(tnum, x, y))
-        Strcpy(outbuf, "trapped door"); /* not "trap door"... */
+        Strcpy(outbuf, "罠のかかった扉"); /* not "trap door"... */
     else
         Strcpy(outbuf, trapname(tnum, FALSE));
     return;
@@ -205,7 +205,7 @@ mhidden_description(
     if (M_AP_TYPE(mon) == M_AP_FURNITURE
         || M_AP_TYPE(mon) == M_AP_OBJECT) {
         if (incl_prefix)
-            Strcpy(outbuf, ", mimicking ");
+            Strcpy(outbuf, "、擬態中: ");
         if (M_AP_TYPE(mon) == M_AP_FURNITURE) {
             what = defsyms[mon->mappearance].explanation;
             if (incl_article)
@@ -234,27 +234,28 @@ mhidden_description(
     } else if (M_AP_TYPE(mon) == M_AP_MONSTER) {
         if (show_altmon) {
             if (incl_prefix)
-                Strcat(outbuf, ", masquerading as ");
+                Strcat(outbuf, "、変装先: ");
             what = pmname(&mons[mon->mappearance], Mgender(mon));
             if (incl_prefix)
                 what = an(what);
             Strcat(outbuf, what);
         }
     } else if (isyou ? u.uundetected : mon->mundetected) {
-        Strcpy(outbuf, ", hiding");
+        Strcpy(outbuf, "、潜んでいた");
         if (hides_under(mon->data)) {
-            Strcat(outbuf, " under ");
+            Strcat(outbuf, " (下: ");
             /* remembered glyph, not glyph_at() which is 'mon' */
             if (glyph_is_object(glyph))
                 goto objfrommap;
             Strcat(outbuf, something);
+            Strcat(outbuf, ")");
         } else if (is_hider(mon->data)) {
-            Sprintf(eos(outbuf), " on the %s",
-                    ceiling_hider(mon->data) ? "ceiling"
+            Sprintf(eos(outbuf), " (%sに潜んでいた)",
+                    ceiling_hider(mon->data) ? "天井"
                        : surface(x, y)); /* trapper */
         } else {
             if (mon->data->mlet == S_EEL && is_pool(x, y))
-                Strcat(outbuf, " in murky water");
+                Strcat(outbuf, "、濁った水中に潜んでいた");
         }
     }
 
@@ -273,8 +274,8 @@ mhidden_description(
             boolean poison_gas = (glyph_is_cmap(rglyph)
                                   && glyph_to_cmap(rglyph) == S_poisoncloud);
 
-            Snprintf(eos(outbuf), BUFSZ - buflen, ", in a cloud of %s",
-                     poison_gas ? "poison gas" : "vapor");
+            Snprintf(eos(outbuf), BUFSZ - buflen, "、%sの雲の中にいた",
+                     poison_gas ? "毒ガス" : "蒸気");
         }
     }
 }
@@ -399,22 +400,22 @@ look_at_object(
     }
 
     if (otmp && otmp->where == OBJ_BURIED)
-        Strcat(buf, " (buried)");
+        Strcat(buf, " (埋まっていた)");
     /* check TREE before STONE due to level.flags.arboreal */
     else if (IS_TREE(levl[x][y].typ))
         /* "dangling": "hanging" could imply that it's growing on this tree */
-        Snprintf(eos(buf), BUFSZ - strlen(buf), " %s in a tree",
-                 (otmp && is_treefruit(otmp)) ? "dangling" : "stuck");
+        Snprintf(eos(buf), BUFSZ - strlen(buf), " 木に%s",
+                 (otmp && is_treefruit(otmp)) ? "ぶら下がっていた" : "刺さっていた");
     else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
-        Strcat(buf, " embedded in stone");
+        Strcat(buf, " 岩に埋まっていた");
     else if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR)
-        Strcat(buf, " embedded in a wall");
+        Strcat(buf, " 壁に埋まっていた");
     else if (closed_door(x, y))
-        Strcat(buf, " embedded in a door");
+        Strcat(buf, " 扉に埋まっていた");
     else if (is_pool(x, y))
-        Strcat(buf, " in water");
+        Strcat(buf, " 水中にあった");
     else if (is_lava(x, y))
-        Strcat(buf, " in molten lava"); /* [can this ever happen?] */
+        Strcat(buf, " 溶岩中にあった"); /* [can this ever happen?] */
     return;
 }
 
@@ -432,22 +433,22 @@ look_at_monster(
               : distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
     Sprintf(buf, "%s%s%s%s",
             (mtmp->mx != x || mtmp->my != y)
-                ? ((mtmp->isshk && accurate) ? "tail of " : "tail of a ")
+                    ? "尾の"
                 : "",
             accurate ? monhealthdescr(mtmp, TRUE, healthbuf) : "",
             (mtmp->mtame && accurate)
-                ? "tame "
+                    ? "飼いならされた"
                 : (mtmp->mpeaceful && accurate)
-                    ? "peaceful "
+                        ? "穏やかな"
                     : "",
             name);
     if (u.ustuck == mtmp) {
         if (u.uswallow || iflags.save_uswallow) /* monster detection */
-            Strcat(buf, digests(mtmp->data) ? ", swallowing you"
-                                            : ", engulfing you");
+                Strcat(buf, digests(mtmp->data) ? "、あなたを飲み込んでいた"
+                                                : "、あなたを包み込んでいた");
         else
-            Strcat(buf, (Upolyd && sticks(gy.youmonst.data))
-                          ? ", being held" : ", holding you");
+                Strcat(buf, (Upolyd && sticks(gy.youmonst.data))
+                              ? "、拘束されていた" : "、あなたを拘束していた");
     }
     /* if mtmp isn't able to move (other than because it is a type of
        monster that never moves), say so [excerpt from mstatusline() for
@@ -455,23 +456,23 @@ look_at_monster(
     if (mtmp->mfrozen)
         /* unfortunately mfrozen covers temporary sleep and being busy
            (donning armor, for instance) as well as paralysis */
-        Strcat(buf, ", can't move (paralyzed or sleeping or busy)");
+            Strcat(buf, "、動けなかった(麻痺・睡眠・行動中)");
     else if (mtmp->msleeping)
         /* sleeping for an indeterminate duration */
-        Strcat(buf, ", asleep");
+            Strcat(buf, "、眠っていた");
     else if ((mtmp->mstrategy & STRAT_WAITMASK) != 0)
         /* arbitrary reason why it isn't moving */
-        Strcat(buf, ", meditating");
+            Strcat(buf, "、瞑想していた");
 
     if (mtmp->mleashed)
-        Strcat(buf, ", leashed to you");
+            Strcat(buf, "、あなたに繋がれていた");
     if (mtmp->mtrapped && cansee(mtmp->mx, mtmp->my)) {
         struct trap *t = t_at(mtmp->mx, mtmp->my);
         int tt = t ? t->ttyp : NO_TRAP;
 
         /* newsym lets you know of the trap, so mention it here */
         if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB) {
-            Sprintf(eos(buf), ", trapped in %s", an(trapname(tt, FALSE)));
+                Sprintf(eos(buf), "、%sにかかっていた", an(trapname(tt, FALSE)));
             t->tseen = 1;
         }
     }
@@ -488,58 +489,58 @@ look_at_monster(
         monbuf[0] = '\0';
         if (how_seen != 0 && how_seen != MONSEEN_NORMAL) {
             if (how_seen & MONSEEN_NORMAL) {
-                Strcat(monbuf, "normal vision");
+                    Strcat(monbuf, "通常視界");
                 how_seen &= ~MONSEEN_NORMAL;
                 /* how_seen can't be 0 yet... */
                 if (how_seen)
                     Strcat(monbuf, ", ");
             }
             if (how_seen & MONSEEN_SEEINVIS) {
-                Strcat(monbuf, "see invisible");
+                    Strcat(monbuf, "透明視認");
                 how_seen &= ~MONSEEN_SEEINVIS;
                 if (how_seen)
                     Strcat(monbuf, ", ");
             }
             if (how_seen & MONSEEN_INFRAVIS) {
-                Strcat(monbuf, "infravision");
+                    Strcat(monbuf, "赤外線視認");
                 how_seen &= ~MONSEEN_INFRAVIS;
                 if (how_seen)
                     Strcat(monbuf, ", ");
             }
             if (how_seen & MONSEEN_TELEPAT) {
-                Strcat(monbuf, "telepathy");
+                    Strcat(monbuf, "テレパシー");
                 how_seen &= ~MONSEEN_TELEPAT;
                 if (how_seen)
                     Strcat(monbuf, ", ");
             }
             if (how_seen & MONSEEN_XRAYVIS) {
                 /* Eyes of the Overworld */
-                Strcat(monbuf, "astral vision");
+                    Strcat(monbuf, "アストラル視界");
                 how_seen &= ~MONSEEN_XRAYVIS;
                 if (how_seen)
                     Strcat(monbuf, ", ");
             }
             if (how_seen & MONSEEN_DETECT) {
-                Strcat(monbuf, "monster detection");
+                    Strcat(monbuf, "怪物感知");
                 how_seen &= ~MONSEEN_DETECT;
                 if (how_seen)
                     Strcat(monbuf, ", ");
             }
             if (how_seen & MONSEEN_WARNMON) {
                 if (Hallucination) {
-                    Strcat(monbuf, "paranoid delusion");
+                    Strcat(monbuf, "被害妄想");
                 } else {
                     unsigned long mW = (svc.context.warntype.obj
                                         | svc.context.warntype.polyd),
                                   m2 = mtmp->data->mflags2;
-                    const char *whom = ((mW & M2_HUMAN & m2) ? "human"
-                                        : (mW & M2_ELF & m2) ? "elf"
-                                          : (mW & M2_ORC & m2) ? "orc"
-                                            : (mW & M2_DEMON & m2) ? "demon"
+                                        const char *whom = ((mW & M2_HUMAN & m2) ? "人間"
+                                                                                : (mW & M2_ELF & m2) ? "エルフ"
+                                                                                    : (mW & M2_ORC & m2) ? "オーク"
+                                                                                        : (mW & M2_DEMON & m2) ? "デーモン"
                                               : pmname(mtmp->data,
                                                        Mgender(mtmp)));
 
-                    Sprintf(eos(monbuf), "warned of %s", makeplural(whom));
+                        Sprintf(eos(monbuf), "%sへの警告", makeplural(whom));
                 }
                 how_seen &= ~MONSEEN_WARNMON;
                 if (how_seen)
@@ -565,61 +566,61 @@ waterbody_name(coordxy x, coordxy y)
     boolean hallucinate = Hallucination && !program_state.gameover;
 
     if (!isok(x, y))
-        return "drink"; /* should never happen */
+        return "飲み物"; /* should never happen */
     ltyp = SURFACE_AT(x, y);
 
     if (ltyp == LAVAPOOL) {
-        Snprintf(pooltype, sizeof pooltype, "molten %s", hliquid("lava"));
+        Snprintf(pooltype, sizeof pooltype, "溶けた%s", hliquid("lava"));
         return pooltype;
     } else if (ltyp == ICE) {
         if (!hallucinate)
-            return "ice";
-        Snprintf(pooltype, sizeof pooltype, "frozen %s", hliquid("water"));
+            return "氷";
+        Snprintf(pooltype, sizeof pooltype, "凍った%s", hliquid("water"));
         return pooltype;
     } else if (ltyp == POOL) {
-        Snprintf(pooltype, sizeof pooltype, "pool of %s", hliquid("water"));
+        Snprintf(pooltype, sizeof pooltype, "%sの水たまり", hliquid("water"));
         return pooltype;
     } else if (ltyp == MOAT) {
         /* a bit of extra flavor over general moat */
         if (hallucinate) {
-            Snprintf(pooltype, sizeof pooltype, "deep %s", hliquid("water"));
+            Snprintf(pooltype, sizeof pooltype, "深い%s", hliquid("water"));
             return pooltype;
         } else if (Is_medusa_level(&u.uz)) {
             /* somewhat iffy since ordinary stairs can take you beneath,
                but previous generic "water" was rather anti-climactic */
-            return "shallow sea";
+            return "浅い海";
         } else if (Is_juiblex_level(&u.uz)) {
-            return "swamp";
+            return "沼地";
         } else if (Role_if(PM_SAMURAI) && Is_qstart(&u.uz)) {
             /* samurai quest home level has two isolated moat spots;
                they sound silly if farlook describes them as such */
-            return "pond";
+            return "池";
         } else {
-            return "moat";
+            return "堀";
         }
     } else if (IS_WATERWALL(ltyp)) {
         if (Is_waterlevel(&u.uz))
-            return "limitless water"; /* even if hallucinating */
-        Snprintf(pooltype, sizeof pooltype, "wall of %s", hliquid("water"));
+            return "果てしない水"; /* even if hallucinating */
+        Snprintf(pooltype, sizeof pooltype, "%sの壁", hliquid("water"));
         return pooltype;
     } else if (ltyp == LAVAWALL) {
-        Snprintf(pooltype, sizeof pooltype, "wall of %s", hliquid("lava"));
+        Snprintf(pooltype, sizeof pooltype, "%sの壁", hliquid("lava"));
         return pooltype;
     }
     /* default; should be unreachable */
-    return "water"; /* don't hallucinate this as some other liquid */
+    return "水"; /* don't hallucinate this as some other liquid */
 }
 
 char *
 ice_descr(coordxy x, coordxy y, char *outbuf)
 {
     static const char *const icetyp[] = {
-        "solid",    /* 0: not melting */
-        "sturdy",   /* 1: more than 1000 turns left */
-        "steady",   /* 2: 101..1000 turns left */
-        "unsteady", /* 3:  51..100 turns left */
-        "thin",     /* 4:  15..50 turns left */
-        "slushy",   /* 5:   1..14 turns left; matches Warning on ice */
+        "堅固な",     /* 0: not melting */
+        "頑丈な",     /* 1: more than 1000 turns left */
+        "安定した",   /* 2: 101..1000 turns left */
+        "不安定な",   /* 3:  51..100 turns left */
+        "薄い",       /* 4:  15..50 turns left */
+        "しゃばしゃばの", /* 5:   1..14 turns left; matches Warning on ice */
     };
     /* same formula as is used in distant_name() for objects */
     int r = (u.xray_range > 2) ? u.xray_range : 2,
@@ -643,7 +644,7 @@ ice_descr(coordxy x, coordxy y, char *outbuf)
                                 : (time_left > 50L) ? 3   /* unsteady */
                                   : (time_left > 14L) ? 4 /* thin */
                                     : 5;                  /* slushy */
-        Sprintf(outbuf, "%s %s", icetyp[(int) iflags.ice_rating],
+        Sprintf(outbuf, "%s%s", icetyp[(int) iflags.ice_rating],
                 waterbody_name(x, y));
     }
     return outbuf;
@@ -691,19 +692,19 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
                 how |= 4;
 
             if (how)
-                Sprintf(eos(buf), " [seen: %s%s%s%s%s]",
-                        (how & 1) ? "infravision" : "",
+                Sprintf(eos(buf), " [視認手段: %s%s%s%s%s]",
+                    (how & 1) ? "赤外線視認" : "",
                         /* add comma if telep and infrav */
                         ((how & 3) > 2) ? ", " : "",
-                        (how & 2) ? "telepathy" : "",
+                    (how & 2) ? "テレパシー" : "",
                         /* add comma if detect and (infrav or telep or both) */
                         ((how & 7) > 4) ? ", " : "",
-                        (how & 4) ? "monster detection" : "");
+                    (how & 4) ? "怪物感知" : "");
         }
     } else if (u.uswallow) {
         /* when swallowed, we're only called for spots adjacent to hero,
            and blindness doesn't prevent hero from feeling what holds him */
-        Sprintf(buf, "interior of %s", mon_nam(u.ustuck));
+        Sprintf(buf, "%sの体内", mon_nam(u.ustuck));
         pm = u.ustuck->data;
     } else if (glyph_is_monster(glyph)) {
         if ((mtmp = m_at(x, y)) != 0) {
@@ -726,14 +727,14 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
     } else if (glyph_is_invisible(glyph)) {
         Strcpy(buf, invisexplain); /* redundant; handled by caller */
     } else if (glyph_is_nothing(glyph)) {
-        Strcpy(buf, "dark part of a room");
+        Strcpy(buf, "部屋の暗がり");
     } else if (glyph_is_unexplored(glyph)) {
         if (Underwater && !Is_waterlevel(&u.uz)) {
             /* "unknown" == previously mapped but not visible when
                submerged; better terminology appreciated... */
-            Strcpy(buf, (next2u(x, y)) ? "land" : "unknown");
+            Strcpy(buf, (next2u(x, y)) ? "陸地" : "不明");
         } else {
-            Strcpy(buf, "unexplored area");
+            Strcpy(buf, "未探索領域");
         }
     } else if (glyph_is_cmap(glyph)) {
         int amsk;
@@ -744,26 +745,26 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
         case S_altar:
             amsk = altarmask_at(x, y);
             algn = Amask2align(amsk & AM_MASK);
-            Sprintf(buf, "%s %saltar",
+            Sprintf(buf, "%s%s祭壇",
                     /* like endgame high priests, endgame high altars
                        are only recognizable when immediately adjacent */
                     (Is_astralevel(&u.uz) && !next2u(x, y)
                      && (amsk & AM_SANCTUM))
-                        ? "aligned"
+                        ? "属性"
                         : align_str(algn),
-                    (amsk & AM_SANCTUM) ? "high " : "");
+                    (amsk & AM_SANCTUM) ? "高位" : "");
             break;
         case S_ndoor:
             if (is_drawbridge_wall(x, y) >= 0)
-                Strcpy(buf, "open drawbridge portcullis");
+                Strcpy(buf, "開いた跳ね橋の落とし格子");
             else if ((levl[x][y].doormask & ~D_TRAPPED) == D_BROKEN)
-                Strcpy(buf, "broken door");
+                Strcpy(buf, "壊れた扉");
             else
-                Strcpy(buf, "doorway");
+                Strcpy(buf, "戸口");
             break;
         case S_cloud:
             Strcpy(buf,
-                   Is_airlevel(&u.uz) ? "cloudy area" : "fog/vapor cloud");
+                   Is_airlevel(&u.uz) ? "雲が漂う領域" : "霧/蒸気の雲");
             break;
         case S_pool:
         case S_water: /* was Plane of Water, now that or "wall of water" */
@@ -774,19 +775,19 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
             break;
         case S_engroom:
         case S_engrcorr:
-            Strcpy(buf, "engraving");
+            Strcpy(buf, "刻印");
             break;
         case S_stone:
             if (!levl[x][y].seenv) {
-                Strcpy(buf, "unexplored");
+                Strcpy(buf, "未探索");
                 break;
             } else if (Underwater && !Is_waterlevel(&u.uz)) {
                 /* "unknown" == previously mapped but not visible when
                    submerged; better terminology appreciated... */
-                Strcpy(buf, (next2u(x, y)) ? "land" : "unknown");
+                Strcpy(buf, (next2u(x, y)) ? "陸地" : "不明");
                 break;
             } else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR) {
-                Strcpy(buf, "stone");
+                Strcpy(buf, "岩");
                 break;
             }
             FALLTHROUGH;
@@ -796,7 +797,7 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
             break;
         }
     } else { /* not mon, obj, trap, or cmap */
-        Strcpy(buf, "unexplored area");
+        Strcpy(buf, "未探索領域");
     }
     return (pm && !Hallucination) ? pm : (struct permonst *) 0;
 }
@@ -845,7 +846,7 @@ checkfile(
 
     fp = dlb_fopen(DATAFILE, "r");
     if (!fp) {
-        pline("Cannot open 'data' file!");
+        pline("'data'ファイルを開けなかった!");
         return res;
     }
     /* If someone passed us garbage, prevent fault. */
@@ -1058,19 +1059,15 @@ checkfile(
                     char *entrytext = pass ? alt : dbase_str;
                     char question[QBUFSZ];
 
-                    Strcpy(question, "More info about \"");
-                    /* +2 => length of "\"?" */
-                    copynchars(eos(question), entrytext,
-                               (int) (sizeof question - 1
-                                      - (strlen(question) + 2)));
-                    Strcat(question, "\"?");
+                    Snprintf(question, sizeof question,
+                             "\"%s\"の詳細を見る?", entrytext);
                     if (y_n(question) == 'y')
                         yes_to_moreinfo = TRUE;
                 }
 
                 if (user_typed_name || without_asking || yes_to_moreinfo) {
                     if (dlb_fseek(fp, fseekoffset, SEEK_SET) < 0) {
-                        pline("? Seek error on 'data' file!");
+                        pline("'data'ファイルのシークに失敗した!");
                         goto checkfile_done;
                     }
                     res = TRUE;
@@ -1113,7 +1110,7 @@ checkfile(
                     destroy_nhwindow(datawin), datawin = WIN_ERR;
                 }
             } else if (user_typed_name && pass == 0 && !pass1found_in_file) {
-                pline("You don't have any information on those things.");
+                pline("それらについての情報は見つからなかった.");
             }
         }
     }
@@ -1144,7 +1141,6 @@ add_cmap_descr(
     char *out_str)      /* input/output: current description gets appended */
 {
     char *mbuf = NULL;
-    const char *p;
     int absidx = abs(idx);
 
     if (glyph == NO_GLYPH) {
@@ -1152,10 +1148,10 @@ add_cmap_descr(
         if (!strcmp(x_str, "water")) {
             /* duplicate some transformations performed by waterbody_name() */
             if (idx == S_pool)
-                x_str = "pool of water";
+                x_str = "水たまり";
             else if (idx == S_water)
-                x_str = !Is_waterlevel(&u.uz) ? "wall of water"
-                                              : "limitless water";
+                x_str = !Is_waterlevel(&u.uz) ? "水の壁"
+                                              : "果てしない水";
         }
         if (absidx == S_pool)
             idx = S_pool;
@@ -1187,31 +1183,13 @@ add_cmap_descr(
         EHalluc_resistance = save_prop;
         levl[cc.x][cc.y].typ = save_ltyp;
 
-        /* shorten the feedback for farlook/quicklook: "pool or ..." */
-        if (!strcmp(mbuf, "pool of water"))
-            mbuf[4] = '\0';
-        else if (!strcmp(mbuf, "molten lava"))
-            Strcpy(mbuf, "lava");
+        /* shorten the feedback for farlook/quicklook */
+        if (!strcmp(mbuf, "水の水たまり"))
+            Strcpy(mbuf, "水たまり");
+        else if (!strcmp(mbuf, "溶けた溶岩"))
+            Strcpy(mbuf, "溶岩");
         x_str = mbuf;
-        /* avoid "an ice" and so forth; "a pool", "a moat", and
-           "a wall of ..." are grammatically correct but make
-           "a pool or a moat or a wall of water" become too verbose */
-        article = !(!strncmp(x_str, "water", 5)
-                    || !strncmp(x_str, "ice", 3)
-                    || !strncmp(x_str, "pool", 4)
-                    || !strncmp(x_str, "moat", 4)
-                    || !strncmp(x_str, "lava", 4)
-                    || !strncmp(x_str, "swamp", 5)
-                    || !strncmp(x_str, "molten", 6)
-                    || !strncmp(x_str, "shallow", 7)
-                    || !strncmp(x_str, "limitless", 9)
-                    || !strncmp(x_str, "wall of lava", 12)
-                    || !strncmp(x_str, "wall of water", 13)
-                    /* ice while hallucinating */
-                    || !strncmp(x_str, "frozen", 6)
-                    /* thawing ice ("solid ice", "thin ice", &c) */
-                    || ((p = strchr(x_str, ' ')) != 0 && !strcmpi(p, " ice"))
-                    );
+        article = 0;
     }
 
     if (!found) {
@@ -1250,8 +1228,8 @@ do_screen_description(
     const char **firstmatch,
     struct permonst **for_supplement)
 {
-    static const char mon_interior[] = "the interior of a monster",
-                      unreconnoitered[] = "unreconnoitered";
+    static const char mon_interior[] = "怪物の体内",
+                      unreconnoitered[] = "未確認";
     static char look_buf[BUFSZ];
     char prefix[BUFSZ];
     int i, j, alt_i, glyph = NO_GLYPH,
@@ -1350,7 +1328,7 @@ do_screen_description(
                        && u_at(cc.x, cc.y))
                     : (sym == def_monsyms[S_HUMAN].sym && !flags.showrace))
             && !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
-            found += append_str(out_str, "you"); /* tack on "or you" */
+            found += append_str(out_str, "あなた"); /* tack on "or you" */
     }
 
     /* Now check for objects */
@@ -1419,7 +1397,7 @@ do_screen_description(
     }
     if ((glyph && glyph_is_nothing(glyph))
         || (looked && sym == gs.showsyms[SYM_NOTHING + SYM_OFF_X])) {
-        x_str = "the dark part of a room";
+        x_str = "部屋の暗がり";
         if (!found) {
             Sprintf(out_str, "%s%s", prefix, x_str);
             *firstmatch = x_str;
@@ -1430,9 +1408,9 @@ do_screen_description(
     }
     if ((glyph && glyph_is_unexplored(glyph))
         || (looked && sym == gs.showsyms[SYM_UNEXPLORED + SYM_OFF_X])) {
-        x_str = "unexplored";
+        x_str = "未探索";
         if (submerged)
-            x_str = "land"; /* replace "unexplored" */
+            x_str = "陸地"; /* replace "unexplored" */
         if (!found) {
             Sprintf(out_str, "%s%s", prefix, x_str);
             *firstmatch = x_str;
@@ -1522,7 +1500,7 @@ do_screen_description(
             /* Kludge: warning trumps boulders on the display.
                Reveal the boulder too or player can get confused */
             if (looked && sobj_at(BOULDER, cc.x, cc.y))
-                Strcat(out_str, " co-located with a boulder");
+                Strcat(out_str, "（巨大な岩と同じ場所）");
             break; /* out of for loop*/
         }
     }
@@ -1586,7 +1564,7 @@ do_screen_description(
         /* 3.6.3: this used to be "That can be many things" (without prefix)
            which turned it into a sentence that lacked its terminating period;
            we could add one below but reinstating the prefix here is better */
-        Sprintf(out_str, "%scan be many things", prefix);
+        Sprintf(out_str, "%sいろいろな可能性がある", prefix);
 
  didlook:
     if (looked) {
@@ -1599,11 +1577,11 @@ do_screen_description(
             pm = lookat(cc.x, cc.y, look_buf, monbuf);
             if (pm && for_supplement)
                 *for_supplement = pm;
-            if (!strcmp(look_buf, "ice"))
+            if (!strcmp(look_buf, "氷"))
                 (void) ice_descr(cc.x, cc.y, look_buf);
             if (!strcmp(look_buf, "staircase down")
                 && on_level(&u.uz, &qstart_level) && !ok_to_quest())
-                Strcpy(look_buf, "blocked staircase down");
+                Strcpy(look_buf, "封鎖された下り階段");
 
             if (look_buf[0] != '\0')
                 *firstmatch = look_buf;
@@ -1616,7 +1594,7 @@ do_screen_description(
                 found = 1; /* we have something to look up */
             }
             if (monbuf[0]) {
-                Snprintf(temp_buf, sizeof temp_buf, " [seen: %s]", monbuf);
+                Snprintf(temp_buf, sizeof temp_buf, " [視認手段: %s]", monbuf);
                 (void) strncat(out_str, temp_buf,
                                BUFSZ - strlen(out_str) - 1);
             }
@@ -1655,19 +1633,19 @@ add_quoted_engraving(
         return FALSE;
 
     if (ep->eread)
-        Snprintf(temp_buf, sizeof temp_buf, " with %s: \"%s\"",
-                 headstone ? "headstone reading" : "remembered text",
+        Snprintf(temp_buf, sizeof temp_buf, " (%s: \"%s\")",
+                 headstone ? "墓碑銘" : "記憶している文",
                  ep->engr_txt[remembered_text]);
     else
-        Snprintf(temp_buf, sizeof temp_buf, " %s you haven't read",
-                 headstone ? "whose headstone" : "that");
+        Snprintf(temp_buf, sizeof temp_buf, " (%sは未読)",
+                 headstone ? "墓石" : "刻印");
 
     (void) strncat(buf, temp_buf, BUFSZ - strlen(buf) - 1);
     return TRUE;
 }
 
 /* also used by getpos hack in getpos.c */
-const char what_is_a_location[] = "a monster, object or location";
+const char what_is_a_location[] = "怪物、物体、または場所";
 
 int
 do_look(int mode, coord *click_cc)
@@ -1732,18 +1710,18 @@ do_look(int mode, coord *click_cc)
             add_menu(win, &nul_glyphinfo, &any,
                      flags.lootabc ? 0 : any.a_char,
                      flags.lootabc ? '/' : 'y', ATR_NONE,
-                     clr, "something on the map", MENU_ITEMFLAGS_NONE);
+                     clr, "地図上の何か", MENU_ITEMFLAGS_NONE);
             any.a_char = 'i';
             add_menu(win, &nul_glyphinfo, &any,
                      /* [don't use 'i' as lootabc group accelerator because
                         it will make the regular 'i' choice inaccessible] */
                      flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                     clr, "something you're carrying", MENU_ITEMFLAGS_NONE);
+                     clr, "持ち物の何か", MENU_ITEMFLAGS_NONE);
             any.a_char = '?';
             add_menu(win, &nul_glyphinfo, &any,
                      flags.lootabc ? 0 : any.a_char,
                      flags.lootabc ? '?' : 'n', ATR_NONE,
-                     clr, "something else (by symbol or name)",
+                     clr, "その他(記号または名前で指定)",
                      MENU_ITEMFLAGS_NONE);
             if (!u.uswallow && !Hallucination) {
                 any = cg.zeroany;
@@ -1758,49 +1736,49 @@ do_look(int mode, coord *click_cc)
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
-                         clr, "nearby monsters", MENU_ITEMFLAGS_NONE);
+                         clr, "近くの怪物", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'M';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
-                         clr, "all monsters shown on map",
+                         clr, "地図に表示中の怪物すべて",
                          MENU_ITEMFLAGS_NONE);
                 any.a_char = 'o';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
-                         clr, "nearby objects", MENU_ITEMFLAGS_NONE);
+                         clr, "近くの物体", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'O';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
-                         clr, "all objects shown on map",
+                         clr, "地図に表示中の物体すべて",
                          MENU_ITEMFLAGS_NONE);
                 any.a_char = 't';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : '^', ATR_NONE,
-                         clr, "nearby traps", MENU_ITEMFLAGS_NONE);
+                         clr, "近くの罠", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'T';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : '\"', ATR_NONE,
-                         clr, "all seen or remembered traps",
+                         clr, "視認済み・記憶済みの罠すべて",
                          MENU_ITEMFLAGS_NONE);
                 any.a_char = 'e';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          /* [don't use 'e' as lootabc group accelerator] */
                          flags.lootabc ? 0 : '`', ATR_NONE,
-                         clr, "nearby engravings", MENU_ITEMFLAGS_NONE);
+                         clr, "近くの刻印", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'E';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : '|', ATR_NONE,
-                         clr, "all seen or remembered engravings",
+                         clr, "視認済み・記憶済みの刻印すべて",
                          MENU_ITEMFLAGS_NONE);
             }
-            end_menu(win, "What do you want to look at:");
+            end_menu(win, "何を調べる?");
             if (select_menu(win, PICK_ONE, &pick_list) > 0) {
                 i = pick_list->item.a_char;
                 free((genericptr_t) pick_list);
@@ -1841,7 +1819,7 @@ do_look(int mode, coord *click_cc)
           }
         case '?':
             from_screen = FALSE;
-            getlin("Specify what? (type the word)", out_str);
+            getlin("何を指定する? (1文字を入力)", out_str);
             if (strcmp(out_str, " ")) /* keep single space as-is */
                 /* remove leading and trailing whitespace and
                    condense consecutive internal whitespace */
@@ -1902,10 +1880,10 @@ do_look(int mode, coord *click_cc)
         if (from_screen || clicklook) {
             if (from_screen) {
                 if (flags.verbose)
-                    pline("Please move the cursor to %s.",
+                    pline("カーソルを%sへ移動して.",
                           what_is_a_location);
                 else
-                    pline("Pick %s.", what_is_a_location);
+                    pline("%sを選んで.", what_is_a_location);
 
                 ans = getpos(&cc, quick, what_is_a_location);
                 if (ans < 0 || cc.x < 0)
@@ -1954,7 +1932,7 @@ do_look(int mode, coord *click_cc)
                                          (boolean) (ans == LOOK_VERBOSE));
             }
         } else {
-            pline("I've never heard of such things.");
+            pline("そのようなものは聞いたことがない.");
         }
     } while (from_screen && !quick && ans != LOOK_ONCE && !clicklook);
 
@@ -2024,15 +2002,15 @@ look_all(
                 cmode = (iflags.getpos_coords != GPCOORDS_NONE)
                            ? iflags.getpos_coords : GPCOORDS_MAP;
                 if (count == 1) {
-                    Strcpy(which, do_mons ? "monsters" : "objects");
+                    Strcpy(which, do_mons ? "怪物" : "物体");
                     if (nearby)
-                        Sprintf(outbuf, "%s currently shown near %s:",
+                        Sprintf(outbuf, "%s(現在表示中) %s 付近:",
                                 upstart(which),
                                 (cmode != GPCOORDS_COMPASS)
                                   ? coord_desc(u.ux, u.uy, coordbuf, cmode)
-                                  : !canspotself() ? "your position" : "you");
+                                  : !canspotself() ? "あなたの位置" : "あなた");
                     else
-                        Sprintf(outbuf, "All %s currently shown on the map:",
+                        Sprintf(outbuf, "地図上で現在表示中の%sすべて:",
                                 which);
                     putstr(win, 0, outbuf);
                     /* hack alert! Qt watches a text window for any line
@@ -2067,9 +2045,9 @@ look_all(
     if (count)
         display_nhwindow(win, TRUE);
     else
-        pline("No %s are currently shown %s.",
-              do_mons ? "monsters" : "objects",
-              nearby ? "nearby" : "on the map");
+          pline("現在%sに表示されている%sはなかった.",
+              nearby ? "近く" : "地図上",
+              do_mons ? "怪物" : "物体");
     destroy_nhwindow(win);
 }
 
@@ -2099,7 +2077,7 @@ look_traps(boolean nearby)
                        && ((!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
                            || couldsee(x, y))) {
                 Strcpy(lookbuf, trapname(t->ttyp, FALSE));
-                Sprintf(eos(lookbuf), ", obscured by %s", encglyph(glyph));
+                Sprintf(eos(lookbuf), "、%sで隠れていた", encglyph(glyph));
                 glyph = trap_to_glyph(t);
                 ++count;
             }
@@ -2109,9 +2087,9 @@ look_traps(boolean nearby)
                 cmode = (iflags.getpos_coords != GPCOORDS_NONE)
                            ? iflags.getpos_coords : GPCOORDS_MAP;
                 if (count == 1) {
-                    Sprintf(outbuf, "%sseen or remembered traps%s:",
-                            nearby ? "nearby " : "",
-                            nearby ? "" : " on this level");
+                        Sprintf(outbuf, "%s視認済み・記憶済みの罠%s:",
+                            nearby ? "近くの" : "",
+                            nearby ? "" : "(この階層)");
                     putstr(win, 0, upstart(outbuf));
                     /* hack alert! Qt watches a text window for any line
                        with 4 consecutive spaces and renders the window
@@ -2134,7 +2112,7 @@ look_traps(boolean nearby)
     if (count)
         display_nhwindow(win, TRUE);
     else
-        pline("No traps seen or remembered%s.", nearby ? " nearby" : "");
+        pline("視認済み・記憶済みの罠はなかった%s.", nearby ? "(近く)" : "");
     destroy_nhwindow(win);
 }
 
@@ -2167,16 +2145,16 @@ look_engrs(boolean nearby)
             if (!e)
                 continue;
             is_headstone = IS_GRAVE(svl.lastseentyp[x][y]);
-            Sprintf(lookbuf, " (%s", is_headstone ? "grave" : "engraving");
+            Sprintf(lookbuf, " (%s", is_headstone ? "墓石" : "刻印");
             (void) add_quoted_engraving(x, y, lookbuf, TRUE);
             /* the paren is used by farlook and add_quoted_engraving()
                expected to see it; we don't want it here */
             if (is_headstone) {
-                (void) strsubst(lookbuf, "(grave with ", "");
-                (void) strsubst(lookbuf, "(grave whose ", "");
+                (void) strsubst(lookbuf, "(墓碑銘: ", "");
+                (void) strsubst(lookbuf, "(墓石は未読)", "未読の墓石");
             } else {
-                (void) strsubst(lookbuf, "(engraving with ", "");
-                (void) strsubst(lookbuf, "(engraving ", "engraving ");
+                (void) strsubst(lookbuf, "(記憶している文: ", "");
+                (void) strsubst(lookbuf, "(刻印は未読)", "未読の刻印");
             }
 
             glyph = glyph_at(x, y);
@@ -2187,7 +2165,7 @@ look_engrs(boolean nearby)
             } else {
                 /* engraving or grave covered by object(s) */
                 Snprintf(eos(lookbuf), sizeof lookbuf - strlen(lookbuf),
-                         ", obscured by %s", encglyph(glyph));
+                         "、%sで隠れていた", encglyph(glyph));
                 glyph = is_headstone ? cmap_to_glyph(S_grave)
                                      : engraving_to_glyph(e);
                 ++count;
@@ -2198,9 +2176,9 @@ look_engrs(boolean nearby)
                 cmode = (iflags.getpos_coords != GPCOORDS_NONE)
                            ? iflags.getpos_coords : GPCOORDS_MAP;
                 if (count == 1) {
-                    Sprintf(outbuf, "%sseen or remembered engravings%s:",
-                            nearby ? "nearby " : "",
-                            nearby ? "" : " on this level");
+                        Sprintf(outbuf, "%s視認済み・記憶済みの刻印%s:",
+                            nearby ? "近くの" : "",
+                            nearby ? "" : "(この階層)");
                     putstr(win, 0, upstart(outbuf));
                     /* hack alert! Qt watches a text window for any line
                        with 4 consecutive spaces and renders the window
@@ -2223,29 +2201,29 @@ look_engrs(boolean nearby)
     if (count)
         display_nhwindow(win, TRUE);
     else
-        pline("No engravings seen or remembered%s.", nearby ? " nearby" : "");
+        pline("視認済み・記憶済みの刻印はなかった%s.", nearby ? "(近く)" : "");
     destroy_nhwindow(win);
 }
 
-static const char *suptext1[] = {
-    "%s is a member of a marauding horde of orcs",
-    "rumored to have brutally attacked and plundered",
-    "the ordinarily sheltered town that is located ",
-    "deep within The Gnomish Mines.",
+    static const char *suptext1[] = {
+    "%sは略奪を繰り返すオークの群れの一員で、",
+    "残忍な襲撃と略奪で名高く、",
+    "ノームの鉱山の奥深くにある",
+    "平穏な町を荒らしたと噂されている.",
     "",
-    "The members of that vicious horde proudly and ",
-    "defiantly acclaim their allegiance to their",
-    "leader %s in their names.",
+    "その凶暴な群れの者たちは誇らしげに、",
+    "そして反抗的に、己の名へ",
+    "首領%sへの忠誠を刻んでいる.",
     (char *) 0,
 };
 
 static const char *suptext2[] = {
-    "\"%s\" is the common dungeon name of",
-    "a nefarious orc who is known to acquire property",
-    "from thieves and sell it off for profit.",
+    "\"%s\"はダンジョンで通る通り名で、",
+    "盗賊から盗品を買い集め、",
+    "利ざやを乗せて売りさばく悪辣なオークとして知られている.",
     "",
-    "The perpetrator was last seen hanging around the",
-    "stairs leading to the Gnomish Mines.",
+    "その当人は最後に、",
+    "ノームの鉱山へ通じる階段付近で目撃された.",
     (char *) 0,
 };
 
@@ -2276,11 +2254,8 @@ do_supplemental_info(
         if (bp || bp2) {
             Strcpy(fullname, name);
             if (!without_asking) {
-                Strcpy(question, "More info about \"");
-                /* +2 => length of "\"?" */
-                copynchars(eos(question), entrytext,
-                        (int) (sizeof question - 1 - (strlen(question) + 2)));
-                Strcat(question, "\"?");
+                Snprintf(question, sizeof question,
+                         "\"%s\"の詳細を見る?", entrytext);
                 if (y_n(question) == 'y')
                 yes_to_moreinfo = TRUE;
             }
@@ -2355,7 +2330,7 @@ doidtrap(void)
         boolean chesttrap = trapped_chest_at(tt, x, y);
 
         if (chesttrap || trapped_door_at(tt, x, y)) {
-            pline("That is a trapped %s.", chesttrap ? "chest" : "door");
+            pline("それは罠のかかった%sだった.", chesttrap ? "箱" : "扉");
             return ECMD_OK; /* trap ID'd, but no time elapses */
         }
     }
@@ -2369,22 +2344,22 @@ doidtrap(void)
                 if (u.dz < 0 ? is_hole(tt) : tt == ROCKTRAP)
                     break;
             }
-            pline("That is %s%s%s.",
+            pline("それは%s%s%sだった.",
                   an(trapname(tt, FALSE)),
                   !trap->madeby_u
                      ? ""
                      : (tt == WEB)
-                        ? " woven"
+                                ? " (張り巡らせた)"
                         /* trap doors & spiked pits can't be made by
                            player, and should be considered at least
                            as much "set" as "dug" anyway */
                         : (tt == HOLE || tt == PIT)
-                           ? " dug"
-                           : " set",
-                  !trap->madeby_u ? "" : " by you");
+                                    ? " (掘った)"
+                                    : " (仕掛けた)",
+                        !trap->madeby_u ? "" : " あなたが");
             return ECMD_OK;
         }
-    pline("I can't see a trap there.");
+    pline("そこに罠は見えなかった.");
     return ECMD_OK;
 }
 
@@ -2426,7 +2401,7 @@ whatdoes_help(void)
 
     fp = dlb_fopen(KEYHELP, "r");
     if (!fp) {
-        pline("Cannot open \"%s\" data file!", KEYHELP);
+        pline("\"%s\"データファイルを開けなかった!", KEYHELP);
         display_nhwindow(WIN_MESSAGE, TRUE);
         return;
     }
@@ -2598,7 +2573,7 @@ dowhatdoes_core(char q, char *cbuf)
 #if 0
     fp = dlb_fopen(CMDHELPFILE, "r");
     if (!fp) {
-        pline("Cannot open \"%s\" data file!", CMDHELPFILE);
+        pline("\"%s\"データファイルを開けなかった!", CMDHELPFILE);
         return 0;
     }
 
@@ -2663,9 +2638,9 @@ dowhatdoes(void)
     char q, *reslt;
 
     if (!once) {
-        pline("Ask about '&' or '?' to get more info.%s",
+          pline("'&' または '?' を入力すると、詳しい説明を読める.%s",
 #ifdef ALTMETA
-              iflags.altmeta ? "  (For ESC, type it twice.)" :
+              iflags.altmeta ? "  (ESC は2回入力してほしい.)" :
 #endif
               "");
         once = TRUE;
@@ -2673,7 +2648,7 @@ dowhatdoes(void)
 #if defined(UNIX) || defined(VMS)
     introff(); /* disables ^C but not ^\ */
 #endif
-    q = yn_function("What command?", (char *) 0, '\0', TRUE);
+    q = yn_function("どのコマンド?", (char *) 0, '\0', TRUE);
 #ifdef ALTMETA
     if (q == '\033' && iflags.altmeta) {
         /* in an ideal world, we would know whether another keystroke
@@ -2708,7 +2683,7 @@ dowhatdoes(void)
             pline("%8.8s%s", reslt, p + 1);
         }
     } else {
-        pline("No such command '%s', char code %d (0%03o or 0x%02x).",
+          pline("そのコマンド'%s'は存在しなかった. 文字コード %d (0%03o または 0x%02x).",
               visctrl(q), (uchar) q, (uchar) q, (uchar) q);
     }
     return ECMD_OK;
@@ -2722,23 +2697,23 @@ docontact(void)
 
     if (sysopt.support) {
         /*XXX overflow possibilities*/
-        Sprintf(buf, "To contact local support, %s", sysopt.support);
+        Sprintf(buf, "ローカルサポートへの連絡先: %s", sysopt.support);
         putstr(cwin, 0, buf);
         putstr(cwin, 0, "");
     } else if (sysopt.fmtd_wizard_list) { /* formatted SYSCF WIZARDS */
-        Sprintf(buf, "To contact local support, contact %s.",
+        Sprintf(buf, "ローカルサポートへの連絡先: %s.",
                 sysopt.fmtd_wizard_list);
         putstr(cwin, 0, buf);
         putstr(cwin, 0, "");
     }
-    putstr(cwin, 0, "To contact the NetHack development team directly,");
+    putstr(cwin, 0, "NetHack 開発チームへ直接連絡するには,");
     /*XXX overflow possibilities*/
-    Sprintf(buf, "see the 'Contact' form on our website or email <%s>.",
+        Sprintf(buf, "公式サイトの 'Contact' フォームか <%s> へ連絡してほしい.",
             DEVTEAM_EMAIL);
     putstr(cwin, 0, buf);
     putstr(cwin, 0, "");
-    putstr(cwin, 0, "For more information on NetHack, or to report a bug,");
-    Sprintf(buf, "visit our website \"%s\".", DEVTEAM_URL);
+        putstr(cwin, 0, "NetHack の詳細情報やバグ報告は,");
+        Sprintf(buf, "公式サイト \"%s\" を参照してほしい.", DEVTEAM_URL);
     putstr(cwin, 0, buf);
     display_nhwindow(cwin, FALSE);
     destroy_nhwindow(cwin);
@@ -2831,25 +2806,25 @@ static const struct {
     void (*f)(void);
     const char *text;
 } help_menu_items[] = {
-    { hmenu_doextversion, "About NetHack (version information)." },
-    { dispfile_help, "Long description of the game and commands." },
-    { dispfile_shelp, "List of game commands." },
-    { hmenu_dohistory, "Concise history of NetHack." },
-    { hmenu_dowhatis, "Info on a character in the game display." },
-    { hmenu_dowhatdoes, "Info on what a given key does." },
-    { option_help, "List of game options." },
-    { dispfile_optionfile, "Longer explanation of game options." },
-    { dispfile_optmenu, "Using the %s command to set options." },
-    { dokeylist, "Full list of keyboard commands." },
-    { hmenu_doextlist, "List of extended commands." },
-    { domenucontrols, "List menu control keys." },
-    { dispfile_usagehelp, "Description of NetHack's command line." },
-    { dispfile_license, "The NetHack license." },
-    { docontact, "Support information." },
+    { hmenu_doextversion, "NetHack について(バージョン情報)." },
+    { dispfile_help, "ゲームとコマンドの詳細説明." },
+    { dispfile_shelp, "ゲームコマンド一覧." },
+    { hmenu_dohistory, "NetHack の簡易な歴史." },
+    { hmenu_dowhatis, "画面上の文字情報を調べる." },
+    { hmenu_dowhatdoes, "指定したキーの機能を調べる." },
+    { option_help, "ゲームオプション一覧." },
+    { dispfile_optionfile, "ゲームオプションの詳細説明." },
+    { dispfile_optmenu, "%s コマンドでオプションを設定する方法." },
+    { dokeylist, "キーボードコマンド完全一覧." },
+    { hmenu_doextlist, "拡張コマンド一覧." },
+    { domenucontrols, "メニュー操作キー一覧." },
+    { dispfile_usagehelp, "NetHack のコマンドライン説明." },
+    { dispfile_license, "NetHack ライセンス." },
+    { docontact, "サポート情報." },
 #ifdef PORT_HELP
-    { port_help, "%s-specific help and commands." },
+    { port_help, "%s 固有のヘルプとコマンド." },
 #endif
-    { dispfile_debughelp, "List of wizard-mode commands." },
+    { dispfile_debughelp, "ウィザードモードコマンド一覧." },
     { (void (*)(void)) 0, (char *) 0 }
 };
 
@@ -2860,7 +2835,7 @@ int
 dohelp(void)
 {
     winid tmpwin = create_nhwindow(NHW_MENU);
-    char helpbuf[QBUFSZ], tmpbuf[QBUFSZ];
+    char helpbuf[BUFSZ], tmpbuf[QBUFSZ];
     int i, n;
     menu_item *selected;
     anything any;
@@ -2877,17 +2852,19 @@ dohelp(void)
             continue;
 
         if (help_menu_items[i].text[0] == '%') {
-            Sprintf(helpbuf, help_menu_items[i].text, PORT_ID);
+            Snprintf(helpbuf, sizeof helpbuf, help_menu_items[i].text,
+                     PORT_ID);
         } else if (help_menu_items[i].f == dispfile_optmenu) {
-            Sprintf(helpbuf, help_menu_items[i].text, setopt_cmd(tmpbuf));
+            Snprintf(helpbuf, sizeof helpbuf, help_menu_items[i].text,
+                     setopt_cmd(tmpbuf));
         } else {
-            Strcpy(helpbuf, help_menu_items[i].text);
+            Snprintf(helpbuf, sizeof helpbuf, "%s", help_menu_items[i].text);
         }
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  helpbuf, MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Select one item:");
+    end_menu(tmpwin, "項目を選んでください:");
     n = select_menu(tmpwin, PICK_ONE, &selected);
     destroy_nhwindow(tmpwin);
     if (n > 0) {

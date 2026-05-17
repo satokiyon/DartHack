@@ -2835,7 +2835,7 @@ doeat(void)
 
         if (res) {
             Your(
-               "%s stops tingling and your sense of smell returns to normal.",
+                             "%sのむずむずはおさまり、嗅覚は元に戻った.",
                  body_part(NOSE));
             u.uedibility = 0;
             if (res == 1)

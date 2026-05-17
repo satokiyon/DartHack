@@ -2366,7 +2366,7 @@ wipeoff(void)
         }
         return 0;
     } else if (!u.ucreamed) {
-        Your("%sを洗ってっぽやかになった。", body_part(FACE));
+        Your("%sはいまきれいになった.", body_part(FACE));
         return 0;
     }
     return 1; /* still busy */
@@ -2386,7 +2386,7 @@ dowipe(void)
          */
         return ECMD_TIME;
     }
-    Your("%sはもうきれいになっていた。", body_part(FACE));
+    Your("%sはもうきれいになっていた.", body_part(FACE));
     return ECMD_TIME;
 }
 

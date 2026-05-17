@@ -252,7 +252,7 @@ vomiting_dialogue(void)
                [vomit() issues its own message for the cantvomit() case
                and for the FAINTING-or-worse case where stomach is empty] */
             if (u.uhs < FAINTING)
-                You("%s!", !Hallucination ? "vomit" : "hurl chunks");
+                You("%s!", !Hallucination ? "吐いた" : "激しく吐いた");
         }
         vomit();
         break;
@@ -270,7 +270,7 @@ sleep_dialogue(void)
     long i = (HSleepy & TIMEOUT);
 
     if (i == 4)
-        You("yawn.");
+        You("あくびした.");
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL   /* RESTORE is after slime_dialogue */
@@ -784,7 +784,7 @@ nh_timeout(void)
                 if (unconscious() || Sleep_resistance) {
                     incr_itimeout(&HSleepy, rnd(100));
                 } else if (Sleepy) {
-                    You("fall asleep.");
+                    You("眠り込んだ.");
                     sleeptime = rnd(20);
                     fall_asleep(-sleeptime, TRUE);
                     incr_itimeout(&HSleepy, sleeptime + rnd(100));
@@ -805,7 +805,7 @@ nh_timeout(void)
                 /* timed Flying is via #wizintrinsic only */
                 if (was_flying && !Flying) {
                     disp.botl = TRUE;
-                    You("land.");
+                    You("着地した.");
                     spoteffects(TRUE);
                 }
                 break;
@@ -819,7 +819,7 @@ nh_timeout(void)
                         break;
                     }
                     if (!Unaware)
-                        You("no longer feel safe from acid.");
+                        You("もう酸に対して安全ではないと感じた.");
                 }
                 break;
             case STONE_RES:
@@ -832,7 +832,7 @@ nh_timeout(void)
                         break;
                     }
                     if (!Unaware)
-                        You("no longer feel secure from petrification.");
+                        You("もう石化に対して安全ではないと感じた.");
                     /* no-op if not wielding a cockatrice corpse;
                        uswapwep case is always a no-op because two-weapon
                        combat is only possible with two one-handed weapons
@@ -866,7 +866,7 @@ nh_timeout(void)
                     svc.context.warntype.species = (struct permonst *) 0;
                     svc.context.warntype.speciesidx = NON_PM;
                     if (wptr)
-                        You("are no longer warned about %s.",
+                        You("もう%sへの警告を受けなくなった.",
                             makeplural(wptr->pmnames[NEUTRAL]));
                 }
                 break;
@@ -882,8 +882,10 @@ nh_timeout(void)
             case MAGICAL_BREATHING:
                 if (!Breathless) {
                     if (region_danger())
-                        You("cough%s",
-                            Poison_resistance ? "." : " and spit blood!");
+                        You("%s",
+                            Poison_resistance
+                                ? "せき込んだ."
+                                : "せき込んで血を吐いた!");
                 }
                 break;
             case STRANGLED:
@@ -1248,7 +1250,7 @@ slip_or_trip(void)
             pline("Egads!  %s bite%s your %s!", what,
                   (!otmp || otmp->quan == 1L) ? "s" : "", body_part(FOOT));
         } else {
-            You("trip over %s.", what);
+            You("%sにつまずいた.", what);
         }
         if (!uarmf && otmp->otyp == CORPSE
             && touch_petrifies(&mons[otmp->corpsenm]) && !Stone_resistance) {
@@ -1298,18 +1300,18 @@ slip_or_trip(void)
         if (on_foot) {
             switch (rn2(4)) {
             case 1:
-                You("trip over your own %s.",
+                You("自分の%sにつまずいた.",
                     Hallucination ? "elbow" : makeplural(body_part(FOOT)));
                 break;
             case 2:
-                You("slip %s.",
-                    Hallucination ? "on a banana peel" : "and nearly fall");
+                You("%s.",
+                    Hallucination ? "バナナの皮で足を滑らせた" : "足を滑らせて転びそうになった");
                 break;
             case 3:
-                You("flounder.");
+                You("よろめいた.");
                 break;
             default:
-                You("stumble.");
+                You("つまずいた.");
                 break;
             }
 
@@ -1323,13 +1325,13 @@ slip_or_trip(void)
                      makeplural(body_part(FOOT)));
                 break;
             case 2:
-                You("let go of the reins.");
+                You("手綱を手放した.");
                 break;
             case 3:
-                You("bang into the saddle-horn.");
+                You("鞍頭にぶつかった.");
                 break;
             default:
-                You("slide to one side of the saddle.");
+                You("鞍の片側へずり落ちた.");
                 break;
             }
             dismount_steed(DISMOUNT_FELL);

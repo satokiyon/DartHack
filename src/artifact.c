@@ -2218,10 +2218,10 @@ arti_invoke(struct obj *obj)
             }
             newsym(u.ux, u.uy);
             if (on)
-                Your("体を%sに透明にした...",
-                     Hallucination ? "速やか" : "変下はとになった");
+                Your("体が%s透明になった...",
+                     Hallucination ? "普通に" : "奇妙に");
             else
-                Your("体が晴れが戻った...");
+                Your("体の透明感が薄れていった...");
             break;
         }
     }

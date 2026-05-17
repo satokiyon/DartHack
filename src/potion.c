@@ -119,9 +119,9 @@ make_stunned(long xtime, boolean talk)
     if (xtime && !old) {
         if (talk) {
             if (u.usteed)
-                You("wobble in the saddle.");
+                You("鞍の上でよろめいた.");
             else
-                You("%s...", stagger(gy.youmonst.data, "stagger"));
+                You("よろめいた...");
         }
     }
     if ((!xtime && old) || (xtime && !old))
@@ -254,8 +254,7 @@ make_vomiting(long xtime, boolean talk)
             You_feel("吐き気がずいぶん治まった.");
 }
 
-static const char vismsg[] = "vision seems to %s for a moment but is %s now.";
-static const char eyemsg[] = "%s momentarily %s.";
+static const char vismsg[] = "視界は一瞬%sように感じられたが、いまは%s.";
 
 void
 make_blinded(long xtime, boolean talk)
@@ -290,9 +289,9 @@ make_blinded(long xtime, boolean talk)
                 eyes = body_part(EYE);
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
-                Your(eyemsg, eyes, vtense(eyes, "itch"));
+                Your("%sが一瞬かゆくなった.", eyes);
             } else { /* Eyes of the Overworld */
-                Your(vismsg, "brighten", Hallucination ? "sadder" : "normal");
+                Your(vismsg, "明るくなった", Hallucination ? "さらに奇妙だ" : "普段どおりだ");
             }
         }
     }
@@ -316,9 +315,9 @@ make_blinded(long xtime, boolean talk)
                 eyes = body_part(EYE);
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
-                Your(eyemsg, eyes, vtense(eyes, "twitch"));
+                Your("%sが一瞬ぴくりと動いた.", eyes);
             } else { /* Eyes of the Overworld */
-                Your(vismsg, "dim", Hallucination ? "happier" : "normal");
+                Your(vismsg, "暗くなった", Hallucination ? "さらに奇妙だ" : "普段どおりだ");
             }
         }
     }
@@ -404,9 +403,9 @@ make_hallucinated(
 
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
-                Your(eyemsg, eyes, vtense(eyes, "itch"));
+                Your("%sが一瞬かゆくなった.", eyes);
             } else { /* Grayswandir */
-                Your(vismsg, "flatten", "normal");
+                Your(vismsg, "平板になった", "普段どおりだ");
             }
         }
     }
@@ -1199,7 +1198,7 @@ peffect_levitation(struct obj *otmp)
         } else if (has_ceiling(&u.uz)) {
             int dmg = rnd(!uarmh ? 10 : !hard_helmet(uarmh) ? 6 : 3);
 
-            You("hit your %s on the %s.", body_part(HEAD),
+            You("%sを%sにぶつけた.", body_part(HEAD),
                 ceiling(u.ux, u.uy));
             losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling",
                    KILLED_BY);
@@ -1271,7 +1270,7 @@ peffect_oil(struct obj *otmp)
              * extra damage, but drinking potions in that form isn't
              * possible so there's no need to try to handle that.
              */
-            You("burn your %s.", body_part(FACE));
+            You("%sが焼けた.", body_part(FACE));
             /* fire damage */
             vulnerable = !Fire_resistance || Cold_resistance;
             losehp(d(vulnerable ? 4 : 2, 4),
@@ -2060,7 +2059,7 @@ potionbreathe(struct obj *obj)
             gn.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else {
-            You("yawn.");
+            You("あくびをした.");
             monstseesu(M_SEEN_SLEEP);
         }
         break;
@@ -2452,7 +2451,7 @@ potion_dip(struct obj *obj, struct obj *potion)
         return ECMD_OK;
     }
     if (obj == &hands_obj) {
-        You("can't fit your %s into the mouth of the bottle!",
+        You("%sは瓶の口に入らなかった!",
             body_part(HAND));
         return ECMD_OK;
     }
@@ -2707,7 +2706,7 @@ potion_dip(struct obj *obj, struct obj *potion)
             pline("%s %s full.", Yname2(obj), otense(obj, "are"));
             potion->in_use = FALSE; /* didn't go poof */
         } else {
-            You("fill %s with oil.", yname(obj));
+            You("%sに油を注いだ.", yname(obj));
             check_unpaid(potion);        /* Yendorian Fuel Tax */
             /* burns more efficiently in a lamp than in a bottle;
                diluted potion provides less benefit but we don't attempt
@@ -2828,7 +2827,7 @@ djinni_from_bottle(struct obj *obj)
         pline("In a cloud of smoke, %s emerges!", a_monnam(mtmp));
         pline("%s speaks.", Monnam(mtmp));
     } else {
-        You("smell acrid fumes.");
+        You("刺激臭のある煙を嗅いだ.");
         pline("%s speaks.", Something);
     }
 
@@ -2881,9 +2880,8 @@ split_mon(
 
     reason[0] = '\0';
     if (mtmp)
-        Sprintf(reason, " from %s heat",
-                (mtmp == &gy.youmonst) ? the_your[1]
-                                    : (const char *) s_suffix(mon_nam(mtmp)));
+        Sprintf(reason, "（%sの熱で）",
+                (mtmp == &gy.youmonst) ? "あなた" : mon_nam(mtmp));
 
     if (mon == &gy.youmonst) {
         if (u.mh > u.mhmax) /* sanity precaution */
@@ -2896,7 +2894,7 @@ split_mon(
             mtmp2->mhpmax = u.mhmax / 2;
             u.mhmax -= mtmp2->mhpmax;
             disp.botl = TRUE;
-            You("multiply%s!", reason);
+            You("分裂した%s!", reason);
         }
     } else {
         if (mon->mhp > mon->mhpmax) /* sanity precaution */
@@ -2910,7 +2908,7 @@ split_mon(
             mtmp2->mhpmax = mon->mhpmax / 2;
             mon->mhpmax -= mtmp2->mhpmax;
             if (canspotmon(mon))
-                pline("%s multiplies%s!", Monnam(mon), reason);
+                pline("%sは分裂した%s!", Monnam(mon), reason);
         }
     }
     return mtmp2;

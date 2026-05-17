@@ -2196,7 +2196,7 @@ doloot_core(void)
         return ECMD_OK;
     }
     if (nohands(gy.youmonst.data)) {
-        You("have no hands!"); /* not `body_part(HAND)' */
+        You("手がなかった!"); /* not `body_part(HAND)' */
         return ECMD_OK;
     }
     if (Confusion) {

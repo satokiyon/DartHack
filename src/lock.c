@@ -846,16 +846,16 @@ doopen_indir(coordxy x, coordxy y)
 
         switch (door->doormask) {
         case D_BROKEN:
-            mesg = "は壊れていた";
+            mesg = "は壊れている";
             break;
         case D_NODOOR:
-            mesg = "口には扉がなかった";
+            mesg = "戸口には扉がなかった";
             break;
         case D_ISOPEN:
             mesg = "は既に開いていた";
             break;
         default:
-            mesg = "には鍵がかかっていた";
+            mesg = "には鍵がかかっている";
             locked = TRUE;
             break;
         }
@@ -925,7 +925,7 @@ obstructed(coordxy x, coordxy y, boolean quietly)
                 /* s_suffix() returns a modifiable buffer */
                 Mn = strcat(s_suffix(Mn), "の尻尾");
 
-            pline("%sが道を塞いでいた!", Mn);
+            pline("%sが道を塞いでいる!", Mn);
         }
         if (!canspotmon(mtmp))
             map_invisible(x, y);
@@ -934,7 +934,7 @@ obstructed(coordxy x, coordxy y, boolean quietly)
     if (OBJ_AT(x, y)) {
  objhere:
         if (!quietly)
-            pline("%sが道を塞いでいた.", Something);
+            pline("%sが道を塞いでいる.", Something);
         return TRUE;
     }
     return FALSE;
@@ -965,7 +965,7 @@ doclose(void)
     x = u.ux + u.dx;
     y = u.uy + u.dy;
     if (u_at(x, y) && !Passes_walls) {
-        You("邪魔になっていた!");
+        You("邪魔になっている!");
         return ECMD_TIME;
     }
 
