@@ -1063,7 +1063,7 @@ dotele(
                 }
             }
             if (trap)
-                You("%s onto the teleportation trap.", u_locomotion("jump"));
+                You("%sでテレポートの罠へ飛び込んだ.", u_locomotion("jump"));
         } else
             trap = 0;
     }
@@ -1113,15 +1113,16 @@ dotele(
         } else
 #endif
         if (u.uhunger <= 10) {
-            cantdoit = "are too weak from hunger";
+            cantdoit = "空腹で弱りすぎていた";
         } else if (ACURR(A_STR) < 4) {
-            cantdoit = "lack the strength";
+            cantdoit = "力が足りなかった";
         } else if (energy > u.uen) {
-            cantdoit = "lack the energy";
+            cantdoit = "エネルギーが足りなかった";
         }
         if (cantdoit) {
-            You("%s %s.", cantdoit,
-                castit ? "for a teleport spell" : "to teleport");
+            You("%sため、%sできなかった.", cantdoit,
+                castit ? "テレポート呪文を唱えることが"
+                       : "テレポートすることが");
             return 0;
         } else if (check_capacity(
                        "Your concentration falters from carrying so much.")) {

@@ -6,7 +6,7 @@
 #include "hack.h"
 
 static const char brief_feeling[] =
-    "have a %s feeling for a moment, then it passes.";
+    "一瞬%s気分になったが、すぐにおさまった.";
 
 staticfn boolean mhitm_mgc_atk_negated(struct monst *, struct monst *,
                                      boolean) NONNULLPTRS;
@@ -3076,7 +3076,7 @@ mhitm_ad_curs(
                     mhm->done = TRUE;
                     return;
                 } else if (mdef->mtame && !gv.vis) {
-                    You(brief_feeling, "strangely sad");
+                    You(brief_feeling, "妙に悲しい");
                 }
                 mhm->hitflags = (M_ATTK_DEF_DIED
                                  | (grow_up(magr, mdef) ? 0
@@ -3349,8 +3349,8 @@ mhitm_ad_wrap(
                 if (m_slips_free(mdef, mattk)) {
                     mhm->damage = 0;
                 } else {
-                    You("%s yourself around %s!",
-                        coil ? "coil" : "swing", mon_nam(mdef));
+                    You("%sに体を%sつけた!", mon_nam(mdef),
+                        coil ? "巻き" : "絡み");
                     set_ustuck(mdef);
                 }
             } else if (u.ustuck == mdef && !tailmiss) {
@@ -3966,7 +3966,7 @@ do_stone_mon(
             mhm->done = TRUE;
             return;
         } else if (mdef->mtame && !gv.vis) {
-            You(brief_feeling, "peculiarly sad");
+            You(brief_feeling, "妙に悲しい");
         }
         mhm->hitflags = (M_ATTK_DEF_DIED
                          | (grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED));
@@ -4522,7 +4522,7 @@ mhitm_ad_dgst(
                 mhm->done = TRUE;
                 return;
             } else if (magr->mtame && !gv.vis)
-                You(brief_feeling, "queasy");
+                You(brief_feeling, "むかむかした");
             mhm->hitflags = M_ATTK_AGR_DIED;
             mhm->done = TRUE;
             return;
@@ -4938,9 +4938,9 @@ start_engulf(struct monst *mdef)
         tmp_at(DISP_ALWAYS, mon_to_glyph(&gy.youmonst, rn2_on_display_rng));
         tmp_at(mdef->mx, mdef->my);
     }
-    You("%s %s%s!",
-        u_digest ? "swallow" : u_enfold ? "enclose" : "engulf",
-        mon_nam(mdef), u_digest ? " whole" : "");
+    You("%sを%s%s!", mon_nam(mdef),
+        u_digest ? "丸のみした" : u_enfold ? "包み込んだ" : "飲み込んだ",
+        u_digest ? "まま" : "");
     nh_delay_output();
     nh_delay_output();
 }
@@ -4965,9 +4965,9 @@ gulpum(struct monst *mdef, struct attack *mattk)
             u_enfold = enfolds(gy.youmonst.data);
     struct obj *otmp;
     struct permonst *pd = mdef->data;
-    const char *expel_verb = u_digest ? "regurgitate"
-                             : u_enfold ? "release"
-                               : "expel";
+        const char *expel_verb = u_digest ? "吐き戻した"
+                                                         : u_enfold ? "解放した"
+                                                             : "吐き出した";
 
     /* Not totally the same as for real monsters.  Specifically, these
      * don't take multiple moves.  (It's just too hard, for too little
@@ -4990,8 +4990,10 @@ gulpum(struct monst *mdef, struct attack *mattk)
            vampire form now instead of dealing with that when it dies */
         if (is_vampshifter(mdef)
             && newcham(mdef, &mons[mdef->cham], NO_NC_FLAGS)) {
-            You("%s it, then %s it.",
-                u_digest ? "swallow" : u_enfold ? "enclose" : "engulf",
+            You("%sを%sが、すぐに%s.", mon_nam(mdef),
+                u_digest ? "丸のみした"
+                         : u_enfold ? "包み込んだ"
+                           : "飲み込んだ",
                 expel_verb);
             if (canspotmon(mdef)) {
                 /* Avoiding a_monnam here: if the target is named, it gives us
@@ -5022,7 +5024,8 @@ gulpum(struct monst *mdef, struct attack *mattk)
 
             if (!type_is_pname(pd))
                 mnam = an(mnam);
-            You("%s %s.", u_digest ? "englut" : "engulf", mon_nam(mdef));
+            You("%sを%s.", mon_nam(mdef),
+                u_digest ? "丸のみした" : "飲み込んだ");
             Sprintf(kbuf, "%s %s%s",
                     u_digest ? "swallowing"
                     : u_enfold ? "enclosing"
@@ -5184,7 +5187,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                 if (DEADMONSTER(mdef)) /* not lifesaved */
                     return M_ATTK_DEF_DIED;
             }
-            You("%s %s!", expel_verb, mon_nam(mdef));
+            You("%sを%s!", mon_nam(mdef), expel_verb);
             if ((Slow_digestion || is_animal(gy.youmonst.data)) && u_digest) {
                 pline("Obviously, you didn't like %s taste.",
                       s_suffix(mon_nam(mdef)));
@@ -5343,9 +5346,9 @@ mhitm_knockback(
         if (u_def || (u.usteed && mdef == u.usteed)) {
             mdefbuf[0] = '\0';
             if (u.usteed)
-                Snprintf(mdefbuf, sizeof mdefbuf, "and %s ",
+                Snprintf(mdefbuf, sizeof mdefbuf, "%sとともに",
                          y_monnam(u.usteed));
-            You("%sdon't budge.", mdefbuf);
+            You("%sびくともしなかった.", mdefbuf);
         } else if (canseemon(mdef)) {
             pline("%s doesn't budge.", Monnam(mdef));
         }

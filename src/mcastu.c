@@ -510,7 +510,7 @@ mcast_stun_you(int dmg)
             You_feel("一瞬ふらついた.");
         make_stunned(1L, FALSE);
     } else {
-        You(Stunned ? "struggle to keep your balance." : "reel...");
+        You(Stunned ? "バランスを保とうともがいた." : "よろめいた...");
         dmg = d(ACURR(A_DEX) < 12 ? 6 : 4, 4);
         if (Half_spell_damage)
             dmg = (dmg + 1) / 2;

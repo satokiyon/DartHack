@@ -589,9 +589,9 @@ do_improvisation(struct obj *instr)
     case MAGIC_FLUTE: /* Make monster fall asleep */
         consume_obj_charge(instr, TRUE);
 
-        You("%sproduce %s%s music.", !Deaf ? "" : "seem to ",
-            Hallucination ? "piped" : "soft",
-            same_old_song ? ", familiar" : "");
+        You("%s%s%s音楽を奏でた.", !Deaf ? "" : "どうやら",
+            Hallucination ? "甲高い" : "柔らかな",
+            same_old_song ? "、聞き覚えのある" : "");
         Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
         put_monsters_to_sleep(u.ulevel * 5);
         exercise(A_DEX, TRUE);
@@ -804,8 +804,8 @@ do_play_instrument(struct obj *instr)
         }
     }
 
-    You(!Deaf ? "extract a strange sound from %s!"
-              : "can feel %s emitting vibrations.", the(xname(instr)));
+    You(!Deaf ? "%sから奇妙な音を引き出した!"
+              : "%sが震えているのを感じた.", the(xname(instr)));
     Hero_playnotes(obj_to_instr(instr), buf, 50);
 
 

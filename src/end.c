@@ -195,7 +195,7 @@ done_in_by(struct monst *mtmp, int how)
             mimicker = (M_AP_TYPE(mtmp) == M_AP_MONSTER),
             imitator = (mptr != champtr || mimicker);
 
-    You((how == STONING) ? "turn to stone..." : "die...");
+    You((how == STONING) ? "石になっていく..." : "死んでいく...");
     mark_synch(); /* flush buffered screen output */
     buf[0] = '\0';
     svk.killer.format = KILLED_BY_AN;

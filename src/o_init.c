@@ -892,9 +892,9 @@ doclassdisco(void)
 {
     static NEARDATA const char
         prompt[] = "View discoveries for which sort of objects?",
-        havent_discovered_any[] = "haven't discovered any %s yet.",
-        unique_items[] = "unique items or relics",
-        artifact_items[] = "artifacts";
+        havent_discovered_any[] = "まだ%sを何も発見していなかった.",
+        unique_items[] = "固有の品や秘宝",
+        artifact_items[] = "アーティファクト";
     winid tmpwin = WIN_ERR;
     menu_item *pick_list = 0;
     anything any;
@@ -990,7 +990,7 @@ doclassdisco(void)
 
     /* there might not be anything for us to do... */
     if (!discosyms[0]) {
-        You(havent_discovered_any, "items");
+        You(havent_discovered_any, "品物");
         if (tmpwin != WIN_ERR)
             destroy_nhwindow(tmpwin);
         return ECMD_OK;

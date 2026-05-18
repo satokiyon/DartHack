@@ -2808,7 +2808,8 @@ mbag_item_gone(boolean held, struct obj *item, boolean silent)
         if (item->dknown)
             pline("%s %s vanished!", Doname2(item), otense(item, "have"));
         else
-            You("%s %s disappear!", Blind ? "notice" : "see", doname(item));
+            You("%sが消えるのを%s!", doname(item),
+                Blind ? "感じた" : "見た");
     }
 
     if (*u.ushops && (shkp = shop_keeper(*u.ushops)) != 0) {
