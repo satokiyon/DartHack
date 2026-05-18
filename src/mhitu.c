@@ -1075,7 +1075,7 @@ u_slip_free(
                   : cloak_simple_name(obj));
 
         if (obj->greased && !rn2(2)) {
-            pline_The("grease wears off.");
+            pline_The("油は落ちた.");
             obj->greased = 0;
             update_inventory();
         }
@@ -1486,7 +1486,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
         break;
     case AD_ELEC:
         if (!mtmp->mcan && rn2(2)) {
-            pline_The("air around you crackles with electricity.");
+            pline_The("あなたの周囲の空気が電気を帯びてはじけた.");
             if (Shock_resistance) {
                 shieldeff(u.ux, u.uy);
                 You("平気そうだった.");
@@ -1833,7 +1833,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
                 stop_occupation();
                 if (Fire_resistance) {
                     shieldeff(u.ux, u.uy);
-                    pline_The("fire doesn't feel hot!");
+                    pline_The("炎は熱く感じない!");
                     monstseesu(M_SEEN_FIRE);
                     ugolemeffects(AD_FIRE, d(12, 6));
                     dmg = 0;

@@ -2858,7 +2858,7 @@ lifesaved_monster(struct monst *mtmp)
                 else
                     pline("%s looks much better!", Monnam(mtmp));
             }
-            pline_The("medallion crumbles to dust!");
+            pline_The("メダリオンは塵となって崩れた!");
         }
         m_useup(mtmp, lifesave);
         /* equip replacement amulet, if any, on next move */
@@ -2959,7 +2959,7 @@ vamprises(struct monst *mtmp)
                 You_see("%s.", trapped ? "扉が爆発するのを見た"
                                       : "扉が壊れるのを見た");
             else if (!Unaware)
-                pline_The("door is smashed%s",
+                pline_The("扉は叩き壊され%s",
                           trapped ? " and it explodes!" : ".");
             set_msg_xy(0, 0); /* in case none of the messages was delivered */
 

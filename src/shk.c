@@ -542,14 +542,14 @@ call_kops(struct monst *shkp, boolean nearshop)
         if (nearshop) {
             /* Create swarm around you, if you merely "stepped out" */
             if (flags.verbose)
-                pline_The("Keystone Kops appear!");
+                pline_The("キーストーン・コップが現れた!");
             mm.x = u.ux;
             mm.y = u.uy;
             makekops(&mm);
             return;
         }
         if (flags.verbose)
-            pline_The("Keystone Kops are after you!");
+            pline_The("キーストーン・コップがあなたを追っている!");
         /* Create swarm near down staircase (hinders return to level) */
         if (isok(sx, sy)) {
             mm.x = sx;
@@ -826,7 +826,7 @@ u_entered_shop(char *enterstring)
             verbalize("また来たのか、%s？俺の%sでしっかり見張っとくぞ。",
                       svp.plname, mbodypart(shkp, EYE));
         } else {
-            pline_The("atmosphere at %s %s seems unwelcoming.",
+            pline_The("%s%sの空気は歓迎していないようだ.",
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         }
     } else if (eshkp->robbed) {
@@ -1282,11 +1282,11 @@ check_credit(long  tmp, struct monst *shkp)
     if (credit == 0L) {
         ; /* nothing to do; just 'return tmp;' */
     } else if (credit >= tmp) {
-        pline_The("price is deducted from your credit.");
+        pline_The("代金はあなたの信用枠から差し引かれた.");
         ESHK(shkp)->credit -= tmp;
         tmp = 0L;
     } else {
-        pline_The("price is partially covered by your credit.");
+        pline_The("代金はあなたの信用枠で一部相殺された.");
         ESHK(shkp)->credit = 0L;
         tmp -= credit;
     }
@@ -3587,11 +3587,11 @@ addtobill(
     } else if (!silent) {
         if (ltmp) {
             set_voice(shkp, 0, 80, 0);
-            pline_The("list price of %s%s%s is %ld %s%s.",
+            pline_The("%s%s%sの定価は%ld %s%sだ.",
                       (contentscount && !obj->unpaid) ? the_contents_of : "",
                       the(xname(obj)),
                       (contentscount && obj->unpaid) ? and_its_contents : "",
-                      ltmp, currency(ltmp), (obj->quan > 1L) ? " each" : "");
+                      ltmp, currency(ltmp), (obj->quan > 1L) ? "個あたり" : "");
         } else {
             pline("%s does not notice.", Shknam(shkp));
         }
@@ -5619,8 +5619,8 @@ kops_gone(boolean silent)
         }
     }
     if (cnt && !silent)
-        pline_The("Kop%s (disappointed) vanish%s into thin air.",
-                  plur(cnt), (cnt == 1) ? "es" : "");
+        pline_The("コップ%sは落胆してかき消すように消えた.",
+                  plur(cnt));
 }
 
 staticfn long
@@ -6045,9 +6045,9 @@ globby_bill_fixup(struct obj *obj_absorber, struct obj *obj_absorbed)
                         eshkp->loan = 0L;
                 }
                 eshkp->debit -= amount;
-                pline_The("donated %s %spays off your debt.",
+                pline_The("寄進した%sで負債は%s返済された.",
                           obj_typename(obj_absorbed->otyp),
-                          eshkp->debit ? "partially " : "");
+                          eshkp->debit ? "一部" : "全額");
             } else {
                 long delta = amount - eshkp->debit;
 

@@ -1302,7 +1302,7 @@ Mb_hit(struct monst *magr, /* attacker */
     verb = mb_verb[!!Hallucination][attack_indx];
     if (youattack || youdefend || vis) {
         result = TRUE;
-        pline_The("magic-absorbing blade %s %s!",
+        pline_The("魔力吸収の刃が%s、%s!",
                   vtense((const char *) 0, verb), hittee);
         /* assume probing has some sort of noticeable feedback
            even if it is being done by one monster to another */
@@ -1380,7 +1380,7 @@ Mb_hit(struct monst *magr, /* attacker */
 
     case MB_INDEX_PROBE:
         if (youattack && (mb->spe == 0 || !rn2(3 * abs(mb->spe)))) {
-            pline_The("%s is insightful.", verb);
+            pline_The("%sは洞察に満ちている.", verb);
             /* pre-damage status */
             probe_monster(mdef);
         }
@@ -1481,12 +1481,12 @@ artifact_hit(
     /* the four basic attacks: fire, cold, shock and missiles */
     if (attacks(AD_FIRE, otmp)) {
         if (realizes_damage)
-            pline_The("fiery blade %s %s%c",
+            pline_The("炎の刃が%s %s%c",
                       !gs.spec_dbon_applies
-                          ? "hits"
+                          ? "命中した"
                           : (mdef->data == &mons[PM_WATER_ELEMENTAL])
-                                ? "vaporizes part of"
-                                : "burns",
+                                ? "一部を蒸発させた"
+                                : "焼いた",
                       hittee, !gs.spec_dbon_applies ? '.' : '!');
         if (!rn2(4)) {
             int itemdmg = destroy_items(mdef, AD_FIRE, *dmgptr);
@@ -1500,8 +1500,8 @@ artifact_hit(
     }
     if (attacks(AD_COLD, otmp)) {
         if (realizes_damage)
-            pline_The("ice-cold blade %s %s%c",
-                      !gs.spec_dbon_applies ? "hits" : "freezes", hittee,
+            pline_The("氷の刃が%s %s%c",
+                      !gs.spec_dbon_applies ? "命中した" : "凍らせた", hittee,
                       !gs.spec_dbon_applies ? '.' : '!');
         if (!rn2(4)) {
             int itemdmg = destroy_items(mdef, AD_COLD, *dmgptr);
@@ -1512,8 +1512,8 @@ artifact_hit(
     }
     if (attacks(AD_ELEC, otmp)) {
         if (realizes_damage)
-            pline_The("massive hammer hits%s %s%c",
-                      !gs.spec_dbon_applies ? "" : "!  Lightning strikes",
+            pline_The("巨大なハンマーが%s %s%c",
+                      !gs.spec_dbon_applies ? "命中した" : "叩きつけ、雷が走った",
                       hittee, !gs.spec_dbon_applies ? '.' : '!');
         if (gs.spec_dbon_applies)
             wake_nearto(mdef->mx, mdef->my, 4 * 4);
@@ -1526,10 +1526,10 @@ artifact_hit(
     }
     if (attacks(AD_MAGM, otmp)) {
         if (realizes_damage)
-            pline_The("imaginary widget hits%s %s%c",
+            pline_The("幻想の装置が%s %s%c",
                       !gs.spec_dbon_applies
-                          ? ""
-                          : "!  A hail of magic missiles strikes",
+                          ? "命中した"
+                          : "作動し、魔法の矢の雨が降り注いだ",
                       hittee, !gs.spec_dbon_applies ? '.' : '!');
         return realizes_damage;
     }
@@ -2751,8 +2751,8 @@ void
 mkot_trap_warn(void)
 {
     static const char *const heat[7] = {
-        "cool", "slightly warm", "warm", "very warm",
-        "hot", "very hot", "like fire"
+        "ひんやり", "少し温かい", "温かい", "かなり温かい",
+        "熱い", "とても熱い", "焼けるように熱い"
     };
 
     if (!uarmg && u_wield_art(ART_MASTER_KEY_OF_THIEVERY)) {
@@ -2760,7 +2760,7 @@ mkot_trap_warn(void)
 
         if (ntraps != gm.mkot_trap_warn_count) {
             idx = min(ntraps, SIZE(heat) - 1);
-            pline_The("Key feels %s%c", heat[idx], (ntraps > 3) ? '!' : '.');
+            pline_The("鍵は%s%c", heat[idx], (ntraps > 3) ? '!' : '.');
         }
         gm.mkot_trap_warn_count = ntraps;
     } else

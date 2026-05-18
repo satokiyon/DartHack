@@ -1089,7 +1089,7 @@ done(int how)
         if (how == CHOKING)
             You("嘔吐した...");
         You_feel("かなり気分がよくなった!");
-        pline_The("medallion crumbles to dust!");
+        pline_The("メダリオンは崩れて塵になった!");
         if (uamul)
             useup(uamul);
 

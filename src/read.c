@@ -1504,7 +1504,7 @@ seffect_remove_curse(struct obj **sobjp)
                 : "the power of the Force against you!"));
 
     if (scursed) {
-        pline_The("scroll disintegrates.");
+        pline_The("巻物は崩れ去った.");
     } else {
         /* 5.0: this used to use a straight
                for (obj = invent; obj; obj = obj->nobj) {}
@@ -1600,7 +1600,7 @@ seffect_remove_curse(struct obj **sobjp)
         unpunish();
     if (u.utrap && u.utraptype == TT_BURIEDBALL) {
         buried_ball_to_freedom();
-        pline_The("clasp on your %s vanishes.", body_part(LEG));
+        pline_The("%sの留め具が消えた.", body_part(LEG));
     }
     update_inventory();
 }
@@ -1711,9 +1711,9 @@ seffect_taming(struct obj **sobjp)
         pline("Nothing interesting %s.",
               !candidates ? "happens" : "seems to happen");
     } else {
-        pline_The("neighborhood %s %sfriendlier.",
-                  vis_results ? "is" : "seems",
-                  (results < 0) ? "un" : "");
+        pline_The("周囲の空気は%s%sなった.",
+              vis_results ? "" : "どこか",
+              (results < 0) ? "険悪に" : "和やかに");
         if (vis_results > 0)
             gk.known = TRUE;
     }
@@ -1882,7 +1882,7 @@ seffect_fire(struct obj **sobjp)
                          makeplural(body_part(HAND)));
         } else {
             monstunseesu(M_SEEN_FIRE);
-            pline_The("scroll catches fire and you burn your %s.",
+            pline_The("巻物は燃え上がり、あなたの%sが焼けた.",
                       makeplural(body_part(HAND)));
             losehp(1, "scroll of fire", KILLED_BY_AN);
         }
@@ -1906,7 +1906,7 @@ seffect_fire(struct obj **sobjp)
             }
         }
         if (u_at(cc.x, cc.y)) {
-            pline_The("scroll erupts in a tower of flame!");
+            pline_The("巻物は火柱となって噴き上がった!");
             iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
             burn_away_slime();
         }
@@ -2534,7 +2534,7 @@ litroom(
                lit squares before and after to know; we do know that being
                swallowed won't be affected--the interior is still lit */
             if (still_lit)
-                pline_The("ambient light seems dimmer.");
+                pline_The("周囲の明かりは弱まったようだ.");
             else if (u.uswallow)
                 pline("It seems even darker in here than before.");
             else

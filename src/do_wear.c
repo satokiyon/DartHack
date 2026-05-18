@@ -2706,7 +2706,7 @@ select_off(struct obj *otmp)
         struct obj glibdummy;
 
         if (nolimbs(gy.youmonst.data)) {
-            pline_The("ring is stuck.");
+            pline_The("指輪は抜けない.");
             return 0;
         }
         glibdummy = cg.zeroobj;
@@ -2744,7 +2744,7 @@ select_off(struct obj *otmp)
     /* special boot checks */
     if (otmp == uarmf) {
         if (u.utrap && u.utraptype == TT_BEARTRAP) {
-            pline_The("bear trap prevents you from pulling your %s out.",
+            pline_The("トラばさみが%sを引き抜くのを妨げた.",
                       body_part(FOOT));
             return 0;
         } else if (u.utrap && u.utraptype == TT_INFLOOR) {

@@ -2934,7 +2934,7 @@ use_whip(struct obj *obj)
     struct monst *mtmp;
     struct obj *otmp;
     int rx, ry, proficient, res = ECMD_OK;
-    const char *msg_slipsfree = "むちはするりと抜けた.";
+    const char *msg_slipsfree = "ムチはするりと抜けた.";
     const char *msg_snap = "ビシッ!";
 
     if (obj != uwep) {

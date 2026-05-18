@@ -209,7 +209,7 @@ castmu(
         Soundeffect(se_air_crackles, 60);
         if (canseemon(mtmp) && !Deaf) {
             set_msg_xy(mtmp->mx, mtmp->my);
-            pline_The("air crackles around %s.", mon_nam(mtmp));
+            pline_The("%sの周囲の空気がはじけた.", mon_nam(mtmp));
         }
         return M_ATTK_MISS;
     }
@@ -283,7 +283,7 @@ castmu(
         You("ミサイルの雨を浴びた!");
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
-            pline_The("missiles bounce off!");
+            pline_The("魔法の矢は弾かれた!");
             monstseesu(M_SEEN_MAGR);
             dmg = 0;
         } else {

@@ -241,7 +241,7 @@ summon_minion(aligntyp alignment, boolean talk)
     if (mon) {
         if (talk) {
             if (!Deaf)
-                pline_The("voice of %s booms:", align_gname(alignment));
+                pline_The("%sの声が轟いた:", align_gname(alignment));
             else
                 You_feel("%sの轟く声を感じた:",
                          s_suffix(align_gname(alignment)));

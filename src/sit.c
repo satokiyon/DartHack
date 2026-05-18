@@ -228,8 +228,8 @@ throne_sit_effect(void)
         newsym_force(tx, ty);
         /* "[God] promptly vanishes in a puff of logic" is from
            Douglas Adams' _The_Hitchhiker's_Guide_to_the_Galaxy_. */
-        pline_The("throne %s in a puff of logic.",
-                  cansee(tx, ty) ? "vanishes" : "has vanished");
+          pline_The("玉座は(マジックではなく)ロジックの一吹きとともに%s.",
+                        cansee(tx, ty) ? "消え去る" : "消え去った");
     }
 }
 
@@ -252,7 +252,7 @@ special_throne_effect(int effect) {
         levl[tx][ty].typ = ROOM, levl[tx][ty].flags = 0;
         map_background(tx, ty, FALSE);
         newsym_force(tx, ty);
-        pline_The("throne disintegrates, having spent its power.");
+        pline_The("玉座は力を使い果たして崩壊した.");
         break;
     case 5:
         /* permanent level drain */
@@ -281,7 +281,7 @@ special_throne_effect(int effect) {
     case 7:
         /* lose an intrinsic */
         attrcurse();
-        pline_The("throne somehow seems to be amused.");
+        pline_The("玉座はなぜか面白がっているようだ.");
         break;
     case 8:
     {
@@ -301,7 +301,7 @@ special_throne_effect(int effect) {
     {
         /* summon demons; a NULL argument to msummon summons demons as
            though they were summoned by the Wizard of Yendor */
-        pline_The("throne seeems to be calling for help!");
+          pline_The("玉座は助けを呼んでいるようだ!");
         msummon(NULL);
         msummon(NULL);
         msummon(NULL);

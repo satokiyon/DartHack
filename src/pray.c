@@ -1423,7 +1423,7 @@ godvoice(aligntyp g_align, const char *words)
     else
         words = "";
 
-    pline_The("voice of %s %s: %s%s%s", align_gname(g_align),
+    pline_The("%sの%sの声: %s%s%s", align_gname(g_align),
               ROLL_FROM(godvoices), quot, words, quot);
 }
 
@@ -1673,7 +1673,7 @@ offer_different_alignment_altar(
                 levl[u.ux][u.uy].altarmask |= AM_SHRINE;
             newsym(u.ux, u.uy); /* in case Invisible to self */
             if (!Blind)
-                pline_The("altar glows %s.",
+                                pline_The("祭壇は%sに輝いた.",
                           hcolor((u.ualign.type == A_LAWFUL) ? NH_WHITE
                                  : u.ualign.type ? NH_BLACK
                                    : (const char *) "gray"));
@@ -1718,7 +1718,7 @@ sacrifice_your_race(
         return;
     } else if (altaralign != A_CHAOTIC && altaralign != A_NONE) {
         /* curse the lawful/neutral altar */
-        pline_The("altar is stained with %s blood.", gu.urace.adj);
+        pline_The("祭壇は%sの血で汚された.", gu.urace.adj);
         levl[u.ux][u.uy].altarmask = AM_CHAOTIC;
         newsym(u.ux, u.uy); /* in case Invisible to self */
         angry_priest();
@@ -1739,7 +1739,7 @@ sacrifice_your_race(
             demonless_msg = "cloud dissipates";
         } else {
             /* either you're chaotic or altar is Moloch's or both */
-            pline_The("blood covers the altar!");
+            pline_The("血が祭壇を覆った!");
             change_luck(altaralign == A_NONE ? -2 : 2);
             demonless_msg = "blood coagulates";
         }
@@ -2053,7 +2053,7 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
             }
         } else { /* not satisfied yet */
             if (Hallucination)
-                pline_The("gods seem tall.");
+                pline_The("神々がやけに大きく見える.");
             else
                 You("不十分な気持ちを覚えた.");
         }
@@ -2133,7 +2133,7 @@ can_pray(boolean praying) /* false means no messages should be given */
     if (is_demon(gy.youmonst.data) /* ok if chaotic or none (Moloch) */
         && (gp.p_aligntyp == A_LAWFUL || gp.p_aligntyp != A_NEUTRAL)) {
         if (praying)
-            pline_The("very idea of praying to a %s god is repugnant to you.",
+            pline_The("%sの神に祈るという考え自体があなたには耐え難い.",
                       gp.p_aligntyp ? "lawful" : "neutral");
         return FALSE;
     }

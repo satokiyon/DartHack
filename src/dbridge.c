@@ -578,7 +578,7 @@ do_entity(struct entity *etmp)
     }
     if (e_missed(etmp, FALSE)) {
         if (at_portcullis) {
-            pline_The("portcullis misses %s!", e_nam(etmp));
+            pline_The("跳ね格子は%sを押し潰し損ねた!", e_nam(etmp));
         } else {
             debugpline1("The drawbridge misses %s!", e_nam(etmp));
         }
@@ -708,7 +708,7 @@ do_entity(struct entity *etmp)
                 if (automiss(etmp))
                     You("その中をすり抜けた!");
                 else
-                    pline_The("drawbridge closes in...");
+                    pline_The("跳ね橋が閉じてくる...");
             } else
                 pline("%s behind the drawbridge.",
                       E_phrase(etmp, "disappear"));
@@ -911,13 +911,13 @@ destroy_drawbridge(coordxy x, coordxy y)
         Soundeffect(se_loud_splash, 100);  /* Deaf-aware */
         if (lev1->typ == DRAWBRIDGE_UP) {
             if (cansee(x2, y2) || u_at(x2, y2))
-                pline_The("portcullis of the drawbridge falls into the %s!",
+                pline_The("跳ね橋の跳ね格子は%sへ落ちた!",
                           lava ? hliquid("lava") : "moat");
             else
                 You_hear("大きな水しぶきの音が聞こえた!");  /* Deaf-aware */
         } else {
             if (cansee(x, y) || u_at(x, y))
-                pline_The("drawbridge collapses into the %s!",
+                pline_The("跳ね橋は%sへ崩れ落ちた!",
                           lava ? hliquid("lava") : "moat");
             else
                 You_hear("大きな水しぶきの音が聞こえた!");  /* Deaf-aware */
@@ -932,7 +932,7 @@ destroy_drawbridge(coordxy x, coordxy y)
         /* no moat beneath */
         Soundeffect(se_loud_crash, 100);  /* Deaf-aware */
         if (cansee(x, y) || u_at(x, y))
-            pline_The("drawbridge disintegrates!");
+            pline_The("跳ね橋は崩壊した!");
         else
             You_hear("大きな衝突音が聞こえた!");  /* Deaf-aware */
         lev1->typ = ((lev1->drawbridgemask & DB_ICE) ? ICE : ROOM);
