@@ -1,133 +1,47 @@
-# Copilot Instructions for NetHackJP
+# Copilot Instructions for NetHackJP (Technical & Operational)
 
-このリポジトリでは、以下を最優先で守ること。
+このファイルは、NetHackJP プロジェクトにおける技術的な運用、ビルド手順、および開発フローに関する指示をまとめたものです。翻訳に関する具体的なガイドラインは `docs/translation-instructions-ja.md` を参照してください。
 
-## 1. 作業対象
+## 1. プロジェクト構成と環境
 
-- 主に日本語翻訳作業を行う。
-- `README.JP` は `README` の翻訳として扱い、日本語化プロジェクトの進捗や状況説明は記載しない。
-- 画面表示されるプレイヤー向けメッセージ（`You(...)`, `You_feel(...)`, `pline(...)` など）を優先して翻訳する。
-- 翻訳対象は画面に表示される文だけとし、コメントやログは原則として翻訳対象外とする。
-- `impossible(...)`, `error()`, `paniclog(...)` などの診断・デバッグ向け関数の出力は、ゲーム画面に表示されない内部診断用の文言のため、翻訳対象外とする。これらは開発時のバグ検出や異常条件の検出に使われ、通常のゲームプレイではプレイヤーには表示されない。
-- 原則として文字列リテラルの変更を優先する。
-- ただし自然な日本語にするため、語順の入れ替え、補助語の付け足し、文脈を保つための最小限のロジック調整は許可する。
-- 文字列差し替えだけでは原文の文意を保った自然な日本語にできない場合は、表示文の組み立て方に限って最小限のロジック変更を行ってよい。
-- 上記の調整はゲーム挙動を変えない範囲に限定し、条件分岐や制御フローの意味を変えない。
+- **OS**: Windows (win32)
+- **シェル**: PowerShell / VS Developer Shell 推奨
+- **ツール**:
+  - 文字列検索: `ag` コマンドを使用（`grep` は避ける）
+  - スクリプト: `PowerShell` または `Python` を使用（`bash` は避ける）
 
-## 2. 翻訳スタイル
+## 2. ビルド手順 (Windows / VS)
 
-- 常体を基本とする。
-- 叙述は過去形を優先する。
-- 原文の意味を変えない。
-- 文末記号は互換性のため半角 `.`, `!`, `?` を維持する。
-
-## 3. 書式指定子の厳守
-
-- `%s`, `%d`, `%ld`, `%c` などの個数・順序・型をできるだけ変更しない。
-- 対応する引数式をできるだけ変更しない。
-- `Monnam(...)`, `body_part(...)`, `s_suffix(...)`, `Tobjnam(...)` などの補助関数は、その返り値を前提に文全体で自然な日本語になるよう調整する。
-- 助詞や語順は文字列リテラル側で吸収し、補助関数の引数や呼び出し条件には触れない。
-
-## 4. 用語ルール
-
-- boulder: 巨大な岩
-- rock (地形/壁文脈): 岩
-- iron bars: 鉄格子
-- tree: 木
-- door: 扉
-- wall: 壁
-- Ranger: 野伏
-
-boulder と rock を同じ訳語にしない。
-
-JNetHack での翻訳例を参考にしつつ、上記の用語ルールを守ること。
-
-## 5. 翻訳対象外ファイル
-
-以下のファイルは翻訳対象外とし、英語のまま維持すること。
-
-- `include/defsym.h`: タイルモードでのタイル名照合に使われる文字列（`tilenm` 引数）が含まれるため、日本語化するとタイルファイルとの照合が失敗する。全エントリを英語のまま維持する。
-
-## 6. 翻訳時の実務知見
-
-- 1つの英語文が複数の文字列リテラルや分岐に分かれて組み立てられている場合、リテラル単体ではなく最終表示文全体で自然か確認する。
-- `pline(...)`, `pline_dir(...)`, `pline_xy(...)` などのメッセージ出力では、文言以外の位置制御や履歴制御に触れない。
-- 文字列連結、バッファ長計算、`Sprintf` 系の呼び出しは壊れやすい。翻訳のために連結構造や計算式を広く組み替えない。
-- `still_chewing()` では boulder と rock の文脈が混在するため、`巨大な岩` と `岩` を取り違えない。
-- Lua データや quest 系テキストでは、文字列だけを置換し、キー名・テーブル構造・配列順・`%` プレースホルダは変更しない。
-- 所有格や部位名を含む文では、`%s` 展開後の語順と助詞を確認し、不自然なら周辺の語順だけを最小限調整する。
-- 変更後はビルドだけで終わらせず、可能ならメッセージ履歴と `--More--` を含む表示崩れも確認する。
-
-## 7. 変更後の確認
-
-- ビルド確認を行う。
-- Windows では Developer PowerShell（VS DevShell）を使用して msbuild を実行する。
-- `NetHack.exe` と `NetHackW.exe` の生成を確認する。
-
-## 8. 使用できるスクリプトやコマンド
-- 文字列の検索にはgrepではなくagコマンドを使用する
-- スクリプトはbashではなく、Powershellやpythonを使用する
-
-## 9. 参照先
-
-詳細手順は以下を参照:
-
-- docs/translation-instructions-ja.md
-- docs/message-translation-safety-checklist.md
-- docs/translation-glossary-quest.md
-
-## 10. 参考プロジェクト
-- NetHack
- -- https://github.com/NetHack/NetHack
-
-- JNetHack
- -- https://github.com/jnethack/jnethack-release
-
-## 11. デバッグ実装の扱い
-
-- 調査のためにトレース出力やデバッグ用フラグを追加することは許可する。
-- ただし原因切り分けと修正確認が完了したら、トレース出力処理・環境変数トグル・デバッグ用 define は必ず削除する。
-- 恒久対策（表示ロジックの修正など）だけを残し、診断コードを本番運用コードに残さない。
-- 一時生成物（`*trace*.tsv`, `build*.log`, `output.txt`, 検証用メモ）はコミット対象外とする。
-
-## 11. アップストリーム同期
-
-- NetHack 本家（https://github.com/NetHack/NetHack）の更新を取り込む際は、直接 `main` に取り込まず、必ず `upstream-base` ブランチを経由すること。
-- `upstream-base` は本家のコードを忠実に保持する。日本語版独自の修正（翻訳や表示改善）をこのブランチにコミットしてはならない。
-
-### 11.1 初期設定（初回のみ）
+### 推奨: VS Developer Shell 経由
 ```powershell
-# 1. 本家リポジトリを upstream として登録
-git remote add upstream https://github.com/NetHack/NetHack.git
-
-# 2. 最新情報を取得
-git fetch upstream
-
-# 3. 本家の NetHack-5.0 ブランチをベースにしたブランチを作成
-git checkout -b upstream-base upstream/NetHack-5.0
+Import-Module 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\Microsoft.VisualStudio.DevShell.dll'
+Enter-VsDevShell -VsInstallPath 'C:\Program Files\Microsoft Visual Studio\18\Community' -SkipAutomaticLocation -DevCmdArguments '-arch=x64 -host_arch=x64'
+Set-Location 'C:\Users\satok\NetHackJP'
+msbuild sys\windows\vs\NetHack.sln '/t:NetHack;NetHackW' /p:Configuration=Debug /p:Platform=x64 /m /nologo /verbosity:minimal
 ```
 
-### 11.2 定期的な同期（2回目以降）
+### 最低確認事項
+- Exit Code が `0` であること。
+- `binary\Debug\x64\NetHack.exe` と `NetHackW.exe` が生成されること。
+- `NetHackW.exe` 起動中はリンク失敗（LNK1168）するため、ビルド前に終了させること。
+
+## 3. アップストリーム同期 (Git)
+
+本家（https://github.com/NetHack/NetHack）の更新は `upstream-base` ブランチを経由して取り込む。
+
+### 同期の手順
 ```powershell
-# 1. upstream-base を最新にする
 git switch upstream-base
 git pull upstream NetHack-5.0
-
-# 2. main に統合する
 git switch main
 git merge upstream-base
-
-# 3. コンフリクトが発生した場合の処理（VS Code等で解決後）
-# 競合箇所を手動修正し、全解決後に以下を実行
-# git add は個別に実行する（例: git add dat/history）
-git add <解決したファイル名>
+# コンフリクト解決後
+git add <解決したファイル>
 git commit -m "Merge branch 'upstream-base' into main"
-
-# 4. 確認とプッシュ
-# ビルドを行い、動作確認後に実行
-git push origin main
-
-# （補足）マージを中断して作業前の状態に戻す場合
-git merge --abort
 ```
-- 同期後のビルドおよび動作確認を徹底すること。
+
+## 4. 参照先
+
+- **翻訳ガイドライン**: `docs/translation-instructions-ja.md`
+- **安全チェックリスト**: `docs/message-translation-safety-checklist.md`
+- **用語集**: `docs/translation-glossary-quest.md`
