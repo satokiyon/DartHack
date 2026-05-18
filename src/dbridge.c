@@ -460,8 +460,8 @@ e_died(
 
             if (DEADMONSTER(etmp->emon)) {
                 if (seeit)
-                    pline("Unfortunately for %s, %s is still crushed.",
-                          mon_nam(etmp->emon), mhe(etmp->emon));
+                    pline("残念ながら%sはまだ押しつぶされている。",
+                          mon_nam(etmp->emon));
             } else {
                 ; /* FIXME: still not dead?  What should we do now? */
             }

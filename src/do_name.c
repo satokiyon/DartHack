@@ -219,7 +219,7 @@ do_mgivenname(void)
         if (u.usteed && canspotmon(u.usteed)) {
             mtmp = u.usteed;
         } else {
-            pline("This %s creature is called %s and cannot be renamed.",
+            pline("この%sクリーチャーは%sという名前で、改名はできない。",
                   beautiful(), svp.plname);
             return;
         }
@@ -243,7 +243,7 @@ do_mgivenname(void)
                 || M_AP_TYPE(mtmp) == M_AP_OBJECT
                 || (mtmp->minvis && !See_invisible))))) {
 
-        pline("I see no monster there.");
+        pline("そこにはモンスターがいない。");
         return;
     }
     /* special case similar to the one in lookat() */
@@ -348,7 +348,7 @@ do_oname(struct obj *obj)
         do {
             wipeout_text(bufp, rnd_on_display_rng(2), (unsigned) 0);
         } while (!strcmp(buf, bufcpy));
-        pline("While engraving, your %s slips.", body_part(HAND));
+        pline("刷り込んでいる間に%sが滑った。", body_part(HAND));
         display_nhwindow(WIN_MESSAGE, FALSE);
         You("%sを刻んだ。", buf);
         /* violate illiteracy conduct since hero attempted to write

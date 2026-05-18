@@ -383,9 +383,9 @@ ohitmon(
         Soundeffect(se_splat_egg, 35);
         if (vis) {
             if (otmp->otyp == EGG) {
-                pline("Splat!  %s is hit with %s egg!", Monnam(mtmp),
-                      otmp->known ? an(mons[otmp->corpsenm].pmnames[NEUTRAL])
-                                  : "an");
+                pline("べちゃ！ %sが%sの卵の直撃を食らった！", Monnam(mtmp),
+                      otmp->known ? mons[otmp->corpsenm].pmnames[NEUTRAL]
+                                  : "何か");
             } else {
                 char how[BUFSZ];
 

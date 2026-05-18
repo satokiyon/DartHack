@@ -1270,7 +1270,7 @@ dochat(void)
         return ECMD_OK;
     }
     if (u.uswallow) {
-        pline("外では聆こえないだろう。");
+        pline("外では聞こえないだろう。");
         return ECMD_OK;
     }
     if (Underwater) {
@@ -1303,7 +1303,7 @@ dochat(void)
     }
 
     if (u.dz) {
-        pline("そこでは聆こえないだろう、%sの方に。", u.dz < 0 ? "上" : "下");
+        pline("そこでは聞こえないだろう、%sの方に。", u.dz < 0 ? "上" : "下");
         return ECMD_OK;
     }
 
@@ -1318,7 +1318,7 @@ dochat(void)
             return 1;
         }
          */
-        pline("自分自身と話すのはダンジョンを探索する者の愧い習慣だ。");
+        pline("自分自身と話すのはダンジョンを探索する者の醜い習慣だ。");
         return ECMD_OK;
     }
 
@@ -1397,7 +1397,7 @@ dochat(void)
     if (Deaf) {
         const char *xresponse = humanoid(gy.youmonst.data)
                     ? "falls on deaf ears"
-                    : "is inaudible";
+                    : "は聞こえない";
 
         pline("返事%s%s%s。",
               canspotmon(mtmp) ? "は" : "",
@@ -1493,7 +1493,7 @@ tiphat(void)
     }
 
     if (unseen || (statue && Hallucination)) {
-        pline("\u305d\u306e%s\u751f\u304d\u7269\u306f\u3042\u306a\u305f\u3092\u7121\u8996\u3057\u3066\u3044\u308b\uff01", unseen ? "見\u3048\u306a\u3044" : "");
+        pline("その%sクリーチャーはあなたを無視している！", unseen ? "見えない" : "");
     } else if (!mtmp || !responsive_mon_at(x, y)) {
         if (vismon) /* 'vismon' is only True when 'mtmp' is non-Null */
             pline("%s seems not to notice you.", Monnam(mtmp));

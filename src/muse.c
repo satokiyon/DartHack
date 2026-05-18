@@ -1961,7 +1961,7 @@ use_offensive(struct monst *mtmp)
         mreadmsg(mtmp, otmp);
         if (mtmp->mconf) {
             if (vis)
-                pline("Oh, what a pretty fire!");
+                pline("おお、なんと美しい炎だ！");
         } else {
             struct monst *mtmp2;
             int num;
@@ -3150,7 +3150,7 @@ muse_unslime(
         mreadmsg(mon, obj);
         if (mon->mconf) {
             if (cansee(mon->mx, mon->my))
-                pline("Oh, what a pretty fire!");
+                pline("おお、なんと美しい炎だ！");
             if (vis)
                 trycall(obj);
             m_useup(mon, obj); /* after trycall() */

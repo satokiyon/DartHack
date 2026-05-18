@@ -4352,7 +4352,7 @@ feel_cockatrice(struct obj *otmp, boolean force_touch)
             You("素手の%sで%sに触れた.",
                 makeplural(body_part(HAND)), kbuf);
         else
-            pline("Touching %s is a fatal mistake...", kbuf);
+            pline("%sに触れることは致命的な誤りだ...", kbuf);
         /* normalize body shape here; hand, not body_part(HAND) */
         Sprintf(kbuf, "touching %s bare-handed", killer_xname(otmp));
         /* will call polymon() for the poly_when_stoned() case */

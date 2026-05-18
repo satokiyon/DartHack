@@ -858,7 +858,7 @@ getpos(coord *ccp, boolean force, const char *goal)
     lock_mouse_buttons(TRUE);
     for (;;) {
         if (show_goal_msg) {
-            pline("Move cursor to %s:", goal);
+            pline("カーソルを%sに移動:", goal);
             curs(WIN_MAP, cx, cy);
             flush_screen(0);
             show_goal_msg = FALSE;
@@ -961,9 +961,9 @@ getpos(coord *ccp, boolean force, const char *goal)
             goto nxtc;
         } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]) {
             iflags.autodescribe = !iflags.autodescribe;
-            pline("Automatic description %sis %s.",
-                  flags.verbose ? "of features under cursor " : "",
-                  iflags.autodescribe ? "on" : "off");
+            pline("%s自動説明は%sだ。",
+                  flags.verbose ? "カーソル下の特徴の" : "",
+                  iflags.autodescribe ? "オン" : "オフ");
             if (!iflags.autodescribe)
                 show_goal_msg = TRUE;
             msg_given = TRUE;
@@ -1111,7 +1111,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                             } /* column */
                         }     /* row */
                     }         /* pass */
-                    pline("Can't find dungeon feature '%c'.", c);
+                    pline("ダンジョンの地形 '%c' が見つからない。", c);
                     msg_given = TRUE;
                     goto nxtc;
                 } else {
@@ -1126,14 +1126,14 @@ getpos(coord *ccp, boolean force, const char *goal)
                                 visctrl(cmd_from_func(do_move_north)),
                                 visctrl(cmd_from_func(do_move_east)),
                                 visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]));
-                    pline("Unknown direction: '%s' (%s).", visctrl((char) c),
+                    pline("不明な方向: '%s' (%s)。", visctrl((char) c),
                           note);
                     msg_given = TRUE;
                 } /* k => matching */
             }     /* !quitchars */
             if (force)
                 goto nxtc;
-            pline("Done.");
+            pline("完了。");
             msg_given = FALSE; /* suppress clear */
             cx = -1;
             cy = 0;
