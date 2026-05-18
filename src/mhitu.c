@@ -669,7 +669,7 @@ mattacku(struct monst *mtmp)
         if (sticky && !youseeit)
             pline("〽ぉっと「にんべん」ときっつくやられた.");
         else /* see note about m_monnam() above */
-            pline("Wait, %s!  That's a %s named %s!", m_monnam(mtmp),
+            pline("待って、%s！ それは%sで%sという名だ！", m_monnam(mtmp),
                   pmname(gy.youmonst.data, Ugender), svp.plname);
         if (sticky)
             set_ustuck(mtmp);
@@ -690,7 +690,7 @@ mattacku(struct monst *mtmp)
                   ? "tries to pick you up"
                   : "disturbs you");
         else /* see note about m_monnam() above */
-            pline("Wait, %s!  That %s is really %s named %s!", m_monnam(mtmp),
+            pline("待って、%s！ その%sは実は%s、%sという名だ！", m_monnam(mtmp),
                   mimic_obj_name(&gy.youmonst),
                   an(pmname(&mons[u.umonnum], Ugender)), svp.plname);
         if (gm.multi < 0) { /* this should always be the case */
@@ -999,7 +999,7 @@ summonmu(struct monst *mtmp, boolean youseeit)
                     if (numseen == 0)
                         You_feel("取り囲まれたように感じた.");
                 } else {
-                    pline("But none comes.");
+                    pline("しかし誰も来なかった。");
                 }
             } else {
                 const char *from_nowhere;
@@ -2538,7 +2538,7 @@ passiveum(
                 if (mtmp->mcansee && haseyes(mtmp->data) && rn2(3)
                     && (perceives(mtmp->data) || !Invis)) {
                     if (Blind) {
-                        pline("As a blind %s, you cannot defend yourself.",
+                        pline("盲目の%sとして、あなたは自分を守ることができない。",
                               pmname(gy.youmonst.data,
                                      flags.female ? FEMALE : MALE));
                     } else {
