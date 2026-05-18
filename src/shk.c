@@ -1410,7 +1410,7 @@ make_happy_shk(struct monst *shkp, boolean silentkops)
         if (on_level(&eshkp->shoplevel, &u.uz)) {
             home_shk(shkp, FALSE);
             if (canspotmon(shkp)) {
-                pline("%s returns to %s shop.", Shknam(shkp),
+                pline("%sは%sの店に戻った。", Shknam(shkp),
                       noit_mhis(shkp));
                 vanished = FALSE; /* don't give 'Shk disappears' message */
             }
@@ -1430,7 +1430,7 @@ make_happy_shk(struct monst *shkp, boolean silentkops)
         if (vanished)
             pline("満足して、%sは急に消えた！", shk_nam);
     } else if (wasmad)
-        pline("%s calms down.", Shknam(shkp));
+        pline("%sは落ち着いた。", Shknam(shkp));
 
     make_happy_shoppers(silentkops);
 }
@@ -2615,7 +2615,7 @@ inherits(
         && !eshkp->following && u.ugrave_arise < LOW_PM) {
         taken = (gi.invent != 0);
         if (taken && !silently)
-            pline("%s gratefully inherits all your possessions.",
+            pline("%sは感謝しながら、あなたのすべての所持品を受け継いだ。",
                   Shknam(shkp));
         goto clear;
     }
@@ -3111,9 +3111,9 @@ special_stock(
         if (!quietly) {
             if (is_izchak(shkp, TRUE) && !u.uevent.invoked) {
                 if (Deaf || muteshk(shkp)) {
-                    pline("%s seems %s that you want to sell that.",
+                    pline("%sはあなたがそれを売ろうとしたことに%sように見えた。",
                           Shknam(shkp),
-                          (obj->spe < 7) ? "horrified" : "concerned");
+                          (obj->spe < 7) ? "恐怖を感じているのか、関心を持っているのか" : "関心を持っているのか");
                 } else {
                     SetVoice(shkp, 0, 80, 0);
                     verbalize("いや、俱だったらそれは手放さないね。");
@@ -3556,12 +3556,12 @@ addtobill(
            add_one_tobill above */
 
         if (!ltmp) {
-            pline("%s has no interest in %s.", Shknam(shkp), the(xname(obj)));
+            pline("%sは%sに関心がない。", Shknam(shkp), the(xname(obj)));
             return;
         }
         if (!ininv) {
-            pline("%s will cost you %ld %s%s.", The(xname(obj)), ltmp,
-                  currency(ltmp), (obj->quan > 1L) ? " each" : "");
+            pline("それは%ld %sかかるぞ%s。", ltmp,
+                  currency(ltmp), (obj->quan > 1L) ? "（1個あたり）" : "");
         } else {
             long save_quan = obj->quan;
 
@@ -3970,7 +3970,7 @@ sellobj(
             SetVoice(shkp, 0, 80, 0);
             verbalize("ありがとうね、クズ野郎。");
         } else {
-            pline("%s smirks with satisfaction.", Shknam(shkp));
+            pline("%sは満足げに薄笑いした。", Shknam(shkp));
         }
         subfrombill(obj, shkp);
         return;
@@ -3992,7 +3992,7 @@ sellobj(
 
         if (!unpaid && (gs.sell_how != SELL_DONTSELL)
             && !special_stock(obj, shkp, FALSE))
-            pline("%s seems uninterested.", Shknam(shkp));
+            pline("%sは無関心なように見えた。", Shknam(shkp));
         return;
     }
 
@@ -4035,8 +4035,8 @@ sellobj(
         || offer == 0L || (obj->oclass == FOOD_CLASS && obj->oeaten)
         || (Is_candle(obj)
             && obj->age < 20L * (long) objects[obj->otyp].oc_cost)) {
-        pline("%s seems uninterested%s.", Shknam(shkp),
-              cgold ? " in the rest" : "");
+        pline("%sは無関心なようだ%s。", Shknam(shkp),
+              cgold ? "、残りのものについては" : "");
         if (container)
             dropped_container(obj, shkp, FALSE);
         obj->no_charge = 1;
@@ -4051,7 +4051,7 @@ sellobj(
         if (gs.sell_how == SELL_NORMAL || ga.auto_credit) {
             c = gs.sell_response = 'y';
         } else if (gs.sell_response != 'n') {
-            pline("%s cannot pay you at present.", Shknam(shkp));
+            pline("%sは今のところあなたに支払うことができない。", Shknam(shkp));
             Sprintf(qbuf, "Will you accept %ld %s in credit for ", tmpcr,
                     currency(tmpcr));
             record_price_quote(obj->otyp, tmpcr / obj->quan, FALSE);
