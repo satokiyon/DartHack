@@ -57,7 +57,7 @@ mb_trapped(struct monst *mtmp, boolean canseeit)
         if (canseeit && !Unaware)
             pline_mon(mtmp, "ドカーン!! 扉が爆発するのが見えた.");
         else if (!Deaf)
-            You_hear("%s爆発音が聞こえた.",
+            You_hear("%s爆発音が聞こえる.",
                      (mdistu(mtmp) > 7 * 7) ? "遠くで" : "近くで");
     }
     wake_nearto(mtmp->mx, mtmp->my, 7 * 7);

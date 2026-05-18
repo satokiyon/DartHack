@@ -46,7 +46,7 @@ dowatersnakes(void)
                   Hallucination ? makeplural(rndmonnam(NULL)) : "蛇");
         } else {
             Soundeffect(se_snakes_hissing, 75);
-            You_hear("%sがシューシュー鳴くのが聞こえた!", something);
+            You_hear("%sがシューシュー鳴くのが聞こえる!", something);
         }
         while (num-- > 0)
             if ((mtmp = makemon(&mons[PM_WATER_MOCCASIN], u.ux, u.uy,
@@ -71,7 +71,7 @@ dowaterdemon(void)
             if (!Blind)
                 You("%sを解き放った!", a_monnam(mtmp));
             else
-                You_feel("邪悪の気配を感じた.");
+                You_feel("邪悪な気配を感じる.");
 
             /* Give those on low levels a (slightly) better chance of survival
              */
@@ -101,7 +101,7 @@ dowaternymph(void)
         if (!Blind)
             You("%sを引き寄せた!", a_monnam(mtmp));
         else
-            You_hear("魅惑的な声が聞こえた.");
+            You_hear("魅惑的な声が聞こえる.");
         mtmp->msleeping = 0;
         if (t_at(mtmp->mx, mtmp->my))
             (void) mintrap(mtmp, NO_TRAP_FLAGS);
@@ -685,11 +685,11 @@ drinksink(void)
     /* more odd messages --JJB */
     case 11:
         Soundeffect(se_clanking_pipe, 50);
-        You_hear("配管の中からがちゃんがちゃんという音が聞こえた...");
+        You_hear("配管の中からがちゃんがちゃんという音が聞こえる...");
         break;
     case 12:
         Soundeffect(se_sewer_song, 100);
-        You_hear("下水の奥から歌声の切れ端が聞こえた...");
+        You_hear("下水の奥から歌声が途切れ途切れに聞こえる...");
         break;
     case 13:
         pline("うっ、ひどい悪臭だ!");

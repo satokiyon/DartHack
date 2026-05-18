@@ -276,7 +276,7 @@ cannot_push(struct obj *otmp, coordxy sx, coordxy sy)
                           && autopick_testobj(otmp, TRUE));
 
         if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
-            You("%sから%sを%sには騎乗の腕前が足りなかった.",
+            You("%sから%sを%sには騎乗の腕前が足りない.",
                 y_monnam(u.usteed), the(xname(otmp)),
                 willpickup ? "拾う" : "押しのける");
         } else {
@@ -462,7 +462,7 @@ moverock_core(coordxy sx, coordxy sy)
                     deliver_part1 = TRUE;
                 } else {
                     Soundeffect(se_monster_behind_boulder, 50);
-                    You_hear("%sの向こうにモンスターがいるのが聞こえた.",
+                    You_hear("%sの向こうにモンスターがいるのが聞こえる.",
                              the(xname(otmp)));
                     if (!Deaf)
                         deliver_part1 = TRUE;
@@ -2121,7 +2121,7 @@ domove_swap_with_pet(
         didnt_move = TRUE;
     } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
         /* can't swap places when pet can't move to your spot */
-        You("止まった.  %sは斜めに移動できなかった.", YMonnam(mtmp));
+        You("止まった.  %sは斜めに移動できない.", YMonnam(mtmp));
         didnt_move = TRUE;
     } else if (u_with_boulder
                && !(verysmall(mtmp->data)
@@ -3848,11 +3848,11 @@ pickup_checks(void)
         /* if there's a hole here, any objects here clearly aren't at
            the bottom so only check for pits */
         if (traphere && uteetering_at_seen_pit(traphere)) {
-            You("落とし穴の底まで手が届かなかった.");
+            You("落とし穴の底まで手が届かない.");
         } else if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
             rider_cant_reach();
         } else if (Blind) {
-            You("ここでは何にも手が届かなかった.");
+            You("ここでは何にも手が届かない.");
         } else {
             const char *surf = surface(u.ux, u.uy);
 
@@ -3862,7 +3862,7 @@ pickup_checks(void)
                 else if (traphere->ttyp == TRAPDOOR)
                     surf = "落とし扉";
             }
-            You("%sに手が届かなかった.", surf);
+            You("%sに手が届かない.", surf);
         }
         return 0;
     }
@@ -3903,7 +3903,7 @@ lookaround(void)
     /* Grid bugs stop if trying to move diagonal, even if blind.  Maybe */
     /* they polymorphed while in the middle of a long move. */
     if (NODIAG(u.umonnum) && u.dx && u.dy) {
-        You("斜めに移動できなかった.");
+        You("斜めに移動できない.");
         nomul(0);
         return;
     }
@@ -4235,8 +4235,8 @@ maybe_wail(void)
         }
     } else {
         Soundeffect(se_wailing_of_the_banshee, 75);
-        You_hear(u.uhp == 1 ? "バンシーの嘆き声が聞こえた..."
-                            : "クン・アンヌンの遠吠えが聞こえた...");
+        You_hear(u.uhp == 1 ? "バンシーの嘆き声が聞こえる..."
+                            : "クン・アンヌンの遠吠えが聞こえる...");
     }
 }
 

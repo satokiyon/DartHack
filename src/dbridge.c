@@ -792,7 +792,7 @@ close_drawbridge(coordxy x, coordxy y)
                     : "上がっていく");
     } else { /* "5 gears turn" for castle drawbridge tune */
         Soundeffect(se_chains_rattling_gears_turning, 75);
-        You_hear("鎖が鳴り、歯車が回る音が聞こえた.");
+        You_hear("鎖が鳴り、歯車が回る音が聞こえる.");
     }
     lev1->typ = DRAWBRIDGE_UP;
     lev2 = &levl[x2][y2];
@@ -855,7 +855,7 @@ open_drawbridge(coordxy x, coordxy y)
                                              : "下がってくる");
     } else { /* "5 gears turn" for castle drawbridge tune */
         Soundeffect(se_gears_turning_chains_rattling, 100);
-        You_hear("歯車が回り、鎖が鳴る音が聞こえた.");
+        You_hear("歯車が回り、鎖が鳴る音が聞こえる.");
     }
     lev1->typ = DRAWBRIDGE_DOWN;
     lev2 = &levl[x2][y2];

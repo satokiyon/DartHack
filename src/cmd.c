@@ -1299,7 +1299,7 @@ lookaround_known_room(coordxy x, coordxy y)
             an(selection_size_description(sel, qbuf)),
             rmno >= 0 ? "部屋" : "領域");
     } else {
-        You("%sの大きさは推測できなかった.",
+        You("%sの大きさは推測できない.",
             u_at(x, y) ? "この" : "その");
     }
     selection_free(sel, TRUE);

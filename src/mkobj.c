@@ -3844,7 +3844,7 @@ pudding_merge_message(struct obj *otmp, struct obj *otmp2)
         }
     } else {
         Soundeffect(se_faint_sloshing, 25);
-        You_hear("かすかな水音が聞こえた.");
+        You_hear("かすかな水音が聞こえる.");
     }
 }
 

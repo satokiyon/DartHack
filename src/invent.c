@@ -1910,7 +1910,7 @@ getobj(
     *ap = '\0';
 
     if (suggested == 0 && !forceprompt && !allownone) {
-        You("%s%sものを持っていなかった.", inaccess ? "ほかに" : "", word);
+        You("%s%sものを持っていない.", inaccess ? "ほかに" : "", word);
         return (struct obj *) 0;
     }
     for (;;) {
@@ -2009,7 +2009,7 @@ getobj(
                than one invent slot of gold and picking the non-'$' one */
             || (otmp && otmp->oclass == COIN_CLASS)) {
             if (otmp && obj_ok(otmp) <= GETOBJ_EXCLUDE) {
-                You("金貨を%sできなかった.", word);
+                You("金貨を%sできない.", word);
                 return (struct obj *) 0;
             }
             /*
@@ -2038,7 +2038,7 @@ getobj(
             coins = (otmp->oclass == COIN_CLASS);
             if (cnt > 1L && (!coins || cnt > otmp->quan)) {
                 if (cnt > otmp->quan)
-                    You("%ld%s%sしか持っていなかった.", otmp->quan,
+                    You("%ld%s%sしか持っていない.", otmp->quan,
                         (!coins && otmp->quan > 1L) ? " and " : "",
                         (!coins && otmp->quan > 1L) ? only_one : "");
                 else
@@ -2056,7 +2056,7 @@ getobj(
            that's been moved above so that otmp can be checked earlier] */
         /* verify the chosen object */
         if (!otmp) {
-            You("その品物は持っていなかった.");
+            You("その品物は持っていない.");
             if (gi.in_doagain)
                 return (struct obj *) 0;
             continue;
@@ -2213,7 +2213,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
     char buf[BUFSZ] = DUMMY, qbuf[QBUFSZ];
 
     if (!gi.invent) {
-        You("%sものを何も持っていなかった.", word);
+        You("%sものを何も持っていない.", word);
         if (resultflags)
             *resultflags = ALL_FINISHED;
         return 0;
@@ -2311,16 +2311,16 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
                 return 0;
             } else if (oc_of_sym == WEAPON_CLASS && !uwep && !uswapwep
                        && !uquiver) {
-                You("何も装備していなかった.");
+                You("何も装備していない.");
                 return 0;
             } else if (oc_of_sym == RING_CLASS && !uright && !uleft) {
-                You("指輪を着けていなかった.");
+                You("指輪を着けていない.");
                 return 0;
             } else if (oc_of_sym == AMULET_CLASS && !uamul) {
-                You("護符を着けていなかった.");
+                You("護符を着けていない.");
                 return 0;
             } else if (oc_of_sym == TOOL_CLASS && !ublindf) {
-                You("目隠しを着けていなかった.");
+                You("目隠しを着けていない.");
                 return 0;
             }
         }
@@ -2338,7 +2338,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
         } else if (sym == 'm') {
             m_seen = TRUE;
         } else if (oc_of_sym == MAXOCLASSES) {
-            You("%cに該当する品物を持っていなかった.", sym);
+            You("%cに該当する品物を持っていない.", sym);
         } else {
             if (!strchr(olets, oc_of_sym)) {
                 add_valid_menu_class(oc_of_sym);
@@ -3772,7 +3772,7 @@ dounpaid(
                        : "on or under the floor";
 
         if (!count) {
-            You("未払い品は持っていなかったが、そこに%s %d %sあった.",
+            You("未払い品は持っていないが、そこに%s %d %sあった.",
                 floorverb, xtracount, where);
         } else {
             putstr(win, 0, "");
@@ -3842,7 +3842,7 @@ dotypeinv(void)
     gt.this_type = 0;
     gt.this_title = NULL;
     if (!gi.invent && !billx) {
-        You("何も持っていなかった.");
+        You("何も持っていない.");
         goto doI_done;
     }
     title[0] = '\0';
@@ -3952,7 +3952,7 @@ dotypeinv(void)
         if (any_unpaid)
             dounpaid(u_carried, u_floor, u_buried);
         else
-            You("未払い品は持っていなかった.");
+            You("未払い品は持っていない.");
         goto doI_done;
     }
 
@@ -3999,7 +3999,7 @@ dotypeinv(void)
 
     if (traditional) {
         if (strchr(types, c) > strchr(types, '\033')) {
-            You("%s品物%sは持っていなかった.", before, after);
+            You("%s品物%sは持っていない.", before, after);
             goto doI_done;
         }
         gt.this_type = oclass; /* extra input for this_type_only() */
@@ -4531,7 +4531,7 @@ doprgold(void)
         if (total)
             You("合計で%ld %sを持っていた.", total, currency(total));
         else
-            You("お金を持っていなかった.");
+            You("お金を持っていない.");
     }
     shopper_financial_report();
 
@@ -4578,7 +4578,7 @@ staticfn void
 noarmor(boolean report_uskin)
 {
     if (!uskin || !report_uskin) {
-        You("鎧を何も着けていなかった.");
+        You("鎧を何も着けていない.");
     } else {
         char *p, *uskinname, buf[BUFSZ];
 
@@ -4642,7 +4642,7 @@ int
 doprring(void)
 {
     if (!uleft && !uright) {
-        You("指輪を何も着けていなかった.");
+        You("指輪を何も着けていない.");
     } else {
         char lets[3]; /* 3: uright, uleft, terminator */
         boolean use_inuse_mode = FALSE;
@@ -4679,7 +4679,7 @@ int
 dopramulet(void)
 {
     if (!uamul) {
-        You("護符を着けていなかった.");
+        You("護符を着けていない.");
     } else {
         char lets[2];
 
@@ -4728,7 +4728,7 @@ doprtool(void)
         }
     lets[ct] = '\0';
     if (!ct)
-        You("道具は何も使用していなかった.");
+        You("道具を何も使用していない.");
     else
         (void) dispinv_with_action(lets, TRUE, NULL);
     return ECMD_OK;
@@ -4986,7 +4986,7 @@ doorganize(void) /* inventory organizer by Del Lamb */
     /* when no invent, or just gold in '$' slot, there's nothing to adjust */
     if (!gi.invent || (gi.invent->oclass == COIN_CLASS
                       && gi.invent->invlet == GOLD_SYM && !gi.invent->nobj)) {
-        You("%sものを何も持っていなかった.",
+        You("%sものを何も持っていない.",
             !gi.invent ? "整理する" : "整理可能な");
         return ECMD_OK;
     }

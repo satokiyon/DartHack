@@ -1466,7 +1466,7 @@ mdig_tunnel(struct monst *mtmp)
         /* KMH -- Okay on arboreal levels (room walls are still stone) */
         if (flags.verbose && !rn2(5)) {
             Soundeffect(se_crashing_rock, 75);
-            You_hear("岩が崩れる音が聞こえた.");
+            You_hear("岩が崩れる音が聞こえる.");
         }
         if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))
             add_damage(mtmp->mx, mtmp->my, 0L);
@@ -1516,14 +1516,14 @@ draft_message(boolean unexpected)
             /* U.S. classification system uses 1-A for eligible to serve
                and 4-F for ineligible due to physical or mental defect;
                some intermediate values exist but are rarely seen */
-            You_feel("自分が%sだと感じた.",
+            You_feel("自分が%sだと感じる.",
                      (ACURR(A_STR) < 6 || ACURR(A_DEX) < 6
                       || ACURR(A_CON) < 6 || ACURR(A_CHA) < 6
                       || ACURR(A_INT) < 6 || ACURR(A_WIS) < 6) ? "4-F"
                                                                : "1-A");
     } else {
         if (!Hallucination) {
-            You_feel("風を感じた.");
+            You_feel("風を感じる.");
         } else {
             /* "marching" is deliberately ambiguous; it might mean drills
                 after entering military service or mean engaging in protests */

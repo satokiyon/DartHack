@@ -2589,7 +2589,7 @@ fpostfx(struct obj *otmp)
                 You("眠りに落ちた.");
             } else {
                 Soundeffect(se_sinister_laughter, 100);
-                You_hear("眠りに落ちる時、不気味な笑い声が聞こえた...");
+                You_hear("眠りに落ちる時、不気味な笑い声が聞こえる...");
             }
             fall_asleep(-rn1(11, 20), TRUE);
         }

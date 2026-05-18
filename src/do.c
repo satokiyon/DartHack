@@ -118,7 +118,7 @@ boulder_hits_pool(
                     } else {
                         Soundeffect(se_splash, 100);
                     }
-                    You_hear("%sという音が聞こえた.", lava ? "じゅうじゅうという" : "ざばー");
+                    You_hear("%sという音が聞こえる.", lava ? "じゅうじゅうという" : "ざばー");
                 }
                 wake_nearto(rx, ry, 40);
             }
@@ -1850,12 +1850,12 @@ goto_level(
     if (!In_hell(&u.uz0) && Inhell) {
         if (Is_valley(&u.uz)) {
             You("ゲヘナの谷に入った。");
-            pline_The("焼ける肉と腐った死体の臭いが潜んでいた.");
+            pline_The("焼ける肉と腐った死体の臭いが漂っている.");
 #ifdef MICRO
             display_nhwindow(WIN_MESSAGE, FALSE);
 #endif
             Soundeffect(se_groans_and_moans, 25);
-            You_hear("責め苦を受ける魂の叫びが聞こえた.");
+            You_hear("責め苦を受ける魂の叫びが聞こえる.");
         }
 
         record_achievement(ACH_HELL); /* reached Gehennom */
@@ -2215,7 +2215,7 @@ revive_corpse(struct obj *corpse)
                     newsym(mtmp->mx, mtmp->my);
                 } else if (mdistu(mtmp) < 5*5) {
                     Soundeffect(se_scratching, 50);
-                    You_hear("ひっかくような音が聞こえた.");
+                    You_hear("ひっかくような音が聞こえる.");
                 }
                 fill_pit(mtmp->mx, mtmp->my);
                 break;

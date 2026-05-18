@@ -361,21 +361,21 @@ use_stethoscope(struct obj *obj)
     } else if (u.dz) {
         if (Underwater) {
             Soundeffect(se_faint_splashing, 35);
-            You_hear("かすかな水しぶきが聞こえた.");
+            You_hear("かすかな水しぶきが聞こえる.");
         } else if (u.dz < 0 || !can_reach_floor(TRUE)) {
             cant_reach_floor(u.ux, u.uy, (u.dz < 0), TRUE, FALSE);
         } else if (its_dead(u.ux, u.uy, &res)) {
             ; /* message already given */
         } else if (Is_stronghold(&u.uz)) {
             Soundeffect(se_crackling_of_hellfire, 35);
-            You_hear("地獄の炎の爆ぜる音が聞こえた.");
+            You_hear("地獄の炎の爆ぜる音が聞こえる.");
         } else {
             pline_The("%sは十分に健全そうだった.", surface(u.ux, u.uy));
         }
         return res;
     } else if (obj->cursed && !rn2(2)) {
         Soundeffect(se_heart_beat, 100);
-        You_hear("自分の心臓の鼓動が聞こえた.");
+        You_hear("自分の心臓の鼓動が聞こえる.");
         return res;
     }
     confdir(FALSE);
@@ -387,7 +387,7 @@ use_stethoscope(struct obj *obj)
     ry = u.uy + u.dy;
     if (!isok(rx, ry)) {
         Soundeffect(se_typing_noise, 100);
-        You_hear("かすかな打鍵音が聞こえた.");
+        You_hear("かすかな打鍵音が聞こえる.");
         return ECMD_OK;
     }
     if ((mtmp = m_at(rx, ry)) != 0) {
@@ -1064,9 +1064,9 @@ use_mirror(struct obj *obj)
             } else if (u.uhs >= WEAK) {
                 You(look_like_str, "栄養不足の");
             } else if (Upolyd) {
-                You("%sのように見えた.", pmname(&mons[u.umonnum], Ugender));
+                You("%sのように見える.", pmname(&mons[u.umonnum], Ugender));
             } else {
-                You("いつもどおり%sに見えた.", uvisage);
+                You("いつもどおり%sに見える.", uvisage);
             }
         }
         return ECMD_TIME;
@@ -1977,7 +1977,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
     if (!magic && (nolimbs(gy.youmonst.data) || slithy(gy.youmonst.data))) {
         /* normally (nolimbs || slithy) implies !Jumping,
            but that isn't necessarily the case for knights */
-        You_cant("脚がないので跳べなかった!");
+        You_cant("脚がないので跳べない!");
         return ECMD_OK;
     } else if (!magic && !Jumping) {
         You_cant("遠くまでは跳べなかった.");
@@ -1992,7 +1992,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
             You("少し跳ね回った.");
             return ECMD_TIME;
         }
-        pline("冗談でしょ!");
+        pline("冗談でし!");
         return ECMD_OK;
     } else if (u.uinwater) {
         if (magic) {
@@ -2026,7 +2026,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
         You("荷物が多すぎて跳べなかった!");
         return ECMD_OK;
     } else if (!magic && (u.uhunger <= 100 || ACURR(A_STR) < 6)) {
-        You("跳ぶ力が足りなかった!");
+        You("跳ぶ力が足りない!");
         return ECMD_OK;
     } else if (!magic && Wounded_legs) {
         legs_in_no_shape("jumping", u.usteed != 0);
@@ -2170,7 +2170,7 @@ use_tinning_kit(struct obj *obj)
     if (!(corpse = floorfood("tin", 2)))
         return;
     if (corpse->oeaten) {
-        You("食べかけの%sを缶詰にできなかった.", something);
+        You("食べかけの%sを缶詰にできない.", something);
         return;
     }
     mptr = &mons[corpse->corpsenm];
@@ -3904,7 +3904,7 @@ do_break_wand(struct obj *obj)
         Your("%sはふさがっている!", makeplural(body_part(HAND)));
         return ECMD_OK;
     } else if (ACURR(A_STR) < (is_fragile ? 5 : 10)) {
-        You("%sを折る力が足りなかった!", yname(obj));
+        You("%sを折る力が足りない!", yname(obj));
         return ECMD_OK;
     }
     if (!paranoid_query(ParanoidBreakwand,

@@ -465,7 +465,7 @@ gold_detect(struct obj *sobj)
         newsym(u.ux, u.uy);
         ter_typ |= TER_MON; /* so autodescribe will recognize hero */
     }
-    You_feel("強欲さに満たされ、金の気配を感じた!");
+    You_feel("強欲さに満たされ、金の気配を感じる!");
     exercise(A_WIS, TRUE);
 
     browse_map(ter_typ, "金");
@@ -513,7 +513,7 @@ food_detect(struct obj *sobj)
         gk.known = stale && !confused;
         if (stale) {
             docrt();
-            You("近くに%sがないことを感じた.", what);
+            You("近くに%sがないことを感じる.", what);
             if (sobj && sobj->blessed) {
                 if (!u.uedibility)
                     Your("%sがむずむずし始めた.", body_part(NOSE));
@@ -691,7 +691,7 @@ object_detect(struct obj *detector, /* object doing the detecting */
                 strange_feeling(detector, "何かが欠けている気がした.");
             return 1;
         }
-        You("近くに%sがある気配を感じた.", stuff);
+        You("近くに%sがある気配を感じる.", stuff);
         return 0;
     }
 
@@ -843,7 +843,7 @@ monster_detect(struct obj *otmp, /* detecting object (if any) */
         }
         if (!swallowed)
             display_self();
-        You("モンスターの気配を感じた.");
+        You("モンスターの気配を感じる.");
         if (woken)
             pline("モンスターもあなたの気配を感じ取った.");
 
@@ -2005,7 +2005,7 @@ mfind0(struct monst *mtmp, boolean via_warning)
         if (!canspotmon(mtmp)) {
             map_invisible(x, y);
             set_msg_xy(x, y);
-            You_feel("見えないモンスターの存在を感じた!");
+            You_feel("見えないモンスターの存在を感じる!");
         } else if (!sensemon(mtmp)) {
             set_msg_xy(x, y);
             You("%sを見つけた.", mtmp->mtame ? y_monnam(mtmp)

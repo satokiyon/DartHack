@@ -677,7 +677,7 @@ getpos_menu(coord *ccp, int gloc)
 
     if (gcount < 2) { /* gcount always includes the hero */
         free((genericptr_t) garr);
-        You("%sを%sことはできなかった.",
+        You("%sを%sことはできない.",
             gloc_descr[gloc][0],
             (iflags.getloc_filter == GFILTER_VIEW) ? "見る" : "感知する");
         return FALSE;

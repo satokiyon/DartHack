@@ -65,13 +65,13 @@ picklock(void)
         }
         switch (gx.xlock.door->doormask) {
         case D_NODOOR:
-            pline("この戸口には扉がなかった.");
+            pline("この戸口には扉がない.");
             return ((gx.xlock.usedtime = 0));
         case D_ISOPEN:
-            You("開いた扉には鍵をかけられなかった.");
+            You("開いた扉には鍵をかけられない.");
             return ((gx.xlock.usedtime = 0));
         case D_BROKEN:
-            pline("この扉は壊れていた.");
+            pline("この扉は壊れている.");
             return ((gx.xlock.usedtime = 0));
         }
     }
@@ -460,7 +460,7 @@ pick_lock(
                 if (autounlock && (flags.autounlock & AUTOUNLOCK_UNTRAP) != 0
                     && could_untrap(FALSE, TRUE)
                     && (c = otmp->tknown ? (otmp->otrapped ? 'y' : 'n')
-                            : ynq(safe_qbuf(qbuf, "", "に罠がないか調べるか?",
+                            : ynq(safe_qbuf(qbuf, "", "に罠がないか調べる?",
                                           otmp, yname, ysimple_name, "これ")))
                        != 'n') {
                     if (c == 'q')
@@ -472,7 +472,7 @@ pick_lock(
                           && (flags.autounlock & AUTOUNLOCK_APPLY_KEY) != 0) {
                     c = 'q';
                     if (pick != &dummypick) {
-                        Sprintf(qbuf, "%sで解錠するか?", yname(pick));
+                        Sprintf(qbuf, "%sで解錠する?", yname(pick));
                         c = ynq(qbuf);
                     }
                     if (c != 'y')
@@ -577,27 +577,27 @@ pick_lock(
 
             if (is_drawbridge_wall(cc.x, cc.y) >= 0)
                 You("跳ね橋に鍵がないことを%s.",
-                    Blind ? "感じた" : "見た");
+                    Blind ? "感じる" : "見た");
             else if (Blind)
-                You("そこに扉がないことを感じた.");
+                You("そこに扉がないことを感じる.");
             else
-                You("そこに扉は見当たらなかった.");
+                You("そこに扉は見当たらない.");
             return res;
         }
         switch (door->doormask) {
         case D_NODOOR:
-            pline("この戸口には扉がなかった.");
+            pline("この戸口には扉がない.");
             return PICKLOCK_LEARNED_SOMETHING;
         case D_ISOPEN:
-            You("開いた扉には鍵をかけられなかった.");
+            You("開いた扉には鍵をかけられない.");
             return PICKLOCK_LEARNED_SOMETHING;
         case D_BROKEN:
-            pline("この扉は壊れていた.");
+            pline("この扉は壊れている.");
             return PICKLOCK_LEARNED_SOMETHING;
         default:
             if ((flags.autounlock & AUTOUNLOCK_UNTRAP) != 0
                 && could_untrap(FALSE, FALSE)
-                && (c = ynq("この扉に罠がないか調べるか?")) != 'n') {
+                && (c = ynq("この扉に罠がないか調べる?")) != 'n') {
                 if (c == 'q')
                     return PICKLOCK_DID_NOTHING;
                 /* c == 'y' */
@@ -606,7 +606,7 @@ pick_lock(
             }
             /* credit cards are only good for unlocking */
             if (picktyp == CREDIT_CARD && !(door->doormask & D_LOCKED)) {
-                You_cant("クレジットカードで扉に鍵をかけることはできなかった.");
+                You_cant("クレジットカードで扉に鍵をかけることはできない.");
                 return PICKLOCK_LEARNED_SOMETHING;
             }
 
@@ -707,12 +707,12 @@ doforce(void)
                    since we're about to set lknown, there's no need to
                    remember and then reset its current value */
                 otmp->lknown = 0;
-                    There("ここに%sがあったが、その鍵は既に%sだった.",
-                        doname(otmp), otmp->obroken ? "壊れている" : "開いている");
+                    There("ここに%sがあったが、その鍵は既に%sた.",
+                        doname(otmp), otmp->obroken ? "壊れてい" : "開いてい");
                 otmp->lknown = 1;
                 continue;
             }
-            (void) safe_qbuf(qbuf, "", "がここにある; 鍵をこじ開けるか?",
+            (void) safe_qbuf(qbuf, "", "がここにある; 鍵をこじ開ける?",
                              otmp, doname, ansimpleoname, "箱");
             otmp->lknown = 1;
 
@@ -834,9 +834,9 @@ doopen_indir(coordxy x, coordxy y)
             pline("向こうに漁れそうなものが%s.",
                   Blind ? "ある気がした" : "あるように見えた");
         else if (Blind)
-            You("そこに扉がないことを感じた.");
+            You("そこに扉がないことを感じる.");
         else
-            You("そこに扉は見当たらなかった.");
+            You("そこに扉は見当たらない.");
         return res;
     }
 
@@ -849,7 +849,7 @@ doopen_indir(coordxy x, coordxy y)
             mesg = "は壊れている";
             break;
         case D_NODOOR:
-            mesg = "戸口には扉がなかった";
+            mesg = "戸口には扉がない;
             break;
         case D_ISOPEN:
             mesg = "は既に開いていた";
@@ -871,7 +871,7 @@ doopen_indir(coordxy x, coordxy y)
                                 (struct obj *) 0) ? ECMD_TIME : ECMD_OK;
             } else if ((flags.autounlock & AUTOUNLOCK_KICK) != 0
                        && !u.usteed /* kicking is different when mounted */
-                      && ynq("蹴るか?") == 'y') {
+                      && ynq("蹴る?") == 'y') {
                 cmdq_add_ec(CQ_CANNED, dokick);
                 cmdq_add_dir(CQ_CANNED,
                              sgn(cc.x - u.ux), sgn(cc.y - u.uy), 0);
@@ -1001,23 +1001,23 @@ doclose(void)
         else {
  nodoor:
             if (Blind)
-                You("そこに扉がないことを感じた.");
+                You("そこに扉がないことを感じる.");
             else
-                You("そこに扉は見当たらなかった.");
+                You("そこに扉は見当たらない.");
         }
         return res;
     }
 
     if (door->doormask == D_NODOOR) {
-        pline("この戸口には扉がなかった.");
+        pline("この戸口には扉がない.");
         return res;
     } else if (obstructed(x, y, FALSE)) {
         return res;
     } else if (door->doormask == D_BROKEN) {
-        pline("この扉は壊れていた.");
+        pline("この扉は壊れている.");
         return res;
     } else if (door->doormask & (D_CLOSED | D_LOCKED)) {
-        pline("この扉は既に閉まっていた.");
+        pline("この扉は既に閉まっている.");
         return res;
     }
 
@@ -1134,7 +1134,7 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
                       dustcloud);
             } else {
                 Soundeffect(se_swoosh, 25);
-                You_hear("シュッという音が聞こえた.");
+                You_hear("シュッという音が聞こえる.");
             }
             if (obstructed(x, y, mysterywand)) {
                 if (vis)
@@ -1213,7 +1213,7 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
                             pline("ドカーン!!  扉が爆発するのが見えた.");
                         } else if (!Deaf) {
                             Soundeffect(se_explosion, 75);
-                            You_hear("%s爆発音が聞こえた.",
+                            You_hear("%s爆発音が聞こえる.",
                                      (distu(x, y) > 7 * 7) ? "遠くの"
                                                            : "近くの");
                         }
