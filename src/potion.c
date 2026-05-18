@@ -2569,17 +2569,17 @@ potion_dip(struct obj *obj, struct obj *potion)
                 break;
             default:
                 useupall(obj);
-                pline_The("mixture %sevaporates.",
-                          !Blind ? "glows brightly and " : "");
+                pline_The("混合液は%s蒸発した.",
+                          !Blind ? "まばゆく輝き、" : "");
                 return ECMD_TIME;
             }
         }
         obj->odiluted = (obj->otyp != POT_WATER);
 
         if (obj->otyp == POT_WATER && !Hallucination) {
-            pline_The("mixture bubbles%s.", Blind ? "" : ", then clears");
+            pline_The("混合液は泡立った%s.", Blind ? "" : "が、やがて透き通った");
         } else if (!Blind) {
-            pline_The("mixture looks %s.",
+            pline_The("混合液は%sに見えた.",
                       hcolor(OBJ_DESCR(objects[obj->otyp])));
         }
 
@@ -2607,7 +2607,7 @@ potion_dip(struct obj *obj, struct obj *potion)
     }
 
     if (potion->otyp == POT_WATER && obj->otyp == TOWEL) {
-        pline_The("towel soaks it up!");
+        pline_The("タオルがそれを吸い取った!");
         /* wetting towel already done via water_damage() in H2Opotion_dip */
         poof(potion);
         return ECMD_TIME;
@@ -2649,7 +2649,7 @@ potion_dip(struct obj *obj, struct obj *potion)
         if (potion->lamplit) { /* burning */
             fire_damage(obj, TRUE, u.ux, u.uy);
         } else if (potion->cursed) {
-            pline_The("potion spills and covers your %s with oil.",
+            pline_The("薬瓶がこぼれてあなたの%sが油まみれになった.",
                       fingers_or_gloves(TRUE));
             make_glib((int) (Glib & TIMEOUT) + d(2, 10));
         } else if (obj->oclass != WEAPON_CLASS && !is_weptool(obj)) {

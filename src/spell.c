@@ -153,7 +153,7 @@ cursed_book(struct obj *bp)
         make_confused(HConfusion + rn1(7, 16), FALSE);
         break;
     case 5:
-        pline_The("book was coated with contact poison!");
+        pline_The("本には接触毒が塗られていた!");
         if (uarmg) {
             erode_obj(uarmg, "gloves", ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
             break;
@@ -169,7 +169,7 @@ cursed_book(struct obj *bp)
     case 6:
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
-            pline_The("book %s, but you are unharmed!", explodes);
+            pline_The("本は%sしたが、あなたは無傷だった!", explodes);
         } else {
             pline("As you read the book, it %s in your %s!", explodes,
                   body_part(FACE));
@@ -279,7 +279,7 @@ deadbook(struct obj *book2)
         }
 
         if (arti_cursed) {
-            pline_The("invocation fails!");
+            pline_The("召喚の儀は失敗した!");
             /* this used to say "your artifacts" but the invocation tools
                are not artifacts */
             pline("少なくとも一つの遺物が呪われていた...");
@@ -329,7 +329,7 @@ deadbook(struct obj *book2)
             Your("祖先たちは怒っていた!");
             break;
         case 1:
-            pline_The("headstones in the cemetery begin to move!");
+            pline_The("墓地の墓石が動き始めた!");
             break;
         default:
             pline("おお! あなたの名前が本の中に現れた!");
@@ -611,7 +611,7 @@ study_book(struct obj *spellbook)
             svc.context.spbook.delay = 0;
             if (gone || !rn2(3)) {
                 if (!gone)
-                    pline_The("spellbook crumbles to dust!");
+                    pline_The("魔法書は塵となって崩れた!");
                 trycall(spellbook);
                 useup(spellbook);
             } else
@@ -1495,7 +1495,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
                  * spelleffects() is organized means that aborting with
                  * "nevermind" is not an option.
                  */
-                pline_The("magical energy is released!");
+                pline_The("魔法の力が解き放たれた!");
             }
             if (!u.dx && !u.dy && !u.dz) {
                 if ((damage = zapyourself(pseudo, TRUE)) != 0) {
@@ -1676,10 +1676,10 @@ throwspell(void)
 
     /* The number of moves from hero to where the spell drops.*/
     if (distmin(u.ux, u.uy, cc.x, cc.y) > 10) {
-        pline_The("spell dissipates over the distance!");
+        pline_The("呪文ははるか彼方で霧散した!");
         return 0;
     } else if (u.uswallow) {
-        pline_The("spell is cut short!");
+        pline_The("呪文は途中でかき消えた!");
         exercise(A_WIS, FALSE); /* What were you THINKING! */
         u.dx = 0;
         u.dy = 0;

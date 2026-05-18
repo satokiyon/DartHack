@@ -271,10 +271,10 @@ dowrite(struct obj *pen)
         Your("マーカーは乾き切った!");
         /* scrolls disappear, spellbooks don't */
         if (paper->oclass == SPBOOK_CLASS) {
-            pline_The("spellbook is left unfinished and your writing fades.");
+            pline_The("呪文書は書きかけのまま、文字は消えていった.");
             update_inventory(); /* pen charges */
         } else {
-            pline_The("scroll is now useless and disappears!");
+            pline_The("巻物はもう役に立たず消えてしまった!");
             useup(paper);
         }
         obfree(new_obj, (struct obj *) 0);
@@ -357,7 +357,7 @@ dowrite(struct obj *pen)
     /* success */
     if (new_obj->oclass == SPBOOK_CLASS) {
         /* acknowledge the change in the object's description... */
-        pline_The("spellbook warps strangely, then turns %s.",
+        pline_The("呪文書は奇妙にゆがみ、やがて%sになった.",
                   new_book_description(new_obj->otyp, namebuf));
     }
     new_obj->blessed = (curseval > 0);

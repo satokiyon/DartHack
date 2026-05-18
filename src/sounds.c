@@ -1349,23 +1349,23 @@ dochat(void)
                    already been mapped as a wall */
                 ;
             } else if (!Hallucination) {
-                pline("壁に話をしかけているようなものだ.");
+                pline("壁に話しかけているようなものだ.");
             } else {
                 static const char *const walltalk[] = {
-                    "gripes about its job.",
-                    "tells you a funny joke!",
-                    "insults your heritage!",
-                    "chuckles.",
-                    "guffaws merrily!",
-                    "deprecates your exploration efforts.",
-                    "suggests a stint of rehab...",
-                    "doesn't seem to be interested.",
+                    "自分の仕事への不満をこぼした.",
+                    "おかしな冗談を言った!",
+                    "あなたの出自をけなした!",
+                    "くすくす笑った.",
+                    "陽気にげらげら笑った!",
+                    "あなたの探索をこき下ろした.",
+                    "しばらく更生施設に行けと勧めた...",
+                    "どうやら興味がないようだ.",
                 };
                 int idx = rn2(10);
 
                 if (idx >= SIZE(walltalk))
                     idx = SIZE(walltalk) - 1;
-                pline_The("wall %s", walltalk[idx]);
+                pline_The("壁は%s", walltalk[idx]);
             }
             return ECMD_OK;
         }
@@ -1457,7 +1457,7 @@ tiphat(void)
         } else if (u.dz) {
             pline("There's no one %s there.", (u.dz < 0) ? "up" : "down");
         } else {
-            pline_The("lout here doesn't acknowledge you...");
+            pline_The("ここにいる無作法者はあなたを無視した...");
         }
         return res;
     }

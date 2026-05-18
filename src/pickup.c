@@ -1851,9 +1851,11 @@ pickup_object(
         } else if (!obj->spe && !obj->cursed) {
             obj->spe = 1;
         } else {
-            pline_The("scroll%s %s to dust as you %s %s up.", plur(obj->quan),
-                      otense(obj, "turn"), telekinesis ? "raise" : "pick",
-                      (obj->quan == 1L) ? "it" : "them");
+            pline_The("巻物%sを%sようとしたが、%sはボロボロに%sて塵になってしまった.",
+                      (obj->quan > 1L) ? "ら" : "",
+                      telekinesis ? "持ち上げ" : "拾い上げ",
+                      (obj->quan == 1L) ? "それ" : "それら",
+                      "崩れ");
             trycall(obj);
             useupf(obj, obj->quan);
             return 1; /* tried to pick something up and failed, but
@@ -2575,7 +2577,7 @@ in_container(struct obj *obj)
         return 0;
     } else if ((obj->otyp == LOADSTONE) && obj->cursed) {
         set_bknown(obj, 1);
-        pline_The("stone%s won't leave your person.", plur(obj->quan));
+        pline_The("石%sは体から離れない.", plur(obj->quan));
         return 0;
     } else if (obj->otyp == AMULET_OF_YENDOR
                || obj->otyp == CANDELABRUM_OF_INVOCATION

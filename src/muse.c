@@ -824,7 +824,7 @@ use_defensive(struct monst *mtmp)
             if (otmp)
                 pline_mon(mtmp, "%s uses a unicorn horn!", Monnam(mtmp));
             else
-                pline_The("tip of %s's horn glows!", mon_nam(mtmp));
+                pline_The("%sの角先が光った!", mon_nam(mtmp));
         }
         if (!mtmp->mcansee) {
             mcureblindness(mtmp, vismon);
@@ -926,7 +926,7 @@ use_defensive(struct monst *mtmp)
             || IS_DRAWBRIDGE(levl[mtmp->mx][mtmp->my].typ)
             || (is_drawbridge_wall(mtmp->mx, mtmp->my) >= 0)
             || stairway_at(mtmp->mx, mtmp->my)) {
-            pline_The("digging ray is ineffective.");
+            pline_The("掘削光線は効かなかった.");
             return 2;
         }
         if (!Can_dig_down(&u.uz) && !levl[mtmp->mx][mtmp->my].candig) {
@@ -1619,14 +1619,14 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
             } else if (rnd(20) < 10 + u.uac &&
                        !(gb.buzzer && !gb.buzzer->mwandexp)) {
                 monstunseesu(M_SEEN_MAGR); /* mons see hero not resisting */
-                pline_The("wand hits you!");
+                pline_The("魔法の杖の光線があなたに命中した!");
                 tmp = d(2, 12);
                 if (Half_spell_damage)
                     tmp = (tmp + 1) / 2;
                 losehp(tmp, "wand", KILLED_BY_AN);
                 learnit = TRUE;
             } else {
-                pline_The("wand misses you.");
+                pline_The("魔法の杖の光線は外れた.");
             }
             stop_occupation();
             nomul(0);
@@ -1967,7 +1967,7 @@ use_offensive(struct monst *mtmp)
             int num;
 
             if (vis)
-                pline_The("scroll erupts in a tower of flame!");
+                pline_The("巻物は火柱となって噴き上がった!");
             shieldeff(mtmp->mx, mtmp->my);
             pline_mon(mtmp, "%sは無傷だった.", Monnam(mtmp));
             (void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
@@ -2586,7 +2586,7 @@ use_misc(struct monst *mtmp)
                 where_to = 0;
             }
             if (!where_to) {
-                pline_The("whip slips free."); /* not `The_whip' */
+                pline_The("ムチはするりと外れた."); /* not `The_whip' */
                 return 1;
             } else if (where_to == 3 && mon_hates_silver(mtmp)
                        && objects[obj->otyp].oc_material == SILVER) {

@@ -975,9 +975,9 @@ polymon(int mntmp)
     if (Passes_walls && u.utrap
         && (u.utraptype == TT_INFLOOR || u.utraptype == TT_BURIEDBALL)) {
         if (u.utraptype == TT_INFLOOR) {
-            pline_The("rock seems to no longer trap you.");
+            pline_The("岩はもはやあなたを閉じ込めていないようだ.");
         } else {
-            pline_The("buried ball is no longer bound to you.");
+            pline_The("埋まった鉄球はもはやあなたにつながれていない.");
             buried_ball_to_freedom();
         }
         reset_utrap(TRUE);
@@ -1181,11 +1181,11 @@ break_armor(void)
                 (void) Cloak_off();
                 useup(otmp);
             } else if (otmp->otyp == ALCHEMY_SMOCK) {
-                pline_The("knot on your %s is pulled apart!", cloak_simple_name(otmp));
+                pline_The("あなたの%sの結び目はほどけた!", cloak_simple_name(otmp));
                 (void) Cloak_off();
                 dropp(otmp);
             } else {
-                pline_The("clasp on your %s breaks open!", cloak_simple_name(otmp));
+                pline_The("あなたの%sの留め金が外れた!", cloak_simple_name(otmp));
                 (void) Cloak_off();
                 dropp(otmp);
             }
@@ -1480,7 +1480,7 @@ doremove(void)
 {
     if (!Punished) {
         if (u.utrap && u.utraptype == TT_BURIEDBALL) {
-            pline_The("ball and chain are buried firmly in the %s.",
+            pline_The("鉄球と鎖は%sに深く埋まっている.",
                       surface(u.ux, u.uy));
             return ECMD_OK;
         }
@@ -1536,11 +1536,11 @@ dospinweb(void)
                     Strcpy(sweep, "freezes, shatters and ");
                     break;
                 }
-                pline_The("web %sis swept away!", sweep);
+                pline_The("蜘蛛の巣は%s流された!", sweep);
             }
             return ECMD_OK;
         } /* default: a nasty jelly-like creature */
-        pline_The("web dissolves into %s.", mon_nam(u.ustuck));
+        pline_The("蜘蛛の巣は%sの中に溶けた.", mon_nam(u.ustuck));
         return ECMD_OK;
     }
     if (u.utrap) {
@@ -1558,7 +1558,7 @@ dospinweb(void)
             newsym(x, y);
             return ECMD_TIME;
         case SQKY_BOARD:
-            pline_The("squeaky board is muffled.");
+            pline_The("きしむ板の音は抑えられた.");
             deltrap(ttmp);
             newsym(x, y);
             return ECMD_TIME;
@@ -1798,7 +1798,7 @@ dohide(void)
        such critters aren't offered the option of hiding via #monster */
     if (gy.youmonst.data->mlet == S_EEL && !is_pool(u.ux, u.uy)) {
         if (IS_FOUNTAIN(levl[u.ux][u.uy].typ))
-            pline_The("fountain is not deep enough to hide in.");
+            pline_The("噴水は身を隠すには浅すぎた.");
         else
             There("には身を隠せる%sがない.", hliquid("water"));
         u.uundetected = 0;

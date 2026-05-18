@@ -752,7 +752,7 @@ scatter(
             boolean waschain = (otmp == uchain);
 
             Soundeffect(se_chain_shatters, 25);
-            pline_The("chain shatters!");
+            pline_The("鎖は砕け散った!");
             unpunish();
             if (waschain)
                 continue;

@@ -2020,8 +2020,8 @@ getobj(
              */
             if (cntgiven && cnt <= 0L) {
                 if (cnt < 0L)
-                    pline_The("LRS would be very interested to know"
-                              " you have that much.");
+                    pline_The("LRSならあなたがそんな大金を持つ事実に"
+                              "強い関心を示すだろう.");
                 return (struct obj *) 0;
             }
         }
@@ -2125,7 +2125,7 @@ silly_thing(const char *word,
     if (!strcmp(word, "call")
         && (otmp->otyp == AMULET_OF_YENDOR
             || (otmp->otyp == FAKE_AMULET_OF_YENDOR && !otmp->known)))
-        pline_The("Amulet doesn't like being called names.");
+        pline_The("護符は変なあだ名で呼ばれるのを好まない.");
     else
         pline(silly_thing_to, word);
 }
