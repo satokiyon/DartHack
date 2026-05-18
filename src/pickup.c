@@ -2106,7 +2106,7 @@ do_loot_cont(
         else
 #endif
         if (cobj->lknown)
-            pline("%s is locked.", The(xname(cobj)));
+            pline("%sは施錠されている。", The(xname(cobj)));
         else
             pline("うーん、%sは施錠されていた.", the(xname(cobj)));
         cobj->lknown = 1;
@@ -2587,10 +2587,10 @@ in_container(struct obj *obj)
          * steal them.  It also becomes a pain to check to see if someone
          * has the Amulet.  Ditto for the Candelabrum, the Bell and the Book.
          */
-        pline("%s cannot be confined in such trappings.", The(xname(obj)));
+        pline("%sはそのような入れ物には収められない。", The(xname(obj)));
         return 0;
     } else if (obj->otyp == LEASH && obj->leashmon != 0) {
-        pline("%s attached to your pet.", Tobjnam(obj, "are"));
+        pline("%sはあなたのペットにつながっている。", The(xname(obj)));
         return 0;
     } else if (obj == uwep) {
         if (welded(obj)) {
@@ -2996,7 +2996,7 @@ use_container(
             update_inventory();
     }
     if (obj->olocked) {
-        pline("%s locked.", Tobjnam(obj, "are"));
+        pline("%s施錠されている。", Tobjnam(obj, "are"));
         if (held)
             You("解錠するには地面に置く必要があった.");
         return ECMD_OK;
@@ -3657,8 +3657,8 @@ dotip(void)
         else if (is_lava(u.ux, u.uy))
             Sprintf(buf, " and immediately %s away",
                     vtense(spillage, "burn"));
-        pline("Some %s %s onto the %s%s.", spillage,
-              vtense(spillage, "spill"), surface(u.ux, u.uy), buf);
+          pline("%sの一部が%sの上にこぼれ%s。", spillage,
+              surface(u.ux, u.uy), buf);
         /* shop usage message comes after the spill message */
         if (cobj->otyp == CAN_OF_GREASE && cobj->spe > 0) {
             consume_obj_charge(cobj, TRUE);
@@ -3748,12 +3748,12 @@ tipcontainer(struct obj *box) /* or bag */
          * "ObjK drops to the floor.", "ObjL drops to the floor.", &c.
          */
         if (targetbox)
-            pline("%s into %s.",
-                  box->cobj->nobj ? "Objects tumble" : "An object tumbles",
+            pline("%s%sに転がり込んだ。",
+                box->cobj->nobj ? "いくつもの品物が" : "ひとつの品物が",
                   the(xname(targetbox)));
         else
-            pline("%s out%c",
-              box->cobj->nobj ? "Objects spill" : "An object spills",
+            pline("%sこぼれ出た%c",
+              box->cobj->nobj ? "いくつもの品物が" : "ひとつの品物が",
               terse ? ':' : '.');
 
         for (otmp = box->cobj; otmp; otmp = nobj) {
@@ -3978,7 +3978,7 @@ tipcontainer_checks(
     }
 
     if (box->olocked) {
-        pline("%s is locked.", upstart(thesimpleoname(box)));
+        pline("%sは施錠されている。", upstart(thesimpleoname(box)));
         return TIPCHECK_LOCKED;
 
     } else if (box->otrapped) {
@@ -4048,7 +4048,7 @@ tipcontainer_checks(
 
     } else if (!allowempty && !Has_contents(box)) {
         box->cknown = 1;
-        pline("%s is empty.", upstart(thesimpleoname(box)));
+        pline("%sは空だ。", upstart(thesimpleoname(box)));
         return TIPCHECK_EMPTY;
 
     }
