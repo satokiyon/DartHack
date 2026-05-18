@@ -2540,7 +2540,7 @@ mhitm_ad_fire(
                       !mlifesaver(mdef) ? "burns completely"
                                         : "is totally engulfed in flames");
             else
-                You("焦げる匂い%sを感じた.",
+                You("%sが焦げたにおいを感じた.",
                                         (pd == &mons[PM_PAPER_GOLEM]) ? "紙"
                                             : (pd == &mons[PM_STRAW_GOLEM]) ? "藁" : "");
             xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
@@ -3042,7 +3042,7 @@ mhitm_ad_curs(
             if (!Deaf) {
                 Soundeffect(se_laughter, 40);
                 if (Blind) {
-                    You_hear("笑い声が聞こえた.");
+                    You_hear("笑い声が聞こえる.");
                 } else {
                     pline_mon(magr, "%s chuckles.", Monnam(magr));
                 }
@@ -3086,7 +3086,7 @@ mhitm_ad_curs(
             }
             if (!Deaf) {
                 if (!gv.vis)
-                    You_hear("笑い声が聞こえた.");
+                    You_hear("笑い声が聞こえる.");
                 else if (canseemon(magr))
                     pline_mon(magr, "%s chuckles.", Monnam(magr));
             }
@@ -4214,15 +4214,15 @@ mhitm_ad_ston(
         if (!rn2(3)) {
             if (magr->mcan) {
                 if (!Deaf)
-                        You_hear("%sのせき込みが聞こえた!", mon_nam(magr));
+                        You_hear("%sのせき込みが聞こえる!", mon_nam(magr));
             } else {
                 if (Hallucination && !Blind) {
                     Soundeffect(se_cockatrice_hiss, 50);
-                        You_hear("シューッという音が聞こえた."); /* You_hear() deals with Deaf */
+                        You_hear("シューッという音が聞こえる."); /* You_hear() deals with Deaf */
                     pline("%s appears to be blowing you a kiss...",
                           Monnam(magr));
                 } else if (!Deaf) {
-                        You_hear("%sのシューッという音が聞こえた!",
+                        You_hear("%sのシューッという音が聞こえる!",
                                  s_suffix(mon_nam(magr)));
                 } else if (!Blind) {
                     pline("%s seems to grimace.", Monnam(magr));

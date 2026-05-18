@@ -276,7 +276,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
                 mtmp->mhp -= rnd(m_already_trapped ? 4 : 6);
                 if (DEADMONSTER(mtmp)) {
                     if (!cansee(x, y)) {
-                        pline("たかがって不可観、一玬のうちに爆発した!");
+                        pline("たかがって不可観、一瞬のうちに爆発した!");
                     } else {
                         You("%sを破壊した!",
                             mtmp->mtame
@@ -765,13 +765,13 @@ do_play_instrument(struct obj *instr)
     boolean ok;
 
     if (Underwater) {
-        You_cant("水中では音楽を奏でられなかった!");
+        You_cant("水中では音楽を奏でられない!");
         return ECMD_OK;
     } else if ((instr->otyp == WOODEN_FLUTE || instr->otyp == MAGIC_FLUTE
                 || instr->otyp == TOOLED_HORN || instr->otyp == FROST_HORN
                 || instr->otyp == FIRE_HORN || instr->otyp == BUGLE)
                && !can_blow(&gy.youmonst)) {
-        You("%sを演奏できなかった.", thesimpleoname(instr));
+        You("%sを演奏できない.", thesimpleoname(instr));
         return ECMD_OK;
     }
     if (instr->otyp != LEATHER_DRUM && instr->otyp != DRUM_OF_EARTHQUAKE

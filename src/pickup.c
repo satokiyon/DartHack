@@ -240,7 +240,7 @@ query_classes(
                     if (*where)
                         There("are no %c's %s.", sym, where);
                     else
-                        You("%cは持っていなかった.", sym);
+                        You("%cは持っていない.", sym);
                     not_everything = TRUE;
                 }
             }
@@ -1676,7 +1676,7 @@ carry_count(struct obj *obj,            /* object to pick up... */
     /* we can carry qq of them */
     if (qq > 0) {
         if (qq < count)
-            You("%sの%sを%sしか%sことができなかった.",
+            You("%sの%sを%sしか%sことができない.",
                 where, obj_nambuf, (qq == 1L) ? "1つ" : "いくつか", verb);
         *wt_after = wt;
         return qq;
@@ -1728,7 +1728,7 @@ lift_object(
            [this was using simpleonames(obj) for shortest description, but
            that's suboptimal for loadstones because it omits user-assigned
            type name which is something of interest for gray stones] */
-        You("荷物が多すぎて%s%sを持ち上げることができなかった.",
+        You("荷物が多すぎて%s%sを持ち上げることができない.",
             (obj->quan == 1L) ? "さらに" : "もっと", xname(obj));
         return -1;
     }
@@ -2054,14 +2054,14 @@ able_to_loot(
     } else if ((is_pool(x, y) && (looting || !Underwater)) || is_lava(x, y)) {
         /* at present, can't loot in water even when Underwater;
            can tip underwater, but not when over--or stuck in--lava */
-        You("深い%sの中のものを%sことはできなかった.",
+        You("深い%sの中のものを%sことはできない.",
             hliquid(is_lava(x, y) ? "lava" : "water"), verb);
         return FALSE;
     } else if (nolimbs(gy.youmonst.data)) {
-        pline("Without limbs, you cannot %s anything.", verb);
+        pline("手足がなければ、何も%sことはできない.", verb);
         return FALSE;
     } else if (looting && !freehand()) {
-          pline("空いた%sがなければ、何も略奪できなかった.",
+          pline("空いた%sがなければ、何も略奪できない.",
               body_part(HAND));
         return FALSE;
     }
@@ -2332,7 +2332,7 @@ doloot_core(void)
                     You("略奪するには入れ物のそばにいる必要があった.");
                 }
             } else {
-                You("略奪できるものが%s見つからなかった.",
+                You("略奪できるものが%s見つからない.",
                     (prev_inquiry || prev_loot) ? "他に" : "");
                 return (timepassed ? ECMD_TIME : ECMD_OK);
             }
@@ -2383,7 +2383,7 @@ reverse_loot(void)
         dropx(goldob);
         /* the dropped gold might have fallen to lower level */
         if (g_at(x, y))
-            pline("よし、ここに戦利品があった.");
+            pline("よし、ここに戦利品がある.");
     } else {
         /* find original coffers chest if present, otherwise use nearest */
         otmp = 0;
@@ -2446,11 +2446,11 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
                          SUPPRESS_SADDLE, FALSE));
         if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y') {
             if (nolimbs(gy.youmonst.data)) {
-                You_cant("手足がなくてはそれはできなかった。"); /* not body_part(HAND) */
+                You_cant("手足が無いためそれはできなかった。"); /* not body_part(HAND) */
                 return 0;
             }
             if (otmp->cursed) {
-                You("できなかった。鞍が%sにくっついているようだ.",
+                You("できない。鞍が%sにくっついているようだ.",
                     x_monnam(mtmp, ARTICLE_THE, (char *) 0,
                              SUPPRESS_SADDLE, FALSE));
                 /* the attempt costs you time */
@@ -2616,7 +2616,7 @@ in_container(struct obj *obj)
         || (obj->otyp == STATUE && bigmonst(&mons[obj->corpsenm]))) {
         /* consumes multiple obufs but not enough to overwrite the result */
         Strcpy(buf, the(xname(obj)));
-        You("%sを%sに入れることができなかった.", buf, the(xname(gc.current_container)));
+        You("%sを%sに入れることができない.", buf, the(xname(gc.current_container)));
         return 0;
     }
 
@@ -3155,7 +3155,7 @@ use_container(
     }
 
     if ((loot_in || stash_one) && !inokay) {
-        You("%s%sものを持っていなかった.", gi.invent ? "ほかに" : "",
+        You("%s%sものを持っていない.", gi.invent ? "ほかに" : "",
             stash_one ? "しまう" : "入れる");
         loot_in = stash_one = FALSE;
     }

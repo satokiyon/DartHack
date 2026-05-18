@@ -543,7 +543,7 @@ fix_worst_trouble(int trouble)
         if (Hallucination)
             pline("タンクの中に虎がいた.");
         else
-            You_feel("再び健康になった気がした.");
+            You_feel("再び健康になった気がする.");
         for (i = 0; i < A_MAX; i++) {
             if (ABASE(i) < AMAX(i)) {
                 ABASE(i) = AMAX(i);
@@ -585,7 +585,7 @@ fix_worst_trouble(int trouble)
         make_confused(0L, TRUE);
         break;
     case TROUBLE_HALLUCINATION:
-        pline("カンザスに戻ってきたようだった.");
+        pline("福知山に戻ってきたようだった.");
         (void) make_hallucinated(0L, FALSE, 0L);
         break;
     case TROUBLE_SADDLE:
@@ -1234,7 +1234,7 @@ pleased(aligntyp g_align)
                     break;
                 } else if (u.uevent.uheard_tune < 2) {
                     Soundeffect(se_divine_music, 50);
-                    You_hear("神々しい音楽が聞こえた...");
+                    You_hear("神々しい音楽が聞こえる...");
                     pline("It sounds like:  \"%s\".", svt.tune);
                     u.uevent.uheard_tune++;
                     record_achievement(ACH_TUNE);
@@ -1285,7 +1285,7 @@ pleased(aligntyp g_align)
             int any = 0;
 
             if (Blind)
-                You_feel("%sの力を感じた.", u_gname());
+                You_feel("%sの力を感じる.", u_gname());
             else
                 You("%sオーラに包まれた.", an(hcolor(NH_LIGHT_BLUE)));
             for (otmp = gi.invent; otmp; otmp = nextobj) {
@@ -1512,7 +1512,7 @@ desecrate_altar(boolean highaltar, aligntyp altaralign)
         adjalign(-20);
         u.ugangr += 5;
     }
-    You_feel("周囲の空気が張り詰めていくのを感じた...");
+    You_feel("周囲の空気が張り詰めていくのを感じる...");
     pline("Suddenly, you realize that %s has noticed you...",
           align_gname(altaralign));
     Sprintf(gvbuf, "So, mortal!  You dare desecrate my %s!",
@@ -1609,7 +1609,7 @@ offer_fake_amulet(
         return;
     }
     Soundeffect(se_thunderclap, 100);
-    You_hear("近くで雷鳴の響きが聞こえた.");
+    You_hear("近くで雷鳴の響きが聞こえる.");
     if (!otmp->known) {
         You("%sをしでかしたと気づいた.",
             Hallucination ? "大失敗" : "過ち");
@@ -1637,7 +1637,7 @@ offer_different_alignment_altar(
     if (ugod_is_angry() || (altaralign == A_NONE && Inhell)) {
         if (u.ualignbase[A_CURRENT] == u.ualignbase[A_ORIGINAL]
             && altaralign != A_NONE) {
-            You("%sが怒っている気が強くした...", u_gname());
+            You("%sが怒っているに違いないと思った...", u_gname());
             consume_offering(otmp);
             pline("%s accepts your allegiance.", a_gname());
 
@@ -1657,12 +1657,12 @@ offer_different_alignment_altar(
         }
     } else {
         consume_offering(otmp);
-        You("%sと%sの対立を感じた.", u_gname(), a_gname());
+        You("%sと%sの対立を感じる.", u_gname(), a_gname());
         if (rn2(8 + u.ulevel) > 5) {
             struct monst *pri;
             boolean shrine;
 
-            You_feel("%sの力が増したのを感じた.", u_gname());
+            You_feel("%sの力が増したのを感じる.", u_gname());
             exercise(A_WIS, TRUE);
             change_luck(1);
             shrine = on_shrine();
@@ -2061,7 +2061,7 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
         if (value > -u.ualign.record)
             value = -u.ualign.record;
         adjalign(value);
-        You_feel("いくらか赦された気がした.");
+        You_feel("いくらか赦された気がする.");
     } else if (u.ublesscnt > 0) {
         int saved_cnt = u.ublesscnt;
         u.ublesscnt -= ((value * (u.ualign.type == A_CHAOTIC ? 500 : 300))
@@ -2296,7 +2296,7 @@ prayer_done(void) /* M. Stephenson (1.0.3b) */
                  (alignment == A_LAWFUL)
                     ? "Vile creature, thou durst call upon me?"
                     : "Walk no more, perversion of nature!");
-        You_feel("体がばらばらに崩れていくように感じた.");
+        You_feel("体がばらばらに崩れていくように感じる.");
         /* KMH -- Gods have mastery over unchanging */
         rehumanize();
         /* no Half_physical_damage adjustment here */
@@ -2431,7 +2431,7 @@ doturn(void)
     /* [What about needing free hands (does #turn involve any gesturing)?] */
     if (!can_chant(&gy.youmonst)) {
         /* "evilness": "demons and undead" is too verbose and too precise */
-        You("邪悪を退けるために%s%sを呼びかけることができなかった.",
+        You("邪悪を退けるために%s%sを呼びかけることができない.",
             Strangled ? "" : "とても", Gname);
         /* violates agnosticism due to intent; conduct tracking is not
            supposed to affect play but we make an exception here:  use a

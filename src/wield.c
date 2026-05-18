@@ -441,7 +441,7 @@ dowield(void)
         /* wielding whole readied stack, so no longer quivered */
         setuqwep((struct obj *) 0);
     } else if (wep->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
-        You("それを装備することはできなかった!");
+        You("それを装備することはできない!");
         return ECMD_FAIL;
     }
 
@@ -522,7 +522,7 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
     if (!gi.invent) {
         /* could accept '-' to empty quiver, but there's no point since
            inventory is empty so uquiver is already Null */
-        You("射撃用に構えるものを持っていなかった.");
+        You("矢筒に用意できるものを持っていない.");
         return ECMD_OK;
     }
 
@@ -537,11 +537,11 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
     } else if (newquiver == &hands_obj) { /* no object */
         /* Explicitly nothing */
         if (uquiver) {
-            You("もう弾薬は構えていなかった.");
+            You("矢筒には何も用意されていない.");
             /* skip 'quivering: prinv()' */
             setuqwep((struct obj *) 0);
         } else {
-            You("最初から弾薬は構えていなかった!");
+            You("最初から矢筒は空だった!");
         }
         return ECMD_OK;
     } else if (newquiver->o_id == svc.context.objsplit.child_oid) {
@@ -553,17 +553,17 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
             goto already_quivered;
         } else if (newquiver->oclass == COIN_CLASS) {
             /* don't allow splitting a stack of coins into quiver */
-            You("金貨の一部だけを構えることはできなかった.");
+            You("金貨の一部だけを矢筒に準備することはできない.");
             unsplitobj(newquiver);
             return ECMD_OK;
         }
         finish_splitting(newquiver);
     } else if (newquiver == uquiver) {
  already_quivered:
-        pline("That ammunition is already readied!");
+        pline("それは既に矢筒に準備されている!");
         return ECMD_OK;
     } else if (newquiver->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
-        You("それを%sできなかった!", verb);
+        You("それを%sできない!", verb);
         return ECMD_OK;
     } else if (newquiver == uwep) {
         int weld_res = !uwep->bknown;
@@ -696,7 +696,7 @@ wield_tool(struct obj *obj,
                    || strstri(what, "s of ") != 0);
 
     if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
-        You_cant("%sを着用している間は使えなかった。", yname(obj));
+        You_cant("%sを着用している間は使えない。", yname(obj));
         return FALSE;
     }
     if (uwep && welded(uwep)) {
@@ -711,17 +711,17 @@ wield_tool(struct obj *obj,
                "Since your weapon is welded to your %s, you cannot %s %s %s.",
                   hand, verb, more_than_1 ? "those" : "that", xname(obj));
         } else {
-            You_cant("それはできなかった.");
+            You_cant("それはできない.");
         }
         return FALSE;
     }
     if (cantwield(gy.youmonst.data)) {
-        You_cant("%sをしっかりと握ることはできなかった。", more_than_1 ? "それらは" : "それは");
+        You_cant("%sをしっかりと握ることはできない。", more_than_1 ? "それらは" : "それは");
         return FALSE;
     }
     /* check shield */
     if (uarms && bimanual(obj)) {
-        You("盾を装備したままでは両手用の%sを%sできなかった.",
+        You("盾を装備したままでは両手用の%sを%sできない.",
             (obj->oclass == WEAPON_CLASS) ? "武器" : "道具", verb);
         return FALSE;
     }
@@ -763,7 +763,7 @@ can_twoweapon(void)
 
     if (!could_twoweap(gy.youmonst.data)) {
         if (Upolyd)
-            You_cant("現在の姿では二つの武器を使うことはできなかった。");
+            You_cant("現在の姿では二つの武器を使うことはできない。");
         else
             pline("%s aren't able to use two weapons at once.",
                   makeplural((flags.female && gu.urole.name.f)

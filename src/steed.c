@@ -300,7 +300,7 @@ mount_steed(
     if (mtmp->mtrapped) {
         struct trap *t = t_at(mtmp->mx, mtmp->my);
 
-        You_cant("%sに乗ることはできなかった。%sが%sに引っ掛かっている。", mon_nam(mtmp),
+        You_cant("%sに乗ることはできない。%sが%sに引っ掛かっている。", mon_nam(mtmp),
                  mhe(mtmp), an(trapname(t->ttyp, FALSE)));
         return (FALSE);
     }
@@ -315,19 +315,19 @@ mount_steed(
         return (FALSE);
     }
     if (!force && Underwater && !is_swimmer(ptr)) {
-        You_cant("%sの中ではその生物に乗ることはできなかった。",
+        You_cant("%sの中ではその生物に乗ることはできない。",
                  hliquid("water"));
         return (FALSE);
     }
     if (!can_saddle(mtmp) || !can_ride(mtmp)) {
-        You_cant("そのような生物には乗ることはできなかった。");
+        You_cant("そのような生物には乗ることはできない。");
         return FALSE;
     }
 
     /* Is the player impaired? */
     if (!force && !is_floater(ptr) && !is_flyer(ptr) && Levitation
         && !Lev_at_will) {
-        You("%sに手が届かなかった.", mon_nam(mtmp));
+        You("%sに手が届かない.", mon_nam(mtmp));
         return (FALSE);
     }
     if (!force && uarm && is_metallic(uarm) && greatest_erosion(uarm)) {

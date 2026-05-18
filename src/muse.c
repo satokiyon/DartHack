@@ -143,7 +143,7 @@ precheck(struct monst *mon, struct obj *obj)
                            ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
             Soundeffect(se_zap_then_explosion, 100);
-                You_hear("%sで放射音と爆発音が聞こえた.",
+                You_hear("%sで放射音と爆発音が聞こえる.",
                             (mdistu(mon) <= range * range)
                                 ? "すぐ近く" : "遠く");
         }
@@ -176,7 +176,7 @@ mzapwand(
                        ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
         Soundeffect(se_zap, 100);
-        You_hear("%sで放射音が聞こえた.", (mdistu(mtmp) <= range * range)
+        You_hear("%sで放射音が聞こえる.", (mdistu(mtmp) <= range * range)
                                  ? "近く" : "遠く");
         unknow_object(otmp); /* hero loses info when unseen obj is used */
     } else if (self) {
@@ -204,7 +204,7 @@ mplayhorn(
                        ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
         Soundeffect(se_horn_being_played, 50);
-        You_hear("%sで角笛の音が聞こえた.",
+        You_hear("%sで角笛の音が聞こえる.",
                  (mdistu(mtmp) <= range * range)
                     ? "近く" : "遠く");
         unknow_object(otmp); /* hero loses info when unseen obj is used */
@@ -279,7 +279,7 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
             Snprintf(blindbuf, sizeof blindbuf, "%sを唱えようとしている", onambuf);
         else
             Snprintf(blindbuf, sizeof blindbuf, "%sを読んでいる", onambuf);
-        You_hear("%sが%sのが聞こえた.",
+        You_hear("%sが%sのが聞こえる.",
                  x_monnam(mtmp, ARTICLE_A, (char *) 0, mflags, FALSE),
                  blindbuf);
         if (tpindicator)
@@ -298,7 +298,7 @@ mquaffmsg(struct monst *mtmp, struct obj *otmp)
         pline_mon(mtmp, "%s drinks %s!", Monnam(mtmp), singular(otmp, doname));
     } else if (!Deaf) {
         Soundeffect(se_mon_chugging_potion, 25);
-        You_hear("ごくごくと飲む音が聞こえた.");
+        You_hear("ごくごくと飲む音が聞こえる.");
     }
 }
 
@@ -2933,7 +2933,7 @@ mon_consume_unstone(
               distant_name(obj, doname));
         obj->quan = save_quan;
     } else if (!Deaf)
-        You_hear("%s音が聞こえた.",
+        You_hear("%s音が聞こえる.",
                  (obj->oclass == POTION_CLASS) ? "飲み込む" : "噛み砕く");
 
     m_useup(mon, obj);
@@ -2960,13 +2960,13 @@ mon_consume_unstone(
             pline("What a pity - %s just ruined a future piece of art!",
                   mon_nam(mon));
         else
-            pline_mon(mon, "%sは身軽になったようだった!", Monnam(mon));
+            pline_mon(mon, "%sは身軽になったようだ!", Monnam(mon));
     }
     if (lizard && (mon->mconf || mon->mstun)) {
         mon->mconf = 0;
         mon->mstun = 0;
         if (vis && !is_bat(mon->data) && mon->data != &mons[PM_STALKER])
-            pline_mon(mon, "%sはいま少し落ち着いたようだった.", Monnam(mon));
+            pline_mon(mon, "%sはいま少し落ち着いたようだ.", Monnam(mon));
     }
     if (mon->mtame && !mon->isminion && nutrit > 0) {
         struct edog *edog = EDOG(mon);

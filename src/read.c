@@ -1479,7 +1479,7 @@ seffect_scare_monster(struct obj **sobjp)
         } else {
             Soundeffect(se_maniacal_laughter, 50);
         }
-        You_hear("%sが%sで聞こえた.",
+        You_hear("%sが%sで聞こえる.",
                  (confused || scursed) ? "悲しげな嘆き声"
                                       : "狂気じみた笑い声",
                  !ct ? "遠く" : "すぐ近く");
@@ -1932,7 +1932,7 @@ seffect_earth(struct obj **sobjp)
 
         /* Identify the scroll */
         if (u.uswallow) {
-            You_hear("地鳴りが聞こえた.");
+            You_hear("地鳴りが聞こえる.");
         } else {
             if (!avoid_ceiling(&u.uz)) {
                 pline_The("%s rumbles %s you!", ceiling(u.ux, u.uy),
@@ -2363,7 +2363,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
             if (mtmp->minvis && !canspotmon(mtmp))
                 map_invisible(mtmp->mx, mtmp->my);
         } else if (engulfing_u(mtmp))
-            You_hear("何かが%sの%s越しにあなたの%sへぶつかる音が聞こえた!",
+            You_hear("何かが%sの%s越しにあなたの%sへぶつかる音が聞こえる!",
                      s_suffix(mon_nam(mtmp)), mbodypart(mtmp, STOMACH),
                      body_part(HEAD));
 
@@ -2374,7 +2374,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
                     pline("Fortunately, %s is wearing a hard helmet.",
                           mon_nam(mtmp));
                 else if (!Deaf)
-                    You_hear("金属がぶつかる甲高い音が聞こえた.");
+                    You_hear("金属がぶつかる甲高い音が聞こえる.");
                 if (mdmg > 2)
                     mdmg = 2;
             } else {

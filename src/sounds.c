@@ -68,15 +68,15 @@ beehive_mon_sound(struct monst *mtmp)
         switch (rn2(2) + hallu) {
         case 0:
             Soundeffect(se_low_buzzing, 30);
-            You_hear("低いうなり音が聞こえた.");
+            You_hear("低いうなり音が聞こえる.");
             break;
         case 1:
             Soundeffect(se_angry_drone, 100);
-            You_hear("怒った羽音が聞こえた.");
+            You_hear("怒った羽音が聞こえる.");
             break;
         case 2:
             Soundeffect(se_bees, 100);
-            You_hear("%s帽子の中で蜂が騒いでいる音が聞こえた!",
+            You_hear("%s帽子の中で蜂が騒いでいる音が聞こえる!",
                      uarmh ? "" : "(nonexistent) ");
             break;
         }
@@ -254,11 +254,11 @@ dosounds(void)
                     != (ROOM_INDEX(sroom) + ROOMOFFSET)) {
                     if (gold_in_vault) {
                         You_hear(!hallu
-                                     ? "誰かが金貨を数える音が聞こえた."
-                                     : "クォーターバックがプレーを指示する声が聞こえた.");
+                                     ? "誰かが金貨を数える音が聞こえる."
+                                     : "クォーターバックがプレーを指示する声が聞こえる.");
                     } else {
                         Soundeffect(se_someone_searching, 30);
-                        You_hear("誰かが探し回る音が聞こえた.");
+                        You_hear("誰かが探し回る音が聞こえる.");
                     }
                     break;
                 }
@@ -267,7 +267,7 @@ dosounds(void)
                 /*FALLTHRU*/
             case 0:
                 Soundeffect(se_guards_footsteps, 30);
-                You_hear("巡回中の衛兵の足音が聞こえた.");
+                You_hear("巡回中の衛兵の足音が聞こえる.");
                 break;
             case 2:
                 You_hear("エベネーザ・スクルージ!");
