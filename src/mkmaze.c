@@ -1716,7 +1716,7 @@ water_friction(void)
         eff = TRUE;
     }
     if (eff)
-        pline("Water turbulence affects your movements.");
+        pline("水流の乱れが動きに影響した。");
 }
 
 void

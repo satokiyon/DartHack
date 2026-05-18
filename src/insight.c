@@ -2538,10 +2538,10 @@ do_gamelog(void)
     if (gg.gamelog) {
         show_gamelog(ENL_GAMEINPROGRESS);
     } else {
-        pline("No chronicled events.");
+        pline("記録されたイベントはない。");
     }
 #else
-    pline("Chronicle was turned off during compile-time.");
+    pline("コンパイル時に記録機能が無効化されている。");
 #endif /* !CHRONICLE */
     return ECMD_OK;
 }
@@ -2943,7 +2943,7 @@ list_vanquished(char defquery, boolean ask)
      */
     } else if (!program_state.gameover) {
         /* #vanquished rather than final disclosure, so pline() is ok */
-        pline("No creatures have been vanquished.");
+        pline("倒されたクリーチャーはいない。");
 #ifdef DUMPLOG
     } else if (dumping) {
         putstr(0, 0, "No creatures were vanquished."); /* not pline() */
@@ -3125,7 +3125,7 @@ list_genocided(char defquery, boolean ask)
     } else if (!program_state.gameover) {
         /* #genocided rather than final disclosure, so pline() is ok and
            extinction has been ignored */
-        pline("No creatures have been genocided%s.", genoing ? " yet" : "");
+        pline("抖滅されたクリーチャーはいない%s。", genoing ? "（まだ）" : "");
 #ifdef DUMPLOG
     } else if (dumping) { /* 'gameover' is True if we make it here */
         putstr(0, 0, "No species were genocided or became extinct.");
@@ -3395,7 +3395,7 @@ mstatusline(struct monst *mtmp)
     Strcpy(monnambuf, x_monnam(mtmp, ARTICLE_YOUR, (char *) 0,
                                (SUPPRESS_IT | SUPPRESS_INVISIBLE), FALSE));
 
-    pline("Status of %s (%s, %s):  Level %d  HP %d(%d)  AC %d%s.",
+    pline("%sのステータス (%s, %s): レベル%d HP%d(%d) AC%d%s。",
           monnambuf, align_str(alignment), size_str(mtmp->data->msize),
           mtmp->m_lev, mtmp->mhp, mtmp->mhpmax, find_mac(mtmp), info);
 }
@@ -3485,7 +3485,7 @@ ustatusline(void)
         Snprintf(eos(info), sizeof info - ln, ", in a cloud of %s",
                  reg_damg(reg) ? "poison gas" : "vapor");
 
-    pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.", svp.plname,
+    pline("%sのステータス (%s): レベル%d HP%d(%d) AC%d%s。", svp.plname,
           piousness(FALSE, align_str(u.ualign.type)),
           Upolyd ? mons[u.umonnum].mlevel : u.ulevel, Upolyd ? u.mh : u.uhp,
           Upolyd ? u.mhmax : u.uhpmax, u.uac, info);

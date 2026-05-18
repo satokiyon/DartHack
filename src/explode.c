@@ -449,7 +449,7 @@ explode(
     }
 
     if (!Deaf && !didmsg)
-        pline("Boom!");
+        pline("ドカン！");
 
     /* apply effects to monsters and floor objects first, in case the
        damage to the hero is fatal and leaves bones */
