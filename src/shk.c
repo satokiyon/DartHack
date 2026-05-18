@@ -5141,9 +5141,7 @@ getcad(
             verbalize("よくも俺の%sを%sしやがった！", dugwall ? "店" : "戸",
                         dmgstr);
         } else {
-            pline("%s is %s that you decided to %s %s %s!",
-                    Shknam(shkp), ROLL_FROM(angrytexts),
-                    dmgstr, noit_mhis(shkp), dugwall ? "shop" : "door");
+            pline("%sはあなたが%sの%sを%sしたことに%s！", Shknam(shkp), noit_mhis(shkp), dugwall ? "店" : "戸", dmgstr, ROLL_FROM(angrytexts));
         }
     } else {
         if (!Deaf) {
@@ -5152,9 +5150,7 @@ getcad(
             verbalize("誰だ！俺の%sを%sしたのは！", dugwall ? "店" : "戸",
                         dmgstr);
         } else {
-            pline("%s is %s that someone decided to %s %s %s!",
-                    Shknam(shkp), ROLL_FROM(angrytexts),
-                    dmgstr, noit_mhis(shkp), dugwall ? "shop" : "door");
+            pline("%sは誰かが%sの%sを%sしたことに%s！", Shknam(shkp), noit_mhis(shkp), dugwall ? "店" : "戸", dmgstr, ROLL_FROM(angrytexts));
         }
     }
     hot_pursuit(shkp);
