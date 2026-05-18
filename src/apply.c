@@ -1009,6 +1009,7 @@ beautiful(void)
 }
 
 static const char look_str[] = "%sに見えた.";
+static const char look_like_str[] = "%sように見えた.";
 
 staticfn int
 use_mirror(struct obj *obj)
@@ -1059,9 +1060,9 @@ use_mirror(struct obj *obj)
             } else if (Hallucination) {
                 You(look_str, hcolor((char *) 0));
             } else if (Sick) {
-                You(look_str, "やつれた");
+                You(look_like_str, "やつれている");
             } else if (u.uhs >= WEAK) {
-                You(look_str, "栄養不足");
+                You(look_like_str, "栄養不足の");
             } else if (Upolyd) {
                 You("%sのように見えた.", pmname(&mons[u.umonnum], Ugender));
             } else {

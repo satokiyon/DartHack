@@ -7,7 +7,7 @@
 #include "artifact.h"
 
 static const char brief_feeling[] =
-    "have a %s feeling for a moment, then it passes.";
+    "一瞬%s気分になったが、すぐにおさまった.";
 
 staticfn void noises(struct monst *, struct attack *);
 staticfn void pre_mm_attack(struct monst *, struct monst *);
@@ -238,7 +238,7 @@ mdisplacem(
             if (!DEADMONSTER(magr))
                 return M_ATTK_HIT; /* lifesaved */
             else if (magr->mtame && !gv.vis)
-                You(brief_feeling, "peculiarly sad");
+                You(brief_feeling, "妙に悲しい");
             return M_ATTK_AGR_DIED;
         }
     }
@@ -1004,7 +1004,7 @@ explmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
             Your("綱がたるんだ.");
     }
     if (magr->mtame) /* give this one even if it was visible */
-        You(brief_feeling, "melancholy");
+        You(brief_feeling, "物悲しい");
 
     return result;
 }
@@ -1051,7 +1051,7 @@ mdamagem(
             if (!DEADMONSTER(magr))
                 return M_ATTK_HIT; /* lifesaved */
             else if (magr->mtame && !gv.vis)
-                You(brief_feeling, "peculiarly sad");
+                You(brief_feeling, "妙に悲しい");
             return M_ATTK_AGR_DIED;
         }
     }

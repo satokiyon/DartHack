@@ -1871,7 +1871,8 @@ dopay(void)
         if (!ltmp) {
             You("%sには何も借りがなかった.", shkname(shkp));
         } else if (!umoney) {
-            You("%shave no gold.", stashed_gold ? "seem to " : "");
+            You("%s金を持っていなかった.",
+                stashed_gold ? "見える範囲では" : "");
             if (stashed_gold)
                 pline("But you have some gold stashed away.");
         } else {
@@ -2059,8 +2060,8 @@ pay_billed_items(
 
     umoney = money_cnt(gi.invent);
     if (!umoney && !eshkp->credit) {
-        You("%shave no gold or credit%s.",
-            stashed_gold ? "seem to " : "", *paid_p ? " left" : "");
+        You("%s金も信用枠も%s残っていなかった.",
+            stashed_gold ? "見える範囲では" : "", *paid_p ? "もう" : "");
         return TRUE;
     }
     bp = eshkp->bill_p;
@@ -2465,8 +2466,8 @@ insufficient_funds(
        buy_container() checks for both early but uses separate calls to us */
     if (!cost && umoney + ecredit == 0L) {
         stashed_gold = hidden_gold(TRUE);
-        You("%shave no gold or credit left.",
-            (stashed_gold > 0) ? "seem to " : "");
+        You("%s金も信用枠も残っていなかった.",
+            (stashed_gold > 0) ? "見える範囲では" : "");
         return TRUE;
     }
     if (cost && umoney + ecredit < cost) {

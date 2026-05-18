@@ -4140,8 +4140,8 @@ look_here(
         Sprintf(fbuf, "Contents of %s %s", s_suffix(mon_nam(mtmp)),
                 mbodypart(mtmp, STOMACH));
         /* Skip "Contents of " by using fbuf index 12 */
-        You("%s to %s what is lying in %s.", Blind ? "try" : "look around",
-            verb, &fbuf[12]);
+        You("%s%sに何があるのか%s.", &fbuf[12], verb,
+            Blind ? "確かめようとした" : "見回した");
         otmp = mtmp->minvent;
         if (otmp) {
             for (; otmp; otmp = otmp->nobj) {
@@ -4155,7 +4155,7 @@ look_here(
             Strcat(fbuf, ":");
             (void) display_minventory(mtmp, MINV_ALL | PICK_NONE, fbuf);
         } else {
-            You("%s no objects here.", verb);
+            You("ここには何も%sなかった.", verb);
         }
         return (!!Blind ? ECMD_TIME : ECMD_OK);
     }

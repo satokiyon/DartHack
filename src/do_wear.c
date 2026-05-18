@@ -130,11 +130,11 @@ toggle_stealth(
         } else {
             boolean riding = (u.usteed != NULL);
 
-            You("%s%s are noisy.", riding ? "and " : "sure",
+            You("%s足音がうるさくなった.",
                 riding ? x_monnam(u.usteed, ARTICLE_YOUR, (char *) NULL,
                                   (SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION),
                                   FALSE)
-                       : "");
+                       : "確かに");
         }
     }
 }
@@ -623,10 +623,9 @@ wielding_corpse(
     if (touch_petrifies(&mons[obj->corpsenm]) && !Stone_resistance) {
         char kbuf[BUFSZ], hbuf[BUFSZ];
 
-        You("%s %s in your bare %s.",
-            (how && is_gloves(how)) ? "now wield" : "are wielding",
-            corpse_xname(obj, (const char *) 0, CXN_ARTICLE),
-            makeplural(body_part(HAND)));
+        You("%s素手で%sをつかんでしまった.",
+            (how && is_gloves(how)) ? "今や" : "",
+            corpse_xname(obj, (const char *) 0, CXN_ARTICLE));
         /* "removing" ought to be "taking off" but that makes the
            tombstone text more likely to be truncated */
         if (how)
@@ -3348,7 +3347,7 @@ inaccessible_equipment(
                                    * be cursed */
 {
     static NEARDATA const char need_to_take_off_outer_armor[] =
-        "need to take off %s to %s %s.";
+        "%sを外さないと%sを%sことができなかった.";
     char buf[BUFSZ];
     boolean anycovering = !only_if_known_cursed; /* more comprehensible... */
 #define BLOCKSACCESS(x) (anycovering || ((x)->cursed && (x)->bknown))
@@ -3360,7 +3359,7 @@ inaccessible_equipment(
     if (obj == uarm && uarmc && BLOCKSACCESS(uarmc)) {
         if (verb) {
             Strcpy(buf, yname(uarmc));
-            You(need_to_take_off_outer_armor, buf, verb, yname(obj));
+            You(need_to_take_off_outer_armor, buf, yname(obj), verb);
         }
         return TRUE;
     }
@@ -3383,7 +3382,7 @@ inaccessible_equipment(
                 Strcat(buf, " and ");
             if (uarm)
                 Strcat(buf, sameprefix ? xname(uarm) : yname(uarm));
-            You(need_to_take_off_outer_armor, buf, verb, yname(obj));
+            You(need_to_take_off_outer_armor, buf, yname(obj), verb);
         }
         return TRUE;
     }
@@ -3391,7 +3390,7 @@ inaccessible_equipment(
     if ((obj == uleft || obj == uright) && uarmg && BLOCKSACCESS(uarmg)) {
         if (verb) {
             Strcpy(buf, yname(uarmg));
-            You(need_to_take_off_outer_armor, buf, verb, yname(obj));
+            You(need_to_take_off_outer_armor, buf, yname(obj), verb);
         }
         return TRUE;
     }

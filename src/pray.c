@@ -693,8 +693,8 @@ god_zaps_you(aligntyp resp_god)
 staticfn void
 fry_by_god(aligntyp resp_god, boolean via_disintegration)
 {
-    You("%s!", !via_disintegration ? "fry to a crisp"
-                                   : "disintegrate into a pile of dust");
+    You("%s!", !via_disintegration ? "こんがり焼き尽くされた"
+                                   : "塵の山となって崩れた");
     svk.killer.format = KILLED_BY;
     Sprintf(svk.killer.name, "the wrath of %s", align_gname(resp_god));
     done(DIED);

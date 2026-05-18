@@ -698,7 +698,7 @@ canletgo(struct obj *obj, const char *word)
     }
     if (obj->owornmask & W_SADDLE) {
         if (*word)
-            You("あなたが乗っている%sは%sことができない.", "something", word);
+            You("乗っているものは%sことができない.", word);
         return FALSE;
     }
     return TRUE;

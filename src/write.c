@@ -319,11 +319,11 @@ dowrite(struct obj *pen)
         && rnl(((Role_if(PM_WIZARD) && paper->oclass != SPBOOK_CLASS)
                 || spell_knowledge == spe_GoingStale)
                ? 5 : 15)) {
-        You("%s to write that.", by_descr ? "fail" : "don't know how");
+        You("%sので、それは書けなかった.",
+            by_descr ? "書き損ねた" : "書き方がわからなかった");
         /* scrolls disappear, spellbooks don't */
         if (paper->oclass == SPBOOK_CLASS) {
-            You(
-      "write in your best handwriting:  \"My Diary\", but it quickly fades.");
+            You("達筆で\"私の日記\"と書いたが、すぐに消えた.");
             update_inventory(); /* pen charges */
         } else {
             if (by_descr) {

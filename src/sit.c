@@ -571,10 +571,10 @@ rndcurse(void)
     int nobj = 0;
     int cnt, onum;
     struct obj *otmp;
-    static const char mal_aura[] = "feel a malignant aura surround %s.";
+    static const char mal_aura[] = "%sを邪悪な気配が包むのを感じた.";
 
     if (u_wield_art(ART_MAGICBANE) && rn2(20)) {
-        You(mal_aura, "the magic-absorbing blade");
+        You(mal_aura, "魔法吸収の刃");
         return;
     }
 
@@ -582,7 +582,7 @@ rndcurse(void)
         shieldeff(u.ux, u.uy);
     }
 
-    You(mal_aura, "you");
+    You(mal_aura, "自分");
 
     for (otmp = gi.invent; otmp; otmp = otmp->nobj) {
         /* gold isn't subject to being cursed or blessed */
@@ -711,8 +711,8 @@ attrcurse(void)
                 /* might not be able to see self anymore */
                 newsym(u.ux, u.uy);
             }
-            You("%s!", Hallucination ? "tawt you taw a puttie tat"
-                                     : "thought you saw something");
+            You("%s!", Hallucination ? "変な子猫を見た気がした"
+                                     : "何かが見えた気がした");
             ret = SEE_INVIS;
             break;
         }
