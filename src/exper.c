@@ -347,7 +347,7 @@ pluslvl(
             u.uexp = newuexp(u.ulevel);
         }
         ++u.ulevel;
-        pline("%s経験レベル %d になった！",
+        pline("%sレベル %d になった！",
               (u.ulevelmax < u.ulevel) ? "" : "再び",
               u.ulevel);
         if (u.ulevelmax < u.ulevel)

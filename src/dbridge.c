@@ -569,7 +569,7 @@ do_entity(struct entity *etmp)
 
     if (automiss(etmp) && e_survives_at(etmp, oldx, oldy)) {
         if (e_inview && (at_portcullis || IS_DRAWBRIDGE(crm->typ)))
-            pline_The("%s passes through %s!",
+            pline_The("%sが%sを通り抜けた!",
                       at_portcullis ? "portcullis" : "drawbridge",
                       e_nam(etmp));
         if (is_u(etmp))

@@ -2943,7 +2943,7 @@ list_vanquished(char defquery, boolean ask)
      */
     } else if (!program_state.gameover) {
         /* #vanquished rather than final disclosure, so pline() is ok */
-        pline("倒されたクリーチャーはいない。");
+        pline("倒された怪物はいない。");
 #ifdef DUMPLOG
     } else if (dumping) {
         putstr(0, 0, "No creatures were vanquished."); /* not pline() */
@@ -3125,7 +3125,7 @@ list_genocided(char defquery, boolean ask)
     } else if (!program_state.gameover) {
         /* #genocided rather than final disclosure, so pline() is ok and
            extinction has been ignored */
-        pline("抖滅されたクリーチャーはいない%s。", genoing ? "（まだ）" : "");
+        pline("虐殺された怪物はいない%s。", genoing ? "（まだ）" : "");
 #ifdef DUMPLOG
     } else if (dumping) { /* 'gameover' is True if we make it here */
         putstr(0, 0, "No species were genocided or became extinct.");

@@ -1839,7 +1839,7 @@ dotakeoff(void)
     if (!Narmorpieces && !Naccessories) {
         /* assert( GRAY_DRAGON_SCALES > YELLOW_DRAGON_SCALE_MAIL ); */
         if (uskin)
-            pline_The("%s merged with your skin!",
+            pline_The("%sはあなたの皮膚と一体化した!",
                       uskin->otyp >= GRAY_DRAGON_SCALES
                           ? "dragon scales are"
                           : "dragon scale mail is");
@@ -2053,7 +2053,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
                 : !WrappingAllowed(gy.youmonst.data)))
         && (racial_exception(&gy.youmonst, otmp) < 1)) {
         if (noisy)
-            pline_The("%s will not fit on your body.", which);
+            pline_The("%sはあなたの体には合わない.", which);
         return 0;
     } else if (otmp->owornmask & W_ARMOR) {
         if (noisy)
@@ -2076,9 +2076,8 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
         } else if (Upolyd && has_horns(gy.youmonst.data) && !is_flimsy(otmp)) {
             /* (flimsy exception matches polyself handling) */
             if (noisy)
-                pline_The("%s won't fit over your horn%s.",
-                          helm_simple_name(otmp),
-                          plur(num_horns(gy.youmonst.data)));
+                pline_The("%sはあなたの角が邪魔でかぶれない.",
+                          helm_simple_name(otmp));
             err++;
         } else
             *mask = W_ARMH;

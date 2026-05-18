@@ -98,12 +98,12 @@ morgue_mon_sound(struct monst *mtmp)
             You("不自然なほど静かなことに突然気づいた.");
             break;
         case 1:
-            pline_The("%s on the back of your %s %s up.", hair,
-                      body_part(NECK), vtense(hair, "stand"));
+            pline_The("あなたの%sの後ろの%sが逆立った.", body_part(NECK),
+                      hair);
             break;
         case 2:
-            pline_The("%s on your %s %s to stand up.", hair,
-                      body_part(HEAD), vtense(hair, "seem"));
+            pline_The("あなたの%sの%sが逆立っているようだ.",
+                      body_part(HEAD), hair);
             break;
         }
         return TRUE;
@@ -1334,7 +1334,7 @@ dochat(void)
         if ((otmp = vobj_at(tx, ty)) != 0 && otmp->otyp == STATUE) {
             /* Talking to a statue */
             if (!Blind)
-                pline_The("%s seems not to notice you.",
+                pline_The("%sはあなたに気づいていないようだ.",
                           /* if hallucinating, you can't tell it's a statue */
                           Hallucination ? rndmonnam((char *) 0) : "statue");
             return ECMD_OK;
@@ -1493,7 +1493,7 @@ tiphat(void)
     }
 
     if (unseen || (statue && Hallucination)) {
-        pline("その%sクリーチャーはあなたを無視している！", unseen ? "見えない" : "");
+        pline("その%s怪物はあなたを無視している！", unseen ? "見えない" : "");
     } else if (!mtmp || !responsive_mon_at(x, y)) {
         if (vismon) /* 'vismon' is only True when 'mtmp' is non-Null */
             pline("%s seems not to notice you.", Monnam(mtmp));

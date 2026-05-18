@@ -1889,7 +1889,7 @@ seffect_fire(struct obj **sobjp)
         return;
     }
     if (Underwater) {
-        pline_The("%s around you vaporizes violently!", hliquid("water"));
+        pline_The("%sがあなたの周囲で激しく気化した!", hliquid("water"));
     } else {
         if (sblessed) {
             if (!already_known)
@@ -1935,8 +1935,8 @@ seffect_earth(struct obj **sobjp)
             You_hear("地鳴りが聞こえる.");
         } else {
             if (!avoid_ceiling(&u.uz)) {
-                pline_The("%s rumbles %s you!", ceiling(u.ux, u.uy),
-                          sblessed ? "around" : "above");
+                pline_The("%sがあなたの%sで鳴り響いた!", ceiling(u.ux, u.uy),
+                          sblessed ? "周囲" : "頭上");
             } else {
                 char matbuf[BUFSZ];
                 const char *const avalanche = "avalanche";
@@ -2714,11 +2714,11 @@ do_class_genocide(void)
                     mongone(mtmp);
                     gonecnt++;
                 }
-                pline("Eliminated %d monster%s.", gonecnt, plur(gonecnt));
+                pline("モンスターを%d体消去した.", gonecnt);
                 return;
             } else
-                pline("That %s does not represent any monster.",
-                      strlen(buf) == 1 ? "symbol" : "response");
+                pline("その%sはどのモンスターも表していない.",
+                      strlen(buf) == 1 ? "記号" : "返答");
             continue;
         }
 

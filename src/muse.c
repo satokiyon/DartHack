@@ -936,7 +936,7 @@ use_defensive(struct monst *mtmp)
             if (t_at(mtmp->mx, mtmp->my)
                 || !(t = maketrap(mtmp->mx, mtmp->my, PIT))) {
                 if (vismon) {
-                    pline_The("%s here is too hard to dig in.",
+                    pline_The("%sはここでは硬すぎて掘れない.",
                               surface(mtmp->mx, mtmp->my));
                 }
                 return 2;
@@ -1900,12 +1900,13 @@ use_offensive(struct monst *mtmp)
         mreadmsg(mtmp, otmp);
         /* Identify the scroll */
         if (canspotmon(mtmp)) {
-            pline_The("%s rumbles %s %s!", ceiling(mtmp->mx, mtmp->my),
-                      otmp->blessed ? "around" : "above", mon_nam(mtmp));
+            pline_The("%sが%sの%sで鳴り響いた!",
+                      ceiling(mtmp->mx, mtmp->my), mon_nam(mtmp),
+                      otmp->blessed ? "周囲" : "頭上");
             if (oseen)
                 makeknown(otmp->otyp);
         } else if (cansee(mtmp->mx, mtmp->my)) {
-            pline_The("%s rumbles in the middle of nowhere!",
+            pline_The("%sが何もない場所で鳴り響いた!",
                       ceiling(mtmp->mx, mtmp->my));
             if (mtmp->minvis)
                 map_invisible(mtmp->mx, mtmp->my);

@@ -1298,12 +1298,26 @@ Mb_hit(struct monst *magr, /* attacker */
         *dmgptr += rnd(4); /* (4..6)d4 */
     }
 
-    /* give the hit message prior to inflicting the effects */
     verb = mb_verb[!!Hallucination][attack_indx];
+    nhUse(verb);
+
+    /* give the hit message prior to inflicting the effects */
     if (youattack || youdefend || vis) {
         result = TRUE;
-        pline_The("魔力吸収の刃が%s、%s!",
-                  vtense((const char *) 0, verb), hittee);
+        switch (attack_indx) {
+        case MB_INDEX_PROBE:
+            pline_The("魔力吸収の刃が%sを探った!", hittee);
+            break;
+        case MB_INDEX_STUN:
+            pline_The("魔力吸収の刃が%sを気絶させた!", hittee);
+            break;
+        case MB_INDEX_SCARE:
+            pline_The("魔力吸収の刃が%sを怯えさせた!", hittee);
+            break;
+        case MB_INDEX_CANCEL:
+            pline_The("魔力吸収の刃が%sの魔力を封じた!", hittee);
+            break;
+        }
         /* assume probing has some sort of noticeable feedback
            even if it is being done by one monster to another */
         if (attack_indx == MB_INDEX_PROBE && !canspotmon(mdef))
@@ -1409,24 +1423,18 @@ Mb_hit(struct monst *magr, /* attacker */
        so vtense() won't be fooled by assigned name ending in 's' */
     fakeidx = youdefend ? 1 : 0;
     if (youattack || youdefend || vis) {
-        (void) upstart(hittee); /* capitalize */
         if (resisted) {
-            pline("%s %s!", hittee, vtense(fakename[fakeidx], "resist"));
+            pline("%sは抵抗した!", hittee);
             shieldeff(youdefend ? u.ux : mdef->mx,
                       youdefend ? u.uy : mdef->my);
         }
         if ((do_stun || do_confuse) && flags.verbose) {
-            char buf[BUFSZ];
-
-            buf[0] = '\0';
-            if (do_stun)
-                Strcat(buf, "stunned");
             if (do_stun && do_confuse)
-                Strcat(buf, " and ");
-            if (do_confuse)
-                Strcat(buf, "confused");
-            pline("%s %s %s%c", hittee, vtense(fakename[fakeidx], "are"), buf,
-                  (do_stun && do_confuse) ? '!' : '.');
+                pline("%sは気絶して混乱した!", hittee);
+            else if (do_stun)
+                pline("%sは気絶した.", hittee);
+            else
+                pline("%sは混乱した.", hittee);
         }
     }
 
@@ -1664,7 +1672,7 @@ artifact_hit(
                 char *otmpname = distant_name(otmp, xname);
 
                 if (is_art(otmp, ART_STORMBRINGER))
-                    pline_The("%s blade draws the %s from %s!",
+                    pline_The("%sの刃が%sの生命力を%sから吸い取った!",
                               hcolor(NH_BLACK), life, mon_nam(mdef));
                 else
                     pline("%s draws the %s from %s!",
@@ -1705,7 +1713,7 @@ artifact_hit(
                 char *otmpname = distant_name(otmp, xname);
 
                 if (is_art(otmp, ART_STORMBRINGER))
-                    pline_The("%s blade drains your %s!",
+                    pline_The("%sの刃があなたの%sを吸い取った!",
                               hcolor(NH_BLACK), life);
                 else
                     pline("%s drains your %s!", The(otmpname), life);

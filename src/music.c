@@ -423,7 +423,7 @@ do_earthquake(int force)
                     break;
                 algn = Amask2align(amsk & AM_MASK);
                 if (cansee(x, y))
-                    pline_The("%s altar falls%s.",
+                    pline_The("%sの祭壇は%s崩れ落ちた.",
                               align_str(algn), into_a_chasm);
                 desecrate_altar(FALSE, algn);
                 do_pit(x, y, tu_pit);

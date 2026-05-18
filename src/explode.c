@@ -669,7 +669,7 @@ explode(
                     || iflags.last_msg == PLNMSG_TOWER_OF_FLAME) /*seffects()*/
                     pline("臈臬的な手残しだ.");
                 else
-                    pline_The("%s is fatal.", str);
+                    pline_The("%sは致命的だ.", str);
                 /* Known BUG: BURNING suppresses corpse in bones data,
                    but done does not handle killer reason correctly */
                 done((adtyp == AD_FIRE) ? BURNING : DIED);

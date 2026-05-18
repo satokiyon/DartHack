@@ -2142,7 +2142,7 @@ revive_corpse(struct obj *corpse)
         switch (where) {
         case OBJ_INVENT:
             if (is_uwep)
-                pline_The("%s writhes out of your grasp!", cname);
+                pline_The("%sがあなたの手からうねって抜け出した!", cname);
             else
                 You_feel("バックパックの中で何かがもぞもぞ動いている!");
             break;
