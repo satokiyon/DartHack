@@ -74,8 +74,8 @@ throne_sit_effect(void)
             (void) adjattrib(rn2(A_MAX), 1, FALSE);
             break;
         case 3:
-            pline("A%s electric shock shoots through your body!",
-                  (Shock_resistance) ? "n" : " massive");
+            pline("あなたの体に%s電撃が走った！",
+                  (Shock_resistance) ? "" : "物凄い");
             losehp(Shock_resistance ? rnd(6) : rnd(30), "electric chair",
                    KILLED_BY_AN);
             exercise(A_CON, FALSE);
@@ -114,7 +114,7 @@ throne_sit_effect(void)
                 int cnt = rnd(10);
 
                 /* Magical voice not affected by deafness */
-                pline("A voice echoes:");
+                pline("声が響き渡る：");
                 SetVoice((struct monst *) 0, 0, 80, voice_throne);
                 verbalize("汝の謁見者が召喚されたぞ、%s！",
                           flags.female ? "姫君" : "殿下");
@@ -124,7 +124,7 @@ throne_sit_effect(void)
             }
         case 8:
             /* Magical voice not affected by deafness */
-            pline("A voice echoes:");
+            pline("声が響き渡る：");
             SetVoice((struct monst *) 0, 0, 80, voice_throne);
             verbalize("汝の崇高なる命により、%s...",
                       flags.female ? "姫君" : "殿下");
@@ -132,7 +132,7 @@ throne_sit_effect(void)
             break;
         case 9:
             /* Magical voice not affected by deafness */
-            pline("A voice echoes:");
+            pline("声が響き渡る：");
             SetVoice((struct monst *) 0, 0, 80, voice_throne);
             verbalize(
                  "A curse upon thee for sitting upon this most holy throne!");
@@ -145,11 +145,11 @@ throne_sit_effect(void)
         case 10:
             if (Luck < 0 || (HSee_invisible & INTRINSIC)) {
                 if (svl.level.flags.nommap) {
-                    pline("A terrible drone fills your head!");
+                    pline("恐ろしい音があなたの頭を満たす！");
                     make_confused((HConfusion & TIMEOUT) + (long) rnd(30),
                                   FALSE);
                 } else {
-                    pline("An image forms in your mind.");
+                    pline("イメージがあなたの心に浮かぶ。");
                     do_mapping();
                 }
             } else {
@@ -256,7 +256,7 @@ special_throne_effect(int effect) {
         break;
     case 5:
         /* permanent level drain */
-        pline("Sitting on the throne was a terrible experience.");
+        pline("玉座に座ることは恐ろしい経験だった。");
         if (!Drain_resistance) {
             losexp("a bad experience sitting on a throne");
             if (u.ulevelmax > u.ulevel)
@@ -270,7 +270,7 @@ special_throne_effect(int effect) {
            Same rules for which items can be affected as grease_ok in apply.c */
         struct obj *otmp;
 
-        pline("A greasy liquid sprays all over you!");
+        pline("油っぽい液体があなた全体にかかった！");
         for (otmp = gi.invent; otmp; otmp = otmp->nobj)
             if (otmp->oclass != COIN_CLASS)
                 otmp->greased = 1;
@@ -328,14 +328,14 @@ special_throne_effect(int effect) {
         if (is_vampire(gy.youmonst.data)) {
             You_feel("自分にはふさわしくないと感じる.");
         } else {
-            pline("This throne was not meant for those such as you!");
+            pline("この玉座はあなたのような者のためのものではない！");
             You_feel("体に変化が訪れるのを感じた.");
             polyself(POLY_NOFLAGS);
         }
         break;
     case 12:
         /* acid damage */
-        pline("The throne is covered in acid!");
+        pline("玉座は酸で覆われている！");
         losehp(Acid_resistance ? rnd(16) : rnd(80), "acidic chair",
                KILLED_BY_AN);
         exercise(A_CON, FALSE);
@@ -344,7 +344,7 @@ special_throne_effect(int effect) {
     {
         /* ability shuffle */
         int ability;
-        pline("As you sit on the throne, your body and mind start to warp.");
+        pline("玉座に座ると、あなたの体と心が歪み始める。");
         for (ability = 0; ability < A_MAX; ++ability) {
             adjattrib(ability, rn2(5) - 2, -1);
         }
@@ -370,7 +370,7 @@ lay_an_egg(void)
         return ECMD_OK;
     } else if (eggs_in_water(gy.youmonst.data)) {
         if (!(Underwater || Is_waterlevel(&u.uz))) {
-            pline("A splash tetra you are not.");
+            pline("あなたはスプラッシュテトラではない。");
             return ECMD_OK;
         }
         if (Upolyd
@@ -445,7 +445,7 @@ dosit(void)
                 (obj->quan + money_cnt(gi.invent) < u.ulevel * 1000)
                 ? "わずかな" : "");
         } else if (obj->otyp == TOWEL) {
-            pline("It's probably not a good time for a picnic...");
+            pline("今はピクニックをするのに良い時ではない...");
         } else {
             if (slithy(gy.youmonst.data))
                 You("%sを囲んで巻きついた.", the(xname(obj)));
@@ -456,12 +456,12 @@ dosit(void)
             else if (obj->otyp == CREAM_PIE) {
                  if (!Deaf) {
                    Soundeffect(se_squelch, 30);
-                   pline("Squelch!");
+                   pline("ズチュッ！");
                 }
                 useupf(obj, obj->quan);
             } else if (!(Is_box(obj)
                          || objects[obj->otyp].oc_material == CLOTH))
-                pline("It's not very comfortable...");
+                pline("あまり快適ではない...");
         }
     } else if (trap != 0 || (u.utrap && (u.utraptype >= TT_LAVA))) {
         if (u.utrap) {
@@ -559,7 +559,7 @@ dosit(void)
     } else if (lays_eggs(gy.youmonst.data)) {
         return lay_an_egg();
     } else {
-        pline("Having fun sitting on the %s?", surface(u.ux, u.uy));
+        pline("%sの上に座って楽しんでいるのか？", surface(u.ux, u.uy));
     }
     return ECMD_TIME;
 }
