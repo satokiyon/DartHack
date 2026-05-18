@@ -31,7 +31,7 @@ noises(struct monst *magr, struct attack *mattk)
     if (!Deaf && (farq != gf.far_noise || svm.moves - gn.noisetime > 10)) {
         gf.far_noise = farq;
         gn.noisetime = svm.moves;
-        You_hear("%s%s聞こえた.",
+        You_hear("%s%s聞こえる.",
                  (mattk->aatyp == AT_EXPL) ? "爆発音が" : "物音が",
                  farq ? "遠くで" : "");
     }

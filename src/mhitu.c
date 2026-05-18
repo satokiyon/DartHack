@@ -863,7 +863,7 @@ mattacku(struct monst *mtmp)
                         if (is_whirly(mtmp->data)) {
                             Soundeffect(se_rushing_wind_noise, 60);
                         }
-                        You_hear("近くで%sが聞こえた.",
+                        You_hear("近くで%sが聞こえる.",
                                  is_whirly(mtmp->data) ? "風を切る音"
                                                        : "ぴちゃりという音");
                     }

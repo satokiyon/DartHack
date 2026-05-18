@@ -788,7 +788,7 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
         || ((t = t_at(uchain->ox, uchain->oy))
             && (is_pit(t->ttyp) || is_hole(t->ttyp)))) {
         if (Levitation) {
-            You_feel("鉄球に引かれる感触がした.");
+            You_feel("鉄球に引かれる感触がする.");
             if (t)
                 t->tseen = 1;
         } else {

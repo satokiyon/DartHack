@@ -300,7 +300,7 @@ ok_to_throw(int *shotlimit_p) /* (see dothrow()) */
     gm.multi = 0; /* reset; it's been used up */
 
     if (notake(gy.youmonst.data)) {
-        You("身体的に投擲も射撃もできなかった.");
+        You("身体的に投擲も射撃もできない.");
         return FALSE;
     } else if (nohands(gy.youmonst.data)) {
         You_cant("手がなければ投げることも撃つこともできなかった."); /* not body_part(HAND) */
@@ -519,14 +519,13 @@ dofire(void)
                        && uswapwep && is_pole(uswapwep)
                        && !(uswapwep->cursed && uswapwep->bknown)) {
                 /* we have a known not-cursed polearm as swap weapon.
-                   swap to it and retry */
-                cmdq_add_ec(CQ_CANNED, doswapweapon);
-                cmdq_add_ec(CQ_CANNED, dofire);
-                return ECMD_OK; /* haven't taken any time yet */
-            } else {
-                You("準備した弾薬がなかった.");
-            }
-        } else {
+                   if (uquiver) {
+                       cmdq_add_ec(CQ_CANNED, doswapweapon);
+                       cmdq_add_ec(CQ_CANNED, dofire);
+                       return ECMD_OK; /* haven't taken any time yet */
+                   } else {
+                       You("矢筒は空だった.");
+                   }        } else {
             autoquiver();
             obj = uquiver;
             if (obj) {

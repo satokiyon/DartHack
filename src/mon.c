@@ -1510,7 +1510,7 @@ meatmetal(struct monst *mtmp)
                 } else {
                     if (flags.verbose) {
                         Soundeffect(se_crunching_sound, 50);
-                        You_hear("バリバリとかみ砕く音が聞こえた.");
+                        You_hear("バリバリとかみ砕く音が聞こえる.");
                     }
                 }
                 mtmp->meating = otmp->owt / 2 + 1;
@@ -1624,7 +1624,7 @@ meatobj(struct monst *mtmp) /* for gelatinous cubes */
             } else {
                 Soundeffect(se_slurping_sound, 30);
                 if (flags.verbose)
-                    You_hear("ずるずるとすする音が聞こえた.");
+                    You_hear("ずるずるとすする音が聞こえる.");
             }
             m_consume_obj(mtmp, otmp);
             /* in case it polymorphed or died */
@@ -1642,7 +1642,7 @@ meatobj(struct monst *mtmp) /* for gelatinous cubes */
         if (cansee(mtmp->mx, mtmp->my) && flags.verbose && buf[0])
             pline1(buf);
         else if (flags.verbose)
-            You_hear("%sずるずるとすする音が聞こえた.",
+            You_hear("%sずるずるとすする音が聞こえる.",
                      (ecount == 1) ? "かすかな" : "いくつもの");
     }
     return (count > 0 || ecount > 0) ? 1 : 0;
@@ -1703,7 +1703,7 @@ meatcorpse(
         } else {
             Soundeffect(se_masticating_sound, 50);
             if (flags.verbose)
-                You_hear("むしゃむしゃと食べる音が聞こえた.");
+                You_hear("むしゃむしゃと食べる音が聞こえる.");
         }
 
         m_consume_obj(mtmp, otmp);
@@ -3704,10 +3704,10 @@ xkilled(
         /* your god is mighty displeased... */
         if (!Hallucination) {
             Soundeffect(se_distant_thunder, 40);
-            You_hear("遠くで雷鳴がとどろくのが聞こえた...");
+            You_hear("遠くで雷鳴がとどろくのが聞こえる...");
         } else {
             Soundeffect(se_applause, 40);
-            You_hear("観客席から湧いた拍手が聞こえた!");
+            You_hear("観客席から湧いた拍手が聞こえる!");
         }
         if (!unique_corpstat(mdat)) {
             boolean mname = has_mgivenname(mtmp);
@@ -5749,7 +5749,7 @@ angry_guards(boolean silent)
                       buf, vtense(buf, "are"));
             } else {
                 Soundeffect(se_shrill_whistle, 100);
-                You_hear("%s警笛が鋭く鳴るのが聞こえた.",
+                You_hear("%s警笛が鋭く鳴るのが聞こえる.",
                          (ct == 1) ? "見張りの" : "見張りたちの");
             }
         }
@@ -5811,7 +5811,7 @@ usmellmon(struct permonst *mdat)
         case PM_CAVE_DWELLER:
         case PM_BARBARIAN:
         case PM_NEANDERTHAL:
-            You("体臭がした.");
+            You("体臭がする.");
             msg_given = TRUE;
             break;
         /*
@@ -5834,7 +5834,7 @@ usmellmon(struct permonst *mdat)
         case PM_WERERAT:
         case PM_WEREWOLF:
         case PM_OWLBEAR:
-            You("獣の巣のようなにおいがした.");
+            You("獣の巣のようなにおいがする.");
             msg_given = TRUE;
             break;
         /*
@@ -5842,16 +5842,16 @@ usmellmon(struct permonst *mdat)
             break;
         */
         case PM_STEAM_VORTEX:
-            You("蒸気のにおいがした.");
+            You("蒸気のにおいがする.");
             msg_given = TRUE;
             break;
         case PM_GREEN_SLIME:
-            pline("%sはひどいにおいがした.", Something);
+            pline("%sはひどいにおいがする.", Something);
             msg_given = TRUE;
             break;
         case PM_VIOLET_FUNGUS:
         case PM_SHRIEKER:
-            You("きのこのにおいがした.");
+            You("きのこのにおいがする.");
             msg_given = TRUE;
             break;
         /* These are here to avoid triggering the
@@ -5873,24 +5873,24 @@ usmellmon(struct permonst *mdat)
                 msg_given = TRUE;
                 break;
             case S_DRAGON:
-                You("ドラゴンのにおいがした!");
+                You("ドラゴンのにおいがする!");
                 msg_given = TRUE;
                 break;
             case S_FUNGUS:
-                pline("%sはかび臭かった.", Something);
+                pline("%sはかび臭い.", Something);
                 msg_given = TRUE;
                 break;
             case S_UNICORN:
-                You("%s厩舎のようなにおいがした.",
+                You("%s厩舎のようなにおいがする.",
                     (mndx == PM_PONY) ? "ほのかな" : "強い");
                 msg_given = TRUE;
                 break;
             case S_ZOMBIE:
-                You("腐肉のにおいがした.");
+                You("腐肉のにおいがする.");
                 msg_given = TRUE;
                 break;
             case S_EEL:
-                You("魚のにおいがした.");
+                You("魚のにおいがする.");
                 msg_given = TRUE;
                 break;
             case S_ORC:
