@@ -517,7 +517,7 @@ call_kops(struct monst *shkp, boolean nearshop)
 
     Soundeffect(se_alarm, 80);
     if (!Deaf)
-        pline("An alarm sounds!");
+        pline("アラームが鳴った！");
 
     nokops = ((svm.mvitals[PM_KEYSTONE_KOP].mvflags & G_GONE)
               && (svm.mvitals[PM_KOP_SERGEANT].mvflags & G_GONE)
@@ -526,7 +526,7 @@ call_kops(struct monst *shkp, boolean nearshop)
 
     if (!angry_guards(!!Deaf) && nokops) {
         if (flags.verbose && !Deaf)
-            pline("But no one seems to respond to it.");
+            pline("だが誰も応じてくれない。");
         return;
     }
 
@@ -742,8 +742,8 @@ deserted_shop(/*const*/ char *enterstring)
     if (Blind && !(Blind_telepat || Detect_monsters))
         ++n; /* force feedback to be less specific */
 
-    pline("This shop %s %s.", (m < n) ? "seems to be" : "is",
-          !n ? "deserted" : "untended");
+    pline("この店は%s%s。", (m < n) ? "気がする" : "である",
+          !n ? "誰もいない" : "主人がいない");
 }
 
 /* called from check_special_room(hack.c) */
@@ -826,7 +826,7 @@ u_entered_shop(char *enterstring)
             verbalize("また来たのか、%s？俺の%sでしっかり見張っとくぞ。",
                       svp.plname, mbodypart(shkp, EYE));
         } else {
-            pline_The("%s%sの空気は歓迎していないようだ.",
+            pline_The("%s%sは歓迎していない雰囲気だ.",
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         }
     } else if (eshkp->robbed) {
@@ -1428,7 +1428,7 @@ make_happy_shk(struct monst *shkp, boolean silentkops)
             eshkp->dismiss_kops = TRUE;
         }
         if (vanished)
-            pline("Satisfied, %s suddenly disappears!", shk_nam);
+            pline("満足して、%sは急に消えた！", shk_nam);
     } else if (wasmad)
         pline("%s calms down.", Shknam(shkp));
 
@@ -1821,7 +1821,7 @@ dopay(void)
         cx = cc.x;
         cy = cc.y;
         if (cx < 0) {
-            pline("Try again...");
+            pline("もう一度試してください...");
             return ECMD_OK;
         }
         if (u_at(cx, cy)) {
@@ -1874,7 +1874,7 @@ dopay(void)
             You("%s金を持っていない.",
                 stashed_gold ? "見える範囲では" : "");
             if (stashed_gold)
-                pline("But you have some gold stashed away.");
+                pline("だが、どこかに隠した金がある。");
         } else {
             if (umoney > ltmp) {
                 You("%sが求めた%ld枚の金貨%sを渡した.",
@@ -1885,10 +1885,10 @@ dopay(void)
                     stashed_gold ? "見えている" : "");
                 pay(umoney, shkp);
                 if (stashed_gold)
-                    pline("But you have hidden gold!");
+                    pline("だが、隠した金がある！");
             }
             if ((umoney < ltmp / 2L) || (umoney < ltmp && stashed_gold))
-                pline("Unfortunately, %s doesn't look satisfied.",
+                pline("残念ながら、%sは満足しているようではない。",
                       noit_mhe(shkp));
             else
                 make_happy_shk(shkp, FALSE);
@@ -1912,10 +1912,10 @@ dopay(void)
                     pline(not_enough_money, noit_mhim(shkp));
                 return ECMD_TIME;
             }
-            pline("But since %s shop has been robbed recently,",
+            pline("だが、このところ%sの店が盗まれたので、",
                   noit_mhis(shkp));
-            pline("you %scompensate %s for %s losses.",
-                  (umoney < ltmp) ? "partially " : "", shkname(shkp),
+            pline("お前は%s%sに%sの損失を補償しなければならない。",
+                  (umoney < ltmp) ? "部分的に" : "", shkname(shkp),
                   noit_mhis(shkp));
             pay(umoney < ltmp ? umoney : ltmp, shkp);
             make_happy_shk(shkp, FALSE);
@@ -1939,7 +1939,7 @@ dopay(void)
             if (strncmp(eshkp->customer, svp.plname, PL_NSIZ) || rn2(3))
                 make_happy_shk(shkp, FALSE);
             else
-                pline("But %s is as angry as ever.", shkname(shkp));
+                pline("だが、%sは相変わらず怒っている。", shkname(shkp));
         }
         return ECMD_TIME;
     }
@@ -2076,7 +2076,7 @@ pay_billed_items(
             more_than_one ? "のどれか" : "", "",
             (ebillct > 1) ? "(選んだ品物に)" : "(勘定書きの品物に)");
         if (stashed_gold)
-            pline("Maybe you have some gold stashed away?");
+            pline("もしかして、隠した金があるのかもしれない？");
         return TRUE;
     }
 
@@ -4762,7 +4762,7 @@ repair_damage(
                 if (canseemon(shkp) && dist2(x, y, shkp->mx, shkp->my) <= 2)
                     pline("%s untraps %s.", Shknam(shkp), ansimpleoname(otmp));
                 else if (ttmp->tseen && cansee(ttmp->tx, ttmp->ty))
-                    pline("The %s vanishes.", trapname(ttmp->ttyp, TRUE));
+                    pline("その%sは消える。", trapname(ttmp->ttyp, TRUE));
             }
             (void) mpickobj(shkp, otmp);
             break;
@@ -4770,11 +4770,11 @@ repair_damage(
         case PIT:
         case SPIKED_PIT:
             if (!catchup && ttmp->tseen && cansee(ttmp->tx, ttmp->ty))
-                pline("The %s is filled in.", trapname(ttmp->ttyp, TRUE));
+                pline("その%sは塞がった。", trapname(ttmp->ttyp, TRUE));
             break;
         default:
             if (!catchup && ttmp->tseen && cansee(ttmp->tx, ttmp->ty))
-                pline("The %s vanishes.", trapname(ttmp->ttyp, TRUE));
+                pline("その%sは消える。", trapname(ttmp->ttyp, TRUE));
             break;
         }
         deltrap(ttmp);
@@ -4822,9 +4822,9 @@ repair_damage(
         if (IS_WALL(tmp_dam->typ)) {
             /* player sees actual repair process, so KNOWS it's a wall */
             levl[x][y].seenv = SVALL;
-            pline("Suddenly, a section of the wall closes up!");
+            pline("突然、壁の一部が塞がった！");
         } else if (IS_DOOR(tmp_dam->typ)) {
-            pline("Suddenly, the shop door reappears!");
+            pline("突然、商店の扉が再び現れた！");
         }
         newsym(x, y);
     } else if (IS_WALL(tmp_dam->typ)) {
@@ -5314,7 +5314,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
             money2mon(shkp, cost_of_damage);
             disp.botl = TRUE;
         }
-        pline("Mollified, %s accepts your restitution.", shkname(shkp));
+        pline("機嫌が直って、%sはあなたの賠償を受け入れた。", shkname(shkp));
         /* move shk back to his home loc */
         home_shk(shkp, FALSE);
         pacify_shk(shkp, FALSE);
