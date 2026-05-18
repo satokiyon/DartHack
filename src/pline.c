@@ -417,7 +417,7 @@ pline_The(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
-    vpline(YouMessage(tmp, "その", line), the_args);
+    vpline(YouMessage(tmp, "", line), the_args);
     va_end(the_args);
 }
 

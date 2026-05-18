@@ -328,7 +328,7 @@ special_throne_effect(int effect) {
         if (is_vampire(gy.youmonst.data)) {
             You_feel("自分にはふさわしくないと感じる.");
         } else {
-            pline("この玉座はあなたのような者のためのものではない！");
+            pline("この玉座はおまえのような者のためのものではない！");
             You_feel("体に変化が訪れるのを感じた.");
             polyself(POLY_NOFLAGS);
         }
