@@ -390,7 +390,8 @@ doread(void)
             return ECMD_OK;
         }
         if (otyp == HAWAIIAN_SHIRT) {
-            pline("%s features %s.", flags.verbose ? "The design" : "It",
+            pline(flags.verbose ? "その柄には%sが描かれている."
+                                : "%sが描かれている.",
                   hawaiian_design(scroll, buf));
             return ECMD_TIME;
         }
@@ -434,9 +435,12 @@ doread(void)
                      simpleonames(scroll));
             return ECMD_OK;
         }
-        pline("%s on the %s.  It reads:  %s.",
-              !Blind ? "There is writing" : "You feel lettering",
-              simpleonames(scroll), cap_text);
+          if (!Blind)
+            pline("その%sには%sと書かれている.",
+                simpleonames(scroll), cap_text);
+          else
+            pline("その%sに文字があるのを感じた. %sと読めるようだ.",
+                simpleonames(scroll), cap_text);
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT, "became literate by reading %s",
                            (otyp == DUNCE_CAP) ? "a dunce cap"
@@ -468,7 +472,7 @@ doread(void)
             You("浮き彫りの数字を感じ取った:");
         } else {
             if (flags.verbose)
-                pline("It reads:");
+                pline("こう書かれている:");
             pline("\"%s\"",
                   scroll->oartifact
                       ? card_msgs[SIZE(card_msgs) - 1]
@@ -489,7 +493,7 @@ doread(void)
 
         return ECMD_TIME;
     } else if (otyp == CAN_OF_GREASE) {
-        pline("This %s has no label.", singular(scroll, xname));
+        pline("この%sにはラベルがない.", singular(scroll, xname));
         return ECMD_OK;
     } else if (otyp == MAGIC_MARKER) {
         static const int red_mons[] = {
@@ -506,9 +510,9 @@ doread(void)
             return ECMD_OK;
         }
         if (flags.verbose)
-            pline("It reads:");
+            pline("こう書かれている:");
         Sprintf(buf, "%s", pmname(pm, NEUTRAL));
-        pline("\"Magic Marker(TM) %s Red Ink Marker Pen.  Water Soluble.\"",
+        pline("\"Magic Marker(TM) %s 赤インクマーカーペン. 水溶性.\"",
               upwords(buf));
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
@@ -520,7 +524,7 @@ doread(void)
             You("浮き彫りの文字を感じ取った:");
         else if (flags.verbose)
             You("読んだ:");
-        pline("\"1 Zorkmid.  857 GUE.  In Frobs We Trust.\"");
+        pline("\"1 Zorkmid.  857 GUE.  我らは Frobs を信ず.\"");
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
                            "became literate by reading a coin's engravings");
@@ -530,8 +534,8 @@ doread(void)
         if (Blind)
             You("刻まれた署名を感じ取った:");
         else
-            pline("准胞を描書している:");
-        pline("\"Odin.\"");
+            pline("こう署名されている:");
+        pline("\"オーディン.\"");
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
                    "became literate by reading the divine signature of Odin");
@@ -545,10 +549,10 @@ doread(void)
             return ECMD_OK;
         }
         if (!*wrapper) {
-            pline("The candy bar's wrapper is blank.");
+            pline("キャンディバーの包み紙には何も書かれていない.");
             return ECMD_OK;
         }
-        pline("The wrapper reads: \"%s\".", wrapper);
+        pline("包み紙にはこう書かれている: \"%s\".", wrapper);
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
                            "became literate by reading a candy bar wrapper");
@@ -556,7 +560,7 @@ doread(void)
         return ECMD_TIME;
     } else if (scroll->oclass != SCROLL_CLASS
                && scroll->oclass != SPBOOK_CLASS) {
-        pline(silly_thing_to, "read");
+        pline("それを読むのはばかげている.");
         return ECMD_OK;
     } else if (Blind && otyp != SPE_BOOK_OF_THE_DEAD) {
         const char *what = 0;
@@ -570,7 +574,7 @@ doread(void)
         else if (!scroll->dknown)
             what = "formula on the scroll";
         if (what) {
-            pline("Being blind, you cannot read the %s.", what);
+            pline("盲目では%sを読むことができない.", what);
             return ECMD_OK;
         }
     }
@@ -618,18 +622,21 @@ doread(void)
                        || (otyp == SCR_REMOVE_CURSE && scroll->cursed));
         if (Blind)
             pline(nodisappear
-                      ? "You %s the formula on the scroll."
-                      : "As you %s the formula on it, the scroll disappears.",
-                  silently ? "cogitate" : "pronounce");
+                      ? (silently ? "巻物の呪文を心の中で思い描いた."
+                                  : "巻物の呪文を唱えた.")
+                      : (silently
+                             ? "巻物の呪文を心の中で思い描くと、巻物は消えた."
+                             : "巻物の呪文を唱えると、巻物は消えた."));
         else
-            pline(nodisappear ? "You read the scroll."
-                              : "As you read the scroll, it disappears.");
+            pline(nodisappear ? "巻物を読んだ."
+                              : "巻物を読むと、巻物は消えた.");
         if (confused) {
             if (Hallucination)
-                pline("Being so trippy, you screw up...");
+                pline("あまりに幻覚が強くて、うまく読めなかった...");
             else
-                pline("Being confused, you %s the magic words...",
-                      silently ? "misunderstand" : "mispronounce");
+                pline(silently
+                          ? "混乱していたため、魔法の言葉を取り違えてしまった..."
+                          : "混乱していたため、魔法の言葉を言い間違えてしまった...");
         }
     }
     if (!seffects(scroll)) {
@@ -655,7 +662,7 @@ stripspe(struct obj *obj)
         pline1(nothing_happens);
     } else {
         /* order matters: message, shop handling, actual transformation */
-        pline("%s briefly.", Yobjnam2(obj, "vibrate"));
+        pline("%sは一瞬震えた.", Yname2(obj));
         costly_alteration(obj, COST_UNCHRG);
         obj->spe = 0;
         if (obj->otyp == OIL_LAMP || obj->otyp == BRASS_LANTERN)
@@ -666,22 +673,26 @@ stripspe(struct obj *obj)
 staticfn void
 p_glow1(struct obj *otmp)
 {
-    pline("%s briefly.", Yobjnam2(otmp, Blind ? "vibrate" : "glow"));
+    pline(Blind ? "%sは一瞬震えた." : "%sは一瞬光った.", Yname2(otmp));
 }
 
 staticfn void
 p_glow2(struct obj *otmp, const char *color)
 {
-    pline("%s%s%s for a moment.", Yobjnam2(otmp, Blind ? "vibrate" : "glow"),
-          Blind ? "" : " ", Blind ? "" : hcolor(color));
+    if (Blind)
+        pline("%sは一瞬震えた.", Yname2(otmp));
+    else
+        pline("%sは一瞬%s色に光った.", Yname2(otmp), hcolor(color));
 }
 
 staticfn void
 p_glow3(struct obj *otmp, const char *color)
 {
-    pline("%s feebly%s%s for a moment.",
-          Yobjnam2(otmp, Blind ? "vibrate" : "glow"),
-          Blind ? "" : " ", Blind ? "" : hcolor(color));
+    if (Blind)
+        pline("%sはかすかに震えた.", Yname2(otmp));
+    else
+        pline("%sはしばらくかすかに%s色に光った.", Yname2(otmp),
+              hcolor(color));
 }
 
 /* getobj callback for object to charge */
@@ -805,8 +816,7 @@ recharge(struct obj *obj, int curse_bless)
 
         /* destruction depends on current state, not adjustment */
         if (obj->spe > rn2(7) || obj->spe <= -5) {
-            pline("%s momentarily, then %s!", Yobjnam2(obj, "pulsate"),
-                  otense(obj, "explode"));
+            pline("%sは一瞬脈打ち、その後爆発した!", Yname2(obj));
             if (is_on)
                 Ring_gone(obj);
             s = rnd(3 * abs(obj->spe)); /* amount of damage */
@@ -815,8 +825,8 @@ recharge(struct obj *obj, int curse_bless)
         } else {
             long mask = is_on ? (obj == uleft ? LEFT_RING : RIGHT_RING) : 0L;
 
-            pline("%s spins %sclockwise for a moment.", Yname2(obj),
-                  s < 0 ? "counter" : "");
+            pline("%sはしばらく%s回転した.", Yname2(obj),
+                  s < 0 ? "反時計回りに" : "時計回りに");
             if (s < 0)
                 costly_alteration(obj, COST_DECHNT);
             /* cause attributes and/or properties to be updated */
@@ -898,7 +908,7 @@ recharge(struct obj *obj, int curse_bless)
                 stripspe(obj);
                 if (obj->lamplit) {
                     if (!Blind)
-                        pline("%s out!", Tobjnam(obj, "go"));
+                        pline("%sの火は消えた!", Yname2(obj));
                     end_burn(obj, TRUE);
                 }
             } else if (is_blessed) {
@@ -924,7 +934,7 @@ recharge(struct obj *obj, int curse_bless)
                     p_glow2(obj, NH_BLACK);
                     curse(obj);
                 } else {
-                    pline("%s briefly.", Yobjnam2(obj, "vibrate"));
+                    pline("%sは一瞬震えた.", Yname2(obj));
                 }
                 if (obj->spe > 0)
                     costly_alteration(obj, COST_UNCHRG);
@@ -1139,19 +1149,18 @@ seffect_enchant_armor(struct obj **sobjp)
         otmp->oerodeproof = 0; /* for messages */
         if (Blind) {
             otmp->rknown = FALSE;
-            pline("%s warm for a moment.", Yobjnam2(otmp, "feel"));
+            pline("%sは一瞬熱を帯びた.", Yname2(otmp));
         } else {
             otmp->rknown = TRUE;
-            pline("%s covered by a %s %s %s!", Yobjnam2(otmp, "are"),
-                  scursed ? "mottled" : "shimmering",
-                  hcolor(scursed ? NH_BLACK : NH_GOLDEN),
-                  scursed ? "glow"
-                  : (is_shield(otmp) ? "layer" : "shield"));
+            pline(scursed ? "%sはまだらな%s色の光に包まれた!"
+                          : (is_shield(otmp)
+                                 ? "%sはきらめく%s色の膜に包まれた!"
+                                 : "%sはきらめく%s色の盾に包まれた!"),
+                  Yname2(otmp), hcolor(scursed ? NH_BLACK : NH_GOLDEN));
         }
         if (new_erodeproof && (otmp->oeroded || otmp->oeroded2)) {
             otmp->oeroded = otmp->oeroded2 = 0;
-            pline("%s as good as new!",
-                  Yobjnam2(otmp, Blind ? "feel" : "look"));
+            pline("%sは新品同様になった!", Yname2(otmp));
         }
         if (old_erodeproof && !new_erodeproof) {
             /* restore old_erodeproof before shop charges */
@@ -1285,8 +1294,8 @@ seffect_enchant_armor(struct obj **sobjp)
 
     if ((otmp->spe > (special_armor ? 5 : 3))
         && (special_armor || !rn2(7)))
-        pline("%s %s.", Yobjnam2(otmp, "suddenly vibrate"),
-              Blind ? "again" : "unexpectedly");
+          pline(Blind ? "%sは再び突然震えた." : "%sは不意に震えた.",
+              Yname2(otmp));
 }
 
 /* destroy a random cursed armor worn by hero */
@@ -1353,7 +1362,7 @@ seffect_destroy_armor(struct obj **sobjp)
     if (scursed) {
         if (otmp && otmp->cursed) {
             /* armor and scroll both cursed */
-            pline("%s.", Yobjnam2(otmp, "vibrate"));
+            pline("%sは震えた.", Yname2(otmp));
             if (otmp->spe >= -6) {
                 otmp->spe += -1;
                 adj_abon(otmp, -1);
@@ -1371,7 +1380,7 @@ seffect_destroy_armor(struct obj **sobjp)
             struct obj *atmp;
 
             if (!objects[sobj->otyp].oc_name_known)
-                pline("This is %s!", an(actualoname(sobj)));
+                pline("これは%sだ!", an(actualoname(sobj)));
             gk.known = TRUE;
             atmp = getobj("destroy", any_worn_armor_ok, GETOBJ_PROMPT);
             /* check the return value, if user picked non-valid obj */
@@ -1417,9 +1426,12 @@ seffect_confuse_monster(struct obj **sobjp)
                 Your("%sが%s色に光り始めた.", hands, hcolor(NH_PURPLE));
             make_confused(HConfusion + rnd(100), FALSE);
         } else {
-            pline("A %s%s surrounds your %s.",
-                  altfeedback ? "" : hcolor(NH_RED),
-                  altfeedback ? "faint buzz" : " glow", body_part(HEAD));
+            if (altfeedback)
+                pline("あなたの%sの周囲にかすかなざわめきが広がった.",
+                      body_part(HEAD));
+            else
+                pline("あなたの%sの周囲に%s色の輝きが広がった.",
+                      body_part(HEAD), hcolor(NH_RED));
             make_confused(0L, TRUE);
         }
     } else {
@@ -1587,8 +1599,7 @@ seffect_remove_curse(struct obj **sobjp)
                 /* like rndcurse(sit.c), effect on regular inventory
                    doesn't show things glowing but saddle does */
                 if (!Blind) {
-                    pline("%s %s.", Yobjnam2(obj, "glow"),
-                              hcolor("amber"));
+                    pline("%sは%s色に光った.", Yname2(obj), hcolor("amber"));
                     obj->bknown = Hallucination ? 0 : 1;
                 } else {
                     obj->bknown = 0; /* skip set_bknown() */
@@ -1647,15 +1658,13 @@ seffect_enchant_weapon(struct obj **sobjp)
             Your("武器が一瞬熱くなった.");
         } else {
             uwep->rknown = TRUE;
-            pline("%s covered by a %s %s %s!", Yobjnam2(uwep, "are"),
-                  scursed ? "mottled" : "shimmering",
-                  hcolor(scursed ? NH_PURPLE : NH_GOLDEN),
-                  scursed ? "glow" : "shield");
+            pline(scursed ? "%sはまだらな%s色の光に包まれた!"
+                          : "%sはきらめく%s色の盾に包まれた!",
+                  Yname2(uwep), hcolor(scursed ? NH_PURPLE : NH_GOLDEN));
         }
         if (new_erodeproof && (uwep->oeroded || uwep->oeroded2)) {
             uwep->oeroded = uwep->oeroded2 = 0;
-            pline("%s as good as new!",
-                  Yobjnam2(uwep, Blind ? "feel" : "look"));
+            pline("%sは新品同様になった!", Yname2(uwep));
         }
         if (old_erodeproof && !new_erodeproof) {
             /* restore old_erodeproof before shop charges */
@@ -1708,8 +1717,8 @@ seffect_taming(struct obj **sobjp)
             }
     }
     if (!results) {
-        pline("Nothing interesting %s.",
-              !candidates ? "happens" : "seems to happen");
+        pline(!candidates ? "何も起こらなかった."
+                          : "特に何も起こらなかったようだ.");
     } else {
         pline_The("周囲の空気は%s%sなった.",
               vis_results ? "" : "どこか",
@@ -1758,7 +1767,7 @@ seffect_light(struct obj **sobjp)
         int pm = scursed ? PM_BLACK_LIGHT : PM_YELLOW_LIGHT;
 
         if ((svm.mvitals[pm].mvflags & G_GONE)) {
-            pline("Tiny lights sparkle in the air momentarily.");
+            pline("小さな光が一瞬だけ空中できらめいた.");
         } else {
             /* surround with cancelled tame lights which won't explode */
             struct monst *mon;
@@ -1778,7 +1787,7 @@ seffect_light(struct obj **sobjp)
                 }
             }
             if (sawlights) {
-                pline("Lights appear all around you!");
+                pline("光があなたの周囲に現れた!");
                 gk.known = TRUE;
             }
         }
@@ -1814,7 +1823,7 @@ seffect_charging(struct obj **sobjp)
     }
     /* known = TRUE; -- handled inline here */
     if (!already_known) {
-        pline("This is a charging scroll.");
+        pline("これは充填の巻物だ.");
         learnscroll(sobj);
     }
     /* use it up now to prevent it from showing in the
@@ -1838,12 +1847,11 @@ seffect_amnesia(struct obj **sobjp)
     if (Hallucination) /* Ommmmmm! */
         Your("心は俗世のしがらみから解き放たれた.");
     else if (!strncmpi(svp.plname, "Maud", 4))
-        pline("As your mind turns inward on itself,"
-              " you forget everything else.");
+        pline("意識が内へ内へと向かうにつれ、他のすべてを忘れてしまった.");
     else if (rn2(2))
-        pline("Who was that Maud person anyway?");
+        pline("そもそも Maud とは誰だったのだろう?");
     else
-        pline("Thinking of Maud you forget everything else.");
+        pline("Maud のことを考えているうちに、他のすべてを忘れてしまった.");
     exercise(A_WIS, FALSE);
 }
 
@@ -1869,13 +1877,13 @@ seffect_fire(struct obj **sobjp)
         (void) learnscrolltyp(SCR_FIRE);
     if (confused) {
         if (Underwater) {
-            pline("A little %s around you vaporizes.", hliquid("water"));
+            pline("あなたの周囲の水が少し蒸発した.");
         }
         else if (Fire_resistance) {
             shieldeff(u.ux, u.uy);
             monstseesu(M_SEEN_FIRE);
             if (!Blind)
-                pline("Oh, look, what a pretty fire in your %s.",
+                pline("おや、あなたの%sにきれいな炎が見える.",
                       makeplural(body_part(HAND)));
             else
                 You_feel("%sに心地よいぬくもりを感じた.",
@@ -1893,9 +1901,9 @@ seffect_fire(struct obj **sobjp)
     } else {
         if (sblessed) {
             if (!already_known)
-                pline("This is a scroll of fire!");
+                pline("これは火炎の巻物だ!");
             dam *= 5;
-            pline("Where do you want to center the explosion?");
+            pline("爆発の中心をどこにする?");
             getpos_sethilite(display_stinking_cloud_positions,
                              can_center_cloud);
             (void) getpos(&cc, TRUE, "the desired position");
@@ -1969,7 +1977,7 @@ seffect_earth(struct obj **sobjp)
         if (!sblessed) {
             drop_boulder_on_player(confused, !scursed, TRUE, FALSE);
         } else if (!nboulders)
-            pline("But nothing else happens.");
+            pline("しかし、それ以外には何も起こらなかった.");
     }
 }
 
@@ -2008,7 +2016,7 @@ seffect_blank_paper(struct obj **sobjp UNUSED)
     if (Blind)
         You("この巻物に魔法の言葉があった記憶がなかった.");
     else
-        pline("This scroll seems to be blank.");
+        pline("この巻物には何も書かれていないようだ.");
     gk.known = TRUE;
 }
 
@@ -2075,7 +2083,7 @@ seffect_identify(struct obj **sobjp)
         if (confused || (scursed && !already_known))
             You("これが鑑定の巻物だとわかった.");
         else if (!already_known)
-            pline("This is an identify scroll.");
+            pline("これは鑑定の巻物だ.");
         if (!already_known)
             (void) learnscrolltyp(SCR_IDENTIFY);
         if (confused || (scursed && !already_known))
@@ -2094,8 +2102,8 @@ seffect_identify(struct obj **sobjp)
     } else {
         /* spell cast with inventory empty or scroll read when it's
            the only item leaving empty inventory after being used up */
-        pline("You're not carrying anything%s to be identified.",
-              (is_scroll) ? " else" : "");
+        pline((is_scroll) ? "鑑定できる物をもう何も持っていない."
+                          : "鑑定できる物を何も持っていない.");
     }
 }
 
@@ -2113,7 +2121,7 @@ seffect_magic_mapping(struct obj **sobjp)
         if (svl.level.flags.nommap) {
             Your("心がでたらめな線で埋め尽くされた!");
             if (Hallucination)
-                pline("Wow!  Modern art.");
+                    pline("おお! 現代芸術だ.");
             else
                 Your("%sが混乱でぐるぐる回った.", body_part(HEAD));
             make_confused(HConfusion + rnd(30), FALSE);
@@ -2140,7 +2148,7 @@ seffect_magic_mapping(struct obj **sobjp)
         make_confused(HConfusion + rnd(30), FALSE);
         return;
     }
-    pline("A map coalesces in your mind!");
+    pline("地図があなたの脳裏に浮かび上がった!");
     cval = (scursed && !confused);
     if (cval)
         HConfusion = 1; /* to screw up map */
@@ -2149,7 +2157,7 @@ seffect_magic_mapping(struct obj **sobjp)
     notice_mon_on();
     if (cval) {
         HConfusion = 0; /* restore */
-        pline("Unfortunately, you can't grasp the details.");
+        pline("しかし、細部までは把握できなかった.");
     }
 }
 
@@ -2164,16 +2172,15 @@ seffect_mail(struct obj **sobjp)
     switch (sobj->spe) {
     case 2:
         /* "stamped scroll" created via magic marker--without a stamp */
-        pline("This scroll is marked \"%s\".",
-              odd ? "Postage Due" : "Return to Sender");
+          pline("この巻物には\"%s\"と書かれている.",
+              odd ? "料金不足" : "差出人へ返送");
         break;
     case 1:
         /* scroll of mail obtained from bones file or from wishing;
            note to the puzzled: the game Larn actually sends you junk
            mail if you win! */
-        pline("This seems to be %s.",
-              odd ? "a chain letter threatening your luck"
-              : "junk mail addressed to the finder of the Eye of Larn");
+          pline(odd ? "これは幸運が失われると脅すチェーンレターのようだ."
+                : "これはラルンの眼を見つけた者宛ての迷惑郵便のようだ.");
         break;
     default:
 #ifdef MAIL
@@ -2182,7 +2189,7 @@ seffect_mail(struct obj **sobjp)
         /* unreachable since with MAIL undefined, sobj->spe won't be 0;
            as a precaution, be prepared to give arbitrary feedback;
            caller has already reported that it disappears upon reading */
-        pline("That was a scroll of mail?");
+        pline("今のは郵便の巻物だったのか?");
 #endif
         break;
     }
@@ -2318,7 +2325,7 @@ drop_boulder_on_player(
         dmg = (int) (dmgval(otmp2, &gy.youmonst) * otmp2->quan);
         if (uarmh && helmet_protects) {
             if (hard_helmet(uarmh)) {
-                pline("Fortunately, you are wearing a hard helmet.");
+                pline("幸い、あなたは頑丈な兜をかぶっていた.");
                 if (dmg > 2)
                     dmg = 2;
             } else if (flags.verbose) {
@@ -2371,7 +2378,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
         if (helmet) {
             if (hard_helmet(helmet)) {
                 if (canspotmon(mtmp))
-                    pline("Fortunately, %s is wearing a hard helmet.",
+                    pline("幸い、%sは頑丈な兜をかぶっていた.",
                           mon_nam(mtmp));
                 else if (!Deaf)
                     You_hear("金属がぶつかる甲高い音が聞こえる.");
@@ -2536,7 +2543,7 @@ litroom(
             if (still_lit)
                 pline_The("周囲の明かりは弱まったようだ.");
             else if (u.uswallow)
-                pline("It seems even darker in here than before.");
+                pline("ここはさっきよりさらに暗くなったようだ.");
             else
                 You("暗闇に包まれた!");
         }
@@ -2558,12 +2565,13 @@ litroom(
                 pline("%s %s is lit.", s_suffix(Monnam(u.ustuck)),
                       mbodypart(u.ustuck, STOMACH));
             else if (is_whirly(u.ustuck->data))
-                pline("%s shines briefly.", Monnam(u.ustuck));
+                pline("%sは一瞬だけ輝いた.", Monnam(u.ustuck));
             else
-                pline("%s glistens.", Monnam(u.ustuck));
+                pline("%sはきらりと光った.", Monnam(u.ustuck));
         } else if (!Blind && (!Is_rogue_level(&u.uz)
                               || levl[u.ux][u.uy].typ != CORR)) {
-            pline("A lit field %ssurrounds you!", no_op ? "briefly " : "");
+            pline(no_op ? "光の場が一瞬あなたを包んだ!"
+                        : "光の場があなたを包んだ!");
         }
     }
 
@@ -2700,9 +2708,9 @@ do_class_genocide(void)
         if (!goodcnt && class != mons[gu.urole.mnum].mlet
             && class != mons[gu.urace.mnum].mlet) {
             if (gonecnt)
-                pline("All such monsters are already nonexistent.");
+                pline("その種の怪物はすでにすべていなくなっている.");
             else if (immunecnt || class == S_invisible)
-                You("そのようなモンスターを絶滅させることは許されなかった.");
+                You("そのようなモンスターを虐殺することは許されなかった.");
             else if (wizard && buf[0] == '*') {
                 struct monst *mtmp, *mtmp2;
 
@@ -2749,7 +2757,7 @@ do_class_genocide(void)
                     svm.mvitals[i].mvflags |= (G_GENOD | G_NOCORPSE);
                     kill_genocided_monsters();
                     update_inventory(); /* eggs & tins */
-                    pline("Wiped out all %s.", nam);
+                    pline("すべての%sを虐殺した.", nam);
                     if (Upolyd && vampshifted(&gy.youmonst)
                         /* current shifted form or base vampire form */
                         && (i == u.umonnum || i == gy.youmonst.cham))
@@ -2782,7 +2790,7 @@ do_class_genocide(void)
                     }
                 } else if (svm.mvitals[i].mvflags & G_GENOD) {
                     if (!gameover)
-                        pline("%s are already nonexistent.", upstart(nam));
+                        pline("%sはすでに存在しない.", upstart(nam));
                 } else if (!gameover) {
                     /* suppress feedback about quest beings except
                        for those applicable to our own role */
@@ -2891,8 +2899,9 @@ do_genocide(
 
             mndx = name_to_mon(buf, (int *) 0);
             if (mndx == NON_PM || (svm.mvitals[mndx].mvflags & G_GENOD)) {
-                pline("Such creatures %s exist in this world.",
-                      (mndx == NON_PM) ? "do not" : "no longer");
+                pline((mndx == NON_PM)
+                          ? "そのような怪物はこの世界には存在しない."
+                          : "そのような怪物はもはやこの世界には存在しない.");
                 continue;
             }
             ptr = &mons[mndx];
@@ -2919,8 +2928,7 @@ do_genocide(
                      * aren't supposed to be hampered by deafness....
                      */
                     if (flags.verbose)
-                        pline("A thunderous voice booms"
-                              " through the caverns:");
+                        pline("洞窟に雷鳴のような声が響き渡った:");
                     SetVoice((struct monst *) 0, 0, 80, voice_deity);
                     /* FIXME? shouldn't this override deafness? */
                     verbalize("いいえ、定命の者よ！それは行われない。");
@@ -2964,7 +2972,7 @@ do_genocide(
 
         /* setting no-corpse affects wishing and random tin generation */
         svm.mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE);
-        pline("Wiped out %s%s.", which,
+          pline("%sを虐殺した.",
               (*which != 'a') ? buf : makeplural(buf));
 
         if (killplayer) {
@@ -3010,8 +3018,8 @@ do_genocide(
             /* accumulated 'cnt' doesn't take groups into account;
                assume bringing in new mon(s) didn't remove any old ones */
             cnt = monster_census(FALSE) - census;
-            pline("Sent in %s%s.", (cnt > 1) ? "some " : "",
-                  (cnt > 1) ? makeplural(buf) : an(buf));
+            pline("%sが送り込まれた.",
+                  (cnt > 1) ? makeplural(buf) : buf);
         } else
             pline1(nothing_happens);
     }
@@ -3038,7 +3046,7 @@ punish(struct obj *sobj)
     if (amorphous(gy.youmonst.data) || is_whirly(gy.youmonst.data)
         || unsolid(gy.youmonst.data)) {
         if (!reuse_ball) {
-            pline("A ball and chain appears, then falls away.");
+            pline("鉄球と鎖が現れたが、そのまま落ちた.");
             dropy(mkobj(BALL_CLASS, TRUE));
         } else {
             dropy(reuse_ball);
@@ -3085,8 +3093,8 @@ do_stinking_cloud(struct obj *sobj, boolean mention_stinking)
 {
     coord cc;
 
-    pline("Where do you want to center the %scloud?",
-          mention_stinking ? "stinking " : "");
+    pline(mention_stinking ? "悪臭雲の中心をどこにする?"
+                           : "雲の中心をどこにする?");
     cc.x = u.ux;
     cc.y = u.uy;
     getpos_sethilite(display_stinking_cloud_positions, can_center_cloud);
@@ -3095,11 +3103,11 @@ do_stinking_cloud(struct obj *sobj, boolean mention_stinking)
         return;
     } else if (!can_center_cloud(cc.x, cc.y)) {
         if (Hallucination)
-            pline("Ugh... someone cut the cheese.");
+            pline("うっ... 誰かがとんでもない臭いを放った.");
         else
-            pline("%s a whiff of rotten eggs.",
-                  sobj->oclass == SCROLL_CLASS ? "The scroll crumbles with"
-                                               : "You smell");
+            pline(sobj->oclass == SCROLL_CLASS
+                      ? "巻物は腐った卵のような臭いを放ちながら崩れた."
+                      : "腐った卵のような臭いがした.");
         return;
     }
     (void) create_gas_cloud(cc.x, cc.y, 15 + 10 * bcsign(sobj),
@@ -3391,9 +3399,9 @@ create_particular(void)
 
         /* no good; try again... */
         if (*bufp || altmsg || tryct < 2) {
-            pline("I've never heard of such monsters.");
+            pline("そのような怪物は聞いたことがない.");
         } else {
-            pline("Try again (type * for random, ESC to cancel).");
+            pline("もう一度入力して (* でランダム、ESC で中止).");
             ++altmsg;
         }
         /* when a second try is needed, expand the prompt */

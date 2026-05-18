@@ -852,7 +852,7 @@ scrolltele(struct obj *scroll)
 
     /* Disable teleportation in stronghold && Vlad's Tower */
     if (noteleport_level(&gy.youmonst) && !wizard) {
-        pline("A mysterious force prevents you from teleporting!");
+        pline("謎の力に阻まれてテレポートできない!");
         if (scroll)
             learnscroll(scroll); /* this is obviously a teleport scroll */
         return;
@@ -872,14 +872,14 @@ scrolltele(struct obj *scroll)
     if (((Teleport_control || (scroll && scroll->blessed)) && !Stunned)
         || wizard) {
         if (unconscious()) {
-            pline("Being unconscious, you cannot control your teleport.");
+            pline("意識を失っていてはテレポートを制御できない.");
         } else {
             char whobuf[BUFSZ];
 
-            Strcpy(whobuf, "you");
+            Strcpy(whobuf, "あなた");
             if (u.usteed)
-                Sprintf(eos(whobuf), " and %s", mon_nam(u.usteed));
-            pline("Where do %s want to be teleported?", whobuf);
+                Sprintf(eos(whobuf), "と%s", mon_nam(u.usteed));
+            pline("%sをどこへテレポートさせる?", whobuf);
             if (scroll)
                 learnscroll(scroll);
             cc.x = u.ux;
@@ -900,7 +900,7 @@ scrolltele(struct obj *scroll)
                     iflags.travelcc.x = iflags.travelcc.y = 0;
                 return;
             }
-            pline("Sorry...");
+            pline("そこへは行けない.");
         }
     }
 
@@ -1054,7 +1054,7 @@ dotele(
         } else if (trap->ttyp == TELEP_TRAP) {
             trap_once = trap->once; /* trap may get deleted, save this */
             if (trap->once) {
-                pline("This is a vault teleport, usable once only.");
+                pline("これは一度しか使えない金庫テレポートだ.");
                 if (y_n("Jump in?") == 'n') {
                     trap = 0;
                 } else {
@@ -1214,7 +1214,7 @@ level_tele(void)
             if (!strcmp(buf, "*")) {
                 goto random_levtport;
             } else if (Confusion && rnl(5)) {
-                pline("Oops...");
+                pline("おっと...");
                 goto random_levtport;
             } else if (!strcmp(buf, "\033")) { /* cancelled */
                 return;
@@ -1267,7 +1267,7 @@ level_tele(void)
             svk.killer.format = NO_KILLER_PREFIX;
             Strcpy(svk.killer.name, "committed suicide");
             done(DIED);
-            pline("An energized cloud of dust begins to coalesce.");
+                        pline("帯電した塵の雲が集まり始めた.");
               Your("体が再実体化した%s",
                   gi.invent ? "。そして持ち物をすべて拾い集めた." : ".");
             return;
@@ -1340,10 +1340,10 @@ level_tele(void)
             Strcpy(svk.killer.name, "went to heaven prematurely");
         } else if (newlev == -9) {
             You_feel("有頂天になった.");
-            pline("(In fact, you're on Cloud 9!)");
+            pline("(実際、ここは Cloud 9 だ!)");
             display_nhwindow(WIN_MESSAGE, FALSE);
         } else
-            You("今、囲空中速高速上昇中...");
+            You("今、空中を高速上昇中...");
 
         if (svk.killer.name[0]) {
             ; /* arrival in heaven is pending */
@@ -1352,7 +1352,7 @@ level_tele(void)
         } else if (Flying) {
             escape_by_flying = "fly down to the ground";
         } else {
-            pline("Unfortunately, you don't know how to fly.");
+            pline("残念ながら、飛び方がわからない.");
             You("数千フィート落下して命を落とした.");
             Sprintf(svk.killer.name,
                     "teleported out of the dungeon and fell to %s death",
@@ -1406,7 +1406,7 @@ level_tele(void)
          */
         if (!wizard && Inhell && !u.uevent.invoked && newlev >= deepest) {
             newlev = deepest - 1;
-            pline("Sorry...");
+            pline("そこへは行けない.");
         }
         /* no teleporting out of quest dungeon */
         if (In_quest(&u.uz) && newlev < depth(&qstart_level))
@@ -1914,23 +1914,24 @@ control_mon_tele(
     if (!wizard || !iflags.mon_telecontrol)
         return FALSE;
 
-    pline("Teleport %s @ <%d,%d> where?",
+    pline("%s @ <%d,%d> をどこへテレポートする?",
           noit_mon_nam(mon), mon->mx, mon->my);
     /* getpos '?' will show "Move the cursor to <where to teleport Foo>:" */
-    Sprintf(tcbuf, "where to teleport %s", noit_mon_nam(mon));
+    Sprintf(tcbuf, "%sをテレポートさせる場所", noit_mon_nam(mon));
     if (getpos(cc_p, FALSE, tcbuf) >= 0 && !u_at(cc_p->x, cc_p->y)) {
         if (via_rloc
               ? rloc_pos_ok(cc_p->x, cc_p->y, mon)
               : goodpos(cc_p->x, cc_p->y, mon, rlocflags))
             return TRUE;
         if (!iflags.debug_fuzzer) {
-            Sprintf(tcbuf, "<%d,%d> is not considered viable; force anyway?",
+            Sprintf(tcbuf, "<%d,%d> は不適切な場所と判断されたが、強行する?",
                     mon->mx, mon->my);
             if (y_n(tcbuf) == 'y')
                 return TRUE;
         }
     }
-    pline("%s destination.", via_rloc ? "Picking random" : "Using derived");
+    pline(via_rloc ? "目的地はランダムに選ばれた."
+                   : "導出した目的地を使う.");
     return FALSE;
 }
 
@@ -1952,7 +1953,7 @@ tele_restrict(struct monst *mon)
 {
     if (noteleport_level(mon)) {
         if (canseemon(mon))
-            pline("A mysterious force prevents %s from teleporting!",
+            pline("謎の力に阻まれて%sはテレポートできない!",
                   mon_nam(mon));
         return TRUE;
     }
@@ -2269,7 +2270,7 @@ u_teleport_mon(
 
     if (svl.level.flags.stasis_until >= svm.moves) {
         if (give_feedback)
-            pline("A mysterious force prevents you teleporting %s!",
+            pline("謎の力に阻まれて%sをテレポートさせられない!",
                   mon_nam(mtmp));
         return FALSE;
     } else if (mtmp->ispriest && *in_rooms(mtmp->mx, mtmp->my, TEMPLE)) {
