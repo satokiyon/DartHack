@@ -5311,8 +5311,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
         /* home_shk() suppresses rloc()'s vanish/appear messages */
         if (shkp->mx != sx || shkp->my != sy) {
             if (was_outside && canspotmon(shkp))
-                pline("%s returns to %s shop.", Shknam(shkp),
-                      noit_mhis(shkp));
+                pline("%sは%sの店に戻った。", Shknam(shkp), noit_mhis(shkp));
             else if ((is_seen = canseemon(shkp)) == TRUE || was_seen)
                 pline("%s %s.", Shknam(shkp), !was_seen ? "appears"
                                               : is_seen ? "shifts location"
