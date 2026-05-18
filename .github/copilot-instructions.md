@@ -40,7 +40,22 @@ git add <解決したファイル>
 git commit -m "Merge branch 'upstream-base' into main"
 ```
 
-## 4. 参照先
+## 4. プロジェクト管理とコミット
+
+- **進捗管理**: 計画と進捗を `/memories/repo/translation-notes.md` に記録する。
+- **コミットルール**:
+  - ユーザーの明示的な依頼がある時のみ行う。
+  - `git status --short` で関係ない変更が含まれていないか確認する。
+  - コミットメッセージは日本語で簡潔に記述する。
+- **デバッグ実装**: 調査用のトレース出力やデバッグフラグは、完了後に必ず削除し、本番コードに残さない。
+
+## 5. 技術的注意点 (Unicode / Console)
+
+- **sys/windows/consoletty.c**:
+  - `ReadConsole` は常に `ReadConsoleW` を使い、バッファは `WCHAR` とする。
+  - `INPUT_RECORD` の参照には `UnicodeChar` を使う。`AsciiChar` は日本語文字で誤動作の原因となる。
+
+## 6. 参照先
 
 - **翻訳ガイドライン**: `docs/translation-instructions-ja.md`
 - **安全チェックリスト**: `docs/message-translation-safety-checklist.md`
