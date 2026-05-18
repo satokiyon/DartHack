@@ -3113,7 +3113,7 @@ special_stock(
                 if (Deaf || muteshk(shkp)) {
                     pline("%sはあなたがそれを売ろうとしたことに%sように見えた。",
                           Shknam(shkp),
-                          (obj->spe < 7) ? "恐怖を感じているのか、関心を持っているのか" : "関心を持っているのか");
+                          (obj->spe < 7) ? "恐怖を感じているかの、関心を持っているかの" : "関心を持っているかの");
                 } else {
                     SetVoice(shkp, 0, 80, 0);
                     verbalize("いや、俱だったらそれは手放さないね。");
@@ -3132,9 +3132,7 @@ special_stock(
                     SetVoice(shkp, 0, 80, 0);
                     verbalize("そんなもの仕入れはしない。ここから出ていけ！");
                 } else {
-                    pline("%s shakes %s %s in refusal.",
-                          Shknam(shkp), noit_mhis(shkp),
-                          mbodypart(shkp, HEAD));
+                    pline("%sは拒絶するように%sを%sで振った。", Shknam(shkp), noit_mhis(shkp), mbodypart(shkp, HEAD));
                 }
             }
         }
@@ -3593,7 +3591,7 @@ addtobill(
                       (contentscount && obj->unpaid) ? and_its_contents : "",
                       ltmp, currency(ltmp), (obj->quan > 1L) ? "個あたり" : "");
         } else {
-            pline("%s does not notice.", Shknam(shkp));
+            pline("%sは気づかなかった。", Shknam(shkp));
         }
     }
 }
@@ -4380,9 +4378,7 @@ shkcatch(
             verbalize("邪魔だ邪魔！このクズ！");
         }
         if (cansee(x, y)) {
-            pline("%s nimbly%s catches %s.", Shknam(shkp),
-                  (x == shkp->mx && y == shkp->my) ? "" : " reaches over and",
-                  the(xname(obj)));
+            pline("%sは見事に%s%sをキャッチした。", Shknam(shkp), (x == shkp->mx && y == shkp->my) ? "" : "身を乗り出して", the(xname(obj)));
             if (!canspotmon(shkp))
                 map_invisible(x, y);
             nh_delay_output();
@@ -4564,8 +4560,7 @@ shk_fixes_damage(struct monst *shkp)
     shk_closeby = (mdistu(shkp) <= (BOLT_LIM / 2) * (BOLT_LIM / 2));
 
     if (canseemon(shkp)) {
-        pline("%s whispers %s.", Shknam(shkp),
-              shk_closeby ? "an incantation" : "something");
+        pline("%sは%sささやいた。", Shknam(shkp), shk_closeby ? "呪文を" : "何かを");
     } else if (!Deaf && shk_closeby) {
         Soundeffect(se_mutter_incantation, 100);
         You_hear("誰かが呪文をつぶやくのが聞こえる.");
@@ -4760,7 +4755,7 @@ repair_damage(
             otmp->owt = weight(otmp);
             if (!catchup) {
                 if (canseemon(shkp) && dist2(x, y, shkp->mx, shkp->my) <= 2)
-                    pline("%s untraps %s.", Shknam(shkp), ansimpleoname(otmp));
+                    pline("%sは%sを罠から外した。", Shknam(shkp), ansimpleoname(otmp));
                 else if (ttmp->tseen && cansee(ttmp->tx, ttmp->ty))
                     pline("その%sは消える。", trapname(ttmp->ttyp, TRUE));
             }
@@ -4916,14 +4911,11 @@ shk_move(struct monst *shkp)
                     verbalize("%s, %s!  Didn't you forget to pay?",
                               Hello(shkp), svp.plname);
                 } else {
-                    pline("%s holds out %s upturned %s.",
-                          Shknam(shkp), noit_mhis(shkp),
-                          mbodypart(shkp, HAND));
+                    pline("%sは%s %sを上に向けて掲げた。", Shknam(shkp), noit_mhis(shkp), mbodypart(shkp, HAND));
                 }
                 gf.followmsg = svm.moves;
                 if (!rn2(9)) {
-                    pline("%s doesn't like customers who don't pay.",
-                          Shknam(shkp));
+                    pline("%sは支払わない客が嫌いだ。", Shknam(shkp));
                     rile_shk(shkp);
                 }
             }
@@ -5070,8 +5062,7 @@ shopdig(int fall)
              * reasons, it isn't currently.
              */
             if (lang == 2)
-                pline("%s curses %s inability to grab your backpack!",
-                      Shknam(shkp), noit_mhim(shkp));
+                pline("%sはあなたのバックパックを掴めない%sの無力さを呪った！", Shknam(shkp), noit_mhim(shkp));
             rile_shk(shkp);
             return;
 #endif
@@ -5081,8 +5072,7 @@ shopdig(int fall)
             /* for some reason the shopkeeper can't come next to you */
             if (!m_next2u(shkp)) {
                 if (lang == 2)
-                    pline("%s curses you in anger and frustration!",
-                          Shknam(shkp));
+                    pline("%sは怒りと失望の中、あなたを呪った！", Shknam(shkp));
                 else if (lang == 1)
                     growl(shkp);
                 rile_shk(shkp);
@@ -5157,7 +5147,7 @@ getcad(
         }
     } else {
         if (!Deaf) {
-            pline("%s shouts:", Shknam(shkp));
+            pline("%sが叫んだ：", Shknam(shkp));
             SetVoice(shkp, 0, 80, 0);
             verbalize("誰だ！俺の%sを%sしたのは！", dugwall ? "店" : "戸",
                         dmgstr);
@@ -5255,7 +5245,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
     if (uinshp) {
         if (um_dist(shkp->mx, shkp->my, 1)
             && !um_dist(shkp->mx, shkp->my, 3)) {
-            pline("%s leaps towards you!", Shknam(shkp));
+            pline("%sがあなたに向かって飛びかかった！", Shknam(shkp));
             mnexto(shkp, RLOC_NOMSG);
         }
         pursue = um_dist(shkp->mx, shkp->my, 1);
@@ -5334,9 +5324,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
                 SetVoice(shkp, 0, 80, 0);
                 verbalize("ああ、そうとも！払ってもらうぞ！");
             } else {
-                pline("%s lunges %s %s toward your %s!",
-                      Shknam(shkp), noit_mhis(shkp),
-                      mbodypart(shkp, HAND), body_part(NECK));
+                pline("%sが%s %sを使ってあなたの%sへ飛びかかった！", Shknam(shkp), noit_mhis(shkp), mbodypart(shkp, HAND), body_part(NECK));
             }
         } else
             growl(shkp);
@@ -5528,8 +5516,7 @@ shk_chat(struct monst *shkp)
            not actually a shk, which could happen if someone
            wishes for a shopkeeper statue and then animates it.
            (Note: shkname() would be "" in a case like this.) */
-        pline("%s asks whether you've seen any untended shops recently.",
-              Monnam(shkp));
+        pline("%sは最近無人の店を見かけたかと尋ねた。", Monnam(shkp));
         /* [Perhaps we ought to check whether this conversation
            is taking place inside an untended shop, but a shopless
            shk can probably be expected to be rather disoriented.] */
@@ -5556,8 +5543,7 @@ shk_chat(struct monst *shkp)
                 verbalize("%s %s!  Didn't you forget to pay?",
                           Hello(shkp), svp.plname);
             } else {
-                pline("%s taps you on the %s.",
-                      Shknam(shkp), body_part(ARM));
+                pline("%sはあなたの%sをタップした。", Shknam(shkp), body_part(ARM));
             }
         }
     } else if (eshk->billct) {
@@ -5573,8 +5559,7 @@ shk_chat(struct monst *shkp)
               (!Deaf && !muteshk(shkp)) ? "reminds you" : "indicates",
               noit_mhim(shkp), eshk->debit, currency(eshk->debit));
     } else if (eshk->credit) {
-        pline("%s encourages you to use your %ld %s of credit.",
-              Shknam(shkp), eshk->credit, currency(eshk->credit));
+        pline("%sはあなたに%ld %sのクレジットを使うことを勧めた。", Shknam(shkp), eshk->credit, currency(eshk->credit));
     } else if (eshk->robbed) {
         pline("%s %s about a recent robbery.",
               Shknam(shkp),
@@ -5596,7 +5581,7 @@ shk_chat(struct monst *shkp)
             pline(ROLL_FROM(Izchak_speaks), shkname(shkp));
     } else {
         if (!Deaf && !muteshk(shkp))
-            pline("%s talks about the problem of shoplifters.", Shknam(shkp));
+            pline("%sは万引き犯の問題について話した。", Shknam(shkp));
     }
 }
 
