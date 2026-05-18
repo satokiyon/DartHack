@@ -4378,7 +4378,7 @@ domagictrap(void)
                     if (!See_invisible)
                         You("再び自分の姿が見えるようになった!");
                     else
-                        You_cant("もう自分を透かして見ることはできない.");
+                            You_cant("もう自分を透かして見ることはできない.");
                 }
             } else {
                 /* If we're invisible from another source */
@@ -5942,7 +5942,7 @@ untrap(
             Strcpy(the_trap, the(trapdescr));
             if (boxcnt) {
                 if (is_pit(ttmp->ttyp)) {
-                        You_cant("%s%sには手出ししにくい.", the_trap,
+                    You_cant("%s%sには手出ししにくい.", the_trap,
                              u.utrap ? "（そこに捕まっている）"
                                  : "（縁に立っている）");
                     trap_skipped = TRUE;

@@ -2065,7 +2065,7 @@ domove_fight_web(coordxy x, coordxy y)
                                                  : makeplural(scndbuf);
             }
             You_cant("%s%s%sでは巣を切れなかった!", uwepstr,
-                     !onewep ? " or " : "", !onewep ? scndstr : "");
+                     !onewep ? "または" : "", !onewep ? scndstr : "");
             return TRUE;
 
         /* weapon is ok; check whether hit is successful */

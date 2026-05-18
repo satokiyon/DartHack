@@ -315,7 +315,7 @@ mount_steed(
         return (FALSE);
     }
     if (!force && Underwater && !is_swimmer(ptr)) {
-        You_cant("その生物に%sの中では乗ることはできなかった。",
+        You_cant("%sの中ではその生物に乗ることはできなかった。",
                  hliquid("water"));
         return (FALSE);
     }

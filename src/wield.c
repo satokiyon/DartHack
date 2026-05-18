@@ -696,8 +696,7 @@ wield_tool(struct obj *obj,
                    || strstri(what, "s of ") != 0);
 
     if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
-        You_cant("%s%sを着用している間、%sはできなかった。", verb, yname(obj),
-                 more_than_1 ? "それらは" : "それは");
+        You_cant("%sを着用している間は使えなかった。", yname(obj));
         return FALSE;
     }
     if (uwep && welded(uwep)) {
