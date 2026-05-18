@@ -928,7 +928,7 @@ return_from_mtoss(
         /* it didn't make it back to thrower's location */
         if (tethered_weapon)
             tmp_at(DISP_END, 0);
-        You_hear("大きな破裂音が聞こえた!");
+        You_hear("大きな破裂音が聞こえる!");
         notcaught = TRUE;
     }
     if (otmp) {
@@ -1025,7 +1025,7 @@ spitmm(struct monst *mtmp, struct attack *mattk, struct monst *mtarg)
                       s_suffix(mon_nam(mtmp)));
             } else {
                 Soundeffect(se_dry_throat_rattle, 50);
-                You_hear("近くで乾いたがらがら音が聞こえた.");
+                You_hear("近くで乾いたがらがら音が聞こえる.");
             }
         }
         return M_ATTK_MISS;
@@ -1103,7 +1103,7 @@ breamm(struct monst *mtmp, struct attack *mattk, struct monst *mtarg)
                     pline("%s coughs.", Monnam(mtmp));
                 } else {
                     Soundeffect(se_cough, 100);
-                    You_hear("せき込む音が聞こえた.");
+                    You_hear("せき込む音が聞こえる.");
                 }
             }
             return M_ATTK_MISS;
@@ -1438,8 +1438,8 @@ hit_bars(
                     pline_The("鉄格子が溶けた!");
             } else {
                 Soundeffect(se_angry_snakes, 100);
-                    You_hear(Hallucination ? "怒った蛇たちの声が聞こえた!"
-                                           : "シューという音が聞こえた.");
+                    You_hear(Hallucination ? "怒った蛇たちの声が聞こえる!"
+                                           : "シューという音が聞こえる.");
             }
             if (!nodissolve)
                 dissolve_bars(barsx, barsy);

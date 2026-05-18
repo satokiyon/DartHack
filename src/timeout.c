@@ -819,7 +819,7 @@ nh_timeout(void)
                         break;
                     }
                     if (!Unaware)
-                        You("もう酸に対して安全ではないと感じた.");
+                        You("もう酸に対して安全ではない.");
                 }
                 break;
             case STONE_RES:
@@ -832,7 +832,7 @@ nh_timeout(void)
                         break;
                     }
                     if (!Unaware)
-                        You("もう石化に対して安全ではないと感じた.");
+                        You("もう石化に対して安全ではない.");
                     /* no-op if not wielding a cockatrice corpse;
                        uswapwep case is always a no-op because two-weapon
                        combat is only possible with two one-handed weapons
@@ -1887,7 +1887,7 @@ do_storms(void)
             gn.nomovemsg = 0;
         }
     } else
-        You_hear("地鳴りのような音が聞こえた.");
+        You_hear("地鳴りのような音が聞こえる.");
 }
 
 /* -------------------------------------------------------------------------

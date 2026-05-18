@@ -723,7 +723,7 @@ wallify_vault(struct monst *grd)
         if (in_fcorridor(grd, grd->mx, grd->my) || cansee(grd->mx, grd->my))
             pline("%sは呪文をささやいた.", noit_Monnam(grd));
         else
-            You_hear("遠くで詠唱が聞こえた.");
+            You_hear("遠くで詠唱が聞こえる.");
         if (movedgold)
             pline("謎の力が金を宝物庫へ運んだ.");
         if (fixed)

@@ -463,10 +463,10 @@ wiz_level_change(void)
         return ECMD_OK;
     }
     if (newlevel == u.ulevel) {
-        You("すでにその経験値だった.");
+        You("すでにその経験値に達していた.");
     } else if (newlevel < u.ulevel) {
         if (u.ulevel == 1) {
-            You("これ以上経験を下げることはできなかった.");
+            You("これ以上経験値を下げることはできない.");
             return ECMD_OK;
         }
         if (newlevel < 1)
@@ -475,7 +475,7 @@ wiz_level_change(void)
             losexp("#levelchange");
     } else {
         if (u.ulevel >= MAXULEV) {
-            You("これ以上経験を上げることはできなかった.");
+            You("これ以上経験値を上げることはできない.");
             return ECMD_OK;
         }
         if (newlevel > MAXULEV)

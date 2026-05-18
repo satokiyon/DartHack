@@ -1462,7 +1462,7 @@ trapeffect_sqky_board(
                              ((mdistu(mtmp) <= range * range)
                                 ? 40 : 20));
             }
-            You_hear("%sが%sできしむ音が聞こえた.", trapnote(trap, FALSE),
+            You_hear("%sが%sできしむ音が聞こえる.", trapnote(trap, FALSE),
                      (mdistu(mtmp) <= range * range)
                         ? "近くで" : "遠くで");
         }
@@ -1536,7 +1536,7 @@ trapeffect_bear_trap(
                 if (mptr == &mons[PM_OWLBEAR]
                     || mptr == &mons[PM_BUGBEAR]) {
                     Soundeffect(se_roar, 100);
-                    You_hear("怒った熊のうなり声が聞こえた!");
+                    You_hear("怒った熊のうなり声が聞こえる!");
                 }
             }
         } else if (forcetrap) {
@@ -1746,7 +1746,7 @@ trapeffect_fire_trap(
                   surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
         else if (see_it) { /* evidently `mtmp' is invisible */
             set_msg_xy(mtmp->mx, mtmp->my);
-            You_see("%sが%sから噴き出すのを見た!", tower_of_flame,
+            You_see("%sが%sから噴き出すのが見える!", tower_of_flame,
                     surface(mtmp->mx, mtmp->my));
         }
         if (resists_fire(mtmp)) {
@@ -1849,7 +1849,7 @@ trapeffect_pit(
         feeltrap(trap);
         if (!Sokoban && is_clinger(gy.youmonst.data) && !plunged) {
             if (already_known) {
-                You_see("%s%s落とし穴が足元に見えた.", a_your[trap->madeby_u],
+                You_see("%s%s落とし穴が足元に見える.", a_your[trap->madeby_u],
                         ttype == SPIKED_PIT ? "棘だらけの" : "");
             } else {
                 pline("%s%s落とし穴があなたの足元で開いた!", A_Your[trap->madeby_u],
@@ -2217,7 +2217,7 @@ trapeffect_web(
         case PM_BUGBEAR:
             if (!in_sight) {
                 Soundeffect(se_roar, 60);
-                You_hear("混乱した熊のうなり声が聞こえた!");
+                You_hear("混乱した熊のうなり声が聞こえる!");
                 mtmp->mtrapped = 1;
                 break;
             }
@@ -3323,10 +3323,10 @@ launch_obj(
                 You_see("%sが転がり始めたのを見た.", an(xname(singleobj)));
             } else if (Hallucination) {
                 Soundeffect(se_someone_bowling, 60);
-                You_hear("誰かがボウリングしている音が聞こえた.");
+                You_hear("誰かがボウリングしている音が聞こえる.");
             } else {
                 Soundeffect(se_rumbling, 60);
-                You_hear("地鳴りが%sで聞こえた.", (distu(x1, y1) <= 4 * 4) ? "近く"
+                You_hear("地鳴りが%sで聞こえる.", (distu(x1, y1) <= 4 * 4) ? "近く"
                                            : "遠く");
             }
         }
@@ -4369,7 +4369,7 @@ domagictrap(void)
             break;
         case 11: /* toggle intrinsic invisibility */
             Soundeffect(se_low_hum, 100);
-            You_hear("低いうなり音が聞こえた.");
+            You_hear("低いうなり音が聞こえる.");
             if (!Invis) {
                 if (!Blind)
                     self_invis_message();
@@ -4382,7 +4382,7 @@ domagictrap(void)
                 }
             } else {
                 /* If we're invisible from another source */
-                You_feel("いまは少しだけ%s気がした.",
+                You_feel("いまは少しだけ%s気がする.",
                          HInvis ? "目立つ" : "隠れている");
             }
             HInvis = HInvis ? 0 : HInvis | FROMOUTSIDE;
@@ -5479,7 +5479,7 @@ try_disarm(
         if ((gi.invent && (inv_weight() + weight_cap() > WT_TOOMUCH_DIAGONAL))
             || bigmonst(gy.youmonst.data)) {
             /* don't allow untrap if they can't get thru to it */
-            You("%sに手が届かなかった!", trapname(ttype, FALSE));
+            You("%sに手が届かない!", trapname(ttype, FALSE));
             return 0;
         }
     }
@@ -5488,7 +5488,7 @@ try_disarm(
         if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
             rider_cant_reach();
         else
-            You("%sに手が届かなかった!", trapname(ttype, FALSE));
+            You("%sに手が届かない!", trapname(ttype, FALSE));
         return 0;
     }
 
@@ -5855,7 +5855,7 @@ untrap_box(
         if (ynq("解除するか?") == 'y')
             disarm_box(box, force, confused);
     } else {
-        You("%sに罠は見つからなかった.", the(xname(box)));
+        You("%sに罠は見つからない.", the(xname(box)));
     }
 }
 
@@ -5949,11 +5949,11 @@ untrap(
                     deal_with_floor_trap = FALSE;
                 } else {
                     Snprintf(qbuf, sizeof(qbuf),
-                             "ここには%sと%sがある.%s%sか?",
+                             "ここには%sと%sがある.%sを%sする?",
                              (boxcnt == 1) ? "容器" : "複数の容器",
                              an(trapdescr),
-                             (ttmp->ttyp == WEB) ? "除去" : "解除",
-                             the_trap);
+                             the_trap,
+                             (ttmp->ttyp == WEB) ? "除去" : "解除");
                     switch (ynq(qbuf)) {
                     case 'q':
                         return 0;
@@ -6000,7 +6000,7 @@ untrap(
                     }
                     return help_monster_out(mtmp, ttmp);
                 default:
-                    You("%s罠を無効化できなかった.", !here ? "その" : "この");
+                    You("%s罠を無効化できない.", !here ? "その" : "この");
                     return 0;
                 }
             }
@@ -6078,7 +6078,7 @@ untrap(
         || (!force && confused && !rn2(3))) {
         You("扉に罠を見つけた!");
         exercise(A_WIS, TRUE);
-        if (ynq("解除するか?") != 'y')
+        if (ynq("解除する?") != 'y')
             return 1;
         if (levl[x][y].doormask & D_TRAPPED) {
             ch = 15 + (Role_if(PM_ROGUE) ? u.ulevel * 3 : u.ulevel);
@@ -6103,7 +6103,7 @@ untrap(
             pline("この扉には罠がなかった.");
         return 1;
     } else {
-        You("扉に罠は見つからなかった.");
+        You("扉に罠は見つからない.");
         return 1;
     }
 }

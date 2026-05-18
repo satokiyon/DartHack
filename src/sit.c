@@ -104,7 +104,7 @@ throne_sit_effect(void)
             break;
         case 6:
             if (u.uluck + rn2(5) < 0) {
-                You_feel("運気が変わりつつある気がした.");
+                You_feel("運気が変わりつつある気がする.");
                 change_luck(1);
             } else
                 makewish();
@@ -184,7 +184,7 @@ throne_sit_effect(void)
             break;
         case 11:
             if (Luck < 0) {
-                You_feel("脅かされている気がした.");
+                You_feel("脅かされている気がする.");
                 aggravate();
             } else {
                 You_feel("引き裂かれるような感覚を覚えた.");
@@ -211,7 +211,7 @@ throne_sit_effect(void)
         if (is_prince(gy.youmonst.data) || u.uevent.uhand_of_elbereth)
             You_feel("ここはとても居心地がよい.");
         else
-            You_feel("どうにも場違いな気がした...");
+            You_feel("どうにも場違いな気がする...");
     }
 
     /* 5.0: when the random chance for removal is hit, ask for confirmation
@@ -326,7 +326,7 @@ special_throne_effect(int effect) {
         /* polymorph effect (not blocked by magic resistance, but other things
            that protect from polymorphs work) */
         if (is_vampire(gy.youmonst.data)) {
-            You_feel("自分にはふさわしくないと感じた.");
+            You_feel("自分にはふさわしくないと感じる.");
         } else {
             pline("This throne was not meant for those such as you!");
             You_feel("体に変化が訪れるのを感じた.");
@@ -649,7 +649,7 @@ attrcurse(void)
     case 1:
         if (HFire_resistance & INTRINSIC) {
             HFire_resistance &= ~INTRINSIC;
-            You_feel("少し暖かく感じた.");
+            You_feel("少し暖かく感じる.");
             ret = FIRE_RES;
             break;
         }
@@ -687,7 +687,7 @@ attrcurse(void)
     case 5:
         if (HCold_resistance & INTRINSIC) {
             HCold_resistance &= ~INTRINSIC;
-            You_feel("少し涼しく感じた.");
+            You_feel("少し涼しく感じる.");
             ret = COLD_RES;
             break;
         }
@@ -730,7 +730,7 @@ attrcurse(void)
     case 9:
         if (HStealth & INTRINSIC) {
             HStealth &= ~INTRINSIC;
-            You_feel("不器用になった気がした.");
+            You_feel("不器用になった気がする.");
             ret = STEALTH;
             break;
         }
@@ -740,7 +740,7 @@ attrcurse(void)
         /* intrinsic protection is just disabled, not set back to 0 */
         if (HProtection & INTRINSIC) {
             HProtection &= ~INTRINSIC;
-            You_feel("無防備になった気がした.");
+            You_feel("無防備になった気がする.");
             ret = PROTECTION;
             break;
         }
@@ -749,7 +749,7 @@ attrcurse(void)
     case 11:
         if (HAggravate_monster & INTRINSIC) {
             HAggravate_monster &= ~INTRINSIC;
-            You_feel("魅力が薄れた気がした.");
+            You_feel("魅力が薄れた気がする.");
             ret = AGGRAVATE_MONSTER;
             break;
         }

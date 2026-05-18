@@ -1623,7 +1623,7 @@ dosummon(void)
 {
     int placeholder;
     if (u.uen < 10) {
-        You("助けを呼ぶ力が足りなかった!");
+        You("助けを呼ぶ力が足りない!");
         return ECMD_OK;
     }
     u.uen -= 10;
@@ -1664,7 +1664,7 @@ dogaze(void)
         return ECMD_OK;
     }
     if (u.uen < 15) {
-        You("特殊な視線を使う力が足りなかった!");
+        You("特殊な視線を使う力が足りない!");
         return ECMD_OK;
     }
     u.uen -= 15;
@@ -1895,7 +1895,7 @@ domindblast(void)
     int dmg;
 
     if (u.uen < 10) {
-        You("集中しようとしたが、維持する力が足りなかった.");
+        You("集中しようとしたが、維持する力が足りない.");
         return ECMD_OK;
     }
     u.uen -= 10;

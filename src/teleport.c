@@ -1113,14 +1113,14 @@ dotele(
         } else
 #endif
         if (u.uhunger <= 10) {
-            cantdoit = "空腹で弱りすぎていた";
+            cantdoit = "空腹で弱りすぎている";
         } else if (ACURR(A_STR) < 4) {
-            cantdoit = "力が足りなかった";
+            cantdoit = "力が足りない";
         } else if (energy > u.uen) {
-            cantdoit = "エネルギーが足りなかった";
+            cantdoit = "エネルギーが足りない";
         }
         if (cantdoit) {
-            You("%sため、%sできなかった.", cantdoit,
+            You("%sため、%sできない.", cantdoit,
                 castit ? "テレポート呪文を唱えることが"
                        : "テレポートすることが");
             return 0;

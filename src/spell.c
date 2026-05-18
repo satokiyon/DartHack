@@ -254,10 +254,10 @@ deadbook(struct obj *book2)
             pline("悪寒が%sを走り抜けた.", body_part(SPINE));
             if (!u.uhave.bell) {
                 Soundeffect(se_faint_chime, 30);
-                You_hear("かすかな鐘の音が聞こえた...");
+                You_hear("かすかな鐘の音が聞こえる...");
             }
             if (!u.uhave.menorah)
-                pline("ヴラドの分身は面白がっていた.");
+                pline("ヴラドの分身は面白がってる.");
             return;
         }
 
@@ -701,7 +701,7 @@ rejectcasting(void)
          * But why isn't lack of free arms (for gesturing) an issue when
          * poly'd hero has no limbs?
          */
-        Your("腕がふさがっていて詠唱できなかった!");
+        Your("腕がふさがっていて詠唱できない!");
         return TRUE;
     }
     return FALSE;
@@ -720,7 +720,7 @@ getspell(int *spell_no)
 
     nspells = num_spells();
     if (!nspells) {
-        You("今は呪文を何も知らなかった.");
+        You("今は呪文を何も知らない.");
         return FALSE;
     }
     if (rejectcasting())
@@ -771,7 +771,7 @@ getspell(int *spell_no)
 
             idx = spell_let_to_idx(ilet);
             if (idx < 0 || idx >= nspells) {
-                You("その呪文は知らなかった.");
+                You("その呪文は知らない.");
                 continue; /* ask again */
             }
             *spell_no = idx;
@@ -1269,11 +1269,11 @@ spelleffects_check(int spell, int *res, int *energy)
     }
 
     if (u.uhunger <= 10 && spellid(spell) != SPE_DETECT_FOOD) {
-        You("空腹すぎてその呪文を唱えられなかった.");
+        You("空腹すぎてその呪文を唱えられない.");
         *res = ECMD_OK;
         return TRUE;
     } else if (ACURR(A_STR) < 4 && spellid(spell) != SPE_RESTORE_ABILITY) {
-        You("呪文を唱えるだけの力が足りなかった.");
+        You("呪文を唱えるだけの力が足りない.");
         *res = ECMD_OK;
         return TRUE;
     } else if (check_capacity(
@@ -1312,7 +1312,7 @@ spelleffects_check(int spell, int *res, int *energy)
          * isn't now (lost energy when losing levels or polymorphing into
          * new person or had some stripped away by traps or monsters).
          */
-                You("その呪文を唱えるための魔力が%s足りなかった.",
+                You("その呪文を唱えるための魔力が%s足りない.",
             (u.uen < u.uenmax) ? "" /* not at full energy => normal message */
                         : (*energy > u.uenpeak) ? "まだ" /* haven't ever had enough */
                             : "もはや"); /* once had enough but have lost some since */
@@ -1576,7 +1576,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
             do_vicinity_map(pseudo);
         /* at present, only one thing blocks clairvoyance */
         } else if (uarmh && uarmh->otyp == CORNUTHAUM)
-            You("%sの上にとがった帽子を感じた.", body_part(HEAD));
+            You("%sの上にとがった帽子を感じる.", body_part(HEAD));
         break;
     case SPE_PROTECTION:
         cast_protection();
@@ -2025,7 +2025,7 @@ dovspell(void)
     struct spell spl_tmp;
 
     if (spellid(0) == NO_SPELL) {
-        You("今は呪文を知らなかった.");
+        You("今は呪文を知らない.");
     } else {
         while (dospellmenu("Currently known spells",
                            SPELLMENU_VIEW, &splnum)) {

@@ -2238,7 +2238,7 @@ bhito(struct obj *obj, struct obj *otmp)
                     /* we don't want to force alive vs dead
                        determination for Schroedinger's Cat here,
                        so just make probing be inconclusive for it */
-                    You("%sの中に%sがいるのか、その死体があるのかは確信できなかった.",
+                    You("%sの中に%sがいるのか、その死体があるのかは確信できない.",
                         the(xname(obj)),
                         /* unfortunately, we can't tell whether rndmonnam()
                            picks a form which can't leave a corpse */
@@ -2624,7 +2624,7 @@ dozap(void)
     int damage, need_dir;
 
     if (nohands(gy.youmonst.data)) {
-        You("今の姿では何も振れなかった.");
+        You("今の姿では何も振れない.");
         return ECMD_OK;
     }
     if (check_capacity((char *) 0))
@@ -2731,7 +2731,7 @@ zapyourself(struct obj *obj, boolean ordinary)
             monstunseesu(M_SEEN_ELEC);
         } else {
             shieldeff(u.ux, u.uy);
-            You("自分に撃ったが、無傷に見えた.");
+            You("自分に撃ったが、無傷に見える.");
             monstseesu(M_SEEN_ELEC);
             ugolemeffects(AD_ELEC, orig_dmg);
         }
@@ -3419,7 +3419,7 @@ zapwrapup(void)
 {
     /* if do_osshock() set obj_zapped while polying, give a message now */
     if (go.obj_zapped)
-        You_feel("身震いするような振動を感じた.");
+        You_feel("身震いするような振動を感じる.");
     go.obj_zapped = FALSE;
 }
 
@@ -5244,7 +5244,7 @@ zap_over_floor(
                     pline_The("%sは一瞬凍りついた.",
                               hliquid(lavawall ? "溶岩" : "水"));
                 else
-                    You_hear("ぱちぱちという小さな音が聞こえた.");
+                    You_hear("ぱちぱちという小さな音が聞こえる.");
                 rangemod -= 1000; /* stop */
             } else {
                 char buf[BUFSZ];
@@ -5284,7 +5284,7 @@ zap_over_floor(
                         Norep("%sは凍りついた.", hliquid("水"));
                     newsym(x, y);
                 } else if (!lava) {
-                    You_hear("ぱちぱちという小さな音が聞こえた.");
+                    You_hear("ぱちぱちという小さな音が聞こえる.");
                 }
                 if (u_at(x, y)) {
                     if (u.uinwater) { /* not just `if (Underwater)' */

@@ -1830,7 +1830,7 @@ dopay(void)
         }
         mtmp = m_at(cx, cy);
         if (!cansee(cx, cy) && (!mtmp || !canspotmon(mtmp))) {
-            You("そこには誰も%sことができなかった.", !Blind ? "見る" : "感じる");
+            You("そこには誰も%sことができない.", !Blind ? "見る" : "感じる");
             return ECMD_OK;
         }
         if (!mtmp) {
@@ -1871,7 +1871,7 @@ dopay(void)
         if (!ltmp) {
             You("%sには何も借りがなかった.", shkname(shkp));
         } else if (!umoney) {
-            You("%s金を持っていなかった.",
+            You("%s金を持っていない.",
                 stashed_gold ? "見える範囲では" : "");
             if (stashed_gold)
                 pline("But you have some gold stashed away.");
@@ -2072,7 +2072,7 @@ pay_billed_items(
                         we can deduce that it is ibill[0] */
                      || ibill[0].usedup == UndisclosedContainer);
     if ((umoney + eshkp->credit) < cheapest_item(ibillct, ibill)) {
-        You("品物%s %sを買うには金が足りなかった%s.",
+        You("品物%s %sを買うには金が足りない%s.",
             more_than_one ? "のどれか" : "", "",
             (ebillct > 1) ? "(選んだ品物に)" : "(勘定書きの品物に)");
         if (stashed_gold)
@@ -2472,7 +2472,7 @@ insufficient_funds(
     }
     if (cost && umoney + ecredit < cost) {
         stashed_gold = hidden_gold(TRUE);
-        You("%s%sの支払いに足る金%sを持っていなかった.",
+        You("%s%sの支払いに足る金%sを持っていない.",
             (stashed_gold > 0L) ? "どうやら" : "",
             (ecredit > 0L) ? "や信用" : "",
             paydoname(item));
@@ -4569,7 +4569,7 @@ shk_fixes_damage(struct monst *shkp)
               shk_closeby ? "an incantation" : "something");
     } else if (!Deaf && shk_closeby) {
         Soundeffect(se_mutter_incantation, 100);
-        You_hear("誰かが呪文をつぶやくのが聞こえた.");
+        You_hear("誰かが呪文をつぶやくのが聞こえる.");
     }
 
     (void) repair_damage(shkp, dam, FALSE);
