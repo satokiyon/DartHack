@@ -290,7 +290,7 @@ dog_eat(struct monst *mtmp,
                       devour ? "devours" : "eats", obj_name);
         } else if (seeobj) {
             obj_name = distant_name(obj, doname);
-            pline("It %s %s.", devour ? "devours" : "eats", obj_name);
+            pline("それは%sを%s。", obj_name, devour ? "むさぼり食った" : "食べた");
         }
     }
     if (obj->unpaid) {

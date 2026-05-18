@@ -590,7 +590,7 @@ mind_blast(struct monst *mtmp)
         You("微かな精神波動を感じた。");
         return;
     }
-    pline("A wave of psychic energy pours over you!");
+    pline("サイキックエネルギーの波があなたを覆った！");
     if (mtmp->mpeaceful
         && (!Conflict || resist_conflict(mtmp))) {
         pline("安らぎを訓へられているような次第だ.");
@@ -612,10 +612,10 @@ mind_blast(struct monst *mtmp)
                 gy.youmonst.mappearance = 0;
                 newsym(u.ux, u.uy);
             }
-            pline("It locks on to your %s!",
-                    m_sen ? "telepathy"
-                    : Blind_telepat ? "latent telepathy"
-                    : "mind"); /* note: hero is never mindless */
+            pline("あなたの%sを目標に定めた！",
+                    m_sen ? "テレパシー"
+                    : Blind_telepat ? "潜在テレパシー"
+                    : "精神"); /* note: hero is never mindless */
             dmg = rnd(15);
             if (Half_spell_damage)
                 dmg = (dmg + 1) / 2;
@@ -636,7 +636,7 @@ mind_blast(struct monst *mtmp)
             /* wake it up first, to bring hidden monster out of hiding */
             wakeup(m2, FALSE);
             if (cansee(m2->mx, m2->my))
-                pline("It locks on to %s.", mon_nam(m2));
+                pline("それは%sを目標に定めた。", mon_nam(m2));
             m2->mhp -= rnd(15);
             if (DEADMONSTER(m2))
                 monkilled(m2, "", AD_DRIN);
