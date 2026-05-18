@@ -849,7 +849,7 @@ doopen_indir(coordxy x, coordxy y)
             mesg = "は壊れている";
             break;
         case D_NODOOR:
-            mesg = "戸口には扉がない;
+            mesg = "戸口には扉がない";
             break;
         case D_ISOPEN:
             mesg = "は既に開いていた";
