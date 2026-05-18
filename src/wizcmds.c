@@ -332,7 +332,7 @@ wiz_kill(void)
             if (u.utotype || !on_level(&u.uz, &uarehere))
                 break;
         } else {
-            There("is no monster there.");
+            There("にはモンスターがいない.");
             break;
         }
     }
@@ -551,7 +551,7 @@ wiz_fuzzer(void)
 {
     if (flags.suppress_alert < FEATURE_NOTICE_VER(3,7,0)) {
         pline("The fuzz tester will make NetHack execute random keypresses.");
-        There("is no conventional way out of this mode.");
+        There("にはこのモードから抜け出す通常の方法はない.");
     }
     if (paranoid_query(TRUE, "Do you want to start fuzz testing?")) {
         /* Thoth, take the reins */

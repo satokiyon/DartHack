@@ -4370,7 +4370,7 @@ mhitm_ad_heal(
             if (Role_if(PM_HEALER)) {
                 if (!Deaf && !(svm.moves % 5)) {
                     SetVoice(magr, 0, 80, 0);
-                    verbalize("Doc, I can't help you unless you cooperate.");
+                    verbalize("先生、あなたの協力がないとおれは助けられない。");
                 }
                 mhm->damage = 0;
             } else
@@ -4530,7 +4530,7 @@ mhitm_ad_dgst(
         if (flags.verbose && !Deaf) {
             /* Soundeffect? */
             SetVoice(magr, 0, 80, 0);
-            verbalize("Burrrrp!");
+            verbalize("ゲップ！");
         }
         wake_nearto(magr->mx, magr->my, 2 * 2); /* Burrrrp! */
         mhm->damage = mdef->mhp;

@@ -4171,9 +4171,9 @@ look_here(
             trap = (struct trap *) NULL;
 
         if (reg || trap)
-            There("is %s%s%s here.",
+            There("%s%s%sがある.",
                   reg ? regbuf : "",
-                  (reg && trap) ? " and " : "",
+                  (reg && trap) ? "と" : "",
                   trap ? an(trapname(trap->ttyp, FALSE)) : "");
     }
 
@@ -4254,14 +4254,14 @@ look_here(
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (obj_cnt == 1 && otmp->quan == 1L)
-            There("is %s object here.", picked_some ? "another" : "an");
+            There("%sの物体がある.", picked_some ? "別の1つ" : "1つ");
         else
-            There("are %s%s objects here.",
-                  (obj_cnt == 2) ? "two"
-                  : (obj_cnt < 5) ? "a few"
-                    : (obj_cnt < 10) ? "several"
-                      : "many",
-                  picked_some ? " more" : "");
+            There("%sの物体が%sある.",
+                  (obj_cnt == 2) ? "2つ"
+                  : (obj_cnt < 5) ? "少数"
+                    : (obj_cnt < 10) ? "いくつか"
+                      : "多数",
+                  picked_some ? "さらに" : "");
         for (; otmp; otmp = otmp->nexthere)
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
                 pline("%s %s%s.",

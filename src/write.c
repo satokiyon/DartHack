@@ -204,7 +204,7 @@ dowrite(struct obj *pen)
         goto found;
     }
 
-    There("is no such %s!", typeword);
+    There("にはそのような%sはない!", typeword);
     return ECMD_TIME;
  found:
 

@@ -373,7 +373,7 @@ doaltarobj(struct obj *obj)
     }
 
     if (obj->blessed || obj->cursed) {
-        There("is %s flash as %s %s the altar.",
+        There("%sの閃光が走り、%sが祭壇を%sた.",
               an(hcolor(obj->blessed ? NH_AMBER : NH_BLACK)), doname(obj),
               otense(obj, "hit"));
         if (!Hallucination)

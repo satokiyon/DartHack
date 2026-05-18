@@ -114,7 +114,7 @@ dosave0(void)
         if (nhfp) {
             close_nhfile(nhfp);
             clear_nhwindow(WIN_MESSAGE);
-            There("seems to be an old save file.");
+            There("には古いセーブファイルがあるようだ.");
             if (y_n("Overwrite the old file?") == 'n') {
                 nh_sfconvert(fq_save);
                 nh_compress(fq_save);

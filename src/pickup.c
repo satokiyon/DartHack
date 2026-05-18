@@ -235,10 +235,10 @@ query_classes(
                     oclasses[oclassct] = '\0';
                 } else {
                     if (!where)
-                        where = !strcmp(action, "pick up") ? "here"
-                                : !strcmp(action, "take out") ? "inside" : "";
+                        where = !strcmp(action, "pick up") ? "ここに"
+                                : !strcmp(action, "take out") ? "中に" : "";
                     if (*where)
-                        There("are no %c's %s.", sym, where);
+                        There("%cが%sない.", sym, where);
                     else
                         You("%cは持っていない.", sym);
                     not_everything = TRUE;
@@ -819,7 +819,7 @@ pickup(int what) /* should be a long */
         } else if (ct >= 2) {
             int via_menu = 0;
 
-            There("are %s objects here.", (ct <= 10) ? "several" : "many");
+            There("%sの物体がある.", (ct <= 10) ? "いくつか" : "多数");
             if (!query_classes(oclasses, &selective, &all_of_a_type,
                                "pick up", *objchain_p,
                                (traverse_how & BY_NEXTHERE) ? TRUE : FALSE,
@@ -2400,7 +2400,7 @@ reverse_loot(void)
 
         if (coffers) {
             SetVoice((struct monst *) 0, 0, 80, 0);
-            verbalize("Thank you for your contribution to reduce the debt.");
+            verbalize("神殿への借りをお返しいただき、ありがとうございます。");
             freeinv(goldob);
             (void) add_to_container(coffers, goldob);
             coffers->owt = weight(coffers);

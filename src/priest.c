@@ -653,29 +653,29 @@ priest_talk(struct monst *priest)
                   Monnam(priest));
         if ((offer = bribe(priest, buf)) == 0) {
             SetVoice(priest, 0, 80, 0);
-            verbalize("Thou shalt regret thine action!");
+            verbalize("汝、その行いを悔いることになろうぞ！");
             if (coaligned)
                 adjalign(-1);
             if (cheapskate) ++*cheapskate;
         } else if (offer < suggested * quan) {
             if (money_cnt(gi.invent) > (offer * 2L)) {
                 SetVoice(priest, 0, 80, 0);
-                verbalize("Cheapskate.");
+                verbalize("けちんぼめ。");
                 if (cheapskate) ++*cheapskate;
             } else {
                 SetVoice(priest, 0, 80, 0);
-                verbalize("I thank thee for thy contribution.");
+                verbalize("汝の奉納に感謝いたします。");
                 /* give player some token */
                 exercise(A_WIS, TRUE);
             }
         } else if (offer < suggested * quan * 2) {
             SetVoice(priest, 0, 80, 0);
-            verbalize("Thou art indeed a pious individual.");
+            verbalize("汝は実に信心深い方だ。");
             if (money_cnt(gi.invent) < (offer * 2L)) {
                 if (coaligned && u.ualign.record <= ALGN_SINNED)
                     adjalign(1);
             }
-            verbalize("I bestow upon thee a blessing.");
+            verbalize("汝に祝福を授けましょう。");
             incr_itimeout(&HClairvoyant, rn1(500 * offer / suggested,
                                              500 * offer / suggested));
         } else if (offer < suggested * quan * 3) {
@@ -699,15 +699,15 @@ priest_talk(struct monst *priest)
             }
             SetVoice(priest, 0, 80, 0);
             if (u.ublessed > orig_ublessed) {
-                verbalize("Thou hast been rewarded for thy devotion.");
+                verbalize("汝の献身への報いが授けられた。");
             } else {
-                verbalize("Thy selfless generosity is deeply appreciated.");
+                verbalize("汝の寛大な寄進、深く感謝いたします。");
             }
         } else {
-            SetVoice(priest, 0, 80, 0);
-            verbalize("Thy selfless generosity is deeply appreciated.");
-            /* money_cnt check is preserved for futureproofing but probably
-               can't fail in the current code */
+                SetVoice(priest, 0, 80, 0);
+                verbalize("汝の寛大な寄進、深く感謝いたします。");
+                /* money_cnt check is preserved for futureproofing but probably
+                    can't fail in the current code */
             if (money_cnt(gi.invent) < (offer * 2L) && coaligned) {
                 if (strayed && (svm.moves - u.ucleansed) > 5000L) {
                     u.ualign.record = 0; /* cleanse thee */

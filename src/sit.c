@@ -116,8 +116,8 @@ throne_sit_effect(void)
                 /* Magical voice not affected by deafness */
                 pline("A voice echoes:");
                 SetVoice((struct monst *) 0, 0, 80, voice_throne);
-                verbalize("Thine audience hath been summoned, %s!",
-                          flags.female ? "Dame" : "Sire");
+                verbalize("汝の謁見者が召喚されたぞ、%s！",
+                          flags.female ? "姫君" : "殿下");
                 while (cnt--)
                     (void) makemon(courtmon(), tx, ty, NO_MM_FLAGS);
                 break;
@@ -126,8 +126,8 @@ throne_sit_effect(void)
             /* Magical voice not affected by deafness */
             pline("A voice echoes:");
             SetVoice((struct monst *) 0, 0, 80, voice_throne);
-            verbalize("By thine Imperious order, %s...",
-                      flags.female ? "Dame" : "Sire");
+            verbalize("汝の崇高なる命により、%s...",
+                      flags.female ? "姫君" : "殿下");
             do_genocide(5); /* REALLY|ONTHRONE, see do_genocide() */
             break;
         case 9:
@@ -413,7 +413,7 @@ dosit(void)
 
     if (!can_reach_floor(FALSE)) {
         if (u.uswallow)
-            There("are no seats in here!");
+            There("には席がない!");
         else if (Levitation)
             You("その場でひっくり返った.");
         else
@@ -505,7 +505,7 @@ dosit(void)
     } else if ((Underwater || Is_waterlevel(&u.uz))
                 && !eggs_in_water(gy.youmonst.data)) {
         if (Is_waterlevel(&u.uz))
-            There("are no cushions floating nearby.");
+            There("には近くに浮いているクッションがない.");
         else
             You("泥だらけの底に座った.");
     } else if (is_pool(u.ux, u.uy) && !eggs_in_water(gy.youmonst.data)) {

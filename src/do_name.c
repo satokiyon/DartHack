@@ -270,7 +270,7 @@ do_mgivenname(void)
                     || mtmp->data->msound <= MS_ANIMAL)) {
         if (!alreadynamed(mtmp, monnambuf, buf)) {
             SetVoice(mtmp, 0, 80, 0);
-            verbalize("I'm %s, not %s.", shkname(mtmp), buf);
+            verbalize("私は%s、%sではない。", shkname(mtmp), buf);
         }
     } else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk
                || mtmp->data == &mons[PM_GHOST] || has_ebones(mtmp)) {
@@ -703,8 +703,8 @@ namefloorobj(void)
     }
     if (!obj) {
         /* "under you" is safe here since there's no object to hide under */
-        There("doesn't seem to be any object %s.",
-              u_at(cc.x, cc.y) ? "under you" : "there");
+        There("にはそのような物体が%sないようだ.",
+              u_at(cc.x, cc.y) ? "足元に" : "");
         return;
     }
     /* note well: 'obj' might be an instance of STRANGE_OBJECT if target

@@ -243,7 +243,7 @@ finish_quest(struct obj *obj) /* quest artifact or thrown unique item or faux
             verbalize(
       "Sorry to say, this is a mere imitation of the true Amulet of Yendor.");
         } else {
-            verbalize("Ah, I see you've found %s.", the(xname(obj)));
+            verbalize("ああ、%sを見つけたのか。", the(xname(obj)));
         }
         return;
     }
@@ -456,7 +456,7 @@ prisoner_speaks(struct monst *mtmp)
         if (canseemon(mtmp))
             pline("%s speaks:", Monnam(mtmp));
         SetVoice(mtmp, 0, 80, 0);
-        verbalize("I'm finally free!");
+        verbalize("ようやく自由だ！");
         mtmp->mstrategy &= ~STRAT_WAITMASK;
         mtmp->mpeaceful = 1;
 

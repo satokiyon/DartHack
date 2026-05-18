@@ -129,7 +129,7 @@ pick_familiar_pm(struct obj *otmp, boolean quietly)
 
         pm = rndmonst_adj(0, max);
         if (!pm && !quietly)
-            There("seems to be nothing available for a familiar.");
+            There("使い魔にできるものがいないようだ.");
     }
     return pm;
 }

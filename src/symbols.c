@@ -957,8 +957,8 @@ do_symset(boolean rogueflag)
                 big_desc = thissize;
         }
         if (!setcount) {
-            There("are no appropriate %s symbol sets available.",
-                  rogueflag ? "rogue level" : "primary");
+            There("には適切な%sシンボルセットがない.",
+                  rogueflag ? "ローグレベルの" : "標準の");
             return TRUE;
         }
 
@@ -1043,7 +1043,7 @@ do_symset(boolean rogueflag)
         return TRUE;
     } else if (!gs.symset_list) {
         /* The symbols file was empty */
-        There("were no symbol sets found in \"%s\".", SYMBOLS);
+        There("に\"%s\"のシンボルセットが見つからなかった.", SYMBOLS);
         return TRUE;
     }
 

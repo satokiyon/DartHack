@@ -3209,7 +3209,7 @@ corpse_chance(
                 /* mdef is a gas spore (AT_BOOM) that is exploding inside an
                    engulfer; suppress usual explosion since it's contained */
                 if (magr == &gy.youmonst) {
-                    There("is an explosion in your %s!", body_part(STOMACH));
+                    There("%sの中で爆発が起きた!", body_part(STOMACH));
                     Sprintf(svk.killer.name, "%s explosion",
                             s_suffix(pmname(mdat, Mgender(mon))));
                     losehp(Maybe_Half_Phys(tmp), svk.killer.name,
@@ -4180,7 +4180,7 @@ peacefuls_respond(struct monst *mtmp)
             if (humanoid(mon->data) || mon->isshk || mon->ispriest) {
                 if (is_watch(mon->data)) {
                     SetVoice(mon, 0, 80, 0);
-                    verbalize("Halt!  You're under arrest!");
+                    verbalize("動くな！お前を逮捕する！");
                     (void) angry_guards(!!Deaf);
                 } else {
                     if (!Deaf && !rn2(5)) {
