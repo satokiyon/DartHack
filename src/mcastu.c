@@ -251,10 +251,10 @@ castmu(
      */
     switch (mattk->adtyp) {
     case AD_FIRE:
-        pline("You're enveloped in flames.");
+        pline("炎に包まれた。");
         if (Fire_resistance) {
             shieldeff(u.ux, u.uy);
-            pline("But you resist the effects.");
+            pline("しかし効果に抵抗した。");
             monstseesu(M_SEEN_FIRE);
             dmg = 0;
         } else {
@@ -265,10 +265,10 @@ castmu(
         mon_spell_hits_spot(mtmp, AD_FIRE, u.ux, u.uy);
         break;
     case AD_COLD:
-        pline("You're covered in frost.");
+        pline("霜に覆われた。");
         if (Cold_resistance) {
             shieldeff(u.ux, u.uy);
-            pline("But you resist the effects.");
+            pline("しかし効果に抵抗した。");
             monstseesu(M_SEEN_COLD);
             dmg = 0;
         } else {
@@ -388,7 +388,7 @@ death_inflicted_by(
 staticfn void
 mcast_death_touch(struct monst *mtmp)
 {
-    pline("Oh no, %s's using the touch of death!", mhe(mtmp));
+    pline("しまった、%sが死の接触を使っている！", mhe(mtmp));
     if (nonliving(gy.youmonst.data) || is_demon(gy.youmonst.data)) {
         You("少しも死んだ気はしなかった.");
     } else if (!Antimagic && rn2(mtmp->m_lev) > 12) {
@@ -403,7 +403,7 @@ mcast_death_touch(struct monst *mtmp)
             shieldeff(u.ux, u.uy);
             monstseesu(M_SEEN_MAGR);
         }
-        pline("Lucky for you, it didn't work!");
+        pline("運がよかった、効かなかった！");
     }
 }
 
@@ -411,7 +411,7 @@ staticfn void
 mcast_clone_wiz(struct monst *mtmp)
 {
     if (mtmp->iswiz && svc.context.no_of_wizards == 1) {
-        pline("Double Trouble...");
+        pline("大変だ... ２倍になった！");
         clonewiz();
     } else
         impossible("bad wizard cloning?");
