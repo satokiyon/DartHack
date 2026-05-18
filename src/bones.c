@@ -422,7 +422,7 @@ savebones(int how, time_t when, struct obj *corpse)
                 if (delete_bonesfile(&u.uz))
                     goto make_bones;
                 else
-                    pline("Cannot unlink old bones.");
+                    pline("古い bones ファイルを削除できない。");
             }
         }
         /* compression can change the file's name, so must
@@ -663,7 +663,7 @@ getbones(void)
     program_state.reading_bonesfile = 1;
     if (validate(nhfp, gb.bones, FALSE) != SF_UPTODATE) {
         if (!wizard)
-            pline("Discarding unusable bones; no need to panic...");
+            pline("使えない bones は破棄する。慌てる必要はない...");
         ok = FALSE;
         program_state.reading_bonesfile = 0;
     } else {
