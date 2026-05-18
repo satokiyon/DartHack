@@ -1,51 +1,7 @@
-# Copilot Instructions for NetHackJP
+# Copilot Instructions for NetHackJP (Windows VS)
 
-このリポジトリでは、以下を最優先で守ること。
+このリポジトリの運用および翻訳に関する指示は、以下のファイルを参照してください。
 
-## 1. 作業対象
-
-- 主に日本語翻訳作業を行う。
-- 原則として文字列リテラルの変更を優先する。
-- ただし自然な日本語にするため、語順の入れ替え、補助語の付け足し、文脈を保つための最小限のロジック調整は許可する。
-- 上記の調整はゲーム挙動を変えない範囲に限定し、条件分岐や制御フローの意味を変えない。
-
-## 2. 翻訳スタイル
-
-- 常体を基本とする。
-- 叙述は過去形を優先する。
-- 原文の意味を変えない。
-- 文末記号は互換性のため半角 `.`, `!`, `?` を維持する。
-
-## 3. 書式指定子の厳守
-
-- `%s`, `%d`, `%ld`, `%c` などの個数・順序・型を変更しない。
-- 対応する引数式を変更しない。
-
-## 4. 用語ルール
-
-- boulder: 巨大な岩
-- rock (地形/壁文脈): 岩
-- iron bars: 鉄格子
-- tree: 木
-- door: 扉
-- wall: 壁
-
-boulder と rock を同じ訳語にしない。
-
-## 5. 変更後の確認
-
-- ビルド確認を行う。
-- Windows では VS Developer Shell 経由の msbuild を推奨。
-- `NetHack.exe` と `NetHackW.exe` の生成を確認する。
-
-## 6. 参照先
-
-詳細手順は以下を参照:
-
-- docs/translation-instructions-ja.md
-- docs/message-translation-safety-checklist.md
-- docs/translation-glossary-quest.md
-
-翻訳時の参考プロジェクト:
-
-- https://github.com/jnethack/jnethack-release
+- **技術・運用指示 (ビルド等)**: [.github/copilot-instructions.md](../../../../.github/copilot-instructions.md)
+- **翻訳ガイドライン (全般)**: [docs/translation-instructions-ja.md](../../../../docs/translation-instructions-ja.md)
+- **翻訳用語集 (Quest等)**: [docs/translation-glossary-quest.md](../../../../docs/translation-glossary-quest.md)
