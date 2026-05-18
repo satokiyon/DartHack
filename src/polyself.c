@@ -1782,11 +1782,11 @@ dohide(void)
     if (u.ustuck || (u.utrap && (u.utraptype != TT_PIT || on_ceiling))) {
         You_cant("隠れることはできなかった。%sているから。",
                  !u.ustuck ? "引っ掛かっ"
-                   : u.uswallow ? (digests(u.ustuck->data) ? "swallowed"
-                                                           : "engulfed")
-                     : !sticks(gy.youmonst.data) ? "being held"
-                       : (humanoid(u.ustuck->data) ? "holding someone"
-                                                   : "holding that creature"));
+                                     : u.uswallow ? (digests(u.ustuck->data) ? "消化され"
+                                                                                                                     : "飲み込まれ")
+                                         : !sticks(gy.youmonst.data) ? "つかまれ"
+                                             : (humanoid(u.ustuck->data) ? "誰かをつかまえ"
+                                                                                                     : "その生き物をつかまえ"));
         if (u.uundetected || (ismimic && U_AP_TYPE != M_AP_NOTHING)) {
             u.uundetected = 0;
             gy.youmonst.m_ap_type = M_AP_NOTHING;

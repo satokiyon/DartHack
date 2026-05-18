@@ -1787,13 +1787,12 @@ armor_or_accessory_off(struct obj *obj)
                 Strcat(what, cloak_simple_name(uarmc));
             if ((obj == uarmu) && uarm) {
                 if (uarmc)
-                    Strcat(what, " and ");
+                    Strcat(what, "と");
                 Strcat(what, suit_simple_name(uarm));
             }
-            Snprintf(why, sizeof why, " without taking off your %s first",
-                     what);
+            Snprintf(why, sizeof why, "（先に%sを脱ぐ必要があった）", what);
         } else {
-            Strcpy(why, "; it's embedded");
+            Strcpy(why, "（体に埋め込まれていた）");
         }
         You_cant("それを取り外すことはできなかった%s。", why);
         return ECMD_OK;
