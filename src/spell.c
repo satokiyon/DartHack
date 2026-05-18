@@ -171,7 +171,7 @@ cursed_book(struct obj *bp)
             shieldeff(u.ux, u.uy);
             pline_The("本は%sしたが、あなたは無傷だった!", explodes);
         } else {
-            pline("As you read the book, it %s in your %s!", explodes,
+            pline("本を読んでいると、それはあなたの%sで%sした!", explodes,
                   body_part(FACE));
             dmg = 2 * rnd(10) + 5;
             losehp(Maybe_Half_Phys(dmg), "exploding rune", KILLED_BY_AN);
@@ -344,7 +344,7 @@ book_cursed(struct obj *book)
 {
     if (book->cursed && gm.multi >= 0
         && go.occupation == learn && svc.context.spbook.book == book) {
-        pline("%s shut!", Tobjnam(book, "slam"));
+        pline("%s閉じた!", Tobjnam(book, "slam"));
         set_bknown(book, 1);
         stop_occupation();
     }
@@ -485,7 +485,7 @@ study_book(struct obj *spellbook)
             eyes = body_part(EYE);
             if (eyecount(gy.youmonst.data) > 1)
                 eyes = makeplural(eyes);
-            pline("This book is so dull that you can't keep your %s open.",
+            pline("この本はあまりに退屈で、%sを開けていられない。",
                   eyes);
             dullbook += rnd(2 * objects[booktype].oc_level);
             fall_asleep(-dullbook, TRUE);
@@ -1048,7 +1048,7 @@ cast_chain_lightning(void)
                     if (DEADMONSTER(mon)) {
                         xkilled(mon, XKILL_GIVEMSG);
                     } else {
-                        pline("You shock %s%s", mon_nam(mon), exclam(dmg));
+                        pline("あなたは%sに電撃を浴びせた%s", mon_nam(mon), exclam(dmg));
                         /* if a long worm, only map 'I' for its head */
                         if (!canseemon(mon) && !gn.notonhead)
                             /* FIXME: this doesn't work, possibly because
@@ -1056,7 +1056,7 @@ cast_chain_lightning(void)
                             map_invisible(zap.x, zap.y);
                     }
                 } else if (canseemon(mon)) {
-                    pline("%s resists.", Monnam(mon));
+                    pline("%sは抵抗した。", Monnam(mon));
                 }
                 if (!DEADMONSTER(mon)) {
                     /* wakeup is via attack, but since mon is already
@@ -2063,7 +2063,7 @@ show_spells(void)
         pline("呪文を何も知らなかった.");
         pline("%s", "");
     } else {
-        pline("Spells:");
+        pline("呪文:");
         nhUse(dospellmenu("", SPELLMENU_DUMP, &unused));
     }
 }
