@@ -1620,7 +1620,7 @@ meatobj(struct monst *mtmp) /* for gelatinous cubes */
                 /* give this one even if !verbose */
                 if (otmp->oclass == SCROLL_CLASS
                     && objdescr_is(otmp, "YUM YUM"))
-                    pline("Yum%c", otmp->blessed ? '!' : '.');
+                    pline("%s", otmp->blessed ? "うまい！" : "うまい。");
             } else {
                 Soundeffect(se_slurping_sound, 30);
                 if (flags.verbose)
@@ -2847,7 +2847,7 @@ lifesaved_monster(struct monst *mtmp)
          * Nor do you check invisibility, because glowing and
          * disintegrating amulets are always visible. */
         if (cansee(mtmp->mx, mtmp->my)) {
-            pline("But wait...");
+            pline("しかし待て...");
             pline("%s medallion begins to glow!", s_suffix(Monnam(mtmp)));
             makeknown(AMULET_OF_LIFE_SAVING);
             /* amulet is visible, but monster might not be */
@@ -2876,7 +2876,7 @@ lifesaved_monster(struct monst *mtmp)
         if (!surviver) {
             /* genocided monster can't be life-saved */
             if (cansee(mtmp->mx, mtmp->my))
-                pline("Unfortunately, %s is still genocided...",
+                pline("残念ながら、%sはまだ抹殺されたままだ...",
                       mon_nam(mtmp));
             mtmp->mhp = 0;
         }
@@ -3406,12 +3406,12 @@ monkilled(
     /* extra message if pet golem is completely destroyed;
        if not visible, this will follow "you have a sad feeling" */
     if (mdef->mtame) {
-        const char *rxt = (how == AD_FIRE && completelyburns(mptr)) ? "roast"
-                          : (how == AD_RUST && completelyrusts(mptr)) ? "rust"
-                            : (how == AD_DCAY && completelyrots(mptr)) ? "rot"
+        const char *rxt = (how == AD_FIRE && completelyburns(mptr)) ? "焼かれながら"
+                          : (how == AD_RUST && completelyrusts(mptr)) ? "錆びながら"
+                            : (how == AD_DCAY && completelyrots(mptr)) ? "腐りながら"
                               :  0;
         if (rxt)
-            pline("May %s %s in peace.", noit_mon_nam(mdef), rxt);
+            pline("%sよ、%s安らかに眠れ。", noit_mon_nam(mdef), rxt);
     }
     return;
 }
@@ -3555,7 +3555,7 @@ xkilled(
          */
         gs.stoned = FALSE;
         if (!cansee(x, y) && !gv.vamp_rise_msg)
-            pline("Maybe not...");
+            pline("そうでもなかったか...");
         return;
     }
 
@@ -3689,9 +3689,9 @@ xkilled(
         u.ugangr++;
         change_luck(-4);
         if (!Hallucination)
-            pline("That was probably a bad idea...");
+            pline("それはたぶん悪い考えだった...");
         else
-            pline("Whoopsie-daisy!");
+            pline("うわ、しまった！");
     } else if (mtmp->ispriest) {
         adjalign((p_coaligned(mtmp)) ? -2 : 2);
         /* cancel divine protection for killing your priest */
@@ -3752,7 +3752,7 @@ mon_to_stone(struct monst *mtmp)
             pline_mon(mtmp, "%s solidifies...", Monnam(mtmp));
         if (newcham(mtmp, &mons[PM_STONE_GOLEM], NO_NC_FLAGS)) {
             if (canseemon(mtmp))
-                pline("Now it's %s.", an(pmname(mtmp->data, Mgender(mtmp))));
+                pline("今は%sに変わった。", pmname(mtmp->data, Mgender(mtmp)));
         } else {
             if (canseemon(mtmp))
                 pline("... and returns to normal.");
@@ -4248,7 +4248,7 @@ peacefuls_respond(struct monst *mtmp)
                     if (exclaimed && !alreadyfleeing)
                         /* word like a separate sentence so that we
                            don't have to poke around inside growl() */
-                        pline("And then starts to flee.");
+                        pline("そして逃げ始めた。");
                 }
             }
         }

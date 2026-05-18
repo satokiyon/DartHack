@@ -1294,7 +1294,7 @@ Ring_on(struct obj *obj)
 
         if (Invis && !oldprop && !HSee_invisible && !Blind) {
             newsym(u.ux, u.uy);
-            pline("Suddenly you are transparent, but there!");
+            pline("突然透明になったが、まだここにいる！");
             learnring(obj, TRUE);
         }
         break;
@@ -1907,7 +1907,7 @@ cursed(struct obj *otmp)
             /* for weapon, we'll only get here via 'A )' */
             && (uarmg ? (otmp == uwep)
                       : ((otmp->owornmask & (W_WEP | W_RING)) != 0)))
-            pline("Despite your slippery %s, you can't.",
+            pline("%sが滑りすぎてできない。",
                   fingers_or_gloves(TRUE));
         else
             You("だめだ.  %s呪われている.", use_plural ? "それらは" : "それは");
@@ -3212,7 +3212,7 @@ disintegrate_arm(struct obj *atmp)
      */
 
     if ((otmp = maybe_destroy_armor(uarmc, atmp, &resistedc)) != 0) {
-        urgent_pline("Your %s crumbles and turns to dust!",
+        urgent_pline("あなたの%sが崩れて塵になった！",
                      /* cloak/robe/apron/smock (ID'd apron)/wrapping */
                      cloak_simple_name(otmp));
     } else if (!resistedc
@@ -3223,24 +3223,22 @@ disintegrate_arm(struct obj *atmp)
            stops shining _after_ we've been told that it is destroyed */
         if (otmp->lamplit)
             end_burn(otmp, FALSE);
-        urgent_pline("Your %s %s to dust and %s to the %s!",
-                     /* suit might be "dragon scales" so vtense() is needed */
-                     suit, vtense(suit, "turn"), vtense(suit, "fall"),
-                     surface(u.ux, u.uy));
+        urgent_pline("あなたの%sが塵と化して%sに崩れ落ちた！",
+                     suit, surface(u.ux, u.uy));
     } else if (!resistedc && !resistedsuit
              && (otmp = maybe_destroy_armor(uarmu, atmp, &resisted)) != 0) {
-        urgent_pline("Your %s crumbles into tiny threads and falls apart!",
+        urgent_pline("あなたの%sが細かい糸くずに崩れてバラバラになった！",
                      shirt_simple_name(otmp)); /* always "shirt" */
     } else if ((otmp = maybe_destroy_armor(uarmh, atmp, &resisted)) != 0) {
-        urgent_pline("Your %s turns to dust and is blown away!",
+        urgent_pline("あなたの%sが塵になって吹き飛んだ！",
                      helm_simple_name(otmp)); /* "helm" or "hat" */
     } else if ((otmp = maybe_destroy_armor(uarmg, atmp, &resisted)) != 0) {
-        urgent_pline("Your %s vanish!", gloves_simple_name(otmp));
+        urgent_pline("あなたの%sが消えてしまった！", gloves_simple_name(otmp));
         losing_gloves = TRUE;
     } else if ((otmp = maybe_destroy_armor(uarmf, atmp, &resisted)) != 0) {
-        urgent_pline("Your %s disintegrate!", boots_simple_name(otmp));
+        urgent_pline("あなたの%sが崩壊した！", boots_simple_name(otmp));
     } else if ((otmp = maybe_destroy_armor(uarms, atmp, &resisted)) != 0) {
-        urgent_pline("Your %s crumbles away!", shield_simple_name(otmp));
+        urgent_pline("あなたの%sが崩れ去った！", shield_simple_name(otmp));
     } else {
         return 0; /* could not destroy anything */
     }

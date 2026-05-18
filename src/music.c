@@ -233,8 +233,8 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
     mtmp = m_at(x, y); /* (redundant?) */
     if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
         if (cansee(x, y))
-            pline("KADOOM!  The boulder falls into a chasm%s!",
-                  u_at(x, y) ? " below you" : "");
+            pline("ドカーン！岩が裂け目に落ちた%s！",
+                  u_at(x, y) ? "（あなたの足元に）" : "");
         if (mtmp)
             mtmp->mtrapped = 0;
         obj_extract_self(otmp);
@@ -442,7 +442,7 @@ do_earthquake(int force)
                 levl[x][y].typ = CORR;
                 unblock_point(x, y);
                 if (cansee(x, y))
-                    pline("A secret corridor is revealed.");
+                    pline("隠し通路が現れた。");
                 FALLTHROUGH;
                 /*FALLTHRU*/
             case CORR:
@@ -452,7 +452,7 @@ do_earthquake(int force)
             case SDOOR:
                 cvt_sdoor_to_door(&levl[x][y]); /* .typ = DOOR */
                 if (cansee(x, y))
-                    pline("A secret door is revealed.");
+                    pline("隠し扉が現れた。");
                 FALLTHROUGH;
                 /*FALLTHRU*/
             case DOOR: /* make the door collapse */
@@ -575,7 +575,7 @@ do_improvisation(struct obj *instr)
     case PLAY_CONFUSED | PLAY_HALLU:
     case PLAY_STUNNED | PLAY_CONFUSED | PLAY_HALLU:
     default:
-        pline("What you perform is quite far from music...");
+        pline("演奏したものはとても音楽とは呼べない...");
         break;
     }
 #undef PLAY_NORMAL
