@@ -345,7 +345,7 @@ mattackm(
                 else if (mdef->m_id == gl.last_hider)
                     You("%sに気づいた。", mon_nam(mdef));
                 else
-                    pline("Suddenly, you notice %s.", a_monnam(mdef));
+                    pline("突然、%sに気づいた。", a_monnam(mdef));
             }
         }
     }
@@ -759,7 +759,7 @@ gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
         || (archon ? resists_blnd(mdef) : !magr->mcansee)
         || (magr->minvis && !perceives(mdef->data)) || mdef->msleeping) {
         if (gv.vis && canspotmon(mdef))
-            pline("but nothing happens.");
+            pline("しかし何も起きなかった。");
         return M_ATTK_MISS;
     }
     /* call mon_reflects 2x, first test, then, if visible, print message */
@@ -878,7 +878,7 @@ gulpmm(
             pline("%s expels %s.", Monnam(magr),
                   canspotmon(mdef) ? "it" : something);
             if (canspotmon(mdef)) {
-                pline("It turns into %s.",
+                pline("それは%sに変わった。",
                       x_monnam(mdef, ARTICLE_A, (char *) 0,
                                (SUPPRESS_NAME | SUPPRESS_IT
                                 | SUPPRESS_INVISIBLE), FALSE));
