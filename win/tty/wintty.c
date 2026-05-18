@@ -3968,6 +3968,8 @@ static int
 utf8_char_display_width(const unsigned char *utf8str)
 {
     unsigned short chartype = utf8_char_chartype(utf8str);
+    wchar_t wch[2] = { 0, 0 };
+    int ulen = utf8_sequence_len(utf8str);
 
     if (chartype & NH_C3_NONSPACING)
         return 0;
@@ -3979,6 +3981,24 @@ utf8_char_display_width(const unsigned char *utf8str)
         return 2;
     if (chartype & NH_C3_HALFWIDTH)
         return 1;
+
+    /* Keep in sync with sys/windows/consoletty.c width overrides.
+       These characters are rendered as full-width on Windows console. */
+    if (ulen > 1
+        && MultiByteToWideChar(65001U, 0x00000008UL,
+                               (const char *) utf8str, ulen, wch, 1) == 1) {
+        switch (wch[0]) {
+        case 0x3005: /* 々 */
+        case 0x300E: /* 『 */
+        case 0x300F: /* 』 */
+        case 0x3010: /* 【 */
+        case 0x3011: /* 】 */
+            return 2;
+        default:
+            break;
+        }
+    }
+
     return 1;
 }
 
