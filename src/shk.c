@@ -797,13 +797,13 @@ u_entered_shop(char *enterstring)
         return; /* no dialog */
 
     if (Invis) {
-        pline("%s senses your presence.", Shknam(shkp));
+        pline("%sはあなたの存在を感じた。", Shknam(shkp));
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
             verbalize("姿を隠した客は歓迎できねえな!");
         } else {
-            pline("%s stands firm as if %s knows you are there.",
-                  Shknam(shkp), noit_mhe(shkp));
+            pline("%sはあなたがそこにいることを知っているかのように立ち止まった。",
+                  Shknam(shkp));
         }
         return;
     }
@@ -816,9 +816,9 @@ u_entered_shop(char *enterstring)
             verbalize("なあ、%sよ。よくも%s%sに戻ってきやがったな！？", svp.plname,
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         } else {
-            pline("%s seems %s over your return to %s %s!",
-                  Shknam(shkp), ROLL_FROM(angrytexts),
-                  noit_mhis(shkp), shtypes[rt - SHOPBASE].name);
+            pline("%sはあなたが%sの%sに戻ってきたことに%s。",
+                  Shknam(shkp), noit_mhis(shkp), shtypes[rt - SHOPBASE].name,
+                  ROLL_FROM(angrytexts));
         }
     } else if (eshkp->surcharge) {
         if (!Deaf && !muteshk(shkp)) {
@@ -832,10 +832,10 @@ u_entered_shop(char *enterstring)
     } else if (eshkp->robbed) {
         if (!Deaf) {
             Soundeffect(se_mutter_imprecations, 50);
-            pline("%s mutters imprecations against shoplifters.",
+            pline("%sは万引き犯に対する呪詛をつぶやいた。",
                   Shknam(shkp));
         } else {
-            pline("%s is combing through %s inventory list.",
+            pline("%sは%sの在庫リストをチェックしている。",
                   Shknam(shkp), noit_mhis(shkp));
         }
     } else {
@@ -1804,7 +1804,7 @@ dopay(void)
                 break;
         assert(shkp != NULL); /* seensk==1 =>  traversal will spot one shk */
         if (shkp != resident && !m_next2u(shkp)) {
-            pline("%s is not near enough to receive your payment.",
+            pline("%sは支払いを受け取るのに十分近くない。",
                   Shknam(shkp));
             return ECMD_OK;
         }
@@ -1813,7 +1813,7 @@ dopay(void)
         coord cc;
         int cx, cy;
 
-        pline("Pay whom?");
+        pline("誰に支払う？");
         cc.x = u.ux;
         cc.y = u.uy;
         if (getpos(&cc, TRUE, "the creature you want to pay") < 0)
@@ -1838,11 +1838,11 @@ dopay(void)
             return ECMD_OK;
         }
         if (!mtmp->isshk) {
-            pline("%s is not interested in your payment.", Monnam(mtmp));
+            pline("%sはあなたの支払いに関心がない。", Monnam(mtmp));
             return ECMD_OK;
         }
         if (mtmp != resident && !m_next2u(mtmp)) {
-            pline("%s is too far to receive your payment.", Shknam(mtmp));
+            pline("%sは支払いを受け取るには遠すぎる。", Shknam(mtmp));
             return ECMD_OK;
         }
         shkp = mtmp;
@@ -1888,7 +1888,7 @@ dopay(void)
                     pline("だが、隠した金がある！");
             }
             if ((umoney < ltmp / 2L) || (umoney < ltmp && stashed_gold))
-                pline("残念ながら、%sは満足しているようではない。",
+                pline("残念ながら、%sは満足していないようだ。",
                       noit_mhe(shkp));
             else
                 make_happy_shk(shkp, FALSE);
@@ -1904,7 +1904,7 @@ dopay(void)
             if (!umoney)
                 pline(no_money, stashed_gold ? " seem to" : "");
         } else if (ltmp) {
-            pline("%s is after blood, not gold!", shkname(shkp));
+            pline("%sは血を求めており、金を求めているわけではない！", shkname(shkp));
             if (umoney < ltmp / 2L || (umoney < ltmp && stashed_gold)) {
                 if (!umoney)
                     pline(no_money, stashed_gold ? " seem to" : "");
@@ -1922,7 +1922,7 @@ dopay(void)
         } else {
             /* shopkeeper is angry, but has not been robbed --
              * door broken, attacked, etc. */
-            pline("%s is after your hide, not your gold!", Shknam(shkp));
+            pline("%sはあなたの身を狙っており、金ではない!", Shknam(shkp));
             if (umoney < 1000L) {
                 if (!umoney)
                     pline(no_money, stashed_gold ? " seem to" : "");
@@ -1969,9 +1969,9 @@ dopay(void)
         }
         pline1(sbuf);
         if (umoney + eshkp->credit < dtmp) {
-            pline("But you don't%s have enough gold%s.",
-                  stashed_gold ? " seem to" : "",
-                  eshkp->credit ? " or credit" : "");
+            pline("だが、あなたは金を%s持っていない%s。",
+                  stashed_gold ? "十分に" : "",
+                  eshkp->credit ? "、またはクレジットも" : "");
             return ECMD_TIME;
         } else {
             if (eshkp->credit >= dtmp) {
@@ -2017,9 +2017,9 @@ dopay(void)
                       shtypes[eshkp->shoptype - SHOPBASE].name,
                       !eshkp->surcharge ? "!" : ".");
         } else {
-            pline("%s nods%s at you for shopping in %s %s%s",
-                  Shknam(shkp), !eshkp->surcharge ? " appreciatively" : "",
-                  noit_mhis(shkp), shtypes[eshkp->shoptype - SHOPBASE].name,
+            pline("%sはあなたが%sの%sでお買い物くださったことに%sうなずいた%s",
+                  Shknam(shkp), noit_mhis(shkp), shtypes[eshkp->shoptype - SHOPBASE].name,
+                  !eshkp->surcharge ? "感謝して" : "",
                   !eshkp->surcharge ? "!" : ".");
         }
     }
