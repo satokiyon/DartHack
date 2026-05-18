@@ -3934,7 +3934,7 @@ status_hilite_menu_add(int origfld)
 
  choose_value:
     if (retry++ > 5) {
-        pline("That's enough tries.");
+        pline("試行回数が多すぎる。");
         return FALSE;
     }
     if (behavior == BL_TH_VAL_PERCENTAGE
@@ -3984,7 +3984,7 @@ status_hilite_menu_add(int origfld)
         }
         if (*inp == '%') {
             if (!percent) {
-                pline("Not expecting a percentage.");
+                pline("パーセント値は期待されていない。");
                 goto choose_behavior;
             }
             *inp = '\0'; /* strip '%' [this accepts trailing junk!] */
@@ -3994,7 +3994,7 @@ status_hilite_menu_add(int origfld)
             goto choose_value;
         }
         if (!gotnum) {
-            pline("Is that an invisible number?");
+            pline("それは見えない数字か？");
             goto choose_value;
         }
         op = (lt_gt_eq == LT_VALUE) ? "<"
@@ -4011,7 +4011,7 @@ status_hilite_menu_add(int origfld)
         if (percent) {
             val = aval.a_int;
             if (initblstats[fld].idxmax == -1) {
-                pline("Field '%s' does not support percentage values.",
+                pline("フィールド '%s' はパーセント値をサポートしていない。",
                       initblstats[fld].fldname);
                 behavior = BL_TH_VAL_ABSOLUTE;
                 goto choose_value;
@@ -4272,7 +4272,7 @@ status_hilite_menu_add(int origfld)
         tmpattr = hlattr2attrname(atr, attrbuf, BUFSZ);
         if (tmpattr)
             Sprintf(eos(clrbuf), "&%s", tmpattr);
-        pline("Added hilite condition/%s/%s",
+        pline("ハイライト条件を追加: condition/%s/%s",
               conditionbitmask2str(cond), clrbuf);
     } else {
         char *p, *q;
@@ -4286,7 +4286,7 @@ status_hilite_menu_add(int origfld)
             *p = '\0'; /* chop off " or female-rank" */
             /* new rule for male-rank */
             status_hilite_add_threshold(fld, &hilite);
-            pline("Added hilite %s", status_hilite2str(&hilite));
+            pline("ハイライトを追加: %s", status_hilite2str(&hilite));
             /* transfer female-rank to start of hilite.textmatch buffer */
             p += sizeof " or " - sizeof "";
             q = hilite.textmatch;
@@ -4295,7 +4295,7 @@ status_hilite_menu_add(int origfld)
             /* proceed with normal addition of new rule */
         }
         status_hilite_add_threshold(fld, &hilite);
-        pline("Added hilite %s", status_hilite2str(&hilite));
+        pline("ハイライトを追加: %s", status_hilite2str(&hilite));
     }
     reset_status_hilites();
     return TRUE;
