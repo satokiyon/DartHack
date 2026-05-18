@@ -1261,7 +1261,7 @@ dochat(void)
     struct obj *otmp;
 
     if (is_silent(gy.youmonst.data)) {
-        pline("As %s, you cannot speak.",
+        pline("あなたは%sなので、話すことができない。",
               an(pmname(gy.youmonst.data, flags.female ? FEMALE : MALE)));
         return ECMD_OK;
     }
@@ -1270,7 +1270,7 @@ dochat(void)
         return ECMD_OK;
     }
     if (u.uswallow) {
-        pline("They won't hear you out there.");
+        pline("外では聆こえないだろう。");
         return ECMD_OK;
     }
     if (Underwater) {
@@ -1303,7 +1303,7 @@ dochat(void)
     }
 
     if (u.dz) {
-        pline("They won't hear you %s there.", u.dz < 0 ? "up" : "down");
+        pline("そこでは聆こえないだろう、%sの方に。", u.dz < 0 ? "上" : "下");
         return ECMD_OK;
     }
 
@@ -1318,7 +1318,7 @@ dochat(void)
             return 1;
         }
          */
-        pline("Talking to yourself is a bad habit for a dungeoneer.");
+        pline("自分自身と話すのはダンジョンを探索する者の愧い習慣だ。");
         return ECMD_OK;
     }
 
@@ -1399,8 +1399,8 @@ dochat(void)
                     ? "falls on deaf ears"
                     : "is inaudible";
 
-        pline("Any response%s%s %s.",
-              canspotmon(mtmp) ? " from " : "",
+        pline("返事%s%s%s。",
+              canspotmon(mtmp) ? "は" : "",
               canspotmon(mtmp) ? mon_nam(mtmp) : "",
               xresponse);
         return ECMD_OK;
@@ -1455,7 +1455,7 @@ tiphat(void)
             else
                 (void) domonnoise(u.usteed);
         } else if (u.dz) {
-            pline("There's no one %s there.", (u.dz < 0) ? "up" : "down");
+            pline("%sにはいないようだ。", (u.dz < 0) ? "上" : "下");
         } else {
             pline_The("ここにいる無作法者はあなたを無視した...");
         }
@@ -1493,7 +1493,7 @@ tiphat(void)
     }
 
     if (unseen || (statue && Hallucination)) {
-        pline("That %screature is ignoring you!", unseen ? "unseen " : "");
+        pline("\u305d\u306e%s\u751f\u304d\u7269\u306f\u3042\u306a\u305f\u3092\u7121\u8996\u3057\u3066\u3044\u308b\uff01", unseen ? "見\u3048\u306a\u3044" : "");
     } else if (!mtmp || !responsive_mon_at(x, y)) {
         if (vismon) /* 'vismon' is only True when 'mtmp' is non-Null */
             pline("%s seems not to notice you.", Monnam(mtmp));
