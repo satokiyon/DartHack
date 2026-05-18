@@ -2257,8 +2257,8 @@ accessory_or_armor_on(struct obj *obj)
                 return ECMD_OK;
             }
             if (uleft && uright) {
-                There("are no more %s%s to fill.",
-                      humanoid(gy.youmonst.data) ? "ring-" : "",
+                There("空き%s%sがない.",
+                      humanoid(gy.youmonst.data) ? "指輪用の" : "",
                       fingers_or_gloves(FALSE));
                 return ECMD_OK;
             }
@@ -3132,7 +3132,7 @@ menu_remarm(int retry)
             (void) select_off(pick_list[i].item.a_obj);
         free((genericptr_t) pick_list);
     } else if (n < 0 && flags.menu_style != MENU_COMBINATION) {
-        There("is nothing else you can remove or unwield.");
+        There("はずせるものも降ろせるものももうない.");
     }
     return 0;
 }

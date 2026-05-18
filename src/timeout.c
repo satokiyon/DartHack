@@ -1122,7 +1122,7 @@ hatch_egg(anything *arg, long timeout)
                       flags.female ? "mommy" : "daddy", egg->spe ? "." : "?");
             } else if (mon->data->mlet == S_DRAGON && !Deaf) {
                 SetVoice(mon, 0, 80, 0);
-                verbalize("Gleep!"); /* Mything eggs :-) */
+                verbalize("ギーッ！");  /* Mything eggs :-) */
             }
             break;
 

@@ -511,7 +511,7 @@ monflee(
                           Monnam(mtmp), lsrc);
                 } else {
                     SetVoice(mtmp, 0, 80, 0);
-                    verbalize("Bright light!");
+                    verbalize("眩しい光だ！");
                 }
             } else {
                 pline_mon(mtmp, "%sは逃げ出そうとした.", Monnam(mtmp));
@@ -1832,7 +1832,7 @@ m_move(struct monst *mtmp, int after)
     if (ptr == &mons[PM_MAIL_DAEMON]) {
         if (!Deaf && canseemon(mtmp)) {
             SetVoice(mtmp, 0, 80, 0);
-            verbalize("I'm late!");
+            verbalize("遅刻だ！");
         }
         mongone(mtmp);
         return MMOVE_DIED;

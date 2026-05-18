@@ -800,7 +800,7 @@ u_entered_shop(char *enterstring)
         pline("%s senses your presence.", Shknam(shkp));
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
-            verbalize("Invisible customers are not welcome!");
+            verbalize("姿を隠した客は歓迎できねえな!");
         } else {
             pline("%s stands firm as if %s knows you are there.",
                   Shknam(shkp), noit_mhe(shkp));
@@ -813,7 +813,7 @@ u_entered_shop(char *enterstring)
     if (ANGRY(shkp)) {
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
-            verbalize("So, %s, you dare return to %s %s?!", svp.plname,
+            verbalize("なあ、%sよ。よくも%s%sに戻ってきやがったな！？", svp.plname,
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         } else {
             pline("%s seems %s over your return to %s %s!",
@@ -823,7 +823,7 @@ u_entered_shop(char *enterstring)
     } else if (eshkp->surcharge) {
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
-            verbalize("Back again, %s?  I've got my %s on you.",
+            verbalize("また来たのか、%s？俺の%sでしっかり見張っとくぞ。",
                       svp.plname, mbodypart(shkp, EYE));
         } else {
             pline_The("atmosphere at %s %s seems unwelcoming.",
@@ -933,7 +933,7 @@ pick_pick(struct obj *obj)
         if (svm.moves != pickmovetime) {
             if (!Deaf && !muteshk(shkp)) {
                 SetVoice(shkp, 0, 80, 0);
-                verbalize("You sneaky %s!  Get out of here with that pick!",
+                verbalize("この卑怯な%s！そのつるはしを持ったまま出ていけ！",
                       cad(FALSE));
             } else {
                 pline("%s %s your pick!",
@@ -1780,7 +1780,7 @@ dopay(void)
     }
 
     if ((!sk && (!Blind || Blind_telepat)) || (!Blind && !seensk)) {
-        There("appears to be no shopkeeper here to receive your payment.");
+        There("には支払いを受け取る店主がいないようだ.");
         return ECMD_OK;
     }
 
@@ -1834,7 +1834,7 @@ dopay(void)
             return ECMD_OK;
         }
         if (!mtmp) {
-            There("is no one there to receive your payment.");
+            There("には支払いを受け取る者がいない.");
             return ECMD_OK;
         }
         if (!mtmp->isshk) {
@@ -2012,7 +2012,7 @@ dopay(void)
     if (pay_done && !ANGRY(shkp) && paid) {
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
-            verbalize("Thank you for shopping in %s %s%s",
+            verbalize("%s%sでのお買い物ありがとうございます%s",
                       s_suffix(shkname(shkp)),
                       shtypes[eshkp->shoptype - SHOPBASE].name,
                       !eshkp->surcharge ? "!" : ".");
@@ -2131,8 +2131,7 @@ pay_billed_items(
                 buy = PAY_BUY;
             } else { /* buy_container() failed... */
                 if (boxbag_result == 2)    /* ... but didn't explain why */
-                    verbalize("You need to remove any unpaid items from"
-                              " that %s and buy them separately.",
+                    verbalize("支払い済みでない物をその%sから取り出して、別々に買ってください。",
                               simpleonames(otmp));
                 buy = PAY_CANT;
             }
@@ -3117,7 +3116,7 @@ special_stock(
                           (obj->spe < 7) ? "horrified" : "concerned");
                 } else {
                     SetVoice(shkp, 0, 80, 0);
-                    verbalize("No thanks, I'd hang onto that if I were you.");
+                    verbalize("いや、俱だったらそれは手放さないね。");
                     if (obj->spe < 7) {
                         SetVoice(shkp, 0, 80, 0);
                         verbalize(
@@ -3131,7 +3130,7 @@ special_stock(
             } else {
                 if (!Deaf && !muteshk(shkp)) {
                     SetVoice(shkp, 0, 80, 0);
-                    verbalize("I won't stock that.  Take it out of here!");
+                    verbalize("そんなもの仕入れはしない。ここから出ていけ！");
                 } else {
                     pline("%s shakes %s %s in refusal.",
                           Shknam(shkp), noit_mhis(shkp),
@@ -3969,7 +3968,7 @@ sellobj(
     if (ANGRY(shkp)) { /* they become shop-objects, no pay */
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
-            verbalize("Thank you, scum!");
+            verbalize("ありがとうね、クズ野郎。");
         } else {
             pline("%s smirks with satisfaction.", Shknam(shkp));
         }
@@ -4378,7 +4377,7 @@ shkcatch(
         if (mnearto(shkp, x, y, TRUE, RLOC_NOMSG) == 2
             && !Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
-            verbalize("Out of my way, scum!");
+            verbalize("邪魔だ邪魔！このクズ！");
         }
         if (cansee(x, y)) {
             pline("%s nimbly%s catches %s.", Shknam(shkp),
@@ -4647,7 +4646,7 @@ litter_scatter(
              */
             if (!Deaf && !muteshk(shkp)) {
                 SetVoice(shkp, 0, 80, 0);
-                verbalize("Get your junk out of my wall!");
+                verbalize("そのガラクタを壁から出せ！");
             }
             unplacebc(); /* pick 'em up */
             placebc();   /* put 'em down */
@@ -5149,8 +5148,8 @@ getcad(
     } else if (pursue || uinshp || !um_dist(x, y, 1)) {
         if (!Deaf) {
             SetVoice(shkp, 0, 80, 0);
-            verbalize("How dare you %s my %s?", dmgstr,
-                        dugwall ? "shop" : "door");
+            verbalize("よくも俺の%sを%sしやがった！", dugwall ? "店" : "戸",
+                        dmgstr);
         } else {
             pline("%s is %s that you decided to %s %s %s!",
                     Shknam(shkp), ROLL_FROM(angrytexts),
@@ -5160,8 +5159,8 @@ getcad(
         if (!Deaf) {
             pline("%s shouts:", Shknam(shkp));
             SetVoice(shkp, 0, 80, 0);
-            verbalize("Who dared %s my %s?", dmgstr,
-                        dugwall ? "shop" : "door");
+            verbalize("誰だ！俺の%sを%sしたのは！", dugwall ? "店" : "戸",
+                        dmgstr);
         } else {
             pline("%s is %s that someone decided to %s %s %s!",
                     Shknam(shkp), ROLL_FROM(angrytexts),
@@ -5277,7 +5276,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
                     /* Soundeffect(se_angry_voice, 75); */
                     You_hear("怒った声が聞こえた:");
                     SetVoice(shkp, 0, 80, 0);
-                    verbalize("Out of my way, scum!");
+                    verbalize("邪魔だ邪魔！このクズ！");
                 }
                 wait_synch();
 #if defined(UNIX) || defined(VMS)
@@ -5333,7 +5332,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
         if (!animal) {
             if (!Deaf && !muteshk(shkp)) {
                 SetVoice(shkp, 0, 80, 0);
-                verbalize("Oh, yes!  You'll pay!");
+                verbalize("ああ、そうとも！払ってもらうぞ！");
             } else {
                 pline("%s lunges %s %s toward your %s!",
                       Shknam(shkp), noit_mhis(shkp),
@@ -6084,10 +6083,11 @@ globby_bill_fixup(struct obj *obj_absorber, struct obj *obj_absorbed)
         amount = bp->price;
         bill_dummy_object(obj_absorbed);
         SetVoice(shkp, 0, 80, 0);
-        verbalize("You owe me %ld %s for my %s that you %s with your%s",
-                  amount, currency(amount), obj_typename(obj_absorbed->otyp),
-                  ANGRY(shkp) ? "had the audacity to mix" : "just mixed",
-                  ANGRY(shkp) ? " stinking batch!" : "s.");
+        verbalize("俺の%sを%s分の代金、%ld%sを払え%s",
+                  obj_typename(obj_absorbed->otyp),
+                  ANGRY(shkp) ? "勝手に混ぜやがった" : "混ぜた",
+                  amount, currency(amount),
+                  ANGRY(shkp) ? "！このバカが！" : "。");
         return;
     }
     /**************************************************************
@@ -6107,7 +6107,7 @@ use_unpaid_trapobj(struct obj *otmp, coordxy x, coordxy y)
 
             if (shkp && !muteshk(shkp)) {
                 SetVoice(shkp, 0, 80, 0);
-                verbalize("You set it, you buy it!");
+                verbalize("それを仕掛けたなら、買え！");
             }
         }
         bill_dummy_object(otmp);

@@ -529,7 +529,7 @@ beg(struct monst *mtmp)
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
         SetVoice(mtmp, 0, 80, 0);
-        verbalize("I'm hungry.");
+        verbalize("オイラは腹が減った。");
     } else {
         /* this is pretty lame but is better than leaving out the block
            of speech types between animal and humanoid; this covers
@@ -1129,7 +1129,7 @@ domonnoise(struct monst *mtmp)
     case MS_ARREST:
         if (mtmp->mpeaceful) {
             SetVoice(mtmp, 0, 80, 0);
-            verbalize("Just the facts, %s.", flags.female ? "Ma'am" : "Sir");
+            verbalize("事実だけを言い給え、%s。", flags.female ? "お嬢さん" : "旦那");
         } else {
             static const char *const arrest_msg[3] = {
                 "Anything you say can be used against you.",

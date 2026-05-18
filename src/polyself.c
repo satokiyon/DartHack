@@ -1800,7 +1800,7 @@ dohide(void)
         if (IS_FOUNTAIN(levl[u.ux][u.uy].typ))
             pline_The("fountain is not deep enough to hide in.");
         else
-            There("is no %s to hide in here.", hliquid("water"));
+            There("には身を隠せる%sがない.", hliquid("water"));
         u.uundetected = 0;
         return ECMD_OK;
     }
@@ -1809,7 +1809,7 @@ dohide(void)
         struct obj *otmp, *otop = svl.level.objects[u.ux][u.uy];
 
         if (!otop) {
-            There("is nothing to hide under here.");
+            There("には下に隠れるものがない.");
             u.uundetected = 0;
             return ECMD_OK;
         }
@@ -1841,13 +1841,13 @@ dohide(void)
     }
     /* Planes of Air and Water */
     if (on_ceiling && !has_ceiling(&u.uz)) {
-        There("is nowhere to hide above you.");
+        There("にはあなたの上に隠れる場所がない.");
         u.uundetected = 0;
         return ECMD_OK;
     }
     if ((is_hider(gy.youmonst.data) && !Flying) /* floor hider */
         && (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))) {
-        There("is nowhere to hide beneath you.");
+        There("にはあなたの下に隠れる場所がない.");
         u.uundetected = 0;
         return ECMD_OK;
     }

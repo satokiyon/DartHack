@@ -246,7 +246,7 @@ summon_minion(aligntyp alignment, boolean talk)
                 You_feel("%sの轟く声を感じた:",
                          s_suffix(align_gname(alignment)));
             SetVoice(mon, 0, 80, 0);
-            verbalize("Thou shalt pay for thine indiscretion!");
+            verbalize("汝の不謹慎な行動に代価を払わせるぞ！");
             if (canspotmon(mon))
                 pline("%s appears before you.", Amonnam(mon));
             mon->mstrategy &= ~STRAT_APPEARMSG;
@@ -476,7 +476,7 @@ lose_guardian_angel(
             if (!Deaf) {
                 pline("%s rebukes you, saying:", Monnam(mon));
                 SetVoice(mon, 0, 80, 0);
-                verbalize("Since you desire conflict, have some more!");
+                verbalize("争いを望むなら、もっとくれてやる！");
             } else {
                 pline("%s vanishes!", Monnam(mon));
             }
@@ -509,7 +509,7 @@ gain_guardian_angel(void)
         else
             You_feel("轟く声を感じた:");
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
-        verbalize("Thy desire for conflict shall be fulfilled!");
+        verbalize("汝の争いへの欲望は叶えられん！");
         /* send in some hostile angels instead */
         lose_guardian_angel((struct monst *) 0);
     } else if (u.ualign.record > 8) { /* fervent */
@@ -518,7 +518,7 @@ gain_guardian_angel(void)
         else
             You_feel("やわらかな声を感じた:");
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
-        verbalize("Thou hast been worthy of me!");
+        verbalize("汝は我に値する者だった！");
         mm.x = u.ux;
         mm.y = u.uy;
         if (enexto(&mm, mm.x, mm.y, &mons[PM_ANGEL])

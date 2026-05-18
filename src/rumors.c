@@ -704,7 +704,7 @@ doconsult(struct monst *oracl)
     umoney = money_cnt(gi.invent);
 
     if (!oracl) {
-        There("is no one here to consult.");
+        There("には相談できる者がいない.");
         return ECMD_OK;
     } else if (!oracl->mpeaceful) {
         pline("%s is in no mood for consultations.", Monnam(oracl));

@@ -115,11 +115,11 @@ precheck(struct monst *mon, struct obj *obj)
                 /* can't wish for wands of death here.... */
                 SetVoice(mtmp, 0, 80, 0);
                 if (rn2(2)) {
-                    verbalize("You freed me!");
+                    verbalize("おれを助けたな！");
                     mtmp->mpeaceful = 1;
                     set_malign(mtmp);
                 } else {
-                    verbalize("It is about time.");
+                    verbalize("ようやくか。");
                     if (vis)
                         pline("%s vanishes.", Monnam(mtmp));
                     mongone(mtmp);
@@ -1939,7 +1939,7 @@ use_offensive(struct monst *mtmp)
     case MUSE_CAMERA: {
         if (Hallucination) {
             SetVoice(mtmp, 0, 80, 0);
-            verbalize("Say cheese!");
+            verbalize("はいチーズ！");
         } else if (!Blind) {
             pline("%s takes a picture of you with %s!",
                   Monnam(mtmp), an(xname(otmp)));

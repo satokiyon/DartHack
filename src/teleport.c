@@ -1335,7 +1335,7 @@ level_tele(void)
         if (newlev <= -10) {
             You("天上界にたどり着いた.");
             SetVoice((struct monst *) 0, 0, 80, voice_deity);
-            verbalize("Thou art early, but we'll admit thee.");
+            verbalize("汝は早く来たが、我ら汝を認めよう。");
             svk.killer.format = NO_KILLER_PREFIX;
             Strcpy(svk.killer.name, "went to heaven prematurely");
         } else if (newlev == -9) {

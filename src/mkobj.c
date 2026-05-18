@@ -803,9 +803,8 @@ costly_alteration(struct obj *obj, int alter_type)
         if (shkp) {
             SetVoice(shkp, 0, 80, 0);
         }
-        verbalize("You %s %s %s, you pay for %s!",
-                  alteration_verbs[alter_type], those, simpleonames(obj),
-                  them);
+        verbalize("お前が%sした%s%s、払え!",
+              alteration_verbs[alter_type], those, simpleonames(obj));
         bill_dummy_object(obj);
         break;
     case OBJ_FLOOR:
@@ -815,8 +814,8 @@ costly_alteration(struct obj *obj, int alter_type)
             if (shkp) {
                 SetVoice(shkp, 0, 80, 0);
             }
-            verbalize("You %s %s, you pay for %s!",
-                      alteration_verbs[alter_type], those, them);
+            verbalize("お前が%sした%s、払え!",
+                      alteration_verbs[alter_type], those);
             bill_dummy_object(obj);
         } else {
             (void) stolen_value(obj, ox, oy, FALSE, FALSE);

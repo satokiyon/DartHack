@@ -2923,7 +2923,7 @@ do_genocide(
                               " through the caverns:");
                     SetVoice((struct monst *) 0, 0, 80, voice_deity);
                     /* FIXME? shouldn't this override deafness? */
-                    verbalize("No, mortal!  That will not be done.");
+                    verbalize("いいえ、定命の者よ！それは行われない。");
                 }
                 continue;
             }

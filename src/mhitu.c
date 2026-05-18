@@ -2140,8 +2140,8 @@ doseduce(struct monst *mon)
         if (!Deaf) {
             if (!(ld() && mon->female)) {
                 SetVoice(mon, 0, 80, 0);
-                verbalize("You're such a %s; I wish...",
-                          flags.female ? "sweet lady" : "nice guy");
+                verbalize("あなたは本当に%sですね。ああ…",
+                          flags.female ? "素敵な淑女" : "いいやつ");
             } else {
                 struct obj *yourgloves = u_carried_gloves();
 
@@ -2149,11 +2149,10 @@ doseduce(struct monst *mon)
                    name, possibly revealing them to you */
                 if (yourgloves)
                     observe_object(yourgloves);
-                verbalize("Well, then you owe me %s%s!",
+                verbalize("では、あなたは%s%sをくれないと…",
                           yourgloves ? yname(yourgloves)
-                                     : "twelve pairs of gloves",
-                          yourgloves ? " and eleven more pairs of gloves"
-                                     : "");
+                                     : "12足の手袋",
+                          yourgloves ? "とさらに11足の手袋" : "");
             }
         } else if (seewho)
             pline_mon(mon, "%s appears to sigh.", Monnam(mon));
@@ -2286,7 +2285,7 @@ doseduce(struct monst *mon)
         if (!cost) {
             if (!Deaf) {
                 SetVoice(mon, 0, 80, 0);
-                verbalize("It's on the house!");
+                verbalize("ただです！");
             } else {
                 pline("ただだ.");
             }
@@ -2334,15 +2333,15 @@ mayberem(struct monst *mon,
         Sprintf(hairbuf, "let me run my fingers through your %s",
                 body_part(HAIR));
         SetVoice(mon, 0, 80, 0);
-        verbalize("Take off your %s; %s.", str,
-                  (obj == uarm)
-                     ? "let's get a little closer"
-                     : (obj == uarmc || obj == uarms)
-                        ? "it's in the way"
-                        : (obj == uarmf)
-                           ? "let me rub your feet"
-                           : (obj == uarmg)
-                              ? "they're too clumsy"
+          verbalize("あなたの%sを脱いで。%s", str,
+                        (obj == uarm)
+                            ? "もっと近くなりましょう"
+                            : (obj == uarmc || obj == uarms)
+                                ? "邪魔ですから"
+                                : (obj == uarmf)
+                                    ? "足をもませてよ"
+                                    : (obj == uarmg)
+                                        ? "不器用ですから"
                               : (obj == uarmu)
                                  ? "let me massage you"
                                  /* obj == uarmh */

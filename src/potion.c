@@ -2841,27 +2841,27 @@ djinni_from_bottle(struct obj *obj)
     SetVoice(mtmp, 0, 80, 0);
     switch (chance) {
     case 0:
-        verbalize("I am in your debt.  I will grant one wish!");
+        verbalize("お前には借りがある。1つだけ願いを叶えてやろう!");
         /* give a wish and discard the monster (mtmp set to null) */
         mongrantswish(&mtmp);
         break;
     case 1:
-        verbalize("Thank you for freeing me!");
+        verbalize("おれを解放してくれてありがとう！");
         (void) tamedog(mtmp, (struct obj *) 0, FALSE);
         break;
     case 2:
-        verbalize("You freed me!");
+        verbalize("おれを助けたな！");
         mtmp->mpeaceful = TRUE;
         set_malign(mtmp);
         break;
     case 3:
-        verbalize("It is about time!");
+        verbalize("ようやくか！");
         if (canspotmon(mtmp))
             pline("%s vanishes.", Monnam(mtmp));
         mongone(mtmp);
         break;
     default:
-        verbalize("You disturbed me, fool!");
+        verbalize("おれを邪魔したな、このバカ！");
         mtmp->mpeaceful = FALSE;
         set_malign(mtmp);
         break;

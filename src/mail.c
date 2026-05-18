@@ -339,7 +339,7 @@ md_rush(struct monst *md,
             if (mon)
                 verbalize1(md_exclamations());
             else if (u_at(fx, fy))
-                verbalize("Excuse me.");
+                verbalize("失礼します。");
         }
 
         if (mon)
@@ -370,7 +370,7 @@ md_rush(struct monst *md,
         newsym(fx, fy);
         if (!Deaf) {
             SetVoice(md, 0, 80, 0);
-            verbalize("This place's too crowded.  I'm outta here.");
+            verbalize("ここは人が多すぎます。出ていきます。");
         } else {
             pline("%s.", Never_mind);
         }
@@ -415,7 +415,7 @@ newmail(struct mail_info *info)
     message_seen = TRUE;
     if (!Deaf) {
         SetVoice(md, 0, 80, 0);
-        verbalize("%s, %s!  %s.", Hello(md), svp.plname, info->display_txt);
+        verbalize("%s, %s!    %s.", Hello(md), svp.plname, info->display_txt);
     } else {
         pline("Message:  %s.", info->display_txt);
     }
@@ -431,7 +431,7 @@ newmail(struct mail_info *info)
         if (!m_next2u(md)) {
             if (!Deaf) {
                 SetVoice(md, 0, 80, 0);
-                verbalize("Catch!");
+                verbalize("キャッチ！");
             } else {
                 /* don't bother with nonverbal alternative ... */
                 ;
@@ -623,8 +623,8 @@ read_simplemail(const char *mbox, boolean adminmsg)
             fl.l_type = F_UNLCK;
             fcntl(fileno(mb), F_UNLCK, &fl);
 #endif
-            There("is a%s message on this scroll.",
-                  seen_one_already ? "nother" : "");
+            There("この巻物には%sメッセージがある.",
+                  seen_one_already ? "別の" : "");
         }
         msg = strchr(curline, ':');
 
