@@ -6038,14 +6038,13 @@ globby_bill_fixup(struct obj *obj_absorber, struct obj *obj_absorbed)
                     Your("負債は返済された.");
                 }
                 if (eshkp->credit == delta)
-                    pline_The("%s established %ld %s credit.",
+                    pline_The("%sで%ld %sの信用が生じた.",
                               obj_typename(obj_absorbed->otyp),
                               delta, currency(delta));
                 else
-                    pline_The("%s added %ld %s %s %ld %s.",
+                    pline_The("%sで%ld %sの信用が増え、合計は%ld %sになった.",
                               obj_typename(obj_absorbed->otyp),
                               delta, currency(delta),
-                              "to your credit; total is now",
                               eshkp->credit, currency(eshkp->credit));
             }
         }

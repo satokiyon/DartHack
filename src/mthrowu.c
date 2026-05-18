@@ -397,7 +397,8 @@ ohitmon(
                 hit(distant_name(otmp, mshot_xname), mtmp, how);
             }
         } else if (verbose && !gm.mtarget)
-            pline("%s%s is hit%s", (otmp->otyp == EGG) ? "Splat!  " : "",
+            pline("%s%sに当たった%s",
+                  (otmp->otyp == EGG) ? "ドスン!  " : "",
                   Monnam(mtmp), exclam(damage));
 
         if (otmp->opoisoned && is_poisonable(otmp)) {
@@ -427,7 +428,7 @@ ohitmon(
                     m_name = strcat(s_suffix(m_name), " flesh");
                 pline_The("銀が%sを焼いた!", m_name);
             } else if (verbose && !gm.mtarget) {
-                pline("%s is seared!", flesh ? "Its flesh" : "It");
+                pline("%sは焼けただれた!", flesh ? "肉" : "それ");
             }
         }
         if (otmp->otyp == ACID_VENOM && cansee(mtmp->mx, mtmp->my)) {
@@ -436,7 +437,7 @@ ohitmon(
                     pline("%sは平然としていた.", Monnam(mtmp));
             } else {
                 if (vis)
-                    pline_The("%s burns %s!", hliquid("acid"), mon_nam(mtmp));
+                    pline_The("%sが%sを焼いた!", hliquid("acid"), mon_nam(mtmp));
                 else if (verbose && !gm.mtarget)
                     pline("焼けついた!");
             }

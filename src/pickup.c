@@ -3635,29 +3635,28 @@ dotip(void)
     /* assorted other cases */
     if (Is_candle(cobj) && cobj->lamplit) {
         /* note "wax" even for tallow candles to avoid giving away info */
-        spillage = "wax";
+        spillage = "ろう";
     } else if ((cobj->otyp == POT_OIL && cobj->lamplit)
                || (cobj->otyp == OIL_LAMP && cobj->age != 0L)
                || (cobj->otyp == MAGIC_LAMP && cobj->spe != 0)) {
-        spillage = "oil";
+        spillage = "油";
         /* todo: reduce potion's remaining burn timer or oil lamp's fuel */
     } else if (cobj->otyp == CAN_OF_GREASE && cobj->spe > 0) {
         /* charged consumed below */
-        spillage = "grease";
+        spillage = "油脂";
     } else if (cobj->otyp == FOOD_RATION || cobj->otyp == CRAM_RATION
                || cobj->otyp == LEMBAS_WAFER) {
-        spillage = "crumbs";
+        spillage = "くず";
     } else if (cobj->oclass == VENOM_CLASS) {
-        spillage = "venom";
+        spillage = "毒液";
     }
     if (spillage) {
         buf[0] = '\0';
         if (is_pool(u.ux, u.uy))
-            Sprintf(buf, " and gradually %s", vtense(spillage, "dissipate"));
+            Sprintf(buf, "、やがて消えていった");
         else if (is_lava(u.ux, u.uy))
-            Sprintf(buf, " and immediately %s away",
-                    vtense(spillage, "burn"));
-          pline("%sの一部が%sの上にこぼれ%s。", spillage,
+            Sprintf(buf, "、すぐに燃え尽きた");
+        pline("%sの一部が%sの上にこぼれ%s.", spillage,
               surface(u.ux, u.uy), buf);
         /* shop usage message comes after the spill message */
         if (cobj->otyp == CAN_OF_GREASE && cobj->spe > 0) {
@@ -3668,7 +3667,7 @@ dotip(void)
     }
     /* anything not covered yet */
     if (cobj->oclass == POTION_CLASS) /* can't pour potions... */
-        pline_The("%s %s securely sealed.", xname(cobj), otense(cobj, "are"));
+        pline_The("%sはまだしっかり封がされている.", xname(cobj));
     else if (uarmh && cobj == uarmh)
         return tiphat() ? ECMD_TIME : ECMD_OK;
     else if (cobj->otyp == STATUE)

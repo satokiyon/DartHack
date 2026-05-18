@@ -169,10 +169,9 @@ cursed_book(struct obj *bp)
     case 6:
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
-            pline_The("本は%sしたが、あなたは無傷だった!", explodes);
+            pline_The("本は爆発したが、あなたは無傷だった!");
         } else {
-            pline("本を読んでいると、それはあなたの%sで%sした!", explodes,
-                  body_part(FACE));
+            pline("本を読んでいると、それはあなたの顔の前で爆発した!");
             dmg = 2 * rnd(10) + 5;
             losehp(Maybe_Half_Phys(dmg), "exploding rune", KILLED_BY_AN);
         }
@@ -245,8 +244,8 @@ deadbook(struct obj *book2)
 
         if (book2->cursed) {
             pline_The("%s!",
-                      Blind ? "Book seems to be ignoring you"
-                            : "runes appear scrambled.  You can't read them");
+                      Blind ? "本はあなたを無視しているようだ"
+                            : "ルーンがぐちゃぐちゃで読めない");
             return;
         }
 
@@ -1145,7 +1144,7 @@ cast_protection(void)
             const char *hgolden = hcolor(NH_GOLDEN), *atmosphere;
 
             if (u.uspellprot) {
-                pline_The("%s haze around you becomes more dense.", hgolden);
+                pline_The("%sのもやがあなたの周囲で濃くなった.", hgolden);
             } else {
                 struct permonst *pm = u.ustuck ? u.ustuck->data : 0;
 
@@ -1161,7 +1160,7 @@ cast_protection(void)
                                      : IS_TREE(rmtyp) ? "vegetation"
                                        : IS_STWALL(rmtyp) ? "stone"
                                          : "air");
-                pline_The("%s around you begins to shimmer with %s haze.",
+                pline_The("あなたの周囲の%sが%s色のもやできらめき始めた.",
                           atmosphere, an(hgolden));
             }
         }

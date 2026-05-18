@@ -219,7 +219,7 @@ do_mgivenname(void)
         if (u.usteed && canspotmon(u.usteed)) {
             mtmp = u.usteed;
         } else {
-            pline("この%sクリーチャーは%sという名前で、改名はできない。",
+            pline("この%s怪物は%sという名前で、改名はできない。",
                   beautiful(), svp.plname);
             return;
         }

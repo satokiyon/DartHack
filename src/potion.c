@@ -1633,8 +1633,8 @@ potionhit(struct monst *mon, struct obj *obj, int how)
     if (isyou) {
         tx = u.ux, ty = u.uy;
         distance = 0;
-        pline_The("%s crashes on your %s and breaks into shards.", botlnam,
-                  body_part(HEAD));
+        pline_The("%sがあなたの%sに当たり、砕け散った.", botlnam,
+              body_part(HEAD));
         losehp(Maybe_Half_Phys(rnd(2)),
                (how == POTHIT_OTHER_THROW) ? "propelled potion" /* scatter */
                                            : "thrown potion",
@@ -1669,8 +1669,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                 Strcpy(buf, mnam);
             }
             Soundeffect(se_potion_crash_and_break, 60);
-            pline_The("%s crashes on %s and breaks into shards.", botlnam,
-                      buf);
+            pline_The("%sが%sに当たり、砕け散った.", botlnam, buf);
         }
         if (rn2(5) && mon->mhp > 1 && !hit_saddle)
             mon->mhp--;

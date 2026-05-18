@@ -2960,7 +2960,7 @@ vamprises(struct monst *mtmp)
                                       : "扉が壊れるのを見た");
             else if (!Unaware)
                 pline_The("扉は叩き壊され%s",
-                          trapped ? " and it explodes!" : ".");
+                          trapped ? "、さらに爆発した!" : ".");
             set_msg_xy(0, 0); /* in case none of the messages was delivered */
 
             door->doormask = D_NODOOR;
@@ -4148,12 +4148,8 @@ qst_guardians_respond(void)
         }
     }
     if (got_mad && !Hallucination) {
-        const char *who = q_guardian->pmnames[NEUTRAL];
-
-        if (got_mad > 1)
-            who = makeplural(who);
-        pline_The("%s %s to be angry too...",
-                  who, vtense(who, "appear"));
+        pline_The("%sも怒っているようだ...",
+                  (got_mad > 1) ? "守護者たち" : "守護者");
     }
 }
 
@@ -5735,18 +5731,14 @@ angry_guards(boolean silent)
             char buf[BUFSZ];
 
             if (slct) { /* sleeping guard(s) */
-                Sprintf(buf, "guard%s", plur(slct));
-                pline_The("%s %s up.", buf, vtense(buf, "wake"));
+                pline_The("%sが起きた.", (slct == 1) ? "衛兵" : "衛兵たち");
             }
 
             if (nct) { /* seen/sensed adjacent guard(s) */
-                Sprintf(buf, "guard%s", plur(nct));
-                pline_The("%s %s angry!", buf, vtense(buf, "get"));
+                pline_The("%sが怒った!", (nct == 1) ? "衛兵" : "衛兵たち");
             } else if (sct) { /* seen/sensed non-adjacent guard(s) */
-                Sprintf(buf, "guard%s", plur(sct));
-                pline("%s %s %s approaching!",
-                      (sct == 1) ? "An angry" : "Angry",
-                      buf, vtense(buf, "are"));
+                pline("%sが近づいてくる!",
+                      (sct == 1) ? "怒った衛兵" : "怒った衛兵たち");
             } else {
                 Soundeffect(se_shrill_whistle, 100);
                 You_hear("%s警笛が鋭く鳴るのが聞こえる.",

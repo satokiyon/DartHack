@@ -269,7 +269,7 @@ digcheck_fail_message(enum digcheck_result digresult, struct monst *madeby,
         pline_The("祭壇は硬すぎて壊せなかった.");
         break;
     case DIGCHECK_FAIL_BOULDER:
-        There("ここには%sための十分なスペースがない.", verb);
+        pline_The("ここには%sするのに十分なスペースがない.", verb);
         break;
     case DIGCHECK_FAIL_ONLADDER:
         pline_The("はしごはビクともしなかった.");
@@ -913,8 +913,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
     if ((ttmp && (undestroyable_trap(ttmp->ttyp) || nohole))
         || (IS_OBSTRUCTED(old_typ) && old_typ != SDOOR
             && (lev->wall_info & W_NONDIGGABLE) != 0)) {
-        pline_The("%s %shere is too hard to dig in.", surface(dig_x, dig_y),
-                  (dig_x != u.ux || dig_y != u.uy) ? "t" : "");
+        pline_The("%sは掘るには硬すぎる.", surface(dig_x, dig_y));
     } else if (ttmp && is_magical_trap(ttmp->ttyp)) {
         explode(dig_x, dig_y, 0, 20 + d(3, 6), TRAP_EXPLODE, EXPL_MAGICAL);
         deltrap(ttmp);
@@ -2194,11 +2193,11 @@ bury_monst(struct monst *mtmp)
     debugpline1("bury_monst: %s", mon_nam(mtmp));
     if (canseemon(mtmp)) {
         if (is_flyer(mtmp->data) || is_floater(mtmp->data)) {
-            pline_The("%s opens up, but %s is not swallowed!",
+            pline_The("%sが開いたが、%sは飲み込まれなかった!",
                       surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
             return;
         } else
-            pline_The("%s opens up and swallows %s!",
+            pline_The("%sが開いて%sを飲み込んだ!",
                       surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
     }
 
