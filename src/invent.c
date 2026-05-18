@@ -9,6 +9,38 @@ staticfn void inuse_classify(Loot *, struct obj *);
 staticfn char *loot_xname(struct obj *);
 staticfn int invletter_value(char);
 staticfn int QSORTCALLBACK sortloot_cmp(const genericptr, const genericptr);
+
+staticfn const char *
+action_verb_jp(const char *word)
+{
+    if (!strcmp(word, "identify")) return "識別";
+    if (!strcmp(word, "adjust")) return "整理";
+    if (!strcmp(word, "split")) return "分割";
+    if (!strcmp(word, "call")) return "名付け";
+    if (!strcmp(word, "drop")) return "落とし";
+    if (!strcmp(word, "put in")) return "入れ";
+    if (!strcmp(word, "take out")) return "取り出し";
+    if (!strcmp(word, "wear") || !strcmp(word, "put on")) return "装着";
+    if (!strcmp(word, "remove") || !strcmp(word, "take off")) return "取り外し";
+    if (!strcmp(word, "wield")) return "装備";
+    if (!strcmp(word, "ready")) return "準備";
+    if (!strcmp(word, "read")) return "読書";
+    if (!strcmp(word, "zap")) return "使用";
+    if (!strcmp(word, "eat")) return "食事";
+    if (!strcmp(word, "throw")) return "投擲";
+    if (!strcmp(word, "apply")) return "使用";
+    if (!strcmp(word, "loot")) return "あさり";
+    if (!strcmp(word, "tip")) return "ひっくり返し";
+    if (!strcmp(word, "quaff")) return "飲用";
+    if (!strcmp(word, "fire")) return "射撃";
+    if (!strcmp(word, "travel")) return "移動";
+    if (!strcmp(word, "kick")) return "蹴り";
+    if (!strcmp(word, "glance")) return "見回し";
+    if (!strcmp(word, "search")) return "探索";
+    if (!strcmp(word, "pickup")) return "拾い上げ";
+    if (!strcmp(word, "wear")) return "装着";
+    return word;
+}
 staticfn void reorder_invent(void);
 staticfn struct obj *addinv_core0(struct obj *, struct obj *,
                                                          boolean) NONNULLARG1;
@@ -60,8 +92,8 @@ static const char venom_inv[] = { VENOM_CLASS, 0 }; /* (constant) */
    pointers aren't const because dispinv_with_action() might temporarily
    change "Accessories" to "Rings" or "Amulet", then back again */
 static const char *inuse_headers[] = { /* [4] shown first, [1] last */
-    "", "Miscellaneous", "Worn Armor",
-    "Wielded/Readied Weapons", "Accessories",
+    "", "その他", "装備中の防具",
+    "装備中/準備中の武器", "装飾品",
 };
 
 /* sortloot() classification for in-use sort;
@@ -1916,7 +1948,7 @@ getobj(
     for (;;) {
         cnt = 0L;
         cntgiven = FALSE;
-        Sprintf(qbuf, "What do you want to %s?", word);
+        Sprintf(qbuf, "何を%sしたい?", action_verb_jp(word));
         if (gi.in_doagain) {
             ilet = readchar();
         } else if (iflags.force_invmenu) {
@@ -1972,7 +2004,7 @@ getobj(
             menuquery[0] = qbuf[0] = '\0';
             if (iflags.force_invmenu)
                 Snprintf(menuquery, sizeof menuquery,
-                         "What do you want to %s?", word);
+                         "何を%sしたい?", action_verb_jp(word));
             if (!allowed_choices || *allowed_choices == HANDS_SYM
                 || *buf == HANDS_SYM)
                 handsbuf = getobj_hands_txt(word, qbuf);
@@ -2116,8 +2148,8 @@ silly_thing(const char *word,
             s1 = "R", s2 = "remove", s3 = "";
     }
     if (s1)
-        pline("Use the '%s' command to %s %s%s.", s1, s2,
-              !(is_plural(otmp) || pair_of(otmp)) ? "that" : "those", s3);
+        pline("'%s' コマンドで %s %s%s する.", s1, s2,
+              !(is_plural(otmp) || pair_of(otmp)) ? "それ" : "それら", s3);
     else
 #endif
     /* see comment about Amulet of Yendor in objtyp_is_callable(do_name.c);
@@ -2665,8 +2697,7 @@ menu_identify(int id_limit)
     /* assumptions:  id_limit > 0 and at least one unID'd item is present */
 
     while (id_limit) {
-        Sprintf(buf, "What would you like to identify %s?",
-                first ? "first" : "next");
+        Sprintf(buf, "最初の持ち物を識別する?" );
         n = query_objlist(buf, &gi.invent, (SIGNAL_NOMENU | SIGNAL_ESCAPE
                                            | USE_INVLET | INVORDER_SORT),
                           &pick_list, PICK_ANY, not_fully_identified);
@@ -2683,13 +2714,13 @@ menu_identify(int id_limit)
         } else if (n == -2) { /* player used ESC to quit menu */
             break;
         } else if (n == -1) { /* no eligible items found */
-            pline("以上だった.");
+            pline("以上.");
             break;
         } else if (!--tryct) { /* stop re-prompting */
             pline1(thats_enough_tries);
             break;
         } else { /* try again */
-            pline("品物を選んでほしい. 取り消すには ESC を使うこと.");
+            pline("持ち物を選んで. 取り消すには ESC を使うこと.");
         }
     }
 }
@@ -2717,7 +2748,7 @@ identify_pack(
 
     if (!unid_cnt) {
         You("持ち物の%sをすでに識別していた.",
-            !learning_id ? "all" : "the rest");
+            !learning_id ? "すべて" : "残り全部");
     } else if (!id_limit || id_limit >= unid_cnt) {
         /* identify everything */
         /* TODO:  use fully_identify_obj and cornline/menu/whatever here */
@@ -2837,8 +2868,8 @@ doperminv(void)
               windowprocs.name);
 
     } else if (!iflags.perm_invent) {
-        pline(
-     "Persistent inventory ('perm_invent' option) is not presently enabled.");
+          pline(
+      "持続型インベントリ表示（'perm_invent' オプション）はまだ有効ではない.");
 
     } else if (!gi.invent) {
         /* [should this be left for the interface to decide?] */
@@ -3063,9 +3094,9 @@ display_pickinv(
     long *out_cnt) /* optional; count player entered when selecting an item */
 {
     static const char /* potential entries for perm_invent window */
-        not_carrying_anything[] = "Not carrying anything",
-        not_using_anything[] = "Not using any items",
-        only_carrying_gold[] = "Only carrying gold";
+        not_carrying_anything[] = "何も持っていない",
+        not_using_anything[] = "何も使っていない",
+        only_carrying_gold[] = "持っているのは金貨だけ";
     struct obj *otmp, wizid_fakeobj, inuse_fakeobj;
     char ilet, ret, *formattedobj;
     const char *invlet = flags.inv_order;
@@ -3224,27 +3255,26 @@ display_pickinv(
         char prompt[QBUFSZ];
 
         unid_cnt = count_unidentified(gi.invent);
-        Sprintf(prompt, "Debug Identify"); /* 'title' rather than 'prompt' */
+        Sprintf(prompt, "デバッグ識別"); /* 'title' rather than 'prompt' */
         if (unid_cnt)
             Sprintf(eos(prompt),
-                    " -- unidentified or partially identified item%s",
+                    " -- 未識別または部分識別の品物%s",
                     plur(unid_cnt));
         add_menu_str(win, prompt);
         if (!unid_cnt) {
             add_menu_str(win,
-                         "(all items are permanently identified already)");
+                         "(すべての品物はすでに恒久識別済みだ)");
             gotsomething = TRUE;
         } else {
             any.a_obj = &wizid_fakeobj;
-            Sprintf(prompt, "select %s to permanently identify",
-                    (unid_cnt == 1) ? "it": "any or all of them");
+            Sprintf(prompt, "恒久識別する対象を選んでほしい");
             /* wiz_identify stuffed the wiz_identify command character (^I)
                into iflags.override_ID for our use as an accelerator;
                it could be ambiguous if player has assigned a letter to
                the #wizidentify command, so include it as a group accelerator
                but use '_' as the primary selector */
             if (unid_cnt > 1)
-                Sprintf(eos(prompt), " (%s for all)",
+                Sprintf(eos(prompt), " (%sで全件)",
                         visctrl(iflags.override_ID));
             add_menu(win, &nul_glyphinfo, &any, '_', iflags.override_ID,
                      ATR_NONE, clr, prompt, MENU_ITEMFLAGS_SKIPINVERT);
@@ -3253,7 +3283,7 @@ display_pickinv(
    } else if (usextra) {
         /* wizard override ID and xtra_choice are mutually exclusive */
         if (flags.sortpack)
-            add_menu_heading(win, "Miscellaneous");
+            add_menu_heading(win, "その他");
         any.a_char = HANDS_SYM; /* '-' */
         add_menu(win, &nul_glyphinfo, &any, HANDS_SYM, 0, ATR_NONE,
                  clr, xtra_choice, MENU_ITEMFLAGS_NONE);
@@ -3276,8 +3306,8 @@ display_pickinv(
             if (inuse_only) {
                 /* for inuse-only, start with an extra header */
                 if (!inusecount++)
-                    add_menu_heading(win, doing_perm_invent ? "In use"
-                                            : "Inventory in use");
+                    add_menu_heading(win, doing_perm_invent ? "使用中"
+                                            : "使用中の持ち物");
             } else if (doing_perm_invent && !show_gold) {
                 /* don't skip gold if it is quivered, even for !show_gold */
                 if (otmp->invlet == GOLD_SYM && !otmp->owornmask) {
@@ -3311,8 +3341,8 @@ display_pickinv(
 
                 /* like doname() below, makeplural() returns an obuf[] */
                 formattedobj = makeplural(body_part(HAND));
-                Sprintf(barehands, "%s %s (no weapon)",
-                        uarmg ? "gloved" : "bare", formattedobj);
+                Sprintf(barehands, "%s %s (武器なし)",
+                    uarmg ? "手袋付きの" : "素手の", formattedobj);
                 add_menu(win, &nul_glyphinfo, &any, ilet, 0,
                          ATR_NONE, clr, barehands, MENU_ITEMFLAGS_NONE);
             } else {
@@ -3353,13 +3383,13 @@ display_pickinv(
         if ((allowxtra && !usextra)
             || (lets && (int) strlen(lets) < inv_cnt(TRUE))) {
             any.a_char = '*';
-            menutext = "(list everything)";
+            menutext = "(すべて表示)";
         } else if (!lets) {
             any.a_char = '?';
-            menutext = "(list likely candidates)";
+            menutext = "(候補を表示)";
         }
         if (menutext) {
-            add_menu_heading(win, "Special");
+            add_menu_heading(win, "特別");
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0, ATR_NONE, clr,
                      menutext, MENU_ITEMFLAGS_NONE);
             gotsomething = TRUE; /* menu isn't empty */
@@ -3505,7 +3535,7 @@ display_used_invlets(char avoidlet)
                 continue;
             invdone = 1;
         }
-        end_menu(win, "Inventory letters used:");
+        end_menu(win, "使用済みのインベントリ文字:");
 
         n = select_menu(win, PICK_ONE, &selected);
         if (n > 0) {
@@ -3827,7 +3857,7 @@ int
 dotypeinv(void)
 {
     static const char
-        prompt[] = "What type of object do you want an inventory of?";
+        prompt[] = "どの種類の品物の一覧がほしい?";
     char c = '\0';
     int n, i = 0;
     char *extra_types, types[BUFSZ], title[QBUFSZ];
@@ -4007,7 +4037,7 @@ dotypeinv(void)
     if (strchr("BUCXP", c)) {
         /* the before and after phrases for "you have no..." can both be
            treated as mutually-exclusive suffices when creating a title */
-        Sprintf(title, "Items %s", (before && *before) ? before : after);
+        Sprintf(title, "%s品物", (before && *before) ? before : after);
         /* get rid of trailing space from 'before' and double-space from
            'after's leading space */
         (void) mungspaces(title);
@@ -4137,10 +4167,9 @@ look_here(
          *  something along the lines of "because it's worn on the outside
          *  so is unreachable from in here...").
          */
-        Sprintf(fbuf, "Contents of %s %s", s_suffix(mon_nam(mtmp)),
-                mbodypart(mtmp, STOMACH));
-        /* Skip "Contents of " by using fbuf index 12 */
-        You("%s%sに何があるのか%s.", &fbuf[12], verb,
+        Sprintf(fbuf, "%sの%s", s_suffix(mon_nam(mtmp)),
+            mbodypart(mtmp, STOMACH));
+        You("%sに何があるのか%s.", fbuf,
             Blind ? "確かめようとした" : "見回した");
         otmp = mtmp->minvent;
         if (otmp) {
@@ -4514,16 +4543,16 @@ doprgold(void)
         char buf[BUFSZ];
 
         if (!umoney) {
-            Strcpy(buf, "Your wallet is empty");
+            Strcpy(buf, "財布は空だ");
         } else {
-            Sprintf(buf, "Your wallet contains %ld %s",
+            Sprintf(buf, "財布には%ld %sが入っている",
                     umoney, currency(umoney));
         }
         if (hmoney) {
             Sprintf(eos(buf),
-                    ", %s you have %ld %s stashed away in your pack",
-                    umoney ? "and" : "but", hmoney,
-                    umoney ? "more" : currency(hmoney));
+                    "%s荷物の中に%ld %sを隠している",
+                    umoney ? "、さらに" : "、だが", hmoney,
+                    umoney ? "ほかに" : currency(hmoney));
         }
         pline("%s.", buf);
     } else {
@@ -5020,7 +5049,7 @@ adjust_split(void)
         splitamount = 1L;
     } else {
         /* get first digit; doesn't wait for <return> */
-        dig = yn_function("Split off how many?", (char *) 0, '\0', TRUE);
+        dig = yn_function("いくつ分ける?", (char *) 0, '\0', TRUE);
         if (!digit(dig)) {
             pline1(Never_mind);
             return ECMD_CANCEL;
@@ -5450,7 +5479,7 @@ display_cinventory(struct obj *obj)
     int n;
     menu_item *selected = 0;
 
-    (void) safe_qbuf(qbuf, "Contents of ", ":", obj,
+    (void) safe_qbuf(qbuf, "", "の中身:", obj,
                      /* custom formatting routines to insert "trapped"
                         into the object's name when appropriate;
                         last resort "that" won't ever get used */
@@ -5506,21 +5535,20 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
         if (!obj->nexthere) {
             boolean more_than_1 = is_plural(obj);
 
-            There("%s %s under the %s here.", more_than_1 ? "are" : "is",
-                  doname(obj), seen_liquid);
+            There("%sの下に%sがある.", seen_liquid, doname(obj));
             n2 = 1;
             /* "pair of boots" is singular but "beneath it" sounds strange */
             if (pair_of(obj))
                 more_than_1 = TRUE;
-            underwhat = more_than_1 ? "under them" : "beneath it";
+            underwhat = more_than_1 ? "その下" : "それの下";
         } else {
-            Sprintf(qbuf, "Things that are under the %s here:", seen_liquid);
+            Sprintf(qbuf, "%sの下にある品物:", seen_liquid);
             if (query_objlist(qbuf, &svl.level.objects[x][y], BY_NEXTHERE,
                               &selected, PICK_NONE, allow_all) > 0)
                 free((genericptr_t) selected), selected = 0;
             for (n2 = 0; obj; obj = obj->nexthere)
                 ++n2;
-            underwhat = "beneath them";
+            underwhat = "その下";
         }
     }
 
@@ -5536,7 +5564,7 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
         go.only.x = x;
         go.only.y = y;
         /* "buried here", but vary if we've already shown underwater items */
-        Sprintf(qbuf, "Things that are buried %s:", underwhat);
+        Sprintf(qbuf, "%sに埋まっている品物:", underwhat);
         if (query_objlist(qbuf, &svl.level.buriedobjlist, INVORDER_SORT,
                           &selected, PICK_NONE, only_here) > 0)
             free((genericptr_t) selected);
