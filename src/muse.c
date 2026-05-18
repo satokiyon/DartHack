@@ -20,6 +20,7 @@ staticfn void mplayhorn(struct monst *, struct obj *, boolean) NONNULLPTRS;
 staticfn void mreadmsg(struct monst *, struct obj *) NONNULLPTRS;
 staticfn void mquaffmsg(struct monst *, struct obj *) NONNULLPTRS;
 staticfn boolean m_use_healing(struct monst *);
+
 staticfn boolean m_sees_sleepy_soldier(struct monst *);
 staticfn void m_tele(struct monst *, boolean, boolean, int);
 staticfn boolean m_next2m(struct monst *);
@@ -83,12 +84,12 @@ precheck(struct monst *mon, struct obj *obj)
                 } else {
                     if (vis) {
                         pline(
-                            "As %s opens the bottle, an enormous %s emerges!",
+                            "%sがボトルを開くと、巨大な%sが現れた！",
                               mon_nam(mon),
                               Hallucination ? rndmonnam(NULL)
-                                            : (const char *) "ghost");
-                        pline("%s is frightened to death,"
-                              " and unable to move.",
+                                                                                        : (const char *) "幽霊");
+                        pline("%sは恐怖で身がすくみ、"
+                              "動けなくなった。",
                               Monnam(mon));
                     }
                     paralyze_monst(mon, 3);
@@ -110,7 +111,7 @@ precheck(struct monst *mon, struct obj *obj)
             } else {
                 if (vis)
                     pline_mon(mtmp, "In a cloud of smoke, %s emerges!", a_monnam(mtmp));
-                pline("%s speaks.", vis ? Monnam(mtmp) : Something);
+                pline("%sは何かを言った。", vis ? Monnam(mtmp) : Something);
                 /* I suspect few players will be upset that monsters */
                 /* can't wish for wands of death here.... */
                 SetVoice(mtmp, 0, 80, 0);
@@ -121,7 +122,7 @@ precheck(struct monst *mon, struct obj *obj)
                 } else {
                     verbalize("ようやくか。");
                     if (vis)
-                        pline("%s vanishes.", Monnam(mtmp));
+                        pline("%sは消えた。", Monnam(mtmp));
                     mongone(mtmp);
                 }
             }
@@ -286,7 +287,7 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
             flash_mon(mtmp);
     }
     if (mtmp->mconf) /* (note: won't get if not seen and hero can't hear) */
-        pline("Being confused, %s mispronounces the magic words...",
+          pline("混乱しているため、%sは魔法の言葉を言い間違えた...",
               vismon ? mon_nam(mtmp) : mhe(mtmp));
 }
 
@@ -1074,8 +1075,7 @@ use_defensive(struct monst *mtmp)
         if (Inhell && mon_has_amulet(mtmp) && !rn2(4)
             && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3)) {
             if (vismon)
-                pline("As %s climbs the stairs, a mysterious force"
-                      " momentarily surrounds %s...",
+                    pline("%sが階段を上ると、謎の力が一瞬%sを包んだ...",
                       mon_nam(mtmp), mhim(mtmp));
             /* simpler than for the player; this will usually be
                the Wizard and he'll immediately go right to the
@@ -1614,7 +1614,7 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
                 monstseesu(M_SEEN_MAGR); /* monsters notice hero resisting */
                 shieldeff(u.ux, u.uy);
                 Soundeffect(se_boing, 40);
-                pline("Boing!");
+                pline("ボイーン！");
                 learnit = TRUE;
             } else if (rnd(20) < 10 + u.uac &&
                        !(gb.buzzer && !gb.buzzer->mwandexp)) {
@@ -1633,7 +1633,7 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
         } else if (resists_magm(mtmp)) {
             shieldeff(mtmp->mx, mtmp->my);
             Soundeffect(se_boing, 40);
-            pline("Boing!");
+            pline("ボイーン！");
             learnit = TRUE;
         } else if (rnd(20) < 10 + find_mac(mtmp)) {
             tmp = d(2, 12);
@@ -1941,7 +1941,7 @@ use_offensive(struct monst *mtmp)
             SetVoice(mtmp, 0, 80, 0);
             verbalize("はいチーズ！");
         } else if (!Blind) {
-            pline("%s takes a picture of you with %s!",
+            pline("%sは%sであなたを撮影した！",
                   Monnam(mtmp), an(xname(otmp)));
         }
         gm.m_using = TRUE;
@@ -2452,11 +2452,10 @@ use_misc(struct monst *mtmp)
         mon_set_minvis(mtmp, !otmp->cursed ? FALSE : TRUE);
         if (vismon && mtmp->minvis) { /* was seen, now invisible */
             if (canspotmon(mtmp)) {
-                pline("%s body takes on a %s transparency.",
-                      upstart(s_suffix(nambuf)),
-                      Hallucination ? "normal" : "strange");
+                    pline("%sの体は%s透明になった。", upstart(nambuf),
+                        Hallucination ? "普通に" : "奇妙に");
             } else {
-                pline("Suddenly you cannot see %s.", nambuf);
+                    pline("突然%sが見えなくなった。", nambuf);
                 if (vis)
                     map_invisible(mtmp->mx, mtmp->my);
             }
@@ -2464,7 +2463,7 @@ use_misc(struct monst *mtmp)
                 makeknown(otmp->otyp);
         } else if (vismon && !mtmp->minvis) {
             /* cursed potion; mon tried to make itself invisible but failed */
-            pline("%s briefly seems to be transparent.", Monnam(mtmp));
+            pline("%sは一瞬透明になったように見えた。", Monnam(mtmp));
             /* we could call map_invisible() before the pline(), then
                newsym() after; unseen monster glyph would be visible during
                the pline, but hero would forget any remembered object under
@@ -2472,7 +2471,7 @@ use_misc(struct monst *mtmp)
         } else if (!vismon && canseemon(mtmp)) {
             /* cursed potion; this won't happen because a monster will only
                drink a potion of invisibility when not already invisible */
-            pline("%s suddenly appears!", Monnam(mtmp));
+            pline("%sが突然現れた！", Monnam(mtmp));
         }
         if (otmp->otyp == POT_INVISIBILITY) {
             if (otmp->cursed)
@@ -2631,8 +2630,7 @@ RESTORE_WARNINGS
 staticfn void
 you_aggravate(struct monst *mtmp)
 {
-    pline("For some reason, %s presence is known to you.",
-          s_suffix(noit_mon_nam(mtmp)));
+    pline("なぜか、%sの存在がわかる。", noit_mon_nam(mtmp));
     cls();
 #ifdef CLIPPING
     cliparound(mtmp->mx, mtmp->my);
@@ -2957,7 +2955,7 @@ mon_consume_unstone(
     }
     if (stoning && vis) {
         if (Hallucination)
-            pline("What a pity - %s just ruined a future piece of art!",
+            pline("なんてことだ。%sが未来の芸術作品を台無しにしてしまった！",
                   mon_nam(mon));
         else
             pline_mon(mon, "%sは身軽になったようだ!", Monnam(mon));
