@@ -1076,64 +1076,61 @@ cyclops
 		[『オデュッセイア』（第9巻）、ホメロス著 ]
 ~sting
 *dagger
-	Is this a dagger which I see before me,
-	The handle toward my hand? Come, let me clutch thee.
-	I have thee not, and yet I see thee still.
-	Art thou not, fatal vision, sensible
-	To feeling as to sight? or art thou but
-	A dagger of the mind, a false creation,
-	Proceeding from the heat-oppressed brain?
-	I see thee yet, in form as palpable
-	As this which now I draw.
-		[ Macbeth, by William Shakespeare ]
+	私の前に見えているのは短剣（ダガー）か、
+	柄が私の手の方を向いているのか？ さあ、掴ませてくれ。
+	おまえを掴むことはできないが、それでもおまえが見える。
+	おお、不吉な幻よ、おまえは
+	視覚だけでなく触覚でも感じられるのか？ それともおまえは
+	単なる心の短剣であり、熱に浮かされた脳が生み出した
+	虚構に過ぎないのか？
+	それでもまだ見える、形は今私が
+	引き抜こうとしているこれと同じようにはっきりと。
+		[『マクベス』、ウィリアム・シェイクスピア著 ]
 dark one
-	... But he ruled rather by force and fear, if they might
-	avail; and those who perceived his shadow spreading over the
-	world called him the Dark Lord and named him the Enemy; and
-	he gathered again under his government all the evil things of
-	the days of Morgoth that remained on earth or beneath it,
-	and the Orcs were at his command and multiplied like flies.
-	Thus the Black Years began ...
-		[ The Silmarillion, by J.R.R. Tolkien ]
+	... だが、彼は利用できるものならむしろ力と恐怖によって支配した。
+	世界に広がる彼の影を察知した者たちは、彼を闇の主（ダークロード）と
+	呼び、敵（エネミー）と名付けた。彼はかつてモルゴスの時代に地上や
+	その下に残されていた邪悪なものたちを再び自らの支配下に集め、
+	オークたちは彼の命令に従って、蝿のように増殖した。
+	こうして暗黒の時代が始まったのである...
+		[『シルマリルの物語』、J・R・R・トールキン著 ]
 # includes "dart trap"
 dart*
-	Darts are missile weapons, designed to fly such that a sharp,
-	often weighted point will strike first.  They can be
-	distinguished from javelins by fletching (i.e., feathers on
-	the tail) and a shaft that is shorter and/or more flexible,
-	and from arrows by the fact that they are not of the right
-	length to use with a normal bow.
-		[ Wikipedia, the free encyclopedia ]
+	ダーツは投擲武器であり、鋭く、しばしば重りのついた先端が最初に
+	命中するように設計されている。尾部に羽（フレッチング）があり、
+	シャフトがより短く、かつ／またはより柔軟であるという点で
+	投げ槍（ジャベリン）と区別される。また、通常の弓で使うには
+	長さが適していないという点で矢（アロー）とも区別される。
+		[ ウィキペディア、フリー百科事典 ]
 
-	Against my foe I hurled a murderous dart.
-	He caught it in his hand -- I heard him laugh --
-	I saw the thing that should have pierced his heart
-	Turn to a golden staff.
-		[ Gifts, by Mary Coleridge ]
+	我が敵に対し、私は殺意を込めたダーツを投げつけた。
+	彼はそれを手で受け止め――私は彼の笑い声を聞いた――
+	彼の心臓を貫くはずだったそのものが
+	黄金の杖へと変わるのを、私は見た。
+		[『贈り物』、メアリー・コールリッジ著 ]
 demogorgon
-	A terrible deity, whose very name was capable of producing the
-	most horrible effects.  He is first mentioned by the 4th-century
-	Christian writer, Lactantius, who in doing so broke with the
-	superstition that the very reference to Demogorgon by name
-	brought death and disaster.
-		[ Brewer's Concise Dictionary of Phrase and Fable ]
+	その名を聞くだけで恐ろしい効果をもたらすと言われる、恐るべき神。
+	4世紀のキリスト教作家ラクタンティウスが初めて言及したが、彼は
+	デモゴルゴンの名を出すこと自体が死と災いをもたらすという迷信を
+	打ち破ったのである。
+		[『ブリュワー慣用句・寓話辞典』 ]
 
-	Demogorgon, the prince of demons, wallows in filth and can
-	spread a quickly fatal illness to his victims while rending
-	them.  He is a mighty spellcaster, and he can drain the life
-	of mortals with a touch of his tail.
+	デモゴルゴン、悪魔の王子は、不潔な場所を好み、犠牲者を
+	引き裂きながら即死性の病を蔓延させる。彼は強力な魔法の
+	使い手であり、尻尾で触れることで定命の者の生命を
+	吸い取ることができる。
 # takes "major demon" when specifying '&'
 demon
 major demon
-	It is often very hard to discover what any given Demon looks
-	like, apart from a general impression of large size, huge
-	fangs, staring eyes, many limbs, and an odd color; but all
-	accounts agree that Demons are very powerful, very Magic (in
-	a nonhuman manner), and made of some substance that can squeeze
-	through a keyhole yet not be pierced with a Sword.  This makes
-	them difficult to deal with, even on the rare occasions when
-	they are friendly.
-	  [ The Tough Guide to Fantasyland, by Diana Wynne Jones ]
+	特定の悪魔（デーモン）がどのような姿をしているかを突き止めるのは
+	非常に困難であることが多い。巨大な体、巨大な牙、剥き出しの目、
+	多くの四肢、そして奇妙な色という一般的な印象を除けば。しかし
+	すべての記録が一致しているのは、悪魔は非常に強力で、非常に魔法的
+	（人間以外のやり方で）であり、鍵穴を通り抜けることができるが
+	剣では貫けないような物質でできているということである。このため、
+	彼らが友好的であるという稀な機会においてさえ、対処するのは困難
+	である。
+	  [『ファンタジーランドの過酷なガイド』、ダイアナ・ウィン・ジョーンズ著 ]
 # added by PR #1108 by NullCGT then replaced by PR #1109 by entrez
 # (Demonbane has been changed from a sword to a mace so the new quote doesn't
 # seem to be very appropriate)
@@ -1145,100 +1142,88 @@ demonbane
 #	forsaken, and still obeys.
 #		[ The Screwtape Letters, by C.S. Lewis ]
 #
-	Think not that I am come to send peace on earth:  I came not to
-	send peace, but a sword.
-		[ The Gospel According to Matthew, 10:34 ]
+	わたしがきたのは地上に平和をもたらすためだと思うな。
+	平和ではなく、つるぎを投げ込むためにきたのである。
+		[『マタイによる福音書』、10:34 ]
 dented pot
-	Here was a sight to beat all: a man in the prime of life rambling
-	barefoot down the wilderness road, dressed in raggedy pantaloons
-	sewn out of two meal sacks, a shirt so tattered and scrappish
-	that its owner had a proud choice of holes to stick his arms
-	through, and -- the crowning glory -- a hat in the exact
-	likeness of a tin mush pot, somewhat dented, but snugly fitted,
-	with the handle turned to one side, as if it were the very
-	latest and smartest of fashions.
-		[ Johnny Appleseed, by James Howard Kunstler ]
+	ここには、すべてを圧倒するような光景があった。人生の盛りに、荒野の
+	道を裸足でぶらぶらと歩いている男だ。二枚の食事袋を縫い合わせたボロボロ
+	の短ズボンを履き、シャツはあまりにボロボロで継ぎはぎだらけだったので、
+	持ち主は腕を通す穴を誇らしげに選べるほどだった。そして――仕上げの
+	栄光として――錫（すず）のマッシュ・ポットを正確に模した帽子を被って
+	いた。それはいくらか凹んでいた（デンティッド）が、ぴったりとフィット
+	しており、取っ手は片側に向けられていた。まるでそれが最新で最高に
+	スマートなファッションであるかのように。
+		[『ジョニー・アップルシード』、ジェームズ・ハワード・クンストラー著 ]
 diamond
-	The hardest known mineral (with a hardness of 10 on Mohs' scale).
-	It is an allotropic form of pure carbon that has crystallized in
-	the cubic system, usually as octahedra or cubes, under great
-	pressure.
-		[ A Concise Dictionary of Physics ]
+	既知の鉱物の中で最も硬いもの（モース硬度10）。これは純粋な炭素の
+	同素体であり、巨大な圧力の下で等軸晶系（通常は八面体または六面体）に
+	結晶化したものである。
+		[『コンサイス物理学辞典』 ]
 
-	The diamond, _adamas_ or _dyamas_, is a transparent stone, like
-	crystal, but having the colour of polished iron, but it cannot
-	be destroyed by iron, fire or any other means, unless it is
-	placed in the hot blood of a goat; with sharp pieces of diamond
-	other stones are engraved and polished.  It is no greater than
-	a small nut.  There are six kinds, however Adamant attracts
-	metal; it expels venom; it produces amber (and is efficacious
-	against empty fears and for those resisting spells).  It is
-	found in India, in Greece and in Cyprus, where magicians make
-	use of it.  It gives you courage; it averts apparitions; it
-	removes anger and quarrels; it heals the mad; it defends you
-	from your enemies.  It should be set in gold or silver and worn
-	on the left arm.  It is likewise found in Arabia.
-	 	[ The Aberdeen Bestiary, translated by Colin McLaren ]
+	ダイヤモンド、adamas または dyamas は、水晶のように透明な石であるが、
+	磨かれた鉄のような色をしている。鉄や火、あるいは他のいかなる手段に
+	よっても破壊することはできないが、雄山羊の温かい血の中に置かれた
+	ときだけは例外である。ダイヤモンドの鋭い破片を使えば、他の石を刻んだり
+	磨いたりすることができる。それは小さなナット（木の実）よりも大きくはない。
+	6つの種類がある。しかしアダマント（金剛石）は金属を引き寄せ、毒を
+	退け、琥珀を生み出す（そして空虚な恐怖や呪文に抵抗する者に対して
+	効果がある）。それはインド、ギリシャ、キプロスで見つかり、魔術師
+	たちがそれを利用する。それは勇気を与え、幻影を遠ざけ、怒りや争いを取り
+	除き、狂人を癒し、敵からあなたを守る。それは金や銀にセットして、左腕に
+	着けるべきである。同様にアラビアでも見つかる。
+	 	[『アバディーン・ベストゥアリ（動物寓意集）』、コリン・マクラーレン訳 ]
 dilithium*
-	The most famous and the first to be named of the imaginary
-	"minerals" of Star Trek is dilithium. ... Because of this
-	mineral's central role in the storyline, a whole mythology
-	surrounds it.  It is, however, a naturally occurring substance
-	within the mythology, as there are various episodes that
-	make reference to the mining of dilithium deposits. ...
-	This name itself is imaginary and gives no real information on
-	the structure or make-up of this substance other than that this
-	version of the name implies a lithium and iron-bearing
-	aluminosilicate of some sort.  That said, the real mineral that
-	most closely matches the descriptive elements of this name is
-	ferroholmquistite which is a dilithium triferrodiallosilicate.
-	If one goes on the premise that nature follows certain general
-	norms, then one could extrapolate that dilithium might have a
-	similar number of silicon atoms in its structure.
-	Keeping seven (i.e. hepto) ferrous irons and balancing the
-	oxygens would give a theoretical formula of Li2Fe7Al2Si8O27.
-	A mineral with this composition could theoretically exist,
-	although it is doubtful that it would possess the more fantastic
-	properties ascribed to dilithium.
-		[ The Mineralogy of Star Trek, by Jeffrey de Fourestier ]
+	『スター・トレック』に登場する架空の「鉱物」の中で最も有名で、最初に
+	名付けられたのがジリチウム（ディリチウム）である。... この鉱物が
+	物語の中で中心的な役割を果たしているため、その周囲には一つの神話が
+	形成されている。しかし、神話の中では天然に存在する物質であり、
+	ジリチウム鉱床の採掘に言及するエピソードがいくつかある。... この名称
+	自体は架空のものであり、リチウムと鉄を含むある種のアルミノケイ酸塩で
+	あることを示唆している以外、その構造や組成に関する実質的な情報は
+	与えていない。とはいえ、この名称の記述要素に最も密接に一致する実在の
+	鉱物はフェロホルムクイスト石であり、これはジリチウム・三鉄・二アル
+	ミニウム・八ケイ酸・二十七酸素（Li2Fe7Al2Si8O27）である。自然界が
+	一定の規範に従うという前提に立てば、ジリチウムもその構造の中に同様の
+	数のケイ素原子を持っていると推測できる。7つの鉄原子（すなわちヘプト）
+	を維持し、酸素のバランスを取ると、理論的な化学式は Li2Fe7Al2Si8O27
+	となる。このような組成の鉱物は理論的には存在しうるが、ジリチウムに
+	帰せられているような幻想的な特性を備えているかどうかは疑わしい。
+		[『スター・トレックの鉱物学』、ジェフリー・ド・フレステイエ著 ]
 dingo
-	A wolflike wild dog, Canis dingo, of Australia, having a
-	reddish- or yellowish-brown coat, believed to have been
-	introduced by the aborigines.
-		[ Webster's Encyclopedic Unabridged Dictionary
-		    of the English Language ]
+	オーストラリアに生息する狼のような野生の犬、カニス・ディンゴ。
+	赤褐色または黄褐色の毛並みを持ち、先住民（アボリジニ）によって
+	持ち込まれたと考えられている。
+		[『ウェブスター英語百科辞典』 ]
 disenchanter
-	Ask not, what your magic can do to it.  Ask what it can do
-	to your magic.
+	魔法がディセンチャンター（魔力消去者）に対して何ができるかを問うては
+	ならない。ディセンチャンターがあなたの魔法に対して何ができるかを
+	問うべきである。
 dispater
-	The Roman ruler of the underworld and fortune, similar to the
-	Greek Hades.  Every hundred years, the Ludi Tarentini were
-	celebrated in his honor.  The Gauls regarded Dis Pater as
-	their ancestor.  The name is a contraction of the Latin Dives,
-	"the wealthy", Dives Pater, "the wealthy father", or "Fater
-	Wealth".  It refers to the wealth of precious stone below the
-	earth.
-		[ Encyclopedia Mythica, ed. M.F. Lindemans ]
+	ギリシャのハデスに似た、冥界と富を司るローマの支配者。100年ごとに、
+	ルディ・タレンティーニが彼を称えて祝われた。ガリア人はディス・
+	パテルを自分たちの祖先と見なしていた。その名はラテン語の Dives
+	（裕福な）、Dives Pater（裕福な父）、あるいは Fater Wealth
+	（富の父）の短縮形である。これは地中の貴石の富を指している。
+		[『エンサイクロペディア・ミシカ』、M・F・リンデマンス編 ]
 # 5.0; monster adapted from slash'em based on an AD&D Monster Manual entry;
 # slash'em lacked a description so this entry has been created from scratch;
 # the puma comparison is how the AD&D monster is described (except that
 # that creature has six legs and two tentacles!) but the actual monster's
 # behavior is substantially different
 displacer beast
-	This strange creature appears to be mutant form of puma (aka
-	cougar or mountain lion) which lives in underground settings
-	rather than outdoor wilderness.  It is capable of exchanging
-	positions with people or creatures in its path and is not
-	fooled by displaced images of others.
+	この奇妙な生き物は、屋外の荒野ではなく地下の環境に生息するピューマ
+	（別名クーガー、マウンテンライオン）の変異種のようである。
+	進路上にいる人々や生き物と位置を入れ替えることができ、他者の
+	変位した幻影に惑わされることもない。
 djinn*
-	The djinn are genies from the elemental plane of Air.  There,
-	among their kind, they have their own societies.  They are
-	sometimes encountered on earth and may even be summoned here
-	to perform some service for powerful wizards.  The wizards
-	often leave them about for later service, safely tucked away
-	in a flask or lamp.  Once in a while, such a tool is found by
-	a lucky rogue, and some djinn are known to be so grateful
-	when released that they might grant their rescuer a wish.
+	ジン（魔神）は風のエレメンタル界から来た精霊である。そこでは同族の
+	間で独自の社会を形成している。地上でも遭遇することがあり、強力な
+	魔術師によって使役されるために召喚されることもある。魔術師たちはしば
+	しば、後で使うために彼らを瓶やランプの中に閉じ込めて放置する。
+	運の良い悪党がそのような道具を見つけることが稀にあり、ジンの中には
+	解放されたことに深く感謝し、救助者に願いを叶えてくれるものもいると
+	知られている。
 # takes "dog or other canine" when specifying 'd'
 ~hachi
 ~slasher
@@ -1246,164 +1231,152 @@ djinn*
 *dog
 pup*
 *canine
-	A domestic animal, the _tame dog_ (_Canis familiaris_), of
-	which numerous breeds exist.  The male is called a dog,
-	while the female is called a bitch.  Because of its known
-	loyalty to man and gentleness with children, it is the
-	world's most popular domestic animal.  It can easily be
-	trained to perform various tasks.
+	家畜化された動物、「飼い犬」（Canis familiaris）であり、数多くの
+	犬種が存在する。オスはドッグ、メスはビッチと呼ばれる。人間に対する
+	忠誠心や子供に対する優しさで知られており、世界で最も人気のある家畜
+	である。様々な任務を遂行するよう容易に訓練することができる。
 # typing "spellbook or a closed door" (map description for "+" when using
 # the default symbol set) shouldn't yield this entry
 ~trap*door
 ~*spellbook*
 *door
 doorway
-	Through me you pass into the city of woe:
-	Through me you pass into eternal pain:
-	Through me among the people lost for aye.
-	Justice the founder of my fabric mov'd:
-	To rear me was the task of power divine,
-	Supremest wisdom, and primeval love.
-	Before me things create were none, save things
-	Eternal, and eternal I endure.
-	All hope abandon ye who enter here.
-	    [ The Inferno, from The Divine Comedy of Dante Alighieri,
-	      translated by H.F. Cary ]
+	私を通り抜けて、悲嘆の都市（まち）へと至る：
+	私を通り抜けて、永遠の苦痛へと至る：
+	私を通り抜けて、永遠に失われし人々の中へと至る。
+	正義は、我が創造主を動かし：
+	神の力、最高の知恵、そして始原の愛が
+	私を造り上げた。
+	私の前に造られたものはなく、ただ
+	永遠なるもののみがあり、私は永遠に耐え忍ぶ。
+	ここに入る者は、一切の希望を捨てよ。
+	    [ ダンテ・アリギエーリ著『神曲 地獄篇』、H・F・キャリー訳 ]
 doppelganger
-	"Then we can only give thanks that this is Antarctica, where
-	there is not one, single, solitary, living thing for it to
-	imitate, except these animals in camp."
+	「それなら、ここが南極であることに感謝するしかないな。ここには、
+	キャンプにいる動物たちを除けば、あいつが模倣できる生き物は
+	ただの一匹もいないんだから」
 
-	"Us," Blair giggled. "It can imitate us. Dogs can't make four
-	hundred miles to the sea; there's no food. There aren't any
-	skua gulls to imitate at this season. There aren't any
-	penguins this far inland. There's nothing that can reach the
-	sea from this point - except us. We've got brains. We can do
-	it. Don't you see - it's got to imitate us - it's got to be one
-	of us - that's the only way it can fly an airplane - fly a plane
-	for two hours, and rule - be - all Earth's inhabitants. A world
-	for the taking - if it imitates us!
-		[ Who Goes There?, by John W. Campbell ]
+	「僕たちがいる」ブレアがクスクス笑った。「あいつは僕たちを模倣できる。
+	犬は海までの400マイルを走破できない。食べ物がないからだ。今の季節、
+	模倣できるトウゾクカモメもいない。これほど内陸にはペンギンもいない。
+	ここから海に辿り着けるものは何もない――僕たちを除いてはね。
+	僕たちには脳がある。僕たちならやれる。わからないか――あいつは
+	僕たちを模倣しなけりゃならないんだ――僕たちの誰かにならなけりゃ
+	ならないんだ――そうでなきゃ、飛行機を操縦して2時間も飛ばし、
+	支配し――なりきる――地球の全住民に、なんてことはできないんだ。
+	僕たちを模倣しさえすれば、世界はあいつのものなんだ！」
+		[『影の軍団（遊星よりの物体X）』、ジョン・W・キャンベル著 ]
 
-	Xander: Let go!  I have to kill the demon bot!
-	Xander Double (grabbing the gun): Anya, get out of the way.
-	Buffy: Xander!
-	Xander Double: That's all right, Buffy.  I have him.
-	Xander: No, Buffy, I'm me.  Help me!
-	Anya: My gun, he's got my gun.
-	Riley: You own a gun?
-	Buffy: Xander, gun holding Xander, give it to me.
-	Anya: Buffy, which one's real?
-	Xander: I am.
-	Xander Double: No, _I_ am.
-	    [ Buffy the Vampire Slayer, Episode 5.03, "The Replacement" ]
+	ザンダー：放せ！ あのデモン・ボットを殺さなきゃならないんだ！
+	ザンダーの分身（銃を奪いながら）：アーニャ、どいて。
+	バフィー：ザンダー！
+	ザンダーの分身：大丈夫だ、バフィー。捕まえたぞ。
+	ザンダー：違う、バフィー、僕が本物だ。助けて！
+	アーニャ：私の銃、あいつが私の銃を持ってる。
+	ライリー：君、銃なんて持ってたのか？
+	バフィー：ザンダー、銃を持ってる方のザンダー、それを渡しなさい。
+	アーニャ：バフィー、どっちが本物なの？
+	ザンダー：僕だ。
+	ザンダーの分身：いいえ、『僕』です。
+	    [『バフィー 〜恋する十字架〜』、第5シーズン第3話「交代」 ]
 *dragon
 *xoth
-	In the West the dragon was the natural enemy of man.  Although
-	preferring to live in bleak and desolate regions, whenever it
-	was seen among men it left in its wake a trail of destruction
-	and disease.  Yet any attempt to slay this beast was a perilous
-	undertaking.  For the dragon's assailant had to contend
-	not only with clouds of sulphurous fumes pouring from its fire
-	breathing nostrils, but also with the thrashings of its tail,
-	the most deadly part of its serpent-like body.
-	 [ Mythical Beasts, by Deirdre Headon (The Leprechaun Library) ]
+	西洋において、ドラゴンは人間の天敵であった。荒涼とした荒れ果てた
+	地域に住むことを好むものの、人間の間に姿を現せば、その跡には
+	破壊と疫病の道が残された。しかし、この獣を退治しようとする試みは
+	危険な冒険であった。ドラゴンの攻撃者は、火を吐く鼻孔から噴き出す
+	硫黄の煙の雲だけでなく、蛇のような体の最も致命的な部分である、
+	尻尾による強打とも戦わなければならなかったからである。
+	 [『幻の動物たち』、ディアドラ・ヘイドン（レプラコーン・ライブラリ） ]
 
-	"One whom the dragons will speak with," he said, "that is a
-	dragonlord, or at least that is the center of the matter.  It's
-	not a trick of mastering the dragons, as most people think.
-	Dragons have no masters.  The question is always the same, with
-	a dragon:  will he talk to you or will he eat you?  If you can
-	count upon his doing the former, and not doing the latter, why
-	then you're a dragonlord."
-		[ The Tombs of Atuan, by Ursula K. Le Guin ]
+	「ドラゴンが言葉を交わす相手」と彼は言った。「それがドラゴンロードだ。
+	少なくとも、それが核心だ。多くの人が考えているように、ドラゴンを
+	乗りこなす術のことではない。ドラゴンには主人はいない。ドラゴンに関
+	する問いは、常に同じだ： 奴はおまえと話をするか、それともおまえを
+	食べるか？ もし奴に前者を選ばせ、後者をさせないようにできるなら、
+	そのときおまえはドラゴンロードなのだ」
+		[『アチュアンの墓』、アーシュラ・K・ル＝グウィン著 ]
 *dragon*scale*
-	Stephen had argued, and the expert armorer had grudgingly
-	admitted, that dragonscale shield or armor, provided it proved
-	feasible to make at all, ought to offer some real, practical
-	advantages over any metal breastplate or shield -- gram for
-	gram of weight, such a defense would probably be a lot
-	tougher and more protective than any human smiths could
-	make of steel.
-		[ The Last Book of Swords: Shieldbreaker's Story,
-			by Fred Saberhagen ]
+	スティーブンは主張し、熟練の甲冑師も渋々認めたことだが、
+	ドラゴンスケール（竜の鱗）の盾や鎧は、もし製造が可能であれば、
+	いかなる金属製の胸当てや盾に対しても、実質的で実用的な利点を
+	提供するはずだ――同じ重量であれば、そのような防御具はおそらく
+	人間の鍛冶屋が鋼鉄で作れるいかなるものよりもはるかに強靭で、
+	保護能力が高いだろう。
+		[『最後の剣の書：シールドブレイカー物語』、
+			フレッド・セイバーヘーゲン著 ]
 dragonbane
-	And now the youth
-	was to enter the line of battle with his lord,
-	his first time to be tested as a fighter.
-	His spirit did not break and the ancestral blade
-	would keep its edge, as the dragon discovered
-	as soon as they came together in combat.
-		[ Beowulf, translated by Seamus Heaney ]
+	そして今、若者は
+	主君と共に戦列に加わろうとしていた、
+	戦士として試されるのは、これが初めてだった。
+	彼の精神は挫けず、祖先伝来の刃は
+	その鋭さを保ち続けた、ドラゴンが
+	戦いで相まみえた瞬間に思い知ったように。
+		[『ベオウルフ』、シーマス・ヒーニー訳 ]
 *drum*
-	Many travelers have seen the drums of the great apes, and
-	some have heard the sounds of their beating and the noise of
-	the wild, weird revelry of these first lords of the jungle,
-	but Tarzan, Lord Greystoke, is, doubtless, the only human
-	being who ever joined in the fierce, mad, intoxicating revel
-	of the Dum-Dum.
-		[ Tarzan of the Apes, by Edgar Rice Burroughs ]
+	多くの旅行者が類人猿たちのドラムを目にし、その鼓動の音や、ジャングルの
+	最初の主（ロード）たちの荒々しく不気味な乱痴気騒ぎの音を聞いたことが
+	あるが、類人猿の集会（ダムダム）の激しく、狂おしく、陶酔させるような
+	騒ぎに加わったことのある人間は、疑いなくグレイストーク卿ターザン
+	ただ一人である。
+		[『類人猿ターザン』、エドガー・ライス・バローズ著 ]
 dunce*
-	A dunce cap, also variously known as a dunce hat, dunce's
-	cap, or dunce's hat, is a tall conical hat.  In popular
-	culture, it is typically made of paper and often marked with
-	a D, and given to schoolchildren to wear as punishment for
-	being stupid or lazy.  While this is now a rare practice,
-	it is frequently depicted in popular culture such as
-	children's cartoons.
-		[ Wikipedia, the free encyclopedia ]
+	ダンス・キャップ（学帽）は、ダンス・ハットとも呼ばれ、背の高い円錐形の
+	帽子である。大衆文化においては通常紙で作られ、しばしば「D」の文字が
+	記されており、愚かであったり怠惰であったりする罰として学童に被らされる。
+	現在では稀な慣習となっているが、子供向けのカートゥーンなどの大衆文化
+	では頻繁に描かれている。
+		[ ウィキペディア、フリー百科事典 ]
 dungeon*
-	At once as far as Angels kenn he views
-	The dismal Situation waste and wilde,
-	A Dungeon horrible, on all sides round
-	As one great Furnace flam'd, yet from those flames
-	No light, but rather darkness visible
-	Serv'd only to discover sights of woe,
-	Regions of sorrow, doleful shades, where peace
-	And rest can never dwell, hope never comes
-	That comes to all; but torture without end
-	Still urges, and a fiery Deluge, fed
-	With ever-burning Sulphur unconsum'd:
-	Such place Eternal Justice had prepar'd
-	For those rebellious, here their Prison ordain'd
-	In utter darkness, and their portion set
-	As far remov'd from God and light of Heav'n
-	As from the Center thrice to th' utmost Pole.
-		[ Paradise Lost, by John Milton ]
+	たちまち、天使の目にも届く限りの
+	荒涼として荒れ果てた惨状が広がる、
+	恐るべき地下牢（ダンジョン）、四方は
+	巨大な炉のごとく燃え盛るが、その炎からは
+	光はなく、むしろ目に見える暗黒が
+	ただ悲嘆の光景を暴き出すのみ、
+	悲哀の領域、愁いの影、そこには平和も
+	安らぎも決して住まわず、希望も決して来ない、
+	万人に来る希望さえも；ただ果てしない拷問が
+	常に迫り、燃え続ける硫黄を糧とする
+	火の奔流が絶えることなく流れる：
+	永遠の正義が、反逆者たちのために
+	用意した場所、ここが彼らの監獄と定められ
+	完全な暗黒の中に、彼らの分（わけまえ）が置かれた、
+	神と天の光から遠く隔たった場所に
+	中心から極点までの距離の三倍も遠くに。
+		[『失楽園』、ジョン・ミルトン著 ]
 ~dwarf ??m*
 ~dwar* cloak
 #~dwar* cave*man
 dwarf*
-	Dwarfs have faces like men (ugly men, with wrinkled, leathery
-	skins), but are generally either flat-footed, duck-footed, or
-	have feet pointing backwards.  They are of the earth, earthy,
-	living in the darkest of caverns and venturing forth only
-	with the cloaks by which they can make themselves invisible,
-	and others disguised as toads.  Miners often come across them,
-	and sometimes establish reasonably close relations with them.
-	... The miners of Cornwall were always delighted to hear a
-	bucca busily mining away, for all dwarfs have an infallible
-	nose for precious metals.
-	Among other things, dwarfs are rightly valued for their skill
-	as blacksmiths and jewellers: they made Odin his famous spear
-	Gungnir, and Thor his hammer; for Freya they designed a
-	magnificent necklace, and for Frey a golden boar.  And in their
-	spare time they are excellent bakers.  Ironically, despite
-	their odd feet, they are particularly fond of dancing.  They
-	can also see into the future, and consequently are excellent
-	meteorologists.  They can be free with presents to people
-	they like, and a dwarvish gift is likely to turn to gold in
-	the hand.  But on the whole they are a snappish lot.
-	    [ The Immortals, by Derek and Julia Parker ]
+	ドワーフは人間のような顔（しわくちゃで革のような肌をした、醜い人間の
+	ような顔）をしているが、一般的に扁平足か、アヒルのような足か、あるい
+	は後ろを向いた足をしている。彼らは大地の、土のような存在であり、
+	最も暗い洞窟に住み、姿を消すことができるクロークを羽織ったり、
+	ガマに変装したりして外出する。坑夫たちはしばしば彼らに遭遇し、
+	時にはかなり親密な関係を築くこともある。... コーンウォールの
+	坑夫たちは、ブッカ（ドワーフの一種）がいそいそと採掘している音を
+	聞くのを常に喜んでいた。なぜなら、すべてのドワーフは貴金属を
+	嗅ぎ分ける確かな鼻を持っているからである。
+	とりわけ、ドワーフはその鍛冶屋や宝石細工師としての技術を正当に評価
+	されている：彼らはオーディンに有名な槍グングニルを、トールには
+	そのハンマーを作った。フレイヤには見事なネックレスを、フレイには
+	黄金の猪をデザインした。そして暇なときには、彼らは優れたパン焼き
+	職人でもある。皮肉なことに、奇妙な足をしているにもかかわらず、
+	彼らは特に踊りを好む。彼らは未来を見ることもでき、その結果、優れた
+	気象学者でもある。気に入った相手には気前よくプレゼントをすることもあり、
+	ドワーフの贈り物は手に持つと黄金に変わることが多い。だが概して、
+	彼らは怒りっぽい連中である。
+	    [『不死なる者たち』、デレクおよびジュリア・パーカー著 ]
 # accept "dwarfish" and "dwarvish"
 dwar* cloak
 hooded cloak
-	That's how they all came to start, jogging off from the inn one
-	fine morning just before May, on laden ponies; and Bilbo was
-	wearing a dark-green hood (a little weather-stained) and a
-	dark-green cloak borrowed from Dwalin.  They were too large for
-	him, and he looked rather comic.
-		[ The Hobbit, by J.R.R. Tolkien ]
+	こうして彼らは出発することになった。5月の直前のある晴れた朝、
+	荷物を積んだポニーに乗って宿屋からゆっくりと進み出したのである。
+	ビルボは（少し天候で汚れた）濃緑色の頭巾（フード）と、ドワリンから
+	借りた濃緑色のクロークを身に着けていた。それらは彼には大きすぎて、
+	かなり滑稽な姿に見えた。
+		[『ホビットの冒険』、J・R・R・トールキン著 ]
 earendil
 elwing
 	In after days, when because of the triumph of Morgoth Elves and
@@ -2181,26 +2154,22 @@ healer
 attendant
 doctor
 physician
-	I swear by Apollo the physician, and Aesculapius, and Health,
-	and All-heal, and all the gods and goddesses, that, according
-	to my ability and judgment, I will keep this Oath and this
-	stipulation -- to reckon him who taught me this Art equally dear
-	to me as my parents, to share my substance with him, and relieve
-	his necessities if required; to look upon his offspring in the
-	same footing as my own brothers, and to teach them this art, if
-	they shall wish to learn it, without fee or stipulation; and
-	that by precept, lecture, and every other mode of instruction,
-	I will impart a knowledge of the Art to my own sons, and those
-	of my teachers, and to disciples bound by a stipulation and oath
-	according to the law of medicine, but to none others.  I will
-	follow that system of regimen which, according to my ability and
-	judgment, I consider for the benefit of my patients, and abstain
-	from whatever is deleterious and mischievous.  [...]
-		[ Hippocrates' Oath, translated by Francis Adams ]
+	医神アポロン、アスクレピオス、ヒギエイア、パナケイア、および
+	すべての神々、女神々に誓う。私の能力と判断に従って、この誓いと
+	規約を履行することを。――この術を私に教えた人を、実の親と
+	同等に尊び、私の持ち物を共有し、必要とあらば彼の窮乏を救うことを。
+	彼の子供たちを自らの兄弟と見なし、彼らが学びたいと願うなら、
+	報酬も規約もなしにこの術を教えることを。規約と誓いによって
+	結ばれた、医学の法に従う自分の息子たち、師の息子たち、および
+	弟子たちに対しては、教訓や講義、その他あらゆる教育手段によって
+	術の知識を伝えるが、それ以外の誰に対しても伝えないことを。
+	私の能力と判断に従って、患者の利益になると考える養生法を
+	採用し、有害で悪意のあるものからは遠ざかることを。[...]
+		[『ヒポクラテスの誓い』、フランシス・アダムス訳 ]
 
-	PHYSICIAN, n.  One upon whom we set our hopes when ill and our
-	dogs when well.
-		[ The Devil's Dictionary, by Ambrose Bierce ]
+	医師（フィジシャン）：名詞。病気のときには自分たちの希望を託し、
+	健康なときには自分たちの犬を託す相手。
+		[『悪魔の辞典』、アンブローズ・ビアス著 ]
 heart of ahriman
 	The other three drew in their breath sharply, and the dark,
 	powerful man who stood at the head of the sarcophagus whispered:
