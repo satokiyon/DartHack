@@ -511,7 +511,7 @@ doread(void)
         }
         if (flags.verbose)
             pline("こう書かれている:");
-        Sprintf(buf, "%s", pmname(pm, NEUTRAL));
+        Sprintf(buf, "%s", jp_pmname(pm, NEUTRAL));
         pline("\"Magic Marker(TM) %s 赤インクマーカーペン. 水溶性.\"",
               upwords(buf));
         if (!u.uconduct.literate++)
@@ -2848,7 +2848,7 @@ do_genocide(
     if (how & PLAYER) {
         mndx = u.umonster; /* non-polymorphed mon num */
         ptr = &mons[mndx];
-        Strcpy(buf, pmname(ptr, Ugender));
+        Strcpy(buf, jp_pmname(ptr, Ugender));
         killplayer++;
     } else {
         buf[0] = '\0'; /* init for EDIT_GETLIN */
@@ -2948,7 +2948,7 @@ do_genocide(
     if (Hallucination) {
         /* hallucinate hero's type */
         if (Upolyd) {
-            Strcpy(buf, pmname(gy.youmonst.data,
+            Strcpy(buf, jp_pmname(gy.youmonst.data,
                                flags.female ? FEMALE : MALE));
         } else {
             Strcpy(buf, (flags.female && gu.urole.name.f) ? gu.urole.name.f

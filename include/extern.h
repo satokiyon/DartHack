@@ -742,6 +742,8 @@ extern const char *lookup_novel(const char *, int *) NONNULLARG1;
 extern int Mgender(struct monst *) NONNULLARG1;
 extern const char *pmname(struct permonst *, int) NONNULLARG1;
 #endif
+extern const char *jp_pmname(struct permonst *, int) NONNULLARG1;
+extern const char *jp_pmname_from_idx(int, int);
 extern const char *mon_pmname(struct monst *) NONNULLARG1;
 extern const char *obj_pmname(struct obj *) NONNULLARG1;
 

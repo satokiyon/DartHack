@@ -116,7 +116,7 @@ self_lookat(char *outbuf)
     Sprintf(outbuf, "%s%s%s、名は%s",
             /* being blinded may hide invisibility from self */
             (Invis && (senseself() || !Blind)) ? "透明な" : "", race,
-            pmname(&mons[u.umonnum], Ugender), svp.plname);
+            jp_pmname(&mons[u.umonnum], Ugender), svp.plname);
     if (u.usteed)
         Sprintf(eos(outbuf), "、%sに騎乗していた", y_monnam(u.usteed));
     if (u.uundetected || (Upolyd && U_AP_TYPE)
@@ -235,7 +235,7 @@ mhidden_description(
         if (show_altmon) {
             if (incl_prefix)
                 Strcat(outbuf, "、変装先: ");
-            what = pmname(&mons[mon->mappearance], Mgender(mon));
+            what = jp_pmname(&mons[mon->mappearance], Mgender(mon));
             if (incl_prefix)
                 what = an(what);
             Strcat(outbuf, what);
@@ -537,7 +537,7 @@ look_at_monster(
                                                                                 : (mW & M2_ELF & m2) ? "エルフ"
                                                                                     : (mW & M2_ORC & m2) ? "オーク"
                                                                                         : (mW & M2_DEMON & m2) ? "デーモン"
-                                              : pmname(mtmp->data,
+                                              : jp_pmname(mtmp->data,
                                                        Mgender(mtmp)));
 
                         Sprintf(eos(monbuf), "%sへの警告", makeplural(whom));

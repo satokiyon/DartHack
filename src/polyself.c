@@ -604,7 +604,7 @@ polyself(int psflags)
                        0 and trigger thats_enough_tries message */
                     ++tryct;
                 }
-                pm_name = pmname(&mons[mntmp], flags.female ? FEMALE : MALE);
+                pm_name = jp_pmname(&mons[mntmp], flags.female ? FEMALE : MALE);
                 if (the_unique_pm(&mons[mntmp]))
                     pm_name = the(pm_name);
                 else if (!type_is_pname(&mons[mntmp]))
@@ -679,7 +679,7 @@ polyself(int psflags)
             }
             if (controllable_poly) {
                 Sprintf(buf, "Become %s?",
-                        an(pmname(&mons[mntmp], gvariant)));
+                        an(jp_pmname(&mons[mntmp], gvariant)));
                 if (y_n(buf) != 'y')
                     return;
             }
@@ -741,7 +741,7 @@ polymon(int mntmp)
 
     if (svm.mvitals[mntmp].mvflags & G_GENOD) { /* allow G_EXTINCT */
         You_feel("少し%sっぽい気がした.",
-                 pmname(&mons[mntmp], flags.female ? FEMALE : MALE));
+                 jp_pmname(&mons[mntmp], flags.female ? FEMALE : MALE));
         exercise(A_WIS, TRUE);
         return 0;
     }
@@ -750,7 +750,7 @@ polymon(int mntmp)
     if (!u.uconduct.polyselfs++)
         livelog_printf(LL_CONDUCT,
                        "changed form for the first time, becoming %s",
-                       an(pmname(&mons[mntmp], flags.female ? FEMALE : MALE)));
+                       an(jp_pmname(&mons[mntmp], flags.female ? FEMALE : MALE)));
 
     /* exercise used to be at the very end but only Wis was affected
        there since the polymorph was always in effect by then */
@@ -800,7 +800,7 @@ polymon(int mntmp)
         Strcat(buf, (is_male(&mons[mntmp]) || is_female(&mons[mntmp]))
                        ? "" : flags.female ? "female " : "male ");
     }
-    Strcat(buf, pmname(&mons[mntmp], flags.female ? FEMALE : MALE));
+    Strcat(buf, jp_pmname(&mons[mntmp], flags.female ? FEMALE : MALE));
     You("%s %s!", (u.umonnum != mntmp) ? "変身する" : "気がした", an(buf));
 
     if (Stoned && poly_when_stoned(&mons[mntmp])) {
@@ -956,7 +956,7 @@ polymon(int mntmp)
             pline("%s touch %s.", no_longer_petrify_resistant,
                   mon_nam(u.usteed));
             Sprintf(buf, "riding %s",
-                    an(pmname(u.usteed->data, Mgender(u.usteed))));
+                    an(jp_pmname(u.usteed->data, Mgender(u.usteed))));
             instapetrify(buf);
         }
         if (!can_ride(u.usteed))
@@ -1880,7 +1880,7 @@ dopoly(void)
         polyself(POLY_MONSTER);
         if (savedat != gy.youmonst.data) {
             You("%sへ変身した.",
-                an(pmname(gy.youmonst.data, Ugender)));
+                an(jp_pmname(gy.youmonst.data, Ugender)));
             newsym(u.ux, u.uy);
         }
     }
