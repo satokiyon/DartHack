@@ -27,17 +27,15 @@
 # Some entries include blank lines to separate paragraphs but many don't.
 #
 abbot
-	For it had been long apparent to Count Landulf that nothing
-	could be done with his seventh son Thomas, except to make him
-	an Abbot or something of that kind.  Born in 1226, he had from
-	childhood a mysterious objection to becoming a predatory eagle,
-	or even to taking an ordinary interest in falconry or tilting
-	or any other gentlemanly pursuits.  He was a large and heavy and
-	quiet boy, and phenomenally silent, scarcely opening his mouth
-	except to say suddenly to his schoolmaster in an explosive
-	manner, "What is God?"  The answer is not recorded but it is
-	probable that the asker went on worrying out answers for himself.
-		[ The Runaway Abbot, by G.K. Chesterton ]
+	ランドルフ伯爵にとって、七男のトマスには修道院長か何かにならせる以外に
+	できることがないのは、とっくの昔から明らかだった。1226年に生まれた彼
+	は、子供の頃から、略奪する鷲になることや、鷹狩り、馬上槍試合、その他
+	の紳士的な活動にありふれた興味を持つことに対して、神秘的な反感を抱い
+	ていた。彼は大柄で重苦しく、物静かな少年で、驚くほど無口だった。家庭
+	教師に突然、爆発的な口調で「神とは何か？」と問いかけるとき以外、ほと
+	んど口を開かなかった。その答えは記録されていないが、質問した本人は自
+	分で答えを探し続けるのに忙しかったのだろう。
+		[ The Runaway Abbot, G.K.チェスタトン著 ]
 # takes "suit or piece of armor" when specifying '['
 # FIXME: "dragon scales, dragon scale mail" needs its own entry
 # FIXME too: "ac, armor class" also merits its own distinct entry
@@ -49,334 +47,278 @@ suit or piece of armor
 ~*dragon*scale*
 ~scroll of mail
 *mail
-	"The last spot on the school jousting team came down to another
-	boy and me.  He was poor, and his only armor was a blanket his
-	mother had made him from her hair.  I, on the other hand, had
-	a brand new suit of chain mail.  Just before our joust, I asked
-	him what he'd do if he made the team.  (I was hoping to be more
-	popular with the ladies.)  He said he would be able to save the
-	town from dragons and be able to afford some water for his 20
-	brothers and sisters.
+	「学園の馬上槍試合チームの最後の枠は、別の少年と私で争うことになった。
+	彼は貧しく、唯一の鎧といえば母親が髪の毛から作ってくれた毛布だけだった。
+	一方の私は、真新しい鎖帷子の鎧を持っていた。試合の直前、私は彼に、もし
+	チームに入れたら何をするつもりかと尋ねた（私は女性にもっと人気者になり
+	たかったのだ）。彼は、ドラゴンから町を救い、20人の兄弟姉妹のために水
+	をいくらか買ってあげられるようになると答えた。
 
-	Well, a sense of compassion came over me.  I insisted we swap
-	armor.  He was forced to accept, as it would have been an
-	insult not to do so.
+	さて、私は同情心に駆られた。私は鎧を交換しようと強く勧めた。そうしない
+	ことは侮辱になるため、彼はそれを受け入れざるを得なかった。
 
-	On the battlefield, we charged at each other and we both connected
-	with our lances.
+	戦場で、私たちは互いに突撃し、二人ともランスで相手を捉えた。
 
-	Lying there on the mud mortally wounded, I learned what true armor
-	class was that day."
-		[ When Help Collides, by J.D. Berry ]
+	泥の中に横たわり、致命傷を負った私は、その日、真の防御力（AC）とは何か
+	を学んだのである」
+		[ When Help Collides, J.B.ベリー著 ]
 aclys
 aklys
 thonged club
-	A short studded or spiked club attached to a cord allowing
-	it to be drawn back to the wielder after having been thrown.
-	It should not be confused with the atlatl, which is a device
-	used to throw spears for longer distances.
+	投げた後に使い手の元へ引き戻せるよう、紐が付けられた棘付きの短い棍棒。
+	槍を長距離投げるための道具であるアトラトル（投槍器）と混同してはならない。
 ~agate ring
 agate*
-	Translucent, cryptocrystalline variety of quartz and a subvariety
-	of chalcedony.  Agates are identical in chemical structure to
-	jasper, flint, chert, petrified wood, and tiger's-eye, and are
-	often found in association with opal.  The colorful, banded rocks
-	are used as a semiprecious gemstone and in the manufacture of
-	grinding equipment.  An agate's banding forms as silica from
-	solution is slowly deposited into cavities and veins in older
-	rock.
-		[ The Columbia Encyclopedia, Sixth Edition ]
+	半透明で潜晶質の石英の一種であり、カルセドニーの亜種。メノウ（アゲート）
+	は化学構造においてジャスパー（碧玉）、フリント（火打ち石）、チャート、
+	珪化木、タイガーアイ（虎目石）と同一であり、オパールと共産することが多
+	い。色彩豊かで縞模様のある岩石は、半貴石として、また粉砕装置の製造にも
+	用いられる。メノウの縞模様は、溶液中のシリカが古い岩石の空洞や脈にゆっ
+	くりと沈殿することで形成される。
+		[ コロンビア百科事典、第6版 ]
 alchemy
-	By and large, the only skill the alchemists of Ankh-Morpork had
-	discovered so far was the ability to turn gold into less gold.
-		[ Moving Pictures, by Terry Pratchett ]
+	概して、アンク＝モルポークの錬金術師たちがこれまでに発見した唯一の技術
+	は、金をそれ以下の価値の金に変える能力である。
+		[『アニメイ・ピクチャーズ』、テリー・プラチェット著 ]
 aleax
-	Said to be a doppelganger sent to inflict divine punishment
-	for alignment violations.
+	属性違反に対する神罰を下すために送り込まれたドッペルゲンガーであると言
+	われている。
 *altar
 offer*
 sacrific*
-	Altars are of three types:
-	1.  In Temples.  These are for Sacrifices [...].  The stone
-	top will have grooves for blood, and the whole will be covered
-	with _dry brown stains of a troubling kind_ from former
-	Sacrifices.
-	  [ The Tough Guide to Fantasyland, by Diana Wynne Jones ]
+	祭壇には3つのタイプがある：
+	1. 神殿内のもの。これらは捧げもの用である [... ]。石の天板には血を流すた
+	めの溝があり、全体がかつての捧げものによる「気がかりな種類の乾いた茶色
+	の染み」で覆われている。
+	  [『ファンタジーランドの過酷なガイド』、ダイアナ・ウィン・ジョーンズ著 ]
 
-	To every man upon this earth
-	Death cometh soon or late;
-	And how can man die better
-	Than facing fearful odds
-	For the ashes of his fathers
-	And the temples of his gods?
-		[ Lays of Ancient Rome, by Thomas B. Macaulay ]
+	この地球上のすべての人間には
+	死は早かれ遅かれ訪れるもの
+	父祖たちの遺灰と
+	神々の神殿を守るために
+	恐ろしい強敵に立ち向かうこと以上に
+	人間はどうすればよりよく死ねるだろうか？
+		[『ローマ古謡』、トーマス・B・マコーレー著 ]
 amaterasu omikami
-	The Shinto sun goddess, Amaterasu Omikami is the central
-	figure of Shintoism and the ancestral deity of the imperial
-	house.  One of the daughters of the primordial god Izanagi
-	and said to be his favourite offspring, she was born from
-	his left eye.
-		[ Encyclopedia of Gods, by Michael Jordan ]
+	神道の太陽神。アマテラスオオミカミは神道における中心的な存在であり、皇
+	室の祖神である。根源的な神イザナギの娘の一人であり、彼のお気に入りの子
+	供であると言われ、イザナギの左目から生まれた。
+		[『神の百科事典』、マイケル・ジョーダン著 ]
 amber*
-	"Tree sap," Wu explained, "often flows over insects and traps
-	them.  The insects are then perfectly preserved within the
-	fossil.  One finds all kinds of insects in amber - including
-	biting insects that have sucked blood from larger animals."
-		[ Jurassic Park, by Michael Crichton ]
+	「木の樹液は」ウーは説明した。「しばしば昆虫の上を流れ、それらを閉じ込
+	める。昆虫はその後、化石の中で完璧に保存される。琥珀の中にはあらゆる種
+	類の昆虫が見つかる。より大きな動物から血を吸った吸血昆虫さえもね」
+		[『ジュラシック・パーク』、マイケル・クライトン著 ]
 *amnesia
 maud
-	Get thee hence, nor come again,
-	Mix not memory with doubt,
-	Pass, thou deathlike type of pain,
-	Pass and cease to move about!
-	'Tis the blot upon the brain
-	That will show itself without.
+	そこから立ち去れ、二度と来るな、
+	記憶と疑念を混ぜるな、
+	去れ、死に似た苦痛の型よ、
+	去れ、そして動き回るのをやめよ！
+	脳にあるその汚点は
+	外に現れるだろう。
 		...
-	For, Maud, so tender and true,
-	As long as my life endures
-	I feel I shall owe you a debt,
-	That I never can hope to pay;
-	And if ever I should forget
-	That I owe this debt to you
-	And for your sweet sake to yours;
-	O then, what then shall I say? -
-	If ever I should forget,
-	May God make me more wretched
-	Than ever I have been yet!
-		[ Maud, And Other Poems, by Alfred, Lord Tennyson ]
+	モードよ、かくも優しく真実なる人よ、
+	私の命が続く限り
+	私はあなたに借りがあると感じるだろう、
+	決して返せそうもない借りだ；
+	そしてもし私が忘れてしまったら
+	あなたにこの借りがあることを
+	そしてあなたの甘い愛ゆえにあなたの一族に借りがあることを；
+	ああ、そのときは、私は何を言おう？ -
+	もし私が忘れてしまったら、
+	神よ、私をこれまで以上に
+	惨めにしておくれ！
+		[『モード、その他の詩』、アルフレッド・ロード・テニスン著 ]
 ~amulet of yendor
 ~amulet of restful sleep
 *amulet
 amulet of *
 amulet versus *
-	"The complete Amulet can keep off all the things that make
-	people unhappy -- jealousy, bad temper, pride, disagreeableness,
-	greediness, selfishness, laziness.  Evil spirits, people called
-	them when the Amulet was made.  Don't you think it would be nice
-	to have it?"
-	"Very," said the children, quite without enthusiasm.
-	"And it can give you strength and courage."
-	"That's better," said Cyril.
-	"And virtue."
-	"I suppose it's nice to have that," said Jane, but not with much
-	interest.
-	"And it can give you your heart's desire."
-	"Now you're talking," said Robert.
-		[ The Story of the Amulet, by Edith Nesbit ]
+	「完全な魔除けは、人を不幸にするあらゆるものを寄せ付けない。嫉妬、短気、
+	高慢、不機嫌、貪欲、利己心、怠惰だ。魔除けが作られたとき、人々はそれを
+	悪霊と呼んだ。持っておくと素敵だと思わないか？」
+	「とても」子供たちは全く熱意を見せずに言った。
+	「そして、それを持つ者の心からの願いを叶えてくれる」
+	「やっと本題に入ったね」ロバートは言った。
+		[『魔除けの物語』、イーディス・ネズビット著 ]
 amulet of yendor
-	This mysterious talisman is the object of your quest.  It is
-	said to possess powers which mere mortals can scarcely
-	comprehend, let alone utilize.  The gods will grant the gift of
-	immortality to the adventurer who can deliver it from the
-	depths of Moloch's Sanctum and offer it on the appropriate high
-	altar on the Astral Plane.
+	この神秘的なお守りは、あなたの探求の目的である。それは、単なる定命の者
+	には理解すら困難な力を秘めていると言われている。神々は、モロクの聖域の
+	深淵からそれを持ち出し、アストラル界の適切な高祭壇に捧げることができる
+	冒険者に、不死の贈り物を授けるだろう。
 angel*
-	He answered and said unto them, he that soweth the good seed
-	is the Son of man; the field is the world, and the good seed
-	are the children of the kingdom; but the weeds are the
-	children of the wicked one; the enemy that sowed them is the
-	devil; the harvest is the end of the world; and the reapers
-	are the angels.  As therefore the weeds are gathered and
-	burned in the fire; so shall it be in the end of this world.
-	[...]  So shall it be at the end of the world; the angels
-	shall come forth, and sever the wicked from among the just,
-	and shall cast them into the furnace of fire; there shall be
-	wailing and gnashing of teeth.
-		[ The Gospel According to Matthew, 13:37-42, 49-50 ]
+	彼は彼らに答えて言った、「良い種をまく者は人の子である。畑は世界であり、
+	良い種は王国の子供たちである。しかし毒麦は悪魔の子供たちである。それを
+	まいた敵は悪魔である。収穫は世界の終わりである。そして刈り取る者は天使
+	たちである。毒麦が集められて火で焼かれるように、世界の終わりもそうなる。
+	[...] 世界の終わりにもそうなる。天使たちが現れて、正しい者の中から悪い者
+	を分け、火の炉の中に投げ込むだろう。そこで泣き叫び、歯ぎしりをするのだ」
+		[『マタイによる福音書』、13:37-42, 49-50 ]
 angry god*
-	Cold wind blows.
-	The gods look down in anger on this poor child.
+	冷たい風が吹く。
+	神々は怒りの眼差しでこの哀れな子供を見下ろす。
 
-	Why so unforgiving?
-	And why so cold?
-		[ Bridge of Sighs, by Robin Trower ]
+	なぜこれほどまでに容赦がないのか？
+	そして、なぜこれほどまでに冷酷なのか？
+		[『ため息の橋』、ロビン・トロワー著 ]
 anhur
-	An Egyptian god of war and a great hunter, few gods can match
-	his fury.  Unlike many gods of war, he is a force for good.
-	The wrath of Anhur is slow to come, but it is inescapable
-	once earned.  Anhur is a mighty figure with four arms.  He
-	is often seen with a powerful lance that requires both of
-	his right arms to wield and which is tipped with a fragment
-	of the sun.  He is married to Mehut, a lion-headed goddess.
+	エジプトの戦神であり偉大な狩人。彼ほどの怒りを持つ神はほとんどいない。
+	多くの戦神とは異なり, 彼は善の力である。アンフールの怒りはなかなか現れ
+	ないが、一度買いかぶれば避けられない。アンフールは四本の腕を持つ力強い
+	姿をしている。彼はしばしば、右手の二本を使って振るう、太陽の破片が先端
+	に付いた強力な槍とともに見られる。彼は獅子の頭を持つ女神メフトと結婚し
+	ている。
 ankh-morpork
-	The twin city of Ankh-Morpork, foremost of all the cities
-	bounding the Circle Sea, was as a matter of course the home
-	of a large number of gangs, thieves' guilds, syndicates and
-	similar organisations.  This was one of the reasons for its
-	wealth.  Most of the humbler folk on the widdershin side of
-	the river, in Morpork's mazy alleys, supplemented their
-	meagre incomes by filling some small role for one or other
-	of the competing gangs.
-	    [ The Colour of Magic, by Terry Pratchett ]
+	サークル海の周囲にあるすべての都市の中で最も重要な双子都市アンク＝モル
+	ポークは、当然のことながら、多くのギャング、盗賊ギルド、シンジケート、
+	そして同様の組織の本拠地であった。これがこの都市の富の理由の一つである。
+	川のウィダーシン側の、モルポークの迷路のような路地にある最も卑しい住民
+	のほとんどは、競合するギャングのいずれかの小さな役割を果たすことで、わず
+	かな収入を補っていた。
+	    [『魔法の色』、テリー・プラチェット著 ]
 anshar
-	A primordial Babylonian-Akkadian deity, Anshar is mentioned
-	in the Babylonian creation epic _Enuma Elish_ as one of a
-	pair of offspring (with Kishar) of Lahmu and Lahamu.  Anshar
-	is linked with heaven while Kishar is identified with earth.
-	    [ Encyclopedia of Gods, by Michael Jordan ]
+	バビロニアとアッカドの原始神話の神。アンシャルはバビロニアの創世叙事詩
+	『エヌマ・エリシュ』において、ラフムとラハムの子供の一対（キシャルとと
+	もに）として言及されている。アンシャルは天と結びついており、キシャルは
+	地と同一視されている。
+	    [『神の百科事典』、マイケル・ジョーダン著 ]
 ant
 * ant
-	This giant variety of the ordinary ant will fight just as
-	fiercely as its small, distant cousin.  Various varieties
-	exist, and they are known and feared for their relentless
-	persecution of their victims.
+	この巨大な品種の普通の蟻は、その小さく遠い親戚と同じくらい激しく戦う。
+	様々な亜種が存在し、獲物に対する執拗な追跡で知られ、恐れられている。
 anu
-	Anu was the Babylonian god of the heavens, the monarch of
-	the north star.  He was the oldest of the Babylonian gods,
-	the father of all gods, and the ruler of heaven and destiny.
-	Anu features strongly in the _atiku_ festival in
-	Babylon, Uruk and other cities.
+	アヌは天のバビロニアの神であり、北極星の君主である。彼は最も古いバビロ
+	ニアの神であり、すべての神々の父、そして天と運命の支配者である。アヌは
+	バビロン、ウルク、その他の都市で開催される『アティク』祭で重要な役割を
+	果たす。
 # takes "apelike creature" when specifying 'Y'
 ape
 apelike creature
 * ape
-	The most highly evolved of all the primates, as shown by
-	all their anatomical characters and particularly the
-	development of the brain.  Both arboreal and terrestrial,
-	the apes have the forelimbs much better developed than
-	the hind limbs.  Tail entirely absent.  Growth is slow
-	and sexual maturity reached at quite an advanced age.
-	  [ A Field Guide to the Larger Mammals of Africa, by Dorst ]
+	霊長類の中で最も高度に進化しており、その解剖学的特徴、特に脳の発達にそ
+	れが示されている。樹上生活と地上生活の両方を行い、猿類は後肢よりも前肢
+	の方がはるかに発達している。尾は完全に欠如している。成長は遅く、性成熟
+	はかなり高齢になってから到達する。
+	  [『アフリカの大型哺乳類フィールドガイド』、ドルスト著 ]
 
-	Aldo the gorilla had a plan.  It was a good plan.  It was
-	right.  He knew it.  He smacked his lips in anticipation as
-	he thought of it.  Yes.  Apes should be strong.  Apes should
-	be masters.  Apes should be proud.  Apes should make the
-	Earth shake when they walked.  Apes should _rule_ the Earth.
-	  [ Battle for the Planet of the Apes, by David Gerrold ]
+	ゴリラのアルドには計画があった。良い計画だった。正しかった。彼はそれを知
+	っていた。彼はその計画を考えて、期待に胸を膨らませて唇を鳴らした。そうだ。
+	猿は強くあるべきだ。猿は支配者であるべきだ。猿は誇り高くあるべきだ。猿
+	は歩くとき、地球を揺るがすべきだ。猿が地球を『支配』すべきなのだ。
+	  [『猿の惑星の征服』、デヴィッド・ジェロルド著 ]
 apple
-	NEWTONIAN, adj.  Pertaining to a philosophy of the universe
-	invented by Newton, who discovered that an apple will fall
-	to the ground, but was unable to say why.  His successors
-	and disciples have advanced so far as to be able to say
-	when.
-		[ The Devil's Dictionary, by Ambrose Bierce ]
+	ニュートン風の（形容詞）。ニュートンが発明した宇宙の哲学に関する。彼はリ
+	ンゴが地面に落ちることは発見したが、なぜそうなるのかを説明することはでき
+	なかった。彼の後継者や弟子たちは、いつそうなるかを言えるまでに進歩した。
+		[『悪魔の辞典』、アンブローズ・ビアス著 ]
 archeolog*
 * archeologist
-	Archeology is the search for fact, not truth. [...]
-	So forget any ideas you've got about lost cities, exotic travel,
-	and digging up the world. We do not follow maps to buried
-	treasure, and X never, ever, marks the spot.
-		[ Indiana Jones and the Last Crusade ]
+	考古学とは事実の探求であり、真実の探求ではない。[...]
+	だから、失われた都市やエキゾチックな旅、そして世界を掘り返すといったアイ
+	デアは忘れなさい。我々は埋蔵金を探す地図には従わないし、X印が場所を記す
+	などということは決して、絶対にありえない。
+		[『インディ・ジョーンズ / 最後の聖戦』 ]
 
-	"I cannot be having with archeological excavations, myself,"
-	I said.  "The fellows who dig them only ever find tiny walls
-	and a few bits of broken pottery, and then they get all
-	excited and swear that they have just made the most
-	important discovery of the century, the ruins of a mile-high
-	gold-covered temple to Frogmore the God of Bike-Saddle
-	Fixtures or some such."
-	"I think you will find," said Mr Rune, "that they do this
-	in order to secure further government funding for their
-	diggings and so remain in employment."
-	"That is a rather cynical view," I said.
-		[ the brightonomicon, by Robert Rankin ]
+	「私自身、考古学の発掘調査などには我慢ならない」
+	と私は言った。「発掘する連中がせいぜい見つけるのは、小さな壁と壊れた陶器
+	のかけらぐらいのものだ。そうして連中は大興奮して、世紀の最も重要な発見を
+	したとか、フロッグモア自転車サドル固定具神への高さ1マイルの黄金の神殿の
+	遺跡だとか、そんなことを誓うんだ」
+	「君も気づくと思うが」とルーン氏は言った。「彼らは発掘のための政府からの
+	資金援助を確保し、それによって雇用を維持するためにそうしているのだよ」
+	「それはかなり皮肉な見方だ」と私は言った。
+		[『ブライトノミコン』、ロバート・ランキン著 ]
 #		[title & author: same situation as with "bad luck" entry]
 archon
-	Archons are the predominant inhabitants of the heavens.
-	However unusual their appearance, they are not generally
-	evil.  They are beings at peace with themselves and their
-	surroundings.
+	アルコンは天国の支配的な住人である。彼らの外見がどれほど奇妙であれ、彼ら
+	は一般的に邪悪ではない。彼らは自分自身と周囲と平和にある存在である。
 arioch
-	Arioch, the patron demon of Elric's ancestors; one of the most
-	powerful of all the Dukes of Hell, who was called Knight of
-	the Swords, Lord of the Seven Darks, Lord of the Higher Hell
-	and many more names besides.
-		[ Elric of Melnibone, by Michael Moorcock ]
+	アリオク。エルリックの先祖の守護悪魔。地獄の全公爵の中で最も強力な一人で
+	あり、剣の騎士、七つの闇の王、高位地獄の王、そしてその他多くの
+	名で呼ばれた。
+		[『メルニボネのエルリック』、マイケル・ムーアコック著 ]
 *arrow
-	I shot an arrow into the air,
-	It fell to earth, I knew not where;
-	For, so swiftly it flew, the sight
-	Could not follow it in its flight.
+	私は空に向かって矢を射た、
+	矢は地面に落ちた、どこに落ちたか私は知らない；
+	あまりに素早く飛んだので、その光景を
+	その飛行中に追うことはできなかった。
 
-	I breathed a song into the air,
-	It fell to earth, I knew not where;
-	For who has sight so keen and strong
-	That it can follow the flight of song?
+	私は空に向かって歌を吐き出した、
+	歌は地面に落ちた、どこに落ちたか私は知らない；
+	空を見通す鋭く強い力を持つ者でなければ
+	歌の飛翔を追いかけることなどできようか？
 
-	Long, long afterward, in an oak
-	I found the arrow still unbroke;
-	And the song, from beginning to end,
-	I found again in the heart of a friend.
-	  [ The Arrow and the Song, by Henry Wadsworth Longfellow ]
+	ずっとずっと後になって、私は樫の木の中で
+	まだ折れていないその矢を見つけた；
+	そして歌も、最初から最後まで、
+	友の心の中に再び見つけたのである。
+	  [『矢と歌』、ヘンリー・ワズワース・ロングフェロー著 ]
 ashikaga takauji
-	Ashikaga Takauji was a daimyo of the Minamoto clan who
-	joined forces with the Go-Daigo to defeat the Hojo armies.
-	Later when Go-Daigo attempted to reduce the powers of the
-	samurai clans he rebelled against him.  He defeated Go-
-	Daigo and established the emperor Komyo on the throne.
-	Go-Daigo eventually escaped and established another
-	government in the town of Yoshino.  This period of dual
-	governments was known as the Nambokucho.
-	  [ Samurai - The Story of a Warrior Tradition, by Cook ]
+	足利尊氏は、北条軍を倒すために後醍醐天皇と協力した源氏の武将であった。そ
+	後、後醍醐天皇が武士団の力を弱めようとしたとき、彼は反旗を翻した。彼は
+	後醍醐天皇を破り、光明天皇を玉座に就けた。後醍醐天皇は最終的に逃亡し、吉
+	野の町で別の政府を樹立した。この南北朝の分裂期間は、南北朝時代として知ら
+	れている。
+	  [『侍 - 武士の伝統の物語』、クック著 ]
 asmodeus
-	It is said that Asmodeus is the overlord over all of hell.
-	His appearance, unlike many other demons and devils, is
-	human apart from his horns and tail.  He can freeze flesh
-	with a touch.
+	アスモデウスは地獄のすべての支配者であると言われている。彼の外見は、他の
+	多くの悪魔と異なり、角と尻尾を除けば人間である。彼は触れるだけで肉を凍ら
+	せることができる。
 		[]
 
-	The evil demon who appears in the Apocryphal book of _Tobit_
-	and is derived from the Persian _Aeshma_.  In _Tobit_ Asmodeus
-	falls in love with Sara, daughter of Raguel, and causes the
-	death of seven husbands in succession, each on his bridal night.
-	He was finally driven from Egypt through a charm made by Tobias
-	of the heart and liver of a fish burned on perfumed ashes, as
-	described by Milton in _Paradise Lost_ (IV, 167-71).  Hence
-	Asmodeus often figures as the spirit of matrimonial jealousy
-	or unhappiness.
-		[ Brewer's Concise Dictionary of Phrase and Fable ]
+	外典『トビト記』に登場する邪悪な悪魔であり、ペルシャ語の『アエシュマ』に
+	由来する。トビト記において、アスモデウスはラグエルの娘サラに恋をし、7人の
+	夫を結婚の夜に次々と死に追いやる。彼は最終的に、トビアスが魚の心臓と肝臓
+	を香りの良い灰の上で焼いて作った魔除けによってエジプトから追い出された。こ
+	れはミルトンの『失楽園』（IV, 167-71）でも記述されている。そのためアスモ
+	デウスは、しばしば結婚の嫉妬や不幸の精として描かれる。
+		[『ブリュワー慣用句・寓話辞典』 ]
 athame
-	The consecrated ritual knife of a Wiccan initiate (one of four
-	basic tools, together with the wand, chalice and pentacle).
-	Traditionally, the athame is a double-edged, black-handled,
-	cross-hilted dagger of between six and eighteen inches length.
+	ウィッカ（魔女）の信徒が使用する奉献された儀式用ナイフ（杖、聖杯、五芒星と
+	ともに4つの基本的な道具の一つ）。伝統的に、アサメイは両刃で黒い柄を持ち、
+	十字の柄頭がある6インチから18インチの長さの短剣である。
 		[]
 
-	A belt made from a twisted braid of silken threads of gold wound
-	around her waist, and a dark-handled knife rested on a slant at
-	her hip through a loop in the belt.
+	黄金の絹糸を撚り合わせたベルトが腰に巻かれ、ベルトのループを通してヒップの
+	傾斜に沿って黒い柄のナイフが置かれていた。
 	[...]
-	She arched her brows. "You should know better, dear godchild.
-	You know I cannot speak what is untrue.  During our last
-	encounter I returned to Faerie with great power and upset vital
-	balances.  Those balances had to be redressed, and your debt was
-	the mechanism that the Queen chose to employ."
-	I frowned at her for a minute.  "Returned with great power."  My
-	eyes fell to the knife at her waist.  "That thing the vampires
-	gave you?"
-	She rested her fingers lightly on the knife's hilt.  "Don't
-	cheapen it.  This athame was no creation of theirs.  And it was
-	less a gift than a trade."
-	"Amoracchius and that thing are in the same league?"  Gulp.  My
-	faerie godmother was dangerous enough without a big-time
-	artifact of magic.
-		[ Summer Knight, by Jim Butcher ]
+	彼女は眉をひそめた。「もっとよく知るべきよ、親愛なる神の子。私が真実でない
+	ことを言えないのは知っているでしょう。最後の遭遇の際、私は強大な力を持って
+	フェアリーの国に戻り、重要なバランスを乱したわ。そのバランスは回復されなけ
+	ればならず、あなたの負債は女王が選んだ手段だったの」
+	私は彼女を1分間睨みつけた。「強大な力を持って戻っただって？」私の目は彼女の
+	腰のナイフに落ちた。「あの吸血鬼があなたに渡した物？」
+	彼女はナイフの柄に軽く指を置いた。「安っぽく扱わないで。このアサメイは彼らの
+	創造物じゃないわ。それに、これは贈り物というより取引に近いものよ」
+	「アモラキウスとあれが同じレベルだって？」ゴクリ。私のフェアリーのゴッドマザー
+	は、強力な魔法のアーティファクトがなくても十分に危険だったのに。
+		[『サマー・ナイト』、ジム・ブッチャー著 ]
 athen*
-	Athene was the offspring of Zeus, and without a mother.  She
-	sprang forth from his head completely armed.  Her favourite
-	bird was the owl, and the plant sacred to her is the olive.
-		[ Bulfinch's Mythology, by Thomas Bulfinch ]
+	アテナはゼウスの子供であり、母親はいない。彼女は完全に武装した状態で彼の頭
+	から飛び出した。彼女の好きな鳥はフクロウであり、彼女にとって神聖な植物はオ
+	リーブである。
+		[『ブルフィンチの神話』、トーマス・ブルフィンチ著 ]
 axe
 battle?axe
 double?headed?axe
-	"For ev'ry silver ringing blow,
-	Cities and palaces shall grow!"
+	「銀色の鳴り響く一撃ごとに、
+	都市と宮殿は成長するだろう！」
 
-	"Bite deep and wide, O Axe, the tree,
-	Tell wider prophecies to me."
+	「深く、広く噛みつけ、おお斧よ、木を、
+	私により広い予言を語りかけよ」
 
-	"When rust hath gnaw'd me deep and red,
-	A nation strong shall lift his head.
+	「錆が私を深く赤く食い荒らすとき、
+	力ある国家がその頭をあげるだろう」
 
-	"His crown the very Heav'ns shall smite,
-	Aeons shall build him in his might."
+	「その冠はまさに天を打ち砕き、
+	永遠がその力の中に彼を築くだろう」
 
-	"Bite deep and wide, O Axe, the tree;
-	Bright Seer, help on thy prophecy!"
-		[ Malcolm's Katie, by Isabella Valancey Crawford ]
+	「深く、広く噛みつけ、おお斧よ、木を；
+	明るき預言者よ、予言を助けよ！」
+		[『マルコムのケイティ』、イザベラ・ヴァランシー・クロフォード著 ]
 axolotl
-	A mundane salamander, harmless.
+	ありふれたサンショウウオ。無害。
 bag
 bag of *
 sack
