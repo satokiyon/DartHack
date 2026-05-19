@@ -810,8 +810,8 @@ domonnoise(struct monst *mtmp)
                     verbl_msg = verbuf;
                 } else if (vampindex == 1) {
                     Sprintf(verbuf, vampmsg[vampindex],
-                            Upolyd ? an(pmname(&mons[u.umonnum],
-                                               flags.female ? FEMALE : MALE))
+                            Upolyd ? an(jp_pmname(&mons[u.umonnum],
+                                                       flags.female ? FEMALE : MALE))
                                    : an(racenoun));
                     verbl_msg = verbuf;
                 } else

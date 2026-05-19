@@ -498,12 +498,12 @@ background_enlightenment(int unused_mode UNUSED, int final)
             Sprintf(tmpbuf, "%s ", genders[flags.female ? 1 : 0].adj);
         if (altphrasing)
             Sprintf(eos(tmpbuf), "%s in ",
-                    pmname(&mons[gy.youmonst.cham],
+                          jp_pmname(&mons[gy.youmonst.cham],
                            flags.female ? FEMALE : MALE));
         Snprintf(buf, sizeof(buf), "%s%s%s%s form",
                  !final ? "currently " : "",
                  altphrasing ? just_an(anbuf, tmpbuf) : "in ",
-                 tmpbuf, pmname(uasmon, flags.female ? FEMALE : MALE));
+                 tmpbuf, jp_pmname(uasmon, flags.female ? FEMALE : MALE));
         you_are(buf, "");
     }
 

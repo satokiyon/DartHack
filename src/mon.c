@@ -3752,7 +3752,7 @@ mon_to_stone(struct monst *mtmp)
             pline_mon(mtmp, "%s solidifies...", Monnam(mtmp));
         if (newcham(mtmp, &mons[PM_STONE_GOLEM], NO_NC_FLAGS)) {
             if (canseemon(mtmp))
-                pline("今は%sに変わった。", pmname(mtmp->data, Mgender(mtmp)));
+                pline("今は%sに変わった。", jp_pmname(mtmp->data, Mgender(mtmp)));
         } else {
             if (canseemon(mtmp))
                 pline("... and returns to normal.");

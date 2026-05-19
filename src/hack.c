@@ -4189,7 +4189,7 @@ unmul(const char *msg_override)
            declining to die since can't be both Unchanging and Lifesaved) */
         if (Upolyd && !strncmpi(gn.nomovemsg, "You survived that ", 18))
             You("%sの姿だった.",
-                pmname(&mons[u.umonnum], Ugender)); /* (ignore Hallu) */
+                jp_pmname(&mons[u.umonnum], Ugender)); /* (ignore Hallu) */
     }
     gn.nomovemsg = 0;
     u.usleep = 0;

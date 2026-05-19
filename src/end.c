@@ -225,15 +225,15 @@ done_in_by(struct monst *mtmp, int how)
 
     if (imitator) {
         char shape[BUFSZ];
-        const char *realnm = pmname(champtr, Mgender(mtmp)),
-                   *fakenm = pmname(mptr, Mgender(mtmp));
+        const char *realnm = jp_pmname(champtr, Mgender(mtmp)),
+               *fakenm = jp_pmname(mptr, Mgender(mtmp));
         boolean alt = is_vampshifter(mtmp);
 
         if (mimicker) {
             /* realnm is already correct because champtr==mptr;
                set up fake mptr for type_is_pname/the_unique_pm */
             mptr = &mons[mtmp->mappearance];
-            fakenm = pmname(mptr, Mgender(mtmp));
+            fakenm = jp_pmname(mptr, Mgender(mtmp));
         } else if (alt && strstri(realnm, "vampire")
                    && !strcmp(fakenm, "vampire bat")) {
             /* special case: use "vampire in bat form" in preference
@@ -276,7 +276,7 @@ done_in_by(struct monst *mtmp, int how)
            it overrides the effect of Hallucination on priestname() */
         Strcat(buf, m_monnam(mtmp));
     } else {
-        Strcat(buf, pmname(mptr, Mgender(mtmp)));
+        Strcat(buf, jp_pmname(mptr, Mgender(mtmp)));
         if (has_mgivenname(mtmp)) {
             Sprintf(eos(buf), " %s %s",
                     has_ebones(mtmp) ? "of" : "called",
@@ -1359,7 +1359,7 @@ really_done(int how)
              (u.ugrave_arise != PM_GREEN_SLIME)
                  ? "肉体が死からよみがえり"
                  : "怨霊が消えずに残り",
-             an(pmname(&mons[u.ugrave_arise], Ugender)));
+            an(jp_pmname(&mons[u.ugrave_arise], Ugender)));
         display_nhwindow(WIN_MESSAGE, FALSE);
     }
 

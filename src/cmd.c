@@ -4475,7 +4475,7 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
 #if 0
     if (Upolyd) { /* before objects */
         Sprintf(buf, "Use %s special ability",
-                s_suffix(pmname(&mons[u.umonnum], Ugender)));
+            s_suffix(jp_pmname(&mons[u.umonnum], Ugender)));
         mcmd_addmenu(win, MCMD_MONABILITY, buf), ++K;
     }
 #endif

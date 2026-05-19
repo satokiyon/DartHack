@@ -3152,7 +3152,7 @@ mhitm_ad_drst(
         if (!negated && !rn2(8)) {
             Sprintf(buf, "%s %s", s_suffix(Monnam(magr)),
                     mpoisons_subj(magr, mattk));
-            poisoned(buf, ptmp, pmname(pa, Mgender(magr)), 30, FALSE);
+            poisoned(buf, ptmp, jp_pmname(pa, Mgender(magr)), 30, FALSE);
         }
     } else {
         /* mhitm */
@@ -3395,7 +3395,7 @@ mhitm_ad_wrap(
                     svk.killer.format = KILLED_BY_AN;
                     Sprintf(svk.killer.name, "%s by %s",
                             moat ? "moat" : "pool of water",
-                            an(pmname(magr->data, Mgender(magr))));
+                            an(jp_pmname(magr->data, Mgender(magr))));
                     done(DROWNING);
                 } else if (mattk->aatyp == AT_HUGS) {
                     You("押し潰されていた.");
@@ -3567,7 +3567,7 @@ mhitm_ad_slim(
             You("ひどく気分が悪かった.");
             make_slimed(10L, (char *) 0);
             delayed_killer(SLIMED, KILLED_BY_AN,
-                           pmname(magr->data, Mgender(magr)));
+                           jp_pmname(magr->data, Mgender(magr)));
         } else
             pline("Yuck!");
     } else {
@@ -3925,7 +3925,7 @@ do_stone_u(struct monst *mtmp)
         && !(poly_when_stoned(gy.youmonst.data)
              && polymon(PM_STONE_GOLEM))) {
         int kformat = KILLED_BY_AN;
-        const char *kname = pmname(mtmp->data, Mgender(mtmp));
+        const char *kname = jp_pmname(mtmp->data, Mgender(mtmp));
 
         if (mtmp->data->geno & G_UNIQ) {
             if (!type_is_pname(mtmp->data))
@@ -5019,7 +5019,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
 
         if (fatal_gulp && !is_rider(pd)) { /* petrification */
             char kbuf[BUFSZ];
-            const char *mnam = pmname(pd, Mgender(mdef));
+            const char *mnam = jp_pmname(pd, Mgender(mdef));
 
             if (!type_is_pname(pd))
                 mnam = an(mnam);
@@ -5040,7 +5040,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                     pline("Unfortunately, digesting any of it is fatal.");
                     end_engulf();
                     Sprintf(svk.killer.name, "unwisely tried to eat %s",
-                            pmname(pd, Mgender(mdef)));
+                            jp_pmname(pd, Mgender(mdef)));
                     svk.killer.format = NO_KILLER_PREFIX;
                     done(DIED);
                     return M_ATTK_MISS; /* lifesaved */
@@ -5096,7 +5096,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                         pline1(msgbuf);
                     if (pd == &mons[PM_GREEN_SLIME]) {
                         Sprintf(msgbuf, "%s isn't sitting well with you.",
-                                The(pmname(pd, Mgender(mdef))));
+                                The(jp_pmname(pd, Mgender(mdef))));
                         if (!Unchanging) {
                             make_slimed(5L, (char *) 0);
                         }
@@ -6246,7 +6246,7 @@ that_is_a_mimic(
             int mndx = glyph_to_mon(glyph);
 
             assert(mndx >= LOW_PM && mndx <= HIGH_PM);
-            mtmp_name = pmname(&mons[mndx], Mgender(mtmp));
+            mtmp_name = jp_pmname(&mons[mndx], Mgender(mtmp));
             Snprintf(fmtbuf, sizeof fmtbuf,
                      "Wait!  That %s is really %%s!", mtmp_name);
         }

@@ -637,7 +637,7 @@ eat_brains(
         if (magr == &gy.youmonst) {
             if (!Stone_resistance && !Stoned)
                 make_stoned(5L, (char *) 0, KILLED_BY_AN,
-                            pmname(pd, Mgender(mdef)));
+                            jp_pmname(pd, Mgender(mdef)));
         } else {
             /* no need to check for poly_when_stoned or Stone_resistance;
                mind flayers don't have those capabilities */
@@ -668,7 +668,7 @@ eat_brains(
         } else if (is_rider(pd)) {
             pline("それを摂取すると致命的だった.");
             Sprintf(svk.killer.name, "unwisely ate the brain of %s",
-                    pmname(pd, Mgender(mdef)));
+                    jp_pmname(pd, Mgender(mdef)));
             svk.killer.format = NO_KILLER_PREFIX;
             done(DIED);
             /* life-saving needed to reach here */
