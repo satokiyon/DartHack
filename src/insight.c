@@ -1867,14 +1867,14 @@ attributes_enlightenment(
              && u.umonnum == PM_GREEN_SLIME && !Unchanging)) {
         /* foreign shape (except were-form which is handled below) */
         if (!vampshifted(&gy.youmonst))
-            Sprintf(buf, "polymorphed into %s",
-                    an(pmname(gy.youmonst.data,
-                              flags.female ? FEMALE : MALE)));
+                Sprintf(buf, "polymorphed into %s",
+                    an(jp_pmname(gy.youmonst.data,
+                          flags.female ? FEMALE : MALE)));
         else
-            Sprintf(buf, "polymorphed into %s in %s form",
-                    an(pmname(&mons[gy.youmonst.cham],
-                              flags.female ? FEMALE : MALE)),
-                    pmname(gy.youmonst.data, flags.female ? FEMALE : MALE));
+                Sprintf(buf, "polymorphed into %s in %s form",
+                    an(jp_pmname(&mons[gy.youmonst.cham],
+                          flags.female ? FEMALE : MALE)),
+                    jp_pmname(gy.youmonst.data, flags.female ? FEMALE : MALE));
         if (wizard)
             Sprintf(eos(buf), " (%d)", u.mtimedone);
         you_are(buf, "");
@@ -1883,7 +1883,7 @@ attributes_enlightenment(
         you_can("lay eggs", "");
     if (ismnum(u.ulycn)) {
         /* "you are a werecreature [in beast form]" */
-        Strcpy(buf, an(pmname(&mons[u.ulycn],
+        Strcpy(buf, an(jp_pmname(&mons[u.ulycn],
                flags.female ? FEMALE : MALE)));
         if (u.umonnum == u.ulycn) {
             Strcat(buf, " in beast form");
