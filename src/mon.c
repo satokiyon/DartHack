@@ -3677,7 +3677,7 @@ xkilled(
         adjalign(-(u.ualign.record + (int) ALIGNLIM / 2));
         u.ugangr += 7; /* instantly become "extremely" angry */
         change_luck(-20);
-        pline("それは%s悪い考えだった...",
+        pline("それは%s悪い考えだ...",
               u.uevent.qcompleted ? "たぶん" : "");
         if (!svc.context.mon_moving)
             iter_mons(anger_quest_guardians);
@@ -3689,7 +3689,7 @@ xkilled(
         u.ugangr++;
         change_luck(-4);
         if (!Hallucination)
-            pline("それはたぶん悪い考えだった...");
+            pline("それはたぶん悪い考えだ...");
         else
             pline("うわ、しまった！");
     } else if (mtmp->ispriest) {
