@@ -1658,7 +1658,11 @@ filter_nonascii(char *line)
             break;
         if (*p == '\t' && ascii_ctx.tabok)
             continue;
+#ifdef MAKEDEFS_ALLOW_UTF8
+        reason = (*p == '\t') ? 2 : (*p < ' ');
+#else
         reason = (*p > 126) ? 3 : (*p == '\t') ? 2 : (*p < ' ');
+#endif
         if (reason != 0) {
             if (!warned)
                 ascii_ctx.warncnt += 1; /* number of lines warned about */
