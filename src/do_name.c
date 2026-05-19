@@ -1271,7 +1271,7 @@ minimal_monnam(struct monst *mon, boolean ckloc)
     } else if (ckloc && ptr == &mons[PM_LONG_WORM] && mon->mx
                && svl.level.monsters[mon->mx][mon->my] != mon) {
         Sprintf(outbuf, "%s <%d,%d>",
-                pmname(&mons[PM_LONG_WORM_TAIL], Mgender(mon)),
+            jp_pmname(&mons[PM_LONG_WORM_TAIL], Mgender(mon)),
                 mon->mx, mon->my);
     } else {
         Sprintf(outbuf, "%s%s <%d,%d>",
@@ -1279,7 +1279,7 @@ minimal_monnam(struct monst *mon, boolean ckloc)
                 mon_pmname(mon), mon->mx, mon->my);
         if (mon->cham != NON_PM)
             Sprintf(eos(outbuf), "{%s}",
-                    pmname(&mons[mon->cham], Mgender(mon)));
+                jp_pmname(&mons[mon->cham], Mgender(mon)));
     }
     return outbuf;
 }
@@ -1329,7 +1329,7 @@ obj_pmname(struct obj *obj)
 
         /* obj->oextra->omonst->data is Null but ...->mnum is set */
         if (ismnum(m->mnum))
-            return pmname(&mons[m->mnum], Mgender(m));
+            return jp_pmname(&mons[m->mnum], Mgender(m));
     }
 #endif
     if ((obj->otyp == CORPSE || obj->otyp == STATUE || obj->otyp == FIGURINE)
@@ -1404,7 +1404,7 @@ rndmonnam(char *code)
     if (name >= SPECIAL_PM) {
         mnam = bogusmon(buf, code);
     } else {
-        mnam = strcpy(buf, pmname(&mons[name], rn2_on_display_rng(2)));
+        mnam = strcpy(buf, jp_pmname(&mons[name], rn2_on_display_rng(2)));
     }
     return mnam;
 #undef BOGUSMONSIZE

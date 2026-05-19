@@ -1517,8 +1517,8 @@ quickmimic(struct monst *mtmp)
                                 && OBJ_NAME(objects[mtmp->mappearance]))
                                ? OBJ_NAME(objects[mtmp->mappearance])
                                : (M_AP_TYPE(mtmp) == M_AP_MONSTER)
-                                 ? pmname(&mons[mtmp->mappearance],
-                                          Mgender(mtmp))
+                                   ? jp_pmname(&mons[mtmp->mappearance],
+                                                Mgender(mtmp))
                                  : something;
 
         newsym(mtmp->mx, mtmp->my);

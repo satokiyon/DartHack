@@ -70,7 +70,7 @@ use_saddle(struct obj *otmp)
         You("%sに触れた.", mon_nam(mtmp));
         if (!(poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))) {
             Sprintf(kbuf, "attempting to saddle %s",
-                    an(pmname(mtmp->data, Mgender(mtmp))));
+                    an(jp_pmname(mtmp->data, Mgender(mtmp))));
             instapetrify(kbuf);
         }
     }
@@ -290,7 +290,7 @@ mount_steed(
 
         You("%sに触れた.", mon_nam(mtmp));
         Sprintf(kbuf, "attempting to ride %s",
-                an(pmname(mtmp->data, Mgender(mtmp))));
+            an(jp_pmname(mtmp->data, Mgender(mtmp))));
         instapetrify(kbuf);
     }
     if (!mtmp->mtame || mtmp->isminion) {
@@ -643,7 +643,7 @@ dismount_steed(
         }
         if (!has_mgivenname(mtmp)) {
             pline("You've been through the dungeon on %s with no name.",
-                  an(pmname(mtmp->data, Mgender(mtmp))));
+                an(jp_pmname(mtmp->data, Mgender(mtmp))));
             if (Hallucination)
                 pline("雨から出てこれても整気。");
         } else

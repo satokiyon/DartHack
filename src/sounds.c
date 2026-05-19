@@ -1262,7 +1262,7 @@ dochat(void)
 
     if (is_silent(gy.youmonst.data)) {
         pline("あなたは%sなので、話すことができない。",
-              an(pmname(gy.youmonst.data, flags.female ? FEMALE : MALE)));
+              an(jp_pmname(gy.youmonst.data, flags.female ? FEMALE : MALE)));
         return ECMD_OK;
     }
     if (Strangled) {

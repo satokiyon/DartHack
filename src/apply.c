@@ -1064,7 +1064,7 @@ use_mirror(struct obj *obj)
             } else if (u.uhs >= WEAK) {
                 You(look_like_str, "栄養不足の");
             } else if (Upolyd) {
-                You("%sのように見える.", pmname(&mons[u.umonnum], Ugender));
+                You("%sのように見える.", jp_pmname(&mons[u.umonnum], Ugender));
             } else {
                 You("いつもどおり%sに見える.", uvisage);
             }

@@ -1210,7 +1210,7 @@ cpostfx(int pm)
                     Hallucination
                        ? "皮をむかれるのが急に怖くなり、再び%sに化けた!"
                        : "再び%sに化けるのがお似合いだと思った.",
-                    Upolyd ? pmname(gy.youmonst.data, Ugender)
+                    Upolyd ? jp_pmname(gy.youmonst.data, Ugender)
                               : gu.urace.noun);
             ge.eatmbuf = dupstr(buf);
             gn.nomovemsg = ge.eatmbuf;

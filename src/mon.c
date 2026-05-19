@@ -3210,8 +3210,8 @@ corpse_chance(
                    engulfer; suppress usual explosion since it's contained */
                 if (magr == &gy.youmonst) {
                     There("%sの中で爆発が起きた!", body_part(STOMACH));
-                    Sprintf(svk.killer.name, "%s explosion",
-                            s_suffix(pmname(mdat, Mgender(mon))));
+                        Sprintf(svk.killer.name, "%s explosion",
+                            s_suffix(jp_pmname(mdat, Mgender(mon))));
                     losehp(Maybe_Half_Phys(tmp), svk.killer.name,
                            KILLED_BY_AN);
                 } else {
@@ -3715,7 +3715,7 @@ xkilled(
             livelog_printf(LL_KILLEDPET, "murdered %s%s%s faithful %s",
                            mname ? MGIVENNAME(mtmp) : "",
                            mname ? ", " : "",
-                           uhis(), pmname(mdat, Mgender(mtmp)));
+                           uhis(), jp_pmname(mdat, Mgender(mtmp)));
         }
     } else if (mtmp->mpeaceful)
         adjalign(-5);

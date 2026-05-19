@@ -1231,7 +1231,7 @@ paygd(boolean silently)
         gdy = svr.rooms[EGD(grd)->vroom].ly + rn2(2);
         Sprintf(buf, "クロイソスへ: %sなる%sから回収した金をここに納める.",
                 svp.plname,
-                pmname(&mons[u.umonster], flags.female ? FEMALE : MALE));
+                jp_pmname(&mons[u.umonster], flags.female ? FEMALE : MALE));
         make_grave(gdx, gdy, buf);
     }
     for (coins = gi.invent; coins; coins = nextcoins) {

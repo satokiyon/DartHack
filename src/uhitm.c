@@ -4114,7 +4114,7 @@ mhitm_ad_phys(
                      * strength-based. With hpdamchance = 10, HP damage occurs
                      * 1/2 of the time and it will hit Str rest of the time.
                      * (This is the same as poisoned ammo.) */
-                    poisoned(buf, A_STR, pmname(magr->data, Mgender(magr)),
+                    poisoned(buf, A_STR, jp_pmname(magr->data, Mgender(magr)),
                              10, FALSE);
                 }
             } else if (mattk->aatyp != AT_TUCH || mhm->damage != 0
