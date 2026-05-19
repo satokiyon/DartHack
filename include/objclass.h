@@ -188,6 +188,12 @@ enum misc_object_nums {
 extern NEARDATA struct objclass objects[NUM_OBJECTS + 1];
 extern NEARDATA struct objdescr obj_descr[NUM_OBJECTS + 1];
 
+/* JP localization: Japanese item names and descriptions */
+extern const char *const obj_jp_names[NUM_OBJECTS + 1];
+extern const char *const obj_jp_descrs[NUM_OBJECTS + 1];
+extern const char *jp_item_name(int otyp);
+extern const char *jp_item_descr(int otyp);
+
 #define OBJ_NAME(obj) (obj_descr[(obj).oc_name_idx].oc_name)
 #define OBJ_DESCR(obj) (obj_descr[(obj).oc_descr_idx].oc_descr)
 
