@@ -1927,7 +1927,7 @@ consume_tin(const char *mesg)
                KILLED_BY_AN); /* acid damage */
     } else if (poisonous(&mons[mnum]) && rn2(5)) {
         tp++;
-        pline("げっ - 毒があったに違いない!");
+        pline("うげっ - 毒があった!");
         if (!Poison_resistance) {
             poison_strdmg(rnd(4), rnd(15),
                           !glob ? "poisonous corpse" : "poisonous glob",
@@ -2792,7 +2792,7 @@ doeat_nonfood(struct obj *otmp)
         nodelicious = TRUE;
 
     if (otmp->oclass == WEAPON_CLASS && otmp->opoisoned) {
-        pline("げっ - 毒があったに違いない!");
+        pline("うげっ - 毒があった!");
         if (!Poison_resistance) {
             poison_strdmg(rnd(4), rnd(15), xname(otmp), KILLED_BY_AN);
         } else
