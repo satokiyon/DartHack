@@ -185,6 +185,7 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">4100;4244;4245;4310;4706;4820;4324</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="$(SrcDir)objects.c" />
+    <ClCompile Include="$(SrcDir)obj_jp.c" />
     <ClCompile Include="$(SrcDir)objnam.c" />
     <ClCompile Include="$(SrcDir)options.c" />
     <ClCompile Include="$(SrcDir)o_init.c" />

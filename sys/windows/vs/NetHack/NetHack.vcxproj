@@ -158,6 +158,7 @@
     <ClCompile Include="$(SrcDir)nhlsel.c" />
     <ClCompile Include="$(SrcDir)nhlua.c" />
     <ClCompile Include="$(SrcDir)objects.c" />
+    <ClCompile Include="$(SrcDir)obj_jp.c" />
     <ClCompile Include="$(SrcDir)objnam.c" />
     <ClCompile Include="$(SrcDir)options.c" />
     <ClCompile Include="$(SrcDir)o_init.c" />

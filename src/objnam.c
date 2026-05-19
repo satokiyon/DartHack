@@ -103,19 +103,18 @@ struct Jitem {
              && typ != OPAL)))
 
 static const struct Jitem Japanese_items[] = {
-    { SHORT_SWORD, "wakizashi" },
-    { BROADSWORD, "ninja-to" },
-    { FLAIL, "nunchaku" },
-    { GLAIVE, "naginata" },
-    { LOCK_PICK, "osaku" },
-    { WOODEN_HARP, "koto" },
-    { MAGIC_HARP, "magic koto" },
-    { KNIFE, "shito" },
-    { PLATE_MAIL, "tanko" },
-    { HELMET, "kabuto" },
-    { LEATHER_GLOVES, "yugake" },
-    { FOOD_RATION, "gunyoki" },
-    { POT_BOOZE, "sake" },
+    { SHORT_SWORD, "脇差し" },
+    { BROADSWORD, "忍者刀" },
+    { FLAIL, "ヌンチャク" },
+    { GLAIVE, "なぎなた" },
+    { LOCK_PICK, "おさく" },
+    { WOODEN_HARP, "琴" },
+    { KNIFE, "刺刀" },
+    { PLATE_MAIL, "短甲" },
+    { HELMET, "兜" },
+    { LEATHER_GLOVES, "弓懸" },
+    { FOOD_RATION, "丸薬" },
+    { POT_BOOZE, "酒" },
     { 0, "" }
 };
 
@@ -202,15 +201,15 @@ obj_typename(int otyp)
 {
     char *buf = nextobuf();
     struct objclass *ocl = &objects[otyp];
-    const char *actualn = OBJ_NAME(*ocl);
-    const char *dn = OBJ_DESCR(*ocl);
+    const char *actualn = jp_item_name(otyp);
+    const char *dn = jp_item_descr(otyp);
     const char *un = ocl->oc_uname;
     int nn = ocl->oc_name_known;
 
     if (Role_if(PM_SAMURAI)) {
         actualn = Japanese_item_name(otyp, actualn);
         if (otyp == WOODEN_HARP || otyp == MAGIC_HARP)
-            dn = "koto";
+            dn = "琴";
     }
     /* generic items don't have an actual-name; we shouldn't ever be called
        for those; pacify static analyzer without resorting to impossible() */
@@ -588,8 +587,8 @@ xname_flags(
     int typ = obj->otyp;
     struct objclass *ocl = &objects[typ];
     int nn = ocl->oc_name_known, omndx = obj->corpsenm;
-    const char *actualn = OBJ_NAME(*ocl);
-    const char *dn = OBJ_DESCR(*ocl);
+    const char *actualn = jp_item_name(typ);
+    const char *dn = jp_item_descr(typ);
     const char *un = ocl->oc_uname;
     boolean pluralize = (obj->quan != 1L) && !(cxn_flags & CXN_SINGULAR);
     boolean known, dknown, bknown;
@@ -605,7 +604,7 @@ xname_flags(
     if (Role_if(PM_SAMURAI)) {
         actualn = Japanese_item_name(typ, actualn);
         if (typ == WOODEN_HARP || typ == MAGIC_HARP)
-            dn = "koto";
+            dn = "琴";
     }
     /* generic items don't have an actual-name; we shouldn't ever be called
        for those; pacify static analyzer without resorting to impossible() */
@@ -1846,7 +1845,7 @@ corpse_xname(
     nambuf = gx.xnamep + PREFIX;
 
     if (glob) {
-        mnam = OBJ_NAME(objects[otmp->otyp]); /* "glob of <monster>" */
+        mnam = jp_item_name(otmp->otyp); /* "glob of <monster>" */
     } else if (omndx == NON_PM) { /* paranoia */
         mnam = "thing";
     } else {
@@ -5477,7 +5476,7 @@ suit_simple_name(struct obj *suit)
             return "dragon mail"; /* <color> dragon scale mail */
         else if (Is_dragon_scales(suit))
             return "dragon scales";
-        suitnm = OBJ_NAME(objects[suit->otyp]);
+        suitnm = jp_item_name(suit->otyp);
         esuitp = eos((char *) suitnm);
         if (strlen(suitnm) > 5 && !strcmp(esuitp - 5, " mail"))
             return "mail"; /* most suits fall into this category */
@@ -5536,8 +5535,8 @@ gloves_simple_name(struct obj *gloves)
     if (gloves && gloves->dknown) {
         int otyp = gloves->otyp;
         struct objclass *ocl = &objects[otyp];
-        const char *actualn = OBJ_NAME(*ocl),
-                   *descrpn = OBJ_DESCR(*ocl);
+        const char *actualn = jp_item_name(otyp),
+                   *descrpn = jp_item_descr(otyp);
 
         if (strstri(objects[otyp].oc_name_known ? actualn : descrpn,
                     gauntlets))
@@ -5555,8 +5554,8 @@ boots_simple_name(struct obj *boots)
     if (boots && boots->dknown) {
         int otyp = boots->otyp;
         struct objclass *ocl = &objects[otyp];
-        const char *actualn = OBJ_NAME(*ocl),
-                   *descrpn = OBJ_DESCR(*ocl);
+        const char *actualn = jp_item_name(otyp),
+                   *descrpn = jp_item_descr(otyp);
 
         if (strstri(descrpn, shoes)
             || (objects[otyp].oc_name_known && strstri(actualn, shoes)))
