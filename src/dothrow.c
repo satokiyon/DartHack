@@ -868,8 +868,8 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
         if (touch_petrifies(mon->data)
             /* this is a bodily collision, so check for body armor */
             && !uarmu && !uarm && !uarmc) {
-            Sprintf(svk.killer.name, "bumping into %s",
-                    an(pmname(mon->data, NEUTRAL)));
+                Sprintf(svk.killer.name, "bumping into %s",
+                    an(jp_pmname(mon->data, NEUTRAL)));
             instapetrify(svk.killer.name);
         }
         if (touch_petrifies(gy.youmonst.data)

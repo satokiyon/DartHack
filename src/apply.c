@@ -427,7 +427,7 @@ use_stethoscope(struct obj *obj)
                               || odummy->otyp == LENSES);
                 break;
             case M_AP_MONSTER: /* ignore Hallucination here */
-                what = pmname(&mons[mtmp->mappearance], Mgender(mtmp));
+                what = jp_pmname(&mons[mtmp->mappearance], Mgender(mtmp));
                 break;
             case M_AP_FURNITURE:
                 what = defsyms[mtmp->mappearance].explanation;

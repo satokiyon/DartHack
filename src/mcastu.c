@@ -364,8 +364,8 @@ death_inflicted_by(
     if (mtmp) {
         struct permonst *mptr = mtmp->data,
             *champtr = (ismnum(mtmp->cham)) ? &mons[mtmp->cham] : mptr;
-        const char *realnm = pmname(champtr, Mgender(mtmp)),
-            *fakenm = pmname(mptr, Mgender(mtmp));
+        const char *realnm = jp_pmname(champtr, Mgender(mtmp)),
+            *fakenm = jp_pmname(mptr, Mgender(mtmp));
 
         /* greatly simplified extract from done_in_by(), primarily for
            reason for death due to 'touch of death' spell; if mtmp is

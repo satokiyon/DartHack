@@ -622,11 +622,11 @@ mpickobj(struct monst *mtmp, struct obj *otmp)
 
     if (!otmp) {
         impossible("monster (%s) taking or picking up nothing?",
-                   pmname(mtmp->data, Mgender(mtmp)));
+                   jp_pmname(mtmp->data, Mgender(mtmp)));
         return 1;
     } else if (otmp == uball || otmp == uchain) {
         impossible("monster (%s) taking or picking up attached %s (%s)?",
-                   pmname(mtmp->data, Mgender(mtmp)),
+                   jp_pmname(mtmp->data, Mgender(mtmp)),
                    (otmp == uchain) ? "chain" : "ball", simpleonames(otmp));
         return 0;
     }

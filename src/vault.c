@@ -443,7 +443,7 @@ invault(void)
         spotted = canspotmon(guard);
         if (spotted) {
             pline("突然、宝物庫の%sの一人が入ってきた!",
-                  makeplural(pmname(guard->data, Mgender(guard))));
+                  makeplural(jp_pmname(guard->data, Mgender(guard))));
             newsym(guard->mx, guard->my);
         } else {
             pline("誰かが宝物庫に入ってきた.");

@@ -2125,7 +2125,7 @@ grow_up(struct monst *mtmp, struct monst *victim)
         if (svm.mvitals[newtype].mvflags & G_GENOD) { /* allow G_EXTINCT */
             if (canspotmon(mtmp))
                 pline("%sは%sに成長しようとして%s！", mon_nam(mtmp),
-                      pmname(ptr, Mgender(mtmp)),
+                      jp_pmname(ptr, Mgender(mtmp)),
                       nonliving(ptr) ? "力尽きた" : "死んでしまった");
             set_mon_data(mtmp, ptr); /* keep svm.mvitals[] accurate */
             mondied(mtmp);
@@ -2143,7 +2143,7 @@ grow_up(struct monst *mtmp, struct monst *victim)
                            (can't happen with 3.6.0 mons[], but perhaps
                            slightly less sexist if prepared for it...) */
                       : (fem && !mtmp->female) ? "female " : "",
-                    pmname(ptr, fem));
+                    jp_pmname(ptr, fem));
             pline_mon(mtmp, "%s %s %s.", YMonnam(mtmp),
                       (fem != mtmp->female) ? "changes into"
                                             : humanoid(ptr) ? "becomes"

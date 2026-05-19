@@ -641,12 +641,12 @@ mattacku(struct monst *mtmp)
                         pline(
                              "Wait, %s!  There's a hidden %s named %s there!",
                               m_monnam(mtmp),
-                              pmname(gy.youmonst.data, Ugender), svp.plname);
+                              jp_pmname(gy.youmonst.data, Ugender), svp.plname);
                     else
                         pline(
                           "Wait, %s!  There's a %s named %s hiding under %s!",
                               m_monnam(mtmp),
-                              pmname(gy.youmonst.data, Ugender),
+                              jp_pmname(gy.youmonst.data, Ugender),
                               svp.plname,
                               doname(svl.level.objects[u.ux][u.uy]));
                     if (obj)
@@ -670,7 +670,7 @@ mattacku(struct monst *mtmp)
             pline("〽ぉっと「にんべん」ときっつくやられた.");
         else /* see note about m_monnam() above */
             pline("待って、%s！ それは%sで%sという名だ！", m_monnam(mtmp),
-                  pmname(gy.youmonst.data, Ugender), svp.plname);
+                  jp_pmname(gy.youmonst.data, Ugender), svp.plname);
         if (sticky)
             set_ustuck(mtmp);
         gy.youmonst.m_ap_type = M_AP_NOTHING;
@@ -692,12 +692,12 @@ mattacku(struct monst *mtmp)
         else /* see note about m_monnam() above */
             pline("待って、%s！ その%sは実は%s、%sという名だ！", m_monnam(mtmp),
                   mimic_obj_name(&gy.youmonst),
-                  an(pmname(&mons[u.umonnum], Ugender)), svp.plname);
+                  an(jp_pmname(&mons[u.umonnum], Ugender)), svp.plname);
         if (gm.multi < 0) { /* this should always be the case */
             char buf[BUFSZ];
 
             Sprintf(buf, "You appear to be %s again.",
-                    Upolyd ? (const char *) an(pmname(gy.youmonst.data,
+                    Upolyd ? (const char *) an(jp_pmname(gy.youmonst.data,
                                                       flags.female))
                            : (const char *) "yourself");
             unmul(buf); /* immediately stop mimicking */
@@ -1752,7 +1752,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
                 break;
             urgent_pline("あなたは石になっていく...");
             svk.killer.format = KILLED_BY;
-            Strcpy(svk.killer.name, pmname(mtmp->data, Mgender(mtmp)));
+            Strcpy(svk.killer.name, jp_pmname(mtmp->data, Mgender(mtmp)));
             done(STONING);
         }
         break;
@@ -2539,7 +2539,7 @@ passiveum(
                     && (perceives(mtmp->data) || !Invis)) {
                     if (Blind) {
                         pline("盲目の%sとして、あなたは自分を守ることができない。",
-                              pmname(gy.youmonst.data,
+                              jp_pmname(gy.youmonst.data,
                                      flags.female ? FEMALE : MALE));
                     } else {
                         if (mon_reflects(mtmp,
