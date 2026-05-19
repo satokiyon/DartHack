@@ -39,7 +39,7 @@ A.S. ->
 # Siskel & Ebert
 大絶賛!
 # The First C Program
-こんにちは、世界!
+Hello,　world!
 ^?MAIL
 # AOL
 メールが届いていた!
