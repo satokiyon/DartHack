@@ -3828,19 +3828,19 @@ pickup_checks(void)
         if (IS_THRONE(lev->typ))
             pline("少なくとも一トンはありそうだ%s!", lev->looted ? "な" : "");
         else if (IS_SINK(lev->typ))
-            pline_The("配管は床とつながっていた.");
+            pline_The("配管は床とつながっている.");
         else if (IS_GRAVE(lev->typ))
-            You("墓標は必要なかった.今はまだ.");
+            You("墓標は必要ない.今はまだ.");
         else if (IS_FOUNTAIN(lev->typ))
             You("%sを飲めそうだ...", hliquid("water"));
         else if (IS_DOOR(lev->typ) && (lev->doormask & D_ISOPEN))
-            pline("蝶番からは外れなかった.");
+            pline("蝶番からは外れない.");
         else if (IS_ALTAR(lev->typ))
-            pline("祭壇を動かすのは非常にまずい考えだった.");
+            pline("祭壇を動かすのは非常にまずい考えだ.");
         else if (lev->typ == STAIRS)
             pline_The("階段はしっかり固定されていた.");
         else
-            There("拾うものはなかった.");
+            There("拾うものはない.");
         return 0;
     }
     traphere = t_at(u.ux, u.uy);
