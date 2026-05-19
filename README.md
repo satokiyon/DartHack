@@ -25,6 +25,17 @@
 *   原則として文字列リテラルのみを変更し、ゲームロジックや条件分岐の意味は変えません。
 *   `隠し%s` のようなテンプレートは、展開後の最終語形 (`隠し扉`, `隠し通路`) が自然か確認します。
 
+### オブジェクト名ローカライズ方針 (Method C)
+
+`include/objects.h` を直接日本語化すると、Lua special floor の `des.object({ id = "leather armor" })` のような英語 ID ルックアップが壊れるため、本プロジェクトでは **Method C** を採用しています。
+
+- **内部IDは英語維持**: `include/objects.h` は upstream 英語のまま保持し、Lua・wish・検索系の互換性を確保する。
+- **表示だけ日本語化**: `src/obj_jp.c` に日本語名テーブル (`obj_jp_names[]`) と未識別外観テーブル (`obj_jp_descrs[]`) を持たせる。
+- **表示層で切り替え**: `src/objnam.c` の表示処理は `jp_item_name()` / `jp_item_descr()` を使う。
+- **シャッフル対応**: 未識別外観は `oc_descr_idx` が実行時に変わるため、`jp_item_descr()` は `objects[otyp].oc_descr_idx` を経由する。
+
+この設計により、英語ID依存の内部処理を壊さずに日本語表示を実現できます。チュートリアルの Lua `Unknown object id` 問題もこの方式で解消しました。
+
 ## リポジトリ構成と運用
 
 NetHack 本家（アップストリーム）の修正を継続的に反映するため、以下の構成で運用します。

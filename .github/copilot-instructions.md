@@ -55,7 +55,22 @@ git commit -m "Merge branch 'upstream-base' into main"
   - `ReadConsole` は常に `ReadConsoleW` を使い、バッファは `WCHAR` とする。
   - `INPUT_RECORD` の参照には `UnicodeChar` を使う。`AsciiChar` は日本語文字で誤動作の原因となる。
 
-## 6. 参照先
+## 6. 技術的注意点 (Object 名ローカライズ: Method C)
+
+- **基本方針**: `include/objects.h` は upstream 英語を維持し、内部ID解決（Lua `des.object({ id = "..." })`、wish、各種検索）を壊さない。
+- **表示の日本語化**: 日本語名・未識別外観は `src/obj_jp.c` に分離し、`jp_item_name()` / `jp_item_descr()` を表示層で使う。
+- **実装ポイント**:
+  - `include/objclass.h` に `obj_jp_names[]`, `obj_jp_descrs[]`, `jp_item_name()`, `jp_item_descr()` の extern 宣言を置く。
+  - `src/objnam.c` の表示系処理で `OBJ_NAME()` / `OBJ_DESCR()` の代わりに `jp_item_name()` / `jp_item_descr()` を利用する。
+  - `oc_descr_idx` はシャッフル対象なので、未識別外観は `objects[otyp].oc_descr_idx` 経由で引く。
+  - `sys/windows/vs/NetHack/NetHack.vcxproj` と `sys/windows/vs/NetHackW/NetHackW.vcxproj` の両方に `src/obj_jp.c` を追加する。
+- **注意**: `objects.h` の `#if 0` で無効なIDを `obj_jp.c` に入れるとコンパイルエラーになる。
+- **最低検証**:
+  - `msbuild sys\windows\vs\NetHack.sln '/t:NetHack;NetHackW' /p:Configuration=Debug /p:Platform=x64` が成功すること。
+  - `binary\Debug\x64\NetHack.exe` と `NetHackW.exe` が生成されること。
+  - tutorial が Lua エラー (`Unknown object id`) なしで起動すること。
+
+## 7. 参照先
 
 - **翻訳ガイドライン**: `docs/translation-instructions-ja.md`
 - **安全チェックリスト**: `docs/message-translation-safety-checklist.md`
