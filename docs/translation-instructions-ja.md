@@ -36,6 +36,7 @@
 - **creature**: 怪物
 - **genocide**: 虐殺
 
+なお、その他の用語についてはJNetHack-3.6.7の日本語化パッチ( `docs/jnethack-3.6.7-0.1.diff.UTF8` )も参考にする
 
 ## 4. フォーマット指定子の厳守
 
@@ -51,6 +52,15 @@
 - **接頭辞の自動付与**: `You_hear()`, `You_feel()`, `You_see()` 等は主語を自動付与するため、リテラル側で主語を重複させない。
 - **不自然な連結の回避**: `隠し%s` などのテンプレートは、展開後の語（扉、通路等）との連結が自然か確認する。
 
+### オブジェクト名 (Method C) の補足指針
+- **内部IDと表示名を分離する**: `include/objects.h` は upstream 英語を維持し、Lua `des.object({ id = "..." })` や各種ルックアップの互換性を守る。
+- **日本語表示は `src/obj_jp.c` に集約する**: アイテムの日本語名・未識別外観は `obj_jp_names[]` / `obj_jp_descrs[]` と `jp_item_name()` / `jp_item_descr()` で管理する。
+- **表示系のみ差し替える**: `src/objnam.c` などユーザー向け表示で `jp_item_name()` / `jp_item_descr()` を使い、検索・同定・wish・Lua ID解決の内部ロジックは英語名参照を維持する。
+- **外見名と真名の分離**: `OBJ(name, desc)` の `name` と `desc` は意味が異なるため、同一語にまとめない。
+- **`oc_descr_idx` の扱いに注意**: 未識別外観は shuffle の影響を受けるため、`jp_item_descr()` は `objects[otyp].oc_descr_idx` 経由で参照する。
+- **`#if 0` 定義を混ぜない**: `objects.h` 上で無効化されている ID（例: DEFERRED 呪文）を `obj_jp.c` に入れるとビルドエラーになるため除外する。
+- **語彙方針**: JNetHack-3.6.7 の語彙を基本としつつ、個別指定がある用語（例: `へんげの杖`）を優先する。
+
 ## 6. 推奨ワークフロー
 
 1. 未翻訳メッセージを抽出する。
@@ -64,3 +74,4 @@
 - **安全チェックリスト**: `docs/message-translation-safety-checklist.md`
 - **Quest 用語集・知見**: `docs/translation-glossary-quest.md`
 - **技術・運用指示**: `.github/copilot-instructions.md`
+- **JNetHack-3.6.7の日本語化パッチ**: `docs/jnethack-3.6.7-0.1.diff.UTF8`
