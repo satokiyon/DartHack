@@ -321,6 +321,13 @@
  *      makedefs wouldn't reject them.)
  */
 #define MAKEDEFS_FILTER_NONASCII
+/*
+ *      Optional: keep control-character filtering but allow UTF-8 bytes.
+ *      When enabled, makedefs will no longer warn about or replace bytes
+ *      >= 0x80, but it will still warn about and replace disallowed control
+ *      characters (and tabs where tabs are not permitted).
+ */
+#define MAKEDEFS_ALLOW_UTF8
 
 /*
  *      PERSMAX, POINTSMIN, ENTRYMAX, PERS_IS_UID:
