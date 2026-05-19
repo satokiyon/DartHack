@@ -171,6 +171,7 @@
     <ClCompile Include="$(SrcDir)mon.c" />
     <ClCompile Include="$(SrcDir)mondata.c" />
     <ClCompile Include="$(SrcDir)monmove.c" />
+    <ClCompile Include="$(SrcDir)mon_jp.c" />
     <ClCompile Include="$(SrcDir)monst.c" />
     <ClCompile Include="$(SrcDir)mplayer.c" />
     <ClCompile Include="$(SrcDir)mthrowu.c" />

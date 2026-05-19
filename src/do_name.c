@@ -906,7 +906,7 @@ x_monnam(
     /* 'pm_name' is the base part of most names */
     if (do_mappear) {
         /*assert(ismnum(mtmp->mappearance));*/
-        pm_name = pmname(&mons[mtmp->mappearance], Mgender(mtmp));
+        pm_name = jp_pmname(&mons[mtmp->mappearance], Mgender(mtmp));
     } else {
         pm_name = mon_pmname(mtmp);
     }
@@ -1313,7 +1313,7 @@ const char *
 mon_pmname(struct monst *mon)
 {
     /* for neuter, mon->data->pmnames[MALE] will be Null and use [NEUTRAL] */
-    return pmname(mon->data, Mgender(mon));
+    return jp_pmname(mon->data, Mgender(mon));
 }
 
 /* mons[]->pmname for a corpse or statue or figurine */
@@ -1352,7 +1352,7 @@ obj_pmname(struct obj *obj)
         if (mndx == PM_ALIGNED_CLERIC && cgend == CORPSTAT_RANDOM)
             mndx = PM_CLERIC;
 
-        return pmname(&mons[mndx], mgend);
+        return jp_pmname(&mons[mndx], mgend);
     }
     impossible("obj_pmname otyp:%i,corpsenm:%i", obj->otyp, obj->corpsenm);
     return "two-legged glorkum-seeker";

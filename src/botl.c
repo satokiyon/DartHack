@@ -64,7 +64,7 @@ do_statusline1(void)
         char mbot[BUFSZ];
         int k = 0;
 
-        Strcpy(mbot, pmname(&mons[u.umonnum], Ugender));
+        Strcpy(mbot, jp_pmname(&mons[u.umonnum], Ugender));
         while (mbot[k] != 0) {
             if ((k == 0 || (k > 0 && mbot[k - 1] == ' ')) && 'a' <= mbot[k]
                 && mbot[k] <= 'z')
@@ -988,7 +988,7 @@ bot_via_windowport(void)
      */
     Strcpy(nb = buf, svp.plname);
     nb[0] = highc(nb[0]);
-    titl = !Upolyd ? rank() : pmname(&mons[u.umonnum], Ugender);
+    titl = !Upolyd ? rank() : jp_pmname(&mons[u.umonnum], Ugender);
     i = (int) (strlen(buf) + sizeof " the " + strlen(titl) - sizeof "");
     /* if "Name the Rank/monster" is too long, we truncate the name but
        always keep at least BOTL_NSIZ characters of it; when hitpointbar is
