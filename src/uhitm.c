@@ -2803,7 +2803,7 @@ mhitm_ad_sgld(
                 addinv(mongold);
                     Your("財布が重くなった気がした.");
             } else {
-                You("%sの金をつかんだが、背嚢に空きがなかった.",
+                You("%sの金をつかんだが、袋に空きがなかった.",
                     l_monnam(mdef));
                 dropy(mongold);
             }

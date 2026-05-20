@@ -329,7 +329,7 @@ read_engr_at(coordxy x, coordxy y)
         case DUST:
             if (!Blind) {
                 sensed = 1;
-                pline("%sの上に%sが書かれていた.",
+                pline("%sの上に%sが書かれている.",
                       is_ice(x, y) ? "霜" : "埃", Something);
             }
             break;
@@ -337,20 +337,20 @@ read_engr_at(coordxy x, coordxy y)
         case HEADSTONE:
             if (!Blind || can_reach_floor(TRUE)) {
                 sensed = 1;
-                pline("%sに%sが刻まれていた.", eloc, Something);
+                pline("%sに%sが刻まれている.", eloc, Something);
             }
             break;
         case BURN:
             if (!Blind || can_reach_floor(TRUE)) {
                 sensed = 1;
-                pline("%sに文字が%s残っていた.",
+                pline("%sに文字が%s残っている.",
                       eloc, is_ice(x, y) ? "溶け込んで" : "焼き付いて");
             }
             break;
         case MARK:
             if (!Blind) {
                 sensed = 1;
-                pline("%sに落書きがあった.", eloc);
+                pline("%sに落書きがある.", eloc);
             }
             break;
         case ENGR_BLOOD:
@@ -360,7 +360,7 @@ read_engr_at(coordxy x, coordxy y)
              */
             if (!Blind) {
                 sensed = 1;
-                You_see("ここに血で殴り書きされたメッセージを見た.");
+                You_see("ここに血で殴り書きされたメッセージがある.");
             }
             break;
         default:

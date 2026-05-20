@@ -5853,7 +5853,7 @@ untrap_box(
         if (!confused)
             exercise(A_WIS, TRUE);
 
-        if (ynq("解除するか?") == 'y')
+        if (ynq("解除しますか?") == 'y')
             disarm_box(box, force, confused);
     } else {
         You("%sに罠は見つからない.", the(xname(box)));
@@ -5950,7 +5950,7 @@ untrap(
                     deal_with_floor_trap = FALSE;
                 } else {
                     Snprintf(qbuf, sizeof(qbuf),
-                             "ここには%sと%sがある.%sを%sする?",
+                             "ここには%sと%sがある.%sを%sしますか?",
                              (boxcnt == 1) ? "容器" : "複数の容器",
                              an(trapdescr),
                              the_trap,
@@ -6017,10 +6017,10 @@ untrap(
                 if (!Is_box(otmp))
                     continue;
                 if (otmp->tknown && otmp->dknown)
-                    (void) safe_qbuf(qbuf, "この", "を解除するか?",
+                    (void) safe_qbuf(qbuf, "この", "を解除しますか?",
                                      otmp, xname, ansimpleoname, "箱");
                 else
-                    (void) safe_qbuf(qbuf, "ここに", "がある.罠を調べるか?", otmp,
+                    (void) safe_qbuf(qbuf, "ここに", "がある.罠を調べますか?", otmp,
                                      doname, ansimpleoname, "箱");
                 switch (ynq(qbuf)) {
                     case 'q':
@@ -6079,7 +6079,7 @@ untrap(
         || (!force && confused && !rn2(3))) {
         You("扉に罠を見つけた!");
         exercise(A_WIS, TRUE);
-        if (ynq("解除する?") != 'y')
+        if (ynq("解除しますか?") != 'y')
             return 1;
         if (levl[x][y].doormask & D_TRAPPED) {
             ch = 15 + (Role_if(PM_ROGUE) ? u.ulevel * 3 : u.ulevel);
