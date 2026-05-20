@@ -1948,7 +1948,7 @@ getobj(
     for (;;) {
         cnt = 0L;
         cntgiven = FALSE;
-        Sprintf(qbuf, "何を%sしたい?", action_verb_jp(word));
+        Sprintf(qbuf, "何を%sしますか?", action_verb_jp(word));
         if (gi.in_doagain) {
             ilet = readchar();
         } else if (iflags.force_invmenu) {
@@ -2004,7 +2004,7 @@ getobj(
             menuquery[0] = qbuf[0] = '\0';
             if (iflags.force_invmenu)
                 Snprintf(menuquery, sizeof menuquery,
-                         "何を%sしたい?", action_verb_jp(word));
+                         "何を%sしますか?", action_verb_jp(word));
             if (!allowed_choices || *allowed_choices == HANDS_SYM
                 || *buf == HANDS_SYM)
                 handsbuf = getobj_hands_txt(word, qbuf);
@@ -3857,7 +3857,7 @@ int
 dotypeinv(void)
 {
     static const char
-        prompt[] = "どの種類の品物の一覧がほしい?";
+        prompt[] = "どの種類の品物の一覧をご覧になりますか?";
     char c = '\0';
     int n, i = 0;
     char *extra_types, types[BUFSZ], title[QBUFSZ];
@@ -5049,7 +5049,7 @@ adjust_split(void)
         splitamount = 1L;
     } else {
         /* get first digit; doesn't wait for <return> */
-        dig = yn_function("いくつ分ける?", (char *) 0, '\0', TRUE);
+        dig = yn_function("いくつ分けますか?", (char *) 0, '\0', TRUE);
         if (!digit(dig)) {
             pline1(Never_mind);
             return ECMD_CANCEL;

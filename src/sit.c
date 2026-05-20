@@ -559,7 +559,7 @@ dosit(void)
     } else if (lays_eggs(gy.youmonst.data)) {
         return lay_an_egg();
     } else {
-        pline("%sの上に座って楽しんでいるのか？", surface(u.ux, u.uy));
+        pline("%sの上に座って楽しんでいるのですか?", surface(u.ux, u.uy));
     }
     return ECMD_TIME;
 }

@@ -1813,7 +1813,7 @@ dopay(void)
         coord cc;
         int cx, cy;
 
-        pline("誰に支払う？");
+        pline("誰にお支払いいたしますか?");
         cc.x = u.ux;
         cc.y = u.uy;
         if (getpos(&cc, TRUE, "the creature you want to pay") < 0)

@@ -3994,7 +3994,7 @@ status_hilite_menu_add(int origfld)
             goto choose_value;
         }
         if (!gotnum) {
-            pline("それは見えない数字か？");
+            pline("それは見えない数字ですか?");
             goto choose_value;
         }
         op = (lt_gt_eq == LT_VALUE) ? "<"

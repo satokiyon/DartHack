@@ -610,10 +610,10 @@ pick_lock(
                 return PICKLOCK_LEARNED_SOMETHING;
             }
 
-                Sprintf(qbuf, "%s%s%sか?",
-                    (door->doormask & D_LOCKED) ? "解錠" : "施錠",
-                    autounlock ? "に " : "を",
-                    autounlock ? yname(pick) : "この扉");
+                Sprintf(qbuf, "%s%s%sする?",
+                    autounlock ? yname(pick) : "この扉を",
+                    autounlock ? "で" : "",
+                    (door->doormask & D_LOCKED) ? "解錠" : "施錠");
             c = ynq(qbuf);
             if (c != 'y')
                 return PICKLOCK_DID_NOTHING;
@@ -778,7 +778,7 @@ doopen_indir(coordxy x, coordxy y)
 
     dirprompt = NULL; /* have get_adjacent_loc() -> getdir() use default */
     if (u.utrap && u.utraptype == TT_PIT && container_at(u.ux, u.uy, FALSE))
-        dirprompt = "どこを開ける? [.>]";
+        dirprompt = "どこを開けますか? [.>]";
 
     if (x > 0 && y >= 0) {
         /* nonzero <x,y> is used when hero in amorphous form tries to

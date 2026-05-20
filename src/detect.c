@@ -1299,7 +1299,7 @@ use_crystal_ball(struct obj **optr)
     /* read a single character */
     if (flags.verbose)
         You("物体、モンスター、または特殊な地図記号を探せた.");
-    ch = yn_function("何を探す?", (char *) 0, '\0', TRUE);
+    ch = yn_function("何をお探しですか?", (char *) 0, '\0', TRUE);
     /* Don't filter out ' ' here; it has a use */
     if ((ch != def_monsyms[S_GHOST].sym) && strchr(quitchars, ch)) {
         if (flags.verbose)
