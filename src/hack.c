@@ -2164,7 +2164,7 @@ domove_swap_with_pet(
         newsym(x, y);
         newsym(u.ux0, u.uy0);
 
-        You("%sを%s.",
+        You("%s%s%s.",
             x_monnam(mtmp,
                      mtmp->mtame ? ARTICLE_YOUR
                      : (!has_mgivenname(mtmp)
@@ -2172,6 +2172,7 @@ domove_swap_with_pet(
                      : ARTICLE_NONE,
                      (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
                      has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE),
+            mtmp->mpeaceful ? "と" : "を",
             mtmp->mpeaceful ? "入れ替わった" : "驚かせた");
 
         /* check for displacing it into pools and traps */

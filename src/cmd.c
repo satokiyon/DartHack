@@ -894,7 +894,7 @@ domonability(void)
     char c = '\0';
 
     if (might_hide && webmaker(uptr)) {
-        c = yn_function("隠れる [h] か、クモの巣を張る [s] か?",
+        c = yn_function("隠れる [h] か、クモの巣を張る [s] か、どちらにしますか?",
                         hidespinchars, 'q', TRUE);
         if (c == 'q' || c == '\033')
             return ECMD_OK;
@@ -1149,7 +1149,7 @@ doterrain(void)
                      MENU_ITEMFLAGS_NONE);
         }
     }
-    end_menu(men, "どれを表示する?");
+    end_menu(men, "どれを表示しますか?");
 
     n = select_menu(men, PICK_ONE, &sel);
     destroy_nhwindow(men);
@@ -2301,7 +2301,7 @@ handler_rebind_keys_add(boolean keyfirst)
     int clr = NO_COLOR;
 
     if (keyfirst) {
-        pline("どのキーに割り当てるか? ");
+        pline("どのキーに割り当てますか? ");
         key = pgetchar();
 
         if (!key || key == '\033')
@@ -2429,7 +2429,7 @@ handler_rebind_keys(void)
         add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
                  "変更されたキー割り当てを表示する", MENU_ITEMFLAGS_NONE);
     }
-    end_menu(win, "何をするか?");
+    end_menu(win, "何をなさいますか?");
     npick = select_menu(win, PICK_ONE, &picks);
     destroy_nhwindow(win);
     if (npick > 0) {
@@ -2478,7 +2478,7 @@ handler_change_autocompletions(void)
                  MENU_ITEMFLAGS_NONE);
     }
 
-    end_menu(win, "どのコマンドを自動補完するか?");
+    end_menu(win, "どのコマンドを自動補完しますか?");
     n = select_menu(win, PICK_ANY, &picks);
     if (n >= 0) {
         int j;
@@ -3985,7 +3985,7 @@ getdir(const char *s)
     if (gi.in_doagain || *readchar_queue) {
         dirsym = readchar();
     } else {
-        dirsym = yn_function((s && *s != '^') ? s : "どの方向?",
+        dirsym = yn_function((s && *s != '^') ? s : "どの方向ですか?",
                              (char *) 0, '\0', FALSE);
 
         /* for the fuzzer, usually force the result to be a valid direction,
@@ -4880,7 +4880,7 @@ there_cmd_menu(coordxy x, coordxy y, int mod)
         act_on_act(act, dx, dy);
         return '\0';
     } else {
-        end_menu(win, "何をしたいか?");
+        end_menu(win, "何をなさいますか?");
         npick = select_menu(win, PICK_ONE, &picks);
         ch = '\033';
     }

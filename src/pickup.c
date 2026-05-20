@@ -2998,7 +2998,7 @@ use_container(
     if (obj->olocked) {
         pline("%s施錠されている。", Tobjnam(obj, "are"));
         if (held)
-            You("解錠するには地面に置く必要があった.");
+            You("解錠するには地面に置く必要がある.");
         return ECMD_OK;
     } else if (obj->otrapped) {
         if (held)

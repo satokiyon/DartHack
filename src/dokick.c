@@ -1267,7 +1267,7 @@ dokick(void)
         You("小さすぎて蹴ることができない.");
         no_kick = TRUE;
     } else if (u.usteed) {
-        if (yn_function("乗騎を蹴るか?", ynchars, 'y', TRUE) == 'y') {
+        if (yn_function("乗騎を蹴りますか?", ynchars, 'y', TRUE) == 'y') {
             You("%sを蹴った.", mon_nam(u.usteed));
             kick_steed();
             return ECMD_TIME;
