@@ -404,7 +404,7 @@ dosit(void)
     int typ = levl[u.ux][u.uy].typ;
 
     if (u.usteed) {
-        You("すでに%sに乗っている.", mon_nam(u.usteed));
+        You("すでに%sに乗っている.", l_monnam(u.usteed));
         return ECMD_OK;
     }
     if (u.uundetected && is_hider(gy.youmonst.data)

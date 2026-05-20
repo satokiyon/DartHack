@@ -266,7 +266,7 @@ uleftvault(struct monst *grd)
         && um_dist(grd->mx, grd->my, 1)) {
         if (grd->mpeaceful) {
             if (canspotmon(grd)) /* see or sense via telepathy */
-                pline("%sは激怒した.", Monnam(grd));
+                pline("%sは激怒した.", l_monnam(grd));
             grd->mpeaceful = 0; /* bypass setmangry() */
         }
         /* if arriving outside guard's temporary corridor, give the
@@ -1175,7 +1175,7 @@ gd_move(struct monst *grd)
         /* We're stuck, so try to find a new destination. */
         if (!find_guard_dest(grd, &egrd->gdx, &egrd->gdy)
             || (egrd->gdx == ggx && egrd->gdy == ggy)) {
-            pline("%sは混乱して消えた.", Monnam(grd));
+            pline("%sは混乱して消えた.", l_monnam(grd));
             return gd_move_cleanup(grd, semi_dead, TRUE);
         } else
             goto nextpos;
@@ -1194,7 +1194,7 @@ gd_move(struct monst *grd)
            it and give an inappropriate message */
         mpickgold(grd);
         if (canspotmon(grd))
-            pline("%sは金をいくらか拾った.", Monnam(grd));
+            pline("%sは金をいくらか拾った.", l_monnam(grd));
     } else
         newsym(grd->mx, grd->my);
     restfakecorr(grd);
@@ -1226,7 +1226,7 @@ paygd(boolean silently)
 
         mnexto(grd, RLOC_NOMSG);
         if (!silently)
-            pline("%sはあなたの金を宝物庫へ送り届けた.", Monnam(grd));
+            pline("%sはあなたの金を宝物庫へ送り届けた.", l_monnam(grd));
         gdx = svr.rooms[EGD(grd)->vroom].lx + rn2(2);
         gdy = svr.rooms[EGD(grd)->vroom].ly + rn2(2);
         Sprintf(buf, "クロイソスへ: %sなる%sから回収した金をここに納める.",

@@ -67,7 +67,7 @@ use_saddle(struct obj *otmp)
     if (touch_petrifies(ptr) && !uarmg && !Stone_resistance) {
         char kbuf[BUFSZ];
 
-        You("%sに触れた.", mon_nam(mtmp));
+        You("%sに触れた.", l_monnam(mtmp));
         if (!(poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))) {
             Sprintf(kbuf, "attempting to saddle %s",
                     an(jp_pmname(mtmp->data, Mgender(mtmp))));
@@ -127,7 +127,7 @@ use_saddle(struct obj *otmp)
 
     /* Make the attempt */
     if (rn2(100) < chance) {
-        You("%sに鞍を載せた.", mon_nam(mtmp));
+        You("%sに鞍を載せた.", l_monnam(mtmp));
         if (otmp->owornmask)
             remove_worn_item(otmp, FALSE);
         freeinv(otmp);
@@ -204,7 +204,7 @@ mount_steed(
 
     /* Sanity checks */
     if (u.usteed) {
-        You("すでに%sに乗っていた.", mon_nam(u.usteed));
+        You("すでに%sに乗っていた.", l_monnam(u.usteed));
         return (FALSE);
     }
 
@@ -288,7 +288,7 @@ mount_steed(
     if (touch_petrifies(ptr) && !Stone_resistance) {
         char kbuf[BUFSZ];
 
-        You("%sに触れた.", mon_nam(mtmp));
+        You("%sに触れた.", l_monnam(mtmp));
         Sprintf(kbuf, "attempting to ride %s",
             an(jp_pmname(mtmp->data, Mgender(mtmp))));
         instapetrify(kbuf);
@@ -300,7 +300,7 @@ mount_steed(
     if (mtmp->mtrapped) {
         struct trap *t = t_at(mtmp->mx, mtmp->my);
 
-        You_cant("%sに乗ることはできない。%sが%sに引っ掛かっている。", mon_nam(mtmp),
+        You_cant("%sに乗ることはできない。%sが%sに引っ掛かっている。", l_monnam(mtmp),
                  mhe(mtmp), an(trapname(t->ttyp, FALSE)));
         return (FALSE);
     }
@@ -327,7 +327,7 @@ mount_steed(
     /* Is the player impaired? */
     if (!force && !is_floater(ptr) && !is_flyer(ptr) && Levitation
         && !Lev_at_will) {
-        You("%sに手が届かない.", mon_nam(mtmp));
+        You("%sに手が届かない.", l_monnam(mtmp));
         return (FALSE);
     }
     if (!force && uarm && is_metallic(uarm) && greatest_erosion(uarm)) {
@@ -343,7 +343,7 @@ mount_steed(
             pline("%s slips away from you.", Monnam(mtmp));
             return FALSE;
         }
-        You("%sに乗ろうとして滑った.", mon_nam(mtmp));
+        You("%sに乗ろうとして滑った.", l_monnam(mtmp));
 
         Sprintf(buf, "slipped while mounting %s",
                 /* "a saddled mumak" or "a saddled pony called Dobbin" */
@@ -361,7 +361,7 @@ mount_steed(
         if (Levitation && !is_floater(ptr) && !is_flyer(ptr))
             /* Must have Lev_at_will at this point */
             pline("%s magically floats up!", Monnam(mtmp));
-        You("%sに乗った.", mon_nam(mtmp));
+        You("%sに乗った.", l_monnam(mtmp));
         if (Flying)
             You("%sとともに飛び立った.", mon_nam(mtmp));
     }
@@ -616,7 +616,7 @@ dismount_steed(
         }
         break;
     case DISMOUNT_POLY:
-        You("もう%sには乗れなかった.", mon_nam(u.usteed));
+        You("もう%sには乗れなかった.", l_monnam(u.usteed));
         if (!have_spot)
             have_spot = landing_spot(&cc, reason, 1);
         break;

@@ -441,7 +441,7 @@ cutworm(struct monst *worm, coordxy x, coordxy y,
                 pline("Part of %s tail has been cut off.",
                       s_suffix(mon_nam(worm)));
         } else
-            You("%sの尾を一部切り取った。", mon_nam(worm));
+            You("%sの尾を一部切り取った。", l_monnam(worm));
         toss_wsegs(new_tail, TRUE);
         if (worm->mhp > 1)
             worm->mhp /= 2;
@@ -473,7 +473,7 @@ cutworm(struct monst *worm, coordxy x, coordxy y,
     if (svc.context.mon_moving)
         pline("%s is cut in half.", Monnam(worm));
     else
-        You("%sを両断した。", mon_nam(worm));
+        You("%sを両断した。", l_monnam(worm));
 }
 
 /*

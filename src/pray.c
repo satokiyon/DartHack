@@ -612,7 +612,7 @@ god_zaps_you(aligntyp resp_god)
     if (u.uswallow) {
         pline(
           "Suddenly a bolt of lightning comes down at you from the heavens!");
-        pline("%sを打ち抜いた!", mon_nam(u.ustuck));
+        pline("%sを打ち抜いた!", l_monnam(u.ustuck));
         if (!resists_elec(u.ustuck)) {
             pline("%s fries to a crisp!", Monnam(u.ustuck));
             /* Yup, you get experience.  It takes guts to successfully

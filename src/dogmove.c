@@ -458,7 +458,7 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
 
                             if (flags.verbose)
                                 pline_xy(omx, omy, "%sは%sを拾った.",
-                                      Monnam(mtmp), otmpname);
+                                      l_monnam(mtmp), otmpname);
                         }
                         obj_extract_self(otmp);
                         newsym(omx, omy);

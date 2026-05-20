@@ -994,7 +994,7 @@ minliquid_core(struct monst *mtmp)
         int dam = d(2, 6);
 
         if (cansee(mtmp->mx, mtmp->my))
-            pline_mon(mtmp, "%sは錆びた.", Monnam(mtmp));
+            pline_mon(mtmp, "%sは錆びた.", l_monnam(mtmp));
         mtmp->mhp -= dam;
         if (mtmp->mhpmax > dam)
             mtmp->mhpmax -= dam;
@@ -1043,10 +1043,10 @@ minliquid_core(struct monst *mtmp)
                 if (DEADMONSTER(mtmp)) {
                     if (cansee(mtmp->mx, mtmp->my))
                         pline_mon(mtmp, "%sは炎に屈した.",
-                                  Monnam(mtmp));
+                                  l_monnam(mtmp));
                     mondead(mtmp); /* no corpse */
                 } else if (cansee(mtmp->mx, mtmp->my)) {
-                    pline_mon(mtmp, "%sは少し燃えた.", Monnam(mtmp));
+                    pline_mon(mtmp, "%sは少し燃えた.", l_monnam(mtmp));
                 }
             }
             if (!DEADMONSTER(mtmp)) {
@@ -1080,10 +1080,10 @@ minliquid_core(struct monst *mtmp)
             }
             if (cansee(mtmp->mx, mtmp->my)) {
                 if (svc.context.mon_moving)
-                    pline_mon(mtmp, "%sは溺れた.", Monnam(mtmp));
+                    pline_mon(mtmp, "%sは溺れた.", l_monnam(mtmp));
                 else
                     /* hero used fire to melt ice that monster was on */
-                    You("%sを溺れさせた.", mon_nam(mtmp));
+                    You("%sを溺れさせた.", l_monnam(mtmp));
             }
             if (engulfing_u(mtmp)) {
                 /* This can happen after a purple worm plucks you off a
@@ -2877,7 +2877,7 @@ lifesaved_monster(struct monst *mtmp)
             /* genocided monster can't be life-saved */
             if (cansee(mtmp->mx, mtmp->my))
                 pline("残念ながら、%sはまだ抹殺されたままだ...",
-                      mon_nam(mtmp));
+                      l_monnam(mtmp));
             mtmp->mhp = 0;
         }
     }

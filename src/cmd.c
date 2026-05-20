@@ -4592,11 +4592,11 @@ there_cmd_menu_next2u(
     }
     if (mtmp && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)
         && carrying(SADDLE)) {
-        Sprintf(buf, "%sに鞍を付ける", mon_nam(mtmp));
+        Sprintf(buf, "%sに鞍を付ける", l_monnam(mtmp));
         mcmd_addmenu(win, MCMD_APPLY_SADDLE, buf), ++K;
     }
     if (mtmp && (mtmp->mpeaceful || mtmp->mtame)) {
-        Sprintf(buf, "%sに話しかける", mon_nam(mtmp));
+        Sprintf(buf, "%sに話しかける", l_monnam(mtmp));
         mcmd_addmenu(win, MCMD_TALK, buf), ++K;
 
         Sprintf(buf, "%sと位置を入れ替える", mon_nam(mtmp));

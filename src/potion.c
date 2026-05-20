@@ -2907,7 +2907,7 @@ split_mon(
             mtmp2->mhpmax = mon->mhpmax / 2;
             mon->mhpmax -= mtmp2->mhpmax;
             if (canspotmon(mon))
-                pline("%sは分裂した%s!", Monnam(mon), reason);
+                pline("%sは分裂した%s!", l_monnam(mon), reason);
         }
     }
     return mtmp2;

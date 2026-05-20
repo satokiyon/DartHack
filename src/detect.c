@@ -1912,11 +1912,11 @@ openit(void)
             if (Blind)
                 pline("口が開く音がした!");
             else
-                pline("%sが口を開いた!", Monnam(u.ustuck));
+                pline("%sが口を開いた!", l_monnam(u.ustuck));
 #if 0   /* expels() will take care of this */
         } else if (enfolds(u.ustuck->data)) {
             /* trapper or lurker above */
-            pline("%sが広がった!", Monnam(u.ustuck));
+            pline("%sが広がった!", l_monnam(u.ustuck));
 #endif
         }
         expels(u.ustuck, u.ustuck->data, TRUE);

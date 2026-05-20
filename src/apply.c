@@ -346,7 +346,7 @@ use_stethoscope(struct obj *obj)
     gn.notonhead = u.uswallow;
     if (u.usteed && u.dz > 0) {
         if (interference) {
-            pline("%sが邪魔をした.", Monnam(u.ustuck));
+            pline("%sが邪魔をした.", l_monnam(u.ustuck));
             mstatusline(u.ustuck);
         } else
             mstatusline(u.usteed);
@@ -355,7 +355,7 @@ use_stethoscope(struct obj *obj)
         mstatusline(u.ustuck);
         return res;
     } else if (u.uswallow && interference) {
-        pline("%sが邪魔をした.", Monnam(u.ustuck));
+        pline("%sが邪魔をした.", l_monnam(u.ustuck));
         mstatusline(u.ustuck);
         return res;
     } else if (u.dz) {
@@ -725,7 +725,7 @@ m_unleash(struct monst *mtmp, boolean feedback)
     if (feedback) {
         if (canseemon(mtmp))
             pline_mon(mtmp, "%sは%s綱から抜け出した!",
-                      Monnam(mtmp), mhis(mtmp));
+                      l_monnam(mtmp), mhis(mtmp));
         else
             Your("綱がゆるんだ.");
     }
@@ -825,7 +825,7 @@ use_leash_core(struct obj *obj, struct monst *mtmp, coord *cc, int spotmon)
            (and also that it doesn't change location by retry time) */
         map_invisible(cc->x, cc->y);
     } else if (!mtmp->mtame) {
-        pline("%sは%s首輪の対象ではなかった!", Monnam(mtmp),
+        pline("%sは%s首輪の対象ではなかった!", l_monnam(mtmp),
               (!obj->leashmon) ? "" : "この");
     } else if (!obj->leashmon) {
         /* applying a leash which isn't currently in use */
@@ -836,7 +836,7 @@ use_leash_core(struct obj *obj, struct monst *mtmp, coord *cc, int spotmon)
             pline("首輪はただ外れただけだった.");
         } else if (nolimbs(mtmp->data) && !has_head(mtmp->data)) {
             pline("%sには首輪を通せる突起がなかった.",
-                  Monnam(mtmp));
+                  l_monnam(mtmp));
         } else if (!leashable(mtmp)) {
             char lmonbuf[BUFSZ];
             char *lmonnam = l_monnam(mtmp);
@@ -947,7 +947,7 @@ check_leash(coordxy x, coordxy y)
                     || (mtmp->mhp -= rnd(2)) <= 0) {
                     long save_pacifism = u.uconduct.killer;
 
-                    Your("綱が%sを絞め殺した!", mon_nam(mtmp));
+                    Your("綱が%sを絞め殺した!", l_monnam(mtmp));
                     /* hero might not have intended to kill pet, but
                        that's the result of his actions; gain experience,
                        lose pacifism, take alignment and luck hit, make
@@ -958,7 +958,7 @@ check_leash(coordxy x, coordxy y)
                         u.uconduct.killer = save_pacifism;
                 } else {
                     pline_mon(mtmp, "%sは綱で首を絞められた!",
-                              Monnam(mtmp));
+                              l_monnam(mtmp));
                     /* tameness eventually drops to 1 here (never 0) */
                     if (mtmp->mtame && rn2(mtmp->mtame))
                         mtmp->mtame--;
@@ -1108,27 +1108,27 @@ use_mirror(struct obj *obj)
     mlet = mtmp->data->mlet;
     if (mtmp->msleeping) {
         if (vis)
-            pline("%sはあなたの%sを見るには疲れすぎていた.", Monnam(mtmp),
+            pline("%sはあなたの%sを見るには疲れすぎていた.", l_monnam(mtmp),
                   mirror);
     } else if (!mtmp->mcansee) {
         if (vis)
-            pline("%sは今は何も見えなかった.", Monnam(mtmp));
+            pline("%sは今は何も見えなかった.", l_monnam(mtmp));
     } else if (invis_mirror && !perceives(mtmp->data)) {
         if (vis)
-            pline("%sはあなたの%sに気づかなかった.", Monnam(mtmp), mirror);
+            pline("%sはあなたの%sに気づかなかった.", l_monnam(mtmp), mirror);
         /* infravision doesn't produce an image in the mirror */
     } else if ((how_seen & SEENMON) == MONSEEN_INFRAVIS) {
         if (vis) /* (redundant) */
-            pline("%sは遠すぎて姿を捉えられなかった.", Monnam(mtmp));
+            pline("%sは遠すぎて姿を捉えられなかった.", l_monnam(mtmp));
         /* some monsters do special things */
     } else if (mlet == S_VAMPIRE || mlet == S_GHOST || is_vampshifter(mtmp)) {
         if (vis)
-            pline("%sは姿が映らなかった.", Monnam(mtmp));
+            pline("%sは姿が映らなかった.", l_monnam(mtmp));
     } else if (monable && mtmp->data == &mons[PM_MEDUSA]) {
         if (mon_reflects(mtmp, "%sの%sで視線は反射された!"))
             return ECMD_TIME;
         if (vis)
-            pline("%sは石になった!", Monnam(mtmp));
+            pline("%sは石になった!", l_monnam(mtmp));
         gs.stoned = TRUE;
         killed(mtmp);
     } else if (monable && mtmp->data == &mons[PM_FLOATING_EYE]) {
@@ -1136,20 +1136,20 @@ use_mirror(struct obj *obj)
         if (!rn2(4))
             tmp = 120;
         if (vis)
-            pline("%sは自分の姿に凍りついた.", Monnam(mtmp));
+            pline("%sは自分の姿に凍りついた.", l_monnam(mtmp));
         else
             You_hear("%sが動きを止めたのを聞いた.", something);
         paralyze_monst(mtmp, (int) mtmp->mfrozen + tmp);
     } else if (monable && mtmp->data == &mons[PM_UMBER_HULK]) {
         if (vis)
-            pline("%sは自分自身を混乱させた!", Monnam(mtmp));
+            pline("%sは自分自身を混乱させた!", l_monnam(mtmp));
         mtmp->mconf = 1;
     } else if (monable && (mlet == S_NYMPH
                            || mtmp->data == &mons[PM_AMOROUS_DEMON])) {
         if (vis) {
             char buf[BUFSZ]; /* "She" or "He" */
 
-            pline("%sはあなたの%sに見とれた.", Monnam(mtmp), mirror);
+            pline("%sはあなたの%sに見とれた.", l_monnam(mtmp), mirror);
             pline("%sはそれを奪った!", upstart(strcpy(buf, mhe(mtmp))));
         } else
             pline("それはあなたの%sを盗んだ!", mirror);
@@ -1165,7 +1165,7 @@ use_mirror(struct obj *obj)
 
         if (mtmp->mfrozen) {
             if (vis)
-                You("%sに明らかな反応は見られなかった.", mon_nam(mtmp));
+                You("%sに明らかな反応は見られなかった.", l_monnam(mtmp));
             else
                 You_feel(
                        "その方向へ鏡を向けるのは少し間抜けに感じた.");
@@ -1173,7 +1173,7 @@ use_mirror(struct obj *obj)
         }
         if (do_react) {
             if (vis)
-                pline("%sは自分の姿に怯えた.", Monnam(mtmp));
+                pline("%sは自分の姿に怯えた.", l_monnam(mtmp));
             monflee(mtmp, d(2, 4), FALSE, FALSE);
         }
     } else if (!Blind) {
@@ -1182,10 +1182,10 @@ use_mirror(struct obj *obj)
         else if ((mtmp->minvis && !perceives(mtmp->data))
                  /* redundant: can't get here if these are true */
                  || !haseyes(mtmp->data) || gn.notonhead || !mtmp->mcansee)
-            pline("%sは%s自身の姿に気づかないようだった.", Monnam(mtmp),
+            pline("%sは%s自身の姿に気づかないようだった.", l_monnam(mtmp),
                   mhis(mtmp));
         else
-            pline("%sは%s自身の姿を無視した.", Monnam(mtmp), mhis(mtmp));
+            pline("%sは%s自身の姿を無視した.", l_monnam(mtmp), mhis(mtmp));
     }
     return ECMD_TIME;
 #undef SEENMON
@@ -2010,7 +2010,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
             return ECMD_TIME;
         }
         if (magic) {
-            You("%sに掴まれながら少しもがいた!", mon_nam(u.ustuck));
+            You("%sに掴まれながら少しもがいた!", l_monnam(u.ustuck));
             return ECMD_TIME;
         }
         You("%sから逃げられなかった!", mon_nam(u.ustuck));
@@ -2032,7 +2032,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
         legs_in_no_shape("jumping", u.usteed != 0);
         return ECMD_OK;
     } else if (u.usteed && u.utrap) {
-        pline("%sは罠にはまっていた.", Monnam(u.usteed));
+        pline("%sは罠にはまっていた.", l_monnam(u.usteed));
         return ECMD_OK;
     }
 
@@ -2859,7 +2859,7 @@ use_trap(struct obj *otmp)
             chance = (rnl(10) > 3);
         else
             chance = (rnl(10) > 5);
-        You("%sの上から手を伸ばすのは得意ではなかった.", mon_nam(u.usteed));
+        You("%sの上から手を伸ばすのは得意ではなかった.", l_monnam(u.usteed));
         Sprintf(buf, "%sの設置を続ける?",
                 the(trapname(ttyp, FALSE)));
         if (y_n(buf) == 'y') {
@@ -2998,7 +2998,7 @@ use_whip(struct obj *obj)
 
         /* Sometimes you hit your steed by mistake */
         if (u.usteed && !rn2(proficient + 2)) {
-            You("%sを鞭で打った!", mon_nam(u.usteed));
+            You("%sを鞭で打った!", l_monnam(u.usteed));
             kick_steed();
             return ECMD_TIME;
         }
@@ -3226,7 +3226,7 @@ use_whip(struct obj *obj)
                 stumble_onto_mimic(mtmp);
                 do_snap = FALSE;
             } else {
-                You("%sへむちを振るった.", mon_nam(mtmp));
+                You("%sへむちを振るった.", l_monnam(mtmp));
             }
             if (proficient && force_attack(mtmp, FALSE))
                 return ECMD_TIME;
@@ -3811,7 +3811,7 @@ use_grapple(struct obj *obj)
             (void) attack_checks(mtmp, uwep);
             flags.confirm = save_confirm;
             check_caitiff(mtmp); /* despite fact there's no damage */
-            You("%sを引き寄せた!", mon_nam(mtmp));
+            You("%sを引き寄せた!", l_monnam(mtmp));
             mtmp->mundetected = 0;
             rloc_to(mtmp, cc.x, cc.y);
             return ECMD_TIME;

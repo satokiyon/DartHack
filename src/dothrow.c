@@ -1024,7 +1024,7 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
     }
     if ((mtmp = m_at(x, y)) != 0 && mtmp != mon) {
         if (canseemon(mon) || canseemon(mtmp))
-            pline("%sが%sにぶつかった.", Monnam(mon), a_monnam(mtmp));
+            pline("%sが%sにぶつかった.", l_monnam(mon), a_monnam(mtmp));
         wakeup(mtmp, !svc.context.mon_moving);
         /* check whether 'mon' is turned to stone by touching 'mtmp' */
         if (touch_petrifies(mtmp->data)
@@ -1139,7 +1139,7 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
      */
     if (mon->data->msize >= MZ_HUGE || mon == u.ustuck || mon->mtrapped) {
         if (canseemon(mon))
-            pline("%sはびくともしない!", Monnam(mon));
+            pline("%sはびくともしない!", l_monnam(mon));
         return;
     }
 
@@ -1806,7 +1806,7 @@ throwit(
         obj_no_longer_held(obj);
         if (mon && mon->isshk && is_pick(obj)) {
             if (cansee(gb.bhitpos.x, gb.bhitpos.y))
-                pline("%sが%sをひったくった.", Monnam(mon), the(xname(obj)));
+                pline("%sが%sをひったくった.", l_monnam(mon), the(xname(obj)));
             if (*u.ushops || obj->unpaid)
                 check_shop_obj(obj, gb.bhitpos.x, gb.bhitpos.y, FALSE);
             (void) mpickobj(mon, obj); /* may merge and free obj */
@@ -2088,10 +2088,10 @@ thitmonst(
             tmiss(obj, mon, FALSE);
             return 0;
         } else if (mon->mtame) {
-            pline("%sは%sを受け止めて落とした.", Monnam(mon), the(xname(obj)));
+            pline("%sは%sを受け止めて落とした.", l_monnam(mon), the(xname(obj)));
             return 0;
         } else {
-            pline("%sは%sを受け止めた.", Monnam(mon), the(xname(obj)));
+            pline("%sは%sを受け止めた.", l_monnam(mon), the(xname(obj)));
             return gem_accept(mon, obj);
         }
     }

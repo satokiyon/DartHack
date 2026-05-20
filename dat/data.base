@@ -1742,27 +1742,19 @@ fruit
 fruitname
 	食用であると言われている。冒険者の中には奇妙な味覚を持つ者もいる。
 *fung*
-	Fungi, division of simple plants that lack chlorophyll, true
-	stems, roots, and leaves.  Unlike algae, fungi cannot
-	photosynthesize, and live as parasites or saprophytes.  The
-	division comprises the slime molds and true fungi.  True
-	fungi are multicellular (with the exception of yeasts); the
-	body of most true fungi consists of slender cottony
-	filaments, or hyphae.  All fungi are capable of asexual
-	reproduction by cell division, budding, fragmentation, or
-	spores.  Those that reproduce sexually alternate a sexual
-	generation (gametophyte) with a spore-producing one.  The
-	four classes of true fungi are the algaelike fungi (e.g.,
-	black bread mold and downy mildew), sac fungi (e.g., yeasts,
-	powdery mildews, truffles, and blue and green molds such as
-	Penicillium), basidium fungi (e.g., mushrooms and puffballs)
-	and imperfect fungi (e.g., species that cause athlete's foot
-	and ringworm).  Fungi help decompose organic matter (important
-	in soil renewal); are valuable as a source of antibiotics,
-	vitamins, and various chemicals; and for their role in
-	fermentation, e.g., in bread and alcoholic beverage
-	production.
-		[ The Concise Columbia Encyclopedia ]
+	菌類（Fungi）は、葉緑素を持たず、真正の茎、根、葉を欠く単なる植物の
+	一区分である。藻類とは異なり、菌類は光合成を行うことができず、寄生
+	または腐生生活を送る。この区分には粘菌と真菌が含まれる。真菌は（酵母
+	を除き）多細胞生物であり、その体は糸状の細い菌糸から成る。すべての
+	菌類は、細胞分裂、出芽、断片化、または胞子形成による無性生殖が可能
+	である。有性生殖を行う菌類は、有性世代（配偶体）と胞子形成世代を
+	交互に繰り返す。真菌には4つの綱がある：藻菌類（例：黒パンカビやべと
+	病菌）、子嚢菌類（例：酵母、うどんこ病菌、トリュフ、およびペニシリウム
+	などの青緑カビ）、担子菌類（例：キノコやホコリタケ）、不完全菌類（例：
+	水虫や白癬菌の原因となる種）。菌類は有機物の分解を助け（土壌の再生に
+	重要である）、抗生物質、ビタミン、および様々な化学物質の供給源として、
+	また発酵の役割（パンやアルコール飲料の製造など）として価値がある。
+		[ コロンビア百科事典 ]
 *gargoyle
 	And so it came to pass that while Man ruled on Earth, the
 	gargoyles waited, lurking, hidden from the light.  Reborn
@@ -1803,32 +1795,28 @@ fruitname
 gehenn*
 *h?nnom
 hell
-	"Place of Torment."  The Valley of Hinnom, south-west of
-	Jerusalem, where Solomon, king of Israel, built "a high place",
-	or place of worship, for the gods Chemosh and Moloch.  The
-	valley came to be regarded as a place of abomination because
-	some of the Israelites sacrificed their children to Moloch
-	there.  In a later period it was made a refuse dump and
-	perpetual fires were maintained there to prevent pestilence.
-	Thus, in the New Testament, Gehenna became synonymous with hell.
-		[ Encyclopedia Mythica, ed. M.F. Lindemans ]
+	「苦しみの場所」。エルサレムの南西にあるヒンノムの谷。イスラエル王
+	ソロモンが、神ケモシュとモロクのために「高き場所」、すなわち礼拝の
+	場所を築いた。その谷は、一部のイスラエル人がそこでモロクに子供を
+	捧げたため、忌まわしい場所とみなされるようになった。後の時代には
+	ゴミ捨て場となり、疫病を防ぐために絶えず火が燃やされていた。この
+	ため、新約聖書においてゲヘナは地獄と同義語となった。
+		[ エンサイクロペディア・ミシカ、M・F・リンデマンス編 ]
 gelatinous cube
-	Despite its popularity (or perhaps because of it), the
-	gelatinous cube is also widely known as one of the sillier
-	role-playing monsters.  It is something of a commentary on the
-	ubiquity of treasure-laden dungeons in the Dungeons & Dragons
-	universe, as the cube is a creature specifically adapted to a
-	dungeon ecosystem.  10 feet to the side, it travels through
-	standard 10-foot by 10-foot dungeon corridors, cleaning up
-	debris and redistributing treasure by excreting indigestible
-	metal items.
-		[ Wikipedia, the free encyclopedia ]
+	その人気（あるいは、おそらくはその人気の理由）にもかかわらず、
+	ゼラチナス・キューブは最も馬鹿げたロールプレイング・モンスターの
+	一つとしても広く知られている。それはダンジョンズ＆ドラゴンズの世界
+	における、宝物が溢れるダンジョンの遍在性に対する一種の批評であり、
+	このキューブはダンジョンの生態系に特化したクリーチャーである。
+	一辺が10フィートあり、標準的な10フィート四方のダンジョンの通路を
+	移動しながら、消化できない金属製品を排泄することで、瓦礫を掃除し
+	宝物を再配置している。
+		[ ウィキペディア、フリー百科事典 ]
 *gem
 gem or rock
-	The difference between false memories and true ones is the
-	same as for jewels:  it is always the false ones that look the
-	most real, the most brilliant.
-		[ Salvador Dali ]
+	偽の記憶と真実の記憶の違いは、宝石の場合と同じである。最もリアルで、
+	最も輝いて見えるのは、常に偽物の方である。
+		[ サルバドール・ダリ ]
 # 5.0; monster derived from slash'em which lacked a description so this
 # entry has been created from scratch
 genetic engineer
@@ -1848,30 +1836,23 @@ genetic engineer
 	a much smaller voice.
 		[ Cetaganda, Lois McMaster Bujold ]
 geryon
-	Forthwith that image vile of fraud appear'd,
-	His head and upper part expos'd on land,
-	But laid not on the shore his bestial train.
-	His face the semblance of a just man's wore,
-	So kind and gracious was its outward cheer;
-	The rest was serpent all: two shaggy claws
-	Reach'd to the armpits, and the back and breast,
-	And either side, were painted o'er with nodes
-	And orbits.  Colours variegated more
-	Nor Turks nor Tartars e'er on cloth of state
-	With interchangeable embroidery wove,
-	Nor spread Arachne o'er her curious loom.
-	As ofttimes a light skiff, moor'd to the shore,
-	Stands part in water, part upon the land;
-	Or, as where dwells the greedy German boor,
-	The beaver settles watching for his prey;
-	So on the rim, that fenc'd the sand with rock,
-	Sat perch'd the fiend of evil.  In the void
-	Glancing, his tail upturn'd its venomous fork,
-	With sting like scorpion's arm'd.  Then thus my guide:
-	"Now need our way must turn few steps apart,
-	Far as to that ill beast, who couches there."
-	    [ The Inferno, from The Divine Comedy of Dante Alighieri,
-	      translated by H.F. Cary ]
+	直ちにその欺瞞の卑劣な姿が現れた。
+	頭と上半身は陸にさらされていたが、その獣のような尾は岸に横たえてはいなかった。
+	その顔は正義の人の面影をまとっており、その外見は親切で優雅であった；
+	だがそれ以外はすべて蛇であった：二つの毛深い爪が脇の下まで届き、
+	背中と胸、そして両側面は、結節（ノード）と軌道で彩られていた。
+	トルコ人もタタール人も、布の上でこれほどまでに多様な色を織り交ぜた刺繍を
+	施したことはなく、アラクネでさえ、その奇妙な織機の上にこれほどまでに
+	複雑な模様を広げたことはなかった。
+	時折、岸に繋がれた軽い小舟が、半分は水に、半分は陸にあるように、
+	あるいはドイツの強欲な大男が住む場所で、ビーバーが獲物を狙って座っている
+	ように；
+	岩で砂を囲んだ縁の上に、その邪悪な化身は座っていた。空虚の中で、
+	ちらりと見ると、尾は蠍の針のように武装し、毒のある二又の先を上げていた。
+	すると我が導き手はこう言った：
+	「今や我らの道は数歩離れなければならない、
+	そこに蹲（うずくま）っているあの邪悪な獣の方へと」
+		[『神曲 地獄篇』、ダンテ・アリギエーリ著、H・F・キャリー訳 ]
 *ghost
 valley of *dea*
 	And now the souls of the dead who had gone below came swarming
@@ -1919,83 +1900,67 @@ gauntlets*
 #~gnom* cave*man
 gnome*
 gnomish wizard
-	...  And then a gnome came by, carrying a bundle, an old
-	fellow three times as large as an imp and wearing clothes of
-	a sort, especially a hat.  And he was clearly just as frightened
-	as the imps though he could not go so fast.  Ramon Alonzo
-	saw that there must be some great trouble that was vexing
-	magical things; and, since gnomes speak the language of men, and
-	will answer if spoken to gently, he raised his hat, and asked
-	of the gnome his name.  The gnome did not stop his hasty
-	shuffle a moment as he answered 'Alaraba' and grabbed the rim
-	of his hat but forgot to doff it.
-	'What is the trouble, Alaraba?'  said Ramon Alonzo.
-	'White magic.  Run!'  said the gnome ..
-		[ The Charwoman's Shadow, by Lord Dunsany ]
+	……そしてその時、一人のノームが通りかかった。包みを抱え、小鬼の3倍も
+	あろうかという老いた姿で、何らかの衣服、特に帽子を被っていた。
+	その動きの速さからして、小鬼と同じくらい怖がっているのは明らかだったが、
+	それほど早くは動けなかった。ラモン・アロンゾは、魔法の存在を悩ませる
+	大きなトラブルがあるに違いないと察した。ノームは人間の言葉を話し、
+	優しく話しかければ答えてくれるので、彼は帽子を持ち上げ、ノームに
+	名を尋ねた。ノームは答える際に足を止めることもなく、「アラババ」と
+	言い、帽子の縁を掴んだが、被り直すのを忘れていた。
+	「何が問題なんだ、アラババ？」とラモン・アロンゾは言った。
+	「白魔術だ。逃げろ！」とノームは言った……
+		[『洗濯女の影』、ロード・ダンセイニ著 ]
 
-	"Muggles have garden gnomes, too, you know," Harry told Ron as
-	they crossed the lawn.
-	"Yeah, I've seen those things they think are gnomes," said Ron,
-	bent double with his head in a peony bush, "like fat little
-	Santa Clauses with fishing rods..."
-	There was a violent scuffling noise, the peony bush shuddered,
-	and Ron straightened up.  "This is a gnome," he said grimly.
-	"Geroff me! Gerroff me!" squealed the gnome.
-	It was certainly nothing like Santa Claus.  It was small and
-	leathery looking, with a large, knobby, bald head exactly like
-	a potato.  Ron held it at arm's length as it kicked out at him
-	with its horny little feet; he grasped it around the ankles
-	and turned it upside down.
-	  [ Harry Potter and the Chamber of Secrets, by J.K. Rowling ]
+	「マグルたちも庭のノームを飼っているんだよ、知ってるだろ」とハリーは
+	芝生を横切りながらロンに言った。
+	「ああ、彼らがノームだと思っている代物なら見たことがある」ロンは、
+	牡丹の茂みに頭を突っ込んで二つ折れになりながら言った。「釣り竿を持った
+	太ったサンタクロースみたいな……」
+	激しい格闘の音がし、牡丹の茂みが揺れ、ロンが体を起こした。「これが
+	ノームだ」彼は険しい顔で言った。
+	「離せ！ 離してくれ！」ノームは悲鳴を上げた。
+	それは確かにサンタクロースとは似ても似つかなかった。小さく革のような
+	外見で、大きなコブのある禿げた頭は、まさにジャガイモそのものだった。
+	ロンは、ノームが角質化した小さな足で蹴りかかってくるのを腕の長さで
+	抑え、足首を掴んで逆さまにした。
+	  [『ハリー・ポッターと秘密の部屋』、J.K.ローリング著 ]
 goblin
-	Now goblins are cruel, wicked, and bad-hearted.  They make
-	no beautiful things, but they make many clever ones.  They
-	can tunnel and mine as well as any but the most skilled
-	dwarves, when they take the trouble, though they are usually
-	untidy and dirty.  Hammers, axes, swords, daggers, pickaxes,
-	tongs, and also instruments of torture, they make very well,
-	or get other people to make to their design, prisoners and
-	slaves that have to work till they die for want of air and
-	light.
-	     [ The Hobbit, by J.R.R. Tolkien ]
+	ゴブリンは残酷で、邪悪で、心の卑しい生き物だ。彼らは美しいものを作る
+	ことはないが、多くの狡猾なものを作る。彼らは意欲さえあれば、最も熟練した
+	ドワーフに匹敵するほど掘削や採掘ができるが、通常はだらしなく汚い。
+	ハンマー、斧、剣、短剣、つるはし、やっとこ、そして拷問器具まで、彼らは
+	非常にうまく作るか、あるいは空気と光を求めて死ぬまで働かされる囚人や
+	奴隷といった他人に設計通り作らせる。
+	     [『ホビットの冒険』、J.R.R. トールキン著 ]
 god
 goddess
-	Goddesses and Gods operate in ones, threesomes, or whole
-	pantheons of nine or more (see Religion).  Most of them claim
-	to have made the world, and this is indeed a likely claim in
-	the case of threesomes or pantheons:  Fantasyland does have
-	the air of having been made by a committee.  But all Goddesses
-	and Gods, whether they say they made the world or not, have
-	very detailed short-term plans for it which they are determined
-	to carry out.  Consequently they tend to push people into the
-	required actions by the use of coincidence or Prophecy, or just
-	by narrowing down your available choices of what to do next:
-	if a deity is pushing you, things will go miserably badly until
-	there is only one choice left to you.
-	  [ The Tough Guide to Fantasyland, by Diana Wynne Jones ]
+	女神や神は、単独、三人組、あるいは9柱以上のパンテオン（神々の集団）
+	として活動する（宗教を参照）。彼らのほとんどは自らが世界を創造したと
+	主張しており、三人組やパンテオンの場合、それは確かにありそうな主張である。
+	ファンタジーランドは、委員会によって作られたかのような雰囲気を漂わせている。
+	しかし、すべての女神や神は、世界を創造したと言おうが言うまいが、
+	それを実行しようと決意している非常に詳細な短期計画を持っている。
+	結果として、彼らは偶然や預言を利用して、あるいは次に行うべきことの
+	選択肢を狭めることによって、人々を必要な行動へと追い込む傾向がある：
+	神格があなたを押し出そうとしているならば、選択肢が一つしか残らなく
+	なるまで、事態は悲惨なほど悪化するだろう。
+		[『ファンタジーランドの過酷なガイド』、ダイアナ・ウィン・ジョーンズ著 ]
 gold
 gold piece
-	A metal of characteristic yellow colour, the most precious
-	metal used as a common commercial medium of exchange.  Symbol,
-	Au; at. no. 79; at. wt. 197.2.  It is the most malleable
-	and ductile of all metals, and very heavy (sp. gr., 19.3).
-	It is quite unalterable by heat, moisture, and most
-	corrosive agents, and therefore well suited for its use in
-	coin and jewelry.
-	     [ Webster's New International Dictionary
-		  of the English Language, Second Edition ]
+	特徴的な黄色い色をした金属であり、一般的な商取引の媒体として使用される
+	最も貴重な金属。元素記号 Au、原子番号 79、原子量 197.2。すべての金属の中で
+	最も展性と延性に富み、非常に重い（比重 19.3）。熱、湿気、およびほとんどの
+	腐食剤によって全く変質しないため、硬貨や宝飾品としての使用に非常に適している。
+	     [『ウェブスター新国際英語辞典』、第2版 ]
 gold golem
-	The bellows he set away from the fire, and gathered all the tools
-	wherewith he wrought into a silver chest; and with a sponge wiped
-	he his face and his two hands withal, and his mighty neck and
-	shaggy breast, and put upon him a tunic, and grasped a stout staff,
-	and went forth halting; but there moved swiftly to support their
-	lord handmaidens wrought of gold in the semblance of living maids.
-	In them is understanding in their hearts, and in them speech and
-	strength, and they know cunning handiwork by gift of the immortal
-	gods.
-		[ The Iliad, by Homer ]
-~flesh golem
+	彼はふいごを火から遠ざけ、加工に使ったすべての道具を銀の箱に集めた。
+	そしてスポンジで顔と両手、力強い首と毛深い胸を拭うと、チュニックを
+	身に着け、頑丈な杖を手に取って足を引きずりながら外へ出た。
+	しかし、彼らの主を支えるために、黄金で鍛えられた生きている娘のような
+	侍女たちが素早く動いた。彼女たちの心には理解があり、言葉と力があり、
+	不死の神々の贈り物として巧妙な細工を知っていた。
+		[『イリアス』、ホマロス著 ]~flesh golem
 ~gold golem
 ~straw golem
 ~wood golem

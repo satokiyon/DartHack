@@ -2328,7 +2328,7 @@ doloot_core(void)
             if (!underfoot && container_at(cc.x, cc.y, FALSE)) {
                 if (mtmp) {
                     You_cant("%sが邪魔して、%sを奪うことはできなかった。",
-                             mon_nam(mtmp), prev_inquiry ? "他を" : "");
+                             l_monnam(mtmp), prev_inquiry ? "他を" : "");
                     return (timepassed ? ECMD_TIME : ECMD_OK);
                 } else {
                     You("略奪するには入れ物のそばにいる必要があった.");
@@ -2856,7 +2856,7 @@ observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
                         body_part(FOOT));
                 else
                       pline("箱の中の%sはまだ生きていた!",
-                          Monnam(livecat));
+                          l_monnam(livecat));
             }
             (void) christen_monst(livecat, sc);
             if (deadcat) {

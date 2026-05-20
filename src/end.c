@@ -751,7 +751,7 @@ savelife(int how)
         expels(u.ustuck, u.ustuck->data, TRUE);
     } else if (u.ustuck) {
         if (Upolyd && sticks(gy.youmonst.data))
-            You("%sを放した.", mon_nam(u.ustuck));
+            You("%sを放した.", l_monnam(u.ustuck));
         else
             pline("%s releases you.", Monnam(u.ustuck));
         unstuck(u.ustuck);

@@ -2379,7 +2379,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
             if (hard_helmet(helmet)) {
                 if (canspotmon(mtmp))
                     pline("幸い、%sは頑丈な兜をかぶっていた.",
-                          mon_nam(mtmp));
+                          l_monnam(mtmp));
                 else if (!Deaf)
                     You_hear("金属がぶつかる甲高い音が聞こえる.");
                 if (mdmg > 2)
@@ -2565,9 +2565,9 @@ litroom(
                 pline("%s %s is lit.", s_suffix(Monnam(u.ustuck)),
                       mbodypart(u.ustuck, STOMACH));
             else if (is_whirly(u.ustuck->data))
-                pline("%sは一瞬だけ輝いた.", Monnam(u.ustuck));
+                pline("%sは一瞬だけ輝いた.", l_monnam(u.ustuck));
             else
-                pline("%sはきらりと光った.", Monnam(u.ustuck));
+                pline("%sはきらりと光った.", l_monnam(u.ustuck));
         } else if (!Blind && (!Is_rogue_level(&u.uz)
                               || levl[u.ux][u.uy].typ != CORR)) {
             pline(no_op ? "光の場が一瞬あなたを包んだ!"

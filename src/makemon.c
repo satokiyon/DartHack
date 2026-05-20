@@ -2124,7 +2124,7 @@ grow_up(struct monst *mtmp, struct monst *victim)
 
         if (svm.mvitals[newtype].mvflags & G_GENOD) { /* allow G_EXTINCT */
             if (canspotmon(mtmp))
-                pline("%sは%sに成長しようとして%s！", mon_nam(mtmp),
+                pline("%sは%sに成長しようとして%s！", l_monnam(mtmp),
                       jp_pmname(ptr, Mgender(mtmp)),
                       nonliving(ptr) ? "力尽きた" : "死んでしまった");
             set_mon_data(mtmp, ptr); /* keep svm.mvitals[] accurate */

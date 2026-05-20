@@ -85,7 +85,7 @@ precheck(struct monst *mon, struct obj *obj)
                     if (vis) {
                         pline(
                             "%sがボトルを開くと、巨大な%sが現れた！",
-                              mon_nam(mon),
+                              l_monnam(mon),
                               Hallucination ? rndmonnam(NULL)
                                                                                         : (const char *) "幽霊");
                         pline("%sは恐怖で身がすくみ、"
@@ -122,7 +122,7 @@ precheck(struct monst *mon, struct obj *obj)
                 } else {
                     verbalize("ようやくか。");
                     if (vis)
-                        pline("%sは消えた。", Monnam(mtmp));
+                        pline("%sは消えた。", l_monnam(mtmp));
                     mongone(mtmp);
                 }
             }
@@ -785,7 +785,7 @@ mon_escape(struct monst *mtmp, boolean vismon)
         || (mtmp->iswiz && svc.context.no_of_wizards < 2))
         return 0;
     if (vismon)
-        pline_mon(mtmp, "%sはダンジョンから逃げ出した!", Monnam(mtmp));
+        pline_mon(mtmp, "%sはダンジョンから逃げ出した!", l_monnam(mtmp));
     mongone(mtmp);
     return 2;
 }
@@ -825,14 +825,14 @@ use_defensive(struct monst *mtmp)
             if (otmp)
                 pline_mon(mtmp, "%s uses a unicorn horn!", Monnam(mtmp));
             else
-                pline_The("%sの角先が光った!", mon_nam(mtmp));
+                pline_The("%sの角先が光った!", l_monnam(mtmp));
         }
         if (!mtmp->mcansee) {
             mcureblindness(mtmp, vismon);
         } else if (mtmp->mconf || mtmp->mstun) {
             mtmp->mconf = mtmp->mstun = 0;
             if (vismon)
-                pline_mon(mtmp, "%sはいま少し落ち着いたようだった.", Monnam(mtmp));
+                pline_mon(mtmp, "%sはいま少し落ち着いたようだった.", l_monnam(mtmp));
         } else {
             impossible("No need for unicorn horn?");
         }
@@ -896,10 +896,10 @@ use_defensive(struct monst *mtmp)
             if (mon_has_amulet(mtmp) || In_endgame(&u.uz)) {
                 if (vismon)
                       pline_mon(mtmp, "%sは一瞬ひどく混乱したようだった.",
-                          Monnam(mtmp));
+                          l_monnam(mtmp));
             } else if (nlev == depth(&u.uz)) {
                 if (vismon)
-                    pline_mon(mtmp, "%sは一瞬身震いした.", Monnam(mtmp));
+                    pline_mon(mtmp, "%sは一瞬身震いした.", l_monnam(mtmp));
             } else {
                 get_level(&flev, nlev);
                 migrate_to_level(mtmp, ledger_no(&flev), MIGR_RANDOM,
@@ -1076,7 +1076,7 @@ use_defensive(struct monst *mtmp)
             && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3)) {
             if (vismon)
                     pline("%sが階段を上ると、謎の力が一瞬%sを包んだ...",
-                      mon_nam(mtmp), mhim(mtmp));
+                      l_monnam(mtmp), mhim(mtmp));
             /* simpler than for the player; this will usually be
                the Wizard and he'll immediately go right to the
                upstairs, so there's not much point in having any
@@ -1085,7 +1085,7 @@ use_defensive(struct monst *mtmp)
                              (coord *) 0);
         } else {
             if (vismon)
-                pline_mon(mtmp, "%sは上の階へ逃げた!", Monnam(mtmp));
+                pline_mon(mtmp, "%sは上の階へ逃げた!", l_monnam(mtmp));
             migrate_to_level(mtmp, ledger_no(&(stway->tolev)),
                              MIGR_STAIRS_DOWN, (coord *) 0);
         }
@@ -1096,7 +1096,7 @@ use_defensive(struct monst *mtmp)
         if (!stway)
             return 0;
         if (vismon)
-            pline_mon(mtmp, "%sは下の階へ逃げた!", Monnam(mtmp));
+            pline_mon(mtmp, "%sは下の階へ逃げた!", l_monnam(mtmp));
         migrate_to_level(mtmp, ledger_no(&(stway->tolev)), MIGR_STAIRS_UP,
                          (coord *) 0);
         return 2;
@@ -1106,7 +1106,7 @@ use_defensive(struct monst *mtmp)
         if (!stway)
             return 0;
         if (vismon)
-            pline_mon(mtmp, "%sははしごを上って逃げた!", Monnam(mtmp));
+            pline_mon(mtmp, "%sははしごを上って逃げた!", l_monnam(mtmp));
         migrate_to_level(mtmp, ledger_no(&(stway->tolev)), MIGR_LADDER_DOWN,
                          (coord *) 0);
         return 2;
@@ -1116,7 +1116,7 @@ use_defensive(struct monst *mtmp)
         if (!stway)
             return 0;
         if (vismon)
-            pline_mon(mtmp, "%sははしごを下って逃げた!", Monnam(mtmp));
+            pline_mon(mtmp, "%sははしごを下って逃げた!", l_monnam(mtmp));
         migrate_to_level(mtmp, ledger_no(&(stway->tolev)), MIGR_LADDER_UP,
                          (coord *) 0);
         return 2;
@@ -1168,7 +1168,7 @@ use_defensive(struct monst *mtmp)
         if (!otmp->cursed && !mtmp->mcansee)
             mcureblindness(mtmp, vismon);
         if (vismon)
-            pline_mon(mtmp, "%sは少し回復したようだった.", Monnam(mtmp));
+            pline_mon(mtmp, "%sは少し回復したようだった.", l_monnam(mtmp));
         if (oseen)
             makeknown(POT_HEALING);
         m_useup(mtmp, otmp);
@@ -1182,7 +1182,7 @@ use_defensive(struct monst *mtmp)
         if (!mtmp->mcansee)
             mcureblindness(mtmp, vismon);
         if (vismon)
-            pline_mon(mtmp, "%sはかなり回復したようだった.", Monnam(mtmp));
+            pline_mon(mtmp, "%sはかなり回復したようだった.", l_monnam(mtmp));
         if (oseen)
             makeknown(POT_EXTRA_HEALING);
         m_useup(mtmp, otmp);
@@ -1197,7 +1197,7 @@ use_defensive(struct monst *mtmp)
         if (!mtmp->mcansee && otmp->otyp != POT_SICKNESS)
             mcureblindness(mtmp, vismon);
         if (vismon)
-            pline_mon(mtmp, "%sは完全に回復したようだった.", Monnam(mtmp));
+            pline_mon(mtmp, "%sは完全に回復したようだった.", l_monnam(mtmp));
         if (oseen)
             makeknown(otmp->otyp);
         m_useup(mtmp, otmp);
@@ -1658,7 +1658,7 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
             /* for consistency with zap.c, don't identify */
             if (mtmp->ispriest && *in_rooms(mtmp->mx, mtmp->my, TEMPLE)) {
                 if (cansee(mtmp->mx, mtmp->my))
-                    pline_mon(mtmp, "%sは魔法に抵抗した!", Monnam(mtmp));
+                    pline_mon(mtmp, "%sは魔法に抵抗した!", l_monnam(mtmp));
             } else if (!tele_restrict(mtmp))
                 (void) rloc(mtmp, RLOC_MSG);
         }
@@ -1943,7 +1943,7 @@ use_offensive(struct monst *mtmp)
             verbalize("はいチーズ！");
         } else if (!Blind) {
             pline("%sは%sであなたを撮影した！",
-                  Monnam(mtmp), an(xname(otmp)));
+                  l_monnam(mtmp), an(xname(otmp)));
         }
         gm.m_using = TRUE;
         if (!Blind && !resists_blnd(&gy.youmonst)) {
@@ -1970,7 +1970,7 @@ use_offensive(struct monst *mtmp)
             if (vis)
                 pline_The("巻物は火柱となって噴き上がった!");
             shieldeff(mtmp->mx, mtmp->my);
-            pline_mon(mtmp, "%sは無傷だった.", Monnam(mtmp));
+            pline_mon(mtmp, "%sは無傷だった.", l_monnam(mtmp));
             (void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
             (void) destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
             (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
@@ -2424,7 +2424,7 @@ use_misc(struct monst *mtmp)
             } else {
  skipmsg:
                 if (vismon) {
-                    pline_mon(mtmp, "%sは不安そうに見えた.", Monnam(mtmp));
+                    pline_mon(mtmp, "%sは不安そうに見えた.", l_monnam(mtmp));
                     trycall(otmp);
                 }
                 m_useup(mtmp, otmp);
@@ -2432,7 +2432,7 @@ use_misc(struct monst *mtmp)
             }
         }
         if (vismon)
-            pline_mon(mtmp, "%sはより経験を積んだようだった.", Monnam(mtmp));
+            pline_mon(mtmp, "%sはより経験を積んだようだった.", l_monnam(mtmp));
         if (oseen)
             makeknown(POT_GAIN_LEVEL);
         m_useup(mtmp, otmp);
@@ -2464,7 +2464,7 @@ use_misc(struct monst *mtmp)
                 makeknown(otmp->otyp);
         } else if (vismon && !mtmp->minvis) {
             /* cursed potion; mon tried to make itself invisible but failed */
-            pline("%sは一瞬透明になったように見えた。", Monnam(mtmp));
+            pline("%sは一瞬透明になったように見えた。", l_monnam(mtmp));
             /* we could call map_invisible() before the pline(), then
                newsym() after; unseen monster glyph would be visible during
                the pline, but hero would forget any remembered object under
@@ -2472,7 +2472,7 @@ use_misc(struct monst *mtmp)
         } else if (!vismon && canseemon(mtmp)) {
             /* cursed potion; this won't happen because a monster will only
                drink a potion of invisibility when not already invisible */
-            pline("%sが突然現れた！", Monnam(mtmp));
+            pline("%sが突然現れた！", l_monnam(mtmp));
         }
         if (otmp->otyp == POT_INVISIBILITY) {
             if (otmp->cursed)
@@ -2512,7 +2512,7 @@ use_misc(struct monst *mtmp)
         mquaffmsg(mtmp, otmp);
         m_useup(mtmp, otmp);
         if (vismon)
-            pline_mon(mtmp, "%sは突然変異した!", Monnam(mtmp));
+            pline_mon(mtmp, "%sは突然変異した!", l_monnam(mtmp));
         (void) newcham(mtmp, muse_newcham_mon(mtmp), NC_SHOW_MSG);
         if (oseen)
             makeknown(POT_POLYMORPH);
@@ -2875,7 +2875,7 @@ mcureblindness(struct monst *mon, boolean verbos)
         mon->mcansee = 1;
         mon->mblinded = 0;
         if (verbos && haseyes(mon->data))
-            pline_mon(mon, "%sは再び見えるようになった.", Monnam(mon));
+            pline_mon(mon, "%sは再び見えるようになった.", l_monnam(mon));
     }
 }
 
@@ -2943,7 +2943,7 @@ mon_consume_unstone(
         if (vis)
             pline_mon(mon, "%s has a very bad case of stomach acid.", Monnam(mon));
         if (DEADMONSTER(mon)) {
-            pline_mon(mon, "%sは死んだ!", Monnam(mon));
+            pline_mon(mon, "%sは死んだ!", l_monnam(mon));
             if (by_you)
                 /* hero gets credit (experience) and blame (possible loss
                    of alignment and/or luck and/or telepathy depending on
@@ -2957,15 +2957,15 @@ mon_consume_unstone(
     if (stoning && vis) {
         if (Hallucination)
             pline("なんてことだ。%sが未来の芸術作品を台無しにしてしまった！",
-                  mon_nam(mon));
+                  l_monnam(mon));
         else
-            pline_mon(mon, "%sは身軽になったようだ!", Monnam(mon));
+            pline_mon(mon, "%sは身軽になったようだ!", l_monnam(mon));
     }
     if (lizard && (mon->mconf || mon->mstun)) {
         mon->mconf = 0;
         mon->mstun = 0;
         if (vis && !is_bat(mon->data) && mon->data != &mons[PM_STALKER])
-            pline_mon(mon, "%sはいま少し落ち着いたようだ.", Monnam(mon));
+            pline_mon(mon, "%sはいま少し落ち着いたようだ.", l_monnam(mon));
     }
     if (mon->mtame && !mon->isminion && nutrit > 0) {
         struct edog *edog = EDOG(mon);

@@ -998,7 +998,7 @@ doengrave(void)
     }
 
     if (de->jello) {
-        You("%sを%sでくすぐった.", mon_nam(u.ustuck), de->writer);
+        You("%sを%sでくすぐった.", l_monnam(u.ustuck), de->writer);
         Your("メッセージは溶けて消えていった...");
         goto doengr_exit;
     }

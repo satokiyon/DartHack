@@ -495,7 +495,7 @@ monflee(
             } else if (flees_light(mtmp)) {
                 if (Unaware) {
                     /* tell the player even if the hero is unconscious */
-                    pline_mon(mtmp, "%sはおびえた.", Monnam(mtmp));
+                    pline_mon(mtmp, "%sはおびえた.", l_monnam(mtmp));
                 } else if (rn2(10) || Deaf) {
                     /* via flees_light(), will always be either via uwep
                        (Sunsword) or uarm (gold dragon scales/mail) or both;
@@ -508,13 +508,13 @@ monflee(
                                          : "[its imagination?]";
 
                       pline_mon(mtmp, "%sは%sの苦痛な光から逃げた.",
-                          Monnam(mtmp), lsrc);
+                          l_monnam(mtmp), lsrc);
                 } else {
                     SetVoice(mtmp, 0, 80, 0);
                     verbalize("眩しい光だ！");
                 }
             } else {
-                pline_mon(mtmp, "%sは逃げ出そうとした.", Monnam(mtmp));
+                pline_mon(mtmp, "%sは逃げ出そうとした.", l_monnam(mtmp));
             }
         }
 
@@ -585,7 +585,7 @@ mind_blast(struct monst *mtmp)
     struct monst *m2, *nmon = (struct monst *) 0;
 
     if (canseemon(mtmp))
-        pline_mon(mtmp, "%sは精神を集中させた.", Monnam(mtmp));
+        pline_mon(mtmp, "%sは精神を集中させた.", l_monnam(mtmp));
     if (mdistu(mtmp) > BOLT_LIM * BOLT_LIM) {
         You("微かな精神波動を感じた。");
         return;
@@ -636,7 +636,7 @@ mind_blast(struct monst *mtmp)
             /* wake it up first, to bring hidden monster out of hiding */
             wakeup(m2, FALSE);
             if (cansee(m2->mx, m2->my))
-                pline("それは%sを目標に定めた。", mon_nam(m2));
+                pline("それは%sを目標に定めた。", l_monnam(m2));
             m2->mhp -= rnd(15);
             if (DEADMONSTER(m2))
                 monkilled(m2, "", AD_DRIN);
@@ -1053,7 +1053,7 @@ boolean
 itsstuck(struct monst *mtmp)
 {
     if (sticks(gy.youmonst.data) && mtmp == u.ustuck && !u.uswallow) {
-        pline_mon(mtmp, "%sはあなたから逃げられなかった!", Monnam(mtmp));
+        pline_mon(mtmp, "%sはあなたから逃げられなかった!", l_monnam(mtmp));
         return TRUE;
     }
     return FALSE;
@@ -1565,7 +1565,7 @@ postmov(
                     if (flags.verbose) {
                         if (canseeit && canspotmon(mtmp)) {
                             pline_mon(mtmp, "%sは鍵を開けて扉を開いた.",
-                                  Monnam(mtmp));
+                                  l_monnam(mtmp));
                         } else if (canseeit) {
                             You_see("扉の鍵が開いて開くのを見た.");
                         } else if (!Deaf) {
@@ -1582,7 +1582,7 @@ postmov(
                     Soundeffect(se_door_open, 100);
                     if (flags.verbose) {
                         if (canseeit && canspotmon(mtmp)) {
-                            pline_mon(mtmp, "%sは扉を開いた.", Monnam(mtmp));
+                            pline_mon(mtmp, "%sは扉を開いた.", l_monnam(mtmp));
                         } else if (canseeit) {
                             You_see("扉が開くのを見た.");
                         } else if (!Deaf) {
@@ -1607,7 +1607,7 @@ postmov(
                     if (flags.verbose) {
                         if (canseeit && canspotmon(mtmp)) {
                             pline_mon(mtmp, "%sは扉を叩き壊した.",
-                                      Monnam(mtmp));
+                                      l_monnam(mtmp));
                         } else if (canseeit) {
                             You_see("扉が打ち破られて開くのを見た.");
                         } else if (!Deaf) {
@@ -1630,7 +1630,7 @@ postmov(
                     || metallivorous(ptr))) {
                 if (canseemon(mtmp))
                     pline_mon(mtmp, "%sは鉄格子を食い破った.",
-                              Monnam(mtmp));
+                              l_monnam(mtmp));
                 dissolve_bars(mtmp->mx, mtmp->my);
                 return MMOVE_DONE;
             } else if (flags.verbose && canseemon(mtmp))
