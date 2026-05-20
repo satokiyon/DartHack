@@ -1115,7 +1115,7 @@ u_stuck_cannot_go(const char *updn)
             struct monst *mtmp = u.ustuck;
 
             set_ustuck((struct monst *) 0);
-            You("%sから逃れた.", mon_nam(mtmp));
+            You("%sから逃れた.", l_monnam(mtmp));
         }
     }
     return FALSE;

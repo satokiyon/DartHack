@@ -4599,7 +4599,7 @@ there_cmd_menu_next2u(
         Sprintf(buf, "%sに話しかける", l_monnam(mtmp));
         mcmd_addmenu(win, MCMD_TALK, buf), ++K;
 
-        Sprintf(buf, "%sと位置を入れ替える", mon_nam(mtmp));
+        Sprintf(buf, "%sと位置を入れ替える", l_monnam(mtmp));
         mcmd_addmenu(win, MCMD_MOVE_DIR, buf), ++K;
 
         Sprintf(buf, "%s %s",

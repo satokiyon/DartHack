@@ -1709,7 +1709,7 @@ rloc_to_core(
         set_msg_xy(x, y);
         mtmp->mstrategy &= ~STRAT_APPEARMSG; /* one chance only */
         if (mtmp == u.ustuck && !u_at(u.ux0, u.uy0)) {
-            You("%sと一緒にテレポートした.", mon_nam(mtmp));
+            You("%sと一緒にテレポートした.", l_monnam(mtmp));
         } else if (telemsg && (couldsee(x, y) || sensemon(mtmp))) {
             pline("%s vanishes and reappears%s.",
                   Monnam(mtmp),

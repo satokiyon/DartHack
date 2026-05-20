@@ -2139,14 +2139,12 @@ domove_swap_with_pet(
     } else if (mtmp->mpeaceful && mtmp->mtrapped) {
         /* all mtame are also mpeaceful, so this affects pets too */
         assert(trap != NULL); /* implied by mtrapped */
-        const char *what = trapname(trap->ttyp, FALSE), *which = "that ";
-        char anbuf[10];
+        const char *what = trapname(trap->ttyp, FALSE);
 
         if (!trap->tseen) {
             feeltrap(trap); /* show on map once mtmp is out of the way */
-            which = just_an(anbuf, what); /* "a " or "an " */
         }
-        You("止まった.  %sは%s%sから出られなかった.", YMonnam(mtmp), which, what);
+        You("止まった.  %sは%sから出られなかった.", l_monnam(mtmp), what);
         (void) handle_tip(TIP_UNTRAP_MON);
         didnt_move = TRUE;
     } else if (mtmp->mpeaceful
@@ -2674,7 +2672,7 @@ escape_from_sticky_mon(coordxy x, coordxy y)
                 /*FALLTHRU*/
             default:
                 if (Conflict || u.ustuck->mconf || !u.ustuck->mtame) {
-                    You("%sから逃げられなかった!", y_monnam(u.ustuck));
+                    You("%sから逃げられなかった!", l_monnam(u.ustuck));
                     nomul(0);
                     return TRUE;
                 }
@@ -2685,7 +2683,7 @@ escape_from_sticky_mon(coordxy x, coordxy y)
             case 2:
                 mtmp = u.ustuck;
                 set_ustuck((struct monst *) 0);
-                You("%sから引き離れた.", y_monnam(mtmp));
+                You("%sから引き離れた.", l_monnam(mtmp));
                 break;
             }
         }

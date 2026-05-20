@@ -866,8 +866,8 @@ use_leash_core(struct obj *obj, struct monst *mtmp, coord *cc, int spotmon)
             mtmp->mleashed = 0;
             obj->leashmon = 0;
             update_inventory();
-            You("%s%sから首輪を外した.",
-                spotmon ? "あなたの" : "", l_monnam(mtmp));
+            You("%sから首輪を外した.",
+                spotmon ? y_monnam(mtmp) : l_monnam(mtmp));
         }
     }
 }
@@ -2006,14 +2006,14 @@ jump(int magic) /* 0=Physical, otherwise skill level */
             struct monst *mtmp = u.ustuck;
 
             set_ustuck((struct monst *) 0);
-            You("%sから抜け出した.", mon_nam(mtmp));
+            You("%sから抜け出した.", l_monnam(mtmp));
             return ECMD_TIME;
         }
         if (magic) {
             You("%sに掴まれながら少しもがいた!", l_monnam(u.ustuck));
             return ECMD_TIME;
         }
-        You("%sから逃げられなかった!", mon_nam(u.ustuck));
+        You("%sから逃げられなかった!", l_monnam(u.ustuck));
         return ECMD_OK;
     } else if (Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)) {
         if (magic) {

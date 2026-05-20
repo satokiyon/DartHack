@@ -75,3 +75,10 @@ git commit -m "Merge branch 'upstream-base' into main"
 - **翻訳ガイドライン**: `docs/translation-instructions-ja.md`
 - **安全チェックリスト**: `docs/message-translation-safety-checklist.md`
 - **用語集**: `docs/translation-glossary-quest.md`
+
+## 8. 技術的注意点 (メッセージ連結自然化)
+
+- 日本語テンプレートで `%s` の直後に助詞（`は/を/に/へ/が/の/と/から`）が来る表示文は、`mon_nam()/Monnam()` ではなく `l_monnam()` を優先する。
+- `%s%sから` / `%sは%s%sから` / `%sを%s%sから` のような複合テンプレートは機械置換しない。文脈ごとに語順を手動で整える。
+- 英語冠詞を返す補助（`just_an()` など）の結果を日本語文に連結しない。必要なら日本語名詞句を一度バッファへ組み立ててから表示文に渡す。
+- 置換後は対象ファイルで `get_errors` を確認し、最低限 `hack.c`, `apply.c`, `trap.c`, `uhitm.c`, `mhitu.c`, `steed.c` の表示文を重点確認する。
