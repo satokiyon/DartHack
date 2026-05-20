@@ -2129,18 +2129,17 @@ trapeffect_web(
             return Trap_Effect_Finished;
         }
         if (webmsgok) {
-            char verbbuf[BUFSZ];
-
             if (forcetrap || viasitting) {
-                Strcpy(verbbuf, "捕まった");
+                You("%sクモの巣に捕まった!", a_your[trap->madeby_u]);
             } else if (u.usteed) {
-                Sprintf(verbbuf, "%sを道連れに",
-                        x_monnam(u.usteed, steed_article, (char *) 0,
-                                 SUPPRESS_SADDLE, FALSE));
+                You("%sを道連れに、%sクモの巣にかかった!",
+                    x_monnam(u.usteed, steed_article, (char *) 0,
+                             SUPPRESS_SADDLE, FALSE),
+                    a_your[trap->madeby_u]);
             } else {
-                Sprintf(verbbuf, "%s", u_locomotion("よろめいて"));
+                You("よろめきながら、%sクモの巣にかかった!",
+                    a_your[trap->madeby_u]);
             }
-            You("%s%sクモの巣にかかった!", verbbuf, a_your[trap->madeby_u]);
         }
 
         /* time will be adjusted below */
