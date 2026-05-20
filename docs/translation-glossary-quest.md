@@ -13,13 +13,13 @@
 
 ## 2. 役職・職業（既存UI訳語準拠）
 - Archeologist: 考古学者
-- Barbarian: 蛮族
+- Barbarian: 野蛮人
 - Caveman / Cavewoman: 洞窟人
-- Healer: 治癒師
+- Healer: 薬師
 - Knight: 騎士
 - Monk: 武闘家
-- Priest / Priestess: 僧侶
-- Ranger: 野伏
+- Priest / Priestess: 司祭
+- Ranger: レンジャー
 - Rogue: 盗賊
 - Samurai: 侍
 - Tourist: 観光客

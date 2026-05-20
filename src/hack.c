@@ -3713,7 +3713,7 @@ check_special_room(boolean newlev)
                 if (!oracle->mpeaceful)
                     verbalize("ここはデルファイだ, %s.", svp.plname);
                 else
-                    verbalize("%s, %s, デルファイへようこそ!",
+                    verbalize("%s、%s! デルファイへようこそ!",
                               Hello((struct monst *) 0), svp.plname);
             } else
                 msg_given = FALSE;

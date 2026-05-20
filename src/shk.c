@@ -841,9 +841,9 @@ u_entered_shop(char *enterstring)
     } else {
         if (!Deaf && !muteshk(shkp)) {
             set_voice(shkp, 0, 80, 0);
-            verbalize("%s, %s!  Welcome%s to %s %s!", Hello(shkp), svp.plname,
-                      eshkp->visitct++ ? " again" : "",
-                      s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
+            verbalize("%s、%s! %s%s%sへようこそ!", Hello(shkp), svp.plname,
+                      shkname(shkp), eshkp->visitct++ ? "、またお越しいただき" : "の",
+                      shtypes[rt - SHOPBASE].name);
         } else {
             You("%sの%s%sに入った!",
                 s_suffix(shkname(shkp)),
@@ -4899,7 +4899,7 @@ shk_move(struct monst *shkp)
             if (strncmp(eshkp->customer, svp.plname, PL_NSIZ)) {
                 if (!Deaf && !muteshk(shkp)) {
                     SetVoice(shkp, 0, 80, 0);
-                    verbalize("%s, %s!  I was looking for %s.", Hello(shkp),
+                    verbalize("%s、%s! %sを探していましたよ。", Hello(shkp),
                               svp.plname, eshkp->customer);
                 }
                 eshkp->following = 0;
@@ -4908,7 +4908,7 @@ shk_move(struct monst *shkp)
             if (svm.moves > gf.followmsg + 4) {
                 if (!Deaf && !muteshk(shkp)) {
                     SetVoice(shkp, 0, 80, 0);
-                    verbalize("%s, %s!  Didn't you forget to pay?",
+                    verbalize("%s、%s! お支払いをお忘れではないですか?",
                               Hello(shkp), svp.plname);
                 } else {
                     pline("%sは%s %sを上に向けて掲げた。", Shknam(shkp), noit_mhis(shkp), mbodypart(shkp, HAND));
@@ -5528,14 +5528,14 @@ shk_chat(struct monst *shkp)
         if (strncmp(eshk->customer, svp.plname, PL_NSIZ)) {
             if (!Deaf && !muteshk(shkp)) {
                 SetVoice(shkp, 0, 80, 0);
-                verbalize("%s %s!  I was looking for %s.",
+                verbalize("%s、%s! %sを探していましたよ。",
                       Hello(shkp), svp.plname, eshk->customer);
             }
             eshk->following = 0;
         } else {
             if (!Deaf && !muteshk(shkp)) {
                 SetVoice(shkp, 0, 80, 0);
-                verbalize("%s %s!  Didn't you forget to pay?",
+                verbalize("%s、%s! お支払いをお忘れではないですか?",
                           Hello(shkp), svp.plname);
             } else {
                 pline("%sはあなたの%sをタップした。", Shknam(shkp), body_part(ARM));

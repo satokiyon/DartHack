@@ -39,6 +39,28 @@
 - **creature**: 怪物
 - **genocide**: 虐殺
 
+### 職業・種族・性別・属性（全UI共通の統一語彙）
+
+以下は、コンソール選択UI・GUI選択UI・Quest文言で共通して使う。
+
+- **職業**
+  - Archeologist: 考古学者
+  - Barbarian: 野蛮人
+  - Caveman / Cavewoman: 洞窟人
+  - Healer: 薬師
+  - Knight: 騎士
+  - Monk: 武闘家
+  - Priest / Priestess: 司祭
+  - Ranger: レンジャー
+  - Rogue: 盗賊
+  - Samurai: 侍
+  - Tourist: 観光客
+  - Valkyrie: ワルキューレ
+  - Wizard: 魔法使い
+- **種族**: 人間 / エルフ / ドワーフ / ノーム / オーク
+- **性別**: 男性 / 女性
+- **属性**: 秩序 / 中立 / 混沌
+
 なお、その他の用語についてはJNetHack-3.6.7の日本語化パッチ( `docs/jnethack-3.6.7-0.1.diff.UTF8` )も参考にする
 
 ## 4. フォーマット指定子の厳守
