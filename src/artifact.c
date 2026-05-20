@@ -1375,7 +1375,7 @@ Mb_hit(struct monst *magr, /* attacker */
                 gn.nomovemsg = "";
                 if (magr && magr == u.ustuck && sticks(gy.youmonst.data)) {
                     set_ustuck((struct monst *) 0);
-                    You("%sを放した!", mon_nam(magr));
+                    You("%sを放した!", l_monnam(magr));
                 }
             }
         } else {
@@ -1560,7 +1560,7 @@ artifact_hit(
             wepdesc = "The razor-sharp blade";
             /* not really beheading, but so close, why add another SPFX */
             if (youattack && engulfing_u(mdef)) {
-                You("%sを真っ二つに切り裂いた!", mon_nam(mdef));
+                You("%sを真っ二つに切り裂いた!", l_monnam(mdef));
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
                 return TRUE;
             }
@@ -1571,7 +1571,7 @@ artifact_hit(
 
                 if (bigmonst(mdef->data)) {
                     if (youattack)
-                        You("%sを深く切り裂いた!", mon_nam(mdef));
+                        You("%sを深く切り裂いた!", l_monnam(mdef));
                     else if (vis)
                         pline("%s cuts deeply into %s!", Monnam(magr),
                               hittee);
@@ -1611,9 +1611,9 @@ artifact_hit(
             if (!youdefend) {
                 if (!has_head(mdef->data) || gn.notonhead || u.uswallow) {
                     if (youattack)
-                        pline("なぜか、%sを大きく外してしまった.", mon_nam(mdef));
+                        pline("なぜか、%sを大きく外してしまった.", l_monnam(mdef));
                     else if (vis)
-                        pline("なぜか、%sは大きく外した.", mon_nam(magr));
+                        pline("なぜか、%sは大きく外した.", l_monnam(magr));
                     *dmgptr = 0;
                     return (boolean) (youattack || vis);
                 }

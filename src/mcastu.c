@@ -209,7 +209,7 @@ castmu(
         Soundeffect(se_air_crackles, 60);
         if (canseemon(mtmp) && !Deaf) {
             set_msg_xy(mtmp->mx, mtmp->my);
-            pline_The("%sの周囲の空気がはじけた.", mon_nam(mtmp));
+            pline_The("%sの周囲の空気がはじけた.", l_monnam(mtmp));
         }
         return M_ATTK_MISS;
     }

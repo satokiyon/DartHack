@@ -1047,7 +1047,7 @@ cast_chain_lightning(void)
                     if (DEADMONSTER(mon)) {
                         xkilled(mon, XKILL_GIVEMSG);
                     } else {
-                        pline("あなたは%sに電撃を浴びせた%s", mon_nam(mon), exclam(dmg));
+                        pline("あなたは%sに電撃を浴びせた%s", l_monnam(mon), exclam(dmg));
                         /* if a long worm, only map 'I' for its head */
                         if (!canseemon(mon) && !gn.notonhead)
                             /* FIXME: this doesn't work, possibly because
@@ -1055,7 +1055,7 @@ cast_chain_lightning(void)
                             map_invisible(zap.x, zap.y);
                     }
                 } else if (canseemon(mon)) {
-                    pline("%sは抵抗した。", Monnam(mon));
+                    pline("%sは抵抗した。", l_monnam(mon));
                 }
                 if (!DEADMONSTER(mon)) {
                     /* wakeup is via attack, but since mon is already

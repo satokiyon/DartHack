@@ -395,7 +395,7 @@ pick_lock(
         return PICKLOCK_DID_NOTHING;
     } else if (u.uswallow) {
         You_cant("ここでは%sに鍵を使えなかった.",
-                 mon_nam(u.ustuck));
+                 l_monnam(u.ustuck));
         return PICKLOCK_DID_NOTHING;
     }
 
@@ -555,7 +555,7 @@ pick_lock(
                 verbalize("小切手もクレジットも不要だ. 問題ない.");
             } else {
                 pline("%sはそれを喜ばないだろう.",
-                      mon_nam(mtmp));
+                      l_monnam(mtmp));
             }
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (mtmp && is_door_mappear(mtmp)) {

@@ -371,16 +371,16 @@ bribe(struct monst *mtmp, const char *prompt)
     /*Michael Paddon -- fix for negative offer to monster*/
     /*JAR880815 - */
     if (offer < 0L) {
-        You("%sに少なく払おうとしたが、失敗した.", mon_nam(mtmp));
+        You("%sに少なく払おうとしたが、失敗した.", l_monnam(mtmp));
         return 0L;
     } else if (offer == 0L) {
         You("断った.");
         return 0L;
     } else if (offer >= umoney) {
-        You("%sに全ての金を与えた.", mon_nam(mtmp));
+        You("%sに全ての金を与えた.", l_monnam(mtmp));
         offer = umoney;
     } else {
-        You("%sに%ld %sを与えた.", mon_nam(mtmp), offer, currency(offer));
+        You("%sに%ld %sを与えた.", l_monnam(mtmp), offer, currency(offer));
     }
     (void) money2mon(mtmp, offer);
     disp.botl = TRUE;

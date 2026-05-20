@@ -1939,7 +1939,7 @@ domove_bump_mon(struct monst *mtmp, int glyph)
             /* m_monnam(): "dog" or "Fido", no "invisible dog" or "it" */
             pline("失礼、%s.", m_monnam(mtmp));
         else
-            You("%sに濃突してしまった!", mon_nam(mtmp));
+            You("%sに濃突してしまった!", l_monnam(mtmp));
         return TRUE;
     }
     return FALSE;

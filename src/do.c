@@ -2173,7 +2173,7 @@ revive_corpse(struct obj *corpse)
             if (cansee(mtmp->mx, mtmp->my)) {
                 if (mcarry && canseemon(mcarry))
                     pline("驚いた%sが%sを落とした!",
-                          mon_nam(mcarry), an(cname));
+                          l_monnam(mcarry), an(cname));
                 else if (canspotmon(mtmp))
                     pline("%s suddenly appears!",
                           chewed ? Adjmonnam(mtmp, "bite-covered")
@@ -2396,7 +2396,7 @@ legs_in_no_shape(const char *for_what, /* jumping, kicking, riding */
                  boolean by_steed)
 {
     if (by_steed && u.usteed) {
-        pline("%sは%sができる状態ではない.", Monnam(u.usteed), for_what);
+        pline("%sは%sができる状態ではない.", l_monnam(u.usteed), for_what);
     } else {
         long wl = (EWounded_legs & BOTH_SIDES);
         const char *bp = body_part(LEG);

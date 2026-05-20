@@ -622,12 +622,12 @@ eat_brains(
                   (mdef == &gy.youmonst) ? "あなた" : Monnam(mdef));
         return M_ATTK_MISS; /* side-effects can't occur */
     } else if (magr == &gy.youmonst) {
-        You("%sの脳を食べた!", mon_nam(mdef));
+        You("%sの脳を食べた!", l_monnam(mdef));
     } else if (mdef == &gy.youmonst) {
         Your("脳を食べられた!");
     } else { /* monster against monster */
         if (visflag && canspotmon(mdef))
-            pline("%sの脳が食べられた!", Monnam(mdef));
+            pline("%sの脳が食べられた!", l_monnam(mdef));
     }
 
     if (flesh_petrifies(pd)) {
@@ -642,7 +642,7 @@ eat_brains(
             /* no need to check for poly_when_stoned or Stone_resistance;
                mind flayers don't have those capabilities */
             if (visflag && canseemon(magr))
-                pline("%sは石になった!", Monnam(magr));
+                pline("%sは石になった!", l_monnam(magr));
             monstone(magr);
             if (!DEADMONSTER(magr)) {
                 /* life-saved; don't continue eating the brains */
@@ -662,7 +662,7 @@ eat_brains(
          */
         eating_conducts(pd);
         if (mindless(pd)) { /* (cannibalism not possible here) */
-            pline("%sは気づかなかった.", Monnam(mdef));
+            pline("%sは気づかなかった.", l_monnam(mdef));
             /* all done; no extra harm inflicted upon target */
             return M_ATTK_MISS;
         } else if (is_rider(pd)) {
@@ -728,7 +728,7 @@ eat_brains(
          */
         if (mindless(pd)) {
             if (visflag && canspotmon(mdef))
-                pline("%sは気づかなかった.", Monnam(mdef));
+                pline("%sは気づかなかった.", l_monnam(mdef));
             return M_ATTK_MISS;
         } else if (is_rider(pd)) {
             mondied(magr);
@@ -741,7 +741,7 @@ eat_brains(
             give_nutrit = TRUE;
             if (*dmg_p >= mdef->mhp && visflag && canspotmon(mdef))
                 pline("%sの最後の記憶が消えていった...",
-                      Monnam(mdef));
+                      l_monnam(mdef));
         }
     }
 

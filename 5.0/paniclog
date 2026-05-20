@@ -1,1 +1,25 @@
 5.0.0-0 20260508 105240 1 -: scorefile missing "C:\ProgramData\NetHackJP\5.0\record", creating new scorefile.
+5.0.0-0 20260519 164518 1 -: impossible Lua error: 5:tut-1.lua Unknown object id (line 147 [string "(tut-1.lua)"])
+stack traceback:
+	[C]: in ?
+	[C]: in field 'object'
+	[string "(tut-1.lua)"]:147: in main chunk
+5.0.0-0 20260519 164518 1 -: impossible Couldn't load "tut-1.lua" - making a maze.
+5.0.0-0 20260519 185816 1 -: impossible Lua error: 5:tut-1.lua Unknown object id (line 147 [string "(tut-1.lua)"])
+stack traceback:
+	[C]: in ?
+	[C]: in field 'object'
+	[string "(tut-1.lua)"]:147: in main chunk
+5.0.0-0 20260519 185816 1 -: impossible Couldn't load "tut-1.lua" - making a maze.
+5.0.0-0 20260519 223143 1 -: impossible Lua error: 5:tut-1.lua Unknown object id (line 147 [string "(tut-1.lua)"])
+stack traceback:
+	[C]: in ?
+	[C]: in field 'object'
+	[string "(tut-1.lua)"]:147: in main chunk
+5.0.0-0 20260519 223143 1 -: impossible Couldn't load "tut-1.lua" - making a maze.
+5.0.0-0 20260520 031313 1 -: impossible Lua error: 6:minefill.lua Unknown object id (line 32 [string "(minefill.lua)"])
+stack traceback:
+	[C]: in ?
+	[C]: in field 'object'
+	[string "(minefill.lua)"]:32: in main chunk
+5.0.0-0 20260520 031313 1 -: impossible Couldn't load "minefill.lua" - making a maze.

@@ -91,9 +91,9 @@ missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
         map_invisible(mtmp->mx, mtmp->my);
 
     if (could_seduce(mtmp, &gy.youmonst, mattk) && !mtmp->mcan)
-        pline_mon(mtmp, "%sは友好的なふりをした.", Monnam(mtmp));
+        pline_mon(mtmp, "%sは友好的なふりをした.", l_monnam(mtmp));
     else
-        pline_mon(mtmp, "%sは%s外した!", Monnam(mtmp),
+        pline_mon(mtmp, "%sは%s外した!", l_monnam(mtmp),
                   (nearmiss && flags.verbose) ? "かろうじて" : "");
 
     stop_occupation();
@@ -201,7 +201,7 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
 
     compat = ((mattk->adtyp == AD_SEDU || mattk->adtyp == AD_SSEX)
               ? could_seduce(mtmp, &gy.youmonst, mattk) : 0);
-    Monst_name = Monnam(mtmp);
+    Monst_name = l_monnam(mtmp);
 
     set_msg_xy(mtmp->mx, mtmp->my);
     if (unotseen) { /* !mtmp->cansee || (Invis && !perceives(mtmp->data)) */
@@ -1580,7 +1580,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
                                                 : "外へ弾き出された");
         if (flags.verbose
             && (digests(mtmp->data) && Slow_digestion))
-                        pline("どうやら%sはあなたの味が気に入らなかったらしい.", mon_nam(mtmp));
+                        pline("どうやら%sはあなたの味が気に入らなかったらしい.", l_monnam(mtmp));
         expels(mtmp, mtmp->data, FALSE);
     }
     return M_ATTK_HIT;
@@ -1736,7 +1736,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
                 break;
             }
             if (useeit)
-                pline_mon(mtmp, "%sは石に変わった!", Monnam(mtmp));
+                pline_mon(mtmp, "%sは石に変わった!", l_monnam(mtmp));
             gs.stoned = TRUE;
             killed(mtmp);
 
@@ -2005,7 +2005,7 @@ doseduce(struct monst *mon)
     if (!seewho)
         pline("誰かに優しく撫でられた...");
     else
-        You_feel("とても%sに惹かれた.", mon_nam(mon));
+        You_feel("とても%sに惹かれた.", l_monnam(mon));
     /* cache the seducer's name in a local buffer */
     Strcpy(Who, (!seewho ? (fem ? "She" : "He") : Monnam(mon)));
 
@@ -2354,7 +2354,7 @@ staticfn int
 assess_dmg(struct monst *mtmp, int tmp)
 {
     if ((mtmp->mhp -= tmp) <= 0) {
-        pline_mon(mtmp, "%sは死んだ!", Monnam(mtmp));
+        pline_mon(mtmp, "%sは死んだ!", l_monnam(mtmp));
         xkilled(mtmp, XKILL_NOMSG);
         if (!DEADMONSTER(mtmp))
             return M_ATTK_HIT;
@@ -2468,7 +2468,7 @@ passiveum(
                      been told that hero has reverted to normal form */
                   !Upolyd ? "" : "your ", hliquid("acid"));
             if (resists_acid(mtmp)) {
-                pline_mon(mtmp, "%sには効かない.", Monnam(mtmp));
+                pline_mon(mtmp, "%sには効かない.", l_monnam(mtmp));
                 tmp = 0;
             }
         } else
@@ -2495,7 +2495,7 @@ passiveum(
                 mon_to_stone(mtmp);
                 return 1;
             }
-            pline_mon(mtmp, "%sは石に変わった!", Monnam(mtmp));
+            pline_mon(mtmp, "%sは石に変わった!", l_monnam(mtmp));
             gs.stoned = 1;
             xkilled(mtmp, XKILL_NOMSG);
             if (!DEADMONSTER(mtmp))
@@ -2552,7 +2552,7 @@ passiveum(
                     }
                 }
             } else { /* gelatinous cube */
-                pline_mon(mtmp, "%sはあなたに凍らされた.", Monnam(mtmp));
+                pline_mon(mtmp, "%sはあなたに凍らされた.", l_monnam(mtmp));
                 paralyze_monst(mtmp, tmp);
                 return M_ATTK_AGR_DONE;
             }
@@ -2560,12 +2560,12 @@ passiveum(
         case AD_COLD: /* Brown mold or blue jelly */
             if (resists_cold(mtmp)) {
                 shieldeff(mtmp->mx, mtmp->my);
-                pline_mon(mtmp, "%sは少し冷えた.", Monnam(mtmp));
+                pline_mon(mtmp, "%sは少し冷えた.", l_monnam(mtmp));
                 golemeffects(mtmp, AD_COLD, tmp);
                 tmp = 0;
                 break;
             }
-            pline_mon(mtmp, "%sは突然とても冷たくなった!", Monnam(mtmp));
+            pline_mon(mtmp, "%sは突然とても冷たくなった!", l_monnam(mtmp));
             u.mh += (tmp + rn2(2)) / 2;
             if (u.mhmax < u.mh)
                 u.mhmax = u.mh;
@@ -2583,17 +2583,17 @@ passiveum(
         case AD_FIRE: /* Red mold */
             if (resists_fire(mtmp)) {
                 shieldeff(mtmp->mx, mtmp->my);
-                pline_mon(mtmp, "%sは少し温まった.", Monnam(mtmp));
+                pline_mon(mtmp, "%sは少し温まった.", l_monnam(mtmp));
                 golemeffects(mtmp, AD_FIRE, tmp);
                 tmp = 0;
                 break;
             }
-            pline_mon(mtmp, "%sは突然とても熱くなった!", Monnam(mtmp));
+            pline_mon(mtmp, "%sは突然とても熱くなった!", l_monnam(mtmp));
             break;
         case AD_ELEC:
             if (resists_elec(mtmp)) {
                 shieldeff(mtmp->mx, mtmp->my);
-                pline_mon(mtmp, "%sは少ししびれた.", Monnam(mtmp));
+                pline_mon(mtmp, "%sは少ししびれた.", l_monnam(mtmp));
                 golemeffects(mtmp, AD_ELEC, tmp);
                 tmp = 0;
                 break;

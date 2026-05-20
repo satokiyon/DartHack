@@ -232,7 +232,7 @@ mdisplacem(
                     pline("%s tries to move %s out of %s way.", Monnam(magr),
                           mon_nam(mdef), is_rider(pa) ? "the" : mhis(magr));
                 }
-                pline_mon(magr, "%sは石に変わった!", Monnam(magr));
+                pline_mon(magr, "%sは石に変わった!", l_monnam(magr));
             }
             monstone(magr);
             if (!DEADMONSTER(magr))
@@ -341,9 +341,9 @@ mattackm(
             } else {
                 if (iflags.last_msg == PLNMSG_HIDE_UNDER
                     && mdef->m_id == gl.last_hider)
-                    pline_mon(mdef, "%sは隠れ場所から現れた.", Monnam(mdef));
+                    pline_mon(mdef, "%sは隠れ場所から現れた.", l_monnam(mdef));
                 else if (mdef->m_id == gl.last_hider)
-                    You("%sに気づいた。", mon_nam(mdef));
+                    You("%sに気づいた。", l_monnam(mdef));
                 else
                     pline("突然、%sに気づいた。", a_monnam(mdef));
             }
@@ -782,7 +782,7 @@ gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
                 return M_ATTK_MISS;
             }
             if (canseemon(magr))
-                pline_mon(magr, "%sは石に変わった!", Monnam(magr));
+                pline_mon(magr, "%sは石に変わった!", l_monnam(magr));
             monstone(magr);
             if (!DEADMONSTER(magr))
                 return M_ATTK_MISS;
@@ -975,7 +975,7 @@ explmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
         return M_ATTK_MISS;
 
     if (cansee(magr->mx, magr->my))
-        pline_mon(magr, "%sは爆発した!", Monnam(magr));
+        pline_mon(magr, "%sは爆発した!", l_monnam(magr));
     else
         noises(magr, mattk);
 
@@ -1046,7 +1046,7 @@ mdamagem(
                 return M_ATTK_HIT; /* no damage during the polymorph */
             }
             if (gv.vis && canspotmon(magr))
-                pline_mon(magr, "%sは石に変わった!", Monnam(magr));
+                pline_mon(magr, "%sは石に変わった!", l_monnam(magr));
             monstone(magr);
             if (!DEADMONSTER(magr))
                 return M_ATTK_HIT; /* lifesaved */
@@ -1395,14 +1395,14 @@ passivemm(
         case AD_COLD:
             if (resists_cold(magr)) {
                 if (canseemon(magr)) {
-                    pline_mon(magr, "%sは少し冷えた.", Monnam(magr));
+                    pline_mon(magr, "%sは少し冷えた.", l_monnam(magr));
                     golemeffects(magr, AD_COLD, tmp);
                 }
                 tmp = 0;
                 break;
             }
             if (canseemon(magr))
-                pline_mon(magr, "%sは突然とても冷たくなった!", Monnam(magr));
+                pline_mon(magr, "%sは突然とても冷たくなった!", l_monnam(magr));
             healmon(mdef, tmp/2, tmp/2);
             if (mdef->mhpmax > ((int) (mdef->m_lev + 1) * 8))
                 (void) split_mon(mdef, magr);
@@ -1419,19 +1419,19 @@ passivemm(
         case AD_FIRE:
             if (resists_fire(magr)) {
                 if (canseemon(magr)) {
-                    pline_mon(magr, "%sは少し温まった.", Monnam(magr));
+                    pline_mon(magr, "%sは少し温まった.", l_monnam(magr));
                     golemeffects(magr, AD_FIRE, tmp);
                 }
                 tmp = 0;
                 break;
             }
             if (canseemon(magr))
-                pline_mon(magr, "%sは突然とても熱くなった!", Monnam(magr));
+                pline_mon(magr, "%sは突然とても熱くなった!", l_monnam(magr));
             break;
         case AD_ELEC:
             if (resists_elec(magr)) {
                 if (canseemon(magr)) {
-                    pline_mon(magr, "%sは少ししびれた.", Monnam(magr));
+                    pline_mon(magr, "%sは少ししびれた.", l_monnam(magr));
                     golemeffects(magr, AD_ELEC, tmp);
                 }
                 tmp = 0;
@@ -1439,7 +1439,7 @@ passivemm(
             }
             if (canseemon(magr))
                 pline_mon(magr, "%sは電撃を受けた!",
-                          Monnam(magr));
+                          l_monnam(magr));
             break;
         default:
             tmp = 0;
@@ -1465,7 +1465,7 @@ xdrainenergym(struct monst *mon, boolean givemsg)
             || attacktype(mon->data, AT_BREA))) {
         mon->mspec_used += d(2, 2);
         if (givemsg)
-            pline_mon(mon, "%sはけだるそうになった.", Monnam(mon));
+            pline_mon(mon, "%sはけだるそうになった.", l_monnam(mon));
     }
 }
 

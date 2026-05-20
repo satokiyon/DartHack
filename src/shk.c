@@ -1838,7 +1838,7 @@ dopay(void)
             return ECMD_OK;
         }
         if (!mtmp->isshk) {
-            pline("%sはあなたの支払いに関心がない。", Monnam(mtmp));
+            pline("%sはあなたの支払いに関心がない。", l_monnam(mtmp));
             return ECMD_OK;
         }
         if (mtmp != resident && !m_next2u(mtmp)) {
@@ -5511,7 +5511,7 @@ shk_chat(struct monst *shkp)
            not actually a shk, which could happen if someone
            wishes for a shopkeeper statue and then animates it.
            (Note: shkname() would be "" in a case like this.) */
-        pline("%sは最近無人の店を見かけたかと尋ねた。", Monnam(shkp));
+        pline("%sは最近無人の店を見かけたかと尋ねた。", l_monnam(shkp));
         /* [Perhaps we ought to check whether this conversation
            is taking place inside an untended shop, but a shopless
            shk can probably be expected to be rather disoriented.] */

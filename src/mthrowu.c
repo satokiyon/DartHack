@@ -383,7 +383,7 @@ ohitmon(
         Soundeffect(se_splat_egg, 35);
         if (vis) {
             if (otmp->otyp == EGG) {
-                pline("べちゃ！ %sが%sの卵の直撃を食らった！", Monnam(mtmp),
+                pline("べちゃ！ %sが%sの卵の直撃を食らった！", l_monnam(mtmp),
                       otmp->known ? mons[otmp->corpsenm].pmnames[NEUTRAL]
                                   : "何か");
             } else {
@@ -405,7 +405,7 @@ ohitmon(
             if (resists_poison(mtmp)) {
                 if (vis)
                     pline_The("毒は%sに効かないようだ.",
-                              mon_nam(mtmp));
+                              l_monnam(mtmp));
             } else {
                 if (rn2(30)) {
                     damage += rnd(6);
@@ -434,7 +434,7 @@ ohitmon(
         if (otmp->otyp == ACID_VENOM && cansee(mtmp->mx, mtmp->my)) {
             if (resists_acid(mtmp)) {
                 if (vis || (verbose && !gm.mtarget))
-                    pline("%sは平然としていた.", Monnam(mtmp));
+                    pline("%sは平然としていた.", l_monnam(mtmp));
             } else {
                 if (vis)
                     pline_The("%sが%sを焼いた!", hliquid("acid"), mon_nam(mtmp));

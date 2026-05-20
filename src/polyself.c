@@ -1409,7 +1409,7 @@ rehumanize(void)
     update_inventory();
     if (was_flying && !Flying && u.usteed)
         You("そして%sと一緒にそっと%sへ戻った.",
-            mon_nam(u.usteed), surface(u.ux, u.uy));
+            l_monnam(u.usteed), surface(u.ux, u.uy));
     retouch_equipment(2);
     if (!uarmg)
         selftouch(no_longer_petrify_resistant);
@@ -1508,7 +1508,7 @@ dospinweb(void)
         return ECMD_OK;
     }
     if (u.uswallow) {
-        You("%sの中で蜘蛛の糸を吐き出した.", mon_nam(u.ustuck));
+        You("%sの中で蜘蛛の糸を吐き出した.", l_monnam(u.ustuck));
         if (is_animal(u.ustuck->data)) {
             expels(u.ustuck, u.ustuck->data, TRUE);
             return ECMD_OK;
@@ -1540,7 +1540,7 @@ dospinweb(void)
             }
             return ECMD_OK;
         } /* default: a nasty jelly-like creature */
-        pline_The("蜘蛛の巣は%sの中に溶けた.", mon_nam(u.ustuck));
+        pline_The("蜘蛛の巣は%sの中に溶けた.", l_monnam(u.ustuck));
         return ECMD_OK;
     }
     if (u.utrap) {
@@ -1676,9 +1676,9 @@ dogaze(void)
         if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)) {
             looked++;
             if (Invis && !perceives(mtmp->data)) {
-                pline("%sはあなたの視線に気づかないようだ.", Monnam(mtmp));
+                pline("%sはあなたの視線に気づかないようだ.", l_monnam(mtmp));
             } else if (mtmp->minvis && !See_invisible) {
-                You_cant("%sをどこで見つめるのか見えなかった。", Monnam(mtmp));
+                You_cant("%sをどこで見つめるのか見えなかった。", l_monnam(mtmp));
             } else if (M_AP_TYPE(mtmp) == M_AP_FURNITURE
                        || M_AP_TYPE(mtmp) == M_AP_OBJECT) {
                 looked--;
@@ -1688,7 +1688,7 @@ dogaze(void)
             } else {
                 if (flags.confirm && mtmp->mpeaceful && !Confusion) {
                     Sprintf(qbuf, "本当に%sを%sする?",
-                            mon_nam(mtmp),
+                            l_monnam(mtmp),
                             (adtyp == AD_CONF) ? "混乱" : "攻撃");
                     if (y_n(qbuf) != 'y')
                         continue;
@@ -1704,17 +1704,17 @@ dogaze(void)
                  */
                 if (adtyp == AD_CONF) {
                     if (!mtmp->mconf)
-                        Your("視線で%sを混乱させた!", mon_nam(mtmp));
+                        Your("視線で%sを混乱させた!", l_monnam(mtmp));
                     else
                         pline("%sはますます混乱した.",
-                              Monnam(mtmp));
+                              l_monnam(mtmp));
                     mtmp->mconf = 1;
                 } else if (adtyp == AD_FIRE) {
                     int dmg = d(2, 6), orig_dmg = dmg, lev = (int) u.ulevel;
 
-                    You("炎の視線で%sを攻撃した!", mon_nam(mtmp));
+                    You("炎の視線で%sを攻撃した!", l_monnam(mtmp));
                     if (resists_fire(mtmp)) {
-                        pline_The("炎は%sを燃やせなかった!", mon_nam(mtmp));
+                        pline_The("炎は%sを燃やせなかった!", l_monnam(mtmp));
                         dmg = 0;
                     }
                     if (lev > rn2(20)) {

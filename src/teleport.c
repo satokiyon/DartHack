@@ -1954,7 +1954,7 @@ tele_restrict(struct monst *mon)
     if (noteleport_level(mon)) {
         if (canseemon(mon))
             pline("謎の力に阻まれて%sはテレポートできない!",
-                  mon_nam(mon));
+                  l_monnam(mon));
         return TRUE;
     }
     return FALSE;
@@ -2025,7 +2025,7 @@ mlevel_tele_trap(
             } else if (Is_botlevel(&u.uz)) {
                 if (in_sight && trap->tseen)
                     pline_mon(mtmp, "%sは%sを避けた.",
-                              Monnam(mtmp),
+                              l_monnam(mtmp),
                              (tt == HOLE) ? "hole" : "trap");
                 return Trap_Effect_Finished;
             } else {
@@ -2073,7 +2073,7 @@ mlevel_tele_trap(
                 if (nlev == depth(&u.uz)) {
                     if (in_sight)
                         pline_mon(mtmp, "%sは一瞬身震いした.",
-                                  Monnam(mtmp));
+                                  l_monnam(mtmp));
                     return Trap_Effect_Finished;
                 }
                 get_level(&tolevel, nlev);
@@ -2084,7 +2084,7 @@ mlevel_tele_trap(
         }
 
         if (in_sight) {
-                        pline_mon(mtmp, "突然、%sは%s.", mon_nam(mtmp),
+                        pline_mon(mtmp, "突然、%sは%s.", l_monnam(mtmp),
                                          (tt == HOLE) ? "穴に落ちた"
                                      : (tt == TRAPDOOR) ? "落とし戸を通って落ちた"
                                      : "視界の外へ消えた");
@@ -2271,7 +2271,7 @@ u_teleport_mon(
     if (svl.level.flags.stasis_until >= svm.moves) {
         if (give_feedback)
             pline("謎の力に阻まれて%sをテレポートさせられない!",
-                  mon_nam(mtmp));
+                  l_monnam(mtmp));
         return FALSE;
     } else if (mtmp->ispriest && *in_rooms(mtmp->mx, mtmp->my, TEMPLE)) {
         if (give_feedback)
@@ -2279,7 +2279,7 @@ u_teleport_mon(
         return FALSE;
     } else if (engulfing_u(mtmp) && noteleport_level(mtmp)) {
         if (give_feedback)
-            You("もう%sの中にはいなかった!", mon_nam(mtmp));
+            You("もう%sの中にはいなかった!", l_monnam(mtmp));
         unstuck(mtmp);
         if (!rloc(mtmp, RLOC_MSG))
             m_into_limbo(mtmp);

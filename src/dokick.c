@@ -100,7 +100,7 @@ kickdmg(struct monst *mon, boolean clumsy)
         mdy = mon->my + u.dy;
         /* TODO: replace with mhurtle? */
         if (goodpos(mdx, mdy, mon, 0)) {
-            pline("%sは一撃によろめいた.", Monnam(mon));
+            pline("%sは一撃によろめいた.", l_monnam(mon));
             if (m_in_out_region(mon, mdx, mdy)) {
                 remove_monster(mon->mx, mon->my);
                 newsym(mon->mx, mon->my);
@@ -208,7 +208,7 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
                 Your("%s%sをけり抜けた.", kick_passes_thru, mon_nam(mon));
                 break; /* skip any additional kicks */
             } else if (tmp > kickdieroll) {
-                You("%sを蹴った.", mon_nam(mon));
+                You("%sを蹴った.", l_monnam(mon));
                 sum = damageum(mon, uattk, specialdmg);
                 (void) passive(mon, uarmf, (sum != M_ATTK_MISS),
                                !(sum & M_ATTK_DEF_DIED), AT_KICK, FALSE);
@@ -253,14 +253,14 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
     else if (uarm && objects[uarm->otyp].oc_bulky && ACURR(A_DEX) < rnd(25))
         clumsy = TRUE;
  doit:
-    You("%sを蹴った.", mon_nam(mon));
+    You("%sを蹴った.", l_monnam(mon));
     if (!rn2(clumsy ? 3 : 4) && (clumsy || !bigmonst(mon->data))
         && mon->mcansee && !mon->mtrapped && !thick_skinned(mon->data)
         && mon->data->mlet != S_EEL && haseyes(mon->data) && mon->mcanmove
         && !mon->mstun && !mon->mconf && !mon->msleeping
         && mon->data->mmove >= 12) {
         if (!nohands(mon->data) && !rn2(martial() ? 5 : 3)) {
-            pline("%sはあなたの%s蹴りを防いだ.", Monnam(mon),
+            pline("%sはあなたの%s蹴りを防いだ.", l_monnam(mon),
                 clumsy ? "不器用な" : "");
             (void) passive(mon, uarmf, FALSE, 1, AT_KICK, FALSE);
             return;
@@ -268,7 +268,7 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
             maybe_mnexto(mon);
             if (mon->mx != x || mon->my != y) {
                 (void) unmap_invisible(x, y);
-                    pline("%sは%s、あなたの%s蹴りを%s避けた.", Monnam(mon),
+                    pline("%sは%s、あなたの%s蹴りを%s避けた.", l_monnam(mon),
                       (can_teleport(mon->data) && !noteleport_level(mon))
                           ? "瞬間移動し"
                           : is_floater(mon->data)
@@ -318,7 +318,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
             setmangry(mtmp, TRUE);
         /* greedy monsters catch gold */
         if (cansee(mtmp->mx, mtmp->my))
-            pline("%sは%s金貨を受け止めた.", Monnam(mtmp),
+            pline("%sは%s金貨を受け止めた.", l_monnam(mtmp),
                 was_sleeping ? "目を覚まして" : "");
         (void) mpickobj(mtmp, gold);
         gold = (struct obj *) 0; /* obj has been freed */
@@ -1268,7 +1268,7 @@ dokick(void)
         no_kick = TRUE;
     } else if (u.usteed) {
         if (yn_function("乗騎を蹴りますか?", ynchars, 'y', TRUE) == 'y') {
-            You("%sを蹴った.", mon_nam(u.usteed));
+            You("%sを蹴った.", l_monnam(u.usteed));
             kick_steed();
             return ECMD_TIME;
         } else {
@@ -1335,7 +1335,7 @@ dokick(void)
             break;
         case 1:
             if (digests(u.ustuck->data)) {
-                pline("%sが盛大にげっぷをした.", Monnam(u.ustuck));
+                pline("%sが盛大にげっぷをした.", l_monnam(u.ustuck));
                 break;
             }
             FALLTHROUGH;

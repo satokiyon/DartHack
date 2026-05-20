@@ -706,7 +706,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
         else
             You("%sの中に%sを掘った.", surface_type, an(tname));
     } else if (!madeby_obj && canseemon(madeby)) {
-        pline("%sは%sの中に%sを掘った.", Monnam(madeby), surface_type,
+        pline("%sは%sの中に%sを掘った.", l_monnam(madeby), surface_type,
               an(tname));
     } else if (cansee(x, y) && flags.verbose) {
         if (IS_STWALL(old_typ))
@@ -745,7 +745,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
         } else if (mtmp) {
             if (is_flyer(mtmp->data) || is_floater(mtmp->data)) {
                 if (canseemon(mtmp))
-                    pline("%sは落とし穴の上を%s.", Monnam(mtmp),
+                    pline("%sは落とし穴の上を%s.", l_monnam(mtmp),
                           (is_flyer(mtmp->data)) ? "飛んでいる" : "浮かんでいる");
             } else if (mtmp != madeby)
                 (void) mintrap(mtmp, NO_TRAP_FLAGS);
@@ -813,7 +813,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
                         assign_level(&tolevel, &valley_level);
                     } else if (Is_botlevel(&u.uz)) {
                         if (canseemon(mtmp))
-                            pline("%sは罠を避けた.", Monnam(mtmp));
+                            pline("%sは罠を避けた.", l_monnam(mtmp));
                         return;
                     } else {
                         get_level(&tolevel, depth(&u.uz) + 1);

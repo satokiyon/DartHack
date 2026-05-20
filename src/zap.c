@@ -224,7 +224,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             check_gear_next_turn(mtmp); /* might want speed boots */
 
             if (engulfing_u(mtmp) && is_whirly(mtmp->data)) {
-                You("%sをかき乱した!", mon_nam(mtmp));
+                You("%sをかき乱した!", l_monnam(mtmp));
                 pline("巨大な穴が開いた...");
                 expels(mtmp, mtmp->data, TRUE);
             }
@@ -289,7 +289,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
                with their metabolism...) */
             if (mtmp->cham == NON_PM && !rn2(25)) {
                 if (canseemon(mtmp)) {
-                    pline("%sは身震いした!", Monnam(mtmp));
+                    pline("%sは身震いした!", l_monnam(mtmp));
                     learn_it = TRUE;
                 }
                 /* svc.context.bypasses = TRUE; ## for make_corpse() */
@@ -404,11 +404,11 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             if (mtmp->data->msize < MZ_HUMAN && !m_is_steadfast(mtmp)) {
                 if (canseemon(mtmp))
                     pline("%sは弾き飛ばされた!",
-                          Monnam(mtmp));
+                          l_monnam(mtmp));
                 mhurtle(mtmp, mtmp->mx - u.ux, mtmp->my - u.uy, rnd(2));
             } else {
                 if (canseemon(mtmp))
-                    pline("%sは動じなかった.", Monnam(mtmp));
+                    pline("%sは動じなかった.", l_monnam(mtmp));
             }
             if (!DEADMONSTER(mtmp)) {
                 wakeup(mtmp, !mindless(mtmp->data));
@@ -455,7 +455,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
                     } else
                         mimic_hit_msg(mtmp, otyp);
                 } else
-                      pline("%sは%s元気そうになった.", Monnam(mtmp),
+                      pline("%sは%s元気そうになった.", l_monnam(mtmp),
                           otyp == SPE_EXTRA_HEALING ? "ぐっと" : "");
             }
             if (mtmp->mtame && Role_if(PM_HEALER) && (delta > 0)) {
@@ -538,7 +538,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             } else {
                 mtmp->m_lev--;
                 if (canseemon(mtmp))
-                    pline("%sは突然弱くなった気がした!", Monnam(mtmp));
+                    pline("%sは突然弱くなった気がした!", l_monnam(mtmp));
             }
         }
         break;
@@ -584,7 +584,7 @@ release_hold(void)
     } else if (u.uswallow) { /* possible for sticky hero to be swallowed */
         if (digests(mtmp->data)) {
             if (!Blind)
-                pline("%sは口を開いた!", Monnam(mtmp));
+                pline("%sは口を開いた!", l_monnam(mtmp));
             else
                 You_feel("突然、風が吹き抜けた気がした!");
         }
@@ -595,13 +595,13 @@ release_hold(void)
            set_ustuck() will set flag for botl update, You() pline will
            trigger a status update with "UHold" removed */
         set_ustuck((struct monst *) 0);
-        You("%sを放した.", mon_nam(mtmp));
+        You("%sを放した.", l_monnam(mtmp));
     } else { /* held but not swallowed */
         unstuck(u.ustuck);
         if (!nohands(mtmp->data))
-            You("%sのつかみから解放された.", mon_nam(mtmp));
+            You("%sのつかみから解放された.", l_monnam(mtmp));
         else
-            You("%sの拘束から解放された.", mon_nam(mtmp));
+            You("%sの拘束から解放された.", l_monnam(mtmp));
     }
 }
 
@@ -1069,7 +1069,7 @@ revive(struct obj *corpse, boolean by_hero)
         if (ghost && ghost->data == &mons[PM_GHOST]) {
             if (canseemon(ghost))
                 pline("%sは突然かつての体へ引き込まれた!",
-                      Monnam(ghost));
+                      l_monnam(ghost));
             /* transfer the ghost's inventory along with it */
             while ((otmp = ghost->minvent) != 0) {
                 obj_extract_self(otmp);
@@ -2377,7 +2377,7 @@ bhito(struct obj *obj, struct obj *otmp)
                             /* didn't see corpse but do see monster: it
                                has been placed somewhere other than <ox,oy>
                                or blind hero spots it with ESP */
-                                pline("%sが現れた.", Monnam(mtmp));
+                                pline("%sが現れた.", l_monnam(mtmp));
                     }
                     if (learn_it)
                         exercise(A_WIS, TRUE);
@@ -4725,7 +4725,7 @@ disintegrate_mon(
 
     if (canseemon(mon)) {
         if (!m_amulet)
-            pline("%sは分解された!", Monnam(mon));
+            pline("%sは分解された!", l_monnam(mon));
         else
             hit(fltxt, mon, "!");
     }
@@ -4884,13 +4884,13 @@ dobuzz(
                         && abs(type) == ZT_BREATH(ZT_DEATH)) {
                         if (canseemon(mon)) {
                             hit(flash_str(fltyp, FALSE), mon, ".");
-                            pline("%sは分解した.", Monnam(mon));
+                            pline("%sは分解した.", l_monnam(mon));
                             pline("%sの体があなたの%sの前で再構成された!",
                                   s_suffix(Monnam(mon)),
                                   (eyecount(gy.youmonst.data) == 1)
                                       ? body_part(EYE)
                                       : makeplural(body_part(EYE)));
-                            pline("%sは復活した!", Monnam(mon));
+                            pline("%sは復活した!", l_monnam(mon));
                         }
                         mon->mhp = mon->mhpmax;
                         break; /* Out of while loop */
@@ -4898,7 +4898,7 @@ dobuzz(
                     if (mon->data == &mons[PM_DEATH] && damgtype == ZT_DEATH) {
                         if (canseemon(mon)) {
                             hit(flash_str(fltyp, FALSE), mon, ".");
-                            pline("%sは致命的な%sを吸収した!", Monnam(mon),
+                            pline("%sは致命的な%sを吸収した!", l_monnam(mon),
                                   type == ZT_BREATH(ZT_DEATH) ? "爆風"
                                                               : "光線");
                             pline("以前より強くなった気がした.");

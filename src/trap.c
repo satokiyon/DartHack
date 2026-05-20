@@ -369,7 +369,7 @@ grease_protect(
         if (victim == &gy.youmonst)
             Your("%sは%s", ostr, txt);
         else if (vismon)
-            pline("%sの%sは%s", Monnam(victim), ostr, txt);
+            pline("%sの%sは%s", l_monnam(victim), ostr, txt);
     } else if (victim == &gy.youmonst || vismon) {
         pline("%sは%s", Yname2(otmp), txt);
     }
@@ -988,7 +988,7 @@ mu_maybe_destroy_web(
                         a_your[trap->madeby_u], (flaming(mptr)) ? "焼い" : "溶かし");
                 else
                     pline_mon(mtmp,
-                          "%sは%sクモの巣を%sた!", Monnam(mtmp),
+                          "%sは%sクモの巣を%sた!", l_monnam(mtmp),
                           a_your[trap->madeby_u], (flaming(mptr)) ? "焼い" : "溶かし");
             }
             deltrap(trap);
@@ -1000,7 +1000,7 @@ mu_maybe_destroy_web(
                 You("%sクモの巣をすり抜けた.", a_your[trap->madeby_u]);
             } else {
                 pline_mon(mtmp,
-                      "%sは%sクモの巣をすり抜けた.", Monnam(mtmp),
+                      "%sは%sクモの巣をすり抜けた.", l_monnam(mtmp),
                       a_your[trap->madeby_u]);
                 seetrap(trap);
             }
@@ -1226,7 +1226,7 @@ trapeffect_arrow_trap(
             if (in_sight && see_it)
                 pline_mon(mtmp,
                       "%sが罠を作動させたが、何も起きなかった.",
-                      Monnam(mtmp));
+                      l_monnam(mtmp));
             deltrap(trap);
             newsym(mtmp->mx, mtmp->my);
             return Trap_Is_Gone;
@@ -1297,7 +1297,7 @@ trapeffect_dart_trap(
             if (in_sight && see_it)
                 pline_mon(mtmp,
                       "%sが罠を作動させたが、何も起きなかった.",
-                      Monnam(mtmp));
+                      l_monnam(mtmp));
             deltrap(trap);
             newsym(mtmp->mx, mtmp->my);
             return Trap_Is_Gone;
@@ -1378,7 +1378,7 @@ trapeffect_rocktrap(
             if (in_sight && see_it)
                 pline_mon(mtmp,
                       "%sの上の落とし戸が開いたが、何も落ちてこなかった!",
-                      mon_nam(mtmp));
+                      l_monnam(mtmp));
             deltrap(trap);
             newsym(mtmp->mx, mtmp->my);
             return Trap_Is_Gone;
@@ -1445,12 +1445,12 @@ trapeffect_sqky_board(
                 }
                 pline_mon(mtmp,
                       "%sの足元の床板が%s大きくきしんだ.",
-                      mon_nam(mtmp), trapnote(trap, FALSE));
+                      l_monnam(mtmp), trapnote(trap, FALSE));
                 seetrap(trap);
             } else if (!mindless(mtmp->data)) {
                 pline_mon(mtmp,
                       "%sは一瞬立ち止まり、身をすくめたように見えた.",
-                      Monnam(mtmp));
+                      l_monnam(mtmp));
             }
         } else {
             /* same near/far threshold as mzapmsg() */
@@ -1529,7 +1529,7 @@ trapeffect_bear_trap(
             mtmp->mtrapped = 1;
             if (in_sight) {
                     pline_mon(mtmp,
-                        "%sは%s熊罠にかかった!", Monnam(mtmp),
+                        "%sは%s熊罠にかかった!", l_monnam(mtmp),
                       a_your[trap->madeby_u]);
                 seetrap(trap);
             } else {
@@ -1542,7 +1542,7 @@ trapeffect_bear_trap(
         } else if (forcetrap) {
             if (in_sight) {
                 pline_mon(mtmp,
-                      "%sは%s熊罠をかわした!", Monnam(mtmp),
+                      "%sは%s熊罠をかわした!", l_monnam(mtmp),
                       a_your[trap->madeby_u]);
                 seetrap(trap);
             }
@@ -1580,7 +1580,7 @@ trapeffect_slp_gas_trap(
             && !helpless(mtmp)) {
             if (sleep_monst(mtmp, rnd(25), -1) && in_sight) {
                 pline_mon(mtmp,
-                          "%sは突然眠り込んだ!", Monnam(mtmp));
+                          "%sは突然眠り込んだ!", l_monnam(mtmp));
                 seetrap(trap);
             }
         }
@@ -1708,7 +1708,7 @@ trapeffect_rust_trap(
 
         if (completelyrusts(mptr)) {
             if (in_sight)
-                pline_mon(mtmp, "%s %sになった!", Monnam(mtmp),
+                pline_mon(mtmp, "%s %sになった!", l_monnam(mtmp),
                       !mlifesaver(mtmp) ? "錆び崩れ" : "錆び崩れたが命拾いし");
             monkilled(mtmp, (const char *) 0, AD_RUST);
             if (DEADMONSTER(mtmp))
@@ -1752,7 +1752,7 @@ trapeffect_fire_trap(
         if (resists_fire(mtmp)) {
             if (in_sight) {
                 shieldeff(mtmp->mx, mtmp->my);
-                pline("%sは無傷だった.", Monnam(mtmp));
+                pline("%sは無傷だった.", l_monnam(mtmp));
             }
         } else {
             int num = orig_dmg, alt;
@@ -1977,7 +1977,7 @@ trapeffect_pit(
                 if (in_sight) {
                     seetrap(trap);
                     pline_mon(mtmp,
-                             "%sは落とし穴に落ちなかった.", Monnam(mtmp));
+                             "%sは落とし穴に落ちなかった.", l_monnam(mtmp));
                 }
                 return Trap_Effect_Finished;
             }
@@ -1989,7 +1989,7 @@ trapeffect_pit(
             mtmp->mtrapped = 1;
         if (in_sight) {
             pline_mon(mtmp,
-                     "%sは%s%s落とし穴へ落ちた!", Monnam(mtmp), fallverb,
+                     "%sは%s%s落とし穴へ落ちた!", l_monnam(mtmp), fallverb,
                      a_your[trap->madeby_u]);
             if (mptr == &mons[PM_PIT_VIPER]
                 || mptr == &mons[PM_PIT_FIEND])
@@ -2043,18 +2043,18 @@ trapeffect_hole(
                     if (tt == TRAPDOOR)
                         pline_mon(mtmp,
                             "落とし戸が開いたが、%sは落ちなかった.",
-                              mon_nam(mtmp));
+                              l_monnam(mtmp));
                     else /* (tt == HOLE) */
                         pline_mon(mtmp,
                                  "%sは穴に落ちなかった.",
-                                 Monnam(mtmp));
+                                 l_monnam(mtmp));
                 }
                 return Trap_Effect_Finished; /* inescapable = FALSE; */
             }
             if (inescapable) { /* sokoban hole */
                 if (in_sight) {
                     pline_mon(mtmp,
-                             "%sは下へ引きずり込まれたようだ!", Monnam(mtmp));
+                             "%sは下へ引きずり込まれたようだ!", l_monnam(mtmp));
                     seetrap(trap);
                 }
             } else
@@ -2231,7 +2231,7 @@ trapeffect_web(
                 tear_web = TRUE;
             } else if (in_sight) {
                 pline_mon(mtmp,
-                      "%sは%sクモの巣にかかった.", Monnam(mtmp),
+                      "%sは%sクモの巣にかかった.", l_monnam(mtmp),
                       a_your[trap->madeby_u]);
                 seetrap(trap);
             }
@@ -2257,14 +2257,14 @@ trapeffect_web(
         if (tear_web) {
             if (in_sight)
                 pline_mon(mtmp,
-                     "%sは%sクモの巣を引き裂いた!", Monnam(mtmp),
+                     "%sは%sクモの巣を引き裂いた!", l_monnam(mtmp),
                       a_your[trap->madeby_u]);
             deltrap(trap);
             newsym(mtmp->mx, mtmp->my);
         } else if (forcetrap && !mtmp->mtrapped) {
             if (in_sight) {
                 pline_mon(mtmp,
-                      "%sは%sクモの巣を避けた!", Monnam(mtmp),
+                      "%sは%sクモの巣を避けた!", l_monnam(mtmp),
                       a_your[trap->madeby_u]);
                 seetrap(trap);
             }
@@ -2409,7 +2409,7 @@ trapeffect_anti_magic(
                 if (in_sight) {
                     seetrap(trap);
                     pline_mon(mtmp, "%sは魔力を失ったように見える.",
-                              Monnam(mtmp));
+                              l_monnam(mtmp));
                 }
             }
         } else { /* take some damage */
@@ -2610,7 +2610,7 @@ trapeffect_landmine(
             if (in_sight && !already_seen) {
                 pline_mon(mtmp,
                      "%sの足元の土の山に信管が現れた.",
-                      mon_nam(mtmp));
+                      l_monnam(mtmp));
                 seetrap(trap);
             }
             if (rn2(3))
@@ -3135,7 +3135,7 @@ steedintrap(struct trap *trap, struct obj *otmp)
             && !helpless(steed)) {
             if (sleep_monst(steed, rnd(25), -1))
                 /* no in_sight check here; you can feel it even if blind */
-                pline("%sは突然眠り込んだ!", Monnam(steed));
+                pline("%sは突然眠り込んだ!", l_monnam(steed));
         }
         steedhit = TRUE;
         break;
@@ -3398,7 +3398,7 @@ launch_obj(
                 if (rn2(3)) {
                     if (cansee(x, y))
                         pline_mon(mtmp, "%sが巨大な岩を受け止めた.",
-                                  Monnam(mtmp));
+                                  l_monnam(mtmp));
                     singleobj->otrapped = 0;
                     (void) mpickobj(mtmp, singleobj);
                     used_up = TRUE;
@@ -3756,17 +3756,17 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
                     mtmp->mtrapped = 0;
                     if (canseemon(mtmp))
                         pline_mon(mtmp, "%sは引き抜けた...",
-                                 Monnam(mtmp));
+                                 l_monnam(mtmp));
                     fill_pit(mtmp->mx, mtmp->my);
                 }
             } else {
                 if (canseemon(mtmp)) {
                     set_msg_xy(mtmp->mx, mtmp->my);
                     if (is_pit(trap->ttyp))
-                        pline("%sは%s落とし穴から這い出した.", Monnam(mtmp),
+                        pline("%sは%s落とし穴から這い出した.", l_monnam(mtmp),
                               m_easy_escape_pit(mtmp) ? "楽々" : "");
                     else if (trap->ttyp == BEAR_TRAP || trap->ttyp == WEB)
-                        pline("%sは%sから抜け出した.", Monnam(mtmp),
+                        pline("%sは%sから抜け出した.", l_monnam(mtmp),
                               trapname(trap->ttyp, FALSE));
                 }
                 mtmp->mtrapped = 0;
@@ -3775,14 +3775,14 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
             if (trap->ttyp == BEAR_TRAP) {
                 if (canseemon(mtmp))
                     pline_mon(mtmp, "%sは熊罠を食べた!",
-                              Monnam(mtmp));
+                              l_monnam(mtmp));
                 deltrap(trap);
                 mtmp->meating = 5;
                 mtmp->mtrapped = 0;
             } else if (trap->ttyp == SPIKED_PIT) {
                 if (canseemon(mtmp))
                     pline_mon(mtmp, "%sは棘をむしゃむしゃ食べた!",
-                              Monnam(mtmp));
+                              l_monnam(mtmp));
                 trap->ttyp = PIT;
                 mtmp->meating = 5;
             }
@@ -3872,7 +3872,7 @@ minstapetrify(struct monst *mon, boolean byplayer)
     mon_adjust_speed(mon, -3, (struct obj *) 0);
 
     if (cansee(mon->mx, mon->my))
-        pline_mon(mon, "%sは石になった.", Monnam(mon));
+        pline_mon(mon, "%sは石になった.", l_monnam(mon));
     if (byplayer) {
         gs.stoned = TRUE;
         xkilled(mon, XKILL_NOMSG);
@@ -3990,7 +3990,7 @@ float_up(void)
         if (is_animal(u.ustuck->data))
             You("%sからふわりと離れた.", surface(u.ux, u.uy));
         else
-            You("らせんを描いて%sの中へ浮かび上がった.", mon_nam(u.ustuck));
+            You("らせんを描いて%sの中へ浮かび上がった.", l_monnam(u.ustuck));
     } else if (Hallucination) {
         pline("上へ、上へ、さらに上へ! 空中を歩いている! ");
     } else if (Is_airlevel(&u.uz)) {
@@ -4001,9 +4001,9 @@ float_up(void)
     if (u.usteed && !is_floater(u.usteed->data)
         && !is_flyer(u.usteed->data)) {
         if (Lev_at_will) {
-            pline("%sが魔法でふわりと浮かび上がった!", Monnam(u.usteed));
+            pline("%sが魔法でふわりと浮かび上がった!", l_monnam(u.usteed));
         } else {
-            You("%sの上に乗っていられなかった.", mon_nam(u.usteed));
+            You("%sの上に乗っていられなかった.", l_monnam(u.usteed));
             dismount_steed(DISMOUNT_GENERIC);
         }
     }
@@ -4098,10 +4098,10 @@ float_down(
         if (!u.uswallow && u.ustuck) {
             if (sticks(gy.youmonst.data))
                 You("%sをつかみ続けられなかった.",
-                    mon_nam(u.ustuck));
+                    l_monnam(u.ustuck));
             else
                 pline("驚いた%sは、もうあなたをつかんでいられなかった!",
-                      mon_nam(u.ustuck));
+                      l_monnam(u.ustuck));
             set_ustuck((struct monst *) 0);
         }
         /* kludge alert:
@@ -5282,7 +5282,7 @@ could_untrap(boolean verbosely, boolean check_floor)
                || !gy.youmonst.data->mmove) {
         Strcpy(buf, "いったいどうやってそれをするつもりだ?");
     } else if (u.ustuck && sticks(gy.youmonst.data)) {
-        Sprintf(buf, "まず%sを放す必要がある.", mon_nam(u.ustuck));
+        Sprintf(buf, "まず%sを放す必要がある.", l_monnam(u.ustuck));
     } else if (u.ustuck || (welded(uwep) && bimanual(uwep))) {
         Sprintf(buf, "%sがふさがっていてそれはできない.",
                 makeplural(body_part(HAND)));
@@ -5465,7 +5465,7 @@ try_disarm(
 
     /* Test for monster first, monsters are displayed instead of trap. */
     if (mtmp && (!mtmp->mtrapped || !holdingtrap)) {
-        pline("%sが邪魔で進めない.", Monnam(mtmp));
+        pline("%sが邪魔で進めない.", l_monnam(mtmp));
         return 0;
     }
     /* We might be forced to move onto the trap's location. */
@@ -5523,7 +5523,7 @@ try_disarm(
                         }
                     }
                     if (mtmp->mtrapped)
-                        pline("%sはまだ絡まれたままだ.", Monnam(mtmp));
+                        pline("%sはまだ絡まれたままだ.", l_monnam(mtmp));
                 }
             } else if (under_u) {
                 /* [don't need the iflags.failing_untrap hack here] */
@@ -5552,7 +5552,7 @@ reward_untrap(struct trap *ttmp, struct monst *mtmp)
             && mtmp->data->mlet != S_HUMAN) {
             mtmp->mpeaceful = 1;
             set_malign(mtmp); /* reset alignment */
-            pline("%sは感謝している.", Monnam(mtmp));
+            pline("%sは感謝している.", l_monnam(mtmp));
         }
         /* Helping someone out of a trap is a nice thing to do.
            A lawful may be rewarded, but not too often.  */
@@ -5581,7 +5581,7 @@ disarm_holdingtrap(struct trap *ttmp)
        There's no need for a cockatrice test, only the trap is touched */
     if ((mtmp = m_at(ttmp->tx, ttmp->ty)) != 0) {
         mtmp->mtrapped = 0;
-        You("%sを%s%sから助け出した.", mon_nam(mtmp),
+        You("%sを%s%sから助け出した.", l_monnam(mtmp),
             which, (ttmp->ttyp == BEAR_TRAP) ? "熊罠" : "クモの巣");
         reward_untrap(ttmp, mtmp);
     } else if (ttmp->ttyp == BEAR_TRAP) {
@@ -5697,14 +5697,14 @@ try_lift(
     boolean stuff) /* False: monster w/o minvent; True: w/ minvent */
 {
     if (calc_capacity(xtra_wt) >= HVY_ENCUMBER) {
-          pline("%sは%sので持ち上げられない.", Monnam(mtmp),
+          pline("%sは%sので持ち上げられない.", l_monnam(mtmp),
               stuff ? "荷物が多すぎる" : "重すぎる");
         if (!ttmp->madeby_u && !mtmp->mpeaceful && mtmp->mcanmove
             && !mindless(mtmp->data) && mtmp->data->mlet != S_HUMAN
             && rnl(10) < 3) {
             mtmp->mpeaceful = 1;
             set_malign(mtmp); /* reset alignment */
-            pline("%sはあなたの試みをありがたいと思ったようだ.", Monnam(mtmp));
+            pline("%sはあなたの試みをありがたいと思ったようだ.", l_monnam(mtmp));
         }
         return 0;
     }
@@ -5731,7 +5731,7 @@ help_monster_out(
      * Test the monster first - monsters are displayed before traps.
      */
     if (!mtmp->mtrapped) {
-        pline("%sは罠にかかっていない.", Monnam(mtmp));
+        pline("%sは罠にかかっていない.", l_monnam(mtmp));
         return 0;
     }
     /* Do you have the necessary capacity to lift anything? */
@@ -5764,10 +5764,10 @@ help_monster_out(
     }
     /* need to do cockatrice check first if sleeping or paralyzed */
     if (uprob) {
-        You("%sをつかもうとしたが、うまくつかめなかった.", mon_nam(mtmp));
+        You("%sをつかもうとしたが、うまくつかめなかった.", l_monnam(mtmp));
         if (mtmp->msleeping) {
             mtmp->msleeping = 0;
-            pline("%sは目を覚ました.", Monnam(mtmp));
+            pline("%sは目を覚ました.", l_monnam(mtmp));
         }
         return 1;
     }
@@ -5777,12 +5777,12 @@ help_monster_out(
 
     if (mtmp->msleeping) {
         mtmp->msleeping = 0;
-        pline("%sは目を覚ました.", Monnam(mtmp));
+        pline("%sは目を覚ました.", l_monnam(mtmp));
     } else if (mtmp->mfrozen && !rn2(mtmp->mfrozen)) {
         /* After such manhandling, perhaps the effect wears off */
         mtmp->mcanmove = 1;
         mtmp->mfrozen = 0;
-        pline("%sが身じろぎした.", Monnam(mtmp));
+        pline("%sが身じろぎした.", l_monnam(mtmp));
     }
 
     /* is the monster too heavy? */
@@ -5799,7 +5799,7 @@ help_monster_out(
             return 1;
     }
 
-    You("%sを落とし穴から引き上げた.", mon_nam(mtmp));
+    You("%sを落とし穴から引き上げた.", l_monnam(mtmp));
     mtmp->mtrapped = 0;
     reward_untrap(ttmp, mtmp);
     fill_pit(mtmp->mx, mtmp->my);
@@ -6199,7 +6199,7 @@ openholdingtrap(
         mon->mtrapped = 0;
         if (canspotmon(mon)) {
             *noticed = TRUE;
-            pline("%sは%s%sから解放された.", Monnam(mon), which,
+            pline("%sは%s%sから解放された.", l_monnam(mon), which,
                   trapdescr);
         } else if (cansee(t->tx, t->ty) && t->tseen) {
             *noticed = TRUE;
@@ -6743,7 +6743,7 @@ thitm(
     if (!strike) {
         if (obj && cansee(mon->mx, mon->my))
             pline_mon(mon, "%sは%sにかすめられた!",
-                      Monnam(mon), doname(obj));
+                      l_monnam(mon), doname(obj));
     } else {
         int dam = 1;
         boolean harmless = (obj && stone_missile(obj)
@@ -6751,7 +6751,7 @@ thitm(
 
         if (obj && cansee(mon->mx, mon->my))
             pline_mon(mon, "%sに%sが当たった%s",
-                      Monnam(mon), doname(obj),
+                      l_monnam(mon), doname(obj),
                       harmless ? "が、無傷だった." : "!");
         if (d_override) {
             dam = d_override;
