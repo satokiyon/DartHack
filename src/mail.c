@@ -415,9 +415,9 @@ newmail(struct mail_info *info)
     message_seen = TRUE;
     if (!Deaf) {
         SetVoice(md, 0, 80, 0);
-        verbalize("%s, %s!    %s.", Hello(md), svp.plname, info->display_txt);
+        verbalize("%s、%s! %s.", Hello(md), svp.plname, info->display_txt);
     } else {
-        pline("Message:  %s.", info->display_txt);
+        pline("メッセージ: %s.", info->display_txt);
     }
 
     if (info->message_typ) {

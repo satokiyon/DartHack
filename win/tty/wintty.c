@@ -669,7 +669,8 @@ tty_player_selection(void)
 void
 tty_askname(void)
 {
-    static const char who_are_you[] = "Who are you? ";
+    static const char who_are_you[] = "お名前は? ";
+    int prompt_cols;
     int c, ct, tryct = 0;
 
 #ifdef SELECTSAVED
@@ -696,9 +697,14 @@ tty_askname(void)
             /* erase previous prompt (in case of ESC after partial response) */
             tty_curs(BASE_WINDOW, 1, wins[BASE_WINDOW]->cury), cl_end();
         }
+        #ifdef WIN32CON
+            prompt_cols = win32con_putstr_utf8(who_are_you);
+            tty_curs(BASE_WINDOW, prompt_cols + 1, wins[BASE_WINDOW]->cury - 1);
+        #else
         tty_putstr(BASE_WINDOW, 0, who_are_you);
         tty_curs(BASE_WINDOW, (int) (sizeof who_are_you),
                  wins[BASE_WINDOW]->cury - 1);
+        #endif
         ct = 0;
         while ((c = tty_nhgetch()) != '\n') {
             if (c == EOF)

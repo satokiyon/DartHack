@@ -1720,28 +1720,28 @@ ceiling(coordxy x, coordxy y)
      * see check_special_room()
      */
     if (*in_rooms(x, y, VAULT))
-        what = "vault's ceiling";
+        what = "金庫の天井";
     else if (*in_rooms(x, y, TEMPLE))
-        what = "temple's ceiling";
+        what = "神殿の天井";
     else if (*in_rooms(x, y, SHOPBASE))
-        what = "shop's ceiling";
+        what = "店の天井";
     else if (Is_waterlevel(&u.uz))
         /* water plane has no surface; its air bubbles aren't below sky */
-        what = "water above";
+        what = "上の水";
     else if (IS_AIR(lev->typ))
-        what = "sky";
+        what = "空";
     else if (Is_firelevel(&u.uz))
-        what = "flames above";
+        what = "上の炎";
     else if (In_quest(&u.uz))
         /* just in case; try to avoid in caller if you can */
-        what = "expanse above";
+        what = "上空";
     else if (Underwater)
-        what = "water's surface";
+        what = "水面";
     else if ((IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz))
              || IS_WALL(lev->typ) || IS_DOOR(lev->typ) || lev->typ == SDOOR)
-        what = "ceiling";
+        what = "天井";
     else
-        what = "rock cavern";
+        what = "岩盤の天井";
 
     return what;
 }
@@ -1754,37 +1754,37 @@ surface(coordxy x, coordxy y)
 
     if (u_at(x, y) && u.uswallow && is_animal(u.ustuck->data))
         /* 'husk' is iffy but maw is wrong for 't' class */
-        return digests(u.ustuck->data) ? "maw"
-               : enfolds(u.ustuck->data) ? "husk"
-                 : "nonesuch"; /* can't happen (fingers crossed...) */
+        return digests(u.ustuck->data) ? "胃袋の中"
+               : enfolds(u.ustuck->data) ? "腸の中"
+                 : "内部"; /* can't happen (fingers crossed...) */
     else if (IS_AIR(levtyp))
-        return Is_waterlevel(&u.uz) ? "air bubble"
-                                    : (levtyp == CLOUD) ? "cloud" : "air";
+        return Is_waterlevel(&u.uz) ? "気泡"
+                                    : (levtyp == CLOUD) ? "雲" : "空中";
     else if (is_pool(x, y))
         return (Underwater && !Is_waterlevel(&u.uz))
-            ? "bottom" : hliquid("water");
+            ? "準底" : hliquid("水面");
     else if (is_ice(x, y))
-        return "ice";
+        return "氷の上";
     else if (is_lava(x, y))
-        return hliquid("lava");
+        return hliquid("溶岩の上");
     else if (lev->typ == DRAWBRIDGE_DOWN)
-        return "bridge";
+        return "橋の上";
     else if (IS_ALTAR(levtyp))
-        return "altar";
+        return "祭壇";
     else if (IS_GRAVE(levtyp))
-        return "headstone";
+        return "墓男";
     else if (IS_FOUNTAIN(levtyp))
-        return "fountain";
+        return "泉の辺";
     else if (On_stairs(x, y))
-        return "stairs";
+        return "階段";
     else if (IS_WALL(levtyp) || levtyp == SDOOR)
-        return "wall"; /* 'surface' during Passes_walls */
+        return "壁"; /* 'surface' during Passes_walls */
     else if (IS_DOOR(levtyp))
-        return "doorway"; /* even for closed door */
+        return "出入り口"; /* even for closed door */
     else if (IS_ROOM(levtyp) && !Is_earthlevel(&u.uz))
-        return "floor";
+        return "床";
     else
-        return "ground";
+        return "地面";
 }
 
 /*

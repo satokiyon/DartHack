@@ -1,4 +1,4 @@
-/* NetHack 5.0	engrave.c	$NHDT-Date: 1737345573 2025/01/19 19:59:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
+﻿/* NetHack 5.0	engrave.c	$NHDT-Date: 1737345573 2025/01/19 19:59:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -329,28 +329,28 @@ read_engr_at(coordxy x, coordxy y)
         case DUST:
             if (!Blind) {
                 sensed = 1;
-                pline("%sがここでは%sに書かれていた.", Something,
-                      is_ice(x, y) ? "霜" : "埃");
+                pline("%sの上に%sが書かれていた.",
+                      is_ice(x, y) ? "霜" : "埃", Something);
             }
             break;
         case ENGRAVE:
         case HEADSTONE:
             if (!Blind || can_reach_floor(TRUE)) {
                 sensed = 1;
-                pline("%sがここでは%sに刻まれていた.", Something, eloc);
+                pline("%sに%sが刻まれていた.", eloc, Something);
             }
             break;
         case BURN:
             if (!Blind || can_reach_floor(TRUE)) {
                 sensed = 1;
-                pline("ここでは文字が%s%sに残っていた.",
-                      is_ice(x, y) ? "溶け込んで" : "焼き付いて", eloc);
+                pline("%sに文字が%s残っていた.",
+                      eloc, is_ice(x, y) ? "溶け込んで" : "焼き付いて");
             }
             break;
         case MARK:
             if (!Blind) {
                 sensed = 1;
-                pline("ここでは%sに落書きがあった.", eloc);
+                pline("%sに落書きがあった.", eloc);
             }
             break;
         case ENGR_BLOOD:

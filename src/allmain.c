@@ -901,20 +901,28 @@ welcome(boolean new_game) /* false => restoring an old game */
     if (new_game || u.ualignbase[A_ORIGINAL] != u.ualignbase[A_CURRENT] || adrift)
         Sprintf(eos(buf), " %s%s",
                 adrift ? "漂流した " : "",
-                adrift ? align_str(u.ualign.type)
-                       : align_str(u.ualignbase[A_CURRENT]));
+                jp_align_for_display(adrift ? (u.ualign.type == A_LAWFUL)
+                                            ? 0
+                                            : (u.ualign.type == A_NEUTRAL)
+                                                  ? 1
+                                                  : 2
+                                       : (u.ualignbase[A_CURRENT] == A_LAWFUL)
+                                            ? 0
+                                            : (u.ualignbase[A_CURRENT] == A_NEUTRAL)
+                                                  ? 1
+                                                  : 2));
 #endif
     if (!gu.urole.name.f
         && (new_game
             ? (gu.urole.allow & ROLE_GENDMASK) == (ROLE_MALE | ROLE_FEMALE)
             : currentgend != flags.initgend))
-        Sprintf(eos(buf), " %s", genders[currentgend].adj);
-    Sprintf(eos(buf), " %s %s", gu.urace.adj,
-            (currentgend && gu.urole.name.f) ? gu.urole.name.f
-                                             : gu.urole.name.m);
+        Sprintf(eos(buf), " %s", jp_gender_for_display(currentgend));
+    Sprintf(eos(buf), " %s の %s",
+            jp_current_race_adj(),
+            jp_role_name_for_display(flags.initrole, currentgend));
 
-    pline(new_game ? "%s %s、NetHackへようこそ! あなたは%sだ."
-                   : "%s %s、%s、NetHackへ戻ってきた.",
+    pline(new_game ? "%s、%s! NetHackへようこそ! あなたは%sだ."
+                   : "%s、%s! %s、NetHackへ戻ってきた.",
           Hello((struct monst *) 0), svp.plname, buf);
 
     if (new_game) {

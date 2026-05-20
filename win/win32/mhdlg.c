@@ -29,29 +29,29 @@ plsel_localize_role(const char *role)
     if (!strcmp(role, "Caveman"))
         return L"\u6D1E\u7A9F\u4EBA";
     if (!strcmp(role, "Cavewoman"))
-        return L"\u6D1E\u7A9F\u5973\u6027";
+        return L"\u6D1E\u7A9F\u4EBA";
     if (!strcmp(role, "Healer"))
-        return L"\u7662\u3057\u624B";
+        return L"\u85AC\u5E2B";
     if (!strcmp(role, "Knight"))
         return L"\u9A0E\u58EB";
     if (!strcmp(role, "Monk"))
-        return L"\u4FEE\u9053\u50E7";
+        return L"\u6B66\u95D8\u5BB6";
     if (!strcmp(role, "Priest"))
         return L"\u53F8\u796D";
     if (!strcmp(role, "Priestess"))
-        return L"\u5973\u53F8\u796D";
+        return L"\u53F8\u796D";
     if (!strcmp(role, "Ranger"))
-        return L"\u91CE\u4F0F";
+        return L"\u30EC\u30F3\u30B8\u30E3\u30FC";
     if (!strcmp(role, "Rogue"))
         return L"\u76D7\u8CCA";
     if (!strcmp(role, "Samurai"))
         return L"\u4F8D";
     if (!strcmp(role, "Tourist"))
-        return L"\u65C5\u884C\u8005";
+        return L"\u89B3\u5149\u5BA2";
     if (!strcmp(role, "Valkyrie"))
         return L"\u30EF\u30EB\u30AD\u30E5\u30FC\u30EC";
     if (!strcmp(role, "Wizard"))
-        return L"\u9B54\u8853\u5E2B";
+        return L"\u9B54\u6CD5\u4F7F\u3044";
     return NULL;
 }
 
