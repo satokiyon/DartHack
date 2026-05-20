@@ -283,16 +283,16 @@ expels(
                 if (is_whirly(mdat)) {
                     switch (attk->adtyp) {
                     case AD_ELEC:
-                        Strcpy(blast, " in a shower of sparks");
+                        Strcpy(blast, "火花を散らしながら");
                         break;
                     case AD_COLD:
-                        Strcpy(blast, " in a blast of frost");
+                        Strcpy(blast, "凍気をまとって");
                         break;
                     }
                 } else {
-                    Strcpy(blast, " with a squelch");
+                    Strcpy(blast, "ぬちゃりと");
                 }
-                You("%s%sから吐き出された!", mon_nam(mtmp), blast);
+                You("%s%s吐き出された!", blast, l_monnam(mtmp));
             }
         }
     }

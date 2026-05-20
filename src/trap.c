@@ -5570,6 +5570,7 @@ disarm_holdingtrap(struct trap *ttmp)
 {
     struct monst *mtmp;
     const char *which = the_your[ttmp->madeby_u];
+    char trapbuf[BUFSZ];
     int fails = try_disarm(ttmp, FALSE);
 
     if (fails < 2)
@@ -5581,8 +5582,9 @@ disarm_holdingtrap(struct trap *ttmp)
        There's no need for a cockatrice test, only the trap is touched */
     if ((mtmp = m_at(ttmp->tx, ttmp->ty)) != 0) {
         mtmp->mtrapped = 0;
-        You("%sを%s%sから助け出した.", l_monnam(mtmp),
-            which, (ttmp->ttyp == BEAR_TRAP) ? "熊罠" : "クモの巣");
+        Snprintf(trapbuf, sizeof trapbuf, "%s%s", which,
+                 (ttmp->ttyp == BEAR_TRAP) ? "熊罠" : "クモの巣");
+        You("%sを%sから助け出した.", l_monnam(mtmp), trapbuf);
         reward_untrap(ttmp, mtmp);
     } else if (ttmp->ttyp == BEAR_TRAP) {
         You("%s熊罠を解除した.", which);
@@ -6117,7 +6119,7 @@ openholdingtrap(
                        * otherwise left with its previous value intact */
 {
     struct trap *t, tdummy;
-    char buf[BUFSZ], whichbuf[20];
+    char buf[BUFSZ], whichbuf[20], trapbuf[BUFSZ];
     const char *trapdescr = 0, *which = 0;
     boolean ishero = (mon == &gy.youmonst);
 
@@ -6174,7 +6176,8 @@ openholdingtrap(
         which = t->tseen ? the_your[t->madeby_u] : "1つの";
     assert(which != 0);
     if (*which)
-        which = strcat(strcpy(whichbuf, which), " ");
+        which = strcpy(whichbuf, which);
+    Snprintf(trapbuf, sizeof trapbuf, "%s%s", which, trapdescr);
 
     if (ishero) {
         if (!u.utrap)
@@ -6187,7 +6190,7 @@ openholdingtrap(
         else
             Sprintf(buf, "%sは", noit_Monnam(u.usteed));
         /* give release message before untrap in case it triggers a message */
-        pline("%s%s%sから解放された.", buf, which, trapdescr);
+        pline("%s%sから解放された.", buf, trapbuf);
         /* might float up if Levitation is being unblocked */
         gv.vision_full_recalc = 1; /* vision limits can change (pit escape) */
         reset_utrap(TRUE);
@@ -6199,13 +6202,11 @@ openholdingtrap(
         mon->mtrapped = 0;
         if (canspotmon(mon)) {
             *noticed = TRUE;
-            pline("%sは%s%sから解放された.", l_monnam(mon), which,
-                  trapdescr);
+            pline("%sは%sから解放された.", l_monnam(mon), trapbuf);
         } else if (cansee(t->tx, t->ty) && t->tseen) {
             *noticed = TRUE;
             if (t->ttyp == WEB)
-                pline("%sは%s%sから解放された.", Something, which,
-                      trapdescr);
+                pline("%sは%sから解放された.", Something, trapbuf);
             else /* BEAR_TRAP */
                 pline("%s%sが開いた.", upstart(strcpy(buf, which)), trapdescr);
         }

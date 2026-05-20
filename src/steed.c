@@ -363,7 +363,7 @@ mount_steed(
             pline("%s magically floats up!", Monnam(mtmp));
         You("%sに乗った.", l_monnam(mtmp));
         if (Flying)
-            You("%sとともに飛び立った.", mon_nam(mtmp));
+            You("%sとともに飛び立った.", l_monnam(mtmp));
     }
     /* setuwep handles polearms differently when you're mounted */
     if (uwep && is_pole(uwep))
@@ -647,7 +647,7 @@ dismount_steed(
             if (Hallucination)
                 pline("雨から出てこれても整気。");
         } else
-            You("%sから降りた.", mon_nam(mtmp));
+            You("%sから降りた.", l_monnam(mtmp));
     }
     /* While riding, Wounded_legs refers to the steed's legs;
        after dismounting, it reverts to the hero's legs. */
