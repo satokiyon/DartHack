@@ -94,6 +94,12 @@
 - **`#if 0` 定義を混ぜない**: `objects.h` 上で無効化されている ID（例: DEFERRED 呪文）を `obj_jp.c` に入れるとビルドエラーになるため除外する。
 - **語彙方針**: JNetHack-3.6.7 の語彙を基本としつつ、個別指定がある用語（例: `へんげの杖`）を優先する。
 
+### 地形名表示 (Method C) の補足指針（2026-05 追加知見）
+- **`defsyms[]` 本体は英語維持**: `src/drawing.c` の家具判定や `src/sp_lev.c` の `appear_as.str` 比較が `defsyms[i].explanation` の英語を前提にしている。テーブル本体を日本語化すると special level 互換を壊しやすい。
+- **表示は専用ヘルパへ分離**: 地形名は `jp_cmap_explanation()` / `jp_terrain_name()` のような表示専用経路で日本語化し、内部比較・ID解決は英語のまま維持する。
+- **`dfeature_at()` の戻り値を比較キーにしない**: 表示文字列を日本語化した後に `"open door"` / `"doorway"` / `"pool of water"` / `"altar "` などの英語文字列比較を残すと回帰しやすい。判定は `levl[x][y].typ`、`doormask`、`is_pool()`、`IS_ALTAR()` など型ベースで行う。
+- **壁の描画差分は表示名を統一**: `S_vwall` 〜 `S_trwall` は見た目の差（線分・角・T字）であり、地形種別としては同じ壁なので表示名は `壁` に統一してよい。
+
 ## 6. 推奨ワークフロー
 
 1. 未翻訳メッセージを抽出する。
