@@ -25,6 +25,7 @@ struct sysopt_s {
                        * -1: getenv() で DEBUGFILES の値が見つからなかった。
                        */
     int maxplayers;
+    int maxrerolls;
     int seduce;
     int check_save_uid; /* セーブ復元時に UID を確認するか? */
     int check_plname; /* wizards/explorers/shellers 判定に plname を使う */
