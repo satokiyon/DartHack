@@ -10,7 +10,8 @@ staticfn char *name_from_player(char *, const char *, const char *);
 staticfn void do_mgivenname(void);
 staticfn boolean alreadynamed(struct monst *, char *, char *) NONNULLPTRS;
 staticfn void do_oname(struct obj *) NONNULLARG1;
-staticfn char *docall_xname(struct obj *) NONNULLARG1;
+staticfn const char *docall_target_name(struct obj *, char *, size_t) NONNULLPTRS;
+staticfn void build_docall_prompt(char *, size_t, struct obj *) NONNULLPTRS;
 staticfn void namefloorobj(void);
 
 #define NUMMBUF 5
@@ -247,7 +248,7 @@ do_mgivenname(void)
         return;
     }
     /* special case similar to the one in lookat() */
-    Sprintf(qbuf, "What do you want to call %s?",
+    Sprintf(qbuf, "%sを何と呼びますか?",
             distant_monnam(mtmp, ARTICLE_THE, monnambuf));
     /* use getlin() to get a name string from the player */
     if (!name_from_player(buf, qbuf,
@@ -295,13 +296,13 @@ do_oname(struct obj *obj)
 
     /* Do this now because there's no point in even asking for a name */
     if (obj->otyp == SPE_NOVEL) {
-        pline("%s already has a published name.", Ysimple_name2(obj));
+        pline("%sにはすでに正式な名前がある.", Ysimple_name2(obj));
         return;
     }
 
-    Sprintf(qbuf, "What do you want to name %s ",
-            is_plural(obj) ? "these" : "this");
-    (void) safe_qbuf(qbuf, qbuf, "?", obj, xname, simpleonames, "item");
+    Snprintf(qbuf, sizeof qbuf, "%s%sにどんな名前を付けますか?",
+             is_plural(obj) ? "これらの" : "この",
+             simpleonames(obj));
     /* use getlin() to get a name string from the player */
     if (!name_from_player(buf, qbuf, safe_oname(obj)))
         return;
@@ -319,10 +320,10 @@ do_oname(struct obj *obj)
     if (obj->oartifact) {
         /* this used to give "The artifact seems to resist the attempt."
            but resisting is definite, no "seems to" about it */
-        pline("%s resists the attempt.",
+          pline("%sは命名に抵抗した.",
               /* any artifact should always pass the has_oname() test
                  but be careful just in case */
-              has_oname(obj) ? ONAME(obj) : "The artifact");
+                  has_oname(obj) ? ONAME(obj) : "アーティファクト");
         return;
     }
 
@@ -522,32 +523,32 @@ docallcmd(void)
     any = cg.zeroany;
     any.a_char = 'm'; /* group accelerator 'C' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'C',
-             ATR_NONE, clr, "a monster", MENU_ITEMFLAGS_NONE);
+             ATR_NONE, clr, "モンスター", MENU_ITEMFLAGS_NONE);
     if (gi.invent) {
         /* we use y and n as accelerators so that we can accept user's
            response keyed to old "name an individual object?" prompt */
         any.a_char = 'i'; /* group accelerator 'y' */
         add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'y',
-                 ATR_NONE, clr, "a particular object in inventory",
+                 ATR_NONE, clr, "持ち物の特定のアイテム",
                  MENU_ITEMFLAGS_NONE);
         any.a_char = 'o'; /* group accelerator 'n' */
         add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'n',
-                 ATR_NONE, clr, "the type of an object in inventory",
+                 ATR_NONE, clr, "持ち物のアイテム種別",
                  MENU_ITEMFLAGS_NONE);
     }
     any.a_char = 'f'; /* group accelerator ',' (or ':' instead?) */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, ',',
-             ATR_NONE, clr, "the type of an object upon the floor",
+             ATR_NONE, clr, "床にあるアイテムの種別",
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'd'; /* group accelerator '\' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, '\\',
-             ATR_NONE, clr, "the type of an object on discoveries list",
+             ATR_NONE, clr, "発見済み一覧のアイテム種別",
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'a'; /* group accelerator 'l' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'l',
-             ATR_NONE, clr, "record an annotation for the current level",
+             ATR_NONE, clr, "現在の階層に注釈を記録",
              MENU_ITEMFLAGS_NONE);
-    end_menu(win, "What do you want to name?");
+    end_menu(win, "何に名前を付けますか?");
     if (select_menu(win, PICK_ONE, &pick_list) > 0) {
         ch = pick_list[0].item.a_char;
         free((genericptr_t) pick_list);
@@ -600,9 +601,9 @@ docallcmd(void)
     return ECMD_OK;
 }
 
-/* for use by safe_qbuf() */
-staticfn char *
-docall_xname(struct obj *obj)
+/* type-calling prompt用: 英語冠詞経路を使わない安全な対象名 */
+staticfn const char *
+docall_target_name(struct obj *obj, char *outbuf, size_t outbufsz)
 {
     struct obj otemp;
 
@@ -629,7 +630,21 @@ docall_xname(struct obj *obj)
     else if (otemp.oclass == FOOD_CLASS && otemp.globby)
         otemp.owt = 120; /* 6*20, neither a small glob nor a large one */
 
-    return an(xname(&otemp));
+    Snprintf(outbuf, outbufsz, "%s", simpleonames(&otemp));
+    return outbuf;
+}
+
+staticfn void
+build_docall_prompt(char *qbuf, size_t qbufsz, struct obj *obj)
+{
+    char target[BUFSZ];
+
+    if (obj->oclass == POTION_CLASS && obj->fromsink) {
+        Snprintf(qbuf, qbufsz, "この液体を何と呼びますか?");
+        return;
+    }
+    Snprintf(qbuf, qbufsz, "%sを何と呼びますか?",
+             docall_target_name(obj, target, sizeof target));
 }
 
 void
@@ -643,13 +658,7 @@ docall(struct obj *obj)
         return; /* probably blind; Blind || Hallucination for 'fromsink' */
     flush_screen(1); /* buffered updates might matter to player's response */
 
-    if (obj->oclass == POTION_CLASS && obj->fromsink)
-        /* fromsink: kludge, meaning it's sink water */
-        Sprintf(qbuf, "Call a stream of %s fluid:",
-                OBJ_DESCR(objects[obj->otyp]));
-    else
-        (void) safe_qbuf(qbuf, "Call ", ":", obj,
-                         docall_xname, simpleonames, "thing");
+    build_docall_prompt(qbuf, sizeof qbuf, obj);
     /* pointer to old name */
     uname_p = &(objects[obj->otyp].oc_uname);
     /* use getlin() to get a name string from the player */
@@ -688,9 +697,9 @@ namefloorobj(void)
     /* "dot for under/over you" only makes sense when the cursor hasn't
        been moved off the hero's '@' yet, but there's no way to adjust
        the help text once getpos() has started */
-    Sprintf(buf, "object on map (or '.' for one %s you)",
+     Sprintf(buf, "地図上の物体（'.'で%s物体）",
             (u.uundetected && hides_under(gy.youmonst.data))
-              ? "over" : "under");
+                  ? "あなたの上の" : "足元の");
     if (getpos(&cc, FALSE, buf) < 0 || cc.x <= 0)
         return;
     if (u_at(cc.x, cc.y)) {
@@ -738,12 +747,12 @@ namefloorobj(void)
         unames[4] = roguename();
         /* silly */
         unames[5] = "Wibbly Wobbly";
-        pline("%s %s to call you \"%s.\"",
-              The(buf), use_plural ? "decide" : "decides",
+          pline("%sはあなたを\"%s\"と呼ぶことに決めた.",
+              The(buf),
               unames[rn2_on_display_rng(SIZE(unames))]);
     } else if (call_ok(obj) == GETOBJ_EXCLUDE) {
-        pline("%s %s can't be assigned a type name.",
-              use_plural ? "Those" : "That", buf);
+          pline("%sには種類名を付けられない.",
+              use_plural ? "それら" : "それ");
     } else if (!obj->dknown) {
         You("%sはまだ十分よく知らないため、%sと名付けられない。",
             use_plural ? "それら" : "それ", buf);

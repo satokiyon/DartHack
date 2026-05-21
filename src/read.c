@@ -568,11 +568,11 @@ doread(void)
         if (otyp == SPE_NOVEL)
             /* unseen novels are already distinguishable from unseen
                spellbooks so this isn't revealing any extra information */
-            what = "words";
+            what = "文字";
         else if (scroll->oclass == SPBOOK_CLASS)
-            what = "mystic runes";
+            what = "神秘のルーン文字";
         else if (!scroll->dknown)
-            what = "formula on the scroll";
+            what = "巻物の文様";
         if (what) {
             pline("盲目では%sを読むことができない.", what);
             return ECMD_OK;
@@ -592,7 +592,7 @@ doread(void)
            scroll didn't come from bones, ask for confirmation */
         if (!u.uconduct.literate) {
             if (!scroll->spe && y_n(
-             "Reading mail will violate \"illiterate\" conduct.  Read anyway?"
+                 "これを読むと\"非識字\"の行いを破る。 それでも読むか?"
                                    ) != 'y')
                 return ECMD_OK;
         }
@@ -1136,8 +1136,8 @@ seffect_enchant_armor(struct obj **sobjp)
 
     if (!otmp) {
         strange_feeling(sobj, !Blind
-                        ? "Your skin glows then fades."
-                        : "Your skin feels warm for a moment.");
+                        ? "あなたの肌は一瞬光ってすぐ消えた."
+                        : "あなたの肌は一瞬あたたかくなった.");
         *sobjp = 0; /* useup() in strange_feeling() */
         exercise(A_CON, !scursed);
         exercise(A_STR, !scursed);
@@ -1187,12 +1187,11 @@ seffect_enchant_armor(struct obj **sobjp)
     s = scursed ? -otmp->spe : otmp->spe;
     if (s > (special_armor ? 5 : 3) && rn2(s)) {
         otmp->in_use = TRUE;
-        pline("%s violently %s%s%s for a while, then %s.", Yname2(otmp),
-              otense(otmp, Blind ? "vibrate" : "glow"),
+          pline("%sはしばらく激しく%s%s%s、その後に消え去った.", Yname2(otmp),
+              Blind ? "震え" : "輝き",
               (!Blind && !same_color) ? " " : "",
               (Blind || same_color) ? "" : hcolor(scursed ? NH_BLACK
-                                                  : NH_SILVER),
-              otense(otmp, "evaporate"));
+                                      : NH_SILVER));
         remove_worn_item(otmp, FALSE);
         useup(otmp);
         return;
@@ -1236,7 +1235,7 @@ seffect_enchant_armor(struct obj **sobjp)
         int old_light = artifact_light(otmp) ? arti_light_radius(otmp) : 0;
 
         /* dragon scales get turned into dragon scale mail */
-        pline("%s merges and hardens!", Yname2(otmp));
+        pline("%sは融合して硬化した!", Yname2(otmp));
         setworn((struct obj *) 0, W_ARM);
         /* assumes same order */
         otmp->otyp += GRAY_DRAGON_SCALE_MAIL - GRAY_DRAGON_SCALES;
@@ -1259,13 +1258,12 @@ seffect_enchant_armor(struct obj **sobjp)
             maybe_adjust_light(otmp, old_light);
         return;
     }
-    pline("%s %s%s%s%s for a %s.", Yname2(otmp),
-          (s == 0) ? "violently " : "",
-          otense(otmp, Blind ? "vibrate" : "glow"),
-          (!Blind && !same_color) ? " " : "",
-          (Blind || same_color)
-          ? "" : hcolor(scursed ? NH_BLACK : NH_SILVER),
-          (s * s > 1) ? "while" : "moment");
+        pline("%sは%s%s%s%sた.", Yname2(otmp),
+            (s * s > 1) ? "しばらく" : "一瞬",
+            (s == 0) ? "激しく" : "",
+            (Blind || same_color)
+            ? "" : hcolor(scursed ? NH_BLACK : NH_SILVER),
+            Blind ? "震え" : "輝い");
     /* [this cost handling will need updating if shop pricing is
        ever changed to care about curse/bless status of armor] */
     if (s < 0)
@@ -1340,7 +1338,7 @@ seffect_destroy_armor(struct obj **sobjp)
 
     if (confused) {
         if (!otmp) {
-            strange_feeling(sobj, "Your bones itch.");
+            strange_feeling(sobj, "骨がむずむずする.");
             *sobjp = 0; /* useup() in strange_feeling() */
             exercise(A_STR, FALSE);
             exercise(A_CON, FALSE);
@@ -1394,7 +1392,7 @@ seffect_destroy_armor(struct obj **sobjp)
             gk.known = TRUE;
             return;
         } else if (!destroy_arm()) {
-            strange_feeling(sobj, "Your skin itches.");
+            strange_feeling(sobj, "肌がむずむずする.");
             *sobjp = 0; /* useup() in strange_feeling() */
             exercise(A_STR, FALSE);
             exercise(A_CON, FALSE);
@@ -1509,11 +1507,11 @@ seffect_remove_curse(struct obj **sobjp)
     struct obj *obj, *nxto;
     long wornmask;
 
-    You_feel(!Hallucination
-             ? (!confused ? "like someone is helping you."
-                : "like you need some help.")
-             : (!confused ? "in touch with the Universal Oneness."
-                : "the power of the Force against you!"));
+     You_feel(!Hallucination
+                 ? (!confused ? "誰かが助けてくれている気がする."
+                     : "助けが必要な気がする.")
+                 : (!confused ? "宇宙の大いなる調和に触れた気がする."
+                     : "フォースの力があなたに逆らっている気がする!"));
 
     if (scursed) {
         pline_The("巻物は崩れ去った.");
@@ -1906,7 +1904,7 @@ seffect_fire(struct obj **sobjp)
             pline("爆発の中心をどこにする?");
             getpos_sethilite(display_stinking_cloud_positions,
                              can_center_cloud);
-            (void) getpos(&cc, TRUE, "the desired position");
+            (void) getpos(&cc, TRUE, "狙う場所");
             if (!can_center_cloud(cc.x, cc.y)) {
                 /* try to reach too far, get burned */
                 cc.x = u.ux;
@@ -1951,9 +1949,10 @@ seffect_earth(struct obj **sobjp)
 
                 Sprintf(matbuf, "%s",
                         sblessed ? makeplural(avalanche) : an(avalanche));
-                pline("%s of boulders %s %s you!",
-                      upstart(matbuf), vtense(matbuf, "materialize"),
-                      sblessed ? "around" : "above");
+                pline("%sが%sから%sのように降ってきた!",
+                      upstart(matbuf),
+                      sblessed ? "周囲" : "頭上",
+                      sblessed ? "雪崩" : "塊");
             }
         }
         gk.known = 1;
@@ -2329,7 +2328,7 @@ drop_boulder_on_player(
                 if (dmg > 2)
                     dmg = 2;
             } else if (flags.verbose) {
-                pline("%s does not protect you.", Yname2(uarmh));
+                pline("%sでは守りきれない.", Yname2(uarmh));
             }
         }
     } else
@@ -2342,7 +2341,7 @@ drop_boulder_on_player(
         newsym(u.ux, u.uy);
     }
     if (dmg)
-        losehp(Maybe_Half_Phys(dmg), "scroll of earth", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(dmg), "大地の巻物", KILLED_BY_AN);
 }
 
 boolean
@@ -2366,7 +2365,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
         long mdmg;
 
         if (cansee(mtmp->mx, mtmp->my)) {
-            pline("%s is hit by %s!", Monnam(mtmp), doname(otmp2));
+            pline("%sに%sが命中した!", Monnam(mtmp), doname(otmp2));
             if (mtmp->minvis && !canspotmon(mtmp))
                 map_invisible(mtmp->mx, mtmp->my);
         } else if (engulfing_u(mtmp))
@@ -2386,8 +2385,8 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
                     mdmg = 2;
             } else {
                 if (canspotmon(mtmp))
-                    pline("%s's %s does not protect %s.", Monnam(mtmp),
-                          xname(helmet), mhim(mtmp));
+                    pline("%sの%sでは守りきれない.", Monnam(mtmp),
+                          xname(helmet));
             }
         }
         mtmp->mhp -= mdmg;
@@ -2395,7 +2394,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
             if (byu) {
                 killed(mtmp);
             } else {
-                pline("%s is killed.", Monnam(mtmp));
+                pline("%sは倒れた.", Monnam(mtmp));
                 mondied(mtmp);
             }
         } else {

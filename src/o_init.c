@@ -1180,9 +1180,9 @@ rename_disco(void)
     if (ct == 0) {
         You("まだ何も発見していない...");
     } else if (mn == 0) {
-        pline("None of your discoveries can be assigned names...");
+        pline("発見済みの中に名前を付けられるものがない...");
     } else {
-        end_menu(tmpwin, "Pick an object type to name");
+        end_menu(tmpwin, "名前を付けるアイテム種別を選んでください");
         dis = STRANGE_OBJECT;
         sl = select_menu(tmpwin, PICK_ONE, &selected);
         if (sl > 0) {
