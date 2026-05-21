@@ -68,7 +68,7 @@ void
 off_msg(struct obj *otmp)
 {
     if (flags.verbose)
-        You("%sを着ていた.", doname(otmp));
+        You("%sを外した.", doname(otmp));
 }
 
 /* for items that involve no delay */
@@ -629,12 +629,13 @@ wielding_corpse(
         /* "removing" ought to be "taking off" but that makes the
            tombstone text more likely to be truncated */
         if (how)
-            Sprintf(hbuf, "%s %s", voluntary ? "脱いでいた" : "失った",
+            Sprintf(hbuf, "%sを%s",
                     is_gloves(how) ? gloves_simple_name(how)
-                    : strsubst(simpleonames(how), "set of ", ""));
+                    : strsubst(simpleonames(how), "set of ", ""),
+                    voluntary ? "脱いだ" : "失った");
         else
             Strcpy(hbuf, "耐性が切れた");
-        Snprintf(kbuf, sizeof kbuf, "%s while wielding %s",
+        Snprintf(kbuf, sizeof kbuf, "%s状態で%sを扱った",
                  hbuf, killer_xname(obj));
         instapetrify(kbuf);
         /* life-saved or got poly'd into a stone golem; can't continue
@@ -1709,7 +1710,7 @@ stop_donning(
        by unmul() since the on or off action isn't completing */
     ga.afternmv = (int (*)(void)) 0;
     if (putting_on || otmp != stolenobj) {
-        Sprintf(buf, "あなたは%sを%sのを中断した.",
+        Sprintf(buf, "あなたは%sを%sことを中断した.",
             thesimpleoname(otmp),
             putting_on ? "身に着ける" : "外す");
     } else {
@@ -1909,7 +1910,7 @@ cursed(struct obj *otmp)
             pline("%sが滑りすぎてできない。",
                   fingers_or_gloves(TRUE));
         else
-            You("だめだ.  %s呪われている.", use_plural ? "それらは" : "それは");
+            pline("だめだ. %s呪われている.", use_plural ? "それらは" : "それは");
         set_bknown(otmp, 1);
         return 1;
     }
@@ -2266,7 +2267,7 @@ accessory_or_armor_on(struct obj *obj)
                 mask = LEFT_RING;
             } else {
                 do {
-                        Sprintf(qbuf, "どちらの%s%sにはめますか? 右と左のどちらですか?",
+                        Sprintf(qbuf, "どちらの%s%sにはめますか?（右手/左手）",
                             humanoid(gy.youmonst.data) ? "指輪用の" : "",
                             body_part(FINGER));
                     answer = yn_function(qbuf, rightleftchars, '\0', TRUE);
@@ -2999,7 +3000,7 @@ better_not_take_that_off(struct obj *otmp)
     if (corpse
         && !u_safe_from_fatal_corpse(corpse, st_corpse | st_petrifies)) {
         Snprintf(buf, sizeof buf,
-              "死んだ%sを持っているのに%sを脱ぎますか?",
+              "死んだ%sを持っているのに、%sを脱ぎますか?",
                  gloves_simple_name(otmp), obj_pmname(corpse));
         return (paranoid_ynq(TRUE, buf, FALSE) != 'y');
     }
