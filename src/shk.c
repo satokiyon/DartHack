@@ -4755,7 +4755,8 @@ repair_damage(
                 if (canseemon(shkp) && dist2(x, y, shkp->mx, shkp->my) <= 2)
                     pline("%sは%sを罠から外した。", Shknam(shkp), ansimpleoname(otmp));
                 else if (ttmp->tseen && cansee(ttmp->tx, ttmp->ty))
-                    pline("その%sは消える。", trapname(ttmp->ttyp, TRUE));
+                    pline("その%sは消える。",
+                          jp_trapname_for_display(ttmp->ttyp, TRUE));
             }
             (void) mpickobj(shkp, otmp);
             break;
@@ -4763,11 +4764,13 @@ repair_damage(
         case PIT:
         case SPIKED_PIT:
             if (!catchup && ttmp->tseen && cansee(ttmp->tx, ttmp->ty))
-                pline("その%sは塞がった。", trapname(ttmp->ttyp, TRUE));
+                pline("その%sは塞がった。",
+                      jp_trapname_for_display(ttmp->ttyp, TRUE));
             break;
         default:
             if (!catchup && ttmp->tseen && cansee(ttmp->tx, ttmp->ty))
-                pline("その%sは消える。", trapname(ttmp->ttyp, TRUE));
+                pline("その%sは消える。",
+                      jp_trapname_for_display(ttmp->ttyp, TRUE));
             break;
         }
         deltrap(ttmp);

@@ -2837,7 +2837,7 @@ use_trap(struct obj *otmp)
     ttyp = (otmp->otyp == LAND_MINE) ? LANDMINE : BEAR_TRAP;
     if (otmp == gt.trapinfo.tobj && u_at(gt.trapinfo.tx, gt.trapinfo.ty)) {
         You("%s%sの設置を再開した.", shk_your(buf, otmp),
-            trapname(ttyp, FALSE));
+            jp_trapname_for_display(ttyp, FALSE));
         set_occupation(set_trap, occutext, 0);
         return;
     }
@@ -2862,7 +2862,7 @@ use_trap(struct obj *otmp)
             chance = (rnl(10) > 5);
         You("%sの上から手を伸ばすのは得意ではなかった.", l_monnam(u.usteed));
         Sprintf(buf, "%sの設置を続ける?",
-                the(trapname(ttyp, FALSE)));
+            jp_trapname_for_display(ttyp, FALSE));
         if (y_n(buf) == 'y') {
             if (chance) {
                 switch (ttyp) {
@@ -2872,7 +2872,8 @@ use_trap(struct obj *otmp)
                     break;
                 case BEAR_TRAP: /* drop it without arming it */
                     reset_trapset();
-                    You("%sを落としてしまった!", the(trapname(ttyp, FALSE)));
+                    You("%sを落としてしまった!",
+                        jp_trapname_for_display(ttyp, FALSE));
                     dropx(otmp);
                     return;
                 }
@@ -2882,7 +2883,8 @@ use_trap(struct obj *otmp)
             return;
         }
     }
-    You("%s%sを仕掛け始めた.", shk_your(buf, otmp), trapname(ttyp, FALSE));
+    You("%s%sを仕掛け始めた.", shk_your(buf, otmp),
+        jp_trapname_for_display(ttyp, FALSE));
     use_unpaid_trapobj(otmp, u.ux, u.uy);
     set_occupation(set_trap, occutext, 0);
     return;
@@ -2914,7 +2916,8 @@ set_trap(void)
             add_damage(u.ux, u.uy, 0L); /* schedule removal */
         }
         if (!gt.trapinfo.force_bungle)
-            You("%sの設置を終えた.", the(trapname(ttyp, FALSE)));
+            You("%sの設置を終えた.",
+                jp_trapname_for_display(ttyp, FALSE));
         if (((otmp->cursed || Fumbling) && (rnl(10) > 5))
             || gt.trapinfo.force_bungle)
             dotrap(ttmp,

@@ -1956,7 +1956,7 @@ find_trap(struct trap *trap)
     }
 
     set_msg_xy(trap->tx, trap->ty);
-    You("%sを見つけた.", an(trapname(trap->ttyp, FALSE)));
+    You("%sを見つけた.", jp_trapname_for_display(trap->ttyp, FALSE));
 
     if (cleared) {
         display_nhwindow(WIN_MAP, TRUE); /* wait */

@@ -4240,7 +4240,7 @@ look_here(
             There("%s%s%sがある.",
                   reg ? regbuf : "",
                   (reg && trap) ? "と" : "",
-                  trap ? an(trapname(trap->ttyp, FALSE)) : "");
+                  trap ? jp_trapname_for_display(trap->ttyp, FALSE) : "");
     }
 
     otmp = svl.level.objects[u.ux][u.uy];

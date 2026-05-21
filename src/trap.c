@@ -81,6 +81,33 @@ static const char *const A_gush_of_water_hits = "水流が";
 static const char *const blindgas[6] = { "湿った",   "無臭の",
                                          "刺激臭の", "冷たい",
                                          "刺激の強い",   "刺すような" };
+static const char *const jp_trap_names[TRAPNUM] = {
+    [ARROW_TRAP] = "矢の罠",
+    [DART_TRAP] = "吹き矢の罠",
+    [ROCKTRAP] = "落石の罠",
+    [SQKY_BOARD] = "きしみ床板の罠",
+    [BEAR_TRAP] = "熊罠",
+    [LANDMINE] = "地雷",
+    [ROLLING_BOULDER_TRAP] = "転がる巨大岩の罠",
+    [SLP_GAS_TRAP] = "睡眠ガスの罠",
+    [RUST_TRAP] = "錆の罠",
+    [FIRE_TRAP] = "火炎の罠",
+    [PIT] = "落とし穴",
+    [SPIKED_PIT] = "棘だらけの落とし穴",
+    [HOLE] = "穴",
+    [TRAPDOOR] = "落とし戸",
+    [TELEP_TRAP] = "テレポートの罠",
+    [LEVEL_TELEP] = "階層テレポートの罠",
+    [MAGIC_PORTAL] = "魔法の門",
+    [WEB] = "クモの巣",
+    [STATUE_TRAP] = "石像の罠",
+    [MAGIC_TRAP] = "魔法の罠",
+    [ANTI_MAGIC] = "反魔法の罠",
+    [POLY_TRAP] = "変身の罠",
+    [VIBRATING_SQUARE] = "振動床",
+    [TRAPPED_DOOR] = "罠のかかった扉",
+    [TRAPPED_CHEST] = "罠のかかった箱",
+};
 
 /* called when you're hit by fire (dofiretrap,buzz,zapyourself,explode);
    returns TRUE if hit on torso */
@@ -3018,7 +3045,7 @@ dotrap(struct trap *trap, unsigned trflags)
          */
         pline("気流があなたを%s%sへ引きずり下ろした!",
               a_your[trap->madeby_u],
-              trapname(ttype, TRUE)); /* do force "pit" while hallucinating */
+              jp_trapname_for_display(ttype, TRUE));
         /* then proceed to normal trap effect */
     } else if (!forcetrap) {
         if (floor_trigger(ttype) && check_in_air(&gy.youmonst, trflags)) {
@@ -3026,7 +3053,7 @@ dotrap(struct trap *trap, unsigned trflags)
                 You("%s%s%sをまたいだ.", u_locomotion("踏み出して"),
                     (ttype == ARROW_TRAP && !trap->madeby_u)
                     ? "1つの" : a_your[trap->madeby_u],
-                    trapname(ttype, FALSE));
+                    jp_trapname_for_display(ttype, FALSE));
             }
             return;
         }
@@ -3037,7 +3064,7 @@ dotrap(struct trap *trap, unsigned trflags)
                 You("%s%sを避けた.", (ttype == ARROW_TRAP && !trap->madeby_u)
                                      ? "1つの"
                                      : a_your[trap->madeby_u],
-                trapname(ttype, FALSE));
+                jp_trapname_for_display(ttype, FALSE));
             return;
         }
     }
@@ -3766,7 +3793,7 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
                               m_easy_escape_pit(mtmp) ? "楽々" : "");
                     else if (trap->ttyp == BEAR_TRAP || trap->ttyp == WEB)
                         pline("%sは%sから抜け出した.", l_monnam(mtmp),
-                              trapname(trap->ttyp, FALSE));
+                              jp_trapname_for_display(trap->ttyp, FALSE));
                 }
                 mtmp->mtrapped = 0;
             }
@@ -3950,7 +3977,8 @@ float_up(void)
     if (u.utrap) {
         if (u.utraptype == TT_PIT) {
             reset_utrap(FALSE);
-            You("%sから浮かび上がった!", trapname(PIT, FALSE));
+            You("%sから浮かび上がった!",
+                jp_trapname_for_display(PIT, FALSE));
             gv.vision_full_recalc = 1; /* vision limits change */
             fill_pit(u.ux, u.uy);
         } else if (u.utraptype == TT_LAVA /* molten lava */
@@ -3972,7 +4000,7 @@ float_up(void)
                 IS_ROOM(levl[cc.x][cc.y].typ) ? "床" : "地面");
         } else if (u.utraptype == WEB) {
             You("少し浮き上がったが、まだ%sに絡まれたままだった.",
-                trapname(WEB, FALSE));
+                jp_trapname_for_display(WEB, FALSE));
         } else { /* bear trap */
             You("少し浮き上がったが、%sはまだ挟まれたままだった.",
                 body_part(LEG));
@@ -4197,7 +4225,7 @@ climb_pit(void)
     if (!u.utrap || u.utraptype != TT_PIT)
         return;
 
-    pitname = trapname(PIT, FALSE);
+    pitname = jp_trapname_for_display(PIT, FALSE);
     if (Passes_walls) {
         /* marked as trapped so they can pick things up */
         You("%sから這い上がった.", pitname);
@@ -5478,7 +5506,8 @@ try_disarm(
         if ((gi.invent && (inv_weight() + weight_cap() > WT_TOOMUCH_DIAGONAL))
             || bigmonst(gy.youmonst.data)) {
             /* don't allow untrap if they can't get thru to it */
-            You("%sに手が届かない!", trapname(ttype, FALSE));
+            You("%sに手が届かない!",
+                jp_trapname_for_display(ttype, FALSE));
             return 0;
         }
     }
@@ -5487,7 +5516,8 @@ try_disarm(
         if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
             rider_cant_reach();
         else
-            You("%sに手が届かない!", trapname(ttype, FALSE));
+            You("%sに手が届かない!",
+                jp_trapname_for_display(ttype, FALSE));
         return 0;
     }
 
@@ -5533,7 +5563,7 @@ try_disarm(
         } else {
             pline("%s%sを%sのは難しかった.",
                   ttmp->madeby_u ? "あなたの" : under_u ? "この" : "その",
-                  trapname(ttype, FALSE),
+                jp_trapname_for_display(ttype, FALSE),
                   (ttype == WEB) ? "取り除く" : "解除する");
         }
         return 1;
@@ -5908,7 +5938,7 @@ untrap(
     ttmp = t_at(x, y);
     if (ttmp && !ttmp->tseen)
         ttmp = 0;
-    trapdescr = ttmp ? trapname(ttmp->ttyp, FALSE) : 0;
+    trapdescr = ttmp ? jp_trapname_for_display(ttmp->ttyp, FALSE) : 0;
     here = u_at(x, y); /* !u.dx && !u.dy */
 
     if (here) /* are there are one or more containers here? */
@@ -6154,9 +6184,11 @@ openholdingtrap(
         case TT_BEARTRAP:
         case TT_PIT:
         case TT_WEB:
-            trapdescr = defsyms[(u.utraptype == TT_WEB) ? S_web
-                                : (u.utraptype == TT_PIT) ? S_pit
-                                  : S_bear_trap].explanation;
+                        trapdescr = jp_trapname_for_display(
+                                (u.utraptype == TT_WEB) ? WEB
+                                : (u.utraptype == TT_PIT) ? PIT
+                                    : BEAR_TRAP,
+                                FALSE);
             break;
         default:
             /* lint suppression in case 't' is unexpectedly Null
@@ -6168,7 +6200,7 @@ openholdingtrap(
         /* if no trap here or it's not a holding trap, we're done */
         if (!t || (t->ttyp != BEAR_TRAP && t->ttyp != WEB))
             return FALSE;
-        trapdescr = trapname(t->ttyp, FALSE);
+        trapdescr = jp_trapname_for_display(t->ttyp, FALSE);
     }
     assert(t != NULL);
     if (!which)
@@ -7159,6 +7191,23 @@ trapname(
             ttyp = nameidx;
     }
     return defsyms[trap_to_defsym(ttyp)].explanation;
+}
+
+const char *
+jp_trapname_for_display(
+    int ttyp,
+    boolean override) /* if True, ignore Hallucination */
+{
+    const char *name;
+
+    if (ttyp <= NO_TRAP || ttyp >= TRAPNUM)
+        return trapname(ttyp, override);
+
+    if (Hallucination && !override)
+        return trapname(ttyp, override);
+
+    name = jp_trap_names[ttyp];
+    return name ? name : trapname(ttyp, override);
 }
 
 /* Ignite ignitable items (limited to light sources) in the given object

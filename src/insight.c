@@ -249,7 +249,8 @@ trap_predicament(char *outbuf, int final, boolean wizxtra)
     default: /* TT_BEARTRAP, TT_PIT, or TT_WEB */
         Strcpy(outbuf, "trapped");
         if ((t = t_at(u.ux, u.uy)) != 0) /* should never be null */
-            Sprintf(eos(outbuf), " in %s", an(trapname(t->ttyp, FALSE)));
+            Sprintf(eos(outbuf), " in %s",
+                    jp_trapname_for_display(t->ttyp, FALSE));
         break;
     }
     if (wizxtra) { /* give extra information for wizard mode enlightenment */

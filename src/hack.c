@@ -2139,7 +2139,7 @@ domove_swap_with_pet(
     } else if (mtmp->mpeaceful && mtmp->mtrapped) {
         /* all mtame are also mpeaceful, so this affects pets too */
         assert(trap != NULL); /* implied by mtrapped */
-        const char *what = trapname(trap->ttyp, FALSE);
+        const char *what = jp_trapname_for_display(trap->ttyp, FALSE);
 
         if (!trap->tseen) {
             feeltrap(trap); /* show on map once mtmp is out of the way */
@@ -2454,7 +2454,7 @@ avoid_moving_on_trap(coordxy x, coordxy y, boolean msg)
         if (msg && flags.mention_walls) {
             set_msg_xy(x, y);
             You("%sの前で止まった.",
-                an(trapname(trap->ttyp, FALSE)));
+                jp_trapname_for_display(trap->ttyp, FALSE));
         }
         return TRUE;
     }
@@ -2567,7 +2567,7 @@ avoid_trap_andor_region(coordxy x, coordxy y)
         boolean into = into_vs_onto(traptype);
 
         Snprintf(qbuf, sizeof qbuf, "本当にその%sの%sへ進むか?",
-             defsyms[trap_to_defsym(traptype)].explanation,
+               jp_trapname_for_display(traptype, FALSE),
              into ? "中" : "上");
         /* handled like paranoid_confirm:pray; when paranoid_confirm:trap
            isn't set, don't ask at all but if it is set (checked above),

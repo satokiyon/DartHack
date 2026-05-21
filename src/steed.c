@@ -303,7 +303,7 @@ mount_steed(
         struct trap *t = t_at(mtmp->mx, mtmp->my);
 
         You_cant("%sに乗ることはできない。%sが%sに引っ掛かっている。", l_monnam(mtmp),
-                 mhe(mtmp), an(trapname(t->ttyp, FALSE)));
+                 mhe(mtmp), jp_trapname_for_display(t->ttyp, FALSE));
         return (FALSE);
     }
 

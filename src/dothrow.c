@@ -959,7 +959,8 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
             return TRUE;
         } else {
             if (ttmp->tseen)
-                You("%sの真上を通り過ぎた.", an(trapname(ttmp->ttyp, FALSE)));
+                You("%sの真上を通り過ぎた.",
+                    jp_trapname_for_display(ttmp->ttyp, FALSE));
         }
     }
     if (--*range < 0) /* make sure our range never goes negative */
