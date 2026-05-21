@@ -394,15 +394,11 @@ describe_decor(void)
     } else if (dfeature) {
         if (waterhere)
             dfeature = strcpy(fbuf, waterbody_name(u.ux, u.uy));
-        if (strcmp(dfeature, "swamp") && ltyp != ICE)
-            dfeature = an(dfeature);
 
         if (flags.verbose) {
-            Sprintf(outbuf, "There is %s here.", dfeature);
+            Sprintf(outbuf, "ここには%sがある.", dfeature);
         } else {
-            if (dfeature != fbuf)
-                Strcpy(fbuf, dfeature);
-            Sprintf(outbuf, "%s.", upstart(fbuf));
+            Sprintf(outbuf, "%sがある.", dfeature);
         }
         if (ltyp == ICE && flags.mention_decor)
             Norep("%s", outbuf);
@@ -2577,7 +2573,7 @@ in_container(struct obj *obj)
         return 0;
     } else if ((obj->otyp == LOADSTONE) && obj->cursed) {
         set_bknown(obj, 1);
-        pline_The("石%sは体から離れない.", plur(obj->quan));
+        pline_The("石は体から離れない.");
         return 0;
     } else if (obj->otyp == AMULET_OF_YENDOR
                || obj->otyp == CANDELABRUM_OF_INVOCATION
@@ -3591,8 +3587,8 @@ dotip(void)
     if (boxes > 0
         && (!iflags.menu_requested
             || (flags.menu_style == MENU_TRADITIONAL && boxes > 1))) {
-        Sprintf(buf, "You can't tip %s while carrying so much.",
-                !flags.verbose ? "a container" : (boxes > 1) ? "one" : "it");
+        Sprintf(buf, "荷物が多すぎて%sをひっくり返せない.",
+            !flags.verbose ? "容器" : (boxes > 1) ? "どれか1つ" : "それ");
         if (!check_capacity(buf) && able_to_loot(cc.x, cc.y, FALSE)) {
             if (boxes > 1) {
                 int res;
@@ -3606,9 +3602,9 @@ dotip(void)
                     nobj = cobj->nexthere;
                     if (!Is_container(cobj))
                         continue;
-                    c = ynq(safe_qbuf(qbuf, "There is ", " here, tip it?",
+                    c = ynq(safe_qbuf(qbuf, "", "がここにあります。ひっくり返しますか?",
                                       cobj,
-                                      doname, ansimpleoname, "container"));
+                                      doname, ansimpleoname, "容器"));
                     if (c == 'q')
                         return ECMD_OK;
                     if (c == 'n')

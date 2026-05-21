@@ -9,6 +9,7 @@ staticfn void inuse_classify(Loot *, struct obj *);
 staticfn char *loot_xname(struct obj *);
 staticfn int invletter_value(char);
 staticfn int QSORTCALLBACK sortloot_cmp(const genericptr, const genericptr);
+staticfn const char *drop_english_article(const char *);
 
 staticfn const char *
 action_verb_jp(const char *word)
@@ -41,6 +42,21 @@ action_verb_jp(const char *word)
     if (!strcmp(word, "wear")) return "装着";
     return word;
 }
+
+staticfn const char *
+drop_english_article(const char *name)
+{
+    if (!name)
+        return "";
+    if (!strncmpi(name, "a ", 2))
+        return name + 2;
+    if (!strncmpi(name, "an ", 3))
+        return name + 3;
+    if (!strncmpi(name, "the ", 4))
+        return name + 4;
+    return name;
+}
+
 staticfn void reorder_invent(void);
 staticfn struct obj *addinv_core0(struct obj *, struct obj *,
                                                          boolean) NONNULLARG1;
@@ -3258,8 +3274,7 @@ display_pickinv(
         Sprintf(prompt, "デバッグ識別"); /* 'title' rather than 'prompt' */
         if (unid_cnt)
             Sprintf(eos(prompt),
-                    " -- 未識別または部分識別の品物%s",
-                    plur(unid_cnt));
+                " -- 未識別または部分識別の品物");
         add_menu_str(win, prompt);
         if (!unid_cnt) {
             add_menu_str(win,
@@ -3806,8 +3821,8 @@ dounpaid(
                 floorverb, xtracount, where);
         } else {
             putstr(win, 0, "");
-            Sprintf(buf, "(There %s %d more unpaid object%s %s.)",
-                    floorverb, xtracount, plur(xtracount), where);
+            Sprintf(buf, "(未払い品がさらに%d個、%sにある.)",
+                xtracount, where);
             putstr(win, 0, buf);
         }
     }
@@ -4137,7 +4152,6 @@ look_here(
 {
     struct obj *otmp;
     struct trap *trap;
-    const char *verb = Blind ? "feel" : "see";
     const char *dfeature = (char *) 0;
     char fbuf[BUFSZ], fbuf2[BUFSZ];
     winid tmpwin;
@@ -4180,11 +4194,14 @@ look_here(
                     feel_cockatrice(otmp, FALSE);
             }
             if (Blind)
-                Strcpy(fbuf, "You feel");
+                Strcpy(fbuf, "手探りで分かったもの");
             Strcat(fbuf, ":");
             (void) display_minventory(mtmp, MINV_ALL | PICK_NONE, fbuf);
         } else {
-            You("ここには何も%sなかった.", verb);
+            if (Blind)
+                You("ここには何も感じられなかった.");
+            else
+                You("ここには何も見当たらなかった.");
         }
         return (!!Blind ? ECMD_TIME : ECMD_OK);
     }
@@ -4194,8 +4211,8 @@ look_here(
 
         regbuf[0] = '\0';
         if ((reg = visible_region_at(u.ux, u.uy)) != 0)
-            Sprintf(regbuf, "a %s cloud",
-                    reg_damg(reg) ? "poison gas" : "vapor");
+            Sprintf(regbuf, "%sの雲",
+                reg_damg(reg) ? "毒ガス" : "蒸気");
         if ((trap = t_at(u.ux, u.uy)) != 0 && !trap->tseen)
             trap = (struct trap *) NULL;
 
@@ -4228,13 +4245,15 @@ look_here(
             skip_dfeature = TRUE; /* ice already described */
         } else {
             boolean cant_reach = !can_reach_floor(TRUE);
-            const char *surf = surface(u.ux, u.uy),
-                       *where = cant_reach ? "lying beneath you"
-                                           : "lying here on the ",
-                       *onwhat = cant_reach ? "" : surf;
+            const char *surf = surface(u.ux, u.uy);
 
-            You("%s%sにあるものを手探りした.", drift ? "ここに漂う" : where,
-                drift ? "" : onwhat);
+            if (drift) {
+                You("ここに漂うものを手探りした.");
+            } else if (cant_reach) {
+                You("あなたの下にあるものを手探りした.");
+            } else {
+                You("ここにある%sの上のものを手探りした.", surf);
+            }
 
             if (dfeature && !drift && !strcmp(dfeature, surf))
                 skip_dfeature = TRUE; /* terrain feature already identified */
@@ -4247,24 +4266,7 @@ look_here(
     }
 
     if (dfeature && !skip_dfeature) {
-        const char *p;
-        int article = 1; /* 0 => none, 1 => a/an, 2 => the (not used here) */
-
-        /* "molten lava", "iron bars", and plain "ice" are handled as special
-           cases in an() but probably shouldn't be; don't rely on that */
-        if (!strcmp(dfeature, "molten lava")
-            || !strcmp(dfeature, "iron bars")
-            || !strcmp(dfeature, "ice")
-            || !strncmp(dfeature, "frozen ", 7) /* ice while hallucinating */
-            /* thawing ice ("solid ice", "thin ice", &c) */
-            || ((p = strchr(dfeature, ' ')) != 0 && !strcmpi(p, " ice")))
-            article = 0;
-        if (article == 1)
-            dfeature = an(dfeature);
-
-        /* hardcoded "is" worked here because "iron bars" is actually
-           "set of iron bars"; use vtense() instead of relying on that */
-        Sprintf(fbuf, "There %s %s here.", vtense(dfeature, "are"), dfeature);
+        Sprintf(fbuf, "ここには%sがある.", dfeature);
     }
 
     if (!otmp || is_lava(u.ux, u.uy)
@@ -4272,8 +4274,12 @@ look_here(
         if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
-        if (!skip_objects && (Blind || !dfeature))
-            You("%s no objects here.", verb);
+        if (!skip_objects && (Blind || !dfeature)) {
+            if (Blind)
+                You("ここには何も感じられなかった.");
+            else
+                You("ここには何も見当たらなかった.");
+        }
         return (!!Blind ? ECMD_TIME : ECMD_OK);
     }
     /* we know there is something here */
@@ -4293,22 +4299,25 @@ look_here(
                   picked_some ? "さらに" : "");
         for (; otmp; otmp = otmp->nexthere)
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
-                pline("%s %s%s.",
-                      (obj_cnt > 1) ? "Including"
-                      : (otmp->quan > 1L) ? "They're"
-                        : "It's",
-                      corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
-                      poly_when_stoned(gy.youmonst.data) ? ""
-                      : ", unfortunately");
+                                pline("%s%s.",
+                                            corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
+                                            poly_when_stoned(gy.youmonst.data) ? "がある"
+                                            : "がある。うかつに触れると危険だ");
                 feel_cockatrice(otmp, FALSE);
                 break;
             }
     } else if (!otmp->nexthere) {
         /* only one object */
+        const char *here_item;
+
         if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
-        You("%s here %s.", verb, doname_with_price(otmp));
+        here_item = drop_english_article(doname_with_price(otmp));
+        if (Blind)
+            pline("ここに%sがあるのを手探りで確かめた.", here_item);
+        else
+            pline("ここに%sがある.", here_item);
         iflags.last_msg = PLNMSG_ONE_ITEM_HERE;
         if (otmp->otyp == CORPSE)
             feel_cockatrice(otmp, FALSE);
@@ -4321,18 +4330,18 @@ look_here(
             putstr(tmpwin, 0, fbuf);
             putstr(tmpwin, 0, "");
         }
-        Sprintf(buf, "%s that %s here:",
-                picked_some ? "Other things" : "Things",
-                Blind ? "you feel" : "are");
+        Sprintf(buf, "%s",
+            Blind ? (picked_some ? "手探りで分かった他のもの:" : "手探りで分かったもの:")
+                  : (picked_some ? "ここにある他のもの:" : "ここにあるもの:"));
         putstr(tmpwin, 0, buf);
         for (; otmp; otmp = otmp->nexthere) {
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
                 felt_cockatrice = TRUE;
-                Sprintf(buf, "%s...", doname(otmp));
+                Sprintf(buf, "%s...", drop_english_article(doname(otmp)));
                 putstr(tmpwin, 0, buf);
                 break;
             }
-            putstr(tmpwin, 0, doname_with_price(otmp));
+            putstr(tmpwin, 0, drop_english_article(doname_with_price(otmp)));
         }
         display_nhwindow(tmpwin, TRUE);
         destroy_nhwindow(tmpwin);
