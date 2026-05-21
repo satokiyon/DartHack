@@ -543,7 +543,7 @@ really_kick_object(coordxy x, coordxy y)
         && touch_petrifies(&mons[gk.kickedobj->corpsenm])
         && !Stone_resistance) {
         You("%sを素足の%sで蹴った.",
-            corpse_xname(gk.kickedobj, (const char *) 0, CXN_PFX_THE),
+            jp_corpse_xname(gk.kickedobj, (const char *) 0, CXN_PFX_THE),
             makeplural(body_part(FOOT)));
         if (poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM)) {
             ; /* hero has been transformed but kick continues */
@@ -1911,7 +1911,7 @@ otransit_msg(struct obj *otmp, boolean nodrop, boolean chainthere, long num)
     if (otmp->otyp == CORPSE) {
         /* Tobjnam() calls xname() and would yield "The corpse";
            we want more specific "The newt corpse" or "Medusa's corpse" */
-        optr = upstart(corpse_xname(otmp, (char *) 0, CXN_PFX_THE));
+        optr = upstart(jp_corpse_xname(otmp, (char *) 0, CXN_PFX_THE));
     } else {
         optr = Tobjnam(otmp, (char *) 0);
     }

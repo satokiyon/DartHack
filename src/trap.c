@@ -1453,10 +1453,10 @@ trapeffect_sqky_board(
             if (IndexOk(trap->tnote, tsnds)) {
                 Soundeffect(tsnds[trap->tnote], 50);
             }
-            pline("足元の床板が%s%s%s.",
+            pline("足元の床板が%s大きな音%s%s.",
                   Deaf ? "震え" : "きしみ",
                   Deaf ? "" : trapnote(trap, FALSE),
-                  Deaf ? "" : "大きな音を立てた");
+                  Deaf ? "" : "を立てた");
             wake_nearby(FALSE);
         }
     } else {
@@ -3959,7 +3959,7 @@ mselftouch(
         if (cansee(mon->mx, mon->my)) {
             pline_mon(mon, "%s%sは%sに触れた.", arg ? arg : "",
                   arg ? mon_nam(mon) : Monnam(mon),
-                  corpse_xname(mwep, (const char *) 0, CXN_PFX_THE));
+                  jp_corpse_xname(mwep, (const char *) 0, CXN_PFX_THE));
         }
         minstapetrify(mon, byplayer);
         /* if life-saved, might not be able to continue wielding */

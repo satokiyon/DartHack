@@ -146,7 +146,7 @@ cant_wield_corpse(struct obj *obj)
     /* Prevent wielding cockatrice when not wearing gloves --KAA */
     You("素手の%sで%sを構えた.",
         makeplural(body_part(HAND)),
-        corpse_xname(obj, (const char *) 0, CXN_PFX_THE));
+        jp_corpse_xname(obj, (const char *) 0, CXN_PFX_THE));
     Sprintf(kbuf, "wielding %s bare-handed", killer_xname(obj));
     instapetrify(kbuf);
     return TRUE;

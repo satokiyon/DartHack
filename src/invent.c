@@ -4320,7 +4320,7 @@ look_here(
         for (; otmp; otmp = otmp->nexthere)
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
                                 pline("%s%s.",
-                                            corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
+                                            jp_corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
                                             poly_when_stoned(gy.youmonst.data) ? "がある"
                                             : "がある。うかつに触れると危険だ");
                 feel_cockatrice(otmp, FALSE);
@@ -4404,7 +4404,7 @@ feel_cockatrice(struct obj *otmp, boolean force_touch)
 
     if (will_feel_cockatrice(otmp, force_touch)) {
         /* "the <cockatrice> corpse" */
-        Strcpy(kbuf, corpse_xname(otmp, (const char *) 0, CXN_PFX_THE));
+        Strcpy(kbuf, jp_corpse_xname(otmp, (const char *) 0, CXN_PFX_THE));
 
         if (poly_when_stoned(gy.youmonst.data))
             You("素手の%sで%sに触れた.",

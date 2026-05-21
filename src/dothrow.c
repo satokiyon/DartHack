@@ -139,7 +139,7 @@ throw_obj(struct obj *obj, int shotlimit)
     if (!uarmg && obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])
         && !Stone_resistance) {
         You("素手の%sで%sを投げた.",
-            corpse_xname(obj, (const char *) 0, CXN_PFX_THE),
+            jp_corpse_xname(obj, (const char *) 0, CXN_PFX_THE),
             /* throwing with one hand, but pluralize since the
                expression "with your bare hands" sounds better */
             makeplural(body_part(HAND)));

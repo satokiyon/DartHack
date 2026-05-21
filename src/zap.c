@@ -965,7 +965,8 @@ revive(struct obj *corpse, boolean by_hero)
         || (mons[montype].mlet == S_EEL && !IS_POOL(levl[x][y].typ))) {
         if (cansee(x, y))
             pline("%sは弱々しくピクピクした.",
-                upstart(corpse_xname(corpse, (const char *) 0, CXN_PFX_THE)));
+                upstart(jp_corpse_xname(corpse, (const char *) 0,
+                                        CXN_PFX_THE)));
         return (struct monst *) 0;
     }
 
@@ -1039,7 +1040,8 @@ revive(struct obj *corpse, boolean by_hero)
             (void) shk_your(eos(buf), corpse);
             if (one_of)
                 corpse->quan++; /* force plural */
-            Strcat(buf, corpse_xname(corpse, (const char *) 0, CXN_NO_PFX));
+            Strcat(buf, jp_corpse_xname(corpse, (const char *) 0,
+                                        CXN_NO_PFX));
             if (one_of) /* could be simplified to ''corpse->quan = 1L;'' */
                 corpse->quan--;
             pline("%sは虹色に輝いた.", upstart(buf));
@@ -1171,7 +1173,8 @@ unturn_dead(struct monst *mon)
             continue;
         /* save the name; the object is liable to go away */
         if (youseeit) {
-            Strcpy(corpse, corpse_xname(otmp, (const char *) 0, CXN_NORMAL));
+            Strcpy(corpse,
+                   jp_corpse_xname(otmp, (const char *) 0, CXN_NORMAL));
             /* shk_your/Shk_Your produces a value with a trailing space */
             if (otmp->quan > 1L) {
                 Strcpy(owner, "ひとつの ");

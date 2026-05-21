@@ -2117,9 +2117,9 @@ revive_corpse(struct obj *corpse)
                || (where == OBJ_BURIED && is_reviver(&mons[montype])));
     is_uwep = (corpse == uwep);
     chewed = (corpse->oeaten != 0);
-    Strcpy(cname, corpse_xname(corpse,
-                               chewed ? "bite-covered" : (const char *) 0,
-                               CXN_SINGULAR));
+    Strcpy(cname, jp_corpse_xname(corpse,
+                                  chewed ? "かじられた" : (const char *) 0,
+                                  CXN_SINGULAR));
     mcarry = (where == OBJ_MINVENT) ? corpse->ocarry : 0;
     /* mcarry is NULL for (where == OBJ_BURIED and OBJ_CONTAINED) now */
 

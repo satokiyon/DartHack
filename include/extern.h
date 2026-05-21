@@ -2240,6 +2240,7 @@ extern char *doname_with_price(struct obj *) NONNULLARG1;
 extern char *doname_vague_quan(struct obj *) NONNULLARG1;
 extern boolean not_fully_identified(struct obj *) NONNULLARG1;
 extern char *corpse_xname(struct obj *, const char *, unsigned) NONNULLARG1;
+extern char *jp_corpse_xname(struct obj *, const char *, unsigned) NONNULLARG1;
 extern char *cxname(struct obj *) NONNULLARG1;
 extern char *cxname_singular(struct obj *) NONNULLARG1;
 extern char *killer_xname(struct obj *) NONNULLARG1;

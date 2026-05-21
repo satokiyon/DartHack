@@ -56,6 +56,7 @@ staticfn void dbterrainmesg(const char *, coordxy, coordxy) NONNULLARG1;
 staticfn void readobjnam_init(char *, struct _readobjnam_data *);
 staticfn int readobjnam_preparse(struct _readobjnam_data *);
 staticfn void readobjnam_parse_charges(struct _readobjnam_data *);
+staticfn int jp_name_to_mon(const char *, int *);
 staticfn int readobjnam_postparse1(struct _readobjnam_data *);
 staticfn int readobjnam_postparse2(struct _readobjnam_data *);
 staticfn int readobjnam_postparse3(struct _readobjnam_data *);
@@ -1915,6 +1916,49 @@ corpse_xname(
         Strcpy(nambuf, obufp = an(nambuf));
         releaseobuf(obufp);
     }
+    return nambuf;
+}
+
+/* display-only corpse formatter for Japanese output;
+   unlike corpse_xname(), this intentionally avoids English articles/plurals */
+char *
+jp_corpse_xname(
+    struct obj *otmp,
+    const char *adjective,
+    unsigned cxn_flags) /* bitmask of CXN_xxx values */
+{
+    char *nambuf;
+    int omndx = otmp->corpsenm;
+    boolean the_prefix = (cxn_flags & CXN_PFX_THE) != 0,
+            any_prefix = (cxn_flags & CXN_ARTICLE) != 0,
+            omit_corpse = (cxn_flags & CXN_NOCORPSE) != 0,
+            glob = (otmp->otyp != CORPSE && otmp->globby);
+    const char *mnam;
+
+    nambuf = nextobuf();
+
+    if (glob) {
+        mnam = jp_item_name(otmp->otyp);
+    } else if (omndx == NON_PM) {
+        mnam = "何か";
+    } else {
+        mnam = obj_pmname(otmp);
+    }
+
+    *nambuf = '\0';
+    if (the_prefix || any_prefix)
+        Strcat(nambuf, "その");
+
+    if (adjective && *adjective) {
+        Sprintf(eos(nambuf), "%s %s", adjective, mnam);
+        mungspaces(nambuf);
+    } else {
+        Strcat(nambuf, mnam);
+    }
+
+    if (!glob && !omit_corpse)
+        Strcat(nambuf, "の死体");
+
     return nambuf;
 }
 
@@ -4301,6 +4345,26 @@ readobjnam_parse_charges(struct _readobjnam_data *d)
 }
 
 staticfn int
+jp_name_to_mon(const char *name, int *gender_p)
+{
+    int pm, gi;
+    static const int genders[] = { NEUTRAL, MALE, FEMALE };
+
+    for (pm = LOW_PM; pm < NUMMONS; ++pm) {
+        for (gi = 0; gi < (int) SIZE(genders); ++gi) {
+            const char *jpname = jp_pmname(&mons[pm], genders[gi]);
+
+            if (jpname && !strcmpi(name, jpname)) {
+                if (gender_p)
+                    *gender_p = genders[gi];
+                return pm;
+            }
+        }
+    }
+    return NON_PM;
+}
+
+staticfn int
 readobjnam_postparse1(struct _readobjnam_data *d)
 {
     int i;
@@ -4459,6 +4523,70 @@ readobjnam_postparse1(struct _readobjnam_data *d)
                 *d->p = 0;
         }
     }
+
+    /* Japanese wish input support for corpse aliases */
+    if (d->mntmp < LOW_PM) {
+        static const char *const jp_corpse_suffixes[] = {
+            "の死体", "のしたい", "のなきがら", "の亡骸", "の遺体", "の遺骸", "の屍",
+            " 死体", " したい", " なきがら", " 亡骸", " 遺体", " 遺骸", " 屍",
+            "死体", "したい", "なきがら", "亡骸", "遺体", "遺骸", "屍", 0
+        };
+        static const char *const jp_corpse_prefixes[] = {
+            "死体の", "したいの", "なきがらの", "亡骸の", "遺体の", "遺骸の", "屍の",
+            "死体 ", "したい ", "なきがら ", "亡骸 ", "遺体 ", "遺骸 ", "屍 ", 0
+        };
+        int si;
+
+        for (si = 0; jp_corpse_suffixes[si]; ++si) {
+            const char *sfx = jp_corpse_suffixes[si];
+
+            if ((d->p = strstri(d->bp, sfx)) != 0 && !strcmpi(d->p, sfx)) {
+                char *trim = d->p;
+                char save_ch;
+                int jpm;
+
+                while (trim > d->bp && trim[-1] == ' ')
+                    --trim;
+                save_ch = *trim;
+                *trim = '\0';
+                while (*d->bp == ' ')
+                    ++d->bp;
+
+                jpm = jp_name_to_mon(d->bp, &d->mgend);
+                if (jpm >= LOW_PM) {
+                    d->mntmp = jpm;
+                    d->typ = CORPSE;
+                    return 2; /* goto typfnd */
+                }
+
+                *trim = save_ch;
+            }
+        }
+
+        for (si = 0; jp_corpse_prefixes[si]; ++si) {
+            const char *pfx = jp_corpse_prefixes[si];
+            int plen = (int) strlen(pfx);
+            char *rest;
+            int jpm;
+
+            if (strncmpi(d->bp, pfx, plen))
+                continue;
+
+            rest = d->bp + plen;
+            while (*rest == ' ')
+                ++rest;
+            if (!*rest)
+                continue;
+
+            jpm = jp_name_to_mon(rest, &d->mgend);
+            if (jpm >= LOW_PM) {
+                d->mntmp = jpm;
+                d->typ = CORPSE;
+                return 2; /* goto typfnd */
+            }
+        }
+    }
+
     /* Find corpse type w/o "of" (red dragon scale mail, yeti corpse) */
     if (strncmpi(d->bp, "samurai sword", 13)  /* not the "samurai" monster! */
         && strncmpi(d->bp, "wizard lock", 11) /* not the "wizard" monster! */
