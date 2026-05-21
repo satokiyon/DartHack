@@ -120,7 +120,7 @@ throw_obj(struct obj *obj, int shotlimit)
         goto unsplit_stack;
     }
     if (is_art(obj, ART_MJOLLNIR) && obj != uwep) {
-        pline("%sは装備してからでないと投げられなかった.", The(xname(obj)));
+        pline("%sは装備してからでないと投げられなかった.", xname(obj));
         res = ECMD_OK;
         goto unsplit_stack;
     }
@@ -1551,7 +1551,7 @@ throwit(
         && obj->owt > (unsigned) ((Upolyd ? u.mh : u.uhp) * 2)
         && !Is_airlevel(&u.uz)) {
         You("体力が尽きかけて、%sを取り落とした.",
-            the(xname(obj)));
+            xname(obj));
         exercise(A_CON, FALSE);
         u.dx = u.dy = 0;
         u.dz = 1;
@@ -1806,7 +1806,7 @@ throwit(
         obj_no_longer_held(obj);
         if (mon && mon->isshk && is_pick(obj)) {
             if (cansee(gb.bhitpos.x, gb.bhitpos.y))
-                pline("%sが%sをひったくった.", l_monnam(mon), the(xname(obj)));
+                pline("%sが%sをひったくった.", l_monnam(mon), xname(obj));
             if (*u.ushops || obj->unpaid)
                 check_shop_obj(obj, gb.bhitpos.x, gb.bhitpos.y, FALSE);
             (void) mpickobj(mon, obj); /* may merge and free obj */
@@ -2088,10 +2088,10 @@ thitmonst(
             tmiss(obj, mon, FALSE);
             return 0;
         } else if (mon->mtame) {
-            pline("%sは%sを受け止めて落とした.", l_monnam(mon), the(xname(obj)));
+            pline("%sは%sを受け止めて落とした.", l_monnam(mon), xname(obj));
             return 0;
         } else {
-            pline("%sは%sを受け止めた.", l_monnam(mon), the(xname(obj)));
+            pline("%sは%sを受け止めた.", l_monnam(mon), xname(obj));
             return gem_accept(mon, obj);
         }
     }
@@ -2106,7 +2106,7 @@ thitmonst(
         mon->mstrategy &= ~STRAT_WAITMASK;
 
         if (mon->mcanmove) {
-            pline("%sは%sを受け止めた.", Some_Monnam(mon), the(xname(obj)));
+            pline("%sは%sを受け止めた.", Some_Monnam(mon), xname(obj));
             /* leader will keep tossed invocation item after you've done the
                invocation and it's become unnecessary for completion.. */
             if ((u.uevent.invoked && objects[obj->otyp].oc_unique
@@ -2120,7 +2120,7 @@ thitmonst(
                        appear in the message */
                     fully_identify_obj(obj);
                     verbalize("%sの役目はここで終わった.",
-                              s_suffix(The(xname(obj))));
+                                        s_suffix(xname(obj)));
                     verbalize(
                 "二度と必要にならないことを%sに祈りつつ、我らがこれを守る.",
                               align_gname(u.ualignbase[A_ORIGINAL]));
@@ -2135,7 +2135,7 @@ thitmonst(
 
                 finish_quest(obj); /* acknowledge quest completion */
                         pline("%sが%sで%sをあなたに返した.", Some_Monnam(mon),
-                            (next2u ? "手渡し" : "投げ返し"), the(xname(obj)));
+                            (next2u ? "手渡し" : "投げ返し"), xname(obj));
                 if (!next2u)
                     sho_obj_return_to_u(obj);
                 obj = addinv(obj); /* back into your inventory */

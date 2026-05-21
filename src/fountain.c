@@ -728,7 +728,7 @@ dipsink(struct obj *obj)
         (void) wash_hands();
         return;
     } else if (obj->oclass != POTION_CLASS) {
-        You("%sを蛇口の下にかざした.", the(xname(obj)));
+        You("%sを蛇口の下にかざした.", xname(obj));
         if (water_damage(obj, (const char *) 0, TRUE) == ER_NOTHING)
             pline1(nothing_seems_to_happen);
         return;
@@ -736,7 +736,7 @@ dipsink(struct obj *obj)
 
     /* at this point the object must be a potion */
     You("%s%sを排水口に流し込んだ.", (obj->quan > 1L ? "そのうち1つの" : ""),
-        the(xname(obj)));
+        xname(obj));
     switch (obj->otyp) {
     case POT_POLYMORPH:
         polymorph_sink();

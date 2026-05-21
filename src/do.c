@@ -287,7 +287,7 @@ flooreffects(
         if (is_pit(t->ttyp)) {
             if (Blind && !Deaf) {
                 Soundeffect(se_item_tumble_downwards, 50);
-                You_hear("%sが落ちていくのが聞こえた.", the(xname(obj)));
+                You_hear("%sが落ちていくのが聞こえた.", xname(obj));
             } else {
                 pline("%sが%sの落とし穴へ転がり落ちた.", Tobjnam(obj, "tumble"),
                       the_your[t->madeby_u]);
@@ -2192,11 +2192,11 @@ revive_corpse(struct obj *corpse)
             } else if (mcarry && canseemon(mcarry)) {
                 pline("%sが%sから這い出した!", mnam, yname(container));
             } else if (container_where == OBJ_INVENT) {
-                Strcpy(sackname, an(xname(container)));
+                Strcpy(sackname, xname(container));
                 pline("%sがバッグの中の%sから這い出した!", mnam, sackname);
             } else if (container_where == OBJ_FLOOR
                        && cansee(corpsex, corpsey)) {
-                Strcpy(sackname, an(xname(container)));
+                Strcpy(sackname, xname(container));
                 pline("%sが%sから逃げ出した!", mnam, sackname);
             }
             break;

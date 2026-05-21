@@ -1203,7 +1203,7 @@ use_bell(struct obj **optr)
                         && !On_stairs(u.ux, u.uy));
 
     Hero_playnotes(obj_to_instr(obj), "C", 100);
-    You("%sを鳴らした.", the(xname(obj)));
+    You("%sを鳴らした.", xname(obj));
 
     if (Underwater || (u.uswallow && ordinary)) {
         pline("しかし音はこもってしまった.");
@@ -1341,12 +1341,12 @@ use_candelabrum(struct obj *obj)
         return;
     }
     if (obj->spe < 7) {
-        There("%sには%d本しか%sがなかった.", the(xname(obj)), obj->spe, s,
-              the(xname(obj)));
+          There("%sには%d本しか%sがなかった.", xname(obj), obj->spe, s,
+              xname(obj));
         if (!Blind)
             pline("火が付いた.  それは淡く光った.");
     } else {
-        pline("%sの%sが%s", The(xname(obj)), s,
+          pline("%sの%sが%s", xname(obj), s,
               (Blind ? "燃えていた." : "明るく燃え上がった!"));
     }
     if (!invocation_pos(u.ux, u.uy) || On_stairs(u.ux, u.uy)) {
@@ -1425,7 +1425,7 @@ use_candle(struct obj **optr)
             end_burn(obj, TRUE);
 
         You("%ld%s%sを%sに取り付けた.", obj->quan, !otmp->spe ? "" : "本を追加で", s,
-            the(xname(otmp)));
+            xname(otmp));
         if (!otmp->spe || otmp->age > obj->age)
             otmp->age = obj->age;
         otmp->spe += (int) obj->quan;
@@ -1442,7 +1442,7 @@ use_candle(struct obj **optr)
                     otmp->lamplit ? "燃やす" : "使う");
         }
         if (obj->quan < 7L && otmp->spe == 7)
-            pline("%sにはいま7本%sのろうそくが付いていた.", The(xname(otmp)),
+            pline("%sにはいま7本%sのろうそくが付いていた.", xname(otmp),
                 otmp->lamplit ? "点灯中" : "");
         /* candelabrum's light range might increase */
         if (otmp->lamplit)
@@ -2676,7 +2676,7 @@ use_stone(struct obj *tstone)
         return ECMD_CANCEL;
 
     if (obj == tstone && obj->quan == 1L) {
-        You_cant("%sをそれ自身にこすりつけられなかった.", the(xname(obj)));
+        You_cant("%sをそれ自身にこすりつけられなかった.", xname(obj));
         return ECMD_OK;
     }
 
@@ -2689,7 +2689,7 @@ use_stone(struct obj *tstone)
             pline("うわあ、きれいな破片だ.");
         else
             pline("鋭いひび割れ音とともに%s%sは砕けた.",
-                  (obj->quan > 1L) ? "そのうち1つの" : "", the(xname(obj)));
+                (obj->quan > 1L) ? "そのうち1つの" : "", xname(obj));
         useup(obj);
         return ECMD_TIME;
     }
@@ -3555,8 +3555,7 @@ use_cream_pie(struct obj *obj)
         You("顔面にクリームを塗りたくった.");
     else
           You("%sを%s%sに突っ込んだ.", body_part(FACE),
-              several ? "one of " : "",
-              several ? makeplural(the(xname(obj))) : the(xname(obj)));
+              several ? "そのうち1つの" : "", xname(obj));
     if (can_blnd((struct monst *) 0, &gy.youmonst, AT_WEAP, obj)) {
         int blindinc = rnd(25);
 
@@ -3564,7 +3563,7 @@ use_cream_pie(struct obj *obj)
         make_blinded(BlindedTimeout + (long) blindinc, FALSE);
         if (!Blind || (Blind && wasblind))
             pline("%sベタベタしたものが%s中に付いた.",
-                  wascreamed ? "more " : "", body_part(FACE));
+                wascreamed ? "さらに" : "", body_part(FACE));
         else /* Blind  && !wasblind */
             You_cant("%sのベタベタで前が見えなかった.",
                      body_part(FACE));
