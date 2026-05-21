@@ -3955,7 +3955,7 @@ float_up(void)
             fill_pit(u.ux, u.uy);
         } else if (u.utraptype == TT_LAVA /* molten lava */
                    || u.utraptype == TT_INFLOOR) { /* solidified lava */
-            Your("体は上に引かれたが、%sはまだ引っかかったままだった.",
+            Your("体は上に引かれたが、%sはまだ引っかかったままだ.",
                  makeplural(body_part(LEG)));
         } else if (u.utraptype == TT_BURIEDBALL) { /* tethered */
             coord cc;
@@ -6064,7 +6064,7 @@ untrap(
 
     switch (levl[x][y].doormask) {
     case D_NODOOR:
-        You("そこに扉は%sなかった.", Blind ? "感じられ" : "見え");
+        You("そこに扉は%sない.", Blind ? "感じられ" : "見え");
         return 0;
     case D_ISOPEN:
         pline("この扉は安全に開いている.");
@@ -6101,7 +6101,7 @@ untrap(
                 newexplevel();
             }
         } else
-            pline("この扉には罠がなかった.");
+            pline("この扉には罠がない.");
         return 1;
     } else {
         You("扉に罠は見つからない.");

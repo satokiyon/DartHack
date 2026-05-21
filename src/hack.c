@@ -1563,7 +1563,7 @@ trapmove(
     switch (u.utraptype) {
     case TT_BEARTRAP:
         if (flags.verbose) {
-            predicament = "ベアトラップにかかっていた";
+            predicament = "熊罠にかかっている";
             if (u.usteed)
                 Norep("%sは%s.", upstart(steedname), predicament);
             else
@@ -1606,7 +1606,7 @@ trapmove(
         break;
     case TT_LAVA:
         if (flags.verbose) {
-            predicament = "溶岩にはまっていた";
+            predicament = "溶岩にはまっている";
             if (u.usteed)
                 Norep("%sは%s.", upstart(steedname), predicament);
             else
@@ -1649,10 +1649,10 @@ trapmove(
         if (--u.utrap) {
             if (flags.verbose) {
                 if (anchored) {
-                    predicament = "埋まった鉄球につながれていた";
+                    predicament = "埋まった鉄球につながれている";
                     culprit = "";
                 } else {
-                    predicament = "に引っかかっていた";
+                    predicament = "に引っかかっている";
                     culprit = surface(u.ux, u.uy);
                 }
                 if (u.usteed) {
