@@ -1263,7 +1263,7 @@ bot_via_windowport(void)
             classify_terrain();
         i = iflags.terrain_typ;
         if (gb.blstats[idx][BL_TERRAIN].a.a_int != i) {
-            Strcpy(gb.blstats[idx][BL_TERRAIN].val, terrain_descr[i]);
+            Strcpy(gb.blstats[idx][BL_TERRAIN].val, jp_terrain_name(i));
             gb.blstats[idx][BL_TERRAIN].a.a_int = i;
         }
     } else {

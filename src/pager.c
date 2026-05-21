@@ -38,6 +38,143 @@ staticfn void dispfile_shelp(void);
 staticfn void dispfile_optionfile(void);
 staticfn void dispfile_optmenu(void);
 staticfn void dispfile_license(void);
+
+/* Static Japanese names for cmap terrain/furniture symbols.
+    Context-sensitive liquids are overridden in jp_cmap_explanation(). */
+static const char *const jp_cmap_names[MAXPCHARS] = {
+    [S_stone] = "岩壁",
+    [S_vwall] = "壁",
+    [S_hwall] = "壁",
+    [S_tlcorn] = "壁",
+    [S_trcorn] = "壁",
+    [S_blcorn] = "壁",
+    [S_brcorn] = "壁",
+    [S_crwall] = "壁",
+    [S_tuwall] = "壁",
+    [S_tdwall] = "壁",
+    [S_tlwall] = "壁",
+    [S_trwall] = "壁",
+    [S_ndoor] = "戸口",
+    [S_vodoor] = "開いた扉",
+    [S_hodoor] = "開いた扉",
+    [S_vcdoor] = "閉じた扉",
+    [S_hcdoor] = "閉じた扉",
+    [S_bars] = "鉄格子",
+    [S_tree] = "木",
+    [S_room] = "床",
+    [S_darkroom] = "床",
+    [S_engroom] = "刻印",
+    [S_corr] = "通路",
+    [S_litcorr] = "通路",
+    [S_engrcorr] = "刻印",
+    [S_upstair] = "上り階段",
+    [S_dnstair] = "下り階段",
+    [S_upladder] = "上りはしご",
+    [S_dnladder] = "下りはしご",
+    [S_brupstair] = "上り階段",
+    [S_brdnstair] = "下り階段",
+    [S_brupladder] = "上りはしご",
+    [S_brdnladder] = "下りはしご",
+    [S_altar] = "祭壇",
+    [S_grave] = "墓",
+    [S_throne] = "玉座",
+    [S_sink] = "シンク",
+    [S_fountain] = "泉",
+    [S_pool] = "水たまり",
+    [S_ice] = "氷",
+    [S_lava] = "溶岩",
+    [S_lavawall] = "溶岩の壁",
+    [S_vodbridge] = "下りた跳ね橋",
+    [S_hodbridge] = "下りた跳ね橋",
+    [S_vcdbridge] = "上がった跳ね橋",
+    [S_hcdbridge] = "上がった跳ね橋",
+    [S_air] = "空中",
+    [S_cloud] = "雲",
+    [S_water] = "水の壁",
+};
+
+/* Static Japanese names for terrain status values.
+   classify_terrain() maps context-sensitive water variants to xSEA/xSWAMP
+   and similar pseudo-types before these names are displayed. */
+static const char *const jp_terrain_names[xWATERWALL + 1] = {
+    [STONE] = "岩壁",
+    [VWALL] = "壁",
+    [HWALL] = "壁",
+    [TLCORNER] = "壁",
+    [TRCORNER] = "壁",
+    [BLCORNER] = "壁",
+    [BRCORNER] = "壁",
+    [CROSSWALL] = "壁",
+    [TUWALL] = "壁",
+    [TDWALL] = "壁",
+    [TLWALL] = "壁",
+    [TRWALL] = "壁",
+    [DBWALL] = "落とし格子",
+    [TREE] = "木",
+    [SDOOR] = "壁",
+    [SCORR] = "岩壁",
+    [POOL] = "水たまり",
+    [MOAT] = "堀",
+    [WATER] = "果てしない水",
+    [DRAWBRIDGE_UP] = "橋の切れ目",
+    [LAVAPOOL] = "溶岩",
+    [LAVAWALL] = "溶岩の壁",
+    [IRONBARS] = "鉄格子",
+    [DOOR] = "戸口",
+    [CORR] = "通路",
+    [ROOM] = "部屋",
+    [STAIRS] = "階段",
+    [LADDER] = "はしご",
+    [FOUNTAIN] = "泉",
+    [THRONE] = "玉座",
+    [SINK] = "シンク",
+    [GRAVE] = "墓",
+    [ALTAR] = "祭壇",
+    [ICE] = "氷",
+    [DRAWBRIDGE_DOWN] = "跳ね橋",
+    [AIR] = "空中",
+    [CLOUD] = "雲",
+    [MATCH_WALL] = "壁",
+    [xFLOOR] = "床",
+    [xGROUND] = "地面",
+    [xOPENDOOR] = "開いた扉",
+    [xSHUTDOOR] = "閉じた扉",
+    [xSWAMP] = "沼地",
+    [xSUBMERGED] = "水中",
+    [xSEA] = "浅い海",
+    [xWATERWALL] = "水の壁",
+};
+
+const char *
+jp_cmap_explanation(int cmap, coordxy x, coordxy y)
+{
+    const char *name = (cmap >= 0 && cmap < MAXPCHARS) ? jp_cmap_names[cmap]
+                                                       : (const char *) 0;
+
+    switch (cmap) {
+    case S_pool:
+    case S_water:
+    case S_lava:
+    case S_lavawall:
+    case S_ice:
+        if (isok(x, y))
+            return waterbody_name(x, y);
+        break;
+    default:
+        break;
+    }
+
+    return name ? name : defsyms[cmap].explanation;
+}
+
+const char *
+jp_terrain_name(int terrain_typ)
+{
+    return (terrain_typ >= 0 && terrain_typ <= xWATERWALL
+            && jp_terrain_names[terrain_typ])
+               ? jp_terrain_names[terrain_typ]
+               : "";
+}
 staticfn void dispfile_debughelp(void);
 staticfn void dispfile_usagehelp(void);
 staticfn void hmenu_doextversion(void);
@@ -207,8 +344,9 @@ mhidden_description(
         if (incl_prefix)
             Strcpy(outbuf, "、擬態中: ");
         if (M_AP_TYPE(mon) == M_AP_FURNITURE) {
-            what = defsyms[mon->mappearance].explanation;
-            if (incl_article)
+            what = jp_cmap_explanation(mon->mappearance, x, y);
+            if (incl_article
+                && what == defsyms[mon->mappearance].explanation)
                 what = an(what);
             Strcat(outbuf, what);
         } else if (M_AP_TYPE(mon) == M_AP_OBJECT
@@ -786,7 +924,7 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
             FALLTHROUGH;
             /*FALLTHRU*/
         default:
-            Strcpy(buf, defsyms[symidx].explanation);
+            Strcpy(buf, jp_cmap_explanation(symidx, x, y));
             break;
         }
     } else { /* not mon, obj, trap, or cmap */
@@ -1192,6 +1330,16 @@ add_cmap_descr(
                     || !strncmp(x_str, "lava", 4)
                     || !strncmp(x_str, "swamp", 5)
                     || strstr(x_str, " wall of "));
+    }
+
+    if (!(absidx == S_pool || idx == S_water || idx == S_lava
+          || idx == S_lavawall || idx == S_ice)) {
+        const char *jp_x_str = jp_cmap_explanation(absidx, cc.x, cc.y);
+
+        if (jp_x_str != defsyms[absidx].explanation) {
+            x_str = jp_x_str;
+            article = 0;
+        }
     }
 
     if (!found) {

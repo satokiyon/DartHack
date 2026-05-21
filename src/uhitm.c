@@ -6214,7 +6214,7 @@ that_is_a_mimic(
             if (M_AP_TYPE(mtmp) == M_AP_FURNITURE
                 || (M_AP_TYPE(mtmp) == M_AP_OBJECT && sym == S_trapped_chest))
                 Snprintf(fmtbuf, sizeof fmtbuf, "その%sは実は%%sだ!",
-                         defsyms[sym].explanation);
+                         jp_cmap_explanation(sym, x, y));
         } else if (glyph_is_object(glyph)) {
             boolean fakeobj;
             const char *otmp_name;

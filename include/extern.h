@@ -2367,6 +2367,8 @@ extern void mhidden_description(struct monst *, unsigned, char *) NONNULLPTRS;
 extern boolean object_from_map(int, coordxy, coordxy,
                                struct obj **) NONNULLPTRS;
 extern const char *waterbody_name(coordxy, coordxy) NONNULL;
+extern const char *jp_cmap_explanation(int, coordxy, coordxy);
+extern const char *jp_terrain_name(int);
 extern char *ice_descr(coordxy, coordxy, char *) NONNULL NONNULLARG3;
 extern boolean ia_checkfile(struct obj *) NONNULLARG1;
 extern int do_screen_description(coord, boolean, int, char *, const char **,
