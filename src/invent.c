@@ -2930,7 +2930,7 @@ prinv(const char *prefix, struct obj *obj, long quan)
     totalbuf[0] = '\0';
     if (total_of)
         Snprintf(totalbuf, sizeof totalbuf,
-                 " (%ld in total).", obj->quan);
+                 "（合計 %ld）.", obj->quan);
     pline("%s%s%s%s", prefix, *prefix ? " " : "",
           xprname(obj, (char *) 0, obj_to_let(obj), !total_of, 0L, quan),
           flags.verbose ? totalbuf : "");
