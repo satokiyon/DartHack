@@ -862,8 +862,8 @@ xname_flags(
         } else if (un) {
             xcalled(buf, BUFSZ - PREFIX, "", un);
         } else if (ocl->oc_magic) {
-            Strcat(buf, " labeled ");
-            Strcat(buf, dn);
+            /* Show only the label text for unknown magical scrolls. */
+            Strcpy(buf, dn);
         } else {
             Strcpy(buf, dn);
             Strcat(buf, " scroll");
@@ -2164,7 +2164,7 @@ an(const char *str)
         impossible("Alphabet soup: 'an(%s)'.", str ? "\"\"" : "<null>");
         return strcpy(buf, "[]");
     }
-    return strncat(buf, str, BUFSZ - 1);
+    return Snprintf(buf, BUFSZ, "%s", str), buf;
 }
 
 char *
@@ -2252,7 +2252,7 @@ the(const char *str)
         impossible("Alphabet soup: 'the(%s)'.", str ? "\"\"" : "<null>");
         return strcpy(buf, "[]");
     }
-    return strncat(buf, str, BUFSZ - 1);
+    return Snprintf(buf, BUFSZ, "%s", str), buf;
 }
 
 char *
