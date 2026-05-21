@@ -6058,7 +6058,7 @@ untrap(
      */
     if (!IS_DOOR(levl[x][y].typ)) {
         if (!trap_skipped)
-            You("そこに罠はないようだ.");
+            pline("そこに罠はないようだ.");
         return 0;
     }
 
