@@ -426,7 +426,7 @@ mcast_summon_mons(struct monst *mtmp)
         ; /* nothing was created? */
     } else if (mtmp->iswiz) {
         SetVoice(mtmp, 0, 80, 0);
-        verbalize("泥棒を滅ぼせ、わが従僕よ%s！", plur(count));
+        verbalize("泥棒を滅ぼせ、わが従僕たちよ!");
     } else {
         boolean one = (count == 1);
         const char *mappear = one ? "A monster appears"

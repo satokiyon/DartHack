@@ -43,6 +43,8 @@ staticfn char *doname_base(struct obj *obj, unsigned);
 staticfn boolean singplur_lookup(char *, char *, boolean,
                                const char *const *);
 staticfn char *singplur_compound(char *);
+staticfn boolean has_nonascii(const char *);
+staticfn const char *jp_counter_for_obj(struct obj *);
 staticfn boolean ch_ksound(const char *basestr);
 staticfn boolean badman(const char *, boolean);
 staticfn boolean wishymatch(const char *, const char *, boolean);
@@ -1281,9 +1283,9 @@ doname_base(
     prefix[0] = '\0';
     if (obj->quan != 1L) {
         if (dknown || !vague_quan)
-            Sprintf(prefix, "%ld ", obj->quan);
+            Sprintf(prefix, "%ld%sの", obj->quan, jp_counter_for_obj(obj));
         else
-            Strcpy(prefix, "some ");
+            Strcpy(prefix, "いくつかの");
     } else if (obj->otyp == CORPSE) {
         /* skip article prefix for corpses [else corpse_xname()
            would have to be taught how to strip it off again] */
@@ -1291,10 +1293,8 @@ doname_base(
     } else if (force_the || obj_is_pname(obj) || the_unique_obj(obj)) {
         if (!strncmpi(bp, "the ", 4))
             bp += 4; /* doesn't affect bp_eos or bpspaceleft */
-        Strcpy(prefix, "the ");
     } else if (!fake_arti) {
-        /* default prefix */
-        Strcpy(prefix, "a ");
+        ;
     }
 
     /* "empty" goes at the beginning, but item count goes at the end */
@@ -1321,9 +1321,9 @@ doname_base(
          * always allow "uncursed potion of water"
          */
         if (obj->cursed)
-            Strcat(prefix, "cursed ");
+            Strcat(prefix, "呪われた");
         else if (obj->blessed)
-            Strcat(prefix, "blessed ");
+            Strcat(prefix, "祝福された");
         else if (!flags.implicit_uncursed
             /* For most items with charges or +/-, if you know how many
              * charges are left or what the +/- is, then you must have
@@ -1344,7 +1344,7 @@ doname_base(
                      && obj->otyp != FAKE_AMULET_OF_YENDOR
                      && obj->otyp != AMULET_OF_YENDOR
                      && !Role_if(PM_CLERIC)))
-            Strcat(prefix, "uncursed ");
+                    Strcat(prefix, "無祝福の");
     }
 
     /* "a large trapped box" would perhaps be more correct; [no!]
@@ -2107,6 +2107,7 @@ singular(struct obj *otmp, char *(*func)(OBJ_P))
 char *
 just_an(char *outbuf, const char *str)
 {
+#if 0
     char c0;
 
     *outbuf = '\0';
@@ -2138,11 +2139,16 @@ just_an(char *outbuf, const char *str)
             Strcpy(outbuf, "a ");
     }
     return outbuf;
+#endif
+    *outbuf = '\0';
+    nhUse(str);
+    return outbuf;
 }
 
 char *
 an(const char *str)
 {
+#if 0
     char *buf = nextobuf();
 
     if (!str || !*str) {
@@ -2151,15 +2157,26 @@ an(const char *str)
     }
     (void) just_an(buf, str);
     return strncat(buf, str, BUFSZ - 1 - Strlen(buf));
+#endif
+    char *buf = nextobuf();
+
+    if (!str || !*str) {
+        impossible("Alphabet soup: 'an(%s)'.", str ? "\"\"" : "<null>");
+        return strcpy(buf, "[]");
+    }
+    return strncat(buf, str, BUFSZ - 1);
 }
 
 char *
 An(const char *str)
 {
+#if 0
     char *tmp = an(str);
 
     *tmp = highc(*tmp);
     return tmp;
+#endif
+    return an(str);
 }
 
 /*
@@ -2169,6 +2186,7 @@ An(const char *str)
 char *
 the(const char *str)
 {
+#if 0
     const char *aname;
     char *buf = nextobuf();
     boolean insert_the = FALSE;
@@ -2227,15 +2245,26 @@ the(const char *str)
     else
         buf[0] = '\0';
     return strncat(buf, str, BUFSZ - 1 - Strlen(buf));
+#endif
+    char *buf = nextobuf();
+
+    if (!str || !*str) {
+        impossible("Alphabet soup: 'the(%s)'.", str ? "\"\"" : "<null>");
+        return strcpy(buf, "[]");
+    }
+    return strncat(buf, str, BUFSZ - 1);
 }
 
 char *
 The(const char *str)
 {
+#if 0
     char *tmp = the(str);
 
     *tmp = highc(*tmp);
     return tmp;
+#endif
+    return the(str);
 }
 
 /* returns "count cxname(otmp)" or just cxname(otmp) if count == 1 */
@@ -2246,7 +2275,7 @@ aobjnam(struct obj *otmp, const char *verb)
     char *bp = cxname(otmp);
 
     if (otmp->quan != 1L) {
-        Sprintf(prefix, "%ld ", otmp->quan);
+        Sprintf(prefix, "%ld%sの", otmp->quan, jp_counter_for_obj(otmp));
         bp = strprepend(bp, prefix);
     }
     if (verb) {
@@ -2812,6 +2841,37 @@ singplur_compound(char *str)
     return 0;
 }
 
+staticfn boolean
+has_nonascii(const char *str)
+{
+    const uchar *p = (const uchar *) str;
+
+    while (*p) {
+        if (*p & 0x80)
+            return TRUE;
+        ++p;
+    }
+    return FALSE;
+}
+
+staticfn const char *
+jp_counter_for_obj(struct obj *obj)
+{
+    if (!obj)
+        return "個";
+
+    if (obj->oclass == SPBOOK_CLASS)
+        return "冊";
+
+    if (obj->oclass == WEAPON_CLASS && is_ammo(obj))
+        return "本";
+
+    if (obj->oclass == WAND_CLASS)
+        return "本";
+
+    return "個";
+}
+
 /* Plural routine; once upon a time it may have been chiefly used for
  * user-defined fruits, but it is now used extensively throughout the
  * program.
@@ -2868,6 +2928,11 @@ makeplural(const char *oldstr)
     }
 
     Strcpy(str, oldstr);
+
+    /* Japanese and other non-ASCII words shouldn't gain English plural
+       suffixes like "s" or "'s". */
+    if (has_nonascii(str))
+        return str;
 
     /*
      * Skip changing "pair of" to "pairs of".  According to Webster, usual

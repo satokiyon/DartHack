@@ -1226,10 +1226,9 @@ hmon_hitmon_misc_obj(
                     ? the(mons[mnum].pmnames[NEUTRAL])
                     : (cnt > 1L) ? "some" : "an";
 
-            You("%sに%s個の卵%sをぶつけた.", l_monnam(mon), eggp,
-                plur(cnt));
+            You("%sに%s個の卵をぶつけた.", l_monnam(mon), eggp);
             if (touch_petrifies(hmd->mdat) && !stale_egg(obj)) {
-                pline_The("卵%sはもう生きていない...", plur(cnt));
+                pline_The("卵はもう生きていない...");
                 if (obj->timed)
                     obj_stop_timers(obj);
                 obj->otyp = ROCK;
@@ -1277,7 +1276,7 @@ hmon_hitmon_misc_obj(
                           mon->mcansee ? "" : "さらに");
             } else {
                 char *whom = mon_nam(mon);
-                char *what = The(xname(obj));
+                char *what = xname(obj);
 
                 if (!hmd->thrown && obj->quan > 1L)
                     what = An(singular(obj, xname));
