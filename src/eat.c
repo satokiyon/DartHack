@@ -619,7 +619,7 @@ eat_brains(
     if (noncorporeal(pd)) {
         if (visflag)
             pline("%sの脳は無傷だった.",
-                  (mdef == &gy.youmonst) ? "あなた" : Monnam(mdef));
+                  (mdef == &gy.youmonst) ? "あなた" : l_monnam(mdef));
         return M_ATTK_MISS; /* side-effects can't occur */
     } else if (magr == &gy.youmonst) {
         You("%sの脳を食べた!", l_monnam(mdef));

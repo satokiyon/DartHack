@@ -1474,7 +1474,7 @@ really_done(int how)
         Strcpy(pbuf, "あなた");
         if (mtmp || Schroedingers_cat) {
             while (mtmp) {
-                Sprintf(eos(pbuf), "と%s", mon_nam(mtmp));
+                Sprintf(eos(pbuf), "と%s", l_monnam(mtmp));
                 if (mtmp->mtame)
                     u.urexp = nowrap_add(u.urexp, mtmp->mhp);
                 mtmp = mtmp->nmon;
