@@ -1048,7 +1048,7 @@ use_defensive(struct monst *mtmp)
         if (vis) {
             pline_mon(mtmp, "%s %s into a %s!", Monnam(mtmp),
                   vtense(fakename[0], locomotion(mtmp->data, "jump")),
-                  trapname(t->ttyp, FALSE));
+                  jp_trapname_for_display(t->ttyp, FALSE));
         }
         /* if trap was in a concealed niche, it's no longer concealed */
         reveal_trap(t, vis);
@@ -1144,7 +1144,7 @@ use_defensive(struct monst *mtmp)
         if (vis) {
             pline_mon(mtmp, "%s %s onto a %s!", Monnam(mtmp),
                   vtense(fakename[0], locomotion(mtmp->data, "jump")),
-                  trapname(t->ttyp, FALSE));
+                  jp_trapname_for_display(t->ttyp, FALSE));
         }
         /* if trap was in a concealed niche, it's no longer concealed */
         reveal_trap(t, vis);
@@ -2525,7 +2525,8 @@ use_misc(struct monst *mtmp)
         if (vismon || vistrapspot) {
             pline_mon(mtmp, "%s deliberately %s onto a %s!", Some_Monnam(mtmp),
                   vtense(fakename[0], locomotion(mtmp->data, "jump")),
-                  t->tseen ? trapname(t->ttyp, FALSE) : "hidden trap");
+                t->tseen ? jp_trapname_for_display(t->ttyp, FALSE)
+                       : "隠れた罠");
             /* note: if mtmp is unseen because it is invisible, its new
                shape will also be invisible and could produce "Its armor
                falls off" messages during the transformation; those make

@@ -3780,12 +3780,12 @@ zap_map(
             newsym(x, y);
 
             if (!t_already_seen || hallu) {
-                ttmpname = trapname(ttmp->ttyp, FALSE);
+                ttmpname = jp_trapname_for_display(ttmp->ttyp, FALSE);
                 use_the = !hallu ? (ttmp->ttyp == VIBRATING_SQUARE
                                     && Invocation_lev(&u.uz))
                                  : !rn2(4);
                 You("%sを見つけた%c",
-                    use_the ? the(ttmpname) : an(ttmpname),
+                    ttmpname,
                     use_the ? '!' : '.');
                 learn_it = !hallu;
             }

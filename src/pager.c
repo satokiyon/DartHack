@@ -313,7 +313,7 @@ trap_description(char *outbuf, int tnum, coordxy x, coordxy y)
     else if (trapped_door_at(tnum, x, y))
         Strcpy(outbuf, "罠のかかった扉"); /* not "trap door"... */
     else
-        Strcpy(outbuf, trapname(tnum, FALSE));
+        Strcpy(outbuf, jp_trapname_for_display(tnum, FALSE));
     return;
 }
 
@@ -610,7 +610,8 @@ look_at_monster(
 
         /* newsym lets you know of the trap, so mention it here */
         if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB) {
-                Sprintf(eos(buf), "、%sにかかっている", an(trapname(tt, FALSE)));
+                Sprintf(eos(buf), "、%sにかかっている",
+                        jp_trapname_for_display(tt, FALSE));
             t->tseen = 1;
         }
     }
@@ -2226,7 +2227,7 @@ look_traps(boolean nearby)
                           clouds except when hero has direct line of sight */
                        && ((!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
                            || couldsee(x, y))) {
-                Strcpy(lookbuf, trapname(t->ttyp, FALSE));
+                Strcpy(lookbuf, jp_trapname_for_display(t->ttyp, FALSE));
                 Sprintf(eos(lookbuf), "、%sで隠れていた", encglyph(glyph));
                 glyph = trap_to_glyph(t);
                 ++count;
@@ -2495,7 +2496,7 @@ doidtrap(void)
                     break;
             }
             pline("それは%s%s%sだった.",
-                  an(trapname(tt, FALSE)),
+                jp_trapname_for_display(tt, FALSE),
                   !trap->madeby_u
                      ? ""
                      : (tt == WEB)

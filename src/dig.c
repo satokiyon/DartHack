@@ -412,12 +412,12 @@ dig(void)
             svc.context.digging.effort = 0;
             return 0;
         } else if (ttmp && dcresult == DIGCHECK_PASSED_DESTROY_TRAP) {
-            const char *ttmpname = trapname(ttmp->ttyp, FALSE);
+            const char *ttmpname = jp_trapname_for_display(ttmp->ttyp, FALSE);
 
             if (ispick)
                 You("%sで%sを破壊した.",
                     yobjnam(uwep, (const char *) 0),
-                    ttmp->tseen ? the(ttmpname) : an(ttmpname));
+                    ttmpname);
             deltrap(ttmp);
             /* we haven't made any progress toward a pit yet */
             svc.context.digging.effort = 0;
@@ -698,21 +698,21 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
     else if (madeby_u)
         feeltrap(ttmp);
 
-    tname = trapname(ttyp, TRUE);
+    tname = jp_trapname_for_display(ttyp, TRUE);
     in_thru = (ttyp == HOLE ? "through" : "in");
     if (madeby_u) {
         if (x != u.ux || y != u.uy)
             You("隣の%sを掘った.", tname);
         else
-            You("%sの中に%sを掘った.", surface_type, an(tname));
+            You("%sの中に%sを掘った.", surface_type, tname);
     } else if (!madeby_obj && canseemon(madeby)) {
         pline("%sは%sの中に%sを掘った.", l_monnam(madeby), surface_type,
-              an(tname));
+              tname);
     } else if (cansee(x, y) && flags.verbose) {
         if (IS_STWALL(old_typ))
-            pline_The("%sが崩れて%sになった.", surface_type, an(tname));
+            pline_The("%sが崩れて%sになった.", surface_type, tname);
         else
-            pline("%sに%sが現れた.", surface_type, An(tname));
+            pline("%sに%sが現れた.", surface_type, tname);
     }
     if (IS_FURNITURE(old_typ) && cansee(x, y))
         pline_The("%sは%sの中に落ちた!", furniture, tname);
