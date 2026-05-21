@@ -625,7 +625,7 @@ wielding_corpse(
 
         You("%s素手で%sをつかんでしまった.",
             (how && is_gloves(how)) ? "今や" : "",
-            corpse_xname(obj, (const char *) 0, CXN_ARTICLE));
+            jp_corpse_xname(obj, (const char *) 0, CXN_ARTICLE));
         /* "removing" ought to be "taking off" but that makes the
            tombstone text more likely to be truncated */
         if (how)

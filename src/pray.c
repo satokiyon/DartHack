@@ -1979,7 +1979,7 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
     if (!u.uconduct.gnostic++)
         livelog_printf(LL_CONDUCT, "rejected atheism"
                                    " by offering %s on an altar of %s",
-                       corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
+                       jp_corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
                        a_gname());
 
     /* you're handling this corpse, even if it was killed upon the altar

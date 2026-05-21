@@ -219,12 +219,8 @@ food_xname(struct obj *food, boolean the_pfx)
     const char *result;
 
     if (food->otyp == CORPSE) {
-        result = corpse_xname(food, (const char *) 0,
-                              CXN_SINGULAR | (the_pfx ? CXN_PFX_THE : 0));
-        /* not strictly needed since pname values are capitalized
-           and the() is a no-op for them */
-        if (type_is_pname(&mons[food->corpsenm]))
-            the_pfx = FALSE;
+        result = jp_corpse_xname(food, (const char *) 0,
+                                 CXN_SINGULAR | (the_pfx ? CXN_PFX_THE : 0));
     } else {
         /* the ordinary case */
         result = singular(food, xname);
@@ -553,10 +549,10 @@ done_eating(boolean message)
             pline1(gn.nomovemsg);
         gn.nomovemsg = 0;
     } else if (message) {
-        You("%s %sを完食した.",
-            (gy.youmonst.data == &mons[PM_FIRE_ELEMENTAL]) ? "消費し尽くして"
-            : "食べて",
-            food_xname(piece, TRUE));
+        You("%sを%s.", food_xname(piece, TRUE),
+            (gy.youmonst.data == &mons[PM_FIRE_ELEMENTAL])
+                ? "消費し尽くした"
+                : "食べ終えた");
     }
 
     if (piece->otyp == CORPSE || piece->globby)
@@ -1910,10 +1906,10 @@ consume_tin(const char *mesg)
             /* make sure new ill doesn't result in improvement */
             if (Sick && (sick_time > Sick))
                 sick_time = (Sick > 1L) ? Sick - 1L : 1L;
-            make_sick(sick_time, corpse_xname(otmp, "rotted", CXN_NORMAL),
+            make_sick(sick_time, jp_corpse_xname(otmp, "腐った", CXN_NORMAL),
                       TRUE, SICK_VOMITABLE);
 
-            pline("(It must have died too long ago to be safe to eat.)");
+            pline("(死んでから時間が経ちすぎていて、安全に食べられないようだ.)");
         }
         if (carried(otmp))
             useup(otmp);
@@ -1987,31 +1983,21 @@ consume_tin(const char *mesg)
                               : carnivorous(gy.youmonst.data))
                              && rn2(10)
                              && (rotted < 1 || !rn2((int) rotted + 1)));
-        const char *pmxnam = food_xname(otmp, FALSE);
-        static const char *const palatable_msgs[] = {
-            /* first char: T = tastes ... , I = is ... */
-            /* veggies are always just "okay" */
-            "Tokay", "Istringy", "Igamey", "Ifatty", "Itough"
-        };
-        int idx = vegetarian(&mons[mnum]) ? 0 : rn2(SIZE(palatable_msgs));
-        const char *palat_msg = palatable_msgs[idx];
-        boolean use_is = (Hallucination || (palatable && *palat_msg == 'I'));
+          const char *pmxnam = food_xname(otmp, FALSE);
+          static const char *const palatable_msgs[] = {
+                "まあまあだ", "筋っぽい", "獣くさい", "脂っこい", "硬い"
+          };
+          int idx = vegetarian(&mons[mnum]) ? 0 : rn2(SIZE(palatable_msgs));
+          const char *taste_desc = Hallucination
+                                                 ? (yummy ? "最高だ"
+                                                     : palatable ? "悪くない"
+                                                                    : "最悪だ")
+                                                 : (yummy ? "とてもおいしい"
+                                                     : palatable ? palatable_msgs[idx]
+                                                                    : "ひどい味");
 
-        if (!strncmpi(pmxnam, "the ", 4))
-            pmxnam += 4;
-        pline("%s%s %s %s%c",
-              type_is_pname(&mons[mnum])
-                 ? "" : the_unique_pm(&mons[mnum]) ? "The " : "This ",
-              pmxnam,
-              use_is ? "is" : "tastes",
-                  /* tiger reference is to TV ads for "Frosted Flakes",
-                     breakfast cereal targeted at kids by "Tony the tiger" */
-              Hallucination
-                 ? (yummy ? ((u.umonnum == PM_TIGER) ? "gr-r-reat" : "gnarly")
-                          : palatable ? "copacetic" : "grody")
-              : (yummy ? "delicious" : palatable ?
-                 &palat_msg[1] : "terrible"),
-              (yummy || !palatable) ? '!' : '.');
+          pline("%sは%s%c", pmxnam, taste_desc,
+                  (yummy || !palatable) ? '!' : '.');
     }
 
     return retcode;
@@ -2068,7 +2054,7 @@ start_eating(struct obj *otmp, boolean already_partly_eaten)
         return;
     }
 
-    Sprintf(msgbuf, "eating %s", food_xname(otmp, TRUE));
+    Sprintf(msgbuf, "%sを食べるの", food_xname(otmp, TRUE));
     set_occupation(eatfood, msgbuf, 0);
 }
 
@@ -2457,8 +2443,8 @@ eatspecial(void)
     /* KMH -- idea by "Tommy the Terrorist" */
     if (otmp->otyp == TRIDENT && !otmp->cursed) {
         /* sugarless chewing gum which used to be heavily advertised on TV */
-        pline(Hallucination ? "Four out of five dentists agree."
-                            : "That was pure chewing satisfaction!");
+        pline(Hallucination ? "歯医者の5人中4人が太鼓判を押している."
+                    : "噛みごたえは文句なしだった!");
         exercise(A_WIS, TRUE);
     }
     if (otmp->otyp == FLINT && !otmp->cursed) {
@@ -2629,15 +2615,13 @@ edibility_prompts(struct obj *otmp)
      * ability to detect food that is unfit for consumption
      * or dangerous and avoid it.
      */
-    char buf[BUFSZ], foodsmell[BUFSZ],
-         it_or_they[QBUFSZ];
+    char buf[BUFSZ], foodsmell[BUFSZ];
     /* 5.0: decaying globs don't become tainted anymore; in 3.6, they did */
     boolean cadaver = (otmp->otyp == CORPSE), stoneorslime = FALSE;
     int material = objects[otmp->otyp].oc_material, mnum = otmp->corpsenm;
     long rotted = 0L;
 
     Strcpy(foodsmell, Tobjnam(otmp, "smell"));
-    Strcpy(it_or_they, (otmp->quan == 1L) ? "it" : "they");
 
     if (cadaver || otmp->otyp == EGG || otmp->otyp == TIN
         || otmp->otyp == GLOB_OF_GREEN_SLIME) {
@@ -2670,40 +2654,40 @@ edibility_prompts(struct obj *otmp)
     buf[0] = '\0';
     if (cadaver && rotted > 5L && !Sick_resistance) {
         /* Tainted meat */
-        Snprintf(buf, sizeof buf, "%s like %s could be tainted!",
-                 foodsmell, it_or_they);
+        Snprintf(buf, sizeof buf, "%s。ひどく汚染されているかもしれない!",
+             foodsmell);
     } else if (stoneorslime) {
         Snprintf(buf, sizeof buf,
-                 "%s like %s could be something very dangerous!",
-                 foodsmell, it_or_they);
+             "%s。とても危険なものかもしれない!",
+             foodsmell);
     } else if (cadaver && rotted > 5L && Sick_resistance) {
         /* Tainted meat with Sick_resistance (testing for that is
            redundant; we don't get this far for !Sick_resistance)
            needs to be done now even though there is no danger because
            it can't match after the rotten (cadaver && rotted > 3) test */
-        Snprintf(buf, sizeof buf, "%s like %s could be tainted.",
-                 foodsmell, it_or_they);
+        Snprintf(buf, sizeof buf, "%s。汚染されているかもしれない.",
+             foodsmell);
     } else if (otmp->orotten || (cadaver && rotted > 3L)) {
         /* Rotten */
-        Snprintf(buf, sizeof buf, "%s like %s could be rotten!",
-                 foodsmell, it_or_they);
+        Snprintf(buf, sizeof buf, "%s。腐っているかもしれない!",
+             foodsmell);
     } else if (cadaver && poisonous(&mons[mnum]) && !Poison_resistance) {
         /* poisonous */
-        Snprintf(buf, sizeof buf, "%s like %s might be poisonous!",
-                 foodsmell, it_or_they);
+        Snprintf(buf, sizeof buf, "%s。毒があるかもしれない!",
+             foodsmell);
     } else if (otmp->otyp == APPLE && otmp->cursed && !Sleep_resistance) {
         /* causes sleep, for long enough to be dangerous */
-        Snprintf(buf, sizeof buf, "%s like %s might have been poisoned.",
-                 foodsmell, it_or_they);
+        Snprintf(buf, sizeof buf, "%s。毒入りかもしれない.",
+             foodsmell);
     } else if (cadaver && !vegetarian(&mons[mnum])
                && !u.uconduct.unvegetarian && Role_if(PM_MONK)) {
-        Snprintf(buf, sizeof buf, "%s unhealthy.", foodsmell);
+        Snprintf(buf, sizeof buf, "%s体に良くなさそうだ.", foodsmell);
     } else if (cadaver && acidic(&mons[mnum]) && !Acid_resistance) {
-        Snprintf(buf, sizeof buf, "%s rather acidic.", foodsmell);
+        Snprintf(buf, sizeof buf, "%sかなり酸っぱいようだ.", foodsmell);
     } else if (Upolyd && u.umonnum == PM_RUST_MONSTER && is_metallic(otmp)
                && otmp->oerodeproof) {
-        Snprintf(buf, sizeof buf, "%s disgusting to you right now.",
-                 foodsmell);
+        Snprintf(buf, sizeof buf, "%s今のあなたには受け付けない.",
+             foodsmell);
 
     /*
      * Breaks conduct, but otherwise safe.
@@ -2712,18 +2696,19 @@ edibility_prompts(struct obj *otmp)
                && ((material == LEATHER || material == BONE
                     || material == DRAGON_HIDE || material == WAX)
                    || (cadaver && !vegan(&mons[mnum])))) {
-        Snprintf(buf, sizeof buf, "%s foul and unfamiliar to you.",
-                 foodsmell);
+        Snprintf(buf, sizeof buf, "%sあなたには不快でなじみがない.",
+             foodsmell);
     } else if (!u.uconduct.unvegetarian
                && ((material == LEATHER || material == BONE
                     || material == DRAGON_HIDE)
                    || (cadaver && !vegetarian(&mons[mnum])))) {
-        Snprintf(buf, sizeof buf, "%s unfamiliar to you.", foodsmell);
+        Snprintf(buf, sizeof buf, "%sあなたにはなじみがない.", foodsmell);
     }
 
     if (*buf) {
-        Snprintf(eos(buf), sizeof buf - strlen(buf), "  Eat %s anyway?",
-                 (otmp->quan == 1L) ? "it" : "one");
+        Snprintf(eos(buf), sizeof buf - strlen(buf),
+             "  それでも%s食べますか?",
+             (otmp->quan == 1L) ? "" : "1つ");
         return (yn_function(buf, ynchars, 'n', TRUE) == 'n') ? 1 : 2;
     }
     return 0;
@@ -2798,14 +2783,10 @@ doeat_nonfood(struct obj *otmp)
         } else
             You("毒の影響を受けていないようだ.");
     } else if (!nodelicious) {
-        pline("%s%s is delicious!",
-              (obj_is_pname(otmp)
-               && otmp->oartifact < ART_ORB_OF_DETECTION)
-              ? ""
-              : "This ",
+          pline("%sはおいしい!",
               (otmp->oclass == COIN_CLASS)
-              ? foodword(otmp)
-              : singular(otmp, xname));
+                ? foodword(otmp)
+                : singular(otmp, xname));
     }
     eatspecial();
     return ECMD_TIME;
@@ -2942,8 +2923,8 @@ doeat(void)
            "you finish eating" message when done; use different wording
            for resuming with one bite remaining instead of trying to
            determine whether or not "you finish" is going to be given */
-        You("%s your meal.",
-            !one_bite_left ? "resume" : "consume the last bite of");
+        You("食事を%s.",
+            !one_bite_left ? "再開した" : "最後の一口まで食べ切った");
         if (otmp)
             start_eating(otmp, FALSE);
         return ECMD_TIME;
@@ -3039,9 +3020,8 @@ doeat(void)
                 return ECMD_TIME;
             }
         } else {
-            You("%s %s.",
-                (svc.context.victual.reqtime == 1) ? "eat" : "begin eating",
-                doname(otmp));
+            You("%sを%s.", doname(otmp),
+                (svc.context.victual.reqtime == 1) ? "食べた" : "食べ始めた");
         }
     }
 
@@ -3690,12 +3670,18 @@ floorfood(
                    attempt to eat off floor */
                 return (struct obj *) 0;
             }
-            /* "There is <an object> here; <verb> it?" or
-               "There are <N objects> here; <verb> one?" */
-            Sprintf(qbuf, "そこに%s ", otense(otmp, "are"));
-            Sprintf(qsfx, " がある; %sか?", one ? "それを食べます" : "1つ食べます");
-            (void) safe_qbuf(qbuf, qbuf, qsfx, otmp, doname, ansimpleoname,
-                             one ? something : (const char *) "things");
+                if (otmp->otyp == CORPSE) {
+                     Sprintf(qbuf, "そこに%sがある; それを食べますか?",
+                                jp_corpse_xname(otmp, (const char *) 0,
+                                                     CXN_SINGULAR | CXN_ARTICLE));
+                } else {
+                     /* "There is <an object> here; <verb> it?" or
+                         "There are <N objects> here; <verb> one?" */
+                     Sprintf(qbuf, "そこに%s ", otense(otmp, "are"));
+                     Sprintf(qsfx, " がある; %sか?", one ? "それを食べます" : "1つ食べます");
+                     (void) safe_qbuf(qbuf, qbuf, qsfx, otmp, doname, ansimpleoname,
+                                            one ? something : (const char *) "things");
+                }
             if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y')
                 return  otmp;
             else if (c == 'q')

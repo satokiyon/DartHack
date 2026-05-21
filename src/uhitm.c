@@ -1151,9 +1151,9 @@ hmon_hitmon_misc_obj(
             hmd->dmg = 1;
             hmd->hittxt = TRUE;
             You("%sを%sで殴った.", l_monnam(mon),
-                corpse_xname(obj, (const char *) 0,
-                             obj->dknown ? CXN_PFX_THE
-                             : CXN_ARTICLE));
+                jp_corpse_xname(obj, (const char *) 0,
+                                obj->dknown ? CXN_PFX_THE
+                                : CXN_ARTICLE));
             observe_object(obj);
             if (!munstone(mon, TRUE))
                 minstapetrify(mon, TRUE);
@@ -2151,7 +2151,7 @@ theft_petrifies(struct obj *otmp)
 #endif
 
     /* stealing this corpse is fatal... */
-    instapetrify(corpse_xname(otmp, "stolen", CXN_ARTICLE));
+    instapetrify(jp_corpse_xname(otmp, "奪った", CXN_ARTICLE));
     /* apparently wasn't fatal after all... */
     return TRUE;
 }

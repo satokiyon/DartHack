@@ -2153,7 +2153,7 @@ rot_corpse(anything *arg, long timeout)
         y = obj->oy;
     } else if (in_invent) {
         if (flags.verbose) {
-            char *cname = corpse_xname(obj, (const char *) 0, CXN_NO_PFX);
+            char *cname = jp_corpse_xname(obj, (const char *) 0, CXN_NO_PFX);
 
             Your("%s%sは腐って%s%c", obj == uwep ? "構えていた" : "", cname,
                  otense(obj, "なくなった"), obj == uwep ? '!' : '.');

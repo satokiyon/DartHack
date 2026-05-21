@@ -292,8 +292,9 @@ fatal_corpse_mistake(struct obj *obj, boolean remotely)
         return FALSE;
     }
 
-    pline("%sに触れるのは致命的な間違いだった.",
-          corpse_xname(obj, (const char *) 0, CXN_SINGULAR | CXN_ARTICLE));
+        pline("%sに触れるのは致命的な間違いだった.",
+            jp_corpse_xname(obj, (const char *) 0,
+                      CXN_SINGULAR | CXN_ARTICLE));
     instapetrify(killer_xname(obj));
     return TRUE;
 }
