@@ -447,7 +447,7 @@ moverock_core(coordxy sx, coordxy sy)
             }
 
             if (revive_nasty(rx, ry,
-                             "You sense movement on the other side.")) {
+                             "向こう側で何かが動く気配を感じる.")) {
                 return -1;
             }
 
@@ -752,7 +752,7 @@ still_chewing(coordxy x, coordxy y)
             add_damage(x, y, SHOP_WALL_DMG);
             dmgtxt = "damage";
         }
-        digtxt = "chew a hole in the wall.";
+        digtxt = "壁に穴をかじり開けた.";
         if (svl.level.flags.is_maze_lev) {
             lev->typ = ROOM;
         } else if (svl.level.flags.is_cavernous_lev && !in_town(x, y)) {
@@ -762,7 +762,7 @@ still_chewing(coordxy x, coordxy y)
             lev->doormask = D_NODOOR;
         }
     } else if (IS_TREE(lev->typ)) {
-        digtxt = "chew through the tree.";
+        digtxt = "木をかじり抜けた.";
         lev->typ = ROOM;
     } else if (lev->typ == IRONBARS) {
         if (metallivorous(gy.youmonst.data)) { /* should always be True here */
@@ -777,15 +777,15 @@ still_chewing(coordxy x, coordxy y)
             morehungry(-nut);
         }
         digtxt = u_at(x, y)
-                 ? "devour the iron bars."
-                 : "eat through the bars.";
+                 ? "鉄格子をむさぼり食った."
+                 : "鉄格子をかじり抜けた.";
         dissolve_bars(x, y);
     } else if (lev->typ == SDOOR) {
         if (lev->doormask & D_TRAPPED) {
             lev->doormask = D_NODOOR;
             b_trapped("secret door", NO_PART);
         } else {
-            digtxt = "chew through the secret door.";
+            digtxt = "隠し扉をかじり抜けた.";
             lev->doormask = D_BROKEN;
         }
         lev->typ = DOOR;
@@ -799,12 +799,12 @@ still_chewing(coordxy x, coordxy y)
             lev->doormask = D_NODOOR;
             b_trapped("door", NO_PART);
         } else {
-            digtxt = "chew through the door.";
+            digtxt = "扉をかじり抜けた.";
             lev->doormask = D_BROKEN;
         }
 
     } else { /* STONE or SCORR */
-        digtxt = "chew a passage through the rock.";
+        digtxt = "岩をかじって通路を開けた.";
         lev->typ = CORR;
     }
 

@@ -48,19 +48,19 @@ use_saddle(struct obj *otmp)
         return ECMD_CANCEL;
     }
     if (!u.dx && !u.dy) {
-        pline("Saddle yourself?  Very funny...");
+        pline("自分に鞍を付ける? それは無理だ...");
         return ECMD_OK;
     }
     if (!isok(u.ux + u.dx, u.uy + u.dy)
         || !(mtmp = m_at(u.ux + u.dx, u.uy + u.dy)) || !canspotmon(mtmp)) {
-        pline("I see nobody there.");
+        pline("そこには誰も見当たらない.");
         return ECMD_TIME;
     }
 
     /* Is this a valid monster? */
     if ((mtmp->misc_worn_check & W_SADDLE) != 0L
         || which_armor(mtmp, W_SADDLE)) {
-        pline("%s doesn't need another one.", Monnam(mtmp));
+        pline("%sに鞍はこれ以上要らない.", Monnam(mtmp));
         return ECMD_TIME;
     }
     ptr = mtmp->data;
@@ -69,19 +69,19 @@ use_saddle(struct obj *otmp)
 
         You("%sに触れた.", l_monnam(mtmp));
         if (!(poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))) {
-            Sprintf(kbuf, "attempting to saddle %s",
+            Sprintf(kbuf, "%sに鞍を付けようとして",
                     an(jp_pmname(mtmp->data, Mgender(mtmp))));
             instapetrify(kbuf);
         }
     }
     if (ptr == &mons[PM_AMOROUS_DEMON]) {
-        pline("Shame on you!");
+        pline("なんてことをするんだ!");
         exercise(A_WIS, FALSE);
         return ECMD_TIME;
     }
     if (mtmp->isminion || mtmp->isshk || mtmp->ispriest || mtmp->isgd
         || mtmp->iswiz) {
-        pline("I think %s would mind.", mon_nam(mtmp));
+        pline("%sは嫌がるだろう.", mon_nam(mtmp));
         return ECMD_TIME;
     }
     if (!can_saddle(mtmp)) {
@@ -134,7 +134,7 @@ use_saddle(struct obj *otmp)
         /* !can_saddle(mtmp) already eliminated above */
         put_saddle_on_mon(otmp, mtmp);
     } else
-        pline("%s resists!", Monnam(mtmp));
+        pline("%sは抵抗した!", Monnam(mtmp));
     return ECMD_TIME;
 }
 
@@ -210,7 +210,7 @@ mount_steed(
 
     /* Is the player in the right form? */
     if (Hallucination && !force) {
-        pline("Maybe you should find a designated driver.");
+        pline("今は誰かに任せたほうがよさそうだ.");
         return (FALSE);
     }
     /* While riding, Wounded_legs refers to the steed's
@@ -230,8 +230,10 @@ mount_steed(
         char qbuf[QBUFSZ];
 
         legs_in_no_shape("riding", FALSE);
-        Sprintf(qbuf, "Heal your leg%s?",
-                ((HWounded_legs & BOTH_SIDES) == BOTH_SIDES) ? "s" : "");
+        Sprintf(qbuf, "%sの傷を治すか?",
+            ((HWounded_legs & BOTH_SIDES) == BOTH_SIDES)
+                ? "両脚"
+                : "片脚");
         if (force && wizard && y_n(qbuf) == 'y')
             heal_legs(0);
         else
@@ -254,7 +256,7 @@ mount_steed(
     if (!mtmp || (!force && ((Blind && !Blind_telepat) || mtmp->mundetected
                              || M_AP_TYPE(mtmp) == M_AP_FURNITURE
                              || M_AP_TYPE(mtmp) == M_AP_OBJECT))) {
-        pline("I see nobody there.");
+        pline("そこには誰も見当たらない.");
         return (FALSE);
     }
     if (mtmp->data == &mons[PM_LONG_WORM]
@@ -271,16 +273,16 @@ mount_steed(
         || !test_move(u.ux, u.uy, mtmp->mx - u.ux, mtmp->my - u.uy,
                       TEST_MOVE)) {
         if (Punished || !(u.uswallow || u.ustuck || u.utrap))
-            You("%sを上げりることができない。", body_part(LEG));
+            You("%sをうまく上げられない。", body_part(LEG));
         else
-            You("今はここを遲けられない。");
+            You("今はここを抜けられない。");
         return (FALSE);
     }
 
     /* Is this a valid monster? */
     otmp = which_armor(mtmp, W_SADDLE);
     if (!otmp) {
-        pline("%s is not saddled.", Monnam(mtmp));
+        pline("%sには鞍が付いていない.", Monnam(mtmp));
         return (FALSE);
     }
 
@@ -289,12 +291,12 @@ mount_steed(
         char kbuf[BUFSZ];
 
         You("%sに触れた.", l_monnam(mtmp));
-        Sprintf(kbuf, "attempting to ride %s",
+        Sprintf(kbuf, "%sに乗ろうとして",
             an(jp_pmname(mtmp->data, Mgender(mtmp))));
         instapetrify(kbuf);
     }
     if (!mtmp->mtame || mtmp->isminion) {
-        pline("I think %s would mind.", mon_nam(mtmp));
+        pline("%sは嫌がるだろう.", mon_nam(mtmp));
         return (FALSE);
     }
     if (mtmp->mtrapped) {
@@ -308,8 +310,8 @@ mount_steed(
     if (!force && !Role_if(PM_KNIGHT) && !(--mtmp->mtame)) {
         /* no longer tame */
         newsym(mtmp->mx, mtmp->my);
-        pline("%s resists%s!", Monnam(mtmp),
-              mtmp->mleashed ? " and its leash comes off" : "");
+          pline("%sは抵抗した%s!", Monnam(mtmp),
+              mtmp->mleashed ? "。綱も外れた" : "");
         if (mtmp->mleashed)
             m_unleash(mtmp, FALSE);
         return (FALSE);
@@ -340,12 +342,12 @@ mount_steed(
             || otmp->greased
             || (u.ulevel + mtmp->mtame < rnd(MAXULEV / 2 + 5)))) {
         if (Levitation) {
-            pline("%s slips away from you.", Monnam(mtmp));
+            pline("%sはあなたの手からすり抜けた.", Monnam(mtmp));
             return FALSE;
         }
         You("%sに乗ろうとして滑った.", l_monnam(mtmp));
 
-        Sprintf(buf, "slipped while mounting %s",
+        Sprintf(buf, "%sに乗ろうとして滑った",
                 /* "a saddled mumak" or "a saddled pony called Dobbin" */
                 x_monnam(mtmp, ARTICLE_A, (char *) 0,
                          SUPPRESS_IT | SUPPRESS_INVISIBLE
@@ -360,7 +362,7 @@ mount_steed(
     if (!force) {
         if (Levitation && !is_floater(ptr) && !is_flyer(ptr))
             /* Must have Lev_at_will at this point */
-            pline("%s magically floats up!", Monnam(mtmp));
+            pline("%sは魔法でふわりと浮かび上がった!", Monnam(mtmp));
         You("%sに乗った.", l_monnam(mtmp));
         if (Flying)
             You("%sとともに飛び立った.", l_monnam(mtmp));
@@ -422,13 +424,13 @@ kick_steed(void)
                 u.usteed->mcanmove = 1;
             }
             if (helpless(u.usteed))
-                pline("%s stirs.", He);
+                pline("%sは身じろぎした.", He);
             else
                 /* if hallucinating, might yield "He rouses herself" or
                    "She rouses himself" */
-                pline("%s!", monverbself(u.usteed, He, "rouse", (char *) 0));
+                pline("%sは目を覚ました!", Monnam(u.usteed));
         } else
-            pline("%s does not respond.", He);
+            pline("%sは反応しない.", He);
         return;
     }
 
@@ -444,7 +446,7 @@ kick_steed(void)
         return;
     }
 
-    pline("%s gallops!", Monnam(u.usteed));
+    pline("%sは駆け出した!", Monnam(u.usteed));
     u.ugallop += rn1(20, 30);
     return;
 }
@@ -593,23 +595,23 @@ dismount_steed(
                    * also affects u_locomotion() */
     ufly = Flying ? TRUE : FALSE;
     ulev = Levitation ? TRUE : FALSE;
-    verb = u_locomotion("fall"); /* only used for _FELL and _KNOCKED */
+    verb = "落ちた"; /* only used for _FELL and _KNOCKED */
     u.usteed = mtmp;
 
     /* Check the reason for dismounting */
     otmp = which_armor(mtmp, W_SADDLE);
     switch (reason) {
     case DISMOUNT_THROWN:
-        verb = "are thrown";
+        verb = "投げ落とされた";
         FALLTHROUGH;
         /*FALLTHRU*/
     case DISMOUNT_KNOCKED:
     case DISMOUNT_FELL:
-        You("%s off of %s!", verb, mon_nam(mtmp));
+        You("%sから%s!", mon_nam(mtmp), verb);
         if (!have_spot)
             have_spot = landing_spot(&cc, reason, 1);
         if (!ulev && !ufly) {
-            losehp(Maybe_Half_Phys(rn1(10, 10)), "riding accident",
+            losehp(Maybe_Half_Phys(rn1(10, 10)), "落馬事故",
                    KILLED_BY_AN);
             set_wounded_legs(BOTH_SIDES, (int) HWounded_legs + rn1(5, 5));
             repair_leg_damage = FALSE;
@@ -638,14 +640,14 @@ dismount_steed(
             return;
         }
         if (!have_spot) {
-            You("できなか;った。立つ場所がなかった.");
+            You("できなかった。立つ場所がなかった.");
             return;
         }
         if (!has_mgivenname(mtmp)) {
-            pline("You've been through the dungeon on %s with no name.",
+            pline("%sという名もないまま、その背でここまで来たんだな.",
                 an(jp_pmname(mtmp->data, Mgender(mtmp))));
             if (Hallucination)
-                pline("雨から出てこれても整気。");
+                pline("ふらついていても、ここまで来られた。");
         } else
             You("%sから降りた.", l_monnam(mtmp));
     }
@@ -724,14 +726,14 @@ dismount_steed(
             if (grounded(mdat)) {
                 if (is_pool(u.ux, u.uy)) {
                     if (!Underwater)
-                        pline("%s falls into the %s!", Monnam(mtmp),
+                        pline("%sは%sへ落ちた!", Monnam(mtmp),
                               surface(u.ux, u.uy));
                     if (!cant_drown(mdat)) {
                         killed(mtmp);
                         adjalign(-1);
                     }
                 } else if (is_lava(u.ux, u.uy)) {
-                    pline("%s is pulled into the %s!", Monnam(mtmp),
+                    pline("%sは%sへ引き込まれた!", Monnam(mtmp),
                           hliquid("lava"));
                     if (!likes_lava(mdat)) {
                         killed(mtmp);
@@ -842,7 +844,7 @@ maybewakesteed(struct monst *steed)
         }
     }
     if (wasimmobile && !helpless(steed))
-        pline("%s wakes up.", Monnam(steed));
+        pline("%sは目を覚ました.", Monnam(steed));
     /* regardless of waking, terminate any meal in progress */
     finish_meating(steed);
 }
@@ -882,12 +884,12 @@ stucksteed(boolean checkfeeding)
     if (steed) {
         /* check whether steed can move */
         if (helpless(steed)) {
-            pline("%s won't move!", YMonnam(steed));
+            pline("%sは動こうとしない!", YMonnam(steed));
             return TRUE;
         }
         /* optionally check whether steed is in the midst of a meal */
         if (checkfeeding && steed->meating) {
-            pline("%s is still eating.", YMonnam(steed));
+            pline("%sはまだ食事中だ.", YMonnam(steed));
             return TRUE;
         }
     }
