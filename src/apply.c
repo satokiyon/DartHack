@@ -430,7 +430,8 @@ use_stethoscope(struct obj *obj)
                 what = jp_pmname(&mons[mtmp->mappearance], Mgender(mtmp));
                 break;
             case M_AP_FURNITURE:
-                what = defsyms[mtmp->mappearance].explanation;
+                what = jp_cmap_explanation(mtmp->mappearance,
+                                           mtmp->mx, mtmp->my);
                 break;
             }
             seemimic(mtmp);
@@ -3528,7 +3529,8 @@ use_pole(struct obj *obj, boolean autohit)
                  || levl[gb.bhitpos.x][gb.bhitpos.y].typ == SCORR)
                                 ? "岩"
                 : glyph_is_cmap(glyph)
-                  ? the(defsyms[glyph_to_cmap(glyph)].explanation)
+                                    ? jp_cmap_explanation(glyph_to_cmap(glyph),
+                                                                                gb.bhitpos.x, gb.bhitpos.y)
                                     : (const char *) "未知の障害物");
         } else {
                         You("外した; そこには誰もいなかった.");

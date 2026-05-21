@@ -1060,7 +1060,7 @@ test_move(
                     if (sym == S_stone)
                         Strcpy(buf, "岩壁");
                     else if (sym >= 0)
-                        Strcpy(buf, an(defsyms[sym].explanation));
+                        Strcpy(buf, jp_cmap_explanation(sym, x, y));
                     else
                         Sprintf(buf, "impossible [background glyph=%d]",
                                 glyph);
@@ -2302,7 +2302,8 @@ domove_fight_empty(coordxy x, coordxy y)
             if (levl[x][y].seenv || IS_STWALL(levl[x][y].typ)
                 || levl[x][y].typ == SDOOR || levl[x][y].typ == SCORR) {
                 glyph = back_to_glyph(x, y);
-                Strcpy(buf, the(defsyms[glyph_to_cmap(glyph)].explanation));
+                Strcpy(buf,
+                       jp_cmap_explanation(glyph_to_cmap(glyph), x, y));
             } else {
                 Strcpy(buf, unknown_obstacle);
             }

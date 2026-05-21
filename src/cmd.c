@@ -4445,7 +4445,8 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
 
     if ((IS_FOUNTAIN(typ) || IS_SINK(typ)) && can_reach_floor(FALSE)) {
         Sprintf(buf, "%sから飲む",
-                defsyms[IS_FOUNTAIN(typ) ? S_fountain : S_sink].explanation);
+                jp_cmap_explanation(IS_FOUNTAIN(typ) ? S_fountain : S_sink,
+                                    x, y));
         mcmd_addmenu(win, MCMD_QUAFF, buf), ++K;
     }
     if (IS_FOUNTAIN(typ) && can_reach_floor(FALSE))

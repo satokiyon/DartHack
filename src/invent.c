@@ -4096,7 +4096,7 @@ dfeature_at(coordxy x, coordxy y, char *buf)
             cmap = S_vodoor;
             break; /* "open door" */
         case D_BROKEN:
-            dfeature = "broken door";
+            dfeature = "壊れた扉";
             break;
         default:
             cmap = S_vcdoor;
@@ -4104,7 +4104,7 @@ dfeature_at(coordxy x, coordxy y, char *buf)
         }
         /* override door description for open drawbridge */
         if (is_drawbridge_wall(x, y) >= 0)
-            dfeature = "open drawbridge portcullis", cmap = -1;
+            dfeature = "開いた跳ね橋の落とし格子", cmap = -1;
     } else if (IS_FOUNTAIN(ltyp))
         cmap = S_fountain; /* "fountain" */
     else if (IS_THRONE(ltyp))
@@ -4118,13 +4118,14 @@ dfeature_at(coordxy x, coordxy y, char *buf)
     else if (IS_SINK(ltyp))
         cmap = S_sink; /* "sink" */
     else if (IS_ALTAR(ltyp)) {
-        Sprintf(altbuf, "%saltar to %s (%s)",
-                (lev->altarmask & AM_SANCTUM) ? "high " : "",
+        Sprintf(altbuf, "%s%sの祭壇(%s)",
+                (lev->altarmask & AM_SANCTUM) ? "高位" : "",
                 a_gname(),
                 align_str(Amask2align(lev->altarmask & ~AM_SHRINE)));
         dfeature = altbuf;
     } else if (stway) {
-        dfeature = stairs_description(stway, altbuf, TRUE);
+        dfeature = stway->up ? (stway->isladder ? "上りはしご" : "上り階段")
+                            : (stway->isladder ? "下りはしご" : "下り階段");
     } else if (ltyp == DRAWBRIDGE_DOWN)
         cmap = S_vodbridge; /* "lowered drawbridge" */
     else if (ltyp == DBWALL)
@@ -4134,10 +4135,10 @@ dfeature_at(coordxy x, coordxy y, char *buf)
     else if (ltyp == TREE)
         cmap = S_tree; /* "tree" */
     else if (ltyp == IRONBARS)
-        dfeature = "set of iron bars";
+        dfeature = "鉄格子";
 
     if (cmap >= 0)
-        dfeature = defsyms[cmap].explanation;
+        dfeature = jp_cmap_explanation(cmap, x, y);
     if (dfeature)
         Strcpy(buf, dfeature);
     return dfeature;
@@ -4225,13 +4226,13 @@ look_here(
 
     otmp = svl.level.objects[u.ux][u.uy];
     dfeature = dfeature_at(u.ux, u.uy, fbuf2);
-    if (dfeature && !strcmp(dfeature, "pool of water") && Underwater)
+    if (dfeature && is_pool(u.ux, u.uy) && Underwater)
         dfeature = 0;
 
     if (Blind) {
         boolean drift = Is_airlevel(&u.uz) || Is_waterlevel(&u.uz);
 
-        if (dfeature && !strncmp(dfeature, "altar ", 6)) {
+        if (dfeature && IS_ALTAR(SURFACE_AT(u.ux, u.uy))) {
             /* don't say "altar" twice, dfeature has more info */
             You("ここに何があるか手探りした.");
         } else if (SURFACE_AT(u.ux, u.uy) == ICE) {

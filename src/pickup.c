@@ -378,9 +378,10 @@ describe_decor(void)
 
     /* we don't mention "ordinary" doors but do mention broken ones (and
        closed ones, which will only happen for Passes_walls) */
-    doorhere = dfeature && (!strcmp(dfeature, "open door")
-                            || !strcmp(dfeature, "doorway"));
-    waterhere = dfeature && !strcmp(dfeature, "pool of water");
+    doorhere = (levl[u.ux][u.uy].typ == DOOR
+                && ((levl[u.ux][u.uy].doormask & D_ISOPEN) != 0
+                    || levl[u.ux][u.uy].doormask == D_NODOOR));
+    waterhere = dfeature && is_pool(u.ux, u.uy);
     if (doorhere || Underwater
         || (ltyp == ICE && IS_POOL(iflags.prev_decor))) /* pooleffects() */
         dfeature = 0;
