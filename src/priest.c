@@ -615,16 +615,16 @@ priest_talk(struct monst *priest)
             if (pmoney > 0L) {
                 const char *bits;
                 bits = (Hallucination) ? currency(pmoney)
-                                       : (pmoney == 1L) ? "bit" : "bits";
+                                       : "ビット";
                 /* Note: two bits is actually 25 cents.  Hmm. */
-                pline("%s gives you %s%s for an ale.", Monnam(priest),
-                      (pmoney == 1L) ? "one " : "two ", bits);
+                pline("%sはエール代として%s%sをあなたに渡した.", Monnam(priest),
+                      (pmoney == 1L) ? "1" : "2", bits);
                 money2u(priest, pmoney > 1L ? 2 : 1);
             } else
-                pline("%s preaches the virtues of poverty.", Monnam(priest));
+                pline("%sは清貧の徳を説いた.", Monnam(priest));
             exercise(A_WIS, TRUE);
         } else
-            pline("%s is not interested.", Monnam(priest));
+            pline("%sは関心を示さない.", Monnam(priest));
         return;
     } else {
         /* there's now some randomization in how much you need to donate, but
@@ -642,14 +642,14 @@ priest_talk(struct monst *priest)
         if (quan < 1)
             quan = 1;
 
-        Sprintf(buf, "How much will you offer (suggested: %ld or %ld)?",
+        Sprintf(buf, "いくら奉納しますか（目安: %ld または %ld）?",
                 suggested * quan, suggested * quan * 2);
 
         if (flags.debug)
-            pline("%s asks you for a contribution for the temple (base %ld).",
+            pline("%sは神殿への寄進を求めてきた（基準値 %ld）.",
                   Monnam(priest), suggested);
         else
-            pline("%s asks you for a contribution for the temple.",
+            pline("%sは神殿への寄進を求めてきた.",
                   Monnam(priest));
         if ((offer = bribe(priest, buf)) == 0) {
             SetVoice(priest, 0, 80, 0);

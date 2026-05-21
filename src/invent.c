@@ -2074,7 +2074,7 @@ getobj(
             }
         }
         if (cntgiven && !strcmp(word, "throw")) {
-            static const char only_one[] = "can only throw one at a time";
+            static const char only_one[] = "一度に投げられるのは1つだけ";
             boolean coins;
 
             /* permit counts for throwing gold, but don't accept counts
@@ -2087,7 +2087,7 @@ getobj(
             if (cnt > 1L && (!coins || cnt > otmp->quan)) {
                 if (cnt > otmp->quan)
                     You("%ld%s%sしか持っていない.", otmp->quan,
-                        (!coins && otmp->quan > 1L) ? " and " : "",
+                        (!coins && otmp->quan > 1L) ? "、そして" : "",
                         (!coins && otmp->quan > 1L) ? only_one : "");
                 else
                     You("%s.", only_one);

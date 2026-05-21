@@ -291,17 +291,17 @@ demon_talk(struct monst *mtmp)
 
         mtmp->minvis = mtmp->perminvis = 0;
         if (wasunseen && canspotmon(mtmp)) {
-            pline("%s appears before you.", Amonnam(mtmp));
+            pline("%sがあなたの前に現れた.", Amonnam(mtmp));
             mtmp->mstrategy &= ~STRAT_APPEARMSG;
         }
         newsym(mtmp->mx, mtmp->my);
     }
     if (gy.youmonst.data->mlet == S_DEMON) { /* Won't blackmail their own. */
         if (!Deaf)
-            pline("%s says, \"Good hunting, %s.\"", Amonnam(mtmp),
-                  flags.female ? "Sister" : "Brother");
+            pline("%sは\"よい狩りを, %s.\"と言った.", Amonnam(mtmp),
+                  flags.female ? "姉妹よ" : "兄弟よ");
         else if (canseemon(mtmp))
-            pline("%s says something.", Amonnam(mtmp));
+            pline("%sが何か言った.", Amonnam(mtmp));
         if (!tele_restrict(mtmp))
             (void) rloc(mtmp, RLOC_MSG);
         return 1;
@@ -327,21 +327,21 @@ demon_talk(struct monst *mtmp)
             demand = cash + (long) rn1(1000, 125);
 
         if (!Deaf)
-            pline("%s demands %ld %s for safe passage.",
+            pline("%sは安全な通行の対価として%ld %sを要求した.",
                   Amonnam(mtmp), demand, currency(demand));
         else if (canseemon(mtmp))
-            pline("%s seems to be demanding something.", Amonnam(mtmp));
+            pline("%sは何かを要求しているようだ.", Amonnam(mtmp));
         offer = 0L;
         if (!Deaf &&
-            ((offer = bribe(mtmp, "How much will you offer?")) >= demand)) {
-            pline("%s vanishes, laughing about cowardly mortals.",
+            ((offer = bribe(mtmp, "いくら差し出しますか?")) >= demand)) {
+            pline("%sは臆病な人間をあざ笑いながら消えた.",
                   Amonnam(mtmp));
         } else if (offer > 0L
                    && (long) rnd(5 * ACURR(A_CHA)) > (demand - offer)) {
-            pline("%s scowls at you menacingly, then vanishes.",
+            pline("%sはあなたを険しい目でにらみつけると消えた.",
                   Amonnam(mtmp));
         } else {
-            pline("%s gets angry...", Amonnam(mtmp));
+            pline("%sは怒りだした...", Amonnam(mtmp));
             mtmp->mpeaceful = 0;
             set_malign(mtmp);
             return 0;

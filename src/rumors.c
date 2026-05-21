@@ -671,10 +671,10 @@ outoracle(boolean special, boolean delphi)
         if (delphi)
             putstr(tmpwin, 0,
                    special
-                     ? "The Oracle scornfully takes all your gold and says:"
-                     : "The Oracle meditates for a moment and then intones:");
+                     ? "オラクルはあなたの金をすべて軽蔑気味に受け取り、こう言った:"
+                     : "オラクルはしばし瞑想し、それから厳かに告げた:");
         else
-            putstr(tmpwin, 0, "The message reads:");
+            putstr(tmpwin, 0, "こう書かれている:");
         putstr(tmpwin, 0, "");
 
         while (dlb_fgets(line, COLNO, oracles) && strcmp(line, "---\n")) {
@@ -707,14 +707,14 @@ doconsult(struct monst *oracl)
         There("には相談できる者がいない.");
         return ECMD_OK;
     } else if (!oracl->mpeaceful) {
-        pline("%s is in no mood for consultations.", Monnam(oracl));
+        pline("%sは相談に応じる気分ではない.", Monnam(oracl));
         return ECMD_OK;
     } else if (!umoney) {
         You("金を持っていない.");
         return ECMD_OK;
     }
 
-    Sprintf(qbuf, "\"Wilt thou settle for a minor consultation?\" (%d %s)",
+    Sprintf(qbuf, "\"軽い相談でよいかね?\" (%d %s)",
             minor_cost, currency((long) minor_cost));
     switch (ynq(qbuf)) {
     default:
@@ -731,7 +731,7 @@ doconsult(struct monst *oracl)
         if (umoney <= (long) minor_cost /* don't even ask */
             || (svo.oracle_cnt == 1 || go.oracle_flg < 0))
             return ECMD_OK;
-        Sprintf(qbuf, "\"Then dost thou desire a major one?\" (%d %s)",
+        Sprintf(qbuf, "\"では本格的な相談を望むかね?\" (%d %s)",
                 major_cost, currency((long) major_cost));
         if (y_n(qbuf) != 'y')
             return ECMD_OK;
