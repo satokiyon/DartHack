@@ -118,14 +118,14 @@ self_lookat(char *outbuf)
             (Invis && (senseself() || !Blind)) ? "透明な" : "", race,
             jp_pmname(&mons[u.umonnum], Ugender), svp.plname);
     if (u.usteed)
-        Sprintf(eos(outbuf), "、%sに騎乗していた", y_monnam(u.usteed));
+        Sprintf(eos(outbuf), "、%sに騎乗している", y_monnam(u.usteed));
     if (u.uundetected || (Upolyd && U_AP_TYPE)
         || visible_region_at(u.ux, u.uy))
         mhidden_description(&gy.youmonst,
                             MHID_PREFIX | MHID_ARTICLE | MHID_REGION,
                             eos(outbuf));
     if (Punished)
-        Sprintf(eos(outbuf), "、%sに鎖で繋がれていた",
+        Sprintf(eos(outbuf), "、%sに鎖で繋がれている",
                 uball ? ansimpleoname(uball) : "何か");
     if (u.utrap) /* bear trap, pit, web, in-floor, in-lava, tethered */
         Sprintf(eos(outbuf), "、%s", trap_predicament(trapbuf, 0, FALSE));
@@ -241,7 +241,7 @@ mhidden_description(
             Strcat(outbuf, what);
         }
     } else if (isyou ? u.uundetected : mon->mundetected) {
-        Strcpy(outbuf, "、潜んでいた");
+        Strcpy(outbuf, "、潜んでいる");
         if (hides_under(mon->data)) {
             Strcat(outbuf, " (下: ");
             /* remembered glyph, not glyph_at() which is 'mon' */
@@ -250,12 +250,12 @@ mhidden_description(
             Strcat(outbuf, something);
             Strcat(outbuf, ")");
         } else if (is_hider(mon->data)) {
-            Sprintf(eos(outbuf), " (%sに潜んでいた)",
+            Sprintf(eos(outbuf), " (%sに潜んでいる)",
                     ceiling_hider(mon->data) ? "天井"
                        : surface(x, y)); /* trapper */
         } else {
             if (mon->data->mlet == S_EEL && is_pool(x, y))
-                Strcat(outbuf, "、濁った水中に潜んでいた");
+                Strcat(outbuf, "、濁った水中に潜んでいる");
         }
     }
 
@@ -274,7 +274,7 @@ mhidden_description(
             boolean poison_gas = (glyph_is_cmap(rglyph)
                                   && glyph_to_cmap(rglyph) == S_poisoncloud);
 
-            Snprintf(eos(outbuf), BUFSZ - buflen, "、%sの雲の中にいた",
+            Snprintf(eos(outbuf), BUFSZ - buflen, "、%sの雲の中にいる",
                      poison_gas ? "毒ガス" : "蒸気");
         }
     }
@@ -400,22 +400,22 @@ look_at_object(
     }
 
     if (otmp && otmp->where == OBJ_BURIED)
-        Strcat(buf, " (埋まっていた)");
+        Strcat(buf, " (埋まっている)");
     /* check TREE before STONE due to level.flags.arboreal */
     else if (IS_TREE(levl[x][y].typ))
         /* "dangling": "hanging" could imply that it's growing on this tree */
         Snprintf(eos(buf), BUFSZ - strlen(buf), " 木に%s",
-                 (otmp && is_treefruit(otmp)) ? "ぶら下がっていた" : "刺さっていた");
+                 (otmp && is_treefruit(otmp)) ? "ぶら下がっている" : "刺さっている");
     else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
-        Strcat(buf, " 岩に埋まっていた");
+        Strcat(buf, " 岩に埋まっている");
     else if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR)
-        Strcat(buf, " 壁に埋まっていた");
+        Strcat(buf, " 壁に埋まっている");
     else if (closed_door(x, y))
-        Strcat(buf, " 扉に埋まっていた");
+        Strcat(buf, " 扉に埋まっている");
     else if (is_pool(x, y))
-        Strcat(buf, " 水中にあった");
+        Strcat(buf, " 水中にある");
     else if (is_lava(x, y))
-        Strcat(buf, " 溶岩中にあった"); /* [can this ever happen?] */
+        Strcat(buf, " 溶岩中にある"); /* [can this ever happen?] */
     return;
 }
 
@@ -444,11 +444,11 @@ look_at_monster(
             name);
     if (u.ustuck == mtmp) {
         if (u.uswallow || iflags.save_uswallow) /* monster detection */
-                Strcat(buf, digests(mtmp->data) ? "、あなたを飲み込んでいた"
-                                                : "、あなたを包み込んでいた");
+                Strcat(buf, digests(mtmp->data) ? "、あなたを飲み込んでいる"
+                                                : "、あなたを包み込んでいる");
         else
                 Strcat(buf, (Upolyd && sticks(gy.youmonst.data))
-                              ? "、拘束されていた" : "、あなたを拘束していた");
+                              ? "、拘束されている" : "、あなたを拘束している");
     }
     /* if mtmp isn't able to move (other than because it is a type of
        monster that never moves), say so [excerpt from mstatusline() for
@@ -456,23 +456,23 @@ look_at_monster(
     if (mtmp->mfrozen)
         /* unfortunately mfrozen covers temporary sleep and being busy
            (donning armor, for instance) as well as paralysis */
-            Strcat(buf, "、動けなかった(麻痺・睡眠・行動中)");
+            Strcat(buf, "、動けない(麻痺・睡眠・行動中)");
     else if (mtmp->msleeping)
         /* sleeping for an indeterminate duration */
-            Strcat(buf, "、眠っていた");
+            Strcat(buf, "、眠っている");
     else if ((mtmp->mstrategy & STRAT_WAITMASK) != 0)
         /* arbitrary reason why it isn't moving */
-            Strcat(buf, "、瞑想していた");
+            Strcat(buf, "、瞑想している");
 
     if (mtmp->mleashed)
-            Strcat(buf, "、あなたに繋がれていた");
+            Strcat(buf, "、あなたに繋がれている");
     if (mtmp->mtrapped && cansee(mtmp->mx, mtmp->my)) {
         struct trap *t = t_at(mtmp->mx, mtmp->my);
         int tt = t ? t->ttyp : NO_TRAP;
 
         /* newsym lets you know of the trap, so mention it here */
         if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB) {
-                Sprintf(eos(buf), "、%sにかかっていた", an(trapname(tt, FALSE)));
+                Sprintf(eos(buf), "、%sにかかっている", an(trapname(tt, FALSE)));
             t->tseen = 1;
         }
     }
@@ -561,7 +561,6 @@ look_at_monster(
 const char *
 waterbody_name(coordxy x, coordxy y)
 {
-    static char pooltype[40];
     schar ltyp;
     boolean hallucinate = Hallucination && !program_state.gameover;
 
@@ -570,21 +569,17 @@ waterbody_name(coordxy x, coordxy y)
     ltyp = SURFACE_AT(x, y);
 
     if (ltyp == LAVAPOOL) {
-        Snprintf(pooltype, sizeof pooltype, "溶けた%s", hliquid("lava"));
-        return pooltype;
+        return "溶岩";
     } else if (ltyp == ICE) {
         if (!hallucinate)
             return "氷";
-        Snprintf(pooltype, sizeof pooltype, "凍った%s", hliquid("water"));
-        return pooltype;
+        return "氷面";
     } else if (ltyp == POOL) {
-        Snprintf(pooltype, sizeof pooltype, "%sの水たまり", hliquid("water"));
-        return pooltype;
+        return "水たまり";
     } else if (ltyp == MOAT) {
         /* a bit of extra flavor over general moat */
         if (hallucinate) {
-            Snprintf(pooltype, sizeof pooltype, "深い%s", hliquid("water"));
-            return pooltype;
+            return "深い堀";
         } else if (Is_medusa_level(&u.uz)) {
             /* somewhat iffy since ordinary stairs can take you beneath,
                but previous generic "water" was rather anti-climactic */
@@ -601,11 +596,9 @@ waterbody_name(coordxy x, coordxy y)
     } else if (IS_WATERWALL(ltyp)) {
         if (Is_waterlevel(&u.uz))
             return "果てしない水"; /* even if hallucinating */
-        Snprintf(pooltype, sizeof pooltype, "%sの壁", hliquid("water"));
-        return pooltype;
+        return "水の壁";
     } else if (ltyp == LAVAWALL) {
-        Snprintf(pooltype, sizeof pooltype, "%sの壁", hliquid("lava"));
-        return pooltype;
+        return "溶岩の壁";
     }
     /* default; should be unreachable */
     return "水"; /* don't hallucinate this as some other liquid */
@@ -1183,13 +1176,22 @@ add_cmap_descr(
         EHalluc_resistance = save_prop;
         levl[cc.x][cc.y].typ = save_ltyp;
 
-        /* shorten the feedback for farlook/quicklook */
-        if (!strcmp(mbuf, "水の水たまり"))
-            Strcpy(mbuf, "水たまり");
-        else if (!strcmp(mbuf, "溶けた溶岩"))
-            Strcpy(mbuf, "溶岩");
+        /* shorten the feedback for farlook/quicklook: "pool or ..." */
+        if (!strcmp(mbuf, "pool of water"))
+            mbuf[4] = '\0';
+        else if (!strcmp(mbuf, "molten lava"))
+            Strcpy(mbuf, "lava");
         x_str = mbuf;
-        article = 0;
+        /* avoid "an ice" and so forth; "a pool", "a moat", and
+           "a wall of ..." are grammatically correct but make
+           "a pool or a moat or a wall of water" become too verbose */
+        article = !(!strncmp(x_str, "water", 5)
+                    || !strncmp(x_str, "ice", 3)
+                    || !strncmp(x_str, "pool", 4)
+                    || !strncmp(x_str, "moat", 4)
+                    || !strncmp(x_str, "lava", 4)
+                    || !strncmp(x_str, "swamp", 5)
+                    || strstr(x_str, " wall of "));
     }
 
     if (!found) {
