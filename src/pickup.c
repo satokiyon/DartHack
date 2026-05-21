@@ -64,10 +64,10 @@ staticfn void tipcontainer(struct obj *);
 #define Icebox (gc.current_container->otyp == ICE_BOX)
 
 static const char
-    slightloadpfx[] = "You have a little trouble",
-    moderateloadpfx[] = "You have trouble",
-    nearloadpfx[] = "You have much trouble",
-    overloadpfx[] = "You have extreme difficulty";
+    slightloadpfx[] = "少し苦労して",
+    moderateloadpfx[] = "苦労して",
+    nearloadpfx[] = "かなり苦労して",
+    overloadpfx[] = "極めて苦労して";
 
 /* BUG: this lets you look at cockatrice corpses while blind without
    touching them */
@@ -1766,8 +1766,8 @@ lift_object(
                         : (next_encumbr >= HVY_ENCUMBER) ? nearloadpfx
                           : (next_encumbr >= MOD_ENCUMBER) ? moderateloadpfx
                             : slightloadpfx,
-                        !container ? "lifting" : "removing");
-                (void) safe_qbuf(qbuf, qbuf, ".  Continue?", obj, doname,
+                    !container ? "拾い上げ" : "取り出し");
+                (void) safe_qbuf(qbuf, qbuf, "。続けますか?", obj, doname,
                                  ansimpleoname, something);
                 obj->quan = savequan;
                 switch (ynq(qbuf)) {
@@ -1878,7 +1878,7 @@ pickup_object(
 
     if (uwep && uwep == obj)
         gm.mrg_to_wielded = TRUE;
-    pickup_prinv(obj, count, "lifting");
+    pickup_prinv(obj, count, "拾い上げた");
     if (obj->ghostly)
         fix_ghostly_obj(obj);
     gm.mrg_to_wielded = FALSE;
@@ -1964,7 +1964,7 @@ pickup_prinv(
         gp.pickup_encumbrance = nearload;
     }
     if (prefix)
-        Sprintf(pbuf, "%s %s", prefix, verb);
+        Sprintf(pbuf, "%s%s", prefix, verb);
 
     prinv(pbuf, obj, count);
 }
@@ -2765,7 +2765,7 @@ out_container(struct obj *obj)
         pick_pick(obj); /* shopkeeper feedback */
 
     otmp = addinv(obj);
-    pickup_prinv(otmp, count, "removing");
+    pickup_prinv(otmp, count, "取り出した");
 
     if (is_gold) {
         bot(); /* update character's gold piece count immediately */
