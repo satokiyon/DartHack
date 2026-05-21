@@ -549,7 +549,7 @@ done_eating(boolean message)
             pline1(gn.nomovemsg);
         gn.nomovemsg = 0;
     } else if (message) {
-        You("%sを%s.", food_xname(piece, TRUE),
+        You("%sを%s.", food_xname(piece, FALSE),
             (gy.youmonst.data == &mons[PM_FIRE_ELEMENTAL])
                 ? "消費し尽くした"
                 : "食べ終えた");
