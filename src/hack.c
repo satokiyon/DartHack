@@ -187,7 +187,7 @@ dopush(
         }
         givemesg = (svm.moves > gb.bldrpushtime + 2L
                     || svm.moves < gb.bldrpushtime);
-        what = givemesg ? the(xname(otmp)) : 0;
+        what = givemesg ? xname(otmp) : 0;
         if (!u.usteed) {
             easypush = throws_rocks(gy.youmonst.data);
             if (givemesg)
@@ -248,7 +248,7 @@ cannot_push_msg(struct obj *otmp, coordxy sx, coordxy sy)
 {
     const char *what;
 
-    what = the(xname(otmp));
+    what = xname(otmp);
     if (u.usteed)
         pline("%sは%sを動かそうとしたが、できなかった.",
               YMonnam(u.usteed), what);
@@ -277,7 +277,7 @@ cannot_push(struct obj *otmp, coordxy sx, coordxy sy)
 
         if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
             You("%sから%sを%sには騎乗の腕前が足りない.",
-                y_monnam(u.usteed), the(xname(otmp)),
+                y_monnam(u.usteed), xname(otmp),
                 willpickup ? "拾う" : "押しのける");
         } else {
             /*
@@ -315,10 +315,10 @@ rock_disappear_msg(struct obj *otmp)
 {
     if (u.usteed)
         pline("%sが%sを押すと、突然消えた!",
-                YMonnam(u.usteed), the(xname(otmp)));
+                YMonnam(u.usteed), xname(otmp));
     else
         You("%sを押したら、突然消えてしまった!",
-            the(xname(otmp)));
+            xname(otmp));
 
 }
 
@@ -418,7 +418,7 @@ moverock_core(coordxy sx, coordxy sy)
                not levitating) */
             if (Blind)
                 feel_location(sx, sy);
-            You("%sを押す力がなかった.", the(xname(otmp)));
+            You("%sを押す力がなかった.", xname(otmp));
             /* Give them a chance to climb over it? */
             return -1;
         }
@@ -441,8 +441,8 @@ moverock_core(coordxy sx, coordxy sy)
             if (Sokoban && u.dx && u.dy) {
                 if (Blind)
                     feel_location(sx, sy);
-                    pline("%sはこの%sでは斜めに転がらなかった.",
-                      The(xname(otmp)), surface(sx, sy));
+                                        pline("%sはこの%sでは斜めに転がらなかった.",
+                                            xname(otmp), surface(sx, sy));
                 return cannot_push(otmp, sx, sy);
             }
 
@@ -463,7 +463,7 @@ moverock_core(coordxy sx, coordxy sy)
                 } else {
                     Soundeffect(se_monster_behind_boulder, 50);
                     You_hear("%sの向こうにモンスターがいるのが聞こえる.",
-                             the(xname(otmp)));
+                             xname(otmp));
                     if (!Deaf)
                         deliver_part1 = TRUE;
                     map_invisible(rx, ry);
@@ -476,7 +476,7 @@ moverock_core(coordxy sx, coordxy sy)
                       pline("%s%sは%sを動かせなかった.",
                           deliver_part1 ? "おそらくそのため、" : "",
                           you_or_steed,
-                          deliver_part1 ? "それ" : the(xname(otmp)));
+                          deliver_part1 ? "それ" : xname(otmp));
                 }
                 return cannot_push(otmp, sx, sy);
             }
@@ -545,7 +545,7 @@ moverock_core(coordxy sx, coordxy sy)
                     Soundeffect(se_kerplunk_boulder_gone, 40);
                     if (Blind)
                 pline("ドスン!もう%sの感触はなかった.",
-                              the(xname(otmp)));
+                              xname(otmp));
                     else
                         pline("%s%s、%s%sを%sに作った!",
                               Tobjnam(otmp, (ttmp->ttyp == TRAPDOOR)
@@ -729,7 +729,7 @@ still_chewing(coordxy x, coordxy y)
 
     if (boulder) {
         delobj(boulder);         /* boulder goes bye-bye */
-        You("その%sを食べた.", the(xname(boulder))); /* yum */
+        You("その%sを食べた.", xname(boulder)); /* yum */
 
         /*
          *  The location could still block because of
@@ -3079,7 +3079,7 @@ invocation_message(void)
         You_feel("奇妙な振動を%sに感じた.", buf);
         u.uevent.uvibrated = 1;
         if (otmp && otmp->spe == 7 && otmp->lamplit)
-            pline("%sは%s!", The(xname(otmp)),
+            pline("%sは%s!", xname(otmp),
                   Blind ? "はっきり脈打った" : "奇妙な光で輝いた");
     }
 }

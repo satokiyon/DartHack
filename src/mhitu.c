@@ -2076,11 +2076,11 @@ doseduce(struct monst *mon)
             makeknown(RIN_ADORNMENT);
             if (!uright) {
                 pline("%s puts %s on your right %s.",
-                      Who, the(xname(ring)), body_part(HAND));
+                      Who, xname(ring), body_part(HAND));
                 setworn(ring, RIGHT_RING);
             } else if (!uleft) {
                 pline("%s puts %s on your left %s.",
-                      Who, the(xname(ring)), body_part(HAND));
+                      Who, xname(ring), body_part(HAND));
                 setworn(ring, LEFT_RING);
             } else if (uright && uright->otyp != RIN_ADORNMENT) {
                 /* note: the "replaces" message might be inaccurate if

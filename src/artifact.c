@@ -948,7 +948,7 @@ touch_artifact(struct obj *obj, struct monst *mon)
 
         if (!yours)
             return 0;
-        You("%sの力に打ちのめされた!", s_suffix(the(xname(obj))));
+        You("%sの力に打ちのめされた!", s_suffix(xname(obj)));
         touch_blasted = TRUE;
         dmg = d((Antimagic ? 2 : 4), (self_willed ? 10 : 4));
         /* add half (maybe quarter) of the usual silver damage bonus */
@@ -2118,7 +2118,7 @@ arti_invoke_cost(struct obj *obj)
 
         if (pw_cost < 0 || u.uen < pw_cost) {
             /* the artifact is tired :-) */
-            You_feel("%sに無視された気がした.", the(xname(obj)));
+            You_feel("%sに無視された気がした.", xname(obj));
             /* and just got more so; patience is essential... */
             obj->age += (long) d(3, 10);
             return FALSE;
@@ -2190,7 +2190,7 @@ arti_invoke(struct obj *obj)
         if (on && obj->age > svm.moves) {
             /* the artifact is tired :-) */
             u.uprops[oart->inv_prop].extrinsic ^= W_ARTI;
-            You_feel("%sに無視された気がした.", the(xname(obj)));
+            You_feel("%sに無視された気がした.", xname(obj));
             /* can't just keep repeatedly trying */
             obj->age += (long) d(3, 10);
             return ECMD_TIME;

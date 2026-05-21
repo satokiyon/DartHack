@@ -166,7 +166,7 @@ breakchestlock(struct obj *box, boolean destroyit)
                 peaceful_shk = costly && (boolean) shkp->mpeaceful;
         long loss = 0L;
 
-        pline("実際のところ、%sを完全に壊してしまった.", the(xname(box)));
+        pline("実際のところ、%sを完全に壊してしまった.", xname(box));
         /* Put the contents on ground at the hero's feet. */
         while ((otmp = box->cobj) != 0) {
             obj_extract_self(otmp);
@@ -444,7 +444,7 @@ pick_lock(
                 ++count;
                 if (!can_reach_floor(TRUE)) {
                     You_cant("ここからでは%sに手が届かなかった.",
-                             the(xname(otmp)));
+                             xname(otmp));
                     return PICKLOCK_LEARNED_SOMETHING;
                 }
                 it = 0;

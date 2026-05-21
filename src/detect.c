@@ -1213,7 +1213,7 @@ use_crystal_ball(struct obj **optr)
     boolean charged = (obj->spe > 0);
 
     if (Blind) {
-        pline("残念ながら、%sは見えなかった.", the(xname(obj)));
+        pline("残念ながら、%sは見えなかった.", xname(obj));
         return;
     }
     oops = is_quest_artifact(obj) ? 8 : obj->blessed ? 16 : 20;
@@ -1311,7 +1311,7 @@ use_crystal_ball(struct obj **optr)
      *  for help in using the crystal ball.
      */
 
-    You("%sをのぞき込んだ...", the(xname(obj)));
+    You("%sをのぞき込んだ...", xname(obj));
     nomul(-rnd(charged ? 10 : 2));
     gm.multi_reason = "水晶玉をのぞき込んでいる";
     gn.nomovemsg = "";

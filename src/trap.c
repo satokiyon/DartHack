@@ -1341,7 +1341,7 @@ trapeffect_rocktrap(
             place_object(otmp, u.ux, u.uy);
 
             pline("%sの落とし戸が開き、%sがあなたの%sに落ちてきた!",
-                  the(ceiling(u.ux, u.uy)), an(xname(otmp)), body_part(HEAD));
+                ceiling(u.ux, u.uy), xname(otmp), body_part(HEAD));
             if (uarmh) {
                 /* normally passes_rocks() would protect against a falling
                    rock, but not when wearing a helmet */
@@ -3319,7 +3319,7 @@ launch_obj(
     case ROLL | LAUNCH_UNSEEN:
         if (otyp == BOULDER) {
             if (cansee(x1, y1)) {
-                You_see("%sが転がり始めたのを見た.", an(xname(singleobj)));
+                You_see("%sが転がり始めたのを見た.", xname(singleobj));
             } else if (Hallucination) {
                 Soundeffect(se_someone_bowling, 60);
                 You_hear("誰かがボウリングしている音が聞こえる.");
@@ -4526,7 +4526,7 @@ fire_damage(
             return FALSE;
         if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
             if (in_sight)
-                pline("%sから煙が立ちのぼった.", the(xname(obj)));
+                pline("%sから煙が立ちのぼった.", xname(obj));
             return FALSE;
         }
         dindx = (obj->oclass == SCROLL_CLASS) ? 3 : 4;
@@ -4808,7 +4808,7 @@ water_damage(
             if (get_obj_location(obj, &ox, &oy, CONTAINED_TOO | BURIED_TOO))
                 obj->ox = ox, obj->oy = oy;
             if (isok(ox, oy) && cansee(ox, oy))
-                pline("%sから湯気が立ちのぼった.", the(xname(obj)));
+                pline("%sから湯気が立ちのぼった.", xname(obj));
             return 0;
         } else if (otyp == SPE_BLANK_PAPER) {
             return 0;
@@ -5845,9 +5845,9 @@ untrap_box(
         || box->tknown
         || (!force && confused && !rn2(3))) {
         if (!(box->tknown && box->dknown))
-            You("%sに罠を見つけた!", the(xname(box)));
+            You("%sに罠を見つけた!", xname(box));
         else
-            pline("%sには罠がある.", the(xname(box)));
+            pline("%sには罠がある.", xname(box));
         box->tknown = 1;
         observe_object(box);
         if (!confused)
@@ -5856,7 +5856,7 @@ untrap_box(
         if (ynq("解除しますか?") == 'y')
             disarm_box(box, force, confused);
     } else {
-        You("%sに罠は見つからない.", the(xname(box)));
+        You("%sに罠は見つからない.", xname(box));
     }
 }
 
@@ -6373,7 +6373,7 @@ chest_trap(
             insider = (*u.ushops && inside_shop(u.ux, u.uy)
                        && *in_rooms(ox, oy, SHOPBASE) == *u.ushops);
 
-            pline("%sが爆発した!", The(xname(obj)));
+            pline("%sが爆発した!", xname(obj));
             Sprintf(buf, "exploding %s", xname(obj));
 
             if (costly)
@@ -6427,7 +6427,7 @@ chest_trap(
         case 19:
         case 18:
         case 17:
-            pline("有毒ガスの雲が%sから噴き出した.", the(xname(obj)));
+            pline("有毒ガスの雲が%sから噴き出した.", xname(obj));
             if (rn2(3))
                 poisoned("ガス雲", A_STR, "毒ガスの雲", 15,
                          FALSE);
@@ -6485,7 +6485,7 @@ chest_trap(
         case 0:
             pline("%sガスの雲が%sから噴き出した.",
                   Blind ? ROLL_FROM(blindgas) : rndcolor(),
-                  the(xname(obj)));
+                xname(obj));
             if (!Stunned) {
                 if (Hallucination)
                     pline("なんてイカした気分なんだ!");
@@ -6909,7 +6909,7 @@ lava_effects(void)
             } else if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
                 if (usurvive && !Blind)
                       pline("%sは奇妙な%sに輝いたが、無事だった.",
-                          The(xname(obj)), hcolor("dark red"));
+                          xname(obj), hcolor("dark red"));
             } else if (obj->in_use) {
                 if (obj->owornmask) {
                     if (usurvive) {

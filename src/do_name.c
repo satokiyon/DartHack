@@ -1010,14 +1010,13 @@ x_monnam(
     buf2[0] = '\0'; /* lint suppression */
     switch (article) {
     case ARTICLE_YOUR:
-        Strcpy(buf2, "your ");
+        Strcpy(buf2, "あなたの");
         break;
     case ARTICLE_THE:
-        Strcpy(buf2, "the ");
+        insertbuf2 = FALSE;
         break;
     case ARTICLE_A:
-        /* avoid an() here */
-        (void) just_an(buf2, buf); /* copy "a " or "an " into buf2[] */
+        insertbuf2 = FALSE;
         break;
     case ARTICLE_NONE:
     default:

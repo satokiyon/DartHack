@@ -341,18 +341,18 @@ dig(void)
                 dropx(uwep);
             } else {
                 if (u.usteed)
-                    pline("%sが跳ね返って%sに当たった!", the(xname(uwep)),
+                    pline("%sが跳ね返って%sに当たった!", xname(uwep),
                           mon_nam(u.usteed));
                 else
                     pline("痛い!  %sが跳ね返って自分に当たった!",
-                          the(xname(uwep)));
+                          xname(uwep));
                 set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
             }
             break;
         case 1:
             Soundeffect(se_bang_weapon_side, 100);
             pline("バシッ!  %sの平らな面で叩いた!",
-                  the(xname(uwep)));
+                  xname(uwep));
             wake_nearby(FALSE);
             break;
         default:
