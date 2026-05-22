@@ -4133,7 +4133,7 @@ dfeature_at(coordxy x, coordxy y, char *buf)
     else if (is_ice(x, y))
         dfeature = ice_descr(x, y, altbuf), cmap = -1; /* "ice" */
     else if (is_pool(x, y))
-        dfeature = "pool of water";
+        dfeature = "水たまり";
     else if (IS_SINK(ltyp))
         cmap = S_sink; /* "sink" */
     else if (IS_ALTAR(ltyp)) {
@@ -5548,7 +5548,7 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
 {
     struct obj *obj;
     char qbuf[QBUFSZ];
-    const char *underwhat = "here";
+    const char *underwhat = "ここ";
     menu_item *selected = 0;
     int n, n2 = 0;
 

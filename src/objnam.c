@@ -1529,18 +1529,18 @@ doname_base(
         if (obj->oeaten)
             Strcat(prefix, "partly eaten ");
         if (obj->otyp == CORPSE) {
-            /* (quan == 1) => want corpse_xname() to supply article,
+                /* (quan == 1) => want jp_corpse_xname() to supply article,
                (quan != 1) => already have count or "some" as prefix;
                "corpse" is already in the buffer returned by xname() */
             unsigned cxarg = (((obj->quan != 1L) ? 0 : CXN_ARTICLE)
                               | CXN_NOCORPSE);
             char *cxstr, *save_xnamep;
 
-            /* corpse_xname() sets xnamep; callers other than doname_base()
+                /* jp_corpse_xname() sets xnamep; callers other than doname_base()
                itself shouldn't care about xnamep (pointer to start of
                current obuf[]) but keep it accurate anyway */
             save_xnamep = gx.xnamep;
-            cxstr = corpse_xname(obj, prefix, cxarg);
+                cxstr = jp_corpse_xname(obj, prefix, cxarg);
             Sprintf(prefix, "%s ", cxstr);
             /* avoid having doname(corpse) consume an extra obuf */
             releaseobuf(cxstr);
