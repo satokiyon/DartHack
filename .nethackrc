@@ -239,3 +239,9 @@ OPTIONS=hilite_status:characteristics/up/green/down/red
 # These identify you in crash reports
 #OPTIONS=crash_name:Your Name
 #OPTIONS=crash_email:user@example.com
+
+
+OPTIONS=map_mode:tiles
+OPTIONS=tile_file:Nevanda_5.0.0_32x32.bmp
+OPTIONS=tile_width:32
+OPTIONS=tile_height:32

@@ -104,3 +104,41 @@ git merge --abort
 
 ---
 NetHack 5.0 の詳細については、[README](README) または [README.JP](README.JP) を参照してください。
+
+
+# タイルセット
+次のサイトのリンク先から好みのタイルセットをダウンロードし、BMPファイルに変換して使用可能
+- https://nethackwiki.com/wiki/Tileset
+
+タイルセットを使うときは、`.nethackrc` に以下を設定します。
+
+```ini
+OPTIONS=map_mode:tiles
+OPTIONS=tile_file:nevanda_nethack_32x32.bmp
+OPTIONS=tile_width:32
+OPTIONS=tile_height:32
+```
+
+- `tile_file` には BMP ファイル名（または絶対パス）を指定します。
+- `tile_width` / `tile_height` は、1タイルのピクセルサイズに合わせてください（例: 32x32 なら `32`）。
+
+## .nethackrc の配置場所
+
+- このプロジェクトでは、リポジトリ直下の `.nethackrc` を使用します。
+- 配置場所: `NetHackJP/.nethackrc`
+- 必要に応じてこのファイルを編集して、`tile_file` などの設定を変更してください。
+
+起動方法によって、実際に読み込まれる設定ファイルが異なる場合があります。
+
+- このリポジトリの想定手順で起動する場合は、`NetHackJP/.nethackrc` を編集対象として使用します。
+- `--nethackrc=<パス>` で起動した場合は、指定したファイルが優先されます（例: `--nethackrc=.nethackrc`）。
+- 明示指定なしで通常起動した場合は、環境によって `%USERPROFILE%\nethack\.nethackrc` 側が使われることがあります。
+
+期待した設定が反映されない場合は、起動引数で `--nethackrc` を明示指定してください。
+
+## タイル画像の配置場所
+
+- 相対パスで指定する場合は、実行ファイル (`NetHack.exe` / `NetHackW.exe`) と同じフォルダに置くのが確実です。
+- このリポジトリの Debug ビルドでは、通常 `binary/Debug/x64/` に配置します。
+- 別の場所に置く場合は、`OPTIONS=tile_file:C:\\path\\to\\your_tiles.bmp` のように絶対パスを指定します。
+
