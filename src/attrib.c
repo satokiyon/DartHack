@@ -13,6 +13,12 @@ static const char
     *const minusattr[] = { "弱く",   "愚かに",
                            "浅はかに", "不器用に",
                            "脆く",   "不快に" };
+static const char
+    *const plusattr_feel[] = { "力強くなった", "賢くなった", "思慮深くなった",
+                               "機敏になった", "丈夫になった", "魅力的になった" },
+    *const minusattr_feel[] = { "弱くなった",   "愚かになった",
+                                "浅はかになった", "不器用になった",
+                                "脆くなった",   "不快になった" };
 /* also used by enlightenment in insight.c for non-abbreviated status info */
 extern const char *const attrname[6];
 
@@ -174,7 +180,7 @@ adjattrib(
 {               /* negative => conditional (msg if change made) */
     int old_acurr, old_abase, old_amax, decr;
     boolean abonflg;
-    const char *attrstr;
+    const char *attrstr, *attrfeel;
 
     if (Fixed_abil || !incr)
         return FALSE;
@@ -196,6 +202,7 @@ adjattrib(
                 ABASE(ndx) = AMAX(ndx) = ATTRMAX(ndx);
         }
         attrstr = plusattr[ndx];
+        attrfeel = plusattr_feel[ndx];
         abonflg = (ABON(ndx) < 0);
     } else { /* incr is negative */
         if (ABASE(ndx) < ATTRMIN(ndx)) {
@@ -223,6 +230,7 @@ adjattrib(
                 AMAX(ndx) = ATTRMIN(ndx);
         }
         attrstr = minusattr[ndx];
+        attrfeel = minusattr_feel[ndx];
         abonflg = (ABON(ndx) > 0);
     }
     if (ACURR(ndx) == old_acurr) {
@@ -245,7 +253,7 @@ adjattrib(
 
     disp.botl = TRUE;
     if (msgflg <= 0)
-        You_feel("%s%s!", (incr > 1 || incr < -1) ? "とても" : "", attrstr);
+        You_feel("%s%s!", (incr > 1 || incr < -1) ? "とても" : "", attrfeel);
     if (program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
         encumber_msg();
     return TRUE;
