@@ -3380,9 +3380,12 @@ monkilled(
 {
     struct permonst *mptr = mdef->data;
 
-    if (fltxt && (mdef->wormno ? worm_known(mdef)
-                               : cansee(mdef->mx, mdef->my)))
+    if (fltxt && *fltxt && (mdef->wormno ? worm_known(mdef)
+                                         : cansee(mdef->mx, mdef->my)))
         pline_mon(mdef, "%sは%sに%s!", Monnam(mdef), fltxt,
+                  nonliving(mptr) ? "破壊された" : "倒された");
+    else if (mdef->wormno ? worm_known(mdef) : cansee(mdef->mx, mdef->my))
+        pline_mon(mdef, "%sは%s!", Monnam(mdef),
                   nonliving(mptr) ? "破壊された" : "倒された");
     else
         /* sad feeling is deferred until after potential life-saving */

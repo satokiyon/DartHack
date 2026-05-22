@@ -29,7 +29,11 @@ staticfn int passivemm(struct monst *, struct monst *, boolean, int,
 staticfn void
 jp_mm_name(char *outbuf, struct monst *mon, struct monst *other_mon)
 {
-    Strcpy(outbuf, (mon != other_mon) ? l_monnam(mon) : "自分");
+    const char *name = (mon != other_mon) ? l_monnam(mon) : "自分";
+
+    if (mon != other_mon && (!strcmp(name, "it") || !strcmp(name, "something")))
+        name = "何か";
+    Strcpy(outbuf, name);
 }
 
 staticfn void
