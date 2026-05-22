@@ -11,8 +11,12 @@ static NEARDATA struct obj *mon_currwep = (struct obj *) 0;
 staticfn void missmu(struct monst *, boolean, struct attack *);
 staticfn void mswings(struct monst *, struct obj *, boolean);
 staticfn void wildmiss(struct monst *, struct attack *);
+staticfn const char *jp_wildmiss_swings(struct monst *, struct attack *);
+staticfn const char *jp_react_degree(boolean);
+staticfn const char *jp_generic_creature_label(void);
 staticfn void calc_mattacku_vars(struct monst *, boolean *, boolean *,
                                  boolean *, boolean *);
+staticfn const char *jp_hitmsg_verb(int);
 staticfn void summonmu(struct monst *, boolean);
 staticfn int hitmu(struct monst *, struct attack *);
 staticfn int gulpmu(struct monst *, struct attack *);
@@ -24,57 +28,83 @@ staticfn int passiveum(struct permonst *, struct monst *, struct attack *);
 
 #define ld() ((yyyymmdd((time_t) 0) - (getyear() * 10000L)) == 0xe5)
 
+staticfn const char *
+jp_hitmsg_verb(int aatyp)
+{
+    switch (aatyp) {
+    case AT_BITE:
+        return "噛みついた";
+    case AT_KICK:
+        return "蹴りつけた";
+    case AT_STNG:
+        return "刺した";
+    case AT_BUTT:
+        return "頭突きした";
+    case AT_TUCH:
+        return "触れた";
+    case AT_TENT:
+        return "触手であなたの脳を吸った";
+    case AT_EXPL:
+    case AT_BOOM:
+        return "爆発した";
+    default:
+        return "攻撃した";
+    }
+}
+
+staticfn const char *
+jp_wildmiss_swings(struct monst *mtmp, struct attack *mattk)
+{
+    if (mattk->aatyp == AT_BITE)
+        return "噛みつこうとした";
+    if (mattk->aatyp == AT_KICK)
+        return "蹴りつけようとした";
+    if (mattk->aatyp == AT_STNG || mattk->aatyp == AT_BUTT
+        || nolimbs(mtmp->data))
+        return "突進した";
+    return "攻撃を繰り出した";
+}
+
+staticfn const char *
+jp_react_degree(boolean already)
+{
+    if (!rn2(3))
+        return "";
+    return already ? "かなり" : (!rn2(2) ? "少し" : "やや");
+}
+
+staticfn const char *
+jp_generic_creature_label(void)
+{
+    return "生き物";
+}
+
 /* monster hits hero (most callers have been moved to uthim.c) */
 void
 hitmsg(struct monst *mtmp, struct attack *mattk)
 {
     int compat;
-    const char *verb = 0, *again, *punct = "!";
+    const char *again, *punct = "!";
     char *Monst_name = Monnam(mtmp);
 
     /* Note: if opposite gender, "seductively";
        if same gender, "engagingly" for nymph, normal msg for others. */
     if ((compat = could_seduce(mtmp, &gy.youmonst, mattk)) != 0
         && !mtmp->mcan && !mtmp->mspec_used) {
-        pline_mon(mtmp, "%s %s you %s.", Monst_name,
-              !Blind ? "smiles at" : !Deaf ? "talks to" : "touches",
-              (compat == 2) ? "engagingly" : "seductively");
+        pline_mon(mtmp, "%sはあなたに%s%s.", Monst_name,
+              (compat == 2) ? "親しげに" : "妖しく",
+              !Blind ? "微笑みかけた" : !Deaf ? "話しかけた"
+                                             : "触れた");
     } else {
-        switch (mattk->aatyp) {
-        case AT_BITE:
-            verb = "bites";
-            break;
-        case AT_KICK:
-            if (thick_skinned(gy.youmonst.data))
-                punct = ".";
-            verb = "kicks";
-            break;
-        case AT_STNG:
-            verb = "stings";
-            break;
-        case AT_BUTT:
-            verb = "butts";
-            break;
-        case AT_TUCH:
-            verb = "touches you";
-            break;
-        case AT_TENT:
-            verb = "tentacles suck your brain";
-            Monst_name = s_suffix(Monst_name);
-            break;
-        case AT_EXPL:
-        case AT_BOOM:
-            verb = "explodes";
-            break;
-        default:
-            verb = "hits";
-        }
+        const char *verb = jp_hitmsg_verb(mattk->aatyp);
+        if (mattk->aatyp == AT_KICK && thick_skinned(gy.youmonst.data))
+            punct = ".";
         /* if a monster hits more than once with similar attack, say so */
         again = (mtmp->m_id == gh.hitmsg_mid
                  && gh.hitmsg_prev != NULL
                  && mattk == gh.hitmsg_prev + 1
-                 && mattk->aatyp == gh.hitmsg_prev->aatyp) ? " again" : "";
-        pline_mon(mtmp, "%s %s%s%s", Monst_name, verb, again, punct);
+                 && mattk->aatyp == gh.hitmsg_prev->aatyp) ? "もう一度" : "";
+        pline_mon(mtmp, "%sは%s%s%s", Monst_name, again, verb, punct);
     }
     gh.hitmsg_mid = mtmp->m_id;
     gh.hitmsg_prev = mattk;
@@ -133,9 +163,8 @@ mswings(
     boolean bash)       /* True: polearm used at too close range */
 {
     if (flags.verbose && !Blind && mon_visible(mtmp)) {
-        pline_mon(mtmp, "%s %s %s%s %s.", Monnam(mtmp),
-                  mswings_verb(otemp, bash),
-                  (otemp->quan > 1L) ? "one of " : "",
+        pline_mon(mtmp, "%sは%s%s%sで攻撃した.", Monnam(mtmp),
+                  (otemp->quan > 1L) ? "そのうち1つの" : "",
                   mhis(mtmp), xname(otemp));
     }
 }
@@ -205,12 +234,7 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
 
     set_msg_xy(mtmp->mx, mtmp->my);
     if (unotseen) { /* !mtmp->cansee || (Invis && !perceives(mtmp->data)) */
-        const char *swings = (mattk->aatyp == AT_BITE) ? "snaps"
-                             : (mattk->aatyp == AT_KICK) ? "kicks"
-                               : (mattk->aatyp == AT_STNG
-                                  || mattk->aatyp == AT_BUTT
-                                  || nolimbs(mtmp->data)) ? "lunges"
-                                 : "swings";
+        const char *swings = jp_wildmiss_swings(mtmp, mattk);
 
         if (compat) {
             pline("%sはあなたに触れようとして外した!", Monst_name);
@@ -271,7 +295,8 @@ expels(
         if (digests(mdat)) {
             You("吐き出された!");
         } else if (enfolds(mdat)) {
-            pline_mon(mtmp, "%s unfolds and you are released!", Monnam(mtmp));
+            pline_mon(mtmp, "%sの拘束がほどけ、あなたは解放された!",
+                      Monnam(mtmp));
         } else {
             char blast[40];
             struct attack *attk = attacktype_fordmg(mdat, AT_ENGL, AD_ANY);
@@ -667,9 +692,9 @@ mattacku(struct monst *mtmp)
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
         if (sticky && !youseeit)
-            pline("〽ぉっと「にんべん」ときっつくやられた.");
+            pline("何かがあなたに絡みついた.");
         else /* see note about m_monnam() above */
-            pline("待って、%s！ それは%sで%sという名だ！", m_monnam(mtmp),
+            pline("待て、%s! それは%s、名は%sだ!", m_monnam(mtmp),
                   jp_pmname(gy.youmonst.data, Ugender), svp.plname);
         if (sticky)
             set_ustuck(mtmp);
@@ -990,9 +1015,9 @@ summonmu(struct monst *mtmp, boolean youseeit)
             int numseen, numhelp;
             char buf[BUFSZ], genericwere[BUFSZ];
 
-            Strcpy(genericwere, "creature");
+            Strcpy(genericwere, jp_generic_creature_label());
             if (youseeit)
-                pline_mon(mtmp, "%s summons help!", Monnam(mtmp));
+                pline_mon(mtmp, "%sは助けを呼んだ!", Monnam(mtmp));
             numhelp = were_summon(mdat, FALSE, &numseen, genericwere);
             if (youseeit) {
                 if (numhelp > 0) {
@@ -1064,15 +1089,14 @@ u_slip_free(
        protection might fail (33% chance) when the armor is cursed */
     if (obj && (obj->greased || obj->otyp == OILSKIN_CLOAK)
         && (!obj->cursed || rn2(3))) {
-        pline_mon(mtmp, "%s %s your %s %s!", Monnam(mtmp),
-              (mattk->adtyp == AD_WRAP) ? "はあなたから滑り落ちた"
-                                        : "はあなたをつかんだが保持できなかった",
-              obj->greased ? "greased" : "slippery",
-              /* avoid "slippery slippery cloak"
-                 for undiscovered oilskin cloak */
+        pline_mon(mtmp, "%sはあなたの%s%sのせいで%s!", Monnam(mtmp),
+              obj->greased ? "油まみれの" : "すべりやすい",
+              /* avoid repeating adjective for undiscovered oilskin cloak */
               (obj->greased || objects[obj->otyp].oc_name_known)
                   ? xname(obj)
-                  : cloak_simple_name(obj));
+                  : cloak_simple_name(obj),
+              (mattk->adtyp == AD_WRAP) ? "滑り落ちた"
+                                        : "つかみきれなかった");
 
         if (obj->greased && !rn2(2)) {
             pline_The("油は落ちた.");
@@ -1888,9 +1912,8 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             react = rn2(SIZE(reactions));
         /* cancelled/hallucinatory feedback; monster might look "confused",
            "stunned",&c but we don't actually set corresponding attribute */
-        pline_mon(mtmp, "%s looks %s%s.", Monnam(mtmp),
-              !rn2(3) ? "" : already ? "quite "
-                                     : (!rn2(2) ? "a bit " : "somewhat "),
+        pline_mon(mtmp, "%sは%s%sように見える.", Monnam(mtmp),
+              jp_react_degree(already),
               reactions[react]);
     }
     return M_ATTK_MISS;
@@ -2461,11 +2484,11 @@ passiveum(
     switch (oldu_mattk->adtyp) {
     case AD_ACID:
         if (!rn2(2)) {
-            pline_mon(mtmp, "%s is splashed by %s%s!", Monnam(mtmp),
+            pline_mon(mtmp, "%sは%s%sを浴びた!", Monnam(mtmp),
                   /* temporary? hack for sequencing issue:  "your acid"
                      looks strange coming immediately after player has
                      been told that hero has reverted to normal form */
-                  !Upolyd ? "" : "your ", hliquid("acid"));
+                !Upolyd ? "" : "あなたの", hliquid("acid"));
             if (resists_acid(mtmp)) {
                 pline_mon(mtmp, "%sには効かない.", l_monnam(mtmp));
                 tmp = 0;
@@ -2574,8 +2597,7 @@ passiveum(
         case AD_STUN: /* Yellow mold */
             if (!mtmp->mstun) {
                 mtmp->mstun = 1;
-                pline_mon(mtmp, "%s %s.", Monnam(mtmp),
-                      makeplural(stagger(mtmp->data, "stagger")));
+                pline_mon(mtmp, "%sはよろめいた.", Monnam(mtmp));
             }
             tmp = 0;
             break;
@@ -2597,8 +2619,7 @@ passiveum(
                 tmp = 0;
                 break;
             }
-            pline_mon(mtmp, "%s is jolted with your electricity!",
-                      Monnam(mtmp));
+            pline_mon(mtmp, "%sはあなたの電撃でしびれた!", Monnam(mtmp));
             break;
         default:
             tmp = 0;

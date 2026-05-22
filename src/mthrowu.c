@@ -110,7 +110,7 @@ thitu(
         } else if (u.uac + tlev <= dieroll - 2) {
             if (onm != onmbuf)
                 Strcpy(onmbuf, onm); /* [modifiable buffer for upstart()] */
-            pline("%s %s you.", upstart(onmbuf), vtense(onmbuf, "miss"));
+            pline("%sの攻撃はあなたに当たらなかった.", upstart(onmbuf));
         } else
             You("%sに当たりそうになった.", onm);
         return 0;
@@ -288,9 +288,12 @@ monshoot(struct monst *mtmp, struct obj *otmp, struct obj *mwep)
         gm.m_shot.s = ammo_and_launcher(otmp, mwep) ? TRUE : FALSE;
         Strcpy(trgbuf, mtarg ? some_mon_nam(mtarg) : "");
         set_msg_xy(mtmp->mx, mtmp->my);
-        pline("%s %s %s%s%s!", Monnam(mtmp),
-              gm.m_shot.s ? "shoots" : "throws", onm,
-              mtarg ? " at " : "", trgbuf);
+          if (mtarg)
+            pline("%sは%sを%sへ%s!", Monnam(mtmp), onm, trgbuf,
+                gm.m_shot.s ? "撃った" : "投げた");
+          else
+            pline("%sは%sを%s!", Monnam(mtmp), onm,
+                gm.m_shot.s ? "撃った" : "投げた");
         gm.m_shot.o = otmp->otyp;
     } else {
         gm.m_shot.o = STRANGE_OBJECT; /* don't give multishot feedback */
@@ -454,9 +457,9 @@ ohitmon(
             mtmp->mhp -= damage;
             if (DEADMONSTER(mtmp)) {
                 if (vis || (verbose && !gm.mtarget))
-                    pline("%s is %s!", Monnam(mtmp),
+                    pline("%sは%s!", Monnam(mtmp),
                           (nonliving(mtmp->data) || is_vampshifter(mtmp)
-                           || !canspotmon(mtmp)) ? "destroyed" : "killed");
+                           || !canspotmon(mtmp)) ? "破壊された" : "倒れた");
                 /* don't blame hero for unknown rolling boulder trap */
                 if (!svc.context.mon_moving
                    && (otmp->otyp != BOULDER || range >= 0 || otmp->otrapped))
@@ -478,9 +481,9 @@ ohitmon(
                    two message [first via hit() above] sequence:
                    "The {splash of venom,cream pie} hits <mon>."
                    "<Mon> is blinded by the {venom,pie}." */
-                pline("%s is blinded by %s.", Monnam(mtmp),
-                      the((otmp->oclass == VENOM_CLASS) ? "venom"
-                          : (otmp->otyp == CREAM_PIE) ? "pie"
+                pline("%sは%sで目がくらんだ.", Monnam(mtmp),
+                      ((otmp->oclass == VENOM_CLASS) ? "毒液"
+                          : (otmp->otyp == CREAM_PIE) ? "パイ"
                             : xname(otmp))); /* catchall; not used */
             mtmp->mcansee = 0;
             tmp = (int) mtmp->mblinded + rnd(25) + 20;
@@ -623,9 +626,9 @@ m_throw(
     if ((singleobj->cursed || singleobj->greased) && (dx || dy) && !rn2(7)) {
         if (canseemon(mon) && flags.verbose) {
             if (is_ammo(singleobj))
-                pline("%s misfires!", Monnam(mon));
+                pline("%sの射撃は不発だった!", Monnam(mon));
             else
-                pline("%s as %s throws it!", Tobjnam(singleobj, "slip"),
+                pline("%sが%sの手を滑って落ちた!", Tobjnam(singleobj, "slip"),
                       mon_nam(mon));
         }
         dx = rn2(3) - 1;
@@ -804,14 +807,13 @@ m_throw(
                    in order to get "Grimtooth" rather than "The Grimtooth" */
                 if (range && cansee(gb.bhitpos.x, gb.bhitpos.y)
                     && IS_SINK(levl[gb.bhitpos.x][gb.bhitpos.y].typ))
-                    pline("%s %s onto the sink.", The(mshot_xname(singleobj)),
-                          otense(singleobj, Hallucination ? "plop" : "drop"));
+                    pline("%sは流しへ落ちた.", The(mshot_xname(singleobj)));
                 else if (gm.m_shot.n > 1
                          && (!gm.mesg_given
                              || gb.bhitpos.x != u.ux || gb.bhitpos.y != u.uy)
                          && (cansee(gb.bhitpos.x, gb.bhitpos.y)
                              || (gm.marcher && canseemon(gm.marcher))))
-                    pline("%s misses.", The(mshot_xname(singleobj)));
+                    pline("%sは外れた.", The(mshot_xname(singleobj)));
                 if (!tethered_weapon) {
                     (void) drop_throw(singleobj, 0,
                                       gb.bhitpos.x, gb.bhitpos.y);
@@ -903,9 +905,9 @@ return_from_mtoss(
             dmg = rn2(2);
             if (!dmg) {
                 if (canseemon(magr)) {
-                    pline("%s back to %s, landing %s %s %s.",
+                    pline("%sは%sのもとへ戻り、%s%sの%sに落ちた.",
                           Tobjnam(otmp, "return"), mon_nam(magr),
-                          mlevitating ? "beneath" : "at", mhis(magr),
+                          mlevitating ? "下" : "足元", mhis(magr),
                           jp_mbodypart_plural(magr, FOOT));
                 } else if (!Deaf) {
                     You_hear("%sが%sの近くに落ちる音が聞こえた.",
@@ -914,7 +916,7 @@ return_from_mtoss(
             } else {
                 dmg += rnd(3);
                 if (canseemon(magr)) {
-                    pline("%s back toward %s, hitting %s %s!",
+                    pline("%sは%sへ飛び戻り、%sの%sに当たった!",
                           Tobjnam(otmp, "fly"), mon_nam(magr),
                           mhis(magr), jp_body_part(ARM));
                 } else if (!Deaf) {
@@ -955,7 +957,7 @@ return_from_mtoss(
                 /* Some sound effects when item lands in water or lava */
                 if (is_pool(x, y) || (is_lava(x, y) && !is_flammable(otmp))) {
                     Soundeffect(se_splash, 50);
-                    pline((weight(otmp) > 9) ? "Splash!" : "Plop!");
+                    pline((weight(otmp) > 9) ? "ざぶん!" : "ぽちゃん!");
                 }
             }
             if (obj_sheds_light(otmp))
@@ -1051,7 +1053,7 @@ spitmm(struct monst *mtmp, struct attack *mattk, struct monst *mtarg)
         }
         if (!rn2(BOLT_LIM-distmin(mtmp->mx,mtmp->my,tx,ty))) {
             if (canseemon(mtmp))
-                pline("%s spits venom!", Monnam(mtmp));
+                pline("%sは毒液を吐いた!", Monnam(mtmp));
             if (!utarg)
                 gm.mtarget = mtarg;
             m_throw(mtmp, mtmp->mx, mtmp->my, sgn(gt.tbx), sgn(gt.tby),
@@ -1101,7 +1103,7 @@ breamm(struct monst *mtmp, struct attack *mattk, struct monst *mtarg)
         if (mtmp->mcan) {
             if (!Deaf) {
                 if (canseemon(mtmp)) {
-                    pline("%s coughs.", Monnam(mtmp));
+                    pline("%sはせき込んだ.", Monnam(mtmp));
                 } else {
                     Soundeffect(se_cough, 100);
                     You_hear("せき込む音が聞こえる.");
@@ -1119,7 +1121,7 @@ breamm(struct monst *mtmp, struct attack *mattk, struct monst *mtarg)
         if (!mtmp->mspec_used && rn2(3)) {
             if (BZ_VALID_ADTYP(typ)) {
                 if (canseemon(mtmp))
-                    pline("%s breathes %s!",
+                    pline("%sは%sを吐いた!",
                           Monnam(mtmp), breathwep_name(typ));
                 gb.buzzer = mtmp;
                 dobuzz(BZ_M_BREATH(BZ_OFS_AD(typ)), (int) mattk->damn,
@@ -1221,10 +1223,8 @@ thrwmu(struct monst *mtmp)
 
         if (canseemon(mtmp)) {
             onm = xname(otmp);
-            pline_mon(mtmp, "%s %s %s.", Monnam(mtmp),
-                  /* "thrusts" or "swings", or "bashes with" if adjacent */
-                  mswings_verb(otmp, (rang <= 2) ? TRUE : FALSE),
-                  obj_is_pname(otmp) ? the(onm) : an(onm));
+            pline_mon(mtmp, "%sは%sで攻撃した.", Monnam(mtmp),
+                obj_is_pname(otmp) ? the(onm) : an(onm));
         }
 
         dam = dmgval(otmp, &gy.youmonst);
