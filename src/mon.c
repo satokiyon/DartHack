@@ -2976,7 +2976,7 @@ vamprises(struct monst *mtmp)
                    have been called but no message about its death given yet;
                    mtmp was a vampire so use unconditional "destroyed" */
                 if (trap_killed && canspotmon(mtmp) && !Unaware)
-                    pline_mon(mtmp, "%s is destroyed!", Monnam(mtmp));
+                    pline_mon(mtmp, "%sは破壊された!", Monnam(mtmp));
             }
         }
         newsym(x, y);
@@ -3382,9 +3382,8 @@ monkilled(
 
     if (fltxt && (mdef->wormno ? worm_known(mdef)
                                : cansee(mdef->mx, mdef->my)))
-        pline_mon(mdef, "%s is %s%s%s!", Monnam(mdef),
-              nonliving(mptr) ? "destroyed" : "killed",
-              *fltxt ? " by the " : "", fltxt);
+        pline_mon(mdef, "%sは%sに%s!", Monnam(mdef), fltxt,
+                  nonliving(mptr) ? "破壊された" : "倒された");
     else
         /* sad feeling is deferred until after potential life-saving */
         iflags.sad_feeling = mdef->mtame ? TRUE : FALSE;
@@ -3501,13 +3500,14 @@ xkilled(
     }
     if (!nomsg) {
         boolean namedpet = has_mgivenname(mtmp) && !Hallucination;
+                const char *target =
+                        !(wasinside || canspotmon(mtmp)) ? "それ"
+                            : !mtmp->mtame ? mon_nam(mtmp)
+                                : x_monnam(mtmp, namedpet ? ARTICLE_NONE : ARTICLE_THE,
+                                                     "poor", namedpet ? SUPPRESS_SADDLE : 0, FALSE);
 
-        You("%s %s!",
-            nonliving(mtmp->data) ? "destroy" : "kill",
-            !(wasinside || canspotmon(mtmp)) ? "it"
-              : !mtmp->mtame ? mon_nam(mtmp)
-                : x_monnam(mtmp, namedpet ? ARTICLE_NONE : ARTICLE_THE,
-                           "poor", namedpet ? SUPPRESS_SADDLE : 0, FALSE));
+                You("%sを%s!", target,
+                        nonliving(mtmp->data) ? "破壊した" : "倒した");
     }
 
     if (mtmp->mtrapped && (t = t_at(x, y)) != 0 && is_pit(t->ttyp)) {
@@ -4275,7 +4275,7 @@ setmangry(struct monst *mtmp, boolean via_attack)
         adjalign((u.ualign.record > 5) ? -5 : -rnd(5));
 
         if (!Blind)
-            pline("The engraving beneath you fades.");
+            pline("足元の刻印が薄れていく.");
         del_engr_at(u.ux, u.uy);
     }
 
