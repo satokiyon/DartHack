@@ -144,7 +144,7 @@ cant_wield_corpse(struct obj *obj)
         return FALSE;
 
     /* Prevent wielding cockatrice when not wearing gloves --KAA */
-    You("素手の%sで%sを構えた.",
+    You("素手の%sで%sを装備した.",
         jp_body_part_plural(HAND),
         jp_corpse_xname(obj, (const char *) 0, CXN_PFX_THE));
     Sprintf(kbuf, "wielding %s bare-handed", killer_xname(obj));
@@ -162,7 +162,7 @@ empty_handed(void)
              /* hands but no weapon and no gloves */
                          ? "素手だ"
                /* alternate phrasing for paws or lack of hands */
-                             : "何も構えていない";
+                             : "何も装備していない";
 }
 
 staticfn int
@@ -184,7 +184,7 @@ ready_weapon(struct obj *wep)
         /* hero must have been life-saved to get here; use a turn */
         res = ECMD_TIME; /* corpse won't be wielded */
     } else if (uarms && bimanual(wep)) {
-        You("盾を装備したままでは両手用の%sを構えられなかった.",
+        You("盾を装備したままでは両手用の%sを装備できなかった.",
             is_sword(wep) ? "剣" : wep->otyp == BATTLE_AXE ? "斧"
                                                               : "武器");
         res = ECMD_FAIL;
@@ -491,7 +491,7 @@ doswapweapon(void)
         if (uswapwep)
             prinv((char *) 0, uswapwep, 0L);
         else
-            You("副武器は構えていなかった.");
+            You("副武器は装備していなかった.");
     }
 
     if (u.twoweap && !can_twoweapon())
@@ -740,7 +740,7 @@ wield_tool(struct obj *obj,
             /* hope none of ready_weapon()'s early returns apply here... */
             (void) ready_weapon(obj);
         } else {
-            You("今は%sを構えた.", doname(obj));
+            You("今は%sを装備した.", doname(obj));
             setuwep(obj);
         }
         if (flags.pushweapon && oldwep && uwep != oldwep)
