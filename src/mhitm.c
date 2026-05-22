@@ -1316,9 +1316,9 @@ mswingsm(
                         && (dist2(magr->mx, magr->my, mdef->mx, mdef->my)
                             <= 2));
 
-        pline("%s %s %s%s %s at %s.", Monnam(magr), mswings_verb(otemp, bash),
-              (otemp->quan > 1L) ? "one of " : "", mhis(magr), xname(otemp),
-              mon_nam(mdef));
+        pline("%sは%s%s%sで%sを攻撃した.", Monnam(magr),
+              (otemp->quan > 1L) ? "そのうち1つの" : "",
+              mhis(magr), xname(otemp), mon_nam(mdef));
     }
 }
 
