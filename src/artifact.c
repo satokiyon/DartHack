@@ -1619,7 +1619,7 @@ artifact_hit(
                 }
                 if (noncorporeal(mdef->data) || amorphous(mdef->data)) {
                     pline("%s slices through %s %s.", wepdesc,
-                          s_suffix(mon_nam(mdef)), mbodypart(mdef, NECK));
+                          s_suffix(mon_nam(mdef)), jp_mbodypart(mdef, NECK));
                     return TRUE;
                 }
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
@@ -1639,7 +1639,7 @@ artifact_hit(
                 if (noncorporeal(gy.youmonst.data)
                     || amorphous(gy.youmonst.data)) {
                     pline("%s slices through your %s.", wepdesc,
-                          body_part(NECK));
+                          jp_body_part(NECK));
                     return TRUE;
                 }
                 *dmgptr = 2 * (Upolyd ? u.mh : u.uhp) + FATAL_DAMAGE_MODIFIER;

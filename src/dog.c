@@ -1318,7 +1318,7 @@ wary_dog(struct monst *mtmp, boolean was_dead)
                     pline_mon(mtmp,
                              "%s %s to look you in the %s.", Monnam(mtmp),
                              mtmp->mpeaceful ? "seems unable" : "refuses",
-                             body_part(EYE));
+                             jp_body_part(EYE));
                 else
                     pline_mon(mtmp, "%s avoids your gaze.", Monnam(mtmp));
             }

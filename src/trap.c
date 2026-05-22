@@ -1368,7 +1368,7 @@ trapeffect_rocktrap(
             place_object(otmp, u.ux, u.uy);
 
             pline("%sの落とし戸が開き、%sがあなたの%sに落ちてきた!",
-                ceiling(u.ux, u.uy), xname(otmp), body_part(HEAD));
+                ceiling(u.ux, u.uy), xname(otmp), jp_body_part(HEAD));
             if (uarmh) {
                 /* normally passes_rocks() would protect against a falling
                    rock, but not when wearing a helmet */
@@ -1530,12 +1530,12 @@ trapeffect_bear_trap(
         set_utrap((unsigned) rn1(4, 4), TT_BEARTRAP);
         if (u.usteed) {
             pline("%sの熊罠が%sの%sを挟んだ!", A_Your[trap->madeby_u],
-                  s_suffix(mon_nam(u.usteed)), mbodypart(u.usteed, FOOT));
+                  s_suffix(mon_nam(u.usteed)), jp_mbodypart(u.usteed, FOOT));
             if (thitm(0, u.usteed, (struct obj *) 0, dmg, FALSE))
                 reset_utrap(TRUE); /* steed died, hero not trapped */
         } else {
             pline("%sの熊罠があなたの%sを挟んだ!", A_Your[trap->madeby_u],
-                  body_part(FOOT));
+                  jp_body_part(FOOT));
             if (u.umonnum == PM_OWLBEAR || u.umonnum == PM_BUGBEAR)
                 You("怒ってうなった!");
             if (wearing_iron_shoes(mtmp))
@@ -1633,11 +1633,11 @@ trapeffect_rust_trap(
          */
         switch (rn2(5)) {
         case 0:
-            pline("%sあなたの%sを打った!", A_gush_of_water_hits, body_part(HEAD));
+            pline("%sあなたの%sを打った!", A_gush_of_water_hits, jp_body_part(HEAD));
             (void) water_damage(uarmh, helm_simple_name(uarmh), TRUE);
             break;
         case 1:
-            pline("%sあなたの左%sを打った!", A_gush_of_water_hits, body_part(ARM));
+            pline("%sあなたの左%sを打った!", A_gush_of_water_hits, jp_body_part(ARM));
             if (water_damage(uarms, "盾", TRUE) != ER_NOTHING)
                 break;
             if (u.twoweap || (uwep && bimanual(uwep)))
@@ -1646,7 +1646,7 @@ trapeffect_rust_trap(
             (void) water_damage(uarmg, gloves_simple_name(uarmg), TRUE);
             break;
         case 2:
-            pline("%sあなたの右%sを打った!", A_gush_of_water_hits, body_part(ARM));
+            pline("%sあなたの右%sを打った!", A_gush_of_water_hits, jp_body_part(ARM));
             (void) water_damage(uwep, 0, TRUE);
             goto uglovecheck;
         default:
@@ -1689,7 +1689,7 @@ trapeffect_rust_trap(
             if (in_sight)
                 pline_mon(mtmp,
                       "%s%sの%sを打った!", A_gush_of_water_hits,
-                      mon_nam(mtmp), mbodypart(mtmp, HEAD));
+                      mon_nam(mtmp), jp_mbodypart(mtmp, HEAD));
             target = which_armor(mtmp, W_ARMH);
             (void) water_damage(target, helm_simple_name(target), TRUE);
             break;
@@ -1697,7 +1697,7 @@ trapeffect_rust_trap(
             if (in_sight)
                 pline_mon(mtmp,
                       "%s%sの左%sを打った!", A_gush_of_water_hits,
-                      mon_nam(mtmp), mbodypart(mtmp, ARM));
+                      mon_nam(mtmp), jp_mbodypart(mtmp, ARM));
             target = which_armor(mtmp, W_ARMS);
             if (water_damage(target, "盾", TRUE) != ER_NOTHING)
                 break;
@@ -1712,7 +1712,7 @@ trapeffect_rust_trap(
             if (in_sight)
                 pline_mon(mtmp,
                       "%s%sの右%sを打った!", A_gush_of_water_hits,
-                      mon_nam(mtmp), mbodypart(mtmp, ARM));
+                      mon_nam(mtmp), jp_mbodypart(mtmp, ARM));
             (void) water_damage(MON_WEP(mtmp), 0, TRUE);
             goto mglovecheck;
         default:
@@ -2771,7 +2771,7 @@ trapeffect_vibrating_square(
                 } else {
                     Strcpy(buf, s_suffix(monnm));
                     p = eos(strcat(buf, " "));
-                    Strcpy(p, makeplural(mbodypart(mtmp, FOOT)));
+                    Strcpy(p, jp_mbodypart_plural(mtmp, FOOT));
                     /* avoid "beneath 'rear paws'" or 'rear hooves' */
                     (void) strsubst(p, "rear ", "");
                 }
@@ -3984,7 +3984,7 @@ float_up(void)
         } else if (u.utraptype == TT_LAVA /* molten lava */
                    || u.utraptype == TT_INFLOOR) { /* solidified lava */
             Your("体は上に引かれたが、%sはまだ引っかかったままだ.",
-                 makeplural(body_part(LEG)));
+                 jp_body_part_plural(LEG));
         } else if (u.utraptype == TT_BURIEDBALL) { /* tethered */
             coord cc;
 
@@ -3996,14 +3996,14 @@ float_up(void)
             /* being chained to the floor blocks levitation from floating
                above that floor but not from enhancing carrying capacity */
             You("体が軽くなった気がしたが、%sはまだ%sにつながれたままだった.",
-                body_part(LEG),
+                jp_body_part(LEG),
                 IS_ROOM(levl[cc.x][cc.y].typ) ? "床" : "地面");
         } else if (u.utraptype == WEB) {
             You("少し浮き上がったが、まだ%sに絡まれたままだった.",
                 jp_trapname_for_display(WEB, FALSE));
         } else { /* bear trap */
             You("少し浮き上がったが、%sはまだ挟まれたままだった.",
-                body_part(LEG));
+                jp_body_part(LEG));
         }
         /* when still trapped, float_vs_flight() below will block levitation */
 #if 0
@@ -4233,10 +4233,10 @@ climb_pit(void)
         fill_pit(u.ux, u.uy);
         gv.vision_full_recalc = 1; /* vision limits change */
     } else if (!rn2(2) && sobj_at(BOULDER, u.ux, u.uy)) {
-        Your("%sが岩の割れ目にはまった.", body_part(LEG));
+        Your("%sが岩の割れ目にはまった.", jp_body_part(LEG));
         display_nhwindow(WIN_MESSAGE, FALSE);
         clear_nhwindow(WIN_MESSAGE);
-        You("%sを引き抜いた.", body_part(LEG));
+        You("%sを引き抜いた.", jp_body_part(LEG));
     } else if ((Flying || is_clinger(gy.youmonst.data)) && !Sokoban) {
         /* eg fell in pit, then poly'd to a flying monster;
            or used '>' to deliberately enter it */
@@ -4421,7 +4421,7 @@ domagictrap(void)
 
         /* odd feelings */
         case 13:
-            pline("%sにぞくりと悪寒が走った!", body_part(SPINE));
+            pline("%sにぞくりと悪寒が走った!", jp_body_part(SPINE));
             break;
         case 14:
             You_hear(Hallucination ? "月があなたに吠える声が聞こえた."
@@ -5312,7 +5312,7 @@ could_untrap(boolean verbosely, boolean check_floor)
         Sprintf(buf, "まず%sを放す必要がある.", l_monnam(u.ustuck));
     } else if (u.ustuck || (welded(uwep) && bimanual(uwep))) {
         Sprintf(buf, "%sがふさがっていてそれはできない.",
-                makeplural(body_part(HAND)));
+                jp_body_part_plural(HAND));
     } else if (check_floor && !can_reach_floor(FALSE)) {
         /* only checked here for autounlock of chest/box and that will
            be !verbosely so precise details of the message don't matter */
@@ -5772,7 +5772,7 @@ help_monster_out(
     /* Will our hero succeed? */
     if ((uprob = untrap_prob(ttmp)) != 0 && !helpless(mtmp)) {
         You("%sを伸ばしてみたが、%sは疑うように後ずさった.",
-            makeplural(body_part(ARM)), mon_nam(mtmp));
+            jp_body_part_plural(ARM), mon_nam(mtmp));
         return 1;
     }
 
@@ -5781,7 +5781,7 @@ help_monster_out(
         const char *mtmp_pmname = mon_pmname(mtmp);
 
         You("素手の%sで罠にかかった%sをつかんだ.",
-            mtmp_pmname, makeplural(body_part(HAND)));
+            mtmp_pmname, jp_body_part_plural(HAND));
 
         if (poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM)) {
             display_nhwindow(WIN_MESSAGE, FALSE);
@@ -5803,7 +5803,7 @@ help_monster_out(
         return 1;
     }
 
-    You("%sを伸ばして%sをつかんだ.", makeplural(body_part(ARM)),
+    You("%sを伸ばして%sをつかんだ.", jp_body_part_plural(ARM),
         mon_nam(mtmp));
 
     if (mtmp->msleeping) {
@@ -6471,7 +6471,7 @@ chest_trap(
         case 15:
         case 14:
         case 13:
-            You_feel("針が%sを刺したのを感じた.", body_part(bodypart));
+            You_feel("針が%sを刺したのを感じた.", jp_body_part(bodypart));
             poisoned("針", A_CON, "毒針", 10, FALSE);
             exercise(A_CON, FALSE);
             break;

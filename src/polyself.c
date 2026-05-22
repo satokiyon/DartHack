@@ -177,7 +177,7 @@ check_strangling(boolean on)
             && can_be_strangled(&gy.youmonst)) {
             Strangled = 6L;
             disp.botl = TRUE;
-              Your("%sが%sを%s!", simpleonames(uamul), body_part(NECK),
+              Your("%sが%sを%s!", simpleonames(uamul), jp_body_part(NECK),
                   was_strangled ? "まだ締めつけている" : "締めつけ始めた"); /* "throat" */
             makeknown(AMULET_OF_STRANGULATION);
         }
@@ -2141,6 +2141,300 @@ const char *
 body_part(int part)
 {
     return mbodypart(&gy.youmonst, part);
+}
+
+staticfn const char *
+jp_bodypart_default(int part)
+{
+    switch (part) {
+    case ARM:
+        return "腕";
+    case EYE:
+        return "目";
+    case FACE:
+        return "顔";
+    case FINGER:
+        return "指";
+    case FINGERTIP:
+        return "指先";
+    case FOOT:
+        return "足";
+    case HAND:
+        return "手";
+    case HANDED:
+        return "手";
+    case HEAD:
+        return "頭";
+    case LEG:
+        return "脚";
+    case LIGHT_HEADED:
+        return "めまいがする";
+    case NECK:
+        return "首";
+    case SPINE:
+        return "背筋";
+    case TOE:
+        return "つま先";
+    case HAIR:
+        return "体毛";
+    case BLOOD:
+        return "血";
+    case LUNG:
+        return "肺";
+    case NOSE:
+        return "鼻";
+    case STOMACH:
+        return "胃";
+    default:
+        return "部位";
+    }
+}
+
+staticfn boolean
+jp_has_nonascii(const char *str)
+{
+    const uchar *p = (const uchar *) str;
+
+    if (!str)
+        return FALSE;
+    while (*p) {
+        if (*p & 0x80)
+            return TRUE;
+        ++p;
+    }
+    return FALSE;
+}
+
+staticfn const char *
+jp_translate_bodypart_name(const char *part, int part_id)
+{
+    static const struct {
+        const char *en;
+        const char *ja;
+    } jp_bodypart_map[] = {
+        { "abdomen", "腹部" },
+        { "addled", "めまいがする" },
+        { "anal fin", "尻びれ" },
+        { "anterior segment", "前体節" },
+        { "appendage", "付属肢" },
+        { "arm", "腕" },
+        { "backbone", "背骨" },
+        { "beam", "光条" },
+        { "bill", "くちばし" },
+        { "blood", "血" },
+        { "body", "胴体" },
+        { "book lung", "書肺" },
+        { "cap area", "傘部" },
+        { "caudal fin", "尾びれ" },
+        { "center", "中心" },
+        { "central core", "中核" },
+        { "cephalothorax", "頭胸部" },
+        { "cerebral area", "中枢部" },
+        { "cilia", "繊毛" },
+        { "claw", "爪" },
+        { "claw tip", "爪先" },
+        { "clawed", "鉤爪" },
+        { "clitellum", "環帯" },
+        { "cornea", "角膜" },
+        { "currents", "流れ" },
+        { "dark spot", "暗斑" },
+        { "digestive tract", "消化管" },
+        { "dorsal fin", "背びれ" },
+        { "edge", "縁" },
+        { "equator", "赤道部" },
+        { "eye", "目" },
+        { "face", "顔" },
+        { "feathers", "羽毛" },
+        { "fin", "ヒレ" },
+        { "finger", "指" },
+        { "fingertip", "指先" },
+        { "finned", "ヒレ" },
+        { "foot", "足" },
+        { "foreclaw", "前爪" },
+        { "forehoof", "前ひづめ" },
+        { "foreleg", "前脚" },
+        { "forelimb", "前肢" },
+        { "forked tongue", "二股舌" },
+        { "front", "前面" },
+        { "fur", "体毛" },
+        { "gill", "えら" },
+        { "gills", "えら" },
+        { "grasp", "把持器" },
+        { "grasped", "把持肢" },
+        { "hair", "体毛" },
+        { "hand", "手" },
+        { "handed", "手" },
+        { "head", "頭" },
+        { "hemolymph", "血リンパ" },
+        { "hoof tip", "ひづめ先" },
+        { "hooved", "ひづめ" },
+        { "hypha", "菌糸" },
+        { "interior", "内部" },
+        { "juices", "体液" },
+        { "labrum", "上唇" },
+        { "large scale", "大鱗" },
+        { "large scale tip", "鱗先" },
+        { "leading edge", "前縁" },
+        { "leg", "脚" },
+        { "length", "胴体" },
+        { "life force", "生命力" },
+        { "light headed", "頭がくらくら" },
+        { "light sensitive cell", "光感受細胞" },
+        { "lower appendage", "下部付属肢" },
+        { "lower current", "下部流" },
+        { "lower pseudopod", "下部仮足" },
+        { "lower tentacle", "下部触手" },
+        { "lower tentacle tip", "下部触手先" },
+        { "lung", "肺" },
+        { "mane", "たてがみ" },
+        { "middle", "中央部" },
+        { "minor current", "小渦流" },
+        { "mycelium", "菌糸体" },
+        { "neck", "首" },
+        { "nose", "鼻" },
+        { "nostril", "鼻孔" },
+        { "olfactory nerve", "嗅神経" },
+        { "optic nerve", "視神経" },
+        { "over stretched", "めまいがする" },
+        { "palped", "触肢" },
+        { "paw", "前足" },
+        { "pawed", "前足" },
+        { "pectoral fin", "胸びれ" },
+        { "pedipalp", "触肢" },
+        { "peduncle", "尾柄" },
+        { "pelvic axillary", "腹びれ基部" },
+        { "pelvic fin", "腹びれ" },
+        { "played out", "めまいがする" },
+        { "posterior", "後部" },
+        { "posterior segment", "後体節" },
+        { "posterior setae", "後部剛毛" },
+        { "premaxillary", "前上顎" },
+        { "prostomium", "口前葉" },
+        { "pseudopod", "仮足" },
+        { "pseudopod extension", "仮足突起" },
+        { "pseudopod extremity", "仮足先" },
+        { "pseudopod root", "仮足根" },
+        { "ray", "光線" },
+        { "rayed", "光線" },
+        { "rear claw", "後ろ爪" },
+        { "rear claw tip", "後ろ爪先" },
+        { "rear hoof", "後ろひづめ" },
+        { "rear hoof tip", "後ろひづめ先" },
+        { "rear leg", "後脚" },
+        { "rear limb", "後肢" },
+        { "rear paw", "後ろ足" },
+        { "rear region", "後部" },
+        { "rear scale", "後部鱗" },
+        { "region", "渦部" },
+        { "retina", "網膜" },
+        { "rhizome", "根茎" },
+        { "rhizome tip", "根茎先" },
+        { "ripples", "波紋" },
+        { "root", "根" },
+        { "rotational", "めまいがする" },
+        { "scale gap", "鱗間" },
+        { "scale gapped", "鱗の隙間" },
+        { "scales", "鱗" },
+        { "segment", "体節" },
+        { "segmented", "体節" },
+        { "sensor", "感覚器" },
+        { "setae", "剛毛" },
+        { "skin", "皮膚" },
+        { "spine", "背筋" },
+        { "spores", "胞子" },
+        { "sporulated", "めまいがする" },
+        { "spun out", "めまいがする" },
+        { "stalk", "柄" },
+        { "stomach", "胃" },
+        { "strand", "菌糸束" },
+        { "stranded", "菌糸" },
+        { "surface", "表面" },
+        { "swirl", "渦流" },
+        { "swirled", "渦" },
+        { "tarsus", "跗節" },
+        { "tentacle", "触手" },
+        { "tentacle tip", "触手先" },
+        { "tentacled", "触手" },
+        { "toe", "つま先" },
+        { "trunk", "鼻" },
+        { "vestigial limb", "痕跡肢" },
+        { "viscous", "粘質部" },
+        { "visual area", "視覚域" },
+        { "wing", "翼" },
+        { "wing tip", "翼端" },
+        { "winged", "翼" },
+    };
+    int i;
+
+    if (!part || !*part)
+        return jp_bodypart_default(part_id);
+    if (jp_has_nonascii(part))
+        return part;
+
+    for (i = 0; i < (int) SIZE(jp_bodypart_map); ++i)
+        if (!strcmp(part, jp_bodypart_map[i].en))
+            return jp_bodypart_map[i].ja;
+
+    return jp_bodypart_default(part_id);
+}
+
+staticfn const char *
+jp_bodypart_pluralized(const char *jpname, int part)
+{
+    static char bufs[8][BUFSZ];
+    static int idx = 0;
+    char *buf;
+    boolean paired = FALSE;
+
+    if (!jpname || !*jpname)
+        jpname = jp_bodypart_default(part);
+
+    switch (part) {
+    case ARM:
+    case EYE:
+    case FINGER:
+    case FINGERTIP:
+    case FOOT:
+    case HAND:
+    case LEG:
+    case LUNG:
+    case TOE:
+        paired = TRUE;
+        break;
+    default:
+        paired = FALSE;
+        break;
+    }
+    if (!paired)
+        return jpname;
+
+    buf = bufs[idx++ % SIZE(bufs)];
+    Snprintf(buf, BUFSZ, "両%s", jpname);
+    return buf;
+}
+
+const char *
+jp_mbodypart(struct monst *mon, int part)
+{
+    return jp_translate_bodypart_name(mbodypart(mon, part), part);
+}
+
+const char *
+jp_body_part(int part)
+{
+    return jp_translate_bodypart_name(body_part(part), part);
+}
+
+const char *
+jp_mbodypart_plural(struct monst *mon, int part)
+{
+    return jp_bodypart_pluralized(jp_mbodypart(mon, part), part);
+}
+
+const char *
+jp_body_part_plural(int part)
+{
+    return jp_bodypart_pluralized(jp_body_part(part), part);
 }
 
 int

@@ -3075,7 +3075,7 @@ invocation_message(void)
         else if (Levitation || Flying)
             Strcpy(buf, "beneath you");
         else
-            Sprintf(buf, "under your %s", makeplural(body_part(FOOT)));
+            Sprintf(buf, "under your %s", jp_body_part_plural(FOOT));
 
         You_feel("奇妙な振動を%sに感じた.", buf);
         u.uevent.uvibrated = 1;

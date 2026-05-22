@@ -667,7 +667,7 @@ canletgo(struct obj *obj, const char *word)
         /* no weldmsg(), so uwep->bknown might become set silently
            if word is "" */
         if (*word) {
-            const char *hand = body_part(HAND);
+            const char *hand = jp_body_part(HAND);
 
             if (bimanual(uwep))
                 hand = makeplural(hand);
@@ -693,7 +693,7 @@ canletgo(struct obj *obj, const char *word)
     }
     if (obj->otyp == LEASH && obj->leashmon != 0) {
         if (*word)
-            pline_The("綱があなたの%sに結ばれている.", body_part(HAND));
+            pline_The("綱があなたの%sに結ばれている.", jp_body_part(HAND));
         return FALSE;
     }
     if (obj->owornmask & W_SADDLE) {
@@ -736,7 +736,7 @@ drop(struct obj *obj)
             /* doname can call s_suffix, reusing its buffer */
             if (digests(u.ustuck->data)) {
                 Sprintf(monbuf, "%s %s", s_suffix(mnam_p),
-                        mbodypart(u.ustuck, STOMACH));
+                        jp_mbodypart(u.ustuck, STOMACH));
                 mnam_p = monbuf;
             }
             onam_p = is_unpaid(obj) ? yobjnam(obj, (char *) 0) : doname(obj);
@@ -949,7 +949,7 @@ better_not_try_to_drop_that(struct obj *otmp)
         Snprintf(
             buf, sizeof buf,
             "Drop the %s corpse without %s protection on?",
-            obj_pmname(otmp), body_part(HAND));
+            obj_pmname(otmp), jp_body_part(HAND));
         return (paranoid_ynq(TRUE, buf, FALSE) != 'y');
     }
     return FALSE;
@@ -2366,7 +2366,7 @@ wipeoff(void)
         }
         return 0;
     } else if (!u.ucreamed) {
-        Your("%sはいまきれいになった.", body_part(FACE));
+        Your("%sはいまきれいになった.", jp_body_part(FACE));
         return 0;
     }
     return 1; /* still busy */
@@ -2379,14 +2379,14 @@ dowipe(void)
     if (u.ucreamed) {
         static NEARDATA char buf[39];
 
-        Sprintf(buf, "%sを拭いている", body_part(FACE));
+        Sprintf(buf, "%sを拭いている", jp_body_part(FACE));
         set_occupation(wipeoff, buf, 0);
         /* Not totally correct; what if they change back after now
          * but before they're finished wiping?
          */
         return ECMD_TIME;
     }
-    Your("%sはもうきれいになっていた.", body_part(FACE));
+    Your("%sはもうきれいになっていた.", jp_body_part(FACE));
     return ECMD_TIME;
 }
 
@@ -2399,7 +2399,7 @@ legs_in_no_shape(const char *for_what, /* jumping, kicking, riding */
         pline("%sは%sができる状態ではない.", l_monnam(u.usteed), for_what);
     } else {
         long wl = (EWounded_legs & BOTH_SIDES);
-        const char *bp = body_part(LEG);
+        const char *bp = jp_body_part(LEG);
 
         if (wl == BOTH_SIDES)
             bp = makeplural(bp);
@@ -2446,7 +2446,7 @@ heal_legs(
            before the final stages and that calls us (how==2) to cure
            wounded legs, but we want to suppress the feel better message */
         if (!u.usteed && how != 2) {
-            const char *legs = body_part(LEG);
+            const char *legs = jp_body_part(LEG);
 
             if ((EWounded_legs & BOTH_SIDES) == BOTH_SIDES)
                 legs = makeplural(legs);

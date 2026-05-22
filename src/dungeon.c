@@ -1559,7 +1559,7 @@ earth_sense(void)
 
     for (otmp = svl.level.buriedobjlist; otmp; otmp = otmp->nobj)
         if (u_at(otmp->ox, otmp->oy)) {
-            You("%sの下に何かを感じた。", makeplural(body_part(FOOT)));
+            You("%sの下に何かを感じた。", jp_body_part_plural(FOOT));
             return;
         }
 }

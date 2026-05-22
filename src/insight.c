@@ -1148,7 +1148,7 @@ status_enlightenment(int mode, int final)
            form of extrinsic impairment; HWounded_legs is used for timeout;
            both apply to steed instead of hero when mounted */
         long whichleg = (EWounded_legs & BOTH_SIDES);
-        const char *bp = u.usteed ? mbodypart(u.usteed, LEG) : body_part(LEG),
+        const char *bp = u.usteed ? jp_mbodypart(u.usteed, LEG) : jp_body_part(LEG),
             *article = "a ", /* precedes "wounded", so never "an " */
             *leftright = "";
 
@@ -3381,7 +3381,7 @@ mstatusline(struct monst *mtmp)
                some form of extrinsic impairment; HWounded_legs is used for
                timeout; both apply to steed instead of hero when mounted */
             long legs = (EWounded_legs & BOTH_SIDES);
-            const char *what = mbodypart(mtmp, LEG);
+            const char *what = jp_mbodypart(mtmp, LEG);
 
             if (legs == BOTH_SIDES)
                 what = makeplural(what);
@@ -3446,7 +3446,7 @@ ustatusline(void)
            form of extrinsic impairment; HWounded_legs is used for timeout;
            both apply to steed instead of hero when mounted */
         long legs = (EWounded_legs & BOTH_SIDES);
-        const char *what = body_part(LEG);
+        const char *what = jp_body_part(LEG);
 
         if (legs == BOTH_SIDES)
             what = makeplural(what);

@@ -2075,11 +2075,11 @@ doseduce(struct monst *mon)
             makeknown(RIN_ADORNMENT);
             if (!uright) {
                 pline("%sは%sをあなたの右%sにはめた.",
-                      Who, xname(ring), body_part(HAND));
+                      Who, xname(ring), jp_body_part(HAND));
                 setworn(ring, RIGHT_RING);
             } else if (!uleft) {
                 pline("%sは%sをあなたの左%sにはめた.",
-                      Who, xname(ring), body_part(HAND));
+                      Who, xname(ring), jp_body_part(HAND));
                 setworn(ring, LEFT_RING);
             } else if (uright && uright->otyp != RIN_ADORNMENT) {
                 /* note: the "replaces" message might be inaccurate if
@@ -2330,7 +2330,7 @@ mayberem(struct monst *mon,
         char hairbuf[BUFSZ];
 
         Sprintf(hairbuf, "あなたの%sに指を通させて",
-                body_part(HAIR));
+                jp_body_part(HAIR));
         SetVoice(mon, 0, 80, 0);
           verbalize("あなたの%sを脱いで。%s", str,
                         (obj == uarm)

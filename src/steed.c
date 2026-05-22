@@ -273,7 +273,7 @@ mount_steed(
         || !test_move(u.ux, u.uy, mtmp->mx - u.ux, mtmp->my - u.uy,
                       TEST_MOVE)) {
         if (Punished || !(u.uswallow || u.ustuck || u.utrap))
-            You("%sをうまく上げられない。", body_part(LEG));
+            You("%sをうまく上げられない。", jp_body_part(LEG));
         else
             You("今はここを抜けられない。");
         return (FALSE);

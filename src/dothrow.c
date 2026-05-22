@@ -142,7 +142,7 @@ throw_obj(struct obj *obj, int shotlimit)
             jp_corpse_xname(obj, (const char *) 0, CXN_PFX_THE),
             /* throwing with one hand, but pluralize since the
                expression "with your bare hands" sounds better */
-            makeplural(body_part(HAND)));
+            jp_body_part_plural(HAND));
         Sprintf(svk.killer.name, "throwing %s bare-handed",
                 killer_xname(obj));
         instapetrify(svk.killer.name);
@@ -303,7 +303,7 @@ ok_to_throw(int *shotlimit_p) /* (see dothrow()) */
         You("身体的に投擲も射撃もできない.");
         return FALSE;
     } else if (nohands(gy.youmonst.data)) {
-        You_cant("手がなければ投げることも撃つこともできなかった."); /* not body_part(HAND) */
+        You_cant("手がなければ投げることも撃つこともできなかった."); /* not jp_body_part(HAND) */
         return FALSE;
         /*[what about !freehand(), aside from cursed missile launcher?]*/
     }
@@ -1281,7 +1281,7 @@ toss_up(struct obj *obj, boolean hitsroof)
         action = "かすめ";
     }
     pline("%sは%sを%s、あなたの%sの上に落ちてきた.", Doname2(obj),
-          action, ceiling(u.ux, u.uy), body_part(HEAD));
+          action, ceiling(u.ux, u.uy), jp_body_part(HEAD));
 
     /* object now hits you */
 
@@ -1315,7 +1315,7 @@ toss_up(struct obj *obj, boolean hitsroof)
             /*FALLTHRU*/
         case CREAM_PIE:
         case BLINDING_VENOM:
-            pline("%sじゅうにべったり付いた!", body_part(FACE));
+            pline("%sじゅうにべったり付いた!", jp_body_part(FACE));
             if (blindinc) {
                 if (otyp == BLINDING_VENOM && !Blind)
                     pline("目がくらんだ!");
@@ -1642,7 +1642,7 @@ throwit(
                     pline("%sを装備していないため、%sを%sで投げた.",
                       an(skill_name(weapon_type(obj))),
                       weapon_descr(obj),
-                      body_part(HAND));
+                      jp_body_part(HAND));
             }
         }
 
@@ -1733,13 +1733,13 @@ throwit(
                                                                 : "%sが戻ってきて%sあなたの%sに落ちた.",
                                                             Blind ? Something : Doname2(obj),
                             Levitation ? "足元の下へ" : "ちょうど",
-                            makeplural(body_part(FOOT)));
+                            jp_body_part_plural(FOOT));
                     } else {
                         dmg += rnd(3);
                                                 pline(Blind ? "%sがあなたの%sに当たった!"
                                                                 : "%sが戻ってきてあなたの%sに当たった!",
                                                             Blind ? Something : Doname2(obj),
-                              body_part(ARM));
+                              jp_body_part(ARM));
                         if (obj->oartifact)
                             (void) artifact_hit((struct monst *) 0,
                                                 &gy.youmonst, obj, &dmg, 0);
@@ -2506,7 +2506,7 @@ breakobj(
                         /* [what about "familiar odor" when known?] */
                         You("奇妙な匂いを嗅いだ...");
                     } else {
-                        const char *eyes = body_part(EYE);
+                        const char *eyes = jp_body_part(EYE);
 
                         if (eyecount(gy.youmonst.data) != 1)
                             eyes = makeplural(eyes);
@@ -2681,7 +2681,7 @@ throw_gold(struct obj *obj)
         if (u.dz < 0 && !Is_airlevel(&u.uz) && !Underwater
             && !Is_waterlevel(&u.uz)) {
             pline_The("金貨は%sに当たり、あなたの%sの上へ落ちてきた.",
-                      ceiling(u.ux, u.uy), body_part(HEAD));
+                      ceiling(u.ux, u.uy), jp_body_part(HEAD));
             /* some self damage? */
             if (uarmh)
                 pline("幸運にも、%sを着けていた!",

@@ -77,11 +77,11 @@ stealgold(struct monst *mtmp)
         if (u.usteed) {
             who = u.usteed;
             whose = s_suffix(y_monnam(who));
-            what = makeplural(mbodypart(who, FOOT));
+            what = jp_mbodypart_plural(who, FOOT);
         } else {
             who = &gy.youmonst;
             whose = "your";
-            what = makeplural(body_part(FOOT));
+            what = jp_body_part_plural(FOOT);
         }
         /* [ avoid "between your rear regions" :-] */
         if (slithy(who->data))
@@ -314,7 +314,9 @@ worn_item_removal(
     }
     /* these ought to be guarded against matching user-supplied name */
     (void) strsubst(objbuf, " (being worn)", "");
+    (void) strsubst(objbuf, " (装備中)", "");
     (void) strsubst(objbuf, " (alternate weapon; not wielded)", "");
+    (void) strsubst(objbuf, " (予備武器; 未装備)", "");
     /* convert "ring (on left hand)" to "ring (from left hand)" */
     if ((p = strstri(objbuf, " (on "))
         && (!strncmp(p + 5, "left ", 5) || !strncmp(p + 5, "right ", 6)))
@@ -791,7 +793,7 @@ maybe_absorb_item(
                   Some_Monnam(mon), /* Monnam() or "Something" */
                   yname(obj), (obj->quan > 1L) ? "them" : "it");
         } else {
-            const char *hand_s = body_part(HAND);
+            const char *hand_s = jp_body_part(HAND);
 
             if (bimanual(obj))
                 hand_s = makeplural(hand_s);

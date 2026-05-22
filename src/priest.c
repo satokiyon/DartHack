@@ -509,7 +509,7 @@ intemple(int roomno)
             You_feel("誰かに見張られている気がした.");
             break;
         case 2:
-            pline("悪寒が%sを走り抜けた.", body_part(SPINE));
+            pline("悪寒が%sを走り抜けた.", jp_body_part(SPINE));
             break;
         default:
             break; /* no message; unfortunately there's no

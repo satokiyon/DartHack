@@ -114,8 +114,8 @@ mon_yells(struct monst *mon, const char *shout)
                 Amonnam(mon),
                 nolimbs(mon->data) ? "shakes" : "waves",
                 mhis(mon),
-                nolimbs(mon->data) ? mbodypart(mon, HEAD)
-                                   : makeplural(mbodypart(mon, ARM)));
+                nolimbs(mon->data) ? jp_mbodypart(mon, HEAD)
+                                   : jp_mbodypart_plural(mon, ARM));
     } else {
         if (canspotmon(mon)) {
             pline_mon(mon, "%sは叫んだ:", Amonnam(mon));

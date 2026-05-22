@@ -187,8 +187,8 @@ watchman_warn_fountain(struct monst *mtmp)
             pline("%sは必死に%sを振って訴えた!",
                   Amonnam(mtmp),
                   nolimbs(mtmp->data)
-                  ? mbodypart(mtmp, HEAD)
-                  : makeplural(mbodypart(mtmp, ARM)));
+                  ? jp_mbodypart(mtmp, HEAD)
+                  : jp_mbodypart_plural(mtmp, ARM));
         }
         return TRUE;
     }
@@ -491,7 +491,7 @@ dipfountain(struct obj *obj)
         dogushforth(FALSE);
         break;
     case 26: /* Strange feeling */
-        pline("%sに奇妙なしびれが走った.", body_part(ARM));
+        pline("%sに奇妙なしびれが走った.", jp_body_part(ARM));
         break;
     case 27: /* Strange feeling */
         You_feel("突然寒気がした.");
@@ -555,7 +555,7 @@ dipfountain(struct obj *obj)
 int
 wash_hands(void)
 {
-    const char *hands = makeplural(body_part(HAND));
+    const char *hands = jp_body_part_plural(HAND);
     int res = ER_NOTHING;
     boolean was_glib = !!Glib;
 
@@ -809,7 +809,7 @@ sink_backs_up(coordxy x, coordxy y)
     else if (!Deaf)
         Strcpy(buf, "ざぶりという音が聞こえた"); /* Deaf-aware */
     else
-        Sprintf(buf, "何かがあなたの%sに跳ねかかった", body_part(FACE));
+        Sprintf(buf, "何かがあなたの%sに跳ねかかった", jp_body_part(FACE));
     pline("%s%s.", !Deaf ? "ぼちゃん!  " : "", buf);
 
     if (!(levl[x][y].looted & S_LRING)) { /* once per sink */

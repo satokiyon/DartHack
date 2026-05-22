@@ -861,7 +861,7 @@ mon_wield_item(struct monst *mon)
         if (mw_tmp && mwelded(mw_tmp)) {
             if (canseemon(mon)) {
                 char welded_buf[BUFSZ];
-                const char *mon_hand = mbodypart(mon, HAND);
+                const char *mon_hand = jp_mbodypart(mon, HAND);
 
                 if (bimanual(mw_tmp))
                     mon_hand = makeplural(mon_hand);
@@ -905,7 +905,7 @@ mon_wield_item(struct monst *mon)
             newly_welded = mwelded(obj);
             obj->owornmask &= ~W_WEP;
             if (newly_welded) {
-                const char *mon_hand = mbodypart(mon, HAND);
+                const char *mon_hand = jp_mbodypart(mon, HAND);
 
                 if (bimanual(obj))
                     mon_hand = makeplural(mon_hand);
@@ -920,7 +920,7 @@ mon_wield_item(struct monst *mon)
             if (canseemon(mon))
                 pline("%s %s in %s %s!", Tobjnam(obj, "shine"),
                       arti_light_description(obj), s_suffix(mon_nam(mon)),
-                      mbodypart(mon, HAND));
+                      jp_mbodypart(mon, HAND));
             /* 3.6.3: artifact might be getting wielded by invisible monst */
             else if (cansee(mon->mx, mon->my))
                     pline("光が%sで輝き始めた.",
@@ -1820,7 +1820,7 @@ setmnotwielded(struct monst *mon, struct obj *obj)
         end_burn(obj, FALSE);
         if (canseemon(mon))
             pline("%s in %s %s %s shining.", The(xname(obj)),
-                  s_suffix(mon_nam(mon)), mbodypart(mon, HAND),
+                  s_suffix(mon_nam(mon)), jp_mbodypart(mon, HAND),
                   otense(obj, "stop"));
     }
     if (MON_WEP(mon) == obj)

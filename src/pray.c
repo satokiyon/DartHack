@@ -406,7 +406,7 @@ fix_worst_trouble(int trouble)
         FALLTHROUGH;
         /* FALLTHRU*/
     case TROUBLE_HUNGRY:
-        Your("%sは満たされた.", body_part(STOMACH));
+        Your("%sは満たされた.", jp_body_part(STOMACH));
         init_uhunger();
         disp.botl = TRUE;
         break;
@@ -554,7 +554,7 @@ fix_worst_trouble(int trouble)
         break;
     case TROUBLE_BLIND: { /* handles deafness as well as blindness */
         char msgbuf[BUFSZ];
-        const char *eyes = body_part(EYE);
+        const char *eyes = jp_body_part(EYE);
         boolean cure_deaf = (HDeaf & TIMEOUT) ? TRUE : FALSE;
 
         msgbuf[0] = '\0';
@@ -792,12 +792,12 @@ at_your_feet(const char *str)
     if (u.uswallow) {
         /* barrier between you and the floor */
         pline("%s %s into %s %s.", str, vtense(str, "drop"),
-              s_suffix(mon_nam(u.ustuck)), mbodypart(u.ustuck, STOMACH));
+              s_suffix(mon_nam(u.ustuck)), jp_mbodypart(u.ustuck, STOMACH));
     } else {
         pline("%s %s %s your %s!", str,
               vtense(str, Blind ? "land" : "appear"),
               Levitation ? "beneath" : "at",
-              makeplural(body_part(FOOT)));
+              jp_body_part_plural(FOOT));
     }
 }
 
@@ -2111,12 +2111,12 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
         if (u.uluck != orig_luck) {
             if (Blind)
                 You("%sが%sに触れた気がした.", something,
-                    body_part(FOOT));
+                    jp_body_part(FOOT));
             else
                 You(Hallucination
                 ? "see crabgrass at your %s.  A funny thing in a dungeon."
                         : "glimpse a four-leaf clover at your %s.",
-                    makeplural(body_part(FOOT)));
+                    jp_body_part_plural(FOOT));
         }
     }
 }

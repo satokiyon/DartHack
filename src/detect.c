@@ -407,7 +407,7 @@ gold_detect(struct obj *sobj)
     /* only under me - no separate display required */
     if (stale)
         docrt();
-    You("%sの間に金を見つけた.", makeplural(body_part(FOOT)));
+    You("%sの間に金を見つけた.", jp_body_part_plural(FOOT));
     return 0;
 
  outgoldmap:
@@ -516,13 +516,13 @@ food_detect(struct obj *sobj)
             You("近くに%sがないことを感じる.", what);
             if (sobj && sobj->blessed) {
                 if (!u.uedibility)
-                    Your("%sがむずむずし始めた.", body_part(NOSE));
+                    Your("%sがむずむずし始めた.", jp_body_part(NOSE));
                 u.uedibility = 1;
             }
         } else if (sobj) {
             char buf[BUFSZ];
 
-            Sprintf(buf, "%sがぴくぴくした%s.", body_part(NOSE),
+            Sprintf(buf, "%sがぴくぴくした%s.", jp_body_part(NOSE),
                     (sobj->blessed && !u.uedibility)
                         ? "後、むずむずし始めた"
                         : "");
@@ -542,7 +542,7 @@ food_detect(struct obj *sobj)
         You("近くに%sがあると%sた.", what, sobj ? "嗅ぎ取っ" : "感じ");
         if (sobj && sobj->blessed) {
             if (!u.uedibility)
-                Your("%sがむずむずし始めた.", body_part(NOSE));
+                Your("%sがむずむずし始めた.", jp_body_part(NOSE));
             u.uedibility = 1;
         }
     } else {
@@ -577,12 +577,12 @@ food_detect(struct obj *sobj)
         }
         if (sobj) {
             if (sobj->blessed) {
-                Your("%s%s、%sの匂いを嗅ぎ取った.", body_part(NOSE),
+                Your("%s%s、%sの匂いを嗅ぎ取った.", jp_body_part(NOSE),
                      u.uedibility ? "はむずむずし続け" : "がむずむずし始め",
                      what);
                 u.uedibility = 1;
             } else
-                Your("%sがむずむずし、%sの匂いを嗅ぎ取った.", body_part(NOSE),
+                Your("%sがむずむずし、%sの匂いを嗅ぎ取った.", jp_body_part(NOSE),
                      what);
         } else
             You("%sを感じ取った.", what);
@@ -1080,12 +1080,12 @@ trap_detect(
     if (!found) {
         char buf[BUFSZ];
 
-        Sprintf(buf, "%sのむずむずが止まった.", makeplural(body_part(TOE)));
+        Sprintf(buf, "%sのむずむずが止まった.", jp_body_part_plural(TOE));
         strange_feeling(sobj, buf);
         return 1;
     }
     /* traps exist, but only under me - no separate display required */
-    Your("%sがむずむずした.", makeplural(body_part(TOE)));
+    Your("%sがむずむずした.", jp_body_part_plural(TOE));
     return 0;
 }
 

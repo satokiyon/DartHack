@@ -286,7 +286,7 @@ make_blinded(long xtime, boolean talk)
             if (!haseyes(gy.youmonst.data) || PermaBlind) {
                 strange_feeling((struct obj *) 0, (char *) 0);
             } else if (Blindfolded) {
-                eyes = body_part(EYE);
+                eyes = jp_body_part(EYE);
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
                 Your("%sが一瞬かゆくなった.", eyes);
@@ -312,7 +312,7 @@ make_blinded(long xtime, boolean talk)
             if (!haseyes(gy.youmonst.data) || PermaBlind) {
                 strange_feeling((struct obj *) 0, (char *) 0);
             } else if (Blindfolded) {
-                eyes = body_part(EYE);
+                eyes = jp_body_part(EYE);
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
                 Your("%sが一瞬ぴくりと動いた.", eyes);
@@ -399,7 +399,7 @@ make_hallucinated(
             if (!haseyes(gy.youmonst.data)) {
                 strange_feeling((struct obj *) 0, (char *) 0);
             } else if (Blind) {
-                const char *eyes = body_part(EYE);
+                const char *eyes = jp_body_part(EYE);
 
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
@@ -887,7 +887,7 @@ peffect_paralysis(struct obj *otmp)
         else if (u.usteed)
             You("その場で凍りついた!");
         else
-            Your("%sは%sに貼りついて凍りついた!", makeplural(body_part(FOOT)),
+            Your("%sは%sに貼りついて凍りついた!", jp_body_part_plural(FOOT),
                  surface(u.ux, u.uy));
         nomul(-(rn1(10, 25 - 12 * bcsign(otmp))));
         gm.multi_reason = "frozen by a potion";
@@ -1198,7 +1198,7 @@ peffect_levitation(struct obj *otmp)
         } else if (has_ceiling(&u.uz)) {
             int dmg = rnd(!uarmh ? 10 : !hard_helmet(uarmh) ? 6 : 3);
 
-            You("%sを%sにぶつけた.", body_part(HEAD),
+            You("%sを%sにぶつけた.", jp_body_part(HEAD),
                 ceiling(u.ux, u.uy));
             losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling",
                    KILLED_BY);
@@ -1270,7 +1270,7 @@ peffect_oil(struct obj *otmp)
              * extra damage, but drinking potions in that form isn't
              * possible so there's no need to try to handle that.
              */
-            You("%sが焼けた.", body_part(FACE));
+            You("%sが焼けた.", jp_body_part(FACE));
             /* fire damage */
             vulnerable = !Fire_resistance || Cold_resistance;
             losehp(d(vulnerable ? 4 : 2, 4),
@@ -1634,7 +1634,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
         tx = u.ux, ty = u.uy;
         distance = 0;
         pline_The("%sがあなたの%sに当たり、砕け散った.", botlnam,
-              body_part(HEAD));
+              jp_body_part(HEAD));
         losehp(Maybe_Half_Phys(rnd(2)),
                (how == POTHIT_OTHER_THROW) ? "propelled potion" /* scatter */
                                            : "thrown potion",
@@ -1953,7 +1953,7 @@ potionbreathe(struct obj *obj)
             if (!breathless(gy.youmonst.data)) {
                 pline("Ulch!  That potion smells terrible!");
             } else if (haseyes(gy.youmonst.data)) {
-                const char *eyes = body_part(EYE);
+                const char *eyes = jp_body_part(EYE);
 
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
@@ -2296,7 +2296,7 @@ dodip(void)
      * getobj: "What do you want to dip <the object> into? [xyz or ?*] "
      */
     if (is_hands) {
-        Snprintf(obuf, sizeof obuf, "your %s", makeplural(body_part(HAND)));
+        Snprintf(obuf, sizeof obuf, "your %s", jp_body_part_plural(HAND));
     } else {
         Strcpy(obuf, short_oname(obj, doname, thesimpleoname,
                                  /* 128 - (24 + 54 + 1) leaves 49 for
@@ -2451,7 +2451,7 @@ potion_dip(struct obj *obj, struct obj *potion)
     }
     if (obj == &hands_obj) {
         You("%sは瓶の口に入らなかった!",
-            body_part(HAND));
+            jp_body_part(HAND));
         return ECMD_OK;
     }
 
@@ -2920,7 +2920,7 @@ speed_up(long duration)
    if (!Very_fast)
        You("突然%s速く動けるようになった.", Fast ? "" : "ずっと");
    else
-    Your("%sに新たな力がみなぎった.", makeplural(body_part(LEG)));
+    Your("%sに新たな力がみなぎった.", jp_body_part_plural(LEG));
 
    exercise(A_DEX, TRUE);
    incr_itimeout(&HFast, duration);

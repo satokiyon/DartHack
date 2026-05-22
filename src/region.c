@@ -1111,12 +1111,12 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
         if (m_poisongas_ok(&gy.youmonst) == M_POISONGAS_OK)
             return FALSE;
         if (!Blind) {
-            Your("%sが痛んだ.", makeplural(body_part(EYE)));
+            Your("%sが痛んだ.", jp_body_part_plural(EYE));
             make_blinded(1L, FALSE);
         }
         if (!Poison_resistance) {
             pline("%s is burning your %s!", Something,
-                  makeplural(body_part(LUNG)));
+                  jp_body_part_plural(LUNG));
             You("せき込み、血を吐いた!");
             wake_nearto(u.ux, u.uy, 2);
             dam = Maybe_Half_Phys(rnd(dam) + 5);
