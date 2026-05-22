@@ -158,7 +158,7 @@ throne_sit_effect(void)
                     Your("視界は澄んだ.");
                 } else {
                     int num_of_eyes = eyecount(gy.youmonst.data);
-                    const char *eye = body_part(EYE);
+                    const char *eye = jp_body_part(EYE);
 
                     /* note: 1 eye case won't actually happen--can't
                        sit on throne when poly'd into always-levitating
@@ -174,7 +174,7 @@ throne_sit_effect(void)
                         break;
                     case 0: /* no eyes */
                         You("%sに非常に奇妙な感覚を覚えた.",
-                            body_part(HEAD));
+                            jp_body_part(HEAD));
                         break;
                     }
                 }
@@ -468,7 +468,7 @@ dosit(void)
             exercise(A_WIS, FALSE); /* you're getting stuck longer */
             if (u.utraptype == TT_BEARTRAP) {
                 You_cant("熊の罠に%sが引っ掛かっているので座ることはできなかった。",
-                         body_part(FOOT));
+                         jp_body_part(FOOT));
                 u.utrap++;
             } else if (u.utraptype == TT_PIT) {
                 if (trap && trap->ttyp == SPIKED_PIT) {

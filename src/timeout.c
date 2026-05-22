@@ -299,7 +299,7 @@ choke_dialogue(void)
     if (i > 0 && i <= SIZE(choke_texts)) {
         if (Breathless || !rn2(50)) {
             urgent_pline(choke_texts2[SIZE(choke_texts2) - i],
-                         body_part(NECK));
+                         jp_body_part(NECK));
         } else {
             const char *str = choke_texts[SIZE(choke_texts) - i];
 
@@ -1248,7 +1248,7 @@ slip_or_trip(void)
             what = strcpy(buf, what);
             buf[0] = highc(buf[0]);
             pline("Egads!  %s bite%s your %s!", what,
-                  (!otmp || otmp->quan == 1L) ? "s" : "", body_part(FOOT));
+                  (!otmp || otmp->quan == 1L) ? "s" : "", jp_body_part(FOOT));
         } else {
             You("%sにつまずいた.", what);
         }
@@ -1301,7 +1301,7 @@ slip_or_trip(void)
             switch (rn2(4)) {
             case 1:
                 You("自分の%sにつまずいた.",
-                    Hallucination ? "elbow" : makeplural(body_part(FOOT)));
+                    Hallucination ? "elbow" : jp_body_part_plural(FOOT));
                 break;
             case 2:
                 You("%s.",
@@ -1322,7 +1322,7 @@ slip_or_trip(void)
             switch (rn2(4)) {
             case 1:
                 Your("%sが鐙から外れた.",
-                     makeplural(body_part(FOOT)));
+                     jp_body_part_plural(FOOT));
                 break;
             case 2:
                 You("手綱を手放した.");

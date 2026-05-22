@@ -349,7 +349,7 @@ do_oname(struct obj *obj)
         do {
             wipeout_text(bufp, rnd_on_display_rng(2), (unsigned) 0);
         } while (!strcmp(buf, bufcpy));
-        pline("刷り込んでいる間に%sが滑った。", body_part(HAND));
+        pline("刷り込んでいる間に%sが滑った。", jp_body_part(HAND));
         display_nhwindow(WIN_MESSAGE, FALSE);
         You("%sを刻んだ。", buf);
         /* violate illiteracy conduct since hero attempted to write

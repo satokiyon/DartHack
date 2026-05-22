@@ -398,9 +398,9 @@ dig(void)
                     dmg = 1;
                 else if (uarmf)
                     dmg = (dmg + 1) / 2;
-                You("自分の%sを叩いてしまった.", body_part(FOOT));
+                You("自分の%sを叩いてしまった.", jp_body_part(FOOT));
                 Sprintf(kbuf, "chopping off %s own %s", uhis(),
-                        body_part(FOOT));
+                        jp_body_part(FOOT));
                 losehp(Maybe_Half_Phys(dmg), kbuf, KILLED_BY);
             } else {
                 You("%sで熊罠を破壊した.",
@@ -1569,7 +1569,7 @@ zap_dig(void)
         if (!is_whirly(mtmp->data)) {
             if (digests(mtmp->data))
                 You("%sの%sの壁を突き破った!", s_suffix(mon_nam(mtmp)),
-                    mbodypart(mtmp, STOMACH));
+                    jp_mbodypart(mtmp, STOMACH));
             if (unique_corpstat(mtmp->data))
                 mtmp->mhp = (mtmp->mhp + 1) / 2;
             else
@@ -1590,7 +1590,7 @@ zap_dig(void)
                               ceiling(u.ux, u.uy));
                 }
                 You("%sの岩を緩めた.", ceiling(u.ux, u.uy));
-                pline("それが自分の%sに落ちてきた!", body_part(HEAD));
+                pline("それが自分の%sに落ちてきた!", jp_body_part(HEAD));
                 dmg = rnd(hard_helmet(uarmh) ? 2 : 6);
                 losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
                 otmp = mksobj_at(ROCK, u.ux, u.uy, FALSE, FALSE);

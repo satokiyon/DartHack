@@ -509,7 +509,7 @@ itemactions(struct obj *otmp)
                 Strcpy(buf, "Put this ring on");
             else
                 Sprintf(buf, "[both ring %s in use]",
-                        makeplural(body_part(FINGER)));
+                        jp_body_part_plural(FINGER));
         } else if (otmp->otyp == BLINDFOLD || otmp->otyp == TOWEL
                    || otmp->otyp == LENSES) {
             if (ublindf)
@@ -624,7 +624,7 @@ itemactions(struct obj *otmp)
                 /* only two-handed weapons and unicorn horns care about
                    pluralizing "hand" and they won't reach here, but plural
                    sounds better when poly'd into something with "claw" */
-                makeplural(body_part(HAND)));
+                jp_body_part_plural(HAND));
         ia_addmenu(win, IA_WIELD_OBJ, 'w', buf);
     }
 

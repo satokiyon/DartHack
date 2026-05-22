@@ -610,13 +610,13 @@ mcast_psi_bolt(int dmg)
         monstunseesu(M_SEEN_MAGR);
     }
     if (dmg <= 5)
-        You("%sが少し痛んだ.", body_part(HEAD));
+        You("%sが少し痛んだ.", jp_body_part(HEAD));
     else if (dmg <= 10)
         Your("脳が焼けつくように痛んだ!");
     else if (dmg <= 20)
-        Your("%sが突然激しく痛んだ!", body_part(HEAD));
+        Your("%sが突然激しく痛んだ!", jp_body_part(HEAD));
     else
-        Your("%sが突然ものすごく痛んだ!", body_part(HEAD));
+        Your("%sが突然ものすごく痛んだ!", jp_body_part(HEAD));
     return dmg;
 }
 
@@ -733,8 +733,8 @@ mcast_blind_you(void)
         int num_eyes = eyecount(gy.youmonst.data);
 
         pline("鱗があなたの%sを覆った!", (num_eyes == 1)
-                                      ? body_part(EYE)
-                                      : makeplural(body_part(EYE)));
+                                      ? jp_body_part(EYE)
+                                      : jp_body_part_plural(EYE));
         make_blinded(Half_spell_damage ? 100L : 200L, FALSE);
         if (!Blind)
             Your1(vision_clears);

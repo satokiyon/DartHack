@@ -3308,7 +3308,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
             int dmg;
             /* similar to zap_dig() */
             pline("岩が%sから崩れ、あなたの%sに落ちた",
-                  ceiling(x, y), body_part(HEAD));
+                  ceiling(x, y), jp_body_part(HEAD));
             dmg = rnd(hard_helmet(uarmh) ? 2 : 6);
             losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
             if ((otmp = mksobj_at(ROCK, x, y, FALSE, FALSE)) != 0) {
@@ -3355,7 +3355,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
             || (Is_qstart(&u.uz) && u.dz < 0)) {
             pline1(nothing_happens);
         } else if (u.dz < 0) { /* we should do more... */
-            pline("血があなたの%sに滴り落ちた.", body_part(FACE));
+            pline("血があなたの%sに滴り落ちた.", jp_body_part(FACE));
         } else if (u.dz > 0 && !OBJ_AT(u.ux, u.uy)) {
             /*
             Print this message only if there wasn't an engraving
@@ -3371,7 +3371,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
                 else
                     pline("%s血があなたの%sにたまった.",
                           is_lava(u.ux, u.uy) ? "沸騰した" : "流れた",
-                          makeplural(body_part(FOOT)));
+                          jp_body_part_plural(FOOT));
             }
         }
         break;
@@ -4891,8 +4891,8 @@ dobuzz(
                             pline("%sの体があなたの%sの前で再構成された!",
                                   s_suffix(Monnam(mon)),
                                   (eyecount(gy.youmonst.data) == 1)
-                                      ? body_part(EYE)
-                                      : makeplural(body_part(EYE)));
+                                      ? jp_body_part(EYE)
+                                      : jp_body_part_plural(EYE));
                             pline("%sは復活した!", l_monnam(mon));
                         }
                         mon->mhp = mon->mhpmax;
@@ -4982,7 +4982,7 @@ dobuzz(
             } else if (!Blind) {
                 pline("%sがすぐそばを通り過ぎた!", The(flash_str(fltyp, FALSE)));
             } else if (damgtype == ZT_LIGHTNING) {
-                Your("%sがしびれた.", body_part(ARM));
+                Your("%sがしびれた.", jp_body_part(ARM));
             }
             if (damgtype == ZT_LIGHTNING)
                 (void) flashburn((long) d(nd, 50), TRUE);

@@ -1018,7 +1018,7 @@ from_what(
                      && BlindedTimeout == (long) u.ucreamed
                      && !EBlinded && !(HBlinded & ~TIMEOUT))
                 Sprintf(buf, "due to goop covering your %s",
-                        body_part(FACE));
+                        jp_body_part(FACE));
 
             /* remove some verbosity and/or redundancy */
             if ((p = strstri(buf, " pair of ")) != 0)

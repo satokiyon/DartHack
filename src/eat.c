@@ -1814,7 +1814,7 @@ consume_tin(const char *mesg)
         if (Hallucination)
             You_feel("ちょっとトリップした気がした.");
         else
-            You_feel("ちょっと%s気がした.", body_part(LIGHT_HEADED));
+            You_feel("ちょっと%s気がした.", jp_body_part(LIGHT_HEADED));
         make_confused(HConfusion + d(2, 4), FALSE);
     } else if (!rn2(4) && !Blind) {
             pline("突然、すべてが暗くなった.");
@@ -1918,7 +1918,7 @@ consume_tin(const char *mesg)
         return 2;
     } else if (acidic(&mons[mnum]) && !Acid_resistance) {
         tp++;
-        You("ひどい胃酸過多に襲われた.");   /* not body_part() */
+        You("ひどい胃酸過多に襲われた.");   /* not jp_body_part() */
         losehp(rnd(15), !glob ? "acidic corpse" : "acidic glob",
                KILLED_BY_AN); /* acid damage */
     } else if (poisonous(&mons[mnum]) && rn2(5)) {
@@ -2110,7 +2110,7 @@ fprefx(struct obj *otmp)
         /* 700-1+800 remains below 1500, the choking threshold which
            triggers "you're having a hard time getting it down" feedback */
         else if (u.uhunger < 700)
-            pline("これであなたの%sは満たされた!", body_part(STOMACH));
+            pline("これであなたの%sは満たされた!", jp_body_part(STOMACH));
         /* [satiation message may be inaccurate if eating gets interrupted] */
         break;
     case TRIPE_RATION:
@@ -2817,7 +2817,7 @@ doeat(void)
         if (res) {
             Your(
                              "%sのむずむずはおさまり、嗅覚は元に戻った.",
-                 body_part(NOSE));
+                 jp_body_part(NOSE));
             u.uedibility = 0;
             if (res == 1)
                 return ECMD_OK;
@@ -3724,7 +3724,7 @@ vomit(void) /* A good idea from David Neves */
 
     if (cantvomit(gy.youmonst.data)) {
         /* doesn't cure food poisoning; message assumes that we aren't
-           dealing with some esoteric body_part() */
+           dealing with some esoteric jp_body_part() */
         Your("あごが痙攣して開いた.");
     } else {
         if (Sick && (u.usick_type & SICK_VOMITABLE) != 0)
@@ -3733,7 +3733,7 @@ vomit(void) /* A good idea from David Neves */
            vomiting_dialog() gives a vomit message when its countdown
            reaches 0, but only if u.uhs < FAINTING (and !cantvomit()) */
         if (u.uhs >= FAINTING)
-            Your("%sが激しく痙攣した!", body_part(STOMACH));
+            Your("%sが激しく痙攣した!", jp_body_part(STOMACH));
         else
             spewed = TRUE;
     }

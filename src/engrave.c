@@ -1,4 +1,4 @@
-﻿/* NetHack 5.0	engrave.c	$NHDT-Date: 1737345573 2025/01/19 19:59:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
+/* NetHack 5.0	engrave.c	$NHDT-Date: 1737345573 2025/01/19 19:59:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -983,7 +983,7 @@ doengrave(void)
     }
 
     if (de->otmp == &hands_obj) {
-        Strcat(strcpy(de->fbuf, "あなたの"), body_part(FINGERTIP));
+        Strcat(strcpy(de->fbuf, "あなたの"), jp_body_part(FINGERTIP));
         de->writer = de->fbuf;
     } else {
         de->writer = yname(de->otmp);
@@ -993,7 +993,7 @@ doengrave(void)
      * while both your hands are tied up.
      */
     if (!freehand() && de->otmp != uwep && !de->otmp->owornmask) {
-        You("文字を書くための空いた%sがなかった!", body_part(HAND));
+        You("文字を書くための空いた%sがなかった!", jp_body_part(HAND));
         goto doengr_exit;
     }
 
@@ -1183,7 +1183,7 @@ doengrave(void)
             doname(de->otmp), de->everb);
     else
         You("%sを自分の%sで%sた.",
-            de->eloc, body_part(FINGERTIP), de->everb);
+            de->eloc, jp_body_part(FINGERTIP), de->everb);
 
     /* Prompt for engraving! */
     Sprintf(de->qbuf, "ここで%sに何を%sたい?", de->eloc, de->everb);

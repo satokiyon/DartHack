@@ -1770,16 +1770,16 @@ getobj_hands_txt(const char *action, char *qbuf)
     if (!strcmp(action, "grease")) {
         Sprintf(qbuf, "your %s", fingers_or_gloves(FALSE));
     } else if (!strcmp(action, "write with")) {
-        Sprintf(qbuf, "your %s", body_part(FINGERTIP));
+        Sprintf(qbuf, "your %s", jp_body_part(FINGERTIP));
     } else if (!strcmp(action, "wield")) {
         Sprintf(qbuf, "your %s %s%s", uarmg ? "gloved" : "bare",
-                makeplural(body_part(HAND)),
+                jp_body_part_plural(HAND),
                 !uwep ? " (wielded)" : "");
     } else if (!strcmp(action, "ready")) {
         Sprintf(qbuf, "empty quiver%s",
                 !uquiver ? " (nothing readied)" : "");
     } else {
-        Sprintf(qbuf, "your %s", makeplural(body_part(HAND)));
+        Sprintf(qbuf, "your %s", jp_body_part_plural(HAND));
     }
     return qbuf;
 }
@@ -3374,7 +3374,7 @@ display_pickinv(
                 char barehands[QBUFSZ];
 
                 /* like doname() below, makeplural() returns an obuf[] */
-                formattedobj = makeplural(body_part(HAND));
+                formattedobj = jp_body_part_plural(HAND);
                 Sprintf(barehands, "%s %s (武器なし)",
                     uarmg ? "手袋付きの" : "素手の", formattedobj);
                 add_menu(win, &nul_glyphinfo, &any, ilet, 0,
@@ -4202,7 +4202,7 @@ look_here(
          *  so is unreachable from in here...").
          */
         Sprintf(fbuf, "%sの%s", s_suffix(mon_nam(mtmp)),
-            mbodypart(mtmp, STOMACH));
+            jp_mbodypart(mtmp, STOMACH));
         You("%sに何があるのか%s.", fbuf,
             Blind ? "確かめようとした" : "見回した");
         otmp = mtmp->minvent;
@@ -4408,10 +4408,10 @@ feel_cockatrice(struct obj *otmp, boolean force_touch)
 
         if (poly_when_stoned(gy.youmonst.data))
             You("素手の%sで%sに触れた.",
-                makeplural(body_part(HAND)), kbuf);
+                jp_body_part_plural(HAND), kbuf);
         else
             pline("%sに触れることは致命的な誤りだ...", kbuf);
-        /* normalize body shape here; hand, not body_part(HAND) */
+        /* normalize body shape here; hand, not jp_body_part(HAND) */
         Sprintf(kbuf, "touching %s bare-handed", killer_xname(otmp));
         /* will call polymon() for the poly_when_stoned() case */
         instapetrify(kbuf);

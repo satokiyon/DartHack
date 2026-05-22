@@ -924,7 +924,7 @@ wiz_smell(void)
         /* Is it a monster? */
         if (mptr) {
             if (is_you)
-                You("こっそり%sの下を嗅いだ.", body_part(ARM));
+                You("こっそり%sの下を嗅いだ.", jp_body_part(ARM));
             if (!usmellmon(mptr))
                 pline("%s to not give off any smell.",
                       is_you ? "You seem" : "That monster seems");

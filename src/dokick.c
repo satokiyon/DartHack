@@ -544,11 +544,11 @@ really_kick_object(coordxy x, coordxy y)
         && !Stone_resistance) {
         You("%sを素足の%sで蹴った.",
             jp_corpse_xname(gk.kickedobj, (const char *) 0, CXN_PFX_THE),
-            makeplural(body_part(FOOT)));
+            jp_body_part_plural(FOOT));
         if (poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM)) {
             ; /* hero has been transformed but kick continues */
         } else {
-            /* normalize body shape here; foot, not body_part(FOOT) */
+            /* normalize body shape here; foot, not jp_body_part(FOOT) */
             Sprintf(svk.killer.name, "kicking %s barefoot",
                     killer_xname(gk.kickedobj));
             instapetrify(svk.killer.name);
@@ -1297,7 +1297,7 @@ dokick(void)
             break;
         case TT_WEB:
         case TT_BEARTRAP:
-            You_cant("%sを動かせなかった!", body_part(LEG));
+            You_cant("%sを動かせなかった!", jp_body_part(LEG));
             break;
         default:
             break;
@@ -1331,7 +1331,7 @@ dokick(void)
     if (u.uswallow) {
         switch (rn2(3)) {
         case 0:
-            You_cant("%sを動かせなかった!", body_part(LEG));
+            You_cant("%sを動かせなかった!", jp_body_part(LEG));
             break;
         case 1:
             if (digests(u.ustuck->data)) {

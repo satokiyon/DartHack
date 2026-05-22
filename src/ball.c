@@ -53,7 +53,7 @@ ballfall(void)
     if (gets_hit) {
         int dmg = rn1(7, 25);
 
-        pline_The("鉄球があなたの%sに落ちてきた.", body_part(HEAD));
+        pline_The("鉄球があなたの%sに落ちてきた.", jp_body_part(HEAD));
         if (uarmh) {
             if (hard_helmet(uarmh)) {
                 pline("幸運にも、頑丈なかぶとを身に着けていた.");
@@ -915,7 +915,7 @@ drop_ball(coordxy x, coordxy y)
                 if (!u.usteed) {
                     Your("%sの%sにひどい傷を負った.",
                          (side == LEFT_SIDE) ? "左" : "右",
-                         body_part(LEG));
+                         jp_body_part(LEG));
                     losehp(Maybe_Half_Phys(2),
                            "クマ罠から引きずり出されて脚を負傷した",
                            KILLED_BY);

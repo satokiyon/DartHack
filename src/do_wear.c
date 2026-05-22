@@ -61,7 +61,7 @@ fingers_or_gloves(boolean check_gloves)
 {
     return ((check_gloves && uarmg)
             ? gloves_simple_name(uarmg) /* "gloves" or "gauntlets" */
-            : makeplural(body_part(FINGER))); /* "fingers" */
+            : jp_body_part_plural(FINGER)); /* "fingers" */
 }
 
 void
@@ -92,7 +92,7 @@ on_msg(struct obj *otmp)
 
         how[0] = '\0';
         if (otmp->otyp == TOWEL)
-            Sprintf(how, " around your %s", body_part(HEAD));
+            Sprintf(how, " around your %s", jp_body_part(HEAD));
         You("%s%sを着ている.",
             obj_is_pname(otmp) ? the(otmp_name) : an(otmp_name), how);
     }
@@ -1142,7 +1142,7 @@ Amulet_off(void)
             Strangled = 0L;
             disp.botl = TRUE;
             if (Breathless)
-                Your("%sを絞められていない.", body_part(NECK));
+                Your("%sを絞められていない.", jp_body_part(NECK));
             else
                 You("息がずっと楽になった!");
             mkn = TRUE;
@@ -2106,12 +2106,12 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
             err++;
         } else if (Upolyd && slithy(gy.youmonst.data)) {
             if (noisy)
-                You("足がない..."); /* not body_part(FOOT) */
+                You("足がない..."); /* not jp_body_part(FOOT) */
             err++;
         } else if (Upolyd && gy.youmonst.data->mlet == S_CENTAUR) {
             /* break_armor() pushes boots off for centaurs, so don't let
                dowear() put them back on;
-               makeplural(body_part(FOOT)) would yield "rear hooves" here,
+               jp_body_part_plural(FOOT) would yield "rear hooves" here,
                which sounds odd, so use hard-coded "hooves" */
             if (noisy)
                 You("ひづめが多すぎて%sを履けない.", c_boots);
@@ -2122,15 +2122,15 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
                        || u.utraptype == TT_BURIEDBALL)) {
             if (u.utraptype == TT_BEARTRAP) {
                 if (noisy)
-                    Your("%sが引っかかっている.", body_part(FOOT));
+                    Your("%sが引っかかっている.", jp_body_part(FOOT));
             } else if (u.utraptype == TT_INFLOOR || u.utraptype == TT_LAVA) {
                 if (noisy)
                     Your("%sが%sに引っかかっている!",
-                         makeplural(body_part(FOOT)), surface(u.ux, u.uy));
+                         jp_body_part_plural(FOOT), surface(u.ux, u.uy));
             } else { /*TT_BURIEDBALL*/
                 if (noisy)
                     Your("%sは埋まった鉄球につながれている!",
-                         body_part(LEG));
+                         jp_body_part(LEG));
             }
             err++;
         } else
@@ -2269,7 +2269,7 @@ accessory_or_armor_on(struct obj *obj)
                 do {
                         Sprintf(qbuf, "どちらの%s%sにはめますか?（右手/左手）",
                             humanoid(gy.youmonst.data) ? "指輪用の" : "",
-                            body_part(FINGER));
+                            jp_body_part(FINGER));
                     answer = yn_function(qbuf, rightleftchars, '\0', TRUE);
                     switch (answer) {
                     case '\0':
@@ -2304,7 +2304,7 @@ accessory_or_armor_on(struct obj *obj)
                 if (((mask == RIGHT_RING && URIGHTY)
                      || (mask == LEFT_RING  && ULEFTY)
                      || bimanual(uwep)) && welded(uwep)) {
-                    const char *hand = body_part(HAND);
+                    const char *hand = jp_body_part(HAND);
 
                     /* welded will set bknown */
                     if (bimanual(uwep))
@@ -2329,7 +2329,7 @@ accessory_or_armor_on(struct obj *obj)
             if (ublindf) {
                 if (ublindf->otyp == TOWEL)
                     Your("%sはもうタオルで覆っている.",
-                         body_part(FACE));
+                         jp_body_part(FACE));
                 else if (ublindf->otyp == BLINDFOLD) {
                     if (obj->otyp == LENSES)
                         already_wearing2("レンズ", "目隠し");
@@ -2547,7 +2547,7 @@ glibr(void)
         /* changed so cursed rings don't fall off, GAN 10/30/86 */
         Your("指輪が%sから滑り落ちた.",
              (leftfall && rightfall) ? fingers_or_gloves(FALSE)
-                                     : body_part(FINGER));
+                                     : jp_body_part(FINGER));
         xfl++;
         if (leftfall) {
             otmp = uleft;
@@ -2573,7 +2573,7 @@ glibr(void)
         otherwep = is_sword(otmp) ? c_sword : weapon_descr(otmp);
         if (otmp->quan > 1L)
             otherwep = makeplural(otherwep);
-        hand = body_part(HAND);
+        hand = jp_body_part(HAND);
         which = URIGHTY ? "左" : "右";  /* text for the off hand */
            Your("%sが%s%s%sから滑り落ちた.", otherwep, xfl ? "さらに" : "", which,
                hand);
@@ -2603,7 +2603,7 @@ glibr(void)
             else
                 thiswep = makeplural(thiswep);
         }
-        hand = body_part(HAND);
+        hand = jp_body_part(HAND);
         which = "";
         if (bimanual(otmp)) {
             hand = makeplural(hand);
@@ -2710,7 +2710,7 @@ select_off(struct obj *otmp)
         glibdummy = cg.zeroobj;
         why = 0; /* the item which prevents ring removal */
         if (welded(uwep) && ((otmp == RING_ON_PRIMARY) || bimanual(uwep))) {
-                Sprintf(buf, "武器を持つ%sを空ける", body_part(HAND));
+                Sprintf(buf, "武器を持つ%sを空ける", jp_body_part(HAND));
             why = uwep;
         } else if (uarmg && (uarmg->cursed || Glib)) {
                 Sprintf(buf, "%s%sを脱ぐ",
@@ -2743,11 +2743,11 @@ select_off(struct obj *otmp)
     if (otmp == uarmf) {
         if (u.utrap && u.utraptype == TT_BEARTRAP) {
             pline_The("トラばさみが%sを引き抜くのを妨げた.",
-                      body_part(FOOT));
+                      jp_body_part(FOOT));
             return 0;
         } else if (u.utrap && u.utraptype == TT_INFLOOR) {
             You("%sに足を取られていて、%sを引き抜けない.",
-                surface(u.ux, u.uy), makeplural(body_part(FOOT)));
+                surface(u.ux, u.uy), jp_body_part_plural(FOOT));
             return 0;
         }
     }

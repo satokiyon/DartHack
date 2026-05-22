@@ -1410,7 +1410,7 @@ seffect_confuse_monster(struct obj **sobjp)
             scursed = sobj->cursed,
             confused = (Confusion != 0),
             altfeedback = (Blind || Invisible);
-    const char *const hands = makeplural(body_part(HAND));
+    const char *const hands = jp_body_part_plural(HAND);
 
     if (gy.youmonst.data->mlet != S_HUMAN || scursed) {
         if (!HConfusion)
@@ -1426,10 +1426,10 @@ seffect_confuse_monster(struct obj **sobjp)
         } else {
             if (altfeedback)
                 pline("あなたの%sの周囲にかすかなざわめきが広がった.",
-                      body_part(HEAD));
+                      jp_body_part(HEAD));
             else
                 pline("あなたの%sの周囲に%s色の輝きが広がった.",
-                      body_part(HEAD), hcolor(NH_RED));
+                      jp_body_part(HEAD), hcolor(NH_RED));
             make_confused(0L, TRUE);
         }
     } else {
@@ -1609,7 +1609,7 @@ seffect_remove_curse(struct obj **sobjp)
         unpunish();
     if (u.utrap && u.utraptype == TT_BURIEDBALL) {
         buried_ball_to_freedom();
-        pline_The("%sの留め具が消えた.", body_part(LEG));
+        pline_The("%sの留め具が消えた.", jp_body_part(LEG));
     }
     update_inventory();
 }
@@ -1882,14 +1882,14 @@ seffect_fire(struct obj **sobjp)
             monstseesu(M_SEEN_FIRE);
             if (!Blind)
                 pline("おや、あなたの%sにきれいな炎が見える.",
-                      makeplural(body_part(HAND)));
+                      jp_body_part_plural(HAND));
             else
                 You_feel("%sに心地よいぬくもりを感じた.",
-                         makeplural(body_part(HAND)));
+                         jp_body_part_plural(HAND));
         } else {
             monstunseesu(M_SEEN_FIRE);
             pline_The("巻物は燃え上がり、あなたの%sが焼けた.",
-                      makeplural(body_part(HAND)));
+                      jp_body_part_plural(HAND));
             losehp(1, "scroll of fire", KILLED_BY_AN);
         }
         return;
@@ -2122,7 +2122,7 @@ seffect_magic_mapping(struct obj **sobjp)
             if (Hallucination)
                     pline("おお! 現代芸術だ.");
             else
-                Your("%sが混乱でぐるぐる回った.", body_part(HEAD));
+                Your("%sが混乱でぐるぐる回った.", jp_body_part(HEAD));
             make_confused(HConfusion + rnd(30), FALSE);
             return;
         }
@@ -2142,7 +2142,7 @@ seffect_magic_mapping(struct obj **sobjp)
     }
 
     if (svl.level.flags.nommap) {
-        Your("%sが回転し、%sに呪文を阻まれた!", body_part(HEAD),
+        Your("%sが回転し、%sに呪文を阻まれた!", jp_body_part(HEAD),
              something);
         make_confused(HConfusion + rnd(30), FALSE);
         return;
@@ -2370,8 +2370,8 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
                 map_invisible(mtmp->mx, mtmp->my);
         } else if (engulfing_u(mtmp))
             You_hear("何かが%sの%s越しにあなたの%sへぶつかる音が聞こえる!",
-                     s_suffix(mon_nam(mtmp)), mbodypart(mtmp, STOMACH),
-                     body_part(HEAD));
+                     s_suffix(mon_nam(mtmp)), jp_mbodypart(mtmp, STOMACH),
+                     jp_body_part(HEAD));
 
         mdmg = dmgval(otmp2, mtmp) * otmp2->quan;
         if (helmet) {
@@ -2562,7 +2562,7 @@ litroom(
                 ; /* no feedback */
             else if (digests(u.ustuck->data))
                 pline("%s %s is lit.", s_suffix(Monnam(u.ustuck)),
-                      mbodypart(u.ustuck, STOMACH));
+                      jp_mbodypart(u.ustuck, STOMACH));
             else if (is_whirly(u.ustuck->data))
                 pline("%sは一瞬だけ輝いた.", l_monnam(u.ustuck));
             else

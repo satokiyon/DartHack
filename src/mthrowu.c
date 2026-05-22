@@ -764,9 +764,9 @@ m_throw(
                         pline("うわっ!  パイまみれになった.");
                     else
                         pline("%sがあなたの%s一面にべったり付いている.",
-                              something, body_part(FACE));
+                              something, jp_body_part(FACE));
                 } else if (singleobj->otyp == BLINDING_VENOM) {
-                    const char *eyes = body_part(EYE);
+                    const char *eyes = jp_body_part(EYE);
 
                     if (eyecount(gy.youmonst.data) != 1)
                         eyes = makeplural(eyes);
@@ -885,7 +885,7 @@ return_from_mtoss(
 
             if (!do_not_annoy || (svm.moves - do_not_annoy) > 500L) {
                 pline("%s to %s %s!", Tobjnam(otmp, "return"),
-                      s_suffix(mon_nam(magr)), mbodypart(magr, HAND));
+                      s_suffix(mon_nam(magr)), jp_mbodypart(magr, HAND));
                 do_not_annoy = svm.moves;
             }
             if (otmp) {
@@ -906,7 +906,7 @@ return_from_mtoss(
                     pline("%s back to %s, landing %s %s %s.",
                           Tobjnam(otmp, "return"), mon_nam(magr),
                           mlevitating ? "beneath" : "at", mhis(magr),
-                          makeplural(mbodypart(magr, FOOT)));
+                          jp_mbodypart_plural(magr, FOOT));
                 } else if (!Deaf) {
                     You_hear("%sが%sの近くに落ちる音が聞こえた.",
                              Something, mon_nam(magr));
@@ -916,7 +916,7 @@ return_from_mtoss(
                 if (canseemon(magr)) {
                     pline("%s back toward %s, hitting %s %s!",
                           Tobjnam(otmp, "fly"), mon_nam(magr),
-                          mhis(magr), body_part(ARM));
+                          mhis(magr), jp_body_part(ARM));
                 } else if (!Deaf) {
                     You_hear("%sが%sに鈍い音を立てて当たったのが聞こえた!",
                              something, mon_nam(magr));

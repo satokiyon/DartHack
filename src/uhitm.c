@@ -544,7 +544,7 @@ do_attack(struct monst *mtmp)
                 You("モンスターを%s始めた(%s %sで).",
                     Role_if(PM_MONK) ? "殴打し" : "打ち据え",
                     uarmg ? "手袋をした" : "素手の", /* Del Lamb */
-                    makeplural(body_part(HAND)));
+                    jp_body_part_plural(HAND));
         }
     }
     exercise(A_STR, TRUE); /* you're exercising muscles */
@@ -1280,7 +1280,7 @@ hmon_hitmon_misc_obj(
                 if (haseyes(hmd->mdat)
                     && hmd->mdat != &mons[PM_FLOATING_EYE])
                     whom = strcat(strcat(s_suffix(whom), " "),
-                                  mbodypart(mon, FACE));
+                                  jp_mbodypart(mon, FACE));
                 pline("%sを%sにぶちまけた!", what, whom);
             }
             setmangry(mon, TRUE);
@@ -3224,7 +3224,7 @@ mhitm_ad_drin(
             return;
 
         if (uarmh && rn2(8)) {
-            /* not body_part(HEAD) */
+            /* not jp_body_part(HEAD) */
             Your("%sが頭への攻撃を防いだ.",
                  helm_simple_name(uarmh));
             return;
@@ -3359,7 +3359,7 @@ mhitm_ad_wrap(
                         You("%sに触れた.", l_monnam(mdef));
                     else
                         You("%s%sに触れた.", s_suffix(mon_nam(mdef)),
-                            tailmiss ? "尾" : mbodypart(mdef, LEG));
+                            tailmiss ? "尾" : jp_mbodypart(mdef, LEG));
                 }
             }
         } else
@@ -3401,7 +3401,7 @@ mhitm_ad_wrap(
                                   Monnam(magr));
                     else
                         pline_mon(magr, "%sがあなたの%sに触れた.",
-                                  Monnam(magr), body_part(LEG));
+                                  Monnam(magr), jp_body_part(LEG));
                 }
             }
         } else
@@ -4431,7 +4431,7 @@ mhitm_ad_legs(
         /* mhitu */
         long side = rn2(2) ? RIGHT_SIDE : LEFT_SIDE;
         const char *sidestr = (side == RIGHT_SIDE) ? "right" : "left",
-                   *Monst_name = Monnam(magr), *leg = body_part(LEG);
+                   *Monst_name = Monnam(magr), *leg = jp_body_part(LEG);
 
         /* This case is too obvious to ignore, but Nethack is not in
          * general very good at considering height--most short monsters
@@ -5055,7 +5055,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                 xkilled(mdef, XKILL_GIVEMSG | XKILL_NOCORPSE);
                 if (!DEADMONSTER(mdef)) { /* monster lifesaved */
                     You("%sで焼けつくそれを慌てて吐き戻した.",
-                        body_part(STOMACH));
+                        jp_body_part(STOMACH));
                 } else {
                     tmp = 1 + (pd->cwt >> 8);
                     if (corpse_chance(mdef, &gy.youmonst, TRUE)
@@ -5614,7 +5614,7 @@ hmonas(struct monst *mon)
                                                 &silverhit);
                     break;
                 case AT_BUTT:
-                    verb = "head butt"; /* mbodypart(mon,HEAD)=="head" */
+                    verb = "head butt"; /* jp_mbodypart(mon,HEAD)=="head" */
                     /* hypothetical; if any form with a head-butt attack
                        could wear a helmet, it would hit shades when
                        wearing a blessed (or silver) one */
@@ -6310,7 +6310,7 @@ nohandglow(struct monst *mon)
     if (!u.umconf || mon->mconf)
         return;
 
-    hands = makeplural(body_part(HAND));
+    hands = jp_body_part_plural(HAND);
     altfeedback = (Blind || Invisible); /* Invisible == Invis && !See_invis */
     if (u.umconf == 1) {
         if (altfeedback)

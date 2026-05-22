@@ -250,7 +250,7 @@ deadbook(struct obj *book2)
         }
 
         if (!u.uhave.bell || !u.uhave.menorah) {
-            pline("悪寒が%sを走り抜けた.", body_part(SPINE));
+            pline("悪寒が%sを走り抜けた.", jp_body_part(SPINE));
             if (!u.uhave.bell) {
                 Soundeffect(se_faint_chime, 30);
                 You_hear("かすかな鐘の音が聞こえる...");
@@ -481,7 +481,7 @@ study_book(struct obj *spellbook)
             dullbook -= rnd(objects[booktype].oc_level);
 
         if (dullbook > 0) {
-            eyes = body_part(EYE);
+            eyes = jp_body_part(EYE);
             if (eyecount(gy.youmonst.data) > 1)
                 eyes = makeplural(eyes);
             pline("この本はあまりに退屈で、%sを開けていられない。",
@@ -1575,7 +1575,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
             do_vicinity_map(pseudo);
         /* at present, only one thing blocks clairvoyance */
         } else if (uarmh && uarmh->otyp == CORNUTHAUM)
-            You("%sの上にとがった帽子を感じる.", body_part(HEAD));
+            You("%sの上にとがった帽子を感じる.", jp_body_part(HEAD));
         break;
     case SPE_PROTECTION:
         cast_protection();

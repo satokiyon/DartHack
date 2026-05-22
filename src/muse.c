@@ -2564,7 +2564,7 @@ use_misc(struct monst *mtmp)
                 break; /* shouldn't happen after find_misc() */
 
             Strcpy(the_weapon, the(xname(obj)));
-            hand = body_part(HAND);
+            hand = jp_body_part(HAND);
             if (bimanual(obj))
                 hand = makeplural(hand);
             (void) strncpy(hand_buf, hand, sizeof hand_buf - 1);

@@ -95,7 +95,7 @@ use_camera(struct obj *obj)
         (void) zapyourself(obj, TRUE);
     } else if (u.uswallow) {
         You("%sの%sを撮影した.", s_suffix(mon_nam(u.ustuck)),
-            mbodypart(u.ustuck, STOMACH));
+            jp_mbodypart(u.ustuck, STOMACH));
     } else if (u.dz) {
         You("%sを撮影した.",
             (u.dz > 0) ? surface(u.ux, u.uy) : ceiling(u.ux, u.uy));
@@ -114,7 +114,7 @@ use_towel(struct obj *obj)
     boolean drying_feedback = (obj == uwep);
 
     if (!freehand()) {
-        You("自由な%sがなかった!", body_part(HAND));
+        You("自由な%sがなかった!", jp_body_part(HAND));
         return ECMD_OK;
     } else if (obj == ublindf) {
         You("身に着けたままでは使えなかった!");
@@ -126,7 +126,7 @@ use_towel(struct obj *obj)
         case 2:
             old = (Glib & TIMEOUT);
             make_glib((int) old + rn1(10, 3)); /* + 3..12 */
-            Your("%sが%s!", makeplural(body_part(HAND)),
+            Your("%sが%s!", jp_body_part_plural(HAND),
                  (old ? "さらに汚れた" : "ぬるぬるになった"));
             if (is_wet_towel(obj))
                 dry_a_towel(obj, -1, drying_feedback);
@@ -135,7 +135,7 @@ use_towel(struct obj *obj)
             if (!ublindf) {
                 old = u.ucreamed;
                 u.ucreamed += rn1(10, 3);
-                pline("うげっ!  %sが%sべたついてしまった!", body_part(FACE),
+                pline("うげっ!  %sが%sべたついてしまった!", jp_body_part(FACE),
                       (old ? "さらに" : ""));
                 make_blinded(BlindedTimeout + (long) u.ucreamed - old, TRUE);
             } else {
@@ -166,7 +166,7 @@ use_towel(struct obj *obj)
     if (Glib) {
         make_glib(0);
         You("%sを拭った.",
-            !uarmg ? makeplural(body_part(HAND)) : gloves_simple_name(uarmg));
+            !uarmg ? jp_body_part_plural(HAND) : gloves_simple_name(uarmg));
         if (is_wet_towel(obj))
             dry_a_towel(obj, -1, drying_feedback);
         return ECMD_TIME;
@@ -180,15 +180,15 @@ use_towel(struct obj *obj)
                 make_blinded(0L, TRUE);
             }
         } else {
-            Your("%sはいまきれいになった.", body_part(FACE));
+            Your("%sはいまきれいになった.", jp_body_part(FACE));
         }
         if (is_wet_towel(obj))
             dry_a_towel(obj, -1, drying_feedback);
         return ECMD_TIME;
     }
 
-    Your("%sと%sはすでにきれいだった.", body_part(FACE),
-         makeplural(body_part(HAND)));
+    Your("%sと%sはすでにきれいだった.", jp_body_part(FACE),
+         jp_body_part_plural(HAND));
 
     return ECMD_OK;
 }
@@ -327,13 +327,13 @@ use_stethoscope(struct obj *obj)
                             && !rn2(Role_if(PM_HEALER) ? 10 : 3));
 
     if (nohands(gy.youmonst.data)) {
-        You("手がなかった!"); /* not `body_part(HAND)' */
+        You("手がなかった!"); /* not `jp_body_part(HAND)' */
         return ECMD_OK;
     } else if (Deaf) {
         You_cant("何も聞こえなかった!");
         return ECMD_OK;
     } else if (!freehand()) {
-        You("空いている%sがなかった.", body_part(HAND));
+        You("空いている%sがなかった.", jp_body_part(HAND));
         return ECMD_OK;
     }
     if (!getdir((char *) 0))
@@ -484,7 +484,7 @@ use_whistle(struct obj *obj)
         You("%sを通して泡を吹いた.", yname(obj));
     } else {
         if (Deaf)
-            You_feel("勢いよく抜けた空気が%sをくすぐった.", body_part(NOSE));
+            You_feel("勢いよく抜けた空気が%sをくすぐった.", jp_body_part(NOSE));
         else
             You(whistle_str, obj->cursed ? "けたたましい" : "高い");
         Soundeffect(se_shrill_whistle, 50);
@@ -1036,7 +1036,7 @@ use_mirror(struct obj *obj)
     }
     if (!u.dx && !u.dy && !u.dz) {
         if (!useeit) {
-            You_cant("自分の%s%sが見えなかった.", uvisage, body_part(FACE));
+            You_cant("自分の%s%sが見えなかった.", uvisage, jp_body_part(FACE));
         } else {
             if (u.umonnum == PM_FLOATING_EYE) {
                 if (Free_action) {
@@ -1075,7 +1075,7 @@ use_mirror(struct obj *obj)
     if (u.uswallow) {
         if (useeit)
             You("%sの%sを映した.", s_suffix(mon_nam(u.ustuck)),
-                mbodypart(u.ustuck, STOMACH));
+                jp_mbodypart(u.ustuck, STOMACH));
         return ECMD_TIME;
     }
     if (Underwater) {
@@ -2079,7 +2079,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
             case TT_BURIEDBALL:
             case TT_INFLOOR:
                 You("%sに力を込めたが、まだ%s.",
-                    makeplural(body_part(LEG)),
+                    jp_body_part_plural(LEG),
                     (u.utraptype == TT_INFLOOR)
                         ? "床に埋まったままだった"
                         : "埋まった鉄球につながれたままだった");
@@ -3037,13 +3037,13 @@ use_whip(struct obj *obj)
         dam = rnd(2) + dbon() + obj->spe;
         if (dam <= 0)
             dam = 1;
-        You("むちで自分の%sを叩いてしまった.", body_part(FOOT));
+        You("むちで自分の%sを叩いてしまった.", jp_body_part(FOOT));
         Sprintf(buf, "むちで%s自身を打って死んだ", uhim());
         losehp(Maybe_Half_Phys(dam), buf, NO_KILLER_PREFIX);
         return ECMD_TIME;
 
     } else if ((Fumbling || Glib) && !rn2(5)) {
-        pline_The("むちは%sから滑り落ちた.", body_part(HAND));
+        pline_The("むちは%sから滑り落ちた.", jp_body_part(HAND));
         dropx(obj);
 
     } else if (u.utrap && u.utraptype == TT_PIT) {
@@ -3137,7 +3137,7 @@ use_whip(struct obj *obj)
 
             Strcpy(onambuf, cxname(otmp));
             if (gotit) {
-                mon_hand = mbodypart(mtmp, HAND);
+                mon_hand = jp_mbodypart(mtmp, HAND);
                 if (bimanual(otmp))
                     mon_hand = makeplural(mon_hand);
             } else
@@ -3559,7 +3559,7 @@ use_cream_pie(struct obj *obj)
     if (Hallucination)
         You("顔面にクリームを塗りたくった.");
     else
-          You("%sを%s%sに突っ込んだ.", body_part(FACE),
+          You("%sを%s%sに突っ込んだ.", jp_body_part(FACE),
               several ? "そのうち1つの" : "", xname(obj));
     if (can_blnd((struct monst *) 0, &gy.youmonst, AT_WEAP, obj)) {
         int blindinc = rnd(25);
@@ -3568,10 +3568,10 @@ use_cream_pie(struct obj *obj)
         make_blinded(BlindedTimeout + (long) blindinc, FALSE);
         if (!Blind || (Blind && wasblind))
             pline("%sベタベタしたものが%s中に付いた.",
-                wascreamed ? "さらに" : "", body_part(FACE));
+                wascreamed ? "さらに" : "", jp_body_part(FACE));
         else /* Blind  && !wasblind */
             You_cant("%sのベタベタで前が見えなかった.",
-                     body_part(FACE));
+                     jp_body_part(FACE));
     }
 
     setnotworn(obj);
@@ -3905,7 +3905,7 @@ do_break_wand(struct obj *obj)
         You_cant("手がないので%sを折れなかった!", yname(obj));
         return ECMD_OK;
     } else if (!freehand()) {
-        Your("%sはふさがっている!", makeplural(body_part(HAND)));
+        Your("%sはふさがっている!", jp_body_part_plural(HAND));
         return ECMD_OK;
     } else if (ACURR(A_STR) < (is_fragile ? 5 : 10)) {
         You("%sを折る力が足りない!", yname(obj));
@@ -3917,7 +3917,7 @@ do_break_wand(struct obj *obj)
                                   "?", obj, yname, ysimple_name, "the wand")))
         return ECMD_OK;
     pline("%sを%sの上に高く掲げ、真っ二つに%s!", yname(obj),
-          body_part(HEAD), is_fragile ? "snap" : "break");
+          jp_body_part(HEAD), is_fragile ? "snap" : "break");
 
     /* [ALI] Do this first so that wand is removed from bill. Otherwise,
      * the freeinv() below also hides it from setpaid() which causes problems.

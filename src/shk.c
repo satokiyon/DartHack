@@ -824,7 +824,7 @@ u_entered_shop(char *enterstring)
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
             verbalize("また来たのか、%s？俺の%sでしっかり見張っとくぞ。",
-                      svp.plname, mbodypart(shkp, EYE));
+                      svp.plname, jp_mbodypart(shkp, EYE));
         } else {
             pline_The("%s%sは歓迎していない雰囲気だ.",
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
@@ -2597,7 +2597,7 @@ inherits(
             takes[0] = '\0';
             if (has_head(shkp->data) && !rn2(2))
                 Sprintf(takes, ", shakes %s %s,", noit_mhis(shkp),
-                        mbodypart(shkp, HEAD));
+                        jp_mbodypart(shkp, HEAD));
             pline("%s %slooks at your corpse%s and %s.", Shknam(shkp),
                   helpless(shkp) ? "wakes up, " : "",
                   takes, !inhishop(shkp) ? "disappears" : "sighs");
@@ -3130,7 +3130,7 @@ special_stock(
                     SetVoice(shkp, 0, 80, 0);
                     verbalize("そんなもの仕入れはしない。ここから出ていけ！");
                 } else {
-                    pline("%sは拒絶するように%sを%sで振った。", Shknam(shkp), noit_mhis(shkp), mbodypart(shkp, HEAD));
+                    pline("%sは拒絶するように%sを%sで振った。", Shknam(shkp), noit_mhis(shkp), jp_mbodypart(shkp, HEAD));
                 }
             }
         }
@@ -4912,7 +4912,7 @@ shk_move(struct monst *shkp)
                     verbalize("%s、%s! お支払いをお忘れではないですか?",
                               Hello(shkp), svp.plname);
                 } else {
-                    pline("%sは%s %sを上に向けて掲げた。", Shknam(shkp), noit_mhis(shkp), mbodypart(shkp, HAND));
+                    pline("%sは%s %sを上に向けて掲げた。", Shknam(shkp), noit_mhis(shkp), jp_mbodypart(shkp, HAND));
                 }
                 gf.followmsg = svm.moves;
                 if (!rn2(9)) {
@@ -5320,7 +5320,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
                 SetVoice(shkp, 0, 80, 0);
                 verbalize("ああ、そうとも！払ってもらうぞ！");
             } else {
-                pline("%sが%s %sを使ってあなたの%sへ飛びかかった！", Shknam(shkp), noit_mhis(shkp), mbodypart(shkp, HAND), body_part(NECK));
+                pline("%sが%s %sを使ってあなたの%sへ飛びかかった！", Shknam(shkp), noit_mhis(shkp), jp_mbodypart(shkp, HAND), jp_body_part(NECK));
             }
         } else
             growl(shkp);
@@ -5539,7 +5539,7 @@ shk_chat(struct monst *shkp)
                 verbalize("%s、%s! お支払いをお忘れではないですか?",
                           Hello(shkp), svp.plname);
             } else {
-                pline("%sはあなたの%sをタップした。", Shknam(shkp), body_part(ARM));
+                pline("%sはあなたの%sをタップした。", Shknam(shkp), jp_body_part(ARM));
             }
         }
     } else if (eshk->billct) {

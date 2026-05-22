@@ -145,7 +145,7 @@ cant_wield_corpse(struct obj *obj)
 
     /* Prevent wielding cockatrice when not wearing gloves --KAA */
     You("素手の%sで%sを構えた.",
-        makeplural(body_part(HAND)),
+        jp_body_part_plural(HAND),
         jp_corpse_xname(obj, (const char *) 0, CXN_PFX_THE));
     Sprintf(kbuf, "wielding %s bare-handed", killer_xname(obj));
     instapetrify(kbuf);
@@ -204,8 +204,8 @@ ready_weapon(struct obj *wep)
                   (wep->quan == 1L) ? "itself" : "themselves", /* a3 */
                   bimanual(wep) ? "" :
                       (URIGHTY ? "dominant right " : "dominant left "),
-                  bimanual(wep) ? (const char *) makeplural(body_part(HAND))
-                                : body_part(HAND));
+                  bimanual(wep) ? (const char *) jp_body_part_plural(HAND)
+                                : jp_body_part(HAND));
             set_bknown(wep, 1);
         } else {
             /* The message must be printed before setuwep (since
@@ -701,7 +701,7 @@ wield_tool(struct obj *obj,
     }
     if (uwep && welded(uwep)) {
         if (flags.verbose) {
-            const char *hand = body_part(HAND);
+            const char *hand = jp_body_part(HAND);
 
             if (bimanual(uwep))
                 hand = makeplural(hand);
@@ -769,7 +769,7 @@ can_twoweapon(void)
                   makeplural((flags.female && gu.urole.name.f)
                              ? gu.urole.name.f : gu.urole.name.m));
     } else if (!uwep || !uswapwep) {
-        const char *hand_s = body_part(HAND);
+        const char *hand_s = jp_body_part(HAND);
 
         if (!uwep && !uswapwep)
             hand_s = makeplural(hand_s);
@@ -809,11 +809,11 @@ drop_uswapwep(void)
     char left_hand[QBUFSZ];
     struct obj *obj = uswapwep;
 
-    /* this used to use makeplural(body_part(HAND)) but in order to be
+    /* this used to use jp_body_part_plural(HAND) but in order to be
        dual-wielded, or to get this far attempting to achieve that,
        uswapwep must be one-handed; since it's secondary, the hand must
        be the left one */
-    Sprintf(left_hand, "left %s", body_part(HAND));
+    Sprintf(left_hand, "left %s", jp_body_part(HAND));
     if (!obj->cursed)
         /* attempting to two-weapon while Glib */
         pline("%s from your %s!", Yobjnam2(obj, "slip"), left_hand);
@@ -931,12 +931,12 @@ chwepon(struct obj *otmp, int amount)
                 uwep->bknown = !Hallucination; /* ok to bypass set_bknown() */
             } else {
                 /* cursed tin opener is wielded in right hand */
-                Sprintf(buf, "Your right %s tingles.", body_part(HAND));
+                Sprintf(buf, "Your right %s tingles.", jp_body_part(HAND));
             }
             uncurse(uwep);
             update_inventory();
         } else {
-            Sprintf(buf, "Your %s %s.", makeplural(body_part(HAND)),
+            Sprintf(buf, "Your %s %s.", jp_body_part_plural(HAND),
                     (amount >= 0) ? "twitch" : "itch");
         }
         strange_feeling(otmp, buf); /* pline()+docall()+useup() */
@@ -1033,7 +1033,7 @@ chwepon(struct obj *otmp, int amount)
      * spe dependent.  Give an obscure clue here.
      */
     if (u_wield_art(ART_MAGICBANE) && uwep->spe >= 0) {
-           Your("右%sが%s.", body_part(HAND),
+           Your("右%sが%s.", jp_body_part(HAND),
                (((amount > 1) && (uwep->spe > 1)) ? "ひきつった" : "かゆくなった"));
     }
 
@@ -1060,7 +1060,7 @@ void
 weldmsg(struct obj *obj)
 {
     long savewornmask;
-    const char *hand = body_part(HAND);
+    const char *hand = jp_body_part(HAND);
 
     if (bimanual(obj))
         hand = makeplural(hand);

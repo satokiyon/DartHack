@@ -3209,7 +3209,7 @@ corpse_chance(
                 /* mdef is a gas spore (AT_BOOM) that is exploding inside an
                    engulfer; suppress usual explosion since it's contained */
                 if (magr == &gy.youmonst) {
-                    There("%sの中で爆発が起きた!", body_part(STOMACH));
+                    There("%sの中で爆発が起きた!", jp_body_part(STOMACH));
                         Sprintf(svk.killer.name, "%s explosion",
                             s_suffix(jp_pmname(mdat, Mgender(mon))));
                     losehp(Maybe_Half_Phys(tmp), svk.killer.name,

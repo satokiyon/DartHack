@@ -1709,7 +1709,7 @@ lift_object(
     int result, old_wt, new_wt, prev_encumbr, next_encumbr;
 
     if (obj->otyp == BOULDER && Sokoban) {
-        You("%sでは%sをつかめなかった.", body_part(HAND),
+        You("%sでは%sをつかめなかった.", jp_body_part(HAND),
             xname(obj));
         return -1;
     }
@@ -2062,7 +2062,7 @@ able_to_loot(
         return FALSE;
     } else if (looting && !freehand()) {
           pline("空いた%sがなければ、何も略奪できない.",
-              body_part(HAND));
+              jp_body_part(HAND));
         return FALSE;
     }
     return TRUE;
@@ -2196,7 +2196,7 @@ doloot_core(void)
         return ECMD_OK;
     }
     if (nohands(gy.youmonst.data)) {
-        You("手がなかった!"); /* not `body_part(HAND)' */
+        You("手がなかった!"); /* not `jp_body_part(HAND)' */
         return ECMD_OK;
     }
     if (Confusion) {
@@ -2446,7 +2446,7 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
                          SUPPRESS_SADDLE, FALSE));
         if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y') {
             if (nolimbs(gy.youmonst.data)) {
-                You_cant("手足が無いためそれはできなかった。"); /* not body_part(HAND) */
+                You_cant("手足が無いためそれはできなかった。"); /* not jp_body_part(HAND) */
                 return 0;
             }
             if (otmp->cursed) {
@@ -2851,7 +2851,7 @@ observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
             if (givemsg) {
                 if (!canspotmon(livecat))
                     You("%sが%sに触れたような気がした.", something,
-                        body_part(FOOT));
+                        jp_body_part(FOOT));
                 else
                       pline("箱の中の%sはまだ生きていた!",
                           l_monnam(livecat));
@@ -2943,10 +2943,10 @@ boolean
 u_handsy(void)
 {
     if (nohands(gy.youmonst.data)) {
-        You("手がない!"); /* not `body_part(HAND)' */
+        You("手がない!"); /* not `jp_body_part(HAND)' */
         return FALSE;
     } else if (!freehand()) {
-        You("空いた%sがなかった.", body_part(HAND));
+        You("空いた%sがなかった.", jp_body_part(HAND));
         return FALSE;
     }
     return TRUE;

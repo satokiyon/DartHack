@@ -91,19 +91,19 @@ morgue_mon_sound(struct monst *mtmp)
     if ((is_undead(mtmp->data) || is_vampshifter(mtmp))
         && mon_in_room(mtmp, MORGUE)) {
         int hallu = Hallucination ? 1 : 0;
-        const char *hair = body_part(HAIR); /* hair/fur/scales */
+        const char *hair = jp_body_part(HAIR); /* hair/fur/scales */
 
         switch (rn2(2) + hallu) {
         case 0:
             You("不自然なほど静かなことに突然気づいた.");
             break;
         case 1:
-            pline_The("あなたの%sの後ろの%sが逆立った.", body_part(NECK),
+            pline_The("あなたの%sの後ろの%sが逆立った.", jp_body_part(NECK),
                       hair);
             break;
         case 2:
             pline_The("あなたの%sの%sが逆立っているようだ.",
-                      body_part(HEAD), hair);
+                      jp_body_part(HEAD), hair);
             break;
         }
         return TRUE;
@@ -806,7 +806,7 @@ domonnoise(struct monst *mtmp)
             } else {
                 vampindex = rn2(SIZE(vampmsg));
                 if (vampindex == 0) {
-                    Sprintf(verbuf, vampmsg[vampindex], body_part(BLOOD));
+                    Sprintf(verbuf, vampmsg[vampindex], jp_body_part(BLOOD));
                     verbl_msg = verbuf;
                 } else if (vampindex == 1) {
                     Sprintf(verbuf, vampmsg[vampindex],
