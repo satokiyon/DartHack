@@ -1214,8 +1214,6 @@ hmon_hitmon_misc_obj(
         o = (struct obj *) 0;            \
     } while (0) /* now gone */
     case EGG: {
-        long cnt = obj->quan;
-
         hmd->dmg = 1; /* nominal physical damage */
         hmd->get_dmg_bonus = FALSE;
         hmd->hittxt = TRUE; /* message always given */
@@ -4418,8 +4416,6 @@ mhitm_ad_stun(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &gy.youmonst) {
         /* uhitm */
         if (!Blind)
@@ -6342,7 +6338,7 @@ disguised_as_mon(struct monst *mtmp)
 staticfn void
 nohandglow(struct monst *mon)
 {
-    char *hands;
+    const char *hands;
     boolean altfeedback;
 
     if (!u.umconf || mon->mconf)
