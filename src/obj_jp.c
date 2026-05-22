@@ -100,6 +100,7 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [GAUNTLETS_OF_FUMBLING] = "お手玉の小手",
     [GAUNTLETS_OF_POWER] = "力の小手",
     [GLAIVE] = "グレイブ",
+    [GOLD_PIECE] = "金貨",
     [GRAPPLING_HOOK] = "ひっかけ棒",
     [GUISARME] = "ギザルム",
     [HALBERD] = "ハルバード",

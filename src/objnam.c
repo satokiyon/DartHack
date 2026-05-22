@@ -203,6 +203,7 @@ char *
 obj_typename(int otyp)
 {
     char *buf = nextobuf();
+    char typbuf[BUFSZ];
     struct objclass *ocl = &objects[otyp];
     const char *actualn = jp_item_name(otyp);
     const char *dn = jp_item_descr(otyp);
@@ -224,30 +225,51 @@ obj_typename(int otyp)
     case COIN_CLASS:
         return strcpy(buf, actualn); /* "gold piece" */
     case POTION_CLASS:
-        Strcpy(buf, "potion");
+        Strcpy(buf, "薬");
         break;
     case SCROLL_CLASS:
-        Strcpy(buf, "scroll");
+        Strcpy(buf, "巻物");
         break;
     case WAND_CLASS:
-        Strcpy(buf, "wand");
-        break;
+        if (nn)
+            Sprintf(buf, "%sの杖", actualn);
+        else if (un)
+            xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "杖", un);
+        else
+            Strcpy(buf, dn ? dn : "杖");
+        if (dn && (nn || un))
+            Sprintf(eos(buf), " (%s)", dn);
+        return buf;
     case SPBOOK_CLASS:
         if (otyp != SPE_NOVEL) {
-            Strcpy(buf, "spellbook");
+            Strcpy(buf, "魔法書");
         } else {
-            Strcpy(buf, !nn ? "book" : "novel");
-            nn = 0;
+            if (nn)
+                Strcpy(buf, actualn);
+            else if (un)
+                xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "本", un);
+            else
+                Strcpy(buf, dn ? dn : "本");
+            if (dn && (nn || un))
+                Sprintf(eos(buf), " (%s)", dn);
+            return buf;
         }
         break;
     case RING_CLASS:
-        Strcpy(buf, "ring");
-        break;
+        if (nn)
+            Sprintf(buf, "%sの指輪", actualn);
+        else if (un)
+            xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "指輪", un);
+        else
+            Strcpy(buf, dn ? dn : "指輪");
+        if (dn && (nn || un))
+            Sprintf(eos(buf), " (%s)", dn);
+        return buf;
     case AMULET_CLASS:
         if (nn)
             Strcpy(buf, actualn);
         else
-            Strcpy(buf, "amulet");
+            Strcpy(buf, "お守り");
         if (un)
             xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "", un);
         if (dn)
@@ -256,16 +278,16 @@ obj_typename(int otyp)
     case ARMOR_CLASS:
         if (objects[otyp].oc_armcat == ARM_GLOVES
             || objects[otyp].oc_armcat == ARM_BOOTS)
-            Strcpy(buf, "pair of ");
+            Strcpy(buf, "1対の");
         else if (otyp >= GRAY_DRAGON_SCALES && otyp <= YELLOW_DRAGON_SCALES)
-            Strcpy(buf, "set of ");
+            Strcpy(buf, "1組の");
         FALLTHROUGH;
         /*FALLTHRU*/
     default:
         if (nn) {
             Strcat(buf, actualn);
             if (GemStone(otyp))
-                Strcat(buf, " stone");
+                Strcat(buf, " 石");
             if (un) /* 3: length of " (" + ")" which will enclose 'dn' */
                 xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "", un);
             if (dn)
@@ -274,18 +296,20 @@ obj_typename(int otyp)
             Strcat(buf, dn ? dn : actualn);
             if (ocl->oc_class == GEM_CLASS)
                 Strcat(buf,
-                       (ocl->oc_material == MINERAL) ? " stone" : " gem");
+                       (ocl->oc_material == MINERAL) ? " 石" : " 宝石");
             if (un)
                 xcalled(buf, BUFSZ, "", un);
         }
         return buf;
     }
-    /* here for ring/scroll/potion/wand */
+    /* here for potion/scroll/spellbook */
     if (nn) {
         if (ocl->oc_unique)
             Strcpy(buf, actualn); /* avoid spellbook of Book of the Dead */
-        else
-            Sprintf(eos(buf), " of %s", actualn);
+        else {
+            Strcpy(typbuf, buf);
+            Sprintf(buf, "%sの%s", actualn, typbuf);
+        }
     }
     if (un) /* 3: length of " (" + ")" which will enclose 'dn' */
         xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "", un);
@@ -872,13 +896,13 @@ xname_flags(
         break;
     case WAND_CLASS:
         if (!dknown)
-            Strcpy(buf, "wand");
+            Strcpy(buf, "杖");
         else if (nn)
-            Sprintf(buf, "wand of %s", actualn);
+            Strcpy(buf, actualn);
         else if (un)
-            xcalled(buf, BUFSZ - PREFIX, "wand", un);
+            xcalled(buf, BUFSZ - PREFIX, "杖", un);
         else
-            Sprintf(buf, "%s wand", dn);
+            Strcpy(buf, dn);
         break;
     case SPBOOK_CLASS:
         if (typ == SPE_NOVEL) { /* 3.6 tribute */
@@ -905,13 +929,13 @@ xname_flags(
         break;
     case RING_CLASS:
         if (!dknown)
-            Strcpy(buf, "ring");
+            Strcpy(buf, "指輪");
         else if (nn)
-            Sprintf(buf, "ring of %s", actualn);
+            Strcpy(buf, actualn);
         else if (un)
-            xcalled(buf, BUFSZ - PREFIX, "ring", un);
+            xcalled(buf, BUFSZ - PREFIX, "指輪", un);
         else
-            Sprintf(buf, "%s ring", dn);
+            Strcpy(buf, dn);
         break;
     case GEM_CLASS: {
         const char *rock = (ocl->oc_material == MINERAL) ? "stone" : "gem";
@@ -2912,6 +2936,9 @@ jp_counter_for_obj(struct obj *obj)
 
     if (obj->oclass == WAND_CLASS)
         return "本";
+
+    if (obj->oclass == COIN_CLASS)
+        return "枚";
 
     return "個";
 }
