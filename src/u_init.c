@@ -1181,6 +1181,8 @@ ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
 staticfn short
 ini_inv_obj_substitution(const struct trobj *trop, struct obj *obj)
 {
+    (void) trop;
+
     if (gu.urace.mnum != PM_HUMAN) {
         int i;
 

@@ -5728,8 +5728,6 @@ angry_guards(boolean silent)
     }
     if (ct) {
         if (!silent) { /* do we want pline msgs? */
-            char buf[BUFSZ];
-
             if (slct) { /* sleeping guard(s) */
                 pline_The("%sが起きた.", (slct == 1) ? "衛兵" : "衛兵たち");
             }
