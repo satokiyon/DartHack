@@ -3114,6 +3114,7 @@ extern int tport_spell(int);
 extern void losespells(void);
 extern int dovspell(void);
 extern void show_spells(void);
+extern const char *jp_spellname_for_display(int);
 extern void initialspell(struct obj *) NONNULLARG1;
 extern int known_spell(short);
 extern int spell_idx(short);

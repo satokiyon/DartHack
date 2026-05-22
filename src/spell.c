@@ -22,7 +22,7 @@
 #define incrnknow(spell, x) (svs.spl_book[spell].sp_know = KEEN + (x))
 
 #define spellev(spell) svs.spl_book[spell].sp_lev
-#define spellname(spell) OBJ_NAME(objects[spellid(spell)])
+#define spellname(spell) jp_spellname_for_display(spellid(spell))
 #define spellet(spell) \
     ((char) ((spell < 26) ? ('a' + spell) : ('A' + spell - 26)))
 
@@ -386,9 +386,9 @@ learn(void)
         return 0;
     }
 
-    Sprintf(splname,
-            objects[booktype].oc_name_known ? "\"%s\"" : "the \"%s\" spell",
-            OBJ_NAME(objects[booktype]));
+        Sprintf(splname,
+            objects[booktype].oc_name_known ? "\"%s\"" : "「%s」の呪文",
+            jp_spellname_for_display(booktype));
     for (i = 0; i < MAXSPELL; i++)
         if (spellid(i) == booktype || spellid(i) == NO_SPELL)
             break;
@@ -563,7 +563,7 @@ study_book(struct obj *spellbook)
                 break;
         if (spellid(i) == booktype && spellknow(i) > KEEN / 10) {
             You("\"%s\"はすでによく理解していた.",
-                OBJ_NAME(objects[booktype]));
+                jp_spellname_for_display(booktype));
             /* hero has just been told what spell this book is for; it may
                have been undiscovered if spell was learned via divine gift */
             makeknown(booktype);
@@ -800,7 +800,7 @@ dowizcast(void)
             break;
         any.a_int = n;
         add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
-                 OBJ_NAME(objects[n]), MENU_ITEMFLAGS_NONE);
+                 jp_spellname_for_display(n), MENU_ITEMFLAGS_NONE);
     }
     end_menu(win, "Cast which spell?");
     n = select_menu(win, PICK_ONE, &selected);
@@ -1916,7 +1916,8 @@ spell_cmp(const genericptr vptr1, const genericptr vptr2)
                                : (vptr1 > vptr2); /* keep current order */
     }
     /* tie-breaker for most sorts--alphabetical by spell name */
-    return strcmpi(OBJ_NAME(objects[otyp1]), OBJ_NAME(objects[otyp2]));
+    return strcmpi(jp_spellname_for_display(otyp1),
+                   jp_spellname_for_display(otyp2));
 }
 
 /* sort the index used for display order of the "view known spells"
