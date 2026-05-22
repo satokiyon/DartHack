@@ -948,38 +948,35 @@ cobra
 		［『リッキ・ティッキ・タヴィ』、
 		  ラドヤード・キプリング著 ］
 c*ckatrice
-	Once in a great while, when the positions of the stars are
-	just right, a seven-year-old rooster will lay an egg.  Then,
-	along will come a snake, to coil around the egg, or a toad,
-	to squat upon the egg, keeping it warm and helping it to
-	hatch.  When it hatches, out comes a creature called basilisk,
-	or cockatrice, the most deadly of all creatures.  A single
-	glance from its yellow, piercing toad's eyes will kill both
-	man and beast.  Its power of destruction is said to be so
-	great that sometimes simply to hear its hiss can prove fatal.
-	Its breath is so venomous that it causes all vegetation
-	to wither.
+	ごく稀に、星々の配置が完全に一致したとき、７歳に達した雄鶏が
+	卵を産むことがある。すると、そこへ蛇がやってきて卵に巻き付くか、
+	あるいはヒキガエルが卵の上にうずくまり、卵を温めて孵化を助ける。
+	こうして生まれたのが、バジリスク、すなわちコカトリスと呼ばれる、
+	すべての生物の中で最も致命的な怪物である。その黄色く鋭い
+	ヒキガエルのような目から放たれる一瞥は、人間も野獣も即座に
+	死に至らしめる。その破壊力はあまりに強大で、単にその鳴き声を
+	（シューという音）聞くだけで命を落とすことさえあるという。
+	その息は極めて有毒であり、あらゆる植物を枯れ果てさせる。
 
-	There is, however, one creature which can withstand the
-	basilisk's deadly gaze, and this is the weasel.  No one knows
-	why this is so, but although the fierce weasel can slay the
-	basilisk, it will itself be killed in the struggle.  Perhaps
-	the weasel knows the basilisk's fatal weakness:  if it ever
-	sees its own reflection in a mirror it will perish instantly.
-	But even a dead basilisk is dangerous, for it is said that
-	merely touching its lifeless body can cause a person to
-	sicken and die.
-	  [ Mythical Beasts, by Deirdre Headon (The Leprechaun Library)
-		and other sources ]
+	しかしながら、バジリスクの死の眼差しに耐えうる生物が
+	１つだけ存在する。それがイタチである。なぜそうなのかは誰も
+	知らないが、獰猛なイタチはバジリスクを退治できるものの、
+	その死闘の過程で自身も命を落としてしまう。おそらくイタチは、
+	バジリスクの致命的な弱点を知っているのだろう ―― もし鏡に映った
+	自身の姿を見れば、バジリスクは瞬時に滅び去るのだ。
+	しかし、死んだバジリスクであっても危険である。その命なき体に
+	単に触れるだけで、人は病に倒れ、死に至ると言われているからだ。
+	  ［『神話の獣たち』、ディードル・ヒードン著、
+	    およびその他の情報源 ］
 *coin
 ~creeping coins
 *coins
 zorkmid*
-	The coin bears the likeness of Belwit the Flat, along with the
-	inscriptions, "One Zorkmid," and "699 GUE [ Great Underground
-	Empire ]."  On the other side, the coin depicts Egreth Castle,
-	and says "In Frobs We Trust" in several languages.
-		[ Zork Zero, by Infocom ]
+	この硬貨には、愚帝ベルウィットの肖像と共に、「１ゾークミッド」、
+	および「６９９ ＧＵＥ［ グレート・アンダーグラウンド・エンパイア ］」
+	という文字が刻まれている。裏面にはエグレス城が描かれており、
+	複数の言語で「我らフロブスを信ず」と書かれている。
+		［『ゾーク・ゼロ』、インフォコム著 ］
 combat
 fight
 fracas
@@ -987,190 +984,191 @@ melee
 spat
 squabble
 tiff
-	[Scene: Mr. Moon and Gilbert enter tavern and discover many
-	corpses strewn about the place; Blind Pew is sole survivor.]
-	Blind Pew:  Evening.  Sounded as though there has been a bit
-	            of a squabble.
-	 Mr. Moon:  Squabble?  They're all dead.
-	Blind Pew:  Oh.  Must have been more of a tiff then.
-		[ Yellowbeard, directed by Mel Damski, screenplay
-		  by Graham Chapman, Peter Cook, Bernard McKenna ]
+	［場面：ムーン氏とギルバートが居酒屋に入ると、多くの死体が
+	  あたり一面に散乱している。盲目のピューが唯一の生存者である。］
+	盲目のピュー：こんばんは。何やら、ちょっとした小競り合いが
+	              あったような音でしたな。
+	  ムーン氏：小競り合い？ 全員死んでるぞ。
+	盲目のピュー：おや。それなら、ただの口喧嘩程度だったに
+	              違いない。
+		［映画『海賊イエローベアード』、メル・ダムスキ監督、
+		  グレアム・チャップマン、ピーター・クック、
+		  バーナード・マッケナ脚本 ］
 conical hat
-	You couldn't escape the pointy hat, though. There was nothing magical
-	about a pointy hat except that it said that the woman underneath it
-	was a witch. People paid attention to a pointy hat.
-		[ Wintersmith, by Terry Pratchett ]
+	それでも、とんがり帽子から逃れることはできなかった。
+	とんがり帽子自体には何の魔法もなかったが、それを被っている
+	女性が魔女であることを示すという点だけが特別だった。
+	人々はとんがり帽子に注目したのである。
+		［『ウィンタースミス』、テリー・プラチェット著 ］
 # not "*cope" because that would match "stethoscope"
 cope
 * cope
-	The cope is a liturgical vestment which may be worn by any
-	rank of the clergy.  Copes are made in all liturgical colours,
-	and are like a very long mantle or cloak, fastened at the breast
-	by a clasp.
-		[ Wikipedia, the free encyclopedia ]
+	コープ（典礼用マント）は、聖職者のあらゆる階級が着用できる
+	典礼用の衣服である。コープはすべての典礼色で作られており、
+	非常に長いマントやクロークに似ていて、胸元を留め金で固定する。
+		［ ウィキペディア フリー百科事典 ］
 # the word "cornuthaum" was coined by devteam member jwalz and adopted in
 # 3.2.0, after searching for an actual name for pointy hat came up empty
 cornuthaum
-	He was dressed in a flowing gown with fur tippets which had
-	the signs of the zodiac embroidered over it, with various
-	cabalistic signs, such as triangles with eyes in them, queer
-	crosses, leaves of trees, bones of birds and animals, and a
-	planetarium whose stars shone like bits of looking-glass with
-	the sun on them.  He had a pointed hat like a dunce's cap, or
-	like the headgear worn by ladies of that time, except that
-	the ladies were accustomed to have a bit of veil floating
-	from the top of it.
-		[ The Once and Future King, by T.H. White ]
+	彼は、黄道十二宮の記号や、中に目の描かれた三角形、奇妙な
+	十字架、木の葉、鳥や動物の骨といった様々なカバラの記号が
+	刺繍された、毛皮のティペット付きの流れるような長衣をまとっていた。
+	そこには、太陽の光を浴びた鏡の破片のように星々が輝く天象儀もあった。
+	彼は、かつての女性たちが被っていた頭飾りのような、あるいは
+	のろまの帽子のような、先のとがった帽子を被っていた。
+	ただし、当時の女性たちの帽子には、その頂点からベールが
+	なびいていたのに対し、彼の帽子にはそれがなかった。
+		［『かつてと未来の王』、Ｔ・Ｈ・ホワイト著 ］
 
-	"A wizard!" Dooley exclaimed, astounded.
-	"At your service, sirs," said the wizard.  "How
-	perceptive of you to notice.  I suppose my hat rather gives me
-	away.  Something of a beacon, I don't doubt."  His hat was
-	pretty much that, tall and cone-shaped with stars and crescent
-	moons all over it.  All in all, it couldn't have been more
-	wizardish.
-		[ The Elfin Ship, James P. Blaylock ]
+	「魔法使いだ！」とドゥーリーは驚愕して叫んだ。
+	「いかにも、皆様」と魔法使いは言った。「実によくお気づきで。
+	やはりこの帽子で正体がばれてしまうのでしょうな。まるで
+	灯台の火のようなものですから。間違いありません」彼の帽子は
+	まさにその通りで、星や三日月がちりばめられた、背の高い
+	円錐形の帽子だった。どう見ても、これ以上魔法使いらしい
+	帽子はなかった。
+		［『エルフの船』、ジェームズ・Ｐ・ブレイロック著 ］
 couatl
-	A mythical feathered serpent.  The couatl are very rare.
+	神話に登場する羽毛のある蛇。クァールは極めて稀な存在である。
 coyote
-	This carnivore is known for its voracious appetite and
-	inflated view of its own intelligence.
+	この肉食動物は、その貪欲な食欲と、自らの知性に対する
+	過剰な自信（うぬぼれ）で知られている。
 cram*
-	If you want to know what cram is, I can only say that I don't
-	know the recipe; but it is biscuitish, keeps good indefinitely,
-	is supposed to be sustaining, and is certainly not entertaining,
-	being in fact very uninteresting except as a chewing
-	exercise.  It was made by the Lake-men for long journeys.
-		[ The Hobbit, by J.R.R. Tolkien ]
+	クラムがどんなものか知りたいのなら、私に言えるのは、その製法を
+	知らないということだけだ。しかし、それはビスケットのようなもので、
+	いつまでも長持ちし、栄養があって腹持ちが良いとされている。
+	そして間違いなく、食べて楽しいものではなく、顎の運動以外には
+	まったく面白みのない代物だ。これは湖の人間たちが長い旅路の
+	ために作ったものである。
+		［『ホビットの冒険』、Ｊ・Ｒ・Ｒ・トールキン著 ］
 cream pie
-	Gregor stared at the pastry tray, and sighed.  "I suppose
-	it would disturb the guards if I tried to shove a cream torte up
-	your nose."
-	"Deeply.  You should have done it when we were eight and
-	twelve, you could have gotten away with it then.  The cream pie
-	of justice flies one way," Miles snickered.
-		[ The Vor Game, by Lois McMaster Bujold ]
+	グレゴールは菓子のトレイを見つめ、ため息をついた。
+	「君の鼻の穴にクリームタルトを突っ込もうとしたら、
+	やはり衛兵たちが騒ぎ立てるだろうな」
+	「大騒ぎになるね。僕らが８歳と１２歳だった頃にやっておくべきだった。
+	あの頃なら許されたのに。正義のクリームパイは一方通行で
+	飛んでいくものさ」マイルズはクスクスと笑った。
+		［『ヴォル・ゲーム』、ロイス・マクマスター・ビジョルド著 ］
 credit card
 charge card
-	"We are not worried about the expiration date," repeated the
-	barman, satisfied that he now had Ford Prefect's full attention;
-	"we are worried about the entire piece of plastic."
-	"What?" said Ford.  He seemed a little taken aback.
-	"This," said the barman, holding out the card as if it were a
-	small fish whose soul had three weeks earlier winged its way to
-	the Land Where Fish Are Eternally Blessed.  "We don't accept it."
-	[...]
-	"But you don't understand," said Ford, his expression slowly
-	ripening from a little taken abackness into rank incredulity,
-	"this is the American Express card.  It is the finest way of
-	settling bills known to man.  Haven't you read their junk mail?"
-		[ So Long, and Thanks For All The Fish, by Douglas Adams ]
+	「有効期限のことを気にしているのではありません」バーテンダーは
+	フォード・プリーフェクトの注意を完全に引いたことに満足して繰り返した。
+	「このプラスチックの破片そのものを気にしているのです」
+	「何だって？」とフォードは言った。彼は少し不意を突かれたようだった。
+	「これですよ」バーテンダーは、３週間前にその魂が『魚たちが永遠に
+	祝福される地』へと旅立っていった小さな魚であるかのように、そのカードを
+	差し出して言った。「当店ではこれを扱っておりません」
+	［…］
+	「しかし君は分かっていない」フォードの表情は、不意を突かれた驚きから
+	徐々に完全な不信へと変わっていった。「これはアメリカン・エキスプレスの
+	カードだ。人類に知られている中で、勘定を済ませる最も素晴らしい方法だぞ。
+	彼らのダイレクトメールを読んだことはないのか？」
+		［『さようなら、いままで魚をありがとう』、
+		  ダグラス・アダムス著 ］
 *crocodile
-	A big animal with the appearance of a lizard, constituting
-	an order of the reptiles (_Loricata_ or _Crocodylia_), the
-	crocodile is a large, dangerous predator native to tropical
-	and subtropical climes.  It spends most of its time in large
-	bodies of water.
-		[]
+	トカゲのような姿をした大型の動物で、爬虫類の目（ワニ目）を
+	構成するワニは、熱帯および亜熱帯の気候に生息する大型で危険な
+	捕食者である。その時間の大部分を大きな水辺で過ごす。
+		［］
 
-	How doth the little crocodile
-	    Improve his shining tail,
-	And pour the waters of the Nile
-	    On every golden scale!
+	小さきワニはいかにして
+	    輝くしっぽをきれいにし、
+	ナイルの水を注ぐのか
+	    黄金色のウロコへと！
 
-	How cheerfully he seems to grin
-	    How neatly spreads his claws,
-	And welcomes little fishes in,
-	    With gently smiling jaws!
-		[ How Doth The Little Crocodile, by Lewis Carroll ]
+	いかにも楽しげにニヤリと笑い
+	    いかに器用に爪を広げ、
+	小さき魚たちを招き入れるのか、
+	    優しく微笑むアゴの中へと！
+		［『小さなワニはいかにして』、ルイス・キャロル著 ］
 # Creosote is the Discworld analogue of Croesus
 croesus
 kroisos
 creosote
-	Croesus (in Greek: Kroisos), the wealthy last king of Lydia;
-	his empire was destroyed when he attacked Cyrus in 549 BC,
-	after the Oracle of Delphi (q.v.) had told him: "if you attack
-	the Persians, you will destroy a mighty empire".  Herodotus
-	relates of his legendary conversation with Solon of Athens,
-	who impressed upon him that being rich does not imply being
-	happy and that no one should be considered fortunate before
-	his death.
+	クロイソス（ギリシャ語ではクロイソス）は、リディアの裕福な
+	最後の王であった。デルポイの神託から「もしペルシアを攻撃すれば、
+	偉大な帝国を滅ぼすことになるだろう」と告げられた彼は、紀元前
+	５４９年にキュロスを攻撃し、彼自身の帝国を滅ぼすことになった。
+	ヘロドトスは、アテネのソロンと彼との伝説的な会話について伝えている。
+	ソロンは彼に対し、富裕であることが幸福を意味するわけではないこと、
+	そして死を迎えるまでは誰も幸運であるとみなされるべきではないことを
+	説いたのである。
 crom
-	Warily Conan scanned his surroundings, all of his senses alert
-	for signs of possible danger.  Off in the distance, he could
-	see the familiar shapes of the Camp of the Duali tribe.
-	Suddenly, the hairs on his neck stand on end as he detects the
-	aura of evil magic in the air.  Without thought, he readies
-	his weapon, and mutters under his breath:
-	"By Crom, there will be blood spilt today."
-	    [ Conan the Avenger, by Robert E. Howard, Bjorn Nyberg,
-		and L. Sprague de Camp ]
+	コナンは用心深く周囲を見渡し、危険の兆候がないかすべての感覚を
+	研ぎ澄ませた。遥か彼方に、見慣れたデュアリ部族のキャンプの姿が
+	見えた。突然、空気の中に邪悪な魔法の気配を感じ取り、彼の首筋の
+	毛が逆立った。考えるよりも早く、彼は武器を構え、低い声で呟いた。
+	「クロムにかけて、今日は血が流れることになるぞ」
+		［『復讐者コナン』、ロバート・Ｅ・ハワード、
+		  ビョルン・ニイバーグ、Ｌ・スプレイグ・ディ・キャンプ著 ］
 crossbow*
-	"God save thee, ancient Mariner!
-	From the fiends, that plague thee thus! -
-	Why look'st thou so?" - With my cross-bow
-	I shot the Albatross.
-	  [ The Rime of the Ancient Mariner, by Samuel Taylor Coleridge ]
+	「神よ汝を救いたまえ、老水夫よ！
+	    汝を苦しめる悪魔どもから！
+	なぜそのような顔をするのか？」 ―― 「我がクロスボウにて
+	    私はアホウドリを撃ち落としたのです」
+		［『老水夫の歌』、サミュエル・テイラー・コールリッジ著 ］
 crystal ball
-	You look into one of these and see _vapours swirling like
-	clouds_.  These shortly clear away to show a sort of video
-	without sound of something that is going to happen to you
-	soon.  It is seldom good news.
-	  [ The Tough Guide to Fantasyland, by Diana Wynne Jones ]
+	これらを覗き込むと、「雲のように渦巻く蒸気」が見える。
+	それはすぐに消え去り、近い将来あなたに起こるであろう出来事の、
+	一種の無声映像が映し出される。それが良い知らせであることは
+	滅多にない。
+		［『ファンタジーランドのタフ・ガイド』、
+		  ダイアナ・ウィン・ジョーンズ著 ］
 curse*
-	Curses are longstanding ill-wishings which, in Fantasyland,
-	often manifest as semisentient.  They have to be broken or
-	dispelled.  The method varies according to the type and
-	origin of the Curse:
-	[...]
-	4.  Curses on Rings and Swords.  You have problems.  Rings
-	have to be returned whence they came, preferably at over a
-	thousand degrees Fahrenheit, and the Curse means you won't
-	want to do this.  Swords usually resist all attempts to
-	raise their Curses.  Your best source is to hide the Sword
-	or give it to someone you dislike.
-	  [ The Tough Guide to Fantasyland, by Diana Wynne Jones ]
+	呪いとは古くからある悪意ある願いであり、ファンタジー世界においては、
+	しばしば半ば知性を持った存在として現れる。それらは解くか、あるいは
+	払わなければならない。その方法は、呪いの種類や起源によって異なる。
+	［…］
+	４． 指輪と剣の呪い。厄介な問題だ。指輪は元あった場所、できれば
+	華氏１０００度（約摂氏５４０度）以上の場所に戻さなければならないが、
+	呪いのせいでそうする気が起きなくなる。剣は通常、その呪いを取り除く
+	あらゆる試みに抵抗する。最善の策は、剣を隠すか、気に入らない誰かに
+	プレゼントすることだ。
+		［『ファンタジーランドのタフ・ガイド』、
+		  ダイアナ・ウィン・ジョーンズ著 ］
 cwn*n
-	A pack of snow-white, red-eared spectral hounds which
-	sometimes took part in the kidnappings and raids the
-	inhabitants of the underworld sometimes make on this world
-	(the Wild Hunt).  They are associated in Wales with the sounds
-	of migrating wild geese, and are said to be leading the souls
-	of the damned to hell.  The phantom chase is usually heard or
-	seen in midwinter and is accompanied by a howling wind.
-		[ Encyclopedia Mythica, ed. M.F. Lindemans ]
+	冥界の住民がこの世界に対して時折行う誘拐や襲撃（ワイルドハント）に、
+	しばしば加わった、耳が赤く体は雪のように白い、幻影の猟犬の群れ。
+	ウェールズ地方では渡り鳥のガンの鳴き声と結びつけられており、
+	呪われた者たちの魂を地獄へと導いていると言われている。
+	この幻影の追跡劇は通常、真冬に遠吠えのような風の音を伴って
+	聞こえるか、あるいは目撃される。
+		［『神話百科事典』、M・F・リンデマンス編 ］
 cyclops
-	And after he had milked his cattle swiftly,
-	he again took hold of two of my men
-	and had them as his supper.
-	Then I went, with a tub of red wine,
-	to stand before the Cyclops, saying:
-	"A drop of wine after all this human meat,
-	so you can taste the delicious wine
-	that is stored in our ship, Cyclops."
-	He took the tub and emptied it.
-	He appreciated the priceless wine that much
-	that he promptly asked me for a second tub.
-	"Give it", he said, "and give me your name as well".
+	彼が手早く家畜の乳を搾り終えると、
+	再び我が部下を二人捕らえ、
+	夕食の皿にしてしまった。
+	そこで私は、赤ワインの樽を抱え、
+	サイクロプスの前に進み出て言った。
+	「これほど多くの人肉を食らった後に、
+	ワインを一口いかがかな、サイクロプス。
+	我が船に蓄えられた、この美味なる
+	ワインの味がお分かりいただけるだろう」
+	彼は樽を受け取り、飲み干した。
+	その至高の味を大いに気に入り、
+	すぐさま二杯目の樽を求めてきた。
+	「これをもっとくれ、そして名も教えよ」
 			...
-	Thrice I filled the tub,
-	and after the wine had clouded his mind,
-	I said to him, in a tone as sweet as honey:
-	"You have asked my name, Cyclops?  Well,
-	my name is very well known.  I'll give it to you,
-	if you give me the gift you promised me as a guest.
-	My name is Nobody.  All call me thus:
-	my father and my mother and my friends."
-	Ruthlessly he answered to this:
-	"Nobody, I will eat you last of all;
-	your host of friends will completely precede you.
-	That will be my present to you, my friend."
-	And after these words he fell down backwards,
-	restrained by the all-restrainer Hupnos.
-	His monstrous neck slid into the dust;
-	the red wine squirted from his throat;
-	the drunk vomited lumps of human flesh.
-		[ The Odyssey, (chapter Epsilon), by Homer ]
+	私は三度、樽を満たし、
+	ワインが彼の理性をごまかし始めた頃、
+	蜂蜜のように甘い声で言った。
+	「我が名をお知りになりたいか、サイクロプス。
+	私の名はよく知られている。お教えしよう、
+	あなたが約束してくれた客への贈り物を
+	くださるのなら。我が名は『誰でもない』。
+	父も母も友も、皆私をそう呼ぶのだ」
+	彼は無慈悲にこう答えた。
+	「『誰でもない』よ、お前を一番最後に
+	喰ってやろう。他のすべての友人どもを
+	先に喰い尽くした後に。
+	それがお前への贈り物だ、我が友よ」
+	これらの言葉をあとに残し、彼は仰向けに倒れ込み、
+	万物を拘束する眠りの神（ヒュプノス）に
+	捕らえられた。
+	その巨大な首はちりの中に沈み、
+	喉からは赤ワインが噴き出し、
+	酔い潰れた彼は人肉の塊を吐き出した。
+		［『オデュッセイア』（第９歌）、ホメロス著 ］
 ~sting
 *dagger
 	Is this a dagger which I see before me,
