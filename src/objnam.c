@@ -1557,11 +1557,9 @@ doname_base(
         if (obj->oeaten)
             prefix_append(prefix, sizeof prefix, "食べかけの");
         if (obj->otyp == CORPSE) {
-                /* (quan == 1) => want jp_corpse_xname() to supply article,
-               (quan != 1) => already have count or "some" as prefix;
-               "corpse" is already in the buffer returned by xname() */
-            unsigned cxarg = (((obj->quan != 1L) ? 0 : CXN_ARTICLE)
-                              | CXN_NOCORPSE);
+            /* Build the full corpse label in Japanese and discard xname()'s
+               English base noun so floor messages and inventory stay natural. */
+            unsigned cxarg = CXN_NORMAL;
             char *cxstr, *save_xnamep;
 
                 /* jp_corpse_xname() sets xnamep; callers other than doname_base()
@@ -1569,7 +1567,8 @@ doname_base(
                current obuf[]) but keep it accurate anyway */
             save_xnamep = gx.xnamep;
                 cxstr = jp_corpse_xname(obj, prefix, cxarg);
-            Sprintf(prefix, "%s ", cxstr);
+            Strcpy(prefix, cxstr);
+            *bp = '\0';
             /* avoid having doname(corpse) consume an extra obuf */
             releaseobuf(cxstr);
             gx.xnamep = save_xnamep;
@@ -1978,9 +1977,7 @@ jp_corpse_xname(
 {
     char *nambuf;
     int omndx = otmp->corpsenm;
-    boolean the_prefix = (cxn_flags & CXN_PFX_THE) != 0,
-            any_prefix = (cxn_flags & CXN_ARTICLE) != 0,
-            omit_corpse = (cxn_flags & CXN_NOCORPSE) != 0,
+    boolean omit_corpse = (cxn_flags & CXN_NOCORPSE) != 0,
             glob = (otmp->otyp != CORPSE && otmp->globby);
     const char *mnam;
 
@@ -1995,8 +1992,6 @@ jp_corpse_xname(
     }
 
     *nambuf = '\0';
-    if (the_prefix || any_prefix)
-        Strcat(nambuf, "その");
 
     if (adjective && *adjective) {
         Sprintf(eos(nambuf), "%s %s", adjective, mnam);
