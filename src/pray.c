@@ -1037,7 +1037,7 @@ give_spell(void)
         if ((spe_let = force_learn_spell(otmp->otyp)) != '\0') {
             /* for spellbook class, OBJ_NAME() yields the name of
                the spell rather than "spellbook of <spell-name>" */
-            const char *spe_name = OBJ_NAME(objects[otmp->otyp]);
+            const char *spe_name = jp_spellname_for_display(otmp->otyp);
 
             if (spe_knowledge == spe_Unknown) /* prior to learning */
                 /* appending "spell 'a'" seems slightly silly but

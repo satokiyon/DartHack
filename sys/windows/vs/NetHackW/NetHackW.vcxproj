@@ -216,6 +216,7 @@
     <ClCompile Include="$(SrcDir)sit.c" />
     <ClCompile Include="$(SrcDir)sounds.c" />
     <ClCompile Include="$(SrcDir)spell.c" />
+    <ClCompile Include="$(SrcDir)spell_jp.c" />
     <ClCompile Include="$(SrcDir)sp_lev.c" />
     <ClCompile Include="$(SrcDir)stairs.c" />
     <ClCompile Include="$(SrcDir)steal.c" />
