@@ -68,40 +68,8 @@ staticfn boolean mhurtle_to_doom(struct monst *, int,
                              struct permonst **) NONNULLARG13;
 staticfn void first_weapon_hit(struct obj *) NONNULLARG1;
 staticfn boolean shade_aware(struct obj *) NO_NNARGS;
-enum jp_umelee_verb_key {
-    JP_UMELEE_ATTACK = 0,
-    JP_UMELEE_TENTACLE,
-    JP_UMELEE_KICK,
-    JP_UMELEE_HEADBUTT,
-    JP_UMELEE_BITE,
-    JP_UMELEE_STING,
-    JP_UMELEE_STRIKE
-};
-staticfn const char *jp_umelee_verb(enum jp_umelee_verb_key);
 
 #define PROJECTILE(obj) ((obj) && is_ammo(obj))
-
-staticfn const char *
-jp_umelee_verb(enum jp_umelee_verb_key key)
-{
-    switch (key) {
-    case JP_UMELEE_TENTACLE:
-        return "触手攻撃";
-    case JP_UMELEE_KICK:
-        return "蹴り";
-    case JP_UMELEE_HEADBUTT:
-        return "頭突き";
-    case JP_UMELEE_BITE:
-        return "噛みつき";
-    case JP_UMELEE_STING:
-        return "刺突";
-    case JP_UMELEE_STRIKE:
-        return "打撃";
-    case JP_UMELEE_ATTACK:
-    default:
-        return "攻撃";
-    }
-}
 
 staticfn boolean
 mhitm_mgc_atk_negated(
@@ -1214,6 +1182,8 @@ hmon_hitmon_misc_obj(
         o = (struct obj *) 0;            \
     } while (0) /* now gone */
     case EGG: {
+        long cnt = obj->quan;
+
         hmd->dmg = 1; /* nominal physical damage */
         hmd->get_dmg_bonus = FALSE;
         hmd->hittxt = TRUE; /* message always given */
@@ -1670,15 +1640,20 @@ hmon_hitmon_msg_hit(
             hit(mshot_xname(obj), mon, exclam(hmd->dmg));
         else if (!flags.verbose)
             You("それに当てた.");
-        else /* hand_to_hand */
-            You("%s %s%s",
-                (obj && (is_shield(obj)
-                         || obj->otyp == HEAVY_IRON_BALL)) ? "bash"
+        else { /* hand_to_hand */
+            const char *verb =
+                (obj && (is_shield(obj) || obj->otyp == HEAVY_IRON_BALL))
+                    ? "叩きつけた"
                 : (obj && (objects[obj->otyp].oc_skill == P_WHIP
-                           || is_wet_towel(obj))) ? "lash"
-                  : Role_if(PM_BARBARIAN) ? "smite"
-                    : "hit",
-                mon_nam(mon), canseemon(mon) ? exclam(hmd->dmg) : ".");
+                           || is_wet_towel(obj)))
+                    ? "しばきつけた"
+                : Role_if(PM_BARBARIAN)
+                    ? "打ち据えた"
+                    : "攻撃した";
+
+            You("%sを%s%s", mon_nam(mon), verb,
+                canseemon(mon) ? exclam(hmd->dmg) : ".");
+        }
     }
 }
 
@@ -4416,6 +4391,8 @@ mhitm_ad_stun(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
+    struct permonst *pd = mdef->data;
+
     if (magr == &gy.youmonst) {
         /* uhitm */
         if (!Blind)
@@ -5596,7 +5573,7 @@ hmonas(struct monst *mon)
             if (dhit) {
                 int compat, specialdmg;
                 long silverhit = 0L;
-                enum jp_umelee_verb_key verb_key = JP_UMELEE_ATTACK;
+                const char *verb_jp = "攻撃";
 
                 if (!u.uswallow
                     && (compat = could_seduce(&gy.youmonst, mon, mattk))
@@ -5613,11 +5590,8 @@ hmonas(struct monst *mon)
                 switch (mattk->aatyp) {
                 case AT_CLAW:
                 case AT_TUCH:
-                          /* claw/touch shares silver-ring handling; displayed verb
-                              is decided later via jp_umelee_verb() */
-                          verb_key = (mattk->aatyp == AT_TUCH)
-                                              ? JP_UMELEE_ATTACK
-                                              : JP_UMELEE_STRIKE;
+                    /* claw/touch shares silver-ring handling */
+                    verb_jp = (mattk->aatyp == AT_TUCH) ? "攻撃" : "打撃";
                     /* decide if silver-hater will be hit by silver ring(s);
                        for 'multi_claw' where attacks alternate right/left,
                        assume 'even' claw or touch attacks use dominant hand
@@ -5638,15 +5612,15 @@ hmonas(struct monst *mon)
                 case AT_TENT:
                     /* assumes mind flayer's tentacles-on-head rather
                        than sea monster's tentacle-as-arm */
-                    verb_key = JP_UMELEE_TENTACLE;
+                    verb_jp = "触手攻撃";
                     break;
                 case AT_KICK:
-                    verb_key = JP_UMELEE_KICK;
+                    verb_jp = "蹴り";
                     specialdmg = special_dmgval(&gy.youmonst, mon, W_ARMF,
                                                 &silverhit);
                     break;
                 case AT_BUTT:
-                    verb_key = JP_UMELEE_HEADBUTT;
+                    verb_jp = "頭突き";
                     /* hypothetical; if any form with a head-butt attack
                        could wear a helmet, it would hit shades when
                        wearing a blessed (or silver) one */
@@ -5654,21 +5628,21 @@ hmonas(struct monst *mon)
                                                 &silverhit);
                     break;
                 case AT_BITE:
-                    verb_key = JP_UMELEE_BITE;
+                    verb_jp = "噛みつき";
                     break;
                 case AT_STNG:
-                    verb_key = JP_UMELEE_STING;
+                    verb_jp = "刺突";
                     break;
                 default:
-                    verb_key = JP_UMELEE_ATTACK;
+                    verb_jp = "攻撃";
                     break;
                 }
                 if (mon->data == &mons[PM_SHADE] && !specialdmg) {
-                    if (verb_key == JP_UMELEE_ATTACK
+                    if (!strcmp(verb_jp, "攻撃")
                         || (mattk->aatyp == AT_CLAW && humanoid(mon->data)))
-                        verb_key = JP_UMELEE_ATTACK;
-                    Your("%sは無害に%sをすり抜けた.",
-                         jp_umelee_verb(verb_key), l_monnam(mon));
+                        verb_jp = "攻撃";
+                    Your("%sは無害に%sをすり抜けた.", verb_jp,
+                         l_monnam(mon));
                 } else {
                     /* either not a shade or no special silver/blessed damage,
                        other unsolid monsters are immune to AT_TUCH+AD_WRAP */
@@ -5679,8 +5653,8 @@ hmonas(struct monst *mon)
                         Your("触手が%sに吸いついた.", l_monnam(mon));
                     } else {
                         if (mattk->aatyp == AT_CLAW)
-                            verb_key = JP_UMELEE_STRIKE;
-                        You("%sで%sを攻撃した.", jp_umelee_verb(verb_key),
+                            verb_jp = "打撃";
+                        You("%sで%sを攻撃した.", verb_jp,
                             l_monnam(mon));
                         if (silverhit && flags.verbose)
                             silver_sears(&gy.youmonst, mon, silverhit);
