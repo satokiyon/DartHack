@@ -472,7 +472,8 @@ pick_lock(
                           && (flags.autounlock & AUTOUNLOCK_APPLY_KEY) != 0) {
                     c = 'q';
                     if (pick != &dummypick) {
-                        Sprintf(qbuf, "%sで解錠する?", yname(pick));
+                        Sprintf(qbuf, "%sで解錠しますか?",
+                                ansimpleoname(pick));
                         c = ynq(qbuf);
                     }
                     if (c != 'y')
@@ -610,10 +611,11 @@ pick_lock(
                 return PICKLOCK_LEARNED_SOMETHING;
             }
 
-                Sprintf(qbuf, "%s%s%sする?",
-                    autounlock ? yname(pick) : "この扉を",
-                    autounlock ? "で" : "",
-                    (door->doormask & D_LOCKED) ? "解錠" : "施錠");
+                Sprintf(qbuf, "%s%sしますか?",
+                    autounlock ? ansimpleoname(pick) : "この扉を",
+                    (door->doormask & D_LOCKED)
+                        ? (autounlock ? "で解錠" : "解錠")
+                        : (autounlock ? "で施錠" : "施錠"));
             c = ynq(qbuf);
             if (c != 'y')
                 return PICKLOCK_DID_NOTHING;
