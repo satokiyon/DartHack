@@ -917,15 +917,16 @@ xname_flags(
             break;
             /* end of tribute */
         } else if (!dknown) {
-            Strcpy(buf, "spellbook");
+            Strcpy(buf, "魔法書");
         } else if (nn) {
             if (typ != SPE_BOOK_OF_THE_DEAD)
-                Strcpy(buf, "spellbook of ");
-            Strcat(buf, actualn);
+                Sprintf(buf, "%sの魔法書", actualn);
+            else
+                Strcpy(buf, actualn);
         } else if (un) {
-            xcalled(buf, BUFSZ - PREFIX, "spellbook", un);
+            xcalled(buf, BUFSZ - PREFIX, "魔法書", un);
         } else
-            Sprintf(buf, "%s spellbook", dn);
+            Sprintf(buf, "%sの魔法書", dn);
         break;
     case RING_CLASS:
         if (!dknown)
