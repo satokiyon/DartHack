@@ -2615,7 +2615,7 @@ reroll_menu(void)
     struct obj *otmp;
     int tmpglyph;
     glyph_info tmpglyphinfo;
-    char option;
+    char option = 'n';
     char buf[BUFSZ];
 
     win = create_nhwindow(NHW_MENU);
@@ -3373,10 +3373,11 @@ display_pickinv(
                 /* fake item to format as "bare|gloved hands" */
                 char barehands[QBUFSZ];
 
-                /* like doname() below, makeplural() returns an obuf[] */
-                formattedobj = jp_body_part_plural(HAND);
+                const char *handpart = jp_body_part_plural(HAND);
+
+                formattedobj = (char *) 0;
                 Sprintf(barehands, "%s %s (武器なし)",
-                    uarmg ? "手袋付きの" : "素手の", formattedobj);
+                    uarmg ? "手袋付きの" : "素手の", handpart);
                 add_menu(win, &nul_glyphinfo, &any, ilet, 0,
                          ATR_NONE, clr, barehands, MENU_ITEMFLAGS_NONE);
             } else {
@@ -3391,7 +3392,8 @@ display_pickinv(
             /* doname() uses a static pool of obuf[] output buffers and
                we don't want inventory display to overwrite all of them,
                so when we've used one we release it for re-use */
-            maybereleaseobuf(formattedobj);
+            if (formattedobj)
+                maybereleaseobuf(formattedobj);
             gotsomething = TRUE;
         }
     }
@@ -4844,13 +4846,43 @@ useupf(struct obj *obj, long numused)
  * Conversion from a class to a string for printing.
  * This must match the object class order.
  */
-static NEARDATA const char *names[] = {
+static NEARDATA const char *inv_class_names_en[] = {
     0, "Illegal objects", "Weapons", "Armor", "Rings", "Amulets", "Tools",
     "Comestibles", "Potions", "Scrolls", "Spellbooks", "Wands", "Coins",
     "Gems/Stones", "Boulders/Statues", "Iron balls", "Chains", "Venoms"
 };
+static NEARDATA const char *inv_class_names_ja[] = {
+    0, "不正なオブジェクト", "武器", "防具", "指輪", "護符", "道具",
+    "食べ物", "薬", "巻物", "魔法書", "杖", "金貨",
+    "宝石/石", "巨石/彫像", "鉄球", "鎖", "毒液"
+};
 static NEARDATA const char oth_symbols[] = { CONTAINED_SYM, '\0' };
-static NEARDATA const char *oth_names[] = { "Bagged/Boxed items" };
+static NEARDATA const char *oth_names_en[] = { "Bagged/Boxed items" };
+static NEARDATA const char *oth_names_ja[] = { "袋/箱の中の品物" };
+
+/* keep English key names separate from localized display names */
+staticfn const char *
+inv_class_name_core(char let, boolean for_display)
+{
+    const char *const *class_names =
+        for_display ? inv_class_names_ja : inv_class_names_en;
+    const char *const *other_names =
+        for_display ? oth_names_ja : oth_names_en;
+    const char *pos;
+    int oclass = (let >= 1 && let < MAXOCLASSES) ? let : 0;
+
+    if (oclass)
+        return class_names[oclass];
+    if ((pos = strchr(oth_symbols, let)) != 0)
+        return other_names[pos - oth_symbols];
+    return class_names[ILLOBJ_CLASS];
+}
+
+const char *
+invlet_class_name_key(char let)
+{
+    return inv_class_name_core(let, FALSE);
+}
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
@@ -4860,18 +4892,12 @@ let_to_name(char let, boolean unpaid, boolean showsym)
     const char *ocsymfmt = "  ('%c')";
     const int invbuf_sympadding = 8; /* arbitrary */
     const char *class_name;
-    const char *pos;
     int oclass = (let >= 1 && let < MAXOCLASSES) ? let : 0;
     unsigned len;
 
-    if (oclass)
-        class_name = names[oclass];
-    else if ((pos = strchr(oth_symbols, let)) != 0)
-        class_name = oth_names[pos - oth_symbols];
-    else
-        class_name = names[ILLOBJ_CLASS];
+    class_name = inv_class_name_core(let, TRUE);
 
-    len = Strlen(class_name) + (unpaid ? sizeof "unpaid_" : sizeof "")
+    len = Strlen(class_name) + (unpaid ? sizeof "未払い " : sizeof "")
           + (oclass ? (Strlen(ocsymfmt) + invbuf_sympadding) : 0);
     if (len > gi.invbufsiz) {
         if (gi.invbuf)
@@ -4880,7 +4906,7 @@ let_to_name(char let, boolean unpaid, boolean showsym)
         gi.invbuf = (char *) alloc(gi.invbufsiz);
     }
     if (unpaid)
-        Strcat(strcpy(gi.invbuf, "Unpaid "), class_name);
+        Strcat(strcpy(gi.invbuf, "未払い "), class_name);
     else
         Strcpy(gi.invbuf, class_name);
     if ((oclass != 0) && showsym) {
