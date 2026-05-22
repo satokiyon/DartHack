@@ -2088,7 +2088,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
             err++;
         } else if (uwep && bimanual(uwep)) {
             if (noisy)
-                You("両手用の%sを構えたままでは盾を装備できない.",
+                You("両手用の%sを装備したままでは盾を装備できない.",
                     is_sword(uwep) ? c_sword : (uwep->otyp == BATTLE_AXE)
                                                    ? c_axe
                                                    : c_weapon);
@@ -2726,7 +2726,7 @@ select_off(struct obj *otmp)
     /* special glove checks */
     if (otmp == uarmg) {
         if (welded(uwep)) {
-            You("その%sを構えたままでは%sを外せない.",
+            You("その%sを装備したままでは%sを外せない.",
                 c_gloves, is_sword(uwep) ? c_sword : c_weapon);
             set_bknown(uwep, 1);
             return 0;
@@ -2829,7 +2829,7 @@ do_takeoff(void)
         if (!cursed(uwep)) {
             setuwep((struct obj *) 0);
             if (was_twoweap)
-                You("もうどちらの武器も構えていない.");
+                You("もうどちらの武器も装備していない.");
             else
                 You("%s.", empty_handed());
         }

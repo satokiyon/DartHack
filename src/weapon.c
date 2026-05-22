@@ -865,17 +865,16 @@ mon_wield_item(struct monst *mon)
 
                 if (bimanual(mw_tmp))
                     mon_hand = makeplural(mon_hand);
-                Sprintf(welded_buf, "%s welded to %s %s",
-                        otense(mw_tmp, "are"), mhis(mon), mon_hand);
+                Sprintf(welded_buf, "%sの%sにくっついている",
+                        mhis(mon), mon_hand);
 
                 if (obj->otyp == PICK_AXE) {
-                    pline("Since %s weapon%s %s,", s_suffix(mon_nam(mon)),
-                          plur(mw_tmp->quan), welded_buf);
-                    pline("%s cannot wield that %s.", mon_nam(mon),
+                    pline("だが、%sの武器は%sので、", mon_nam(mon), welded_buf);
+                    pline("%sはその%sを装備できない.", mon_nam(mon),
                           xname(obj));
                 } else {
-                    pline_mon(mon, "%s tries to wield %s.", Monnam(mon), doname(obj));
-                    pline("%s %s!", Yname2(mw_tmp), welded_buf);
+                    pline_mon(mon, "%sは%sを装備しようとした.", Monnam(mon), doname(obj));
+                    pline("%sは%s!", Yname2(mw_tmp), welded_buf);
                 }
                 mw_tmp->bknown = 1;
             }
@@ -889,11 +888,11 @@ mon_wield_item(struct monst *mon)
             boolean newly_welded;
             const struct throw_and_return_weapon *arw;
 
-            pline_mon(mon, "%s wields %s%c",
+            pline_mon(mon, "%sは%sを装備した%c",
                       Monnam(mon), doname(obj),
                       exclaim ? '!' : '.');
             if ((arw = autoreturn_weapon(obj)) != 0 && arw->tethered != 0)
-                pline_mon(mon, "%s secures the tether on %s.", Monnam(mon),
+                pline_mon(mon, "%sは%sのひもを固定した.", Monnam(mon),
                           the(xname(obj)));
 
             /* 3.6.3: mwelded() predicate expects the object to have its
