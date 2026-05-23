@@ -422,8 +422,8 @@ e_died(
             /* So, you didn't die */
             if (!e_survives_at(etmp, etmp->ex, etmp->ey)) {
                 if (enexto(&xy, etmp->ex, etmp->ey, etmp->edata)) {
-                    pline("A %s force teleports you away...",
-                          Hallucination ? "normal" : "strange");
+                      pline("%s力で瞬間移動させられた...",
+                          Hallucination ? "普通の" : "奇妙な");
                     teleds(xy.x, xy.y, TELEDS_NO_FLAGS);
                 }
                 /* otherwise on top of the drawbridge is the

@@ -1297,13 +1297,13 @@ peffect_acid(struct obj *otmp)
 {
     if (Acid_resistance) {
         /* Not necessarily a creature who _likes_ acid */
-        pline("This tastes %s.", Hallucination ? "tangy" : "sour");
+        pline("これは%s味がする.", Hallucination ? "刺激的な" : "すっぱい");
     } else {
         int dmg;
 
-        pline("This burns%s!",
-              otmp->blessed ? " a little" : otmp->cursed ? " a lot"
-                                                         : " like acid");
+        pline("%s痛む!",
+              otmp->blessed ? "少し" : otmp->cursed ? "かなり"
+                                                    : "焼けるように");
         dmg = d(otmp->cursed ? 2 : 1, otmp->blessed ? 4 : 8);
         losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
         exercise(A_CON, FALSE);
@@ -1552,7 +1552,7 @@ H2Opotion_dip(
         if (useeit) {
             glowcolor = hcolor(glowcolor);
             if (altfmt)
-                pline("%s with %s aura.", objphrase, an(glowcolor));
+                pline("%sが%sのオーラに包まれた.", objphrase, an(glowcolor));
             else
                 pline("%s %s.", objphrase, glowcolor);
             iflags.last_msg = PLNMSG_OBJ_GLOWS;
@@ -1652,19 +1652,19 @@ potionhit(struct monst *mon, struct obj *obj, int how)
         distance = distu(tx, ty);
         if (!cansee(tx, ty)) {
             Soundeffect(se_potion_crash_and_break, 60);
-            pline("Crash!");
+            pline("ガシャーン!");
         } else {
             char *mnam = mon_nam(mon);
             char buf[BUFSZ];
 
             if (hit_saddle && saddle) {
-                Sprintf(buf, "%s saddle",
+                Sprintf(buf, "%sの鞍",
                         s_suffix(x_monnam(mon, ARTICLE_THE, (char *) 0,
                                           (SUPPRESS_IT | SUPPRESS_SADDLE),
                                           FALSE)));
             } else if (has_head(mon->data)) {
-                Sprintf(buf, "%s %s", s_suffix(mnam),
-                        (gn.notonhead ? "body" : "head"));
+                Sprintf(buf, "%sの%s", s_suffix(mnam),
+                        (gn.notonhead ? "胴体" : "頭"));
             } else {
                 Strcpy(buf, mnam);
             }
@@ -1695,9 +1695,9 @@ potionhit(struct monst *mon, struct obj *obj, int how)
             if (!Acid_resistance) {
                 int dmg;
 
-                pline("This burns%s!",
-                      obj->blessed ? " a little"
-                                   : obj->cursed ? " a lot" : "");
+                pline("%s痛む!",
+                      obj->blessed ? "少し"
+                                   : obj->cursed ? "かなり" : "");
                 dmg = d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
                 losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
             }
@@ -1723,7 +1723,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
             break;
         }
         if (useeit && !affected)
-            pline("%s %s wet.", buf, aobjnam(saddle, "get"));
+            pline("%sが濡れた.", buf);
     } else {
         boolean angermon = your_fault, cureblind = FALSE;
 
@@ -1751,7 +1751,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
             if (mon->mhp < mon->mhpmax) {
                 healmon(mon, mon->mhpmax, 0);
                 if (canseemon(mon))
-                    pline("%s looks sound and hale again.", Monnam(mon));
+                    pline("%sはすっかり元気になったようだ.", Monnam(mon));
             }
             if (cureblind)
                 mcureblindness(mon, canseemon(mon));
@@ -1765,14 +1765,14 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                 /* most common case */
                 || resists_poison(mon)) {
                 if (canseemon(mon))
-                    pline("%s looks unharmed.", Monnam(mon));
+                    pline("%sは何ともなさそうだ.", Monnam(mon));
                 break;
             }
  do_illness:
             if (mon->mhp > 2) {
                 mon->mhp /= 2;
                 if (canseemon(mon))
-                    pline("%s looks rather ill.", Monnam(mon));
+                    pline("%sはかなり具合が悪そうだ.", Monnam(mon));
             }
             break;
         case POT_CONFUSION:
@@ -1790,19 +1790,19 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                 if (cansee(mon->mx, mon->my))
                     map_invisible(mon->mx, mon->my);
             } else if (sawit && cursed_potion) {
-                pline("%s briefly seems to be transparent.", Monnam(mon));
+                pline("%sは一瞬透けて見えた.", Monnam(mon));
                 /* see use_misc(muse.c) for comment about map_invisible() */
             } else if (!sawit && canspotmon(mon)) {
                 /* if an invisible mon glyph was present, mon_set_minvis()'s
                    newsym() has gotten rid of it */
-                pline("%s appears!", Monnam(mon));
+                pline("%sが姿を現した!", Monnam(mon));
             }
             break;
         }
         case POT_SLEEPING:
             /* wakeup() doesn't rouse victims of temporary sleep */
             if (sleep_monst(mon, rnd(12), POTION_CLASS)) {
-                pline("%s falls asleep.", Monnam(mon));
+                pline("%sは眠り込んだ.", Monnam(mon));
                 slept_monst(mon);
             }
             break;
@@ -1832,8 +1832,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
             if (mon_hates_blessings(mon) /* undead or demon */
                 || is_were(mon->data) || is_vampshifter(mon)) {
                 if (obj->blessed) {
-                    pline("%s %s in pain!", Monnam(mon),
-                          is_silent(mon->data) ? "writhes" : "shrieks");
+                    pline("%sは苦痛にもだえた!", Monnam(mon));
                     if (!is_silent(mon->data))
                         wake_nearto(tx, ty, mon->data->mlevel * 10);
                     mon->mhp -= d(2, 6);
@@ -1845,7 +1844,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                 } else if (obj->cursed) {
                     angermon = FALSE;
                     if (canseemon(mon))
-                        pline("%s looks healthier.", Monnam(mon));
+                        pline("%sは少し元気になったようだ.", Monnam(mon));
                     healmon(mon, d(2, 6), 0);
                     if (is_were(mon->data) && is_human(mon->data)
                         && !Protection_from_shape_changers)
@@ -1856,7 +1855,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                 (void) split_mon(mon, (struct monst *) 0);
             } else if (mon->data == &mons[PM_IRON_GOLEM]) {
                 if (canseemon(mon))
-                    pline("%s rusts.", Monnam(mon));
+                    pline("%sは錆びついた.", Monnam(mon));
                 mon->mhp -= d(1, 6);
                 /* should only be by you */
                 if (DEADMONSTER(mon))
@@ -1869,8 +1868,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
             break;
         case POT_ACID:
             if (!resists_acid(mon) && !resist(mon, POTION_CLASS, 0, NOTELL)) {
-                pline("%s %s in pain!", Monnam(mon),
-                      is_silent(mon->data) ? "writhes" : "shrieks");
+                pline("%sは酸で苦しんだ!", Monnam(mon));
                 if (!is_silent(mon->data))
                     wake_nearto(tx, ty, mon->data->mlevel * 10);
                 mon->mhp -= d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
@@ -1951,7 +1949,7 @@ potionbreathe(struct obj *obj)
     case POT_GAIN_ABILITY:
         if (obj->cursed) {
             if (!breathless(gy.youmonst.data)) {
-                pline("Ulch!  That potion smells terrible!");
+                pline("うえっ! その薬はひどい臭いだ!");
             } else if (haseyes(gy.youmonst.data)) {
                 const char *eyes = jp_body_part(EYE);
 
@@ -2033,15 +2031,15 @@ potionbreathe(struct obj *obj)
     case POT_INVISIBILITY:
         if (!Blind && !Invis) {
             kn++;
-            pline("For an instant you %s!",
-                  See_invisible ? "could see right through yourself"
-                                : "couldn't see yourself");
+            pline("一瞬%s!",
+                  See_invisible ? "自分の向こう側が見えた"
+                                : "自分の姿が見えなくなった");
         }
         break;
     case POT_PARALYSIS:
         kn++;
         if (!Free_action) {
-            pline("%s seems to be holding you.", Something);
+            pline("%sに押さえつけられているようだ.", Something);
             nomul(-rnd(5));
             gm.multi_reason = "frozen by a potion";
             gn.nomovemsg = You_can_move_again;
@@ -2424,7 +2422,7 @@ dip_potion_explosion(struct obj *obj, int dmg)
            around for potionbreathe() [and we can't set obj->in_use
            to 'amt' because that's not implemented] */
         obj->in_use = 1;
-        pline("%sThey explode!", !Deaf ? "BOOM!  " : "");
+        pline("%s薬瓶が爆発した!", !Deaf ? "ドカーン!  " : "");
         wake_nearto(u.ux, u.uy, (BOLT_LIM + 1) * (BOLT_LIM + 1));
         exercise(A_STR, FALSE);
         if (!breathless(gy.youmonst.data) || haseyes(gy.youmonst.data))
@@ -2446,7 +2444,7 @@ potion_dip(struct obj *obj, struct obj *potion)
     short mixture;
 
     if (potion == obj && potion->quan == 1L) {
-        pline("That is a potion bottle, not a Klein bottle!");
+        pline("それはクラインの壺ではなく、ただの薬瓶だ!");
         return ECMD_OK;
     }
     if (obj == &hands_obj) {
@@ -2508,7 +2506,7 @@ potion_dip(struct obj *obj, struct obj *potion)
 
         magic = (mixture != STRANGE_OBJECT) ? objects[mixture].oc_magic
             : (objects[obj->otyp].oc_magic || objects[potion->otyp].oc_magic);
-        Strcpy(qbuf, "The"); /* assume full stack */
+        Strcpy(qbuf, "すべての"); /* assume full stack */
         if (amt > (obj->odiluted ? 2 : magic ? 3 : 7)) {
             /* Trying to dip multiple potions will usually affect only a
                subset; pick an amount between 3 and 8, inclusive, for magic
@@ -2527,12 +2525,12 @@ potion_dip(struct obj *obj, struct obj *potion)
 
             if ((long) amt < obj->quan) {
                 obj = splitobj(obj, (long) amt);
-                Sprintf(qbuf, "%ld of the", obj->quan);
+                Sprintf(qbuf, "%ld個の", obj->quan);
             }
         }
         /* [N of] the {obj(s)} mix(es) with [one of] {the potion}... */
-        pline("%s %s %s with %s%s...", qbuf, simpleonames(obj),
-              otense(obj, "mix"), (potion->quan > 1L) ? "one of " : "",
+        pline("%s%sが%s%sと混ざり合った...", qbuf, simpleonames(obj),
+              (potion->quan > 1L) ? "そのうちの1つの" : "",
               thesimpleoname(potion));
         /* get rid of 'dippee' before potential perm_invent updates */
         useup(potion); /* now gone */
@@ -2589,16 +2587,16 @@ potion_dip(struct obj *obj, struct obj *potion)
            been made in order to get the merge result for both cases;
            as a consequence, mixing while Fumbling drops the mixture */
         freeinv(obj);
-        hold_potion(obj, "You drop %s!", doname(obj), (const char *) 0);
+        hold_potion(obj, "%sを落としてしまった!", doname(obj), (const char *) 0);
         return ECMD_TIME;
     }
 
     if (potion->otyp == POT_ACID && obj->otyp == CORPSE
         && obj->corpsenm == PM_LICHEN) {
-        pline("%s %s %s around the edges.", The(cxname(obj)),
-              otense(obj, "turn"), Blind ? "wrinkled"
-                                   : potion->odiluted ? hcolor(NH_ORANGE)
-                                     : hcolor(NH_RED));
+          pline("%sの縁が%sになった.", The(cxname(obj)),
+              Blind ? "しわしわ"
+                  : potion->odiluted ? hcolor(NH_ORANGE)
+                              : hcolor(NH_RED));
         potion->in_use = FALSE; /* didn't go poof */
         if (potion->dknown)
             trycall(potion);
@@ -2617,10 +2615,10 @@ potion_dip(struct obj *obj, struct obj *potion)
             char buf[BUFSZ];
 
             if (potion->quan > 1L)
-                Sprintf(buf, "One of %s", the(xname(potion)));
+                Sprintf(buf, "%sのうちの1つ", the(xname(potion)));
             else
                 Strcpy(buf, The(xname(potion)));
-            pline("%s forms a coating on %s.", buf, the(xname(obj)));
+            pline("%sが%sに膜を作った.", buf, the(xname(obj)));
             obj->opoisoned = TRUE;
             poof(potion);
             return ECMD_TIME;
@@ -2628,7 +2626,7 @@ potion_dip(struct obj *obj, struct obj *potion)
                    && (potion->otyp == POT_HEALING
                        || potion->otyp == POT_EXTRA_HEALING
                        || potion->otyp == POT_FULL_HEALING)) {
-            pline("A coating wears off %s.", the(xname(obj)));
+            pline("%sの膜がはがれ落ちた.", the(xname(obj)));
             obj->opoisoned = 0;
             poof(potion);
             return ECMD_TIME;
@@ -2662,16 +2660,14 @@ potion_dip(struct obj *obj, struct obj *potion)
                    || is_ammo(obj) || (!obj->oeroded && !obj->oeroded2)) {
             /* uses up potion, doesn't set obj->greased */
             if (!Blind)
-                pline("%s %s with an oily sheen.", Yname2(obj),
-                      otense(obj, "gleam"));
+                pline("%sが油でてらてら光った.", Yname2(obj));
             else /*if (!uarmg)*/
-                pline("%s %s oily.", Yname2(obj), otense(obj, "feel"));
+                pline("%sが油っぽく感じられた.", Yname2(obj));
         } else {
-            pline("%s %s less %s.", Yname2(obj),
-                  otense(obj, !Blind ? "are" : "feel"),
+            pline("%sが以前より%sなった.", Yname2(obj),
                   (obj->oeroded && obj->oeroded2)
-                      ? "corroded and rusty"
-                      : obj->oeroded ? "rusty" : "corroded");
+                      ? "錆や腐食が減って"
+                      : obj->oeroded ? "錆びが減って" : "腐食が減って");
             if (obj->oeroded > 0)
                 obj->oeroded--;
             if (obj->oeroded2 > 0)
@@ -2702,7 +2698,7 @@ potion_dip(struct obj *obj, struct obj *potion)
             obj->age = 0;
         }
         if (obj->age > 1000L) {
-            pline("%s %s full.", Yname2(obj), otense(obj, "are"));
+            pline("%sはもう満タンだった.", Yname2(obj));
             potion->in_use = FALSE; /* didn't go poof */
         } else {
             You("%sに油を注いだ.", yname(obj));
@@ -2762,11 +2758,11 @@ potion_dip(struct obj *obj, struct obj *potion)
                 Sprintf(newbuf, "turns %s",
                         hcolor(OBJ_DESCR(objects[mixture])));
             if (*newbuf)
-                pline_The("%spotion%s %s.", oldbuf,
-                          more_than_one ? " that you dipped into" : "",
+                pline_The("%s薬%sは%s.", oldbuf,
+                          more_than_one ? "（浸したほう）" : "",
                           newbuf);
             else
-                pline("Something happens.");
+                pline("何かが起きた.");
 
             if (old_dknown
                 && !objects[old_otyp].oc_name_known
@@ -2782,12 +2778,12 @@ potion_dip(struct obj *obj, struct obj *potion)
         }
         /* remove potion from inventory and re-insert it, possibly stacking
            with compatible ones; override 'pickup_burden' while doing so */
-        hold_potion(singlepotion, "You juggle and drop %s!",
+        hold_potion(singlepotion, "手元が狂って%sを落としてしまった!",
                     doname(singlepotion), (const char *) 0);
         return ECMD_TIME;
     }
 
-    pline("Interesting...");
+    pline("ふむ...");
     return ECMD_TIME;
 }
 
@@ -2823,11 +2819,11 @@ djinni_from_bottle(struct obj *obj)
     }
 
     if (!Blind) {
-        pline("In a cloud of smoke, %s emerges!", a_monnam(mtmp));
-        pline("%s speaks.", Monnam(mtmp));
+        pline("煙の雲の中から%sが現れた!", a_monnam(mtmp));
+        pline("%sが話しかけてきた.", Monnam(mtmp));
     } else {
         You("刺激臭のある煙を嗅いだ.");
-        pline("%s speaks.", Something);
+        pline("%sが話しかけてきた.", Something);
     }
 
     chance = rn2(5);
@@ -2840,7 +2836,7 @@ djinni_from_bottle(struct obj *obj)
     SetVoice(mtmp, 0, 80, 0);
     switch (chance) {
     case 0:
-        verbalize("お前には借りがある。1つだけ願いを叶えてやろう!");
+        pline("%sは消え去った.", Monnam(mtmp));
         /* give a wish and discard the monster (mtmp set to null) */
         mongrantswish(&mtmp);
         break;
@@ -2856,7 +2852,7 @@ djinni_from_bottle(struct obj *obj)
     case 3:
         verbalize("ようやくか！");
         if (canspotmon(mtmp))
-            pline("%s vanishes.", Monnam(mtmp));
+            pline("%sは消え去った.", Monnam(mtmp));
         mongone(mtmp);
         break;
     default:

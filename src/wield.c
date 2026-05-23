@@ -361,7 +361,7 @@ dowield(void)
     /* May we attempt this? */
     gm.multi = 0;
     if (cantwield(gy.youmonst.data)) {
-        pline("Don't be ridiculous!");
+        pline("ばかげている!");
         return ECMD_FAIL;
     }
     /* Keep going even if inventory is completely empty, since wielding '-'
@@ -410,7 +410,7 @@ dowield(void)
         /* offer to split stack if multiple are quivered */
         if (uquiver->quan > 1L && inv_cnt(FALSE) < invlet_basic
                                     && splittable(uquiver)) {
-            Sprintf(qbuf, "You have %ld %s readied.  Wield one?",
+            Sprintf(qbuf, "%ld本の%sを構えている。1本だけ装備するか?",
                     uquiver->quan, simpleonames(uquiver));
             switch (ynq(qbuf)) {
             case 'q':
@@ -423,19 +423,19 @@ dowield(void)
             default:
                 break;
             }
-            Strcpy(qbuf, "Wield all of them instead?");
+            Strcpy(qbuf, "代わりに全部装備するか?");
         } else {
             boolean use_plural = (is_plural(uquiver) || pair_of(uquiver));
 
-            Sprintf(qbuf, "You have %s readied.  Wield %s instead?",
-                    !use_plural ? "that" : "those",
-                    !use_plural ? "it" : "them");
+            Sprintf(qbuf, "%sを構えている。代わりに%sを装備するか?",
+                    !use_plural ? "それ" : "それら",
+                    !use_plural ? "それ" : "それら");
         }
         /* require confirmation to wield the quivered weapon */
         if (ynq(qbuf) != 'y') {
             (void) Shk_Your(qbuf, uquiver); /* replace qbuf[] contents */
-            pline("%s%s %s readied.", qbuf,
-                  simpleonames(uquiver), otense(uquiver, "remain"));
+            pline("%s%sはそのまま構えられている.", qbuf,
+                  simpleonames(uquiver));
             return ECMD_OK;
         }
         /* wielding whole readied stack, so no longer quivered */
@@ -466,7 +466,7 @@ doswapweapon(void)
     /* May we attempt this? */
     gm.multi = 0;
     if (cantwield(gy.youmonst.data)) {
-        pline("Don't be ridiculous!");
+        pline("ばかげている!");
         return ECMD_FAIL;
     }
     if (welded(uwep)) {

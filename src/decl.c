@@ -44,7 +44,7 @@ const struct c_common_strings c_common_strings =
       "shudder for a moment.",
       "何か",
       "何か",
-      "You can move again.",
+    "再び動けるようになった.",
       "Never mind.",
       "vision quickly clears.",
       { "the", "your" },

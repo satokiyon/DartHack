@@ -944,6 +944,9 @@ extern void room_discovered(int);
 extern void recbranch_mapseen(d_level *, d_level *) NONNULLPTRS;
 extern void overview_stats(winid, const char *, long *, long *) NONNULLPTRS;
 extern void remdun_mapseen(int);
+extern const char *jp_dungeon_name_for_display(const char *);
+extern const char *jp_dungeon_name_by_dnum(int);
+extern const char *jp_endgamelevelname_for_display(char *, int);
 extern const char *endgamelevelname(char *, int);
 
 /* ### earlyarg.c ### */
@@ -992,6 +995,7 @@ extern void cant_finish_meal(struct obj *) NONNULLARG1;
 extern void set_tin_variety(struct obj *, int) NONNULLARG1;
 extern int tin_variety_txt(char *, int *);
 extern void tin_details(struct obj *, int, char *);
+extern const char *jp_hunger_status_for_display(int, boolean);
 extern boolean Popeye(int);
 extern int Finish_digestion(void);
 
@@ -2589,11 +2593,14 @@ extern int dosacrifice(void);
 extern boolean can_pray(boolean);
 extern int dopray(void);
 extern const char *u_gname(void);
+extern const char *jp_u_gname_for_display(void);
 extern int doturn(void);
 extern int altarmask_at(coordxy, coordxy);
 extern const char *a_gname(void);
 extern const char *a_gname_at(coordxy x, coordxy y);
 extern const char *align_gname(aligntyp);
+extern const char *jp_align_gname_for_display(aligntyp);
+extern const char *jp_gname_for_display(const char *);
 extern const char *halu_gname(aligntyp);
 extern const char *align_gtitle(aligntyp);
 extern void altar_wrath(coordxy, coordxy);
@@ -3766,6 +3773,10 @@ extern void wet_a_towel(struct obj *, int, boolean) NONNULLARG1;
 extern void dry_a_towel(struct obj *, int, boolean) NONNULLARG1;
 extern char *skill_level_name(int, char *) NONNULLARG2;
 extern const char *skill_name(int);
+extern char *jp_skill_level_name_for_display(int, char *) NONNULLARG2;
+extern const char *jp_skill_name_for_display(int);
+extern char *jp_weapon_descr_for_display(struct obj *, char *, size_t)
+   NONNULLARG23;
 extern boolean can_advance(int, boolean);
 extern void show_skills(void);
 extern int enhance_weapon_skill(void);
