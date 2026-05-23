@@ -4130,15 +4130,15 @@ sellobj(
                when container's contents are unknown, plural "items"
                should be used to not give away information.
              */
-            Sprintf(qbuf, "%sは%s%ld %s%sを%s%sに提示した ",
+            Sprintf(qbuf, "%sは%s%ld %sで%s%s",
                     Shknam(shkp), short_funds ? "手持ちの都合で" : "", offer,
-                    plur(offer),
+                    currency(offer),
                     (cltmp && !ltmp)
                         ? ((yourc == 1L) ? "あなたの容器内の品" : "あなたの容器内の品々")
                         : "",
                     obj->unpaid ? "その" : "あなたの");
             one = !ltmp ? (yourc == 1L) : (obj->quan == 1L && !cltmp);
-            Sprintf(qsfx, "%s。%sを売るか?",
+            Sprintf(qsfx, "%sを買い取ると言っている。%sを売るか?",
                     (cltmp && ltmp)
                         ? (only_partially_your_contents
                                ? ((yourc == 1L) ? "と中の品"

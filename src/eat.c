@@ -158,6 +158,81 @@ static const struct {
                 { "", 0, 0, 0 } };
 #define TTSZ SIZE(tintxts)
 
+static const char *const tintxts_jp[] = {
+    "腐った",
+    "手製の",
+    "スープにした",
+    "フライにした",
+    "酢漬けにした",
+    "ゆでた",
+    "燻製にした",
+    "干した",
+    "揚げた",
+    "四川風の",
+    "あぶり焼きにした",
+    "炒めた",
+    "ソテーにした",
+    "砂糖漬けにした",
+    "すり潰した",
+    ""
+};
+
+staticfn void jp_tin_content_name(int, int, char *, size_t);
+staticfn void jp_tin_display_name(int, int, char *, size_t);
+
+staticfn void
+jp_tin_content_name(int tvariety, int mnum, char *buf, size_t bufsz)
+{
+    char foodbuf[BUFSZ];
+    const char *qualifier = "";
+
+    if (!buf || bufsz == 0)
+        return;
+
+    if (tvariety == SPINACH_TIN) {
+        Snprintf(buf, bufsz, "ほうれん草");
+        return;
+    }
+    if (mnum == NON_PM) {
+        Snprintf(buf, bufsz, "空");
+        return;
+    }
+
+    if (tvariety >= 0 && tvariety < (int) TTSZ)
+        qualifier = tintxts_jp[tvariety];
+
+    if (vegetarian(&mons[mnum]))
+        Snprintf(foodbuf, sizeof foodbuf, "%s", jp_pmname(&mons[mnum], NEUTRAL));
+    else
+        Snprintf(foodbuf, sizeof foodbuf, "%s肉", jp_pmname(&mons[mnum], NEUTRAL));
+
+    if (qualifier && *qualifier)
+        Snprintf(buf, bufsz, "%s%s", qualifier, foodbuf);
+    else
+        Snprintf(buf, bufsz, "%s", foodbuf);
+}
+
+staticfn void
+jp_tin_display_name(int tvariety, int mnum, char *buf, size_t bufsz)
+{
+    char contentbuf[BUFSZ];
+
+    if (!buf || bufsz == 0)
+        return;
+
+    if (tvariety == SPINACH_TIN) {
+        Snprintf(buf, bufsz, "ほうれん草の缶詰");
+        return;
+    }
+    if (mnum == NON_PM) {
+        Snprintf(buf, bufsz, "空の缶");
+        return;
+    }
+
+    jp_tin_content_name(tvariety, mnum, contentbuf, sizeof contentbuf);
+    Snprintf(buf, bufsz, "%sの缶詰", contentbuf);
+}
+
 /* called after mimicking is over */
 staticfn int
 eatmdone(void)
@@ -1423,34 +1498,10 @@ tin_variety_txt(char *s, int *tinvariety)
 void
 tin_details(struct obj *obj, int mnum, char *buf)
 {
-    char buf2[BUFSZ];
-
     if (!obj || !buf)
         return;
 
-    int r = tin_variety(obj, TRUE);
-
-    if (r == SPINACH_TIN)
-        Strcat(buf, " of spinach");
-    else if (mnum == NON_PM)
-        Strcpy(buf, "empty tin");
-    else {
-        if ((obj->cknown || iflags.override_ID) && obj->spe < 0) {
-            if (r == ROTTEN_TIN || r == HOMEMADE_TIN) {
-                /* put these before the word tin */
-                Sprintf(buf2, "%s %s of ", tintxts[r].txt, buf);
-                Strcpy(buf, buf2);
-            } else {
-                Sprintf(eos(buf), " of %s ", tintxts[r].txt);
-            }
-        } else {
-            Strcpy(eos(buf), " of ");
-        }
-        if (vegetarian(&mons[mnum]))
-            Sprintf(eos(buf), "%s", mons[mnum].pmnames[NEUTRAL]);
-        else
-            Sprintf(eos(buf), "%s meat", mons[mnum].pmnames[NEUTRAL]);
-    }
+    jp_tin_display_name(tin_variety(obj, TRUE), mnum, buf, BUFSZ);
 }
 
 void
@@ -1594,7 +1645,12 @@ consume_tin(const char *mesg)
         /* in case stop_occupation() was called on previous meal */
         svc.context.victual = zero_victual; /* victual.piece = 0, .o_id = 0 */
 
-        You("%sの%sを完食した.", tintxts[r].txt, mons[mnum].pmnames[NEUTRAL]);
+        {
+            char tinbuf[BUFSZ];
+
+            jp_tin_content_name(r, mnum, tinbuf, sizeof tinbuf);
+            You("%sを完食した.", tinbuf);
+        }
 
         eating_conducts(&mons[mnum]);
 
@@ -1633,10 +1689,12 @@ consume_tin(const char *mesg)
                it's debatable whether a rock mole should have its paws made
                slippery when eating a greasy tin, but we'll go with that... */
             int alreadyglib = (int) (Glib & TIMEOUT);
+            char tinbuf[BUFSZ];
 
+            jp_tin_content_name(r, mnum, tinbuf, sizeof tinbuf);
             make_glib(alreadyglib + rn1(11, 5)); /* 5..15 */
-            pline("%sの食べ物を食べたので、%sが%s滑りやすくなった.",
-                  tintxts[r].txt, fingers_or_gloves(TRUE),
+            pline("%sを食べたので、%sが%s滑りやすくなった.",
+                tinbuf, fingers_or_gloves(TRUE),
                   alreadyglib ? "さらに" : "非常に");
         }
 
