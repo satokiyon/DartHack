@@ -4015,55 +4015,51 @@ piranha
 		［ 熱帯雨林の動物たちウェブサイト ］
 pit
 spiked pit
-	Amid the thought of the fiery destruction that impended, the
-	idea of the coolness of the well came over my soul like balm.
-	I rushed to its deadly brink.  I threw my straining vision
-	below.  The glare from the enkindled roof illumined its inmost
-	recesses.  Yet, for a wild moment, did my spirit refuse to
-	comprehend the meaning of what I saw.  At length it forced --
-	it wrestled its way into my soul -- it burned itself in upon my
-	shuddering reason.  Oh! for a voice to speak! -- oh! horror! --
-	oh! any horror but this!
-		[ The Pit and the Pendulum, by Edgar Allan Poe ]
+	差し迫る火刑の恐怖のただ中で、井戸の冷たさという考えが、
+	私の魂に香油のように染み渡ってきた。私はその死の縁へと
+	駆け寄った。目を凝らして下を覗き込んだ。燃え上がる天井からの
+	眩い光が、その最も奥深い暗がりを照らし出していた。しかし、
+	狂乱の瞬間のなか、私の精神は自分が見たものの意味を理解するのを
+	拒んだ。やがてそれは無理やり ―― 私の魂へと押し入り、私の
+	身震いする理性のなかに焼きついた。ああ！ 叫ぶべき言葉があれば！
+	―― ああ！ 恐怖よ！ ―― ああ！ これ以外のどんな恐怖であっても
+	よかったのに！
+		［『落とし穴と振り子』、エドガー・アラン・ポー著 ］
 pit fiend
-	Pit fiends are among the more powerful of devils, capable of
-	attacking twice with weapons as well as grabbing and crushing
-	the life out of those unwary enough to enter their
-	domains.
+	ピット・フィーンド（深淵の悪魔）は、悪魔の中でも極めて強力な
+	存在であり、武器による２回の攻撃に加え、不用意にも彼らの領域に
+	足を踏み入れた愚か者を捕らえ、その命を握りつぶす能力を持っている。
 platinum yendorian express card
-	This is an ancient artifact made of an unknown material.  It
-	is rectangular in shape, very thin, and inscribed with archaic
-	runes of power.  When carried, it grants the bearer ESP, reduces
-	incoming damage from spells by half, and protects from magic
-	missile attacks.  Additionally, its power is such that when
-	invoked, it can charge other objects.
-# playing style, rather vague topic but these quotes are too apt to pass up
+	未知の素材で作られた古代のアーティファクトである。形状は長方形で
+	非常に薄く、太古の力あるルーンが刻まれている。所持していると、
+	持ち主にテレパシー（ＥＳＰ）を授け、呪文による被ダメージを半分に
+	軽減し、マジックミサイルの攻撃から身を守る。さらにその力は絶大で、
+	使用すると、他の道具を充電（充填）することができる。
 player
 play* style
 user
-	Be bold,
-	be bold,
-	but not too bold.
-	Or else your life's blood,
-	shall run cold.
-		[ The White Road, by Neil Gaiman ]
+	勇敢であれ、
+	勇敢であれ、
+	しかし、勇敢になりすぎるな。
+	さもなくばお前の命の血は、
+	冷たく凍りつくであろう。
+		［『白い道』、ニール・ゲイマン著 ］
 
-	People think I'm crazy to worry all the time;
-	If you paid attention, you'd be worried too.
-	You better pay attention, or this world we love so much
-	Might just kill you.
-		[ It's a Jungle Out There, by Randy Newman ]
-#			[ theme song from "Monk" ]
+	四六時中心配ばかりして、狂っていると人は言う；
+	もし君が注意を払っていれば、君だって心配になるさ。
+	注意を怠るな、さもなくば我々の大好きなこの世界が
+	君を殺してしまうかもしれない。
+		［「イッツ・ア・ジャングル・アウト・ゼア」、
+		  ランディ・ニューマン著 ］
 poison
 poisoned
 potion of sickness
 *venom
-	Fate intervened. Some of us, that day, she led inexorably
-	through the gates of death. Some of us, innocent and unsuspecting,
-	took, unwillingly, that one last step to oblivion. Some of us took
-	very little sugar.
-		[ We Have Always Lived in the Castle,
-			by Shirley Jackson ]
+	運命が介入した。あの日、彼女はある者たちを死の門へと容赦なく
+	導いた。罪もなく何も疑うことのない一部の者たちは、意に反して、
+	忘却へと至る最後の一歩を踏み出した。そして私たちの何人かは、
+	砂糖をほんの少ししか入れなかった。
+		［『城の生祠』、シャーリイ・ジャクスン著 ］
 polearm
 * polearm
 partisan
@@ -4089,180 +4085,165 @@ bec de corbin
 	すべて一つの武器に統合したものも存在した。
 		［『中世の紋章と甲冑』、マーヴィン・Ｈ・パクラ著 ］
 polymorph trap
-	One morning, as Gregor Samsa was waking up from anxious dreams,
-	he discovered that in bed he had been changed into a monstrous
-	verminous bug.  He lay on his armour-hard back and saw, as he
-	lifted his head up a little, his brown, arched abdomen divided
-	up into rigid bow-like sections.  From this height the blanket,
-	just about ready to slide off completely, could hardly stay in
-	place.  His numerous legs, pitifully thin in comparison to the
-	rest of his circumference, flickered helplessly before his eyes.
-		[ The Metamorphosis, by Franz Kafka,
-			translated by Ian Johnston ]
+	ある朝、グレーゴル・ザムザが不安な夢から目を覚ますと、自分が
+	ベッドの中で１匹の巨大な毒虫に変わっていることに気づいた。
+	彼は鎧のように硬い背中を下にして横たわっており、頭を少し持ち
+	上げると、茶色くてアーチ状になった自分の腹部が、頑丈な弓なりの
+	節に分かれているのが見えた。この高さからは、今にも完全にずり
+	落ちそうな掛け布団が、かろうじて留まっているのがやっとだった。
+	他の胴体の太さに比べて哀れなほど細い彼の無数の脚が、彼の目の前で
+	どうすることもできずに頼りなくうごめいていた。
+		［『変身』、フランツ・カフカ著 ］
 pony
-		Hey! now! Come hoy now! Whither do you wander?
-		Up, down, near or far, here, there or yonder?
-		Sharp-ears, Wise-nose, Swish-tail and Bumpkin,
-		White-socks my little lad, and old Fatty Lumpkin!
+		やあ！ さあ！ ここへおいで！ どこへさまようのだ？
+		上か、下か、近くか遠くか、ここか、あそこか、向こうか？
+		耳尖り、鼻利き、尾振り、それに田舎っぺ、
+		白い靴下ちゃん、それに年老いたデブのルンプキン！
 
-	[...]
-	Tom called them one by one and they climbed over the brow and
-	stood in a line.  Then Tom bowed to the hobbits.
+	［……］
+	トムが名前を一つずつ呼ぶと、彼らは丘の頂を越えて登ってきて、
+	一列に並んだ。それからトムはホビットたちにお辞儀をした。
 
-	"Here are your ponies, now!" he said.  "They've more sense (in some
-	ways) than you wandering hobbits have -- more sense in their noses.
-	For they sniff danger ahead which you walk right into; and if they
-	run to save themselves, then they run the right way."
-		[ The Fellowship of the Ring, by J.R.R. Tolkien ]
+	「さあ、お前さんたちのポニーだ！」彼は言った。「この子たちは
+	（ある意味では）放浪するお前さんたちよりずっと分別がある ――
+	特に鼻の分別がな。お前さんたちがうかつに踏み込む行く手の危険を
+	嗅ぎつけ、我が身を守るために逃げ出すときは、正しい方向へと
+	駆けていくのだからな。」
+		［『旅の仲間』、Ｊ・Ｒ・Ｒ・トールキン著 ］
 *portal
-	Portals can be Mirrors, Pictures, Standing Stones, Stone
-	Circles, Windows, and special gates set up for the purpose.
-	You will travel through them both to distant parts of the
-	continent and to and from our own world.  The precise manner
-	of their working is a Management secret.
-	  [ The Tough Guide to Fantasyland, by Diana Wynne Jones ]
+	ポータル（転移門）は鏡、絵画、立石、環状列石、窓、およびその
+	目的のために設置された特別な門である。あなたはそれらを通じて、
+	大陸の遥か遠方へ旅するだけでなく、我々の世界との間を行き来する
+	ことになる。その正確な仕組みは、運営元の最高機密である。
+		［『ファンタジーランドのタフ・ガイド』、
+		  ダイアナ・ウィン・ジョーンズ著 ］
 trident
 poseido*n
-	Poseido(o)n, lord of the seas and father of rivers and
-	fountains, was the son of Chronos and Rhea, brother of Zeus,
-	Hades, Hera, Hestia and Demeter.  His rank of ruler of the
-	waves he received by lot at the Council Meeting of the Gods,
-	at which Zeus took the upper world for himself and gave
-	dominion over the lower world to Hades.
+	海の主であり、河川と泉の父であるポセイドンは、クロノスとレアーの
+	息子であり、ゼウス、ハデス、ヘラ、ヘスティア、デメテルの兄弟で
+	あった。波を支配する王者としての彼の地位は、ゼウスが天界を自らの
+	ものとし、冥界の支配権をハデスに与えた神々の合議におけるくじ引き
+	によって決定された。
 
-	Poseidon is associated in many ways with horses and thus is
-	the god of horses.  He taught men how to ride and manage the
-	animal he invented and is looked upon as the originator and
-	guardian deity of horse races.
+	ポセイドンは馬と多方面で結びついており、それゆえに馬の神でもある。
+	彼は自らが創り出したこの動物に乗り、操る方法を人間に教え、競馬の
+	創始者にして守護神とみなされている。
 
-	His symbol is the familiar trident or three-pronged spear
-	with which he can split rocks, cause or quell storms, and
-	shake the earth, a power which makes him the god of
-	earthquakes as well.  Physically, he is shown as a strong and
-	powerful ruler, every inch a king.
-	    [ The Encyclopaedia of Myths and Legends of All Nations,
-		by Herbert Spencer Robinson and Knox Wilson ]
+	彼の象徴はよく知られた三叉の矛（トライデント）であり、それによって
+	岩を砕き、嵐を起こし、あるいは鎮め、大地を揺るがすことができる。
+	この力は彼を地震の神にもしている。容姿においては、頭から足先まで
+	どこから見ても王にふさわしい、屈強で強力な支配者として描かれる。
+		［『万国神話伝説百科』、ハーバート・スペンサー・
+		  ロビンソン、ノックス・ウィルソン著 ］
 ~*sleeping
 ~*booze
 *potion*
-	POTABLE, n.  Suitable for drinking.  Water is said to be
-	potable; indeed, some declare it our natural beverage,
-	although even they find it palatable only when suffering
-	from the recurrent disorder known as thirst, for which it
-	is a medicine.  Upon nothing has so great and diligent
-	ingenuity been brought to bear in all ages and in all
-	countries, except the most uncivilized, as upon the
-	invention of substitutes for water.  To hold that this
-	general aversion to that liquid has no basis in the
-	preservative instinct of the race is to be unscientific --
-	and without science we are as the snakes and toads.
-		[ The Devil's Dictionary, by Ambrose Bierce ]
+	飲用に適したもの、名詞。飲料。水は飲用に適していると言われる；
+	実際、一部の者はそれを我々の自然な飲み物だと断言しているが、
+	そうした者たちでさえ、渇きとして知られる再発性の障害に苦しんで
+	いるとき（水はその薬である）にしか、それを美味しいとは思わない。
+	最も未開な地域を除き、あらゆる時代、あらゆる国において、水の代用
+	品の発明ほど、多大かつ勤勉な独創性が注ぎ込まれたものはない。
+	この液体に対する一般的な嫌悪感が、人類の自己保存本能に根ざして
+	いないと主張することは非科学的である ―― そして科学がなければ、
+	我々は蛇やヒキガエルと同類なのである。
+		［『悪魔の辞典』、アンブローズ・ビアス著 ］
 
-	Jack Burton:  What's in the flask, Egg?  Magic potion?
-	   Egg Shen:  Yeah.
-	       Jack:  I thought so, good.  What do we do?  Drink it?
-	        Egg:  Yeah.
-	       Jack:  Good, I thought so.
-	     [later]
-	       Jack:  This does what again, exactly?
-	        Egg:  Huge buzz!  [drinks]  Oh good!  See things no
-	              one else can see, do things no one else can do.
-		[ Big Trouble in Little China, directed by
-		  John Carpenter, written by Gary Goldman &
-		  David Z. Weinstein, adaptation by W.D. Richter ]
+	ジャック・バートン：そのフラスコには何が入ってるんだ、エッグ？
+	                    魔法の薬か？
+	      エッグ・シェン：そうだ。
+	        ジャック：そう思ったぜ、いいね。どうする？ 飲むのか？
+	          エッグ：そうだ。
+	        ジャック：よし、そう思ったぜ。
+	     ［後ほど］
+	        ジャック：これって、正確にはどんな効果があるんだっけ？
+	          エッグ：凄まじくキマるぞ！［飲む］おお、最高だ！
+	                  他の誰にも見えないものが見え、他の誰にも
+	                  できないことができる。
+		［映画『ゴーストハンターズ』、
+		  ジョン・カーペンター監督 ］
 pray*
-	Whatever a man prays for, he prays for a miracle.  Every
-	prayer reduces itself to this:  Great God, grant that twice
-	two be not four.
-		[ Fathers and Sons, by Ivan Turgenev ]
+	人が何を祈ろうとも、それは奇跡を祈っているのである。すべての
+	祈りは突き詰めればこれに帰結する：偉大なる神よ、どうか２かける
+	２が４になりませんように。
+		［『父と子』、イワン・ツルゲーネフ著 ］
 priest*
 * priest*
 cleric
 * cleric
 acolyte
-	[...]  For the two priests were talking exactly like priests,
-	piously, with learning and leisure, about the most aerial
-	enigmas of theology.  The little Essex priest spoke the more
-	simply, with his round face turned to the strengthening stars;
-	the other talked with his head bowed, as if he were not even
-	worthy to look at them.  But no more innocently clerical
-	conversation could have been heard in any white Italian cloister
-	or black Spanish cathedral.  The first he heard was the tail of
-	one of Father Brown's sentences, which ended:  "... what they
-	really meant in the Middle Ages by the heavens being
-	incorruptible."  The taller priest nodded his bowed head and
-	said:  "Ah, yes, these modern infidels appeal to their reason;
-	but who can look at those millions of worlds and not feel that
-	there may well be wonderful universes above us where reason is
-	utterly unreasonable?"
-		[ The Innocence of Father Brown, by G.K. Chesterton ]
+	［……］二人の神父はまさに神父らしく、敬虔に、知性と余裕を漂わせ、
+	神学の極めて観念的な謎について語り合っていた。エセックスから来た
+	小柄な神父は、輝きを増す星々に丸顔を向けながら、より素朴に語った。
+	もう一方は、星々を見つめることすら自分には値しないとでも言うように、
+	頭を垂れて話していた。しかし、これほど無垢で聖職者らしい会話は、
+	白いイタリアの修道院でも、黒いスペインの大聖堂でも耳にすることは
+	できなかっただろう。最初に聞こえたのは、ブラウン神父の言葉の
+	最後の一節であった：「……彼らが中世において、天が不朽であると
+	言った真の意味がそこにあるのです。」背の高い神父は垂れた頭を
+	縦に振り、語った：「ああ、そうですな。現代の不信心者たちは
+	理性に訴えかけます。しかし、何百万もの世界を見つめて、我々の頭上
+	には理性が全く通用しない素晴らしい宇宙が広がっているかもしれないと、
+	そう感じない者がいるでしょうか？」
+		［『ブラウン神父の童心』、Ｇ・Ｋ・チェスタトン著 ］
 paddle cactus
-	Opuntia, commonly called prickly pear, is a genus in the cactus
-	family, Cactaceae. Prickly pears are also known as tuna (fruit),
-	sabra, nopal (paddle, plural nopales) from the Nahuatl word
-	nopalli for the pads, or nostle, from the Nahuatl word nochtli
-	for the fruit; or paddle cactus.
-		[ Wikipedia, the free encyclopedia ]
+	一般的にウチワサボテン（Prickly pear）と呼ばれるオプンティアは、
+	サボテン科（Cactaceae）に属する属である。ウチワサボテンは、
+	ツナ（果実）、サブラ、ナワトル語で茎葉を意味するノパッリに由来する
+	ノパル（茎葉、複数形ノパレス）、あるいはナワトル語で果実を意味する
+	ノチトリに由来するノストル、またはパドル・サボテンとも呼ばれる。
+		［『ウィキペディア百科事典』 ］
 prisoner
-	Where am I?
-		In the Village.
-	What do you want?
-		Information.
-	Whose side are you on?
-		That would be telling.  We want information ...
-		information ...
-	You won't get it.
-		By hook or by crook, we will.
-	Who are you?
-		The new Number 2.
-	Who is Number 1?
-		You are Number 6.
-	I am not a number!  I am a free man!
-		[ The Prisoner, by Patrick McGoohan ]
+	ここはどこだ？
+		村の中だ。
+	何の用だ？
+		情報だ。
+	どちらの味方だ？
+		それは教えられないな。我々は情報が欲しいのだ……
+		情報が……
+	手に入るものか。
+		手段を選ばず、何としても手に入れる。
+	お前は誰だ？
+		新しいナンバー２だ。
+	ナンバー１は誰だ？
+		お前はナンバー６だ。
+	私は番号ではない！ 自由な人間だ！
+		［『プリズナーNo.6』、パトリック・マクグーハン作 ］
 ptah
-	Known under various names (Nu, Neph, Cenubis, Amen-Kneph,
-	Khery-Bakef), Ptah is the creator god and god of craftsmen.
-	He is usually depicted as wearing a closely fitting robe
-	with only his hands free.  His most distinctive features are
-	the invariable skull-cap exposing only his face and ears,
-	and the _was_ or rod of domination which he holds,
-	consisting of a staff surmounted by the _ankh_ symbol of
-	life.  He is otherwise symbolized by his sacred animal, the
-	bull.
+	様々な名前（ヌ、ネフ、クヌビス、アメン・クネフ、ヘリ・バケフ）で
+	知られるプタハは、創造神であり職人の神である。彼は通常、両手だけ
+	を露出させたぴったりとしたローブをまとった姿で描かれる。最も特徴
+	的なのは、顔と耳だけを露出する頭に密着したキャップと、彼が手にする
+	支配の杖（ワス杖）であり、これには生命の象徴であるアンクが冠されて
+	いる。その他の象徴としては、彼の聖獣である牡牛が用いられる。
 *purple worm
-	A gargantuan version of the harmless rain-worm, the purple
-	worm poses a huge threat to the ordinary adventurer.  It is
-	known to swallow whole and digest its victims within only a
-	few minutes.  These worms are always on guard, sensitive
-	to the most minute vibrations in the earth, but may also
-	be awakened by a remote shriek.
+	無害なミミズを途方もなく巨大化させたパープル・ワームは、普通の
+	冒険者にとって極めて重大な脅威となる。犠牲者を丸呑みし、わずか
+	数分で消化してしまうことで知られている。これらのワームは常に
+	警戒を怠らず、地上の極めて微細な振動にも敏感であるが、遥か遠くの
+	悲鳴によって呼び起こされることもある。
 pyrolisk
-	At first glance around the corner, I thought it was another
-	cockatrice. I had encountered the wretched creatures two or
-	three times since leaving the open area. I quickly ducked my
-	head back and considered what to do next. My heart had begun
-	to thump audibly as I patted my pack to make sure I still had
-	the dead lizards at close reach. A check of my attire showed
-	no obvious holes or damage. I had to keep moving. One deep
-	breath, and a count of three, two, one, and around the corner
-	I bolted. But it was no cockatrice! I felt a sudden intense
-	searing of the skin around my face, and flames began to leap
-	from my pack. I tossed it to the ground, and quickly retreated
-	back, around that corner, desperately striving to get out of
-	its sight.
+	角を曲がって最初に見つめたとき、私はまた別のコカトリスかと思った。
+	開けた場所を離れてから、すでにあの忌々しい生き物に２、３回遭遇して
+	いたからだ。私は素早く頭を引っ込めて、次にするべきことを考えた。
+	手元にまだトカゲの死骸があることを確かめようとパックを軽く叩くと、
+	私の心臓はドクドクと音を立てて波打ち始めた。衣服をチェックしたが、
+	目立つ穴や損傷はなかった。進み続けなければならない。深呼吸を
+	一つして、３、２、１とカウントし、角を曲がって飛び出した。
+	だが、コカトリスではなかった！ 顔の周りの皮膚が突然激しく焼かれる
+	ような熱さを感じ、私のパックから炎が噴き出し始めたのだ。私はそれを
+	地面に投げ捨て、その視界から何としても逃れようと、あの角の後ろへと
+	大慌てで退却した。
 python
-	A monstrous serpent in Greek mythology, and the child of Gaia,
-	the goddess earth.  It was produced from the slime and mud
-	that was left on the earth by the great flood of Deucalion.
-	It lived in a cave and guarded the oracle of Delphi on mount
-	Parnassus.
+	ギリシャ神話に登場する巨大な蛇であり、大地の女神ガイアの子。
+	デウカリオンの大洪水によって地上に残された泥やヘドロから生まれた。
+	パルナッソス山にある洞窟に住み、デルポイの神託所を守っていた。
 
-	No man dared to approach the beast and the people asked Apollo
-	for help.  He came down from Mount Olympus with his silver bow
-	and golden arrows.  With using only one arrow he killed the
-	serpent and claimed the oracle for himself. ... The old name of
-	Delphi, Pytho, refers to the serpent.
-		[ Encyclopedia Mythica, ed. M.F. Lindemans ]
+	この獣に近づく者はおらず、人々はアポロンに助けを求めた。
+	彼は銀の弓と金の矢を携えてオリンポス山から降臨した。彼はわずか
+	１本の矢で大蛇を退治し、神託所を自らのものとした。……デルポイの
+	古い名前であるピュートーは、この大蛇に由来している。
+		［『神話百科事典』、Ｍ・Ｆ・リンデマンス編 ］
 quadruped
 	The woodlands and other regions are inhabited by multitudes
 	of four-legged creatures which cannot be simply classified.
