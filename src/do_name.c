@@ -647,6 +647,21 @@ build_docall_prompt(char *qbuf, size_t qbufsz, struct obj *obj)
              docall_target_name(obj, target, sizeof target));
 }
 
+staticfn void
+normalize_scroll_callname(struct obj *obj, char *buf, size_t bufsz)
+{
+    const char *en_descr;
+    const char *jp_descr;
+
+    if (!obj || obj->oclass != SCROLL_CLASS || !buf || !*buf)
+        return;
+
+    en_descr = OBJ_DESCR(objects[obj->otyp]);
+    jp_descr = jp_item_descr(obj->otyp);
+    if (en_descr && jp_descr && !strcmpi(buf, en_descr))
+        Snprintf(buf, bufsz, "%s", jp_descr);
+}
+
 void
 docall(struct obj *obj)
 {
@@ -673,6 +688,7 @@ docall(struct obj *obj)
 
     /* strip leading and trailing spaces; uncalls item if all spaces */
     (void) mungspaces(buf);
+    normalize_scroll_callname(obj, buf, sizeof buf);
     if (!*buf) {
         if (had_name) /* possibly remove from disco[]; old *uname_p is gone */
             undiscover_object(obj->otyp);

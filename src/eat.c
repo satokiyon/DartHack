@@ -2052,7 +2052,7 @@ consume_tin(const char *mesg)
                                                                     : "最悪だ")
                                                  : (yummy ? "とてもおいしい"
                                                      : palatable ? palatable_msgs[idx]
-                                                                    : "ひどい味");
+                                                                    : "ひどい味だ");
 
           pline("%sは%s%c", pmxnam, taste_desc,
                   (yummy || !palatable) ? '!' : '.');
