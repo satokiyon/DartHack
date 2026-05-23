@@ -39,6 +39,15 @@
 - **mortal**: 定命の者
 - **creature**: 怪物
 - **genocide**: 虐殺
+- **Sokoban**: 倉庫番
+- **Moloch**: モーロック
+- **experience point**: 経験値
+- **energy point**: MP
+- **spell power**: 魔力
+- **skill**: スキル
+
+
+なお、その他の用語についてはJNetHack-3.6.7の日本語化パッチ( `docs/jnethack-3.6.7-0.1.diff.UTF8` )も参考にする
 
 ### 職業・種族・性別・属性（全UI共通の統一語彙）
 
