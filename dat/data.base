@@ -1872,18 +1872,18 @@ fruitname
 	役割としても価値がある。
 		［『コロンビア簡約百科事典』 ］
 *gargoyle
-	かくして、人間が地上を支配する間、ガルゴイルたちは
+	かくして、人間が地上を支配する間、ガーゴイルたちは
 	光から身を隠し、潜みながら待ち続けた。人間の暦で
-	６００年ごとに蘇るガルゴイルたちは、地上の支配権を
+	６００年ごとに蘇るガーゴイルたちは、地上の支配権を
 	手に入れるために人間との戦いに挑んだ。
 
 	出現するたびに、より多くの数で繁栄する人間によって
-	ガルゴイルたちは全滅寸前まで追い込まれた。今や
-	数百年が経過し、古代のガルゴイルの彫像や絵画は、
+	ガーゴイルたちは全滅寸前まで追い込まれた。今や
+	数百年が経過し、古代のガーゴイルの彫像や絵画は、
 	単なる人間の想像力の産物に過ぎないかのように見える。
 	今年、人間が自ら招いた多くの災いに心を奪われている間に、
-	最も古き敵であるガルゴイルの存在を忘れてしまったのだ。
-		［ 映画『ガルゴイル』オープニングナレーションより抜粋、
+	最も古き敵であるガーゴイルの存在を忘れてしまったのだ。
+		［ 映画『ガーゴイル』オープニングナレーションより抜粋、
 		   スティーヴン＆エリナー・カープフ脚本 ］
 *garlic
 	１１月１日 ―― 私たちは一日中、かなりの速度で旅を続けた。
@@ -2761,41 +2761,37 @@ jubilex
 # in nethack they weigh the same and K-ration provides more nutrition?
 k?ration
 c?ration
-	The C ration was a predecessor of the K ration.
-		[]
-	The K ration was the [ Quartermaster Subsistence Research
-	and Development Laboratory's ] answer to the demand for an
-	individual, easy-to-carry ration that could be used in
-	assault and combat operations.  It was noted for compactness
-	and superior packaging and was acknowledged as the ration
-	that provided the greatest variety of nutritionally balanced
-	components within the smallest space.
-		[ Special Rations for the Armed Forces, 1946-53,
-		  by Franz A. Koehler ]
+	ＣレーションはＫレーションの前身である。
+		［］
+	Ｋレーションは、突撃作戦や戦闘作戦で使用できる、
+	個人の持ち運びが容易な携行食への要求に対する、
+	［クォーターマスター兵站自給研究開発研究所］の回答で
+	あった。それはコンパクトさと優れた包装で注目され、最小の
+	スペースの中に最も多様で栄養バランスの取れた成分を
+	提供する携行食として認められていた。
+		［『軍用特別配給食 1946-53』、
+		  フランツ・A・ケーラー著 ］
 kabuto
-	The kabuto is the helmet worn by the samurai.  It was
-	characterized by a prominent beaked front which jutted out over
-	the brow to protect the wearer's face; a feature that gives
-	rise to their modern Japanese name of 'shokaku tsuki kabuto'
-	(battering-ram helmet).  Their main constructional element
-	was an oval plate, the shokaku bo, slightly domed for the
-	head with a narrow prolongation in front that curved forwards
-	and downwards where it developed a pronounced central
-	fold.  Two horizontal strips encircling the head were riveted
-	to this frontal strip:  the lower one, the koshimaki (hip
-	wrap), formed the lower edge of the helmet bowl; the other,
-	the do maki (body wrap), was set at about the level of the
-	temples.  Filling the gaps between these strips and the shokaku
-	bo were small plates, sometimes triangular but more commonly
-	rectangular in shape.  Because the front projected so
-	far from the head, the triangular gap beneath was filled by
-	a small plate, the shoshaku tei ita, whose rear edge bent
-	downwards into a flange that rested against the forehead.
-	   [ Arms & Armour of the Samurai, by Bottomley & Hopson ]
+	兜（かぶと）は、侍が着用するヘルメット（鉢）である。
+	着用者の顔を保護するために額の上に突き出た、目立つ嘴状の
+	前面部が特徴的であった；この特徴が「衝角付兜」という
+	現代の日本名（船首の体当たり突起に似た兜）の由来となって
+	いる。その主な構造的要素は、頭部に合わせて緩やかに
+	ドーム状になった楕円形の板「衝角の棒」であり、前方に細く
+	伸びて前方かつ下方へ湾曲し、そこで顕著な中央の折り目を
+	形成していた。この前面の帯に、頭部を囲む二本の水平な
+	帯板が鋲留めされていた：下側の「腰巻」は兜鉢の下縁を
+	形成し、もう一方の「胴巻」はほぼこめかみの高さに配置
+	された。これらの帯板と「衝角の棒」の隙間を埋めるのは、
+	三角形または多くは長方形の形状をした小札（こざね）板で
+	あった。前面が頭部から大きく突き出していたため、その下の
+	三角形の隙間は小板（眉庇貞板）で塞がれ、その後の縁は
+	額に当たるフランジへと下向きに曲げられていた。
+	   ［『侍の武器と甲冑』、ボトムリー＆ホプソン著 ］
 katana
-	The katana is a long, single-edged samurai sword with a
-	slightly curved blade.  Its long handle is designed to allow
-	it to be wielded with either one or two hands.
+	刀（かたな）は、わずかに反りのある片刃の侍の長剣である。
+	その長い柄は、片手でも両手でも振るうことができるように
+	設計されている。
 kelp*
 *frond
 	すべての植物が、ほとんど目に見えないほどの結びつきで土壌に
@@ -2810,119 +2806,121 @@ kelp*
 	観察する機会を得たのである。
 		［『海底二万マイル』、ジュール・ヴェルヌ著 ］
 ki-rin
-	The ki-rin is a strange-looking wingless flying creature.
-	It has scales, a mane like a lion, a tail, four legs with
-	hooves, and a horn like a unicorn's.  It is brightly colored,
-	and can usually be found flying in the sky looking for good
-	deeds to reward.
+	麒麟（キリン）は、羽を持たない奇妙な姿の飛行生物である。
+	鱗、獅子のようなたてがみ、尾、蹄のある四本の脚、そして
+	一角獣のような一本の角を持っている。鮮やかな色彩をしており、
+	通常は空を飛び回りながら、報いるべき善行を探している。
 king arthur
 *arthur
-	Ector took both his sons to the church before which the
-	anvil had been placed.  There, standing before the anvil, he
-	commanded Kay:  "Put the sword back into the steel if you
-	really think the throne is yours!"  But the sword glanced
-	off the steel.  "Now it is your turn", Ector said facing
-	Arthur.
-	The young man lifted the sword and thrust with both arms; the
-	blade whizzed through the air with a flash and drilled the
-	metal as if it were mere butter.  Ector and Kay dropped to
-	their knees before Arthur.
-	"Why, father and brother, do you bow before me?", Arthur asked
-	with wonder in his voice.
-	"Because now I know for sure that you are the king, not only
-	by birth but also by law", Ector said.  "You are no son of
-	mine nor are you Kay's brother.  Immediately after your birth,
-	Merlin the Wise brought you to me to be raised safely.  And
-	though it was me that named you Arthur when you were baptized,
-	you are really the son of brave king Uther Pendragon and queen
-	Igraine..."
-	And after these words, the lord rose and went to see the arch-
-	bishop to impart to him what had passed.
-	   [ Van Gouden Tijden Zingen de Harpen, by Vladimir Hulpach,
-		Emanuel Frynta, and Vackav Cibula ]
+	エクターは二人の息子を、金床が置かれた教会の前に連れて
+	行った。金床の前に立つと、彼はケイに命じた。「もし本当に
+	王座が自分のものだと思うなら、剣を鋼に戻してみろ！」だが
+	剣は鋼の表面で滑り落ちた。「今度はお前の番だ」エクターは
+	アーサーの方を向いて言った。
+	若者は剣を持ち上げ、両腕で突き刺した；刃は閃光と共に空を
+	うならせて通り抜け、まるでただのバターであるかのように
+	金属に穴を開けた。エクターとケイはアーサーの前にひざまず
+	いた。
+	「父上、兄上、なぜ私の前に頭を垂れるのですか？」アーサーは
+	不思議そうな声をあげて尋ねた。
+	「なぜなら、お前が生まれだけでなく、法によっても王である
+	ことが今や確信できたからだ」とエクターは言った。「お前は
+	私の息子ではなく、ケイの弟でもない。お前が生まれてすぐに、
+	賢者マーリンが安全に育てるようにお前を私のところに連れて
+	きたのだ。洗礼時にお前をアーサーと名付けたのは私だが、
+	お前は本当は勇敢なるウーサー・ペンドラゴン王とイグレイン
+	王妃の息子なのだ……」
+	こう語ると、この領主は立ち上がり、何が起きたかを大司教に
+	伝えるために彼を訪ねて行った。
+	   ［『竪琴は黄金の時代を歌う』、ウラジミール・フルパフ、
+		エマニュエル・フリンタ、ヴァツラフ・シブラ著 ］
 knife
 stiletto
-	Possibly perceiving an expression of dubiosity on their
-	faces, the globetrotter went on adhering to his adventures.
+	彼らの顔に半信半疑の表情が浮かんでいるのを察したのか、
+	その世界旅行者は、自らの冒険談をさらに熱心に語り続けた。
 
-	-- And I seen a man killed in Trieste by an Italian chap.
-	Knife in his back.  Knife like that.
+	―― それから、トリエステでイタリア人の男が殺されるのを
+	見たよ。背中にナイフが刺さってた。ちょうどこんなナイフだ。
 
-	Whilst speaking he produced a dangerous looking clasp knife,
-	quite in keeping with his character, and held it in the
-	striking position.
+	話しながら彼は、自らの怪しげな人格にまさにふさわしい、
+	危険な見た目の折りたたみナイフを取り出すと、それを突き刺す
+	ような構えで構えてみせた。
 
-	-- In a knockingshop it was count of a tryon between two
-	smugglers.  Fellow hid behind a door, come up behind him.
-	Like that.  Prepare to meet your God, says he.  Chuck!  It
-	went into his back up to the butt.
-		[ Ulysses, by James Joyce ]
+	―― 売春宿でのことでな、二人の密輸業者の小競り合いが
+	原因だった。一人の男がドアの後ろに隠れて, そいつの背後に
+	忍び寄った。こんな風にだ。お前の神にまみえる覚悟をしろ、
+	とそいつは言った。グサッ！ ナイフは柄のところまでそいつの
+	背中に突き刺さったのさ。
+		［『ユリシーズ』、ジェイムズ・ジョイス著 ］
 knight
 * knight
-	Here lies the noble fearless knight,
-	Whose valour rose to such a height;
-	When Death at last had struck him down,
-	His was the victory and renown.
-	He reck'd the world of little prize,
-	And was a bugbear in men's eyes;
-	But had the fortune in his age
-	To live a fool and die a sage.
-	  [ Don Quixote of La Mancha, by Miguel de Cervantes Saavedra ]
+	気高く恐れを知らぬ騎士、ここに眠る、
+	その武勇は比類なき高みへと達せり；
+	ついに死が彼を打ち倒せしとき、
+	勝利と名声は彼のものとなりぬ。
+	彼はこの世を価値なきものと見なし、
+	人々の目には大いなる厄介者なりき；
+	されど晩年には幸いにして、
+	愚者として生き、賢者として世を去れり。
+	  ［『ラ・マンチャのドン・キホーテ』、
+	    ミゲル・デ・セルバンテス・サアベドラ著 ］
 ~kobold ??m*
 *kobold*
-	The race of kobolds are reputed to be an artificial creation
-	of a master wizard (demi-god?).  They are about 3' tall with
-	a vaguely dog-like face.  They bear a violent dislike of the
-	Elven race, and will go out of their way to cause trouble
-	for Elves at any time.
+	コボルドという種族は、大魔法使い（あるいは半神？）の
+	手によって作り出された創造物であると噂されている。
+	体長は約３フィート（約９０センチ）で、どことなく犬に似た
+	顔立ちをしている。彼らはエルフの種族に対して激しい嫌悪感を
+	抱いており、隙あらばエルフに厄介事を引き起こそうとする。
 *kop*
 rubber hose
-	The Kops are a brilliant concept.  To take a gaggle of inept
-	policemen and display them over and over again in a series of
-	riotously funny physical punishments plays equally well to the
-	peanut gallery and the expensive box seats.  People hate cops.
-	Even people who have never had anything to do with cops hate
-	them.  Of course, we count on them to keep order and to protect
-	us when we need protecting, and we love them on television shows
-	in which they have nerves of steel and hearts of gold, but in
-	the abstract, as a nation, collectively we hate them.  They are
-	too much like high school principals.  We're very happy to see
-	their pants fall down, and they look good to us with pie on
-	their faces.  The Keystone Kops turn up--and they get punished
-	for it, as they crash into each other, fall down, and suffer
-	indignity after indignity.  Here is pure movie satisfaction.
+	コップ（警官）たちは素晴らしいコンセプトだ。無能な警察の
+	群れを連れてきて、大爆笑を誘うようなドタバタの体罰を何度も
+	何度も見せることは、安席の観客にも、高価な特別席の観客にも
+	等しくウケる。人々は警察を嫌っている。警察と何の関係も
+	持ったことのない人々でさえも彼らを嫌う。もちろん、私たちは
+	秩序を維持し、保護が必要なときに私たちを守ってくれることを
+	警察に期待しているし、鋼の意志と優しい心を持ったテレビの
+	刑事ドラマの警察も大好きだが、抽象的、あるいは国家として
+	集団的に見れば、私たちは彼らを嫌っているのだ。彼らは
+	高校の校長先生に似すぎている。彼らのズボンがずり落ちるのを
+	見れば私たちは大喜びするし、彼らが顔にパイを投げつけられて
+	いる姿は最高に見栄えが良い。キーストン・コップスが現れ ――
+	お仕置きを受ける。お互いに衝突し、転倒し、屈辱に次ぐ
+	屈辱を味わうのだ。これこそが、映画がもたらす純粋な満足感
+	である。
 
-	The Kops are very skillfully presented.  The comic originality
-	and timing in one of their chase scenes requires imagination
-	to think up, talent to execute, understanding of the medium,
-	and, of course, raw courage to perform.  The Kops are madmen
-	presented as incompetents, and they're madmen rushing around
-	in modern machines.  What's more, the machines they were operating
-	in their routines were newly invented and not yet experienced
-	by the average moviegoer.  (In the early days of automobiles,
-	it was reported that there were only two cars registered in all
-	of Kansas City, and they ran into each other.  There is both
-	poetry and philosophy in this fact, but most of all, there is
-	humor.  Sennett got the humor.)
-		[ Silent Stars, by Jeanine Basinger ]
+	コップたちの演出は極めて巧みである。彼らの追跡シーンに
+	おけるコミカルな独創性とタイミングは、考案するための
+	想像力、実行するための才能、映像メディアへの理解、工程
+	もちろん、演じるための生の勇気を必要とする。コップたちは
+	無能として描かれた狂人であり、近代的な機械に乗って暴れ回る
+	狂人なのだ。さらに、彼らが劇中で操作していた機械は、当時
+	発明されたばかりで、一般の映画観客にとってはまだ未体験の
+	ものであった。（自動車の黎明期、カンザスシティ全体で
+	登録されていたのはわずか２台だけであったが、その２台が
+	お互いに衝突したと報告されている。この事実には詩情と哲学の
+	両方があるが、何よりもユーモアがある。セネットはその
+	ユーモアを掴んでいたのだ。）
+		［『サイレント・スターズ』、ジーン・ベイスンジャー著 ］
 kos
-	"I am not a coward!" he cried.  "I'll dare Thieves' House
-	and fetch you Krovas' head and toss it with blood a-drip at
-	Vlana's feet.  I swear that, witness me, Kos the god of
-	dooms, by the brown bones of Nalgron my father and by his
-	sword Graywand here at my side!"
-	   [ Swords and Deviltry, by Fritz Leiber ]
+	「俺は臆病者じゃない！」と彼は叫んだ。「盗賊ギルドの館へ
+	乗り込み、クローヴァスの首を仕留めて持ってきてやろう。
+	そして、ヴラーナの足元に血の滴る首を投げ出してやる。
+	誓って言う、運命の神コスよ、俺の証人となれ。我が父
+	ナルグロンの茶色い骨にかけて、そして俺の傍らにある
+	彼の愛剣グレイワンドにかけて誓う！」
+	   ［『剣と悪魔』、フリッツ・ライバー著 ］
 koto
-	A Japanese harp.
+	日本の琴。
 kraken
-	Out from the water a long sinuous tentacle had crawled; it
-	was pale-green and luminous and wet.  Its fingered end had
-	hold of Frodo's foot, and was dragging him into the water.
-	Sam on his knees was now slashing at it with a knife.  The
-	arm let go of Frodo, and Sam pulled him away, crying out
-	for help.  Twenty other arms came rippling out.  The dark
-	water boiled, and there was a hideous stench.
-	   [ The Fellowship of the Ring, by J.R.R. Tolkien ]
+	水の中から、うねうねと動く一本の長い触手が生い出てきた；
+	それは薄緑色で光を放ち、濡れそぼっていた。指のようになった
+	先端がフロドの足をつかみ、彼を水の中に引きずり込もうと
+	していた。ひざまずいたサムは、ナイフでその触手に斬りかかって
+	いた。触手はフロドを放し、サムは助けを求めて叫びながら、
+	彼を引き戻した。さらに二十本もの触手が波打つように現れた。
+	暗い水面は沸き立ち、恐るべき悪臭が漂った。
+	   ［『指輪物語 旅の仲間』、Ｊ・Ｒ・Ｒ・トールキン著 ］
 the lady
 lady
 lady luck
