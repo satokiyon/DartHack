@@ -284,6 +284,9 @@ extern boolean exp_percent_changing(void);
 extern int stat_cap_indx(void);
 extern int stat_hunger_indx(void);
 extern const char *bl_idx_to_fldname(int);
+extern const char *encumbrance_display_text(int);
+extern char *encumbrance_enlightenment_text(int, int, char *, size_t)
+   NONNULL NONNULLARG3;
 extern void repad_with_dashes(char *);
 extern void condopt(int, boolean *, boolean);
 extern int parse_cond_option(boolean, char *);
