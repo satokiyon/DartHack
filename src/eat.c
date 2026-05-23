@@ -3527,9 +3527,10 @@ newuhs(boolean incr)
                           ? gu.urole.name.m
                           : "エルフ");
             else
-                You("%s、体が衰弱している.", !incr ? "相変わらず"
-                                : (u.uhunger < 45) ? "のを感じるが"
-                                  : "のを感じ始めており");
+                You("%s.", !incr ? "相変わらず体が衰弱している"
+                          : (u.uhunger < 45)
+                              ? "空腹を感じており、体が衰弱している"
+                              : "空腹を感じ始めており、体が衰弱している");
             if (incr && go.occupation
                 && (go.occupation != eatfood && go.occupation != opentin))
                 stop_occupation();

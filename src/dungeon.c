@@ -1772,7 +1772,7 @@ surface(coordxy x, coordxy y)
     else if (IS_ALTAR(levtyp))
         return "祭壇";
     else if (IS_GRAVE(levtyp))
-        return "墓男";
+        return "墓石";
     else if (IS_FOUNTAIN(levtyp))
         return "泉の辺";
     else if (On_stairs(x, y))
