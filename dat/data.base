@@ -3761,128 +3761,120 @@ naiad
 	ニンフへと至る道は怪物たちによって阻まれているということを。
 		［『ミノタウロス』、バーナード・エヴスリン著 ］
 obsidian*
-	A volcanic glass, homogeneous in texture and having a low water
-	content, with a vitreous luster and a conchoidal fracture.  The
-	color is commonly black, but may be some shade of red or brown,
-	and cut sections sometimes appear to be green.  Like other
-	volcanic glasses, obsidian is a lava that has cooled too quickly
-	for the contained minerals to crystallize.  In chemical
-	composition it is rich in silica and similar to granite.  It is
-	favored by primitive peoples for knives, arrowheads, spearheads,
-	and other weapons and tools.
-		[ The Columbia Encyclopedia, Sixth Edition ]
+	火山ガラスの一種であり、均質な質感と低い水分含有量を持ち、
+	ガラス光沢と貝殻状の破断面を特徴とする。色は通常は黒色だが、
+	赤色や褐色の色調を帯びることもあり、切断面が緑色に見えることも
+	ある。他の火山ガラスと同様に、黒曜石は含まれる鉱物が結晶化する
+	ひまもないほど急速に冷却された溶岩である。化学組成においては
+	シリカ（二酸化ケイ素）が豊富で、花崗岩に似ている。
+	原始的な人々によって、ナイフや矢尻、槍の頭、その他の武器や道具に
+	好んで用いられた。
+		［『コロンビア百科事典』第６版 ］
 odin
-	Also called Sigtyr (god of Victory), Val-father (father of
-	the slain), One-Eyed, Hanga-god (god of the hanged), Farma-
-	god (god of cargoes), Hapta-god (god of prisoners), and
-	Othin.  He is the prime god of the Norsemen:  god of war and
-	victory, wisdom and prophecy, poetry, the dead, air and wind,
-	hospitality, and magic.
-	As the god of war and victory, Odin is ruler of the Valkyries,
-	warrior-maidens who lived in the halls of Valhalla in Asgard,
-	the hall of dead heroes where he held his court.
-	These chosen ones will defend the realm of the gods against
-	the Frost Giants on the final day of reckoning, Ragnarok.
-	As god of the wind, Odin rides through the air on his eight-
-	footed horse, Sleipnir, wielding Gungner, his spear, normally
-	accompanied by his ravens, Hugin and Munin, who he would also
-	use as his spies.
-	As a god of hospitality, he enjoys visiting the earth in
-	disguise to see how people were behaving and to see how they
-	would treat him, not knowing who he was.
-	Odin is usually represented as a one-eyed wise old man with a
-	long white beard and a wide-brimmed hat (he gave one of his
-	eyes to Mimir, the guardian of the well of wisdom in Hel, in
-	exchange for a draught of knowledge).
+	シグテュール（勝利の神）、ヴァルファズル（戦死者の父）、独眼、
+	ハンガグズ（首吊られた者の神）、ファルマグズ（船荷の神）、
+	ハプタグズ（囚人の神）、あるいはオージンとも呼ばれる。彼は
+	北欧人の最高神であり、戦争と勝利、知恵と予言、詩歌、死者、
+	空気と風、もてなし、そして魔法の神である。
+	戦争と勝利の神として、オーディンはヴァルキリーたちの支配者であり、
+	彼女たちはアスガルドにあるヴァルハラ（オーディンが宮廷を開いた
+	死せる英雄たちの殿堂）に暮らしていた。これらの選ばれし者たちは、
+	最後の審判の日であるラグナロクにおいて、霜の巨人に立ち向かって
+	神々の領域を守るのである。
+	風の神として、オーディンは８本脚の愛馬スレイプニルに乗って空を駆け、
+	槍のグングニルを振るう。通常は、スパイとしても使われる彼のワタリガラス、
+	フギンとムニンを従えている。
+	もてなしの神として、彼は変装して地上を訪れ、人々がどのように振る舞い、
+	彼が誰であるかを知らずにどのように扱うかを見るのを好んでいた。
+	オーディンは通常、長い白い髭を蓄え、広いつばの帽子を被った独眼の
+	知恵ある老人の姿で描かれる（彼はヘルにある知恵の泉の番人ミーミルに、
+	一口の知恵の水を飲むことと引き換えに、自らの片目を与えたのである）。
 ogre*
-	Anyone who has met a gluttonous, nude, angry ogre, will not
-	easily forget this encounter -- if he survives it at all.
-	Both male and female ogres can easily grow as tall as three
-	metres.  Build and facial expressions would remind one of a
-	Neanderthal.  Its small, pointy, keen teeth are striking.
-	Since ogres avoid direct sunlight, their ragged, unfurry
-	skin is as white as a sheet.  They enjoy coating their body
-	with lard and usually wear nothing but a loin-cloth.  An elf
-	would smell its rancid stench at ten metres distance.
-	Ogres are solitary creatures:  very rarely one may encounter
-	a female with two or three young.  They are the only real
-	carnivores among the humanoids, and its favourite meal is --
-	not surprisingly -- human flesh.  They sometimes ally with
-	orcs or goblins, but only when they anticipate a good meaty
-	meal.
-		[ het Boek van de Regels; Het Oog des Meesters ]
+	大食いで、全裸で、怒り狂ったオーガ（オグレ）に出会った者は、
+	もし生き延びることができたとしても、その遭遇を容易に忘れることは
+	ないだろう。オスのオーガもメスのオーガも、身長は容易に３メートルに
+	達する。体格と顔の表情はネアンデルタール人を思い起こさせる。
+	その小さく尖った鋭い歯が極めて特徴的である。
+	オーガは直射日光を避けるため、彼らの毛のないゴツゴツした皮膚は
+	シーツのように真っ白である。彼らは体にラードを塗るのを好み、
+	通常は腰布一枚しか身につけていない。エルフであれば、１０メートル
+	離れていてもその腐ったような悪臭に気づくだろう。
+	オーガは孤独な生き物だ：２、３匹の子供を連れたメスに遭遇することは
+	極めて稀である。彼らは人型生物の中で唯一の真の肉食動物であり、
+	その大好物は ―― 驚くことではないが ―― 人間の肉である。
+	彼らは時折オークやゴブリンと同盟を結ぶが、それはたっぷりと肉が
+	食べられると見込んでいるときだけである。
+		［『ルールの書』；『主人の目』より ］
 oilskin cloak
-	During our watches below we overhauled our clothes, and made
-	and mended everything for bad weather.  Each of us had made
-	for himself a suit of oil-cloth or tarpaulin, and these we
-	got out, and gave thorough coatings of oil or tar, and hung
-	upon the stays to dry.  Our stout boots, too, we covered
-	over with a thick mixture of melted grease and tar.  Thus we
-	took advantage of the warm sun and fine weather of the
-	Pacific to prepare for its other face.
-		[ Two Years Before the Mast, by Richard Henry Dana ]
+	非番の時間に私たちは衣服を点検し、悪天候に備えてあらゆるものを
+	作り、修繕した。私たちはそれぞれ、自分用にオイルクロスや防水布で
+	一着の防水衣を作っていた。それを取り出して油やタールをたっぷりと
+	塗り込み、乾燥させるためにステイ（索具）に吊るした。
+	私たちの頑丈なブーツも、溶かしたグリースとタールの分厚い混合物で
+	覆った。こうして私たちは、太平洋の穏やかな太陽と素晴らしい気候を
+	利用して、そのもう一つの顔（荒天）へと備えたのである。
+		［『前檣の二年』、リチャード・ヘンリー・デイナ著 ］
 oilskin sack
-	Summer passed all too quickly.  On the last day of camp, Mr.
-	Brickle called his counselors together and paid them what he
-	owed them.  Louis received one hundred dollars - the first
-	money he had ever earned.  He had no wallet and no pockets,
-	so Mr. Brickle placed the money in a waterproof bag that had
-	a drawstring.  He hung this moneybag around Louis' neck,
-	along with the trumpet, the slate, the chalk pencil, and the
-	lifesaving medal.
-		[ The Trumpet of the Swan, by E.B. White ]
+	夏はあまりにもあっさりと過ぎ去ってしまった。キャンプの最終日に、
+	ブリックル先生は指導員たちを集め、給料を支払った。ルイスは
+	１００ドルを受け取った ―― 彼が生まれて初めて稼いだお金だった。
+	彼には財布もポケットもなかったため、ブリックル先生は引き紐のついた
+	防水の袋にお金を入れ、その金入れ袋をルイスの首から吊るしてあげた。
+	トランペット、石板、チョークのペンシル、そして救命メダルと一緒に。
+		［『白鳥のトランペット』、Ｅ・Ｂ・ホワイト著 ］
 olog-hai
-	But at the end of the Third Age a troll-race not before seen
-	appeared in southern Mirkwood and in the mountain borders of
-	Mordor.  Olog-hai they were called in the Black Speech.  That
-	Sauron bred them none doubted, though from what stock was not
-	known.  Some held that they were not Trolls but giant Orcs;
-	but the Olog-hai were in fashion of body and mind quite unlike
-	even the largest of Orc-kind, whom they far surpassed in size
-	and power.  Trolls they were, but filled with the evil will
-	of their master:  a fell race, strong, agile, fierce and
-	cunning, but harder than stone.  Unlike the older race of the
-	Twilight they could endure the Sun....  They spoke little,
-	and the only tongue they knew was the Black Speech of Barad-dur.
-		[ The Return of the King, by J.R.R. Tolkien ]
+	しかし第三紀の終わりに、それまで見られなかったトロールの種族が
+	闇の森の南部、およびモルドールの国境の山脈に現れた。
+	暗黒語で彼らはオログ＝ハイと呼ばれていた。サウロンが彼らを
+	作り出したことには疑いの余地がなかったが、その素性（掛け合わせ）は
+	知られていなかった。ある者は、彼らはトロールではなく巨大な
+	オークではないかと主張したが、オログ＝ハイの肉体と精神のありようは、
+	サイズと力において遥かに凌駕していた最大級のオークとさえ全く
+	異なっていた。彼らはトロールであったが、主人の邪悪な意志に
+	満ちていた。すなわち、強靭で、俊敏で、狂暴で狡猾だが、石よりも
+	硬い恐るべき種族であった。薄明に生きた古い種族とは異なり、
+	彼らは太陽の光に耐えることができた。彼らはほとんど喋らず、
+	彼らが知る唯一の言語はバラド＝ドゥーアの暗黒語だけであった。
+		［『指輪物語 王の帰還』、Ｊ・Ｒ・Ｒ・トールキン著 ］
 oracle
 delphi
 p*thia
-	Delphi under towering Parnassus, where Apollo's oracle was,
-	plays an important part in mythology.  Castalia was its
-	sacred spring; Cephissus its river.  It was held to be the
-	center of the world, so many pilgrims came to it, from
-	foreign countries as well as Greece.  No other shrine rivaled
-	it.  The answers to the questions asked by the anxious
-	seekers for Truth were delivered by a priestess who went into
-	a trance before she spoke.
-		[ Mythology, by Edith Hamilton ]
+	アポロンの神託所があった、そびえ立つパルナッソス山の麓にある
+	デルポイ（デルフィ）は、神話において重要な役割を果たしている。
+	カスタリアはその聖なる泉であり、ケピソスはその川であった。
+	そこは世界の中心と信じられていたため、ギリシャ国内だけでなく
+	諸外国からも非常に多くの巡礼者が訪れた。これに匹敵する神殿は
+	他に存在しなかった。真実を求める切実な巡礼者たちから寄せられた
+	問いへの答えは、話す前にトランス（忘我）状態に陥る巫女によって
+	もたらされた。
+		［『ギリシア・ローマ神話』、エディス・ハミルトン著 ］
 orange
 pear
-	What was the fruit like?  Unfortunately, no one can describe
-	a taste.  All I can say is that, compared with those fruits,
-	the freshest grapefruit you've ever eaten was dull, and the
-	juiciest orange was dry, and the most melting pear was hard
-	and woody, and the sweetest wild strawberry was sour.  And
-	there were no seeds or stones, and no wasps.  If you had once
-	eaten that fruit, all the nicest things in this world would
-	taste like medicines after it.  But I can't describe it.  You
-	can't find out what it is like unless you can get to that
-	country and taste it for yourself.
-		[ The Last Battle, by C.S. Lewis ]
+	その果物はどのようなものだったか？ 残念ながら、味を言葉で
+	表現することは誰にもできない。私に言えるのはただ、あの果物に比べたら、
+	君がこれまでに食べた最も新鮮なグレープフルーツさえも退屈で、
+	最もジューシーなオレンジもパサパサで、最もとろけるような洋ナシも
+	硬くて木皮のようであり、最も甘い野いちごも酸っぱく感じられると
+	いうことだ。種も芯もなく、スズメバチもいなかった。
+	一度でもその果物を口にしたら、この世界のあらゆる極上のごちそうも、
+	その後にはまるで薬のような味に思えることだろう。しかし、私には
+	それを描写することはできない。君が自分でその国に行き、実際に
+	自分の舌で味わってみない限り、それがどのようなものであるかを知る
+	方法はないのだ。
+		［『最後の戦い』、Ｃ・Ｓ・ルイス著 ］
 *orb of detection
-	This Orb is a crystal ball of exceptional powers.  When
-	carried, it grants ESP, limits damage done by spells, and
-	protects the carrier from magic missiles.  When invoked it
-	allows the carrier to become invisible.
+	このオーブは、並外れた力を宿した水晶玉である。所持していると、
+	持ち主にＥＳＰ（超感覚的知覚）を授け、呪文によるダメージを制限し、
+	マジックミサイルから所持者を保護する。呼び出す（使用する）と、
+	所持者を透明状態にすることができる。
 *orb of fate
-	Some say that Odin himself created this ancient crystal ball,
-	although others argue that Loki created it and forged Odin's
-	signature on the bottom.  In any case, it is a powerful
-	artifact.  Anyone who carries it is granted the gift of
-	warning, and damage, both spell and physical, is partially
-	absorbed by the orb itself.  When invoked it has the power
-	to teleport the invoker between levels.
+	オーディン自身がこの古代の水晶玉を作ったと言う者もいれば、
+	ロキがこれを作り、底面にオーディンの署名を偽造したと主張する者も
+	いる。いずれにせよ、これは強力なアーティファクトである。
+	所持していると、持ち主に警告（危険察知）の恩恵が授けられ、
+	物理および魔法の双方のダメージがオーブ自体によって部分的に
+	吸収される。呼び出す（使用する）と、使用者を階層間でテレポートさせる
+	力を発揮する。
 goblin king
 orcrist
 	大ゴブリンはそれを見るなり、実に恐ろしい怒りの咆哮を上げ、
@@ -3895,9 +3887,10 @@ orcrist
 	それ以上に激しく憎み嫌っていた。
 		［『ホビットの冒険』、Ｊ・Ｒ・Ｒ・トールキン著 ］
 orcus
-	Orcus, Prince of the Undead, has a ram's head and a poison
-	stinger.  He is most feared, though, for his powerful magic
-	abilities.  His wand causes death to those he chooses.
+	アンデッドの君主である魔王オルクスは、牡羊の頭と毒の尾針を
+	持っている。しかし、彼が最も恐れられているのは、その強力な
+	魔法能力によるものである。彼の持つ杖は、彼が選んだ者に死を
+	もたらす。
 ~orc ??m*
 ~orcish barbarian
 ~orcish ranger
@@ -3906,51 +3899,45 @@ orcus
 orc*
 * orc
 uruk*hai
-	Orcs, bipeds with a humanoid appearance, are related to the
-	goblins, but much bigger and more dangerous.  The average orc
-	is only moderately intelligent, has broad, muscled shoulders,
-	a short neck, a sloping forehead and a thick, dark fur.
-	Their lower eye-teeth are pointing forward, like a boar's.
-	Female orcs are more lightly built and bare-chested.  Not
-	needing any clothing, they do like to dress in variegated
-	apparels.  Suspicious by nature, orcs live in tribes or
-	hordes.  They tend to live underground as well as above
-	ground (but they dislike sunlight).  Orcs can use all weapons,
-	tools and armours that are used by men.  Since they don't have
-	the talent to fashion these themselves, they are constantly
-	hunting for them.  There is nothing a horde of orcs cannot
-	use.
-		[ het Boek van de Regels; Het Oog des Meesters ]
+	オークは人型生物の容姿をした二足歩行の生物であり、ゴブリンの
+	近縁種だが、彼らよりもはるかに大きく危険である。一般的なオークは
+	知能が低く、筋肉質な広い肩、短い首、傾斜した額、そして濃い色の
+	厚い毛皮を持っている。下側の犬歯は、野生の猪のように前方へと
+	突き出ている。メスのオークは比較的華奢な体格で、上半身は裸である。
+	衣服を必要とはしないが、色鮮やかな衣装を身にまとうのを好む。
+	本質的に疑い深く、オークは部族や軍勢をなして暮らしている。
+	彼らは地上だけでなく地下にも好んで居住する（しかし日光は嫌う）。
+	オークは人間が使用するすべての武器、道具、鎧を使用できる。
+	これらを自ら作り出す才能を持たないため、彼らは絶えずそれらを
+	探し求めて狩りを行っている。オークの軍勢が利用できないものなど、
+	この世に存在しない。
+		［『ルールの書』；『主人の目』より ］
 orion
 sirius
-	Orion was the son of Neptune. He was a handsome giant and a
-	mighty hunter. His father gave him the power of wading
-	through the depths of the sea, or, as others say, of
-	walking on its surface.
+	オリオンはネプチューンの息子であった。彼は見事な巨体をした
+	美男子であり、強力な狩人であった。父親は彼に、深い海の底を
+	歩いて渡る力、あるいは他の説によれば、海面の上を歩く力を授けた。
 
-	He dwelt as a hunter with Diana (Artemis), with whom he
-	was a favourite, and it is even said she was about to marry
-	him. Her brother was highly displeased and often chid her,
-	but to no purpose. One day, observing Orion wading through
-	the sea with his head just above the water, Apollo pointed
-	it out to his sister and maintained that she could not hit
-	that black thing on the sea. The archer-goddess discharged
-	a shaft with fatal aim. The waves rolled the dead body of
-	Orion to the land, and bewailing her fatal error with many
-	tears, Diana placed him among the stars, where he appears
-	as a giant, with a girdle, sword, lion's skin, and
-	club. Sirius, his dog, follows him, and the Pleiads fly
-	before him.
-		[ Bulfinch's Mythology, by Thomas Bulfinch ]
+	彼は狩人としてディアナ（アルテミス）と共に暮らし、彼女のお気に入り
+	となった。彼女は彼と結婚するつもりだったとさえ言われている。
+	彼女の兄（アポロン）はこれをひどく嫌い、しばしば妹を咎めたが、
+	無駄であった。ある日、頭だけを水面に出して海を渡っているオリオンの
+	姿を目にしたアポロンは、それを妹に指し示し、海に浮かぶあの黒いものを
+	射抜くことは彼女にはできまいと言い張った。弓矢の女神は致命的な
+	狙いを定めて矢を放った。波はオリオンの亡骸を陸地へと押し流し、
+	ディアナは己の致命的な過ちを数々の涙と共に嘆き悲しみ、彼を星々の中に
+	配置した。そこで彼は帯、剣、ライオンの毛皮、そして棍棒を携えた
+	巨人として現れる。猟犬シリウスが彼の後に続き、プレアデス（すばる）が
+	彼の前を逃げ飛んでいくのである。
+		［『バルフィンチの神話』、トマス・バルフィンチ著 ］
 osaku
-	The osaku is a small tool for picking locks.
+	おさく（オサク）は、錠前をこじ開けるための小さな道具である。
 owlbear
-	Owlbears are probably the crossbreed creation of a demented
-	wizard; given the lethal nature of this creation, it is quite
-	likely the wizard who created them is no longer alive.  As
-	the name might already suggest, owlbears are a cross between
-	a giant owl and a bear.  They are covered with fur and
-	feathers.
+	アウルベアは、おそらく狂った魔法使いが交配によって作り出した
+	創造物である。この創造物の極めて致命的な性質を考慮すると、
+	これを作り出した魔法使いは、すでにこの世にはいない可能性が
+	非常に高い。名前が示唆している通り、アウルベアは巨大なフクロウと
+	クマの交配種である。彼らの全身は毛皮と羽毛で覆われている。
 page
 	A male servant or attendant; specifically, in chivalry,
 	a lad or young man in training for knighthood, or a youth
