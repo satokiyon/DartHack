@@ -400,13 +400,14 @@ enlightenment(
     *tmpbuf = highc(*tmpbuf); /* same adjustment as bottom line */
     /* as in background_enlightenment, when poly'd we need to use the saved
        gender in u.mfemale rather than the current you-as-monster gender */
-    Snprintf(buf, sizeof(buf), "%s the %s's attributes:", tmpbuf,
-             ((Upolyd ? u.mfemale : flags.female) && gu.urole.name.f)
-                ? gu.urole.name.f
-                : gu.urole.name.m);
+     Snprintf(buf, sizeof(buf), "%sの能力値（%s）:", tmpbuf,
+                 jp_role_name_for_display(flags.initrole,
+                                                  (Upolyd ? u.mfemale : flags.female)
+                                                        ? 1
+                                                        : 0));
 
     /* title */
-    enlght_out(buf); /* "Conan the Archeologist's attributes:" */
+     enlght_out(buf);
     /* background and characteristics; ^X or end-of-game disclosure */
     if (mode & BASICENLIGHTENMENT) {
         /* role, race, alignment, deities, dungeon level, time, experience */
@@ -470,16 +471,14 @@ enlightenment(
 staticfn void
 background_enlightenment(int unused_mode UNUSED, int final)
 {
-    const char *role_titl, *rank_titl;
+    const char *role_titl;
     int innategend, difgend, difalgn;
     char buf[BUFSZ], tmpbuf[BUFSZ];
 
     /* note that if poly'd, we need to use u.mfemale instead of flags.female
        to access hero's saved gender-as-human/elf/&c rather than current */
     innategend = (Upolyd ? u.mfemale : flags.female) ? 1 : 0;
-    role_titl = (innategend && gu.urole.name.f) ? gu.urole.name.f
-                                                : gu.urole.name.m;
-    rank_titl = rank_of(u.ulevel, Role_switch, innategend);
+     role_titl = jp_role_name_for_display(flags.initrole, innategend);
 
     enlght_out(""); /* separator after title */
     enlght_out("背景:");
@@ -491,14 +490,14 @@ background_enlightenment(int unused_mode UNUSED, int final)
        (with countdown timer appended for wizard mode); we really want
        the player to know he's not a samurai at the moment... */
     if (Upolyd) {
-        char anbuf[20]; /* includes trailing space; [4] suffices */
         struct permonst *uasmon = gy.youmonst.data;
         boolean altphrasing = vampshifted(&gy.youmonst);
 
         tmpbuf[0] = '\0';
         /* here we always use current gender, not saved role gender */
         if (!is_male(uasmon) && !is_female(uasmon) && !is_neuter(uasmon))
-            Sprintf(tmpbuf, "%s ", genders[flags.female ? 1 : 0].adj);
+            Sprintf(tmpbuf, "%s ",
+                    jp_gender_for_display(flags.female ? 1 : 0));
         if (altphrasing)
             Sprintf(eos(tmpbuf), "%sから",
                           jp_pmname(&mons[gy.youmonst.cham],
@@ -515,24 +514,18 @@ background_enlightenment(int unused_mode UNUSED, int final)
     if (!gu.urole.name.f
         && ((gu.urole.allow & ROLE_GENDMASK) == (ROLE_MALE | ROLE_FEMALE)
             || innategend != flags.initgend))
-        Sprintf(tmpbuf, "%s ", genders[innategend].adj);
+        Sprintf(tmpbuf, "%s ", jp_gender_for_display(innategend));
     buf[0] = '\0';
     if (Upolyd)
         Strcpy(buf, "本来は");
-    if (!strcmpi(rank_titl, role_titl)) {
-        /* omit role when rank title matches it */
-        Sprintf(eos(buf), "%s、レベル%dの%s%sだ", an(rank_titl), u.ulevel,
-                tmpbuf, gu.urace.noun);
-    } else {
-        Sprintf(eos(buf), "%s、レベル%dの%s%s %sだ", an(rank_titl), u.ulevel,
-                tmpbuf, gu.urace.adj, role_titl);
-    }
+    Sprintf(eos(buf), "レベル%dの%s%sの%sだ", u.ulevel,
+            tmpbuf, jp_current_race_adj(), role_titl);
     you_are(buf, "");
 
     /* report alignment (bypass you_are() in order to omit ending period);
        adverb is used to distinguish between temporary change (helm of opp.
        alignment), permanent change (one-time conversion), and original */
-    Sprintf(buf, " %s%s%sで、%s%sに仕えている",
+    Sprintf(buf, " %s%s%sで、%s %s に仕えている",
             You_, !final ? are : were,
             align_str(u.ualign.type),
             /* helm of opposite alignment (might hide conversion) */
@@ -551,21 +544,20 @@ background_enlightenment(int unused_mode UNUSED, int final)
                      ? "名目上"
                      /* lastly, normal case */
                      : "",
-            u_gname());
+                    jp_u_gname_for_display());
     enlght_out(buf);
     /* show the rest of this game's pantheon (finishes previous sentence)
        [appending "also Moloch" at the end would allow for straightforward
        trailing "and" on all three aligned entries but looks too verbose] */
     Sprintf(buf, " 対立する神格:");
     if (u.ualign.type != A_LAWFUL)
-        Sprintf(eos(buf), " %s（%s）", align_gname(A_LAWFUL),
+        Sprintf(eos(buf), " %s（%s）", jp_align_gname_for_display(A_LAWFUL),
                 align_str(A_LAWFUL));
     if (u.ualign.type != A_NEUTRAL)
-        Sprintf(eos(buf), " %s（%s）", align_gname(A_NEUTRAL),
-                align_str(A_NEUTRAL),
-                "");
+        Sprintf(eos(buf), " %s（%s）", jp_align_gname_for_display(A_NEUTRAL),
+            align_str(A_NEUTRAL));
     if (u.ualign.type != A_CHAOTIC)
-        Sprintf(eos(buf), " %s（%s）", align_gname(A_CHAOTIC),
+        Sprintf(eos(buf), " %s（%s）", jp_align_gname_for_display(A_CHAOTIC),
                 align_str(A_CHAOTIC));
     Strcat(buf, "."); /* terminate sentence */
     enlght_out(buf);
@@ -585,7 +577,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
     }
     if (difgend || difalgn) { /* sex change or perm align change or both */
         Sprintf(buf, " 最初は%s%s%sだった.",
-                difgend ? genders[flags.initgend].adj : "",
+            difgend ? jp_gender_for_display(flags.initgend) : "",
                 (difgend && difalgn) ? "で" : "",
                 difalgn ? align_str(u.ualignbase[A_ORIGINAL]) : "");
         enlght_out(buf);
@@ -607,20 +599,14 @@ background_enlightenment(int unused_mode UNUSED, int final)
     if (In_endgame(&u.uz)) {
         int egdepth = observable_depth(&u.uz);
 
-        (void) endgamelevelname(tmpbuf, egdepth);
-        Snprintf(buf, sizeof(buf), "エンドゲームの%s%sにいる",
-                 !strncmp(tmpbuf, "Plane", 5) ? "元素界 " : "", tmpbuf);
+        (void) jp_endgamelevelname_for_display(tmpbuf, egdepth);
+        Snprintf(buf, sizeof(buf), "%sにいる", tmpbuf);
     } else if (Is_knox(&u.uz)) {
         /* this gives away the fact that the knox branch is only 1 level */
-        Sprintf(buf, "%s階にいる", svd.dungeons[u.uz.dnum].dname);
+        Sprintf(buf, "%sにいる", jp_dungeon_name_by_dnum(u.uz.dnum));
         /* TODO? maybe phrase it differently when actually inside the fort,
            if we're able to determine that (not trivial) */
     } else {
-        char dgnbuf[QBUFSZ];
-
-        Strcpy(dgnbuf, svd.dungeons[u.uz.dnum].dname);
-        if (!strncmpi(dgnbuf, "The ", 4))
-            *dgnbuf = lowc(*dgnbuf);
         Sprintf(tmpbuf, "%d階",
                 In_quest(&u.uz) ? dunlev(&u.uz) : depth(&u.uz));
         /* TODO? maybe extend this bit to include various other automatic
@@ -629,7 +615,8 @@ background_enlightenment(int unused_mode UNUSED, int final)
             Strcat(tmpbuf, "（原始的な区域）");
         else if (Is_bigroom(&u.uz) && !Blind)
             Strcat(tmpbuf, "（非常に大きな部屋）");
-        Snprintf(buf, sizeof(buf), "%sの%sにいる", dgnbuf, tmpbuf);
+        Snprintf(buf, sizeof(buf), "%sの%sにいる",
+                 jp_dungeon_name_by_dnum(u.uz.dnum), tmpbuf);
     }
     you_are(buf, "");
 
@@ -688,10 +675,11 @@ background_enlightenment(int unused_mode UNUSED, int final)
 
     if (!Upolyd) {
         int ulvl = (int) u.ulevel;
+        char expbuf[BUFSZ];
         /* [flags.showexp currently does not matter; should it?] */
 
         /* experience level is already shown above */
-        Sprintf(buf, "経験値 %ld", u.uexp);
+        Sprintf(expbuf, "%ld", u.uexp);
         /* TODO?
          *  Remove wizard-mode restriction since patient players can
          *  determine the numbers needed without resorting to spoilers
@@ -703,9 +691,9 @@ background_enlightenment(int unused_mode UNUSED, int final)
         if (ulvl < 30 && (final || wizard)) {
             long nxtlvl = newuexp(ulvl), delta = nxtlvl - u.uexp;
 
-                Sprintf(eos(buf), "（次のレベル%dまであと%ld）", (ulvl + 1), delta);
+                Sprintf(eos(expbuf), "（次のレベル%dまであと%ld）", (ulvl + 1), delta);
         }
-        you_have(buf, "");
+        enl_msg("あなたの", "経験値は ", "経験値は ", expbuf, "");
     }
 #ifdef SCORE_ON_BOTL
     if (flags.showscore) {
@@ -736,20 +724,20 @@ basics_enlightenment(int mode UNUSED, int final)
         hp = 0;
     /* "1 out of 1" rather than "all" if max is only 1; should never happen */
     if (hp == hpmax && hpmax > 1)
-        Sprintf(buf, "HPは%d（満タン）", hpmax);
+        Sprintf(buf, "HP : %d（満タン）", hpmax);
     else
-        Sprintf(buf, "HPは%d/%d", hp, hpmax);
+        Sprintf(buf, "HP : %d/%d", hp, hpmax);
     you_have(buf, "");
 
     /* low max energy is feasible, so handle couple of extra special cases */
     if (pwmax == 0)
-        Sprintf(buf, "%sはない", Power);
+        Sprintf(buf, "%s : なし", Power);
     else if (pw == pwmax && pwmax == 2) /* not "all 2" */
-        Sprintf(buf, "%sは2（満タン）", Power);
+        Sprintf(buf, "%s : 2（満タン）", Power);
     else if (pw == pwmax && pwmax > 2)
-        Sprintf(buf, "%sは%d（満タン）", Power, pwmax);
+        Sprintf(buf, "%s : %d（満タン）", Power, pwmax);
     else
-        Sprintf(buf, "%sは%d/%d", Power, pw, pwmax);
+        Sprintf(buf, "%s : %d/%d", Power, pw, pwmax);
     you_have(buf, "");
 
     if (Upolyd) {
@@ -772,7 +760,7 @@ basics_enlightenment(int mode UNUSED, int final)
     Sprintf(buf, "%d", u.uac);
     if (abs(u.uac) == AC_MAX)
         Sprintf(eos(buf), "（理論上の%s値）", (u.uac < 0) ? "上限" : "下限");
-    enl_msg("アーマークラス ", "は", "は", buf, "");
+    enl_msg("アーマークラス ", " : ", " : ", buf, "");
 
     /* gold; similar to doprgold (#showgold) but without shop billing info;
        includes container contents, unlike status line but like doprgold */
@@ -929,7 +917,7 @@ one_characteristic(int mode, int final, int attrindx)
         if (acurrent != abase || abase != apeak || interesting_alimit)
             Strcat(valubuf, ")");
     }
-    enl_msg(subjbuf, "は", "は", valubuf, "");
+    enl_msg(subjbuf, " : ", " : ", valubuf, "");
 }
 
 /* status: selected obvious capabilities, assorted troubles */
@@ -1192,17 +1180,11 @@ status_enlightenment(int mode, int final)
                 enl_msg(You_, "", "", "急速に空腹になる",
                     from_what(HUNGER));
     }
-    Strcpy(buf, hu_stat[u.uhs]); /* hunger status; omitted if "normal" */
-    mungspaces(buf);             /* strip trailing spaces */
-    /* status line doesn't show hunger when state is "not hungry", we do;
-       needed for wizard mode's reveal of u.uhunger but add it for everyone */
-    if (!*buf)
-        Strcpy(buf, "空腹ではない");
+    Strcpy(buf, jp_hunger_status_for_display((int) u.uhs, TRUE));
     if (*buf) { /* (since "not hungry" was added, this will always be True) */
-        *buf = lowc(*buf); /* override capitalization */
-        if (!strcmp(buf, "weak"))
+        if (u.uhs == WEAK)
             Strcat(buf, "（深刻な空腹）");
-        else if (!strncmp(buf, "faint", 5)) /* fainting, fainted */
+        else if (u.uhs == FAINTING || u.uhs == FAINTED)
             Strcat(buf, "（飢餓状態）");
         if (wizard)
             Sprintf(eos(buf), " <%d>", u.uhunger);
@@ -1247,7 +1229,7 @@ status_enlightenment(int mode, int final)
 staticfn void
 weapon_insight(int final)
 {
-    char buf[BUFSZ];
+    char buf[BUFSZ], whatbuf[BUFSZ];
     int wtype;
 
     /* report being weaponless; distinguish whether gloves are worn
@@ -1264,7 +1246,8 @@ weapon_insight(int final)
        described as a long sword, for instance; mattock, hook, and aklys
        are exceptions), or wielded non-weapon item by its object class */
     } else {
-        const char *what = weapon_descr(uwep);
+        const char *what = jp_weapon_descr_for_display(uwep, whatbuf,
+                                                        sizeof whatbuf);
 
         /* [what about other silver items?] */
         if (uwep->otyp == SHIELD_OF_REFLECTION)
@@ -1272,13 +1255,10 @@ weapon_insight(int final)
         else if (is_wet_towel(uwep))
             what = /* (uwep->spe < 3) ? "moist towel" : */ "濡れたタオル";
 
-        if (!strcmpi(what, "armor") || !strcmpi(what, "food")
-            || !strcmpi(what, "venom"))
-            Sprintf(buf, "%sを構えている", what);
+        if (uwep->quan > 1L && is_ammo(uwep))
+            Sprintf(buf, "%ld個の%sを構えている", uwep->quan, what);
         else
-            /* [maybe include known blessed?] */
-            Sprintf(buf, "%sを構えている",
-                    (uwep->quan == 1L) ? an(what) : makeplural(what));
+            Sprintf(buf, "%sを構えている", what);
         you_are(buf, "");
     }
 
@@ -1287,17 +1267,17 @@ weapon_insight(int final)
      * noticed #enhance or decided that it was pointless.
      */
     if ((wtype = weapon_type(uwep)) != P_NONE && (!uwep || !is_ammo(uwep))) {
-        char sklvlbuf[20];
+        char sklvlbuf[BUFSZ];
         int sklvl = P_SKILL(wtype);
         boolean hav = (sklvl != P_UNSKILLED && sklvl != P_SKILLED);
 
         if (sklvl == P_ISRESTRICTED)
             Strcpy(sklvlbuf, "スキルなし");
         else
-            (void) lcase(skill_level_name(wtype, sklvlbuf));
+            (void) jp_skill_level_name_for_display(wtype, sklvlbuf);
         /* "you have no/basic/expert/master/grand-master skill with <skill>"
            or "you are unskilled/skilled in <skill>" */
-        Sprintf(buf, "%sスキル: %s", skill_name(wtype), sklvlbuf);
+        Sprintf(buf, "%sスキル: %s", jp_skill_name_for_display(wtype), sklvlbuf);
 
         if (!u.twoweap) {
             if (can_advance(wtype, FALSE))
@@ -1310,7 +1290,7 @@ weapon_insight(int final)
 
         } else { /* two-weapon */
             char pfx[QBUFSZ], sfx[QBUFSZ],
-                sknambuf2[20], sklvlbuf2[20], twobuf[20];
+                sknambuf2[BUFSZ], sklvlbuf2[BUFSZ], twobuf[BUFSZ];
             const char *also3 = (char *) 0,
                        *verb_present, *verb_past;
             int wtype2 = weapon_type(uswapwep),
@@ -1330,14 +1310,15 @@ weapon_insight(int final)
                    skill_level_name() returns "Unknown" for it */
                 Strcpy(twobuf, "制限");
             } else {
-                (void) lcase(skill_level_name(P_TWO_WEAPON_COMBAT, twobuf));
+                (void) jp_skill_level_name_for_display(P_TWO_WEAPON_COMBAT,
+                                                       twobuf);
             }
 
             /* keep buf[] from above in case skill levels match */
             pfx[0] = sfx[0] = '\0';
             if (twoskl < sklvl) {
                 /* twoskil won't be restricted so sklvl is at least basic */
-                Sprintf(pfx, "%sスキルは", skill_name(wtype));
+                Sprintf(pfx, "%sスキルは", jp_skill_name_for_display(wtype));
                 Sprintf(sfx, "二刀流スキル（%s）で制限される", twobuf);
             } else if (twoskl > sklvl) {
                 /* sklvl might be restricted */
@@ -1347,7 +1328,7 @@ weapon_insight(int final)
                     Sprintf(eos(sfx), "%s", sklvlbuf);
                 else
                     Sprintf(eos(sfx), "スキルなし");
-                Sprintf(eos(sfx), " / %s）", skill_name(wtype));
+                Sprintf(eos(sfx), " / %s）", jp_skill_name_for_display(wtype));
             } else {
                 Strcat(buf, " と二刀流");
                 also3 = "また";
@@ -1362,8 +1343,8 @@ weapon_insight(int final)
             /* skip comparison between secondary and two-weapons if it is
                identical to the comparison between primary and twoweap */
             if (wtype2 != wtype) {
-                Strcpy(sknambuf2, skill_name(wtype2));
-                (void) lcase(skill_level_name(wtype2, sklvlbuf2));
+                Strcpy(sknambuf2, jp_skill_name_for_display(wtype2));
+                (void) jp_skill_level_name_for_display(wtype2, sklvlbuf2);
                 verb_present = "", verb_past = "";
                 pfx[0] = sfx[0] = buf[0] = '\0';
                 if (twoskl < sklvl2) {
@@ -1420,11 +1401,11 @@ weapon_insight(int final)
                    possible because 'a2' gets forced to False above */
                 Strcpy(sfx, " 強化可能なスキル: ");
                 if (a1)
-                    Strcat(sfx, skill_name(wtype));
+                    Strcat(sfx, jp_skill_name_for_display(wtype));
                 if (a2) {
                     if (a1)
                         Strcat(sfx, "、");
-                    Strcat(sfx, skill_name(wtype2));
+                    Strcat(sfx, jp_skill_name_for_display(wtype2));
                 }
                 if (ab) {
                     if (a1 || a2)
@@ -1904,7 +1885,7 @@ attributes_enlightenment(
             u.ugangr > 6 ? "激しく" : u.ugangr > 3 ? "かなり" : "");
         if (wizard)
             Sprintf(eos(buf), " (%d)", u.ugangr);
-        enl_msg(u_gname(), "は", "は", buf, "");
+        enl_msg(jp_u_gname_for_display(), "は", "は", buf, "");
     } else {
         /*
          * We need to suppress this when the game is over, because death

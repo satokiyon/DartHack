@@ -3405,6 +3405,72 @@ br_string2(branch *br)
     return "(unknown)";
 }
 
+const char *
+jp_dungeon_name_for_display(const char *dname)
+{
+    if (!dname || !*dname)
+        return "<ダンジョン>";
+
+    if (!strcmp(dname, "The Dungeons of Doom"))
+        return "運命の大迷宮";
+    if (!strcmp(dname, "The Gnomish Mines"))
+        return "ノームの鉱山";
+    if (!strcmp(dname, "Sokoban"))
+        return "倉庫番";
+    if (!strcmp(dname, "The Quest"))
+        return "クエスト";
+    if (!strcmp(dname, "Fort Ludios"))
+        return "ローディオス砦";
+    if (!strcmp(dname, "Gehennom"))
+        return "ゲヘナ";
+    if (!strcmp(dname, "Vlad's Tower"))
+        return "ヴラド侯の塔";
+    if (!strcmp(dname, "The Elemental Planes"))
+        return "精霊界";
+    if (!strcmp(dname, "Moloch's Sanctum"))
+        return "モーロックの聖域";
+
+    return dname;
+}
+
+const char *
+jp_dungeon_name_by_dnum(int dnum)
+{
+    if (dnum < 0 || dnum >= MAXDUNGEON || !*svd.dungeons[dnum].dname)
+        return "<ダンジョン>";
+    return jp_dungeon_name_for_display(svd.dungeons[dnum].dname);
+}
+
+const char *
+jp_endgamelevelname_for_display(char *outbuf, int indx)
+{
+    const char *planename = 0;
+
+    *outbuf = '\0';
+    switch (indx) {
+    case -5:
+        Strcpy(outbuf, "アストラル界");
+        break;
+    case -4:
+        planename = "水";
+        break;
+    case -3:
+        planename = "火";
+        break;
+    case -2:
+        planename = "風";
+        break;
+    case -1:
+        planename = "地";
+        break;
+    }
+    if (planename)
+        Sprintf(outbuf, "%sの精霊界", planename);
+    else if (!*outbuf)
+        Sprintf(outbuf, "不明な界層 #%d", indx);
+    return outbuf;
+}
+
 /* get the name of an endgame level; topten.c does something similar */
 const char *
 endgamelevelname(char *outbuf, int indx)

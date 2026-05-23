@@ -2529,6 +2529,102 @@ u_gname(void)
 }
 
 const char *
+jp_gname_for_display(const char *gnam)
+{
+    if (!gnam || !*gnam)
+        return "<神格>";
+
+    if (!strcmp(gnam, "Quetzalcoatl"))
+        return "ケツアルコアトル";
+    if (!strcmp(gnam, "Camaxtli"))
+        return "カマキシトリ";
+    if (!strcmp(gnam, "Huhetotl"))
+        return "フヘトトル";
+    if (!strcmp(gnam, "Mitra"))
+        return "ミトラ";
+    if (!strcmp(gnam, "Crom"))
+        return "クロム";
+    if (!strcmp(gnam, "Set"))
+        return "セト";
+    if (!strcmp(gnam, "Anu"))
+        return "アヌ";
+    if (!strcmp(gnam, "Ishtar"))
+        return "イシュタル";
+    if (!strcmp(gnam, "Anshar"))
+        return "アンシャル";
+    if (!strcmp(gnam, "Athena"))
+        return "アテナ";
+    if (!strcmp(gnam, "Hermes"))
+        return "ヘルメス";
+    if (!strcmp(gnam, "Poseidon"))
+        return "ポセイドン";
+    if (!strcmp(gnam, "Lugh"))
+        return "ルーフ";
+    if (!strcmp(gnam, "Brigit"))
+        return "ブリジット";
+    if (!strcmp(gnam, "Manannan Mac Lir"))
+        return "マナンナン・マクリール";
+    if (!strcmp(gnam, "Shan Lai Ching"))
+        return "山雷精";
+    if (!strcmp(gnam, "Chih Sung-tzu"))
+        return "赤松子";
+    if (!strcmp(gnam, "Huan Ti"))
+        return "黄帝";
+    if (!strcmp(gnam, "Issek"))
+        return "イセック";
+    if (!strcmp(gnam, "Mog"))
+        return "モグ";
+    if (!strcmp(gnam, "Kos"))
+        return "コス";
+    if (!strcmp(gnam, "Mercury"))
+        return "マーキュリー";
+    if (!strcmp(gnam, "Venus"))
+        return "ビーナス";
+    if (!strcmp(gnam, "Mars"))
+        return "マーズ";
+    if (!strcmp(gnam, "Amaterasu Omikami"))
+        return "天照大神";
+    if (!strcmp(gnam, "Raijin"))
+        return "雷神";
+    if (!strcmp(gnam, "Susanowo"))
+        return "須佐之男";
+    if (!strcmp(gnam, "Blind Io"))
+        return "盲目のイオ";
+    if (!strcmp(gnam, "The Lady"))
+        return "＜女神＞";
+    if (!strcmp(gnam, "Offler"))
+        return "オフラー";
+    if (!strcmp(gnam, "Tyr"))
+        return "チュール";
+    if (!strcmp(gnam, "Odin"))
+        return "オーディン";
+    if (!strcmp(gnam, "Loki"))
+        return "ロキ";
+    if (!strcmp(gnam, "Ptah"))
+        return "プタハ";
+    if (!strcmp(gnam, "Thoth"))
+        return "トート";
+    if (!strcmp(gnam, "Anhur"))
+        return "アンフル";
+    if (!strcmp(gnam, Moloch))
+        return "モーロック";
+
+    return gnam;
+}
+
+const char *
+jp_u_gname_for_display(void)
+{
+    return jp_gname_for_display(u_gname());
+}
+
+const char *
+jp_align_gname_for_display(aligntyp alignment)
+{
+    return jp_gname_for_display(align_gname(alignment));
+}
+
+const char *
 align_gname(aligntyp alignment)
 {
     const char *gnam;

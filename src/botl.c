@@ -500,15 +500,13 @@ describe_level(
     int ret = 1;
 
     if (Is_knox(&u.uz)) {
-        Sprintf(buf, "%s", svd.dungeons[u.uz.dnum].dname);
+        Sprintf(buf, "%s", jp_dungeon_name_by_dnum(u.uz.dnum));
         addbranch = FALSE;
     } else if (In_quest(&u.uz)) {
-        Sprintf(buf, "Home %d", dunlev(&u.uz));
+        Sprintf(buf, "クエスト %d", dunlev(&u.uz));
     } else if (In_endgame(&u.uz)) {
         /* [3.6.2: this used to be "Astral Plane" or generic "End Game"] */
-        (void) endgamelevelname(buf, depth(&u.uz));
-        if (!addbranch)
-            (void) strsubst(buf, "Plane of ", ""); /* just keep <element> */
+        (void) jp_endgamelevelname_for_display(buf, depth(&u.uz));
         addbranch = FALSE;
     } else {
         /* ports with more room may expand this one */
@@ -520,8 +518,7 @@ describe_level(
         ret = 0;
     }
     if (addbranch) {
-        Sprintf(eos(buf), ", %s", svd.dungeons[u.uz.dnum].dname);
-        (void) strsubst(buf, "The ", "the ");
+        Sprintf(eos(buf), ", %s", jp_dungeon_name_by_dnum(u.uz.dnum));
     }
     if (addspace)
         Strcat(buf, " ");

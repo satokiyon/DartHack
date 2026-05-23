@@ -1126,6 +1126,150 @@ skill_name(int skill)
     return P_NAME(skill);
 }
 
+/* localized skill level text for display-only paths */
+char *
+jp_skill_level_name_for_display(int skill, char *buf)
+{
+    const char *ptr;
+
+    switch (P_SKILL(skill)) {
+    case P_UNSKILLED:
+        ptr = "未熟";
+        break;
+    case P_BASIC:
+        ptr = "基本";
+        break;
+    case P_SKILLED:
+        ptr = "熟練";
+        break;
+    case P_EXPERT:
+        ptr = "熟達";
+        break;
+    case P_MASTER:
+        ptr = "達人";
+        break;
+    case P_GRAND_MASTER:
+        ptr = "免許皆伝";
+        break;
+    default:
+        ptr = "不明";
+        break;
+    }
+    Strcpy(buf, ptr);
+    return buf;
+}
+
+/* localized skill category names for display-only paths */
+const char *
+jp_skill_name_for_display(int skill)
+{
+    if (skill <= P_NONE || skill >= P_NUM_SKILLS)
+        return "不明";
+
+    if (skill_names_indices[skill] > 0)
+        return jp_item_name(skill_names_indices[skill]);
+
+    switch (skill) {
+    case P_BARE_HANDED_COMBAT:
+        return martial_bonus() ? "武術" : "素手格闘";
+    case P_TWO_WEAPON_COMBAT:
+        return "二刀流";
+    case P_RIDING:
+        return "騎乗";
+    case P_POLEARMS:
+        return "長柄武器";
+    case P_SABER:
+        return "サーベル";
+    case P_HAMMER:
+        return "ハンマー";
+    case P_WHIP:
+        return "鞭";
+    case P_ATTACK_SPELL:
+        return "攻撃呪文";
+    case P_HEALING_SPELL:
+        return "治癒呪文";
+    case P_DIVINATION_SPELL:
+        return "占術呪文";
+    case P_ENCHANTMENT_SPELL:
+        return "付与呪文";
+    case P_CLERIC_SPELL:
+        return "聖職呪文";
+    case P_ESCAPE_SPELL:
+        return "離脱呪文";
+    case P_MATTER_SPELL:
+        return "物質呪文";
+    default:
+        return "不明";
+    }
+}
+
+/* localized weapon descriptor used in status/enlightenment displays */
+char *
+jp_weapon_descr_for_display(struct obj *obj, char *buf, size_t bufsz)
+{
+    int skill;
+    const char *class_name;
+
+    if (!buf || bufsz == 0)
+        return buf;
+
+    if (!obj) {
+        Snprintf(buf, bufsz, "素手");
+        return buf;
+    }
+
+    skill = weapon_type(obj);
+    switch (skill) {
+    case P_NONE:
+        if (obj->otyp == CORPSE || obj->otyp == TIN || obj->otyp == EGG
+            || obj->otyp == STATUE || obj->otyp == BOULDER
+            || obj->otyp == TOWEL || obj->otyp == TIN_OPENER)
+            Snprintf(buf, bufsz, "%s", jp_item_name(obj->otyp));
+        else if (obj->globby)
+            Snprintf(buf, bufsz, "塊");
+        else {
+            class_name = let_to_name((char) obj->oclass, FALSE, FALSE);
+            Snprintf(buf, bufsz, "%s", class_name);
+        }
+        break;
+    case P_SLING:
+        if (is_ammo(obj)) {
+            if (obj->otyp == ROCK || is_graystone(obj))
+                Snprintf(buf, bufsz, "石");
+            else if (obj->oclass == GEM_CLASS)
+                Snprintf(buf, bufsz, "宝石");
+            else
+                Snprintf(buf, bufsz, "%s", let_to_name((char) obj->oclass,
+                                                        FALSE, FALSE));
+        } else {
+            Snprintf(buf, bufsz, "%s", jp_skill_name_for_display(skill));
+        }
+        break;
+    case P_BOW:
+        Snprintf(buf, bufsz, "%s", is_ammo(obj) ? "矢" : jp_skill_name_for_display(skill));
+        break;
+    case P_CROSSBOW:
+        Snprintf(buf, bufsz, "%s", is_ammo(obj) ? "ボルト" : jp_skill_name_for_display(skill));
+        break;
+    case P_FLAIL:
+        if (obj->otyp == GRAPPLING_HOOK)
+            Snprintf(buf, bufsz, "鉤爪");
+        else
+            Snprintf(buf, bufsz, "%s", jp_skill_name_for_display(skill));
+        break;
+    case P_PICK_AXE:
+        if (obj->otyp == DWARVISH_MATTOCK)
+            Snprintf(buf, bufsz, "%s", jp_item_name(obj->otyp));
+        else
+            Snprintf(buf, bufsz, "%s", jp_skill_name_for_display(skill));
+        break;
+    default:
+        Snprintf(buf, bufsz, "%s", jp_skill_name_for_display(skill));
+        break;
+    }
+    return buf;
+}
+
 /* return the # of slots required to advance the skill */
 staticfn int
 slots_required(int skill)
