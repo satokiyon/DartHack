@@ -1112,7 +1112,7 @@ checkfile(
            if the fruit name is an extant object, looking at the fruit yields
            that object's description. */
         if (!alt && fruit_from_name(dbase_str, TRUE, (int *) 0))
-            alt = strcpy(newstr, obj_descr[SLIME_MOLD].oc_name);
+            alt = strcpy(newstr, jp_item_name(SLIME_MOLD));
         /*
          * If the object is named, then the name is the alternate description;
          * otherwise, the result of makesingular() applied to the name is.

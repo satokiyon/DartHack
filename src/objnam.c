@@ -472,13 +472,24 @@ fruitname(
 {
     char *buf = nextobuf();
     const char *fruit_nam = strstri(svp.pl_fruit, " of ");
+    const char *base_fruit;
+    char *singular;
 
     if (fruit_nam)
         fruit_nam += 4; /* skip past " of " */
     else
         fruit_nam = svp.pl_fruit; /* use it as is */
 
-    Sprintf(buf, "%s%s", makesingular(fruit_nam), juice ? " juice" : "");
+    singular = makesingular(fruit_nam);
+    base_fruit = !strcmpi(singular, "slime mold") ? "果物" : singular;
+    if (juice) {
+        if (!strcmp(base_fruit, "果物"))
+            Sprintf(buf, "果汁");
+        else
+            Sprintf(buf, "%sジュース", base_fruit);
+    } else
+        Sprintf(buf, "%s", base_fruit);
+    releaseobuf(singular);
     return buf;
 }
 
@@ -806,6 +817,9 @@ xname_flags(
             if (!f) {
                 impossible("Bad fruit #%d?", obj->spe);
                 Strcpy(buf, "果物");
+            } else if (!strcmpi(f->fname, "slime mold")) {
+                Strcpy(buf, "果物");
+                pluralize = FALSE;
             } else {
                 /* fruit name is limited in length to PL_FSIZ; converting
                    to/from singular/plural might increase the length a
