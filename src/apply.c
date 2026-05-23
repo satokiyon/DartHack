@@ -1611,7 +1611,6 @@ catch_lit(struct obj *obj)
 staticfn void
 use_lamp(struct obj *obj)
 {
-    char buf[BUFSZ];
     const char *lamp = (obj->otyp == OIL_LAMP
                         || obj->otyp == MAGIC_LAMP) ? "lamp"
                        : (obj->otyp == BRASS_LANTERN) ? "lantern"
@@ -1625,7 +1624,7 @@ use_lamp(struct obj *obj)
 
     if (obj->lamplit) {
         if (lamp) /* lamp or lantern */
-            pline("%s%sは消えた.", Shk_Your(buf, obj), lamp);
+            You("%sの火を消した.", yname(obj));
         else
             You("%sの火を消した.", yname(obj));
         end_burn(obj, TRUE);
@@ -1663,7 +1662,7 @@ use_lamp(struct obj *obj)
     } else {
         if (lamp) { /* lamp or lantern */
             check_unpaid(obj);
-            pline("%s%sに火が付いた.", Shk_Your(buf, obj), lamp);
+            You("%sに火をつけた.", yname(obj));
         } else { /* candle(s) */
             pline("%sの火は%s", s_suffix(Yname2(obj)),
                   Blind ? "燃えていた." : "明るく燃え上がった!");
@@ -4203,7 +4202,7 @@ doapply(void)
     if (check_capacity((char *) 0))
         return ECMD_OK;
 
-    obj = getobj("use or apply", apply_ok, GETOBJ_NOFLAGS);
+    obj = getobj("apply", apply_ok, GETOBJ_NOFLAGS);
     if (!obj)
         return ECMD_CANCEL;
 

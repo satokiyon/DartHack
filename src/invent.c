@@ -49,6 +49,7 @@ action_prompt_jp(const char *word)
     if (!strcmp(word, "write with")) return "何を使って書きますか?";
     if (!strcmp(word, "grease")) return "何に油を塗りますか?";
     if (!strcmp(word, "disarm")) return "何を使って解除しますか?";
+    if (!strcmp(word, "apply")) return "何を使いますか?";
     return (const char *) 0;
 }
 
@@ -58,6 +59,7 @@ action_missing_jp(const char *word)
     if (!strcmp(word, "write with")) return "書くための";
     if (!strcmp(word, "grease")) return "油を塗るための";
     if (!strcmp(word, "disarm")) return "解除に使う";
+    if (!strcmp(word, "apply")) return "使うための";
     return word;
 }
 
