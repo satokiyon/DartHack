@@ -38,6 +38,8 @@ staticfn void releaseobuf(char *) NONNULLARG1;
 staticfn void prefix_append(char *, size_t, const char *);
 staticfn const char *jp_hand_part_name(void);
 staticfn const char *jp_sided_hand_label(boolean);
+staticfn const char *jp_scroll_uname_for_display(int, const char *);
+staticfn void jp_scroll_called_name(char *, int, int, const char *);
 staticfn void xcalled(char *, int, const char *, const char *);
 staticfn char *xname_flags(struct obj *, unsigned);
 staticfn char *minimal_xname(struct obj *);
@@ -168,6 +170,38 @@ jp_sided_hand_label(boolean right_side)
     return buf;
 }
 
+staticfn const char *
+jp_scroll_uname_for_display(int otyp, const char *uname)
+{
+    const char *dn = jp_item_descr(otyp);
+    const char *en_descr = OBJ_DESCR(objects[otyp]);
+
+    if (!uname || !*uname)
+        return (const char *) 0;
+    if (dn && !strcmpi(uname, dn))
+        return dn;
+    if (dn && en_descr && !strcmpi(uname, en_descr))
+        return dn;
+    return uname;
+}
+
+staticfn void
+jp_scroll_called_name(char *buf, int siz, int otyp, const char *uname)
+{
+    const char *dn = jp_item_descr(otyp);
+    const char *shown = jp_scroll_uname_for_display(otyp, uname);
+
+    if (!shown || !*shown) {
+        Snprintf(buf, siz, "%s", dn ? dn : "巻物");
+        return;
+    }
+    if (dn && !strcmp(shown, dn)) {
+        Snprintf(buf, siz, "%s", dn);
+        return;
+    }
+    Snprintf(buf, siz, "「%s」と呼ばれている巻物", shown);
+}
+
 /* manage a pool of BUFSZ buffers, so callers don't have to */
 static char NEARDATA obufs[NUMOBUF][BUFSZ];
 static int obufidx = 0;
@@ -235,7 +269,6 @@ char *
 obj_typename(int otyp)
 {
     char *buf = nextobuf();
-    char typbuf[BUFSZ];
     struct objclass *ocl = &objects[otyp];
     const char *actualn = jp_item_name(otyp);
     const char *dn = jp_item_descr(otyp);
@@ -260,7 +293,12 @@ obj_typename(int otyp)
         Strcpy(buf, "薬");
         break;
     case SCROLL_CLASS:
-        Strcpy(buf, "巻物");
+        if (nn)
+            Strcpy(buf, actualn);
+        else if (un)
+            jp_scroll_called_name(buf, BUFSZ, otyp, un);
+        else
+            Strcpy(buf, dn ? dn : "巻物");
         break;
     case WAND_CLASS:
         if (nn)
@@ -916,14 +954,13 @@ xname_flags(
         }
         break;
     case SCROLL_CLASS:
-        Strcpy(buf, "巻物");
         if (!dknown)
-            break;
-        if (nn) {
+            Strcpy(buf, "巻物");
+        else if (nn)
             Strcpy(buf, actualn);
-        } else if (un) {
-            xcalled(buf, BUFSZ - PREFIX, "", un);
-        } else if (ocl->oc_magic) {
+        else if (un)
+            jp_scroll_called_name(buf, BUFSZ - PREFIX, typ, un);
+        else if (ocl->oc_magic) {
             /* Show only the label text for unknown magical scrolls. */
             Strcpy(buf, dn);
         } else {

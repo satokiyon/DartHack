@@ -4486,15 +4486,16 @@ flip_through_book(struct obj *obj)
         pline("これは読んで面白そうだった.");
     } else {
         static const char *const fadeness[] = {
-            "真新しい",
-            "やや薄れた",
-            "かなり薄れた",
-            "ひどく薄れた",
-            "かろうじて読める"
+            "真新しかっ",
+            "やや薄れ",
+            "かなり薄れ",
+            "ひどく薄れ",
+            "かろうじて読める程度に薄れ",
+             "完全に薄れて読めなくなっ"
         };
         int findx = min(obj->spestudied, MAX_SPELL_STUDY);
 
-          pline("この魔法書の%sインクは%sだった.",
+          pline("この魔法書の%sインクは%sた.",
               objects[obj->otyp].oc_magic ? "魔法の" : "",
               fadeness[findx]);
     }
