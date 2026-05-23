@@ -391,12 +391,12 @@ steal(struct monst *mtmp, char *objnambuf)
             pline("%s takes off your unseen chain.", Monnambuf);
             (void) openholdingtrap(&gy.youmonst, &dummy);
         } else if (Blind) {
-            pline("Somebody tries to rob you, but finds nothing to steal.");
+            pline("誰かがあなたを盗もうとしたが、盗れる物は何もなかった.");
         } else if (inv_cnt(TRUE) > inv_cnt(FALSE)) {
-            pline("%s tries to rob you, but isn't interested in gold.",
+            pline("%sはあなたを盗もうとしたが、金貨には興味がないようだ.",
                   Monnambuf);
         } else {
-            pline("%s tries to rob you, but there is nothing to steal!",
+            pline("%sはあなたを盗もうとしたが、盗れる物は何もない!",
                   Monnambuf);
         }
         return 1; /* let her flee */

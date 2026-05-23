@@ -126,11 +126,11 @@ property_by_index(int idx, int *propertynum)
 
 /* He is being petrified - dialogue by inmet!tower */
 static NEARDATA const char *const stoned_texts[] = {
-    "You are slowing down.",            /* 5 */
-    "Your limbs are stiffening.",       /* 4 */
-    "Your limbs have turned to stone.", /* 3 */
-    "You have turned to stone.",        /* 2 */
-    "You are a statue."                 /* 1 */
+    "動きが鈍くなってきた.",      /* 5 */
+    "手足がこわばってきた.",      /* 4 */
+    "手足が石になってしまった.",  /* 3 */
+    "体が石になってしまった.",    /* 2 */
+    "あなたは石像になった."       /* 1 */
 };
 
 staticfn void
@@ -142,8 +142,8 @@ stoned_dialogue(void)
         char buf[BUFSZ];
 
         Strcpy(buf, stoned_texts[SIZE(stoned_texts) - i]);
-        if (nolimbs(gy.youmonst.data) && strstri(buf, "limbs"))
-            (void) strsubst(buf, "limbs", "extremities");
+        if (nolimbs(gy.youmonst.data) && strstri(buf, "手足"))
+            (void) strsubst(buf, "手足", "体の末端");
         urgent_pline("%s", buf);
     }
     switch ((int) i) {
@@ -186,18 +186,17 @@ stoned_dialogue(void)
 
 /* hero is getting sicker and sicker prior to vomiting */
 static NEARDATA const char *const vomiting_texts[] = {
-    "are feeling mildly nauseated.", /* 14 */
-    "feel slightly confused.",       /* 11 */
-    "can't seem to think straight.", /* 8 */
-    "feel incredibly sick.",         /* 5 */
-    "are about to vomit."            /* 2 */
+    "少し吐き気がしてきた.",                     /* 14 */
+    "少し混乱してきた.",                         /* 11 */
+    "まともに考えられない.",                     /* 8 */
+    "ひどく気分が悪い.",                         /* 5 */
+    "今にも吐きそうだ."                          /* 2 */
 };
 
 staticfn void
 vomiting_dialogue(void)
 {
     const char *txt = 0;
-    char buf[BUFSZ];
     long v = (Vomiting & TIMEOUT);
 
     /* note: nhtimeout() hasn't decremented timed properties for the
@@ -208,8 +207,8 @@ vomiting_dialogue(void)
         break;
     case 11:
         txt = vomiting_texts[1];
-        if (strstri(txt, " confused") && Confusion)
-            txt = strsubst(strcpy(buf, txt), " confused", " more confused");
+        if (Confusion)
+            txt = "さらに混乱してきた.";
         break;
     case 6:
         make_stunned((HStun & TIMEOUT) + (long) d(2, 4), FALSE);
@@ -224,8 +223,8 @@ vomiting_dialogue(void)
         break;
     case 8:
         txt = vomiting_texts[2];
-        if (strstri(txt, " think") && Stunned)
-            txt = strsubst(strcpy(buf, txt), "can't seem to ", "can't ");
+        if (Stunned)
+            txt = "頭がぼんやりして考えがまとまらない.";
         break;
     case 5:
         txt = vomiting_texts[3];
@@ -233,11 +232,11 @@ vomiting_dialogue(void)
     case 2:
         txt = vomiting_texts[4];
         if (cantvomit(gy.youmonst.data))
-            txt = "gag uncontrollably.";
+            txt = "えずきが止まらない.";
         else if (Hallucination)
             /* "hurl" is short for "hurl chunks" which is slang for
                relatively violent vomiting... */
-            txt = "are about to hurl!";
+            txt = "今にも派手に吐きそうだ!";
         break;
     case 0:
         stop_occupation();
@@ -276,19 +275,19 @@ sleep_dialogue(void)
 DISABLE_WARNING_FORMAT_NONLITERAL   /* RESTORE is after slime_dialogue */
 
 static NEARDATA const char *const choke_texts[] = {
-    "You find it hard to breathe.",
-    "You're gasping for air.",
-    "You can no longer breathe.",
-    "You're turning %s.",
-    "You suffocate."
+    "息をするのが苦しくなってきた.",
+    "息が切れてきた.",
+    "もう息ができない.",
+    "体が%sくなってきた.",
+    "窒息してしまう."
 };
 
 static NEARDATA const char *const choke_texts2[] = {
-    "Your %s is becoming constricted.",
-    "Your blood is having trouble reaching your brain.",
-    "The pressure on your %s increases.",
-    "Your consciousness is fading.",
-    "You suffocate."
+    "あなたの%sが締めつけられてきた.",
+    "脳に血が届きにくくなってきた.",
+    "あなたの%sへの圧迫が強まっている.",
+    "意識が薄れていく.",
+    "窒息してしまう."
 };
 
 staticfn void
@@ -314,9 +313,9 @@ choke_dialogue(void)
 }
 
 static NEARDATA const char *const sickness_texts[] = {
-    "Your illness feels worse.",
-    "Your illness is severe.",
-    "You are at Death's door.",
+    "病状が悪化している.",
+    "病状は深刻だ.",
+    "もう死の淵だ.",
 };
 
 staticfn void
@@ -328,16 +327,13 @@ sickness_dialogue(void)
         char buf[BUFSZ], pronounbuf[40];
 
         Strcpy(buf, sickness_texts[SIZE(sickness_texts) - i]);
-        /* change the message slightly for food poisoning */
-        if ((u.usick_type & SICK_NONVOMITABLE) == 0)
-            (void) strsubst(buf, "illness", "sickness");
-        if (Hallucination && strstri(buf, "Death's door")) {
+        if (Hallucination && i == 1L) {
             /* youmonst: for Hallucination, mhe()'s mon argument isn't used */
             Strcpy(pronounbuf, mhe(&gy.youmonst));
-            Sprintf(eos(buf), "  %s %s inviting you in.",
+            Sprintf(eos(buf), "  %sがあなたを手招きしている.",
                     /* upstart() modifies its argument but vtense() doesn't
                        care whether or not that has already happened */
-                    upstart(pronounbuf), vtense(pronounbuf, "are"));
+                    upstart(pronounbuf));
         }
         urgent_pline("%s", buf);
     }
@@ -377,11 +373,11 @@ levitation_dialogue(void)
 }
 
 static NEARDATA const char *const slime_texts[] = {
-    "You are turning a little %s.",   /* 5 */
-    "Your limbs are getting oozy.",   /* 4 */
-    "Your skin begins to peel away.", /* 3 */
-    "You are turning into %s.",       /* 2 */
-    "You have become %s."             /* 1 */
+    "少しずつ%sに変わってきた.",    /* 5 */
+    "手足がぬめってきた.",          /* 4 */
+    "皮膚がはがれはじめた.",        /* 3 */
+    "%sに変わりつつある.",          /* 2 */
+    "あなたは%sになった."           /* 1 */
 };
 
 staticfn void
@@ -404,8 +400,8 @@ slime_dialogue(void)
         char buf[BUFSZ];
 
         Strcpy(buf, slime_texts[SIZE(slime_texts) - i - 1L]);
-        if (nolimbs(gy.youmonst.data) && strstri(buf, "limbs"))
-            (void) strsubst(buf, "limbs", "extremities");
+        if (nolimbs(gy.youmonst.data) && strstri(buf, "手足"))
+            (void) strsubst(buf, "手足", "体の末端");
 
         if (strchr(buf, '%')) {
             if (i == 4L) {  /* "you are turning green" */
@@ -447,7 +443,7 @@ void
 burn_away_slime(void)
 {
     if (Slimed) {
-        make_slimed(0L, "The slime that covers you is burned away!");
+        make_slimed(0L, "体を覆うスライムは焼き払われた!");
     }
 }
 
@@ -502,13 +498,13 @@ slimed_to_death(struct kinfo *kptr)
         Strcpy(svk.killer.name, "slimicide");
         /* vary the message depending upon whether life-save was due to
            amulet or due to declining to die in explore or wizard mode */
-        Strcpy(slimebuf, "green slime has been genocided...");
+        Strcpy(slimebuf, "グリーンスライムは絶滅している...");
         if (iflags.last_msg == PLNMSG_OK_DONT_DIE)
             /* follows "OK, so you don't die." and arg is second sentence */
-            urgent_pline("Yes, you do.  %s", upstart(slimebuf));
+            urgent_pline("そうはいかない。 %s", upstart(slimebuf));
         else
             /* follows "The medallion crumbles to dust." */
-            urgent_pline("Unfortunately, %s", slimebuf);
+            urgent_pline("残念ながら、%s", slimebuf);
         /* die again; no possibility of amulet this time */
         done(GENOCIDED); /* [should it be done_timeout(GENOCIDED, SLIMED)?] */
         /* could be life-saved again (only in explore or wizard mode)
@@ -525,8 +521,8 @@ slimed_to_death(struct kinfo *kptr)
    move between things which are closely packed--like the substance of
    solid rock! */
 static NEARDATA const char *const phaze_texts[] = {
-    "You start to feel bloated.",
-    "You are feeling rather flabby.",
+    "体が少しふくらんできた気がする.",
+    "体がぶよぶよしてきた気がする.",
 };
 
 staticfn void
@@ -545,8 +541,8 @@ phaze_dialogue(void)
    gas region but can't, (HMagical_breathing & TIMEOUT) will be set to
    a small value.  Unlike Passes_walls, there's no joke message. */
 static NEARDATA const char *const region_texts[] = {
-    "You seem to have some trouble breathing.",
-    "The air here seems foul.",
+    "呼吸が少し苦しい.",
+    "このあたりの空気がよどんでいる.",
 };
 
 staticfn void
@@ -875,8 +871,8 @@ nh_timeout(void)
                     if (stuck_in_wall())
                         You_feel("また身動きが取りづらくなった.");
                     else
-                        pline("You're back to your %s self again.",
-                              !Upolyd ? "normal" : "unusual");
+                        pline("あなたは%s姿に戻った.",
+                              !Upolyd ? "元の" : "異形の");
                 }
                 break;
             case MAGICAL_BREATHING:
@@ -1248,8 +1244,8 @@ slip_or_trip(void)
         if (Hallucination) {
             what = strcpy(buf, what);
             buf[0] = highc(buf[0]);
-            pline("Egads!  %s bite%s your %s!", what,
-                  (!otmp || otmp->quan == 1L) ? "s" : "", jp_body_part(FOOT));
+            pline("うわっ!  %sがあなたの%sにかみついた!", what,
+                  jp_body_part(FOOT));
         } else {
             You("%sにつまずいた.", what);
         }
@@ -1364,13 +1360,13 @@ lantern_message(struct obj *obj)
     case OBJ_INVENT:
         Your("ランタンが暗くなってきた.");
         if (Hallucination)
-            pline("Batteries have not been invented yet.");
+            pline("電池というものは、まだ発明されていないようだ.");
         break;
     case OBJ_FLOOR:
         You_see("ランプが暗くなっているのを見た.");
         break;
     case OBJ_MINVENT:
-        pline("%s lantern is getting dim.", s_suffix(Monnam(obj->ocarry)));
+        pline("%sのランタンが暗くなってきた.", Monnam(obj->ocarry));
         break;
     }
 }
@@ -1878,7 +1874,7 @@ do_storms(void)
         /* Inside a cloud during a thunderstorm is deafening. */
         /* Even if already deaf, we sense the thunder's vibrations. */
         Soundeffect(se_kaboom_boom_boom, 80);
-        pline("Kaboom!!!  Boom!!  Boom!!");
+        pline("ドカーン!!!  ゴロゴロ!!  ゴロゴロ!!");
         incr_itimeout(&HDeaf, rn1(20, 30));
         disp.botl = TRUE;
         if (!u.uinvulnerable) {

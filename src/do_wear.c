@@ -1401,7 +1401,7 @@ Ring_off_or_gone(struct obj *obj, boolean gone)
         if (!Invis && !BInvis && !Blind) {
             newsym(u.ux, u.uy);
             Your("体が%s見えるようになった.",
-                 See_invisible ? "完全に" : "模糊的に");
+                 See_invisible ? "はっきり" : "うっすら");
             learnring(obj, TRUE);
         }
         break;

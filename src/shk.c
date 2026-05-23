@@ -1384,7 +1384,7 @@ rouse_shk(struct monst *shkp, boolean verbosely)
         /* greed induced recovery... */
         if (verbosely && canspotmon(shkp))
             pline("%s %s.", Shknam(shkp),
-                  shkp->msleeping ? "wakes up" : "can move again");
+                  shkp->msleeping ? "目を覚ました" : "再び動けるようになった");
         shkp->msleeping = 0;
         shkp->mfrozen = 0;
         shkp->mcanmove = 1;

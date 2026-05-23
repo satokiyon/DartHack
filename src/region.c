@@ -987,14 +987,14 @@ enter_force_field(genericptr_t p1, genericptr_t p2)
     if (p2 == (genericptr_t) 0) { /* That means the player */
         if (!Blind)
             You("%sにぶつかった。痛い!",
-                Hallucination ? "an invisible tree"
-                              : "some kind of invisible wall");
+                Hallucination ? "見えない木"
+                              : "見えない壁のようなもの");
         else
-            pline("Ouch!");
+            pline("痛っ!");
     } else {
         mtmp = (struct monst *) p2;
         if (canseemon(mtmp))
-            pline("%s bumps into %s!", Monnam(mtmp), something);
+            pline("%sは%sにぶつかった!", Monnam(mtmp), something);
     }
     return FALSE;
 }

@@ -563,7 +563,7 @@ polyself(int psflags)
 
             if (mntmp < LOW_PM) {
                 if (!class)
-                    pline("I've never heard of such monsters.");
+                    pline("そんなモンスターは聞いたことがない.");
                 else
                     You_cant("そのいずれにもポリモーフすることはできなかった。");
             } else if (wizard && Upolyd
@@ -922,7 +922,7 @@ polymon(int mntmp)
             if (unsolid(gy.youmonst.data)) {
                 if (canspotmon(u.ustuck)) /* [see below for explanation] */
                     Strcpy(ustuckNam, Monnam(u.ustuck));
-                pline("%s can no longer contain you.", ustuckNam);
+                pline("%sはもうあなたを飲み込んでおけない.", ustuckNam);
                 expels_mesg = FALSE;
             }
             expels(u.ustuck, u.ustuck->data, expels_mesg);
@@ -945,7 +945,7 @@ polymon(int mntmp)
         if (canspotmon(u.ustuck))
             Strcpy(ustuckNam, Monnam(u.ustuck));
         set_ustuck((struct monst *) 0);
-        pline("%s loses its grip on you.", ustuckNam);
+        pline("%sはあなたを放した.", ustuckNam);
     } else if (sticking && !sticks(gy.youmonst.data)) {
         /* was holding onto u.ustuck but no longer capable of that */
         uunstick();
@@ -953,7 +953,7 @@ polymon(int mntmp)
 
     if (u.usteed) {
         if (touch_petrifies(u.usteed->data) && !Stone_resistance && rnl(3)) {
-            pline("%s touch %s.", no_longer_petrify_resistant,
+            pline("%sが%sに触れた.", no_longer_petrify_resistant,
                   mon_nam(u.usteed));
             Sprintf(buf, "riding %s",
                     an(jp_pmname(u.usteed->data, Mgender(u.usteed))));
@@ -1756,7 +1756,7 @@ dogaze(void)
                     pline("目覚めた%sを見つめるのは得策ではなかった.",
                           l_monnam(mtmp));
                     /* as if gazing at a sleeping anything is fruitful... */
-                    urgent_pline("You turn to stone...");
+                      urgent_pline("あなたは石になっていく...");
                     svk.killer.format = KILLED_BY;
                     Strcpy(svk.killer.name,
                            "deliberately meeting Medusa's gaze");
@@ -1830,7 +1830,7 @@ dohide(void)
                 corpse_name = an(corpse_name);
             /* no need to check poly_when_stoned(); no hide-underers can
                turn into stone golems instead of becoming petrified */
-            pline("Hiding under %s%s is a fatal mistake...",
+                pline("%s%sの下に隠れるのは致命的な失敗だ...",
                   corpse_name, plur(ct));
             Sprintf(kbuf, "hiding under %s%s", corpse_name, plur(ct));
             instapetrify(kbuf);
@@ -1902,7 +1902,7 @@ domindblast(void)
     disp.botl = TRUE;
 
     You("集中した.");
-    pline("A wave of psychic energy pours out.");
+    pline("精神エネルギーの波があふれ出した.");
     for (mtmp = fmon; mtmp; mtmp = nmon) {
         int u_sen;
 
@@ -1945,7 +1945,7 @@ uunstick(void)
         return;
     }
     set_ustuck((struct monst *) 0); /* before pline() */
-    pline("%s is no longer in your clutches.", Monnam(mtmp));
+    pline("%sはもうあなたの手中にはいない.", Monnam(mtmp));
 }
 
 void
@@ -2474,7 +2474,7 @@ ugolemeffects(int damtype, int dam)
         if (u.mh > u.mhmax)
             u.mh = u.mhmax;
         disp.botl = TRUE;
-        pline("Strangely, you feel better than before.");
+        pline("奇妙なことに、前より体調がよくなった.");
         exercise(A_STR, TRUE);
     }
 }
