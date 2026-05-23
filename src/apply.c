@@ -2600,7 +2600,7 @@ use_grease(struct obj *obj)
             dropx(obj);
             return ECMD_TIME;
         }
-        otmp = getobj("油を塗る", grease_ok, GETOBJ_PROMPT);
+        otmp = getobj("grease", grease_ok, GETOBJ_PROMPT);
         if (!otmp)
             return ECMD_CANCEL;
         if (inaccessible_equipment(otmp, "油を塗る", FALSE))

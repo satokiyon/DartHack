@@ -5680,7 +5680,7 @@ disarm_squeaky_board(struct trap *ttmp)
     boolean bad_tool;
     int fails;
 
-    obj = getobj("解除に使うものは", unsqueak_ok, GETOBJ_PROMPT);
+    obj = getobj("disarm", unsqueak_ok, GETOBJ_PROMPT);
     if (!obj)
         return 0;
 
