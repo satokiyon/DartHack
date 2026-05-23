@@ -33,10 +33,10 @@ throne_mon_sound(struct monst *mtmp)
          || is_prince(mtmp->data)) && !is_animal(mtmp->data)
         && mon_in_room(mtmp, COURT)) {
         static const char *const throne_msg[4] = {
-            "the tones of courtly conversation.",
-            "a sceptre pounded in judgment.",
-            "Someone shouts \"Off with %s head!\"",
-            "Queen Beruthiel's cats!",
+            "宮廷の会話が聞こえる.",
+            "笏で裁きを告げる音が聞こえる.",
+            "誰かが「%sの首をはねろ!」と叫ぶ声が聞こえる.",
+            "ベルシエル女王の猫の声が聞こえる!",
         };
         int which = rn2(3) + (Hallucination ? 1 : 0);
 
@@ -76,8 +76,8 @@ beehive_mon_sound(struct monst *mtmp)
             break;
         case 2:
             Soundeffect(se_bees, 100);
-            You_hear("%s帽子の中で蜂が騒いでいる音が聞こえる!",
-                     uarmh ? "" : "(nonexistent) ");
+            You_hear(uarmh ? "帽子の中で蜂が騒いでいる音が聞こえる!"
+                          : "かぶってもいない帽子の中で蜂が騒いでいる音が聞こえる!");
             break;
         }
         return TRUE;
@@ -118,8 +118,8 @@ zoo_mon_sound(struct monst *mtmp)
         && mon_in_room(mtmp, ZOO)) {
         int hallu = Hallucination ? 1 : 0, selection = rn2(2) + hallu;
         static const char *const zoo_msg[3] = {
-            "a sound reminiscent of an elephant stepping on a peanut.",
-            "a sound reminiscent of a seal barking.", "Doctor Dolittle!",
+            "象がピーナッツを踏みつけたような音が聞こえる.",
+            "アシカが吠えるような音が聞こえる.", "ドリトル先生の声が聞こえる!",
         };
         You_hear1(zoo_msg[selection]);
         return TRUE;
@@ -144,9 +144,9 @@ temple_priest_sound(struct monst *mtmp)
            care if telepathy or extended detection reveals that the
            priest is not currently standing on the altar; he's mobile). */
         static const char *const temple_msg[] = {
-            "*someone praising %s.", "*someone beseeching %s.",
-            "#an animal carcass being offered in sacrifice.",
-            "*a strident plea for donations.",
+            "*誰かが%sをたたえる声.", "*誰かが%sにすがる声.",
+            "#動物の死骸を供物としてささげる気配.",
+            "*寄進を求める鋭い声.",
         };
         const char *msg;
         int hallu = Hallucination ? 1 : 0;
@@ -187,11 +187,11 @@ oracle_sound(struct monst *mtmp)
     if (Hallucination || !canseemon(mtmp)) {
         int hallu = Hallucination ? 1 : 0;
         static const char *const ora_msg[5] = {
-            "a strange wind.",     /* Jupiter at Dodona */
-            "convulsive ravings.", /* Apollo at Delphi */
-            "snoring snakes.",     /* AEsculapius at Epidaurus */
-            "someone say \"No more woodchucks!\"",
-            "a loud ZOT!" /* both rec.humor.oracle */
+            "不思議な風の音.", /* Jupiter at Dodona */
+            "取りつかれたようなたわごと.", /* Apollo at Delphi */
+            "蛇のいびき.", /* AEsculapius at Epidaurus */
+            "誰かが「No more woodchucks!」と言う声.",
+            "大きなZOT!の音." /* both rec.humor.oracle */
         };
         You_hear1(ora_msg[rn2(3) + hallu * 2]);
     }
@@ -212,14 +212,14 @@ dosounds(void)
 
     if (svl.level.flags.nfountains && !rn2(400)) {
         static const char *const fountain_msg[4] = {
-            "bubbling water.", "water falling on coins.",
-            "the splashing of a naiad.", "a soda fountain!",
+            "ゴボゴボという水音が聞こえる.", "コインに水が落ちる音が聞こえる.",
+            "水の精の水はね音が聞こえる.", "炭酸飲料のシューという音が聞こえる!",
         };
         You_hear1(fountain_msg[rn2(3) + hallu]);
     }
     if (svl.level.flags.nsinks && !rn2(300)) {
         static const char *const sink_msg[3] = {
-            "a slow drip.", "a gurgling noise.", "dishes being washed!",
+            "水がぽたぽたと落ちる音が聞こえる.", "ゴボゴボという音が聞こえる.", "皿を洗う音が聞こえる!",
         };
         You_hear1(sink_msg[rn2(2) + hallu]);
     }
@@ -229,8 +229,8 @@ dosounds(void)
     }
     if (svl.level.flags.has_swamp && !rn2(200)) {
         static const char *const swamp_msg[3] = {
-            "hear mosquitoes!", "smell marsh gas!", /* so it's a smell...*/
-            "hear Donald Duck!",
+            "蚊の羽音を聞いた.", "腐った匂いがした!", /* so it's a smell...*/
+            "ドナルドダックの声を聞いた!",
         };
         You1(swamp_msg[rn2(2) + hallu]);
         return;
@@ -285,8 +285,8 @@ dosounds(void)
     }
     if (svl.level.flags.has_barracks && !rn2(200)) {
         static const char *const barracks_msg[4] = {
-            "blades being honed.", "loud snoring.", "dice being thrown.",
-            "General MacArthur!",
+            "刃物を研ぐ音が聞こえる.", "大きないびきが聞こえる.", "ダイスが振られる音が聞こえる.",
+            "マッカーサー将軍の声が聞こえる!",
         };
         int count = 0;
 
@@ -319,8 +319,8 @@ dosounds(void)
         if (tended_shop(sroom)
             && !strchr(u.ushops, (int) (ROOM_INDEX(sroom) + ROOMOFFSET))) {
             static const char *const shop_msg[3] = {
-                "someone cursing shoplifters.",
-                "the chime of a cash register.", "Neiman and Marcus arguing!",
+                "誰かが万引き犯をののしる声が聞こえる.",
+                "レジのチーンという音が聞こえる.", "ニーマンとマーカスが言い争う声が聞こえる!",
             };
             You_hear1(shop_msg[rn2(2) + hallu]);
             noisy_shop(sroom);
@@ -395,6 +395,41 @@ growl_sound(struct monst *mtmp)
         ret = "scream";
     }
     return ret;
+}
+
+const char *
+growl_sound_jp(struct monst *mtmp)
+{
+    switch (mtmp->data->msound) {
+    case MS_MEW:
+    case MS_HISS:
+        return "のシューッという声";
+    case MS_BARK:
+    case MS_GROWL:
+        return "のうなり声";
+    case MS_ROAR:
+        return "の咆哮";
+    case MS_BELLOW:
+        return "の怒号";
+    case MS_BUZZ:
+        return "の羽音";
+    case MS_SQEEK:
+        return "の悲鳴";
+    case MS_SQAWK:
+        return "の金切り声";
+    case MS_NEIGH:
+        return "のいななき";
+    case MS_WAIL:
+        return "のうめき声";
+    case MS_GROAN:
+        return "のうなり";
+    case MS_MOO:
+        return "の低いうなり";
+    case MS_SILENT:
+        return "の騒ぎ";
+    default:
+        return "の叫び声";
+    }
 }
 
 /* the sounds of a seriously abused pet, including player attacking it */
@@ -536,18 +571,34 @@ beg(struct monst *mtmp)
            MS_SILENT too (if caller lets that get this far) since it's
            excluded by the first two cases */
         if (canspotmon(mtmp))
-            pline("%s seems famished.", Monnam(mtmp));
+            pline("%sはひどく腹を空かせているようだ.", Monnam(mtmp));
         /* looking famished will be a good trick for a tame skeleton... */
     }
 }
 
 /* hero has attacked a peaceful monster within 'mon's view */
 const char *
+maybe_gasp_text(int gasp_type)
+{
+    switch (gasp_type) {
+    case MGASP_UH_OH:
+        return "うわっ。";
+    case MGASP_OH_MY:
+        return "なんてことだ。";
+    case MGASP_WHAT:
+        return "えっ?";
+    case MGASP_WHY:
+        return "なぜ?";
+    case MGASP_GASP:
+        return "息をのんだ";
+    default:
+        return "";
+    }
+}
+
+int
 maybe_gasp(struct monst *mon)
 {
-    static const char *const Exclam[] = {
-        "Gasp!", "Uh-oh.", "Oh my!", "What?", "Why?",
-    };
     struct permonst *mptr = mon->data;
     int msound = mptr->msound;
     boolean dogasp = FALSE;
@@ -604,9 +655,9 @@ maybe_gasp(struct monst *mon)
         break;
     }
     if (dogasp) {
-        return ROLL_FROM(Exclam); /* [mon->m_id % SIZE(Exclam)]; */
+        return rn2(5) + 1;
     }
-    return (const char *) 0;
+    return MGASP_NONE;
 }
 
 /* for egg hatching; caller will apply "ing" suffix
@@ -652,6 +703,33 @@ cry_sound(struct monst *mtmp)
         break;
     }
     return ret;
+}
+
+const char *
+cry_sound_jp(struct monst *mtmp)
+{
+    struct permonst *ptr = mtmp->data;
+
+    switch (ptr->msound) {
+    default:
+    case MS_SILENT:
+        return (ptr->mlet == S_EEL) ? "ごぼごぼと" : "かさかさと";
+    case MS_HISS:
+        return "シューッと";
+    case MS_ROAR:
+    case MS_GROWL:
+        return "うなって";
+    case MS_CHIRP:
+        return "ぴよぴよと";
+    case MS_BUZZ:
+        return "ぶんぶんと";
+    case MS_SQAWK:
+        return "ギャーギャーと";
+    case MS_GRUNT:
+        return "ぶつぶつと";
+    case MS_MUMBLE:
+        return "もごもごと";
+    }
 }
 
 /* return True if mon is a gecko or seems to look like one (hallucination) */
@@ -736,7 +814,7 @@ domonnoise(struct monst *mtmp)
         } else {
             /* approximation of GEICO's advertising slogan (it actually
                concludes with "save you 15% or more on car insurance.") */
-            Sprintf(verbuf, "15 minutes could save you 15 %s.",
+            Sprintf(verbuf, "15分で15%sは節約できるかもしれない。",
                     currency(15L)); /* "zorkmids" */
             verbl_msg = verbuf;
         }
@@ -758,50 +836,49 @@ domonnoise(struct monst *mtmp)
 
         if (mtmp->mtame) {
             if (kindred) {
-                Sprintf(verbuf, "Good %s to you Master%s",
-                        isnight ? "evening" : "day",
-                        isnight ? "!" : ".  Why do we not rest?");
+                Sprintf(verbuf, "こんばんは、主%s",
+                        isnight ? "!" : "。なぜ休まないのですか?");
                 verbl_msg = verbuf;
             } else {
                 Sprintf(verbuf, "%s%s",
-                        nightchild ? "Child of the night, " : "",
+                        nightchild ? "夜の子よ、" : "",
                         midnight()
-                         ? "I can stand this craving no longer!"
+                         ? "もうこの渇きを我慢できない!"
                          : isnight
-                          ? "I beg you, help me satisfy this growing craving!"
-                          : "I find myself growing a little weary.");
+                          ? "頼む、この募る渇きを満たす手助けをしてくれ!"
+                          : "少し疲れを感じる." );
                 verbl_msg = verbuf;
             }
         } else if (mtmp->mpeaceful) {
             if (kindred && isnight) {
-                Sprintf(verbuf, "Good feeding %s!",
-                        flags.female ? "sister" : "brother");
+                Sprintf(verbuf, "よい狩りを、%s!",
+                        flags.female ? "姉妹" : "兄弟");
                 verbl_msg = verbuf;
             } else if (nightchild && isnight) {
-                Sprintf(verbuf, "How nice to hear you, child of the night!");
+                Sprintf(verbuf, "夜の子よ、声を聞けてうれしいぞ!");
                 verbl_msg = verbuf;
             } else
-                verbl_msg = "I only drink... potions.";
+                verbl_msg = "私が飲むのは…薬だけだ.";
         } else {
             static const char *const vampmsg[] = {
                 /* These first two (0 and 1) are specially handled below */
-                "I vant to suck your %s!",
-                "I vill come after %s without regret!",
+                "%sを吸わせてもらうぞ!",
+                "%sを容赦なく追い詰める!",
                 /* other famous vampire quotes can follow here if desired */
             };
             int vampindex;
 
             if (kindred) {
-                verbl_msg = "This is my hunting ground"
-                            " that you dare to prowl!";
+                verbl_msg = "ここは私の狩り場だ。"
+                            "よくもうろつけたものだ!";
             } else if (gy.youmonst.data == &mons[PM_SILVER_DRAGON]
                        || gy.youmonst.data == &mons[PM_BABY_SILVER_DRAGON]) {
                 /* Silver dragons are silver in color, not made of silver */
                 Sprintf(verbuf,
-                        "%s!  Your silver sheen"" does not frighten me!",
+                        "%s!  銀色の輝きごときで私は怯まない!",
                         (gy.youmonst.data == &mons[PM_SILVER_DRAGON])
-                            ? "Fool"
-                            : "Young Fool");
+                            ? "愚か者"
+                            : "若造");
                 verbl_msg = verbuf;
             } else {
                 vampindex = rn2(SIZE(vampmsg));
@@ -822,34 +899,34 @@ domonnoise(struct monst *mtmp)
     }
     case MS_WERE:
         if (flags.moonphase == FULL_MOON && (night() ^ !rn2(13))) {
-            pline("%s throws back %s head and lets out a blood curdling %s!",
+            pline("%sは%s頭を反らし、血も凍るような%sを上げた!",
                   Monnam(mtmp), mhis(mtmp),
-                  (ptr == &mons[PM_HUMAN_WERERAT]) ? "shriek" : "howl");
+                  (ptr == &mons[PM_HUMAN_WERERAT]) ? "悲鳴" : "遠吠え");
             Soundeffect((ptr == &mons[PM_HUMAN_WERERAT]) ? se_scream
                                                          : se_canine_howl,
                         80);
             wake_nearto(mtmp->mx, mtmp->my, 11 * 11);
         } else {
             pline_msg =
-                "whispers inaudibly.  All you can make out is \"moon\".";
+                "聞き取れないほど小さな声でつぶやいた。辛うじて\"moon\"だけが聞き取れた.";
         }
         break;
     case MS_BARK:
         if (flags.moonphase == FULL_MOON && night()) {
-            pline_msg = "howls.";
+            pline_msg = "遠吠えした.";
         } else if (mtmp->mpeaceful) {
             if (mtmp->mtame
                 && (mtmp->mconf || mtmp->mflee || mtmp->mtrapped
                     || svm.moves > EDOG(mtmp)->hungrytime || mtmp->mtame < 5))
-                pline_msg = "whines.";
+                pline_msg = "鼻を鳴らした.";
             else if (mtmp->mtame && EDOG(mtmp)->hungrytime > svm.moves + 1000)
-                pline_msg = "yips.";
+                pline_msg = "キャンと鳴いた.";
             else {
                 if (ptr != &mons[PM_DINGO]) /* dingos do not actually bark */
-                    pline_msg = "barks.";
+                    pline_msg = "吠えた.";
             }
         } else {
-            pline_msg = "growls.";
+            pline_msg = "うなった.";
         }
         break;
     case MS_MEW:
@@ -857,16 +934,16 @@ domonnoise(struct monst *mtmp)
             if (mtmp->mconf || mtmp->mflee || mtmp->mtrapped
                 || mtmp->mtame < 5) {
                 Soundeffect(se_feline_yowl, 80);
-                pline_msg = "yowls.";
+                pline_msg = "うなり声を上げた.";
             } else if (svm.moves > EDOG(mtmp)->hungrytime) {
                 Soundeffect(se_feline_meow, 80);
-                pline_msg = "meows.";
+                pline_msg = "ニャーと鳴いた.";
             } else if (EDOG(mtmp)->hungrytime > svm.moves + 1000) {
                 Soundeffect(se_feline_purr, 40);
-                pline_msg = "purrs.";
+                pline_msg = "喉を鳴らした.";
             } else {
                 Soundeffect(se_feline_mew, 60);
-                pline_msg = "mews.";
+                pline_msg = "ミューと鳴いた.";
             }
             break;
         }
@@ -874,100 +951,100 @@ domonnoise(struct monst *mtmp)
         /*FALLTHRU*/
     case MS_GROWL:
         Soundeffect((mtmp->mpeaceful ? se_snarl : se_growl), 80);
-        pline_msg = mtmp->mpeaceful ? "snarls." : "growls!";
+        pline_msg = mtmp->mpeaceful ? "歯をむいた." : "うなった!";
         break;
     case MS_ROAR:
         Soundeffect((mtmp->mpeaceful ? se_snarl : se_roar), 80);
-        pline_msg = mtmp->mpeaceful ? "snarls." : "roars!";
+        pline_msg = mtmp->mpeaceful ? "歯をむいた." : "ほえたてた!";
         break;
     case MS_SQEEK:
         Soundeffect(se_squeak, 80);
-        pline_msg = "squeaks.";
+        pline_msg = "キーキー鳴いた.";
         break;
     case MS_SQAWK:
         if (ptr == &mons[PM_RAVEN] && !mtmp->mpeaceful) {
-            verbl_msg = "Nevermore!";
+            verbl_msg = "二度とない!";
         } else {
             Soundeffect(se_squawk, 80);
-            pline_msg = "squawks.";
+            pline_msg = "けたたましく鳴いた.";
         }
         break;
     case MS_HISS:
         if (!mtmp->mpeaceful) {
             Soundeffect(se_hiss, 80);
-            pline_msg = "hisses!";
+            pline_msg = "シューッとうなった!";
         } else {
             return ECMD_OK; /* no sound */
         }
         break;
     case MS_BUZZ:
         Soundeffect((mtmp->mpeaceful ? se_buzz : se_angry_drone), 80);
-        pline_msg = mtmp->mpeaceful ? "drones." : "buzzes angrily.";
+        pline_msg = mtmp->mpeaceful ? "ぶんぶんとうなった." : "怒って羽音を立てた.";
         break;
     case MS_GRUNT:
         Soundeffect(se_grunt, 60);
-        pline_msg = "grunts.";
+        pline_msg = "うなった.";
         break;
     case MS_NEIGH:
         if (mtmp->mtame < 5) {
             Soundeffect(se_equine_neigh, 60);
-            pline_msg = "neighs.";
+            pline_msg = "いなないた.";
         } else if (svm.moves > EDOG(mtmp)->hungrytime) {
             Soundeffect(se_equine_whinny, 60);
-            pline_msg = "whinnies.";
+            pline_msg = "ヒヒーンと鳴いた.";
         } else {
             Soundeffect(se_equine_whicker, 60);
-            pline_msg = "whickers.";
+            pline_msg = "甘えるように鼻を鳴らした.";
         }
         break;
     case MS_MOO:
         Soundeffect(se_bovine_moo, 80);
-        pline_msg = "moos.";
+        pline_msg = "モーと鳴いた.";
         break;
     case MS_BELLOW:
         Soundeffect((ptr->mlet == S_QUADRUPED) ? se_bovine_bellow
                                                : se_croc_bellow,
                     80);
-        pline_msg = "bellows!";
+        pline_msg = "大きくうなり声を上げた!";
         break;
     case MS_CHIRP:
         Soundeffect(se_chirp, 60);
-        pline_msg = "chirps.";
+        pline_msg = "さえずった.";
         break;
     case MS_WAIL:
         Soundeffect(se_sad_wailing, 60);
-        pline_msg = "wails mournfully.";
+        pline_msg = "悲しげに泣いた.";
         break;
     case MS_GROAN:
         if (!rn2(3)) {
             Soundeffect(se_groan, 60);
-            pline_msg = "groans.";
+            pline_msg = "うめいた.";
         }
         break;
     case MS_GURGLE:
         Soundeffect(se_gurgle, 60);
-        pline_msg = "gurgles.";
+        pline_msg = "ごぼごぼとうなった.";
         break;
     case MS_BURBLE:
         Soundeffect(se_jabberwock_burble, 60);
-        pline_msg = "burbles.";
+        pline_msg = "ぶつぶつとつぶやいた.";
         break;
     case MS_TRUMPET:
         Soundeffect(se_elephant_trumpet, 60);
-        pline_msg = "trumpets!";
+        pline_msg = "らっぱのように鳴いた!";
         wake_nearto(mtmp->mx, mtmp->my, 11 * 11);
         break;
     case MS_SHRIEK:
         Soundeffect(se_shriek, 60);
-        pline_msg = "shrieks.";
+        pline_msg = "金切り声を上げた.";
         aggravate();
         break;
     case MS_IMITATE:
-        pline_msg = "imitates you.";
+        pline_msg = "あなたのまねをした.";
         break;
     case MS_BONES:
         Soundeffect(se_bone_rattle, 60);
-        pline("%s rattles noisily.", Monnam(mtmp));
+        pline("%sは骨をがちゃがちゃ鳴らした.", Monnam(mtmp));
         You("一瞬体がすくんだ.");
         nomul(-2);
         gm.multi_reason = "scared by rattling";
@@ -975,46 +1052,46 @@ domonnoise(struct monst *mtmp)
         break;
     case MS_LAUGH: {
         static const char *const laugh_msg[4] = {
-            "giggles.", "chuckles.", "snickers.", "laughs.",
+            "くすくす笑った.", "くっくっと笑った.", "にやにや笑った.", "笑った.",
         };
         Soundeffect(se_laughter, 60);
         pline_msg = laugh_msg[rn2(4)];
         break;
     }
     case MS_MUMBLE:
-        pline_msg = "mumbles incomprehensibly.";
+        pline_msg = "聞き取れない言葉をぶつぶつつぶやいた.";
         break;
     case MS_ORC: /* this used to be an alias for grunt, now it is distinct */
         Soundeffect(se_orc_grunt, 60);
-        pline_msg = "grunts.";
+        pline_msg = "うなった.";
         break;
     case MS_DJINNI:
         if (mtmp->mtame) {
-            verbl_msg = "Sorry, I'm all out of wishes.";
+            verbl_msg = "すまない、もう願いは残っていない。";
         } else if (mtmp->mpeaceful) {
             if (ptr == &mons[PM_WATER_DEMON])
-                pline_msg = "gurgles.";
+                pline_msg = "ごぼごぼとうなった.";
             else
-                verbl_msg = "I'm free!";
+                verbl_msg = "自由だ!";
         } else {
             if (ptr != &mons[PM_PRISONER])
-                verbl_msg = "This will teach you not to disturb me!";
+                verbl_msg = "私を邪魔するとどうなるか思い知れ!";
             else /* vague because prisoner might already be out of cell */
-                verbl_msg = "Get me out of here.";
+                verbl_msg = "ここから出してくれ。";
         }
         break;
     case MS_BOAST: /* giants */
         if (!mtmp->mpeaceful) {
             switch (rn2(4)) {
             case 0:
-                pline("%s boasts about %s gem collection.", Monnam(mtmp),
+                pline("%sは%s宝石の収集を自慢した.", Monnam(mtmp),
                       mhis(mtmp));
                 break;
             case 1:
-                pline_msg = "complains about a diet of mutton.";
+                pline_msg = "羊肉ばかりの食事に文句を言った.";
                 break;
             default:
-                pline_msg = "shouts \"Fee Fie Foe Foo!\" and guffaws.";
+                pline_msg = "「Fee Fie Foe Foo!」と叫んで高笑いした.";
                 wake_nearto(mtmp->mx, mtmp->my, 7 * 7);
                 break;
             }
@@ -1027,38 +1104,38 @@ domonnoise(struct monst *mtmp)
             if (In_endgame(&u.uz) && is_mplayer(ptr))
                 mplayer_talk(mtmp);
             else
-                pline_msg = "threatens you.";
+                pline_msg = "あなたを脅した.";
             break;
         }
         /* Generic peaceful humanoid behavior. */
         if (mtmp->mflee)
-            pline_msg = "wants nothing to do with you.";
+            pline_msg = "あなたに関わりたくないようだ.";
         else if (mtmp->mhp < mtmp->mhpmax / 4)
-            pline_msg = "moans.";
+            pline_msg = "うめいた.";
         else if (mtmp->mconf || mtmp->mstun)
-            verbl_msg = !rn2(3) ? "Huh?" : rn2(2) ? "What?" : "Eh?";
+            verbl_msg = !rn2(3) ? "ん?" : rn2(2) ? "なに?" : "え?";
         else if (!mtmp->mcansee)
-            verbl_msg = "I can't see!";
+            verbl_msg = "見えない!";
         else if (mtmp->mtrapped) {
             struct trap *t = t_at(mtmp->mx, mtmp->my);
 
             if (t)
                 t->tseen = 1;
-            verbl_msg = "I'm trapped!";
+            verbl_msg = "罠にはまった!";
         } else if (mtmp->mhp < mtmp->mhpmax / 2)
-            pline_msg = "asks for a potion of healing.";
+            pline_msg = "治療の薬を求めた.";
         else if (mtmp->mtame && !mtmp->isminion
                  && svm.moves > EDOG(mtmp)->hungrytime)
-            verbl_msg = "I'm hungry.";
+            verbl_msg = "腹が減った。";
         /* Specific monsters' interests */
         else if (is_elf(ptr))
-            pline_msg = "curses orcs.";
+            pline_msg = "オークをののしった.";
         else if (is_dwarf(ptr))
-            pline_msg = "talks about mining.";
+            pline_msg = "採掘の話をした.";
         else if (likes_magic(ptr))
-            pline_msg = "talks about spellcraft.";
+            pline_msg = "呪文術の話をした.";
         else if (ptr->mlet == S_CENTAUR)
-            pline_msg = "discusses hunting.";
+            pline_msg = "狩りの話をした.";
         else if (is_gnome(ptr)) {
             if (Hallucination && (gnomeplan = rn2(4)) % 2) {
                 /* skipped for rn2(4) result of 0 or 2;
@@ -1071,11 +1148,11 @@ domonnoise(struct monst *mtmp)
                          Collect underpants       ?          Profit
                    and they never verbalize step 2 so we don't either */
                 verbl_msg = (gnomeplan == 1)
-                            ? "Phase one, collect underpants."
-                            : "Phase three, profit!";
+                            ? "第一段階、下着を集める。"
+                            : "第三段階、利益!";
             } else {
-                verbl_msg = "Many enter the dungeon,"
-                            " and few return to the sunlit lands.";
+                verbl_msg = "ダンジョンへ入る者は多いが、"
+                            "陽の当たる地へ戻れる者は少ない。";
             }
         } else
             switch (monsndx(ptr)) {
@@ -1087,18 +1164,18 @@ domonnoise(struct monst *mtmp)
                 pline_msg = (mtmp->mhp < mtmp->mhpmax
                              && (mtmp->mhpmax <= 10
                                  || mtmp->mhp <= mtmp->mhpmax - 10))
-                            ? "complains about unpleasant dungeon conditions."
-                            : "asks you about the One Ring.";
+                            ? "ダンジョン環境のひどさに文句を言った."
+                            : "あなたに一つの指輪のことを尋ねた.";
                 break;
             case PM_ARCHEOLOGIST:
                 pline_msg =
-                "describes a recent article in \"Spelunker Today\" magazine.";
+                "雑誌\"Spelunker Today\"の最近の記事について語った.";
                 break;
             case PM_TOURIST:
-                verbl_msg = "Aloha.";
+                verbl_msg = "アロハ。";
                 break;
             default:
-                pline_msg = "discusses dungeon exploration.";
+                pline_msg = "ダンジョン探索について語った.";
                 break;
             }
         break;
@@ -1117,13 +1194,13 @@ domonnoise(struct monst *mtmp)
             swval = ((poly_gender() == 0) ? rn2(3) : 0);
         switch (swval) {
         case 2:
-            verbl_msg = "Hello, sailor.";
+            verbl_msg = "やあ、船乗りさん.";
             break;
         case 1:
-            pline_msg = "comes on to you.";
+            pline_msg = "あなたを誘惑してきた.";
             break;
         default:
-            pline_msg = "cajoles you.";
+            pline_msg = "あなたを言いくるめようとした.";
         }
     } break;
     case MS_ARREST:
@@ -1132,8 +1209,8 @@ domonnoise(struct monst *mtmp)
             verbalize("事実だけを言い給え、%s。", flags.female ? "お嬢さん" : "旦那");
         } else {
             static const char *const arrest_msg[3] = {
-                "Anything you say can be used against you.",
-                "You're under arrest!", "Stop in the name of the Law!",
+                "お前の発言はすべて不利な証拠として使われる。",
+                "お前を逮捕する!", "法の名のもとに止まれ!",
             };
             verbl_msg = arrest_msg[rn2(3)];
         }
@@ -1149,42 +1226,42 @@ domonnoise(struct monst *mtmp)
         if (!mtmp->mpeaceful)
             cuss(mtmp);
         else if (is_lminion(mtmp))
-            verbl_msg = "It's not too late.";
+            verbl_msg = "まだ間に合う。";
         else
-            verbl_msg = "We're all doomed.";
+            verbl_msg = "もう皆おしまいだ。";
         break;
     case MS_SPELL:
         /* deliberately vague, since it's not actually casting any spell */
-        pline_msg = "seems to mutter a cantrip.";
+        pline_msg = "何かの呪文をぼそぼそ唱えているようだ.";
         break;
     case MS_NURSE:
-        verbl_msg_mcan = "I hate this job!";
+        verbl_msg_mcan = "この仕事、大嫌い!";
         if (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
-            verbl_msg = "Put that weapon away before you hurt someone!";
+            verbl_msg = "誰かを傷つける前に、その武器をしまって!";
         else if (uarmc || uarm || uarmh || uarms || uarmg || uarmf)
             verbl_msg = Role_if(PM_HEALER)
-                            ? "Doc, I can't help you unless you cooperate."
-                            : "Please undress so I can examine you.";
+                            ? "先生、協力してくれないと処置できません。"
+                            : "診察するので服を脱いでください。";
         else if (uarmu)
-            verbl_msg = "Take off your shirt, please.";
+            verbl_msg = "シャツを脱いでください。";
         else
-            verbl_msg = "Relax, this won't hurt a bit.";
+            verbl_msg = "力を抜いて、全然痛くないから。";
         break;
     case MS_GUARD:
         if (money_cnt(gi.invent))
-            verbl_msg = "Please drop that gold and follow me.";
+            verbl_msg = "その金を置いて、私についてきなさい.";
         else
-            verbl_msg = "Please follow me.";
+            verbl_msg = "私についてきなさい.";
         break;
     case MS_SOLDIER: {
         static const char
             *const soldier_foe_msg[3] = {
-                "Resistance is useless!", "You're dog meat!", "Surrender!",
+                "抵抗は無意味だ!", "お前は終わりだ!", "降伏しろ!",
             },
             *const soldier_pax_msg[3] = {
-                "What lousy pay we're getting here!",
-                "The food's not fit for Orcs!",
-                "My feet hurt, I've been on them all day!",
+                "ここでの給料はひどすぎる!",
+                "この食事はオークでも食わないぞ!",
+                "一日中立ちっぱなしで足が痛い!",
             };
         verbl_msg = mtmp->mpeaceful ? soldier_pax_msg[rn2(3)]
                                     : soldier_foe_msg[rn2(3)];
@@ -1199,11 +1276,11 @@ domonnoise(struct monst *mtmp)
         if (ms_Death && !svc.context.tribute.Deathnotice
             && (book = u_have_novel()) != 0) {
             if ((tribtitle = noveltitle(&book->novelidx)) != 0) {
-                Sprintf(verbuf, "Ah, so you have a copy of /%s/.", tribtitle);
+                Sprintf(verbuf, "ほう、/%s/を持っているのか.", tribtitle);
                 /* no Death featured in these two, so exclude them */
                 if (strcmpi(tribtitle, "Snuff")
                     && strcmpi(tribtitle, "The Wee Free Men"))
-                    Strcat(verbuf, "  I may have been misquoted there.");
+                    Strcat(verbuf, "  あれでは少し誤って引用されていたかもしれない。" );
                 verbl_msg = verbuf;
             }
             svc.context.tribute.Deathnotice = 1;
@@ -1212,9 +1289,9 @@ domonnoise(struct monst *mtmp)
         /* end of tribute addition */
 
         } else if (ms_Death && !rn2(10)) {
-            pline_msg = "is busy reading a copy of Sandman #8.";
+            pline_msg = "『Sandman #8』を熱心に読んでいる.";
         } else
-            verbl_msg = "Who do you think you are, War?";
+            verbl_msg = "自分をWarだとでも思っているのか?";
         break;
     } /* case MS_RIDER */
     } /* switch */
@@ -1261,7 +1338,7 @@ dochat(void)
     struct obj *otmp;
 
     if (is_silent(gy.youmonst.data)) {
-        pline("あなたは%sなので、話すことができない。",
+        pline("あなたは%sなので、話すことができない.",
               an(jp_pmname(gy.youmonst.data, flags.female ? FEMALE : MALE)));
         return ECMD_OK;
     }
@@ -1270,7 +1347,7 @@ dochat(void)
         return ECMD_OK;
     }
     if (u.uswallow) {
-        pline("外では聞こえないだろう。");
+        pline("外には聞こえないだろう.");
         return ECMD_OK;
     }
     if (Underwater) {
@@ -1289,21 +1366,22 @@ dochat(void)
         return ECMD_TIME;
     }
 
-    if (!getdir("Talk to whom? (in what direction)")) {
+    if (!getdir("誰に話しかけますか? (どの方向ですか)")) {
         /* decided not to chat */
         return ECMD_CANCEL;
     }
 
     if (u.usteed && u.dz > 0) {
         if (helpless(u.usteed)) {
-            pline("%s seems not to notice you.", Monnam(u.usteed));
+            pline("%sはあなたに気づいていないようだ.", Monnam(u.usteed));
             return ECMD_TIME;
         } else
             return domonnoise(u.usteed);
     }
 
     if (u.dz) {
-        pline("そこでは聞こえないだろう、%sの方に。", u.dz < 0 ? "上" : "下");
+        pline("そこでは聞こえないだろう、%sの方には.",
+              u.dz < 0 ? "上" : "下");
         return ECMD_OK;
     }
 
@@ -1318,7 +1396,7 @@ dochat(void)
             return 1;
         }
          */
-        pline("自分自身と話すのはダンジョンを探索する者の醜い習慣だ。");
+        pline("自分自身と話すのはダンジョンを探索する者の醜い習慣だ.");
         return ECMD_OK;
     }
 
@@ -1336,7 +1414,7 @@ dochat(void)
             if (!Blind)
                 pline_The("%sはあなたに気づいていないようだ.",
                           /* if hallucinating, you can't tell it's a statue */
-                          Hallucination ? rndmonnam((char *) 0) : "statue");
+                          Hallucination ? rndmonnam((char *) 0) : "像");
             return ECMD_OK;
         }
         if (!Deaf && (IS_WALL(levl[tx][ty].typ)
@@ -1381,7 +1459,7 @@ dochat(void)
         /* If it is unseen, the player can't tell the difference between
            not noticing him and just not existing, so skip the message. */
         if (canspotmon(mtmp))
-            pline("%s seems not to notice you.", Monnam(mtmp));
+            pline("%sはあなたに気づいていないようだ.", Monnam(mtmp));
         return ECMD_OK;
     }
 
@@ -1391,18 +1469,18 @@ dochat(void)
     if (!Deaf && mtmp->mtame && mtmp->meating) {
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
-        pline("%s is eating noisily.", Monnam(mtmp));
+        pline("%sはくちゃくちゃと音を立てて食べている.", Monnam(mtmp));
         return ECMD_OK;
     }
     if (Deaf) {
         const char *xresponse = humanoid(gy.youmonst.data)
-                    ? "falls on deaf ears"
-                    : "は聞こえない";
+                    ? "届かなかった"
+                    : "聞こえなかった";
 
-        pline("返事%s%s%s。",
-              canspotmon(mtmp) ? "は" : "",
-              canspotmon(mtmp) ? mon_nam(mtmp) : "",
-              xresponse);
+        if (canspotmon(mtmp))
+            pline("返事は%sには%s.", mon_nam(mtmp), xresponse);
+        else
+            pline("返事は%s.", xresponse);
         return ECMD_OK;
     }
     return domonnoise(mtmp);
@@ -1438,7 +1516,7 @@ tiphat(void)
         return res; /* if learned of curse, use a move */
 
     /* might choose a position, but dealing with direct lines is simpler */
-    if (!getdir("At whom? (in what direction)")) /* bail on ESC */
+    if (!getdir("誰に会釈しますか? (どの方向ですか)")) /* bail on ESC */
         return res; /* iffy; now know it's not cursed for sure (since we got
                      * past prior test) but might have already known that */
     res = 1; /* physical action is going to take place */
@@ -1451,11 +1529,11 @@ tiphat(void)
     if (!u.dx && !u.dy) {
         if (u.usteed && u.dz > 0) {
             if (helpless(u.usteed))
-                pline("%s doesn't notice.", Monnam(u.usteed));
+                pline("%sは気づいていないようだ.", Monnam(u.usteed));
             else
                 (void) domonnoise(u.usteed);
         } else if (u.dz) {
-            pline("%sにはいないようだ。", (u.dz < 0) ? "上" : "下");
+            pline("%sにはいないようだ.", (u.dz < 0) ? "上" : "下");
         } else {
             pline_The("ここにいる無作法者はあなたを無視した...");
         }
@@ -1493,10 +1571,10 @@ tiphat(void)
     }
 
     if (unseen || (statue && Hallucination)) {
-        pline("その%s怪物はあなたを無視している！", unseen ? "見えない" : "");
+        pline("その%s怪物はあなたを無視している!", unseen ? "見えない" : "");
     } else if (!mtmp || !responsive_mon_at(x, y)) {
         if (vismon) /* 'vismon' is only True when 'mtmp' is non-Null */
-            pline("%s seems not to notice you.", Monnam(mtmp));
+            pline("%sはあなたに気づいていないようだ.", Monnam(mtmp));
         else
             goto nada;
     } else { /* 'mtmp' is guaranteed to be non-Null if we get here */
@@ -1505,29 +1583,29 @@ tiphat(void)
 
         if (vismon && humanoid(mtmp->data) && mtmp->mpeaceful && !Conflict) {
             if ((otmp = which_armor(mtmp, W_ARMH)) == 0) {
-                pline("%s waves.", Monnam(mtmp));
+                pline("%sは手を振った.", Monnam(mtmp));
             } else if (otmp->cursed) {
-                pline("%s grasps %s %s but can't remove it.", Monnam(mtmp),
+                pline("%sは%s%sをつかんだが外せなかった.", Monnam(mtmp),
                       mhis(mtmp), helm_simple_name(otmp));
                 otmp->bknown = 1;
             } else {
-                pline("%s tips %s %s in response.", Monnam(mtmp),
+                pline("%sは返礼として%s%sをちょいと持ち上げた.", Monnam(mtmp),
                       mhis(mtmp), helm_simple_name(otmp));
             }
         } else if (vismon && humanoid(mtmp->data)) {
             static const char *const reaction[3] = {
-                "curses", "gestures rudely", "gestures offensively",
+                "悪態をつく", "無礼な身ぶりをする", "侮辱的な身ぶりをする",
             };
             int which = !Deaf ? rn2(3) : rn1(2, 1),
                 twice = (Deaf || which > 0 || rn2(3)) ? 0 : rn1(2, 1);
 
-            pline("%s %s%s%s at you...", Monnam(mtmp), reaction[which],
-                  twice ? " and " : "", twice ? reaction[twice] : "");
+            pline("%sはあなたに%s%s%s.", Monnam(mtmp), reaction[which],
+                  twice ? "、さらに" : "", twice ? reaction[twice] : "");
         } else if (next2u(x, y) && !Deaf && domonnoise(mtmp)) {
             if (!vismon)
                 map_invisible(x, y);
         } else if (vismon) {
-            pline("%s doesn't respond.", Monnam(mtmp));
+            pline("%sは反応しなかった.", Monnam(mtmp));
         } else {
  nada:
             pline("%s", nothing_happens);

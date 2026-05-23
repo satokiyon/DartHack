@@ -284,10 +284,10 @@ dog_eat(struct monst *mtmp,
                result won't be printed */
             obj_name = distant_name(obj, doname);
             if (tunnels(mtmp->data))
-                pline_mon(mtmp, "%s digs in.", noit_Monnam(mtmp));
+                pline_mon(mtmp, "%s\u306f\u6398\u3063\u3066\u3044\u308b.", noit_Monnam(mtmp));
             else
-                pline_mon(mtmp, "%s %s %s.", noit_Monnam(mtmp),
-                      devour ? "devours" : "eats", obj_name);
+                pline_mon(mtmp, "%s\u306f%s\u3092%s.", noit_Monnam(mtmp),
+                      obj_name, devour ? "\u3080\u3055\u307c\u308a\u98df\u3063\u305f" : "\u98df\u3079\u305f");
         } else if (seeobj) {
             obj_name = distant_name(obj, doname);
             pline("それは%sを%s。", obj_name, devour ? "むさぼり食った" : "食べた");

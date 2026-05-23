@@ -4183,15 +4183,15 @@ peacefuls_respond(struct monst *mtmp)
                     (void) angry_guards(!!Deaf);
                 } else {
                     if (!Deaf && !rn2(5)) {
-                        const char *gasp = maybe_gasp(mon);
+                        int gasp = maybe_gasp(mon);
 
-                        if (gasp) {
-                            if (!strncmpi(gasp, "gasp", 4)) {
-                                Sprintf(buf, "%s gasps", Monnam(mon));
+                        if (gasp != MGASP_NONE) {
+                            if (gasp == MGASP_GASP) {
+                                Sprintf(buf, "%sは息をのんだ", Monnam(mon));
                                 needpunct = TRUE;
                             } else {
-                                Sprintf(buf, "%s exclaims \"%s\"",
-                                        Monnam(mon), gasp);
+                                Sprintf(buf, "%sは「%s」と叫んだ",
+                                        Monnam(mon), maybe_gasp_text(gasp));
                             }
                             exclaimed = TRUE;
                         }
@@ -4204,7 +4204,8 @@ peacefuls_respond(struct monst *mtmp)
                         || (mon->data == &mons[quest_info(MS_LEADER)]
                             && mtmp->data != &mons[gu.urole.guardnum])) {
                         if (exclaimed)
-                            pline_mon(mon, "%s%s", buf, " then shrugs.");
+                            pline_mon(mon, "%s%s", buf,
+                                      "、そして肩をすくめた.");
                         continue;
                     }
 
@@ -4215,8 +4216,8 @@ peacefuls_respond(struct monst *mtmp)
                         monflee(mon, rn2(50) + 25, TRUE, !exclaimed);
                         if (exclaimed) {
                             if (flags.verbose && !alreadyfleeing) {
-                                Strcat(buf, " and then turns to flee.");
-                                needpunct = FALSE;
+                                Strcat(buf, "、そして逃げ出した");
+                                needpunct = TRUE;
                             }
                         } else
                             exclaimed = TRUE; /* got msg from monflee() */
@@ -4231,7 +4232,7 @@ peacefuls_respond(struct monst *mtmp)
                         mon->mstrategy &= ~STRAT_WAITMASK;
                         adjalign(-1);
                         if (!exclaimed)
-                            pline_mon(mon, "%s gets angry!", Monnam(mon));
+                            pline_mon(mon, "%sは怒った!", Monnam(mon));
                     }
                 }
             } else if (mon->data->mlet == mtmp->data->mlet
