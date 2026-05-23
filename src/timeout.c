@@ -1115,11 +1115,12 @@ hatch_egg(anything *arg, long timeout)
             else
                 You_see("%sが荷物の中から飛び出した!", monnambuf);
             if (yours) {
-                pline("%s %s %s like \"%s%s\"",
-                      siblings ? "Their" : "Its",
-                      ing_suffix(cry_sound(mon)),
-                      (is_silent(mon->data) || Deaf) ? "seems" : "sounds",
-                      flags.female ? "mommy" : "daddy", egg->spe ? "." : "?");
+                pline((is_silent(mon->data) || Deaf)
+                          ? "%sは%s\"%s%s\"と鳴いているように見えた."
+                          : "%sは%s\"%s%s\"と鳴いているように聞こえた.",
+                      siblings ? "それら" : "それ",
+                      cry_sound_jp(mon),
+                      flags.female ? "ママ" : "パパ", egg->spe ? "." : "?");
             } else if (mon->data->mlet == S_DRAGON && !Deaf) {
                 SetVoice(mon, 0, 80, 0);
                 verbalize("ギーッ！");  /* Mything eggs :-) */

@@ -1030,8 +1030,8 @@ summonmu(struct monst *mtmp, boolean youseeit)
                 const char *from_nowhere;
 
                 if (!Deaf) {
-                    pline("%s %s!", Something,
-                          makeplural(growl_sound(mtmp)));
+                    pline("%s%sが聞こえた!", Something,
+                          growl_sound_jp(mtmp));
                     from_nowhere = "";
                 } else {
                     from_nowhere = " どこからともなく";

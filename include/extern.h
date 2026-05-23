@@ -3030,12 +3030,23 @@ extern int attrcurse(void);
 
 extern void dosounds(void);
 extern const char *growl_sound(struct monst *) NONNULLARG1;
+extern const char *growl_sound_jp(struct monst *) NONNULLARG1;
 extern void growl(struct monst *) NONNULLARG1;
 extern void yelp(struct monst *) NONNULLARG1;
 extern void whimper(struct monst *) NONNULLARG1;
 extern void beg(struct monst *) NONNULLARG1;
-extern const char *maybe_gasp(struct monst *) NONNULLARG1;
+enum maybe_gasp_type {
+   MGASP_NONE = 0,
+   MGASP_GASP,
+   MGASP_UH_OH,
+   MGASP_OH_MY,
+   MGASP_WHAT,
+   MGASP_WHY,
+};
+extern const char *maybe_gasp_text(int);
+extern int maybe_gasp(struct monst *) NONNULLARG1;
 extern const char *cry_sound(struct monst *) NONNULLARG1;
+extern const char *cry_sound_jp(struct monst *) NONNULLARG1;
 extern int domonnoise(struct monst *) NONNULLARG1;
 extern int dotalk(void);
 extern int tiphat(void);
