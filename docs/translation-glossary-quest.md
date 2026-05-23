@@ -5,7 +5,7 @@
 ## 1. 固有名詞
 - Amulet of Yendor: イェンダーの魔除け
 - Wizard of Yendor: イェンダーの魔術師
-- Moloch: モロク
+- Moloch: モーロック
 - Marduk: マルドゥク
 - Gehennom: ゲヘナ
 - Astral Plane: アストラル界
