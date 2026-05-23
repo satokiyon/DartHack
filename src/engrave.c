@@ -44,6 +44,7 @@ staticfn void doengrave_ctx_init(struct _doengrave_ctx *);
 staticfn void doengrave_sfx_item_WAN(struct _doengrave_ctx *);
 staticfn boolean doengrave_sfx_item(struct _doengrave_ctx *);
 staticfn void doengrave_ctx_verb(struct _doengrave_ctx *);
+staticfn const char *doengrave_prompt_verb(const struct _doengrave_ctx *);
 staticfn int engrave(void);
 staticfn const char *blengr(void);
 
@@ -926,6 +927,27 @@ doengrave_ctx_verb(struct _doengrave_ctx *de)
     }
 }
 
+/* polite prompt verb stem for "何を%sますか?" */
+staticfn const char *
+doengrave_prompt_verb(const struct _doengrave_ctx *de)
+{
+    switch (de->type) {
+    default:
+        return "書き";
+    case DUST:
+        return "書き";
+    case HEADSTONE:
+    case ENGRAVE:
+        return "刻み";
+    case BURN:
+        return de->frosted ? "溶かし込み" : "焼き付け";
+    case MARK:
+        return "落書きし";
+    case ENGR_BLOOD:
+        return "血で殴り書きし";
+    }
+}
+
 /* Mohs' Hardness Scale:
  *  1 - Talc             6 - Orthoclase
  *  2 - Gypsum           7 - Quartz
@@ -976,7 +998,7 @@ doengrave(void)
      * Edited by GAN 10/20/86 so as not to change weapon wielded.
      */
 
-    de->otmp = getobj("書く道具", stylus_ok, GETOBJ_PROMPT);
+    de->otmp = getobj("write with", stylus_ok, GETOBJ_PROMPT);
     if (!de->otmp) {/* otmp == &hands_obj if fingers */
         de->ret = ECMD_CANCEL;
         goto doengr_exit;
@@ -1175,18 +1197,19 @@ doengrave(void)
 
     /* Tell adventurer what is going on */
     if (de->otmp != &hands_obj)
-        You("%sを%s%sで%sた.", de->eloc,
+        You("%sに%s%sで文字を記した.", de->eloc,
             /* since doname() yields "N items" when quantity is more than
                one, match that by using "1 of" rather than "one of" when
                informing the player that the stack will be split */
             (de->type == ENGRAVE && de->otmp->quan > 1L) ? "1つの" : "",
-            doname(de->otmp), de->everb);
+            doname(de->otmp));
     else
-        You("%sを自分の%sで%sた.",
-            de->eloc, jp_body_part(FINGERTIP), de->everb);
+        You("%sに%sで書いた.",
+            de->eloc, jp_body_part(FINGERTIP));
 
     /* Prompt for engraving! */
-    Sprintf(de->qbuf, "ここで%sに何を%sたい?", de->eloc, de->everb);
+    Sprintf(de->qbuf, "ここで%sに何を%sますか?",
+            de->eloc, doengrave_prompt_verb(de));
     getlin(de->qbuf, de->ebuf);
     /* convert tabs to spaces and condense consecutive spaces to one */
     mungspaces(de->ebuf);

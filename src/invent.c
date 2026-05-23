@@ -44,6 +44,24 @@ action_verb_jp(const char *word)
 }
 
 staticfn const char *
+action_prompt_jp(const char *word)
+{
+    if (!strcmp(word, "write with")) return "何を使って書きますか?";
+    if (!strcmp(word, "grease")) return "何に油を塗りますか?";
+    if (!strcmp(word, "disarm")) return "何を使って解除しますか?";
+    return (const char *) 0;
+}
+
+staticfn const char *
+action_missing_jp(const char *word)
+{
+    if (!strcmp(word, "write with")) return "書くための";
+    if (!strcmp(word, "grease")) return "油を塗るための";
+    if (!strcmp(word, "disarm")) return "解除に使う";
+    return word;
+}
+
+staticfn const char *
 drop_english_article(const char *name)
 {
     if (!name)
@@ -1767,9 +1785,9 @@ staticfn char *
 getobj_hands_txt(const char *action, char *qbuf)
 {
     if (!strcmp(action, "grease")) {
-        Sprintf(qbuf, "your %s", fingers_or_gloves(FALSE));
+        Sprintf(qbuf, "%s", fingers_or_gloves(FALSE));
     } else if (!strcmp(action, "write with")) {
-        Sprintf(qbuf, "your %s", jp_body_part(FINGERTIP));
+        Sprintf(qbuf, "%s", jp_body_part(FINGERTIP));
     } else if (!strcmp(action, "wield")) {
         Sprintf(qbuf, "your %s %s%s", uarmg ? "gloved" : "bare",
                 jp_body_part_plural(HAND),
@@ -1958,13 +1976,21 @@ getobj(
     *ap = '\0';
 
     if (suggested == 0 && !forceprompt && !allownone) {
-        You("%s%sものを持っていない.", inaccess ? "ほかに" : "", word);
+        You("%s%sものを持っていない.", inaccess ? "ほかに" : "",
+            action_missing_jp(word));
         return (struct obj *) 0;
     }
     for (;;) {
         cnt = 0L;
         cntgiven = FALSE;
-        Sprintf(qbuf, "何を%sしますか?", action_verb_jp(word));
+        {
+            const char *prompt = action_prompt_jp(word);
+
+            if (prompt)
+                Sprintf(qbuf, "%s", prompt);
+            else
+                Sprintf(qbuf, "何を%sしますか?", action_verb_jp(word));
+        }
         if (gi.in_doagain) {
             ilet = readchar();
         } else if (iflags.force_invmenu) {
@@ -2018,9 +2044,15 @@ getobj(
                 allowed_choices = altlets;
 
             menuquery[0] = qbuf[0] = '\0';
-            if (iflags.force_invmenu)
-                Snprintf(menuquery, sizeof menuquery,
-                         "何を%sしますか?", action_verb_jp(word));
+            if (iflags.force_invmenu) {
+                const char *prompt = action_prompt_jp(word);
+
+                if (prompt)
+                    Snprintf(menuquery, sizeof menuquery, "%s", prompt);
+                else
+                    Snprintf(menuquery, sizeof menuquery,
+                             "何を%sしますか?", action_verb_jp(word));
+            }
             if (!allowed_choices || *allowed_choices == HANDS_SYM
                 || *buf == HANDS_SYM)
                 handsbuf = getobj_hands_txt(word, qbuf);
