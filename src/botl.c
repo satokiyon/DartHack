@@ -13,6 +13,59 @@ const char *const enc_stat[] = {
     "Strained", "Overtaxed", "Overloaded"
 };
 
+/* Japanese display labels for encumbrance; keep enc_stat[] for compatibility
+   with existing config/status-hilite values that may still use English. */
+static const char *const enc_stat_ja[] = {
+    "", "重荷", "圧迫", "過重", "超過重", "過積載"
+};
+
+const char *
+encumbrance_display_text(int cap)
+{
+    if (cap <= UNENCUMBERED || cap > OVERLOADED)
+        return "";
+    return enc_stat_ja[cap];
+}
+
+char *
+encumbrance_enlightenment_text(int cap, int final, char *outbuf, size_t outbufsz)
+{
+    const char *state = "荷物で圧迫されている";
+    const char *adj = "";
+
+    nhUse(outbufsz);
+    switch (cap) {
+    case SLT_ENCUMBER:
+        state = "荷物でやや圧迫されている";
+        adj = "やや";
+        break;
+    case MOD_ENCUMBER:
+        state = "荷物でかなり圧迫されている";
+        adj = "かなり";
+        break;
+    case HVY_ENCUMBER:
+        state = "荷物で非常に圧迫されている";
+        adj = "非常に";
+        break;
+    case EXT_ENCUMBER:
+        state = "荷物で極めて圧迫されている";
+        adj = "極めて";
+        break;
+    case OVERLOADED:
+        state = "過積載だ";
+        break;
+    default:
+        break;
+    }
+
+    Strcpy(outbuf, state);
+    if (cap < OVERLOADED)
+        Sprintf(eos(outbuf), "（移動速度%s%s低下）", !final ? "が" : "は", adj);
+    else
+        Strcat(outbuf, "（移動不能）");
+    return outbuf;
+}
+
 staticfn const char *rank(void);
 staticfn void bot_via_windowport(void);
 staticfn void stat_update_time(void);
@@ -185,7 +238,7 @@ do_statusline2(void)
     if (u.uhs != NOT_HUNGRY)
         Sprintf(nb = eos(nb), " %s", hu_stat[u.uhs]);
     if ((cap = near_capacity()) > UNENCUMBERED)
-        Sprintf(nb = eos(nb), " %s", enc_stat[cap]);
+        Sprintf(nb = eos(nb), " %s", encumbrance_display_text(cap));
     if (Blind)
         Strcpy(nb = eos(nb), " Blind");
     if (Deaf)
@@ -1106,7 +1159,7 @@ bot_via_windowport(void)
     cap = near_capacity();
     gb.blstats[idx][BL_CAP].a.a_int = cap;
     Strcpy(gb.blstats[idx][BL_CAP].val,
-           (cap > UNENCUMBERED) ? enc_stat[cap] : "");
+            (cap > UNENCUMBERED) ? encumbrance_display_text(cap) : "");
     gv.valset[BL_CAP] = TRUE;
 
     /* Version; unchanging unless player toggles 'showvers' option or
@@ -2900,10 +2953,13 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
                 up = TRUE;
             changed = TRUE;
         } else if (fld == BL_CAP
-                   && is_fld_arrayvalues(s[sidx], enc_stat,
-                                         SLT_ENCUMBER, OVERLOADED + 1,
-                                         &kidx)) {
-            txt = enc_stat[kidx];
+                   && (is_fld_arrayvalues(s[sidx], enc_stat,
+                                          SLT_ENCUMBER, OVERLOADED + 1,
+                                          &kidx)
+                       || is_fld_arrayvalues(s[sidx], enc_stat_ja,
+                                             SLT_ENCUMBER, OVERLOADED + 1,
+                                             &kidx))) {
+            txt = encumbrance_display_text(kidx);
             txtval = TRUE;
         } else if (fld == BL_ALIGN
                    && is_fld_arrayvalues(s[sidx], aligntxt, 0, 3, &kidx)) {
@@ -4133,14 +4189,14 @@ status_hilite_menu_add(int origfld)
                 initblstats[fld].fldname);
         if (fld == BL_CAP) {
             int rv = query_arrayvalue(qry_buf,
-                                      enc_stat,
+                                      enc_stat_ja,
                                       SLT_ENCUMBER, OVERLOADED + 1);
 
             if (rv < SLT_ENCUMBER)
                 goto choose_behavior;
 
             hilite.rel = TXT_VALUE;
-            Strcpy(hilite.textmatch, enc_stat[rv]);
+            Strcpy(hilite.textmatch, encumbrance_display_text(rv));
         } else if (fld == BL_ALIGN) {
             static const char *const aligntxt[] = {
                 "chaotic", "neutral", "lawful"
