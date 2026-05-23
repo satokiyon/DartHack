@@ -1858,7 +1858,7 @@ handle_tip(int tip)
         /* the "Tip:" prefix is a hint to use of OPTIONS=!tips to suppress */
         switch (tip) {
         case TIP_ENHANCE:
-            pline("(ヒント: #enhanceコマンドで技能を向上できる.)");
+            pline("(ヒント: #enhanceコマンドでスキルを向上できる.)");
             break;
         case TIP_SWIM:
             pline("(ヒント: 本当に踏み込みたいなら接頭辞'%s'を使うとよい.)",

@@ -143,7 +143,7 @@ amulet versus *
 amulet of yendor
 	この神秘的なタリスマンこそが、あなたの探求の目的である。単なる凡人
 	にはほとんど理解できず、ましてや使いこなすことなど到底できない力を
-	秘めていると言われている。モロクの神殿の深淵からこれを持ち帰り、
+	秘めていると言われている。モーロックの神殿の深淵からこれを持ち帰り、
 	アストラル界の然るべき高位の祭壇へ捧げた冒険者には、
 	神々から不老不死の贈り物が授けられるだろう。
 angel*
@@ -1908,9 +1908,9 @@ gehenn*
 *h?nnom
 hell
 	「苦悶の場所。」エルサレムの南西にあるヒノムの谷のことで、
-	かつてイスラエルの王ソロモンが神ケモシュとモロクのために
+	かつてイスラエルの王ソロモンが神ケモシュとモーロックのために
 	「高き場所」、すなわち礼拝所を建てた場所である。この谷は、
-	一部のイスラエル人がそこで我が子をモロクの生贄に捧げたため、
+	一部のイスラエル人がそこで我が子をモーロックの生贄に捧げたため、
 	嫌悪すべき場所と見なされるようになった。後世にはゴミ捨て場と
 	され、疫病を防ぐために絶えず火が燃やされ続けた。こうして、
 	新約聖書において「ゲヘナ」は地獄の代名詞となったのである。
@@ -2676,88 +2676,86 @@ izchak
 			［マイク・スティーブンソン、NetHack開発チームに代わって ］
 jabberwock
 vorpal*
-	"Beware the Jabberwock, my son!
-	  The jaws that bite, the claws that catch!
-	Beware the Jubjub bird, and shun
-	  The frumious Bandersnatch!"
+	「ジャバウォックに気をつけろ、我が息子よ！
+	  噛みつく顎、掴みかかる爪！
+	ジュブジュブ鳥にも気をつけろ、そして避けよ、
+	  怒り狂えるバンダースナッチを！」
 
-	He took his vorpal sword in hand;
-	  Long time the manxome foe he sought --
-	So rested he by the Tumtum tree,
-	  And stood awhile in thought.
+	彼はヴォーパルの剣を手に取り；
+	  長きにわたり、憎むべき敵を捜し求めた ――
+	こうして彼はタムタムの木の傍らで身を休め、
+	  しばし佇んで考えにふけった。
 
-	And, as in uffish thought he stood,
-	  The Jabberwock, with eyes of flame,
-	Came whiffling through the tulgey wood,
-	  And burbled as it came!
+	そして、彼がうつろな考えのまま佇んでいると、
+	  両の目に炎を燃やしたジャバウォックが、
+	鬱蒼とした森をヒュウヒュウと音を立てて通り抜け、
+	  ぶつぶつと呟きながらやってきた！
 
-	One, two! One, two! And through and through
-	  The vorpal blade went snicker-snack!
-	He left it dead, and with its head
-	  He went galumphing back.
-				[ Jabberwocky, by Lewis Carroll ]
+	一、二！ 一、二！ そして裏へ表へ
+	  ヴォーパルの刃がシュブシュブと切り裂く！
+	彼は怪物を仕留め、その首を携えて、
+	  意気揚々と引き返していった。
+				［『ジャバウォックの詩』、ルイス・キャロル著 ］
 jacinth*
-	Sweet in the rough weather
-	  The voice of the turtle-dove
-	'Beautiful altogether
-	  Is my Love.
-	  His Hands are open spread for love
-	And full of jacinth stones
-	  As the apple-tree among trees of the grove
-	Is He among the sons.'
-		[ The Beloved, by May Probyn ]
+	荒れた天候の中でも優しく響く
+	  キジバトのその声よ ――
+	「どこまでも美しいのは
+	  私の愛するお方。
+	  その両手は愛のために広げられ
+	そしてジャシンス（風信子石）の石で満ちている。
+	  林の木々の中のリンゴの木のように、
+	その方は人子たちの中で際立っている。」
+		［『最愛の人』、メイ・プロビン著 ］
 jackal
-	In Asiatic folktale, jackal provides for the lion; he scares
-	up game, which the lion kills and eats, and receives what is
-	left as reward.  In stories from northern India he is
-	sometimes termed "minister to the king," i.e. to the lion.
-	From the legend that he does not kill his own food has arisen
-	the legend of his cowardice.  Jackal's heart must never be
-	eaten, for instance, in the belief of peoples indigenous to
-	the regions where the jackal abounds. ... In Hausa Negro
-	folktale Jackal plays the role of sagacious judge and is
-	called "O Learned One of the Forest."  The Bushmen say that
-	Jackal goes around behaving the way he does "because he is
-	Jackal".
-		[ Funk & Wagnalls Standard Dictionary of Folklore ]
+	アジアの民話において、ジャッカルはライオンのために
+	獲物を提供する。彼は獲物を追い立て、それをライオンが
+	仕留めて食べ、残りを報酬として受け取る。北インドの物語では、
+	彼はしばしばライオンの「国王の相（大臣）」と呼ばれる。
+	彼が自分で獲物を殺さないという伝説から、彼の臆病さの伝説が
+	生まれた。例えば、ジャッカルが数多く生息する地域の先住民族の
+	信仰では、ジャッカルの心臓を決して食べてはならないとされている。
+	……ハウサ族の民話において、ジャッカルは賢明な裁判官の役割を
+	演じ、「森の賢者よ」と呼ばれる。ブッシュマン（サン人）は、
+	ジャッカルがあのような振る舞いをするのは「彼がジャッカルだからだ」
+	と語る。
+		［『ファンク＆ワグネルス標準民俗学辞典』 ］
 *jack*boot*
-	A large boot extending over the knee, acting as protective
-	armour for the leg, worn by troopers in the 17th and 18th
-	centuries and later.  It is still the type of boot worn by
-	the Household Cavalry and was adopted by fishermen and others
-	before the advent of gum boots.  Figuratively, _to be under the
-	jack-boot_ is to be controlled by a brutal military regime.
-		[ Brewer's Concise Dictionary of Phrase and Fable ]
+	膝の上まで伸びる大型のブーツで、脚の防護用の鎧として
+	機能し、１７〜１８世紀以降の騎兵によって着用された。
+	現在でも王室騎兵が着用するブーツのタイプであり、ゴム靴の
+	登場以前は漁師らにも採用されていた。比喩的には、
+	「ジャックブーツ（軍靴）の下にある」とは、残虐な軍事政権によって
+	支配されている状態を意味する。
+		［『ブリューワー故事成語・寓話辞典』 ］
 jade*
-	Nothing grew among the ruins of the city.  The streets were
-	broken and the walls of the houses had fallen, but there were
-	no weeds flowering in the cracks and it seemed that the city
-	had but recently been brought down by an earthquake.  Only
-	one thing still stood intact, towering over the ruins.  It
-	was a gigantic statue of white, gray and green jade - the
-	statue of a naked youth with a face of almost feminine beauty
-	that turned sightless eyes toward the north.
-	"The eyes!" Duke Avan Astran said.  "They're gone!"
-		[ The Jade Man's Eyes, by Michael Moorcock ]
+	街の廃墟には何も生えていなかった。通りは壊れ、民家の壁は
+	崩れ落ちていたが、裂け目には雑草の一輪すら咲いておらず、
+	その街はつい最近地震によって崩壊したかのようであった。
+	ただ一つだけが傷一つなく立ち残り、廃墟の上にそびえ立っていた。
+	それは白、灰、そして緑の翡翠（ヒスイ）で作られた巨大な像 ――
+	北に向けて盲目の目を向けた、ほとんど女性的な美しさの顔を
+	持った裸の若者の像であった。
+	「目だ！」とアヴァン・アストラン公爵は言った。「消えている！」
+		［『翡翠の男の眼』、マイケル・ムアコック著 ］
 jaguar
-	Large, flesh-eating animal of the cat family, of Central and
-	South America.  This feline predator (_Panthera onca_) is
-	sometimes incorrectly called a panther.
-	    [ Van Dale's Groot Woordenboek der Nederlandse Taal ]
+	中南米に生息する、ネコ科の大型肉食動物。
+	このネコ科の捕食者（_Panthera onca_）は、
+	しばしば誤ってヒョウ（パンサー）と呼ばれることがある。
+		［『ファン・ダーレ・オランダ語大辞典』 ］
 jellyfish
-	I do not care to share the seas
-	With jellyfishes such as these;
-	Particularly Portuguese.
-	  [ Lines on Meeting a Portuguese Man-o'-war while Bathing,
-	      by Michael Flanders ]
+	私は海を共有したくはない
+	このようなクラゲたちと；
+	特にカツオノエボシとは。
+		［「海水浴中にカツオノエボシに遭遇した際の詩」、
+		  マイケル・フランダース著 ］
 juiblex
 jubilex
-	Little is known about the Faceless Lord, even the correct
-	spelling of his name.  He does not have a physical form as
-	we know it, and those who have peered into his realm claim
-	he is a slime-like creature who swallows other creatures
-	alive, spits acidic secretions, and causes disease in his
-	victims which can be almost instantly fatal.
+	この「無貌の主（フェイスレス・ロード）」については、
+	その名前の正しい綴りを含めてほとんど知られていない。
+	彼は我々が知るような肉体を持っておらず、彼の領域を
+	覗き見た者たちは、彼が他の生物を生きたまま飲み込み、
+	酸性の分泌物を吐き散らし、犠牲者にほぼ即死に近い
+	致命的な病をもたらすスライムのような生物であると主張している。
 # historically (according to wikipedia...), C-ration was heavier but
 # provided more nutrition, and required some form of tin opener;
 # in nethack they weigh the same and K-ration provides more nutrition?
@@ -4985,24 +4983,24 @@ captain
 	so is considered a wise thing.
 *spear
 javelin
-	- they come together with great random, and a spear is brast,
-	and one party brake his shield and the other one goes down,
-	horse and man, over his horse-tail and brake his neck, and
-	then the next candidate comes randoming in, and brast his
-	spear, and the other man brast his shield, and down he goes,
-	horse and man, over his horse-tail, and brake his neck, and
-	then there's another elected, and another and another and
-	still another, till the material is all used up; and when you
-	come to figure up results, you can't tell one fight from
-	another, nor who whipped; and as a picture of living, raging,
-	roaring battle, sho! why it's pale and noiseless - just
-	ghosts scuffling in a fog.  Dear me, what would this barren
-	vocabulary get out of the mightiest spectacle? - the burning
-	of Rome in Nero's time, for instance?  Why, it would merely
-	say 'Town burned down; no insurance; boy brast a window,
-	fireman brake his neck!'  Why, that ain't a picture!
-		[ A Connecticut Yankee in King Arthur's Court,
-		    by Mark Twain ]
+	―― 彼らはもの凄い勢いで激突し、槍が砕け散り、
+	一方が相手の盾を壊し、もう一方は馬もろとも落馬して、
+	馬の尾を越えて真っ逆さまに落ちて首を折る。すると次の
+	挑戦者が突進してきて、その槍が砕け、相手は盾を壊され、
+	馬もろとも落馬して、馬の尾を越えて真っ逆さまに落ちて
+	首を折る。そしてまた次の者が選ばれ、さらに次、その次、
+	そのまた次と、人間が尽きるまでこれが続く；そして結果を
+	計算してみると、どの戦いも区別がつかず、誰が勝ったかも
+	分からない；生き生きとした、激しい、轟音の響く戦闘の
+	描写としては、なんと！ 蒼白で静まり返っている ――
+	まるで霧の中で幽霊たちが掴み合っているかのようだ。
+	やれやれ、この貧弱な語彙力では、最も壮大なスペクタクルから
+	何を引き出せるというのだ？ ―― 例えば、ネロ皇帝の時代の
+	ローマの大火はどうだ？ なに、単に『街が全焼；保険なし；
+	少年が窓を割り、消防士が首を折った！』としか言わないだろう！
+	おいおい、そんなの描写じゃない！
+		［『アーサー王宮廷のコネチカット・ヤンキー』、
+		  マーク・トウェイン著 ］
 *spellbook*
 	The Book of Three lay closed on the table.  Taran had never
 	been allowed to read the volume for himself; now he was sure

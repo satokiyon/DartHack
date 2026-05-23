@@ -1713,7 +1713,7 @@ struct ext_func_tab extcmdlist[] = {
               doeat, CMD_M_PREFIX, NULL },
     { 'E',    "engrave", "床に文字を彫る",
               doengrave, 0, NULL },
-    { M('e'), "enhance", "武器と呪文の技能を上げるか確認する",
+    { M('e'), "enhance", "武器と呪文のスキルを上げるか確認する",
               enhance_weapon_skill, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
     /* #exploremode should be flagged AUTOCOMPETE but that would negatively
        impact frequently used #enhance by making #e become ambiguous */

@@ -1307,7 +1307,7 @@ show_skills(void)
     winid win;
     menu_item *selected;
 
-    pline("技能:");
+    pline("スキル:");
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
     add_skills_to_menu(win, FALSE, FALSE);
