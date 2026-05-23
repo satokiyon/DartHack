@@ -1547,7 +1547,7 @@ really_done(int how)
                     (u.uz.dlevel < 0) ? "力尽きた" : ends[how]);
         } else {
             /* more conventional demise */
-            const char *where = svd.dungeons[u.uz.dnum].dname;
+            const char *where = jp_dungeon_name_by_dnum(u.uz.dnum);
 
             if (Is_astralevel(&u.uz))
                 where = "アストラル界";

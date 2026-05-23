@@ -72,6 +72,30 @@ const char *const hu_stat[] = {
     "Fainting", "Fainted ", "Starved "
 };
 
+/* display-only hunger text for localized UI paths */
+const char *
+jp_hunger_status_for_display(int uhs, boolean include_not_hungry)
+{
+    switch (uhs) {
+    case SATIATED:
+        return "満腹";
+    case NOT_HUNGRY:
+        return include_not_hungry ? "空腹ではない" : "";
+    case HUNGRY:
+        return "空腹";
+    case WEAK:
+        return "衰弱";
+    case FAINTING:
+        return "失神寸前";
+    case FAINTED:
+        return "失神";
+    case STARVED:
+        return "飢餓";
+    default:
+        return include_not_hungry ? "空腹ではない" : "";
+    }
+}
+
 static const struct victual_info zero_victual = { 0 };
 
 /* used by getobj() callback routines eat_ok()/offer_ok()/tin_ok() to
