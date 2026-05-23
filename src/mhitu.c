@@ -14,6 +14,8 @@ staticfn void wildmiss(struct monst *, struct attack *);
 staticfn const char *jp_wildmiss_swings(struct monst *, struct attack *);
 staticfn const char *jp_react_degree(boolean);
 staticfn const char *jp_generic_creature_label(void);
+staticfn const char *jp_attacker_label(struct monst *, boolean, boolean *);
+staticfn const char *jp_attacker_topic(boolean);
 staticfn void calc_mattacku_vars(struct monst *, boolean *, boolean *,
                                  boolean *, boolean *);
 staticfn const char *jp_hitmsg_verb(int);
@@ -79,19 +81,40 @@ jp_generic_creature_label(void)
     return "生き物";
 }
 
+staticfn const char *
+jp_attacker_label(struct monst *mtmp, boolean capitalized, boolean *generic)
+{
+    const char *name = capitalized ? Monnam(mtmp) : l_monnam(mtmp);
+
+    if (!strcmp(name, "It") || !strcmp(name, "it")) {
+        *generic = TRUE;
+        return "何か";
+    }
+    *generic = FALSE;
+    return name;
+}
+
+staticfn const char *
+jp_attacker_topic(boolean generic)
+{
+    return generic ? "が" : "は";
+}
+
 /* monster hits hero (most callers have been moved to uthim.c) */
 void
 hitmsg(struct monst *mtmp, struct attack *mattk)
 {
     int compat;
     const char *again, *punct = "!";
-    char *Monst_name = Monnam(mtmp);
+    boolean generic = FALSE;
+    const char *Monst_name = jp_attacker_label(mtmp, TRUE, &generic);
+    const char *topic = jp_attacker_topic(generic);
 
     /* Note: if opposite gender, "seductively";
        if same gender, "engagingly" for nymph, normal msg for others. */
     if ((compat = could_seduce(mtmp, &gy.youmonst, mattk)) != 0
         && !mtmp->mcan && !mtmp->mspec_used) {
-        pline_mon(mtmp, "%sはあなたに%s%s.", Monst_name,
+        pline_mon(mtmp, "%s%sあなたに%s%s.", Monst_name, topic,
               (compat == 2) ? "親しげに" : "妖しく",
               !Blind ? "微笑みかけた" : !Deaf ? "話しかけた"
                                              : "触れた");
@@ -104,7 +127,7 @@ hitmsg(struct monst *mtmp, struct attack *mattk)
                  && gh.hitmsg_prev != NULL
                  && mattk == gh.hitmsg_prev + 1
                  && mattk->aatyp == gh.hitmsg_prev->aatyp) ? "もう一度" : "";
-        pline_mon(mtmp, "%sは%s%s%s", Monst_name, again, verb, punct);
+        pline_mon(mtmp, "%s%s%s%s%s", Monst_name, topic, again, verb, punct);
     }
     gh.hitmsg_mid = mtmp->m_id;
     gh.hitmsg_prev = mattk;
@@ -114,6 +137,10 @@ hitmsg(struct monst *mtmp, struct attack *mattk)
 staticfn void
 missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
 {
+    boolean generic = FALSE;
+    const char *monst_name = jp_attacker_label(mtmp, FALSE, &generic);
+    const char *topic = jp_attacker_topic(generic);
+
     gh.hitmsg_mid = 0;
     gh.hitmsg_prev = NULL;
 
@@ -121,9 +148,9 @@ missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
         map_invisible(mtmp->mx, mtmp->my);
 
     if (could_seduce(mtmp, &gy.youmonst, mattk) && !mtmp->mcan)
-        pline_mon(mtmp, "%sは友好的なふりをした.", l_monnam(mtmp));
+        pline_mon(mtmp, "%s%s友好的なふりをした.", monst_name, topic);
     else
-        pline_mon(mtmp, "%sは%s外した!", l_monnam(mtmp),
+        pline_mon(mtmp, "%s%s%s外した!", monst_name, topic,
                   (nearmiss && flags.verbose) ? "かろうじて" : "");
 
     stop_occupation();
@@ -205,7 +232,9 @@ staticfn void
 wildmiss(struct monst *mtmp, struct attack *mattk)
 {
     int compat;
-    const char *Monst_name; /* Monnam(), deferred until after early returns */
+    const char *Monst_name;
+    const char *topic;
+    boolean generic = FALSE;
     /* expected reasons for wildmiss() */
     boolean unotseen = (!mtmp->mcansee || (Invis && !perceives(mtmp->data))),
             unotthere = (Displaced != 0), usubmerged = (Underwater != 0);
@@ -230,54 +259,56 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
 
     compat = ((mattk->adtyp == AD_SEDU || mattk->adtyp == AD_SSEX)
               ? could_seduce(mtmp, &gy.youmonst, mattk) : 0);
-    Monst_name = l_monnam(mtmp);
+    Monst_name = jp_attacker_label(mtmp, FALSE, &generic);
+    topic = jp_attacker_topic(generic);
 
     set_msg_xy(mtmp->mx, mtmp->my);
     if (unotseen) { /* !mtmp->cansee || (Invis && !perceives(mtmp->data)) */
         const char *swings = jp_wildmiss_swings(mtmp, mattk);
 
         if (compat) {
-            pline("%sはあなたに触れようとして外した!", Monst_name);
+            pline("%s%sあなたに触れようとして外した!", Monst_name, topic);
         } else {
             switch (rn2(3)) {
             case 0:
-                pline("%sは激しく%sが、外した!", Monst_name, swings);
+                pline("%s%s激しく%sが、外した!", Monst_name, topic, swings);
                 break;
             case 1:
-                pline("%sはあなたのすぐ脇を攻撃した.", Monst_name);
+                pline("%s%sあなたのすぐ脇を攻撃した.", Monst_name, topic);
                 break;
             case 2:
-                pline("%sは%sを攻撃した!", Monst_name,
+                pline("%s%s%sを攻撃した!", Monst_name, topic,
                       is_waterwall(mtmp->mux,mtmp->muy)
                         ? "空の水面"
                         : "空気");
                 break;
             default:
-                pline("%sは激しく%s!", Monst_name, swings);
+                pline("%s%s激しく%s!", Monst_name, topic, swings);
                 break;
             }
         }
     } else if (unotthere) { /* Displaced */
         /* give 'displaced' message even if hero is Blind */
         if (compat)
-            pline("%sはあなたの%sずれた像に%s微笑みかけた...", Monst_name,
+            pline("%s%sあなたの%sずれた像に%s微笑みかけた...", Monst_name,
+                  topic,
                   Invis ? "見えない" : "",
                   (compat == 2) ? "魅力的に" : "誘惑するように");
         else
-            pline("%sはあなたの%sずれた像を攻撃したが、あなたには当たらない!",
+            pline("%s%sあなたの%sずれた像を攻撃したが、あなたには当たらない!",
                   /* Note:  if you're both invisible and displaced, only
                    * monsters which see invisible will attack your displaced
                    * image, since the displaced image is also invisible. */
-                  Monst_name, Invis ? "見えない" : "");
+                  Monst_name, topic, Invis ? "見えない" : "");
 
     } else if (usubmerged) { /* Underwater */
         /* monsters may miss especially on water level where
            bubbles shake the player here and there */
         if (compat)
-            pline("%sはあなたのゆがんだ像へ手を伸ばした.", Monst_name);
+            pline("%s%sあなたのゆがんだ像へ手を伸ばした.", Monst_name, topic);
         else
-            pline("%sは水面の反射に惑わされて外した!",
-                  Monst_name);
+            pline("%s%s水面の反射に惑わされて外した!",
+                  Monst_name, topic);
 
     } else {
         ; /*NOTREACHED*/
@@ -1628,8 +1659,11 @@ explmu(
     not_affected = defended(mtmp, (int) mattk->adtyp);
 
     if (!ufound) {
-          pline("%sは%sで爆発した!",
-              canseemon(mtmp) ? Monnam(mtmp) : "It",
+        boolean generic = FALSE;
+        const char *monst_name = jp_attacker_label(mtmp, TRUE, &generic);
+
+        pline("%s%s%sで爆発した!",
+              monst_name, jp_attacker_topic(generic),
               is_waterwall(mtmp->mux,mtmp->muy) ? "水の中の虚空"
                                     : "何もない空間");
     } else {
