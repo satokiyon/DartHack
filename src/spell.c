@@ -48,7 +48,8 @@ staticfn void cast_protection(void);
 staticfn void cast_chain_lightning(void);
 staticfn void spell_backfire(int);
 staticfn boolean spelleffects_check(int, int *, int *);
-staticfn const char *spelltypemnemonic(int);
+staticfn const char *jp_spelltype_label_for_display(int);
+staticfn const char *jp_spell_sortchoice_label_for_display(int);
 staticfn boolean can_center_spell_location(coordxy, coordxy);
 staticfn void display_spell_target_positions(boolean);
 staticfn boolean spell_aim_step(genericptr_t, coordxy, coordxy);
@@ -191,8 +192,7 @@ confused_book(struct obj *spellbook)
 
     if (!rn2(3) && spellbook->otyp != SPE_BOOK_OF_THE_DEAD) {
         spellbook->in_use = TRUE; /* in case called from learn() */
-        pline(
-         "Being confused you have difficulties in controlling your actions.");
+        pline("混乱していて、うまく行動を制御できなかった.");
         display_nhwindow(WIN_MESSAGE, FALSE);
         You("うっかり魔法書を引き裂いてしまった.");
         trycall(spellbook);
@@ -200,7 +200,7 @@ confused_book(struct obj *spellbook)
         gone = TRUE;
     } else {
         You("%s行目を何度も繰り返し読んでしまった.",
-            spellbook == svc.context.spbook.book ? "next" : "first");
+            spellbook == svc.context.spbook.book ? "次の" : "最初の");
     }
     return gone;
 }
@@ -343,7 +343,7 @@ book_cursed(struct obj *book)
 {
     if (book->cursed && gm.multi >= 0
         && go.occupation == learn && svc.context.spbook.book == book) {
-        pline("%s閉じた!", Tobjnam(book, "slam"));
+        pline("%sが勢いよく閉じた!", yname(book));
         set_bknown(book, 1);
         stop_occupation();
     }
@@ -567,7 +567,7 @@ study_book(struct obj *spellbook)
             /* hero has just been told what spell this book is for; it may
                have been undiscovered if spell was learned via divine gift */
             makeknown(booktype);
-            if (y_n("Refresh your memory anyway?") == 'n')
+            if (y_n("それでも記憶を新たにしますか?") == 'n')
                 return 0;
         }
 
@@ -587,8 +587,8 @@ study_book(struct obj *spellbook)
                     char qbuf[QBUFSZ];
 
                     Sprintf(qbuf,
-                    "This spellbook is %sdifficult to comprehend.  Continue?",
-                            (read_ability < 12 ? "very " : ""));
+                            "この魔法書は%s理解しにくいです。 それでも続けますか?",
+                            (read_ability < 12 ? "とても" : ""));
                     if (y_n(qbuf) != 'y') {
                         spellbook->in_use = FALSE;
                         return 1;
@@ -751,7 +751,7 @@ getspell(int *spell_no)
         else
             Sprintf(lets, "a-zA-%c", 'A' + nspells - 27);
 
-        Snprintf(qbuf, sizeof qbuf, "Cast which spell? [%s *?]", lets);
+        Snprintf(qbuf, sizeof qbuf, "どの呪文を唱えますか? [%s *?]", lets);
         for (retry_limit = 0; ; ++retry_limit) {
             if (retry_limit == 10) {
                 /* limit is mainly to prevent the fuzzer from getting stuck
@@ -777,7 +777,7 @@ getspell(int *spell_no)
             return TRUE;
         }
     }
-    return dospellmenu("Choose which spell to cast", SPELLMENU_CAST,
+    return dospellmenu("唱える呪文を選んでください", SPELLMENU_CAST,
                        spell_no);
 }
 
@@ -802,7 +802,7 @@ dowizcast(void)
         add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
                  jp_spellname_for_display(n), MENU_ITEMFLAGS_NONE);
     }
-    end_menu(win, "Cast which spell?");
+    end_menu(win, "どの呪文を唱えますか?");
     n = select_menu(win, PICK_ONE, &selected);
     destroy_nhwindow(win);
     if (n > 0) {
@@ -828,23 +828,23 @@ docast(void)
 }
 
 staticfn const char *
-spelltypemnemonic(int skill)
+jp_spelltype_label_for_display(int skill)
 {
     switch (skill) {
     case P_ATTACK_SPELL:
-        return "attack";
+        return "攻撃";
     case P_HEALING_SPELL:
-        return "healing";
+        return "回復";
     case P_DIVINATION_SPELL:
-        return "divination";
+        return "占術";
     case P_ENCHANTMENT_SPELL:
-        return "enchantment";
+        return "付与";
     case P_CLERIC_SPELL:
-        return "clerical";
+        return "聖職";
     case P_ESCAPE_SPELL:
-        return "escape";
+        return "離脱";
     case P_MATTER_SPELL:
-        return "matter";
+        return "物質";
     default:
         impossible("Unknown spell skill, %d;", skill);
         return "";
@@ -1150,18 +1150,18 @@ cast_protection(void)
 
                 rmtyp = levl[u.ux][u.uy].typ;
                 atmosphere = (pm && u.uswallow)
-                                ? ((pm == &mons[PM_FOG_CLOUD]) ? "mist"
-                                   : is_whirly(pm) ? "maelstrom"
-                                     : enfolds(pm) ? "folds"
-                                       : is_animal(pm) ? "maw"
-                                         : "ooze")
-                                : (u.uinwater ? hliquid("water")
-                                   : (rmtyp == CLOUD) ? "cloud"
-                                     : IS_TREE(rmtyp) ? "vegetation"
-                                       : IS_STWALL(rmtyp) ? "stone"
-                                         : "air");
+                                                                ? ((pm == &mons[PM_FOG_CLOUD]) ? "霧"
+                                                                     : is_whirly(pm) ? "渦"
+                                                                         : enfolds(pm) ? "絡みつく体"
+                                                                             : is_animal(pm) ? "顎"
+                                                                                 : "粘液")
+                                                                : (u.uinwater ? "水"
+                                                                     : (rmtyp == CLOUD) ? "雲"
+                                                                         : IS_TREE(rmtyp) ? "草木"
+                                                                             : IS_STWALL(rmtyp) ? "石"
+                                                                                 : "空気");
                 pline_The("あなたの周囲の%sが%s色のもやできらめき始めた.",
-                          atmosphere, an(hgolden));
+                                                    atmosphere, hgolden);
             }
         }
         u.uspellprot += gain;
@@ -1276,7 +1276,7 @@ spelleffects_check(int spell, int *res, int *energy)
         *res = ECMD_OK;
         return TRUE;
     } else if (check_capacity(
-                "Your concentration falters while carrying so much stuff.")) {
+                   "荷物を持ちすぎて集中が途切れてしまう。")) {
         *res = ECMD_TIME;
         return TRUE;
     }
@@ -1562,7 +1562,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
         if (was_sick || !was_slimed)
             You("%s.", was_sick ? "もはや病気ではない" : "病気ではない");
         if (was_slimed)
-            make_slimed(0L, "The slime disappears!");
+            make_slimed(0L, "スライムは消え去った!");
         break;
     }
     case SPE_CREATE_FAMILIAR:
@@ -1664,12 +1664,12 @@ throwspell(void)
         return 0;
     }
 
-    pline("呪文をどこに向けて唱えるか?");
+    pline("呪文をどこに向けて唱えますか?");
     cc.x = u.ux;
     cc.y = u.uy;
     getpos_sethilite(display_spell_target_positions,
                      can_center_spell_location);
-    if (getpos(&cc, TRUE, "the desired position") < 0)
+    if (getpos(&cc, TRUE, "狙う位置") < 0)
         return 0; /* user pressed ESC */
     clear_nhwindow(WIN_MESSAGE); /* discard any autodescribe feedback */
 
@@ -1851,18 +1851,32 @@ enum spl_sort_types {
     NUM_SPELL_SORTBY
 };
 
-static const char *const spl_sortchoices[NUM_SPELL_SORTBY] = {
-    "by casting letter",
-    "alphabetically",
-    "by level, low to high",
-    "by level, high to low",
-    "by skill group, alphabetized within each group",
-    "by skill group, low to high level within group",
-    "by skill group, high to low level within group",
-    "maintain current ordering",
-    /* a menu choice rather than a sort choice */
-    "reassign casting letters to retain current order",
-};
+staticfn const char *
+jp_spell_sortchoice_label_for_display(int idx)
+{
+    switch (idx) {
+    case SORTBY_LETTER:
+        return "詠唱文字順";
+    case SORTBY_ALPHA:
+        return "五十音順";
+    case SORTBY_LVL_LO:
+        return "レベル順（低→高）";
+    case SORTBY_LVL_HI:
+        return "レベル順（高→低）";
+    case SORTBY_SKL_AL:
+        return "系統ごとに五十音順";
+    case SORTBY_SKL_LO:
+        return "系統ごとにレベル順（低→高）";
+    case SORTBY_SKL_HI:
+        return "系統ごとにレベル順（高→低）";
+    case SORTBY_CURRENT:
+        return "現在の並びを維持";
+    case SORTRETAINORDER:
+        return "現在の並びで詠唱文字を振り直す";
+    default:
+        return "";
+    }
+}
 
 /* qsort callback routine */
 staticfn int QSORTCALLBACK
@@ -1986,7 +2000,7 @@ spellsortmenu(void)
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany; /* zero out all bits */
 
-    for (i = 0; i < SIZE(spl_sortchoices); i++) {
+    for (i = 0; i < NUM_SPELL_SORTBY; i++) {
         if (i == SORTRETAINORDER) {
             let = 'z'; /* assumes fewer than 26 sort choices... */
             /* separate final choice from others with a blank line */
@@ -1996,11 +2010,11 @@ spellsortmenu(void)
         }
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, let, 0,
-                 ATR_NONE, clr, spl_sortchoices[i],
+                 ATR_NONE, clr, jp_spell_sortchoice_label_for_display(i),
                  (i == gs.spl_sortmode) ? MENU_ITEMFLAGS_SELECTED
                                         : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "View known spells list sorted");
+    end_menu(tmpwin, "既知呪文一覧の並び替え");
 
     n = select_menu(tmpwin, PICK_ONE, &selected);
     destroy_nhwindow(tmpwin);
@@ -2027,13 +2041,14 @@ dovspell(void)
     if (spellid(0) == NO_SPELL) {
         You("今は呪文を知らない.");
     } else {
-        while (dospellmenu("Currently known spells",
+        while (dospellmenu("現在習得している呪文",
                            SPELLMENU_VIEW, &splnum)) {
             if (splnum == SPELLMENU_SORT) {
                 if (spellsortmenu())
                     sortspells();
             } else {
-                Sprintf(qbuf, "Reordering spells; swap '%c' with",
+                Sprintf(qbuf,
+                    "呪文の並び替え: '%c' と入れ替える対象を選んでください",
                         spellet(splnum));
                 if (!dospellmenu(qbuf, splnum, &othnum))
                     break;
@@ -2100,25 +2115,26 @@ dospellmenu(
      * need to be subtracted.
      */
     if (!iflags.menu_tab_sep) {
-        Sprintf(buf, "%s%-20s Level %-12s Fail Retention",
+        Sprintf(buf, "%s%-20s レベル %-12s 失敗率 記憶",
                 splaction == SPELLMENU_DUMP ? "" : "    ",
-                "Name",
-                "Category");
+                "呪文名",
+                "系統");
         fmt = "%-20s  %2d   %-12s %3d%% %9s";
         sep = ' ';
     } else {
-        Sprintf(buf, "Name\tLevel\tCategory\tFail\tRetention");
+        Sprintf(buf, "呪文名\tレベル\t系統\t失敗率\t記憶");
         fmt = "%s\t%-d\t%s\t%-d%%\t%s";
         sep = '\t';
     }
     if (wizard)
-        Sprintf(eos(buf), "%c%6s", sep, "turns");
+        Sprintf(eos(buf), "%c%6s", sep, "ターン");
 
     add_menu_heading(tmpwin, buf);
     for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
         splnum = !gs.spl_orderindx ? i : gs.spl_orderindx[i];
         Sprintf(buf, fmt, spellname(splnum), spellev(splnum),
-                spelltypemnemonic(spell_skilltype(spellid(splnum))),
+                jp_spelltype_label_for_display(
+                    spell_skilltype(spellid(splnum))),
                 100 - percent_success(splnum),
                 spellretention(splnum, retentionbuf));
         if (wizard)
@@ -2139,7 +2155,8 @@ dospellmenu(
             /* more than 1 spell, add an extra menu entry */
             any.a_int = SPELLMENU_SORT + 1;
             add_menu(tmpwin, &nul_glyphinfo, &any, '+', 0,
-                     ATR_NONE, clr, "[sort spells]", MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, clr, "[呪文を並び替える]",
+                     MENU_ITEMFLAGS_NONE);
         }
     }
     end_menu(tmpwin, prompt);
@@ -2304,7 +2321,7 @@ spellretention(int idx, char * outbuf)
 
     if (turnsleft < 1L) {
         /* spell has expired; hero can't successfully cast it anymore */
-        Strcpy(outbuf, "(gone)");
+        Strcpy(outbuf, "(消失)");
     } else if (turnsleft >= (long) KEEN) {
         /* full retention, first turn or immediately after reading book */
         Strcpy(outbuf, "100%");
