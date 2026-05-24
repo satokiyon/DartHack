@@ -1055,28 +1055,23 @@ summonmu(struct monst *mtmp, boolean youseeit)
                     if (numseen == 0)
                         You_feel("取り囲まれたように感じた.");
                 } else {
-                    pline("しかし誰も来なかった。");
+                    pline("しかし誰も来なかった.");
                 }
             } else {
-                const char *from_nowhere;
-
                 if (!Deaf) {
                     pline("%s%sが聞こえた!", Something,
                           growl_sound_jp(mtmp));
-                    from_nowhere = "";
-                } else {
-                    from_nowhere = " どこからともなく";
                 }
                 if (numhelp > 0) {
                     if (numseen < 1) {
                         You_feel("取り囲まれたように感じた.");
                     } else {
-                        if (numseen == 1)
-                            Sprintf(buf, "%sが現れた", an(genericwere));
+                        Sprintf(buf, "%s%sが現れた",
+                                genericwere, (numseen == 1) ? "" : "たち");
+                        if (Deaf)
+                            pline("%sがどこからともなく現れた!", buf);
                         else
-                            Sprintf(buf, "%sが現れた",
-                                    makeplural(genericwere));
-                        pline("%s%s!", upstart(buf), from_nowhere);
+                            pline("%s!", buf);
                     }
                 } /* else no help came; but you didn't know it tried */
             }
@@ -2522,7 +2517,7 @@ passiveum(
                   /* temporary? hack for sequencing issue:  "your acid"
                      looks strange coming immediately after player has
                      been told that hero has reverted to normal form */
-                !Upolyd ? "" : "あなたの", hliquid("acid"));
+                !Upolyd ? "" : "あなたの", "酸液");
             if (resists_acid(mtmp)) {
                 pline_mon(mtmp, "%sには効かない.", l_monnam(mtmp));
                 tmp = 0;

@@ -2754,12 +2754,11 @@ mhitm_ad_acid(
         hitmsg(magr, mattk);
         if (!magr->mcan && !rn2(3))
             if (Acid_resistance) {
-                pline("あなたは%sを浴びたが、害はなさそうだ.",
-                      hliquid("acid"));
+                pline("あなたは酸液を浴びたが、害はなさそうだ.");
                 monstseesu(M_SEEN_ACID);
                 mhm->damage = 0;
             } else {
-                pline("あなたは%sを浴びた! 焼けるように痛い!", hliquid("acid"));
+                pline("あなたは酸液を浴びた! 焼けるように痛い!");
                 exercise(A_STR, FALSE);
                 monstunseesu(M_SEEN_ACID);
             }
@@ -2773,11 +2772,11 @@ mhitm_ad_acid(
         }
         if (resists_acid(mdef) || defended(mdef, AD_ACID)) {
             if (gv.vis && canseemon(mdef))
-                pline("%sは%sを浴びたが、効いていないようだ.",
-                      Monnam(mdef), hliquid("acid"));
+                pline("%sは酸液を浴びたが、効いていないようだ.",
+                      Monnam(mdef));
             mhm->damage = 0;
         } else if (gv.vis && canseemon(mdef)) {
-            pline_mon(mdef, "%sは%sを浴びた!", Monnam(mdef), hliquid("acid"));
+            pline_mon(mdef, "%sは酸液を浴びた!", Monnam(mdef));
             pline("%sは焼けるように苦しんでいる!", mon_nam(mdef));
         }
         if (!rn2(30))
@@ -5906,8 +5905,7 @@ passive(
             if (Blind || !flags.verbose)
                 You("しぶきを浴びた!");
             else
-                You("%s%sを浴びた!", s_suffix(mon_nam(mon)),
-                    hliquid("acid"));
+                You("%s酸液を浴びた!", s_suffix(mon_nam(mon)));
 
             if (!Acid_resistance) {
                 mdamageu(mon, tmp);

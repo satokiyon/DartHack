@@ -6,6 +6,7 @@
 
 staticfn int explosionmask(struct monst *, uchar, char) NONNULLARG1;
 staticfn void engulfer_explosion_msg(uchar, char);
+staticfn const char *jp_explosion_text_for_display(const char *, char *, size_t);
 
 /* Note: Arrays are column first, while the screen is row first */
 static const int explosion[3][3] = {
@@ -117,65 +118,134 @@ explosionmask(
 staticfn void
 engulfer_explosion_msg(uchar adtyp, char olet)
 {
-    const char *adj = (char *) 0;
+    const char *msg = (char *) 0;
 
     if (digests(u.ustuck->data)) {
         switch (adtyp) {
         case AD_FIRE:
-            adj = "heartburn";
+            msg = "胸やけを起こした";
             break;
         case AD_COLD:
-            adj = "chilly";
+            msg = "寒気に震えた";
             break;
         case AD_DISN:
             if (olet == WAND_CLASS)
-                adj = "irradiated by pure energy";
+                msg = "純粋なエネルギーを浴びた";
             else
-                adj = "perforated";
+                msg = "穴だらけになった";
             break;
         case AD_ELEC:
-            adj = "shocked";
+            msg = "感電した";
             break;
         case AD_DRST:
-            adj = "poisoned";
+            msg = "毒に侵された";
             break;
         case AD_ACID:
-            adj = "an upset stomach";
+            msg = "胃がむかついた";
             break;
         default:
-            adj = "fried";
+            msg = "こんがり焼けた";
             break;
         }
-        pline("%s gets %s!", Monnam(u.ustuck), adj);
+        pline("%sは%s!", Monnam(u.ustuck), msg);
     } else {
         switch (adtyp) {
         case AD_FIRE:
-            adj = "toasted";
+            msg = "少し炙られた";
             break;
         case AD_COLD:
-            adj = "chilly";
+            msg = "少し冷えた";
             break;
         case AD_DISN:
             if (olet == WAND_CLASS)
-                adj = "overwhelmed by pure energy";
+                msg = "純粋なエネルギーに包まれた";
             else
-                adj = "perforated";
+                msg = "少し穴だらけになった";
             break;
         case AD_ELEC:
-            adj = "shocked";
+            msg = "少ししびれた";
             break;
         case AD_DRST:
-            adj = "intoxicated";
+            msg = "少し気分が悪くなった";
             break;
         case AD_ACID:
-            adj = "burned";
+            msg = "少し焼けただれた";
             break;
         default:
-            adj = "fried";
+            msg = "少し焼けた";
             break;
         }
-        pline("%s gets slightly %s!", Monnam(u.ustuck), adj);
+        pline("%sは%s!", Monnam(u.ustuck), msg);
     }
+}
+
+staticfn const char *
+jp_explosion_text_for_display(const char *in, char *out, size_t outsz)
+{
+    const char *pos;
+    size_t n;
+
+    if (!in)
+        return "爆発";
+    if (!*in)
+        return "爆発";
+    if (!strcmpi(in, "explosion"))
+        return "爆発";
+    if (!strcmpi(in, "magical blast"))
+        return "魔法の爆発";
+    if (!strcmpi(in, "burning oil"))
+        return "燃える油";
+    if (!strcmpi(in, "tower of flame"))
+        return "火柱";
+    if (!strcmpi(in, "fireball"))
+        return "火の玉";
+    if (!strcmpi(in, "ball of cold"))
+        return "冷気の玉";
+    if (!strcmpi(in, "death field"))
+        return "死の領域";
+    if (!strcmpi(in, "disintegration field"))
+        return "分解領域";
+    if (!strcmpi(in, "ball of lightning"))
+        return "電撃の玉";
+    if (!strcmpi(in, "poison gas cloud"))
+        return "毒ガス雲";
+    if (!strcmpi(in, "splash of acid"))
+        return "酸の飛沫";
+
+    pos = strstri(in, "'s explosion");
+    if (pos) {
+        n = (size_t) (pos - in);
+        if (n >= outsz)
+            n = outsz - 1;
+        memcpy(out, in, n);
+        out[n] = '\0';
+        Snprintf(eos(out), outsz - strlen(out), "の爆発");
+        return out;
+    }
+
+    pos = strstri(in, "s' explosion");
+    if (pos) {
+        n = (size_t) (pos - in);
+        if (n >= outsz)
+            n = outsz - 1;
+        memcpy(out, in, n);
+        out[n] = '\0';
+        Snprintf(eos(out), outsz - strlen(out), "の爆発");
+        return out;
+    }
+
+    pos = strstri(in, " explosion");
+    if (pos) {
+        n = (size_t) (pos - in);
+        if (n >= outsz)
+            n = outsz - 1;
+        memcpy(out, in, n);
+        out[n] = '\0';
+        Snprintf(eos(out), outsz - strlen(out), "の爆発");
+        return out;
+    }
+
+    return in;
 }
 
 /* Note: I had to choose one of three possible kinds of "type" when writing
@@ -216,7 +286,7 @@ explode(
     boolean shopdamage = FALSE, generic = FALSE,
             do_hallu = FALSE, inside_engulfer, grabbed, grabbing;
     coord grabxy;
-    char hallu_buf[BUFSZ], killr_buf[BUFSZ];
+    char hallu_buf[BUFSZ], killr_buf[BUFSZ], disp_buf[BUFSZ];
     short exploding_wand_typ = 0;
     boolean you_exploding = (olet == MON_EXPLODE && type >= 0);
     boolean didmsg = FALSE;
@@ -503,9 +573,13 @@ explode(
                 if (engulfing_u(mtmp)) {
                     engulfer_explosion_msg(adtyp, olet);
                 } else if (cansee(xx, yy)) {
+                    const char *dispstr =
+                        jp_explosion_text_for_display(str, disp_buf,
+                                                      sizeof disp_buf);
+
                     if (mtmp->m_ap_type)
                         seemimic(mtmp);
-                    pline("%s is caught in the %s!", Monnam(mtmp), str);
+                    pline("%sは%sに巻き込まれた!", Monnam(mtmp), dispstr);
                 }
 
                 itemdmg = destroy_items(mtmp, (int) adtyp, dam);
@@ -532,9 +606,13 @@ explode(
                     int mdam = dam;
 
                     if (resist(mtmp, olet, 0, FALSE)) {
+                        const char *dispstr =
+                            jp_explosion_text_for_display(str, disp_buf,
+                                                          sizeof disp_buf);
+
                         /* inside_engulfer: <xx,yy> == <u.ux,u.uy> */
                         if (cansee(xx, yy) || inside_engulfer)
-                            pline("%s resists the %s!", Monnam(mtmp), str);
+                            pline("%sは%sに耐えた!", Monnam(mtmp), dispstr);
                         mdam = (dam + 1) / 2;
                     }
                     /* if grabber is reaching into hero's spot and
@@ -569,10 +647,10 @@ explode(
                          * would be "you killed <mdef>" so give our own.
                          */
                         if (cansee(mtmp->mx, mtmp->my) || canspotmon(mtmp))
-                            pline("%s is %s!", Monnam(mtmp),
-                                  xkflg ? "burned completely"
-                                        : nonliving(mtmp->data) ? "destroyed"
-                                                                : "killed");
+                            pline("%sは%s!", Monnam(mtmp),
+                                xkflg ? "燃え尽きた"
+                                    : nonliving(mtmp->data) ? "破壊された"
+                                                    : "倒された");
                         xkilled(mtmp, XKILL_NOMSG | XKILL_NOCONDUCT | xkflg);
                     } else {
                         if (xkflg)
@@ -592,6 +670,8 @@ explode(
         /* give message for any monster-induced explosion
            or player-induced one other than scroll of fire */
         if (flags.verbose && (type < 0 || olet != SCROLL_CLASS)) {
+            const char *dispstr;
+
             if (do_hallu) { /* (see explanation above) */
                 do {
                     Sprintf(hallu_buf, "%s explosion",
@@ -599,7 +679,9 @@ explode(
                 } while (*hallu_buf != lowc(*hallu_buf));
                 str = hallu_buf;
             }
-            You("%sに巻き込まれた!", str);
+            dispstr = jp_explosion_text_for_display(str, disp_buf,
+                                                    sizeof disp_buf);
+            You("%sに巻き込まれた!", dispstr);
             iflags.last_msg = PLNMSG_CAUGHT_IN_EXPLOSION;
         }
         /* do property damage first, in case we end up leaving bones */
@@ -607,7 +689,7 @@ explode(
             burn_away_slime();
         if (Invulnerable) {
             damu = 0;
-            You("安蔿無傷だ.");
+            You("無傷だ.");
         } else if (adtyp == AD_PHYS || adtyp == AD_ACID)
             damu = Maybe_Half_Phys(damu);
         if (adtyp == AD_FIRE) {
@@ -667,9 +749,11 @@ explode(
                 }
                 if (iflags.last_msg == PLNMSG_CAUGHT_IN_EXPLOSION
                     || iflags.last_msg == PLNMSG_TOWER_OF_FLAME) /*seffects()*/
-                    pline("臈臬的な手残しだ.");
+                    pline("それがあなたの最期の感覚だった.");
                 else
-                    pline_The("%sは致命的だ.", str);
+                    pline_The("%sは致命的だ.",
+                              jp_explosion_text_for_display(str, disp_buf,
+                                                            sizeof disp_buf));
                 /* Known BUG: BURNING suppresses corpse in bones data,
                    but done does not handle killer reason correctly */
                 done((adtyp == AD_FIRE) ? BURNING : DIED);
@@ -775,7 +859,7 @@ scatter(
             && rn2(10)) {
             if (otmp->otyp == BOULDER) {
                 if (cansee(sx, sy)) {
-                    pline("%s apart.", Tobjnam(otmp, "break"));
+                    pline("%sは砕け散った.", Yname2(otmp));
                 } else {
                     Soundeffect(se_stone_breaking, 100);
                     You_hear("石が砕ける音が聞こえた.");
@@ -793,7 +877,7 @@ scatter(
                 if ((trap = t_at(sx, sy)) && trap->ttyp == STATUE_TRAP)
                     deltrap(trap);
                 if (cansee(sx, sy)) {
-                    pline("%s.", Tobjnam(otmp, "crumble"));
+                    pline("%sは崩れ落ちた.", Yname2(otmp));
                 } else {
                     Soundeffect(se_stone_crumbling, 100);
                     You_hear("石が崩れる音が聞こえた.");

@@ -1367,7 +1367,7 @@ passivemm(
             jp_mm_possessive(def_possessive, mdef, magr);
             if (canseemon(magr))
                 pline("%sが%s%sを浴びた!", buf,
-                      def_possessive, hliquid("acid"));
+                      def_possessive, "酸液");
             if (resists_acid(magr)) {
                 if (canseemon(magr))
                     pline("%sには効いていない.", Monnam(magr));
@@ -1447,8 +1447,7 @@ passivemm(
             if (!magr->mstun) {
                 magr->mstun = 1;
                 if (canseemon(magr))
-                    pline_mon(magr, "%s %s...", Monnam(magr),
-                          makeplural(stagger(magr->data, "stagger")));
+                    pline_mon(magr, "%sはよろめいた...", l_monnam(magr));
             }
             tmp = 0;
             break;
