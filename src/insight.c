@@ -1460,11 +1460,11 @@ attributes_enlightenment(
         you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1], "");
     }
 
-    Sprintf(buf, "%s", piousness(TRUE, "属性に従って"));
+    Sprintf(buf, "%s", piousness(TRUE, "属性の道を歩んでいる"));
     if (u.ualign.record >= 0)
         you_are(buf, "");
     else
-        you_have(buf, "");
+        you_are(buf, "");
 
     if (wizard) {
         Sprintf(buf, " %d", u.ualign.record);
@@ -3200,16 +3200,14 @@ piousness(boolean showneg, const char *suffix)
     else if (!showneg)
         pio = "不十分に";
     else if (u.ualign.record >= -3)
-        pio = "道を外れ";
+        pio = "属性の道を外れている";
     else if (u.ualign.record >= -8)
-        pio = "罪を犯し";
+        pio = "属性に背いている";
     else
-        pio = "大きく背いて";
+        pio = "属性に大きく背いている";
 
     Sprintf(buf, "%s", pio);
     if (suffix && (!showneg || u.ualign.record >= 0)) {
-        if (u.ualign.record != 3)
-            Strcat(buf, " ");
         Strcat(buf, suffix);
     }
     return buf;
@@ -3347,7 +3345,7 @@ void
 ustatusline(void)
 {
     NhRegion *reg;
-    char info[BUFSZ];
+    char info[BUFSZ], alignbuf[BUFSZ];
     size_t ln;
 
     info[0] = '\0';
@@ -3428,8 +3426,9 @@ ustatusline(void)
         Snprintf(eos(info), sizeof info - ln, ", %sの雲の中",
              reg_damg(reg) ? "毒ガス" : "蒸気");
 
-    pline("%sのステータス (%s): レベル%d HP%d(%d) AC%d%s。", svp.plname,
-          piousness(FALSE, align_str(u.ualign.type)),
+        Sprintf(alignbuf, "%sに従っている", align_str(u.ualign.type));
+        pline("%sのステータス (%s): レベル%d HP%d(%d) AC%d%s。", svp.plname,
+            piousness(FALSE, alignbuf),
           Upolyd ? mons[u.umonnum].mlevel : u.ulevel, Upolyd ? u.mh : u.uhp,
           Upolyd ? u.mhmax : u.uhpmax, u.uac, info);
 }
