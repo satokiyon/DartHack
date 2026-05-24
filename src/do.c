@@ -132,7 +132,7 @@ boulder_hits_pool(
                 int dmg;
 
                 You("溶けた%sに当たった%c",
-                    hliquid("溶岩"), Fire_resistance ? '。' : '!');
+                    hliquid("lava"), Fire_resistance ? '。' : '!');
                 burn_away_slime();
                 dmg = d((Fire_resistance ? 1 : 3), 6);
                 losehp(Maybe_Half_Phys(dmg), /* lava damage */
@@ -528,26 +528,26 @@ dosinkring(struct obj *obj)
         You_hear("排水溝から大きな音が聞こえた.");
         break;
     case RIN_SUSTAIN_ABILITY: /* KMH */
-        pline_The("%sの流れが止まった.", hliquid("水"));
+        pline_The("%sの流れが止まった.", hliquid("water"));
         break;
     case RIN_GAIN_STRENGTH:
         pline_The("%sの流れが%sになった.",
-                  hliquid("水"),
+                  hliquid("water"),
                   (obj->spe < 0) ? "弱く" : "強く");
         break;
     case RIN_GAIN_CONSTITUTION:
         pline_The("%sの流れが%sになった.",
-                  hliquid("水"),
+                  hliquid("water"),
                   (obj->spe < 0) ? "不安定に" : "安定して");
         break;
     case RIN_INCREASE_ACCURACY: /* KMH */
         pline_The("%sの流れが%s.",
-                  hliquid("水"),
+                  hliquid("water"),
                   (obj->spe < 0) ? "的を外れた" : "的に当たった");
         break;
     case RIN_INCREASE_DAMAGE:
         pline_The("%sの勢いが%sになった.",
-                  hliquid("水"),
+                  hliquid("water"),
                   (obj->spe < 0) ? "弱く" : "強く");
         break;
     case RIN_HUNGER:

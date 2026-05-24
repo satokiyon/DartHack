@@ -551,7 +551,7 @@ do_improvisation(struct obj *instr)
        now use a different verb here */
     switch (mode) {
     case PLAY_NORMAL:
-        You("%sを演奏し始めた.", yname(instr));
+        You("%sを演奏し始めた.", xname(instr));
         break;
     case PLAY_STUNNED:
         if (!Deaf)

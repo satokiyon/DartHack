@@ -1997,7 +1997,7 @@ mtele_trap(struct monst *mtmp, struct trap *trap, int in_sight)
             if (canseemon(mtmp))
                 pline("%s seems disoriented.", monname);
             else
-                pline("%s suddenly disappears!", monname);
+                pline("%sが突然消えた!", monname);
             seetrap(trap);
         }
     }
