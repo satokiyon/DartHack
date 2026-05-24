@@ -712,7 +712,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
 staticfn void
 basics_enlightenment(int mode UNUSED, int final)
 {
-    static char Power[] = "MP（魔力）";
+    static char Power[] = "MP";
     char buf[BUFSZ];
     int pw = u.uen, hp = (Upolyd ? u.mh : u.uhp),
         pwmax = u.uenmax, hpmax = (Upolyd ? u.mhmax : u.uhpmax);
@@ -727,7 +727,7 @@ basics_enlightenment(int mode UNUSED, int final)
         Sprintf(buf, "HP : %d（満タン）", hpmax);
     else
         Sprintf(buf, "HP : %d/%d", hp, hpmax);
-    you_have(buf, "");
+    enl_msg("あなたの", "", "", buf, "");
 
     /* low max energy is feasible, so handle couple of extra special cases */
     if (pwmax == 0)
@@ -738,22 +738,22 @@ basics_enlightenment(int mode UNUSED, int final)
         Sprintf(buf, "%s : %d（満タン）", Power, pwmax);
     else
         Sprintf(buf, "%s : %d/%d", Power, pw, pwmax);
-    you_have(buf, "");
+    enl_msg("あなたの", "", "", buf, "");
 
     if (Upolyd) {
         switch (mons[u.umonnum].mlevel) {
         case 0:
             /* status line currently being explained shows "HD:0" */
-            Strcpy(buf, "0ヒットダイス（実際は1/2）");
+            Strcpy(buf, "ヒットダイス : 0（実際は1/2）");
             break;
         case 1:
-            Strcpy(buf, "1ヒットダイス");
+            Strcpy(buf, "ヒットダイス : 1");
             break;
         default:
-            Sprintf(buf, "%dヒットダイス", mons[u.umonnum].mlevel);
+            Sprintf(buf, "ヒットダイス : %d", mons[u.umonnum].mlevel);
             break;
         }
-        you_have(buf, "");
+        enl_msg("あなたの", "", "", buf, "");
     }
 
     find_ac(); /* enforces AC_MAX cap */
@@ -2547,22 +2547,22 @@ show_gamelog(int final)
 /* the two uppercase choices are implemented but suppressed from menu.
    also used in options.c */
 const char *const vanqorders[NUM_VANQ_ORDER_MODES][3] = {
-    { "t", "traditional: by monster level",
-           "traditional: by monster level, by internal monster index" },
-    { "d", "by monster difficulty rating",
-           "by monster difficulty rating, by internal monster index" },
-    { "a", "alphabetically, unique monsters separate",
-           "alphabetically, first unique monsters, then others" },
-    { "A", "alphabetically, unique monsters intermixed",
-           "alphabetically, unique monsters and others intermixed" },
-    { "C", "by monster class, high to low level in class",
-           "by monster class, high to low level within class" },
-    { "c", "by monster class, low to high level in class",
-           "by monster class, low to high level within class" },
-    { "n", "by count, high to low",
-           "by count, high to low, by internal index within tied count" },
-    { "z", "by count, low to high",
-           "by count, low to high, by internal index within tied count" },
+    { "t", "従来方式: 怪物レベル順",
+        "従来方式: 怪物レベル順（同値時は内部インデックス順）" },
+    { "d", "怪物の強さ順",
+        "怪物の強さ順（同値時は内部インデックス順）" },
+    { "a", "アルファベット順（ユニーク別枠）",
+        "アルファベット順（先にユニーク、次に通常怪物）" },
+    { "A", "アルファベット順（ユニーク混在）",
+        "アルファベット順（ユニークと通常怪物を混在）" },
+    { "C", "怪物クラス順（クラス内は高レベル→低レベル）",
+        "怪物クラス順（クラス内は高レベル→低レベル）" },
+    { "c", "怪物クラス順（クラス内は低レベル→高レベル）",
+        "怪物クラス順（クラス内は低レベル→高レベル）" },
+    { "n", "討伐数順（多い→少ない）",
+        "討伐数順（多い→少ない、同値時は内部インデックス順）" },
+    { "z", "討伐数順（少ない→多い）",
+        "討伐数順（少ない→多い、同値時は内部インデックス順）" },
 };
 
 staticfn int QSORTCALLBACK
@@ -2687,16 +2687,16 @@ set_vanq_order(boolean for_vanq)
            and "alpha, unique intermixed" are confusing descriptions when
            this menu is for #genocided rather than for #vanquished */
         if (!for_vanq && i == VANQ_ALPHA_SEP)
-            desc = "alphabetically";
+            desc = "アルファベット順";
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, *vanqorders[i][0], 0,
                  ATR_NONE, clr, desc,
                  (i == flags.vanq_sortmode) ? MENU_ITEMFLAGS_SELECTED
                                             : MENU_ITEMFLAGS_NONE);
     }
-    Sprintf(buf, "Sort order for %s",
-            for_vanq ? "vanquished monster counts (also genocided types)"
-                     : "genocided monster types (also vanquished counts)");
+        Sprintf(buf, "%sの並び順",
+            for_vanq ? "倒した怪物数（虐殺種も含む）"
+                 : "虐殺した怪物種（討伐数も含む）");
     end_menu(tmpwin, buf);
 
     n = select_menu(tmpwin, PICK_ONE, &selected);
@@ -2787,7 +2787,7 @@ list_vanquished(char defquery, boolean ask)
                 if (defquery == 'a') /* potential default from 'disclose' */
                     defquery = 'y';
             }
-            c = yn_function("Do you want an account of creatures vanquished?",
+            c = yn_function("倒した怪物の一覧を表示しますか?",
                             allow_yn, defquery, TRUE);
         } else {
             c = defquery;
@@ -2821,10 +2821,11 @@ list_vanquished(char defquery, boolean ask)
                 if (class_header
                     && (mlet != prev_mlet || (special_hdr && !Rider))) {
                     if (!Rider) {
-                        Strcpy(buf, def_monsyms[(int) mlet].explain);
+                        Sprintf(buf, "記号 '%c' の怪物",
+                                def_monsyms[(int) mlet].sym);
                         special_hdr = FALSE;
                     } else {
-                        Strcpy(buf, "Rider");
+                        Strcpy(buf, "四騎士");
                         special_hdr = TRUE;
                     }
                     /* 'ask' implies final disclosure, where highlighting
@@ -2834,12 +2835,9 @@ list_vanquished(char defquery, boolean ask)
                     prev_mlet = mlet;
                 }
                 if (UniqCritterIndx(i)) {
-                    Sprintf(buf, "%s%s",
-                            !type_is_pname(&mons[i]) ? "the " : "",
-                            mons[i].pmnames[NEUTRAL]);
+                    Sprintf(buf, "%s", jp_pmname(&mons[i], NEUTRAL));
                     if (nkilled > 1)
-                        Sprintf(eos(buf), " (%s)",
-                                N_times((long) nkilled, buftoo));
+                        Sprintf(eos(buf), " x%d", nkilled);
                     was_uniq = TRUE;
                 } else {
                     if (uniq_header && was_uniq) {
@@ -2849,18 +2847,13 @@ list_vanquished(char defquery, boolean ask)
                     /* trolls or undead might have come back,
                        but we don't keep track of that */
                     if (nkilled == 1)
-                        Strcpy(buf, an(mons[i].pmnames[NEUTRAL]));
+                        Strcpy(buf, jp_pmname(&mons[i], NEUTRAL));
                     else
-                        Sprintf(buf, "%3d %s", nkilled,
-                                makeplural(mons[i].pmnames[NEUTRAL]));
+                        Sprintf(buf, "%s x%d", jp_pmname(&mons[i], NEUTRAL),
+                                nkilled);
                 }
-                /* number of leading spaces to match 3 digit prefix */
-                pfx = !strncmpi(buf, "the ", 4) ? 0
-                      : !strncmpi(buf, "an ", 3) ? 1
-                        : !strncmpi(buf, "a ", 2) ? 2
-                          : !digit(buf[2]) ? 4 : 0;
-                if (class_header)
-                    ++pfx;
+                /* Keep a stable indent now that we no longer use articles. */
+                pfx = class_header ? 5 : 4;
                 Snprintf(buftoo, sizeof buftoo, "%*s%s", pfx, "", buf);
                 putstr(klwin, 0, buftoo);
             }
@@ -2871,7 +2864,7 @@ list_vanquished(char defquery, boolean ask)
             if (ntypes > 1) {
                 if (!dumping)
                     putstr(klwin, 0, "");
-                Sprintf(buf, "%ld creatures vanquished.", total_killed);
+                Sprintf(buf, "%ld体を倒した。", total_killed);
                 putstr(klwin, 0, buf);
             }
             display_nhwindow(klwin, TRUE);
@@ -2981,10 +2974,11 @@ list_genocided(char defquery, boolean ask)
 
     /* genocided or extinct species list */
     if (ngone > 0) {
-        Sprintf(buf, "Do you want a list of %sspecies%s%s?",
-                (nextinct && !ngenocided) ? "extinct " : "",
-                (ngenocided) ? " genocided" : "",
-                (nextinct && ngenocided) ? " and extinct" : "");
+        Sprintf(buf, "%sを表示しますか?",
+            (nextinct && ngenocided)
+                ? "虐殺・絶滅した怪物種の一覧"
+                : nextinct ? "絶滅した怪物種の一覧"
+                      : "虐殺した怪物種の一覧");
         c = ask ? yn_function(buf, (ngone > 1) ? "ynaq" : "ynq\033a",
                               defquery, TRUE)
                 : defquery;
@@ -3018,9 +3012,11 @@ list_genocided(char defquery, boolean ask)
             }
 
             klwin = create_nhwindow(NHW_MENU);
-            Sprintf(buf, "%s%s species:",
-                    (ngenocided) ? "Genocided" : "Extinct",
-                    (nextinct && ngenocided) ? " or extinct" : "");
+                Sprintf(buf, "%s:",
+                    (nextinct && ngenocided)
+                    ? "虐殺・絶滅した怪物種"
+                    : (ngenocided ? "虐殺した怪物種"
+                              : "絶滅した怪物種"));
             putstr(klwin, 0, buf);
             if (!dumping)
                 putstr(klwin, 0, "");
@@ -3029,14 +3025,15 @@ list_genocided(char defquery, boolean ask)
                 mndx = mindx[i];
                 mlet = mons[mndx].mlet;
                 if (class_header && mlet != prev_mlet) {
-                    Strcpy(buf, def_monsyms[(int) mlet].explain);
+                          Sprintf(buf, "記号 '%c' の怪物",
+                                     def_monsyms[(int) mlet].sym);
                     /* 'ask' implies final disclosure, where highlighting
                        of various header lines is suppressed */
                     putstr(klwin, ask ? ATR_NONE : iflags.menu_headings.attr,
                            upstart(buf));
                     prev_mlet = mlet;
                 }
-                Sprintf(buf, " %s", makeplural(mons[mndx].pmnames[NEUTRAL]));
+                Sprintf(buf, " %s", jp_pmname(&mons[mndx], NEUTRAL));
                 /*
                  * "Extinct" is unfortunate terminology.  A species
                  * is marked extinct when its birth limit is reached,
@@ -3048,17 +3045,17 @@ list_genocided(char defquery, boolean ask)
                  * collected list unless that bit is set.
                  */
                 if ((svm.mvitals[mndx].mvflags & G_GONE) == G_EXTINCT)
-                    Strcat(buf, " (extinct)");
+                    Strcat(buf, "（絶滅）");
                 putstr(klwin, 0, buf);
             }
             if (!dumping)
                 putstr(klwin, 0, "");
             if (ngenocided > 0) {
-                Sprintf(buf, "%d species genocided.", ngenocided);
+                Sprintf(buf, "%d種を虐殺した。", ngenocided);
                 putstr(klwin, 0, buf);
             }
             if (nextinct > 0) {
-                Sprintf(buf, "%d species extinct.", nextinct);
+                Sprintf(buf, "%d種が絶滅した。", nextinct);
                 putstr(klwin, 0, buf);
             }
 

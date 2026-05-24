@@ -3315,6 +3315,10 @@ extern void timer_sanity_check(void);
 /* ### topten.c ### */
 
 extern void formatkiller(char *, unsigned, int, boolean) NONNULLARG1;
+extern void jp_translate_killer_text_for_display(char *, unsigned,
+                                                 const char *) NONNULLPTRS;
+extern void jp_formatkiller_for_display(char *, unsigned, int,
+                                        boolean) NONNULLARG1;
 extern int observable_depth(d_level *) NONNULLARG1;
 extern void topten(int, time_t);
 extern void prscore(int, char **);

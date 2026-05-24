@@ -74,8 +74,8 @@ staticfn boolean thitm(int, struct monst *, struct obj *, int,
                                                          boolean) NONNULLARG2;
 staticfn void maybe_finish_sokoban(void);
 
-static const char *const a_your[2] = { "その", "あなたの" };
-static const char *const A_Your[2] = { "その", "あなたの" };
+static const char *const a_your[2] = { "", "" };
+static const char *const A_Your[2] = { "", "" };
 static const char tower_of_flame[] = "火柱";
 static const char *const A_gush_of_water_hits = "水流が";
 static const char *const blindgas[6] = { "湿った",   "無臭の",
@@ -1518,24 +1518,21 @@ trapeffect_bear_trap(
         feeltrap(trap);
         if (amorphous(gy.youmonst.data) || is_whirly(gy.youmonst.data)
             || unsolid(gy.youmonst.data)) {
-            pline("%sの熊罠はあなたを傷つけることなくすり抜けた.",
-                  A_Your[trap->madeby_u]);
+            pline("熊罠はあなたを傷つけることなくすり抜けた.");
             return Trap_Effect_Finished;
         }
         if (!u.usteed && gy.youmonst.data->msize <= MZ_SMALL) {
-            pline("%sの熊罠はあなたを傷つけることなく頭上で閉じた.",
-                  A_Your[trap->madeby_u]);
+            pline("熊罠はあなたを傷つけることなく頭上で閉じた.");
             return Trap_Effect_Finished;
         }
         set_utrap((unsigned) rn1(4, 4), TT_BEARTRAP);
         if (u.usteed) {
-            pline("%sの熊罠が%sの%sを挟んだ!", A_Your[trap->madeby_u],
-                  s_suffix(mon_nam(u.usteed)), jp_mbodypart(u.usteed, FOOT));
+            pline("熊罠が%sの%sを挟んだ!",
+                s_suffix(mon_nam(u.usteed)), jp_mbodypart(u.usteed, FOOT));
             if (thitm(0, u.usteed, (struct obj *) 0, dmg, FALSE))
                 reset_utrap(TRUE); /* steed died, hero not trapped */
         } else {
-            pline("%sの熊罠があなたの%sを挟んだ!", A_Your[trap->madeby_u],
-                  jp_body_part(FOOT));
+            pline("熊罠があなたの%sを挟んだ!", jp_body_part(FOOT));
             if (u.umonnum == PM_OWLBEAR || u.umonnum == PM_BUGBEAR)
                 You("怒ってうなった!");
             if (wearing_iron_shoes(mtmp))
@@ -1876,10 +1873,10 @@ trapeffect_pit(
         feeltrap(trap);
         if (!Sokoban && is_clinger(gy.youmonst.data) && !plunged) {
             if (already_known) {
-                You_see("%s%s落とし穴が足元に見える.", a_your[trap->madeby_u],
+                You_see("%s落とし穴が足元に見える.",
                         ttype == SPIKED_PIT ? "棘だらけの" : "");
             } else {
-                pline("%s%s落とし穴があなたの足元で開いた!", A_Your[trap->madeby_u],
+                pline("%s落とし穴があなたの足元で開いた!",
                       ttype == SPIKED_PIT ? "棘だらけの" : "");
                 You("しかし落ちなかった!");
             }
@@ -1912,7 +1909,7 @@ trapeffect_pit(
                        !plunged ? "落ち" : (Flying ? "飛び込み" : "飛び込ん"));
             }
             if (*verbbuf)
-                You("%s%s落とし穴に入った!", verbbuf, a_your[trap->madeby_u]);
+                You("%s落とし穴に入った!", verbbuf);
         }
         /* wumpus reference */
         if (Role_if(PM_RANGER) && !trap->madeby_u && !trap->once
@@ -2574,17 +2571,18 @@ trapeffect_landmine(
             if (!already_seen && rn2(3))
                 return Trap_Effect_Finished;
             feeltrap(trap);
-            pline("足元の土の山に%s %s.",
-                  already_seen ? "ある" : "見つけた",
-                  trap->madeby_u ? "自分の地雷の信管が" : "信管を");
+            if (already_seen) {
+                pline("足元の土山に%s地雷の信管が見える.",
+                    trap->madeby_u ? "自分の" : "");
+            } else {
+                pline("足元の土山から%s地雷の信管を見つけた.",
+                    trap->madeby_u ? "自分の" : "");
+            }
             if (already_seen && rn2(3))
                 return Trap_Effect_Finished;
             Soundeffect(se_kaablamm_of_mine, 80);
-            pline("ドカーン!!!  %s%s%s!",
-                  forcebungle ? "不器用な解除で"
-                  : "気流で",
-                  already_seen ? a_your[trap->madeby_u] : "それが",
-                  already_seen ? "地雷が爆発した" : "爆発した");
+            pline("ドカーン!!!  %s地雷が爆発した!",
+                forcebungle ? "不器用な解除で" : "気流で");
         } else {
             /* prevent landmine from killing steed, throwing you to
              * the ground, and then that same landmine affecting you
@@ -2634,8 +2632,8 @@ trapeffect_landmine(
             boolean already_seen = trap->tseen;
 
             if (in_sight && !already_seen) {
-                pline_mon(mtmp,
-                     "%sの足元の土の山に信管が現れた.",
+                 pline_mon(mtmp,
+                     "%sの足元の土山に信管が現れた.",
                       l_monnam(mtmp));
                 seetrap(trap);
             }
@@ -3043,16 +3041,13 @@ dotrap(struct trap *trap, unsigned trflags)
          * reason why the player cannot escape the trap with a dexterity
          * check, clinging to the ceiling, etc.
          */
-        pline("気流があなたを%s%sへ引きずり下ろした!",
-              a_your[trap->madeby_u],
+        pline("気流があなたを%sへ引きずり下ろした!",
               jp_trapname_for_display(ttype, TRUE));
         /* then proceed to normal trap effect */
     } else if (!forcetrap) {
         if (floor_trigger(ttype) && check_in_air(&gy.youmonst, trflags)) {
             if (already_seen) {
-                You("%s%s%sをまたいだ.", u_locomotion("踏み出して"),
-                    (ttype == ARROW_TRAP && !trap->madeby_u)
-                    ? "1つの" : a_your[trap->madeby_u],
+                You("%s%sをまたいだ.", u_locomotion("踏み出して"),
                     jp_trapname_for_display(ttype, FALSE));
             }
             return;
@@ -3061,10 +3056,7 @@ dotrap(struct trap *trap, unsigned trflags)
             && ttype != ANTI_MAGIC && !forcebungle && !plunged
             && !conj_pit && !adj_pit
             && (!rn2(5) || (is_pit(ttype) && is_clinger(gy.youmonst.data)))) {
-                You("%s%sを避けた.", (ttype == ARROW_TRAP && !trap->madeby_u)
-                                     ? "1つの"
-                                     : a_your[trap->madeby_u],
-                jp_trapname_for_display(ttype, FALSE));
+            You("%sを避けた.", jp_trapname_for_display(ttype, FALSE));
             return;
         }
     }
@@ -5728,7 +5720,7 @@ try_lift(
     boolean stuff) /* False: monster w/o minvent; True: w/ minvent */
 {
     if (calc_capacity(xtra_wt) >= HVY_ENCUMBER) {
-          pline("%sは%sので持ち上げられない.", l_monnam(mtmp),
+          pline("%sは%sのため持ち上げられない.", l_monnam(mtmp),
               stuff ? "荷物が多すぎる" : "重すぎる");
         if (!ttmp->madeby_u && !mtmp->mpeaceful && mtmp->mcanmove
             && !mindless(mtmp->data) && mtmp->data->mlet != S_HUMAN
