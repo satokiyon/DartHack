@@ -1438,9 +1438,7 @@ really_done(int how)
 
     Sprintf(pbuf, "%s %s %s...", Goodbye(), svp.plname,
             (how != ASCENDED)
-                ? (const char *) ((flags.female && gu.urole.name.f)
-                    ? gu.urole.name.f
-                    : gu.urole.name.m)
+                ? jp_role_name_for_display(flags.initrole, flags.female ? 1 : 0)
                 : (const char *) (flags.female ? "半女神" : "半神"));
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     dump_forward_putstr(endwin, 0, "", done_stopprint);

@@ -80,10 +80,16 @@ staticfn void free_ttlist(struct toptenentry *);
 staticfn int classmon(char *);
 staticfn int score_wanted(boolean, int, struct toptenentry *, int,
                         const char **, int);
+staticfn int tt_gend_from_filecode(const char *);
+staticfn const char *tt_role_name_from_filecode(const char *, const char *);
+staticfn const char *tt_race_name_from_filecode(const char *);
+staticfn const char *tt_gender_name_from_filecode(const char *);
+staticfn const char *tt_align_name_from_filecode(const char *);
 #ifdef NO_SCAN_BRACK
 staticfn void nsb_mung_line(char *);
 staticfn void nsb_unmung_line(char *);
 #endif
+staticfn const char *skip_english_article(const char *);
 
 /* "killed by",&c ["an"] 'svk.killer.name' */
 void
@@ -159,6 +165,173 @@ formatkiller(
             Strcpy(buf, ", while helpless");
         /* else extra death info won't fit, so leave it out */
     }
+}
+
+staticfn const char *
+skip_english_article(const char *s)
+{
+    if (!s)
+        return "";
+    if (!strncmp(s, "an ", 3))
+        return s + 3;
+    if (!strncmp(s, "a ", 2))
+        return s + 2;
+    if (!strncmp(s, "the ", 4))
+        return s + 4;
+    return s;
+}
+
+void
+jp_translate_killer_text_for_display(
+    char *out,
+    unsigned outsz,
+    const char *in)
+{
+    char tmp[BUFSZ], outmain[BUFSZ], whilebuf[BUFSZ];
+    char *whilep;
+    const char *core;
+
+    if (!out || outsz == 0)
+        return;
+
+    out[0] = '\0';
+    Snprintf(tmp, sizeof tmp, "%s", in ? in : "");
+    whilebuf[0] = '\0';
+
+    whilep = strstr(tmp, ", while ");
+    if (whilep) {
+        Snprintf(whilebuf, sizeof whilebuf, "%s", whilep + 8);
+        *whilep = '\0';
+    }
+
+    core = tmp;
+    outmain[0] = '\0';
+    if (!strncmp(core, "killed by ", 10)) {
+        Snprintf(outmain, sizeof outmain, "%sに倒された",
+                 skip_english_article(core + 10));
+    } else if (!strncmp(core, "choked on ", 10)) {
+        Snprintf(outmain, sizeof outmain, "%sで窒息した",
+                 skip_english_article(core + 10));
+    } else if (!strncmp(core, "poisoned by ", 12)) {
+        Snprintf(outmain, sizeof outmain, "%sで毒に侵された",
+                 skip_english_article(core + 12));
+    } else if (!strncmp(core, "died of ", 8)) {
+        Snprintf(outmain, sizeof outmain, "%sで死亡した",
+                 skip_english_article(core + 8));
+    } else if (!strncmp(core, "drowned in ", 11)) {
+        Snprintf(outmain, sizeof outmain, "%sで溺死した",
+                 skip_english_article(core + 11));
+    } else if (!strncmp(core, "burned by ", 10)) {
+        Snprintf(outmain, sizeof outmain, "%sで焼死した",
+                 skip_english_article(core + 10));
+    } else if (!strncmp(core, "dissolved in ", 13)) {
+        Snprintf(outmain, sizeof outmain, "%sで溶けた",
+                 skip_english_article(core + 13));
+    } else if (!strncmp(core, "crushed to death by ", 20)) {
+        Snprintf(outmain, sizeof outmain, "%sに押しつぶされた",
+                 skip_english_article(core + 20));
+    } else if (!strncmp(core, "petrified by ", 13)) {
+        Snprintf(outmain, sizeof outmain, "%sで石化した",
+                 skip_english_article(core + 13));
+    } else if (!strncmp(core, "turned to slime by ", 19)) {
+        Snprintf(outmain, sizeof outmain, "%sでスライム化した",
+                 skip_english_article(core + 19));
+    } else if (!strcmp(core, "quit")) {
+        Snprintf(outmain, sizeof outmain, "中断した");
+    } else if (!strncmp(core, "ascended", 8)) {
+        Snprintf(outmain, sizeof outmain, "昇天した");
+    } else if (!strncmp(core, "escaped", 7)) {
+        const char *etail = core + 7;
+
+        while (*etail == ' ')
+            etail++;
+        if (!*etail) {
+            Snprintf(outmain, sizeof outmain, "脱出した");
+        } else if (!strcmp(etail, "(with the Amulet)")) {
+            Snprintf(outmain, sizeof outmain,
+                     "アミュレットを持ったまま脱出した");
+        } else if (!strcmp(etail, "(in celestial disgrace)")) {
+            Snprintf(outmain, sizeof outmain,
+                     "天上界の不名誉を背負って脱出した");
+        } else if (!strcmp(etail, "(with a fake Amulet)")) {
+            Snprintf(outmain, sizeof outmain,
+                     "偽物のアミュレットを持って脱出した");
+        } else {
+            Snprintf(outmain, sizeof outmain, "脱出した %s", etail);
+        }
+    } else if (!strncmp(core, "quit ", 5)) {
+        Snprintf(outmain, sizeof outmain, "中断した（%s）", core + 5);
+    } else if (!strncmp(core, "died", 4)) {
+        Snprintf(outmain, sizeof outmain, "死亡した");
+    } else {
+        Snprintf(outmain, sizeof outmain, "%s", core);
+    }
+
+    Snprintf(out, outsz, "%s", outmain);
+    if (*whilebuf) {
+        const char *whiletxt = !strcmp(whilebuf, "helpless")
+                                 ? "無力状態"
+                                 : whilebuf;
+        Snprintf(out, outsz, "%s（%s中）", outmain, whiletxt);
+    }
+}
+
+void
+jp_formatkiller_for_display(
+    char *buf,
+    unsigned siz,
+    int how,
+    boolean incl_helpless)
+{
+    char tmp[BUFSZ];
+
+    formatkiller(tmp, sizeof tmp, how, incl_helpless);
+    jp_translate_killer_text_for_display(buf, siz, tmp);
+}
+
+staticfn int
+tt_gend_from_filecode(const char *fc)
+{
+    if (!fc || !*fc)
+        return 0;
+    if (!strncmp(fc, "Fem", 3) || !strncmp(fc, "F", 1))
+        return 1;
+    if (!strncmp(fc, "Mal", 3) || !strncmp(fc, "M", 1))
+        return 0;
+    return 0;
+}
+
+staticfn const char *
+tt_role_name_from_filecode(const char *rolefc, const char *gendfc)
+{
+    int roleidx = str2role(rolefc);
+    int gidx = tt_gend_from_filecode(gendfc);
+
+    return (roleidx >= 0)
+            ? jp_role_name_for_display(roleidx, gidx)
+            : rolefc;
+}
+
+staticfn const char *
+tt_race_name_from_filecode(const char *racefc)
+{
+    int raceidx = str2race(racefc);
+
+    return (raceidx >= 0) ? jp_race_adj_for_display(raceidx) : racefc;
+}
+
+staticfn const char *
+tt_gender_name_from_filecode(const char *gendfc)
+{
+    return jp_gender_for_display(tt_gend_from_filecode(gendfc));
+}
+
+staticfn const char *
+tt_align_name_from_filecode(const char *alignfc)
+{
+    int aidx = str2align(alignfc);
+
+    return (aidx != ROLE_NONE) ? jp_align_gname_for_display(aidx) : alignfc;
 }
 
 staticfn void
@@ -702,7 +875,7 @@ topten(int how, time_t when)
 #ifdef LOGFILE /* used for debugging (who dies of what, where) */
     if (lock_file(LOGFILE, SCOREPREFIX, 10)) {
         if (!(lfile = fopen_datafile(LOGFILE, "a", SCOREPREFIX))) {
-            HUP raw_print("Cannot open log file!");
+            HUP raw_print("ログファイルを開けない。");
         } else {
             writeentry(lfile, t0);
             (void) fclose(lfile);
@@ -713,7 +886,7 @@ topten(int how, time_t when)
 #ifdef XLOGFILE
     if (lock_file(XLOGFILE, SCOREPREFIX, 10)) {
         if (!(xlfile = fopen_datafile(XLOGFILE, "a", SCOREPREFIX))) {
-            HUP raw_print("Cannot open extended log file!");
+            HUP raw_print("拡張ログファイルを開けない。");
         } else {
             writexlentry(xlfile, t0, how);
             (void) fclose(xlfile);
@@ -729,8 +902,8 @@ topten(int how, time_t when)
 
                 topten_print("");
                 Sprintf(pbuf,
-             "Since you were in %s mode, the score list will not be checked.",
-                        wizard ? "wizard" : "discover");
+                        "%sモード中のため、スコア一覧は更新されない。",
+                    wizard ? "ウィザード(wizard)" : "探索(discover)");
                 topten_print(pbuf);
             }
         goto showwin;
@@ -746,7 +919,7 @@ topten(int how, time_t when)
 #endif
 
     if (!rfile) {
-        HUP raw_print("Cannot open record file!");
+        HUP raw_print("スコア記録ファイルを開けない。");
         unlock_file(RECORD);
         goto destroywin;
     }
@@ -792,7 +965,7 @@ topten(int how, time_t when)
                     char pbuf[BUFSZ];
 
                     Sprintf(pbuf,
-                         "You didn't beat your previous score of %ld points.",
+                        "前回の自己記録 %ld 点を更新できなかった。",
                             t1->points);
                     topten_print(pbuf);
                     topten_print("");
@@ -819,7 +992,7 @@ topten(int how, time_t when)
 #else
         (void) fclose(rfile);
         if (!(rfile = fopen_datafile(RECORD, "w", SCOREPREFIX))) {
-            HUP raw_print("Cannot write record file");
+            HUP raw_print("スコア記録ファイルを書き込めない。");
             unlock_file(RECORD);
             free_ttlist(tt_head);
             goto destroywin;
@@ -828,13 +1001,13 @@ topten(int how, time_t when)
         if (!done_stopprint)
             if (rank0 > 0) {
                 if (rank0 <= 10) {
-                    topten_print("You made the top ten list!");
+                    topten_print("トップ10入りした。");
                 } else {
                     char pbuf[BUFSZ];
 
                     Sprintf(pbuf,
-                            "You reached the %d%s place on the top %d list.",
-                            rank0, ordin(rank0), sysopt.entrymax);
+                            "トップ%dのうち %d 位に入った。",
+                            sysopt.entrymax, rank0);
                     topten_print(pbuf);
                 }
                 topten_print("");
@@ -931,11 +1104,11 @@ outheader(void)
     char linebuf[BUFSZ];
     char *bp;
 
-    Strcpy(linebuf, " No  Points     Name");
+    Strcpy(linebuf, "順位      点数  名前");
     bp = eos(linebuf);
     while (bp < linebuf + COLNO - 9)
         *bp++ = ' ';
-    Strcpy(bp, "Hp [max]");
+    Strcpy(bp, "HP[最大]");
     topten_print(linebuf);
 }
 
@@ -945,9 +1118,9 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 staticfn void
 outentry(int rank, struct toptenentry *t1, boolean so)
 {
-    boolean second_line = TRUE;
     char linebuf[BUFSZ];
-    char *bp, hpbuf[24], linebuf3[BUFSZ];
+    char *bp, hpbuf[24], linebuf3[BUFSZ], deathbuf[BUFSZ], profilebuf[BUFSZ];
+    const char *arg;
     int hppos, lngr;
 
     linebuf[0] = '\0';
@@ -958,97 +1131,58 @@ outentry(int rank, struct toptenentry *t1, boolean so)
 
     Sprintf(eos(linebuf), " %10ld  %.10s", t1->points ? t1->points : u.urexp,
             t1->name);
-    Sprintf(eos(linebuf), "-%s", t1->plrole);
+    Snprintf(profilebuf, sizeof profilebuf, "%s",
+             tt_role_name_from_filecode(t1->plrole, t1->plgend));
     if (t1->plrace[0] != '?')
-        Sprintf(eos(linebuf), "-%s", t1->plrace);
-    /* Printing of gender and alignment is intentional.  It has been
-     * part of the NetHack Geek Code, and illustrates a proper way to
-     * specify a character from the command line.
-     */
-    Sprintf(eos(linebuf), "-%s", t1->plgend);
+        Sprintf(eos(profilebuf), "/%s", tt_race_name_from_filecode(t1->plrace));
+    Sprintf(eos(profilebuf), "/%s", tt_gender_name_from_filecode(t1->plgend));
     if (t1->plalign[0] != '?')
-        Sprintf(eos(linebuf), "-%s ", t1->plalign);
-    else
-        Strcat(linebuf, " ");
+        Sprintf(eos(profilebuf), "/%s", tt_align_name_from_filecode(t1->plalign));
+    Sprintf(eos(linebuf), " %s ", profilebuf);
+
+    jp_translate_killer_text_for_display(deathbuf, sizeof deathbuf, t1->death);
     if (!strncmp("escaped", t1->death, 7)) {
-        Sprintf(eos(linebuf), "escaped the dungeon %s[max level %d]",
-                !strncmp(" (", t1->death + 7, 2) ? t1->death + 7 + 2 : "",
-                t1->maxlvl);
-        /* fixup for closing paren in "escaped... with...Amulet)[max..." */
-        if ((bp = strchr(linebuf, ')')) != 0)
-            *bp = (t1->deathdnum == astral_level.dnum) ? '\0' : ' ';
-        second_line = FALSE;
+        Sprintf(eos(linebuf), "%s（最大到達 %d階）", deathbuf, t1->maxlvl);
     } else if (!strncmp("ascended", t1->death, 8)) {
-        Sprintf(eos(linebuf), "ascended to demigod%s-hood",
-                (t1->plgend[0] == 'F') ? "dess" : "");
-        second_line = FALSE;
+        Strcat(linebuf, deathbuf);
     } else {
-        if (!strncmp(t1->death, "quit", 4)) {
-            Strcat(linebuf, "quit");
-            second_line = FALSE;
-        } else if (!strncmp(t1->death, "died of st", 10)) {
-            Strcat(linebuf, "starved to death");
-            second_line = FALSE;
-        } else if (!strncmp(t1->death, "choked", 6)) {
-            Sprintf(eos(linebuf), "choked on h%s food",
-                    (t1->plgend[0] == 'F') ? "er" : "is");
-        } else if (!strncmp(t1->death, "poisoned", 8)) {
-            Strcat(linebuf, "was poisoned");
-        } else if (!strncmp(t1->death, "crushed", 7)) {
-            Strcat(linebuf, "was crushed to death");
-        } else if (!strncmp(t1->death, "petrified by ", 13)) {
-            Strcat(linebuf, "turned to stone");
-        } else
-            Strcat(linebuf, "died");
+        Sprintf(eos(linebuf), "%s", deathbuf);
 
         if (t1->deathdnum == astral_level.dnum) {
-            const char *arg, *fmt = " on the Plane of %s";
+            const char *fmt = "（%s）";
 
             switch (t1->deathlev) {
             case -5:
-                fmt = " on the %s Plane";
-                arg = "Astral";
+                arg = "星界";
                 break;
             case -4:
-                arg = "Water";
+                arg = "水界";
                 break;
             case -3:
-                arg = "Fire";
+                arg = "火界";
                 break;
             case -2:
-                arg = "Air";
+                arg = "風界";
                 break;
             case -1:
-                arg = "Earth";
+                arg = "地界";
                 break;
             default:
-                arg = "Void";
+                arg = "虚無";
                 break;
             }
             Sprintf(eos(linebuf), fmt, arg);
         } else {
-            Sprintf(eos(linebuf), " in %s", svd.dungeons[t1->deathdnum].dname);
+            Sprintf(eos(linebuf), "（%s",
+                    jp_dungeon_name_by_dnum(t1->deathdnum));
             if (t1->deathdnum != knox_level.dnum)
-                Sprintf(eos(linebuf), " on level %d", t1->deathlev);
+                Sprintf(eos(linebuf), " %d階", t1->deathlev);
             if (t1->deathlev != t1->maxlvl)
-                Sprintf(eos(linebuf), " [max %d]", t1->maxlvl);
+                Sprintf(eos(linebuf), ", 最大到達 %d階", t1->maxlvl);
+            Strcat(linebuf, "）");
         }
-
-        /* kludge for "quit while already on Charon's boat" */
-        if (!strncmp(t1->death, "quit ", 5))
-            Strcat(linebuf, t1->death + 4);
     }
     Strcat(linebuf, ".");
-
-    /* Quit, starved, ascended, and escaped contain no second line */
-    if (second_line) {
-        bp = eos(linebuf);
-        Sprintf(bp, "  %c%s.", highc(*(t1->death)), t1->death + 1);
-        /* fix up "Killed by Mr. Asidonhopo; the shopkeeper"; that starts
-           with a comma but has it changed to semi-colon to keep the comma
-           out of 'record'; change it back for display */
-        (void) strsubst(bp, "; the ", ", the ");
-    }
 
     lngr = (int) strlen(linebuf);
     if (t1->hp <= 0)
@@ -1208,13 +1342,13 @@ prscore(int argc, char **argv)
            : Strlen(argv[1]);
     if (ln < 2 || (strncmp(argv[1], "-s", 2)
                    && strcmp(argv[1], "--scores"))) {
-        raw_printf("prscore: bad arguments (%d)", argc);
+        raw_printf("prscore: 引数が不正 (%d)", argc);
         return;
     }
 
     rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);
     if (!rfile) {
-        raw_print("Cannot open record file!");
+        raw_print("スコア記録ファイルを開けない。");
         return;
     }
 
@@ -1297,15 +1431,15 @@ prscore(int argc, char **argv)
                 (void) outentry(rank, t1, FALSE);
         }
     } else {
-        Sprintf(pbuf, "Cannot find any %sentries for ",
-                current_ver ? "current " : "");
+        Sprintf(pbuf, "%s該当エントリが見つからない（条件: ",
+                current_ver ? "現バージョンの" : "");
         if (playerct < 1) {
-            Strcat(pbuf, "you");
+            Strcat(pbuf, "あなた");
         } else {
             /* minor bug: 'nethack -s -u ziggy' will say "any of"
                even though the '-u' doesn't indicate multiple names */
             if (playerct > 1)
-                Strcat(pbuf, "any of ");
+                Strcat(pbuf, "いずれか ");
             for (i = 0; i < playerct; i++) {
                 /* accept '-u name' and '-uname' as well as just 'name'
                    so skip '-u' for the none-found feedback */
@@ -1328,17 +1462,19 @@ prscore(int argc, char **argv)
                         && players[i][2] == 0)
                         Strcat(pbuf, " ");
                     else
-                        Strcat(pbuf, ":");
+                        Strcat(pbuf, "、");
                 }
             }
         }
+        if (strlen(pbuf) < BUFSZ - 1)
+            Strcat(pbuf, "）");
         /* append end-of-sentence punctuation if there is room */
         if (strlen(pbuf) < BUFSZ - 1)
             Strcat(pbuf, ".");
         raw_print(pbuf);
-        raw_printf("Usage: %s -s [-v] <playertypes> [maxrank] [playernames]",
+        raw_printf("使い方: %s -s [-v] <playertypes> [maxrank] [playernames]",
                    gh.hname);
-        raw_printf("Player types are: [-p role] [-r race]");
+        raw_printf("プレイヤー種別指定: [-p role] [-r race]");
     }
     free_ttlist(tt_head);
 #ifdef AMIGA

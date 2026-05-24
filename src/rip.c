@@ -110,7 +110,7 @@ genl_outrip(winid tmpwin, int how, time_t when)
     center(GOLD_LINE, buf);
 
     /* Put together death description */
-    formatkiller(buf, sizeof buf, how, FALSE);
+    jp_formatkiller_for_display(buf, sizeof buf, how, FALSE);
 
     /* Put death type on stone */
     for (line = DEATH_LINE, dpx = buf; line < YEAR_LINE; line++) {
