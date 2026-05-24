@@ -37,6 +37,7 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [BILL_GUISARME] = "ビル・ギザルム",
     [BLACK_OPAL] = "黒オパール",
     [BLINDFOLD] = "目隠し",
+    [BOULDER] = "巨大な岩",
     [BOOMERANG] = "ブーメラン",
     [BOW] = "弓",
     [BRASS_LANTERN] = "真鍮のランタン",

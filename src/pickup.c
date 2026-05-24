@@ -12,6 +12,7 @@
 #define CONTAINED_SYM '>' /* from invent.c */
 
 staticfn void simple_look(struct obj *, boolean);
+staticfn const char *jp_action_phrase_for_display(const char *);
 staticfn boolean query_classes(char *, boolean *, boolean *, const char *,
                              struct obj *, boolean, int *);
 staticfn boolean fatal_corpse_mistake(struct obj *, boolean);
@@ -71,6 +72,26 @@ static const char
 
 /* BUG: this lets you look at cockatrice corpses while blind without
    touching them */
+staticfn const char *
+jp_action_phrase_for_display(const char *action)
+{
+    if (!action)
+        return "操作";
+    if (!strcmp(action, "pick up"))
+        return "拾う";
+    if (!strcmp(action, "take out"))
+        return "取り出す";
+    if (!strcmp(action, "put in"))
+        return "入れる";
+    if (!strcmp(action, "loot"))
+        return "あさる";
+    if (!strcmp(action, "tip"))
+        return "ひっくり返す";
+    if (!strcmp(action, "stash"))
+        return "しまう";
+    return action;
+}
+
 /* much simpler version of the look-here code; used by query_classes() */
 staticfn void
 simple_look(struct obj *otmp, /* list of objects */
@@ -199,8 +220,8 @@ query_classes(
         oclasses[oclassct = 0] = '\0';
         *one_at_a_time = *everything = FALSE;
         not_everything = filtered = FALSE;
-        Sprintf(qbuf, "What kinds of thing do you want to %s? [%s]", action,
-                ilets);
+        Sprintf(qbuf, "どの種類の物を%sしますか? [%s]",
+            jp_action_phrase_for_display(action), ilets);
         getlin(qbuf, inbuf);
         if (*inbuf == '\033')
             return FALSE;
@@ -1318,18 +1339,18 @@ query_category(
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
                  /* note: menu_remarm() doesn't pass the CHOOSE_ALL flag,
                     so do_worn handling here is moot */
-                 do_worn ? "Auto-select every item being worn or wielded"
-                         : "Auto-select every relevant item",
+                 do_worn ? "装備中・手持ち中の項目をすべて自動選択"
+                         : "該当する項目をすべて自動選択",
                  MENU_ITEMFLAGS_SKIPINVERT);
         verify_All = (how == PICK_ANY) && ParanoidAutoAll;
         if (!verify_All) {
             if (!ga.A_first_hint++ || iflags.cmdassist)
                 add_menu_str(win,
-                   "    (ignored unless some other choices are also picked)");
+                   "    (他の選択と併用したときだけ有効)");
         } else if (show_a) {
             if (!ga.A_second_hint++ || iflags.cmdassist)
                 add_menu_str(win,
-                      "    (if no other choices are picked, 'a' is implied)");
+                      "    (他に選択がない場合は 'a' が自動で適用される)");
         }
         /* blank separator */
         add_menu_str(win, "");
@@ -1340,7 +1361,7 @@ query_category(
         any = cg.zeroany;
         any.a_int = ALL_TYPES_SELECTED;
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 do_worn ? "All worn and wielded types" : "All types",
+                 do_worn ? "装備中・手持ち中の全種類" : "全種類",
                  MENU_ITEMFLAGS_SKIPINVERT);
         ++invlet; /* invlet = 'b'; */
     }
@@ -1405,38 +1426,41 @@ query_category(
         any = cg.zeroany;
         any.a_int = 'B';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Items known to be Blessed", MENU_ITEMFLAGS_SKIPINVERT);
+                 "祝福済みだと判明している物",
+                 MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_cursed) {
         invlet = 'C';
         any = cg.zeroany;
         any.a_int = 'C';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Items known to be Cursed", MENU_ITEMFLAGS_SKIPINVERT);
+                 "呪われていると判明している物",
+                 MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_uncursed) {
         invlet = 'U';
         any = cg.zeroany;
         any.a_int = 'U';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Items known to be Uncursed", MENU_ITEMFLAGS_SKIPINVERT);
+                 "呪われていないと判明している物",
+                 MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_buc_unknown) {
         invlet = 'X';
         any = cg.zeroany;
         any.a_int = 'X';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Items of unknown Bless/Curse status",
+                 "祝福・呪いの状態が不明な物",
                  MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (num_justpicked) {
         char tmpbuf[BUFSZ];
 
         if (num_justpicked == 1)
-            Sprintf(tmpbuf, "Just picked up: %s",
+            Sprintf(tmpbuf, "たった今拾った物: %s",
                     doname(find_justpicked(olist)));
         else
-            Strcpy(tmpbuf, "Items you just picked up");
+            Strcpy(tmpbuf, "たった今拾った物");
         invlet = 'P';
         any = cg.zeroany;
         any.a_int = 'P';
@@ -1460,7 +1484,7 @@ query_category(
                    just "y" to accept (and "no" rather than "n" to decline;
                    accepts "quit" and ESC without converting them to 'n') */
                 switch (paranoid_ynq(ParanoidConfirm,
-                                     "Really autoselect All?", TRUE)) {
+                                     "本当に全選択しますか?", TRUE)) {
                 case 'y':
                     /* yes => honor Auto-select All */
                     break;
@@ -2042,7 +2066,7 @@ able_to_loot(
     coordxy x, coordxy y,
     boolean looting) /* loot vs tip */
 {
-    const char *verb = looting ? "loot" : "tip";
+    const char *verb = looting ? "あさる" : "ひっくり返す";
     struct trap *t = t_at(x, y);
 
     if (!can_reach_floor(t && is_pit(t->ttyp))) {
@@ -2182,7 +2206,6 @@ doloot_core(void)
     int timepassed = 0;
     coord cc;
     boolean underfoot = TRUE;
-    const char *dont_find_anything = "don't find anything";
     struct monst *mtmp;
     int prev_inquiry = 0;
     boolean prev_loot = FALSE;
@@ -2255,7 +2278,7 @@ doloot_core(void)
                     add_menu(win, &tmpglyphinfo, &any, 0, 0, ATR_NONE, clr,
                              doname(cobj), MENU_ITEMFLAGS_NONE);
                 }
-            end_menu(win, "Loot which containers?");
+            end_menu(win, "どの容器をあさりますか?");
             n = select_menu(win, PICK_ANY, &pick_list);
             destroy_nhwindow(win);
 
@@ -2298,15 +2321,14 @@ doloot_core(void)
  lootmon:
     if (c != 'y' && (mon_beside(u.ux, u.uy) || iflags.menu_requested)) {
         boolean looted_mon = FALSE;
-        if (!get_adjacent_loc("Loot in what direction?",
-                              "Invalid loot location", u.ux, u.uy, &cc))
+        if (!get_adjacent_loc("どの方向をあさりますか?",
+                      "あされない場所です", u.ux, u.uy, &cc))
             return ECMD_OK;
         underfoot = u_at(cc.x, cc.y);
         if (underfoot && container_at(cc.x, cc.y, FALSE))
             goto lootcont;
         if (u.dz < 0) {
-            You("%s to loot on the %s.", dont_find_anything,
-                ceiling(cc.x, cc.y));
+            You("%sにはあさるものが見つからない.", ceiling(cc.x, cc.y));
             return ECMD_TIME;
         }
         mtmp = m_at(cc.x, cc.y);
@@ -2341,8 +2363,7 @@ doloot_core(void)
             }
         }
     } else if (c != 'y' && c != 'n') {
-        You("%s %s to loot.", dont_find_anything,
-            underfoot ? "here" : "there");
+        You("%sにはあさるものが見つからない.", underfoot ? "ここ" : "そこ");
     }
     return (timepassed ? ECMD_TIME : ECMD_OK);
 }
@@ -2914,17 +2935,17 @@ staticfn void
 explain_container_prompt(boolean more_containers)
 {
     static const char *const explaintext[] = {
-        "Container actions:",
+        "容器操作:",
         "",
-        " : -- Look: examine contents",
-        " o -- Out: take things out",
-        " i -- In: put things in",
-        " b -- Both: first take things out, then put things in",
-        " r -- Reversed: put things in, then take things out",
-        " s -- Stash: put one item in", "",
-        " n -- Next: loot next selected container",
-        " q -- Quit: finished",
-        " ? -- Help: display this text.",
+        " : -- 中を見る",
+        " o -- 取り出す",
+        " i -- 入れる",
+        " b -- 両方: 取り出してから入れる",
+        " r -- 逆順: 入れてから取り出す",
+        " s -- しまう: 1つ入れる", "",
+        " n -- 次へ: 次の容器をあさる",
+        " q -- 終了",
+        " ? -- ヘルプ: この説明を表示する", 
         "", 0
     };
     const char *const *txtpp;
@@ -3043,9 +3064,9 @@ use_container(
     /* might take something out if container isn't empty */
     outokay = Has_contents(gc.current_container);
     if (!outokay) /* preformat the empty-container message */
-        Sprintf(emptymsg, "%s is %sempty.",
+        Sprintf(emptymsg, "%sは%s空だ.",
                 Ysimple_name2(gc.current_container),
-                (quantum_cat || cursed_mbag) ? "now " : "");
+                (quantum_cat || cursed_mbag) ? "今は" : "");
 
     /*
      * What-to-do prompt's list of possible actions:
@@ -3077,12 +3098,13 @@ use_container(
     for (;;) { /* repeats iff '?' or ':' gets chosen */
         outmaybe = (outokay || !gc.current_container->cknown);
         if (!outmaybe)
-            (void) safe_qbuf(qbuf, (char *) 0, " is empty.  Do what with it?",
+            (void) safe_qbuf(qbuf, (char *) 0, "は空だ。どうしますか?",
                              gc.current_container, Yname2, Ysimple_name2,
-                             "This");
+                             "これは");
         else
-            (void) safe_qbuf(qbuf, "Do what with ", "?", gc.current_container,
-                             yname, ysimple_name, "it");
+            (void) safe_qbuf(qbuf, (char *) 0, "をどうしますか?",
+                             gc.current_container,
+                             yname, ysimple_name, "それ");
         /* ask player about what to do with this container */
         if (flags.menu_style == MENU_PARTIAL
             || flags.menu_style == MENU_FULL) {
@@ -3271,7 +3293,7 @@ menu_loot(int retry, boolean put_in)
     boolean all_categories = TRUE, loot_everything = FALSE, autopick = FALSE;
     char buf[BUFSZ];
     boolean loot_justpicked = FALSE;
-    const char *action = put_in ? "Put in" : "Take out";
+    const char *action_disp = put_in ? "入れる" : "取り出す";
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
     int mflags, res;
@@ -3283,7 +3305,7 @@ menu_loot(int retry, boolean put_in)
         all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
-        Sprintf(buf, "%s what type of objects?", action);
+        Sprintf(buf, "どの種類の物を%sしますか?", action_disp);
         mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES | CHOOSE_ALL
                   | JUSTPICKED );
         n = query_category(buf,
@@ -3361,7 +3383,7 @@ menu_loot(int retry, boolean put_in)
             mflags |= JUSTPICKED;
         if (!put_in)
             gc.current_container->cknown = 1;
-        Sprintf(buf, "%s what?", action);
+        Sprintf(buf, "何を%sしますか?", action_disp);
         n = query_objlist(buf,
                           put_in ? &gi.invent : &(gc.current_container->cobj),
                           mflags, &pick_list, PICK_ANY,
@@ -3420,35 +3442,36 @@ in_or_out_menu(
     start_menu(win, MENU_BEHAVE_STANDARD);
 
     any.a_int = 1; /* ':' */
-    Sprintf(buf, "Look inside %s", thesimpleoname(obj));
+    Sprintf(buf, "%sの中を見る", thesimpleoname(obj));
     add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
              ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     if (outokay) {
         any.a_int = 2; /* 'o' */
-        Sprintf(buf, "take %s out", something);
+        Sprintf(buf, "%sを取り出す", something);
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     }
     if (inokay) {
         any.a_int = 3; /* 'i' */
-        Sprintf(buf, "put %s in", something);
+        Sprintf(buf, "%sを入れる", something);
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     }
     if (outokay) {
         any.a_int = 4; /* 'b' */
-        Sprintf(buf, "%stake out, then put in", inokay ? "both; " : "");
+        Sprintf(buf, "%s取り出してから入れる",
+                inokay ? "両方: " : "");
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     }
     if (inokay) {
         any.a_int = 5; /* 'r' */
-        Sprintf(buf, "%sput in, then take out",
-                outokay ? "both reversed; " : "");
+        Sprintf(buf, "%s入れてから取り出す",
+                outokay ? "両方(逆順): " : "");
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
         any.a_int = 6; /* 's' */
-        Sprintf(buf, "stash one item into %s", thesimpleoname(obj));
+        Sprintf(buf, "1つだけ%sへしまう", thesimpleoname(obj));
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     }
@@ -3456,11 +3479,11 @@ in_or_out_menu(
     if (more_containers) {
         any.a_int = 7; /* 'n' */
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
-                 ATR_NONE, clr, "loot next container",
+                 ATR_NONE, clr, "次の容器をあさる",
                  MENU_ITEMFLAGS_SELECTED);
     }
     any.a_int = 8; /* 'q' */
-    Strcpy(buf, alreadyused ? "done" : "do nothing");
+    Strcpy(buf, alreadyused ? "終了" : "何もしない");
     add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
              ATR_NONE, clr, buf,
              more_containers ? MENU_ITEMFLAGS_NONE : MENU_ITEMFLAGS_SELECTED);
@@ -3536,10 +3559,10 @@ choose_tip_container_menu(void)
            containers that it's already being used */
         i = (i <= 'i' - 'a' && !flags.lootabc) ? 'i' : 0;
         add_menu(win, &nul_glyphinfo, &any, i, 0, ATR_NONE,
-                 clr, "tip something being carried",
+                 clr, "持ち物の容器を選ぶ",
                  MENU_ITEMFLAGS_SELECTED);
     }
-    end_menu(win, "Tip which container?");
+    end_menu(win, "どの容器をひっくり返しますか?");
     n = select_menu(win, PICK_ONE, &pick_list);
     destroy_nhwindow(win);
     /*

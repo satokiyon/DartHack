@@ -39,6 +39,7 @@ staticfn boolean avoid_moving_on_trap(coordxy, coordxy, boolean);
 staticfn boolean avoid_moving_on_liquid(coordxy, coordxy, boolean);
 staticfn boolean avoid_running_into_trap_or_liquid(coordxy, coordxy);
 staticfn boolean avoid_trap_andor_region(coordxy, coordxy);
+staticfn const char *jp_directionname(int);
 staticfn boolean move_out_of_bounds(coordxy, coordxy);
 staticfn boolean carrying_too_much(void);
 staticfn boolean escape_from_sticky_mon(coordxy, coordxy);
@@ -1114,7 +1115,7 @@ test_move(
                                 You_cant("%sをその閉じた扉の向こうへ導けなかった.",
                                          y_monnam(u.usteed));
                             } else {
-                                pline("いたっ! 扈に濃突した.");
+                                pline("いたっ! 扉に衝突した.");
                                 exercise(A_DEX, FALSE);
                             }
                             /* use current move; needed for the "ouch" case
@@ -1939,7 +1940,7 @@ domove_bump_mon(struct monst *mtmp, int glyph)
             /* m_monnam(): "dog" or "Fido", no "invisible dog" or "it" */
             pline("失礼、%s.", m_monnam(mtmp));
         else
-            You("%sに濃突してしまった!", l_monnam(mtmp));
+            You("%sに衝突してしまった!", l_monnam(mtmp));
         return TRUE;
     }
     return FALSE;
@@ -2582,6 +2583,19 @@ avoid_trap_andor_region(coordxy x, coordxy y)
     return FALSE;
 }
 
+staticfn const char *
+jp_directionname(int dir)
+{
+    static NEARDATA const char *const jp_dirnames[N_DIRS_Z] = {
+        "西",   "北西", "北",   "北東", "東",
+        "南東", "南",   "南西", "下",   "上",
+    };
+
+    if (dir < 0 || dir >= N_DIRS_Z)
+        return "その方向";
+    return jp_dirnames[dir];
+}
+
 /* trying to move out-of-bounds? */
 staticfn boolean
 move_out_of_bounds(coordxy x, coordxy y)
@@ -2603,7 +2617,7 @@ move_out_of_bounds(coordxy x, coordxy y)
                     dy = 0;
             }
             You("%s方向へはこれ以上進めなかった.",
-                directionname(xytodir(dx, dy)));
+                jp_directionname(xytodir(dx, dy)));
         }
         nomul(0);
         svc.context.move = 0;
