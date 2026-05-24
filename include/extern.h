@@ -2677,9 +2677,14 @@ extern long random(void);
 
 extern void learnscroll(struct obj *) NONNULLARG1;
 extern char *tshirt_text(struct obj *, char *) NONNULLARG12;
+extern char *jp_tshirt_text_for_display(struct obj *, char *) NONNULLARG12;
 extern char *hawaiian_motif(struct obj *, char *) NONNULLARG12;
+extern char *jp_hawaiian_motif_for_display(struct obj *, char *) NONNULLARG12;
+extern char *jp_hawaiian_design_for_display(struct obj *, char *) NONNULLARG12;
 extern char *apron_text(struct obj *, char *) NONNULLARG12;
+extern char *jp_apron_text_for_display(struct obj *, char *) NONNULLARG12;
 extern const char *candy_wrapper_text(struct obj *) NONNULLARG1;
+extern const char *jp_candy_wrapper_text_for_display(struct obj *) NONNULLARG1;
 extern void assign_candy_wrapper(struct obj *) NONNULLARG1;
 extern int doread(void);
 extern int charge_ok(struct obj *) NO_NNARGS;
