@@ -13,6 +13,7 @@ staticfn void do_oname(struct obj *) NONNULLARG1;
 staticfn const char *docall_target_name(struct obj *, char *, size_t) NONNULLPTRS;
 staticfn void build_docall_prompt(char *, size_t, struct obj *) NONNULLPTRS;
 staticfn void namefloorobj(void);
+staticfn const char *jp_bogusmon_for_display(const char *);
 
 #define NUMMBUF 5
 
@@ -1408,6 +1409,173 @@ bogusmon(char *buf, char *code)
     return mnam;
 }
 
+staticfn const char *
+jp_bogusmon_for_display(const char *name)
+{
+    static const struct {
+        const char *en;
+        const char *ja;
+    } bogons[] = {
+        { "jumbo shrimp", "巨大な小エビ" },
+        { "giant pigmy", "巨大なピグミー" },
+        { "gnu", "ヌー" },
+        { "killer penguin", "殺人ペンギン" },
+        { "giant cockroach", "巨大ゴキブリ" },
+        { "giant slug", "巨大ナメクジ" },
+        { "maggot", "ウジ虫" },
+        { "pterodactyl", "プテロダクティルス" },
+        { "tyrannosaurus rex", "ティラノサウルス・レックス" },
+        { "basilisk", "バシリスク" },
+        { "beholder", "ビホルダー" },
+        { "nightmare", "ナイトメア" },
+        { "efreeti", "イフリート" },
+        { "marid", "マリド" },
+        { "rot grub", "腐肉ウジ" },
+        { "bookworm", "本の虫" },
+        { "master lichen", "親玉地衣類" },
+        { "shadow", "影" },
+        { "hologram", "ホログラム" },
+        { "jester", "道化師" },
+        { "attorney", "弁護士" },
+        { "sleazoid", "ろくでなし" },
+        { "killer tomato", "殺人トマト" },
+        { "amazon", "アマゾネス" },
+        { "robot", "ロボット" },
+        { "battlemech", "バトルメック" },
+        { "rhinovirus", "ライノウイルス" },
+        { "harpy", "ハーピー" },
+        { "lion-dog", "獅子犬" },
+        { "rat-ant", "ネズミアリ" },
+        { "Y2K bug", "Y2Kバグ" },
+        { "angry mariachi", "怒れるマリアッチ" },
+        { "arch-pedant", "大衒学者" },
+        { "bluebird of happiness", "幸せの青い鳥" },
+        { "cardboard golem", "段ボールのゴーレム" },
+        { "duct tape golem", "ダクトテープのゴーレム" },
+        { "diagonally moving grid bug", "斜めに動くグリッドバグ" },
+        { "evil overlord", "邪悪な大君主" },
+        { "newsgroup troll", "ニュースグループの荒らし" },
+        { "ninja pirate zombie robot", "忍者海賊ゾンビロボット" },
+        { "octarine dragon", "オクタリンのドラゴン" },
+        { "plaid unicorn", "チェック柄のユニコーン" },
+        { "gonzo journalist", "ゴンゾー・ジャーナリスト" },
+        { "lag monster", "ラグ怪物" },
+        { "loan shark", "高利貸しザメ" },
+        { "possessed waffle iron", "取りつかれたワッフル焼き器" },
+        { "poultrygeist", "ポウルトリーガイスト" },
+        { "stuffed raccoon puppet", "アライグマのぬいぐるみ人形" },
+        { "viking", "ヴァイキング" },
+        { "wee green blobbie", "小さな緑のブロブ" },
+        { "wereplatypus", "ワープラティパス" },
+        { "hag of bolding", "太字化の魔女" },
+        { "blancmange", "ブランマンジェ" },
+        { "raging nerd", "激怒したオタク" },
+        { "spelling bee", "スペリング蜂" },
+        { "land octopus", "陸ダコ" },
+        { "frog prince", "カエルの王子" },
+        { "pigasus", "ピガサス" },
+        { "Semigorgon", "セミゴルゴン" },
+        { "conventioneer", "大会参加者" },
+        { "large microbat", "大きなマイクロバット" },
+        { "small megabat", "小さなメガバット" },
+        { "uberhulk", "ユーバーハルク" },
+        { "tofurkey", "トーファーキー" },
+        { "Dudley", "ダドリー" },
+        { "shrinking violet", "引っ込み思案のスミレ" },
+        { "shallow one", "浅きもの" },
+        { "spherical cow", "球形の牛" },
+        { "electric giraffe", "電気キリン" },
+        { "steam dragon", "蒸気ドラゴン" },
+        { "omnibus", "オムニバス" },
+        { "slinky", "スリンキー" },
+        { "maxotaur", "マクソタウロス" },
+        { "millitaur", "ミリタウロス" },
+        { "octahedron", "八面体" },
+        { "dungeon core", "ダンジョンコア" },
+        { "quale", "クェール" },
+        { "holloway", "ホロウェイ" },
+        { "chiasmus", "キアズマス" },
+        { "giant tetrapod", "巨大四脚獣" },
+        { "voussoir", "ヴソワール" },
+        { "barking spider", "ほえるクモ" },
+        { "frog cloud", "カエル雲" },
+        { "toothsayer", "トゥースセイヤー" },
+        { "third eye", "第三の目" },
+        { "owlpug", "フクロウパグ" },
+        { "pugasus", "パガサス" },
+        { "acorn", "どんぐり" },
+        { "red dot", "赤い点" },
+        { "robot chicken", "ロボットチキン" },
+        { "doozer", "ドーザー" },
+        { "poison cackler", "毒のけたたまし屋" },
+        { "lhurgoyf", "ラーゴイフ" },
+        { "phelddagrif", "フェルダグリフ" },
+        { "tiktaalik", "ティクターリク" },
+        { "weremoustache", "ワーマスタッシュ" },
+        { "rapier tapir", "レイピアバク" },
+        { "choplet", "チョプレット" },
+        { "pommelbug", "ポメルバグ" },
+        { "quest sprout", "クエストもやし" },
+        { "grue", "グルー" },
+        { "Christmas-tree monster", "クリスマスツリー怪物" },
+        { "luck sucker", "幸運吸い" },
+        { "paskald", "パスカルド" },
+        { "brogmoid", "ブログモイド" },
+        { "dornbeast", "ドルンビースト" },
+        { "Ancient Multi-Hued Dragon", "古代の極彩色ドラゴン" },
+        { "Evil Iggy", "邪悪なイギー" },
+        { "rattlesnake", "ガラガラヘビ" },
+        { "ice monster", "氷の怪物" },
+        { "phantom", "ファントム" },
+        { "quagga", "クアッガ" },
+        { "aquator", "アクエイター" },
+        { "griffin", "グリフィン" },
+        { "emu", "エミュー" },
+        { "kestrel", "チョウゲンボウ" },
+        { "xeroc", "ゼロック" },
+        { "venus flytrap", "ハエトリグサ" },
+        { "creeping coins", "うごめく硬貨" },
+        { "hydra", "ヒュドラ" },
+        { "siren", "セイレーン" },
+        { "killer bunny", "殺人ウサギ" },
+        { "rodent of unusual size", "異常に大きいげっ歯類" },
+        { "were-rabbit", "ワーラビット" },
+        { "Smokey Bear", "スモーキー・ベア" },
+        { "Luggage", "ラゲッジ" },
+        { "vampiric watermelon", "吸血スイカ" },
+        { "Ent", "エント" },
+        { "tangle tree", "もつれ木" },
+        { "nickelpede", "ニッケルムカデ" },
+        { "wiggle", "うねうね" },
+        { "white rabbit", "白ウサギ" },
+        { "snark", "スナーク" },
+        { "pushmi-pullyu", "プシュミプルユ" },
+        { "smurf", "スマーフ" },
+        { "tribble", "トリブル" },
+        { "Klingon", "クリンゴン" },
+        { "Borg", "ボーグ" },
+        { "Ewok", "イウォーク" },
+        { "Totoro", "トトロ" },
+        { "ohmu", "王蟲" },
+        { "youma", "妖魔" },
+        { "nyaasu", "ニャース" },
+        { "Godzilla", "ゴジラ" },
+        { "King Kong", "キングコング" },
+        { "earthquake beast", "地震獣" },
+        { "Invid", "インビッド" },
+        { "Terminator", "ターミネーター" },
+        { "boomer", "ブーマー" },
+        { "Dalek", "ダーレク" },
+    };
+    int i;
+
+    for (i = 0; i < SIZE(bogons); ++i)
+        if (!strcmp(name, bogons[i].en))
+            return bogons[i].ja;
+
+    return name;
+}
+
 /* return a random monster name, for hallucination */
 char *
 rndmonnam(char *code)
@@ -1426,7 +1594,7 @@ rndmonnam(char *code)
              && (type_is_pname(&mons[name]) || (mons[name].geno & G_NOGEN)));
 
     if (name >= SPECIAL_PM) {
-        mnam = bogusmon(buf, code);
+        mnam = strcpy(buf, jp_bogusmon_for_display(bogusmon(buf, code)));
     } else {
         mnam = strcpy(buf, jp_pmname(&mons[name], rn2_on_display_rng(2)));
     }
