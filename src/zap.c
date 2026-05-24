@@ -4526,11 +4526,11 @@ zhitu(
         break;
     case ZT_ACID:
         if (Acid_resistance) {
-            pline_The("%sは痛くなかった.", hliquid("酸"));
+            pline_The("%sは痛くなかった.", hliquid("acid"));
             monstseesu(M_SEEN_ACID);
             dam = 0;
         } else {
-            pline_The("%sで焼けつくようだった!", hliquid("酸"));
+            pline_The("%sで焼けつくようだった!", hliquid("acid"));
             dam = d(nd, 6);
             exercise(A_STR, FALSE);
             monstunseesu(M_SEEN_ACID);
@@ -5280,11 +5280,11 @@ zap_over_floor(
                 if (see_it) {
                     if (lava)
                         Norep("%sは冷えて固まった.",
-                              hliquid("溶岩"));
+                            hliquid("lava"));
                     else if (moat)
                         Norep("%sは氷で橋渡しされた!", buf);
                     else
-                        Norep("%sは凍りついた.", hliquid("水"));
+                        Norep("%sは凍りついた.", hliquid("water"));
                     newsym(x, y);
                 } else if (!lava) {
                     You_hear("ぱちぱちという小さな音が聞こえる.");

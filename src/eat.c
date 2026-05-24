@@ -41,6 +41,7 @@ staticfn int bounded_increase(int, int, int);
 staticfn void accessory_has_effect(struct obj *);
 staticfn void eataccessory(struct obj *);
 staticfn const char *foodword(struct obj *);
+staticfn const char *jp_foodword_for_display(struct obj *);
 staticfn int tin_variety(struct obj *, boolean);
 staticfn boolean maybe_cannibal(int, boolean);
 staticfn int eat_ok(struct obj *);
@@ -366,7 +367,7 @@ choke(struct obj *food)
          * high score list & tombstone.  So plan accordingly.
          */
         if (food) {
-            You("%sで喉を詰まらせた.", foodword(food));
+            You("%sで喉を詰まらせた.", jp_foodword_for_display(food));
             if (food->oclass == COIN_CLASS) {
                 Strcpy(svk.killer.name, "very rich meal");
             } else {
@@ -1891,7 +1892,8 @@ consume_tin(const char *mesg)
     rottenfood(struct obj *obj)
     {
     pline("おえっ!  %s%sだ!",
-          is_rottable(obj) ? "腐った" : "ひどい味の", foodword(obj));
+            is_rottable(obj) ? "腐った" : "ひどい味の",
+            jp_foodword_for_display(obj));
     if (!rn2(4)) {
         if (Hallucination)
             You_feel("ちょっとトリップした気がした.");
@@ -2561,6 +2563,13 @@ static const char *const foodwords[] = {
     "plastic", "glass",   "rich food", "stone"
 };
 
+/* Display-only localized labels keyed by oc_material order. */
+static const char *const jp_foodwords[] = {
+    "食事", "液体", "蝋", "食べ物", "肉", "紙", "布", "革", "木", "骨",
+    "鱗", "金属", "金属", "金属", "銀", "金", "プラチナ", "ミスリル",
+    "プラスチック", "ガラス", "ごちそう", "石"
+};
+
 staticfn const char *
 foodword(struct obj *otmp)
 {
@@ -2570,6 +2579,17 @@ foodword(struct obj *otmp)
         && otmp->dknown)
         makeknown(otmp->otyp);
     return foodwords[objects[otmp->otyp].oc_material];
+}
+
+staticfn const char *
+jp_foodword_for_display(struct obj *otmp)
+{
+    if (otmp->oclass == FOOD_CLASS)
+        return "食べ物";
+    if (otmp->oclass == GEM_CLASS && objects[otmp->otyp].oc_material == GLASS
+        && otmp->dknown)
+        makeknown(otmp->otyp);
+    return jp_foodwords[objects[otmp->otyp].oc_material];
 }
 
 /* called after consuming (non-corpse) food */
@@ -2867,7 +2887,7 @@ doeat_nonfood(struct obj *otmp)
     } else if (!nodelicious) {
           pline("%sはおいしい!",
               (otmp->oclass == COIN_CLASS)
-                ? foodword(otmp)
+                                ? jp_foodword_for_display(otmp)
                 : singular(otmp, xname));
     }
     eatspecial();

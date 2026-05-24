@@ -1512,6 +1512,35 @@ static NEARDATA const char *const hliquids[] = {
     /* "new coke (tm)", --better not */
 };
 
+/* Display-only localized labels for hallucination liquid text. */
+static NEARDATA const char *const jp_hliquids[] = {
+    "ヨーグルト", "ウーブレック", "凝固した血", "薄めた水", "浄化水",
+    "インスタントコーヒー", "紅茶", "薬草茶", "虹色の液体",
+    "濃厚な泡", "ホットワイン", "ブイヨン", "ネクター", "グロッグ", "フラバー",
+    "ケチャップ", "ゆっくりした光", "油", "ビネグレット", "液晶", "蜂蜜",
+    "キャラメルソース", "インク", "房水", "代用ミルク",
+    "果汁", "光る溶岩", "胃酸", "ミネラルウォーター",
+    "咳止めシロップ", "水銀", "甘い礬油", "グレイグー", "ピンクスライム",
+    "コズミックラテ", "骨油", "カスタード", "ラード", "酢", "クレオソート",
+};
+
+staticfn const char *
+jp_liquidname_for_display(const char *liquidpref)
+{
+    if (!liquidpref || !*liquidpref)
+        return liquidpref;
+
+    /* Keep upstream-style liquid keys at call sites and normalize here. */
+    if (!strcmp(liquidpref, "water"))
+        return "水";
+    if (!strcmp(liquidpref, "lava"))
+        return "溶岩";
+    if (!strcmp(liquidpref, "acid"))
+        return "酸";
+
+    return liquidpref;
+}
+
 /* if hallucinating, return a random liquid instead of 'liquidpref' */
 const char *
 hliquid(
@@ -1520,17 +1549,19 @@ hliquid(
     boolean hallucinate = Hallucination && !program_state.gameover;
 
     if (hallucinate || !liquidpref || !*liquidpref) {
-        int indx, count = SIZE(hliquids);
+        int indx, count = SIZE(jp_hliquids);
 
         /* if we have a non-hallucinatory default value, include it
            among the choices */
         if (liquidpref && *liquidpref)
             ++count;
         indx = rn2_on_display_rng(count);
+        if (IndexOk(indx, jp_hliquids))
+            return jp_hliquids[indx];
         if (IndexOk(indx, hliquids))
             return hliquids[indx];
     }
-    return liquidpref;
+    return jp_liquidname_for_display(liquidpref);
 }
 
 /* Aliases for road-runner nemesis

@@ -5078,7 +5078,7 @@ rescued_from_terrain(int how)
                 u.uinwater ? "の中" : "の上", hliquid("water"));
             mesggiven = TRUE;
         } else if (is_lava(u.ux, u.uy)) {
-            You("%s%sの上にいた.", find_yourself, hliquid("溶岩"));
+            You("%s%sの上にいた.", find_yourself, hliquid("lava"));
             mesggiven = TRUE;
         }
         break;

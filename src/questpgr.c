@@ -22,6 +22,8 @@ staticfn const char *homebase(void);
 staticfn void qtext_pronoun(char, char);
 staticfn void convert_arg(char);
 staticfn void convert_line(char *,char *);
+staticfn const char *jp_quest_alignname(aligntyp);
+staticfn boolean quest_text_uses_multibyte(const char *);
 staticfn void deliver_by_pline(const char *);
 staticfn void deliver_by_window(const char *, int);
 staticfn boolean skip_pager(boolean);
@@ -242,20 +244,20 @@ convert_arg(char c)
         str = svp.plname;
         break;
     case 'c':
-        str = (flags.female && gu.urole.name.f) ? gu.urole.name.f
-                                               : gu.urole.name.m;
+        str = jp_role_name_for_display(Role_switch, flags.female ? 1 : 0);
         break;
     case 'r':
-        str = rank_of(u.ulevel, Role_switch, flags.female);
+        str = jp_rank_of_for_display(u.ulevel, Role_switch, flags.female);
         break;
     case 'R':
-        str = rank_of(MIN_QUEST_LEVEL, Role_switch, flags.female);
+        str = jp_rank_of_for_display(MIN_QUEST_LEVEL, Role_switch,
+                                     flags.female);
         break;
     case 's':
-        str = (flags.female) ? "sister" : "brother";
+        str = (flags.female) ? "姉妹" : "兄弟";
         break;
     case 'S':
-        str = (flags.female) ? "daughter" : "son";
+        str = (flags.female) ? "娘" : "息子";
         break;
     case 'l':
         str = ldrname();
@@ -282,34 +284,34 @@ convert_arg(char c)
         str = guardname();
         break;
     case 'G':
-        str = align_gtitle(u.ualignbase[A_ORIGINAL]);
+        str = jp_align_gtitle_for_display(u.ualignbase[A_ORIGINAL]);
         break;
     case 'H':
         str = homebase();
         break;
     case 'a':
-        str = align_str(u.ualignbase[A_ORIGINAL]);
+        str = jp_quest_alignname(u.ualignbase[A_ORIGINAL]);
         break;
     case 'A':
-        str = align_str(u.ualign.type);
+        str = jp_quest_alignname(u.ualign.type);
         break;
     case 'd':
-        str = align_gname(u.ualignbase[A_ORIGINAL]);
+        str = jp_align_gname_for_display(u.ualignbase[A_ORIGINAL]);
         break;
     case 'D':
-        str = align_gname(A_LAWFUL);
+        str = jp_align_gname_for_display(A_LAWFUL);
         break;
     case 'C':
-        str = "chaotic";
+        str = jp_quest_alignname(A_CHAOTIC);
         break;
     case 'N':
-        str = "neutral";
+        str = jp_quest_alignname(A_NEUTRAL);
         break;
     case 'L':
-        str = "lawful";
+        str = jp_quest_alignname(A_LAWFUL);
         break;
     case 'x':
-        str = Blind ? "sense" : "see";
+        str = Blind ? "感じる" : "見る";
         break;
     case 'Z':
         str = svd.dungeons[0].dname;
@@ -324,10 +326,39 @@ convert_arg(char c)
     Strcpy(gc.cvt_buf, str);
 }
 
+staticfn const char *
+jp_quest_alignname(aligntyp alignment)
+{
+    switch (alignment) {
+    case A_LAWFUL:
+        return "秩序";
+    case A_NEUTRAL:
+        return "中立";
+    case A_CHAOTIC:
+        return "混沌";
+    default:
+        return "<属性>";
+    }
+}
+
+staticfn boolean
+quest_text_uses_multibyte(const char *str)
+{
+    const unsigned char *cursor = (const unsigned char *) str;
+
+    while (*cursor) {
+        if (*cursor & 0x80)
+            return TRUE;
+        ++cursor;
+    }
+    return FALSE;
+}
+
 staticfn void
 convert_line(char *in_line, char *out_line)
 {
     char *c, *cc;
+    boolean multibyte;
 
     cc = out_line;
     for (c = in_line; *c; c++) {
@@ -341,20 +372,32 @@ convert_line(char *in_line, char *out_line)
         case '%':
             if (*(c + 1)) {
                 convert_arg(*(++c));
+                multibyte = quest_text_uses_multibyte(gc.cvt_buf);
                 switch (*(++c)) {
                 /* insert "a"/"an" prefix */
                 case 'A':
+                    if (multibyte) {
+                        Strcat(cc, gc.cvt_buf);
+                        cc += strlen(gc.cvt_buf);
+                        continue; /* for */
+                    }
                     Strcat(cc, An(gc.cvt_buf));
                     cc += strlen(cc);
                     continue; /* for */
                 case 'a':
+                    if (multibyte) {
+                        Strcat(cc, gc.cvt_buf);
+                        cc += strlen(gc.cvt_buf);
+                        continue; /* for */
+                    }
                     Strcat(cc, an(gc.cvt_buf));
                     cc += strlen(cc);
                     continue; /* for */
 
                 /* capitalize */
                 case 'C':
-                    gc.cvt_buf[0] = highc(gc.cvt_buf[0]);
+                    if (!multibyte)
+                        gc.cvt_buf[0] = highc(gc.cvt_buf[0]);
                     break;
 
                 /* replace name with pronoun;
@@ -373,25 +416,29 @@ convert_line(char *in_line, char *out_line)
 
                 /* pluralize */
                 case 'P':
-                    gc.cvt_buf[0] = highc(gc.cvt_buf[0]);
+                    if (!multibyte)
+                        gc.cvt_buf[0] = highc(gc.cvt_buf[0]);
                     FALLTHROUGH;
                     /*FALLTHRU*/
                 case 'p':
-                    Strcpy(gc.cvt_buf, makeplural(gc.cvt_buf));
+                    if (!multibyte)
+                        Strcpy(gc.cvt_buf, makeplural(gc.cvt_buf));
                     break;
 
                 /* append possessive suffix */
                 case 'S':
-                    gc.cvt_buf[0] = highc(gc.cvt_buf[0]);
+                    if (!multibyte)
+                        gc.cvt_buf[0] = highc(gc.cvt_buf[0]);
                     FALLTHROUGH;
                     /*FALLTHRU*/
                 case 's':
-                    Strcpy(gc.cvt_buf, s_suffix(gc.cvt_buf));
+                    if (!multibyte)
+                        Strcpy(gc.cvt_buf, s_suffix(gc.cvt_buf));
                     break;
 
                 /* strip any "the" prefix */
                 case 't':
-                    if (!strncmpi(gc.cvt_buf, "the ", 4)) {
+                    if (!multibyte && !strncmpi(gc.cvt_buf, "the ", 4)) {
                         Strcat(cc, &gc.cvt_buf[4]);
                         cc += strlen(cc);
                         continue; /* for */

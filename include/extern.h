@@ -2603,6 +2603,7 @@ extern const char *jp_align_gname_for_display(aligntyp);
 extern const char *jp_gname_for_display(const char *);
 extern const char *halu_gname(aligntyp);
 extern const char *align_gtitle(aligntyp);
+extern const char *jp_align_gtitle_for_display(aligntyp);
 extern void altar_wrath(coordxy, coordxy);
 
 /* ### priest.c ### */
@@ -2659,6 +2660,7 @@ extern void com_pager(const char *);
 extern void qt_pager(const char *);
 extern struct permonst *qt_montype(void);
 extern void deliver_splev_message(void);
+extern const char *jp_rank_of_for_display(int, short, boolean);
 
 /* ### random.c ### */
 

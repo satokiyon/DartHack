@@ -2572,7 +2572,7 @@ jp_gname_for_display(const char *gnam)
     if (!strcmp(gnam, "Mercury"))
         return "マーキュリー";
     if (!strcmp(gnam, "Venus"))
-        return "ビーナス";
+        return "ヴィーナス";
     if (!strcmp(gnam, "Mars"))
         return "マーズ";
     if (!strcmp(gnam, "Amaterasu Omikami"))
@@ -2584,7 +2584,7 @@ jp_gname_for_display(const char *gnam)
     if (!strcmp(gnam, "Blind Io"))
         return "盲目のイオ";
     if (!strcmp(gnam, "The Lady"))
-        return "＜女神＞";
+        return "レディ";
     if (!strcmp(gnam, "Offler"))
         return "オフラー";
     if (!strcmp(gnam, "Tyr"))
@@ -2737,6 +2737,12 @@ align_gtitle(aligntyp alignment)
     if (gnam && *gnam == '_')
         result = "goddess";
     return result;
+}
+
+const char *
+jp_align_gtitle_for_display(aligntyp alignment)
+{
+    return !strcmp(align_gtitle(alignment), "goddess") ? "女神" : "神";
 }
 
 void
