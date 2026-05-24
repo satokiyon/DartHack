@@ -63,24 +63,24 @@ staticfn void
 cursetxt(struct monst *mtmp, boolean undirected)
 {
     if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)) {
-        const char *point_msg; /* spellcasting monsters are impolite */
+        const char *fmt; /* spellcasting monsters are impolite */
 
         if (undirected)
-            point_msg = "all around, then curses";
+            fmt = "%sは辺りを見回して悪態をついた.";
         else if ((Invis && !perceives(mtmp->data)
                   && (mtmp->mux != u.ux || mtmp->muy != u.uy))
                  || is_obj_mappear(&gy.youmonst, STRANGE_OBJECT)
                  || u.uundetected)
-            point_msg = "and curses in your general direction";
+            fmt = "%sはあなたのいる辺りへ向かって悪態をついた.";
         else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-            point_msg = "and curses at your displaced image";
+            fmt = "%sはあなたの幻影へ向かって悪態をついた.";
         else
-            point_msg = "at you, then curses";
+            fmt = "%sはあなたを指して悪態をついた.";
 
-        pline_mon(mtmp, "%s points %s.", Monnam(mtmp), point_msg);
+        pline_mon(mtmp, fmt, Monnam(mtmp));
     } else if ((!(svm.moves % 4) || !rn2(4))) {
         if (!Deaf)
-            Norep("You hear a mumbled curse.");   /* Deaf-aware */
+            Norep("誰かのくぐもった悪態が聞こえた.");   /* Deaf-aware */
     }
 }
 
@@ -197,10 +197,10 @@ castmu(
      */
     if (!foundyou && thinks_it_foundyou
         && !is_undirected_spell(spellnum)) {
-        pline_mon(mtmp, "%s casts a spell at %s!",
-                 canseemon(mtmp) ? Monnam(mtmp) : "Something",
-                 is_waterwall(mtmp->mux, mtmp->muy) ? "empty water"
-                                                    : "thin air");
+        pline_mon(mtmp, "%sは%sへ呪文を放った!",
+                 canseemon(mtmp) ? Monnam(mtmp) : "何か",
+                 is_waterwall(mtmp->mux, mtmp->muy) ? "水の壁の中"
+                                                    : "空中");
         return M_ATTK_MISS;
     }
 
@@ -214,15 +214,23 @@ castmu(
         return M_ATTK_MISS;
     }
     if (canspotmon(mtmp) || !is_undirected_spell(spellnum)) {
-        pline_mon(mtmp, "%s casts a spell%s!",
-                 canspotmon(mtmp) ? Monnam(mtmp) : "Something",
-                 is_undirected_spell(spellnum) ? ""
-                 : (Invis && !perceives(mtmp->data)
-                    && !u_at(mtmp->mux, mtmp->muy))
-                   ? " at a spot near you"
-                   : (Displaced && !u_at(mtmp->mux, mtmp->muy))
-                     ? " at your displaced image"
-                     : " at you");
+        const char *targettxt = "";
+
+        if (is_undirected_spell(spellnum)) {
+            pline_mon(mtmp, "%sは呪文を唱えた!",
+                      canspotmon(mtmp) ? Monnam(mtmp) : "何か");
+        } else {
+            if (Invis && !perceives(mtmp->data)
+                && !u_at(mtmp->mux, mtmp->muy))
+                targettxt = "あなたの近くへ";
+            else if (Displaced && !u_at(mtmp->mux, mtmp->muy))
+                targettxt = "あなたの幻影へ";
+            else
+                targettxt = "あなたへ";
+            pline_mon(mtmp, "%sは%s呪文を唱えた!",
+                      canspotmon(mtmp) ? Monnam(mtmp) : "何か",
+                      targettxt);
+        }
     }
 
     /*
@@ -309,7 +317,7 @@ m_cure_self(struct monst *mtmp, int dmg)
 {
     if (mtmp->mhp < mtmp->mhpmax) {
         if (canseemon(mtmp))
-            pline_mon(mtmp, "%s looks better.", Monnam(mtmp));
+            pline_mon(mtmp, "%sは元気を取り戻したようだ.", Monnam(mtmp));
         /* note: player healing does 6d4; this used to do 1d8 */
         healmon(mtmp, d(3, 6), 0);
         dmg = 0;
@@ -429,20 +437,19 @@ mcast_summon_mons(struct monst *mtmp)
         verbalize("泥棒を滅ぼせ、わが従僕たちよ!");
     } else {
         boolean one = (count == 1);
-        const char *mappear = one ? "A monster appears"
-                                  : "Monsters appear";
 
         /* messages not quite right if plural monsters created but
            only a single monster is seen */
         if (Invis && !perceives(mtmp->data)
             && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-            pline("%s %s a spot near you!", mappear,
-                  one ? "at" : "around");
+            pline(one ? "あなたの近くに怪物が突然現れた!"
+                      : "あなたの近くに怪物たちが突然現れた!");
         else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-            pline("%s %s your displaced image!", mappear,
-                  one ? "by" : "around");
+            pline(one ? "あなたの幻影のそばに怪物が突然現れた!"
+                      : "あなたの幻影の周囲に怪物たちが突然現れた!");
         else
-            pline("%s from nowhere!", mappear);
+            pline(one ? "どこからともなく怪物が現れた!"
+                      : "どこからともなく怪物たちが現れた!");
     }
 }
 
@@ -491,8 +498,8 @@ mcast_disappear(struct monst *mtmp)
 {
     if (!mtmp->minvis && !mtmp->invis_blkd) {
         if (canseemon(mtmp))
-            pline_mon(mtmp, "%s suddenly %s!", Monnam(mtmp),
-                      !See_invisible ? "disappears" : "becomes transparent");
+            pline_mon(mtmp, "%sは突然%s!", Monnam(mtmp),
+                      !See_invisible ? "姿を消した" : "半透明になった");
         mon_set_minvis(mtmp, FALSE);
         if (cansee(mtmp->mx, mtmp->my) && !canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
@@ -570,7 +577,7 @@ mcast_lightning(struct monst *mtmp, int dmg)
 
     Soundeffect(se_bolt_of_lightning, 80);
     pline("稲妻が上空からあなためがけて落ちてきた!");
-    reflects = ureflects("It bounces off your %s%s.", "");
+    reflects = ureflects("しかし%sはあなたの%sで跳ね返った!", "");
     orig_dmg = dmg = d(8, 6);
     if (reflects || Shock_resistance) {
         shieldeff(u.ux, u.uy);
@@ -652,7 +659,7 @@ mcast_insects(struct monst *mtmp)
     boolean success = FALSE, seecaster;
     int i, quan, oldseen, newseen;
     coord bypos;
-    const char *fmt, *what;
+    const char *what;
 
     oldseen = monster_census(TRUE);
     quan = (mtmp->m_lev < 2) ? 1 : rnd((int) mtmp->m_lev / 2);
@@ -673,30 +680,21 @@ mcast_insects(struct monst *mtmp)
 
     /* not canspotmon() which includes unseen things sensed via warning */
     seecaster = canseemon(mtmp) || tp_sensemon(mtmp) || Detect_monsters;
-    what = (let == S_SNAKE) ? "snakes" : "insects";
+    what = (let == S_SNAKE) ? "ヘビ" : "虫";
     if (Hallucination)
-        what = makeplural(bogusmon(whatbuf, (char *) 0));
+        what = bogusmon(whatbuf, (char *) 0);
 
-    fmt = 0;
     if (!seecaster) {
         if (newseen <= oldseen || Unaware) {
             /* unseen caster fails or summons unseen critters,
                or unconscious hero ("You dream that you hear...") */
             You_hear("誰かが%sを召喚するのが聞こえた.", what);
         } else {
-            char *arg;
-
-            if (what != whatbuf)
-                what = strcpy(whatbuf, what);
-            /* unseen caster summoned seen critter(s) */
-            arg = (newseen == oldseen + 1) ? an(makesingular(what))
-                                           : whatbuf;
             if (!Deaf) {
                 Soundeffect(se_someone_summoning, 100);
-                You_hear("誰かが何かを召喚し、%sが%sのが聞こえた.", arg,
-                         vtense(arg, "appear"));
+                You_hear("誰かが何かを召喚し、%sが現れるのが聞こえた.", what);
             } else {
-                pline("%s %s.", upstart(arg), vtense(arg, "appear"));
+                pline("%sが現れた.", what);
             }
         }
 
@@ -706,22 +704,18 @@ mcast_insects(struct monst *mtmp)
            words, no need to fuss with visibility or singularization;
            player is told what's happening even if hero is unconscious) */
     } else if (!success) {
-        fmt = "%s casts at a clump of sticks, but nothing happens.%s";
-        what = "";
+        pline_mon(mtmp, "%sは棒切れの塊へ呪文を放ったが、何も起きなかった.",
+                  Monnam(mtmp));
     } else if (let == S_SNAKE) {
-        fmt = "%s transforms a clump of sticks into %s!";
+        pline_mon(mtmp, "%sは棒切れの塊を%sへ変えた!", Monnam(mtmp), what);
     } else if (Invis && !perceives(mtmp->data)
                && (mtmp->mux != u.ux || mtmp->muy != u.uy)) {
-        fmt = "%s summons %s around a spot near you!";
+        pline_mon(mtmp, "%sはあなたの近くに%sを召喚した!", Monnam(mtmp), what);
     } else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy)) {
-        fmt = "%s summons %s around your displaced image!";
+        pline_mon(mtmp, "%sはあなたの幻影の周囲に%sを召喚した!",
+                  Monnam(mtmp), what);
     } else {
-        fmt = "%s summons %s!";
-    }
-    if (fmt) {
-        DISABLE_WARNING_FORMAT_NONLITERAL;
-        pline_mon(mtmp, fmt, Monnam(mtmp), what);
-        RESTORE_WARNING_FORMAT_NONLITERAL;
+        pline_mon(mtmp, "%sは%sを召喚した!", Monnam(mtmp), what);
     }
 }
 

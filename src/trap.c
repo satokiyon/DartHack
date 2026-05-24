@@ -1732,8 +1732,8 @@ trapeffect_rust_trap(
 
         if (completelyrusts(mptr)) {
             if (in_sight)
-                pline_mon(mtmp, "%s %sになった!", l_monnam(mtmp),
-                      !mlifesaver(mtmp) ? "錆び崩れ" : "錆び崩れたが命拾いし");
+                pline_mon(mtmp, "%sは%s!", l_monnam(mtmp),
+                      !mlifesaver(mtmp) ? "錆び崩れた" : "錆び崩れたが命拾いした");
             monkilled(mtmp, (const char *) 0, AD_RUST);
             if (DEADMONSTER(mtmp))
                 trapkilled = TRUE;
@@ -1767,7 +1767,7 @@ trapeffect_fire_trap(
         if (in_sight)
             pline_mon(mtmp,
                  "%sが%sの足元の%sから噴き出した!", tower_of_flame,
-                  surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
+                  l_monnam(mtmp), surface(mtmp->mx, mtmp->my));
         else if (see_it) { /* evidently `mtmp' is invisible */
             set_msg_xy(mtmp->mx, mtmp->my);
             You_see("%sが%sから噴き出すのが見える!", tower_of_flame,
@@ -4779,14 +4779,14 @@ water_damage(
     } else if (Is_container(obj)
                && (!Waterproof_container(obj) || (obj->cursed && !rn2(3)))) {
         if (in_invent) {
-            pline("%sがあなたの%sに入り込んだ!", hliquid("water"), ostr);
+            pline("水があなたの%sに入り込んだ!", ostr);
             gm.mentioned_water = !Hallucination;
         }
         water_damage_chain(obj->cobj, FALSE);
         return ER_DAMAGED; /* contents were damaged */
     } else if (Waterproof_container(obj)) {
         if (in_invent && !Blind && !Underwater) {
-            pline_The("%sはあなたの%sには入り込めなかった.", hliquid("water"), ostr);
+            pline("水はあなたの%sには入り込めなかった.", ostr);
             gm.mentioned_water = !Hallucination;
             makeknown(obj->otyp); /* if an oilskin sack, discover it; doesn't
                                    * matter for chest, large box, ice box */
@@ -5055,7 +5055,7 @@ rescued_from_terrain(int how)
                         You("%s%s%sにいた.", find_yourself,
                                 (Is_waterlevel(&u.uz) || IS_WATERWALL(lev->typ))
                                     ? "の真ん中" : "の上",
-                                hliquid("water"));
+                                "水");
             mesggiven = TRUE;
         } else if (IS_AIR(lev->typ)) {
             You("%s%sにいた.", find_yourself,
@@ -5067,10 +5067,10 @@ rescued_from_terrain(int how)
     case DISSOLVED: /* sunk into lava while fire resistant */
         if (is_pool(u.ux, u.uy)) {
             You("%s%s%sにいた.", find_yourself,
-                u.uinwater ? "の中" : "の上", hliquid("water"));
+                u.uinwater ? "の中" : "の上", "水");
             mesggiven = TRUE;
         } else if (is_lava(u.ux, u.uy)) {
-            You("%s%sの上にいた.", find_yourself, hliquid("lava"));
+            You("%s%sの上にいた.", find_yourself, "溶岩");
             mesggiven = TRUE;
         }
         break;
@@ -5187,7 +5187,7 @@ drown(void)
         /* time to do some strip-tease... */
         boolean succ = Is_waterlevel(&u.uz) ? TRUE : emergency_disrobe(&lost);
 
-        You("%sから這い上がろうとした.", hliquid("water"));
+        You("水から這い上がろうとした.");
         if (lost)
             You("軽くなるために装備をいくつか捨てた...");
         if (succ) {
@@ -6906,7 +6906,7 @@ lava_effects(void)
 
     if (!Fire_resistance) {
         if (Wwalking) {
-            pline_The("ここの%sがあなたを焼いた!", hliquid("lava"));
+            pline("ここの溶岩があなたを焼いた!");
             if (usurvive) {
                 losehp(dmg, lava_killer, KILLED_BY); /* lava damage */
                 goto burn_stuff;

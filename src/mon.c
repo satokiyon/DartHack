@@ -3190,8 +3190,8 @@ corpse_chance(
 
     if (mdat == &mons[PM_VLAD_THE_IMPALER] || mdat->mlet == S_LICH) {
         if (cansee(mon->mx, mon->my) && !was_swallowed)
-            pline_mon(mon, "%s body crumbles into dust.",
-                      s_suffix(Monnam(mon)));
+            pline_mon(mon, "%sの体は塵となって崩れ去った.",
+                      l_monnam(mon));
         return FALSE;
     }
 
@@ -3221,9 +3221,9 @@ corpse_chance(
                         mondied(magr);
                     if (DEADMONSTER(magr)) { /* maybe lifesaved */
                         if (canspotmon(magr))
-                            pline_mon(magr, "%s rips open!", Monnam(magr));
+                            pline_mon(magr, "%sの腹が裂けた!", Monnam(magr));
                     } else if (canseemon(magr))
-                        pline_mon(magr, "%s seems to have indigestion.",
+                        pline_mon(magr, "%sは消化不良を起こしたようだ.",
                                   Monnam(magr));
                 }
                 return FALSE;

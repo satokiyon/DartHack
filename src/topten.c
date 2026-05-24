@@ -85,6 +85,9 @@ staticfn const char *tt_role_name_from_filecode(const char *, const char *);
 staticfn const char *tt_race_name_from_filecode(const char *);
 staticfn const char *tt_gender_name_from_filecode(const char *);
 staticfn const char *tt_align_name_from_filecode(const char *);
+staticfn int topten_utf8_charlen(const char *);
+staticfn int topten_dispwidth(const char *);
+staticfn char *topten_wrapsplit(char *, int);
 #ifdef NO_SCAN_BRACK
 staticfn void nsb_mung_line(char *);
 staticfn void nsb_unmung_line(char *);
@@ -172,11 +175,11 @@ skip_english_article(const char *s)
 {
     if (!s)
         return "";
-    if (!strncmp(s, "an ", 3))
+    if (!strncmpi(s, "an ", 3))
         return s + 3;
-    if (!strncmp(s, "a ", 2))
+    if (!strncmpi(s, "a ", 2))
         return s + 2;
-    if (!strncmp(s, "the ", 4))
+    if (!strncmpi(s, "the ", 4))
         return s + 4;
     return s;
 }
@@ -206,34 +209,34 @@ jp_translate_killer_text_for_display(
 
     core = tmp;
     outmain[0] = '\0';
-    if (!strncmp(core, "killed by ", 10)) {
+    if (!strncmpi(core, "killed by ", 10)) {
         Snprintf(outmain, sizeof outmain, "%sに倒された",
                  skip_english_article(core + 10));
-    } else if (!strncmp(core, "choked on ", 10)) {
+    } else if (!strncmpi(core, "choked on ", 10)) {
         Snprintf(outmain, sizeof outmain, "%sで窒息した",
                  skip_english_article(core + 10));
-    } else if (!strncmp(core, "poisoned by ", 12)) {
+    } else if (!strncmpi(core, "poisoned by ", 12)) {
         Snprintf(outmain, sizeof outmain, "%sで毒に侵された",
                  skip_english_article(core + 12));
-    } else if (!strncmp(core, "died of ", 8)) {
+    } else if (!strncmpi(core, "died of ", 8)) {
         Snprintf(outmain, sizeof outmain, "%sで死亡した",
                  skip_english_article(core + 8));
-    } else if (!strncmp(core, "drowned in ", 11)) {
+    } else if (!strncmpi(core, "drowned in ", 11)) {
         Snprintf(outmain, sizeof outmain, "%sで溺死した",
                  skip_english_article(core + 11));
-    } else if (!strncmp(core, "burned by ", 10)) {
+    } else if (!strncmpi(core, "burned by ", 10)) {
         Snprintf(outmain, sizeof outmain, "%sで焼死した",
                  skip_english_article(core + 10));
-    } else if (!strncmp(core, "dissolved in ", 13)) {
+    } else if (!strncmpi(core, "dissolved in ", 13)) {
         Snprintf(outmain, sizeof outmain, "%sで溶けた",
                  skip_english_article(core + 13));
-    } else if (!strncmp(core, "crushed to death by ", 20)) {
+    } else if (!strncmpi(core, "crushed to death by ", 20)) {
         Snprintf(outmain, sizeof outmain, "%sに押しつぶされた",
                  skip_english_article(core + 20));
-    } else if (!strncmp(core, "petrified by ", 13)) {
+    } else if (!strncmpi(core, "petrified by ", 13)) {
         Snprintf(outmain, sizeof outmain, "%sで石化した",
                  skip_english_article(core + 13));
-    } else if (!strncmp(core, "turned to slime by ", 19)) {
+    } else if (!strncmpi(core, "turned to slime by ", 19)) {
         Snprintf(outmain, sizeof outmain, "%sでスライム化した",
                  skip_english_article(core + 19));
     } else if (!strcmp(core, "quit")) {
@@ -350,6 +353,66 @@ topten_print_bold(const char *x)
         raw_print_bold(x);
     else
         putstr(gt.toptenwin, ATR_BOLD, x);
+}
+
+staticfn int
+topten_utf8_charlen(const char *s)
+{
+    uchar c0;
+
+    if (!s || !*s)
+        return 0;
+    c0 = (uchar) *s;
+    if (c0 < 0x80)
+        return 1;
+    if (c0 >= 0xC2 && c0 <= 0xDF)
+        return (uchar) s[1] >= 0x80 && (uchar) s[1] <= 0xBF ? 2 : 1;
+    if (c0 >= 0xE0 && c0 <= 0xEF)
+        return ((uchar) s[1] >= 0x80 && (uchar) s[1] <= 0xBF
+                && (uchar) s[2] >= 0x80 && (uchar) s[2] <= 0xBF) ? 3 : 1;
+    if (c0 >= 0xF0 && c0 <= 0xF4)
+        return ((uchar) s[1] >= 0x80 && (uchar) s[1] <= 0xBF
+                && (uchar) s[2] >= 0x80 && (uchar) s[2] <= 0xBF
+                && (uchar) s[3] >= 0x80 && (uchar) s[3] <= 0xBF) ? 4 : 1;
+    return 1;
+}
+
+staticfn int
+topten_dispwidth(const char *s)
+{
+    int w = 0, len;
+
+    while (s && *s) {
+        len = topten_utf8_charlen(s);
+        w += ((uchar) *s < 0x80) ? 1 : 2;
+        s += len;
+    }
+    return w;
+}
+
+/* return split position; caller will terminate line at this pointer */
+staticfn char *
+topten_wrapsplit(char *s, int maxw)
+{
+    char *p = s, *last_space = (char *) 0, *first_over = (char *) 0;
+    int w = 0, len, cw;
+
+    while (*p) {
+        len = topten_utf8_charlen(p);
+        cw = ((uchar) *p < 0x80) ? 1 : 2;
+        if (*p == ' ')
+            last_space = p;
+        if (w + cw >= maxw) {
+            first_over = p;
+            break;
+        }
+        w += cw;
+        p += len;
+    }
+
+    if (first_over)
+        return (last_space && last_space > s + 14) ? last_space : first_over;
+    return eos(s);
 }
 
 int
@@ -1102,13 +1165,15 @@ staticfn void
 outheader(void)
 {
     char linebuf[BUFSZ];
-    char *bp;
+    int w;
 
     Strcpy(linebuf, "順位      点数  名前");
-    bp = eos(linebuf);
-    while (bp < linebuf + COLNO - 9)
-        *bp++ = ' ';
-    Strcpy(bp, "HP[最大]");
+    w = topten_dispwidth(linebuf);
+    while (w < COLNO - 9) {
+        Strcat(linebuf, " ");
+        ++w;
+    }
+    Strcat(linebuf, "HP[最大]");
     topten_print(linebuf);
 }
 
@@ -1184,7 +1249,7 @@ outentry(int rank, struct toptenentry *t1, boolean so)
     }
     Strcat(linebuf, ".");
 
-    lngr = (int) strlen(linebuf);
+    lngr = topten_dispwidth(linebuf);
     if (t1->hp <= 0)
         hpbuf[0] = '-', hpbuf[1] = '\0';
     else
@@ -1192,11 +1257,7 @@ outentry(int rank, struct toptenentry *t1, boolean so)
     /* beginning of hp column after padding (not actually padded yet) */
     hppos = COLNO - (int) (sizeof "  Hp [max]" - sizeof "");
     while (lngr >= hppos) {
-        for (bp = eos(linebuf); !(*bp == ' ' && bp - linebuf < hppos); bp--)
-            ;
-        /* special case: word is too long, wrap in the middle */
-        if (linebuf + 15 >= bp)
-            bp = linebuf + hppos - 1;
+        bp = topten_wrapsplit(linebuf, hppos);
         /* special case: if about to wrap in the middle of maximum
            dungeon depth reached, wrap in front of it instead */
         if (bp > linebuf + 5 && !strncmp(bp - 5, " [max", 5))
@@ -1214,16 +1275,17 @@ outentry(int rank, struct toptenentry *t1, boolean so)
         } else
             topten_print(linebuf);
         Snprintf(linebuf, sizeof(linebuf), "%15s %s", "", linebuf3);
-        lngr = Strlen(linebuf);
+        lngr = topten_dispwidth(linebuf);
     }
     /* beginning of hp column not including padding */
     hppos = COLNO - 7 - (int) strlen(hpbuf);
     bp = eos(linebuf);
 
-    if (bp <= linebuf + hppos) {
+    if (topten_dispwidth(linebuf) <= hppos) {
         /* pad any necessary blanks to the hit point entry */
-        while (bp < linebuf + hppos)
-            *bp++ = ' ';
+        while (topten_dispwidth(linebuf) < hppos)
+            Strcat(linebuf, " ");
+        bp = eos(linebuf);
         Strcpy(bp, hpbuf);
         Sprintf(eos(bp), " %s[%d]",
                 (t1->maxhp < 10) ? "  " : (t1->maxhp < 100) ? " " : "",
@@ -1231,10 +1293,8 @@ outentry(int rank, struct toptenentry *t1, boolean so)
     }
 
     if (so) {
-        bp = eos(linebuf);
-        while (bp < linebuf + (COLNO - 1))
-            *bp++ = ' ';
-        *bp = '\0';
+        while (topten_dispwidth(linebuf) < (COLNO - 1))
+            Strcat(linebuf, " ");
         topten_print_bold(linebuf);
     } else
         topten_print(linebuf);

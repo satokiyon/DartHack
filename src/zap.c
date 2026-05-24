@@ -2231,12 +2231,12 @@ bhito(struct obj *obj, struct obj *otmp)
                        statues; plural handling here and the "empty" case
                        below are superfluous because containers don't stack */
                     if (obj->otrapped)
-                        pline("%sは罠付きだった!", Tobjnam(obj, "are"));
+                        pline("%sは罠付きだった!", Yname2(obj));
                     obj->tknown = 1;
                 }
 
                 if (!obj->cobj) {
-                    pline("%sは空だった.", Tobjnam(obj, "are"));
+                    pline("%sは空だった.", Yname2(obj));
                 } else if (SchroedingersBox(obj)) {
                     /* we don't want to force alive vs dead
                        determination for Schroedinger's Cat here,
@@ -2672,7 +2672,7 @@ dozap(void)
         gc.current_wand = 0;
     }
     if (obj && obj->spe < 0) {
-        pline("%sは塵になった.", Tobjnam(obj, "turn"));
+        pline("%sは塵になった.", Yname2(obj));
         useupall(obj); /* calls freeinv() -> update_inventory() */
     } else
         update_inventory(); /* maybe used a charge */
@@ -4526,11 +4526,11 @@ zhitu(
         break;
     case ZT_ACID:
         if (Acid_resistance) {
-            pline_The("%sは痛くなかった.", hliquid("acid"));
+            pline("酸液は痛くなかった.");
             monstseesu(M_SEEN_ACID);
             dam = 0;
         } else {
-            pline_The("%sで焼けつくようだった!", hliquid("acid"));
+            pline("酸液で焼けつくようだった!");
             dam = d(nd, 6);
             exercise(A_STR, FALSE);
             monstunseesu(M_SEEN_ACID);
@@ -5279,12 +5279,11 @@ zap_over_floor(
                 }
                 if (see_it) {
                     if (lava)
-                        Norep("%sは冷えて固まった.",
-                            hliquid("lava"));
+                        Norep("溶岩は冷えて固まった.");
                     else if (moat)
                         Norep("%sは氷で橋渡しされた!", buf);
                     else
-                        Norep("%sは凍りついた.", hliquid("water"));
+                        Norep("水は凍りついた.");
                     newsym(x, y);
                 } else if (!lava) {
                     You_hear("ぱちぱちという小さな音が聞こえる.");
