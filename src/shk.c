@@ -2290,8 +2290,8 @@ dopayobj(
         if (!unseen)
             shk_names_obj(shkp, obj,
                           consumed
-                              ? "%sの代金として%ld %s%sを支払った.%s"
-                              : "%sを%ld %s%sで買った.%s",
+                              ? "%sの代金として%ld %s%sを支払った."
+                              : "%sを%ld %s%sで買った.",
                           ltmp, "");
     }
 
@@ -2403,7 +2403,7 @@ buy_container(
         if (unpaidcontainer)
             container->unpaid = container->no_charge = 1;
         shk_names_obj(shkp, container,
-                      "bought %s for %ld gold piece%s.%s",
+                      "%sを%ld %s%sで買った.",
                       totalcost, "");
         container->unpaid = container->no_charge = 0;
     }
@@ -3434,9 +3434,9 @@ shk_names_obj(
     obj_name = paydoname(obj);
     /* Use an alternate message when extra information is being provided */
     if (was_unknown) {
-        Sprintf(fmtbuf, "%%s; you %s", fmt);
+        Sprintf(fmtbuf, "%%s; あなたは%s", fmt);
         obj_name[0] = highc(obj_name[0]);
-        pline(fmtbuf, obj_name, (obj->quan > 1L) ? "them" : "it", amt,
+        pline(fmtbuf, obj_name, (obj->quan > 1L) ? "それら" : "それ", amt,
               plur(amt), arg);
     } else {
         You(fmt, obj_name, amt, plur(amt), arg);
@@ -4066,8 +4066,8 @@ sellobj(
         if (c == 'y') {
             shk_names_obj(shkp, obj,
                           ((gs.sell_how != SELL_NORMAL)
-                          ? "%sを売り、%ld %s%s分の%sクレジットを受け取った."
-                      : "%sを引き渡し、%ld %s%s分の%sクレジットを受け取った."),
+                          ? "%sを売り、%ld %s分の%sクレジットを受け取った."
+                      : "%sを引き渡し、%ld %s分の%sクレジットを受け取った."),
                           tmpcr, (eshkp->credit > 0L) ? "追加" : "");
             eshkp->credit += tmpcr;
             if (container)
@@ -4181,9 +4181,9 @@ sellobj(
             shk_names_obj(shkp, obj,
                           (gs.sell_how != SELL_NORMAL)
                                                      ? ((!ltmp && cltmp && only_partially_your_contents)
-                                                 ? "%s内の一部の品を%ld %s%sで売った.%s"
-                                                 : "%sを%ld %s%sで売った.%s")
-                        : "%sを手放し、代償として%ld %s%sを受け取った.%s",
+                                                                                                 ? "%s内の一部の品を%ld %s%sで売った."
+                                                                                                 : "%sを%ld %s%sで売った.")
+                                                : "%sを手放し、代償として%ld %s%sを受け取った.",
                           offer, "");
             break;
         default:
