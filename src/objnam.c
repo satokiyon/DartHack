@@ -1078,18 +1078,19 @@ xname_flags(
         switch (obj->otyp) {
         case T_SHIRT:
         case ALCHEMY_SMOCK:
-            ConcatF1(buf, 0, " with text \"%s\"",
-                     (obj->otyp == T_SHIRT) ? tshirt_text(obj, tmpbuf)
-                                            : apron_text(obj, tmpbuf));
+            ConcatF1(buf, 0, " 「%s」と書かれた",
+                     (obj->otyp == T_SHIRT)
+                         ? jp_tshirt_text_for_display(obj, tmpbuf)
+                         : jp_apron_text_for_display(obj, tmpbuf));
             break;
         case CANDY_BAR:
-            lbl = candy_wrapper_text(obj);
+            lbl = jp_candy_wrapper_text_for_display(obj);
             if (*lbl)
-                ConcatF1(buf, 0, " labeled \"%s\"", lbl);
+                ConcatF1(buf, 0, " 「%s」ラベル付き", lbl);
             break;
         case HAWAIIAN_SHIRT:
-            ConcatF1(buf, 0, " with %s motif",
-                     an(hawaiian_motif(obj, tmpbuf)));
+            ConcatF1(buf, 0, " %s",
+                     jp_hawaiian_design_for_display(obj, tmpbuf));
             break;
         default:
             break;

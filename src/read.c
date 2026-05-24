@@ -187,6 +187,96 @@ tshirt_text(struct obj *tshirt, char *buf)
 }
 
 char *
+jp_tshirt_text_for_display(struct obj *tshirt, char *buf)
+{
+    static const char *const shirt_msgs_ja[] = {
+        /* Scott Bigham */
+        "ダンジョンを踏破したのに、手に入ったのはこのTシャツだけだ!",
+        "そのポケットのミョルニルは飾りか? それとも私に会えてうれしいだけか?",
+        "剣は大きさではない。#enhance の腕前がものを言う。",
+        "マダム・エルヴィラのサキュバス館 終身顧客",
+        "マダム・エルヴィラのサキュバス館 今月の優秀従業員",
+        "ルーディオス金庫警備隊 暗くて狭い部屋で大活躍",
+        "イェンダー軍の兵士は大人数行動が信条",
+        "イェンダー軍の新兵訓練を生き延びた",
+        "ルーディオス会計学校 学内ラクロス部",
+        "Oracle(TM) 噴水 第10回 濡れTシャツ大会",
+        "おい、黒竜! これを分解してみろ!",
+        "私はおバカと一緒 -->",
+        "私のせいじゃない、イツチャクに投票したんだ!",
+        "慌てるな", /* HHGTTG */
+        "風林館高校 運動部",                /* Ranma 1/2 */
+        "ハローーー、ナース!",             /* Animaniacs */
+        "=^.^=",
+        "ゴブリン毛100% - 洗濯禁止",
+        "アバーゾンビー&フィッチ",
+        "cK -- コカトリス、コップにタッチ",
+        "聞かないでくれ、私はここで冒険しているだけだ",
+        "ズボン反対!",
+        "d: それは犬か、それとも殺し屋か?",
+        "無料のパグとイモリ!",
+        "行け行けアリ軍団!",
+        "イモリ、足りてる?",
+        "やあ、愛しいみんな!", /* Charlie Drake */
+        "おいニンフ! このTシャツを盗め!",
+        "I <3 ダンジョン・オブ・ドゥーム",
+        "I <3 モード",
+        /* note: there is a similarly worded apron (alchemy smock) slogan */
+        "私はワルキューレ。走っていたら、置いていかれるな。",
+        "私はパックラットじゃない。コレクターだ。",
+        "ゴムの木に跳ね返された",         /* Monkey Island */
+        "プランダー島 ブリムストーン・ビーチクラブ", /* Monkey Island */
+        "これが読めるなら、私は長柄武器でお前に届く",
+        "混乱中!",
+        "王女といい仲になった",
+        "永遠に生きる。無理なら挑んで死ぬ。",
+        "ライケン公園",
+        "思考で遭難中 - 捜索隊求む",
+        "肉こそモルドールだ",
+        "ミネタウン優良企業協会",
+        "ミネタウン監視隊",
+        /* Discworld riff; unfortunately long */
+        ("パーム夫人の交渉可能な愛情の館--とても評判のよい"
+            "いかがわしい館"),
+        "みかじめ料取り立て人",
+        "真の男はクロムを愛す",
+        "誰かが私のモジョを盗んだ!",
+        "ヘルハウンド団",
+        "狼男団",
+        "彼らはストームジャイアントかもしれない",
+        "武器は人を殺さない。殺すのは私だ",
+        "ホワイトゾンビ",
+        "もう勘弁してくれ!",
+        "アンフル州立大学 - 闘うファイアアントの本拠地!",
+        "ハグ無料",
+        "連続昇天者",
+        "真の男はワルキューレだ",
+        "若者洞窟掘削協会",
+        "占拠せよフォート・ルーディオス",
+        "このTシャツは高くて買えなかったので盗んだ!",
+        "マインドフレイヤーなんて大嫌いだ",
+        "私はズボンをはいていない",
+        "生者どもに反対!",
+        "プリン栽培家",
+        "菜食主義者",
+        "やあ、私は戦争そのものだ!",
+        "暗闇をのろうより、ろうそくを一本ともせ",
+        "ろうそくをともすより、暗闇をのろう方が楽だ",
+        /* expanded "rock--paper--scissors" featured in TV show "Big Bang
+           Theory" although they didn't create it (and an actual T-shirt
+           with pentagonal diagram showing which choices defeat which) */
+        "グー--パー--チョキ--トカゲ--スポック!",
+        /* "All men must die -- all men must serve" challenge and response
+           from book series _A_Song_of_Ice_and_Fire_ by George R.R. Martin,
+           TV show "Game of Thrones" (probably an actual T-shirt too...) */
+        "/ヴァラー・モルグリス/ -- /ヴァラー・ドヘアリス/",
+    };
+
+    Strcpy(buf, shirt_msgs_ja[tshirt->o_id % SIZE(shirt_msgs_ja)]);
+    return erode_obj_text(tshirt, buf);
+}
+
+char *
 hawaiian_motif(struct obj *shirt, char *buf)
 {
     static const char *const hawaiian_motifs[] = {
@@ -217,6 +307,37 @@ hawaiian_motif(struct obj *shirt, char *buf)
     unsigned motif = shirt->o_id ^ (unsigned) ubirthday;
 
     Strcpy(buf, hawaiian_motifs[motif % SIZE(hawaiian_motifs)]);
+    return buf;
+}
+
+char *
+jp_hawaiian_motif_for_display(struct obj *shirt, char *buf)
+{
+    static const char *const hawaiian_motifs_ja[] = {
+        /* birds */
+        "フラミンゴ",
+        "オウム",
+        "オオハシ",
+        "極楽鳥",
+        /* sea creatures */
+        "ウミガメ",
+        "熱帯魚",
+        "クラゲ",
+        "巨大ウナギ",
+        "水のニンフ",
+        /* plants */
+        "プルメリア",
+        "ラン",
+        "ハイビスカス",
+        "ヤシの木",
+        /* other */
+        "フラダンサー",
+        "ヨット",
+        "ウクレレ",
+    };
+    unsigned motif = shirt->o_id ^ (unsigned) ubirthday;
+
+    Strcpy(buf, hawaiian_motifs_ja[motif % SIZE(hawaiian_motifs_ja)]);
     return buf;
 }
 
@@ -251,6 +372,33 @@ hawaiian_design(struct obj *shirt, char *buf)
 }
 
 char *
+jp_hawaiian_design_for_display(struct obj *shirt, char *buf)
+{
+    static const char *const hawaiian_bgs_ja[] = {
+        /* solid colors */
+        "紫",
+        "黄",
+        "赤",
+        "青",
+        "オレンジ",
+        "黒",
+        "緑",
+        /* adjectives */
+        "抽象",
+        "幾何学",
+        "模様",
+        "写実",
+    };
+    char motif_buf[BUFSZ];
+    unsigned bg = shirt->o_id ^ (unsigned) ~ubirthday;
+
+    jp_hawaiian_motif_for_display(shirt, motif_buf);
+    Sprintf(buf, "%s地に%s柄", hawaiian_bgs_ja[bg % SIZE(hawaiian_bgs_ja)],
+            motif_buf);
+    return buf;
+}
+
+char *
 apron_text(struct obj *apron, char *buf)
 {
     static const char *const apron_msgs[] = {
@@ -280,6 +428,36 @@ apron_text(struct obj *apron, char *buf)
     return erode_obj_text(apron, buf);
 }
 
+char *
+jp_apron_text_for_display(struct obj *apron, char *buf)
+{
+    static const char *const apron_msgs_ja[] = {
+        "料理人にキス",
+        "私は今、サイエンス してる!",
+        "料理長をなめるな",
+        "私に毒を盛らせないで",
+        "ゲヘナのキッチン",
+        "ネズミ: もうひとつの白い肉",
+        "暑さに耐えられないなら、ゲヘナから出ていけ!",
+        "動物を食べるべきでないなら、なぜ肉でできているの?",
+        "料理が気に入らないなら、刺すわよ",
+        /* In the movie "The Sum of All Fears", a Russian worker in a weapons
+           facility wears a T-shirt that a translator says reads, "I am a
+           bomb technician, if you see me running ... try to catch up."
+           In nethack, the quote is far more suitable to an alchemy smock
+           (particularly since so many of these others are about cooking)
+           than a T-shirt and is paraphrased to simplify/shorten it.
+           [later... turns out that this is already a T-shirt message:
+            "I am a Valkyrie.  If you see me running, try to keep up."
+           so this one has been revised a little:  added alchemist prefix,
+           changed "keep up" to original source's "catch up"] */
+        "私は錬金術師。私が走っていたら、追いついてみて...",
+    };
+
+    Strcpy(buf, apron_msgs_ja[apron->o_id % SIZE(apron_msgs_ja)]);
+    return erode_obj_text(apron, buf);
+}
+
 static const char *const candy_wrappers[] = {
     "",                         /* (none -- should never happen) */
     "Apollo",                   /* Lost */
@@ -291,12 +469,29 @@ static const char *const candy_wrappers[] = {
     "Wonka Bar",                /* Charlie and the Chocolate Factory */
 };
 
+static const char *const candy_wrappers_ja[] = {
+    "", /* (none -- should never happen) */
+    "アポロ",
+    "ムーン・クランチー",
+    "スナッキーケーキ", "チョコレート・ナギー", "スモール・バー",
+    "クリスピー・ヤムヤム", "ニラ・クランチー", "ベリー・バー",
+    "チョコ・ヌマー", "オムノム",
+    "フルーティー・オーティー",
+    "ウォンカ・バー",
+};
+
 /* return the text of a candy bar's wrapper */
 const char *
 candy_wrapper_text(struct obj *obj)
 {
     /* modulo operation is just bullet proofing; 'spe' is already in range */
     return candy_wrappers[obj->spe % SIZE(candy_wrappers)];
+}
+
+const char *
+jp_candy_wrapper_text_for_display(struct obj *obj)
+{
+    return candy_wrappers_ja[obj->spe % SIZE(candy_wrappers_ja)];
 }
 
 /* assign a wrapper to a candy bar stack */
@@ -392,7 +587,7 @@ doread(void)
         if (otyp == HAWAIIAN_SHIRT) {
             pline(flags.verbose ? "その柄には%sが描かれている."
                                 : "%sが描かれている.",
-                  hawaiian_design(scroll, buf));
+                  jp_hawaiian_design_for_display(scroll, buf));
             return ECMD_TIME;
         }
         if (!u.uconduct.literate++)
@@ -401,8 +596,8 @@ doread(void)
                            : "an apron");
 
         /* populate 'buf[]' */
-        mesg = (otyp == T_SHIRT) ? tshirt_text(scroll, buf)
-                                 : apron_text(scroll, buf);
+        mesg = (otyp == T_SHIRT) ? jp_tshirt_text_for_display(scroll, buf)
+                     : jp_apron_text_for_display(scroll, buf);
         endpunct = "";
         if (flags.verbose) {
             int ln = (int) strlen(mesg);
@@ -410,7 +605,7 @@ doread(void)
             /* we will be displaying a sentence; need ending punctuation */
             if (ln > 0 && !strchr(".!?", mesg[ln - 1]))
                 endpunct = ".";
-            pline("次のように描書すれている:");
+            pline("次のように書かれている:");
         }
         pline("\"%s\"%s", mesg, endpunct);
         return ECMD_TIME;
@@ -542,7 +737,7 @@ doread(void)
 
         return ECMD_TIME;
     } else if (otyp == CANDY_BAR) {
-        const char *wrapper = candy_wrapper_text(scroll);
+        const char *wrapper = jp_candy_wrapper_text_for_display(scroll);
 
         if (Blind) {
             You_cant(find_any_braille);
