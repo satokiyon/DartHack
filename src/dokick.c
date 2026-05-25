@@ -1138,7 +1138,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
             if (!rn2(6)
                 && !(svm.mvitals[PM_KILLER_BEE].mvflags & G_GONE)
                 && !(gm.maploc->looted & TREE_SWARM))
-                You_hear("a low buzzing."); /* a warning */
+                You_hear("低いうなり音が聞こえる."); /* a warning */
             kick_ouch(x, y, "");
             return ECMD_TIME;
         }

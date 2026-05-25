@@ -3559,7 +3559,7 @@ choose_tip_container_menu(void)
            containers that it's already being used */
         i = (i <= 'i' - 'a' && !flags.lootabc) ? 'i' : 0;
         add_menu(win, &nul_glyphinfo, &any, i, 0, ATR_NONE,
-                 clr, "持ち物の容器を選ぶ",
+                 clr, "持ち物から容器を選ぶ",
                  MENU_ITEMFLAGS_SELECTED);
     }
     end_menu(win, "どの容器をひっくり返しますか?");
@@ -3644,11 +3644,14 @@ dotip(void)
                      * is carried out.
                      */
                     (void) tipcontainer_gettarget(cobj, &dum, &target_count);
-                    Sprintf(prompt_part2, " here, tip it%s%s?",
-                            (target_count == 0) ? " onto the " : "",
-                            (target_count == 0) ? surface(cobj->ox, cobj->oy)
-                                                : "");
-                    c = ynq(safe_qbuf(qbuf, "There is ", prompt_part2,
+                        if (target_count == 0)
+                        Sprintf(prompt_part2,
+                            "がある。ひっくり返して%sに中身をあけますか?",
+                            surface(cobj->ox, cobj->oy));
+                        else
+                        Sprintf(prompt_part2,
+                            "がある。ひっくり返して中身をあけますか?");
+                        c = ynq(safe_qbuf(qbuf, "ここに", prompt_part2,
                                       cobj,
                                       doname, ansimpleoname, "容器"));
                     if (c == 'q')
@@ -3963,7 +3966,7 @@ tipcontainer_gettarget(
             any = cg.zeroany;
             any.a_obj = &dummyobj;
             /* tip to floor does not require free hands */
-            Sprintf(on_the_surface, "on the %s", surface(u.ux, u.uy));
+            Sprintf(on_the_surface, "足元の%sにあける", surface(u.ux, u.uy));
             add_menu(win, &nul_glyphinfo, &any, '-', 0, ATR_NONE, clr,
                      on_the_surface, MENU_ITEMFLAGS_SELECTED);
             add_menu_str(win, "");
@@ -4000,7 +4003,7 @@ tipcontainer_gettarget(
         }
     }
     if (!skip_targetmenu) {
-        Sprintf(buf, "Where to tip the contents of %s", doname(box));
+        Sprintf(buf, "%sの中身をどこへあけますか?", doname(box));
         end_menu(win, buf);
         n = select_menu(win, PICK_ONE, &pick_list);
         destroy_nhwindow(win);
