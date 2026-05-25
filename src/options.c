@@ -312,28 +312,28 @@ typedef struct {
 } menu_cmd_t;
 
 static const menu_cmd_t default_menu_cmd_info[] = {
-    { "menu_next_page",     MENU_NEXT_PAGE,     "Go to next page" },
-    { "menu_previous_page", MENU_PREVIOUS_PAGE, "Go to previous page" },
-    { "menu_first_page",    MENU_FIRST_PAGE,    "Go to first page" },
-    { "menu_last_page",     MENU_LAST_PAGE,     "Go to last page" },
+    { "menu_next_page",     MENU_NEXT_PAGE,     "次ページへ移動" },
+    { "menu_previous_page", MENU_PREVIOUS_PAGE, "前ページへ移動" },
+    { "menu_first_page",    MENU_FIRST_PAGE,    "最初のページへ移動" },
+    { "menu_last_page",     MENU_LAST_PAGE,     "最後のページへ移動" },
     { "menu_select_all",    MENU_SELECT_ALL,
-                            "Select all items in entire menu" },
+                            "メニュー全体を選択" },
     { "menu_invert_all",    MENU_INVERT_ALL,
-                            "Invert selection for all items" },
+                            "メニュー全体を反転選択" },
     { "menu_deselect_all",  MENU_UNSELECT_ALL,
-                            "Unselect all items in entire menu" },
+                            "メニュー全体の選択解除" },
     { "menu_select_page",   MENU_SELECT_PAGE,
-                            "Select all items on current page" },
+                            "現在ページを選択" },
     { "menu_invert_page",   MENU_INVERT_PAGE,
-                            "Invert current page's selections" },
+                            "現在ページを反転選択" },
     { "menu_deselect_page", MENU_UNSELECT_PAGE,
-                            "Unselect all items on current page" },
+                            "現在ページの選択解除" },
     { "menu_search",        MENU_SEARCH,
-                            "Search and invert matching items" },
+                            "検索一致項目を反転選択" },
     { "menu_shift_right",   MENU_SHIFT_RIGHT,
-                            "Pan current page to right (perm_invent only)" },
+                            "現在ページを右へ移動 (perm_inventのみ)" },
     { "menu_shift_left",    MENU_SHIFT_LEFT,
-                            "Pan current page to left (perm_invent only)" },
+                            "現在ページを左へ移動 (perm_inventのみ)" },
     { (char *) 0, '\0', (char *) 0 }
 };
 
@@ -9075,11 +9075,11 @@ show_menu_controls(winid win, boolean dolist)
         const char *key, *desc;
     };
     static const struct xtra_cntrls hardcoded[] = {
-        { "Return", "Accept current choice(s) and dismiss menu" },
-        { "Enter",  "Same as Return" },
-        { "Space",  "If not on last page, advance one page;" },
-        { "     ",  "when on last page, treat like Return" },
-        { "Escape", "Cancel menu without making any choice(s)" },
+        { "Return", "現在の選択を確定してメニューを閉じる" },
+        { "Enter",  "Returnと同じ" },
+        { "Space",  "最終ページ以外では1ページ進む;" },
+        { "     ",  "最終ページではReturnと同じ" },
+        { "Escape", "選択せずにメニューを閉じる" },
         { (char *) 0, (char *) 0}
     };
     static const char mc_fmt[] = "%8s     %-6s %s",
@@ -9094,7 +9094,7 @@ show_menu_controls(winid win, boolean dolist)
      * with a fixed-width font or will look dreadful.
      */
 
-    putstr(win, 0, "Menu control keys:");
+    putstr(win, 0, "メニュー操作キー:");
     if (dolist) { /* key bindings help: '?i' */
         int i;
         char ch;
@@ -9115,53 +9115,53 @@ show_menu_controls(winid win, boolean dolist)
         arg = ""; /* no extra prefix for 'dolist' */
     } else { /* menu controls help: '?k' */
         putstr(win, 0, "");
-        Sprintf(buf, mc_altfmt, "", "Whole", "Current");
+        Sprintf(buf, mc_altfmt, "", "全体", "現在");
         putstr(win, 0, buf);
-        Sprintf(buf, mc_altfmt, "", " Menu", " Page");
+        Sprintf(buf, mc_altfmt, "", "メニュー", "ページ");
         putstr(win, 0, buf);
-        Sprintf(buf, mc_fmt, "Select",
+        Sprintf(buf, mc_fmt, "選択",
                 visctrl(get_menu_cmd_key(MENU_SELECT_ALL)),
                 visctrl(get_menu_cmd_key(MENU_SELECT_PAGE)));
         putstr(win, 0, buf);
-        Sprintf(buf, mc_fmt, "Invert",
+        Sprintf(buf, mc_fmt, "反転",
                 visctrl(get_menu_cmd_key(MENU_INVERT_ALL)),
                 visctrl(get_menu_cmd_key(MENU_INVERT_PAGE)));
         putstr(win, 0, buf);
-        Sprintf(buf, mc_fmt, "Deselect",
+        Sprintf(buf, mc_fmt, "解除",
                 visctrl(get_menu_cmd_key(MENU_UNSELECT_ALL)),
                 visctrl(get_menu_cmd_key(MENU_UNSELECT_PAGE)));
         putstr(win, 0, buf);
         putstr(win, 0, "");
-        Sprintf(buf, mc_fmt, "Go to",
+        Sprintf(buf, mc_fmt, "移動先",
                 visctrl(get_menu_cmd_key(MENU_NEXT_PAGE)),
-                "Next page");
+            "次ページ");
         putstr(win, 0, buf);
         Sprintf(buf, mc_fmt, "",
                 visctrl(get_menu_cmd_key(MENU_PREVIOUS_PAGE)),
-                "Previous page");
+            "前ページ");
         putstr(win, 0, buf);
         Sprintf(buf, mc_fmt, "",
                 visctrl(get_menu_cmd_key(MENU_FIRST_PAGE)),
-                "First page");
+            "最初のページ");
         putstr(win, 0, buf);
         Sprintf(buf, mc_fmt, "",
                 visctrl(get_menu_cmd_key(MENU_LAST_PAGE)),
-                "Last page");
+            "最後のページ");
         putstr(win, 0, buf);
         if (has_menu_shift) {
-            Sprintf(buf, mc_fmt, "Pan view",
+            Sprintf(buf, mc_fmt, "画面移動",
                     visctrl(get_menu_cmd_key(MENU_SHIFT_RIGHT)),
-                    "Right (perm_invent only)");
+                "右 (perm_inventのみ)");
             putstr(win, 0, buf);
             Sprintf(buf, mc_fmt, "",
                     visctrl(get_menu_cmd_key(MENU_SHIFT_LEFT)),
-                    "Left");
+                "左");
             putstr(win, 0, buf);
         }
         putstr(win, 0, "");
-        Sprintf(buf, mc_fmt, "Search",
+        Sprintf(buf, mc_fmt, "検索",
                 visctrl(get_menu_cmd_key(MENU_SEARCH)),
-                "Exter a target string and invert all matching entries");
+            "対象文字列を入力して一致項目を反転");
         putstr(win, 0, buf);
         /* separator before hardcoded */
         putstr(win, 0, "");
@@ -9430,33 +9430,33 @@ sym_val(const char *strval) /* up to 4*BUFSZ-1 long; only first few
 /* data for option_help() */
 static const char *opt_intro[] = {
     "",
-    "                 NetHack Options Help:", "",
+    "                 NetHack オプションヘルプ:", "",
 #define CONFIG_SLOT 3 /* fill in next value at run-time */
     (char *) 0,
 #if !defined(MICRO) && !defined(MACOS9)
-    "or use `NETHACKOPTIONS=\"<options>\"' in your environment",
+    "または環境変数で `NETHACKOPTIONS=\"<options>\"' を指定する",
 #endif
-    "(<options> is a list of options separated by commas)",
+    "(<options> はカンマ区切りのオプション一覧)",
 #ifdef VMS
     "-- for example, $ DEFINE NETHACKOPTIONS \"noautopickup,fruit:kumquat\"",
 #endif
-    "or press \"O\" while playing and use the menu.",
+    "またはゲーム中に \"O\" を押してメニューから設定する.",
     "",
-    ("Boolean options (which can be negated by prefixing them"
-     " with '!' or \"no\"):"),
+    ("真偽値オプション（先頭に '!' または \"no\" を付けると"
+     "否定できる）:"),
     (char *) 0
 };
 
 static const char *const opt_epilog[] = {
     "",
-    "Some of the options can only be set before the game is started;",
-    "those items will not be selectable in the 'O' command's menu.",
-    "Some options are stored in a game's save file, and will keep saved",
-    "values when restoring that game even if you have updated your config-",
-    "uration file to change them.  Such changes will matter for new games.",
-    "The \"other settings\" can be set with 'O', but when set within the",
-    "configuration file they use their own directives rather than OPTIONS.",
-    "See NetHack's \"Guidebook\" for details.",
+    "一部のオプションは、ゲーム開始前にしか設定できない.",
+    "それらは 'O' コマンドのメニューで選択できない.",
+    "一部のオプションはセーブファイルに保存されるため、",
+    "設定ファイルを変更しても、復元したゲームでは保存時の値が使われる.",
+    "設定変更は新しく開始するゲームに反映される.",
+    "\"その他の設定\" は 'O' で設定できるが、",
+    "設定ファイルでは OPTIONS ではなく専用ディレクティブを使う.",
+    "詳細は NetHack の \"Guidebook\" を参照すること.",
     (char *) 0
 };
 
@@ -9470,7 +9470,7 @@ option_help(void)
 
     datawin = create_nhwindow(NHW_TEXT);
     Snprintf(buf, sizeof buf,
-             "Set options as OPTIONS=<options> in %s", get_configfile());
+             "%s では OPTIONS=<options> として設定する", get_configfile());
     opt_intro[CONFIG_SLOT] = (const char *) buf;
     for (i = 0; opt_intro[i]; i++)
         putstr(datawin, 0, opt_intro[i]);
@@ -9492,7 +9492,7 @@ option_help(void)
     next_opt(datawin, "");
 
     /* Compound options */
-    putstr(datawin, 0, "Compound options:");
+    putstr(datawin, 0, "複合オプション:");
     for (i = 0; allopt[i].name; i++) {
         if (allopt[i].opttyp != CompOpt
             || (allopt[i].setwhere == set_wizonly && !wizard))
@@ -9512,7 +9512,7 @@ option_help(void)
     putstr(datawin, 0, "");
 
     /* Compound options */
-    putstr(datawin, 0, "Other settings:");
+    putstr(datawin, 0, "その他の設定:");
     for (i = 0; allopt[i].name; i++) {
         if (allopt[i].opttyp != OthrOpt)
             continue;
