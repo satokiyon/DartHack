@@ -427,8 +427,8 @@ get_rnd_line(
                          * if 0, end-of-file will be used */
     unsigned padlength) /* expected line length; 0 if no expectations */
 {
-    char *newl, *xbufp, xbuf[BUFSZ];
-    long filechunksize, chunkoffset;
+    char *newl, *xbufp, xbuf[BUFSZ], candbuf[BUFSZ];
+    long filechunksize, chunkoffset, seekpos, line_start;
     int trylimit;
 
     *buf = '\0';
@@ -463,11 +463,36 @@ get_rnd_line(
      */
     for (trylimit = 10; trylimit > 0; --trylimit) {
         chunkoffset = (long) (*rng)((int) filechunksize);
-        (void) dlb_fseek(fh, startpos + chunkoffset, SEEK_SET);
+        seekpos = startpos + chunkoffset;
+        line_start = seekpos;
+
+        /* find the current line start so decryption can use the right
+           xcrypt bitmask phase even when seek lands mid-line */
+        if (line_start > startpos) {
+            int ch = 0;
+
+            while (line_start > startpos) {
+                (void) dlb_fseek(fh, line_start - 1L, SEEK_SET);
+                ch = dlb_fgetc(fh);
+                if (ch == '\n')
+                    break;
+                --line_start;
+            }
+            if (ch != '\n')
+                line_start = startpos;
+        }
+
+        (void) dlb_fseek(fh, seekpos, SEEK_SET);
         (void) dlb_fgets(buf, bufsiz, fh);
         /* if padlength is 0, accept any position; when non-zero,
-           padlength does not count the newline but strlen(buf) does */
-        if (!padlength || (unsigned) strlen(buf) <= padlength + 1)
+           check byte length against the correctly decrypted text for this
+           random landing position */
+        if (!padlength)
+            break;
+
+        (void) xcrypt_from_offset(buf, candbuf, seekpos - line_start);
+        if ((unsigned) strlen(candbuf)
+            <= padlength + 1)
             break;
     }
     /* use next line; for rumors, caller takes care of whether startpos

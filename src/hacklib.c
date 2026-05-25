@@ -395,15 +395,13 @@ ing_suffix(const char *s)
     return buf;
 }
 
-/* trivial text encryption routine (see makedefs) */
-char *
-xcrypt(const char *str, char *buf)
+staticfn char *
+xcrypt_with_bitmask(const char *str, char *buf, int bitmask)
 {
     const char *p;
     char *q;
-    int bitmask;
 
-    for (bitmask = 1, p = str, q = buf; *p; q++) {
+    for (p = str, q = buf; *p; q++) {
         *q = *p++;
         if (*q & (32 | 64))
             *q ^= bitmask;
@@ -412,6 +410,43 @@ xcrypt(const char *str, char *buf)
     }
     *q = '\0';
     return buf;
+}
+
+/* trivial text encryption routine (see makedefs) */
+char *
+xcrypt(const char *str, char *buf)
+{
+    return xcrypt_with_bitmask(str, buf, 1);
+}
+
+/* xcrypt variant that starts with phase corresponding to byte offset */
+char *
+xcrypt_from_offset(const char *str, char *buf, long offset)
+{
+    int bitmask;
+
+    if (offset < 0L)
+        offset = 0L;
+    switch ((int) (offset % 5L)) {
+    case 0:
+    default:
+        bitmask = 1;
+        break;
+    case 1:
+        bitmask = 2;
+        break;
+    case 2:
+        bitmask = 4;
+        break;
+    case 3:
+        bitmask = 8;
+        break;
+    case 4:
+        bitmask = 16;
+        break;
+    }
+
+    return xcrypt_with_bitmask(str, buf, bitmask);
 }
 
 /* is a string entirely whitespace? */
