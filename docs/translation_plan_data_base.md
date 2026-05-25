@@ -2878,3 +2878,67 @@ Oブロック（`obsidian*` から `owlbear` までの全15箇所・22キー）�
     ```
 
 
+
+---
+
+## 30. Phase 19「s」「*s」で始まるキーの翻訳計画
+
+### 全エントリ一覧と状態
+
+| # | キー | 行番号 | 行数 | 引用元 | 状態 |
+| :--- | :--- | :--- | :---: | :--- | :--- |
+| 1 | `*saber` / `*sabre` | 4498-4513 | 16 | テニスン『軽騎兵旅団の突撃』 | 未着手 |
+| 2 | `saddle` | 4514-4523 | 10 | エマーソン『頌歌』 | 未着手 |
+| 3 | `sake` | 4524-4525 | 2 | ゲーム内記述 | 未着手 |
+| 4 | `salamander` | 4526-4533 | 8 | Cherie Winner著 | 未着手 |
+| 5 | `samurai` / `* samurai` | 4534-4546 | 13 | 司馬遼太郎『酔って候』 | 未着手 |
+| 6 | `sandestin` | 4547-4578 | 32 | Jack Vance著 | 未着手 |
+| 7 | `sasquatch` | 4579-4597 | 19 | Daniel Cohen著 | 未着手 |
+| 8 | `scalpel` | 4598-4603 | 6 | ウィキペディア | 未着手 |
+| 9 | `*sceptre of might` | 4604-4610 | 7 | ゲーム内記述 | 未着手 |
+| 10 | `scimitar` | 4611-4616 | 6 | デュマ著 | 未着手 |
+| 11 | `scorpio*` | 4617-4622 | 6 | オランダ語辞典 | 未着手 |
+| 12 | `scorpius` | 4623-4629 | 7 | Chet Raymo著 | 未着手 |
+| 13 | `scroll of punishment` / `punish*` | 4630-4636 | 7 | ヘンリー『無敵』 | 未着手 |
+| 14 | `*scroll` / `scroll *` | 4637-4656 | 20 | キーツ『エンディミオン』 | 未着手 |
+| 15 | `set` / `seth` | 4657-4671 | 15 | Encyclopedia Mythica | 未着手 |
+| 16 | `shad*` | 4672-4693 | 22 | Sanderson著 | 未着手 |
+| 17 | `shaman karnov` | 4694-4697 | 4 | ゲーム内記述 | 未着手 |
+| 18 | `shan*lai*ching` | 4698-4703 | 6 | Spectrum Atlas van de Mythologie | 未着手 |
+| 19 | `shark` | 4704-4719 | 16 | Michael Capuzzo著 | 未着手 |
+| 20 | `*shield` | 4722-4737 | 16 | ヘシオドス讃歌 | 未着手 |
+| 21 | `shito` | 4738-4739 | 2 | ゲーム内記述 | 未着手 |
+| 22 | `shopkeeper` | 4740-4764 | 25 | Terry Pratchett著 | 未着手 |
+| 23 | `shrieker` | 4765-4772 | 8 | Thomas A. Miller著 | 未着手 |
+| 24 | `throwing star` / `shuriken` | 4773-4781 | 9 | Steven Brust著 | 未着手 |
+| 25 | `skeleton` | 4782-4786 | 5 | ゲーム内記述 | 未着手 |
+| 26 | `slasher` | 4787-4804 | 18 | Robert E Howard著 | 未着手 |
+| 27 | `*sleep` | 4805-4810 | 6 | Sir Thomas Browne著 | 未着手 |
+| 28 | `slime mold` | 4811-4819 | 9 | ブリタニカ百科事典 | 未着手 |
+| 29 | `sling` | 4820-4831 | 12 | サムエル記上 | 未着手 |
+| 30 | `*snake` / `serpent` 等 | 4832-4859 | 28 | 創世記3章 | 未着手 |
+| 31 | `snickersnee` | 4860-4866 | 7 | Gilbert著 | 未着手 |
+| 32 | `sokoban` | 4867-4879 | 13 | ウィキペディア | 未着手 |
+| 33 | `*soldier` / `sergeant` 等 | 4880-4891 | 12 | ゲーム内記述 | 未着手 |
+| 34 | `*spear` / `javelin` | 4892-4911 | 20 | マーク・トウェイン | ✅ 完了 |
+| 35 | `*spellbook*` | 4912-4928 | 17 | Lloyd Alexander著 | 未着手 |
+| 36 | `*spider` | 4929-4940 | 12 | E.B. White著 | 未着手 |
+| 37 | `*spore` / `*sphere` | 4941-4946 | 6 | Frank Herbert著 | 未着手 |
+| 38 | `squeaky board` | 4947-4955 | 9 | Terry Pratchett著 | 未着手 |
+| 39 | `*staff` | 4957-4975 | 19 | Howard Pyle著 | 未着手 |
+| 40 | `*staff of aesculapius` | 4976-4981 | 6 | ゲーム内記述 | 未着手 |
+| 41 | `stair*` / `branch stair*` | 4982-5003 | 22 | Norton Juster / Ghostbusters | 未着手 |
+| 42 | `*stalker` | 5004-5029 | 26 | H.G. Wells著 | 未着手 |
+| 43 | `statue*` | 5031-5048 | 18 | C.S. Lewis著 | 未着手 |
+| 44 | `stethoscope` 等 | 5052-5064 | 13 | ゲーム内記述 | 未着手 |
+| 45 | `sting` | 5065-5078 | 14 | トールキン著 | 未着手 |
+| 46 | `stormbringer` | 5079-5096 | 18 | Michael Moorcock著 | 未着手 |
+| 47 | `*strange object` / `strange` / `glorkum*` | 5097-5104 | 8 | ドストエフスキー著 | ✅ 完了 |
+| 48 | `straw golem` | 5105-5116 | 12 | L. Frank Baum著 | 未着手 |
+| 49 | `sunsword` | 5117-5121 | 5 | Cordell and Wyatt著 | 未着手 |
+| 50 | `susano*o` | 5122-5128 | 7 | Encyclopedia of Gods | 未着手 |
+
+合計：50エントリ（既翻訳2、残48）
+
+翻訳設計の詳細は `docs/s_block_translation_plan.md` を参照。
+
