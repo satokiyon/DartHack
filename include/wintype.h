@@ -51,13 +51,14 @@ enum any_types {
     ANY_UINT,        /* unsigned int */
     ANY_LONG,        /* long */
     ANY_ULONG,       /* unsigned long */
-    ANY_IPTR,        /* int へのポインタ */
-    ANY_UPTR,        /* unsigned int へのポインタ */
-    ANY_LPTR,        /* long へのポインタ */
-    ANY_ULPTR,       /* unsigned long へのポインタ */
-    ANY_STR,         /* ヌル終端 char 文字列へのポインタ */
-    ANY_NFUNC,       /* 引数なし int 戻り値関数へのポインタ */
-    ANY_MASK32,      /* 32ビットマスク（unsigned long に格納） */
+    ANY_IPTR,        /* pointer to int */
+    ANY_UPTR,        /* pointer to unsigned int */
+    ANY_LPTR,        /* pointer to long */
+    ANY_ULPTR,       /* pointer to unsigned long */
+    ANY_STR,         /* pointer to null-terminated char string */
+    ANY_NFUNC,       /* pointer to function taking no args, returning int */
+    ANY_MASK32,      /* 32-bit mask (stored as unsigned long) */
+    ANY_INT16,      /* xint16 / coordxy (16-bit signed) */
 
     ANY_INVALID      /* これを最後に置く */
 };
