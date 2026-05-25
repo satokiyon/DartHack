@@ -1,242 +1,249 @@
-        NetHack 5.0 ���� Microsoft Windows �ŗL�w���v
+        NetHack 5.0 向け Microsoft Windows 固有ヘルプ
         Copyright (c) NetHack PC Development Team 1993-2025.
         NetHack may be freely distributed.  See license for details.
-                   (�ŏI�X�V: August 19, 2025)
+                   (最終改訂: 2025年8月19日)
 
-���̃t�@�C���́AWindows �� NetHack �ŗL�̎d�l��������܂��B
+このファイルでは、Windows 版 NetHack に固有の仕様を説明します。
 
-���߂ėV�ԕ��́ANetHack �̊�{��񂪏����ꂽ GuideBook.txt ��
-�ǂނ��Ƃ��������߂��܂��BNetHack ���s�t�@�C���Ɠ����f�B���N�g���ɂ���܂��B
+初めて遊ぶ方は、NetHack の基本情報が書かれている GuideBook.txt を
+必ず読んでください。GuideBook.txt は NetHack 実行ファイルと同じ
+ディレクトリにあります。
 
-Windows �� NetHack �ł́A�ǉ�/�g���R�}���h��
-Windows �Ő�p�̐ݒ荀�ڂ𗘗p�ł��܂��B
+Windows 版 NetHack では、追加/拡張コマンドと、
+いくつかの設定ファイル用オプションを利用できます。
 
-�L���� NetHack �ݒ�t�@�C���́A���[�U�[�v���t�@�C���z����
-nethack �T�u�t�H���_�ɕۑ�����܂��B�]���� CMD �v�����v�g�ł�
-���̂悤�ɎQ�Ƃł��܂�:
+現在有効な NetHack 設定ファイルは、ユーザープロファイル配下の
+nethack サブフォルダーに保存されます。レガシー CMD では次のように
+参照できます:
     %USERPROFILE%\nethack\.nethackrc
 
-PowerShell �ł́A���̂悤�ɎQ�Ƃł��܂�:
+PowerShell では次のように参照できます:
     $env:USERPROFILE\nethack\.nethackrc
 
-�ꕔ�̃I�v�V�����́u�O���t�B�J�� �C���^�[�t�F�[�X�v��p�ł��B
-�����͐�p�Z�N�V�����Ő������܂��B
+一部のオプションは「グラフィカルインターフェース」でのみ有効です。
+これらは専用セクションで説明します。
 
-�ڎ�
-1. ALT �L�[�g�ݍ��킹
-2. �O���t�B�J�� �C���^�[�t�F�[�X - �l��ݒ�ł���I�v�V����
-3. �O���t�B�J�� �C���^�[�t�F�[�X - �ǉ�/�g���R�}���h
-4. �O���t�B�J�� �C���^�[�t�F�[�X - ���j���[
-5. �e���L�[�inumber_pad ���[�h�p�j
+目次
+1. ALT キー組み合わせ
+2. グラフィカルインターフェース - 値を設定できるオプション
+3. グラフィカルインターフェース - 追加/拡張コマンド
+4. グラフィカルポート - メニュー
+5. テンキー（number_pad モード用）
 
 
-1. ALT �L�[�g�ݍ��킹
+1. ALT キー組み合わせ
 ----------------------------------------------
-��O���t�B�J���itty�j�ł͏�ɁuNetHack mode�v�œ��삵�܂����A
-�uNetHack for Windows - Graphical Interface�v�ł�
-���[�h��؂�ւ����܂��B�� NetHack mode �ł� ALT �L�[�g�ݍ��킹��
-NetHack �ł͂Ȃ� Windows ���ɑ����܂��B
+非グラフィカル（tty）インターフェースは常に「NetHack mode」で動作します。
+一方「NetHack for Windows - Graphical Interface」ではモードを切り替えられます。
+NetHack mode ではない場合、ALT キー組み合わせは NetHack ではなく
+Windows 側へ送られます。
 
-NetHack mode �ł� ALT �L�[�ƕʃL�[�̑g�ݍ��킹�ŁA
-# �R�}���h���͂̑�ւƂ��Ċg���R�}���h�����s�ł��܂��B
-�g�p�\�ȃR�}���h�͎��̒ʂ�ł�:
+NetHack mode でプレイ中は、ALT キーと別キーの組み合わせで、
+# キーシーケンス入力の代わりに拡張コマンドを実行できます。
+利用可能なコマンドは次のとおりです。
 
-    Alt-2    #twoweapon      - �񓁗��̃g�O�� (number_pad ���[�h�̐ݒ莞�͗��p�s��)
-    Alt-a    #adjust         - �����i�̕����𒲐�
-    Alt-c    #chat           - �N���≽���ɘb��������
-    Alt-d    #dip            - �����������ɐZ��
-    Alt-e    #enhance        - ����̃X�L��������
-    Alt-f    #force          - ���������J����
-    Alt-i    #invoke         - �A�C�e���̔\�͂𔭓�
-    Alt-j    #jump           - ���W�ɃW�����v
-    Alt-l    #loot           - �n�ʂ̔��𗪒D
-    Alt-m    #monster        - �����X�^�[�̓���\�͂��g�p
-    Alt-n    #name           - �A�C�e����I�u�W�F�N�g�̎�ނɖ��O��t����
-    Alt-o    #offer          - �_�X�ɐ����т������
-    Alt-p    #pray           - �_�X�ɏ��������߂ċF��
-    Alt-q    #quit           - �Q�[�����I�� (�R�}���h #quit �Ɠ���)
-    Alt-r    #rub            - �����v��������
-    Alt-s    #sit            - ����
-    Alt-t    #turn           - �A���f�b�h���Ђ�����Ԃ�
-    Alt-u    #untrap         - ������㩂�����
-    Alt-v    #version        - ���� NetHack �̃r���h���I�v�V�����̕\��
-    Alt-w    #wipe           - ���@��
-    Alt-?    #?              - �g�����j���[�R�}���h�̃��X�g��\��
+    Alt-2    #twoweapon      - 二刀流戦闘を切り替え
+                               （number_pad モード有効時は使用不可）
+    Alt-a    #adjust         - 持ち物の文字割り当てを調整する。
+    Alt-c    #chat           - 誰か/何かに話しかける。
+    Alt-d    #dip            - アイテムを何かに浸す。
+    Alt-e    #enhance        - 武器スキルを向上する。
+    Alt-f    #force          - 鍵をこじ開ける。
+    Alt-i    #invoke         - アイテムの力を発動する。
+    Alt-j    #jump           - 指定地点へジャンプする。
+    Alt-l    #loot           - 床の箱をあさる。
+    Alt-m    #monster        - モンスターの特殊能力を使う。
+    Alt-n    #name           - アイテムまたはオブジェクト種別に名前を付ける。
+    Alt-o    #offer          - 神々へ生け贄を捧げる。
+    Alt-p    #pray           - 神々へ助けを祈る。
+    Alt-q    #quit           - ゲームを終了する。（#quit と同じ）
+    Alt-r    #rub            - ランプをこする。
+    Alt-s    #sit            - 座る。
+    Alt-t    #turn           - アンデッドを退散させる。
+    Alt-u    #untrap         - 罠を解除する。
+    Alt-v    #version        - この NetHack のコンパイル時オプションを表示。
+    Alt-w    #wipe           - 顔をぬぐう。
+    Alt-?    #?              - 拡張メニューコマンド一覧を表示
 
-2. �O���t�B�J�� �C���^�[�t�F�[�X - �l��ݒ�ł���I�v�V����
+2. 値を設定できるオプション（グラフィカルインターフェース専用）
 ----------------------------------------------------------------
 
-�uNetHack for Windows - Graphical Interface�v�ł́A�ȉ��̒ǉ��I�v�V������
-�F�����܂��B�����͔�O���t�B�J���itty�j�łł͖�������܂��B
-�����́A���܂��܂ȃE�B���h�E�̑������w�肷��I�v�V�����ł��B
-�J�X�^�}�C�Y�ł���E�B���h�E�ɂ́A���j���[�E�B���h�E�i�����i���X�g�Ȃǁj�A
-�e�L�X�g�E�B���h�E�i�u...�̖{�ɏ�����Ă���v��ʂȂǁj�A
-���b�Z�[�W�E�B���h�E�i�Q�[���̃C�x���g���\�������ꏊ�j�A
-�X�e�[�^�X�E�B���h�E�i�L�����N�^�[���⑮�����\�������ꏊ�j�A
-�}�b�v�E�B���h�E�i�}�b�v���`�悳���ꏊ�j�Ȃǂ�����܂��B
+「NetHack for Windows - Graphical Interface」では、
+次の追加オプションを認識します。これらは非グラフィカル（tty）版では
+何もせず無視されます。これらは各種ウィンドウの属性を指定するための
+オプションです。調整できるウィンドウには、メニューウィンドウ
+（持ち物一覧など）、テキストウィンドウ（「...の書にこう記されている」
+画面など）、メッセージウィンドウ（ゲーム内イベント表示）、
+ステータスウィンドウ（キャラクター名や能力値表示）、
+マップウィンドウ（地図描画）があります。
 
-�E�B���h�E�����I�v�V����:
+ウィンドウ配置オプション:
 
-    align_message  ���b�Z�[�W�E�B���h�E�̑����ʒu���w��B
-                   �u�㕔�v�܂��́u�����v�ɑ����邱�Ƃ��\�B
-                   �f�t�H���g: [TOP]
+    align_message  メッセージウィンドウを NetHack 画面のどちら側に
+                   配置するか指定する。
+                   "top" または "bottom" を指定可能。
+                   既定値: [TOP]
 
-    align_status   �X�e�[�^�X�E�B���h�E�̑����ʒu���w��B
-                   �u�㕔�v�܂��́u�����v�ɑ����邱�Ƃ��\�B
-                   �f�t�H���g: [BOTTOM]
+    align_status   ステータスウィンドウを NetHack 画面のどちら側に
+                   配置するか指定する。
+                   "top" または "bottom" を指定可能。
+                   既定値: [BOTTOM]
 
-�}�b�v�E�B���h�E�I�v�V����:
+マップウィンドウオプション:
 
-    map_mode       �g�p����}�b�v���[�h���w��B
-                   ���p�\�ȃ}�b�v���[�h�͎��̒ʂ�:
-                   tiles�i�}�b�v��̂��̂��J���\�^�C���ŕ\���j�A
+    map_mode       使用するマップモードを指定する。
+                   利用可能なモードは次のとおり。
+                   tiles（色付きタイルで表示）、
                    ascii4x6, ascii6x8, ascii8x8, ascii16x8, ascii7x12,
                    ascii8x12, ascii16x12, ascii12x16, ascii10x18
-                   �i���ꂼ��̃T�C�Y�̃t�H���g�Ń}�b�v��̂��̂�\���j�A
-                   �܂��� fit_to_screen�i���ׂĂ̂��̂�1��ʂɎ��߂�ASCII���[�h�j�B
-                   �f�t�H���g: [tiles]
+                   （対応フォントサイズで表示）、
+                   fit_to_screen（1画面に収める ascii モード）。
+                   既定値: [tiles]
 
-    scroll_margin  �X�N���[�����n�܂�}�b�v�Z���̐����w��B
-                   �f�t�H���g: [5]
+    scroll_margin  マップウィンドウ端から何セルでスクロールするかを
+                   指定する。
+                   既定値: [5]
 
-    tile_file      �^�C���p�̃r�b�g�}�b�v���܂ޑ�փt�@�C���B
-                   ���̃t�@�C���� .bmp �`���ŁA40 �̒����`�^�C�������ɕ��Ԃ悤��
-                   �\������Ă���K�v������܂��B�e�^�C���̐��m�ȓ��e��
-                   �����ł͐���������܂���B
+    tile_file      タイル表示用ビットマップを含む代替ファイル。
+                   このファイルは .bmp 形式で、横 40 枚の長方形タイルとして
+                   構成されている必要がある。
+                   .bmp 内各タイルの厳密な内容は本書の範囲外で、
+                   NetHack ビルド時のオブジェクト一覧と一致している必要がある。
 
-    tile_height    tile_file �Ƌ��Ɏg�p�����^�C���̍������w��B
-                   ���̃I�v�V������ defaults.nh �ݒ�t�@�C���ɂ̂ݎw��\�B
-                   �f�t�H���g: [16]
+    tile_height    tile_file と併用し、各タイルの高さ（ピクセル）を指定。
+                   このオプションは defaults.nh 設定ファイルでのみ指定可能。
+                   既定値: [16]
 
-    tile_width     tile_file �Ƌ��Ɏg�p�����^�C���̕����w��B
-                   ���̃I�v�V������ defaults.nh �ݒ�t�@�C���ɂ̂ݎw��\�B
-                   �f�t�H���g: [16]
+    tile_width     tile_file と併用し、各タイルの幅（ピクセル）を指定。
+                   このオプションは defaults.nh 設定ファイルでのみ指定可能。
+                   既定値: [16]
 
-���̑��̃E�B���h�E�I�v�V����:
+その他のウィンドウオプション:
 
-    windowcolors   ���܂��܂ȃE�B���h�E�̐F���w��
-                   ���̃I�v�V������ defaults.nh �ݒ�t�@�C���ɂ̂ݎw��\�ŁA
-                   ���̌`���������܂�:
+    windowcolors   各種ウィンドウの色を指定する。
+                   このオプションは defaults.nh 設定ファイルでのみ指定可能。
+                   書式:
                        window-type foreground/background
-                   ���ӎ���:
-                      - �O�i����єw�i�F�͕K�{�ł���A�������X���b�V���ŋ�؂�K�v������܂��B
-                      - "window-type" �� "message" �܂��� "status" �ł��B
-                        �i�Z�k�`�� "msg" �܂��� "sts"�j�B
-                      - "foreground" �� "background" �́A�F���i��: "blue"�j�܂���
-                        6 ����16�i�� RGB �J���[�l�i��: "#8F8F8F"�j�Ŏw��\�B
-                      - ���p�\�ȐF��:
+                   注意:
+                      - 前景色と背景色は両方必須で、スラッシュ区切りにする。
+                      - "window-type" は "message" または "status"
+                        （短縮形は "msg" または "sts"）。
+                      - "foreground" と "background" には、
+                        色名（例: "blue"）または 6 桁 16 進 RGB 値
+                        （例: "#8F8F8F"）を指定できる。
+                      - 使用可能な色名:
                         black, red, green, brown, blue, magenta,
-                        cyan, gray (�܂��� grey), orange, brightgreen,
+                        cyan, gray（または grey）, orange, brightgreen,
                         yellow, brightblue, brightmagenta, brightcyan,
                         white, trueblack, purple, silver, maroon, fuchsia,
-                        lime, olive, navy, teal, aqua�B�܂��A���̖��O���g����
-                        Windows �̃f�t�H���g�ݒ���Q�Ƃł��܂�: activeborder,
-                        activecaption, appworkspace, background, btnface, btnshadow, btntext,
-                        captiontext, graytext, highlight, highlighttext,
-                        inactiveborder, inactivecaption, menu, menutext,
-                        scrollbar, window, windowframe, windowtext.
+                        lime, olive, navy, teal, aqua。
+                        さらに Windows 既定設定参照用として次の名前も使える:
+                        activeborder, activecaption, appworkspace, background,
+                        btnface, btnshadow, btntext, captiontext, graytext,
+                        highlight, highlighttext, inactiveborder,
+                        inactivecaption, menu, menutext, scrollbar, window,
+                        windowframe, windowtext。
 
-                        ��:
+                        例:
                         OPTIONS=windowcolors:sts #00FF80/blue msg menutext/menu
 
-    font_menu      ���j���[�̃t�H���g�����w��
-    font_message   ���b�Z�[�W�̃t�H���g�����w��
-    font_status    �X�e�[�^�X�̃t�H���g�����w��
-    font_text      �e�L�X�g�̃t�H���g�����w��
+    font_menu      メニューフォント名を指定する。
+    font_message   メッセージフォント名を指定する。
+    font_status    ステータスフォント名を指定する。
+    font_text      テキストフォント名を指定する。
 
-    font_size_menu ���j���[�̃t�H���g�T�C�Y���w��
+    font_size_menu メニューフォントサイズを指定する。
 
     font_size_message
-                   ���b�Z�[�W�̃t�H���g�T�C�Y���w��
+                   メッセージフォントサイズを指定する。
 
     font_size_status
-                   �X�e�[�^�X�̃t�H���g�T�C�Y���w��
+                   ステータスフォントサイズを指定する。
 
-    font_size_text �e�L�X�g�̃t�H���g�T�C�Y���w��
+    font_size_text テキストフォントサイズを指定する。
 
-���̑��̃I�v�V����:
+その他オプション:
 
-    vary_msgcount  ���b�Z�[�W�E�B���h�E�ɕ\������s��
+    vary_msgcount  メッセージウィンドウに表示する行数。
 
 
-3. NetHack for Windows - Graphical Interface, �ǉ�/�g���R�}���h
+3. NetHack for Windows - Graphical Interface, 追加/拡張コマンド
 -------------------------------------------------------------------------
 
-�uNetHack for Windows - Graphical Interface�v�ł́A�ȉ��̃t�@���N�V�����L�[��
-�L���ł�:
+「NetHack for Windows - Graphical Interface」では、
+次のファンクションキーが有効です。
 
-    F4             �}�b�v�̑S�̕\�����[�h���g�O��
-                   �E�B���h�E�ɂ҂����荇�킹�ă}�b�s���O���ꂽ�r���[�ƁA
-                   �ʏ�̃T�C�Y�̂��܂��܂ȃV���{����\������r���[�̊Ԃ�
-                   �؂�ւ��܂��B����́A�K�w���̈ʒu��c������̂ɕ֗��ł��B
+    F4             レベル全体表示モードを切り替える。
+                   マップを、ウィンドウにぴったり収めた表示と、
+                   各種シンボルを通常サイズで表示する表示の間で切り替える。
+                   現在レベル内の自分の位置感覚をつかむのに便利。
 
-    F5             �^�C���\�����g�O��
-                   �^�C���\���Ə]���� ASCII �\���̊ԂŐ؂�ւ��܂��B
-                   ����́umap_mode�v�I�v�V�������g�p����̂Ɠ����ł��B
+    F5             タイル表示を切り替える。
+                   タイル表示と従来の ASCII 表示を切り替える。
+                   "map_mode" オプションを使うのと同等。
 
-    F10            ���j���[�o�[���A�N�e�B�u��
-                   ���j���[�o�[���A�N�e�B�u�ɂ��A�t�@�C���A�}�b�v�A�E�B���h�E�ݒ�A����уw���v
-                   �̊e���j���[��I���ł���悤�ɂ��܂��B
+    F10            メニューバーを有効化する。
+                   メニューバーを有効化し、File、Map、
+                   Window Settings、Help の各メニューを選べるようにする。
 
-4. �O���t�B�J�� �|�[�g ���j���[
+4. グラフィカルポートのメニュー
 -----------------------
 
-�t�@�C��
-  �ۑ� - �Q�[����ۑ����ďI��
-  �I�� - �Q�[�����I��
+File
+  Save - ゲームを保存して終了する
+  Quit - ゲームを終了する
 
-�}�b�v - �}�b�v���[�h�̑I����񋟁B����� map_mode �I�v�V�������g�p����̂Ɠ����B
+Map - マップモードを選択する。map_mode オプションを使うのと同等。
 
-�E�B���h�E�ݒ� - ���O�C�����̃��[�U�[�� NetHack �ݒ��ύX���܂��B
-���p�\�Ȑݒ�� 1 ����: NetHack mode�B������`�F�b�N�܂��̓A���`�F�b�N�ł��܂��B
-NetHack mode �ł́A�Q�[���L�[�R�}���h�� ALT �L�[���g�p�ł��܂�
-�i��L���X�g���Q�Ɓj�BNetHack mode �̏ꍇ�AF10 ���g�p���ă��j���[�o�[�ɃA�N�Z�X�ł��܂��B
-�܂��A���O�C�����̃��[�U�[�� NetHack �ݒ���N���A���邱�Ƃ��ł��܂��B
-���̃E�B���h�E�̐ݒ�́A���O�C�����̃��[�U�[�̃��W�X�g���ɕۑ�����܂��B
+Window Settings - 現在ログオン中ユーザーの NetHack 設定を変更する。
+利用可能な設定は 1 つだけ: NetHack mode。
+この設定はチェック/チェック解除できる。
+NetHack mode では ALT キーをゲームのキーコマンドに使える
+（上記一覧参照）。NetHack mode 中でも F10 でメニューバーへアクセス可能。
+また、現在ログオン中ユーザーの NetHack 設定をクリアすることもできる。
+このウィンドウ内の設定は、ログオン中ユーザーのレジストリへ保存される。
 
-�w���v - NetHack �̂��܂��܂ȕ����Ɋւ���w���v��񋟂��܂��B
+Help - NetHack の各種項目についてヘルプを表示する。
 
 
-5. �e���L�[�i"OPTION=number_pad" ���[�h�p�j
+5. テンキー（"OPTION=number_pad" モード用）
 ------------------------------------------------
 
-�e���L�[�Ƃ���ɗאڂ��镶���́ANetHack �̂��܂��܂ȃR�}���h�̃}�N���Ƃ��ċ@�\���܂��B
-�����̃L�[���ő���Ɋ��p���邽�߂ɁANum Lock ���u�I���v�ɂ���K�v������܂�:
+テンキーとその周辺キーは、NetHack の各種コマンドに対する
+マクロとして機能します。これらのキーを最大限活用するため、
+Num Lock は "on" にしてください。
 
-          �L�[         �ʏ�       Shift�L�[
+          キー         通常         Shift キー
        ----------   ----------    -------------
-       1, 2, 3, 4   �ړ�         �삯���݈ړ�
-       6, 7, 8, 9   ����         ����
+       1, 2, 3, 4   方向移動       その方向へ走る
+       6, 7, 8, 9   方向移動       その方向へ走る
 
-        0 (Ins)     �����i         �J�e�S����
-                                  �����i
+        0 (Ins)     持ち物         分類別持ち物
 
-        . (Del)     �s���ҋ@     : - �����𒲂ׂ�
+        . (Del)     1ターン待機    : - その場所を調べる
 
-        +           �������X�g    P - �A�N�Z�T���𑕒�
+        +           呪文一覧       P - 装飾品を装備
 
-        -           m - �ړ�      �O��
-                    �̂�          ���b�Z�[�W
+        -           m - 移動のみ   直前メッセージ
 
-    NetHack for Windows - tty �C���^�[�t�F�[�X�ŗL�̓���:
+    NetHack for Windows - tty インターフェース固有動作:
     ------------------------------------------------------
 
-      ��O���t�B�J���itty�j�C���^�[�t�F�[�X�ł́A�����L�[�i1, 2, 3, 4, 6, 7, 8, 9�j��
-      Ctrl �L�[�𓯎��ɉ����ƁA�u�w�肵�������Ɉړ����A�ǂɂԂ��邩������
-      ��Q���ɓ�����܂Ői�ݑ�����v���Ƃ��Ӗ����܂��B
+      非グラフィカル（tty）インターフェースでは、
+      方向キー（1, 2, 3, 4, 6, 7, 8, 9）と Ctrl キーを同時に使うと、
+      「指定方向へ、壁にぶつかるか興味深いものに遭遇するまで進む」
+      という意味になる。
 
-    NetHack for Windows - Graphical Interface �ŗL�̓���:
+    NetHack for Windows - Graphical Interface 固有動作:
     ------------------------------------------------------------
 
-      ����̕����Ƀ}�b�v���X�N���[���܂��̓p�����邱�Ƃ��ł��܂�:
+      指定方向へマップをスクロール（パン）できる。
 
-        Ctrl-Shift-Left  (4)     ���Ƀ}�b�v���X�N���[���i�p���j
-        Ctrl-Shift-Right (6)     �E�Ƀ}�b�v���X�N���[���i�p���j
-        Ctrl-Shift-Up    (8)     ��Ƀ}�b�v���X�N���[���i�p���j
-        Ctrl-Shift-Down  (2)     ���Ƀ}�b�v���X�N���[���i�p���j
-        Ctrl-Shift-Home  (7)     ���[�Ƀ}�b�v���X�N���[���i�p���j
-        Ctrl-Shift-End   (1)     �E�[�Ƀ}�b�v���X�N���[���i�p���j
-        Ctrl-Shift-PgUp  (9)     ��[�Ƀ}�b�v���X�N���[���i�p���j
-        Ctrl-Shift-PgDn  (3)     ���[�Ƀ}�b�v���X�N���[���i�p���j
-
-
+        Ctrl-Shift-Left  (4)     マップを左へスクロール（パン）
+        Ctrl-Shift-Right (6)     マップを右へスクロール（パン）
+        Ctrl-Shift-Up    (8)     マップを上へスクロール（パン）
+        Ctrl-Shift-Down  (2)     マップを下へスクロール（パン）
+        Ctrl-Shift-Home  (7)     マップを左上端へスクロール（パン）
+        Ctrl-Shift-End   (1)     マップを右下端へスクロール（パン）
+        Ctrl-Shift-PgUp  (9)     マップを右上端へスクロール（パン）
+        Ctrl-Shift-PgDn  (3)     マップを左下端へスクロール（パン）
