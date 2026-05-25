@@ -531,21 +531,21 @@ steal(struct monst *mtmp, char *objnambuf)
                 otmp->cursed = 0;
                 slowly = (armordelay >= 1 || gm.multi < 0);
                 if (flags.female)
-                    urgent_pline("%s charms you.  You gladly %s your %s.",
-                                 !seen ? "She" : Monnambuf,
-                                 curssv ? "let her take"
-                                 : !slowly ? "hand over"
-                                   : was_doffing ? "continue removing"
-                                     : "start removing",
-                                 armor_simple_name(otmp));
+                    urgent_pline("%sはあなたを魅了した。喜んで%sを%s。",
+                                 !seen ? "彼女" : Monnambuf,
+                                 armor_simple_name(otmp),
+                                 curssv ? "彼女に持ち去らせた"
+                                 : !slowly ? "手渡した"
+                                   : was_doffing ? "引き続き脱いでいた"
+                                     : "脱ぎ始めた");
                 else
-                    urgent_pline("%s seduces you and %s off your %s.",
-                                 !seen ? "She" : Adjmonnam(mtmp, "美しい"),
-                                 curssv ? "helps you to take"
-                                 : !slowly ? "you take"
-                                   : was_doffing ? "you continue taking"
-                                     : "you start taking",
-                                 armor_simple_name(otmp));
+                    urgent_pline("%sはあなたを誘惑した。%sを%s。",
+                                 !seen ? "彼女" : Adjmonnam(mtmp, "美しい"),
+                                 armor_simple_name(otmp),
+                                 curssv ? "一緒に脱いだ"
+                                 : !slowly ? "脱いだ"
+                                   : was_doffing ? "引き続き脱いでいた"
+                                     : "脱ぎ始めた");
                 named++;
                 /* the following is to set multi for later on */
                 nomul(-armordelay);
@@ -602,7 +602,7 @@ steal(struct monst *mtmp, char *objnambuf)
     if (iflags.last_msg == PLNMSG_MON_TAKES_OFF_ITEM
         && mtmp->data->mlet == S_NYMPH)
         ++named;
-    urgent_pline("%s stole %s.", named ? "She" : Monnambuf, doname(otmp));
+    urgent_pline("%sが%sを盗んだ.", named ? "彼女" : Monnambuf, doname(otmp));
     encumber_msg();
     could_petrify = (otmp->otyp == CORPSE
                      && touch_petrifies(&mons[otmp->corpsenm]));
