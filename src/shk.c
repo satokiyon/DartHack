@@ -1934,7 +1934,7 @@ dopay(void)
             }
             You("%sをなだめようとして、%sに1000枚の金貨を渡した.",
                 canspotmon(shkp)
-                    ? x_monnam(shkp, ARTICLE_THE, "angry", 0, FALSE)
+                    ? x_monnam(shkp, ARTICLE_THE, "怒っている", 0, FALSE)
                     : shkname(shkp),
                 noit_mhim(shkp));
             pay(1000L, shkp);

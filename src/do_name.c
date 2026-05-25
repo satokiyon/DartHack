@@ -159,15 +159,14 @@ christen_monst(struct monst *mtmp, const char *name)
 staticfn boolean
 alreadynamed(struct monst *mtmp, char *monnambuf, char *usrbuf)
 {
-    char pronounbuf[10], *p;
+    char *p;
 
     if (!*usrbuf) { /* attempt to erase existing name */
         boolean name_not_title = (has_mgivenname(mtmp)
                                   || type_is_pname(mtmp->data)
                                   || mtmp->isshk);
-        pline("%s would rather keep %s existing %s.", upstart(monnambuf),
-              is_rider(mtmp->data) ? "its" : mhis(mtmp),
-              name_not_title ? "name" : "title");
+        pline("%sはすでにある%sを維持したがっている.", upstart(monnambuf),
+              name_not_title ? "名前" : "称号");
         return TRUE;
     } else if (fuzzymatch(usrbuf, monnambuf, " -_", TRUE)
                /* catch trying to name "the Oracle" as "Oracle" */
@@ -181,16 +180,15 @@ alreadynamed(struct monst *mtmp, char *monnambuf, char *usrbuf)
                    && fuzzymatch(usrbuf, p + 4, " -_", TRUE))) {
         if (is_rider(mtmp->data)) {
             /* avoid gendered pronoun for riders */
-            pline("%s is already called that.", upstart(monnambuf));
+            pline("%sはすでにそう呼ばれている.", upstart(monnambuf));
         } else {
-            pline("%s is already called %s.",
-                  upstart(strcpy(pronounbuf, mhe(mtmp))), monnambuf);
+            pline("%sはすでにその名前が付いている.", upstart(monnambuf));
         }
         return TRUE;
     } else if (mtmp->data == &mons[PM_JUIBLEX]
                && strstri(monnambuf, "Juiblex")
                && !strcmpi(usrbuf, "Jubilex")) {
-        pline("%s doesn't like being called %s.", upstart(monnambuf), usrbuf);
+        pline("%sは%sと呼ばれることを嫌がった.", upstart(monnambuf), usrbuf);
         return TRUE;
     }
     return FALSE;
@@ -212,7 +210,7 @@ do_mgivenname(void)
     }
     cc.x = u.ux;
     cc.y = u.uy;
-    if (getpos(&cc, FALSE, "the monster you want to name") < 0
+    if (getpos(&cc, FALSE, "名前をつけたいモンスター") < 0
         || !isok(cc.x, cc.y))
         return;
     cx = cc.x, cy = cc.y;
@@ -266,7 +264,7 @@ do_mgivenname(void)
      */
     if ((mtmp->data->geno & G_UNIQ) && !mtmp->ispriest) {
         if (!alreadynamed(mtmp, monnambuf, buf))
-            pline("%s doesn't like being called names!", upstart(monnambuf));
+            pline("%sは命名を嫌がった!", upstart(monnambuf));
     } else if (mtmp->isshk
                && !(Deaf || helpless(mtmp)
                     || mtmp->data->msound <= MS_ANIMAL)) {
@@ -277,7 +275,7 @@ do_mgivenname(void)
     } else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk
                || mtmp->data == &mons[PM_GHOST] || has_ebones(mtmp)) {
         if (!alreadynamed(mtmp, monnambuf, buf))
-            pline("%s will not accept the name %s.", upstart(monnambuf), buf);
+            pline("%sは名前「%s」を受け入れなかった.", upstart(monnambuf), buf);
     } else {
         (void) christen_monst(mtmp, buf);
     }
@@ -809,7 +807,7 @@ rndghostname(void)
  * noit_mon_nam:your newt (as if detected) your invisible orc   Fido
  * some_mon_nam:the newt    someone     the invisible orc       Fido
  *          or              something
- * l_monnam:    newt            it      invisible orc           Fidoという仔犬
+ * l_monnam:    newt            it      invisible orc           dog called Fido
  * Monnam:      The newt        It      The invisible orc       Fido
  * noit_Monnam: Your newt (as if detected) Your invisible orc   Fido
  * Some_Monnam: The newt    Someone     The invisible orc       Fido
@@ -944,31 +942,29 @@ x_monnam(
      */
     if (mtmp->isshk && !do_hallu && !do_mappear) {
         if (adjective && article == ARTICLE_THE) {
-            /* pathological case: "the angry Asidonhopo the blue dragon"
-               sounds silly */
-            Strcpy(buf, "the ");
-            Strcat(strcat(buf, adjective), " ");
+            /* 形容詞+役職+固有名: "怒っているよろず屋Asidonhopo" */
+            Strcat(buf, adjective);
+            Strcat(buf, pm_name);
             Strcat(buf, shkname(mtmp));
         } else {
-            Strcat(buf, shkname(mtmp));
-            if (mdat != &mons[PM_SHOPKEEPER] || do_invis){
-                Strcat(buf, " the ");
+            if (mdat != &mons[PM_SHOPKEEPER] || do_invis) {
                 if (do_invis)
-                    Strcat(buf, "invisible ");
+                    Strcat(buf, "見えない");
                 Strcat(buf, pm_name);
             }
+            Strcat(buf, shkname(mtmp));
         }
         return buf;
     }
 
     /* Put the adjectives in the buffer */
     if (adjective)
-        Strcat(strcat(buf, adjective), " ");
+        Strcat(buf, adjective);
     if (do_invis)
-        Strcat(buf, "invisible ");
+        Strcat(buf, "見えない");
     if (do_saddle && (mtmp->misc_worn_check & W_SADDLE) && !Blind
         && !Hallucination)
-        Strcat(buf, "saddled ");
+        Strcat(buf, "鞍をつけた");
     has_adjectives = (buf[0] != '\0');
 
     /* Put the actual monster name or type into the buffer now.
@@ -987,7 +983,7 @@ x_monnam(
       if (has_ebones(mtmp)) {
 #endif
         if (mdat == &mons[PM_GHOST]) {
-            Sprintf(eos(buf), "%s ghost", s_suffix(name));
+            Sprintf(eos(buf), "%sのゴースト", name);
             name_at_start = TRUE;
         } else if (called) {
             char adj_save[BUFSZ];
@@ -1225,17 +1221,17 @@ mon_nam_too(struct monst *mon, struct monst *other_mon)
         outbuf = nextmbuf();
         switch (pronoun_gender(mon, PRONOUN_HALLU)) {
         case 0:
-            Strcpy(outbuf, "himself");
+            Strcpy(outbuf, "彼自身");
             break;
         case 1:
-            Strcpy(outbuf, "herself");
+            Strcpy(outbuf, "彼女自身");
             break;
         default:
         case 2:
-            Strcpy(outbuf, "itself");
+            Strcpy(outbuf, "自分自身");
             break;
         case 3: /* could happen when hallucinating */
-            Strcpy(outbuf, "themselves");
+            Strcpy(outbuf, "お互い");
             break;
         }
     }
@@ -1651,11 +1647,31 @@ static NEARDATA const char *const hcolors[] = {
     "bistre", "ecru", "fulvous", "tekhelet", "selective yellow",
 };
 
+/* Display-only localized labels for hallucination color text. */
+static NEARDATA const char *const jp_hcolors[] = {
+    "紫外線色", "赤外線色", "青みがかったオレンジ", "赤みがかった緑",
+    "暗い白", "明るい黒", "空色ピンク", "ピンクがかったシアン", "藍と黄緑の混色",
+    "塩辛い色", "甘い色", "酸っぱい色", "苦い色", "うま味色", /* basic tastes */
+    "縞模様", "螺旋模様", "渦巻き", "格子縞", "チェック模様", "アーガイル", "ペイズリー",
+    "まだら模様", "ガーンジー牛柄", "水玉模様", "四角い色", "丸い色",
+    "三角の色", "カベルネ色", "サングリア色", "フクシア", "藤色", "レモンライム色",
+    "イチゴバナナ色", "ペパーミント色", "ロマンチックな色", "白熱光色",
+    "オクタリン（魔法の色）", /* Discworld: the Colour of Magic */
+    "刺激的なほど地味な色", "モーヴ", "電気色",
+    "ネオン色", "蛍光色", "燐光色", "半透明", "不透明",
+    "サイケデリック", "虹色", "レインボー色", "多色",
+    "無色", "無色の緑",
+    "踊る色", "歌う色", "愛情深い色", "うるさい色", "騒がしい色", "ガタガタ鳴る色", "無音の色",
+    "アポシアン", "赤外ピンク", "オパール色", "バイオラント", "音程外れの色",
+    "ヴィリジアン", "オレオリン", "辰砂（朱色）", "プルプリン", "藤黄（黄橙）", "茜色",
+    "ビストル", "エクリュ", "黄褐色", "テヘレット", "選択黄",
+};
+
 const char *
 hcolor(const char *colorpref)
 {
     return (Hallucination || !colorpref)
-        ? hcolors[rn2_on_display_rng(SIZE(hcolors))]
+        ? jp_hcolors[rn2_on_display_rng(SIZE(jp_hcolors))]
         : colorpref;
 }
 
@@ -1666,7 +1682,7 @@ rndcolor(void)
     int k = rn2(CLR_MAX);
 
     return Hallucination ? hcolor((char *) 0)
-                         : (k == NO_COLOR) ? "colorless"
+                         : (k == NO_COLOR) ? "無色"
                                            : c_obj_colors[k];
 }
 
@@ -1747,14 +1763,25 @@ static const char *const coynames[] = {
     "Canis latrans"
 };
 
+static const char *const jp_coynames[] = {
+    "肉食属 普通種", "鳥追走属 消化良好種", "何食属 万物摂取種",
+    "空腹属 空腹種", "何食属 ほぼ万物種", "鳥食属 鳥追種",
+    "空腹属 幻想種", "永遠空腹属 永久飢餓種", "空腹属 一般種",
+    "空腹属 一般巧妙種", "食いしん坊属 よだれ種", "硬頭属 難題種",
+    "肉食属 よだれ種", "硬頭属 猛食種", "常食属 常食種",
+    "巨大食欲属 大食種", "飢餓属 ノミ袋種", "過信属 一般種",
+    "犬神経属 王種", "奇怪属 食欲種", "天罰属 愚行種",
+    "コヨーテ（Canis latrans）"
+};
+
 char *
 coyotename(struct monst *mtmp, char *buf)
 {
     if (mtmp && buf) {
         Sprintf(buf, "%s - %s",
                 x_monnam(mtmp, ARTICLE_NONE, (char *) 0, 0, TRUE),
-                mtmp->mcan ? coynames[SIZE(coynames) - 1]
-                           : coynames[mtmp->m_id % (SIZE(coynames) - 1)]);
+                mtmp->mcan ? jp_coynames[SIZE(jp_coynames) - 1]
+                           : jp_coynames[mtmp->m_id % (SIZE(jp_coynames) - 1)]);
     }
     return buf;
 }
@@ -1762,9 +1789,9 @@ coyotename(struct monst *mtmp, char *buf)
 char *
 rndorcname(char *s)
 {
-    static const char *const v[] = { "a", "ai", "og", "u" };
-    static const char *const snd[] = { "gor", "gris", "un", "bane", "ruk",
-                                 "oth","ul", "z", "thos","akh","hai" };
+    static const char *const v[] = { "ア", "イ", "ウ", "エ", "オ" };
+    static const char *const snd[] = { "ゴ", "ク", "ザ", "ナ", "リ",
+                                 "ブ","ガ", "ズ", "ロ","ダ","バ" };
     int i, iend = rn1(2, 3), vstart = rn2(2);
 
     if (s) {
@@ -1788,7 +1815,7 @@ christen_orc(struct monst *mtmp, const char *gang, const char *other)
     /* rndorcname() won't return NULL */
     sz = (int) strlen(orcname);
     if (gang)
-        sz += (int) (strlen(gang) + sizeof " of " - sizeof "");
+        sz += (int) (strlen(gang) + strlen("の"));
     else if (other)
         sz += (int) strlen(other);
 
@@ -1797,8 +1824,8 @@ christen_orc(struct monst *mtmp, const char *gang, const char *other)
         boolean nameit = FALSE;
 
         if (gang) {
-            Sprintf(buf, "%s of %s", upstart(orcname),
-                    upstart(strcpy(gbuf, gang)));
+            Sprintf(buf, "%sの%s", upstart(strcpy(gbuf, gang)),
+                    upstart(orcname));
             nameit = TRUE;
         } else if (other) {
             Sprintf(buf, "%s%s", upstart(orcname), other);
@@ -1832,6 +1859,21 @@ static const char *const sir_Terry_novels[] = {
 #define NVL_AMAZING_MAURICE 27
 #define NVL_THUD 33
 
+/* Display-only Japanese titles (same order as sir_Terry_novels[]). */
+static const char *const jp_sir_Terry_novels[] = {
+    "魔法の色", "光のファンタスティック", "平等の儀式", "モート",
+    "ソーサリー", "ウィアード・シスターズ", "ピラミッド", "衛兵！衛兵！", "エリック",
+    "動く映像", "死神マン", "海外の魔女たち", "小さな神々",
+    "貴族と淑女", "武装した男たち", "ソウル・ミュージック", "面白き時代",
+    "仮面劇", "粘土の足", "ホッグファーザー", "ジンゴ", "最後の大陸",
+    "喉笛を掴め", "第五の象", "真実", "時間泥棒",
+    "最後の英雄", "驚くべきモーリスと教養ある齧歯類たち",
+    "夜警", "小さな自由の男たち", "怪物の連隊",
+    "空いっぱいの帽子", "郵便局へ行こう", "ドカン！", "冬の精",
+    "お金を作ろう", "見えない学者たち", "真夜中の装い", "スナッフ",
+    "蒸気を起こせ", "羊飼いの王冠"
+};
+
 const char *
 noveltitle(int *novidx)
 {
@@ -1844,7 +1886,7 @@ noveltitle(int *novidx)
         else if (*novidx >= 0 && *novidx < k)
             j = *novidx;
     }
-    return sir_Terry_novels[j];
+    return jp_sir_Terry_novels[j];
 }
 
 /* figure out canonical novel title from player-specified one */

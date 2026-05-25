@@ -540,7 +540,7 @@ steal(struct monst *mtmp, char *objnambuf)
                                  armor_simple_name(otmp));
                 else
                     urgent_pline("%s seduces you and %s off your %s.",
-                                 !seen ? "She" : Adjmonnam(mtmp, "beautiful"),
+                                 !seen ? "She" : Adjmonnam(mtmp, "美しい"),
                                  curssv ? "helps you to take"
                                  : !slowly ? "you take"
                                    : was_doffing ? "you continue taking"

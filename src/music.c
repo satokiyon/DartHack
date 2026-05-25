@@ -280,7 +280,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
                     } else {
                         You("%sを破壊した!",
                             mtmp->mtame
-                             ? x_monnam(mtmp, ARTICLE_THE, "poor",
+                             ? x_monnam(mtmp, ARTICLE_THE, "哀れな",
                                         has_mgivenname(mtmp)
                                          ? SUPPRESS_SADDLE : 0,
                                         FALSE)

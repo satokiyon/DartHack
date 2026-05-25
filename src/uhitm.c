@@ -4657,7 +4657,7 @@ mhitm_ad_sedu(
         } else if (magr->mcan) {
             if (!Blind)
                 pline("%sはあなたを%sとしたが、あなたは%s.",
-                      Adjmonnam(magr, "plain"),
+                      Adjmonnam(magr, "普通の"),
                       flags.female ? "魅了しよう" : "誘惑しよう",
                       flags.female ? "平然としていた" : "興味を示さなかった");
             if (rn2(3)) {
@@ -6043,7 +6043,7 @@ passive(
                     }
                 } else {
                     pline("%sは身を守れないようだ.",
-                          Adjmonnam(mon, "blind"));
+                          Adjmonnam(mon, "目の見えない"));
                     if (!rn2(500))
                         change_luck(-1);
                 }
@@ -6257,7 +6257,7 @@ that_is_a_mimic(
                      || M_AP_TYPE(mtmp) == M_AP_FURNITURE)
                  && (mtmp->msleeping || mtmp->mfrozen))
             /* BUG: this will misclassify a paralyzed mimic as sleeping */
-            what = x_monnam(mtmp, ARTICLE_A, "sleeping", 0, FALSE);
+            what = x_monnam(mtmp, ARTICLE_A, "眠っている", 0, FALSE);
         else
             what = a_monnam(mtmp);
     }
