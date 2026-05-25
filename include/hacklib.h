@@ -32,6 +32,7 @@ extern char *strcasecpy(char *, const char *) NONNULL NONNULLPTRS;
 extern char *s_suffix(const char *) NONNULL NONNULLARG1;
 extern char *ing_suffix(const char *) NONNULL NONNULLARG1;
 extern char *xcrypt(const char *, char *) NONNULL NONNULLPTRS;
+extern char *xcrypt_from_offset(const char *, char *, long) NONNULL NONNULLPTRS;
 extern boolean onlyspace(const char *) NONNULLARG1;
 extern char *tabexpand(char *) NONNULL NONNULLARG1;
 extern char *visctrl(char) NONNULL;
