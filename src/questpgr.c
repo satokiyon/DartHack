@@ -19,7 +19,10 @@ staticfn struct obj *find_qarti(struct obj *) NO_NNARGS;
 staticfn const char *neminame(void);
 staticfn const char *guardname(void);
 staticfn const char *homebase(void);
+staticfn const char *jp_quest_place_name(boolean);
+staticfn const char *jp_quest_artiname_for_display(int, boolean);
 staticfn void qtext_pronoun(char, char);
+staticfn const char *jp_quest_pronoun(int, char, boolean);
 staticfn void convert_arg(char);
 staticfn void convert_line(char *,char *);
 staticfn const char *jp_quest_alignname(aligntyp);
@@ -53,16 +56,14 @@ ldrname(void)
 {
     int i = gu.urole.ldrnum;
 
-    Sprintf(gn.nambuf, "%s%s", type_is_pname(&mons[i]) ? "" : "the ",
-            mons[i].pmnames[NEUTRAL]);
-    return gn.nambuf;
+    return jp_pmname_from_idx(i, NEUTRAL);
 }
 
 /* return your intermediate target string */
 staticfn const char *
 intermed(void)
 {
-    return gu.urole.intermed;
+    return jp_quest_place_name(FALSE);
 }
 
 boolean
@@ -127,9 +128,7 @@ neminame(void)
 {
     int i = gu.urole.neminum;
 
-    Sprintf(gn.nambuf, "%s%s", type_is_pname(&mons[i]) ? "" : "the ",
-            mons[i].pmnames[NEUTRAL]);
-    return gn.nambuf;
+    return jp_pmname_from_idx(i, NEUTRAL);
 }
 
 staticfn const char *
@@ -137,13 +136,85 @@ guardname(void) /* return your role leader's guard monster name */
 {
     int i = gu.urole.guardnum;
 
-    return mons[i].pmnames[NEUTRAL];
+    return jp_pmname_from_idx(i, NEUTRAL);
 }
 
 staticfn const char *
 homebase(void) /* return your role leader's location */
 {
-    return gu.urole.homebase;
+    return jp_quest_place_name(TRUE);
+}
+
+staticfn const char *
+jp_quest_place_name(boolean homebase)
+{
+    const char *fc = gu.urole.filecode;
+
+    if (!strcmpi(fc, "Arc"))
+        return homebase ? "考古学学院" : "トルテック王の墓";
+    if (!strcmpi(fc, "Bar"))
+        return homebase ? "デュアリ族の野営地" : "デュアリのオアシス";
+    if (!strcmpi(fc, "Cav"))
+        return homebase ? "祖先の洞窟" : "ドラゴンのねぐら";
+    if (!strcmpi(fc, "Hea"))
+        return homebase ? "エピダウロス神殿" : "コイオス神殿";
+    if (!strcmpi(fc, "Kni"))
+        return homebase ? "キャメロット城" : "ガラスの島";
+    if (!strcmpi(fc, "Mon"))
+        return homebase ? "チャン=スネ僧院" : "地主の僧院";
+    if (!strcmpi(fc, "Pri"))
+        return homebase ? "大神殿" : "ナルゾックの神殿";
+    if (!strcmpi(fc, "Rog"))
+        return homebase ? "盗賊ギルド会館" : "暗殺者ギルド会館";
+    if (!strcmpi(fc, "Ran"))
+        return homebase ? "オリオンの野営地" : "ワンプスの洞窟";
+    if (!strcmpi(fc, "Sam"))
+        return homebase ? "太郎一族の城" : "将軍の城";
+    if (!strcmpi(fc, "Tou"))
+        return homebase ? "アンク・モルポーク" : "盗賊ギルド会館";
+    if (!strcmpi(fc, "Val"))
+        return homebase ? "運命の聖堂" : "スルトの洞窟";
+    if (!strcmpi(fc, "Wiz"))
+        return homebase ? "孤独の塔" : "闇の塔";
+
+    return homebase ? gu.urole.homebase : gu.urole.intermed;
+}
+
+staticfn const char *
+jp_quest_artiname_for_display(int artinum, boolean short_name)
+{
+    nhUse(short_name);
+
+    switch (artinum) {
+    case ART_ORB_OF_DETECTION:
+        return "探知のオーブ";
+    case ART_HEART_OF_AHRIMAN:
+        return "アーリマンの心臓";
+    case ART_SCEPTRE_OF_MIGHT:
+        return "力の王笏";
+    case ART_STAFF_OF_AESCULAPIUS:
+        return "アスクレピオスの杖";
+    case ART_MAGIC_MIRROR_OF_MERLIN:
+        return "マーリンの魔法の鏡";
+    case ART_EYES_OF_THE_OVERWORLD:
+        return "オーバーワールドの目";
+    case ART_MITRE_OF_HOLINESS:
+        return "神聖の僧帽";
+    case ART_LONGBOW_OF_DIANA:
+        return "ディアナの長弓";
+    case ART_MASTER_KEY_OF_THIEVERY:
+        return "盗賊術のマスターキー";
+    case ART_TSURUGI_OF_MURAMASA:
+        return "村正の剣";
+    case ART_YENDORIAN_EXPRESS_CARD:
+        return "プラチナ・イェンドリアン・エキスプレスカード";
+    case ART_ORB_OF_FATE:
+        return "運命のオーブ";
+    case ART_EYE_OF_THE_AETHIOPICA:
+        return "エチオピカの目";
+    default:
+        return (const char *) 0;
+    }
 }
 
 /* returns 1 if nemesis death message mentions noxious fumes, otherwise 0;
@@ -174,10 +245,9 @@ stinky_nemesis(struct monst *mon)
     (void) com_pager_core(gu.urole.filecode, "killed_nemesis", FALSE, &mesg);
 #endif
 
-    /* this is somewhat fragile; it assumes that when both {noxious or
-       poisonous or toxic} and {gas or fumes} are present, the latter
-       refers to the former rather than to something unrelated; it does
-       make sure that fumes occurs after noxious rather than before */
+     /* this is somewhat fragile; it assumes that when both poison-ish
+         qualifier and gas/fumes token are present, the latter refers to
+         the former rather than to something unrelated. */
     if (mesg) {
         char *p;
 
@@ -186,8 +256,11 @@ stinky_nemesis(struct monst *mon)
 
         if (((p = strstri(mesg, "noxious")) != 0
              || (p = strstri(mesg, "poisonous")) != 0
-             || (p = strstri(mesg, "toxic")) != 0)
-            && (strstri(p, " gas") || strstri(p, " fumes")))
+             || (p = strstri(mesg, "toxic")) != 0
+             || (p = strstri(mesg, "有毒")) != 0
+             || (p = strstri(mesg, "毒")) != 0)
+            && (strstri(p, " gas") || strstri(p, " fumes")
+            || strstri(p, "ガス") || strstri(p, "煙")))
             res = 1;
 
         free((genericptr_t) mesg);
@@ -197,6 +270,32 @@ stinky_nemesis(struct monst *mon)
 
 /* replace deity, leader, nemesis, or artifact name with pronoun;
    overwrites cvt_buf[] */
+staticfn const char *
+jp_quest_pronoun(
+    int godgend,
+    char lwhich,
+    boolean plural)
+{
+    if (plural)
+        return (lwhich == 'h') ? "それら"
+               : (lwhich == 'i') ? "それらを"
+               : (lwhich == 'j') ? "それらの" : "?";
+
+    if (godgend == 0) {
+        return (lwhich == 'h') ? "彼"
+               : (lwhich == 'i') ? "彼を"
+               : (lwhich == 'j') ? "彼の" : "?";
+    } else if (godgend == 1) {
+        return (lwhich == 'h') ? "彼女"
+               : (lwhich == 'i') ? "彼女を"
+               : (lwhich == 'j') ? "彼女の" : "?";
+    }
+
+    return (lwhich == 'h') ? "それ"
+           : (lwhich == 'i') ? "それを"
+           : (lwhich == 'j') ? "その" : "?";
+}
+
 staticfn void
 qtext_pronoun(
     char who,   /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => arti */
@@ -205,6 +304,8 @@ qtext_pronoun(
     const char *pnoun;
     int godgend;
     char lwhich = lowc(which); /* H,I,J -> h,i,j */
+    boolean plural_artifact;
+    boolean multibyte;
 
     /*
      * Invalid subject (not d,l,n,o) yields neuter, singular result.
@@ -212,9 +313,23 @@ qtext_pronoun(
      * For %o, treat all artifacts as neuter; some have plural names,
      * which genders[] doesn't handle; cvt_buf[] already contains name.
      */
-    if (who == 'o'
-        && (strstri(gc.cvt_buf, "Eyes ")
-            || strcmpi(gc.cvt_buf, makesingular(gc.cvt_buf)))) {
+    plural_artifact = (boolean) (who == 'o'
+                                 && (strstri(gc.cvt_buf, "Eyes ")
+                                     || strcmpi(gc.cvt_buf,
+                                                makesingular(gc.cvt_buf))));
+    multibyte = quest_text_uses_multibyte(gc.cvt_buf);
+
+    if (multibyte) {
+        if (plural_artifact) {
+            pnoun = jp_quest_pronoun(2, lwhich, TRUE);
+        } else {
+            godgend = (who == 'd') ? svq.quest_status.godgend
+                : (who == 'l') ? svq.quest_status.ldrgend
+                : (who == 'n') ? svq.quest_status.nemgend
+                : 2; /* default to neuter */
+            pnoun = jp_quest_pronoun(godgend, lwhich, FALSE);
+        }
+    } else if (plural_artifact) {
         pnoun = (lwhich == 'h') ? "they"
                 : (lwhich == 'i') ? "them"
                 : (lwhich == 'j') ? "their" : "?";
@@ -229,7 +344,7 @@ qtext_pronoun(
     }
     Strcpy(gc.cvt_buf, pnoun);
     /* capitalize for H,I,J */
-    if (lwhich != which)
+    if (lwhich != which && !quest_text_uses_multibyte(gc.cvt_buf))
         gc.cvt_buf[0] = highc(gc.cvt_buf[0]);
     return;
 }
@@ -267,14 +382,17 @@ convert_arg(char c)
         break;
     case 'O':
     case 'o':
-        str = the(artiname(gu.urole.questarti));
-        if (c == 'O') {
-            /* shorten "the Foo of Bar" to "the Foo"
-               (buffer returned by the() is modifiable) */
-            char *p = strstri(str, " of ");
+        str = jp_quest_artiname_for_display(gu.urole.questarti, c == 'O');
+        if (!str) {
+            str = the(artiname(gu.urole.questarti));
+            if (c == 'O') {
+                /* shorten "the Foo of Bar" to "the Foo"
+                   (buffer returned by the() is modifiable) */
+                char *p = strstri(str, " of ");
 
-            if (p)
-                *p = '\0';
+                if (p)
+                    *p = '\0';
+            }
         }
         break;
     case 'n':
@@ -314,7 +432,7 @@ convert_arg(char c)
         str = Blind ? "感じる" : "見る";
         break;
     case 'Z':
-        str = svd.dungeons[0].dname;
+        str = jp_dungeon_name_by_dnum(0);
         break;
     case '%':
         str = "%";
