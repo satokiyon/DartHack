@@ -11,6 +11,13 @@
 
 staticfn boolean histemple_at(struct monst *, coordxy, coordxy);
 staticfn boolean has_shrine(struct monst *);
+staticfn const char *jp_priest_role_for_display(boolean, boolean);
+
+staticfn const char *
+jp_priest_role_for_display(boolean do_hallu, boolean female)
+{
+    return do_hallu ? "法王" : female ? "女僧侶" : "僧侶";
+}
 
 void
 newepri(struct monst *mtmp)
@@ -127,7 +134,7 @@ move_special(struct monst *mtmp, boolean in_his_shop, schar appr,
 #if 0 /* dead code; maybe someday someone will track down why... */
         if (ib) {
             if (cansee(mtmp->mx, mtmp->my))
-                pline("%s picks up %s.", Monnam(mtmp),
+                pline("%sは%sを拾った.", Monnam(mtmp),
                       distant_name(ib, doname));
             obj_extract_self(ib);
             (void) mpickobj(mtmp, ib);
@@ -317,42 +324,25 @@ priestname(
     /* for high priest(ess), "high" (or "grand" for poohbah) will be inserted
        [this was done near the end but we want 'what' to be updated sooner] */
     if (mon->ispriest || aligned_priest || high_priest)
-        what = do_hallu ? "poohbah" : mon->female ? "priestess" : "priest";
+        what = jp_priest_role_for_display(do_hallu, mon->female);
 
     *pname = '\0';
-    if (article != ARTICLE_NONE && (!do_hallu || !bogon_is_pname(whatcode))) {
-        if (article == ARTICLE_YOUR || (article == ARTICLE_A && high_priest))
-            article = ARTICLE_THE;
-        if (article == ARTICLE_THE) {
-            Strcpy(pname, "the ");
-        } else if (!strcmp(what, "Angel")) {
-            /* bypass just_an(); it would yield "" due to treating capital A
-               as indicating a personal name */
-            Strcpy(pname, "an ");
-        } else {
-            (void) just_an(pname, what);
-        }
-    }
-    /* pname[] contains "" or {"a ","an ","the "} */
+    if (article == ARTICLE_YOUR)
+        Strcat(pname, "あなたの");
+
     if (mon->minvis) {
-        /* avoid "a invisible priest" */
-        if (!strcmp(pname, "a "))
-            Strcpy(pname, "an ");
-        Strcat(pname, "invisible ");
+        Strcat(pname, "透明な");
     }
     if (mon->isminion && EMIN(mon)->renegade) {
-        /* avoid "an renegade Angel" */
-        if (!strcmp(pname, "an ") && !mon->minvis)
-            Strcpy(pname, "a ");
-        Strcat(pname, "renegade ");
+        Strcat(pname, "離反した");
     }
 
     if (mon->ispriest || aligned_priest) {
         if (high_priest)
-            Strcat(pname, do_hallu ? "grand " : "high ");
+            Strcat(pname, do_hallu ? "大いなる" : "高位の");
     } else {
-        if (mon->mtame && !strcmpi(what, "Angel"))
-            Strcat(pname, "guardian ");
+        if (mon->mtame && mon->data == &mons[PM_ANGEL])
+            Strcat(pname, "守護");
     }
 
     Strcat(pname, what);
@@ -360,8 +350,9 @@ priestname(
     if (do_hallu || !high_priest || reveal_high_priest
         || !Is_astralevel(&u.uz)
         || m_next2u(mon) || program_state.gameover) {
-        Strcat(pname, " of ");
+        Strcat(pname, "（");
         Strcat(pname, halu_gname(mon_aligntyp(mon)));
+        Strcat(pname, "の）");
     }
     return pname;
 }
@@ -437,8 +428,8 @@ intemple(int roomno)
                Moloch so suppress the "of Moloch" for him here too */
             if (sanctum && !Hallucination)
                 priest->ispriest = 0;
-            pline("%s intones:",
-                  canseemon(priest) ? Monnam(priest) : "A nearby voice");
+            pline("%sが詠唱した:",
+                canseemon(priest) ? Monnam(priest) : "近くの声");
             priest->ispriest = save_priest;
             epri_p->intone_time = svm.moves + (long) d(10, 500); /* ~2505 */
             /* make sure that we don't suppress entry message when
@@ -449,18 +440,18 @@ intemple(int roomno)
         if (sanctum && Is_sanctum(&u.uz)) {
             if (priest->mpeaceful) {
                 /* first time inside */
-                msg1 = "Infidel, you have entered Moloch's Sanctum!";
-                msg2 = "Be gone!";
+                msg1 = "異教徒よ、貴様はモーロックの聖域に足を踏み入れた!";
+                msg2 = "立ち去れ!";
                 priest->mpeaceful = 0;
                 /* became angry voluntarily; no penalty for attacking him */
                 set_malign(priest);
             } else {
                 /* repeat visit, or attacked priest before entering */
-                msg1 = "You desecrate this place by your presence!";
+                msg1 = "貴様の存在そのものがこの地を穢している!";
             }
         } else if (svm.moves >= epri_p->enter_time) {
-            Sprintf(buf, "Pilgrim, you enter a %s place!",
-                    !shrined ? "desecrated" : "sacred");
+            Sprintf(buf, "巡礼者よ、ここは%s場所だ!",
+                    !shrined ? "穢れた" : "神聖な");
             msg1 = buf;
         }
         if (msg1 && can_speak && !Deaf) {
@@ -471,15 +462,19 @@ intemple(int roomno)
             epri_p->enter_time = svm.moves + (long) d(10, 100); /* ~505 */
         }
         if (!sanctum) {
+            const char *sense_msg;
+
             if (!shrined || !p_coaligned(priest)
                 || u.ualign.record <= ALGN_SINNED) {
-                msg1 = "have a%s forbidding feeling...";
-                msg2 = (!shrined || !p_coaligned(priest)) ? "" : " strange";
+                sense_msg = (!shrined || !p_coaligned(priest))
+                                ? "何か不吉な気配を感じる..."
+                                : "どこか妙な不吉さを感じる...";
                 this_time = &epri_p->hostile_time;
                 other_time = &epri_p->peaceful_time;
             } else {
-                msg1 = "experience %s sense of peace.";
-                msg2 = (u.ualign.record >= ALGN_DEVOUT) ? "a" : "an unusual";
+                sense_msg = (u.ualign.record >= ALGN_DEVOUT)
+                                ? "心が安らいでいくのを感じる."
+                                : "どこか不思議な安らぎを感じる.";
                 this_time = &epri_p->peaceful_time;
                 other_time = &epri_p->hostile_time;
             }
@@ -487,7 +482,7 @@ intemple(int roomno)
                if alignment update has caused it to switch from
                forbidding to sense-of-peace or vice versa */
             if (svm.moves >= *this_time || *other_time >= *this_time) {
-                You(msg1, msg2);
+                You("%s", sense_msg);
                 *this_time = svm.moves + (long) d(10, 20); /* ~55 */
                 /* avoid being tricked by the RNG:  switch might have just
                    happened and previous random threshold could be larger */
@@ -521,8 +516,8 @@ intemple(int roomno)
                    != 0) {
             int ngen = svm.mvitals[PM_GHOST].born;
             if (canspotmon(mtmp))
-                pline("A%s ghost appears next to you%c",
-                      ngen < 5 ? "n enormous" : "",
+                pline("%s亡霊があなたのそばに現れた%c",
+                      ngen < 5 ? "巨大な" : "",
                       ngen < 10 ? '!' : '.');
             else
                 You("近くに何かの存在を感じた!");
@@ -532,7 +527,7 @@ intemple(int roomno)
                 You("恐怖で、動けなくなった.");
             nomul(-3);
             gm.multi_reason = "being terrified of a ghost";
-            gn.nomovemsg = "You regain your composure.";
+            gn.nomovemsg = "ようやく平静を取り戻した。";
         }
     }
 }
@@ -575,7 +570,7 @@ priest_talk(struct monst *priest)
                        mon_nam(priest));
 
     if (priest->mflee || (!priest->ispriest && coaligned && strayed)) {
-        pline("%s doesn't want anything to do with you!", Monnam(priest));
+        pline("%sはあなたと関わろうとしない!", Monnam(priest));
         priest->mpeaceful = 0;
         return;
     }
@@ -583,13 +578,13 @@ priest_talk(struct monst *priest)
     /* priests don't chat unless peaceful and in their own temple */
     if (!inhistemple(priest) || !priest->mpeaceful || helpless(priest)) {
         static const char *const cranky_msg[3] = {
-            "Thou wouldst have words, eh?  I'll give thee a word or two!",
-            "Talk?  Here is what I have to say!",
-            "Pilgrim, I would speak no longer with thee."
+            "話がしたいのか? ならば思い知らせてやる!",
+            "話だと? 私から言うことはこれだけだ!",
+            "巡礼者よ、もはや汝と語ることはない。"
         };
 
         if (helpless(priest)) {
-            pline("%s breaks out of %s reverie!", Monnam(priest),
+            pline("%sは%sの放心状態から我に返った!", Monnam(priest),
                   mhis(priest));
             priest->mfrozen = priest->msleeping = 0;
             priest->mcanmove = 1;
@@ -604,8 +599,7 @@ priest_talk(struct monst *priest)
     if (priest->mpeaceful && *in_rooms(priest->mx, priest->my, TEMPLE)
         && !has_shrine(priest)) {
         SetVoice(priest, 0, 80, 0);
-        verbalize(
-              "Begone!  Thou desecratest this holy place with thy presence.");
+        verbalize("立ち去れ! 汝の存在がこの聖地を穢している。");
         priest->mpeaceful = 0;
         return;
     }
@@ -849,15 +843,15 @@ ghod_hitsu(struct monst *priest)
 
     switch (rn2(3)) {
     case 0:
-        pline("%s roars in anger:  \"Thou shalt suffer!\"",
+        pline("%sは怒りに咆えた:  \"汝は罰を受けるがよい!\"",
               a_gname_at(ax, ay));
         break;
     case 1:
-        pline("%s voice booms:  \"How darest thou harm my servant!\"",
+        pline("%sの声が轟いた:  \"よくも我がしもべを傷つけたな!\"",
               s_suffix(a_gname_at(ax, ay)));
         break;
     default:
-        pline("%s roars:  \"Thou dost profane my shrine!\"",
+        pline("%sは咆えた:  \"汝は我が神殿を穢した!\"",
               a_gname_at(ax, ay));
         break;
     }
