@@ -1887,7 +1887,7 @@ deliver_obj_to_mon(struct monst *mtmp, int cnt, unsigned long deliverflags)
                                             at_crime_scene ? ONAME(otmp)
                                                            : (char *) 0,
                                             /* bought the stolen goods */
-                                            " the Fence");
+                                            "（盗品売り）");
                 }
                 free_oname(otmp);
             }

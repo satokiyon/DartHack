@@ -6257,7 +6257,7 @@ that_is_a_mimic(
                      || M_AP_TYPE(mtmp) == M_AP_FURNITURE)
                  && (mtmp->msleeping || mtmp->mfrozen))
             /* BUG: this will misclassify a paralyzed mimic as sleeping */
-            what = x_monnam(mtmp, ARTICLE_A, "眠っている", 0, FALSE);
+            what = x_monnam(mtmp, ARTICLE_NONE, "眠っている", 0, FALSE);
         else
             what = a_monnam(mtmp);
     }
