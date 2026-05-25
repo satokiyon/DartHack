@@ -809,7 +809,7 @@ rndghostname(void)
  * noit_mon_nam:your newt (as if detected) your invisible orc   Fido
  * some_mon_nam:the newt    someone     the invisible orc       Fido
  *          or              something
- * l_monnam:    newt            it      invisible orc           dog called Fido
+ * l_monnam:    newt            it      invisible orc           Fidoという仔犬
  * Monnam:      The newt        It      The invisible orc       Fido
  * noit_Monnam: Your newt (as if detected) Your invisible orc   Fido
  * Some_Monnam: The newt    Someone     The invisible orc       Fido
@@ -990,7 +990,9 @@ x_monnam(
             Sprintf(eos(buf), "%s ghost", s_suffix(name));
             name_at_start = TRUE;
         } else if (called) {
-            Sprintf(eos(buf), "%s called %s", pm_name, name);
+            char adj_save[BUFSZ];
+            Strcpy(adj_save, buf); /* save adjectives already in buf (may be "") */
+            Sprintf(buf, "%sという%s%s", name, adj_save, pm_name);
             name_at_start = (boolean) type_is_pname(mdat);
         } else if (is_mplayer(mdat) && (bp = strstri(name, " the ")) != 0) {
             /* <name> the <adjective> <invisible> <saddled> <rank> */
