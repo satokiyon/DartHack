@@ -2178,7 +2178,7 @@ revive_corpse(struct obj *corpse)
                     pline("驚いた%sが%sを落とした!",
                           l_monnam(mcarry), an(cname));
                 else if (canspotmon(mtmp))
-                    pline("%s suddenly appears!",
+                    pline("突然%sが現れた!",
                           chewed ? Adjmonnam(mtmp, "噛み跡だらけの")
                                  : Monnam(mtmp));
             }
