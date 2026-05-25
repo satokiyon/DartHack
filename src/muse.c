@@ -181,9 +181,8 @@ mzapwand(
                                  ? "近く" : "遠く");
         unknow_object(otmp); /* hero loses info when unseen obj is used */
     } else if (self) {
-        pline("%s with %s!",
-              monverbself(mtmp, Monnam(mtmp), "zap", (char *) 0),
-              doname(otmp));
+        pline_mon(mtmp, "%sは%sで自分自身を攻撃した!",
+                  Monnam(mtmp), doname(otmp));
     } else {
         pline_mon(mtmp, "%s zaps %s!", Monnam(mtmp), an(xname(otmp)));
         stop_occupation();
@@ -198,7 +197,7 @@ mplayhorn(
     struct obj *otmp,
     boolean self)
 {
-    char *objnamp, objbuf[BUFSZ];
+    char *objnamp;
 
     if (!canseemon(mtmp)) {
         int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
@@ -211,12 +210,8 @@ mplayhorn(
         unknow_object(otmp); /* hero loses info when unseen obj is used */
     } else if (self) {
         observe_object(otmp);
-        objnamp = xname(otmp);
-        if (strlen(objnamp) >= QBUFSZ)
-            objnamp = simpleonames(otmp);
-        Sprintf(objbuf, "a %s directed at", objnamp);
-        /* "<mon> plays a <horn> directed at himself!" */
-        pline("%s!", monverbself(mtmp, Monnam(mtmp), "play", objbuf));
+        pline_mon(mtmp, "%sは%sを自分自身に向けて吹いた!",
+                  Monnam(mtmp), doname(otmp));
         makeknown(otmp->otyp); /* (wands handle this slightly differently) */
     } else {
         observe_object(otmp);
@@ -3142,8 +3137,8 @@ muse_unslime(
     } else if (otyp == STRANGE_OBJECT) {
         /* monster is using fire breath on self */
         if (vis)
-            pline_mon(mon, "%s.",
-                      monverbself(mon, Monnam(mon), "breath", "fire on"));
+            pline_mon(mon, "%sは自分自身に炎の息を吐いた.",
+                      Monnam(mon));
         if (!rn2(3))
             mon->mspec_used = rn1(10, 5);
         /* -21 => monster's fire breath; 1 => # of damage dice */

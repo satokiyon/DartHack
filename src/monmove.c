@@ -491,7 +491,7 @@ monflee(
                receive the same alternate message */
             if (!mtmp->mcanmove || !mtmp->data->mmove) {
                 pline_mon(mtmp, "%sはひるんだようだ.",
-                          Adjmonnam(mtmp, "immobile"));
+                          Adjmonnam(mtmp, "動けない"));
             } else if (flees_light(mtmp)) {
                 if (Unaware) {
                     /* tell the player even if the hero is unconscious */

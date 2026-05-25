@@ -879,7 +879,7 @@ gd_letknow(struct monst *grd)
                 ? "%sが近づいてくるのを見た."
                 : "%sに立ちはだかわれた.",
             /* "an angry guard" */
-            x_monnam(grd, ARTICLE_A, "angry", 0, FALSE));
+            x_monnam(grd, ARTICLE_A, "怒っている", 0, FALSE));
 }
 
 /*

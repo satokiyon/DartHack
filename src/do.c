@@ -2163,7 +2163,7 @@ revive_corpse(struct obj *corpse)
 
                 if (canseemon(mtmp)) {
                     pline("うわっ、%sが死体から這い出してきた%s!",
-                          chewed ? Adjmonnam(mtmp, "bite-covered")
+                          chewed ? Adjmonnam(mtmp, "噛み跡だらけの")
                                  : Monnam(mtmp),
                           effect);
                 } else {
@@ -2179,7 +2179,7 @@ revive_corpse(struct obj *corpse)
                           l_monnam(mcarry), an(cname));
                 else if (canspotmon(mtmp))
                     pline("%s suddenly appears!",
-                          chewed ? Adjmonnam(mtmp, "bite-covered")
+                          chewed ? Adjmonnam(mtmp, "噛み跡だらけの")
                                  : Monnam(mtmp));
             }
             break;
