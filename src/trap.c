@@ -142,7 +142,7 @@ burnarmor(struct monst *victim)
             item = hitting_u ? uarmh : which_armor(victim, W_ARMH);
             if (item) {
                 mat_idx = objects[item->otyp].oc_material;
-                Sprintf(buf, "%s %s", materialnm[mat_idx],
+                Sprintf(buf, "%s %s", jp_material_name_for_display(mat_idx),
                         helm_simple_name(item));
             }
             if (!burn_dmg(item, item ? buf : "兜"))

@@ -2732,7 +2732,7 @@ use_stone(struct obj *tstone)
                 break;
             }
         }
-        streak_color = c_obj_colors[objects[obj->otyp].oc_color];
+        streak_color = jp_obj_color_for_display(objects[obj->otyp].oc_color);
         break; /* gem or ring */
 
     default:
@@ -2765,7 +2765,7 @@ use_stone(struct obj *tstone)
                scratch a stone.  They will leave streaks on
                non-touchstones and touchstones alike. */
             if (is_flimsy(obj))
-                streak_color = c_obj_colors[objects[obj->otyp].oc_color];
+                streak_color = jp_obj_color_for_display(objects[obj->otyp].oc_color);
             else
                 do_scratch = (tstone->otyp != TOUCHSTONE);
             break;

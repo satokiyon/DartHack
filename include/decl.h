@@ -8,6 +8,7 @@
 
 /* The names of the colors used for gems, etc. */
 extern const char *c_obj_colors[];
+extern const char *jp_obj_color_for_display(int);
 
 /* lua callback queue names */
 extern const char * const nhcb_name[];
@@ -69,6 +70,7 @@ extern const char hexdd[33];
 
 /* material strings */
 extern const char *materialnm[];
+extern const char *jp_material_name_for_display(int);
 
 /* current mon class symbols */
 extern uchar monsyms[MAXMCLASSES];

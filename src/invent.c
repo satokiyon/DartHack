@@ -14,32 +14,42 @@ staticfn const char *drop_english_article(const char *);
 staticfn const char *
 action_verb_jp(const char *word)
 {
+    if (!strcmp(word, "name") || !strcmp(word, "call")) return "名付け";
     if (!strcmp(word, "identify")) return "識別";
     if (!strcmp(word, "adjust")) return "整理";
     if (!strcmp(word, "split")) return "分割";
-    if (!strcmp(word, "call")) return "名付け";
     if (!strcmp(word, "drop")) return "落とし";
+    if (!strcmp(word, "open")) return "開け";
+    if (!strcmp(word, "sacrifice")) return "捧げ";
     if (!strcmp(word, "put in")) return "入れ";
     if (!strcmp(word, "take out")) return "取り出し";
     if (!strcmp(word, "wear") || !strcmp(word, "put on")) return "装着";
     if (!strcmp(word, "remove") || !strcmp(word, "take off")) return "取り外し";
     if (!strcmp(word, "wield")) return "装備";
     if (!strcmp(word, "ready")) return "準備";
+    if (!strcmp(word, "write with") || !strcmp(word, "write on")) return "書き";
     if (!strcmp(word, "read")) return "読書";
     if (!strcmp(word, "zap")) return "使用";
+    if (!strcmp(word, "invoke")) return "発動";
+    if (!strcmp(word, "charge")) return "充填";
+    if (!strcmp(word, "rub") || !strcmp(word, "rub the royal jelly on")) return "こすり";
+    if (!strcmp(word, "grease")) return "油塗り";
+    if (!strcmp(word, "disarm")) return "解除";
     if (!strcmp(word, "eat")) return "食事";
+    if (!strcmp(word, "drink") || !strcmp(word, "quaff")) return "飲用";
+    if (!strcmp(word, "dip")) return "浸し";
+    if (!strcmp(word, "destroy")) return "破壊";
     if (!strcmp(word, "throw")) return "投擲";
     if (!strcmp(word, "apply")) return "使用";
     if (!strcmp(word, "loot")) return "あさり";
+    if (!strcmp(word, "stash")) return "隠し";
     if (!strcmp(word, "tip")) return "ひっくり返し";
-    if (!strcmp(word, "quaff")) return "飲用";
     if (!strcmp(word, "fire")) return "射撃";
     if (!strcmp(word, "travel")) return "移動";
     if (!strcmp(word, "kick")) return "蹴り";
     if (!strcmp(word, "glance")) return "見回し";
     if (!strcmp(word, "search")) return "探索";
     if (!strcmp(word, "pickup")) return "拾い上げ";
-    if (!strcmp(word, "wear")) return "装着";
     return word;
 }
 
@@ -2209,7 +2219,7 @@ silly_thing(const char *word,
             || (otmp->otyp == FAKE_AMULET_OF_YENDOR && !otmp->known)))
         pline_The("護符は変なあだ名で呼ばれるのを好まない.");
     else
-        pline(silly_thing_to, word);
+        pline(silly_thing_to, action_verb_jp(word));
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL

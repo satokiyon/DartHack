@@ -5777,9 +5777,9 @@ mimic_hit_msg(struct monst *mtmp, short otyp)
         break;
     case M_AP_OBJECT:
         if (otyp == SPE_HEALING || otyp == SPE_EXTRA_HEALING) {
-            pline_mon(mtmp, "%s seems a more vivid %s than before.",
+            pline_mon(mtmp, "%sは以前より鮮やかな%sに見えた.",
                   The(simple_typename(ap)),
-                  c_obj_colors[objects[ap].oc_color]);
+                  jp_obj_color_for_display(objects[ap].oc_color));
         }
         break;
     }
