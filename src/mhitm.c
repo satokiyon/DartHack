@@ -774,7 +774,7 @@ gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 
     if (gv.vis) {
         Sprintf(buf, "%sが%sをにらみつけた",
-                altmesg ? Adjmonnam(magr, "盲目になった") : Monnam(magr),
+                altmesg ? Adjmonnam(magr, "盲目の") : Monnam(magr),
             altmesg ? "周囲" : "相手");
         pline("%s...", buf,
               canspotmon(mdef) ? mon_nam(mdef) : "何か");

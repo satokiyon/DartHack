@@ -3442,12 +3442,12 @@ spoteffects(boolean pick)
                       Amonnam(mtmp), helm_simple_name(uarmh));
             } else if (u.uac + 3 <= rnd(20)) {
                 You("%sにもう少しで当たりそうになった!",
-                    x_monnam(mtmp, ARTICLE_A, "落下中の", 0, TRUE));
+                    x_monnam(mtmp, ARTICLE_NONE, "落下中の", 0, TRUE));
             } else {
                 int dmg;
 
                 You("%sに当たった!",
-                    x_monnam(mtmp, ARTICLE_A, "落下中の", 0, TRUE));
+                    x_monnam(mtmp, ARTICLE_NONE, "落下中の", 0, TRUE));
                 dmg = d(4, 6);
                 if (Half_physical_damage)
                     dmg = (dmg + 1) / 2;
