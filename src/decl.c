@@ -36,17 +36,37 @@ const char *c_obj_colors[] = {
     "white",          /* CLR_WHITE */
 };
 
+/* Display-only localized labels. Keep c_obj_colors[] as internal English keys. */
+static const char *const jp_c_obj_colors[] = {
+    "黒",      /* CLR_BLACK */
+    "赤",      /* CLR_RED */
+    "緑",      /* CLR_GREEN */
+    "茶色",    /* CLR_BROWN */
+    "青",      /* CLR_BLUE */
+    "赤紫",    /* CLR_MAGENTA */
+    "青緑",    /* CLR_CYAN */
+    "灰色",    /* CLR_GRAY */
+    "透明",    /* no_color */
+    "橙色",    /* CLR_ORANGE */
+    "明るい緑", /* CLR_BRIGHT_GREEN */
+    "黄色",    /* CLR_YELLOW */
+    "明るい青", /* CLR_BRIGHT_BLUE */
+    "明るい赤紫", /* CLR_BRIGHT_MAGENTA */
+    "明るい青緑", /* CLR_BRIGHT_CYAN */
+    "白",      /* CLR_WHITE */
+};
+
 const struct c_common_strings c_common_strings =
-    { "Nothing happens.",
-      "Nothing seems to happen.",
-      "That's enough tries!",
-      "That is a silly thing to %s.",
-      "shudder for a moment.",
+        { "何も起こらない.",
+            "何も起こらないようだ.",
+            "もう十分試した!",
+            "それを%sするのはばかげている.",
+            "一瞬身震いした.",
       "何か",
       "何か",
-    "再び動けるようになった.",
-      "Never mind.",
-      "vision quickly clears.",
+            "再び動けるようになった.",
+            "やめておこう.",
+            "視界はすぐに晴れた.",
       { "the", "your" },
       { "mon", "you" }
 };
@@ -93,6 +113,27 @@ const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
                              "metal",      "copper",  "silver",     "gold",
                              "platinum",   "mithril", "plastic",    "glass",
                              "gemstone",   "stone" };
+
+/* Display-only localized labels. Keep materialnm[] as internal English keys. */
+static const char *const jp_materialnm[] = {
+    "神秘的な", "液体の", "蝋の", "有機物の", "肉の", "紙の", "布の", "革の", "木の", "骨の",
+    "ドラゴンの皮の", "鉄の", "金属の", "銅の", "銀の", "金の", "プラチナの", "ミスリルの",
+    "プラスチックの", "ガラスの", "宝石の", "石の"
+};
+
+const char *
+jp_obj_color_for_display(int color)
+{
+    return (color >= 0 && color < CLR_MAX) ? jp_c_obj_colors[color] : "不明な色";
+}
+
+const char *
+jp_material_name_for_display(int mat)
+{
+    return (mat >= 0 && mat < (int) SIZE(materialnm))
+                ? jp_materialnm[mat]
+                : "不明な素材";
+}
 const char quitchars[] = " \r\n\033";
 const int shield_static[SHIELD_COUNT] = {
     S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4, /* 7 per row */

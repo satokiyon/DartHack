@@ -1683,7 +1683,7 @@ rndcolor(void)
 
     return Hallucination ? hcolor((char *) 0)
                          : (k == NO_COLOR) ? "無色"
-                                           : c_obj_colors[k];
+                                           : jp_obj_color_for_display(k);
 }
 
 static NEARDATA const char *const hliquids[] = {
