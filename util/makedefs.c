@@ -1398,25 +1398,25 @@ d_filter(char *line)
 }
 
 static const char *special_oracle[] = {
-    "\"...it is rather disconcerting to be confronted with the",
-    "following theorem from [Baker, Gill, and Solovay, 1975].",
-    "",
-    "Theorem 7.18  There exist recursive languages A and B such that",
-    "  (1)  P(A) == NP(A), and",
-    "  (2)  P(B) != NP(B)",
-    "",
-    "This provides impressive evidence that the techniques that are",
-    ("currently available will not suffice for proving that P != NP or"
-    "          "),
-    "that P == NP.\"  [Garey and Johnson, p. 185.]"
+        "\"...次の定理を突きつけられると、",
+        "いささか心穏やかではいられない。",
+        "[Baker, Gill, Solovay, 1975] より。",
+        "",
+        "定理 7.18  ある再帰言語 A, B が存在して、",
+        "  (1)  P(A) == NP(A) かつ",
+        "  (2)  P(B) != NP(B)",
+        "",
+        "これは、現在利用可能な手法だけでは",
+        "P != NP も P == NP も証明するには不十分であることを",
+        "強く示唆する証拠である。\"  [Garey and Johnson, p. 185.]"
 };
 
 /*
-   The oracle file consists of a "do not edit" comment, a decimal count N
-   and set of N+1 hexadecimal fseek offsets, followed by N multiple-line
-   records, separated by "---" lines.  The first oracle is a special case.
-   The input data contains just those multi-line records, separated by
-   "-----" lines.
+     The oracle file consists of a "do not edit" comment, a decimal count N
+     and set of N+1 hexadecimal fseek offsets, followed by N multiple-line
+     records, separated by "---" lines.  The first oracle is a special case.
+     The input data contains just those multi-line records, separated by
+     "-----" lines.
  */
 
 void
@@ -1424,11 +1424,14 @@ do_oracles(void)
 {
     char infile[60], tempfile[60], xbuf[BUFSZ];
     boolean in_oracle, ok;
+    int input_lineno;
     long fpos;
     unsigned long txt_offset, offset;
     int oracle_cnt;
     int i;
     char *line;
+    size_t linebytes;
+    static const size_t oracle_line_limit = 79;
 
     Sprintf(tempfile, DATA_TEMPLATE, "oracles.tmp");
     filename[0] = '\0';
@@ -1466,6 +1469,20 @@ do_oracles(void)
     offset = (unsigned long) ftell(tfp);
     Fprintf(ofp, "%05lx\n", offset); /* start pos of special oracle */
     for (i = 0; i < SIZE(special_oracle); i++) {
+        linebytes = strlen(special_oracle[i]);
+        if (linebytes >= oracle_line_limit + 1) {
+            Fprintf(stderr,
+                    "special oracle line %d too long (%lu bytes, max %lu).\n",
+                    i + 1, (unsigned long) linebytes,
+                    (unsigned long) oracle_line_limit);
+            Fclose(ifp);
+            Fclose(ofp);
+            Fclose(tfp);
+            Unlink(tempfile);
+            Unlink(filename);
+            makedefs_exit(EXIT_FAILURE);
+            /*NOTREACHED*/
+        }
         (void) fputs(xcrypt(special_oracle[i], xbuf), tfp);
         (void) fputc('\n', tfp);
     }
@@ -1476,9 +1493,11 @@ do_oracles(void)
     offset = (unsigned long) ftell(tfp);
     Fprintf(ofp, "%05lx\n", offset); /* start pos of first oracle */
     in_oracle = FALSE;
+    input_lineno = 0;
 
     set_fgetline_context(infile, TRUE, FALSE);
     while ((line = fgetline(ifp)) != 0) {
+        input_lineno++;
         SpinCursor(3);
 
         if (h_filter(line)) {
@@ -1497,6 +1516,23 @@ do_oracles(void)
             Fprintf(ofp, "%05lx\n", offset); /* start pos of this oracle */
         } else {
             in_oracle = TRUE;
+            linebytes = strlen(line);
+            if (linebytes > 0 && line[linebytes - 1] == '\n')
+                linebytes--;
+            if (linebytes >= oracle_line_limit + 1) {
+                Fprintf(stderr,
+                        "%s:%d oracle line too long (%lu bytes, max %lu).\n",
+                        infile, input_lineno, (unsigned long) linebytes,
+                        (unsigned long) oracle_line_limit);
+                free((genericptr_t) line);
+                Fclose(ifp);
+                Fclose(ofp);
+                Fclose(tfp);
+                Unlink(tempfile);
+                Unlink(filename);
+                makedefs_exit(EXIT_FAILURE);
+                /*NOTREACHED*/
+            }
             (void) fputs(xcrypt(line, xbuf), tfp);
         }
         free((genericptr_t) line);
