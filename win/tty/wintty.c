@@ -250,6 +250,7 @@ static void tty_putsym(winid, int, int, char);
 static boolean check_fields(boolean forcefields, int sz[MAX_STATUS_ROWS]);
 static void render_status(void);
 static void tty_putstatusfield(const char *, int, int);
+static int status_text_cells(const char *);
 static boolean check_windowdata(void);
 static void set_condition_length(void);
 static int make_things_fit(boolean);
@@ -4872,7 +4873,7 @@ tty_status_update(
         tty_status[NOW][fldidx].idx = fldidx;
         tty_status[NOW][fldidx].color = (color & 0x00FF);
         tty_status[NOW][fldidx].attr = term_attr_fixup(attrmask);
-        tty_status[NOW][fldidx].lth = strlen(status_vals[fldidx]);
+        tty_status[NOW][fldidx].lth = status_text_cells(status_vals[fldidx]);
         tty_status[NOW][fldidx].valid = TRUE;
         tty_status[NOW][fldidx].dirty = TRUE;
         tty_status[NOW][fldidx].sanitycheck = TRUE;
@@ -4937,6 +4938,16 @@ tty_status_update(
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
+
+static int
+status_text_cells(const char *text)
+{
+#ifdef WIN32CON
+    if ((windowprocs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8))
+        return win32con_utf8_strlen_cells(text);
+#endif
+    return (int) strlen(text);
+}
 
 static int
 make_things_fit(boolean force_update)
@@ -5169,7 +5180,7 @@ tty_putstatusfield(const char *text, int x, int y)
 
     ncols = cw->cols;
     nrows = cw->maxrow;
-    lth = (int) strlen(text);
+    lth = status_text_cells(text);
 
     print_vt_code2(AVTC_SELECT_WINDOW, NHW_STATUS);
 
@@ -5179,6 +5190,19 @@ tty_putstatusfield(const char *text, int x, int y)
         for (i = 0; i < lth; ++i) {
             n = i + x;
             if (n < ncols && *text) {
+#ifdef WIN32CON
+                if ((windowprocs.wincap2 & WC2_U_UTF8STR)
+                    && SYMHANDLING(H_UTF8)) {
+                    int drawn = win32con_putstr_utf8(text);
+                    int col;
+
+                    cw->curx += drawn;
+                    for (col = 0; col < drawn && (x + col - 1) < ncols;
+                         ++col)
+                        cw->data[y][x + col - 1] = '#';
+                    break;
+                }
+#endif
                 (void) putchar(*text);
                 ttyDisplay->curx++;
                 cw->curx++;
@@ -5222,7 +5246,7 @@ shrink_enc(int lvl)
         enc_shrinklvl = lvl;
         Sprintf(status_vals[BL_CAP], " %s", encvals[lvl][enclev]);
     }
-    tty_status[NOW][BL_CAP].lth = strlen(status_vals[BL_CAP]);
+    tty_status[NOW][BL_CAP].lth = status_text_cells(status_vals[BL_CAP]);
 }
 
 static void
@@ -5237,7 +5261,8 @@ shrink_dlvl(int lvl)
         Strcpy(buf, (lvl == 0) ? "Dlvl" : "Dl");
         Strcat(buf, levval);
         Strcpy(status_vals[BL_LEVELDESC], buf);
-        tty_status[NOW][BL_LEVELDESC].lth = strlen(status_vals[BL_LEVELDESC]);
+        tty_status[NOW][BL_LEVELDESC].lth
+            = status_text_cells(status_vals[BL_LEVELDESC]);
     }
 }
 

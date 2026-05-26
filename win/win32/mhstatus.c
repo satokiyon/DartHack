@@ -356,9 +356,23 @@ onWMPaint(HWND hWnd, WPARAM wParam UNUSED, LPARAM lParam UNUSED)
 
                 cached_font * fnt = mswin_get_font(NHW_STATUS, fntatr, hdc, FALSE);
 
-                BOOL useUnicode = fnt->supportsUnicode;
+                BOOL useUnicode = TRUE;
 
-                winos_ascii_to_wide_str((const unsigned char *) str, wbuf, SIZE(wbuf));
+                {
+                    int wlen = MultiByteToWideChar(NH_CODEPAGE, 0, str, -1,
+                                                   wbuf, SIZE(wbuf));
+                    if (wlen > 0)
+                        vlen = wlen - 1;
+                    else {
+                        vlen = 0;
+                        wbuf[0] = L'\0';
+                    }
+                }
+
+                if (!useUnicode) {
+                    winos_ascii_to_wide_str((const unsigned char *) str,
+                                            wbuf, SIZE(wbuf));
+                }
 
                 nFg = (clr == NO_COLOR ? status_fg_color
                     : ((clr >= 0 && clr < CLR_MAX) ? nhcolor_to_RGB(clr)
