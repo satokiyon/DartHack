@@ -2721,7 +2721,7 @@ reroll_menu(void)
 
     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR, "",
              MENU_ITEMFLAGS_NONE);
-    Sprintf(buf, "筋:%s 器:%-1d 耐:%-1d 知:%-1d 賢:%-1d 魅:%-1d",
+    Sprintf(buf, "St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
             get_strength_str(),
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
             ACURR(A_CHA));
