@@ -2247,8 +2247,8 @@ steal_it(struct monst *mdef, struct attack *mattk)
         if (otmp == ustealo)
             pline("%sは鎧を脱ぎ終えた.", Monnam(mdef));
         /* give the object to the character */
-        otmp = hold_another_object(otmp, "You snatched but dropped %s.",
-                                   doname(otmp), "You steal: ");
+        otmp = hold_another_object(otmp, "奪い取ったが、%sを落としてしまった.",
+                   doname(otmp), "あなたは盗んだ:");
         /* might have dropped otmp, and it might have broken or left level */
         if (!otmp || otmp->where != OBJ_INVENT)
             continue;
@@ -4370,7 +4370,7 @@ mhitm_ad_heal(
             if (Role_if(PM_HEALER)) {
                 if (!Deaf && !(svm.moves % 5)) {
                     SetVoice(magr, 0, 80, 0);
-                    verbalize("先生、あなたの協力がないとおれは助けられない。");
+                    verbalize("先生、協力してくださらないと先生を治療できません。");
                 }
                 mhm->damage = 0;
             } else
