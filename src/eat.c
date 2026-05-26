@@ -3773,18 +3773,18 @@ floorfood(
                    attempt to eat off floor */
                 return (struct obj *) 0;
             }
-                if (otmp->otyp == CORPSE) {
-                     Sprintf(qbuf, "そこに%sがある; それを食べますか?",
-                                jp_corpse_xname(otmp, (const char *) 0,
-                                                     CXN_SINGULAR | CXN_ARTICLE));
-                } else {
-                     /* "There is <an object> here; <verb> it?" or
-                         "There are <N objects> here; <verb> one?" */
-                     Sprintf(qbuf, "そこに%s ", otense(otmp, "are"));
-                     Sprintf(qsfx, " がある; %sか?", one ? "それを食べます" : "1つ食べます");
-                     (void) safe_qbuf(qbuf, qbuf, qsfx, otmp, doname, ansimpleoname,
-                                            one ? something : (const char *) "things");
-                }
+            if (otmp->otyp == CORPSE) {
+                Sprintf(qbuf, "そこに%sがある; それを食べますか?",
+                        jp_corpse_xname(otmp, (const char *) 0,
+                                        CXN_SINGULAR | CXN_ARTICLE));
+            } else {
+                /* "There is <an object> here; <verb> it?" or
+                   "There are <N objects> here; <verb> one?" */
+                Sprintf(qbuf, "そこに");
+                Sprintf(qsfx, "がある; %sか?", one ? "それを食べます" : "1つ食べます");
+                (void) safe_qbuf(qbuf, qbuf, qsfx, otmp, doname, ansimpleoname,
+                                 one ? something : (const char *) "things");
+            }
             if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y')
                 return  otmp;
             else if (c == 'q')
