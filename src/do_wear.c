@@ -64,6 +64,12 @@ fingers_or_gloves(boolean check_gloves)
             : jp_body_part_plural(FINGER)); /* "fingers" */
 }
 
+staticfn const char *
+ring_slot_text(void)
+{
+    return humanoid(gy.youmonst.data) ? "両手の指" : fingers_or_gloves(FALSE);
+}
+
 void
 off_msg(struct obj *otmp)
 {
@@ -85,16 +91,12 @@ on_msg(struct obj *otmp)
     }
 
     if (flags.verbose) {
-        char how[BUFSZ];
-        /* call xname() before obj_is_pname(); formatting obj's name
-           might set obj->dknown and that affects the pname test */
         const char *otmp_name = xname(otmp);
 
-        how[0] = '\0';
         if (otmp->otyp == TOWEL)
-            Sprintf(how, " around your %s", jp_body_part(HEAD));
-        You("%s%sを着ている.",
-            obj_is_pname(otmp) ? the(otmp_name) : an(otmp_name), how);
+            You("%sを%sに巻きつけた.", otmp_name, jp_body_part(HEAD));
+        else
+            You("%sを身に着けた.", otmp_name);
     }
 }
 
@@ -623,9 +625,12 @@ wielding_corpse(
     if (touch_petrifies(&mons[obj->corpsenm]) && !Stone_resistance) {
         char kbuf[BUFSZ], hbuf[BUFSZ];
 
-        You("%s素手で%sをつかんでしまった.",
-            (how && is_gloves(how)) ? "今や" : "",
-            jp_corpse_xname(obj, (const char *) 0, CXN_ARTICLE));
+        if (how && is_gloves(how))
+            You("今や素手で%sをつかんでしまった.",
+                jp_corpse_xname(obj, (const char *) 0, CXN_ARTICLE));
+        else
+            You("素手で%sをつかんでしまった.",
+                jp_corpse_xname(obj, (const char *) 0, CXN_ARTICLE));
         /* "removing" ought to be "taking off" but that makes the
            tombstone text more likely to be truncated */
         if (how)
@@ -1166,10 +1171,10 @@ Amulet_off(void)
         float_vs_flight(); /* probably not needed here */
         if (was_flying && !Flying) {
             disp.botl = TRUE; /* status: 'Fly' Off */
-            You("%s.", (is_pool_or_lava(u.ux, u.uy)
-                        || Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
-                          ? "stop flying"
-                          : "land");
+                        You("%s.", (is_pool_or_lava(u.ux, u.uy)
+                                                || Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
+                                                    ? "飛行をやめた"
+                                                    : "着地した");
             mkn = TRUE; /* makeknown(AMULET_OF_FLYING) */
             spoteffects(TRUE);
         }
@@ -2071,7 +2076,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
     if (is_helmet(otmp)) {
         if (uarmh) {
             if (noisy)
-                already_wearing(an(helm_simple_name(uarmh)));
+                already_wearing(helm_simple_name(uarmh));
             err++;
         } else if (Upolyd && has_horns(gy.youmonst.data) && !is_flimsy(otmp)) {
             /* (flimsy exception matches polyself handling) */
@@ -2149,8 +2154,8 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
             /* prevent slippery bare fingers from transferring to
                gloved fingers */
             if (noisy)
-                Your("%sは滑りすぎて%sをはめられない.",
-                     fingers_or_gloves(FALSE), gloves_simple_name(otmp));
+                 Your("%sは滑りすぎて%sをはめられない.",
+                     jp_body_part_plural(FINGER), gloves_simple_name(otmp));
             err++;
         } else
             *mask = W_ARMG;
@@ -2171,7 +2176,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
     } else if (is_cloak(otmp)) {
         if (uarmc) {
             if (noisy)
-                already_wearing(an(cloak_simple_name(uarmc)));
+                already_wearing(cloak_simple_name(uarmc));
             err++;
         } else
             *mask = W_ARMC;
@@ -2256,9 +2261,10 @@ accessory_or_armor_on(struct obj *obj)
                 return ECMD_OK;
             }
             if (uleft && uright) {
-                There("空き%s%sがない.",
-                      humanoid(gy.youmonst.data) ? "指輪用の" : "",
-                      fingers_or_gloves(FALSE));
+                if (humanoid(gy.youmonst.data))
+                    There("指輪をはめる指に空きがない.");
+                else
+                    There("%sの空きがない.", ring_slot_text());
                 return ECMD_OK;
             }
             if (uleft) {
@@ -2267,9 +2273,10 @@ accessory_or_armor_on(struct obj *obj)
                 mask = LEFT_RING;
             } else {
                 do {
-                        Sprintf(qbuf, "どちらの%s%sにはめますか?（右手/左手）",
-                            humanoid(gy.youmonst.data) ? "指輪用の" : "",
-                            jp_body_part(FINGER));
+                    Sprintf(qbuf, "どちらの%sにはめますか?（右手/左手）",
+                            humanoid(gy.youmonst.data)
+                                ? "指"
+                                : jp_body_part(FINGER));
                     answer = yn_function(qbuf, rightleftchars, '\0', TRUE);
                     switch (answer) {
                     case '\0':
@@ -2458,9 +2465,13 @@ doputon(void)
     if (uleft && uright && uamul && ublindf
         && uarm && uarmu && uarmc && uarmh && uarms && uarmg && uarmf) {
         /* 'P' message doesn't mention armor */
-           Your("%sがいっぱいで、これ以上%sを着けられない.",
-               fingers_or_gloves(FALSE),
-               (ublindf->otyp == LENSES) ? "レンズ" : "目隠し");
+        if (humanoid(gy.youmonst.data))
+            Your("両手の指がふさがっていて、これ以上%sを着けられない.",
+                 (ublindf->otyp == LENSES) ? "目隠し" : "レンズ");
+        else
+            Your("%sがいっぱいで、これ以上%sを着けられない.",
+                 ring_slot_text(),
+                 (ublindf->otyp == LENSES) ? "目隠し" : "レンズ");
         return ECMD_OK;
     }
     otmp = getobj("put on", puton_ok, GETOBJ_NOFLAGS);
@@ -2545,8 +2556,8 @@ glibr(void)
 
     if (!uarmg && (leftfall || rightfall) && !nolimbs(gy.youmonst.data)) {
         /* changed so cursed rings don't fall off, GAN 10/30/86 */
-        Your("指輪が%sから滑り落ちた.",
-             (leftfall && rightfall) ? fingers_or_gloves(FALSE)
+           Your("指輪が%sから滑り落ちた.",
+               (leftfall && rightfall) ? ring_slot_text()
                                      : jp_body_part(FINGER));
         xfl++;
         if (leftfall) {
@@ -2768,7 +2779,7 @@ select_off(struct obj *otmp)
             why = uwep;
         }
         if (why) {
-            You("%sできないので%sを脱げない.", buf, the(xname(otmp)));
+            You("%sできないので%sを脱げない.", buf, xname(otmp));
             set_bknown(why, 1);
             return 0;
         }
