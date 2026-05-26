@@ -190,9 +190,9 @@ mswings(
     boolean bash)       /* True: polearm used at too close range */
 {
     if (flags.verbose && !Blind && mon_visible(mtmp)) {
-        pline_mon(mtmp, "%sは%s%s%sで攻撃した.", Monnam(mtmp),
-                  (otemp->quan > 1L) ? "そのうち1つの" : "",
-                  mhis(mtmp), xname(otemp));
+        pline_mon(mtmp, "%sは%s%sで攻撃した.", Monnam(mtmp),
+                  (otemp->quan > 1L) ? "そのうち1つの" : "その",
+                  xname(otemp));
     }
 }
 
@@ -206,11 +206,11 @@ mpoisons_subj(
         struct obj *mwep = (mtmp == &gy.youmonst) ? uwep : MON_WEP(mtmp);
         /* "Foo's attack was poisoned." is pretty lame, but at least
            it's better than "sting" when not a stinging attack... */
-        return (!mwep || !mwep->opoisoned) ? "attack" : "weapon";
+        return (!mwep || !mwep->opoisoned) ? "攻撃" : "武器";
     } else {
-        return (mattk->aatyp == AT_TUCH) ? "contact"
-                  : (mattk->aatyp == AT_GAZE) ? "gaze"
-                       : (mattk->aatyp == AT_BITE) ? "bite" : "sting";
+        return (mattk->aatyp == AT_TUCH) ? "接触"
+                  : (mattk->aatyp == AT_GAZE) ? "視線"
+                       : (mattk->aatyp == AT_BITE) ? "かみつき" : "刺突";
     }
 }
 
@@ -654,7 +654,7 @@ mattacku(struct monst *mtmp)
 
             obj = which_armor(mtmp, WORN_HELMET);
             if (hard_helmet(obj)) {
-                Your("攻撃は%sの%sで受け流された.", s_suffix(mon_nam(mtmp)),
+                 Your("攻撃は%sの%sで受け流された.", l_monnam(mtmp),
                      helm_simple_name(obj));
             } else {
                 if (3 + find_mac(mtmp) <= rnd(20)) {
@@ -1777,7 +1777,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
 
             if (useeit)
                 (void) ureflects("%sの視線はあなたの%sで反射された.",
-                                 s_suffix(Monnam(mtmp)));
+                                 l_monnam(mtmp));
             if (mon_reflects(mtmp, !useeit ? (char *) 0
                                   : "視線は%s%sで反射された!"))
                 break;
@@ -1798,7 +1798,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
         }
         if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)
             && !Stone_resistance && !Unaware) {
-            You("%sの視線をまともに受けた.", s_suffix(mon_nam(mtmp)));
+            You("%sの視線をまともに受けた.", l_monnam(mtmp));
             stop_occupation();
             if (poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))
                 break;
@@ -1819,7 +1819,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
                 mtmp->mspec_used = mtmp->mspec_used + (conf + rn2(6));
                 if (!Confusion)
                     pline_mon(mtmp, "%sの視線で混乱した!",
-                              s_suffix(Monnam(mtmp)));
+                              l_monnam(mtmp));
                 else
                     You("ますます混乱してきた.");
                 make_confused(HConfusion + conf, FALSE);
@@ -1855,7 +1855,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             } else {
                 int blnd = d((int) mattk->damn, (int) mattk->damd);
 
-                You("%sの輝きで目がくらんだ!", s_suffix(mon_nam(mtmp)));
+                You("%sの輝きで目がくらんだ!", l_monnam(mtmp));
                 make_blinded((long) blnd, FALSE);
                 stop_occupation();
                 /* not blind at this point implies you're wearing
@@ -1912,8 +1912,8 @@ gazemu(struct monst *mtmp, struct attack *mattk)
                 already = (mtmp->mfrozen != 0); /* can't happen... */
             } else {
                 fall_asleep(-rnd(10), TRUE);
-                    pline("%sの視線でひどく眠くなってきた...",
-                      s_suffix(Monnam(mtmp)));
+                                pline("%sの視線でひどく眠くなってきた...",
+                                            l_monnam(mtmp));
                 monstunseesu(M_SEEN_SLEEP);
             }
         }
