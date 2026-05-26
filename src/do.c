@@ -210,10 +210,10 @@ flooreffects(
                         mtmp->mhp -= damage;
                         if (DEADMONSTER(mtmp)) {
                             if (canspotmon(mtmp))
-                                pline("%s is %s!", Monnam(mtmp),
+                                  pline("%sは%s!", Monnam(mtmp),
                                       (nonliving(mtmp->data)
                                        || is_vampshifter(mtmp))
-                                      ? "destroyed" : "killed");
+                                      ? "破壊された" : "倒された");
                             mondied(mtmp);
                         }
                     } else {
@@ -289,7 +289,7 @@ flooreffects(
                 Soundeffect(se_item_tumble_downwards, 50);
                 You_hear("%sが落ちていくのが聞こえた.", xname(obj));
             } else {
-                pline("%sが%sの落とし穴へ転がり落ちた.", Tobjnam(obj, "tumble"),
+                pline("%sが%sの落とし穴へ転がり落ちた.", xname(obj),
                       the_your[t->madeby_u]);
             }
         } else if (ship_object(obj, x, y, FALSE)) {
@@ -329,7 +329,7 @@ flooreffects(
         if (cansee(x,y)) {
             /* unconditional "ground" is safe as this only runs for
                room and corridor tiles */
-            pline("%sが熱い地面に触れて熱くなった.", Tobjnam(obj, "heat"));
+            pline("%sが熱い地面に触れて熱くなった.", xname(obj));
         }
 
         int survival_chance = obj->blessed ? 70 : 50;
@@ -861,7 +861,7 @@ engulfer_digests_food(struct obj *obj)
             could_slime = TRUE;
         }
         /* see or feel the effect */
-        pline("%sは一気に消化された!", Tobjnam(obj, "are"));
+        pline("%sは一気に消化された!", xname(obj));
 
         if (could_poly || could_slime) {
             (void) newcham(u.ustuck, could_slime ? &mons[PM_GREEN_SLIME] : 0,
@@ -2255,11 +2255,11 @@ revive_mon(anything *arg, long timeout UNUSED)
 
         if (rloc(mtmp, RLOC_NOMSG)) {
             if (notice_it && !canseemon(mtmp))
-                pline("%s vanishes.", monname);
+                pline("%sは消えた.", monname);
             else if (!notice_it && canseemon(mtmp))
-                pline("%s appears.", Monnam(mtmp)); /* not pre-rloc monname */
+                pline("%sが現れた.", Monnam(mtmp)); /* not pre-rloc monname */
             else if (notice_it && dist2(mtmp->mx, mtmp->my, x, y) > 2)
-                pline("%s teleports.", monname); /* saw it and still see it */
+                pline("%sはテレポートした.", monname); /* saw it and still see it */
         }
     }
 

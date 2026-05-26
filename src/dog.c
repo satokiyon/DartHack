@@ -831,21 +831,18 @@ keepdogs(
                 mdrop_special_objs(mtmp); /* drop Amulet */
             } else if (mtmp->meating || mtmp->mtrapped) {
                 if (canseemon(mtmp))
-                    pline_mon(mtmp, "%s is still %s.", Monnam(mtmp),
-                             mtmp->meating ? "eating" : "trapped");
+                    pline_mon(mtmp, "%sはまだ%s.", l_monnam(mtmp),
+                             mtmp->meating ? "食事中だ" : "罠にかかっている");
                 stay_behind = TRUE;
             } else if (mon_has_amulet(mtmp)) {
                 if (canseemon(mtmp))
-                    pline("%s seems very disoriented for a moment.",
-                          Monnam(mtmp));
+                    pline("%sは一瞬ひどく混乱したように見えた.",
+                          l_monnam(mtmp));
                 stay_behind = TRUE;
             }
             if (stay_behind) {
                 if (mtmp->mleashed) {
-                    pline("%s leash suddenly comes loose.",
-                          humanoid(mtmp->data)
-                              ? (mtmp->female ? "Her" : "His")
-                              : "Its");
+                    pline("綱が突然はずれた.");
                     m_unleash(mtmp, FALSE);
                 }
                 if (mtmp == u.usteed) {
@@ -877,7 +874,7 @@ keepdogs(
         } else if (mtmp->mleashed) {
             /* this can happen if your quest leader ejects you from the
                "home" level while a leashed pet isn't next to you */
-            pline("%s leash goes slack.", s_suffix(Monnam(mtmp)));
+            pline("%sの綱がたるんだ.", l_monnam(mtmp));
             m_unleash(mtmp, FALSE);
         }
     }
@@ -1167,8 +1164,8 @@ tamedog(
 
     /* worst case, at least it'll be peaceful. */
     if (givemsg && !mtmp->mpeaceful && canspotmon(mtmp)) {
-        pline_mon(mtmp, "%s seems %s.", Monnam(mtmp),
-              Hallucination ? "really chill" : "more amiable");
+          pline_mon(mtmp, "%sは%s.", l_monnam(mtmp),
+              Hallucination ? "やけにのんびりしている" : "以前より友好的に見える");
         givemsg = FALSE; /* don't give another message below */
     }
     mtmp->mpeaceful = 1;
@@ -1202,11 +1199,11 @@ tamedog(
                 boolean big_corpse =
                     (obj->otyp == CORPSE && ismnum(obj->corpsenm)
                      && mons[obj->corpsenm].msize > mtmp->data->msize);
-                pline_mon(mtmp, "%s catches %s%s",
-                          Monnam(mtmp), the(xname(obj)),
-                         !big_corpse ? "." : ", or vice versa!");
+                pline_mon(mtmp, "%sは%sを受け止めた%s",
+                          l_monnam(mtmp), the(xname(obj)),
+                         !big_corpse ? "." : "、あるいは逆かもしれない!");
             } else if (cansee(mtmp->mx, mtmp->my))
-                pline("%s.", Tobjnam(obj, "stop"));
+                pline("%sが止まった.", xname(obj));
             /* dog_eat expects a floor object */
             place_object(obj, mtmp->mx, mtmp->my);
             (void) dog_eat(mtmp, obj, mtmp->mx, mtmp->my, FALSE);
@@ -1268,8 +1265,8 @@ tamedog(
     }
 
     if (givemsg && canspotmon(mtmp))
-        pline_mon(mtmp, "%s seems quite %s.", Monnam(mtmp),
-              Hallucination ? "approachable" : "friendly");
+        pline_mon(mtmp, "%sはかなり%s.", l_monnam(mtmp),
+              Hallucination ? "親しみやすそうだ" : "友好的だ");
 
     newsym(mtmp->mx, mtmp->my);
     if (mtmp->wormno)
@@ -1316,11 +1313,13 @@ wary_dog(struct monst *mtmp, boolean was_dead)
             if (haseyes(gy.youmonst.data)) {
                 if (haseyes(mtmp->data))
                     pline_mon(mtmp,
-                             "%s %s to look you in the %s.", Monnam(mtmp),
-                             mtmp->mpeaceful ? "seems unable" : "refuses",
-                             jp_body_part(EYE));
+                             "%sはあなたの%sを%s.", l_monnam(mtmp),
+                             jp_body_part(EYE),
+                             mtmp->mpeaceful
+                                 ? "見ることができないようだ"
+                                 : "見ようとしない");
                 else
-                    pline_mon(mtmp, "%s avoids your gaze.", Monnam(mtmp));
+                    pline_mon(mtmp, "%sはあなたの視線を避けた.", l_monnam(mtmp));
             }
         }
     } else {
@@ -1332,8 +1331,8 @@ wary_dog(struct monst *mtmp, boolean was_dead)
 
     if (!mtmp->mtame) {
         if (!quietly && canspotmon(mtmp))
-            pline_mon(mtmp, "%s %s.", Monnam(mtmp),
-                  mtmp->mpeaceful ? "is no longer tame" : "has become feral");
+            pline_mon(mtmp, "%sは%s.", l_monnam(mtmp),
+                mtmp->mpeaceful ? "もう飼い慣らされていない" : "野生化した");
         newsym(mtmp->mx, mtmp->my);
         /* a life-saved monster might be leashed;
            don't leave it that way if it's no longer tame */
