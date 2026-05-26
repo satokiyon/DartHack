@@ -712,7 +712,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
 staticfn void
 basics_enlightenment(int mode UNUSED, int final)
 {
-    static char Power[] = "MP";
+    static char Power[] = "Pw(魔力)";
     char buf[BUFSZ];
     int pw = u.uen, hp = (Upolyd ? u.mh : u.uhp),
         pwmax = u.uenmax, hpmax = (Upolyd ? u.mhmax : u.uhpmax);
@@ -724,9 +724,9 @@ basics_enlightenment(int mode UNUSED, int final)
         hp = 0;
     /* "1 out of 1" rather than "all" if max is only 1; should never happen */
     if (hp == hpmax && hpmax > 1)
-        Sprintf(buf, "HP : %d（満タン）", hpmax);
+        Sprintf(buf, "HP(体力) : %d（満タン）", hpmax);
     else
-        Sprintf(buf, "HP : %d/%d", hp, hpmax);
+        Sprintf(buf, "HP(体力) : %d/%d", hp, hpmax);
     enl_msg("あなたの", "", "", buf, "");
 
     /* low max energy is feasible, so handle couple of extra special cases */
