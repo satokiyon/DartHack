@@ -350,7 +350,7 @@ set_entity(
 staticfn const char *
 e_nam(struct entity *etmp)
 {
-    return is_u(etmp) ? "you" : mon_nam(etmp->emon);
+    return is_u(etmp) ? "you" : l_monnam(etmp->emon);
 }
 
 /*
@@ -362,7 +362,7 @@ E_phrase(struct entity *etmp, const char *verb)
 {
     static char wholebuf[80];
 
-    Strcpy(wholebuf, is_u(etmp) ? "You" : Monnam(etmp->emon));
+    Strcpy(wholebuf, is_u(etmp) ? "You" : upstart(l_monnam(etmp->emon)));
     if (!verb || !*verb)
         return wholebuf;
     Strcat(wholebuf, " ");
@@ -598,8 +598,11 @@ do_entity(struct entity *etmp)
                 Strcpy(svk.killer.name,
                        "crushed to death underneath a drawbridge");
             }
-            pline("%s crushed underneath the drawbridge.",
-                  E_phrase(etmp, "are"));             /* no jump */
+            if (is_u(etmp))
+                pline("あなたは跳ね橋の下敷きになった.");
+            else
+                pline("%sは跳ね橋の下敷きになった.",
+                      l_monnam(etmp->emon));             /* no jump */
             e_died(etmp,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                    CRUSHING); /* no corpse */
@@ -614,8 +617,11 @@ do_entity(struct entity *etmp)
                 debugpline0("Jump succeeds!");
             } else {
                 if (e_inview) {
-                    pline("%s crushed by the falling portcullis!",
-                          E_phrase(etmp, "are"));
+                    if (is_u(etmp))
+                        pline("あなたは落ちてきた跳ね格子に押し潰された!");
+                    else
+                        pline("%sは落ちてきた跳ね格子に押し潰された!",
+                              l_monnam(etmp->emon));
                 } else if (!Deaf) {
                     Soundeffect(se_crushing_sound, 100);
                     You_hear("押し潰すような音が聞こえた.");
@@ -710,8 +716,7 @@ do_entity(struct entity *etmp)
                 else
                     pline_The("跳ね橋が閉じてくる...");
             } else
-                pline("%s behind the drawbridge.",
-                      E_phrase(etmp, "disappear"));
+                pline("%sは跳ね橋の向こうへ消えた.", l_monnam(etmp->emon));
         }
         if (!e_survives_at(etmp, etmp->ex, etmp->ey)) {
             svk.killer.format = KILLED_BY_AN;
@@ -730,7 +735,10 @@ do_entity(struct entity *etmp)
         if (e_survives_at(etmp, etmp->ex, etmp->ey)) {
             if (e_inview && !is_flyer(etmp->edata)
                 && !is_floater(etmp->edata))
-                pline("%s from the bridge.", E_phrase(etmp, "fall"));
+                if (is_u(etmp))
+                    pline("あなたは跳ね橋から落ちた.");
+                else
+                    pline("%sは跳ね橋から落ちた.", l_monnam(etmp->emon));
             return;
         }
         debugpline1("%s cannot survive on the drawbridge square",
@@ -741,14 +749,15 @@ do_entity(struct entity *etmp)
                 boolean lava = is_lava(etmp->ex, etmp->ey);
 
                 if (Hallucination)
-                    pline("%s the %s and disappears.",
-                          E_phrase(etmp, "drink"), lava ? "lava" : "moat");
+                      pline("%sは%sを飲み込んで消えた.",
+                          l_monnam(etmp->emon),
+                          lava ? hliquid("lava") : hliquid("water"));
                 else
-                    pline("%s into the %s.", E_phrase(etmp, "fall"),
-                          lava ? hliquid("lava") : "moat");
+                    pline("%sは%sへ落ちた.", l_monnam(etmp->emon),
+                          lava ? hliquid("lava") : hliquid("water"));
             }
         svk.killer.format = NO_KILLER_PREFIX;
-        Strcpy(svk.killer.name, "fell from a drawbridge");
+            Strcpy(svk.killer.name, "fell from a drawbridge");
         e_died(etmp, /* CRUSHING is arbitrary */
                XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                is_pool(etmp->ex, etmp->ey) ? DROWNING
@@ -912,13 +921,13 @@ destroy_drawbridge(coordxy x, coordxy y)
         if (lev1->typ == DRAWBRIDGE_UP) {
             if (cansee(x2, y2) || u_at(x2, y2))
                 pline_The("跳ね橋の跳ね格子は%sへ落ちた!",
-                          lava ? hliquid("lava") : "moat");
+                          lava ? hliquid("lava") : hliquid("water"));
             else
                 You_hear("大きな水しぶきの音が聞こえた!");  /* Deaf-aware */
         } else {
             if (cansee(x, y) || u_at(x, y))
                 pline_The("跳ね橋は%sへ崩れ落ちた!",
-                          lava ? hliquid("lava") : "moat");
+                          lava ? hliquid("lava") : hliquid("water"));
             else
                 You_hear("大きな水しぶきの音が聞こえた!");  /* Deaf-aware */
         }
@@ -970,10 +979,13 @@ destroy_drawbridge(coordxy x, coordxy y)
         e_inview = e_canseemon(etmp2);
         if (!automiss(etmp2)) {
             if (e_inview)
-                pline("%s blown apart by flying debris.",
-                      E_phrase(etmp2, "are"));
+                if (is_u(etmp2))
+                    pline("あなたは飛び散る破片で粉々になった.");
+                else
+                    pline("%sは飛び散る破片で粉々になった.",
+                          l_monnam(etmp2->emon));
             svk.killer.format = KILLED_BY_AN;
-            Strcpy(svk.killer.name, "exploding drawbridge");
+                Strcpy(svk.killer.name, "exploding drawbridge");
             e_died(etmp2,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                    CRUSHING); /*no corpse*/
@@ -992,11 +1004,12 @@ destroy_drawbridge(coordxy x, coordxy y)
         } else {
             if (e_inview) {
                 if (!is_u(etmp1) && Hallucination)
-                    pline("%s into some heavy metal!",
-                          E_phrase(etmp1, "get"));
+                    pline("%sは重金属まみれになった!", l_monnam(etmp1->emon));
+                else if (is_u(etmp1))
+                    pline("あなたは巨大な金属片の直撃を受けた!");
                 else
-                    pline("%s hit by a huge chunk of metal!",
-                          E_phrase(etmp1, "are"));
+                    pline("%sは巨大な金属片の直撃を受けた!",
+                          l_monnam(etmp1->emon));
             } else {
                 if (!Deaf && !is_u(etmp1) && !is_pool(x, y)) {
                     Soundeffect(se_crushing_sound, 75);
@@ -1006,7 +1019,7 @@ destroy_drawbridge(coordxy x, coordxy y)
                 }
             }
             svk.killer.format = KILLED_BY_AN;
-            Strcpy(svk.killer.name, "collapsing drawbridge");
+                 Strcpy(svk.killer.name, "collapsing drawbridge");
             e_died(etmp1,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                    CRUSHING); /*no corpse*/

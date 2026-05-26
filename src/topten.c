@@ -209,9 +209,24 @@ jp_translate_killer_text_for_display(
 
     core = tmp;
     outmain[0] = '\0';
-    if (!strncmpi(core, "killed by ", 10)) {
-        Snprintf(outmain, sizeof outmain, "%sに倒された",
-                 skip_english_article(core + 10));
+    if (!strcmpi(core, "crushed to death underneath a drawbridge")) {
+        Snprintf(outmain, sizeof outmain, "跳ね橋の下敷きになった");
+    } else if (!strcmpi(core, "fell from a drawbridge")) {
+        Snprintf(outmain, sizeof outmain, "跳ね橋から落ちた");
+    } else if (!strncmpi(core, "killed by ", 10)) {
+        const char *killer = skip_english_article(core + 10);
+
+        if (!strcmpi(killer, "falling drawbridge")) {
+            Snprintf(outmain, sizeof outmain, "落下した跳ね橋に倒された");
+        } else if (!strcmpi(killer, "closing drawbridge")) {
+            Snprintf(outmain, sizeof outmain, "閉じる跳ね橋に倒された");
+        } else if (!strcmpi(killer, "exploding drawbridge")) {
+            Snprintf(outmain, sizeof outmain, "爆発する跳ね橋に倒された");
+        } else if (!strcmpi(killer, "collapsing drawbridge")) {
+            Snprintf(outmain, sizeof outmain, "崩れ落ちる跳ね橋に倒された");
+        } else {
+            Snprintf(outmain, sizeof outmain, "%sに倒された", killer);
+        }
     } else if (!strncmpi(core, "choked on ", 10)) {
         Snprintf(outmain, sizeof outmain, "%sで窒息した",
                  skip_english_article(core + 10));
