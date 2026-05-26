@@ -2213,7 +2213,7 @@ revive_corpse(struct obj *corpse)
                     ttmp = t_at(mtmp->mx, mtmp->my);
                     if (ttmp)
                         ttmp->tseen = TRUE;
-                    pline("%s claws itself out of the ground!",
+                    pline("%sが地面をかき分けて這い出してきた!",
                           canspotmon(mtmp) ? Amonnam(mtmp) : Something);
                     newsym(mtmp->mx, mtmp->my);
                 } else if (mdistu(mtmp) < 5*5) {
@@ -2320,14 +2320,14 @@ cmd_safety_prevention(const char *ucverb, const char *cmddesc,
 
         buf[0] = '\0';
         if (iflags.cmdassist || !(*flagcounter)++)
-            Sprintf(buf, "  Use '%s' prefix to force %s.",
+            Sprintf(buf, "  '%s'接頭辞を付けると%sを強行できる.",
                     visctrl(cmd_from_func(do_reqmenu)), cmddesc);
 
         if (monster_nearby()) {
             Norep("%s%s", act, buf);
             return TRUE;
         } else if (danger_uprops()) {
-            Norep("%s doesn't feel like a good idea right now.", ucverb);
+            Norep("%sは今は止めた方がよさそうだ.", ucverb);
             return TRUE;
         }
     }
@@ -2340,7 +2340,7 @@ cmd_safety_prevention(const char *ucverb, const char *cmddesc,
 int
 donull(void)
 {
-    if (cmd_safety_prevention("Waiting", "a no-op (to rest)",
+    if (cmd_safety_prevention("待機", "待機",
                           "攻撃が当たるのを待っているつもりか?",
                           &gd.did_nothing_flag))
         return ECMD_OK;
