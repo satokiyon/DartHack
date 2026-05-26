@@ -126,7 +126,8 @@ do_statusline1(void)
         }
         Strcpy(nb = eos(nb), mbot);
     } else {
-        Strcpy(nb = eos(nb), rank());
+        Strcpy(nb = eos(nb), jp_rank_of_for_display(u.ulevel, Role_switch,
+                                                     flags.female));
     }
 
     Sprintf(nb = eos(nb), "  ");
@@ -139,10 +140,7 @@ do_statusline1(void)
             get_strength_str(),
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
             ACURR(A_CHA));
-    Sprintf(nb = eos(nb), "%s",
-            (u.ualign.type == A_CHAOTIC) ? "  Chaotic"
-              : (u.ualign.type == A_NEUTRAL) ? "  Neutral"
-                : "  Lawful");
+        Sprintf(nb = eos(nb), "  %s", jp_align_for_display(u.ualign.type));
 #ifdef SCORE_ON_BOTL
     if (flags.showscore)
         Sprintf(nb = eos(nb), " S:%ld", botl_score());
@@ -1131,7 +1129,9 @@ bot_via_windowport(void)
      */
     Strcpy(nb = buf, svp.plname);
     nb[0] = highc(nb[0]);
-    titl = !Upolyd ? rank() : jp_pmname(&mons[u.umonnum], Ugender);
+    titl = !Upolyd ? jp_rank_of_for_display(u.ulevel, Role_switch,
+                                            flags.female)
+                   : jp_pmname(&mons[u.umonnum], Ugender);
     i = (int) (strlen(buf) + sizeof " the " + strlen(titl) - sizeof "");
     /* if "Name the Rank/monster" is too long, we truncate the name but
        always keep at least BOTL_NSIZ characters of it; when hitpointbar is
@@ -1163,11 +1163,8 @@ bot_via_windowport(void)
     gb.blstats[idx][BL_CH].a.a_int = ACURR(A_CHA);
 
     /* Alignment */
-    Strcpy(gb.blstats[idx][BL_ALIGN].val, (u.ualign.type == A_CHAOTIC)
-                                          ? "Chaotic"
-                                          : (u.ualign.type == A_NEUTRAL)
-                                               ? "Neutral"
-                                               : "Lawful");
+        Strcpy(gb.blstats[idx][BL_ALIGN].val,
+            jp_align_for_display(u.ualign.type));
 
     /* Score */
     gb.blstats[idx][BL_SCORE].a.a_long =
