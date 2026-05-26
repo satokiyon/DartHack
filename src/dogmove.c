@@ -350,7 +350,7 @@ dog_starve(struct monst *mtmp)
     if (mtmp->mleashed && mtmp != u.usteed)
         Your("綱がゆるんだ.");
     else if (cansee(mtmp->mx, mtmp->my))
-        pline_mon(mtmp, "%s starves.", Monnam(mtmp));
+        pline_mon(mtmp, "%sは飢え死にした.", l_monnam(mtmp));
     else
         You_feel("一瞬%s気分になった.",
                  Hallucination ? "がっかりした" : "悲しい");
@@ -378,7 +378,7 @@ dog_hunger(struct monst *mtmp, struct edog *edog)
                 return TRUE;
             }
             if (cansee(mtmp->mx, mtmp->my))
-                pline_mon(mtmp, "%s is confused from hunger.", Monnam(mtmp));
+                pline_mon(mtmp, "%sは空腹で混乱している.", l_monnam(mtmp));
             else if (couldsee(mtmp->mx, mtmp->my))
                 beg(mtmp);
             else
