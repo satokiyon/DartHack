@@ -1273,14 +1273,15 @@ hmon_hitmon_misc_obj(
             } else {
                 char *whom = mon_nam(mon);
                 char *what = xname(obj);
+                char whombuf[BUFSZ];
 
                 if (!hmd->thrown && obj->quan > 1L)
                     what = An(singular(obj, xname));
-                /* note: s_suffix returns a modifiable buffer */
                 if (haseyes(hmd->mdat)
                     && hmd->mdat != &mons[PM_FLOATING_EYE])
-                    whom = strcat(strcat(s_suffix(whom), " "),
-                                  jp_mbodypart(mon, FACE));
+                    Snprintf(whombuf, sizeof(whombuf), "%sの%s",
+                             whom, jp_mbodypart(mon, FACE)),
+                    whom = whombuf;
                 pline("%sを%sにぶちまけた!", what, whom);
             }
             setmangry(mon, TRUE);
@@ -1666,31 +1667,28 @@ hmon_hitmon_msg_silver(
     const char *fmt;
     char *whom = mon_nam(mon);
     char silverobjbuf[BUFSZ];
+    char safe_oname[BUFSZ];
+    char whombuf[BUFSZ];
 
     if (canspotmon(mon)) {
         if (hmd->barehand_silver_rings == 1)
-            fmt = "Your silver ring sears %s!";
+            fmt = "あなたの銀の指輪が%sを焼いた!";
         else if (hmd->barehand_silver_rings == 2)
-            fmt = "Your silver rings sear %s!";
+            fmt = "あなたの銀の指輪が両方とも%sを焼いた!";
         else if (hmd->silverobj && hmd->saved_oname[0]) {
-            /* guard constructed format string against '%' in
-               saved_oname[] from xname(via cxname()) */
-            Snprintf(silverobjbuf, sizeof(silverobjbuf), "Your %s%s %s",
-                     strstri(hmd->saved_oname, "silver") ? "" : "silver ",
-                     hmd->saved_oname, vtense(hmd->saved_oname, "sear"));
-            (void) strNsubst(silverobjbuf, "%", "%%", 0);
-            strncat(silverobjbuf, " %s!",
-                    sizeof(silverobjbuf) - (strlen(silverobjbuf) + 1));
+            Snprintf(safe_oname, sizeof(safe_oname), "%s", hmd->saved_oname);
+            (void) strNsubst(safe_oname, "%", "%%", 0);
+            Snprintf(silverobjbuf, sizeof(silverobjbuf),
+                     "あなたの%sが%%sを焼いた!", safe_oname);
             fmt = silverobjbuf;
         } else
-            fmt = "The silver sears %s!";
+            fmt = "銀が%sを焼いた!";
     } else {
-        *whom = highc(*whom); /* "it" -> "It" */
-        fmt = "%s is seared!";
+        fmt = "%sは焼かれた!";
     }
-    /* note: s_suffix returns a modifiable buffer */
+    /* 日本語表示では英語所有格を使わず、所有関係を文中で組み立てる。 */
     if (!noncorporeal(hmd->mdat) && !amorphous(hmd->mdat))
-        whom = strcat(s_suffix(whom), " flesh");
+        Snprintf(whombuf, sizeof(whombuf), "%sの肉体", whom), whom = whombuf;
     DISABLE_WARNING_FORMAT_NONLITERAL
     pline(fmt, whom);
     RESTORE_WARNING_FORMAT_NONLITERAL
@@ -1705,23 +1703,25 @@ hmon_hitmon_msg_lightobj(
     const char *fmt;
     char *whom = mon_nam(mon);
     char emitlightobjbuf[BUFSZ];
+    char safe_oname[BUFSZ];
+    char whombuf[BUFSZ];
 
     if (canspotmon(mon)) {
         if (hmd->saved_oname[0]) {
-            Sprintf(emitlightobjbuf,
-                    "%s radiance penetrates deep into",
-                    s_suffix(hmd->saved_oname));
-            Strcat(emitlightobjbuf, " %s!");
+            Snprintf(safe_oname, sizeof(safe_oname), "%s", hmd->saved_oname);
+            (void) strNsubst(safe_oname, "%", "%%", 0);
+            Snprintf(emitlightobjbuf, sizeof(emitlightobjbuf),
+                     "あなたの%sの輝きが%%sの深部まで貫いた!",
+                     safe_oname);
             fmt = emitlightobjbuf;
         } else
-            fmt = "The light sears %s!";
+            fmt = "光が%sを焼いた!";
     } else {
-        *whom = highc(*whom); /* "it" -> "It" */
-        fmt = "%s is seared!";
+        fmt = "%sは焼かれた!";
     }
-    /* note: s_suffix returns a modifiable buffer */
+    /* 日本語表示では英語所有格を使わず、所有関係を文中で組み立てる。 */
     if (!noncorporeal(hmd->mdat) && !amorphous(hmd->mdat))
-        whom = strcat(s_suffix(whom), " flesh");
+        Snprintf(whombuf, sizeof(whombuf), "%sの肉体", whom), whom = whombuf;
     DISABLE_WARNING_FORMAT_NONLITERAL
     pline(fmt, whom);
     RESTORE_WARNING_FORMAT_NONLITERAL
@@ -2017,7 +2017,7 @@ shade_miss(
     boolean thrown,
     boolean verbose)
 {
-    const char *what, *whose, *target;
+    const char *what, *target;
     boolean youagr = (magr == &gy.youmonst), youdef = (mdef == &gy.youmonst);
 
     /* we're using dmgval() for zero/not-zero, not for actual damage amount */
@@ -2030,8 +2030,11 @@ shade_miss(
         what = (!obj || shade_aware(obj)) ? "attack" : cxname(obj);
         target = youdef ? "you" : mon_nam(mdef);
         if (!thrown) {
-            whose = youagr ? "Your" : s_suffix(Monnam(magr));
-            pline("%sの%sは無害に%sをすり抜けた.", whose, what, target);
+            if (youagr)
+                pline("あなたの%sは無害に%sをすり抜けた.", what, target);
+            else
+                pline("%sの%sは無害に%sをすり抜けた.",
+                      l_monnam(magr), what, target);
         } else {
             pline("%sは無害に%sをすり抜けた.",
                   The(what), /* note: not pline_The() */
@@ -2070,7 +2073,7 @@ m_slips_free(struct monst *mdef, struct attack *mattk)
         && (!obj->cursed || rn2(3))) {
         if (mattk->adtyp == AD_WRAP) {
             You("%sの%s%sのせいで滑り落ちた!",
-                s_suffix(mon_nam(mdef)),
+                l_monnam(mdef),
                 obj->greased ? "油まみれの" : "すべりやすい",
                 /* avoid repeating "すべりやすい" for undiscovered oilskin */
                 (obj->greased || objects[obj->otyp].oc_name_known)
@@ -2078,7 +2081,7 @@ m_slips_free(struct monst *mdef, struct attack *mattk)
                     : cloak_simple_name(obj));
         } else {
             You("%sの%s%sのせいでつかみきれなかった!",
-                s_suffix(mon_nam(mdef)),
+                l_monnam(mdef),
                 obj->greased ? "油まみれの" : "すべりやすい",
                 (obj->greased || objects[obj->otyp].oc_name_known)
                     ? xname(obj)
@@ -2209,12 +2212,12 @@ steal_it(struct monst *mdef, struct attack *mattk)
            switch to dynamic pronoun */
         if (gender(mdef) == (int) u.mfemale
             && gy.youmonst.data->mlet == S_NYMPH)
-            You("%sを魅了した. %sは喜んで%sの所持品%sを差し出した.",
+            You("%sを魅了した. %sは喜んで%s所持品を差し出した.",
                 l_monnam(mdef), upstart(strcpy(heshe, mhe(mdef))),
-                !gold ? "" : "ほとんどの", mhis(mdef));
+                !gold ? "" : "ほとんどの");
         else
-            You("%sを誘惑し、%sは%sの服を脱ぎ始めた.",
-                l_monnam(mdef), mhe(mdef), mhis(mdef));
+            You("%sを誘惑し、%sは服を脱ぎ始めた.",
+                l_monnam(mdef), mhe(mdef));
     }
 
     /* prevent gold from being stolen so that steal-item isn't a superset
@@ -2242,8 +2245,7 @@ steal_it(struct monst *mdef, struct attack *mattk)
         /* special message for final item; no need to check owornmask because
          * ustealo is only set on objects with (owornmask & W_ARM) */
         if (otmp == ustealo)
-            pline("%sは%s鎧を脱ぎ終えた.", Monnam(mdef),
-                  mhis(mdef));
+            pline("%sは鎧を脱ぎ終えた.", Monnam(mdef));
         /* give the object to the character */
         otmp = hold_another_object(otmp, "You snatched but dropped %s.",
                                    doname(otmp), "You steal: ");
@@ -2997,7 +2999,7 @@ mhitm_ad_blnd(
                 Snprintf(buf, sizeof buf, "%sは目がくらんだ", Monnam(mdef));
                 if (mdef->data == &mons[PM_ARCHON] && canseemon(mdef))
                     Snprintf(eos(buf), sizeof buf - strlen(buf),
-                             "（%sの輝きで）", s_suffix(mon_nam(magr)));
+                             "（%sの輝きで）", l_monnam(magr));
                 pline("%s.", buf);
             }
             rnd_tmp = d((int) mattk->damn, (int) mattk->damd);
@@ -3026,7 +3028,7 @@ mhitm_ad_curs(
             if (pd == &mons[PM_CLAY_GOLEM]) {
                 if (!Blind)
                     pline("%sの頭の文字が消えた!",
-                          s_suffix(mon_nam(mdef)));
+                          l_monnam(mdef));
                 xkilled(mdef, XKILL_NOMSG);
                 /* Don't return yet; keep hp<1 and mhm.damage=0 for pet msg */
             } else {
@@ -3069,7 +3071,7 @@ mhitm_ad_curs(
             if (pd == &mons[PM_CLAY_GOLEM]) {
                 if (gv.vis && canseemon(mdef)) {
                     pline("%sの頭の文字が消えた!",
-                          s_suffix(mon_nam(mdef)));
+                          l_monnam(mdef));
                     pline_mon(mdef, "%sは崩れ落ちた!", Monnam(mdef));
                 }
                 mondied(mdef);
@@ -3106,7 +3108,7 @@ mhitm_really_poison(struct monst *magr, struct attack *mattk,
                     struct monst *mdef, struct mhitm_data *mhm)
 {
     if (gv.vis && canspotmon(magr))
-        pline("%s%sは毒を受けた!", s_suffix(Monnam(magr)),
+        pline("%sの%sは毒を受けた!", l_monnam(magr),
               mpoisons_subj(magr, mattk));
         if (resists_poison(mdef)) {
             if (gv.vis && canspotmon(mdef) && canspotmon(magr))
@@ -3153,7 +3155,7 @@ mhitm_ad_drst(
         }
         hitmsg(magr, mattk);
         if (!negated && !rn2(8)) {
-            Sprintf(buf, "%s %s", s_suffix(Monnam(magr)),
+            Sprintf(buf, "%sの%s", l_monnam(magr),
                     mpoisons_subj(magr, mattk));
             poisoned(buf, ptmp, jp_pmname(pa, Mgender(magr)), 30, FALSE);
         }
@@ -3207,7 +3209,7 @@ mhitm_ad_drin(
 
         if ((helmet = which_armor(mdef, W_ARMH)) != 0 && rn2(8)) {
             pline("%sの%sが、あなたの%sへの攻撃を防いだ.",
-                Monnam(mdef), helm_simple_name(helmet), mhis(mdef));
+                Monnam(mdef), helm_simple_name(helmet), "頭");
             return;
         }
         amu = which_armor(mdef, W_AMUL);
@@ -3271,8 +3273,6 @@ mhitm_ad_drin(
         }
     } else {
         /* mhitm */
-        char buf[BUFSZ];
-
         if (gn.notonhead || !has_head(pd)) {
             if (gv.vis && canspotmon(mdef))
                 pline_mon(mdef, "%sには効いていないようだ.", Monnam(mdef));
@@ -3285,9 +3285,8 @@ mhitm_ad_drin(
         }
         if ((mdef->misc_worn_check & W_ARMH) && rn2(8)) {
             if (gv.vis && canspotmon(magr) && canseemon(mdef)) {
-                Strcpy(buf, s_suffix(Monnam(mdef)));
-                pline("%sかぶとが、%sの%sへの攻撃を防いだ.", buf,
-                      s_suffix(mon_nam(magr)), mhis(mdef));
+                pline("%sのかぶとが、%sの頭への攻撃を防いだ.",
+                      l_monnam(mdef), l_monnam(magr));
             }
             return;
         }
@@ -3367,7 +3366,7 @@ mhitm_ad_wrap(
                     if (coil && !tailmiss)
                         You("%sに触れた.", l_monnam(mdef));
                     else
-                        You("%s%sに触れた.", s_suffix(mon_nam(mdef)),
+                        You("%sの%sに触れた.", l_monnam(mdef),
                             tailmiss ? "尾" : jp_mbodypart(mdef, LEG));
                 }
             }
@@ -4110,7 +4109,7 @@ mhitm_ad_phys(
                     /* similar to mhitm_really_poison, but we don't use the
                      * exact same values, nor do we want same 1/8 chance of
                      * poison taking (use 1/4, same as in the mhitm case). */
-                    Sprintf(buf, "%s %s", s_suffix(Monnam(magr)),
+                        Sprintf(buf, "%sの%s", l_monnam(magr),
                             mpoisons_subj(magr, mattk));
                     /* arbitrary, but most poison sources in the game are
                      * strength-based. With hpdamchance = 10, HP damage occurs
@@ -4223,8 +4222,8 @@ mhitm_ad_ston(
                     pline("%sがこちらに投げキッスしているように見える...",
                           Monnam(magr));
                 } else if (!Deaf) {
-                        You_hear("%sのシューッという音が聞こえる!",
-                                 s_suffix(mon_nam(magr)));
+                    You_hear("%sのシューッという音が聞こえる!",
+                             l_monnam(magr));
                 } else if (!Blind) {
                     pline("%sが険しい顔をしたようだ.", Monnam(magr));
                 }
@@ -5187,7 +5186,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
             You("%sを%s!", l_monnam(mdef), expel_verb);
             if ((Slow_digestion || is_animal(gy.youmonst.data)) && u_digest) {
                 pline("どうやら%sの味は好みではなかったようだ.",
-                      s_suffix(mon_nam(mdef)));
+                      l_monnam(mdef));
             }
         }
     }
@@ -5905,7 +5904,7 @@ passive(
             if (Blind || !flags.verbose)
                 You("しぶきを浴びた!");
             else
-                You("%s酸液を浴びた!", s_suffix(mon_nam(mon)));
+                You("%sの酸液を浴びた!", l_monnam(mon));
 
             if (!Acid_resistance) {
                 mdamageu(mon, tmp);
@@ -6020,8 +6019,8 @@ passive(
                     break;
                 }
                 if (mon->mcansee) {
-                    if (ureflects("%s gaze is reflected by your %s.",
-                                  s_suffix(Monnam(mon)))) {
+                    if (ureflects("%sの視線はあなたの%sで反射された.",
+                                  l_monnam(mon))) {
                         ;
                     } else if (Hallucination && rn2(4)) {
                         /* [it's the hero who should be getting paralyzed
@@ -6032,9 +6031,9 @@ passive(
                             !rn2(2) ? "しびれている" : "ぼんやりしている");
                     } else if (Free_action) {
                         You("%sの視線で一瞬体がこわばった!",
-                            s_suffix(mon_nam(mon)));
+                            l_monnam(mon));
                     } else {
-                        You("%sの視線で凍りついた!", s_suffix(mon_nam(mon)));
+                        You("%sの視線で凍りついた!", l_monnam(mon));
                         nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127);
                         /* set gm.multi_reason;
                            3.6.x used "frozen by a monster's gaze" */
