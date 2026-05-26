@@ -12,7 +12,49 @@ staticfn int QSORTCALLBACK sortloot_cmp(const genericptr, const genericptr);
 staticfn const char *drop_english_article(const char *);
 
 staticfn const char *
-action_verb_jp(const char *word)
+action_prompt_verb_jp(const char *word)
+{
+    if (!strcmp(word, "name") || !strcmp(word, "call")) return "名付け";
+    if (!strcmp(word, "identify")) return "識別";
+    if (!strcmp(word, "adjust")) return "整理";
+    if (!strcmp(word, "split")) return "分割";
+    if (!strcmp(word, "drop")) return "落とし";
+    if (!strcmp(word, "open")) return "開け";
+    if (!strcmp(word, "sacrifice")) return "捧げ";
+    if (!strcmp(word, "put in")) return "入れ";
+    if (!strcmp(word, "take out")) return "取り出し";
+    if (!strcmp(word, "wear") || !strcmp(word, "put on")) return "装着";
+    if (!strcmp(word, "remove") || !strcmp(word, "take off")) return "取り外し";
+    if (!strcmp(word, "wield")) return "装備";
+    if (!strcmp(word, "ready")) return "準備";
+    if (!strcmp(word, "write with") || !strcmp(word, "write on")) return "書き";
+    if (!strcmp(word, "read")) return "読み";
+    if (!strcmp(word, "zap")) return "使用";
+    if (!strcmp(word, "invoke")) return "発動";
+    if (!strcmp(word, "charge")) return "充填";
+    if (!strcmp(word, "rub") || !strcmp(word, "rub the royal jelly on")) return "こすり";
+    if (!strcmp(word, "grease")) return "油塗り";
+    if (!strcmp(word, "disarm")) return "解除";
+    if (!strcmp(word, "eat")) return "食べ";
+    if (!strcmp(word, "drink") || !strcmp(word, "quaff")) return "飲み";
+    if (!strcmp(word, "dip")) return "浸し";
+    if (!strcmp(word, "destroy")) return "破壊";
+    if (!strcmp(word, "throw")) return "投擲";
+    if (!strcmp(word, "apply")) return "使用";
+    if (!strcmp(word, "loot")) return "あさり";
+    if (!strcmp(word, "stash")) return "隠し";
+    if (!strcmp(word, "tip")) return "ひっくり返し";
+    if (!strcmp(word, "fire")) return "射撃";
+    if (!strcmp(word, "travel")) return "移動";
+    if (!strcmp(word, "kick")) return "蹴り";
+    if (!strcmp(word, "glance")) return "見回し";
+    if (!strcmp(word, "search")) return "探索";
+    if (!strcmp(word, "pickup")) return "拾い上げ";
+    return "実行";
+}
+
+staticfn const char *
+action_label_jp(const char *word)
 {
     if (!strcmp(word, "name") || !strcmp(word, "call")) return "名付け";
     if (!strcmp(word, "identify")) return "識別";
@@ -50,7 +92,7 @@ action_verb_jp(const char *word)
     if (!strcmp(word, "glance")) return "見回し";
     if (!strcmp(word, "search")) return "探索";
     if (!strcmp(word, "pickup")) return "拾い上げ";
-    return word;
+    return "操作";
 }
 
 staticfn const char *
@@ -1801,14 +1843,13 @@ getobj_hands_txt(const char *action, char *qbuf)
     } else if (!strcmp(action, "write with")) {
         Sprintf(qbuf, "%s", jp_body_part(FINGERTIP));
     } else if (!strcmp(action, "wield")) {
-        Sprintf(qbuf, "your %s %s%s", uarmg ? "gloved" : "bare",
-                jp_body_part_plural(HAND),
-                !uwep ? " (wielded)" : "");
+        Sprintf(qbuf, "%s%s%s", uarmg ? "手袋越しの" : "素手の",
+                jp_body_part_plural(HAND), !uwep ? " (武器なし)" : "");
     } else if (!strcmp(action, "ready")) {
-        Sprintf(qbuf, "empty quiver%s",
-                !uquiver ? " (nothing readied)" : "");
+        Sprintf(qbuf, "空の矢筒%s",
+                !uquiver ? " (何も準備していない)" : "");
     } else {
-        Sprintf(qbuf, "your %s", jp_body_part_plural(HAND));
+        Sprintf(qbuf, "%s", jp_body_part_plural(HAND));
     }
     return qbuf;
 }
@@ -2001,7 +2042,7 @@ getobj(
             if (prompt)
                 Sprintf(qbuf, "%s", prompt);
             else
-                Sprintf(qbuf, "何を%sしますか?", action_verb_jp(word));
+                Sprintf(qbuf, "何を%sしますか?", action_prompt_verb_jp(word));
         }
         if (gi.in_doagain) {
             ilet = readchar();
@@ -2017,7 +2058,7 @@ getobj(
             if (!buf[0])
                 Strcat(qbuf, " [*]");
             else
-                Sprintf(eos(qbuf), " [%s or ?*]", buf);
+                Sprintf(eos(qbuf), " [%s または ?*]", buf);
             ilet = yn_function(qbuf, (char *) 0, '\0', FALSE);
         }
         if (digit(ilet)) {
@@ -2063,7 +2104,7 @@ getobj(
                     Snprintf(menuquery, sizeof menuquery, "%s", prompt);
                 else
                     Snprintf(menuquery, sizeof menuquery,
-                             "何を%sしますか?", action_verb_jp(word));
+                             "何を%sしますか?", action_prompt_verb_jp(word));
             }
             if (!allowed_choices || *allowed_choices == HANDS_SYM
                 || *buf == HANDS_SYM)
@@ -2101,7 +2142,7 @@ getobj(
                than one invent slot of gold and picking the non-'$' one */
             || (otmp && otmp->oclass == COIN_CLASS)) {
             if (otmp && obj_ok(otmp) <= GETOBJ_EXCLUDE) {
-                You("金貨を%sできない.", word);
+                You("金貨には%sできない.", action_label_jp(word));
                 return (struct obj *) 0;
             }
             /*
@@ -2219,7 +2260,7 @@ silly_thing(const char *word,
             || (otmp->otyp == FAKE_AMULET_OF_YENDOR && !otmp->known)))
         pline_The("護符は変なあだ名で呼ばれるのを好まない.");
     else
-        pline(silly_thing_to, action_verb_jp(word));
+        pline(silly_thing_to, action_label_jp(word));
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
@@ -2305,7 +2346,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
     char buf[BUFSZ] = DUMMY, qbuf[QBUFSZ];
 
     if (!gi.invent) {
-        You("%sものを何も持っていない.", word);
+        You("%sものを何も持っていない.", action_missing_jp(word));
         if (resultflags)
             *resultflags = ALL_FINISHED;
         return 0;
@@ -2350,8 +2391,8 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
     ilets[iletct] = '\0';
 
     for (;;) {
-        Sprintf(qbuf, "What kinds of thing do you want to %s? [%s]",
-                word, ilets);
+        Sprintf(qbuf, "何を%sしますか? [%s]",
+            action_prompt_verb_jp(word), ilets);
         getlin(qbuf, buf);
         if (buf[0] == '\033')
             return 0;
@@ -2548,13 +2589,13 @@ askchain(
                    class of objects is involved, so prefix the first
                    object being queried here with an explanation why */
                 if (take_out || put_in)
-                    Sprintf(qpfx, "%s: ", word), *qpfx = highc(*qpfx);
+                    Sprintf(qpfx, "%s: ", action_label_jp(word));
                 first = FALSE;
             }
             (void) safe_qbuf(qbuf, qpfx, "?", otmp,
                              ininv ? safeq_xprname : doname,
                              ininv ? safeq_shortxprname : ansimpleoname,
-                             "item");
+                             "品物");
             /* nyaq(qbuf) or nyNaq(qbuf), bypassing canned input for ^A */
             sym = yn_function(qbuf,
                               (takeoff || ident || otmp->quan < 2L)
@@ -2657,10 +2698,10 @@ reroll_menu(void)
 
     any.a_char = 'n';
     add_menu(win, &nul_glyphinfo, &any, flags.lootabc ? 0 : 'p', 0,
-             ATR_NONE, NO_COLOR, "start the game with this character",
+             ATR_NONE, NO_COLOR, "このキャラクターでゲームを開始する",
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'y';
-    Strcpy(buf, "reroll another character");
+    Strcpy(buf, "別のキャラクターを再抽選する");
     add_menu(win, &nul_glyphinfo, &any, flags.lootabc ? 0 : 'r', 0,
              ATR_NONE, NO_COLOR, buf, MENU_ITEMFLAGS_NONE);
     any.a_char = 0;
@@ -2680,14 +2721,14 @@ reroll_menu(void)
 
     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR, "",
              MENU_ITEMFLAGS_NONE);
-    Sprintf(buf, "St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
+    Sprintf(buf, "筋:%s 器:%-1d 耐:%-1d 知:%-1d 賢:%-1d 魅:%-1d",
             get_strength_str(),
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
             ACURR(A_CHA));
     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
              buf, MENU_ITEMFLAGS_NONE);
 
-    end_menu(win, "Reroll this character?");
+    end_menu(win, "このキャラクターを再抽選しますか?");
     if (select_menu(win, PICK_ONE, &pick_list) > 0) {
         option = pick_list[0].item.a_char;
         free((genericptr_t) pick_list);
@@ -2695,7 +2736,7 @@ reroll_menu(void)
         /* user closed the menu without selecting; unclear what their choice
            is here so ask again; but (e.g. for hangup handling) stop asking if
            the user cancels out again */
-        option = y_n("Reroll this character?");
+        option = y_n("このキャラクターを再抽選しますか?");
     }
     destroy_nhwindow(win);
 
@@ -3824,7 +3865,7 @@ dounpaid(
                     char contbuf[BUFSZ];
 
                     /* Shopkeeper knows what to charge for contents */
-                    Sprintf(contbuf, "%s contents", s_suffix(xname(otmp)));
+                        Sprintf(contbuf, "%sの中身", s_suffix(xname(otmp)));
                     putstr(win, 0,
                            xprname((struct obj *) 0, contbuf, CONTAINED_SYM,
                                    TRUE, contcost, 0L));
@@ -3836,7 +3877,7 @@ dounpaid(
     if (count > 0) {
         putstr(win, 0, "");
         putstr(win, 0,
-               xprname((struct obj *) 0, "Total:", '*', FALSE, totcost, 0L));
+             xprname((struct obj *) 0, "合計:", '*', FALSE, totcost, 0L));
     }
 
     /* an unpaid item can be on the floor if dropped on the shop boundary
@@ -3847,19 +3888,18 @@ dounpaid(
     if (xtracount > 0) { /* floorcount + buriedcount > 0 */
         char buf[BUFSZ];
         const char
-            *floorverb = (xtracount > 1) ? "are" : "is",
             /* "under the floor" might actually be "under the floor
                beneath a wall" when shop repair is involved but that seems
                too nit-picky to bother trying to handle here (even more
                extreme description-wise:  "under the floor beneath the
                door/doorway") */
-            *where = (buriedcount == 0) ? "on the floor"
-                     : (floorcount == 0) ? "under the floor"
-                       : "on or under the floor";
+            *where = (buriedcount == 0) ? "床の上"
+                     : (floorcount == 0) ? "床の下"
+                       : "床の上か下";
 
         if (!count) {
-            You("未払い品は持っていないが、そこに%s %d %sあった.",
-                floorverb, xtracount, where);
+            You("未払い品は持っていないが、そこには%d個の未払い品が%sにあった.",
+                xtracount, where);
         } else {
             putstr(win, 0, "");
             Sprintf(buf, "(未払い品がさらに%d個、%sにある.)",
@@ -3917,7 +3957,7 @@ dotypeinv(void)
     char c = '\0';
     int n, i = 0;
     char *extra_types, types[BUFSZ], title[QBUFSZ];
-    const char *before = "", *after = "";
+    const char *modifier = "";
     int class_count, oclass, itemcount,
         any_unpaid, u_carried, u_floor, u_buried;
     int bcnt, ccnt, ucnt, xcnt, ocnt, jcnt;
@@ -4058,19 +4098,19 @@ dotypeinv(void)
        constructing a title to be used by query_objlist() */
     switch (c) {
     case 'B':
-        before = "known to be blessed ";
+        modifier = "祝福された";
         break;
     case 'U':
-        before = "known to be uncursed ";
+        modifier = "呪われていない";
         break;
     case 'C':
-        before = "known to be cursed ";
+        modifier = "呪われた";
         break;
     case 'X':
-        after = " whose blessed/uncursed/cursed status is unknown";
-        break; /* better phrasing is desirable */
+        modifier = "祝福・無呪・呪い状態が不明な";
+        break;
     case 'P':
-        after = " that were just picked up";
+        modifier = "拾ったばかりの";
         break;
     default:
         /* 'c' is an object class, because we've already handled
@@ -4079,25 +4119,19 @@ dotypeinv(void)
            to somewhere above so that we can access it here (via
            lcase(strcpy(classnamebuf, names[(int) c]))), but the
            game-play value of doing so is low... */
-        before = "such ";
+        modifier = "そのような";
         break;
     }
 
     if (traditional) {
         if (strchr(types, c) > strchr(types, '\033')) {
-            You("%s品物%sは持っていない.", before, after);
+            You("%s品物は持っていない.", modifier);
             goto doI_done;
         }
         gt.this_type = oclass; /* extra input for this_type_only() */
     }
     if (strchr("BUCXP", c)) {
-        /* the before and after phrases for "you have no..." can both be
-           treated as mutually-exclusive suffices when creating a title */
-        Sprintf(title, "%s品物", (before && *before) ? before : after);
-        /* get rid of trailing space from 'before' and double-space from
-           'after's leading space */
-        (void) mungspaces(title);
-        Strcat(title, ":"); /* after removing unwanted trailing space */
+        Sprintf(title, "%s品物:", modifier);
         gt.this_title = title;
     }
 
@@ -4434,7 +4468,7 @@ feel_cockatrice(struct obj *otmp, boolean force_touch)
         else
             pline("%sに触れることは致命的な誤りだ...", kbuf);
         /* normalize body shape here; hand, not jp_body_part(HAND) */
-        Sprintf(kbuf, "touching %s bare-handed", killer_xname(otmp));
+        Sprintf(kbuf, "%sに素手で触れた", killer_xname(otmp));
         /* will call polymon() for the poly_when_stoned() case */
         instapetrify(kbuf);
     }
@@ -4749,7 +4783,7 @@ doprring(void)
         (void) dispinv_with_action(lets, use_inuse_mode,
                                    /* note; alternate label will be ignored
                                       if 'use_inuse_mode' is False */
-                                   (ct == 1) ? "Ring" : "Rings");
+                                              (ct == 1) ? "指輪" : "指輪類");
     }
     return ECMD_OK;
 }
@@ -4768,7 +4802,7 @@ dopramulet(void)
            in order to perform a context-sensitive item action */
         lets[0] = obj_to_let(uamul), lets[1] = '\0';
 
-        (void) dispinv_with_action(lets, TRUE, "Amulet");
+        (void) dispinv_with_action(lets, TRUE, "護符");
     }
     return ECMD_OK;
 }
@@ -5150,13 +5184,12 @@ adjust_split(void)
         }
     }
     if (splitamount < 1L || splitamount >= obj->quan) {
-        static const char
-            Amount[] = "Amount to split from current stack must be";
+        static const char Amount[] = "現在の束から分割する数は";
 
         if (splitamount < 1L)
-            pline("%s at least 1.", Amount);
+            pline("%s1以上でなければならない.", Amount);
         else
-            pline("%s less than %ld.", Amount, obj->quan);
+            pline("%s%ld未満でなければならない.", Amount, obj->quan);
         return ECMD_CANCEL;
     }
 
@@ -5239,11 +5272,11 @@ doorganize_core(struct obj *obj)
 
     /* get 'to' slot to use as destination */
     if (!splitting)
-        Strcpy(qbuf, "Adjust letter");
+        Strcpy(qbuf, "スロット文字を調整");
     else /* note: splitting->quan is the amount being left in original slot */
-        Sprintf(qbuf, "Split %ld", obj->quan);
-    Sprintf(eos(qbuf), " to what [%s]%s?", lets,
-            gi.invent ? " (? see used letters)" : "");
+        Sprintf(qbuf, "%ld個を分割", obj->quan);
+    Sprintf(eos(qbuf), " 移動先はどこにしますか [%s]%s?", lets,
+            gi.invent ? " (?で使用中の文字を表示)" : "");
     for (trycnt = 1; ; ++trycnt) {
         let = !isgold ? yn_function(qbuf, (char *) 0, '\0', TRUE) : GOLD_SYM;
         if (let == '?' || let == '*') {
@@ -5282,9 +5315,9 @@ doorganize_core(struct obj *obj)
 
     collect = (let == obj->invlet);
     /* change the inventory and print the resulting item */
-    adj_type = collect ? "Collecting:"
-               : !splitting ? "Moving:"
-                 : "Splitting:";
+        adj_type = collect ? "集約:"
+                             : !splitting ? "移動:"
+                                 : "分割:";
 
     /*
      * don't use freeinv/addinv to avoid double-touching artifacts,
@@ -5317,7 +5350,7 @@ doorganize_core(struct obj *obj)
             /* Merging: when from and to are compatible */
             if ((!otmpname || (objname && !strcmp(objname, otmpname)))
                 && merged(&otmp, &obj)) {
-                adj_type = "Merging:";
+                adj_type = "統合:";
                 obj = otmp;
                 otmp = otmp->nobj;
                 extract_nobj(obj, &gi.invent);
@@ -5327,7 +5360,7 @@ doorganize_core(struct obj *obj)
                Found 'otmp' in destination slot; merge if compatible,
                otherwise bump whatever is there to an open slot. */
             if (!splitting) {
-                adj_type = "Swapping:";
+                adj_type = "入れ替え:";
                 otmp->invlet = obj->invlet;
             } else {
                 /* strip 'from' name if it has one */
@@ -5344,7 +5377,7 @@ doorganize_core(struct obj *obj)
                 }
 
                 if (merged(&otmp, &obj)) {
-                    adj_type = "Splitting and merging:";
+                    adj_type = "分割して統合:";
                     obj = otmp;
                     extract_nobj(obj, &gi.invent);
                 } else if (inv_cnt(FALSE) >= invlet_basic) {
@@ -5382,7 +5415,7 @@ doorganize_core(struct obj *obj)
     /* messages deferred until inventory has been fully reestablished */
     prinv(adj_type, obj, 0L);
     if (bumped)
-        prinv("Moving:", bumped, 0L);
+        prinv("移動:", bumped, 0L);
     if (splitting)
         clear_splitobjs(); /* reset splitobj context */
     update_inventory();
@@ -5457,8 +5490,8 @@ display_minventory(
         have_any = (have_inv || incl_hero),
         pickings = (dflags & MINV_PICKMASK);
 
-    Sprintf(tmp, "%s %s:", s_suffix(noit_Monnam(mon)),
-            do_all ? "possessions" : "armament");
+        Sprintf(tmp, "%s %s:", s_suffix(noit_Monnam(mon)),
+            do_all ? "持ち物" : "武装");
 
     if (do_all ? have_any : (mon->misc_worn_check || MON_WEP(mon))) {
         /* Fool the 'weapon in hand' routine into
@@ -5477,7 +5510,7 @@ display_minventory(
         /* was 'set_uasmon();' but that potentially has side-effects */
         gy.youmonst.data = &mons[u.umonnum]; /* basic part of set_uasmon() */
     } else {
-        invdisp_nothing(title ? title : tmp, "(none)");
+        invdisp_nothing(title ? title : tmp, "(なし)");
         n = 0;
     }
 
@@ -5557,14 +5590,14 @@ display_cinventory(struct obj *obj)
     (void) safe_qbuf(qbuf, "", "の中身:", obj,
                      /* custom formatting routines to insert "trapped"
                         into the object's name when appropriate;
-                        last resort "that" won't ever get used */
-                     cinv_doname, cinv_ansimpleoname, "that");
+                                last resort "それ" won't ever get used */
+                            cinv_doname, cinv_ansimpleoname, "それ");
 
     if (obj->cobj) {
         n = query_objlist(qbuf, &(obj->cobj), INVORDER_SORT,
                           &selected, PICK_NONE, allow_all);
     } else {
-        invdisp_nothing(qbuf, "(empty)");
+        invdisp_nothing(qbuf, "(空)");
         n = 0;
     }
     if (n > 0) {
@@ -5668,7 +5701,6 @@ void
 sync_perminvent(void)
 {
     static win_request_info *wri = 0;
-    const char *wport_id;
 
     if (WIN_INVEN == WIN_ERR) {
         if ((gc.core_invent_state
@@ -5729,12 +5761,10 @@ sync_perminvent(void)
                     iflags.perm_invent = FALSE;
                     if (WIN_INVEN != WIN_ERR)
                         destroy_nhwindow(WIN_INVEN), WIN_INVEN = WIN_ERR;
-                    wport_id = WINDOWPORT(tty) ? "tty perm_invent"
-                                               : "perm_invent";
-                    pline("%s could not be enabled.", wport_id);
-                    pline("%s needs a terminal that is at least %dx%d, yours "
-                          "is %dx%d.",
-                          wport_id, wri->tocore.needrows,
+                      pline("持続型インベントリ表示を有効化できなかった.");
+                      pline("持続型インベントリ表示には最低でも%dx%dの端末サイズが必要だが、"
+                          "現在は%dx%dだった.",
+                          wri->tocore.needrows,
                           wri->tocore.needcols, wri->tocore.haverows,
                           wri->tocore.havecols);
                     wait_synch();
