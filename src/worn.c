@@ -543,18 +543,18 @@ mon_adjust_speed(
         && !(mon->mfrozen || mon->msleeping) && canseemon(mon)) {
         /* fast to slow (skipping intermediate state) or vice versa */
         const char *howmuch =
-            (mon->mspeed + oldspeed == MFAST + MSLOW) ? "much " : "";
+            (mon->mspeed + oldspeed == MFAST + MSLOW) ? "かなり" : "";
 
         if (petrify) {
             /* mimic the player's petrification countdown; "slowing down"
                even if fast movement rate retained via worn speed boots */
             if (flags.verbose)
-                pline_mon(mon, "%s is slowing down.", Monnam(mon));
+                pline_mon(mon, "%sは動きが鈍ってきた.", Monnam(mon));
         } else if (adjust > 0 || mon->mspeed == MFAST)
-            pline_mon(mon, "%s is suddenly moving %sfaster.",
+            pline_mon(mon, "%sは突然%s速く動いている.",
                       Monnam(mon), howmuch);
         else
-            pline_mon(mon, "%s seems to be moving %sslower.",
+            pline_mon(mon, "%sは%s遅く動いているようだ.",
                       Monnam(mon), howmuch);
 
         /* might discover an object if we see the speed change happen */
