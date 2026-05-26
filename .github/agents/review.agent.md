@@ -1,7 +1,7 @@
 ---
 name: Review Agent
 description: "Use when: レビュー, code review, コードレビュー, 翻訳レビュー, 品質確認, バグ確認, 回帰確認"
-tools: [read, search]
+tools: [read, search, edit]
 user-invocable: true
 argument-hint: "レビュー対象（例: src/do_name.c の変更点、直近コミット、翻訳差分）"
 ---
@@ -15,6 +15,8 @@ argument-hint: "レビュー対象（例: src/do_name.c の変更点、直近コ
 
 ## 制約
 - 原則としてコード編集はしない（レビューと指摘を優先）
+- ファイル書き込みは、レビュー結果をテキストファイル（例: `docs/reviews/*.md`, `docs/reviews/*.txt`）として保存する場合に限って許可する
+- レビュー結果保存以外の目的でファイル書き込みをしない
 - 事実に基づかない推測はしない
 - 問題が無い場合は「重大な指摘なし」と明示する
 
