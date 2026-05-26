@@ -37,3 +37,9 @@
 - 変更ファイルでフォーマット警告が増えていない
 - 戦闘・罠・移動・視認・聴覚の代表メッセージが正しく表示される
 - メッセージ履歴や `--More--` の挙動に変化がない
+
+## 6. Oracle 追加検証
+
+- `dat/oracles.txt` の本文行と `util/makedefs.c` の `special_oracle[]` 各行は UTF-8 バイト長で **80 未満**になっているか（`src/rumors.c` の `line[COLNO]` 読み出し前提）。
+- `dat/oracles.txt` の区切り行 `-----` が欠損・増減していないか。
+- `The Dungeons of Doom` を表示文で使う場合、`src/dungeon.c` の表示語彙に合わせて **運命の大迷宮** を使っているか。
