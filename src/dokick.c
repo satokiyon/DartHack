@@ -713,8 +713,8 @@ really_kick_object(coordxy x, coordxy y)
     }
 
     if (slide && !Blind)
-          pline("ひゅー!  %sが%sを%s滑っていった.", Doname2(gk.kickedobj),
-              otense(gk.kickedobj, "slide"), surface(x, y));
+        pline("ひゅー!  %sが%sの上を滑っていった.", Doname2(gk.kickedobj),
+              surface(x, y));
 
 #if 0   /* now that 'costly' above includes no_charge items, this would
          * clear their no_charge state (while declining to add to bill)

@@ -373,9 +373,8 @@ doaltarobj(struct obj *obj)
     }
 
     if (obj->blessed || obj->cursed) {
-        There("%sの閃光が走り、%sが祭壇を%sた.",
-              an(hcolor(obj->blessed ? NH_AMBER : NH_BLACK)), doname(obj),
-              otense(obj, "hit"));
+        There("%sの閃光が走り、%sが祭壇に当たった.",
+              an(hcolor(obj->blessed ? NH_AMBER : NH_BLACK)), doname(obj));
         if (!Hallucination)
             obj->bknown = 1; /* ok to bypass set_bknown() */
     } else {

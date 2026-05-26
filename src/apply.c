@@ -3630,7 +3630,7 @@ use_royal_jelly(struct obj **optr)
 
     if (obj->cursed) {
         if (eobj->timed || eobj->corpsenm != oldcorpsenm)
-            pline("%sは弱々しく%s.", xname(eobj), otense(eobj, "quiver"));
+            pline("%sは弱々しく震えた.", xname(eobj));
         else
             pline("%s", nothing_seems_to_happen);
         kill_egg(eobj);
@@ -3649,7 +3649,7 @@ use_royal_jelly(struct obj **optr)
 
     if ((eobj->timed && !was_timed) || eobj->spe == 2
         || eobj->corpsenm != oldcorpsenm)
-        pline("%sはしばらく%s.", xname(eobj), otense(eobj, "quiver"));
+        pline("%sはしばらく震えた.", xname(eobj));
     else
         pline("%s", nothing_seems_to_happen);
 
