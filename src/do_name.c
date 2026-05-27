@@ -13,6 +13,7 @@ staticfn void do_oname(struct obj *) NONNULLARG1;
 staticfn const char *docall_target_name(struct obj *, char *, size_t) NONNULLPTRS;
 staticfn void build_docall_prompt(char *, size_t, struct obj *) NONNULLPTRS;
 staticfn void namefloorobj(void);
+staticfn const char *jp_default_dog_name_for_display(struct monst *, const char *);
 staticfn const char *jp_bogusmon_for_display(const char *);
 
 #define NUMMBUF 5
@@ -165,7 +166,7 @@ alreadynamed(struct monst *mtmp, char *monnambuf, char *usrbuf)
         boolean name_not_title = (has_mgivenname(mtmp)
                                   || type_is_pname(mtmp->data)
                                   || mtmp->isshk);
-        pline("%sはすでにある%sを維持したがっている.", upstart(monnambuf),
+        pline("%sは今の%sを変えたがらない.", upstart(monnambuf),
               name_not_title ? "名前" : "称号");
         return TRUE;
     } else if (fuzzymatch(usrbuf, monnambuf, " -_", TRUE)
@@ -205,7 +206,7 @@ do_mgivenname(void)
     boolean do_swallow = FALSE;
 
     if (Hallucination) {
-        You("どうせ認識できないだろう.");
+        You("どうせ見分けられないだろう.");
         return;
     }
     cc.x = u.ux;
@@ -219,7 +220,7 @@ do_mgivenname(void)
         if (u.usteed && canspotmon(u.usteed)) {
             mtmp = u.usteed;
         } else {
-            pline("この%s怪物は%sという名前で、改名はできない。",
+            pline("この%s怪物の名は%sで、変えられない。",
                   beautiful(), svp.plname);
             return;
         }
@@ -264,7 +265,7 @@ do_mgivenname(void)
      */
     if ((mtmp->data->geno & G_UNIQ) && !mtmp->ispriest) {
         if (!alreadynamed(mtmp, monnambuf, buf))
-            pline("%sは命名を嫌がった!", upstart(monnambuf));
+            pline("%sは名前を付けられるのを嫌がった!", upstart(monnambuf));
     } else if (mtmp->isshk
                && !(Deaf || helpless(mtmp)
                     || mtmp->data->msound <= MS_ANIMAL)) {
@@ -275,7 +276,7 @@ do_mgivenname(void)
     } else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk
                || mtmp->data == &mons[PM_GHOST] || has_ebones(mtmp)) {
         if (!alreadynamed(mtmp, monnambuf, buf))
-            pline("%sは名前「%s」を受け入れなかった.", upstart(monnambuf), buf);
+            pline("%sは「%s」という名を受け入れなかった.", upstart(monnambuf), buf);
     } else {
         (void) christen_monst(mtmp, buf);
     }
@@ -295,11 +296,11 @@ do_oname(struct obj *obj)
 
     /* Do this now because there's no point in even asking for a name */
     if (obj->otyp == SPE_NOVEL) {
-        pline("%sにはすでに正式な名前がある.", Ysimple_name2(obj));
+        pline("%sにはすでに正式な名前が付いている.", Ysimple_name2(obj));
         return;
     }
 
-    Snprintf(qbuf, sizeof qbuf, "%s%sにどんな名前を付けますか?",
+    Snprintf(qbuf, sizeof qbuf, "%s%sを何と名付けますか?",
              is_plural(obj) ? "これらの" : "この",
              simpleonames(obj));
     /* use getlin() to get a name string from the player */
@@ -319,7 +320,7 @@ do_oname(struct obj *obj)
     if (obj->oartifact) {
         /* this used to give "The artifact seems to resist the attempt."
            but resisting is definite, no "seems to" about it */
-          pline("%sは命名に抵抗した.",
+          pline("%sは名付けを拒んだ.",
               /* any artifact should always pass the has_oname() test
                  but be careful just in case */
                   has_oname(obj) ? ONAME(obj) : "アーティファクト");
@@ -348,9 +349,9 @@ do_oname(struct obj *obj)
         do {
             wipeout_text(bufp, rnd_on_display_rng(2), (unsigned) 0);
         } while (!strcmp(buf, bufcpy));
-        pline("刷り込んでいる間に%sが滑った。", jp_body_part(HAND));
+        pline("刻みつけている最中に%sが滑った。", jp_body_part(HAND));
         display_nhwindow(WIN_MESSAGE, FALSE);
-        You("%sを刻んだ。", buf);
+        You("「%s」と刻みつけた。", buf);
         /* violate illiteracy conduct since hero attempted to write
            a valid artifact name */
         u.uconduct.literate++;
@@ -528,20 +529,20 @@ docallcmd(void)
            response keyed to old "name an individual object?" prompt */
         any.a_char = 'i'; /* group accelerator 'y' */
         add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'y',
-                 ATR_NONE, clr, "持ち物の特定のアイテム",
+                 ATR_NONE, clr, "持ち物の個別のアイテム",
                  MENU_ITEMFLAGS_NONE);
         any.a_char = 'o'; /* group accelerator 'n' */
         add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'n',
-                 ATR_NONE, clr, "持ち物のアイテム種別",
+                 ATR_NONE, clr, "持ち物のアイテムの種類",
                  MENU_ITEMFLAGS_NONE);
     }
     any.a_char = 'f'; /* group accelerator ',' (or ':' instead?) */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, ',',
-             ATR_NONE, clr, "床にあるアイテムの種別",
+             ATR_NONE, clr, "床にあるアイテムの種類",
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'd'; /* group accelerator '\' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, '\\',
-             ATR_NONE, clr, "発見済み一覧のアイテム種別",
+             ATR_NONE, clr, "発見済み一覧のアイテムの種類",
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'a'; /* group accelerator 'l' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'l',
@@ -577,7 +578,7 @@ docallcmd(void)
             (void) xname(obj);
 
             if (!obj->dknown) {
-                You("別のものをもう一度認識できるわけがなかった.");
+                You("それを別の種類の物として認識し直すことはできなかった.");
 #if 0
             } else if (call_ok(obj) == GETOBJ_EXCLUDE) {
                 You("それについてはすでに十分知っている.");
@@ -712,7 +713,7 @@ namefloorobj(void)
     /* "dot for under/over you" only makes sense when the cursor hasn't
        been moved off the hero's '@' yet, but there's no way to adjust
        the help text once getpos() has started */
-     Sprintf(buf, "地図上の物体（'.'で%s物体）",
+         Sprintf(buf, "地図上の物体（'.'で%s物体を指定）",
             (u.uundetected && hides_under(gy.youmonst.data))
                   ? "あなたの上の" : "足元の");
     if (getpos(&cc, FALSE, buf) < 0 || cc.x <= 0)
@@ -762,14 +763,14 @@ namefloorobj(void)
         unames[4] = roguename();
         /* silly */
         unames[5] = "Wibbly Wobbly";
-          pline("%sはあなたを\"%s\"と呼ぶことに決めた.",
+          pline("%sはあなたを\"%s\"と呼ぶことにした.",
               The(buf),
               unames[rn2_on_display_rng(SIZE(unames))]);
     } else if (call_ok(obj) == GETOBJ_EXCLUDE) {
-          pline("%sには種類名を付けられない.",
+          pline("%sに種類名は付けられない.",
               use_plural ? "それら" : "それ");
     } else if (!obj->dknown) {
-        You("%sはまだ十分よく知らないため、%sと名付けられない。",
+        You("%sの正体をまだ十分に知らないため、%sとは名付けられない。",
             use_plural ? "それら" : "それ", buf);
     } else {
         docall(obj);
@@ -782,13 +783,12 @@ namefloorobj(void)
 
 static const char *const ghostnames[] = {
     /* these names should have length < PL_NSIZ */
-    /* Capitalize the names for aesthetics -dgk */
-    "Adri",    "Andries",       "Andreas",     "Bert",    "David",  "Dirk",
-    "Emile",   "Frans",         "Fred",        "Greg",    "Hether", "Jay",
-    "John",    "Jon",           "Karnov",      "Kay",     "Kenny",  "Kevin",
-    "Maud",    "Michiel",       "Mike",        "Peter",   "Robert", "Ron",
-    "Tom",     "Wilmar",        "Nick Danger", "Phoenix", "Jiro",   "Mizue",
-    "Stephan", "Lance Braccus", "Shadowhawk",  "Murphy"
+    "アドリ",      "アンドリース", "アンドレアス", "バート",        "デビッド",    "ディルク",
+    "エミール",    "フランツ",     "フレッド",     "グレッグ",      "ヘザー",      "ジェイ",
+    "ジョン",      "ヨン",         "カルノフ",     "ケイ",          "ケニー",      "ケビン",
+    "モード",      "ミヒール",     "マイク",       "ピーター",      "ロバート",    "ロン",
+    "トム",        "ウィルマー",   "ニック・デンジャー", "フェニックス", "ジロー",      "ミズエ",
+    "ステファン",  "ランス・ブラッカス", "シャドウホーク",  "マーフィー"
 };
 
 /* ghost names formerly set by x_monnam(), now by makemon() instead */
@@ -977,18 +977,19 @@ x_monnam(
         name_at_start = bogon_is_pname(rnamecode);
     } else if (do_name && has_mgivenname(mtmp)) {
         char *name = MGIVENNAME(mtmp);
+        const char *disp_name = jp_default_dog_name_for_display(mtmp, name);
 
 #if 0
       /* hardfought */
       if (has_ebones(mtmp)) {
 #endif
         if (mdat == &mons[PM_GHOST]) {
-            Sprintf(eos(buf), "%sのゴースト", name);
+            Sprintf(eos(buf), "%sのゴースト", disp_name);
             name_at_start = TRUE;
         } else if (called) {
             char adj_save[BUFSZ];
             Strcpy(adj_save, buf); /* save adjectives already in buf (may be "") */
-            Sprintf(buf, "%sという%s%s", name, adj_save, pm_name);
+            Sprintf(buf, "%sという%s%s", disp_name, adj_save, pm_name);
             name_at_start = (boolean) type_is_pname(mdat);
         } else if (is_mplayer(mdat) && (bp = strstri(name, " the ")) != 0) {
             /* <name> the <adjective> <invisible> <saddled> <rank> */
@@ -1003,7 +1004,7 @@ x_monnam(
             article = ARTICLE_NONE;
             name_at_start = TRUE;
         } else {
-            Strcat(buf, name);
+            Strcat(buf, disp_name);
             name_at_start = TRUE;
         }
 #if 0 /* hardfought */
@@ -1405,6 +1406,34 @@ bogusmon(char *buf, char *code)
         ++mnam;
     }
     return mnam;
+}
+
+staticfn const char *
+jp_default_dog_name_for_display(struct monst *mtmp, const char *name)
+{
+    if (!name || !*name || !mtmp || !mtmp->data || mtmp->data->mlet != S_DOG)
+        return name;
+
+    if (!strcmpi(name, "Idefix"))
+        return "イデフィックス";
+    if (!strcmpi(name, "Slasher"))
+        return "スラッシャー";
+    if (!strcmpi(name, "Hachi"))
+        return "ハチ";
+    if (!strcmpi(name, "Sirius"))
+        return "シリウス";
+    return name;
+}
+
+const char *
+jp_mgivenname_for_display(struct monst *mtmp)
+{
+    const char *name;
+
+    if (!mtmp || !has_mgivenname(mtmp))
+        return "";
+    name = MGIVENNAME(mtmp);
+    return jp_default_dog_name_for_display(mtmp, name);
 }
 
 staticfn const char *
