@@ -93,6 +93,10 @@ staticfn void nsb_mung_line(char *);
 staticfn void nsb_unmung_line(char *);
 #endif
 staticfn const char *skip_english_article(const char *);
+staticfn const char *jp_translate_multi_reason_exact(const char *, char *,
+                                                     unsigned);
+staticfn const char *jp_translate_multi_reason_for_display(const char *,
+                                                           char *, unsigned);
 
 /* "killed by",&c ["an"] 'svk.killer.name' */
 void
@@ -182,6 +186,114 @@ skip_english_article(const char *s)
     if (!strncmpi(s, "the ", 4))
         return s + 4;
     return s;
+}
+
+staticfn const char *
+jp_translate_multi_reason_exact(
+    const char *reason,
+    char *out,
+    unsigned outsz)
+{
+    static const struct {
+        const char *reason;
+        const char *jp;
+    } reason_map[] = {
+        { "dragging an iron ball", "鉄球を引きずっていた" },
+        { "digesting something", "何かを消化していた" },
+        { "gazing into a mirror", "鏡をのぞき込んでいた" },
+        { "jumping around", "跳び回っていた" },
+        { "stuck in a spider web", "蜘蛛の巣に絡まっていた" },
+        { "disrobing", "服を脱いでいた" },
+        { "dressing up", "着替えていた" },
+        { "moving through the air", "空中を移動していた" },
+        { "pretending to be a pile of gold", "金貨の山のふりをしていた" },
+        { "unconscious from rotten food", "腐った食べ物で意識を失っていた" },
+        { "fainted from lack of food", "食料不足で気絶していた" },
+        { "vomiting", "吐いていた" },
+        { "opening a container", "容器を開けていた" },
+        { "tipping a container", "容器を傾けていた" },
+        { "being scared stiff", "恐怖で身動きできなかった" },
+        { "being frightened to death", "恐怖で死にかけていた" },
+        { "sleeping off a magical draught", "魔法の薬で眠っていた" },
+        { "reading a book", "本を読んでいた" },
+        { "taking off clothes", "服を脱いでいた" },
+        { "praying", "祈っていた" },
+        { "trying to turn the monsters", "モンスターを退散させようとしていた" },
+        { "being terrified of a demon", "悪魔におびえていた" },
+        { "being terrified of a ghost", "幽霊におびえていた" },
+        { "scared by rattling", "ガタガタいう音に驚いていた" },
+        { "frozen by a potion", "ポーションで凍りついていた" },
+        { "getting stoned", "石化していた" },
+        { "fumbling", "もたついていた" },
+        { "sleeping", "眠っていた" },
+        { "hiding from thunderstorm", "雷雨を避けて隠れていた" },
+        { "paralyzed by a monster", "モンスターに麻痺させられていた" },
+        { "frozen by a monster's gaze", "モンスターの視線で凍りついていた" },
+        { "frozen by a monster", "モンスターに凍りつかされていた" },
+        { 0, 0 }
+    };
+    int i;
+
+    for (i = 0; reason_map[i].reason; ++i) {
+        if (!strcmpi(reason, reason_map[i].reason)) {
+            Snprintf(out, outsz, "%s", reason_map[i].jp);
+            return out;
+        }
+    }
+    return NULL;
+}
+
+staticfn const char *
+jp_translate_multi_reason_for_display(
+    const char *reason,
+    char *out,
+    unsigned outsz)
+{
+    const char *who;
+
+    if (!out || outsz == 0)
+        return "";
+    out[0] = '\0';
+    if (!reason || !*reason)
+        return out;
+
+    if (jp_translate_multi_reason_exact(reason, out, outsz))
+        return out;
+
+    if (!strncmp(reason, "paralyzed by ", 13)) {
+        who = skip_english_article(reason + 13);
+        Snprintf(out, outsz, "%sに麻痺させられていた", who);
+        return out;
+    }
+    if (!strncmp(reason, "frozen by ", 10)) {
+        char who_buf[BUFSZ];
+        size_t wholen;
+
+        who = skip_english_article(reason + 10);
+        wholen = strlen(who);
+        if (wholen > 5 && !strcmp(who + wholen - 5, " gaze")) {
+            size_t baselen = wholen - 5;
+
+            if (baselen >= sizeof who_buf)
+                baselen = sizeof who_buf - 1;
+            (void) memcpy(who_buf, who, baselen);
+            who_buf[baselen] = '\0';
+            baselen = strlen(who_buf);
+            if (baselen >= 2 && who_buf[baselen - 2] == '\''
+                && who_buf[baselen - 1] == 's')
+                who_buf[baselen - 2] = '\0';
+            else if (baselen >= 1 && who_buf[baselen - 1] == '\'')
+                who_buf[baselen - 1] = '\0';
+            who = skip_english_article(who_buf);
+            Snprintf(out, outsz, "%sの視線で凍りついていた", who);
+        } else {
+            Snprintf(out, outsz, "%sに凍りつかされていた", who);
+        }
+        return out;
+    }
+
+    Snprintf(out, outsz, "%s", reason);
+    return out;
 }
 
 void
@@ -287,10 +399,17 @@ jp_translate_killer_text_for_display(
 
     Snprintf(out, outsz, "%s", outmain);
     if (*whilebuf) {
-        const char *whiletxt = !strcmp(whilebuf, "helpless")
-                                 ? "無力状態"
-                                 : whilebuf;
-        Snprintf(out, outsz, "%s（%s中）", outmain, whiletxt);
+        char whilejp[BUFSZ];
+
+        if (!strcmp(whilebuf, "helpless")) {
+            Snprintf(out, outsz, "%s（無力状態）", outmain);
+        } else {
+            const char *whiletxt =
+                jp_translate_multi_reason_for_display(whilebuf,
+                                                      whilejp,
+                                                      sizeof whilejp);
+            Snprintf(out, outsz, "%s（%s）", outmain, whiletxt);
+        }
     }
 }
 
