@@ -2042,9 +2042,9 @@ seffect_amnesia(struct obj **sobjp)
     else if (!strncmpi(svp.plname, "Maud", 4))
         pline("意識が内へ内へと沈むにつれ、ほかのすべてを忘れてしまった.");
     else if (rn2(2))
-        pline("そもそもモードとは誰のことだっただろう?");
+        pline("そもそも「モード」とは誰のことだっただろう?");
     else
-        pline("モードのことを考えているうちに、ほかのすべてを忘れてしまった.");
+        pline("「モード」のことを考えているうちに、ほかのすべてを忘れてしまった.");
     exercise(A_WIS, FALSE);
 }
 
