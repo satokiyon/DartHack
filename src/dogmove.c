@@ -306,7 +306,7 @@ dog_eat(struct monst *mtmp,
         if (canseemon(mtmp)) {
             obj_name = distant_name(obj, doname); /* (see above) */
             if (flags.verbose)
-                pline("%s spits %s out in disgust!",
+                pline("%sは不快そうに%sを吐き出した!",
                       Monnam(mtmp), obj_name);
         }
     } else {
@@ -1279,8 +1279,8 @@ dog_move(
 
         if (mfp.info[chi] & ALLOW_U) {
             if (mtmp->mleashed) { /* play it safe */
-                pline_mon(mtmp, "%s breaks loose of %s leash!",
-                         Monnam(mtmp), mhis(mtmp));
+                pline_mon(mtmp, "%sは綱を振り切った!",
+                         Monnam(mtmp));
                 m_unleash(mtmp, FALSE);
             }
             (void) mattacku(mtmp);
@@ -1302,13 +1302,14 @@ dog_move(
             struct obj *o = (!Hallucination && svl.level.flags.hero_memory
                              && glyph_is_object(levl[nix][niy].glyph))
                                ? vobj_at(nix, niy) : 0;
-            const char *what = o ? distant_name(o, doname) : something;
+            const char *what = o ? distant_name(o, doname) : "何か";
 
-            pline_mon(mtmp, "%s %s reluctantly %s %s.", noit_Monnam(mtmp),
-                  vtense((char *) 0, locomotion(mtmp->data, "step")),
-                  (is_flyer(mtmp->data) || is_floater(mtmp->data)) ? "over"
-                                                                   : "onto",
-                  what);
+            if (is_flyer(mtmp->data) || is_floater(mtmp->data))
+                pline_mon(mtmp, "%sはしぶしぶ%sの上を飛び越えた.",
+                          noit_Monnam(mtmp), what);
+            else
+                pline_mon(mtmp, "%sはしぶしぶ%sの上に乗った.",
+                          noit_Monnam(mtmp), what);
         }
         mon_track_add(mtmp, omx, omy);
         /* We have to know if the pet's going to do a combined eat and
@@ -1508,18 +1509,18 @@ quickmimic(struct monst *mtmp)
 
     if (spotted || seeloc || canspotmon(mtmp)) {
         int prev_glyph = glyph_at(mtmp->mx, mtmp->my);
-        const char *what = (M_AP_TYPE(mtmp) == M_AP_FURNITURE)
-                           ? defsyms[mtmp->mappearance].explanation
-                           : (M_AP_TYPE(mtmp) == M_AP_OBJECT
-                              && OBJ_DESCR(objects[mtmp->mappearance]))
-                             ? OBJ_DESCR(objects[mtmp->mappearance])
-                             : (M_AP_TYPE(mtmp) == M_AP_OBJECT
-                                && OBJ_NAME(objects[mtmp->mappearance]))
-                               ? OBJ_NAME(objects[mtmp->mappearance])
-                               : (M_AP_TYPE(mtmp) == M_AP_MONSTER)
-                                   ? jp_pmname(&mons[mtmp->mappearance],
-                                                Mgender(mtmp))
-                                 : something;
+          const char *what = (M_AP_TYPE(mtmp) == M_AP_FURNITURE)
+                                    ? defsyms[mtmp->mappearance].explanation
+                                    : (M_AP_TYPE(mtmp) == M_AP_OBJECT
+                                        && OBJ_DESCR(objects[mtmp->mappearance]))
+                                      ? OBJ_DESCR(objects[mtmp->mappearance])
+                                      : (M_AP_TYPE(mtmp) == M_AP_OBJECT
+                                          && OBJ_NAME(objects[mtmp->mappearance]))
+                                         ? OBJ_NAME(objects[mtmp->mappearance])
+                                         : (M_AP_TYPE(mtmp) == M_AP_MONSTER)
+                                              ? jp_pmname(&mons[mtmp->mappearance],
+                                                                Mgender(mtmp))
+                                            : "何か";
 
         newsym(mtmp->mx, mtmp->my);
         if (was_leashed
@@ -1528,12 +1529,12 @@ quickmimic(struct monst *mtmp)
             Your("綱がゆるんだ.");
             m_unleash(mtmp, FALSE);
         }
-        if (glyph_at(mtmp->mx, mtmp->my) != prev_glyph)
-            You("%s %s %s where %s was!",
-                seeloc ? "see" : "sense that",
-                (what != something) ? an(what) : what,
-                seeloc ? "appear" : "has appeared", buf);
-        else
+        if (glyph_at(mtmp->mx, mtmp->my) != prev_glyph) {
+            if (seeloc)
+                You("%sのいた場所に%sが現れたのを見た.", buf, what);
+            else
+                You("%sのいた場所に%sが現れたのを感じた.", buf, what);
+        } else
             You("%sがやや%sっぽく感じられた.", buf, what);
 
         display_nhwindow(WIN_MAP, TRUE);
