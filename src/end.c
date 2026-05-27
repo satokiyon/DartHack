@@ -281,7 +281,7 @@ done_in_by(struct monst *mtmp, int how)
     } else if (mptr == &mons[PM_GHOST]) {
         Strcat(buf, "幽霊");
         if (has_mgivenname(mtmp))
-            Sprintf(eos(buf), "の%s", MGIVENNAME(mtmp));
+            Sprintf(eos(buf), "の%s", jp_mgivenname_for_display(mtmp));
     } else if (mtmp->isshk) {
         const char *shknm = shkname(mtmp),
                    *honorific = "";
@@ -297,7 +297,7 @@ done_in_by(struct monst *mtmp, int how)
         if (has_mgivenname(mtmp)) {
             Sprintf(eos(buf), "（%s%s）",
                     has_ebones(mtmp) ? "" : "名は",
-                    MGIVENNAME(mtmp));
+                    jp_mgivenname_for_display(mtmp));
         }
     }
 

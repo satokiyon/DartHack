@@ -705,6 +705,7 @@ extern int call_ok(struct obj *);
 extern int docallcmd(void);
 extern void docall(struct obj *) NONNULLARG1;
 extern const char *rndghostname(void);
+extern const char *jp_mgivenname_for_display(struct monst *);
 extern char *x_monnam(struct monst *, int, const char *, int, boolean) NONNULLARG1;
 extern char *l_monnam(struct monst *) NONNULLARG1;
 extern char *mon_nam(struct monst *) NONNULLARG1;
