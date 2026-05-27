@@ -693,7 +693,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
 
                 Sprintf(eos(expbuf), "（次のレベル%dまであと%ld）", (ulvl + 1), delta);
         }
-        enl_msg("あなたの", "経験値は ", "経験値は ", expbuf, "");
+        enl_msg("あなたの", "経験は ", "経験は ", expbuf, "");
     }
 #ifdef SCORE_ON_BOTL
     if (flags.showscore) {
@@ -701,7 +701,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
            only show it here if player has the 'showscore' option enabled */
         Sprintf(buf, "%ld%s", botl_score(),
             !final ? "" : "（最終調整前）");
-        enl_msg("スコア ", "は", "は", buf, "");
+        enl_msg("得点", "は", "は", buf, "");
     }
 #endif
 }
@@ -712,7 +712,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
 staticfn void
 basics_enlightenment(int mode UNUSED, int final)
 {
-    static char Power[] = "Pw(魔力)";
+    static char Power[] = "魔力";
     char buf[BUFSZ];
     int pw = u.uen, hp = (Upolyd ? u.mh : u.uhp),
         pwmax = u.uenmax, hpmax = (Upolyd ? u.mhmax : u.uhpmax);
@@ -724,9 +724,9 @@ basics_enlightenment(int mode UNUSED, int final)
         hp = 0;
     /* "1 out of 1" rather than "all" if max is only 1; should never happen */
     if (hp == hpmax && hpmax > 1)
-        Sprintf(buf, "HP(体力) : %d（満タン）", hpmax);
+        Sprintf(buf, "体力 : %d（満タン）", hpmax);
     else
-        Sprintf(buf, "HP(体力) : %d/%d", hp, hpmax);
+        Sprintf(buf, "体力 : %d/%d", hp, hpmax);
     enl_msg("あなたの", "", "", buf, "");
 
     /* low max energy is feasible, so handle couple of extra special cases */
@@ -744,13 +744,13 @@ basics_enlightenment(int mode UNUSED, int final)
         switch (mons[u.umonnum].mlevel) {
         case 0:
             /* status line currently being explained shows "HD:0" */
-            Strcpy(buf, "ヒットダイス : 0（実際は1/2）");
+            Strcpy(buf, "魔階 : 0（実際は1/2）");
             break;
         case 1:
-            Strcpy(buf, "ヒットダイス : 1");
+            Strcpy(buf, "魔階 : 1");
             break;
         default:
-            Sprintf(buf, "ヒットダイス : %d", mons[u.umonnum].mlevel);
+            Sprintf(buf, "魔階 : %d", mons[u.umonnum].mlevel);
             break;
         }
         enl_msg("あなたの", "", "", buf, "");
@@ -760,7 +760,7 @@ basics_enlightenment(int mode UNUSED, int final)
     Sprintf(buf, "%d", u.uac);
     if (abs(u.uac) == AC_MAX)
         Sprintf(eos(buf), "（理論上の%s値）", (u.uac < 0) ? "上限" : "下限");
-    enl_msg("アーマークラス ", " : ", " : ", buf, "");
+    enl_msg("防御", " : ", " : ", buf, "");
 
     /* gold; similar to doprgold (#showgold) but without shop billing info;
        includes container contents, unlike status line but like doprgold */
