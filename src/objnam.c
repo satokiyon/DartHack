@@ -658,7 +658,7 @@ reorder_fruit(boolean forward)
     }
 }
 
-/* add "<pfx> called <sfx>" to end of buf, truncating if necessary */
+/* add "<pfx>（<sfx>と呼ばれている）" to end of buf, truncating if necessary */
 staticfn void
 xcalled(
     char *buf,       /* eos(obuf) or eos(&obuf[PREFIX]) */
@@ -666,14 +666,16 @@ xcalled(
     const char *pfx, /* usually class string, sometimes more specific */
     const char *sfx) /* user assigned type name */
 {
+    const char *mid = "（";
+    const char *tail = "と呼ばれている）";
     int bufsiz = siz - 1 - (int) strlen(buf),
-        pfxlen = (int) (strlen(pfx) + sizeof " called " - sizeof "");
+        pfxlen = (int) (strlen(pfx) + strlen(mid) + strlen(tail));
 
     if (pfxlen > bufsiz)
         panic("xcalled: not enough room for prefix (%d > %d)",
               pfxlen, bufsiz);
 
-    Sprintf(eos(buf), "%s called %.*s", pfx, bufsiz - pfxlen, sfx);
+    Sprintf(eos(buf), "%s%s%.*s%s", pfx, mid, bufsiz - pfxlen, sfx, tail);
 }
 
 char *
@@ -1025,7 +1027,7 @@ xname_flags(
         } else {
             Strcpy(buf, actualn);
             if (GemStone(typ))
-                Strcat(buf, " stone");
+                Strcat(buf, "の宝石");
         }
         break;
     } /* gem */
