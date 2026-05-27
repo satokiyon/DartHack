@@ -5904,7 +5904,7 @@ passive(
             if (Blind || !flags.verbose)
                 You("しぶきを浴びた!");
             else
-                You("%sから飛び散った酸液を浴びた!", l_monnam(mon));
+                You("%sの酸液を浴びた!", l_monnam(mon));
 
             if (!Acid_resistance) {
                 mdamageu(mon, tmp);

@@ -739,7 +739,7 @@ doconsult(struct monst *oracl)
         return ECMD_OK;
     }
 
-    Sprintf(qbuf, "\"軽い相談をご希望ですか?\" (%d %s)",
+    Sprintf(qbuf, "\"軽い相談でよいかね?\" (%d %s)",
             minor_cost, currency((long) minor_cost));
     switch (ynq(qbuf)) {
     default:
@@ -747,7 +747,7 @@ doconsult(struct monst *oracl)
         return ECMD_OK;
     case 'y':
         if (umoney < (long) minor_cost) {
-            You("その額の金を持っていない!");
+            You("それだけの金さえ持っていない!");
             return ECMD_OK;
         }
         u_pay = minor_cost;
@@ -756,7 +756,7 @@ doconsult(struct monst *oracl)
         if (umoney <= (long) minor_cost /* don't even ask */
             || (svo.oracle_cnt == 1 || go.oracle_flg < 0))
             return ECMD_OK;
-        Sprintf(qbuf, "\"では、本格的な相談をご希望ですか?\" (%d %s)",
+        Sprintf(qbuf, "\"では本格的な相談を望むかね?\" (%d %s)",
                 major_cost, currency((long) major_cost));
         if (y_n(qbuf) != 'y')
             return ECMD_OK;
