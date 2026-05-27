@@ -50,7 +50,6 @@
 - **Sokoban**: 倉庫番
 - **Moloch**: モーロック
 - **experience point**: 経験値
-- **energy point**: MP
 - **spell power**: 魔力
 - **skill**: スキル
 
@@ -180,11 +179,19 @@
 - Pw: 魔力
 - AC: 防御
 - Xp: 経験
-- HD: 魔階
+- HD: 魔級
 - T: ターン
 - Gold: 金額
 - Dlvl: 階層
 - Score: 得点
+
+- Str/St : 筋力
+- Int/In : 知力
+- Wis/Wi : 賢明
+- Dex/Dx : 器用
+- Con/Co : 耐久
+- Cha/Ch : 魅力
+
 
 ### 狭幅ttyでのラベル省略順（固定）
 1. 条件表示の短縮（既存の段階短縮）
