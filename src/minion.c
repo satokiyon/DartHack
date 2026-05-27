@@ -13,6 +13,62 @@ static const int elementals[4] = {
     PM_EARTH_ELEMENTAL, PM_WATER_ELEMENTAL
 };
 
+staticfn const char *jp_summon_cloud_word(const char *);
+staticfn const char *jp_summon_what_word(const char *);
+staticfn const char *jp_summon_phrase(const char *, const char *);
+
+staticfn const char *
+jp_summon_cloud_word(const char *cloud)
+{
+    if (!strcmp(cloud, "cloud"))
+        return "雲";
+    if (!strcmp(cloud, "shower"))
+        return "雨";
+    if (!strcmp(cloud, "ball"))
+        return "球";
+    if (!strcmp(cloud, "flash"))
+        return "閃光";
+    return cloud;
+}
+
+staticfn const char *
+jp_summon_what_word(const char *what)
+{
+    if (!strcmp(what, "vapor"))
+        return "蒸気";
+    if (!strcmp(what, "steam"))
+        return "湯気";
+    if (!strcmp(what, "sparks"))
+        return "火花";
+    if (!strcmp(what, "dust"))
+        return "塵";
+    if (!strcmp(what, "flame"))
+        return "炎";
+    if (!strcmp(what, "light"))
+        return "光";
+    if (!strcmp(what, "smoke"))
+        return "煙";
+    return what;
+}
+
+staticfn const char *
+jp_summon_phrase(const char *cloud, const char *what)
+{
+    static char phrasebuf[BUFSZ];
+    const char *cloud_word = jp_summon_cloud_word(cloud);
+    const char *what_word = jp_summon_what_word(what);
+
+    if (!strcmp(cloud, "flash") && !strcmp(what, "light"))
+        return "閃光";
+    if (!strcmp(cloud, "shower") && !strcmp(what, "sparks"))
+        return "火花";
+    if (!strcmp(cloud, "ball") && !strcmp(what, "flame"))
+        return "炎の球";
+
+    Snprintf(phrasebuf, sizeof phrasebuf, "%sの%s", what_word, cloud_word);
+    return phrasebuf;
+}
+
 void
 newemin(struct monst *mtmp)
 {
@@ -173,8 +229,8 @@ msummon(struct monst *mon)
                 const char *cloud = 0,
                            *what = msummon_environ(mtmp->data, &cloud);
 
-                pline("%s appears in a %s of %s!", Amonnam(mtmp),
-                      cloud, what);
+                pline("%sが%sの中に現れた!", Amonnam(mtmp),
+                      jp_summon_phrase(cloud, what));
             }
         }
         cnt--;
@@ -248,7 +304,7 @@ summon_minion(aligntyp alignment, boolean talk)
             SetVoice(mon, 0, 80, 0);
             verbalize("汝の不謹慎な行動に代価を払わせるぞ！");
             if (canspotmon(mon))
-                pline("%s appears before you.", Amonnam(mon));
+                pline("%sがあなたの前に現れた.", Amonnam(mon));
             mon->mstrategy &= ~STRAT_APPEARMSG;
         }
         mon->mpeaceful = FALSE;
