@@ -23,8 +23,8 @@ static const char
 extern const char *const attrname[6];
 
 const char
-    *const attrname[] = { "筋力", "知性", "知恵",
-                          "器用さ", "耐久力", "魅力" };
+    *const attrname[] = { "筋力", "知力", "賢明",
+                          "器用", "耐久", "魅力" };
 
 static const struct innate {
     schar ulevel;
