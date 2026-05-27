@@ -256,6 +256,9 @@ static void set_condition_length(void);
 static int make_things_fit(boolean);
 static void shrink_enc(int);
 static void shrink_dlvl(int);
+static void restore_status_rawvals(void);
+static void strip_field_annotation(enum statusfields);
+static void apply_annotation_omit_rules(int);
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 static void status_sanity_check(void);
 #endif /* NH_DEVEL_STATUS */
@@ -4665,7 +4668,9 @@ static boolean windowdata_init = FALSE;
 static int cond_shrinklvl = 0;
 static int enclev = 0, enc_shrinklvl = 0;
 static int dlvl_shrinklvl = 0;
+static int annotation_omit_lvl = 0;
 static boolean truncation_expected = FALSE;
+static char status_rawvals[MAXBLSTATS][MAXCO];
 #define FORCE_RESET TRUE
 #define NO_RESET FALSE
 
@@ -4919,9 +4924,9 @@ tty_status_update(
         break;
     case BL_TITLE:
         /* when hitpointbar is enabled, rendering will enforce a length
-           of 30 on title, padding with spaces or truncating if necessary */
+           of 20 on title, padding with spaces or truncating if necessary */
         if (iflags.wc2_hitpointbar)
-            tty_status[NOW][fldidx].lth = 30 + 2; /* '[' and ']' */
+            tty_status[NOW][fldidx].lth = 20 + 2; /* '[' and ']' */
         break;
     case BL_GOLD:
         /* \GXXXXNNNN counts as 1 [moot since we use decode_mixed() above] */
@@ -4933,6 +4938,8 @@ tty_status_update(
         enclev = stat_cap_indx();
         break;
     }
+    if (fldidx >= 0 && fldidx < MAXBLSTATS && fldidx != BL_CONDITION)
+        Strcpy(status_rawvals[fldidx], status_vals[fldidx]);
     /* As of 3.6.2 we only render on BL_FLUSH (or BL_RESET) */
     return;
 }
@@ -4943,10 +4950,89 @@ static int
 status_text_cells(const char *text)
 {
 #ifdef WIN32CON
-    if ((windowprocs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8))
+    if (windowprocs.wincap2 & WC2_U_UTF8STR)
         return win32con_utf8_strlen_cells(text);
 #endif
     return (int) strlen(text);
+}
+
+static void
+restore_status_rawvals(void)
+{
+    int idx;
+
+    for (idx = 0; idx < MAXBLSTATS; ++idx) {
+        if (idx == BL_CONDITION || !tty_status[NOW][idx].valid)
+            continue;
+        Strcpy(status_vals[idx], status_rawvals[idx]);
+        tty_status[NOW][idx].lth = status_text_cells(status_vals[idx]);
+        if (idx == BL_TITLE && iflags.wc2_hitpointbar)
+            tty_status[NOW][idx].lth = 20 + 2; /* '[' + title + ']' */
+    }
+}
+
+static void
+strip_field_annotation(enum statusfields fld)
+{
+    char *txt, *val, *colon, *dst;
+    boolean had_leading_space = FALSE;
+
+    if (!status_activefields[fld])
+        return;
+    txt = status_vals[fld];
+    if (!txt || !*txt)
+        return;
+
+    if (*txt == ' ')
+        had_leading_space = TRUE;
+
+    colon = strchr(txt, ':');
+    if (!colon)
+        return;
+    val = colon + 1;
+    while (*val == ' ')
+        ++val;
+
+    dst = txt;
+    if (had_leading_space)
+        *dst++ = ' ';
+
+    (void) memmove((genericptr_t) dst, (genericptr_t) val, strlen(val) + 1);
+    tty_status[NOW][fld].lth = status_text_cells(txt);
+}
+
+static void
+apply_annotation_omit_rules(int lvl)
+{
+    if (lvl >= 1) {
+        strip_field_annotation(BL_VERS);
+        strip_field_annotation(BL_TERRAIN);
+        strip_field_annotation(BL_ARMOR);
+        strip_field_annotation(BL_WEAPON);
+        strip_field_annotation(BL_TIME);
+    }
+    if (lvl >= 2) {
+        strip_field_annotation(BL_LEVELDESC);
+        strip_field_annotation(BL_GOLD);
+        strip_field_annotation(BL_AC);
+        strip_field_annotation(BL_XP);
+        strip_field_annotation(BL_HD);
+        strip_field_annotation(BL_ENE);
+        strip_field_annotation(BL_HP);
+    }
+    if (lvl >= 3) {
+        strip_field_annotation(BL_ALIGN);
+        strip_field_annotation(BL_CAP);
+        strip_field_annotation(BL_SCORE);
+    }
+    if (lvl >= 4) {
+        strip_field_annotation(BL_STR);
+        strip_field_annotation(BL_DX);
+        strip_field_annotation(BL_CO);
+        strip_field_annotation(BL_IN);
+        strip_field_annotation(BL_WI);
+        strip_field_annotation(BL_CH);
+    }
 }
 
 static int
@@ -4958,12 +5044,19 @@ make_things_fit(boolean force_update)
     num_rows = StatusRows();
     condrow = num_rows - 1; /* always last row, 1 for 0..1 or 2 for 0..2 */
     cond_shrinklvl = 0;
+    annotation_omit_lvl = 0;
     if (enc_shrinklvl > 0 && num_rows == 2)
-        shrink_enc(0);
+        enc_shrinklvl = 0;
     if (dlvl_shrinklvl > 0)
-        shrink_dlvl(0);
-    set_condition_length();
-    for (trycnt = 0; trycnt < 6 && !fitting; ++trycnt) {
+        dlvl_shrinklvl = 0;
+    for (trycnt = 0; trycnt < 12 && !fitting; ++trycnt) {
+        restore_status_rawvals();
+        apply_annotation_omit_rules(annotation_omit_lvl);
+        if (enc_shrinklvl > 0 && num_rows == 2)
+            shrink_enc(enc_shrinklvl);
+        if (dlvl_shrinklvl > 0)
+            shrink_dlvl(dlvl_shrinklvl);
+        set_condition_length();
         /* FIXME: this remeasures each line every time even though it
            is only attempting to shrink one of them and the other one
            (or two) remains the same */
@@ -4984,6 +5077,10 @@ make_things_fit(boolean force_update)
             }
             continue;
         }
+        if (annotation_omit_lvl < 4) {
+            annotation_omit_lvl++;
+            continue;
+        }
         if (cond_shrinklvl >= 2) {
             /* We've exhausted the condition identifiers shrinkage,
              * so let's try shrinking other things...
@@ -4992,9 +5089,9 @@ make_things_fit(boolean force_update)
                 /* try shrinking the encumbrance word, but
                    only when it's on the same line as conditions */
                 if (num_rows == 2)
-                    shrink_enc(otheroptions + 1);
+                    enc_shrinklvl = otheroptions + 1;
             } else if (otheroptions == 2) {
-                shrink_dlvl(1);
+                dlvl_shrinklvl = 1;
             } else {
                 /* Last resort - turn on trunction */
                 truncation_expected = TRUE;
@@ -5191,8 +5288,7 @@ tty_putstatusfield(const char *text, int x, int y)
             n = i + x;
             if (n < ncols && *text) {
 #ifdef WIN32CON
-                if ((windowprocs.wincap2 & WC2_U_UTF8STR)
-                    && SYMHANDLING(H_UTF8)) {
+                if (windowprocs.wincap2 & WC2_U_UTF8STR) {
                     int drawn = win32con_putstr_utf8(text);
                     int col;
 
@@ -5476,7 +5572,7 @@ render_status(void)
                                 bits = 0L; /* skip any remaining conditions */
                             }
                             tty_putstatusfield(condtext, x, y);
-                            x += (int) strlen(condtext);
+                            x += status_text_cells(condtext);
                             if (iflags.hilite_delta) {
                                 if (coloridx != NO_COLOR)
                                     term_end_color();
@@ -5505,20 +5601,20 @@ render_status(void)
                      */
                     /* hitpointbar using hp percent calculation */
                     int bar_len, bar_pos = 0;
-                    char bar[30 + 1], *bar2 = (char *) 0, savedch = '\0';
+                    char bar[20 + 1], *bar2 = (char *) 0, savedch = '\0';
                     boolean twoparts = (hpbar_percent < 100);
 
-                    /* force exactly 30 characters, padded with spaces
+                    /* force exactly 20 characters, padded with spaces
                        if shorter or truncated if longer */
-                    if (strlen(text) != 30) {
-                        Sprintf(bar, "%-30.30s", text);
+                    if (strlen(text) != 20) {
+                        Sprintf(bar, "%-20.20s", text);
                         Strcpy(status_vals[BL_TITLE], bar);
                     } else {
                         Strcpy(bar, text);
                     }
                     if (hpbar_crit_hp)
                         repad_with_dashes(bar);
-                    bar_len = (int) strlen(bar); /* always 30 */
+                    bar_len = (int) strlen(bar); /* always 20 */
                     /*tlth = bar_len + 2; // not needed within this 'if'*/
                     attrmask = 0; /* for the second part only case: dead */
                     /* when at full HP, the whole title will be highlighted;
@@ -5609,7 +5705,7 @@ render_status(void)
                             term_start_color(coloridx);
                     }
                     tty_putstatusfield(text, x, y);
-                    x += (int) strlen(text);
+                    x += status_text_cells(text);
                     if (iflags.hilite_delta) {
                         if (coloridx != NO_COLOR)
                             term_end_color();

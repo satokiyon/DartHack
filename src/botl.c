@@ -69,6 +69,27 @@ encumbrance_enlightenment_text(int cap, int final, char *outbuf, size_t outbufsz
 staticfn const char *rank(void);
 staticfn void bot_via_windowport(void);
 staticfn void stat_update_time(void);
+staticfn void jp_status_relabel_dlvl(char *);
+staticfn int alignnum_to_display_index(int);
+
+staticfn void
+jp_status_relabel_dlvl(char *text)
+{
+    char tmp[QBUFSZ];
+
+    if (!text || strncmp(text, "Dlvl:", 5) != 0)
+        return;
+    Strcpy(tmp, text + 5);
+    Sprintf(text, "階層:%s", tmp);
+}
+
+staticfn int
+alignnum_to_display_index(int alignnum)
+{
+        return (alignnum == A_LAWFUL) ? 0
+                     : (alignnum == A_NEUTRAL) ? 1
+                         : (alignnum == A_CHAOTIC) ? 2 : -1;
+}
 
 char *
 get_strength_str(void)
@@ -111,7 +132,7 @@ do_statusline1(void)
     if ('a' <= newbot1[0] && newbot1[0] <= 'z')
         newbot1[0] += 'A' - 'a';
     newbot1[BOTL_NSIZ] = 0;
-    Sprintf(nb = eos(newbot1), " the ");
+    Sprintf(nb = eos(newbot1), " ");
 
     if (Upolyd) {
         char mbot[BUFSZ];
@@ -136,14 +157,16 @@ do_statusline1(void)
     if ((i - j) > 0)
         Sprintf(nb = eos(nb), "%*s", i - j, " "); /* pad with spaces */
 
-    Sprintf(nb = eos(nb), "St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
+    Sprintf(nb = eos(nb),
+            "筋力:%s 器用:%-1d 体力:%-1d 知力:%-1d 賢明:%-1d 魅力:%-1d",
             get_strength_str(),
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
             ACURR(A_CHA));
-        Sprintf(nb = eos(nb), "  %s", jp_align_for_display(u.ualign.type));
+        Sprintf(nb = eos(nb), "  属性:%s",
+            jp_align_for_display(alignnum_to_display_index(u.ualign.type)));
 #ifdef SCORE_ON_BOTL
     if (flags.showscore)
-        Sprintf(nb = eos(nb), " S:%ld", botl_score());
+        Sprintf(nb = eos(nb), " 得点:%ld", botl_score());
 #endif
     return newbot1;
 }
@@ -175,10 +198,11 @@ do_statusline2(void)
      */
 
     /* dungeon location plus gold */
-    (void) describe_level(dloc, 1); /* includes at least one trailing space */
+        (void) describe_level(dloc, 1); /* includes at least one trailing space */
+        jp_status_relabel_dlvl(dloc);
     if ((money = money_cnt(gi.invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
-    Sprintf(eos(dloc), "%s:%-2ld", /* strongest hero can lift ~300000 gold */
+                Sprintf(eos(dloc), " 金額:%s:%-2ld", /* strongest hero can lift ~300000 gold */
             (iflags.in_dumplog || iflags.invis_goldsym) ? "$"
               : encglyph(objnum_to_glyph(GOLD_PIECE)),
             min(money, 999999L));
@@ -191,23 +215,23 @@ do_statusline2(void)
     hpmax = Upolyd ? u.mhmax : u.uhpmax;
     if (hp < 0)
         hp = 0;
-    Sprintf(hlth, "HP:%d(%d) Pw:%d(%d) AC:%-2d",
+    Sprintf(hlth, "体力:%d(%d) 魔力:%d(%d) 防御:%-2d",
             min(hp, 9999), min(hpmax, 9999),
             min(u.uen, 9999), min(u.uenmax, 9999), u.uac);
     hln = strlen(hlth);
 
     /* experience */
     if (Upolyd)
-        Sprintf(expr, "HD:%d", mons[u.umonnum].mlevel);
+        Sprintf(expr, "魔階:%d", mons[u.umonnum].mlevel);
     else if (flags.showexp)
-        Sprintf(expr, "Xp:%d/%-1ld", u.ulevel, u.uexp);
+        Sprintf(expr, "経験:%d/%-1ld", u.ulevel, u.uexp);
     else
-        Sprintf(expr, "Xp:%d", u.ulevel);
+        Sprintf(expr, "経験:%d", u.ulevel);
     xln = strlen(expr);
 
     /* time/move counter */
     if (flags.time)
-        Sprintf(tmmv, "T:%ld", svm.moves);
+        Sprintf(tmmv, "ターン:%ld", svm.moves);
     else
         tmmv[0] = '\0';
     tln = strlen(tmmv);
@@ -222,38 +246,38 @@ do_statusline2(void)
      * unusual for more than one of them to apply at a time.]
      */
     if (Stoned)
-        Strcpy(nb = eos(nb), " Stone");
+        Strcpy(nb = eos(nb), " 石化");
     if (Slimed)
-        Strcpy(nb = eos(nb), " Slime");
+        Strcpy(nb = eos(nb), " 粘液");
     if (Strangled)
-        Strcpy(nb = eos(nb), " Strngl");
+        Strcpy(nb = eos(nb), " 絞首");
     if (Sick) {
         if (u.usick_type & SICK_VOMITABLE)
-            Strcpy(nb = eos(nb), " FoodPois");
+            Strcpy(nb = eos(nb), " 食中毒");
         if (u.usick_type & SICK_NONVOMITABLE)
-            Strcpy(nb = eos(nb), " TermIll");
+            Strcpy(nb = eos(nb), " 病気");
     }
     if (u.uhs != NOT_HUNGRY)
         Sprintf(nb = eos(nb), " %s", hu_stat[u.uhs]);
     if ((cap = near_capacity()) > UNENCUMBERED)
         Sprintf(nb = eos(nb), " %s", encumbrance_display_text(cap));
     if (Blind)
-        Strcpy(nb = eos(nb), " Blind");
+        Strcpy(nb = eos(nb), " 盲目");
     if (Deaf)
-        Strcpy(nb = eos(nb), " Deaf");
+        Strcpy(nb = eos(nb), " 難聴");
     if (Stunned)
-        Strcpy(nb = eos(nb), " Stun");
+        Strcpy(nb = eos(nb), " 朦朧");
     if (Confusion)
-        Strcpy(nb = eos(nb), " Conf");
+        Strcpy(nb = eos(nb), " 混乱");
     if (Hallucination)
-        Strcpy(nb = eos(nb), " Hallu");
+        Strcpy(nb = eos(nb), " 幻覚");
     /* levitation and flying are mutually exclusive; riding is not */
     if (Levitation)
-        Strcpy(nb = eos(nb), " Lev");
+        Strcpy(nb = eos(nb), " 浮遊");
     if (Flying)
-        Strcpy(nb = eos(nb), " Fly");
+        Strcpy(nb = eos(nb), " 飛行");
     if (u.usteed)
-        Strcpy(nb = eos(nb), " Ride");
+        Strcpy(nb = eos(nb), " 騎乗");
     cln = strlen(cond);
 
     /* version on status line, with leading space */
@@ -794,6 +818,8 @@ staticfn char *conditionbitmask2str(unsigned long);
 staticfn unsigned long match_str2conditionbitmask(const char *);
 staticfn unsigned long str2conditionbitmask(char *);
 staticfn boolean parse_condition(char (*)[QBUFSZ], int);
+staticfn int status_textmatch_compat_variants(int, const char *,
+                                              char [][QBUFSZ], int);
 staticfn char *hlattr2attrname(int, char *, size_t);
 staticfn void status_hilite_linestr_add(int, struct hilite_s *, unsigned long,
                                         const char *);
@@ -843,25 +869,26 @@ staticfn void status_hilites_viewall(void);
  */
 static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("title", "%s", ANY_STR, MAXVALWIDTH, BL_TITLE),
-    INIT_BLSTAT("strength", " St:%s", ANY_INT, 10, BL_STR),
-    INIT_BLSTAT("dexterity", " Dx:%s", ANY_INT,  10, BL_DX),
-    INIT_BLSTAT("constitution", " Co:%s", ANY_INT, 10, BL_CO),
-    INIT_BLSTAT("intelligence", " In:%s", ANY_INT, 10, BL_IN),
-    INIT_BLSTAT("wisdom", " Wi:%s", ANY_INT, 10, BL_WI),
-    INIT_BLSTAT("charisma", " Ch:%s", ANY_INT, 10, BL_CH),
-    INIT_BLSTAT("alignment", " %s", ANY_STR, 20, BL_ALIGN),
-    INIT_BLSTAT("score", " S:%s", ANY_LONG, 30, BL_SCORE),
+    INIT_BLSTAT("strength", " 筋力:%s", ANY_INT, 20, BL_STR),
+    INIT_BLSTAT("dexterity", " 器用:%s", ANY_INT, 20, BL_DX),
+    INIT_BLSTAT("constitution", " 体力:%s", ANY_INT, 20, BL_CO),
+    INIT_BLSTAT("intelligence", " 知力:%s", ANY_INT, 20, BL_IN),
+    INIT_BLSTAT("wisdom", " 賢明:%s", ANY_INT, 20, BL_WI),
+    INIT_BLSTAT("charisma", " 魅力:%s", ANY_INT, 20, BL_CH),
+    INIT_BLSTAT("alignment", " 属性:%s", ANY_STR, 24, BL_ALIGN),
+    INIT_BLSTAT("score", " 得点:%s", ANY_LONG, 30, BL_SCORE),
     INIT_BLSTAT("carrying-capacity", " %s", ANY_INT, 20, BL_CAP),
-    INIT_BLSTAT("gold", " %s", ANY_LONG, 40, BL_GOLD),
-    INIT_BLSTATP("power", " Pw:%s", ANY_INT, 10, BL_ENEMAX, BL_ENE),
+    INIT_BLSTAT("gold", " 金額:%s", ANY_LONG, 40, BL_GOLD),
+    INIT_BLSTATP("power", " 魔力:%s", ANY_INT, 20, BL_ENEMAX, BL_ENE),
     INIT_BLSTAT("power-max", "(%s)", ANY_INT, 10, BL_ENEMAX),
-    INIT_BLSTATP("experience-level", " Xp:%s", ANY_INT, 10, BL_XP, BL_XP),
-    INIT_BLSTAT("armor-class", " AC:%s", ANY_INT, 10, BL_AC),
-    INIT_BLSTAT("HD", " HD:%s", ANY_INT, 10, BL_HD),
-    INIT_BLSTAT("time", " T:%s", ANY_LONG, 30, BL_TIME),
+    INIT_BLSTATP("experience-level", " 経験:%s", ANY_INT, 20, BL_XP,
+                 BL_XP),
+    INIT_BLSTAT("armor-class", " 防御:%s", ANY_INT, 20, BL_AC),
+    INIT_BLSTAT("HD", " 魔階:%s", ANY_INT, 20, BL_HD),
+    INIT_BLSTAT("time", " ターン:%s", ANY_LONG, 30, BL_TIME),
     /* hunger used to be 'ANY_UINT'; see note below in bot_via_windowport() */
     INIT_BLSTAT("hunger", " %s", ANY_INT, 20, BL_HUNGER),
-    INIT_BLSTATP("hitpoints", " HP:%s", ANY_INT, 10, BL_HPMAX, BL_HP),
+    INIT_BLSTATP("hitpoints", " 体力:%s", ANY_INT, 20, BL_HPMAX, BL_HP),
     INIT_BLSTAT("hitpoints-max", "(%s)", ANY_INT, 10, BL_HPMAX),
     INIT_BLSTAT("dungeon-level", "%s", ANY_STR, MAXVALWIDTH, BL_LEVELDESC),
     INIT_BLSTATP("experience", "/%s", ANY_LONG, 30, BL_EXP, BL_EXP),
@@ -889,6 +916,16 @@ static struct istat_s initblstats[MAXBLSTATS] = {
 
 static const struct condmap condition_aliases[] = {
     { "strangled",      BL_MASK_STRNGL },
+    /* legacy English condition names for status-hilite compatibility */
+    { "hallu",          BL_MASK_HALLU },
+    { "hallucinat",     BL_MASK_HALLU },
+    { "conf",           BL_MASK_CONF },
+    { "stun",           BL_MASK_STUN },
+    { "termill",        BL_MASK_TERMILL },
+    { "termIll",        BL_MASK_TERMILL },
+    { "foodpois",       BL_MASK_FOODPOIS },
+    { "foodPois",       BL_MASK_FOODPOIS },
+    { "slime",          BL_MASK_SLIME },
     { "all",            BL_MASK_BAREH | BL_MASK_BLIND | BL_MASK_BUSY
                         | BL_MASK_CONF | BL_MASK_DEAF | BL_MASK_ELF_IRON
                         | BL_MASK_FLY | BL_MASK_FOODPOIS | BL_MASK_GLOWHANDS
@@ -921,36 +958,37 @@ static const struct condmap condition_aliases[] = {
 /* condition names and their abbreviations are used by windowport code */
 const struct conditions_t conditions[] = {
     /* ranking, mask, identifier, txt1, txt2, txt3 */
-    { 20, BL_MASK_BAREH,     bl_bareh,     { "Bare",     "Bar",   "Bh"  } },
-    { 10, BL_MASK_BLIND,     bl_blind,     { "Blind",    "Blnd",  "Bl"  } },
-    { 20, BL_MASK_BUSY,      bl_busy,      { "Busy",     "Bsy",   "By"  } },
-    { 10, BL_MASK_CONF,      bl_conf,      { "Conf",     "Cnf",   "Cf"  } },
-    { 10, BL_MASK_DEAF,      bl_deaf,      { "Deaf",     "Def",   "Df"  } },
-    { 15, BL_MASK_ELF_IRON,  bl_elf_iron,  { "Iron",     "Irn",   "Fe"  } },
-    { 10, BL_MASK_FLY,       bl_fly,       { "Fly",      "Fly",   "Fl"  } },
-    {  6, BL_MASK_FOODPOIS,  bl_foodpois,  { "FoodPois", "Fpois", "Poi" } },
-    { 20, BL_MASK_GLOWHANDS, bl_glowhands, { "Glow",     "Glo",   "Gl"  } },
-    {  2, BL_MASK_GRAB,      bl_grab,      { "Grab",     "Grb",   "Gr"  } },
-    { 10, BL_MASK_HALLU,     bl_hallu,     { "Hallu",    "Hal",   "Hl"  } },
-    { 20, BL_MASK_HELD,      bl_held,      { "Held",     "Hld",   "Hd"  } },
-    { 20, BL_MASK_ICY,       bl_icy,       { "Icy",      "Icy",   "Ic"  } },
-    {  8, BL_MASK_INLAVA,    bl_inlava,    { "InLava",   "Lav",   "La"  } },
-    { 10, BL_MASK_LEV,       bl_lev,       { "Lev",      "Lev",   "Lv"  } },
-    { 20, BL_MASK_PARLYZ,    bl_parlyz,    { "Parlyz",   "Para",  "Par" } },
-    { 10, BL_MASK_RIDE,      bl_ride,      { "Ride",     "Rid",   "Rd"  } },
-    { 20, BL_MASK_SLEEPING,  bl_sleeping,  { "Zzz",      "Zzz",   "Zz"  } },
-    {  6, BL_MASK_SLIME,     bl_slime,     { "Slime",    "Slim",  "Slm" } },
-    { 20, BL_MASK_SLIPPERY,  bl_slippery,  { "Slip",     "Slp",   "Sl"  } },
-    {  6, BL_MASK_STONE,     bl_stone,     { "Stone",    "Ston",  "Sto" } },
-    {  4, BL_MASK_STRNGL,    bl_strngl,    { "Strngl",   "Stngl", "Str" } },
-    { 10, BL_MASK_STUN,      bl_stun,      { "Stun",     "Stun",  "St"  } },
-    { 15, BL_MASK_SUBMERGED, bl_submerged, { "Submrg",   "Subm",  "Sm"  } },
-    {  6, BL_MASK_TERMILL,   bl_termill,   { "TermIll",  "Ill",   "Ill" } },
-    { 20, BL_MASK_TETHERED,  bl_tethered,  { "Teth",     "Tth",   "Te"  } },
-    { 20, BL_MASK_TRAPPED,   bl_trapped,   { "Trap",     "Trp",   "Tr"  } },
-    { 20, BL_MASK_UNCONSC,   bl_unconsc,   { "Out",      "Out",   "KO"  } },
-    { 20, BL_MASK_WOUNDEDL,  bl_woundedl,  { "WLegs",    "Leg",   "Lg"  } },
-    { 20, BL_MASK_HOLDING,   bl_holding,   { "UHold",    "UHld",  "UHd" } },
+    { 20, BL_MASK_BAREH,     bl_bareh,     { "素手",     "素手",   "手"  } },
+    { 10, BL_MASK_BLIND,     bl_blind,     { "盲目",     "盲目",   "盲"  } },
+    { 20, BL_MASK_BUSY,      bl_busy,      { "多忙",     "多忙",   "忙"  } },
+    { 10, BL_MASK_CONF,      bl_conf,      { "混乱",     "混乱",   "乱"  } },
+    { 10, BL_MASK_DEAF,      bl_deaf,      { "難聴",     "難聴",   "聴"  } },
+    { 15, BL_MASK_ELF_IRON,  bl_elf_iron,  { "鉄過敏",   "鉄過敏", "鉄"  } },
+    { 10, BL_MASK_FLY,       bl_fly,       { "飛行",     "飛行",   "飛"  } },
+        {  6, BL_MASK_FOODPOIS,  bl_foodpois,
+                { "食中毒",  "食中毒", "毒"  } },
+            { 20, BL_MASK_GLOWHANDS, bl_glowhands, { "発光",     "発光",   "光"  } },
+            {  2, BL_MASK_GRAB,      bl_grab,      { "捕縛",     "捕縛",   "縛"  } },
+            { 10, BL_MASK_HALLU,     bl_hallu,     { "幻覚",     "幻覚",   "幻"  } },
+            { 20, BL_MASK_HELD,      bl_held,      { "拘束",     "拘束",   "拘"  } },
+            { 20, BL_MASK_ICY,       bl_icy,       { "氷上",     "氷上",   "氷"  } },
+            {  8, BL_MASK_INLAVA,    bl_inlava,    { "溶岩",     "溶岩",   "溶"  } },
+            { 10, BL_MASK_LEV,       bl_lev,       { "浮遊",     "浮遊",   "浮"  } },
+            { 20, BL_MASK_PARLYZ,    bl_parlyz,    { "麻痺",    "麻痺",   "麻"  } },
+            { 10, BL_MASK_RIDE,      bl_ride,      { "騎乗",     "騎乗",   "騎"  } },
+            { 20, BL_MASK_SLEEPING,  bl_sleeping,  { "睡眠",     "睡眠",   "睡"  } },
+            {  6, BL_MASK_SLIME,     bl_slime,     { "粘液",    "粘液",   "粘"  } },
+            { 20, BL_MASK_SLIPPERY,  bl_slippery,  { "滑手",     "滑手",   "滑"  } },
+            {  6, BL_MASK_STONE,     bl_stone,     { "石化",    "石化",   "石"  } },
+            {  4, BL_MASK_STRNGL,    bl_strngl,    { "絞首",    "絞首",   "絞"  } },
+            { 10, BL_MASK_STUN,      bl_stun,      { "朦朧",     "朦朧",   "朦"  } },
+            { 15, BL_MASK_SUBMERGED, bl_submerged, { "水没",     "水没",   "没"  } },
+            {  6, BL_MASK_TERMILL,   bl_termill,   { "病気",    "病気",   "病"  } },
+            { 20, BL_MASK_TETHERED,  bl_tethered,  { "連結",     "連結",   "連"  } },
+            { 20, BL_MASK_TRAPPED,   bl_trapped,   { "罠拘",     "罠拘",   "罠"  } },
+            { 20, BL_MASK_UNCONSC,   bl_unconsc,   { "失神",     "失神",   "失"  } },
+            { 20, BL_MASK_WOUNDEDL,  bl_woundedl,  { "脚傷",     "脚傷",   "脚"  } },
+            { 20, BL_MASK_HOLDING,   bl_holding,   { "保持",    "保持",   "保"  } },
 };
 
 /* [perhaps these should all be opt_out with default of 'in';
@@ -1132,22 +1170,22 @@ bot_via_windowport(void)
     titl = !Upolyd ? jp_rank_of_for_display(u.ulevel, Role_switch,
                                             flags.female)
                    : jp_pmname(&mons[u.umonnum], Ugender);
-    i = (int) (strlen(buf) + sizeof " the " + strlen(titl) - sizeof "");
+    i = (int) (strlen(buf) + sizeof " " + strlen(titl) - sizeof "");
     /* if "Name the Rank/monster" is too long, we truncate the name but
        always keep at least BOTL_NSIZ characters of it; when hitpointbar is
        enabled, anything beyond 30 (long monster name) will be truncated */
     if (i > 30) {
-        i = 30 - (int) (sizeof " the " + strlen(titl) - sizeof "");
+        i = 30 - (int) (sizeof " " + strlen(titl) - sizeof "");
         nb[max(i, BOTL_NSIZ)] = '\0';
     }
-    Strcpy(nb = eos(nb), " the ");
+    Strcpy(nb = eos(nb), " ");
     Strcpy(nb = eos(nb), titl);
     if (Upolyd) { /* when poly'd, capitalize monster name */
         for (i = 0; nb[i]; i++)
             if (i == 0 || nb[i - 1] == ' ')
                 nb[i] = highc(nb[i]);
     }
-    Sprintf(gb.blstats[idx][BL_TITLE].val, "%-30s", buf);
+    Sprintf(gb.blstats[idx][BL_TITLE].val, "%s", buf);
     gv.valset[BL_TITLE] = TRUE; /* indicate val already set */
 
     /* Strength */
@@ -1164,7 +1202,7 @@ bot_via_windowport(void)
 
     /* Alignment */
         Strcpy(gb.blstats[idx][BL_ALIGN].val,
-            jp_align_for_display(u.ualign.type));
+            jp_align_for_display(alignnum_to_display_index(u.ualign.type)));
 
     /* Score */
     gb.blstats[idx][BL_SCORE].a.a_long =
@@ -1185,6 +1223,7 @@ bot_via_windowport(void)
 
     /*  Dungeon level. */
     (void) describe_level(gb.blstats[idx][BL_LEVELDESC].val, 1);
+    jp_status_relabel_dlvl(gb.blstats[idx][BL_LEVELDESC].val);
     gv.valset[BL_LEVELDESC] = TRUE; /* indicate val already set */
 
     /* Gold */
@@ -1488,6 +1527,104 @@ menualpha_cmp(const genericptr vptr1, const genericptr vptr2)
     int indx1 = *(int *) vptr1, indx2 = *(int *) vptr2;
 
     return strcmpi(condtests[indx1].useroption, condtests[indx2].useroption);
+}
+
+staticfn int
+status_textmatch_compat_variants(int fldidx, const char *txtstr,
+                                 char out[][QBUFSZ], int outsz)
+{
+    const char *legacy = (const char *) 0;
+    const char *val, *open, *close, *colon;
+    int n = 0;
+
+    if (!txtstr || !*txtstr || !out || outsz <= 0)
+        return 0;
+
+    if (fldidx == BL_ALIGN) {
+        if (strstr(txtstr, "秩序") && n < outsz)
+            Strcpy(out[n++], "lawful");
+        else if (strstr(txtstr, "中立") && n < outsz)
+            Strcpy(out[n++], "neutral");
+        else if (strstr(txtstr, "混沌") && n < outsz)
+            Strcpy(out[n++], "chaotic");
+    }
+
+    colon = strchr(txtstr, ':');
+    if (!colon)
+        return n;
+    val = colon + 1;
+    while (*val == ' ')
+        ++val;
+
+    if (*val && n < outsz)
+        Snprintf(out[n++], QBUFSZ, "%s", val);
+
+    switch (fldidx) {
+    case BL_STR:
+        legacy = "St";
+        break;
+    case BL_DX:
+        legacy = "Dx";
+        break;
+    case BL_CO:
+        legacy = "Co";
+        break;
+    case BL_IN:
+        legacy = "In";
+        break;
+    case BL_WI:
+        legacy = "Wi";
+        break;
+    case BL_CH:
+        legacy = "Ch";
+        break;
+    case BL_SCORE:
+        legacy = "S";
+        break;
+    case BL_ENE:
+        legacy = "Pw";
+        break;
+    case BL_XP:
+        legacy = "Xp";
+        break;
+    case BL_AC:
+        legacy = "AC";
+        break;
+    case BL_HD:
+        legacy = "HD";
+        break;
+    case BL_TIME:
+        legacy = "T";
+        break;
+    case BL_HP:
+        legacy = "HP";
+        break;
+    case BL_LEVELDESC:
+        legacy = "Dlvl";
+        break;
+    default:
+        break;
+    }
+
+    if (!legacy) {
+        open = strchr(txtstr, '(');
+        close = open ? strchr(open, ')') : (const char *) 0;
+        if (open && close && close < colon && (close - open) > 1) {
+            static char from_paren[16];
+            size_t l = (size_t) (close - open - 1);
+
+            if (l >= sizeof from_paren)
+                l = sizeof from_paren - 1;
+            (void) strncpy(from_paren, open + 1, l);
+            from_paren[l] = '\0';
+            legacy = from_paren;
+        }
+    }
+
+    if (legacy && *legacy && *val && n < outsz)
+        Snprintf(out[n++], QBUFSZ, "%s:%s", legacy, val);
+
+    return n;
 }
 
 int
@@ -1851,7 +1988,7 @@ status_initialize(
                                    : TRUE;
 
         fieldname = initblstats[i].fldname;
-        fieldfmt = (fld == BL_TITLE && iflags.wc2_hitpointbar) ? "%-30.30s"
+        fieldfmt = (fld == BL_TITLE && iflags.wc2_hitpointbar) ? "%s"
                    : initblstats[i].fldfmt;
         status_enablefield(fld, fieldname, fieldfmt, fldenabl);
     }
@@ -2673,11 +2810,37 @@ get_hilite(
                 break;
             case BL_TH_TEXTMATCH: /* ANY_STR */
                 txtstr = gb.blstats[idx][fldidx].val;
-                if (fldidx == BL_TITLE)
-                    /* "<name> the <rank-title>", skip past "<name> the " */
-                    txtstr += strlen(svp.plname) + sizeof " the " - sizeof "";
+                if (fldidx == BL_TITLE) {
+                    size_t pnlen = strlen(svp.plname);
+
+                    /* title text is "<name> <rank-title>" now, but continue
+                       to tolerate legacy "<name> the <rank-title>" strings
+                       for status-hilite matching compatibility. */
+                    if (!strncmp(txtstr, svp.plname, pnlen)) {
+                        txtstr += pnlen;
+                        while (*txtstr == ' ')
+                            ++txtstr;
+                        if (!strncmp(txtstr, "the ", 4))
+                            txtstr += 4;
+                    }
+                }
                 if (hl->rel == TXT_VALUE && hl->textmatch[0]) {
-                    if (fuzzymatch(hl->textmatch, txtstr, "\" -_", TRUE)) {
+                    char compat[4][QBUFSZ];
+                    int ci, cn;
+                    boolean matched = FALSE;
+
+                    if (fuzzymatch(hl->textmatch, txtstr, "\" -_", TRUE))
+                        matched = TRUE;
+                    else if ((cn = status_textmatch_compat_variants(
+                                    fldidx, txtstr, compat, SIZE(compat))) > 0)
+                        for (ci = 0; ci < cn; ++ci)
+                            if (fuzzymatch(hl->textmatch, compat[ci],
+                                           "\" -_", TRUE)) {
+                                matched = TRUE;
+                                break;
+                            }
+
+                    if (matched) {
                         rule = hl;
                         exactmatch = TRUE;
                     } else if (exactmatch) {
