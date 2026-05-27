@@ -695,7 +695,7 @@ nh_timeout(void)
                     adjattrib(A_CON, -1, 1);
                     break;
                 }
-                urgent_pline("症息が原因で死んだ.");
+                urgent_pline("病気が原因で死んだ.");
                 if (kptr && kptr->name[0]) {
                     svk.killer.format = kptr->format;
                     Strcpy(svk.killer.name, kptr->name);
