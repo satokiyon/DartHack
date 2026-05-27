@@ -556,7 +556,7 @@ outrumor(
     int mechanism)
 {
     static const char fortune_msg[] =
-        "This cookie has a scrap of paper inside.";
+        "このクッキーには紙片が入っている.";
     const char *line;
     char buf[BUFSZ];
     boolean reading = (mechanism == BY_COOKIE || mechanism == BY_PAPER);
@@ -568,21 +568,21 @@ outrumor(
         } else if (Blind) {
             if (mechanism == BY_COOKIE)
                 pline(fortune_msg);
-            pline("What a pity that you cannot read it!");
+            pline("残念ながら、読めない!");
             return;
         }
     }
 
     line = getrumor(truth, buf, reading ? FALSE : TRUE);
     if (!*line)
-        line = "NetHack rumors file closed for renovation.";
+        line = "NetHack の噂ファイルは改装中だ.";
     switch (mechanism) {
     case BY_ORACLE:
         /* Oracle delivers the rumor */
-        pline("True to her word, the Oracle %ssays: ",
-              (!rn2(4) ? "offhandedly "
-                       : (!rn2(3) ? "casually "
-                                  : (rn2(2) ? "nonchalantly " : ""))));
+          pline("約束どおり、オラクルは%s告げた:",
+              (!rn2(4) ? "何気なく"
+                     : (!rn2(3) ? "さりげなく"
+                            : (rn2(2) ? "さらりと" : ""))));
         SetVoice((struct monst *) 0, 0, 80, voice_oracle);
         verbalize1(line);
         /* [WIS exercised by getrumor()] */
@@ -592,7 +592,7 @@ outrumor(
         FALLTHROUGH;
     /* FALLTHRU */
     case BY_PAPER:
-        pline("It reads:");
+        pline("こう書かれている:");
         break;
     }
     pline1(line);
@@ -739,7 +739,7 @@ doconsult(struct monst *oracl)
         return ECMD_OK;
     }
 
-    Sprintf(qbuf, "\"軽い相談でよいかね?\" (%d %s)",
+    Sprintf(qbuf, "\"軽い相談をご希望ですか?\" (%d %s)",
             minor_cost, currency((long) minor_cost));
     switch (ynq(qbuf)) {
     default:
@@ -747,7 +747,7 @@ doconsult(struct monst *oracl)
         return ECMD_OK;
     case 'y':
         if (umoney < (long) minor_cost) {
-            You("それだけの金さえ持っていない!");
+            You("その額の金を持っていない!");
             return ECMD_OK;
         }
         u_pay = minor_cost;
@@ -756,7 +756,7 @@ doconsult(struct monst *oracl)
         if (umoney <= (long) minor_cost /* don't even ask */
             || (svo.oracle_cnt == 1 || go.oracle_flg < 0))
             return ECMD_OK;
-        Sprintf(qbuf, "\"では本格的な相談を望むかね?\" (%d %s)",
+        Sprintf(qbuf, "\"では、本格的な相談をご希望ですか?\" (%d %s)",
                 major_cost, currency((long) major_cost));
         if (y_n(qbuf) != 'y')
             return ECMD_OK;

@@ -2038,13 +2038,13 @@ seffect_amnesia(struct obj **sobjp)
     gk.known = TRUE;
     forget((!sblessed ? ALL_SPELLS : 0));
     if (Hallucination) /* Ommmmmm! */
-        Your("心は俗世のしがらみから解き放たれた.");
+        Your("心は俗世のしがらみからふっと解き放たれた.");
     else if (!strncmpi(svp.plname, "Maud", 4))
-        pline("意識が内へ内へと向かうにつれ、他のすべてを忘れてしまった.");
+        pline("意識が内へ内へと沈むにつれ、ほかのすべてを忘れてしまった.");
     else if (rn2(2))
-        pline("そもそも Maud とは誰だったのだろう?");
+        pline("そもそもモードとは誰のことだっただろう?");
     else
-        pline("Maud のことを考えているうちに、他のすべてを忘れてしまった.");
+        pline("モードのことを考えているうちに、ほかのすべてを忘れてしまった.");
     exercise(A_WIS, FALSE);
 }
 
