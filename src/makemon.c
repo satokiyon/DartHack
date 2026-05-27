@@ -1488,14 +1488,13 @@ makemon(
                 what = upstart(mbuf);
             }
             if (what) {
+                const char *where = next2u(x, y) ? "あなたのそばに"
+                                   : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? "近くに"
+                                     : "";
+
                 set_msg_xy(mtmp->mx, mtmp->my);
-                Norep("%s%s %s%s%c", what,
-                      exclaim ? " suddenly" : "",
-                      /* 'what' might be "gold pieces" so need plural verb */
-                      vtense(what, "appear"),
-                      next2u(x, y) ? " next to you"
-                      : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by"
-                        : "",
+                Norep("%sが%s%s現れた%c", what,
+                      exclaim ? "突然" : "", where,
                       exclaim ? '!' : '.');
             }
         }
