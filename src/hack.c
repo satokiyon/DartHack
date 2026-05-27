@@ -1723,7 +1723,7 @@ notice_mon(struct monst *mtmp)
                      : (!has_mgivenname(mtmp)
                         && !type_is_pname(mtmp->data)) ? ARTICLE_A
                      : ARTICLE_NONE,
-                     (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
+                            (mtmp->mpeaceful && !mtmp->mtame) ? "友好的な" : 0,
                      has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
         } else if (!spot) {
             mtmp->mspotted = FALSE;
@@ -2169,7 +2169,7 @@ domove_swap_with_pet(
                      : (!has_mgivenname(mtmp)
                         && !type_is_pname(mtmp->data)) ? ARTICLE_THE
                      : ARTICLE_NONE,
-                     (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
+                            (mtmp->mpeaceful && !mtmp->mtame) ? "友好的な" : 0,
                      has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE),
             mtmp->mpeaceful ? "と" : "を",
             mtmp->mpeaceful ? "入れ替わった" : "驚かせた");
@@ -3085,13 +3085,13 @@ invocation_message(void)
 
         nomul(0); /* stop running or travelling */
         if (u.usteed)
-            Sprintf(buf, "beneath %s", y_monnam(u.usteed));
+            Sprintf(buf, "%sの足元", y_monnam(u.usteed));
         else if (Levitation || Flying)
-            Strcpy(buf, "beneath you");
+            Strcpy(buf, "足元");
         else
-            Sprintf(buf, "under your %s", jp_body_part_plural(FOOT));
+            Sprintf(buf, "あなたの%sの下", jp_body_part_plural(FOOT));
 
-        You_feel("奇妙な振動を%sに感じた.", buf);
+        You_feel("%sに奇妙な振動を感じた.", buf);
         u.uevent.uvibrated = 1;
         if (otmp && otmp->spe == 7 && otmp->lamplit)
             pline("%sは%s!", xname(otmp),
@@ -4235,7 +4235,7 @@ maybe_wail(void)
         int i, powercnt;
 
         who = (Role_if(PM_WIZARD) || Role_if(PM_VALKYRIE)) ? gu.urole.name.m
-                                                           : "Elf";
+                                                           : "エルフ";
         if (u.uhp == 1) {
             pline("%sは死にかけていた.", who);
         } else {
