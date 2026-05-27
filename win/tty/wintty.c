@@ -4956,6 +4956,72 @@ status_text_cells(const char *text)
     return (int) strlen(text);
 }
 
+/* return byte index where [0..cells] display cells end, without splitting
+   a UTF-8 sequence when console UTF-8 output is active */
+static int
+status_byte_index_for_cells(const char *text, int cells)
+{
+    int used = 0, byteidx = 0;
+
+    if (!text || cells <= 0)
+        return 0;
+
+#ifdef WIN32CON
+    if (windowprocs.wincap2 & WC2_U_UTF8STR) {
+        const unsigned char *cp = (const unsigned char *) text;
+
+        while (cp[byteidx] != '\0') {
+            const unsigned char *uchp = &cp[byteidx];
+            int ulen = 1, w = 1;
+
+            if (*uchp >= 0x80U) {
+                ulen = utf8_sequence_len(uchp);
+                if (ulen > 1)
+                    w = utf8_char_display_width(uchp);
+            }
+            if (used + w > cells)
+                break;
+            used += w;
+            byteidx += ulen;
+        }
+        return byteidx;
+    }
+#endif
+
+    while (text[byteidx] != '\0' && used < cells) {
+        ++byteidx;
+        ++used;
+    }
+    return byteidx;
+}
+
+/* fit title to exactly target_cells display columns; never split UTF-8 seq */
+static void
+status_fit_title_cells(char *dst, size_t dstsz, const char *src, int target_cells)
+{
+    int byteidx, cells;
+
+    if (!dst || dstsz == 0)
+        return;
+    dst[0] = '\0';
+    if (!src || target_cells <= 0)
+        return;
+
+    byteidx = status_byte_index_for_cells(src, target_cells);
+    if ((size_t) byteidx >= dstsz)
+        byteidx = (int) dstsz - 1;
+    if (byteidx > 0)
+        (void) memcpy((genericptr_t) dst, (genericptr_t) src, (size_t) byteidx);
+    dst[byteidx] = '\0';
+
+    cells = status_text_cells(dst);
+    while (cells < target_cells && (size_t) byteidx + 1 < dstsz) {
+        dst[byteidx++] = ' ';
+        dst[byteidx] = '\0';
+        ++cells;
+    }
+}
+
 static void
 restore_status_rawvals(void)
 {
@@ -5600,21 +5666,17 @@ render_status(void)
                      * +-------------------------+
                      */
                     /* hitpointbar using hp percent calculation */
-                    int bar_len, bar_pos = 0;
-                    char bar[20 + 1], *bar2 = (char *) 0, savedch = '\0';
+                    int bar_len, bar_pos = 0, bar_split = 0;
+                    char bar[MAXCO], *bar2 = (char *) 0, savedch = '\0';
                     boolean twoparts = (hpbar_percent < 100);
 
-                    /* force exactly 20 characters, padded with spaces
-                       if shorter or truncated if longer */
-                    if (strlen(text) != 20) {
-                        Sprintf(bar, "%-20.20s", text);
-                        Strcpy(status_vals[BL_TITLE], bar);
-                    } else {
-                        Strcpy(bar, text);
-                    }
+                    /* force exactly 20 display cells; preserve UTF-8 sequence
+                       boundaries so multi-byte characters can't be split */
+                    status_fit_title_cells(bar, sizeof bar, text, 20);
+                    Strcpy(status_vals[BL_TITLE], bar);
                     if (hpbar_crit_hp)
                         repad_with_dashes(bar);
-                    bar_len = (int) strlen(bar); /* always 20 */
+                    bar_len = status_text_cells(bar); /* always 20 */
                     /*tlth = bar_len + 2; // not needed within this 'if'*/
                     attrmask = 0; /* for the second part only case: dead */
                     /* when at full HP, the whole title will be highlighted;
@@ -5627,7 +5689,8 @@ render_status(void)
                             bar_pos = 1;
                         if (bar_pos >= bar_len && hpbar_percent < 100)
                             bar_pos = bar_len - 1;
-                        bar2 = &bar[bar_pos];
+                        bar_split = status_byte_index_for_cells(bar, bar_pos);
+                        bar2 = &bar[bar_split];
                         savedch = *bar2;
                         *bar2 = '\0';
                     }
@@ -5639,7 +5702,7 @@ render_status(void)
                         if (iflags.hilite_delta && coloridx != NO_COLOR)
                             term_start_color(coloridx);
                         tty_putstatusfield(bar, x, y);
-                        x += (int) strlen(bar);
+                        x += status_text_cells(bar);
                         if (iflags.hilite_delta && coloridx != NO_COLOR)
                             term_end_color();
                         End_Attr(attrmask);
@@ -5649,7 +5712,7 @@ render_status(void)
                             term_start_attr(ATR_BLINK);
                         *bar2 = savedch;
                         tty_putstatusfield(bar2, x, y);
-                        x += (int) strlen(bar2);
+                        x += status_text_cells(bar2);
                         if ((attrmask & HL_BLINK) != 0)
                             term_end_attr(ATR_BLINK);
                     }
