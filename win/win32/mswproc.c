@@ -1958,7 +1958,7 @@ mswin_outrip(winid wid, int how, time_t when)
     putstr(wid, 0, buf);
 
     /* Put together death description */
-    formatkiller(buf, sizeof buf, how, FALSE);
+    jp_formatkiller_for_display(buf, sizeof buf, how, FALSE);
 
     /* Put death type on stone */
     putstr(wid, 0, buf);
