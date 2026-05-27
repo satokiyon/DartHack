@@ -760,7 +760,7 @@ basics_enlightenment(int mode UNUSED, int final)
     Sprintf(buf, "%d", u.uac);
     if (abs(u.uac) == AC_MAX)
         Sprintf(eos(buf), "（理論上の%s値）", (u.uac < 0) ? "上限" : "下限");
-    enl_msg("防御", " : ", " : ", buf, "");
+    enl_msg("防御(アーマークラス)", " : ", " : ", buf, "");
 
     /* gold; similar to doprgold (#showgold) but without shop billing info;
        includes container contents, unlike status line but like doprgold */
