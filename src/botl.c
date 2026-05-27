@@ -881,7 +881,7 @@ static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("gold", " 金額:%s", ANY_LONG, 40, BL_GOLD),
     INIT_BLSTATP("power", " 魔力:%s", ANY_INT, 20, BL_ENEMAX, BL_ENE),
     INIT_BLSTAT("power-max", "(%s)", ANY_INT, 10, BL_ENEMAX),
-    INIT_BLSTATP("experience-level", " 経験:%s", ANY_INT, 20, BL_XP,
+    INIT_BLSTATP("experience-level", " 等級:%s", ANY_INT, 20, BL_XP,
                  BL_XP),
     INIT_BLSTAT("armor-class", " 防御:%s", ANY_INT, 20, BL_AC),
     INIT_BLSTAT("HD", " 魔級:%s", ANY_INT, 20, BL_HD),
