@@ -744,13 +744,13 @@ basics_enlightenment(int mode UNUSED, int final)
         switch (mons[u.umonnum].mlevel) {
         case 0:
             /* status line currently being explained shows "HD:0" */
-            Strcpy(buf, "魔階 : 0（実際は1/2）");
+            Strcpy(buf, "魔級 : 0（実際は1/2）");
             break;
         case 1:
-            Strcpy(buf, "魔階 : 1");
+            Strcpy(buf, "魔級 : 1");
             break;
         default:
-            Sprintf(buf, "魔階 : %d", mons[u.umonnum].mlevel);
+            Sprintf(buf, "魔級 : %d", mons[u.umonnum].mlevel);
             break;
         }
         enl_msg("あなたの", "", "", buf, "");

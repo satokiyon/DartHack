@@ -158,7 +158,7 @@ do_statusline1(void)
         Sprintf(nb = eos(nb), "%*s", i - j, " "); /* pad with spaces */
 
     Sprintf(nb = eos(nb),
-            "筋力:%s 器用:%-1d 体力:%-1d 知力:%-1d 賢明:%-1d 魅力:%-1d",
+            "筋力:%s 器用:%-1d 耐久:%-1d 知力:%-1d 賢明:%-1d 魅力:%-1d",
             get_strength_str(),
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
             ACURR(A_CHA));
@@ -222,7 +222,7 @@ do_statusline2(void)
 
     /* experience */
     if (Upolyd)
-        Sprintf(expr, "魔階:%d", mons[u.umonnum].mlevel);
+        Sprintf(expr, "魔級:%d", mons[u.umonnum].mlevel);
     else if (flags.showexp)
         Sprintf(expr, "経験:%d/%-1ld", u.ulevel, u.uexp);
     else
@@ -871,7 +871,7 @@ static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("title", "%s", ANY_STR, MAXVALWIDTH, BL_TITLE),
     INIT_BLSTAT("strength", " 筋力:%s", ANY_INT, 20, BL_STR),
     INIT_BLSTAT("dexterity", " 器用:%s", ANY_INT, 20, BL_DX),
-    INIT_BLSTAT("constitution", " 体力:%s", ANY_INT, 20, BL_CO),
+    INIT_BLSTAT("constitution", " 耐久:%s", ANY_INT, 20, BL_CO),
     INIT_BLSTAT("intelligence", " 知力:%s", ANY_INT, 20, BL_IN),
     INIT_BLSTAT("wisdom", " 賢明:%s", ANY_INT, 20, BL_WI),
     INIT_BLSTAT("charisma", " 魅力:%s", ANY_INT, 20, BL_CH),
@@ -884,7 +884,7 @@ static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTATP("experience-level", " 経験:%s", ANY_INT, 20, BL_XP,
                  BL_XP),
     INIT_BLSTAT("armor-class", " 防御:%s", ANY_INT, 20, BL_AC),
-    INIT_BLSTAT("HD", " 魔階:%s", ANY_INT, 20, BL_HD),
+    INIT_BLSTAT("HD", " 魔級:%s", ANY_INT, 20, BL_HD),
     INIT_BLSTAT("time", " ターン:%s", ANY_LONG, 30, BL_TIME),
     /* hunger used to be 'ANY_UINT'; see note below in bot_via_windowport() */
     INIT_BLSTAT("hunger", " %s", ANY_INT, 20, BL_HUNGER),
