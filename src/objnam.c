@@ -102,14 +102,6 @@ struct Jitem {
     /* convert signed ptrdiff_t to unsigned size_t */                   \
     base ## spaceleft = (size_t) (base ## _end - base ## _eos)
 
-/* true for gems/rocks that should have " stone" appended to their names */
-#define GemStone(typ)                                                  \
-    (typ == FLINT                                                      \
-     || (objects[typ].oc_material == GEMSTONE                          \
-         && (typ != DILITHIUM_CRYSTAL && typ != RUBY && typ != DIAMOND \
-             && typ != SAPPHIRE && typ != BLACK_OPAL && typ != EMERALD \
-             && typ != OPAL)))
-
 static const struct Jitem Japanese_items[] = {
     { SHORT_SWORD, "脇差し" },
     { BROADSWORD, "忍者刀" },
@@ -356,17 +348,12 @@ obj_typename(int otyp)
     default:
         if (nn) {
             Strcat(buf, actualn);
-            if (GemStone(otyp))
-                Strcat(buf, " 石");
             if (un) /* 3: length of " (" + ")" which will enclose 'dn' */
                 xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "", un);
             if (dn)
                 Sprintf(eos(buf), " (%s)", dn);
         } else {
             Strcat(buf, dn ? dn : actualn);
-            if (ocl->oc_class == GEM_CLASS)
-                Strcat(buf,
-                       (ocl->oc_material == MINERAL) ? " 石" : " 宝石");
             if (un)
                 xcalled(buf, BUFSZ, "", un);
         }
@@ -1023,11 +1010,9 @@ xname_flags(
             if (un)
                 xcalled(buf, BUFSZ - PREFIX, rock, un);
             else
-                Sprintf(buf, "%s %s", dn, rock);
+                Strcpy(buf, dn);
         } else {
             Strcpy(buf, actualn);
-            if (GemStone(typ))
-                Strcat(buf, "の宝石");
         }
         break;
     } /* gem */
