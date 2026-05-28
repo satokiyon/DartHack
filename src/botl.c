@@ -203,7 +203,7 @@ do_statusline2(void)
     if ((money = money_cnt(gi.invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
                 Sprintf(eos(dloc), " 金額:%s:%-2ld", /* strongest hero can lift ~300000 gold */
-            (iflags.in_dumplog || iflags.invis_goldsym) ? "$"
+            (iflags.in_dumplog || iflags.invis_goldsym) ? "¥"
               : encglyph(objnum_to_glyph(GOLD_PIECE)),
             min(money, 999999L));
     dln = strlen(dloc);
@@ -215,14 +215,14 @@ do_statusline2(void)
     hpmax = Upolyd ? u.mhmax : u.uhpmax;
     if (hp < 0)
         hp = 0;
-    Sprintf(hlth, "体力:%d(%d) 魔力:%d(%d) 防御:%-2d",
+    Sprintf(hlth, "体力:%d(%d) 魔力:%d(%d) 防御(AC):%-2d",
             min(hp, 9999), min(hpmax, 9999),
             min(u.uen, 9999), min(u.uenmax, 9999), u.uac);
     hln = strlen(hlth);
 
     /* experience */
     if (Upolyd)
-        Sprintf(expr, "魔級:%d", mons[u.umonnum].mlevel);
+        Sprintf(expr, "魔レベル:%d", mons[u.umonnum].mlevel);
     else if (flags.showexp)
         Sprintf(expr, "経験:%d/%-1ld", u.ulevel, u.uexp);
     else
@@ -881,10 +881,10 @@ static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("gold", " 金額:%s", ANY_LONG, 40, BL_GOLD),
     INIT_BLSTATP("power", " 魔力:%s", ANY_INT, 20, BL_ENEMAX, BL_ENE),
     INIT_BLSTAT("power-max", "(%s)", ANY_INT, 10, BL_ENEMAX),
-    INIT_BLSTATP("experience-level", " 等級:%s", ANY_INT, 20, BL_XP,
+    INIT_BLSTATP("experience-level", " レベル:%s", ANY_INT, 20, BL_XP,
                  BL_XP),
-    INIT_BLSTAT("armor-class", " 防御:%s", ANY_INT, 20, BL_AC),
-    INIT_BLSTAT("HD", " 魔級:%s", ANY_INT, 20, BL_HD),
+    INIT_BLSTAT("armor-class", " 防御(AC):%s", ANY_INT, 20, BL_AC),
+    INIT_BLSTAT("HD", " 魔レベル:%s", ANY_INT, 20, BL_HD),
     INIT_BLSTAT("time", " ターン:%s", ANY_LONG, 30, BL_TIME),
     /* hunger used to be 'ANY_UINT'; see note below in bot_via_windowport() */
     INIT_BLSTAT("hunger", " %s", ANY_INT, 20, BL_HUNGER),
