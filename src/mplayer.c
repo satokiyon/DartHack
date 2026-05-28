@@ -87,8 +87,9 @@ get_mplname(struct monst *mtmp, char *nam)
     else
         mtmp->female = 0;
     Strcat(nam, " the ");
-    Strcat(nam, rank_of((int) mtmp->m_lev, monsndx(mtmp->data),
-                        (boolean) mtmp->female));
+    Strcat(nam, jp_rank_of_for_display((int) mtmp->m_lev,
+                                       monsndx(mtmp->data),
+                                       (boolean) mtmp->female));
 }
 
 staticfn void

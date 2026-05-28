@@ -7171,7 +7171,8 @@ trapname(
             copynchars(roletrap,
                        rn2(3) ? ((fem && gu.urole.name.f) ? gu.urole.name.f
                                                           : gu.urole.name.m)
-                              : rank_of(u.ulevel, Role_switch, fem),
+                            : jp_rank_of_for_display(u.ulevel,
+                                                Role_switch, fem),
                       (int) (sizeof roletrap - sizeof "の罠"));
                  Strcat(roletrap, "の罠");
             return lcase(roletrap);

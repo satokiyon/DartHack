@@ -746,15 +746,15 @@ namefloorobj(void)
         char tmpbuf[BUFSZ];
 
         /* straight role name */
-        unames[0] = ((Upolyd ? u.mfemale : flags.female) && gu.urole.name.f)
-                     ? gu.urole.name.f
-                     : gu.urole.name.m;
+        unames[0] = jp_role_name_for_display(
+                Role_switch,
+                ((Upolyd ? u.mfemale : flags.female) ? 1 : 0));
         /* random rank title for hero's role
 
            note: the 30 is hardcoded in xlev_to_rank, so should be
            hardcoded here too */
-        unames[1] = rank_of(rn2_on_display_rng(30) + 1,
-                            Role_switch, flags.female);
+        unames[1] = jp_rank_of_for_display(rn2_on_display_rng(30) + 1,
+                           Role_switch, flags.female);
         /* random fake monster */
         unames[2] = bogusmon(tmpbuf, (char *) 0);
         /* increased chance for fake monster */
@@ -1013,8 +1013,9 @@ x_monnam(
     } else if (is_mplayer(mdat) && !In_endgame(&u.uz)) {
         char pbuf[BUFSZ];
 
-        Strcpy(pbuf, rank_of((int) mtmp->m_lev, monsndx(mdat),
-                             (boolean) mtmp->female));
+        Strcpy(pbuf, jp_rank_of_for_display((int) mtmp->m_lev,
+                            monsndx(mdat),
+                            (boolean) mtmp->female));
         Strcat(buf, lcase(pbuf));
         name_at_start = FALSE;
     } else {

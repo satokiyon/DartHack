@@ -2332,8 +2332,9 @@ show_achievements(
         case ACH_RNK1: case ACH_RNK2: case ACH_RNK3: case ACH_RNK4:
         case ACH_RNK5: case ACH_RNK6: case ACH_RNK7: case ACH_RNK8:
             Sprintf(buf, "%sの階級に到達した",
-                    rank_of(rank_to_xlev(absidx - (ACH_RNK1 - 1)),
-                            Role_switch, (achidx < 0) ? TRUE : FALSE));
+                    jp_rank_of_for_display(
+                        rank_to_xlev(absidx - (ACH_RNK1 - 1)),
+                        Role_switch, (achidx < 0) ? TRUE : FALSE));
             you_have_X(buf);
             break;
 
@@ -2398,8 +2399,9 @@ record_achievement(schar achidx)
     if (absidx >= ACH_RNK1 && absidx <= ACH_RNK8) {
         livelog_printf(achieve_msg[absidx].llflag,
                    "%sの階級に到達した (レベル %d)",
-                       rank_of(rank_to_xlev(absidx - (ACH_RNK1 - 1)),
-                               Role_switch, (achidx < 0) ? TRUE : FALSE),
+                       jp_rank_of_for_display(
+                           rank_to_xlev(absidx - (ACH_RNK1 - 1)),
+                           Role_switch, (achidx < 0) ? TRUE : FALSE),
                        u.ulevel);
     } else if (achidx == ACH_SOKO_PRIZE
                || achidx == ACH_MINE_PRIZE) {
