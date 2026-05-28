@@ -1550,7 +1550,9 @@ update_val(struct X_status_value *attr_rec, long new_value)
                 Strcat(buf, mnam);
             } else {
                 Strcat(buf,
-                       rank_of(u.ulevel, svp.pl_character[0], flags.female));
+                       jp_rank_of_for_display(u.ulevel,
+                                              svp.pl_character[0],
+                                              flags.female));
             }
 
         } else if (attr_rec == &shown_stats[F_DLEVEL]) {
