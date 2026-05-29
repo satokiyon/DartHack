@@ -752,10 +752,10 @@ mattacku(struct monst *mtmp)
         if (gm.multi < 0) { /* this should always be the case */
             char buf[BUFSZ];
 
-                Sprintf(buf, "%sに戻ったようだ.",
-                    Upolyd ? (const char *) an(jp_pmname(gy.youmonst.data,
-                                                      flags.female))
-                           : (const char *) "yourself");
+            Sprintf(buf, "%sに戻ったようだ.",
+                Upolyd ? (const char *) an(jp_pmname(gy.youmonst.data,
+                                                  flags.female))
+                       : (const char *) "yourself");
             unmul(buf); /* immediately stop mimicking */
         }
         return 0;
@@ -2081,7 +2081,7 @@ doseduce(struct monst *mon)
             }
             /* confirmation prompt when charisma is high bypassed if deaf */
             if (!Deaf && rn2(20) < ACURR(A_CHA)) {
-                (void) safe_qbuf(qbuf, "\"That ",
+                (void) safe_qbuf(qbuf, "\"その",
                                  "は素敵ね。もらっていい?\"", ring,
                                  xname, simpleonames, "ring");
                 makeknown(RIN_ADORNMENT);
@@ -2112,7 +2112,7 @@ doseduce(struct monst *mon)
             }
             /* confirmation prompt when charisma is high bypassed if deaf */
             if (!Deaf && rn2(20) < ACURR(A_CHA)) {
-                (void) safe_qbuf(qbuf, "\"That ",
+                (void) safe_qbuf(qbuf, "\"その",
                                 "は素敵ね。私のために身に着けてくれる?\"",
                                  ring, xname, simpleonames, "ring");
                 makeknown(RIN_ADORNMENT);
@@ -2170,13 +2170,13 @@ doseduce(struct monst *mon)
     mayberem(mon, Who, uarmc, cloak_simple_name(uarmc));
     if (!uarmc)
         mayberem(mon, Who, uarm, suit_simple_name(uarm));
-    mayberem(mon, Who, uarmf, "boots");
+    mayberem(mon, Who, uarmf, "靴");
     if (!tried_gloves)
-        mayberem(mon, Who, uarmg, "gloves");
-    mayberem(mon, Who, uarms, "shield");
+        mayberem(mon, Who, uarmg, "手袋");
+    mayberem(mon, Who, uarms, "盾");
     mayberem(mon, Who, uarmh, helm_simple_name(uarmh));
     if (!uarmc && !uarm)
-        mayberem(mon, Who, uarmu, "shirt");
+        mayberem(mon, Who, uarmu, "シャツ");
 
     /* removing armor (levitation boots, or levitation ring to make
        room for adornment ring with incubus case) might result in the

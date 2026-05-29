@@ -2597,13 +2597,9 @@ inherits(
        already took everything you had. */
     if (numsk > 1) {
         if (cansee(shkp->mx, shkp->my) && croaked && !silently) {
-            takes[0] = '\0';
-            if (has_head(shkp->data) && !rn2(2))
-                Sprintf(takes, ", shakes %s %s,", noit_mhis(shkp),
-                        jp_mbodypart(shkp, HEAD));
-            pline("%s %slooks at your corpse%s and %s.", Shknam(shkp),
-                  helpless(shkp) ? "wakes up, " : "",
-                  takes, !inhishop(shkp) ? "disappears" : "sighs");
+            pline("%sは%sあなたの死体を見て%s。", Shknam(shkp),
+                  helpless(shkp) ? "目を覚まし、" : "",
+                  !inhishop(shkp) ? "立ち去った" : "ため息をついた");
         }
         taken = uinshop;
         goto skip;
@@ -2635,10 +2631,10 @@ inherits(
         umoney = money_cnt(gi.invent);
         takes[0] = '\0';
         if (helpless(shkp))
-            Strcat(takes, "wakes up and ");
+            Strcat(takes, "目を覚まして ");
         if (!m_next2u(shkp))
-            Strcat(takes, "comes and ");
-        Strcat(takes, "takes");
+            Strcat(takes, "やって来て ");
+        Strcat(takes, "あなたの持ち物をすべて持っていった");
 
         if (loss > umoney || !loss || uinshop) {
             eshkp->robbed -= umoney;
@@ -2649,16 +2645,15 @@ inherits(
                 disp.botl = TRUE;
             }
             if (!silently)
-                pline("%s %s all your possessions.", Shknam(shkp), takes);
+                pline("%sは%s.", Shknam(shkp), takes);
             taken = TRUE;
         } else {
             money2mon(shkp, loss);
             disp.botl = TRUE;
             if (!silently)
-                pline("%s %s the %ld %s %sowed %s.", Shknam(shkp),
+                pline("%sは%s%ld %sを%sから受け取った.", Shknam(shkp),
                       takes, loss, currency(loss),
-                      strncmp(eshkp->customer, svp.plname, PL_NSIZ) ? ""
-                        : "you ",
+                      strncmp(eshkp->customer, svp.plname, PL_NSIZ) ? "" : "あなた",
                       noit_mhim(shkp));
             /* shopkeeper has now been paid in full */
             pacify_shk(shkp, FALSE);
@@ -3858,10 +3853,10 @@ stolen_value(
 
         if (!silent) {
             if (canseemon(shkp)) {
-                Norep("%s booms: \"%s, you are a thief!\"",
-                      Shknam(shkp), svp.plname);
+                    Norep("%sが怒鳴った:「%s、泥棒だ!」",
+                        Shknam(shkp), svp.plname);
             } else if (!Deaf) {
-                Norep("You hear a scream, \"Thief!\"");  /* Deaf-aware */
+                    Norep("悲鳴が聞こえた。「泥棒!」");  /* Deaf-aware */
             }
         }
         hot_pursuit(shkp);
