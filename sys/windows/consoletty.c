@@ -1287,6 +1287,79 @@ nocmov(int x, int y)
     set_console_cursor(x, y);
 }
 
+#if defined(VIRTUAL_TERMINAL_SEQUENCES) && defined(UTF8_FROM_CORE)
+static int
+console_utf8_sequence_len(const unsigned char *utf8str)
+{
+    unsigned char c = *utf8str;
+
+    if ((c & 0x80U) == 0U)
+        return 1;
+    if ((c & 0xE0U) == 0xC0U && (utf8str[1] & 0xC0U) == 0x80U)
+        return 2;
+    if ((c & 0xF0U) == 0xE0U && (utf8str[1] & 0xC0U) == 0x80U
+        && (utf8str[2] & 0xC0U) == 0x80U)
+        return 3;
+    if ((c & 0xF8U) == 0xF0U && (utf8str[1] & 0xC0U) == 0x80U
+        && (utf8str[2] & 0xC0U) == 0x80U
+        && (utf8str[3] & 0xC0U) == 0x80U)
+        return 4;
+    return 1;
+}
+
+static void
+console_put_utf8_sequence(const unsigned char *utf8str, int ulen)
+{
+    cell_t cell = clear_cell;
+    WCHAR wch[2] = { 0, 0 };
+    int wcount, width = 1, i;
+    COORD pos = console.cursor;
+
+    if (ulen < 2 || ulen >= MAX_UTF8_SEQUENCE)
+        return;
+
+    cell.attr = console.attr;
+    cell.colorseq = esc_seq_colors[console.current_nhcolor];
+    cell.bkcolorseq = esc_seq_bkcolors[console.current_nhbkcolor];
+    cell.color24 = console.color24 ? console.color24 : 0L;
+    cell.color256idx = console.color256idx ? console.color256idx : 0;
+    for (i = 0; i < ulen; ++i)
+        cell.utf8str[i] = utf8str[i];
+    cell.utf8str[ulen] = '\0';
+
+    wcount = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR) utf8str, ulen,
+                                 wch, 1);
+    cell.wcharacter = (wcount == 1 && wch[0] != 0)
+                        ? wch[0]
+                        : (WCHAR) CONSOLE_CLEAR_CHARACTER;
+
+    width = nh_win32_cell_expected_width(&cell);
+    if (width < 1)
+        width = 1;
+
+    buffer_write(console.back_buffer, &cell, pos);
+
+    if (width > 1 && pos.X + 1 < console.width) {
+        cell_t trail = clear_cell;
+        COORD trail_pos = pos;
+
+        ++trail_pos.X;
+        buffer_write(console.back_buffer, &trail, trail_pos);
+    }
+
+    while (width-- > 0) {
+        if (console.cursor.X == console.width - 1) {
+            if (console.cursor.Y < console.height - 1) {
+                console.cursor.X = 1;
+                console.cursor.Y++;
+            }
+        } else {
+            console.cursor.X++;
+        }
+    }
+}
+#endif
+
 void
 xputs(const char *s)
 {
@@ -1301,7 +1374,22 @@ xputs(const char *s)
 #ifndef VIRTUAL_TERMINAL_SEQUENCES
             xputc_core(s[k]);
 #else
-            xputc_core((int) s[k]);
+        {
+#ifdef UTF8_FROM_CORE
+            const unsigned char *uch = (const unsigned char *) &s[k];
+
+            if (ttyDisplay && *uch >= 0x80U) {
+                int ulen = console_utf8_sequence_len(uch);
+
+                if (ulen > 1) {
+                    console_put_utf8_sequence(uch, ulen);
+                    k += (ulen - 1);
+                    continue;
+                }
+            }
+#endif
+            xputc_core((int) (unsigned char) s[k]);
+        }
 #endif
     }
 }
