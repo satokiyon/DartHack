@@ -2095,7 +2095,7 @@ show_conduct(int final)
         you_have_been("平和主義者だった");
 
     if (!u.uconduct.literate) {
-        you_have_been("非識字だった");
+        you_have_been("文字を読まず書かずに過ごした");
     } else if (wizard) {
         Sprintf(buf, "アイテムを読んだり刻んだりした回数は%ld回", u.uconduct.literate);
         you_have_X(buf);
