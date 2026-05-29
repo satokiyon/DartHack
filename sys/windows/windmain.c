@@ -109,6 +109,11 @@ staticfn void stdio_nonl_raw_print(const char *str);
 staticfn void stdio_raw_print_bold(const char *str);
 staticfn int stdio_nhgetch(void);
 
+#ifdef WIN32CON
+staticfn boolean stdio_has_nonascii(const char *str);
+staticfn void stdio_console_write_utf8(const char *str, boolean append_newline);
+#endif
+
 #ifdef PORT_HELP
 void port_help(void);
 #endif
@@ -1372,8 +1377,13 @@ stdio_wait_synch(void)
 void
 stdio_raw_print(const char *str)
 {
-    if (str)
-        fprintf(stdout, "%s\n", str);
+    if (!str)
+        return;
+#ifdef WIN32CON
+    stdio_console_write_utf8(str, TRUE);
+#else
+    fprintf(stdout, "%s\n", str);
+#endif
     return;
 }
 
@@ -1382,8 +1392,13 @@ stdio_raw_print(const char *str)
 void
 stdio_nonl_raw_print(const char *str)
 {
-    if (str)
-        fprintf(stdout, "%s", str);
+    if (!str)
+        return;
+#ifdef WIN32CON
+    stdio_console_write_utf8(str, FALSE);
+#else
+    fprintf(stdout, "%s", str);
+#endif
     return;
 }
 
@@ -1401,5 +1416,84 @@ stdio_nhgetch(void)
 {
     return getchar();
 }
+
+#ifdef WIN32CON
+staticfn boolean
+stdio_has_nonascii(const char *str)
+{
+    const unsigned char *p = (const unsigned char *) str;
+
+    while (p && *p) {
+        if (*p >= 0x80U)
+            return TRUE;
+        ++p;
+    }
+    return FALSE;
+}
+
+staticfn void
+stdio_console_write_utf8(const char *str, boolean append_newline)
+{
+    HANDLE hout;
+    DWORD mode, written;
+    int wlen;
+    WCHAR *wbuf = (WCHAR *) 0;
+    UINT saved_cp;
+    BOOL cp_switched = FALSE;
+    boolean needs_utf8_cp;
+
+    if (!str)
+        return;
+
+    hout = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (redirect_stdout || !hout || hout == INVALID_HANDLE_VALUE
+        || !GetConsoleMode(hout, &mode)) {
+        fprintf(stdout, "%s", str);
+        if (append_newline)
+            fputc('\n', stdout);
+        return;
+    }
+
+    wlen = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
+    if (wlen <= 0) {
+        fprintf(stdout, "%s", str);
+        if (append_newline)
+            fputc('\n', stdout);
+        return;
+    }
+
+    wbuf = (WCHAR *) alloc((size_t) wlen * sizeof *wbuf);
+    if (!wbuf) {
+        fprintf(stdout, "%s", str);
+        if (append_newline)
+            fputc('\n', stdout);
+        return;
+    }
+
+    if (MultiByteToWideChar(CP_UTF8, 0, str, -1, wbuf, wlen) <= 0) {
+        free((genericptr_t) wbuf);
+        fprintf(stdout, "%s", str);
+        if (append_newline)
+            fputc('\n', stdout);
+        return;
+    }
+
+    saved_cp = GetConsoleOutputCP();
+    needs_utf8_cp = stdio_has_nonascii(str);
+    if (needs_utf8_cp && saved_cp != 65001U) {
+        if (SetConsoleOutputCP(65001U))
+            cp_switched = TRUE;
+    }
+
+    WriteConsoleW(hout, wbuf, wlen - 1, &written, NULL);
+    if (append_newline)
+        WriteConsoleW(hout, L"\n", 1, &written, NULL);
+
+    if (cp_switched)
+        (void) SetConsoleOutputCP(saved_cp);
+
+    free((genericptr_t) wbuf);
+}
+#endif
 
     /*windmain.c*/
