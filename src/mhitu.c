@@ -290,12 +290,12 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
     } else if (unotthere) { /* Displaced */
         /* give 'displaced' message even if hero is Blind */
         if (compat)
-            pline("%s%sあなたの%sずれた像に%s微笑みかけた...", Monst_name,
+            pline("%s%sあなたの%s残像に%s微笑みかけた...", Monst_name,
                   topic,
                   Invis ? "見えない" : "",
                   (compat == 2) ? "魅力的に" : "誘惑するように");
         else
-            pline("%s%sあなたの%sずれた像を攻撃したが、あなたには当たらない!",
+            pline("%s%sあなたの%s残像を攻撃したが、あなたには当たらない!",
                   /* Note:  if you're both invisible and displaced, only
                    * monsters which see invisible will attack your displaced
                    * image, since the displaced image is also invisible. */
@@ -305,7 +305,7 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
         /* monsters may miss especially on water level where
            bubbles shake the player here and there */
         if (compat)
-            pline("%s%sあなたのゆがんだ像へ手を伸ばした.", Monst_name, topic);
+            pline("%s%sあなたのゆがんだ残像へ手を伸ばした.", Monst_name, topic);
         else
             pline("%s%s水面の反射に惑わされて外した!",
                   Monst_name, topic);
