@@ -730,7 +730,7 @@ static NEARDATA const char *trap_engravings[TRAPNUM] = {
     (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0, (char *) 0,
     (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0,
     /* 14..16: trap door, teleport, level-teleport */
-    "Vlad was here", "ad aerarium", "ad aerarium", (char *) 0, (char *) 0,
+    "ヴラドはここにいた", "ad aerarium（宝物庫へ）", "ad aerarium（宝物庫へ）", (char *) 0, (char *) 0,
     (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0, (char *) 0,
     /* 24..25 */
     (char *) 0, (char *) 0,
@@ -2364,7 +2364,7 @@ mkgrave(struct mkroom *croom)
         return;
 
     /* Put a grave at <m.x,m.y> */
-    make_grave(m.x, m.y, dobell ? "Saved by the bell!" : (char *) 0);
+    make_grave(m.x, m.y, dobell ? "鐘のおかげで助かった!" : (char *) 0);
 
     /* Possibly fill it with objects */
     if (!rn2(3)) {
