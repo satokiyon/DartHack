@@ -8,6 +8,7 @@
 staticfn int unstolenarm(void);
 staticfn int stealarm(void);
 staticfn void worn_item_removal(struct monst *, struct obj *);
+staticfn const char *worn_item_removal_verb(struct obj *);
 
 /* proportional subset of gold; return value actually fits in an int */
 long
@@ -31,6 +32,16 @@ somegold(long lmoney)
         igold = rn1(igold - 5000 + 1, 5000);
 
     return (long) igold;
+}
+
+staticfn const char *
+worn_item_removal_verb(struct obj *obj)
+{
+    if (obj->owornmask & W_WEAPONS)
+        return "奪い取った";
+    if (obj->owornmask & W_ACCESSORY)
+        return "外した";
+    return "脱がせた";
 }
 
 /*
@@ -189,7 +200,7 @@ stealarm(void)
                     if (otmp->unpaid)
                         subfrombill(otmp, shop_keeper(*u.ushops));
                     freeinv(otmp);
-                    pline("%s steals %s!", Monnam(mtmp), doname(otmp));
+                    pline("%sは%sを盗んだ!", Monnam(mtmp), doname(otmp));
                     (void) mpickobj(mtmp, otmp); /* may free otmp */
                     /* Implies seduction, "you gladly hand over ..."
                        so we don't set mavenge bit here. */
@@ -296,7 +307,6 @@ worn_item_removal(
     struct obj *obj)
 {
     char objbuf[BUFSZ], article[20], *p;
-    const char *verb;
     int strip_art;
 
     Strcpy(objbuf, doname(obj));
@@ -322,13 +332,11 @@ worn_item_removal(
         && (!strncmp(p + 5, "left ", 5) || !strncmp(p + 5, "right ", 6)))
         (void) strsubst(p + 2, "on", "from");
 
-    /* slightly iffy for alternate weapon that isn't actively dual-wielded,
-       but it's better to alert the player to the change in equipment than
-       to suppress the message for that case */
-    verb = ((obj->owornmask & W_WEAPONS) != 0L) ? "disarms"
-           : ((obj->owornmask & W_ACCESSORY) != 0L) ? "removes"
-             : "takes off";
-    pline("%s %s %s.", Some_Monnam(mon), verb, objbuf);
+     /* slightly iffy for alternate weapon that isn't actively dual-wielded,
+         but it's better to alert the player to the change in equipment than
+         to suppress the message for that case */
+     pline("%sは%sを%s.", Some_Monnam(mon), objbuf,
+             worn_item_removal_verb(obj));
     iflags.last_msg = PLNMSG_MON_TAKES_OFF_ITEM;
     /* removal might trigger more messages (due to loss of Lev|Fly;
        descending happens before the theft in progress finishes) */
@@ -388,15 +396,15 @@ steal(struct monst *mtmp, char *objnambuf)
 
             /* buried ball is not tracked via 'uball' and there is no chain
                at all (hence no uchain to take off) */
-            pline("%s takes off your unseen chain.", Monnambuf);
+            pline("%sはあなたの見えない鎖を外した.", Monnambuf);
             (void) openholdingtrap(&gy.youmonst, &dummy);
         } else if (Blind) {
             pline("誰かがあなたを盗もうとしたが、盗れる物は何もなかった.");
         } else if (inv_cnt(TRUE) > inv_cnt(FALSE)) {
-            pline("%sはあなたを盗もうとしたが、金貨には興味がないようだ.",
+            pline("%sはあなたから盗もうとしたが、金貨には興味がないようだ.",
                   Monnambuf);
         } else {
-            pline("%sはあなたを盗もうとしたが、盗れる物は何もない!",
+            pline("%sはあなたから盗もうとしたが、盗める物は何もない!",
                   Monnambuf);
         }
         return 1; /* let her flee */
@@ -761,7 +769,7 @@ stealamulet(struct monst *mtmp)
         freeinv(otmp);
         Strcpy(buf, doname(otmp));
         (void) mpickobj(mtmp, otmp); /* could merge and free otmp but won't */
-        pline("%s steals %s!", Some_Monnam(mtmp), buf);
+        pline("%sは%sを盗んだ!", Some_Monnam(mtmp), buf);
         if (can_teleport(mtmp->data) && !tele_restrict(mtmp))
             (void) rloc(mtmp, RLOC_MSG);
         encumber_msg();
