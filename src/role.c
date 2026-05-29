@@ -710,9 +710,16 @@ const char *jp_race_noun_for_display(int);
 const char *jp_race_adj_for_display(int);
 const char *jp_gender_for_display(int);
 const char *jp_align_for_display(int);
+staticfn boolean raceidx_for_display_ok(int);
 
 /* used by str2XXX() */
 static char NEARDATA randomstr[] = "random";
+
+staticfn boolean
+raceidx_for_display_ok(int racenum)
+{
+    return (boolean) (IndexOkT(racenum, races) && races[racenum].noun != 0);
+}
 
 const char *
 jp_role_name_for_display(int rolenum, int gend)
@@ -733,7 +740,7 @@ jp_role_name_for_display(int rolenum, int gend)
 const char *
 jp_race_noun_for_display(int racenum)
 {
-    if (!validrace(ROLE_NONE, racenum))
+    if (!raceidx_for_display_ok(racenum))
         return "<種族>";
     return jp_pmname_from_idx(races[racenum].mnum, NEUTRAL);
 }
@@ -741,7 +748,7 @@ jp_race_noun_for_display(int racenum)
 const char *
 jp_race_adj_for_display(int racenum)
 {
-    if (!validrace(ROLE_NONE, racenum))
+    if (!raceidx_for_display_ok(racenum))
         return "<種族>";
     return jp_race_noun_for_display(racenum);
 }
@@ -771,7 +778,7 @@ const char *
 jp_current_race_adj(void)
 {
     int raceidx = get_race_index_from_current();
-    if (raceidx >= 0 && validrace(ROLE_NONE, raceidx)) {
+    if (raceidx_for_display_ok(raceidx)) {
         return jp_race_adj_for_display(raceidx);
     }
     /* Fallback: use the monster name from mnum directly */

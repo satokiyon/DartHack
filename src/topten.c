@@ -468,7 +468,15 @@ tt_align_name_from_filecode(const char *alignfc)
 {
     int aidx = str2align(alignfc);
 
-    return (aidx != ROLE_NONE) ? jp_align_gname_for_display(aidx) : alignfc;
+    /* str2align() returns an index into aligns[], not an aligntyp.
+     * Use aligns[aidx].value to get the A_LAWFUL/A_NEUTRAL/A_CHAOTIC
+     * constant before passing to jp_align_gname_for_display(), which
+     * ultimately calls align_gname() expecting aligntyp semantics.
+     * ROLE_RANDOM (-2) must also be excluded to avoid hitting the
+     * impossible("unknown alignment.") default branch in align_gname(). */
+    if (aidx < 0 || aidx >= ROLE_ALIGNS)
+        return alignfc;
+    return jp_align_gname_for_display(aligns[aidx].value);
 }
 
 staticfn void

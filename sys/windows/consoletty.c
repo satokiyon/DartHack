@@ -862,12 +862,21 @@ back_buffer_flip(void)
                 if (did_anything
                     || (do_anything & (do_wide_content | do_utf8_content))) {
 #ifdef UTF8_FROM_CORE
-                    if (SYMHANDLING(H_UTF8) || !console.has_unicode) {
+                    if (!console.has_unicode) {
+                        /* Unicode-incapable console: output UTF-8 bytes via
+                         * WriteConsoleA.  Requires console CP=65001 to be set
+                         * by tty_utf8graphics_fixup() beforehand. */
                         WriteConsoleA(console.hConOut, (LPCSTR) back->utf8str,
                                       (int) strlen((char *) back->utf8str),
                                       &unused, NULL);
                         did_anything |= did_utf8_content;
                     } else {
+                        /* Unicode-capable console (modern Windows): always use
+                         * WriteConsoleW with the pre-converted wcharacter so
+                         * that output is independent of the console code page.
+                         * wcharacter was set via MultiByteToWideChar(CP_UTF8)
+                         * in console_put_utf8_sequence() / xputc_core(), so it
+                         * is always correct regardless of the active CP. */
 #endif
                     WriteConsoleW(console.hConOut, &back->wcharacter, 1,
                                   &unused, NULL);
@@ -1289,18 +1298,26 @@ nocmov(int x, int y)
 
 #if defined(VIRTUAL_TERMINAL_SEQUENCES) && defined(UTF8_FROM_CORE)
 static int
-console_utf8_sequence_len(const unsigned char *utf8str)
+console_utf8_sequence_len(const unsigned char *utf8str, int remaining)
 {
     unsigned char c = *utf8str;
 
+    if (remaining < 1)
+        return 1;
     if ((c & 0x80U) == 0U)
         return 1;
-    if ((c & 0xE0U) == 0xC0U && (utf8str[1] & 0xC0U) == 0x80U)
+    if (remaining >= 2
+        && (c & 0xE0U) == 0xC0U
+        && (utf8str[1] & 0xC0U) == 0x80U)
         return 2;
-    if ((c & 0xF0U) == 0xE0U && (utf8str[1] & 0xC0U) == 0x80U
+    if (remaining >= 3
+        && (c & 0xF0U) == 0xE0U
+        && (utf8str[1] & 0xC0U) == 0x80U
         && (utf8str[2] & 0xC0U) == 0x80U)
         return 3;
-    if ((c & 0xF8U) == 0xF0U && (utf8str[1] & 0xC0U) == 0x80U
+    if (remaining >= 4
+        && (c & 0xF8U) == 0xF0U
+        && (utf8str[1] & 0xC0U) == 0x80U
         && (utf8str[2] & 0xC0U) == 0x80U
         && (utf8str[3] & 0xC0U) == 0x80U)
         return 4;
@@ -1378,8 +1395,9 @@ xputs(const char *s)
 #ifdef UTF8_FROM_CORE
             const unsigned char *uch = (const unsigned char *) &s[k];
 
-            if (ttyDisplay && *uch >= 0x80U) {
-                int ulen = console_utf8_sequence_len(uch);
+            if (*uch >= 0x80U) {
+                int remaining = slen - k;
+                int ulen = console_utf8_sequence_len(uch, remaining);
 
                 if (ulen > 1) {
                     console_put_utf8_sequence(uch, ulen);
@@ -1464,6 +1482,10 @@ xputc_core(int ch)
                 ccount = WideCharToMultiByte(
                     CP_UTF8, 0, wch, -1, (char *) cell.utf8str,
                     (int) sizeof cell.utf8str, NULL, NULL);
+                /* Also keep wcharacter for WriteConsoleW path in
+                 * back_buffer_flip(), which is used when has_unicode is TRUE
+                 * to output characters independent of console code page. */
+                cell.wcharacter = wch[0];
             } else {
 #endif
             /* store the wide version here also, so we don't slow
@@ -2851,6 +2873,21 @@ RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 
 #endif /* TTY_GRAPHICS */
 
+#ifdef UTF8_FROM_CORE
+static boolean
+msmsg_has_nonascii(const char *s)
+{
+    const unsigned char *p = (const unsigned char *) s;
+
+    while (p && *p) {
+        if (*p >= 0x80U)
+            return TRUE;
+        ++p;
+    }
+    return FALSE;
+}
+#endif
+
 /* this is used as a printf() replacement when the window
  * system isn't initialized yet
  */
@@ -2858,12 +2895,51 @@ void msmsg
 VA_DECL(const char *, fmt)
 {
     char buf[ROWNO * COLNO]; /* worst case scenario */
+#ifdef UTF8_FROM_CORE
+    WCHAR wbuf[ROWNO * COLNO];
+    int wlen;
+    DWORD written;
+    UINT saved_cp;
+    BOOL cp_switched;
+    boolean needs_utf8_cp;
+#endif
     VA_START(fmt);
     VA_INIT(fmt, const char *);
     (void) vsnprintf(buf, sizeof buf, fmt, VA_ARGS);
-    if (redirect_stdout || program_state.early_options)
+    if (redirect_stdout)
         fprintf(stdout, "%s", buf);
-    else {
+    else if (program_state.early_options) {
+#ifdef UTF8_FROM_CORE
+        if (console.has_unicode) {
+            saved_cp = GetConsoleOutputCP();
+            cp_switched = FALSE;
+            needs_utf8_cp = msmsg_has_nonascii(buf);
+            if (!console.hConOut)
+                console.hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
+            wlen = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR) buf, -1,
+                                       wbuf, (int) SIZE(wbuf));
+            if (wlen > 0) {
+                /* On some Windows host/pty combinations, early raw output
+                 * can still appear mojibake unless CP is UTF-8 at write time.
+                 * Keep the CP switch minimal and temporary. */
+                if (needs_utf8_cp && saved_cp != 65001U) {
+                    if (SetConsoleOutputCP(65001U))
+                        cp_switched = TRUE;
+                }
+                WriteConsoleW(console.hConOut, wbuf, wlen - 1, &written,
+                              NULL);
+                if (cp_switched)
+                    (void) SetConsoleOutputCP(saved_cp);
+            } else {
+                fprintf(stdout, "%s", buf);
+            }
+        } else {
+            fprintf(stdout, "%s", buf);
+        }
+#else
+        fprintf(stdout, "%s", buf);
+#endif
+    } else {
 #ifdef TTY_GRAPHICS
         if(!init_ttycolor_completed)
             init_ttycolor();
