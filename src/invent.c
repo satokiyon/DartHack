@@ -113,6 +113,7 @@ action_missing_jp(const char *word)
     if (!strcmp(word, "disarm")) return "解除に使う";
     if (!strcmp(word, "apply")) return "使うための";
     if (!strcmp(word, "sacrifice")) return "捧げるための";
+    if (!strcmp(word, "offer")) return "捧げるための";
     return word;
 }
 
