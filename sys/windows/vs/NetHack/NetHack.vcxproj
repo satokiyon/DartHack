@@ -128,7 +128,9 @@
     <ClCompile Include="$(SrcDir)getpos.c" />
     <ClCompile Include="$(SrcDir)glyphs.c" />
     <ClCompile Include="$(SrcDir)hack.c" />
-    <ClCompile Include="$(SrcDir)insight.c" />
+    <ClCompile Include="$(SrcDir)insight.c">
+      <InlineFunctionExpansion Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</InlineFunctionExpansion>
+    </ClCompile>
     <ClCompile Include="$(SrcDir)iactions.c" />
     <ClCompile Include="$(SrcDir)invent.c" />
     <ClCompile Include="$(SrcDir)isaac64.c" />

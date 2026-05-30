@@ -262,8 +262,8 @@ ready_weapon(struct obj *wep)
 
             if ((this_shkp = shop_keeper(inside_shop(u.ux, u.uy)))
                 != (struct monst *) 0) {
-                pline("%s says \"You be careful with my %s!\"",
-                      shkname(this_shkp), xname(wep));
+                pline("%sが警告した: \"うちの%sは丁寧に扱ってくれ!\"",
+                      jp_shkname_for_display(this_shkp), xname(wep));
             }
         }
     }
@@ -1083,3 +1083,4 @@ mwelded(struct obj *obj)
 }
 
 /*wield.c*/
+
