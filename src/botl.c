@@ -388,7 +388,7 @@ do_statusline2(void)
     if ((money = money_cnt(gi.invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
                 Sprintf(eos(dloc), " 金額:%s:%-2ld", /* strongest hero can lift ~300000 gold */
-            (iflags.in_dumplog || iflags.invis_goldsym) ? "¥"
+            (iflags.in_dumplog || iflags.invis_goldsym) ? "$"
               : encglyph(objnum_to_glyph(GOLD_PIECE)),
             min(money, 999999L));
     dln = strlen(dloc);

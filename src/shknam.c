@@ -187,6 +187,192 @@ static const char *const shkhealthfoods[] = {
     "=Zennia",  "=Zoe",      "=Zora",    0
 };
 
+static const char *const jp_shoptype_names[] = {
+    "総合商店",
+    "防具屋",
+    "古本屋",
+    "酒商店",
+    "武器屋",
+    "食料商店",
+    "宝飾屋",
+    "魔杖商店",
+    "道具屋",
+    "古書屋",
+    "健康食品屋",
+    "照明商店",
+};
+
+static const struct {
+    const char *eng;
+    const char *jp;
+} jp_shkname_map[] = {
+    { "Hebiwerie", "ヘビウェリー" },
+    { "Possogroenoe", "ポッソグローネオ" },
+    { "Asidonhopo", "アシドンホポ" },
+    { "Manlobbi", "マンロビ" },
+    { "Adjama", "アジャマ" },
+    { "Pakka Pakka", "パッカ・パッカ" },
+    { "Kabalebo", "カバレボ" },
+    { "Wonotobo", "ワノトボ" },
+    { "Akalapi", "アカラピ" },
+    { "Sipaliwini", "シパリウィニ" },
+    { "Annootok", "アノートク" },
+    { "Upernavik", "ウペルナヴィク" },
+    { "Angmagssalik", "アングマグサリク" },
+    { "Aklavik", "アクラヴィク" },
+    { "Inuvik", "イヌヴィク" },
+    { "Tuktoyaktuk", "トクトヤクトク" },
+    { "Chicoutimi", "シクーティミ" },
+    { "Ouiatchouane", "ウイアチュアン" },
+    { "Chibougamau", "シブガモー" },
+    { "Matagami", "マタガミ" },
+    { "Kipawa", "キパワ" },
+    { "Kinojevis", "キノジェヴィス" },
+    { "Abitibi", "アビティビ" },
+    { "Maganasipi", "マガナシピ" },
+    { "Akureyri", "アクレイリ" },
+    { "Kopasker", "コーパスケル" },
+    { "Budereyri", "ブデレイリ" },
+    { "Akranes", "アクラネス" },
+    { "Bordeyri", "ボルデイリ" },
+    { "Holmavik", "ホルマヴィク" },
+    { "Njezjin", "ニェジン" },
+    { "Tsjernigof", "チェルニゴフ" },
+    { "Ossipewsk", "オシペフスク" },
+    { "Gorlowka", "ゴルロフカ" },
+    { "Gomel", "ゴメリ" },
+    { "Demirci", "デミルジ" },
+    { "Kalecik", "カレジク" },
+    { "Boyabai", "ボヤバイ" },
+    { "Yildizeli", "ユルドゥズエリ" },
+    { "Gaziantep", "ガジアンテプ" },
+    { "Skibbereen", "スキベリーン" },
+    { "Kanturk", "カンターク" },
+    { "Rath Luirc", "ラス・ルアーク" },
+    { "Ennistymon", "エニスタイモン" },
+    { "Lahinch", "ラヒンチ" },
+    { "Voulgezac", "ヴルジェザック" },
+    { "Rouffiac", "ルフィアック" },
+    { "Lerignac", "レリニャック" },
+    { "Touverac", "トゥヴラック" },
+    { "Guizengeard", "ギザンジャール" },
+    { "Djasinga", "ジャシンガ" },
+    { "Tjibarusa", "チバルサ" },
+    { "Tjiwidej", "チウィデイ" },
+    { "Pengalengan", "プンガレンガン" },
+    { "Bandjar", "バンジャル" },
+    { "Feyfer", "フェイファー" },
+    { "Flugi", "フルギ" },
+    { "Gheel", "ヒール" },
+    { "Havic", "ハヴィク" },
+    { "Haynin", "ヘイニン" },
+    { "Nairn", "ネアン" },
+    { "Turriff", "タリフ" },
+    { "Inverurie", "インヴァルリー" },
+    { "Braemar", "ブレーマー" },
+    { "Lochnagar", "ロッホナガー" },
+    { "Ymla", "イムラ" },
+    { "Eed-morra", "イード・モラ" },
+    { "Cubask", "キューバスク" },
+    { "Nieb", "ニーブ" },
+    { "Yawolloh", "ヤウォロ" },
+    { "Ga'er", "ガエル" },
+    { "Zhangmu", "チャンムー" },
+    { "Rikaze", "リカゼ" },
+    { "Lhasa", "ラサ" },
+    { "Izchak", "イズチャク" },
+    { "Dirk", "ディルク" },
+    { "Lucrezia", "ルクレツィア" },
+};
+
+staticfn const char *
+jp_katakana_letter(char c)
+{
+    switch (lowc(c)) {
+    case 'a': return "ア";
+    case 'b': return "ブ";
+    case 'c': return "ク";
+    case 'd': return "ド";
+    case 'e': return "エ";
+    case 'f': return "フ";
+    case 'g': return "グ";
+    case 'h': return "ハ";
+    case 'i': return "イ";
+    case 'j': return "ジ";
+    case 'k': return "ク";
+    case 'l': return "ル";
+    case 'm': return "ム";
+    case 'n': return "ン";
+    case 'o': return "オ";
+    case 'p': return "プ";
+    case 'q': return "ク";
+    case 'r': return "ル";
+    case 's': return "ス";
+    case 't': return "ト";
+    case 'u': return "ウ";
+    case 'v': return "ヴ";
+    case 'w': return "ワ";
+    case 'x': return "クス";
+    case 'y': return "イ";
+    case 'z': return "ズ";
+    default:
+        break;
+    }
+    return 0;
+}
+
+staticfn const char *
+jp_katakana_name_fallback(const char *name)
+{
+    static char outbuf[BUFSZ];
+    boolean has_alpha = FALSE;
+    int i;
+
+    outbuf[0] = '\0';
+    for (i = 0; name[i] != '\0'; i++) {
+        unsigned char ch = (unsigned char) name[i];
+        const char *kata;
+
+        if (letter(ch)) {
+            has_alpha = TRUE;
+            kata = jp_katakana_letter((char) ch);
+            if (kata)
+                Snprintf(eos(outbuf), sizeof outbuf - Strlen(outbuf), "%s", kata);
+        } else if (ch == ' ' || ch == '-' || ch == '\'') {
+            if (outbuf[0] && strcmp(eos(outbuf) - 3, "・"))
+                Snprintf(eos(outbuf), sizeof outbuf - Strlen(outbuf), "%s", "・");
+        }
+    }
+    if (!has_alpha || !outbuf[0])
+        return name;
+
+    /* trim trailing separator */
+    while (Strlen(outbuf) >= 3 && !strcmp(eos(outbuf) - 3, "・"))
+        outbuf[Strlen(outbuf) - 3] = '\0';
+    return outbuf[0] ? outbuf : name;
+}
+
+const char *
+jp_shoptype_name_for_display(int shoptype)
+{
+    if (shoptype >= 0 && shoptype < (int) SIZE(jp_shoptype_names))
+        return jp_shoptype_names[shoptype];
+    return "商店";
+}
+
+const char *
+jp_shkname_for_display(struct monst *mtmp)
+{
+    const char *shknm = shkname(mtmp);
+    int i;
+
+    for (i = 0; i < (int) SIZE(jp_shkname_map); i++) {
+        if (!strcmp(shknm, jp_shkname_map[i].eng))
+            return jp_shkname_map[i].jp;
+    }
+    return jp_katakana_name_fallback(shknm);
+}
+
 /*
  * To add new shop types, all that is necessary is to edit the shtypes[]
  * array.  See mkroom.h for the structure definition.  Typically, you'll

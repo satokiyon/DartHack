@@ -1978,11 +1978,11 @@ poly_obj(struct obj *obj, int id)
                     && !costly_spot(u.ux, u.uy)) {
                     make_angry_shk(shkp, ox, oy);
                 } else {
-                    pline("%sは怒った!", Shknam(shkp));
+                    pline("%sは怒った!", jp_shkname_for_display(shkp));
                     hot_pursuit(shkp);
                 }
             } else
-                Norep("%sは激怒した!", Shknam(shkp));
+                Norep("%sは激怒した!", jp_shkname_for_display(shkp));
         }
     }
     delobj(obj);
@@ -5545,7 +5545,7 @@ fracture_rock(struct obj *obj) /* no texts here! */
         if (billable(&shkp, obj, objroom, FALSE)) {
             /* shop message says "you owe <shk> <$> for it!" so we need
                to precede that with a message explaining what "it" is */
-            You("%sの%sを砕いてしまった.", s_suffix(shkname(shkp)), xname(obj));
+            You("%sの%sを砕いてしまった.", s_suffix(jp_shkname_for_display(shkp)), xname(obj));
             /* breakobj won't destroy fracturing statue or boulder but
                will charge for shop goods */
             (void) breakobj(obj, x, y, TRUE, FALSE);
@@ -6437,3 +6437,4 @@ flash_str(
 }
 
 /*zap.c*/
+

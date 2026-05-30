@@ -2074,7 +2074,7 @@ bury_objs(int x, int y)
 
     if (costly && loss) {
         You("商品を引き埋めた代金として、%sに%ld %sの借りがある.",
-            shkname(shkp), loss, currency(loss));
+            jp_shkname_for_display(shkp), loss, currency(loss));
     }
 }
 
@@ -2325,3 +2325,4 @@ wiz_debug_cmd_bury(void)
 /*#undef STRIDENT*/
 
 /*dig.c*/
+

@@ -283,7 +283,7 @@ done_in_by(struct monst *mtmp, int how)
         if (has_mgivenname(mtmp))
             Sprintf(eos(buf), "の%s", jp_mgivenname_for_display(mtmp));
     } else if (mtmp->isshk) {
-        const char *shknm = shkname(mtmp),
+        const char *shknm = jp_shkname_for_display(mtmp),
                    *honorific = "";
 
         Sprintf(eos(buf), "%s%s（店主）", honorific, shknm);
@@ -1963,3 +1963,4 @@ NH_abort(const char *why USED_FOR_CRASHREPORT)
 
 #undef USED_FOR_CRASHREPORT
 /*end.c*/
+

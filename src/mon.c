@@ -3022,7 +3022,7 @@ logdeadmon(struct monst *mtmp, int mndx)
                the alternate phrasing "<shk>, shkdetails, has been killed"
                when hero isn't directly responsible */
             Snprintf(shkdetail, sizeof shkdetail, ", the %s %s%s",
-                     shtypes[ESHK(mtmp)->shoptype - SHOPBASE].name,
+                     jp_shoptype_name_for_display(ESHK(mtmp)->shoptype - SHOPBASE),
                      /* in case shk name doesn't include Mr or Ms honorific */
                      mtmp->female ? "proprietrix" : "proprietor",
                      herodidit ? "" : ",");

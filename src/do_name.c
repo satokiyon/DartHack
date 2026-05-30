@@ -271,7 +271,7 @@ do_mgivenname(void)
                     || mtmp->data->msound <= MS_ANIMAL)) {
         if (!alreadynamed(mtmp, monnambuf, buf)) {
             SetVoice(mtmp, 0, 80, 0);
-            verbalize("私は%s、%sではない。", shkname(mtmp), buf);
+            verbalize("私は%s、%sではない。", jp_shkname_for_display(mtmp), buf);
         }
     } else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk
                || mtmp->data == &mons[PM_GHOST] || has_ebones(mtmp)) {
@@ -945,14 +945,14 @@ x_monnam(
             /* 形容詞+役職+固有名: "怒っているよろず屋Asidonhopo" */
             Strcat(buf, adjective);
             Strcat(buf, pm_name);
-            Strcat(buf, shkname(mtmp));
+            Strcat(buf, jp_shkname_for_display(mtmp));
         } else {
             if (mdat != &mons[PM_SHOPKEEPER] || do_invis) {
                 if (do_invis)
                     Strcat(buf, "見えない");
                 Strcat(buf, pm_name);
             }
-            Strcat(buf, shkname(mtmp));
+            Strcat(buf, jp_shkname_for_display(mtmp));
         }
         return buf;
     }
@@ -1958,3 +1958,4 @@ lookup_novel(const char *lookname, int *idx)
 }
 
 /*do_name.c*/
+

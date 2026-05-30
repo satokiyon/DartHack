@@ -478,7 +478,7 @@ container_impact_dmg(
             You("%ld %sぶんの損害を与えた!", loss, currency(loss));
             make_angry_shk(shkp, x, y);
         } else {
-            You("壊した品物の代金として%sに%ld %s支払う必要がある.", shkname(shkp), loss,
+            You("壊した品物の代金として%sに%ld %s支払う必要がある.", jp_shkname_for_display(shkp), loss,
                 currency(loss));
         }
     }
@@ -1614,7 +1614,7 @@ impact_drop(
                 if (ESHK(shkp)->customer[0] == 0)
                     (void) strncpy(ESHK(shkp)->customer, svp.plname, PL_NSIZ);
                 if (angry)
-                    pline("%sは激怒した!", Shknam(shkp));
+                    pline("%sは激怒した!", jp_shkname_for_display(shkp));
                 else
                     pline("\"%s、お前は盗人だ!\"", svp.plname);
             } else
@@ -1625,7 +1625,7 @@ impact_drop(
         }
         if (ESHK(shkp)->debit > debit) {
             long amt = (ESHK(shkp)->debit - debit);
-            You("失わせた商品の代金として%sに%ld %s支払う必要がある.", shkname(shkp), amt,
+            You("失わせた商品の代金として%sに%ld %s支払う必要がある.", jp_shkname_for_display(shkp), amt,
                 currency(amt));
         }
     }
@@ -1970,3 +1970,4 @@ down_gate(coordxy x, coordxy y)
 }
 
 /*dokick.c*/
+
