@@ -760,7 +760,7 @@ basics_enlightenment(int mode UNUSED, int final)
     Sprintf(buf, "%d", u.uac);
     if (abs(u.uac) == AC_MAX)
         Sprintf(eos(buf), "（理論上の%s値）", (u.uac < 0) ? "上限" : "下限");
-    enl_msg("防御(アーマークラス)", " : ", " : ", buf, "");
+    enl_msg("防御(AC)", " : ", " : ", buf, "");
 
     /* gold; similar to doprgold (#showgold) but without shop billing info;
        includes container contents, unlike status line but like doprgold */
@@ -2856,7 +2856,8 @@ list_vanquished(char defquery, boolean ask)
                 }
                 /* Keep a stable indent now that we no longer use articles. */
                 pfx = class_header ? 5 : 4;
-                Snprintf(buftoo, sizeof buftoo, "%*s%s", pfx, "", buf);
+                Snprintf(buftoo, sizeof buftoo, "%s%s",
+                         pfx == 5 ? "     " : "    ", buf);
                 putstr(klwin, 0, buftoo);
             }
             /*
