@@ -1667,9 +1667,9 @@ offer_different_alignment_altar(
             newsym(u.ux, u.uy); /* in case Invisible to self */
             if (!Blind)
                                 pline_The("祭壇は%sに輝いた.",
-                          hcolor((u.ualign.type == A_LAWFUL) ? NH_WHITE
-                                 : u.ualign.type ? NH_BLACK
-                                   : (const char *) "gray"));
+                                                    (u.ualign.type == A_LAWFUL) ? "白"
+                                                        : u.ualign.type ? "黒"
+                                                            : "灰色");
 
             if (rnl(u.ulevel) > 6 && u.ualign.record > 0
                 && rnd(u.ualign.record) > (3 * ALIGNLIM) / 4)
