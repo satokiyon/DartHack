@@ -3774,14 +3774,17 @@ floorfood(
                 return (struct obj *) 0;
             }
             if (otmp->otyp == CORPSE) {
-                Sprintf(qbuf, "そこに%sがある; それを食べますか?",
+                Sprintf(qbuf, "そこに%sがある; それを%sか?",
                         jp_corpse_xname(otmp, (const char *) 0,
-                                        CXN_SINGULAR | CXN_ARTICLE));
+                                        CXN_SINGULAR | CXN_ARTICLE),
+                        offering ? "捧げます" : "食べます");
             } else {
                 /* "There is <an object> here; <verb> it?" or
                    "There are <N objects> here; <verb> one?" */
                 Sprintf(qbuf, "そこに");
-                Sprintf(qsfx, "がある; %sか?", one ? "それを食べます" : "1つ食べます");
+                Sprintf(qsfx, "がある; %sか?",
+                        one ? (offering ? "それを捧げます" : "それを食べます")
+                            : (offering ? "1つ捧げます" : "1つ食べます"));
                 (void) safe_qbuf(qbuf, qbuf, qsfx, otmp, doname, ansimpleoname,
                                  one ? something : (const char *) "things");
             }

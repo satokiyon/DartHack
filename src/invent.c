@@ -112,6 +112,7 @@ action_missing_jp(const char *word)
     if (!strcmp(word, "grease")) return "油を塗るための";
     if (!strcmp(word, "disarm")) return "解除に使う";
     if (!strcmp(word, "apply")) return "使うための";
+    if (!strcmp(word, "sacrifice")) return "捧げるための";
     return word;
 }
 
@@ -4195,7 +4196,8 @@ dfeature_at(coordxy x, coordxy y, char *buf)
     else if (IS_ALTAR(ltyp)) {
         Sprintf(altbuf, "%s%sの祭壇(%s)",
                 (lev->altarmask & AM_SANCTUM) ? "高位" : "",
-                a_gname(),
+                jp_align_gname_for_display(
+                    Amask2align(lev->altarmask & ~AM_SHRINE)),
                 align_str(Amask2align(lev->altarmask & ~AM_SHRINE)));
         dfeature = altbuf;
     } else if (stway) {
