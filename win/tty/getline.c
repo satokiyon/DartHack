@@ -82,7 +82,9 @@ hooked_tty_getlin(
         (void) fflush(stdout);
         Strcat(strcat(strcpy(gt.toplines, query), " "), obufp);
         term_curs_set(1);
-        c = pgetchar();
+        /* tty getlin needs full-width input values; pgetchar() returns
+         * char and can truncate IME-committed Unicode characters. */
+        c = tty_nhgetch();
         term_curs_set(0);
         if (c == '\033' || c == EOF) {
             if (c == EOF)
