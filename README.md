@@ -121,8 +121,7 @@ git merge --abort
 - 実行時は日本語用ファイルを優先し、存在しない場合は原本へフォールバックする方針を採ります。
 - 原本データは保持し、変更履歴と対応関係を追跡可能な形で管理します。
 
-- ルートライセンス: [LICENSE](LICENSE)
-- 参照元（同内容）: [dat/license](dat/license)
+- ライセンス本文: [dat/license](dat/license)
 - サブモジュール等の第三者コンポーネント: [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES)
 
 ---
