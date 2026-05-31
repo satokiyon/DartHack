@@ -11,28 +11,34 @@
 
 ## 現在の作業方針
 
-*   主にAIを使用して画面表示される英文を日本語に翻訳します。
-*   日本語の文字コードはUTF-8です。
-*   コンソール版もUTF-8を内部処理して画面表示するように(AIが)修正します。
-*   問題の原因調査のためにデバッグ用コードやトレースやログを追加することがありますが、確認が終わったら削除し本番コードには残しません。コミットの履歴に残るのは気にしません。
-*   調査用の一時生成物(ログやデバッグ用データ)はコミット対象外です。
+*   画面表示テキストの日本語化を優先し、内部仕様やID互換性を壊さない方針で進めます。
+*   日本語の文字コードは UTF-8 を前提とし、Windows 版の表示品質を重視します。
+*   変更は原則として最小差分で行い、表示文・訳文に関係ないロジック変更は避けます。
+*   調査のために一時的なトレースやデバッグコードを入れる場合は、原因確認後に必ず削除します。
+*   調査用の一時生成物（ログや検証データ）はコミット対象外にします。
+*   公開リポジトリ運用を前提に、ライセンス・第三者通知・セキュリティ運用情報を維持します。
 
 ## 翻訳時のポイント
 
 *   `src/pline.c` のメッセージ表示関数 (`You`, `Your`, `You_feel`, `You_hear`, `You_see`, `You_cant`, `There`, `pline_The`, `verbalize`, `custompline`) は、関数単体ではなく呼び出し側文字列と結合した最終表示文で自然さを確認します。
 *   `You_feel` / `You_hear` / `You_see` は接頭辞を自動付与するため、呼び出し側リテラルで主語重複や助詞衝突を起こさないようにします。
+*   `%s` の直後に助詞（`は/を/に/へ/が/の/と/から`）が来る文では、`mon_nam()/Monnam()` より `l_monnam()` の利用を優先します。
+*   `%s%sから` のような複合テンプレートは機械置換せず、文脈ごとに語順を手動で整えます。
+*   英語冠詞を返す補助（`just_an()` など）の結果は、日本語文へ直接連結しません。
 *   `%s`, `%d`, `%ld`, `%c` などのフォーマット指定子は、個数・順序・型を変更しません。
 *   原則として文字列リテラルのみを変更し、ゲームロジックや条件分岐の意味は変えません。
 *   `隠し%s` のようなテンプレートは、展開後の最終語形 (`隠し扉`, `隠し通路`) が自然か確認します。
+*   置換後は最低限 `hack.c`, `apply.c`, `trap.c`, `uhitm.c`, `mhitu.c`, `steed.c` を重点確認します。
 
-### オブジェクト名ローカライズ方針 (Method C)
+### オブジェクト名ローカライズ方針
 
-`include/objects.h` を直接日本語化すると、Lua special floor の `des.object({ id = "leather armor" })` のような英語 ID ルックアップが壊れるため、本プロジェクトでは **Method C** を採用しています。
+`include/objects.h` を直接日本語化すると、Lua special floor の `des.object({ id = "leather armor" })` のような英語 ID ルックアップが壊れるため、内部IDは英語のまま維持し、表示層だけを日本語化します。
 
 - **内部IDは英語維持**: `include/objects.h` は upstream 英語のまま保持し、Lua・wish・検索系の互換性を確保する。
 - **表示だけ日本語化**: `src/obj_jp.c` に日本語名テーブル (`obj_jp_names[]`) と未識別外観テーブル (`obj_jp_descrs[]`) を持たせる。
 - **表示層で切り替え**: `src/objnam.c` の表示処理は `jp_item_name()` / `jp_item_descr()` を使う。
 - **シャッフル対応**: 未識別外観は `oc_descr_idx` が実行時に変わるため、`jp_item_descr()` は `objects[otyp].oc_descr_idx` を経由する。
+- **Windows ビルドへの組み込み**: `sys/windows/vs/NetHack/NetHack.vcxproj` と `sys/windows/vs/NetHackW/NetHackW.vcxproj` の両方に `src/obj_jp.c` を含める。
 
 この設計により、英語ID依存の内部処理を壊さずに日本語表示を実現できます。チュートリアルの Lua `Unknown object id` 問題もこの方式で解消しました。
 
@@ -72,17 +78,17 @@ git checkout -b upstream-base upstream/NetHack-5.0
 ```powershell
 # 1. upstream-base を最新にする
 git switch upstream-base
-git pull upstream NetHack-5.0
+git pull
 
 # 2. main に統合する
 git switch main
-git git merge --no-commit --no-ff upstream-base
+git merge --no-commit --no-ff upstream-base
 
 # 3. コンフリクトが発生した場合の処理（VS Code等で解決後）
 # 競合箇所を手動修正し、全解決後に以下を実行
 # git add は個別に実行する（例: git add dat/history）
 git add <解決したファイル名>
-git commit -m "Merge branch 'upstream-base' into main"
+git commit -m "アップストリームの変更をマージ"
 
 # 4. 確認とプッシュ
 # ビルドを行い、動作確認後に実行
