@@ -1128,7 +1128,7 @@ test_move(
                                moving, we need to manually stop running */
                             nomul(0);
                         } else
-                            pline("その扈は閉まっていた.");
+                            pline("その扉は閉まっていた.");
                     }
                 } else if (mode == TEST_TRAV || mode == TEST_TRAP)
                     goto testdiag;
