@@ -842,17 +842,25 @@ u_entered_shop(char *enterstring)
                   jp_shkname_for_display(shkp), noit_mhis(shkp));
         }
     } else {
+        boolean revisit = (eshkp->visitct++ > 0);
+
         if (!Deaf && !muteshk(shkp)) {
             set_voice(shkp, 0, 80, 0);
-            verbalize("%s、%s! %s%s%sへようこそ!", Hello(shkp), svp.plname,
-                      jp_shkname_for_display(shkp),
-                      eshkp->visitct++ ? "、またお越しいただき" : "の",
-                      jp_shoptype_name_for_display(rt - SHOPBASE));
+            if (revisit) {
+                verbalize("%s、%s! また来てくれたのか。%sの%sだ、ゆっくり見ていけ!",
+                          Hello(shkp), svp.plname,
+                          jp_shkname_for_display(shkp),
+                          jp_shoptype_name_for_display(rt - SHOPBASE));
+            } else {
+                verbalize("%s、%s! %sの%sへようこそ!", Hello(shkp), svp.plname,
+                          jp_shkname_for_display(shkp),
+                          jp_shoptype_name_for_display(rt - SHOPBASE));
+            }
         } else {
-            You("%sの%s%sに入った!",
+            You("%sの%s%s入った!",
                 s_suffix(jp_shkname_for_display(shkp)),
                 jp_shoptype_name_for_display(rt - SHOPBASE),
-                eshkp->visitct++ ? "に再び" : "");
+                revisit ? "にまた" : "に");
         }
     }
     /* can't do anything about blocking if teleported in */
@@ -2016,13 +2024,14 @@ dopay(void)
     if (pay_done && !ANGRY(shkp) && paid) {
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
-            verbalize("%s%sでのお買い物ありがとうございます%s",
+            verbalize("%s%sでのお買い上げ、ありがとう%s",
                       s_suffix(jp_shkname_for_display(shkp)),
                       jp_shoptype_name_for_display(eshkp->shoptype - SHOPBASE),
                       !eshkp->surcharge ? "!" : ".");
         } else {
-            pline("%sはあなたが%sの%sでお買い物くださったことに%sうなずいた%s",
-                  jp_shkname_for_display(shkp), noit_mhis(shkp), jp_shoptype_name_for_display(eshkp->shoptype - SHOPBASE),
+            pline("%sはあなたが%sの%sで買い物をしてくれたことに%sうなずいた%s",
+                  jp_shkname_for_display(shkp), noit_mhis(shkp),
+                  jp_shoptype_name_for_display(eshkp->shoptype - SHOPBASE),
                   !eshkp->surcharge ? "感謝して" : "",
                   !eshkp->surcharge ? "!" : ".");
         }
