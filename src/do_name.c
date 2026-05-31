@@ -126,8 +126,7 @@ name_from_player(
 
     /* strip leading and trailing spaces, condense internal sequences */
     (void) mungspaces(outbuf);
-    if (strlen(outbuf) >= PL_PSIZ)
-        outbuf[PL_PSIZ - 1] = '\0';
+    utf8_truncate(outbuf, PL_PSIZ - 1);
     return outbuf;
 }
 
@@ -140,11 +139,13 @@ christen_monst(struct monst *mtmp, const char *name)
     char buf[PL_PSIZ];
 
     /* dogname & catname are PL_PSIZ arrays; object names have same limit */
-    lth = (name && *name) ? ((int) strlen(name) + 1) : 0;
-    if (lth > PL_PSIZ) {
-        lth = PL_PSIZ;
-        name = strncpy(buf, name, PL_PSIZ - 1);
+    lth = 0;
+    if (name && *name) {
+        copynchars(buf, name, PL_PSIZ - 1);
         buf[PL_PSIZ - 1] = '\0';
+        utf8_truncate(buf, PL_PSIZ - 1);
+        name = buf;
+        lth = (int) strlen(name) + 1;
     }
     new_mgivenname(mtmp, lth); /* removes old name if one is present */
     if (lth)
@@ -381,11 +382,13 @@ oname(
     boolean via_naming = (oflgs & ONAME_VIA_NAMING) != 0,
             skip_inv_update = (oflgs & ONAME_SKIP_INVUPD) != 0;
 
-    lth = *name ? (int) (strlen(name) + 1) : 0;
-    if (lth > PL_PSIZ) {
-        lth = PL_PSIZ;
-        name = strncpy(buf, name, PL_PSIZ - 1);
+    lth = 0;
+    if (*name) {
+        copynchars(buf, name, PL_PSIZ - 1);
         buf[PL_PSIZ - 1] = '\0';
+        utf8_truncate(buf, PL_PSIZ - 1);
+        name = buf;
+        lth = (int) strlen(name) + 1;
     }
     /* If named artifact exists in the game, do not create another.
        Also trying to create an artifact shouldn't de-artifact

@@ -1732,10 +1732,11 @@ mswin_getlin(const char *question, char *input)
     logDebug("mswin_getlin(%s, %p)\n", question, input);
 
     if (!iflags.wc_popup_dialog) {
-        char c;
+        int c;
         int len;
         int done;
         int createcaret;
+        uint8 utf8buf[8];
 
         createcaret = 1;
         SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_MSNH_COMMAND,
@@ -1770,14 +1771,33 @@ mswin_getlin(const char *question, char *input)
                     mswin_putstr_ex(WIN_MESSAGE, ATR_NONE, input, -len);
                 if (c == VK_BACK) {
                     if (len > 0)
-                        len--;
+                        len = (int) (utf8_prev_char_start(input, input + len)
+                                     - input);
                     input[len] = '\0';
-                } else if (len>=(BUFSZ-1)) {
-                    PlaySound(TEXT("SystemExclamation"), NULL,
-                              SND_ALIAS | SND_ASYNC);
                 } else {
-                    input[len++] = c;
-                    input[len] = '\0';
+                    const char *inbytes = (const char *) 0;
+                    int inlen = 0;
+
+                    if (c >= 0 && c < 0x80) {
+                        utf8buf[0] = (uint8) c;
+                        utf8buf[1] = '\0';
+                        inbytes = (const char *) utf8buf;
+                        inlen = 1;
+                    } else if (unicodeval_to_utf8str(c, utf8buf,
+                                                     sizeof utf8buf)) {
+                        inbytes = (const char *) utf8buf;
+                        inlen = (int) strlen(inbytes);
+                    }
+
+                    if (!inbytes || len + inlen >= BUFSZ) {
+                        PlaySound(TEXT("SystemExclamation"), NULL,
+                                  SND_ALIAS | SND_ASYNC);
+                    } else {
+                        memcpy((genericptr_t) &input[len],
+                               (genericptr_t) inbytes, (size_t) inlen);
+                        len += inlen;
+                        input[len] = '\0';
+                    }
                 }
                 mswin_putstr_ex(WIN_MESSAGE, ATR_NONE, input, 1);
                 break;

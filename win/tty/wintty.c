@@ -677,6 +677,7 @@ tty_askname(void)
     static const char who_are_you[] = "お名前は? ";
     int prompt_cols;
     int c, ct, tryct = 0;
+    uint8 utf8buf[8];
 
 #ifdef SELECTSAVED
     if (iflags.wc2_selectsaved && !iflags.renameinprogress)
@@ -727,15 +728,23 @@ tty_askname(void)
             /* some people get confused when their erase char is not ^H */
             if (c == '\b' || c == '\177') {
                 if (ct) {
-                    ct--;
+                    const char *prevcp = utf8_prev_char_start(svp.plname,
+                                                              svp.plname + ct);
+                    int delcols = utf8_char_display_width((const unsigned char *) prevcp);
+
+                    if (delcols < 1)
+                        delcols = 1;
+                    ct = (int) (prevcp - svp.plname);
 #ifdef WIN32CON
-                    ttyDisplay->curx--;
+                    ttyDisplay->curx -= delcols;
 #endif
 #if defined(MICRO) || defined(WIN32CON)
 #if defined(WIN32CON) || defined(MSDOS)
-                    backsp(); /* \b is visible on NT */
-                    (void) putchar(' ');
-                    backsp();
+                    while (delcols-- > 0) {
+                        backsp(); /* \b is visible on NT */
+                        (void) putchar(' ');
+                        backsp();
+                    }
 #else
                     msmsg("\b \b");
 #endif
@@ -756,21 +765,40 @@ tty_askname(void)
                     && !(c >= '0' && c <= '9' && ct > 0))
                     c = '_';
 #endif
-            if (ct < (int) (sizeof svp.plname) - 1) {
+            {
+                const char *inbytes = (const char *) 0;
+                int inlen = 0;
+
+                if (c < 0x80) {
+                    utf8buf[0] = (uint8) c;
+                    utf8buf[1] = '\0';
+                    inbytes = (const char *) utf8buf;
+                    inlen = 1;
+                } else if (unicodeval_to_utf8str(c, utf8buf, sizeof utf8buf)) {
+                    inbytes = (const char *) utf8buf;
+                    inlen = (int) strlen(inbytes);
+                }
+
+                if (!inbytes || ct + inlen > (int) (sizeof svp.plname) - 1)
+                    continue;
+
 #if defined(MICRO)
 #if defined(MSDOS)
                 if (iflags.grmode) {
-                    (void) putchar(c);
+                    (void) fputs(inbytes, stdout);
                 } else
 #endif
-                    msmsg("%c", c);
+                    msmsg("%s", inbytes);
 #else
-                (void) putchar(c);
+                (void) fputs(inbytes, stdout);
 #endif
-                svp.plname[ct++] = c;
 #ifdef WIN32CON
-                ttyDisplay->curx++;
+                ttyDisplay->curx += utf8_char_display_width((const unsigned char *) inbytes);
 #endif
+                memcpy((genericptr_t) &svp.plname[ct], (genericptr_t) inbytes,
+                       (size_t) inlen);
+                ct += inlen;
+                svp.plname[ct] = '\0';
             }
         }
         svp.plname[ct] = 0;

@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	getline.c	$NHDT-Date: 1701285885 2023/11/29 19:24:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -47,6 +48,7 @@ hooked_tty_getlin(
 {
     char *obufp = bufp;
     int c;
+    uint8 utf8buf[8];
     struct WinDesc *cw = wins[WIN_MESSAGE];
     boolean doprev = FALSE;
 
@@ -141,11 +143,12 @@ hooked_tty_getlin(
         }
         if (c == erase_char || c == '\b') {
             if (bufp != obufp) {
+                char *newp = (char *) utf8_prev_char_start(obufp, bufp);
 #ifdef NEWAUTOCOMP
                 char *i;
 
 #endif /* NEWAUTOCOMP */
-                bufp--;
+                bufp = newp;
 #ifndef NEWAUTOCOMP
                 putsyms("\b \b"); /* putsym converts \b */
 #else                             /* NEWAUTOCOMP */
@@ -163,18 +166,35 @@ hooked_tty_getlin(
             *bufp = 0;
 #endif /* not NEWAUTOCOMP */
             break;
-        } else if (' ' <= (unsigned char) c && c != '\177'
-                   /* avoid isprint() - some people don't have it
-                      ' ' is not always a printing char */
-                   && (bufp - obufp < BUFSZ - 1 && bufp - obufp < COLNO)) {
+        } else if (c >= ' ' && c != '\177') {
+            const char *inbytes = (const char *) 0;
+            int inlen = 0;
+
+            if (c < 0x80) {
+                utf8buf[0] = (uint8) c;
+                utf8buf[1] = '\0';
+                inbytes = (const char *) utf8buf;
+                inlen = 1;
+            } else if (unicodeval_to_utf8str(c, utf8buf, sizeof utf8buf)) {
+                inbytes = (const char *) utf8buf;
+                inlen = (int) strlen(inbytes);
+            }
+
+            if (!inbytes
+                || (bufp - obufp + inlen > BUFSZ - 1)
+                || (bufp - obufp + inlen > COLNO)) {
+                tty_nhbell();
+                continue;
+            }
 #ifdef NEWAUTOCOMP
             char *i = eos(bufp);
 
 #endif /* NEWAUTOCOMP */
-            *bufp = c;
-            bufp[1] = 0;
-            putsyms(bufp);
-            bufp++;
+            memcpy((genericptr_t) bufp, (genericptr_t) inbytes,
+                   (size_t) inlen);
+            bufp += inlen;
+            *bufp = 0;
+            putsyms(inbytes);
             if (hook && (*hook)(obufp)) {
                 putsyms(bufp);
 #ifndef NEWAUTOCOMP
