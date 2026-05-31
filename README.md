@@ -100,7 +100,11 @@ git merge --abort
 
 ## ライセンス
 
-オリジナルの NetHack 同様、[NetHack General Public License](dat/license) に準じます。
+本リポジトリは、オリジナルの NetHack 同様、NetHack General Public License に準じます。
+
+- ルートライセンス: [LICENSE](LICENSE)
+- 参照元（同内容）: [dat/license](dat/license)
+- サブモジュール等の第三者コンポーネント: [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES)
 
 ---
 NetHack 5.0 の詳細については、[README](README) または [README.JP](README.JP) を参照してください。
@@ -140,5 +144,6 @@ OPTIONS=tile_height:32
 
 - 相対パスで指定する場合は、実行ファイル (`NetHack.exe` / `NetHackW.exe`) と同じフォルダに置くのが確実です。
 - このリポジトリの Debug ビルドでは、通常 `binary/Debug/x64/` に配置します。
-- 別の場所に置く場合は、`OPTIONS=tile_file:C:\\path\\to\\your_tiles.bmp` のように絶対パスを指定します。
+- 別の場所に置く場合は、`OPTIONS=tile_file:tiles/your_tiles.bmp` のように相対パスで指定できます。
+- 絶対パスが必要な環境では、実行環境に合わせたパス表記で指定してください。
 

@@ -1,0 +1,13 @@
+# Global default owner
+* @satokiyon
+
+# Core game sources
+src/ @satokiyon
+include/ @satokiyon
+sys/windows/ @satokiyon
+
+# Translation and documentation
+dat/ @satokiyon
+docs/ @satokiyon
+README.md @satokiyon
+README.JP @satokiyon
