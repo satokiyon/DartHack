@@ -30,6 +30,7 @@ staticfn int restlevelfile(xint8);
 staticfn void rest_bubbles(NHFILE *);
 staticfn void restore_gamelog(NHFILE *);
 staticfn void reset_oattached_mids(boolean);
+
 /* these ones are declared non-static in extern.h if SFCTOOL is defined */
 staticfn boolean restgamestate(NHFILE *);
 staticfn void rest_bubbles(NHFILE *);
@@ -889,7 +890,7 @@ dorecover(NHFILE *nhfp)
     restoreinfo.mread_flags = 0;
 
     rewind_nhfile(nhfp);        /* return to beginning of file */
-    (void) validate(nhfp, (char *) 0, FALSE);
+    (void) validate(nhfp, (char *) 0, FALSE, 0);
     get_plname_from_file(nhfp, svp.plname, TRUE);
 
     /* not 0 nor REST_GSTATE nor REST_LEVELS */
@@ -899,6 +900,11 @@ dorecover(NHFILE *nhfp)
     close_nhfile(nhfp);
     restlevelstate();
     program_state.something_worth_saving = 1; /* useful data now exists */
+
+    if (gu.uplift_needed_rev0_to_rev1 == 1) {
+        /* they've all been uplifted now */
+        gu.uplift_needed_rev0_to_rev1 = 0;
+    }
 
     if (!wizard && !discover)
         (void) delete_savefile();
