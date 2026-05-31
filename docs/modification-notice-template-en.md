@@ -56,6 +56,14 @@ Do not use plain text notices like `NOTICE: ...` in `.rc` files.
 # Modified by NetHackJP contributor @satokiyon; latest change date: YYYY-MM-DD.
 ```
 
+## NMAKE file (`package\\package.nmake`)
+
+Use a line comment that starts with `#`.
+
+```makefile
+# Modified by NetHackJP contributor @satokiyon; latest change date: YYYY-MM-DD.
+```
+
 ## Plain text
 
 ```text

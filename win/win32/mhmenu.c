@@ -117,7 +117,7 @@ mswin_init_menu_window(int type)
     ret = CreateDialog(GetNHApp()->hApp, MAKEINTRESOURCE(IDD_MENU),
                        GetNHApp()->hMainWnd, MenuWndProc);
     if (!ret) {
-        panic("Cannot create menu window");
+        panic("メニューウィンドウを作成できません");
     }
 
     /* move it in the predefined position */
@@ -1205,10 +1205,10 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
             && item->glyphinfo.glyph != NO_GLYPH) {
             if (data->menui.menu.items[lpdis->itemID].count == -1) {
                 nh_stprintf(wbuf, sizeof wbuf,
-                            TEXT("Count: All"));
+                            TEXT("個数: すべて"));
             } else {
                 nh_stprintf(wbuf, sizeof wbuf,
-                            TEXT("Count: %d"),
+                            TEXT("個数: %d"),
                             data->menui.menu.items[lpdis->itemID].count);
             }
 

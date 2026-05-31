@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	mhfont.c	$NHDT-Date: 1596498349 2020/08/03 23:45:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.29 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -195,7 +196,7 @@ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
     /* add font to the table */
     if (font_index == font_table_size) {
         if (font_table_size >= MAXFONTS)
-            panic("font table overflow!");
+            panic("フォントテーブルが上限を超えました!");
         font_table_size++;
     } else {
         DeleteObject(font_table[font_index].hFont);

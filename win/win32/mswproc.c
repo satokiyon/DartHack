@@ -173,7 +173,7 @@ mswin_init_nhwindows(int *argc, char **argv)
     /* Create the main window */
     GetNHApp()->hMainWnd = mswin_init_main_window();
     if (!GetNHApp()->hMainWnd) {
-        panic("Cannot create main window");
+        panic("メインウィンドウを作成できません");
     }
 
     /* Set menu check mark for interface mode */
@@ -282,7 +282,7 @@ mswin_player_selection(void)
                 flags.initrole = pick_role(flags.initrace, flags.initgend,
                                            flags.initalign, PICK_RANDOM);
                 if (flags.initrole < 0) {
-                    raw_print("Incompatible role!");
+                    raw_print("職業の組み合わせに互換性がありません!");
                     flags.initrole = randrole(FALSE);
                 }
             }
@@ -292,7 +292,7 @@ mswin_player_selection(void)
                 flags.initrace = pick_race(flags.initrole, flags.initgend,
                                            flags.initalign, PICK_RANDOM);
                 if (flags.initrace < 0) {
-                    raw_print("Incompatible race!");
+                    raw_print("種族の組み合わせに互換性がありません!");
                     flags.initrace = randrace(flags.initrole);
                 }
             }
@@ -451,11 +451,11 @@ prompt_for_player_selection(void)
             if (any.a_int == 0) /* must be non-zero */
                 any.a_int = randrole(FALSE) + 1;
             add_menu(win, &nul_glyphinfo, &any, '*', 0,
-                     ATR_NONE, clr, "Random", MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, clr, "ランダム", MENU_ITEMFLAGS_NONE);
             any.a_int = i + 1; /* must be non-zero */
             add_menu(win, &nul_glyphinfo, &any, 'q', 0,
-                     ATR_NONE, clr, "Quit", MENU_ITEMFLAGS_NONE);
-            Snprintf(pbuf, sizeof pbuf, "Pick a role for your %s", plbuf);
+                     ATR_NONE, clr, "終了", MENU_ITEMFLAGS_NONE);
+            Snprintf(pbuf, sizeof pbuf, "%sの職業を選んでください", plbuf);
             end_menu(win, pbuf);
             n = select_menu(win, PICK_ONE, &selected);
             destroy_nhwindow(win);
@@ -525,11 +525,11 @@ prompt_for_player_selection(void)
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randrace(flags.initrole) + 1;
                 add_menu(win, &nul_glyphinfo, &any, '*', 0,
-                         ATR_NONE, clr, "Random", MENU_ITEMFLAGS_NONE);
+                         ATR_NONE, clr, "ランダム", MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
                 add_menu(win, &nul_glyphinfo, &any, 'q', 0,
-                         ATR_NONE, clr, "Quit", MENU_ITEMFLAGS_NONE);
-                Snprintf(pbuf, sizeof pbuf, "Pick the race of your %s", plbuf);
+                         ATR_NONE, clr, "終了", MENU_ITEMFLAGS_NONE);
+                Snprintf(pbuf, sizeof pbuf, "%sの種族を選んでください", plbuf);
                 end_menu(win, pbuf);
                 n = select_menu(win, PICK_ONE, &selected);
                 destroy_nhwindow(win);
@@ -600,11 +600,11 @@ prompt_for_player_selection(void)
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randgend(flags.initrole, flags.initrace) + 1;
                 add_menu(win, &nul_glyphinfo, &any, '*', 0,
-                         ATR_NONE, clr, "Random", MENU_ITEMFLAGS_NONE);
+                         ATR_NONE, clr, "ランダム", MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
                 add_menu(win, &nul_glyphinfo, &any, 'q', 0,
-                         ATR_NONE, clr, "Quit", MENU_ITEMFLAGS_NONE);
-                Snprintf(pbuf, sizeof pbuf, "Pick the gender of your %s", plbuf);
+                         ATR_NONE, clr, "終了", MENU_ITEMFLAGS_NONE);
+                Snprintf(pbuf, sizeof pbuf, "%sの性別を選んでください", plbuf);
                 end_menu(win, pbuf);
                 n = select_menu(win, PICK_ONE, &selected);
                 destroy_nhwindow(win);
@@ -702,7 +702,7 @@ mswin_askname(void)
     logDebug("mswin_askname()\n");
 
     if (mswin_getlin_window("お名前は?", svp.plname, PL_NSIZ) == IDCANCEL) {
-        bail("bye-bye");
+        bail("終了");
         /* not reached */
     }
 }
@@ -1066,7 +1066,7 @@ mswin_display_file(const char *filename, boolean must_exist)
         if (must_exist) {
             TCHAR message[90];
             nh_stprintf(message, sizeof message,
-                        TEXT("Warning! Could not find file: %s\n"),
+                        TEXT("警告: ファイルが見つかりません: %s\n"),
                         NH_A2W(filename, wbuf, sizeof(wbuf)));
             NHMessageBox(GetNHApp()->hMainWnd, message,
                          MB_OK | MB_ICONEXCLAMATION);
@@ -1837,7 +1837,7 @@ mswin_get_ext_cmd(void)
                         break;
 
                 if (extcmdlist[i].ef_txt == (char *) 0) {
-                    pline("%s%s: unknown extended command.",
+                      pline("%s%s: 不明な拡張コマンドです。",
                           visctrl(extcmd_initiator()), cmd);
                     i = -1;
                 }
@@ -2217,7 +2217,7 @@ initMapTiles(void)
 
         errcode = GetLastError();
         Sprintf(errmsg, "%s (0x%lx).",
-            "Cannot load tiles from the file. Reverting back to default",
+            "タイル画像ファイルを読み込めないため、既定値に戻します",
             errcode);
         raw_print(errmsg);
         return FALSE;
@@ -2228,8 +2228,8 @@ initMapTiles(void)
     if (bm.bmWidth % iflags.wc_tile_width
         || bm.bmHeight % iflags.wc_tile_height) {
         DeleteObject(hBmp);
-        raw_print("Tiles bitmap does not match tile_width and tile_height "
-                  "options. Reverting back to default.");
+        raw_print("タイル画像が tile_width / tile_height 設定と一致しないため、"
+              "既定値に戻します。");
         return FALSE;
     }
 
@@ -2237,8 +2237,8 @@ initMapTiles(void)
              * (bm.bmHeight / iflags.wc_tile_height);
     if (tl_num < total_tiles_used) {
         DeleteObject(hBmp);
-        raw_print("Number of tiles in the bitmap is less than required by "
-                  "the game. Reverting back to default.");
+        raw_print("タイル画像内のタイル数がゲーム要件より少ないため、"
+              "既定値に戻します。");
         return FALSE;
     }
 

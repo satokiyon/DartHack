@@ -17,7 +17,7 @@
 #define DEFAULT_COLOR_BG_MSG COLOR_WINDOW
 #define DEFAULT_COLOR_FG_MSG COLOR_WINDOWTEXT
 
-#define MORE "--More--"
+#define MORE "--続き--"
 
 struct window_line {
     int attr;
@@ -111,7 +111,7 @@ mswin_init_message_window(void)
         NULL);                /* window-creation data */
 
     if (!ret)
-        panic("Cannot create message window");
+        panic("メッセージウィンドウを作成できません");
 
     /* Set window caption */
     SetWindowText(ret, TEXT("メッセージ"));

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	mhtext.c	$NHDT-Date: 1596498362 2020/08/03 23:46:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.31 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -42,7 +42,7 @@ mswin_init_text_window(void)
     ret = CreateDialog(GetNHApp()->hApp, MAKEINTRESOURCE(IDD_NHTEXT),
                        GetNHApp()->hMainWnd, NHTextWndProc);
     if (!ret)
-        panic("Cannot create text window");
+        panic("テキストウィンドウを作成できません");
 
     /* move it in the predefined position */
     if (!GetNHApp()->bAutoLayout) {
@@ -96,7 +96,7 @@ NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         /* set text control font */
         
         if (!control) {
-            panic("cannot get text view window");
+            panic("テキスト表示ウィンドウを取得できません");
         }
 
         SendMessage(control, WM_SETFONT, (WPARAM) font->hFont, 0);
