@@ -7,6 +7,7 @@
 staticfn int explosionmask(struct monst *, uchar, char) NONNULLARG1;
 staticfn void engulfer_explosion_msg(uchar, char);
 staticfn const char *jp_explosion_text_for_display(const char *, char *, size_t);
+staticfn void jp_set_explosion_killer_name(char *, size_t, const char *);
 
 /* Note: Arrays are column first, while the screen is row first */
 static const int explosion[3][3] = {
@@ -248,6 +249,16 @@ jp_explosion_text_for_display(const char *in, char *out, size_t outsz)
     return in;
 }
 
+staticfn void
+jp_set_explosion_killer_name(char *out, size_t outsz, const char *src)
+{
+    char disp_buf[BUFSZ];
+    const char *jp = jp_explosion_text_for_display(src, disp_buf,
+                                                   sizeof disp_buf);
+
+    Snprintf(out, outsz, "%s", jp);
+}
+
 /* Note: I had to choose one of three possible kinds of "type" when writing
  * this function: a wand type (like in zap.c), an adtyp, or an object type.
  * Wand types get complex because they must be converted to adtyps for
@@ -371,7 +382,8 @@ explode(
         str = strcpy(killr_buf, svk.killer.name);
         do_hallu = (Hallucination
                     && (strstri(str, "'s explosion")
-                        || strstri(str, "s' explosion")));
+                        || strstri(str, "s' explosion")
+                        || strstri(str, "の爆発")));
     }
     if (type == PHYS_EXPL_TYPE) {
         /* currently only gas spores */
@@ -726,26 +738,34 @@ explode(
             } else {
                 if (olet == MON_EXPLODE) {
                     if (generic) /* explosion was unseen; str=="explosion", */
-                        ; /* svk.killer.name=="gas spore's explosion". */
+                        ; /* svk.killer.name=="胞子ガスの爆発" など。 */
                     else if (str != svk.killer.name && str != hallu_buf)
-                        Strcpy(svk.killer.name, str);
+                        jp_set_explosion_killer_name(svk.killer.name,
+                                                     sizeof svk.killer.name,
+                                                     str);
                     svk.killer.format = KILLED_BY_AN;
                 } else if (olet == TRAP_EXPLODE) {
+                    const char *dispstr = jp_explosion_text_for_display(
+                        str, disp_buf, sizeof disp_buf);
+
                     svk.killer.format = NO_KILLER_PREFIX;
                     Snprintf(svk.killer.name, sizeof svk.killer.name,
-                             "caught %sself in a %s", uhim(),
-                             str);
+                             "%sに巻き込まれた", dispstr);
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
+                    const char *dispstr = jp_explosion_text_for_display(
+                        str, disp_buf, sizeof disp_buf);
+
                     svk.killer.format = NO_KILLER_PREFIX;
                     Snprintf(svk.killer.name, sizeof svk.killer.name,
-                             "caught %sself in %s own %s", uhim(),
-                             uhis(), str);
+                             "自分の%sに巻き込まれた", dispstr);
                 } else {
                     svk.killer.format = (!strcmpi(str, "tower of flame")
                                      || !strcmpi(str, "fireball"))
                                         ? KILLED_BY_AN
                                         : KILLED_BY;
-                    Strcpy(svk.killer.name, str);
+                    jp_set_explosion_killer_name(svk.killer.name,
+                                                 sizeof svk.killer.name,
+                                                 str);
                 }
                 if (iflags.last_msg == PLNMSG_CAUGHT_IN_EXPLOSION
                     || iflags.last_msg == PLNMSG_TOWER_OF_FLAME) /*seffects()*/
@@ -1139,8 +1159,8 @@ mon_explodes(
 
     /* This might end up killing you, too; you never know...
      * also, it is used in explode() messages */
-        Sprintf(svk.killer.name, "%s explosion",
-            s_suffix(jp_pmname(mon->data, Mgender(mon))));
+        Sprintf(svk.killer.name, "%sの爆発",
+            jp_pmname(mon->data, Mgender(mon)));
     svk.killer.format = KILLED_BY_AN;
 
     explode(mon->mx, mon->my, type, dmg, MON_EXPLODE,
