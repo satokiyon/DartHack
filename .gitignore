@@ -104,3 +104,6 @@ sys/amiga/regex/
 NetHackJP.code-workspace
 tmp/
 
+# Generated Windows nmake stamp files
+/*.tag
+
