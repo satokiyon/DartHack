@@ -21,6 +21,7 @@ staticfn void look_at_monster(char *, char *, struct monst *,
 staticfn struct permonst *lookat(coordxy, coordxy, char *, char *) NONNULLPTRS;
 staticfn boolean checkfile(char *, struct permonst *, unsigned,
                                                             char *) NO_NNARGS;
+staticfn void jp_translate_screen_desc(char *) NONNULLARG1;
 staticfn int add_cmap_descr(int, int, int, int, coord,
                           const char *, const char *,
                           boolean *, const char **, char *) NONNULLPTRS;
@@ -238,6 +239,138 @@ append_str(char *buf, const char *new_str)
     if (space_left > sizeof sep - 1)
         (void) strncat(buf, new_str, space_left - (sizeof sep - 1));
     return 1; /* something was appended, possibly just part of " or " */
+}
+
+staticfn void
+jp_replace_desc_fragment(char *buf, const char *from, const char *to)
+{
+    while (strNsubst(buf, from, to, 0))
+        ;
+}
+
+/* Keep data.base lookup and internal keys in English; translate only
+   the final /-description text shown to the player. */
+staticfn void
+jp_translate_screen_desc(char *buf)
+{
+    static const struct {
+        const char *en;
+        const char *jp;
+    } repl[] = {
+        { "unknown creature causing you disquiet", "正体不明だが不安をかき立てる何か" },
+        { "unknown creature causing you concern", "正体不明だが気になる何か" },
+        { "unknown creature causing you anxiety", "正体不明だが不安を感じる何か" },
+        { "unknown creature causing you alarm", "正体不明だが警戒すべき何か" },
+        { "unknown creature causing you dread", "正体不明だが恐怖を覚える何か" },
+        { "unknown creature causing you worry", "正体不明だが心配になる何か" },
+        { "a useful item (pick-axe, key, lamp...)", "便利な道具（つるはし、鍵、ランプなど）" },
+        { "a suit or piece of armor", "鎧または防具" },
+        { "a splash of venom", "毒液の飛沫" },
+        { "a pile of coins", "硬貨の山" },
+        { "a gem or rock", "宝石または石" },
+        { "a strange object", "奇妙な物体" },
+        { "illegal objects", "不正な物体" },
+        { "a spellbook", "魔法書" },
+        { "a piece of food", "食べ物" },
+        { "a boulder", "巨大な岩" },
+        { "a statue", "像" },
+        { "a weapon", "武器" },
+        { "a ring", "指輪" },
+        { "an amulet", "護符" },
+        { "a potion", "薬" },
+        { "a scroll", "巻物" },
+        { "a wand", "杖" },
+        { "an iron ball", "鉄球" },
+        { "an iron chain", "鉄鎖" },
+        { "an ant or other insect", "アリなどの昆虫" },
+        { "a dog or other canine", "犬などのイヌ科" },
+        { "an eye or sphere", "目玉や球体" },
+        { "a cat or other feline", "猫などのネコ科" },
+        { "an imp or minor demon", "インプや下級デーモン" },
+        { "a trapper or lurker above", "トラッパーや天井潜み" },
+        { "a unicorn or horse", "ユニコーンや馬" },
+        { "a xan or other mythical/fantastic insect", "ザンなどの幻想昆虫" },
+        { "an angelic being", "天使的存在" },
+        { "a bat or bird", "コウモリや鳥" },
+        { "a giant humanoid", "大型の人型生物" },
+        { "an invisible monster", "姿の見えない怪物" },
+        { "a rust monster or disenchanter", "さびモンスターや魔力剥ぎ" },
+        { "a pudding or ooze", "プリンや粘液体" },
+        { "a quantum mechanic", "量子メカニック" },
+        { "an apelike creature", "類人猿系の生物" },
+        { "a human or elf", "人間またはエルフ" },
+        { "a long worm tail", "ロングワームの尾" },
+        { "a major demon", "上級デーモン" },
+        { "a sea monster", "海の怪物" },
+        { "a Keystone Kop", "キーストーン・コップ" },
+        { "a kobold", "コボルド" },
+        { "a leprechaun", "レプラコーン" },
+        { "a mimic", "ミミック" },
+        { "a nymph", "ニンフ" },
+        { "an orc", "オーク" },
+        { "a piercer", "ピアサー" },
+        { "a quadruped", "四足獣" },
+        { "a rodent", "げっ歯類" },
+        { "a vortex", "渦" },
+        { "a worm", "ワーム" },
+        { "a zruty", "ズルティ" },
+        { "a centaur", "ケンタウロス" },
+        { "a dragon", "ドラゴン" },
+        { "an elemental", "エレメンタル" },
+        { "a fungus or mold", "菌類やカビ" },
+        { "a gnome", "ノーム" },
+        { "a jabberwock", "ジャバウォック" },
+        { "a lich", "リッチ" },
+        { "a mummy", "ミイラ" },
+        { "a naga", "ナーガ" },
+        { "an ogre", "オーガ" },
+        { "a snake", "ヘビ" },
+        { "a troll", "トロル" },
+        { "an umber hulk", "アンバー・ハルク" },
+        { "a vampire", "吸血鬼" },
+        { "a wraith", "レイス" },
+        { "a xorn", "ゾーン" },
+        { "a zombie", "ゾンビ" },
+        { "a ghost", "幽霊" },
+        { "a golem", "ゴーレム" },
+        { "a lizard", "トカゲ" },
+        { "an arachnid or centipede", "クモ類やムカデ" },
+        { "a dark part of a room", "部屋の暗がり" },
+        { "a floor of a room", "部屋の床" },
+        { "a lowered drawbridge", "下りた跳ね橋" },
+        { "a raised drawbridge", "上がった跳ね橋" },
+        { "a staircase up", "上り階段" },
+        { "a staircase down", "下り階段" },
+        { "a ladder up", "上りはしご" },
+        { "a ladder down", "下りはしご" },
+        { "a branch staircase up", "分岐上り階段" },
+        { "a branch staircase down", "分岐下り階段" },
+        { "a branch ladder up", "分岐上りはしご" },
+        { "a branch ladder down", "分岐下りはしご" },
+        { "an open door", "開いた扉" },
+        { "a closed door", "閉じた扉" },
+        { "a doorway", "戸口" },
+        { "a corridor", "通路" },
+        { "an engraving", "刻印" },
+        { "an opulent throne", "玉座" },
+        { "an altar", "祭壇" },
+        { "a grave", "墓" },
+        { "a fountain", "泉" },
+        { "a sink", "シンク" },
+        { "a cloud", "雲" },
+        { "an ice", "氷" },
+        { "an air", "空気" },
+        { "a wall", "壁" },
+        { "a tree", "木" },
+        { "a trap", "罠" },
+        { "an unseen creature", "姿の見えない怪物" },
+        { "an unreconnoitered", "未確認" },
+        { "interior of a monster", "怪物の体内" },
+    };
+    int i;
+
+    for (i = 0; i < SIZE(repl); ++i)
+        jp_replace_desc_fragment(buf, repl[i].en, repl[i].jp);
 }
 
 /* shared by monster probing (via query_objlist!) as well as lookat() */
@@ -2048,6 +2181,7 @@ do_look(int mode, coord *click_cc)
 
         /* Finally, print out our explanation. */
         if (found) {
+            jp_translate_screen_desc(out_str);
             /* use putmixed() because there may be an encoded glyph present */
             putmixed(WIN_MESSAGE, 0, out_str);
 #ifdef DUMPLOG_CORE

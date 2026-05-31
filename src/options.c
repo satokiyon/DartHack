@@ -8881,7 +8881,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
         }
 
     add_menu_str(tmpwin, "");
-    add_menu_heading(tmpwin, "Other settings:");
+    add_menu_heading(tmpwin, "その他の設定:");
 
     for (pass = startpass; pass <= endpass; pass++)
         for (i = 0; (name = allopt[i].name) != 0; i++) {
@@ -9167,7 +9167,7 @@ show_menu_controls(winid win, boolean dolist)
         /* separator before hardcoded */
         putstr(win, 0, "");
         fmt = "%9s  %-8s %s";
-        arg = "Other "; /* prefix for first hardcoded[] entry, then reset */
+        arg = "その他"; /* prefix for first hardcoded[] entry, then reset */
     }
     for (xcp = hardcoded; xcp->key; ++xcp) {
         Sprintf(buf, fmt, arg, xcp->key, xcp->desc);

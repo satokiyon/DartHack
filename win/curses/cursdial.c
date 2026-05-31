@@ -1472,7 +1472,7 @@ curs_nonselect_menu_action(
             break;
 
         search_key[0] = '\0';
-        curses_line_input_dialog("Search for:", search_key, BUFSZ);
+        curses_line_input_dialog("検索文字列:", search_key, BUFSZ);
 
         refresh();
         touchwin(win);
