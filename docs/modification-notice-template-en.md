@@ -6,6 +6,11 @@ Use one of the following short notices in each modified file.
 
 Modified by NetHackJP contributor @satokiyon; latest change date: YYYY-MM-DD.
 
+## NetHack License 2(a) Policy Note
+
+If a file format does not support comments (for example, many raw data files under `dat/`), do not modify the original file just to add a notice.
+Use a separate localized file (for example, `*_jp`) and keep the original upstream file intact.
+
 ## C / C++ / Header
 
 ```c
