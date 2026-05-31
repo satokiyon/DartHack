@@ -476,7 +476,7 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             bail((char *) 0);
         } else {
             /* prompt user for action */
-            switch (NHMessageBox(hWnd, TEXT("Save?"),
+            switch (NHMessageBox(hWnd, TEXT("セーブしますか?"),
                                  MB_YESNOCANCEL | MB_ICONQUESTION)) {
             case IDYES:
 #ifdef SAFERHANGUP
@@ -907,7 +907,7 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         }
 
         if (!OpenClipboard(hWnd)) {
-            NHMessageBox(hWnd, TEXT("Cannot open clipboard"),
+            NHMessageBox(hWnd, TEXT("クリップボードを開けません"),
                          MB_OK | MB_ICONERROR);
             free(p);
 #ifdef ENHANCED_SYMBOLS
@@ -1057,8 +1057,7 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         /* Notify the user that windows settings will not be saved this time.
          */
         NHMessageBox(GetNHApp()->hMainWnd,
-                     TEXT("Your Windows Settings will not be stored when you "
-                          "exit this time."),
+                     TEXT("今回は終了時にウィンドウの設定は保存されません。"),
                      MB_OK | MB_ICONINFORMATION);
         break;
     }

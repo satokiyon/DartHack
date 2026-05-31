@@ -303,7 +303,7 @@ mswin_player_selection(void)
                 flags.initgend = pick_gend(flags.initrole, flags.initrace,
                                            flags.initalign, PICK_RANDOM);
                 if (flags.initgend < 0) {
-                    raw_print("Incompatible gender!");
+                    raw_print("性別の組み合わせに互換性がありません!");
                     flags.initgend = randgend(flags.initrole, flags.initrace);
                 }
             }
@@ -314,7 +314,7 @@ mswin_player_selection(void)
                 flags.initalign = pick_align(flags.initrole, flags.initrace,
                                              flags.initgend, PICK_RANDOM);
                 if (flags.initalign < 0) {
-                    raw_print("Incompatible alignment!");
+                    raw_print("属性の組み合わせに互換性がありません!");
                     flags.initalign =
                         randalign(flags.initrole, flags.initrace);
                 }
@@ -674,11 +674,11 @@ prompt_for_player_selection(void)
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randalign(flags.initrole, flags.initrace) + 1;
                 add_menu(win, &nul_glyphinfo, &any, '*', 0,
-                         ATR_NONE, clr, "Random", MENU_ITEMFLAGS_NONE);
+                         ATR_NONE, clr, "ランダム", MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
                 add_menu(win, &nul_glyphinfo, &any, 'q', 0,
-                         ATR_NONE, clr, "Quit", MENU_ITEMFLAGS_NONE);
-                Snprintf(pbuf, sizeof pbuf, "Pick the alignment of your %s", plbuf);
+                         ATR_NONE, clr, "終了", MENU_ITEMFLAGS_NONE);
+                Snprintf(pbuf, sizeof pbuf, "%sの属性を選んでください", plbuf);
                 end_menu(win, pbuf);
                 n = select_menu(win, PICK_ONE, &selected);
                 destroy_nhwindow(win);
@@ -2867,36 +2867,36 @@ static mswin_status_string _condition_strings[CONDITION_COUNT];
 static mswin_status_field _status_fields[MAXBLSTATS];
 
 static mswin_condition_field _condition_fields[CONDITION_COUNT] = {
-    { BL_MASK_BAREH,     "Bare", 0},
-    { BL_MASK_BLIND,     "Blind", 0 },
-    { BL_MASK_BUSY,      "Busy", 0 },
-    { BL_MASK_CONF,      "Conf", 0 },
-    { BL_MASK_DEAF,      "Deaf", 0 },
-    { BL_MASK_ELF_IRON,  "Iron", 0 },
-    { BL_MASK_FLY,       "Fly", 0 },
-    { BL_MASK_FOODPOIS,  "FoodPois", 0 },
-    { BL_MASK_GLOWHANDS, "Glow", 0 },
-    { BL_MASK_GRAB,      "Grab", 0 },
-    { BL_MASK_HALLU,     "Hallu", 0 },
-    { BL_MASK_HELD,      "Held", 0 },
-    { BL_MASK_ICY,       "Icy", 0 },
-    { BL_MASK_INLAVA,    "Lava", 0 },
-    { BL_MASK_LEV,       "Lev", 0 },
-    { BL_MASK_PARLYZ,    "Parlyz", 0 },
-    { BL_MASK_RIDE,      "Ride", 0 },
-    { BL_MASK_SLEEPING,  "Zzz", 0 },
-    { BL_MASK_SLIME,     "Slime", 0 },
-    { BL_MASK_SLIPPERY,  "Slip", 0 },
-    { BL_MASK_STONE,     "Stone", 0 },
-    { BL_MASK_STRNGL,    "Strngl", 0 },
-    { BL_MASK_STUN,      "Stun", 0 },
-    { BL_MASK_SUBMERGED, "Sub", 0 },
-    { BL_MASK_TERMILL,   "TermIll", 0 },
-    { BL_MASK_TETHERED,  "Teth", 0 },
-    { BL_MASK_TRAPPED,   "Trap", 0 },
-    { BL_MASK_UNCONSC,   "Out", 0 },
-    { BL_MASK_WOUNDEDL,  "Legs", 0 },
-    { BL_MASK_HOLDING,   "Uhold", 0 },
+    { BL_MASK_BAREH,     NULL, 0},
+    { BL_MASK_BLIND,     NULL, 0 },
+    { BL_MASK_BUSY,      NULL, 0 },
+    { BL_MASK_CONF,      NULL, 0 },
+    { BL_MASK_DEAF,      NULL, 0 },
+    { BL_MASK_ELF_IRON,  NULL, 0 },
+    { BL_MASK_FLY,       NULL, 0 },
+    { BL_MASK_FOODPOIS,  NULL, 0 },
+    { BL_MASK_GLOWHANDS, NULL, 0 },
+    { BL_MASK_GRAB,      NULL, 0 },
+    { BL_MASK_HALLU,     NULL, 0 },
+    { BL_MASK_HELD,      NULL, 0 },
+    { BL_MASK_ICY,       NULL, 0 },
+    { BL_MASK_INLAVA,    NULL, 0 },
+    { BL_MASK_LEV,       NULL, 0 },
+    { BL_MASK_PARLYZ,    NULL, 0 },
+    { BL_MASK_RIDE,      NULL, 0 },
+    { BL_MASK_SLEEPING,  NULL, 0 },
+    { BL_MASK_SLIME,     NULL, 0 },
+    { BL_MASK_SLIPPERY,  NULL, 0 },
+    { BL_MASK_STONE,     NULL, 0 },
+    { BL_MASK_STRNGL,    NULL, 0 },
+    { BL_MASK_STUN,      NULL, 0 },
+    { BL_MASK_SUBMERGED, NULL, 0 },
+    { BL_MASK_TERMILL,   NULL, 0 },
+    { BL_MASK_TETHERED,  NULL, 0 },
+    { BL_MASK_TRAPPED,   NULL, 0 },
+    { BL_MASK_UNCONSC,   NULL, 0 },
+    { BL_MASK_WOUNDEDL,  NULL, 0 },
+    { BL_MASK_HOLDING,   NULL, 0 },
 };
 
 extern winid WIN_STATUS;
@@ -2932,6 +2932,7 @@ mswin_status_init(void)
         ci = cond_idx[i];
         mswin_condition_field * condition_field = &_condition_fields[ci];
         nhassert(condition_field->mask == (1 << ci));
+        condition_field->name = conditions[ci].text[0];
         condition_field->bit_position = ci;
     }
 
