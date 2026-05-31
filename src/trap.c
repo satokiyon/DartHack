@@ -1471,7 +1471,7 @@ trapeffect_sqky_board(
                     Soundeffect(tsnds[trap->tnote], 50);
                 }
                 pline_mon(mtmp,
-                      "%sの足元の床板が%s大きくきしんだ.",
+                        "%sの足元の床板が大きなきしむ音%sを立てた.",
                       l_monnam(mtmp), trapnote(trap, FALSE));
                 seetrap(trap);
             } else if (!mindless(mtmp->data)) {
@@ -1489,9 +1489,10 @@ trapeffect_sqky_board(
                              ((mdistu(mtmp) <= range * range)
                                 ? 40 : 20));
             }
-            You_hear("%sが%sできしむ音が聞こえる.", trapnote(trap, FALSE),
+            You_hear("%sできしむ音%sが聞こえる.",
                      (mdistu(mtmp) <= range * range)
-                        ? "近くで" : "遠くで");
+                        ? "近くで" : "遠くで",
+                     trapnote(trap, FALSE));
         }
         /* wake up nearby monsters */
         wake_nearto(mtmp->mx, mtmp->my, 40);
