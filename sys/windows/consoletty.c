@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-29. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	consoletty.c	$NHDT-Date: 1596498316 2020/08/03 23:45:16 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -282,6 +282,7 @@ int ray_processkeystroke(HANDLE, INPUT_RECORD *, boolean *, uchar, int);
 int ray_kbhit(HANDLE, INPUT_RECORD *);
 int ray_checkinput(HANDLE, INPUT_RECORD *, DWORD *, uchar,
                        int, int *, coord *);
+int process_keystroke2(HANDLE, INPUT_RECORD *, boolean *);
 
 int nh340_processkeystroke(HANDLE, INPUT_RECORD *, boolean *, uchar, int);
 int nh340_kbhit(HANDLE, INPUT_RECORD *);
@@ -3422,8 +3423,9 @@ default_checkinput(
             if (mode == 0) {
                 if ((ir->EventType == KEY_EVENT)
                     && ir->Event.KeyEvent.bKeyDown) {
-                    ch = default_processkeystroke(hConIn, ir, &valid,
-                                                  numberpad, 0);
+                    /* Prompt text entry should use the prompt-specific
+                     * Unicode path so IME committed text is accepted. */
+                    ch = process_keystroke2(hConIn, ir, &valid);
                     done = valid;
                 }
             } else {
@@ -3799,11 +3801,9 @@ process_keystroke2(
     int altseq;
     DWORD count;
 
-#ifdef UNICODE
+    /* Prompt input must read UnicodeChar regardless of UNICODE macro;
+     * AsciiChar drops IME-committed non-ASCII characters in Win32 console. */
     ch = (int)(unsigned short)ir->Event.KeyEvent.uChar.UnicodeChar;
-#else
-    ch = (unsigned char)ir->Event.KeyEvent.uChar.AsciiChar;
-#endif
     vk = ir->Event.KeyEvent.wVirtualKeyCode;
     scan = ir->Event.KeyEvent.wVirtualScanCode;
     shiftstate = ir->Event.KeyEvent.dwControlKeyState;
@@ -4208,14 +4208,8 @@ nh340_checkinput(
         ReadConsoleInput(hConIn, ir, 1, count);
         if (mode == 0) {
             if ((ir->EventType == KEY_EVENT) && ir->Event.KeyEvent.bKeyDown) {
-#ifdef QWERTZ_SUPPORT
-                if (qwertz)
-                    numberpad |= 0x10;
-#endif
-                ch = nh340_processkeystroke(hConIn, ir, &valid, numberpad, 0);
-#ifdef QWERTZ_SUPPORT
-                numberpad &= ~0x10;
-#endif
+                /* Keep prompt input behavior aligned across handlers. */
+                ch = process_keystroke2(hConIn, ir, &valid);
                 done = valid;
             }
         } else {
