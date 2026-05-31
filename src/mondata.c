@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	mondata.c	$NHDT-Date: 1738638877 2025/02/03 19:14:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.140 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -877,6 +878,71 @@ struct alt_spl {
     int genderhint;
 };
 
+staticfn boolean
+jp_monname_has_nonascii(const char *str)
+{
+    const unsigned char *p = (const unsigned char *) str;
+
+    if (!str)
+        return FALSE;
+    while (*p) {
+        if (*p & 0x80)
+            return TRUE;
+        ++p;
+    }
+    return FALSE;
+}
+
+staticfn int
+jp_name_to_monplus(const char *str, size_t slen, int *len_p, int *gender_p)
+{
+    static const int gorder[] = { MALE, FEMALE, NEUTRAL };
+    int i, gi, best_pm = NON_PM, best_len = 0, best_gend = -1;
+    boolean exact_match = FALSE;
+
+    for (i = LOW_PM; i < NUMMONS; ++i) {
+        for (gi = 0; gi < (int) SIZE(gorder); ++gi) {
+            int mgend = gorder[gi];
+            const char *jpname = jp_pmname(&mons[i], mgend);
+            int nlen;
+
+            if (!jpname || !*jpname || !jp_monname_has_nonascii(jpname))
+                continue;
+
+            nlen = (int) strlen(jpname);
+            if (nlen <= best_len)
+                continue;
+            if (strncmpi(str, jpname, nlen))
+                continue;
+
+            if ((size_t) nlen == slen) {
+                best_pm = i;
+                best_len = nlen;
+                best_gend = mgend;
+                exact_match = TRUE;
+                break;
+            }
+
+            if (slen > (size_t) nlen
+                && (str[nlen] == ' ' || str[nlen] == '\'')) {
+                best_pm = i;
+                best_len = nlen;
+                best_gend = mgend;
+            }
+        }
+        if (exact_match)
+            break;
+    }
+
+    if (best_pm != NON_PM) {
+        if (len_p)
+            *len_p = best_len;
+        if (gender_p)
+            *gender_p = best_gend;
+    }
+    return best_pm;
+}
+
 /* figure out what type of monster a user-supplied string is specifying;
    ignore anything past the monster name */
 int
@@ -1073,6 +1139,8 @@ name_to_monplus(
     /* FIXME: some titles have gender; title_to_mon() doesn't propagate it */
     if (mntmp == NON_PM)
         mntmp = title_to_mon(str, (int *) 0, &len);
+    if (mntmp == NON_PM)
+        mntmp = jp_name_to_monplus(str, slen, &len, &matchgend);
     if (len && remainder_p)
         *remainder_p = in_str + (&str[len] - buf);
     if (gender_name_var && matchgend != -1) {

@@ -203,6 +203,51 @@ static const char *const tintxts_jp[] = {
     ""
 };
 
+enum {
+    TIN_SOUP_MADE_FROM = 2,
+    TIN_FRENCH_FRIED = 3,
+    TIN_PICKLED = 4,
+    TIN_BOILED = 5,
+    TIN_SMOKED = 6,
+    TIN_DRIED = 7,
+    TIN_DEEP_FRIED = 8,
+    TIN_SZECHUAN = 9,
+    TIN_BROILED = 10,
+    TIN_STIR_FRIED = 11,
+    TIN_SAUTEED = 12,
+    TIN_CANDIED = 13,
+    TIN_PUREED = 14
+};
+
+static const struct {
+    const char *txt;
+    int variety;
+} tintxts_jp_aliases[] = {
+    { "腐敗した", ROTTEN_TIN },
+    { "腐っている", ROTTEN_TIN },
+    { "手製", HOMEMADE_TIN },
+    { "自家製", HOMEMADE_TIN },
+    { "スープ", TIN_SOUP_MADE_FROM },
+    { "フライ", TIN_FRENCH_FRIED },
+    { "フライド", TIN_FRENCH_FRIED },
+    { "酢漬け", TIN_PICKLED },
+    { "ゆで", TIN_BOILED },
+    { "茹で", TIN_BOILED },
+    { "燻製", TIN_SMOKED },
+    { "干し", TIN_DRIED },
+    { "乾燥", TIN_DRIED },
+    { "揚げ", TIN_DEEP_FRIED },
+    { "四川風", TIN_SZECHUAN },
+    { "あぶり焼き", TIN_BROILED },
+    { "炙り焼き", TIN_BROILED },
+    { "炒め", TIN_STIR_FRIED },
+    { "ソテー", TIN_SAUTEED },
+    { "砂糖漬け", TIN_CANDIED },
+    { "すり潰し", TIN_PUREED },
+    { "ピューレ", TIN_PUREED },
+    { 0, -1 }
+};
+
 staticfn void jp_tin_content_name(int, int, char *, size_t);
 staticfn void jp_tin_display_name(int, int, char *, size_t);
 
@@ -1512,6 +1557,38 @@ tin_variety_txt(char *s, int *tinvariety)
                 *tinvariety = k;
                 return (l + 1);
             }
+        }
+        for (k = 0; k < TTSZ - 1; ++k) {
+            int ofs;
+
+            l = (int) strlen(tintxts_jp[k]);
+            if (!l || strncmpi(s, tintxts_jp[k], l))
+                continue;
+
+            ofs = l;
+            while (s[ofs] == ' ')
+                ++ofs;
+
+            *tinvariety = k;
+            return ofs;
+        }
+        for (k = 0; tintxts_jp_aliases[k].txt; ++k) {
+            int ofs;
+
+            l = (int) strlen(tintxts_jp_aliases[k].txt);
+            if (!l || strncmpi(s, tintxts_jp_aliases[k].txt, l))
+                continue;
+
+            ofs = l;
+            while (s[ofs] == ' ')
+                ++ofs;
+            if (!strncmpi(&s[ofs], "の", (int) strlen("の")))
+                ofs += (int) strlen("の");
+            while (s[ofs] == ' ')
+                ++ofs;
+
+            *tinvariety = tintxts_jp_aliases[k].variety;
+            return ofs;
         }
     }
     return 0;

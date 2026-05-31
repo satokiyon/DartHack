@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1745114235 2025/04/19 17:57:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.453 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -63,6 +63,8 @@ staticfn void readobjnam_init(char *, struct _readobjnam_data *);
 staticfn int readobjnam_preparse(struct _readobjnam_data *);
 staticfn void readobjnam_parse_charges(struct _readobjnam_data *);
 staticfn int jp_name_to_mon(const char *, int *);
+staticfn boolean jp_tin_match_special(const char *, struct _readobjnam_data *);
+staticfn int jp_tin_name_to_mon(char *, int *);
 staticfn int readobjnam_postparse1(struct _readobjnam_data *);
 staticfn int readobjnam_postparse2(struct _readobjnam_data *);
 staticfn int readobjnam_postparse3(struct _readobjnam_data *);
@@ -4196,10 +4198,48 @@ readobjnam_preparse(struct _readobjnam_data *d)
         } else if (!strncmpi(d->bp, "blessed ", l = 8)
                    || !strncmpi(d->bp, "holy ", l = 5)) {
             d->blessed = 1, d->uncursed = d->iscursed = 0;
+        } else if (!strncmpi(d->bp, "祝福された ",
+                             l = (int) strlen("祝福された "))
+                   || !strncmpi(d->bp, "祝福された",
+                                l = (int) strlen("祝福された"))
+                   || !strncmpi(d->bp, "祝福の ",
+                                l = (int) strlen("祝福の "))
+                   || !strncmpi(d->bp, "祝福の",
+                                l = (int) strlen("祝福の"))
+                   || !strncmpi(d->bp, "祝福 ",
+                                l = (int) strlen("祝福 "))) {
+            d->blessed = 1, d->uncursed = d->iscursed = 0;
         } else if (!strncmpi(d->bp, "cursed ", l = 7)
                    || !strncmpi(d->bp, "unholy ", l = 7)) {
             d->iscursed = 1, d->blessed = d->uncursed = 0;
+        } else if (!strncmpi(d->bp, "呪われた ",
+                             l = (int) strlen("呪われた "))
+                   || !strncmpi(d->bp, "呪われた",
+                                l = (int) strlen("呪われた"))
+                   || !strncmpi(d->bp, "呪われている ",
+                                l = (int) strlen("呪われている "))
+                   || !strncmpi(d->bp, "呪われている",
+                                l = (int) strlen("呪われている"))
+                   || !strncmpi(d->bp, "呪いの ",
+                                l = (int) strlen("呪いの "))
+                   || !strncmpi(d->bp, "呪いの",
+                                l = (int) strlen("呪いの"))
+                   || !strncmpi(d->bp, "呪 ", l = (int) strlen("呪 "))) {
+            d->iscursed = 1, d->blessed = d->uncursed = 0;
         } else if (!strncmpi(d->bp, "uncursed ", l = 9)) {
+            d->uncursed = 1, d->blessed = d->iscursed = 0;
+        } else if (!strncmpi(d->bp, "無呪 ",
+                             l = (int) strlen("無呪 "))
+                   || !strncmpi(d->bp, "無呪",
+                                l = (int) strlen("無呪"))
+                   || !strncmpi(d->bp, "無呪い ",
+                                l = (int) strlen("無呪い "))
+                   || !strncmpi(d->bp, "無呪い",
+                                l = (int) strlen("無呪い"))
+                   || !strncmpi(d->bp, "呪われていない ",
+                                l = (int) strlen("呪われていない "))
+                   || !strncmpi(d->bp, "呪われていない",
+                                l = (int) strlen("呪われていない"))) {
             d->uncursed = 1, d->blessed = d->iscursed = 0;
         } else if (!strncmpi(d->bp, "rustproof ", l = 10)
                    || !strncmpi(d->bp, "erodeproof ", l = 11)
@@ -4456,6 +4496,57 @@ jp_name_to_mon(const char *name, int *gender_p)
 }
 
 staticfn int
+jp_tin_name_to_mon(char *name, int *gender_p)
+{
+    char *tail = eos(name);
+    char *prev = (char *) utf8_prev_char_start(name, tail);
+    char save_tail = '\0';
+    boolean stripped_meat = FALSE;
+    int jpm;
+
+    if (prev < tail && !strcmp(prev, "肉")) {
+        save_tail = *prev;
+        *prev = '\0';
+        stripped_meat = TRUE;
+    }
+
+    jpm = name_to_mon(name, gender_p);
+
+    if (stripped_meat)
+        *prev = save_tail;
+
+    return jpm;
+}
+
+staticfn boolean
+jp_tin_match_special(const char *name, struct _readobjnam_data *d)
+{
+    if (!strcmpi(name, "ほうれん草") || !strcmpi(name, "ほうれんそう")
+        || !strcmpi(name, "ホウレンソウ")) {
+        d->contents = TIN_SPINACH;
+        d->mntmp = NON_PM;
+        d->typ = TIN;
+        return TRUE;
+    }
+    if (!strcmpi(name, "ランダム") || !strcmpi(name, "おまかせ")
+        || !strcmpi(name, "適当")) {
+        d->tvariety = RANDOM_TIN;
+        d->mntmp = NON_PM;
+        d->typ = TIN;
+        return TRUE;
+    }
+    if (!strcmpi(name, "空") || !strcmpi(name, "空き")
+        || !strcmpi(name, "空っぽ")) {
+        d->contents = TIN_EMPTY;
+        d->mntmp = NON_PM;
+        d->typ = TIN;
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+staticfn int
 readobjnam_postparse1(struct _readobjnam_data *d)
 {
     int i;
@@ -4615,8 +4706,26 @@ readobjnam_postparse1(struct _readobjnam_data *d)
         }
     }
 
-    /* Japanese wish input support for corpse aliases */
+    /* Japanese wish input support for figurine/tin/corpse aliases */
     if (d->mntmp < LOW_PM) {
+        static const char *const jp_statue_suffixes[] = {
+            "の石像", "の彫像", "の像", "石像", "彫像", "像", 0
+        };
+        static const char *const jp_statue_prefixes[] = {
+            "石像の", "彫像の", "像の", 0
+        };
+        static const char *const jp_figurine_suffixes[] = {
+            "のフィギュア", "の人形", "フィギュア", "人形", 0
+        };
+        static const char *const jp_figurine_prefixes[] = {
+            "フィギュアの", "人形の", 0
+        };
+        static const char *const jp_tin_suffixes[] = {
+            "の肉の缶詰", "の肉缶", "の缶詰", "の缶", "缶詰", "缶", 0
+        };
+        static const char *const jp_tin_prefixes[] = {
+            "肉の缶詰の", "缶詰の", "缶の", 0
+        };
         static const char *const jp_corpse_suffixes[] = {
             "の死体", "のしたい", "のなきがら", "の亡骸", "の遺体", "の遺骸", "の屍",
             " 死体", " したい", " なきがら", " 亡骸", " 遺体", " 遺骸", " 屍",
@@ -4627,6 +4736,177 @@ readobjnam_postparse1(struct _readobjnam_data *d)
             "死体 ", "したい ", "なきがら ", "亡骸 ", "遺体 ", "遺骸 ", "屍 ", 0
         };
         int si;
+
+        for (si = 0; jp_statue_suffixes[si]; ++si) {
+            const char *sfx = jp_statue_suffixes[si];
+
+            if ((d->p = strstri(d->bp, sfx)) != 0 && !strcmpi(d->p, sfx)) {
+                char *trim = d->p;
+                char save_ch;
+                int jpm;
+
+                while (trim > d->bp && trim[-1] == ' ')
+                    --trim;
+                save_ch = *trim;
+                *trim = '\0';
+                while (*d->bp == ' ')
+                    ++d->bp;
+
+                jpm = name_to_mon(d->bp, &d->mgend);
+                if (jpm >= LOW_PM) {
+                    d->mntmp = jpm;
+                    d->typ = STATUE;
+                    return 2; /* goto typfnd */
+                }
+
+                *trim = save_ch;
+            }
+        }
+
+        for (si = 0; jp_statue_prefixes[si]; ++si) {
+            const char *pfx = jp_statue_prefixes[si];
+            int plen = (int) strlen(pfx);
+            char *rest;
+            int jpm;
+
+            if (strncmpi(d->bp, pfx, plen))
+                continue;
+
+            rest = d->bp + plen;
+            while (*rest == ' ')
+                ++rest;
+            if (!*rest)
+                continue;
+
+            jpm = name_to_mon(rest, &d->mgend);
+            if (jpm >= LOW_PM) {
+                d->mntmp = jpm;
+                d->typ = STATUE;
+                return 2; /* goto typfnd */
+            }
+        }
+
+        for (si = 0; jp_figurine_suffixes[si]; ++si) {
+            const char *sfx = jp_figurine_suffixes[si];
+
+            if ((d->p = strstri(d->bp, sfx)) != 0 && !strcmpi(d->p, sfx)) {
+                char *trim = d->p;
+                char save_ch;
+                int jpm;
+
+                while (trim > d->bp && trim[-1] == ' ')
+                    --trim;
+                save_ch = *trim;
+                *trim = '\0';
+                while (*d->bp == ' ')
+                    ++d->bp;
+
+                jpm = name_to_mon(d->bp, &d->mgend);
+                if (jpm >= LOW_PM) {
+                    d->mntmp = jpm;
+                    d->typ = FIGURINE;
+                    return 2; /* goto typfnd */
+                }
+
+                *trim = save_ch;
+            }
+        }
+
+        for (si = 0; jp_figurine_prefixes[si]; ++si) {
+            const char *pfx = jp_figurine_prefixes[si];
+            int plen = (int) strlen(pfx);
+            char *rest;
+            int jpm;
+
+            if (strncmpi(d->bp, pfx, plen))
+                continue;
+
+            rest = d->bp + plen;
+            while (*rest == ' ')
+                ++rest;
+            if (!*rest)
+                continue;
+
+            jpm = name_to_mon(rest, &d->mgend);
+            if (jpm >= LOW_PM) {
+                d->mntmp = jpm;
+                d->typ = FIGURINE;
+                return 2; /* goto typfnd */
+            }
+        }
+
+        for (si = 0; jp_tin_suffixes[si]; ++si) {
+            const char *sfx = jp_tin_suffixes[si];
+
+            if ((d->p = strstri(d->bp, sfx)) != 0 && !strcmpi(d->p, sfx)) {
+                char *trim = d->p;
+                char *mname;
+                char save_ch;
+                int jpm;
+
+                while (trim > d->bp && trim[-1] == ' ')
+                    --trim;
+                save_ch = *trim;
+                *trim = '\0';
+                while (*d->bp == ' ')
+                    ++d->bp;
+
+                mname = d->bp;
+                d->tmp = tin_variety_txt(mname, &d->tinv);
+                if (d->tmp > 0) {
+                    d->tvariety = d->tinv;
+                    mname += d->tmp;
+                    while (*mname == ' ')
+                        ++mname;
+                }
+
+                if (jp_tin_match_special(mname, d))
+                    return 2; /* goto typfnd */
+
+                jpm = jp_tin_name_to_mon(mname, &d->mgend);
+                if (jpm >= LOW_PM) {
+                    d->mntmp = jpm;
+                    d->typ = TIN;
+                    return 2; /* goto typfnd */
+                }
+
+                *trim = save_ch;
+            }
+        }
+
+        for (si = 0; jp_tin_prefixes[si]; ++si) {
+            const char *pfx = jp_tin_prefixes[si];
+            int plen = (int) strlen(pfx);
+            char *rest;
+            int jpm;
+
+            if (strncmpi(d->bp, pfx, plen))
+                continue;
+
+            rest = d->bp + plen;
+            while (*rest == ' ')
+                ++rest;
+            if (!*rest)
+                continue;
+
+            d->tmp = tin_variety_txt(rest, &d->tinv);
+            if (d->tmp > 0) {
+                d->tvariety = d->tinv;
+                rest += d->tmp;
+                while (*rest == ' ')
+                    ++rest;
+            }
+
+            if (jp_tin_match_special(rest, d))
+                return 2; /* goto typfnd */
+
+            jpm = jp_tin_name_to_mon(rest, &d->mgend);
+            if (jpm >= LOW_PM) {
+                d->mntmp = jpm;
+                d->typ = TIN;
+                return 2; /* goto typfnd */
+            }
+        }
 
         for (si = 0; jp_corpse_suffixes[si]; ++si) {
             const char *sfx = jp_corpse_suffixes[si];

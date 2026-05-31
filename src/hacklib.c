@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	hacklib.c	$NHDT-Date: 1706213796 2024/01/25 20:16:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
@@ -913,6 +913,75 @@ TODO: add set_impossible(), impossible -> func pointer,
 RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* Unicode routines */
+
+staticfn int
+utf8_sequence_expected_len(uchar lead)
+{
+    if (lead < 0x80)
+        return 1;
+    if (lead >= 0xC2 && lead <= 0xDF)
+        return 2;
+    if (lead >= 0xE0 && lead <= 0xEF)
+        return 3;
+    if (lead >= 0xF0 && lead <= 0xF4)
+        return 4;
+    return 0;
+}
+
+/* returns a safe byte index <= maxbytes, avoiding UTF-8 mid-sequence cuts */
+size_t
+utf8_truncation_point(const char *str, size_t maxbytes)
+{
+    size_t len, cut, lead;
+    int cp_len;
+
+    len = strlen(str);
+    if (len <= maxbytes)
+        return len;
+    if (maxbytes == 0)
+        return 0;
+
+    cut = maxbytes;
+    lead = cut;
+    while (lead > 0 && (((uchar) str[lead]) & 0xC0U) == 0x80U)
+        --lead;
+
+    if (lead < cut) {
+        cp_len = utf8_sequence_expected_len((uchar) str[lead]);
+        if (cp_len == 0 || lead + (size_t) cp_len > cut)
+            return lead;
+    }
+
+    return cut;
+}
+
+/* in-place truncate to at most maxbytes bytes, preserving UTF-8 boundaries */
+void
+utf8_truncate(char *str, size_t maxbytes)
+{
+    str[utf8_truncation_point(str, maxbytes)] = '\0';
+}
+
+/* given [start, pos], return start of previous UTF-8 character */
+const char *
+utf8_prev_char_start(const char *start, const char *pos)
+{
+    const char *p;
+    int cp_len;
+
+    if (pos <= start)
+        return start;
+
+    p = pos - 1;
+    while (p > start && (((uchar) *p) & 0xC0U) == 0x80U)
+        --p;
+
+    cp_len = utf8_sequence_expected_len((uchar) *p);
+    if (cp_len == 0 || p + cp_len > pos)
+        return pos - 1;
+
+    return p;
+}
 
 int
 unicodeval_to_utf8str(int uval, uint8 *buffer, size_t bufsz)

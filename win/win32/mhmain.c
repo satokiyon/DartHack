@@ -419,6 +419,15 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return DefWindowProc(hWnd, message, wParam, lParam);
     } break;
 
+    case WM_CHAR:
+        /* Accept text input from IME/Unicode paths; command keys are
+           handled in WM_KEYDOWN and should not be duplicated here. */
+        if (wParam >= 0x80U) {
+            NHEVENT_KBD((int) wParam);
+            return 0;
+        }
+        return DefWindowProc(hWnd, message, wParam, lParam);
+
     case WM_COMMAND:
         /* process commands - menu commands mostly */
         if (onWMCommand(hWnd, wParam, lParam))
