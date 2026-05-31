@@ -98,7 +98,7 @@ function mk_dgl_extrainfo()
             extrai:close();
         else
             -- failed to open the file.
-            nh.pline("Failed to open dgl extrainfo file: " .. err);
+            nh.pline("dgl extrainfo ファイルを開けなかった: " .. err);
         end
         prev_dgl_extrainfo = u.moves;
     end
@@ -107,14 +107,14 @@ end
 -- Show a helpful tip when player first uses getpos()
 function show_getpos_tip()
    nh.text([[
-Tip: Farlooking or selecting a map location
+ヒント: 周囲を見回す、またはマップ上の位置を選ぶ
 
-You are now in a "farlook" mode - the movement keys move the cursor,
-not your character.  Game time does not advance.  This mode is used
-to look around the map, or to select a location on it.
+現在は "farlook" モードです。移動キーで動くのは、
+あなたのキャラクターではなくカーソルです。ゲーム内時間も進みません。
+このモードでは、マップを見回したり、位置を選択したりできます。
 
-When in this mode, you can press ESC to return to normal game mode,
-and pressing ? will show the key help.
+このモードでは、ESC を押すと通常のゲームモードへ戻ります。
+? を押すとキー操作のヘルプが表示されます。
 ]]);
 end
 
