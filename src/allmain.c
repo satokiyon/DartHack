@@ -53,7 +53,7 @@ moveloop_preamble(boolean resuming)
     /* side-effects from the real world */
     flags.moonphase = phase_of_the_moon();
     if (flags.moonphase == FULL_MOON) {
-        You("ラッキー！今夜は満月だ!");
+        pline("ラッキー！今夜は満月だ!");
         change_luck(1);
     } else if (flags.moonphase == NEW_MOON) {
         pline("気をつけろ!  今夜は新月だ.");
