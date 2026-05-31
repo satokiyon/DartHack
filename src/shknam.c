@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	shknam.c	$NHDT-Date: 1764109114 2025/11/25 22:18:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1112,3 +1113,4 @@ is_izchak(struct monst *shkp, boolean override_hallucination)
 #undef VEGETARIAN_CLASS
 
 /*shknam.c*/
+

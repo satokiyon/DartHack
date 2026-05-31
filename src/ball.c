@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	ball.c	$NHDT-Date: 1596498150 2020/08/03 23:42:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) David Cohrs, 2006. */
@@ -1102,3 +1103,4 @@ bc_sanity_check(void)
 }
 
 /*ball.c*/
+

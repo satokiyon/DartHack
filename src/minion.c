@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-28. */
 /* NetHack 5.0	minion.c	$NHDT-Date: 1762727599 2025/11/09 14:33:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2008. */
@@ -621,3 +622,4 @@ gain_guardian_angel(void)
 }
 
 /*minion.c*/
+

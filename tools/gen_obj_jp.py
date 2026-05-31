@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-21.
 #!/usr/bin/env python3
 """
 gen_obj_jp.py - Generate src/obj_jp.c from current (JP) objects.h
@@ -334,3 +335,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

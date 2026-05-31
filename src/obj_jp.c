@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 #include "config.h"
 #include "obj.h"
 #include "objclass.h"
@@ -756,3 +757,4 @@ jp_item_descr(int otyp)
         return obj_jp_descrs[idx];
     return OBJ_DESCR(objects[otyp]);
 }
+

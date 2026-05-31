@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-21.
 import json
 
 def translate_data_base(input_file, output_file, dictionary_file):
@@ -17,3 +18,4 @@ def translate_data_base(input_file, output_file, dictionary_file):
 
 if __name__ == "__main__":
     translate_data_base('dat/data.base', 'dat/data.base.new', 'dat/w_translation_dict.json')
+

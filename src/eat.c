@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	eat.c	$NHDT-Date: 1740534854 2025/02/25 17:54:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.344 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -4059,4 +4060,5 @@ Finish_digestion(void)
 }
 
 /*eat.c*/
+
 

@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
 /* NetHack 5.0	fnamesiz.h	$NHDT-Date: 1580310580 2020/01/29 15:09:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $ */
 /*-Copyright (c) Michael Allison, 2020. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -76,3 +77,4 @@
 #endif
 
 #endif /* FNAMESIZ_H */
+

@@ -1,3 +1,4 @@
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31.
 -- NetHack core nhcore.lua	$NHDT-Date: 1652196284 2022/05/10 15:24:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $
 --	Copyright (c) 2021 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
@@ -141,4 +142,5 @@ nhcore = {
     enter_tutorial = tutorial_enter,
     leave_tutorial = tutorial_leave,
 };
+
 

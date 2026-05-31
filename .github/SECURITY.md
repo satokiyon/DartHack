@@ -1,3 +1,4 @@
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. -->
 # Security Policy
 
 ## Supported Versions
@@ -20,5 +21,6 @@ Please include:
 - Reproduction steps
 - Impact and attack scenario
 - Any workaround or proposed fix
+
 
 

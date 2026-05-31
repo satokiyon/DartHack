@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-21.
 import sys
 
 # マッピング辞書
@@ -27,3 +28,4 @@ with open(file_path, 'w', encoding='utf-8') as f:
     f.writelines(new_lines)
 
 print("Replacement complete.")
+

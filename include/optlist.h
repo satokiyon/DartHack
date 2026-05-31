@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
 /* NetHack 5.0	optlist.h */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -927,3 +928,4 @@ static int optfn_##a(int, int, boolean, char *, char *);
 #endif /* NHOPT_PROTO || NHOPT_ENUM || NHOPT_PARSE */
 
 /*optlist.h*/
+

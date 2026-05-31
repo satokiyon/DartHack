@@ -1,3 +1,4 @@
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-26. -->
 ---
 name: Review Agent
 description: "Use when: レビュー, code review, コードレビュー, 翻訳レビュー, 品質確認, バグ確認, 回帰確認"
@@ -32,3 +33,4 @@ argument-hint: "レビュー対象（例: src/do_name.c の変更点、直近コ
 3. Summary
 - 変更の総評（2-4行）
 - 残存リスク
+

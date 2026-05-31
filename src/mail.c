@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-20. */
 /* NetHack 5.0	mail.c	$NHDT-Date: 1762750699 2025/11/09 20:58:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -801,3 +802,4 @@ readmail(struct obj *otmp)
 #endif /* MAIL */
 
 /*mail.c*/
+

@@ -1,3 +1,4 @@
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-25. -->
 # NetHackJP `dat/data.base` 日本語翻訳計画
 
 ## 1. 目的
@@ -2941,4 +2942,5 @@ Oブロック（`obsidian*` から `owlbear` までの全15箇所・22キー）�
 合計：50エントリ（既翻訳2、残48）
 
 翻訳設計の詳細は `docs/s_block_translation_plan.md` を参照。
+
 

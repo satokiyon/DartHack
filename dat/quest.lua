@@ -1,3 +1,4 @@
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-23.
 -- NetHack quest.lua	$NHDT-Date: 1726894904 2024/09/21 05:01:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $
 -- Copyright (c) 2021 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
@@ -3059,3 +3060,4 @@ questtext = {
    },
 }
 }
+

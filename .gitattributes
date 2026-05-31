@@ -1,3 +1,4 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-16.
 *.[ch] NHSUBST
 *.cpp NHSUBST
 *.sh NHSUBST
@@ -18,3 +19,4 @@ README NHSUBST
 /dat/history -text
 * NH_filestag=(file%s_in_top_directory)
 NetHack.dsw NH_filestag=(file%s_for_win32_that_are_moved_into_._at_compile_time)
+

@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-25.
         NetHack 5.0 向け Microsoft Windows 固有ヘルプ
         Copyright (c) NetHack PC Development Team 1993-2025.
         NetHack may be freely distributed.  See license for details.
@@ -247,3 +248,4 @@ Num Lock は "on" にしてください。
         Ctrl-Shift-End   (1)     マップを右下端へスクロール（パン）
         Ctrl-Shift-PgUp  (9)     マップを右上端へスクロール（パン）
         Ctrl-Shift-PgDn  (3)     マップを左下端へスクロール（パン）
+

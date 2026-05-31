@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
 /* NetHack 5.0	timeout.h	$NHDT-Date: 1705087443 2024/01/12 19:24:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.23 $ */
 /* Copyright 1994, Dean Luick                                     */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -70,3 +71,4 @@ typedef struct fe {
 } timer_element;
 
 #endif /* TIMEOUT_H */
+

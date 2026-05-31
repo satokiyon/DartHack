@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-23.
          NetHack 5.0.0 -- 一般情報
 
 NetHack 5.0 は、Rogue や Hack の遠い子孫であり、NetHack 3.6 の直接の後継
@@ -151,3 +152,4 @@ NetHack のソースコードのパッチを電子メールで直接送信した
 # $NHDT-Date: 1652133501 2022/05/09 21:58:21 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $
 # Copyright (c) 2012 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
+

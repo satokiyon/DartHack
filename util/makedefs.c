@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-26. */
 /* NetHack 5.0  makedefs.c  $NHDT-Date: 1702948590 2023/12/19 01:16:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
@@ -50,8 +51,11 @@
 
 /* names of files to be generated */
 #define ORACLE_FILE "oracles"
+#define ORACLE_FILE_JP "oracles_jp"
 #define DATA_FILE "data"
+#define DATA_FILE_JP "data_jp"
 #define RUMOR_FILE "rumors"
+#define RUMOR_FILE_JP "rumors_jp"
 
 /* These are affiliated with outdated options
    but we define them for us in messages */
@@ -147,6 +151,9 @@ void do_makedefs(char *);
 void do_data(void);
 void do_rumors(void);
 void do_oracles(void);
+static void do_data_for(const char *);
+static void do_rumors_for(const char *);
+static void do_oracles_for(const char *);
 
 #if defined(OLD_MAKEDEFS_OPTIONS)
 void do_date(void);
@@ -166,8 +173,9 @@ static char *name_file(const char *, const char *);
 static FILE *getfp(const char *, const char *, const char *, int);
 static void do_ext_makedefs(int, char **);
 static char *padline(char *, unsigned);
-static unsigned long read_rumors_file(const char *, int *,
+static unsigned long read_rumors_file(const char *, const char *, int *,
                                       long *, unsigned long, unsigned);
+static boolean input_file_exists(const char *, const char *);
 static void rafile(int);
 static void do_rnd_access_file(const char *, const char *,
                                const char *, unsigned);
@@ -1031,9 +1039,26 @@ padline(char *line, unsigned padlength)
     return line;
 }
 
+static boolean
+input_file_exists(const char *base, const char *ext)
+{
+    char infile[MAXFNAMELEN];
+    FILE *fp;
+
+    Sprintf(infile, DATA_IN_TEMPLATE, base);
+    Strcat(infile, ext);
+    fp = fopen(infile, RDTMODE);
+    if (fp) {
+        Fclose(fp);
+        return TRUE;
+    }
+    return FALSE;
+}
+
 /* common code for do_rumors().  Return 0 on error. */
 static unsigned long
 read_rumors_file(
+    const char *rumor_file,
     const char *file_ext,
     int *rumor_count,
     long *rumor_size,
@@ -1044,7 +1069,7 @@ read_rumors_file(
     char *line;
     unsigned long rumor_offset;
 
-    Sprintf(infile, DATA_IN_TEMPLATE, RUMOR_FILE);
+    Sprintf(infile, DATA_IN_TEMPLATE, rumor_file);
     Strcat(infile, file_ext);
     if (!(ifp = fopen(infile, RDTMODE))) {
         perror(infile);
@@ -1145,20 +1170,32 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 void
 do_rumors(void)
 {
+    do_rumors_for(RUMOR_FILE);
+
+    if (input_file_exists(RUMOR_FILE_JP, ".tru")
+        && input_file_exists(RUMOR_FILE_JP, ".fal"))
+        do_rumors_for(RUMOR_FILE_JP);
+}
+
+static void
+do_rumors_for(const char *rumor_file)
+{
     char *line;
     static const char rumors_header[] =
         "%s%04d,%06ld,%06lx;%04d,%06ld,%06lx;0,0,%06lx\n";
     char tempfile[MAXFNAMELEN];
+    char tmpname[64];
     int true_rumor_count, false_rumor_count;
     long true_rumor_size, false_rumor_size;
     unsigned long true_rumor_offset, false_rumor_offset, eof_offset;
 
-    Sprintf(tempfile, DATA_TEMPLATE, "rumors.tmp");
+    Sprintf(tmpname, "%s.tmp", rumor_file);
+    Sprintf(tempfile, DATA_TEMPLATE, tmpname);
     filename[0] = '\0';
 #ifdef FILE_PREFIX
     Strcat(filename, file_prefix);
 #endif
-    Sprintf(eos(filename), DATA_TEMPLATE, RUMOR_FILE);
+    Sprintf(eos(filename), DATA_TEMPLATE, rumor_file);
     if (!(ofp = fopen(filename, WRTMODE))) {
         perror(filename);
         makedefs_exit(EXIT_FAILURE);
@@ -1183,13 +1220,13 @@ do_rumors(void)
     true_rumor_offset = (unsigned long) ftell(tfp);
 
     false_rumor_offset
-        = (unsigned long) read_rumors_file(".tru", &true_rumor_count,
+        = (unsigned long) read_rumors_file(rumor_file, ".tru", &true_rumor_count,
                                            &true_rumor_size, true_rumor_offset,
                                            MD_PAD_RUMORS);
     if (!false_rumor_offset)
         goto rumors_failure;
 
-    eof_offset = read_rumors_file(".fal", &false_rumor_count,
+    eof_offset = read_rumors_file(rumor_file, ".fal", &false_rumor_count,
                                   &false_rumor_size, false_rumor_offset,
                                   MD_PAD_RUMORS);
     if (!eof_offset)
@@ -1246,19 +1283,37 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 void
 do_data(void)
 {
+    char data_ext[8];
+
+    do_data_for(DATA_FILE);
+
+#ifdef SHORT_FILENAMES
+    Strcpy(data_ext, ".bas");
+#else
+    Strcpy(data_ext, ".base");
+#endif
+    if (input_file_exists(DATA_FILE_JP, data_ext))
+        do_data_for(DATA_FILE_JP);
+}
+
+static void
+do_data_for(const char *data_file)
+{
     char infile[60], tempfile[60];
+    char tmpname[64];
     boolean ok;
     long txt_offset;
     int entry_cnt, line_cnt;
     char *line;
 
-    Sprintf(tempfile, DATA_TEMPLATE, "database.tmp");
+    Sprintf(tmpname, "%s.tmp", data_file);
+    Sprintf(tempfile, DATA_TEMPLATE, tmpname);
     filename[0] = '\0';
 #ifdef FILE_PREFIX
     Strcat(filename, file_prefix);
 #endif
-    Sprintf(eos(filename), DATA_TEMPLATE, DATA_FILE);
-    Sprintf(infile, DATA_IN_TEMPLATE, DATA_FILE);
+    Sprintf(eos(filename), DATA_TEMPLATE, data_file);
+    Sprintf(infile, DATA_IN_TEMPLATE, data_file);
 #ifdef SHORT_FILENAMES
     Strcat(infile, ".bas");
 #else
@@ -1422,7 +1477,17 @@ static const char *special_oracle[] = {
 void
 do_oracles(void)
 {
+    do_oracles_for(ORACLE_FILE);
+
+    if (input_file_exists(ORACLE_FILE_JP, ".txt"))
+        do_oracles_for(ORACLE_FILE_JP);
+}
+
+static void
+do_oracles_for(const char *oracle_file)
+{
     char infile[60], tempfile[60], xbuf[BUFSZ];
+    char tmpname[64];
     boolean in_oracle, ok;
     int input_lineno;
     long fpos;
@@ -1433,13 +1498,14 @@ do_oracles(void)
     size_t linebytes;
     static const size_t oracle_line_limit = 79;
 
-    Sprintf(tempfile, DATA_TEMPLATE, "oracles.tmp");
+    Sprintf(tmpname, "%s.tmp", oracle_file);
+    Sprintf(tempfile, DATA_TEMPLATE, tmpname);
     filename[0] = '\0';
 #ifdef FILE_PREFIX
     Strcat(filename, file_prefix);
 #endif
-    Sprintf(eos(filename), DATA_TEMPLATE, ORACLE_FILE);
-    Sprintf(infile, DATA_IN_TEMPLATE, ORACLE_FILE);
+    Sprintf(eos(filename), DATA_TEMPLATE, oracle_file);
+    Sprintf(infile, DATA_IN_TEMPLATE, oracle_file);
     Strcat(infile, ".txt");
     if (!(ifp = fopen(infile, RDTMODE))) {
         perror(infile);
@@ -2421,3 +2487,4 @@ struct attribs attrmax, attrmin;
 #endif /* STRICT_REF_DEF */
 
 /*makedefs.c*/
+

@@ -1,3 +1,4 @@
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-18. -->
 # You() 翻訳フェーズA/B 進捗 (2026-05-17)
 
 ## フェーズA: 監査結果
@@ -140,3 +141,4 @@
 
 ## 次フェーズ候補
 - 残存ファイル一覧（未集計）
+

@@ -1,3 +1,4 @@
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-23. -->
 # quest.lua 翻訳用語集・実務知見
 
 この文書は `quest.lua` および関連するテキストの翻訳に使用する用語集と、特有の実務知見をまとめたものです。基本方針については [docs/translation-instructions-ja.md](translation-instructions-ja.md) を参照してください。
@@ -35,3 +36,4 @@
   - 役職メッセージや神託などの命令調は、原文の威厳やニュアンスを維持する。
 - **反映ルール**: 反映はブロック単位（common → 各職業）で行い、都度ビルド確認することを推奨。
 - **非破壊編集**: 原文の英文を削除せず、文字列リテラル部分のみを置換すること。
+

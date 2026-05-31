@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31.
 Third-Party Notices
 ===================
 
@@ -48,3 +49,4 @@ Release Checklist (Recommended)
 - Before each release, verify whether submodule updates changed license terms.
 - If distributing binaries, include required third-party notices in release
    artifacts and accompanying documentation.
+

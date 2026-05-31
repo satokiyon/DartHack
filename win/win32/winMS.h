@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
 /* NetHack 5.0	winMS.h	$NHDT-Date: 1596498367 2020/08/03 23:46:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.53 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -268,3 +269,4 @@ extern COLORREF message_fg_color;
     ((mode) != MAP_MODE_TILES && (mode) != MAP_MODE_TILES_FIT_TO_SCREEN)
 
 #endif /* WINMS_H */
+

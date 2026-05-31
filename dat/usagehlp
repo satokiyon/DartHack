@@ -1,106 +1,139 @@
-これは nethack のコマンドライン引数を簡潔に説明した文書です。
-主に UNIX（linux や macOS を含む）向けで、他環境では正確でない場合があります。
+This is a terse description of nethack's command line arguments.
+It is oriented toward UNIX (including descendants such as linux and macOS)
+and might not be accurate for other platforms.
 
-ゲーム開始時、指定キャラクター名のセーブがあれば復元され、
-なければその名前で新規ゲームが始まります。
+When starting play, if there is a save file for the chosen character name
+then it will be restored, otherwise a new game using that name will begin.
 
 nethack
-  引数なし。実行時設定ファイルの OPTIONS=name:キャラクター名 を使い、
-  未設定ならプレイヤーのユーザー名を使います。
+  with no arguments; uses character name from run-time configuration file's
+  OPTIONS=name:character-name entry, or player's username if none.
 
-nethack -u キャラクター名 [-X または -D]
-  '-u キャラクター名' は今回のキャラクター名を指定;
-       -u は小文字必須。名前との間の空白は省略可。
-  '-X' は非スコア探索モード（discovery mode）で開始;
-       -X は大文字必須。開始時に願いの杖を所持し、
-       死亡時に生命維持して続行する選択が可能。
-  '-D' はデバッグモード（wizard mode）で開始; -D は大文字必須;
-       権限がなければ -X に切り替え。権限があれば
-       キャラクター名は "wizard" に変更されます。
+nethack -u character-name [-X or -D]
+  '-u character-name' specifies the name to use for this game's character;
+       -u must be lowercase; the space between it and character-name may
+       be omitted;
+  '-X' play in non-scoring explore mode also known as discovery mode;
+       -X must be uppercase; character starts with a wand of wishing and
+       player may opt to be life-saved and keep going if character dies;
+  '-D' run in debug mode also known as wizard mode; -D must be uppercase;
+       if player is not allowed then nethack will switch to -X; if player
+       is allowed, character name will be changed to "wizard".
 
-  キャラクター名には職業・種族・性別・属性の接尾辞を付けられます。
-  例: -u Conan-Bar-Hum-Mal-Neu や -u Tim-Wiz。
-  各要素は3文字以上で、大小文字は不問です。
+  A character name may have a suffix specifying any or all of role, race,
+  gender, and alignment such as -u Conan-Bar-Hum-Mal-Neu or -u Tim-Wiz.
+  The components present must be at least three letters long but can be
+  longer; their case doesn't matter.  See also -p and -r, next,
 
 nethack -p Ppp -r Rrr [-@]
-  '-p Ppp' 職業指定（-r が使われているため profession の p を使用）;
-       'Ppp' は職業名3文字以上（例: Val = Valkyrie）。
-  '-r Rrr' 種族指定: Hum[an], Elf, Orc, Dwa[rf], Gno[me]
-  '-@' 非対話開始を強制。コマンドラインや設定ファイルで未指定の
-       職業/種族/性別/属性は問い合わせなしでランダム選択。
-       環境によっては @ のエスケープが必要。
+  '-p Ppp' specify role; p for "profession" is used because -r is in use;
+       'Ppp' is three or more letters of the role name such as Val for
+       Valkyrie; unlike -p itself, upper/lower case of Ppp doesn't matter
+  '-r Rrr' specify race or species: Hum[an], Elf, Orc, Dwa[rf], Gno[me];
+  '-@' force non-interactive start; any of role, race, gender, and
+       alignment that is not specified on the command line or in the
+       run-time configuration file gets chosen randomly without prompting;
+       the at-sign might need to be quoted by preceding it with backslash.
 
-  旧形式の職業指定も利用可能:
-  -A/-Arc..., -B/-Bar..., -C/-Cav...,-H/-Hea...,-K/-Kni...,
-  -M/-Mon...,-P/-Pri...,-Ran...,-R/-Rog...,-S/-Sam...,-T/-Tou...,
-  -V/-Val...,-W/-Wiz...。1文字形式は大文字必須。
+  The old form for role is also still accepted:  -A or -Arc[heologist],
+  -B or -Bar[barian], -C or -Cav[eman] or -Cavew[oman], -H or -Hea[ler],
+  -K or -Kni[ght], -M or -Mon[k], -P or -Pri[est] or -Prieste[ss],
+  -Ran[ger], -R or -Rog[ue], -S or -Sam[urai], -T or -Tou[rist],
+  -V or -Val[kyrie], -W or -Wiz[ard].  The single-letter form must be in
+  uppercase, the three or more letter form can be in any case.  There is
+  no single-letter option for the Ranger role.
 
 nethack -DEC[graphics]
 nethack -IBM[graphics]
-  DEC または IBM 記号集合を選択し、テキストマップで罫線文字を使用。
-  インターフェースや表示能力次第で無効・崩れ表示の可能性あり。
+  selects the DEC or IBM symbol set to use line-drawing characters on a
+  text map; might be ignored depending on interface, or ineffective or
+  even scrambled depending on display capability; -DECgraphics and
+  -IBMgraphics are mutually exclusive; they can be any case but must use
+  at least three letters.
 
 nethack -wIii
 nethack --windowtype:Iii
-  Iii はインターフェース指定（tty/curses/X11/Qt）。
-  複数インターフェース対応ビルド時のみ有効。
-  設定ファイルの windowtype 指定やビルド既定値を上書きします。
+  where 'Iii' represents an interface designation:  tty, curses, X11, or
+  Qt; only useful if the program was built to support more than one
+  interface (the game's '#version' command will disclose that); overrides
+  OPTIONS=windowtype:Iii in run-time configuration file and build-time
+  default; '-w' or '--windowtype' must be lowercase, the interface
+  designation itself may be any case; variations '--windowtype Iii' and
+  '-w Iii' work too.
 
-  Windows では nethack.exe は tty/curses（ビルド設定依存）、
-  nethackW.exe は mswin（Win GUI）と必要に応じて curses をサポート。
+  On Windows, nethack.exe supports tty or curses or both depending on
+  settings at the time the program is built from source; nethackW.exe
+  supports mswin (also referred to as Win GUI) and optionally curses.
+  For MS-DOS, the program supports tty or curses or both.
 
 nethack -n
-  news ファイルがあっても起動時に表示しない。
+  don't show the 'news' file if one is present in nethack's directory.
 
 nethack --nethackrc:RC-file
-  既定の実行時設定ファイル（通常 ~/.nethackrc）ではなく RC-file を使用。
+  use RC-file instead of the default run-time configuration file (which is
+  usually '~/.nethackrc'); the file name should include full path unless
+  located in nethack's directory;
 nethack --no-nethackrc
-  実行時設定ファイルを一切使わない。
+  don't use any run-time configuration file; equivalent to
+  --nethackrc:/dev/null which behaves as if an empty file.
 
 nethack -dDir
 nethack --directory:Dir
-  ビルド時 NETHACKDIR を Dir に上書き可能（使うなら他引数より先頭）。
+  could be used to override the build-time value of NETHACKDIR with
+  location Dir; if used, it should precede other command line arguments.
 
-上記オプションは同一コマンドラインで組み合わせ可能です。
+The assorted options above can be combined on a single command line;
+they're listed separately for readability.
 
 *******
 
-以下はゲームを開始せず、処理だけして終了するオプションです。
+Other options which perform some action and then exit rather than play
+the game:
 
 nethack -s
 nethack --scores
-  既定キャラクターのスコア表示。追加指定:
-
+  show scores for the default character; optional additional arguments:
 nethack -s -v
-  記録ファイルに旧バージョン分があれば全バージョンのスコアを表示。
-
-nethack -s キャラクター名 [キャラクター名2 [...]]
-  指定名のスコアのみ表示（sysconf の設定によっては制約あり）。
-  特殊名 "all" で条件に合う全件を表示。
-
+  show scores for all versions present in the high scores file (record)
+  if it contains scores for any older versions; by default, only scores
+  for current version of nethack are shown; when '-v' is used, it should
+  immediately follow -s or --scores, preceding any name(s) or -p or -r;
+nethack -s character-name [character-name2 [character-name3 [...]]]
+  show scores for one or more specific character names (might not be
+  effective if PERS_IS_UID=1 is specified in nethack's sysconf file);
+  character names may be preceded by '-u' but that isn't required;
+  special character-name "all" is used to display all scores that pass
+  other criteria;
 nethack -s -p Ppp -r Rrr
-  職業/種族で絞ってスコア表示。両方指定時は OR 条件で表示。
-
+  show scores for specific roles or races; multiple instances can be used;
+  if both '-p' and '-r' are used, scores that match either will be shown
+  rather than scores that match both;
 nethack -dDir -s
 nethack --directory:Dir -s
-  上記と同様。代替ディレクトリ指定は先頭推奨。
+  as above; alternate directory, if specified, should come first.
 
-nethack --version / --version:copy / --version:dump / --version:show
-  '--version'      バージョン番号とビルド日時を表示して終了。
-  '--version:copy' 版情報を表示し、クリップボードにもコピーして終了。
-  '--version:dump' 内部値を複数表示して終了。
-  '--version:show' '--version' と同じ。
+nethack --version or --version:copy or --version:dump or --version:show
+  '--version' display the program's version number plus the date and
+  time it was built from source code, then exit;
+  '--version:copy' display version number and also copy it into system
+  pasteboard (should work on macOS and Windows; might not work on other
+  systems) so that it could be pasted from there into a subsequent email
+  or web contact form, then exit;
+  '--version:dump' display several internal values, then exit;
+  '--version:show' same as '--version'.
 
 nethack --showpaths
-  各種ファイル/ディレクトリの想定場所を表示して終了。
+  list expected locations for various files and directories, then exit;
+  includes the name and location for the run-time configuration file which
+  can vary from platform to platform.
 
 nethack --usage
 nethack --help
-  この文書を表示。'nethack -?' や 'nethack ?' でも可
-  （シェルに解釈される場合はクォートが必要）。
+  show this text; 'nethack -?' and 'nethack ?' also work but the question
+  mark may need to be quoted to prevent the shell from intercepting it.
 
 *******
 
-この文書はゲーム中の '?' メニューでも参照できます。
-シェルでは 'nethack --usage | more' でも閲覧できます。
+This text is available during play in the menu for the game's '?' command
+or can be viewed via 'nethack --usage | more' at the shell prompt.
 

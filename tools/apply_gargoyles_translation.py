@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-21.
 import json
 
 def translate_data_base_with_full_match(input_file, output_file, dictionary_file):
@@ -18,3 +19,4 @@ def translate_data_base_with_full_match(input_file, output_file, dictionary_file
 
 if __name__ == "__main__":
     translate_data_base_with_full_match('dat/data.base', 'dat/data.base.new', 'dat/gargoyles_translation_dict.json')
+

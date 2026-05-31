@@ -1,4 +1,5 @@
 {
+  "modification_notice": "Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-28.",
   "name": "nethackjp-message-translation",
   "source": "local",
   "description": "NetHackJP のメッセージ翻訳作業で、内部キー互換を壊さず自然な日本語へ改善し、最小変更で検証まで行うための実務手順。",

@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-18. */
 /* NetHack 5.0	write.c	$NHDT-Date: 1702023275 2023/12/08 08:14:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -418,3 +419,4 @@ new_book_description(int booktype, char *outbuf)
 }
 
 /*write.c*/
+

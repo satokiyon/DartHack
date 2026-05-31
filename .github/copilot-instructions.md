@@ -1,3 +1,4 @@
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. -->
 # Copilot Instructions for NetHackJP (Technical & Operational)
 
 このファイルは、NetHackJP プロジェクトにおける技術的な運用、ビルド手順、および開発フローに関する指示をまとめたものです。翻訳に関する具体的なガイドラインは `docs/translation-instructions-ja.md` を参照してください。
@@ -84,3 +85,12 @@ git commit -m "Merge branch 'upstream-base' into main"
 - `%s%sから` / `%sは%s%sから` / `%sを%s%sから` のような複合テンプレートは機械置換しない。文脈ごとに語順を手動で整える。
 - 英語冠詞を返す補助（`just_an()` など）の結果を日本語文に連結しない。必要なら日本語名詞句を一度バッファへ組み立ててから表示文に渡す。
 - 置換後は対象ファイルで `get_errors` を確認し、最低限 `hack.c`, `apply.c`, `trap.c`, `uhitm.c`, `mhitu.c`, `steed.c` の表示文を重点確認する。
+
+## 9. 変更通知コメントの記載ルール
+
+- 変更通知（`Modified by ...` など）を記載する場合は、**対象ファイル形式で有効なコメント構文のみ**を使う。
+- プレーンテキストを機械可読ファイル先頭へ直接置かない（パーサが壊れるため）。
+- **XML**: 先頭は必ず `<?xml ...?>` とし、通知コメントはその直後に `<!-- ... -->` で置く。
+- **JSON**: コメント構文が無いので通知コメントは入れない（必要なら README やコミットメッセージへ記録）。
+- 既存フォーマット仕様を最優先し、通知コメントのためにビルド/解析可能性を下げない。
+

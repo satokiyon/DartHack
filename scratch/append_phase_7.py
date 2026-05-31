@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-23.
 # docs/translation_plan_data_base.md に Phase 7 を追記・挿入するスクリプト
 
 plan_path = r"c:\Users\satok\NetHackJP\docs\translation_plan_data_base.md"
@@ -464,3 +465,4 @@ if "## 18. 「g」「*g」「* g」" not in content:
     print("Phase 7 detailed plan appended successfully.")
 else:
     print("Phase 7 detailed plan already exists.")
+

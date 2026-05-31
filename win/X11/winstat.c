@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-29. */
 /* NetHack 5.0	winstat.c	$NHDT-Date: 1649269127 2022/04/06 18:18:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2594,3 +2595,4 @@ destroy_fancy_status(struct xwindow *wp)
 }
 
 /*winstat.c*/
+

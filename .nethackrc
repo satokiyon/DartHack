@@ -1,3 +1,4 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-27.
 # NetHack 5.0  defaults.nh       $NHDT-Date: 1524689357 2018/04/25 20:49:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.32 $
 # Copyright (c) 2006 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
@@ -245,3 +246,4 @@ OPTIONS=hilite_status:characteristics/up/green/down/red
 OPTIONS=tile_file:Nevanda_5.0.0_32x32.bmp
 OPTIONS=tile_width:32
 OPTIONS=tile_height:32
+

@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-19. */
 /* NetHack 5.0	exper.c	$NHDT-Date: 1706133782 2024/01/24 22:03:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2007. */
@@ -400,3 +401,4 @@ rndexp(boolean gaining) /* gaining XP via potion vs setting XP for polyself */
 }
 
 /*exper.c*/
+

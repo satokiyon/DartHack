@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-21.
 # 重複・不整合が発生した末尾部分を正しい原文に復元するスクリプト
 
 file_path = 'dat/data.base'
@@ -47,3 +48,4 @@ if found:
     print("Restore complete.")
 else:
     print("Error: *gem not found.")
+

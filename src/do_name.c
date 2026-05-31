@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	do_name.c	$NHDT-Date: 1737013431 2025/01/15 23:43:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.326 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -1958,4 +1959,5 @@ lookup_novel(const char *lookname, int *idx)
 }
 
 /*do_name.c*/
+
 

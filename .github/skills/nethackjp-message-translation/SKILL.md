@@ -1,3 +1,4 @@
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-27. -->
 ---
 name: nethackjp-message-translation
 description: NetHackJP のメッセージ翻訳作業で、内部キー互換を壊さず自然な日本語へ改善し、最小変更で検証まで行うための実務手順。
@@ -70,3 +71,4 @@ MSBuild.exe sys\windows\vs\NetHack.sln /t:"NetHack;NetHackW" /p:Configuration=De
 - 進捗と再発防止の知見は `/memories/repo/translation-notes.md` を優先参照する。
 - 技術運用は `.github/copilot-instructions.md`、翻訳方針は `docs/translation-instructions-ja.md` を基準にする。
 - 安全確認は `docs/message-translation-safety-checklist.md` を使う。
+

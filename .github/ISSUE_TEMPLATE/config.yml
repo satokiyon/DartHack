@@ -1,5 +1,7 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31.
 blank_issues_enabled: false
 contact_links:
   - name: Security vulnerability report
     url: https://github.com/satokiyon/NetHackJP/security/policy
     about: Please report vulnerabilities using the process in SECURITY.md, not in public issues.
+

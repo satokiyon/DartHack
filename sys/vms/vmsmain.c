@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-17. */
 /* NetHack 5.0	vmsmain.c	$NHDT-Date: 1693359633 2023/08/30 01:40:33 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -538,3 +539,4 @@ free_nhuuid(void)
 }
 
 /*vmsmain.c*/
+

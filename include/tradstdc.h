@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
 /* NetHack 5.0	tradstdc.h	$NHDT-Date: 1744938651 2025/04/17 17:10:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2006. */
@@ -577,3 +578,4 @@ extern char *rindex(const char *s, int c) __attribute__ ((unavailable));
 
 
 #endif /* TRADSTDC_H */
+

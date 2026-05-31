@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-29. */
 /* NetHack 5.0	windmain.c	$NHDT-Date: 1693359653 2023/08/30 01:40:53 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.189 $ */
 /* Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1497,3 +1498,4 @@ stdio_console_write_utf8(const char *str, boolean append_newline)
 #endif
 
     /*windmain.c*/
+

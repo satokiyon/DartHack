@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
 /* NetHack 5.0	sndprocs.h	$NHDT-Date: 1725653015 2024/09/06 20:03:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Michael Allison, 2022                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -301,3 +302,4 @@ enum sound_file_flags {
 };
 
 #endif /* SNDPROCS_H */
+

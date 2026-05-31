@@ -5,6 +5,8 @@
 #include "config.h"
 #include "dlb.h"
 
+#include <string.h>
+
 #ifdef __DJGPP__
 #include <string.h>
 #endif
@@ -29,6 +31,9 @@ typedef struct dlb_procs {
     int (*dlb_fgetc_proc)(DLB_P);
     long (*dlb_ftell_proc)(DLB_P);
 } dlb_procs_t;
+
+staticfn boolean should_try_jp_datafile(const char *);
+staticfn boolean make_jp_datafile_name(const char *, char *, size_t);
 
 #if defined(VERSION_IN_DLB_FILENAME)
 char dlbfilename[MAX_DLB_FILENAME];
@@ -457,6 +462,7 @@ dlb_fopen(const char *name, const char *mode)
 {
     FILE *fp;
     dlb *dp;
+    char jpname[512];
 
     if (!dlb_initialized)
         return (dlb *) 0;
@@ -466,6 +472,18 @@ dlb_fopen(const char *name, const char *mode)
         return (dlb *) 0;
 
     dp = (dlb *) alloc(sizeof(dlb));
+
+    if (should_try_jp_datafile(name)
+        && make_jp_datafile_name(name, jpname, sizeof jpname)) {
+        if (do_dlb_fopen(dp, jpname, mode)) {
+            dp->fp = (FILE *) 0;
+            return dp;
+        } else if ((fp = fopen_datafile(jpname, mode, DATAPREFIX)) != 0) {
+            dp->fp = fp;
+            return dp;
+        }
+    }
+
     if (do_dlb_fopen(dp, name, mode))
         dp->fp = (FILE *) 0;
     else if ((fp = fopen_datafile(name, mode, DATAPREFIX)) != 0)
@@ -477,6 +495,58 @@ dlb_fopen(const char *name, const char *mode)
     }
 
     return dp;
+}
+
+staticfn boolean
+should_try_jp_datafile(const char *name)
+{
+    static const char *const names[] = {
+        "help", "hh", "keyhelp", "wizhelp", "cmdhelp", "history",
+        "opthelp", "optmenu", "usagehlp", "rumors", "oracles",
+        "engrave", "epitaph", "data"
+    };
+    size_t i;
+
+    if (!name || !*name)
+        return FALSE;
+
+    for (i = 0; i < sizeof names / sizeof names[0]; ++i)
+        if (!strcmp(name, names[i]))
+            return TRUE;
+
+    return FALSE;
+}
+
+staticfn boolean
+make_jp_datafile_name(const char *name, char *buf, size_t bufsz)
+{
+    const char *dot;
+    size_t base_len, ext_len;
+
+    if (!name || !buf || bufsz < 8)
+        return FALSE;
+    if (strstr(name, "_jp"))
+        return FALSE;
+
+    dot = strrchr(name, '.');
+    if (!dot) {
+        if (strlen(name) + 3 >= bufsz)
+            return FALSE;
+        strcpy(buf, name);
+        strcat(buf, "_jp");
+        return TRUE;
+    }
+
+    base_len = (size_t) (dot - name);
+    ext_len = strlen(dot);
+    if (base_len + 3 + ext_len >= bufsz)
+        return FALSE;
+
+    memcpy(buf, name, base_len);
+    buf[base_len] = '\0';
+    strcat(buf, "_jp");
+    strcat(buf, dot);
+    return TRUE;
 }
 
 int
