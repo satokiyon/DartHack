@@ -84,7 +84,7 @@ staticfn int tt_gend_from_filecode(const char *);
 staticfn const char *tt_role_name_from_filecode(const char *, const char *);
 staticfn const char *tt_race_name_from_filecode(const char *);
 staticfn const char *tt_gender_name_from_filecode(const char *);
-staticfn const char *tt_align_name_from_filecode(const char *);
+staticfn const char *tt_align_name_from_filecode(const char *, const char *);
 staticfn int topten_utf8_charlen(const char *);
 staticfn int topten_dispwidth(const char *);
 staticfn char *topten_wrapsplit(char *, int);
@@ -464,19 +464,43 @@ tt_gender_name_from_filecode(const char *gendfc)
 }
 
 staticfn const char *
-tt_align_name_from_filecode(const char *alignfc)
+tt_align_name_from_filecode(const char *alignfc, const char *rolefc)
 {
-    int aidx = str2align(alignfc);
+    int aidx = str2align(alignfc), ridx = str2role(rolefc);
+    const char *gnam = 0;
 
     /* str2align() returns an index into aligns[], not an aligntyp.
      * Use aligns[aidx].value to get the A_LAWFUL/A_NEUTRAL/A_CHAOTIC
-     * constant before passing to jp_align_gname_for_display(), which
-     * ultimately calls align_gname() expecting aligntyp semantics.
-     * ROLE_RANDOM (-2) must also be excluded to avoid hitting the
-     * impossible("unknown alignment.") default branch in align_gname(). */
+     * constant.  For topten display, deity must be resolved from each
+     * record's role (rolefc), not from current gu.urole. */
     if (aidx < 0 || aidx >= ROLE_ALIGNS)
         return alignfc;
-    return jp_align_gname_for_display(aligns[aidx].value);
+
+    if (ridx >= 0) {
+        switch (aligns[aidx].value) {
+        case A_LAWFUL:
+            gnam = roles[ridx].lgod;
+            break;
+        case A_NEUTRAL:
+            gnam = roles[ridx].ngod;
+            break;
+        case A_CHAOTIC:
+            gnam = roles[ridx].cgod;
+            break;
+        default:
+            break;
+        }
+    }
+
+    if (gnam && *gnam) {
+        if (*gnam == '_')
+            ++gnam;
+        return jp_gname_for_display(gnam);
+    }
+
+    /* Fallback when role has no fixed pantheon (for example, some Priest
+       configurations) or role code is unavailable: show alignment label. */
+    return jp_align_for_display(aidx);
 }
 
 staticfn void
@@ -1344,7 +1368,8 @@ outentry(int rank, struct toptenentry *t1, boolean so)
         Sprintf(eos(profilebuf), "/%s", tt_race_name_from_filecode(t1->plrace));
     Sprintf(eos(profilebuf), "/%s", tt_gender_name_from_filecode(t1->plgend));
     if (t1->plalign[0] != '?')
-        Sprintf(eos(profilebuf), "/%s", tt_align_name_from_filecode(t1->plalign));
+        Sprintf(eos(profilebuf), "/%s",
+            tt_align_name_from_filecode(t1->plalign, t1->plrole));
     Sprintf(eos(linebuf), " %s ", profilebuf);
 
     jp_translate_killer_text_for_display(deathbuf, sizeof deathbuf, t1->death);
