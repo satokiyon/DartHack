@@ -151,7 +151,7 @@ missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
     if (could_seduce(mtmp, &gy.youmonst, mattk) && !mtmp->mcan)
         pline_mon(mtmp, "%s%s友好的なふりをした.", monst_name, topic);
     else
-        pline_mon(mtmp, "%s%s%s外した!", monst_name, topic,
+        pline_mon(mtmp, "%s%s%s攻撃を外した!", monst_name, topic,
                   (nearmiss && flags.verbose) ? "かろうじて" : "");
 
     stop_occupation();
