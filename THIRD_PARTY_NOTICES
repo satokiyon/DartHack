@@ -1,0 +1,50 @@
+Third-Party Notices
+===================
+
+This repository uses the following third-party components via git submodules.
+Submodule contents are kept as upstream-origin code and are not modified in this repository.
+When redistributing source or binaries, confirm license obligations at the
+exact pinned commit listed below.
+
+1) Lua
+------
+
+- Path: submodules/lua
+- Upstream: https://github.com/lua/lua.git
+- Pinned commit: 6e22fedb74cf0c9b6656e9fce8b7331db847c605
+- License reference in tree: submodules/lua/lua.h (copyright and permission
+   notice block near end of file)
+- Practical note: include the copyright/permission notice text when
+   redistributing substantial portions, per the upstream notice.
+
+2) PDCurses
+-----------
+
+- Path: submodules/pdcurses
+- Upstream: https://github.com/wmcbrine/PDCurses.git
+- Pinned commit: 09cf16db29753305e4241d4ae609aac997fa730d
+- License/distribution reference in tree: submodules/pdcurses/README.md,
+   section "Legal Stuff"
+- Practical note: core package is described as public domain, but some files
+   (notably in demos and x11 areas) have additional copyright/license notices.
+
+3) PDCursesMod
+--------------
+
+- Path: submodules/pdcursesmod
+- Upstream: https://github.com/Bill-Gray/PDCursesMod.git
+- Pinned commit: 5a255460769fd70067ee46989e85570729ceeae8
+- License/distribution reference in tree: submodules/pdcursesmod/README.md,
+   sections "Legal Stuff" and "Distribution Status"
+- Practical note: core is described as public domain, but parts are under
+   other licenses. Some build helper files (for example config.guess/config.sub)
+   are noted as GPL in upstream README.
+
+Release Checklist (Recommended)
+-------------------------------
+
+- Run: git submodule update --init --recursive
+- Keep this notice file in sync with pinned submodule commits.
+- Before each release, verify whether submodule updates changed license terms.
+- If distributing binaries, include required third-party notices in release
+   artifacts and accompanying documentation.
