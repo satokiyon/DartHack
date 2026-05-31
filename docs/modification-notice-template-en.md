@@ -1,3 +1,4 @@
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. -->
 # Modification Notice Template (English)
 
 Use one of the following short notices in each modified file.
@@ -5,6 +6,20 @@ Use one of the following short notices in each modified file.
 ## Generic sentence
 
 Modified by NetHackJP contributor @satokiyon; latest change date: YYYY-MM-DD.
+
+## Recommended Automation Policy (Git pre-commit)
+
+- Update modification notices automatically at commit time.
+- Update staged files only.
+- Exclude paths where appending notices can break file semantics.
+
+### Safe defaults for exclusions
+
+- Exclude files under `dat/` except `dat/**/*.lua`.
+- Exclude binary-oriented outputs (for example `binary/`, `vsbinary/`).
+- Exclude JSON from auto-append in this repository.
+
+This aligns with NetHack License 2(a) handling in this project: keep upstream raw data intact and use separated localized files such as `*_jp`.
 
 ## NetHack License 2(a) Policy Note
 
