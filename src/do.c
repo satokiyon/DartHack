@@ -500,7 +500,7 @@ dosinkring(struct obj *obj)
     obj->in_use = TRUE;  /* block free identification via interrupt */
     switch (obj->otyp) { /* effects that can be noticed without eyes */
     case RIN_SEARCHING:
-        You("シンクに失くしたと思った%sがそこにあった!", yname(obj));
+        You("シンクに失くしたと思った%sがそこにあった!", xname(obj));
         goto giveback;
     case RIN_SLOW_DIGESTION:
         pline_The("指輪は噴き出してきた!");
@@ -2192,7 +2192,7 @@ revive_corpse(struct obj *corpse)
             if (!container) {
                 impossible("reviving corpse from non-existent container");
             } else if (mcarry && canseemon(mcarry)) {
-                pline("%sが%sから這い出した!", mnam, yname(container));
+                pline("%sが%sから這い出した!", mnam, xname(container));
             } else if (container_where == OBJ_INVENT) {
                 Strcpy(sackname, xname(container));
                 pline("%sがバッグの中の%sから這い出した!", mnam, sackname);

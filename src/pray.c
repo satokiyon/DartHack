@@ -1182,7 +1182,7 @@ pleased(aligntyp g_align)
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
                     } else
                         You_feel("%sの力が%sに宿るのを感じた.", u_gname(),
-                                 yname(uwep));
+                                 xname(uwep));
                     uncurse(uwep);
                     uwep->bknown = 1; /* ok to bypass set_bknown() */
                     *repair_buf = '\0';
@@ -1194,7 +1194,7 @@ pleased(aligntyp g_align)
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
                     } else
                         You_feel("%sの祝福が%sに宿るのを感じた.", u_gname(),
-                                 yname(uwep));
+                                 xname(uwep));
                     bless(uwep);
                     uwep->bknown = 1; /* ok to bypass set_bknown() */
                     *repair_buf = '\0';

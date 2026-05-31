@@ -775,7 +775,7 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
     case FOOD_CLASS:
     case SCROLL_CLASS:
     case SPBOOK_CLASS:
-          pline("%sは%sになってしまう.", Yname2(de->otmp),
+            pline("%sは%sになってしまう.", xname(de->otmp),
               de->frosted ? "霜だらけ" : "汚れすぎ");
         de->ptext = FALSE;
         break;
@@ -825,7 +825,7 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
                to DUST; feedback for that is only given for bladed weapons */
             if (welded(de->otmp))
                 pline("%sでは%sを引っかくだけだった.",
-                      Yname2(de->otmp), surface(u.ux, u.uy));
+                      xname(de->otmp), surface(u.ux, u.uy));
             else if ((int) de->otmp->spe <= -3)
                 pline("%sは鈍すぎて刻めなかった.",
                       Yobjnam2(de->otmp, "are"));
@@ -860,16 +860,16 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
                     if (!Blind)
                         You("ここの文字を拭い去った.");
                     else
-                        pline("%sは%s.", Yname2(de->otmp),
+                        pline("%sは%s.", xname(de->otmp),
                               de->frosted ? "霜まみれになった"
                                           : "埃まみれになった");
                     de->dengr = TRUE;
                 } else {
                     pline("%sではこの刻印を拭い去れなかった.",
-                          Yname2(de->otmp));
+                          xname(de->otmp));
                 }
             } else {
-                pline("%sは%s.", Yname2(de->otmp),
+                pline("%sは%s.", xname(de->otmp),
                       de->frosted ? "霜まみれになった"
                                   : "埃まみれになった");
             }
@@ -1008,7 +1008,7 @@ doengrave(void)
         Strcat(strcpy(de->fbuf, "あなたの"), jp_body_part(FINGERTIP));
         de->writer = de->fbuf;
     } else {
-        de->writer = yname(de->otmp);
+        de->writer = xname(de->otmp);
     }
 
     /* There's no reason you should be able to write with a wand
@@ -1367,7 +1367,7 @@ engrave(void)
            not welded to the hero's hand(s) */
         if (stylus->quan > 1L) {
             if (firsttime)
-                pline("%sのうち1つが鈍くなった.", yname(stylus));
+                pline("%sのうち1つが鈍くなった.", xname(stylus));
             stylus = svc.context.engraving.stylus = splitobj(stylus, 1L);
             /* if stack is wielded or quivered, the split-off one isn't */
             stylus->owornmask = 0L;
@@ -1375,7 +1375,7 @@ engrave(void)
         } else {
             /* normal case: stylus->quan==1 */
             if (firsttime)
-                pline("%sが鈍くなった.", Yname2(stylus));
+                pline("%sが鈍くなった.", xname(stylus));
         }
         /* Dull the weapon at a rate of -1 enchantment per 2 characters,
          * rounding down.

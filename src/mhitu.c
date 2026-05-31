@@ -2090,7 +2090,7 @@ doseduce(struct monst *mon)
                     continue;
             } else
                 pline("%sは%sを気に入り、奪っていった.",
-                      Who, yname(ring));
+                      Who, xname(ring));
             makeknown(RIN_ADORNMENT);
             /* might be in left or right ring slot or weapon/alt-wep/quiver */
             if (ring->owornmask)
@@ -2121,7 +2121,7 @@ doseduce(struct monst *mon)
                     continue;
             } else {
                 pline("%sは%sをあなたに付ければもっと映えると思った.",
-                      Who, yname(ring));
+                      Who, xname(ring));
                 pline("あなたの指にはめた.");
             }
             makeknown(RIN_ADORNMENT);
@@ -2139,7 +2139,7 @@ doseduce(struct monst *mon)
                    but trying to figure that out in advance in order to use
                    alternate wording is not worth the effort */
                     pline("%sは%sを外して%sに替えた.",
-                      Who, yname(uright), yname(ring));
+                                            Who, xname(uright), xname(ring));
                 Ring_gone(uright);
                 /* ring removal might cause loss of levitation which could
                    drop hero onto trap that transports hero somewhere else */
@@ -2149,7 +2149,7 @@ doseduce(struct monst *mon)
             } else if (uleft && uleft->otyp != RIN_ADORNMENT) {
                 /* see "replaces" note above */
                     pline("%sは%sを外して%sに替えた.",
-                      Who, yname(uleft), yname(ring));
+                                            Who, xname(uleft), xname(ring));
                 Ring_gone(uleft);
                 if (u.utotype || !m_next2u(mon))
                     return 1;
@@ -2201,7 +2201,7 @@ doseduce(struct monst *mon)
                 if (yourgloves)
                     observe_object(yourgloves);
                 verbalize("では、あなたは%s%sをくれないと…",
-                          yourgloves ? yname(yourgloves)
+                          yourgloves ? xname(yourgloves)
                                      : "12足の手袋",
                           yourgloves ? "とさらに11足の手袋" : "");
             }

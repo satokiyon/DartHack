@@ -813,7 +813,7 @@ peffect_invisibility(struct obj *otmp)
 
     /* spell cannot penetrate mummy wrapping */
     if (is_spell && BInvis && uarmc->otyp == MUMMY_WRAPPING) {
-        You_feel("%sの下がむずむずした.", yname(uarmc));
+        You_feel("%sの下がむずむずした.", xname(uarmc));
         return;
     }
     if (Invis || Blind || BInvis) {
@@ -2660,11 +2660,11 @@ potion_dip(struct obj *obj, struct obj *potion)
                    || is_ammo(obj) || (!obj->oeroded && !obj->oeroded2)) {
             /* uses up potion, doesn't set obj->greased */
             if (!Blind)
-                pline("%sが油でてらてら光った.", Yname2(obj));
+                pline("%sが油でてらてら光った.", xname(obj));
             else /*if (!uarmg)*/
-                pline("%sが油っぽく感じられた.", Yname2(obj));
+                pline("%sが油っぽく感じられた.", xname(obj));
         } else {
-            pline("%sが以前より%sなった.", Yname2(obj),
+            pline("%sが以前より%sなった.", xname(obj),
                   (obj->oeroded && obj->oeroded2)
                       ? "錆や腐食が減って"
                       : obj->oeroded ? "錆びが減って" : "腐食が減って");
@@ -2698,10 +2698,10 @@ potion_dip(struct obj *obj, struct obj *potion)
             obj->age = 0;
         }
         if (obj->age > 1000L) {
-            pline("%sはもう満タンだった.", Yname2(obj));
+            pline("%sはもう満タンだった.", xname(obj));
             potion->in_use = FALSE; /* didn't go poof */
         } else {
-            You("%sに油を注いだ.", yname(obj));
+            You("%sに油を注いだ.", xname(obj));
             check_unpaid(potion);        /* Yendorian Fuel Tax */
             /* burns more efficiently in a lamp than in a bottle;
                diluted potion provides less benefit but we don't attempt

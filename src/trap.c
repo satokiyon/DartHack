@@ -398,7 +398,7 @@ grease_protect(
         else if (vismon)
             pline("%sの%sは%s", l_monnam(victim), ostr, txt);
     } else if (victim == &gy.youmonst || vismon) {
-        pline("%sは%s", Yname2(otmp), txt);
+        pline("%sは%s", xname(otmp), txt);
     }
     if (!rn2(2)) {
         otmp->greased = 0;
@@ -1380,7 +1380,7 @@ trapeffect_rocktrap(
                     pline("幸い、硬い兜をかぶっていた.");
                     dmg = 2;
                 } else if (flags.verbose) {
-                    pline("%sはあなたを守ってくれなかった.", Yname2(uarmh));
+                    pline("%sはあなたを守ってくれなかった.", xname(uarmh));
                 }
             } else if (passes_rocks(gy.youmonst.data)) {
                 pline("それはあなたをすり抜け、害はない.");
@@ -1536,7 +1536,7 @@ trapeffect_bear_trap(
             if (u.umonnum == PM_OWLBEAR || u.umonnum == PM_BUGBEAR)
                 You("怒ってうなった!");
             if (wearing_iron_shoes(mtmp))
-                pline("%sはあなたの脚を守ってくれた.", Yname2(uarmf));
+                pline("%sはあなたの脚を守ってくれた.", xname(uarmf));
             else {
                 set_wounded_legs(rn2(2) ? RIGHT_SIDE : LEFT_SIDE, rn1(10, 10));
                 losehp(Maybe_Half_Phys(dmg), "熊罠", KILLED_BY_AN);
@@ -1920,7 +1920,7 @@ trapeffect_pit(
             pline("なんて悲惨なんだ.");
         }
         if (relevant_spikes && wearing_iron_shoes(mtmp)) {
-            pline("%sは鋭い鉄の棘からあなたを守ってくれた.", Yname2(uarmf));
+            pline("%sは鋭い鉄の棘からあなたを守ってくれた.", xname(uarmf));
             relevant_spikes = FALSE;
         } else if (relevant_spikes) {
             const char *predicament = "鋭い鉄の棘の上に";
@@ -2356,7 +2356,7 @@ trapeffect_anti_magic(
             /* no message if a monster does this, it isn't visible enough */
             if (mtmp == &gy.youmonst) {
                 seetrap(trap);
-                pline("鈍重なオーラが%sを包んだ.", yname(shoes));
+                pline("鈍重なオーラが%sを包んだ.", xname(shoes));
                 costly_alteration(shoes, COST_DECHNT);
             }
             shoes->spe -= 1;
@@ -2499,7 +2499,7 @@ trapeffect_poly_trap(
         You("%sポリモーフ罠を作動させた!", verbbuf);
         if (wearing_iron_shoes(mtmp)) {
             deltrap(trap);
-            pline("%sが奇妙に歪んだ.", Yname2(uarmf));
+            pline("%sが奇妙に歪んだ.", xname(uarmf));
             poly_obj(
                 uarmf, uarmf->otyp == IRON_SHOES ? KICKING_BOOTS : IRON_SHOES);
             update_inventory();
@@ -4520,7 +4520,7 @@ fire_damage(
         }
         /* Container is burnt up - dump contents out */
         if (in_sight)
-            pline("%sが燃え上がって焼けた.", Yname2(obj));
+            pline("%sが燃え上がって焼けた.", xname(obj));
         if (Has_contents(obj)) {
             if (in_sight)
                 pline("中身がこぼれ落ちた.");
@@ -4551,7 +4551,7 @@ fire_damage(
         }
         dindx = (obj->oclass == SCROLL_CLASS) ? 3 : 4;
         if (in_sight)
-            pline("%s %s.", Yname2(obj),
+            pline("%s %s.", xname(obj),
                   destroy_strings[dindx][(obj->quan > 1L)]);
         setnotworn(obj);
         delobj(obj);
@@ -4559,7 +4559,7 @@ fire_damage(
     } else if (obj->oclass == POTION_CLASS) {
         dindx = (obj->otyp != POT_OIL) ? 1 : 2;
         if (in_sight)
-            pline("%s %s.", Yname2(obj),
+            pline("%s %s.", xname(obj),
                   destroy_strings[dindx][(obj->quan > 1L)]);
         setnotworn(obj);
         delobj(obj);
@@ -4765,7 +4765,7 @@ water_damage(
         if (!rn2(2)) {
             obj->greased = 0;
             if (in_invent) {
-                pline_The("%sの油は洗い流された.", yname(obj));
+                pline_The("%sの油は洗い流された.", xname(obj));
                 described = TRUE; /* used to modify potion feedback */
                 update_inventory();
             }
@@ -6894,7 +6894,7 @@ lava_effects(void)
     if (uarmf && (uarmf->in_use
                   || (is_organic(uarmf) && !uarmf->oerodeproof))) {
         obj = uarmf;
-        pline("%sが燃え上がった!", Yname2(obj));
+        pline("%sが燃え上がった!", xname(obj));
         ++burnmesgcount;
         iflags.in_lava_effects++; /* (see above) */
         (void) Boots_off();
@@ -6937,7 +6937,7 @@ lava_effects(void)
             } else if (obj->in_use) {
                 if (obj->owornmask) {
                     if (usurvive) {
-                        pline("%sが燃え上がった!", Yname2(obj));
+                        pline("%sが燃え上がった!", xname(obj));
                         ++burnmesgcount;
                     }
                     remove_worn_item(obj, TRUE);

@@ -368,7 +368,7 @@ Cloak_on(void)
         }
         break;
     case OILSKIN_CLOAK:
-        pline("%sが体にきつく張り付いた.", Yname2(uarmc));
+        pline("%sが体にきつく張り付いた.", xname(uarmc));
         break;
     /* Alchemy smock gives poison _and_ acid resistance */
     case ALCHEMY_SMOCK:
@@ -480,9 +480,9 @@ Helmet_on(void)
     case DUNCE_CAP:
         if (uarmh && !uarmh->cursed) {
             if (Blind)
-                pline("%sがしばらく震えた.", Yname2(uarmh));
+                pline("%sがしばらく震えた.", xname(uarmh));
             else
-                pline("%sがしばらく%s色に輝いた.", Yname2(uarmh),
+                pline("%sがしばらく%s色に輝いた.", xname(uarmh),
                       hcolor(NH_BLACK));
             curse(uarmh);
             /* curse() doesn't touch bknown so doesn't update persistent
@@ -907,7 +907,7 @@ Armor_on(void)
         begin_burn(uarm, FALSE);
         if (!Blind)
             pline("%sが%sように輝き始めた!",
-                Yname2(uarm), arti_light_description(uarm));
+                xname(uarm), arti_light_description(uarm));
     }
     return 0;
 }
@@ -929,7 +929,7 @@ Armor_off(void)
     if (was_arti_light && !artifact_light(otmp)) {
         end_burn(otmp, FALSE);
         if (!Blind)
-            pline("%sは輝きを失った.", Yname2(otmp));
+            pline("%sは輝きを失った.", xname(otmp));
     }
     dragon_armor_handling(otmp, FALSE, TRUE);
 
@@ -959,7 +959,7 @@ Armor_gone(void)
     if (was_arti_light && !artifact_light(otmp)) {
         end_burn(otmp, FALSE);
         if (!Blind)
-            pline("%sは輝きを失った.", Yname2(otmp));
+            pline("%sは輝きを失った.", xname(otmp));
     }
     dragon_armor_handling(otmp, FALSE, FALSE);
 
@@ -3364,8 +3364,8 @@ inaccessible_equipment(
     /* check for suit covered by cloak */
     if (obj == uarm && uarmc && BLOCKSACCESS(uarmc)) {
         if (verb) {
-            Strcpy(buf, yname(uarmc));
-            You(need_to_take_off_outer_armor, buf, yname(obj), verb);
+            Strcpy(buf, xname(uarmc));
+            You(need_to_take_off_outer_armor, buf, xname(obj), verb);
         }
         return TRUE;
     }
@@ -3373,30 +3373,22 @@ inaccessible_equipment(
     if (obj == uarmu
         && ((uarm && BLOCKSACCESS(uarm)) || (uarmc && BLOCKSACCESS(uarmc)))) {
         if (verb) {
-            char cloaktmp[QBUFSZ], suittmp[QBUFSZ];
-            /* if sameprefix, use yname and xname to get "your cloak and suit"
-               or "Manlobbi's cloak and suit"; otherwise, use yname and yname
-               to get "your cloak and Manlobbi's suit" or vice versa */
-            boolean sameprefix = (uarm && uarmc
-                                  && !strcmp(shk_your(cloaktmp, uarmc),
-                                             shk_your(suittmp, uarm)));
-
             *buf = '\0';
             if (uarmc)
-                Strcat(buf, yname(uarmc));
+                Strcat(buf, xname(uarmc));
             if (uarm && uarmc)
                 Strcat(buf, " and ");
             if (uarm)
-                Strcat(buf, sameprefix ? xname(uarm) : yname(uarm));
-            You(need_to_take_off_outer_armor, buf, yname(obj), verb);
+                Strcat(buf, xname(uarm));
+            You(need_to_take_off_outer_armor, buf, xname(obj), verb);
         }
         return TRUE;
     }
     /* check for ring covered by gloves */
     if ((obj == uleft || obj == uright) && uarmg && BLOCKSACCESS(uarmg)) {
         if (verb) {
-            Strcpy(buf, yname(uarmg));
-            You(need_to_take_off_outer_armor, buf, yname(obj), verb);
+            Strcpy(buf, xname(uarmg));
+            You(need_to_take_off_outer_armor, buf, xname(obj), verb);
         }
         return TRUE;
     }

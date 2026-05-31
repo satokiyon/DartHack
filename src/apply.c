@@ -481,7 +481,7 @@ use_whistle(struct obj *obj)
     if (!can_blow(&gy.youmonst)) {
         You("笛は使えなかった.");
     } else if (Underwater) {
-        You("%sを通して泡を吹いた.", yname(obj));
+        You("%sを通して泡を吹いた.", xname(obj));
     } else {
         if (Deaf)
             You_feel("勢いよく抜けた空気が%sをくすぐった.", jp_body_part(NOSE));
@@ -1491,7 +1491,7 @@ snuff_lit(struct obj *obj)
             || obj->otyp == BRASS_LANTERN || obj->otyp == POT_OIL) {
             (void) get_obj_location(obj, &x, &y, 0);
             if (obj->where == OBJ_MINVENT ? cansee(x, y) : !Blind)
-                pline("%sの火は消えた!", Yname2(obj));
+                pline("%sの火は消えた!", xname(obj));
             end_burn(obj, TRUE);
             return TRUE;
         }
@@ -1541,7 +1541,7 @@ splash_lit(struct obj *obj)
         }
 
         if (useeit || uhearit)
-            pline("%sは%s%s.", Yname2(obj),
+            pline("%sは%s%s.", xname(obj),
                 uhearit ? "パチパチと音を立て" : "",
                 useeit ? "揺らめいた" : "");
         if (!dunk && !snuff)
@@ -1585,7 +1585,7 @@ catch_lit(struct obj *obj)
         if (obj->where == OBJ_INVENT || cansee(x, y)) {
             if (obj->where == OBJ_FLOOR && cansee(x, y))
                 set_msg_xy(x, y);
-            pline("%sは%s.", Yname2(obj),
+            pline("%sは%s.", xname(obj),
                 Blind ? "温かく感じられた" : "火が付いた!");
         }
         if (obj->otyp == POT_OIL)
@@ -1598,7 +1598,7 @@ catch_lit(struct obj *obj)
             check_unpaid(obj);
             SetVoice(shkp, 0, 80, 0);
             verbalize("もちろん、それとは別に%sの代金も払ってもらう.",
-                      yname(obj));
+                      xname(obj));
             bill_dummy_object(obj);
         }
         begin_burn(obj, FALSE);
@@ -1624,9 +1624,9 @@ use_lamp(struct obj *obj)
 
     if (obj->lamplit) {
         if (lamp) /* lamp or lantern */
-            You("%sの火を消した.", yname(obj));
+            You("%sの火を消した.", xname(obj));
         else
-            You("%sの火を消した.", yname(obj));
+            You("%sの火を消した.", xname(obj));
         end_burn(obj, TRUE);
         return;
     }
@@ -1662,9 +1662,9 @@ use_lamp(struct obj *obj)
     } else {
         if (lamp) { /* lamp or lantern */
             check_unpaid(obj);
-            You("%sに火をつけた.", yname(obj));
+            You("%sに火をつけた.", xname(obj));
         } else { /* candle(s) */
-            pline("%sの火は%s", s_suffix(Yname2(obj)),
+            pline("%sの火は%s", xname(obj),
                   Blind ? "燃えていた." : "明るく燃え上がった!");
             if (obj->unpaid && costly_spot(u.ux, u.uy)
                 && obj->age == 20L * (long) objects[obj->otyp].oc_cost) {
@@ -2438,7 +2438,7 @@ fig_transform(anything *arg, long timeout)
             if (cansee_spot && !silent) {
                 set_msg_xy(cc.x, cc.y);
                 if (suppress_see)
-                    pline("%sは突然消えた!", yname(figurine));
+                    pline("%sは突然消えた!", xname(figurine));
                 else
                     You_see("フィギュリンが%s%sへ変身した!", monnambuf,
                             and_vanish);
@@ -2584,7 +2584,7 @@ use_grease(struct obj *obj)
     struct obj *otmp;
 
     if (Glib) {
-        pline("%sから%sが滑り落ちた.", fingers_or_gloves(FALSE), yname(obj));
+        pline("%sから%sが滑り落ちた.", fingers_or_gloves(FALSE), xname(obj));
         dropx(obj);
         return ECMD_TIME;
     }
@@ -2595,7 +2595,7 @@ use_grease(struct obj *obj)
         if ((obj->cursed || Fumbling) && !rn2(2)) {
             consume_obj_charge(obj, TRUE);
 
-            pline("%sから%sが滑り落ちた.", fingers_or_gloves(FALSE), yname(obj));
+            pline("%sから%sが滑り落ちた.", fingers_or_gloves(FALSE), xname(obj));
             dropx(obj);
             return ECMD_TIME;
         }
@@ -2608,7 +2608,7 @@ use_grease(struct obj *obj)
 
         oldglib = (int) (Glib & TIMEOUT);
         if (otmp != &hands_obj) {
-            You("%sを厚い油脂で覆った.", yname(otmp));
+            You("%sを厚い油脂で覆った.", xname(otmp));
             otmp->greased = 1;
             if (obj->cursed && !nohands(gy.youmonst.data)) {
                 make_glib(oldglib + rn1(6, 10)); /* + 10..15 */
@@ -3142,7 +3142,7 @@ use_whip(struct obj *obj)
             } else
                 mon_hand = 0; /* lint suppression */
 
-            You("%sにむちを巻きつけた.", yname(otmp));
+            You("%sにむちを巻きつけた.", xname(otmp));
             if (gotit && mwelded(otmp)) {
                 pline("それは%s %sに溶接されていた%c",
                     mhis(mtmp),
@@ -3158,7 +3158,7 @@ use_whip(struct obj *obj)
                 switch (rn2(proficient + 1)) {
                 case 2:
                     /* to floor near you */
-                    You("%sを%sへ引き寄せた!", yname(otmp),
+                    You("%sを%sへ引き寄せた!", xname(otmp),
                         surface(u.ux, u.uy));
                     place_object(otmp, u.ux, u.uy);
                     stackobj(otmp);
@@ -3185,7 +3185,7 @@ use_whip(struct obj *obj)
                     }
 #endif /* 0 */
                     /* right into your inventory */
-                    You("%sをひったくった!", yname(otmp));
+                    You("%sをひったくった!", xname(otmp));
                     if (otmp->otyp == CORPSE
                         && touch_petrifies(&mons[otmp->corpsenm]) && !uarmg
                         && !Stone_resistance
@@ -3618,7 +3618,7 @@ use_royal_jelly(struct obj **optr)
         return ECMD_CANCEL;
     }
 
-    You("%sにロイヤルゼリーを塗りたくった.", yname(eobj));
+    You("%sにロイヤルゼリーを塗りたくった.", xname(eobj));
     if (eobj->otyp != EGG) {
         pline1(nothing_happens);
         goto useup_jelly;
@@ -3901,13 +3901,13 @@ do_break_wand(struct obj *obj)
                           || objdescr_is(obj, "glass"));
 
     if (nohands(gy.youmonst.data)) {
-        You_cant("手がないので%sを折れなかった!", yname(obj));
+        You_cant("手がないので%sを折れなかった!", xname(obj));
         return ECMD_OK;
     } else if (!freehand()) {
         Your("%sはふさがっている!", jp_body_part_plural(HAND));
         return ECMD_OK;
     } else if (ACURR(A_STR) < (is_fragile ? 5 : 10)) {
-        You("%sを折る力が足りない!", yname(obj));
+        You("%sを折る力が足りない!", xname(obj));
         return ECMD_OK;
     }
     if (!paranoid_query(ParanoidBreakwand,
@@ -3915,7 +3915,7 @@ do_break_wand(struct obj *obj)
                                   "Are you really sure you want to break ",
                                   "?", obj, yname, ysimple_name, "the wand")))
         return ECMD_OK;
-    pline("%sを%sの上に高く掲げ、真っ二つに%s!", yname(obj),
+    pline("%sを%sの上に高く掲げ、真っ二つに%s!", xname(obj),
           jp_body_part(HEAD), is_fragile ? "snap" : "break");
 
     /* [ALI] Do this first so that wand is removed from bill. Otherwise,
@@ -4509,7 +4509,7 @@ flip_coin(struct obj *obj)
     struct obj *otmp = obj;
     boolean lose_coin = FALSE;
 
-    You("%sを弾き上げた.", yname(otmp));
+    You("%sを弾き上げた.", xname(otmp));
     if (Underwater) {
         pline("それは回転しながら流れていった.");
         lose_coin = TRUE;

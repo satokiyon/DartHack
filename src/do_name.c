@@ -296,7 +296,7 @@ do_oname(struct obj *obj)
 
     /* Do this now because there's no point in even asking for a name */
     if (obj->otyp == SPE_NOVEL) {
-        pline("%sにはすでに正式な名前が付いている.", Ysimple_name2(obj));
+        pline("%sにはすでに正式な名前が付いている.", xname(obj));
         return;
     }
 

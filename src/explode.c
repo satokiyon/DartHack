@@ -879,7 +879,7 @@ scatter(
             && rn2(10)) {
             if (otmp->otyp == BOULDER) {
                 if (cansee(sx, sy)) {
-                    pline("%sは砕け散った.", Yname2(otmp));
+                    pline("%sは砕け散った.", xname(otmp));
                 } else {
                     Soundeffect(se_stone_breaking, 100);
                     You_hear("石が砕ける音が聞こえた.");
@@ -897,7 +897,7 @@ scatter(
                 if ((trap = t_at(sx, sy)) && trap->ttyp == STATUE_TRAP)
                     deltrap(trap);
                 if (cansee(sx, sy)) {
-                    pline("%sは崩れ落ちた.", Yname2(otmp));
+                    pline("%sは崩れ落ちた.", xname(otmp));
                 } else {
                     Soundeffect(se_stone_crumbling, 100);
                     You_hear("石が崩れる音が聞こえた.");
