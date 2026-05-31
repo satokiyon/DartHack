@@ -1,7 +1,7 @@
 <!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. -->
 # NetHack 5.0 を勝手に日本語に翻訳する非公式プロジェクト
 
-このリポジトリは、ダンジョン探索ゲーム **NetHack 5.0** を日本語で遊べるようにすることを目的とした**非公式**プロジェクトです。
+NetHackJPは、ダンジョン探索ゲーム **NetHack 5.0** を日本語で遊べるようにすることを目的とした**非公式**プロジェクトです。
 
 ## プロジェクトの目標
 
