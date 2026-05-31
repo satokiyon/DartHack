@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
 /* NetHack 5.0 monflag.h $NHDT-Date: 1596498549 2020/08/03 23:49:09 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) 1989 Mike Threepoint */
 /* NetHack may be freely redistributed. See license for details. */
@@ -217,3 +218,4 @@ enum mgender { MALE, FEMALE, NEUTRAL,
 /* *INDENT-ON* */
 /* clang-format on */
 #endif /* MONFLAG_H */
+

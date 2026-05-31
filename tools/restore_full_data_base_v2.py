@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-21.
 import sys
 
 file_path = 'dat/data.base'
@@ -40,3 +41,4 @@ if found:
     print("Restore complete.")
 else:
     print("Error: grave not found in data.base.")
+

@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-13.
 
                          脅威の迷宮へのガイド
                             (NetHack ガイドブック)
@@ -813,5 +814,6 @@
      :    足元に「何があるか見る（Look）」。
 
      ;    見えている記号が何の種類に対応しているかを表示します。
+
 
 

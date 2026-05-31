@@ -1,4 +1,5 @@
-﻿                         脅威の迷宮へのガイド
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-15.
+                         脅威の迷宮へのガイド
                         (NetHackガイドブック)
 
 
@@ -6243,3 +6244,4 @@
 
           ブランド名および製品名は、それぞれの所有者の商標または
      登録商標です。
+

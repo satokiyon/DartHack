@@ -1,3 +1,4 @@
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-29. -->
 # NetHackJP 翻訳作業 指示ファイル
 
 この文書は、NetHackJP の日本語化作業における翻訳方針、スタイル、および実務上の知見をまとめたものです。ビルド手順やプロジェクト管理などの技術的な運用については `.github/copilot-instructions.md` を参照してください。
@@ -200,4 +201,5 @@
 4. 次に省略: alignment, carrying-capacity, score
 5. 最後に能力値6項目（筋力/器用/体力/知力/賢明/魅力）のラベルを省略
 6. それでも収まらない場合のみ、encumbrance短縮・Dlvl短縮・最終切り詰めを実施
+
 

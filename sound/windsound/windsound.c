@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
 /* NetHack 5.0	windsound.c	$NHDT-Date: $  $NHDT-Branch: $NHDT-Revision: $ */
 /* Copyright (c) Michael Allison, 2022                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -335,3 +336,4 @@ maybe_preinsert_directory(int32_t findsound_approach, char *exedir, char *buf, s
     }
 }
 #endif /* SND_LIB_WINDSOUND */
+

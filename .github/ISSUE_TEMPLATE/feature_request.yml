@@ -1,3 +1,4 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31.
 name: Feature request
 description: Suggest an improvement
 labels: [enhancement]
@@ -31,3 +32,4 @@ body:
     id: additional
     attributes:
       label: Additional context
+

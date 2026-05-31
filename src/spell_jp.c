@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-22. */
 /* NetHack 5.0	spell_jp.c */
 /* Display-only Japanese labels for spells.
  * Keep internal spell IDs and English object keys unchanged.
@@ -63,3 +64,4 @@ jp_spellname_for_display(int spell_otyp)
 
     return "";
 }
+

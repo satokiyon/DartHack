@@ -1,35 +1,43 @@
-動的オプション設定の仕組み:
+ How dynamically setting options works:
 
-シンプルなオプションメニューは、比較的少数のオプションだけを表示し、
-各項目を選ぶたびにその場で反映して、引き続き変更できる状態で
-メニューを再表示します。
+ The simple options menu shows a relatively small subset of options
+ and operates on each choice you make immediately, then is put back
+ up to allow further changes.
 
-フルオプションメニューは、すべてのオプションの現在値を表示し、
-変更したい項目を選べます。ただし選択時点ではまだ反映されません。
-実際の反映はメニューを閉じたときに行われます。多くのインターフェースでは
-<enter> または <return> で閉じますが、[ok] のクリックが必要な場合も
-あります。<escape> または [cancel] で閉じると、保留中の変更は破棄されます。
+ The full options menu shows the current value for all options and
+ lets you pick ones that you'd like to change.  Picking them doesn't
+ make any changes though.  That will take place once you close the
+ menu.  For most of NetHack's interfaces, closing the menu is done
+ by pressing the <enter> key or <return> key; others might require
+ clicking on [ok].  Pressing the <escape> key or clicking on [cancel]
+ will close the menu and discard any pending changes.
 
-オプションメニューは1画面に収まらない長さです。ページ分割型の
-インターフェースでは '>' で次ページ、'<' で前ページへ移動します。
-多くの場合、各ページで選択文字（a-z）が再利用されます。
-一方、長い1ページをスクロールバーで操作する方式もあり、その場合は
-a-z や A-Z を超える項目には選択文字が付かず、クリックで選択します。
+ The options menu is too long to fit on one screen.  Some interfaces
+ paginate menus; use the '>' key to advance a page or '<' to back
+ up.  They typically re-use selection letters (a-z) on each page.
+ Others use one long page and you need to use a scrollbar; once past
+ a-z and A-Z they'll have entries without selection letters.  Those
+ can be selected by clicking on them.
 
-真偽値オプション（True/False または On/Off）は、項目を選ぶだけで
-切り替えできます。複合オプション（数値、定義済み値の選択、
-またはより複雑な値を取るもの。真偽値セクションの後に別セクションで
-表示）については、新しい値の入力を求められます。
+ For toggling boolean (True/False or On/Off) options, selecting them
+ is all that is needed.  For compound options (which take a number,
+ a choice of several particular values, or something more complex,
+ and are listed in a second section after the boolean ones), you will
+ be prompted to supply a new value.
 
-2つのセクションそれぞれの先頭には、ゲーム開始前にしか設定できない
-「選択不可オプション」の値が表示されます。複合オプションの後には、
-複数値を扱うため比較的複雑な「その他オプション」が並びます。
+ At the start of each of the two sections are the values of some
+ unselectable options which can only be set before the game starts.
+ After the compound section are some "other" options which take a set
+ of multiple values and tend to be more complicated to deal with.
 
-一部の変更は、現在のゲームを保存（または終了）するまでしか有効で
-ありません。通常は、別PCで復元した場合に不適切になり得る設定です。
-それ以外のオプションはセーブファイルに保存され、復元後も保持されます。
-オプションメニューで設定した内容は、既存セーブや新規ゲームなど
-他のゲームには影響しません。全体に適用したい場合は実行時設定ファイルを
-更新し、そこへ希望設定を記述してください。ただし既存セーブに保存済みの
-オプション値がある場合、復元時はそちらが優先されます。
+ Some changes will only last until you save (or quit) the current
+ game.  Usually those are for things that might not be appropriate
+ if you were to restore the saved game on another computer with
+ different capabilities.  Other options will be included in this
+ game's save file and retain their settings after restore.  None set
+ in the options menu will affect other games, either already saved or
+ new ones.  For that, you need to update your run-time configuration
+ file and specify the desired options settings there.  Even then,
+ restoring existing games that contain saved option values will use
+ those saved ones.
 

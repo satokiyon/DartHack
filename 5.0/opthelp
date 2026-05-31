@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-20.
 特定のコンパイルフラグに依存しない真偽値オプション（既定値は [] 内）:
 （あなたのバージョンで利用可能なオプションは、'O' コマンドで開ける
 現在のオプション設定画面で確認できます。）
@@ -357,3 +358,4 @@ windowtype 使用するウィンドウシステム                 [OS とコン
 オプションリスト例:
 !autopickup,!tombstone,name:Gandalf,scores:own/3 top/2 around
 female,nonews,dogname:Rover,rest_on_space,!verbose,menustyle:traditional
+

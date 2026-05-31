@@ -1,3 +1,4 @@
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-19.
 
 local tut_ctrl_key = nil;
 local tut_alt_key = nil;
@@ -344,4 +345,5 @@ des.object({ coord = { 72,2 }, id = "potion of object detection", buc = "blessed
 -- des.trap({ type = "magic portal", coord = { 9,5 }, seen = true });
 -- des.trap({ type = "magic portal", coord = { 9,1 }, seen = true });
 -- des.object({ id = "leather armor", spe = 0, coord = { 9,2} });
+
 

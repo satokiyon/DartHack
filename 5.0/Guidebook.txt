@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-28.
 
 
 
@@ -7849,6 +7850,7 @@
 
 
      NetHack 5.0.0                                             May 25, 2026
+
 
 
 

@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-20. */
 #include "config.h"
 #include "permonst.h"
 
@@ -431,3 +432,4 @@ jp_pmname_from_idx(int pmidx, int mgender)
         return jp_pmname(&mons[pmidx], mgender);
     return "";
 }
+

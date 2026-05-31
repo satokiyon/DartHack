@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
 /* NetHack 5.0	mhrip.c	$NHDT-Date: 1596498358 2020/08/03 23:45:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -306,3 +307,4 @@ mswin_finish_rip_text(winid wid)
     SendMessage(mswin_hwnd_from_winid(wid), WM_MSNH_COMMAND, MSNH_MSG_DIED,
                 0);
 }
+

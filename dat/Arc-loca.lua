@@ -1,3 +1,4 @@
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-15.
 -- NetHack Archeologist Arc-loca.lua	$NHDT-Date: 1652195999 2022/05/10 15:19:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991 by M. Stephenson
@@ -143,3 +144,4 @@ des.monster("human mummy")
 des.monster("human mummy")
 des.monster("human mummy")
 des.monster("M")
+

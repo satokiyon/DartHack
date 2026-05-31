@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-21.
 diff -aurN -xDEVEL -x.git -x.circleci -x.travis.yml -xlgtm.yml -x.github -x.gitattributes -x.gitignore NetHack-3.6.7/ChangeLog.j jnethack/source/ChangeLog.j
 --- NetHack-3.6.7/ChangeLog.j	1970-01-01 09:00:00.000000000 +0900
 +++ jnethack/source/ChangeLog.j	2023-02-23 16:01:58.487969000 +0900
@@ -98919,3 +98920,4 @@ diff -aurN -xDEVEL -x.git -x.circleci -x.travis.yml -xlgtm.yml -x.github -x.gita
  #define NHFONT_SIZE_MIN 3
  #define NHFONT_SIZE_MAX 20
  
+

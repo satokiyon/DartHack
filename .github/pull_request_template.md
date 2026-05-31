@@ -1,3 +1,4 @@
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. -->
 ## Summary
 
 - What changed?
@@ -27,3 +28,4 @@ Commands run (if any):
 - [ ] Security-sensitive changes reviewed
 - [ ] License/notice impact checked
 - [ ] Related issue linked
+

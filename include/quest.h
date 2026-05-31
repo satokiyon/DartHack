@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
 /* NetHack 5.0	quest.h	$NHDT-Date: 1596498556 2020/08/03 23:49:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) Mike Stephenson 1991.                            */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -45,3 +46,4 @@ struct q_score {              /* クエストの「スコアカード」 */
 /* 注: exp.lev. 14 は 5番目の称号ランクの閾値 (class title, role.c) */
 
 #endif /* QUEST_H */
+

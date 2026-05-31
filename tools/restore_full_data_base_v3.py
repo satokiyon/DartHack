@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-21.
 import sys
 
 # パス設定
@@ -51,3 +52,4 @@ if found:
         print("Error: *golem not found in source.")
 else:
     print("Error: *golem not found in current file.")
+
