@@ -97,7 +97,7 @@ struct window_procs mswin_procs = {
 #ifdef ENHANCED_SYMBOLS
      WC2_U_UTF8STR | WC2_EXTRACOLORS |
 #endif
-    0L,
+    WC2_SUPPRESS_HIST | 0L,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
     mswin_init_nhwindows, mswin_player_selection, mswin_askname,
     mswin_get_nh_event, mswin_exit_nhwindows, mswin_suspend_nhwindows,

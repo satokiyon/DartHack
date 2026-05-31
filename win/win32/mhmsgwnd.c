@@ -26,10 +26,14 @@ struct window_line {
 typedef struct mswin_nethack_message_window {
     size_t max_text;
     struct window_line window_text[MAX_MSG_HISTORY];
+    struct window_line saved_line;
     int lines_last_turn; /* lines added during the last turn */
     int lines_not_seen;  /* lines not yet seen by user after last turn or
                             --More-- */
     int nevermore;       /* We want no more --More-- prompts */
+    BOOL nohistory_active;
+    int saved_lines_last_turn;
+    int saved_lines_not_seen;
 
     int xChar;  /* horizontal scrolling unit */
     int yChar;  /* vertical scrolling unit */
@@ -56,6 +60,8 @@ static void onPaint(HWND hWnd);
 static void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static BOOL can_append_text(HWND hWnd, int attr, const char *text);
 /* check if text can be appended to the last line without wrapping */
+static void begin_nohistory_line(PNHMessageWindow data);
+static void end_nohistory_line(PNHMessageWindow data);
 
 static BOOL more_prompt_check(HWND hWnd);
 /* check if "--more--" prompt needs to be displayed */
@@ -269,8 +275,30 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr) lParam;
         SCROLLINFO si;
         char *p;
+        BOOL nohistory = ((msg_data->attr & ATR_NOHISTORY) != 0);
+        int base_attr = (msg_data->attr & ~(ATR_NOHISTORY | ATR_URGENT));
 
-        if (msg_data->append == 1) {
+        if (!nohistory && data->nohistory_active)
+            end_nohistory_line(data);
+
+        if (nohistory) {
+            begin_nohistory_line(data);
+            data->window_text[MSG_LINES - 1].attr = base_attr;
+
+            if (msg_data->append == 1) {
+                strncat(data->window_text[MSG_LINES - 1].text, msg_data->text,
+                        MAXWINDOWTEXT
+                            - strlen(data->window_text[MSG_LINES - 1].text));
+            } else if (msg_data->append < 0) {
+                int len = strlen(data->window_text[MSG_LINES - 1].text);
+                int newend = max(len + msg_data->append, 0);
+                data->window_text[MSG_LINES - 1].text[newend] = '\0';
+            } else {
+                strncpy(data->window_text[MSG_LINES - 1].text, msg_data->text,
+                        MAXWINDOWTEXT);
+                data->window_text[MSG_LINES - 1].text[MAXWINDOWTEXT] = '\0';
+            }
+        } else if (msg_data->append == 1) {
             /* Forcibly append to line, even if we pass the edge */
             strncat(data->window_text[MSG_LINES - 1].text, msg_data->text,
                     MAXWINDOWTEXT
@@ -375,6 +403,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     } break;
 
     case MSNH_MSG_CLEAR_WINDOW: {
+        end_nohistory_line(data);
         data->lines_last_turn = 0;
         data->lines_not_seen = 0;
         data->nevermore = 0;
@@ -401,10 +430,16 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
         buflen = 0;
         for (i = 0; i < MSG_LINES; i++)
-            if (*data->window_text[i].text) {
-                strncpy(&msg_data->buffer[buflen], data->window_text[i].text,
+            if (*(data->nohistory_active && i == (MSG_LINES - 1)
+                      ? data->saved_line.text
+                      : data->window_text[i].text)) {
+                const char *line_text = (data->nohistory_active
+                                         && i == (MSG_LINES - 1))
+                                            ? data->saved_line.text
+                                            : data->window_text[i].text;
+                strncpy(&msg_data->buffer[buflen], line_text,
                         msg_data->max_size - buflen);
-                buflen += strlen(data->window_text[i].text);
+                buflen += strlen(line_text);
                 if (buflen >= msg_data->max_size)
                     break;
 
@@ -421,6 +456,33 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         break;
 
     } /* switch( wParam ) */
+}
+
+static void
+begin_nohistory_line(PNHMessageWindow data)
+{
+    if (data->nohistory_active)
+        return;
+
+    data->saved_line = data->window_text[MSG_LINES - 1];
+    data->saved_lines_last_turn = data->lines_last_turn;
+    data->saved_lines_not_seen = data->lines_not_seen;
+    data->nohistory_active = TRUE;
+    data->window_text[MSG_LINES - 1].text[0] = '\0';
+}
+
+static void
+end_nohistory_line(PNHMessageWindow data)
+{
+    if (!data->nohistory_active)
+        return;
+
+    data->window_text[MSG_LINES - 1] = data->saved_line;
+    data->lines_last_turn = data->saved_lines_last_turn;
+    data->lines_not_seen = data->saved_lines_not_seen;
+    data->nohistory_active = FALSE;
+    data->saved_line.text[0] = '\0';
+    data->saved_line.attr = ATR_NONE;
 }
 
 void

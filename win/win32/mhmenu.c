@@ -1421,7 +1421,7 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
             char buf[BUFSZ];
 
             reset_menu_count(hwndList, data);
-            if (mswin_getlin_window("Search for:", buf, BUFSZ) == IDCANCEL) {
+            if (mswin_getlin_window("検索文字列:", buf, BUFSZ) == IDCANCEL) {
                 strcpy(buf, "\033");
             }
             if (data->is_active)
