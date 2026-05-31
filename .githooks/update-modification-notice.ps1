@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01.
 param(
     [string]$Date = (Get-Date -Format 'yyyy-MM-dd')
 )
@@ -172,7 +172,11 @@ $files = ($rawStaged -split "`0") | Where-Object { $_ -and $_.Trim().Length -gt 
 $changed = New-Object System.Collections.Generic.List[string]
 
 foreach ($file in $files) {
-    $rel = $file.Replace('\', '/')
+    $rel = $file.Replace('\\', '/')
+
+    if ($rel -eq '.githooks/pre-commit') {
+        continue
+    }
 
     if (Should-SkipPath -RelPath $rel) {
         continue
