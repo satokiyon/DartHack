@@ -103,6 +103,7 @@ sys/amiga/regex/
 # Local workspace and scratch files
 NetHackJP.code-workspace
 tmp/
+scratch/
 tools/
 
 # Generated Windows nmake stamp files
