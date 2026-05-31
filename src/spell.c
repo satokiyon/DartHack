@@ -343,7 +343,7 @@ book_cursed(struct obj *book)
 {
     if (book->cursed && gm.multi >= 0
         && go.occupation == learn && svc.context.spbook.book == book) {
-        pline("%sが勢いよく閉じた!", yname(book));
+        pline("%sが勢いよく閉じた!", xname(book));
         set_bknown(book, 1);
         stop_occupation();
     }

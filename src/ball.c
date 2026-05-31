@@ -59,7 +59,7 @@ ballfall(void)
                 pline("幸運にも、頑丈なかぶとを身に着けていた.");
                 dmg = 3;
             } else if (flags.verbose)
-                pline("%sでは身を守れなかった.", Yname2(uarmh));
+                    pline("%sでは身を守れなかった.", xname(uarmh));
         }
         losehp(Maybe_Half_Phys(dmg), "鉄球に頭を打ち砕かれた",
                NO_KILLER_PREFIX);
@@ -972,7 +972,7 @@ litter(void)
         if (otmp != uball && rnd(capacity) <= (int) otmp->owt) {
             if (canletgo(otmp, "")) {
                 You("階段を下るときに%sを落とし、%s%s.",
-                    yname(otmp), (otmp->quan == 1L) ? "それが" : "それらが",
+                    xname(otmp), (otmp->quan == 1L) ? "それが" : "それらが",
                     "一緒に落ちていった");
                 setnotworn(otmp);
                 freeinv(otmp);

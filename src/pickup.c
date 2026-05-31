@@ -1202,7 +1202,7 @@ query_objlist(const char *qstr,        /* query string */
                 continue;
             }
             if (engulfer_minvent && curr->owornmask != 0L) {
-                You_cant("%sを拾い上げることはできなかった。", ysimple_name(curr));
+                You_cant("%sを拾い上げることはできなかった。", xname(curr));
                 continue;
             }
             if (mi->count == -1L || mi->count > curr->quan)
@@ -1846,7 +1846,7 @@ pickup_object(
         return 0;
     } else if (obj->where == OBJ_MINVENT && obj->owornmask != 0L
                && engulfing_u(obj->ocarry)) {
-        You_cant("%sを拾い上げることはできなかった。", ysimple_name(obj));
+        You_cant("%sを拾い上げることはできなかった。", xname(obj));
         return 0;
     } else if (obj->oartifact && !touch_artifact(obj, &gy.youmonst)) {
         return 0;
@@ -3068,7 +3068,7 @@ use_container(
     outokay = Has_contents(gc.current_container);
     if (!outokay) /* preformat the empty-container message */
         Sprintf(emptymsg, "%sは%s空だ.",
-                Ysimple_name2(gc.current_container),
+                xname(gc.current_container),
                 (quantum_cat || cursed_mbag) ? "今は" : "");
 
     /*

@@ -539,7 +539,7 @@ do_attack(struct monst *mtmp)
         gu.unweapon = FALSE;
         if (flags.verbose) {
             if (uwep)
-                You("%sでモンスターを打ち据え始めた.", yname(uwep));
+                You("%sでモンスターを打ち据え始めた.", xname(uwep));
             else if (!cantwield(gy.youmonst.data))
                 You("モンスターを%s始めた(%s %sで).",
                     Role_if(PM_MONK) ? "殴打し" : "打ち据え",
@@ -903,7 +903,7 @@ hmon_hitmon_weapon_ranged(
 
                 pline("%sに当たった衝撃で、%s%sは砕け散った.",
               l_monnam(mon), more_than_1 ? "そのうち1つの" : "",
-              yname(obj));
+                            xname(obj));
         if (!more_than_1)
             uwepgone(); /* set gu.unweapon */
         useup(obj);
@@ -1127,7 +1127,7 @@ hmon_hitmon_misc_obj(
         break;
     case MIRROR:
         if (breaktest(obj)) {
-            You("%sを壊してしまった. これは不吉だ!", ysimple_name(obj));
+            You("%sを壊してしまった. これは不吉だ!", xname(obj));
             change_luck(-2);
             useup(obj);
             obj = (struct obj *) 0;
@@ -1139,7 +1139,7 @@ hmon_hitmon_misc_obj(
         break;
     case EXPENSIVE_CAMERA:
         You("%sの破壊に成功した. おめでとう!",
-            ysimple_name(obj));
+            xname(obj));
         release_camera_demon(obj, u.ux, u.uy);
         useup(obj);
         hmd->doreturn = TRUE;
@@ -1550,7 +1550,7 @@ hmon_hitmon_jousting(
                              * untwoweapon() is too verbose here */
         if (obj == uwep)
             uwepgone(); /* set gu.unweapon */
-        pline("%sは衝撃で砕け散った!", Yname2(obj));
+        pline("%sは衝撃で砕け散った!", xname(obj));
         /* minor side-effect: broken lance won't split puddings */
         useup(obj);
         obj = (struct obj *) 0;
@@ -1618,9 +1618,9 @@ hmon_hitmon_splitmon(
         if ((mclone = clone_mon(mon, 0, 0)) != 0) {
             withwhat[0] = '\0';
             if (u.twoweap && flags.verbose)
-                Sprintf(withwhat, " with %s", yname(obj));
+                Sprintf(withwhat, "%s", xname(obj));
             pline("%sは%sで打たれて分裂した!", Monnam(mon),
-                withwhat[0] ? withwhat + 6 : "");
+                withwhat[0] ? withwhat : "");
             hmd->hittxt = TRUE;
             (void) mintrap(mclone, NO_TRAP_FLAGS);
         }

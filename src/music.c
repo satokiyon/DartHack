@@ -597,11 +597,11 @@ do_improvisation(struct obj *instr)
     case WOODEN_FLUTE: /* May charm snakes */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
         if (!Deaf)
-            pline("%sは%s%s.", Yname2(instr),
+            pline("%sは%s%s.", xname(instr),
                   do_spec ? "軽やかに鳴り響いた" : "ぷーと鳴った",
                   same_old_song ? "（どこか聞き覚えのある旋律だ）" : "");
         else
-            You_feel("%sが%s.", yname(instr),
+            You_feel("%sが%s.", xname(instr),
                      do_spec ? "軽やかに鳴っている" : "ぷーと鳴っている");
         Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
         if (do_spec)
@@ -613,7 +613,7 @@ do_improvisation(struct obj *instr)
         consume_obj_charge(instr, TRUE);
 
         if (!getdir((char *) 0)) {
-            pline("%sが震えた.", Yname2(instr));
+            pline("%sが震えた.", xname(instr));
             break;
         } else if (!u.dx && !u.dy && !u.dz) {
             if ((damage = zapyourself(instr, TRUE)) != 0) {
@@ -649,7 +649,7 @@ do_improvisation(struct obj *instr)
     case BUGLE: /* Awaken & attract soldiers */
         if (!Deaf)
             You("%sから大き%sな音を引き出した.",
-                same_old_song ? "どこか聞き覚えのある" : "", yname(instr));
+                same_old_song ? "どこか聞き覚えのある" : "", xname(instr));
         else
             You("ラッパを吹き鳴らした.");
         Hero_playnotes(obj_to_instr(&itmp), improvisation, 80);
@@ -661,7 +661,7 @@ do_improvisation(struct obj *instr)
 
         if (!Deaf)
             pline("%sはとても魅力的%s旋律を奏でた.",
-                  Yname2(instr),
+                  xname(instr),
                   same_old_song ? "で、どこか聞き覚えのある" : "な");
         else
             You_feel("とても心地よい振動を感じた.");
@@ -672,7 +672,7 @@ do_improvisation(struct obj *instr)
     case WOODEN_HARP: /* May calm Nymph */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
         if (!Deaf)
-            pline("%sは%s.", Yname2(instr),
+            pline("%sは%s.", xname(instr),
                   (do_spec && same_old_song)
                   ? "どこか聞き覚えのある、軽やかな旋律を奏でた"
                   : (do_spec) ? "軽やかな旋律を奏でた"

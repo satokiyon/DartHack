@@ -1232,7 +1232,7 @@ break_armor(void)
 
                 /* Future possibilities: This could damage/destroy helmet */
                 Sprintf(hornbuf, "horn%s", plur(num_horns(uptr)));
-                 Your("%sが%sを%s.", hornbuf, yname(otmp), "突き破った");
+                                Your("%sが%sを%s.", hornbuf, xname(otmp), "突き破った");
             } else {
                 if (donning(otmp))
                     cancel_don();

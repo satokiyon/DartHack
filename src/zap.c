@@ -2231,12 +2231,12 @@ bhito(struct obj *obj, struct obj *otmp)
                        statues; plural handling here and the "empty" case
                        below are superfluous because containers don't stack */
                     if (obj->otrapped)
-                        pline("%sは罠付きだった!", Yname2(obj));
+                        pline("%sは罠付きだった!", xname(obj));
                     obj->tknown = 1;
                 }
 
                 if (!obj->cobj) {
-                    pline("%sは空だった.", Yname2(obj));
+                    pline("%sは空だった.", xname(obj));
                 } else if (SchroedingersBox(obj)) {
                     /* we don't want to force alive vs dead
                        determination for Schroedinger's Cat here,
@@ -2672,7 +2672,7 @@ dozap(void)
         gc.current_wand = 0;
     }
     if (obj && obj->spe < 0) {
-        pline("%sは塵になった.", Yname2(obj));
+        pline("%sは塵になった.", xname(obj));
         useupall(obj); /* calls freeinv() -> update_inventory() */
     } else
         update_inventory(); /* maybe used a charge */
@@ -2827,7 +2827,7 @@ zapyourself(struct obj *obj, boolean ordinary)
 
         if (BInvis && uarmc->otyp == MUMMY_WRAPPING) {
             /* A mummy wrapping absorbs it and protects you */
-            You_feel("%sの下がかなりかゆかった.", yname(uarmc));
+            You_feel("%sの下がかなりかゆかった.", xname(uarmc));
             break;
         }
         incr_itimeout(&HInvis, rn1(15, 31));
@@ -3929,7 +3929,7 @@ bhit(
             && (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
             && !rn2(3)) {
             if (cansee(x, y)) {
-                pline("%sはクモの巣に引っかかった!", Yname2(obj));
+                pline("%sはクモの巣に引っかかった!", xname(obj));
                 ttmp->tseen = TRUE;
                 newsym(x, y);
             }
@@ -3947,10 +3947,10 @@ bhit(
             if (is_pool(x, y) && !mtmp) {
                 in_skip = TRUE;
                 if (!Blind)
-                    pline("%sは水面を跳ねた%s.", Yname2(obj),
+                    pline("%sは水面を跳ねた%s.", xname(obj),
                           skipcount ? " (再び)" : "");
                 else
-                    You_hear("%sが水面を跳ねる音が聞こえた.", yname(obj));
+                    You_hear("%sが水面を跳ねる音が聞こえた.", xname(obj));
                 skipcount++;
             } else if (skiprange_start > skiprange_end + 1) {
                 --skiprange_start;
@@ -3963,7 +3963,7 @@ bhit(
                     skiprange(range, &skiprange_start, &skiprange_end);
             } else if (mtmp && M_IN_WATER(mtmp->data)) {
                 if (!Blind && canspotmon(mtmp))
-                    pline("%sは%sを飛び越えた.", Yname2(obj), mon_nam(mtmp));
+                    pline("%sは%sを飛び越えた.", xname(obj), mon_nam(mtmp));
                 mtmp = (struct monst *) 0;
             }
         }
@@ -5906,7 +5906,7 @@ maybe_destroy_item(
                                             : (quan == 2L) ? "両方の"     /* 2 of 2 */
                                                 : "すべての");             /* N of N */
             pline("%s%s %s!", mult,
-                  (cnt == 1L && quan == 1L) ? Yname2(obj) : yname(obj),
+                xname(obj),
                   destroy_strings[dindx][(cnt > 1L)]);
         }
         if (u_carry) { /* effects that happen only to the player */

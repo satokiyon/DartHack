@@ -857,7 +857,7 @@ stripspe(struct obj *obj)
         pline1(nothing_happens);
     } else {
         /* order matters: message, shop handling, actual transformation */
-        pline("%sは一瞬震えた.", Yname2(obj));
+        pline("%sは一瞬震えた.", xname(obj));
         costly_alteration(obj, COST_UNCHRG);
         obj->spe = 0;
         if (obj->otyp == OIL_LAMP || obj->otyp == BRASS_LANTERN)
@@ -868,25 +868,25 @@ stripspe(struct obj *obj)
 staticfn void
 p_glow1(struct obj *otmp)
 {
-    pline(Blind ? "%sは一瞬震えた." : "%sは一瞬光った.", Yname2(otmp));
+    pline(Blind ? "%sは一瞬震えた." : "%sは一瞬光った.", xname(otmp));
 }
 
 staticfn void
 p_glow2(struct obj *otmp, const char *color)
 {
     if (Blind)
-        pline("%sは一瞬震えた.", Yname2(otmp));
+        pline("%sは一瞬震えた.", xname(otmp));
     else
-        pline("%sは一瞬%s色に光った.", Yname2(otmp), hcolor(color));
+        pline("%sは一瞬%s色に光った.", xname(otmp), hcolor(color));
 }
 
 staticfn void
 p_glow3(struct obj *otmp, const char *color)
 {
     if (Blind)
-        pline("%sはかすかに震えた.", Yname2(otmp));
+        pline("%sはかすかに震えた.", xname(otmp));
     else
-        pline("%sはしばらくかすかに%s色に光った.", Yname2(otmp),
+        pline("%sはしばらくかすかに%s色に光った.", xname(otmp),
               hcolor(color));
 }
 
@@ -1011,7 +1011,7 @@ recharge(struct obj *obj, int curse_bless)
 
         /* destruction depends on current state, not adjustment */
         if (obj->spe > rn2(7) || obj->spe <= -5) {
-            pline("%sは一瞬脈打ち、その後爆発した!", Yname2(obj));
+            pline("%sは一瞬脈打ち、その後爆発した!", xname(obj));
             if (is_on)
                 Ring_gone(obj);
             s = rnd(3 * abs(obj->spe)); /* amount of damage */
@@ -1020,7 +1020,7 @@ recharge(struct obj *obj, int curse_bless)
         } else {
             long mask = is_on ? (obj == uleft ? LEFT_RING : RIGHT_RING) : 0L;
 
-            pline("%sはしばらく%s回転した.", Yname2(obj),
+            pline("%sはしばらく%s回転した.", xname(obj),
                   s < 0 ? "反時計回りに" : "時計回りに");
             if (s < 0)
                 costly_alteration(obj, COST_DECHNT);
@@ -1103,7 +1103,7 @@ recharge(struct obj *obj, int curse_bless)
                 stripspe(obj);
                 if (obj->lamplit) {
                     if (!Blind)
-                        pline("%sの火は消えた!", Yname2(obj));
+                        pline("%sの火は消えた!", xname(obj));
                     end_burn(obj, TRUE);
                 }
             } else if (is_blessed) {
@@ -1129,7 +1129,7 @@ recharge(struct obj *obj, int curse_bless)
                     p_glow2(obj, NH_BLACK);
                     curse(obj);
                 } else {
-                    pline("%sは一瞬震えた.", Yname2(obj));
+                    pline("%sは一瞬震えた.", xname(obj));
                 }
                 if (obj->spe > 0)
                     costly_alteration(obj, COST_UNCHRG);
@@ -1344,18 +1344,18 @@ seffect_enchant_armor(struct obj **sobjp)
         otmp->oerodeproof = 0; /* for messages */
         if (Blind) {
             otmp->rknown = FALSE;
-            pline("%sは一瞬熱を帯びた.", Yname2(otmp));
+            pline("%sは一瞬熱を帯びた.", xname(otmp));
         } else {
             otmp->rknown = TRUE;
             pline(scursed ? "%sはまだらな%s色の光に包まれた!"
                           : (is_shield(otmp)
                                  ? "%sはきらめく%s色の膜に包まれた!"
                                  : "%sはきらめく%s色の盾に包まれた!"),
-                  Yname2(otmp), hcolor(scursed ? NH_BLACK : NH_GOLDEN));
+                  xname(otmp), hcolor(scursed ? NH_BLACK : NH_GOLDEN));
         }
         if (new_erodeproof && (otmp->oeroded || otmp->oeroded2)) {
             otmp->oeroded = otmp->oeroded2 = 0;
-            pline("%sは新品同様になった!", Yname2(otmp));
+            pline("%sは新品同様になった!", xname(otmp));
         }
         if (old_erodeproof && !new_erodeproof) {
             /* restore old_erodeproof before shop charges */
@@ -1382,7 +1382,7 @@ seffect_enchant_armor(struct obj **sobjp)
     s = scursed ? -otmp->spe : otmp->spe;
     if (s > (special_armor ? 5 : 3) && rn2(s)) {
         otmp->in_use = TRUE;
-          pline("%sはしばらく激しく%s%s%s、その後に消え去った.", Yname2(otmp),
+          pline("%sはしばらく激しく%s%s%s、その後に消え去った.", xname(otmp),
               Blind ? "震え" : "輝き",
               (!Blind && !same_color) ? " " : "",
               (Blind || same_color) ? "" : hcolor(scursed ? NH_BLACK
@@ -1430,7 +1430,7 @@ seffect_enchant_armor(struct obj **sobjp)
         int old_light = artifact_light(otmp) ? arti_light_radius(otmp) : 0;
 
         /* dragon scales get turned into dragon scale mail */
-        pline("%sは融合して硬化した!", Yname2(otmp));
+        pline("%sは融合して硬化した!", xname(otmp));
         setworn((struct obj *) 0, W_ARM);
         /* assumes same order */
         otmp->otyp += GRAY_DRAGON_SCALE_MAIL - GRAY_DRAGON_SCALES;
@@ -1453,7 +1453,7 @@ seffect_enchant_armor(struct obj **sobjp)
             maybe_adjust_light(otmp, old_light);
         return;
     }
-        pline("%sは%s%s%s%sた.", Yname2(otmp),
+        pline("%sは%s%s%s%sた.", xname(otmp),
             (s * s > 1) ? "しばらく" : "一瞬",
             (s == 0) ? "激しく" : "",
             (Blind || same_color)
@@ -1488,7 +1488,7 @@ seffect_enchant_armor(struct obj **sobjp)
     if ((otmp->spe > (special_armor ? 5 : 3))
         && (special_armor || !rn2(7)))
           pline(Blind ? "%sは再び突然震えた." : "%sは不意に震えた.",
-              Yname2(otmp));
+              xname(otmp));
 }
 
 /* destroy a random cursed armor worn by hero */
@@ -1555,7 +1555,7 @@ seffect_destroy_armor(struct obj **sobjp)
     if (scursed) {
         if (otmp && otmp->cursed) {
             /* armor and scroll both cursed */
-            pline("%sは震えた.", Yname2(otmp));
+            pline("%sは震えた.", xname(otmp));
             if (otmp->spe >= -6) {
                 otmp->spe += -1;
                 adj_abon(otmp, -1);
@@ -1792,7 +1792,7 @@ seffect_remove_curse(struct obj **sobjp)
                 /* like rndcurse(sit.c), effect on regular inventory
                    doesn't show things glowing but saddle does */
                 if (!Blind) {
-                    pline("%sは%s色に光った.", Yname2(obj), hcolor("amber"));
+                    pline("%sは%s色に光った.", xname(obj), hcolor("amber"));
                     obj->bknown = Hallucination ? 0 : 1;
                 } else {
                     obj->bknown = 0; /* skip set_bknown() */
@@ -1853,11 +1853,11 @@ seffect_enchant_weapon(struct obj **sobjp)
             uwep->rknown = TRUE;
             pline(scursed ? "%sはまだらな%s色の光に包まれた!"
                           : "%sはきらめく%s色の盾に包まれた!",
-                  Yname2(uwep), hcolor(scursed ? NH_PURPLE : NH_GOLDEN));
+                  xname(uwep), hcolor(scursed ? NH_PURPLE : NH_GOLDEN));
         }
         if (new_erodeproof && (uwep->oeroded || uwep->oeroded2)) {
             uwep->oeroded = uwep->oeroded2 = 0;
-            pline("%sは新品同様になった!", Yname2(uwep));
+            pline("%sは新品同様になった!", xname(uwep));
         }
         if (old_erodeproof && !new_erodeproof) {
             /* restore old_erodeproof before shop charges */
@@ -2523,7 +2523,7 @@ drop_boulder_on_player(
                 if (dmg > 2)
                     dmg = 2;
             } else if (flags.verbose) {
-                pline("%sでは守りきれない.", Yname2(uarmh));
+                pline("%sでは守りきれない.", xname(uarmh));
             }
         }
     } else
@@ -2615,7 +2615,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
 void
 wand_explode(struct obj *obj, int chg /* recharging */)
 {
-    const char *expl = !chg ? "suddenly" : "vibrates violently and";
+    const char *expl = !chg ? "突然" : "激しく震え、";
     int dmg, n, k;
 
     /* number of damage dice */
@@ -2651,7 +2651,7 @@ wand_explode(struct obj *obj, int chg /* recharging */)
     /* inflict damage and destroy the wand */
     dmg = d(n, k);
     obj->in_use = TRUE; /* in case losehp() is fatal (or --More--^C) */
-    pline("%s %s explodes!", Yname2(obj), expl);
+    pline("%sが%s爆発した!", xname(obj), expl);
     losehp(Maybe_Half_Phys(dmg), "exploding wand", KILLED_BY_AN);
     useup(obj);
     /* obscure side-effect */

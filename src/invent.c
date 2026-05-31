@@ -1159,7 +1159,7 @@ addinv_core2(struct obj *obj)
         obj->otyp != SCR_BLANK_PAPER && !Blind &&
         !objects[obj->otyp].oc_name_known) {
         observe_object(obj);
-        pline("%sのラベルを解読した.", yname(obj));
+        pline("%sのラベルを解読した.", xname(obj));
         makeknown(obj->otyp);
 
         /* conduct: this is avoidable via not picking up / wishing for

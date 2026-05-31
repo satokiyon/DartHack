@@ -220,7 +220,7 @@ forcelock(void)
              * attempt to force the lock is (.992)^50 = .67
              */
             pline("%sは壊れた!",
-                (uwep->quan > 1L) ? "武器のうち1つ" : yname(uwep));
+                (uwep->quan > 1L) ? "武器のうち1つ" : xname(uwep));
             useup(uwep);
             You("鍵をこじ開ける試みを諦めた.");
             exercise(A_DEX, TRUE);
@@ -425,7 +425,7 @@ pick_lock(
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (is_lava(u.ux, u.uy)) {
             pline("そんなことをすれば、おそらく%sは溶けてしまうだろう.",
-                  yname(pick));
+                xname(pick));
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (is_pool(u.ux, u.uy) && !Underwater) {
             pline_The("%sには鍵がなかった.", hliquid("water"));
@@ -725,9 +725,9 @@ doforce(void)
                 continue;
 
             if (picktyp)
-                You("%sを隙間にねじ込み、こじ開け始めた.", yname(uwep));
+                You("%sを隙間にねじ込み、こじ開け始めた.", xname(uwep));
             else
-                You("%sで叩き壊し始めた.", yname(uwep));
+                You("%sで叩き壊し始めた.", xname(uwep));
             gx.xlock.box = otmp;
             gx.xlock.chance = objects[uwep->otyp].oc_wldam * 2;
             gx.xlock.picktyp = picktyp;

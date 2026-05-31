@@ -875,7 +875,7 @@ mon_wield_item(struct monst *mon)
                           xname(obj));
                 } else {
                     pline_mon(mon, "%sは%sを装備しようとした.", Monnam(mon), doname(obj));
-                    pline("%sは%s!", Yname2(mw_tmp), welded_buf);
+                    pline("%sは%s!", xname(mw_tmp), welded_buf);
                 }
                 mw_tmp->bknown = 1;
             }

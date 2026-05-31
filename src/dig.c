@@ -337,7 +337,7 @@ dig(void)
         switch (rn2(3)) {
         case 0:
             if (!welded(uwep)) {
-                You("手元が狂って%sを落とした.", yname(uwep));
+                You("手元が狂って%sを落とした.", xname(uwep));
                 dropx(uwep);
             } else {
                 if (u.usteed)
@@ -1182,7 +1182,7 @@ use_pick_axe2(struct obj *obj)
         dam = rnd(2) + dbon() + obj->spe;
         if (dam <= 0)
             dam = 1;
-        You("%sで自分を叩いてしまった.", yname(uwep));
+        You("%sで自分を叩いてしまった.", xname(uwep));
         Sprintf(buf, "%s own %s", uhis(), OBJ_NAME(objects[obj->otyp]));
         losehp(Maybe_Half_Phys(dam), buf, KILLED_BY);
         disp.botl = TRUE;
