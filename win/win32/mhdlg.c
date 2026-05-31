@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-20. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	mhdlg.c	$NHDT-Date: 1596498347 2020/08/03 23:45:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.36 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -108,7 +108,7 @@ mswin_getlin_window(const char *question, char *result, size_t result_size)
     ret = DialogBoxParam(GetNHApp()->hApp, MAKEINTRESOURCE(IDD_GETLIN),
                          GetNHApp()->hMainWnd, GetlinDlgProc, (LPARAM) &data);
     if (ret == -1)
-        panic("Cannot create getlin window");
+        panic("入力ウィンドウを作成できません");
 
     return (int) ret;
 }
@@ -252,7 +252,7 @@ mswin_ext_cmd_window(int *selection)
     ret = DialogBoxParam(GetNHApp()->hApp, MAKEINTRESOURCE(IDD_EXTCMD),
                          GetNHApp()->hMainWnd, ExtCmdDlgProc, (LPARAM) &data);
     if (ret == -1)
-        panic("Cannot create extcmd window");
+        panic("拡張コマンドウィンドウを作成できません");
     return (int) ret;
 }
 
@@ -431,7 +431,7 @@ mswin_player_selection_window(void)
             GetNHApp()->hApp, MAKEINTRESOURCE(IDD_PLAYER_SELECTOR),
             GetNHApp()->hMainWnd, PlayerSelectorDlgProc, (LPARAM) &data);
         if (ret == -1)
-            panic("Cannot create getlin window");
+            panic("入力ウィンドウを作成できません");
         ok = (ret == IDOK);
     }
 
@@ -674,7 +674,7 @@ plselInitDialog(struct plsel_data * data)
         else
             lvitem.pszText = NH_A2W(roles[i].name.m, wbuf, BUFSZ);
         if (ListView_InsertItem(role_list->hWnd, &lvitem) == -1) {
-            panic("cannot insert menu item");
+            panic("メニュー項目を追加できません");
         }
         data->role_count++;
     }
@@ -694,7 +694,7 @@ plselInitDialog(struct plsel_data * data)
         lvitem.stateMask = LVIS_FOCUSED;
         lvitem.pszText = NH_A2W(races[i].noun, wbuf, BUFSZ);
         if (ListView_InsertItem(race_list->hWnd, &lvitem) == -1) {
-            panic("cannot insert menu item");
+            panic("メニュー項目を追加できません");
         }
         data->race_count++;
     }

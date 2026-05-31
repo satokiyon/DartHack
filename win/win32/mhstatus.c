@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	mhstatus.c	$NHDT-Date: 1596498360 2020/08/03 23:46:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -122,7 +122,7 @@ mswin_init_status_window(void)
                        height,  /* window height */
                        GetNHApp()->hMainWnd, NULL, GetNHApp()->hApp, NULL);
     if (!ret)
-        panic("Cannot create status window");
+        panic("ステータスウィンドウを作成できません");
 
     /* Set window caption */
     SetWindowText(ret, TEXT("ステータス"));

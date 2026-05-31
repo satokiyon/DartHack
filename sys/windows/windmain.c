@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-29. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	windmain.c	$NHDT-Date: 1693359653 2023/08/30 01:40:53 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.189 $ */
 /* Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -282,7 +282,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     check_recordfile((char *) 0);
     /* did something earlier flag a need to exit without starting a game? */
     if (windows_startup_state > 0) {
-        raw_printf("Exiting.");
+        raw_printf("終了します。");
         nethack_exit(EXIT_FAILURE);
     }
 
@@ -291,7 +291,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         fqn_prefix_locked[i] = TRUE;
 
     if (!validate_prefix_locations(failbuf)) {
-        raw_printf("Some invalid directory locations were specified:\n\t%s\n",
+        raw_printf("無効なディレクトリ設定があります:\n\t%s\n",
                    failbuf);
         nethack_exit(EXIT_FAILURE);
     }
@@ -328,11 +328,10 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         pline("%s\n%s\n%s\n%s\n\n", copyright_banner_line(1),
               copyright_banner_line(2), copyright_banner_line(3),
               copyright_banner_line(4));
-        pline("NetHack was unable to open the required file \"%s\"", DLBFILE);
+        pline("NetHack は必要ファイル \"%s\" を開けませんでした", DLBFILE);
         if (file_exists(DLBFILE))
-            pline("\nAre you perhaps trying to run NetHack within a zip "
-                  "utility?");
-        error("dlb_init failure.");
+            pline("\n圧縮ファイルの中から NetHack を実行していませんか?");
+        error("dlb_init 失敗。");
     }
 #endif
 
@@ -414,7 +413,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
      */
     nhfp = create_levelfile(0, (char *) 0);
     if (!nhfp) {
-        raw_print("Cannot create lock file");
+        raw_print("ロックファイルを作成できません");
     } else {
         svh.hackpid = GetCurrentProcessId();
         (void) write(nhfp->fd, (genericptr_t) &svh.hackpid, sizeof(svh.hackpid));
@@ -439,16 +438,16 @@ attempt_restore:
         }
 #endif
         if (ge.early_raw_messages)
-            raw_print("Restoring save file...");
+            raw_print("セーブファイルを復元しています...");
         else
-            pline("Restoring save file...");
+            pline("セーブファイルを復元しています...");
         mark_synch(); /* flush output */
         if (dorecover(nhfp)) {
             resuming = TRUE; /* not starting new game */
             if (discover)
                 You("スコアが記録されない探索モードだった。");
             if (discover || wizard) {
-                if (y_n("Do you want to keep the save file?") == 'n')
+                if (y_n("セーブファイルを残しますか?") == 'n')
                     (void) delete_savefile();
                 else {
                     nh_compress(fqname(gs.SAVEF, SAVEPREFIX, 0));
@@ -728,14 +727,14 @@ copy_file(const char *dst_folder, const char *dst_name,
     strcat(src_path, src_name);
 
     if (!file_exists(src_path))
-        error("Unable to copy file '%s' as it does not exist", src_path);
+        error("コピー元ファイル '%s' が存在しないため、コピーできません", src_path);
 
     if (file_exists(dst_path) && !copy_even_if_it_exists)
         return;
 
     BOOL success = CopyFileA(src_path, dst_path, !copy_even_if_it_exists);
     if (!success)
-        error("Failed to copy '%s' to '%s' (%d)", src_path, dst_path, errno);
+        error("'%s' を '%s' へコピーできませんでした (%d)", src_path, dst_path, errno);
 }
 
 /* update file copying if it does not exist or src is newer then dst */
@@ -757,7 +756,7 @@ update_file(const char *dst_folder, const char *dst_name,
     strcat(save_path, ".save");
 
     if (!file_exists(src_path))
-        error("Unable to copy file '%s' as it does not exist", src_path);
+        error("コピー元ファイル '%s' が存在しないため、コピーできません", src_path);
 
     if (!file_newer(src_path, dst_path))
         return;
@@ -767,7 +766,7 @@ update_file(const char *dst_folder, const char *dst_name,
 
     BOOL success = CopyFileA(src_path, dst_path, FALSE);
     if (!success)
-        error("Failed to update '%s' to '%s'", src_path, dst_path);
+        error("'%s' から '%s' への更新に失敗しました", src_path, dst_path);
 }
 
 void
@@ -1055,7 +1054,7 @@ getlock(void)
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
         chdirx(orgdir, 0);
 #endif
-        error("Quitting.");
+        error("終了します。");
     }
 
     /* regularize(lock); */ /* already done in pcmain */
@@ -1068,10 +1067,10 @@ getlock(void)
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
         chdirx(orgdir, 0);
 #endif
-        error("Bad directory or name: %s\n%s\n", fq_lock,
+        error("ディレクトリまたは名前が不正です: %s\n%s\n", fq_lock,
                   strerror(errno));
         unlock_file(HLOCK);
-        Sprintf(oops, "Cannot open %s", fq_lock);
+        Sprintf(oops, "%s を開けません", fq_lock);
         raw_print(oops);
         nethack_exit(EXIT_FAILURE);
     }
@@ -1089,12 +1088,12 @@ getlock(void)
      * prompt_result == -1 means willfully destroy the old game.
      * prompt_result == 0 should just exit.
      */
-    Sprintf(oops, "You chose to %s.",
+    Sprintf(oops, "あなたは%sことを選びました。",
                 (prompt_result == -1)
-                    ? "destroy the old game and start a new one"
+                    ? "古いゲームを破棄して新しいゲームを開始する"
                     : (prompt_result == 1)
-                        ? "recover the old game"
-                        : "not start a new game");
+                        ? "古いゲームを復旧する"
+                        : "新しいゲームを開始しない");
 #ifdef WIN32CON
     if (istty)
         term_clear_screen();
@@ -1112,7 +1111,7 @@ getlock(void)
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
             chdirx(orgdir, 0);
 #endif
-            raw_print("Couldn't recover the old game.");
+            raw_print("古いゲームを復旧できませんでした。");
         }
     } else if (prompt_result < 0) {    /* destroy old game */
         if (eraseoldlocks()) {
@@ -1126,7 +1125,7 @@ getlock(void)
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
             chdirx(orgdir, 0);
 #endif
-            raw_print("Couldn't destroy the old game.");
+            raw_print("古いゲームを破棄できませんでした。");
             return 0;
         }
     } else {
@@ -1146,8 +1145,8 @@ gotlock:
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
         chdirx(orgdir, 0);
 #endif
-        Sprintf(oops, "cannot creat file (%s.)\n%s\n%s\"%s\" exists?\n", fq_lock,
-              strerror(ern), " Are you sure that the directory",
+          Sprintf(oops, "ファイルを作成できません (%s)\n%s\n%s\"%s\"\n", fq_lock,
+              strerror(ern), " ディレクトリが存在するか確認してください: ",
               gf.fqn_prefix[LEVELPREFIX]);
         raw_print(oops);
     } else {
@@ -1156,13 +1155,13 @@ gotlock:
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
             chdirx(orgdir, 0);
 #endif
-            error("cannot write lock (%s)", fq_lock);
+            error("ロックを書き込めません (%s)", fq_lock);
         }
         if (nhclose(fd) == -1) {
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
             chdirx(orgdir, 0);
 #endif
-            error("cannot close lock (%s)", fq_lock);
+            error("ロックを閉じられません (%s)", fq_lock);
         }
     }
     return prompt_result;
@@ -1218,8 +1217,8 @@ tty_self_recover_prompt(void)
     raw_print("\n");
     raw_print("\n");
     raw_print("\n");
-    raw_print("There are files from a game in progress under your name. ");
-    raw_print("Recover? [yn] ");
+    raw_print("あなたの名前で進行中ゲームのファイルが見つかりました。 ");
+    raw_print("復旧しますか? [yn] ");
 
  tty_ask_again:
 
@@ -1241,8 +1240,8 @@ tty_self_recover_prompt(void)
 
     if (pl == 1 && (c == 'n' || c == 'N')) {
         /* no to recover */
-        raw_print("\n\nAre you sure you wish to destroy the old game rather than try to\n");
-        raw_print("recover it? [yn] ");
+        raw_print("\n\n復旧を試す代わりに古いゲームを破棄してもよいですか?\n");
+        raw_print("本当に破棄しますか? [yn] ");
         c = 'n';
         ct = 0;
         pl = 2;
@@ -1282,13 +1281,13 @@ other_self_recover_prompt(void)
     c = 'n';
     ct = 0;
     if (iflags.window_inited || WINDOWPORT(curses)) {
-        c = y_n("There are files from a game in progress under your name. "
-               "Recover?");
+          c = y_n("あなたの名前で進行中ゲームのファイルが見つかりました。"
+               "復旧しますか?");
     } else {
         c = 'n';
         ct = 0;
-        raw_print("There are files from a game in progress under your name. "
-              "Recover? [yn]");
+          raw_print("あなたの名前で進行中ゲームのファイルが見つかりました。"
+              "復旧しますか? [yn]");
     }
 
  other_ask_again:
@@ -1309,8 +1308,7 @@ other_self_recover_prompt(void)
     }
     if (pl == 1 && (c == 'n' || c == 'N')) {
         /* no to recover */
-        c = y_n("Are you sure you wish to destroy the old game, rather than try to "
-                  "recover it? [yn] ");
+        c = y_n("復旧を試す代わりに古いゲームを破棄してもよいですか? [yn] ");
         pl = 2;
         if (!ismswin && !iscurses) {
             c = 'n';
@@ -1341,7 +1339,7 @@ chdirx(const char *dir, boolean wr)
     static char thisdir[] = ".";
 
     if (dir && chdir(dir) < 0) {
-        error("Cannot chdir to %s.", dir);
+        error("%s へ chdir できません。", dir);
     }
 
     /* warn the player if we can't write the record file */
@@ -1368,7 +1366,7 @@ stdio_wait_synch(void)
 {
     char valid[] = { ' ', '\n', '\r', '\033', '\0' };
 
-    fprintf(stdout, "--More--");
+    fprintf(stdout, "--続き--");
     (void) fflush(stdout);
     while (!strchr(valid, nhgetch()))
         ;

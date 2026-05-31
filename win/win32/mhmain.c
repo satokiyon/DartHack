@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	mhmain.c	$NHDT-Date: 1596498352 2020/08/03 23:45:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ */
 /* Copyright (C) 2001 by Alex Kompel  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -73,7 +74,7 @@ mswin_init_main_window(void)
                      );
 
     if (!ret)
-        panic("Cannot create main window");
+        panic("メインウィンドウを作成できません");
 
     if (GetNHApp()->regMainMinX != CW_USEDEFAULT) {
         wp.length = sizeof(wp);
@@ -1028,7 +1029,7 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         if (!pFile) {
             TCHAR buf[4096];
             nh_stprintf(buf, sizeof buf,
-			TEXT("Cannot open %s for writing!"), filename);
+			TEXT("%s を書き込み用に開けません!"), filename);
             NHMessageBox(hWnd, buf, MB_OK | MB_ICONERROR);
             if (text)
                 free(text);

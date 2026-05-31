@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
 /* NetHack 5.0	mhmap.c	$NHDT-Date: 1596498353 2020/08/03 23:45:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.85 $ */
 /* Copyright (C) 2001 by Alex Kompel      */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -128,8 +128,8 @@ mswin_init_map_window(void)
         NULL,                 /* menu handle or child identifier */
         GetNHApp()->hApp,     /* handle to application instance */
         NULL);                /* window-creation data */
-    if (!hWnd) {
-        panic("Cannot create map window");
+        if (!hWnd) {
+            panic("マップウィンドウを作成できません");
     }
 
     /* Set window caption */
@@ -545,7 +545,7 @@ register_map_window_class(void)
     wcex.lpszClassName = szNHMapWindowClass;
 
     if (!RegisterClass(&wcex)) {
-        panic("cannot register Map window class");
+           panic("マップウィンドウクラスを登録できません");
     }
 }
 
