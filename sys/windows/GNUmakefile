@@ -975,9 +975,10 @@ CLEAN_FILE += $(SFCTARGETS) $(SFCTOOLOBJS) $(U)sf.tags $(U)sfdata.c $(INCL)/sfpr
 #==========================================
 ODLB = $(O)dlb
 DLBOBJS = $(addprefix $(ODLB)/, alloc.o dlb.o dlb_main.o panic.o)
-DAT_CLEAN = $(addprefix $(DAT)/, data oracles options porthelp rumors engrave epitaph bogusmon)
+DAT_CLEAN = $(addprefix $(DAT)/, data data_jp oracles oracles_jp options porthelp rumors rumors_jp engrave epitaph bogusmon)
 DAT_NOCLEAN = $(addprefix $(DAT)/, help hh cmdhelp keyhelp history opthelp optmenu \
-	      wizhelp license engrave epitaph bogusmon tribute)
+	      usagehlp wizhelp help_jp hh_jp cmdhelp_jp keyhelp_jp history_jp opthelp_jp optmenu_jp usagehlp_jp wizhelp_jp \
+	      license engrave epitaph bogusmon tribute)
 DLBLST = $(DAT)/dlb.lst
 DLB = $(GAMEDIR)/nhdat$(NHV)
 DTARGETS = $(U)dlb.exe $(DAT_CLEAN) $(DLBLST) $(DLB)
@@ -996,10 +997,10 @@ $(ODLB)/%.o: $(U)%.c $(NHLUAH) | $(ODLB)
 $(ODLB):
 	@mkdir -p $@
 
-$(DAT)/data: $(U)makedefs.exe $(DAT)/data.base
+$(DAT)/data $(DAT)/data_jp: $(U)makedefs.exe $(DAT)/data.base $(DAT)/data_jp.base
 	$< -d
 
-$(DAT)/oracles: $(U)makedefs.exe $(DAT)/oracles.txt
+$(DAT)/oracles $(DAT)/oracles_jp: $(U)makedefs.exe $(DAT)/oracles.txt $(DAT)/oracles_jp.txt
 	$< -h
 
 $(DAT)/options $(INCL)/date.h: $(U)makedefs.exe
@@ -1008,7 +1009,7 @@ $(DAT)/options $(INCL)/date.h: $(U)makedefs.exe
 $(DAT)/porthelp: $(MSWSYS)/porthelp
 	cp $< $@
 
-$(DAT)/rumors: $(U)makedefs.exe $(DAT)/rumors.tru $(DAT)/rumors.fal
+$(DAT)/rumors $(DAT)/rumors_jp: $(U)makedefs.exe $(DAT)/rumors.tru $(DAT)/rumors.fal $(DAT)/rumors_jp.tru $(DAT)/rumors_jp.fal
 	$< -r
 
 $(DAT)/engrave: $(DAT)/bogusmon
@@ -1020,20 +1021,33 @@ $(DAT)/bogusmon: $(U)makedefs.exe $(DAT)/bogusmon.txt $(DAT)/engrave.txt $(DAT)/
 
 $(DLBLST): $(LUAFILES) | $(DAT_CLEAN) $(DAT_NOCLEAN)
 	echo data > $(DLBLST)
+	echo data_jp >> $(DLBLST)
 	echo oracles >> $(DLBLST)
+	echo oracles_jp >> $(DLBLST)
 	echo options >> $(DLBLST)
 	if [ -f $(DAT)/ttyoptions ] ; then echo ttyoptions >> $(DLBLST) ; fi
 	if [ -f $(DAT)/guioptions ] ; then echo guioptions >> $(DLBLST) ; fi
 	echo porthelp >> $(DLBLST)
 	echo rumors >> $(DLBLST)
+	echo rumors_jp >> $(DLBLST)
 	echo help >> $(DLBLST)
+	echo help_jp >> $(DLBLST)
 	echo hh >> $(DLBLST)
+	echo hh_jp >> $(DLBLST)
 	echo cmdhelp >> $(DLBLST)
+	echo cmdhelp_jp >> $(DLBLST)
 	echo keyhelp >> $(DLBLST)
+	echo keyhelp_jp >> $(DLBLST)
 	echo history >> $(DLBLST)
+	echo history_jp >> $(DLBLST)
 	echo opthelp >> $(DLBLST)
+	echo opthelp_jp >> $(DLBLST)
 	echo optmenu >> $(DLBLST)
+	echo optmenu_jp >> $(DLBLST)
+	echo usagehlp >> $(DLBLST)
+	echo usagehlp_jp >> $(DLBLST)
 	echo wizhelp >> $(DLBLST)
+	echo wizhelp_jp >> $(DLBLST)
 	echo license >> $(DLBLST)
 	echo engrave >> $(DLBLST)
 	echo epitaph >> $(DLBLST)

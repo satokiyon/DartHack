@@ -1,3 +1,4 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01.
 # NetHack 5.0 Makefile.nmake
 #       Copyright (c) NetHack Development Team 1993-2026
 #
@@ -2158,26 +2159,42 @@ $(DAT)porthelp: $(MSWSYS)porthelp
 
 !IF ("$(USE_DLB)"=="Y")
 nhdat$(NHV):	$(U)dlb.exe $(DAT)data $(DAT)oracles $(OPTIONS_FILE) $(LUA_FILES) \
-	$(DAT)rumors $(DAT)help $(DAT)hh $(DAT)cmdhelp $(DAT)keyhelp \
-	$(DAT)history $(DAT)opthelp $(DAT)optmenu $(DAT)wizhelp $(DAT)porthelp \
+	$(DAT)data_jp $(DAT)oracles_jp $(DAT)rumors \
+	$(DAT)rumors_jp $(DAT)help $(DAT)hh $(DAT)cmdhelp $(DAT)keyhelp \
+	$(DAT)history $(DAT)opthelp $(DAT)optmenu $(DAT)usagehlp $(DAT)wizhelp \
+	$(DAT)help_jp $(DAT)hh_jp $(DAT)cmdhelp_jp $(DAT)keyhelp_jp \
+	$(DAT)history_jp $(DAT)opthelp_jp $(DAT)optmenu_jp $(DAT)usagehlp_jp $(DAT)wizhelp_jp $(DAT)porthelp \
 	$(DAT)license $(DAT)engrave $(DAT)epitaph $(DAT)bogusmon $(DAT)tribute
 	@echo Building $@
 	@cd $(DAT)
 	@echo data >dlb.lst
+	@echo data_jp >>dlb.lst
 	@echo oracles >>dlb.lst
+	@echo oracles_jp >>dlb.lst
 	@if exist options @echo options >>dlb.lst
 	@if exist ttyoptions @echo ttyoptions >>dlb.lst
 	@if exist guioptions @echo guioptions >>dlb.lst
 	@if exist porthelp @echo porthelp >>dlb.lst
 	@echo rumors >>dlb.lst
+	@echo rumors_jp >>dlb.lst
 	@echo help >>dlb.lst
+	@echo help_jp >>dlb.lst
 	@echo hh >>dlb.lst
+	@echo hh_jp >>dlb.lst
 	@echo cmdhelp >>dlb.lst
+	@echo cmdhelp_jp >>dlb.lst
 	@echo keyhelp >>dlb.lst
+	@echo keyhelp_jp >>dlb.lst
 	@echo history >>dlb.lst
+	@echo history_jp >>dlb.lst
 	@echo opthelp >>dlb.lst
+	@echo opthelp_jp >>dlb.lst
 	@echo optmenu >>dlb.lst
+	@echo optmenu_jp >>dlb.lst
+	@echo usagehlp >>dlb.lst
+	@echo usagehlp_jp >>dlb.lst
 	@echo wizhelp >>dlb.lst
+	@echo wizhelp_jp >>dlb.lst
 	@echo license >>dlb.lst
 	@echo engrave >>dlb.lst
 	@echo epitaph >>dlb.lst
