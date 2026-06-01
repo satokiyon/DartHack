@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursdial.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -524,7 +524,7 @@ curses_ext_cmd(void)
         char extcmd_char = extcmd_initiator();
 
         if (*cur_choice)
-            pline("%s%s: unknown extended command.",
+            pline("%s%s: その拡張コマンドはありません.",
                   visctrl(extcmd_char), cur_choice);
     }
     return ret;
