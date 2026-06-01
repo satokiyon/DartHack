@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	hacklib.h	$NHDT-Date: 1725653010 2024/09/06 20:03:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -75,6 +75,7 @@ extern size_t utf8_truncation_point(const char *, size_t) NONNULLARG1;
 extern void utf8_truncate(char *, size_t) NONNULLARG1;
 extern const char *utf8_prev_char_start(const char *, const char *)
     NONNULLARG12;
+extern void utf8_hiragana_to_katakana(char *) NONNULLARG1;
 
 #define Snprintf(str, size, ...) \
     nh_snprintf(__func__, __LINE__, str, size, __VA_ARGS__)

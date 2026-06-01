@@ -1381,6 +1381,19 @@ checkfile(
                     destroy_nhwindow(datawin), datawin = WIN_ERR;
                 }
             } else if (user_typed_name && pass == 0 && !pass1found_in_file) {
+                char jp_lookup_key[BUFSZ];
+
+                if (jp_data_lookup_key_from_japanese(inp,
+                                                     jp_lookup_key,
+                                                     sizeof jp_lookup_key)
+                    && strcmp(jp_lookup_key, inp)
+                    && checkfile(jp_lookup_key, pm,
+                                 (chkflags | chkfilDontAsk)
+                                     & ~((unsigned) chkfilUsrTyped),
+                                 supplemental_name)) {
+                    res = TRUE;
+                    goto checkfile_done;
+                }
                 pline("それらについての情報は見つからなかった.");
             }
         }

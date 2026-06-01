@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	hacklib.c	$NHDT-Date: 1706213796 2024/01/25 20:16:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
@@ -981,6 +981,99 @@ utf8_prev_char_start(const char *start, const char *pos)
         return pos - 1;
 
     return p;
+}
+
+staticfn boolean
+utf8_decode_codepoint(const char *s, unsigned *cp, int *seqlen)
+{
+    uchar b0, b1, b2, b3;
+    int len;
+
+    b0 = (uchar) s[0];
+    if (b0 < 0x80U) {
+        *cp = b0;
+        *seqlen = 1;
+        return TRUE;
+    }
+
+    len = utf8_sequence_expected_len(b0);
+    if (len == 0) {
+        *cp = b0;
+        *seqlen = 1;
+        return FALSE;
+    }
+    if (len >= 2 && s[1] == '\0')
+        goto bad_utf8;
+    if (len >= 3 && s[2] == '\0')
+        goto bad_utf8;
+    if (len >= 4 && s[3] == '\0')
+        goto bad_utf8;
+
+    b1 = (uchar) s[1];
+    if ((b1 & 0xC0U) != 0x80U)
+        goto bad_utf8;
+
+    if (len == 2) {
+        *cp = ((unsigned) (b0 & 0x1FU) << 6) | (unsigned) (b1 & 0x3FU);
+        *seqlen = 2;
+        return TRUE;
+    }
+
+    b2 = (uchar) s[2];
+    if ((b2 & 0xC0U) != 0x80U)
+        goto bad_utf8;
+
+    if (len == 3) {
+        *cp = ((unsigned) (b0 & 0x0FU) << 12)
+              | ((unsigned) (b1 & 0x3FU) << 6)
+              | (unsigned) (b2 & 0x3FU);
+        *seqlen = 3;
+        return TRUE;
+    }
+
+    b3 = (uchar) s[3];
+    if ((b3 & 0xC0U) != 0x80U)
+        goto bad_utf8;
+
+    *cp = ((unsigned) (b0 & 0x07U) << 18)
+          | ((unsigned) (b1 & 0x3FU) << 12)
+          | ((unsigned) (b2 & 0x3FU) << 6)
+          | (unsigned) (b3 & 0x3FU);
+    *seqlen = 4;
+    return TRUE;
+
+bad_utf8:
+    *cp = b0;
+    *seqlen = 1;
+    return FALSE;
+}
+
+/* normalize Japanese search input by folding hiragana to katakana */
+void
+utf8_hiragana_to_katakana(char *str)
+{
+    char *p;
+
+    for (p = str; *p != '\0'; ) {
+        unsigned cp;
+        int seqlen;
+
+        if (!utf8_decode_codepoint(p, &cp, &seqlen)) {
+            ++p;
+            continue;
+        }
+
+        if (cp >= 0x3041U && cp <= 0x3096U) {
+            uint8 repl[8];
+            unsigned katakana_cp = cp + 0x60U;
+
+            if (unicodeval_to_utf8str((int) katakana_cp, repl, sizeof repl)
+                && (int) strlen((char *) repl) == seqlen) {
+                memcpy(p, repl, (size_t) seqlen);
+            }
+        }
+        p += seqlen;
+    }
 }
 
 int

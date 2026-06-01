@@ -155,7 +155,8 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   mail.c makemon.c mcastu.c mhitm.c mhitu.c minion.c \
 	   mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c mondata.c \
 	   monmove.c monst.c mplayer.c mthrowu.c muse.c music.c o_init.c \
-	   objects.c objnam.c options.c pager.c pickup.c pline.c polyself.c \
+	   objects.c jp_data_lookup.c objnam.c options.c pager.c pickup.c \
+	   pline.c polyself.c \
 	   potion.c pray.c priest.c quest.c questpgr.c read.c rect.c \
 	   region.c report.c restore.c revision.c rip.c rnd.c role.c \
 	   rumors.c save.c selvar.c sfstruct.c shk.c shknam.c sit.c sounds.c \
@@ -556,6 +557,7 @@ mplayer.obj :	mplayer.c $(HACK_H)
 mthrowu.obj :	mthrowu.c $(HACK_H)
 muse.obj :	muse.c $(HACK_H)
 music.obj :	music.c $(HACK_H) #interp.c
+jp_data_lookup.obj : jp_data_lookup.c $(HACK_H)
 o_init.obj :	o_init.c $(HACK_H)
 objects.obj :	objects.c $(CONFIG_H) $(INC)obj.h $(INC)objclass.h \
 		$(INC)prop.h $(INC)skills.h $(INC)color.h
