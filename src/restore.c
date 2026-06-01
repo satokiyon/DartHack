@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	restore.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.234 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -120,7 +120,7 @@ inven_inuse(boolean quietly)
         otmp2 = otmp->nobj;
         if (otmp->in_use) {
             if (!quietly)
-                pline("Finishing off %s...", xname(otmp));
+                pline("%sを使い切っている...", xname(otmp));
             useup(otmp);
         }
     }
@@ -295,7 +295,7 @@ restobjchn(NHFILE *nhfp, boolean frozen)
         otmp2 = otmp;
     }
     if (first && otmp2->nobj) {
-        impossible("Restobjchn: error reading objchn.");
+        impossible("オブジェクト連鎖の読み込みに失敗した。");
         otmp2->nobj = 0;
     }
 #ifdef SFCTOOL
@@ -441,7 +441,7 @@ restmonchn(NHFILE *nhfp)
                 mtmp->mw = obj;
             else {
                 MON_NOWEP(mtmp);
-                impossible("bad monster weapon restore");
+                impossible("モンスターの武器の復旧に失敗した。");
             }
         }
 
@@ -459,7 +459,7 @@ restmonchn(NHFILE *nhfp)
     }
 #ifndef SFCTOOL
     if (first && mtmp2->nmon) {
-        impossible("Restmonchn: error reading monchn.");
+        impossible("モンスター連鎖の読み込みに失敗した。");
         mtmp2->nmon = 0;
     }
 #endif
@@ -508,7 +508,7 @@ ghostfruit(struct obj *otmp)
             break;
 
     if (!oldf)
-        impossible("no old fruit?");
+        impossible("古い果物が見つからない？");
     else
         otmp->spe = fruitadd(oldf->fname, (struct fruit *) 0);
 }
@@ -546,7 +546,7 @@ restgamestate(NHFILE *nhfp)
         if (!gc.converted_savefile_loaded)
             /* for wizard mode, issue a reminder; for others, treat it
              * as an attempt to cheat and refuse to restore this file */
-            pline("Saved game was not yours.");
+            pline("そのセーブデータはあなたのものではない。");
         if (wizard || gc.converted_savefile_loaded) {
             if (gc.converted_savefile_loaded)
                 gc.converted_savefile_loaded = FALSE;
@@ -597,7 +597,7 @@ restgamestate(NHFILE *nhfp)
     }
     role_init(); /* Reset the initial role, race, gender, and alignment */
 #ifdef AMII_GRAPHICS
-    amii_setpens(amii_numcolors); /* use colors from save file */
+                pline("このセーブデータはあなたのものではありません。");
 #endif
 #endif /* !SFCTOOL */
     Sfi_long(nhfp, &svw.wreserve, "wreserve");
@@ -763,7 +763,7 @@ restlevelfile(xint8 ltmp)
     if (!nhfp) {
         /* failed to create a new file; don't attempt to make a panic save */
         program_state.something_worth_saving = 0;
-        panic("restlevelfile: %s", whynot);
+        panic("レベルファイルの保存に失敗: %s", whynot);
     }
     bufon(nhfp->fd);
     nhfp->mode = WRITING | FREEING;
@@ -865,7 +865,7 @@ dorecover(NHFILE *nhfp)
     dotcnt = 0;
     dotrow = 2;
     if (!WINDOWPORT(X11))
-        putstr(WIN_MAP, 0, "Restoring:");
+        putstr(WIN_MAP, 0, "復旧中:");
 #endif
     restoreinfo.mread_flags = 1; /* return despite error */
     while (1) {
@@ -915,7 +915,7 @@ dorecover(NHFILE *nhfp)
     max_rank_sz(); /* to recompute gm.mrank_sz (botl.c) */
 
     if ((uball && !uchain) || (uchain && !uball)) {
-        impossible("restgamestate: lost ball & chain");
+        impossible("復旧中に鉄球と鎖を見失った。");
         /* poor man's unpunish() */
         setworn((struct obj *) 0, W_CHAIN);
         setworn((struct obj *) 0, W_BALL);
@@ -1041,9 +1041,9 @@ rest_levl(NHFILE *nhfp)
 void
 trickery(char *reason)
 {
-    pline("Strange, this map is not as I remember it.");
-    pline("Somebody is trying some trickery here...");
-    pline("This game is void.");
+    pline("おかしい。この地図は私の記憶と違う。");
+    pline("だれかがここで細工をしている...");
+    pline("このゲームは無効だ。");
     Strcpy(svk.killer.name, reason ? reason : "");
     done(TRICKED);
 }
@@ -1097,10 +1097,10 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
         char trickbuf[BUFSZ];
 
         if (pid && pid != hpid)
-            Sprintf(trickbuf, "PID (%d) doesn't match saved PID (%d)!", hpid,
+            Sprintf(trickbuf, "PID (%d) が保存時の PID (%d) と一致しない!", hpid,
                     pid);
         else
-            Sprintf(trickbuf, "This is level %d, not %d!", dlvl, lev);
+            Sprintf(trickbuf, "ここは %d 階ではなく %d 階だ!", dlvl, lev);
         if (wizard)
             pline1(trickbuf);
         trickery(trickbuf);
@@ -1287,7 +1287,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
                     if (trap->ttyp == MAGIC_PORTAL)
                         break;
                 if (!trap)
-                    panic("getlev: need portal but none found");
+                        panic("getlev: ポータルが必要だが見つからない");
                 assign_level(&trap->dst, &ltmp);
                 break;
             }
@@ -1405,7 +1405,7 @@ restore_gamelog(NHFILE *nhfp)
         if (slen == -1)
             break;
         if (slen > ((BUFSZ*2) - 1))
-            panic("restore_gamelog: msg too big (%d)", slen);
+            panic("restore_gamelog: メッセージが大きすぎる (%d)", slen);
         Sfi_char(nhfp, msg, "gamelog-gamelog_text", slen);
         msg[slen] = '\0';
         Sfi_gamelog_line(nhfp, &tmp, "gamelog-gamelog_line");
@@ -1432,7 +1432,7 @@ restore_msghistory(NHFILE *nhfp)
         if (msgsize == -1)
             break;
         if (msgsize > BUFSZ - 1)
-            panic("restore_msghistory: msg too big (%d)", msgsize);
+            panic("restore_msghistory: メッセージが大きすぎる (%d)", msgsize);
         Sfi_char(nhfp, msg, "msghistory-msg", msgsize);
         msg[msgsize] = '\0';
 #ifndef SFCTOOL
@@ -1443,7 +1443,7 @@ restore_msghistory(NHFILE *nhfp)
 #ifndef SFCTOOL
     if (msgcount)
         putmsghistory((char *) 0, TRUE);
-    debugpline1("Read %d messages from savefile.", msgcount);
+    debugpline1("セーブファイルから%d件のメッセージを読み込んだ。", msgcount);
 #endif  /* !SFCTOOL */
 }
 
@@ -1566,7 +1566,7 @@ restore_menu(
                 add_menu_str(tmpwin, copyright_banner_line(k));
             add_menu_str(tmpwin, "");
         }
-        add_menu_str(tmpwin, "Select one of your saved games");
+        add_menu_str(tmpwin, "保存済みゲームを1つ選んでください");
         /* if all the save files have a playmode of '-' then we'll just list
            their character name-role-race-gend-algn values, but if any are
            'X' or 'D', we'll list playmode along with name-role-&c values
@@ -1592,12 +1592,12 @@ restore_menu(
                : (k <= 26 + 'N' - 'A') ? 'N' : 0;
         any.a_int = -1;                    /* not >= 0 */
         add_menu(tmpwin, &nul_glyphinfo, &any, clet, 'N', ATR_NONE, clr,
-                 "Start a new character", MENU_ITEMFLAGS_NONE);
+               "新しいキャラクターで始める", MENU_ITEMFLAGS_NONE);
         clet = (k + 1 <= 'q' - 'a' && clet == 'n') ? 'q'  /* quit */
                : (k + 1 <= 26 + 'Q' - 'A' && clet == 'N') ? 'Q' : 0;
         any.a_int = -2;
         add_menu(tmpwin, &nul_glyphinfo, &any, clet, 'Q', ATR_NONE, clr,
-                 "Never mind (quit)", MENU_ITEMFLAGS_SELECTED);
+               "やめる（終了）", MENU_ITEMFLAGS_SELECTED);
         /* no prompt on end_menu, as we've done our own at the top */
         end_menu(tmpwin, (char *) 0);
         if (select_menu(tmpwin, PICK_ONE, &chosen_game) > 0) {
