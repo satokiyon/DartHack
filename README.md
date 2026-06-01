@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02. -->
 # NetHack 5.0 を勝手に日本語に翻訳する非公式プロジェクト
 
 NetHackJPは、ダンジョン探索ゲーム **NetHack 5.0** を日本語で遊べるようにすることを目的とした**非公式**プロジェクトです。
@@ -14,6 +14,7 @@ NetHackJPは、ダンジョン探索ゲーム **NetHack 5.0** を日本語で遊
     *   メッセージ、アイテム名、モンスター名などの日本語翻訳および表示対応を行います。
 2.  **Windows版が日本語でプレイできる状態にする**
     *   Windows版にて日本語が表示され、プレイできる状態を目指します。
+    *   日本語入力も可能にし、プレイヤーの名前、アイテムやモンスターの命名、願いの指定、虐殺の指定、データベースの検索、などは日本語/英語どちらも使用できることを目指します。
 
 ## 現在の作業方針
 
