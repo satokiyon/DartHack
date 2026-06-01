@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. -->
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <!-- -v -->
@@ -236,24 +237,37 @@
   </ItemGroup>
   <ItemGroup>
     <DlbList Include = "$(DatDir)data"/>
+    <DlbList Include = "$(DatDir)data_jp"/>
     <DlbList Include = "$(DatDir)oracles"/>
+    <DlbList Include = "$(DatDir)oracles_jp"/>
     <DlbList Include = "$(DatDir)options" Condition="Exists('$(DatDir)options')"/>
     <DlbList Include = "$(DatDir)ttyoptions" Condition="Exists('$(DatDir)ttyoptions')"/>
     <DlbList Include = "$(DatDir)guioptions" Condition="Exists('$(DatDir)guioptions')"/>
     <DlbList Include = "$(DatDir)rumors"/>
+    <DlbList Include = "$(DatDir)rumors_jp"/>
     <DlbList Include = "$(DatDir)engrave"/>
     <DlbList Include = "$(DatDir)epitaph"/>
     <DlbList Include = "$(DatDir)bogusmon"/>
     <DlbList Include = "$(DatDir)tribute"/>
     <DlbList Include = "$(DatDir)help"/>
+    <DlbList Include = "$(DatDir)help_jp"/>
     <DlbList Include = "$(DatDir)porthelp"/>
     <DlbList Include = "$(DatDir)hh"/>
+    <DlbList Include = "$(DatDir)hh_jp"/>
     <DlbList Include = "$(DatDir)cmdhelp"/>
+    <DlbList Include = "$(DatDir)cmdhelp_jp"/>
     <DlbList Include = "$(DatDir)keyhelp"/>
+    <DlbList Include = "$(DatDir)keyhelp_jp"/>
     <DlbList Include = "$(DatDir)history"/>
+    <DlbList Include = "$(DatDir)history_jp"/>
     <DlbList Include = "$(DatDir)opthelp"/>
+    <DlbList Include = "$(DatDir)opthelp_jp"/>
     <DlbList Include = "$(DatDir)optmenu"/>
+    <DlbList Include = "$(DatDir)optmenu_jp"/>
+    <DlbList Include = "$(DatDir)usagehlp"/>
+    <DlbList Include = "$(DatDir)usagehlp_jp"/>
     <DlbList Include = "$(DatDir)wizhelp"/>
+    <DlbList Include = "$(DatDir)wizhelp_jp"/>
     <DlbList Include = "$(DatDir)license"/>
     <DlbList Include = "$(DatDir)*.lua"/>
   </ItemGroup>
