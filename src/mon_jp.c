@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-20. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 #include "config.h"
 #include "permonst.h"
 
@@ -139,7 +139,7 @@ static const char *const mon_jp_names[NUMMONS][NUM_MGENDERS] = {
     [PM_ARCHEOLOGIST] = { 0, 0, "考古学者" },
     [PM_BARBARIAN] = { 0, 0, "野蛮人" },
     [PM_CAVE_DWELLER] = { 0, 0, "洞窟人" },
-    [PM_HEALER] = { 0, 0, "薬師" },
+    [PM_HEALER] = { 0, 0, "治療師" },
     [PM_KNIGHT] = { 0, 0, "騎士" },
     [PM_MONK] = { 0, 0, "武闘家" },
     [PM_CLERIC] = { 0, 0, "司祭" },

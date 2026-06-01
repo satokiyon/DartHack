@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-23. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. -->
 # quest.lua 翻訳用語集・実務知見
 
 この文書は `quest.lua` および関連するテキストの翻訳に使用する用語集と、特有の実務知見をまとめたものです。基本方針については [docs/translation-instructions-ja.md](translation-instructions-ja.md) を参照してください。
@@ -16,7 +16,7 @@
 - Archeologist: 考古学者
 - Barbarian: 野蛮人
 - Caveman / Cavewoman: 洞窟人
-- Healer: 薬師
+- Healer: 治療師
 - Knight: 騎士
 - Monk: 武闘家
 - Priest / Priestess: 司祭

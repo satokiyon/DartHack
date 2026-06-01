@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-29. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. -->
 # NetHackJP 翻訳作業 指示ファイル
 
 この文書は、NetHackJP の日本語化作業における翻訳方針、スタイル、および実務上の知見をまとめたものです。ビルド手順やプロジェクト管理などの技術的な運用については `.github/copilot-instructions.md` を参照してください。
@@ -65,7 +65,7 @@
   - Archeologist: 考古学者
   - Barbarian: 野蛮人
   - Caveman / Cavewoman: 洞窟人
-  - Healer: 薬師
+  - Healer: 治療師
   - Knight: 騎士
   - Monk: 武闘家
   - Priest / Priestess: 司祭
