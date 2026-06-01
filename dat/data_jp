@@ -1286,19 +1286,19 @@ xan
 xorn
 365691,5
 ya
-366064,2
+366064,3
 yeenoghu
-366175,5
+366238,5
 yeti
-366440,15
+366581,15
 *yugake
-367311,3
+367714,3
 yumi
-367496,4
+367930,4
 *zombi*
-367705,5
+368199,5
 zruty
-367948,2
+368442,2
 arc* ranks
 archeologist
 digger
@@ -1310,7 +1310,7 @@ spelunker
 speleologist
 collector
 curator
-368041,11
+368535,11
 bar* ranks
 barbarian
 plunder?*
@@ -1322,7 +1322,7 @@ reaver
 slayer
 chieftain*
 conquer*
-368360,11
+368854,11
 cav* ranks
 caveman
 cavewoman
@@ -1336,7 +1336,7 @@ roamer
 nomad
 rover
 pioneer
-368670,11
+369164,11
 hea* ranks
 healer
 rhizotomist
@@ -1349,7 +1349,7 @@ magister
 magistra
 physician
 chirurgeon
-368985,12
+369479,12
 kni* ranks
 knight
 gallant
@@ -1362,7 +1362,7 @@ chevalier*
 seignieur
 dame
 paladin
-369324,14
+369818,14
 mon* ranks
 monk
 candidate
@@ -1374,7 +1374,7 @@ student of metals
 student of winds
 student of fire
 master
-369678,11
+370172,11
 pri* ranks
 priest*
 aspirant
@@ -1385,7 +1385,7 @@ canon*
 lama
 ?atriarch
 high priest*
-370006,14
+370500,14
 ran* ranks
 ranger
 tenderfoot
@@ -1397,7 +1397,7 @@ arbalester
 archer
 sharpshooter
 marks*man
-370344,11
+370838,11
 rog* ranks
 rogue
 footpad
@@ -1409,7 +1409,7 @@ burglar
 filcher
 mags*man
 thief
-370663,11
+371157,11
 sam* ranks
 samurai
 hatamoto
@@ -1422,7 +1422,7 @@ kokushu
 daimyo
 kuge
 shogun
-370976,14
+371470,14
 tou* ranks
 tourist
 rambler
@@ -1434,7 +1434,7 @@ journeyer
 voyager
 explorer
 adventurer
-371307,12
+371801,12
 val* ranks
 valkyrie
 stripling
@@ -1448,7 +1448,7 @@ heroine
 champion
 lord
 lady
-371638,13
+372132,13
 wiz* ranks
 wizard
 evoker
@@ -1461,13 +1461,13 @@ sorcerer
 sorceress
 necromancer
 mage
-371989,11
+372483,11
 novel
 paperback book
 discworld novel*
-372310,44
+372804,44
 .
-373074,0
+373568,0
 	ランドルフ伯爵にとっては、七男のトマスを修道院長か何かにする以外、
 	道はないことがとうの昔から明らかだった。1226年に生まれた彼は、
 	子供の頃から、獲物を狙う鷲のようになることも、鷹狩りや馬上槍試合
@@ -6324,35 +6324,36 @@ discworld novel*
 	移動させる能力を持っている。これにより、ゾーンは次の食事と
 	自らの間に立ちふさがる、いかなる障害物をも通り抜ける能力を
 	得ている。
-	The arrow of choice of the samurai, ya are made of very
-	straight bamboo, and are tipped with hardened steel.
-	Yeenoghu, the demon lord of gnolls, still exists although
-	all his followers have been wiped off the face of the earth.
-	He casts magic projectiles at those close to him, and a mere
-	gaze into his piercing eyes may hopelessly confuse the
-	battle-weary adventurer.
-	The Abominable Snowman, or yeti, is one of the truly great
-	unknown animals of the twentieth century.  It is a large hairy
-	biped that lives in the Himalayan region of Asia ... The story
-	of the Abominable Snowman is filled with mysteries great and
-	small, and one of the most difficult of all is how it got that
-	awful name.  The creature is neither particularly abominable,
-	nor does it necessarily live in the snows.  _Yeti_ is a Tibetan
-	word which may apply either to a real, but unknown animal of
-	the Himalayas, or to a mountain spirit or demon -- no one is
-	quite sure which.  And after nearly half a century in which
-	Westerners have trampled around looking for the yeti, and
-	asking all sorts of questions, the original native traditions
-	concerning the creature have become even more muddled and
-	confused.
-		[ The Encyclopedia of Monsters, by Daniel Cohen ]
-	Japanese leather archery gloves.  Gloves made for use while
-	practicing had thumbs reinforced with horn.  Those worn into
-	battle had thumbs reinforced with a double layer of leather.
-	The samurai is highly trained with a special type of bow,
-	the yumi.  Like the ya, the yumi is made of bamboo.  With
-	the yumi-ya, the bow and arrow, the samurai is an extremely
-	accurate and deadly warrior.
+	侍が好んで用いる矢（や）は、非常にまっすぐな竹で
+	作られており、その先端には焼き入れされた鋼が
+	取り付けられている。
+	クノルの魔王であるイェノグは、彼の信奉者たちが
+	ことごとく地上から一掃された今もなお存在している。
+	彼は身近な者に対して魔法の投射物を放ち、その鋭い
+	眼光で見つめられるだけで、戦いに疲れた冒険者は
+	絶望的な混乱に陥るかもしれない。
+	雪男、あるいはイエティは、２０世紀における真に
+	偉大な未確認動物の一つである。それはアジアのヒマラヤ
+	地方に生息する、毛むくじゃらで大型の二足歩行生物で
+	ある……雪男の物語は大小さまざまな謎に満ちており、
+	中でも最も不可解なのは、なぜそのような恐ろしい名前が
+	ついたのかということだ。この生物は特に忌まわしいわけ
+	でもなければ、必ずしも雪の中に住んでいるわけでもない。
+	「イエティ」はチベット語であり、ヒマラヤに実在する
+	未確認の動物を指すこともあれば、山の精霊や悪魔を指す
+	こともあるが、どちらなのかははっきりしていない。
+	そして、西洋人がイエティを探し回って踏み荒らし、
+	ありとあらゆる質問を投げかけてから半世紀近くが経ち、
+	この生物に関する本来の先住民の伝承は、さらに混乱して
+	曖昧なものになってしまった。
+		［『モンスター百科事典』、ダニエル・コーエン著 ］
+	日本の革製の弓術用手袋（ゆがけ）。練習用に作られた
+	手袋は、親指が角で補強されていた。合戦で着用された
+	ものは、親指が二重の革で補強されていた。
+	侍は「弓（ゆみ）」と呼ばれる特殊な弓の訓練を高度に
+	積んでいる。矢と同様に、弓も竹で作られている。
+	弓と矢を合わせた「弓矢」を手にすることで、侍は
+	極めて正確で恐るべき戦士となる。
 	The zombi... is a soulless human corpse, still dead, but
 	taken from the grave and endowed by sorcery with a
 	mechanical semblance of life, -- it is a dead body which is
