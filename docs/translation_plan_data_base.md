@@ -1,12 +1,12 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-25. -->
-# NetHackJP `dat/data.base` 日本語翻訳計画
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. -->
+# NetHackJP `dat/data_jp.base` 日本語翻訳計画
 
 ## 1. 目的
-`dat/data.base` ファイル内のゲーム内百科事典の記述を、NetHack の世界観と引用元の雰囲気を尊重しつつ、自然な日本語に翻訳する。
+`dat/data_jp.base` ファイル内のゲーム内百科事典の記述を、NetHack の世界観と引用元の雰囲気を尊重しつつ、自然な日本語に翻訳する。
 以前、ファイルを破壊した経験を踏まえ、今回は安全かつ非破壊的な手法で作業を完遂する。
 
 ## 2. 基本方針
-*   **翻訳のベース**: 既存の日本語版 NetHack の `data.base` を参考にし、文学作品の引用は公式訳を尊重。新規項目は雰囲気を合わせて新訳を作成。
+*   **翻訳のベース**: 既存の日本語版 NetHack の `data_jp.base` を参考にし、文学作品の引用は公式訳を尊重。新規項目は雰囲気を合わせて新訳を作成。
 *   **文体**:
     *   文学的引用: 原文の雰囲気・既訳を尊重。
     *   科学的説明: 客観的な「〜である」調。
@@ -662,7 +662,7 @@
 
 ### 【グループ完了時の処理（グループごとに1回実行）】
 5.  グループ内のすべてのキーの置換が完了した段階で、`dat/` ディレクトリにて `..\tools\Debug\x64\makedefs.exe -d` を実行し、エラーが発生しないこと（makedefs処理が正常に完了すること）を確認する。
-6.  検証が完了した時点で、`git add dat/data.base` を実行してグループ全体の差分をステージ（保護）する。
+6.  検証が完了した時点で、`git add dat/data_jp.base` を実行してグループ全体の差分をステージ（保護）する。
 
 ---
 
