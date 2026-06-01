@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02. */
 /* NetHack 5.0	hack.h	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
@@ -819,6 +820,14 @@ struct sinfo {
     volatile int resize_pending; /* set by signal handler */
     volatile int getting_char;  /* referenced during signal handling */
 #endif
+};
+
+/* structure for current 'level_status'; not saved and restored */
+struct levelstatus {
+    int making;                 /* makelevel has begun */
+    int loading;                /* level loading has begun */
+    int shkready;               /* shops ready */
+    int ready;                  /* level is ready */
 };
 
 /* value of program_state.input_state, significant during readchar();

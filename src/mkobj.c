@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02. */
 /* NetHack 5.0	mkobj.c	$NHDT-Date: 1764044196 2025/11/24 20:16:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.326 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -2354,9 +2354,7 @@ place_object(struct obj *otmp, coordxy x, coordxy y)
     otmp->where = OBJ_FLOOR;
 
     /* if placed outside of shop, no_charge is no longer applicable */
-    if (program_state.beyond_savefile_load
-        && otmp->no_charge
-        && !costly_spot(x, y)
+    if (level_status.shkready && otmp->no_charge && !costly_spot(x, y)
         && !costly_adjacent(find_objowner(otmp, x, y), x, y))
         otmp->no_charge = 0;
 
