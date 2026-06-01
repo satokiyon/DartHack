@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02. */
 /* NetHack 5.0	decl.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.341 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -1044,6 +1044,7 @@ static const struct instance_globals_saved_y init_svy = {
 };
 
 static const struct sinfo init_program_state = { 0 };
+static const struct levelstatus init_level_status = { 0 };
 
 #if 0
 struct instance_globals g;
@@ -1096,6 +1097,7 @@ struct instance_globals_saved_w svw;
 struct instance_globals_saved_x svx;
 struct instance_globals_saved_y svy;
 struct sinfo program_state;
+struct levelstatus level_status;
 
 const struct const_globals cg = {
     DUMMY, /* zeroobj */
@@ -1119,6 +1121,12 @@ void
 program_state_init(void)
 {
     program_state = init_program_state;
+}
+
+void
+level_status_init(void)
+{
+    level_status = init_level_status;
 }
 
 void

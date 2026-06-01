@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02. */
 /* NetHack 5.0  libnhmain.c $NHDT-Date: 1693359589 2023/08/30 01:39:49 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1093,6 +1093,7 @@ void js_constants_init() {
     SET_CONSTANT("GLYPH", GLYPH_SWALLOW_OFF);
     SET_CONSTANT("GLYPH", GLYPH_WARNING_OFF);
     SET_CONSTANT("GLYPH", GLYPH_STATUE_OFF);
+    SET_CONSTANT("GLYPH", GLYPH_PILETOP_OFF);
     SET_CONSTANT("GLYPH", GLYPH_UNEXPLORED_OFF);
     SET_CONSTANT("GLYPH", GLYPH_NOTHING_OFF);
     SET_CONSTANT("GLYPH", MAX_GLYPH);

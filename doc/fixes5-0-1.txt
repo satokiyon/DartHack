@@ -1,3 +1,4 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02.
 NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.20 $ $NHDT-Date: 1779581008 2026/05/24 00:03:28 $
 	
 General Fixes and Modified Features
@@ -46,6 +47,10 @@ replace the hashtable used for parsing glyphnames with sorted indices and
 	of pr #1548 by ingpaschke)
 for SELECTSAVE, allow utd flags for uptodate() to be passed down through
 	the small set of callers that eventually call uptodate()
+avoid calling costly_spot(), costly_adjacent(), find_byowner(), which
+	all rely on shop_keeper() under the hood, in the midst of the level
+	loading process before all the required data structures have
+	been finalized
  
 
 Platform- and/or Interface-Specific Fixes
