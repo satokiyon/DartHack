@@ -669,7 +669,8 @@ HACKCSRC = \
 	$(SRC)mondata.c  $(SRC)monmove.c  $(SRC)monst.c    $(SRC)mplayer.c \
 	$(SRC)mthrowu.c  $(SRC)muse.c     $(SRC)music.c    $(SRC)nhlua.c \
 	$(SRC)nhlsel.c   $(SRC)nhlobj.c   $(SRC)o_init.c   $(SRC)objects.c \
-	$(SRC)objnam.c   $(SRC)options.c  $(SRC)pager.c    $(SRC)pickup.c \
+	$(SRC)jp_data_lookup.c $(SRC)objnam.c $(SRC)options.c $(SRC)pager.c \
+	$(SRC)pickup.c \
 	$(SRC)pline.c    $(SRC)polyself.c $(SRC)potion.c   $(SRC)pray.c \
 	$(SRC)priest.c   $(SRC)quest.c    $(SRC)questpgr.c $(SRC)read.c \
 	$(SRC)rect.c     $(SRC)region.c   $(SRC)restore.c  $(SRC)revision.c \
@@ -3323,6 +3324,7 @@ $(OTTY)nhlobj.o: nhlobj.c $(HACK_H) $(INCL)sp_lev.h
 $(OTTY)nhlsel.o: nhlsel.c $(HACK_H) $(INCL)sp_lev.h
 $(OTTY)nhlua.o: nhlua.c $(HACK_H) $(INCL)dlb.h
 	$(Q)$(CC) $(CFLAGS) $(TTYDEF) -wd4324 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $(@B).c
+$(OTTY)jp_data_lookup.o: jp_data_lookup.c $(HACK_H)
 $(OTTY)nhmd4.o: nhmd4.c $(HACK_H) $(INCL)nhmd4.h
 $(OTTY)o_init.o: o_init.c $(HACK_H)
 $(OTTY)objects.o: objects.c $(CONFIG_H) $(INCL)defsym.h \
@@ -3704,6 +3706,7 @@ $(OGUI)music.o: music.c $(HACK_H)
 $(OGUI)nhlobj.o: nhlobj.c $(HACK_H) $(INCL)sp_lev.h
 $(OGUI)nhlsel.o: nhlsel.c $(HACK_H) $(INCL)sp_lev.h
 $(OGUI)nhlua.o: nhlua.c $(HACK_H) $(INCL)dlb.h
+$(OGUI)jp_data_lookup.o: jp_data_lookup.c $(HACK_H)
 $(OGUI)nhmd4.o: nhmd4.c $(HACK_H) $(INCL)nhmd4.h
 $(OGUI)o_init.o: o_init.c $(HACK_H)
 $(OGUI)objects.o: objects.c $(CONFIG_H) $(INCL)defsym.h \

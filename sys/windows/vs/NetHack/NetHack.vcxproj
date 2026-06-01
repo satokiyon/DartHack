@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. -->
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\config.props" />
   <Import Project="..\dirs.props" />
@@ -162,6 +162,7 @@
     <ClCompile Include="$(SrcDir)nhlsel.c" />
     <ClCompile Include="$(SrcDir)nhlua.c" />
     <ClCompile Include="$(SrcDir)objects.c" />
+    <ClCompile Include="$(SrcDir)jp_data_lookup.c" />
     <ClCompile Include="$(SrcDir)obj_jp.c" />
     <ClCompile Include="$(SrcDir)objnam.c" />
     <ClCompile Include="$(SrcDir)options.c" />

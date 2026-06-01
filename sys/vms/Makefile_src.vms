@@ -122,7 +122,7 @@ HACKFILES := allmain alloc apply artifact attrib ball bones botl \
 	   insight invent isaac64 light lock mail makemon mcastu mdlib mhitm \
 	   mhitu minion mklev mkmap mkmaze mkobj mkroom mon \
 	   mondata monmove monst mplayer mthrowu muse music \
-	   nhlua nhlsel nhlobj objnam o_init objects \
+	   nhlua nhlsel nhlobj jp_data_lookup objnam o_init objects \
 	   options pager pickup pline polyself potion pray \
 	   priest quest questpgr read rect region report restore \
 	   rip rnd role rumors save selvar sfbase sfstruct \
@@ -777,6 +777,7 @@ $(TARGETPFX)music.obj: music.c $(HACK_H)
 $(TARGETPFX)nhlua.obj: nhlua.c $(HACK_H) $(INCL)dlb.h
 $(TARGETPFX)nhlsel.obj: nhlsel.c $(HACK_H) $(INCL)sp_lev.h
 $(TARGETPFX)nhlobj.obj: nhlobj.c $(HACK_H) $(INCL)sp_lev.h
+$(TARGETPFX)jp_data_lookup.obj: jp_data_lookup.c $(HACK_H)
 $(TARGETPFX)o_init.obj: o_init.c $(HACK_H)
 $(TARGETPFX)objects.obj: objects.c $(CONFIG_H) $(INCL)obj.h \
 		$(INCL)prop.h $(INCL)skills.h $(INCL)color.h \

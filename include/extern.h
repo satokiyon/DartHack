@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2381,6 +2381,8 @@ extern const char *jp_cmap_explanation(int, coordxy, coordxy);
 extern const char *jp_terrain_name(int);
 extern char *ice_descr(coordxy, coordxy, char *) NONNULL NONNULLARG3;
 extern boolean ia_checkfile(struct obj *) NONNULLARG1;
+extern boolean jp_data_lookup_key_from_japanese(const char *, char *, size_t)
+   NONNULLARG12;
 extern int do_screen_description(coord, boolean, int, char *, const char **,
                                  struct permonst **) NONNULLARG45;
 extern int do_look(int, coord *);
