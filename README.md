@@ -3,6 +3,11 @@
 
 NetHackJPは、ダンジョン探索ゲーム **NetHack 5.0** を日本語で遊べるようにすることを目的とした**非公式**プロジェクトです。
 
+<img width="1318" height="826" alt="2026-06-02_05h29_10" src="https://github.com/user-attachments/assets/69fc8182-c260-4dbc-9127-7103506f8aad" />
+
+<img width="1058" height="607" alt="2026-06-02_05h25_26" src="https://github.com/user-attachments/assets/ab664586-d185-4a1c-b23e-6807ec676d9a" />
+
+
 ## プロジェクトの目標
 
 1.  **NetHack 5.0 の画面に表示されるメッセージやテキストを日本語に翻訳する**
