@@ -168,6 +168,7 @@ struct window_procs tty_procs = {
 winid BASE_WINDOW;
 struct WinDesc *wins[MAXWIN];
 struct DisplayDesc *ttyDisplay; /* the tty display descriptor */
+boolean tty_prompt_cursor_suppressed = FALSE;
 
 extern void cmov(int, int);   /* from termcap.c */
 extern void nocmov(int, int); /* from termcap.c */
@@ -4447,7 +4448,7 @@ tty_nhgetch(void)
 
     HUPSKIP_RESULT('\033');
     print_vt_code1(AVTC_INLINE_SYNC);
-    term_curs_set(1);
+    term_curs_set(tty_prompt_cursor_suppressed ? 0 : 1);
     (void) fflush(stdout);
     /* Note: if raw_print() and wait_synch() get called to report terminal
      * initialization problems, then wins[] and ttyDisplay might not be

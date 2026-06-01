@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-15. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	wintty.h	$NHDT-Date: 1656014599 2022/06/23 20:03:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) David Cohrs, 1991,1992                           */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -141,6 +141,7 @@ extern winid BASE_WINDOW;
 extern struct WinDesc *wins[MAXWIN];
 
 extern struct DisplayDesc *ttyDisplay; /* the tty display descriptor */
+extern boolean tty_prompt_cursor_suppressed;
 
 extern char morc;         /* last character typed to xwaitforspace */
 extern char defmorestr[]; /* default --more-- prompt */
