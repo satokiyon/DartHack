@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1606009004 2020/11/22 01:36:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -337,6 +337,8 @@ jp_translate_killer_text_for_display(
             Snprintf(outmain, sizeof outmain, "爆発する跳ね橋に倒された");
         } else if (!strcmpi(killer, "collapsing drawbridge")) {
             Snprintf(outmain, sizeof outmain, "崩れ落ちる跳ね橋に倒された");
+        } else if (!strcmpi(killer, "life drainage")) {
+            Snprintf(outmain, sizeof outmain, "生命力吸収で倒された");
         } else {
             Snprintf(outmain, sizeof outmain, "%sに倒された", killer);
         }

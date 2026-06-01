@@ -1159,12 +1159,18 @@ disp_artifact_discoveries(
             continue; /* for WIN_ERR, we just count */
 
         if (i == 0)
-            putstr(tmpwin, iflags.menu_headings.attr, "Artifacts");
+            putstr(tmpwin, iflags.menu_headings.attr, "アーティファクト");
         m = artidisco[i];
         otyp = artilist[m].otyp;
         algnstr = align_str(artilist[m].alignment);
-        if (!strcmp(algnstr, "unaligned"))
-            algnstr = "non-aligned";
+        if (!strcmp(algnstr, "lawful"))
+            algnstr = "秩序";
+        else if (!strcmp(algnstr, "neutral"))
+            algnstr = "中立";
+        else if (!strcmp(algnstr, "chaotic"))
+            algnstr = "混沌";
+        else if (!strcmp(algnstr, "unaligned"))
+            algnstr = "無属性";
 
         Sprintf(buf, "  %s [%s %s]", artiname(m),
                 algnstr, simple_typename(otyp));
@@ -1181,21 +1187,21 @@ dump_artifact_info(winid tmpwin)
     char buf[BUFSZ], buf2[BUFSZ];
 
     /* not a menu, but header uses same bold or whatever attribute as such */
-    putstr(tmpwin, iflags.menu_headings.attr, "Artifacts");
+    putstr(tmpwin, iflags.menu_headings.attr, "アーティファクト");
     for (m = 1; m <= NROFARTIFACTS; ++m) {
         Snprintf(buf2, sizeof buf2,
                 "[%s%s%s%s%s%s%s%s%s]", /* 9 bits overall */
-                artiexist[m].exists ? "exists;" : "",
-                artiexist[m].found  ? " hero knows;" : "",
+                     artiexist[m].exists ? "生成済;" : "",
+                     artiexist[m].found  ? " 既知;" : "",
                 /* .exists and .found have different punctuation because
                    they're expected to be combined with one of these */
-                artiexist[m].gift   ? " gift"   : "",
-                artiexist[m].wish   ? " wish"   : "",
+                     artiexist[m].gift   ? " 授与"   : "",
+                     artiexist[m].wish   ? " 願い"   : "",
                      artiexist[m].named  ? " 命名"   : "",
-                artiexist[m].viadip ? " viadip" : "",
-                artiexist[m].lvldef ? " lvldef" : "",
-                artiexist[m].bones  ? " bones"  : "",
-                artiexist[m].rndm   ? " random" : "");
+                     artiexist[m].viadip ? " 浸し"   : "",
+                     artiexist[m].lvldef ? " 固定配置" : "",
+                     artiexist[m].bones  ? " 遺品"   : "",
+                     artiexist[m].rndm   ? " ランダム" : "");
 #if 0   /* 'tmpwin' here is a text window, not a menu */
         if (iflags.menu_tab_sep)
             Sprintf(buf, "  %s\t%s", artiname(m), buf2);
@@ -1241,8 +1247,8 @@ enum mb_effect_indices {
 
 #define MB_MAX_DIEROLL 8 /* rolls above this aren't magical */
 static const char *const mb_verb[2][NUM_MB_INDICES] = {
-    { "probe", "stun", "scare", "cancel" },
-    { "prod", "amaze", "tickle", "purge" },
+    { "探知", "気絶", "恐慌", "封魔" },
+    { "つつき", "惑わせ", "くすぐり", "浄化" },
 };
 
 /* called when someone is being hit by Magicbane */
@@ -1558,7 +1564,7 @@ artifact_hit(
     /* reverse from AD&D. */
     if (spec_ability(otmp, SPFX_BEHEAD)) {
         if (is_art(otmp, ART_TSURUGI_OF_MURAMASA) && dieroll == 1) {
-            wepdesc = "The razor-sharp blade";
+            wepdesc = "鋭利な刃";
             /* not really beheading, but so close, why add another SPFX */
             if (youattack && engulfing_u(mdef)) {
                 You("%sを真っ二つに切り裂いた!", l_monnam(mdef));
@@ -1574,18 +1580,19 @@ artifact_hit(
                     if (youattack)
                         You("%sを深く切り裂いた!", l_monnam(mdef));
                     else if (vis)
-                        pline("%s cuts deeply into %s!", Monnam(magr),
+                        pline("%sは%sを深く切り裂いた!", Monnam(magr),
                               hittee);
                     *dmgptr *= 2;
                     return TRUE;
                 }
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
-                pline("%s cuts %s in half!", wepdesc, mon_nam(mdef));
+                pline("%sは%sを真っ二つに切り裂いた!", wepdesc,
+                      mon_nam(mdef));
                 observe_object(otmp);
                 return TRUE;
             } else {
                 if (bigmonst(gy.youmonst.data)) {
-                    pline("%s cuts deeply into you!",
+                    pline("%sはあなたを深く切り裂いた!",
                           magr ? Monnam(magr) : wepdesc);
                     *dmgptr *= 2;
                     return TRUE;
@@ -1597,14 +1604,16 @@ artifact_hit(
                  * damage does not prevent death.
                  */
                 *dmgptr = 2 * (Upolyd ? u.mh : u.uhp) + FATAL_DAMAGE_MODIFIER;
-                pline("%s cuts you in half!", wepdesc);
+                pline("%sはあなたを真っ二つに切り裂いた!", wepdesc);
                 observe_object(otmp);
                 return TRUE;
             }
         } else if (is_art(otmp, ART_VORPAL_BLADE)
                    && (dieroll == 1 || mdef->data == &mons[PM_JABBERWOCK])) {
-            static const char *const behead_msg[2] = { "%s beheads %s!",
-                                                       "%s decapitates %s!" };
+            static const char *const behead_msg[2] = {
+                "%sは%sの首を落とした!",
+                "%sは%sを斬首した!"
+            };
 
             if (youattack && engulfing_u(mdef))
                 return FALSE;
@@ -1619,7 +1628,7 @@ artifact_hit(
                     return (boolean) (youattack || vis);
                 }
                 if (noncorporeal(mdef->data) || amorphous(mdef->data)) {
-                    pline("%s slices through %s %s.", wepdesc,
+                    pline("%sは%sの%sを切り裂いた.", wepdesc,
                           s_suffix(mon_nam(mdef)), jp_mbodypart(mdef, NECK));
                     return TRUE;
                 }
@@ -1639,12 +1648,12 @@ artifact_hit(
                 }
                 if (noncorporeal(gy.youmonst.data)
                     || amorphous(gy.youmonst.data)) {
-                    pline("%s slices through your %s.", wepdesc,
+                    pline("%sはあなたの%sを切り裂いた.", wepdesc,
                           jp_body_part(NECK));
                     return TRUE;
                 }
                 *dmgptr = 2 * (Upolyd ? u.mh : u.uhp) + FATAL_DAMAGE_MODIFIER;
-                pline(ROLL_FROM(behead_msg), wepdesc, "you");
+                pline(ROLL_FROM(behead_msg), wepdesc, "あなた");
                 observe_object(otmp);
                 /* Should amulets fall off? */
                 return TRUE;
@@ -1654,7 +1663,7 @@ artifact_hit(
     if (spec_ability(otmp, SPFX_DRLI)) {
         /* some non-living creatures (golems, vortices) are vulnerable to
            life drain effects so can get "<Arti> draws the <life>" feedback */
-        const char *life = nonliving(mdef->data) ? "animating force" : "life";
+        const char *life = nonliving(mdef->data) ? "動力" : "生命力";
 
         if (!youdefend) {
             int m_lev = (int) mdef->m_lev, /* will be 0 for 1d4 mon */
@@ -1676,7 +1685,7 @@ artifact_hit(
                     pline_The("%sの刃が%sの生命力を%sから吸い取った!",
                               hcolor(NH_BLACK), life, mon_nam(mdef));
                 else
-                    pline("%s draws the %s from %s!",
+                    pline("%sは%sから%sを吸い取った!",
                           The(otmpname), life, mon_nam(mdef));
             }
             if (mdef->m_lev == 0) {
@@ -1705,8 +1714,8 @@ artifact_hit(
             if (Blind) {
                 You_feel("%sがあなたの%sを吸い取るのを感じた!",
                          is_art(otmp, ART_STORMBRINGER)
-                            ? "unholy blade"
-                            : "object",
+                                     ? "邪悪な刃"
+                                     : "何か",
                          life);
             } else {
                 /* call distant_name() for possible side-effects even if
@@ -1717,7 +1726,7 @@ artifact_hit(
                     pline_The("%sの刃があなたの%sを吸い取った!",
                               hcolor(NH_BLACK), life);
                 else
-                    pline("%s drains your %s!", The(otmpname), life);
+                    pline("%sはあなたの%sを吸い取った!", The(otmpname), life);
             }
             losexp("life drainage");
             if (magr && magr->mhp < magr->mhpmax) {
@@ -1896,7 +1905,7 @@ invoke_create_portal(struct obj *obj)
         num_ok_dungeons++;
         last_ok_dungeon = i;
     }
-    end_menu(tmpwin, "Open a portal to which dungeon?");
+    end_menu(tmpwin, "どのダンジョンにポータルを開きますか?");
     if (num_ok_dungeons > 1) {
         /* more than one entry; display menu for choices */
         menu_item *selected;
@@ -1931,7 +1940,7 @@ invoke_create_portal(struct obj *obj)
         You_feel("一瞬ひどい目まいに襲われた.");
     } else {
         if (!Blind)
-            You("慨輝く光り浪ばれた.");
+            You("まばゆい光に包まれた.");
         else
             You_feel("一瞬、体がふわりと浮いた気がした.");
         goto_level(&newlev, FALSE, FALSE, FALSE);
@@ -1962,7 +1971,7 @@ invoke_create_ammo(struct obj *obj)
     } else
         otmp->quan += rnd(5);
     otmp->owt = weight(otmp);
-    otmp = hold_another_object(otmp, "Suddenly %s out.",
+    otmp = hold_another_object(otmp, "突然%s.",
                                aobjnam(otmp, "fall"), (char *) 0);
     nhUse(otmp);
     return ECMD_TIME;
@@ -2013,16 +2022,12 @@ invoke_banish(struct obj *obj UNUSED)
     }
 
     if (nvanished) {
-        char subject[] = "demons";
-
-        if (nvanished == 1)
-            *(eos(subject) - 1) = '\0'; /* remove 's' */
-        pline("%s %s %s in a cloud of brimstone!",
-              nstayed ? ((nvanished > nstayed)
-                         ? "Most of the"
-                         : "Some of the")
-              : "The",
-              subject, vtense(subject, "disappear"));
+        if (nstayed)
+            pline("悪魔たちの%sが硫黄の雲の中に消え去った!",
+                  (nvanished > nstayed) ? "大半" : "一部");
+        else
+            pline("悪魔%sが硫黄の雲の中に消え去った!",
+                  (nvanished == 1) ? "" : "たち");
     }
     return ECMD_TIME;
 }
@@ -2072,7 +2077,7 @@ invoke_blinding_ray(struct obj *obj)
             litroom(TRUE, obj);
             pline("%s", ((!Blind && levl[u.ux][u.uy].lit
                           && !levl[u.ux][u.uy].waslit)
-                         ? "It is lit here now."
+                         ? "ここは今、明るく照らされている."
                          : nothing_seems_to_happen));
         } else { /* zapyourself() */
             boolean vulnerable = (u.umonnum == PM_GREMLIN);
@@ -2295,7 +2300,7 @@ arti_speak(struct obj *obj)
 
     line = getrumor(bcsign(obj), buf, TRUE);
     if (!*line)
-        line = "NetHack rumors file closed for renovation.";
+        line = "NetHack の噂話ファイルは改装中だ。";
     pline("%s:", Tobjnam(obj, "whisper"));
     SetVoice((struct monst *) 0, 0, 80, voice_talking_artifact);
     verbalize1(line);
@@ -2441,7 +2446,7 @@ glow_color(int arti_indx)
 
 /* glow verb; [0] holds the value used when blind */
 static const char *const glow_verbs[] = {
-    "quiver", "flicker", "glimmer", "gleam"
+    "かすかに震えている", "明滅している", "ほのかに輝いている", "強く輝いている"
 };
 
 /* relative strength that Sting is glowing (0..3), to select verb */
@@ -2458,14 +2463,8 @@ const char *
 glow_verb(int count, /* 0 means blind rather than no applicable creatures */
           boolean ingsfx)
 {
-    static char resbuf[20];
-
-    Strcpy(resbuf, glow_verbs[glow_strength(count)]);
-    /* ing_suffix() will double the last consonant for all the words
-       we're using and none of them should have that, so bypass it */
-    if (ingsfx)
-        Strcat(resbuf, "ing");
-    return resbuf;
+    nhUse(ingsfx);
+    return glow_verbs[glow_strength(count)];
 }
 
 /* use for warning "glow" for Sting, Orcrist, and Grimtooth */
@@ -2483,7 +2482,7 @@ Sting_effects(
         if (orc_count == -1 && gw.warn_obj_cnt > 0) {
             /* -1 means that blindness has just been toggled; give a
                'continue' message that eventual 'stop' message will match */
-            pline("%s is %s.", bare_artifactname(uwep),
+            pline("%sは%s.", bare_artifactname(uwep),
                   glow_verb(Blind ? 0 : gw.warn_obj_cnt, TRUE));
         } else if (newstr > 0 && newstr != oldstr) {
             /* goto_level() -> docrt() -> see_monsters() -> Sting_effects();
@@ -2493,17 +2492,16 @@ Sting_effects(
 
             /* 'start' message */
             if (!Blind)
-                pline("%s %s %s%c", bare_artifactname(uwep),
-                      otense(uwep, glow_verb(orc_count, FALSE)),
+                pline("%sは%s色に%s%c", bare_artifactname(uwep),
                       glow_color(uwep->oartifact),
+                      glow_verb(orc_count, FALSE),
                       (newstr > oldstr) ? '!' : '.');
             else if (oldstr == 0) /* quivers */
-                pline("%s %s slightly.", bare_artifactname(uwep),
-                      otense(uwep, glow_verb(0, FALSE)));
+                pline("%sはかすかに震えた.", bare_artifactname(uwep));
         } else if (orc_count == 0 && gw.warn_obj_cnt > 0) {
             /* 'stop' message */
-            pline("%s stops %s.", bare_artifactname(uwep),
-                  glow_verb(Blind ? 0 : gw.warn_obj_cnt, TRUE));
+            pline("%sは%s.", bare_artifactname(uwep),
+                  Blind ? "震えが止まった" : "輝きを失った");
         }
     }
 }
@@ -2548,9 +2546,9 @@ retouch_object(
                    game's silver item without stating that it is silver
                    potentially leads to confusion about cause of death */
                 if (obj->oclass == RING_CLASS)
-                    what = "a silver ring";
+                    what = "銀の指輪";
                 else if (obj->oclass == WAND_CLASS)
-                    what = "a silver wand";
+                    what = "銀の杖";
                 /* for anything else, stick with killer_xname() */
             }
             /* damage is somewhat arbitrary; half the usual 1d20 physical
@@ -2559,7 +2557,7 @@ retouch_object(
                 tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
             if (bane)
                 dmg += rnd(10);
-            Sprintf(buf, "handling %s", what);
+            Sprintf(buf, "%sを扱った", what);
             losehp(dmg, buf, KILLED_BY);
             exercise(A_CON, FALSE);
         }
@@ -2588,7 +2586,7 @@ retouch_object(
             /* dropx gives a message if a dropped item lands on an altar;
                we provide one for other terrain */
             if (!IS_ALTAR(levl[u.ux][u.uy].typ))
-                pline("%s to the %s.", Tobjnam(obj, "fall"),
+                pline("%s%sに落ちた.", Tobjnam(obj, "fall"),
                       surface(u.ux, u.uy));
             dropx(obj);
         }
