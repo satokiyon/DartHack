@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	getline.c	$NHDT-Date: 1701285885 2023/11/29 19:24:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -22,9 +22,130 @@ static boolean ext_cmd_getlin_hook(char *);
 typedef boolean (*getlin_hook_proc)(char *);
 
 static void hooked_tty_getlin(const char *, char *, getlin_hook_proc);
+static int getlin_utf8_sequence_len(const unsigned char *);
+static int getlin_utf8_cells(const char *);
+static int getlin_utf8_char_display_width(const unsigned char *);
+static void getlin_put_backspaces(int);
+static void getlin_put_spaces(int);
 extern int extcmd_via_menu(void); /* cmd.c */
 
 extern char erase_char, kill_char; /* from appropriate tty.c file */
+
+#ifdef WIN32CON
+#define NH_C3_NONSPACING 0x0001U
+#define NH_C3_KATAKANA   0x0010U
+#define NH_C3_HIRAGANA   0x0020U
+#define NH_C3_HALFWIDTH  0x0040U
+#define NH_C3_FULLWIDTH  0x0080U
+#define NH_C3_IDEOGRAPH  0x0100U
+
+static unsigned short getlin_utf8_char_chartype(const unsigned char *);
+extern int __stdcall MultiByteToWideChar(unsigned int, unsigned long,
+                                         const char *, int, wchar_t *, int);
+extern int __stdcall GetStringTypeW(unsigned long, const wchar_t *, int,
+                                    unsigned short *);
+#endif
+
+static int
+getlin_utf8_sequence_len(const unsigned char *utf8str)
+{
+    unsigned char c = *utf8str;
+
+    if ((c & 0x80U) == 0)
+        return 1;
+    if ((c & 0xE0U) == 0xC0U && (utf8str[1] & 0xC0U) == 0x80U)
+        return 2;
+    if ((c & 0xF0U) == 0xE0U && (utf8str[1] & 0xC0U) == 0x80U
+        && (utf8str[2] & 0xC0U) == 0x80U)
+        return 3;
+    if ((c & 0xF8U) == 0xF0U && (utf8str[1] & 0xC0U) == 0x80U
+        && (utf8str[2] & 0xC0U) == 0x80U
+        && (utf8str[3] & 0xC0U) == 0x80U)
+        return 4;
+    return 1;
+}
+
+static int
+getlin_utf8_cells(const char *str)
+{
+    const unsigned char *cp = (const unsigned char *) str;
+    int total = 0;
+
+    if (!cp)
+        return 0;
+
+    while (*cp) {
+        if (*cp < 0x80U) {
+            ++total;
+            ++cp;
+        } else {
+            int ulen = getlin_utf8_sequence_len(cp);
+
+            if (ulen > 1) {
+                int width = getlin_utf8_char_display_width(cp);
+
+                total += (width > 0) ? width : 1;
+                cp += ulen;
+            } else {
+                ++total;
+                ++cp;
+            }
+        }
+    }
+
+    return total;
+}
+
+static int
+getlin_utf8_char_display_width(const unsigned char *utf8str)
+{
+#ifdef WIN32CON
+    unsigned short chartype = getlin_utf8_char_chartype(utf8str);
+
+    if (chartype & NH_C3_NONSPACING)
+        return 0;
+    if (chartype & (NH_C3_FULLWIDTH | NH_C3_KATAKANA
+                    | NH_C3_HIRAGANA | NH_C3_IDEOGRAPH))
+        return 2;
+    if (chartype & NH_C3_HALFWIDTH)
+        return 1;
+#endif
+    return (*utf8str < 0x80U) ? 1 : 1;
+}
+
+#ifdef WIN32CON
+static unsigned short
+getlin_utf8_char_chartype(const unsigned char *utf8str)
+{
+    wchar_t wch[2] = { 0, 0 };
+    unsigned short chartype = 0;
+    int ulen = getlin_utf8_sequence_len(utf8str);
+
+    if (ulen <= 1)
+        return 0;
+    if (MultiByteToWideChar(65001U, 0x00000008UL,
+                            (const char *) utf8str, ulen, wch, 1)
+        != 1)
+        return 0;
+    if (!GetStringTypeW(0x0004UL, wch, 1, &chartype))
+        return 0;
+    return chartype;
+}
+#endif
+
+static void
+getlin_put_backspaces(int cells)
+{
+    while (cells-- > 0)
+        putsyms("\b");
+}
+
+static void
+getlin_put_spaces(int cells)
+{
+    while (cells-- > 0)
+        putsyms(" ");
+}
 
 /*
  * Read a line closed with '\n' into the array char bufp[BUFSZ].
@@ -147,18 +268,21 @@ hooked_tty_getlin(
             if (bufp != obufp) {
                 char *newp = (char *) utf8_prev_char_start(obufp, bufp);
 #ifdef NEWAUTOCOMP
-                char *i;
+                int delcols = getlin_utf8_char_display_width(
+                                  (const unsigned char *) newp);
+                int tailcols;
 
 #endif /* NEWAUTOCOMP */
                 bufp = newp;
 #ifndef NEWAUTOCOMP
                 putsyms("\b \b"); /* putsym converts \b */
 #else                             /* NEWAUTOCOMP */
-                putsyms("\b");
-                for (i = bufp; *i; ++i)
-                    putsyms(" ");
-                for (; i > bufp; --i)
-                    putsyms("\b");
+                if (delcols < 1)
+                    delcols = 1;
+                tailcols = getlin_utf8_cells(bufp);
+                getlin_put_backspaces(delcols);
+                getlin_put_spaces(tailcols);
+                getlin_put_backspaces(tailcols);
                 *bufp = 0;
 #endif                            /* NEWAUTOCOMP */
             } else
@@ -190,6 +314,7 @@ hooked_tty_getlin(
             }
 #ifdef NEWAUTOCOMP
             char *i = eos(bufp);
+            int oldtailcols = getlin_utf8_cells(bufp);
 
 #endif /* NEWAUTOCOMP */
             memcpy((genericptr_t) bufp, (genericptr_t) inbytes,
@@ -203,16 +328,11 @@ hooked_tty_getlin(
                 bufp = eos(bufp);
 #else  /* NEWAUTOCOMP */
                 /* pointer and cursor left where they were */
-                for (i = bufp; *i; ++i)
-                    putsyms("\b");
+                getlin_put_backspaces(getlin_utf8_cells(bufp));
             } else if (i > bufp) {
-                char *s = i;
-
                 /* erase rest of prior guess */
-                for (; i > bufp; --i)
-                    putsyms(" ");
-                for (; s > bufp; --s)
-                    putsyms("\b");
+                getlin_put_spaces(oldtailcols);
+                getlin_put_backspaces(oldtailcols);
 #endif /* NEWAUTOCOMP */
             }
         } else if (c == kill_char || c == '\177') { /* Robert Viduya */
@@ -223,10 +343,22 @@ hooked_tty_getlin(
                 putsyms("\b \b");
             }
 #else  /* NEWAUTOCOMP */
-            for (; *bufp; ++bufp)
-                putsyms(" ");
-            for (; bufp != obufp; --bufp)
-                putsyms("\b \b");
+            int tailcols = getlin_utf8_cells(bufp);
+
+            getlin_put_spaces(tailcols);
+            getlin_put_backspaces(tailcols);
+            while (bufp != obufp) {
+                char *newp = (char *) utf8_prev_char_start(obufp, bufp);
+                int delcols = getlin_utf8_char_display_width(
+                                  (const unsigned char *) newp);
+
+                if (delcols < 1)
+                    delcols = 1;
+                getlin_put_backspaces(delcols);
+                getlin_put_spaces(delcols);
+                getlin_put_backspaces(delcols);
+                bufp = newp;
+            }
             *bufp = 0;
 #endif /* NEWAUTOCOMP */
         } else
