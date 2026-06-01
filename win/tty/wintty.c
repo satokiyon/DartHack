@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	wintty.c	$NHDT-Date: 1737691300 2025/01/23 20:01:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.420 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -782,7 +782,11 @@ tty_askname(void)
                 if (!inbytes || ct + inlen > (int) (sizeof svp.plname) - 1)
                     continue;
 
-#if defined(MICRO)
+#ifdef WIN32CON
+                /* WIN32CON needs UTF-8 aware drawing here; raw stdio output
+                 * can degrade multibyte input to '?' depending on code page. */
+                (void) win32con_putstr_utf8(inbytes);
+#elif defined(MICRO)
 #if defined(MSDOS)
                 if (iflags.grmode) {
                     (void) fputs(inbytes, stdout);
@@ -791,9 +795,6 @@ tty_askname(void)
                     msmsg("%s", inbytes);
 #else
                 (void) fputs(inbytes, stdout);
-#endif
-#ifdef WIN32CON
-                ttyDisplay->curx += utf8_char_display_width((const unsigned char *) inbytes);
 #endif
                 memcpy((genericptr_t) &svp.plname[ct], (genericptr_t) inbytes,
                        (size_t) inlen);

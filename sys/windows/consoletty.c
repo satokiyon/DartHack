@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	consoletty.c	$NHDT-Date: 1596498316 2020/08/03 23:45:16 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3419,16 +3419,24 @@ default_checkinput(
             done_a_checkpoint = TRUE;
         } else
         {
-            ReadConsoleInput(hConIn, ir, 1, count);
             if (mode == 0) {
-                if ((ir->EventType == KEY_EVENT)
-                    && ir->Event.KeyEvent.bKeyDown) {
-                    /* Prompt text entry should use the prompt-specific
-                     * Unicode path so IME committed text is accepted. */
-                    ch = process_keystroke2(hConIn, ir, &valid);
-                    done = valid;
+                PeekConsoleInput(hConIn, ir, 1, count);
+                if (*count > 0) {
+                    if ((ir->EventType == KEY_EVENT)
+                        && ir->Event.KeyEvent.bKeyDown) {
+                        /* Prompt text entry should use the prompt-specific
+                         * Unicode path so IME committed text is accepted. */
+                        ch = process_keystroke2(hConIn, ir, &valid);
+                        done = valid;
+                    } else {
+                        /* Discard non-key events and keep waiting for text. */
+                        ReadConsoleInput(hConIn, ir, 1, count);
+                    }
+                } else {
+                    done = 1;
                 }
             } else {
+                ReadConsoleInput(hConIn, ir, 1, count);
                 if (*count > 0) {
                     if (ir->EventType == KEY_EVENT
                         && ir->Event.KeyEvent.bKeyDown) {
@@ -3808,13 +3816,6 @@ process_keystroke2(
     scan = ir->Event.KeyEvent.wVirtualScanCode;
     shiftstate = ir->Event.KeyEvent.dwControlKeyState;
 
-    if (scan == 0 && vk == 0) {
-        /* It's the bogus_key */
-        ReadConsoleInput(hConIn, ir, 1, &count);
-        *valid = FALSE;
-        return 0;
-    }
-
     altseq = is_altseq(shiftstate);
     if (ch || (iskeypad(scan)) || altseq)
         *valid = TRUE;
@@ -3833,13 +3834,27 @@ process_keystroke2(
      * eg. (shiftstate & LEFT_CTRL_PRESSED) is true if the
      *      left control key was pressed with the keystroke.
      */
-    if (iskeypad(scan) && !altseq) {
+    if (ch != 0) {
+        /* IME commits can arrive with scan/vk zero; keep the UnicodeChar. */
+        ReadConsoleInput(hConIn, ir, 1, &count);
+        *valid = TRUE;
+    } else if (scan == 0 && vk == 0) {
+        /* It's the bogus_key. */
+        ReadConsoleInput(hConIn, ir, 1, &count);
+        *valid = FALSE;
+        return 0;
+    } else if (iskeypad(scan) && !altseq) {
         ReadConsoleInput(hConIn, ir, 1, &count);
         ch = keypad_nums[scan - KEYPADLO];
-    } else if (ch < 32 && !isnumkeypad(scan)) {
+    } else if (ch > 0 && ch < 32 && !isnumkeypad(scan)) {
         /* Control code; ReadConsole seems to filter some of these,
          * including ESC */
         ReadConsoleInput(hConIn, ir, 1, &count);
+    } else if (ch != 0) {
+        /* If KEY_EVENT already carries a character (including IME-committed
+         * Unicode), consume this event and keep that character. */
+        ReadConsoleInput(hConIn, ir, 1, &count);
+        *valid = TRUE;
     }
     /* Attempt to work better with international keyboards. */
     else {
@@ -3848,6 +3863,8 @@ process_keystroke2(
         ch = (int)(unsigned short)wch2;
         if (ch == 0)
             *valid = FALSE;
+        else
+            *valid = TRUE;
     }
     if (ch == '\r')
         ch = '\n';
@@ -4205,14 +4222,23 @@ nh340_checkinput(
         if (dwWait == WAIT_FAILED)
             return '\033';
 #endif
-        ReadConsoleInput(hConIn, ir, 1, count);
         if (mode == 0) {
-            if ((ir->EventType == KEY_EVENT) && ir->Event.KeyEvent.bKeyDown) {
-                /* Keep prompt input behavior aligned across handlers. */
-                ch = process_keystroke2(hConIn, ir, &valid);
-                done = valid;
+            PeekConsoleInput(hConIn, ir, 1, count);
+            if (*count > 0) {
+                if ((ir->EventType == KEY_EVENT)
+                    && ir->Event.KeyEvent.bKeyDown) {
+                    /* Keep prompt input behavior aligned across handlers. */
+                    ch = process_keystroke2(hConIn, ir, &valid);
+                    done = valid;
+                } else {
+                    /* Discard non-key events and keep waiting for text. */
+                    ReadConsoleInput(hConIn, ir, 1, count);
+                }
+            } else {
+                done = 1;
             }
         } else {
+            ReadConsoleInput(hConIn, ir, 1, count);
             if (*count > 0) {
                 if (ir->EventType == KEY_EVENT
                     && ir->Event.KeyEvent.bKeyDown) {
