@@ -1296,9 +1296,9 @@ yeti
 yumi
 367930,4
 *zombi*
-368199,5
+368199,6
 zruty
-368442,2
+368574,2
 arc* ranks
 archeologist
 digger
@@ -1310,7 +1310,7 @@ spelunker
 speleologist
 collector
 curator
-368535,11
+368668,11
 bar* ranks
 barbarian
 plunder?*
@@ -1322,7 +1322,7 @@ reaver
 slayer
 chieftain*
 conquer*
-368854,11
+368987,11
 cav* ranks
 caveman
 cavewoman
@@ -1336,7 +1336,7 @@ roamer
 nomad
 rover
 pioneer
-369164,11
+369297,11
 hea* ranks
 healer
 rhizotomist
@@ -1349,7 +1349,7 @@ magister
 magistra
 physician
 chirurgeon
-369479,12
+369612,12
 kni* ranks
 knight
 gallant
@@ -1362,7 +1362,7 @@ chevalier*
 seignieur
 dame
 paladin
-369818,14
+369951,14
 mon* ranks
 monk
 candidate
@@ -1374,7 +1374,7 @@ student of metals
 student of winds
 student of fire
 master
-370172,11
+370305,11
 pri* ranks
 priest*
 aspirant
@@ -1385,7 +1385,7 @@ canon*
 lama
 ?atriarch
 high priest*
-370500,14
+370633,14
 ran* ranks
 ranger
 tenderfoot
@@ -1397,7 +1397,7 @@ arbalester
 archer
 sharpshooter
 marks*man
-370838,11
+370971,11
 rog* ranks
 rogue
 footpad
@@ -1409,7 +1409,7 @@ burglar
 filcher
 mags*man
 thief
-371157,11
+371290,11
 sam* ranks
 samurai
 hatamoto
@@ -1422,7 +1422,7 @@ kokushu
 daimyo
 kuge
 shogun
-371470,14
+371603,14
 tou* ranks
 tourist
 rambler
@@ -1434,7 +1434,7 @@ journeyer
 voyager
 explorer
 adventurer
-371801,12
+371934,12
 val* ranks
 valkyrie
 stripling
@@ -1448,7 +1448,7 @@ heroine
 champion
 lord
 lady
-372132,13
+372265,13
 wiz* ranks
 wizard
 evoker
@@ -1461,13 +1461,13 @@ sorcerer
 sorceress
 necromancer
 mage
-372483,11
+372616,11
 novel
 paperback book
 discworld novel*
-372804,44
+372937,44
 .
-373568,0
+373701,0
 	ランドルフ伯爵にとっては、七男のトマスを修道院長か何かにする以外、
 	道はないことがとうの昔から明らかだった。1226年に生まれた彼は、
 	子供の頃から、獲物を狙う鷲のようになることも、鷹狩りや馬上槍試合
@@ -6354,13 +6354,14 @@ discworld novel*
 	積んでいる。矢と同様に、弓も竹で作られている。
 	弓と矢を合わせた「弓矢」を手にすることで、侍は
 	極めて正確で恐るべき戦士となる。
-	The zombi... is a soulless human corpse, still dead, but
-	taken from the grave and endowed by sorcery with a
-	mechanical semblance of life, -- it is a dead body which is
-	made to walk and act and move as if it were alive.
-		[ W.B. Seabrook ]
-	The zruty are wild and gigantic beings, living in the
-	wildernesses of the Tatra mountains.
+	ゾンビ……は魂を失った人間の死体であり、死んだまま
+	でありながら墓から取り出され、妖術によって機械的な
+	生命の似姿を授けられたものである。――それは、まるで
+	生きているかのように歩き、行動し、動くように作られた
+	死体なのだ。
+		［ Ｗ・Ｂ・シーブルック ］
+	ズルティはタトラ山脈の荒野に住む、野生的で巨大な
+	生物である。
 	考古学者ランク
 	  称号            レベル
 	鉱員              1 to 2
