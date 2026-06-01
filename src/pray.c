@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	pray.c	$NHDT-Date: 1762680996 2025/11/09 01:36:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1806,7 +1806,7 @@ bestow_artifact(uchar max_giftvalue)
                             : Blind ? "an object"
                             : ansimpleoname(otmp)));
             if (!Blind)
-                Sprintf(eos(buf), " named %s",
+                Sprintf(eos(buf), "（%s）",
                         bare_artifactname(otmp));
             at_your_feet(upstart(buf));
             dropy(otmp);

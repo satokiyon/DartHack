@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	uhitm.c	$NHDT-Date: 1752823766 2025/07/17 23:29:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.477 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1973,7 +1973,7 @@ first_weapon_hit(struct obj *weapon)
     } else {
         Strcat(buf, simpleonames(weapon));
         if (weapon->oartifact && weapon->dknown)
-            Sprintf(eos(buf), " named %s", bare_artifactname(weapon));
+            Sprintf(eos(buf), "（%s）", bare_artifactname(weapon));
     }
 
     /* when a hit breaks the never-hit-with-wielded-weapon conduct

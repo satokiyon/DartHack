@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1745114235 2025/04/19 17:57:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.453 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -689,6 +689,7 @@ xname_flags(
     const char *dn = jp_item_descr(typ);
     const char *un = ocl->oc_uname;
     boolean pluralize = (obj->quan != 1L) && !(cxn_flags & CXN_SINGULAR);
+    boolean append_name_parens = FALSE;
     boolean known, dknown, bknown;
 
     gx.xnamep = nextobuf();
@@ -1088,7 +1089,8 @@ xname_flags(
     }
 
     if (has_oname(obj) && dknown) {
-        Concat(buf, 0, " named ");
+        append_name_parens = TRUE;
+        Concat(buf, 0, "（");
 
         /* jump directly here if obj passes the has-personal-name test */
  nameit:
@@ -1098,6 +1100,8 @@ xname_flags(
         /* downcase "The" in "<quest-artifact-item> named The ..." */
         if (obj->oartifact && !strncmp(obufp, "The ", 4))
             *obufp = lowc(*obufp); /* change 'T' in "The " to 't' */
+        if (append_name_parens)
+            Concat(buf, 0, "）");
     }
 
     if (!strncmpi(buf, "the ", 4))
@@ -2355,8 +2359,17 @@ the(const char *str)
             insert_the = !strchr(str, '\'');
         } else if (tmp && strchr(str, ' ') < tmp) { /* has spaces */
             /* it needs an article if the name contains "of" */
+            const char *jp_named;
+
             tmp = strstri(str, " of ");
             named = strstri(str, " named ");
+            if ((jp_named = strstr(str, "（")) != 0) {
+                const char *jp_end = strstr(jp_named + strlen("（"), "）");
+
+                if (jp_end && jp_end[strlen("）")] == '\0'
+                    && (!named || jp_named < named))
+                    named = (char *) jp_named;
+            }
             called = strstri(str, " called ");
             if (called && (!named || called < named))
                 named = called;
@@ -2747,6 +2760,12 @@ vtense(const char *subj, const char *verb)
                     spot = sp - 1;
                 break;
             }
+        }
+        if (!spot && (sp = strstr(subj, "（")) != 0) {
+            const char *jp_end = strstr(sp + strlen("（"), "）");
+
+            if (jp_end && jp_end[strlen("）")] == '\0' && sp > subj)
+                spot = sp - 1;
         }
         len = (int) strlen(subj);
         if (!spot)
@@ -4549,6 +4568,7 @@ jp_tin_match_special(const char *name, struct _readobjnam_data *d)
 staticfn int
 readobjnam_postparse1(struct _readobjnam_data *d)
 {
+    char *jp_named_open, *jp_named_close;
     int i;
 
     /* now we have the actual name, as delivered by xname, say
@@ -4564,6 +4584,13 @@ readobjnam_postparse1(struct _readobjnam_data *d)
         *d->p = 0;
         /* note: if 'name' is too long, oname() will truncate it */
         d->name = d->p + 7;
+    } else if ((jp_named_open = strstr(d->bp, "（")) != 0
+               && (jp_named_close = strstr(jp_named_open + strlen("（"), "）"))
+                      != 0
+               && jp_named_close[strlen("）")] == '\0') {
+        *jp_named_open = 0;
+        *jp_named_close = 0;
+        d->name = jp_named_open + strlen("（");
     }
     if ((d->p = strstri(d->bp, " called ")) != 0) {
         *d->p = 0;

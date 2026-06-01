@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	wizcmds.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
 /*-Copyright (c) Robert Patrick Rankin, 2024. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1590,7 +1590,7 @@ list_migrating_mons(
                 /* minimal_monnam() appends map coordinates; strip that */
                 (void) strsubst(buf, " <0,0>", "");
                 if (has_mgivenname(mtmp)) /* if mtmp is named, include that */
-                    Sprintf(eos(buf), " named %s", MGIVENNAME(mtmp));
+                    Sprintf(eos(buf), "（%s）", MGIVENNAME(mtmp));
                 if (c == 'o' || c == 'a')
                     Sprintf(eos(buf), " to %d:%d", mtmp->mux, mtmp->muy);
                 xyloc = mtmp->mtrack[0].x; /* (for legibility) */

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	artifact.c	$NHDT-Date: 1715889721 2024/05/16 20:02:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.236 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1191,7 +1191,7 @@ dump_artifact_info(winid tmpwin)
                    they're expected to be combined with one of these */
                 artiexist[m].gift   ? " gift"   : "",
                 artiexist[m].wish   ? " wish"   : "",
-                artiexist[m].named  ? " named"  : "",
+                     artiexist[m].named  ? " 命名"   : "",
                 artiexist[m].viadip ? " viadip" : "",
                 artiexist[m].lvldef ? " lvldef" : "",
                 artiexist[m].bones  ? " bones"  : "",

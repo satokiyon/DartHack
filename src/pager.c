@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	pager.c	$NHDT-Date: 1774846177 2026/03/29 20:49:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.296 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -1213,7 +1213,7 @@ checkfile(
                 skipping_entry;
         char *sp, *ap, *alt = 0; /* alternate description */
 
-        /* adjust the input to remove "named " and "called " */
+        /* adjust the input to remove "named ", "called ", and "（...）" */
         if ((ep = strstri(dbase_str, " named ")) != 0) {
             alt = ep + 7;
             if ((ap = strstri(dbase_str, " called ")) != 0 && ap < ep)
@@ -1223,6 +1223,11 @@ checkfile(
             alt = givenname;
             if (supplemental_name && (sp = strstri(inp, " called ")) != 0)
                 copynchars(supplemental_name, sp + 8, BUFSZ - 1);
+        } else if ((ep = strstr(dbase_str, "（")) != 0
+                   && (ap = strstr(ep + strlen("（"), "）")) != 0
+                   && ap[strlen("）")] == '\0') {
+            *ap = '\0';
+            alt = ep + strlen("（");
         } else
             ep = strstri(dbase_str, ", ");
         if (ep && ep > dbase_str)
