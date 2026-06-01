@@ -5834,14 +5834,15 @@ yumi
 	弓と矢を合わせた「弓矢」を手にすることで、侍は
 	極めて正確で恐るべき戦士となる。
 *zombi*
-	The zombi... is a soulless human corpse, still dead, but
-	taken from the grave and endowed by sorcery with a
-	mechanical semblance of life, -- it is a dead body which is
-	made to walk and act and move as if it were alive.
-		[ W.B. Seabrook ]
+	ゾンビ……は魂を失った人間の死体であり、死んだまま
+	でありながら墓から取り出され、妖術によって機械的な
+	生命の似姿を授けられたものである。――それは、まるで
+	生きているかのように歩き、行動し、動くように作られた
+	死体なのだ。
+		［ Ｗ・Ｂ・シーブルック ］
 zruty
-	The zruty are wild and gigantic beings, living in the
-	wildernesses of the Tatra mountains.
+	ズルティはタトラ山脈の荒野に住む、野生的で巨大な
+	生物である。
 ##
 # Rank titles for the various roles.  Some of these keys won't reach here
 # because they'll have matched entries above.  The usual three letter role
