@@ -1282,23 +1282,23 @@ nazgul
 *wumpus
 364144,13
 xan
-364938,12
+364938,11
 xorn
-365563,5
+365691,5
 ya
-365828,2
+366064,2
 yeenoghu
-365939,5
+366175,5
 yeti
-366204,15
+366440,15
 *yugake
-367075,3
+367311,3
 yumi
-367260,4
+367496,4
 *zombi*
-367469,5
+367705,5
 zruty
-367712,2
+367948,2
 arc* ranks
 archeologist
 digger
@@ -1310,7 +1310,7 @@ spelunker
 speleologist
 collector
 curator
-367805,11
+368041,11
 bar* ranks
 barbarian
 plunder?*
@@ -1322,7 +1322,7 @@ reaver
 slayer
 chieftain*
 conquer*
-368124,11
+368360,11
 cav* ranks
 caveman
 cavewoman
@@ -1336,7 +1336,7 @@ roamer
 nomad
 rover
 pioneer
-368434,11
+368670,11
 hea* ranks
 healer
 rhizotomist
@@ -1349,7 +1349,7 @@ magister
 magistra
 physician
 chirurgeon
-368749,12
+368985,12
 kni* ranks
 knight
 gallant
@@ -1362,7 +1362,7 @@ chevalier*
 seignieur
 dame
 paladin
-369088,14
+369324,14
 mon* ranks
 monk
 candidate
@@ -1374,7 +1374,7 @@ student of metals
 student of winds
 student of fire
 master
-369442,11
+369678,11
 pri* ranks
 priest*
 aspirant
@@ -1385,7 +1385,7 @@ canon*
 lama
 ?atriarch
 high priest*
-369770,14
+370006,14
 ran* ranks
 ranger
 tenderfoot
@@ -1397,7 +1397,7 @@ arbalester
 archer
 sharpshooter
 marks*man
-370108,11
+370344,11
 rog* ranks
 rogue
 footpad
@@ -1409,7 +1409,7 @@ burglar
 filcher
 mags*man
 thief
-370427,11
+370663,11
 sam* ranks
 samurai
 hatamoto
@@ -1422,7 +1422,7 @@ kokushu
 daimyo
 kuge
 shogun
-370740,14
+370976,14
 tou* ranks
 tourist
 rambler
@@ -1434,7 +1434,7 @@ journeyer
 voyager
 explorer
 adventurer
-371071,12
+371307,12
 val* ranks
 valkyrie
 stripling
@@ -1448,7 +1448,7 @@ heroine
 champion
 lord
 lady
-371402,13
+371638,13
 wiz* ranks
 wizard
 evoker
@@ -1461,13 +1461,13 @@ sorcerer
 sorceress
 necromancer
 mage
-371753,11
+371989,11
 novel
 paperback book
 discworld novel*
-372074,44
+372310,44
 .
-372838,0
+373074,0
 	ランドルフ伯爵にとっては、七男のトマスを修道院長か何かにする以外、
 	道はないことがとうの昔から明らかだった。1226年に生まれた彼は、
 	子供の頃から、獲物を狙う鷲のようになることも、鷹狩りや馬上槍試合
@@ -6308,23 +6308,22 @@ discworld novel*
 	離さない。
 		［『ハンター・イン・ダークネス』、
 		  アンドリュー・プロットキン著 ］
-	They sent their friend the mosquito [xan] ahead of them to
-	find out what lay ahead.  "Since you are the one who sucks
-	the blood of men walking along paths," they told the mosquito,
-	"go and sting the men of Xibalba."  The mosquito flew
-	down the dark road to the Underworld.  Entering the house of
-	the Lords of Death, he stung the first person that he saw...
+	彼らは先方に何があるかを探るため、友人の蚊［クサン］を
+	先に行かせた。「お前は道を歩く人間の血を吸う者なのだから」
+	と彼らは蚊に言った。「行ってシバルバーの人々を刺すがよい。」
+	蚊は冥界へと続く暗い道を飛び下りた。死の君主たちの館に入り、
+	彼は最初に見かけた人物を刺した……
 
-	The mosquito stung this man as well, and when he yelled, the
-	man next to him asked, "Gathered Blood, what's wrong?"  So
-	he flew along the row stinging all the seated men until he
-	knew the names of all twelve.
-			[ Popul Vuh, as translated by Ralph Nelson ]
-	A distant cousin of the earth elemental, the xorn has the
-	ability to shift the cells of its body around in such a way
-	that it becomes porous to inert material.  This gives it the
-	ability to pass through any obstacle that might be between it
-	and its next meal.
+	蚊はその男も刺した。男が叫ぶと、隣の男が「集まる血よ、
+	どうしたのだ？」と尋ねた。こうして彼は、座っている男たちを
+	列に沿って刺しながら飛び回り、ついに１２人全員の名前を
+	知るに至った。
+			［『ポポル・ヴフ』、ラルフ・ネルソン訳 ］
+	土のエレメンタルの遠い親戚であるゾーンは、不活性な物質に
+	対して多孔質（浸透可能）になるような方法で、自らの体の細胞を
+	移動させる能力を持っている。これにより、ゾーンは次の食事と
+	自らの間に立ちふさがる、いかなる障害物をも通り抜ける能力を
+	得ている。
 	The arrow of choice of the samurai, ya are made of very
 	straight bamboo, and are tipped with hardened steel.
 	Yeenoghu, the demon lord of gnolls, still exists although
