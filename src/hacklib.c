@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02. */
 /* NetHack 5.0	hacklib.c	$NHDT-Date: 1706213796 2024/01/25 20:16:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
@@ -1068,6 +1068,34 @@ utf8_hiragana_to_katakana(char *str)
             unsigned katakana_cp = cp + 0x60U;
 
             if (unicodeval_to_utf8str((int) katakana_cp, repl, sizeof repl)
+                && (int) strlen((char *) repl) == seqlen) {
+                memcpy(p, repl, (size_t) seqlen);
+            }
+        }
+        p += seqlen;
+    }
+}
+
+/* normalize Japanese search input by folding katakana to hiragana */
+void
+utf8_katakana_to_hiragana(char *str)
+{
+    char *p;
+
+    for (p = str; *p != '\0'; ) {
+        unsigned cp;
+        int seqlen;
+
+        if (!utf8_decode_codepoint(p, &cp, &seqlen)) {
+            ++p;
+            continue;
+        }
+
+        if (cp >= 0x30A1U && cp <= 0x30F6U) {
+            uint8 repl[8];
+            unsigned hiragana_cp = cp - 0x60U;
+
+            if (unicodeval_to_utf8str((int) hiragana_cp, repl, sizeof repl)
                 && (int) strlen((char *) repl) == seqlen) {
                 memcpy(p, repl, (size_t) seqlen);
             }
