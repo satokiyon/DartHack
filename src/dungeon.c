@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	dungeon.c	$NHDT-Date: 1737343478 2025/01/19 19:24:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.228 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2365,7 +2365,7 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
         menu_item *selected;
         int idx;
 
-        end_menu(win, "Level teleport to where:");
+        end_menu(win, "どの階へレベルテレポートしますか?");
         n = select_menu(win, PICK_ONE, &selected);
         destroy_nhwindow(win);
         if (n > 0) {
@@ -2385,10 +2385,10 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
         if (br->end1.dnum == svn.n_dgns) {
             if (first) {
                 putstr(win, 0, "");
-                putstr(win, 0, "Floating branches");
+                putstr(win, 0, "接続のみ確認された分岐");
                 first = FALSE;
             }
-            Sprintf(buf, "   %s to %s", br_string(br->type),
+            Sprintf(buf, "   %sで%sへ", br_string(br->type),
                     svd.dungeons[br->end2.dnum].dname);
             putstr(win, 0, buf);
         }
@@ -2397,7 +2397,7 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
     /* I hate searching for the invocation pos while debugging. -dean */
     if (Invocation_lev(&u.uz)) {
         putstr(win, 0, "");
-        Sprintf(buf, "Invocation position @ (%d,%d), hero @ (%d,%d)",
+        Sprintf(buf, "魔法陣の位置 (%d,%d)、あなたの位置 (%d,%d)",
                 svi.inv_pos.x, svi.inv_pos.y, u.ux, u.uy);
         putstr(win, 0, buf);
     } else {
@@ -2414,7 +2414,7 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
                 break;
 
         if (trap)
-            Sprintf(buf, "Portal @ (%d,%d), hero @ (%d,%d)",
+                Sprintf(buf, "ポータルの位置 (%d,%d)、あなたの位置 (%d,%d)",
                     trap->tx, trap->ty, u.ux, u.uy);
 
         /* only report "no portal found" when actually expecting a portal */
@@ -2422,7 +2422,7 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
                  || Is_firelevel(&u.uz) || Is_airlevel(&u.uz)
                  || Is_qstart(&u.uz) || at_dgn_entrance("The Quest")
                  || Is_knox(&u.uz))
-            Strcpy(buf, "No portal found.");
+            Strcpy(buf, "ポータルは見つからなかった。");
 
         /* only give output if we found a portal or expected one and didn't */
         if (*buf) {
@@ -2514,7 +2514,7 @@ query_annotation(d_level *lev)
     if (mptr->custom) {
         char tmpbuf[BUFSZ];
 
-        Sprintf(tmpbuf, "Replace annotation \"%.30s%s\" with?", mptr->custom,
+        Sprintf(tmpbuf, "注釈「%.30s%s」を何に変更しますか?", mptr->custom,
                 (strlen(mptr->custom) > 30) ? "..." : "");
         getlin(tmpbuf, nbuf);
     } else
@@ -2523,7 +2523,7 @@ query_annotation(d_level *lev)
         char qbuf[QBUFSZ], lbuf[QBUFSZ]; /* level description */
 
         if (!lev || on_level(&u.uz, lev)) {
-            Strcpy(lbuf, "this dungeon level");
+            Strcpy(lbuf, "この階層");
         } else {
             int dflgs = (lev->dnum == u.uz.dnum) ? 0 : 2;
             d_level save_uz = u.uz;
@@ -2532,14 +2532,14 @@ query_annotation(d_level *lev)
             (void) describe_level(lbuf, dflgs);
             u.uz = save_uz;
 
-            (void) strsubst(lbuf, "Dlvl:", "level ");
+            (void) strsubst(lbuf, "Dlvl:", "階層 ");
             /* even though we've told describe_level() not to append
                a trailing space (by not including '1' in dflgs), the
                level number is formatted with %-2d so single digit
                values will end up with one anyway; remove it */
             (void) trimspaces(lbuf);
         }
-        Snprintf(qbuf, sizeof qbuf, "What do you want to call %s?", lbuf);
+        Snprintf(qbuf, sizeof qbuf, "%sを何と呼びますか?", lbuf);
         getlin(qbuf, nbuf);
     }
 
