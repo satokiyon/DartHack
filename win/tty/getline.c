@@ -172,6 +172,11 @@ hooked_tty_getlin(
     uint8 utf8buf[8];
     struct WinDesc *cw = wins[WIN_MESSAGE];
     boolean doprev = FALSE;
+    boolean append_query_space = TRUE;
+
+    /* Keep extcmd prompt as just "#" (no auto-added trailing space). */
+    if (query && query[0] == extcmd_initiator() && query[1] == '\0')
+        append_query_space = FALSE;
 
     if (ttyDisplay->toplin == TOPLINE_NEED_MORE && !(cw->flags & WIN_STOP))
         more();
@@ -187,7 +192,8 @@ hooked_tty_getlin(
      * getlin, so the screen won't be modified during whatever this prompt
      * is for.
      */
-    custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s ", query);
+    custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY,
+                append_query_space ? "%s " : "%s", query);
 
 #ifdef EDIT_GETLIN
     /* bufp is input/output; treat current contents (presumed to be from
@@ -200,12 +206,18 @@ hooked_tty_getlin(
 #endif
 
     for (;;) {
+        boolean show_wait_cursor;
+
         (void) fflush(stdout);
-        Strcat(strcat(strcpy(gt.toplines, query), " "), obufp);
-        term_curs_set(1);
+        Strcat(strcpy(gt.toplines, query), append_query_space ? " " : "");
+        Strcat(gt.toplines, obufp);
+        show_wait_cursor = append_query_space || (obufp[0] != '\0');
+        term_curs_set(show_wait_cursor ? 1 : 0);
+        tty_prompt_cursor_suppressed = !show_wait_cursor;
         /* tty getlin needs full-width input values; pgetchar() returns
          * char and can truncate IME-committed Unicode characters. */
         c = tty_nhgetch();
+        tty_prompt_cursor_suppressed = FALSE;
         term_curs_set(0);
         if (c == '\033' || c == EOF) {
             if (c == EOF)
@@ -216,7 +228,8 @@ hooked_tty_getlin(
                 tty_clear_nhwindow(WIN_MESSAGE);
                 cw->maxcol = cw->maxrow;
                 addtopl(query);
-                addtopl(" ");
+                if (append_query_space)
+                    addtopl(" ");
                 addtopl(obufp);
             } else {
                 obufp[0] = '\033';
@@ -251,7 +264,8 @@ hooked_tty_getlin(
                 tty_clear_nhwindow(WIN_MESSAGE);
                 cw->maxcol = cw->maxrow;
                 addtopl(query);
-                addtopl(" ");
+                if (append_query_space)
+                    addtopl(" ");
                 *bufp = 0;
                 addtopl(obufp);
             }
@@ -260,7 +274,8 @@ hooked_tty_getlin(
             cw->maxcol = cw->maxrow;
             doprev = FALSE;
             addtopl(query);
-            addtopl(" ");
+            if (append_query_space)
+                addtopl(" ");
             *bufp = 0;
             addtopl(obufp);
         }
@@ -295,6 +310,12 @@ hooked_tty_getlin(
         } else if (c >= ' ' && c != '\177') {
             const char *inbytes = (const char *) 0;
             int inlen = 0;
+
+            /* Extended command names are ASCII tokens. Ignore IME-side
+             * non-ASCII sentinel input (e.g. 0x80) so '#' stays empty
+             * until a real command character is typed. */
+            if (!append_query_space && c >= 0x80)
+                continue;
 
             if (c < 0x80) {
                 utf8buf[0] = (uint8) c;
