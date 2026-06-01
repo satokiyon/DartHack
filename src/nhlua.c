@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
 /* NetHack 5.0	nhlua.c	$NHDT-Date: 1744963460 2025/04/18 00:04:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.153 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -807,6 +808,65 @@ nhl_menu(lua_State *L)
 
 /* text("foo\nbar\nbaz") */
 staticfn int
+nhl_utf8_charlen(const char *s)
+{
+    uchar c0;
+
+    if (!s || !*s)
+        return 0;
+    c0 = (uchar) *s;
+    if (c0 < 0x80)
+        return 1;
+    if (c0 >= 0xC2 && c0 <= 0xDF)
+        return ((uchar) s[1] >= 0x80 && (uchar) s[1] <= 0xBF) ? 2 : 1;
+    if (c0 >= 0xE0 && c0 <= 0xEF)
+        return ((uchar) s[1] >= 0x80 && (uchar) s[1] <= 0xBF
+                && (uchar) s[2] >= 0x80 && (uchar) s[2] <= 0xBF) ? 3 : 1;
+    if (c0 >= 0xF0 && c0 <= 0xF4)
+        return ((uchar) s[1] >= 0x80 && (uchar) s[1] <= 0xBF
+                && (uchar) s[2] >= 0x80 && (uchar) s[2] <= 0xBF
+                && (uchar) s[3] >= 0x80 && (uchar) s[3] <= 0xBF) ? 4 : 1;
+    return 1;
+}
+
+staticfn int
+nhl_utf8_charwidth(const char *s)
+{
+    return ((uchar) *s < 0x80) ? 1 : 2;
+}
+
+staticfn char *
+nhl_text_wrapsplit(char *s, int maxw)
+{
+    char *p = s, *last_space = (char *) 0, *first_over = (char *) 0;
+    int w = 0, len, cw;
+
+    while (*p) {
+        if (*p == '\n') {
+            return p;
+        }
+        len = nhl_utf8_charlen(p);
+        cw = nhl_utf8_charwidth(p);
+        if (*p == ' ')
+            last_space = p;
+        if (w + cw > maxw) {
+            first_over = p;
+            break;
+        }
+        w += cw;
+        p += len;
+    }
+
+    if (first_over) {
+        if (last_space && last_space >= s && last_space < first_over)
+            p = last_space;
+        else
+            p = first_over;
+    }
+    return p;
+}
+
+staticfn int
 nhl_text(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -821,24 +881,22 @@ nhl_text(lua_State *L)
         while (lua_gettop(L) > 0) {
             char *ostr = dupstr(luaL_checkstring(L, 1));
             char *ptr, *str = ostr;
-            char *lstr = str + strlen(str) - 1;
 
-            do {
-                char *nlp = strchr(str, '\n');
+            while (*str) {
+                int splitlen;
+                char splitch;
 
-                if (nlp && (nlp - str) <= 76) {
-                    ptr = nlp;
-                } else {
-                    ptr = str + 76;
-                    if (ptr > lstr)
-                        ptr = lstr;
-                }
-                while ((ptr > str) && !(*ptr == ' ' || *ptr == '\n'))
-                    ptr--;
+                ptr = nhl_text_wrapsplit(str, 76);
+                splitch = *ptr;
+                splitlen = nhl_utf8_charlen(ptr);
                 *ptr = '\0';
                 add_menu_str(tmpwin, str);
-                str = ptr + 1;
-            } while (*str && str <= lstr);
+                if (splitch == '\0')
+                    break;
+                if (splitch == '\n' || splitch == ' ')
+                    splitlen = 1;
+                str = ptr + splitlen;
+            }
             lua_pop(L, 1);
             free(ostr);
         }
