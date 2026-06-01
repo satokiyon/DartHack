@@ -109,3 +109,11 @@ tools/
 # Generated Windows nmake stamp files
 /*.tag
 
+# docs policy: track only explicitly allowed current markdown files
+/docs/**
+!/docs/
+!/docs/translation-instructions-ja.md
+!/docs/translation-glossary-quest.md
+!/docs/modification-notice-template-en.md
+!/docs/message-translation-safety-checklist.md
+
