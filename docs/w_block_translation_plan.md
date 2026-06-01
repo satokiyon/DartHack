@@ -37,18 +37,18 @@ Wブロックは全21項目あるため、安全と正確性を考慮し、2つ�
   - [x] `win` / `winner` / `winning` の日本語翻訳を適用
   - [x] グループ1適用後の `git diff` による差分確認（`of` 誤字チェック）
   - [x] `makedefs -d` によるビルド検証とステージング (`git add`)
-- [ ] **グループ2の適用と検証** (0/9 完了)
-  - [ ] `wizard` / `* wizard` / `apprentice` の日本語翻訳を適用
-  - [ ] `wizard of yendor` の日本語翻訳を適用
-  - [ ] `wolf` / `*wolf` / `*wolf cub` の日本語翻訳を適用
-  - [ ] `*wolfsbane` の日本語翻訳を適用
-  - [ ] `wood golem` の日本語翻訳を適用
-  - [ ] `woodchuck` の日本語翻訳を適用
-  - [ ] `*worm` / `long worm tail` / `worm tooth` / `crysknife` の日本語翻訳を適用
-  - [ ] `wraith` / `nazgul` の日本語翻訳を適用
-  - [ ] `*wumpus` の日本語翻訳を適用
-  - [ ] グループ2適用後の `git diff` による差分確認（`of` 誤字チェック）
-  - [ ] `makedefs -d` によるビルド検証とステージング (`git add`)
+- [x] **グループ2の適用と検証** (9/9 完了)
+  - [x] `wizard` / `* wizard` / `apprentice` の日本語翻訳を適用
+  - [x] `wizard of yendor` の日本語翻訳を適用
+  - [x] `wolf` / `*wolf` / `*wolf cub` の日本語翻訳を適用
+  - [x] `*wolfsbane` の日本語翻訳を適用
+  - [x] `wood golem` の日本語翻訳を適用
+  - [x] `woodchuck` の日本語翻訳を適用
+  - [x] `*worm` / `long worm tail` / `worm tooth` / `crysknife` の日本語翻訳を適用
+  - [x] `wraith` / `nazgul` の日本語翻訳を適用
+  - [x] `*wumpus` の日本語翻訳を適用
+  - [x] グループ2適用後の `git diff` による差分確認（`of` 誤字チェック）
+  - [x] `makedefs -d` によるビルド検証とステージング (`git add`)
 
 ---
 
