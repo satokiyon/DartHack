@@ -15,12 +15,11 @@
 static struct stat buf;
 
 void
-regularize(s)	/* normalize file name - we don't like .'s, /'s, spaces */
-char *s;
+regularize(char *s)	/* normalize file name - we don't like .'s, /'s, spaces */
 {
 	register char *lp;
 
-	while((lp=index(s, '.')) || (lp=index(s, '/')) || (lp=index(s,' ')) || (lp=index(s,':')))
+	while((lp=strchr(s, '.')) || (lp=strchr(s, '/')) || (lp=strchr(s,' ')) || (lp=strchr(s,':')))
 		*lp = '_';
 }
 
@@ -35,11 +34,11 @@ eraseoldlocks()
 	 */
 	for(i = 1; i <= MAXDUNGEON*MAXLEVEL + 1; i++) {
 		/* try to remove all */
-		set_levelfile_name(lock, i);
-		(void) unlink(fqname(lock, LEVELPREFIX, 0));
+		set_levelfile_name(gl.lock, i);
+		(void) unlink(fqname(gl.lock, LEVELPREFIX, 0));
 	}
-	set_levelfile_name(lock, 0);
-	if (unlink(fqname(lock, LEVELPREFIX, 0)))
+	set_levelfile_name(gl.lock, 0);
+	if (unlink(fqname(gl.lock, LEVELPREFIX, 0)))
 		return(0);				/* cannot remove it */
 	return(1);					/* success! */
 }
@@ -56,10 +55,10 @@ getlock()
 		error("%s", "");
 	}
 
-	regularize(lock);
-	set_levelfile_name(lock, 0);
+	regularize(gl.lock);
+	set_levelfile_name(gl.lock, 0);
 
-	fq_lock = fqname(lock, LEVELPREFIX, 0);
+	fq_lock = fqname(gl.lock, LEVELPREFIX, 0);
 	if((fd = open(fq_lock, 0)) == -1)
 	{
 		if(errno == ENOENT)
@@ -89,7 +88,7 @@ gotlock:
 	{
 		//debuglog("created lock(%s)", fq_lock);
 
-		if(write(fd, (genericptr_t) &hackpid, sizeof(hackpid)) != sizeof(hackpid))
+		if(write(fd, (genericptr_t) &svh.hackpid, sizeof(svh.hackpid)) != sizeof(svh.hackpid))
 		{
 			error("cannot write lock (%s)", fq_lock);
 		}

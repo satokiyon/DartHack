@@ -7,66 +7,65 @@
 #include "func_tab.h"   /* for extended commands */
 #include "dlb.h"
 
-static void FDECL(and_init_nhwindows, (int *, char **));
-static void NDECL(and_player_selection);
-static void NDECL(and_askname);
-static void NDECL(and_get_nh_event) ;
-static void FDECL(and_exit_nhwindows, (const char *));
-static void FDECL(and_suspend_nhwindows, (const char *));
-static void NDECL(and_resume_nhwindows);
-static winid FDECL(and_create_nhwindow, (int));
-static void FDECL(and_clear_nhwindow, (winid));
-static void FDECL(and_display_nhwindow, (winid, BOOLEAN_P));
-static void FDECL(and_dismiss_nhwindow, (winid));
-static void FDECL(and_destroy_nhwindow, (winid));
-static void FDECL(and_curs, (winid,int,int));
-static void FDECL(and_putstr, (winid, int, const char *));
-static void FDECL(and_putmixed, (winid, int, const char *));
-static void FDECL(and_display_file, (const char *, BOOLEAN_P));
-static void FDECL(and_start_menu, (winid));
-static void FDECL(and_add_menu, (winid,int,const ANY_P *, CHAR_P,CHAR_P,int,const char *, BOOLEAN_P));
-static void FDECL(and_end_menu, (winid, const char *));
-static int FDECL(and_select_menu, (winid, int, MENU_ITEM_P **));
-static char FDECL(and_message_menu, (CHAR_P, int, const char *));
-static void NDECL(and_update_inventory);
-static void NDECL(and_mark_synch);
-static void NDECL(and_wait_synch);
+staticfn void and_init_nhwindows(int *, char **);
+staticfn void and_player_selection(void);
+staticfn void and_askname(void);
+staticfn void and_get_nh_event(void) ;
+staticfn void and_exit_nhwindows(const char *);
+staticfn void and_suspend_nhwindows(const char *);
+staticfn void and_resume_nhwindows(void);
+staticfn winid and_create_nhwindow(int);
+staticfn void and_clear_nhwindow(winid);
+staticfn void and_display_nhwindow(winid, boolean);
+staticfn void and_dismiss_nhwindow(winid);
+staticfn void and_destroy_nhwindow(winid);
+staticfn void and_curs(winid,int,int);
+staticfn void and_putstr(winid, int, const char *);
+staticfn void and_putmixed(winid, int, const char *);
+staticfn void and_display_file(const char *, boolean);
+staticfn void and_start_menu(winid, unsigned long);
+staticfn void and_add_menu(winid,const glyph_info *, const anything *, char, char, int, int, const char *, unsigned int);
+staticfn void and_end_menu(winid, const char *);
+staticfn int and_select_menu(winid, int, menu_item **);
+staticfn char and_message_menu(char, int, const char *);
+staticfn void and_update_inventory(int);
+staticfn void and_mark_synch(void);
+staticfn void and_wait_synch(void);
 #ifdef CLIPPING
-static void FDECL(and_cliparound, (int, int));
+staticfn void and_cliparound(int, int);
 #endif
 #ifdef POSITIONBAR
-static void FDECL(and_update_positionbar, (char *));
+staticfn void and_update_positionbar(char *);
 #endif
-static void FDECL(and_print_glyph, (winid,XCHAR_P,XCHAR_P,int,int));
-static void FDECL(and_raw_print, (const char *));
-static void FDECL(and_raw_print_bold, (const char *));
-static int NDECL(and_nhgetch);
-static int FDECL(and_nh_poskey, (int *, int *, int *));
-static void NDECL(and_nhbell);
-static int NDECL(and_doprev_message);
-static char FDECL(and_yn_function, (const char *, const char *, CHAR_P));
-static void FDECL(and_getlin, (const char *,char *));
-static int NDECL(and_get_ext_cmd);
-static void FDECL(and_number_pad, (int));
-static void NDECL(and_delay_output);
+staticfn void and_print_glyph(winid,coordxy,coordxy,const glyph_info *,const glyph_info *);
+staticfn void and_raw_print(const char *);
+staticfn void and_raw_print_bold(const char *);
+staticfn int and_nhgetch(void);
+staticfn int and_nh_poskey(coordxy *, coordxy *, int *);
+staticfn void and_nhbell(void);
+staticfn int and_doprev_message(void);
+staticfn char and_yn_function(const char *, const char *, char);
+staticfn void and_getlin(const char *,char *);
+staticfn int and_get_ext_cmd(void);
+staticfn void and_number_pad(int);
+staticfn void and_delay_output(void);
 #ifdef CHANGE_COLOR
-static void FDECL(and_change_color,(int color,long rgb,int reverse));
-static char * NDECL(and_get_color_string);
+staticfn void and_change_color(int color, long rgb,int reverse);
+staticfn char * and_get_color_string(void);
 #endif
-static void NDECL(and_start_screen);
-static void NDECL(and_end_screen);
-static char* FDECL(and_getmsghistory, (BOOLEAN_P));
-static void FDECL(and_putmsghistory, (const char *, BOOLEAN_P));
-static void save_msg(const char* msg);
-static void FDECL(and_status_update, (int, genericptr_t, int, int, int, unsigned long *));
-static void and_status_flush();
+staticfn void and_start_screen(void);
+staticfn void and_end_screen(void);
+staticfn char* and_getmsghistory(boolean);
+staticfn void and_putmsghistory(const char *, boolean);
+staticfn void save_msg(const char* msg);
+staticfn void and_status_update(int, genericptr_t, int, int, int, unsigned long *);
+staticfn void and_status_flush(void);
+staticfn win_request_info* and_ctrl_nhwindow(winid, int, win_request_info*);
 
 int NetHackMain(int argc, char** argv);
 
-extern short glyph2tile[];
-
 struct window_procs and_procs = {
-	"and",
+    WPID(and),
 	WC_COLOR | WC_HILITE_PET | WC_INVERSE,	/* window port capability options supported */
 	WC2_HILITE_STATUS | WC2_FLUSH_STATUS,	/* additional window port capability options supported */
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
@@ -90,7 +89,6 @@ struct window_procs and_procs = {
 	and_end_menu,
 	and_select_menu,
 	and_message_menu,
-	and_update_inventory,
 	and_mark_synch,
 	and_wait_synch,
 #ifdef CLIPPING
@@ -115,8 +113,6 @@ struct window_procs and_procs = {
 	and_change_color,
 	and_get_color_string,
 #endif
-	and_start_screen,
-	and_end_screen,
 	genl_outrip,
 	genl_preference_update,
 	and_getmsghistory,
@@ -125,7 +121,9 @@ struct window_procs and_procs = {
 	genl_status_finish,
 	genl_status_enablefield,
 	and_status_update,
-	genl_can_suspend_no
+	genl_can_suspend_no,
+    and_update_inventory,
+    and_ctrl_nhwindow,
 };
 
 static void and_n_getline(const char* question, char* buf, int nMax, int showLog);
@@ -253,9 +251,9 @@ void Java_com_tbd_forkfront_NetHackIO_RunNetHack(JNIEnv* env, jobject thiz, jstr
 	jYNFunction = (*jEnv)->GetMethodID(jEnv, jApp, "ynFunction", "([B[BI)V");
 	jGetLine = (*jEnv)->GetMethodID(jEnv, jApp, "getLine", "([BIII)Ljava/lang/String;");
 	jStartMenu = (*jEnv)->GetMethodID(jEnv, jApp, "startMenu", "(I)V");
-	jAddMenu = (*jEnv)->GetMethodID(jEnv, jApp, "addMenu", "(IIIIII[BII)V");
+	jAddMenu = (*jEnv)->GetMethodID(jEnv, jApp, "addMenu", "(IIJIII[BII)V");
 	jEndMenu = (*jEnv)->GetMethodID(jEnv, jApp, "endMenu", "(I[B)V");
-	jSelectMenu = (*jEnv)->GetMethodID(jEnv, jApp, "selectMenu", "(III)[I");
+	jSelectMenu = (*jEnv)->GetMethodID(jEnv, jApp, "selectMenu", "(III)[J");
 	jCliparound = (*jEnv)->GetMethodID(jEnv, jApp, "cliparound", "(IIII)V");
 	jDelayOutput = (*jEnv)->GetMethodID(jEnv, jApp, "delayOutput", "()V");
 	jShowDPad = (*jEnv)->GetMethodID(jEnv, jApp, "askDirection", "()V");
@@ -335,7 +333,7 @@ void quit_possible()
 //____________________________________________________________________________________
 void set_username()
 {
-	jstring username = create_bytearray(plname);
+	jstring username = create_bytearray(svp.plname);
 	JNICallV(jSetUsername, username);
 	destroy_jobject(username);
 
@@ -424,10 +422,10 @@ void and_player_selection()
 		{
 			/* Prompt for a role */
 			win = create_nhwindow(NHW_MENU);
-			and_start_menu(win);
+			and_start_menu(win, MENU_BEHAVE_STANDARD);
 			any.a_void = 0; /* zero out all bits */
 			any.a_int = randrole(TRUE)+1;
-			and_add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random", MENU_UNSELECTED);
+			and_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "Random", 0);
 			for(i = 0; roles[i].name.m; i++)
 			{
 				if(ok_role(i, flags.initrace, flags.initgend, flags.initalign))
@@ -436,7 +434,7 @@ void and_player_selection()
 					thisch = lowc(roles[i].name.m[0]);
 					if(thisch == lastch)
 						thisch = highc(thisch);
-					and_add_menu(win, NO_GLYPH, &any, thisch, 0, ATR_NONE, roles[i].name.m, MENU_UNSELECTED);
+					and_add_menu(win, &nul_glyphinfo, &any, thisch, 0, ATR_NONE, NO_COLOR, roles[i].name.m, 0);
 					lastch = thisch;
 				}
 			}
@@ -466,15 +464,15 @@ void and_player_selection()
 			/* tty_clear_nhwindow(BASE_WINDOW); */
 			/* tty_putstr(BASE_WINDOW, 0, "Choosing Race"); */
 			win = create_nhwindow(NHW_MENU);
-			and_start_menu(win);
+			and_start_menu(win, MENU_BEHAVE_STANDARD);
 			any.a_void = 0; /* zero out all bits */
 			any.a_int = randrace(flags.initrole)+1;
-			and_add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "random", MENU_UNSELECTED);
+			and_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "random", 0);
 			for(i = 0; races[i].noun; i++)
 				if(ok_race(flags.initrole, i, flags.initgend, flags.initalign))
 				{
 					any.a_int = i + 1; /* must be non-zero */
-					and_add_menu(win, NO_GLYPH, &any, races[i].noun[0], 0, ATR_NONE, races[i].noun, MENU_UNSELECTED);
+					and_add_menu(win, &nul_glyphinfo, &any, races[i].noun[0], 0, ATR_NONE, NO_COLOR, races[i].noun, 0);
 				}
 			and_end_menu(win, "Pick a race");
 			result = and_select_menu(win, PICK_ONE, &selected);
@@ -502,15 +500,15 @@ void and_player_selection()
 			/* tty_clear_nhwindow(BASE_WINDOW); */
 			/* tty_putstr(BASE_WINDOW, 0, "Choosing Gender"); */
 			win = create_nhwindow(NHW_MENU);
-			and_start_menu(win);
+			and_start_menu(win, MENU_BEHAVE_STANDARD);
 			any.a_void = 0; /* zero out all bits */
 			any.a_int = randgend(flags.initrole, flags.initrace)+1;
-			and_add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "random", MENU_UNSELECTED);
+			and_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "random", 0);
 			for(i = 0; i < ROLE_GENDERS; i++)
 				if(ok_gend(flags.initrole, flags.initrace, i, flags.initalign))
 				{
 					any.a_int = i + 1;
-					and_add_menu(win, NO_GLYPH, &any, genders[i].adj[0], 0, ATR_NONE, genders[i].adj, MENU_UNSELECTED);
+					and_add_menu(win, &nul_glyphinfo, &any, genders[i].adj[0], 0, ATR_NONE, NO_COLOR, genders[i].adj, 0);
 				}
 			and_end_menu(win, "Pick a gender");
 			result = and_select_menu(win, PICK_ONE, &selected);
@@ -536,15 +534,15 @@ void and_player_selection()
 			/* tty_clear_nhwindow(BASE_WINDOW); */
 			/* tty_putstr(BASE_WINDOW, 0, "Choosing Alignment"); */
 			win = and_create_nhwindow(NHW_MENU);
-			and_start_menu(win);
+			and_start_menu(win, MENU_BEHAVE_STANDARD);
 			any.a_void = 0; /* zero out all bits */
 			any.a_int = randalign(flags.initrole, flags.initrace)+1;
-			and_add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "random", MENU_UNSELECTED);
+			and_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "random", 0);
 			for(i = 0; i < ROLE_ALIGNS; i++)
 				if(ok_align(flags.initrole, flags.initrace, flags.initgend, i))
 				{
 					any.a_int = i + 1;
-					and_add_menu(win, NO_GLYPH, &any, aligns[i].adj[0], 0, ATR_NONE, aligns[i].adj, MENU_UNSELECTED);
+					and_add_menu(win, &nul_glyphinfo, &any, aligns[i].adj[0], 0, ATR_NONE, NO_COLOR, aligns[i].adj, 0);
 				}
 			and_end_menu(win, "Pick an alignment");
 			result = and_select_menu(win, PICK_ONE, &selected);
@@ -616,7 +614,7 @@ void and_clear_nhwindow(winid wid)
 //		-- All calls are blocking in the tty window-port.
 //		-- Calling display_nhwindow(WIN_MESSAGE,???) will do a
 //		   --more--, if necessary, in the tty window-port.
-void and_display_nhwindow(winid wid, BOOLEAN_P blocking)
+void and_display_nhwindow(winid wid, boolean blocking)
 {
 	//debuglog("display_nhwindow(%d)", wid);
 	if(wid != WIN_MESSAGE && /*wid != WIN_STATUS && */wid != WIN_MAP)
@@ -708,22 +706,19 @@ const char* colname(int color)
 }
 
 void
-term_start_attr(attr)
-int attr;
+term_start_attr(int attr)
 {
 	text_attribs |= 1<<attr;
 }
 
 void
-term_end_attr(attr)
-int attr;
+term_end_attr(int attr)
 {
 	text_attribs &= ~(1<<attr);
 }
 
 void
-term_start_color(color)
-int color;
+term_start_color(int color)
 {
 	//debuglog("term_start_color %s", colname(color));
 	text_color = color;
@@ -1095,11 +1090,12 @@ void and_status_flush()
 	and_bot_updated();
 }
 
+staticfn win_request_info* and_ctrl_nhwindow(winid window, int request, win_request_info *wri) {
+    return NULL;
+}
+
 //____________________________________________________________________________________
-void and_putmixed(window, attr, str)
-winid window;
-int attr;
-const char *str;
+void and_putmixed(winid window, int attr, const char *str)
 {
 	//debuglog("put mixed: %s", str);
 	genl_putmixed(window, attr, str);
@@ -1109,7 +1105,7 @@ const char *str;
 //display_file(str, boolean complain)
 //		-- Display the file named str.  Complain about missing files
 //		   iff complain is TRUE.
-void and_display_file(const char *name, BOOLEAN_P complain)
+void and_display_file(const char *name, boolean complain)
 {
 	//debuglog("and_display_file(%s, %d)", name, complain);
 
@@ -1125,9 +1121,9 @@ void and_display_file(const char *name, BOOLEAN_P complain)
 		boolean empty = TRUE;
 		while(dlb_fgets(buf, BUFSZ, f))
 		{
-			if((cr = index(buf, '\n')) != 0)
+			if((cr = strchr(buf, '\n')) != 0)
 				*cr = 0;
-			if(index(buf, '\t') != 0)
+			if(strchr(buf, '\t') != 0)
 				(void)tabexpand(buf);
 			empty = FALSE;
 			and_putstr(datawin, 0, buf);
@@ -1145,7 +1141,7 @@ void and_display_file(const char *name, BOOLEAN_P complain)
 //		   before add_menu().  After calling start_menu() you may not
 //		   putstr() to the window.  Only windows of type NHW_MENU may
 //		   be used for menus.
-void and_start_menu(winid wid)
+void and_start_menu(winid wid, unsigned long behavior)
 {
 	JNICallV(jStartMenu, wid);
 }
@@ -1182,15 +1178,17 @@ void and_start_menu(winid wid)
 //		   with the default object class symbols.
 //		-- If you want this choice to be preselected when the
 //		   menu is displayed, set preselected to TRUE.
-void and_add_menu(winid wid, int glyph, const ANY_P *ident, CHAR_P accelerator, CHAR_P groupacc, int attr, const char *str, BOOLEAN_P preselected)
+void and_add_menu(winid wid, const glyph_info *glyphinfo, const anything *ident, char accelerator, char groupacc, int attr, int color, const char *str, unsigned int itemflags)
 {
-	int tile, color;
-	if(glyph == NO_GLYPH)
-		tile = -1;
-	else
-		tile = glyph2tile[glyph];
+    boolean preselected = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
+    int tile;
+    if (glyphinfo == &nul_glyphinfo) {
+        tile = -1;
+    } else {
+        tile = glyphinfo->gm.tileidx;
+    }
 
-	if(iflags.use_menu_color && get_menu_coloring((char*)str, &color, &attr)) {
+	if(iflags.use_menu_color) {
 		color = nhcolor_to_RGB(color);
 	} else {
 		color = -1;
@@ -1202,7 +1200,7 @@ void and_add_menu(winid wid, int glyph, const ANY_P *ident, CHAR_P accelerator, 
 		attr = 1<<attr;
 
 	jbyteArray jstr = create_bytearray(str);
-	JNICallV(jAddMenu, wid, tile, ident->a_int, (int)accelerator, (int)groupacc, attr, jstr, (int)preselected, color);
+	JNICallV(jAddMenu, wid, tile, ident->a_long, (int)accelerator, (int)groupacc, attr, jstr, (int)preselected, color);
 	destroy_jobject(jstr);
 }
 
@@ -1249,37 +1247,37 @@ void and_end_menu(winid wid, const char *prompt)
 //		   called for them. There is no way of knowing whether
 //		   select_menu() will be called for the window at
 //		   create_nhwindow() time.
-int and_select_menu_r(winid wid, int how, MENU_ITEM_P **selected, int reentry)
+int and_select_menu_r(winid wid, int how, menu_item **selected, int reentry)
 {
 	int i, n;
-	jintArray a;
-	jint* p;
-	jint* q;
+	jlongArray a;
+	jlong* p;
+	jlong* q;
 
-	//debuglog("and_select_menu");
 
-	a = (jintArray)JNICallO(jSelectMenu, wid, how, reentry);
+	a = (jlongArray)JNICallO(jSelectMenu, wid, how, reentry);
 
 	*selected = 0;
 
-	//debuglog("returned %d", a);
 	if(a == 0)
 		return -1;
 
 	n = (*jEnv)->GetArrayLength(jEnv, a);
 
+
 	if(n > 1) // n should always be 2k (id, count) pairs
 	{
 		n >>= 1;
 
-		q = p = (*jEnv)->GetIntArrayElements(jEnv, a, 0);
-		*selected = (MENU_ITEM_P*)malloc(sizeof(MENU_ITEM_P) * n);
+		q = p = (*jEnv)->GetLongArrayElements(jEnv, a, 0);
+		*selected = (menu_item*)alloc(sizeof(menu_item) * n);
 		for(i = 0; i < n; i++)
 		{
-			(*selected)[i].item.a_int = *p++;
+			(*selected)[i].item = cg.zeroany;
+            (*selected)[i].item.a_long = *p++;
 			(*selected)[i].count = *p++;
 		}
-		(*jEnv)->ReleaseIntArrayElements(jEnv, a, q, 0);
+		(*jEnv)->ReleaseLongArrayElements(jEnv, a, q, 0);
 	}
 	else if(n == 1)
 	{
@@ -1295,7 +1293,7 @@ int and_select_menu_r(winid wid, int how, MENU_ITEM_P **selected, int reentry)
 	return n;
 }
 
-int and_select_menu(winid wid, int how, MENU_ITEM_P **selected)
+int and_select_menu(winid wid, int how, menu_item **selected)
 {
 	return and_select_menu_r(wid, how, selected, 0);
 }
@@ -1314,7 +1312,7 @@ int and_select_menu(winid wid, int how, MENU_ITEM_P **selected)
 //		-- Interfaces which issue prompts and messages to separate
 //		   windows typically won't need this functionality, so can
 //		   substitute genl_message_menu (windows.c) instead.
-char and_message_menu(CHAR_P let, int how, const char* mesg)
+char and_message_menu(char let, int how, const char* mesg)
 {
 	//debuglog("message_menu: %s", mesg);
 
@@ -1328,8 +1326,9 @@ char and_message_menu(CHAR_P let, int how, const char* mesg)
 //		   changed.
 //		-- Merely calls display_inventory() for window-ports that
 //		   leave the window up, otherwise empty.
-void and_update_inventory()
+void and_update_inventory(int arg)
 {
+    (void) arg;
 	//debuglog("and_update_inventory");
 }
 
@@ -1347,7 +1346,7 @@ void and_mark_synch()
 //		   streams goes here).
 //		-- May also deal with exposure events etc. so that the
 //		   display is OK when return from wait_synch().
-void and_wait_synch()
+void and_wait_synch(void)
 {
 	//debuglog("and_wait_synch");
 }
@@ -1391,19 +1390,13 @@ void and_update_positionbar(char *features)
 //		   port wants (symbol, font, color, attributes, ...there's
 //		   a 1-1 map between glyphs and distinct things on the map).
 
-void and_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
+void and_print_glyph(winid wid, coordxy x, coordxy y, const glyph_info *glyphinfo, const glyph_info *bkglyphinfo)
 {
+    (void) bkglyphinfo;
+    int glyph = glyphinfo->glyph;
 	//debuglog("and_print_glyph wid=%d %dx%d", wid, x, y);
 	int tile;
-	if(glyph == NO_GLYPH)
-		tile = -1;
-	else
-		tile = glyph2tile[glyph];
-	int ch;
-	int col;
-	unsigned int special;
-	mapglyph(glyph, &ch, &col, &special, x, y, 0);
-
+    int special;
 	special &= ~(MG_CORPSE|MG_INVIS|MG_RIDDEN|MG_STATUE); // TODO support
 	if(!iflags.hilite_pet)
 		special &= ~MG_PET;
@@ -1412,7 +1405,11 @@ void and_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
 	if(!iflags.use_inverse)
 		special &= ~MG_DETECT;
 
-	JNICallV(jPrintTile, wid, x, y, tile, ch, nhcolor_to_RGB(col), special);
+    glyph_info out_glyph_info = {0};
+    map_glyphinfo(x, y, glyph, special, &out_glyph_info);
+    tile = out_glyph_info.gm.tileidx;
+
+	JNICallV(jPrintTile, wid, x, y, tile, out_glyph_info.ttychar, nhcolor_to_RGB(out_glyph_info.gm.sym.color), special);
 }
 
 //____________________________________________________________________________________
@@ -1493,7 +1490,7 @@ void lock_mouse_cursor(boolean bLock)
 	bMouseLock = bLock;
 }
 
-int and_nh_poskey(int *x, int *y, int *mod)
+int and_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
 	//debuglog("and_nh_poskey");
 	jintArray a = (*jEnv)->NewIntArray(jEnv, 2);
@@ -1563,21 +1560,21 @@ int and_doprev_message()
 //		   returned, preserving case (upper or lower.) This means that
 //		   if the calling function needs an exact match, it must handle
 //		   user input correctness itself.
-char and_yn_function(const char *question, const char *choices, CHAR_P def)
+char and_yn_function(const char *question, const char *choices, char def)
 {
 	char ch;
 	char message[BUFSZ];
 	char res_ch[2];
 	boolean digit_ok, allow_num;
-	int esc;
+	uintptr_t esc;
 	int nChoices;
 
 	if(choices)
 	{
 		nChoices = strlen(choices);
-		esc = (int)index(choices, '\033');
+		esc = (uintptr_t) strchr(choices, '\033');
 		if(esc)
-			esc -= (int)choices;
+			esc -= (uintptr_t)choices;
 		else
 			esc = -1;
 	}
@@ -1585,7 +1582,7 @@ char and_yn_function(const char *question, const char *choices, CHAR_P def)
 	{
 		esc = -1;
 	}
-	allow_num = choices && index(choices, '#');
+	allow_num = choices && strchr(choices, '#');
 
 	//if(choices)
 	//	debuglog("yn %s [%s](%c)", question, choices, def);
@@ -1642,7 +1639,8 @@ char and_yn_function(const char *question, const char *choices, CHAR_P def)
 		}
 		else
 		{
-			int x = u.ux, y = u.uy, mod = 0;
+			coordxy x = u.ux, y = u.uy;
+            int mod = 0;
 			int ch = and_nh_poskey(&x, &y, &mod);
 			if(!ch)
 			{
@@ -1662,7 +1660,7 @@ char and_yn_function(const char *question, const char *choices, CHAR_P def)
 		        if(x == 0 && y == 0)	/* map click on player to "rest" command */
 		        	ch = '.';
 		        else
-		        	ch = xytod(x, y);
+		        	ch = xytodir(x, y);
 			}
 			return ch;
 		}
@@ -1683,20 +1681,20 @@ char and_yn_function(const char *question, const char *choices, CHAR_P def)
 		digit_ok = allow_num && digit(ch);
 		if(ch == '\033')
 		{
-			if(index(choices, 'q'))
+			if(strchr(choices, 'q'))
 				ch = 'q';
-			else if(index(choices, 'n'))
+			else if(strchr(choices, 'n'))
 				ch = 'n';
 			else
 				ch = def;
 			break;
 		}
-		else if(index(quitchars, ch))
+		else if(strchr(quitchars, ch))
 		{
 			ch = def;
 			break;
 		}
-		else if(!index(choices, ch) && !digit_ok)
+		else if(!strchr(choices, ch) && !digit_ok)
 		{
 			and_nhbell();
 			ch = (char)0;
@@ -1730,7 +1728,7 @@ char and_yn_function(const char *question, const char *choices, CHAR_P def)
 					and_putstr_ex(WIN_MESSAGE, 1<<ATR_BOLD, digit_string, 0, CLR_WHITE);
 					n_len++;
 				}
-				else if(z == 'y' || index(quitchars, z))
+				else if(z == 'y' || strchr(quitchars, z))
 				{
 					if(z == '\033')
 						value = -1; /* abort */
@@ -1924,13 +1922,13 @@ void and_askname()
 		for(; i < n; i++)
 		{
 			if(isprint(pChars[i]))
-				plname[i] = pChars[i];
+				svp.plname[i] = pChars[i];
 			else
-				plname[i] = '?';
+				svp.plname[i] = '?';
 		}
 		(*jEnv)->ReleaseStringChars(jEnv, jstr, pChars);
 	}
-	plname[i] = 0;
+	svp.plname[i] = 0;
 	destroy_jobject(jstr);
 }
 
@@ -1942,16 +1940,15 @@ void and_askname()
 int do_ext_cmd_menu(BOOLEAN_P complete)
 {
 //	debuglog("and_get_ext_cmd");
-
 	winid wid;
 	int i, count, what, flgs;
 	menu_item *selected = NULL;
-	anything any;
+	anything any = cg.zeroany;
 	char accelerator = 'a', tmp_acc = 0;
 	const char *ptr;
 
 	wid = and_create_nhwindow(NHW_MENU);
-	and_start_menu(wid);
+	and_start_menu(wid, MENU_BEHAVE_STANDARD);
 	for(i = 0; (ptr = extcmdlist[i].ef_txt); i++)
 	{
 		flgs = extcmdlist[i].flags;
@@ -1962,7 +1959,7 @@ int do_ext_cmd_menu(BOOLEAN_P complete)
 			continue;
 
 		any.a_int = i+1;
-		and_add_menu(wid, NO_GLYPH, &any, accelerator, 0, ATR_NONE, ptr, FALSE);
+		and_add_menu(wid, &nul_glyphinfo, &any, accelerator, 0, ATR_NONE, NO_COLOR, ptr, MENU_ITEMFLAGS_NONE);
 
 		if(accelerator == 'z')
 			accelerator = 'A';
@@ -1973,7 +1970,7 @@ int do_ext_cmd_menu(BOOLEAN_P complete)
 	}
 	any.a_int = i+1;
 	if(!complete)
-		and_add_menu(wid, NO_GLYPH, &any, '*', 0, ATR_NONE, "(list everything)", FALSE);
+		and_add_menu(wid, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "(list everything)", 0);
 	and_end_menu(wid, "Extended command");
 	count = and_select_menu(wid, PICK_ONE, &selected);
 	what = count > 0 ? selected->item.a_int - 1 : -1;
@@ -2068,11 +2065,11 @@ int do_ext_cmd_text()
 	for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++)
 		if (!strcmpi(buf, extcmdlist[i].ef_txt)) break;
 
-	if (!in_doagain) {
+	if (!gi.in_doagain) {
 	    int j;
 	    for (j = 0; buf[j]; j++)
-			savech(buf[j]);
-	    savech('\n');
+            cmdq_add_key(CQ_REPEAT, buf[j]);
+        cmdq_add_key(CQ_REPEAT, '\n');
 	}
 
 	if (extcmdlist[i].ef_txt == (char *)0) {
@@ -2153,11 +2150,11 @@ void and_end_screen()
 // 		expected to successively return each message that it wants
 // 		saved, starting with the oldest message first, finishing with
 // 		the most recent. Return null pointer when finished.
-int add_msghistory_idx(int idx)
+int add_msghistory_idx(boolean idx)
 {
 	return (idx + 1) % (sizeof(msghistory)/sizeof(char*));
 }
-char* and_getmsghistory(BOOLEAN_P init)
+char* and_getmsghistory(boolean init)
 {
 	if(init)
 	{
@@ -2192,7 +2189,7 @@ char* and_getmsghistory(BOOLEAN_P init)
 //		should it assume that another message will follow this
 //		one, so it should keep all pointers/indexes intact at the
 //		end of each call.
-void and_putmsghistory(const char *msg, BOOLEAN_P restoring)
+void and_putmsghistory(const char *msg, boolean restoring)
 {
 	if(!msg) return;
 	if(restoring)
@@ -2234,14 +2231,23 @@ void load_usersound(const char *filename)
 	destroy_jobject(jstr);
 }
 
-void play_usersound(const char *filename, int volume)
+void play_usersound(char *filename, int32_t volume, int32_t idx)
 {
+    (void) idx;
 	//debuglog("play_usersound(%s, %d)", filename, volume);
 	jbyteArray jstr = create_bytearray(filename);
 	JNICallV(jPlaySound, jstr, volume);
 	destroy_jobject(jstr);
 }
+
+#ifdef SND_LIB_ANDROIDSOUND
+struct sound_procs androidsound_procs = {
+    SOUNDID(androidsound),
+    .sound_triggers = SOUND_TRIGGER_USERSOUNDS,
+    .sound_play_usersound = play_usersound,
+};
 #endif
+#endif /* USER_SOUNDS */
 
 #ifdef DUMPLOG
 void and_get_dumplog_dir(char* buf)

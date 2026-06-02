@@ -44,5 +44,7 @@
 
 #define CHANGE_COLOR
 
+#undef CRASHREPORT
+
 # endif /* ANDROIDCONF_H */
 #endif /* ANDROID */

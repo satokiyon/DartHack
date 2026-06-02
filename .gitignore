@@ -1,23 +1,46 @@
-*.swp
-*.swo
-compile
-out
+# CVS default ignores begin
+tags
+TAGS
+.make.state
+.nse_depinfo
+*~
+\#*
+.#*
+,*
+_$*
+*$
+*.old
+*.bak
+*.BAK
+*.orig
+*.rej
+.del-*
+*.a
+*.olb
+*.o
+*.obj
+*.so
+*.exe
+*.Z
+*.elc
+*.ln
+core
+# CVS default ignores end
+.*.swp
 
-# /
-/Makefile
-/config.log
-/config.status
-/tags
-/TAGS
-/.svn
+# We generate makefiles by shell script
+Makefile
 
 # Win32-specific ignores
 Debug/
 Release/
 binary/
+package/*
+vspackage/
+vsbinary/
 build/
 ipch/
-lib/
+lib/*
 Nethack.sln
 Nethack.sdf
 Nethack.opensdf
@@ -26,6 +49,7 @@ Makefile.gcc
 Makefile-orig
 Makefile.bcc-orig
 Makefile.gcc-orig
+make.prefs
 *.suo
 *.pdb
 *.ilk
@@ -33,53 +57,44 @@ Makefile.gcc-orig
 *.lastcodeanalysissucceeded
 # VS 2017 caches data into the hidden directory .vs
 .vs
+win/win32/vs/obj/*
 # Win32-specific ignores end
 .DS_Store
+# ms-dos 
+# resulting zip
+NH*DOS.ZIP
+# 8.3 versions
+dat/data.bas
+sys/share/posixreg.c
+include/patchlev.h
+doc/guidebk.txt
+# folders compiler, target objs, binary results
+djgpp/
+src/msdos_o/
+msdos-binary/
+dat/NHTILES.BMP
+dat/msdoshlp.txt
+src/host_o/
+util/djgpp-linux64-gcc550.tar.bz2
+util/djgpp-osx-gcc550.tar.bz2
+util/djgpp-mingw-gcc550-standalone.zip
+util/dlb_main
+util/thintile
+util/til2bin2
+util/tile2bin
+win/share/monthin.txt
+win/share/objthin.txt
+win/share/oththin.txt
+# end of ms-dos
 
-# /dat/
-/dat/Makefile
-
-# /doc/
-/doc/Makefile
-/doc/Guidebook.txt
-
-# /include/
-/include/autoconf.h
-/include/autoconf_paths.h
-/include/date.h
-/include/dgn_comp.h
-/include/lev_comp.h
-/include/onames.h
-/include/pm.h
-/include/vis_tab.h
-/include/win32api.h
-
-# /src/
-/src/*.o
-/src/nhwin.a
-/src/nethack
-/src/Makefile
-/src/Sysunix
-/src/config.h-t
-/src/hack.h-t
-/src/vis_tab.c
-/src/monstr.c
-/src/tile.c
-/src/Sysandroid
-
-# /util/
-/util/*.o
-/util/Makefile
-/util/dgn_comp
-/util/dgn_lex.c
-/util/dgn_yacc.c
-/util/dlb
-/util/lev_comp
-/util/lev_lex.c
-/util/lev_yacc.c
-/util/makedefs
-/util/recover
-/util/tilemap
-
-# /win/
-/win/*/*.o
+#libnethack
+targets/*
+bundle/*
+#test.js
+#sys/lib/npm-package/build/nethack.js
+#sys/lib/npm-package/build/nethack.wasm
+*.user
+util/*.lib
+util/*.exp
+submodules/CHKSUMS.tmp
+sys/amiga/regex/

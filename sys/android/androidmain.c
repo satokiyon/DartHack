@@ -16,17 +16,30 @@ extern void set_username();
 
 static jmp_buf env;
 
-extern struct passwd *FDECL( getpwuid, ( uid_t));
-extern struct passwd *FDECL( getpwnam, (const char *));
+extern struct passwd *getpwuid( uid_t);
+extern struct passwd *getpwnam(const char *);
 
-static boolean NDECL( whoami);
-static void FDECL( process_options, (int, char **));
+staticfn boolean whoami(void);
+staticfn void process_options(int, char **);
 
-static void NDECL( wd_message);
+staticfn void wd_message(void);
 
-static char *make_lockname(filename, lockname)
-const char *filename;
-char *lockname;
+void get_nhuuid(void) {
+#ifdef NHUUID
+    if (svn.nhuuid[0]) return;
+    char struuid[sizeof svn.nhuuid] = {0};
+    uuid_t binuuid;
+    uuid_generate_random(binuuid);
+    uuid_unparse(binuuid, struuid);
+    if (struuid[0]) memcpy(svn.nhuuid, struuid, sizeof svn.nhuuid);
+#endif
+}
+
+void free_nhuuid(void) {
+    memset(&svn.nhuuid, 0, sizeof svn.nhuuid);
+}
+
+static char *make_lockname(const char *filename, char *lockname)
 {
 #  ifdef NO_FILE_LINKS
 	Strcpy(lockname, LOCKDIR);
@@ -67,16 +80,16 @@ int NetHackMain(int argc, char** argv)
 	}
 
 
-	register int fd;
+	NHFILE *nhfp;
 	boolean exact_username;
 	FILE* fp;
 
     boolean resuming = FALSE; /* assume new game */
 
-    sys_early_init();
+    early_init(argc, argv);
 
-	hname = argv[0];
-	hackpid = getpid();
+	gh.hname = argv[0];
+	svh.hackpid = getpid();
 	(void)umask(0777 & ~FCMASK);
 
 	// hack
@@ -118,21 +131,21 @@ int NetHackMain(int argc, char** argv)
 #endif
 	set_username();
 
-	Sprintf(lock, "%d%s", (int)getuid(), plname);
+	Sprintf(gl.lock, "%d%s", (int)getuid(), svp.plname);
 	getlock();
 
 	/* Set up level 0 file to keep the game state.
 	 */
-	fd = create_levelfile(0, (char *)0);
-	if(fd < 0)
+	nhfp = create_levelfile(0, (char *)0);
+	if(!nhfp)
 	{
 		raw_print("Cannot create lock file");
 	}
 	else
 	{
-		hackpid = 1;
-		write(fd, (genericptr_t) & hackpid, sizeof(hackpid));
-		close(fd);
+		svh.hackpid = 1;
+		Sfo_int(nhfp, &svh.hackpid, "svh.hackpid");
+		close_nhfile(nhfp);
 	}
 
 	dlb_init(); /* must be before newgame() */
@@ -141,12 +154,12 @@ int NetHackMain(int argc, char** argv)
 	 * Initialization of the boundaries of the mazes
 	 * Both boundaries have to be even.
 	 */
-	x_maze_max = COLNO - 1;
-	if(x_maze_max % 2)
-		x_maze_max--;
-	y_maze_max = ROWNO - 1;
-	if(y_maze_max % 2)
-		y_maze_max--;
+	gx.x_maze_max = COLNO - 1;
+	if(gx.x_maze_max % 2)
+		gx.x_maze_max--;
+	gy.y_maze_max = ROWNO - 1;
+	if(gy.y_maze_max % 2)
+		gy.y_maze_max--;
 
 	/*
 	 *  Initialize the vision system.  This must be before mklev() on a
@@ -154,9 +167,9 @@ int NetHackMain(int argc, char** argv)
 	 */
 	vision_init();
 
-	display_gamewindows();
+	init_sound_disp_gamewindows();
 
-	if((fd = restore_saved_game()) >= 0)
+	if((nhfp = restore_saved_game()) != 0)
 	{
 #ifdef WIZARD
 		/* Since wizard is actually flags.debug, restoring might
@@ -164,7 +177,7 @@ int NetHackMain(int argc, char** argv)
 		 */
 		boolean remember_wiz_mode = wizard;
 #endif
-		const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
+		const char *fq_save = fqname(gs.SAVEF, SAVEPREFIX, 1);
 
 #ifdef NEWS
 		if(iflags.news)
@@ -173,9 +186,12 @@ int NetHackMain(int argc, char** argv)
 			iflags.news = FALSE; /* in case dorecover() fails */
 		}
 #endif
-		pline("Restoring save file...");
+        if (ge.early_raw_messages)
+            raw_print("Restoring save file...");
+        else
+            pline("Restoring save file...");
 		mark_synch(); /* flush output */
-		if(!dorecover(fd))
+		if(!dorecover(nhfp))
 			goto not_recovered;
 		resuming = TRUE;
 #ifdef WIZARD
@@ -187,7 +203,7 @@ int NetHackMain(int argc, char** argv)
 
 		if(discover || wizard)
 		{
-			if(yn("Do you want to keep the save file?") == 'n')
+			if(y_n("Do you want to keep the save file?") == 'n')
 			{
 				(void)delete_savefile();
 			}
@@ -216,9 +232,12 @@ boolean authorize_wizard_mode()
 	return TRUE;
 }
 
+boolean authorize_explore_mode(void) {
+    return TRUE;
+}
 
-static void process_options(argc, argv)
-	int argc;char *argv[];
+
+staticfn void process_options(int argc, char *argv[])
 {
 	int i;
 
@@ -246,15 +265,15 @@ static void process_options(argc, argv)
 			break;
 #endif
 		case 'u':
-			if(!*plname)
+			if(!*svp.plname)
 			{
 				if(argv[0][2])
-					(void)strncpy(plname, argv[0] + 2, sizeof(plname) - 1);
+					(void)strncpy(svp.plname, argv[0] + 2, sizeof(svp.plname) - 1);
 				else if(argc > 1)
 				{
 					argc--;
 					argv++;
-					(void)strncpy(plname, argv[0], sizeof(plname) - 1);
+					(void)strncpy(svp.plname, argv[0], sizeof(svp.plname) - 1);
 				}
 				else
 					raw_print("Player name expected after -u");
@@ -302,7 +321,20 @@ static void process_options(argc, argv)
 	}
 }
 
-static boolean whoami()
+#ifdef CHDIR
+void chdirx(const char *dir, boolean wr) {
+    if (!dir) goto exit;
+    if (chdir(dir) < 0) {
+        perror(dir);
+        goto exit;
+    }
+    return;
+exit:
+    error("Cannot chdir to %s.", dir);
+}
+#endif
+
+staticfn boolean whoami(void)
 {
 	/*
 	 * Who am i? Algorithm: 1. Use name as specified in NETHACKOPTIONS
@@ -316,10 +348,10 @@ static boolean whoami()
 	 */
 	register char *s;
 
-	if(*plname)
+	if(*svp.plname)
 		return FALSE;
 	if((s = getlogin()))
-		(void)strncpy(plname, s, sizeof(plname) - 1);
+		(void)strncpy(svp.plname, s, sizeof(svp.plname) - 1);
 	return TRUE;
 }
 
@@ -335,7 +367,7 @@ port_help()
 }
 #endif
 
-static void wd_message()
+staticfn void wd_message(void)
 {
 	if(discover)
 		You("are in non-scoring discovery mode.");
@@ -345,8 +377,7 @@ static void wd_message()
  * Add a slash to any name not ending in /. There must
  * be room for the /
  */
-void append_slash(name)
-	char *name;
+void append_slash(char *name)
 {
 	char *ptr;
 
