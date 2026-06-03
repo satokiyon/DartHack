@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-03. */
 /* NetHack 5.0	botl.c	$NHDT-Date: 1769839231 2026/01/30 22:00:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.277 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -123,7 +123,7 @@ status_field_label_for_display(int fld)
     case BL_CAP:
         return "荷重";
     case BL_GOLD:
-        return "金額";
+        return "金貨";
     case BL_ENE:
         return "魔力";
     case BL_ENEMAX:
@@ -388,7 +388,7 @@ do_statusline2(void)
         jp_status_relabel_dlvl(dloc);
     if ((money = money_cnt(gi.invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
-                Sprintf(eos(dloc), " 金額:%s:%-2ld", /* strongest hero can lift ~300000 gold */
+                Sprintf(eos(dloc), " 金貨:%s:%-2ld", /* strongest hero can lift ~300000 gold */
             (iflags.in_dumplog || iflags.invis_goldsym) ? "$"
               : encglyph(objnum_to_glyph(GOLD_PIECE)),
             min(money, 999999L));
@@ -623,22 +623,22 @@ static const struct RoleName jp_role_ranks[NUM_ROLES][9] = {
     {
         { "鉱員", 0 }, { "労働者", 0 }, { "調査者", 0 },
         { "発掘者", 0 }, { "掘削者", 0 }, { "探検者", 0 },
-        { "洞窟学者", 0 }, { "美術収集者", 0 }, { "館長", 0 }
+        { "洞窟学者", 0 }, { "収集家", 0 }, { "館長", 0 }
     },
     {
-        { "盗賊", 0 }, { "略奪者", 0 }, { "悪漢", 0 },
+        { "乱暴者", 0 }, { "略奪者", 0 }, { "悪漢", 0 },
         { "山賊", 0 }, { "侵略者", 0 }, { "強盗", 0 },
         { "殺戮者", 0 }, { "首領", 0 }, { "征服者", 0 }
     },
     {
         { "穴居人", 0 }, { "原住民", 0 }, { "放浪者", 0 },
         { "浮浪者", 0 }, { "旅行者", 0 }, { "放遊者", 0 },
-        { "遊牧民", 0 }, { "流浪者", 0 }, { "先駆者", 0 }
+        { "遊牧民", 0 }, { "漂泊民", 0 }, { "先駆者", 0 }
     },
     {
-        { "見習い治療師", 0 }, { "初級治療師", 0 }, { "看護師", "看護婦" },
-        { "治療助手", 0 }, { "応急手当師", 0 }, { "薬草治療師", 0 },
-        { "主任治療師", 0 }, { "治療医", 0 }, { "外科医", 0 }
+        { "根堀人", 0 }, { "治療師", 0 }, { "遺体処理師", 0 },
+        { "創傷処置師", 0 }, { "整骨医", 0 }, { "薬草治療師", 0 },
+        { "治療大師 ", 0 }, { "治療医", 0 }, { "外科医", 0 }
     },
     {
         { "騎士見習い", 0 }, { "従士", 0 }, { "准騎士", 0 },
@@ -662,8 +662,8 @@ static const struct RoleName jp_role_ranks[NUM_ROLES][9] = {
     },
     {
         { "新米", 0 }, { "見張り", 0 }, { "先導", 0 },
-        { "偵察", 0 }, { "斥候", 0 }, { "弓兵", 0 },
-        { "中級弓兵", 0 }, { "上級弓兵", 0 }, { "上級弓兵", 0 }
+        { "偵察", 0 }, { "斥候", 0 }, { "弩兵", 0 },
+        { "射撃手", 0 }, { "熟練射手", 0 }, { "名射手", 0 }
     },
     {
         { "旗本", 0 }, { "浪人", 0 }, { "忍者", "くノ一" },
@@ -678,7 +678,7 @@ static const struct RoleName jp_role_ranks[NUM_ROLES][9] = {
     {
         { "若き盾乙女", 0 }, { "散兵乙女", 0 }, { "闘士乙女", 0 },
         { "武装乙女", 0 }, { "戦乙女", 0 }, { "剣客乙女", 0 },
-        { "英雄", "女英雄" }, { "勇将", 0 }, { "ヤール", "女ヤール" }
+        { "英雄", "女英雄" }, { "勇者", 0 }, { "盾の勇者", "盾の姫勇者" }
     },
     {
         { "手品師", 0 }, { "奇術師", 0 }, { "占い師", 0 },
@@ -1066,7 +1066,7 @@ static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("alignment", " 属性:%s", ANY_STR, 24, BL_ALIGN),
     INIT_BLSTAT("score", " 得点:%s", ANY_LONG, 30, BL_SCORE),
     INIT_BLSTAT("carrying-capacity", " %s", ANY_INT, 20, BL_CAP),
-    INIT_BLSTAT("gold", " 金額:%s", ANY_LONG, 40, BL_GOLD),
+    INIT_BLSTAT("gold", " 金貨:%s", ANY_LONG, 40, BL_GOLD),
     INIT_BLSTATP("power", " 魔力:%s", ANY_INT, 20, BL_ENEMAX, BL_ENE),
     INIT_BLSTAT("power-max", "(%s)", ANY_INT, 10, BL_ENEMAX),
     INIT_BLSTATP("experience-level", " レベル:%s", ANY_INT, 20, BL_XP,

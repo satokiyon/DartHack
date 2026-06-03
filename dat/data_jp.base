@@ -5887,7 +5887,7 @@ curator
 	掘削者           14 to 17
 	探検者           18 to 21
 	洞窟学者         22 to 25
-	美術収集者       26 to 29
+	収集家           26 to 29
 	館長                30
 bar* ranks
 barbarian
@@ -5902,7 +5902,7 @@ chieftain*
 conquer*
 	野蛮人ランク
 	  称号            レベル
-	盗賊              1 to 2
+	乱暴者            1 to 2
 	略奪者            3 to 5
 	悪漢              6 to 9
 	山賊             10 to 13
@@ -5933,7 +5933,7 @@ pioneer
 	旅行者           14 to 17
 	放遊者           18 to 21
 	遊牧民           22 to 25
-	流浪者           26 to 29
+	漂泊民           26 to 29
 	先駆者              30
 hea* ranks
 healer
@@ -5949,14 +5949,13 @@ physician
 chirurgeon
 	治療師ランク
 	  称号            レベル
-	見習い治療師      1 to 2
-	初級治療師        3 to 5
-	看護師,
-	 看護婦           6 to 9
-	治療助手         10 to 13
-	応急手当師       14 to 17
+	根堀人            1 to 2
+	治療師            3 to 5
+	遺体処理師,       6 to 9
+	創傷処置師       10 to 13
+	整骨医           14 to 17
 	薬草治療師       18 to 21
-	主任治療師       22 to 25
+	治療大師         22 to 25
 	治療医           26 to 29
 	外科医              30
 kni* ranks
@@ -6050,10 +6049,10 @@ marks*man
 	先導              6 to 9
 	偵察             10 to 13
 	斥候             14 to 17
-	弓兵             18 to 21
-	中級弓兵         22 to 25
-	上級弓兵         26 to 29
-	上級弓兵            30
+	弩兵             18 to 21
+	射撃手           22 to 25
+	熟練射手         26 to 29
+	名射手              30
 rog* ranks
 rogue
 footpad
@@ -6148,9 +6147,9 @@ lady
 	剣客乙女         18 to 21
 	英雄,
 	 女英雄          22 to 25
-	勇将             26 to 29
-	ヤール,
-	 女ヤール           30
+	勇者             26 to 29
+	盾の勇者,
+	 盾の姫勇者         30
 wiz* ranks
 wizard
 evoker
