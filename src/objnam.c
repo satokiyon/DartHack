@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-03. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1745114235 2025/04/19 17:57:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.453 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1090,7 +1090,7 @@ xname_flags(
 
     if (has_oname(obj) && dknown) {
         append_name_parens = TRUE;
-        Concat(buf, 0, "（");
+        Concat(buf, 0, " \"");
 
         /* jump directly here if obj passes the has-personal-name test */
  nameit:
@@ -1101,7 +1101,7 @@ xname_flags(
         if (obj->oartifact && !strncmp(obufp, "The ", 4))
             *obufp = lowc(*obufp); /* change 'T' in "The " to 't' */
         if (append_name_parens)
-            Concat(buf, 0, "）");
+            Concat(buf, 0, "\" ");
     }
 
     if (!strncmpi(buf, "the ", 4))
