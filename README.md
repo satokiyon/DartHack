@@ -38,15 +38,14 @@ NetHackJPは、ローグライクゲームの金字塔 **NetHack 5.0** を日本
    * **`NetHack.exe`** （コンソール版）
    * **`NetHackW.exe`** （GUI版）
 
+
+- `.nethackrc` に設定できる各種オプションやゲーム内容に関する説明は、`Guidebook_JP.txt` を参照してください。
+
 ---
-
-`.nethackrc` に設定できる各種オプションやゲーム内容に関する説明は、`Guidebook_JP.txt` を参照してください。
-
-
 
 ### 2. 日本語入力と対応機能
 Windows版では、ゲーム内での日本語入力・表示に対応しています。以下の項目で日本語と英語のどちらも使用可能です。
-* プレイヤーの名前
+* 主人公キャラの名前
 * アイテムやモンスターへの命名（名前付け）
 * 「願い（wishing）」の指定
 * 「虐殺（extinction）」の指定
@@ -76,6 +75,16 @@ NetHack はテキスト（ASCII文字）だけでなく、美しいグラフィ�
 
 ---
 
+## 💖 プロジェクトへの支援（寄付）について
+
+本プロジェクトは非公式のボランティアによって開発・運営されています。もしこの日本語化プロジェクトを気に入っていただき、今後の継続的な開発やメンテナンスを応援していただける場合は、温かいご支援（寄付）をいただけますと幸いです。
+
+[![Sponsor satokiyon](https://img.shields.io/badge/Sponsor-satokiyon-EA4AAA?style=flat-square&logo=github-sponsors&logoColor=white)](https://github.com/sponsors/satokiyon)
+
+（※具体的な寄付方法やリンクなどは、上記のボタンや、本リポジトリの「Sponsor」ボタン等をご確認ください）
+
+---
+
 ## 🛠️ 開発者向け情報
 
 プロジェクトへの貢献や、自分でビルドを行いたい方向けの情報です。
@@ -84,50 +93,8 @@ NetHack はテキスト（ASCII文字）だけでなく、美しいグラフィ�
 Windows でのビルド方法の詳細は、以下のドキュメントを参照してください。
 * [ビルドガイド (sys/windows/vs/build-vs.txt)](sys/windows/vs/build-vs.txt)
 
-### 2. リポジトリ構成と運用
-NetHack 本家（アップストリーム）の修正を継続的に反映するため、以下の2つのブランチで運用しています。
-* **`main`**: 日本語化プロジェクトのメイン開発ブランチ。
-* **`upstream-base`**: 本家 (`NetHack/NetHack-5.0`) のコードをそのまま保持する同期用ブランチ（日本語版独自の変更は加えません）。
 
-#### 初期設定（初回のみ）
-本家のリポジトリを `upstream` リモートとして登録し、同期用ブランチを作成します。
-```powershell
-# 1. 本家リポジトリを upstream として登録
-git remote add upstream https://github.com/NetHack/NetHack.git
-
-# 2. 最新情報を取得
-git fetch upstream
-
-# 3. 本家の NetHack-5.0 ブランチをベースにしたブランチを作成
-git checkout -b upstream-base upstream/NetHack-5.0
-```
-
-#### 定期的な同期（2回目以降）
-本家の更新を `main` ブランチに取り込む手順です。
-```powershell
-# 1. upstream-base を最新にする
-git switch upstream-base
-git pull
-
-# 2. main に統合する
-git switch main
-git merge --no-commit --no-ff upstream-base
-
-# 3. コンフリクトが発生した場合の処理（競合解決後）
-# 競合箇所を手動修正し、全解決後に以下を実行
-# git add は個別に実行する（例: git add dat/history）
-git add <解決したファイル名>
-git commit -m "アップストリームの変更をマージ"
-
-# 4. 確認とプッシュ
-# ビルドを行い、動作確認後に実行
-git push origin main
-
-# （補足）マージを中断して作業前の状態に戻す場合
-git merge --abort
-```
-
-### 3. オブジェクト名ローカライズ方針（重要）
+### 2. オブジェクト名ローカライズ方針（重要）
 表示用テキスト以外にゲームロジック上でキー値として使用されている英単語は、直接日本語に置換せず、日本語の表示用リストを別途用意してヘルパー関数を利用して英単語から日本語へ変換して表示する仕組みをとっています。これによって、もともとのキー値を参照するゲームロジックが破壊されるのを防ぎます。
 
 例えば `include/objects.h` を直接日本語化すると、Lua special floor の `des.object({ id = "leather armor" })` のような英語 ID ルックアップが壊れるため、内部IDは英語のまま維持し、表示層だけを日本語化します。
@@ -169,13 +136,6 @@ git merge --abort
 * `README.JP`: 英語版 README の日本語訳
 * `README.md`: このファイル（プロジェクトの概要）
 
----
-
-## 💖 プロジェクトへの支援（寄付）について
-
-本プロジェクトは非公式のボランティアチームによって開発・運営されています。もしこの日本語化プロジェクトを気に入っていただき、今後の継続的な開発やメンテナンスを応援していただける場合は、温かいご支援（寄付）をいただけますと幸いです。
-
-（※具体的な寄付方法やリンクなどは、本リポジトリの「Sponsor」ボタンや専用のリンク等をご確認ください）
 
 ---
 
@@ -195,3 +155,50 @@ git merge --abort
 
 ---
 NetHack 5.0 の詳細については、[README](README) または [README.JP](README.JP) を参照してください。
+
+---
+
+# リポジトリ運用メモ
+
+## 1. リポジトリ構成と運用
+NetHack 本家（アップストリーム）の修正を継続的に反映するため、以下の2つのブランチで運用しています。
+* **`main`**: 日本語化プロジェクトのメイン開発ブランチ。
+* **`upstream-base`**: 本家 (`NetHack/NetHack-5.0`) のコードをそのまま保持する同期用ブランチ（日本語版独自の変更は加えません）。
+
+### 初期設定（初回のみ）
+本家のリポジトリを `upstream` リモートとして登録し、同期用ブランチを作成します。
+```powershell
+# 1. 本家リポジトリを upstream として登録
+git remote add upstream https://github.com/NetHack/NetHack.git
+
+# 2. 最新情報を取得
+git fetch upstream
+
+# 3. 本家の NetHack-5.0 ブランチをベースにしたブランチを作成
+git checkout -b upstream-base upstream/NetHack-5.0
+```
+
+### 定期的な同期（2回目以降）
+本家の更新を `main` ブランチに取り込む手順です。
+```powershell
+# 1. upstream-base を最新にする
+git switch upstream-base
+git pull
+
+# 2. main に統合する
+git switch main
+git merge --no-commit --no-ff upstream-base
+
+# 3. コンフリクトが発生した場合の処理（競合解決後）
+# 競合箇所を手動修正し、全解決後に以下を実行
+# git add は個別に実行する（例: git add dat/history）
+git add <解決したファイル名>
+git commit -m "アップストリームの変更をマージ"
+
+# 4. 確認とプッシュ
+# ビルドを行い、動作確認後に実行
+git push origin main
+
+# （補足）マージを中断して作業前の状態に戻す場合
+git merge --abort
+```
