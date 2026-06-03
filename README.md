@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-03. -->
 # NetHack 5.0 を勝手に日本語に翻訳する非公式プロジェクト
 
 NetHackJPは、ダンジョン探索ゲーム **NetHack 5.0** を日本語で遊べるようにすることを目的とした**非公式**プロジェクトです。
@@ -127,6 +127,10 @@ git merge --abort
 
 ---
 NetHack 5.0 の詳細については、[README](README) または [README.JP](README.JP) を参照してください。
+
+
+# ビルド方法
+- `sys/windows/vs/build-vs.txt を参照
 
 
 # タイルセット
