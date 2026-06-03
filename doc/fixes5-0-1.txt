@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-03.
 NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.20 $ $NHDT-Date: 1779581008 2026/05/24 00:03:28 $
 	
 General Fixes and Modified Features
@@ -51,7 +51,10 @@ avoid calling costly_spot(), costly_adjacent(), find_byowner(), which
 	all rely on shop_keeper() under the hood, in the midst of the level
 	loading process before all the required data structures have
 	been finalized
- 
+if the hero has already been told that an engraving vanished, ensure that
+	the engraving marker isn't still showing when prompted for a
+	new engraving
+
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------

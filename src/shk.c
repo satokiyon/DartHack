@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-03. */
 /* NetHack 5.0	shk.c	$NHDT-Date: 1736516428 2025/01/10 05:40:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.306 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1096,6 +1096,7 @@ shop_keeper(char rmno)
                         level_status.making, level_status.loading,
                         level_status.shkready, level_status.ready);
 #endif
+            nhUse(hmm);
         }
     }
     return shkp;
