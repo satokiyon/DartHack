@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-03. */
 /* NetHack 5.0	questpgr.c	$NHDT-Date: 1704043695 2023/12/31 17:28:15 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.87 $ */
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -208,7 +208,7 @@ jp_quest_artiname_for_display(int artinum, boolean short_name)
     case ART_TSURUGI_OF_MURAMASA:
         return "村正の剣";
     case ART_YENDORIAN_EXPRESS_CARD:
-        return "プラチナ・イェンドリアン・エキスプレスカード";
+        return "プラチナイェンダー印エクスプレスカード";
     case ART_ORB_OF_FATE:
         return "運命のオーブ";
     case ART_EYE_OF_THE_AETHIOPICA:
