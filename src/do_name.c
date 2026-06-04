@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	do_name.c	$NHDT-Date: 1737013431 2025/01/15 23:43:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.326 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -905,9 +905,9 @@ x_monnam(
         /* !is_animal excludes all Y; !mindless excludes Z, M, \' */
         boolean s_one = humanoid(mdat) && !is_animal(mdat) && !mindless(mdat);
 
-        Strcpy(buf, !augment_it ? "it"
-                    : (!do_hallu ? s_one : !rn2(2)) ? "someone"
-                      : "something");
+        Strcpy(buf, !augment_it ? "それ"
+                    : (!do_hallu ? s_one : !rn2(2)) ? "誰か"
+                      : "何か");
         return buf;
     }
 

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	pray.c	$NHDT-Date: 1762680996 2025/11/09 01:36:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1743,8 +1743,8 @@ sacrifice_your_race(
             char dbuf[BUFSZ];
 
             Strcpy(dbuf, a_monnam(dmon));
-            if (!strcmpi(dbuf, "it"))
-                Strcpy(dbuf, "something dreadful");
+            if (!strcmpi(dbuf, "それ"))
+                Strcpy(dbuf, "何か恐ろしいもの");
             else
                 dmon->mstrategy &= ~STRAT_APPEARMSG;
             You("%sを召喚した!", dbuf);

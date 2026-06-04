@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	hacklib.c	$NHDT-Date: 1706213796 2024/01/25 20:16:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
@@ -352,6 +352,9 @@ s_suffix(const char *s)
         Strcat(buf, "s");
     else if (!strcmpi(buf, "you")) /* you -> your */
         Strcat(buf, "r");
+    else if ((unsigned char)buf[0] >= 0x80) {
+        /* 日本語の場合は何も付加しない */
+    }
     else if (*(eos(buf) - 1) == 's') /* Xs -> Xs' */
         Strcat(buf, "'");
     else /* X -> X's */
