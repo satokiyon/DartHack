@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	consoletty.c	$NHDT-Date: 1596498316 2020/08/03 23:45:16 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2907,8 +2907,7 @@ VA_DECL(const char *, fmt)
 #endif
     VA_START(fmt);
     VA_INIT(fmt, const char *);
-    (void) vsnprintf(buf, sizeof buf, fmt, VA_ARGS);
-    if (redirect_stdout)
+    (void) vsnprintf(buf, sizeof buf, fmt, VA_ARGS);    if (redirect_stdout)
         fprintf(stdout, "%s", buf);
     else if (program_state.early_options) {
 #ifdef UTF8_FROM_CORE

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	rip.c	$NHDT-Date: 1597967808 2020/08/20 23:56:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
@@ -73,14 +73,87 @@ static const char *const rip_txt[] = {
 #define DEATH_LINE 8 /* *char[] line # for death description */
 #define YEAR_LINE 12 /* *char[] line # for year */
 
+/* UTF-8 デコードおよび表示幅計算ヘルパー関数 */
+
+/* 指定された Unicode コードポイントの表示幅（半角=1, 全角=2）を返す */
+staticfn int
+rip_utf8_char_width(unsigned cp)
+{
+    if (cp < 0x80)
+        return 1;
+    /* 半角カタカナ */
+    if (cp >= 0xFF61 && cp <= 0xFF9F)
+        return 1;
+    /* 主要な東アジア文字（日本語のひらがな、カタカナ、漢字、全角記号など）は幅2とする */
+    if (cp >= 0x1100) {
+        return 2;
+    }
+    return 1;
+}
+
+/* UTF-8 のバイト列からコードポイントをデコードして返す。文字バイト数も返す */
+staticfn unsigned
+rip_utf8_decode(const char *s, int *len)
+{
+    unsigned char b0 = (unsigned char)s[0];
+    if (b0 < 0x80) {
+        *len = 1;
+        return b0;
+    }
+    if (b0 >= 0xC2 && b0 <= 0xDF) {
+        if (s[1] == '\0') { *len = 1; return b0; }
+        *len = 2;
+        return ((b0 & 0x1F) << 6) | ((unsigned char)s[1] & 0x3F);
+    }
+    if (b0 >= 0xE0 && b0 <= 0xEF) {
+        if (s[1] == '\0' || s[2] == '\0') { *len = 1; return b0; }
+        *len = 3;
+        return ((b0 & 0x0F) << 12) | (((unsigned char)s[1] & 0x3F) << 6) | ((unsigned char)s[2] & 0x3F);
+    }
+    if (b0 >= 0xF0 && b0 <= 0xF4) {
+        if (s[1] == '\0' || s[2] == '\0' || s[3] == '\0') { *len = 1; return b0; }
+        *len = 4;
+        return ((b0 & 0x07) << 18) | (((unsigned char)s[1] & 0x3F) << 12) | (((unsigned char)s[2] & 0x3F) << 6) | ((unsigned char)s[3] & 0x3F);
+    }
+    *len = 1;
+    return b0;
+}
+
+/* UTF-8 文字列全体の表示幅（カラム数）を計算する */
+staticfn int
+rip_utf8_str_width(const char *str)
+{
+    int w = 0;
+    const char *p = str;
+    int seqlen;
+    unsigned cp;
+
+    while (*p != '\0') {
+        cp = rip_utf8_decode(p, &seqlen);
+        w += rip_utf8_char_width(cp);
+        p += seqlen;
+    }
+    return w;
+}
+
 staticfn void
 center(int line, char *text)
 {
-    char *ip, *op;
-    ip = text;
-    op = &gr.rip[line][STONE_LINE_CENT - ((strlen(text) + 1) >> 1)];
-    while (*ip)
-        *op++ = *ip++;
+    char *op;
+    int w = rip_utf8_str_width(text);
+    op = &gr.rip[line][STONE_LINE_CENT - ((w + 1) >> 1)];
+
+    /* op 以降の元の文字列のうち、上書きされない残りの部分（op + w 以降）を退避する */
+    char temp[BUFSZ];
+    Strcpy(temp, op + w);
+
+    /* 新しいテキストをコピーする */
+    while (*text) {
+        *op++ = *text++;
+    }
+
+    /* 退避しておいた残りの部分（| や \0 など）を直後に連結する */
+    Strcpy(op, temp);
 }
 
 void
@@ -94,8 +167,12 @@ genl_outrip(winid tmpwin, int how, time_t when)
     long cash;
 
     gr.rip = dp = (char **) alloc(sizeof(rip_txt));
-    for (x = 0; rip_txt[x]; ++x)
-        dp[x] = dupstr(rip_txt[x]);
+    for (x = 0; rip_txt[x]; ++x) {
+        /* 日本語（UTF-8）の埋め込みでバイト数が増加するため、余分なバッファを確保する */
+        size_t len = strlen(rip_txt[x]);
+        dp[x] = (char *) alloc(len + 128);
+        Strcpy(dp[x], rip_txt[x]);
+    }
     dp[x] = (char *) 0;
 
     /* Put name on stone */
@@ -116,23 +193,61 @@ genl_outrip(winid tmpwin, int how, time_t when)
     /* Put death type on stone */
     for (line = DEATH_LINE, dpx = buf; line < YEAR_LINE; line++) {
         char tmpchar;
-        int i, i0 = (int) strlen(dpx);
+        int i0 = 0;
+        int count_width = 0;
+        int last_space_byte = 0;
 
-        if (i0 > STONE_LINE_LEN) {
-            for (i = STONE_LINE_LEN; (i > 0) && (i0 > STONE_LINE_LEN); --i)
-                if (dpx[i] == ' ')
-                    i0 = i;
-            if (!i)
-                i0 = STONE_LINE_LEN;
+        /* 文字境界と表示幅を考慮しながら、STONE_LINE_LEN に収まる位置を探す */
+        int byte_idx = 0;
+        int seqlen = 0;
+        while (dpx[byte_idx] != '\0') {
+            unsigned cp = rip_utf8_decode(&dpx[byte_idx], &seqlen);
+            int char_w = rip_utf8_char_width(cp);
+
+            if (count_width + char_w > STONE_LINE_LEN) {
+                break;
+            }
+
+            if (cp == ' ') {
+                last_space_byte = byte_idx + seqlen;
+            }
+
+            count_width += char_w;
+            byte_idx += seqlen;
         }
+
+        /* 収まる部分の末尾のバイトインデックスを設定 */
+        if (dpx[byte_idx] == '\0') {
+            /* 文字列全体が収まる場合 */
+            i0 = byte_idx;
+        } else {
+            /* 途中で切れる場合：英語のようにスペースがあればそこで切る */
+            if (last_space_byte > 0) {
+                i0 = last_space_byte;
+            } else {
+                /* スペースがない場合は表示幅の上限での境界で切る */
+                i0 = byte_idx;
+            }
+        }
+
+        /* 万が一、1文字も入らなかった場合の無限ループ防止 */
+        if (i0 == 0 && dpx[0] != '\0') {
+            (void)rip_utf8_decode(dpx, &seqlen);
+            i0 = seqlen;
+        }
+
         tmpchar = dpx[i0];
         dpx[i0] = 0;
         center(line, dpx);
+
         if (tmpchar != ' ') {
             dpx[i0] = tmpchar;
             dpx = &dpx[i0];
-        } else
+        } else {
+            /* 区切りがスペースだった場合は、スペースをスキップ */
+            dpx[i0] = tmpchar;
             dpx = &dpx[i0 + 1];
+        }
     }
 
     /* Put year on stone */
