@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	potion.c	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.279 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1555,7 +1555,7 @@ H2Opotion_dip(
             if (altfmt)
                 pline("%sが%sのオーラに包まれた.", objphrase, an(glowcolor));
             else
-                pline("%s %s.", objphrase, glowcolor);
+                pline("%sは%sに輝いた.", objphrase, glowcolor);
             iflags.last_msg = PLNMSG_OBJ_GLOWS;
             targobj->bknown = !Hallucination;
         } else {
@@ -1611,7 +1611,7 @@ impact_arti_light(
         curse(otmp);
     else
         bless(otmp);
-    H2Opotion_dip(otmp, obj, seeit, seeit ? Yobjnam2(obj, "glow") : "");
+    H2Opotion_dip(otmp, obj, seeit, seeit ? Yobjnam2(obj, (char *)0) : "");
     dealloc_obj(otmp);
 #if 0   /* defer this until caller has used up the scroll so it won't be
          * visible; player was told that it disappeared as hero read it */
@@ -1678,7 +1678,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
 
     /* oil doesn't instantly evaporate; Neither does a saddle hit */
     if (obj->otyp != POT_OIL && !hit_saddle && cansee(tx, ty))
-        pline("%s.", Tobjnam(obj, "evaporate"));
+        pline("%sは蒸発した.", Tobjnam(obj, (char *)0));
 
     if (isyou) {
         switch (obj->otyp) {
@@ -1715,8 +1715,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
 
         switch (obj->otyp) {
         case POT_WATER:
-            Snprintf(saddle_glows, sizeof(saddle_glows), "%s %s",
-                     buf, aobjnam(saddle, "glow"));
+            Snprintf(saddle_glows, sizeof(saddle_glows), "%s鞍", buf);
             affected = H2Opotion_dip(obj, saddle, useeit, saddle_glows);
             break;
         case POT_POLYMORPH:
@@ -2458,7 +2457,7 @@ potion_dip(struct obj *obj, struct obj *potion)
     potion->in_use = TRUE; /* assume it will be used up */
     if (potion->otyp == POT_WATER) {
         boolean useeit = !Blind || (obj == ublindf && Blindfolded_only);
-        const char *obj_glows = Yobjnam2(obj, "glow");
+        const char *obj_glows = Yobjnam2(obj, (char *)0);
 
         if (H2Opotion_dip(potion, obj, useeit, obj_glows)) {
             poof(potion);

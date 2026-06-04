@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-18. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	write.c	$NHDT-Date: 1702023275 2023/12/08 08:14:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -89,7 +89,7 @@ dowrite(struct obj *pen)
         You("書くには手が必要だった!");
         return ECMD_OK;
     } else if (Glib) {
-        pline("%s from your %s.", Tobjnam(pen, "slip"),
+        pline("%sが%sから滑り落ちた.", Tobjnam(pen, (char *)0),
               fingers_or_gloves(FALSE));
         dropx(pen);
         return ECMD_TIME;
@@ -378,8 +378,8 @@ dowrite(struct obj *pen)
     if (objects[new_obj->otyp].oc_name_known || by_descr)
         observe_object(new_obj);
 
-    new_obj = hold_another_object(new_obj, "Oops!  %s out of your grasp!",
-                                  The(aobjnam(new_obj, "slip")),
+    new_obj = hold_another_object(new_obj, "おっと! %sが手から滑り落ちた!",
+                                  The(aobjnam(new_obj, (char *)0)),
                                   (const char *) 0);
     nhUse(new_obj); /* try to avoid complaint about dead assignment */
     return ECMD_TIME;

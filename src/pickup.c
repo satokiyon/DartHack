@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	pickup.c	$NHDT-Date: 1773373633 2026/03/12 19:47:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.386 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -3022,7 +3022,7 @@ use_container(
             update_inventory();
     }
     if (obj->olocked) {
-        pline("%s施錠されている。", Tobjnam(obj, "are"));
+        pline("%sは施錠されている.", Tobjnam(obj, (char *)0));
         if (held)
             You("解錠するには地面に置く必要がある.");
         return ECMD_OK;

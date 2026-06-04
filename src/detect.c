@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	detect.c	$NHDT-Date: 1763708572 2025/11/20 23:02:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.191 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -1223,30 +1223,30 @@ use_crystal_ball(struct obj **optr)
 
         switch (rnd((obj->oartifact || obj->blessed) ? 4 : 5)) {
         case 1:
-            pline("%sは理解するには多すぎた!", Tobjnam(obj, "are"));
+            pline("%sは理解するには多すぎた!", Tobjnam(obj, (char *)0));
             break;
         case 2:
-            pline("%sはあなたを混乱させた!", Tobjnam(obj, "confuse"));
+            pline("%sはあなたを混乱させた!", Tobjnam(obj, (char *)0));
             make_confused((HConfusion & TIMEOUT) + impair, FALSE);
             break;
         case 3:
             if (!resists_blnd(&gy.youmonst)) {
-                pline("%sはあなたの視界を傷つけた!", Tobjnam(obj, "damage"));
+                pline("%sはあなたの視界を傷つけた!", Tobjnam(obj, (char *)0));
                 make_blinded(BlindedTimeout + impair, FALSE);
                 if (!Blind)
                     Your1(vision_clears);
             } else {
-                pline("%sはあなたの視界を襲った.", Tobjnam(obj, "assault"));
+                pline("%sはあなたの視界を襲った.", Tobjnam(obj, (char *)0));
                 You("影響を受けなかった!");
             }
             break;
         case 4:
-            pline("%sはあなたの精神を打った!", Tobjnam(obj, "zap"));
+            pline("%sはあなたの精神を打った!", Tobjnam(obj, (char *)0));
             (void) make_hallucinated((HHallucination & TIMEOUT) + impair,
                                      FALSE, 0L);
             break;
         case 5:
-            pline("%s!", Tobjnam(obj, "explode"));
+            pline("%sは爆発した!", Tobjnam(obj, (char *)0));
             useup(obj);
             *optr = obj = 0; /* it's gone */
             /* physical damage cause by the shards and force */
@@ -1322,7 +1322,7 @@ use_crystal_ball(struct obj **optr)
 
         if (obj->spe < 0) { /* destroy ball if used after being cancelled */
  implode:   /* no damage to hero but 'multi' has a small negative value */
-            pline("%s!", Tobjnam(obj, "implode"));
+            pline("%sは内側から崩壊した!", Tobjnam(obj, (char *)0));
             useup(obj);
             *optr = obj = (struct obj *) 0; /* it's gone */
             return;

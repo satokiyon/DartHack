@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	sit.c	$NHDT-Date: 1718136168 2024/06/11 20:02:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -609,7 +609,7 @@ rndcurse(void)
 
             if (otmp->oartifact && spec_ability(otmp, SPFX_INTEL)
                 && rn2(10) < 8) {
-                pline("%s!", Tobjnam(otmp, "resist"));
+                pline("%sは抵抗した!", Tobjnam(otmp, (char *)0));
                 continue;
             }
 
@@ -629,7 +629,7 @@ rndcurse(void)
         else
             curse(otmp);
         if (!Blind) {
-            pline("%s %s.", Yobjnam2(otmp, "glow"),
+            pline("%sは%sに輝いた.", Yobjnam2(otmp, (char *)0),
                   hcolor(otmp->cursed ? NH_BLACK : (const char *) "brown"));
             otmp->bknown = Hallucination ? 0 : 1; /* bypass set_bknown() */
         } else {

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	zap.c	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.584 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -2167,7 +2167,7 @@ bhito(struct obj *obj, struct obj *otmp)
         if (svc.context.bypasses) {
             return 0;
         } else {
-            debugpline1("%s for a moment.", Tobjnam(obj, "pulsate"));
+            debugpline1("%sが一瞬脈打った.", Tobjnam(obj, (char *)0));
             obj->bypass = 0;
         }
     }

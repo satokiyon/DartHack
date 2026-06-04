@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	weapon.c	$NHDT-Date: 1725227810 2024/09/01 21:56:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -910,8 +910,7 @@ mon_wield_item(struct monst *mon)
 
                 if (bimanual(obj))
                     mon_hand = makeplural(mon_hand);
-                pline("%s %s to %s %s!", Tobjnam(obj, "weld"),
-                      is_plural(obj) ? "themselves" : "itself",
+                pline("%sは%sの%sにくっついた!", Tobjnam(obj, (char *)0),
                       s_suffix(mon_nam(mon)), mon_hand);
                 obj->bknown = 1;
             }
@@ -919,9 +918,8 @@ mon_wield_item(struct monst *mon)
         if (artifact_light(obj) && !obj->lamplit) {
             begin_burn(obj, FALSE);
             if (canseemon(mon))
-                pline("%s %s in %s %s!", Tobjnam(obj, "shine"),
-                      arti_light_description(obj), s_suffix(mon_nam(mon)),
-                      jp_mbodypart(mon, HAND));
+                pline("%sが%sの%sで輝き始めた!", Tobjnam(obj, (char *)0),
+                      s_suffix(mon_nam(mon)), jp_mbodypart(mon, HAND));
             /* 3.6.3: artifact might be getting wielded by invisible monst */
             else if (cansee(mon->mx, mon->my))
                     pline("光が%sで輝き始めた.",
@@ -1047,14 +1045,14 @@ wet_a_towel(
     if (newspe > obj->spe) {
         if (verbose) {
             const char *wetness = (newspe < 3)
-                                     ? (!obj->spe ? "damp" : "damper")
-                                     : (!obj->spe ? "wet" : "wetter");
+                                     ? (!obj->spe ? "湿った" : "さらに湿った")
+                                     : (!obj->spe ? "濡れた" : "さらに濡れた");
 
             if (carried(obj))
-                pline("%s gets %s.", Yobjnam2(obj, (const char *) 0),
+                pline("%sは%s.", Yobjnam2(obj, (const char *) 0),
                       wetness);
             else if (mcarried(obj) && canseemon(obj->ocarry))
-                pline("%s %s gets %s.", s_suffix(Monnam(obj->ocarry)),
+                pline("%sの%sは%s.", s_suffix(Monnam(obj->ocarry)),
                       xname(obj), wetness);
         }
     }
@@ -1075,12 +1073,13 @@ dry_a_towel(
     /* new state is only reported if it's a decrease */
     if (newspe < obj->spe) {
         if (verbose) {
+            const char *dryness = !newspe ? "すっかり乾いた" : "乾いてきた";
             if (carried(obj))
-                pline("%s dries%s.", Yobjnam2(obj, (const char *) 0),
-                      !newspe ? " out" : "");
+                pline("%sは%s.", Yobjnam2(obj, (const char *) 0),
+                      dryness);
             else if (mcarried(obj) && canseemon(obj->ocarry))
-                pline("%s %s dries%s.", s_suffix(Monnam(obj->ocarry)),
-                      xname(obj), !newspe ? " out" : "");
+                pline("%sの%sは%s.", s_suffix(Monnam(obj->ocarry)),
+                      xname(obj), dryness);
         }
     }
 

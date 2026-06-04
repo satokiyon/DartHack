@@ -360,8 +360,8 @@ fix_curse_trouble(struct obj *otmp, const char *what)
             return;
     }
     if (!Blind || (otmp == ublindf && Blindfolded_only)) {
-        pline("%s %s.",
-                what ? what : (const char *) Yobjnam2(otmp, "softly glow"),
+        pline("%sは%sに微かに輝いた.",
+                what ? what : (const char *) Yobjnam2(otmp, (char *)0),
                 hcolor(NH_AMBER));
         iflags.last_msg = PLNMSG_OBJ_GLOWS;
         otmp->bknown = !Hallucination; /* ok to skip set_bknown() */
@@ -592,7 +592,8 @@ fix_worst_trouble(int trouble)
     case TROUBLE_SADDLE:
         otmp = which_armor(u.usteed, W_SADDLE);
         if (!Blind) {
-            pline("%s %s.", Yobjnam2(otmp, "softly glow"), hcolor(NH_AMBER));
+            pline("%sは%sに微かに輝いた.", Yobjnam2(otmp, (char *)0),
+                  hcolor(NH_AMBER));
             set_bknown(otmp, 1);
         }
         uncurse(otmp);
@@ -1178,7 +1179,7 @@ pleased(aligntyp g_align)
 
                 if (uwep->cursed) {
                     if (!Blind) {
-                        pline("%s %s%s.", Yobjnam2(uwep, "softly glow"),
+                        pline("%sは%sに微かに輝いた%s.", Yobjnam2(uwep, (char *)0),
                               hcolor(NH_AMBER), repair_buf);
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
                     } else
@@ -1189,8 +1190,8 @@ pleased(aligntyp g_align)
                     *repair_buf = '\0';
                 } else if (!uwep->blessed) {
                     if (!Blind) {
-                        pline("%sが%sのオーラ%s.",
-                              Yobjnam2(uwep, "softly glow"),
+                        pline("%sが%sのオーラに包まれた%s.",
+                              Yobjnam2(uwep, (char *)0),
                               an(hcolor(NH_LIGHT_BLUE)), repair_buf);
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
                     } else
@@ -1208,7 +1209,7 @@ pleased(aligntyp g_align)
                     /* only give this message if we didn't just bless
                        or uncurse (which has already given a message) */
                     if (*repair_buf)
-                        pline("%sはすっかり元通りだ!", Yobjnam2(uwep, "見た目"));
+                        pline("%sはすっかり元通りだ!", Yobjnam2(uwep, (char *)0));
                 }
                 update_inventory();
             }
@@ -1292,7 +1293,7 @@ pleased(aligntyp g_align)
                     && (otmp != uarmh /* [see worst_cursed_item()] */
                         || uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT)) {
                     if (!Blind) {
-                        pline("%s %s.", Yobjnam2(otmp, "softly glow"),
+                        pline("%sは%sに微かに輝いた.", Yobjnam2(otmp, (char *)0),
                               hcolor(NH_AMBER));
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
                         otmp->bknown = 1; /* ok to bypass set_bknown() */
