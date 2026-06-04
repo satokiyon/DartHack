@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmesg.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -83,7 +84,7 @@ curses_message_win_puts(const char *message, boolean recursed)
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
     boolean bold, border = curses_window_has_border(MESSAGE_WIN),
                   adjustbold = FALSE;
-    int message_length = (int) strlen(message);
+    int message_length = curses_utf8_str_width(message);
 #ifdef USE_CURSES_PUTMIXED
     boolean have_mixed_leadin = FALSE;
     cchar_t mixed_leadin_cchar[2];

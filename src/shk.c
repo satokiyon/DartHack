@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-03. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	shk.c	$NHDT-Date: 1736516428 2025/01/10 05:40:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.306 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -131,6 +131,7 @@ staticfn boolean rob_shop(struct monst *);
 staticfn void deserted_shop(char *);
 staticfn boolean special_stock(struct obj *, struct monst *, boolean);
 staticfn const char *cad(boolean);
+staticfn const char *jp_dmgstr(const char *);
 
 /*
         invariants: obj->unpaid iff onbill(obj) [unless bp->useup]
@@ -138,7 +139,7 @@ staticfn const char *cad(boolean);
  */
 
 static const char *const angrytexts[] = {
-    "quite upset", "ticked off", "furious"
+    "ひどく狼狽した", "怒り出した", "激怒した"
 };
 
 /*
@@ -3587,9 +3588,8 @@ addtobill(
             if (ANGRY(shkp)) {
                 Strcat(buf, "このろくでなし;");
             } else if (!ESHK(shkp)->surcharge) {
-                Strcat(buf, " ");
                 append_honorific(buf);
-                Strcat(buf, ";特別に");
+                Strcat(buf, "、特別に");
             }
             obj->quan = 1L; /* fool xname() into giving singular */
             set_voice(shkp, 0, 80, 0);
@@ -3622,19 +3622,19 @@ append_honorific(char *buf)
     /* (chooses among [0]..[3] normally; [1]..[4] after the
        Wizard has been killed or invocation ritual performed) */
     static const char *const honored[] = {
-        "good", "honored", "most gracious", "esteemed",
-        "most renowned and sacred"
+        "親愛なる", "尊敬すべき", "慈悲深い", "敬愛なる",
+        "名高き神聖なる"
     };
 
     Strcat(buf, honored[rn2(SIZE(honored) - 1) + u.uevent.udemigod]);
     if (is_vampire(gy.youmonst.data))
-        Strcat(buf, (flags.female) ? " dark lady" : " dark lord");
+        Strcat(buf, (flags.female) ? "吸血姫" : "吸血鬼の旦那");
     else if (maybe_polyd(is_elf(gy.youmonst.data), Race_if(PM_ELF)))
-        Strcat(buf, (flags.female) ? " hiril" : " hir");
+        Strcat(buf, (flags.female) ? "エルフの姫君" : "エルフの旦那");
     else
-        Strcat(buf, !is_human(gy.youmonst.data) ? " creature"
-                      : (flags.female) ? " lady"
-                        : " sir");
+        Strcat(buf, !is_human(gy.youmonst.data) ? "そこのお方"
+                      : (flags.female) ? "お嬢さん"
+                        : "旦那");
 }
 
 void
@@ -3860,17 +3860,17 @@ stolen_value(
                 }
                 still = "still ";
             }
-            Sprintf(buf, "%sowe %s %ld %s", still, jp_shkname_for_display(shkp),
+            Sprintf(buf, "あなたは%s%sに%ld %sの借りがある",
+                    credit_use ? "まだ " : "", jp_shkname_for_display(shkp),
                     value, currency(value));
             if (u_count) /* u_count > 0 implies Has_contents(obj) */
-                Sprintf(eos(buf), " for %s%sits contents",
-                        was_unpaid ? "it and " : "",
-                        (c_count > u_count) ? "some of " : "");
+                Sprintf(eos(buf), "（%sとその中身の分）",
+                        was_unpaid ? "容器" : "");
             else if (obj->oclass != COIN_CLASS)
-                Sprintf(eos(buf), " for %s",
-                        (obj->quan > 1L) ? "them" : "it");
+                Sprintf(eos(buf), "（%sの分）",
+                        (obj->quan > 1L) ? "それら" : "これ");
 
-            You("%s!", buf); /* "You owe <shk> N zorkmids for it!" */
+            You("%s!", buf);
         }
     } else {
         ESHK(shkp)->robbed += value;
@@ -5161,18 +5161,18 @@ getcad(
         if (!Deaf) {
             SetVoice(shkp, 0, 80, 0);
             verbalize("よくも俺の%sを%sしやがった！", dugwall ? "店" : "戸",
-                        dmgstr);
+                        jp_dmgstr(dmgstr));
         } else {
-            pline("%sはあなたが%sの%sを%sしたことに%s！", jp_shkname_for_display(shkp), noit_mhis(shkp), dugwall ? "店" : "戸", dmgstr, ROLL_FROM(angrytexts));
+            pline("%sはあなたが%sの%sを%sしたことに%s！", jp_shkname_for_display(shkp), noit_mhis(shkp), dugwall ? "店" : "戸", jp_dmgstr(dmgstr), ROLL_FROM(angrytexts));
         }
     } else {
         if (!Deaf) {
             pline("%sが叫んだ：", jp_shkname_for_display(shkp));
             SetVoice(shkp, 0, 80, 0);
             verbalize("誰だ！俺の%sを%sしたのは！", dugwall ? "店" : "戸",
-                        dmgstr);
+                        jp_dmgstr(dmgstr));
         } else {
-            pline("%sは誰かが%sの%sを%sしたことに%s！", jp_shkname_for_display(shkp), noit_mhis(shkp), dugwall ? "店" : "戸", dmgstr, ROLL_FROM(angrytexts));
+            pline("%sは誰かが%sの%sを%sしたことに%s！", jp_shkname_for_display(shkp), noit_mhis(shkp), dugwall ? "店" : "戸", jp_dmgstr(dmgstr), ROLL_FROM(angrytexts));
         }
     }
     hot_pursuit(shkp);
@@ -5309,9 +5309,13 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
 
     if (Invis)
         Your("透明化しても%sは欺けなかった!", jp_shkname_for_display(shkp));
-    Sprintf(qbuf, "%sYou did %ld %s worth of damage!%s  Pay?",
-            !animal ? cad(TRUE) : "", cost_of_damage,
-            currency(cost_of_damage), !animal ? "\"" : "");
+    if (!animal) {
+        Sprintf(qbuf, "%s%ld %s相当の損害を与えやがって！」 弁償しますか？",
+                cad(TRUE), cost_of_damage, currency(cost_of_damage));
+    } else {
+        Sprintf(qbuf, "%ld %s相当の損害だ。弁償しますか？",
+                cost_of_damage, currency(cost_of_damage));
+    }
     if (y_n(qbuf) != 'n') {
         boolean is_seen, was_seen = canseemon(shkp),
                 was_outside = !inhishop(shkp);
@@ -5438,13 +5442,13 @@ price_quote(struct obj *first_obj)
         if (otmp->globby)
             cost *= get_pricing_units(otmp);  /* always quan 1, vary by wt */
         if (!cost) {
-            Strcpy(price, "no charge");
+            Strcpy(price, "無料");
             contentsonly = FALSE;
         } else {
             Sprintf(price, "%ld %s%s", cost, currency(cost),
-                    (otmp->quan) > 1L ? " each" : "");
+                    (otmp->quan) > 1L ? "（1つあたり）" : "");
         }
-        Sprintf(buf, "%s%s, %s", contentsonly ? the_contents_of : "",
+        Sprintf(buf, "%s%s：%s", contentsonly ? the_contents_of : "",
                 doname(otmp), price);
         putstr(tmpwin, 0, buf), cnt++;
     }
@@ -5484,42 +5488,42 @@ shk_embellish(struct obj *itm, long cost)
             else
                 o = itm->oclass;
             if (o == FOOD_CLASS)
-                return ", gourmets' delight!";
+                return "、グルメも大喜びの品だ！";
             if (objects[itm->otyp].oc_name_known
                     ? objects[itm->otyp].oc_magic
                     : (o == AMULET_CLASS || o == RING_CLASS || o == WAND_CLASS
                        || o == POTION_CLASS || o == SCROLL_CLASS
                        || o == SPBOOK_CLASS))
-                return ", painstakingly developed!";
-            return ", superb craftsmanship!";
+                return "、丹精込めて作られた逸品だ！";
+            return "、見事な職人技の傑作だ！";
         case 3:
-            return ", finest quality.";
+            return "、最高品質だ。";
         case 2:
-            return ", an excellent choice.";
+            return "、素晴らしい選択だ。";
         case 1:
-            return ", a real bargain.";
+            return "、実にお買い得だ。";
         default:
             break;
         }
     } else if (itm->oartifact) {
-        return ", one of a kind!";
+        return "、唯一無二の一点ものだ！";
     }
-    return ".";
+    return "だ。";
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* First 4 supplied by Ronen and Tamar, remainder by development team */
 static const char *Izchak_speaks[] = {
-    "%s says: 'These shopping malls give me a headache.'",
-    "%s says: 'Slow down.  Think clearly.'",
-    "%s says: 'You need to take things one at a time.'",
-    "%s says: 'I don't like poofy coffee... give me Colombian Supremo.'",
-    "%s says that getting the devteam's agreement on anything is difficult.",
-    "%s says that he has noticed those who serve their deity will prosper.",
-    "%s says: 'Don't try to steal from me - I have friends in high places!'",
-    "%s says: 'You may well need something from this shop in the future.'",
-    "%s comments about the Valley of the Dead as being a gateway."
+    "%sは「こういうショッピングモールは頭痛の種だよ」と言った。",
+    "%sは「落ち着きなさい。冷静に考えるんだ」と言った。",
+    "%sは「物事には順番がある、一つずつ進めることだ」と言った。",
+    "%sは「泡立ちコーヒーは好きじゃないんだ……コロンビア・スプレモをくれ」と言った。",
+    "%sは、開発チームの合意を得ることは何事においても困難だと言った。",
+    "%sは、自らの神に仕える者は繁栄することに気づいたと言った。",
+    "%sは「私から盗もうとしないでくれ。私には有力な味方がいるからね！」と言った。",
+    "%sは「将来、この店にあるものが必要になるかもしれないよ」と言った。",
+    "%sは死の谷がゲートウェイであることについて言及した。"
 };
 
 void
@@ -5705,25 +5709,25 @@ check_unpaid_usage(struct obj *otmp, boolean altusage)
 
     arg1 = arg2 = "";
     if (otmp->oclass == SPBOOK_CLASS) {
-        fmt = "%sYou owe%s %ld %s.";
-        Sprintf(buf, "This is no free library, %s!  ", cad(FALSE));
+        fmt = "%sあなたは%s%ld %sの借りがある。";
+        Sprintf(buf, "ここはタダの図書館じゃないぞ、%s！ ", cad(FALSE));
         arg1 = rn2(2) ? buf : "";
-        arg2 = ESHK(shkp)->debit > 0L ? " an additional" : "";
+        arg2 = ESHK(shkp)->debit > 0L ? "さらに" : "";
     } else if (otmp->otyp == POT_OIL) {
-        fmt = "%s%sThat will cost you %ld %s (Yendorian Fuel Tax).";
+        fmt = "%s%sそれには%ld %sかかるぞ（イェンダー燃料税だ）。";
     } else if (altusage && (otmp->otyp == BAG_OF_TRICKS
                             || otmp->otyp == HORN_OF_PLENTY)) {
-        fmt = "%s%sEmptying that will cost you %ld %s.";
+        fmt = "%s%sそれを空にするには%ld %sかかるぞ。";
         if (!rn2(3))
-            arg1 = "Whoa!  ";
+            arg1 = "おい！ ";
         if (!rn2(3))
-            arg1 = "Watch it!  ";
+            arg1 = "気をつけろ！ ";
     } else {
-        fmt = "%s%sUsage fee, %ld %s.";
+        fmt = "%s%s使用料として%ld %sいただくぞ。";
         if (!rn2(3))
-            arg1 = "Hey!  ";
+            arg1 = "へい！ ";
         if (!rn2(3))
-            arg2 = "Ahem.  ";
+            arg2 = "ゴホン。";
     }
 
     if (!Deaf && !muteshk(shkp)) {
@@ -5914,20 +5918,20 @@ cad(
 
     switch (is_demon(gy.youmonst.data) ? 3 : poly_gender()) {
     case 0:
-        res = "cad";
+        res = "この野郎";
         break;
     case 1:
-        res = "minx";
+        res = "このあま";
         break;
     case 2:
-        res = "beast";
+        res = "ケダモノめ";
         break;
     case 3:
-        res = "fiend";
+        res = "悪鬼め";
         break;
     default:
         impossible("cad: unknown gender");
-        res = "thing";
+        res = "化け物め";
         break;
     }
     if (altusage) {
@@ -5935,11 +5939,22 @@ cad(
 
         /* alternate usage adds a leading double quote and trailing
            exclamation point plus sentence separating spaces */
-        Sprintf(cadbuf, "\"%s!  ", res);
-        cadbuf[1] = highc(cadbuf[1]);
+        Sprintf(cadbuf, "「%s！ ", res);
         res = cadbuf;
     }
     return res;
+}
+
+staticfn const char *
+jp_dmgstr(const char *dmgstr)
+{
+    if (!strcmp(dmgstr, "dig into")) return "掘り";
+    if (!strcmp(dmgstr, "damage")) return "傷つけ";
+    if (!strcmp(dmgstr, "ruin")) return "荒らし";
+    if (!strcmp(dmgstr, "destroy")) return "破壊";
+    if (!strcmp(dmgstr, "break")) return "壊し";
+    if (!strcmp(dmgstr, "burn away")) return "燃やし";
+    return dmgstr;
 }
 
 #ifdef __SASC

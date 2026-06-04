@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmisc.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -269,10 +270,72 @@ curses_copy_of(const char *s)
 /* Determine the number of lines needed for a string for a dialog window
    of the given width */
 
+/* 指定された Unicode コードポイントの表示幅（半角=1, 全角=2）を返す */
+int
+curses_utf8_char_width(unsigned cp)
+{
+    if (cp < 0x80)
+        return 1;
+    /* 半角カタカナ */
+    if (cp >= 0xFF61 && cp <= 0xFF9F)
+        return 1;
+    /* 主要な東アジア文字（日本語のひらがな、カタカナ、漢字、全角記号など）は幅2とする */
+    if (cp >= 0x1100) {
+        return 2;
+    }
+    return 1;
+}
+
+/* UTF-8 のバイト列からコードポイントをデコードして返す。文字バイト数も返す */
+unsigned
+curses_utf8_decode(const char *s, int *len)
+{
+    unsigned char b0 = (unsigned char)s[0];
+    if (b0 < 0x80) {
+        *len = 1;
+        return b0;
+    }
+    if (b0 >= 0xC2 && b0 <= 0xDF) {
+        if (s[1] == '\0') { *len = 1; return b0; }
+        *len = 2;
+        return ((b0 & 0x1F) << 6) | ((unsigned char)s[1] & 0x3F);
+    }
+    if (b0 >= 0xE0 && b0 <= 0xEF) {
+        if (s[1] == '\0' || s[2] == '\0') { *len = 1; return b0; }
+        *len = 3;
+        return ((b0 & 0x0F) << 12) | (((unsigned char)s[1] & 0x3F) << 6) | ((unsigned char)s[2] & 0x3F);
+    }
+    if (b0 >= 0xF0 && b0 <= 0xF4) {
+        if (s[1] == '\0' || s[2] == '\0' || s[3] == '\0') { *len = 1; return b0; }
+        *len = 4;
+        return ((b0 & 0x07) << 18) | (((unsigned char)s[1] & 0x3F) << 12) | (((unsigned char)s[2] & 0x3F) << 6) | ((unsigned char)s[3] & 0x3F);
+    }
+    *len = 1;
+    return b0;
+}
+
+/* UTF-8 文字列全体の表示幅（カラム数）を計算する */
+int
+curses_utf8_str_width(const char *str)
+{
+    int w = 0;
+    const char *p = str;
+    int seqlen;
+    unsigned cp;
+
+    while (*p != '\0') {
+        cp = curses_utf8_decode(p, &seqlen);
+        w += curses_utf8_char_width(cp);
+        p += seqlen;
+    }
+    return w;
+}
+
+/* ダイアログウィンドウの指定された幅に必要な行数を決定する */
 int
 curses_num_lines(const char *str, int width)
 {
-    int last_space, count;
+    int last_space_byte, count_width;
     int curline = 1;
     char substr[BUFSZ];
     char tmpstr[BUFSZ];
@@ -280,21 +343,50 @@ curses_num_lines(const char *str, int width)
     strncpy(substr, str, BUFSZ-1);
     substr[BUFSZ-1] = '\0';
 
-    while (strlen(substr) > (size_t) width) {
-        last_space = 0;
+    while (curses_utf8_str_width(substr) > width) {
+        int byte_idx = 0;
+        int next_byte_idx = 0;
+        unsigned cp;
+        int seqlen;
 
-        for (count = 0; count <= width; count++) {
-            if (substr[count] == ' ')
-                last_space = count;
+        last_space_byte = 0;
+        count_width = 0;
 
+        while (substr[byte_idx] != '\0') {
+            cp = curses_utf8_decode(&substr[byte_idx], &seqlen);
+            next_byte_idx = byte_idx + seqlen;
+
+            int char_w = curses_utf8_char_width(cp);
+            if (count_width + char_w > width) {
+                break;
+            }
+
+            if (cp == ' ') {
+                last_space_byte = next_byte_idx;
+            }
+
+            count_width += char_w;
+            byte_idx = next_byte_idx;
         }
-        if (last_space == 0) {  /* No spaces found */
-            last_space = count - 1;
+
+        if (last_space_byte == 0) {
+            last_space_byte = byte_idx;
+            if (last_space_byte == 0 && substr[0] != '\0') {
+                (void)curses_utf8_decode(substr, &seqlen);
+                last_space_byte = seqlen;
+            }
         }
-        for (count = (last_space + 1); count < (int) strlen(substr); count++) {
-            tmpstr[count - (last_space + 1)] = substr[count];
+
+        int start_idx = last_space_byte;
+        if (substr[start_idx] == ' ') {
+            start_idx++;
         }
-        tmpstr[count - (last_space + 1)] = '\0';
+
+        int i, tmp_idx = 0;
+        for (i = start_idx; substr[i] != '\0'; i++) {
+            tmpstr[tmp_idx++] = substr[i];
+        }
+        tmpstr[tmp_idx] = '\0';
         strcpy(substr, tmpstr);
         curline++;
     }
@@ -302,27 +394,14 @@ curses_num_lines(const char *str, int width)
     return curline;
 }
 
-
-/* Break string into smaller lines to fit into a dialog window of the
-given width */
-
+/* 文字列をダイアログウィンドウの指定幅に収まるよう分割し、指定行目のテキストを返す */
 char *
 curses_break_str(const char *str, int width, int line_num)
 {
-    int last_space, count;
+    int last_space_byte, count_width;
     char *retstr;
     int curline = 0;
     int strsize = (int) strlen(str) + 1;
-#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) && !defined(_MSC_VER)
-    char substr[strsize];
-    char curstr[strsize];
-    char tmpstr[strsize];
-
-    strcpy(substr, str);
-#else
-#ifndef BUFSZ
-#define BUFSZ 256
-#endif
     char substr[BUFSZ * 2];
     char curstr[BUFSZ * 2];
     char tmpstr[BUFSZ * 2];
@@ -333,72 +412,88 @@ curses_break_str(const char *str, int width, int line_num)
         substr[(BUFSZ * 2) - 1] = '\0';
     } else
         strcpy(substr, str);
-#endif
 
     while (curline < line_num) {
-        if (strlen(substr) == 0) {
+        if (substr[0] == '\0') {
             break;
         }
         curline++;
-        last_space = 0;
-        for (count = 0; count <= width; count++) {
-            if (substr[count] == ' ') {
-                last_space = count;
-            } else if (substr[count] == '\0') {
-                last_space = count;
+        last_space_byte = 0;
+        count_width = 0;
+
+        int byte_idx = 0;
+        int next_byte_idx = 0;
+        unsigned cp;
+        int seqlen;
+
+        while (substr[byte_idx] != '\0') {
+            cp = curses_utf8_decode(&substr[byte_idx], &seqlen);
+            next_byte_idx = byte_idx + seqlen;
+
+            int char_w = curses_utf8_char_width(cp);
+            if (count_width + char_w > width) {
                 break;
             }
+
+            if (cp == ' ') {
+                last_space_byte = next_byte_idx;
+            }
+
+            count_width += char_w;
+            byte_idx = next_byte_idx;
         }
-        if (last_space == 0) {  /* No spaces found */
-            last_space = count - 1;
+
+        if (substr[byte_idx] == '\0') {
+            last_space_byte = byte_idx;
         }
-        for (count = 0; count < last_space; count++) {
-            curstr[count] = substr[count];
+
+        if (last_space_byte == 0) {
+            last_space_byte = byte_idx;
+            if (last_space_byte == 0 && substr[0] != '\0') {
+                (void)curses_utf8_decode(substr, &seqlen);
+                last_space_byte = seqlen;
+            }
         }
-        curstr[count] = '\0';
-        if (substr[count] == '\0') {
+
+        int i;
+        for (i = 0; i < last_space_byte; i++) {
+            curstr[i] = substr[i];
+        }
+        curstr[last_space_byte] = '\0';
+
+        if (substr[last_space_byte] == '\0') {
             break;
         }
-        for (count = (last_space + 1); count < (int) strlen(substr); count++) {
-            tmpstr[count - (last_space + 1)] = substr[count];
+
+        int start_idx = last_space_byte;
+        if (substr[start_idx] == ' ') {
+            start_idx++;
         }
-        tmpstr[count - (last_space + 1)] = '\0';
+
+        int tmp_idx = 0;
+        for (i = start_idx; substr[i] != '\0'; i++) {
+            tmpstr[tmp_idx++] = substr[i];
+        }
+        tmpstr[tmp_idx] = '\0';
         strcpy(substr, tmpstr);
     }
 
     if (curline < line_num) {
-#if 0
-        return NULL;
-#else
-        /* callers aren't prepared to handle NULL return */
-        Strcpy(curstr, "");
-#endif
+        strcpy(curstr, "");
     }
 
     retstr = curses_copy_of(curstr);
-
     return retstr;
 }
 
-
-/* Return the remaining portion of a string after hacking-off line_num lines */
-
+/* 文字列から指定された行数を切り落とした残りの文字列を返す */
 char *
 curses_str_remainder(const char *str, int width, int line_num)
 {
-    int last_space, count;
+    int last_space_byte, count_width;
     char *retstr;
     int curline = 0;
     int strsize = strlen(str) + 1;
-#if (__STDC_VERSION__ >= 199901L) && !defined(_MSC_VER)
-    char substr[strsize];
-    char tmpstr[strsize];
-
-    strcpy(substr, str);
-#else
-#ifndef BUFSZ
-#define BUFSZ 256
-#endif
     char substr[BUFSZ * 2];
     char tmpstr[BUFSZ * 2];
 
@@ -408,33 +503,63 @@ curses_str_remainder(const char *str, int width, int line_num)
         substr[(BUFSZ * 2) - 1] = '\0';
     } else
         strcpy(substr, str);
-#endif
 
     while (curline < line_num) {
-        if (strlen(substr) == 0) {
+        if (substr[0] == '\0') {
             break;
         }
         curline++;
-        last_space = 0;
-        for (count = 0; count <= width; count++) {
-            if (substr[count] == ' ') {
-                last_space = count;
-            } else if (substr[count] == '\0') {
-                last_space = count;
+        last_space_byte = 0;
+        count_width = 0;
+
+        int byte_idx = 0;
+        int next_byte_idx = 0;
+        unsigned cp;
+        int seqlen;
+
+        while (substr[byte_idx] != '\0') {
+            cp = curses_utf8_decode(&substr[byte_idx], &seqlen);
+            next_byte_idx = byte_idx + seqlen;
+
+            int char_w = curses_utf8_char_width(cp);
+            if (count_width + char_w > width) {
                 break;
             }
+
+            if (cp == ' ') {
+                last_space_byte = next_byte_idx;
+            }
+
+            count_width += char_w;
+            byte_idx = next_byte_idx;
         }
-        if (last_space == 0) {  /* No spaces found */
-            last_space = count - 1;
+
+        if (substr[byte_idx] == '\0') {
+            last_space_byte = byte_idx;
         }
-        assert(IndexOk(last_space, substr));
-        if (substr[last_space] == '\0') {
+
+        if (last_space_byte == 0) {
+            last_space_byte = byte_idx;
+            if (last_space_byte == 0 && substr[0] != '\0') {
+                (void)curses_utf8_decode(substr, &seqlen);
+                last_space_byte = seqlen;
+            }
+        }
+
+        if (substr[last_space_byte] == '\0') {
             break;
         }
-        for (count = (last_space + 1); count < (int) strlen(substr); count++) {
-            tmpstr[count - (last_space + 1)] = substr[count];
+
+        int start_idx = last_space_byte;
+        if (substr[start_idx] == ' ') {
+            start_idx++;
         }
-        tmpstr[count - (last_space + 1)] = '\0';
+
+        int i, tmp_idx = 0;
+        for (i = start_idx; substr[i] != '\0'; i++) {
+            tmpstr[tmp_idx++] = substr[i];
+        }
+        tmpstr[tmp_idx] = '\0';
         strcpy(substr, tmpstr);
     }
 
@@ -443,7 +568,6 @@ curses_str_remainder(const char *str, int width, int line_num)
     }
 
     retstr = curses_copy_of(substr);
-
     return retstr;
 }
 
