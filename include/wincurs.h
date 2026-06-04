@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0 wincurs.h */
 /* Copyright (c) Karl Garrison, 2010. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -161,6 +162,8 @@ ATTRNORETURN extern void curses_bail(const char *mesg) NORETURN;
 extern winid curses_get_wid(int type);
 extern char *curses_copy_of(const char *s);
 extern int curses_num_lines(const char *str, int width);
+extern int curses_utf8_char_width(unsigned cp);
+extern int curses_utf8_str_width(const char *str);
 extern char *curses_break_str(const char *str, int width, int line_num);
 extern char *curses_str_remainder(const char *str, int width, int line_num);
 extern boolean curses_is_menu(winid wid);
