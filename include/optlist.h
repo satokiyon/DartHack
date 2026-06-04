@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	optlist.h */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -139,7 +139,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 Yes, Yes, Yes, No, "align",
                 "開始時の属性（lawful、neutral、または chaotic）")
     /* 特別な並び順はここまで。残りの項目はアルファベット順 */
-    NHOPTB(accessiblemsg, Advanced, 0, opt_out, set_in_game,
+    NHOPTB(accessiblemsg, Advanced, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &a11y.accessiblemsg, Term_False,
            "メッセージに位置情報を追加する")
     NHOPTB(acoustics, Advanced, 0, opt_out, set_in_game,
@@ -173,7 +173,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(armorstatus, Advanced, 0, opt_in, set_in_game,
                 Off, Yes, No, No, NoAlias, &flags.armorstatus, Term_False,
                 "現在装備中の防具をステータス欄に要約表示する")
-    NHOPTB(ascii_map, Advanced, 0, opt_in, set_in_game,
+    NHOPTB(ascii_map, Advanced, 0, opt_out, set_in_game,
                 ascii_map_Def, Yes, No, No, NoAlias, &iflags.wc_ascii_map,
                 Term_False, "マップをテキストとして表示する")
     NHOPTO("autocompletions", Advanced, o_autocomplete, BUFSZ, opt_in,
@@ -187,7 +187,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(autoopen, Behavior, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.autoopen, Term_False,
            "ドアに向かって歩くと開けようとする")
-    NHOPTB(autopickup, Behavior, 0, opt_out, set_in_game,
+    NHOPTB(autopickup, Behavior, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &flags.pickup, Term_False,
            "アイテムを自動的に拾う")
     NHOPTO("autopickup exceptions", Behavior, o_autopickup_exceptions, BUFSZ,
@@ -239,7 +239,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(cmdassist, Behavior, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &iflags.cmdassist, Term_False,
            "方向入力エラー時のヘルプを表示する")
-    NHOPTB(color, Map, 0, opt_in, set_in_game,
+    NHOPTB(color, Map, 0, opt_out, set_in_game,
            On, Yes, No, No, "colour", &iflags.wc_color, Term_False,
            "マップで色を使う")
     NHOPTB(confirm, Advanced, 0, opt_out, set_in_game,
@@ -458,7 +458,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
            Yes, Yes, No, Yes, "use_menu_glyphs",
            "メニューにオブジェクトシンボルを表示する")
 #ifdef TTY_GRAPHICS
-    NHOPTB(menu_overlay, Advanced, 0, opt_in, set_in_game,
+    NHOPTB(menu_overlay, Advanced, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &iflags.menu_overlay, Term_False,
            "メニューをオーバーレイし、右揃えにする")
 #else
@@ -770,7 +770,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
            "ステータスラインにゲームターンを表示")
 #ifdef TIMED_DELAY
     NHOPTB(timed_delay, Map, 0, opt_out, set_in_game,
-           Off, Yes, No, No, NoAlias, &flags.nap, Term_False,
+           On, Yes, No, No, NoAlias, &flags.nap, Term_False,
            "表示効果のために一時停止する際の遅延を使用")
 #else
     NHOPTB(timed_delay, Map, 0, opt_in, set_in_config,
@@ -793,11 +793,11 @@ static int optfn_##a(int, int, boolean, char *, char *);
            On, Yes, No, No, NoAlias, &flags.travelcmd, Term_False,
            "マウスクリックによる移動を有効にする")
 #ifdef DEBUG
-    NHOPTB(travel_debug, Advanced, 0, opt_out, set_wizonly,
+    NHOPTB(travel_debug, Advanced, 0, opt_in, set_wizonly,
            Off, Yes, No, No, NoAlias, &iflags.trav_debug, Term_False,
            (char *)0)
 #else
-    NHOPTB(travel_debug, Advanced, 0, opt_out, set_wizonly,
+    NHOPTB(travel_debug, Advanced, 0, opt_in, set_wizonly,
            Off, No, No, No, NoAlias, (boolean *) 0, Term_False,
            (char *)0)
 #endif
