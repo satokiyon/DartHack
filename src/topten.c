@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1606009004 2020/11/22 01:36:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -564,12 +564,18 @@ staticfn char *
 topten_wrapsplit(char *s, int maxw)
 {
     char *p = s, *last_space = (char *) 0, *first_over = (char *) 0;
+    char *indent_end = s;
     int w = 0, len, cw;
+
+    /* 先頭のインデント用スペースをスキップする */
+    while (*indent_end == ' ')
+        indent_end++;
 
     while (*p) {
         len = topten_utf8_charlen(p);
         cw = ((uchar) *p < 0x80) ? 1 : 2;
-        if (*p == ' ')
+        /* インデントより後ろにあるスペースのみを記録する */
+        if (*p == ' ' && p >= indent_end)
             last_space = p;
         if (w + cw >= maxw) {
             first_over = p;
@@ -580,7 +586,7 @@ topten_wrapsplit(char *s, int maxw)
     }
 
     if (first_over)
-        return (last_space && last_space > s + 14) ? last_space : first_over;
+        return (last_space && last_space >= indent_end) ? last_space : first_over;
     return eos(s);
 }
 

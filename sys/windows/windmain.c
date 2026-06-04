@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	windmain.c	$NHDT-Date: 1693359653 2023/08/30 01:40:53 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.189 $ */
 /* Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,6 +6,9 @@
 /* main.c - Windows */
 
 #include "win32api.h" /* for GetModuleFileName */
+#include <locale.h>
+#include <fcntl.h>
+#include <io.h>
 
 #include "hack.h"
 #ifdef DLB
@@ -269,7 +272,6 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                    * which clears out gp.fqn_prefix[] */
     // iflags.windowtype_deferred = TRUE;
 
-    /* if (GUILaunched || IsDebuggerPresent()) */
     early_options(&argc, &argv, &dir);
 
     program_state.early_options = 0;
@@ -1431,6 +1433,33 @@ stdio_has_nonascii(const char *str)
 }
 
 staticfn void
+stdio_raw_write_fallback(const char *str, boolean append_newline)
+{
+    int orig_mode = -1;
+    int fd_stdout = _fileno(stdout);
+
+    if (!str)
+        return;
+
+    if (fd_stdout >= 0) {
+        /* 一時的に stdout をバイナリモードに設定し、生の UTF-8 バイト列をそのまま書き出す */
+        orig_mode = _setmode(fd_stdout, _O_BINARY);
+    }
+
+    (void) fwrite(str, 1, strlen(str), stdout);
+    if (append_newline) {
+        /* バイナリモードなので明示的に Windows の改行コード (\r\n) を出力する */
+        (void) fwrite("\r\n", 1, 2, stdout);
+    }
+    (void) fflush(stdout);
+
+    /* 元のモードを復元 */
+    if (fd_stdout >= 0 && orig_mode >= 0) {
+        (void) _setmode(fd_stdout, orig_mode);
+    }
+}
+
+staticfn void
 stdio_console_write_utf8(const char *str, boolean append_newline)
 {
     HANDLE hout;
@@ -1444,36 +1473,30 @@ stdio_console_write_utf8(const char *str, boolean append_newline)
     if (!str)
         return;
 
+
+
     hout = GetStdHandle(STD_OUTPUT_HANDLE);
     if (redirect_stdout || !hout || hout == INVALID_HANDLE_VALUE
         || !GetConsoleMode(hout, &mode)) {
-        fprintf(stdout, "%s", str);
-        if (append_newline)
-            fputc('\n', stdout);
+        stdio_raw_write_fallback(str, append_newline);
         return;
     }
 
     wlen = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
     if (wlen <= 0) {
-        fprintf(stdout, "%s", str);
-        if (append_newline)
-            fputc('\n', stdout);
+        stdio_raw_write_fallback(str, append_newline);
         return;
     }
 
     wbuf = (WCHAR *) alloc((size_t) wlen * sizeof *wbuf);
     if (!wbuf) {
-        fprintf(stdout, "%s", str);
-        if (append_newline)
-            fputc('\n', stdout);
+        stdio_raw_write_fallback(str, append_newline);
         return;
     }
 
     if (MultiByteToWideChar(CP_UTF8, 0, str, -1, wbuf, wlen) <= 0) {
         free((genericptr_t) wbuf);
-        fprintf(stdout, "%s", str);
-        if (append_newline)
-            fputc('\n', stdout);
+        stdio_raw_write_fallback(str, append_newline);
         return;
     }
 
