@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	mhitu.c	$NHDT-Date: 1775259433 2026/04/03 15:37:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.341 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -87,7 +87,7 @@ jp_attacker_label(struct monst *mtmp, boolean capitalized, boolean *generic)
 {
     const char *name = capitalized ? Monnam(mtmp) : l_monnam(mtmp);
 
-    if (!strcmp(name, "It") || !strcmp(name, "it")) {
+    if (!strcmp(name, "それ")) {
         *generic = TRUE;
         return "何か";
     }

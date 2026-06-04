@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	mhitm.c	$NHDT-Date: 1732979463 2024/11/30 07:11:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.253 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -32,7 +32,7 @@ jp_mm_name(char *outbuf, struct monst *mon, struct monst *other_mon)
 {
     const char *name = (mon != other_mon) ? l_monnam(mon) : "自分";
 
-    if (mon != other_mon && (!strcmp(name, "it") || !strcmp(name, "something")))
+    if (mon != other_mon && (!strcmp(name, "それ") || !strcmp(name, "何か")))
         name = "何か";
     Strcpy(outbuf, name);
 }
@@ -1204,7 +1204,7 @@ mon_poly(struct monst *magr, struct monst *mdef, int dmg)
             }
         } else if (newcham(mdef, (struct permonst *) 0, NO_NC_FLAGS)) {
             if (gv.vis) { /* either seen or adjacent */
-                boolean was_seen = !!strcmpi("It", Before),
+                boolean was_seen = !!strcmpi("それ", Before),
                         verbosely = flags.verbose || !was_seen;
 
                 if (canspotmon(mdef))
