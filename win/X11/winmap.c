@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	winmap.c	$NHDT-Date: 1682206649 2023/04/22 23:37:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1969,9 +1970,9 @@ x_event(int exit_condition)
  try_test:
         switch (exit_condition) {
         case EXIT_ON_SENT_EVENT: {
-            XAnyEvent *any = (XAnyEvent *) &event;
+            XClientMessageEvent *cle = (XClientMessageEvent *) &event;
 
-            if (any->send_event) {
+            if (cle->send_event && cle->data.b[0] == DELAY_EVENT_ID) {
                 retval = 0;
                 keep_going = FALSE;
             }

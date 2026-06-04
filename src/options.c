@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	options.c	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.782 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
@@ -7415,8 +7415,22 @@ allopt_array_init(void)
         memcpy(allopt, allopt_init, sizeof(allopt));
         determine_ambiguities();
         for (i = 0; allopt[i].name; i++) {
-            if (allopt[i].addr)
+            if (allopt[i].addr) {
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED \
+     && NH_DEVEL_STATUS != NH_STATUS_POSTRELEASE)
+                if (allopt[i].opttyp == BoolOpt
+                    && allopt[i].initval != allopt[i].opt_in_out)
+                    if (wizard)
+                        impossible("conflicting option init for %s: %s is %s, %s is %s",
+                                   allopt[i].name,
+                                   "opt_in_out",
+                                   allopt[i].opt_in_out ? "on" : "off", "initval",
+                                   allopt[i].initval ? "on" : "off");
+#endif
+                if (allopt[i].opttyp == BoolOpt)
+                    allopt[i].initval = allopt[i].opt_in_out;
                 *(allopt[i].addr) = allopt[i].initval;
+            }
         }
         heed_all_options();
         /*

@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	winX.c	$NHDT-Date: 1717967337 2024/06/09 21:08:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1750,6 +1751,7 @@ d_timeout(XtPointer client_data, XtIntervalId *id)
     mesg->type = ClientMessage;
     mesg->message_type = XA_STRING;
     mesg->format = 8;
+    mesg->data.b[0] = DELAY_EVENT_ID;
     XSendEvent(XtDisplay(window_list[WIN_MAP].w),
                XtWindow(window_list[WIN_MAP].w), False, NoEventMask,
                (XEvent *) mesg);
@@ -1766,11 +1768,13 @@ X11_delay_output(void)
 {
     if (!x_inited)
         return;
-
-    (void) XtAppAddTimeOut(app_context, 30L, d_timeout, (XtPointer) 0);
-
-    /* The timeout function will enable the event loop exit. */
-    (void) x_event(EXIT_ON_SENT_EVENT);
+#ifdef TIMED_DELAY
+    if (flags.nap && !iflags.debug_fuzzer) {
+        (void) XtAppAddTimeOut(app_context, 50L, d_timeout, (XtPointer) 0);
+        /* The timeout function will enable the event loop exit. */
+        (void) x_event(EXIT_ON_SENT_EVENT);
+    }
+#endif
 }
 
 /* X11_hangup ------------------------------------------------------------- */

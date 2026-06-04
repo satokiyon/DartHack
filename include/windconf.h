@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	windconf.h	$NHDT-Date: 1596498552 2020/08/03 23:49:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994.  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -37,6 +37,8 @@
 #ifdef WIN32CON
 #define IDLECHECKPOINT
 #endif
+
+#define TIMED_DELAY
 
 /*
  * -----------------------------------------------------------------
