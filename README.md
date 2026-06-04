@@ -5,6 +5,8 @@ NetHackJPは、ローグライクゲームの金字塔 **NetHack 5.0** を日本
 
 <img width="1318" height="826" alt="2026-06-02_05h29_10" src="https://github.com/user-attachments/assets/69fc8182-c260-4dbc-9127-7103506f8aad" />
 
+<img width="1265" height="607" alt="2026-06-04_16h36_13" src="https://github.com/user-attachments/assets/a26364a0-a940-4c1d-b586-d841562e5533" />
+
 <img width="1058" height="607" alt="2026-06-02_05h25_26" src="https://github.com/user-attachments/assets/ab664586-d185-4a1c-b23e-6807ec676d9a" />
 
 ---
