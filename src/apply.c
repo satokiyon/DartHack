@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	apply.c	$NHDT-Date: 1769342601 2026/01/25 04:03:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.475 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1225,7 +1225,7 @@ use_bell(struct obj **optr)
                                NO_MINVENT | MM_NOMSG)) != 0) {
             You("%sを召喚した!", a_monnam(mtmp));
             if (!obj_resists(obj, 93, 100)) {
-                pline("%sは砕け散った!", Tobjnam(obj, "have"));
+                pline("%sは砕け散った!", Tobjnam(obj, (char *)0));
                 useup(obj);
                 *optr = 0;
             } else
@@ -1367,9 +1367,9 @@ use_candelabrum(struct obj *obj)
     } else {
         if (obj->spe == 7) {
             if (Blind)
-                pline("%sから奇妙な熱が放たれた!", Tobjnam(obj, "radiate"));
+                pline("%sから奇妙な熱が放たれた!", Tobjnam(obj, (char *)0));
             else
-                pline("%sが奇妙な光を放った!", Tobjnam(obj, "glow"));
+                pline("%sが奇妙な光を放った!", Tobjnam(obj, (char *)0));
         }
         obj->known = 1;
     }
@@ -1656,7 +1656,7 @@ use_lamp(struct obj *obj)
                       fingers_or_gloves(TRUE));
             make_glib((int) (Glib & TIMEOUT) + d(2, 10));
         } else if (!Blind) {
-            pline("%sは一瞬ゆらめき、そのまま消えた.", Tobjnam(obj, "flicker"));
+            pline("%sは一瞬ゆらめき、そのまま消えた.", Tobjnam(obj, (char *)0));
         } else {
             pline("%s", nothing_seems_to_happen);
         }
@@ -2622,9 +2622,9 @@ use_grease(struct obj *obj)
         }
     } else {
         if (obj->known)
-            pline("%sは空だった.", Tobjnam(obj, "be"));
+            pline("%sは空だった.", Tobjnam(obj, (char *)0));
         else
-            pline("%sは空のようだった.", Tobjnam(obj, "seem"));
+            pline("%sは空のようだった.", Tobjnam(obj, (char *)0));
     }
     update_inventory();
     return ECMD_TIME;
@@ -2739,13 +2739,13 @@ use_stone(struct obj *tstone)
     default:
         switch (objects[obj->otyp].oc_material) {
         case CLOTH:
-            pline("%sは少し磨かれたように見えた.", Tobjnam(tstone, "look"));
+            pline("%sは少し磨かれたように見えた.", Tobjnam(tstone, (char *)0));
             return ECMD_TIME;
         case LIQUID:
             if (!obj->known) /* note: not "whetstone" */
                 You("これが砥石だとでも思ったのか?");
             else
-                pline("%sは少し湿った.", Tobjnam(tstone, "be"));
+                pline("%sは少し湿った.", Tobjnam(tstone, (char *)0));
             return ECMD_TIME;
         case WAX:
             streak_color = "蝋状";
@@ -4295,7 +4295,7 @@ doapply(void)
             /* sometimes the blessing will be worn off */
             if (!rn2(49)) {
                 if (!Blind) {
-                    pline("%s %s.", Yobjnam2(obj, "glow"), hcolor("brown"));
+                    pline("%sは%sに輝いた.", Yobjnam2(obj, (char *)0), hcolor("brown"));
                     set_bknown(obj, 1);
                 }
                 unbless(obj);

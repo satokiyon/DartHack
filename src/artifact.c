@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	artifact.c	$NHDT-Date: 1715889721 2024/05/16 20:02:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.236 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -964,9 +964,9 @@ touch_artifact(struct obj *obj, struct monst *mon)
     if (badclass && badalign && self_willed) {
         if (yours) {
             if (!carried(obj))
-                pline("%sの手をすり抜けた!", Tobjnam(obj, "evade"));
+                pline("%sはあなたの手をすり抜けた!", Tobjnam(obj, (char *)0));
             else
-                pline("%sはもう制御できなかった!", Tobjnam(obj, "are"));
+                pline("%sはもう制御できなかった!", Tobjnam(obj, (char *)0));
         }
         return 0;
     }
@@ -1971,8 +1971,8 @@ invoke_create_ammo(struct obj *obj)
     } else
         otmp->quan += rnd(5);
     otmp->owt = weight(otmp);
-    otmp = hold_another_object(otmp, "突然%s.",
-                               aobjnam(otmp, "fall"), (char *) 0);
+    otmp = hold_another_object(otmp, "突然%sが落ちた.",
+                               aobjnam(otmp, (char *)0), (char *) 0);
     nhUse(otmp);
     return ECMD_TIME;
 }
@@ -2301,7 +2301,7 @@ arti_speak(struct obj *obj)
     line = getrumor(bcsign(obj), buf, TRUE);
     if (!*line)
         line = "NetHack の噂話ファイルは改装中だ。";
-    pline("%s:", Tobjnam(obj, "whisper"));
+    pline("%sがささやいた:", Tobjnam(obj, (char *)0));
     SetVoice((struct monst *) 0, 0, 80, voice_talking_artifact);
     verbalize1(line);
     return ECMD_TIME;
@@ -2586,7 +2586,7 @@ retouch_object(
             /* dropx gives a message if a dropped item lands on an altar;
                we provide one for other terrain */
             if (!IS_ALTAR(levl[u.ux][u.uy].typ))
-                pline("%s%sに落ちた.", Tobjnam(obj, "fall"),
+                pline("%sは%sに落ちた.", Tobjnam(obj, (char *)0),
                       surface(u.ux, u.uy));
             dropx(obj);
         }
