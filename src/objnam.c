@@ -1096,10 +1096,14 @@ xname_flags(
  nameit:
         /*assert(has_oname(obj));*/
         obufp = eos(buf); /* remember where the name will start */
-        Concat(buf, 0, ONAME(obj));
-        /* downcase "The" in "<quest-artifact-item> named The ..." */
-        if (obj->oartifact && !strncmp(obufp, "The ", 4))
-            *obufp = lowc(*obufp); /* change 'T' in "The " to 't' */
+        if (obj->oartifact && *jp_artiname(obj->oartifact)) {
+            Concat(buf, 0, jp_artiname(obj->oartifact));
+        } else {
+            Concat(buf, 0, ONAME(obj));
+            /* downcase "The" in "<quest-artifact-item> named The ..." */
+            if (obj->oartifact && !strncmp(obufp, "The ", 4))
+                *obufp = lowc(*obufp); /* change 'T' in "The " to 't' */
+        }
         if (append_name_parens)
             Concat(buf, 0, "\" ");
     }
@@ -2676,9 +2680,13 @@ bare_artifactname(struct obj *obj)
 
     if (obj->oartifact) {
         outbuf = nextobuf();
-        Strcpy(outbuf, artiname(obj->oartifact));
-        if (!strncmp(outbuf, "The ", 4))
-            outbuf[0] = lowc(outbuf[0]);
+        if (*jp_artiname(obj->oartifact)) {
+            Strcpy(outbuf, jp_artiname(obj->oartifact));
+        } else {
+            Strcpy(outbuf, artiname(obj->oartifact));
+            if (!strncmp(outbuf, "The ", 4))
+                outbuf[0] = lowc(outbuf[0]);
+        }
     } else {
         outbuf = xname(obj);
     }

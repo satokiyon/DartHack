@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
 /* NetHack 5.0	artifact.c	$NHDT-Date: 1715889721 2024/05/16 20:02:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.236 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -334,6 +334,18 @@ artifact_name(
 {
     const struct artifact *a;
     const char *aname;
+    int artinum;
+
+    if (!name || !*name)
+        return (char *) 0;
+
+    /* 日本語名での判定 */
+    artinum = jp_artiname_to_num(name);
+    if (artinum > 0 && artinum <= NROFARTIFACTS) {
+        if (otyp_p)
+            *otyp_p = artilist[artinum].otyp;
+        return artilist[artinum].name;
+    }
 
     if (!strncmpi(name, "the ", 4))
         name += 4;

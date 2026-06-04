@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
 /* NetHack 5.0	nhlobj.c	$NHDT-Date: 1576097301 2019/12/11 20:48:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
 /*      Copyright (c) 2019 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -284,7 +285,10 @@ l_obj_to_table(lua_State *L)
     nhl_add_table_entry_char(L, "oclass",
                              def_oc_syms[(uchar) obj->oclass].sym);
     nhl_add_table_entry_char(L, "invlet", obj->invlet);
-    /* TODO: nhl_add_table_entry_char(L, "oartifact", obj->oartifact);*/
+    if (obj->oartifact) {
+        nhl_add_table_entry_str(L, "oartifact",
+                                artiname(obj->oartifact));
+    }
     nhl_add_table_entry_int(L, "where", obj->where);
     /* TODO: nhl_add_table_entry_int(L, "timed", obj->timed); */
     nhl_add_table_entry_int(L, "cursed", obj->cursed);

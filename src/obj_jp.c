@@ -1,7 +1,6 @@
 /* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
-#include "config.h"
-#include "obj.h"
-#include "objclass.h"
+#include "hack.h"
+#include "artifact.h"
 
 /* アイテム名の日本語表示テーブル
  * otyp をインデックスとする。NULL エントリは英語 OBJ_NAME にフォールバック。
@@ -777,4 +776,165 @@ jp_item_descr(int otyp)
         return obj_jp_descrs[idx];
     return OBJ_DESCR(objects[otyp]);
 }
+
+/* アーティファクトの日本語表示名テーブル（NROFARTIFACTS + 1 エントリ） */
+const char *const artilist_jp_names[1 + NROFARTIFACTS] = {
+    [ART_EXCALIBUR] = "エクスカリバー",
+    [ART_STORMBRINGER] = "ストームブリンガー",
+    [ART_MJOLLNIR] = "ミョルニル",
+    [ART_CLEAVER] = "クリーバー",
+    [ART_GRIMTOOTH] = "グリムトゥース",
+    [ART_ORCRIST] = "オークリスト",
+    [ART_STING] = "スティング",
+    [ART_MAGICBANE] = "マジックベイン",
+    [ART_FROST_BRAND] = "フロストブランド",
+    [ART_FIRE_BRAND] = "ファイアブランド",
+    [ART_DRAGONBANE] = "ドラゴンベイン",
+    [ART_DEMONBANE] = "デーモンベイン",
+    [ART_WEREBANE] = "ウェアベイン",
+    [ART_GRAYSWANDIR] = "グレイズワンディル",
+    [ART_GIANTSLAYER] = "ジャイアントスレイヤー",
+    [ART_OGRESMASHER] = "オウガスマッシャー",
+    [ART_TROLLSBANE] = "トロルズベイン",
+    [ART_VORPAL_BLADE] = "ヴォーパルブレード",
+    [ART_SNICKERSNEE] = "スニッカーズニー",
+    [ART_SUNSWORD] = "サンソード",
+
+    /* クエストアーティファクト */
+    [ART_ORB_OF_DETECTION] = "探知のオーブ",
+    [ART_HEART_OF_AHRIMAN] = "アーリマンの心臓",
+    [ART_SCEPTRE_OF_MIGHT] = "力の王笏",
+    [ART_STAFF_OF_AESCULAPIUS] = "アスクレピオスの杖",
+    [ART_MAGIC_MIRROR_OF_MERLIN] = "マーリンの魔法の鏡",
+    [ART_EYES_OF_THE_OVERWORLD] = "オーバーワールドの目",
+    [ART_MITRE_OF_HOLINESS] = "神聖の僧帽",
+    [ART_LONGBOW_OF_DIANA] = "ディアナの長弓",
+    [ART_MASTER_KEY_OF_THIEVERY] = "盗賊術のマスターキー",
+    [ART_TSURUGI_OF_MURAMASA] = "村正の剣",
+    [ART_YENDORIAN_EXPRESS_CARD] = "プラチナイェンダー印エクスプレスカード",
+    [ART_ORB_OF_FATE] = "運命のオーブ",
+    [ART_EYE_OF_THE_AETHIOPICA] = "エチオピカの目",
+};
+
+/* JNetHackでのアーティファクトの日本語名テーブル（願い入力用別名） */
+const char *const artilist_jnethack_names[1 + NROFARTIFACTS] = {
+    [ART_MJOLLNIR] = "ミュルニール",
+    [ART_GRAYSWANDIR] = "グレイスワンダー",
+    [ART_OGRESMASHER] = "オーガスマッシャー",
+    [ART_TROLLSBANE] = "トロルスベーン",
+    [ART_VORPAL_BLADE] = "ボーパルブレード",
+    [ART_ORB_OF_DETECTION] = "探索のオーブ",
+    [ART_SCEPTRE_OF_MIGHT] = "権力の笏",
+    [ART_EYES_OF_THE_OVERWORLD] = "超世界の目",
+    [ART_MITRE_OF_HOLINESS] = "聖なる冠",
+    [ART_MASTER_KEY_OF_THIEVERY] = "盗賊のマスターキー",
+    [ART_TSURUGI_OF_MURAMASA] = "村正の刀",
+    [ART_EYE_OF_THE_AETHIOPICA] = "エチオピアの目",
+};
+
+/* アーティファクトの日本語名を取得 */
+const char *
+jp_artiname(int artinum)
+{
+    if (artinum > 0 && artinum <= NROFARTIFACTS && artilist_jp_names[artinum])
+        return artilist_jp_names[artinum];
+    return "";
+}
+
+/* 日本語名（表記揺れ対応）からアーティファクト番号を取得 */
+int
+jp_artiname_to_num(const char *name)
+{
+    int i;
+    char u_buf[256], jp_buf[256];
+    char *p;
+
+    if (!name || !*name)
+        return 0;
+
+    /* 入力文字列のクリーンアップ（「の」やスペースの除去） */
+    strncpy(u_buf, name, sizeof(u_buf) - 1);
+    u_buf[sizeof(u_buf) - 1] = '\0';
+
+    /* 先頭の "the " などをスキップ（英語と日本語の混在対策） */
+    char *u_ptr = u_buf;
+    if (!strncmpi(u_ptr, "the ", 4))
+        u_ptr += 4;
+
+    /* 「の」の除去 */
+    while ((p = strstr(u_ptr, "の")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+    /* 半角スペースの除去 */
+    while ((p = strchr(u_ptr, ' ')) != 0) {
+        memmove(p, p + 1, strlen(p + 1) + 1);
+    }
+    /* 全角スペースの除去 */
+    while ((p = strstr(u_ptr, "　")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+
+    /* 1. 標準日本語表示名テーブルで検索 */
+    for (i = 1; i <= NROFARTIFACTS; i++) {
+        if (!artilist_jp_names[i])
+            continue;
+
+        /* 完全に一致するか？ */
+        if (!strcmpi(u_ptr, artilist_jp_names[i]))
+            return i;
+
+        /* 表記揺れ除去後の比較 */
+        strncpy(jp_buf, artilist_jp_names[i], sizeof(jp_buf) - 1);
+        jp_buf[sizeof(jp_buf) - 1] = '\0';
+
+        /* 辞書名から「の」を除去 */
+        while ((p = strstr(jp_buf, "の")) != 0) {
+            memmove(p, p + 3, strlen(p + 3) + 1);
+        }
+        /* 辞書名から半角スペースを除去 */
+        while ((p = strchr(jp_buf, ' ')) != 0) {
+            memmove(p, p + 1, strlen(p + 1) + 1);
+        }
+        /* 辞書名から全角スペースを除去 */
+        while ((p = strstr(jp_buf, "　")) != 0) {
+            memmove(p, p + 3, strlen(p + 3) + 1);
+        }
+
+        if (!strcmpi(u_ptr, jp_buf))
+            return i;
+    }
+
+    /* 2. JNetHack別名テーブルで検索 */
+    for (i = 1; i <= NROFARTIFACTS; i++) {
+        if (!artilist_jnethack_names[i])
+            continue;
+
+        /* 完全に一致するか？ */
+        if (!strcmpi(u_ptr, artilist_jnethack_names[i]))
+            return i;
+
+        /* 表記揺れ除去後の比較 */
+        strncpy(jp_buf, artilist_jnethack_names[i], sizeof(jp_buf) - 1);
+        jp_buf[sizeof(jp_buf) - 1] = '\0';
+
+        /* 辞書名から「の」を除去 */
+        while ((p = strstr(jp_buf, "の")) != 0) {
+            memmove(p, p + 3, strlen(p + 3) + 1);
+        }
+        /* 辞書名から半角スペースを除去 */
+        while ((p = strchr(jp_buf, ' ')) != 0) {
+            memmove(p, p + 1, strlen(p + 1) + 1);
+        }
+        /* 辞書名から全角スペースを除去 */
+        while ((p = strstr(jp_buf, "　")) != 0) {
+            memmove(p, p + 3, strlen(p + 3) + 1);
+        }
+
+        if (!strcmpi(u_ptr, jp_buf))
+            return i;
+    }
+
+    return 0;
+}
+
 
