@@ -120,7 +120,7 @@ GIT_AVAILABLE=Y
 endif
 
 PDCURSES=pdcursesmod
-PDCURSESFLAGS = -DPDC_WIDE -DPDC_RGB
+PDCURSESFLAGS = -DPDC_WIDE -DPDC_RGB -DPDC_FORCE_UTF8
 
 #
 #==============================================================================

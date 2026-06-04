@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04.
 # NetHack 5.0 Makefile.nmake
 #       Copyright (c) NetHack Development Team 1993-2026
 #
@@ -817,7 +817,7 @@ WINDHDR = $(MSWSYS)win10.h $(MSWSYS)winos.h $(MSWSYS)win32api.h
 #
 
 !IF "$(ADD_CURSES)" == "Y"
-PDCURSESFLAGS = -DPDC_WIDE -DPDC_RGB
+PDCURSESFLAGS = -DPDC_WIDE -DPDC_RGB -DPDC_FORCE_UTF8
 CURSESOBJ= $(OTTY)cursdial.o $(OTTY)cursinit.o $(OTTY)cursinvt.o \
 	$(OTTY)cursmain.o $(OTTY)cursmesg.o $(OTTY)cursmisc.o \
 	$(OTTY)cursstat.o $(OTTY)curswins.o
