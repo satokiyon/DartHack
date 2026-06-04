@@ -3,11 +3,20 @@
 
 NetHackJPは、ローグライクゲームの金字塔 **NetHack 5.0** を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsのみ)
 
-<img width="1318" height="826" alt="2026-06-02_05h29_10" src="https://github.com/user-attachments/assets/69fc8182-c260-4dbc-9127-7103506f8aad" />
+<figure>
+   <figcaption>GUI版 Nevanda_5.0.0_32x32タイル使用</figcaption>
+   <img width="1318" height="826" alt="2026-06-02_05h29_10" src="https://github.com/user-attachments/assets/69fc8182-c260-4dbc-9127-7103506f8aad" />
+</figure>
 
-<img width="1265" height="607" alt="2026-06-04_16h36_13" src="https://github.com/user-attachments/assets/a26364a0-a940-4c1d-b586-d841562e5533" />
+<figure>
+   <figurecaption>コンソール版。`OPTIONS=windowtype:curses,align_message:right`指定</figurecaption>
+   <img width="1283" height="588" alt="2026-06-04_20h10_10" src="https://github.com/user-attachments/assets/58e277fb-4abd-46e6-a839-d7538497a446" />
+</figure>
 
-<img width="1058" height="607" alt="2026-06-02_05h25_26" src="https://github.com/user-attachments/assets/ab664586-d185-4a1c-b23e-6807ec676d9a" />
+<figure>
+    <figurecaption>コンソール版</figurecaption>   
+    <img width="1058" height="607" alt="2026-06-02_05h25_26" src="https://github.com/user-attachments/assets/ab664586-d185-4a1c-b23e-6807ec676d9a" />
+</figure>
 
 ---
 
