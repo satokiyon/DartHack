@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-03. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1745114235 2025/04/19 17:57:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.453 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -3667,6 +3667,103 @@ rnd_otyp_by_wpnskill(schar skill)
     return otyp;
 }
 
+/* 日本語の「の」やスペース（半角/全角）、およびクラス接尾辞を取り除いて曖昧マッチングを行う */
+staticfn boolean
+jp_wish_match(const char *u_str, const char *jp_str)
+{
+    char u_buf[BUFSZ], jp_buf[BUFSZ];
+    char *p;
+    int jp_len;
+    static const char *const suffixes[] = {
+        "魔法書", "魔除け", "巻物", "指輪", "薬", "杖", "鎧", "鱗", "兜", "靴", "クローク", "盾", "小手", "手袋", 0
+    };
+    int sfi;
+
+    if (!u_str || !jp_str)
+        return FALSE;
+
+    if (!strcmpi(u_str, jp_str)) {
+        return TRUE;
+    }
+
+    /* 段階1: 接尾辞を除去せずに「の」やスペースを除去して比較 */
+    Strcpy(u_buf, u_str);
+    Strcpy(jp_buf, jp_str);
+
+    /* 「の」の除去 */
+    while ((p = strstr(u_buf, "の")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+    while ((p = strstr(jp_buf, "の")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+
+    /* 半角スペースの除去 */
+    while ((p = strchr(u_buf, ' ')) != 0) {
+        memmove(p, p + 1, strlen(p + 1) + 1);
+    }
+    while ((p = strchr(jp_buf, ' ')) != 0) {
+        memmove(p, p + 1, strlen(p + 1) + 1);
+    }
+
+    /* 全角スペースの除去 */
+    while ((p = strstr(u_buf, "　")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+    while ((p = strstr(jp_buf, "　")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+
+    if (*u_buf && !strcmpi(u_buf, jp_buf)) {
+        return TRUE;
+    }
+
+    /* 段階2: 辞書定義名(jp_buf)からのみ接尾辞を除去して比較 */
+    Strcpy(u_buf, u_str);
+    Strcpy(jp_buf, jp_str);
+
+    jp_len = (int) strlen(jp_buf);
+
+    /* 末尾のクラス接尾辞を除去 (辞書定義名のみ) */
+    for (sfi = 0; suffixes[sfi]; ++sfi) {
+        int slen = (int) strlen(suffixes[sfi]);
+        if (jp_len >= slen && !strcmp(jp_buf + jp_len - slen, suffixes[sfi])) {
+            jp_buf[jp_len - slen] = '\0';
+            jp_len -= slen;
+        }
+    }
+
+    /* 「の」の除去 */
+    while ((p = strstr(u_buf, "の")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+    while ((p = strstr(jp_buf, "の")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+
+    /* 半角スペースの除去 */
+    while ((p = strchr(u_buf, ' ')) != 0) {
+        memmove(p, p + 1, strlen(p + 1) + 1);
+    }
+    while ((p = strchr(jp_buf, ' ')) != 0) {
+        memmove(p, p + 1, strlen(p + 1) + 1);
+    }
+
+    /* 全角スペースの除去 */
+    while ((p = strstr(u_buf, "　")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+    while ((p = strstr(jp_buf, "　")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+
+    if (*u_buf && !strcmpi(u_buf, jp_buf)) {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 staticfn short
 rnd_otyp_by_namedesc(
     const char *name,
@@ -3728,6 +3825,10 @@ rnd_otyp_by_namedesc(
                 && wishymatch(name, of + 4, FALSE)) /* partial description */
             || ((zn = objects[i].oc_uname) != 0
                 && wishymatch(name, zn, FALSE)) /* user-called name */
+            || ((zn = jp_item_name(i)) != 0
+                && (wishymatch(name, zn, FALSE) || jp_wish_match(name, zn)))
+            || ((zn = jp_item_descr(i)) != 0
+                && (wishymatch(name, zn, FALSE) || jp_wish_match(name, zn)))
             ) {
             validobjs[n++] = (short) i;
             maxprob += (objects[i].oc_prob + xtra_prob);
@@ -4195,6 +4296,12 @@ readobjnam_preparse(struct _readobjnam_data *d)
             break;
         res = 0;
 
+        /* 先頭の助詞（「で」「の」など）をスキップ */
+        if (!strncmpi(d->bp, "で ", l = (int) strlen("で "))) { d->bp += l; continue; }
+        else if (!strncmpi(d->bp, "で", l = (int) strlen("で"))) { d->bp += l; continue; }
+        else if (!strncmpi(d->bp, "の ", l = (int) strlen("の "))) { d->bp += l; continue; }
+        else if (!strncmpi(d->bp, "の", l = (int) strlen("の"))) { d->bp += l; continue; }
+
         if (!strncmpi(d->bp, "an ", l = 3) || !strncmpi(d->bp, "a ", l = 2)) {
             d->cnt = 1;
         } else if (!strncmpi(d->bp, "the ", l = 4)) {
@@ -4203,6 +4310,30 @@ readobjnam_preparse(struct _readobjnam_data *d)
             d->cnt = atoi(d->bp);
             while (digit(*d->bp))
                 d->bp++;
+            /* 日本語の個数助数詞をスキップ */
+            if (!strncmpi(d->bp, "個の ", l = (int) strlen("個の "))) d->bp += l;
+            else if (!strncmpi(d->bp, "個の", l = (int) strlen("個の"))) d->bp += l;
+            else if (!strncmpi(d->bp, "個 ", l = (int) strlen("個 "))) d->bp += l;
+            else if (!strncmpi(d->bp, "個", l = (int) strlen("個"))) d->bp += l;
+            else if (!strncmpi(d->bp, "つの ", l = (int) strlen("つの "))) d->bp += l;
+            else if (!strncmpi(d->bp, "つの", l = (int) strlen("つの"))) d->bp += l;
+            else if (!strncmpi(d->bp, "つ ", l = (int) strlen("つ "))) d->bp += l;
+            else if (!strncmpi(d->bp, "つ", l = (int) strlen("つ"))) d->bp += l;
+            else if (!strncmpi(d->bp, "枚の ", l = (int) strlen("枚の "))) d->bp += l;
+            else if (!strncmpi(d->bp, "枚の", l = (int) strlen("枚の"))) d->bp += l;
+            else if (!strncmpi(d->bp, "枚 ", l = (int) strlen("枚 "))) d->bp += l;
+            else if (!strncmpi(d->bp, "枚", l = (int) strlen("枚"))) d->bp += l;
+            else if (!strncmpi(d->bp, "本の ", l = (int) strlen("本の "))) d->bp += l;
+            else if (!strncmpi(d->bp, "本の", l = (int) strlen("本の"))) d->bp += l;
+            else if (!strncmpi(d->bp, "本 ", l = (int) strlen("本 "))) d->bp += l;
+            else if (!strncmpi(d->bp, "本", l = (int) strlen("本"))) d->bp += l;
+            else if (!strncmpi(d->bp, "袋の ", l = (int) strlen("袋の "))) d->bp += l;
+            else if (!strncmpi(d->bp, "袋の", l = (int) strlen("袋の"))) d->bp += l;
+            else if (!strncmpi(d->bp, "袋 ", l = (int) strlen("袋 "))) d->bp += l;
+            else if (!strncmpi(d->bp, "袋", l = (int) strlen("袋"))) d->bp += l;
+            else if (!strncmpi(d->bp, "の ", l = (int) strlen("の "))) d->bp += l;
+            else if (!strncmpi(d->bp, "of", l = (int) strlen("of"))) d->bp += l;
+            else if (!strncmpi(d->bp, "の", l = (int) strlen("の"))) d->bp += l;
             while (*d->bp == ' ')
                 d->bp++;
             l = 0;
@@ -4267,7 +4398,27 @@ readobjnam_preparse(struct _readobjnam_data *d)
                    || !strncmpi(d->bp, "fireproof ", l = 10)
                    || !strncmpi(d->bp, "rotproof ", l = 9)
                    || !strncmpi(d->bp, "tempered ", l = 9)
-                   || !strncmpi(d->bp, "crackproof ", l = 11)) {
+                   || !strncmpi(d->bp, "crackproof ", l = 11)
+                   || !strncmpi(d->bp, "防錆の ", l = (int) strlen("防錆の "))
+                   || !strncmpi(d->bp, "防錆の", l = (int) strlen("防錆の"))
+                   || !strncmpi(d->bp, "防錆 ", l = (int) strlen("防錆 "))
+                   || !strncmpi(d->bp, "防錆", l = (int) strlen("防錆"))
+                   || !strncmpi(d->bp, "耐火の ", l = (int) strlen("耐火の "))
+                   || !strncmpi(d->bp, "耐火の", l = (int) strlen("耐火の"))
+                   || !strncmpi(d->bp, "耐火 ", l = (int) strlen("耐火 "))
+                   || !strncmpi(d->bp, "耐火", l = (int) strlen("耐火"))
+                   || !strncmpi(d->bp, "火に強い ", l = (int) strlen("火に強い "))
+                   || !strncmpi(d->bp, "火に強い", l = (int) strlen("火に強い"))
+                   || !strncmpi(d->bp, "錆びない ", l = (int) strlen("錆びない "))
+                   || !strncmpi(d->bp, "錆びない", l = (int) strlen("錆びない"))
+                   || !strncmpi(d->bp, "防腐の ", l = (int) strlen("防腐の "))
+                   || !strncmpi(d->bp, "防腐の", l = (int) strlen("防腐の"))
+                   || !strncmpi(d->bp, "防腐 ", l = (int) strlen("防腐 "))
+                   || !strncmpi(d->bp, "防腐", l = (int) strlen("防腐"))
+                   || !strncmpi(d->bp, "固定された ", l = (int) strlen("固定された "))
+                   || !strncmpi(d->bp, "固定された", l = (int) strlen("固定された"))
+                   || !strncmpi(d->bp, "固定 ", l = (int) strlen("固定 "))
+                   || !strncmpi(d->bp, "固定", l = (int) strlen("固定"))) {
             d->erodeproof = 1;
         } else if (!strncmpi(d->bp, "lit ", l = 4)
                    || !strncmpi(d->bp, "burning ", l = 8)) {
@@ -4302,13 +4453,37 @@ readobjnam_preparse(struct _readobjnam_data *d)
 
         /* locked, unlocked, broken: box/chest lock states, also door states;
            open, closed, doorless: additional door states */
-        } else if (!strncmpi(d->bp, "locked ", l = 7)) {
+        } else if (!strncmpi(d->bp, "locked ", l = 7)
+                   || !strncmpi(d->bp, "施錠された ", l = (int) strlen("施錠された "))
+                   || !strncmpi(d->bp, "施錠された", l = (int) strlen("施錠された"))
+                   || !strncmpi(d->bp, "施錠の ", l = (int) strlen("施錠の "))
+                   || !strncmpi(d->bp, "施錠の", l = (int) strlen("施錠の"))
+                   || !strncmpi(d->bp, "施錠 ", l = (int) strlen("施錠 "))
+                   || !strncmpi(d->bp, "施錠", l = (int) strlen("施錠"))) {
             d->locked = d->closed = 1,
                 d->unlocked = d->broken = d->open = d->doorless = 0;
-        } else if (!strncmpi(d->bp, "unlocked ", l = 9)) {
+        } else if (!strncmpi(d->bp, "unlocked ", l = 9)
+                   || !strncmpi(d->bp, "開錠された ", l = (int) strlen("開錠された "))
+                   || !strncmpi(d->bp, "開錠された", l = (int) strlen("開錠された"))
+                   || !strncmpi(d->bp, "開錠の ", l = (int) strlen("開錠の "))
+                   || !strncmpi(d->bp, "開錠の", l = (int) strlen("開錠の"))
+                   || !strncmpi(d->bp, "開錠 ", l = (int) strlen("開錠 "))
+                   || !strncmpi(d->bp, "開錠", l = (int) strlen("開錠"))
+                   || !strncmpi(d->bp, "解錠された ", l = (int) strlen("解錠された "))
+                   || !strncmpi(d->bp, "解錠された", l = (int) strlen("解錠された"))
+                   || !strncmpi(d->bp, "解錠の ", l = (int) strlen("解錠の "))
+                   || !strncmpi(d->bp, "解錠の", l = (int) strlen("解錠の"))
+                   || !strncmpi(d->bp, "解錠 ", l = (int) strlen("解錠 "))
+                   || !strncmpi(d->bp, "解錠", l = (int) strlen("解錠"))) {
             d->unlocked = d->closed = 1,
                 d->locked = d->broken = d->open = d->doorless = 0;
-        } else if (!strncmpi(d->bp, "broken ", l = 7)) {
+        } else if (!strncmpi(d->bp, "broken ", l = 7)
+                   || !strncmpi(d->bp, "壊れた ", l = (int) strlen("壊れた "))
+                   || !strncmpi(d->bp, "壊れた", l = (int) strlen("壊れた"))
+                   || !strncmpi(d->bp, "壊れている ", l = (int) strlen("壊れている "))
+                   || !strncmpi(d->bp, "壊れている", l = (int) strlen("壊れている"))
+                   || !strncmpi(d->bp, "破損した ", l = (int) strlen("破損した "))
+                   || !strncmpi(d->bp, "破損した", l = (int) strlen("破損した"))) {
             d->broken = 1,
                 d->locked = d->unlocked = d->open = d->closed
                 = d->doorless = 0;
@@ -4354,7 +4529,13 @@ readobjnam_preparse(struct _readobjnam_data *d)
             d->ishistoric = 1;
         } else if (!strncmpi(d->bp, "diluted ", l = 8)) {
             d->isdiluted = 1;
-        } else if (!strncmpi(d->bp, "empty ", l = 6)) {
+        } else if (!strncmpi(d->bp, "empty ", l = 6)
+                   || !strncmpi(d->bp, "空の ", l = (int) strlen("空の "))
+                   || !strncmpi(d->bp, "空の", l = (int) strlen("空の"))
+                   || !strncmpi(d->bp, "空で ", l = (int) strlen("空で "))
+                   || !strncmpi(d->bp, "空で", l = (int) strlen("空で"))
+                   || !strncmpi(d->bp, "空 ", l = (int) strlen("空 "))
+                   || !strncmpi(d->bp, "空", l = (int) strlen("空"))) {
             d->contents = TIN_EMPTY;
         } else if (!strncmpi(d->bp, "small ", l = 6)) { /* glob sizes */
             /* "small" might be part of monster name (mimic, if wishing
@@ -4570,6 +4751,50 @@ readobjnam_postparse1(struct _readobjnam_data *d)
 {
     char *jp_named_open, *jp_named_close;
     int i;
+
+    /* 日本語のクラス接尾辞（例：「の薬」「の指輪」など）をパースする */
+    {
+        static const struct {
+            const char *sfx1; /* 「の～」 */
+            const char *sfx2; /* 「～」 */
+            char oclass;
+        } jp_class_suffixes[] = {
+            { "の魔法書", "魔法書", SPBOOK_CLASS },
+            { "の魔除け", "魔除け", AMULET_CLASS },
+            { "の巻物", "巻物", SCROLL_CLASS },
+            { "の指輪", "指輪", RING_CLASS },
+            { "の薬", "薬", POTION_CLASS },
+            { "の杖", "杖", WAND_CLASS },
+            { 0, 0, 0 }
+        };
+        int jpi;
+        int bplen = (int) strlen(d->bp);
+
+        for (jpi = 0; jp_class_suffixes[jpi].sfx1; ++jpi) {
+            int len1 = (int) strlen(jp_class_suffixes[jpi].sfx1);
+            int len2 = (int) strlen(jp_class_suffixes[jpi].sfx2);
+
+            if (bplen >= len1 && !strcmp(d->bp + bplen - len1, jp_class_suffixes[jpi].sfx1)) {
+                d->bp[bplen - len1] = '\0';
+                d->oclass = jp_class_suffixes[jpi].oclass;
+                /* 末尾のスペースをトリム */
+                while (bplen - len1 > 0 && d->bp[bplen - len1 - 1] == ' ') {
+                    d->bp[--bplen - len1] = '\0';
+                }
+                d->actualn = d->bp;
+                break;
+            } else if (bplen >= len2 && !strcmp(d->bp + bplen - len2, jp_class_suffixes[jpi].sfx2)) {
+                d->bp[bplen - len2] = '\0';
+                d->oclass = jp_class_suffixes[jpi].oclass;
+                /* 末尾のスペースをトリム */
+                while (bplen - len2 > 0 && d->bp[bplen - len2 - 1] == ' ') {
+                    d->bp[--bplen - len2] = '\0';
+                }
+                d->actualn = d->bp;
+                break;
+            }
+        }
+    }
 
     /* now we have the actual name, as delivered by xname, say
      *  green potions called whisky
@@ -5088,6 +5313,15 @@ readobjnam_postparse1(struct _readobjnam_data *d)
             d->blessed = 1, d->iscursed = d->uncursed = 0; /* holy water */
         d->typ = POT_WATER;
         return 2; /*goto typfnd;*/
+    } else if (!strcmpi(d->bp, "聖水") || !strcmpi(d->bp, "せいすい")) {
+        d->blessed = 1, d->iscursed = d->uncursed = 0;
+        d->typ = POT_WATER;
+        return 2; /*goto typfnd;*/
+    } else if (!strcmpi(d->bp, "呪われた水") || !strcmpi(d->bp, "不浄の水")
+               || !strcmpi(d->bp, "呪われた聖水") || !strcmpi(d->bp, "不浄の聖水")) {
+        d->iscursed = 1, d->blessed = d->uncursed = 0;
+        d->typ = POT_WATER;
+        return 2; /*goto typfnd;*/
     }
     /* accept "paperback" or "paperback book", reject "paperback spellbook" */
     if (!strncmpi(d->bp, "paperback", 9)) {
@@ -5510,7 +5744,9 @@ readobjnam(char *bp, struct obj *no_wish)
     /* allow wishing for "nothing" to preserve wishless conduct...
        [now requires "wand of nothing" if that's what was really wanted] */
     if (!strcmpi(bp, "nothing") || !strcmpi(bp, "nil")
-        || !strcmpi(bp, "none"))
+        || !strcmpi(bp, "none")
+        || !strcmpi(bp, "なし") || !strcmpi(bp, "無し")
+        || !strcmpi(bp, "何もなし") || !strcmpi(bp, "何も無し"))
         return no_wish;
     /* save the [nearly] unmodified choice string */
     Strcpy(d.fruitbuf, bp);

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
 /* NetHack 5.0	invent.c	$NHDT-Date: 1762680996 2025/11/09 01:36:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.543 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -115,6 +115,24 @@ action_missing_jp(const char *word)
     if (!strcmp(word, "apply")) return "使うための";
     if (!strcmp(word, "sacrifice")) return "捧げるための";
     if (!strcmp(word, "offer")) return "捧げるための";
+    if (!strcmp(word, "eat")) return "食べるための";
+    if (!strcmp(word, "drink") || !strcmp(word, "quaff")) return "飲むための";
+    if (!strcmp(word, "read")) return "読むための";
+    if (!strcmp(word, "wield")) return "構えるための";
+    if (!strcmp(word, "wear") || !strcmp(word, "put on")) return "身につけるための";
+    if (!strcmp(word, "remove") || !strcmp(word, "take off")) return "はずすための";
+    if (!strcmp(word, "dip")) return "浸すための";
+    if (!strcmp(word, "throw")) return "投げるための";
+    if (!strcmp(word, "kick")) return "蹴るための";
+    if (!strcmp(word, "zap")) return "使うための";
+    if (!strcmp(word, "invoke")) return "発動するための";
+    if (!strcmp(word, "charge")) return "充填するための";
+    if (!strcmp(word, "rub") || !strcmp(word, "rub the royal jelly on")) return "こするための";
+    if (!strcmp(word, "loot")) return "あさるための";
+    if (!strcmp(word, "stash")) return "隠すための";
+    if (!strcmp(word, "tip")) return "ひっくり返すための";
+    if (!strcmp(word, "fire")) return "射撃するための";
+    if (!strcmp(word, "travel")) return "移動するための";
     return word;
 }
 

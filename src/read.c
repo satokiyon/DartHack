@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
 /* NetHack 5.0	read.c	$NHDT-Date: 1762577372 2025/11/07 20:49:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.323 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1383,11 +1383,14 @@ seffect_enchant_armor(struct obj **sobjp)
     s = scursed ? -otmp->spe : otmp->spe;
     if (s > (special_armor ? 5 : 3) && rn2(s)) {
         otmp->in_use = TRUE;
-          pline("%sはしばらく激しく%s%s%s、その後に消え去った.", xname(otmp),
-              Blind ? "震え" : "輝き",
-              (!Blind && !same_color) ? " " : "",
-              (Blind || same_color) ? "" : hcolor(scursed ? NH_BLACK
-                                      : NH_SILVER));
+        if (Blind || same_color) {
+            pline("%sはしばらく激しく%s、その後に消え去った.", xname(otmp),
+                Blind ? "震え" : "輝き");
+        } else {
+            pline("%sはしばらく激しく%s色に%s、その後に消え去った.", xname(otmp),
+                hcolor(scursed ? NH_BLACK : NH_SILVER),
+                Blind ? "震え" : "輝き");
+        }
         remove_worn_item(otmp, FALSE);
         useup(otmp);
         return;
@@ -1454,12 +1457,18 @@ seffect_enchant_armor(struct obj **sobjp)
             maybe_adjust_light(otmp, old_light);
         return;
     }
-        pline("%sは%s%s%s%sた.", xname(otmp),
-            (s * s > 1) ? "しばらく" : "一瞬",
-            (s == 0) ? "激しく" : "",
-            (Blind || same_color)
-            ? "" : hcolor(scursed ? NH_BLACK : NH_SILVER),
-            Blind ? "震え" : "輝い");
+        if (Blind || same_color) {
+            pline("%sは%s%s%sた.", xname(otmp),
+                (s * s > 1) ? "しばらく" : "一瞬",
+                (s == 0) ? "激しく" : "",
+                Blind ? "震え" : "輝い");
+        } else {
+            pline("%sは%s%s%s色に%sた.", xname(otmp),
+                (s * s > 1) ? "しばらく" : "一瞬",
+                (s == 0) ? "激しく" : "",
+                hcolor(scursed ? NH_BLACK : NH_SILVER),
+                Blind ? "震え" : "輝い");
+        }
     /* [this cost handling will need updating if shop pricing is
        ever changed to care about curse/bless status of armor] */
     if (s < 0)

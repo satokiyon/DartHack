@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmesg.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -729,12 +729,12 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
 #endif
 
     while (1) {
-        mx = (int) strlen(linestarts[nlines - 1]) + border_space;
+        mx = curses_utf8_str_width(linestarts[nlines - 1]) + border_space;
         if (mx > maxx) {
             if (nlines < maxlines) {
                 tmpstr = curses_break_str(linestarts[nlines - 1],
                                           width - 1, 1);
-                mx = (int) strlen(tmpstr) + border_space;
+                mx = curses_utf8_str_width(tmpstr) + border_space;
                 mvwprintw(win, my, mx, "%*c", maxx - mx + 1, ' ');
                 if (++my > maxy) {
                     scroll_window(MESSAGE_WIN);
@@ -746,12 +746,25 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
                 if (*linestarts[nlines] == ' ')
                     linestarts[nlines]++;
                 mvwaddstr(win, my, mx, linestarts[nlines]);
-                mx = (int) strlen(linestarts[nlines]) + border_space;
+                mx = curses_utf8_str_width(linestarts[nlines]) + border_space;
                 nlines++;
                 free(tmpstr);
             } else {
-                p_answer[--len] = '\0';
-                mvwaddch(win, my, --mx, ' ');
+                /* UTF-8文字単位で末尾の文字を切り捨てる */
+                if (len > 0) {
+                    char *prev = (char *) utf8_prev_char_start(p_answer, p_answer + len);
+                    if (prev) {
+                        len = prev - p_answer;
+                    } else {
+                        len = 0;
+                    }
+                    p_answer[len] = '\0';
+                }
+                /* 画面の現在行を再描画 */
+                int clr_w = width - border_space * 2;
+                mvwprintw(win, my, border_space, "%*s", clr_w, " ");
+                mvwaddstr(win, my, border_space, linestarts[nlines - 1]);
+                mx = curses_utf8_str_width(linestarts[nlines - 1]) + border_space;
             }
         }
         wmove(win, my, mx);
@@ -832,13 +845,28 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
         case '\b': /* ^H (Backspace: '\010') */
         case KEY_BACKSPACE:
             if (len < 1) {
-                len = 1;
+                len = 0;
+                *p_answer = '\0';
                 mx = promptx;
+            } else {
+                /* 直前の UTF-8 文字の開始位置を取得 */
+                char *prev = (char *) utf8_prev_char_start(p_answer, p_answer + len);
+                if (prev) {
+                    len = prev - p_answer;
+                } else {
+                    len = 0;
+                }
+                p_answer[len] = '\0';
             }
-            p_answer[--len] = '\0';
-            mvwaddch(win, my, --mx, ' ');
+            /* 現在の行を画面上でクリアしてから再描画し、mx を更新する */
+            {
+                int clr_w = width - border_space * 2;
+                mvwprintw(win, my, border_space, "%*s", clr_w, " ");
+                mvwaddstr(win, my, border_space, linestarts[nlines - 1]);
+                mx = curses_utf8_str_width(linestarts[nlines - 1]) + border_space;
+            }
             /* try to unwrap back to the previous line if there is one */
-            if (nlines > 1 && (int) strlen(linestarts[nlines - 2]) < width) {
+            if (nlines > 1 && curses_utf8_str_width(linestarts[nlines - 2]) < width) {
                 mvwaddstr(win, my - 1, border_space, linestarts[nlines - 2]);
                 if (nlines-- > height) {
                     unscroll_window(MESSAGE_WIN);
@@ -847,20 +875,32 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
                     mvwaddstr(win, border_space, border_space, tmpstr);
                     free(tmpstr);
                 } else {
-                    /* clean up the leftovers on the next line,
-                       if we didn't scroll it away */
-                    mvwprintw(win, my--, border_space, "%*c",
-                              (int) strlen(linestarts[nlines]), ' ');
+                    /* 移動前の行（古い最後の行）のゴミを消去 */
+                    int clr_w = width - border_space * 2;
+                    mvwprintw(win, my--, border_space, "%*s", clr_w, " ");
+                }
+                /* アンラップされたので、新しい現在行（1行上）を再描画し、mx を更新 */
+                {
+                    int clr_w = width - border_space * 2;
+                    mvwprintw(win, my, border_space, "%*s", clr_w, " ");
+                    mvwaddstr(win, my, border_space, linestarts[nlines - 1]);
+                    mx = curses_utf8_str_width(linestarts[nlines - 1]) + border_space;
                 }
             }
             break;
         default:
             p_answer[len++] = ch;
-            if (len >= buffer)
+            if (len >= buffer) {
                 len = buffer - 1;
-            else
-                mvwaddch(win, my, mx, ch);
-            p_answer[len] = '\0';
+                p_answer[len] = '\0';
+            } else {
+                p_answer[len] = '\0';
+                /* 現在の行を画面上でクリアしてから再描画し、mx を更新する */
+                int clr_w = width - border_space * 2;
+                mvwprintw(win, my, border_space, "%*s", clr_w, " ");
+                mvwaddstr(win, my, border_space, linestarts[nlines - 1]);
+                mx = curses_utf8_str_width(linestarts[nlines - 1]) + border_space;
+            }
         }
     }
 

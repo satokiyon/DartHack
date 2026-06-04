@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
 /* NetHack 5.0	zap.c	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.584 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -6168,19 +6168,22 @@ wishcmdassist(int triesleft)
         wishinfo[] = {
   "願いの詳細:",
   "",
-  "\"potion of monster detection\" のように、物品名を入力する.",
+  "\"potion of monster detection\" や \"怪物を探す薬\" のように、物品名を入力する.",
   "例: \"scroll labeled README\", \"elven mithril-coat\", \"Grimtooth\".",
+  "日本語での例: \"祝福された+2銀のサーベル\"、\"防錆の兜\"、\"10個のりんご\".",
   "(引用符は入力しない).",
   "",
-  "まとめて積まれる種類の物品は、複数形で指定できる.",
+  "まとめて積まれる種類の物品は、複数形や個数で指定できる.",
   "\"potions of healing\" のように書くか、\"1000 gold pieces\" のように",
   "個数を指定できるが、その部分の願いはかなわないこともある.",
+  "日本語では \"10個のりんご\" や \"5枚の白紙の巻物\" のように指定できる.",
   "",
   "物品を修飾する接頭語も指定できる.",
   "たとえば \"uncursed\" や \"rustproof\" や \"+1\" などだ.",
+  "日本語では \"祝福された\"、\"呪われた\"、\"防錆の\"、\"耐火の\" などが指定できる.",
   "所持品一覧で表示される修飾子の多くは指定できる.",
   "",
-  "この願いを明示的に辞退するには 'nothing' を指定できる.",
+  "この願いを明示的に辞退するには 'nothing' または 'なし' を指定できる.",
   0,
     },
         preserve_wishless[] = "そうすると『願いなし』行状を維持できる.",
@@ -6321,7 +6324,7 @@ makewish(void)
     promptbuf[0] = '\0';
     nothing = cg.zeroobj; /* lint suppression; only its address matters */
     if (flags.verbose)
-        You("アイテムを願うことができた.");
+        You("アイテムを願うことができる.");
  retry:
     Strcpy(promptbuf, "何を願う");
     if (iflags.cmdassist && tries > 0)

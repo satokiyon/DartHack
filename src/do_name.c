@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
 /* NetHack 5.0	do_name.c	$NHDT-Date: 1737013431 2025/01/15 23:43:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.326 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -962,8 +962,14 @@ x_monnam(
     }
 
     /* Put the adjectives in the buffer */
-    if (adjective)
-        Strcat(buf, adjective);
+    if (adjective) {
+        if (!strcmp(adjective, "poor"))
+            Strcat(buf, "かわいそうな");
+        else if (!strcmp(adjective, "poor, unseen"))
+            Strcat(buf, "見えない、かわいそうな");
+        else
+            Strcat(buf, adjective);
+    }
     if (do_invis)
         Strcat(buf, "見えない");
     if (do_saddle && (mtmp->misc_worn_check & W_SADDLE) && !Blind
@@ -1701,12 +1707,45 @@ static NEARDATA const char *const jp_hcolors[] = {
     "ビストル", "エクリュ", "黄褐色", "テヘレット", "選択黄",
 };
 
+static const struct {
+    const char *en;
+    const char *ja;
+} color_translation[] = {
+    { "black", "黒" },
+    { "amber", "琥珀" },
+    { "golden", "金" },
+    { "light blue", "淡い青" },
+    { "red", "赤" },
+    { "green", "緑" },
+    { "silver", "銀" },
+    { "blue", "青" },
+    { "purple", "紫" },
+    { "white", "白" },
+    { "orange", "橙" },
+    { "brown", "茶" },
+    { "magenta", "赤紫" },
+    { "cyan", "青緑" },
+    { "gray", "灰" },
+    { "transparent", "透明" },
+    { "bright green", "明るい緑" },
+    { "yellow", "黄" },
+    { "bright blue", "明るい青" },
+    { "bright magenta", "明るい赤紫" },
+    { "bright cyan", "明るい青緑" }
+};
+
 const char *
 hcolor(const char *colorpref)
 {
-    return (Hallucination || !colorpref)
-        ? jp_hcolors[rn2_on_display_rng(SIZE(jp_hcolors))]
-        : colorpref;
+    if (Hallucination || !colorpref)
+        return jp_hcolors[rn2_on_display_rng(SIZE(jp_hcolors))];
+
+    for (int i = 0; i < SIZE(color_translation); ++i) {
+        if (!strcmp(colorpref, color_translation[i].en)) {
+            return color_translation[i].ja;
+        }
+    }
+    return colorpref;
 }
 
 /* return a random real color unless hallucinating */

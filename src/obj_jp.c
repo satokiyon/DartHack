@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
 #include "config.h"
 #include "obj.h"
 #include "objclass.h"
@@ -413,6 +413,26 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [WORTHLESS_YELLOW_GLASS] = "黄色のガラス",
     [YA] = "竹矢",
     [YUMI] = "和弓",
+    [GRAY_DRAGON_SCALE_MAIL] = "灰色ドラゴン鱗鎧",
+    [GOLD_DRAGON_SCALE_MAIL] = "金色ドラゴン鱗鎧",
+    [SILVER_DRAGON_SCALE_MAIL] = "銀色ドラゴン鱗鎧",
+    [RED_DRAGON_SCALE_MAIL] = "赤色ドラゴン鱗鎧",
+    [WHITE_DRAGON_SCALE_MAIL] = "白色ドラゴン鱗鎧",
+    [ORANGE_DRAGON_SCALE_MAIL] = "橙色ドラゴン鱗鎧",
+    [BLACK_DRAGON_SCALE_MAIL] = "黒色ドラゴン鱗鎧",
+    [BLUE_DRAGON_SCALE_MAIL] = "青色ドラゴン鱗鎧",
+    [GREEN_DRAGON_SCALE_MAIL] = "緑色ドラゴン鱗鎧",
+    [YELLOW_DRAGON_SCALE_MAIL] = "黄色ドラゴン鱗鎧",
+    [GRAY_DRAGON_SCALES] = "灰色ドラゴン鱗",
+    [GOLD_DRAGON_SCALES] = "金色ドラゴン鱗",
+    [SILVER_DRAGON_SCALES] = "銀色ドラゴン鱗",
+    [RED_DRAGON_SCALES] = "赤色ドラゴン鱗",
+    [WHITE_DRAGON_SCALES] = "白色ドラゴン鱗",
+    [ORANGE_DRAGON_SCALES] = "橙色ドラゴン鱗",
+    [BLACK_DRAGON_SCALES] = "黒色ドラゴン鱗",
+    [BLUE_DRAGON_SCALES] = "青色ドラゴン鱗",
+    [GREEN_DRAGON_SCALES] = "緑色ドラゴン鱗",
+    [YELLOW_DRAGON_SCALES] = "黄色ドラゴン鱗",
 };
 
 /* 未識別時の外観説明（日本語）
