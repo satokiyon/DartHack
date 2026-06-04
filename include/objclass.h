@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-20. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
 /* NetHack 5.0	objclass.h	$NHDT-Date: 1596498553 2020/08/03 23:49:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -194,6 +194,8 @@ extern const char *const obj_jp_names[NUM_OBJECTS + 1];
 extern const char *const obj_jp_descrs[NUM_OBJECTS + 1];
 extern const char *jp_item_name(int otyp);
 extern const char *jp_item_descr(int otyp);
+extern const char *jp_artiname(int artinum);
+extern int jp_artiname_to_num(const char *name);
 
 #define OBJ_NAME(obj) (obj_descr[(obj).oc_name_idx].oc_name)
 #define OBJ_DESCR(obj) (obj_descr[(obj).oc_descr_idx].oc_descr)

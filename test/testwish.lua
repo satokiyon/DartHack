@@ -93,6 +93,10 @@ local wishtest_objects = {
    ["5枚の白紙の巻物"] = { otyp_name = "blank paper", quan = 5 },
    ["呪われた+3命中の指輪"] = { otyp_name = "increase accuracy", oclass = "=", spe = 3, cursed = 1 },
    ["コボルドの死体"] = { otyp_name = "corpse", oclass = "%", corpsenm_name = "kobold" },
+   ["エクスカリバー"] = { otyp_name = "long sword", oclass = ")", oartifact = "Excalibur" },
+   ["+2グレイスワンダー"] = { otyp_name = "silver saber", oclass = ")", spe = 2, oartifact = "Grayswandir" },
+   ["探知のオーブ"] = { otyp_name = "crystal ball", oclass = "(", oartifact = "The Orb of Detection" },
+   ["権力の笏"] = { otyp_name = "mace", oclass = ")", oartifact = "The Sceptre of Might" },
    ["なし"] = { NO_OBJ = 1 },
 };
 
