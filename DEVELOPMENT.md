@@ -21,6 +21,11 @@ Windows でのビルド方法の詳細は、以下のドキュメントを参照
 * **表示層で切り替え**: `src/objnam.c` の表示処理は `jp_item_name()` / `jp_item_descr()` を使う。
 * **シャッフル対応**: 未識別外観は `oc_descr_idx` が実行時に変わるため、`jp_item_descr()` は `objects[otyp].oc_descr_idx` を経由する。
 * **Windows ビルドへの組み込み**: `sys/windows/vs/NetHack/NetHack.vcxproj` と `sys/windows/vs/NetHackW/NetHackW.vcxproj` の両方に `src/obj_jp.c` を含める。
+* **アーティファクトの日本語化と願い・検索対応**: 
+  - `src/obj_jp.c` に表示用の標準日本語名テーブル (`artilist_jp_names[]`) と、入力受付用のJNetHack表記の別名テーブル (`artilist_jnethack_names[]`) を用意。
+  - `src/objnam.c` の `xname()` や `bare_artifactname()` では、表示時に標準日本語名に置き換える。
+  - `src/artifact.c` の `artifact_name()` で入力された日本語名（表記揺れや別名を含む）を英語キー名にマッピングして「願い」に対応する。
+  - `src/jp_data_lookup.c` において、データ検索用にアーティファクトの日本語名（およびひらがな表記）を英語キーに紐づける alias 設定を追加。
 
 この設計により、英語ID依存の内部処理を壊さずに日本語表示を実現できます。チュートリアルの Lua `Unknown object id` 問題もこの方式で解消しました。
 
