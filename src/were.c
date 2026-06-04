@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
 /* NetHack 5.0	were.c	$NHDT-Date: 1766588485 2025/12/24 07:01:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -23,10 +23,10 @@ were_change(struct monst *mon)
 
                 switch (monsndx(mon->data)) {
                 case PM_WEREWOLF:
-                    howler = "wolf";
+                    howler = "オオカミ";
                     break;
                 case PM_WEREJACKAL:
-                    howler = "jackal";
+                    howler = "ジャッカル";
                     break;
                 default:
                     howler = (char *) 0;
@@ -111,11 +111,28 @@ new_were(struct monst *mon)
         return;
     }
 
-    if (canseemon(mon) && !Hallucination)
-        pline("%s changes into a %s.", Monnam(mon),
-              is_human(&mons[pm]) ? "human"
-                                  /* pmname()+4: skip past "were" prefix */
-                                  : pmname(&mons[pm], Mgender(mon)) + 4);
+    if (canseemon(mon) && !Hallucination) {
+        const char *to_name = "";
+        if (is_human(&mons[pm])) {
+            to_name = "人間";
+        } else {
+            switch (pm) {
+            case PM_WERERAT:
+                to_name = "ネズミ";
+                break;
+            case PM_WEREJACKAL:
+                to_name = "ジャッカル";
+                break;
+            case PM_WEREWOLF:
+                to_name = "オオカミ";
+                break;
+            default:
+                to_name = "獣";
+                break;
+            }
+        }
+        pline("%sは%sに変身した.", Monnam(mon), to_name);
+    }
 
     set_mon_data(mon, &mons[pm]);
     if (helpless(mon)) {
@@ -198,9 +215,25 @@ you_were(void)
     if (Unchanging || u.umonnum == u.ulycn)
         return;
     if (controllable_poly) {
-        /* `+4' => skip "were" prefix to get name of beast */
-        Sprintf(qbuf, "Do you want to change into %s?",
-                an(mons[u.ulycn].pmnames[NEUTRAL] + 4));
+        const char *beast = "";
+        switch (u.ulycn) {
+        case PM_WERERAT:
+        case PM_HUMAN_WERERAT:
+            beast = "ネズミ";
+            break;
+        case PM_WEREJACKAL:
+        case PM_HUMAN_WEREJACKAL:
+            beast = "ジャッカル";
+            break;
+        case PM_WEREWOLF:
+        case PM_HUMAN_WEREWOLF:
+            beast = "オオカミ";
+            break;
+        default:
+            beast = "獣";
+            break;
+        }
+        Sprintf(qbuf, "%sに変身しますか?", beast);
         if (!paranoid_query(ParanoidWerechange, qbuf))
             return;
     } else if (monster_nearby()) {
@@ -222,7 +255,7 @@ you_unwere(boolean purify)
     if (!Unchanging && is_were(gy.youmonst.data)
         && !monster_nearby()
         && (!controllable_poly
-            || !paranoid_query(ParanoidWerechange, "Remain in beast form?")))
+            || !paranoid_query(ParanoidWerechange, "獣の姿のままでいますか?")))
         rehumanize();
     else if (is_were(gy.youmonst.data) && !u.mtimedone)
         u.mtimedone = rn1(200, 200); /* 40% of initial were change */
