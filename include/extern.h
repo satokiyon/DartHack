@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -262,6 +262,7 @@ extern void free_ebones(struct monst *) NONNULLARG1;
 
 /* ### botl.c ### */
 
+extern const char *status_field_label_for_display(int);
 extern char *get_strength_str(void);
 extern char *do_statusline1(void);
 extern void check_gold_symbol(void);

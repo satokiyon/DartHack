@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursstat.c */
 /* Copyright (c) Andy Thomson, 2018. */
@@ -1228,7 +1229,7 @@ curs_vert_status_vals(int win_width)
                 if ((colon = strchr(text, ':')) != 0)
                     text = colon + 1;
             }
-            lbl = status_fieldnm[fldidx];
+            lbl = status_field_label_for_display(fldidx);
             use_name = TRUE;
             leadingspace[0] = '\0';
             /* classify type of field (labeled or not) and make some fixups */
@@ -1236,17 +1237,11 @@ curs_vert_status_vals(int win_width)
             case BL_XP:
                  /* "experience-level : N" is too long and becomes misleading
                     if value is shown as 'N/experience-points' */
-                lbl = "experience";
+                lbl = "経験値";
                 break;
             case BL_LEVELDESC:
                 /* "dungeon-level" is redundant when value is "Dlvl-N" */
-                lbl = "location";
-                break;
-            case BL_HD:
-                /* "HD" is too oscure; 0 actually means 1d4 (so about 1/2);
-                   "hit-dice" is obscure too but doesn't stand out as such */
-                lbl = (!strcmp(text, "1") || !strcmp(text, "0")) ? "hit-die"
-                      : "hit-dice";
+                lbl = "現在地";
                 break;
             case BL_ALIGN:
                 /* don't want sprintf(": %s") below inserting second space */

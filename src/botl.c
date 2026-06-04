@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-03. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
 /* NetHack 5.0	botl.c	$NHDT-Date: 1769839231 2026/01/30 22:00:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.277 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -72,7 +72,7 @@ staticfn void bot_via_windowport(void);
 staticfn void stat_update_time(void);
 staticfn void jp_status_relabel_dlvl(char *);
 staticfn int alignnum_to_display_index(int);
-staticfn const char *status_field_label_for_display(int);
+const char *status_field_label_for_display(int);
 staticfn const char *condition_label_for_display(int);
 static struct istat_s initblstats[MAXBLSTATS];
 #ifdef STATUS_HILITES
@@ -98,7 +98,7 @@ alignnum_to_display_index(int alignnum)
                          : (alignnum == A_CHAOTIC) ? 2 : -1;
 }
 
-staticfn const char *
+const char *
 status_field_label_for_display(int fld)
 {
     switch (fld) {
