@@ -14,8 +14,8 @@ NetHackJPは、ローグライクゲームの金字塔 **NetHack 5.0** を日本
 </figure>
 
 <figure>
-    <figurecaption>コンソール版</figurecaption>   
-    <img width="1058" height="607" alt="2026-06-02_05h25_26" src="https://github.com/user-attachments/assets/ab664586-d185-4a1c-b23e-6807ec676d9a" />
+     <figurecaption>コンソール版</figurecaption>   
+     <img width="1058" height="607" alt="2026-06-02_05h25_26" src="https://github.com/user-attachments/assets/ab664586-d185-4a1c-b23e-6807ec676d9a" />
 </figure>
 
 ---
@@ -103,7 +103,7 @@ NetHack はテキスト（ASCII文字）だけでなく、美しいグラフィ�
 
 ## ⚖️ ライセンス
 本リポジトリは、オリジナルの NetHack 同様、NetHack General Public License に準じます。
-詳細なライセンス方針や第三者コンポーネントの情報は、[DEVELOPMENT.md](DEVELOPMENT.md) および以下を参照してください。
+詳細なライセンス方針や開発向けの情報は、[DEVELOPMENT.md](DEVELOPMENT.md) および以下を参照してください。
 
 * ライセンス本文: [dat/license](dat/license)
 * サブモジュール等の第三者コンポーネント: [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES)
