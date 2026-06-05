@@ -1415,7 +1415,7 @@ toss_up(struct obj *obj, boolean hitsroof)
         if (is_silver && Hate_silver)
             pline_The("銀があなたを焼いた!");
         if (harmless)
-            hit(thesimpleoname(obj), &gy.youmonst, " but doesn't hurt.");
+            hit(thesimpleoname(obj), &gy.youmonst, "が、ダメージはなかった.");
 
         hitfloor(obj, TRUE);
         gt.thrownobj = 0;
@@ -1747,32 +1747,38 @@ throwit(
                     }
                     if (!dmg) {
                         if (tethered_weapon) {
-                            pline(Blind ? "%s%s back and is left"
-                                          " dangling from your %s."
-                                        : "%s is left dangling from your %s.",
-                                  Blind ? "Your tethered weapon" : Tobjnam(obj, "return"),
-                                  Blind ? " snaps" : "",
-                                  body_part(ARM));
+                            if (Blind) {
+                                pline("つなぎ止められた武器が跳ね戻り、あなたの%sからぶら下がった.",
+                                      jp_body_part(ARM));
+                            } else {
+                                pline("%sは戻ってきて、あなたの%sからぶら下がった.",
+                                      Doname2(obj), jp_body_part(ARM));
+                            }
                         } else {
-                            pline(Blind
-                                      ? "%s lands %s your %s."
-                                      : "%s back to you, landing %s your %s.",
-                                  Blind ? Something : Tobjnam(obj, "return"),
-                                  Levitation ? "beneath" : "at",
-                                  makeplural(body_part(FOOT)));
+                            if (Blind) {
+                                pline("何かがあなたの%sに落ちた.",
+                                      Levitation ? "真下" : "足元");
+                            } else {
+                                pline("%sが戻ってきて、あなたの%sに落ちた.",
+                                      Doname2(obj), Levitation ? "真下" : "足元");
+                            }
                         }
                     } else {
                         dmg += rnd(3);
                         if (tethered_weapon) {
-                            Your("tethered %s your %s!",
-                                 Blind ? "weapon returns and hits" : Tobjnam(obj, "hit"),
-                                 body_part(ARM));
+                            if (Blind) {
+                                pline("つなぎ止められた武器が戻ってきてあなたの%sに当たった!",
+                                      jp_body_part(ARM));
+                            } else {
+                                pline("%sが戻ってきてあなたの%sに当たった!",
+                                      Doname2(obj), jp_body_part(ARM));
+                            }
                         } else {
-                                                    pline(
+                            pline(
                                 Blind
                                     ? "%sがあなたの%sに当たった!"
-                                                                : "%sが戻ってきてあなたの%sに当たった!",
-                                                              Blind ? Something : Doname2(obj),
+                                    : "%sが戻ってきてあなたの%sに当たった!",
+                                Blind ? Something : Doname2(obj),
                                 jp_body_part(ARM));
                         }
                         if (obj->oartifact)
@@ -1789,8 +1795,8 @@ throwit(
                         if (!ship_object(obj, u.ux, u.uy, FALSE))
                             dropy(obj);
                     } else {
-                        pline_The("%s tether releases from your %s!",
-                                  s_suffix(simpleonames(obj)), body_part(ARM));
+                        pline("%sのつなぎ紐があなたの%sから外れた!",
+                              simpleonames(obj), jp_body_part(ARM));
                     }
                 }
                 throwit_return(TRUE);
@@ -1806,8 +1812,8 @@ throwit(
                        explicitly rewield the weapon to get throw-and-return
                        capability back anyway, quivered or not shouldn't
                        matter */
-                    pline("The tether snaps off your %s!",
-                          body_part(ARM));
+                    pline("つなぎ紐があなたの%sからちぎれた!",
+                          jp_body_part(ARM));
                 } else {
                     pline("%sは戻るのに失敗した!", Doname2(obj));
                 }
@@ -2000,7 +2006,7 @@ tmiss(struct obj *obj, struct monst *mon, boolean maybe_wakeup)
        an arrow just landing short of any target (no message in that case),
        so will realize that there is a valid target here anyway. */
     if (!canseemon(mon) || (M_AP_TYPE(mon) && M_AP_TYPE(mon) != M_AP_MONSTER))
-        pline("%s %s.", The(missile), otense(obj, "miss"));
+        pline("%sは外れた.", The(missile));
     else
         miss(missile, mon);
     if (maybe_wakeup && !rn2(3))
