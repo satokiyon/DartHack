@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 5.0	pager.c	$NHDT-Date: 1774846177 2026/03/29 20:49:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.296 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -2122,7 +2122,7 @@ do_look(int mode, coord *click_cc)
           }
         case '?':
             from_screen = FALSE;
-            getlin("何を指定する? (1文字を入力)", out_str);
+            getlin("何を指定する? (シンボルまたは単語)", out_str);
             if (strcmp(out_str, " ")) /* keep single space as-is */
                 /* remove leading and trailing whitespace and
                    condense consecutive internal whitespace */
