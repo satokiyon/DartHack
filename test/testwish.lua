@@ -97,6 +97,15 @@ local wishtest_objects = {
    ["+2グレイスワンダー"] = { otyp_name = "silver saber", oclass = ")", spe = 2, oartifact = "Grayswandir" },
    ["探知のオーブ"] = { otyp_name = "crystal ball", oclass = "(", oartifact = "The Orb of Detection" },
    ["権力の笏"] = { otyp_name = "mace", oclass = ")", oartifact = "The Sceptre of Might" },
+   -- JNetHack式のテストケース
+   ["スピードブーツ"] = { otyp_name = "speed boots", oclass = "[" },
+   ["鑑定の巻物"] = { otyp_name = "identify", oclass = "?" },
+   ["解呪の巻物"] = { otyp_name = "remove curse", oclass = "?" },
+   ["呪いをとく巻物"] = { otyp_name = "remove curse", oclass = "?" },
+   ["願いのワンド"] = { otyp_name = "wishing", oclass = "/" },
+   ["灰色ドラゴンの鱗鎧"] = { otyp_name = "gray dragon scale mail", oclass = "[" },
+   ["オレンジドラゴンの鱗"] = { otyp_name = "orange dragon scales", oclass = "[" },
+   ["白ドラゴンの鱗鎧"] = { otyp_name = "white dragon scale mail", oclass = "[" },
    ["なし"] = { NO_OBJ = 1 },
 };
 
