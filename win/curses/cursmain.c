@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmain.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -123,7 +123,7 @@ struct window_procs curses_procs = {
     curses_delay_output,
 #ifdef CHANGE_COLOR
     curses_change_color,
-#ifdef MACOS9 /* old OS 9, not OSX */
+#ifdef MAC68K /* old OS 9, not OSX */
     (void (*)(int)) 0,
     (short (*)(winid, char *)) 0,
 #endif

@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 3.6	mac-term.h	$NHDT-Date: 1596498541 2020/08/03 23:49:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 2003. */
 /*-Copyright (c) Kevin Hugo, 2003. */
@@ -23,7 +24,7 @@
 
 /* Stuff needed for the core of NetHack */
 #undef MAC
-#undef MACOS9
+#undef MAC68K
 #define UNIX
 #define BSD
 #define __FreeBSD__ /* Darwin is based on FreeBSD */

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1473,7 +1473,7 @@ extern boolean stumble_on_door_mimic(coordxy, coordxy);
 extern int doopen_indir(coordxy, coordxy);
 extern int doclose(void);
 
-#ifdef MACOS9
+#ifdef MAC68K
 /* outdated functions removed */
 /* ### macfile.c ### */
 /* ### macmain.c ### */

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 5.0	allmain.c	$NHDT-Date: 1771213100 2026/02/15 19:38:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.286 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -742,7 +742,7 @@ init_sound_disp_gamewindows(void)
        ever having been used, use it here to pacify the Qt interface */
     start_menu(WIN_INVEN, menu_behavior), end_menu(WIN_INVEN, (char *) 0);
 
-#ifdef MACOS9
+#ifdef MAC68K
     /* This _is_ the right place for this - maybe we will
      * have to split init_sound_disp_gamewindows into
      * create_gamewindows and show_gamewindows to get rid of this ifdef...

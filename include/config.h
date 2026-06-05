@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 5.0	config.h	$NHDT-Date: 1710344316 2024/03/13 15:38:36 $  $NHDT-Branch: keni-staticfn $:$NHDT-Revision: 1.188 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
@@ -37,7 +37,7 @@
 /* Hint: if you're not developing code, don't define
    ULTRIX_PROTO. */
 
-#include "config1.h" /* should auto-detect MSDOS, MACOS9, AMIGA, and WIN32 */
+#include "config1.h" /* should auto-detect MSDOS, MAC68K, AMIGA, and WIN32 */
 
 /*
  * Consolidated version, patchlevel, development status.
@@ -68,8 +68,8 @@
  *      tty, X11, mac, amii, BeOS, Qt, Gem, Gnome, shim
  */
 
-/* MACOS9 also means MAC windows */
-#ifdef MACOS9
+/* MAC68K also means MAC windows */
+#ifdef MAC68K
 #ifndef AUX
 #define DEFAULT_WINDOW_SYS "mac"
 #endif
@@ -347,7 +347,7 @@
 #define ENTRYMAX 100 /* must be >= 10 */
 #endif
 #ifndef PERS_IS_UID
-#if !defined(MICRO) && !defined(MACOS9) && !defined(WIN32)
+#if !defined(MICRO) && !defined(MAC68K) && !defined(WIN32)
 #define PERS_IS_UID 1 /* delete for PERSMAX per name; now per uid */
 #else
 #define PERS_IS_UID 0
@@ -442,7 +442,7 @@
  */
 #define INSURANCE /* allow crashed game recovery */
 
-#if !defined(MACOS9) && !defined(SHIM_GRAPHICS)
+#if !defined(MAC68K) && !defined(SHIM_GRAPHICS)
 #define CHDIR /* delete if no chdir() available */
 #endif
 
@@ -541,7 +541,7 @@ typedef unsigned char uchar;
 #define MACRO_CPATH /* use clear_path macros instead of functions */
 #endif
 
-#if !defined(MACOS9)
+#if !defined(MAC68K)
 #if !defined(NOCLIPPING)
 #define CLIPPING /* allow smaller screens -- ERS */
 #endif

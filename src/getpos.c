@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 5.0	getpos.c	$NHDT-Date: 1763708572 2025/11/20 23:02:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.6 $ */
 /*-Copyright (c) Pasi Kallinen, 2023. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -852,7 +852,7 @@ getpos(coord *ccp, boolean force, const char *goal)
 #endif
     curs(WIN_MAP, cx, cy);
     flush_screen(0);
-#ifdef MACOS9
+#ifdef MAC68K
     lock_mouse_cursor(TRUE);
 #endif
     lock_mouse_buttons(TRUE);
@@ -1150,7 +1150,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         flush_screen(0);
     }
  exitgetpos:
-#ifdef MACOS9
+#ifdef MAC68K
     lock_mouse_cursor(FALSE);
 #endif
     lock_mouse_buttons(FALSE);

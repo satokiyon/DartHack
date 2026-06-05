@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 3.6	mac-carbon.h	$NHDT-Date: 1596498540 2020/08/03 23:49:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 2003. */
 /*-Copyright (c) Kevin Hugo, 2003. */
@@ -21,7 +22,7 @@
  *		set "Prefix File" to include/mac-carbon.h
  */
 
-#define MACOS9
+#define MAC68K
 #define MAC
 #undef UNIX
 

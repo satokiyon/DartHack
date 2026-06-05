@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 3.6	wingem.c	$NHDT-Date: 1450453304 2015/12/18 15:41:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Christian Bressler, 1999 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -63,7 +64,7 @@ struct window_procs Gem_procs = {
     Gem_getlin, Gem_get_ext_cmd, Gem_number_pad, Gem_delay_output,
 #ifdef CHANGE_COLOR /* the Mac uses a palette device */
     Gem_change_color,
-#ifdef MACOS9
+#ifdef MAC68K
     Gem_change_background, Gem_set_font_name,
 #endif
     Gem_get_color_string,
@@ -76,7 +77,7 @@ struct window_procs Gem_procs = {
     genl_can_suspend_no,
 };
 
-#ifdef MACOS9
+#ifdef MAC68K
 void *
 Gem_change_background(dummy)
 int dummy;
