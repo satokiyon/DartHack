@@ -118,4 +118,5 @@ tools/
 !/docs/modification-notice-template-en.md
 !/docs/message-translation-safety-checklist.md
 !/docs/emoji_support_investigation.md
+!/docs/wizloadlua_guide.md
 
