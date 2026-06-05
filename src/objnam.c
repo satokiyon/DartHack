@@ -3731,7 +3731,7 @@ jp_wish_match(const char *u_str, const char *jp_str)
     }
 
     /* 段階2: 辞書定義名(jp_buf)からのみ接尾辞を除去して比較 */
-    Strcpy(u_buf, u_str);
+    Strcpy(u_buf, normalized_u_str);
     Strcpy(jp_buf, jp_str);
 
     jp_len = (int) strlen(jp_buf);
