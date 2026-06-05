@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 5.0	mondata.c	$NHDT-Date: 1738638877 2025/02/03 19:14:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.140 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -980,9 +980,18 @@ name_to_monplus(
     int len, mgend, matchgend = -1;
     size_t slen;
     boolean exact_match = FALSE;
+    char en_buf[BUFSZ];
 
     if (remainder_p)
         *remainder_p = (const char *) 0;
+
+    /* 
+     * 純粋なモンスター名入力を期待する呼び出し（remainder_pがNULL）の場合、
+     * 入力が日本語であれば、英語キーに逆変換を試みる
+     */
+    if (!remainder_p && jp_data_lookup_key_from_japanese(in_str, en_buf, sizeof en_buf)) {
+        in_str = en_buf;
+    }
 
     str = strcpy(buf, in_str);
 
