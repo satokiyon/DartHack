@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 5.0	optlist.h */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -173,7 +173,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(armorstatus, Advanced, 0, opt_in, set_in_game,
                 Off, Yes, No, No, NoAlias, &flags.armorstatus, Term_False,
                 "現在装備中の防具をステータス欄に要約表示する")
-    NHOPTB(ascii_map, Advanced, 0, opt_out, set_in_game,
+    /* this one needs unique handling because different window ports
+       expect different defaults */
+    NHOPTB(ascii_map, Advanced, 0, ascii_map_Def, set_in_game,
                 ascii_map_Def, Yes, No, No, NoAlias, &iflags.wc_ascii_map,
                 Term_False, "マップをテキストとして表示する")
     NHOPTO("autocompletions", Advanced, o_autocomplete, BUFSZ, opt_in,
@@ -363,7 +365,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(herecmd_menu, Advanced, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &iflags.herecmd_menu, Term_False,
            "この場所で利用可能なコマンドを表示する")
-#if defined(MACOS9)
+#if defined(MAC68K)
     NHOPTC(hicolor, Advanced, 15, opt_in, set_in_config,
                 No, Yes, No, No, NoAlias,
                 "palette と同じだが並び順が逆")
@@ -396,7 +398,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(idlecheckpoint, Advanced, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &iflags.idlecheckpoint, Term_Off,
            "入力が 10 秒間アイドル状態のときにチェックポイントファイルを更新する")
-#ifndef MACOS9
+#ifndef MAC68K
     NHOPTB(ignintr, Advanced, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &flags.ignintr, Term_False,
            "割り込み信号を無視する")
@@ -548,7 +550,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 No, Yes, No, No, NoAlias,
                 "バックパック内のアイテムの在庫順")
 #ifdef CHANGE_COLOR
-#ifndef MACOS9     /* 旧 Mac OS9 ではない */
+#ifndef MAC68K     /* not old Mac OS9 */
     NHOPTC(palette, Advanced, 15, opt_in, set_gameview,
                 No, Yes, Yes, No, "hicolor",
                 "パレット（パレット内の RGB 色を調整する（色/R-G-B））")

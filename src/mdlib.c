@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 5.0  mdlib.c  $NHDT-Date: 1701499945 2023/12/02 06:52:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
@@ -151,7 +152,7 @@ static struct win_information window_opts[] = {
 #ifdef GNOME_GRAPHICS /* unmaintained/defunct */
     { "Gnome", "Gnome", TRUE },
 #endif
-#ifdef MACOS9 /* defunct OS 9 interface */
+#ifdef MAC68K /* defunct OS 9 interface */
     { "mac", "Mac", TRUE },
 #endif
 #ifdef GEM_GRAPHICS /* defunct Atari interface */
@@ -536,7 +537,7 @@ static const char *const build_opts[] = {
     "screen clipping",
 #endif
 #ifdef NO_TERMS
-#ifdef MACOS9
+#ifdef MAC68K
     "screen control via mactty",
 #endif
 #ifdef SCREEN_BIOS

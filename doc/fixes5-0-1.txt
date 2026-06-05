@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06.
 NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.20 $ $NHDT-Date: 1779581008 2026/05/24 00:03:28 $
 	
 General Fixes and Modified Features
@@ -54,6 +54,8 @@ avoid calling costly_spot(), costly_adjacent(), find_byowner(), which
 if the hero has already been told that an engraving vanished, ensure that
 	the engraving marker isn't still showing when prompted for a
 	new engraving
+aklys path shouldn't be shown for locations that the hero cannot see
+keep the player better-informed about status of the tether on their weapon
 
 
 Platform- and/or Interface-Specific Fixes

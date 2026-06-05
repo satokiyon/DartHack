@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 5.0	dothrow.c	$NHDT-Date: 1737343372 2025/01/19 19:22:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.300 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1729,46 +1729,88 @@ throwit(
                 } else {
                     int dmg = rn2(2);
 
+                    if (tethered_weapon) {
+                        /* It's tethered, so it usually returns to your
+                         * inventory, despite impairment */
+                        obj = addinv_before(obj, oldslot);
+                        encumber_msg();
+                        /* addinv autoquivers an aklys if quiver is empty;
+                          if obj is quivered, remove it before wielding */
+                        if (obj->owornmask & W_QUIVER)
+                           setuqwep((struct obj *) 0);
+#if 0
+                        setuwep(obj);
+                        set_twoweap(twoweap); /* u.twoweap = twoweap */
+#endif
+                        if (cansee(gb.bhitpos.x, gb.bhitpos.y))
+                           newsym(gb.bhitpos.x, gb.bhitpos.y);
+                    }
                     if (!dmg) {
-                        pline(Blind ? "%sあなたの%sに%s."
-                                                                : "%sが戻ってきて%sあなたの%sに落ちた.",
-                                                            Blind ? Something : Doname2(obj),
-                            Levitation ? "足元の下へ" : "ちょうど",
-                            jp_body_part_plural(FOOT));
+                        if (tethered_weapon) {
+                            pline(Blind ? "%s%s back and is left"
+                                          " dangling from your %s."
+                                        : "%s is left dangling from your %s.",
+                                  Blind ? "Your tethered weapon" : Tobjnam(obj, "return"),
+                                  Blind ? " snaps" : "",
+                                  body_part(ARM));
+                        } else {
+                            pline(Blind
+                                      ? "%s lands %s your %s."
+                                      : "%s back to you, landing %s your %s.",
+                                  Blind ? Something : Tobjnam(obj, "return"),
+                                  Levitation ? "beneath" : "at",
+                                  makeplural(body_part(FOOT)));
+                        }
                     } else {
                         dmg += rnd(3);
-                                                pline(Blind ? "%sがあなたの%sに当たった!"
+                        if (tethered_weapon) {
+                            Your("tethered %s your %s!",
+                                 Blind ? "weapon returns and hits" : Tobjnam(obj, "hit"),
+                                 body_part(ARM));
+                        } else {
+                                                    pline(
+                                Blind
+                                    ? "%sがあなたの%sに当たった!"
                                                                 : "%sが戻ってきてあなたの%sに当たった!",
-                                                            Blind ? Something : Doname2(obj),
-                              jp_body_part(ARM));
+                                                              Blind ? Something : Doname2(obj),
+                                jp_body_part(ARM));
+                        }
                         if (obj->oartifact)
                             (void) artifact_hit((struct monst *) 0,
                                                 &gy.youmonst, obj, &dmg, 0);
                         losehp(Maybe_Half_Phys(dmg), killer_xname(obj),
                                KILLED_BY);
                     }
-
-                    if (u.uswallow) {
-                        swallowit(obj);
-                        return;
+                    if (!tethered_weapon) {
+                        if (u.uswallow) {
+                            swallowit(obj);
+                            return;
+                        }
+                        if (!ship_object(obj, u.ux, u.uy, FALSE))
+                            dropy(obj);
+                    } else {
+                        pline_The("%s tether releases from your %s!",
+                                  s_suffix(simpleonames(obj)), body_part(ARM));
                     }
-                    if (!ship_object(obj, u.ux, u.uy, FALSE))
-                        dropy(obj);
                 }
                 throwit_return(TRUE);
                 return;
             } else {
-                if (tethered_weapon)
+                if (tethered_weapon) {
                     tmp_at(DISP_END, 0);
-                /* when this location is stepped on, the weapon will be
-                   auto-picked up due to 'obj->how_lost' of LOST_THROWN;
-                   addinv() prevents thrown Mjollnir from being placed
-                   into the quiver slot, but an aklys will end up there if
-                   that slot is empty at the time; since hero will need to
-                   explicitly rewield the weapon to get throw-and-return
-                   capability back anyway, quivered or not shouldn't matter */
-                pline("%sは戻るのに失敗した!", Doname2(obj));
-
+                    /* when this location is stepped on, the weapon will be
+                       auto-picked up due to 'obj->how_lost' of LOST_THROWN;
+                       addinv() prevents thrown Mjollnir from being placed
+                       into the quiver slot, but an aklys will end up there if
+                       that slot is empty at the time; since hero will need to
+                       explicitly rewield the weapon to get throw-and-return
+                       capability back anyway, quivered or not shouldn't
+                       matter */
+                    pline("The tether snaps off your %s!",
+                          body_part(ARM));
+                } else {
+                    pline("%sは戻るのに失敗した!", Doname2(obj));
+                }
                 if (u.uswallow) {
                     swallowit(obj);
                     return;
