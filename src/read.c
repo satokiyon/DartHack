@@ -580,9 +580,9 @@ doread(void)
         /* can't read shirt worn under suit (under cloak is ok though) */
         if ((otyp == T_SHIRT || otyp == HAWAIIAN_SHIRT) && uarm
             && scroll == uarmu) {
-            pline("%s shirt is obscured by %s%s.",
-                  scroll->unpaid ? "That" : "Your", shk_your(buf, uarm),
-                  suit_simple_name(uarm));
+            pline("%s%sは、上に来ている%sに隠れていて読めない.",
+                  scroll->unpaid ? "その" : "あなたの",
+                  xname(scroll), xname(uarm));
             return ECMD_OK;
         }
         if (otyp == HAWAIIAN_SHIRT) {
@@ -3580,11 +3580,11 @@ create_particular(void)
 {
 #define CP_TRYLIM 5
     struct _create_particular_data d;
-    char *bufp, buf[BUFSZ], prompt[QBUFSZ];
+    char *bufp, buf[BUFSZ], prompt[BUFSZ];
     int  tryct = CP_TRYLIM, altmsg = 0;
 
     buf[0] = '\0'; /* for EDIT_GETLIN */
-    Strcpy(prompt, "Create what kind of monster?");
+    Strcpy(prompt, "どの種類のモンスターを生成しますか？");
     do {
         getlin(prompt, buf);
         bufp = mungspaces(buf);
@@ -3603,7 +3603,7 @@ create_particular(void)
         }
         /* when a second try is needed, expand the prompt */
         if (tryct == CP_TRYLIM)
-            Strcat(prompt, " [type name or symbol]");
+            Strcat(prompt, " [名前か記号を入力してください]");
     } while (--tryct > 0);
 
     if (!tryct)
