@@ -937,4 +937,233 @@ jp_artiname_to_num(const char *name)
     return 0;
 }
 
+/* 文字列置換ヘルパー */
+static void
+str_replace(char *buf, int buf_size, const char *from, const char *to)
+{
+    char tmp[256];
+    char *p;
+    if ((p = strstr(buf, from)) != 0) {
+        int prefix_len = p - buf;
+        int from_len = strlen(from);
+        if (prefix_len + strlen(to) + strlen(p + from_len) < buf_size) {
+            strncpy(tmp, buf, prefix_len);
+            tmp[prefix_len] = '\0';
+            strcat(tmp, to);
+            strcat(tmp, p + from_len);
+            strncpy(buf, tmp, buf_size - 1);
+            buf[buf_size - 1] = '\0';
+        }
+    }
+}
+
+struct jnh_wish_alias {
+    const char *jnh_name;
+    const char *nhjp_name;
+};
+
+static const struct jnh_wish_alias jnh_wish_aliases[] = {
+    /* ワンド / 杖 */
+    { "願いのワンド", "願いの杖" },
+    { "死のワンド", "死の杖" },
+    { "テレポートのワンド", "瞬間移動の杖" },
+    { "瞬間移動のワンド", "瞬間移動の杖" },
+    { "穴掘りのワンド", "穴掘りの杖" },
+    { "へんげのワンド", "へんげの杖" },
+    { "無力化のワンド", "無力化の杖" },
+    { "スピードのワンド", "加速の杖" },
+    { "スピードモンスターのワンド", "加速の杖" },
+    { "スローモンスターのワンド", "減速の杖" },
+    { "加速のワンド", "加速の杖" },
+    { "減速のワンド", "減速の杖" },
+    { "雷のワンド", "雷の杖" },
+    { "炎のワンド", "炎の杖" },
+    { "冷気のワンド", "吹雪の杖" },
+    { "吹雪のワンド", "吹雪 of 杖" }, /* 吹雪の杖 */
+    { "睡眠のワンド", "眠りの杖" },
+    { "眠りのワンド", "眠りの杖" },
+    { "光のワンド", "灯りの杖" },
+    { "灯りのワンド", "灯りの杖" },
+    { "探査のワンド", "探査する杖" },
+    { "開錠のワンド", "開錠の杖" },
+    { "施錠 of ワンド", "施錠の杖" },
+    { "造魔のワンド", "怪物を造る杖" },
+    { "蘇生のワンド", "蘇生の杖" },
+    { "単なるワンド", "単なる杖" },
+
+    /* ポーション / 薬 */
+    { "回復のポーション", "回復の薬" },
+    { "超回復のポーション", "超回復の薬" },
+    { "完全回復のポーション", "完全回復の薬" },
+    { "能力獲得のポーション", "能力獲得の薬" },
+    { "能力回復のポーション", "能力回復の薬" },
+    { "レベルアップのポーション", "レベルアップの薬" },
+    { "魔力のポーション", "魔力の薬" },
+    { "へんげのポーション", "へんげの薬" },
+    { "盲目のポーション", "盲目の薬" },
+    { "混乱のポーション", "混乱の薬" },
+    { "麻痺のポーション", "麻痺の薬" },
+    { "睡眠のポーション", "睡眠の薬" },
+    { "スピードのポーション", "加速の薬" },
+    { "加速のポーション", "加速の薬" },
+    { "啓蒙のポーション", "啓蒙の薬" },
+    { "幻覚のポーション", "幻覚の薬" },
+    { "可視のポーション", "可視の薬" },
+    { "透明のポーション", "透明の薬" },
+    { "病気のポーション", "病気の薬" },
+    { "酸のポーション", "酸の薬" },
+    { "オイルのポーション", "油" },
+
+    /* 巻物 */
+    { "鑑定の巻物", "識別の巻物" },
+    { "解呪の巻物", "解呪の巻物" },
+    { "呪いをとく巻物", "解呪の巻物" },
+    { "呪いを解く巻物", "解呪の巻物" },
+    { "鎧強化の巻物", "鎧に魔法をかける巻物" },
+    { "武器強化の巻物", "武器に魔法をかける巻物" },
+    { "瞬間移動の巻物", "瞬間移動の巻物" },
+    { "テレポートの巻物", "瞬間移動の巻物" },
+    { "充填の巻物", "充填の巻物" },
+    { "怪物を作る巻物", "怪物を作る巻物" },
+    { "怪物創造の巻物", "怪物を作る巻物" },
+    { "飼いならしの巻物", "怪物を飼いならす巻物" },
+
+    /* 魔法書 */
+    { "識別の魔法書", "識別の魔法書" },
+    { "解呪の魔法書", "解呪の魔法書" },
+    { "へんげの魔法書", "へんげの魔法書" },
+    { "開錠の魔法書", "開錠の魔法書" },
+    { "施錠の魔法書", "施錠の魔法書" },
+    { "瞬間移動の魔法書", "瞬間移動の魔法書" },
+    { "蘇生の魔法書", "蘇生の魔法書" },
+    { "回復の魔法書", "回復の魔法書" },
+    { "超回復の魔法書", "超回復の魔法書" },
+    { "眠りの魔法書", "眠りの魔法書" },
+    { "穴掘りの魔法書", "穴掘りの魔法書" },
+
+    /* 指輪 */
+    { "瞬間移動制御の指輪", "瞬間移動制御の指輪" },
+    { "変化制御の指輪", "へんげ制御の指輪" },
+    { "変化の指輪", "へんげの指輪" },
+    { "耐変化の指輪", "耐へんげの指輪" },
+    { "耐変化怪物の指輪", "耐へんげの指輪" },
+    { "瞬間移動の指輪", "瞬間移動の指輪" },
+    { "消化不良の指輪", "消化不良の指輪" },
+    { "スロー消化の指輪", "消化不良の指輪" },
+
+    /* 防具 */
+    { "スピードブーツ", "韋駄天の靴" },
+    { "スピードの靴", "韋駄天の靴" },
+    { "魔除けのクローク", "魔法を防ぐクローク" },
+    { "知性の兜", "知性の兜" },
+    { "知恵の兜", "知性の兜" },
+
+    /* 道具 */
+    { "軽量化のバッグ", "軽量化 of 鞄" }, /* 軽量化の鞄 */
+    { "トリックのバッグ", "トリックの鞄" },
+    { "防水バッグ", "防水袋" },
+    { "万能鍵", "万能鍵" },
+    { "鍵開け器具", "鍵開け器具" },
+    { "クレジットカード", "クレジットカード" },
+    { "魔法のマーカー", "魔法のマーカ" },
+    { "缶詰作成キット", "缶詰作成道具" },
+
+    { (const char *)0, (const char *)0 }
+};
+
+/* JNetHackの通常アイテム名表記（エイリアス・表記揺れ）をNetHackJP名に正規化する */
+void
+jnh_normalize_wish(const char *u_str, char *out_buf)
+{
+    char u_buf[256];
+    char jp_buf[256];
+    char *p;
+    int i;
+
+    if (!u_str || !*u_str || !out_buf)
+        return;
+
+    /* 元の文字列をデフォルトとして出力にコピー */
+    strcpy(out_buf, u_str);
+
+    /* 比較用に「の」やスペースを除去したバッファを作る */
+    strncpy(u_buf, u_str, sizeof(u_buf) - 1);
+    u_buf[sizeof(u_buf) - 1] = '\0';
+
+    /* 「の」の除去 */
+    while ((p = strstr(u_buf, "の")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+    /* 半角スペースの除去 */
+    while ((p = strchr(u_buf, ' ')) != 0) {
+        memmove(p, p + 1, strlen(p + 1) + 1);
+    }
+    /* 全角スペースの除去 */
+    while ((p = strstr(u_buf, "　")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+
+    /* ドラゴンの色名等の正規化 */
+    str_replace(u_buf, sizeof(u_buf), "白ドラゴン", "白色ドラゴン");
+    str_replace(u_buf, sizeof(u_buf), "オレンジドラゴン", "橙色ドラゴン");
+    str_replace(u_buf, sizeof(u_buf), "黒ドラゴン", "黒色ドラゴン");
+    str_replace(u_buf, sizeof(u_buf), "青ドラゴン", "青色ドラゴン");
+    str_replace(u_buf, sizeof(u_buf), "緑ドラゴン", "緑色ドラゴン");
+    str_replace(u_buf, sizeof(u_buf), "黄ドラゴン", "黄色ドラゴン");
+
+    /* エイリアステーブルで検索 */
+    for (i = 0; jnh_wish_aliases[i].jnh_name; i++) {
+        /* jnh_name からも「の」やスペースを除去して比較 */
+        strncpy(jp_buf, jnh_wish_aliases[i].jnh_name, sizeof(jp_buf) - 1);
+        jp_buf[sizeof(jp_buf) - 1] = '\0';
+
+        while ((p = strstr(jp_buf, "の")) != 0) {
+            memmove(p, p + 3, strlen(p + 3) + 1);
+        }
+        while ((p = strchr(jp_buf, ' ')) != 0) {
+            memmove(p, p + 1, strlen(p + 1) + 1);
+        }
+        while ((p = strstr(jp_buf, "　")) != 0) {
+            memmove(p, p + 3, strlen(p + 3) + 1);
+        }
+
+        /* ドラゴン色名の正規化もエイリアス名に対して行う */
+        str_replace(jp_buf, sizeof(jp_buf), "白ドラゴン", "白色ドラゴン");
+        str_replace(jp_buf, sizeof(jp_buf), "オレンジドラゴン", "橙色ドラゴン");
+        str_replace(jp_buf, sizeof(jp_buf), "黒ドラゴン", "黒色ドラゴン");
+        str_replace(jp_buf, sizeof(jp_buf), "青ドラゴン", "青色ドラゴン");
+        str_replace(jp_buf, sizeof(jp_buf), "緑ドラゴン", "緑色ドラゴン");
+        str_replace(jp_buf, sizeof(jp_buf), "黄ドラゴン", "黄色ドラゴン");
+
+        if (!strcmpi(u_buf, jp_buf)) {
+            /* マッチした場合、対応するNetHackJP標準名を出力に書き込む */
+            strcpy(out_buf, jnh_wish_aliases[i].nhjp_name);
+            return;
+        }
+    }
+
+    /* ドラゴン名の正規化だけでマッチする可能性があるため、
+       エイリアスにヒットしなかった場合でもドラゴン名の正規化版を試せるように、
+       u_buf をそのまま out_buf にするのではなく、ドラゴン名置換の結果を反映した文字列を作る。
+       例えば「灰色ドラゴンの鱗鎧」 -> 「灰色ドラゴン鱗鎧」
+    */
+    {
+        char dragon_buf[256];
+        strncpy(dragon_buf, u_str, sizeof(dragon_buf) - 1);
+        dragon_buf[sizeof(dragon_buf) - 1] = '\0';
+        str_replace(dragon_buf, sizeof(dragon_buf), "ドラゴンの", "ドラゴン");
+        str_replace(dragon_buf, sizeof(dragon_buf), "白ドラゴン", "白色ドラゴン");
+        str_replace(dragon_buf, sizeof(dragon_buf), "オレンジドラゴン", "橙色ドラゴン");
+        str_replace(dragon_buf, sizeof(dragon_buf), "黒ドラゴン", "黒色ドラゴン");
+        str_replace(dragon_buf, sizeof(dragon_buf), "青ドラゴン", "青色ドラゴン");
+        str_replace(dragon_buf, sizeof(dragon_buf), "緑ドラゴン", "緑色ドラゴン");
+        str_replace(dragon_buf, sizeof(dragon_buf), "黄ドラゴン", "黄色ドラゴン");
+
+        if (strcmp(dragon_buf, u_str) != 0) {
+            strcpy(out_buf, dragon_buf);
+        }
+    }
+}
+
+
 
