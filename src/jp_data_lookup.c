@@ -2469,7 +2469,8 @@ jp_data_lookup_normalize(char *s)
     /* 中黒（U+30FB、UTF-8バイト列: \xe3\x83\xbb）を除去する */
     {
         char *p = s, *q = s;
-        while (*p != '\0') {
+        int guard = 0;
+        while (guard++ < BUFSZ && *p != '\0') {
             /*
              * 境界外アクセスとナル文字飛び越しを防ぐため、
              * p[1] や p[2] が \0 でないことを必ず確認してからマルチバイト比較を行う
@@ -2489,7 +2490,7 @@ jp_data_lookup_normalize(char *s)
 boolean
 jp_data_lookup_key_from_japanese(const char *input, char *out, size_t outsz)
 {
-    char normalized[BUFSZ];
+    char normalized[BUFSZ] = {0};
     const char *key;
     int i;
 

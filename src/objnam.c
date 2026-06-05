@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1745114235 2025/04/19 17:57:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.453 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -3675,14 +3675,15 @@ rnd_otyp_by_wpnskill(schar skill)
     return otyp;
 }
 
-/* 日本語の「の」やスペース（半角/全角）、およびクラス接尾辞を取り除いて曖昧マッチングを行う */
+/* 日本語の「の」やスペース（半角/全角）、およびクラス接尾辞を取りよけて曖昧マッチングを行う */
 staticfn boolean
 jp_wish_match(const char *u_str, const char *jp_str)
 {
-    char normalized_u_str[256];
-    char u_buf[BUFSZ], jp_buf[BUFSZ];
+    char normalized_u_str[256] = {0};
+    char u_buf[BUFSZ] = {0}, jp_buf[BUFSZ] = {0};
     char *p;
     int jp_len;
+    int guard;
     static const char *const suffixes[] = {
         "魔法書", "魔除け", "巻物", "指輪", "薬", "杖", "鎧", "鱗", "兜", "靴", "クローク", "盾", "小手", "手袋", 0
     };
@@ -3692,7 +3693,7 @@ jp_wish_match(const char *u_str, const char *jp_str)
         return FALSE;
 
     /* JNetHackの通常アイテム名などをNetHackJP表記に正規化 */
-    jnh_normalize_wish(u_str, normalized_u_str);
+    jnh_normalize_wish(u_str, normalized_u_str, sizeof(normalized_u_str));
 
     if (!strcmpi(normalized_u_str, jp_str)) {
         return TRUE;
@@ -3703,26 +3704,32 @@ jp_wish_match(const char *u_str, const char *jp_str)
     Strcpy(jp_buf, jp_str);
 
     /* 「の」の除去 */
-    while ((p = strstr(u_buf, "の")) != 0) {
+    guard = 0;
+    while (guard++ < BUFSZ && (p = strstr(u_buf, "の")) != 0) {
         memmove(p, p + 3, strlen(p + 3) + 1);
     }
-    while ((p = strstr(jp_buf, "の")) != 0) {
+    guard = 0;
+    while (guard++ < BUFSZ && (p = strstr(jp_buf, "の")) != 0) {
         memmove(p, p + 3, strlen(p + 3) + 1);
     }
 
     /* 半角スペースの除去 */
-    while ((p = strchr(u_buf, ' ')) != 0) {
+    guard = 0;
+    while (guard++ < BUFSZ && (p = strchr(u_buf, ' ')) != 0) {
         memmove(p, p + 1, strlen(p + 1) + 1);
     }
-    while ((p = strchr(jp_buf, ' ')) != 0) {
+    guard = 0;
+    while (guard++ < BUFSZ && (p = strchr(jp_buf, ' ')) != 0) {
         memmove(p, p + 1, strlen(p + 1) + 1);
     }
 
     /* 全角スペースの除去 */
-    while ((p = strstr(u_buf, "　")) != 0) {
+    guard = 0;
+    while (guard++ < BUFSZ && (p = strstr(u_buf, "　")) != 0) {
         memmove(p, p + 3, strlen(p + 3) + 1);
     }
-    while ((p = strstr(jp_buf, "　")) != 0) {
+    guard = 0;
+    while (guard++ < BUFSZ && (p = strstr(jp_buf, "　")) != 0) {
         memmove(p, p + 3, strlen(p + 3) + 1);
     }
 
@@ -3746,26 +3753,32 @@ jp_wish_match(const char *u_str, const char *jp_str)
     }
 
     /* 「の」の除去 */
-    while ((p = strstr(u_buf, "の")) != 0) {
+    guard = 0;
+    while (guard++ < BUFSZ && (p = strstr(u_buf, "の")) != 0) {
         memmove(p, p + 3, strlen(p + 3) + 1);
     }
-    while ((p = strstr(jp_buf, "の")) != 0) {
+    guard = 0;
+    while (guard++ < BUFSZ && (p = strstr(jp_buf, "の")) != 0) {
         memmove(p, p + 3, strlen(p + 3) + 1);
     }
 
     /* 半角スペースの除去 */
-    while ((p = strchr(u_buf, ' ')) != 0) {
+    guard = 0;
+    while (guard++ < BUFSZ && (p = strchr(u_buf, ' ')) != 0) {
         memmove(p, p + 1, strlen(p + 1) + 1);
     }
-    while ((p = strchr(jp_buf, ' ')) != 0) {
+    guard = 0;
+    while (guard++ < BUFSZ && (p = strchr(jp_buf, ' ')) != 0) {
         memmove(p, p + 1, strlen(p + 1) + 1);
     }
 
     /* 全角スペースの除去 */
-    while ((p = strstr(u_buf, "　")) != 0) {
+    guard = 0;
+    while (guard++ < BUFSZ && (p = strstr(u_buf, "　")) != 0) {
         memmove(p, p + 3, strlen(p + 3) + 1);
     }
-    while ((p = strstr(jp_buf, "　")) != 0) {
+    guard = 0;
+    while (guard++ < BUFSZ && (p = strstr(jp_buf, "　")) != 0) {
         memmove(p, p + 3, strlen(p + 3) + 1);
     }
 
