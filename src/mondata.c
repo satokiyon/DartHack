@@ -980,7 +980,7 @@ name_to_monplus(
     int len, mgend, matchgend = -1;
     size_t slen;
     boolean exact_match = FALSE;
-    char en_buf[BUFSZ];
+    char en_buf[BUFSZ] = {0};
 
     if (remainder_p)
         *remainder_p = (const char *) 0;

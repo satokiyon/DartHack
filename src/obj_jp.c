@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -846,8 +846,9 @@ int
 jp_artiname_to_num(const char *name)
 {
     int i;
-    char u_buf[256], jp_buf[256];
+    char u_buf[256] = {0}, jp_buf[256] = {0};
     char *p;
+    int guard;
 
     if (!name || !*name)
         return 0;
@@ -862,15 +863,18 @@ jp_artiname_to_num(const char *name)
         u_ptr += 4;
 
     /* 「の」の除去 */
-    while ((p = strstr(u_ptr, "の")) != 0) {
+    guard = 0;
+    while (guard++ < 256 && (p = strstr(u_ptr, "の")) != 0) {
         memmove(p, p + 3, strlen(p + 3) + 1);
     }
     /* 半角スペースの除去 */
-    while ((p = strchr(u_ptr, ' ')) != 0) {
+    guard = 0;
+    while (guard++ < 256 && (p = strchr(u_ptr, ' ')) != 0) {
         memmove(p, p + 1, strlen(p + 1) + 1);
     }
     /* 全角スペースの除去 */
-    while ((p = strstr(u_ptr, "　")) != 0) {
+    guard = 0;
+    while (guard++ < 256 && (p = strstr(u_ptr, "　")) != 0) {
         memmove(p, p + 3, strlen(p + 3) + 1);
     }
 
@@ -888,15 +892,18 @@ jp_artiname_to_num(const char *name)
         jp_buf[sizeof(jp_buf) - 1] = '\0';
 
         /* 辞書名から「の」を除去 */
-        while ((p = strstr(jp_buf, "の")) != 0) {
+        guard = 0;
+        while (guard++ < 256 && (p = strstr(jp_buf, "の")) != 0) {
             memmove(p, p + 3, strlen(p + 3) + 1);
         }
         /* 辞書名から半角スペースを除去 */
-        while ((p = strchr(jp_buf, ' ')) != 0) {
+        guard = 0;
+        while (guard++ < 256 && (p = strchr(jp_buf, ' ')) != 0) {
             memmove(p, p + 1, strlen(p + 1) + 1);
         }
         /* 辞書名から全角スペースを除去 */
-        while ((p = strstr(jp_buf, "　")) != 0) {
+        guard = 0;
+        while (guard++ < 256 && (p = strstr(jp_buf, "　")) != 0) {
             memmove(p, p + 3, strlen(p + 3) + 1);
         }
 
@@ -918,15 +925,18 @@ jp_artiname_to_num(const char *name)
         jp_buf[sizeof(jp_buf) - 1] = '\0';
 
         /* 辞書名から「の」を除去 */
-        while ((p = strstr(jp_buf, "の")) != 0) {
+        guard = 0;
+        while (guard++ < 256 && (p = strstr(jp_buf, "の")) != 0) {
             memmove(p, p + 3, strlen(p + 3) + 1);
         }
         /* 辞書名から半角スペースを除去 */
-        while ((p = strchr(jp_buf, ' ')) != 0) {
+        guard = 0;
+        while (guard++ < 256 && (p = strchr(jp_buf, ' ')) != 0) {
             memmove(p, p + 1, strlen(p + 1) + 1);
         }
         /* 辞書名から全角スペースを除去 */
-        while ((p = strstr(jp_buf, "　")) != 0) {
+        guard = 0;
+        while (guard++ < 256 && (p = strstr(jp_buf, "　")) != 0) {
             memmove(p, p + 3, strlen(p + 3) + 1);
         }
 
@@ -941,18 +951,22 @@ jp_artiname_to_num(const char *name)
 static void
 str_replace(char *buf, int buf_size, const char *from, const char *to)
 {
-    char tmp[256];
+    char tmp[256] = {0};
     char *p;
+    if (buf_size > 256 || buf_size <= 0) return;
     if ((p = strstr(buf, from)) != 0) {
-        int prefix_len = p - buf;
-        int from_len = strlen(from);
-        if (prefix_len + strlen(to) + strlen(p + from_len) < buf_size) {
-            strncpy(tmp, buf, prefix_len);
-            tmp[prefix_len] = '\0';
-            strcat(tmp, to);
-            strcat(tmp, p + from_len);
-            strncpy(buf, tmp, buf_size - 1);
-            buf[buf_size - 1] = '\0';
+        int prefix_len = (int)(p - buf);
+        int from_len = (int)strlen(from);
+        int suffix_len = (int)strlen(p + from_len);
+        int to_len = (int)strlen(to);
+        if (prefix_len + to_len + suffix_len < buf_size) {
+            /* 安全な文字列構築 */
+            memcpy(tmp, buf, prefix_len);
+            memcpy(tmp + prefix_len, to, to_len);
+            memcpy(tmp + prefix_len + to_len, p + from_len, suffix_len);
+            tmp[prefix_len + to_len + suffix_len] = '\0';
+            
+            memcpy(buf, tmp, prefix_len + to_len + suffix_len + 1);
         }
     }
 }
@@ -1053,33 +1067,38 @@ static const struct jnh_wish_alias jnh_wish_aliases[] = {
 
 /* JNetHackの通常アイテム名表記（エイリアス・表記揺れ）をNetHackJP名に正規化する */
 void
-jnh_normalize_wish(const char *u_str, char *out_buf)
+jnh_normalize_wish(const char *u_str, char *out_buf, size_t outsz)
 {
-    char u_buf[256];
-    char jp_buf[256];
+    char u_buf[256] = {0};
+    char jp_buf[256] = {0};
     char *p;
     int i;
+    int guard;
 
-    if (!u_str || !*u_str || !out_buf)
+    if (!u_str || !*u_str || !out_buf || outsz == 0)
         return;
 
     /* 元の文字列をデフォルトとして出力にコピー */
-    strcpy(out_buf, u_str);
+    strncpy(out_buf, u_str, outsz - 1);
+    out_buf[outsz - 1] = '\0';
 
     /* 比較用に「の」やスペースを除去したバッファを作る */
     strncpy(u_buf, u_str, sizeof(u_buf) - 1);
     u_buf[sizeof(u_buf) - 1] = '\0';
 
     /* 「の」の除去 */
-    while ((p = strstr(u_buf, "の")) != 0) {
+    guard = 0;
+    while (guard++ < 256 && (p = strstr(u_buf, "の")) != 0) {
         memmove(p, p + 3, strlen(p + 3) + 1);
     }
     /* 半角スペースの除去 */
-    while ((p = strchr(u_buf, ' ')) != 0) {
+    guard = 0;
+    while (guard++ < 256 && (p = strchr(u_buf, ' ')) != 0) {
         memmove(p, p + 1, strlen(p + 1) + 1);
     }
     /* 全角スペースの除去 */
-    while ((p = strstr(u_buf, "　")) != 0) {
+    guard = 0;
+    while (guard++ < 256 && (p = strstr(u_buf, "　")) != 0) {
         memmove(p, p + 3, strlen(p + 3) + 1);
     }
 
@@ -1097,13 +1116,16 @@ jnh_normalize_wish(const char *u_str, char *out_buf)
         strncpy(jp_buf, jnh_wish_aliases[i].jnh_name, sizeof(jp_buf) - 1);
         jp_buf[sizeof(jp_buf) - 1] = '\0';
 
-        while ((p = strstr(jp_buf, "の")) != 0) {
+        guard = 0;
+        while (guard++ < 256 && (p = strstr(jp_buf, "の")) != 0) {
             memmove(p, p + 3, strlen(p + 3) + 1);
         }
-        while ((p = strchr(jp_buf, ' ')) != 0) {
+        guard = 0;
+        while (guard++ < 256 && (p = strchr(jp_buf, ' ')) != 0) {
             memmove(p, p + 1, strlen(p + 1) + 1);
         }
-        while ((p = strstr(jp_buf, "　")) != 0) {
+        guard = 0;
+        while (guard++ < 256 && (p = strstr(jp_buf, "　")) != 0) {
             memmove(p, p + 3, strlen(p + 3) + 1);
         }
 
@@ -1117,7 +1139,8 @@ jnh_normalize_wish(const char *u_str, char *out_buf)
 
         if (!strcmpi(u_buf, jp_buf)) {
             /* マッチした場合、対応するNetHackJP標準名を出力に書き込む */
-            strcpy(out_buf, jnh_wish_aliases[i].nhjp_name);
+            strncpy(out_buf, jnh_wish_aliases[i].nhjp_name, outsz - 1);
+            out_buf[outsz - 1] = '\0';
             return;
         }
     }
@@ -1128,7 +1151,7 @@ jnh_normalize_wish(const char *u_str, char *out_buf)
        例えば「灰色ドラゴンの鱗鎧」 -> 「灰色ドラゴン鱗鎧」
     */
     {
-        char dragon_buf[256];
+        char dragon_buf[256] = {0};
         strncpy(dragon_buf, u_str, sizeof(dragon_buf) - 1);
         dragon_buf[sizeof(dragon_buf) - 1] = '\0';
         str_replace(dragon_buf, sizeof(dragon_buf), "ドラゴンの", "ドラゴン");
@@ -1140,7 +1163,8 @@ jnh_normalize_wish(const char *u_str, char *out_buf)
         str_replace(dragon_buf, sizeof(dragon_buf), "黄ドラゴン", "黄色ドラゴン");
 
         if (strcmp(dragon_buf, u_str) != 0) {
-            strcpy(out_buf, dragon_buf);
+            strncpy(out_buf, dragon_buf, outsz - 1);
+            out_buf[outsz - 1] = '\0';
         }
     }
 }
