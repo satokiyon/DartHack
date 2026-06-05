@@ -196,6 +196,7 @@ extern const char *jp_item_name(int otyp);
 extern const char *jp_item_descr(int otyp);
 extern const char *jp_artiname(int artinum);
 extern int jp_artiname_to_num(const char *name);
+extern void jnh_normalize_wish(const char *u_str, char *out_buf);
 
 #define OBJ_NAME(obj) (obj_descr[(obj).oc_name_idx].oc_name)
 #define OBJ_DESCR(obj) (obj_descr[(obj).oc_descr_idx].oc_descr)

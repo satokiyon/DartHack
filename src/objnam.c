@@ -3679,6 +3679,7 @@ rnd_otyp_by_wpnskill(schar skill)
 staticfn boolean
 jp_wish_match(const char *u_str, const char *jp_str)
 {
+    char normalized_u_str[256];
     char u_buf[BUFSZ], jp_buf[BUFSZ];
     char *p;
     int jp_len;
@@ -3690,12 +3691,15 @@ jp_wish_match(const char *u_str, const char *jp_str)
     if (!u_str || !jp_str)
         return FALSE;
 
-    if (!strcmpi(u_str, jp_str)) {
+    /* JNetHackの通常アイテム名などをNetHackJP表記に正規化 */
+    jnh_normalize_wish(u_str, normalized_u_str);
+
+    if (!strcmpi(normalized_u_str, jp_str)) {
         return TRUE;
     }
 
     /* 段階1: 接尾辞を除去せずに「の」やスペースを除去して比較 */
-    Strcpy(u_buf, u_str);
+    Strcpy(u_buf, normalized_u_str);
     Strcpy(jp_buf, jp_str);
 
     /* 「の」の除去 */
