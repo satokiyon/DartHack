@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 5.0	read.c	$NHDT-Date: 1762577372 2025/11/07 20:49:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.323 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2852,7 +2852,7 @@ do_class_genocide(void)
 {
     int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead = 0;
     int ll_done = 0;
-    char buf[BUFSZ], promptbuf[QBUFSZ];
+    char buf[BUFSZ], promptbuf[BUFSZ];
     boolean gameover = FALSE; /* true iff killed self */
 
     buf[0] = '\0'; /* for EDIT_GETLIN */
@@ -2861,23 +2861,20 @@ do_class_genocide(void)
             pline1(thats_enough_tries);
             return;
         }
-        Strcpy(promptbuf, "What class of monsters do you want to genocide?");
+        Strcpy(promptbuf, "どのクラスのモンスターを虐殺しますか？");
         if (j > 0)
             Snprintf(eos(promptbuf), sizeof promptbuf - strlen(promptbuf),
-                     " [enter %s]",
+                     " [%s]",
                      iflags.cmdassist
-                       ? "the symbol or name representing a class, or '?'"
-                       : "'?' to see previous genocides");
+                       ? "記号かクラスを表す名前、または'?'を入力してください"
+                       : "'?'で以前の虐殺を確認できます");
         getlin(promptbuf, buf);
         (void) mungspaces(buf);
         /* avoid 'that does not represent any monster' for empty input */
         if (!*buf) {
             pline("%s.", (j + 1 < 5)
-                         ? "Type letter (or punctuation)"
-                           " or name used for a class of monsters or 'none'"
-                         /* next iteration gives "that's enough tries"
-                            so don't suggest typing anything this time */
-                         : "No class of monsters specified");
+                         ? "モンスターのクラスを表す文字(または記号)か名前、あるいは'none'を入力してください"
+                         : "モンスターのクラスが指定されませんでした");
             continue; /* try again */
         }
         /* choosing "none" preserves genocideless conduct */
@@ -2938,7 +2935,7 @@ do_class_genocide(void)
             if (mons[i].mlet == class) {
                 char nam[BUFSZ];
 
-                Strcpy(nam, makeplural(mons[i].pmnames[NEUTRAL]));
+                Strcpy(nam, jp_pmname(&mons[i], NEUTRAL));
                 /* Although "genus" is Latin for race, the hero benefits
                  * from both race and role; thus genocide affects either.
                  */
@@ -2994,7 +2991,7 @@ do_class_genocide(void)
                     }
                 } else if (svm.mvitals[i].mvflags & G_GENOD) {
                     if (!gameover)
-                        pline("%sはすでに存在しない.", upstart(nam));
+                        pline("%sはすでに存在しない.", nam);
                 } else if (!gameover) {
                     /* suppress feedback about quest beings except
                        for those applicable to our own role */
@@ -3018,7 +3015,7 @@ do_class_genocide(void)
 
                         You("%s%sの絶滅は許されていない。",
                             (uniq && !named) ? "" : "",
-                            (uniq || named) ? mons[i].pmnames[NEUTRAL] : nam);
+                            (uniq || named) ? jp_pmname(&mons[i], NEUTRAL) : nam);
                     }
                 }
             }
@@ -3043,7 +3040,7 @@ do_genocide(
               * 3 = forced genocide of player
               * 5 (4 | 1) = normal genocide from throne */
 {
-    char buf[BUFSZ], realbuf[BUFSZ], promptbuf[QBUFSZ];
+    char buf[BUFSZ], realbuf[BUFSZ], promptbuf[BUFSZ];
     int i, killplayer = 0;
     int mndx;
     struct permonst *ptr;
@@ -3066,22 +3063,20 @@ do_genocide(
                 return;
             }
             Strcpy(promptbuf,
-                   "What type of monster do you want to genocide?");
+                   "どの種類のモンスターを虐殺しますか？");
             if (i > 0)
                 Snprintf(eos(promptbuf), sizeof promptbuf - strlen(promptbuf),
-                         " [enter %s]",
+                         " [%s]",
                          iflags.cmdassist
-                           ? "the name of a type of monster, or '?'"
-                           : "'?' to see previous genocides");
+                           ? "モンスターの種類名、または'?'を入力してください"
+                           : "'?'で以前の虐殺を確認できます");
             getlin(promptbuf, buf);
             (void) mungspaces(buf);
             /* avoid 'such creatures do not exist' for empty input */
             if (!*buf) {
                 pline("%s.", (i + 1 < 5)
-                             ? "Type the name of a type of monster or 'none'"
-                             /* next iteration gives "that's enough tries"
-                                so don't suggest typing anything this time */
-                             : "No type of monster specified");
+                             ? "モンスターの種類名、あるいは'none'を入力してください"
+                             : "モンスターの種類が指定されませんでした");
                 continue; /* try again */
             }
             /* choosing "none" preserves genocideless conduct */
@@ -3161,7 +3156,7 @@ do_genocide(
         }
     } else {
         /* use actual type */
-        Strcpy(buf, realbuf);
+        Strcpy(buf, jp_pmname(ptr, Ugender));
         if ((ptr->geno & G_UNIQ) && ptr != &mons[PM_HIGH_CLERIC])
             which = !type_is_pname(ptr) ? "the " : "";
     }
@@ -3176,8 +3171,7 @@ do_genocide(
 
         /* setting no-corpse affects wishing and random tin generation */
         svm.mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE);
-          pline("%sを虐殺した.",
-              (*which != 'a') ? buf : makeplural(buf));
+          pline("%sを虐殺した.", buf);
 
         if (killplayer) {
             u.uhp = -1;
@@ -3222,8 +3216,7 @@ do_genocide(
             /* accumulated 'cnt' doesn't take groups into account;
                assume bringing in new mon(s) didn't remove any old ones */
             cnt = monster_census(FALSE) - census;
-            pline("%sが送り込まれた.",
-                  (cnt > 1) ? makeplural(buf) : buf);
+            pline("%sが送り込まれた.", buf);
         } else
             pline1(nothing_happens);
     }
