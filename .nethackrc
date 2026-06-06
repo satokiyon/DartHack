@@ -1,0 +1,485 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-27.
+# NetHack 5.0  defaults.nh       $NHDT-Date: 1524689357 2018/04/25 20:49:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.32 $
+# Copyright (c) 2006 by Michael Allison
+# NetHack may be freely redistributed.  See license for details.
+
+# Sample config file for win32 NetHack
+# A '#' at the beginning of a line means the rest of the line is a comment.
+#
+# Some options MUST be set in this file, other options can be toggled while
+# playing.  For a list of options available see the <opthelp.> file.
+#
+# To change the configuration, comment out the unwanted lines, and
+# uncomment the configuration you want.
+#
+# $NHDT-Date: 1524689357 2018/04/25 20:49:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.32 $
+
+# *** OPTIONS ***
+#
+# Use the IBM character set rather than just plain ascii characters
+# for tty window-port.
+OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
+
+
+
+# Here is a suggested symbol set from Michael Feir, 
+# for use by blind NetHack players
+# OPTIONS=symset:NHAccess,roguesymset:NHAccess
+
+# Optional curses port interface
+#OPTIONS=windowtype:curses,align_message:right,align_status:left
+#OPTIONS=symset:Enhanced2,roguesymset:RogueEpyx
+#
+# Keyboard handling
+# Ray Chason's keyboard handling
+# OPTIONS=altkeyhandling:ray
+#
+# NetHack 3.4.0 keyboard handling
+# OPTIONS=altkeyhandling:340
+
+# *** Personal Preferences ***
+# Some options to set personal preferences.  Uncomment and change these to
+# suit your personal preference.  If several people are to use the same
+# configuration, options like these should not be set.
+#
+#OPTIONS=name:Janet,role:Valkyrie,race:Human,gender:female,align:lawful
+#OPTIONS=dogname:Fido,catname:Morris,fruit:guava
+#OPTIONS=horsename:Silver
+
+# Disable autopickup
+OPTIONS=!autopickup
+
+# When autopickup is on, automatically pick up these types of objects
+#OPTIONS=pickup_types:$"=/!?+
+
+#OPTIONS=packorder:")[%?+/=!(*0_`
+#OPTIONS=scores:10 top/2 around/own
+#OPTIONS=nolegacy,noverbose
+#OPTIONS=menustyle:traditional
+#OPTIONS=perm_invent
+
+# Set the default boulder symbol to '0'
+OPTIONS=boulder:0
+
+# Disable the prompt for a tutorial
+#OPTIONS=!tutorial
+
+# Disable game tips
+#OPTIONS=!tips
+
+# Highlight menu lines with different colors. You need to define the colors
+# with MENUCOLOR lines.
+#  Toggle menucolor use on or off
+OPTIONS=menucolors
+# Define color used for a certain menu line. Format is
+#    MENUCOLOR="regular expression"=color
+# or
+#    MENUCOLOR="regular expression"=color&attribute
+#  Show all blessed items in green
+MENUCOLOR=" blessed " = green
+#  Show all holy water in green
+MENUCOLOR=" holy " = green
+#  Show all cursed items in red
+MENUCOLOR=" cursed " = red
+#  Show all unholy water in red
+MENUCOLOR=" unholy " = red
+#  Show all cursed worn items in orange and underlined
+MENUCOLOR=" cursed .* \(being worn\)" = orange&underline
+
+
+
+# General options.  You might also set "silent" so as not to attract
+# the boss's attention.
+#
+# number_pad option can have an optional value of 0 (off), 1 (on), 
+# or 2(on,legacy-mode) which causes 5='g', alt-5='G', alt-0='I'
+OPTIONS=time,showexp,number_pad:0,lit_corridor,mouse_support:1
+
+# Make commands that ask for an inventory item pop up a menu
+OPTIONS=force_invmenu
+
+#
+# If you want to get rid of "use #quit to quit..." use:
+OPTIONS=suppress_alert:3.3.1
+#
+# Note: the rest_on_space in the next line may not be
+#       appropriate for a beginning NetHack player, since
+#       it could result in use of a turn unintentionally.
+#       If you're new to NetHack, leave it commented it out.
+#OPTIONS=rest_on_space
+#
+# Set some options to control graphical window-port (these will
+# be safely and silently ignored by the tty port)
+#
+# Map window settings
+# possible map_mode options include: tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|
+#                                    ascii7x12|ascii8x12|ascii16x12|ascii12x16|
+#                                    ascii10x18|fit_to_screen|ascii_fit_to_screen|
+#                                    tiles_fit_to_screen
+OPTIONS=map_mode:tiles,scroll_margin:10
+
+# Message window settings
+#OPTIONS=font_message:Arial,font_size_message:14,align_message:top
+OPTIONS=font_message:Arial,font_size_message:14
+#OPTIONS=font_message:CascadiaMono,font_size_message:14
+
+# Menu settings
+OPTIONS=font_menu:Arial,font_size_menu:14
+#OPTIONS=font_menu:CascadiaMono,font_size_menu:14
+
+
+# Text settings
+OPTIONS=font_text:Courier New,font_size_text:14
+#OPTIONS=font_text:CascadiaMono,font_size_text:14
+
+# Status window settings
+OPTIONS=font_status:Courier New,font_size_status:14
+#OPTIONS=font_status:CascadiaMono,font_size_status:14
+
+# Other
+#OPTIONS=hilite_pet,!toptenwin
+OPTIONS=splash_screen,player_selection:prompts
+
+# Status/message window colors
+# Possible color options include:
+# six digit hexadecimal RGB color value ("#8F8F8F"), black, red, green, brown,
+# blue, magenta, cyan, gray (or grey), orange, brightgreen, yellow, brightblue,
+# brightmagenta, brightcyan, white, trueblack, purple, silver, maroon, fuchsia,
+# lime, olive, navy, teal, aqua, activeborder, activecaption, appworkspace,
+# background, btnface, btnshadow, btntext, captiontext, graytext, highlight,
+# highlighttext, inactiveborder, inactivecaption, menu, menutext, scrollbar,
+# window, windowframe, windowtext.
+#OPTIONS=windowcolors:status windowtext/window message windowtext/window
+OPTIONS=windowcolors:status white/black message white/black
+
+# *** LOCATIONS ***
+# IMPORTANT: If you change any of these locations, the directories they
+# point at must exist.  NetHack will not create them for you.
+#
+# The location that documentation and helps files are placed
+#HACKDIR=c:\User\USERNAME\NetHack\5.0
+#
+# The location that level files in progress are stored (writeable)
+#LEVELDIR=c:\User\USERNAME\AppData\Local\NetHack\5.0
+#
+# The location where saved games are kept (writeable)
+#SAVEDIR=c:\User\USERNAME\AppData\Local\NetHack\5.0
+#
+# The location that bones files are kept (writeable)
+#BONESDIR=c:\ProgramData\NetHack\5.0
+#
+# The location that score files are kept (writeable)
+#SCOREDIR=c:\ProgramData\NetHack\5.0
+#
+# The location that file synchronization locks are stored (writeable)
+#LOCKDIR=c:\ProgramData\NetHack\5.0
+#
+
+# Finnish keyboards might need these modifications uncommented. 
+# For  \, @, $, [, |
+#OPTIONS=subkeyvalue:171/92
+#OPTIONS=subkeyvalue:178/64
+#OPTIONS=subkeyvalue:180/36
+#OPTIONS=subkeyvalue:184/91
+#OPTIONS=subkeyvalue:188/124
+
+#
+# Some versions of Windows allow you to adjust the win32 console port 
+# colors using R-G-B settings.
+#
+#OPTIONS=palette:black-0-0-0
+#OPTIONS=palette:red-210-0-0
+#OPTIONS=palette:green-80-200-0
+#OPTIONS=palette:brown-180-100-0
+#OPTIONS=palette:blue-0-0-200
+#OPTIONS=palette:magenta-128-0-128
+#OPTIONS=palette:cyan-50-180-180
+#OPTIONS=palette:gray-192-192-192
+#OPTIONS=palette:dark gray-100-100-100
+#OPTIONS=palette:orange-255-128-0
+#OPTIONS=palette:bright green-0-255-0
+#OPTIONS=palette:yellow-255-255-0
+#OPTIONS=palette:bright blue-100-100-240
+#OPTIONS=palette:bright magenta-255-0-255
+#OPTIONS=palette:bright cyan-0-255-255
+#OPTIONS=palette:white-255-255-255
+
+
+
+# Status hilites
+OPTIONS=statushilites
+# HP
+OPTIONS=hitpointbar
+OPTIONS=hilite_status:hitpoints/100%/gray&normal
+OPTIONS=hilite_status:hitpoints/<100%/green&normal
+OPTIONS=hilite_status:hitpoints/<66%/yellow&normal
+OPTIONS=hilite_status:hitpoints/<50%/orange&normal
+OPTIONS=hilite_status:hitpoints/<33%/red&bold
+OPTIONS=hilite_status:hitpoints/<15%/red&inverse
+
+## Pw
+OPTIONS=hilite_status:power/100%/gray&normal
+OPTIONS=hilite_status:power/<100%/green&normal
+OPTIONS=hilite_status:power/<66%/yellow&normal
+OPTIONS=hilite_status:power/<50%/orange&normal
+OPTIONS=hilite_status:power/<33%/red&bold
+
+## Carry
+OPTIONS=hilite_status:cap/burdened/yellow/stressed/orange/strained/red&bold/overtaxed/red&inverse/overloaded/red&inverse&blink
+
+## Hunger
+OPTIONS=hilite_status:hunger/satiated/yellow/hungry/orange/weak/red&bold/fainting/red&inverse/fainted/red&inverse&blink
+
+## Mental
+#OPTIONS=hilite_status:condition/hallu/yellow
+#OPTIONS=hilite_status:condition/conf/orange
+#OPTIONS=hilite_status:condition/stun/red&bold
+
+## Health
+#OPTIONS=hilite_status:condition/termill/red&inverse
+#OPTIONS=hilite_status:condition/foodpois/red&inverse
+#OPTIONS=hilite_status:condition/slime/red&inverse
+
+OPTIONS=hilite_status:condition/major_troubles/red&bold&inverse
+OPTIONS=hilite_status:condition/minor_troubles/yellow&bold&inverse
+OPTIONS=hilite_status:condition/movement/light-blue&bold
+
+# gold
+OPTIONS=hilite_status:gold/up/yellow/down/brown
+
+# St, Dx, Co, In, Wi, Ch
+OPTIONS=hilite_status:characteristics/up/green/down/red
+
+# CRASHREPORTURL must be set in syscf to enable these options.
+# These identify you in crash reports
+#OPTIONS=crash_name:Your Name
+#OPTIONS=crash_email:user@example.com
+
+
+OPTIONS=tile_file:Nevanda_5.0.0_32x32.bmp
+OPTIONS=tile_width:32
+OPTIONS=tile_height:32
+OPTIONS=tiled_map
+
+
+OPTIONS=statuslines:3
+OPTIONS=help
+OPTIONS=autodescribe
+
+OPTIONS=price_quotes
+
+
+### 効果音の設定
+SOUNDDIR=C:\Users\satok\NetHackJP\sounds
+
+# きしみ床板罠の音 
+SOUND=MSG "(ド♪)" "se_squeak_C.wav" 100
+SOUND=MSG "(レ♭♪)" "se_squeak_D_flat.wav" 100
+SOUND=MSG "(レ♪)" "se_squeak_D.wav" 100
+SOUND=MSG "(ミ♭♪)" "se_squeak_E_flat.wav" 100
+SOUND=MSG "(ミ♪)" "se_squeak_E.wav" 100
+SOUND=MSG "(ファ♪)" "se_squeak_F.wav" 100
+SOUND=MSG "(ファ#♪)" "se_squeak_F_sharp.wav" 100
+SOUND=MSG "(ソ♪)" "se_squeak_G.wav" 100
+SOUND=MSG "(ソ#♪)" "se_squeak_G_sharp.wav" 100
+SOUND=MSG "(ラ♪)" "se_squeak_A.wav" 100
+SOUND=MSG "(シ♭♪)" "se_squeak_B_flat.wav" 100
+SOUND=MSG "(シ♪)" "se_squeak_B.wav" 100
+
+# レベルアップ・レベルダウン
+SOUND=MSG "(再び)?レベル [0-9]+ になった！|経験を積んだ気がした\." "sa2_xplevelup.wav" 100
+SOUND=MSG "(さようなら|ごきげんよう|アロハ) level [0-9]+\." "sa2_xpleveldown.wav" 100
+ 
+# ベル
+ SOUND=MSG "(ベル|開門のベル)を鳴らした\." "sound_Bell.wav" 100
+ 
+# 地震の太鼓
+SOUND=MSG "重く雷鳴のような轟きを響かせた!|周囲の.*が揺れている!" "sound_Drum_Of_Earthquake.wav" 100
+ 
+# 火の角笛・氷の角笛
+SOUND=MSG "角笛から炎が噴き出した!" "sound_Fire_Horn.wav" 100
+SOUND=MSG "角笛から冷気が噴き出した!" "sound_Frost_Horn.wav" 100
+ 
+# 革太鼓
+SOUND=MSG "耳をつんざく騒音をたたき出した!|を(叩き損ねた|何とか刻んだ|見事に刻んだ)" "sound_Leather_Drum.wav" 100
+
+
+
+### sepack 効果音セット（sepackフォルダのwavファイルをゲームメッセージに対応させる設定）
+# ---- 04: 選択音（低い音）・05: 選択音（高い音）・06: メッセージ送り・07: エラー音 ----
+# UIイベントはSOUND=MSGで対応できないため設定なし
+
+# ---- 08: 階段を使う音 ----
+SOUND=MSG "階段を(上|下|登|降)った.|はしごを(上|下|登|降)った." "sepack/sepack_08_stairs.wav" 100
+SOUND=MSG "はしごから落ちた.|階段から落ちた." "sepack/sepack_08_stairs.wav" 100
+
+# ---- 09: ドアを開ける音 ----
+SOUND=MSG "扉を蹴ると、(粉々に砕け散|激しく開い)た[!。.]" "sepack/sepack_09_open_door.wav" 100
+SOUND=MSG "扉が破壊された[!！]" "sepack/sepack_09_open_door.wav" 100
+SOUND=MSG "壁に扉が現れた[!！]" "sepack/sepack_09_open_door.wav" 100
+
+# ---- 10: ワープ音1 ----
+SOUND=MSG "謎の力が一瞬あなたを包んだ" "sepack/sepack_10_warp_1.wav" 100
+SOUND=MSG "テレポートし" "sepack/sepack_10_warp_1.wav" 100
+SOUND=MSG "(が|は)消えた[!！]" "sepack/sepack_10_warp_1.wav" 100
+
+# ---- 11: ワープ音2（別の消え方・現れ方） ----
+SOUND=MSG "突然.+が現れた[!！]" "sepack/sepack_11_warp_2.wav" 100
+SOUND=MSG "が現れた[.。]" "sepack/sepack_11_warp_2.wav" 100
+
+# ---- 12: ダメージ床 ----
+SOUND=MSG "地雷が爆発した[!！]" "sepack/sepack_12_damage_floor.wav" 100
+SOUND=MSG "棘だらけの落とし穴" "sepack/sepack_12_damage_floor.wav" 100
+SOUND=MSG "ここの溶岩があなたを焼いた[!！]" "sepack/sepack_12_damage_floor.wav" 100
+SOUND=MSG "落とし穴へ(落ちた|つまずいて落ちた)" "sepack/sepack_12_damage_floor.wav" 100
+
+# ---- 13: 警報 ----
+SOUND=MSG "警報が鳴り響いた[!！]" "sepack/sepack_13_alarm.wav" 100
+
+# ---- 14: 打撃音1（斬りつけるイメージ） ----
+SOUND=MSG "切りつける|斬りつけ" "sepack/sepack_14_slash.wav" 100
+
+# ---- 15: 打撃音2（ダメージを食らうイメージ） ----
+SOUND=MSG "爆発した[!！]" "sepack/sepack_15_damage.wav" 100
+SOUND=MSG "を受けた[!！]|で傷つい" "sepack/sepack_15_damage.wav" 100
+SOUND=MSG "はあなたを噛んだ[!！]|を叩いた[!！]|をかじった[!！]" "sepack/sepack_15_damage.wav" 100
+
+# ---- 16: 打撃音3（叩くイメージ、高めの音） ----
+SOUND=MSG "ビヨンッ[!！]" "sepack/sepack_16_hit_high.wav" 100
+SOUND=MSG "は弾き飛ばされた[!！]" "sepack/sepack_16_hit_high.wav" 100
+
+# ---- 17: 打撃音4（叩くイメージ、低めの音） ----
+SOUND=MSG "ガシャーン[!！]" "sepack/sepack_17_hit_low.wav" 100
+SOUND=MSG "ドスン|ズドン" "sepack/sepack_17_hit_low.wav" 100
+
+# ---- 18: 打撃音5（激しめの音） ----
+SOUND=MSG "ドカーン[!！][!！]" "sepack/sepack_18_hit_hard.wav" 100
+
+# ---- 19: 弓矢を放つ・投げる音 ----
+SOUND=MSG "を投げた[.。]" "sepack/sepack_19_shoot_throw.wav" 100
+SOUND=MSG "素手の.+を投げた" "sepack/sepack_19_shoot_throw.wav" 100
+
+# ---- 20: 放ったものが当たる音 ----
+SOUND=MSG "があなたに命中した[!！]" "sepack/sepack_20_hit_missile.wav" 100
+SOUND=MSG "光線があなたに命中した[!！]" "sepack/sepack_20_hit_missile.wav" 100
+
+# ---- 21: 爆発音1（低い音） ----
+SOUND=MSG "爆発音が聞こえた[.。]" "sepack/sepack_21_explosion_low.wav" 100
+SOUND=MSG "遠くで爆発音が" "sepack/sepack_21_explosion_low.wav" 100
+
+# ---- 22: 爆発音2（高い音） ----
+SOUND=MSG "魔法の爆発に巻き込まれた[!！]" "sepack/sepack_22_explosion_high.wav" 100
+SOUND=MSG "薬瓶が爆発した[!！]" "sepack/sepack_22_explosion_high.wav" 100
+SOUND=MSG "が爆発した[!！]" "sepack/sepack_22_explosion_high.wav" 100
+
+# ---- 23: 逃走 ----
+SOUND=MSG "は(上|下)の階へ逃げた[!！]" "sepack/sepack_23_escape.wav" 100
+SOUND=MSG "は(はしごを|階段を)(上|下)(って|りて)逃げた[!！]" "sepack/sepack_23_escape.wav" 100
+SOUND=MSG "から逃げ出した[!！]" "sepack/sepack_23_escape.wav" 100
+
+# ---- 24: ブレス攻撃1（炎・毒ガス等） ----
+SOUND=MSG "火炎の息|炎の息" "sepack/sepack_24_breath_1.wav" 100
+SOUND=MSG "毒ガスの息|睡眠ガスの息" "sepack/sepack_24_breath_1.wav" 100
+SOUND=MSG "角笛から炎が噴き出した[!！]" "sepack/sepack_24_breath_1.wav" 100
+
+# ---- 25: ブレス攻撃2（氷・電撃・分解等） ----
+SOUND=MSG "氷結の息|冷気の息" "sepack/sepack_25_breath_2.wav" 100
+SOUND=MSG "電撃の息|分解の息|酸の息" "sepack/sepack_25_breath_2.wav" 100
+SOUND=MSG "角笛から冷気が噴き出した[!！]" "sepack/sepack_25_breath_2.wav" 100
+
+# ---- 26: 電撃 ----
+SOUND=MSG "電撃を受けた[!！]|感電した" "sepack/sepack_26_lightning.wav" 100
+SOUND=MSG "電撃でしびれた[!！]" "sepack/sepack_26_lightning.wav" 100
+SOUND=MSG "稲妻が上空から" "sepack/sepack_26_lightning.wav" 100
+SOUND=MSG "あなたの体に.+電撃が走った[!！]" "sepack/sepack_26_lightning.wav" 100
+
+# ---- 27: 氷・冷気 ----
+SOUND=MSG "凍りついた[!！]" "sepack/sepack_27_ice.wav" 100
+SOUND=MSG "その場で凍りついた[!！]" "sepack/sepack_27_ice.wav" 100
+SOUND=MSG "から凍りつく霧が立ちのぼり" "sepack/sepack_27_ice.wav" 100
+
+# ---- 28: 呪文詠唱 ----
+SOUND=MSG "は呪文を唱えた[!！]" "sepack/sepack_28_cast_spell.wav" 100
+SOUND=MSG "に呼びかけ、神秘的な呪文を唱えた" "sepack/sepack_28_cast_spell.wav" 100
+SOUND=MSG "巻物の呪文を唱えた" "sepack/sepack_28_cast_spell.wav" 100
+
+# ---- 29: ターゲッティング ----
+SOUND=MSG "をターゲットにし|を狙っ" "sepack/sepack_29_target.wav" 100
+SOUND=MSG "あなたを狙った.*光線が" "sepack/sepack_29_target.wav" 100
+SOUND=MSG "魔法の杖の光線があなたに命中した[!！]" "sepack/sepack_29_target.wav" 100
+
+# ---- 30: 呪文・魔法汎用1 ----
+SOUND=MSG "まばゆい閃光で目がくらんだ[!！]" "sepack/sepack_30_magic_1.wav" 100
+SOUND=MSG "魔法の矢|冷気の光線|睡眠光線" "sepack/sepack_30_magic_1.wav" 100
+SOUND=MSG "壁が光ってから消えた[.。]|岩が光ってから消えた[.。]" "sepack/sepack_30_magic_1.wav" 100
+
+# ---- 31: 呪文・魔法汎用2 ----
+SOUND=MSG "は透明になった[!！]" "sepack/sepack_31_magic_2.wav" 100
+SOUND=MSG "は突然弱くなった気がした[!！]" "sepack/sepack_31_magic_2.wav" 100
+SOUND=MSG "は身震いした[!！]" "sepack/sepack_31_magic_2.wav" 100
+
+# ---- 32: 回復1（小） ----
+SOUND=MSG "気分が(良くなった|かなり良くなった)[.。]" "sepack/sepack_32_heal_small.wav" 100
+SOUND=MSG "回復した気がした[.。]" "sepack/sepack_32_heal_small.wav" 100
+SOUND=MSG "は少し回復したようだった[.。]" "sepack/sepack_32_heal_small.wav" 100
+
+# ---- 33: 回復2（大） ----
+SOUND=MSG "体力が完全に回復した[!！]" "sepack/sepack_33_heal_large.wav" 100
+SOUND=MSG "はかなり回復したようだ[.！]" "sepack/sepack_33_heal_large.wav" 100
+SOUND=MSG "は完全に回復したようだった[.。]" "sepack/sepack_33_heal_large.wav" 100
+
+
+### 以下、ゲーム内で演奏時に自動的に再生されるため設定不要。wavファイルの楽器対応メモとして記載
+# 木製フルート
+# SOUND=MSG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_A.wav" 100
+# SOUND=MSG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_B.wav" 100
+# SOUND=MSG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_C.wav" 100
+# SOUND=MSG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_D.wav" 100
+# SOUND=MSG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_E.wav" 100
+# SOUND=MSG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_F.wav" 100
+# SOUND=MSG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_G.wav" 100
+ 
+# 魔法のフルート
+# SOUND=MSG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_A.wav" 100
+# SOUND=MSG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_B.wav" 100
+# SOUND=MSG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_C.wav" 100
+# SOUND=MSG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_D.wav" 100
+# SOUND=MSG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_E.wav" 100
+# SOUND=MSG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_F.wav" 100
+# SOUND=MSG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_G.wav" 100
+ 
+# 木製ハープ
+# SOUND=MSG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_A.wav" 100
+# SOUND=MSG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_B.wav" 100
+# SOUND=MSG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_C.wav" 100
+# SOUND=MSG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_D.wav" 100
+# SOUND=MSG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_E.wav" 100
+# SOUND=MSG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_F.wav" 100
+# SOUND=MSG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_G.wav" 100
+ 
+# 魔法のハープ
+# SOUND=MSG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_A.wav" 100
+# SOUND=MSG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_B.wav" 100
+# SOUND=MSG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_C.wav" 100
+# SOUND=MSG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_D.wav" 100
+# SOUND=MSG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_E.wav" 100
+# SOUND=MSG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_F.wav" 100
+# SOUND=MSG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_G.wav" 100
+ 
+# 角笛
+# SOUND=MSG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_A.wav" 100
+# SOUND=MSG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_B.wav" 100
+# SOUND=MSG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_C.wav" 100
+# SOUND=MSG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_D.wav" 100
+# SOUND=MSG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_E.wav" 100
+# SOUND=MSG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_F.wav" 100
+# SOUND=MSG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_G.wav" 100
+ 
+# ラッパ
+# SOUND=MSG "ラッパから大きな音を引き出した" "sound_Bugle_A.wav" 100
+# SOUND=MSG "ラッパから大きな音を引き出した" "sound_Bugle_B.wav" 100
+# SOUND=MSG "ラッパから大きな音を引き出した" "sound_Bugle_C.wav" 100
+# SOUND=MSG "ラッパから大きな音を引き出した" "sound_Bugle_D.wav" 100
+# SOUND=MSG "ラッパから大きな音を引き出した" "sound_Bugle_E.wav" 100
+# SOUND=MSG "ラッパから大きな音を引き出した" "sound_Bugle_F.wav" 100
+# SOUND=MSG "ラッパから大きな音を引き出した" "sound_Bugle_G.wav" 100
