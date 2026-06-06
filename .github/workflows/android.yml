@@ -21,9 +21,9 @@ jobs:
           cmdline-tools-version: 9123335
           packages: 'platforms;android-30 ndk;21.4.7075529'
       - name: Configure path to NDK
-        run: sed -i -e 's,NDK = .*,NDK = /usr/local/lib/android/sdk/ndk/21.4.7075529,g' sys/android/Makefile.src
+        run: sed -i -e 's,NDK = .*,NDK = /usr/local/lib/android/sdk/ndk/21.4.7075529,g' sys/android/Makefile.src sys/android/Makefile.top
       - name: Build native Android application
-        run: cd sys/android && sh ./setup.sh && cd ../.. &&  make install
+        run: cd sys/android && sh ./setup.sh && cd ../.. && make fetch-lua && make install
       - name: Build NetHack
         run: cd sys/android && sh gradlew build
       - uses: actions/upload-artifact@v5
