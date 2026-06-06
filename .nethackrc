@@ -273,213 +273,439 @@ OPTIONS=price_quotes
 SOUNDDIR=C:\Users\satok\NetHackJP\sounds
 
 # きしみ床板罠の音 
-SOUND=MSG "(ド♪)" "se_squeak_C.wav" 100
-SOUND=MSG "(レ♭♪)" "se_squeak_D_flat.wav" 100
-SOUND=MSG "(レ♪)" "se_squeak_D.wav" 100
-SOUND=MSG "(ミ♭♪)" "se_squeak_E_flat.wav" 100
-SOUND=MSG "(ミ♪)" "se_squeak_E.wav" 100
-SOUND=MSG "(ファ♪)" "se_squeak_F.wav" 100
-SOUND=MSG "(ファ#♪)" "se_squeak_F_sharp.wav" 100
-SOUND=MSG "(ソ♪)" "se_squeak_G.wav" 100
-SOUND=MSG "(ソ#♪)" "se_squeak_G_sharp.wav" 100
-SOUND=MSG "(ラ♪)" "se_squeak_A.wav" 100
-SOUND=MSG "(シ♭♪)" "se_squeak_B_flat.wav" 100
-SOUND=MSG "(シ♪)" "se_squeak_B.wav" 100
+SOUND=MESG "(ド♪)" "se_squeak_C.wav" 100
+SOUND=MESG "(レ♭♪)" "se_squeak_D_flat.wav" 100
+SOUND=MESG "(レ♪)" "se_squeak_D.wav" 100
+SOUND=MESG "(ミ♭♪)" "se_squeak_E_flat.wav" 100
+SOUND=MESG "(ミ♪)" "se_squeak_E.wav" 100
+SOUND=MESG "(ファ♪)" "se_squeak_F.wav" 100
+SOUND=MESG "(ファ#♪)" "se_squeak_F_sharp.wav" 100
+SOUND=MESG "(ソ♪)" "se_squeak_G.wav" 100
+SOUND=MESG "(ソ#♪)" "se_squeak_G_sharp.wav" 100
+SOUND=MESG "(ラ♪)" "se_squeak_A.wav" 100
+SOUND=MESG "(シ♭♪)" "se_squeak_B_flat.wav" 100
+SOUND=MESG "(シ♪)" "se_squeak_B.wav" 100
 
 # レベルアップ・レベルダウン
-SOUND=MSG "(再び)?レベル [0-9]+ になった！|経験を積んだ気がした\." "sa2_xplevelup.wav" 100
-SOUND=MSG "(さようなら|ごきげんよう|アロハ) level [0-9]+\." "sa2_xpleveldown.wav" 100
+SOUND=MESG "(再び)?レベル [0-9]+ になった！|経験を積んだ気がした\." "sa2_xplevelup.wav" 100
+SOUND=MESG "(さようなら|ごきげんよう|アロハ) level [0-9]+\." "sa2_xpleveldown.wav" 100
  
 # ベル
- SOUND=MSG "(ベル|開門のベル)を鳴らした\." "sound_Bell.wav" 100
+ SOUND=MESG "(ベル|開門のベル)を鳴らした\." "sound_Bell.wav" 100
  
 # 地震の太鼓
-SOUND=MSG "重く雷鳴のような轟きを響かせた!|周囲の.*が揺れている!" "sound_Drum_Of_Earthquake.wav" 100
+SOUND=MESG "重く雷鳴のような轟きを響かせた!|周囲の.*が揺れている!" "sound_Drum_Of_Earthquake.wav" 100
  
 # 火の角笛・氷の角笛
-SOUND=MSG "角笛から炎が噴き出した!" "sound_Fire_Horn.wav" 100
-SOUND=MSG "角笛から冷気が噴き出した!" "sound_Frost_Horn.wav" 100
+SOUND=MESG "角笛から炎が噴き出した!" "sound_Fire_Horn.wav" 100
+SOUND=MESG "角笛から冷気が噴き出した!" "sound_Frost_Horn.wav" 100
  
 # 革太鼓
-SOUND=MSG "耳をつんざく騒音をたたき出した!|を(叩き損ねた|何とか刻んだ|見事に刻んだ)" "sound_Leather_Drum.wav" 100
+SOUND=MESG "耳をつんざく騒音をたたき出した!|を(叩き損ねた|何とか刻んだ|見事に刻んだ)" "sound_Leather_Drum.wav" 100
 
 
 
 ### sepack 効果音セット（sepackフォルダのwavファイルをゲームメッセージに対応させる設定）
 # ---- 04: 選択音（低い音）・05: 選択音（高い音）・06: メッセージ送り・07: エラー音 ----
-# UIイベントはSOUND=MSGで対応できないため設定なし
+# UIイベントはSOUND=MESGで対応できないため設定なし
 
-# ---- 08: 階段を使う音 ----
-SOUND=MSG "階段を(上|下|登|降)った.|はしごを(上|下|登|降)った." "sepack/sepack_08_stairs.wav" 100
-SOUND=MSG "はしごから落ちた.|階段から落ちた." "sepack/sepack_08_stairs.wav" 100
+# ---- 08: 階段を使う音（下り・落下） → snes_rpg側が上り担当 ----
+SOUND=MESG "階段を降りた.|はしごを降りた." "sepack/sepack_08_stairs.wav" 100
+SOUND=MESG "はしごから落ちた.|階段から落ちた." "sepack/sepack_08_stairs.wav" 100
 
-# ---- 09: ドアを開ける音 ----
-SOUND=MSG "扉を蹴ると、(粉々に砕け散|激しく開い)た[!。.]" "sepack/sepack_09_open_door.wav" 100
-SOUND=MSG "扉が破壊された[!！]" "sepack/sepack_09_open_door.wav" 100
-SOUND=MSG "壁に扉が現れた[!！]" "sepack/sepack_09_open_door.wav" 100
+# ---- 09: ドアを開ける音（蹴って開いた・破壊系） → 蹴った音はsnes_rpg側 ※wavファイルが無音なのでコメントアウト---- 
+# SOUND=MESG "扉を蹴ると、激しく開いた[!。.]" "sepack/sepack_09_open_door.wav" 100
+# SOUND=MESG "扉が破壊された[!！]" "sepack/sepack_09_open_door.wav" 100
+# SOUND=MESG "壁に扉が現れた[!！]" "sepack/sepack_09_open_door.wav" 100
 
-# ---- 10: ワープ音1 ----
-SOUND=MSG "謎の力が一瞬あなたを包んだ" "sepack/sepack_10_warp_1.wav" 100
-SOUND=MSG "テレポートし" "sepack/sepack_10_warp_1.wav" 100
-SOUND=MSG "(が|は)消えた[!！]" "sepack/sepack_10_warp_1.wav" 100
+# ---- 10: ワープ音1（謎の力・消える） → テレポート詠唱はsnes_rpg側 ----
+SOUND=MESG "謎の力が一瞬あなたを包んだ" "sepack/sepack_10_warp_1.wav" 100
+SOUND=MESG "(が|は)消えた[!！]" "sepack/sepack_10_warp_1.wav" 100
 
 # ---- 11: ワープ音2（別の消え方・現れ方） ----
-SOUND=MSG "突然.+が現れた[!！]" "sepack/sepack_11_warp_2.wav" 100
-SOUND=MSG "が現れた[.。]" "sepack/sepack_11_warp_2.wav" 100
+SOUND=MESG "突然.+が現れた[!！]" "sepack/sepack_11_warp_2.wav" 100
+SOUND=MESG "が現れた[.。]" "sepack/sepack_11_warp_2.wav" 100
 
 # ---- 12: ダメージ床 ----
-SOUND=MSG "地雷が爆発した[!！]" "sepack/sepack_12_damage_floor.wav" 100
-SOUND=MSG "棘だらけの落とし穴" "sepack/sepack_12_damage_floor.wav" 100
-SOUND=MSG "ここの溶岩があなたを焼いた[!！]" "sepack/sepack_12_damage_floor.wav" 100
-SOUND=MSG "落とし穴へ(落ちた|つまずいて落ちた)" "sepack/sepack_12_damage_floor.wav" 100
+SOUND=MESG "地雷が爆発した[!！]" "sepack/sepack_12_damage_floor.wav" 100
+SOUND=MESG "棘だらけの落とし穴" "sepack/sepack_12_damage_floor.wav" 100
+SOUND=MESG "ここの溶岩があなたを焼いた[!！]" "sepack/sepack_12_damage_floor.wav" 100
+SOUND=MESG "落とし穴へ(落ちた|つまずいて落ちた)" "sepack/sepack_12_damage_floor.wav" 100
 
 # ---- 13: 警報 ----
-SOUND=MSG "警報が鳴り響いた[!！]" "sepack/sepack_13_alarm.wav" 100
+SOUND=MESG "警報が鳴り響いた[!！]" "sepack/sepack_13_alarm.wav" 100
 
-# ---- 14: 打撃音1（斬りつけるイメージ） ----
-SOUND=MSG "切りつける|斬りつけ" "sepack/sepack_14_slash.wav" 100
+# ---- 14: 打撃音1（斬りつける・武器系） → 素手・鈍器はsnes_rpg側 ----
+SOUND=MESG "切りつける|斬りつけ" "sepack/sepack_14_slash.wav" 100
+SOUND=MESG "を叩き切った[!！]|を切った[!！]" "sepack/sepack_14_slash.wav" 100
+SOUND=MESG "あなたは.+を攻撃した" "sepack/sepack_14_slash.wav" 100
 
-# ---- 15: 打撃音2（ダメージを食らうイメージ） ----
-SOUND=MSG "爆発した[!！]" "sepack/sepack_15_damage.wav" 100
-SOUND=MSG "を受けた[!！]|で傷つい" "sepack/sepack_15_damage.wav" 100
-SOUND=MSG "はあなたを噛んだ[!！]|を叩いた[!！]|をかじった[!！]" "sepack/sepack_15_damage.wav" 100
+# ---- 15: 打撃音2（噛まれる・かじられる） → 汎用ダメージはsnes_rpg側 ----
+SOUND=MESG "はあなたを噛んだ[!！]|をかじった[!！]" "sepack/sepack_15_damage.wav" 100
+SOUND=MESG "かみついた" "sepack/sepack_15_damage.wav" 100
 
 # ---- 16: 打撃音3（叩くイメージ、高めの音） ----
-SOUND=MSG "ビヨンッ[!！]" "sepack/sepack_16_hit_high.wav" 100
-SOUND=MSG "は弾き飛ばされた[!！]" "sepack/sepack_16_hit_high.wav" 100
+SOUND=MESG "ビヨンッ[!！]" "sepack/sepack_16_hit_high.wav" 100
+SOUND=MESG "は弾き飛ばされた[!！]" "sepack/sepack_16_hit_high.wav" 100
 
 # ---- 17: 打撃音4（叩くイメージ、低めの音） ----
-SOUND=MSG "ガシャーン[!！]" "sepack/sepack_17_hit_low.wav" 100
-SOUND=MSG "ドスン|ズドン" "sepack/sepack_17_hit_low.wav" 100
+SOUND=MESG "ガシャーン[!！]" "sepack/sepack_17_hit_low.wav" 100
+SOUND=MESG "ドスン|ズドン" "sepack/sepack_17_hit_low.wav" 100
 
 # ---- 18: 打撃音5（激しめの音） ----
-SOUND=MSG "ドカーン[!！][!！]" "sepack/sepack_18_hit_hard.wav" 100
+SOUND=MESG "ドカーン[!！][!！]" "sepack/sepack_18_hit_hard.wav" 100
 
-# ---- 19: 弓矢を放つ・投げる音 ----
-SOUND=MSG "を投げた[.。]" "sepack/sepack_19_shoot_throw.wav" 100
-SOUND=MSG "素手の.+を投げた" "sepack/sepack_19_shoot_throw.wav" 100
+# ---- 19: 弓矢を放つ・投げる音（投擲） → 矢を放つ系はsnes_rpg側 ----
+SOUND=MESG "を投げた[.。]" "sepack/sepack_19_shoot_throw.wav" 100
+SOUND=MESG "素手の.+を投げた" "sepack/sepack_19_shoot_throw.wav" 100
 
 # ---- 20: 放ったものが当たる音 ----
-SOUND=MSG "があなたに命中した[!！]" "sepack/sepack_20_hit_missile.wav" 100
-SOUND=MSG "光線があなたに命中した[!！]" "sepack/sepack_20_hit_missile.wav" 100
+SOUND=MESG "があなたに命中した[!！]" "sepack/sepack_20_hit_missile.wav" 100
+SOUND=MESG "光線があなたに命中した[!！]" "sepack/sepack_20_hit_missile.wav" 100
 
 # ---- 21: 爆発音1（低い音） ----
-SOUND=MSG "爆発音が聞こえた[.。]" "sepack/sepack_21_explosion_low.wav" 100
-SOUND=MSG "遠くで爆発音が" "sepack/sepack_21_explosion_low.wav" 100
+SOUND=MESG "爆発音が聞こえた[.。]" "sepack/sepack_21_explosion_low.wav" 100
+SOUND=MESG "遠くで爆発音が" "sepack/sepack_21_explosion_low.wav" 100
 
 # ---- 22: 爆発音2（高い音） ----
-SOUND=MSG "魔法の爆発に巻き込まれた[!！]" "sepack/sepack_22_explosion_high.wav" 100
-SOUND=MSG "薬瓶が爆発した[!！]" "sepack/sepack_22_explosion_high.wav" 100
-SOUND=MSG "が爆発した[!！]" "sepack/sepack_22_explosion_high.wav" 100
+SOUND=MESG "魔法の爆発に巻き込まれた[!！]" "sepack/sepack_22_explosion_high.wav" 100
+SOUND=MESG "薬瓶が爆発した[!！]" "sepack/sepack_22_explosion_high.wav" 100
+SOUND=MESG "が爆発した[!！]" "sepack/sepack_22_explosion_high.wav" 100
 
-# ---- 23: 逃走 ----
-SOUND=MSG "は(上|下)の階へ逃げた[!！]" "sepack/sepack_23_escape.wav" 100
-SOUND=MSG "は(はしごを|階段を)(上|下)(って|りて)逃げた[!！]" "sepack/sepack_23_escape.wav" 100
-SOUND=MSG "から逃げ出した[!！]" "sepack/sepack_23_escape.wav" 100
+# ---- 23: 逃走（階段・はしごで逃げる） → 汎用モンスター逃走はsnes_rpg側 ----
+SOUND=MESG "は(上|下)の階へ逃げた[!！]" "sepack/sepack_23_escape.wav" 100
+SOUND=MESG "は(はしごを|階段を)(上|下)(って|りて)逃げた[!！]" "sepack/sepack_23_escape.wav" 100
+SOUND=MESG "から逃げ出した[!！]" "sepack/sepack_23_escape.wav" 100
 
-# ---- 24: ブレス攻撃1（炎・毒ガス等） ----
-SOUND=MSG "火炎の息|炎の息" "sepack/sepack_24_breath_1.wav" 100
-SOUND=MSG "毒ガスの息|睡眠ガスの息" "sepack/sepack_24_breath_1.wav" 100
-SOUND=MSG "角笛から炎が噴き出した[!！]" "sepack/sepack_24_breath_1.wav" 100
+# ---- 24: ブレス攻撃1（角笛の炎・毒ガス息） → 炎息ブレスはsnes_rpg側 ----
+SOUND=MESG "毒ガスの息|睡眠ガスの息" "sepack/sepack_24_breath_1.wav" 100
+SOUND=MESG "角笛から炎が噴き出した[!！]" "sepack/sepack_24_breath_1.wav" 100
 
 # ---- 25: ブレス攻撃2（氷・電撃・分解等） ----
-SOUND=MSG "氷結の息|冷気の息" "sepack/sepack_25_breath_2.wav" 100
-SOUND=MSG "電撃の息|分解の息|酸の息" "sepack/sepack_25_breath_2.wav" 100
-SOUND=MSG "角笛から冷気が噴き出した[!！]" "sepack/sepack_25_breath_2.wav" 100
+SOUND=MESG "氷結の息|冷気の息" "sepack/sepack_25_breath_2.wav" 100
+SOUND=MESG "電撃の息|分解の息|酸の息" "sepack/sepack_25_breath_2.wav" 100
+SOUND=MESG "角笛から冷気が噴き出した[!！]" "sepack/sepack_25_breath_2.wav" 100
 
-# ---- 26: 電撃 ----
-SOUND=MSG "電撃を受けた[!！]|感電した" "sepack/sepack_26_lightning.wav" 100
-SOUND=MSG "電撃でしびれた[!！]" "sepack/sepack_26_lightning.wav" 100
-SOUND=MSG "稲妻が上空から" "sepack/sepack_26_lightning.wav" 100
-SOUND=MSG "あなたの体に.+電撃が走った[!！]" "sepack/sepack_26_lightning.wav" 100
+# ---- 26: 電撃（稲妻・体に走った感電） → 電撃を受けた系はsnes_rpg側 ----
+SOUND=MESG "電撃でしびれた[!！]" "sepack/sepack_26_lightning.wav" 100
+SOUND=MESG "稲妻が上空から" "sepack/sepack_26_lightning.wav" 100
+SOUND=MESG "あなたの体に.+電撃が走った[!！]" "sepack/sepack_26_lightning.wav" 100
 
-# ---- 27: 氷・冷気 ----
-SOUND=MSG "凍りついた[!！]" "sepack/sepack_27_ice.wav" 100
-SOUND=MSG "その場で凍りついた[!！]" "sepack/sepack_27_ice.wav" 100
-SOUND=MSG "から凍りつく霧が立ちのぼり" "sepack/sepack_27_ice.wav" 100
+# ---- 27: 氷・冷気（凍りつく状態・霧） → 氷魔法発動はsnes_rpg側 ----
+SOUND=MESG "凍りついた[!！]" "sepack/sepack_27_ice.wav" 100
+SOUND=MESG "その場で凍りついた[!！]" "sepack/sepack_27_ice.wav" 100
+SOUND=MESG "から凍りつく霧が立ちのぼり" "sepack/sepack_27_ice.wav" 100
 
 # ---- 28: 呪文詠唱 ----
-SOUND=MSG "は呪文を唱えた[!！]" "sepack/sepack_28_cast_spell.wav" 100
-SOUND=MSG "に呼びかけ、神秘的な呪文を唱えた" "sepack/sepack_28_cast_spell.wav" 100
-SOUND=MSG "巻物の呪文を唱えた" "sepack/sepack_28_cast_spell.wav" 100
+SOUND=MESG "は呪文を唱えた[!！]" "sepack/sepack_28_cast_spell.wav" 100
+SOUND=MESG "に呼びかけ、神秘的な呪文を唱えた" "sepack/sepack_28_cast_spell.wav" 100
+SOUND=MESG "巻物の呪文を唱えた" "sepack/sepack_28_cast_spell.wav" 100
 
 # ---- 29: ターゲッティング ----
-SOUND=MSG "をターゲットにし|を狙っ" "sepack/sepack_29_target.wav" 100
-SOUND=MSG "あなたを狙った.*光線が" "sepack/sepack_29_target.wav" 100
-SOUND=MSG "魔法の杖の光線があなたに命中した[!！]" "sepack/sepack_29_target.wav" 100
+SOUND=MESG "をターゲットにし|を狙っ" "sepack/sepack_29_target.wav" 100
+SOUND=MESG "あなたを狙った.*光線が" "sepack/sepack_29_target.wav" 100
+SOUND=MESG "魔法の杖の光線があなたに命中した[!！]" "sepack/sepack_29_target.wav" 100
 
 # ---- 30: 呪文・魔法汎用1 ----
-SOUND=MSG "まばゆい閃光で目がくらんだ[!！]" "sepack/sepack_30_magic_1.wav" 100
-SOUND=MSG "魔法の矢|冷気の光線|睡眠光線" "sepack/sepack_30_magic_1.wav" 100
-SOUND=MSG "壁が光ってから消えた[.。]|岩が光ってから消えた[.。]" "sepack/sepack_30_magic_1.wav" 100
+SOUND=MESG "まばゆい閃光で目がくらんだ[!！]" "sepack/sepack_30_magic_1.wav" 100
+SOUND=MESG "魔法の矢|冷気の光線|睡眠光線" "sepack/sepack_30_magic_1.wav" 100
+SOUND=MESG "壁が光ってから消えた[.。]|岩が光ってから消えた[.。]" "sepack/sepack_30_magic_1.wav" 100
 
 # ---- 31: 呪文・魔法汎用2 ----
-SOUND=MSG "は透明になった[!！]" "sepack/sepack_31_magic_2.wav" 100
-SOUND=MSG "は突然弱くなった気がした[!！]" "sepack/sepack_31_magic_2.wav" 100
-SOUND=MSG "は身震いした[!！]" "sepack/sepack_31_magic_2.wav" 100
+SOUND=MESG "は透明になった[!！]" "sepack/sepack_31_magic_2.wav" 100
+SOUND=MESG "は突然弱くなった気がした[!！]" "sepack/sepack_31_magic_2.wav" 100
+SOUND=MESG "は身震いした[!！]" "sepack/sepack_31_magic_2.wav" 100
 
-# ---- 32: 回復1（小） ----
-SOUND=MSG "気分が(良くなった|かなり良くなった)[.。]" "sepack/sepack_32_heal_small.wav" 100
-SOUND=MSG "回復した気がした[.。]" "sepack/sepack_32_heal_small.wav" 100
-SOUND=MSG "は少し回復したようだった[.。]" "sepack/sepack_32_heal_small.wav" 100
+# ---- 32: 回復1（小・薬ポーション・気分が良くなった） → 魔法回復はsnes_rpg側 ----
+SOUND=MESG "気分が(良くなった|かなり良くなった)[.。]" "sepack/sepack_32_heal_small.wav" 100
+SOUND=MESG "は少し回復したようだった[.。]" "sepack/sepack_32_heal_small.wav" 100
 
-# ---- 33: 回復2（大） ----
-SOUND=MSG "体力が完全に回復した[!！]" "sepack/sepack_33_heal_large.wav" 100
-SOUND=MSG "はかなり回復したようだ[.！]" "sepack/sepack_33_heal_large.wav" 100
-SOUND=MSG "は完全に回復したようだった[.。]" "sepack/sepack_33_heal_large.wav" 100
+# ---- 33: 回復2（大・完全回復） → かなり回復はsnes_rpg側 ----
+SOUND=MESG "体力が完全に回復した[!！]" "sepack/sepack_33_heal_large.wav" 100
+SOUND=MESG "は完全に回復したようだった[.。]" "sepack/sepack_33_heal_large.wav" 100
+
+
+### snes_rpg 効果音セット（OtoLogic素材 - snes_rpgフォルダのwavファイル設定）
+# ファイル名表記: snes_rpg/SNES-RPGxx-xx(説明).wav
+
+# ---- Open_Chest: 箱・宝箱を開ける ----
+SOUND=MESG "(箱|宝箱|木箱)を開けた[.。]" "snes_rpg/SNES-RPG01-01(Open_Chest).wav" 100
+SOUND=MESG "(大きな箱|袋)を開けた[.。]" "snes_rpg/SNES-RPG03-4(Open_the_Chest).wav" 100
+
+# ---- Kick: 蹴る（蹴って砕ける系） ----
+SOUND=MESG "扉を蹴ると、粉々に砕け散った[!。.]" "snes_rpg/SNES-RPG01-02(Kick).wav" 100
+SOUND=MESG "蹴った[.。]" "snes_rpg/SNES-RPG01-02(Kick).wav" 100
+
+
+# ---- Doon: 鈍打・ぶつかる ----
+SOUND=MESG "いたっ! 扉に衝突した[.。]" "snes_rpg/SNES-RPG01-03(Doon).wav" 100
+SOUND=MESG "に頭突きをくらわせた[.！]" "snes_rpg/SNES-RPG01-03(Doon).wav" 100
+
+# ---- Hit_the_Wall: 壁にぶつかる・壁を叩く ----
+SOUND=MESG "壁にぶつかった[.！]|壁を叩いた[.！]" "snes_rpg/SNES-RPG01-04(Hit_the_Wall).wav" 100
+SOUND=MESG "そこは固い壁だ[.。]" "snes_rpg/SNES-RPG01-04(Hit_the_Wall).wav" 100
+
+# ---- Up_Stairs: 上り階段 ----
+SOUND=MESG "階段を(上った|登った)[.。]" "snes_rpg/SNES-RPG01-05(Up_Stairs).wav" 100
+SOUND=MESG "はしごを(上った|登った)[.。]" "snes_rpg/SNES-RPG01-05(Up_Stairs).wav" 100
+
+# ---- Down_Stairs: 下り階段（降りた） ----
+SOUND=MESG "階段を(降りた|下りた)[.。]" "snes_rpg/SNES-RPG01-06(Down_Stairs).wav" 100
+SOUND=MESG "はしごを(降りた|下りた)[.。]" "snes_rpg/SNES-RPG01-06(Down_Stairs).wav" 100
+
+# ---- Attack-Sword(02-01): 剣・斬撃系攻撃 ----
+SOUND=MESG "を斬りつけた[!！]|に斬りかかった[!！]" "snes_rpg/SNES-RPG02-01(Attack-Sword).wav" 100
+SOUND=MESG "で切りつけた[!！]" "snes_rpg/SNES-RPG02-01(Attack-Sword).wav" 100
+
+
+# ---- Attack-Boomerang: 投げて戻ってくる系 ----
+SOUND=MESG "ブーメラン" "snes_rpg/SNES-RPG02-02(Attack-Boomerang).wav" 100
+
+# ---- Attack-Whip: ムチ攻撃 ----
+SOUND=MESG "ムチ|whip" "snes_rpg/SNES-RPG02-03(Attack-Whip).wav" 100
+SOUND=MESG "を鞭打った[!！]" "snes_rpg/SNES-RPG02-03(Attack-Whip).wav" 100
+
+# ---- Attack-Punch: 素手・殴打 ----
+SOUND=MESG "素手で(殴|叩|攻撃)" "snes_rpg/SNES-RPG02-04(Attack-Punch).wav" 100
+SOUND=MESG "を殴った[!！]|に頭突き[!！]" "snes_rpg/SNES-RPG02-04(Attack-Punch).wav" 100
+
+# ---- Damage_normal: 通常ダメージを受けた ----
+SOUND=MESG "を受けた[!！]|で傷つい" "snes_rpg/SNES-RPG02-05(Damage_normal).wav" 100
+
+# ---- Damage_heavy: 重ダメージ・大きなダメージ ----
+SOUND=MESG "爆発した[!！]" "snes_rpg/SNES-RPG02-06(Damage_heavy).wav" 100
+SOUND=MESG "ドカーン!!!" "snes_rpg/SNES-RPG02-06(Damage_heavy).wav" 100
+
+# ---- Enemy_attach_me: 敵が攻撃してくる ----
+SOUND=MESG "があなたに飛びかかった[!！]" "snes_rpg/SNES-RPG02-07(Enemy_attach_me).wav" 100
+SOUND=MESG "があなたを(攻撃|蹴|引っかか|ひっかか)" "snes_rpg/SNES-RPG02-07(Enemy_attach_me).wav" 100
+
+# ---- Damage_from_enemy: 敵からダメージを受けた ----
+SOUND=MESG "はあなたを叩いた[!！]" "snes_rpg/SNES-RPG02-08(Damage_from_enemy).wav" 100
+SOUND=MESG "はあなたを引っ?かいた[!！]" "snes_rpg/SNES-RPG02-08(Damage_from_enemy).wav" 100
+
+# ---- Miss: 攻撃がはずれた ----
+SOUND=MESG "は(はずれた|の攻撃をかわした|を攻撃したが当たらなかった)[.！]" "snes_rpg/SNES-RPG02-09(Miss).wav" 100
+SOUND=MESG "を攻撃したが.+かわした[.！]" "snes_rpg/SNES-RPG02-09(Miss).wav" 100
+
+# ---- Run_escape: 逃走（その場から逃げる） ----
+SOUND=MESG "逃げ出した[.！]|逃走した[.！]" "snes_rpg/SNES-RPG02-10(Run_escape).wav" 100
+SOUND=MESG "逃げ切れなかった[.！]|逃げることができ(なかった|ない)[.！]" "snes_rpg/SNES-RPG02-10(Run_escape).wav" 100
+
+# ---- Step_in: 罠や特殊床に踏み込む ----
+SOUND=MESG "落とし穴へ(落ちた|入った)[.！]" "snes_rpg/SNES-RPG03-1(Step_in).wav" 100
+SOUND=MESG "を踏んだ[.！]" "snes_rpg/SNES-RPG03-1(Step_in).wav" 100
+
+# ---- close_the_Door: 扉を閉める ----
+SOUND=MESG "扉を閉めた[.。]|戸口を閉めた[.。]" "snes_rpg/SNES-RPG03-2(close_the_Door).wav" 100
+
+# ---- fire_a_gun: 矢・石を放つ ----
+SOUND=MESG "矢を放った[.！]|を射た[.！]|弓で" "snes_rpg/SNES-RPG03-3(fire_a_gun).wav" 100
+SOUND=MESG "石を投げた[.！]" "snes_rpg/SNES-RPG03-3(fire_a_gun).wav" 100
+
+# ---- Switch_ON: レバー・スイッチ操作 ----
+SOUND=MESG "レバーを(引いた|倒した|操作した)[.！]" "snes_rpg/SNES-RPG03-5(Switch_ON).wav" 100
+SOUND=MESG "スイッチ|引き金" "snes_rpg/SNES-RPG03-5(Switch_ON).wav" 100
+
+# ---- cash_register_ring: 購入・金銭・店 ----
+SOUND=MESG "お代は([0-9]+)ゴールド[.。]" "snes_rpg/SNES-RPG03-6(cash_register_ring).wav" 100
+SOUND=MESG "ありがとう[.。]|いらっしゃい[.。]" "snes_rpg/SNES-RPG03-6(cash_register_ring).wav" 100
+
+# ---- Magic-Fire1: 火炎魔法1（光線・球） ----
+SOUND=MESG "火炎の光線|火の玉" "snes_rpg/SNES-RPG04-02(Magic-Fire1).wav" 100
+
+# ---- Magic-Fire2: 火炎魔法2（爆発・広域） ----
+SOUND=MESG "炎が広がった[!！]|火の海" "snes_rpg/SNES-RPG04-03(Magic-Fire2).wav" 100
+SOUND=MESG "が燃え(上が|出し)った[!！]" "snes_rpg/SNES-RPG04-03(Magic-Fire2).wav" 100
+
+# ---- breathe_fire: 炎のブレス ----
+SOUND=MESG "火炎の息|炎の息" "snes_rpg/SNES-RPG04-04(breathe_fire).wav" 100
+
+# ---- Magic-Thunderbolt: 電撃魔法1 ----
+SOUND=MESG "電撃を受けた[!！]|電撃の光線" "snes_rpg/SNES-RPG04-06(Magic-Thunderbolt).wav" 100
+SOUND=MESG "感電した" "snes_rpg/SNES-RPG04-06(Magic-Thunderbolt).wav" 100
+
+# ---- Thunderbolt2: 電撃魔法2（強力） ----
+SOUND=MESG "電撃でしびれた[!！]" "snes_rpg/SNES-RPG04-07(Thunderbolt2).wav" 100
+
+# ---- Magic-Ice1: 氷魔法1（冷気の光線等） ----
+SOUND=MESG "冷気の光線|冷気の円錐" "snes_rpg/SNES-RPG04-08(Magic-Ice1).wav" 100
+SOUND=MESG "氷結の息" "snes_rpg/SNES-RPG04-08(Magic-Ice1).wav" 100
+
+# ---- Magic-Ice_bolt: 氷の矢 ----
+SOUND=MESG "氷の光線|氷の矢" "snes_rpg/SNES-RPG04-09(Magic-Ice_bolt).wav" 100
+
+# ---- Magic_teleport: テレポート詠唱・発動 ----
+SOUND=MESG "テレポートした[.！]|テレポートし" "snes_rpg/SNES-RPG04-11(Magic_teleport).wav" 100
+SOUND=MESG "突然.+が現れた[!！]" "snes_rpg/SNES-RPG04-11(Magic_teleport).wav" 100
+SOUND=MESG "が現れた[.。]" "snes_rpg/SNES-RPG04-11(Magic_teleport).wav" 100
+
+# ---- Cure: 小回復（呪文・魔法による） ----
+SOUND=MESG "回復した気がした[.。]" "snes_rpg/SNES-RPG04-12(Cure).wav" 100
+SOUND=MESG "は(少し|ぐっと)元気そうになった[.。]" "snes_rpg/SNES-RPG04-12(Cure).wav" 100
+
+# ---- Greater Cure: 大回復 ----
+SOUND=MESG "はかなり回復したようだ[.！]" "snes_rpg/SNES-RPG04-13(Greater Cure).wav" 100
+SOUND=MESG "はかなり回復したようだった[.。]" "snes_rpg/SNES-RPG04-13(Greater Cure).wav" 100
+
+# ---- Status_Down: ステータス低下 ----
+SOUND=MESG "は突然弱くなった気がした[!！]" "snes_rpg/SNES-RPG04-14(Status_Down).wav" 100
+SOUND=MESG "体力が下がった[.！]|能力が下がった[.！]" "snes_rpg/SNES-RPG04-14(Status_Down).wav" 100
+SOUND=MESG "呪われた[.！]|呪いがかかった[.！]" "snes_rpg/SNES-RPG04-14(Status_Down).wav" 100
+
+# ---- Status_Up: ステータス上昇 ----
+SOUND=MESG "体力が上がった[.！]|能力が上がった[.！]" "snes_rpg/SNES-RPG04-15(Status_Up).wav" 100
+SOUND=MESG "強くなった気がした[.！]" "snes_rpg/SNES-RPG04-15(Status_Up).wav" 100
+
+# ---- Status_speed_up_or_paralyze: 加速・麻痺 ----
+SOUND=MESG "その場で凍りついた[!！]" "snes_rpg/SNES-RPG04-16(Status_speed_up_or_paralyze).wav" 100
+SOUND=MESG "動けなくなった[.！]|麻痺した[.！]" "snes_rpg/SNES-RPG04-16(Status_speed_up_or_paralyze).wav" 100
+SOUND=MESG "速くなった[.！]|高速になった[.！]" "snes_rpg/SNES-RPG04-16(Status_speed_up_or_paralyze).wav" 100
+
+# ---- Status_slow_or_hungry: 減速・空腹 ----
+SOUND=MESG "空腹だ[.！]|腹が減った[.！]" "snes_rpg/SNES-RPG04-17(Status_slow_or_hungy).wav" 100
+SOUND=MESG "動きが遅くなった[.！]|鈍くなった[.！]" "snes_rpg/SNES-RPG04-17(Status_slow_or_hungy).wav" 100
+SOUND=MESG "飢えている[.！]|衰弱した[.！]" "snes_rpg/SNES-RPG04-17(Status_slow_or_hungy).wav" 100
+
+# ---- Attack-Sword(05-01): 剣（別パターン・会心系） ----
+SOUND=MESG "会心の一撃[!！]|見事に斬った[!！]" "snes_rpg/SNES-RPG05-01(Attack-Sword).wav" 100
+
+
+# ---- Attack-Knife: ナイフ・短剣系 ----
+SOUND=MESG "刺した[!！]|突き刺した[!！]" "snes_rpg/SNES-RPG05-02(Attack-Knife).wav" 100
+SOUND=MESG "を刺した[!！]" "snes_rpg/SNES-RPG05-02(Attack-Knife).wav" 100
+
+# ---- Attack-Spear: 槍・突き攻撃 ----
+SOUND=MESG "を突いた[!！]|で突き飛ばした[!！]" "snes_rpg/SNES-RPG05-03(Attack-Spear).wav" 100
+
+# ---- Attack-Whip(05-04): ムチ（別） ----
+# Attack-Whip(02-03)と同じメッセージパターンのため、こちらはコメントアウト
+# SOUND=MESG "ムチ" "snes_rpg/SNES-RPG05-04(Attack-Whip).wav" 100
+
+# ---- Attack-Arrow(05-05/06): 矢を放つ（射撃専用） ----
+SOUND=MESG "を(射|放)った[!！.。]" "snes_rpg/SNES-RPG05-05(Attack-Arrow).wav" 100
+
+# ---- Attack-Punch(05-07): 噛みついた ----
+# パンチ用の音だがとりあえず割り当て
+SOUND=MESG "噛みついた" "snes_rpg/SNES-RPG05-07(Attack-Punch).wav" 100
+
+# ---- Miss(05-08): ミス（別） ----
+ SOUND=MESG "攻撃を外した" "snes_rpg/SNES-RPG05-08(Miss).wav" 100
+
+# ---- Monster_attack_Miss: モンスターの攻撃がはずれた ----
+SOUND=MESG "の攻撃をかわした[.！]" "snes_rpg/SNES-RPG05-09(Monster_attack_Miss).wav" 100
+SOUND=MESG "はあなたに当たらなかった[.！]" "snes_rpg/SNES-RPG05-09(Monster_attack_Miss).wav" 100
+
+# ---- Trap_Damage: 罠によるダメージ ----
+SOUND=MESG "罠が作動した[.！]|罠に(はまった|かかった)[.！]" "snes_rpg/SNES-RPG05-10(Trap_Damage).wav" 100
+SOUND=MESG "毒の矢が飛んできた[.！]|矢が飛んできた[.！]" "snes_rpg/SNES-RPG05-10(Trap_Damage).wav" 100
+SOUND=MESG "ブービートラップが仕掛けられていた[.！]" "snes_rpg/SNES-RPG05-10(Trap_Damage).wav" 100
+
+# ---- Defend_Magic: 魔法防御・魔法を弾いた ----
+# SOUND=MESG "ビヨンッ[!！]" "snes_rpg/SNES-RPG05-11(Defend_Magic).wav" 100
+SOUND=MESG "は弾き飛ばされた[!！]" "snes_rpg/SNES-RPG05-11(Defend_Magic).wav" 100
+SOUND=MESG "魔法耐性がある[.！]|魔法が効かない[.！]" "snes_rpg/SNES-RPG05-11(Defend_Magic).wav" 100
+
+# ---- fall_into_a_pitfall: 落とし穴に落ちる ----
+SOUND=MESG "落とし穴へ(落ちた|つまずいて落ちた)" "snes_rpg/SNES-RPG05-13(fall_into_a pitfall).wav" 100
+SOUND=MESG "棘だらけの落とし穴" "snes_rpg/SNES-RPG05-13(fall_into_a pitfall).wav" 100
+
+# ---- Electric: 電撃を受けた・感電 ----
+SOUND=MESG "電撃を受けた[!！]" "snes_rpg/SNES-RPG05-14(Electric).wav" 100
+SOUND=MESG "あなたの体に.+電撃が走った[!！]" "snes_rpg/SNES-RPG05-14(Electric).wav" 100
+
+# ---- Break_a_rock: 岩を砕く・岩が壊れる・扉が壊れる ----
+SOUND=MESG "巨大な岩が落ちた[!！]|岩を砕いた[.！]" "snes_rpg/SNES-RPG05-15(Break_a_rock).wav" 100
+SOUND=MESG "岩が光ってから消えた[.。]" "snes_rpg/SNES-RPG05-15(Break_a_rock).wav" 100
+SOUND=MESG "扉を蹴ると、激しく開いた[!。.]" "snes_rpg/SNES-RPG05-15(Break_a_rock).wav" 100
+SOUND=MESG "扉が破壊された[!！]" "snes_rpg/SNES-RPG05-15(Break_a_rock).wav" 100
+
+# ---- the_drawbridge_lowers: 跳ね橋が下がる ----
+SOUND=MESG "跳ね橋が(下がった|降りた|開いた)[.！]" "snes_rpg/SNES-RPG05-16(the_drawbridge_lowers).wav" 100
+SOUND=MESG "橋が架かった[.！]" "snes_rpg/SNES-RPG05-16(the_drawbridge_lowers).wav" 100
+
+# ---- Damaged_by_Splash: 水・液体によるダメージ ----
+SOUND=MESG "溺れ(そう|かけ|た)[.！]|水に飛び込んだ[.！]" "snes_rpg/SNES-RPG05-17(Damaged_by_Splash).wav" 100
+SOUND=MESG "から凍りつく霧が立ちのぼり" "snes_rpg/SNES-RPG05-17(Damaged_by_Splash).wav" 100
+
+# ---- Monster_Escape: モンスターが逃げる（汎用） ----
+SOUND=MESG "は逃げ(た|出した|惑った)[.！]|は混乱して逃げた[.！]" "snes_rpg/SNES-RPG05-18(Monster_Escape).wav" 100
+SOUND=MESG "は怖じ気づいて逃げた[.！]" "snes_rpg/SNES-RPG05-18(Monster_Escape).wav" 100
+
+
+### pixabay 効果音セット
+# ---- 箱の中のガラスが割れる音 ----
+SOUND=MESG "くぐもった.+音が聞こえた" "pixabay/spinopel-break-the-glass-456388.wav" 100
+
+# ---- 蹴ったときの音 ----
+SOUND=MESG "バキン" "pixabay/universfield-glass-hit-192119.wav" 100
+SOUND=MESG "ドカッ" "pixabay/dragon-studio-door-slam-478362.wav" 100
+
+# ---- 扉の開閉 ----
+SOUND=MESG "扉が開いた" "pixabay/dragon-studio-opening-door-sfx-454240.wav" 100
+SOUND=MESG "扉が閉まった" "pixabay/dragon-studio-close-door-382723.wav" 100
+SOUND=MESG "扉はびくともしなかった" "pixabay/freesound_community-door_rattle_01-102296.wav" 100
+
+# ---- ゲーム開始 ----
+SOUND=MESG "NetHackへ戻ってきた" "pixabay/dariocoiro-transition-sound-fx-530752.wav" 100
+SOUND=MESG "NetHackへようこそ" "pixabay/safeyable-opening-movie-254465.wav" 100
+ 
+# "\$ - 枚の金貨（合計"
+
+
 
 
 ### 以下、ゲーム内で演奏時に自動的に再生されるため設定不要。wavファイルの楽器対応メモとして記載
 # 木製フルート
-# SOUND=MSG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_A.wav" 100
-# SOUND=MSG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_B.wav" 100
-# SOUND=MSG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_C.wav" 100
-# SOUND=MSG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_D.wav" 100
-# SOUND=MSG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_E.wav" 100
-# SOUND=MSG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_F.wav" 100
-# SOUND=MSG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_G.wav" 100
+# SOUND=MESG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_A.wav" 100
+# SOUND=MESG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_B.wav" 100
+# SOUND=MESG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_C.wav" 100
+# SOUND=MESG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_D.wav" 100
+# SOUND=MESG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_E.wav" 100
+# SOUND=MESG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_F.wav" 100
+# SOUND=MESG "木製フルートは(軽やかに鳴り響いた|ぷーと鳴った)" "sound_Wooden_Flute_G.wav" 100
  
 # 魔法のフルート
-# SOUND=MSG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_A.wav" 100
-# SOUND=MSG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_B.wav" 100
-# SOUND=MSG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_C.wav" 100
-# SOUND=MSG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_D.wav" 100
-# SOUND=MSG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_E.wav" 100
-# SOUND=MSG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_F.wav" 100
-# SOUND=MSG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_G.wav" 100
+# SOUND=MESG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_A.wav" 100
+# SOUND=MESG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_B.wav" 100
+# SOUND=MESG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_C.wav" 100
+# SOUND=MESG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_D.wav" 100
+# SOUND=MESG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_E.wav" 100
+# SOUND=MESG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_F.wav" 100
+# SOUND=MESG "(柔らかな|甲高い)音楽を奏でた" "sound_Magic_Flute_G.wav" 100
  
 # 木製ハープ
-# SOUND=MSG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_A.wav" 100
-# SOUND=MSG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_B.wav" 100
-# SOUND=MSG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_C.wav" 100
-# SOUND=MSG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_D.wav" 100
-# SOUND=MSG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_E.wav" 100
-# SOUND=MSG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_F.wav" 100
-# SOUND=MSG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_G.wav" 100
+# SOUND=MESG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_A.wav" 100
+# SOUND=MESG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_B.wav" 100
+# SOUND=MESG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_C.wav" 100
+# SOUND=MESG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_D.wav" 100
+# SOUND=MESG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_E.wav" 100
+# SOUND=MESG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_F.wav" 100
+# SOUND=MESG "木製ハープは(軽やかな旋律を奏でた|音をつま弾いた)" "sound_Wooden_Harp_G.wav" 100
  
 # 魔法のハープ
-# SOUND=MSG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_A.wav" 100
-# SOUND=MSG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_B.wav" 100
-# SOUND=MSG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_C.wav" 100
-# SOUND=MSG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_D.wav" 100
-# SOUND=MSG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_E.wav" 100
-# SOUND=MSG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_F.wav" 100
-# SOUND=MSG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_G.wav" 100
+# SOUND=MESG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_A.wav" 100
+# SOUND=MESG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_B.wav" 100
+# SOUND=MESG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_C.wav" 100
+# SOUND=MESG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_D.wav" 100
+# SOUND=MESG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_E.wav" 100
+# SOUND=MESG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_F.wav" 100
+# SOUND=MESG "魔法のハープはとても魅力的な?旋律を奏でた" "sound_Magic_Harp_G.wav" 100
  
 # 角笛
-# SOUND=MSG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_A.wav" 100
-# SOUND=MSG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_B.wav" 100
-# SOUND=MSG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_C.wav" 100
-# SOUND=MSG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_D.wav" 100
-# SOUND=MSG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_E.wav" 100
-# SOUND=MSG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_F.wav" 100
-# SOUND=MSG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_G.wav" 100
+# SOUND=MESG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_A.wav" 100
+# SOUND=MESG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_B.wav" 100
+# SOUND=MESG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_C.wav" 100
+# SOUND=MESG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_D.wav" 100
+# SOUND=MESG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_E.wav" 100
+# SOUND=MESG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_F.wav" 100
+# SOUND=MESG "恐ろしく重々しい音を響かせた" "sound_Tooled_Horn_G.wav" 100
  
 # ラッパ
-# SOUND=MSG "ラッパから大きな音を引き出した" "sound_Bugle_A.wav" 100
-# SOUND=MSG "ラッパから大きな音を引き出した" "sound_Bugle_B.wav" 100
-# SOUND=MSG "ラッパから大きな音を引き出した" "sound_Bugle_C.wav" 100
-# SOUND=MSG "ラッパから大きな音を引き出した" "sound_Bugle_D.wav" 100
-# SOUND=MSG "ラッパから大きな音を引き出した" "sound_Bugle_E.wav" 100
-# SOUND=MSG "ラッパから大きな音を引き出した" "sound_Bugle_F.wav" 100
-# SOUND=MSG "ラッパから大きな音を引き出した" "sound_Bugle_G.wav" 100
+# SOUND=MESG "ラッパから大きな音を引き出した" "sound_Bugle_A.wav" 100
+# SOUND=MESG "ラッパから大きな音を引き出した" "sound_Bugle_B.wav" 100
+# SOUND=MESG "ラッパから大きな音を引き出した" "sound_Bugle_C.wav" 100
+# SOUND=MESG "ラッパから大きな音を引き出した" "sound_Bugle_D.wav" 100
+# SOUND=MESG "ラッパから大きな音を引き出した" "sound_Bugle_E.wav" 100
+# SOUND=MESG "ラッパから大きな音を引き出した" "sound_Bugle_F.wav" 100
+# SOUND=MESG "ラッパから大きな音を引き出した" "sound_Bugle_G.wav" 100
