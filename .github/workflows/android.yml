@@ -19,9 +19,9 @@ jobs:
         uses: android-actions/setup-android@v3        
         with:
           cmdline-tools-version: 9123335
-          packages: 'platforms;android-30 ndk;21.4.7075529'
+          packages: 'platforms;android-30 ndk;30.0.14904198'
       - name: Configure path to NDK
-        run: sed -i -e 's,NDK = .*,NDK = /usr/local/lib/android/sdk/ndk/21.4.7075529,g' sys/android/Makefile.src sys/android/Makefile.top
+        run: sed -i -e 's,NDK = .*,NDK = /usr/local/lib/android/sdk/ndk/30.0.14904198,g' sys/android/Makefile.src sys/android/Makefile.top
       - name: Build native Android application
         run: cd sys/android && sh ./setup.sh && cd ../.. && make fetch-lua && make install
       - name: Build NetHack
