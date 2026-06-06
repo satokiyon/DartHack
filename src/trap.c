@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1741926700 2025/03/13 20:31:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.621 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -3083,8 +3083,8 @@ trapnote(struct trap *trap, boolean noprefix)
 {
     static const char *const tnnames[] = {
         "(ド♪)", "(レ♭♪)", "(レ♪)", "(ミ♭♪)",
-        "(ミ♪)", "(ファ♭)", "(ファ♪)", "(ソ♭)",
-        "(ソ♪)", "(ラ♭)", "(シ♭)", "(シ♪)",
+        "(ミ♪)", "(ファ♪)", "(ファ#♪)", "(ソ♪)",
+        "(ソ#♪)", "(ラ♪)", "(シ♭♪)", "(シ♪)",
     };
     static char tnbuf[12]; /* result buffer */
     const char *tn;
