@@ -105,7 +105,6 @@ NetHackJP.code-workspace
 tmp/
 scratch/
 tools/
-.nethackrc
 
 # Generated Windows nmake stamp files
 /*.tag
