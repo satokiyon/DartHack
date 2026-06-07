@@ -2457,14 +2457,14 @@ reject_purchase(
         char which[BUFSZ];
 
         if (obj->where == OBJ_CONTAINED)
-            Snprintf(which, sizeof which, "the one%s in %s",
-                     plur(intact_quan), thesimpleoname(obj->ocontainer));
+            Snprintf(which, sizeof which, "%sの中にあるもの",
+                     thesimpleoname(obj->ocontainer));
         else
-            Sprintf(which, "%s", (intact_quan > 1L) ? "these" : "this one");
+            Sprintf(which, "%s", (intact_quan > 1L) ? "これら" : "これ");
 
         SetVoice(shkp, 0, 80, 0);
-          verbalize("%s、まず%sの分を支払ってから%sを買ってくれ.",
-                ANGRY(shkp) ? "払え" : "支払ってくれ",
+        verbalize("%s、まず%sの分を支払ってから%sを買ってくれ.",
+                  ANGRY(shkp) ? "払え" : "支払ってくれ",
                   simpleonames(obj), /* short name suffices */
                   which);
     } else {
