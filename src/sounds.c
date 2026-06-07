@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
 /* NetHack 5.0	sounds.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -470,37 +470,37 @@ yelp(struct monst *mtmp)
 
     /* presumably nearness and soundok checks have already been made */
     if (Hallucination)
-        yelp_verb = ROLL_FROM(h_sounds);
+        yelp_verb = "奇妙な声を出した！";
     else
         switch (mtmp->data->msound) {
         case MS_MEW:
             se = se_feline_yelp;
-            yelp_verb = (!Deaf) ? "yowl" : "arch";
+            yelp_verb = (!Deaf) ? "ニャーと鳴いた！" : "背中を丸めた！";
             break;
         case MS_BARK:
         case MS_GROWL:
             se = se_canine_yelp;
-            yelp_verb = (!Deaf) ? "yelp" : "recoil";
+            yelp_verb = (!Deaf) ? "キャンキャン鳴いた！" : "ひるんだ！";
             break;
         case MS_ROAR:
-            yelp_verb = (!Deaf) ? "snarl" : "bluff";
+            yelp_verb = (!Deaf) ? "うなった！" : "威嚇した！";
             break;
         case MS_SQEEK:
             se = se_squeal;
-            yelp_verb = (!Deaf) ? "squeal" : "quiver";
+            yelp_verb = (!Deaf) ? "悲鳴をあげた！" : "震えた！";
             break;
         case MS_SQAWK:
             se = se_avian_screak;
-            yelp_verb = (!Deaf) ? "screak" : "thrash";
+            yelp_verb = (!Deaf) ? "金切り声をあげた！" : "のたうち回った！";
             break;
         case MS_WAIL:
             se = se_wail;
-            yelp_verb = (!Deaf) ? "wail" : "cringe";
+            yelp_verb = (!Deaf) ? "泣き叫んだ！" : "すくみあがった！";
             break;
         }
     if (yelp_verb) {
         Soundeffect(se, 70);  /* Soundeffect() handles Deaf or not Deaf */
-        pline("%s %s!", Monnam(mtmp), vtense((char *) 0, yelp_verb));
+        pline("%sは%s", Monnam(mtmp), yelp_verb);
         if (svc.context.run)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 12);

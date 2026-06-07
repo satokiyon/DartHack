@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
 /* NetHack 5.0	shk.c	$NHDT-Date: 1736516428 2025/01/10 05:40:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.306 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -3593,13 +3593,11 @@ addtobill(
             }
             obj->quan = 1L; /* fool xname() into giving singular */
             set_voice(shkp, 0, 80, 0);
-            pline("%s%ld %s%s %s%sだ.\"", buf, ltmp, currency(ltmp),
-                  (save_quan > 1L) ? "（1個あたり）"
-                                   : (contentscount && !obj->unpaid)
-                                       ? "（この容器の中身）"
-                                       : "（これ）",
-                  xname(obj),
-                  (contentscount && obj->unpaid) ? and_its_contents : "");
+            pline("%sこの%s%sは%ld %s%sだ.\"", buf, xname(obj),
+                  (contentscount && obj->unpaid) ? and_its_contents :
+                  (contentscount && !obj->unpaid) ? "の中身" : "",
+                  ltmp, currency(ltmp),
+                  (save_quan > 1L) ? "（1個あたり）" : "");
             obj->quan = save_quan;
         }
     } else if (!silent) {
