@@ -23,29 +23,29 @@ staticfn void return_from_mtoss(struct monst *, struct obj *, boolean);
  * Keep consistent with breath weapons in zap.c, and AD_* in monattk.h.
  */
 static NEARDATA const char *breathwep[] = {
-    "fragments", "fire", "frost", "sleep gas", "a disintegration blast",
-    "lightning", "poison gas", "acid", "strange breath #8",
-    "strange breath #9"
+    "破片", "炎", "冷気", "睡眠ガス", "分解ブレス",
+    "電撃", "毒ガス", "酸", "奇妙なブレス #8",
+    "奇妙なブレス #9"
 };
 
 /* hallucinatory ray types */
 static const char *const hallublasts[] = {
-    "asteroids", "beads", "bubbles", "butterflies", "champagne", "chaos",
-    "coins", "cotton candy", "crumbs", "dark matter", "darkness", "data",
-    "dust specks", "emoticons", "emotions", "entropy", "flowers", "foam",
-    "fog", "gamma rays", "gelatin", "gemstones", "ghosts", "glass shards",
-    "glitter", "good vibes", "gravel", "gravity", "gravy", "grawlixes",
-    "holy light", "hornets", "hot air", "hyphens", "hypnosis", "infrared",
-    "insects", "jargon", "laser beams", "leaves", "lightening", "logic gates",
-    "magma", "marbles", "mathematics", "megabytes", "metal shavings",
-    "metapatterns", "meteors", "mist", "mud", "music", "nanites", "needles",
-    "noise", "nostalgia", "oil", "paint", "photons", "pixels", "plasma",
-    "polarity", "powder", "powerups", "prismatic light", "pure logic",
-    "purple", "radio waves", "rainbows", "rock music", "rocket fuel", "rope",
-    "sadness", "salt", "sand", "scrolls", "sludge", "smileys", "snowflakes",
-    "sparkles", "specularity", "spores", "stars", "steam", "tetrahedrons",
-    "text", "the past", "tornadoes", "toxic waste", "ultraviolet light",
-    "viruses", "water", "waveforms", "wind", "X-rays", "zorkmids"
+    "小惑星", "ビーズ", "泡", "蝶", "シャンパン", "混沌",
+    "コイン", "わたあめ", "パンくず", "暗黒物質", "暗闇", "データ",
+    "ほこり", "顔文字", "感情", "エントロピー", "花", "泡",
+    "霧", "ガンマ線", "ゼラチン", "宝石", "幽霊", "ガラスの破片",
+    "きらめき", "良い雰囲気", "砂利", "重力", "グレービーソース", "伏せ字",
+    "聖なる光", "スズメバチ", "熱気", "ハイフン", "催眠", "赤外線",
+    "昆虫", "専門用語", "レーザービーム", "葉っぱ", "雷鳴", "論理ゲート",
+    "マグマ", "ビー玉", "数学", "メガバイト", "金属の削り屑",
+    "メタパターン", "流星", "霧", "泥", "音楽", "ナノマシン", "針",
+    "騒音", "ノスタルジー", "オイル", "ペンキ", "光子", "画素", "プラズマ",
+    "極性", "粉末", "パワーアップ", "虹色の光", "純粋論理",
+    "紫", "電波", "虹", "ロック", "ロケット燃料", "ロープ",
+    "悲しみ", "塩", "砂", "巻物", "ヘドロ", "スマイリー", "雪の結晶",
+    "きらめき", "鏡面反射", "胞子", "星", "蒸気", "四面体",
+    "テキスト", "過去", "竜巻", "毒性廃棄物", "紫外線",
+    "ウイルス", "水", "波形", "風", "X線", "ゾークミッド"
 };
 
 /* Return a random hallucinatory blast. */
@@ -396,8 +396,7 @@ ohitmon(
                 if (!harmless)
                     Strcpy(how, exclam(damage)); /* "!" or "." */
                 else
-                    Sprintf(how, " but passes harmlessly through %.9s.",
-                            mhim(mtmp));
+                    Strcpy(how, "が、何の害もなくすり抜けた.");
                 hit(distant_name(otmp, mshot_xname), mtmp, how);
             }
         } else if (verbose && !gm.mtarget)
@@ -426,11 +425,7 @@ ohitmon(
 
             /* note: extra silver damage is handled by dmgval() */
             if (vis) {
-                char *m_name = mon_nam(mtmp);
-
-                if (flesh) /* s_suffix returns a modifiable buffer */
-                    m_name = strcat(s_suffix(m_name), " flesh");
-                pline_The("銀が%sを焼いた!", m_name);
+                pline_The("銀が%sの肉を焼いた!", mon_nam(mtmp));
             } else if (verbose && !gm.mtarget) {
                 pline("%sは焼けただれた!", flesh ? "肉" : "それ");
             }
@@ -515,18 +510,18 @@ ucatchgem(
     /* won't catch rock or gray stone; catch (then drop) worthless glass */
     if (gem->otyp <= LAST_GLASS_GEM && is_unicorn(gy.youmonst.data)) {
         char *gem_xname = xname(gem),
-             *mon_s_name = s_suffix(mon_nam(mon));
+             *monname = mon_nam(mon);
 
         if (gem->otyp >= FIRST_GLASS_GEM) {
             You("%sを受け止めた.", gem_xname);
-            You("%sがよこしたがらくたには興味がなかった.", mon_s_name);
+            You("%sがよこしたがらくたには興味がなかった.", monname);
             makeknown(gem->otyp);
             dropy(gem);
         } else {
             You("%sの贈り物をその心づかいごと受け取った.",
-                mon_s_name);
-            (void) hold_another_object(gem, "You catch, but drop, %s.",
-                                       gem_xname, "You catch:");
+                monname);
+            (void) hold_another_object(gem, "%sを受け止めたが、落としてしまった.",
+                                       gem_xname, "受け止めた:");
         }
         return TRUE;
     }
@@ -546,8 +541,8 @@ u_catch_thrown_obj(struct obj *otmp)
         && calc_capacity(otmp->owt) <= SLT_ENCUMBER && !rn2(catch_chance)) {
         char buf[BUFSZ];
 
-        Snprintf(buf, BUFSZ, "You catch the %s!", simpleonames(otmp));
-        (void) hold_another_object(otmp, "You catch, but drop, the %s.",
+        Snprintf(buf, BUFSZ, "%sを受け止めた!", simpleonames(otmp));
+        (void) hold_another_object(otmp, "%sを受け止めたが、落としてしまった.",
                                    simpleonames(otmp), buf);
         return TRUE;
     }
@@ -629,7 +624,7 @@ m_throw(
             if (is_ammo(singleobj))
                 pline("%sの射撃は不発だった!", Monnam(mon));
             else
-                pline("%sが%sの手を滑って落ちた!", Tobjnam(singleobj, "slip"),
+                pline("%sが%sの手を滑って落ちた!", Doname2(singleobj),
                       mon_nam(mon));
         }
         dx = rn2(3) - 1;
@@ -887,8 +882,8 @@ return_from_mtoss(
             static long do_not_annoy = 0;
 
             if (!do_not_annoy || (svm.moves - do_not_annoy) > 500L) {
-                pline("%s to %s %s!", Tobjnam(otmp, "return"),
-                      s_suffix(mon_nam(magr)), jp_mbodypart(magr, HAND));
+                pline("%sが%sの%sに戻った!", Doname2(otmp),
+                      mon_nam(magr), jp_mbodypart(magr, HAND));
                 do_not_annoy = svm.moves;
             }
             if (otmp) {
@@ -907,7 +902,7 @@ return_from_mtoss(
             if (!dmg) {
                 if (canseemon(magr)) {
                     pline("%sは%sのもとへ戻り、%s%sの%sに落ちた.",
-                          Tobjnam(otmp, "return"), mon_nam(magr),
+                          Doname2(otmp), mon_nam(magr),
                           mlevitating ? "下" : "足元", mhis(magr),
                           jp_mbodypart_plural(magr, FOOT));
                 } else if (!Deaf) {
@@ -918,7 +913,7 @@ return_from_mtoss(
                 dmg += rnd(3);
                 if (canseemon(magr)) {
                     pline("%sは%sへ飛び戻り、%sの%sに当たった!",
-                          Tobjnam(otmp, "fly"), mon_nam(magr),
+                          Doname2(otmp), mon_nam(magr),
                           mhis(magr), jp_body_part(ARM));
                 } else if (!Deaf) {
                     You_hear("%sが%sに鈍い音を立てて当たったのが聞こえた!",
@@ -1026,7 +1021,7 @@ spitmm(struct monst *mtmp, struct attack *mattk, struct monst *mtarg)
         if (!Deaf && mdistu(mtmp) < BOLT_LIM * BOLT_LIM) {
             if (canspotmon(mtmp)) {
                 pline("%sの喉から乾いたがらがら声がした.",
-                      s_suffix(mon_nam(mtmp)));
+                      mon_nam(mtmp));
             } else {
                 Soundeffect(se_dry_throat_rattle, 50);
                 You_hear("近くで乾いたがらがら音が聞こえる.");
@@ -1454,7 +1449,7 @@ hit_bars(
                 se_bars_clink, se_bars_clonk
             };
             static const char *const barsounds[] = {
-                "", "Whang", "Whap", "Flapp", "Clink", "Clonk"
+                "", "ガーン", "バシッ", "バタバタ", "チリン", "コン"
             };
             int bsindx = (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL)
                          ? 1
