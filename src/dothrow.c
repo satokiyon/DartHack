@@ -144,7 +144,7 @@ throw_obj(struct obj *obj, int shotlimit)
             /* throwing with one hand, but pluralize since the
                expression "with your bare hands" sounds better */
             jp_body_part_plural(HAND));
-        Sprintf(svk.killer.name, "throwing %s bare-handed",
+        Sprintf(svk.killer.name, "%sを素手で投げたこと",
                 killer_xname(obj));
         instapetrify(svk.killer.name);
     }
@@ -536,7 +536,7 @@ dofire(void)
             if (obj) {
                 /* give feedback if quiver has now been filled */
                 uquiver->owornmask &= ~W_QUIVER; /* less verbose */
-                prinv("You ready:", obj, 0L);
+                prinv("用意した:", obj, 0L);
                 uquiver->owornmask |= W_QUIVER;
             } else {
                 You("矢筒に適したものが何もなかった.");
@@ -805,22 +805,22 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
 
         if (IS_OBSTRUCTED(levl[x][y].typ)
             || closed_door(x, y) || odoor_diag) {
-            why = IS_TREE(ltyp) ? "bumping into a tree"
-                  : IS_OBSTRUCTED(ltyp) ? "bumping into a wall"
-                    : odoor_diag ? "bumping into a door frame"
-                      : "bumping into a closed door";
+            why = IS_TREE(ltyp) ? "木にぶつかったこと"
+                  : IS_OBSTRUCTED(ltyp) ? "壁にぶつかったこと"
+                    : odoor_diag ? "扉の枠にぶつかったこと"
+                      : "閉まった扉にぶつかったこと";
             if (odoor_diag)
                 You("扉の枠にぶつかった!");
             pline("いてっ!");
         } else if (ltyp == IRONBARS) {
-            why = "crashing into iron bars";
+            why = "鉄格子に激突したこと";
             You("鉄格子に激突した.  いてっ!");
         } else if ((obj = sobj_at(BOULDER, x, y)) != 0) {
-            why = "bumping into a boulder";
+            why = "岩にぶつかったこと";
             You("%sにぶつかった.  いてっ!", xname(obj));
         }  else if (!may_pass) {
             /* did we hit a no-dig non-wall position? */
-            why = "touching the edge of the universe";
+            why = "世界の果てに触れたこと";
             You("何かにぶつかった!");
         } else if (diagonal
                    && bad_rock(gy.youmonst.data, u.ux, y)
@@ -829,7 +829,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
                        && (inv_weight() + weight_cap() > WT_TOOMUCH_DIAGONAL));
 
             if (bigmonst(gy.youmonst.data) || too_much) {
-                why = "wedging into a narrow crevice";
+                why = "狭い裂け目にはまったこと";
                 You("%s強く押し込まれて裂け目にはまった.",
                     too_much ? "荷物ごと" : "");
             }
@@ -873,8 +873,8 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
         if (touch_petrifies(mon->data)
             /* this is a bodily collision, so check for body armor */
             && !uarmu && !uarm && !uarmc) {
-                Sprintf(svk.killer.name, "bumping into %s",
-                    an(jp_pmname(mon->data, NEUTRAL)));
+                Sprintf(svk.killer.name, "%sにぶつかったこと",
+                    jp_pmname(mon->data, NEUTRAL));
             instapetrify(svk.killer.name);
         }
         if (touch_petrifies(gy.youmonst.data)
@@ -1058,7 +1058,7 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
         /* and whether hero is turned to stone by being touched by 'mon' */
         if (touch_petrifies(mon->data) && !(uarmu || uarm || uarmc)) {
             Snprintf(svk.killer.name, sizeof svk.killer.name,
-                     "being hit by %s",
+                     "%sに当たったこと",
                      /* combine m_monnam() and noname_monnam():
                         "{your,a} hurtling cockatrice" w/o assigned name */
                      x_monnam(mon, mon->mtame ? ARTICLE_YOUR : ARTICLE_A,
@@ -1408,7 +1408,7 @@ toss_up(struct obj *obj, boolean hitsroof)
  petrify:
             svk.killer.format = KILLED_BY;
             /* what goes up... */
-            Strcpy(svk.killer.name, "elementary physics");
+            Strcpy(svk.killer.name, "物理法則");
             You("石になった.");
             if (obj)
                 dropy(obj); /* bypass most of hitfloor() */
@@ -1424,7 +1424,7 @@ toss_up(struct obj *obj, boolean hitsroof)
         hitfloor(obj, TRUE);
         gt.thrownobj = 0;
         if (!harmless)
-            losehp(dmg, "falling object", KILLED_BY_AN);
+            losehp(dmg, "落下物", KILLED_BY_AN);
     }
     return TRUE;
 }
@@ -1693,8 +1693,8 @@ throwit(
                we're about to return */
             if (tethered_weapon) {
                 if (!tether_released_msg) {
-                    pline("The tether comes off your %s.",
-                           body_part(ARM));
+                    pline("紐があなたの%sからはずれた.",
+                           jp_body_part(ARM));
                     tether_released_msg = TRUE;
                 }
                 tmp_at(DISP_END, 0);
@@ -1713,8 +1713,8 @@ throwit(
         /* missile has already been handled */
         if (tethered_weapon) {
             if (!tether_released_msg) {
-                pline("The tether comes off your %s.",
-                       body_part(ARM));
+                pline("紐があなたの%sからはずれた.",
+                       jp_body_part(ARM));
                 tether_released_msg = TRUE;
             }
             tmp_at(DISP_END, 0);
@@ -1763,22 +1763,24 @@ throwit(
                         if (tethered_weapon) {
 				  /* Blind mods unnecessary; you know what you threw,
 				   * and it is tethered to your arm */
-                                  pline("Your tethered %s snaps back but the tether slips from your %s.",
-                                        simpleonames(obj), body_part(ARM));
+                                  pline("紐のついた%sが戻ってきたが、紐があなたの%sから滑り落ちた.",
+                                        xname(obj), jp_body_part(ARM));
 				  tether_released_msg = TRUE;
                         } else {
-                            pline(Blind
-                                      ? "%s lands %s your %s."
-                                      : "%s back to you, landing %s your %s.",
-                                  Blind ? Something : Tobjnam(obj, "return"),
-                                  Levitation ? "beneath" : "at",
-                                  makeplural(body_part(FOOT)));
+                            if (Blind)
+                                pline("%sがあなたの%sの%sに落ちた.",
+                                      Something, jp_body_part_plural(FOOT),
+                                      Levitation ? "下" : "ところ");
+                            else
+                                pline("%sが戻ってきて、あなたの%sの%sに落ちた.",
+                                      Doname2(obj), jp_body_part_plural(FOOT),
+                                      Levitation ? "下" : "ところ");
                         }
                     } else {
                         dmg += rnd(3);
                         if (tethered_weapon) {
-                            Your("tethered %s returns and hits your %s!",
-                                 simpleonames(obj), body_part(ARM));
+                            Your("紐のついた%sが戻ってきてあなたの%sに当たった!",
+                                 xname(obj), jp_body_part(ARM));
                         } else {
                             pline(
                                 Blind
@@ -1802,8 +1804,8 @@ throwit(
                             dropy(obj);
                     } else {
                         if (!tether_released_msg) {
-                            pline_The("%s tether comes off your %s.",
-                                  s_suffix(simpleonames(obj)), body_part(ARM));
+                            pline("%sの紐があなたの%sからはずれた.",
+                                  xname(obj), jp_body_part(ARM));
                             tether_released_msg = TRUE;
                         }
                     }
@@ -1813,10 +1815,10 @@ throwit(
             } else {
                 if (tethered_weapon) {
                    if (!tether_released_msg) {
-                       pline("The tether comes off your %s.",
-                              body_part(ARM));
+                       pline("紐があなたの%sからはずれた.",
+                              jp_body_part(ARM));
                        tether_released_msg = TRUE;
-                    }
+                   }
                     tmp_at(DISP_END, 0);
                     /* when this location is stepped on, the weapon will be
                        auto-picked up due to 'obj->how_lost' of LOST_THROWN;
@@ -2182,7 +2184,7 @@ thitmonst(
                        appear in the message */
                     fully_identify_obj(obj);
                     verbalize("%sの役目はここで終わった.",
-                                        s_suffix(xname(obj)));
+                                        xname(obj));
                     verbalize(
                 "二度と必要にならないことを%sに祈りつつ、我らがこれを守る.",
                               align_gname(u.ualignbase[A_ORIGINAL]));
@@ -2353,8 +2355,6 @@ thitmonst(
         Strcpy(trail,
              digests(md) ? "のはらわた" : is_whirly(md) ? "の渦流" : "");
         monname = mon_nam(mon);
-        if (*trail)
-            monname = s_suffix(monname);
         pline("%sは%s%sの中へ消えた.", Tobjnam(obj, (char *)0), monname, trail);
     } else {
         tmiss(obj, mon, TRUE);
@@ -2369,11 +2369,11 @@ staticfn int
 gem_accept(struct monst *mon, struct obj *obj)
 {
     static NEARDATA const char
-        nogood[]     = " is not interested in your junk.",
-        acceptgift[] = " accepts your gift.",
-        maybeluck[]  = " hesitatingly",
-        noluck[]     = " graciously",
-        addluck[]    = " gratefully";
+        nogood[]     = "はあなたのガラクタには興味がない.",
+        acceptgift[] = "贈り物を受け取った.",
+        maybeluck[]  = "はためらいがちにあなたの",
+        noluck[]     = "は丁寧にもあなたの",
+        addluck[]    = "は喜んであなたの";
     char buf[BUFSZ];
     boolean is_buddy = sgn(mon->data->maligntyp) == sgn(u.ualign.type);
     boolean is_gem = objects[obj->otyp].oc_material == GEMSTONE;
@@ -2731,8 +2731,7 @@ throw_gold(struct obj *obj)
         const char *swallower = mon_nam(u.ustuck);
 
         if (digests(u.ustuck->data))
-            /* note: s_suffix() returns a modifiable buffer */
-            swallower = strcat(s_suffix(swallower), "のはらわた");
+            swallower = strcat(mon_nam(u.ustuck), "のはらわた");
         pline_The("金貨は%sへ消えていった.", swallower);
         add_to_minv(u.ustuck, obj);
         return ECMD_TIME;
