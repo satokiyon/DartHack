@@ -149,7 +149,7 @@ LD_VAR = LD_$(ABI)
 
 TARGET_CC := $($(CC_VAR))
 
-SYSCFLAGS = -fPIC 
+SYSCFLAGS = -fPIC -DLUA_USE_POSIX
 
 # Lua
 LUAHEADERS ?= lib/lua-$(LUA_VERSION)/src
