@@ -105,7 +105,7 @@ SYSOBJ ?= $(TARGETPFX)ioctl.o $(TARGETPFX)androidmain.o $(TARGETPFX)unixtty.o \
 # The gcc compiler switch for accepting C99 code. Because gcc had extensions in
 # earlier versions, a number of C99 features were already compiling cleanly, but
 # not all (e.g., 'for' loop initial declarations).
-# CSTD = -std=c99
+CSTD = -std=c99
 
 # if you're debugging and want gcc to check as much as possible, use:
 # CC = gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings
