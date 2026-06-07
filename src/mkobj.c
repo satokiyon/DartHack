@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
 /* NetHack 5.0	mkobj.c	$NHDT-Date: 1764044196 2025/11/24 20:16:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.326 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -1718,18 +1718,13 @@ maybe_adjust_light(struct obj *obj, int old_range)
             *buf = '\0';
             if (iflags.last_msg == PLNMSG_OBJ_GLOWS)
                 /* we just saw "The <obj> glows <color>." from dipping */
-                Strcpy(buf, (obj->quan == 1L) ? "It" : "They");
+                Strcpy(buf, (obj->quan == 1L) ? "それ" : "それら");
             else if (carried(obj) || cansee(ox, oy))
                 Strcpy(buf, Yname2(obj));
             if (*buf) {
-                /* initial activation says "dimly" if cursed,
-                   "brightly" if uncursed, and "brilliantly" if blessed;
-                   when changing intensity, using "less brightly" is
-                   straightforward for dimming, but we need "brighter"
-                   rather than "more brightly" for brightening; ugh */
-                pline("%s %s %s%s.", buf, otense(obj, "shine"),
-                      (abs(delta) > 1) ? "much " : "",
-                      (delta > 0) ? "brighter" : "less brightly");
+                pline("%sは%s%s輝いた.", buf,
+                      (abs(delta) > 1) ? "ずっと" : "",
+                      (delta > 0) ? "より明るく" : "少し暗く");
             }
         }
     }

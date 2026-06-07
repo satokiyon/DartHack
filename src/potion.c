@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
 /* NetHack 5.0	potion.c	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.279 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -2264,10 +2264,8 @@ hold_potion(
 int
 dodip(void)
 {
-    static const char Dip_[] = "Dip ";
     struct obj *potion, *obj;
     char qbuf[QBUFSZ], obuf[QBUFSZ];
-    const char *shortestname; /* last resort obj name for prompt */
     uchar here = levl[u.ux][u.uy].typ;
     boolean is_hands, at_pool = is_pool(u.ux, u.uy),
             at_fountain = IS_FOUNTAIN(here), at_sink = IS_SINK(here),
@@ -2281,8 +2279,6 @@ dodip(void)
         return ECMD_OK;
 
     is_hands = (obj == &hands_obj);
-    shortestname = (is_hands || is_plural(obj) || pair_of(obj)) ? "them"
-                                                                : "it";
     drink_ok_extra = 0;
     /*
      * Bypass safe_qbuf() since it doesn't handle varying suffix without
@@ -2310,8 +2306,8 @@ dodip(void)
         if (!can_reach_floor(FALSE)) {
             ; /* can't dip something into fountain or pool if can't reach */
         } else if (at_fountain) {
-            Snprintf(qbuf, sizeof(qbuf), "%s%s into the fountain?", Dip_,
-                     flags.verbose ? obuf : shortestname);
+            Snprintf(qbuf, sizeof(qbuf), "%sを噴水に浸す？",
+                     flags.verbose ? obuf : "それ");
             /* "Dip <the object> into the fountain?" */
             if (y_n(qbuf) == 'y') {
                 if (!is_hands)
@@ -2321,8 +2317,8 @@ dodip(void)
             }
             ++drink_ok_extra;
         } else if (at_sink) {
-            Snprintf(qbuf, sizeof(qbuf), "%s%s into the sink?", Dip_,
-                     flags.verbose ? obuf : shortestname);
+            Snprintf(qbuf, sizeof(qbuf), "%sを流しに浸す？",
+                     flags.verbose ? obuf : "それ");
             if (y_n(qbuf) == 'y') {
                 if (!is_hands)
                     obj->pickup_prev = 0;
@@ -2333,8 +2329,8 @@ dodip(void)
         } else if (at_pool) {
             const char *pooltype = waterbody_name(u.ux, u.uy);
 
-            Snprintf(qbuf, sizeof(qbuf), "%s%s into the %s?", Dip_,
-                     flags.verbose ? obuf : shortestname, pooltype);
+            Snprintf(qbuf, sizeof(qbuf), "%sを%sに浸す？",
+                     flags.verbose ? obuf : "それ", pooltype);
             /* "Dip <the object> into the {pool, moat, &c}?" */
             if (y_n(qbuf) == 'y') {
                 if (Levitation) {
@@ -2361,8 +2357,8 @@ dodip(void)
     }
 
     /* "What do you want to dip <the object> into? [xyz or ?*] " */
-    Snprintf(qbuf, sizeof qbuf, "dip %s into",
-             flags.verbose ? obuf : shortestname);
+    Snprintf(qbuf, sizeof qbuf, "%sを何に浸す",
+             flags.verbose ? obuf : "それ");
     potion = getobj(qbuf, drink_ok, GETOBJ_NOFLAGS);
     if (!potion)
         return ECMD_CANCEL;

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
 /* NetHack 5.0	muse.c	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.241 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
@@ -219,10 +219,8 @@ mplayhorn(
         objnamp = xname(otmp);
         if (strlen(objnamp) >= QBUFSZ)
             objnamp = simpleonames(otmp);
-        pline("%s %s %s directed at you!",
-              /* monverbself() would adjust the verb if hallucination made
-                 subject plural; stick with singular here, at least for now */
-              Monnam(mtmp), "plays", an(objnamp));
+        pline("%sはあなたに向けて%sを吹いた!",
+              Monnam(mtmp), an(objnamp));
         makeknown(otmp->otyp);
         stop_occupation();
     }

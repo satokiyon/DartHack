@@ -1235,13 +1235,13 @@ slip_or_trip(void)
           anonymous "something" if there aren't any rocks.
         */
         what = (iflags.last_msg == PLNMSG_ONE_ITEM_HERE)
-                ? ((otmp->quan == 1L) ? "it"
-                      : Hallucination ? "they" : "them")
+                ? ((otmp->quan == 1L) ? "それ"
+                      : "それら")
                 : (otmp->dknown || !Blind)
                       ? doname(otmp)
                       : ((otmp2 = sobj_at(ROCK, u.ux, u.uy)) == 0
                              ? something
-                             : (otmp2->quan == 1L ? "a rock" : "some rocks"));
+                             : (otmp2->quan == 1L ? "岩" : "いくつかの岩"));
         if (Hallucination) {
             what = strcpy(buf, what);
             buf[0] = highc(buf[0]);
