@@ -1441,7 +1441,8 @@ throwing_weapon(struct obj *obj)
                       || obj->otyp == WAR_HAMMER || obj->otyp == AKLYS);
 }
 
-/* the currently thrown object is returning to you (not for boomerangs) */
+/* the currently thrown object is returning to you (not for boomerangs
+   or tethered weapons) */
 staticfn void
 sho_obj_return_to_u(struct obj *obj)
 {
@@ -1524,7 +1525,8 @@ throwit(
     boolean crossbowing,
             impaired = (Confusion || Stunned || Blind
                         || Hallucination || Fumbling),
-            tethered_weapon = (arw && arw->tethered && (wep_mask & W_WEP) != 0);
+            tethered_weapon = (arw && arw->tethered && (wep_mask & W_WEP) != 0),
+            tether_released_msg = FALSE;
 
     gn.notonhead = FALSE; /* reset potentially stale value */
     if ((obj->cursed || obj->greased) && (u.dx || u.dy) && !rn2(7)) {
@@ -1689,8 +1691,14 @@ throwit(
             /* bhit display cleanup was left with this caller
                for tethered_weapon, but clean it up now since
                we're about to return */
-            if (tethered_weapon)
+            if (tethered_weapon) {
+                if (!tether_released_msg) {
+                    pline("The tether comes off your %s.",
+                           body_part(ARM));
+                    tether_released_msg = TRUE;
+                }
                 tmp_at(DISP_END, 0);
+            }
             throwit_return(FALSE);
             return;
         }
@@ -1703,8 +1711,14 @@ throwit(
 
     if (!gt.thrownobj) {
         /* missile has already been handled */
-        if (tethered_weapon)
+        if (tethered_weapon) {
+            if (!tether_released_msg) {
+                pline("The tether comes off your %s.",
+                       body_part(ARM));
+                tether_released_msg = TRUE;
+            }
             tmp_at(DISP_END, 0);
+        }
     } else if (u.uswallow && !iflags.returning_missile) {
         swallowit(obj);
         return;
@@ -1742,41 +1756,29 @@ throwit(
                           if obj is quivered, remove it before wielding */
                         if (obj->owornmask & W_QUIVER)
                            setuqwep((struct obj *) 0);
-#if 0
-                        setuwep(obj);
-                        set_twoweap(twoweap); /* u.twoweap = twoweap */
-#endif
                         if (cansee(gb.bhitpos.x, gb.bhitpos.y))
                            newsym(gb.bhitpos.x, gb.bhitpos.y);
                     }
                     if (!dmg) {
                         if (tethered_weapon) {
-                            if (Blind) {
-                                pline("つなぎ止められた武器が跳ね戻り、あなたの%sからぶら下がった.",
-                                      jp_body_part(ARM));
-                            } else {
-                                pline("%sは戻ってきて、あなたの%sからぶら下がった.",
-                                      Doname2(obj), jp_body_part(ARM));
-                            }
+				  /* Blind mods unnecessary; you know what you threw,
+				   * and it is tethered to your arm */
+                                  pline("Your tethered %s snaps back but the tether slips from your %s.",
+                                        simpleonames(obj), body_part(ARM));
+				  tether_released_msg = TRUE;
                         } else {
-                            if (Blind) {
-                                pline("何かがあなたの%sに落ちた.",
-                                      Levitation ? "真下" : "足元");
-                            } else {
-                                pline("%sが戻ってきて、あなたの%sに落ちた.",
-                                      Doname2(obj), Levitation ? "真下" : "足元");
-                            }
+                            pline(Blind
+                                      ? "%s lands %s your %s."
+                                      : "%s back to you, landing %s your %s.",
+                                  Blind ? Something : Tobjnam(obj, "return"),
+                                  Levitation ? "beneath" : "at",
+                                  makeplural(body_part(FOOT)));
                         }
                     } else {
                         dmg += rnd(3);
                         if (tethered_weapon) {
-                            if (Blind) {
-                                pline("つなぎ止められた武器が戻ってきてあなたの%sに当たった!",
-                                      jp_body_part(ARM));
-                            } else {
-                                pline("%sが戻ってきてあなたの%sに当たった!",
-                                      Doname2(obj), jp_body_part(ARM));
-                            }
+                            Your("tethered %s returns and hits your %s!",
+                                 simpleonames(obj), body_part(ARM));
                         } else {
                             pline(
                                 Blind
@@ -1799,14 +1801,22 @@ throwit(
                         if (!ship_object(obj, u.ux, u.uy, FALSE))
                             dropy(obj);
                     } else {
-                        pline("%sのつなぎ紐があなたの%sから外れた!",
-                              simpleonames(obj), jp_body_part(ARM));
+                        if (!tether_released_msg) {
+                            pline_The("%s tether comes off your %s.",
+                                  s_suffix(simpleonames(obj)), body_part(ARM));
+                            tether_released_msg = TRUE;
+                        }
                     }
                 }
                 throwit_return(TRUE);
                 return;
             } else {
                 if (tethered_weapon) {
+                   if (!tether_released_msg) {
+                       pline("The tether comes off your %s.",
+                              body_part(ARM));
+                       tether_released_msg = TRUE;
+                    }
                     tmp_at(DISP_END, 0);
                     /* when this location is stepped on, the weapon will be
                        auto-picked up due to 'obj->how_lost' of LOST_THROWN;
@@ -1816,8 +1826,6 @@ throwit(
                        explicitly rewield the weapon to get throw-and-return
                        capability back anyway, quivered or not shouldn't
                        matter */
-                    pline("つなぎ紐があなたの%sからちぎれた!",
-                          jp_body_part(ARM));
                 } else {
                     pline("%sは戻るのに失敗した!", Doname2(obj));
                 }
