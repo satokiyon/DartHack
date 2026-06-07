@@ -1566,15 +1566,15 @@ char and_yn_function(const char *question, const char *choices, char def)
 	char message[BUFSZ];
 	char res_ch[2];
 	boolean digit_ok, allow_num;
-	uintptr_t esc;
+	intptr_t esc;
 	int nChoices;
 
 	if(choices)
 	{
 		nChoices = strlen(choices);
-		esc = (uintptr_t) strchr(choices, '\033');
+		esc = (intptr_t) strchr(choices, '\033');
 		if(esc)
-			esc -= (uintptr_t)choices;
+			esc -= (intptr_t)choices;
 		else
 			esc = -1;
 	}
