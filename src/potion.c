@@ -968,7 +968,7 @@ peffect_sickness(struct obj *otmp)
         pline("(実際は少し古くなった%sだった.)", fruitname(TRUE));
         if (!Role_if(PM_HEALER)) {
             /* NB: blessed otmp->fromsink is not possible */
-            losehp(1, "mildly contaminated potion", KILLED_BY_AN);
+            losehp(1, "少し汚染された薬", KILLED_BY);
         }
     } else {
         if (Poison_resistance)
@@ -980,10 +980,13 @@ peffect_sickness(struct obj *otmp)
             char contaminant[BUFSZ];
             int typ = rn2(A_MAX);
 
-            Sprintf(contaminant, "%s%s",
-                    (Poison_resistance) ? "mildly " : "",
-                    (otmp->fromsink) ? "contaminated tap water"
-                    : "contaminated potion");
+            if (otmp->fromsink)
+                Sprintf(contaminant, "%s汚染された水道水",
+                        (Poison_resistance) ? "少し" : "");
+            else
+                Sprintf(contaminant, "%s汚染された薬",
+                        (Poison_resistance) ? "少し" : "");
+
             if (!Fixed_abil) {
                 poisontell(typ, FALSE);
                 (void) adjattrib(typ, Poison_resistance ? -1 : -rn1(4, 3),
@@ -995,11 +998,11 @@ peffect_sickness(struct obj *otmp)
                            KILLED_BY);
                 else
                     losehp(rnd(10) + 5 * !!(otmp->cursed), contaminant,
-                           KILLED_BY_AN);
+                           KILLED_BY);
             } else {
                 /* rnd loss is so that unblessed poorer than blessed */
                 losehp(1 + rn2(2), contaminant,
-                       (otmp->fromsink) ? KILLED_BY : KILLED_BY_AN);
+                       KILLED_BY);
             }
             exercise(A_CON, FALSE);
         }
