@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
 /* NetHack 5.0	botl.c	$NHDT-Date: 1769839231 2026/01/30 22:00:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.277 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -317,7 +317,7 @@ do_statusline1(void)
     Strcpy(newbot1, svp.plname);
     if ('a' <= newbot1[0] && newbot1[0] <= 'z')
         newbot1[0] += 'A' - 'a';
-    newbot1[BOTL_NSIZ] = 0;
+    utf8_truncate(newbot1, BOTL_NSIZ);
     Sprintf(nb = eos(newbot1), " ");
 
     if (Upolyd) {
@@ -1364,7 +1364,7 @@ bot_via_windowport(void)
        enabled, anything beyond 30 (long monster name) will be truncated */
     if (i > 30) {
         i = 30 - (int) (sizeof " " + strlen(titl) - sizeof "");
-        nb[max(i, BOTL_NSIZ)] = '\0';
+        utf8_truncate(nb, max(i, BOTL_NSIZ));
     }
     Strcpy(nb = eos(nb), " ");
     Strcpy(nb = eos(nb), titl);

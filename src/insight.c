@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
 /* NetHack 5.0	insight.c	$NHDT-Date: 1777004419 2026/04/23 20:20:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.134 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -146,7 +146,9 @@ enlght_line(
 
     Sprintf(buf, " %s%s%s%s.", start, middle, end, ps);
 #ifndef NO_ENLGHT_CONTRACTIONS
-    if (strstri(buf, " not ")) { /* TODO: switch to libc strstr() */
+    /* skip English-specific contractions for Japanese strings to avoid
+       corrupting multibyte UTF-8 characters (e.g. 0xE9 in "達") */
+    if (!has_nonascii(buf) && strstri(buf, " not ")) {
         for (i = 0; i < SIZE(contra); ++i)
             (void) strsubst(buf, contra[i].twowords, contra[i].contrctn);
     }
