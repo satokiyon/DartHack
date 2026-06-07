@@ -1393,23 +1393,19 @@ void and_update_positionbar(char *features)
 void and_print_glyph(winid wid, coordxy x, coordxy y, const glyph_info *glyphinfo, const glyph_info *bkglyphinfo)
 {
     (void) bkglyphinfo;
-    int glyph = glyphinfo->glyph;
 	//debuglog("and_print_glyph wid=%d %dx%d", wid, x, y);
-	int tile;
-    int special;
-	special &= ~(MG_CORPSE|MG_INVIS|MG_RIDDEN|MG_STATUE); // TODO support
-	if(!iflags.hilite_pet)
-		special &= ~MG_PET;
-	if(!iflags.hilite_pile)
-		special &= ~MG_OBJPILE;
-	if(!iflags.use_inverse)
-		special &= ~MG_DETECT;
 
-    glyph_info out_glyph_info = {0};
-    map_glyphinfo(x, y, glyph, special, &out_glyph_info);
-    tile = out_glyph_info.gm.tileidx;
+    int tile = glyphinfo->gm.tileidx;
+    unsigned int special = glyphinfo->gm.glyphflags;
 
-	JNICallV(jPrintTile, wid, x, y, tile, out_glyph_info.ttychar, nhcolor_to_RGB(out_glyph_info.gm.sym.color), special);
+    special &= ~(MG_CORPSE|MG_INVIS|MG_RIDDEN|MG_STATUE); // TODO support
+    if(!iflags.hilite_pet)
+        special &= ~MG_PET;
+    if(!iflags.hilite_pile)
+        special &= ~MG_OBJPILE;
+    if(!iflags.use_inverse)
+        special &= ~MG_DETECT;
+	JNICallV(jPrintTile, wid, x, y, tile, glyphinfo->ttychar, nhcolor_to_RGB(glyphinfo->gm.sym.color), special);
 }
 
 //____________________________________________________________________________________
