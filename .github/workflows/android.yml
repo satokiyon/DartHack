@@ -23,7 +23,7 @@ jobs:
       - name: Configure path to NDK
         run: sed -i -e 's,NDK = .*,NDK = /usr/local/lib/android/sdk/ndk/30.0.14904198,g' sys/android/Makefile.src sys/android/Makefile.top
       - name: Build native Android application
-        run: cd sys/android && sh ./setup.sh && cd ../.. && make fetch-lua && make install
+        run: cd sys/android && sh ./setup.sh && cd ../.. && make fetch-lua && make install || make install
       - name: Build NetHack
         run: cd sys/android && sh gradlew build
       - uses: actions/upload-artifact@v5
