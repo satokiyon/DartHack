@@ -33,8 +33,11 @@ android {
   }
 }
 
-dependencies {
-  implementation 'com.tbd.forkfront:lib' version {
-    branch = "master"
+
+git {
+  implementation 'https://github.com/JodiJodington/ForkFront-Android.git', {
+      name 'com.tbd.forkfront'
+      projectPath "lib"
+      commit '621999c5c9d00f4808f38d1f650d8b54358c1dbc'
   }
 }
