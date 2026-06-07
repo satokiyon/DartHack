@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1606009004 2020/11/22 01:36:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -231,6 +231,12 @@ jp_translate_multi_reason_exact(
         { "paralyzed by a monster", "モンスターに麻痺させられていた" },
         { "frozen by a monster's gaze", "モンスターの視線で凍りついていた" },
         { "frozen by a monster", "モンスターに凍りつかされていた" },
+        { "exhaustion", "疲労困憊していた" },
+        { "elementary physics", "物理法則に翻弄されていた" },
+        { "brainlessness", "脳を失っていた" },
+        { "starvation", "飢えに苦しんでいた" },
+        { "system shock", "システムショック状態だった" },
+        { "alchemic blast", "錬金術の爆発に巻き込まれていた" },
         { 0, 0 }
     };
     int i;
@@ -369,7 +375,130 @@ jp_translate_killer_text_for_display(
     } else if (!strncmpi(core, "turned to slime by ", 19)) {
         Snprintf(outmain, sizeof outmain, "%sでスライム化した",
                  skip_english_article(core + 19));
-    } else if (!strcmp(core, "quit")) {
+    } else if (!strcmpi(core, "reverting to unhealthy human form")
+               || !strcmpi(core, "reverting to unhealthy elf form")
+               || !strcmpi(core, "reverting to unhealthy dwarf form")
+               || !strcmpi(core, "reverting to unhealthy gnome form")
+               || !strcmpi(core, "reverting to unhealthy orc form")) {
+        Snprintf(outmain, sizeof outmain, "不健康な姿に戻って倒れた");
+    } else if (!strcmpi(core, "killed while stuck in creature form")) {
+        Snprintf(outmain, sizeof outmain, "怪物の姿から戻れずに倒れた");
+    } else if (!strcmpi(core, "unsuccessful polymorph")) {
+        Snprintf(outmain, sizeof outmain, "変身の失敗で倒れた");
+    } else if (!strcmpi(core, "self-genocide")) {
+        Snprintf(outmain, sizeof outmain, "自分自身の抹殺");
+    } else if (!strcmpi(core, "system shock")) {
+        Snprintf(outmain, sizeof outmain, "システムショック");
+    } else if (!strcmpi(core, "alchemic blast")) {
+        Snprintf(outmain, sizeof outmain, "錬金術の爆発");
+    } else if (!strcmpi(core, "exhaustion")) {
+        Snprintf(outmain, sizeof outmain, "過労死");
+    } else if (!strcmpi(core, "starvation")) {
+        Snprintf(outmain, sizeof outmain, "餓死");
+    } else if (!strcmpi(core, "brainlessness")) {
+        Snprintf(outmain, sizeof outmain, "脳を失ったこと");
+    } else if (!strcmpi(core, "elementary physics")) {
+        Snprintf(outmain, sizeof outmain, "物理法則");
+    } else if (!strcmpi(core, "psychic blast")) {
+        Snprintf(outmain, sizeof outmain, "精神波の爆発");
+    } else if (!strcmpi(core, "gas cloud")) {
+        Snprintf(outmain, sizeof outmain, "毒ガスの雲");
+    } else if (!strcmpi(core, "falling rock")) {
+        Snprintf(outmain, sizeof outmain, "落石");
+    } else if (!strcmpi(core, "falling object")) {
+        Snprintf(outmain, sizeof outmain, "落下物");
+    } else if (!strcmpi(core, "colliding with the ceiling")) {
+        Snprintf(outmain, sizeof outmain, "天井への激突");
+    } else if (!strcmpi(core, "a grappling hook")) {
+        Snprintf(outmain, sizeof outmain, "グラップリングフック");
+    } else if (!strcmpi(core, "jumping out of a bear trap")) {
+        Snprintf(outmain, sizeof outmain, "熊罠からの脱出失敗");
+    } else if (!strcmpi(core, "sitting in lava")) {
+        Snprintf(outmain, sizeof outmain, "溶岩に座ったこと");
+    } else if (!strcmpi(core, "cursed throne")) {
+        Snprintf(outmain, sizeof outmain, "呪われた玉座");
+    } else if (!strcmpi(core, "electric chair")) {
+        Snprintf(outmain, sizeof outmain, "電気椅子");
+    } else if (!strcmpi(core, "acidic chair")) {
+        Snprintf(outmain, sizeof outmain, "酸の椅子");
+    } else if (!strcmpi(core, "acidic corpse")) {
+        Snprintf(outmain, sizeof outmain, "酸性の死体");
+    } else if (!strcmpi(core, "acidic glob")) {
+        Snprintf(outmain, sizeof outmain, "酸性の塊");
+    } else if (!strcmpi(core, "cadaver")) {
+        Snprintf(outmain, sizeof outmain, "腐った死体");
+    } else if (!strcmpi(core, "rotted glob")) {
+        Snprintf(outmain, sizeof outmain, "腐った塊");
+    } else if (!strcmpi(core, "rotten lump of royal jelly")) {
+        Snprintf(outmain, sizeof outmain, "腐ったローヤルゼリー");
+    } else if (!strcmpi(core, "very rich meal")) {
+        Snprintf(outmain, sizeof outmain, "豪華すぎる食事");
+    } else if (!strcmpi(core, "quick snack")) {
+        Snprintf(outmain, sizeof outmain, "軽いスナック");
+    } else if (!strcmpi(core, "axing a hard object")) {
+        Snprintf(outmain, sizeof outmain, "硬いものを斧で叩いたこと");
+    } else if (!strcmpi(core, "exploding ring")) {
+        Snprintf(outmain, sizeof outmain, "指輪の爆発");
+    } else if (!strcmpi(core, "exploding wand")) {
+        Snprintf(outmain, sizeof outmain, "杖の爆発");
+    } else if (!strcmpi(core, "exploding rune")) {
+        Snprintf(outmain, sizeof outmain, "ルーンの爆発");
+    } else if (!strcmpi(core, "residual undead turning effect")) {
+        Snprintf(outmain, sizeof outmain, "アンデッド退散の残留効果");
+    } else if (!strcmpi(core, "genocidal confusion")) {
+        Snprintf(outmain, sizeof outmain, "抹殺による混乱");
+    } else if (!strcmpi(core, "imperious order")) {
+        Snprintf(outmain, sizeof outmain, "傲慢な命令");
+    } else if (!strcmpi(core, "committed suicide")) {
+        Snprintf(outmain, sizeof outmain, "自殺");
+    } else if (!strcmpi(core, "went to heaven prematurely")) {
+        Snprintf(outmain, sizeof outmain, "早すぎる天国への旅");
+    } else if (!strcmpi(core, "turned into green slime")) {
+        Snprintf(outmain, sizeof outmain, "緑のスライムになったこと");
+    } else if (!strcmpi(core, "slimicide")) {
+        Snprintf(outmain, sizeof outmain, "スライム化による死");
+    } else if (!strcmpi(core, "killed by petrification")) {
+        Snprintf(outmain, sizeof outmain, "石化による死");
+    } else if (!strcmpi(core, "quit while already on Charon's boat")) {
+        Snprintf(outmain, sizeof outmain, "カロンの舟の上で人生を諦めた");
+    } else if (!strncmp(core, "unwisely ate the body of ", 25)) {
+        Snprintf(outmain, sizeof outmain, "%sの死体を食べた不心得",
+                 core + 25);
+    } else if (!strncmp(core, "unwisely ate the brain of ", 26)) {
+        Snprintf(outmain, sizeof outmain, "%sの脳を食べた不心得",
+                 core + 26);
+    } else if (!strncmp(core, "tasting ", 8) && strstr(core, " meat")) {
+        char mbuf[BUFSZ];
+        const char *p = strstr(core, " meat");
+        size_t mlen = p - (core + 8);
+        if (mlen < sizeof mbuf) {
+            (void) memcpy(mbuf, core + 8, mlen);
+            mbuf[mlen] = '\0';
+            Snprintf(outmain, sizeof outmain, "%sの肉の試食", mbuf);
+        } else {
+            Snprintf(outmain, sizeof outmain, "肉の試食");
+        }
+    } else if (!strncmp(core, "the wrath of ", 13)) {
+        Snprintf(outmain, sizeof outmain, "%sの怒り",
+                 jp_gname_for_display(core + 13));
+    } else if (strstr(core, " indifference")) {
+        char gbuf[BUFSZ];
+        const char *p = strstr(core, " indifference");
+        size_t glen = p - core;
+        if (glen < sizeof gbuf) {
+            (void) memcpy(gbuf, core, glen);
+            gbuf[glen] = '\0';
+            /* s_suffix を除去 */
+            if (glen >= 2 && !strcmp(gbuf + glen - 2, "'s"))
+                gbuf[glen - 2] = '\0';
+            else if (glen >= 1 && gbuf[glen - 1] == '\'')
+                gbuf[glen - 1] = '\0';
+            Snprintf(outmain, sizeof outmain, "%sの無関心",
+                     jp_gname_for_display(gbuf));
+        } else {
+            Snprintf(outmain, sizeof outmain, "神の無関心");
+        }
+    } else if (!strncmp(core, "quit", 5)) {
         Snprintf(outmain, sizeof outmain, "中断した");
     } else if (!strncmp(core, "ascended", 8)) {
         Snprintf(outmain, sizeof outmain, "昇天した");
