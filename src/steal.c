@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
 /* NetHack 5.0	steal.c	$NHDT-Date: 1720895742 2024/07/13 18:35:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -798,9 +798,9 @@ maybe_absorb_item(
         if (cansee(mon->mx, mon->my)) {
             /* Some_Monnam() avoids "It pulls ... and absorbs it!"
                if hero can see the location but not the monster */
-            pline("%s pulls %s away from you and absorbs %s!",
+            pline("%sはあなたから%sを奪い取り、それを吸収した!",
                   Some_Monnam(mon), /* Monnam() or "Something" */
-                  yname(obj), (obj->quan > 1L) ? "them" : "it");
+                  yname(obj));
         } else {
             const char *hand_s = jp_body_part(HAND);
 
