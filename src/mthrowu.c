@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
 /* NetHack 5.0	mthrowu.c	$NHDT-Date: 1737392015 2025/01/20 08:53:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.173 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
@@ -279,7 +279,7 @@ monshoot(struct monst *mtmp, struct obj *otmp, struct obj *mwep)
         if (multishot > 1) {
             /* "N arrows"; multishot > 1 implies otmp->quan > 1, so
                xname()'s result will already be pluralized */
-            Sprintf(onmbuf, "%d %s", multishot, xname(otmp));
+            Sprintf(onmbuf, "%d%sの%s", multishot, jp_counter_for_obj(otmp), xname(otmp));
             onm = onmbuf;
         } else {
             /* "an arrow" */

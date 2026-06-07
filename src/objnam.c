@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1745114235 2025/04/19 17:57:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.453 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -50,7 +50,6 @@ staticfn boolean singplur_lookup(char *, char *, boolean,
                                const char *const *);
 staticfn char *singplur_compound(char *);
 staticfn boolean has_nonascii(const char *);
-staticfn const char *jp_counter_for_obj(struct obj *);
 staticfn boolean ch_ksound(const char *basestr);
 staticfn boolean badman(const char *, boolean);
 staticfn boolean wishymatch(const char *, const char *, boolean);
@@ -3011,7 +3010,7 @@ has_nonascii(const char *str)
     return FALSE;
 }
 
-staticfn const char *
+const char *
 jp_counter_for_obj(struct obj *obj)
 {
     if (!obj)
@@ -3020,13 +3019,22 @@ jp_counter_for_obj(struct obj *obj)
     if (obj->oclass == SPBOOK_CLASS)
         return "冊";
 
-    if (obj->oclass == WEAPON_CLASS && is_ammo(obj))
-        return "本";
+    if (obj->oclass == WEAPON_CLASS || obj->oclass == TOOL_CLASS || obj->oclass == GEM_CLASS) {
+        int skill = objects[obj->otyp].oc_skill;
+
+        if (skill == -P_SHURIKEN)
+            return "枚";
+        if (is_ammo(obj) || is_missile(obj))
+            return "本";
+        if (skill == P_DAGGER || skill == P_KNIFE || skill == P_SPEAR
+            || skill == P_TRIDENT)
+            return "本";
+    }
 
     if (obj->oclass == WAND_CLASS)
         return "本";
 
-    if (obj->oclass == COIN_CLASS)
+    if (obj->oclass == COIN_CLASS || obj->oclass == SCROLL_CLASS)
         return "枚";
 
     return "個";

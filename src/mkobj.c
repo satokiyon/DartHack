@@ -743,9 +743,9 @@ bill_dummy_object(struct obj *otmp)
 
 /* alteration types; must match COST_xxx macros in hack.h */
 static const char *const alteration_verbs[] = {
-    "cancel", "drain", "uncharge", "unbless", "uncurse", "disenchant",
-    "degrade", "dilute", "erase", "burn", "neutralize", "destroy", "splatter",
-    "bite", "open", "break the lock on", "rust", "rot", "tarnish", "crack",
+    "無効化", "吸い取", "魔力を失わせ", "祝福を解", "呪いを解", "魔力を解",
+    "劣化させ", "薄めた", "消去した", "燃やした", "中和した", "壊した", "ぶちまけた",
+    "かじった", "開けた", "鍵を壊した", "錆びさせた", "腐らせた", "くすませた", "ひびを入れた",
 };
 
 /* possibly bill for an object which the player has just modified */
@@ -755,7 +755,6 @@ costly_alteration(struct obj *obj, int alter_type)
     coordxy ox, oy;
     char objroom;
     boolean learn_bknown;
-    const char *those, *them;
     struct monst *shkp = 0;
 
     if (alter_type < 0 || alter_type >= SIZE(alteration_verbs)) {
@@ -786,11 +785,6 @@ costly_alteration(struct obj *obj, int alter_type)
             return;
     }
 
-    if (obj->quan == 1L)
-        those = "that", them = "it";
-    else
-        those = "those", them = "them";
-
     /* when shopkeeper describes the object as being uncursed or unblessed
        hero will know that it is now uncursed; will also make the feedback
        from `I x' after bill_dummy_object() be more specific for this item */
@@ -804,8 +798,8 @@ costly_alteration(struct obj *obj, int alter_type)
         if (shkp) {
             SetVoice(shkp, 0, 80, 0);
         }
-        verbalize("お前が%sした%s%s、払え!",
-              alteration_verbs[alter_type], those, simpleonames(obj));
+        verbalize("お前が%sしたこの%s、払え!",
+              alteration_verbs[alter_type], simpleonames(obj));
         bill_dummy_object(obj);
         break;
     case OBJ_FLOOR:
@@ -815,8 +809,8 @@ costly_alteration(struct obj *obj, int alter_type)
             if (shkp) {
                 SetVoice(shkp, 0, 80, 0);
             }
-            verbalize("お前が%sした%s、払え!",
-                      alteration_verbs[alter_type], those);
+            verbalize("お前が%sしたそれ、払え!",
+                      alteration_verbs[alter_type]);
             bill_dummy_object(obj);
         } else {
             (void) stolen_value(obj, ox, oy, FALSE, FALSE);

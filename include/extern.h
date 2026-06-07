@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2252,6 +2252,7 @@ extern char *doname_vague_quan(struct obj *) NONNULLARG1;
 extern boolean not_fully_identified(struct obj *) NONNULLARG1;
 extern char *corpse_xname(struct obj *, const char *, unsigned) NONNULLARG1;
 extern char *jp_corpse_xname(struct obj *, const char *, unsigned) NONNULLARG1;
+extern const char *jp_counter_for_obj(struct obj *);
 extern char *cxname(struct obj *) NONNULLARG1;
 extern char *cxname_singular(struct obj *) NONNULLARG1;
 extern char *killer_xname(struct obj *) NONNULLARG1;

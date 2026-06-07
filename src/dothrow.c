@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
 /* NetHack 5.0	dothrow.c	$NHDT-Date: 1737343372 2025/01/19 19:22:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.300 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -243,9 +243,13 @@ throw_obj(struct obj *obj, int shotlimit)
        attempted to specify a count */
     if (multishot > 1 || shotlimit > 0) {
         /* "You shoot N arrows." or "You throw N daggers." */
-        You("%s %d %s.", gm.m_shot.s ? "撃った" : "投げた",
-            multishot, /* (might be 1 if player gave shotlimit) */
-            (multishot == 1) ? singular(obj, xname) : xname(obj));
+        if (multishot == 1) {
+            You("%sを%s.", singular(obj, xname),
+                gm.m_shot.s ? "撃った" : "投げた");
+        } else {
+            You("%d%sの%sを%s.", multishot, jp_counter_for_obj(obj), xname(obj),
+                gm.m_shot.s ? "撃った" : "投げた");
+        }
     }
 
     wep_mask = obj->owornmask;
