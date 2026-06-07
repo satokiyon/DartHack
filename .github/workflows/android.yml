@@ -6,6 +6,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v6
       - name: Install required packages
@@ -21,9 +23,18 @@ jobs:
           cmdline-tools-version: 9123335
           packages: 'platforms;android-30 ndk;30.0.14904198'
       - name: Configure path to NDK
-        run: sed -i -e 's,NDK = .*,NDK = /usr/local/lib/android/sdk/ndk/30.0.14904198,g' sys/android/Makefile.src sys/android/Makefile.top
+        run: |
+          sed -i -e 's,NDK = .*,NDK = /usr/local/lib/android/sdk/ndk/30.0.14904198,g' sys/android/Makefile.src sys/android/Makefile.top
       - name: Build native Android application
-        run: cd sys/android && sh ./setup.sh && cd ../.. && make fetch-lua && make install || make install
+        run: |
+          for ABI in arm64-v8a armeabi armeabi-v7a x86 x86_64
+          do
+            echo "building for $ABI..."
+            sed -i -e "s,ABI = .*,ABI = $ABI,g" sys/android/Makefile.src sys/android/Makefile.top
+            cd sys/android && sh ./setup.sh && cd ../..
+            make fetch-lua && make install || make install
+            make spotless
+          done
       - name: Build NetHack
         run: cd sys/android && sh gradlew build
       - uses: actions/upload-artifact@v5
@@ -34,3 +45,10 @@ jobs:
         with:
           name: nethack-debug
           path: sys/android/app/build/outputs/apk/debug/app-debug.apk 
+      - name: Make a release
+        uses: softprops/action-gh-release@v3
+        if: github.ref_type == 'tag'
+        with:
+          generate_release_notes: true
+          body: "NOTE: currently releases contain libnethack.so for each ABI. Ideally later we will have seperate APKs for each like most modern apps. All of the releases should be considered beta quality as the changes were massive and I have not been able to test it all on my own."
+          files: sys/android/app/build/outputs/apk/release/app-release-unsigned.apk
