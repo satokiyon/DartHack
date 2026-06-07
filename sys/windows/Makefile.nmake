@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07.
 # NetHack 5.0 Makefile.nmake
 #       Copyright (c) NetHack Development Team 1993-2026
 #
@@ -1870,7 +1870,7 @@ $(OTTY)date.o: $(HACKINCL) $(HACKSRC) $(HACKOBJ) $(ALLOBJTTY) $(CURSESOBJ)
 	@echo ^$(OTTY)date.o: >>date-tty.nmk
 	@echo. 	^$(cc) ^$(CFLAGS) -Fo^$@ date.c>>date-tty.nmk
 	@echo.>>date-tty.nmk
-        @$(MAKE) /NOLOGO /A OTTY=objtty\x64\ -f date-tty.nmk
+        @$(MAKE) /NOLOGO /A OTTY=$(OTTY) -f date-tty.nmk
 !ENDIF
 
 $(OGUI)date.o: $(HACKINCL) $(HACKSRC) $(HACKOBJ) $(ALLOBJGUI)
