@@ -126,7 +126,6 @@ OPTIONS=font_message:Arial,font_size_message:14
 # Menu settings
 OPTIONS=font_menu:Arial,font_size_menu:14
 #OPTIONS=font_menu:CascadiaMono,font_size_menu:14
-OPTIONS=menucolors
 
 # Text settings
 OPTIONS=font_text:Courier New,font_size_text:14
@@ -350,8 +349,8 @@ SOUND=MESG "は弾き飛ばされた[!！]" "sepack/sepack_16_hit_high.wav" 100
 
 # ---- 17: 打撃音4（叩くイメージ、低めの音） ----
 SOUND=MESG "ガシャーン[!！]" "sepack/sepack_17_hit_low.wav" 100
-SOUND=MESG "ドスン"" "sepack/sepack_17_hit_low.wav" 100
-SOUND=MESG "ズドン"" "sepack/sepack_17_hit_low.wav" 100
+SOUND=MESG "ドスン" "sepack/sepack_17_hit_low.wav" 100
+SOUND=MESG "ズドン" "sepack/sepack_17_hit_low.wav" 100
 
 # ---- 18: 打撃音5（激しめの音） ----
 SOUND=MESG "ドカーン[!！][!！]" "sepack/sepack_18_hit_hard.wav" 100
