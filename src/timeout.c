@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
 /* NetHack 5.0	timeout.c	$NHDT-Date: 1776080125 2026/04/13 03:35:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -1260,17 +1260,12 @@ slip_or_trip(void)
         /* is fumbling from ice alone? */
         boolean ice_only = !(EFumbling || (HFumbling & ~FROMOUTSIDE));
 
-        pline("%s %s %s the ice.",
+        pline("%sは氷の%s%s.",
               u.usteed ? upstart(x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
                                           SUPPRESS_SADDLE, FALSE))
-                       : "You",
-              /* "steed": arbitrary value that will use third person verb
-                 regardless of what u.usteed might be named, as opposed to
-                 "you" (second person, which won't have final 's' added) */
-              vtense(u.usteed ? "steed" : "you", rn2(2) ? "slip" : "slide"),
-              /* sometimes slipping due to ice occurs during turn that hero
-                 has just moved off the ice; phrase things differently then */
-              is_ice(u.ux, u.uy) ? "on" : "off");
+                       : "あなた",
+              is_ice(u.ux, u.uy) ? "上で" : "外へ",
+              rn2(2) ? "足を滑らせた" : "滑った");
         /* fumbling outside of ice while mounted always causes the hero to
            fall from the saddle (unless it is cursed), so to avoid a
            counterintuitive effect where ice makes riding _less_ hazardous,
@@ -1344,7 +1339,7 @@ see_lamp_flicker(struct obj *obj, const char *tailer)
     switch (obj->where) {
     case OBJ_INVENT:
     case OBJ_MINVENT:
-        pline("%s flickers%s.", Yname2(obj), tailer);
+        pline("%sが%s点滅している.", Yname2(obj), tailer);
         break;
     case OBJ_FLOOR:
         You_see("%sが%s点滅している.", an(xname(obj)), tailer);
@@ -1446,7 +1441,7 @@ burn_object(anything *arg, long timeout)
                 FALLTHROUGH;
                 /*FALLTHRU*/
             case OBJ_MINVENT:
-                pline("%spotion of oil has burnt away.", whose);
+                pline("%s油のポーションは燃え尽きた.", whose);
                 break;
             case OBJ_FLOOR:
                 You_see("燃えている油のポーションが消えるのを見た.");
@@ -1479,7 +1474,7 @@ burn_object(anything *arg, long timeout)
                     lantern_message(obj);
                 else
                     see_lamp_flicker(obj,
-                                     obj->age == 50L ? " considerably" : "");
+                                     obj->age == 50L ? "激しく" : "");
             }
             break;
 
@@ -1491,7 +1486,7 @@ burn_object(anything *arg, long timeout)
                     switch (obj->where) {
                     case OBJ_INVENT:
                     case OBJ_MINVENT:
-                        pline("%s seems about to go out.", Yname2(obj));
+                        pline("%sは今にも消えそうだ.", Yname2(obj));
                         break;
                     case OBJ_FLOOR:
                         You_see("%sが消える寸前のを見た.", an(xname(obj)));
@@ -1511,9 +1506,9 @@ burn_object(anything *arg, long timeout)
                     /*FALLTHRU*/
                 case OBJ_MINVENT:
                     if (obj->otyp == BRASS_LANTERN)
-                        pline("%slantern has run out of power.", whose);
+                        pline("%sランタンの明かりは消えた.", whose);
                     else
-                        pline("%s has gone out.", Yname2(obj));
+                        pline("%sは消えた.", Yname2(obj));
                     break;
                 case OBJ_FLOOR:
                     if (obj->otyp == BRASS_LANTERN)
@@ -1549,9 +1544,9 @@ burn_object(anything *arg, long timeout)
                 switch (obj->where) {
                 case OBJ_INVENT:
                 case OBJ_MINVENT:
-                    pline("%s%scandle%s getting short.", whose,
-                          menorah ? "candelabrum's " : "",
-                          many ? "s are" : " is");
+                    pline("%s%sのろうそく%s短くなってきた.", whose,
+                          menorah ? "ろうそく台" : "",
+                          many ? "たちは" : "は");
                     break;
                 case OBJ_FLOOR:
                     You_see("%sのろうそく%sが短くなっているのを見た.",
@@ -1567,9 +1562,8 @@ burn_object(anything *arg, long timeout)
                 switch (obj->where) {
                 case OBJ_INVENT:
                 case OBJ_MINVENT:
-                    pline("%s%scandle%s flame%s flicker%s low!", whose,
-                          menorah ? "candelabrum's " : "", many ? "s'" : "'s",
-                          many ? "s" : "", many ? "" : "s");
+                    pline("%s%sの炎が弱々しく点滅している!", whose,
+                          menorah ? "ろうそく台のろうそく" : "ろうそく");
                     break;
                 case OBJ_FLOOR:
                     You_see("%sのろうそく%sの炎%sが弱々しく点滅しているのを見た!",
@@ -1590,8 +1584,7 @@ burn_object(anything *arg, long timeout)
                         FALLTHROUGH;
                         /*FALLTHRU*/
                     case OBJ_MINVENT:
-                        pline("%scandelabrum's flame%s.", whose,
-                              many ? "s die" : " dies");
+                        pline("%sろうそく台の炎が消えた.", whose);
                         break;
                     case OBJ_FLOOR:
                         You_see("ろうそく台の炎%sが消えるのを見た.",
@@ -1606,8 +1599,7 @@ burn_object(anything *arg, long timeout)
                            FALLTHROUGH;
                         /*FALLTHRU*/
                     case OBJ_MINVENT:
-                        pline("%s %s consumed!", Yname2(obj),
-                              many ? "are" : "is");
+                        pline("%sは燃え尽きた!", Yname2(obj));
                         break;
                     case OBJ_FLOOR:
                         /*
@@ -1622,9 +1614,9 @@ burn_object(anything *arg, long timeout)
 
                     /* post message */
                     pline(Hallucination
-                              ? (many ? "They shriek!" : "It shrieks!")
-                              : Blind ? "" : (many ? "Their flames die."
-                                                   : "Its flame dies."));
+                              ? (many ? "それらは悲鳴をあげた!" : "それは悲鳴をあげた!")
+                              : Blind ? "" : (many ? "それらの炎は消えた."
+                                                   : "その炎は消えた."));
                 }
             }
             end_burn(obj, FALSE);
