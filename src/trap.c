@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1741926700 2025/03/13 20:31:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.621 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1154,6 +1154,9 @@ m_harmless_trap(struct monst *mtmp, struct trap *ttmp)
     case LANDMINE:
         break;
     case ROLLING_BOULDER_TRAP:
+        /* the Sokoban rolling boulder traps are not dangerous */
+        if (In_sokoban(&u.uz))
+            return TRUE;
         break;
     case SLP_GAS_TRAP:
         if (resists_sleep(mtmp) || defended(mtmp, AD_SLEE))

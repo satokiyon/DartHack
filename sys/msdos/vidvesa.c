@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   VESA BIOS functions copyright (c) Ray Chason 2016              */
 /*   NetHack may be freely redistributed.  See license for details. */
@@ -691,9 +692,16 @@ vesa_xputg(const glyph_info *glyphinfo, const glyph_info *bkglyphinfo UNUSED)
     }
 #endif
     if (vesa_pixel_size > 8 && glyphinfo->gm.customcolor != 0) {
-        /* FIXME: won't display black (0,0,0) correctly, but the background
-           is usually black anyway */
-        attr = glyphinfo->gm.customcolor | 0x80000000;
+        attr = glyphinfo->gm.customcolor;
+        if (attr & NH_BASIC_COLOR) {
+            attr &= 0x0F;
+        } else {
+            struct Pixel p;
+            p.r = (unsigned char)(attr >> 16);
+            p.g = (unsigned char)(attr >>  8);
+            p.b = (unsigned char)(attr >>  0);
+            attr = vesa_MakeColor(p) | 0x80000000;
+        }
     }
 
     row = currow;
