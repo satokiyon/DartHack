@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3786,6 +3786,7 @@ extern int vms_get_saved_games(const char *, char ***);
 /* ### weapon.c ### */
 
 extern const char *weapon_descr(struct obj *) NONNULLARG1;
+extern const char *weapon_descr_jp(struct obj *) NONNULLARG1;
 extern int hitval(struct obj *, struct monst *) NONNULLARG12;
 extern int dmgval(struct obj *, struct monst *) NONNULLARG12;
 extern int special_dmgval(struct monst *, struct monst *, long, long *) NONNULLARG12;
@@ -3802,6 +3803,7 @@ extern void wet_a_towel(struct obj *, int, boolean) NONNULLARG1;
 extern void dry_a_towel(struct obj *, int, boolean) NONNULLARG1;
 extern char *skill_level_name(int, char *) NONNULLARG2;
 extern const char *skill_name(int);
+extern const char *skill_name_jp(int);
 extern char *jp_skill_level_name_for_display(int, char *) NONNULLARG2;
 extern const char *jp_skill_name_for_display(int);
 extern char *jp_weapon_descr_for_display(struct obj *, char *, size_t)

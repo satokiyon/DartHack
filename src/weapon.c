@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
 /* NetHack 5.0	weapon.c	$NHDT-Date: 1725227810 2024/09/01 21:56:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -56,9 +56,18 @@ static NEARDATA const char *const odd_skill_names[] = {
     "attack spells", "healing spells", "divination spells",
     "enchantment spells", "clerical spells", "escape spells", "matter spells",
 };
+static NEARDATA const char *const odd_skill_names_jp[] = {
+    "無技量", "素手",
+    "二刀流", "乗馬", "長柄武器", "三日月刀", "ハンマー", "鞭",
+    "攻撃呪文", "回復呪文", "予知呪文",
+    "付与呪文", "僧侶呪文", "脱出呪文", "物質呪文",
+};
 /* indexed via is_martial() */
 static NEARDATA const char *const barehands_or_martial[] = {
     "bare handed combat", "martial arts"
+};
+static NEARDATA const char *const barehands_or_martial_jp[] = {
+    "素手格闘", "武術"
 };
 
 #define P_NAME(type)                                    \
@@ -67,6 +76,13 @@ static NEARDATA const char *const barehands_or_martial[] = {
          : (type == P_BARE_HANDED_COMBAT)               \
                ? barehands_or_martial[martial_bonus()]  \
                : odd_skill_names[-skill_names_indices[type]])
+
+#define P_NAME_JP(type)                                 \
+    ((skill_names_indices[type] > 0)                    \
+         ? jp_item_name(skill_names_indices[type])      \
+         : (type == P_BARE_HANDED_COMBAT)               \
+               ? barehands_or_martial_jp[martial_bonus()]  \
+               : odd_skill_names_jp[-skill_names_indices[type]])
 
 /* targets that provide attacker with small to-hit bonus when using a spear */
 static NEARDATA const char kebabable[] = {
@@ -78,9 +94,9 @@ give_may_advance_msg(int skill)
 {
     You_feel("自分の%s技量に自信がついた.",
              (skill == P_NONE) ? ""
-                 : (skill <= P_LAST_WEAPON) ? "weapon "
-                     : (skill <= P_LAST_SPELL) ? "spell casting "
-                         : "fighting ");
+                 : (skill <= P_LAST_WEAPON) ? "武器"
+                     : (skill <= P_LAST_SPELL) ? "呪文"
+                         : "格闘");
     (void) handle_tip(TIP_ENHANCE);
 }
 
@@ -140,6 +156,52 @@ weapon_descr(struct obj *obj)
         break;
     }
     return makesingular(descr);
+}
+
+const char *
+weapon_descr_jp(struct obj *obj)
+{
+    int skill = weapon_type(obj);
+    const char *descr = P_NAME_JP(skill);
+
+    /* assorted special cases */
+    switch (skill) {
+    case P_NONE:
+        descr = (obj->otyp == CORPSE || obj->otyp == TIN || obj->otyp == EGG
+                 || obj->otyp == STATUE || obj->otyp == BOULDER
+                 || obj->otyp == TOWEL || obj->otyp == TIN_OPENER)
+                ? jp_item_name(obj->otyp)
+                : obj->globby ? "塊"
+                  : jp_oclass_name(obj->oclass);
+        break;
+    case P_SLING:
+        if (is_ammo(obj))
+            descr = (obj->otyp == ROCK || is_graystone(obj))
+                        ? "石"
+                        : (obj->oclass == GEM_CLASS)
+                            ? "宝石"
+                            : jp_oclass_name(obj->oclass);
+        break;
+    case P_BOW:
+        if (is_ammo(obj))
+            descr = "矢";
+        break;
+    case P_CROSSBOW:
+        if (is_ammo(obj))
+            descr = "ボルト";
+        break;
+    case P_FLAIL:
+        if (obj->otyp == GRAPPLING_HOOK)
+            descr = "鉤爪";
+        break;
+    case P_PICK_AXE:
+        if (obj->otyp == DWARVISH_MATTOCK)
+            descr = "つるはし";
+        break;
+    default:
+        break;
+    }
+    return descr;
 }
 
 /*
@@ -1127,6 +1189,12 @@ skill_name(int skill)
     return P_NAME(skill);
 }
 
+const char *
+skill_name_jp(int skill)
+{
+    return P_NAME_JP(skill);
+}
+
 /* localized skill level text for display-only paths */
 char *
 jp_skill_level_name_for_display(int skill, char *buf)
@@ -1347,7 +1415,7 @@ skill_advance(int skill)
     /* subtly change the advance message to indicate no more advancement */
     You("今、%s%sに熟練した。",
         P_SKILL(skill) >= P_MAX_SKILL(skill) ? "最も" : "より",
-        P_NAME(skill));
+        P_NAME_JP(skill));
 
     /* wizards discover spellbook IDs depending on spell 'school' skill limits;
        this allows them to successfully write books for unknown spells without
@@ -1359,10 +1427,11 @@ skill_advance(int skill)
 static const struct skill_range {
     short first, last;
     const char *name;
+    const char *name_jp;
 } skill_ranges[] = {
-    { P_FIRST_H_TO_H, P_LAST_H_TO_H, "Fighting Skills" },
-    { P_FIRST_WEAPON, P_LAST_WEAPON, "Weapon Skills" },
-    { P_FIRST_SPELL, P_LAST_SPELL, "Spellcasting Skills" },
+    { P_FIRST_H_TO_H, P_LAST_H_TO_H, "Fighting Skills", "格闘のスキル" },
+    { P_FIRST_WEAPON, P_LAST_WEAPON, "Weapon Skills", "武器のスキル" },
+    { P_FIRST_SPELL, P_LAST_SPELL, "Spellcasting Skills", "呪文のスキル" },
 };
 
 /* write a list of skills onto the given menu
@@ -1382,7 +1451,7 @@ add_skills_to_menu(winid win, boolean selectable, boolean speedy)
     for (longest = 0, i = 0; i < P_NUM_SKILLS; i++) {
         if (P_RESTRICTED(i))
             continue;
-        if ((len = Strlen(P_NAME(i))) > longest)
+        if ((len = Strlen(P_NAME_JP(i))) > longest)
             longest = len;
     }
 
@@ -1396,7 +1465,7 @@ add_skills_to_menu(winid win, boolean selectable, boolean speedy)
             /* Print headings for skill types */
             any = cg.zeroany;
             if (i == skill_ranges[pass].first)
-                add_menu_heading(win, skill_ranges[pass].name);
+                add_menu_heading(win, skill_ranges[pass].name_jp);
 
             if (P_RESTRICTED(i))
                 continue;
@@ -1417,26 +1486,26 @@ add_skills_to_menu(winid win, boolean selectable, boolean speedy)
                 prefix = "  # ";
             else
                 prefix = "    ";
-            (void) skill_level_name(i, sklnambuf);
+            (void) jp_skill_level_name_for_display(i, sklnambuf);
             if (wizard) {
                 if (!iflags.menu_tab_sep)
                     Snprintf(buf, sizeof buf,
                              " %s%-*s %-12s %5d(%4d)", prefix,
-                             longest, P_NAME(i), sklnambuf, P_ADVANCE(i),
+                             longest, P_NAME_JP(i), sklnambuf, P_ADVANCE(i),
                              practice_needed_to_advance(P_SKILL(i)));
                 else
                     Snprintf(buf, sizeof buf,
-                             " %s%s\t%s\t%5d(%4d)", prefix, P_NAME(i),
+                             " %s%s\t%s\t%5d(%4d)", prefix, P_NAME_JP(i),
                              sklnambuf, P_ADVANCE(i),
                              practice_needed_to_advance(P_SKILL(i)));
             } else {
                 if (!iflags.menu_tab_sep)
                     Snprintf(buf, sizeof buf,
                              " %s %-*s [%s]", prefix, longest,
-                             P_NAME(i), sklnambuf);
+                             P_NAME_JP(i), sklnambuf);
                 else
                     Snprintf(buf, sizeof buf,
-                             " %s%s\t[%s]", prefix, P_NAME(i),
+                             " %s%s\t[%s]", prefix, P_NAME_JP(i),
                              sklnambuf);
             }
             any.a_int = selectable && can_advance(i, speedy) ? i + 1 : 0;
@@ -1481,7 +1550,7 @@ enhance_weapon_skill(void)
     /* player knows about #enhance, don't show tip anymore */
     svc.context.tips |= (1 << TIP_ENHANCE);
 
-    if (wizard && y_n("Advance skills without practice?") == 'y')
+    if (wizard && y_n("訓練なしでスキルを習熟させますか?") == 'y')
         speedy = TRUE;
 
     do {
@@ -1505,17 +1574,17 @@ enhance_weapon_skill(void)
            with "*" or "#" below */
         if (eventually_advance > 0 || maxxed_cnt > 0) {
             if (eventually_advance > 0) {
-                Sprintf(buf, "(Skill%s flagged by \"*\" may be enhanced %s.)",
-                        plur(eventually_advance),
+                Sprintf(buf, "(「*」の付いたスキル%sは%s習熟させることができます。)",
+                        eventually_advance > 1 ? "ら" : "",
                         (u.ulevel < MAXULEV)
-                            ? "when you're more experienced"
-                            : "if skill slots become available");
+                            ? "より経験を積めば"
+                            : "スキル枠に空きができれば");
                 add_menu_str(win, buf);
             }
             if (maxxed_cnt > 0) {
                 Sprintf(buf,
-                 "(Skill%s flagged by \"#\" cannot be enhanced any further.)",
-                        plur(maxxed_cnt));
+                 "(「#」の付いたスキル%sはこれ以上習熟させることはできません。)",
+                        maxxed_cnt > 1 ? "ら" : "");
                 add_menu_str(win, buf);
             }
             add_menu_str(win, "");
@@ -1524,11 +1593,10 @@ enhance_weapon_skill(void)
         add_skills_to_menu(
             win, to_advance + eventually_advance + maxxed_cnt > 0, speedy);
 
-        Strcpy(buf, (to_advance > 0) ? "Pick a skill to advance:"
-                                     : "Current skills:");
+        Strcpy(buf, (to_advance > 0) ? "習熟させるスキルを選んでください:"
+                                     : "現在のスキル:");
         if (wizard && !speedy)
-            Sprintf(eos(buf), "  (%d slot%s available)", u.weapon_slots,
-                    plur(u.weapon_slots));
+            Sprintf(eos(buf), "  (%d スロット利用可能)", u.weapon_slots);
         end_menu(win, buf);
         n = select_menu(win, to_advance ? PICK_ONE : PICK_NONE, &selected);
         destroy_nhwindow(win);
@@ -1653,7 +1721,7 @@ drain_weapon_skill(int n) /* number of skills to drain */
     for (skill = 0; skill < P_NUM_SKILLS; skill++)
         if (tmpskills[skill]) {
             You("%sの訓練%sを忘れた。",
-                P_NAME(skill),
+                P_NAME_JP(skill),
                 P_SKILL(skill) >= P_BASIC ? "の一部を" : "");
         }
 }

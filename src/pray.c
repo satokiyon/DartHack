@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
 /* NetHack 5.0	pray.c	$NHDT-Date: 1762680996 2025/11/09 01:36:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -562,7 +562,7 @@ fix_worst_trouble(int trouble)
         if (Blinded) {
             if (eyecount(gy.youmonst.data) != 1)
                 eyes = makeplural(eyes);
-            Sprintf(msgbuf, "Your %s %s better", eyes, vtense(eyes, "feel"));
+            Sprintf(msgbuf, "%sの調子が良くなった", eyes);
             u.ucreamed = 0;
             make_blinded(0L, FALSE);
         }

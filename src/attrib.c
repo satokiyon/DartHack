@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
 /* NetHack 5.0	attrib.c	$NHDT-Date: 1777000050 2026/04/23 19:07:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.137 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -393,9 +393,7 @@ poisoned(
         boolean plural = (reason[strlen(reason) - 1] == 's') ? 1 : 0;
 
         /* avoid "The" Orcus's sting was poisoned... */
-        pline("%s%s %s poisoned!",
-              isupper((uchar) *reason) ? "" : "The ", reason,
-              plural ? "were" : "was");
+        pline("%sは毒を帯びていた!", reason);
     }
     if (Poison_resistance) {
         if (blast)

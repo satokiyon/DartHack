@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
 /* NetHack 5.0	hack.c	$NHDT-Date: 1763708572 2025/11/20 23:02:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.494 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -3684,7 +3684,7 @@ check_special_room(boolean newlev)
          * but everything else gives a message only the first time */
         switch (rt) {
         case ZOO:
-            pline("デイビッドの宝箱動物園へようこそ!");
+            pline("デイビッドのトレジャー動物園へようこそ!");
             break;
         case SWAMP:
             pline("ここは%s.", Blind ? "じめじめしている感じがした" : "どろどろして見えた");
@@ -3695,7 +3695,7 @@ check_special_room(boolean newlev)
                 !furniture_present(THRONE, roomno) ? "" : "王座");
             break;
         case LEPREHALL:
-            You("レプリコーンの広間に入った!");
+            You("レプラコーンの広間に入った!");
             break;
         case MORGUE:
             if (midnight()) {

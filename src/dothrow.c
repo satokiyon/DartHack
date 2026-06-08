@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
 /* NetHack 5.0	dothrow.c	$NHDT-Date: 1737343372 2025/01/19 19:22:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.300 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1647,8 +1647,8 @@ throwit(
             } else if (obj->oclass != GEM_CLASS) {
                 range /= 2;
                     pline("%sを装備していないため、%sを%sで投げた.",
-                      an(skill_name(weapon_type(obj))),
-                      weapon_descr(obj),
+                      skill_name_jp(weapon_type(obj)),
+                      weapon_descr_jp(obj),
                       jp_body_part(HAND));
             }
         }

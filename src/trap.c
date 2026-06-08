@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1741926700 2025/03/13 20:31:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.621 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -845,7 +845,7 @@ animate_statue(
                     : golem_xform ? "\u8089\u306b\u5909\u308f\u3063\u305f"
                       : (nonliving(mon->data) || is_vampshifter(mon))
                         ? "\u52d5\u3044\u305f"
-                        : "\u6b8b\u3063\u305f\u6c17\u3054\u3061\u304c\u623b\u3063\u305f";
+                        : "息を吹き返した";
     if (u_at(x, y) || cause == ANIMATE_SPELL) {
         /* "the|your|Manlobbi's statue [of a wombat]" */
         shkp = shop_keeper(*in_rooms(mon->mx, mon->my, SHOPBASE));

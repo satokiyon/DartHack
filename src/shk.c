@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
 /* NetHack 5.0	shk.c	$NHDT-Date: 1736516428 2025/01/10 05:40:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.306 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -5871,9 +5871,19 @@ shk_your(char *buf, struct obj *obj)
     if (chk_pm && type_is_pname(&mons[obj->corpsenm]))
         return buf; /* skip ownership prefix and space: "Medusa's corpse" */
     else if (chk_pm && the_unique_pm(&mons[obj->corpsenm]))
+#ifdef JAPAN
+        return buf;
+#else
         Strcpy(buf, "the"); /* override ownership: "the Oracle's corpse" */
-    else if (!shk_owns(buf, obj) && !mon_owns(buf, obj))
+#endif
+    else if (!shk_owns(buf, obj) && !mon_owns(buf, obj)) {
+#ifdef JAPAN
+        Strcpy(buf, carried(obj) ? "あなたの" : "");
+        if (!buf[0]) return buf;
+#else
         Strcpy(buf, the_your[carried(obj) ? 1 : 0]);
+#endif
+    }
     return strcat(buf, " ");
 }
 
