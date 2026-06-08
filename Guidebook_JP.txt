@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09.
                          脅威の迷宮へのガイド
                         (NetHackガイドブック)
 
@@ -5511,19 +5511,19 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
 
           字形表現を定義するための形式は以下の通りです：
 
-     OPTIONS=glyph:glyphid/U+nnnn/R-G-B
+     OPTIONS=glyph:glyphname/U+nnnn/R-G-B
 
           字形表現を表示するには、使用しているウィンドウポートが UTF-8
      文字シーケンスと明示的な RGB カラーの表示をサポートしている必要が
      あります。例えば、設定ファイルに以下の行を記述すると、
-     glyphid G_pool の字形表現に Unicode コードポイント U+224B を使い、
+     glyphname G_pool の字形表現に Unicode コードポイント U+224B を使い、
      RGB 値 0-0-160 で表される色を使用するようになります：
 
      OPTIONS=glyph:G_pool/U+224B/0-0-160
 
-     許容される glyphid のリストは、 nethack --dumpglyphids で生成
+     許容される glyphname のリストは、 nethack --dumpglyphnames で生成
      できます。個々の NetHack 字形は G_ プレフィックスを使用して指定
-     できます。あるいは、 glyphid に S_ 記号を使用して、その特定の
+     できます。あるいは、 glyphname に S_ 記号を使用して、その特定の
      記号にマッピングされるすべての NetHack 字形に対してカスタム表現を
      保存することもできます。
 
