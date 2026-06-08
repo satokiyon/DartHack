@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-15.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08.
                          脅威の迷宮へのガイド
                         (NetHackガイドブック)
 
@@ -6,7 +6,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
                        オリジナル版 - Eric S. Raymond
      (NetHack 5.0.0用に Mike Stephenson その他によって編集・拡張)
 
-                                  2026年5月2日
+                                  2026年5月29日
 
 
 
@@ -6130,7 +6130,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
      されていた場合に生じたかもしれない、既存のバリアントとの曖昧さや
      混乱を招くこともありませんでした。
 
-          NetHack 5.0.0 は 2026年5月2日にリリースされました。
+          NetHack 5.0.0 は 2026年5月28日にリリースされました。
 
           NetHack 5.0.0 のソースコードは、 C99 標準に準拠するように
      修正され、近代化されました。 5.0.0 リリースには、 3100 件以上の
