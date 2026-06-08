@@ -27,7 +27,7 @@ OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
 # OPTIONS=symset:NHAccess,roguesymset:NHAccess
 
 # Optional curses port interface
-#OPTIONS=windowtype:curses,align_message:right,align_status:left
+OPTIONS=windowtype:curses,align_message:right,align_status:bottom
 #OPTIONS=symset:Enhanced2,roguesymset:RogueEpyx
 #
 # Keyboard handling
@@ -307,6 +307,32 @@ SOUND=MESG "耳をつんざく騒音をたたき出した!|を(叩き損ねた|�
 ### sepack 効果音セット（sepackフォルダのwavファイルをゲームメッセージに対応させる設定）
 # ---- 04: 選択音（低い音）・05: 選択音（高い音）・06: メッセージ送り・07: エラー音 ----
 # UIイベントはSOUND=MESGで対応できないため設定なし
+
+# ---- 状態異常（マイナス効果、浮遊・騎乗などは対象外） ----
+SOUND=MESG "すべてが暗く.*" "misc/sound_lose.wav" 100
+SOUND=MESG "暗闇の雲が.*" "misc/sound_lose.wav" 100
+SOUND=MESG "目がくらんだ.*" "misc/sound_lose.wav" 100
+SOUND=MESG "混乱した.*" "misc/sound_lose.wav" 100
+SOUND=MESG "宇宙的に.*" "misc/sound_lose.wav" 100
+SOUND=MESG "よろめいた.*" "misc/sound_lose.wav" 100
+SOUND=MESG "しびれて動けない.*" "misc/sound_lose.wav" 100
+SOUND=MESG "何も聞こえなく.*" "misc/sound_lose.wav" 100
+SOUND=MESG "死ぬほど病気に.*" "misc/sound_lose.wav" 100
+SOUND=MESG "致命的な病気に.*" "misc/sound_lose.wav" 100
+SOUND=MESG "ひどい食中毒に.*" "misc/sound_lose.wav" 100
+SOUND=MESG "食中毒で重篤.*" "misc/sound_lose.wav" 100
+SOUND=MESG "吐き気.*" "misc/sound_lose.wav" 100
+SOUND=MESG "スライム化しつつ.*" "misc/sound_lose.wav" 100
+SOUND=MESG "スライムに変.*" "misc/sound_lose.wav" 100
+SOUND=MESG "石化しつつ.*" "misc/sound_lose.wav" 100
+SOUND=MESG "石に変.*" "misc/sound_lose.wav" 100
+SOUND=MESG "手足が硬く.*" "misc/sound_lose.wav" 100
+SOUND=MESG "首を絞め.*" "misc/sound_lose.wav" 100
+SOUND=MESG "窒息.*" "misc/sound_lose.wav" 100
+SOUND=MESG "息ができない.*" "misc/sound_lose.wav" 100
+SOUND=MESG "眠り込んで.*" "misc/sound_lose.wav" 100
+SOUND=MESG "眠りに落ち.*" "misc/sound_lose.wav" 100
+SOUND=MESG "気絶した.*" "misc/sound_lose.wav" 100
 
 # ---- 08: 階段を使う音（下り・落下） → snes_rpg側が上り担当 ----
 SOUND=MESG "階段を降りた.|はしごを降りた." "sepack/sepack_08_stairs.wav" 100
