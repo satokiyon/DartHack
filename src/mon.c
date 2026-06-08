@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
 /* NetHack 5.0	mon.c	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.621 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -1237,14 +1237,19 @@ movemon_singlemon(struct monst *mtmp)
             (void) gd_move(mtmp);
             mtmp->mlstmv = svm.moves;
         }
+        mtmp->movement = 0;
         return FALSE;
     }
-    if (DEADMONSTER(mtmp))
+    if (DEADMONSTER(mtmp)) {
+        mtmp->movement = 0;
         return FALSE;
+    }
 
     /* monster isn't on this map anymore */
-    if (mon_offmap(mtmp))
+    if (mon_offmap(mtmp)) {
+        mtmp->movement = 0;
         return FALSE;
+    }
 
     m_everyturn_effect(mtmp);
 
