@@ -4,40 +4,38 @@ plugins {
 
 android {
 
-  compileSdkVersion 30
-  buildToolsVersion "30.0.3"
+  namespace = "com.tbd.NetHack"
+  compileSdk { 
+    version = release(36)
+  }
+  buildToolsVersion = "36.0.0"
 
   defaultConfig {
-    minSdkVersion 7
-    targetSdkVersion 30
-    versionName '5.0.0'
-    versionCode 5000
+    minSdkVersion = 7
+    targetSdkVersion = 30
+    versionName = '5.0.0'
+    versionCode = 5000
   }
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_7
-    targetCompatibility JavaVersion.VERSION_1_7
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
   }
 
   lintOptions {
-    disable 'MissingClass'
+    disable = ['MissingClass', 'ExpiredTargetSdkVersion']
   }
 
   sourceSets {
     main {
-      manifest.srcFile 'AndroidManifest.xml'
-      res.srcDirs = ['res']
-      assets.srcDirs = ['assets']
-      jniLibs.srcDirs = ['libs']
+      manifest.srcFile('AndroidManifest.xml')
+      res.srcDirs(['res'])
+      assets.srcDirs(['assets'])
+      jniLibs.srcDirs(['libs'])
     }
   }
 }
 
-
-git {
-  implementation 'https://github.com/JodiJodington/ForkFront-Android.git', {
-      name 'com.tbd.forkfront'
-      projectPath "lib"
-      commit '621999c5c9d00f4808f38d1f650d8b54358c1dbc'
-  }
+dependencies {
+    implementation 'com.tbd.forkfront:lib:2.0'
 }

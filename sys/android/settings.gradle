@@ -1,10 +1,7 @@
-plugins {
-    id 'com.alexvasilkov.git-dependencies' version '2.0.4'
-}
-
-git {
-    dir '.gradle/com.alexvasilkov.git-dependencies-libs/'
-}
-
-include ':app'
+include(':app')
 rootProject.name = 'NetHack-Android'
+sourceControl {
+  gitRepository("https://github.com/JodiJodington/ForkFront-Android.git") {
+    producesModule("com.tbd.forkfront:lib")
+  }
+}
