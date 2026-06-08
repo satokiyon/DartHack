@@ -272,7 +272,7 @@ REGEXOBJ ?= $(TARGETPFX)posixregex.o
 #REGEXOBJ ?= $(TARGETPFX)pmatchregex.o
 #REGEXOBJ ?= $(TARGETPFX)cppregex.o
 
-GENTILECFILE = $(SRCDIR)/tile.c
+GENTILECFILE = tile.c
 GENTILEOFILE = $(TARGETPFX)tile.o
 
 # Set the WINSRC, WINOBJ, and WINLIB lines to correspond to your desired
@@ -823,7 +823,7 @@ $(MAKEDEFS): $(FIRSTOBJ) \
 	@( cd ../util ; $(MAKE) ../include/pm.h )
 #	Created at build time for configurations which support tiles,
 #	but not by makedefs so not connected to the others.
-../src/tile.c: ../win/share/tilemap.c $(HACK_H)
+tile.c: ../win/share/tilemap.c $(HACK_H)
 	@( cd ../util ; $(MAKE) ../src/tile.c )
 
 #
@@ -1340,7 +1340,7 @@ $(TARGETPFX)strutil.o: strutil.c $(HACK_H)
 $(TARGETPFX)symbols.o: symbols.c $(HACK_H) ../include/tcap.h
 $(TARGETPFX)sys.o: sys.c $(HACK_H)
 $(TARGETPFX)teleport.o: teleport.c $(HACK_H)
-$(TARGETPFX)tile.o: $(SRCDIR)/tile.c $(HACK_H)
+$(TARGETPFX)tile.o: tile.c $(HACK_H)
 $(TARGETPFX)timeout.o: timeout.c $(HACK_H)
 $(TARGETPFX)topten.o: topten.c $(HACK_H) ../include/dlb.h
 $(TARGETPFX)track.o: track.c $(HACK_H)
