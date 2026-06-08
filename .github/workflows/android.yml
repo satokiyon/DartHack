@@ -21,6 +21,10 @@ jobs:
       - name: Configure path to NDK
         run: |
           sed -i -e 's,NDK = .*,NDK = /usr/local/lib/android/sdk/ndk/30.0.14904198,g' sys/android/Makefile.src sys/android/Makefile.top
+      - name: fetch lua
+        run: |
+          cd sys/android && sh ./setup.sh && cd ../..
+          make fetch-lua
       - name: Build native Android application
         run: |
           for ABI in arm64-v8a armeabi armeabi-v7a x86 x86_64
@@ -28,7 +32,7 @@ jobs:
             echo "building for $ABI..."
             sed -i -e "s,ABI = .*,ABI = $ABI,g" sys/android/Makefile.src sys/android/Makefile.top
             cd sys/android && sh ./setup.sh && cd ../..
-            make fetch-lua && make install || make install
+            make install || make install
             make spotless
           done
       - name: Build NetHack
