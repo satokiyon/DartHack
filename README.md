@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 **NetHack 5.0** を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsのみ)
@@ -83,6 +83,31 @@ NetHack はテキスト（ASCII文字）だけでなく、美しいグラフィ�
 #### タイル画像の配置場所
 * 相対パスで指定する場合、実行ファイル（`NetHack.exe` / `NetHackW.exe`）と同じフォルダに置くのが確実です。
 * サブフォルダに置く場合は `OPTIONS=tile_file:tiles/your_tiles.bmp` のように相対パスで指定できます。
+
+---
+
+### 4. 効果音（サウンド）を鳴らす
+NetHackでは、ゲーム内のメッセージに合わせてお好みの効果音（WAVファイル）を鳴らすことができます。
+
+#### 設定手順
+1. 効果音として使用したいWAVファイルを用意し、任意のフォルダ（例: `sounds`）に配置します。
+2. `.nethackrc` を開き、以下の設定を追記または修正します。
+   ```ini
+   # 効果音ファイルが置かれているフォルダの絶対パスを指定します
+   SOUNDDIR=C:\path\to\NetHackJP\sounds
+
+   # SOUND=MESG "メッセージの正規表現" "ファイル名" 音量(0-100)
+   SOUND=MESG "(ド♪)" "se_squeak_C.wav" 100
+   SOUND=MESG "地雷が爆発した[!！]" "sepack/sepack_12_damage_floor.wav" 100
+   SOUND=MESG "は(上|下)の階へ逃げた[!！]" "sepack/sepack_23_escape.wav" 100
+   ```
+   * `SOUNDDIR`: WAVファイルが格納されているベースとなるディレクトリを指定します。
+   * `SOUND=MESG`: メッセージに対する効果音のマッチング設定です。
+     * `"メッセージの正規表現"`: ゲーム内で表示されるメッセージ（正規表現が使用可能です）。
+     * `"ファイル名"`: 再生するWAVファイル名（`SOUNDDIR` からの相対パス）。
+     * `音量`: 0〜100 の数値で指定します。
+
+より多くの設定例が `.nethackrc`（または `nethackrc.template`）に記載されていますので、そちらも参考にしてください。その他の詳細なオプション等については `Guidebook_JP.txt` を参照してください。
 
 ---
 
