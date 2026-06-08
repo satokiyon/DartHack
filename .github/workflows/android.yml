@@ -32,7 +32,7 @@ jobs:
             echo "building for $ABI..."
             sed -i -e "s,ABI = .*,ABI = $ABI,g" sys/android/Makefile.src sys/android/Makefile.top
             cd sys/android && sh ./setup.sh && cd ../..
-            make install
+            make install -j$(nproc)
             make spotless
           done
       - name: Build NetHack
