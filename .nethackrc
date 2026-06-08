@@ -71,20 +71,32 @@ OPTIONS=boulder:0
 # with MENUCOLOR lines.
 #  Toggle menucolor use on or off
 OPTIONS=menucolors
-# Define color used for a certain menu line. Format is
-#    MENUCOLOR="regular expression"=color
-# or
-#    MENUCOLOR="regular expression"=color&attribute
 #  Show all blessed items in green
-MENUCOLOR=" blessed " = green
+MENUCOLOR="祝福された" = green
 #  Show all holy water in green
-MENUCOLOR=" holy " = green
+MENUCOLOR="聖水" = green
 #  Show all cursed items in red
-MENUCOLOR=" cursed " = red
+MENUCOLOR="呪われた" = red
 #  Show all unholy water in red
-MENUCOLOR=" unholy " = red
+MENUCOLOR="邪水" = red
 #  Show all cursed worn items in orange and underlined
-MENUCOLOR=" cursed .* \(being worn\)" = orange&underline
+MENUCOLOR="呪われた.*装備中" = orange&underline
+
+# --- おすすめの追加設定 ---
+# 重要・便利なアイテムを強調表示します
+MENUCOLOR="願いの杖" = brightmagenta&bold
+MENUCOLOR="魔力のランプ" = brightmagenta
+MENUCOLOR="軽量化の鞄" = brightmagenta
+MENUCOLOR="韋駄天の靴" = brightcyan
+MENUCOLOR="命の魔除け" = brightcyan
+MENUCOLOR="反射の(魔除け|盾)" = brightcyan
+MENUCOLOR="魔法を防ぐクローク" = brightcyan
+MENUCOLOR="完全回復の薬" = brightblue
+MENUCOLOR="能力獲得の薬" = brightblue
+MENUCOLOR="識別の巻物" = yellow
+MENUCOLOR="解呪の巻物" = yellow
+# アーティファクト（既知の主要なもの）
+MENUCOLOR="(エクスカリバー|ストームブリンガー|ミョルニル|マジックベイン|フロストブランド|ファイアブランド|グレイスワンダー|ヴォーパルブレード)" = brightmagenta&bold
 
 
 
@@ -307,32 +319,6 @@ SOUND=MESG "耳をつんざく騒音をたたき出した!|を(叩き損ねた|�
 ### sepack 効果音セット（sepackフォルダのwavファイルをゲームメッセージに対応させる設定）
 # ---- 04: 選択音（低い音）・05: 選択音（高い音）・06: メッセージ送り・07: エラー音 ----
 # UIイベントはSOUND=MESGで対応できないため設定なし
-
-# ---- 状態異常（マイナス効果、浮遊・騎乗などは対象外） ----
-SOUND=MESG "すべてが暗く.*" "misc/sound_lose.wav" 100
-SOUND=MESG "暗闇の雲が.*" "misc/sound_lose.wav" 100
-SOUND=MESG "目がくらんだ.*" "misc/sound_lose.wav" 100
-SOUND=MESG "混乱した.*" "misc/sound_lose.wav" 100
-SOUND=MESG "宇宙的に.*" "misc/sound_lose.wav" 100
-SOUND=MESG "よろめいた.*" "misc/sound_lose.wav" 100
-SOUND=MESG "しびれて動けない.*" "misc/sound_lose.wav" 100
-SOUND=MESG "何も聞こえなく.*" "misc/sound_lose.wav" 100
-SOUND=MESG "死ぬほど病気に.*" "misc/sound_lose.wav" 100
-SOUND=MESG "致命的な病気に.*" "misc/sound_lose.wav" 100
-SOUND=MESG "ひどい食中毒に.*" "misc/sound_lose.wav" 100
-SOUND=MESG "食中毒で重篤.*" "misc/sound_lose.wav" 100
-SOUND=MESG "吐き気.*" "misc/sound_lose.wav" 100
-SOUND=MESG "スライム化しつつ.*" "misc/sound_lose.wav" 100
-SOUND=MESG "スライムに変.*" "misc/sound_lose.wav" 100
-SOUND=MESG "石化しつつ.*" "misc/sound_lose.wav" 100
-SOUND=MESG "石に変.*" "misc/sound_lose.wav" 100
-SOUND=MESG "手足が硬く.*" "misc/sound_lose.wav" 100
-SOUND=MESG "首を絞め.*" "misc/sound_lose.wav" 100
-SOUND=MESG "窒息.*" "misc/sound_lose.wav" 100
-SOUND=MESG "息ができない.*" "misc/sound_lose.wav" 100
-SOUND=MESG "眠り込んで.*" "misc/sound_lose.wav" 100
-SOUND=MESG "眠りに落ち.*" "misc/sound_lose.wav" 100
-SOUND=MESG "気絶した.*" "misc/sound_lose.wav" 100
 
 # ---- 08: 階段を使う音（下り・落下） → snes_rpg側が上り担当 ----
 SOUND=MESG "階段を降りた.|はしごを降りた." "sepack/sepack_08_stairs.wav" 100
@@ -677,7 +663,36 @@ SOUND=MESG "扉はびくともしなかった" "pixabay/freesound_community-door
 SOUND=MESG "NetHackへ戻ってきた" "pixabay/dariocoiro-transition-sound-fx-530752.wav" 100
 SOUND=MESG "NetHackへようこそ" "pixabay/safeyable-opening-movie-254465.wav" 100
  
-# "\$ - 枚の金貨（合計"
+
+### ---- Misc (その他) ----
+# お金を拾う音
+SOUND=MESG "＄ー.+枚の金貨（合計" "misc/pick_coins.wav" 100
+
+# ---- 状態異常（マイナス効果、浮遊・騎乗などは対象外） ----
+SOUND=MESG "すべてが暗く.*" "misc/sound_lose.wav" 100
+SOUND=MESG "暗闇の雲が.*" "misc/sound_lose.wav" 100
+SOUND=MESG "目がくらんだ.*" "misc/sound_lose.wav" 100
+SOUND=MESG "混乱した.*" "misc/sound_lose.wav" 100
+SOUND=MESG "宇宙的に.*" "misc/sound_lose.wav" 100
+SOUND=MESG "よろめいた.*" "misc/sound_lose.wav" 100
+SOUND=MESG "しびれて動けない.*" "misc/sound_lose.wav" 100
+SOUND=MESG "何も聞こえなく.*" "misc/sound_lose.wav" 100
+SOUND=MESG "死ぬほど病気に.*" "misc/sound_lose.wav" 100
+SOUND=MESG "致命的な病気に.*" "misc/sound_lose.wav" 100
+SOUND=MESG "ひどい食中毒に.*" "misc/sound_lose.wav" 100
+SOUND=MESG "食中毒で重篤.*" "misc/sound_lose.wav" 100
+SOUND=MESG "吐き気.*" "misc/sound_lose.wav" 100
+SOUND=MESG "スライム化しつつ.*" "misc/sound_lose.wav" 100
+SOUND=MESG "スライムに変.*" "misc/sound_lose.wav" 100
+SOUND=MESG "石化しつつ.*" "misc/sound_lose.wav" 100
+SOUND=MESG "石に変.*" "misc/sound_lose.wav" 100
+SOUND=MESG "手足が硬く.*" "misc/sound_lose.wav" 100
+SOUND=MESG "首を絞め.*" "misc/sound_lose.wav" 100
+SOUND=MESG "窒息.*" "misc/sound_lose.wav" 100
+SOUND=MESG "息ができない.*" "misc/sound_lose.wav" 100
+SOUND=MESG "眠り込んで.*" "misc/sound_lose.wav" 100
+SOUND=MESG "眠りに落ち.*" "misc/sound_lose.wav" 100
+SOUND=MESG "気絶した.*" "misc/sound_lose.wav" 100
 
 
 
