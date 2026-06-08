@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmain.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -1021,6 +1021,10 @@ raw_print(str)  -- Print directly to a screen, or otherwise guarantee that
                    for error messages, and maybe other "msg" uses.  E.g.
                    updating status for micros (i.e, "saving").
 */
+#ifdef WIN32
+extern void stdio_raw_print(const char *str);
+#endif
+
 void
 curses_raw_print(const char *str)
 {
@@ -1033,7 +1037,6 @@ curses_raw_print(const char *str)
     }
 #endif
 #ifdef WIN32
-    extern void stdio_raw_print(const char *str);
     stdio_raw_print(str);
 #else
     puts(str);
