@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
 /* NetHack 5.0	insight.c	$NHDT-Date: 1777004419 2026/04/23 20:20:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.134 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -122,6 +122,18 @@ enlght_out(const char *buf)
         putstr(ge.en_win, 0, buf);
 }
 
+staticfn boolean jp_insight_has_nonascii(const char *str)
+{
+    const uchar *p = (const uchar *) str;
+
+    while (*p) {
+        if (*p & 0x80)
+            return TRUE;
+        ++p;
+    }
+    return FALSE;
+}
+
 staticfn void
 enlght_line(
     const char *start,
@@ -148,7 +160,7 @@ enlght_line(
 #ifndef NO_ENLGHT_CONTRACTIONS
     /* skip English-specific contractions for Japanese strings to avoid
        corrupting multibyte UTF-8 characters (e.g. 0xE9 in "達") */
-    if (!has_nonascii(buf) && strstri(buf, " not ")) {
+    if (!jp_insight_has_nonascii(buf) && strstri(buf, " not ")) {
         for (i = 0; i < SIZE(contra); ++i)
             (void) strsubst(buf, contra[i].twowords, contra[i].contrctn);
     }
