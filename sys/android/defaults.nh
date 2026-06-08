@@ -29,7 +29,7 @@
 # *** General options ***
 #
 
-OPTIONS=autounlock:apply-key+kick, color, dumplog, extmenu, force_invmenu, menucolors, use_inverse
+OPTIONS=autounlock:apply-key+kick+force, color, dumplog, extmenu, force_invmenu, menucolors, use_inverse
 
 #OPTIONS=packorder:")[%?+/=!(*0_`
 OPTIONS=scores:10 top/2 around/own
