@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
 /* NetHack 5.0	sounds.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -449,7 +449,7 @@ growl(struct monst *mtmp)
         growl_verb = growl_sound(mtmp);
     if (growl_verb) {
         if (canseemon(mtmp) || !Deaf) {
-            pline("%s %s!", Monnam(mtmp), vtense((char *) 0, growl_verb));
+            pline("%s%s!", Monnam(mtmp), growl_sound_jp(mtmp));
             iflags.last_msg = PLNMSG_GROWL;
             if (svc.context.run)
                 nomul(0);
@@ -526,21 +526,24 @@ whimper(struct monst *mtmp)
         switch (mtmp->data->msound) {
         case MS_MEW:
         case MS_GROWL:
-            whimper_verb = "whimper";
+            whimper_verb = "悲しげに鳴いた";
             break;
         case MS_BARK:
-            whimper_verb = "whine";
+            whimper_verb = "クーンと鳴いた";
             break;
         case MS_SQEEK:
             se = se_squeal;
-            whimper_verb = "squeal";
+            whimper_verb = "キャンと鳴いた";
             break;
         }
     if (whimper_verb) {
         if (!Hallucination) {
             Soundeffect(se, 50);
         }
-        pline("%s %s.", Monnam(mtmp), vtense((char *) 0, whimper_verb));
+        if (Hallucination)
+            pline("%s %s.", Monnam(mtmp), vtense((char *) 0, whimper_verb));
+        else
+            pline("%sは%s.", Monnam(mtmp), whimper_verb);
         if (svc.context.run)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 6);

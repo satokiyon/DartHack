@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
 /* NetHack 5.0	mkobj.c	$NHDT-Date: 1764044196 2025/11/24 20:16:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.326 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -2863,15 +2863,27 @@ hornoplenty(
                 if (obj->otyp == POT_OIL)
                     fixup_oil(obj, (struct obj *) NULL);
             }
+#ifdef JAPAN
+            what = (obj->quan > 1L) ? "薬がいくつか" : "薬が";
+#else
             what = (obj->quan > 1L) ? "Some potions" : "A potion";
+#endif
         } else {
             obj = mkobj(FOOD_CLASS, FALSE);
             if (obj->otyp == FOOD_RATION && !rn2(7))
                 obj->otyp = LUMP_OF_ROYAL_JELLY;
+#ifdef JAPAN
+            what = "食べ物が";
+#else
             what = "Some food";
+#endif
         }
         ++objcount;
+#ifdef JAPAN
+        pline("%sこぼれ出した.", what);
+#else
         pline("%s %s out.", what, vtense(what, "spill"));
+#endif
         obj->blessed = horn->blessed;
         obj->cursed = horn->cursed;
         obj->owt = weight(obj);

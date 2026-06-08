@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
 /* NetHack 5.0	muse.c	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.241 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
@@ -290,8 +290,9 @@ mquaffmsg(struct monst *mtmp, struct obj *otmp)
 {
     if (canseemon(mtmp)) {
         observe_object(otmp);
-        pline_mon(mtmp, "%s drinks %s!", Monnam(mtmp), singular(otmp, doname));
-    } else if (!Deaf) {
+        pline_mon(mtmp, "%sは%sを飲んだ!", Monnam(mtmp), singular(otmp, doname));
+    }
+ else if (!Deaf) {
         Soundeffect(se_mon_chugging_potion, 25);
         You_hear("ごくごくと飲む音が聞こえる.");
     }

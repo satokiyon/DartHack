@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -775,6 +775,19 @@ jp_item_descr(int otyp)
     if (idx >= 0 && idx < NUM_OBJECTS && obj_jp_descrs[idx])
         return obj_jp_descrs[idx];
     return OBJ_DESCR(objects[otyp]);
+}
+
+const char *
+jp_oclass_name(int oclass)
+{
+    static const char *const names[] = {
+        "不明", "不正規", "武器", "防具", "指輪", "魔除け", "道具",
+        "食べ物", "薬", "巻物", "魔法書", "杖", "金貨",
+        "宝石", "岩石", "鉄球", "鎖", "毒液"
+    };
+    if (oclass >= 0 && oclass < MAXOCLASSES)
+        return names[oclass];
+    return names[0];
 }
 
 /* アーティファクトの日本語表示名テーブル（NROFARTIFACTS + 1 エントリ） */

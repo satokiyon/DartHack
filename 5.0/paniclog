@@ -1,0 +1,72 @@
+5.0.0-0 20260605 022117 1 D: impossible Lua error: 5:testwish.lua [string "(testwish.lua)"]:108: attempt to concatenate a nil value (field '?')
+stack traceback:
+	[C]: in metamethod 'concat'
+	[string "(testwish.lua)"]:108: in main chunk
+5.0.0-0 20260605 022212 1 D: impossible Lua error: 6:testwish.lua [string "(testwish.lua)"]:108: attempt to concatenate a nil value (field '?')
+stack traceback:
+	[C]: in metamethod 'concat'
+	[string "(testwish.lua)"]:108: in main chunk
+5.0.0-0 20260605 023705 1 D: impossible Lua error: 5:testwish.lua [string "(testwish.lua)"]:110: wished 呪われた防錆の+2灰色ドラゴン鱗鎧, but cursed is nil, not 1
+stack traceback:
+	[C]: in ?
+	[C]: in function 'error'
+	[string "(testwish.lua)"]:110: in main chunk
+5.0.0-0 20260605 025602 1 D: impossible Lua error: 5:testwish.lua [string "(testwish.lua)"]:110: wished 聖水の薬, but cursed is nil, not 0
+stack traceback:
+	[C]: in ?
+	[C]: in function 'error'
+	[string "(testwish.lua)"]:110: in main chunk
+5.0.0-0 20260605 030342 1 D: impossible Lua error: 5:testwish.lua [string "(testwish.lua)"]:110: wished 5枚の白紙の巻物, but otyp_name is light, not blank paper
+stack traceback:
+	[C]: in ?
+	[C]: in function 'error'
+	[string "(testwish.lua)"]:110: in main chunk
+5.0.0-0 20260605 033604 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 033604 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 033604 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 033604 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 033604 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 033604 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 033604 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 033604 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 033604 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 033604 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 033636 1 D: impossible Lua error: 5:testwish.lua [string "(testwish.lua)"]:120: attempt to index a nil value (global 'io')
+stack traceback:
+	[C]: in metamethod 'index'
+	[string "(testwish.lua)"]:120: in main chunk
+5.0.0-0 20260605 035036 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 035036 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 035036 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 035036 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 035036 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 035036 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 035036 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 035036 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 035036 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 035036 1 D: [lua] error in __gc (not enough memory)
+5.0.0-0 20260605 035036 1 D: impossible Lua error: 5:testwish.lua [string "(testwish.lua)"]:120: attempt to index a nil value (global 'io')
+stack traceback:
+	[C]: in metamethod 'index'
+	[string "(testwish.lua)"]:120: in main chunk
+5.0.0-0 20260605 035146 1 D: panic obj_is_local
+5.0.0-0 20260605 075600 1 D: impossible Lua error: 5:testwish.lua [string "(testwish.lua)"]:117: wished 権力の笏, but oartifact is nil, not The Sceptre of Might
+stack traceback:
+	[C]: in ?
+	[C]: in function 'error'
+	[string "(testwish.lua)"]:117: in main chunk
+5.0.0-0 20260605 075914 1 D: impossible Lua error: 5:testwish.lua [string "(testwish.lua)"]:114: wished エクスカリバー, but oartifact is nil, not Excalibur
+stack traceback:
+	[C]: in ?
+	[C]: in function 'error'
+	[string "(testwish.lua)"]:114: in main chunk
+5.0.0-0 20260605 081650 1 D: impossible Lua error: 5:testwish.lua [string "(testwish.lua)"]:115: wished +2グレイスワンダー, but otyp_name is silver saber, not saber
+stack traceback:
+	[C]: in ?
+	[C]: in function 'error'
+	[string "(testwish.lua)"]:115: in main chunk
+5.0.0-0 20260605 195830 1 D: impossible Lua error: 5:testwish.lua [string "(testwish.lua)"]:124: wished 呪いをとく巻物, but otyp_name is magic mapping, not remove curse
+stack traceback:
+	[C]: in ?
+	[C]: in function 'error'
+	[string "(testwish.lua)"]:124: in main chunk
