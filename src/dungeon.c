@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* NetHack 5.0	dungeon.c	$NHDT-Date: 1737343478 2025/01/19 19:24:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.228 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -3642,7 +3642,7 @@ print_mapseen(
         }
             ADDNTOBUF("玉座", mptr->feat.nthrone);
             ADDNTOBUF("泉", mptr->feat.nfount);
-            ADDNTOBUF("流し台", mptr->feat.nsink);
+            ADDNTOBUF("シンク", mptr->feat.nsink);
             ADDNTOBUF("墓", mptr->feat.ngrave);
             ADDNTOBUF("木", mptr->feat.ntree);
 #if 0
@@ -3659,7 +3659,7 @@ print_mapseen(
     /* we assume that these are mutually exclusive */
     *buf = '\0';
     if (mptr->flags.oracle) {
-        Sprintf(buf, "%sデルフォイの神託所。", PREFIX);
+        Sprintf(buf, "%sデルファイの神託所。", PREFIX);
     } else if (In_sokoban(&mptr->lev)) {
         Sprintf(buf, "%s%s.", PREFIX,
                 mptr->flags.sokosolved ? "倉庫番を踏破済み"
