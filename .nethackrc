@@ -278,6 +278,7 @@ OPTIONS=help
 OPTIONS=autodescribe
 
 OPTIONS=price_quotes
+OPTIONS=hilite_pile
 
 
 ### 効果音の設定
