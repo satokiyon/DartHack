@@ -61,7 +61,7 @@ jobs:
         if: github.ref_type == 'tag'
         with:
           generate_release_notes: true
-          body: "NOTE: currently releases contain libnethack.so for each ABI. Ideally later we will have seperate APKs for each like most modern apps. All of the releases should be considered beta quality as the changes were massive and I have not been able to test it all on my own."
+          body_path: CHANGELOG.txt
           files: |
             sys/android/app/build/outputs/apk/release/app-release.apk
             sys/android/app/build/outputs/apk/debug/app-debug.apk
