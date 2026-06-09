@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
 /* NetHack 5.0	shk.c	$NHDT-Date: 1736516428 2025/01/10 05:40:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.306 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -467,22 +467,22 @@ append_price_quote(char *buf, char **eos, int otyp) {
     eos2 += sprintf(eos2, " {");
 
     if (objects[otyp].oc_buy_minseen < objects[otyp].oc_buy_maxseen) {
-        eos2 += sprintf(eos2, "buy %lu-%lu",
+        eos2 += sprintf(eos2, "買値 %lu-%lu",
                         objects[otyp].oc_buy_minseen,
                         objects[otyp].oc_buy_maxseen);
         sep = " ";
     } else if (objects[otyp].oc_buy_minseen == objects[otyp].oc_buy_maxseen) {
-        eos2 += sprintf(eos2, "buy %lu",
+        eos2 += sprintf(eos2, "買値 %lu",
                         objects[otyp].oc_buy_minseen);
         sep = " ";
     }
 
     if (objects[otyp].oc_sell_minseen < objects[otyp].oc_sell_maxseen) {
-        eos2 += sprintf(eos2, "%ssell %lu-%lu", sep,
+        eos2 += sprintf(eos2, "%s売値 %lu-%lu", sep,
                         objects[otyp].oc_sell_minseen,
                         objects[otyp].oc_sell_maxseen);
     } else if (objects[otyp].oc_sell_minseen == objects[otyp].oc_sell_maxseen) {
-        eos2 += sprintf(eos2, "%ssell %lu", sep,
+        eos2 += sprintf(eos2, "%s売値 %lu", sep,
                         objects[otyp].oc_sell_minseen);
     }
 
