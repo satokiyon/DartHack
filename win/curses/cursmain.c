@@ -280,10 +280,10 @@ curses_init_nhwindows(
     counting = FALSE;
     curses_init_options();
     if (term_rows < 15 || term_cols < 40) {
-        panic("Terminal is too small; must have at least %s%s%s.",
-              (term_rows < 15) ? "15 rows" : "",
-              (term_rows < 15 && term_cols < 40) ? " and " : "",
-              (term_cols < 40) ? "40 columns" : "");
+        panic("画面サイズが小さすぎます。少なくとも%s%s%s必要です。",
+              (term_rows < 15) ? "15行" : "",
+              (term_rows < 15 && term_cols < 40) ? "と" : "",
+              (term_cols < 40) ? "40列" : "");
     }
     /* during line input, deletes the most recently typed character */
     erase_char = erasechar(); /* <delete>/<rubout> or possibly <backspace> */
@@ -329,7 +329,7 @@ curses_askname(void)
         }
 #endif /* SELECTSAVED */
 
-    curses_line_input_dialog("Who are you?", svp.plname, PL_NSIZ);
+    curses_line_input_dialog("あなたは誰ですか？", svp.plname, PL_NSIZ);
     (void) mungspaces(svp.plname);
     if (!svp.plname[0] || svp.plname[0] == '\033')
          goto bail;
@@ -338,8 +338,8 @@ curses_askname(void)
     return;
 
  bail:
-    /* message is delivered via raw_print() */
-    curses_bail("\nUntil next time then...\n");
+    /* メッセージは raw_print() 経由で出力される */
+    curses_bail("\nそれでは、またお会いしましょう...\n");
     /*NOTREACHED*/
 }
 
@@ -872,7 +872,7 @@ curses_wait_synch(void)
          * a more curses-specific way to handle this. FIXME?]
          */
 
-        (void) fprintf(stdout, "\nPress <return> to continue: ");
+        (void) fprintf(stdout, "\n続けるには <return> を押してください: ");
         (void) fflush(stdout);
         do {
             chr = fgetc(stdin);

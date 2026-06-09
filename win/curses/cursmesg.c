@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmesg.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -541,7 +541,7 @@ curses_prev_mesg(void)
     }
     if (!count)
         curses_add_menu(wid, &nul_glyphinfo, &Id, 0, 0,
-                        A_NORMAL, clr, "[No past messages available.]",
+                        A_NORMAL, clr, "[過去のメッセージはありません。]",
                         MENU_ITEMFLAGS_NONE);
 
     curses_end_menu(wid, "");

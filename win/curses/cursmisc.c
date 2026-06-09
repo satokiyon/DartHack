@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmisc.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -818,7 +818,7 @@ curses_view_file(const char *filename, boolean must_exist)
 
     if (fp == NULL) {
         if (must_exist)
-            pline("Cannot open \"%s\" for reading!", filename);
+            pline("\"%s\" を読み込み用に開くことができません!", filename);
         return;
     }
 
