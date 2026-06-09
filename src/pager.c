@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
 /* NetHack 5.0	pager.c	$NHDT-Date: 1774846177 2026/03/29 20:49:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.296 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -245,8 +245,7 @@ append_str(char *buf, const char *new_str)
 staticfn void
 jp_replace_desc_fragment(char *buf, const char *from, const char *to)
 {
-    while (strNsubst(buf, from, to, 0))
-        ;
+    (void) strNsubst(buf, from, to, 0);
 }
 
 /* Keep data.base lookup and internal keys in English; translate only
