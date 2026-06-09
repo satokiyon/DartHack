@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1741926700 2025/03/13 20:31:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.621 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -7148,7 +7148,7 @@ trapname(
         /* plausible real-life traps */
         "斧刃罠", "煮え油だまり", "流砂穴",
         "撒きびし罠", "丸のこ罠", "針だらけの床", "回転壁罠",
-        "でこぼこ床罠", "指はさみ罠", "びっくり箱罠", "黄色い雪",
+        "でこぼこ床の罠", "指はさみ罠", "びっくり箱の罠", "黄色い雪",
         "ブービートラップ", "ネズミ捕り", "毒釘", "投げ縄罠", "渦流罠",
         "足引きワイヤ罠", "ゴキブリホテル(TM)",
         /* sci-fi */
@@ -7158,10 +7158,10 @@ trapname(
         /* miscellaneous suggestions */
         "甘い匂いのガス噴出罠", "電話ボックス罠", "爆発ルーン",
         "終わりなきエレベーター", "スライム穴", "ワープゾーン", "幻の床",
-        "うんちの山", "ハニートラップ", "観光客罠",
+        "うんちの山", "ハニートラップ", "観光客の罠",
         "バナナの皮", "熊手罠", "ブーブークッション", "箱と棒の落とし罠",
-        "ハエ取り罠", "掟の罠", "蛇穴罠", "オタマジャクシ罠",
-        "滑り坂罠", "渇きの罠", "太陽罠",
+        "ハエ取り罠", "掟の罠", "蛇穴の罠", "オタマジャクシの罠",
+        "滑り坂罠", "渇きの罠", "太陽の罠",
     };
     static char roletrap[33]; /* [17 + 5 + 1] should suffice */
 
