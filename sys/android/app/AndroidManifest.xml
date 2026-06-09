@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.tbd.NetHack"
 	android:installLocation="auto">
 	<uses-sdk />
     <uses-permission android:name="android.permission.INTERNET"/>
 
 	<application
-		android:label="NetHack"
+		android:label="NetHack 5"
 		android:icon="@drawable/icon"
 		android:largeHeap="true"
 		android:theme="@android:style/Theme"
@@ -16,7 +15,7 @@
 			android:name="com.tbd.forkfront.ForkFront"
 			android:enableOnBackInvokedCallback="false"
 			android:exported="true"
-			android:label="NetHack"
+			android:label="NetHack 5"
 			android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
 			android:launchMode="singleTask"
 			android:configChanges="mcc|mnc|locale|keyboard|keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|fontScale">
