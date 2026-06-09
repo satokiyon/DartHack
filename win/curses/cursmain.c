@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmain.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -329,7 +329,7 @@ curses_askname(void)
         }
 #endif /* SELECTSAVED */
 
-    curses_line_input_dialog("あなたは誰ですか？", svp.plname, PL_NSIZ);
+    curses_line_input_dialog("お名前は？", svp.plname, PL_NSIZ);
     (void) mungspaces(svp.plname);
     if (!svp.plname[0] || svp.plname[0] == '\033')
          goto bail;
