@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursinvt.c */
 /* Copyright (c) Fredrik Ljungdahl, 2017. */
@@ -157,7 +158,7 @@ curs_scroll_invt(WINDOW *win UNUSED)
         scrlmask |= 8U; /* include scroll right: } */
     (void) collect_menu_keys(menukeys, scrlmask, TRUE);
 
-    Snprintf(qbuf, sizeof qbuf, "Inventory scroll: [%s%s%s] ",
+    Snprintf(qbuf, sizeof qbuf, "持ち物スクロール: [%s%s%s] ",
              menukeys, *menukeys ? " " : "", "Ret Esc");
 
     curses_count_window(qbuf);
@@ -441,7 +442,7 @@ curs_show_invt(WINDOW *win)
             wmove(win, y, x);
             wclrtoeol(win);
         }
-        Sprintf(tmpbuf, "%c%u-%u of %u%c",
+        Sprintf(tmpbuf, "%c%u-%u / %u%c",
                 (first_shown > 1) ? '<' : '[',
                 first_shown, last_shown, item_count,
                 (last_shown < item_count) ? '>' : ']');
@@ -456,7 +457,7 @@ curs_show_invt(WINDOW *win)
          * so we won't be obscuring an item, but that might not be the
          * situation on page 2 and definitely won't be if 'sortpack' is Off.
          */
-        Sprintf(tmpbuf, "%c%u-%u of %u%c",
+        Sprintf(tmpbuf, "%c%u-%u / %u%c",
                 (left_col > 1) ? '{' : '[',
                 left_col, right_col, widest,
                 (right_col < widest) ? '}' : ']');

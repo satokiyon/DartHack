@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursinit.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -416,7 +417,7 @@ curses_choose_character(void)
     prompt[count_off] = '\0';
     Snprintf(choice, sizeof(choice), "%s%c", tmpchoice, '\033');
     if (strchr(tmpchoice, 't')) {       /* Tutorial mode */
-        mvaddstr(0, 1, "New? Press t to enter a tutorial.");
+        mvaddstr(0, 1, "新しく始めますか？ t を押すとチュートリアルを開始します。");
     }
 
     /* Add capital letters as choices that aren't displayed */

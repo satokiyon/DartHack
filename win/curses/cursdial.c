@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursdial.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -1349,7 +1349,7 @@ menu_display_page(
     if (menu->num_pages > 1) {
         int footer_x, footwidth, shoesize = menu->num_pages;
 
-        footwidth = (int) (sizeof "<- (Page X of Y) ->" - sizeof "");
+        footwidth = (int) (sizeof "<- (%d / %d ページ) ->" - sizeof "");
         while (shoesize >= 10) { /* possible for pickup from big piles... */
              /* room for wider feet; extra digit for both X and Y */
             footwidth += 2;
@@ -1361,7 +1361,7 @@ menu_display_page(
             mvwaddstr(win, menu->height, footer_x, "<=");
             curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
         }
-        mvwprintw(win, menu->height, footer_x + 2, " (Page %d of %d) ",
+        mvwprintw(win, menu->height, footer_x + 2, " (%d / %d ページ) ",
                   page_num, menu->num_pages);
         if (page_num != menu->num_pages) {
             curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
