@@ -29,6 +29,9 @@
 # *** General options ***
 #
 
+# restore old behavior for clicking on yourself (i.e just pick up an item/loot chest/use stairs without a menu popup)
+#BIND=mouse1:mouseaction
+
 OPTIONS=autounlock:apply-key+kick+force, color, dumplog, extmenu, force_invmenu, menucolors, use_inverse
 
 #OPTIONS=packorder:")[%?+/=!(*0_`
