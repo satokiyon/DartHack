@@ -1,3 +1,4 @@
 NOTE: currently releases contain libnethack.so for each ABI. Ideally later we will have seperate APKs for each like most modern apps. All of the releases should be considered beta quality as the changes were massive and I have not been able to test it all on my own.
 
-- fixed a major bug that prevented the app from being launched on newer phones if the app wasn't already installed before and given read/write permissions.
+- moved down from targetting android 16 to targetting 14 because dealing with edge-to-edge proved to be much more difficult than makes sense right now.
+    - eventually I will probably have to convert the whole UI to compose to get this ability. Which I have not looked into but may come with a whole lot of downsides knowing how every new android dev feature google pushes works out.
