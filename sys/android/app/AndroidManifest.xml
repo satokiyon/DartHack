@@ -16,6 +16,7 @@
 		android:allowBackup="true">
 		<activity
 			android:name="com.tbd.forkfront.ForkFront"
+			android:exported="true"
 			android:label="NetHack"
 			android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
 			android:launchMode="singleTask"
