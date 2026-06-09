@@ -4,8 +4,6 @@
 	package="com.tbd.NetHack"
 	android:installLocation="auto">
 	<uses-sdk />
-	<uses-permission
-		android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
 	<application
