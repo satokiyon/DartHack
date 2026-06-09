@@ -667,7 +667,7 @@ SOUND=MESG "NetHackへようこそ" "pixabay/safeyable-opening-movie-254465.wav"
 
 ### ---- Misc (その他) ----
 # お金を拾う音
-SOUND=MESG "＄ー.+枚の金貨（合計" "misc/pick_coins.wav" 100
+SOUND=MESG "\$ - [0-9]+枚の金貨" "misc/pick_coins.wav" 100
 
 # ---- 状態異常（マイナス効果、浮遊・騎乗などは対象外） ----
 SOUND=MESG "すべてが暗く.*" "misc/sound_lose.wav" 100
