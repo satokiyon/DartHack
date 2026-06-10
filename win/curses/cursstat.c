@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursstat.c */
 /* Copyright (c) Andy Thomson, 2018. */
@@ -183,12 +183,16 @@ curses_status_update(
                 if (fldidx == BL_TITLE && iflags.wc2_hitpointbar) {
                     /* The user requested a 20-character fixed width bar.
                        We format it to a temporary buffer, ensure it's valid UTF-8
-                       within 20 columns/bytes, then pad it to exactly 20 columns. */
-                    char tbuf[BUFSZ];
-                    (void) strncpy(tbuf, text, sizeof(tbuf) - 1);
-                    tbuf[sizeof(tbuf) - 1] = '\0';
-                    utf8_truncate(tbuf, 20);
-                    Sprintf(status_vals[fldidx], "%-20s", tbuf);
+                       within 20 columns, then pad it to exactly 20 columns. */
+                    char *tbuf = curses_break_str(text, 20, 1);
+                    int pad_len = 20 - curses_utf8_str_width(tbuf);
+                    char padbuf[30];
+                    int i;
+                    for (i = 0; i < pad_len; i++)
+                        padbuf[i] = ' ';
+                    padbuf[i] = '\0';
+                    Sprintf(status_vals[fldidx], "%s%s", tbuf, padbuf);
+                    free(tbuf);
                 } else {
                     Sprintf(status_vals[fldidx],
                             status_fieldfmt[fldidx] ? status_fieldfmt[fldidx]
