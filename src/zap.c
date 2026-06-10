@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
 /* NetHack 5.0	zap.c	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.584 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -503,7 +503,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
                 mesg = "しばらくの間、かなり肉っぽく見えた.";
 
             if (canseemon(mtmp))
-                pline("%s %s", name, mesg);
+                pline("%sは%s", name, mesg);
         } else if (mtmp->data->mlet == S_MIMIC
                    && ((M_AP_TYPE(mtmp) == M_AP_FURNITURE
                         && stone_furniture_type(mtmp->mappearance))

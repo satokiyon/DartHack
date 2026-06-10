@@ -2423,7 +2423,7 @@ doturn(void)
     if (!u.uconduct.gnostic++)
         livelog_printf(LL_CONDUCT, "rejected atheism by turning undead");
 
-    Gname = halu_gname(u.ualign.type);
+    Gname = jp_gname_for_display(halu_gname(u.ualign.type));
 
     /* [What about needing free hands (does #turn involve any gesturing)?] */
     if (!can_chant(&gy.youmonst)) {
@@ -2648,20 +2648,20 @@ align_gname(aligntyp alignment)
 }
 
 static const char *const hallu_gods[] = {
-    "the Flying Spaghetti Monster", /* Church of the FSM */
-    "Eris",                         /* Discordianism */
-    "the Martians",                 /* every science fiction ever */
-    "Xom",                          /* Crawl */
-    "AnDoR dRaKoN",                 /* ADOM */
-    "the Central Bank of Yendor",   /* economics */
-    "Tooth Fairy",                  /* real world(?) */
-    "Om",                           /* Discworld */
-    "Yawgmoth",                     /* Magic: the Gathering */
-    "Morgoth",                      /* LoTR */
-    "Cthulhu",                      /* Lovecraft */
-    "the Ori",                      /* Stargate */
-    "destiny",                      /* why not? */
-    "your Friend the Computer",     /* Paranoia */
+    "空飛ぶスパゲッティ・モンスター", /* Church of the FSM */
+    "エリス",                       /* Discordianism */
+    "火星人",                       /* every science fiction ever */
+    "ゾム",                         /* Crawl */
+    "アンドール・ドラコン",         /* ADOM */
+    "イェンダー中央銀行",           /* economics */
+    "歯の妖精",                     /* real world(?) */
+    "オム",                         /* Discworld */
+    "ヨーグモス",                   /* Magic: the Gathering */
+    "モルゴス",                     /* LoTR */
+    "クトゥルフ",                   /* Lovecraft */
+    "オーライ",                     /* Stargate */
+    "運命",                         /* why not? */
+    "あなたの友だち、コンピュータ", /* Paranoia */
 };
 
 /* hallucination handling for priest/minion names: select a random god

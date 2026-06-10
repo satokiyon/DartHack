@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
 /* NetHack 5.0	getpos.c	$NHDT-Date: 1763708572 2025/11/20 23:02:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.6 $ */
 /*-Copyright (c) Pasi Kallinen, 2023. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -560,16 +560,16 @@ dxdy_to_dist_descr(coordxy dx, coordxy dy, boolean fulldir)
     int dst;
 
     if (!dx && !dy) {
-        Sprintf(buf, "here");
+        Sprintf(buf, "ここ");
     } else if ((dst = xytodir(dx, dy)) != -1) {
         /* explicit direction; 'one step' is implicit */
-        Sprintf(buf, "%s", directionname(dst));
+        Sprintf(buf, "%s", directionname_jp(dst));
     } else {
         static const char *const dirnames[4][2] = {
-            { "n", "north" },
-            { "s", "south" },
-            { "w", "west" },
-            { "e", "east" } };
+            { "北", "北" },
+            { "南", "南" },
+            { "西", "西" },
+            { "東", "東" } };
         buf[0] = '\0';
         /* 9999: protect buf[] against overflow caused by invalid values */
         if (dy) {
