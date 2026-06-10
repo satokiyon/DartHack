@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
 /* NetHack 5.0	wintty.c	$NHDT-Date: 1737691300 2025/01/23 20:01:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.420 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4955,9 +4955,9 @@ tty_status_update(
         break;
     case BL_TITLE:
         /* when hitpointbar is enabled, rendering will enforce a length
-           of 20 on title, padding with spaces or truncating if necessary */
+           of 24 on title, padding with spaces or truncating if necessary */
         if (iflags.wc2_hitpointbar)
-            tty_status[NOW][fldidx].lth = 20 + 2; /* '[' and ']' */
+            tty_status[NOW][fldidx].lth = 24 + 2; /* '[' and ']' */
         break;
     case BL_GOLD:
         /* \GXXXXNNNN counts as 1 [moot since we use decode_mixed() above] */
@@ -5064,7 +5064,7 @@ restore_status_rawvals(void)
         Strcpy(status_vals[idx], status_rawvals[idx]);
         tty_status[NOW][idx].lth = status_text_cells(status_vals[idx]);
         if (idx == BL_TITLE && iflags.wc2_hitpointbar)
-            tty_status[NOW][idx].lth = 20 + 2; /* '[' + title + ']' */
+            tty_status[NOW][idx].lth = 24 + 2; /* '[' + title + ']' */
     }
 }
 
@@ -5701,13 +5701,13 @@ render_status(void)
                     char bar[MAXCO], *bar2 = (char *) 0, savedch = '\0';
                     boolean twoparts = (hpbar_percent < 100);
 
-                    /* force exactly 20 display cells; preserve UTF-8 sequence
+                    /* force exactly 24 display cells; preserve UTF-8 sequence
                        boundaries so multi-byte characters can't be split */
-                    status_fit_title_cells(bar, sizeof bar, text, 20);
+                    status_fit_title_cells(bar, sizeof bar, text, 24);
                     Strcpy(status_vals[BL_TITLE], bar);
                     if (hpbar_crit_hp)
                         repad_with_dashes(bar);
-                    bar_len = status_text_cells(bar); /* always 20 */
+                    bar_len = status_text_cells(bar); /* always 24 */
                     /*tlth = bar_len + 2; // not needed within this 'if'*/
                     attrmask = 0; /* for the second part only case: dead */
                     /* when at full HP, the whole title will be highlighted;
