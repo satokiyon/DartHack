@@ -2270,7 +2270,7 @@ show_achievements(
             you_have_X("寺院に入った");
             break;
         case ACH_ORCL:
-            you_have_X("デルフィの神託を受けた");
+            you_have_X("デルファイの神託を受けた");
             break;
         case ACH_NOVL:
             you_have_X("ディスクワールド小説を読んだ");

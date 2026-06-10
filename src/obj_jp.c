@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -334,7 +334,7 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [TURQUOISE] = "トルコ石",
     [TWO_HANDED_SWORD] = "両手剣",
     [T_SHIRT] = "Ｔシャツ",
-    [TRIPE_RATION] = "トライプの配給食",
+    [TRIPE_RATION] = "モツの塊",
     [CORPSE] = "死体",
     [EGG] = "卵",
     [MEATBALL] = "肉団子",
