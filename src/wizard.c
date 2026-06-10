@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-18. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* NetHack 5.0	wizard.c	$NHDT-Date: 1741407262 2025/03/07 20:14:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
@@ -76,11 +76,11 @@ amulet(void)
             if (ttmp->ttyp == MAGIC_PORTAL) {
                 int du = distu(ttmp->tx, ttmp->ty);
                 if (du <= 9)
-                    pline("%s hot!", Tobjnam(amu, "feel"));
+                    pline("%s熱くなった!", Tobjnam(amu, "はとても"));
                 else if (du <= 64)
-                    pline("%s very warm.", Tobjnam(amu, "feel"));
+                    pline("%sかなり温かくなった.", Tobjnam(amu, "は"));
                 else if (du <= 144)
-                    pline("%s warm.", Tobjnam(amu, "feel"));
+                    pline("%s温かくなった.", Tobjnam(amu, "は"));
                 /* else, the amulet feels normal */
                 break;
             }
@@ -96,8 +96,7 @@ amulet(void)
         if (mtmp->iswiz && mtmp->msleeping && !rn2(40)) {
             mtmp->msleeping = 0;
             if (!m_next2u(mtmp))
-                You(
-      "get the creepy feeling that somebody noticed your taking the Amulet.");
+                You("誰かがアミュレットを手にしたことに気づいたような、薄気味悪い感覚に襲われた.");
             return;
         }
     }
@@ -773,7 +772,7 @@ resurrect(void)
         mtmp->mtame = 0, mtmp->mpeaceful = 0; /* paranoia */
         set_malign(mtmp);
         if (!Deaf) {
-            pline("A voice booms out...");
+            pline("どこからともなく声が響いた...");
             SetVoice(mtmp, 0, 80, 0);
             verbalize("汝がおれに%sできると思ったのか、愚か者よ。", verb);
         }
@@ -823,23 +822,23 @@ wizdeadorgone(void)
 }
 
 static const char *const random_insult[] = {
-    "antic",      "blackguard",   "caitiff",    "chucklehead",
-    "coistrel",   "craven",       "cretin",     "cur",
-    "dastard",    "demon fodder", "dimwit",     "dolt",
-    "fool",       "footpad",      "imbecile",   "knave",
-    "maledict",   "miscreant",    "niddering",  "poltroon",
-    "rattlepate", "reprobate",    "scapegrace", "varlet",
-    "villein", /* (sic.) */
-    "wittol",     "worm",         "wretch",
+    "愚か者", "悪党", "卑怯者", "うすのろ",
+    "下衆", "弱虫", "白痴", "駄犬",
+    "卑怯者", "悪魔の餌食", "鈍間", "馬鹿",
+    "阿呆", "泥棒", "低能", "曲者",
+    "呪われし者", "極道者", "臆病者", "腰抜け",
+    "能無し", "不徳漢", "ならず者", "下男",
+    "百姓",
+    "寝取られ男", "蛆虫", "ろくでなし",
 };
 
 static const char *const random_malediction[] = {
-    "Hell shall soon claim thy remains,", "I chortle at thee, thou pathetic",
-    "Prepare to die, thou", "Resistance is useless,",
-    "Surrender or die, thou", "There shall be no mercy, thou",
-    "Thou shalt repent of thy cunning,", "Thou art as a flea to me,",
-    "Thou art doomed,", "Thy fate is sealed,",
-    "Verily, thou shalt be one dead"
+    "地獄がお前の亡骸を待っているぞ、", "笑わせるな、この哀れな",
+    "死ぬ覚悟をしろ、この", "無駄な抵抗はやめろ、",
+    "降伏するか死ぬか選べ、この", "慈悲などないと思え、この",
+    "己の浅知恵を悔いるがいい、", "お前など私にとってはノミ同然だ、",
+    "お前の運命は決まった、", "お前の命運は尽きた、",
+    "誓って、お前は死人となるだろう"
 };
 
 /* Insult or intimidate the player */
@@ -850,7 +849,7 @@ cuss(struct monst *mtmp)
         return;
     if (mtmp->iswiz) {
         if (!rn2(5)) { /* typical bad guy action */
-            pline("%s laughs fiendishly.", Monnam(mtmp));
+            pline("%sは残忍に笑った.", Monnam(mtmp));
         } else if (u.uhave.amulet && !rn2(SIZE(random_insult))) {
             SetVoice(mtmp, 0, 80, 0);
             verbalize("アミュレットを譲れ、%s!",
@@ -876,7 +875,7 @@ cuss(struct monst *mtmp)
           + QT_ANGELIC);*/
     } else {
         if (!rn2(is_minion(mtmp->data) ? 100 : 5))
-            pline("%s casts aspersions on your ancestry.", Monnam(mtmp));
+            pline("%sはあなたの家系を侮辱した.", Monnam(mtmp));
         else
             com_pager("demon_cuss");
     }

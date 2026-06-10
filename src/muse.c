@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* NetHack 5.0	muse.c	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.241 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
@@ -137,8 +137,9 @@ precheck(struct monst *mon, struct obj *obj)
         /* 3.6.1: no Deaf filter; 'if' message doesn't warrant it, 'else'
            message doesn't need it since You_hear() has one of its own */
         if (vis) {
-            pline_mon(mon, "%s zaps %s, which suddenly explodes!", Monnam(mon),
-                  an(xname(obj)));
+            pline_mon(mon, "%sは%sを振ったが, それは突然爆発した!", Monnam(mon),
+                      xname(obj));
+
         } else {
             /* same near/far threshold as mzapwand() */
             int range = couldsee(mon->mx, mon->my) /* 9 or 5 */
@@ -185,7 +186,7 @@ mzapwand(
         pline_mon(mtmp, "%sは%sで自分自身を攻撃した!",
                   Monnam(mtmp), doname(otmp));
     } else {
-        pline_mon(mtmp, "%s zaps %s!", Monnam(mtmp), an(xname(otmp)));
+        pline_mon(mtmp, "%sは%sを振った!", Monnam(mtmp), xname(otmp));
         stop_occupation();
     }
     otmp->spe -= 1;

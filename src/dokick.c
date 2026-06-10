@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* NetHack 5.0	dokick.c	$NHDT-Date: 1712453347 2024/04/07 01:29:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.223 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1953,18 +1953,18 @@ down_gate(coordxy x, coordxy y)
         return MIGR_NOWHERE;
     }
     if (stway && !stway->up && !stway->isladder) {
-        gg.gate_str = "down the stairs";
+        gg.gate_str = "階段下";
         return (stway->tolev.dnum == u.uz.dnum) ? MIGR_STAIRS_UP
                                                 : MIGR_SSTAIRS;
     }
     if (stway && !stway->up && stway->isladder) {
-        gg.gate_str = "down the ladder";
+        gg.gate_str = "はしごの下";
         return MIGR_LADDER_UP;
     }
     /* hole will always be flagged as seen; trap drop might or might not */
     if ((ttmp = t_at(x, y)) != 0 && ttmp->tseen && is_hole(ttmp->ttyp)) {
-        gg.gate_str = (ttmp->ttyp == TRAPDOOR) ? "through the trap door"
-                                              : "through the hole";
+        gg.gate_str = (ttmp->ttyp == TRAPDOOR) ? "落とし戸を通って"
+                                              : "穴を通って";
         return MIGR_RANDOM;
     }
     return MIGR_NOWHERE;

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* NetHack 5.0	mcastu.c	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -338,7 +338,8 @@ touch_of_death(struct monst *mtmp)
     /* if we get here, we know that hero isn't magic resistant and isn't
        poly'd into an undead or demon */
     You_feel("力が吸い取られる気がした...");
-    (void) death_inflicted_by(kbuf, "the touch of death", mtmp);
+    (void) death_inflicted_by(kbuf, "死の手", mtmp);
+    (void) strsubst(kbuf, "inflicted", "使った");
 
     if (Upolyd) {
         u.mh = 0;
@@ -380,12 +381,9 @@ death_inflicted_by(
            reason for death due to 'touch of death' spell; if mtmp is
            shape changed, it won't be a vampshifter or mimic since they
            can't cast spells */
-        if (!type_is_pname(champtr) && !the_unique_pm(mptr))
-            realnm = an(realnm);
-        Sprintf(eos(outbuf), " inflicted by %s%s",
-                the_unique_pm(mptr) ? "the " : "", realnm);
+        Sprintf(eos(outbuf), " (%sがinflicted)", realnm);
         if (champtr != mptr)
-            Sprintf(eos(outbuf), " imitating %s", an(fakenm));
+            Sprintf(eos(outbuf), " [%sのふりをしていた]", fakenm);
     }
     return outbuf;
 }
@@ -487,8 +485,9 @@ mcast_weaken_you(struct monst *mtmp, int dmg)
         if (Half_spell_damage)
             dmg = (dmg + 1) / 2;
         losestr(rnd(dmg),
-                death_inflicted_by(kbuf, "strength loss", mtmp),
+                death_inflicted_by(kbuf, "力不足", mtmp),
                 KILLED_BY);
+        (void) strsubst(kbuf, "inflicted", "による");
         svk.killer.name[0] = '\0'; /* not killed if we get here... */
         monstunseesu(M_SEEN_MAGR);
     }
@@ -996,7 +995,7 @@ buzzmu(struct monst *mtmp, struct attack *mattk)
     if (lined_up(mtmp) && rn2(3)) {
         nomul(0);
         if (canseemon(mtmp))
-            pline_mon(mtmp, "%s zaps you with a %s!", Monnam(mtmp),
+            pline_mon(mtmp, "%sは%sをあなたに放った!", Monnam(mtmp),
                   flash_str(BZ_OFS_AD(mattk->adtyp), FALSE));
         gb.buzzer = mtmp;
         buzz(BZ_M_SPELL(BZ_OFS_AD(mattk->adtyp)), (int) mattk->damn,

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* NetHack 5.0	pray.c	$NHDT-Date: 1762680996 2025/11/09 01:36:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2753,15 +2753,16 @@ altar_wrath(coordxy x, coordxy y)
     aligntyp altaralign = a_align(x, y);
 
     if (u.ualign.type == altaralign && u.ualign.record > -rn2(4)) {
-        godvoice(altaralign, "How darest thou desecrate my altar!");
+        godvoice(altaralign, "よくも私の祭壇を汚したな!");
         (void) adjattrib(A_WIS, -1, FALSE);
         u.ualign.record--;
     } else {
-        pline("%s %s%s:",
-              !Deaf ? "A voice (could it be"
-                    : "Despite your deafness, you seem to hear",
-              align_gname(altaralign),
-              !Deaf ? "?) whispers" : " say");
+        if (!Deaf)
+            pline("どこからともなく声が(%sの声だろうか？)囁いた:",
+                  align_gname(altaralign));
+        else
+            pline("耳が聞こえないにもかかわらず、%sの声が聞こえた気がした:",
+                  align_gname(altaralign));
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("報いを受けるがよい、異教徒め！");
         /* higher luck is more likely to be reduced; as it approaches -5

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* NetHack 5.0	zap.c	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.584 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -4563,11 +4563,11 @@ zhitu(
         struct obj *otmp = gc.current_wand;
         /* fire horn and frost horn get handled as wands by caller */
         const char *verb = (abstyp < 10) /* wand */
-                           ? ((otmp && otmp->oclass == TOOL_CLASS) ? "played"
-                              : "zapped")
-                           : (abstyp < 20) ? "cast"
-                             : (abstyp < 30) ? "exhaled"
-                               : "imagined"; /* should never happen */
+                           ? ((otmp && otmp->oclass == TOOL_CLASS) ? "奏でた"
+                              : "振った")
+                           : (abstyp < 20) ? "唱えた"
+                             : (abstyp < 30) ? "吐いた"
+                               : "想像した"; /* should never happen */
 
         if (type < 0 || (type == 0 && gb.buzzer != 0)) {
             /* if gb.buzzer is Null, kbuf[] will end up with just <fltxt> */
@@ -4579,7 +4579,7 @@ zhitu(
             /* FIXME: "zapped by herself" is suitable for a rebound;
                "zapped at herself" would be better if player explicitly
                targeted hero */
-            Sprintf(kbuf, "%s %s by %sself", fltxt, verb, uhim());
+            Sprintf(kbuf, "自分自身で%s%s", verb, fltxt);
         }
         /* Half_spell_damage protection yields half-damage for wands & spells,
            including hero's own ricochets; breath attacks do full damage */
