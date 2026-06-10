@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -482,6 +482,7 @@ extern int dxdy_moveok(void);
 extern int getdir(const char *);
 extern void confdir(boolean);
 extern const char *directionname(int);
+extern const char *directionname_jp(int);
 extern int isok(coordxy, coordxy);
 extern int get_adjacent_loc(const char *, const char *, coordxy, coordxy,
                             coord *);

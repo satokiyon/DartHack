@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
 /* NetHack 5.0	sounds.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -169,9 +169,10 @@ temple_priest_sound(struct monst *mtmp)
             ++msg; /* skip control flags */
         if (strchr(msg, '%')) {
             DISABLE_WARNING_FORMAT_NONLITERAL
-            You_hear(msg, halu_gname(EPRI(mtmp)->shralign));
+            You_hear(msg, jp_gname_for_display(halu_gname(EPRI(mtmp)->shralign)));
             RESTORE_WARNING_FORMAT_NONLITERAL
-        } else
+        }
+ else
             You_hear1(msg);
         return TRUE;
     }
@@ -191,7 +192,7 @@ oracle_sound(struct monst *mtmp)
             "不思議な風の音.", /* Jupiter at Dodona */
             "取りつかれたようなたわごと.", /* Apollo at Delphi */
             "蛇のいびき.", /* AEsculapius at Epidaurus */
-            "誰かが「No more woodchucks!」と言う声.",
+            "誰かが「ウッドチャックはもうたくさんだ!」と言う声.",
             "大きなZOT!の音." /* both rec.humor.oracle */
         };
         You_hear1(ora_msg[rn2(3) + hallu * 2]);
@@ -346,6 +347,15 @@ static const char *const h_sounds[] = {
     "rustle", "honk",    "lisp",   "yodel",  "coo",     "burp",
     "moo",    "boom",    "murmur", "oink",   "quack",   "rumble",
     "twang",  "toot",    "gargle", "hoot",    "warble"
+};
+
+static const char *const h_sounds_jp[] = {
+    "ピーッといった", "ボヨーンといった", "歌った", "ゲップした", "ギイィといった", "咳をした",
+    "がらがら鳴らした", "遠吠えした", "ポンといった", "チリンと鳴らした", "鼻をすすった", "キラキラした",
+    "ヒィといった", "がたがた鳴らした", "ハミングした", "ジュージューいった", "さえずった", "ぜーぜーいった",
+    "カサカサ音を立てた", "パフッといった", "舌足らずにしゃべった", "ヨーデルを歌った", "クークー鳴いた", "げっぷした",
+    "モーと鳴いた", "ドカーンといった", "つぶやいた", "ブーブー鳴いた", "グワッといった", "ゴロゴロ鳴った",
+    "ベンベンといった", "プーッといった", "うがいをした", "ホーホー鳴いた", "さえずった"
 };
 
 const char *
@@ -541,7 +551,7 @@ whimper(struct monst *mtmp)
             Soundeffect(se, 50);
         }
         if (Hallucination)
-            pline("%s %s.", Monnam(mtmp), vtense((char *) 0, whimper_verb));
+            pline("%sは%s.", Monnam(mtmp), ROLL_FROM(h_sounds_jp));
         else
             pline("%sは%s.", Monnam(mtmp), whimper_verb);
         if (svc.context.run)
@@ -1301,7 +1311,7 @@ domonnoise(struct monst *mtmp)
     } /* switch */
 
     if (pline_msg) {
-        pline("%s %s", Monnam(mtmp), pline_msg);
+        pline("%sは%s", Monnam(mtmp), pline_msg);
     } else if (mtmp->mcan && verbl_msg_mcan) {
         SetVoice(mtmp, 0, 80, 0);
         verbalize1(verbl_msg_mcan);

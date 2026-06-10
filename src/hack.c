@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
 /* NetHack 5.0	hack.c	$NHDT-Date: 1763708572 2025/11/20 23:02:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.494 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -40,7 +40,6 @@ staticfn boolean avoid_moving_on_trap(coordxy, coordxy, boolean);
 staticfn boolean avoid_moving_on_liquid(coordxy, coordxy, boolean);
 staticfn boolean avoid_running_into_trap_or_liquid(coordxy, coordxy);
 staticfn boolean avoid_trap_andor_region(coordxy, coordxy);
-staticfn const char *jp_directionname(int);
 staticfn boolean move_out_of_bounds(coordxy, coordxy);
 staticfn boolean carrying_too_much(void);
 staticfn boolean escape_from_sticky_mon(coordxy, coordxy);
@@ -2584,8 +2583,8 @@ avoid_trap_andor_region(coordxy x, coordxy y)
     return FALSE;
 }
 
-staticfn const char *
-jp_directionname(int dir)
+const char *
+directionname_jp(int dir)
 {
     static NEARDATA const char *const jp_dirnames[N_DIRS_Z] = {
         "西",   "北西", "北",   "北東", "東",
@@ -2618,7 +2617,7 @@ move_out_of_bounds(coordxy x, coordxy y)
                     dy = 0;
             }
             You("%s方向へはこれ以上進めなかった.",
-                jp_directionname(xytodir(dx, dy)));
+                directionname_jp(xytodir(dx, dy)));
         }
         nomul(0);
         svc.context.move = 0;

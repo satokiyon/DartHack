@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
 /* NetHack 5.0	priest.c	$NHDT-Date: 1764567778 2025/11/30 21:42:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -352,7 +352,7 @@ priestname(
         || !Is_astralevel(&u.uz)
         || m_next2u(mon) || program_state.gameover) {
         Strcat(pname, "（");
-        Strcat(pname, halu_gname(mon_aligntyp(mon)));
+        Strcat(pname, jp_gname_for_display(halu_gname(mon_aligntyp(mon))));
         Strcat(pname, "の）");
     }
     return pname;
