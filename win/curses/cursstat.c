@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursstat.c */
 /* Copyright (c) Andy Thomson, 2018. */
@@ -182,7 +182,7 @@ curses_status_update(
             } else {
                 Sprintf(status_vals[fldidx],
                         (fldidx == BL_TITLE && iflags.wc2_hitpointbar)
-                        ? "%-30.30s" : status_fieldfmt[fldidx]
+                        ? "%-20.20s" : status_fieldfmt[fldidx]
                                      ? status_fieldfmt[fldidx] : "%s",
                         text);
                 /* strip trailing spaces; core ought to do this for us */
@@ -420,9 +420,9 @@ draw_horizontal(boolean border)
                 if (iflags.wc2_hitpointbar) {
                     w += 2; /* count '[' and ']' */
                     t = (int) strlen(text);
-                    if (t != 30) /* HPbar() will use modified copy of title */
-                        w -= (t - 30); /* '+= strlen()' below will add 't';
-                                        * functional result being 'w += 30' */
+                    if (t != 20) /* HPbar() will use modified copy of title */
+                        w -= (t - 20); /* '+= strlen()' below will add 't';
+                                        * functional result being 'w += 20' */
                 }
                 FALLTHROUGH;
                 /*FALLTHRU*/
@@ -1008,25 +1008,28 @@ curs_HPbar(
 #ifdef STATUS_HILITES
     int coloridx = 0;
 #endif /* STATUS_HILITES */
-    int k, bar_pos;
+    int bar_pos;
     char bar[STATVAL_WIDTH], *bar2 = (char *) 0, savedch = '\0';
     boolean twoparts = (hpbar_percent < 100);
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
 
-    if (bar_len < 1 || bar_len > 30)
-        bar_len = 30;
-    if (bar_len > (k = (int) strlen(text))) /* 26 for vertical status */
-        bar_len = k;
-    (void) strncpy(bar, text, bar_len);
-    bar[bar_len] = '\0';
+    /* The user requested a fixed width of 20 for the HP bar.
+       The core title might be longer, so we truncate it to 20 visible columns. */
+    bar_len = 20;
+    (void) strncpy(bar, text, sizeof(bar) - 1);
+    bar[sizeof(bar) - 1] = '\0';
+    utf8_truncate(bar, bar_len); /* truncate to 20 bytes for now as a baseline */
+    /* Note: Ideally we should use display width, but 20 bytes is safer than 30.
+       To be truly fixed width regardless of content, we pad with spaces. */
+    while (strlen(bar) < (size_t) bar_len)
+        Strcat(bar, " ");
+
     if (hpbar_crit_hp)
         repad_with_dashes(bar);
 
-    bar_pos = (bar_len * hpbar_percent) / 100;
-    if (bar_pos < 1 && hpbar_percent > 0)
-        bar_pos = 1;
-    if (bar_pos >= bar_len && hpbar_percent < 100)
-        bar_pos = bar_len - 1;
+    /* Use utf8_truncation_point to find a safe split point near the target percentage */
+    bar_pos = (int) utf8_truncation_point(bar, (bar_len * hpbar_percent) / 100);
+
     if (twoparts) {
         bar2 = &bar[bar_pos];
         savedch = *bar2;
