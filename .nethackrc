@@ -18,8 +18,8 @@
 #
 # Use the IBM character set rather than just plain ascii characters
 # for tty window-port.
-OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
-
+#OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
+OPTIONS=symset:Enhanced2,roguesymset:RogueEpyx
 
 
 # Here is a suggested symbol set from Michael Feir, 
@@ -28,7 +28,7 @@ OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
 
 # Optional curses port interface
 OPTIONS=windowtype:curses,align_message:right,align_status:bottom
-#OPTIONS=symset:Enhanced2,roguesymset:RogueEpyx
+
 #
 # Keyboard handling
 # Ray Chason's keyboard handling
@@ -62,10 +62,15 @@ OPTIONS=!autopickup
 OPTIONS=boulder:0
 
 # Disable the prompt for a tutorial
-#OPTIONS=!tutorial
+OPTIONS=!tutorial
 
 # Disable game tips
 #OPTIONS=!tips
+
+OPTIONS=armorstatus
+
+# Menu headings syle
+OPTIONS=menu_headings:yellow&underline
 
 # Highlight menu lines with different colors. You need to define the colors
 # with MENUCOLOR lines.
@@ -148,7 +153,7 @@ OPTIONS=font_status:Courier New,font_size_status:14
 #OPTIONS=font_status:CascadiaMono,font_size_status:14
 
 # Other
-#OPTIONS=hilite_pet,!toptenwin
+OPTIONS=hilite_pet,toptenwin
 OPTIONS=splash_screen,player_selection:prompts
 
 # Status/message window colors
@@ -221,12 +226,12 @@ OPTIONS=windowcolors:status white/black message white/black
 OPTIONS=statushilites
 # HP
 OPTIONS=hitpointbar
-OPTIONS=hilite_status:hitpoints/100%/gray&normal
-OPTIONS=hilite_status:hitpoints/<100%/green&normal
-OPTIONS=hilite_status:hitpoints/<66%/yellow&normal
-OPTIONS=hilite_status:hitpoints/<50%/orange&normal
+OPTIONS=hilite_status:hitpoints/100%/gray&bold
+OPTIONS=hilite_status:hitpoints/<100%/green&bold
+OPTIONS=hilite_status:hitpoints/<66%/yellow&bold
+OPTIONS=hilite_status:hitpoints/<50%/orange&bold
 OPTIONS=hilite_status:hitpoints/<33%/red&bold
-OPTIONS=hilite_status:hitpoints/<15%/red&inverse
+OPTIONS=hilite_status:hitpoints/<15%/red&inverse&bold
 
 ## Pw
 OPTIONS=hilite_status:power/100%/gray&normal
@@ -236,10 +241,10 @@ OPTIONS=hilite_status:power/<50%/orange&normal
 OPTIONS=hilite_status:power/<33%/red&bold
 
 ## Carry
-OPTIONS=hilite_status:cap/burdened/yellow/stressed/orange/strained/red&bold/overtaxed/red&inverse/overloaded/red&inverse&blink
+OPTIONS=hilite_status:cap/burdened/yellow/stressed/orange/strained/red&bold/overtaxed/red&inverse&bold/overloaded/red&inverse&blink&bold
 
 ## Hunger
-OPTIONS=hilite_status:hunger/satiated/yellow/hungry/orange/weak/red&bold/fainting/red&inverse/fainted/red&inverse&blink
+OPTIONS=hilite_status:hunger/satiated/yellow/hungry/orange/weak/red&bold/fainting/red&inverse&bold/fainted/red&inverse&blink&bold
 
 ## Mental
 #OPTIONS=hilite_status:condition/hallu/yellow
@@ -247,9 +252,9 @@ OPTIONS=hilite_status:hunger/satiated/yellow/hungry/orange/weak/red&bold/faintin
 #OPTIONS=hilite_status:condition/stun/red&bold
 
 ## Health
-#OPTIONS=hilite_status:condition/termill/red&inverse
-#OPTIONS=hilite_status:condition/foodpois/red&inverse
-#OPTIONS=hilite_status:condition/slime/red&inverse
+#OPTIONS=hilite_status:condition/termill/red&inverse&bold
+#OPTIONS=hilite_status:condition/foodpois/red&inverse&bold
+#OPTIONS=hilite_status:condition/slime/red&inverse&bold
 
 OPTIONS=hilite_status:condition/major_troubles/red&bold&inverse
 OPTIONS=hilite_status:condition/minor_troubles/yellow&bold&inverse
@@ -260,6 +265,19 @@ OPTIONS=hilite_status:gold/up/yellow/down/brown
 
 # St, Dx, Co, In, Wi, Ch
 OPTIONS=hilite_status:characteristics/up/green/down/red
+
+# AC, Exp-Level, HD, HP-MAX, Pw-MAX
+OPTIONS=hilite_status:armor-class/up/red/down/green
+OPTIONS=hilite_status:experience-level/up/green/down/red
+OPTIONS=hilite_status:HD/up/green/down/red
+OPTIONS=hilite_status:hitpoints-max/up/green/down/red
+OPTIONS=hilite_status:power-max/up/green/down/red
+
+# Alignment
+OPTIONS=hilite_status:alignment/change/orange&bold
+
+# Dungeon-Level
+OPTIONS=hilite_status:dungeon-level/change/light-blue&bold
 
 # CRASHREPORTURL must be set in syscf to enable these options.
 # These identify you in crash reports
@@ -648,6 +666,7 @@ SOUND=MESG "は怖じ気づいて逃げた[.！]" "snes_rpg/SNES-RPG05-18(Monste
 
 
 ### pixabay 効果音セット
+
 # ---- 箱の中のガラスが割れる音 ----
 SOUND=MESG "くぐもった.+音が聞こえた" "pixabay/spinopel-break-the-glass-456388.wav" 100
 
