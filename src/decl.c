@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-02. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* NetHack 5.0	decl.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.341 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -68,7 +68,7 @@ const struct c_common_strings c_common_strings =
             "再び動けるようになった.",
             "やめておこう.",
             "視界はすぐに晴れた.",
-      { "the", "your" },
+      { "", "あなたの" },
       { "mon", "you" }
 };
 
