@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmisc.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -341,6 +341,30 @@ curses_utf8_str_width(const char *str)
         p += seqlen;
     }
     return w;
+}
+
+/* 文字列を指定された表示幅（カラム数）で切り詰めたコピーを返す（ワードラップしない） */
+char *
+curses_truncate_str_cols(const char *str, int max_cols)
+{
+    int count_width = 0;
+    int byte_idx = 0;
+    unsigned cp;
+    int seqlen;
+
+    while (str[byte_idx] != '\0') {
+        cp = curses_utf8_decode(&str[byte_idx], &seqlen);
+        int char_w = curses_utf8_char_width(cp);
+        if (count_width + char_w > max_cols) {
+            break;
+        }
+        count_width += char_w;
+        byte_idx += seqlen;
+    }
+
+    char *retstr = curses_copy_of(str);
+    retstr[byte_idx] = '\0';
+    return retstr;
 }
 
 /* ダイアログウィンドウの指定された幅に必要な行数を決定する */

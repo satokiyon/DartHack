@@ -22,6 +22,7 @@ char *curses_str_remainder(const char *str, int width, int line_num);
 int curses_utf8_char_width(unsigned cp);
 unsigned curses_utf8_decode(const char *s, int *len);
 int curses_utf8_str_width(const char *str);
+char *curses_truncate_str_cols(const char *str, int max_cols);
 boolean curses_is_menu(winid wid);
 boolean curses_is_text(winid wid);
 int curses_convert_glyph(int ch, int glyph);
