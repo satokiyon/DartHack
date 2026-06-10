@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* NetHack 5.0	getpos.c	$NHDT-Date: 1763708572 2025/11/20 23:02:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.6 $ */
 /*-Copyright (c) Pasi Kallinen, 2023. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1119,7 +1119,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                     char note[QBUFSZ];
 
                     if (!force)
-                        Strcpy(note, "aborted");
+                        Strcpy(note, "中断");
                     else /* hjkl */
                         Sprintf(note, "'%s', '%s', '%s', '%s' または '%s' を使う",
                                 visctrl(cmd_from_func(do_move_west)),

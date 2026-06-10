@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* NetHack 5.0	bones.c	$NHDT-Date: 1701500709 2023/12/02 07:05:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -670,7 +670,7 @@ getbones(void)
     } else {
         ok = TRUE;
         if (wizard) {
-            if (y_n("Get bones?") == 'n') {
+            if (y_n("bonesを読み込みますか? (Get bones?)") == 'n') {
                 close_nhfile(nhfp);
                 compress_bonesfile();
                 program_state.reading_bonesfile = 0;
@@ -739,7 +739,7 @@ getbones(void)
     u.uroleplay.numbones++;
 
     if (wizard) {
-        if (y_n("Unlink bones?") == 'n') {
+        if (y_n("bonesファイルを削除しますか? (Unlink bones?)") == 'n') {
             compress_bonesfile();
             return ok;
         }

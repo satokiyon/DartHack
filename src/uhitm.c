@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* NetHack 5.0	uhitm.c	$NHDT-Date: 1752823766 2025/07/17 23:29:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.477 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -6228,7 +6228,7 @@ that_is_a_mimic(
 
             fakeobj = object_from_map(glyph, x, y, &otmp);
             otmp_name = (otmp && otmp->otyp != STRANGE_OBJECT)
-                        ? simpleonames(otmp) : "strange object";
+                        ? simpleonames(otmp) : "奇妙な物体";
             Snprintf(fmtbuf, sizeof fmtbuf, "%s%sは実は%%sだ!",
                      (otmp && is_plural(otmp)) ? "それらの" : "その",
                      otmp_name);
