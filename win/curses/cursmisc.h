@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmisc.h */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -18,6 +19,9 @@ char *curses_copy_of(const char *s);
 int curses_num_lines(const char *str, int width);
 char *curses_break_str(const char *str, int width, int line_num);
 char *curses_str_remainder(const char *str, int width, int line_num);
+int curses_utf8_char_width(unsigned cp);
+unsigned curses_utf8_decode(const char *s, int *len);
+int curses_utf8_str_width(const char *str);
 boolean curses_is_menu(winid wid);
 boolean curses_is_text(winid wid);
 int curses_convert_glyph(int ch, int glyph);
