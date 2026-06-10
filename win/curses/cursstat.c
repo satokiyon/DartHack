@@ -181,11 +181,11 @@ curses_status_update(
                 *status_vals[fldidx] = '\0';
             } else {
                 if (fldidx == BL_TITLE && iflags.wc2_hitpointbar) {
-                    /* The user requested a 20-character fixed width bar.
+                    /* The user requested a 24-character fixed width bar.
                        We format it to a temporary buffer, ensure it's valid UTF-8
-                       within 20 columns, then pad it to exactly 20 columns. */
-                    char *tbuf = curses_break_str(text, 20, 1);
-                    int pad_len = 20 - curses_utf8_str_width(tbuf);
+                       within 24 columns, then pad it to exactly 24 columns. */
+                    char *tbuf = curses_break_str(text, 24, 1);
+                    int pad_len = 24 - curses_utf8_str_width(tbuf);
                     char padbuf[30];
                     int i;
                     for (i = 0; i < pad_len; i++)
@@ -434,9 +434,9 @@ draw_horizontal(boolean border)
                 if (iflags.wc2_hitpointbar) {
                     w += 2; /* count '[' and ']' */
                     t = (int) strlen(text);
-                    if (t != 20) /* HPbar() will use modified copy of title */
-                        w -= (t - 20); /* '+= strlen()' below will add 't';
-                                        * functional result being 'w += 20' */
+                    if (t != 24) /* HPbar() will use modified copy of title */
+                        w -= (t - 24); /* '+= strlen()' below will add 't';
+                                        * functional result being 'w += 24' */
                 }
                 FALLTHROUGH;
                 /*FALLTHRU*/
@@ -1027,16 +1027,11 @@ curs_HPbar(
     boolean twoparts = (hpbar_percent < 100);
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
 
-    /* The user requested a fixed width of 20 for the HP bar.
-       The core title might be longer, so we truncate it to 20 visible columns. */
-    bar_len = 20;
+    /* The user requested a fixed width of 24 for the HP bar.
+       The core title might be longer, so we truncate it to 24 visible columns. */
+    bar_len = 24;
     (void) strncpy(bar, text, sizeof(bar) - 1);
     bar[sizeof(bar) - 1] = '\0';
-    utf8_truncate(bar, bar_len); /* truncate to 20 bytes for now as a baseline */
-    /* Note: Ideally we should use display width, but 20 bytes is safer than 30.
-       To be truly fixed width regardless of content, we pad with spaces. */
-    while (strlen(bar) < (size_t) bar_len)
-        Strcat(bar, " ");
 
     if (hpbar_crit_hp)
         repad_with_dashes(bar);
