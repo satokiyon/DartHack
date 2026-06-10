@@ -45,7 +45,7 @@ static int nhattr2curses(int);
 
 /* width of a single line in vertical status orientation (one field per line;
    everything but title fits within 30 even with prefix and longest value) */
-#define STATVAL_WIDTH 60 /* overkill; was MAXCO (200), massive overkill */
+#define STATVAL_WIDTH 120 /* safer buffer for UTF-8 titles and fields */
 
 void
 curses_status_init(void)
@@ -180,11 +180,21 @@ curses_status_update(
                 /* fieldfmt[] is " %s"; avoid lone space when empty */
                 *status_vals[fldidx] = '\0';
             } else {
-                Sprintf(status_vals[fldidx],
-                        (fldidx == BL_TITLE && iflags.wc2_hitpointbar)
-                        ? "%-20.20s" : status_fieldfmt[fldidx]
-                                     ? status_fieldfmt[fldidx] : "%s",
-                        text);
+                if (fldidx == BL_TITLE && iflags.wc2_hitpointbar) {
+                    /* The user requested a 20-character fixed width bar.
+                       We format it to a temporary buffer, ensure it's valid UTF-8
+                       within 20 columns/bytes, then pad it to exactly 20 columns. */
+                    char tbuf[BUFSZ];
+                    (void) strncpy(tbuf, text, sizeof(tbuf) - 1);
+                    tbuf[sizeof(tbuf) - 1] = '\0';
+                    utf8_truncate(tbuf, 20);
+                    Sprintf(status_vals[fldidx], "%-20s", tbuf);
+                } else {
+                    Sprintf(status_vals[fldidx],
+                            status_fieldfmt[fldidx] ? status_fieldfmt[fldidx]
+                                                    : "%s",
+                            text);
+                }
                 /* strip trailing spaces; core ought to do this for us */
                 if (fldidx == BL_HUNGER || fldidx == BL_LEVELDESC)
                     (void) trimspaces(status_vals[fldidx]);

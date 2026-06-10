@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* NetHack 5.0	botl.c	$NHDT-Date: 1769839231 2026/01/30 22:00:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.277 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -1088,12 +1088,12 @@ static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("version", " %s", ANY_STR, MAXVALWIDTH, BL_VERS),
     /* weapon and armor are constructed strings with no particular numeric
        equivalent */
-    INIT_BLSTAT("weapon", " %s", ANY_STR, 20, BL_WEAPON),
-    INIT_BLSTAT("armor", " %s", ANY_STR, 20, BL_ARMOR),
+    INIT_BLSTAT("weapon", " 武器:%s", ANY_STR, 20, BL_WEAPON),
+    INIT_BLSTAT("armor", " 防具:%s", ANY_STR, 20, BL_ARMOR),
     /* terrain is tracked by a number but designating it as type 'int'
        isn't useful; using type 'string' allows highlighting based on text
        matching which is potentially useful */
-    INIT_BLSTAT("terrain", " %s", ANY_STR, 20, BL_TERRAIN),
+    INIT_BLSTAT("terrain", " 地形:%s", ANY_STR, 20, BL_TERRAIN),
 };
 
 #undef INIT_BLSTATP
