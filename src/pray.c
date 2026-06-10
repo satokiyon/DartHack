@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
 /* NetHack 5.0	pray.c	$NHDT-Date: 1762680996 2025/11/09 01:36:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2580,9 +2580,9 @@ jp_gname_for_display(const char *gnam)
     if (!strcmp(gnam, "Amaterasu Omikami"))
         return "天照大神";
     if (!strcmp(gnam, "Raijin"))
-        return "雷神";
+        return "武御雷神";
     if (!strcmp(gnam, "Susanowo"))
-        return "須佐之男";
+        return "須佐之男命";
     if (!strcmp(gnam, "Blind Io"))
         return "盲目のイオ";
     if (!strcmp(gnam, "The Lady"))
@@ -2590,7 +2590,7 @@ jp_gname_for_display(const char *gnam)
     if (!strcmp(gnam, "Offler"))
         return "オフラー";
     if (!strcmp(gnam, "Tyr"))
-        return "チュール";
+        return "テュール";
     if (!strcmp(gnam, "Odin"))
         return "オーディン";
     if (!strcmp(gnam, "Loki"))
