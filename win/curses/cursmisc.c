@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmisc.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -280,7 +280,17 @@ curses_utf8_char_width(unsigned cp)
     if (cp >= 0xFF61 && cp <= 0xFF9F)
         return 1;
     /* 主要な東アジア文字（日本語のひらがな、カタカナ、漢字、全角記号など）は幅2とする */
-    if (cp >= 0x1100) {
+    /* Unicode 15.1 に基づく一般的な全角文字の範囲 */
+    if ((cp >= 0x1100 && cp <= 0x115F) || /* Hangul Jamo */
+        (cp >= 0x2329 && cp <= 0x232A) || /* Braille */
+        (cp >= 0x2E80 && cp <= 0xA4CF) || /* CJK Radicals, Symbols, Kanji, etc. */
+        (cp >= 0xAC00 && cp <= 0xD7A3) || /* Hangul Syllables */
+        (cp >= 0xF900 && cp <= 0xFAFF) || /* CJK Compatibility Ideographs */
+        (cp >= 0xFE10 && cp <= 0xFE19) || /* Vertical forms */
+        (cp >= 0xFE30 && cp <= 0xFE6F) || /* CJK Compatibility Forms */
+        (cp >= 0xFF01 && cp <= 0xFF60) || /* Fullwidth Forms */
+        (cp >= 0xFFE0 && cp <= 0xFFE6) || /* Fullwidth Symbols */
+        (cp >= 0x20000 && cp <= 0x3FFFF)) { /* CJK Extension B-I */
         return 2;
     }
     return 1;
@@ -290,25 +300,27 @@ curses_utf8_char_width(unsigned cp)
 unsigned
 curses_utf8_decode(const char *s, int *len)
 {
-    unsigned char b0 = (unsigned char)s[0];
+    const unsigned char *us = (const unsigned char *) s;
+    unsigned char b0 = us[0];
+
     if (b0 < 0x80) {
         *len = 1;
         return b0;
     }
     if (b0 >= 0xC2 && b0 <= 0xDF) {
-        if (s[1] == '\0') { *len = 1; return b0; }
+        if (us[1] == '\0') { *len = 1; return b0; }
         *len = 2;
-        return ((b0 & 0x1F) << 6) | ((unsigned char)s[1] & 0x3F);
+        return ((b0 & 0x1F) << 6) | (us[1] & 0x3F);
     }
     if (b0 >= 0xE0 && b0 <= 0xEF) {
-        if (s[1] == '\0' || s[2] == '\0') { *len = 1; return b0; }
+        if (us[1] == '\0' || us[2] == '\0') { *len = 1; return b0; }
         *len = 3;
-        return ((b0 & 0x0F) << 12) | (((unsigned char)s[1] & 0x3F) << 6) | ((unsigned char)s[2] & 0x3F);
+        return ((b0 & 0x0F) << 12) | ((us[1] & 0x3F) << 6) | (us[2] & 0x3F);
     }
     if (b0 >= 0xF0 && b0 <= 0xF4) {
-        if (s[1] == '\0' || s[2] == '\0' || s[3] == '\0') { *len = 1; return b0; }
+        if (us[1] == '\0' || us[2] == '\0' || us[3] == '\0') { *len = 1; return b0; }
         *len = 4;
-        return ((b0 & 0x07) << 18) | (((unsigned char)s[1] & 0x3F) << 12) | (((unsigned char)s[2] & 0x3F) << 6) | ((unsigned char)s[3] & 0x3F);
+        return ((b0 & 0x07) << 18) | ((us[1] & 0x3F) << 12) | ((us[2] & 0x3F) << 6) | (us[3] & 0x3F);
     }
     *len = 1;
     return b0;
