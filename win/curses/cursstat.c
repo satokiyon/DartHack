@@ -8,6 +8,7 @@
 #include "hack.h"
 #include "wincurs.h"
 #include "cursstat.h"
+#include "cursmisc.h"
 
 /* Status window functions for curses interface */
 
@@ -184,7 +185,7 @@ curses_status_update(
                     /* The user requested a 24-character fixed width bar.
                        We format it to a temporary buffer, ensure it's valid UTF-8
                        within 24 columns, then pad it to exactly 24 columns. */
-                    char *tbuf = curses_break_str(text, 24, 1);
+                    char *tbuf = curses_truncate_str_cols(text, 24);
                     int pad_len = 24 - curses_utf8_str_width(tbuf);
                     char padbuf[30];
                     int i;
