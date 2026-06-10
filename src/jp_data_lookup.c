@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
 /* NetHack 5.0	jp_data_lookup.c */
 /* Japanese aliases for data.base lookup.
  * Keep data.base keys in English and only map player input for lookup.
@@ -2742,6 +2742,8 @@ static const struct jp_data_lookup_alias jp_data_lookup_aliases[] = {
     { "たいようつるぎ", "sunsword" },
     { "太陽剣", "sunsword" },
     { "すさのお", "susano*o" },
+    { "すさのおのみこと", "susano*o" },
+    { "須佐之男命", "susano*o" },
     { "けんかくおとめ", "swashbuckler" },
     { "すわっしゅばっくらー", "swashbuckler" },
     { "だておとこけんし", "swashbuckler" },

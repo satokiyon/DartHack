@@ -2580,7 +2580,7 @@ jp_gname_for_display(const char *gnam)
     if (!strcmp(gnam, "Amaterasu Omikami"))
         return "天照大神";
     if (!strcmp(gnam, "Raijin"))
-        return "武御雷神";
+        return "雷神";
     if (!strcmp(gnam, "Susanowo"))
         return "須佐之男命";
     if (!strcmp(gnam, "Blind Io"))
