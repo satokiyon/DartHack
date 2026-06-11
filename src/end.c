@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	end.c	$NHDT-Date: 1720397752 2024/07/08 00:15:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.315 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -374,11 +374,11 @@ static const struct {
     /* "petrified by <foo>, while getting stoned" -- "while getting stoned"
        prevented any last-second recovery, but it was not the cause of
        "petrified by <foo>" */
-    { STONING, 1, "getting stoned", (char *) 0 },
+    { STONING, 1, "徐々に石化している", (char *) 0 },
     /* "died of starvation, while fainted from lack of food" is accurate
        but sounds a fairly silly (and doesn't actually appear unless you
        splice together death and while-helpless from xlogfile) */
-    { STARVING, 0, "fainted from lack of food", "fainted" },
+    { STARVING, 0, "空腹のあまり失神している", "失神" },
 };
 
 /* clear away while-helpless when the cause of death caused that
