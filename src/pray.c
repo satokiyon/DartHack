@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	pray.c	$NHDT-Date: 1762680996 2025/11/09 01:36:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -59,7 +59,7 @@ staticfn boolean blocked_boulder(int, int);
 static const char *const Moloch = "Moloch";
 
 static const char *const godvoices[] = {
-    "booms out", "thunders", "rings out", "booms",
+    "響き渡る", "雷鳴のような", "鳴り響く", "轟く",
 };
 
 #define PIOUS 20
@@ -675,7 +675,7 @@ god_zaps_you(aligntyp resp_god)
             monstunseesu(M_SEEN_DISINT);
         } else {
             You("しばらく%sの輝きに包まれた...", NH_BLACK);
-            godvoice(resp_god, "I believe it not!");
+            godvoice(resp_god, "信じられん!");
             monstseesu(M_SEEN_DISINT);
         }
         if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) {
@@ -920,54 +920,54 @@ gcrownu(void)
             discover_artifact(ART_EXCALIBUR);
         break;
     case A_NEUTRAL:
-        if (class_gift != STRANGE_OBJECT) {
-            ; /* already got bonus above */
-        } else if (obj && in_hand) {
-            Your("%sが鋭い音を立てた!", xname(obj));
-            observe_object(obj);
-        } else if (!already_exists) {
-            obj = mksobj(LONG_SWORD, FALSE, FALSE);
-            obj = oname(obj, artiname(ART_VORPAL_BLADE),
-                        ONAME_GIFT | ONAME_KNOW_ARTI);
-            obj->spe = 1;
-            at_your_feet("A sword");
-            dropy(obj);
-            u.ugifts++;
-            livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
-                           "was bestowed with %s",
-                           artiname(ART_VORPAL_BLADE));
-        }
-        /* acquire Vorpal Blade's skill regardless of weapon or gift */
-        unrestrict_weapon_skill(P_LONG_SWORD);
-        if (is_art(obj, ART_VORPAL_BLADE))
-            discover_artifact(ART_VORPAL_BLADE);
-        break;
+    if (class_gift != STRANGE_OBJECT) {
+        ; /* already got bonus above */
+    } else if (obj && in_hand) {
+        Your("%sが鋭い音を立てた!", xname(obj));
+        observe_object(obj);
+    } else if (!already_exists) {
+        obj = mksobj(LONG_SWORD, FALSE, FALSE);
+        obj = oname(obj, artiname(ART_VORPAL_BLADE),
+                    ONAME_GIFT | ONAME_KNOW_ARTI);
+        obj->spe = 1;
+        at_your_feet("1振りの剣");
+        dropy(obj);
+        u.ugifts++;
+        livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
+                       "was bestowed with %s",
+                       artiname(ART_VORPAL_BLADE));
+    }
+    /* acquire Vorpal Blade's skill regardless of weapon or gift */
+    unrestrict_weapon_skill(P_LONG_SWORD);
+    if (is_art(obj, ART_VORPAL_BLADE))
+        discover_artifact(ART_VORPAL_BLADE);
+    break;
     case A_CHAOTIC: {
-        char swordbuf[BUFSZ];
+    char swordbuf[BUFSZ];
 
-        Sprintf(swordbuf, "%s sword", hcolor(NH_BLACK));
-        if (class_gift != STRANGE_OBJECT) {
-            ; /* already got bonus above */
-        } else if (obj && in_hand) {
-            Your("%sが不吉にうなった!", swordbuf);
-            observe_object(obj);
-        } else if (!already_exists) {
-            obj = mksobj(RUNESWORD, FALSE, FALSE);
-            obj = oname(obj, artiname(ART_STORMBRINGER),
-                        ONAME_GIFT | ONAME_KNOW_ARTI);
-            obj->spe = 1;
-            at_your_feet(An(swordbuf));
-            dropy(obj);
-            u.ugifts++;
-            livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
-                           "was bestowed with %s",
-                           artiname(ART_STORMBRINGER));
-        }
-        /* acquire Stormbringer's skill regardless of weapon or gift */
-        unrestrict_weapon_skill(P_BROAD_SWORD);
-        if (is_art(obj, ART_STORMBRINGER))
-            discover_artifact(ART_STORMBRINGER);
-        break;
+    Sprintf(swordbuf, "%sの剣", hcolor(NH_BLACK));
+    if (class_gift != STRANGE_OBJECT) {
+        ; /* already got bonus above */
+    } else if (obj && in_hand) {
+        Your("%sが不吉にうなった!", swordbuf);
+        observe_object(obj);
+    } else if (!already_exists) {
+        obj = mksobj(RUNESWORD, FALSE, FALSE);
+        obj = oname(obj, artiname(ART_STORMBRINGER),
+                    ONAME_GIFT | ONAME_KNOW_ARTI);
+        obj->spe = 1;
+        at_your_feet(swordbuf);
+        dropy(obj);
+        u.ugifts++;
+        livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
+                       "was bestowed with %s",
+                       artiname(ART_STORMBRINGER));
+    }
+    /* acquire Stormbringer's skill regardless of weapon or gift */
+    unrestrict_weapon_skill(P_BROAD_SWORD);
+    if (is_art(obj, ART_STORMBRINGER))
+        discover_artifact(ART_STORMBRINGER);
+    break;
     }
     default:
         obj = 0; /* lint */
@@ -1308,21 +1308,21 @@ pleased(aligntyp g_align)
         }
         case 5: {
             static NEARDATA const char msg[] =
-                "\"and thus I grant thee the gift of %s!\"";
+                "「そして汝に%sの賜物を授けよう!」";
 
             godvoice(u.ualign.type,
-                     "Thou hast pleased me with thy progress,");
+                     "汝の成長に満足しているぞ、");
             if (!(HTelepat & INTRINSIC)) {
                 HTelepat |= FROMOUTSIDE;
-                pline(msg, "Telepathy");
+                pline(msg, "テレパシー");
                 if (Blind)
                     see_monsters();
             } else if (!(HFast & INTRINSIC)) {
                 HFast |= FROMOUTSIDE;
-                pline(msg, "Speed");
+                pline(msg, "速さ");
             } else if (!(HStealth & INTRINSIC)) {
                 HStealth |= FROMOUTSIDE;
-                pline(msg, "Stealth");
+                pline(msg, "隠密");
             } else {
                 if (!(HProtection & INTRINSIC)) {
                     HProtection |= FROMOUTSIDE;
@@ -1330,7 +1330,7 @@ pleased(aligntyp g_align)
                         u.ublessed = rn1(3, 2);
                 } else
                     u.ublessed++;
-                pline(msg, "my protection");
+                pline(msg, "私の守護");
             }
             SetVoice((struct monst *) 0, 0, 80, voice_deity);
             verbalize("我が名のもとに賢明に使うがよい！");
@@ -1412,20 +1412,22 @@ staticfn void
 godvoice(aligntyp g_align, const char *words)
 {
     const char *quot = "";
+    const char *quot_end = "";
 
-    if (words)
-        quot = "\"";
-    else
+    if (words) {
+        quot = "「";
+        quot_end = "」";
+    } else
         words = "";
 
     pline_The("%sの%sの声: %s%s%s", align_gname(g_align),
-              ROLL_FROM(godvoices), quot, words, quot);
+              ROLL_FROM(godvoices), quot, words, quot_end);
 }
 
 staticfn void
 gods_angry(aligntyp g_align)
 {
-    godvoice(g_align, "Thou hast angered me.");
+    godvoice(g_align, "汝、我を怒らせたな.");
 }
 
 /* The g_align god is upset with you. */
@@ -1512,8 +1514,8 @@ desecrate_altar(boolean highaltar, aligntyp altaralign)
     You_feel("周囲の空気が張り詰めていくのを感じる...");
     pline("突然、%sがあなたに気づいたことを悟った...",
           align_gname(altaralign));
-    Sprintf(gvbuf, "So, mortal!  You dare desecrate my %s!",
-            highaltar ? "High Temple" : "altar");
+    Sprintf(gvbuf, "定命の者よ！よくも私の%sを汚したな！",
+            highaltar ? "大神殿" : "祭壇");
     godvoice(altaralign, gvbuf);
     /* Throw everything we have at the player */
     god_zaps_you(altaralign);
@@ -1803,15 +1805,15 @@ bestow_artifact(uchar max_giftvalue)
             if (otmp->cursed)
                 uncurse(otmp);
             otmp->oerodeproof = TRUE;
-            Strcpy(buf, (Hallucination ? "a doodad"
-                            : Blind ? "an object"
+            Strcpy(buf, (Hallucination ? "へんてこなもの"
+                            : Blind ? "何か"
                             : ansimpleoname(otmp)));
             if (!Blind)
                 Sprintf(eos(buf), "（%s）",
                         bare_artifactname(otmp));
             at_your_feet(upstart(buf));
             dropy(otmp);
-            godvoice(u.ualign.type, "Use my gift wisely!");
+            godvoice(u.ualign.type, "我が賜物を賢明に使うがよい!");
             u.ugifts++;
             u.ublesscnt = rnz(300 + (50 * nartifacts));
             exercise(A_WIS, TRUE);
@@ -2108,11 +2110,11 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
                 You("%sが%sに触れた気がした.", something,
                     jp_body_part(FOOT));
             else
-                You(Hallucination
-                ? "see crabgrass at your %s.  A funny thing in a dungeon."
-                        : "glimpse a four-leaf clover at your %s.",
-                    jp_body_part_plural(FOOT));
-        }
+                You("%sに%s.",
+                    jp_body_part_plural(FOOT),
+                    Hallucination
+                        ? "メヒシバが見える. ダンジョンの中ではおかしなものだ"
+                        : "四つ葉のクローバーを見つけた");
     }
 }
 
@@ -2297,7 +2299,7 @@ prayer_done(void) /* M. Stephenson (1.0.3b) */
         /* KMH -- Gods have mastery over unchanging */
         rehumanize();
         /* no Half_physical_damage adjustment here */
-        losehp(rnd(20), "residual undead turning effect", KILLED_BY_AN);
+        losehp(rnd(20), "アンデッド退散の残留効果", KILLED_BY_AN);
         exercise(A_CON, FALSE);
         return 1;
     }

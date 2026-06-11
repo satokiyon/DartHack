@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	write.c	$NHDT-Date: 1702023275 2023/12/08 08:14:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -101,30 +101,30 @@ dowrite(struct obj *pen)
         return ECMD_CANCEL;
     /* can't write on a novel (unless/until it's been converted into a blank
        spellbook), but we want messages saying so to avoid "spellbook" */
-    typeword = (paper->otyp == SPE_NOVEL) ? "book"
-               : (paper->oclass == SPBOOK_CLASS) ? "spellbook"
-                 : "scroll";
+    typeword = (paper->otyp == SPE_NOVEL) ? "本"
+               : (paper->oclass == SPBOOK_CLASS) ? "呪文書"
+                 : "巻物";
     if (Blind) {
         if (!paper->dknown) {
             You("その%sが白紙かどうかわからなかった.", typeword);
             return ECMD_OK;
         } else if (paper->oclass == SPBOOK_CLASS) {
             /* can't write a magic book while blind */
-            pline("%s can't create braille text.",
+            pline("%sでは点字は書けない.",
                   upstart(ysimple_name(pen)));
             return ECMD_OK;
         }
     }
     observe_object(paper);
     if (paper->otyp != SCR_BLANK_PAPER && paper->otyp != SPE_BLANK_PAPER) {
-        pline("That %s is not blank!", typeword);
+        pline("その%sは白紙ではない!", typeword);
         exercise(A_WIS, FALSE);
         return ECMD_TIME;
     }
     makeknown(SCR_BLANK_PAPER);
 
     /* what to write */
-    Sprintf(qbuf, "What type of %s do you want to write?", typeword);
+    Sprintf(qbuf, "どんな%sを書くか?", typeword);
     getlin(qbuf, namebuf);
     (void) mungspaces(namebuf); /* remove any excess whitespace */
     if (namebuf[0] == '\033' || !namebuf[0])
@@ -217,13 +217,22 @@ dowrite(struct obj *pen)
         boolean fanfic = !rn2(3), tearup = !rn2(3);
 
         if (!fanfic) {
-            You("%s to write the Great Yendorian Novel, but %s inspiration.",
-                !tearup ? "prepare" : "try",
-                !Hallucination ? "lack" : "have too much");
+            if (!tearup) {
+                pline("あなたは伝説のイェンダー小説を書こうと準備したが、%s.",
+                      !Hallucination ? "インスピレーションが足りない"
+                                     : "インスピレーションが溢れすぎている");
+            } else {
+                pline("あなたは伝説のイェンダー小説を書こうと試みたが、%s.",
+                      !Hallucination ? "インスピレーションが足りない"
+                                     : "インスピレーションが溢れすぎている");
+            }
         } else {
-            You("%sproduce really %s fan-fiction.",
-                !tearup ? "start to " : "",
-                !Hallucination ? "lame" : "awesome");
+            const char *quality = !Hallucination ? "へっぽこな" : "最高の";
+            if (!tearup) {
+                pline("あなたは本当に%sファンフィクションを書き始めた.", quality);
+            } else {
+                pline("あなたは本当に%sファンフィクションを書き上げた.", quality);
+            }
         }
         if (!tearup) {
             You("その考えをあきらめた.");
@@ -233,12 +242,12 @@ dowrite(struct obj *pen)
         }
         return ECMD_TIME;
     } else if (i == SPE_BOOK_OF_THE_DEAD) {
-        pline("No mere dungeon adventurer could write that.");
+        pline("単なるダンジョン冒険者がそれを書くことなどできない.");
         return ECMD_TIME;
     } else if (by_descr && paper->oclass == SPBOOK_CLASS
                && !objects[i].oc_name_known) {
         /* can't write unknown spellbooks by description */
-        pline("Unfortunately you don't have enough information to go on.");
+        pline("残念ながら、書くのに必要な情報が足りない.");
         return ECMD_TIME;
     }
 

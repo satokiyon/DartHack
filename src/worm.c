@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-20. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	worm.c	$NHDT-Date: 1652689653 2022/05/16 08:27:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
@@ -439,8 +439,7 @@ cutworm(struct monst *worm, coordxy x, coordxy y,
         place_worm_seg(worm, x, y); /* place the "head" segment back */
         if (svc.context.mon_moving) {
             if (canspotmon(worm))
-                pline("Part of %s tail has been cut off.",
-                      s_suffix(mon_nam(worm)));
+                pline("%sの尻尾の一部が切り落とされた.", l_monnam(worm));
         } else
             You("%sの尾を一部切り取った。", l_monnam(worm));
         toss_wsegs(new_tail, TRUE);

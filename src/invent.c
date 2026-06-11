@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	invent.c	$NHDT-Date: 1762680996 2025/11/09 01:36:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.543 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -1660,27 +1660,27 @@ carrying_stoning_corpse(void)
  * http://concord.wikia.com/wiki/List_of_Fictional_Currencies
  */
 static const char *const currencies[] = {
-    "Altarian Dollar",       /* The Hitchhiker's Guide to the Galaxy */
-    "Ankh-Morpork Dollar",   /* Discworld */
-    "auric",                 /* The Domination of Draka */
-    "buckazoid",             /* Space Quest */
-    "cirbozoid",             /* Starslip */
-    "credit chit",           /* Deus Ex */
-    "cubit",                 /* Battlestar Galactica */
-    "Flainian Pobble Bead",  /* The Hitchhiker's Guide to the Galaxy */
-    "fretzer",               /* Jules Verne */
-    "imperial credit",       /* Star Wars */
-    "Hong Kong Luna Dollar", /* The Moon is a Harsh Mistress */
-    "kongbuck",              /* Snow Crash */
-    "nanite",                /* System Shock 2 */
-    "quatloo",               /* Star Trek, Sim City */
-    "simoleon",              /* Sim City */
-    "solari",                /* Spaceballs */
-    "spacebuck",             /* Spaceballs */
-    "sporebuck",             /* Spore */
-    "Triganic Pu",           /* The Hitchhiker's Guide to the Galaxy */
-    "woolong",               /* Cowboy Bebop */
-    "zorkmid",               /* Zork, NetHack */
+    "アルタリア・ドル",       /* The Hitchhiker's Guide to the Galaxy */
+    "アンク=モープ・ドル",   /* Discworld */
+    "オーリック",                 /* The Domination of Draka */
+    "バッカゾイド",             /* Space Quest */
+    "サーボゾイド",             /* Starslip */
+    "クレジット・チット",           /* Deus Ex */
+    "キュービット",                 /* Battlestar Galactica */
+    "フレイニアのポブルビーズ",  /* The Hitchhiker's Guide to the Galaxy */
+    "フレッツァー",               /* Jules Verne */
+    "帝国クレジット",       /* Star Wars */
+    "香港ルナドル", /* The Moon is a Harsh Mistress */
+    "コングバック",              /* Snow Crash */
+    "ナナイト",                /* System Shock 2 */
+    "クワットルー",               /* Star Trek, Sim City */
+    "シムオリオン",              /* Sim City */
+    "ソラリ",                /* Spaceballs */
+    "スペースバック",             /* Spaceballs */
+    "スポアバック",             /* Spore */
+    "トリガニック・プー",   /* The Hitchhiker's Guide to the Galaxy */
+    "ウーロン",               /* Cowboy Bebop */
+    "ゾークミッド",               /* Zork, NetHack */
 };
 
 const char *
@@ -1688,7 +1688,7 @@ currency(long amount)
 {
     const char *res;
 
-    res = Hallucination ? ROLL_FROM(currencies) : "zorkmid";
+    res = Hallucination ? ROLL_FROM(currencies) : "ゾークミッド";
     if (amount != 1L)
         res = makeplural(res);
     return res;

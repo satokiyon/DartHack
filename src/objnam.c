@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1745114235 2025/04/19 17:57:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.453 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -5350,8 +5350,9 @@ readobjnam_postparse1(struct _readobjnam_data *d)
         d->blessed = 1, d->iscursed = d->uncursed = 0;
         d->typ = POT_WATER;
         return 2; /*goto typfnd;*/
-    } else if (!strcmpi(d->bp, "呪われた水") || !strcmpi(d->bp, "不浄の水")
-               || !strcmpi(d->bp, "呪われた聖水") || !strcmpi(d->bp, "不浄の聖水")) {
+    } else if (!strcmpi(d->bp, "呪われた水") || !strcmpi(d->bp, "不浄の水") || !strcmpi(d->bp, "穢れた水")
+               || !strcmpi(d->bp, "呪われた聖水") || !strcmpi(d->bp, "不浄の聖水") || !strcmpi(d->bp, "穢れた聖水")
+               || !strcmpi(d->bp, "のろわれたみず") || !strcmpi(d->bp, "けがれたみず") || !strcmpi(d->bp, "のろわれたせいすい")) {
         d->iscursed = 1, d->blessed = d->uncursed = 0;
         d->typ = POT_WATER;
         return 2; /*goto typfnd;*/

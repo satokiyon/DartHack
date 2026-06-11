@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	polyself.c	$NHDT-Date: 1772101811 2026/02/26 02:30:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.227 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -489,7 +489,7 @@ polyself(int psflags)
         && !isvamp) {
         if (rn2(20) > ACURR(A_CON)) {
             You1(shudder_for_moment);
-            losehp(rnd(30), "system shock", KILLED_BY_AN);
+            losehp(rnd(30), "システムショック", KILLED_BY_AN);
             exercise(A_CON, FALSE);
             return;
         }
@@ -1029,43 +1029,43 @@ polymon(int mntmp)
     /* the explanation of '#monster' used to be shown sooner, but there are
        possible fatalities above and it isn't useful unless hero survives */
     if (flags.verbose) {
-        static const char use_thec[] = "Use the command #%s to %s.";
+        static const char use_thec[] = "コマンド#%sで%sことができる.";
         static const char monsterc[] = "monster";
         struct permonst *uptr = gy.youmonst.data;
         boolean might_hide = (is_hider(uptr) || hides_under(uptr));
 
         if (can_breathe(uptr))
-            pline(use_thec, monsterc, "use your breath weapon");
+            pline(use_thec, monsterc, "ブレスを吐く");
         if (attacktype(uptr, AT_SPIT))
-            pline(use_thec, monsterc, "spit venom");
+            pline(use_thec, monsterc, "毒を吐く");
         if (uptr->mlet == S_NYMPH)
-            pline(use_thec, monsterc, "remove an iron ball");
+            pline(use_thec, monsterc, "鉄球を外す");
         if (attacktype(uptr, AT_GAZE))
-            pline(use_thec, monsterc, "gaze at monsters");
+            pline(use_thec, monsterc, "モンスターを睨みつける");
         if (might_hide && webmaker(uptr))
-            pline(use_thec, monsterc, "hide or to spin a web");
+            pline(use_thec, monsterc, "隠れたり巣を張ったりする");
         else if (might_hide)
-            pline(use_thec, monsterc, "hide");
+            pline(use_thec, monsterc, "隠れる");
         else if (webmaker(uptr))
-            pline(use_thec, monsterc, "spin a web");
+            pline(use_thec, monsterc, "巣を張る");
         if (is_were(uptr))
-            pline(use_thec, monsterc, "summon help");
+            pline(use_thec, monsterc, "仲間を呼ぶ");
         if (u.umonnum == PM_GREMLIN)
-            pline(use_thec, monsterc, "multiply in a fountain");
+            pline(use_thec, monsterc, "噴水で増殖する");
         if (is_unicorn(uptr))
-            pline(use_thec, monsterc, "use your horn");
+            pline(use_thec, monsterc, "角を使う");
         if (is_mind_flayer(uptr))
-            pline(use_thec, monsterc, "emit a mental blast");
+            pline(use_thec, monsterc, "精神波を放つ");
         if (uptr->msound == MS_SHRIEK) /* worthless, actually */
-            pline(use_thec, monsterc, "shriek");
+            pline(use_thec, monsterc, "悲鳴を上げる");
         if (is_vampire(uptr) || is_vampshifter(&gy.youmonst))
-            pline(use_thec, monsterc, "change shape");
+            pline(use_thec, monsterc, "姿を変える");
 
         if (lays_eggs(uptr) && flags.female
             && !(uptr == &mons[PM_GIANT_EEL]
                  || uptr == &mons[PM_ELECTRIC_EEL]))
             pline(use_thec, "sit",
-                  eggs_in_water(uptr) ? "spawn in the water" : "lay an egg");
+                  eggs_in_water(uptr) ? "水中で産卵する" : "卵を産む");
     }
     return 1;
 }

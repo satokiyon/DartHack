@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	wizard.c	$NHDT-Date: 1741407262 2025/03/07 20:14:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
@@ -856,12 +856,12 @@ cuss(struct monst *mtmp)
                       ROLL_FROM(random_insult));
         } else if (u.uhp < 5 && !rn2(2)) { /* Panic */
             SetVoice(mtmp, 0, 80, 0);
-            verbalize(rn2(2) ? "Even now thy life force ebbs, %s!"
-                             : "Savor thy breath, %s, it be thy last!",
+            verbalize(rn2(2) ? "いま、汝の生命力が失われていくぞ、%s!"
+                             : "よく息をしておけ、%s、それが最後だ!",
                       ROLL_FROM(random_insult));
         } else if (mtmp->mhp < 5 && !rn2(2)) { /* Parthian shot */
             SetVoice(mtmp, 0, 80, 0);
-            verbalize(rn2(2) ? "I shall return." : "I'll be back.");
+            verbalize(rn2(2) ? "また戻ってくるぞ." : "また会おう.");
         } else {
             SetVoice(mtmp, 0, 80, 0);
             verbalize("%s%s!",
