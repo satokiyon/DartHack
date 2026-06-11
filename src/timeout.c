@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	timeout.c	$NHDT-Date: 1776080125 2026/04/13 03:35:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -1294,7 +1294,7 @@ slip_or_trip(void)
             switch (rn2(4)) {
             case 1:
                 You("自分の%sにつまずいた.",
-                    Hallucination ? "elbow" : jp_body_part_plural(FOOT));
+                    Hallucination ? "ひじ" : jp_body_part_plural(FOOT));
                 break;
             case 2:
                 You("%s.",

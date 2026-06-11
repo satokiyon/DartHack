@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-20. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	mail.c	$NHDT-Date: 1762750699 2025/11/09 20:58:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -532,7 +532,7 @@ readmail(struct obj *otmp UNUSED)
         }
     }
     if (Blind) {
-        pline("Unfortunately you cannot see what it says.");
+        pline("残念ながら、そこに何が書かれているか見ることはできない.");
     } else {
         if (delivery == subst_delivery)
             pline(junk_templates[i], it_reads, recipient, "\"");

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	potion.c	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.279 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -378,10 +378,6 @@ make_hallucinated(
     if (Unaware)
         talk = FALSE;
 
-    message = (!xtime) ? "Everything %s SO boring now."
-                       : "Oh wow!  Everything %s so cosmic!";
-    verb = (!Blind) ? "looks" : "feels";
-
     if (mask) {
         if (HHallucination)
             changed = TRUE;
@@ -431,8 +427,13 @@ make_hallucinated(
         update_inventory();
 
         disp.botl = TRUE;
-        if (talk)
-            pline(message, verb);
+        if (talk) {
+            if (!xtime) {
+                pline("いまはすべてがとても退屈に%s.", (!Blind) ? "見える" : "感じられる");
+            } else {
+                pline("うわあ! すべてがとても宇宙的に%s!", (!Blind) ? "見える" : "感じられる");
+            }
+        }
     }
     return changed;
 }
@@ -491,11 +492,11 @@ ghost_from_bottle(void)
         return;
     }
     pline("瓶を開けると、巨大な%sが現れた!",
-          Hallucination ? rndmonnam(NULL) : (const char *) "ghost");
+          Hallucination ? rndmonnam(NULL) : (const char *) "幽霊");
     if (flags.verbose)
         You("恐怖で動けなくなった.");
     nomul(-3);
-    gm.multi_reason = "being frightened to death";
+    gm.multi_reason = "恐怖で身がすくんでいる";
     gn.nomovemsg = "ようやく落ち着きを取り戻した.";
 }
 
@@ -891,7 +892,7 @@ peffect_paralysis(struct obj *otmp)
             Your("%sは%sに貼りついて凍りついた!", jp_body_part_plural(FOOT),
                  surface(u.ux, u.uy));
         nomul(-(rn1(10, 25 - 12 * bcsign(otmp))));
-        gm.multi_reason = "frozen by a potion";
+        gm.multi_reason = "薬で凍りついた";
         gn.nomovemsg = You_can_move_again;
         exercise(A_DEX, FALSE);
     }
@@ -1204,8 +1205,7 @@ peffect_levitation(struct obj *otmp)
 
             You("%sを%sにぶつけた.", jp_body_part(HEAD),
                 ceiling(u.ux, u.uy));
-            losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling",
-                   KILLED_BY);
+            losehp(Maybe_Half_Phys(dmg), "天井への衝突", KILLED_BY_AN);
             gp.potion_nothing = 0; /* not nothing after all */
         }
     } else if (otmp->blessed) {
@@ -1278,7 +1278,7 @@ peffect_oil(struct obj *otmp)
             /* fire damage */
             vulnerable = !Fire_resistance || Cold_resistance;
             losehp(d(vulnerable ? 4 : 2, 4),
-                   "quaffing a burning potion of oil",
+                   "燃えている油の薬を飲んだこと",
                    KILLED_BY);
         }
         /*
@@ -1309,7 +1309,7 @@ peffect_acid(struct obj *otmp)
               otmp->blessed ? "少し" : otmp->cursed ? "かなり"
                                                     : "焼けるように");
         dmg = d(otmp->cursed ? 2 : 1, otmp->blessed ? 4 : 8);
-        losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(dmg), "酸の薬", KILLED_BY_AN);
         exercise(A_CON, FALSE);
     }
     if (Stoned)
@@ -1479,13 +1479,12 @@ strange_feeling(struct obj *obj, const char *txt)
     useup(obj);
 }
 
-static const char *bottlenames[] = { "bottle", "phial", "flagon", "carafe",
-                              "flask",  "jar",   "vial" };
+static const char *bottlenames[] = { "瓶", "小瓶", "徳利", "水差し", "フラスコ", "広口瓶", "薬瓶" };
 static const char *hbottlenames[] = {
-    "jug", "pitcher", "barrel", "tin", "bag", "box", "glass", "beaker",
-    "tumbler", "vase", "flowerpot", "pan", "thingy", "mug", "teacup",
-    "teapot", "keg", "bucket", "thermos", "amphora", "wineskin", "parcel",
-    "bowl", "ampoule"
+    "ジャグ", "ピッチャー", "樽", "缶", "袋", "箱", "コップ", "ビーカー",
+    "タンブラー", "花瓶", "植木鉢", "鍋", "なにがし", "マグカップ", "ティーカップ",
+    "ティーポット", "ケグ", "バケツ", "魔法瓶", "アンフォラ", "革袋", "小包",
+    "ボウル", "アンプル"
 };
 
 const char *
@@ -1640,8 +1639,8 @@ potionhit(struct monst *mon, struct obj *obj, int how)
         pline_The("%sがあなたの%sに当たり、砕け散った.", botlnam,
               jp_body_part(HEAD));
         losehp(Maybe_Half_Phys(rnd(2)),
-               (how == POTHIT_OTHER_THROW) ? "propelled potion" /* scatter */
-                                           : "thrown potion",
+               (how == POTHIT_OTHER_THROW) ? "飛んできた薬" /* scatter */
+                                           : "投げられた薬",
                KILLED_BY_AN);
     } else {
         tx = mon->mx, ty = mon->my;
@@ -1703,7 +1702,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                       obj->blessed ? "少し"
                                    : obj->cursed ? "かなり" : "");
                 dmg = d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
-                losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
+                losehp(Maybe_Half_Phys(dmg), "酸の薬", KILLED_BY_AN);
             }
             break;
         }
@@ -2044,7 +2043,7 @@ potionbreathe(struct obj *obj)
         if (!Free_action) {
             pline("%sに押さえつけられているようだ.", Something);
             nomul(-rnd(5));
-            gm.multi_reason = "frozen by a potion";
+            gm.multi_reason = "薬で凍りついた";
             gn.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else
@@ -2055,7 +2054,7 @@ potionbreathe(struct obj *obj)
         if (!Free_action && !Sleep_resistance) {
             You_feel("かなり眠くなった.");
             nomul(-rnd(5));
-            gm.multi_reason = "sleeping off a magical draught";
+            gm.multi_reason = "魔法の薬で眠っている";
             gn.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else {
@@ -2293,13 +2292,13 @@ dodip(void)
      * getobj: "What do you want to dip <the object> into? [xyz or ?*] "
      */
     if (is_hands) {
-        Snprintf(obuf, sizeof obuf, "your %s", jp_body_part_plural(HAND));
+        Snprintf(obuf, sizeof obuf, "あなたの%s", jp_body_part_plural(HAND));
     } else {
         Strcpy(obuf, short_oname(obj, doname, thesimpleoname,
                                  /* 128 - (24 + 54 + 1) leaves 49 for
                                     <object> */
-                                 QBUFSZ - sizeof "What do you want to dip\
- into? [abdeghjkmnpqstvwyzBCEFHIKLNOQRTUWXZ#-# or ?*] "));
+                                 QBUFSZ - sizeof "何を何に浸しますか？\
+ [abdeghjkmnpqstvwyzBCEFHIKLNOQRTUWXZ#-# or ?*] "));
     }
 
     /* preceding #dip with 'm' skips the possibility of dipping into pools,
@@ -2391,8 +2390,8 @@ dip_into(void)
         return ECMD_CANCEL;
 
     /* "What do you want to dip into <the potion>? [abc or ?*] " */
-    Snprintf(qbuf, sizeof qbuf, "dip into %s%s",
-             is_plural(potion) ? "one of " : "", thesimpleoname(potion));
+    Snprintf(qbuf, sizeof qbuf, "%s%sに浸す",
+             is_plural(potion) ? "そのうちの1つの" : "", thesimpleoname(potion));
     obj = getobj(qbuf, dip_ok, GETOBJ_PROMPT);
     if (!obj)
         return ECMD_CANCEL;
@@ -2428,7 +2427,7 @@ dip_potion_explosion(struct obj *obj, int dmg)
             potionbreathe(obj);
         useupall(obj);
         losehp(dmg, /* not physical damage */
-               "alchemic blast", KILLED_BY_AN);
+               "錬金術の爆発", KILLED_BY_AN);
         return TRUE;
     }
     return FALSE;
@@ -2752,9 +2751,9 @@ potion_dip(struct obj *obj, struct obj *potion)
                 observe_object(singlepotion);
             *newbuf = '\0';
             if (mixture == POT_WATER && singlepotion->dknown)
-                Sprintf(newbuf, "clears");
+                Sprintf(newbuf, "透明になった");
             else if (!Blind)
-                Sprintf(newbuf, "turns %s",
+                Sprintf(newbuf, "%sになった",
                         hcolor(OBJ_DESCR(objects[mixture])));
             if (*newbuf)
                 pline_The("%s薬%sは%s.", oldbuf,

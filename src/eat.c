@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	eat.c	$NHDT-Date: 1740534854 2025/02/25 17:54:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.344 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -334,13 +334,13 @@ eatmupdate(void)
 
     if (is_obj_mappear(&gy.youmonst,ORANGE) && !Hallucination) {
         /* revert from hallucinatory to "normal" mimicking */
-        altmsg = "You now prefer mimicking yourself.";
+        altmsg = "今は自分自身のふりをするのがお好みのようだ.";
         altapp = GOLD_PIECE;
     } else if (is_obj_mappear(&gy.youmonst,GOLD_PIECE) && Hallucination) {
         /* won't happen; anything which might make immobilized
            hero begin hallucinating (black light attack, theft
            of Grayswandir) will terminate the mimicry first */
-        altmsg = "Your rind escaped intact.";
+        altmsg = "あなたの外皮は無傷で残った.";
         altapp = ORANGE;
     }
 
@@ -1011,10 +1011,10 @@ fix_petrification(void)
     char buf[BUFSZ];
 
     if (Hallucination)
-        Sprintf(buf, "What a pity--you just ruined a future piece of %sart!",
-                ACURR(A_CHA) > 15 ? "fine " : "");
+        Sprintf(buf, "ああ、なんということだ。あなたは将来の%s芸術作品を台無しにしてしまった!",
+                ACURR(A_CHA) > 15 ? "素晴らしい" : "");
     else
-        Strcpy(buf, "You feel limber!");
+        Strcpy(buf, "体がしなやかになった気がした!");
     make_stoned(0L, buf, 0, (char *) 0);
 }
 
@@ -1347,7 +1347,7 @@ cpostfx(int pm)
             if (u.usteed)
                 dismount_steed(DISMOUNT_FELL);
             nomul(-tmp);
-            gm.multi_reason = "pretending to be a pile of gold";
+            gm.multi_reason = "金貨の山のふりをしている";
             Sprintf(buf,
                     Hallucination
                        ? "皮をむかれるのが急に怖くなり、再び%sに化けた!"
@@ -2000,7 +2000,7 @@ consume_tin(const char *mesg)
         incr_itimeout(&HDeaf, duration);
         disp.botl = TRUE;
         nomul(-duration);
-        gm.multi_reason = "unconscious from rotten food";
+        gm.multi_reason = "腐った食べ物で意識を失っている";
         gn.nomovemsg = "意識を取り戻した.";
         ga.afternmv = Hear_again;
         return 1;
@@ -3582,7 +3582,7 @@ newuhs(boolean incr)
                 incr_itimeout(&HDeaf, duration);
                 disp.botl = TRUE;
                 nomul(-duration);
-                gm.multi_reason = "fainted from lack of food";
+                gm.multi_reason = "空腹のあまり失神している";
                 gn.nomovemsg = "意識を取り戻した.";
                 ga.afternmv = unfaint;
                 newhs = FAINTED;
@@ -3665,7 +3665,7 @@ newuhs(boolean incr)
         if ((Upolyd ? u.mh : u.uhp) < 1) {
             You("空腹と疲労で死んでしまった.");
             svk.killer.format = KILLED_BY;
-            Strcpy(svk.killer.name, "exhaustion");
+            Strcpy(svk.killer.name, "過労");
             done(STARVING);
             return;
         }
@@ -3927,7 +3927,7 @@ vomit(void) /* A good idea from David Neves */
        be immobilized for some other reason at the time vomit() is called */
     if (gm.multi >= -2) {
         nomul(-2);
-        gm.multi_reason = "vomiting";
+        gm.multi_reason = "吐いている";
         gn.nomovemsg = You_can_move_again;
     }
 
