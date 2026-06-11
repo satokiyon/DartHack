@@ -196,10 +196,10 @@ extern boolean status_activefields[MAXBLSTATS];
 static unsigned long* cond_hilites;
 static unsigned long active_conditions;
 static const char* cond_names[] = {
-	"Stone", "Slime", "Strngl", "FoodPois", "TermIll", "Blind",
-	"Deaf", "Stun", "Conf", "Hallu", "Lev", "Fly", "Ride"
+    "Bare",  "Blind",  "Busy", "Conf",   "Deaf",    "Iron",   "Fly",  "FoodPois", "Glow",  "Grab",
+    "Hallu", "Held",   "Icy",  "InLava", "Lev",     "Parlyz", "Ride", "Zzz",      "Slime", "Slip",
+    "Stone", "Strngl", "Stun", "Submrg", "TermIll", "Teth",   "Trap", "Out",      "WLegs", "UHold",
 };
-
 
 //____________________________________________________________________________________
 //
