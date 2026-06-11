@@ -1,5 +1,4 @@
 NOTE: currently releases contain libnethack.so for each ABI. Ideally later we will have seperate APKs for each like most modern apps. All of the releases should be considered beta quality as the changes were massive and I have not been able to test it all on my own.
 
-- fixed status bar showing wrong messages (i.e slimed instead of blind or food poisoned instead of confused)
-    - Not sure how this one slipped past me so long! I guess I need to spend more time playing than developing lol
-        - If you have the time, please file a bug report when you encounter issues like this! it'll save me tons of time
+- name no longer has the race/role/alignment stuff in it in the "Who are you" menu
+- game now correctly identifies what the name for the last save was instead of being alphabetical

@@ -122,7 +122,8 @@ int NetHackMain(int argc, char** argv)
 //#ifdef MAIL
 //	getmailstatus();
 //#endif
-
+    
+    gp.plnamelen = 0;
 	plnamesuffix(); /* strip suffix from name; calls askname() */
 					/* again if suffix was whole name */
 					/* accepts any suffix */

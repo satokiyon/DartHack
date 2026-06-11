@@ -1888,8 +1888,11 @@ void and_askname()
 
 	jclass stringClass = (*jEnv)->FindClass(jEnv, "java/lang/String");
 	jobjectArray strings = (*jEnv)->NewObjectArray(jEnv, nSaves, stringClass, 0);
-    for(i = 0; i < nSaves; i++)
+    for(i = 0; i < nSaves; i++) {
+        char *first_del = strchr(saves[i], '-');
+        if (first_del) *first_del = 0;
     	(*jEnv)->SetObjectArrayElement(jEnv, strings, i, (*jEnv)->NewStringUTF(jEnv, saves[i]));
+    }
 
 	jstr = (jstring)JNICallO(jAskName, PL_NSIZ, strings);
 
