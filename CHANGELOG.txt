@@ -1,4 +1,3 @@
-NOTE: currently releases contain libnethack.so for each ABI. Ideally later we will have seperate APKs for each like most modern apps. All of the releases should be considered beta quality as the changes were massive and I have not been able to test it all on my own.
-
-- name no longer has the race/role/alignment stuff in it in the "Who are you" menu
-- game now correctly identifies what the name for the last save was instead of being alphabetical
+- apks are now split
+    - if you are unsure of which APK to get, you probably want the arm64-v8a one unless your device is really old and then you'll want to try armeabi. The other ones are basically extinct these days and you should know if you're using a device that needs it. Try multiple if you have to! there's no harm, it'll just crash on startup because it failed to load the shared library and then you can try again.
+- Debug builds are no longer shipped. If you need one (for whatever reason), click on the commit associated with the tag and grab it from the action run (valid for about a month)
