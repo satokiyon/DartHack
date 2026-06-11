@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-07. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1606009004 2020/11/22 01:36:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -345,8 +345,46 @@ jp_translate_killer_text_for_display(
             Snprintf(outmain, sizeof outmain, "崩れ落ちる跳ね橋に倒された");
         } else if (!strcmpi(killer, "life drainage")) {
             Snprintf(outmain, sizeof outmain, "生命力吸収で倒された");
+        } else if (!strcmpi(killer, "gas cloud")) {
+            Snprintf(outmain, sizeof outmain, "毒ガスの雲に倒された");
+        } else if (!strcmpi(killer, "wand")) {
+            Snprintf(outmain, sizeof outmain, "魔法の杖に倒された");
+        } else if (!strcmpi(killer, "scroll of fire")) {
+            Snprintf(outmain, sizeof outmain, "火炎の巻物に倒された");
+        } else if (!strcmpi(killer, "potion of acid")) {
+            Snprintf(outmain, sizeof outmain, "酸の薬に倒された");
+        } else if (!strcmpi(killer, "potion of holy water")) {
+            Snprintf(outmain, sizeof outmain, "聖水に倒された");
+        } else if (!strcmpi(killer, "potion of unholy water")) {
+            Snprintf(outmain, sizeof outmain, "不浄な水に倒された");
+        } else if (!strcmpi(killer, "falling rock")) {
+            Snprintf(outmain, sizeof outmain, "落石に倒された");
+        } else if (!strcmpi(killer, "falling object")) {
+            Snprintf(outmain, sizeof outmain, "落下物に倒された");
+        } else if (!strcmpi(killer, "grappling hook")) {
+            Snprintf(outmain, sizeof outmain, "グラップリングフックに倒された");
+        } else if (!strcmpi(killer, "exploding wand")) {
+            Snprintf(outmain, sizeof outmain, "杖の爆発で倒された");
+        } else if (!strcmpi(killer, "exploding ring")) {
+            Snprintf(outmain, sizeof outmain, "指輪の爆発で倒された");
+        } else if (!strcmpi(killer, "exploding rune")) {
+            Snprintf(outmain, sizeof outmain, "ルーンの爆発で倒された");
+        } else if (!strcmpi(killer, "residual undead turning effect")) {
+            Snprintf(outmain, sizeof outmain, "アンデッド退散の残留効果に倒された");
+        } else if (!strcmpi(killer, "system shock")) {
+            Snprintf(outmain, sizeof outmain, "システムショックで倒された");
+        } else if (!strcmpi(killer, "psychic blast")) {
+            Snprintf(outmain, sizeof outmain, "精神波の爆破に倒された");
+        } else if (!strcmpi(killer, "exhaustion")) {
+            Snprintf(outmain, sizeof outmain, "過労で倒された");
         } else {
-            Snprintf(outmain, sizeof outmain, "%sに倒された", killer);
+            char *p;
+            if ((p = strstr(killer, "に触れたこと")) != 0 && p[12] == '\0') {
+                /* 「～に触れたことに倒された」を「～に触れたことで倒された」に改善 */
+                Snprintf(outmain, sizeof outmain, "%sで倒された", killer);
+            } else {
+                Snprintf(outmain, sizeof outmain, "%sに倒された", killer);
+            }
         }
     } else if (!strncmpi(core, "choked on ", 10)) {
         Snprintf(outmain, sizeof outmain, "%sで窒息した",

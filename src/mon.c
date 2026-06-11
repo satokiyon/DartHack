@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	mon.c	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.621 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -3387,11 +3387,18 @@ monkilled(
     struct permonst *mptr = mdef->data;
 
     if (fltxt && *fltxt && (mdef->wormno ? worm_known(mdef)
-                                         : cansee(mdef->mx, mdef->my)))
-        pline_mon(mdef, "%sは%sに%s!", Monnam(mdef), fltxt,
+                                         : cansee(mdef->mx, mdef->my))) {
+        const char *jp_fltxt = fltxt;
+
+        if (!strcmpi(fltxt, "gas cloud"))
+            jp_fltxt = "毒ガスの雲";
+        else if (!strcmpi(fltxt, "fire"))
+            jp_fltxt = "炎";
+
+        pline_mon(mdef, "%sは%sに%s!", l_monnam(mdef), jp_fltxt,
                   nonliving(mptr) ? "破壊された" : "倒された");
-    else if (mdef->wormno ? worm_known(mdef) : cansee(mdef->mx, mdef->my))
-        pline_mon(mdef, "%sは%s!", Monnam(mdef),
+    } else if (mdef->wormno ? worm_known(mdef) : cansee(mdef->mx, mdef->my))
+        pline_mon(mdef, "%sは%s!", l_monnam(mdef),
                   nonliving(mptr) ? "破壊された" : "倒された");
     else
         /* sad feeling is deferred until after potential life-saving */

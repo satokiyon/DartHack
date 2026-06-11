@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	sit.c	$NHDT-Date: 1718136168 2024/06/11 20:02:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -69,7 +69,7 @@ throne_sit_effect(void)
         switch (effect) {
         case 1:
             (void) adjattrib(rn2(A_MAX), -rn1(4, 3), FALSE);
-            losehp(rnd(10), "cursed throne", KILLED_BY_AN);
+            losehp(rnd(10), "呪われた玉座", KILLED_BY_AN);
             break;
         case 2:
             (void) adjattrib(rn2(A_MAX), 1, FALSE);
@@ -77,7 +77,7 @@ throne_sit_effect(void)
         case 3:
             pline("あなたの体に%s電撃が走った！",
                   (Shock_resistance) ? "" : "物凄い");
-            losehp(Shock_resistance ? rnd(6) : rnd(30), "electric chair",
+            losehp(Shock_resistance ? rnd(6) : rnd(30), "電気椅子",
                    KILLED_BY_AN);
             exercise(A_CON, FALSE);
             break;
@@ -337,7 +337,7 @@ special_throne_effect(int effect) {
     case 12:
         /* acid damage */
         pline("玉座は酸で覆われている！");
-        losehp(Acid_resistance ? rnd(16) : rnd(80), "acidic chair",
+        losehp(Acid_resistance ? rnd(16) : rnd(80), "酸味のある椅子",
                KILLED_BY_AN);
         exercise(A_CON, FALSE);
         break;
@@ -474,8 +474,8 @@ dosit(void)
             } else if (u.utraptype == TT_PIT) {
                 if (trap && trap->ttyp == SPIKED_PIT) {
                     You("とげの上に座ってしまった。いたっ!");
-                    losehp(Half_physical_damage ? rn2(2) : 1,
-                           "sitting on an iron spike", KILLED_BY);
+                    losehp(Half_physical_damage ? rn2(2) : 1, "鉄の刺の上に座ったこと",
+                           KILLED_BY);
                     exercise(A_STR, FALSE);
                 } else
                     You("落とし穴の中に座った.");
