@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	region.c	$NHDT-Date: 1727251269 2024/09/25 08:01:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1116,14 +1116,14 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
             make_blinded(1L, FALSE);
         }
         if (!Poison_resistance) {
-            pline("%s is burning your %s!", Something,
+            pline("%sが%sに焼けつくようだ!", Something,
                   jp_body_part_plural(LUNG));
             You("せき込み、血を吐いた!");
             wake_nearto(u.ux, u.uy, 2);
             dam = Maybe_Half_Phys(rnd(dam) + 5);
             if (Half_gas_damage) /* worn towel */
                 dam = (dam + 1) / 2;
-            losehp(dam, "gas cloud", KILLED_BY_AN);
+            losehp(dam, "毒ガスの雲", KILLED_BY_AN);
             monstunseesu(M_SEEN_POISON);
             return FALSE;
         } else {
@@ -1139,7 +1139,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
             if (!is_silent(mtmp->data)) {
                 if (cansee(mtmp->mx, mtmp->my)
                     || (distu(mtmp->mx, mtmp->my) < 8))
-                    pline("%s coughs!", Monnam(mtmp));
+                    pline("%sはせき込んだ!", l_monnam(mtmp));
                 wake_nearto(mtmp->mx, mtmp->my, 2);
             }
             if (heros_fault(reg))

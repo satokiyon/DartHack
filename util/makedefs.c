@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0  makedefs.c  $NHDT-Date: 1702948590 2023/12/19 01:16:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
@@ -428,8 +428,8 @@ rafile(int whichone)
     case '1':
             do_rnd_access_file(EPITAPHFILE, "epitaph",
                 /* default epitaph:  parody of the default engraving */
-                               "No matter where I went, here I am.",
-                               MD_PAD_RUMORS); /* '_RUMORS' is correct here */
+                               "どこへ行こうとも、私はここにいる。",
+                                MD_PAD_RUMORS); /* '_RUMORS' is correct here */
             break;
     case '2':
             do_rnd_access_file(ENGRAVEFILE, "engrave",
