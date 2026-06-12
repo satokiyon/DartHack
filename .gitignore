@@ -119,3 +119,6 @@ tools/
 !/docs/emoji_support_investigation.md
 !/docs/wizloadlua_guide.md
 
+
+#logfiles
+5.0/paniclog
