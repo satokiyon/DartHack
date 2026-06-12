@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
 /* NetHack 5.0	pager.c	$NHDT-Date: 1774846177 2026/03/29 20:49:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.296 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -445,7 +445,7 @@ self_lookat(char *outbuf)
     /* include race with role unless polymorphed */
     race[0] = '\0';
     if (!Upolyd)
-        Sprintf(race, "%s ", gu.urace.adj);
+        Sprintf(race, "%sの", jp_current_race_adj());
     Sprintf(outbuf, "%s%s%s、名は%s",
             /* being blinded may hide invisibility from self */
             (Invis && (senseself() || !Blind)) ? "透明な" : "", race,

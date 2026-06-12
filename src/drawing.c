@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
 /* NetHack 5.0	drawing.c	$NHDT-Date: 1596498163 2020/08/03 23:42:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -38,17 +39,17 @@ const struct class_sym def_monsyms[MAXMCLASSES] = {
 
 const struct symdef def_warnsyms[WARNCOUNT] = {
     /* white warning  */
-    { '0', "unknown creature causing you worry",    CLR_WHITE },
+    { '0', "正体不明だが心配になる何か",    CLR_WHITE },
     /* pink warning   */
-    { '1', "unknown creature causing you concern",  CLR_RED },
+    { '1', "正体不明だが気になる何か",  CLR_RED },
     /* red warning    */
-    { '2', "unknown creature causing you anxiety",  CLR_RED },
+    { '2', "正体不明だが不安を感じる何か",  CLR_RED },
     /* ruby warning   */
-    { '3', "unknown creature causing you disquiet", CLR_RED },
+    { '3', "正体不明だが不安をかき立てる何か", CLR_RED },
     /* purple warning */
-    { '4', "unknown creature causing you alarm",    CLR_MAGENTA },
+    { '4', "正体不明だが警戒すべき何か",    CLR_MAGENTA },
     /* black warning  */
-    { '5', "unknown creature causing you dread",    CLR_BRIGHT_MAGENTA },
+    { '5', "正体不明だが恐怖を覚える何か",    CLR_BRIGHT_MAGENTA },
 };
 
 /*
