@@ -312,19 +312,19 @@ itemactions(struct obj *otmp)
              || otmp->otyp == SKELETON_KEY)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "この道具で鍵を開ける");
     else if (otmp->otyp == TINNING_KIT)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Use this kit to tin a corpse");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "この道具で死体を缶詰にする");
     else if (otmp->otyp == LEASH) {
         if (!otmp->leashmon) {
-            Strcpy(buf, "Attach this leash to a pet");
+            Strcpy(buf, "この紐をペットに繋ぐ");
         } else {
             mtmp = find_mid(otmp->leashmon, FM_FMON);
             if (!mtmp) /* assume this won't happen */
                 panic("Can't find leash's monster");
-            Sprintf(buf, "Detach this leash from %s", some_mon_nam(mtmp));
+            Sprintf(buf, "%sからこの紐を外す", some_mon_nam(mtmp));
         }
         ia_addmenu(win, IA_APPLY_OBJ, 'a', buf);
     } else if (otmp->otyp == SADDLE)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Place this saddle on a pet");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "この鞍をペットに乗せる");
     else if (otmp->otyp == MAGIC_WHISTLE
              || otmp->otyp == TIN_WHISTLE)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "この笛を吹く");
