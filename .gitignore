@@ -122,3 +122,8 @@ tools/
 
 #logfiles
 5.0/paniclog
+
+#user-specific configuration files
+.nethackrc
+GEMINI.md
+
