@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-18. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
 /* NetHack 5.0	pline.c	$NHDT-Date: 1719819280 2024/07/01 07:34:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.130 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -610,11 +610,11 @@ impossible(const char *s, ...)
         return;
     }
 
-    Strcpy(pbuf2, "Program in disorder!");
+    Strcpy(pbuf2, "プログラムが異常を検知しました!");
     if (program_state.something_worth_saving)
-        Strcat(pbuf2, "  (Saving and reloading may fix this problem.)");
+        Strcat(pbuf2, "  (セーブしてリロードすると解決するかもしれません.)");
     pline("%s", pbuf2);
-    pline("Please report these messages to %s.", DEVTEAM_EMAIL);
+    pline("これらのメッセージを %s まで報告してください.", DEVTEAM_EMAIL);
     if (sysopt.support) {
         pline("Alternatively, contact local support: %s", sysopt.support);
     }
