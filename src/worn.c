@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
 /* NetHack 5.0	worn.c	$NHDT-Date: 1770949988 2026/02/12 18:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -930,9 +930,10 @@ m_dowear_type(
                uses accessory verbs for armor but we can live with that */
             if (old) {
                 Strcpy(oldarm, distant_name(old, doname));
-                Snprintf(buf, sizeof buf, " removes %s and", oldarm);
+                Snprintf(buf, sizeof buf, "は%sを脱ぎ、", oldarm);
             } else {
                 buf[0] = oldarm[0] = '\0';
+                Snprintf(buf, sizeof buf, "は");
             }
             Strcpy(newarm, distant_name(best, doname));
             /* a monster will swap an item of the same type as the one it
@@ -941,18 +942,16 @@ m_dowear_type(
                "another <newarm>" for "a|an <newarm>" */
             if (!strcmpi(newarm, oldarm)) {
                 /* size of newarm[] has been overallocated to guarantee
-                   enough room to insert "another " */
-                if (!strncmpi(newarm, "a ", 2))
-                    (void) strsubst(newarm, "a ", "another ");
-                else if (!strncmpi(newarm, "an ", 3))
-                    (void) strsubst(newarm, "an ", "another ");
-                newarm[BUFSZ - 1] = '\0';
+                   enough room to insert "別の" */
+                char tmp[BUFSZ];
+                Strcpy(tmp, "別の");
+                Strcat(tmp, newarm);
+                Strcpy(newarm, tmp);
             }
-            pline_mon(mon, "%s%s puts on %s.", Monnam(mon), buf, newarm);
+            pline_mon(mon, "%s%s%sを着た.", Monnam(mon), buf, newarm);
             if (autocurse)
-                pline("%s %s %s %s for a moment.", s_suffix(Monnam(mon)),
-                      simpleonames(best), otense(best, "glow"),
-                      hcolor(NH_BLACK));
+                pline("%sの%sが一瞬%s光った.", Monnam(mon),
+                      simpleonames(best), hcolor(NH_BLACK));
         } /* can see it */
         m_delay += objects[best->otyp].oc_delay;
         mon->mfrozen = m_delay;

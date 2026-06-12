@@ -1,3 +1,4 @@
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13.
 -- NetHack endgame earth.lua	$NHDT-Date: 1652196025 2022/05/10 15:20:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992,1993 by Izchak Miller, David Cohrs,
@@ -14,9 +15,9 @@ des.level_init({ style = "solidfill", fg = " " });
 
 des.level_flags("mazelevel", "noteleport", "hardfloor", "shortsighted")
 
-des.message("Well done, mortal!")
-des.message("But now thou must face the final Test...")
-des.message("Prove thyself worthy or perish!")
+des.message("よくやった、定命の者よ!")
+des.message("だが、汝は最後の試練に立ち向かわねばならぬ...")
+des.message("汝の価値を証明するか、さもなくば滅びよ!")
 
 -- The player lands, upon arrival, in the
 -- lower-right cavern.  The location of the

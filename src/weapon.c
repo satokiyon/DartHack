@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
 /* NetHack 5.0	weapon.c	$NHDT-Date: 1725227810 2024/09/01 21:56:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -927,10 +927,8 @@ mon_wield_item(struct monst *mon)
                 char welded_buf[BUFSZ];
                 const char *mon_hand = jp_mbodypart(mon, HAND);
 
-                if (bimanual(mw_tmp))
-                    mon_hand = makeplural(mon_hand);
-                Sprintf(welded_buf, "%sの%sにくっついている",
-                        mhis(mon), mon_hand);
+                /* bimanual(mw_tmp) の場合でも日本語では複数形（sの付加など）は不要 */
+                Sprintf(welded_buf, "その%sにくっついている", mon_hand);
 
                 if (obj->otyp == PICK_AXE) {
                     pline("だが、%sの武器は%sので、", mon_nam(mon), welded_buf);
@@ -970,8 +968,7 @@ mon_wield_item(struct monst *mon)
             if (newly_welded) {
                 const char *mon_hand = jp_mbodypart(mon, HAND);
 
-                if (bimanual(obj))
-                    mon_hand = makeplural(mon_hand);
+                /* bimanual(obj) の場合でも日本語では複数形は不要 */
                 pline("%sは%sの%sにくっついた!", Tobjnam(obj, (char *)0),
                       s_suffix(mon_nam(mon)), mon_hand);
                 obj->bknown = 1;
@@ -2031,9 +2028,8 @@ setmnotwielded(struct monst *mon, struct obj *obj)
     if (artifact_light(obj) && obj->lamplit) {
         end_burn(obj, FALSE);
         if (canseemon(mon))
-            pline("%s in %s %s %s shining.", The(xname(obj)),
-                  s_suffix(mon_nam(mon)), jp_mbodypart(mon, HAND),
-                  otense(obj, "stop"));
+            pline("%sの%sにある%sが輝きを失った.",
+                  mon_nam(mon), jp_mbodypart(mon, HAND), xname(obj));
     }
     if (MON_WEP(mon) == obj)
         MON_NOWEP(mon);

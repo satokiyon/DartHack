@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
 #include "config.h"
 #include "permonst.h"
 
@@ -393,6 +393,40 @@ static const char *const mon_jp_names[NUMMONS][NUM_MGENDERS] = {
     /* コボルドのアンデッド */
     [PM_KOBOLD_MUMMY] = { 0, 0, "コボルドのミイラ" },
     [PM_KOBOLD_ZOMBIE] = { 0, 0, "コボルドのゾンビ" },
+    /* 3.7/5.0 で追加されたモンスター */
+#ifdef PM_CERBERUS
+    [PM_CERBERUS] = { 0, 0, "ケルベロス" },
+#endif
+#ifdef PM_BEHOLDER
+    [PM_BEHOLDER] = { 0, 0, "ビホルダー" },
+#endif
+#ifdef PM_BABY_SHIMMERING_DRAGON
+    [PM_BABY_SHIMMERING_DRAGON] = { 0, 0, "揺らめくドラゴンの子供" },
+#endif
+#ifdef PM_SHIMMERING_DRAGON
+    [PM_SHIMMERING_DRAGON] = { 0, 0, "揺らめくドラゴン" },
+#endif
+#ifdef PM_VORPAL_JABBERWOCK
+    [PM_VORPAL_JABBERWOCK] = { 0, 0, "ヴォーパル・ジャバウォック" },
+#endif
+#ifdef PM_VAMPIRE_MAGE
+    [PM_VAMPIRE_MAGE] = { 0, 0, "吸血鬼の魔術師" },
+#endif
+#ifdef PM_CHARON
+    [PM_CHARON] = { 0, 0, "カロン" },
+#endif
+#ifdef PM_EARENDIL
+    [PM_EARENDIL] = { 0, 0, "エアレンディル" },
+#endif
+#ifdef PM_ELWING
+    [PM_ELWING] = { 0, 0, "エルウィング" },
+#endif
+#ifdef PM_GOBLIN_KING
+    [PM_GOBLIN_KING] = { 0, 0, "ゴブリンの王" },
+#endif
+#ifdef PM_HIGH_ELF
+    [PM_HIGH_ELF] = { 0, 0, "ハイエルフ" },
+#endif
 };
 
 static int

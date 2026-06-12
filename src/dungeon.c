@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
 /* NetHack 5.0	dungeon.c	$NHDT-Date: 1737343478 2025/01/19 19:24:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.228 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2319,22 +2319,22 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
         if (bymenu && In_endgame(&u.uz) && i != astral_level.dnum)
             continue;
         unplaced = unplaced_floater(dptr);
-        descr = unplaced ? "depth" : "level";
+        descr = unplaced ? "深度" : "階層";
         nlev = dptr->num_dunlevs;
         if (nlev > 1)
-            Snprintf(buf, sizeof buf, "%s: %s %d to %d", dptr->dname,
-                     makeplural(descr), dptr->depth_start,
+            Snprintf(buf, sizeof buf, "%s: %s %d から %d", jp_dungeon_name_for_display(dptr->dname),
+                     descr, dptr->depth_start,
                      dptr->depth_start + nlev - 1);
         else
-            Snprintf(buf, sizeof buf, "%s: %s %d", dptr->dname,
+            Snprintf(buf, sizeof buf, "%s: %s %d", jp_dungeon_name_for_display(dptr->dname),
                      descr, dptr->depth_start);
 
         /* Most entrances are uninteresting. */
         if (dptr->entry_lev != 1) {
             if (dptr->entry_lev == nlev)
-                Strcat(buf, ", entrance from below");
+                Strcat(buf, ", 下からの入り口");
             else
-                Sprintf(eos(buf), ", entrance on %d",
+                Sprintf(eos(buf), ", %d階からの入り口",
                         dptr->depth_start + dptr->entry_lev - 1);
         }
         if (bymenu) {
@@ -2354,11 +2354,11 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
             print_branch(win, i, last_level, slev->dlevel.dlevel, bymenu,
                          &lchoices);
 
-            Sprintf(buf, "%c %s: %d",
+            Sprintf(buf, "%c %s: %d階",
                     chr_u_on_lvl(&slev->dlevel),
                     slev->proto, depth(&slev->dlevel));
             if (Is_stronghold(&slev->dlevel))
-                Sprintf(eos(buf), " (tune %s)", svt.tune);
+                Sprintf(eos(buf), " (合言葉 %s)", svt.tune);
             if (bymenu)
                 tport_menu(win, buf, &lchoices, &slev->dlevel,
                            unreachable_level(&slev->dlevel, unplaced));
@@ -2400,7 +2400,7 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
                 first = FALSE;
             }
             Sprintf(buf, "   %sで%sへ", br_string(br->type),
-                    svd.dungeons[br->end2.dnum].dname);
+                    jp_dungeon_name_by_dnum(br->end2.dnum));
             putstr(win, 0, buf);
         }
     }

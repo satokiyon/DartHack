@@ -1,3 +1,4 @@
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13.
 -- NetHack endgame astral.lua	$NHDT-Date: 1652196020 2022/05/10 15:20:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992,1993 by Izchak Miller, David Cohrs,
@@ -7,9 +8,9 @@
 des.level_init({ style = "solidfill", fg = " " });
 
 des.level_flags("mazelevel", "noteleport", "hardfloor", "nommap", "shortsighted", "solidify")
-des.message("You arrive on the Astral Plane!")
-des.message("Here the High Temple of %d is located.")
-des.message("You sense alarm, hostility, and excitement in the air!")
+des.message("アストラル界に到着した!")
+des.message("ここには%dの至高の神殿がある.")
+des.message("ただならぬ警戒感、敵意、そして興奮の気配を感じる!")
 des.map([[
                               ---------------                              
                               |.............|                              
