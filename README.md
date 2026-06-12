@@ -1,7 +1,7 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
-NetHackJPは、ローグライクゲームの金字塔 **NetHack 5.0** を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsのみ)
+NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsのみ)
 
 <figure>
    <figcaption>GUI版 Nevanda_5.0.0_32x32タイル使用</figcaption>
@@ -22,7 +22,7 @@ NetHackJPは、ローグライクゲームの金字塔 **NetHack 5.0** を日本
 
 ## 🎮 プレイヤー向け情報（ゲームの始め方）
 
-さっそくダウンロードしてNetHackを日本語で遊んでみてください!
+さっそくダウンロードして[NetHack](https://www.nethack.org/)を日本語で遊んでみてください!
 
 ### 1. 導入手順
 
@@ -131,10 +131,19 @@ NetHackでは、ゲーム内のメッセージに合わせてお好みの効果�
 
 ## ⚖️ ライセンス
 本リポジトリは、オリジナルの NetHack 同様、NetHack General Public License に準じます。
-詳細なライセンス方針や開発向けの情報は、[DEVELOPMENT.md](DEVELOPMENT.md) および以下を参照してください。
+ライセンスに関する詳細な情報は以下を参照してください。
 
 * ライセンス本文: [dat/license](dat/license)
 * サブモジュール等の第三者コンポーネント: [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES)
 
 ---
+
+## 他の日本語化プロジェクト
+* [JNetHack](https://github.com/jnethack): 言わずと知れたNetHack日本語版の偉大なる総本山
+* [NetHack-brass](https://github.com/youkan700/NetHack-brass): 3.4.3ベースを日本語化してさらにいろいろ改造したもの
+* …他にあれば追記する
+
+----
+
 NetHack 5.0 の詳細については、[README](README) または [README.JP](README.JP) を参照してください。
+
