@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
 /* NetHack 5.0	invent.c	$NHDT-Date: 1762680996 2025/11/09 01:36:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.543 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -1104,28 +1104,28 @@ addinv_core1(struct obj *obj)
         disp.botl = TRUE;
     } else if (obj->otyp == AMULET_OF_YENDOR) {
         if (u.uhave.amulet)
-            impossible("already have amulet?");
+            impossible("すでにイェンダーの魔除けを持っている?");
         u.uhave.amulet = 1;
         record_achievement(ACH_AMUL);
     } else if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
         if (u.uhave.menorah)
-            impossible("already have candelabrum?");
+            impossible("すでに祈りの燭台を持っている?");
         u.uhave.menorah = 1;
         record_achievement(ACH_CNDL);
     } else if (obj->otyp == BELL_OF_OPENING) {
         if (u.uhave.bell)
-            impossible("already have silver bell?");
+            impossible("すでに銀の鐘を持っている?");
         u.uhave.bell = 1;
         record_achievement(ACH_BELL);
     } else if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
         if (u.uhave.book)
-            impossible("already have the book?");
+            impossible("すでに死者の書を持っている?");
         u.uhave.book = 1;
         record_achievement(ACH_BOOK);
     } else if (obj->oartifact) {
         if (is_quest_artifact(obj)) {
             if (u.uhave.questart)
-                impossible("already have quest artifact?");
+                impossible("すでにクエストアーティファクトを持っている?");
             u.uhave.questart = 1;
             artitouch(obj);
         }

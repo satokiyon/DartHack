@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
 /* NetHack 5.0	teleport.c	$NHDT-Date: 1769342601 2026/01/25 04:03:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.239 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1243,7 +1243,7 @@ level_tele(void)
                            for something like this, but we don't want
                            fumbling or already full pack to interfere */
                         amu = addinv(amu);
-                        prinv("エンドゲームの前提条件:", amu, 0L);
+                        prinv("ゲームクリアの必須アイテム:", amu, 0L);
                     }
                 }
                 force_dest = TRUE;
