@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	revision.h	$NHDT-Date: 1779927286 2026/05/28 00:14:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.2 $ */
 /* Copyright (c) Michael Allison, 2026. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -171,7 +172,7 @@
  *       extern void uplift_mystruct_rev0_to_mystruct(struct mystruct_rev0 *,
  *                                                    struct mystruct *);
  *
- * 17. Add the uplift function to src/revision.c.  It needs to do 
+ * 17. Add the uplift function to src/revision.c.  It needs to do
  *     field-by-field copies of the fields that exist in the old
  *     revision and the new revision. For now, it likely needs to
  *     be handcrafted using your knowledge of the struct's old

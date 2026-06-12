@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	vidvga.c	$NHDT-Date: 1606765216 2020/11/30 19:40:16 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.26 $ */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
@@ -533,9 +534,9 @@ vga_userpan(enum vga_pan_direction pan)
     /* pline("Into userpan"); */
     if (iflags.over_view || iflags.traditional_view)
         return;
-    if (pan == pan_left)
+    if (pan == pan_right)
         x = min(COLNO - 1, clipxmax + 10);
-    else if (pan == pan_right)
+    else if (pan == pan_left)
         x = max(0, clipx - 10);
     else
         return;
