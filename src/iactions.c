@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
 /* NetHack 5.0	iactions.c	$NHDT-Date: 1762680996 2025/11/09 01:36:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.543 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2026. */
@@ -312,11 +312,19 @@ itemactions(struct obj *otmp)
              || otmp->otyp == SKELETON_KEY)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "この道具で鍵を開ける");
     else if (otmp->otyp == TINNING_KIT)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "この道具で死体を缶詰にする");
-    else if (otmp->otyp == LEASH)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "この綱でペットをつなぐ");
-    else if (otmp->otyp == SADDLE)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "この鞍をペットに装着する");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Use this kit to tin a corpse");
+    else if (otmp->otyp == LEASH) {
+        if (!otmp->leashmon) {
+            Strcpy(buf, "Attach this leash to a pet");
+        } else {
+            mtmp = find_mid(otmp->leashmon, FM_FMON);
+            if (!mtmp) /* assume this won't happen */
+                panic("Can't find leash's monster");
+            Sprintf(buf, "Detach this leash from %s", some_mon_nam(mtmp));
+        }
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', buf);
+    } else if (otmp->otyp == SADDLE)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Place this saddle on a pet");
     else if (otmp->otyp == MAGIC_WHISTLE
              || otmp->otyp == TIN_WHISTLE)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "この笛を吹く");
