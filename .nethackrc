@@ -18,8 +18,10 @@
 #
 # Use the IBM character set rather than just plain ascii characters
 # for tty window-port.
-#OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
-OPTIONS=symset:Enhanced2,roguesymset:RogueEpyx
+OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
+
+
+
 
 
 # Here is a suggested symbol set from Michael Feir, 
@@ -27,7 +29,8 @@ OPTIONS=symset:Enhanced2,roguesymset:RogueEpyx
 # OPTIONS=symset:NHAccess,roguesymset:NHAccess
 
 # Optional curses port interface
-OPTIONS=windowtype:curses,align_message:right,align_status:bottom
+# OPTIONS=windowtype:curses,align_message:buttom,align_status:right
+# OPTIONS=symset:Enhanced2,roguesymset:RogueEpyx
 
 #
 # Keyboard handling
@@ -67,10 +70,13 @@ OPTIONS=!tutorial
 # Disable game tips
 #OPTIONS=!tips
 
-OPTIONS=armorstatus
+# OPTIONS=armorstatus
 
 # Menu headings syle
-OPTIONS=menu_headings:yellow&underline
+## for tty/curses window port
+# OPTIONS=menu_headings:yellow&underline
+## for GUI
+OPTIONS=menu_headings:purple&underline
 
 # Highlight menu lines with different colors. You need to define the colors
 # with MENUCOLOR lines.
@@ -86,6 +92,7 @@ MENUCOLOR="呪われた" = red
 MENUCOLOR="邪水" = red
 #  Show all cursed worn items in orange and underlined
 MENUCOLOR="呪われた.*装備中" = orange&underline
+
 
 # --- おすすめの追加設定 ---
 # 重要・便利なアイテムを強調表示します
@@ -103,6 +110,8 @@ MENUCOLOR="解呪の巻物" = yellow
 # アーティファクト（既知の主要なもの）
 MENUCOLOR="(エクスカリバー|ストームブリンガー|ミョルニル|マジックベイン|フロストブランド|ファイアブランド|グレイスワンダー|ヴォーパルブレード)" = brightmagenta&bold
 
+# 未払い
+MENUCOLOR="未払い" = blue
 
 
 # General options.  You might also set "silent" so as not to attract
@@ -166,7 +175,7 @@ OPTIONS=splash_screen,player_selection:prompts
 # highlighttext, inactiveborder, inactivecaption, menu, menutext, scrollbar,
 # window, windowframe, windowtext.
 #OPTIONS=windowcolors:status windowtext/window message windowtext/window
-OPTIONS=windowcolors:status white/black message white/black
+OPTIONS=windowcolors:status white/trueblack message white/trueblack
 
 # *** LOCATIONS ***
 # IMPORTANT: If you change any of these locations, the directories they
@@ -227,7 +236,8 @@ OPTIONS=statushilites
 # HP
 OPTIONS=hitpointbar
 OPTIONS=hilite_status:hitpoints/100%/gray&bold
-OPTIONS=hilite_status:hitpoints/<100%/green&bold
+#OPTIONS=hilite_status:hitpoints/<100%/green&bold
+OPTIONS=hilite_status:hitpoints/<100%/brightgreen&bold
 OPTIONS=hilite_status:hitpoints/<66%/yellow&bold
 OPTIONS=hilite_status:hitpoints/<50%/orange&bold
 OPTIONS=hilite_status:hitpoints/<33%/red&bold
@@ -235,7 +245,8 @@ OPTIONS=hilite_status:hitpoints/<15%/red&inverse&bold
 
 ## Pw
 OPTIONS=hilite_status:power/100%/gray&normal
-OPTIONS=hilite_status:power/<100%/green&normal
+#OPTIONS=hilite_status:power/<100%/green&normal
+OPTIONS=hilite_status:power/<100%/brightgreen&normal
 OPTIONS=hilite_status:power/<66%/yellow&normal
 OPTIONS=hilite_status:power/<50%/orange&normal
 OPTIONS=hilite_status:power/<33%/red&bold
@@ -264,14 +275,24 @@ OPTIONS=hilite_status:condition/movement/light-blue&bold
 OPTIONS=hilite_status:gold/up/yellow/down/brown
 
 # St, Dx, Co, In, Wi, Ch
-OPTIONS=hilite_status:characteristics/up/green/down/red
+# OPTIONS=hilite_status:characteristics/up/green/down/red
+OPTIONS=hilite_status:characteristics/up/brightgreen/down/red
 
 # AC, Exp-Level, HD, HP-MAX, Pw-MAX
-OPTIONS=hilite_status:armor-class/up/red/down/green
-OPTIONS=hilite_status:experience-level/up/green/down/red
-OPTIONS=hilite_status:HD/up/green/down/red
-OPTIONS=hilite_status:hitpoints-max/up/green/down/red
-OPTIONS=hilite_status:power-max/up/green/down/red
+## CUI
+# OPTIONS=hilite_status:armor-class/up/red/down/green
+# OPTIONS=hilite_status:experience-level/up/green/down/red
+# OPTIONS=hilite_status:HD/up/green/down/red
+# OPTIONS=hilite_status:hitpoints-max/up/green/down/red
+# OPTIONS=hilite_status:power-max/up/green/down/red
+
+## GUI
+OPTIONS=hilite_status:armor-class/up/red/down/brightgreen
+OPTIONS=hilite_status:experience-level/up/brightgreen/down/red
+OPTIONS=hilite_status:HD/up/brightgreen/down/red
+OPTIONS=hilite_status:hitpoints-max/up/brightgreen/down/red
+OPTIONS=hilite_status:power-max/up/brightgreen/down/red
+
 
 # Alignment
 OPTIONS=hilite_status:alignment/change/orange&bold
