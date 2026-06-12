@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -1093,7 +1093,7 @@ static const struct jnh_wish_alias jnh_wish_aliases[] = {
     { "つらぬきまる", "スティング" },
     { "かみつき丸", "オークリスト" },
     { "かみつきまる", "オークリスト" },
-    { "オルクリスと", "オークリスト" },
+    { "オルクリスト", "オークリスト" },
 
     { (const char *)0, (const char *)0 }
 };
@@ -1102,11 +1102,7 @@ static const struct jnh_wish_alias jnh_wish_aliases[] = {
 void
 jnh_normalize_wish(const char *u_str, char *out_buf, size_t outsz)
 {
-    char u_buf[256] = {0};
-    char jp_buf[256] = {0};
-    char *p;
     int i;
-    int guard;
 
     if (!u_str || !*u_str || !out_buf || outsz == 0)
         return;
