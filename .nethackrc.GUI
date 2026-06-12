@@ -21,9 +21,6 @@
 OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
 
 
-
-
-
 # Here is a suggested symbol set from Michael Feir, 
 # for use by blind NetHack players
 # OPTIONS=symset:NHAccess,roguesymset:NHAccess
@@ -73,10 +70,8 @@ OPTIONS=!tutorial
 # OPTIONS=armorstatus
 
 # Menu headings syle
-## for tty/curses window port
-# OPTIONS=menu_headings:yellow&underline
 ## for GUI
-OPTIONS=menu_headings:purple&underline
+# OPTIONS=menu_headings:purple&underline
 
 # Highlight menu lines with different colors. You need to define the colors
 # with MENUCOLOR lines.
@@ -96,19 +91,22 @@ MENUCOLOR="呪われた.*装備中" = orange&underline
 
 # --- おすすめの追加設定 ---
 # 重要・便利なアイテムを強調表示します
-MENUCOLOR="願いの杖" = brightmagenta&bold
-MENUCOLOR="魔力のランプ" = brightmagenta
-MENUCOLOR="軽量化の鞄" = brightmagenta
-MENUCOLOR="韋駄天の靴" = brightcyan
-MENUCOLOR="命の魔除け" = brightcyan
-MENUCOLOR="反射の(魔除け|盾)" = brightcyan
-MENUCOLOR="魔法を防ぐクローク" = brightcyan
-MENUCOLOR="完全回復の薬" = brightblue
-MENUCOLOR="能力獲得の薬" = brightblue
-MENUCOLOR="識別の巻物" = yellow
-MENUCOLOR="解呪の巻物" = yellow
+
+### GUI
+MENUCOLOR="願いの杖" = orange&bold
+MENUCOLOR="魔力のランプ" = orange
+MENUCOLOR="軽量化の鞄" = orange
+MENUCOLOR="韋駄天の靴" = brown
+MENUCOLOR="命の魔除け" = brown
+MENUCOLOR="反射の(魔除け|盾)" = purple
+MENUCOLOR="魔法を防ぐクローク" = purple
+MENUCOLOR="完全回復の薬" = blue
+MENUCOLOR="能力獲得の薬" = blue
+MENUCOLOR="識別の巻物" = brown
+MENUCOLOR="解呪の巻物" = brown
 # アーティファクト（既知の主要なもの）
-MENUCOLOR="(エクスカリバー|ストームブリンガー|ミョルニル|マジックベイン|フロストブランド|ファイアブランド|グレイスワンダー|ヴォーパルブレード)" = brightmagenta&bold
+MENUCOLOR="(エクスカリバー|ストームブリンガー|ミョルニル|マジックベイン|フロストブランド|ファイアブランド|グレイスワンダー|ヴォーパルブレード)" = orange&bold
+
 
 # 未払い
 MENUCOLOR="未払い" = blue
@@ -174,7 +172,6 @@ OPTIONS=splash_screen,player_selection:prompts
 # background, btnface, btnshadow, btntext, captiontext, graytext, highlight,
 # highlighttext, inactiveborder, inactivecaption, menu, menutext, scrollbar,
 # window, windowframe, windowtext.
-#OPTIONS=windowcolors:status windowtext/window message windowtext/window
 OPTIONS=windowcolors:status white/trueblack message white/trueblack
 
 # *** LOCATIONS ***
@@ -236,7 +233,6 @@ OPTIONS=statushilites
 # HP
 OPTIONS=hitpointbar
 OPTIONS=hilite_status:hitpoints/100%/gray&bold
-#OPTIONS=hilite_status:hitpoints/<100%/green&bold
 OPTIONS=hilite_status:hitpoints/<100%/brightgreen&bold
 OPTIONS=hilite_status:hitpoints/<66%/yellow&bold
 OPTIONS=hilite_status:hitpoints/<50%/orange&bold
@@ -245,7 +241,6 @@ OPTIONS=hilite_status:hitpoints/<15%/red&inverse&bold
 
 ## Pw
 OPTIONS=hilite_status:power/100%/gray&normal
-#OPTIONS=hilite_status:power/<100%/green&normal
 OPTIONS=hilite_status:power/<100%/brightgreen&normal
 OPTIONS=hilite_status:power/<66%/yellow&normal
 OPTIONS=hilite_status:power/<50%/orange&normal
@@ -275,17 +270,9 @@ OPTIONS=hilite_status:condition/movement/light-blue&bold
 OPTIONS=hilite_status:gold/up/yellow/down/brown
 
 # St, Dx, Co, In, Wi, Ch
-# OPTIONS=hilite_status:characteristics/up/green/down/red
 OPTIONS=hilite_status:characteristics/up/brightgreen/down/red
 
 # AC, Exp-Level, HD, HP-MAX, Pw-MAX
-## CUI
-# OPTIONS=hilite_status:armor-class/up/red/down/green
-# OPTIONS=hilite_status:experience-level/up/green/down/red
-# OPTIONS=hilite_status:HD/up/green/down/red
-# OPTIONS=hilite_status:hitpoints-max/up/green/down/red
-# OPTIONS=hilite_status:power-max/up/green/down/red
-
 ## GUI
 OPTIONS=hilite_status:armor-class/up/red/down/brightgreen
 OPTIONS=hilite_status:experience-level/up/brightgreen/down/red
