@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	integer.h	$NHDT-Date: 1720397754 2024/07/08 00:15:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $ */
 /*      Copyright (c) 2016 by Michael Allison          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -50,7 +51,7 @@
 #endif  /* !HAS_INTTYPES_H */
 #if defined(__GNUC__) && defined(__INT64_MAX__) && !defined(HAS_STDINT_H)
 #define HAS_STDINT_H
-#endif 
+#endif
 #endif  /* claims to be C99 */
 
 #endif /*?__DECC*/

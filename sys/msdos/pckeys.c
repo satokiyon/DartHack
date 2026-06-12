@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	pckeys.c	$NHDT-Date: 1596498270 2020/08/03 23:44:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) NetHack PC Development Team 1996                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -14,7 +15,7 @@
 #include "pcvideo.h"
 
 boolean pckeys(unsigned char, unsigned char);
-static void userpan(boolean);
+static void userpan(enum vga_pan_direction pan);
 static void overview(boolean);
 static void traditional(boolean);
 static void refresh(void);
@@ -49,11 +50,25 @@ pckeys(unsigned char scancode, unsigned char shift)
 #endif
     case 0x74: /* Control-right_arrow = scroll horizontal to right */
         if ((shift & CTRL) && iflags.tile_view && !opening_dialog)
-            userpan(1);
+            userpan(pan_right);
         break;
     case 0x73: /* Control-left_arrow = scroll horizontal to left */
         if ((shift & CTRL) && iflags.tile_view && !opening_dialog)
-            userpan(0);
+            userpan(pan_left);
+        break;
+    /* Dosbox reports control-up and down arrows, but VirtualBox and QEMU
+       don't; accept home, end, page up and page down also */
+    case 0x77: /* control-home */
+    case 0x8D: /* control-up_arrow */
+    case 0x84: /* control-page_up */
+        if ((shift & CTRL) && iflags.tile_view && !opening_dialog)
+            userpan(pan_up);
+        break;
+    case 0x75: /* control-end */
+    case 0x91: /* control-down_arrow */
+    case 0x76: /* control-page_down */
+        if ((shift & CTRL) && iflags.tile_view && !opening_dialog)
+            userpan(pan_down);
         break;
     case 0x3E: /* F4 = toggle overview mode */
         if (iflags.tile_view && !opening_dialog && !Is_rogue_level(&u.uz)) {
@@ -76,15 +91,15 @@ pckeys(unsigned char scancode, unsigned char shift)
 }
 
 static void
-userpan(boolean on)
+userpan(enum vga_pan_direction pan)
 {
 #ifdef SCREEN_VGA
     if (iflags.usevga)
-        vga_userpan(on);
+        vga_userpan(pan);
 #endif
 #ifdef SCREEN_VESA
     if (iflags.usevesa)
-        vesa_userpan(on);
+        vesa_userpan(pan);
 #endif
 }
 

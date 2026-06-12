@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
 /* NetHack 5.0	options.c	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.782 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
@@ -5315,7 +5315,7 @@ optfn_boolean(
 #ifndef IDLECHECKPOINT
         case opt_idlecheckpoint:
             pline("There is no underlying support for 'idlecheckpoint'"
-                  " compiled in."); 
+                  " compiled in.");
             iflags.idlecheckpoint = FALSE;
             give_opt_msg = FALSE;
             break;
@@ -7431,7 +7431,7 @@ allopt_array_init(void)
                 if (allopt[i].opttyp == BoolOpt && i != opt_ascii_map)
                     allopt[i].initval = allopt[i].opt_in_out;
 #endif
-		*(allopt[i].addr) = allopt[i].initval;
+                *(allopt[i].addr) = allopt[i].initval;
             }
         }
         heed_all_options();

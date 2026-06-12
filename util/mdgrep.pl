@@ -1,3 +1,4 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12.
 #!perl
 # NetHack 5.0  mdgrep.pl  $NHDT-Date: 1710949914 2024/03/20 15:51:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland
@@ -51,7 +52,7 @@ $specials = {
 # TIMED_DELAY DEF_MAILREADER DEF_PAGER NO_SIGNAL PC_LOCKING LATTICE __GO32__
 # msleep NO_FILE_LINKS bsdi HPUX AMIFLUSH
 # SCREEN_BIOS SCREEN_DJGPPFAST SCREEN_VGA SCREEN_8514
-# EXEPATH NOTSTDC SELECTSAVED NOTPARMDECL
+# EXEPATH NOTSTDC SELECTSAVE
 
 # constants
 @const_true = qw/1 TRUE/;
