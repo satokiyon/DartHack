@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
 /* NetHack 5.0	pray.c	$NHDT-Date: 1762680996 2025/11/09 01:36:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1075,12 +1075,13 @@ pleased(aligntyp g_align)
     int trouble = in_trouble(); /* what's your worst difficulty? */
     int pat_on_head = 0, kick_on_butt;
 
-    You_feel("%sが%sと感じた.", align_gname(g_align),
+    pline("%s%sは%sようだ.", Unaware ? "夢の中で、" : "",
+             align_gname(g_align),
              (u.ualign.record >= DEVOUT)
-                 ? Hallucination ? "上機嫌だ" : "大いに満足している"
+                 ? Hallucination ? "上機嫌な" : "大いに満足している"
                  : (u.ualign.record >= STRIDENT)
-                       ? Hallucination ? "くすぐったそうだ" : "満足している"
-                       : Hallucination ? "お腹いっぱいだ" : "満ち足りている");
+                       ? Hallucination ? "くすぐったそうな" : "満足している"
+                       : Hallucination ? "お腹いっぱいな" : "満ち足りている");
 
     /* not your deity */
     if (on_altar() && gp.p_aligntyp != u.ualign.type) {
