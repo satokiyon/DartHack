@@ -998,11 +998,11 @@ peffect_sickness(struct obj *otmp)
                            KILLED_BY);
                 else
                     losehp(rnd(10) + 5 * !!(otmp->cursed), contaminant,
-                           KILLED_BY);
+                           KILLED_BY_AN);
             } else {
                 /* rnd loss is so that unblessed poorer than blessed */
                 losehp(1 + rn2(2), contaminant,
-                       KILLED_BY);
+                       (otmp->fromsink) ? KILLED_BY : KILLED_BY_AN);
             }
             exercise(A_CON, FALSE);
         }

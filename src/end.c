@@ -114,7 +114,7 @@ done2(void)
         && y_n("チュートリアルを終了して通常プレイに戻りますか?") == 'y')
         abandon_tutorial = TRUE;
 
-        if (abandon_tutorial || !paranoid_query(
+    if (abandon_tutorial || !paranoid_query(
             ParanoidQuit, "セーブせずに本当に終了しますか?")) {
 #ifndef NO_SIGNAL
         (void) signal(SIGINT, (SIG_RET_TYPE) done1);

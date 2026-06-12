@@ -2129,10 +2129,10 @@ can_pray(boolean praying)
     gp.p_trouble = in_trouble();
 
     if (is_demon(gy.youmonst.data) /* ok if chaotic or none (Moloch) */
-        && (gp.p_aligntyp == A_LAWFUL || gp.p_aligntyp == A_NEUTRAL)) {
+        && (gp.p_aligntyp == A_LAWFUL || gp.p_aligntyp != A_NEUTRAL)) {
         if (praying)
             pline_The("%sの神に祈るという考え自体があなたには耐え難い.",
-                      (gp.p_aligntyp == A_LAWFUL) ? "秩序" : "中立");
+                      gp.p_aligntyp ? "秩序" : "中立");
         return FALSE;
     }
 
