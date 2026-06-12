@@ -1753,9 +1753,9 @@ sacrifice_your_race(
             You("%sを召喚した!", dbuf);
             if (sgn(u.ualign.type) == sgn(dmon->data->maligntyp))
                 dmon->mpeaceful = TRUE;
-            You("遁0下って動けなくなった.");
+            You("恐怖で身がすくんで動けなくなった.");
             nomul(-3);
-            gm.multi_reason = "being terrified of a demon";
+            gm.multi_reason = "悪魔を恐れている";
             gn.nomovemsg = 0;
         } else
             pline_The("%s.", demonless_msg);
@@ -2115,12 +2115,13 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
                     Hallucination
                         ? "メヒシバが見える. ダンジョンの中ではおかしなものだ"
                         : "四つ葉のクローバーを見つけた");
+        }
     }
 }
 
 /* determine prayer results in advance; also used for enlightenment */
 boolean
-can_pray(boolean praying) /* false means no messages should be given */
+can_pray(boolean praying)
 {
     int alignment;
 
@@ -2128,10 +2129,10 @@ can_pray(boolean praying) /* false means no messages should be given */
     gp.p_trouble = in_trouble();
 
     if (is_demon(gy.youmonst.data) /* ok if chaotic or none (Moloch) */
-        && (gp.p_aligntyp == A_LAWFUL || gp.p_aligntyp != A_NEUTRAL)) {
+        && (gp.p_aligntyp == A_LAWFUL || gp.p_aligntyp == A_NEUTRAL)) {
         if (praying)
             pline_The("%sの神に祈るという考え自体があなたには耐え難い.",
-                      gp.p_aligntyp ? "lawful" : "neutral");
+                      (gp.p_aligntyp == A_LAWFUL) ? "秩序" : "中立");
         return FALSE;
     }
 

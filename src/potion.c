@@ -373,7 +373,6 @@ make_hallucinated(
 {
     long old = HHallucination;
     boolean changed = 0;
-    const char *message, *verb;
 
     if (Unaware)
         talk = FALSE;
