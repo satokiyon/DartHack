@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
 /* NetHack 5.0	version.c	$NHDT-Date: 1737622664 2025/01/23 00:57:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.105 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2018. */
@@ -413,7 +414,7 @@ check_version(
         ) {
 #ifndef SFCTOOL
         if (complain) {
-            pline("Configuration incompatibility for file \"%s\".", filename);
+            pline("ファイル \"%s\" の設定に互換性がありません。", filename);
             display_nhwindow(WIN_MESSAGE, TRUE);
         }
 #endif
@@ -872,3 +873,4 @@ if (additional_utd_flags)
 #endif /* MINIMAL_FOR_RECOVER */
 
 /*version.c*/
+

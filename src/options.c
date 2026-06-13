@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
 /* NetHack 5.0	options.c	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.782 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
@@ -6433,7 +6433,8 @@ handler_menu_colors(void)
 
     } else if (opt_idx == 0) { /* add new */
         mcbuf[0] = '\0';
-        getlin("What new menucolor pattern?", mcbuf);
+        getlin("新しいメニュー色分けパターンは?", mcbuf);
+
         if (*mcbuf == '\033')
             goto menucolors_done;
         if (*mcbuf
@@ -6515,14 +6516,14 @@ handler_msgtype(void)
         return TRUE;
     } else if (opt_idx == 0) { /* add new */
         mtbuf[0] = '\0';
-        getlin("What new message pattern?", mtbuf);
+        getlin("新しいメッセージ表示パターンは?", mtbuf);
         if (*mtbuf == '\033')
             return TRUE;
         if (*mtbuf
             && test_regex_pattern(mtbuf, "MSGTYPE regex")
             && (mttyp = query_msgtype()) != -1
             && !msgtype_add(mttyp, mtbuf)) {
-            pline("Error adding the message type.");
+            pline("メッセージ種類の追加に失敗しました。");
             wait_synch();
         }
         goto msgtypes_again;
@@ -8100,7 +8101,7 @@ void
 add_menu_cmd_alias(char from_ch, char to_ch)
 {
     if (gn.n_menu_mapped >= MAX_MENU_MAPPED_CMDS) {
-        pline("out of menu map space.");
+        pline("メニューマップの空き容量がありません。");
     } else {
         gm.mapped_menu_cmds[gn.n_menu_mapped] = from_ch;
         gm.mapped_menu_op[gn.n_menu_mapped] = to_ch;
@@ -10249,4 +10250,5 @@ disregard_this_option(enum opt optidx)
 #undef PILE_LIMIT_DFLT
 
 /*options.c*/
+
 
