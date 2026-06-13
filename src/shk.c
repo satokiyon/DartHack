@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
 /* NetHack 5.0	shk.c	$NHDT-Date: 1736516428 2025/01/10 05:40:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.306 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1843,8 +1843,9 @@ dopay(void)
         pline("誰にお支払いいたしますか?");
         cc.x = u.ux;
         cc.y = u.uy;
-        if (getpos(&cc, TRUE, "the creature you want to pay") < 0)
-            return ECMD_CANCEL; /* player pressed ESC */
+        if (getpos(&cc, TRUE, "支払いたい相手") < 0)
+            return ECMD_CANCEL;
+ /* player pressed ESC */
         cx = cc.x;
         cy = cc.y;
         if (cx < 0) {

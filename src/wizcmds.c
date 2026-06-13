@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
 /* NetHack 5.0	wizcmds.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
 /*-Copyright (c) Robert Patrick Rankin, 2024. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -452,7 +452,7 @@ wiz_level_change(void)
     int ret;
 
     buf[0] = '\0'; /* in case EDIT_GETLIN is enabled */
-    getlin("To what experience level do you want to be set?", buf);
+    getlin("経験レベルをいくつに設定しますか?", buf);
     (void) mungspaces(buf);
     if (buf[0] == '\033' || buf[0] == '\0')
         ret = 0;
@@ -1899,7 +1899,7 @@ wiz_migrate_mons(void)
         getlin("How many random monsters to migrate to next level? [0]",
                inbuf);
     else
-        pline("Can't get there from here.");
+        pline("ここからはそこへ行けません。");
     if (*inbuf == '\033' || *inbuf == '\0')
         return ECMD_OK;
 

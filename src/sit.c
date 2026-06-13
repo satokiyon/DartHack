@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
 /* NetHack 5.0	sit.c	$NHDT-Date: 1718136168 2024/06/11 20:02:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -51,7 +51,7 @@ throne_sit_effect(void)
             int which;
 
             buf[0] = '\0';
-            getlin("Throne sit effect (1..13) [0=random]", buf);
+            getlin("玉座に座った時の効果 (1..13) [0=ランダム]", buf);
             if (buf[0] == '\033') {
                 pline("%s", Never_mind);
                 return; /* caller will still cause a move to elapse */

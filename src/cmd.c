@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
 /* NetHack 5.0	cmd.c	$NHDT-Date: 1762680996 2025/11/09 01:36:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.755 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -5333,7 +5333,7 @@ dotravel(void)
         iflags.getloc_filter = gfilt;
     } else {
         pline("どこへ移動したいか?");
-        if (getpos(&cc, TRUE, "the desired destination") < 0) {
+        if (getpos(&cc, TRUE, "移動先の目的地") < 0) {
             /* user pressed ESC */
             iflags.getloc_travelmode = FALSE;
             return ECMD_CANCEL;

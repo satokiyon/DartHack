@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
 /* NetHack 5.0	nhlua.c	$NHDT-Date: 1744963460 2025/04/18 00:04:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.153 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -690,7 +690,7 @@ nhl_get_config(lua_State *L)
 }
 
 /*
-  str = getlin("What do you want to call this dungeon level?");
+  str = getlin("このダンジョン階層にどのような名前を付けますか?");
  */
 staticfn int
 nhl_getlin(lua_State *L)
