@@ -55,7 +55,7 @@ jobs:
         with:
           tag_name: ${{ env.TAG_NAME }}
           name: NetHackJP 5.0.0 Daily Build (${{ env.DATE_STR }})
-          body_path: docs/readme.txt
+          body_path: release_readme.txt
           files: ${{ env.ZIP_PATH }}
           draft: false
           prerelease: false
