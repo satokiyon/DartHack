@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
 /* NetHack 5.0	objects.h	$NHDT-Date: 1749097644 2025/06/04 20:27:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -69,8 +70,8 @@
 #error Unproductive inclusion of objects.h
 #endif  /* OBJECTS_DESCR_INIT || OBJECTS_INIT || OBJECTS_ENUM */
 
-#define GENERIC(desc, class, gen_enum) \
-    OBJECT(OBJ("generic " desc, desc),                                  \
+#define GENERIC(id, desc, class, gen_enum) \
+    OBJECT(OBJ("generic " id, desc),                                    \
            BITS(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, 0),            \
            0, class, 0, 0, 0, 0, 0, 0, 0, 0, 0, CLR_GRAY, gen_enum)
 
@@ -83,23 +84,23 @@ OBJECT(OBJ("strange object", NoDes),
    note that 'real' strange object is in slot [0] but ILLOBJ_CLASS is 1
    so we add a dummy for it in slot [1] to simplify accessing the rest;
    there isn't any entry for RANDOM_CLASS (0) */
-GENERIC("strange",    ILLOBJ_CLASS,  GENERIC_ILLOBJ),  /* [1] */
-GENERIC("weapon",     WEAPON_CLASS,  GENERIC_WEAPON),  /* [2] */
-GENERIC("armor",      ARMOR_CLASS,   GENERIC_ARMOR),   /* [3] */
-GENERIC("ring",       RING_CLASS,    GENERIC_RING),    /* [4] */
-GENERIC("amulet",     AMULET_CLASS,  GENERIC_AMULET),  /* [5] */
-GENERIC("tool",       TOOL_CLASS,    GENERIC_TOOL),    /* [6] */
-GENERIC("food",       FOOD_CLASS,    GENERIC_FOOD),    /* [7] */
-GENERIC("potion",     POTION_CLASS,  GENERIC_POTION),  /* [8] */
-GENERIC("scroll",     SCROLL_CLASS,  GENERIC_SCROLL),  /* [9] */
-GENERIC("spellbook",  SPBOOK_CLASS,  GENERIC_SPBOOK),  /* [10] */
-GENERIC("wand",       WAND_CLASS,    GENERIC_WAND),    /* [11] */
-GENERIC("coin",       COIN_CLASS,    GENERIC_COIN),    /* [12] */
-GENERIC("gem",        GEM_CLASS,     GENERIC_GEM),     /* [13] */
-GENERIC("large rock", ROCK_CLASS,    GENERIC_ROCK),    /* [14] bldr+statue */
-GENERIC("iron ball",  BALL_CLASS,    GENERIC_BALL),    /* [15] */
-GENERIC("iron chain", CHAIN_CLASS,   GENERIC_CHAIN),   /* [16] */
-GENERIC("venom",      VENOM_CLASS,   GENERIC_VENOM),   /* [17] */
+GENERIC("strange",    "不正規",   ILLOBJ_CLASS,  GENERIC_ILLOBJ),  /* [1] */
+GENERIC("weapon",     "武器",     WEAPON_CLASS,  GENERIC_WEAPON),  /* [2] */
+GENERIC("armor",      "防具",     ARMOR_CLASS,   GENERIC_ARMOR),   /* [3] */
+GENERIC("ring",       "指輪",     RING_CLASS,    GENERIC_RING),    /* [4] */
+GENERIC("amulet",     "魔除け",   AMULET_CLASS,  GENERIC_AMULET),  /* [5] */
+GENERIC("tool",       "道具",     TOOL_CLASS,    GENERIC_TOOL),    /* [6] */
+GENERIC("food",       "食料",     FOOD_CLASS,    GENERIC_FOOD),    /* [7] */
+GENERIC("potion",     "薬",       POTION_CLASS,  GENERIC_POTION),  /* [8] */
+GENERIC("scroll",     "巻物",     SCROLL_CLASS,  GENERIC_SCROLL),  /* [9] */
+GENERIC("spellbook",  "魔法書",   SPBOOK_CLASS,  GENERIC_SPBOOK),  /* [10] */
+GENERIC("wand",       "杖",       WAND_CLASS,    GENERIC_WAND),    /* [11] */
+GENERIC("coin",       "金貨",     COIN_CLASS,    GENERIC_COIN),    /* [12] */
+GENERIC("gem",        "宝石",     GEM_CLASS,     GENERIC_GEM),     /* [13] */
+GENERIC("large rock", "岩石",     ROCK_CLASS,    GENERIC_ROCK),    /* [14] bldr+statue */
+GENERIC("iron ball",  "鉄球",     BALL_CLASS,    GENERIC_BALL),    /* [15] */
+GENERIC("iron chain", "鎖",       CHAIN_CLASS,   GENERIC_CHAIN),   /* [16] */
+GENERIC("venom",      "毒液",     VENOM_CLASS,   GENERIC_VENOM),   /* [17] */
 #undef GENERIC
 /* FIRST_OBJECT: it would be simpler just to use MARKER(FIRST_OBJECT,ARROW)
    below but that is vulnerable to neglecting to update the marker enum
