@@ -1468,7 +1468,7 @@ extern int doclose(void);
 extern void lock_mouse_cursor(boolean);
 #endif
 
-#ifdef MACOS9
+#ifdef MAC68K
 /* outdated functions removed */
 /* ### macfile.c ### */
 /* ### macmain.c ### */
