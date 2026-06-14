@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
 /* NetHack 5.0	optlist.h */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -748,6 +748,14 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTC(suppress_alert, Advanced, 8, opt_in, set_in_game,
                 No, Yes, Yes, No, NoAlias,
                 "バージョン固有機能に関する警告を抑制する")
+    NHOPTC(msw_msg_cols, Advanced, 6, opt_in, set_in_config,
+                No, Yes, No, No, NoAlias, "メッセージウィンドウの列数")
+    NHOPTC(msw_msg_rows, Advanced, 6, opt_in, set_in_config,
+                No, Yes, No, No, NoAlias, "メッセージウィンドウの行数")
+    NHOPTC(msw_stat_cols, Advanced, 6, opt_in, set_in_config,
+                No, Yes, No, No, NoAlias, "ステータスウィンドウの列数")
+    NHOPTC(msw_stat_rows, Advanced, 6, opt_in, set_in_config,
+                No, Yes, No, No, NoAlias, "ステータスウィンドウの行数")
     NHOPTC(symset, Map, 70, opt_in, set_in_game,
                 No, Yes, No, Yes, NoAlias,
                 "symbols ファイルから表示シンボル一式を読み込む")

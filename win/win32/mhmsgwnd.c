@@ -841,18 +841,24 @@ mswin_message_window_size(HWND hWnd, LPSIZE sz)
     GetClientRect(hWnd, &client_rt);
 
     if (iflags.wc_align_message == ALIGN_TOP || iflags.wc_align_message == ALIGN_BOTTOM) {
-        if (iflags.wc2_term_rows > 0) {
+        int num_lines = iflags.msw_msg_rows;
+        if (num_lines <= 0) num_lines = iflags.wc2_term_rows;
+
+        if (num_lines > 0) {
             sz->cy = sz->cy - (client_rt.bottom - client_rt.top)
-                     + data->yChar * iflags.wc2_term_rows;
+                     + data->yChar * num_lines;
         } else {
             sz->cy = sz->cy - (client_rt.bottom - client_rt.top)
                      + data->yChar * MSG_VISIBLE_LINES;
         }
         sz->cx = 0; /* Fill width */
     } else {
-        if (iflags.wc2_term_cols > 0) {
+        int msg_width = iflags.msw_msg_cols;
+        if (msg_width <= 0) msg_width = iflags.wc2_term_cols;
+
+        if (msg_width > 0) {
             sz->cx = sz->cx - (client_rt.right - client_rt.left)
-                     + data->xChar * iflags.wc2_term_cols;
+                     + data->xChar * msg_width;
         } else {
             sz->cx = 0; /* Fill width (will be handled by mhmain.c) */
         }
