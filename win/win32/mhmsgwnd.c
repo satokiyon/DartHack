@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
 /* NetHack 5.0	mhmsgwnd.c	$NHDT-Date: 1596498357 2020/08/03 23:45:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,7 +10,8 @@
 
 #define MSG_WRAP_TEXT
 
-#define MSG_VISIBLE_LINES max(iflags.wc_vary_msgcount, 1)
+#define MSG_VISIBLE_LINES \
+    (iflags.wc2_term_rows > 0 ? iflags.wc2_term_rows : max(iflags.wc_vary_msgcount, 1))
 #define MSG_LINES (int) min(iflags.msg_history, MAX_MSG_HISTORY)
 #define MAXWINDOWTEXT TBUFSZ
 
@@ -838,8 +839,25 @@ mswin_message_window_size(HWND hWnd, LPSIZE sz)
        horizontal scroll bar (difference between window rect and client rect
        */
     GetClientRect(hWnd, &client_rt);
-    sz->cy = sz->cy - (client_rt.bottom - client_rt.top)
-             + data->yChar * MSG_VISIBLE_LINES;
+
+    if (iflags.wc_align_message == ALIGN_TOP || iflags.wc_align_message == ALIGN_BOTTOM) {
+        if (iflags.wc2_term_rows > 0) {
+            sz->cy = sz->cy - (client_rt.bottom - client_rt.top)
+                     + data->yChar * iflags.wc2_term_rows;
+        } else {
+            sz->cy = sz->cy - (client_rt.bottom - client_rt.top)
+                     + data->yChar * MSG_VISIBLE_LINES;
+        }
+        sz->cx = 0; /* Fill width */
+    } else {
+        if (iflags.wc2_term_cols > 0) {
+            sz->cx = sz->cx - (client_rt.right - client_rt.left)
+                     + data->xChar * iflags.wc2_term_cols;
+        } else {
+            sz->cx = 0; /* Fill width (will be handled by mhmain.c) */
+        }
+        sz->cy = 0; /* Fill height */
+    }
 }
 
 /* check if text can be appended to the last line without wrapping */
