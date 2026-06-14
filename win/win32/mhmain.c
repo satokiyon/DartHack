@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
 /* NetHack 5.0	mhmain.c	$NHDT-Date: 1596498352 2020/08/03 23:45:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ */
 /* Copyright (C) 2001 by Alex Kompel  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -632,25 +632,30 @@ mswin_layout_main_window(HWND changed_child)
                 client_rt.bottom);
         switch (iflags.wc_align_status) {
         case ALIGN_LEFT:
-            status_size.cx = (wnd_rect.right - wnd_rect.left) / 4;
-            status_size.cy =
-                (wnd_rect.bottom - wnd_rect.top); // that won't look good
+            if (status_size.cx <= 0)
+                status_size.cx = (wnd_rect.right - wnd_rect.left) / 4;
+            if (status_size.cy <= 0 || status_size.cy > (wnd_rect.bottom - wnd_rect.top))
+                status_size.cy = (wnd_rect.bottom - wnd_rect.top);
             status_org.x = wnd_rect.left;
             status_org.y = wnd_rect.top;
             wnd_rect.left += status_size.cx;
             break;
 
         case ALIGN_RIGHT:
-            status_size.cx = (wnd_rect.right - wnd_rect.left) / 4;
-            status_size.cy =
-                (wnd_rect.bottom - wnd_rect.top); // that won't look good
+            if (status_size.cx <= 0)
+                status_size.cx = (wnd_rect.right - wnd_rect.left) / 4;
+            if (status_size.cy <= 0 || status_size.cy > (wnd_rect.bottom - wnd_rect.top))
+                status_size.cy = (wnd_rect.bottom - wnd_rect.top);
             status_org.x = wnd_rect.right - status_size.cx;
             status_org.y = wnd_rect.top;
             wnd_rect.right -= status_size.cx;
             break;
 
         case ALIGN_TOP:
-            status_size.cx = (wnd_rect.right - wnd_rect.left);
+            if (status_size.cy <= 0)
+                status_size.cy = 0; /* should not happen with current mhstatus.c */
+            if (status_size.cx <= 0 || status_size.cx > (wnd_rect.right - wnd_rect.left))
+                status_size.cx = (wnd_rect.right - wnd_rect.left);
             status_org.x = wnd_rect.left;
             status_org.y = wnd_rect.top;
             wnd_rect.top += status_size.cy;
@@ -658,7 +663,10 @@ mswin_layout_main_window(HWND changed_child)
 
         case ALIGN_BOTTOM:
         default:
-            status_size.cx = (wnd_rect.right - wnd_rect.left);
+            if (status_size.cy <= 0)
+                status_size.cy = 0;
+            if (status_size.cx <= 0 || status_size.cx > (wnd_rect.right - wnd_rect.left))
+                status_size.cx = (wnd_rect.right - wnd_rect.left);
             status_org.x = wnd_rect.left;
             status_org.y = wnd_rect.bottom - status_size.cy;
             wnd_rect.bottom -= status_size.cy;
@@ -667,23 +675,30 @@ mswin_layout_main_window(HWND changed_child)
 
         switch (iflags.wc_align_message) {
         case ALIGN_LEFT:
-            msg_size.cx = (wnd_rect.right - wnd_rect.left) / 4;
-            msg_size.cy = (wnd_rect.bottom - wnd_rect.top);
+            if (msg_size.cx <= 0)
+                msg_size.cx = (wnd_rect.right - wnd_rect.left) / 4;
+            if (msg_size.cy <= 0 || msg_size.cy > (wnd_rect.bottom - wnd_rect.top))
+                msg_size.cy = (wnd_rect.bottom - wnd_rect.top);
             msg_org.x = wnd_rect.left;
             msg_org.y = wnd_rect.top;
             wnd_rect.left += msg_size.cx;
             break;
 
         case ALIGN_RIGHT:
-            msg_size.cx = (wnd_rect.right - wnd_rect.left) / 4;
-            msg_size.cy = (wnd_rect.bottom - wnd_rect.top);
+            if (msg_size.cx <= 0)
+                msg_size.cx = (wnd_rect.right - wnd_rect.left) / 4;
+            if (msg_size.cy <= 0 || msg_size.cy > (wnd_rect.bottom - wnd_rect.top))
+                msg_size.cy = (wnd_rect.bottom - wnd_rect.top);
             msg_org.x = wnd_rect.right - msg_size.cx;
             msg_org.y = wnd_rect.top;
             wnd_rect.right -= msg_size.cx;
             break;
 
         case ALIGN_TOP:
-            msg_size.cx = (wnd_rect.right - wnd_rect.left);
+            if (msg_size.cy <= 0)
+                msg_size.cy = 0;
+            if (msg_size.cx <= 0 || msg_size.cx > (wnd_rect.right - wnd_rect.left))
+                msg_size.cx = (wnd_rect.right - wnd_rect.left);
             msg_org.x = wnd_rect.left;
             msg_org.y = wnd_rect.top;
             wnd_rect.top += msg_size.cy;
@@ -691,7 +706,10 @@ mswin_layout_main_window(HWND changed_child)
 
         case ALIGN_BOTTOM:
         default:
-            msg_size.cx = (wnd_rect.right - wnd_rect.left);
+            if (msg_size.cy <= 0)
+                msg_size.cy = 0;
+            if (msg_size.cx <= 0 || msg_size.cx > (wnd_rect.right - wnd_rect.left))
+                msg_size.cx = (wnd_rect.right - wnd_rect.left);
             msg_org.x = wnd_rect.left;
             msg_org.y = wnd_rect.bottom - msg_size.cy;
             wnd_rect.bottom -= msg_size.cy;

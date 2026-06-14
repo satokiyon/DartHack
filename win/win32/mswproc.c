@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
 /* NetHack 5.0	mswproc.c	$NHDT-Date: 1717967341 2024/06/09 21:09:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.193 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -98,7 +98,7 @@ struct window_procs mswin_procs = {
 #ifdef ENHANCED_SYMBOLS
      WC2_U_UTF8STR | WC2_EXTRACOLORS |
 #endif
-    WC2_SUPPRESS_HIST | 0L,
+    WC2_SUPPRESS_HIST | WC2_TERM_SIZE | 0L,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
     mswin_init_nhwindows, mswin_player_selection, mswin_askname,
     mswin_get_nh_event, mswin_exit_nhwindows, mswin_suspend_nhwindows,

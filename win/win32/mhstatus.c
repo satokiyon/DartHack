@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
 /* NetHack 5.0	mhstatus.c	$NHDT-Date: 1596498360 2020/08/03 23:46:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -86,6 +86,8 @@ static TCHAR szStatusWindowClass[] = TEXT("MSNHStatusWndClass");
 LRESULT CALLBACK StatusWndProc(HWND, UINT, WPARAM, LPARAM);
 static void register_status_window_class(void);
 static LRESULT onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam);
+static LRESULT onWMPaint_vertical(HWND hWnd, WPARAM wParam, LPARAM lParam);
+static void mswin_status_window_size_vertical(HWND hWnd, LPSIZE sz);
 
 #define DEFAULT_COLOR_BG_STATUS COLOR_WINDOW
 #define DEFAULT_COLOR_FG_STATUS COLOR_WINDOWTEXT
@@ -236,6 +238,8 @@ StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     } break;
 
     case WM_PAINT:
+        if (iflags.wc_align_status == ALIGN_LEFT || iflags.wc_align_status == ALIGN_RIGHT)
+            return onWMPaint_vertical(hWnd, wParam, lParam);
         return onWMPaint(hWnd, wParam, lParam);
 
     case WM_SIZE: {
@@ -498,6 +502,10 @@ onWMPaint(HWND hWnd, WPARAM wParam UNUSED, LPARAM lParam UNUSED)
 void
 mswin_status_window_size(HWND hWnd, LPSIZE sz)
 {
+    if (iflags.wc_align_status == ALIGN_LEFT || iflags.wc_align_status == ALIGN_RIGHT) {
+        mswin_status_window_size_vertical(hWnd, sz);
+        return;
+    }
     RECT rt;
 
     GetClientRect(hWnd, &rt);
@@ -514,7 +522,185 @@ mswin_status_window_size(HWND hWnd, LPSIZE sz)
         TEXTMETRIC tm;
         GetTextMetrics(hdc, &tm);
 
-        rt.bottom = rt.top + text_sz.cy * NHSW_LINES;
+        int num_lines = iflags.wc2_term_rows;
+        if (num_lines <= 0) num_lines = NHSW_LINES;
+        rt.bottom = rt.top + text_sz.cy * num_lines;
+
+        /* In horizontal layout, width should fill the screen by default.
+           Ignore term_cols to avoid conflict with vertical status/message needs. */
+        rt.right = rt.left; 
+
+        SelectObject(hdc, saveFont);
+        ReleaseDC(hWnd, hdc);
+    }
+    AdjustWindowRect(&rt, GetWindowLong(hWnd, GWL_STYLE), FALSE);
+    sz->cx = rt.right - rt.left;
+    sz->cy = rt.bottom - rt.top;
+}
+
+static LRESULT
+onWMPaint_vertical(HWND hWnd, WPARAM wParam UNUSED, LPARAM lParam UNUSED)
+{
+    SIZE sz;
+    WCHAR wbuf[BUFSZ];
+    RECT rt;
+    PAINTSTRUCT ps;
+    PNHStatusWindow data;
+    int width, height;
+    RECT clear_rect;
+    HDC front_buffer_hdc;
+
+    data = (PNHStatusWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
+    front_buffer_hdc = BeginPaint(hWnd, &ps);
+    GetClientRect(hWnd, &rt);
+
+    width = rt.right - rt.left;
+    height = rt.bottom - rt.top;
+
+    back_buffer_size(&data->back_buffer, width, height);
+
+    HDC hdc = data->back_buffer.hdc;
+
+    SetBkColor(hdc, status_bg_color);
+    SetTextColor(hdc, status_fg_color);
+
+    clear_rect.left = 0;
+    clear_rect.top = 0;
+    clear_rect.right = width;
+    clear_rect.bottom = height;
+
+    FillRect(hdc, &clear_rect, status_bg_brush);
+
+    if (data->status_lines != NULL) {
+        
+        data->has_blink_fields = FALSE;
+
+        for (int line = 0; line < NHSW_LINES; line++) {
+            mswin_status_line * status_line = &data->status_lines->lines[line];
+            LONG left = rt.left;
+
+            for (int i = 0; i < status_line->status_strings.count; i++) {
+                mswin_status_string * status_string = status_line->status_strings.status_strings[i];
+                int clr, atr;
+                int fntatr = ATR_NONE;
+                COLORREF nFg, nBg;
+                int vlen;
+                int field_id = -1;
+
+                if (status_string->str == NULL || status_string->str[0] == '\0')
+                    continue;
+
+                /* Identify the field for this string to decide on layout */
+                if (i < status_line->status_fields.count) {
+                    field_id = status_line->status_fields.status_fields[i]->field_index;
+                } else {
+                    field_id = BL_CONDITION;
+                }
+
+                clr = status_string->color;
+                atr = status_string->attribute;
+
+                const char *str = status_string->str;
+                vlen = strlen(str);
+
+                if (atr & HL_BOLD) fntatr = ATR_BOLD;
+                else if (atr & HL_INVERSE) fntatr = ATR_INVERSE;
+                else if (atr & HL_ULINE) fntatr = ATR_ULINE;
+                else if (atr & HL_BLINK) {
+                    data->has_blink_fields = TRUE;
+                    if (data->blink_state) { fntatr = ATR_INVERSE; atr |= HL_INVERSE; }
+                }
+                else if (atr & HL_DIM) fntatr = ATR_DIM;
+
+                cached_font * fnt = mswin_get_font(NHW_STATUS, fntatr, hdc, FALSE);
+
+                {
+                    int wlen = MultiByteToWideChar(NH_CODEPAGE, 0, str, -1, wbuf, SIZE(wbuf));
+                    if (wlen > 0) vlen = wlen - 1;
+                    else { vlen = 0; wbuf[0] = L'\0'; }
+                }
+
+                nFg = (clr == NO_COLOR ? status_fg_color : ((clr >= 0 && clr < CLR_MAX) ? nhcolor_to_RGB(clr) : status_fg_color));
+                if (atr & HL_DIM) {
+                    float redReduction = 0.5f, greenReduction = 0.5f, blueReduction = 0.25f;
+                    uchar red = (uchar)(GetRValue(nFg) * (1.0f - redReduction));
+                    uchar green = (uchar)(GetGValue(nFg) * (1.0f - greenReduction));
+                    uchar blue = (uchar)(GetBValue(nFg) * (1.0f - blueReduction));
+                    nFg = RGB(red, green, blue);
+                }
+                nBg = status_bg_color;
+
+                if (status_string->space_in_front && rt.left > left) {
+                    rt.left += fnt->width;
+                }
+
+                if (status_string->draw_bar && iflags.wc2_hitpointbar) {
+                    COLORREF bar_color = nhcolor_to_RGB(status_string->bar_color);
+                    HBRUSH back_brush = CreateSolidBrush(bar_color);
+                    RECT barrect;
+                    SelectObject(hdc, fnt->hFont);
+                    SetBkMode(hdc, OPAQUE);
+                    SetBkColor(hdc, status_bg_color);
+                    SetTextColor(hdc, status_fg_color);
+                    GetTextExtentPoint32W(hdc, wbuf, vlen, &sz);
+                    DrawTextW(hdc, wbuf, vlen, &rt, DT_LEFT);
+                    int bar_percent = status_string->bar_percent;
+                    if (bar_percent > 0) {
+                        barrect.left = rt.left;
+                        barrect.top = rt.top;
+                        barrect.bottom = rt.top + sz.cy;
+                        barrect.right = rt.left + (int)((bar_percent * sz.cx) / 100);
+                        FillRect(hdc, &barrect, back_brush);
+                        SetBkMode(hdc, TRANSPARENT);
+                        SetTextColor(hdc, nBg);
+                        DrawTextW(hdc, wbuf, vlen, &barrect, DT_LEFT);
+                    }
+                    DeleteObject(back_brush);
+                } else {
+                    if (atr & HL_INVERSE) { COLORREF tmp = nFg; nFg = nBg; nBg = tmp; }
+                    SelectObject(hdc, fnt->hFont);
+                    SetBkMode(hdc, OPAQUE);
+                    SetBkColor(hdc, nBg);
+                    SetTextColor(hdc, nFg);
+                    GetTextExtentPoint32W(hdc, wbuf, vlen, &sz);
+                    DrawTextW(hdc, wbuf, vlen, &rt, DT_LEFT);
+                }
+
+                if (field_id == BL_HP || field_id == BL_ENE || field_id == BL_XP) {
+                    rt.left += sz.cx;
+                } else {
+                    rt.top += sz.cy;
+                    rt.left = left;
+                }
+            }
+        }
+    }
+    BitBlt(front_buffer_hdc, 0, 0, width, height, hdc, 0, 0, SRCCOPY);
+    EndPaint(hWnd, &ps);
+    return 0;
+}
+
+static void
+mswin_status_window_size_vertical(HWND hWnd, LPSIZE sz)
+{
+    RECT rt;
+    GetClientRect(hWnd, &rt);
+    PNHStatusWindow data = (PNHStatusWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    if (data) {
+        HDC hdc = GetDC(hWnd);
+        cached_font * font = mswin_get_font(NHW_STATUS, ATR_NONE, hdc, FALSE);
+        HGDIOBJ saveFont = SelectObject(hdc, font->hFont);
+        SIZE text_sz;
+        GetTextExtentPoint32(hdc, _T("W"), 1, &text_sz);
+        
+        /* Account for the 3 grouped fields (HP/MaxHP, Ene/MaxEne, Level/Exp) */
+        int num_lines = MSWIN_MAX_LINE1_STRINGS + MSWIN_MAX_LINE2_STRINGS - 3;
+        rt.bottom = rt.top + text_sz.cy * num_lines;
+
+        int status_width = iflags.wc2_term_cols;
+        if (status_width <= 0) status_width = 20;
+        rt.right = rt.left + text_sz.cx * status_width; 
 
         SelectObject(hdc, saveFont);
         ReleaseDC(hWnd, hdc);

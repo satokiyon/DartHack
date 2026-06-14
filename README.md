@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsのみ)
@@ -106,6 +106,30 @@ NetHackでは、ゲーム内のメッセージに合わせてお好みの効果�
      * `"メッセージの正規表現"`: ゲーム内で表示されるメッセージ（正規表現が使用可能です）。
      * `"ファイル名"`: 再生するWAVファイル名（`SOUNDDIR` からの相対パス）。
      * `音量`: 0〜100 の数値で指定します。
+
+---
+
+### 5. GUIモードのレイアウトカスタマイズ (NetHackJP独自機能)
+GUI版（`NetHackW.exe`）では、ステータスウィンドウやメッセージウィンドウの配置とサイズを自由にカスタマイズできます。特にステータスウィンドウを左右に配置した際、項目を縦に並べて表示する機能が追加されています。
+
+#### 設定手順
+`.nethackrc` を編集して以下のオプションを組み合わせます。
+
+*   **ステータスウィンドウを縦並びにする**
+    `OPTIONS=align_status:left` (または `right`) を指定すると、ステータス項目が縦1列に並びます。
+    ※HP/最大HP、魔力/最大魔力、レベル/経験値は自動的に同じ行にグループ化され、見やすく表示されます。
+
+*   **ウィンドウサイズを指定する**
+    `term_cols` (幅:文字数) および `term_rows` (高さ:行数) でサイズを固定できます。
+
+#### 設定例
+```ini
+# ステータスを右側に幅20文字分で表示（縦並び）
+OPTIONS=align_status:right,term_cols:20
+
+# メッセージウィンドウを上側に6行分で表示
+OPTIONS=align_message:top,term_rows:6
+```
 
 より多くの設定例が `.nethackrc`（または `nethackrc.template`）に記載されていますので、そちらも参考にしてください。その他の詳細なオプション等については `Guidebook_JP.txt` を参照してください。
 
