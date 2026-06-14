@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
 /* NetHack 5.0	flag.h	$NHDT-Date: 1744860497 2025/04/16 19:28:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.251 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -474,6 +474,10 @@ struct instance_flags {
     int wc_mouse_support;       /* allow mouse support */
     int wc2_term_cols;          /* terminal width, in characters */
     int wc2_term_rows;          /* terminal height, in characters */
+    int msw_msg_cols;           /* Win32 GUI: message window width */
+    int msw_msg_rows;           /* Win32 GUI: message window height */
+    int msw_stat_cols;          /* Win32 GUI: status window width */
+    int msw_stat_rows;          /* Win32 GUI: status window height */
     int wc2_statuslines;        /* default = 2, curses can handle 3 */
     int wc2_windowborders;      /* display borders on NetHack windows */
     int wc2_petattr;            /* text attributes for pet */

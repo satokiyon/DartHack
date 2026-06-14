@@ -4238,6 +4238,51 @@ optfn_symset(
 }
 
 staticfn int
+optfn_msw_term_size(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
+{
+    int retval = optn_ok;
+    long ltmp;
+    int *addr = (int *) 0;
+
+    if (req == do_init) {
+        return optn_ok;
+    }
+
+    switch (allopt[optidx].idx) {
+    case opt_msw_msg_cols: addr = &iflags.msw_msg_cols; break;
+    case opt_msw_msg_rows: addr = &iflags.msw_msg_rows; break;
+    case opt_msw_stat_cols: addr = &iflags.msw_stat_cols; break;
+    case opt_msw_stat_rows: addr = &iflags.msw_stat_rows; break;
+    default: return optn_err;
+    }
+
+    if (req == do_set) {
+        if ((op = string_for_opt(opts, negated)) != empty_optstr) {
+            ltmp = atol(op);
+            if (ltmp <= 0L || ltmp >= (long) LARGEST_INT) {
+                config_error_add("Invalid %s: %ld", allopt[optidx].name, ltmp);
+                retval = optn_err;
+            } else {
+                *addr = (int) ltmp;
+            }
+        }
+        return retval;
+    }
+    if (req == get_val || req == get_cnf_val) {
+        if (*addr)
+            Sprintf(opts, "%d", *addr);
+        else if (req == get_cnf_val)
+            opts[0] = '\0';
+        else
+            Strcpy(opts, defopt);
+        return optn_ok;
+    }
+    return optn_ok;
+}
+
+staticfn int
 optfn_term_cols(
     int optidx, int req, boolean negated,
     char *opts, char *op)

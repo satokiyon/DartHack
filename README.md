@@ -119,16 +119,19 @@ GUI版（`NetHackW.exe`）では、ステータスウィンドウやメッセー
     `OPTIONS=align_status:left` (または `right`) を指定すると、ステータス項目が縦1列に並びます。
     ※HP/最大HP、魔力/最大魔力、レベル/経験値は自動的に同じ行にグループ化され、見やすく表示されます。
 
-*   **ウィンドウサイズを指定する**
-    `term_cols` (幅:文字数) および `term_rows` (高さ:行数) でサイズを固定できます。
+*   **ウィンドウサイズを個別に指定する**
+    以下の専用オプションを使用して、メッセージウィンドウとステータスウィンドウのサイズを独立して設定できます。
+    *   `msw_msg_cols` / `msw_msg_rows`: メッセージウィンドウの幅（列）/ 高さ（行）
+    *   `msw_stat_cols` / `msw_stat_rows`: ステータスウィンドウの幅（列）/ 高さ（行）
+    ※従来の `term_cols` / `term_rows` も使用可能ですが、複数のウィンドウで異なる値を設定したい場合は上記の専用オプションを使用してください。
 
 #### 設定例
 ```ini
-# ステータスを右側に幅20文字分で表示（縦並び）
-OPTIONS=align_status:right,term_cols:20
-
 # メッセージウィンドウを上側に6行分で表示
-OPTIONS=align_message:top,term_rows:6
+OPTIONS=align_message:top,msw_msg_rows:6
+
+# ステータスを右側に幅15文字分で表示（縦並び）
+OPTIONS=align_status:right,msw_stat_cols:15
 ```
 
 より多くの設定例が `.nethackrc`（または `nethackrc.template`）に記載されていますので、そちらも参考にしてください。その他の詳細なオプション等については `Guidebook_JP.txt` を参照してください。

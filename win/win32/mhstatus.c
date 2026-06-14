@@ -522,13 +522,18 @@ mswin_status_window_size(HWND hWnd, LPSIZE sz)
         TEXTMETRIC tm;
         GetTextMetrics(hdc, &tm);
 
-        int num_lines = iflags.wc2_term_rows;
+        int num_lines = iflags.msw_stat_rows;
+        if (num_lines <= 0) num_lines = iflags.wc2_term_rows;
         if (num_lines <= 0) num_lines = NHSW_LINES;
         rt.bottom = rt.top + text_sz.cy * num_lines;
 
         /* In horizontal layout, width should fill the screen by default.
-           Ignore term_cols to avoid conflict with vertical status/message needs. */
-        rt.right = rt.left; 
+           Only use explicit width if msw_stat_cols is set. */
+        int status_width = iflags.msw_stat_cols;
+        if (status_width > 0)
+            rt.right = rt.left + text_sz.cx * status_width;
+        else
+            rt.right = rt.left; 
 
         SelectObject(hdc, saveFont);
         ReleaseDC(hWnd, hdc);
@@ -695,11 +700,18 @@ mswin_status_window_size_vertical(HWND hWnd, LPSIZE sz)
         GetTextExtentPoint32(hdc, _T("W"), 1, &text_sz);
         
         /* Account for the 3 grouped fields (HP/MaxHP, Ene/MaxEne, Level/Exp) */
-        int num_lines = MSWIN_MAX_LINE1_STRINGS + MSWIN_MAX_LINE2_STRINGS - 3;
+        int num_lines = iflags.msw_stat_rows;
+        if (num_lines <= 0)
+            num_lines = iflags.wc2_term_rows;
+        if (num_lines <= 0)
+            num_lines = MSWIN_MAX_LINE1_STRINGS + MSWIN_MAX_LINE2_STRINGS - 3;
         rt.bottom = rt.top + text_sz.cy * num_lines;
 
-        int status_width = iflags.wc2_term_cols;
-        if (status_width <= 0) status_width = 20;
+        int status_width = iflags.msw_stat_cols;
+        if (status_width <= 0)
+            status_width = iflags.wc2_term_cols;
+        if (status_width <= 0)
+            status_width = 20;
         rt.right = rt.left + text_sz.cx * status_width; 
 
         SelectObject(hdc, saveFont);
