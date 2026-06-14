@@ -4282,6 +4282,15 @@ optfn_msw_term_size(
     return optn_ok;
 }
 
+static int optfn_msw_msg_cols(int i, int r, boolean n, char *o, char *p)
+{ return optfn_msw_term_size(i, r, n, o, p); }
+static int optfn_msw_msg_rows(int i, int r, boolean n, char *o, char *p)
+{ return optfn_msw_term_size(i, r, n, o, p); }
+static int optfn_msw_stat_cols(int i, int r, boolean n, char *o, char *p)
+{ return optfn_msw_term_size(i, r, n, o, p); }
+static int optfn_msw_stat_rows(int i, int r, boolean n, char *o, char *p)
+{ return optfn_msw_term_size(i, r, n, o, p); }
+
 staticfn int
 optfn_term_cols(
     int optidx, int req, boolean negated,
