@@ -5,7 +5,7 @@ NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.net
 
 <figure>
    <figcaption>GUI版 Nevanda_5.0.0_32x32タイル使用</figcaption>
-   <img width="1441" height="882" alt="2026-06-14_16h52_58" src="https://github.com/user-attachments/assets/f2a0c7a0-3951-47bf-a203-6fd30cf9b50a" />
+   <img width="1209" height="787" alt="2026-06-14_16h55_40" src="https://github.com/user-attachments/assets/021ab227-be59-469c-8243-099f6c57c640" />
 </figure>
 
 <figure>
