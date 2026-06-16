@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-18. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* NetHack 5.0	windsys.c	$NHDT-Date: 1710949760 2024/03/20 15:49:20 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -152,7 +152,7 @@ findfirst(char *path)
         FindClose(ffhandle);
         ffhandle = (HANDLE) 0;
     }
-    MultiByteToWideChar(GetACP(), 0, path, -1, wpath, SIZE(wpath));
+    MultiByteToWideChar(CP_UTF8, 0, path, -1, wpath, SIZE(wpath));
     ffhandle = FindFirstFileW(wpath, &ffd);
     return (ffhandle == INVALID_HANDLE_VALUE) ? 0 : 1;
 }
@@ -160,7 +160,7 @@ findfirst(char *path)
 int
 findnext(void)
 {
-    return FindNextFile(ffhandle, &ffd) ? 1 : 0;
+    return FindNextFileW(ffhandle, &ffd) ? 1 : 0;
 }
 
 char *
@@ -168,7 +168,7 @@ foundfile_buffer(void)
 {
     static char filebuf[MAX_PATH];
 
-    WideCharToMultiByte(GetACP(), 0, ffd.cFileName, -1, filebuf,
+    WideCharToMultiByte(CP_UTF8, 0, ffd.cFileName, -1, filebuf,
                         SIZE(filebuf), NULL, NULL);
     return filebuf;
 }
@@ -229,7 +229,7 @@ void nt_regularize(char* s) /* normalize file name */
     for (lp = (unsigned char *) s; *lp; lp++)
         if (*lp == '?' || *lp == '"' || *lp == '\\' || *lp == '/'
             || *lp == '>' || *lp == '<' || *lp == '*' || *lp == '|'
-            || *lp == ':' || (*lp > 127))
+            || *lp == ':')
             *lp = '_';
 }
 
@@ -825,18 +825,19 @@ nt_assert_failed(const char *expression, const char *filepath, int line)
 boolean
 get_user_home_folder(char *homebuf, size_t sz)
 {
-    static char szHomeDirBuf[MAX_PATH] = { 0 };
     // We need a process with query permission set
     HANDLE hToken = 0;
     DWORD result =
         OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken);
+    WCHAR szHomeDirBuf[MAX_PATH] = { 0 };
     DWORD BufSize = MAX_PATH;
 
-    result = GetUserProfileDirectoryA(hToken, szHomeDirBuf, &BufSize);
+    result = GetUserProfileDirectoryW(hToken, szHomeDirBuf, &BufSize);
     // Close handle opened via OpenProcessToken
     CloseHandle(hToken);
     if (result != 0) {
-        Snprintf(homebuf, sz, "%s", szHomeDirBuf);
+        WideCharToMultiByte(CP_UTF8, 0, szHomeDirBuf, -1, homebuf, (int) sz,
+                            NULL, NULL);
     }
 
     return (result != 0);
@@ -845,19 +846,10 @@ get_user_home_folder(char *homebuf, size_t sz)
 char *
 get_executable_path(void)
 {
-#ifdef UNICODE
-    {
-        TCHAR wbuf[BUFSZ];
-        GetModuleFileName((HANDLE) 0, wbuf, BUFSZ);
-        WideCharToMultiByte(CP_ACP, 0, wbuf, -1, path_buffer,
-                            sizeof(path_buffer), NULL, NULL);
-    }
-#else
-    DWORD length = GetModuleFileName((HANDLE) 0, path_buffer, MAX_PATH);
-    if (length == ERROR_INSUFFICIENT_BUFFER)
-        error("Unable to get module name");
-    path_buffer[length] = '\0';
-#endif
+    WCHAR wbuf[BUFSZ];
+    GetModuleFileNameW((HANDLE) 0, wbuf, BUFSZ);
+    WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, path_buffer,
+                        sizeof(path_buffer), NULL, NULL);
 
     char *separator = strrchr(path_buffer, PATH_SEPARATOR);
     if (separator)
@@ -942,20 +934,12 @@ get_known_folder_path(const KNOWNFOLDERID *folder_id, char *path,
         return FALSE;
     }
 
-    size_t converted;
-    errno_t err;
-
-    err = wcstombs_s(&converted, path, path_size, wide_path, _TRUNCATE);
+    int res = WideCharToMultiByte(CP_UTF8, 0, wide_path, -1, path, (int) path_size,
+                                  NULL, NULL);
 
     CoTaskMemFree(wide_path);
 
-    if (err == STRUNCATE || err == EILSEQ) {
-        // silently handle this problem
-        return FALSE;
-    } else if (err != 0) {
-        error(
-            "Failed folder (%lu) path string conversion, unexpected err = %d",
-            folder_id->Data1, err);
+    if (res <= 0) {
         return FALSE;
     }
 
@@ -965,7 +949,9 @@ get_known_folder_path(const KNOWNFOLDERID *folder_id, char *path,
 void
 create_directory(const char *path)
 {
-    BOOL dres = CreateDirectoryA(path, NULL);
+    WCHAR wpath[MAX_PATH];
+    MultiByteToWideChar(CP_UTF8, 0, path, -1, wpath, MAX_PATH);
+    BOOL dres = CreateDirectoryW(wpath, NULL);
 
     if (!dres) {
         DWORD dw = GetLastError();

@@ -1,9 +1,13 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* NetHack 5.0	hacklib.c	$NHDT-Date: 1706213796 2024/01/25 20:16:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
 /* NetHack may be freely redistributed.  See license for details. */
+
+#if defined(WIN32)
+#include "win32api.h"
+#endif
 
 #include "hack.h" /* for config.h+extern.h */
 
@@ -935,27 +939,25 @@ utf8_sequence_expected_len(uchar lead)
 size_t
 utf8_truncation_point(const char *str, size_t maxbytes)
 {
-    size_t len, cut, lead;
+    size_t cut, lead;
     int cp_len;
 
-    len = strlen(str);
-    if (len <= maxbytes)
-        return len;
     if (maxbytes == 0)
         return 0;
 
-    cut = maxbytes;
-    lead = cut;
-    while (lead > 0 && (((uchar) str[lead]) & 0xC0U) == 0x80U)
-        --lead;
-
-    if (lead < cut) {
+    cut = 0;
+    while (str[cut]) {
+        lead = cut;
         cp_len = utf8_sequence_expected_len((uchar) str[lead]);
-        if (cp_len == 0 || lead + (size_t) cp_len > cut)
-            return lead;
-    }
+        if (cp_len <= 0)
+            break; /* invalid UTF-8 lead byte */
 
-    return cut;
+        if (cut + (size_t) cp_len > maxbytes)
+            return lead; /* would exceed limit, return previous boundary */
+
+        cut += (size_t) cp_len;
+    }
+    return cut; /* reached end of string within limit */
 }
 
 /* in-place truncate to at most maxbytes bytes, preserving UTF-8 boundaries */
@@ -1241,5 +1243,99 @@ what_datamodel_is_this(int retidx, int szshort, int szint, int szlong, int szll,
     return unknown;
 }
 #undef MAX_D
+#ifdef WIN32
+#include <io.h>
+#include <fcntl.h>
+#include <stdarg.h>
+
+/* UTF-8 文字列を WideChar (UTF-16) に変換する内部関数 */
+static wchar_t *
+utf8_to_w(const char *s)
+{
+    int wlen;
+    wchar_t *wbuf;
+    if (!s) return NULL;
+    wlen = MultiByteToWideChar(CP_UTF8, 0, s, -1, NULL, 0);
+    if (wlen <= 0) return NULL;
+    wbuf = (wchar_t *) malloc(wlen * sizeof(wchar_t));
+    if (wbuf) MultiByteToWideChar(CP_UTF8, 0, s, -1, wbuf, wlen);
+    return wbuf;
+}
+
+int
+win32_open(const char *path, int flags, ...)
+{
+    wchar_t *wpath = utf8_to_w(path);
+    int res, mode = 0;
+    if (flags & O_CREAT) {
+        va_list ap;
+        va_start(ap, flags);
+        mode = va_arg(ap, int);
+        va_end(ap);
+    }
+    res = _wopen(wpath, flags, mode);
+    free(wpath);
+    return res;
+}
+
+int
+win32_creat(const char *path, int mode)
+{
+    wchar_t *wpath = utf8_to_w(path);
+    int res = _wcreat(wpath, mode);
+    free(wpath);
+    return res;
+}
+
+int
+win32_unlink(const char *path)
+{
+    wchar_t *wpath = utf8_to_w(path);
+    int res = _wunlink(wpath);
+    free(wpath);
+    return res;
+}
+
+int
+win32_stat(const char *path, struct stat *buf)
+{
+    wchar_t *wpath = utf8_to_w(path);
+    int res = _wstat(wpath, (struct _stat *) buf);
+    free(wpath);
+    return res;
+}
+
+int
+win32_access(const char *path, int mode)
+{
+    wchar_t *wpath = utf8_to_w(path);
+    int res = _waccess(wpath, mode);
+    free(wpath);
+    return res;
+}
+
+FILE *
+win32_fopen(const char *path, const char *mode)
+{
+    wchar_t *wpath = utf8_to_w(path);
+    wchar_t *wmode = utf8_to_w(mode);
+    FILE *res = _wfopen(wpath, wmode);
+    free(wpath);
+    free(wmode);
+    return res;
+}
+
+int
+win32_rename(const char *oldpath, const char *newpath)
+{
+    wchar_t *wold = utf8_to_w(oldpath);
+    wchar_t *wnew = utf8_to_w(newpath);
+    int res = _wrename(wold, wnew);
+    free(wold);
+    free(wnew);
+    return res;
+}
+#endif
+
 /*hacklib.c*/
 
