@@ -65,6 +65,6 @@ jobs:
         with:
           generate_release_notes: true
           body_path: CHANGELOG.txt
-          preverse_order: true
+          preserve_order: true
           files: |
             sys/android/app/build/outputs/apk/release/app-*-release.apk
