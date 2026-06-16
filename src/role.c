@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-29. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* NetHack 5.0	role.c	$NHDT-Date: 1737607158 2025/01/22 20:39:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.107 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1739,8 +1739,12 @@ build_plselection_prompt(
 void
 plnamesuffix(void)
 {
-    char *sptr, *eptr;
+    char *eptr;
     int i;
+#ifdef SELECTSAVED
+    boolean save_selectsaved = iflags.wc2_selectsaved;
+    boolean skip_select = FALSE;
+#endif
 
     /* some generic user names will be ignored in favor of prompting */
     if (sysopt.genericusers) {
@@ -1763,33 +1767,93 @@ plnamesuffix(void)
     }
 
     do {
+#ifdef SELECTSAVED
+        /* 名前が長すぎて再試行する場合のみセーブ選択をスキップ。
+           名前が空（Enterのみ）で戻ってきた場合は、設定に関わらずセーブ選択を表示する。 */
+        if (skip_select)
+            iflags.wc2_selectsaved = FALSE;
+        else if (!svp.plname[0])
+            iflags.wc2_selectsaved = TRUE;
+        else
+            iflags.wc2_selectsaved = save_selectsaved;
+
+        skip_select = FALSE;
+#endif
         if (!svp.plname[0]) {
+            memset(svp.plname, 0, sizeof(svp.plname));
             askname(); /* fill svp.plname[] if necessary, or set
                         * defer_plname */
-            gp.plnamelen = 0; /* plname[] might have -role-race-&c attached */
+            /* askname() might have populated plname via restore_menu();
+               if so, it contains "name-role-race-gender-alignment" */
+            gp.plnamelen = 0;
+            if (svp.plname[0] && !iflags.defer_plname) {
+                /* check if we have a dash after the name part */
+                char *p = strchr(svp.plname, '-');
+                if (p) {
+                    /* ensure it's not a dash in the name itself (like a username)
+                       by matching it against known role/race/etc codes */
+                    while (p) {
+                        if (str2role(p + 1) != ROLE_NONE ||
+                            str2race(p + 1) != ROLE_NONE ||
+                            str2gend(p + 1) != ROLE_NONE ||
+                            str2align(p + 1) != ROLE_NONE) {
+                            gp.plnamelen = (int) (p - svp.plname);
+                            break;
+                        }
+                        p = strchr(p + 1, '-');
+                    }
+                }
+            }
         }
 
-        /* Look for tokens delimited by '-' */
-        sptr = svp.plname + gp.plnamelen;
-        if ((eptr = strchr(sptr, '-')) != (char *) 0)
-            *eptr++ = '\0';
-        while (eptr) {
-            /* Isolate the next token */
-            sptr = eptr;
-            if ((eptr = strchr(sptr, '-')) != (char *) 0)
-                *eptr++ = '\0';
+        /* プレイヤー名の長さが保存ファイルの制限を超えないかチェックする。
+           長すぎる場合はメッセージを表示して svp.plname をクリアし、再入力を促す。 */
+        if (svp.plname[0] && !iflags.defer_plname) {
+            boolean buffer_overflow = (svp.plname[PL_NSIZ - 1] != '\0');
+            svp.plname[PL_NSIZ - 1] = '\0'; /* strlen 安全化のための強制終端 */
+            int old_len = (int) strlen(svp.plname);
 
-            /* Try to match it to something */
-            if ((i = str2role(sptr)) != ROLE_NONE)
-                flags.initrole = i;
-            else if ((i = str2race(sptr)) != ROLE_NONE)
-                flags.initrace = i;
-            else if ((i = str2gend(sptr)) != ROLE_NONE)
-                flags.initgend = i;
-            else if ((i = str2align(sptr)) != ROLE_NONE)
-                flags.initalign = i;
+            /* UTF-8 境界を考慮して安全に切り詰める。これにより文字化けによる
+               ファイルシステムエラー (Unknown error) を防止する。 */
+            utf8_truncate(svp.plname, PL_NSIZ - 1);
+            int new_len = (int) strlen(svp.plname);
+
+            int encoded_len = 0;
+            int max_encoded = 0;
+#if defined(WIN32)
+            char tmp_plname[BUFSZ];
+            static const char okchars[] =
+                "*ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.";
+            const char *legal = okchars + 1; /* '*' はスキップ */
+
+            (void) fname_encode(legal, '%', svp.plname, tmp_plname, sizeof tmp_plname);
+            encoded_len = (int) strlen(tmp_plname);
+#else
+            encoded_len = (int) strlen(svp.plname);
+#endif
+            max_encoded = (int) (SAVESIZE - 2 - strlen(SAVE_EXTENSION));
+
+            if (new_len < old_len || buffer_overflow || encoded_len > max_encoded) {
+                pline("名前が長すぎます。ファイル名の制限により保存できません。");
+#if defined(WIN32)
+                pline("半角英数字なら %d 文字、日本語なら約 %d 文字以内で入力してください。",
+                      max_encoded, max_encoded / 3);
+#else
+                pline(" %d 文字以内で入力してください。", max_encoded);
+#endif
+                wait_synch();
+                svp.plname[0] = '\0';
+                gp.plnamelen = 0;
+#ifdef SELECTSAVED
+                skip_select = TRUE; /* 次回ループではセーブ選択をスキップして直接入力へ */
+#endif
+            }
         }
     } while (!svp.plname[0] && !iflags.defer_plname);
+
+#ifdef SELECTSAVED
+    iflags.wc2_selectsaved = save_selectsaved; /* 元の設定を復元 */
+#endif
 
     /* commas in the svp.plname confuse the record file, convert to spaces */
     (void) strNsubst(svp.plname, ",", " ", 0);
@@ -2883,14 +2947,14 @@ plsel_startmenu(int ttyrows, int aspect)
         rolename = jp_role_name_for_display(ROLE, GEND);
     if (!svp.plname[0] || ROLE < 0 || RACE < 0 || GEND < 0 || ALGN < 0) {
         /* "<role> <race> <gender> <alignment>" */
-        Sprintf(qbuf, "%.20s %.20s %.20s %.20s",
+        Sprintf(qbuf, "%s %s %s %s",
                 rolename,
             jp_race_noun_for_display(RACE),
             jp_gender_for_display(GEND),
             jp_align_for_display(ALGN));
     } else {
         /* "<name> (<alignment> <gender> <race> <role>)" */
-        Sprintf(qbuf, "%.20s (%.20s %.20s %.20s %.20s)",
+        Sprintf(qbuf, "%s (%s %s %s %s)",
                 svp.plname,
             jp_align_for_display(ALGN),
             jp_gender_for_display(GEND),

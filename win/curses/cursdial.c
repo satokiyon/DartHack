@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursdial.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -117,7 +117,7 @@ curses_line_input_dialog(
     WINDOW *askwin, *bwin;
     char *tmpstr;
     int prompt_width, prompt_height = 1, height = prompt_height,
-        answerx = 0, answery = 0, trylim;
+        answerx = 0, answery = 0;
     char input[BUFSZ];
 
     /* if messages were being suppressed for the remainder of the turn,
@@ -127,7 +127,7 @@ curses_line_input_dialog(
     if (buffer > (int) sizeof input)
         buffer = (int) sizeof input;
     /* +1: space between prompt and answer; buffer already accounts for \0 */
-    prompt_width = (int) strlen(prompt) + 1 + buffer;
+    prompt_width = curses_utf8_str_width(prompt) + 1 + buffer;
     maxwidth = term_cols - 2;
 
     if (iflags.window_inited) {
@@ -145,7 +145,7 @@ curses_line_input_dialog(
         height = prompt_height;
         prompt_width = maxwidth;
         tmpstr = curses_break_str(prompt, maxwidth, prompt_height);
-        remaining_buf = buffer - ((int) strlen(tmpstr) - 1);
+        remaining_buf = buffer - (curses_utf8_str_width(tmpstr) - 1);
         if (remaining_buf > 0) {
             height += (remaining_buf / prompt_width);
             if ((remaining_buf % prompt_width) > 0) {
@@ -166,7 +166,7 @@ curses_line_input_dialog(
         tmpstr = curses_break_str(prompt, maxwidth, count + 1);
         mvwaddstr(askwin, count, 0, tmpstr);
         if (count == prompt_height - 1) { /* Last line */
-            if ((int) strlen(tmpstr) < maxwidth)
+            if (curses_utf8_str_width(tmpstr) < maxwidth)
                 waddch(askwin, ' ');
             else
                 wmove(askwin, count + 1, 0);
@@ -179,21 +179,20 @@ curses_line_input_dialog(
 
     echo();
     curs_set(1);
-    trylim = 10;
-    do {
-        /* move and clear are only needed for 2nd and subsequent passes */
-        wmove(askwin, answery, answerx);
-        wclrtoeol(askwin);
 
-        wgetnstr(askwin, input, buffer - 1);
-        /* ESC after some input kills that input and tries again;
-           ESC at the start cancels, leaving ESC in the result buffer.
-           [Note: wgetnstr() treats <escape> as an ordinary character
-           so user has to type <escape><return> for it to behave the
-           way we want it to.] */
-        if (input[0] != '\033' && strchr(input, '\033') != 0)
-             input[0] = '\0';
-    } while (--trylim > 0 && !input[0]);
+    /* move and clear are only needed for 2nd and subsequent passes */
+    wmove(askwin, answery, answerx);
+    wclrtoeol(askwin);
+
+    wgetnstr(askwin, input, buffer - 1);
+    /* ESC after some input kills that input and tries again;
+       ESC at the start cancels, leaving ESC in the result buffer.
+       [Note: wgetnstr() treats <escape> as an ordinary character
+       so user has to type <escape><return> for it to behave the
+       way we want it to.] */
+    if (input[0] != '\033' && strchr(input, '\033') != 0)
+         input[0] = '\0';
+
     curs_set(0);
     Strcpy(answer, input);
     werase(bwin);
@@ -1045,7 +1044,7 @@ menu_win_size(nhmenu *menu)
 {
     int maxwidth, maxheight, curentrywidth, lastline;
     int maxentrywidth = 0;
-    int maxheaderwidth = menu->prompt ? (int) strlen(menu->prompt) : 0;
+    int maxheaderwidth = menu->prompt ? curses_utf8_str_width(menu->prompt) : 0;
     nhmenu_item *menu_item_ptr, *last_item_ptr = NULL;
     boolean only_if_no_headers = (iflags.menuobjsyms & 4) != 0;
 
@@ -1082,7 +1081,7 @@ menu_win_size(nhmenu *menu)
     assert(menu->entries != NULL); /* at least one iteration will occur */
     for (menu_item_ptr = menu->entries; menu_item_ptr != NULL;
          menu_item_ptr = menu_item_ptr->next_item) {
-        curentrywidth = (int) strlen(menu_item_ptr->str);
+        curentrywidth = curses_utf8_str_width(menu_item_ptr->str);
         if (menu_item_ptr->identifier.a_void == NULL) {
             if (curentrywidth > maxheaderwidth) {
                 maxheaderwidth = curentrywidth;
@@ -1251,7 +1250,7 @@ menu_display_page(
             tmpstr = curses_break_str(menu->prompt, menu->width, count + 1);
             curses_menu_color_attr(win, curses_menu_promptstyle.color,
 			             curses_menu_promptstyle.attr, ON);
-            mvwprintw(win, count + 1, 1, "%s", tmpstr);
+            mvwaddstr(win, count + 1, 1, tmpstr);
             curses_menu_color_attr(win, curses_menu_promptstyle.color,
 			             curses_menu_promptstyle.attr, OFF);
             free(tmpstr);
@@ -1335,8 +1334,8 @@ menu_display_page(
             if (menu_item_ptr->str && *menu_item_ptr->str) {
                 tmpstr = curses_break_str(menu_item_ptr->str,
                                           entry_cols, count + 1);
-                mvwprintw(win, menu_item_ptr->line_num + count + 1, start_col,
-                          "%s", tmpstr);
+                mvwaddstr(win, menu_item_ptr->line_num + count + 1, start_col,
+                          tmpstr);
                 free(tmpstr);
             }
         }
