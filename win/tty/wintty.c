@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* NetHack 5.0	wintty.c	$NHDT-Date: 1737691300 2025/01/23 20:01:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.420 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -780,8 +780,17 @@ tty_askname(void)
                     inlen = (int) strlen(inbytes);
                 }
 
-                if (!inbytes || ct + inlen > (int) (sizeof svp.plname) - 1)
+                if (!inbytes)
                     continue;
+
+                if (ct + inlen > (int) (sizeof svp.plname) - 1) {
+                    /* バッファ溢れ。これ以上は格納せず、終端に印を付けて即座に終了する。
+                       ct の位置をヌル終端し、さらに最後のバイトを非ヌルにすることで
+                       src/role.c の overflow チェックを有効にする。 */
+                    svp.plname[ct] = '\0';
+                    svp.plname[sizeof(svp.plname) - 1] = ' ';
+                    goto askname_done;
+                }
 
 #ifdef WIN32CON
                 /* WIN32CON needs UTF-8 aware drawing here; raw stdio output
@@ -804,8 +813,9 @@ tty_askname(void)
             }
         }
         svp.plname[ct] = 0;
-    } while (ct == 0);
+    } while (ct == 0 && c != '\n' && c != '\r');
 
+askname_done:
     /* move to next line to simulate echo of user's <return> */
     tty_curs(BASE_WINDOW, 1, wins[BASE_WINDOW]->cury + 1);
 
