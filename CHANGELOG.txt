@@ -1,3 +1,8 @@
 - apks are now split
     - if you are unsure of which APK to get, you probably want the arm64-v8a one unless your device is really old and then you'll want to try armeabi. The other ones are basically extinct these days and you should know if you're using a device that needs it. Try multiple if you have to! there's no harm, it'll just crash on startup because it failed to load the shared library and then you can try again.
 - Debug builds are no longer shipped. If you need one (for whatever reason), click on the commit associated with the tag and grab it from the action run (valid for about a month)
+- merged with upstream 5.0.0
+    - a lot of misc changes, you can see the git commit history to see
+    - my favorite change is that the boulder traps in sokoban no longer count as dangerous traps, so pets will step over them as if they were a normal tile
+- added a setting to make the back button center your screen if it's panned
+
