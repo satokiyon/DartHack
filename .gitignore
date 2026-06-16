@@ -118,6 +118,7 @@ tools/
 !/docs/message-translation-safety-checklist.md
 !/docs/emoji_support_investigation.md
 !/docs/wizloadlua_guide.md
+!/docs/plan_fix_save_filename_consistency.md
 
 
 #logfiles
