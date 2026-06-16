@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsのみ)
@@ -69,7 +69,9 @@ NetHack はテキスト（ASCII文字）だけでなく、美しいグラフィ�
 
 #### 設定手順
 1. 好みのタイルセットをダウンロードし、BMP形式に変換します。
-   * 参考リンク: [NetHackWiki Tileset 一覧](https://nethackwiki.com/wiki/Tileset)
+   * 参考リンク
+     * [NetHackWiki Tileset 一覧](https://nethackwiki.com/wiki/Tileset)
+     * [Geoduck Tile Set](http://www.geoduckthings.net/nhack/nhack.html)
 2. `.nethackrc` を開き、以下の例のように設定を追記または修正します。
    ```ini
    OPTIONS=map_mode:tiles
