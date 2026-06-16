@@ -1,10 +1,13 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* NetHack 5.0	options.c	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.782 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef OPTION_LISTS_ONLY
+#if defined(WIN32)
+#include "win32api.h"
+#endif
 #include "hack.h"
 #include "tcap.h"
 #else /* OPTION_LISTS_ONLY: (AMIGA) external program for opt lists */
@@ -6904,12 +6907,33 @@ OPTIONS=gender
 char *
 nh_getenv(const char *ev)
 {
+#ifdef WIN32
+    static char envbuf[BUFSZ];
+    WCHAR *wev, *wval;
+    int wlen;
+
+    wlen = MultiByteToWideChar(CP_UTF8, 0, ev, -1, NULL, 0);
+    wev = (WCHAR *) malloc(wlen * sizeof(WCHAR));
+    if (!wev) return (char *) 0;
+    MultiByteToWideChar(CP_UTF8, 0, ev, -1, wev, wlen);
+
+    wval = _wgetenv(wev);
+    free(wev);
+
+    if (wval) {
+        int ulen = WideCharToMultiByte(CP_UTF8, 0, wval, -1, envbuf, sizeof(envbuf), NULL, NULL);
+        if (ulen > 0 && (size_t) ulen <= (BUFSZ / 2))
+            return envbuf;
+    }
+    return (char *) 0;
+#else
     char *getev = getenv(ev);
 
     if (getev && strlen(getev) <= (BUFSZ / 2))
         return getev;
     else
         return (char *) 0;
+#endif
 }
 
 /* copy up to maxlen-1 characters; 'dest' must be able to hold maxlen;

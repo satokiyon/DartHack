@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* NetHack 5.0	windconf.h	$NHDT-Date: 1596498552 2020/08/03 23:49:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994.  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -205,6 +205,26 @@ typedef SSIZE_T ssize_t;
 #define FCMASK (_S_IREAD | _S_IWRITE) /* ファイル作成マスク */
 #define regularize nt_regularize
 #define HLOCK "NHPERM"
+
+#ifdef WIN32
+/* UTF-8 パス対応のためのラッパー */
+#include <stdio.h>
+extern int win32_open(const char *, int, ...);
+extern int win32_creat(const char *, int);
+extern int win32_unlink(const char *);
+extern int win32_stat(const char *, struct stat *);
+extern int win32_access(const char *, int);
+extern FILE *win32_fopen(const char *, const char *);
+extern int win32_rename(const char *, const char *);
+
+#define open win32_open
+#define creat win32_creat
+#define unlink win32_unlink
+#define stat(path, st) win32_stat(path, st)
+#define access win32_access
+#define fopen win32_fopen
+#define rename win32_rename
+#endif
 
 #ifndef M
 #define M(c) ((char) (0x80 | (c)))
