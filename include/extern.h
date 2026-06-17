@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-11. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2857,6 +2857,7 @@ extern void clearrolefilter(int);
 extern char *root_plselection_prompt(char *, int, int, int, int, int) NO_NNARGS;
 extern char *build_plselection_prompt(char *, int, int, int, int, int) NONNULLARG1;
 extern void plnamesuffix(void);
+extern void select_saved_game(const char *) NONNULLARG1; /* NetHackJP: save data restoration */
 extern void role_selection_prolog(int, winid);
 extern void role_menu_extra(int, winid, boolean);
 extern void role_init(void);
