@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* NetHack 5.0	o_init.c	$NHDT-Date: 1771216675 2026/02/15 20:37:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -599,10 +599,10 @@ sortloot_descr(int otyp, char *outbuf)
 /* also used in options.c (optfn_sortdiscoveries) */
 static const char disco_order_let[] = "osca";
 static const char *const disco_orders_descr[] = {
-    "by order of discovery within each class",
-    "sortloot order (by class with some sub-class groupings)",
-    "alphabetical within each class",
-    "alphabetical across all classes",
+    "各クラスの発見順",
+    "種類ごとの並び順（サブクラス分類あり）",
+    "各クラスの五十音順",
+    "全体の五十音順",
     (char *) 0
 };
 
@@ -642,7 +642,7 @@ choose_disco_sort(
         add_menu_str(tmpwin,
                     "      will matter for future use of total discoveries.");
     }
-    end_menu(tmpwin, "Ordering of discoveries");
+    end_menu(tmpwin, "発見済みの並び順");
 
     n = select_menu(tmpwin, PICK_ONE, &selected);
     destroy_nhwindow(tmpwin);
@@ -734,7 +734,7 @@ disco_fmt_uniq(int uidx, char *outbuf)
        in the unique/relics section we want "papyrus spellbook" instead */
     if (!objects[uidx].oc_name_known
         && objects[uidx].oc_class == SPBOOK_CLASS)
-        Strcat(outbuf, " spellbook");
+        Strcat(outbuf, "の魔法書");
 }
 
 /* sort and output sorted_lines to window and free the lines */
@@ -786,7 +786,7 @@ dodiscovered(void) /* free after Robert Viduya */
     sortindx = strchr(disco_order_let, flags.discosort) - disco_order_let;
 
     tmpwin = create_nhwindow(NHW_TEXT);
-    Sprintf(buf, "Discoveries, %s", disco_orders_descr[sortindx]);
+    Sprintf(buf, "発見済みの物体: %s", disco_orders_descr[sortindx]);
     putstr(tmpwin, 0, buf);
     putstr(tmpwin, 0, "");
 
@@ -805,7 +805,7 @@ dodiscovered(void) /* free after Robert Viduya */
             || (objects[uidx].oc_encountered && uidx != AMULET_OF_YENDOR)) {
             if (!dis++)
                 putstr(tmpwin, iflags.menu_headings.attr,
-                       "Unique items or Relics");
+                       "固有の品や秘宝");
             ++uniq_ct;
             disco_fmt_uniq(uidx, buf);
             putstr(tmpwin, 0, buf);
@@ -863,7 +863,7 @@ dodiscovered(void) /* free after Robert Viduya */
                classes, we normally don't need a header; but it we showed
                any unique items or any artifacts then we do need one */
             if ((uniq_ct || arti_ct) && alphabetized && !alphabyclass)
-                putstr(tmpwin, iflags.menu_headings.attr, "Discovered items");
+                putstr(tmpwin, iflags.menu_headings.attr, "発見済みの品");
             disco_output_sorted(tmpwin, sorted_lines, sorted_ct, lootsort);
         }
         display_nhwindow(tmpwin, TRUE);
@@ -892,7 +892,7 @@ int
 doclassdisco(void)
 {
     static NEARDATA const char
-        prompt[] = "View discoveries for which sort of objects?",
+        prompt[] = "どの種類の発見済みリストを表示しますか？",
         havent_discovered_any[] = "まだ%sを何も発見していなかった.",
         unique_items[] = "固有の品や秘宝",
         artifact_items[] = "アーティファクト";
@@ -1067,7 +1067,7 @@ doclassdisco(void)
            but requires at least one artifact discovery for other styles
            [could fix that by forcing the 'a' choice into the pick-class
            menu when running in wizard mode] */
-        if (wizard && y_n("Dump information about all artifacts?") == 'y') {
+        if (wizard && y_n("全アーティファクトの情報を出力しますか？") == 'y') {
             dump_artifact_info(tmpwin);
             ct = NROFARTIFACTS; /* non-zero vs zero is what matters below */
             break;
@@ -1082,10 +1082,10 @@ doclassdisco(void)
         /* this should never happen but has been observed via the fuzzer */
         if (oclass == MAXOCLASSES)
             impossible("doclassdisco: invalid object class '%s'", visctrl(c));
-        Sprintf(buf, "Discovered %s in %s", let_to_name(oclass, FALSE, FALSE),
-                (flags.discosort == 'o') ? "order of discovery"
-                : (flags.discosort == 's') ? "'sortloot' order"
-                  : "alphabetical order");
+        Sprintf(buf, "%sの発見済みリスト（%s）", let_to_name(oclass, FALSE, FALSE),
+                (flags.discosort == 'o') ? "発見順"
+                : (flags.discosort == 's') ? "種類順"
+                  : "五十音順");
         putstr(tmpwin, 0, buf); /* skip iflags.menu_headings */
         sorted_ct = 0;
         for (i = svb.bases[(int) oclass]; i <= svb.bases[oclass + 1] - 1;

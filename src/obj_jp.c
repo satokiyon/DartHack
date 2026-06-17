@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -667,6 +667,7 @@ const char *const obj_jp_descrs[NUM_OBJECTS + 1] = {
     [SCR_STINKING_CLOUD] = "「ドスコイ・ワッショイ」と書かれた巻物",
     [SCR_TAMING] = "「ドッコイセ」と書かれた巻物",
     [SCR_TELEPORTATION] = "「ランタナ・シチヘンゲ」と書かれた巻物",
+    [SMALL_SHIELD] = "木盾",
     [SHIELD_OF_DRAIN_RESISTANCE] = "木盾",
     [SHIELD_OF_REFLECTION] = "銀色の磨かれた盾",
     [SHIELD_OF_SHOCK_RESISTANCE] = "木盾",
