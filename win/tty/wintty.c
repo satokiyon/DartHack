@@ -684,7 +684,7 @@ tty_askname(void)
     if (iflags.wc2_selectsaved && !iflags.renameinprogress)
         switch (restore_menu(BASE_WINDOW)) {
         case -1:
-            bail("Until next time then..."); /* quit */
+            bail("またお会いしましょう..."); /* quit */
             /*NOTREACHED*/
             break;
         case 0:
@@ -698,7 +698,7 @@ tty_askname(void)
     do {
         if (++tryct > 1) {
             if (tryct > 10)
-                bail("Giving up after 10 tries.\n");
+                bail("10回試行しましたが、中断します。\n");
             tty_curs(BASE_WINDOW, 1, wins[BASE_WINDOW]->cury - 1);
             tty_putstr(BASE_WINDOW, 0, "Enter a name for your character...");
             /* erase previous prompt (in case of ESC after partial response) */
@@ -724,7 +724,7 @@ tty_askname(void)
             } /* continue outer loop */
 #if defined(WIN32CON)
             if (c == '\003')
-                bail("^C abort.\n");
+                bail("^C 中断.\n");
 #endif
             /* some people get confused when their erase char is not ^H */
             if (c == '\b' || c == '\177') {

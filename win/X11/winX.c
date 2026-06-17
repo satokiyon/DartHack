@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* NetHack 5.0	winX.c	$NHDT-Date: 1717967337 2024/06/09 21:08:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1863,7 +1863,7 @@ X11_askname(void)
     if (iflags.wc2_selectsaved && !iflags.renameinprogress)
         switch (restore_menu(WIN_MAP)) {
         case -1: /* quit */
-            X11_bail("Until next time then...");
+            X11_bail("またお会いしましょう...");
             /*NOTREACHED*/
         case 0: /* no game chosen; start new game */
             break;

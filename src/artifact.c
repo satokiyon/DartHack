@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* NetHack 5.0	artifact.c	$NHDT-Date: 1715889721 2024/05/16 20:02:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.236 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -455,13 +455,13 @@ find_artifact(struct obj *otmp)
          */
         where = ((otmp->where == OBJ_FLOOR)
                  ?  ((inside_shop(otmp->ox, otmp->oy) != NO_ROOM)
-                     ? " in a shop"
-                     : " on the floor")
+                     ? "（店の中）"
+                     : "（床の上）")
                  /* artifacts aren't created in containers but could be
                     inside one if it comes from a bones level */
-                 : (otmp->where == OBJ_CONTAINED) ? " in a container"
+                 : (otmp->where == OBJ_CONTAINED) ? "（入れ物の中）"
                    /* perhaps probing, or seeing monster wield artifact */
-                   : (otmp->where == OBJ_MINVENT) ? " carried by a monster"
+                   : (otmp->where == OBJ_MINVENT) ? "（モンスターが所持）"
                      /* catchall: probably in inventory, picked up while
                         blind but now seen; there's no previous_where to
                         figure out how it got here */
