@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -197,9 +198,9 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(
     chosen_align(ROLE_NONE),
     cleric_role_row(0),
     human_race_row(0),
-    rand_btn(new QPushButton("Random")),
-    play_btn(new QPushButton("Play")),
-    quit_btn(new QPushButton("Quit"))
+    rand_btn(new QPushButton("ランダム")),
+    play_btn(new QPushButton("開始")),
+    quit_btn(new QPushButton("終了"))
 {
     /*
                0              1              2
@@ -254,12 +255,12 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(
     l->setColumnStretch(2, 1);
     sizePolicy().setHorizontalPolicy(QSizePolicy::Minimum);
 
-    QGroupBox* namebox = new QGroupBox("Name", this);
+    QGroupBox* namebox = new QGroupBox("名前", this);
     QVBoxLayout *namelayout = new QVBoxLayout(namebox);
     QLineEdit* name = new QLineEdit(namebox);
     namelayout->addWidget(name);
     name->setMaxLength(PL_NSIZ - 1);
-    name->setPlaceholderText(QString("  (required)")); // grayed out
+    name->setPlaceholderText(QString("  （必須）")); // grayed out
 
     // if plname[] contains a generic user name, clear it
     if (generic_plname())
@@ -337,12 +338,12 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(
 
     connect(role, SIGNAL(currentCellChanged(int, int, int, int)),
             this, SLOT(selectRole(int, int, int, int)));
-    role->setHorizontalHeaderLabels(QStringList("Role"));
+    role->setHorizontalHeaderLabels(QStringList("職業"));
     role->resizeColumnToContents(0);
 
     connect(race, SIGNAL(currentCellChanged(int, int, int, int)),
             this, SLOT(selectRace(int, int, int, int)));
-    race->setHorizontalHeaderLabels(QStringList("Race"));
+    race->setHorizontalHeaderLabels(QStringList("種族"));
     race->resizeColumnToContents(0);
 
     // TODO:
@@ -350,22 +351,23 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(
     //  horizontal header labels for role and race.  (Getting the font from
     //  race table above and setting it for labels below made no difference.)
 
-    QLabel *gendlabel = new QLabel("Gender");
+    QLabel *gendlabel = new QLabel("性別");
     genderbox->layout()->addWidget(gendlabel);
     gender = new QRadioButton*[ROLE_GENDERS];
     for (i=0; i<ROLE_GENDERS; i++) {
-	gender[i] = new QRadioButton( genders[i].adj, genderbox );
+	gender[i] = new QRadioButton( QString::fromUtf8(jp_gender_for_display(i)), genderbox );
 	genderbox->layout()->addWidget(gender[i]);
 	gendergroup->addButton(gender[i], i);
     }
     connect(gendergroup, SIGNAL(buttonClicked(int)),
             this, SLOT(selectGender(int)));
 
-    QLabel *alignlabel = new QLabel("Alignment");
+    QLabel *alignlabel = new QLabel("属性");
     alignbox->layout()->addWidget(alignlabel);
     alignment = new QRadioButton*[ROLE_ALIGNS];
     for (i=0; i<ROLE_ALIGNS; i++) {
-	alignment[i] = new QRadioButton( aligns[i].adj, alignbox );
+	alignment[i] = new QRadioButton( QString::fromUtf8(jp_align_for_display(i)), alignbox );
+	alignment[i]->setToolTip(QString::fromUtf8(jp_align_for_display(i)));
 	alignbox->layout()->addWidget(alignment[i]);
 	aligngroup->addButton(alignment[i], i);
     }
@@ -394,7 +396,6 @@ NetHackQtPlayerSelector::populate_roles()
     // (always gender-specific) and role's name (sometimes gender-specific)
     //
     QTableWidgetItem *item;
-    const char *rolename;
     glyph_info gi;
     int v, gf, gn = chosen_gend, al = chosen_align;
     // if no race yet, we use human for gender check (gender doesn't affect
@@ -403,15 +404,13 @@ NetHackQtPlayerSelector::populate_roles()
     bool is_f = (gn == 1);
     NetHackQtGlyphs& glyphs = qt_settings->glyphs();
     for (int i = 0; roles[i].name.m; ++i) {
-        rolename = (is_f && roles[i].name.f) ? roles[i].name.f
-                                             : roles[i].name.m;
         gf = monnum_to_glyph(roles[i].mnum, is_f ? FEMALE : MALE);
         map_glyphinfo(0, 0, gf, 0, &gi);
         v = ((ra < 0 || validrace(i, ra))
              && (gn < 0 || validgend(i, (ra >= 0) ? ra : hu, gn))
              && (al < 0 || validalign(i, (ra >= 0) ? ra : hu, al)));
         item = role->item(i, 0);
-        item->setText(rolename);
+        item->setText(QString::fromUtf8(jp_role_name_for_display(i, is_f ? 1 : 0)));
         item->setIcon(QIcon(glyphs.glyph(gf, gi.gm.tileidx)));
         item->setFlags(v ? Qt::ItemIsEnabled | Qt::ItemIsSelectable
                          : Qt::NoItemFlags);
@@ -440,7 +439,7 @@ NetHackQtPlayerSelector::populate_races()
         v = ((ro < 0 || validrace(ro, j))
              && (al < 0 || validalign((ro >= 0) ? ro : cl, j, al)));
         item = race->item(j, 0);
-        item->setText(races[j].noun);
+        item->setText(QString::fromUtf8(jp_race_noun_for_display(j)));
         item->setIcon(QIcon(glyphs.glyph(gf, gi.gm.tileidx)));
         item->setFlags(v ? Qt::ItemIsEnabled | Qt::ItemIsSelectable
                          : Qt::NoItemFlags);

@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -84,15 +85,15 @@ QLayout: Attempting to add QLayout "" to QDialog "", which already has a layout
     hb = new QHBoxLayout((QWidget *) NULL);
     vbl->addLayout(hb, Qt::AlignCenter);
 
-    QPushButton *q = new QPushButton("Quit", this);
+    QPushButton *q = new QPushButton("終了", this);
     hb->addWidget(q);
     connect(q, SIGNAL(clicked()), this, SLOT(reject()));
-    QPushButton *c = new QPushButton("New Game", this);
+    QPushButton *c = new QPushButton("新規ゲーム", this);
     hb->addWidget(c);
     connect(c, SIGNAL(clicked()), this, SLOT(accept()));
     c->setDefault(true);
 
-    QGroupBox *box = new QGroupBox("Saved Characters", this);
+    QGroupBox *box = new QGroupBox("保存されたキャラクター", this);
     QVBoxLayout *bgl = new QVBoxLayout();
     QButtonGroup *bg = new QButtonGroup();
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
