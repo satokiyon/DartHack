@@ -1524,6 +1524,130 @@ race_alignmentcount(int racenum)
 }
 
 char *
+jp_root_plselection_prompt(
+    char *suppliedbuf, int buflen,
+    int rolenum, int racenum, int gendnum, int alignnum)
+{
+    int k, gendercount = 0, aligncount = 0;
+    char buf[BUFSZ];
+    static char err_ret[] = "キャラクター";
+    boolean donefirst = FALSE;
+
+    if (!suppliedbuf || buflen < 1)
+        return err_ret;
+
+    /* initialize these static variables each time this is called */
+    gr.role_post_attribs = 0;
+    for (k = 0; k < NUM_BP; ++k)
+        gr.role_pa[k] = 0;
+    buf[0] = '\0';
+    *suppliedbuf = '\0';
+
+    /* How many alignments are allowed for the desired race? */
+    if (racenum != ROLE_NONE && racenum != ROLE_RANDOM)
+        aligncount = race_alignmentcount(racenum);
+
+    if (alignnum != ROLE_NONE && alignnum != ROLE_RANDOM
+        && ok_align(rolenum, racenum, gendnum, alignnum)) {
+        if (donefirst)
+            Strcat(buf, "・");
+        Strcat(buf, jp_align_for_display(alignnum));
+        donefirst = TRUE;
+    } else {
+        /* in case we got here by failing the ok_align() test */
+        if (alignnum != ROLE_RANDOM)
+            alignnum = ROLE_NONE;
+        /* if alignment not specified, but race is specified
+           and only one choice of alignment for that race then
+           don't include it in the later list */
+        if ((((racenum != ROLE_NONE && racenum != ROLE_RANDOM)
+              && ok_race(rolenum, racenum, gendnum, alignnum))
+             && (aligncount > 1))
+            || (racenum == ROLE_NONE || racenum == ROLE_RANDOM)) {
+            gr.role_pa[BP_ALIGN] = 1;
+            gr.role_post_attribs++;
+        }
+    }
+
+    /* How many genders are allowed for the desired role? */
+    if (validrole(rolenum))
+        gendercount = role_gendercount(rolenum);
+
+    if (gendnum != ROLE_NONE && gendnum != ROLE_RANDOM) {
+        if (validrole(rolenum)) {
+            /* if role specified, and multiple choice of genders for it,
+               and name of role itself does not distinguish gender */
+            if ((rolenum != ROLE_NONE) && (gendercount > 1)
+                && !roles[rolenum].name.f) {
+                if (donefirst)
+                    Strcat(buf, "・");
+                Strcat(buf, jp_gender_for_display(gendnum));
+                donefirst = TRUE;
+            }
+        } else {
+            if (donefirst)
+                Strcat(buf, "・");
+            Strcat(buf, jp_gender_for_display(gendnum));
+            donefirst = TRUE;
+        }
+    } else {
+        /* if gender not specified, but role is specified
+                and only one choice of gender then
+                don't include it in the later list */
+        if ((validrole(rolenum) && (gendercount > 1))
+            || !validrole(rolenum)) {
+            gr.role_pa[BP_GEND] = 1;
+            gr.role_post_attribs++;
+        }
+    }
+
+    if (racenum != ROLE_NONE && racenum != ROLE_RANDOM) {
+        if (validrole(rolenum)
+            && ok_race(rolenum, racenum, gendnum, alignnum)) {
+            if (donefirst)
+                Strcat(buf, "・");
+            Strcat(buf, jp_race_noun_for_display(racenum));
+            donefirst = TRUE;
+        } else if (!validrole(rolenum)) {
+            if (donefirst)
+                Strcat(buf, "・");
+            Strcat(buf, jp_race_noun_for_display(racenum));
+            donefirst = TRUE;
+        } else {
+            gr.role_pa[BP_RACE] = 1;
+            gr.role_post_attribs++;
+        }
+    } else {
+        gr.role_pa[BP_RACE] = 1;
+        gr.role_post_attribs++;
+    }
+
+    if (validrole(rolenum)) {
+        if (donefirst)
+            Strcat(buf, "・");
+        Strcat(buf, jp_role_name_for_display(rolenum, gendnum));
+        donefirst = TRUE;
+    } else if (rolenum == ROLE_NONE) {
+        gr.role_pa[BP_ROLE] = 1;
+        gr.role_post_attribs++;
+    }
+
+    if ((racenum == ROLE_NONE || racenum == ROLE_RANDOM)
+        && !validrole(rolenum)) {
+        if (donefirst)
+            Strcat(buf, "・");
+        Strcat(buf, "キャラクター");
+        /*donefirst = TRUE;*/
+    }
+
+    if (buflen > (int) (strlen(buf) + 1)) {
+        Strcpy(suppliedbuf, buf);
+        return suppliedbuf;
+    } else
+        return err_ret;
+}
+
+char *
 root_plselection_prompt(
     char *suppliedbuf, int buflen,
     int rolenum, int racenum, int gendnum, int alignnum)
