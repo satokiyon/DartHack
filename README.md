@@ -138,6 +138,8 @@ OPTIONS=align_status:right,msw_stat_cols:15
 
 より多くの設定例が `.nethackrc`（または `nethackrc.template`）に記載されていますので、そちらも参考にしてください。その他の詳細なオプション等については `Guidebook_JP.txt` を参照してください。
 
+----
+
 ### 6. セーブデータ一覧画面の表示とロード(NetHackJP独自機能)
 ゲーム起動時に、セーブファイルが存在すればファイル一覧を表示し、その中から選択してゲームを再開できます。
 
