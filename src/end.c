@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* NetHack 5.0	end.c	$NHDT-Date: 1720397752 2024/07/08 00:15:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.315 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1428,12 +1428,12 @@ really_done(int how)
     }
 #endif
     if (u.uhave.amulet) {
-        Strcat(svk.killer.name, " (with the Amulet)");
+        Strcat(svk.killer.name, "（魔除けを所持）");
     } else if (how == ESCAPED) {
         if (Is_astralevel(&u.uz)) /* offered Amulet to wrong deity */
-            Strcat(svk.killer.name, " (in celestial disgrace)");
+            Strcat(svk.killer.name, "（神の不興を買って）");
         else if (carrying(FAKE_AMULET_OF_YENDOR))
-            Strcat(svk.killer.name, " (with a fake Amulet)");
+            Strcat(svk.killer.name, "（偽の魔除けを所持）");
         /* don't bother counting to see whether it should be plural */
     }
 
