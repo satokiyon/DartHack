@@ -1400,7 +1400,6 @@ get_saved_games(void)
 
 #ifdef WIN32
     {
-        char *foundfile;
         const char *fq_save;
 #if 0
         const char *fq_new_save;
@@ -1417,7 +1416,6 @@ get_saved_games(void)
         fq_save = fqname(gs.SAVEF, SAVEPREFIX, 0);
 
         n = 0;
-        foundfile = foundfile_buffer();
         if (findfirst((char *) fq_save)) {
             do {
                 ++n;
@@ -1430,7 +1428,8 @@ get_saved_games(void)
             if (findfirst((char *) fq_save)) {
                 i = 0;
                 do {
-                    files[i++] = dupstr(foundfile);
+                    /* NetHackJP: update buffer for each file */
+                    files[i++] = dupstr(foundfile_buffer());
                 } while (findnext());
             }
         }
