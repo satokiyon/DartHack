@@ -394,7 +394,7 @@ prompt_for_player_selection(void)
         }
     }
 
-    (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
+    (void) jp_root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
                                    flags.initrace, flags.initgend,
                                    flags.initalign);
 
@@ -402,7 +402,6 @@ prompt_for_player_selection(void)
     /* we'll try to be compatible with pre-selected race/gender/alignment,
      * but may not succeed */
     if (flags.initrole < 0) {
-        char rolenamebuf[QBUFSZ];
         /* Process the choice */
         if (pick4u == 'y' || flags.initrole == ROLE_RANDOM
             || flags.randomall) {
@@ -427,22 +426,8 @@ prompt_for_player_selection(void)
                     thisch = lowc(roles[i].name.m[0]);
                     if (thisch == lastch)
                         thisch = highc(thisch);
-                    if (flags.initgend != ROLE_NONE
-                        && flags.initgend != ROLE_RANDOM) {
-                        if (flags.initgend == 1 && roles[i].name.f)
-                            Strcpy(rolenamebuf, roles[i].name.f);
-                        else
-                            Strcpy(rolenamebuf, roles[i].name.m);
-                    } else {
-                        if (roles[i].name.f) {
-                            Strcpy(rolenamebuf, roles[i].name.m);
-                            Strcat(rolenamebuf, "/");
-                            Strcat(rolenamebuf, roles[i].name.f);
-                        } else
-                            Strcpy(rolenamebuf, roles[i].name.m);
-                    }
                     add_menu(win, &nul_glyphinfo, &any, thisch, 0, ATR_NONE,
-                             clr, an(rolenamebuf), MENU_ITEMFLAGS_NONE);
+                             clr, jp_role_name_for_display(i, flags.initgend), MENU_ITEMFLAGS_NONE);
                     lastch = thisch;
                 }
             }
@@ -467,7 +452,7 @@ prompt_for_player_selection(void)
             flags.initrole = selected[0].item.a_int - 1;
             free((genericptr_t) selected), selected = 0;
         }
-        (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
+        (void) jp_root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
                                        flags.initrace, flags.initgend,
                                        flags.initalign);
     }
@@ -518,7 +503,7 @@ prompt_for_player_selection(void)
                         any.a_int = i + 1; /* must be non-zero */
                         add_menu(win, &nul_glyphinfo, &any,
                                  races[i].noun[0], 0, ATR_NONE, clr,
-                                 races[i].noun, MENU_ITEMFLAGS_NONE);
+                                 jp_race_noun_for_display(i), MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_race(flags.initrole, flags.initgend,
                                       flags.initalign, PICK_RANDOM) + 1;
@@ -541,7 +526,7 @@ prompt_for_player_selection(void)
             }
             flags.initrace = k;
         }
-        (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
+        (void) jp_root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
                                        flags.initrace, flags.initgend,
                                        flags.initalign);
     }
@@ -593,7 +578,7 @@ prompt_for_player_selection(void)
                         any.a_int = i + 1;
                         add_menu(win, &nul_glyphinfo, &any,
                                  genders[i].adj[0], 0, ATR_NONE, clr,
-                                 genders[i].adj, MENU_ITEMFLAGS_NONE);
+                                 jp_gender_for_display(i), MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_gend(flags.initrole, flags.initrace,
                                       flags.initalign, PICK_RANDOM) + 1;
@@ -616,7 +601,7 @@ prompt_for_player_selection(void)
             }
             flags.initgend = k;
         }
-        (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
+        (void) jp_root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
                                        flags.initrace, flags.initgend,
                                        flags.initalign);
     }
@@ -667,7 +652,7 @@ prompt_for_player_selection(void)
                         any.a_int = i + 1;
                         add_menu(win, &nul_glyphinfo, &any,
                                  aligns[i].adj[0], 0, ATR_NONE, clr,
-                                 aligns[i].adj, MENU_ITEMFLAGS_NONE);
+                                 jp_align_for_display(i), MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_align(flags.initrole, flags.initrace,
                                        flags.initgend, PICK_RANDOM) + 1;
@@ -798,7 +783,7 @@ mswin_create_nhwindow(int type)
             && !GetNHApp()->windowlist[i].dead)
             break;
     if (i == MAXWINDOWS)
-        panic("ERROR:  No windows available...\n");
+        panic("エラー: 利用可能なウィンドウがありません...\n");
 
     switch (type) {
     case NHW_MAP: {
@@ -2805,7 +2790,7 @@ mswin_color_from_string(char *colorstring, HBRUSH *brushptr,
         }
     }
     if (max_brush > TOTAL_BRUSHES)
-        panic("Too many colors!");
+        panic("色が多すぎます!");
     *brushptr = CreateSolidBrush(*colorptr);
     if (IndexOk(max_brush, brush_table)) {
         brush_table[max_brush] = *brushptr;

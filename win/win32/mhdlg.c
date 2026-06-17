@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* NetHack 5.0	mhdlg.c	$NHDT-Date: 1596498347 2020/08/03 23:45:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.36 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -17,62 +17,6 @@ int list_view_height(HWND hWnd, int count);
 void get_rect_size(RECT *rect, SIZE *size);
 void center_dialog(HWND dialog);
 void size_dialog(HWND dialog, SIZE new_client_size);
-
-static LPCWSTR
-plsel_localize_role(const char *role)
-{
-    if (!role)
-        return NULL;
-    if (!strcmp(role, "Archeologist"))
-        return L"\u8003\u53E4\u5B66\u8005";
-    if (!strcmp(role, "Barbarian"))
-        return L"\u91CE\u86EE\u4EBA";
-    if (!strcmp(role, "Caveman"))
-        return L"\u6D1E\u7A9F\u4EBA";
-    if (!strcmp(role, "Cavewoman"))
-        return L"\u6D1E\u7A9F\u4EBA";
-    if (!strcmp(role, "Healer"))
-        return L"\u85AC\u5E2B";
-    if (!strcmp(role, "Knight"))
-        return L"\u9A0E\u58EB";
-    if (!strcmp(role, "Monk"))
-        return L"\u6B66\u95D8\u5BB6";
-    if (!strcmp(role, "Priest"))
-        return L"\u53F8\u796D";
-    if (!strcmp(role, "Priestess"))
-        return L"\u53F8\u796D";
-    if (!strcmp(role, "Ranger"))
-        return L"\u30EC\u30F3\u30B8\u30E3\u30FC";
-    if (!strcmp(role, "Rogue"))
-        return L"\u76D7\u8CCA";
-    if (!strcmp(role, "Samurai"))
-        return L"\u4F8D";
-    if (!strcmp(role, "Tourist"))
-        return L"\u89B3\u5149\u5BA2";
-    if (!strcmp(role, "Valkyrie"))
-        return L"\u30EF\u30EB\u30AD\u30E5\u30FC\u30EC";
-    if (!strcmp(role, "Wizard"))
-        return L"\u9B54\u6CD5\u4F7F\u3044";
-    return NULL;
-}
-
-static LPCWSTR
-plsel_localize_race(const char *race)
-{
-    if (!race)
-        return NULL;
-    if (!strcmp(race, "human"))
-        return L"\u4EBA\u9593";
-    if (!strcmp(race, "elf"))
-        return L"\u30A8\u30EB\u30D5";
-    if (!strcmp(race, "dwarf"))
-        return L"\u30C9\u30EF\u30FC\u30D5";
-    if (!strcmp(race, "gnome"))
-        return L"\u30CE\u30FC\u30E0";
-    if (!strcmp(race, "orc"))
-        return L"\u30AA\u30FC\u30AF";
-    return NULL;
-}
 
 /*---------------------------------------------------------------*/
 /* data for getlin dialog */
@@ -642,7 +586,6 @@ plselInitDialog(struct plsel_data * data)
 {
     TCHAR wbuf[BUFSZ];
     LVCOLUMN lvcol;
-    control_t *control;
 
     SetWindowLongPtr(data->dialog, GWLP_USERDATA, (LONG_PTR) data);
 
@@ -669,10 +612,7 @@ plselInitDialog(struct plsel_data * data)
         lvitem.iSubItem = 0;
         lvitem.state = 0;
         lvitem.stateMask = LVIS_FOCUSED;
-        if (flags.female && roles[i].name.f)
-            lvitem.pszText = NH_A2W(roles[i].name.f, wbuf, BUFSZ);
-        else
-            lvitem.pszText = NH_A2W(roles[i].name.m, wbuf, BUFSZ);
+        lvitem.pszText = NH_A2W(jp_role_name_for_display(i, flags.female ? 1 : 0), wbuf, BUFSZ);
         if (ListView_InsertItem(role_list->hWnd, &lvitem) == -1) {
             panic("メニュー項目を追加できません");
         }
@@ -692,7 +632,7 @@ plselInitDialog(struct plsel_data * data)
         lvitem.iSubItem = 0;
         lvitem.state = 0;
         lvitem.stateMask = LVIS_FOCUSED;
-        lvitem.pszText = NH_A2W(races[i].noun, wbuf, BUFSZ);
+        lvitem.pszText = NH_A2W(jp_race_noun_for_display(i), wbuf, BUFSZ);
         if (ListView_InsertItem(race_list->hWnd, &lvitem) == -1) {
             panic("メニュー項目を追加できません");
         }
@@ -723,9 +663,8 @@ plselInitDialog(struct plsel_data * data)
     plselAdjustSelections(data->dialog);
 
     /* set tab order */
-
     for (int i = psc_quit_button; i >= psc_name_box; i--) {
-        control = &data->controls[i];
+        control_t *control = &data->controls[i];
         SetWindowPos(control->hWnd, NULL, 0, 0, 0, 0,
                      SWP_NOMOVE | SWP_NOSIZE);
     }
@@ -1056,24 +995,18 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     int i = lpdis->itemID;
 
     const char * string;
-    LPCWSTR localized = NULL;
     WCHAR wbuf[BUFSZ];
 
     boolean ok = TRUE;
     boolean selected;
 
     if (wParam == IDC_PLSEL_ROLE_LIST) {
-        if (flags.female && roles[i].name.f)
-            string = roles[i].name.f;
-        else
-            string = roles[i].name.m;
-        localized = plsel_localize_role(string);
+        string = jp_role_name_for_display(i, flags.female ? 1 : 0);
         selected = (flags.initrole == i);
     } else {
         assert(wParam == IDC_PLSEL_RACE_LIST);
         ok = ok_race(flags.initrole, i, ROLE_RANDOM, ROLE_RANDOM);
-        string = races[i].noun;
-        localized = plsel_localize_race(string);
+        string = jp_race_noun_for_display(i);
         selected = (flags.initrace == i);
     }
 
@@ -1096,12 +1029,8 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     RECT rect = lpdis->rcItem;
     rect.left += 5;
 
-    if (localized)
-        DrawTextW(lpdis->hDC, localized, (int) wcslen(localized), &rect,
-                  DT_LEFT | DT_SINGLELINE | DT_VCENTER);
-    else
-        DrawTextW(lpdis->hDC, NH_A2W(string, wbuf, BUFSZ), (int) wcslen(wbuf),
-                  &rect, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
+    DrawTextW(lpdis->hDC, NH_A2W(string, wbuf, BUFSZ), (int) wcslen(wbuf),
+              &rect, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
 
     if (data->focus == control) {
         if (lpdis->itemState & LVIS_FOCUSED) {

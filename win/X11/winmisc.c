@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* NetHack 5.0	winmisc.c	$NHDT-Date: 1596498374 2020/08/03 23:46:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1242,7 +1243,7 @@ X11_player_selection_prompts(void)
     /* avoid unnecessary prompts further down */
     rigid_role_checks();
 
-    (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
+    (void) jp_root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
                                    flags.initrace, flags.initgend,
                                    flags.initalign);
 
@@ -1315,7 +1316,7 @@ X11_player_selection_prompts(void)
         }
     }
 
-    (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
+    (void) jp_root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
                                    flags.initrace, flags.initgend,
                                    flags.initalign);
 
@@ -1390,7 +1391,7 @@ X11_player_selection_prompts(void)
         } /* more than one race choice available */
     }
 
-    (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
+    (void) jp_root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
                                    flags.initrace, flags.initgend,
                                    flags.initalign);
 
@@ -1462,7 +1463,7 @@ X11_player_selection_prompts(void)
         } /* more than one gender choice available */
     }
 
-    (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
+    (void) jp_root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
                                    flags.initrace, flags.initgend,
                                    flags.initalign);
 

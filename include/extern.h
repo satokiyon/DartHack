@@ -2855,6 +2855,7 @@ extern boolean gotrolefilter(void);
 extern char *rolefilterstring(char *, int) NONNULLARG1;
 extern void clearrolefilter(int);
 extern char *root_plselection_prompt(char *, int, int, int, int, int) NO_NNARGS;
+extern char *jp_root_plselection_prompt(char *, int, int, int, int, int) NO_NNARGS;
 extern char *build_plselection_prompt(char *, int, int, int, int, int) NONNULLARG1;
 extern void plnamesuffix(void);
 extern void select_saved_game(const char *) NONNULLARG1; /* NetHackJP: save data restoration */
