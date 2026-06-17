@@ -1859,6 +1859,70 @@ plnamesuffix(void)
     (void) strNsubst(svp.plname, ",", " ", 0);
 }
 
+/* NetHackJP: save data restoration
+   セーブヘッダのバイナリ情報から属性（職業・種族等）とプレイモードを復旧する。
+   restore_menu() でセーブファイルが選択された直後に呼び出される。 */
+void
+select_saved_game(const char *buffer)
+{
+    char tmpbuf[BUFSZ];
+    int i, namelen;
+
+    /* 名前の終わり（最初の '-' または '\0'）を探す */
+    for (namelen = 0; namelen < PL_NSIZ - 1; ++namelen) {
+        if (buffer[namelen] == '-' || buffer[namelen] == '\0')
+            break;
+    }
+    (void) memcpy(svp.plname, buffer, namelen);
+    svp.plname[namelen] = '\0';
+    gp.plnamelen = 0; /* svp.plname からサフィックスを除去したため */
+
+    /* 49バイトのヘッダ領域全体をスキャンして、属性サフィックスを探す。
+       ハイフン区切り（ Name-Role... ）と NUL 区切り（ Name\0-Role... ）の両方に対応 */
+    for (i = 0; i < PL_NSIZ_PLUS - 1; ++i) {
+        if (buffer[i] == '-') {
+            /* セグメントの開始 */
+            int start = i + 1;
+            int len = 0;
+            /* 次の区切り（'-' または '\0'）までを抽出 */
+            while (start + len < PL_NSIZ_PLUS - 1 && 
+                   buffer[start + len] != '-' && buffer[start + len] != '\0') {
+                len++;
+            }
+            
+            if (len > 0 && len < BUFSZ) {
+                (void) memcpy(tmpbuf, &buffer[start], len);
+                tmpbuf[len] = '\0';
+                
+                int idx;
+                if ((idx = str2role(tmpbuf)) != ROLE_NONE) flags.initrole = idx;
+                else if ((idx = str2race(tmpbuf)) != ROLE_NONE) flags.initrace = idx;
+                else if ((idx = str2gend(tmpbuf)) != ROLE_NONE) flags.initgend = idx;
+                else if ((idx = str2align(tmpbuf)) != ROLE_NONE) flags.initalign = idx;
+            }
+            /* このセグメントをスキップ。次の '-' 探しへ。
+               len が 0 の場合（連なった '-' 等）も考慮 */
+            i = start + (len > 0 ? len - 1 : 0);
+        }
+    }
+
+    /* プレイモード (通常/ウィザード/探索) を復元。
+       PL_NSIZ_PLUS - 1 (48バイト目) に記録されている。 */
+    char mode = buffer[PL_NSIZ_PLUS - 1];
+    if (mode == 'D') {
+        wizard = TRUE;
+        discover = iflags.deferred_X = FALSE;
+    } else if (mode == 'X') {
+        discover = TRUE;
+        wizard = iflags.deferred_X = FALSE;
+    } else {
+        wizard = discover = iflags.deferred_X = FALSE;
+    }
+
+    /* システム状態を確定させる */
+    set_playmode();
+}
+
 /* show current settings for name, role, race, gender, and alignment
    in the specified window */
 void

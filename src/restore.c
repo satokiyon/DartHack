@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
 /* NetHack 5.0	restore.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.234 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -1627,7 +1627,8 @@ restore_menu(
         if (select_menu(tmpwin, PICK_ONE, &chosen_game) > 0) {
             ch = chosen_game->item.a_int;
             if (ch > 0)
-                Strcpy(svp.plname, saved[ch - 1]);
+                /* NetHackJP: save data restoration */
+                select_saved_game(saved[ch - 1]);
             else if (ch < 0)
                 ++ch; /* -1 -> 0 (new game), -2 -> -1 (quit) */
             free((genericptr_t) chosen_game);
