@@ -307,6 +307,7 @@ OPTIONS=autodescribe
 
 OPTIONS=price_quotes
 OPTIONS=hilite_pile
+OPTIONS=selectsaved
 
 
 ### 効果音の設定
