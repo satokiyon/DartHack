@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-18. */
 /* NetHack 5.0	role.c	$NHDT-Date: 1737607158 2025/01/22 20:39:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.107 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1896,8 +1896,6 @@ plnamesuffix(void)
            名前が空（Enterのみ）で戻ってきた場合は、設定に関わらずセーブ選択を表示する。 */
         if (skip_select)
             iflags.wc2_selectsaved = FALSE;
-        else if (!svp.plname[0])
-            iflags.wc2_selectsaved = TRUE;
         else
             iflags.wc2_selectsaved = save_selectsaved;
 
