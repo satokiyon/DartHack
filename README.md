@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-18. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsのみ)
@@ -143,7 +143,7 @@ OPTIONS=align_status:right,msw_stat_cols:15
 ### 6. セーブデータ一覧画面の表示とロード(NetHackJP独自機能)
 ゲーム起動時に、セーブファイルが存在すればファイル一覧を表示し、その中から選択してゲームを再開できます。
 
-オリジナルでは、名前を入力する際に空入力(Enterを押すだけなど)を10回繰り返すと、セーブファイル一覧が表示されていましたが、NetHackJPでは最初から(または空入力を1回だけで)セーブデータを選択する画面を表示するようにしました。
+名前を入力する際に空入力(Enterを押すだけなど)を10回繰り返すと、セーブファイル一覧が表示されます。
 
 また、セーブデータから職業、種別、性別、属性を読み取るようにしました。オリジナルでは名前だけしか読めない場合があったのを暫定処置的に修正しています。なお、オリジナルがこの処理を変更・修正されればそれに追従する予定です。詳細は[DEVELOPMENT.md](DEVELOPMENT.md)に記載しています。
 

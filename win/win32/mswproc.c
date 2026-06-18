@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-18. */
 /* NetHack 5.0	mswproc.c	$NHDT-Date: 1717967341 2024/06/09 21:09:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.193 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -684,6 +684,7 @@ prompt_for_player_selection(void)
 void
 mswin_askname(void)
 {
+    int tryct = 0;
     logDebug("mswin_askname()\n");
 
 #ifdef SELECTSAVED
@@ -700,10 +701,32 @@ mswin_askname(void)
     }
 #endif
 
-    if (mswin_getlin_window("お名前は?", svp.plname, PL_NSIZ) == IDCANCEL) {
-        bail("終了");
-        /* not reached */
-    }
+    do {
+        if (++tryct > 1) {
+            if (tryct > 10) {
+#ifdef SELECTSAVED
+                switch (restore_menu(WIN_ERR)) {
+                case -1:
+                    bail("終了");
+                    return;
+                case 1:
+                    return; /* svp.plname[] has been set */
+                case 0:
+                    tryct = 0; /* start new game, retry */
+                    break;
+                }
+                if (tryct == 0) continue;
+#else
+                bail("10回試行しましたが、中断します。\n");
+                return;
+#endif
+            }
+        }
+        if (mswin_getlin_window("お名前は?", svp.plname, PL_NSIZ) == IDCANCEL) {
+            svp.plname[0] = '\0'; /* Treat cancel as empty input to trigger retry */
+        }
+        (void) mungspaces(svp.plname);
+    } while (!svp.plname[0]);
 }
 
 /* Does window event processing (e.g. exposure events).

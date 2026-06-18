@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-18. */
 /* NetHack 5.0	wintty.c	$NHDT-Date: 1737691300 2025/01/23 20:01:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.420 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -697,8 +697,24 @@ tty_askname(void)
     tty_putstr(BASE_WINDOW, 0, "");
     do {
         if (++tryct > 1) {
-            if (tryct > 10)
+            if (tryct > 10) {
+#ifdef SELECTSAVED
+                switch (restore_menu(BASE_WINDOW)) {
+                case -1:
+                    bail("またお会いしましょう..."); /* quit */
+                    /*NOTREACHED*/
+                    break;
+                case 0:
+                    tryct = 0; /* start new game, retry */
+                    break;
+                case 1:
+                    return; /* svp.plname[] has been set */
+                }
+                if (tryct == 0) continue;
+#else
                 bail("10回試行しましたが、中断します。\n");
+#endif
+            }
             tty_curs(BASE_WINDOW, 1, wins[BASE_WINDOW]->cury - 1);
             tty_putstr(BASE_WINDOW, 0, "Enter a name for your character...");
             /* erase previous prompt (in case of ESC after partial response) */

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-18. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmain.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -317,6 +317,8 @@ curses_player_selection(void)
 void
 curses_askname(void)
 {
+    int tryct = 0;
+
 #ifdef SELECTSAVED
     if (iflags.wc2_selectsaved && !iflags.renameinprogress)
         switch (restore_menu(MAP_WIN)) {
@@ -329,10 +331,30 @@ curses_askname(void)
         }
 #endif /* SELECTSAVED */
 
-    curses_line_input_dialog("お名前は？", svp.plname, PL_NSIZ);
-    (void) mungspaces(svp.plname);
-    if (svp.plname[0] == '\033')
-         goto bail;
+    do {
+        if (++tryct > 1) {
+            if (tryct > 10) {
+#ifdef SELECTSAVED
+                switch (restore_menu(MAP_WIN)) {
+                case -1: /* quit */
+                    goto bail;
+                case 0: /* new game */
+                    tryct = 0;
+                    break;
+                case 1: /* picked a save file */
+                    return;
+                }
+                if (tryct == 0) continue;
+#else
+                goto bail;
+#endif
+            }
+        }
+        curses_line_input_dialog("お名前は？", svp.plname, PL_NSIZ);
+        (void) mungspaces(svp.plname);
+        if (svp.plname[0] == '\033')
+             svp.plname[0] = '\0'; /* Treat ESC as empty to trigger retry */
+    } while (!svp.plname[0]);
 
     iflags.renameallowed = TRUE; /* tty uses this, we don't [yet?] */
     return;
