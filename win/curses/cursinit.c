@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-20. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursinit.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -8,6 +8,7 @@
 #include "hack.h"
 #include "wincurs.h"
 #include "cursinit.h"
+#include "cursmisc.h"
 
 /* Initialization and startup functions for curses interface */
 
@@ -335,18 +336,18 @@ curses_init_nhcolors(void)
     /* COLOR_foo + 8 means COLOR | A_BOLD when COLORS < 16 */
     /* otherwise assume the terminal has least 16 different colors */
     /* these map to the NetHack CLR_ defines */
-    static const int fg_clr[16] = {
+    static const int basic_fg_clr[16] = {
         COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
         COLOR_BLUE,  COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE,
         -1, COLOR_RED + 8, COLOR_GREEN + 8, COLOR_YELLOW + 8,
         COLOR_BLUE + 8, COLOR_MAGENTA + 8, COLOR_CYAN + 8, COLOR_WHITE + 8
     };
-    static const int bg_clr[8] = {
+    static const int bg_clr[CURSES_NUM_BACKGROUND_COLORS] = {
         -1, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
         COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE
     };
     int bg, nhclr;
-    int maxc = (COLORS >= 16) ? 16 : 8;
+    int maxc = curses_has_256color() ? 256 : (COLORS >= 16) ? 16 : 8;
 
     if (!has_colors())
         return;
@@ -354,8 +355,9 @@ curses_init_nhcolors(void)
     use_default_colors();
 
     for (nhclr = CLR_BLACK; nhclr < maxc; nhclr++) {
-        for (bg = 0; bg < 8; bg++) {
-            init_pair((maxc * bg) + nhclr + 1, fg_clr[nhclr], bg_clr[bg]);
+        for (bg = 0; bg < CURSES_NUM_BACKGROUND_COLORS; bg++) {
+            int fg_color = (nhclr < 16) ? basic_fg_clr[nhclr] : nhclr;
+            init_pair((maxc * bg) + nhclr + 1, fg_color, bg_clr[bg]);
         }
     }
 

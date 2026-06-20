@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-20.
 NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.36 $ $NHDT-Date: 1781062909 2026/06/09 19:41:49 $
 	
 General Fixes and Modified Features
@@ -62,6 +62,8 @@ fix a bug in which steeds would continuously gain movement points while
         being ridden
 when hero's behavior makes erinyes stronger, cap level at 49 rather than 50
 with inventory item action for leash, distingluish leash-in-use from empty one
+deafness check was missing from a shopkeeper message in ready_weapon()
+thrown ball travel did not check for regions (pr #1595 by copperwater)
 
 
 Platform- and/or Interface-Specific Fixes
