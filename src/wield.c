@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-20. */
 /* NetHack 5.0	wield.c	$NHDT-Date: 1707525193 2024/02/10 00:33:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
@@ -276,8 +276,13 @@ ready_weapon(struct obj *wep)
 
             if ((this_shkp = shop_keeper(inside_shop(u.ux, u.uy)))
                 != (struct monst *) 0) {
+                /* check msound because we don't have access to muteshk() */
+                if (!Deaf && this_shkp->data->msound > MS_ANIMAL)
                 pline("%sが警告した: \"うちの%sは丁寧に扱ってくれ!\"",
                       jp_shkname_for_display(this_shkp), xname(wep));
+                else
+                    pline("%sはあなたが%sを装備するのを心配しているようだ.",
+                          jp_shkname_for_display(this_shkp), xname(wep));
             }
         }
     }

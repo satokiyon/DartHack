@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-20. */
 /* NetHack 5.0	ball.c	$NHDT-Date: 1596498150 2020/08/03 23:42:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) David Cohrs, 2006. */
@@ -809,7 +809,8 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
                     miss(xname(uball), victim);
 
             } /* now check again in case mon died */
-            if (!m_at(uchain->ox, uchain->oy)) {
+            if (!m_at(uchain->ox, uchain->oy)
+                && in_out_region(uchain->ox, uchain->oy)) {
                 u.ux = uchain->ox;
                 u.uy = uchain->oy;
                 newsym(u.ux0, u.uy0);
@@ -821,6 +822,9 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
             *ballx = uchain->ox;
             *bally = uchain->oy;
             move_bc(0, *bc_control, *ballx, *bally, *chainx, *chainy);
+            /* weirdness: you were dragged back on account of the ball falling
+             * into the pit, but if you escape the pit, the ball is "on top of"
+             * the pit and does not hinder your movement further */
             spoteffects(TRUE);
             return FALSE;
         }
@@ -933,10 +937,11 @@ drop_ball(coordxy x, coordxy y)
             && (is_pool(x, y)
                 || ((t = t_at(x, y))
                     && (is_pit(t->ttyp)
-                        || is_hole(t->ttyp))))) {
+                        || is_hole(t->ttyp))))
+            && in_out_region(x, y)) {
             u.ux = x;
             u.uy = y;
-        } else {
+        } else if (in_out_region(x - u.dx, y - u.dy)) {
             u.ux = x - u.dx;
             u.uy = y - u.dy;
         }
