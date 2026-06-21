@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-18. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
 /* NetHack 5.0	wintty.c	$NHDT-Date: 1737691300 2025/01/23 20:01:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.420 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -677,7 +677,7 @@ tty_askname(void)
 {
     static const char who_are_you[] = "お名前は? ";
     int prompt_cols;
-    int c, ct, tryct = 0;
+    int c = 0, ct = 0, tryct = 0;
     uint8 utf8buf[8];
 
 #ifdef SELECTSAVED
@@ -716,7 +716,7 @@ tty_askname(void)
 #endif
             }
             tty_curs(BASE_WINDOW, 1, wins[BASE_WINDOW]->cury - 1);
-            tty_putstr(BASE_WINDOW, 0, "Enter a name for your character...");
+            tty_putstr(BASE_WINDOW, 0, "主人公の名前を入力してください...");
             /* erase previous prompt (in case of ESC after partial response) */
             tty_curs(BASE_WINDOW, 1, wins[BASE_WINDOW]->cury), cl_end();
         }
