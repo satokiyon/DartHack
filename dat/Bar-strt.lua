@@ -1,4 +1,5 @@
--- NetHack Barbarian Bar-strt.lua	$NHDT-Date: 1652196001 2022/05/10 15:20:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
+-- NetHack Barbarian Bar-strt.lua	$NHDT-Date: 1781994865 2026/06/20 22:34:25 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.

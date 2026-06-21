@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
-/* NetHack 5.0	dlb_main.c	$NHDT-Date: 1706213798 2024/01/25 20:16:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.27 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* NetHack 5.0	dlb_main.c	$NHDT-Date: 1706213798 2024/01/25 20:16:38 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,5 @@
-/* NetHack 5.0	micro.h	$NHDT-Date: 1596498546 2020/08/03 23:49:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* NetHack 5.0	micro.h	$NHDT-Date: 1781973082 2026/06/20 16:31:22 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.14 $ */
 /*      Copyright (c) 2015 by Kenneth Lorber              */
 /* NetHack may be freely redistributed.  See license for details. */
 

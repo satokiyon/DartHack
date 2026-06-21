@@ -1,4 +1,5 @@
-/* NetHack 5.0	nhregex.h	$NHDT-Date: $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* NetHack 5.0	nhregex.h	$NHDT-Date: $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef NHREGEX_H

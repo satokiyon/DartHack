@@ -1,5 +1,5 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-15.
--- NetHack endgame air.lua	$NHDT-Date: 1652196019 2022/05/10 15:20:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
+-- NetHack endgame air.lua	$NHDT-Date: 1781994877 2026/06/20 22:34:37 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.3 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992,1993 by Izchak Miller, David Cohrs,
 --                      and Timo Hakulinen
