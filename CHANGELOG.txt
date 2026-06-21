@@ -1,2 +1,1 @@
-- added a way to import/export settings (including the nethackrc) in the settings menu.
-
+- save files are now backed up each time they are loaded. This is in case a save file becomes corrupted (i.e when android kills the app in the middle of saving), you can just use the last successful restore

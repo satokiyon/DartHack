@@ -6,6 +6,8 @@
 #include "dlb.h"
 #include <setjmp.h>
 
+#include <errno.h>
+#include <sys/mman.h>
 #include <sys/stat.h>
 #include <pwd.h>
 #ifndef O_RDONLY
@@ -179,7 +181,26 @@ int NetHackMain(int argc, char** argv)
 		boolean remember_wiz_mode = wizard;
 #endif
 		const char *fq_save = fqname(gs.SAVEF, SAVEPREFIX, 1);
-
+		int fq_save_fd = open(fq_save, O_RDONLY);
+		if (fq_save_fd == -1) {
+			debuglog("failed to open save file: %s", strerror(errno));
+			goto backup_error;
+		}
+		struct stat sb;
+		if (fstat(fq_save_fd, &sb) < 0) {
+			debuglog("failed to stat save file: %s", strerror(errno));
+			goto backup_error;
+		}
+		size_t fq_save_length = sb.st_size;
+		char *fq_save_contents = mmap(NULL, fq_save_length, PROT_READ, MAP_PRIVATE,  fq_save_fd, 0);
+		if (fq_save_contents == MAP_FAILED) {
+			debuglog("failed to mmap save file: %s", strerror(errno));
+			goto backup_error;
+		} else goto backup_clean;
+backup_error:
+		debuglog("WARNING: failed to make a backup save file. See messages above for more info.");
+backup_clean:
+		if (fq_save_fd != -1) close(fq_save_fd);
 #ifdef NEWS
 		if(iflags.news)
 		{
@@ -192,8 +213,46 @@ int NetHackMain(int argc, char** argv)
         else
             pline("Restoring save file...");
 		mark_synch(); /* flush output */
-		if(!dorecover(nhfp))
+		if(!dorecover(nhfp)) {
+			pline("You may have a backup save file in your save directory. Make a backup and then remove the .bak suffix and restart the app to try again.");
+			pline("if you have any questions, open up a github issue, I would be happy to help. Unfortunately this process is probably not automatable in a good way.");
 			goto not_recovered;
+		}
+		if (fq_save_contents) {
+			char *fq_save_backup = (char *)alloc(strlen(fq_save) + 4 + 1);
+			if (!fq_save_backup) {
+				debuglog("OOM");
+				goto write_backup_error;
+			}
+			Sprintf(fq_save_backup, "%s.bak", fq_save);
+			int fq_save_backup_fd = creat(fq_save_backup, FCMASK);
+			if (fq_save_backup_fd == -1) {
+				debuglog("failed to open save backup file: %s", strerror(errno));
+				goto write_backup_error;
+			}
+			size_t written_total = 0;
+			while (written_total < fq_save_length) {
+				ssize_t written_just_now = write(fq_save_backup_fd, fq_save_contents + written_total, fq_save_length - written_total);
+				if (written_just_now < 0) {
+					if (errno == EINTR) continue;
+					debuglog("failed to write backup file: %s", strerror(errno));
+					goto write_backup_error;
+				} else if (written_just_now == 0) {
+					debuglog("unexpected EOF in save file when writing backup save file");
+					goto write_backup_error;
+				} else {
+					written_total += written_just_now;
+				}
+			}
+			debuglog("finished writing backup file");
+			goto write_backup_cleanup;
+write_backup_error:
+			debuglog("WARNING: failed to write a backup save file. See logs above for more information");
+write_backup_cleanup:
+			munmap(fq_save_contents, fq_save_length);
+			if (fq_save_backup) free(fq_save_backup);
+			if (fq_save_backup_fd) close(fq_save_backup_fd);
+		}
 		resuming = TRUE;
 #ifdef WIZARD
 		if(!wizard && remember_wiz_mode)
