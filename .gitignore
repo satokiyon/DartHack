@@ -129,3 +129,8 @@ tools/
 .nethackrc
 GEMINI.md
 
+.github/context-mode/
+.github/hooks/
+.vscode/
+
+
