@@ -1,4 +1,5 @@
-/* NetHack 3.6	macpopup.h	$NHDT-Date: 1596498542 2020/08/03 23:49:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* NetHack 3.6	macpopup.h	$NHDT-Date: 1596498542 2020/08/03 23:49:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Nethack Development Team, 1999.		*/
 /* NetHack may be freely redistributed.  See license for details. */
 

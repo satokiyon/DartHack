@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-06. */
-/* NetHack 5.0	wintty.h	$NHDT-Date: 1656014599 2022/06/23 20:03:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* NetHack 5.0	wintty.h	$NHDT-Date: 1781973092 2026/06/20 16:31:32 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) David Cohrs, 1991,1992                           */
 /* NetHack may be freely redistributed.  See license for details. */
 

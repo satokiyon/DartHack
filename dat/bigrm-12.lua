@@ -1,4 +1,5 @@
--- NetHack bigroom bigrm-12.lua	$NHDT-Date: $  $NHDT-Branch: NetHack-3.7 $
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
+-- NetHack bigroom bigrm-12.lua	$NHDT-Date: $  $NHDT-Branch: NetHack-5.0 $
 --	Copyright (c) 2024 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
 --
