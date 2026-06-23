@@ -837,7 +837,7 @@ polymon(int mntmp)
     }
 
     if (Stone_resistance && Stoned) { /* parnes@eniac.seas.upenn.edu */
-        make_stoned(0L, "You no longer seem to be petrifying.", 0,
+        make_stoned(0L, "石化が止まったようだ.", 0,
                     (char *) 0);
     }
     if (Sick_resistance && Sick) {
@@ -846,7 +846,7 @@ polymon(int mntmp)
     }
     if (Slimed) {
         if (flaming(gy.youmonst.data)) {
-            make_slimed(0L, "The slime burns away!");
+            make_slimed(0L, "体を覆うスライムは焼き払われた!");
         } else if (mntmp == PM_GREEN_SLIME) {
             /* do it silently */
             make_slimed(0L, (char *) 0);
