@@ -1,1 +1,1 @@
-- save files are now backed up each time they are loaded. This is in case a save file becomes corrupted (i.e when android kills the app in the middle of saving), you can just use the last successful restore
+- android 2.1 support was added back since people were requesting it. I'm not sure how maintainable it will be forever, but for now, no code had to change so it's definitely doable. When we move to jetpack compose, this will probably need to be dropped (likely in its own branch that gets bug fixes and stuff but no major updates)
