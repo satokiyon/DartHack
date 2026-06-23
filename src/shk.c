@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	shk.c	$NHDT-Date: 1781973066 2026/06/20 16:31:06 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.323 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -709,9 +709,10 @@ rob_shop(struct monst *shkp)
     /* by this point, we know an actual robbery has taken place */
     eshkp->robbed += total;
     You("商品を%ld %s分盗んだ.", total, currency(total));
-    livelog_printf(LL_ACHIEVE, "stole %ld %s worth of merchandise from %s %s",
-                   total, currency(total), s_suffix(jp_shkname_for_display(shkp)),
-                   jp_shoptype_name_for_display(eshkp->shoptype - SHOPBASE));
+    livelog_printf(LL_ACHIEVE, "%sの%sから %ld %s分の商品を盗み出した",
+                   jp_shkname_for_display(shkp),
+                   jp_shoptype_name_for_display(eshkp->shoptype - SHOPBASE),
+                   total, currency(total));
 
     if (!Role_if(PM_ROGUE)) /* stealing is unlawful */
         adjalign(-sgn(u.ualign.type));

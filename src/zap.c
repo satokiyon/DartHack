@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	zap.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.596 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -2198,8 +2198,7 @@ bhito(struct obj *obj, struct obj *otmp)
             }
             /* KMH, conduct */
             if (!u.uconduct.polypiles++)
-                livelog_printf(LL_CONDUCT, "polymorphed %s first object",
-                               uhis());
+                livelog_printf(LL_CONDUCT, "初めてオブジェクトをポリモーフした");
 
             /* any saved lock context will be dangerously obsolete */
             if (Is_box(obj))
@@ -6369,7 +6368,7 @@ makewish(void)
     } else if (otmp == &nothing) {
         /* explicitly wished for "nothing", presumably attempting
            to retain wishless conduct */
-        livelog_printf(LL_WISH, "declined to make a wish");
+        livelog_printf(LL_WISH, "願い事をするのを拒否した");
         return;
     } else if (otmp == &hands_obj) {
         wish_history_add(bufcpy);
@@ -6385,16 +6384,16 @@ makewish(void)
 
     /* wisharti conduct handled in readobjnam() */
     maybe_LL_arti = ((oldwisharti < u.uconduct.wisharti) ? LL_ARTIFACT : 0L);
-    Snprintf(wish, sizeof wish, "\"%s\", got \"%s\"", bufcpy, doname(otmp));
+    Snprintf(wish, sizeof wish, "願ったのは\"%s\"、手に入れたのは\"%s\"", bufcpy, doname(otmp));
     /* KMH, conduct */
     if (!u.uconduct.wishes++)
         livelog_printf((LL_CONDUCT | LL_WISH | maybe_LL_arti),
-                       "made %s first wish - %s", uhis(), wish);
+                       "初めて願い事をした - %s", wish);
     else if (!oldwisharti && u.uconduct.wisharti)
         livelog_printf((LL_CONDUCT | LL_WISH | LL_ARTIFACT),
-                       "made %s first artifact wish - %s", uhis(), wish);
+                       "初めてアーティファクトを願った - %s", wish);
     else
-        livelog_printf((LL_WISH | maybe_LL_arti), "wished for %s", wish);
+        livelog_printf((LL_WISH | maybe_LL_arti), "%s", wish);
     /* TODO? maybe generate a second event describing what was received since
        these just echo player's request rather than show actual result */
 

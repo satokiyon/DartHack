@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.645 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -7124,8 +7124,8 @@ maybe_finish_sokoban(void)
             /* log the completion event regardless of whether or not
                any normal in-game feedback has just been given */
             livelog_printf(LL_MINORAC | LL_DUMP,
-                           "completed %d%s Sokoban level",
-                           sokonum, ordin(sokonum));
+                           "倉庫番の第 %d 階層をクリアした",
+                           sokonum);
         }
     }
 }

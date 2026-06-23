@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	read.c	$NHDT-Date: 1781973063 2026/06/20 16:31:03 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.333 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -565,7 +565,7 @@ doread(void)
         if (!Blind)
             if (!u.uconduct.literate++)
                 livelog_printf(LL_CONDUCT,
-                               "became literate by reading a fortune cookie");
+                               "フォーチュンクッキーを読むことで、読み書きができるようになった");
         useup(scroll);
         return ECMD_TIME;
     } else if (otyp == T_SHIRT || otyp == ALCHEMY_SMOCK
@@ -592,9 +592,9 @@ doread(void)
             return ECMD_TIME;
         }
         if (!u.uconduct.literate++)
-            livelog_printf(LL_CONDUCT, "became literate by reading %s",
-                           (scroll->otyp == T_SHIRT) ? "a T-shirt"
-                           : "an apron");
+            livelog_printf(LL_CONDUCT, "%sを読むことで、読み書きができるようになった",
+                           (scroll->otyp == T_SHIRT) ? "Tシャツ"
+                           : "エプロン");
 
         /* populate 'buf[]' */
         mesg = (otyp == T_SHIRT) ? jp_tshirt_text_for_display(scroll, buf)
@@ -685,7 +685,7 @@ doread(void)
               (flags.verbose || Blind) ? "." : "");
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                           "became literate by reading a credit card");
+                           "クレジットカードを読むことで、読み書きができるようになった");
 
         return ECMD_TIME;
     } else if (otyp == CAN_OF_GREASE) {
@@ -712,7 +712,7 @@ doread(void)
               upwords(buf));
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                           "became literate by reading a magic marker");
+                           "魔法のマーカーを読むことで、読み書きができるようになった");
 
         return ECMD_TIME;
     } else if (scroll->oclass == COIN_CLASS) {
@@ -723,7 +723,7 @@ doread(void)
         pline("\"1 Zorkmid.  857 GUE.  我らは Frobs を信ず.\"");
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                           "became literate by reading a coin's engravings");
+                           "硬貨の刻印を読むことで、読み書きができるようになった");
 
         return ECMD_TIME;
     } else if (is_art(scroll, ART_ORB_OF_FATE)) {
@@ -734,7 +734,7 @@ doread(void)
         pline("\"オーディン.\"");
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                   "became literate by reading the divine signature of Odin");
+                   "オーディンの神聖な署名を読むことで、読み書きができるようになった");
 
         return ECMD_TIME;
     } else if (otyp == CANDY_BAR) {
@@ -751,7 +751,7 @@ doread(void)
         pline("包み紙にはこう書かれている: \"%s\".", wrapper);
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                           "became literate by reading a candy bar wrapper");
+                           "キャンディバーの包み紙を読むことで、読み書きができるようになった");
 
         return ECMD_TIME;
     } else if (scroll->oclass != SCROLL_CLASS
@@ -800,10 +800,10 @@ doread(void)
     if (otyp != SPE_BOOK_OF_THE_DEAD && otyp != SPE_NOVEL
         && otyp != SPE_BLANK_PAPER && otyp != SCR_BLANK_PAPER)
         if (!u.uconduct.literate++)
-            livelog_printf(LL_CONDUCT, "became literate by reading %s",
-                           (scroll->oclass == SPBOOK_CLASS) ? "a book"
-                           : (scroll->oclass == SCROLL_CLASS) ? "a scroll"
-                             : something);
+            livelog_printf(LL_CONDUCT, "%sを読むことで、読み書きができるようになった",
+                           (scroll->oclass == SPBOOK_CLASS) ? "本"
+                           : (scroll->oclass == SCROLL_CLASS) ? "巻物"
+                             : "何か物");
 
     if (scroll->oclass == SPBOOK_CLASS) {
         return study_book(scroll) ? ECMD_TIME : ECMD_OK;
@@ -2881,7 +2881,7 @@ do_class_genocide(void)
         if (*buf == '\033' || !strcmpi(buf, "none")
             || !strcmpi(buf, "'none'") || !strcmpi(buf, "nothing")) {
             livelog_printf(LL_GENOCIDE,
-                           "declined to perform class genocide");
+                           "怪物クラスの虐殺を行うのを拒否した");
             return;
         }
         /* "?" runs #genocided to show existing genocides, then re-prompts;
@@ -2948,10 +2948,10 @@ do_class_genocide(void)
                     if (!ll_done++) {
                         if (!num_genocides())
                             livelog_printf(LL_CONDUCT | LL_GENOCIDE,
-                                     "performed %s first genocide (class %c)",
-                                           uhis(), def_monsyms[class].sym);
+                                           "初めて虐殺を行った（怪物クラス'%c'）",
+                                           def_monsyms[class].sym);
                         else
-                            livelog_printf(LL_GENOCIDE, "genocided class %c",
+                            livelog_printf(LL_GENOCIDE, "怪物クラス'%c'を虐殺した",
                                            def_monsyms[class].sym);
                     }
 
@@ -3086,7 +3086,7 @@ do_genocide(
                 if (!(how & REALLY) && (ptr = rndmonst()) != 0)
                     break; /* remaining checks don't apply */
 
-                livelog_printf(LL_GENOCIDE, "declined to perform genocide");
+                livelog_printf(LL_GENOCIDE, "虐殺を行うのを拒否した");
                 return;
             }
             /* "?" or "'?'" runs #genocided to show existing genocides */
@@ -3164,10 +3164,10 @@ do_genocide(
     if (how & REALLY) {
         if (!num_genocides())
             livelog_printf(LL_CONDUCT | LL_GENOCIDE,
-                           "performed %s first genocide (%s)",
-                           uhis(), makeplural(realbuf));
+                           "初めて虐殺（%s）を行った",
+                           jp_pmname(ptr, NEUTRAL));
         else
-            livelog_printf(LL_GENOCIDE, "genocided %s", makeplural(realbuf));
+            livelog_printf(LL_GENOCIDE, "%sを虐殺した", jp_pmname(ptr, NEUTRAL));
 
         /* setting no-corpse affects wishing and random tin generation */
         svm.mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE);

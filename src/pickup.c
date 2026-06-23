@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	pickup.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.397 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2683,7 +2683,7 @@ in_container(struct obj *obj)
             (void) stop_timer(SHRINK_GLOB, obj_to_any(obj));
         }
     } else if (Is_mbag(gc.current_container) && mbag_explodes(obj, 0)) {
-        livelog_printf(LL_ACHIEVE, "just blew up %s bag of holding", uhis());
+        livelog_printf(LL_ACHIEVE, "軽量化の袋を爆発させてしまった");
         /* explicitly mention what item is triggering the explosion */
         urgent_pline(
               "%sを入れた瞬間、魔法の爆発に巻き込まれた!",
@@ -3825,8 +3825,7 @@ tipcontainer(struct obj *box) /* or bag */
             if (targetbox) {
                 if (Is_mbag(targetbox) && mbag_explodes(otmp, 0)) {
                     livelog_printf(LL_ACHIEVE,
-                                 "just blew up %s bag of holding via tipping",
-                                   uhis());
+                                 "中身をぶちまけることで軽量化の袋を爆発させてしまった");
                     /* explicitly mention what item is triggering explosion */
                     urgent_pline(
                    "%sが中へ%s込んだ瞬間、魔法の爆発に巻き込まれた!",

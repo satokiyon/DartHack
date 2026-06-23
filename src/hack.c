@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	hack.c	$NHDT-Date: 1781973050 2026/06/20 16:30:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.508 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -720,12 +720,12 @@ still_chewing(coordxy x, coordxy y)
     /* Okay, you've chewed through something */
     if (!u.uconduct.food++)
         livelog_printf(LL_CONDUCT,
-                       "ate for the first time, by chewing through %s",
-                       boulder ? "a boulder"
-                       : IS_TREE(lev->typ) ? "a tree"
-                         : IS_OBSTRUCTED(lev->typ) ? "rock"
-                           : (lev->typ == IRONBARS) ? "iron bars"
-                             : "a door");
+                       "初めて食事をした - %sを噛み砕くことで",
+                       boulder ? "岩"
+                       : IS_TREE(lev->typ) ? "木"
+                         : IS_OBSTRUCTED(lev->typ) ? "石"
+                           : (lev->typ == IRONBARS) ? "鉄格子"
+                             : "扉");
     u.uhunger += rnd(20);
 
     if (boulder) {
@@ -2198,7 +2198,7 @@ domove_swap_with_pet(
                 int tmp, mndx;
 
                 if (!u.uconduct.killer++)
-                    livelog_printf(LL_CONDUCT, "killed for the first time");
+                    livelog_printf(LL_CONDUCT, "初めて獲物を倒した");
                 mndx = monsndx(mtmp->data);
                 tmp = experience(mtmp, (int) svm.mvitals[mndx].died);
                 more_experienced(tmp, 0);

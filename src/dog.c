@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	dog.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.197 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -82,8 +82,8 @@ initedog(struct monst *mtmp, boolean everything)
          * from a figurine or some other method in which it was created tame
          * using an() is safe unless it somehow becomes possible to tame a
          * unique monster */
-        livelog_printf(LL_CONDUCT, "obtained %s first pet (%s)",
-                       uhis(), an(mon_pmname(mtmp)));
+        livelog_printf(LL_CONDUCT, "初めてペット（%s）を手に入れた",
+                       jp_pmname(mtmp->data, Mgender(mtmp)));
     }
     u.uconduct.pets++;
 }
