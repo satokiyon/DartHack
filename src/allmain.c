@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	allmain.c	$NHDT-Date: 1781973040 2026/06/20 16:30:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.304 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -966,8 +966,8 @@ welcome(boolean new_game) /* false => restoring an old game */
 
     if (new_game) {
         /* guarantee that 'major' event category is never empty */
-        livelog_printf(LL_ACHIEVE, "%s the%s entered the dungeon",
-                       svp.plname, buf);
+        livelog_printf(LL_ACHIEVE, "%s%sがダンジョンに入った",
+                       svp.plname, (*buf == ' ') ? buf + 1 : buf);
     } else {
         /* if restoring in Gehennom, give same hot/smoky message as when
            first entering it */

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	do_name.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.339 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -417,11 +417,11 @@ oname(
             /* violate illiteracy conduct since successfully wrote arti-name */
             if (!u.uconduct.literate++)
                 livelog_printf(LL_CONDUCT | LL_ARTIFACT,
-                               "became literate by naming %s",
+                               "%sと命名することで読み書きができるようになった",
                                bare_artifactname(obj));
             else
                 livelog_printf(LL_ARTIFACT,
-                               "chose %s to be named \"%s\"",
+                               "%sの名前を\"%s\"に指定した",
                                ansimpleoname(obj), bare_artifactname(obj));
         }
     }

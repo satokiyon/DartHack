@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	pray.c	$NHDT-Date: 1781973062 2026/06/20 16:31:02 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.253 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -839,7 +839,7 @@ gcrownu(void)
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("汝に冠を授けよう……エルベレスの御手よ！");
         livelog_printf(LL_DIVINEGIFT,
-                       "was crowned \"The Hand of Elbereth\" by %s",
+                       "%sより\"エルベレスの御手\"の戴冠を受けた",
                        u_gname());
         break;
     case A_NEUTRAL:
@@ -849,8 +849,8 @@ gcrownu(void)
                                         artiname(ART_VORPAL_BLADE));
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("汝は我がバランスの使者となれ！");
-        livelog_printf(LL_DIVINEGIFT, "became %s Envoy of Balance",
-                       s_suffix(u_gname()));
+        livelog_printf(LL_DIVINEGIFT, "%sのバランスの使者となった",
+                       u_gname());
         break;
     case A_CHAOTIC:
         u.uevent.uhand_of_elbereth = 3;
@@ -864,8 +864,9 @@ gcrownu(void)
         verbalize("汝は我が栄光のために%sよう選ばれた！",
                   (((already_exists && !in_hand) || class_gift != STRANGE_OBJECT)
                        ? "命を奪う" : "魂を奪う"));
-        livelog_printf(LL_DIVINEGIFT, "was chosen to %s for the Glory of %s",
-                       what, u_gname());
+        livelog_printf(LL_DIVINEGIFT, "%sの栄光のために%sよう選ばれた",
+                       u_gname(),
+                       (strcmp(what, "take lives") == 0) ? "命を奪う" : "魂を奪う");
         break;
     }
 
@@ -887,7 +888,7 @@ gcrownu(void)
         /* not an artifact, but treat like one for this situation;
            classify as a spoiler in case player hasn't IDed the book yet */
         livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT | LL_SPOILER,
-                       "was bestowed with %s", bbuf);
+                       "%sを授かった", bbuf);
 
         /* when getting a new book for known spell, enhance
            currently wielded weapon rather than the book */
@@ -910,8 +911,8 @@ gcrownu(void)
             if (is_art(obj, ART_EXCALIBUR)) {
                 u.ugifts++;
                 livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
-                               "had %s wielded %s transformed into %s",
-                               uhis(), lbuf, artiname(ART_EXCALIBUR));
+                               "装備していた%sが%sへと変化した",
+                               lbuf, artiname(ART_EXCALIBUR));
             }
         }
         /* acquire Excalibur's skill regardless of weapon or gift */
@@ -934,7 +935,7 @@ gcrownu(void)
         dropy(obj);
         u.ugifts++;
         livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
-                       "was bestowed with %s",
+                       "%sを授かった",
                        artiname(ART_VORPAL_BLADE));
     }
     /* acquire Vorpal Blade's skill regardless of weapon or gift */
@@ -960,7 +961,7 @@ gcrownu(void)
         dropy(obj);
         u.ugifts++;
         livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
-                       "was bestowed with %s",
+                       "%sを授かった",
                        artiname(ART_STORMBRINGER));
     }
     /* acquire Stormbringer's skill regardless of weapon or gift */
@@ -1819,9 +1820,9 @@ bestow_artifact(uchar max_giftvalue)
             u.ublesscnt = rnz(300 + (50 * nartifacts));
             exercise(A_WIS, TRUE);
             livelog_printf (LL_DIVINEGIFT | LL_ARTIFACT,
-                            "was bestowed with %s by %s",
-                            artiname(otmp->oartifact),
-                            align_gname(u.ualign.type));
+                            "%sより%sを授かった",
+                            align_gname(u.ualign.type),
+                            artiname(otmp->oartifact));
             /* make sure we can use this weapon */
             unrestrict_weapon_skill(weapon_type(otmp));
             if (!Hallucination && !Blind) {
@@ -1975,10 +1976,9 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
 
     /* KMH, conduct */
     if (!u.uconduct.gnostic++)
-        livelog_printf(LL_CONDUCT, "rejected atheism"
-                                   " by offering %s on an altar of %s",
-                       jp_corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
-                       a_gname());
+        livelog_printf(LL_CONDUCT, "%sの祭壇に%sを捧げることで、無神論を破った",
+                       a_gname(),
+                       jp_corpse_xname(otmp, (const char *) 0, CXN_ARTICLE));
 
     /* you're handling this corpse, even if it was killed upon the altar
      */
@@ -2225,7 +2225,7 @@ dopray(void)
          * should not break conduct.  Also we can add more detail to the
          * livelog message as p_aligntyp will be known.
          */
-        livelog_printf(LL_CONDUCT, "rejected atheism with a prayer");
+        livelog_printf(LL_CONDUCT, "祈りを捧げることで、無神論を破った");
 
     /* set up p_type and p_alignment */
     if (!can_pray(TRUE))
@@ -2425,7 +2425,7 @@ doturn(void)
         return ECMD_OK;
     }
     if (!u.uconduct.gnostic++)
-        livelog_printf(LL_CONDUCT, "rejected atheism by turning undead");
+        livelog_printf(LL_CONDUCT, "アンデッドを退散させることで、無神論を破った");
 
     Gname = jp_gname_for_display(halu_gname(u.ualign.type));
 

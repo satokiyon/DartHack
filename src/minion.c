@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	minion.c	$NHDT-Date: 1781973054 2026/06/20 16:30:54 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.88 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2008. */
@@ -405,9 +405,9 @@ demon_talk(struct monst *mtmp)
     /* if 'mtmp' is unrecognizable due to hero's hallucination,
        #chronicle will reveal its true identity -- just live with that;
        also, avoid random hallucinatory currency() units */
-    livelog_printf(LL_UMONST, "bribed %s with %ld %s for safe passage",
+    livelog_printf(LL_UMONST, "安全に通過するため、%sを %ld %sで買収した",
                    x_monnam(mtmp, ARTICLE_A, (char *) 0, EXACT_NAME, FALSE),
-                   offer, (offer == 1L) ? "zorkmid" : "zorkmids");
+                   offer, currency(offer));
     mongone(mtmp);
     return 1;
 }

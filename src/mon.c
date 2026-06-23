@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	mon.c	$NHDT-Date: 1781062909 2026/06/09 19:41:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.634 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -3056,18 +3056,19 @@ logdeadmon(struct monst *mtmp, int mndx)
                 llevent_type |= LL_ACHIEVE;
             xtra[0] = '\0';
             if (howmany > 1) /* "(2nd time)" or "(50th time)" */
-                Sprintf(xtra, " (%d%s time)", howmany, ordin(howmany));
+                Sprintf(xtra, "（%d回目）", howmany);
 
-            mkilled = nonliving(mtmp->data) ? "destroyed" : "killed";
+            mkilled = nonliving(mtmp->data) ? "破壊した" : "倒した";
             /* hero is responsible: "killed <monst>" */
             if (herodidit)
-                livelog_printf(llevent_type, "%s %s%s%s",
-                               mkilled,
-                               livelog_mon_nam(mtmp), shkdetail, xtra);
-            else /* trap, pet, conflict:  "<monst> has been killed" */
-                livelog_printf(llevent_type, "%s%s has been %s%s",
+                livelog_printf(llevent_type, "%s%sを%s%s",
                                livelog_mon_nam(mtmp), shkdetail,
                                mkilled, xtra);
+            else /* trap, pet, conflict:  "<monst> has been killed" */
+                livelog_printf(llevent_type, "%s%sが%s%s",
+                               livelog_mon_nam(mtmp), shkdetail,
+                               nonliving(mtmp->data) ? "破壊された" : "倒された",
+                               xtra);
         }
     }
 }
@@ -3512,7 +3513,7 @@ xkilled(
     mtmp->mhp = 0; /* caller will usually have already done this */
     if (!noconduct) { /* KMH, conduct */
         if (!u.uconduct.killer++)
-            livelog_printf(LL_CONDUCT, "killed for the first time");
+            livelog_printf(LL_CONDUCT, "初めて獲物を倒した");
     }
     if (!nomsg) {
         boolean namedpet = has_mgivenname(mtmp) && !Hallucination;
@@ -3728,10 +3729,10 @@ xkilled(
         if (!unique_corpstat(mdat)) {
             boolean mname = has_mgivenname(mtmp);
 
-            livelog_printf(LL_KILLEDPET, "murdered %s%s%s faithful %s",
+            livelog_printf(LL_KILLEDPET, "忠実なペット%s%s（%s）を殺害した",
+                           mname ? " " : "",
                            mname ? MGIVENNAME(mtmp) : "",
-                           mname ? ", " : "",
-                           uhis(), jp_pmname(mdat, Mgender(mtmp)));
+                           jp_pmname(mdat, Mgender(mtmp)));
         }
     } else if (mtmp->mpeaceful)
         adjalign(-5);

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	do.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.411 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -366,7 +366,7 @@ doaltarobj(struct obj *obj)
         /* KMH, conduct */
         if (!svc.context.mon_moving && !u.uconduct.gnostic++)
             livelog_printf(LL_CONDUCT,
-                           "eschewed atheism, by dropping %s on an altar",
+                           "祭壇に%sを置くことで、無神論を破った",
                            doname(obj));
     } else {
         /* coins don't have bless/curse status */
@@ -1950,7 +1950,7 @@ goto_level(
                          || In_quest(&u.uz));
 
         (void) describe_level(dloc, 2);
-        livelog_printf(major ? LL_ACHIEVE : LL_DEBUG, "entered %s", dloc);
+        livelog_printf(major ? LL_ACHIEVE : LL_DEBUG, "%sに入った", dloc);
 
         if (Role_if(PM_TOURIST)) {
             more_experienced(level_difficulty(), 0);

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	attrib.c	$NHDT-Date: 1781973041 2026/06/20 16:30:41 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.142 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1387,8 +1387,8 @@ uchangealign(
     disp.botl = TRUE; /* status line needs updating */
     if (reason == A_CG_CONVERT) {
         /* conversion via altar */
-        livelog_printf(LL_ALIGNMENT, "permanently converted to %s",
-                       aligns[1 - newalign].adj);
+        livelog_printf(LL_ALIGNMENT, "永続的に%sに改宗した",
+                       align_str((aligntyp) (1 - newalign)));
         u.ualignbase[A_CURRENT] = (aligntyp) newalign;
         /* worn helm of opposite alignment might block change */
         if (!uarmh || uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT)
@@ -1405,8 +1405,8 @@ uchangealign(
             if (Is_astralevel(&u.uz) || ((unsigned) rn2(50) < u.ualign.abuse))
                 summon_furies(Is_astralevel(&u.uz) ? 0 : 1);
             /* don't livelog taking it back off */
-            livelog_printf(LL_ALIGNMENT, "used a helm to turn %s",
-                           aligns[1 - newalign].adj);
+            livelog_printf(LL_ALIGNMENT, "兜を使用して%sへ改宗した",
+                           align_str((aligntyp) (1 - newalign)));
         } else if (reason == A_CG_HELM_OFF) {
             Your("思考は%s.", Hallucination
                                     ? "ますますわけが分からなくなった"

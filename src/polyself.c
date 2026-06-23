@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	polyself.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -322,12 +322,17 @@ livelog_newform(boolean viapoly, int oldgend, int newgend)
                                                   : gu.urole.name.m;
             oldrank = rank_of(u.ulevel, Role_switch, oldgend);
             newrank = rank_of(u.ulevel, Role_switch, newgend);
-            Sprintf(buf, "%.10s %.30s", genders[flags.female].adj, newrank);
-            livelog_printf(LL_MINORAC, "%s into %s",
-                           viapoly ? "polymorphed" : "transformed",
-                           an(strcmp(newrole, oldrole) ? newrole
-                              : strcmp(newrank, oldrank) ? newrank
-                                : buf));
+            const char *jp_oldrole = jp_role_name_for_display(Role_switch, oldgend);
+            const char *jp_newrole = jp_role_name_for_display(Role_switch, newgend);
+            const char *jp_oldrank = jp_rank_of_for_display(u.ulevel, Role_switch, oldgend);
+            const char *jp_newrank = jp_rank_of_for_display(u.ulevel, Role_switch, newgend);
+
+            Sprintf(buf, "%sの%s", newgend ? "女性" : "男性", jp_newrank);
+            livelog_printf(LL_MINORAC, "%sに%s",
+                           strcmp(jp_newrole, jp_oldrole) ? jp_newrole
+                           : strcmp(jp_newrank, jp_oldrank) ? jp_newrank
+                             : buf,
+                           viapoly ? "ポリモーフした" : "変化した");
         }
     }
 }
@@ -446,8 +451,8 @@ newman(void)
     /* note: newman() bypasses achievements for new ranks attained and
        doesn't log "new <form>" when that isn't accompanied by level change */
     if (newlvl != oldlvl)
-        livelog_printf(LL_MINORAC, "became experience level %d as a new %s",
-                       newlvl, newform);
+        livelog_printf(LL_MINORAC, "新たな%sとして経験値レベル %d になった",
+                       jp_race_noun_for_display(Race_switch), newlvl);
     else
         livelog_newform(TRUE, oldgend, newgend);
 
@@ -750,8 +755,8 @@ polymon(int mntmp)
     /* KMH, conduct */
     if (!u.uconduct.polyselfs++)
         livelog_printf(LL_CONDUCT,
-                       "changed form for the first time, becoming %s",
-                       an(jp_pmname(&mons[mntmp], flags.female ? FEMALE : MALE)));
+                       "初めて姿を変え、%sになった",
+                       jp_pmname(&mons[mntmp], flags.female ? FEMALE : MALE));
 
     /* exercise used to be at the very end but only Wis was affected
        there since the polymorph was always in effect by then */

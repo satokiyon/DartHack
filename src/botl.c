@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	botl.c	$NHDT-Date: 1781973042 2026/06/20 16:30:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.286 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -805,7 +805,11 @@ describe_level(
         Sprintf(buf, "%s", jp_dungeon_name_by_dnum(u.uz.dnum));
         addbranch = FALSE;
     } else if (In_quest(&u.uz)) {
-        Sprintf(buf, "クエスト %d", dunlev(&u.uz));
+        if (addbranch)
+            Sprintf(buf, "%sのクエスト %d", jp_dungeon_name_by_dnum(u.uz.dnum), dunlev(&u.uz));
+        else
+            Sprintf(buf, "クエスト %d", dunlev(&u.uz));
+        addbranch = FALSE;
     } else if (In_endgame(&u.uz)) {
         /* [3.6.2: this used to be "Astral Plane" or generic "End Game"] */
         (void) jp_endgamelevelname_for_display(buf, depth(&u.uz));
@@ -816,7 +820,8 @@ describe_level(
                 Sprintf(buf, "%s:%-2d",
                     In_tutorial(&u.uz) ? "チュートリアル" : "階層", depth(&u.uz));
         else
-                Sprintf(buf, "階層 %d", depth(&u.uz));
+                Sprintf(buf, "%sの階層 %d", jp_dungeon_name_by_dnum(u.uz.dnum), depth(&u.uz));
+        addbranch = FALSE;
         ret = 0;
     }
     if (addbranch) {

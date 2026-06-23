@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	quest.c	$NHDT-Date: 1781973063 2026/06/20 16:31:03 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.48 $ */
 /*      Copyright 1991, M. Stephenson             */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -344,7 +344,7 @@ chat_with_leader(struct monst *mtmp)
                 /* being expelled is hardly an achievement but none of the
                    other livelog classifications fit */
                 livelog_printf(LL_ACHIEVE,
-                               "%s has expelled you from the quest",
+                               "%sによってクエストから追放された",
                                noit_mon_nam(mtmp));
             }
         } else if (purity == 0) {
@@ -361,9 +361,9 @@ chat_with_leader(struct monst *mtmp)
                clue to players who are reaching the quest for first time;
                matters most for Home 1 that has stairs down which aren't
                easily found */
-            livelog_printf(LL_ACHIEVE,
-                     "%s has granted access to proceed deeper into the quest",
-                           noit_mon_nam(mtmp));
+             livelog_printf(LL_ACHIEVE,
+                            "%sによってクエストの深部へ進むことを許可された",
+                            noit_mon_nam(mtmp));
         }
     }
 }

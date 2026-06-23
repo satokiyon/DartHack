@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	priest.c	$NHDT-Date: 1781973062 2026/06/20 16:31:02 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -567,7 +567,7 @@ priest_talk(struct monst *priest)
     /* KMH, conduct */
     if (!u.uconduct.gnostic++)
         livelog_printf(LL_CONDUCT,
-                       "rejected atheism by consulting with %s",
+                       "%sに相談することで、無神論を破った",
                        mon_nam(priest));
 
     if (priest->mflee || (!priest->ispriest && coaligned && strayed)) {

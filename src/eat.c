@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	eat.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.354 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -720,21 +720,21 @@ eating_conducts(struct permonst *pd)
     int ll_conduct = 0;
 
     if (!u.uconduct.food++) {
-        livelog_printf(LL_CONDUCT, "ate for the first time - %s",
+        livelog_printf(LL_CONDUCT, "初めて食事をした - %s",
                        pd->pmnames[NEUTRAL]);
         ll_conduct++;
     }
     if (!vegan(pd)) {
         if (!u.uconduct.unvegan++ && !ll_conduct) {
             livelog_printf(LL_CONDUCT,
-                           "consumed animal products (%s) for the first time",
+                           "初めて動物性食品（%s）を口にした",
                            pd->pmnames[NEUTRAL]);
             ll_conduct++;
         }
     }
     if (!vegetarian(pd)) {
         if (!u.uconduct.unvegetarian && !ll_conduct)
-            livelog_printf(LL_CONDUCT, "tasted meat (%s) for the first time",
+            livelog_printf(LL_CONDUCT, "初めて肉（%s）を口にした",
                            pd->pmnames[NEUTRAL]);
         violated_vegetarian();
     }
@@ -1340,7 +1340,7 @@ cpostfx(int pm)
 
             if (!u.uconduct.polyselfs++) /* you're changing form */
                 livelog_printf(LL_CONDUCT,
-                            "changed form for the first time by mimicking %s",
+                            "初めて姿を変えた（%sに擬態）",
                                tempshape);
             You("%sに化けたいという誘惑に勝てなかった.", tempshape);
             /* A pile of gold can't ride. */
@@ -1825,7 +1825,7 @@ consume_tin(const char *mesg)
          */
         /* don't need vegetarian checks for spinach */
         if (!u.uconduct.food++)
-            livelog_printf(LL_CONDUCT, "ate for the first time (spinach)");
+            livelog_printf(LL_CONDUCT, "初めて食事をした（ホウレンソウ）");
         if (!tin->cursed)
             pline("これで%sになった気分だ!",
                   /* "Swee'pea" is a character from the Popeye cartoons */
@@ -2028,15 +2028,15 @@ consume_tin(const char *mesg)
     if (!vegan(&mons[mnum]))
         if (!u.uconduct.unvegan++) {
             livelog_printf(LL_CONDUCT,
-                  "consumed animal products for the first time, by eating %s",
-                           an(food_xname(otmp, FALSE)));
+                  "初めて動物性食品を口にした（%sを食べることで）",
+                           food_xname(otmp, FALSE));
             ll_conduct++;
         }
     if (!vegetarian(&mons[mnum])) {
         if (!u.uconduct.unvegetarian && !ll_conduct)
             livelog_printf(LL_CONDUCT,
-                           "tasted meat for the first time, by eating %s",
-                           an(food_xname(otmp, FALSE)));
+                           "初めて肉を口にした（%sを食べることで）",
+                           food_xname(otmp, FALSE));
         violated_vegetarian();
     }
     if (!nonrotting_corpse(mnum)) {
@@ -2689,7 +2689,7 @@ fpostfx(struct obj *otmp)
         if (!Blind)
             if (!u.uconduct.literate++)
                 livelog_printf(LL_CONDUCT,
-                    "became literate by reading the fortune inside a cookie");
+                    "クッキーの中のメッセージを読むことで読み書きができるようになった");
         break;
     case LUMP_OF_ROYAL_JELLY:
         if (gy.youmonst.data == &mons[PM_KILLER_BEE] && !Unchanging
@@ -2929,7 +2929,7 @@ doeat_nonfood(struct obj *otmp)
 
     if (!u.uconduct.food++) {
         ll_conduct++;
-        livelog_printf(LL_CONDUCT, "ate for the first time (%s)",
+        livelog_printf(LL_CONDUCT, "初めて食事をした（%s）",
                        food_xname(otmp, FALSE));
     }
     material = objects[otmp->otyp].oc_material;
@@ -2937,15 +2937,15 @@ doeat_nonfood(struct obj *otmp)
         || material == DRAGON_HIDE || material == WAX) {
         if (!u.uconduct.unvegan++ && !ll_conduct) {
             livelog_printf(LL_CONDUCT,
-                  "consumed animal products for the first time, by eating %s",
-                           an(food_xname(otmp, FALSE)));
+                  "初めて動物性食品を口にした（%sを食べることで）",
+                           food_xname(otmp, FALSE));
             ll_conduct++;
         }
         if (material != WAX) {
             if (!u.uconduct.unvegetarian && !ll_conduct)
                 livelog_printf(LL_CONDUCT,
-                   "tasted meat by-products for the first time, by eating %s",
-                               an(food_xname(otmp, FALSE)));
+                   "初めて肉製品を口にした（%sを食べることで）",
+                               food_xname(otmp, FALSE));
             violated_vegetarian();
         }
     }
@@ -3120,7 +3120,7 @@ doeat(void)
 
     /* KMH, conduct */
     if (!u.uconduct.food++) {
-        livelog_printf(LL_CONDUCT, "ate for the first time - %s",
+        livelog_printf(LL_CONDUCT, "初めて食事をした - %s",
                        food_xname(otmp, FALSE));
         ll_conduct++;
     }
@@ -3159,15 +3159,15 @@ doeat(void)
         case FLESH:
             if (!u.uconduct.unvegan++ && !ll_conduct) {
                 livelog_printf(LL_CONDUCT,
-                  "consumed animal products for the first time, by eating %s",
-                               an(food_xname(otmp, FALSE)));
+                  "初めて動物性食品を口にした（%sを食べることで）",
+                               food_xname(otmp, FALSE));
                 ll_conduct++;
             }
             if (otmp->otyp != EGG) {
                 if (!u.uconduct.unvegetarian && !ll_conduct)
                     livelog_printf(LL_CONDUCT,
-                               "tasted meat for the first time, by eating %s",
-                                   an(food_xname(otmp, FALSE)));
+                               "初めて肉を口にした（%sを食べることで）",
+                                   food_xname(otmp, FALSE));
 
                 violated_vegetarian();
             }
@@ -3178,7 +3178,7 @@ doeat(void)
                 || otmp->otyp == LUMP_OF_ROYAL_JELLY)
                 if (!u.uconduct.unvegan++ && !ll_conduct)
                     livelog_printf(LL_CONDUCT,
-                           "consumed animal products (%s) for the first time",
+                           "初めて動物性食品（%s）を口にした",
                                    food_xname(otmp, FALSE));
             break;
         }

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	end.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.349 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1118,8 +1118,8 @@ done(int how)
             pline("残念ながら、まだ虐殺されたままだ...");
         } else {
             char killbuf[BUFSZ];
-            formatkiller(killbuf, BUFSZ, how, FALSE);
-            livelog_printf(LL_LIFESAVE, "averted death (%s)", killbuf);
+            jp_formatkiller_for_display(killbuf, BUFSZ, how, FALSE);
+            livelog_printf(LL_LIFESAVE, "死を免れた（%s）", killbuf);
             survive = TRUE;
         }
     }
@@ -1304,7 +1304,7 @@ really_done(int how)
         /* it would be better to do this after killer.name fixups but
            that comes too late; included in final dumplog but might be
            excluded by active livelog */
-        formatkiller(pbuf, (unsigned) sizeof pbuf, how, TRUE);
+        jp_formatkiller_for_display(pbuf, (unsigned) sizeof pbuf, how, TRUE);
         if (!*pbuf)
             Strcpy(pbuf, death_label_for_display(how));
         livelog_printf(LL_DUMP, "%s", pbuf);

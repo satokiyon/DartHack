@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	invent.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.563 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -1185,7 +1185,7 @@ addinv_core2(struct obj *obj)
            scrolls */
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                           "became literate by deciphering a scroll label");
+                           "巻物のラベルを解読することで、読み書きができるようになった");
     }
 }
 

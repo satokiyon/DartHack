@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	engrave.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1258,7 +1258,7 @@ doengrave(void)
     /* A single `x' is the traditional signature of an illiterate person */
     if (de->len != 1 || (!strchr(de->ebuf, 'x') && !strchr(de->ebuf, 'X')))
         if (!u.uconduct.literate++)
-            livelog_printf(LL_CONDUCT, "became literate by engraving \"%s\"",
+            livelog_printf(LL_CONDUCT, "文字\"%s\"を刻むことで、読み書きができるようになった",
                            de->ebuf);
 
     /* Mix up engraving if surface or state of mind is unsound.
