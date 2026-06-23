@@ -296,10 +296,10 @@ summon_minion(aligntyp alignment, boolean talk)
     if (mon) {
         if (talk) {
             if (!Deaf)
-                pline_The("%sの声が轟いた:", align_gname(alignment));
+                pline_The("%sの声が轟いた:", jp_align_gname_for_display(alignment));
             else
                 You_feel("%sの轟く声を感じた:",
-                         s_suffix(align_gname(alignment)));
+                         s_suffix(jp_align_gname_for_display(alignment)));
             SetVoice(mon, 0, 80, 0);
             verbalize("汝の不謹慎な行動に代価を払わせるぞ！");
             if (canspotmon(mon))
