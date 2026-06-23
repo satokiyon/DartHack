@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
 /* NetHack 5.0	dothrow.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.318 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -2187,7 +2187,7 @@ thitmonst(
                                         xname(obj));
                     verbalize(
                 "二度と必要にならないことを%sに祈りつつ、我らがこれを守る.",
-                              align_gname(u.ualignbase[A_ORIGINAL]));
+                              jp_align_gname_for_display(u.ualignbase[A_ORIGINAL]));
                 }
                 if (*u.ushops || obj->unpaid) /* not very likely... */
                     check_shop_obj(obj, mon->mx, mon->my, FALSE);
