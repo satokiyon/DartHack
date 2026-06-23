@@ -376,15 +376,15 @@ fix_worst_trouble(int trouble)
     int i, maxhp;
     struct obj *otmp = 0;
     const char *what = (const char *) 0;
-    static NEARDATA const char leftglow[] = "Your left ring softly glows",
-                               rightglow[] = "Your right ring softly glows";
+    static NEARDATA const char leftglow[] = "左の指輪",
+                               rightglow[] = "右の指輪";
 
     switch (trouble) {
     case TROUBLE_STONED:
-        make_stoned(0L, "You feel more limber.", 0, (char *) 0);
+        make_stoned(0L, "体がしなやかになった気がした!", 0, (char *) 0);
         break;
     case TROUBLE_SLIMED:
-        make_slimed(0L, "The slime disappears.");
+        make_slimed(0L, "スライムは消え去った!");
         break;
     case TROUBLE_STRANGLED:
         if (uamul && uamul->otyp == AMULET_OF_STRANGULATION) {
@@ -568,9 +568,13 @@ fix_worst_trouble(int trouble)
         }
         if (cure_deaf) {
             make_deaf(0L, FALSE);
-            if (!Deaf)
-                Sprintf(eos(msgbuf), "%s can hear again",
-                        !*msgbuf ? "You" : " and you");
+            if (!Deaf) {
+                if (*msgbuf) {
+                    Sprintf(msgbuf, "%sの調子が良くなり、再び聞こえるようになった", eyes);
+                } else {
+                    Sprintf(msgbuf, "再び聞こえるようになった");
+                }
+            }
         }
         if (*msgbuf)
             pline("%s.", msgbuf);
@@ -631,7 +635,7 @@ god_zaps_you(aligntyp resp_god)
             if (Blind)
                 pline("なぜか影響を受けなかった.");
             else
-                (void) ureflects("%s reflects from your %s.", "It");
+                (void) ureflects("しかし%sはあなたの%sで跳ね返った!", "雷");
             monstseesu(M_SEEN_REFL);
         } else if (Shock_resistance) {
             shieldeff(u.ux, u.uy);
@@ -644,7 +648,7 @@ god_zaps_you(aligntyp resp_god)
         }
     }
 
-    pline("%sはひるまない...", align_gname(resp_god));
+    pline("%sはひるまない...", jp_align_gname_for_display(resp_god));
     if (u.uswallow) {
         pline("あなたを狙った広角の崩壊光線が%sに命中した!",
               mon_nam(u.ustuck));
@@ -726,7 +730,7 @@ angrygods(aligntyp resp_god)
     switch (rn2(maxanger)) {
     case 0:
     case 1:
-        You_feel("%sが%sと感じた.", align_gname(resp_god),
+        You_feel("%sが%sと感じた.", jp_align_gname_for_display(resp_god),
                  Hallucination ? "しょんぼりしている" : "不機嫌だ");
         break;
     case 2:
@@ -1077,7 +1081,7 @@ pleased(aligntyp g_align)
     int pat_on_head = 0, kick_on_butt;
 
     pline("%s%sは%sようだ.", Unaware ? "夢の中で、" : "",
-             align_gname(g_align),
+             jp_align_gname_for_display(g_align),
              (u.ualign.record >= DEVOUT)
                  ? Hallucination ? "上機嫌な" : "大いに満足している"
                  : (u.ualign.record >= STRIDENT)
@@ -1422,7 +1426,7 @@ godvoice(aligntyp g_align, const char *words)
     } else
         words = "";
 
-    pline_The("%sの%sの声: %s%s%s", align_gname(g_align),
+    pline_The("%sの%sの声: %s%s%s", jp_align_gname_for_display(g_align),
               ROLL_FROM(godvoices), quot, words, quot_end);
 }
 
@@ -1515,7 +1519,7 @@ desecrate_altar(boolean highaltar, aligntyp altaralign)
     }
     You_feel("周囲の空気が張り詰めていくのを感じる...");
     pline("突然、%sがあなたに気づいたことを悟った...",
-          align_gname(altaralign));
+          jp_align_gname_for_display(altaralign));
     Sprintf(gvbuf, "定命の者よ！よくも私の%sを汚したな！",
             highaltar ? "大神殿" : "祭壇");
     godvoice(altaralign, gvbuf);
@@ -1530,7 +1534,7 @@ staticfn void
 offer_real_amulet(struct obj *otmp, aligntyp altaralign)
 {
     static NEARDATA const char
-        cloud_of_smoke[] = "A cloud of %s smoke surrounds you...";
+        cloud_of_smoke[] = "%s色の煙があなたの周囲を取り囲んだ...";
 
     /* The final Test.  Did you win? */
     if (uamul == otmp)
@@ -1729,18 +1733,18 @@ sacrifice_your_race(
         /* is equivalent to demon summoning */
         if (altaralign == A_CHAOTIC && u.ualign.type != A_CHAOTIC) {
             pline(
-            "The blood floods the altar, which vanishes in %s cloud!",
-                    an(hcolor(NH_BLACK)));
+            "血が祭壇に溢れ、祭壇は%s色の雲の中に消え去った!",
+                    hcolor(NH_BLACK));
             levl[u.ux][u.uy].typ = ROOM;
             levl[u.ux][u.uy].altarmask = 0;
             newsym(u.ux, u.uy);
             angry_priest();
-            demonless_msg = "cloud dissipates";
+            demonless_msg = "雲は消え去った";
         } else {
             /* either you're chaotic or altar is Moloch's or both */
             pline_The("血が祭壇を覆った!");
             change_luck(altaralign == A_NONE ? -2 : 2);
-            demonless_msg = "blood coagulates";
+            demonless_msg = "血は固まった";
         }
         if ((pm = dlord(altaralign)) != NON_PM
             && (dmon = makemon(&mons[pm], u.ux, u.uy, MM_NOMSG))
@@ -1788,7 +1792,7 @@ bestow_artifact(uchar max_giftvalue)
         /* The player can gain an artifact */
         /* The chance goes down as the number of artifacts goes up */
         if (wizard)
-            do_bestow = y_n("Gift an artifact?") == 'y';
+            do_bestow = y_n("アーティファクトを贈りますか？") == 'y';
         else
             do_bestow = !rn2(6 + (2 * u.ugifts * nartifacts));
     }
@@ -1821,7 +1825,7 @@ bestow_artifact(uchar max_giftvalue)
             exercise(A_WIS, TRUE);
             livelog_printf (LL_DIVINEGIFT | LL_ARTIFACT,
                             "%sより%sを授かった",
-                            align_gname(u.ualign.type),
+                            jp_align_gname_for_display(u.ualign.type),
                             artiname(otmp->oartifact));
             /* make sure we can use this weapon */
             unrestrict_weapon_skill(weapon_type(otmp));
@@ -2138,7 +2142,7 @@ can_pray(boolean praying)
     }
 
     if (praying)
-        You("%sへ祈り始めた.", align_gname(gp.p_aligntyp));
+        You("%sへ祈り始めた.", jp_align_gname_for_display(gp.p_aligntyp));
 
     if (u.ualign.type && u.ualign.type == -gp.p_aligntyp)
         alignment = -u.ualign.record; /* Opposite alignment altar */
@@ -2208,7 +2212,7 @@ dopray(void)
      */
     if (ParanoidPray) {
         ok = paranoid_query(ParanoidConfirm,
-                            "Are you sure you want to pray?");
+                            "本当に祈りを捧げますか？");
 #if 0
         /* clear command recall buffer; otherwise ^A to repeat p(ray) would
            do so without confirmation (if 'ok') or do nothing (if '!ok') */
@@ -2232,7 +2236,7 @@ dopray(void)
         return ECMD_OK;
 
     if (wizard && gp.p_type >= 0) {
-        static const char forcesuccess[] = "Force the gods to be pleased?";
+        static const char forcesuccess[] = "神々を強制的に喜ばせますか？";
 
         /* if we asked "are you sure?" above we suppressed the response
            from the do-again buffer, so need to suppress this response too;
@@ -2260,7 +2264,7 @@ dopray(void)
     }
     nomul(-3);
     gm.multi_reason = "praying";
-    gn.nomovemsg = "You finish your prayer.";
+    gn.nomovemsg = "祈りを捧げ終えた.";
     ga.afternmv = prayer_done;
 
     if (gp.p_type == 3 && !Inhell) {
@@ -2295,8 +2299,8 @@ prayer_done(void) /* M. Stephenson (1.0.3b) */
         /* praying while poly'd into an undead creature while non-chaotic */
         godvoice(alignment,
                  (alignment == A_LAWFUL)
-                    ? "Vile creature, thou durst call upon me?"
-                    : "Walk no more, perversion of nature!");
+                    ? "下劣な生き物め、よくも私に呼びかけたな！"
+                    : "これ以上歩むな、自然への反逆者め！");
         You_feel("体がばらばらに崩れていくように感じる.");
         /* KMH -- Gods have mastery over unchanging */
         rehumanize();
@@ -2307,7 +2311,7 @@ prayer_done(void) /* M. Stephenson (1.0.3b) */
     }
     if (Inhell) {
         pline("ここはゲヘナなので、%sはあなたを助けられない.",
-              align_gname(alignment));
+              jp_align_gname_for_display(alignment));
         /* haltingly aligned is least likely to anger */
         if (u.ualign.record <= 0 || rnl(u.ualign.record))
             angrygods(u.ualign.type);
@@ -2763,10 +2767,10 @@ altar_wrath(coordxy x, coordxy y)
     } else {
         if (!Deaf)
             pline("どこからともなく声が(%sの声だろうか？)囁いた:",
-                  align_gname(altaralign));
+                  jp_align_gname_for_display(altaralign));
         else
             pline("耳が聞こえないにもかかわらず、%sの声が聞こえた気がした:",
-                  align_gname(altaralign));
+                  jp_align_gname_for_display(altaralign));
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("報いを受けるがよい、異教徒め！");
         /* higher luck is more likely to be reduced; as it approaches -5
