@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-18. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsのみ)
@@ -75,7 +75,7 @@ NetHack はテキスト（ASCII文字）だけでなく、美しいグラフィ�
 2. `.nethackrc` を開き、以下の例のように設定を追記または修正します。
    ```ini
    OPTIONS=map_mode:tiles
-   OPTIONS=tile_file:Nevanda_5.0.0_32x32.bmp
+   OPTIONS=tile_file:Nevanda_5.0.0_v2_32x32.bmp
    OPTIONS=tile_width:32
    OPTIONS=tile_height:32
    ```
