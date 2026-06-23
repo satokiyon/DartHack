@@ -11,7 +11,7 @@ android {
   buildToolsVersion = "36.0.0"
 
   defaultConfig {
-    minSdkVersion = 21
+    minSdkVersion = 7
     targetSdkVersion = 34
     versionName = '5.0.0'
     versionCode = 5000
@@ -46,5 +46,5 @@ android {
 }
 
 dependencies {
-    implementation 'com.tbd.forkfront:lib:2.7'
+    implementation 'com.tbd.forkfront:lib:2.8'
 }
