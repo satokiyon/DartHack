@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -397,6 +397,92 @@ jp_translate_killer_text_for_display(
             Snprintf(outmain, sizeof outmain, "窒息して倒された");
         } else if (!strcmpi(killer, "slimicide")) {
             Snprintf(outmain, sizeof outmain, "スライム化による死");
+        } else if (!strncmpi(killer, "riding ", 7)) {
+            const char *mname = skip_english_article(killer + 7);
+            char mbuf[BUFSZ];
+            Snprintf(mbuf, sizeof mbuf, "%s", mname);
+            int mndx, gend;
+            mndx = name_to_mon(mbuf, &gend);
+            if (mndx >= 0) {
+                Snprintf(outmain, sizeof outmain, "%sに騎乗中に石化した",
+                         jp_pmname_from_idx(mndx, 0));
+            } else {
+                Snprintf(outmain, sizeof outmain, "%sに騎乗中に石化した", mbuf);
+            }
+        } else if (!strncmpi(killer, "falling off ", 12)) {
+            const char *mname = skip_english_article(killer + 12);
+            char mbuf[BUFSZ];
+            Snprintf(mbuf, sizeof mbuf, "%s", mname);
+            int mndx, gend;
+            mndx = name_to_mon(mbuf, &gend);
+            if (mndx >= 0) {
+                Snprintf(outmain, sizeof outmain, "%sから落馬したことで石化した",
+                         jp_pmname_from_idx(mndx, 0));
+            } else {
+                Snprintf(outmain, sizeof outmain, "%sから落馬したことで石化した", mbuf);
+            }
+        } else if (!strncmpi(killer, "trying to saddle ", 17)) {
+            const char *mname = skip_english_article(killer + 17);
+            char mbuf[BUFSZ];
+            Snprintf(mbuf, sizeof mbuf, "%s", mname);
+            int mndx, gend;
+            mndx = name_to_mon(mbuf, &gend);
+            if (mndx >= 0) {
+                Snprintf(outmain, sizeof outmain, "%sに鞍を付けようとして石化した",
+                         jp_pmname_from_idx(mndx, 0));
+            } else {
+                Snprintf(outmain, sizeof outmain, "%sに鞍を付けようとして石化した", mbuf);
+            }
+        } else if (!strncmpi(killer, "trying to mount ", 16)) {
+            const char *mname = skip_english_article(killer + 16);
+            char mbuf[BUFSZ];
+            Snprintf(mbuf, sizeof mbuf, "%s", mname);
+            int mndx, gend;
+            mndx = name_to_mon(mbuf, &gend);
+            if (mndx >= 0) {
+                Snprintf(outmain, sizeof outmain, "%sに乗ろうとして石化した",
+                         jp_pmname_from_idx(mndx, 0));
+            } else {
+                Snprintf(outmain, sizeof outmain, "%sに乗ろうとして石化した", mbuf);
+            }
+        } else if (!strncmpi(killer, "trying to tin ", 14) && strstr(killer, " without gloves")) {
+            const char *mname = skip_english_article(killer + 14);
+            char mbuf[BUFSZ];
+            Snprintf(mbuf, sizeof mbuf, "%s", mname);
+            char *p = strstr(mbuf, " corpse");
+            if (p) *p = '\0';
+            int mndx, gend;
+            mndx = name_to_mon(mbuf, &gend);
+            if (mndx >= 0) {
+                Snprintf(outmain, sizeof outmain, "手袋なしで%sを缶詰にしようとして石化した",
+                         jp_pmname_from_idx(mndx, 0));
+            } else {
+                Snprintf(outmain, sizeof outmain, "手袋なしで%sを缶詰にしようとして石化した", mbuf);
+            }
+        } else if (!strncmpi(killer, "snatching ", 10)) {
+            const char *what = skip_english_article(killer + 10);
+            char buf[BUFSZ];
+            Snprintf(buf, sizeof buf, "%s", what);
+            if (strstr(buf, " corpse")) {
+                char *p = strstr(buf, " corpse");
+                if (p) *p = '\0';
+                const char *mname = skip_english_article(buf);
+                int mndx, gend;
+                mndx = name_to_mon(mname, &gend);
+                if (mndx >= 0) {
+                    Snprintf(outmain, sizeof outmain, "%sの死体をひったくろうとして石化した",
+                             jp_pmname_from_idx(mndx, 0));
+                } else {
+                    Snprintf(outmain, sizeof outmain, "%sの死体をひったくろうとして石化した", mname);
+                }
+            } else {
+                int otyp = name_to_otyp(buf);
+                if (otyp >= 0 && otyp < NUM_OBJECTS) {
+                    Snprintf(outmain, sizeof outmain, "%sをひったくろうとして石化した", jp_item_name(otyp));
+                } else {
+                    Snprintf(outmain, sizeof outmain, "%sをひったくろうとして石化した", buf);
+                }
+            }
         } else {
             char kbuf[BUFSZ];
             int mndx, gend, otyp;

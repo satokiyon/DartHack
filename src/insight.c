@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
 /* NetHack 5.0	insight.c	$NHDT-Date: 1781973051 2026/06/20 16:30:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1837,12 +1837,12 @@ attributes_enlightenment(
         /* foreign shape (except were-form which is handled below) */
         if (!vampshifted(&gy.youmonst))
                 Sprintf(buf, "%sに変身している",
-                    an(jp_pmname(gy.youmonst.data,
-                          flags.female ? FEMALE : MALE)));
+                    jp_pmname(gy.youmonst.data,
+                          flags.female ? FEMALE : MALE));
         else
                 Sprintf(buf, "%sから%sの姿へ変身している",
-                    an(jp_pmname(&mons[gy.youmonst.cham],
-                          flags.female ? FEMALE : MALE)),
+                    jp_pmname(&mons[gy.youmonst.cham],
+                          flags.female ? FEMALE : MALE),
                     jp_pmname(gy.youmonst.data, flags.female ? FEMALE : MALE));
         if (wizard)
             Sprintf(eos(buf), " (%d)", u.mtimedone);
@@ -1852,8 +1852,8 @@ attributes_enlightenment(
         you_can("産卵できる", "");
     if (ismnum(u.ulycn)) {
         /* "you are a werecreature [in beast form]" */
-        Strcpy(buf, an(jp_pmname(&mons[u.ulycn],
-               flags.female ? FEMALE : MALE)));
+        Strcpy(buf, jp_pmname(&mons[u.ulycn],
+               flags.female ? FEMALE : MALE));
         if (u.umonnum == u.ulycn) {
             Strcat(buf, "（獣形態）");
             if (wizard)
@@ -2002,7 +2002,7 @@ youhiding(boolean via_enlghtmt, /* enlightenment line vs topl message */
            for the hypothetical furniture and monster cases */
         bp = eos(strcpy(buf, "擬態している"));
         if (U_AP_TYPE == M_AP_OBJECT) {
-            Sprintf(bp, "（%s）", an(simple_typename(gy.youmonst.mappearance)));
+            Sprintf(bp, "（%s）", simple_typename(gy.youmonst.mappearance));
         } else if (U_AP_TYPE == M_AP_FURNITURE) {
             Strcpy(bp, "（何かの家具）");
         } else if (U_AP_TYPE == M_AP_MONSTER) {

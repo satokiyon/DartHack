@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
 /* NetHack 5.0	worn.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1326,7 +1326,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
 
             You("%sに触れた。", l_monnam(u.usteed));
             Sprintf(buf, "falling off %s",
-                    an(jp_pmname(u.usteed->data, Mgender(u.usteed))));
+                    an(pmname(u.usteed->data, Mgender(u.usteed))));
             instapetrify(buf);
         }
         dismount_steed(DISMOUNT_FELL);

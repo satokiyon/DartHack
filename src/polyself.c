@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
 /* NetHack 5.0	polyself.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -684,8 +684,8 @@ polyself(int psflags)
                     mntmp = gy.youmonst.cham;
             }
             if (controllable_poly) {
-                Sprintf(buf, "Become %s?",
-                        an(jp_pmname(&mons[mntmp], gvariant)));
+                Sprintf(buf, "%sになりますか?",
+                        jp_pmname(&mons[mntmp], gvariant));
                 if (y_n(buf) != 'y')
                     return;
             }
@@ -962,7 +962,7 @@ polymon(int mntmp)
             pline("%sが%sに触れた.", no_longer_petrify_resistant,
                   mon_nam(u.usteed));
             Sprintf(buf, "riding %s",
-                    an(jp_pmname(u.usteed->data, Mgender(u.usteed))));
+                    an(pmname(u.usteed->data, Mgender(u.usteed))));
             instapetrify(buf);
         }
         if (!can_ride(u.usteed))

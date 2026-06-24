@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
 /* NetHack 5.0	apply.c	$NHDT-Date: 1781973040 2026/06/20 16:30:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.482 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2177,15 +2177,16 @@ use_tinning_kit(struct obj *obj)
     mptr = &mons[corpse->corpsenm];
     if (touch_petrifies(mptr) && !Stone_resistance && !uarmg) {
         char kbuf[BUFSZ];
-        const char *corpse_name = an(cxname(corpse));
+        const char *corpse_name_jp = cxname(corpse);
 
         if (poly_when_stoned(gy.youmonst.data)) {
-            You("手袋なしで%sを缶詰にした.", corpse_name);
+            You("手袋なしで%sを缶詰にした.", corpse_name_jp);
             kbuf[0] = '\0';
         } else {
             pline("手袋なしで%sを缶詰にするのは致命的な間違いだった...",
-                  corpse_name);
-            Sprintf(kbuf, "trying to tin %s without gloves", corpse_name);
+                  corpse_name_jp);
+            Sprintf(kbuf, "trying to tin %s corpse without gloves",
+                    an(pmname(mptr, MALE)));
         }
         instapetrify(kbuf);
     }
@@ -3194,9 +3195,15 @@ use_whip(struct obj *obj)
                              && polymon(PM_STONE_GOLEM))) {
                         char kbuf[BUFSZ];
 
-                        Strcpy(kbuf, (otmp->quan == 1L) ? an(onambuf)
-                                                        : onambuf);
-                        pline("%sをひったくるのは致命的な間違いだった.", kbuf);
+                        if (otmp->otyp == CORPSE) {
+                            Sprintf(kbuf, "snatching a %s corpse",
+                                    pmname(&mons[otmp->corpsenm], MALE));
+                        } else {
+                            Sprintf(kbuf, "snatching %s%s",
+                                    (otmp->quan == 1L) ? "a " : "",
+                                    OBJ_NAME(objects[otmp->otyp]));
+                        }
+                        pline("%sをひったくるのは致命的な間違いだった.", onambuf);
                         /* corpse probably has a rot timer but is now
                            OBJ_FREE; end of game cleanup will panic if
                            it isn't part of current level; plus it would
