@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -53,4 +53,14 @@
      - 職業名: `jp_role_name_for_display(Role_switch, gender)`
      - 肩書: `jp_rank_of_for_display(u.ulevel, Role_switch, gender)`
      - 種族名: `jp_race_noun_for_display(Race_switch)`
+
+
+## Windows (MSVC) 開発における C コード記述とビルドの制約
+
+1. **strcasecmp の使用禁止と strcmpi / strncmpi の徹底**:
+   - Windows (MSVC) ビルド環境では `strcasecmp` や `strncasecmp` は利用できず、リンクエラー（外部シンボル未解決）になります。
+   - 大文字小文字を無視した文字列比較を行う場合は、NetHackで定義されているマクロである `strcmpi` / `strncmpi` を必ず使用してください。
+
+2. **AIエージェント用ビルドスクリプトの利用**:
+   - Windows環境でコードのビルド確認を行う際は、ルートのCMakeではなく、用意されているエージェント用バッチファイル `sys\windows\vs\build_one.bat` を優先して実行してください。これにより、環境の自動セットアップと `Release|x64` 構成でのビルドが一貫して行われます。
 
