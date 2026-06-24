@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
 /* NetHack 5.0	mhitu.c	$NHDT-Date: 1781973054 2026/06/20 16:30:54 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.347 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -749,14 +749,14 @@ mattacku(struct monst *mtmp)
         else /* see note about m_monnam() above */
             pline("待って、%s！ その%sは実は%s、%sという名だ！", m_monnam(mtmp),
                   mimic_obj_name(&gy.youmonst),
-                  an(jp_pmname(&mons[u.umonnum], Ugender)), svp.plname);
+                  jp_pmname(&mons[u.umonnum], Ugender), svp.plname);
         if (gm.multi < 0) { /* this should always be the case */
             char buf[BUFSZ];
 
             Sprintf(buf, "%sに戻ったようだ.",
-                Upolyd ? (const char *) an(jp_pmname(gy.youmonst.data,
-                                                  flags.female))
-                       : (const char *) "yourself");
+                Upolyd ? (const char *) jp_pmname(gy.youmonst.data,
+                                                  flags.female)
+                       : (const char *) "自分自身");
             unmul(buf); /* immediately stop mimicking */
         }
         return 0;
