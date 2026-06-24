@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -186,7 +186,109 @@ name_to_otyp(const char *name)
             return i;
         }
     }
-    return STRANGE_OBJECT;
+    return -1;
+}
+staticfn void
+jp_translate_food_or_corpse(char *out, unsigned outsz, const char *in)
+{
+    char tmp[BUFSZ];
+    char adj[BUFSZ];
+    char noun[BUFSZ];
+    const char *p;
+    const char *q;
+
+    out[0] = '\0';
+    adj[0] = '\0';
+    noun[0] = '\0';
+
+    if (!in || !*in)
+        return;
+
+    Snprintf(tmp, sizeof tmp, "%s", in);
+    p = skip_english_article(tmp);
+
+    /* 形容詞の抽出 */
+    if (!strncmpi(p, "rotted ", 7)) {
+        Snprintf(adj, sizeof adj, "腐った");
+        p += 7;
+    } else if (!strncmpi(p, "rotten ", 7)) {
+        Snprintf(adj, sizeof adj, "腐った");
+        p += 7;
+    } else if (!strncmpi(p, "stolen ", 7)) {
+        Snprintf(adj, sizeof adj, "奪った");
+        p += 7;
+    } else if (!strncmpi(p, "acidic ", 7)) {
+        Snprintf(adj, sizeof adj, "酸性の");
+        p += 7;
+    } else if (!strncmpi(p, "very rich ", 10)) {
+        Snprintf(adj, sizeof adj, "豪華すぎる");
+        p += 10;
+    } else if (!strncmpi(p, "quick ", 6)) {
+        Snprintf(adj, sizeof adj, "軽い");
+        p += 6;
+    }
+
+    p = skip_english_article(p);
+
+    /* 名詞の判定 */
+    if ((q = strstr(p, " corpse")) != 0) {
+        char mbuf[BUFSZ];
+        size_t len = q - p;
+        if (len < sizeof mbuf) {
+            (void) memcpy(mbuf, p, len);
+            mbuf[len] = '\0';
+            const char *mname = skip_english_article(mbuf);
+            int mndx, gend;
+            mndx = name_to_mon(mname, &gend);
+            if (mndx >= 0) {
+                Snprintf(noun, sizeof noun, "%sの死体", jp_pmname_from_idx(mndx, 0));
+            } else {
+                Snprintf(noun, sizeof noun, "%sの死体", mname);
+            }
+        }
+    } else if ((q = strstr(p, " egg")) != 0) {
+        char mbuf[BUFSZ];
+        size_t len = q - p;
+        if (len < sizeof mbuf) {
+            (void) memcpy(mbuf, p, len);
+            mbuf[len] = '\0';
+            const char *mname = skip_english_article(mbuf);
+            int mndx, gend;
+            mndx = name_to_mon(mname, &gend);
+            if (mndx >= 0) {
+                Snprintf(noun, sizeof noun, "%sの卵", jp_pmname_from_idx(mndx, 0));
+            } else {
+                Snprintf(noun, sizeof noun, "%sの卵", mname);
+            }
+        }
+    } else if (!strcmpi(p, "glob")) {
+        Snprintf(noun, sizeof noun, "塊");
+    } else if (!strcmpi(p, "lump of royal jelly")) {
+        Snprintf(noun, sizeof noun, "ローヤルゼリー");
+    } else if (!strcmpi(p, "meal")) {
+        Snprintf(noun, sizeof noun, "食事");
+    } else if (!strcmpi(p, "snack")) {
+        Snprintf(noun, sizeof noun, "スナック");
+    } else {
+        int mndx, gend, otyp;
+        mndx = name_to_mon(p, &gend);
+        if (mndx >= 0) {
+            Snprintf(noun, sizeof noun, "%s", jp_pmname_from_idx(mndx, 0));
+        } else {
+            otyp = name_to_otyp(p);
+            if (otyp >= 0 && otyp < NUM_OBJECTS) {
+                Snprintf(noun, sizeof noun, "%s", jp_item_name(otyp));
+            } else {
+                Snprintf(noun, sizeof noun, "%s", p);
+            }
+        }
+    }
+
+    if (*adj) {
+        Snprintf(out, outsz, "%s%s", adj, noun);
+    } else {
+        Snprintf(out, outsz, "%s", noun);
+    }
 }
 
 staticfn const char *
@@ -324,7 +426,9 @@ jp_translate_killer_text_for_display(
     const char *in)
 {
     char tmp[BUFSZ], outmain[BUFSZ], whilebuf[BUFSZ];
+    char wieldingbuf[BUFSZ];
     char *whilep;
+    char *wieldingp;
     const char *core;
 
     if (!out || outsz == 0)
@@ -333,6 +437,13 @@ jp_translate_killer_text_for_display(
     out[0] = '\0';
     Snprintf(tmp, sizeof tmp, "%s", in ? in : "");
     whilebuf[0] = '\0';
+    wieldingbuf[0] = '\0';
+
+    wieldingp = strstr(tmp, " while wielding ");
+    if (wieldingp) {
+        Snprintf(wieldingbuf, sizeof wieldingbuf, "%s", wieldingp + 16);
+        *wieldingp = '\0';
+    }
 
     whilep = strstr(tmp, ", while ");
     if (whilep) {
@@ -483,6 +594,43 @@ jp_translate_killer_text_for_display(
                     Snprintf(outmain, sizeof outmain, "%sをひったくろうとして石化した", buf);
                 }
             }
+        } else if (!strncmpi(killer, "inflicted by ", 13)) {
+            const char *p = killer + 13;
+            char what[BUFSZ];
+            char mon[BUFSZ];
+            what[0] = '\0';
+            mon[0] = '\0';
+            const char *ofp = strstr(p, " of ");
+            if (ofp) {
+                size_t wlen = ofp - p;
+                if (wlen < sizeof what) {
+                    memcpy(what, p, wlen);
+                    what[wlen] = '\0';
+                }
+                const char *mname = skip_english_article(ofp + 4);
+                int mndx, gend;
+                mndx = name_to_mon(mname, &gend);
+                if (mndx >= 0) {
+                    Snprintf(mon, sizeof mon, "%s", jp_pmname_from_idx(mndx, 0));
+                } else {
+                    Snprintf(mon, sizeof mon, "%s", mname);
+                }
+            } else {
+                Snprintf(what, sizeof what, "%s", p);
+            }
+            char whatjp[BUFSZ];
+            if (!strcmpi(what, "the touch of death")) {
+                Snprintf(whatjp, sizeof whatjp, "死の手");
+            } else if (!strcmpi(what, "strength loss")) {
+                Snprintf(whatjp, sizeof whatjp, "力不足");
+            } else {
+                Snprintf(whatjp, sizeof whatjp, "%s", what);
+            }
+            if (*mon) {
+                Snprintf(outmain, sizeof outmain, "%sの%sによって倒された", mon, whatjp);
+            } else {
+                Snprintf(outmain, sizeof outmain, "%sによって倒された", whatjp);
+            }
         } else {
             char kbuf[BUFSZ];
             int mndx, gend, otyp;
@@ -509,57 +657,56 @@ jp_translate_killer_text_for_display(
     } else if (!strncmpi(core, "choked on ", 10)) {
         const char *what = skip_english_article(core + 10);
         char buf[BUFSZ];
-        Snprintf(buf, sizeof buf, "%s", what);
-        if (strstr(buf, " corpse")) {
-            char *p = strstr(buf, " corpse");
-            *p = '\0';
-            const char *mname = skip_english_article(buf);
-            int mndx, gend;
-            mndx = name_to_mon(mname, &gend);
-            if (mndx >= 0) {
-                Snprintf(outmain, sizeof outmain, "%sの死体で窒息した",
-                         jp_pmname_from_idx(mndx, 0));
-            } else {
-                Snprintf(outmain, sizeof outmain, "%sの死体で窒息した", mname);
-            }
-        } else if (strstr(buf, " tin")) {
-            Snprintf(outmain, sizeof outmain, "缶詰で窒息した");
-        } else {
-            int otyp = name_to_otyp(buf);
-            if (otyp >= 0 && otyp < NUM_OBJECTS) {
-                Snprintf(outmain, sizeof outmain, "%sで窒息した", jp_item_name(otyp));
-            } else {
-                Snprintf(outmain, sizeof outmain, "%sで窒息した", buf);
-            }
-        }
+        jp_translate_food_or_corpse(buf, sizeof buf, what);
+        Snprintf(outmain, sizeof outmain, "%sで窒息した", buf);
     } else if (!strncmpi(core, "poisoned by ", 12)) {
         const char *what = skip_english_article(core + 12);
         char buf[BUFSZ];
-        Snprintf(buf, sizeof buf, "%s", what);
-        int mndx, gend, otyp;
-        mndx = name_to_mon(buf, &gend);
-        if (mndx >= 0) {
-            Snprintf(outmain, sizeof outmain, "%sで毒に侵された",
-                     jp_pmname_from_idx(mndx, 0));
-        } else {
-            otyp = name_to_otyp(buf);
-            if (otyp >= 0 && otyp < NUM_OBJECTS) {
-                Snprintf(outmain, sizeof outmain, "%sで毒に侵された", jp_item_name(otyp));
-            } else {
-                Snprintf(outmain, sizeof outmain, "%sで毒に侵された", buf);
-            }
-        }
+        jp_translate_food_or_corpse(buf, sizeof buf, what);
+        Snprintf(outmain, sizeof outmain, "%sで毒に侵された", buf);
     } else if (!strncmpi(core, "died of ", 8)) {
         Snprintf(outmain, sizeof outmain, "%sで死亡した",
                  skip_english_article(core + 8));
     } else if (!strncmpi(core, "drowned in ", 11)) {
         const char *what = skip_english_article(core + 11);
-        if (!strcmpi(what, "water")) {
-            Snprintf(outmain, sizeof outmain, "水で溺死した");
-        } else if (!strcmpi(what, "moat")) {
-            Snprintf(outmain, sizeof outmain, "堀で溺死した");
+        const char *by_ptr = strstr(what, " by ");
+        if (by_ptr) {
+            char place[BUFSZ];
+            char monster_eng[BUFSZ];
+            char monster_jp[BUFSZ];
+            size_t place_len = by_ptr - what;
+            if (place_len < sizeof place) {
+                (void) memcpy(place, what, place_len);
+                place[place_len] = '\0';
+            } else {
+                Strcpy(place, "");
+            }
+            Strcpy(monster_eng, by_ptr + 4);
+            jp_translate_food_or_corpse(monster_jp, sizeof monster_jp, monster_eng);
+
+            const char *place_jp = "水";
+            if (!strcmpi(place, "moat")) place_jp = "堀";
+            else if (!strcmpi(place, "pool of water")) place_jp = "水たまり";
+            else if (!strcmpi(place, "deep water")) place_jp = "深い水";
+            else if (!strcmpi(place, "limitless water")) place_jp = "果てしない水";
+            else if (!strcmpi(place, "water")) place_jp = "水";
+
+            Snprintf(outmain, sizeof outmain, "%sで%sに溺れさせられた", place_jp, monster_jp);
         } else {
-            Snprintf(outmain, sizeof outmain, "%sで溺死した", what);
+            const char *place_jp = NULL;
+            if (!strcmpi(what, "moat")) place_jp = "堀";
+            else if (!strcmpi(what, "pool of water")) place_jp = "水たまり";
+            else if (!strcmpi(what, "deep water")) place_jp = "深い水";
+            else if (!strcmpi(what, "limitless water")) place_jp = "果てしない水";
+            else if (!strcmpi(what, "water")) place_jp = "水";
+
+            if (place_jp) {
+                Snprintf(outmain, sizeof outmain, "%sで溺死した", place_jp);
+            } else {
+                char fbuf[BUFSZ];
+                jp_translate_food_or_corpse(fbuf, sizeof fbuf, what);
+                Snprintf(outmain, sizeof outmain, "%sで溺死した", fbuf);
+            }
         }
     } else if (!strncmpi(core, "burned by ", 10)) {
         const char *what = skip_english_article(core + 10);
@@ -580,7 +727,7 @@ jp_translate_killer_text_for_display(
         }
     } else if (!strncmpi(core, "dissolved in ", 13)) {
         const char *what = skip_english_article(core + 13);
-        if (!strcmpi(what, "lava")) {
+        if (!strcmpi(what, "lava") || !strcmpi(what, "molten lava")) {
             Snprintf(outmain, sizeof outmain, "溶岩で溶けた");
         } else {
             Snprintf(outmain, sizeof outmain, "%sで溶けた", what);
@@ -607,47 +754,69 @@ jp_translate_killer_text_for_display(
         char buf[BUFSZ];
         Snprintf(buf, sizeof buf, "%s", what);
         if (!strncmp(what, "tripping over ", 14)) {
-            const char *mname = skip_english_article(what + 14);
-            char mbuf[BUFSZ];
-            Snprintf(mbuf, sizeof mbuf, "%s", mname);
-            char *p = strstr(mbuf, " corpse");
-            if (p) *p = '\0';
-            int mndx, gend;
-            mndx = name_to_mon(mbuf, &gend);
-            if (mndx >= 0) {
-                Snprintf(outmain, sizeof outmain, "%sの死体につまずいたことで石化した",
-                         jp_pmname_from_idx(mndx, 0));
-            } else {
-                Snprintf(outmain, sizeof outmain, "%sの死体につまずいたことで石化した", mbuf);
-            }
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, what + 14);
+            Snprintf(outmain, sizeof outmain, "%sにつまずいたことで石化した", fbuf);
         } else if (!strncmp(what, "kicking ", 8) && strstr(what, " barefoot")) {
-            const char *mname = skip_english_article(what + 8);
             char mbuf[BUFSZ];
-            Snprintf(mbuf, sizeof mbuf, "%s", mname);
+            Snprintf(mbuf, sizeof mbuf, "%s", what + 8);
             char *p = strstr(mbuf, " barefoot");
             if (p) *p = '\0';
-            int mndx, gend;
-            mndx = name_to_mon(mbuf, &gend);
-            if (mndx >= 0) {
-                Snprintf(outmain, sizeof outmain, "%sを素手で蹴ったことで石化した",
-                         jp_pmname_from_idx(mndx, 0));
-            } else {
-                Snprintf(outmain, sizeof outmain, "%sを素手で蹴ったことで石化した", mbuf);
-            }
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, mbuf);
+            Snprintf(outmain, sizeof outmain, "%sを素手で蹴ったことで石化した", fbuf);
+        } else if (!strncmp(what, "throwing ", 9) && strstr(what, " bare-handed")) {
+            char mbuf[BUFSZ];
+            Snprintf(mbuf, sizeof mbuf, "%s", what + 9);
+            char *p = strstr(mbuf, " bare-handed");
+            if (p) *p = '\0';
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, mbuf);
+            Snprintf(outmain, sizeof outmain, "%sを素手で投げたことで石化した", fbuf);
+        } else if (!strncmp(what, "wielding ", 9) && strstr(what, " bare-handed")) {
+            char mbuf[BUFSZ];
+            Snprintf(mbuf, sizeof mbuf, "%s", what + 9);
+            char *p = strstr(mbuf, " bare-handed");
+            if (p) *p = '\0';
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, mbuf);
+            Snprintf(outmain, sizeof outmain, "素手で%sを装備したことで石化した", fbuf);
+        } else if (!strncmp(what, "bumping into ", 13)) {
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, what + 13);
+            Snprintf(outmain, sizeof outmain, "%sにぶつかったことで石化した", fbuf);
+        } else if (!strncmp(what, "being hit by ", 13)) {
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, what + 13);
+            Snprintf(outmain, sizeof outmain, "%sに当たったことで石化した", fbuf);
+        } else if (!strncmp(what, "attempting to saddle ", 21)) {
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, what + 21);
+            Snprintf(outmain, sizeof outmain, "%sに鞍を付けようとして石化した", fbuf);
+        } else if (!strncmp(what, "attempting to ride ", 19)) {
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, what + 19);
+            Snprintf(outmain, sizeof outmain, "%sに乗ろうとして石化した", fbuf);
+        } else if (!strncmp(what, "swallowing ", 11) && strstr(what, " whole")) {
+            char mbuf[BUFSZ];
+            Snprintf(mbuf, sizeof mbuf, "%s", what + 11);
+            char *p = strstr(mbuf, " whole");
+            if (p) *p = '\0';
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, mbuf);
+            Snprintf(outmain, sizeof outmain, "%sを丸のみして石化した", fbuf);
+        } else if (!strncmp(what, "engulfing ", 10)) {
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, what + 10);
+            Snprintf(outmain, sizeof outmain, "%sを包み込んで石化した", fbuf);
+        } else if (!strncmp(what, "enclosing ", 10)) {
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, what + 10);
+            Snprintf(outmain, sizeof outmain, "%sを閉じ込めて石化した", fbuf);
         } else {
-            int mndx, gend, otyp;
-            mndx = name_to_mon(buf, &gend);
-            if (mndx >= 0) {
-                Snprintf(outmain, sizeof outmain, "%sで石化した",
-                         jp_pmname_from_idx(mndx, 0));
-            } else {
-                otyp = name_to_otyp(buf);
-                if (otyp >= 0 && otyp < NUM_OBJECTS) {
-                    Snprintf(outmain, sizeof outmain, "%sで石化した", jp_item_name(otyp));
-                } else {
-                    Snprintf(outmain, sizeof outmain, "%sで石化した", buf);
-                }
-            }
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, what);
+            Snprintf(outmain, sizeof outmain, "%sで石化した", fbuf);
         }
     } else if (!strncmpi(core, "turned to slime by ", 19)) {
         const char *what = skip_english_article(core + 19);
@@ -735,6 +904,56 @@ jp_translate_killer_text_for_display(
         Snprintf(outmain, sizeof outmain, "抹殺による混乱");
     } else if (!strcmpi(core, "imperious order")) {
         Snprintf(outmain, sizeof outmain, "傲慢な命令");
+    } else if (!strcmpi(core, "removing gloves")) {
+        Snprintf(outmain, sizeof outmain, "手袋を脱いだこと");
+    } else if (!strcmpi(core, "losing gloves")) {
+        Snprintf(outmain, sizeof outmain, "手袋を失ったこと");
+    } else if (!strcmpi(core, "removing boots")) {
+        Snprintf(outmain, sizeof outmain, "靴を脱いだこと");
+    } else if (!strcmpi(core, "losing boots")) {
+        Snprintf(outmain, sizeof outmain, "靴を失ったこと");
+    } else if (!strcmpi(core, "resistance timing out")) {
+        Snprintf(outmain, sizeof outmain, "石化耐性が切れたこと");
+    } else if (!strcmpi(core, "elementary physics")) {
+        Snprintf(outmain, sizeof outmain, "物理法則");
+    } else if (!strncmpi(core, "unwisely tried to eat ", 22)) {
+        char fbuf[BUFSZ];
+        jp_translate_food_or_corpse(fbuf, sizeof fbuf, core + 22);
+        Snprintf(outmain, sizeof outmain, "無謀にも%sを食べようとした", fbuf);
+    } else if (!strncmpi(core, "shot ", 5) && strstr(core, "self with a death ray")) {
+        Snprintf(outmain, sizeof outmain, "死の光線を自分自身に撃った");
+    } else if (strstr(core, " by himself") || strstr(core, " by herself") || strstr(core, " by itself")) {
+        char verb[BUFSZ];
+        char fltxt[BUFSZ];
+        fltxt[0] = '\0';
+        verb[0] = '\0';
+        if (strstr(core, "zapped")) {
+            Snprintf(verb, sizeof verb, "放った");
+        } else if (strstr(core, "breathed")) {
+            Snprintf(verb, sizeof verb, "吐いた");
+        } else {
+            Snprintf(verb, sizeof verb, "引き起こした");
+        }
+        if (strstr(core, "magic missile")) {
+            Snprintf(fltxt, sizeof fltxt, "魔法の矢");
+        } else if (strstr(core, "fire")) {
+            Snprintf(fltxt, sizeof fltxt, "火炎");
+        } else if (strstr(core, "frost")) {
+            Snprintf(fltxt, sizeof fltxt, "冷気");
+        } else if (strstr(core, "sleep")) {
+            Snprintf(fltxt, sizeof fltxt, "睡眠ガス");
+        } else if (strstr(core, "death")) {
+            Snprintf(fltxt, sizeof fltxt, "死の光線");
+        } else if (strstr(core, "lightning")) {
+            Snprintf(fltxt, sizeof fltxt, "稲妻");
+        } else if (strstr(core, "poison gas")) {
+            Snprintf(fltxt, sizeof fltxt, "毒ガス");
+        } else if (strstr(core, "acid")) {
+            Snprintf(fltxt, sizeof fltxt, "酸");
+        } else {
+            Snprintf(fltxt, sizeof fltxt, "光線");
+        }
+        Snprintf(outmain, sizeof outmain, "自分自身で%s%s", verb, fltxt);
     } else if (!strcmpi(core, "committed suicide")) {
         Snprintf(outmain, sizeof outmain, "自殺");
     } else if (!strcmpi(core, "went to heaven prematurely")) {
@@ -839,6 +1058,14 @@ jp_translate_killer_text_for_display(
         Snprintf(outmain, sizeof outmain, "死亡した");
     } else {
         Snprintf(outmain, sizeof outmain, "%s", core);
+    }
+
+    if (*wieldingbuf) {
+        char wieldingjp[BUFSZ];
+        jp_translate_food_or_corpse(wieldingjp, sizeof wieldingjp, wieldingbuf);
+        char outtmp[BUFSZ];
+        Snprintf(outtmp, sizeof outtmp, "%s", outmain);
+        Snprintf(outmain, sizeof outmain, "%s（%sを装備中）で石化した", outtmp, wieldingjp);
     }
 
     Snprintf(out, outsz, "%s", outmain);

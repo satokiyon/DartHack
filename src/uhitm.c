@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	uhitm.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.503 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2165,7 +2165,7 @@ theft_petrifies(struct obj *otmp)
 #endif
 
     /* stealing this corpse is fatal... */
-    instapetrify(jp_corpse_xname(otmp, "奪った", CXN_ARTICLE));
+    instapetrify(corpse_xname(otmp, "stolen", CXN_ARTICLE));
     /* apparently wasn't fatal after all... */
     return TRUE;
 }
@@ -3395,9 +3395,9 @@ mhitm_ad_wrap(
 
                         urgent_pline("%sがあなたを溺れさせた...", Monnam(magr));
                     svk.killer.format = KILLED_BY_AN;
-                        Sprintf(svk.killer.name, "%sで%sに溺れさせられた",
-                            moat ? "堀" : "水たまり",
-                            an(jp_pmname(magr->data, Mgender(magr))));
+                    Sprintf(svk.killer.name, "%s by %s",
+                            moat ? "moat" : "pool of water",
+                            an(pmname(magr->data, Mgender(magr))));
                     done(DROWNING);
                 } else if (mattk->aatyp == AT_HUGS) {
                     You("押し潰されていた.");
@@ -5019,15 +5019,17 @@ gulpum(struct monst *mdef, struct attack *mattk)
 
         if (fatal_gulp && !is_rider(pd)) { /* petrification */
             char kbuf[BUFSZ];
-            const char *mnam = jp_pmname(pd, Mgender(mdef));
+            const char *mnam = pmname(pd, Mgender(mdef));
 
             if (!type_is_pname(pd))
                 mnam = an(mnam);
             You("%sを%s.", l_monnam(mdef),
                 u_digest ? "丸のみした" : "飲み込んだ");
-                                        Sprintf(kbuf, "%s%sを%s",
-                                        u_digest ? "丸のみして" : "包み込んで",
-                                        mnam, u_digest ? "石化した" : "石化した");
+            Sprintf(kbuf, "%s %s%s",
+                    u_digest ? "swallowing"
+                    : u_enfold ? "enclosing"
+                      : "engulfing",
+                    mnam, u_digest ? " whole" : "");
             instapetrify(kbuf);
         } else {
             start_engulf(mdef);
@@ -5037,8 +5039,8 @@ gulpum(struct monst *mdef, struct attack *mattk)
                 if (is_rider(pd)) {
                     pline("しかし、これを消化すると致命的だ.");
                     end_engulf();
-                    Sprintf(svk.killer.name, "無謀にも%sを食べようとした",
-                            jp_pmname(pd, Mgender(mdef)));
+                    Sprintf(svk.killer.name, "unwisely tried to eat %s",
+                            pmname(pd, Mgender(mdef)));
                     svk.killer.format = NO_KILLER_PREFIX;
                     done(DIED);
                     return M_ATTK_MISS; /* lifesaved */

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	dothrow.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.318 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -144,7 +144,7 @@ throw_obj(struct obj *obj, int shotlimit)
             /* throwing with one hand, but pluralize since the
                expression "with your bare hands" sounds better */
             jp_body_part_plural(HAND));
-        Sprintf(svk.killer.name, "%sを素手で投げたこと",
+        Sprintf(svk.killer.name, "throwing %s bare-handed",
                 killer_xname(obj));
         instapetrify(svk.killer.name);
     }
@@ -873,8 +873,8 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
         if (touch_petrifies(mon->data)
             /* this is a bodily collision, so check for body armor */
             && !uarmu && !uarm && !uarmc) {
-                Sprintf(svk.killer.name, "%sにぶつかったこと",
-                    jp_pmname(mon->data, NEUTRAL));
+                Sprintf(svk.killer.name, "bumping into %s",
+                        pmname(mon->data, NEUTRAL));
             instapetrify(svk.killer.name);
         }
         if (touch_petrifies(gy.youmonst.data)
@@ -1058,7 +1058,7 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
         /* and whether hero is turned to stone by being touched by 'mon' */
         if (touch_petrifies(mon->data) && !(uarmu || uarm || uarmc)) {
             Snprintf(svk.killer.name, sizeof svk.killer.name,
-                     "%sに当たったこと",
+                     "being hit by %s",
                      /* combine m_monnam() and noname_monnam():
                         "{your,a} hurtling cockatrice" w/o assigned name */
                      x_monnam(mon, mon->mtame ? ARTICLE_YOUR : ARTICLE_A,
@@ -1408,7 +1408,7 @@ toss_up(struct obj *obj, boolean hitsroof)
  petrify:
             svk.killer.format = KILLED_BY;
             /* what goes up... */
-            Strcpy(svk.killer.name, "物理法則");
+            Strcpy(svk.killer.name, "elementary physics");
             You("石になった.");
             if (obj)
                 dropy(obj); /* bypass most of hitfloor() */
