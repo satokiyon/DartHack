@@ -375,7 +375,7 @@ doaltarobj(struct obj *obj)
 
     if (obj->blessed || obj->cursed) {
         There("%sの閃光が走り、%sが祭壇に当たった.",
-              an(hcolor(obj->blessed ? NH_AMBER : NH_BLACK)), doname(obj));
+              hcolor(obj->blessed ? NH_AMBER : NH_BLACK), doname(obj));
         if (!Hallucination)
             obj->bknown = 1; /* ok to bypass set_bknown() */
     } else {
@@ -444,7 +444,7 @@ polymorph_sink(void)
     /* give message even if blind; we know we're not levitating,
        so can feel the outcome even if we can't directly see it */
     if (levl[u.ux][u.uy].typ != ROOM)
-        pline_The("シンクが%sになった!", an(defsyms[sym].explanation));
+        pline_The("シンクが%sになった!", jp_cmap_explanation(sym, u.ux, u.uy));
     else
         pline_The("シンクが消えた.");
     newsym(u.ux, u.uy);
@@ -2189,7 +2189,7 @@ revive_corpse(struct obj *corpse)
             if (cansee(mtmp->mx, mtmp->my)) {
                 if (mcarry && canseemon(mcarry))
                     pline("驚いた%sが%sを落とした!",
-                          l_monnam(mcarry), an(cname));
+                          l_monnam(mcarry), cname);
                 else if (canspotmon(mtmp))
                     pline("突然%sが現れた!",
                           chewed ? Adjmonnam(mtmp, "噛み跡だらけの")
