@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-09.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24.
                          脅威の迷宮へのガイド
                         (NetHackガイドブック)
 
@@ -6,7 +6,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
                        オリジナル版 - Eric S. Raymond
      (NetHack 5.0.0用に Mike Stephenson その他によって編集・拡張)
 
-                                  2026年5月29日
+                                  2026年6月23日
 
 
 
@@ -5721,7 +5721,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
        環境では、適切にメンテナンスされない限りファイルが非常に大きく
        なる可能性があるため、コメントアウトしたままにしておくべきです。
 
-       CRASHREPORTURL = https://www.nethack.org/links/cr-37BETA.html に
+       CRASHREPORTURL = https://www.nethack.org/links/cr-5.0.0.html に
        設定され、かつサポートが組み込まれている場合、ゲームがパニックを
        起こしたり内部的に矛盾した状態になったりした際、あるいは
        #bugreport コマンドが呼び出された際に、問題を報告するために必要な
