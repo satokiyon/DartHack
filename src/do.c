@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
 /* NetHack 5.0	do.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.411 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -658,9 +658,13 @@ dosinkring(struct obj *obj)
 boolean
 canletgo(struct obj *obj, const char *word)
 {
+    const char *action_jp = !strcmp(word, "drop") ? "落とす"
+                            : !strcmp(word, "throw") ? "投げる"
+                            : word;
+
     if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
         if (*word)
-            Norep("着用中の%sは%sことができない.", "something", word);
+            Norep("身につけているものを%sことはできない.", action_jp);
         return FALSE;
     }
     if (obj == uwep && welded(uwep)) {
@@ -671,8 +675,8 @@ canletgo(struct obj *obj, const char *word)
 
             if (bimanual(uwep))
                 hand = makeplural(hand);
-            Norep("あなたの%sに溶接された%sを%sことはできない.", word, something,
-                  hand);
+            Norep("あなたの%sに溶接された%sを%sことはできない.", hand, something,
+                  action_jp);
         }
         return FALSE;
     }
@@ -684,8 +688,15 @@ canletgo(struct obj *obj, const char *word)
                implicitly forced to be 1; replicate its kludge... */
             if (!strcmp(word, "throw") && obj->quan > 1L)
                 obj->corpsenm = 1;
-            pline("何らかの理由で、あなたはその岩を%s%sことができない%s!", word,
-                  obj->corpsenm ? " any of" : "", plur(obj->quan));
+            if (obj->quan > 1L) {
+                if (obj->corpsenm) {
+                    pline("何らかの理由で、あなたはその岩のいずれも%sことはできない!", action_jp);
+                } else {
+                    pline("何らかの理由で、あなたはそれらの岩を%sことはできない!", action_jp);
+                }
+            } else {
+                pline("何らかの理由で、あなたはその岩を%sことはできない!", action_jp);
+            }
         }
         obj->corpsenm = 0; /* reset */
         set_bknown(obj, 1);
@@ -698,7 +709,7 @@ canletgo(struct obj *obj, const char *word)
     }
     if (obj->owornmask & W_SADDLE) {
         if (*word)
-            You("乗っているものは%sことができない.", word);
+            You("乗っているものは%sことはできない.", action_jp);
         return FALSE;
     }
     return TRUE;
