@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	mcastu.c	$NHDT-Date: 1781973053 2026/06/20 16:30:53 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.122 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -338,8 +338,7 @@ touch_of_death(struct monst *mtmp)
     /* if we get here, we know that hero isn't magic resistant and isn't
        poly'd into an undead or demon */
     You_feel("力が吸い取られる気がした...");
-    (void) death_inflicted_by(kbuf, "死の手", mtmp);
-    (void) strsubst(kbuf, "inflicted", "使った");
+    (void) death_inflicted_by(kbuf, "the touch of death", mtmp);
 
     if (Upolyd) {
         u.mh = 0;
@@ -374,16 +373,16 @@ death_inflicted_by(
     if (mtmp) {
         struct permonst *mptr = mtmp->data,
             *champtr = (ismnum(mtmp->cham)) ? &mons[mtmp->cham] : mptr;
-        const char *realnm = jp_pmname(champtr, Mgender(mtmp)),
-            *fakenm = jp_pmname(mptr, Mgender(mtmp));
+        const char *realnm = pmname(champtr, Mgender(mtmp)),
+            *fakenm = pmname(mptr, Mgender(mtmp));
 
         /* greatly simplified extract from done_in_by(), primarily for
            reason for death due to 'touch of death' spell; if mtmp is
            shape changed, it won't be a vampshifter or mimic since they
            can't cast spells */
-        Sprintf(eos(outbuf), " (%sがinflicted)", realnm);
+        Sprintf(eos(outbuf), " inflicted by %s", realnm);
         if (champtr != mptr)
-            Sprintf(eos(outbuf), " [%sのふりをしていた]", fakenm);
+            Sprintf(eos(outbuf), " imitating %s", an(fakenm));
     }
     return outbuf;
 }
@@ -485,9 +484,8 @@ mcast_weaken_you(struct monst *mtmp, int dmg)
         if (Half_spell_damage)
             dmg = (dmg + 1) / 2;
         losestr(rnd(dmg),
-                death_inflicted_by(kbuf, "力不足", mtmp),
+                death_inflicted_by(kbuf, "strength loss", mtmp),
                 KILLED_BY);
-        (void) strsubst(kbuf, "inflicted", "による");
         svk.killer.name[0] = '\0'; /* not killed if we get here... */
         monstunseesu(M_SEEN_MAGR);
     }

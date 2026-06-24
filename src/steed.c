@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	steed.c	$NHDT-Date: 1781973068 2026/06/20 16:31:08 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -70,7 +70,7 @@ use_saddle(struct obj *otmp)
 
         You("%sに触れた.", l_monnam(mtmp));
         if (!(poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))) {
-            Sprintf(kbuf, "trying to saddle a %s",
+            Sprintf(kbuf, "attempting to saddle a %s",
                 pmname(mtmp->data, Mgender(mtmp)));
             instapetrify(kbuf);
         }
@@ -292,8 +292,11 @@ mount_steed(
         char kbuf[BUFSZ];
 
         You("%sに触れた.", l_monnam(mtmp));
-        Sprintf(kbuf, "trying to mount a %s",
-            pmname(mtmp->data, Mgender(mtmp)));
+        Sprintf(kbuf, "attempting to ride %s",
+                /* "a saddled mumak" or "a saddled pony called Dobbin" */
+                x_monnam(mtmp, ARTICLE_A, (char *) 0,
+                         SUPPRESS_IT | SUPPRESS_INVISIBLE
+                             | SUPPRESS_SADDLE, FALSE));
         instapetrify(kbuf);
     }
     if (!mtmp->mtame || mtmp->isminion) {

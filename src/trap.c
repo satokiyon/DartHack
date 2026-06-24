@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.645 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -3923,7 +3923,7 @@ selftouch(const char *arg)
         && !Stone_resistance) {
         corpse_pmname = obj_pmname(uwep);
         pline("%s%sの死体に触れた.", jp_arg, corpse_pmname);
-        Sprintf(kbuf, "%sの死体", corpse_pmname);
+        Sprintf(kbuf, "touching %s", corpse_xname(uwep, (const char *) 0, CXN_ARTICLE));
         instapetrify(kbuf);
         /* life-saved; unwield the corpse if we can't handle it */
         if (!uarmg && !Stone_resistance)
@@ -3935,7 +3935,7 @@ selftouch(const char *arg)
         && touch_petrifies(&mons[uswapwep->corpsenm]) && !Stone_resistance) {
         corpse_pmname = obj_pmname(uswapwep);
         pline("%s%sの死体に触れた.", jp_arg, corpse_pmname);
-        Sprintf(kbuf, "%sの死体", corpse_pmname);
+        Sprintf(kbuf, "touching %s", corpse_xname(uswapwep, (const char *) 0, CXN_ARTICLE));
         instapetrify(kbuf);
         /* life-saved; unwield the corpse */
         if (!uarmg && !Stone_resistance)
@@ -5212,18 +5212,14 @@ drown(void)
         /* killer format and name are reconstructed every iteration
            because lifesaving resets them */
         pool_of_water = waterbody_name(u.ux, u.uy);
-        {
-            const char *pool_of_water_jp = pool_of_water;
-
-            svk.killer.format = KILLED_BY_AN;
-            /* avoid "drowned in [a] water" */
-            if (!strcmp(pool_of_water, "water"))
-                pool_of_water_jp = "深い水", svk.killer.format = KILLED_BY;
-            /* avoid "drowned in _a_ limitless water" on Plane of Water */
-            else if (!strcmp(pool_of_water, "limitless water"))
-                pool_of_water_jp = "果てしない水", svk.killer.format = KILLED_BY;
-            Strcpy(svk.killer.name, pool_of_water_jp);
-        }
+        svk.killer.format = KILLED_BY_AN;
+        /* avoid "drowned in [a] water" */
+        if (!strcmp(pool_of_water, "water"))
+            pool_of_water = "deep water", svk.killer.format = KILLED_BY;
+        /* avoid "drowned in _a_ limitless water" on Plane of Water */
+        else if (!strcmp(pool_of_water, "limitless water"))
+            svk.killer.format = KILLED_BY;
+        Strcpy(svk.killer.name, pool_of_water);
         done(DROWNING);
         /* oops, we're still alive.  better get out of the water. */
         if (safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT))
@@ -6826,7 +6822,7 @@ unconscious(void)
                     || !strncmp(gn.nomovemsg, "You are consci", 14))));
 }
 
-static const char lava_killer[] = "溶岩";
+static const char lava_killer[] = "molten lava";
 
 /* hero enters pool of molten lava; returns True if hero is killed and
    then life-saved (with teleport to safe spot), False for other survival;
@@ -7046,7 +7042,7 @@ sink_into_lava(void)
         u.utrap -= (1 << 8);
         if (u.utrap < (1 << 8)) {
             svk.killer.format = KILLED_BY;
-            Strcpy(svk.killer.name, "溶岩");
+            Strcpy(svk.killer.name, "molten lava");
             urgent_pline("あなたは水面下へ沈み、死んだ.");
             burn_away_slime(); /* add insult to injury? */
             done(DISSOLVED);

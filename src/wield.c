@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	wield.c	$NHDT-Date: 1781973073 2026/06/20 16:31:13 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
@@ -167,7 +167,7 @@ cant_wield_corpse(struct obj *obj)
     You("素手の%sで%sを装備した.",
         jp_body_part_plural(HAND),
         jp_corpse_xname(obj, (const char *) 0, CXN_PFX_THE));
-    Sprintf(kbuf, "素手で%sを装備した", killer_xname(obj));
+    Sprintf(kbuf, "wielding %s bare-handed", killer_xname(obj));
     instapetrify(kbuf);
     return TRUE;
 }

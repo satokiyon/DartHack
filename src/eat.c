@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	eat.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.354 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2068,7 +2068,7 @@ consume_tin(const char *mesg)
             /* make sure new ill doesn't result in improvement */
             if (Sick && (sick_time > Sick))
                 sick_time = (Sick > 1L) ? Sick - 1L : 1L;
-            make_sick(sick_time, jp_corpse_xname(otmp, "腐った", CXN_NORMAL),
+            make_sick(sick_time, corpse_xname(otmp, "rotted", CXN_NORMAL),
                       TRUE, SICK_VOMITABLE);
 
             pline("(死んでから時間が経ちすぎていて、安全に食べられないようだ.)");
@@ -3665,7 +3665,7 @@ newuhs(boolean incr)
         if ((Upolyd ? u.mh : u.uhp) < 1) {
             You("空腹と疲労で死んでしまった.");
             svk.killer.format = KILLED_BY;
-            Strcpy(svk.killer.name, "過労");
+            Strcpy(svk.killer.name, "exhaustion");
             done(STARVING);
             return;
         }

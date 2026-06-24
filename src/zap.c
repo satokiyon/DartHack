@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	zap.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.596 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -2888,7 +2888,8 @@ zapyourself(struct obj *obj, boolean ordinary)
             break;
         }
         learn_it = TRUE;
-        Strcpy(svk.killer.name, "死の光線を自分に撃った");
+        Sprintf(svk.killer.name, "shot %sself with a death ray",
+                uhim());
         svk.killer.format = NO_KILLER_PREFIX;
         /* probably don't need these to be urgent; player just gave input
            without subsequent opportunity to dismiss --More-- with ESC */
@@ -4501,7 +4502,10 @@ zhitu(
         }
         monstunseesu(M_SEEN_MAGR);
         svk.killer.format = KILLED_BY_AN;
-        Strcpy(svk.killer.name, fltxt ? fltxt : "");
+        Sprintf(svk.killer.name, "%s by %sself",
+                (type == -ZT_BREATH(ZT_DEATH)) ? "disintegration breath"
+                                               : "magic missile",
+                uhim());
         /* when killed by disintegration breath, don't leave corpse */
         u.ugrave_arise = (type == -ZT_BREATH(ZT_DEATH)) ? -3 : NON_PM;
         done(DIED);
