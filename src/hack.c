@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	hack.c	$NHDT-Date: 1781973050 2026/06/20 16:30:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.508 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -4234,8 +4234,9 @@ maybe_wail(void)
         const char *who;
         int i, powercnt;
 
-        who = (Role_if(PM_WIZARD) || Role_if(PM_VALKYRIE)) ? gu.urole.name.m
-                                                           : "エルフ";
+        who = (Role_if(PM_WIZARD) || Role_if(PM_VALKYRIE))
+              ? jp_role_name_for_display(Role_switch, flags.female ? 1 : 0)
+              : "エルフ";
         if (u.uhp == 1) {
             pline("%sは死にかけていた.", who);
         } else {
