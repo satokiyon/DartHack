@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	shk.c	$NHDT-Date: 1781973066 2026/06/20 16:31:06 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.323 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -820,8 +820,8 @@ u_entered_shop(char *enterstring)
                       s_suffix(jp_shkname_for_display(shkp)),
                       jp_shoptype_name_for_display(rt - SHOPBASE));
         } else {
-            pline("%sはあなたが%sの%sに戻ってきたことに%s。",
-                  jp_shkname_for_display(shkp), noit_mhis(shkp),
+            pline("%sはあなたが自分の%sに戻ってきたことに%s。",
+                  jp_shkname_for_display(shkp),
                   jp_shoptype_name_for_display(rt - SHOPBASE),
                   ROLL_FROM(angrytexts));
         }
@@ -841,8 +841,8 @@ u_entered_shop(char *enterstring)
             pline("%sは万引き犯に対する呪詛をつぶやいた。",
                   jp_shkname_for_display(shkp));
         } else {
-            pline("%sは%sの在庫リストをチェックしている。",
-                  jp_shkname_for_display(shkp), noit_mhis(shkp));
+            pline("%sは自分の在庫リストをチェックしている。",
+                  jp_shkname_for_display(shkp));
         }
     } else {
         boolean revisit = (eshkp->visitct++ > 0);
@@ -1435,8 +1435,7 @@ make_happy_shk(struct monst *shkp, boolean silentkops)
         if (on_level(&eshkp->shoplevel, &u.uz)) {
             home_shk(shkp, FALSE);
             if (canspotmon(shkp)) {
-                pline("%sは%sの店に戻った。", jp_shkname_for_display(shkp),
-                      noit_mhis(shkp));
+                pline("%sは自分の店に戻った。", jp_shkname_for_display(shkp));
                 vanished = FALSE; /* don't give 'Shk disappears' message */
             }
         } else {
@@ -1516,7 +1515,7 @@ make_angry_shk(
 
 static const char
     no_money[] = "それに、あなたは%s金を持っていない。",
-    not_enough_money[] = "それに、%sの興味を引くには足りない。";
+    not_enough_money[] = "それに、相手の興味を引くには足りない。";
 
 /* if one item is used-up and the other isn't, the used-up one comes first;
    otherwise, if their costs differ, the more expensive one comes first;
@@ -1906,8 +1905,8 @@ dopay(void)
                 pline("だが、どこかに隠した金がある。");
         } else {
             if (umoney > ltmp) {
-                You("%sが求めた%ld枚の金貨%sを渡した.",
-                    jp_shkname_for_display(shkp), ltmp, plur(ltmp), noit_mhe(shkp));
+                You("%sが求めた%ld枚の金貨を渡した.",
+                    jp_shkname_for_display(shkp), ltmp);
                 pay(ltmp, shkp);
             } else {
                 You("%sに手持ち%sの金をすべて渡した.", jp_shkname_for_display(shkp),
@@ -1918,7 +1917,7 @@ dopay(void)
             }
             if ((umoney < ltmp / 2L) || (umoney < ltmp && stashed_gold))
                 pline("残念ながら、%sは満足していないようだ。",
-                      noit_mhe(shkp));
+                      jp_shkname_for_display(shkp));
             else
                 make_happy_shk(shkp, FALSE);
         }
@@ -1938,14 +1937,12 @@ dopay(void)
                 if (!umoney)
                     pline(no_money, stashed_gold ? "どうやら" : "");
                 else
-                    pline(not_enough_money, noit_mhim(shkp));
+                    pline(not_enough_money);
                 return ECMD_TIME;
             }
-            pline("だが、このところ%sの店が盗まれたので、",
-                  noit_mhis(shkp));
-            pline("お前は%s%sに%sの損失を補償しなければならない。",
-                  (umoney < ltmp) ? "部分的に" : "", jp_shkname_for_display(shkp),
-                  noit_mhis(shkp));
+            pline("だが、このところ自分の店が盗まれたので、");
+            pline("お前は%s%sにその損失を補償しなければならない。",
+                  (umoney < ltmp) ? "部分的に" : "", jp_shkname_for_display(shkp));
             pay(umoney < ltmp ? umoney : ltmp, shkp);
             make_happy_shk(shkp, FALSE);
         } else {
@@ -1956,14 +1953,13 @@ dopay(void)
                 if (!umoney)
                     pline(no_money, stashed_gold ? "どうやら" : "");
                 else
-                    pline(not_enough_money, noit_mhim(shkp));
+                    pline(not_enough_money);
                 return ECMD_TIME;
             }
-            You("%sをなだめようとして、%sに1000枚の金貨を渡した.",
+            You("%sをなだめようとして、1000枚の金貨を渡した.",
                 canspotmon(shkp)
                     ? x_monnam(shkp, ARTICLE_THE, "怒っている", 0, FALSE)
-                    : jp_shkname_for_display(shkp),
-                noit_mhim(shkp));
+                    : jp_shkname_for_display(shkp));
             pay(1000L, shkp);
             if (strncmp(eshkp->customer, svp.plname, PL_NSIZ) || rn2(3))
                 make_happy_shk(shkp, FALSE);
@@ -2045,8 +2041,8 @@ dopay(void)
                       jp_shoptype_name_for_display(eshkp->shoptype - SHOPBASE),
                       !eshkp->surcharge ? "!" : ".");
         } else {
-            pline("%sはあなたが%sの%sで買い物をしてくれたことに%sうなずいた%s",
-                  jp_shkname_for_display(shkp), noit_mhis(shkp),
+            pline("%sはあなたが自分の%sで買い物をしてくれたことに%sうなずいた%s",
+                  jp_shkname_for_display(shkp),
                   jp_shoptype_name_for_display(eshkp->shoptype - SHOPBASE),
                   !eshkp->surcharge ? "感謝して" : "",
                   !eshkp->surcharge ? "!" : ".");
@@ -2687,8 +2683,7 @@ inherits(
             if (!silently)
                 pline("%sは%s%ld %sを%sから受け取った.", jp_shkname_for_display(shkp),
                       takes, loss, currency(loss),
-                      strncmp(eshkp->customer, svp.plname, PL_NSIZ) ? "" : "あなた",
-                      noit_mhim(shkp));
+                      strncmp(eshkp->customer, svp.plname, PL_NSIZ) ? "顧客" : "あなた");
             /* shopkeeper has now been paid in full */
             pacify_shk(shkp, FALSE);
             eshkp->following = 0;
@@ -3161,7 +3156,7 @@ special_stock(
                     SetVoice(shkp, 0, 80, 0);
                     verbalize("そんなもの仕入れはしない。ここから出ていけ！");
                 } else {
-                    pline("%sは拒絶するように%sを%sで振った。", jp_shkname_for_display(shkp), noit_mhis(shkp), jp_mbodypart(shkp, HEAD));
+                    pline("%sは拒絶するように%sを振った。", jp_shkname_for_display(shkp), jp_mbodypart(shkp, HEAD));
                 }
             }
         }
@@ -4940,7 +4935,7 @@ shk_move(struct monst *shkp)
                     verbalize("%s、%s! お支払いをお忘れではないですか?",
                               Hello(shkp), svp.plname);
                 } else {
-                    pline("%sは%s %sを上に向けて掲げた。", jp_shkname_for_display(shkp), noit_mhis(shkp), jp_mbodypart(shkp, HAND));
+                    pline("%sは%sを上に向けて掲げた。", jp_shkname_for_display(shkp), jp_mbodypart(shkp, HAND));
                 }
                 gf.followmsg = svm.moves;
                 if (!rn2(9)) {
@@ -5089,7 +5084,7 @@ shopdig(int fall)
              * reasons, it isn't currently.
              */
             if (lang == 2)
-                pline("%sはあなたのバックパックを掴めない%sの無力さを呪った！", jp_shkname_for_display(shkp), noit_mhim(shkp));
+                pline("%sはあなたのバックパックを掴めない自身の無力さを呪った！", jp_shkname_for_display(shkp));
             rile_shk(shkp);
             return;
 #endif
@@ -5169,7 +5164,7 @@ getcad(
             verbalize("よくも俺の%sを%sしやがった！", dugwall ? "店" : "戸",
                         jp_dmgstr(dmgstr));
         } else {
-            pline("%sはあなたが%sの%sを%sしたことに%s！", jp_shkname_for_display(shkp), noit_mhis(shkp), dugwall ? "店" : "戸", jp_dmgstr(dmgstr), ROLL_FROM(angrytexts));
+            pline("%sはあなたが自分の%sを%sしたことに%s！", jp_shkname_for_display(shkp), dugwall ? "店" : "戸", jp_dmgstr(dmgstr), ROLL_FROM(angrytexts));
         }
     } else {
         if (!Deaf) {
@@ -5178,7 +5173,7 @@ getcad(
             verbalize("誰だ！俺の%sを%sしたのは！", dugwall ? "店" : "戸",
                         jp_dmgstr(dmgstr));
         } else {
-            pline("%sは誰かが%sの%sを%sしたことに%s！", jp_shkname_for_display(shkp), noit_mhis(shkp), dugwall ? "店" : "戸", jp_dmgstr(dmgstr), ROLL_FROM(angrytexts));
+            pline("%sは誰かが自分の%sを%sしたことに%s！", jp_shkname_for_display(shkp), dugwall ? "店" : "戸", jp_dmgstr(dmgstr), ROLL_FROM(angrytexts));
         }
     }
     hot_pursuit(shkp);
@@ -5339,7 +5334,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
         /* home_shk() suppresses rloc()'s vanish/appear messages */
         if (shkp->mx != sx || shkp->my != sy) {
             if (was_outside && canspotmon(shkp))
-                pline("%sは%sの店に戻った。", jp_shkname_for_display(shkp), noit_mhis(shkp));
+                pline("%sは自分の店に戻った。", jp_shkname_for_display(shkp));
             else if ((is_seen = canseemon(shkp)) == TRUE || was_seen)
                                 pline("%sは%s。", jp_shkname_for_display(shkp), !was_seen ? "現れた"
                                                                                          : is_seen ? "位置を変えた"
@@ -5351,7 +5346,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
                 SetVoice(shkp, 0, 80, 0);
                 verbalize("ああ、そうとも！払ってもらうぞ！");
             } else {
-                pline("%sが%s %sを使ってあなたの%sへ飛びかかった！", jp_shkname_for_display(shkp), noit_mhis(shkp), jp_mbodypart(shkp, HAND), jp_body_part(NECK));
+                pline("%sが%sを使ってあなたの%sへ飛びかかった！", jp_shkname_for_display(shkp), jp_mbodypart(shkp, HAND), jp_body_part(NECK));
             }
         } else
             growl(shkp);
@@ -5552,10 +5547,10 @@ shk_chat(struct monst *shkp)
 
     eshk = ESHK(shkp);
     if (ANGRY(shkp)) {
-          pline("%sは%s、%sが%s客を嫌っていることを示した.",
+          pline("%sは%s、%s客を嫌っていることを示した.",
               jp_shkname_for_display(shkp),
               (!Deaf && !muteshk(shkp)) ? "語り" : "示し",
-              noit_mhe(shkp), eshk->robbed ? "無銭" : "無礼な");
+              eshk->robbed ? "無銭" : "無礼な");
     } else if (eshk->following) {
         if (strncmp(eshk->customer, svp.plname, PL_NSIZ)) {
             if (!Deaf && !muteshk(shkp)) {
@@ -5581,10 +5576,10 @@ shk_chat(struct monst *shkp)
               (!Deaf && !muteshk(shkp)) ? "言い" : "示し",
               total, currency(total));
     } else if (eshk->debit) {
-          pline("%sは%s、あなたが%sに%ld %sの支払いを残していると伝えた.",
+          pline("%sは%s、あなたが自分に%ld %sの支払いを残していると伝えた.",
               jp_shkname_for_display(shkp),
               (!Deaf && !muteshk(shkp)) ? "念を押し" : "示し",
-              noit_mhim(shkp), eshk->debit, currency(eshk->debit));
+              eshk->debit, currency(eshk->debit));
     } else if (eshk->credit) {
         pline("%sはあなたに%ld %sのクレジットを使うことを勧めた。", jp_shkname_for_display(shkp), eshk->credit, currency(eshk->credit));
     } else if (eshk->robbed) {
@@ -5592,9 +5587,8 @@ shk_chat(struct monst *shkp)
               jp_shkname_for_display(shkp),
               (!Deaf && !muteshk(shkp)) ? "不満を漏らし" : "気にしている様子を見せ");
     } else if (eshk->surcharge) {
-          pline("%sは%s、%sがあなたを厳しく見張っていると伝えた.", jp_shkname_for_display(shkp),
-              (!Deaf && !muteshk(shkp)) ? "警告し" : "示し",
-              noit_mhe(shkp));
+          pline("%sは%s、自分があなたを厳しく見張っていると伝えた.", jp_shkname_for_display(shkp),
+              (!Deaf && !muteshk(shkp)) ? "警告し" : "示し");
     } else if ((shkmoney = money_cnt(shkp->minvent)) < 50L) {
           pline("%sは%s、商売が厳しいとこぼした.",
               jp_shkname_for_display(shkp),
