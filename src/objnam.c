@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1781973060 2026/06/20 16:31:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.464 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -3019,7 +3019,7 @@ jp_counter_for_obj(struct obj *obj)
     if (obj->oclass == SPBOOK_CLASS)
         return "冊";
 
-    if (obj->oclass == WEAPON_CLASS || obj->oclass == TOOL_CLASS || obj->oclass == GEM_CLASS) {
+    if (obj->oclass == WEAPON_CLASS || obj->oclass == TOOL_CLASS) {
         int skill = objects[obj->otyp].oc_skill;
 
         if (skill == -P_SHURIKEN)
