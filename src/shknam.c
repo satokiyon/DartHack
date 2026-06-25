@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	shknam.c	$NHDT-Date: 1781973067 2026/06/20 16:31:07 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -945,7 +945,7 @@ stock_room(int shp_indx, struct mkroom *sroom)
             n--;
         else if (inside_shop(sx, sy - 1))
             n++;
-        Sprintf(buf, "Closed for inventory");
+        Sprintf(buf, "棚卸しのため閉店");
         make_engr_at(m, n, buf, NULL, 0L, DUST);
         if (levl[m][n].typ != CORR && levl[m][n].typ != ROOM)
             levl[m][n].typ = (Is_special(&u.uz)
