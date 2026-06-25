@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	muse.c	$NHDT-Date: 1781973057 2026/06/20 16:30:57 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.248 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
@@ -245,7 +245,7 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
 
     if (vismon) {
         /* directly see the monster reading the scroll */
-        pline_mon(mtmp, "%s reads %s!", Monnam(mtmp), onambuf);
+        pline_mon(mtmp, "%sは%sを読んだ!", Monnam(mtmp), onambuf);
     } else { /* !Deaf, otherwise we wouldn't reach here */
         char blindbuf[BUFSZ];
         boolean similar = same_race(gy.youmonst.data, mtmp->data),
@@ -819,7 +819,7 @@ use_defensive(struct monst *mtmp)
         /* unlike most defensive cases, unicorn horn object is optional */
         if (vismon) {
             if (otmp)
-                pline_mon(mtmp, "%s uses a unicorn horn!", Monnam(mtmp));
+                pline_mon(mtmp, "%sはユニコーンの角を使った!", Monnam(mtmp));
             else
                 pline_The("%sの角先が光った!", l_monnam(mtmp));
         }
@@ -837,7 +837,7 @@ use_defensive(struct monst *mtmp)
         if (!otmp)
             panic(MissingDefensiveItem, "bugle");
         if (vismon) {
-            pline_mon(mtmp, "%s plays %s!", Monnam(mtmp), doname(otmp));
+            pline_mon(mtmp, "%sは%sを演奏した!", Monnam(mtmp), doname(otmp));
         } else if (!Deaf) {
             Soundeffect(se_bugle_playing_reveille, 100);
             You_hear("起床ラッパが鳴り響いた!");
@@ -1042,8 +1042,7 @@ use_defensive(struct monst *mtmp)
         m_flee(mtmp);
         t = t_at(gt.trapx, gt.trapy);
         if (vis) {
-            pline_mon(mtmp, "%s %s into a %s!", Monnam(mtmp),
-                  vtense(fakename[0], locomotion(mtmp->data, "jump")),
+            pline_mon(mtmp, "%sは%sに逃げ込んだ!", Monnam(mtmp),
                   jp_trapname_for_display(t->ttyp, FALSE));
         }
         /* if trap was in a concealed niche, it's no longer concealed */
@@ -1125,8 +1124,8 @@ use_defensive(struct monst *mtmp)
             return mon_escape(mtmp, vismon);
         }
         if (vismon)
-            pline_mon(mtmp, "%s escapes %sstairs!", Monnam(mtmp),
-                  stway->up ? "up" : "down");
+            pline_mon(mtmp, "%sは階段を%sって逃げた!", Monnam(mtmp),
+                  stway->up ? "上" : "下");
         /* going from the Valley to Castle (Stronghold) has no sstairs
            to target, but having gs.sstairs.<sx,sy> == <0,0> will work the
            same as specifying MIGR_RANDOM when mon_arrive() eventually
@@ -1138,8 +1137,7 @@ use_defensive(struct monst *mtmp)
         m_flee(mtmp);
         t = t_at(gt.trapx, gt.trapy);
         if (vis) {
-            pline_mon(mtmp, "%s %s onto a %s!", Monnam(mtmp),
-                  vtense(fakename[0], locomotion(mtmp->data, "jump")),
+            pline_mon(mtmp, "%sは%sに逃げ込んだ!", Monnam(mtmp),
                   jp_trapname_for_display(t->ttyp, FALSE));
         }
         /* if trap was in a concealed niche, it's no longer concealed */
@@ -2012,7 +2010,7 @@ use_offensive(struct monst *mtmp)
          */
         if (cansee(mtmp->mx, mtmp->my)) {
             observe_object(otmp);
-            pline_mon(mtmp, "%s hurls %s!",
+            pline_mon(mtmp, "%sは%sを投げつけた!",
                       Monnam(mtmp), singular(otmp, doname));
         }
         m_throw(mtmp, mtmp->mx, mtmp->my, sgn(mtmp->mux - mtmp->mx),
@@ -2519,14 +2517,9 @@ use_misc(struct monst *mtmp)
         if (vis || vistrapspot)
             seetrap(t);
         if (vismon || vistrapspot) {
-            pline_mon(mtmp, "%s deliberately %s onto a %s!", Some_Monnam(mtmp),
-                  vtense(fakename[0], locomotion(mtmp->data, "jump")),
+            pline_mon(mtmp, "%sは意図的に%sに逃げ込んだ!", Some_Monnam(mtmp),
                 t->tseen ? jp_trapname_for_display(t->ttyp, FALSE)
                        : "隠れた罠");
-            /* note: if mtmp is unseen because it is invisible, its new
-               shape will also be invisible and could produce "Its armor
-               falls off" messages during the transformation; those make
-               more sense after we've given "Someone jumps onto a trap." */
         }
 
         /*  don't use rloc() due to worms */
@@ -2547,7 +2540,7 @@ use_misc(struct monst *mtmp)
     case MUSE_BULLWHIP:
         /* attempt to disarm hero */
         {
-            const char *The_whip = vismon ? "The bullwhip" : "A whip";
+            const char *The_whip = vismon ? "牛追い鞭" : "鞭";
             int where_to = rn2(4);
             struct obj *obj = uwep;
             const char *hand;
@@ -2567,17 +2560,16 @@ use_misc(struct monst *mtmp)
             hand_buf[sizeof hand_buf - 1] = '\0';
 
             if (vismon)
-                pline_mon(mtmp, "%s flicks a bullwhip towards your %s!",
+                pline_mon(mtmp, "%sはあなたの%sに向けて牛追い鞭をパチンとしならせた!",
                           Monnam(mtmp), hand_buf);
             if (obj->otyp == HEAVY_IRON_BALL) {
-                pline("%s fails to wrap around %s.", The_whip, the_weapon);
+                pline("%sは%sに巻きつかなかった.", The_whip, the_weapon);
                 return 1;
             }
-            urgent_pline("%s wraps around %s you're wielding!", The_whip,
+            urgent_pline("%sがあなたの持っている%sに巻きついた!", The_whip,
                          the_weapon);
             if (welded(obj)) {
-                pline("%s welded to your %s%c",
-                      !is_plural(obj) ? "It is" : "They are", hand_buf,
+                pline("それはあなたの%sに貼り付いている%c", hand_buf,
                       !obj->bknown ? '!' : '.');
                 /* obj->bknown = 1; */ /* welded() takes care of this */
                 where_to = 0;
@@ -2938,7 +2930,7 @@ mon_consume_unstone(
     if (acid && !tinned && !resists_acid(mon)) {
         mon->mhp -= rnd(15);
         if (vis)
-            pline_mon(mon, "%s has a very bad case of stomach acid.", Monnam(mon));
+            pline_mon(mon, "%sはひどい胃酸過多のようだ.", Monnam(mon));
         if (DEADMONSTER(mon)) {
             pline_mon(mon, "%sは死んだ!", l_monnam(mon));
             if (by_you)
@@ -3109,8 +3101,8 @@ muse_unslime(
     boolean vis = canseemon(mon), res = TRUE;
 
     if (vis)
-        pline_mon(mon, "%s starts turning %s.", Monnam(mon),
-              green_mon(mon) ? "into ooze" : hcolor(NH_GREEN));
+        pline_mon(mon, "%sは%sになり始めた.", Monnam(mon),
+              green_mon(mon) ? "粘液" : hcolor(NH_GREEN));
     /* -4 => sliming, causes quiet loss of enhanced speed */
     mon_adjust_speed(mon, -4, (struct obj *) 0);
 
@@ -3119,8 +3111,7 @@ muse_unslime(
 
         if (mon->mx == trap->tx && mon->my == trap->ty) {
             if (vis)
-                pline("%s triggers %s fire trap!", Mnam,
-                      trap->tseen ? "the" : "a");
+                pline("%sは火の罠を作動させた!", Mnam);
         } else {
             remove_monster(mon->mx, mon->my);
             newsym(mon->mx, mon->my);
@@ -3129,10 +3120,8 @@ muse_unslime(
                 worm_move(mon);
             newsym(mon->mx, mon->my);
             if (vis)
-                pline("%s %s %s %s fire trap!", Mnam,
-                      vtense(fakename[0], locomotion(mon->data, "move")),
-                      is_floater(mon->data) ? "over" : "onto",
-                      trap->tseen ? "the" : "a");
+                pline("%sは火の罠の%sに移動した!", Mnam,
+                      is_floater(mon->data) ? "上空" : "上");
         }
         (void) mintrap(mon, FORCETRAP);
     } else if (otyp == STRANGE_OBJECT) {
