@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	botl.c	$NHDT-Date: 1781973042 2026/06/20 16:30:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.286 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -697,7 +697,7 @@ jp_rank_of_for_display(int lev, short monnum, boolean female)
         if (monnum == role->mnum)
             break;
     if (!role->name.m) {
-        roleidx = Role_switch;
+        roleidx = flags.initrole;
         if (!validrole(roleidx))
             return "<称号>";
     }

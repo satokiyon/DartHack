@@ -3646,7 +3646,7 @@ newuhs(boolean incr)
                               || Role_if(PM_VALKYRIE)))
                 pline("%sはひどく食べ物を欲している!",
                       (Role_if(PM_WIZARD) || Role_if(PM_VALKYRIE))
-                          ? jp_role_name_for_display(Role_switch, flags.female ? 1 : 0)
+                          ? jp_role_name_for_display(flags.initrole, flags.female ? 1 : 0)
                           : "エルフ");
             else
                 You("%s.", !incr ? "相変わらず体が衰弱している"

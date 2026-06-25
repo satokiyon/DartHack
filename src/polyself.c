@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	polyself.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -322,8 +322,8 @@ livelog_newform(boolean viapoly, int oldgend, int newgend)
                                                   : gu.urole.name.m;
             oldrank = rank_of(u.ulevel, Role_switch, oldgend);
             newrank = rank_of(u.ulevel, Role_switch, newgend);
-            const char *jp_oldrole = jp_role_name_for_display(Role_switch, oldgend);
-            const char *jp_newrole = jp_role_name_for_display(Role_switch, newgend);
+            const char *jp_oldrole = jp_role_name_for_display(flags.initrole, oldgend);
+            const char *jp_newrole = jp_role_name_for_display(flags.initrole, newgend);
             const char *jp_oldrank = jp_rank_of_for_display(u.ulevel, Role_switch, oldgend);
             const char *jp_newrank = jp_rank_of_for_display(u.ulevel, Role_switch, newgend);
 

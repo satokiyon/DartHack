@@ -4235,7 +4235,7 @@ maybe_wail(void)
         int i, powercnt;
 
         who = (Role_if(PM_WIZARD) || Role_if(PM_VALKYRIE))
-              ? jp_role_name_for_display(Role_switch, flags.female ? 1 : 0)
+              ? jp_role_name_for_display(flags.initrole, flags.female ? 1 : 0)
               : "エルフ";
         if (u.uhp == 1) {
             pline("%sは死にかけていた.", who);
