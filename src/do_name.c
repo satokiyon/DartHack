@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
 /* NetHack 5.0	do_name.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.339 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -751,7 +751,7 @@ namefloorobj(void)
 
         /* straight role name */
         unames[0] = jp_role_name_for_display(
-                Role_switch,
+                flags.initrole,
                 ((Upolyd ? u.mfemale : flags.female) ? 1 : 0));
         /* random rank title for hero's role
 

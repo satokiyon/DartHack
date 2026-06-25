@@ -7170,7 +7170,7 @@ trapname(
 
             /* inspired by "tourist trap" */
             copynchars(roletrap,
-                       rn2(3) ? jp_role_name_for_display(Role_switch, fem ? 1 : 0)
+                       rn2(3) ? jp_role_name_for_display(flags.initrole, fem ? 1 : 0)
                             : jp_rank_of_for_display(u.ulevel,
                                                 Role_switch, fem),
                       (int) (sizeof roletrap - sizeof "の罠"));

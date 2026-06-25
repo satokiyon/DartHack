@@ -3151,7 +3151,7 @@ do_genocide(
             Strcpy(buf, jp_pmname(gy.youmonst.data,
                                flags.female ? FEMALE : MALE));
         } else {
-            Strcpy(buf, jp_role_name_for_display(Role_switch, flags.female ? 1 : 0));
+            Strcpy(buf, jp_role_name_for_display(flags.initrole, flags.female ? 1 : 0));
         }
     } else {
         /* use actual type */
