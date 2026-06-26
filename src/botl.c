@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-27. */
 /* NetHack 5.0	botl.c	$NHDT-Date: 1781973042 2026/06/20 16:30:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.286 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -1119,6 +1119,28 @@ static const struct condmap condition_aliases[] = {
     { "foodpois",       BL_MASK_FOODPOIS },
     { "foodPois",       BL_MASK_FOODPOIS },
     { "slime",          BL_MASK_SLIME },
+    { "blind",          BL_MASK_BLIND },
+    { "deaf",           BL_MASK_DEAF },
+    { "barehanded",     BL_MASK_BAREH },
+    { "busy",           BL_MASK_BUSY },
+    { "fly",            BL_MASK_FLY },
+    { "glowhands",      BL_MASK_GLOWHANDS },
+    { "grab",           BL_MASK_GRAB },
+    { "held",           BL_MASK_HELD },
+    { "ice",            BL_MASK_ICY },
+    { "lava",           BL_MASK_INLAVA },
+    { "levitate",       BL_MASK_LEV },
+    { "paralyzed",      BL_MASK_PARLYZ },
+    { "ride",           BL_MASK_RIDE },
+    { "sleep",          BL_MASK_SLEEPING },
+    { "slip",           BL_MASK_SLIPPERY },
+    { "stone",          BL_MASK_STONE },
+    { "submerged",      BL_MASK_SUBMERGED },
+    { "tethered",       BL_MASK_TETHERED },
+    { "trap",           BL_MASK_TRAPPED },
+    { "unconscious",    BL_MASK_UNCONSC },
+    { "woundedlegs",    BL_MASK_WOUNDEDL },
+    { "holding",        BL_MASK_HOLDING },
     { "all",            BL_MASK_BAREH | BL_MASK_BLIND | BL_MASK_BUSY
                         | BL_MASK_CONF | BL_MASK_DEAF | BL_MASK_ELF_IRON
                         | BL_MASK_FLY | BL_MASK_FOODPOIS | BL_MASK_GLOWHANDS
