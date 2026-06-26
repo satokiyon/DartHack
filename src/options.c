@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	options.c	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.782 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
@@ -10232,6 +10232,7 @@ options_free_window_colors(void)
 void
 set_playmode(void)
 {
+#ifndef ANDROID
     if (wizard) {
         if (authorize_wizard_mode())
             gp.plnamelen = (int) strlen(strcpy(svp.plname, "wizard"));
@@ -10248,6 +10249,7 @@ set_playmode(void)
         discover = iflags.deferred_X = FALSE;
     }
     /* don't need to do anything special for normal play */
+#endif
 }
 
 staticfn void

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-20. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1015,6 +1015,9 @@ extern void NH_abort(const char *);
 #if !defined(CPPREGEX_C)
 ATTRNORETURN extern void panic(const char *, ...) PRINTF_F(1, 2) NORETURN;
 #endif
+#ifdef ANDROID
+void and_you_die();
+#endif
 #if !defined(MAKEDEFS_C) && !defined(MDLIB_C) && !defined(CPPREGEX_C)
 extern void done(int);
 extern void container_contents(struct obj *, boolean, boolean, boolean);
@@ -1473,6 +1476,10 @@ extern int doopen(void);
 extern boolean stumble_on_door_mimic(coordxy, coordxy);
 extern int doopen_indir(coordxy, coordxy);
 extern int doclose(void);
+
+#ifdef ANDROID
+extern void lock_mouse_cursor(boolean);
+#endif
 
 #ifdef MAC68K
 /* outdated functions removed */
@@ -3894,6 +3901,9 @@ extern void genl_status_update(int, genericptr_t, int, int, int,
                                unsigned long *) NONNULLARG2;
 #ifdef DUMPLOG
 extern char *dump_fmtstr(const char *, char *, boolean) NONNULLPTRS;
+#ifdef ANDROID
+extern void and_get_dumplog_dir(char *);
+#endif
 #endif
 extern void dump_open_log(time_t);
 extern void dump_close_log(void);

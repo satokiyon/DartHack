@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	global.h	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -175,6 +175,10 @@ typedef uchar nhsym;
 
 #include "warnings.h"
 
+#ifdef ANDROID
+#include "androidconf.h"
+#endif
+
 /* amiconf.h needs to be the last nested #include of config.h because
    'make depend' will turn it into a comment, hiding anything after it */
 #ifdef AMIGA
@@ -260,7 +264,7 @@ typedef uchar nhsym;
 #endif
 
 #if defined(X11_GRAPHICS) || defined(QT_GRAPHICS) || defined(GNOME_GRAPHICS) \
-    || defined(MSWIN_GRAPHICS)
+    || defined(MSWIN_GRAPHICS) || defined(ANDROID_GRAPHICS)
 #ifndef NO_TILE_C
 #ifndef TILES_IN_GLYPHMAP
 #define TILES_IN_GLYPHMAP

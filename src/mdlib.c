@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0  mdlib.c  $NHDT-Date: 1781973053 2026/06/20 16:30:53 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
@@ -147,7 +147,9 @@ static struct win_information window_opts[] = {
     { "amii", "Amiga Intuition (text)", TRUE },
     { "amiv", "Amiga Intuition (tiles)", TRUE },
 #endif
-
+#ifdef ANDROID_GRAPHICS
+    { "and", "Android", TRUE },
+#endif
 #if 0  /* remainder have been retired */
 #ifdef GNOME_GRAPHICS /* unmaintained/defunct */
     { "Gnome", "Gnome", TRUE },

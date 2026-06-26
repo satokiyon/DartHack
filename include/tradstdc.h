@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	tradstdc.h	$NHDT-Date: 1781973090 2026/06/20 16:31:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2006. */
@@ -414,9 +414,10 @@ typedef genericptr genericptr_t; /* (void *) または (char *) */
  * これをプロトタイプ宣言へ付与する（extern.h の pline() を参照）。
  */
 #ifdef __GNUC__
-#if (__GNUC__ >= 2) && !defined(USE_OLDARGS)
+#ifdef ANDROID
+#define PRINTF_F(f,v) __attribute__ ((format (__printf__, f, v)))
+#elif (__GNUC__ >= 2) && !defined(USE_OLDARGS)
 #define PRINTF_F(f, v) __attribute__((format(printf, f, v)))
-#endif
 #if (__GNUC__ > 3) || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1)
 #define PRINTF_F_PTR(f, v) PRINTF_F(f, v)
 #endif
@@ -505,6 +506,7 @@ typedef genericptr genericptr_t; /* (void *) または (char *) */
 
 #if !defined(UNUSED) && defined(ATTRUNUSED)
 #define UNUSED ATTRUNUSED
+#endif
 #endif
 
 /* フォールバック実装 */

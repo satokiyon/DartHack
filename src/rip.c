@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	rip.c	$NHDT-Date: 1781973064 2026/06/20 16:31:04 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
@@ -11,7 +11,7 @@
 
 #if defined(TTY_GRAPHICS) || defined(X11_GRAPHICS) || defined(GEM_GRAPHICS) \
     || defined(DUMPLOG) || defined(CURSES_GRAPHICS) || defined(SHIM_GRAPHICS) \
-    || defined(AMII_GRAPHICS)
+    || defined(AMII_GRAPHICS) || defined(ANDROID_GRAPHICS)
 #define TEXT_TOMBSTONE
 #endif
 #if defined(mac) || defined(__BEOS__)

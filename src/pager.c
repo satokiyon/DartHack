@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	pager.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.302 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -289,7 +289,6 @@ append_str(char *buf, const char *new_str)
                        (unsigned long) oldlen);
         return 0; /* no space available */
     }
-
     /* some space available, but not necessarily enough for full append */
     space_left = BUFSZ - 1 - oldlen;  /* space remaining in buf */
     (void) strncat(buf, sep, space_left);

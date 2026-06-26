@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. -->
+<resources>
+    <string-array name="tileNames">
+    	<item>Ascii (no tiles)</item>
+        <item>Default</item>
+        <item>Geoduck</item>
+        <item>Nevanda</item>
+    </string-array>
+    <string-array name="tileValues">
+        <item>TTY</item>
+        <item>default_16x16</item>
+        <item>geoduck_15x25</item>
+        <item>nevanda_32x32</item>
+    </string-array>
+
+</resources>

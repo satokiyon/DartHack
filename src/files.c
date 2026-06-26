@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	files.c	$NHDT-Date: 1781973049 2026/06/20 16:30:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.448 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -68,7 +68,7 @@ const
 #endif
 #endif
 
-#if defined(UNIX) && defined(SELECTSAVED)
+#if defined(UNIX) && defined(SELECTSAVED) || defined(ANDROID)
 #include <sys/types.h>
 #include <dirent.h>
 #endif
@@ -736,10 +736,12 @@ clearlocks(void)
         return;
 #endif
 #ifndef NO_SIGNAL
-    (void) signal(SIGINT, SIG_IGN);
+        (void) signal(SIGINT, SIG_IGN);
+#ifndef ANDROID
 #if defined(UNIX) || defined(VMS)
     sethanguphandler((void (*)(int)) SIG_IGN);
 #endif
+#endif /* !ANDROID */
 #endif /* NO_SIGNAL */
     /* can't access maxledgerno() before dungeons are created -dlc */
     for (x = (svn.n_dgns ? maxledgerno() : 0); x >= 0; x--)
@@ -919,7 +921,7 @@ commit_bonesfile(d_level *lev)
     tempname = set_bonestemp_name();
     tempname = fqname(tempname, BONESPREFIX, 1);
 
-#if (defined(SYSV) && !defined(SVR4)) || defined(GENIX)
+#if (defined(SYSV) && !defined(SVR4) && !defined(ANDROID)) || defined(GENIX)
     /* old SYSVs don't have rename.  Some SVR3's may, but since they
      * also have link/unlink, it doesn't matter. :-)
      */
@@ -1382,6 +1384,45 @@ plname_from_file(
     nh_compress(gs.SAVEF);
     return result; /* file's plname[]+playmode value */
 }
+#ifdef ANDROID
+int filter_running(const struct dirent* entry)
+{
+    return *entry->d_name && entry->d_name[strlen(entry->d_name)-1] == '0';
+}
+char *
+plname_from_running(const char *filename)
+{
+    int fd;
+    char *result = 0;
+    int savelev, hpid, pltmpsiz;
+    struct version_info version_data;
+    char savename[SAVESIZE];
+    char tmpplbuf[PL_NSIZ];
+
+    /* level 0 file contains:
+     *  pid of creating process (ignored here)
+     *  level number for current level of save file
+     *  name of save file nethack would have created
+     *  savefile info
+     *  player name
+     *  and game state
+     */
+    if((fd = open(filename, O_RDONLY | O_BINARY, 0)) >= 0) {
+        if (read(fd, (genericptr_t) &hpid, sizeof hpid) == sizeof hpid
+         && read(fd, (genericptr_t) &savelev, sizeof(savelev)) == sizeof savelev
+         && read(fd, (genericptr_t) savename, sizeof savename) == sizeof savename
+         && read(fd, (genericptr_t) &version_data, sizeof version_data) == sizeof version_data
+         && read(fd, (genericptr_t) &pltmpsiz, sizeof pltmpsiz) == sizeof pltmpsiz
+         && pltmpsiz > 0 && pltmpsiz <= PL_NSIZ
+         && read(fd, (genericptr_t) &tmpplbuf, pltmpsiz) == pltmpsiz ) {
+            result = dupstr(tmpplbuf);
+        }
+        close(fd);
+    }
+
+    return result;
+}
+#endif
 #endif /* defined(SELECTSAVED) */
 
 #define SUPPRESS_WAITSYNCH_PERFILE TRUE
@@ -1474,7 +1515,7 @@ get_saved_games(void)
             wait_synch();
     }
 #endif /* WIN32 */
-#ifdef UNIX
+#if defined(UNIX) && !defined(ANDROID)
     /* posixly correct version */
     int myuid = getuid();
     DIR *dir;
@@ -1513,7 +1554,44 @@ get_saved_games(void)
             closedir(dir);
         }
     }
-#endif /* UNIX */
+#endif /* UNIX && !ANDROID */
+#ifdef ANDROID
+    int myuid=getuid();
+    struct dirent **namelist;
+    struct dirent **namelist2;
+    int n1 = scandir("save", &namelist, 0, 0);
+    int n2 = scandir(".", &namelist2, filter_running, 0);
+    if(n1 < 0) n1 = 0;
+    if(n2 < 0) n2 = 0;
+    int i,uid;
+    char name[64]; /* more than PL_NSIZ */
+    if(n1 > 0 || n2 > 0) {
+        result = (char**)alloc((n1+n2+1)*sizeof(char*)); /* at most */
+        (void) memset((genericptr_t) result, 0, (n1+n2+1) * sizeof(char *));
+    }
+    for (i=0; i<n1; i++) {
+        if ( sscanf( namelist[i]->d_name, "%d%63s", &uid, name ) == 2 ) {
+            if ( uid == myuid ) {
+                char filename[BUFSZ];
+                char* r;
+                Sprintf(filename,"save/%d%s", uid, name);
+                r = plname_from_file(filename, ALLOW_WAITSYNCH_PERFILE, 0);
+                if ( r )
+                    result[j++] = r;
+            }
+        }
+    }
+    for (i=0; i<n2; i++) {
+        if ( sscanf( namelist2[i]->d_name, "%d%63[^.].0", &uid, name ) == 2 ) {
+            if ( uid==myuid ) {
+                char* r;
+                r = plname_from_running(namelist2[i]->d_name);
+                if ( r )
+                    result[j++] = r;
+            }
+        }
+    }
+#endif
 #ifdef VMS
     Strcpy(svp.plname, "*");
     set_savefile_name(FALSE);
@@ -2496,7 +2574,7 @@ fopen_wizkit_file(void)
 #endif
     }
 
-#if defined(MICRO) || defined(MAC68K) || defined(__BEOS__) || defined(WIN32)
+#if defined(MICRO) || defined(MAC68K) || defined(__BEOS__) || defined(WIN32) || defined(ANDROID)
     if ((fp = fopen(fqname(gw.wizkit, CONFIGPREFIX, 0), "r")) != (FILE *) 0)
         return fp;
 #else
@@ -3060,6 +3138,14 @@ recover_savefile(void)
             (void) unlink(fq_lock);
         }
     }
+
+#ifdef ANDROID
+	/* if the new savefile isn't compressed
+	 * it will be overwritten when the old
+	 * savefile is restored in restore_saved_game()
+	 */
+	nh_compress(fqname(gs.SAVEF, SAVEPREFIX, 0));
+#endif
  cleanup:
     if (savewrite_failure) {
         raw_printf("\nError writing %s; recovery failed (%s).\n",

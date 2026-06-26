@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	winprocs.h	$NHDT-Date: 1781973091 2026/06/20 16:31:31 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) David Cohrs, 1992                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -14,6 +14,9 @@
 enum wp_ids { wp_tty = 1, wp_X11, wp_Qt, wp_mswin, wp_curses,
               wp_chainin, wp_chainout, wp_shim,
               wp_hup, wp_guistubs, wp_ttystubs,
+#ifdef ANDROID
+              wp_and,
+#endif
 #if defined(AMIGA)
               wp_amii, wp_amiv,
 #endif
@@ -83,7 +86,6 @@ struct window_procs {
 #endif
     char *(*win_get_color_string)(void);
 #endif
-
     void (*win_outrip)(winid, int, time_t);
     void (*win_preference_update)(const char *);
     char *(*win_getmsghistory)(boolean);

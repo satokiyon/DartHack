@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	restore.c	$NHDT-Date: 1781973064 2026/06/20 16:31:04 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.265 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -521,10 +521,14 @@ ghostfruit(struct obj *otmp)
 }
 #endif /* !SFCTOOL */
 
+#ifdef ANDROID
+#define SYSOPT_CHECK_SAVE_UID FALSE
+#else
 #ifdef SYSCF
 #define SYSOPT_CHECK_SAVE_UID sysopt.check_save_uid
 #else
 #define SYSOPT_CHECK_SAVE_UID TRUE
+#endif
 #endif
 
 #ifndef SFCTOOL

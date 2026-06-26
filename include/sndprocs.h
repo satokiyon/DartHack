@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	sndprocs.h	$NHDT-Date: 1781973088 2026/06/20 16:31:28 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.28 $ */
 /* Copyright (c) Michael Allison, 2022                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -37,6 +37,9 @@ enum soundlib_ids {
 #endif
 #ifdef SND_LIB_QTSOUND
     soundlib_qtsound,
+#endif
+#ifdef SND_LIB_ANDROIDSOUND
+    soundlib_androidsound,
 #endif
     soundlib_notused
 };

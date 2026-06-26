@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	end.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.349 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1067,6 +1067,12 @@ done(int how)
         disp.botlx = TRUE;
         bot();
     }
+    
+#ifdef ANDROID
+    if (how != TRICKED && how != QUIT && how != PANICKED && how != ESCAPED) {
+        and_you_die();
+    }
+#endif
 
     /* hero_seq is (moves<<3 + n) where n is number of moves made
        by the hero on the current turn (since the 'moves' variable

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	flag.h	$NHDT-Date: 1781973080 2026/06/20 16:31:20 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.265 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -492,6 +492,9 @@ struct instance_flags {
     Bitfield(save_uswallow, 1);
     Bitfield(save_uinwater, 1);
     Bitfield(save_uburied, 1);
+#ifdef ANDROID
+	boolean dumplog; /* enable/disable dump logs */
+#endif
     struct debug_flags debug;
     boolean windowtype_locked;   /* windowtype can't change from configfile */
     boolean windowtype_deferred; /* pick a windowport and store it in

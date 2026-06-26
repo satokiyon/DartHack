@@ -1,3 +1,4 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26.
 #!/bin/sh
 # NetHack 5.0  setup.sh	$NHDT-Date: 1596498296 2020/08/03 23:44:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.17 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.

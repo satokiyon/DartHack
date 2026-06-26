@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	cmd.c	$NHDT-Date: 1781973043 2026/06/20 16:30:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.772 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -94,6 +94,10 @@ extern int dowieldquiver(void);      /**/
 extern int dozap(void);              /**/
 extern int doorganize(void);         /**/
 #endif /* DUMB */
+
+#ifdef ANDROID
+extern void quit_possible(void);
+#endif
 
 staticfn struct Cmd_bind *cmdbind_get(uchar);
 staticfn void cmdbind_add(uchar, const struct ext_func_tab *, boolean);
@@ -3656,15 +3660,18 @@ rhack(int key)
         if (!key && cmdq_peek(CQ_CANNED))
             goto got_prefix_input;
     }
-
     /* if there's no command, there's nothing to do except reset */
     if (!key || key == (char) 0377
         || key == gc.Cmd.spkeys[NHKF_ESC]) {
-        if (key == gc.Cmd.spkeys[NHKF_ESC])
+        if (key == gc.Cmd.spkeys[NHKF_ESC]) {
+#ifdef ANDROID
+            quit_possible();
+#endif
             /* don't perform next sanity check if player typed ESC for
                the current command, similar to handling for CMD_INSANE
                flag below (^P and ^R) */
             iflags.sanity_no_check = iflags.sanity_check;
+        }
         else
             nhbell();
         reset_cmd_vars(TRUE);

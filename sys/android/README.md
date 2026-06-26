@@ -1,0 +1,45 @@
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. -->
+
+# Build instructions
+
+These instructions are written for a 64-bit Ubuntu installation.
+Modifying them for other linux distributions should be little to no
+work. If you're running Windows you're on your own.
+
+
+## Preparations
+
+ - Download and extract Android SDK Command-line Tools [https://developer.android.com/studio/index.html#command-tools]()
+ - Install JDK 8. Required by Android SDK manager (e.g. [https://adoptium.net/temurin/releases?version=8&os=any&arch=any](Temurin))
+ - Install `bison` and `flex`. Used by the native nethack build.
+ - Check out NetHack-Android: `git clone https://github.com/gurrhack/NetHack-Android.git`
+ - Create an env variable called `ANDROID_SDK_ROOT` and point it to the android-sdk installation directory. Used by Gradle.
+
+### Install Android build tools
+
+ 1. `cd /path/to/android-sdk/tools/bin`
+ 2. Update the sdk manager: `./sdkmanager --update`. If you get "NoClassDefFoundError" it's because you're not running JDK 8. Make sure the env variable `JAVA_HOME` points to JDK 8.
+ 3. Install the platform tools: `./sdkmanager --install "platforms;android-30"`
+ 4. Install the NDK: `./sdkmanager --install "ndk;21.4.7075529"`
+
+
+## Build
+
+### Build the native nethack library
+
+ 1. `cd /path/to/NetHack-Android/sys/android`
+ 2. Open `Makefile.src` and change NDK to the appropriate path.
+ 3. `sh ./setup.sh`
+ 4. `cd ../..`
+ 5. `make install`
+
+### Build the Android application
+
+ 1. `cd /path/to/NetHack-Android/sys/android`
+ 2. `./gradlew build`
+ 3. `cd ./app/build/outputs/apk/debug`
+ 4. Copy the APK file from this directory to your device.
+ 5. On your device: locate the APK file, install it and run!
+
+---
+Happy hacking!

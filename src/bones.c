@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	bones.c	$NHDT-Date: 1781973041 2026/06/20 16:30:41 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -581,7 +581,12 @@ savebones(int how, time_t when, struct obj *corpse)
        gender and alignment reflect final values rather than what the
        character started out as, same as topten and logfile entries */
     Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s",
-            svp.plname, gu.urole.filecode,
+#ifdef ANDROID
+            wizard ? "wizard" : svp.plname,
+#else
+            svp.plname,
+#endif
+            gu.urole.filecode,
             gu.urace.filecode, genders[flags.female].filecode,
             aligns[1 - u.ualign.type].filecode);
     formatkiller(newbones->how, sizeof newbones->how, how, TRUE);

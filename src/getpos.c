@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	getpos.c	$NHDT-Date: 1781973050 2026/06/20 16:30:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $ */
 /*-Copyright (c) Pasi Kallinen, 2023. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -847,12 +847,12 @@ getpos(coord *ccp, boolean force, const char *goal)
     }
     cx = gg.getposx = ccp->x;
     cy = gg.getposy = ccp->y;
-#ifdef CLIPPING
+#if defined(CLIPPING) && !defined(ANDROID)
     cliparound(cx, cy);
 #endif
     curs(WIN_MAP, cx, cy);
     flush_screen(0);
-#ifdef MAC68K
+#if defined(MAC68K) || defined(ANDROID)
     lock_mouse_cursor(TRUE);
 #endif
     lock_mouse_buttons(TRUE);
@@ -1150,7 +1150,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         flush_screen(0);
     }
  exitgetpos:
-#ifdef MAC68K
+#if defined(MAC68K) || defined(ANDROID)
     lock_mouse_cursor(FALSE);
 #endif
     lock_mouse_buttons(FALSE);

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	cfgfiles.c	$NHDT-Date: 1781973042 2026/06/20 16:30:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -129,13 +129,13 @@ static boolean ignore_errors_on_unmatched = FALSE,
 
 /* used for messaging. Also used in options.c */
 static const char *default_configfile =
-#ifdef UNIX
+#if defined(UNIX) && !defined(ANDROID)
     ".nethackrc";
 #else
 #if defined(MAC68K) || defined(__BEOS__)
     "NetHack Defaults";
 #else
-#if defined(MSDOS) || defined(WIN32)
+#if defined(MSDOS) || defined(WIN32) || defined(ANDROID)
     CONFIG_FILE;
 #else
     "NetHack.cnf";
@@ -281,7 +281,7 @@ fopen_config_file(const char *filename, int src)
     }
     /* fall through to standard names */
 
-#if defined(MICRO) || defined(MAC68K) || defined(__BEOS__) || defined(WIN32)
+#if defined(MICRO) || defined(MAC68K) || defined(__BEOS__) || defined(WIN32) || defined(ANDROID)
     set_configfile_name(fqname(default_configfile, CONFIGPREFIX, 0));
     if ((fp = fopen(configfile, "r")) != (FILE *) 0) {
         return fp;

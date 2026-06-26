@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	optlist.h */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -298,7 +298,8 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 "開始時のペットが小型犬の場合の名前")
     NHOPTB(dropped_nopick, Behavior, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.nopick_dropped, Term_False,
-           "ドロップアイテムを自動的に拾わない")
+            "ドロップアイテムを自動的に拾わない")
+    NHOPTB(dumplog, General, 0, opt_in, set_in_game, On, Yes, No, No, NoAlias, &iflags.dumplog, Term_False, "（Android専用）ダンプログを出力する")
     NHOPTC(dungeon, Advanced, MAXDCHARS + 1,opt_in, set_in_config,
                 No, Yes, No, No, NoAlias,
                 "ダンジョンマップ描画に使用するシンボルのリスト")

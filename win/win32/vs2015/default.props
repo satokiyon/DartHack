@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. -->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+    <LocalDebuggerWorkingDirectory>$(BinDir)</LocalDebuggerWorkingDirectory>
+  </PropertyGroup> 
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" >
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" >
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+
+</Project>

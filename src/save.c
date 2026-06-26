@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	save.c	$NHDT-Date: 1781973065 2026/06/20 16:31:05 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.263 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -102,13 +102,14 @@ dosave0(void)
         goto done;
 
     fq_save = fqname(gs.SAVEF, SAVEPREFIX, 1); /* level files take 0 */
-#ifndef NO_SIGNAL
+#if !defined(NO_SIGNAL) && !defined(ANDROID)
 #if defined(UNIX) || defined(VMS)
     sethanguphandler((void (*)(int) ) SIG_IGN);
 #endif
     (void) signal(SIGINT, SIG_IGN);
 #endif
 
+#ifndef ANDROID
     HUP if (iflags.window_inited) {
         nh_uncompress(fq_save);
         nhfp = open_savefile();
@@ -123,6 +124,7 @@ dosave0(void)
             }
         }
     }
+#endif
 
     HUP mark_synch(); /* flush any buffered screen output */
 

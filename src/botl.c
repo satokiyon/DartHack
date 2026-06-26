@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	botl.c	$NHDT-Date: 1781973042 2026/06/20 16:30:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.286 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -2013,6 +2013,7 @@ eval_notify_windowport_field(
         pc = 0;
     }
 
+#ifndef ANDROID
     /* Temporary? hack: moveloop()'s prolog for a new game sets
      * svc.context.rndencode after the status window has been init'd,
      * so $:0 has already been encoded and cached by the window
@@ -2038,6 +2039,7 @@ eval_notify_windowport_field(
         oldrndencode = svc.context.rndencode;
         oldgoldsym = gs.showsyms[COIN_CLASS + SYM_OFF_O];
     }
+#endif
 
     reset = FALSE;
 #ifdef STATUS_HILITES

@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0  posixregex.c	$NHDT-Date: 1596498286 2020/08/03 23:44:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.7 $ */
 /* Copyright (c) Sean Hunt  2015.                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -107,6 +108,13 @@ regex_match(const char *s, struct nhregex *re)
 void
 regex_free(struct nhregex *re)
 {
+#ifdef ANDROID
+    /* If an error occured the struct is already freed internally
+     * in the Bionic implementation (which is based on NetBSD)
+     * https://android.googlesource.com/platform/bionic/+/master/libc/upstream-netbsd/lib/libc/regex/regcomp.c (331)
+     */
+    if (!re->err)
+#endif
     regfree(&re->re);
     free(re);
 }
