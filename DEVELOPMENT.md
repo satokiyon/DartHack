@@ -46,6 +46,20 @@ Android版（`main-android` ブランチ）を WSL (`Ubuntu`) および Windows 
     $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\gradlew.bat assembleDebug
     ```
 
+* **AIエージェント向けビルドコマンド**:
+  AIエージェントが Android ビルドを実行する際は、以下のコマンドを手動承認で順次実行してください。
+  - **Step 1: WSLでのCライブラリコンパイルと配置**
+    ```powershell
+    wsl -d Ubuntu-26.04 make NDK=/home/satok/android_sdk/ndk/30.0.14904198 ABI=arm64-v8a install
+    ```
+    ※ NDKのバージョンやパスは環境によって固定されています。ディストリビューション名を明示的（`-d Ubuntu-26.04`）に指定してください。
+  - **Step 2: Windows側での Gradle パッケージング**
+    カレントディレクトリを `sys/android` に指定した上で、環境変数 `ANDROID_HOME` を設定してビルドを実行します。
+    ```powershell
+    $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\gradlew.bat assembleDebug
+    ```
+    ※ 外部依存プロジェクト（ForkFront-Android）へSDKパスを伝播させるため、必ず環境変数 `ANDROID_HOME` を提供してください。
+
 ### 4. オブジェクト名ローカライズ方針（重要）
 表示用テキスト以外にゲームロジック上でキー値として使用されている英単語は、直接日本語に置換せず、日本語の表示用リストを別途用意してヘルパー関数を利用して英単語から日本語へ変換して表示する仕組みをとっています。これによって、もともとのキー値を参照するゲームロジックが破壊されるのを防ぎます。
 
