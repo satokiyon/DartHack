@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-27. -->
 # NetHackJP 開発者向け情報
 
 本ドキュメントは、NetHackJP プロジェクトのビルド、翻訳方針、およびリポジトリの運用に関する開発者向けの情報をまとめたものです。
@@ -64,6 +64,17 @@ Android版（`main-android` ブランチ）を WSL (`Ubuntu`) および Windows 
     ```
     ※ 外部依存プロジェクト（ForkFront-Android）へSDKパスを伝播させるため、必ず環境変数 `ANDROID_HOME` を提供してください。
 
+* **CP437デコーダの無効化（日本語文字化け対策）**:
+  Android版 NetHack は `sys/android/app/res/values/config.xml` の `useCP437Decoder` が `true` の場合、テキスト出力を CP437（単バイト・IBMコードページ）としてデコードします。NetHackJP の日本語テキストは UTF-8 でエンコードされているため、CP437 デコードでは文字化けが発生します。
+  - **対策**: `useCP437Decoder` を **`false`** に設定してください。上流リポジトリ（NetHack-Android）ではデフォルトが `true` であるため、`android-base` ブランチ同期時にこの設定が巻き戻らないよう注意が必要です。
+
+* **FALLTHROUGH マクロの clang（NDK）互換性**:
+  `include/tradstdc.h` の clang 向け `FALLTHROUGH` マクロ定義が `__attribute__((fallthrough))` のみだと、特定の文脈（`case` ラベル直後など）で Android NDK の clang が「expected expression」エラーを出すことがあります。
+  - **対策**: マクロ定義の先頭にセミコロンを付与し、`; __attribute__((fallthrough))` とします。上流の NetHack 本家リポジトリからの更新で `tradstdc.h` が変更された際は、この修正が維持されていることを確認してください。
+
+* **defaults.nh のオプション名エイリアス整合性**:
+  `sys/android/defaults.nh` で日本語版独自のステータス表示オプション（例: `statuslines`）を使用する場合、`src/botl.c` 内のフィールド名テーブルに対応するエイリアスが登録されていないと、起動時に `Unknown status field` 警告が出力されます。
+  - **対策**: `defaults.nh` にフィールド名やエイリアスを追加する際は、対応する C コード側（`src/botl.c` 等）にもエイリアスを登録してください。
 
 ### 4. オブジェクト名ローカライズ方針（重要）
 表示用テキスト以外にゲームロジック上でキー値として使用されている英単語は、直接日本語に置換せず、日本語の表示用リストを別途用意してヘルパー関数を利用して英単語から日本語へ変換して表示する仕組みをとっています。これによって、もともとのキー値を参照するゲームロジックが破壊されるのを防ぎます。
