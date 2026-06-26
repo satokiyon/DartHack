@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. -->
 # NetHackJP 開発者向け情報
 
 本ドキュメントは、NetHackJP プロジェクトのビルド、翻訳方針、およびリポジトリの運用に関する開発者向けの情報をまとめたものです。
@@ -40,7 +40,7 @@ Windows でのビルド方法の詳細は、以下のドキュメントを参照
   - `src/jp_data_lookup.c` において、データ検索用にアーティファクトの日本語名（およびひらがな表記）を英語キーに紐づける alias 設定を追加。
 * **通常オブジェクトの日本語名による願い対応（JNetHack表記揺れ吸収対応）**:
   - `src/obj_jp.c` に、JNetHack式の日本語名（例：「スピードブーツ」「願いのワンド」など）から英語名にマッピングするためのエイリアステーブル (`jnh_wish_aliases[]`) を定義。
-  - クラス接尾辞（「の巻物」「の指輪」など）が剥ぎ取られた部分名（例: 「鑑定」→ `"identify"` 等）でマッチングするようにマッピングを構成。
+  - クラス接尾辞（「の巻物」「の指輪」など）が剥ぎ取られた部分名（例: 「識別」→ `"identify"` 等）でマッチングするようにマッピングを構成。
   - `src/obj_jp.c` の `jnh_normalize_wish()` 内で、入力された文字列に対して `jnh_wish_aliases` による**部分置換**（`str_replace`）を適用。これにより、「祝福されたつらぬき丸」のように修飾語（祝福された/呪われた等）とJNetHack風の固有名が組み合わされた入力でも、固有名部分のみを置換して正しく「願い」を認識可能。
   - `src/objnam.c` の `jp_wish_match()` 内で、正規化された文字列を段階的に英語名と比較してヒットを判定。
 

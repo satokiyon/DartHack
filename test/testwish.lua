@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-05.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26.
 
 local wishtest_objects = {
    ["a rock"] = { otyp_name = "rock", quan = 1, oclass = "*" },
@@ -99,7 +99,7 @@ local wishtest_objects = {
    ["権力の笏"] = { otyp_name = "mace", oclass = ")", oartifact = "The Sceptre of Might" },
    -- JNetHack式のテストケース
    ["スピードブーツ"] = { otyp_name = "speed boots", oclass = "[" },
-   ["鑑定の巻物"] = { otyp_name = "identify", oclass = "?" },
+   ["識別の巻物"] = { otyp_name = "identify", oclass = "?" },
    ["解呪の巻物"] = { otyp_name = "remove curse", oclass = "?" },
    ["呪いをとく巻物"] = { otyp_name = "remove curse", oclass = "?" },
    ["願いのワンド"] = { otyp_name = "wishing", oclass = "/" },
