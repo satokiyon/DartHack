@@ -156,44 +156,93 @@ Windows版において、複数のセーブファイルが存在する際に一�
 ## 🔄 リポジトリ運用メモ
 
 ### 1. ブランチ構成と運用
-NetHack 本家（アップストリーム）の修正を継続的に反映するため、以下の2つのブランチで運用しています。
-* **`main`**: 日本語化プロジェクトのメイン開発ブランチ。
-* **`upstream-base`**: 本家 (`NetHack/NetHack-5.0`) のコードをそのまま保持する同期用ブランチ（日本語版独自の変更は加えません）。
+NetHack 本家（アップストリーム）および Android 移植ポートの修正を継続的に反映するため、以下のブランチで運用しています。
 
-### 2. 初期設定（初回のみ）
-本家のリポジトリを `upstream` リモートとして登録し、同期用ブランチを作成します。
-```powershell
-# 1. 本家リポジトリを upstream として登録
-git remote add upstream https://github.com/NetHack/NetHack.git
+*   **`main`**: 日本語化プロジェクトのメイン開発ブランチ（Windows版ベース）。
+*   **`upstream-base`**: 本家 (`NetHack/NetHack-5.0`) のコードをそのまま保持する同期用ブランチ（日本語独自の変更は加えません）。
+*   **`android-base`**: Androidポート (`JodiJodington/NetHack-Android-master`) のコードをそのまま保持する同期用ブランチ（日本語独自の変更は加えません）。
+*   **`main-android`**: 日本語化された Android 版の開発・ビルド用ブランチ。`main` と `android-base` を統合します。
 
-# 2. 最新情報を取得
-git fetch upstream
-
-# 3. 本家の NetHack-5.0 ブランチをベースにしたブランチを作成
-git checkout -b upstream-base upstream/NetHack-5.0
+```mermaid
+graph TD
+    ub[upstream-base: 本家クリーン] -->|マージ| main[main: 日本語版・Windows]
+    ab[android-base: Androidポートクリーン] -->|マージ| ma[main-android: Android対応日本語版]
+    main -->|マージ| ma
 ```
 
-### 3. 定期的な同期（2回目以降）
-本家の更新を `main` ブランチに取り込む手順です。
+### 2. 初期設定（初回のみ）
+本家および Android ポートのリモートを登録し、同期用ブランチを作成します。
+```powershell
+# 1. 本家およびAndroidポートのリモートリポジトリを登録
+git remote add upstream https://github.com/NetHack/NetHack.git
+git remote add android-port https://github.com/JodiJodington/NetHack-Android.git
+git fetch --all
+
+# 2. 同期用ブランチを作成
+git checkout -b upstream-base upstream/NetHack-5.0
+git checkout -b android-base android-port/master
+
+# 3. 開発ブランチの作成とマージ
+git checkout main
+git checkout -b main-android
+git merge --no-commit --no-ff android-base
+# ※ 競合（config.h や files.c 等）を手動解決してコミット
+git commit -m "Androidポートの初期マージ"
+```
+
+### 3. 本家 (upstream) 更新の main ブランチへの同期 (定期実行)
+本家 NetHack 側の更新を日本語版メイン (`main`) に取り込み、Windows版でのビルド・動作を確認します。
 ```powershell
 # 1. upstream-base を最新にする
 git switch upstream-base
-git pull
+git pull upstream NetHack-5.0
 
-# 2. main に統合する
+# 2. main にマージする
 git switch main
 git merge --no-commit --no-ff upstream-base
 
-# 3. コンフリクトが発生した場合の処理（競合解決後）
-# 競合箇所を手動修正し、全解決後に以下を実行
-# git add は個別に実行する（例: git add dat/history）
+# 3. コンフリクトが発生した場合（競合を手動解決後）
 git add <解決したファイル名>
 git commit -m "アップストリームの変更をマージ"
 
-# 4. 確認とプッシュ
-# ビルドを行い、動作確認後に実行
+# 4. 動作確認後にプッシュ
 git push origin main
 
 # （補足）マージを中断して作業前の状態に戻す場合
 git merge --abort
+```
+
+### 4. Android版 (main-android) の同期・統合手順 (定期実行)
+本家更新による日本語版メイン (`main`) の変更、または Android ポート (`android-base`) 側の変更を、Android日本語版開発ブランチ (`main-android`) に統合します。
+
+```powershell
+git switch main-android
+
+# ----------------------------------------------------
+# Step A: 日本語版の最新変更 (main) をマージ
+# ----------------------------------------------------
+git merge --no-commit --no-ff main
+# ※ 競合（表示・ローカライズ処理の差分など）が発生した場合は手動解決
+git add <解決したファイル名>
+git commit -m "mainブランチの更新を統合"
+
+# ----------------------------------------------------
+# Step B: Androidポートの最新変更 (android-base) をマージ
+# ----------------------------------------------------
+# 1. まず同期用ブランチを最新化
+git switch android-base
+git pull android-port master
+git switch main-android
+
+# 2. マージを実行
+git merge --no-commit --no-ff android-base
+# ※ 競合が発生した場合は手動解決
+git add <解決したファイル名>
+git commit -m "Androidポートの更新を統合"
+
+# ----------------------------------------------------
+# Step C: ビルド確認とプッシュ
+# ----------------------------------------------------
+# WSL上でCライブラリをビルドし、Windows上でGradleビルドが通ることを確認後にプッシュします
+git push origin main-android
 ```
