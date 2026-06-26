@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	read.c	$NHDT-Date: 1782083451 2026/06/21 18:10:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.334 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2286,9 +2286,9 @@ seffect_identify(struct obj **sobjp)
         /* scroll just identifies itself for any scroll read while confused
            or for cursed scroll read without knowing identify yet */
         if (confused || (scursed && !already_known))
-            You("これが鑑定の巻物だとわかった.");
+            You("これが識別の巻物だとわかった.");
         else if (!already_known)
-            pline("これは鑑定の巻物だ.");
+            pline("これは識別の巻物だ.");
         if (!already_known)
             (void) learnscrolltyp(SCR_IDENTIFY);
         if (confused || (scursed && !already_known))
@@ -2307,8 +2307,8 @@ seffect_identify(struct obj **sobjp)
     } else {
         /* spell cast with inventory empty or scroll read when it's
            the only item leaving empty inventory after being used up */
-        pline((is_scroll) ? "鑑定できる物をもう何も持っていない."
-                          : "鑑定できる物を何も持っていない.");
+        pline((is_scroll) ? "識別できる物をもう何も持っていない."
+                          : "識別できる物を何も持っていない.");
     }
 }
 
