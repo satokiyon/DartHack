@@ -23,7 +23,30 @@ Windows でのビルド方法の詳細は、以下のドキュメントを参照
   - 新機能の追加やバグ修正の際は、検証用の Lua スクリプト（例: `testwish.lua`）を作成または利用して、ゲーム内で `#wizloadlua` コマンドを実行し、手動でテスト結果を確認してください。
   - 自動検証の仕組化や自動実行プロセスのリポジトリへの組み込みは行わず、あくまで開発者の手元での確認補助ツールとして運用します。
 
-### 3. オブジェクト名ローカライズ方針（重要）
+### 3. Android版 (WSL + Gradle) のビルドとトラブルシューティング
+Android版（`main-android` ブランチ）を WSL (`Ubuntu`) および Windows の Gradle 環境でビルドする際は、以下の構成と制約に注意してください。
+
+* **WSLでのCライブラリビルド**:
+  Cライブラリ (`libnethack.so`) は、WSL上の Android NDK と `make` を使用してビルドします。
+  - **実行コマンド例 (arm64-v8aの場合)**:
+    ```bash
+    make NDK=/path/to/android-ndk ABI=arm64-v8a install
+    ```
+  - **改行コード (CRLF) のパース制限と対応**:
+    Windows側のファイル改行コードが CRLF であるため、WSL (Linux) 上の `makedefs` ユーティリティでデータファイル等をパースする際、行末の `\r` が原因で `unknown identifier` や `non-printable` エラーが発生することがあります。これに対応するため、`util/makedefs.c` には行末の `\r` を自動トリミングする処理が実装されています。新しくパーサやファイルを拡張する際は、このトリミングが適切に行われていることを確認してください。
+
+* **Android NDK (clang) における全角文字キャストエラー**:
+  - **制限**: NDK コンパイラでは、`'。'` などのマルチバイト文字をシングルクォーテーションで囲んで文字定数（`char`）として定義すると `character too large` エラーになります。
+  - **対策**: 全角文字や記号を条件によって切り替えて出力したい場合は、必ず文字列リテラル（例: `"。"`）を使用し、フォーマット指定子を `%c` から `%s` に変更してください。
+
+* **Windows上の Gradle での APK パッケージング**:
+  `settings.gradle` 内で Gradle Source Control を用いて外部モジュール（例: `ForkFront-Android`）を一時ディレクトリ内でビルドする際、プロジェクト内の `local.properties` に設定した `sdk.dir` が外部モジュールに引き継がれず、`SDK location not found` エラーが発生します。
+  - **対策**: ビルド実行時は、必ず以下のように環境変数 `ANDROID_HOME` を設定して `gradlew` を呼び出してください。
+    ```powershell
+    $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\gradlew.bat assembleDebug
+    ```
+
+### 4. オブジェクト名ローカライズ方針（重要）
 表示用テキスト以外にゲームロジック上でキー値として使用されている英単語は、直接日本語に置換せず、日本語の表示用リストを別途用意してヘルパー関数を利用して英単語から日本語へ変換して表示する仕組みをとっています。これによって、もともとのキー値を参照するゲームロジックが破壊されるのを防ぎます。
 
 例えば `include/objects.h` を直接日本語化すると、Lua special floor の `des.object({ id = "leather armor" })` のような英語 ID ルックアップが壊れるため、内部IDは英語のまま維持し、表示層だけを日本語化します。
