@@ -16,5 +16,5 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
 - **対策**: Gradleビルド（`gradlew`）を呼び出す際は、必ずビルドプロセス全体の環境変数として `ANDROID_HOME` を直接提供してください。
   - **PowerShellでの実行例**:
     ```powershell
-    $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\gradlew.bat assembleDebug
+    $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\gradlew.bat assemble
     ```

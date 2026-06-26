@@ -43,6 +43,13 @@ android {
         universalApk = false
     }
   }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      signingConfig signingConfigs.debug
+    }
+  }
 }
 
 dependencies {
