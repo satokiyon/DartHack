@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0  makedefs.c  $NHDT-Date: 1702948590 2023/12/19 01:16:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
@@ -951,8 +951,12 @@ grep0(FILE *inputfp0, FILE* outputfp0, int flg)
 
         if (fgets(buf, sizeof(buf), inputfp0) == 0)
             break;
-        if ((tmp = strchr(buf, '\n')))
+        if ((tmp = strchr(buf, '\n'))) {
             *tmp = '\0';
+            if (tmp > buf && *(tmp - 1) == '\r') {
+                *(tmp - 1) = '\0';
+            }
+        }
         grep_lineno++;
         if (grep_trace) {
             Fprintf(outputfp0, "%04d %c >%s\n", grep_lineno,
@@ -1735,6 +1739,16 @@ fgetline(FILE *fd)
         len = newlen;
     }
 
+    if (c) {
+        char *src = c, *dst = c;
+        while (*src) {
+            if (*src == '\r' && *(src + 1) == '\n') {
+                src++;
+            }
+            *dst++ = *src++;
+        }
+        *dst = '\0';
+    }
     filter_nonascii(c);
     return c;
 }

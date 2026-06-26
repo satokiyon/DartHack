@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
 /* NetHack 5.0	do.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.411 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -132,8 +132,8 @@ boulder_hits_pool(
             } else if (lava && next2u(rx, ry)) {
                 int dmg;
 
-                You("溶けた%sに当たった%c",
-                    hliquid("lava"), Fire_resistance ? '。' : '!');
+                You("溶けた%sに当たった%s",
+                    hliquid("lava"), Fire_resistance ? "。" : "!");
                 burn_away_slime();
                 dmg = d((Fire_resistance ? 1 : 3), 6);
                 losehp(Maybe_Half_Phys(dmg), /* lava damage */
