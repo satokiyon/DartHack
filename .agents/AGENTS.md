@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-27. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. -->
 # NetHackJP Android 開発・ビルドに関する追加ルール
 
 NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下の制約とトラブルシューティング知識を遵守してください。
@@ -43,3 +43,7 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
   具体的には、`sys/android/Makefile.top` 内の `dofiles-nodlb` ターゲット等のアセットコピー処理直後に、日本語ファイル（`data_jp` 等）を元の英語名（`data` 等）へ上書きリネーム（`mv -f`）して格納します。
 - **アセットバージョン（ver）のインクリメント**:
   データファイルアセットを変更・追加した際は、上書きインストール時に強制的にアセットコピーがトリガーされるよう、必ず `sys/android/app/assets/ver` 内のバージョン値（整数値）をインクリメントしてください。
+
+## 8. デバッグ用一時コード・ログ出力のクリーンアップ
+- **原則**: デバッグや診断の目的で一時的に埋め込んだログ出力処理（例：Cコード内の `__android_log_print` や print文など）や、ログ出力のためだけに一時的に追加したリンクライブラリ指定（例：`-llog` 等）は、**原因の特定および問題の解決が完了した段階で、必ずすべて削除し、元のクリーンな状態に復元した上でコミット**してください。
+- **理由**: 本番コードやリリースパッケージ内に不要な処理やリンク依存を残さず、ログの肥大化やパフォーマンスの余計なオーバーヘッドを避けるためです。
