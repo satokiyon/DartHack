@@ -1,7 +1,4 @@
 include(':app')
+include(':lib')
+project(':lib').projectDir = file('ForkFront-Android/lib')
 rootProject.name = 'NetHack-Android'
-sourceControl {
-  gitRepository("https://github.com/JodiJodington/ForkFront-Android.git") {
-    producesModule("com.tbd.forkfront:lib")
-  }
-}

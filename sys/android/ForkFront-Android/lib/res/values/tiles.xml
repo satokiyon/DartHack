@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. -->
+<resources>
+    <string-array name="tileNames">
+    	<item>Ascii (no tiles)</item>
+    </string-array>
+    <string-array name="tileValues">
+        <item>TTY</item>
+    </string-array>
+
+</resources>
