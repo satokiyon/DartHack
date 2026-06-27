@@ -1,5 +1,4 @@
 /* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-27. */
-#include <android/log.h>
 #include <string.h>
 #include <errno.h>
 #include <jni.h>
@@ -358,14 +357,9 @@ void debuglog(const char *fmt, ...)
 		strcpy(buf, "(null)");
 	}
 
-	__android_log_print(ANDROID_LOG_DEBUG, "NetHackJP", "%s", buf);
-
-	if (jEnv && jAppInstance && jDebugLog)
-	{
-		jbyteArray jstr = create_bytearray(buf);
-		JNICallV(jDebugLog, jstr);
-		destroy_jobject(jstr);
-	}
+	jbyteArray jstr = create_bytearray(buf);
+	JNICallV(jDebugLog, jstr);
+	destroy_jobject(jstr);
 }
 
 //____________________________________________________________________________________
