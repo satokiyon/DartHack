@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-27. */
 /* NetHack 5.0	options.c	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.782 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
@@ -3037,8 +3037,8 @@ optfn_paranoid_confirmation(
                          " %s", paranoia[i].argname);
         }
         /* note: always leaves enough room for caller to tack on '\n' */
-        opts[0] = '\0';
-        (void) strncat(opts, tmpbuf[0] ? &tmpbuf[1] : "none", BUFSZ - 1);
+        Snprintf(opts, BUFSZ - 1, "%s",
+                 tmpbuf[0] ? &tmpbuf[1] : "none");
         return optn_ok;
     }
     if (req == do_handler) {
@@ -9045,9 +9045,10 @@ doset(void) /* changing options via menu by Per Liboriussen */
                     getlin(buf, abuf);
                     if (abuf[0] == '\033')
                         continue;
-                    Sprintf(buf, "%s:", allopt[opt_indx].name);
-                    (void) strncat(eos(buf), abuf,
-                                   (sizeof buf - 1 - strlen(buf)));
+                    Snprintf(buf, sizeof buf,
+                             "%s:%s",
+                             allopt[opt_indx].name,
+                             abuf);
                     /* pass the buck */
                     (void) parseoptions(buf, FALSE, FALSE);
                 }

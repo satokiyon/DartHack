@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-27. */
 /* NetHack 5.0	mon.c	$NHDT-Date: 1781062909 2026/06/09 19:41:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.634 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -4872,7 +4872,7 @@ pick_animal(void)
     /* rogue level should use monsters represented by uppercase letters
        only, but since chameleons aren't generated there (not uppercase!)
        we don't perform a lot of retries */
-    if (Is_rogue_level(&u.uz) && !isupper(monsym(&mons[res])))
+    if (Is_rogue_level(&u.uz) && !isupper((int) monsym(&mons[res])))
         res = ga.animal_list[rn2(ga.animal_list_count)];
     return res;
 }
@@ -5235,7 +5235,7 @@ select_newcham_form(struct monst *mon)
         } while (--tryct > 0 && !validspecmon(mon, mndx)
                  /* try harder to select uppercase monster on rogue level */
                  && (tryct > 40 && Is_rogue_level(&u.uz)
-                     && !isupper(monsym(&mons[mndx]))));
+                     && !isupper((int) monsym(&mons[mndx]))));
     }
     return mndx;
 }
@@ -5345,7 +5345,7 @@ newcham(
             /* for the first several tries we require upper-case on
                the rogue level (after that, we take whatever we get) */
             if (tryct > 15 && Is_rogue_level(&u.uz)
-                && mdat && !isupper(monsym(mdat)))
+                && mdat && !isupper((int) monsym(mdat)))
                 mdat = 0;
             if (mdat)
                 break;
