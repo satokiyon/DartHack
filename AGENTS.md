@@ -88,3 +88,18 @@
 6. **デバッグ用一時コード・ログ出力のクリーンアップ**:
    - デバッグや診断の目的で一時的に埋め込んだログ出力処理（例：Cコード内の `__android_log_print` や print文など）や、ログ出力のためだけに一時的に追加したリンクライブラリ指定（例：`-llog` 等）は、**原因の特定および問題の解決が完了した段階で、必ずすべて削除し、元のクリーンな状態に復元した上でコミット**してください。
 
+7. **独自のバーチャルキーボード（SoftKeyboard）の非表示漏れとプレビュー残存バグ対策**:
+   - 独自のバーチャルキーボード（`SoftKeyboard` / `KeyboardView`）が非表示になる際、拡大キープレビュー（`PopupWindow`）が消えずに画面上に残り、システムキーボード（IME）へのタッチ入力を阻害するバグ。また、初期化されていない状態で `hide()` を呼んだ際に `kbd_frame` の非表示（`GONE`）化がスキップされ、システムキーボードの直上のタッチを阻害するバグ。
+   - 対策：
+     - `mainwindow.xml` の `kbd_frame` の初期可視性を `gone` にする。
+     - `SoftKeyboard.java` のコンストラクタで `mKeyboardFrame.setVisibility(View.GONE)` を呼び出す。
+     - `SoftKeyboard.show()` 時に `setPreviewEnabled(true)` でプレビューを有効化。
+     - `SoftKeyboard.hide()` 時に `setPreviewEnabled(false)` でプレビューを無効化し、かつ `closing()` を明示的に呼び出してプレビューウィンドウを破棄・クローズした上で、`mKeyboardFrame.setVisibility(View.GONE)` でフレームを非表示にする。
+
+8. **外部モジュール ForkFront-Android のローカルモジュール化と修正の適用**:
+   - 背景：以前はビルド時に `sourceControl` で GitHub から直接取得されていたため、ローカルの Java ソースコード修正をビルドに反映できませんでした。
+   - 構成：
+     - `settings.gradle` で `sourceControl` を削除し、`include(':lib')` と `project(':lib').projectDir = file('ForkFront-Android/lib')` を設定。
+     - `app/build.gradle` の `dependencies` に `implementation project(':lib')` を指定。
+     - `ForkFront-Android` は `.git` を削除したうえで、NetHackJPの通常のローカルディレクトリとして Git 追跡対象とします。
+
