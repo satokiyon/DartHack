@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-27. */
 /* NetHack 5.0	sp_lev.c	$NHDT-Date: 1778778225 2026/05/14 17:03:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.387 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2042,7 +2043,8 @@ create_monster(monster *m, struct mkroom *croom)
                         && m_bad_boulder_spot(x, y)) {
                         int retrylimit = 10;
 
-                        remove_monster(x, y);
+                        if (x >= 0)
+                            remove_monster(x, y);
                         do {
                             x = m->x;
                             y = m->y;
