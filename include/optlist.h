@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-27. */
 /* NetHack 5.0	optlist.h */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -366,11 +366,15 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(herecmd_menu, Advanced, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &iflags.herecmd_menu, Term_False,
            "この場所で利用可能なコマンドを表示する")
+#if 0
+/* there is no optfn_hicolor() defined in options.c presently
+   and that is required for NHOPTC */
 #if defined(MAC68K)
     NHOPTC(hicolor, Advanced, 15, opt_in, set_in_config,
                 No, Yes, No, No, NoAlias,
                 "palette と同じだが並び順が逆")
 #endif
+#endif /* 0 */
     NHOPTB(hilite_pet, Map, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &iflags.wc_hilite_pet, Term_False,
            "ペットをハイライト表示する")
