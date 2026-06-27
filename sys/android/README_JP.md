@@ -38,44 +38,70 @@ WSL (Ubuntu) 内で以下を実行します：
 
 ```bash
 sudo apt update
-sudo apt install -y build-essential bison flex curl unzip
+sudo apt install -y build-essential bison flex curl unzip default-jdk
 ```
 
+また、WSL側からWindows側のファイルを操作するために`/etc/wsl.conf`につぎを追記します。
+NTFSの領域を次のようなパーミッションでマウントするようWSLを設定するためです。
+
+```bash
+[automount]
+options = "metadata,umask=22,fmask=11"
 ---
+
+WSLをいったん停止して、Ubuntuを再起動してください
+
+```bash
+wsl shutdown
+```
 
 ## 🤖 Step 2: Android NDK のインストール（WSL内）
 
 ### 2.1 NDK のダウンロードと展開
 
 WSL (Ubuntu) 内で以下を実行し、Android NDK をインストールします。
-NDK のバージョンは `21.4.7075529` を使用します（Makefile.src に合わせてください）。
+
+まず[Android Studioのページ](https://developer.android.com/studio) から、Linux用のコマンドラインツールをダウンロードし、 [sdkmanagerのマニュアル](https://developer.android.com/tools/sdkmanager?hl=ja)に従ってセットアップし、sdkmanagerを使用してAndroid NDKをインストールします。
+
+なお、この例ではコマンドラインツールは`commandlinetools-linux-14742923_latest.zip`をダウンロードします。
+また、Androdid NDKのバージョンは`30.0.14904198`を使用します。
 
 ```bash
 # ディレクトリの作成
-mkdir -p ~/android_sdk/ndk
+mkdir -p ~/android_sdk/
 
-# NDK r21e のダウンロード
-cd /tmp
-curl -O https://dl.google.com/android/repository/android-ndk-r21e-linux-x86_64.zip
+# コマンドラインツールをダウンロード
+cd ~/android_sdk
+curl -o https://dl.google.com/android/repository/commandlinetools-linux-14742923_latest.zip
 
-# 展開
-unzip android-ndk-r21e-linux-x86_64.zip
+#コマンドラインツールを展開
+unzip ./commandlinetools-linux-14742923_latest.zip
+cd cmdline-tools
 
-# 所定のディレクトリに配置
-mv android-ndk-r21e ~/android_sdk/ndk/21.4.7075529
+#latestディレクトリにすべて移す
+mkdir ./latest
+mv ./NOTICE.txt ./bin ./lib ./source.properties ./latest/
+
+#sdkmanagerを使用してAndroid NDKをダウンロードする
+cd ./latest/bin
+./sdkmanager --update
+./sdkmanager --list | grep ndk
+./sdkmanager --install "ndk;30.0.14904198"
+
+#ndkのインストールを確認
+ls ~/android_sdk/ndk/
 ```
 
-### 2.2 NDK パスの確認
-
-Makefile 内の `NDK` 変数と一致していることを確認します：
+インストールしたバージョンに合わせて Makefile.top と Makefile.src のNDK=の行を更新してください。
 
 ```bash
-ls ~/android_sdk/ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin/
-# aarch64-linux-android30-clang 等が存在すればOK
+NDK = ${HOME}/android_sdk/ndk/30.0.14904198
 ```
 
 > [!IMPORTANT]
 > `Makefile.src` と `Makefile.top` 内の `NDK` 変数のパスが、実際のインストールパスと一致していることを確認してください。異なる場合はパスを修正するか、`make` 実行時に `NDK=<パス>` で上書き指定してください。
+
+wslの環境セットアップは以上です。
 
 ---
 
@@ -98,6 +124,7 @@ Android Studio の **SDK Manager** (File → Settings → Android SDK) から以
 > [!TIP]
 > Android Studio を使わず SDK Command-line Tools だけで構築することも可能です。
 > その場合は `sdkmanager` を使って上記コンポーネントをインストールしてください。
+> WSL環境だけでapkをビルドすることも可能です。README.mdを参照してください。
 
 ### 3.3 SDK パスの確認
 
@@ -256,7 +283,7 @@ sys/android/app/build/outputs/apk/release/
 ```
 
 > [!NOTE]
-> リリース版は `build.gradle` の `buildTypes.release` で `signingConfig signingConfigs.debug` が設定されているため、デバッグ署名が使用されます。Google Play ストア等への公開を行う場合は、独自の署名鍵を設定してください。
+> リリース版は `build.gradle` の `buildTypes.release` で `signingConfig signingConfigs.debug` が設定されているため、デバッグ署名が使用されます。
 
 ---
 
