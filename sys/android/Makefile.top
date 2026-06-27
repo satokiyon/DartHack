@@ -68,7 +68,7 @@ INSTDIR = $(HACKDIR)
 #	Qt without X11; assumes GRAPHIC_TOMBSTONE:
 # VARDATND = nhtiles.bmp pet_mark.xbm pilemark.xbm rip.xpm
 
-VARDATD = bogusmon data engrave epitaph oracles options quest.lua rumors
+VARDATD = bogusmon data engrave epitaph oracles options quest.lua rumors data_jp rumors_jp oracles_jp
 VARDAT = $(VARDATD) $(VARDATND)
 
 #	Some versions of make use the SHELL environment variable as the
@@ -92,7 +92,8 @@ LUA_VERSION = 5.4.8
 # end of configuration
 #
 
-DATHELP = help hh cmdhelp keyhelp history opthelp optmenu usagehlp wizhelp
+DATHELP = help hh cmdhelp keyhelp history opthelp optmenu usagehlp wizhelp \
+	help_jp hh_jp cmdhelp_jp keyhelp_jp history_jp opthelp_jp optmenu_jp usagehlp_jp wizhelp_jp
 
 SPEC_LEVS = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
 	juiblex.lua knox.lua medusa-?.lua minend-?.lua minefill.lua \
@@ -234,6 +235,9 @@ distrib:
 data: $(GAME)
 	( cd dat ; $(MAKE) data )
 
+data_jp: $(GAME)
+	( cd dat ; $(MAKE) data_jp )
+
 engrave: $(GAME)
 	( cd dat ; $(MAKE) engrave )
 
@@ -246,8 +250,14 @@ epitaph: $(GAME)
 rumors: $(GAME)
 	( cd dat ; $(MAKE) rumors )
 
+rumors_jp: $(GAME)
+	( cd dat ; $(MAKE) rumors_jp )
+
 oracles: $(GAME)
 	( cd dat ; $(MAKE) oracles )
+
+oracles_jp: $(GAME)
+	( cd dat ; $(MAKE) oracles_jp )
 
 #	Note: options should have already been made with make, but...
 options: $(GAME)
@@ -363,6 +373,12 @@ dofiles-dlb: check-dlb
 dofiles-nodlb:
 # copy over the game files
 	( cd dat ; cp $(DAT) $(INSTDIR) )
+	-( cd $(INSTDIR) ; \
+	  for f in help hh cmdhelp keyhelp history opthelp optmenu usagehlp wizhelp data rumors oracles; do \
+	    if [ -f $${f}_jp ]; then \
+	      mv -f $${f}_jp $$f ; \
+	    fi ; \
+	  done )
 # set up their permissions
 	#-( cd $(INSTDIR) ; $(CHOWN) $(GAMEUID) $(DAT) ; \
 			#$(CHGRP) $(GAMEGRP) $(DAT) ; \

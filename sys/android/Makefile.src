@@ -227,7 +227,7 @@ TARGET_CXX   := $(TARGET_CC)++
 TARGET_LINK := $(TARGET_CC)
 
 CFLAGS = -DANDROID -DSND_LIB_ANDROIDSOUND -O2 -g -Wno-format -fsigned-char -fPIC -I../include
-LFLAGS = -shared
+LFLAGS = -shared -llog
 
 
 #fallback values, only if these are not already set

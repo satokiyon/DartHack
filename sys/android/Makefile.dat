@@ -9,7 +9,7 @@ NHSROOT=..
 # SHELL=E:/GEMINI2/MUPFEL.TTP
 # UUDECODE=uudecode
 
-VARDAT = bogusmon data engrave epitaph rumors oracles
+VARDAT = bogusmon data engrave epitaph rumors oracles data_jp rumors_jp oracles_jp
 
 all:	$(VARDAT) spec_levs quest_levs
 
@@ -114,6 +114,15 @@ bogusmon:	bogusmon.txt ../util/makedefs
 
 options:	../util/makedefs
 	../util/makedefs -v
+
+data_jp:	data_jp.base ../util/makedefs
+	../util/makedefs -d
+
+rumors_jp:	rumors_jp.tru rumors_jp.fal ../util/makedefs
+	../util/makedefs -r
+
+oracles_jp:	oracles_jp.txt ../util/makedefs
+	../util/makedefs -h
 
 # these don't actually do anything useful now that levcomp and dngcomp are gone
 spec_levs:
