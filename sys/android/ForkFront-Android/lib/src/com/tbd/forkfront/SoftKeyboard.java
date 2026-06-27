@@ -69,6 +69,7 @@ public class SoftKeyboard implements OnKeyboardActionListener
 
 			mKeyboardView.setKeyboard(mQwertyKeyboard);
 			mKeyboardView.setShifted(mIsShifted);
+			mKeyboardView.setPreviewEnabled(true);
 
 			switch(mCurrent)
 			{
@@ -91,6 +92,8 @@ public class SoftKeyboard implements OnKeyboardActionListener
 	{
 		if(mQwertyKeyboard != null)
 		{
+			mKeyboardView.setPreviewEnabled(false);
+			mKeyboardView.closing();
 			Util.hideKeyboard(mContext, mKeyboardView);
 			mQwertyKeyboard = null;
 			mMetaKeyboard = null;
