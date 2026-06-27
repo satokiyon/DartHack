@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-27. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -73,3 +73,15 @@
 3. **Windows (PowerShell) 環境での Git コミット・コマンド実行の制約**:
    - `run_command` 等でコマンドを連結する際、PowerShell では `&&` を使用すると構文エラーになるため、1行ずつ実行するかセミコロン `;` 等で区切ってください。
    - 日本語のコミットメッセージを指定する場合、PowerShell 上で文字化けが発生するのを防ぐため、メッセージを一時ファイル（UTF-8）を artifacts の scratch ディレクトリ（例：`<appDataDir>\brain\<conversation-id>\scratch\commit_msg.txt`）に書き込み、`git commit -F <ファイルパス>` でコミットを行ってください。コミット完了後、一時ファイルは削除してください。
+
+4. **Android (WSL + Gradle) 環境での自動ビルドスクリプトの利用**:
+   - Android環境向けに `libnethack.so` のコンパイルおよびAPKビルドを行う際は、用意されているPowerShellスクリプト `sys/android/build_android.ps1` を実行してください。
+   - このスクリプトを実行する際は、PowerShell上で `& .\sys\android\build_android.ps1` の形式で呼び出します。これにより、自動的に WSL (Ubuntu-26.04) 上での C ライブラリのビルドと、Windows 側での `ANDROID_HOME` の設定を伴う `gradlew.bat` による APK パッケージングが一貫して行われます。
+
+5. **Android版における日本語データファイル（データベース・ヘルプ）の配置方針**:
+   - Androidポートでは、データファイル群（`data`, `rumors`, `oracles` 等）およびヘルプ・メニューなどのデータファイル群を個別のファイルとして `assets/nethackdir/` にパッケージングし、アプリ起動時に Java 側の `UpdateAssets.java` を経由して端末のストレージ（データディレクトリ）にコピーして読み込みます。
+   - `data_jp` や `help_jp` といった `_jp` 接尾辞を持つ日本語ファイルをそのまま別ファイル名としてアセットに配置すると、Java側のアセット取得バグやC側のファイルオープン制限によって、正常にコピーまたはロードされず、英語版データにフォールバックして表示されてしまう問題が発生します。
+   - 解決策として、Androidポートでは英語版データファイル自体を完全に排除し、**日本語版データを英語版と同じ標準ファイル名（例：`data`, `help`, `rumors` 等）としてアセット化**します。
+   - 具体的には、`sys/android/Makefile.top` 内の `dofiles-nodlb` ターゲット等のアセットコピー処理直後に、日本語ファイル（`data_jp` 等）を元の英語名（`data` 等）へ上書きリネーム（`mv -f`）して格納します。
+   - データファイルアセットを変更・追加した際は、上書きインストール時に強制的にアセットコピーがトリガーされるよう、必ず `sys/android/app/assets/ver` 内のバージョン値（整数値）をインクリメントしてください。
+
