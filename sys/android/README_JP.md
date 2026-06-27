@@ -151,6 +151,9 @@ cd sys/android
 sh ./setup.sh
 cd ../..
 
+#現在NetHackJPにいることを確認
+pwd
+
 # Lua のソース取得
 make fetch-lua
 ```

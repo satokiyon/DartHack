@@ -50,19 +50,14 @@ Android版（`main-android` ブランチ）を WSL (`Ubuntu`) および Windows 
     $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\gradlew.bat assembleRelease
     ```
 
-* **AIエージェント向けビルドコマンド**:
-  AIエージェントが Android ビルドを実行する際は、以下のコマンドを手動承認で順次実行してください。
-  - **Step 1: WSLでのCライブラリコンパイルと配置**
-    ```powershell
-    wsl -d Ubuntu-26.04 make NDK=/home/satok/android_sdk/ndk/30.0.14904198 ABI=arm64-v8a install
-    ```
-    ※ NDKのバージョンやパス is fixed in the host.
-  - **Step 2: Windows側での Gradle パッケージング**
-    カレントディレクトリを `sys/android` に指定した上で、環境変数 `ANDROID_HOME` を設定してビルドを実行します。
-    ```powershell
-    $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\gradlew.bat assemble
-    ```
-    ※ 外部依存プロジェクト（ForkFront-Android）へSDKパスを伝播させるため、必ず環境変数 `ANDROID_HOME` を提供してください。
+* **AIエージェント・開発者向け自動ビルドスクリプト**:
+  WSL上のCライブラリコンパイルからWindows上のGradleパッケージング（`assembleDebug`）までを一貫して自動実行するスクリプトが用意されています。
+  AIエージェントや開発者が Android ビルドを行う際は、PowerShell から以下のスクリプトを呼び出してください。
+  ```powershell
+  & .\sys\android\build_android.ps1
+  ```
+  ※ スクリプト内部で自動的に `wslpath` を使用してリポジトリパスを解決し、環境変数 `ANDROID_HOME` も伝播させてビルドを実行します。
+  ※ 生成されるデバッグ用APKは `sys/android/app/build/outputs/apk/debug/app-debug.apk` に配置されます。
 
 * **CP437デコーダの無効化（日本語文字化け対策）**:
   Android版 NetHack は `sys/android/app/res/values/config.xml` の `useCP437Decoder` が `true` の場合、テキスト出力を CP437（単バイト・IBMコードページ）としてデコードします。NetHackJP の日本語テキストは UTF-8 でエンコードされているため、CP437 デコードでは文字化けが発生します。
