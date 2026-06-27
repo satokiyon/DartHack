@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-27. */
 /* NetHack 5.0	cmd.c	$NHDT-Date: 1781973043 2026/06/20 16:30:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.772 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -2430,7 +2430,7 @@ handler_rebind_keys(void)
         add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
                  "変更されたキー割り当てを表示する", MENU_ITEMFLAGS_NONE);
     }
-    end_menu(win, "何をなさいますか?");
+    end_menu(win, "何をしますか?");
     npick = select_menu(win, PICK_ONE, &picks);
     destroy_nhwindow(win);
     if (npick > 0) {
@@ -4882,7 +4882,7 @@ there_cmd_menu(coordxy x, coordxy y, int mod)
         act_on_act(act, dx, dy);
         return '\0';
     } else {
-        end_menu(win, "何をなさいますか?");
+        end_menu(win, "何をしますか?");
         npick = select_menu(win, PICK_ONE, &picks);
         ch = '\033';
     }
