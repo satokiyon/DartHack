@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0  decl.h  $NHDT-Date: 1781973078 2026/06/20 16:31:18 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.408 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
@@ -806,6 +806,9 @@ struct instance_globals_p {
     int  poly_zapped;
 
     /* new stuff */
+    int puzzling_criteria;
+    char puzzling_ilets[invlet_basic + 1];
+
     boolean havestate;
 };
 
