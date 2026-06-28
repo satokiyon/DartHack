@@ -2251,15 +2251,15 @@ br_string(int type)
 {
     switch (type) {
     case BR_PORTAL:
-        return "Portal";
+        return "ポータル";
     case BR_NO_END1:
-        return "Connection";
+        return "接続路";
     case BR_NO_END2:
-        return "One way stair";
+        return "一方通行の階段";
     case BR_STAIR:
-        return "Stair";
+        return "階段";
     }
-    return " (unknown)";
+    return " (不明)";
 }
 
 staticfn char
@@ -2282,10 +2282,10 @@ print_branch(
     for (br = svb.branches; br; br = br->next) {
         if (br->end1.dnum == dnum && lower_bound < br->end1.dlevel
             && br->end1.dlevel <= upper_bound) {
-            Sprintf(buf, "%c %s to %s: %d",
+            Sprintf(buf, "%c %sへの%s: %d階",
                     bymenu ? chr_u_on_lvl(&br->end1) : ' ',
-                    br_string(br->type),
-                    svd.dungeons[br->end2.dnum].dname, depth(&br->end1));
+                    jp_dungeon_name_for_display(svd.dungeons[br->end2.dnum].dname),
+                    br_string(br->type), depth(&br->end1));
             if (bymenu)
                 tport_menu(win, buf, lchoices_p, &br->end1,
                            unreachable_level(&br->end1, FALSE));
@@ -3500,6 +3500,9 @@ jp_special_level_name(const char *proto)
     static char buf[128];
     if (!proto || !*proto) return proto;
 
+    if (!strncmpi(proto, "bigrm", 5)) {
+        return "大部屋";
+    }
     if (!strncmpi(proto, "medusa", 6)) {
         return "メデューサの島";
     }
@@ -3548,10 +3551,10 @@ jp_special_level_name(const char *proto)
     if (!strcmpi(proto, "knox")) return "フォート・ノックス";
     if (!strcmpi(proto, "asmodeus")) return "アスモデウスの霊廟";
     if (!strcmpi(proto, "baalz")) return "バアルゼブブの霊廟";
-    if (!strcmpi(proto, "juiblex")) return "ジュイブレクスの沼";
+    if (!strcmpi(proto, "juiblex")) return "ジョウビレックスの沼";
     if (!strcmpi(proto, "orcus")) return "オルクスの町";
     if (!strcmpi(proto, "astral")) return "アストラル界";
-    if (!strcmpi(proto, "air")) return "気の界";
+    if (!strcmpi(proto, "air")) return "空の界";
     if (!strcmpi(proto, "earth")) return "土の界";
     if (!strcmpi(proto, "fire")) return "火の界";
     if (!strcmpi(proto, "water")) return "水の界";
@@ -3571,7 +3574,7 @@ jp_special_level_name(const char *proto)
         else if (!strncmpi(proto, "Rog", 3)) role = "盗賊";
         else if (!strncmpi(proto, "Sam", 3)) role = "侍";
         else if (!strncmpi(proto, "Tou", 3)) role = "観光客";
-        else if (!strncmpi(proto, "Val", 3)) role = "戦乙女";
+        else if (!strncmpi(proto, "Val", 3)) role = "ワルキューレ";
         else if (!strncmpi(proto, "Wiz", 3)) role = "魔法使い";
         
         if (*role) {
