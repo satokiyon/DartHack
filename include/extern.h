@@ -952,6 +952,7 @@ extern void remdun_mapseen(int);
 extern const char *jp_dungeon_name_for_display(const char *);
 extern const char *jp_dungeon_name_by_dnum(int);
 extern const char *jp_endgamelevelname_for_display(char *, int);
+extern const char *jp_special_level_name(const char *);
 extern const char *endgamelevelname(char *, int);
 
 /* ### earlyarg.c ### */

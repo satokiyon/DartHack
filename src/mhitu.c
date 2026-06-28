@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	mhitu.c	$NHDT-Date: 1781973054 2026/06/20 16:30:54 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.347 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -349,7 +349,7 @@ expels(
                 } else {
                     Strcpy(blast, "ぬちゃりと");
                 }
-                You("%s%s吐き出された!", blast, l_monnam(mtmp));
+                You("%s%sから吐き出された!", blast, l_monnam(mtmp));
             }
         }
     }
