@@ -3501,7 +3501,7 @@ jp_special_level_name(const char *proto)
     if (!proto || !*proto) return proto;
 
     if (!strncmpi(proto, "bigrm", 5)) {
-        return "大部屋";
+        return "ビッグルーム";
     }
     if (!strncmpi(proto, "medusa", 6)) {
         return "メデューサの島";
