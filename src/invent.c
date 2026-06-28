@@ -4489,14 +4489,16 @@ look_here(
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
                 felt_cockatrice = TRUE;
                 Sprintf(buf, "%s...",
-                        (puzzling_count) ? doname_with_cgender(otmp)
-                                         : doname(otmp));
+                        drop_english_article(
+                            (puzzling_count) ? doname_with_cgender(otmp)
+                                             : doname(otmp)));
                 putstr(tmpwin, 0, buf);
                 break;
             }
             putstr(tmpwin, 0,
-                   (puzzling_count) ? doname_with_price_and_cgender(otmp)
-                                    : doname_with_price(otmp));
+                   drop_english_article(
+                       (puzzling_count) ? doname_with_price_and_cgender(otmp)
+                                        : doname_with_price(otmp)));
         }
         display_nhwindow(tmpwin, TRUE);
         destroy_nhwindow(tmpwin);
