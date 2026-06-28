@@ -455,7 +455,7 @@ prisoner_speaks(struct monst *mtmp)
         && (mtmp->mstrategy & STRAT_WAITMASK)) {
         /* Awaken the prisoner */
         if (canseemon(mtmp))
-            pline("%s speaks:", Monnam(mtmp));
+            pline("%sは語りかけた：", Monnam(mtmp));
         SetVoice(mtmp, 0, 80, 0);
         verbalize("ようやく自由だ！");
         mtmp->mstrategy &= ~STRAT_WAITMASK;
