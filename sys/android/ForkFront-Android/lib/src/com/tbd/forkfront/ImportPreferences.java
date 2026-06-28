@@ -67,7 +67,7 @@ public class ImportPreferences extends Preference implements PreferenceManager.O
 									os.flush();
 									os.close();
 								} catch (IOException e) {
-									Toast.makeText(getContext(), "failed to write file", Toast.LENGTH_LONG).show();
+									Toast.makeText(getContext(), "設定ファイルの保存に失敗しました", Toast.LENGTH_LONG).show();
 								}
 							} else {
 								Object obj = jsonobj.get(key);
@@ -81,12 +81,12 @@ public class ImportPreferences extends Preference implements PreferenceManager.O
 							}
 						}
 						edit.apply();
-						Toast.makeText(getContext(), "applied the new settings", Toast.LENGTH_LONG).show();
+						Toast.makeText(getContext(), "設定を適用しました", Toast.LENGTH_LONG).show();
 					} catch (JSONException e) {
-						Toast.makeText(getContext(), "failed to read json", Toast.LENGTH_LONG).show();
+						Toast.makeText(getContext(), "設定データの解析に失敗しました", Toast.LENGTH_LONG).show();
 					}
 				} catch (IOException e) {
-					Toast.makeText(getContext(), "failed to read file", Toast.LENGTH_LONG).show();
+					Toast.makeText(getContext(), "設定ファイルの読み込みに失敗しました", Toast.LENGTH_LONG).show();
 				}
 			}
 			// otherwise the settings menu will be in a weird state where the settings are set in SharedPreferences but not in the menus

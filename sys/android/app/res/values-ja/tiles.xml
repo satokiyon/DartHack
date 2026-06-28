@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. -->
 <resources>
     <string-array name="tileNames">
-    	<item>Ascii (no tiles)</item>
-        <item>Default</item>
+    	<item>Ascii (タイルなし)</item>
+        <item>デフォルト</item>
         <item>Geoduck</item>
         <item>Nevanda</item>
         <item>PixelHack</item>
@@ -15,5 +15,4 @@
         <item>nevanda_32x32</item>
         <item>pixelhack_32x32</item>
     </string-array>
-
 </resources>

@@ -103,3 +103,5 @@
      - `app/build.gradle` の `dependencies` に `implementation project(':lib')` を指定。
      - `ForkFront-Android` は `.git` を削除したうえで、NetHackJPの通常のローカルディレクトリとして Git 追跡対象とします。
 
+9. **固有名詞の英語表記の維持方針**:
+   - タイルセット名（Geoduck, Nevanda, PixelHack など）のような固有名詞は、日本語化リソース（xmlなど）を作成する際にもカタカナなどに翻訳せず、元の英語表記のまま維持してください。

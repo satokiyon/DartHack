@@ -121,16 +121,16 @@ public class ExportPreferences extends Preference implements PreferenceManager.O
 						rcBytes = readAllbytes(is);
 						is.close();
 					} catch (FileNotFoundException e) {
-						Toast.makeText(getContext(), "nethack rc file not found", Toast.LENGTH_LONG).show();
+						Toast.makeText(getContext(), "設定ファイル(defaults.nh)が見つかりません", Toast.LENGTH_LONG).show();
 						rcBytes = "".getBytes();
 					} catch (IOException e) {
-						Toast.makeText(getContext(), "failed to read nethack rc file", Toast.LENGTH_LONG).show();
+						Toast.makeText(getContext(), "設定ファイル(defaults.nh)の読み込みに失敗しました", Toast.LENGTH_LONG).show();
 						rcBytes = "".getBytes();
 					}
 					String rcStr = new String(rcBytes);
 					jsonobj.put("rcFileContents", rcStr);
 				} catch (JSONException e) {
-					Toast.makeText(getContext(), "failed to create settings json", Toast.LENGTH_LONG).show();
+					Toast.makeText(getContext(), "設定データの作成に失敗しました", Toast.LENGTH_LONG).show();
 				}
 				String str = jsonobj.toString();
 				byte[] bytes;
@@ -141,7 +141,7 @@ public class ExportPreferences extends Preference implements PreferenceManager.O
 					os.flush();
 					os.close();
 				} catch (IOException e) {
-					Toast.makeText(getContext(), "failed to write settings file", Toast.LENGTH_LONG).show();
+					Toast.makeText(getContext(), "設定ファイルの書き出しに失敗しました", Toast.LENGTH_LONG).show();
 				}
 			}
 			return true;
