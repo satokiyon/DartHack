@@ -19,8 +19,8 @@ Write-Host "[Step 1/2] Compiling C libraries in WSL (Ubuntu-26.04)..." -Foregrou
 $WslRepoPath = (wsl -d Ubuntu-26.04 wslpath ($RepoRoot.Replace('\', '/'))).Trim()
 Write-Host "WSL repository path: $WslRepoPath" -ForegroundColor Gray
 
-# Clean and make install in WSL
-wsl -d Ubuntu-26.04 bash -lc "cd '$WslRepoPath' && make clean && make -j4 install"
+# Clean and make install in WSL (Run setup.sh and fetch Lua first)
+wsl -d Ubuntu-26.04 bash -lc "cd '$WslRepoPath/sys/android' && sh ./setup.sh && cd '$WslRepoPath' && make fetch-lua && make clean && make -j4 install"
 
 # 2. Windows Gradle packaging
 Write-Host "[Step 2/2] Packaging APK with Gradle in Windows..." -ForegroundColor Yellow
