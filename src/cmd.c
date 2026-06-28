@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	cmd.c	$NHDT-Date: 1781973043 2026/06/20 16:30:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.772 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -4484,8 +4484,8 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
 
 #if 0
     if (Upolyd) { /* before objects */
-        Sprintf(buf, "Use %s special ability",
-            s_suffix(jp_pmname(&mons[u.umonnum], Ugender)));
+        Sprintf(buf, "%sの特殊能力を使う",
+            jp_pmname(&mons[u.umonnum], Ugender));
         mcmd_addmenu(win, MCMD_MONABILITY, buf), ++K;
     }
 #endif
@@ -4557,14 +4557,14 @@ there_cmd_menu_next2u(
             key_or_pick = (carrying(SKELETON_KEY) || carrying(LOCK_PICK));
             card = (carrying(CREDIT_CARD) != 0);
             if (key_or_pick || card) {
-                Sprintf(buf, "%sunlock the door",
-                        key_or_pick ? "lock or " : "");
-                mcmd_addmenu(win, MCMD_LOCK_DOOR, upstart(buf)), ++K;
+                Sprintf(buf, "扉を%s",
+                        key_or_pick ? "施錠／解錠する" : "解錠する");
+                mcmd_addmenu(win, MCMD_LOCK_DOOR, buf), ++K;
             }
             /* unfortunately there's no tknown flag for doors (or chests)
                to remember whether a trap had been found */
             mcmd_addmenu(win, MCMD_UNTRAP_DOOR,
-                         "Search the door for a trap"), ++K;
+                         "扉の罠を捜索する"), ++K;
             /* [what about #force?] */
             mcmd_addmenu(win, MCMD_KICK_DOOR, "扉を蹴る"), ++K;
         } else if ((dm & D_ISOPEN) && (mod == CLICK_2)) {

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1781973060 2026/06/20 16:31:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.464 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1317,9 +1317,10 @@ erosion_matters(struct obj *obj)
     return FALSE;
 }
 
-#define DONAME_WITH_PRICE 1
-#define DONAME_VAGUE_QUAN 2
-#define DONAME_FOR_MENU   4 /* [not used anywhere yet] */
+#define DONAME_WITH_PRICE   1
+#define DONAME_VAGUE_QUAN   2
+#define DONAME_FOR_MENU     4 /* [not used anywhere yet] */
+#define DONAME_FORCE_GENDER 8 /* always add male or female */
 
 /* core of doname() */
 staticfn char *
@@ -1330,7 +1331,8 @@ doname_base(
     boolean ispoisoned = FALSE,
             with_price = (doname_flags & DONAME_WITH_PRICE) != 0,
             vague_quan = (doname_flags & DONAME_VAGUE_QUAN) != 0,
-            for_menu = (doname_flags & DONAME_FOR_MENU) != 0;
+            for_menu = (doname_flags & DONAME_FOR_MENU) != 0,
+            with_corpse_genders = (doname_flags & DONAME_FORCE_GENDER) != 0;
     boolean known, dknown, cknown, bknown, lknown,
             fake_arti, force_the;
     char prefix[PREFIX];
@@ -1610,7 +1612,15 @@ doname_base(
                English base noun so floor messages and inventory stay natural. */
             unsigned cxarg = CXN_NORMAL;
             char *cxstr, *save_xnamep;
+            int puzzidx = (obj->invlet >= 'A' && obj->invlet <= 'Z')
+                          ? obj->invlet - 'A'
+                      : (obj->invlet >= 'a' && obj->invlet <= 'z')
+                          ? obj->invlet - 'a' + 26
+                          : 53;  /* valid index, but always holds zero */
 
+            if (with_corpse_genders && puzzidx < 53
+                && gp.puzzling_criteria == 411 && gp.puzzling_ilets[puzzidx])
+                cxarg |= CXN_ADDGNDR;
                 /* jp_corpse_xname() sets xnamep; callers other than doname_base()
                itself shouldn't care about xnamep (pointer to start of
                current obuf[]) but keep it accurate anyway */
@@ -1860,6 +1870,20 @@ doname_with_price(struct obj *obj)
     return doname_base(obj, DONAME_WITH_PRICE);
 }
 
+/* Name of object including corpse genders. */
+char *
+doname_with_cgender(struct obj *obj)
+{
+    return doname_base(obj, DONAME_FORCE_GENDER);
+}
+
+/* doname with both price and corpse gender */
+char *
+doname_with_price_and_cgender(struct obj *obj)
+{
+    return doname_base(obj, DONAME_WITH_PRICE | DONAME_FORCE_GENDER);
+}
+
 /* "some" instead of precise quantity if obj->dknown not set */
 char *
 doname_vague_quan(struct obj *obj)
@@ -1934,9 +1958,10 @@ corpse_xname(
         any_prefix = (cxn_flags & CXN_ARTICLE) != 0,
             /* leave off suffix (do_name() appends "corpse" itself) */
         omit_corpse = (cxn_flags & CXN_NOCORPSE) != 0,
+        gndr_prefix = (cxn_flags & CXN_ADDGNDR) != 0,
         possessive = FALSE,
         glob = (otmp->otyp != CORPSE && otmp->globby);
-    const char *mnam;
+    const char *mnam, *gndr;
 
     /* some callers [aobjnam()] rely on prefix area that xname() sets aside */
     gx.xnamep = nextobuf();
@@ -1976,15 +2001,19 @@ corpse_xname(
        into the code, so the() has been modified to deal with capitalized
        monster names; we could switch to using it below like an() */
 
+    gndr = (gndr_prefix && otmp->spe & CORPSTAT_MALE) != 0     ? "male "
+           : (gndr_prefix && otmp->spe & CORPSTAT_FEMALE) != 0 ? "female "
+                                                               : "";
     if (!adjective || !*adjective) {
+        Strcat(nambuf, gndr);
         /* normal case:  newt corpse */
         Strcat(nambuf, mnam);
     } else {
         /* adjective positioning depends upon format of monster name */
         if (possessive) /* Medusa's cursed partly eaten corpse */
-            Sprintf(eos(nambuf), "%s %s", mnam, adjective);
+            Sprintf(eos(nambuf), "%s %s%s", mnam, gndr, adjective);
         else /* cursed partly eaten troll corpse */
-            Sprintf(eos(nambuf), "%s %s", adjective, mnam);
+            Sprintf(eos(nambuf), "%s %s%s", adjective, gndr, mnam);
         /* in case adjective has a trailing space, squeeze it out */
         mungspaces(nambuf);
         /* doname() might include a count in the adjective argument;

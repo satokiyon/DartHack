@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	wizard.c	$NHDT-Date: 1781973074 2026/06/20 16:31:14 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
@@ -76,11 +76,11 @@ amulet(void)
             if (ttmp->ttyp == MAGIC_PORTAL) {
                 int du = distu(ttmp->tx, ttmp->ty);
                 if (du <= 9)
-                    pline("%s熱くなった!", Tobjnam(amu, "はとても"));
+                    pline("%sがとても熱くなった!", Tobjnam(amu, (char *)0));
                 else if (du <= 64)
-                    pline("%sかなり温かくなった.", Tobjnam(amu, "は"));
+                    pline("%sがかなり温かくなった.", Tobjnam(amu, (char *)0));
                 else if (du <= 144)
-                    pline("%s温かくなった.", Tobjnam(amu, "は"));
+                    pline("%sが温かくなった.", Tobjnam(amu, (char *)0));
                 /* else, the amulet feels normal */
                 break;
             }

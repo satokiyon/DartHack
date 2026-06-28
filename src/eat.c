@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	eat.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.354 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2801,7 +2801,7 @@ edibility_prompts(struct obj *otmp)
     int material = objects[otmp->otyp].oc_material, mnum = otmp->corpsenm;
     long rotted = 0L;
 
-    Strcpy(foodsmell, Tobjnam(otmp, "smell"));
+    Snprintf(foodsmell, sizeof foodsmell, "%sからは臭いがする", Tobjnam(otmp, (char *)0));
 
     if (cadaver || otmp->otyp == EGG || otmp->otyp == TIN
         || otmp->otyp == GLOB_OF_GREEN_SLIME) {
@@ -2861,12 +2861,12 @@ edibility_prompts(struct obj *otmp)
              foodsmell);
     } else if (cadaver && !vegetarian(&mons[mnum])
                && !u.uconduct.unvegetarian && Role_if(PM_MONK)) {
-        Snprintf(buf, sizeof buf, "%s体に良くなさそうだ.", foodsmell);
+        Snprintf(buf, sizeof buf, "%s。体に良くなさそうだ.", foodsmell);
     } else if (cadaver && acidic(&mons[mnum]) && !Acid_resistance) {
-        Snprintf(buf, sizeof buf, "%sかなり酸っぱいようだ.", foodsmell);
+        Snprintf(buf, sizeof buf, "%s。かなり酸っぱいようだ.", foodsmell);
     } else if (Upolyd && u.umonnum == PM_RUST_MONSTER && is_metallic(otmp)
                && otmp->oerodeproof) {
-        Snprintf(buf, sizeof buf, "%s今のあなたには受け付けない.",
+        Snprintf(buf, sizeof buf, "%s。今のあなたには受け付けない.",
              foodsmell);
 
     /*
@@ -2876,13 +2876,13 @@ edibility_prompts(struct obj *otmp)
                && ((material == LEATHER || material == BONE
                     || material == DRAGON_HIDE || material == WAX)
                    || (cadaver && !vegan(&mons[mnum])))) {
-        Snprintf(buf, sizeof buf, "%sあなたには不快でなじみがない.",
+        Snprintf(buf, sizeof buf, "%s。あなたには不快でなじみがない.",
              foodsmell);
     } else if (!u.uconduct.unvegetarian
                && ((material == LEATHER || material == BONE
                     || material == DRAGON_HIDE)
                    || (cadaver && !vegetarian(&mons[mnum])))) {
-        Snprintf(buf, sizeof buf, "%sあなたにはなじみがない.", foodsmell);
+        Snprintf(buf, sizeof buf, "%s。あなたにはなじみがない.", foodsmell);
     }
 
     if (*buf) {

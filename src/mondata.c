@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	mondata.c	$NHDT-Date: 1781973056 2026/06/20 16:30:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.148 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1743,6 +1743,40 @@ get_atkdam_type(int adtyp)
         return ROLL_FROM(rnd_breath_typ);
     }
     return adtyp;
+}
+
+/* 英語の炎効果キーを表示用の日本語に翻訳する */
+const char *
+jp_on_fire_text(const char *how)
+{
+    if (!strcmp(how, "already on fire")) return "すでに燃えている";
+    if (!strcmp(how, "boiling")) return "煮え立っている";
+    if (!strcmp(how, "melting")) return "溶けている";
+    if (!strcmp(how, "heating up")) return "熱くなっている";
+    if (!strcmp(how, "being roasted")) return "あぶられている";
+    if (!strcmp(how, "on fire")) return "燃え上がった";
+    return how;
+}
+
+/* 英語の移動表現キーを表示用の日本語に翻訳する */
+const char *
+jp_locomotion_text(const char *verb)
+{
+    if (!strcmpi(verb, "float")) return "浮遊して";
+    if (!strcmpi(verb, "wobble")) return "ふらついた";
+    if (!strcmpi(verb, "fly")) return "飛び上がって";
+    if (!strcmpi(verb, "flutter")) return "羽ばたいた";
+    if (!strcmpi(verb, "stagger")) return "よろめいた";
+    if (!strcmpi(verb, "slither")) return "這い進んで";
+    if (!strcmpi(verb, "falter")) return "よろめいた";
+    if (!strcmpi(verb, "swim")) return "泳いで";
+    if (!strcmpi(verb, "flop")) return "バタバタして";
+    if (!strcmpi(verb, "ooze")) return "にじみ出て";
+    if (!strcmpi(verb, "tremble")) return "震えた";
+    if (!strcmpi(verb, "wiggle")) return "うごめいて";
+    if (!strcmpi(verb, "pulsate")) return "脈動した";
+    if (!strcmpi(verb, "crawl")) return "這って";
+    return verb;
 }
 
 /*mondata.c*/

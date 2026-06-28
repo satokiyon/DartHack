@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.645 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1902,7 +1902,7 @@ trapeffect_pit(
                                      SUPPRESS_SADDLE, FALSE));
             } else if (iflags.menu_requested && already_known) {
                 You("慎重に%s落とし穴へ入った.",
-                    u_locomotion("身を下ろし"));
+                    jp_locomotion_text(u_locomotion("身を下ろし")));
                 deliberate = TRUE;
             } else if (conj_pit) {
                 You("隣の落とし穴へ移動した.");
@@ -2500,7 +2500,7 @@ trapeffect_poly_trap(
                     x_monnam(u.usteed, steed_article, (char *) 0,
                              SUPPRESS_SADDLE, FALSE));
         else
-            Sprintf(verbbuf, "%s", u_locomotion("踏み出して"));
+            Sprintf(verbbuf, "%s", jp_locomotion_text(u_locomotion("踏み出して")));
         You("%sポリモーフ罠を作動させた!", verbbuf);
         if (wearing_iron_shoes(mtmp)) {
             deltrap(trap);
@@ -3052,7 +3052,7 @@ dotrap(struct trap *trap, unsigned trflags)
     } else if (!forcetrap) {
         if (floor_trigger(ttype) && check_in_air(&gy.youmonst, trflags)) {
             if (already_seen) {
-                You("%s%sをまたいだ.", u_locomotion("踏み出して"),
+                You("%s%sをまたいだ.", jp_locomotion_text(u_locomotion("踏み出して")),
                     jp_trapname_for_display(ttype, FALSE));
             }
             return;
@@ -4237,7 +4237,7 @@ climb_pit(void)
     } else if ((Flying || is_clinger(gy.youmonst.data)) && !Sokoban) {
         /* eg fell in pit, then poly'd to a flying monster;
            or used '>' to deliberately enter it */
-        You("%s%sから抜け出した.", u_locomotion("よじ登って"), pitname);
+        You("%s%sから抜け出した.", jp_locomotion_text(u_locomotion("よじ登って")), pitname);
         reset_utrap(FALSE);
         fill_pit(u.ux, u.uy);
         gv.vision_full_recalc = 1; /* vision limits change */
@@ -5113,8 +5113,8 @@ drown(void)
     }
 
     if (!u.uinwater) {
-        You("%s%sへ%s%c", is_solid ? "飛び込み" : "落下し",
-            waterbody_name(u.ux, u.uy),
+        You("%sへ%s%c", waterbody_name(u.ux, u.uy),
+            is_solid ? "飛び込んだ" : "落下した",
             (Amphibious || Swimming || Breathless) ? '.' : '!');
         if (!Swimming && !is_solid)
             You("%sのように沈んだ.", Hallucination ? "タイタニック" : "岩");

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -952,6 +952,7 @@ extern void remdun_mapseen(int);
 extern const char *jp_dungeon_name_for_display(const char *);
 extern const char *jp_dungeon_name_by_dnum(int);
 extern const char *jp_endgamelevelname_for_display(char *, int);
+extern const char *jp_special_level_name(const char *);
 extern const char *endgamelevelname(char *, int);
 
 /* ### earlyarg.c ### */
@@ -1420,6 +1421,7 @@ extern void perm_invent_toggled(boolean negated);
 extern void prepare_perminvent(winid window);
 extern struct obj *carrying_stoning_corpse(void);
 extern void repopulate_perminvent(void);
+extern int check_for_puzzling_nonmerge(struct obj *);
 
 /* ### ioctl.c ### */
 
@@ -1933,6 +1935,8 @@ extern boolean big_little_match(int, int);
 extern const char *locomotion(const struct permonst *, const char *) NONNULLARG12;
 extern const char *stagger(const struct permonst *, const char *) NONNULLARG12;
 extern const char *on_fire(struct permonst *, struct attack *) NONNULLARG12;
+extern const char *jp_on_fire_text(const char *) NONNULLARG1;
+extern const char *jp_locomotion_text(const char *) NONNULLARG1;
 extern const char *msummon_environ(struct permonst *, const char **) NONNULLARG12;
 extern const struct permonst *raceptr(struct monst *) NONNULLARG1;
 extern boolean olfaction(struct permonst *) NONNULLARG1;
@@ -2256,6 +2260,8 @@ extern boolean the_unique_pm(struct permonst *) NONNULLARG1;
 extern boolean erosion_matters(struct obj *) NONNULLARG1;
 extern char *doname(struct obj *) NONNULLARG1;
 extern char *doname_with_price(struct obj *) NONNULLARG1;
+extern char *doname_with_cgender(struct obj *) NONNULLARG1;
+extern char *doname_with_price_and_cgender(struct obj *) NONNULLARG1;
 extern char *doname_vague_quan(struct obj *) NONNULLARG1;
 extern boolean not_fully_identified(struct obj *) NONNULLARG1;
 extern char *corpse_xname(struct obj *, const char *, unsigned) NONNULLARG1;

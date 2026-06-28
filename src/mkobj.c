@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	mkobj.c	$NHDT-Date: 1781973055 2026/06/20 16:30:55 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.335 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -2897,14 +2897,14 @@ hornoplenty(
         if (!tipping) {
             obj = hold_another_object(obj,
                                       u.uswallow
-                                        ? "Oops!  %s out of your reach!"
+                                        ? "おっと! %sが手の届かないところに行ってしまった!"
                                         : (Is_airlevel(&u.uz)
                                            || Is_waterlevel(&u.uz)
                                            || levl[u.ux][u.uy].typ < IRONBARS
                                            || levl[u.ux][u.uy].typ >= ICE)
-                                          ? "Oops!  %s away from you!"
-                                          : "Oops!  %s to the floor!",
-                                      The(aobjnam(obj, "slip")), (char *) 0);
+                                          ? "おっと! %sが手から滑り落ちて、あなたから離れていってしまった!"
+                                          : "おっと! %sが手から滑り落ちて、床に落ちてしまった!",
+                                      The(aobjnam(obj, (char *)0)), (char *) 0);
             nhUse(obj);
         } else if (targetbox) {
             add_to_container(targetbox, obj);

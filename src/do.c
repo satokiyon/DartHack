@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	do.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.411 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -245,8 +245,11 @@ flooreffects(
                           : (ttyp == HOLE) ? "穴をふさいだ"
                             : "落とし穴を埋めた");
             } else {
+                const char *jp_verb = "落ちる";
+                if (!strcmp(verb, "settle")) jp_verb = "落ち着く";
+                else if (!strcmp(verb, "land")) jp_verb = "着地する";
                 Soundeffect(se_boulder_drop, 100);
-                You_hear("巨大な岩が%sのが聞こえた.", verb);
+                You_hear("巨大な岩が%sのが聞こえた.", jp_verb);
             }
         }
         /*

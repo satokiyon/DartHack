@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	pickup.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.397 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1061,7 +1061,7 @@ query_objlist(const char *qstr,        /* query string */
     unsigned sortflags;
     glyph_info tmpglyphinfo = nul_glyphinfo;
     Loot *sortedolist, *srtoli;
-    int clr = NO_COLOR;
+    int clr = NO_COLOR, puzzling_count = 0;
 
     *pick_list = (menu_item *) 0;
     if (!olist && !engulfer)
@@ -1095,6 +1095,8 @@ query_objlist(const char *qstr,        /* query string */
         (*pick_list)->count = last->quan;
         return 1;
     }
+
+    puzzling_count = check_for_puzzling_nonmerge(olist);
 
     sortflags = (((flags.sortloot == 'f'
                    || (flags.sortloot == 'l' && !(qflags & USE_INVLET)))
@@ -1154,7 +1156,9 @@ query_objlist(const char *qstr,        /* query string */
                          (qflags & USE_INVLET) ? curr->invlet
                            : (first && curr->oclass == COIN_CLASS) ? '$' : 0,
                          def_oc_syms[(int) objects[curr->otyp].oc_class].sym,
-                         ATR_NONE, clr, doname_with_price(curr),
+                         ATR_NONE, clr,
+                         (puzzling_count) ? doname_with_price_and_cgender(curr)
+                                          : doname_with_price(curr),
                          MENU_ITEMFLAGS_NONE);
                 first = FALSE;
             }
@@ -2017,7 +2021,7 @@ encumber_msg(void)
             break;
         case 3:
             You("重い荷物で%s。移動がとても辛い.",
-                stagger(gy.youmonst.data, "よろめいた"));
+                jp_locomotion_text(stagger(gy.youmonst.data, "よろめいた")));
             break;
         default:
             You("この荷物では%s一歩も動けない!",
@@ -2038,7 +2042,7 @@ encumber_msg(void)
             break;
         case 3:
             You("荷物で%s。まだ移動がとても辛い.",
-                stagger(gy.youmonst.data, "よろめいた"));
+                jp_locomotion_text(stagger(gy.youmonst.data, "よろめいた")));
             break;
         }
         disp.botl = TRUE;

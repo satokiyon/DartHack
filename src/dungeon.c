@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	dungeon.c	$NHDT-Date: 1781973047 2026/06/20 16:30:47 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.239 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2251,15 +2251,15 @@ br_string(int type)
 {
     switch (type) {
     case BR_PORTAL:
-        return "Portal";
+        return "ポータル";
     case BR_NO_END1:
-        return "Connection";
+        return "接続路";
     case BR_NO_END2:
-        return "One way stair";
+        return "一方通行の階段";
     case BR_STAIR:
-        return "Stair";
+        return "階段";
     }
-    return " (unknown)";
+    return " (不明)";
 }
 
 staticfn char
@@ -2282,10 +2282,10 @@ print_branch(
     for (br = svb.branches; br; br = br->next) {
         if (br->end1.dnum == dnum && lower_bound < br->end1.dlevel
             && br->end1.dlevel <= upper_bound) {
-            Sprintf(buf, "%c %s to %s: %d",
+            Sprintf(buf, "%c %sへの%s: %d階",
                     bymenu ? chr_u_on_lvl(&br->end1) : ' ',
-                    br_string(br->type),
-                    svd.dungeons[br->end2.dnum].dname, depth(&br->end1));
+                    jp_dungeon_name_for_display(svd.dungeons[br->end2.dnum].dname),
+                    br_string(br->type), depth(&br->end1));
             if (bymenu)
                 tport_menu(win, buf, lchoices_p, &br->end1,
                            unreachable_level(&br->end1, FALSE));
@@ -2356,7 +2356,7 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
 
             Sprintf(buf, "%c %s: %d階",
                     chr_u_on_lvl(&slev->dlevel),
-                    slev->proto, depth(&slev->dlevel));
+                    jp_special_level_name(slev->proto), depth(&slev->dlevel));
             if (Is_stronghold(&slev->dlevel))
                 Sprintf(eos(buf), " (合言葉 %s)", svt.tune);
             if (bymenu)
@@ -3494,6 +3494,106 @@ endgamelevelname(char *outbuf, int indx)
     return outbuf;
 }
 
+const char *
+jp_special_level_name(const char *proto)
+{
+    static char buf[128];
+    if (!proto || !*proto) return proto;
+
+    if (!strncmpi(proto, "bigrm", 5)) {
+        return "ビッグルーム";
+    }
+    if (!strncmpi(proto, "medusa", 6)) {
+        return "メデューサの島";
+    }
+    if (!strncmpi(proto, "soko", 4)) {
+        char num = proto[4];
+        if (num >= '1' && num <= '4') {
+            Sprintf(buf, "倉庫番の第%c階", num);
+            return buf;
+        }
+        return "倉庫番";
+    }
+    if (!strncmpi(proto, "minetn", 6)) {
+        return "鉱山街";
+    }
+    if (!strncmpi(proto, "minend", 6)) {
+        return "鉱山の最下層";
+    }
+    if (!strncmpi(proto, "fakewiz", 7)) {
+        char num = proto[7];
+        if (num >= '1' && num <= '3') {
+            Sprintf(buf, "偽りの塔の第%c階", num);
+            return buf;
+        }
+        return "偽りの塔";
+    }
+    if (!strncmpi(proto, "wizard", 6)) {
+        char num = proto[6];
+        if (num >= '1' && num <= '3') {
+            Sprintf(buf, "魔法使いの塔の第%c階", num);
+            return buf;
+        }
+        return "魔法使いの塔";
+    }
+    if (!strncmpi(proto, "tower", 5)) {
+        char num = proto[5];
+        if (num >= '1' && num <= '3') {
+            Sprintf(buf, "ヴラド侯の塔の第%c階", num);
+            return buf;
+        }
+        return "ヴラド侯の塔";
+    }
+    if (!strcmpi(proto, "castle")) return "迷宮の城";
+    if (!strcmpi(proto, "valley")) return "死の谷";
+    if (!strcmpi(proto, "sanctum")) return "モーロックの聖域";
+    if (!strcmpi(proto, "oracle")) return "神託所";
+    if (!strcmpi(proto, "knox")) return "フォート・ノックス";
+    if (!strcmpi(proto, "asmodeus")) return "アスモデウスの霊廟";
+    if (!strcmpi(proto, "baalz")) return "バアルゼブブの霊廟";
+    if (!strcmpi(proto, "juiblex")) return "ジョウビレックスの沼";
+    if (!strcmpi(proto, "orcus")) return "オルクスの町";
+    if (!strcmpi(proto, "astral")) return "アストラル界";
+    if (!strcmpi(proto, "air")) return "空の界";
+    if (!strcmpi(proto, "earth")) return "土の界";
+    if (!strcmpi(proto, "fire")) return "火の界";
+    if (!strcmpi(proto, "water")) return "水の界";
+
+    if (strlen(proto) >= 8 && proto[3] == '-') {
+        const char *role = "";
+        const char *stage = "";
+        
+        if (!strncmpi(proto, "Arc", 3)) role = "考古学者";
+        else if (!strncmpi(proto, "Bar", 3)) role = "野蛮人";
+        else if (!strncmpi(proto, "Cav", 3)) role = "洞窟人";
+        else if (!strncmpi(proto, "Hea", 3)) role = "治療師";
+        else if (!strncmpi(proto, "Kni", 3)) role = "騎士";
+        else if (!strncmpi(proto, "Mon", 3)) role = "武闘家";
+        else if (!strncmpi(proto, "Pri", 3)) role = "僧侶";
+        else if (!strncmpi(proto, "Ran", 3)) role = "レンジャー";
+        else if (!strncmpi(proto, "Rog", 3)) role = "盗賊";
+        else if (!strncmpi(proto, "Sam", 3)) role = "侍";
+        else if (!strncmpi(proto, "Tou", 3)) role = "観光客";
+        else if (!strncmpi(proto, "Val", 3)) role = "ワルキューレ";
+        else if (!strncmpi(proto, "Wiz", 3)) role = "魔法使い";
+        
+        if (*role) {
+            const char *suffix = proto + 4;
+            if (!strcmpi(suffix, "strt")) stage = "クエスト開始地点";
+            else if (!strcmpi(suffix, "loca")) stage = "クエスト中間地点";
+            else if (!strcmpi(suffix, "goal")) stage = "クエスト目標地点";
+            else if (!strcmpi(suffix, "fila") || !strcmpi(suffix, "filb")) stage = "クエスト充填階";
+            
+            if (*stage) {
+                Sprintf(buf, "%sの%s", role, stage);
+                return buf;
+            }
+        }
+    }
+
+    return proto;
+}
+
 /* if player knows about the mastermind tune, append it to Castle annotation;
    if drawbridge has been destroyed, flags.castletune will be zero */
 staticfn char *
@@ -3602,7 +3702,7 @@ print_mapseen(
         s_level *slev;
 
         if ((slev = Is_special(&mptr->lev)) != 0)
-            Sprintf(eos(buf), " [%s]", slev->proto);
+            Sprintf(eos(buf), " [%s]", jp_special_level_name(slev->proto));
     }
     /* [perhaps print custom annotation on its own line when it's long] */
     if (mptr->custom)
