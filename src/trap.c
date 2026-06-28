@@ -5113,8 +5113,8 @@ drown(void)
     }
 
     if (!u.uinwater) {
-        You("%s%sへ%s%c", is_solid ? "飛び込み" : "落下し",
-            waterbody_name(u.ux, u.uy),
+        You("%sへ%s%c", waterbody_name(u.ux, u.uy),
+            is_solid ? "飛び込んだ" : "落下した",
             (Amphibious || Swimming || Breathless) ? '.' : '!');
         if (!Swimming && !is_solid)
             You("%sのように沈んだ.", Hallucination ? "タイタニック" : "岩");
