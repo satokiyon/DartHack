@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	hack.c	$NHDT-Date: 1781973050 2026/06/20 16:30:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.508 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -488,8 +488,6 @@ moverock_core(coordxy sx, coordxy sy)
             }
 
             /* at this point the boulder should be able to move (though
-               potentially into something like a trap, pool, or lava) */
-
             /* rumbling disturbs buried zombies */
             disturb_buried_zombies(sx, sy);
 
@@ -508,16 +506,9 @@ moverock_core(coordxy sx, coordxy sy)
                         place_object(otmp, rx, ry);
                         newsym(sx, sy);
                         pline("%s!  %sが%s地雷を作動させた.",
-                              /* "kablam" is a variation of "ka-boom" or
-                                 "kablooey", rather cartoonish descriptions
-                                 of the sound of an explosion, but give it
-                                 even when deaf if hero sees the explosion */
-                                        (!Deaf || !Blind) ? "ドッカーン!!"
-                              /* use an alternate exclamation when feeling
-                                 the floor/ground/whatever shake (or maybe
-                                 a weak shockwave if levitating or flying) */
-                                                                : "グラグラッ",
-                              Tobjnam(otmp, "trigger"),
+                              (!Deaf || !Blind) ? "ドッカーン!!"
+                                                : "グラグラッ",
+                              Tobjnam(otmp, (char *) 0),
                               ttmp->madeby_u ? "あなたの" : "1つの");
                         blow_up_landmine(ttmp);
                         /* if the boulder remains, it should fill the pit */
@@ -545,17 +536,15 @@ moverock_core(coordxy sx, coordxy sy)
                 case TRAPDOOR:
                     Soundeffect(se_kerplunk_boulder_gone, 40);
                     if (Blind)
-                pline("ドスン!もう%sの感触はなかった.",
+                        pline("ドスン!もう%sの感触はなかった.",
                               xname(otmp));
                     else
-                        pline("%s%s、%s%sを%sに作った!",
-                              Tobjnam(otmp, (ttmp->ttyp == TRAPDOOR)
-                                                ? "trigger"
-                                                : "fall"),
-                            (ttmp->ttyp == TRAPDOOR) ? "" : "の中へ",
-                              otense(otmp, "plug"),
-                            (ttmp->ttyp == TRAPDOOR) ? "落とし戸" : "穴",
-                              surface(rx, ry));
+                        pline("%sが%s%s、%sの%sをふさいだ!",
+                              Tobjnam(otmp, (char *)0),
+                              (ttmp->ttyp == TRAPDOOR) ? "作動して" : "落ちて",
+                              (ttmp->ttyp == TRAPDOOR) ? "" : "中へ",
+                              surface(rx, ry),
+                              (ttmp->ttyp == TRAPDOOR) ? "落とし戸" : "穴");
                     deltrap(ttmp);
                     useupf(otmp, 1L);
                     bury_objs(rx, ry);
@@ -606,8 +595,8 @@ moverock_core(coordxy sx, coordxy sy)
                         if (tox == ttmp->launch2.x && toy == ttmp->launch2.y)
                             break;
                     }
-                      pline("%sはあなたから離れて転がっていった!",
-                          Tobjnam(otmp, "suddenly roll"));
+                      pline("%sは突然あなたから離れて転がっていった!",
+                          Tobjnam(otmp, (char *)0));
                     feeltrap(ttmp);
                     launch_obj(BOULDER, sx, sy, tox, toy, ROLL | LAUNCH_KNOWN);
                     return sobj_at(BOULDER, sx, sy) ? -1 : 0;

@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28.
 -- NetHack quest.lua	$NHDT-Date: 1781994887 2026/06/20 22:34:47 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
 -- Copyright (c) 2021 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
@@ -274,7 +274,7 @@ questtext = {
       },
       goal_next = {
          text = "%oのなじみ深い気配が空気の中に漂っている.",
-            synopsis = "[「%nを見つけ, %njを追い, %njを倒し, %oを奪い返してこい.」]",
+      },
       gotit = {
          synopsis = "[%oの力が体を駆け巡る! それを%lのもとへ持ち帰らねばならない.]",
          output = "text",
@@ -3058,6 +3058,5 @@ questtext = {
 それで, イェンダーの魔除けを求める探索はうまくいっているか?" ]],
       },
    },
-}
 }
 

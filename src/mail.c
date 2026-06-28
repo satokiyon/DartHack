@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	mail.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.80 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -439,7 +439,7 @@ newmail(struct mail_info *info)
             }
         }
         display_nhwindow(WIN_MESSAGE, FALSE);
-        obj = hold_another_object(obj, "Oops!", (const char *) 0,
+        obj = hold_another_object(obj, "おっと!", (const char *) 0,
                                   (const char *) 0);
         nhUse(obj);
     }
