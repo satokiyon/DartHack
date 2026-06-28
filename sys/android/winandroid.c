@@ -196,11 +196,7 @@ static int status_colors[MAXBLSTATS];
 extern boolean status_activefields[MAXBLSTATS];
 static unsigned long* cond_hilites;
 static unsigned long active_conditions;
-static const char* cond_names[] = {
-    "Bare",  "Blind",  "Busy", "Conf",   "Deaf",    "Iron",   "Fly",  "FoodPois", "Glow",  "Grab",
-    "Hallu", "Held",   "Icy",  "InLava", "Lev",     "Parlyz", "Ride", "Zzz",      "Slime", "Slip",
-    "Stone", "Strngl", "Stun", "Submrg", "TermIll", "Teth",   "Trap", "Out",      "WLegs", "UHold",
-};
+// cond_names is removed because we directly use NetHackJP's core conditions array.
 
 //____________________________________________________________________________________
 //
@@ -302,7 +298,7 @@ boolean SaveAndExit()
 			u.uhp = -1;		/* universal game's over indicator */
 			/* make sure they see the Saving message */
 			display_nhwindow(WIN_MESSAGE, TRUE);
-			exit_nhwindows("Be seeing you...");
+			exit_nhwindows("また会いましょう…");
 			nh_terminate(EXIT_SUCCESS);
 		}
 		return FALSE;
@@ -325,7 +321,7 @@ void quit_possible()
 		quit_if_possible = FALSE;
 		if(!SaveAndExit())
 		{
-			if(and_yn_function("Error saving game. Quit anyway?", ynchars, 'n') == 'y')
+			if(and_yn_function("ゲームの保存に失敗しました。それでも終了しますか？", ynchars, 'n') == 'y')
 				nh_terminate(EXIT_SUCCESS);
 		}
 	}
@@ -426,7 +422,7 @@ void and_player_selection()
 			and_start_menu(win, MENU_BEHAVE_STANDARD);
 			any.a_void = 0; /* zero out all bits */
 			any.a_int = randrole(TRUE)+1;
-			and_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "Random", 0);
+			and_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "ランダム", 0);
 			for(i = 0; roles[i].name.m; i++)
 			{
 				if(ok_role(i, flags.initrace, flags.initgend, flags.initalign))
@@ -435,11 +431,11 @@ void and_player_selection()
 					thisch = lowc(roles[i].name.m[0]);
 					if(thisch == lastch)
 						thisch = highc(thisch);
-					and_add_menu(win, &nul_glyphinfo, &any, thisch, 0, ATR_NONE, NO_COLOR, roles[i].name.m, 0);
+					and_add_menu(win, &nul_glyphinfo, &any, thisch, 0, ATR_NONE, NO_COLOR, jp_role_name_for_display(i, flags.initgend >= 0 ? flags.initgend : (flags.female ? 1 : 0)), 0);
 					lastch = thisch;
 				}
 			}
-			and_end_menu(win, "Pick a role");
+			and_end_menu(win, "職業を選んでください");
 			result = and_select_menu(win, PICK_ONE, &selected);
 			and_destroy_nhwindow(win);
 
@@ -468,14 +464,14 @@ void and_player_selection()
 			and_start_menu(win, MENU_BEHAVE_STANDARD);
 			any.a_void = 0; /* zero out all bits */
 			any.a_int = randrace(flags.initrole)+1;
-			and_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "random", 0);
+			and_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "ランダム", 0);
 			for(i = 0; races[i].noun; i++)
 				if(ok_race(flags.initrole, i, flags.initgend, flags.initalign))
 				{
 					any.a_int = i + 1; /* must be non-zero */
-					and_add_menu(win, &nul_glyphinfo, &any, races[i].noun[0], 0, ATR_NONE, NO_COLOR, races[i].noun, 0);
+					and_add_menu(win, &nul_glyphinfo, &any, races[i].noun[0], 0, ATR_NONE, NO_COLOR, jp_race_noun_for_display(i), 0);
 				}
-			and_end_menu(win, "Pick a race");
+			and_end_menu(win, "種族を選んでください");
 			result = and_select_menu(win, PICK_ONE, &selected);
 			and_destroy_nhwindow(win);
 
@@ -504,14 +500,14 @@ void and_player_selection()
 			and_start_menu(win, MENU_BEHAVE_STANDARD);
 			any.a_void = 0; /* zero out all bits */
 			any.a_int = randgend(flags.initrole, flags.initrace)+1;
-			and_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "random", 0);
+			and_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "ランダム", 0);
 			for(i = 0; i < ROLE_GENDERS; i++)
 				if(ok_gend(flags.initrole, flags.initrace, i, flags.initalign))
 				{
 					any.a_int = i + 1;
-					and_add_menu(win, &nul_glyphinfo, &any, genders[i].adj[0], 0, ATR_NONE, NO_COLOR, genders[i].adj, 0);
+					and_add_menu(win, &nul_glyphinfo, &any, genders[i].adj[0], 0, ATR_NONE, NO_COLOR, jp_gender_for_display(i), 0);
 				}
-			and_end_menu(win, "Pick a gender");
+			and_end_menu(win, "性別を選んでください");
 			result = and_select_menu(win, PICK_ONE, &selected);
 			and_destroy_nhwindow(win);
 
@@ -538,14 +534,14 @@ void and_player_selection()
 			and_start_menu(win, MENU_BEHAVE_STANDARD);
 			any.a_void = 0; /* zero out all bits */
 			any.a_int = randalign(flags.initrole, flags.initrace)+1;
-			and_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "random", 0);
+			and_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "ランダム", 0);
 			for(i = 0; i < ROLE_ALIGNS; i++)
 				if(ok_align(flags.initrole, flags.initrace, flags.initgend, i))
 				{
 					any.a_int = i + 1;
-					and_add_menu(win, &nul_glyphinfo, &any, aligns[i].adj[0], 0, ATR_NONE, NO_COLOR, aligns[i].adj, 0);
+					and_add_menu(win, &nul_glyphinfo, &any, aligns[i].adj[0], 0, ATR_NONE, NO_COLOR, jp_align_for_display(i), 0);
 				}
-			and_end_menu(win, "Pick an alignment");
+			and_end_menu(win, "属性を選んでください");
 			result = and_select_menu(win, PICK_ONE, &selected);
 			and_destroy_nhwindow(win);
 
@@ -968,7 +964,7 @@ void and_status_update(int idx, genericptr_t ptr, int chg, int percent, int colo
 	}
 }
 
-int get_condition_color(int cond_mask)
+int get_condition_color(unsigned long cond_mask)
 {
 	int i;
 	for(i = 0; i < CLR_MAX; i++)
@@ -977,7 +973,7 @@ int get_condition_color(int cond_mask)
 	return CLR_WHITE;
 }
 
-int get_condition_attr(int cond_mask)
+int get_condition_attr(unsigned long cond_mask)
 {
 	int i;
 	int attr = 0;
@@ -987,14 +983,14 @@ int get_condition_attr(int cond_mask)
 	return attr;
 }
 
-void print_conditions(const char** names)
+void print_conditions()
 {
 	int i;
-	for(i = 0; i < MAXBLCONDITIONS; i++) {
-		int cond_mask = 1 << i;
+	for(i = 0; i < CONDITION_COUNT; i++) {
+		unsigned long cond_mask = conditions[i].mask;
 		if(active_conditions & cond_mask)
 		{
-			const char* name = names[i];
+			const char* name = conditions[i].text[1];
 			int color = get_condition_color(cond_mask);
 			int attr = get_condition_attr(cond_mask);
 			//debuglog("cond '%s' active. col=%s attr=%x", name, colname(color), attr);
@@ -1032,7 +1028,7 @@ void print_status_field(int idx, boolean first_field)
 
 	if(idx == BL_CONDITION)
 	{
-		print_conditions(cond_names);
+		print_conditions();
 	}
 	else
 	{
@@ -1992,8 +1988,8 @@ int do_ext_cmd_menu(BOOLEAN_P complete)
 	}
 	any.a_int = i+1;
 	if(!complete)
-		and_add_menu(wid, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "(list everything)", 0);
-	and_end_menu(wid, "Extended command");
+		and_add_menu(wid, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "(すべて表示)", 0);
+	and_end_menu(wid, "拡張コマンド");
 	count = and_select_menu(wid, PICK_ONE, &selected);
 	what = count > 0 ? selected->item.a_int - 1 : -1;
 	if(selected)
