@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -54,6 +54,11 @@
      - 職業名: `jp_role_name_for_display(flags.initrole, gender)`
      - 肩書: `jp_rank_of_for_display(u.ulevel, Role_switch, gender)`
      - 種族名: `jp_race_noun_for_display(Race_switch)`
+
+5. **可変引数マクロのフォーマットと引数の完全一致確認**:
+   - `pline()`, `You()`, `pline_The()`, `impossible()` などの可変引数マクロを日本語化・修正する際は、フォーマット文字列内の指定子（`%s`, `%c`, `%d`等）と、渡す実引数の個数および型が完全に一致していることを必ず確認してください。
+   - 特に英語メッセージの `%c`（文字型、`.` や `!` など）をそのまま残すか `%s`（文字列型）に誤って変更してしまうと、メモリアクセス違反（`strnlen` でのクラッシュ）を引き起こします。
+   - フォーマット文字列の順序を入れ替える場合は、渡す引数の順序もそれに合わせて並び替えてください。
 
 
 ## アイテムの日本語助数詞（単位）表示方針
