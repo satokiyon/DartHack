@@ -5,10 +5,32 @@
 
 ---
 
-## 1. 開発環境の構築とビルド
+## 1. 開発環境の要件（事前準備）
+
+ビルドを実行する前に、Windows環境およびWSL環境に以下のソフトウェアをインストールし、セットアップを完了させてください。
+
+### Windows 環境
+- **Android Studio** (または Android SDK Command-Line Tools)
+  - Android SDK が必要です。通常は `C:\Users\<ユーザー名>\AppData\Local\Android\Sdk` に配置されます。
+- **Java Development Kit (JDK)**
+  - Gradle の動作に必要な JDK (Java 17 以上を推奨) をインストールしてください（Android Studio 同梱のものでも構いません）。
+- **Git for Windows**
+- **PowerShell** (自動ビルドスクリプトの実行に必要)
+
+### WSL 環境 (Windows Subsystem for Linux)
+- **Ubuntu** (ビルド自動化スクリプトは `Ubuntu-26.04` ディストリビューションをデフォルトとして動作します)
+- WSLのUbuntu上に、Cライブラリコンパイルに必要なパッケージ群をインストールしてください。
+  ```bash
+  sudo apt update
+  sudo apt install build-essential curl
+  ```
+
+---
+
+## 2. 開発手順とビルド
 
 ### 依存サブモジュールの準備
-Android ビルドを行う前に、以下のサブモジュールをチェックアウト・更新してください。
+Android ビルドを行う前に、外部依存サブモジュールをチェックアウト・更新してください。
 ```bash
 git submodule update --init --recursive
 ```
@@ -30,7 +52,7 @@ $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\sys\android\buil
 
 ---
 
-## 2. 技術上の注意点
+## 3. 技術上の注意点
 
 ### NDK (clang) における全角文字キャストエラー
 - **制限**: NDK コンパイラでは、`'。'` などのマルチバイト文字をシングルクォーテーションで囲んで文字定数（`char`）として定義すると `character too large` エラーになります。
@@ -49,7 +71,7 @@ $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\sys\android\buil
 
 ---
 
-## 3. オブジェクト名ローカライズ方針
+## 4. オブジェクト名ローカライズ方針
 
 表示用テキスト以外にゲームロジック上でキー値として使用されている英単語は、直接日本語に置換せず、日本語の表示用リストを別途用意してヘルパー関数を利用して英単語から日本語へ変換して表示する仕組みをとっています。
 
@@ -62,9 +84,9 @@ $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\sys\android\buil
 
 ---
 
-## 4. リポジトリ構成とマージ運用
+## 5. リポジトリ構成とマージ運用
 
-本リポジトリは、Windows版日本語化リポジトリ `NetHackJP` と、Android移植元の `JodiJodington/NetHack-Android` の2つを統合し、`main` ブランチで一本化して開発を進めます。
+本リポジトリは、Windows版日本語化リポジトリ `NetHackJP` と、Android移植元の `JodiJodington/NetHack-Android` の2つを統合し、`main` ブランクで一本化して開発を進めます。
 
 ```mermaid
 graph TD
@@ -127,7 +149,7 @@ Android 移植元のバグ修正や機能追加を取り込みます。
 
 ---
 
-## 5. リレース・タグ手順
+## 6. リリース・タグ手順
 
 ### リリース用 APK のビルド
 1. リリース用キーストアの署名情報を環境変数または `local.properties` に準備します。
