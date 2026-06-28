@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	apply.c	$NHDT-Date: 1781973040 2026/06/20 16:30:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.482 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2419,21 +2419,31 @@ fig_transform(anything *arg, long timeout)
 
         if (mtmp->mundetected) {
             if (hides_under(mtmp->data) && mshelter) {
-                Sprintf(and_vanish, " and %s under %s",
-                        locomotion(mtmp->data, "crawl"), doname(mshelter));
+                const char *locokey = locomotion(mtmp->data, "crawl");
+                const char *verb = "這い入った";
+                if (!strcmpi(locokey, "float")) verb = "浮かび入った";
+                else if (!strcmpi(locokey, "fly")) verb = "飛び入った";
+                else if (!strcmpi(locokey, "slither")) verb = "這い入った";
+                else if (!strcmpi(locokey, "crawl")) verb = "這い入った";
+                else if (!strcmpi(locokey, "ooze")) verb = "にじみ入った";
+                
+                Sprintf(and_vanish, "て%sの下に%s",
+                        doname(mshelter), verb);
             } else if (mtmp->data->mlet == S_MIMIC
                        || mtmp->data->mlet == S_EEL) {
                 suppress_see = TRUE;
             } else
-                Strcpy(and_vanish, " and vanish");
+                Strcpy(and_vanish, "て消え去った");
         }
 
         switch (figurine->where) {
         case OBJ_INVENT:
             if (Blind || suppress_see)
                 You_feel("%sが荷物の中から飛び出したのを感じた!", something);
+            else if (*and_vanish)
+                You_see("%sが荷物の中から飛び出し%s!", monnambuf, and_vanish);
             else
-                You_see("%sが荷物の中から飛び出した%s!", monnambuf, and_vanish);
+                You_see("%sが荷物の中から飛び出した!", monnambuf);
             break;
 
         case OBJ_FLOOR:
@@ -2441,9 +2451,11 @@ fig_transform(anything *arg, long timeout)
                 set_msg_xy(cc.x, cc.y);
                 if (suppress_see)
                     pline("%sは突然消えた!", xname(figurine));
-                else
-                    You_see("フィギュリンが%s%sへ変身した!", monnambuf,
+                else if (*and_vanish)
+                    You_see("フィギュリンが%sに変身し%s!", monnambuf,
                             and_vanish);
+                else
+                    You_see("フィギュリンが%sに変身した!", monnambuf);
                 redraw = TRUE; /* update figurine's map location */
             }
             break;
@@ -2461,8 +2473,11 @@ fig_transform(anything *arg, long timeout)
                     Strcpy(carriedby, "水面");
                 else
                     Strcpy(carriedby, "空気");
-                You_see("%sが%sから飛び出した%s!", monnambuf, carriedby,
-                        and_vanish);
+                if (*and_vanish)
+                    You_see("%sが%sから飛び出し%s!", monnambuf, carriedby,
+                            and_vanish);
+                else
+                    You_see("%sが%sから飛び出した!", monnambuf, carriedby);
             }
             break;
 #if 0

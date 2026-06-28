@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	timeout.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.212 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -1138,16 +1138,19 @@ hatch_egg(anything *arg, long timeout)
                 mon2 = egg->ocarry;
                 if (canseemon(mon2)
                     && (!mon2->wormno || cansee(mon2->mx, mon2->my))) {
-                    Sprintf(carriedby, "%s pack",
-                            s_suffix(a_monnam(mon2)));
+                    Sprintf(carriedby, "%sの荷物",
+                            a_monnam(mon2));
                     knows_egg = TRUE;
                 } else if (is_pool(mon->mx, mon->my)) {
-                    Strcpy(carriedby, "empty water");
+                    Strcpy(carriedby, "水中");
                 } else {
-                    Strcpy(carriedby, "thin air");
+                    Strcpy(carriedby, "空中");
                 }
-                You_see("%sが%sから%sへ出ているのを見た!", monnambuf,
-                        locomotion(mon->data, "drop"), carriedby);
+                You_see("%sが%sから%sきたのを見た!", monnambuf,
+                        carriedby,
+                        !strcmpi(locomotion(mon->data, "drop"), "float") ? "浮遊して"
+                        : !strcmpi(locomotion(mon->data, "drop"), "fly") ? "飛び出して"
+                        : "這い出て");
             }
             break;
 #if 0
