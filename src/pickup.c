@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	pickup.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.397 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2017,7 +2017,7 @@ encumber_msg(void)
             break;
         case 3:
             You("重い荷物で%s。移動がとても辛い.",
-                stagger(gy.youmonst.data, "よろめいた"));
+                jp_locomotion_text(stagger(gy.youmonst.data, "よろめいた")));
             break;
         default:
             You("この荷物では%s一歩も動けない!",
@@ -2038,7 +2038,7 @@ encumber_msg(void)
             break;
         case 3:
             You("荷物で%s。まだ移動がとても辛い.",
-                stagger(gy.youmonst.data, "よろめいた"));
+                jp_locomotion_text(stagger(gy.youmonst.data, "よろめいた")));
             break;
         }
         disp.botl = TRUE;

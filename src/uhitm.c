@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	uhitm.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.503 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2537,7 +2537,7 @@ mhitm_ad_fire(
             return;
         }
         if (!Blind)
-            pline("%sは%s!", Monnam(mdef), on_fire(pd, mattk));
+            pline("%sは%s!", Monnam(mdef), jp_on_fire_text(on_fire(pd, mattk)));
         if (completelyburns(pd)) { /* paper golem or straw golem */
             if (!Blind)
                 /* note: the life-saved case is hypothetical because
@@ -2567,7 +2567,7 @@ mhitm_ad_fire(
         /* mhitu */
         hitmsg(magr, mattk);
         if (!mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
-            pline("あなたは%s!", on_fire(pd, mattk));
+            pline("あなたは%s!", jp_on_fire_text(on_fire(pd, mattk)));
             if (completelyburns(pd)) { /* paper or straw golem */
                 You("燃え上がった!");
                 monstunseesu(M_SEEN_FIRE);
@@ -2596,7 +2596,7 @@ mhitm_ad_fire(
             return;
         }
         if (gv.vis && canseemon(mdef))
-            pline_mon(mdef, "%sは%s!", Monnam(mdef), on_fire(pd, mattk));
+            pline_mon(mdef, "%sは%s!", Monnam(mdef), jp_on_fire_text(on_fire(pd, mattk)));
         if (completelyburns(pd)) { /* paper golem or straw golem */
             /* note: the life-saved case is hypothetical because
                life-saving doesn't work for golems */

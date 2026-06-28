@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
 /* NetHack 5.0	monmove.c	$NHDT-Date: 1781973056 2026/06/20 16:30:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.284 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -1633,11 +1633,13 @@ postmov(
                               l_monnam(mtmp));
                 dissolve_bars(mtmp->mx, mtmp->my);
                 return MMOVE_DONE;
-            } else if (flags.verbose && canseemon(mtmp))
-                Norep("%s %s %s the iron bars.", Monnam(mtmp),
-                      /* pluralization fakes verb conjugation */
-                      makeplural(locomotion(ptr, "pass")),
-                      passes_walls(ptr) ? "through" : "between");
+            } else if (flags.verbose && canseemon(mtmp)) {
+                pline_mon(mtmp, "%sは鉄格子の%sを%s抜け出した.", Monnam(mtmp),
+                      passes_walls(ptr) ? "中" : "間",
+                      !strcmpi(locomotion(ptr, "pass"), "float") ? "浮遊して"
+                      : !strcmpi(locomotion(ptr, "pass"), "fly") ? "飛び上がって"
+                      : "這い寄って");
+            }
         } /* doors and bars */
 
         /* possibly dig */
