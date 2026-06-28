@@ -2592,7 +2592,7 @@ in_container(struct obj *obj)
         impossible("<in> no gc.current_container?");
         return 0;
     } else if (obj == uball || obj == uchain) {
-        You("冗談でしょう.");
+        You("ふざけているのかな.");
         return 0;
     } else if (obj == gc.current_container) {
         pline("それは興味深いトポロジーの演習だっただろう.");
