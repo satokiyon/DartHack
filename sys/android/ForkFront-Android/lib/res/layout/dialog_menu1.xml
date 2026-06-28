@@ -29,5 +29,18 @@
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"/>
 
+		<LinearLayout
+			style="@android:style/ButtonBar"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content">
+			<Button
+				android:id="@+id/btn_cancel"
+				style="@style/ButtonText"
+				android:text="@string/cancel"
+				android:layout_weight="1"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"/>
+		</LinearLayout>
+
 	</LinearLayout>
 </RelativeLayout>

@@ -43,14 +43,14 @@
 			<Button
 				android:id="@+id/btn_ok"
 				style="@style/ButtonText"
-				android:text="Ok"
+				android:text="@string/ok"
 				android:layout_weight="1"
 				android:layout_width="0dip"
 				android:layout_height="wrap_content"/>
 			<Button
 				android:id="@+id/btn_cancel"
 				style="@style/ButtonText"
-				android:text="Cancel"
+				android:text="@string/cancel"
 				android:layout_weight="1"
 				android:layout_width="0dip"
 				android:layout_height="wrap_content"/>
