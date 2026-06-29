@@ -73,4 +73,5 @@
 
 	<string name="cancel">キャンセル</string>
 	<string name="ok">決定</string>
+	<string name="select_all">すべて選択</string>
 </resources>

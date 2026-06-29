@@ -36,7 +36,7 @@
 			<Button
 				android:id="@+id/btn_all"
 				style="@style/ButtonText"
-				android:text="Select all"
+				android:text="@string/select_all"
 				android:layout_weight="1"
 				android:layout_width="0dip"
 				android:layout_height="wrap_content"/>
