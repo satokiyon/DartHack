@@ -229,6 +229,7 @@ public class NHW_Menu implements NH_Window
 		private ListView mListView;
 		private AmountSelector mAmountSelector;
 		private Button mSelectAllBtn;
+		private boolean mIsClearAllState = false;
 
 		public UI(Activity context)
 		{
@@ -604,7 +605,10 @@ public class NHW_Menu implements NH_Window
 				((MenuItemAdapter)mListView.getAdapter()).notifyDataSetChanged();
 				mKeyboardCount = -1;
 				if(mSelectAllBtn != null)
-					mSelectAllBtn.setText("Clear all");
+				{
+					mSelectAllBtn.setText(R.string.clear_all);
+					mIsClearAllState = true;
+				}
 			}
 		}
 
@@ -622,7 +626,10 @@ public class NHW_Menu implements NH_Window
 				((MenuItemAdapter)mListView.getAdapter()).notifyDataSetChanged();
 				mKeyboardCount = -1;
 				if(mSelectAllBtn != null)
-					mSelectAllBtn.setText("Select all");
+				{
+					mSelectAllBtn.setText(R.string.select_all);
+					mIsClearAllState = false;
+				}
 			}
 		}
 
@@ -714,17 +721,20 @@ public class NHW_Menu implements NH_Window
 
 			mSelectAllBtn = (Button)mRoot.findViewById(R.id.btn_all);
 			if(mSelectAllBtn != null)
+			{
+				mIsClearAllState = false;
 				mSelectAllBtn.setOnClickListener(new OnClickListener()
 				{
 					@Override
 					public void onClick(View view)
 					{
-						if("Clear all".equals(mSelectAllBtn.getText().toString()))
+						if(mIsClearAllState)
 							clearAll();
 						else
 							selectAll();
 					}
 				});
+			}
 
 			View btn = mRoot.findViewById(R.id.btn_ok);
 			if(btn != null)

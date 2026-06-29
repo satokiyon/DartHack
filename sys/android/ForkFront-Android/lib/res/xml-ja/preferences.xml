@@ -88,7 +88,7 @@
 			android:persistent="true"
 			android:key="statusOpacity"
 			android:dialogMessage="透明 (0) から不透明 (255) までの範囲で指定します"
-			android:defaultValue="0"
+			android:defaultValue="150"
 			android:text=""
 			android:max="255"/>
 
@@ -111,21 +111,21 @@
 				android:summary="縦画面のときに常に移動キーを表示します"
 				android:persistent="true"
 				android:key="ovlPortAlways"
-				android:defaultValue="false"/>
+				android:defaultValue="true"/>
 
 			<CheckBoxPreference
 				android:title="横画面で常に表示"
 				android:summary="横画面のときに常に移動キーを表示します"
 				android:persistent="true"
 				android:key="ovlLandAlways"
-				android:defaultValue="false"/>
+				android:defaultValue="true"/>
 
 			<ListPreference
 				android:title="縦画面での位置"
 				android:summary="縦画面における移動キーの表示位置"
 				android:persistent="true"
 				android:key="ovlPortLoc"
-				android:defaultValue="1"
+				android:defaultValue="3"
 				android:entries="@array/dirLocationNames"
 				android:entryValues="@array/dirLocationValues"/>
 
@@ -134,7 +134,7 @@
 				android:summary="横画面における移動キーの表示位置"
 				android:persistent="true"
 				android:key="ovlLandLoc"
-				android:defaultValue="1"
+				android:defaultValue="3"
 				android:entries="@array/dirLocationNames"
 				android:entryValues="@array/dirLocationValues"/>
 
@@ -144,7 +144,7 @@
 				android:persistent="true"
 				android:key="ovlOpacity"
 				android:dialogMessage="透明 (0) から不透明 (255) までの範囲で指定します"
-				android:defaultValue="255"
+				android:defaultValue="150"
 				android:text=""
 				android:max="255"/>
 
@@ -154,7 +154,7 @@
 					android:persistent="true"
 					android:key="ovlSize"
 					android:dialogMessage="移動キーのボタンの大きさを変更します"
-					android:defaultValue="0"
+					android:defaultValue="5"
 					android:text=""
 					forkfront:min="-10"
 					android:max="10"/>
@@ -164,7 +164,7 @@
 				android:summary="移動キーが表示されている状態でも、マップのタップによる移動入力を許可します"
 				android:persistent="true"
 				android:key="allowMapDir"
-				android:defaultValue="false"/>
+				android:defaultValue="true"/>
 
 		</PreferenceScreen>
 		

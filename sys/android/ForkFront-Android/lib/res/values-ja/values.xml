@@ -74,4 +74,19 @@
 	<string name="cancel">キャンセル</string>
 	<string name="ok">決定</string>
 	<string name="select_all">すべて選択</string>
+	<string name="clear_all">すべて解除</string>
+	<string name="press_any_key_to_continue">キーを押して続行</string>
+	<string name="tap_to_continue">タップして続行</string>
+	<string name="preparing_content">データを準備中...</string>
+	<string name="not_enough_space">空き容量が不足しています。%.2fMB 必要です。</string>
+	<string name="unknown_error_preparing_content">データの準備中に不明なエラーが発生しました</string>
+	<string name="invalid_tile_dimensions">無効なタイルサイズ (%1$dx%2$d)</string>
+	<string name="invalid_tileset_settings">無効なタイルセット設定 \'%1$s\' (%2$dx%3$d)</string>
+	<string name="error_loading_custom_tileset">カスタムタイルセットの読み込みに失敗しました</string>
+	<string name="error_loading_custom_tileset_detail">カスタムタイルセットの読み込みに失敗しました: %1$s</string>
+	<string name="error_loading_custom_tileset_oom">カスタムタイルセットの読み込みに失敗しました: メモリ不足</string>
+	<string name="error_loading_tileset">タイルセットの読み込みに失敗しました</string>
+	<string name="error_loading_path">読み込み失敗: %1$s</string>
+	<string name="error_loading_path_detail">読み込み失敗 %1$s: %2$s</string>
+	<string name="error_loading_path_oom">読み込み失敗 %1$s: メモリ不足</string>
 </resources>

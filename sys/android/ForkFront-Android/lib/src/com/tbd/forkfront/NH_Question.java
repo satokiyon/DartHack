@@ -32,11 +32,6 @@ public class NH_Question
 		mState = state;
 	}
 
-	// ____________________________________________________________________________________
-	public boolean isActive()
-	{
-		return mUI != null;
-	}
 
 	// ____________________________________________________________________________________
 	public void show(Activity context, String question, byte[] choices, int def)

@@ -194,7 +194,7 @@ public class TilesetPreference extends Preference implements PreferenceManager.O
 			Util.copy(inputStream, outputStream);
 			return true;
 		} catch(Exception e) {
-			Toast.makeText(getContext(), "Error loading tileset", Toast.LENGTH_LONG).show();
+			Toast.makeText(getContext(), getContext().getString(R.string.error_loading_tileset), Toast.LENGTH_LONG).show();
 		} finally {
 			if(inputStream != null)
 				try { inputStream.close(); } catch(IOException e) {}
@@ -369,17 +369,17 @@ public class TilesetPreference extends Preference implements PreferenceManager.O
 
 					mCustomTileset = BitmapFactory.decodeFile(Tileset.getLocalTilesetFile(getContext()).getPath());
 					if(mCustomTileset == null)
-						Toast.makeText(getContext(), "Error loading: " + newPath, Toast.LENGTH_LONG).show();
+						Toast.makeText(getContext(), getContext().getString(R.string.error_loading_path, newPath), Toast.LENGTH_LONG).show();
 
 				}
 				catch(Exception e)
 				{
-					Toast.makeText(getContext(), "Error loading " + newPath + ": " + e.toString(), Toast.LENGTH_LONG).show();
+					Toast.makeText(getContext(), getContext().getString(R.string.error_loading_path_detail, newPath, e.toString()), Toast.LENGTH_LONG).show();
 					mCustomTileset = null;
 				}
 				catch(OutOfMemoryError e)
 				{
-					Toast.makeText(getContext(), "Error loading " + newPath + ": Out of memory", Toast.LENGTH_LONG).show();
+					Toast.makeText(getContext(), getContext().getString(R.string.error_loading_path_oom, newPath), Toast.LENGTH_LONG).show();
 					mCustomTileset = null;
 				}
 			}

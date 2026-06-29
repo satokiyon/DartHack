@@ -68,7 +68,7 @@ public class Tileset
 
 		if(!TTY && (tileW <= 0 || tileH <= 0))
 		{
-			Toast.makeText(mContext, "Invalid tile dimensions (" + mTileW + "x" + mTileH + ")", Toast.LENGTH_LONG).show();
+			Toast.makeText(mContext, mContext.getString(R.string.invalid_tile_dimensions, mTileW, mTileH), Toast.LENGTH_LONG).show();
 			TTY = true;
 
 		}
@@ -99,7 +99,7 @@ public class Tileset
 
 			if(mnCols <= 0)
 			{
-				Toast.makeText(mContext, "Invalid tileset settings '" + tilesetName + "' (" + mTileW + "x" + mTileH + ")", Toast.LENGTH_LONG).show();
+				Toast.makeText(mContext, mContext.getString(R.string.invalid_tileset_settings, tilesetName, mTileW, mTileH), Toast.LENGTH_LONG).show();
 				TTY = true;
 			}
 		}
@@ -128,7 +128,7 @@ public class Tileset
 		if(mBitmap == null)
 			mBitmap = tryLoadBitmap(tilesetName, true);
 		if(mBitmap == null)
-			Toast.makeText(mContext, "Error loading custom tileset", Toast.LENGTH_LONG).show();
+			Toast.makeText(mContext, mContext.getString(R.string.error_loading_custom_tileset), Toast.LENGTH_LONG).show();
 	}
 
 	// ____________________________________________________________________________________
@@ -142,12 +142,12 @@ public class Tileset
 		catch(Exception e)
 		{
 			if(logFailure)
-				Toast.makeText(mContext, "Error loading custom tileset: " + e.toString(), Toast.LENGTH_LONG).show();
+				Toast.makeText(mContext, mContext.getString(R.string.error_loading_custom_tileset_detail, e.toString()), Toast.LENGTH_LONG).show();
 		}
 		catch(OutOfMemoryError e)
 		{
 			if(logFailure)
-				Toast.makeText(mContext, "Error loading custom tileset: Out of memory", Toast.LENGTH_LONG).show();
+				Toast.makeText(mContext, mContext.getString(R.string.error_loading_custom_tileset_oom), Toast.LENGTH_LONG).show();
 		}
 		return bitmap;
 	}

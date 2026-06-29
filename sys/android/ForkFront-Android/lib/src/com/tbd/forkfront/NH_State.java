@@ -481,7 +481,7 @@ public class NH_State
 	// ____________________________________________________________________________________
 	public void updateVisibleState()
 	{
-		if(mControlsVisible && !mGetLine.isActive() && !mQuestion.isActive())
+		if(mControlsVisible)
 		{
 			if(mMode == CmdMode.Panel)
 			{

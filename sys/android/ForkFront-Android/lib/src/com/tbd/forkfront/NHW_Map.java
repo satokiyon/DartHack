@@ -1198,7 +1198,7 @@ public class NHW_Map implements NH_Window
 		{
 			if(bBlocking)
 			{
-				String blockMsg = Util.hasPhysicalKeyboard(mContext) ? "Press any key to continue" : "Tap to continue";
+				String blockMsg = Util.hasPhysicalKeyboard(mContext) ? mContext.getString(R.string.press_any_key_to_continue) : mContext.getString(R.string.tap_to_continue);
 				TextView tv = (TextView)mContext.findViewById(R.id.nh_blockmsg);
 				tv.setText(blockMsg);
 				tv.setVisibility(View.VISIBLE);

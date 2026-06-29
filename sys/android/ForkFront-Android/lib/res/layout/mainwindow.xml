@@ -70,7 +70,7 @@
                     android:clickable="false"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
-                    android:text="Tap to continue"
+                    android:text="@string/tap_to_continue"
                     android:textSize="15sp"
                     android:visibility="gone" />
 
@@ -94,7 +94,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        android:visibility="gone" />
+        android:layout_gravity="bottom" />
 
 </LinearLayout>

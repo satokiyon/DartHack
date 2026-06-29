@@ -54,7 +54,6 @@ public class SoftKeyboard implements OnKeyboardActionListener
 		mKeyboardView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
 		mKeyboardFrame.addView(mKeyboardView);
 		mKeyboardView.setOnKeyboardActionListener(this);
-		mKeyboardFrame.setVisibility(View.GONE);
 	}
 
 	// ____________________________________________________________________________________
@@ -95,12 +94,12 @@ public class SoftKeyboard implements OnKeyboardActionListener
 			mKeyboardView.setPreviewEnabled(false);
 			mKeyboardView.closing();
 			Util.hideKeyboard(mContext, mKeyboardView);
+			mKeyboardFrame.setVisibility(View.GONE);
 			mQwertyKeyboard = null;
 			mMetaKeyboard = null;
 			mCtrlKeyboard = null;
 			mSymbolsKeyboard = null;
 		}
-		mKeyboardFrame.setVisibility(View.GONE);
 	}
 
 	// ____________________________________________________________________________________

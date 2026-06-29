@@ -144,7 +144,7 @@ public class UpdateAssets extends AsyncTask<Void, Void, Void>
 			mProgress = new ProgressDialog(mActivity);
 			mProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			mProgress.setMax((int)mRequiredSpace);
-			mProgress.setMessage("Preparing content...");
+			mProgress.setMessage(mActivity.getString(R.string.preparing_content));
 			mProgress.setCancelable(false);
 			mProgress.show();
 		}
@@ -169,7 +169,7 @@ public class UpdateAssets extends AsyncTask<Void, Void, Void>
 				}
 				
 				if(dstPath == null)
-					mError = String.format("Not enough space. %.2fMb required", (float)(mRequiredSpace)/(1024.f*1024.f));
+					mError = String.format(mActivity.getString(R.string.not_enough_space), (float)(mRequiredSpace)/(1024.f*1024.f));
 				else {
 
 					long startns = System.nanoTime();
@@ -199,7 +199,7 @@ public class UpdateAssets extends AsyncTask<Void, Void, Void>
 		catch(IOException e)
 		{
 			e.printStackTrace();
-			mError = "Unknown error while preparing content";
+			mError = mActivity.getString(R.string.unknown_error_preparing_content);
 			return null;
 		}
 	}
@@ -208,7 +208,7 @@ public class UpdateAssets extends AsyncTask<Void, Void, Void>
 	private void showError()
 	{
 		AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-		builder.setMessage(mError).setPositiveButton("Ok", new DialogInterface.OnClickListener()
+		builder.setMessage(mError).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
 		{
 			public void onClick(DialogInterface dialog, int id)
 			{
@@ -229,7 +229,7 @@ public class UpdateAssets extends AsyncTask<Void, Void, Void>
 	private void showMessage(String msg)
 	{
 		AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-		builder.setMessage(msg).setPositiveButton("Ok", new DialogInterface.OnClickListener()
+		builder.setMessage(msg).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
 		{
 			public void onClick(DialogInterface dialog, int id)
 			{}

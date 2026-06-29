@@ -44,11 +44,6 @@ public class NH_GetLine
 		mState = state;
 	}
 
-	// ____________________________________________________________________________________
-	public boolean isActive()
-	{
-		return mUI != null;
-	}
 
 	// ____________________________________________________________________________________
 	public void show(Activity context, final String title, final int nMaxChars)
