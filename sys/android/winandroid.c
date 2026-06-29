@@ -1835,7 +1835,7 @@ void and_n_getline_r(const char* question, char* buf, int nMax, int showLog, int
 	{
 		const char *utf8 = (*jEnv)->GetStringUTFChars(jEnv, jstr, 0);
 		if (utf8) {
-			if(utf8[0] == 0x80)
+			if((unsigned char)utf8[0] == 0x80)
 			{
 				// special case: ABORT
 				if(!program_state.gameover && program_state.something_worth_saving)
@@ -1922,7 +1922,7 @@ void and_askname()
 
 	const char *utf8 = (*jEnv)->GetStringUTFChars(jEnv, jstr, 0);
 	if (utf8) {
-		if (utf8[0] == 0x80 || utf8[0] == '\033') {
+		if ((unsigned char)utf8[0] == 0x80 || utf8[0] == '\033') {
 			clearlocks();
 			and_exit_nhwindows("bye");
 			nh_terminate(EXIT_SUCCESS);
