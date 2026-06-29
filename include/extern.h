@@ -2391,8 +2391,7 @@ extern const char *jp_cmap_explanation(int, coordxy, coordxy);
 extern const char *jp_terrain_name(int);
 extern char *ice_descr(coordxy, coordxy, char *) NONNULL NONNULLARG3;
 extern boolean ia_checkfile(struct obj *) NONNULLARG1;
-extern boolean jp_data_lookup_key_from_japanese(const char *, char *, size_t)
-   NONNULLARG12;
+extern boolean jp_data_lookup_key_from_japanese(const char *, char *, size_t);
 extern int do_screen_description(coord, boolean, int, char *, const char **,
                                  struct permonst **) NONNULLARG45;
 extern int do_look(int, coord *);
@@ -3349,7 +3348,7 @@ extern void timer_sanity_check(void);
 
 extern void formatkiller(char *, unsigned, int, boolean) NONNULLARG1;
 extern void jp_translate_killer_text_for_display(char *, unsigned,
-                                                 const char *) NONNULLPTRS;
+                                                 const char *);
 extern void jp_formatkiller_for_display(char *, unsigned, int,
                                         boolean) NONNULLARG1;
 extern int observable_depth(d_level *) NONNULLARG1;
@@ -3816,8 +3815,7 @@ extern const char *skill_name(int);
 extern const char *skill_name_jp(int);
 extern char *jp_skill_level_name_for_display(int, char *) NONNULLARG2;
 extern const char *jp_skill_name_for_display(int);
-extern char *jp_weapon_descr_for_display(struct obj *, char *, size_t)
-   NONNULLARG12;
+extern char *jp_weapon_descr_for_display(struct obj *, char *, size_t);
 extern boolean can_advance(int, boolean);
 extern void show_skills(void);
 extern int enhance_weapon_skill(void);
