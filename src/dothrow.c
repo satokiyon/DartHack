@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
 /* NetHack 5.0	dothrow.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.318 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -523,14 +523,16 @@ dofire(void)
             } else if (iflags.fireassist
                        && uswapwep && is_pole(uswapwep)
                        && !(uswapwep->cursed && uswapwep->bknown)) {
-                /* we have a known not-cursed polearm as swap weapon.
-                   if (uquiver) {
-                       cmdq_add_ec(CQ_CANNED, doswapweapon);
-                       cmdq_add_ec(CQ_CANNED, dofire);
-                       return ECMD_OK; /* haven't taken any time yet */
-                   } else {
-                       You("矢筒は空だった.");
-                   }        } else {
+                /* we have a known not-cursed polearm as swap weapon. */
+                if (uquiver) {
+                    cmdq_add_ec(CQ_CANNED, doswapweapon);
+                    cmdq_add_ec(CQ_CANNED, dofire);
+                    return ECMD_OK; /* haven't taken any time yet */
+                } else {
+                    You("矢筒は空だった.");
+                }
+            }
+        } else {
             autoquiver();
             obj = uquiver;
             if (obj) {
