@@ -1977,7 +1977,22 @@ int do_ext_cmd_menu(BOOLEAN_P complete)
 			continue;
 
 		any.a_int = i+1;
-		and_add_menu(wid, &nul_glyphinfo, &any, accelerator, 0, ATR_NONE, NO_COLOR, ptr, MENU_ITEMFLAGS_NONE);
+		char buf[BUFSZ];
+		if (extcmdlist[i].ef_desc && *extcmdlist[i].ef_desc) {
+			const char *desc = extcmdlist[i].ef_desc;
+			char descbuf[BUFSZ];
+			if (!wizard && !discover
+			    && (flgs & GENERALCMD) != 0
+			    && strstri(desc, "虐殺")) {
+				desc = strsubst(strcpy(descbuf, desc),
+				                "絶滅または虐殺された",
+				                "虐殺された");
+			}
+			Sprintf(buf, "%s (%s)", ptr, desc);
+		} else {
+			Strcpy(buf, ptr);
+		}
+		and_add_menu(wid, &nul_glyphinfo, &any, accelerator, 0, ATR_NONE, NO_COLOR, buf, MENU_ITEMFLAGS_NONE);
 
 		if(accelerator == 'z')
 			accelerator = 'A';
