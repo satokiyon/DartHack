@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
 /* NetHack 5.0	lock.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -696,7 +696,7 @@ doforce(void)
     picktyp = is_blade(uwep) && !is_pick(uwep);
     if (gx.xlock.usedtime && gx.xlock.box && picktyp == gx.xlock.picktyp) {
         You("鍵をこじ開ける試みを再開した.");
-        set_occupation(forcelock, "鍵をこじ開けている", 0);
+        set_occupation(forcelock, "鍵のこじ開け", 0);
         return ECMD_TIME;
     }
 
@@ -738,7 +738,7 @@ doforce(void)
         }
 
     if (gx.xlock.box)
-        set_occupation(forcelock, "鍵をこじ開けている", 0);
+        set_occupation(forcelock, "鍵のこじ開け", 0);
     else
         You("無理にこじ開けるのはやめることにした.");
     return ECMD_TIME;

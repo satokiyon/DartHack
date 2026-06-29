@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
 /* NetHack 5.0	do_wear.c	$NHDT-Date: 1781973047 2026/06/20 16:30:47 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.212 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2935,7 +2935,7 @@ take_off(void)
     doff->delay = 0;
 
     if (doff->what == 0L) {
-        You("%s終えた.", doff->disrobing);
+        You("%sを終えた.", doff->disrobing);
         return 0;
     } else if (doff->what == W_WEP) {
         doff->delay = 1;
@@ -3035,7 +3035,7 @@ doddoremarm(void)
     int result = 0;
 
     if (svc.context.takeoff.what || svc.context.takeoff.mask) {
-        You("%s続けた.", svc.context.takeoff.disrobing);
+        You("%sを続けた.", svc.context.takeoff.disrobing);
         set_occupation(take_off, svc.context.takeoff.disrobing, 0);
         return ECMD_OK;
     } else if (!uwep && !uswapwep && !uquiver && !uamul && !ublindf
@@ -3055,9 +3055,9 @@ doddoremarm(void)
                        (((svc.context.takeoff.mask & ~W_WEAPONS) != 0)
                         /* default activity for armor and/or accessories,
                            possibly combined with weapons */
-                                ? "脱衣を"
+                                ? "脱衣"
                         /* specific activity when handling weapons only */
-                                : "武装解除を"), CONTEXTVERBSZ);
+                                : "武装解除"), CONTEXTVERBSZ);
         (void) take_off();
     }
     /* The time to perform the command is already completely accounted for
