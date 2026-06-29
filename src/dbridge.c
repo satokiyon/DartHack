@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
 /* NetHack 5.0	dbridge.c	$NHDT-Date: 1781973044 2026/06/20 16:30:44 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.74 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet              */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -735,11 +735,12 @@ do_entity(struct entity *etmp)
             }
         if (e_survives_at(etmp, etmp->ex, etmp->ey)) {
             if (e_inview && !is_flyer(etmp->edata)
-                && !is_floater(etmp->edata))
+                && !is_floater(etmp->edata)) {
                 if (is_u(etmp))
                     pline("あなたは跳ね橋から落ちた.");
                 else
                     pline("%sは跳ね橋から落ちた.", l_monnam(etmp->emon));
+            }
             return;
         }
         debugpline1("%s cannot survive on the drawbridge square",
@@ -979,12 +980,13 @@ destroy_drawbridge(coordxy x, coordxy y)
     if (etmp2->edata) {
         e_inview = e_canseemon(etmp2);
         if (!automiss(etmp2)) {
-            if (e_inview)
+            if (e_inview) {
                 if (is_u(etmp2))
                     pline("あなたは飛び散る破片で粉々になった.");
                 else
                     pline("%sは飛び散る破片で粉々になった.",
                           l_monnam(etmp2->emon));
+            }
             svk.killer.format = KILLED_BY_AN;
                 Strcpy(svk.killer.name, "exploding drawbridge");
             e_died(etmp2,
