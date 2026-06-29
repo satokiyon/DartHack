@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29.
 -- NetHack Archeologist Arc-loca.lua	$NHDT-Date: 1781994864 2026/06/20 22:34:24 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.3 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991 by M. Stephenson
@@ -89,9 +89,9 @@ des.object()
 des.object()
 -- Treasure?
 des.engraving({ type="engrave", text="Xがここを示している." })
-des.engraving({ type="engrave", text="X marks the spot." })
-des.engraving({ type="engrave", text="X marks the spot." })
-des.engraving({ type="engrave", text="X marks the spot." })
+des.engraving({ type="engrave", text="Xがここを示している." })
+des.engraving({ type="engrave", text="Xがここを示している." })
+des.engraving({ type="engrave", text="Xがここを示している." })
 -- Random traps
 des.trap("spiked pit",24,02)
 des.trap("spiked pit",37,00)
