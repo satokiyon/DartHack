@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
 /* NetHack 5.0	eat.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.354 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1948,7 +1948,7 @@ consume_tin(const char *mesg)
     } else {
         svc.context.tin.reqtime = tmp;
         svc.context.tin.usedtime = 0;
-        set_occupation(opentin, "opening the tin", 0);
+        set_occupation(opentin, "缶を開けるの", 0);
     }
     return;
     }
@@ -2563,7 +2563,7 @@ eatspecial(void)
     struct obj *otmp = svc.context.victual.piece;
 
     /* lesshungry wants an occupation to handle choke messages correctly */
-    set_occupation(eatfood, "eating non-food", 0);
+    set_occupation(eatfood, "食物以外を食べるの", 0);
     lesshungry(svc.context.victual.nmod);
     go.occupation = 0;
     svc.context.victual = zero_victual; /* victual.piece = 0, .o_id = 0 */

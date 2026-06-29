@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
 /* NetHack 5.0	apply.c	$NHDT-Date: 1781973040 2026/06/20 16:30:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.482 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2817,7 +2817,7 @@ use_trap(struct obj *otmp)
     const char *what = (char *) 0;
     char buf[BUFSZ];
     int levtyp = levl[u.ux][u.uy].typ;
-    const char *occutext = "罠を仕掛けている";
+    const char *occutext = "罠の設置";
 
     if (nohands(gy.youmonst.data))
         what = "手がない";

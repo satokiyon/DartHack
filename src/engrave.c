@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
 /* NetHack 5.0	engrave.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1287,7 +1287,7 @@ doengrave(void)
     svc.context.engraving.pos.x = u.ux;
     svc.context.engraving.pos.y = u.uy;
     svc.context.engraving.actionct = 0;
-    set_occupation(engrave, "刻字中", 0);
+    set_occupation(engrave, "刻字", 0);
 
     if (de->post_engr_text[0])
         pline("%s", de->post_engr_text);
