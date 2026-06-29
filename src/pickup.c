@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
 /* NetHack 5.0	pickup.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.397 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1792,16 +1792,17 @@ lift_object(
                 result = 0; /* don't lift */
             } else {
                 char qbuf[BUFSZ];
+                char qsfx[BUFSZ];
                 long savequan = obj->quan;
 
                 obj->quan = *cnt_p;
-                Sprintf(qbuf, "%s %s ",
+                Sprintf(qsfx, "を%s%sます。続けますか?",
                         (next_encumbr >= EXT_ENCUMBER) ? overloadpfx
                         : (next_encumbr >= HVY_ENCUMBER) ? nearloadpfx
                           : (next_encumbr >= MOD_ENCUMBER) ? moderateloadpfx
                             : slightloadpfx,
-                    !container ? "拾い上げ" : "取り出し");
-                (void) safe_qbuf(qbuf, qbuf, "。続けますか?", obj, doname,
+                        !container ? "拾い上げ" : "取り出し");
+                (void) safe_qbuf(qbuf, "", qsfx, obj, doname,
                                  ansimpleoname, something);
                 obj->quan = savequan;
                 switch (ynq(qbuf)) {
@@ -1982,11 +1983,9 @@ pickup_prinv(
     long count,
     const char *verb)
 {
-    char pbuf[QBUFSZ];
     const char *prefix;
     int nearload = near_capacity();
 
-    pbuf[0] = '\0';
     if (nearload == gp.pickup_encumbrance) {
         prefix = (char *) 0;
     } else {
@@ -1997,10 +1996,24 @@ pickup_prinv(
                        : (char *) 0;
         gp.pickup_encumbrance = nearload;
     }
-    if (prefix)
-        Sprintf(pbuf, "%s%s", prefix, verb);
 
-    prinv(pbuf, obj, count);
+    if (prefix) {
+        boolean total_of = (count && (count < obj->quan));
+        char totalbuf[QBUFSZ];
+        totalbuf[0] = '\0';
+        if (total_of && flags.verbose) {
+            Snprintf(totalbuf, sizeof totalbuf, "（合計 %ld）.", obj->quan);
+            pline("%sを%s%s%s",
+                  xprname(obj, (char *) 0, obj->invlet, FALSE, 0L, count),
+                  prefix, verb, totalbuf);
+        } else {
+            pline("%sを%s%s.",
+                  xprname(obj, (char *) 0, obj->invlet, FALSE, 0L, count),
+                  prefix, verb);
+        }
+    } else {
+        prinv((char *) 0, obj, count);
+    }
 }
 
 /*
