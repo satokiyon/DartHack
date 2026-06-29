@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
 /* NetHack 5.0  makedefs.c  $NHDT-Date: 1702948590 2023/12/19 01:16:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
@@ -1299,7 +1299,7 @@ do_data(void)
 static void
 do_data_for(const char *data_file)
 {
-    char infile[60], tempfile[60];
+    char infile[MAXFNAMELEN], tempfile[MAXFNAMELEN];
     char tmpname[64];
     boolean ok;
     long txt_offset;
@@ -1486,7 +1486,7 @@ do_oracles(void)
 static void
 do_oracles_for(const char *oracle_file)
 {
-    char infile[60], tempfile[60], xbuf[BUFSZ];
+    char infile[MAXFNAMELEN], tempfile[MAXFNAMELEN], xbuf[BUFSZ];
     char tmpname[64];
     boolean in_oracle, ok;
     int input_lineno;
