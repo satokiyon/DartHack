@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
 /* NetHack 5.0	cmd.c	$NHDT-Date: 1781973043 2026/06/20 16:30:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.772 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -655,10 +655,10 @@ doextlist(void)
                    doesn't apply during the current game */
                 if (!wizard && !discover
                     && (efp->flags & GENERALCMD) != 0 /* minor optimization */
-                    && strstri(cmd_desc, "extinct"))
+                    && strstri(cmd_desc, "虐殺"))
                     cmd_desc = strsubst(strcpy(descbuf, cmd_desc),
-                                        " been genocided or become extinct",
-                                        " been genocided");
+                                        "絶滅または虐殺された",
+                                        "虐殺された");
                 /* if searching, skip this command if it doesn't match */
                 if (*searchbuf
                     /* first try case-insensitive substring match */
@@ -1731,7 +1731,7 @@ struct ext_func_tab extcmdlist[] = {
     { M('f'), "force", "鍵をこじ開ける",
               doforce, AUTOCOMPLETE, NULL },
     { M('g'), "genocided",
-              "絶滅または根絶されたモンスターを一覧表示する",
+              "絶滅または虐殺されたモンスターを一覧表示する",
               dogenocided,
               IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
     { ';',    "glance", "地図記号が何を表すか表示する",
@@ -1849,7 +1849,7 @@ struct ext_func_tab extcmdlist[] = {
               do_write_config_file,
               IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
     { 's',    "search", "罠と隠し扉を探す",
-              dosearch, IFBURIED | CMD_M_PREFIX, "searching" },
+              dosearch, IFBURIED | CMD_M_PREFIX, "探索" },
     { '*',    "seeall", "使用中の装備をすべて表示する",
               doprinuse, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
     { AMULET_SYM, "seeamulet", "現在着けている護符を表示する",
@@ -1933,7 +1933,7 @@ struct ext_func_tab extcmdlist[] = {
     { '\0',   "vision", "視界配列を表示する",
               wiz_show_vision, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { '.',    "wait", "何もせず1ターン休む",
-              donull, IFBURIED | CMD_M_PREFIX, "waiting" },
+              donull, IFBURIED | CMD_M_PREFIX, "待機" },
     { 'W',    "wear", "鎧を身に着ける",
               dowear, 0, NULL },
     { '&',    "whatdoes", "コマンドの働きを説明する",
