@@ -89,4 +89,15 @@
 	<string name="error_loading_path">読み込み失敗: %1$s</string>
 	<string name="error_loading_path_detail">読み込み失敗 %1$s: %2$s</string>
 	<string name="error_loading_path_oom">読み込み失敗 %1$s: メモリ不足</string>
+
+	<string-array name="kbdCloseLocationNames">
+		<item>左端</item>
+		<item>中央</item>
+		<item>右端</item>
+	</string-array>
+	<string-array name="kbdCloseLocationValues">
+		<item>0</item>
+		<item>1</item>
+		<item>2</item>
+	</string-array>
 </resources>

@@ -167,6 +167,49 @@
 				android:defaultValue="true"/>
 
 		</PreferenceScreen>
+
+		<PreferenceScreen
+			android:title="Keyboard close button"
+			android:summary="Configure the keyboard close button overlay">
+
+			<CheckBoxPreference
+				android:title="Show close button"
+				android:summary="Show a button to close the virtual keyboard and return to the command panels"
+				android:persistent="true"
+				android:key="showCloseKbdBtn"
+				android:defaultValue="true"/>
+
+			<ListPreference
+				android:title="Button location"
+				android:summary="The location of the close button"
+				android:persistent="true"
+				android:key="closeKbdBtnLoc"
+				android:defaultValue="0"
+				android:entries="@array/kbdCloseLocationNames"
+				android:entryValues="@array/kbdCloseLocationValues"/>
+
+			<com.tbd.forkfront.SliderPreference
+				android:title="Opacity"
+				android:summary="The opacity of the button"
+				android:persistent="true"
+				android:key="closeKbdBtnOpacity"
+				android:dialogMessage="The opacity between invisible (0) and opaque (255)"
+				android:defaultValue="150"
+				android:text=""
+				android:max="255"/>
+
+			<com.tbd.forkfront.SliderPreference
+					android:title="Size"
+					android:summary="The relative size of the button"
+					android:persistent="true"
+					android:key="closeKbdBtnSize"
+					android:dialogMessage="Change the relative size of the button"
+					android:defaultValue="0"
+					android:text=""
+					forkfront:min="-10"
+					android:max="10"/>
+
+		</PreferenceScreen>
 		
 		<PreferenceScreen
 			android:title="Command panels"

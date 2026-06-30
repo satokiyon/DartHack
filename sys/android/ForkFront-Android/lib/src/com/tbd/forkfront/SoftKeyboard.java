@@ -3,14 +3,18 @@ package com.tbd.forkfront;
 import java.util.EnumSet;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import com.tbd.forkfront.Input.Modifier;
 
@@ -41,6 +45,14 @@ public class SoftKeyboard implements OnKeyboardActionListener
 	private KEYBOARD mCurrent;
 	private boolean mIsShifted;
 
+	private ColorStateList mDefaultTextColor;
+	private Button mCloseBtn;
+	private boolean mShowCloseBtn;
+	private int mCloseBtnLoc;
+	private int mCloseBtnOpacity;
+	private int mCloseBtnSize;
+	private boolean mIsVisible;
+
 	// ____________________________________________________________________________________
 	public SoftKeyboard(Activity context, NH_State state)
 	{
@@ -54,6 +66,29 @@ public class SoftKeyboard implements OnKeyboardActionListener
 		mKeyboardView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
 		mKeyboardFrame.addView(mKeyboardView);
 		mKeyboardView.setOnKeyboardActionListener(this);
+
+		mCloseBtn = (Button)mContext.findViewById(R.id.close_kbd_btn);
+		if (mCloseBtn != null) {
+			mDefaultTextColor = mCloseBtn.getTextColors();
+			mCloseBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					handleClose();
+				}
+			});
+			mCloseBtn.setOnTouchListener(new View.OnTouchListener() {
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					int action = event.getAction() & MotionEvent.ACTION_MASK;
+					if (action == MotionEvent.ACTION_DOWN) {
+						v.getBackground().setAlpha(255);
+					} else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+						v.getBackground().setAlpha(mCloseBtnOpacity);
+					}
+					return false;
+				}
+			});
+		}
 	}
 
 	// ____________________________________________________________________________________
@@ -83,6 +118,8 @@ public class SoftKeyboard implements OnKeyboardActionListener
 			break;
 			}
 			mKeyboardFrame.setVisibility(View.VISIBLE);
+			mIsVisible = true;
+			updateCloseBtn();
 		}
 	}
 
@@ -99,6 +136,65 @@ public class SoftKeyboard implements OnKeyboardActionListener
 			mMetaKeyboard = null;
 			mCtrlKeyboard = null;
 			mSymbolsKeyboard = null;
+			mIsVisible = false;
+			updateCloseBtn();
+		}
+	}
+
+	// ____________________________________________________________________________________
+	public void preferencesUpdated(SharedPreferences prefs)
+	{
+		mShowCloseBtn = prefs.getBoolean("showCloseKbdBtn", true);
+		mCloseBtnLoc = getGravity(prefs.getString("closeKbdBtnLoc", "0"));
+		mCloseBtnOpacity = prefs.getInt("closeKbdBtnOpacity", 150);
+		mCloseBtnSize = prefs.getInt("closeKbdBtnSize", 0);
+
+		updateCloseBtn();
+	}
+
+	// ____________________________________________________________________________________
+	private int getGravity(String val)
+	{
+		int loc = Integer.parseInt(val);
+		if(loc == 0)
+			return Gravity.LEFT;
+		if(loc == 1)
+			return Gravity.CENTER_HORIZONTAL;
+		if(loc == 2)
+			return Gravity.RIGHT;
+		return Gravity.LEFT;
+	}
+
+	// ____________________________________________________________________________________
+	private void updateCloseBtn()
+	{
+		if (mCloseBtn == null)
+			return;
+
+		if (mShowCloseBtn && mIsVisible)
+		{
+			FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mCloseBtn.getLayoutParams();
+			params.gravity = Gravity.BOTTOM | mCloseBtnLoc;
+
+			final float density = mContext.getResources().getDisplayMetrics().density;
+			int scale = mCloseBtnSize > 0 ? 2 : 1;
+			int size = (int)((50 + scale * mCloseBtnSize) * density + 0.5f);
+			params.width = size;
+			params.height = size;
+			mCloseBtn.setLayoutParams(params);
+
+			mCloseBtn.getBackground().setAlpha(mCloseBtnOpacity);
+			if (mCloseBtnOpacity > 127) {
+				mCloseBtn.setTextColor(mDefaultTextColor);
+			} else {
+				mCloseBtn.setTextColor(0xffffffff);
+			}
+
+			mCloseBtn.setVisibility(View.VISIBLE);
+		}
+		else
+		{
+			mCloseBtn.setVisibility(View.GONE);
 		}
 	}
 

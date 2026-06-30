@@ -120,6 +120,8 @@ public class NHW_Map implements NH_Window
 	private NH_State mNHState;
 	private final ByteDecoder mDecoder;
 	private int mBorderColor;
+	private double mSavedCenterTileX = -1;
+	private double mSavedCenterTileY = -1;
 
 	// ____________________________________________________________________________________
 	public NHW_Map(Activity context, Tileset tileset, NHW_Status status, NH_State nhState, ByteDecoder decoder)
@@ -401,6 +403,55 @@ public class NHW_Map implements NH_Window
 		{
 			mBorderColor = borderColor;
 			mUI.invalidate();
+		}
+	}
+
+	// ____________________________________________________________________________________
+	public void saveCenterTilePosition()
+	{
+		if (mUI == null) return;
+		float tileW = mUI.getScaledTileWidth();
+		float tileH = mUI.getScaledTileHeight();
+		if (tileW > 0 && tileH > 0 && mCanvasRect.width() > 0 && mCanvasRect.height() > 0)
+		{
+			float centerX_pixel = mCanvasRect.left + mCanvasRect.width() * 0.5f;
+			float centerY_pixel = mCanvasRect.top + mCanvasRect.height() * 0.5f;
+			mSavedCenterTileX = (centerX_pixel - mViewOffset.x) / tileW;
+			mSavedCenterTileY = (centerY_pixel - mViewOffset.y) / tileH;
+		}
+		else
+		{
+			mSavedCenterTileX = -1;
+			mSavedCenterTileY = -1;
+		}
+	}
+
+	// ____________________________________________________________________________________
+	public void restoreCenterTilePosition()
+	{
+		if (mUI == null) return;
+		if (mSavedCenterTileX >= 0 && mSavedCenterTileY >= 0)
+		{
+			float tileW = mUI.getScaledTileWidth();
+			float tileH = mUI.getScaledTileHeight();
+			if (tileW > 0 && tileH > 0 && mCanvasRect.width() > 0 && mCanvasRect.height() > 0)
+			{
+				if (shouldLockView(tileW, tileH))
+				{
+					centerView(0, 0);
+				}
+				else
+				{
+					float centerX_pixel = mCanvasRect.left + mCanvasRect.width() * 0.5f;
+					float centerY_pixel = mCanvasRect.top + mCanvasRect.height() * 0.5f;
+					float ofsX = (float) (centerX_pixel - tileW * mSavedCenterTileX);
+					float ofsY = (float) (centerY_pixel - tileH * mSavedCenterTileY);
+					mViewOffset.set(ofsX, ofsY);
+					mUI.invalidate();
+				}
+			}
+			mSavedCenterTileX = -1;
+			mSavedCenterTileY = -1;
 		}
 	}
 

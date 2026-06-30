@@ -112,6 +112,11 @@ public class ExportPreferences extends Preference implements PreferenceManager.O
 					jsonobj.put("ovlOpacity", prefs.getInt("ovlOpacity", 255));
 					jsonobj.put("ovlSize", prefs.getInt("ovlSize", 0));
 
+					jsonobj.put("showCloseKbdBtn", prefs.getBoolean("showCloseKbdBtn", true));
+					jsonobj.put("closeKbdBtnLoc", prefs.getString("closeKbdBtnLoc", "0"));
+					jsonobj.put("closeKbdBtnOpacity", prefs.getInt("closeKbdBtnOpacity", 150));
+					jsonobj.put("closeKbdBtnSize", prefs.getInt("closeKbdBtnSize", 0));
+
 					File dir = new File(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("datadir", ""));
 					File rcFile = new File(dir, getContext().getResources().getString(R.string.defaultsFile));
 					Uri rcUri = Uri.fromFile(rcFile);

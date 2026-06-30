@@ -89,4 +89,15 @@
 	<string name="error_loading_path">Error loading: %1$s</string>
 	<string name="error_loading_path_detail">Error loading %1$s: %2$s</string>
 	<string name="error_loading_path_oom">Error loading %1$s: Out of memory</string>
+
+	<string-array name="kbdCloseLocationNames">
+		<item>Left</item>
+		<item>Center</item>
+		<item>Right</item>
+	</string-array>
+	<string-array name="kbdCloseLocationValues">
+		<item>0</item>
+		<item>1</item>
+		<item>2</item>
+	</string-array>
 </resources>

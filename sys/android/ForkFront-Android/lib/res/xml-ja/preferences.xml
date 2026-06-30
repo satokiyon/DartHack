@@ -167,6 +167,49 @@
 				android:defaultValue="true"/>
 
 		</PreferenceScreen>
+
+		<PreferenceScreen
+			android:title="キーボードを閉じるボタン"
+			android:summary="仮想キーボードを閉じるボタンを設定します">
+
+			<CheckBoxPreference
+				android:title="閉じるボタンを表示"
+				android:summary="仮想キーボードを閉じてコマンドパネルに戻るための『...』ボタンを表示します"
+				android:persistent="true"
+				android:key="showCloseKbdBtn"
+				android:defaultValue="true"/>
+
+			<ListPreference
+				android:title="ボタンの位置"
+				android:summary="閉じるボタンの表示位置"
+				android:persistent="true"
+				android:key="closeKbdBtnLoc"
+				android:defaultValue="0"
+				android:entries="@array/kbdCloseLocationNames"
+				android:entryValues="@array/kbdCloseLocationValues"/>
+
+			<com.tbd.forkfront.SliderPreference
+				android:title="不透明度"
+				android:summary="閉じるボタンの不透明度"
+				android:persistent="true"
+				android:key="closeKbdBtnOpacity"
+				android:dialogMessage="透明 (0) から不透明 (255) までの範囲で指定します"
+				android:defaultValue="150"
+				android:text=""
+				android:max="255"/>
+
+			<com.tbd.forkfront.SliderPreference
+					android:title="サイズ"
+					android:summary="閉じるボタンの相対サイズ"
+					android:persistent="true"
+					android:key="closeKbdBtnSize"
+					android:dialogMessage="閉じるボタンの大きさを変更します"
+					android:defaultValue="0"
+					android:text=""
+					forkfront:min="-10"
+					android:max="10"/>
+
+		</PreferenceScreen>
 		
 		<PreferenceScreen
 			android:title="コマンドパネル"

@@ -74,6 +74,12 @@
                     android:textSize="15sp"
                     android:visibility="gone" />
 
+                <Button
+                    android:id="@+id/close_kbd_btn"
+                    style="@style/dPadBtn"
+                    android:text="..."
+                    android:visibility="gone" />
+
                 <include
                     android:id="@+id/dpad"
                     layout="@layout/dpad_ovl" />

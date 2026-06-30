@@ -128,8 +128,11 @@ public class NH_State
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 
+		mMap.saveCenterTilePosition();
+
 		mCmdPanelLayout.preferencesUpdated(prefs);
 		mDPad.preferencesUpdated(prefs);
+		mKeyboard.preferencesUpdated(prefs);
 		mMap.preferencesUpdated(prefs);
 		mStatus.preferencesUpdated(prefs);
 		mMessage.preferencesUpdated(prefs);
@@ -144,6 +147,9 @@ public class NH_State
 
 		mTileset.updateTileset(prefs, mContext.getResources());
 		mMap.updateZoomLimits();
+
+		mMap.restoreCenterTilePosition();
+
 		updateSystemUiVisibilityFlags(prefs);
 	}
 
