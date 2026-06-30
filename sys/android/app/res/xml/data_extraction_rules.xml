@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-30. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Googleドライブなどのクラウドバックアップからはセーブデータを除外 -->
+        <exclude domain="external" path="."/>
+        <exclude domain="file" path="."/>
+    </cloud-backup>
+    <device-to-device-transfer>
+        <!-- 端末間移行時はセーブデータを含めるため、除外設定をしない -->
+    </device-to-device-transfer>
+</data-extraction-rules>

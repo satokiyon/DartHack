@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-30. -->
 <manifest
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:installLocation="auto">
@@ -7,16 +7,18 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
 	<application
-		android:label="NetHack 5"
+		android:label="NetHackJP"
 		android:icon="@drawable/icon"
 		android:largeHeap="true"
 		android:theme="@android:style/Theme"
-		android:allowBackup="true">
+		android:allowBackup="true"
+		android:fullBackupContent="@xml/backup_rules"
+		android:dataExtractionRules="@xml/data_extraction_rules">
 		<activity
-			android:name="com.tbd.forkfront.ForkFront"
+			android:name="jp.satokiyon.nethackjp"
 			android:enableOnBackInvokedCallback="false"
 			android:exported="true"
-			android:label="NetHack 5"
+			android:label="NetHackJP"
 			android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
 			android:launchMode="singleTask"
 			android:configChanges="mcc|mnc|locale|keyboard|keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|fontScale">
@@ -29,8 +31,8 @@
 			</intent-filter>
 		</activity>
 		<activity
-			android:name="com.tbd.forkfront.Settings"
-			android:label="NetHack Settings">
+			android:name="jp.satokiyon.nethackjp.Settings"
+			android:label="NetHackJP Settings">
 		</activity>
 	</application>
 </manifest>

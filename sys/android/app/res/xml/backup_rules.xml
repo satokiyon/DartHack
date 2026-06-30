@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-30. -->
+<full-backup-content>
+    <!-- セーブデータや骨ファイルが含まれるディレクトリを自動バックアップから除外 -->
+    <exclude domain="external" path="."/>
+    <exclude domain="file" path="."/>
+</full-backup-content>
