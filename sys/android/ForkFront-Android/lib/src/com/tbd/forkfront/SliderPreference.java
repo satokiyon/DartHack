@@ -79,13 +79,24 @@ public class SliderPreference extends DialogPreference implements SeekBar.OnSeek
 	}
 
 	@Override
+	protected Object onGetDefaultValue(android.content.res.TypedArray a, int index)
+	{
+		return a.getInt(index, 0);
+	}
+
+	@Override
 	protected void onSetInitialValue(boolean restore, Object defaultValue)
 	{
 		super.onSetInitialValue(restore, defaultValue);
 		if(restore)
+		{
 			mValue = getPersistedInt(mDefault);
+		}
 		else
+		{
 			mValue = (Integer)defaultValue;
+			persistInt(mValue);
+		}
 	}
 
 	@Override

@@ -76,7 +76,7 @@ public class DPadOverlay
 		mLandAlwaysShow = prefs.getBoolean("ovlLandAlways", false);
 		mPortLoc = getGravity(prefs.getString("ovlPortLoc", "1"));
 		mLandLoc = getGravity(prefs.getString("ovlLandLoc", "1"));
-		mOpacity = prefs.getInt("ovlOpacity", 255);
+		mOpacity = prefs.getInt("ovlOpacity", 150);
 		mRelSize = prefs.getInt("ovlSize", 0);
 		mUI.setTransparent();
 		mUI.updateSize();
