@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_gravity="center"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:id="@+id/shortcut_panel">
+
+	<!-- 1段目: 3つの等幅ボタン (左: i, 中: /, 右: #terrain) -->
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+		<Button
+			style="@style/dPadBtn"
+			android:id="@+id/shortcut_btn0"
+			android:text="i"/>
+		<Button
+			style="@style/dPadBtn"
+			android:id="@+id/shortcut_btn1"
+			android:text="/"/>
+		<Button
+			style="@style/dPadBtn"
+			android:id="@+id/shortcut_btn2"
+			android:text="terr"/>
+	</LinearLayout>
+
+	<!-- 2段目: 3つのショートカットボタン (左: #therecmdmenu, 中: #herecmdmenu, 右: #attributes) -->
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+		<Button
+			style="@style/dPadBtn"
+			android:id="@+id/shortcut_btn3"
+			android:text="menu"/>
+		<Button
+			style="@style/dPadBtn"
+			android:id="@+id/shortcut_btn4"
+			android:text="here"/>
+		<Button
+			style="@style/dPadBtn"
+			android:id="@+id/shortcut_btn5"
+			android:text="attr"/>
+	</LinearLayout>
+
+	<!-- 3段目: 3つのショートカットボタン (左: #chronicle, 中: #overview, 右: #chat) -->
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+		<Button
+			style="@style/dPadBtn"
+			android:id="@+id/shortcut_btn6"
+			android:text="chro"/>
+		<Button
+			style="@style/dPadBtn"
+			android:id="@+id/shortcut_btn7"
+			android:text="over"/>
+		<Button
+			style="@style/dPadBtn"
+			android:id="@+id/shortcut_btn8"
+			android:text="chat"/>
+	</LinearLayout>
+</LinearLayout>

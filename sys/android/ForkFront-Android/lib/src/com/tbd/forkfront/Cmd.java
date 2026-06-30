@@ -186,6 +186,27 @@ public interface Cmd
 				return;
 			}
 
+			final boolean isExtCmd = mCommand.startsWith("#");
+			if(isExtCmd)
+			{
+				mState.setExtMenuOption(false);
+			}
+
+			final ExecuteFinishedHandler wrappedFinishedHandler = new ExecuteFinishedHandler()
+			{
+				@Override
+				public void onExecuteFinished()
+				{
+					if(isExtCmd)
+					{
+						android.content.SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(mState.getContext());
+						boolean originalVal = prefs.getBoolean("extmenu", true);
+						mState.setExtMenuOption(originalVal);
+					}
+					executeHandler.onExecuteFinished();
+				}
+			};
+
 			// Handle response from NetHack for each key, before posting the next
 			final Handler handler = mState.getHandler();
 			@SuppressWarnings("unchecked")
@@ -206,7 +227,7 @@ public interface Cmd
 						handler.post(this);
 					}
 					else
-						executeHandler.onExecuteFinished();
+						wrappedFinishedHandler.onExecuteFinished();
 				}
 			});
 		}

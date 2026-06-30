@@ -539,6 +539,20 @@ public class NetHackIO
 
 	// ____________________________________________________________________________________
 	@SuppressWarnings("unused")
+	private void setYnQuestionActive(final boolean active)
+	{
+		mHandler.post(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				mNhHandler.setYnQuestionActive(active);
+			}
+		});
+	}
+
+	// ____________________________________________________________________________________
+	@SuppressWarnings("unused")
 	private void ynFunction(final byte[] cquestion, final byte[] choices, final int def)
 	{
 		final String question = mDecoder.decode(cquestion);
@@ -895,4 +909,10 @@ public class NetHackIO
 	// ____________________________________________________________________________________
 	private native void RunNetHack(String path);
 	private native void SaveNetHackState();
+	private native void setExtMenu(boolean enable);
+
+	public void setExtMenuOption(boolean enable)
+	{
+		setExtMenu(enable);
+	}
 }

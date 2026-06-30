@@ -166,6 +166,120 @@
 				android:key="allowMapDir"
 				android:defaultValue="true"/>
 
+			<Preference
+				android:title="Enabled move modes"
+				android:summary="Choose move modes to enable when cycling"
+				android:key="ovlMoveModes" />
+
+		</PreferenceScreen>
+
+		<PreferenceScreen
+			android:title="Shortcut overlay"
+			android:summary="Configure the shortcut button overlay">
+
+			<CheckBoxPreference
+				android:title="Always show in portrait"
+				android:summary="Always show the shortcut overlay in portrait mode"
+				android:persistent="true"
+				android:key="ovlShortcutPortAlways"
+				android:defaultValue="false"/>
+
+			<CheckBoxPreference
+				android:title="Always show in landscape"
+				android:summary="Always show the shortcut overlay in landscape mode"
+				android:persistent="true"
+				android:key="ovlShortcutLandAlways"
+				android:defaultValue="false"/>
+
+			<ListPreference
+				android:title="Portrait location"
+				android:summary="The location of the overlay in portrait mode"
+				android:persistent="true"
+				android:key="ovlShortcutPortLoc"
+				android:defaultValue="3"
+				android:entries="@array/dirLocationNames"
+				android:entryValues="@array/dirLocationValues"/>
+
+			<ListPreference
+				android:title="Landscape location"
+				android:summary="The location of the overlay in landscape mode"
+				android:persistent="true"
+				android:key="ovlShortcutLandLoc"
+				android:defaultValue="3"
+				android:entries="@array/dirLocationNames"
+				android:entryValues="@array/dirLocationValues"/>
+
+			<com.tbd.forkfront.SliderPreference
+				android:title="Opacity"
+				android:summary="The opacity of the overlay"
+				android:persistent="true"
+				android:key="ovlShortcutOpacity"
+				android:dialogMessage="The opacity between invisible (0) and opaque (255)"
+				android:defaultValue="150"
+				android:text=""
+				android:max="255"/>
+
+			<com.tbd.forkfront.SliderPreference
+				android:title="Size"
+				android:summary="The relative size of the overlay"
+				android:persistent="true"
+				android:key="ovlShortcutSize"
+				android:dialogMessage="Change the relative size of the overlay buttons"
+				android:defaultValue="5"
+				android:text=""
+				forkfront:min="-10"
+				android:max="10"/>
+
+			<PreferenceCategory
+				android:title="Customize Commands">
+
+				<EditTextPreference
+					android:title="Top Left Button"
+					android:key="shortcut_btn_0"
+					android:defaultValue="i"/>
+
+				<EditTextPreference
+					android:title="Top Center Button"
+					android:key="shortcut_btn_1"
+					android:defaultValue="/"/>
+
+				<EditTextPreference
+					android:title="Top Right Button"
+					android:key="shortcut_btn_2"
+					android:defaultValue="#terrain"/>
+
+				<EditTextPreference
+					android:title="Middle Row - Left"
+					android:key="shortcut_btn_3"
+					android:defaultValue="#therecmdmenu"/>
+
+				<EditTextPreference
+					android:title="Middle Row - Center"
+					android:key="shortcut_btn_4"
+					android:defaultValue="#herecmdmenu"/>
+
+				<EditTextPreference
+					android:title="Middle Row - Right"
+					android:key="shortcut_btn_5"
+					android:defaultValue="#attributes"/>
+
+				<EditTextPreference
+					android:title="Bottom Row - Left"
+					android:key="shortcut_btn_6"
+					android:defaultValue="#chronicle"/>
+
+				<EditTextPreference
+					android:title="Bottom Row - Center"
+					android:key="shortcut_btn_7"
+					android:defaultValue="#overview"/>
+
+				<EditTextPreference
+					android:title="Bottom Row - Right"
+					android:key="shortcut_btn_8"
+					android:defaultValue="#chat"/>
+
+			</PreferenceCategory>
+
 		</PreferenceScreen>
 
 		<PreferenceScreen

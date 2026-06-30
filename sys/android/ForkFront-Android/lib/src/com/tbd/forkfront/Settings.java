@@ -75,6 +75,20 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 			if(fullscreenPref != null)
 				settingsCategory.removePreference(fullscreenPref);
 		}
+
+		Preference moveModesPref = findPreference("ovlMoveModes");
+		if(moveModesPref != null)
+		{
+			moveModesPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+			{
+				@Override
+				public boolean onPreferenceClick(Preference preference)
+				{
+					showMoveModesSelectDialog();
+					return true;
+				}
+			});
+		}
 	}
 
 	// ____________________________________________________________________________________
@@ -106,5 +120,65 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 			String name = sharedPreferences.getString("pName" + idx, "");
 			screen.setTitle(name);
 		}
+	}
+
+	private void showMoveModesSelectDialog()
+	{
+		final String[] rawModes = {"NORMAL", "UPPER", "G_LOWER", "G_UPPER", "CTRL", "M_CMD", "F_CMD"};
+		final String[] labels = {"標準", "大文字", "g", "G", "^(Ctrl)", "m", "F"};
+		final boolean[] checked = new boolean[rawModes.length];
+
+		final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+		String raw = prefs.getString("dpad_enabled_move_modes", "NORMAL,UPPER,G_LOWER,G_UPPER,CTRL,M_CMD,F_CMD");
+		final java.util.List<String> enabledList = new java.util.ArrayList<>();
+		for(String s : raw.split(","))
+		{
+			enabledList.add(s.trim());
+		}
+
+		for(int i = 0; i < rawModes.length; i++)
+		{
+			checked[i] = enabledList.contains(rawModes[i]);
+		}
+
+		android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+		builder.setTitle("使用する移動モードの選択");
+		builder.setMultiChoiceItems(labels, checked, new android.content.DialogInterface.OnMultiChoiceClickListener()
+		{
+			@Override
+			public void onClick(android.content.DialogInterface dialog, int which, boolean isChecked)
+			{
+				checked[which] = isChecked;
+			}
+		});
+
+		builder.setPositiveButton("OK", new android.content.DialogInterface.OnClickListener()
+		{
+			@Override
+			public void onClick(android.content.DialogInterface dialog, int which)
+			{
+				StringBuilder sb = new StringBuilder();
+				boolean first = true;
+				for(int i = 0; i < rawModes.length; i++)
+				{
+					if(checked[i])
+					{
+						if(!first) sb.append(",");
+						sb.append(rawModes[i]);
+						first = false;
+					}
+				}
+				if(sb.length() == 0)
+				{
+					sb.append("NORMAL");
+				}
+
+				SharedPreferences.Editor editor = prefs.edit();
+				editor.putString("dpad_enabled_move_modes", sb.toString());
+				editor.commit();
+			}
+		});
+		builder.setNegativeButton("キャンセル", null);
+		builder.show();
 	}
 }

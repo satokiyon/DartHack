@@ -29,4 +29,5 @@ public interface NH_Handler
 	void askName(int nMaxChars, String[] saves);
 	void loadSound(String filename);
 	void playSound(String filename, int volume);
+	void setYnQuestionActive(boolean active);
 }

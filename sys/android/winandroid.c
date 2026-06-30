@@ -164,6 +164,7 @@ static jmethodID jAskName;
 static jmethodID jLoadSound;
 static jmethodID jPlaySound;
 static jmethodID jGetDumplogDir;
+static jmethodID jSetYnQuestionActive;
 
 static boolean quit_if_possible;
 static boolean restoring_msghistory;
@@ -261,13 +262,14 @@ void Java_com_tbd_forkfront_NetHackIO_RunNetHack(JNIEnv* env, jobject thiz, jstr
 	jLoadSound = (*jEnv)->GetMethodID(jEnv, jApp, "loadSound", "([B)V");
 	jPlaySound = (*jEnv)->GetMethodID(jEnv, jApp, "playSound", "([BI)V");
 	jGetDumplogDir = (*jEnv)->GetMethodID(jEnv, jApp, "getDumplogDir", "()Ljava/lang/String;");
+	jSetYnQuestionActive = (*jEnv)->GetMethodID(jEnv, jApp, "setYnQuestionActive", "(Z)V");
 
 	if(!(jReceiveKey && jReceivePosKey && jCreateWindow && jClearWindow && jDisplayWindow &&
 			jDestroyWindow && jPutString && jRawPrint && jSetCursorPos && jPrintTile &&
 			jYNFunction && jGetLine && jStartMenu && jAddMenu && jEndMenu && jSelectMenu &&
 			jCliparound && jDelayOutput && jShowDPad && jShowLog && jSetUsername &&
 			jSetNumPadOption && jAskName && jSetHealthColor && jRedrawStatus &&
-			jLoadSound && jPlaySound && jGetDumplogDir))
+			jLoadSound && jPlaySound && jGetDumplogDir && jSetYnQuestionActive))
 	{
 		debuglog("baaaaad");
 		return;
@@ -311,6 +313,12 @@ void Java_com_tbd_forkfront_NetHackIO_SaveNetHackState(JNIEnv* env, jobject thiz
 {
 	if(!program_state.gameover && program_state.something_worth_saving)
 		save_currentstate();
+}
+
+//____________________________________________________________________________________
+void Java_com_tbd_forkfront_NetHackIO_setExtMenu(JNIEnv* env, jobject thiz, jboolean enable)
+{
+	iflags.extmenu = enable;
 }
 
 //____________________________________________________________________________________
@@ -1590,6 +1598,8 @@ char and_yn_function(const char *question, const char *choices, char def)
 	intptr_t esc;
 	int nChoices;
 
+	JNICallV(jSetYnQuestionActive, JNI_TRUE);
+
 	if(choices)
 	{
 		nChoices = strlen(choices);
@@ -1624,6 +1634,7 @@ char and_yn_function(const char *question, const char *choices, char def)
 		destroy_jobject(jb);
 
 		ch = and_nhgetch();
+		JNICallV(jSetYnQuestionActive, JNI_FALSE);
 		return ch;
 	}
 
@@ -1683,6 +1694,7 @@ char and_yn_function(const char *question, const char *choices, char def)
 		        else
 		        	ch = xytodir(x, y);
 			}
+			JNICallV(jSetYnQuestionActive, JNI_FALSE);
 			return ch;
 		}
 	}
@@ -1806,6 +1818,7 @@ char and_yn_function(const char *question, const char *choices, char def)
 		and_clear_nhwindow(WIN_MESSAGE);
 	}
 
+	JNICallV(jSetYnQuestionActive, JNI_FALSE);
 	return ch;
 }
 

@@ -166,6 +166,120 @@
 				android:key="allowMapDir"
 				android:defaultValue="true"/>
 
+			<Preference
+				android:title="有効にする移動モード"
+				android:summary="切り替え時に使用する移動モードを選択します"
+				android:key="ovlMoveModes" />
+
+		</PreferenceScreen>
+
+		<PreferenceScreen
+			android:title="ショートカットボタンのオーバーレイ表示"
+			android:summary="画面に重ねて表示するショートカットボタンを設定します">
+
+			<CheckBoxPreference
+				android:title="縦画面で常に表示"
+				android:summary="縦画面のときに常にショートカットボタンを表示します"
+				android:persistent="true"
+				android:key="ovlShortcutPortAlways"
+				android:defaultValue="false"/>
+
+			<CheckBoxPreference
+				android:title="横画面で常に表示"
+				android:summary="横画面のときに常にショートカットボタンを表示します"
+				android:persistent="true"
+				android:key="ovlShortcutLandAlways"
+				android:defaultValue="false"/>
+
+			<ListPreference
+				android:title="縦画面での位置"
+				android:summary="縦画面におけるショートカットボタンの表示位置"
+				android:persistent="true"
+				android:key="ovlShortcutPortLoc"
+				android:defaultValue="3"
+				android:entries="@array/dirLocationNames"
+				android:entryValues="@array/dirLocationValues"/>
+
+			<ListPreference
+				android:title="横画面での位置"
+				android:summary="横画面におけるショートカットボタンの表示位置"
+				android:persistent="true"
+				android:key="ovlShortcutLandLoc"
+				android:defaultValue="3"
+				android:entries="@array/dirLocationNames"
+				android:entryValues="@array/dirLocationValues"/>
+
+			<com.tbd.forkfront.SliderPreference
+				android:title="不透明度"
+				android:summary="ショートカットボタンの不透明度"
+				android:persistent="true"
+				android:key="ovlShortcutOpacity"
+				android:dialogMessage="透明 (0) から不透明 (255) までの範囲で指定します"
+				android:defaultValue="150"
+				android:text=""
+				android:max="255"/>
+
+			<com.tbd.forkfront.SliderPreference
+				android:title="サイズ"
+				android:summary="ショートカットボタンの相対サイズ"
+				android:persistent="true"
+				android:key="ovlShortcutSize"
+				android:dialogMessage="ショートカットボタンの大きさを変更します"
+				android:defaultValue="5"
+				android:text=""
+				forkfront:min="-10"
+				android:max="10"/>
+
+			<PreferenceCategory
+				android:title="コマンドのカスタマイズ">
+
+				<EditTextPreference
+					android:title="上段 - 左"
+					android:key="shortcut_btn_0"
+					android:defaultValue="i"/>
+
+				<EditTextPreference
+					android:title="上段 - 中央"
+					android:key="shortcut_btn_1"
+					android:defaultValue="/"/>
+
+				<EditTextPreference
+					android:title="上段 - 右"
+					android:key="shortcut_btn_2"
+					android:defaultValue="#terrain"/>
+
+				<EditTextPreference
+					android:title="中段 - 左"
+					android:key="shortcut_btn_3"
+					android:defaultValue="#therecmdmenu"/>
+
+				<EditTextPreference
+					android:title="中段 - 中央"
+					android:key="shortcut_btn_4"
+					android:defaultValue="#herecmdmenu"/>
+
+				<EditTextPreference
+					android:title="中段 - 右"
+					android:key="shortcut_btn_5"
+					android:defaultValue="#attributes"/>
+
+				<EditTextPreference
+					android:title="下段 - 左"
+					android:key="shortcut_btn_6"
+					android:defaultValue="#chronicle"/>
+
+				<EditTextPreference
+					android:title="下段 - 中央"
+					android:key="shortcut_btn_7"
+					android:defaultValue="#overview"/>
+
+				<EditTextPreference
+					android:title="下段 - 右"
+					android:key="shortcut_btn_8"
+					android:defaultValue="#chat"/>
+
+			</PreferenceCategory>
+
 		</PreferenceScreen>
 
 		<PreferenceScreen

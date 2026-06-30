@@ -37,7 +37,9 @@ public class NH_State
 	private Tileset mTileset;
 	private CmdPanelLayout mCmdPanelLayout;
 	private DPadOverlay mDPad;
+	private ShortcutOverlay mShortcutOvl;
 	private boolean mIsDPadActive;
+	private boolean mIsYnQuestionActive;
 	private boolean mStickyKeyboard;
 	private boolean mHideQuickKeyboard;
 	private CmdMode mMode;
@@ -62,6 +64,7 @@ public class NH_State
 		mMap = new NHW_Map(context, mTileset, mStatus, this, decoder);
 		mCmdPanelLayout = (CmdPanelLayout)context.findViewById(R.id.cmdPanelLayout1);
 		mDPad = new DPadOverlay(this);
+		mShortcutOvl = new ShortcutOverlay(this);
 		mKeyboard = new SoftKeyboard(context, this);
 		mSoundPlayer = new SoundPlayer();
 		mMode = CmdMode.Panel;
@@ -81,6 +84,7 @@ public class NH_State
 		mStatus.setContext(context);
 		mCmdPanelLayout.setContext(context, this);
 		mDPad.setContext(context);
+		mShortcutOvl.setContext(context);
 		mMap.setContext(context);
 		mTileset.setContext(context);
 	}
@@ -120,6 +124,7 @@ public class NH_State
 
 		mCmdPanelLayout.setOrientation(newConfig.orientation);
 		mDPad.setOrientation(newConfig.orientation);
+		mShortcutOvl.setOrientation(newConfig.orientation);
 	}
 
 	// ____________________________________________________________________________________
@@ -132,6 +137,7 @@ public class NH_State
 
 		mCmdPanelLayout.preferencesUpdated(prefs);
 		mDPad.preferencesUpdated(prefs);
+		mShortcutOvl.preferencesUpdated(prefs);
 		mKeyboard.preferencesUpdated(prefs);
 		mMap.preferencesUpdated(prefs);
 		mStatus.preferencesUpdated(prefs);
@@ -502,6 +508,7 @@ public class NH_State
 					mDPad.showDirectional(false);
 					mCmdPanelLayout.show();
 				}
+				mShortcutOvl.updateVisibleState();
 			}
 			else
 			{
@@ -509,6 +516,7 @@ public class NH_State
 				mCmdPanelLayout.hide();
 				//mDPad.setVisible(false);
 				mDPad.forceHide();
+				mShortcutOvl.forceHide();
 			}
 		}
 		else
@@ -516,6 +524,7 @@ public class NH_State
 			mCmdPanelLayout.hide();
 			mKeyboard.hide();
 			mDPad.forceHide();
+			mShortcutOvl.forceHide();
 		}
 	}
 
@@ -768,9 +777,47 @@ public class NH_State
 
 		// ____________________________________________________________________________________
 		@Override
+		public void setYnQuestionActive(boolean active) {
+			NH_State.this.setYnQuestionActive(active);
+		}
+
+		// ____________________________________________________________________________________
+		@Override
 		public void redrawStatus()
 		{
 			mStatus.redraw();
 		}
 	};
+
+	public DPadOverlay getDPad() {
+		return mDPad;
+	}
+
+	public void setYnQuestionActive(boolean active) {
+		mIsYnQuestionActive = active;
+	}
+
+	public boolean isYnQuestionActive() {
+		if (mIsYnQuestionActive) {
+			return true;
+		}
+		if (mMessage != null) {
+			String lastMsg = mMessage.getLogLine(1);
+			if (lastMsg != null) {
+				String lower = lastMsg.toLowerCase();
+				if (lower.contains("[y/n]") || lower.contains("[yn]") || lower.contains("(y/n)") || lower.contains("[y/n?]")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public Activity getContext() {
+		return mContext;
+	}
+
+	public void setExtMenuOption(boolean enable) {
+		mIO.setExtMenuOption(enable);
+	}
 }
