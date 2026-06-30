@@ -15,7 +15,7 @@
 		android:fullBackupContent="@xml/backup_rules"
 		android:dataExtractionRules="@xml/data_extraction_rules">
 		<activity
-			android:name="jp.satokiyon.nethackjp"
+			android:name="com.tbd.forkfront.ForkFront"
 			android:enableOnBackInvokedCallback="false"
 			android:exported="true"
 			android:label="NetHackJP"
@@ -31,7 +31,7 @@
 			</intent-filter>
 		</activity>
 		<activity
-			android:name="jp.satokiyon.nethackjp.Settings"
+			android:name="com.tbd.forkfront.Settings"
 			android:label="NetHackJP Settings">
 		</activity>
 	</application>
