@@ -123,3 +123,12 @@
     - ステータスライン等で盲目や混乱、石化などの状態表示を日本語化する際は、英語の文字列を個別にハードコードして翻訳するのではなく、ゲームコア側（`src/botl.c`）の `conditions[i].text[1]` の日本語定義を直接参照してください。
     - 表示ループの上限には古いハードコード値（13など）を使用せず、必ず `CONDITION_COUNT` (30) を使用し、すべての状態異常が正しく表示されるようにしてください。
     - ビットマスク処理の安全性のために、状態判定用の変数や関数の引数型は、マスク幅に合わせた `unsigned long` 等を使用してください。
+
+11. **Android 独自設定（Preference）におけるデフォルト値の永続化徹底**:
+    - 現象と制約：
+      `SliderPreference` などのカスタム Preference を実装する場合、単に XML で `android:defaultValue` を設定しただけでは、インストール直後の初回起動時（`PreferenceManager.setDefaultValues` 実行時）に初期値が SharedPreferences に保存されず、設定値が反映されなくなる（キーが存在しない状態になる）問題が発生します。
+    - 対策：
+      カスタム Preference クラスを定義・修正する際は、必ず以下の2つのメソッドをオーバーライドしてください。
+      1. `onGetDefaultValue(TypedArray a, int index)`: XML からデフォルト値を正しく取得して返す。
+      2. `onSetInitialValue(boolean restore, Object defaultValue)`: `restore` が `false`（デフォルト値設定時）の際、引数から受け取った `defaultValue` を設定した上で、 `persistInt` / `persistString` / `persistBoolean` を明示的に呼び出して SharedPreferences に値を保存する。
+
