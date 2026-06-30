@@ -38,8 +38,13 @@ android {
       res.srcDirs(['res'])
     }
   }
+  buildTypes {
+    debug {
+      jniDebuggable true
+    }
+  }
 }
 
 dependencies {
-  implementation 'cz.msebera.android:httpclient:4.4.1.2'
+  implementation 'cz.msebera.android:httpclient:4.5.8'
 }

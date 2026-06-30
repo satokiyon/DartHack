@@ -1,4 +1,4 @@
 include(':app')
 include(':lib')
 project(':lib').projectDir = file('ForkFront-Android/lib')
-rootProject.name = 'NetHack-Android'
+rootProject.name = 'NetHackJP-Android'
