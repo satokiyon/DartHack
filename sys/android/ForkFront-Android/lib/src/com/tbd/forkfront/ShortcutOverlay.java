@@ -320,37 +320,65 @@ public class ShortcutOverlay
 			input.setText(mCommands[index]);
 			layout.addView(input);
 
-			final Spinner spinner = new Spinner(mContext);
-			ArrayAdapter<String> adapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, EXT_COMMANDS);
-			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			spinner.setAdapter(adapter);
-			layout.addView(spinner);
+			String[] rawCmds = null;
+			try {
+				rawCmds = mNHState.getIO().getExtCmdsOption();
+			} catch (Exception e) {
+				// フォールバック
+			}
 
-			// Spinnerの選択時に入力フィールドに値を設定する
-			spinner.setOnTouchListener(new OnTouchListener()
-			{
-				@Override
-				public boolean onTouch(View v, MotionEvent event)
-				{
-					// ユーザーがタッチしたときのみイベントを拾うようにする（初期配置時の自動発火防止）
-					return false;
-				}
-			});
-			spinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener()
-			{
-				@Override
-				public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id)
-				{
-					String selected = EXT_COMMANDS[position];
-					if(!selected.isEmpty())
-					{
-						input.setText(selected);
+			final String[] displayCmds;
+			final String[] actualCmds;
+
+			if (rawCmds != null && rawCmds.length > 0) {
+				displayCmds = new String[rawCmds.length + 1];
+				actualCmds = new String[rawCmds.length + 1];
+				displayCmds[0] = "(なし)";
+				actualCmds[0] = "";
+				for (int i = 0; i < rawCmds.length; i++) {
+					String[] parts = rawCmds[i].split("\t");
+					String cmd = parts[0];
+					String desc = parts.length > 1 ? parts[1] : "";
+					
+					// 先頭に # がなければ付与する (特殊コマンド `#` や `?` を除く)
+					if (!cmd.startsWith("#") && !cmd.startsWith("?")) {
+						cmd = "#" + cmd;
+					}
+					
+					actualCmds[i + 1] = cmd;
+					if (!desc.isEmpty()) {
+						displayCmds[i + 1] = cmd + " (" + desc + ")";
+					} else {
+						displayCmds[i + 1] = cmd;
 					}
 				}
+			} else {
+				displayCmds = EXT_COMMANDS;
+				actualCmds = EXT_COMMANDS;
+			}
 
+			Button selectBtn = new Button(mContext);
+			selectBtn.setText("拡張コマンドから選択...");
+			layout.addView(selectBtn);
+
+			selectBtn.setOnClickListener(new OnClickListener()
+			{
 				@Override
-				public void onNothingSelected(android.widget.AdapterView<?> parent)
+				public void onClick(View v)
 				{
+					AlertDialog.Builder listBuilder = new AlertDialog.Builder(mContext);
+					listBuilder.setTitle("拡張コマンド");
+					listBuilder.setItems(displayCmds, new DialogInterface.OnClickListener()
+					{
+						@Override
+						public void onClick(DialogInterface dialog, int which)
+						{
+							String selected = actualCmds[which];
+							input.setText(selected);
+						}
+					});
+					listBuilder.setNegativeButton("キャンセル", null);
+					listBuilder.show();
 				}
 			});
 

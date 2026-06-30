@@ -182,21 +182,21 @@
 				android:summary="Always show the shortcut overlay in portrait mode"
 				android:persistent="true"
 				android:key="ovlShortcutPortAlways"
-				android:defaultValue="false"/>
+				android:defaultValue="true"/>
 
 			<CheckBoxPreference
 				android:title="Always show in landscape"
 				android:summary="Always show the shortcut overlay in landscape mode"
 				android:persistent="true"
 				android:key="ovlShortcutLandAlways"
-				android:defaultValue="false"/>
+				android:defaultValue="true"/>
 
 			<ListPreference
 				android:title="Portrait location"
 				android:summary="The location of the overlay in portrait mode"
 				android:persistent="true"
 				android:key="ovlShortcutPortLoc"
-				android:defaultValue="3"
+				android:defaultValue="5"
 				android:entries="@array/dirLocationNames"
 				android:entryValues="@array/dirLocationValues"/>
 
@@ -205,7 +205,7 @@
 				android:summary="The location of the overlay in landscape mode"
 				android:persistent="true"
 				android:key="ovlShortcutLandLoc"
-				android:defaultValue="3"
+				android:defaultValue="5"
 				android:entries="@array/dirLocationNames"
 				android:entryValues="@array/dirLocationValues"/>
 

@@ -910,9 +910,15 @@ public class NetHackIO
 	private native void RunNetHack(String path);
 	private native void SaveNetHackState();
 	private native void setExtMenu(boolean enable);
+	private native String[] getExtCmds();
 
 	public void setExtMenuOption(boolean enable)
 	{
 		setExtMenu(enable);
+	}
+
+	public String[] getExtCmdsOption()
+	{
+		return getExtCmds();
 	}
 }

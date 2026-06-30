@@ -322,6 +322,56 @@ void Java_com_tbd_forkfront_NetHackIO_setExtMenu(JNIEnv* env, jobject thiz, jboo
 }
 
 //____________________________________________________________________________________
+jobjectArray Java_com_tbd_forkfront_NetHackIO_getExtCmds(JNIEnv* env, jobject thiz)
+{
+	int i, count = 0;
+	for(i = 0; extcmdlist[i].ef_txt; i++)
+	{
+		int flgs = extcmdlist[i].flags;
+		if(flgs & (CMD_NOT_AVAILABLE | INTERNALCMD))
+			continue;
+		if((flgs & WIZMODECMD) && !wizard)
+			continue;
+		if(strcmp(extcmdlist[i].ef_txt, "#") == 0 || strcmp(extcmdlist[i].ef_txt, "?") == 0)
+			continue;
+		count++;
+	}
+
+	jclass stringClass = (*env)->FindClass(env, "java/lang/String");
+	if(!stringClass) return NULL;
+	jobjectArray array = (*env)->NewObjectArray(env, count, stringClass, NULL);
+	if(!array) return NULL;
+
+	int idx = 0;
+	for(i = 0; extcmdlist[i].ef_txt; i++)
+	{
+		int flgs = extcmdlist[i].flags;
+		if(flgs & (CMD_NOT_AVAILABLE | INTERNALCMD))
+			continue;
+		if((flgs & WIZMODECMD) && !wizard)
+			continue;
+		if(strcmp(extcmdlist[i].ef_txt, "#") == 0 || strcmp(extcmdlist[i].ef_txt, "?") == 0)
+			continue;
+
+		char buf[512];
+		if(extcmdlist[i].ef_desc && *extcmdlist[i].ef_desc)
+		{
+			snprintf(buf, sizeof(buf), "%s\t%s", extcmdlist[i].ef_txt, extcmdlist[i].ef_desc);
+		}
+		else
+		{
+			snprintf(buf, sizeof(buf), "%s\t", extcmdlist[i].ef_txt);
+		}
+
+		jstring str = (*env)->NewStringUTF(env, buf);
+		(*env)->SetObjectArrayElement(env, array, idx++, str);
+		(*env)->DeleteLocalRef(env, str);
+	}
+
+	return array;
+}
+
+//____________________________________________________________________________________
 void quit_possible()
 {
 	if(quit_if_possible)

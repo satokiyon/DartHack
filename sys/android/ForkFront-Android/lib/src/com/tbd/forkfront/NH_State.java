@@ -820,4 +820,8 @@ public class NH_State
 	public void setExtMenuOption(boolean enable) {
 		mIO.setExtMenuOption(enable);
 	}
+
+	public NetHackIO getIO() {
+		return mIO;
+	}
 }
