@@ -84,7 +84,7 @@ MENUCOLOR="聖水" = green
 #  Show all cursed items in red
 MENUCOLOR="呪われた" = red
 #  Show all unholy water in red
-MENUCOLOR="邪水" = red
+MENUCOLOR="穢れた水" = red
 #  Show all cursed worn items in orange and underlined
 MENUCOLOR="呪われた.*装備中" = orange&underline
 
@@ -93,17 +93,21 @@ MENUCOLOR="呪われた.*装備中" = orange&underline
 # 重要・便利なアイテムを強調表示します
 
 ### CUI
- MENUCOLOR="願いの杖" = brightmagenta&bold
- MENUCOLOR="魔力のランプ" = brightmagenta
- MENUCOLOR="軽量化の鞄" = brightmagenta
- MENUCOLOR="韋駄天の靴" = brightcyan
- MENUCOLOR="命の魔除け" = brightcyan
- MENUCOLOR="反射の(魔除け|盾)" = brightcyan
- MENUCOLOR="魔法を防ぐクローク" = brightcyan
- MENUCOLOR="完全回復の薬" = brightblue
- MENUCOLOR="能力獲得の薬" = brightblue
- MENUCOLOR="識別の巻物" = yellow
- MENUCOLOR="解呪の巻物" = yellow
+MENUCOLOR="願いの杖" = brightmagenta&bold
+MENUCOLOR="魔力のランプ" = brightmagenta
+MENUCOLOR="軽量化の鞄" = brightmagenta
+MENUCOLOR="韋駄天の靴" = brightcyan
+MENUCOLOR="命の魔除け" = brightcyan
+MENUCOLOR="反射の(魔除け|盾)" = brightcyan
+MENUCOLOR="魔法を防ぐクローク" = brightcyan
+MENUCOLOR="完全回復の薬" = brightblue
+MENUCOLOR="能力獲得の薬" = brightblue
+MENUCOLOR="識別の巻物" = yellow
+MENUCOLOR="解呪の巻物" = yellow
+MENUCOLOR="死者の書" = orange
+MENUCOLOR="開放の鐘" = orange
+MENUCOLOR="ろうそく" = orange
+
 # アーティファクト（既知の主要なもの）
  MENUCOLOR="(エクスカリバー|ストームブリンガー|ミョルニル|マジックベイン|フロストブランド|ファイアブランド|グレイスワンダー|ヴォーパルブレード)" = brightmagenta&bold
 

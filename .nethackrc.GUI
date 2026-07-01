@@ -86,7 +86,7 @@ MENUCOLOR="聖水" = green
 #  Show all cursed items in red
 MENUCOLOR="呪われた" = red
 #  Show all unholy water in red
-MENUCOLOR="邪水" = red
+MENUCOLOR="穢れた水" = red
 #  Show all cursed worn items in orange and underlined
 MENUCOLOR="呪われた.*装備中" = orange&underline
 
@@ -106,6 +106,10 @@ MENUCOLOR="完全回復の薬" = blue
 MENUCOLOR="能力獲得の薬" = blue
 MENUCOLOR="識別の巻物" = brown
 MENUCOLOR="解呪の巻物" = brown
+MENUCOLOR="死者の書" = orange
+MENUCOLOR="開放の鐘" = orange
+MENUCOLOR="ろうそく" = orange
+
 # アーティファクト（既知の主要なもの）
 MENUCOLOR="(エクスカリバー|ストームブリンガー|ミョルニル|マジックベイン|フロストブランド|ファイアブランド|グレイスワンダー|ヴォーパルブレード)" = orange&bold
 
