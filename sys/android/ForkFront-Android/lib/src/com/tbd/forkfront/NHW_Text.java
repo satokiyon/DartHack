@@ -165,7 +165,7 @@ public class NHW_Text implements NH_Window
 		// ____________________________________________________________________________________
 		private int getActionIndex(MotionEvent event)
 		{
-			return (event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT;
+			return event.getActionIndex();
 		}
 
 		// ____________________________________________________________________________________

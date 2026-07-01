@@ -15,15 +15,21 @@ android {
   buildToolsVersion '36.0.0'
 
   defaultConfig {
-    minSdkVersion 7
+    minSdkVersion 30
     targetSdkVersion 36
     versionName version
     versionCode versionId
   }
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
+
+  afterEvaluate {
+    tasks.withType(JavaCompile).configureEach {
+      options.compilerArgs += ["-Xlint:deprecation"]
+    }
   }
 
   lint {
@@ -43,6 +49,7 @@ android {
       jniDebuggable true
     }
   }
+    ndkVersion '30.0.14904198 rc1'
 }
 
 dependencies {

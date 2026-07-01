@@ -199,7 +199,7 @@ public interface Cmd
 				{
 					if(isExtCmd)
 					{
-						android.content.SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(mState.getContext());
+						android.content.SharedPreferences prefs = mState.getContext().getSharedPreferences(mState.getContext().getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 						boolean originalVal = prefs.getBoolean("extmenu", true);
 						mState.setExtMenuOption(originalVal);
 					}

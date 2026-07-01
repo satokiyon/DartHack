@@ -9,7 +9,6 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.*;
 import android.view.MenuItem;
@@ -79,12 +78,10 @@ public class CmdPanelLayout extends FrameLayout
 		if(widthMode == MeasureSpec.UNSPECIFIED || heightMode == MeasureSpec.UNSPECIFIED) {
 
 			Point size = new Point();
-			if(android.os.Build.VERSION.SDK_INT >= 13) {
-				mContext.getWindowManager().getDefaultDisplay().getSize(size);
-			} else if(MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.UNSPECIFIED) {
-				size.x = mContext.getWindowManager().getDefaultDisplay().getWidth();
-				size.y = mContext.getWindowManager().getDefaultDisplay().getHeight();
-			}
+			android.graphics.Rect bounds = mContext.getSystemService(android.view.WindowManager.class)
+					.getCurrentWindowMetrics().getBounds();
+			size.x = bounds.width();
+			size.y = bounds.height();
 
 			if(widthMode == MeasureSpec.UNSPECIFIED)
 				viewWidth = size.x;
@@ -490,7 +487,7 @@ public class CmdPanelLayout extends FrameLayout
 	// ____________________________________________________________________________________
 	public void savePanelCmds(CmdPanel panel)
 	{
-		Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+		Editor editor = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE).edit();
 		for(Panel p : mPanelCmds)
 		{
 			if(p.panel == panel)
@@ -645,7 +642,7 @@ public class CmdPanelLayout extends FrameLayout
 	{
 		if(!permanent)
 			return null;
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 		return prefs.edit();
 	}
 

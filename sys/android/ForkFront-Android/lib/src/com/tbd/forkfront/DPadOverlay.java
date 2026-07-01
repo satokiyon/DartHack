@@ -304,7 +304,7 @@ public class DPadOverlay
 
 		private void saveEnabledModes()
 		{
-			SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(mContext);
+			SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 			SharedPreferences.Editor editor = prefs.edit();
 			StringBuilder sb = new StringBuilder();
 			for(int i = 0; i < mEnabledModes.size(); i++)

@@ -11,7 +11,6 @@ import android.graphics.Paint.Align;
 import android.graphics.Paint.FontMetrics;
 import android.graphics.Paint.Style;
 import android.os.CountDownTimer;
-import android.preference.PreferenceManager;
 import android.text.TextPaint;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -279,7 +278,7 @@ public class NHW_Map implements NH_Window
 	// ____________________________________________________________________________________
 	private boolean shouldLockView(float tileW, float tileH)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 		if(!prefs.getBoolean("lockView", true))
 			return false;
 
@@ -488,7 +487,7 @@ public class NHW_Map implements NH_Window
 	// ____________________________________________________________________________________
 	private Travel getTravelOption()
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 		// Convert old option
 		if(prefs.contains("travelAfterPan"))
 		{
@@ -624,13 +623,13 @@ public class NHW_Map implements NH_Window
 
 	// ____________________________________________________________________________________
 	public void saveZoomLevel() {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 		prefs.edit().putFloat("zoomLevel", mScaleCount).commit();
 	}
 	
 	// ____________________________________________________________________________________
 	public void loadZoomLevel() {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 		float zoomLevel = 0;
 		try
 		{
@@ -694,7 +693,7 @@ public class NHW_Map implements NH_Window
 			int ofsX = (int)(mViewOffset.x + tileW * tileX);
 			int ofsY = (int)(mViewOffset.y + tileH * tileY);
 
-			invalidate(new Rect(ofsX - 4, ofsY - 4, (int)(ofsX + tileW) + 4, (int)(ofsY + tileH) + 4));
+			invalidate();
 		}
 
 		// ____________________________________________________________________________________
@@ -1127,7 +1126,7 @@ public class NHW_Map implements NH_Window
 		// ____________________________________________________________________________________
 		private int getActionIndex(MotionEvent event)
 		{
-			return (event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT;
+			return event.getActionIndex();
 		}
 
 		// ____________________________________________________________________________________
@@ -1368,7 +1367,7 @@ public class NHW_Map implements NH_Window
 			if(!mNHState.isDPadVisible())
 				return true;
 
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+			SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 			return  prefs.getBoolean("allowMapDir", false);
 		}
 

@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -51,7 +50,7 @@ public class NH_TextView extends TextView {
 		if(mRevision != REVISION)
 			update();
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+		SharedPreferences prefs = getContext().getSharedPreferences(getContext().getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 		prefs.registerOnSharedPreferenceChangeListener(onPrefsChanged);
 
 		super.onAttachedToWindow();
@@ -59,7 +58,7 @@ public class NH_TextView extends TextView {
 
 	@Override
 	protected void onDetachedFromWindow() {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+		SharedPreferences prefs = getContext().getSharedPreferences(getContext().getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 		prefs.unregisterOnSharedPreferenceChangeListener(onPrefsChanged);
 
 		super.onDetachedFromWindow();
@@ -95,7 +94,7 @@ public class NH_TextView extends TextView {
 	}
 
 	private void update() {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+		SharedPreferences prefs = getContext().getSharedPreferences(getContext().getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 		boolean isMonospaceMode = prefs.getBoolean("monospace", false);
 		if(isMonospaceMode) {
 			updateMode(true, Typeface.MONOSPACE, FITTED_SIZE_PX);
@@ -117,7 +116,7 @@ public class NH_TextView extends TextView {
 		float baseWidth = paint.measureText(max);
 		float fontScale = DISPLAY_WIDTH_PX / baseWidth;
 		FITTED_SIZE_PX = (float)Math.floor(baseSize * fontScale);
-		float maxSizePx = MAX_SIZE_SP * displayMetrics.scaledDensity;
+		float maxSizePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, MAX_SIZE_SP, displayMetrics);
 		if(FITTED_SIZE_PX > maxSizePx)
 			FITTED_SIZE_PX = maxSizePx;
 	}

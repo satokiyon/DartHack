@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
  * This class communicates with the Hearse server and provides all Hearse functionality.
  * @author Ranbato
  */
+@SuppressWarnings("deprecation") // 外部ライブラリ cz.msebera.android.httpclient の非推奨 API (DefaultHttpClient, consumeContent) のため抑制
 public class Hearse {
 
 	private final String CLIENT_ID;

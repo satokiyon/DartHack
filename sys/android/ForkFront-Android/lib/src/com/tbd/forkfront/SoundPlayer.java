@@ -1,6 +1,6 @@
 package com.tbd.forkfront;
 
-import android.media.AudioManager;
+import android.media.AudioAttributes;
 import android.media.SoundPool;
 
 import java.util.HashMap;
@@ -19,7 +19,13 @@ public class SoundPlayer {
 		if(!mSoundIds.containsKey(filename))
 		{
 			if(mSoundPool == null)
-				mSoundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+				mSoundPool = new SoundPool.Builder()
+						.setMaxStreams(10)
+						.setAudioAttributes(new AudioAttributes.Builder()
+								.setUsage(AudioAttributes.USAGE_GAME)
+								.setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+								.build())
+						.build();
 			int soundId = mSoundPool.load(filename, 1);
 			mSoundIds.put(filename, soundId);
 		}

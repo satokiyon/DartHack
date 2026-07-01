@@ -95,8 +95,8 @@ public class AutoFitTextView extends NH_TextView {
 	// ____________________________________________________________________________________
 	public float getMinTextSize()
 	{
-		float scaledDensity = getContext().getResources().getDisplayMetrics().scaledDensity;
-		return MIN_SIZE_SP * scaledDensity;
+		android.util.DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
+		return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, MIN_SIZE_SP, dm);
 	}
 
 	@Override

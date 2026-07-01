@@ -4,7 +4,6 @@ import java.util.EnumSet;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 
 public class Input
@@ -114,7 +113,7 @@ public class Input
 
 	public static int keyCodeToAction(int keyCode, Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = context.getSharedPreferences(context.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 		
 		if(prefs == null)
 			return keyCode;

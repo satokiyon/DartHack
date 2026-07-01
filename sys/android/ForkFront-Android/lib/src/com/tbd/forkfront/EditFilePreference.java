@@ -13,7 +13,6 @@ import android.content.DialogInterface;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.preference.Preference;
-import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import com.tbd.forkfront.Log;
 
+@SuppressWarnings("deprecation") // android.preference.Preference クラス全体が非推奨のため抑制
 public class EditFilePreference extends Preference implements DialogInterface.OnDismissListener
 {
 	private EditText mEditText;
@@ -152,8 +152,9 @@ public class EditFilePreference extends Preference implements DialogInterface.On
 
 	private void loadFile()
 	{
-		File dir = new File(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("datadir", ""));
-		File file = new File(dir, getContext().getResources().getString(R.string.defaultsFile));
+		Context ctx = getContext();
+		File dir = new File(ctx.getSharedPreferences(ctx.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE).getString("datadir", ""));
+		File file = new File(dir, ctx.getResources().getString(R.string.defaultsFile));
 
 		try
 		{
@@ -177,8 +178,9 @@ public class EditFilePreference extends Preference implements DialogInterface.On
 
 	private void saveFile(String text)
 	{
-		File dir = new File(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("datadir", ""));
-		File file = new File(dir, getContext().getResources().getString(R.string.defaultsFile));
+		Context ctx = getContext();
+		File dir = new File(ctx.getSharedPreferences(ctx.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE).getString("datadir", ""));
+		File file = new File(dir, ctx.getResources().getString(R.string.defaultsFile));
 
 		try
 		{

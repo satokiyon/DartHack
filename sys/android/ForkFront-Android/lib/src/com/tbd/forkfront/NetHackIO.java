@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import android.app.Activity;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 
 public class NetHackIO
 {
@@ -147,7 +148,7 @@ public class NetHackIO
 		mLibraryName = context.getResources().getString(R.string.libraryName);
 		mNextWinId = 1;
 		mCmdQue = new ConcurrentLinkedQueue<>();
-		mHandler = new Handler();
+		mHandler = new Handler(Looper.getMainLooper());
 		mThread = new Thread(ThreadMain, "nh_thread");
 	}
 

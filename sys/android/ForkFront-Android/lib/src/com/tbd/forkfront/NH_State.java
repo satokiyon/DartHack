@@ -13,7 +13,7 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Debug;
 import android.os.Handler;
-import android.preference.PreferenceManager;
+import android.view.WindowInsets;
 import android.view.*;
 import com.tbd.forkfront.*;
 import com.tbd.forkfront.Hearse.Hearse;
@@ -100,14 +100,14 @@ public class NH_State
 		mMap.loadZoomLevel();
 
 		// I have preferences already, might as well pass them in...
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 		mHearse = new Hearse(mContext, prefs, path);
 	}
 
 	// ____________________________________________________________________________________
 	private String getLastUsername()
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 		return prefs.getString("lastUsername", "");
 	}
 
@@ -131,7 +131,7 @@ public class NH_State
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public void preferencesUpdated()
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 
 		mMap.saveCenterTilePosition();
 
@@ -168,22 +168,36 @@ public class NH_State
 	// ____________________________________________________________________________________
 	public void onContextMenuClosed() {
 		mCmdPanelLayout.onContextMenuClosed();
-		updateSystemUiVisibilityFlags(PreferenceManager.getDefaultSharedPreferences(mContext));
+		updateSystemUiVisibilityFlags(mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE));
 	}
 
 	// ____________________________________________________________________________________
 	private void updateSystemUiVisibilityFlags(SharedPreferences prefs)
 	{
 		boolean isFullscreen = prefs.getBoolean("fullscreen", false);
-		int fullscreenFlag = isFullscreen ? WindowManager.LayoutParams.FLAG_FULLSCREEN : 0;
-		mContext.getWindow().setFlags(fullscreenFlag, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		boolean isImmersive = prefs.getBoolean("immersive", false);
+
+		android.view.WindowInsetsController insetsController =
+				mContext.getWindow().getInsetsController();
+		if(insetsController != null)
 		{
-			boolean isImmersive = prefs.getBoolean("immersive", false);
-			int uiVisibilityFlags = isImmersive ?
-					(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
-					: 0;
-			mContext.getWindow().getDecorView().setSystemUiVisibility(uiVisibilityFlags);
+			if(isFullscreen || isImmersive)
+			{
+				insetsController.hide(
+						WindowInsets.Type.statusBars() |
+						(isImmersive ? WindowInsets.Type.navigationBars() : 0));
+				if(isImmersive)
+					insetsController.setSystemBarsBehavior(
+							android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+				else
+					insetsController.setSystemBarsBehavior(
+							android.view.WindowInsetsController.BEHAVIOR_DEFAULT);
+			}
+			else
+			{
+				insetsController.show(
+						WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+			}
 		}
 	}
 
@@ -263,7 +277,7 @@ public class NH_State
 			return true;
 		}
 		if(keyCode == KeyEvent.KEYCODE_BACK) {
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+			SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 			int action = Util.parseInt(prefs.getString("backAction", ""), KeyAction.SystemDefault);
 			switch (action) {
 				case KeyAction.SystemDefault:
@@ -551,7 +565,7 @@ public class NH_State
 	private NH_Handler NhHandler = new NH_Handler() {
 		@Override
 		public void setLastUsername(String username) {
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+			SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 			prefs.edit().putString("lastUsername", username).commit();
 		}
 

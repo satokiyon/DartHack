@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 
+@SuppressWarnings("deprecation") // android.preference.Preference クラス全体が非推奨のため抑制
 public class ExportPreferences extends Preference implements PreferenceManager.OnActivityResultListener {
 	private static final int CREATE_FILE_REQUEST = 343;
 	private Activity mActivity;
@@ -45,7 +46,8 @@ public class ExportPreferences extends Preference implements PreferenceManager.O
 	public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == CREATE_FILE_REQUEST) {
 			if (resultCode == Activity.RESULT_OK) {
-				SharedPreferences prefs = getSharedPreferences();
+				Context ctx = getContext();
+				SharedPreferences prefs = ctx.getSharedPreferences(ctx.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 				JSONObject jsonobj = new JSONObject();
 				try {
 					jsonobj.put("tileset", prefs.getString("tileset", "TTY"));
@@ -117,8 +119,8 @@ public class ExportPreferences extends Preference implements PreferenceManager.O
 					jsonobj.put("closeKbdBtnOpacity", prefs.getInt("closeKbdBtnOpacity", 150));
 					jsonobj.put("closeKbdBtnSize", prefs.getInt("closeKbdBtnSize", 0));
 
-					File dir = new File(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("datadir", ""));
-					File rcFile = new File(dir, getContext().getResources().getString(R.string.defaultsFile));
+					File dir = new File(ctx.getSharedPreferences(ctx.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE).getString("datadir", ""));
+					File rcFile = new File(dir, ctx.getResources().getString(R.string.defaultsFile));
 					Uri rcUri = Uri.fromFile(rcFile);
 					byte[] rcBytes;
 					try {

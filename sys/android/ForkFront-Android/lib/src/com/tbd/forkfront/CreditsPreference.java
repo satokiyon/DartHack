@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.tbd.forkfront.Util;
 
+@SuppressWarnings("deprecation") // android.preference.Preference クラス全体が非推奨のため抑制
 public class CreditsPreference extends Preference
 {
 	// ____________________________________________________________________________________

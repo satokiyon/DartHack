@@ -12,6 +12,7 @@ import android.preference.PreferenceScreen;
 import android.view.Window;
 import com.tbd.forkfront.TilesetPreference;
 
+@SuppressWarnings("deprecation") // android.preference.PreferenceActivity クラス全体が非推奨のため抑制
 public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener
 {
 	private TilesetPreference mTilesetPref;

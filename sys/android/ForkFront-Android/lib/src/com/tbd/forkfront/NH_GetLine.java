@@ -7,7 +7,7 @@ import java.util.Set;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
-import android.preference.PreferenceManager;
+import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -129,7 +129,7 @@ public class NH_GetLine
 			builder.append(h);
 			builder.append(';');
 		}
-		Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+		Editor editor = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE).edit();
 		editor.putString("lineHistory", builder.toString());
 		editor.commit();
 	}
@@ -137,7 +137,7 @@ public class NH_GetLine
 	// ____________________________________________________________________________________
 	private List<String> loadHistory()
 	{
-		String value = PreferenceManager.getDefaultSharedPreferences(mContext).getString("lineHistory", "");
+		String value = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE).getString("lineHistory", "");
 		String[] strings = value.split(";");
 		List<String> history = new ArrayList<>(strings.length);
 		for(String s : strings)

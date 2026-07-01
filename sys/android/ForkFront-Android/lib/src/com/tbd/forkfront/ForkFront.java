@@ -84,6 +84,7 @@ public class ForkFront extends Activity
 		goodToGo();
 	}
 
+	@SuppressWarnings("deprecation") // UpdateAssets が AsyncTask（非推奨）を継承しているため抑制
 	private void goodToGo() {
 		if(nhState == null)
 		{
@@ -104,7 +105,7 @@ public class ForkFront extends Activity
 				};
 
 			nhState = new NH_State(this, decoder);
-			new UpdateAssets(this, onAssetsReady).execute((Void[])null);
+			new UpdateAssets(this, onAssetsReady).executeOnExecutor(android.os.AsyncTask.THREAD_POOL_EXECUTOR, (Void[])null);
 		}
 		else
 		{
@@ -134,10 +135,16 @@ public class ForkFront extends Activity
 			if(!nhSaveDir.exists())
 				nhSaveDir.mkdir();
 
-			PreferenceManager.setDefaultValues(ForkFront.this, R.xml.preferences, false);
+			setPreferenceDefaults();
 			nhState.startNetHack(path.getAbsolutePath());
 		}
 	};
+
+	// ____________________________________________________________________________________
+	@SuppressWarnings("deprecation") // PreferenceManager.setDefaultValues は非推奨だが代替 API なし
+	private void setPreferenceDefaults() {
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+	}
 
 	// ____________________________________________________________________________________
 	@Override

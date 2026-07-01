@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
-import android.preference.PreferenceManager;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -394,7 +393,7 @@ public class ShortcutOverlay
 					updateButtonLabels();
 
 					// 保存
-					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+					SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 					prefs.edit().putString("shortcut_btn_" + index, value).apply();
 				}
 			});

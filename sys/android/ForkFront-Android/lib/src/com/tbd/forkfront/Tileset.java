@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.*;
 import android.graphics.drawable.BitmapDrawable;
-import android.preference.PreferenceManager;
 import android.text.TextPaint;
 import android.widget.Toast;
 
@@ -86,7 +85,7 @@ public class Tileset
 			int id = mContext.getResources().getIdentifier("overlays", "drawable", mNamespace);
 			if(id > 0)
 			{
-				BitmapDrawable bmpDrawable = (BitmapDrawable)r.getDrawable(id);
+				BitmapDrawable bmpDrawable = (BitmapDrawable)r.getDrawable(id, mContext.getTheme());
 				mOverlay = bmpDrawable.getBitmap();
 			}
 			else
@@ -160,7 +159,7 @@ public class Tileset
 		clearBitmap();
 		if(id > 0)
 		{
-			BitmapDrawable bmpDrawable = (BitmapDrawable) r.getDrawable(id);
+			BitmapDrawable bmpDrawable = (BitmapDrawable) r.getDrawable(id, mContext.getTheme());
 			mBitmap = bmpDrawable.getBitmap();
 		}
 	}
@@ -266,7 +265,7 @@ public class Tileset
 
 	// ____________________________________________________________________________________
 	public static File getLocalTilesetFile(Context context) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = context.getSharedPreferences(context.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
 		File dir = new File(prefs.getString("datadir", ""));
 		File file = new File(dir, LOCAL_TILESET_NAME);
 		return file;
