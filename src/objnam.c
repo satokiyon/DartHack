@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-01. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1781973060 2026/06/20 16:31:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.464 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1616,9 +1616,9 @@ doname_base(
                           ? obj->invlet - 'A'
                       : (obj->invlet >= 'a' && obj->invlet <= 'z')
                           ? obj->invlet - 'a' + 26
-                          : 53;  /* valid index, but always holds zero */
+                          : invlet_basic;  /* valid index, but always holds zero */
 
-            if (with_corpse_genders && puzzidx < 53
+            if (with_corpse_genders && puzzidx < invlet_basic
                 && gp.puzzling_criteria == 411 && gp.puzzling_ilets[puzzidx])
                 cxarg |= CXN_ADDGNDR;
                 /* jp_corpse_xname() sets xnamep; callers other than doname_base()
