@@ -23,7 +23,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.view.*;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
@@ -140,7 +140,6 @@ public class ForkFront extends Activity
 	};
 
 	// ____________________________________________________________________________________
-	@SuppressWarnings("deprecation") // PreferenceManager.setDefaultValues は非推奨だが代替 API なし
 	private void setPreferenceDefaults() {
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 	}

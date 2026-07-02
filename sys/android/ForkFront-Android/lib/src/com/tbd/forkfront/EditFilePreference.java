@@ -12,7 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.preference.Preference;
+import androidx.preference.Preference;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,7 +21,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import com.tbd.forkfront.Log;
 
-@SuppressWarnings("deprecation") // android.preference.Preference クラス全体が非推奨のため抑制
 public class EditFilePreference extends Preference implements DialogInterface.OnDismissListener
 {
 	private EditText mEditText;

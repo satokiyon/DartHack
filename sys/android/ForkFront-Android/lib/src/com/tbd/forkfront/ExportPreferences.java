@@ -1,7 +1,6 @@
 package com.tbd.forkfront;
 import android.app.Activity;
-import android.preference.Preference;
-import android.preference.PreferenceManager;
+import androidx.preference.Preference;
 import android.content.Intent;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,8 +20,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 
-@SuppressWarnings("deprecation") // android.preference.Preference クラス全体が非推奨のため抑制
-public class ExportPreferences extends Preference implements PreferenceManager.OnActivityResultListener {
+public class ExportPreferences extends Preference {
 	private static final int CREATE_FILE_REQUEST = 343;
 	private Activity mActivity;
 	private Context mContext;
@@ -42,7 +40,6 @@ public class ExportPreferences extends Preference implements PreferenceManager.O
 		mActivity.startActivityForResult(intent, CREATE_FILE_REQUEST);
 	}
 
-	@Override
 	public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == CREATE_FILE_REQUEST) {
 			if (resultCode == Activity.RESULT_OK) {

@@ -10,8 +10,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.preference.Preference;
-import android.preference.PreferenceManager;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceViewHolder;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -28,7 +28,7 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
-public class TilesetPreference extends Preference implements PreferenceManager.OnActivityResultListener
+public class TilesetPreference extends Preference
 {
 	private static final int GET_IMAGE_REQUEST = 342;
 	private final String TTY = "TTY";
@@ -56,9 +56,10 @@ public class TilesetPreference extends Preference implements PreferenceManager.O
 	}
 
 	@Override
-	protected View onCreateView(ViewGroup parent)
+	public void onBindViewHolder(PreferenceViewHolder holder)
 	{
-		mRoot = (LinearLayout)super.onCreateView(parent);
+		super.onBindViewHolder(holder);
+		mRoot = (LinearLayout)holder.itemView;
 
 		createChoices();
 
@@ -84,10 +85,6 @@ public class TilesetPreference extends Preference implements PreferenceManager.O
 		});
 		mTilesetPath = (TextView)mRoot.findViewById(R.id.image_path);
 
-		///////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Workaround for weird focus problem
-		// When the keyboard is opened because an input field receive focus the entire view is recreated,
-		// which makes the field lose focus again
 		mTileW.setSelectAllOnFocus(true);
 		mTileH.setSelectAllOnFocus(true);
 
@@ -124,15 +121,6 @@ public class TilesetPreference extends Preference implements PreferenceManager.O
 				mTileHFocus = hasFocus;
 			}
 		});
-		///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		return mRoot;
-	}
-
-	@Override
-	protected void onBindView(View view)
-	{
-		super.onBindView(view);
 
 		SharedPreferences prefs = getSharedPreferences();
 		String currentValue = prefs.getString("tileset", TTY);
@@ -140,8 +128,18 @@ public class TilesetPreference extends Preference implements PreferenceManager.O
 		int i = mEntryValues.indexOf(currentValue);
 		if(i < 0)
 			i = mEntryValues.indexOf(TTY);
-		if(!prefs.getBoolean("customTiles", false))
-			((RadioButton)mRoot.getChildAt(i)).setChecked(true);
+		if(!prefs.getBoolean("customTiles", false)) {
+			RadioButton rb = (RadioButton) mRoot.findViewWithTag(currentValue);
+			if (rb != null) {
+				rb.setChecked(true);
+			} else {
+				RadioButton fallbackRb = (RadioButton) mRoot.findViewWithTag(TTY);
+				if (fallbackRb != null) fallbackRb.setChecked(true);
+			}
+		} else {
+			RadioButton customTilesRb = (RadioButton) mRoot.findViewById(R.id.custom_tiles);
+			if (customTilesRb != null) customTilesRb.setChecked(true);
+		}
 
 		mTilesetPath.setText(prefs.getString("customTileset", ""));
 		mTileW.setText(Integer.toString(prefs.getInt("customTileW", 32)));
@@ -169,7 +167,6 @@ public class TilesetPreference extends Preference implements PreferenceManager.O
 		mActivity.startActivityForResult(Intent.createChooser(intent, "Select Tileset Image"), GET_IMAGE_REQUEST);
 	}
 
-	@Override
 	public boolean onActivityResult(int requestCode, int resultCode, Intent data)
 	{
 		if(resultCode == Activity.RESULT_OK && requestCode == GET_IMAGE_REQUEST)
@@ -252,6 +249,15 @@ public class TilesetPreference extends Preference implements PreferenceManager.O
 
 	private void createChoices()
 	{
+		// Remove any existing radio buttons we added previously to prevent duplication
+		for(int i = mRoot.getChildCount() - 1; i >= 0; i--)
+		{
+			View child = mRoot.getChildAt(i);
+			if(child instanceof RadioButton)
+			{
+				mRoot.removeViewAt(i);
+			}
+		}
 		for(int i = mEntries.size() - 1; i >= 0; i--)
 		{
 			RadioButton button = new RadioButton(getContext());
@@ -265,9 +271,10 @@ public class TilesetPreference extends Preference implements PreferenceManager.O
 
 	private void persistTileset(String id, int tileW, int tileH, boolean custom)
 	{
-		SharedPreferences.Editor editor = getEditor();
-		if(editor != null)
+		SharedPreferences prefs = getSharedPreferences();
+		if(prefs != null)
 		{
+			SharedPreferences.Editor editor = prefs.edit();
 			editor.putString("tileset", id);
 			editor.putInt("tileW", tileW);
 			editor.putInt("tileH", tileH);
@@ -278,10 +285,7 @@ public class TilesetPreference extends Preference implements PreferenceManager.O
 				editor.putInt("customTileW", tileW);
 				editor.putInt("customTileH", tileH);
 			}
-			if(shouldCommit())
-			{
-				editor.commit();
-			}
+			editor.apply();
 		}
 	}
 

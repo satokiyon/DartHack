@@ -1,7 +1,8 @@
 package com.tbd.forkfront;
 
 import android.content.Context;
-import android.preference.Preference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceViewHolder;
 import android.text.Html;
 import android.text.Layout.Alignment;
 import android.text.Spannable;
@@ -13,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.tbd.forkfront.Util;
 
-@SuppressWarnings("deprecation") // android.preference.Preference クラス全体が非推奨のため抑制
 public class CreditsPreference extends Preference
 {
 	// ____________________________________________________________________________________
@@ -26,10 +26,10 @@ public class CreditsPreference extends Preference
 
 	// ____________________________________________________________________________________
 	@Override
-	protected View onCreateView(ViewGroup parent)
+	public void onBindViewHolder(PreferenceViewHolder holder)
 	{
-		View view = super.onCreateView(parent);//Util.inflate(getContext(), R.layout.textwindow);
-		TextView text = (TextView)view.findViewById(R.id.text_view);
+		super.onBindViewHolder(holder);
+		TextView text = (TextView)holder.findViewById(R.id.text_view);
 
 		text.setText(Html.fromHtml(getContext().getString(R.string.credits)), TextView.BufferType.SPANNABLE);
 
@@ -37,7 +37,5 @@ public class CreditsPreference extends Preference
 
 		Spannable span = (Spannable)text.getText();
 		span.setSpan(new AlignmentSpan.Standard(Alignment.ALIGN_CENTER), 0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-		return view;
 	}
 }
