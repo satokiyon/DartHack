@@ -7,6 +7,7 @@
 		android:title="設定"
 		android:key="settings">
 		<PreferenceScreen
+			android:key="tileset_screen"
 			android:title="タイルセット"
 			android:summary="ゲーム世界を描くタイルのスタイル">
 
@@ -103,6 +104,7 @@
 			android:max="255"/>
 
 		<PreferenceScreen
+			android:key="dpad_screen"
 			android:title="移動キーのオーバーレイ表示"
 			android:summary="画面に重ねて表示する移動キーを設定します">
 
@@ -174,6 +176,7 @@
 		</PreferenceScreen>
 
 		<PreferenceScreen
+			android:key="shortcut_screen"
 			android:title="ショートカットボタンの表示"
 			android:summary="画面に重ねて表示するショートカットボタンを設定します">
 
@@ -283,6 +286,7 @@
 		</PreferenceScreen>
 
 		<PreferenceScreen
+			android:key="close_kbd_screen"
 			android:title="キーボードを閉じるボタン"
 			android:summary="仮想キーボードを閉じるボタンを設定します">
 
@@ -326,6 +330,7 @@
 		</PreferenceScreen>
 		
 		<PreferenceScreen
+			android:key="panels_screen"
 			android:title="コマンドパネル"
 			android:summary="コマンドパネルのレイアウトや表示するコマンドを設定します"
 			android:orderingFromXml="true">
@@ -880,6 +885,7 @@
 		android:title="アプリについて">
 
 		<PreferenceScreen
+			android:key="credits_screen"
 			android:title="クレジット"
 			android:summary="このAndroid版の開発者・貢献者">
 

@@ -7,6 +7,7 @@
 		android:title="Settings"
 		android:key="settings">
 		<PreferenceScreen
+			android:key="tileset_screen"
 			android:title="Tileset"
 			android:summary="The visual style of the game world">
 
@@ -103,6 +104,7 @@
 			android:max="255"/>
 
 		<PreferenceScreen
+			android:key="dpad_screen"
 			android:title="Directional overlay"
 			android:summary="Configure the directional overlay">
 
@@ -174,6 +176,7 @@
 		</PreferenceScreen>
 
 		<PreferenceScreen
+			android:key="shortcut_screen"
 			android:title="Shortcut overlay"
 			android:summary="Configure the shortcut button overlay">
 
@@ -283,6 +286,7 @@
 		</PreferenceScreen>
 
 		<PreferenceScreen
+			android:key="close_kbd_screen"
 			android:title="Keyboard close button"
 			android:summary="Configure the keyboard close button overlay">
 
@@ -326,6 +330,7 @@
 		</PreferenceScreen>
 		
 		<PreferenceScreen
+			android:key="panels_screen"
 			android:title="Command panels"
 			android:summary="Configure layout and content of the command panels"
 			android:orderingFromXml="true">
@@ -880,6 +885,7 @@
 		android:title="About">
 
 		<PreferenceScreen
+			android:key="credits_screen"
 			android:title="Credits"
 			android:summary="Contributors of this port">
 
