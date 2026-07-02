@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import androidx.preference.PreferenceManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +37,7 @@ public class MenuItemAdapter extends ArrayAdapter<MenuItem>
 	}
 
 	private void updateMonospaceFlag() {
-		SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", Context.MODE_PRIVATE);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		mIsMonospaceMode = prefs.getBoolean("monospace", false);
 	}
 

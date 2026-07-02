@@ -8,6 +8,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import androidx.preference.PreferenceManager;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Build;
@@ -100,14 +101,14 @@ public class NH_State
 		mMap.loadZoomLevel();
 
 		// I have preferences already, might as well pass them in...
-		SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		mHearse = new Hearse(mContext, prefs, path);
 	}
 
 	// ____________________________________________________________________________________
 	private String getLastUsername()
 	{
-		SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		return prefs.getString("lastUsername", "");
 	}
 
@@ -131,7 +132,7 @@ public class NH_State
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public void preferencesUpdated()
 	{
-		SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 
 		mMap.saveCenterTilePosition();
 
@@ -168,7 +169,7 @@ public class NH_State
 	// ____________________________________________________________________________________
 	public void onContextMenuClosed() {
 		mCmdPanelLayout.onContextMenuClosed();
-		updateSystemUiVisibilityFlags(mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE));
+		updateSystemUiVisibilityFlags(PreferenceManager.getDefaultSharedPreferences(mContext));
 	}
 
 	// ____________________________________________________________________________________
@@ -277,7 +278,7 @@ public class NH_State
 			return true;
 		}
 		if(keyCode == KeyEvent.KEYCODE_BACK) {
-			SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 			int action = Util.parseInt(prefs.getString("backAction", ""), KeyAction.SystemDefault);
 			switch (action) {
 				case KeyAction.SystemDefault:
@@ -565,7 +566,7 @@ public class NH_State
 	private NH_Handler NhHandler = new NH_Handler() {
 		@Override
 		public void setLastUsername(String username) {
-			SharedPreferences prefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preferences", android.content.Context.MODE_PRIVATE);
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 			prefs.edit().putString("lastUsername", username).commit();
 		}
 

@@ -19,6 +19,8 @@ import android.widget.ProgressBar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import androidx.preference.PreferenceManager;
+
 public class UpdateAssets
 {
 	public interface Listener
@@ -63,8 +65,7 @@ public class UpdateAssets
 	{
 		convertFromOldPreferences(activity);
 		mActivity = activity;
-		mPrefs = activity.getSharedPreferences(
-				activity.getPackageName() + "_preferences", Context.MODE_PRIVATE);
+		mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		mAM = mActivity.getResources().getAssets();
 		mIsInitiating = true;
 		mTotalRead = 0;
@@ -84,8 +85,7 @@ public class UpdateAssets
 			return;
 
 		SharedPreferences oldPrefs = activity.getSharedPreferences(oldActivityName, Activity.MODE_PRIVATE);
-		SharedPreferences newPrefs = activity.getSharedPreferences(
-				activity.getPackageName() + "_preferences", Context.MODE_PRIVATE);
+		SharedPreferences newPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 		SharedPreferences.Editor oldEditor = oldPrefs.edit();
 		SharedPreferences.Editor newEditor = newPrefs.edit();
 
