@@ -6,16 +6,20 @@ import java.util.Scanner;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
-import android.preference.PreferenceManager;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.ProgressBar;
 
-public class UpdateAssets extends AsyncTask<Void, Void, Void>
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class UpdateAssets
 {
 	public interface Listener
 	{
@@ -36,7 +40,8 @@ public class UpdateAssets extends AsyncTask<Void, Void, Void>
 	private AssetManager mAM;
 	private SharedPreferences mPrefs;
 	private boolean mIsInitiating;
-	private ProgressDialog mProgress;
+	private AlertDialog mProgressDialog;
+	private ProgressBar mProgressBar;
 	private File mDstPath;
 	private String mError;
 	private FileStatus mFileStatus;
@@ -50,12 +55,16 @@ public class UpdateAssets extends AsyncTask<Void, Void, Void>
 	private final String mNamespace;
 	private final String mDefaultsFile;
 
+	private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
+	private final Handler mMainHandler = new Handler(Looper.getMainLooper());
+
 	// ____________________________________________________________________________________
 	public UpdateAssets(Activity activity, Listener listener)
 	{
 		convertFromOldPreferences(activity);
 		mActivity = activity;
-		mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
+		mPrefs = activity.getSharedPreferences(
+				activity.getPackageName() + "_preferences", Context.MODE_PRIVATE);
 		mAM = mActivity.getResources().getAssets();
 		mIsInitiating = true;
 		mTotalRead = 0;
@@ -75,7 +84,8 @@ public class UpdateAssets extends AsyncTask<Void, Void, Void>
 			return;
 
 		SharedPreferences oldPrefs = activity.getSharedPreferences(oldActivityName, Activity.MODE_PRIVATE);
-		SharedPreferences newPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
+		SharedPreferences newPrefs = activity.getSharedPreferences(
+				activity.getPackageName() + "_preferences", Context.MODE_PRIVATE);
 		SharedPreferences.Editor oldEditor = oldPrefs.edit();
 		SharedPreferences.Editor newEditor = newPrefs.edit();
 
@@ -105,20 +115,42 @@ public class UpdateAssets extends AsyncTask<Void, Void, Void>
 	}
 
 	// ____________________________________________________________________________________
-	@Override
-	protected void onPostExecute(Void unused)
-	{
-		if(mProgress != null)
-			mProgress.dismiss();
-		if(mDstPath == null)
-		{
+	/**
+	 * 非同期処理を開始する（旧 AsyncTask.execute() の代替）。
+	 */
+	public void start() {
+		mExecutor.execute(new Runnable() {
+			@Override
+			public void run() {
+				// バックグラウンドで実行（旧 doInBackground）
+				mDstPath = load();
+
+				// UI スレッドで完了処理（旧 onPostExecute）
+				mMainHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						onFinished();
+					}
+				});
+			}
+		});
+	}
+
+	// ____________________________________________________________________________________
+	/**
+	 * 完了後の UI 処理（旧 onPostExecute）。必ず UI スレッドから呼び出すこと。
+	 */
+	private void onFinished() {
+		if (mProgressDialog != null)
+			mProgressDialog.dismiss();
+		if (mDstPath == null) {
 			showError();
-		}
-		else
-		{
-			if(mDefaultsFileBackedUp) {
+		} else {
+			if (mDefaultsFileBackedUp) {
 				String symLinkedPath = "/sdcard/Android/data/" + mNamespace + "/";
-				showMessage("Your " + mDefaultsFile + " file was replaced during the update. A backup is saved in:\n" + symLinkedPath);
+				showMessage("Your " + mDefaultsFile
+						+ " file was replaced during the update. A backup is saved in:\n"
+						+ symLinkedPath);
 			}
 			Log.print("Starting on: " + mDstPath.getAbsolutePath());
 			mListener.onAssetsReady(mDstPath);
@@ -126,30 +158,34 @@ public class UpdateAssets extends AsyncTask<Void, Void, Void>
 	}
 
 	// ____________________________________________________________________________________
-	@Override
-	protected Void doInBackground(Void... params)
-	{
-		mDstPath = load();
-		return null;
-	}
+	/**
+	 * プログレス更新を UI スレッドに投ける（旧 publishProgress → onProgressUpdate）。
+	 */
+	private void updateProgress() {
+		mMainHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				if (mTotalRead > 0 && mIsInitiating) {
+					mIsInitiating = false;
 
-	// ____________________________________________________________________________________
-	@Override
-    protected void onProgressUpdate(Void... progress)
-	{
-		if(mTotalRead > 0 && mIsInitiating)
-		{
-			mIsInitiating = false;
-			
-			mProgress = new ProgressDialog(mActivity);
-			mProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			mProgress.setMax((int)mRequiredSpace);
-			mProgress.setMessage(mActivity.getString(R.string.preparing_content));
-			mProgress.setCancelable(false);
-			mProgress.show();
-		}
-		mProgress.setProgress((int)mTotalRead);
-    }
+					// ProgressDialog の代替: AlertDialog + 水平 ProgressBar
+					mProgressBar = new ProgressBar(
+							mActivity, null,
+							android.R.attr.progressBarStyleHorizontal);
+					mProgressBar.setMax((int) mRequiredSpace);
+					AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+					builder.setMessage(mActivity.getString(R.string.preparing_content));
+					builder.setView(mProgressBar);
+					builder.setCancelable(false);
+					mProgressDialog = builder.create();
+					mProgressDialog.show();
+				}
+				if (mProgressBar != null) {
+					mProgressBar.setProgress((int) mTotalRead);
+				}
+			}
+		});
+	}
 	
 	// ____________________________________________________________________________________
 	private File load()
@@ -335,7 +371,7 @@ public class UpdateAssets extends AsyncTask<Void, Void, Void>
 				else
 					break;
 				mTotalRead += nRead;
-				publishProgress((Void[])null);
+				updateProgress();
 			}
 
 			os.flush();

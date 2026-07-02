@@ -84,7 +84,6 @@ public class ForkFront extends Activity
 		goodToGo();
 	}
 
-	@SuppressWarnings("deprecation") // UpdateAssets が AsyncTask（非推奨）を継承しているため抑制
 	private void goodToGo() {
 		if(nhState == null)
 		{
@@ -105,7 +104,7 @@ public class ForkFront extends Activity
 				};
 
 			nhState = new NH_State(this, decoder);
-			new UpdateAssets(this, onAssetsReady).executeOnExecutor(android.os.AsyncTask.THREAD_POOL_EXECUTOR, (Void[])null);
+			new UpdateAssets(this, onAssetsReady).start();
 		}
 		else
 		{
