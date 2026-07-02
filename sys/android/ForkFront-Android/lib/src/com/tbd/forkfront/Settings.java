@@ -111,17 +111,20 @@ public class Settings extends AppCompatActivity implements PreferenceFragmentCom
 			sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
 			mTilesetPref = (TilesetPreference)findPreference("tilesetPreference");
-			mTilesetPref.setActivity(getActivity());
+			if (mTilesetPref != null)
+				mTilesetPref.setActivity(getActivity());
 			mExportPreferences = (ExportPreferences)findPreference("exportPreferences");
-			mExportPreferences.setActivity(getActivity());
+			if (mExportPreferences != null)
+				mExportPreferences.setActivity(getActivity());
 			mImportPreferences = (ImportPreferences)findPreference("importPreferences");
-			mImportPreferences.setActivity(getActivity());
+			if (mImportPreferences != null)
+				mImportPreferences.setActivity(getActivity());
 
 			if(!getContext().getApplicationContext().getResources().getBoolean(R.bool.hearseAvailable))
 			{
 				PreferenceCategory hearseParent = (PreferenceCategory)findPreference("advanced");
 				Preference hearsePref = findPreference("hearse");
-				if(hearsePref != null)
+				if(hearseParent != null && hearsePref != null)
 					hearseParent.removePreference(hearsePref);
 			}
 
@@ -130,7 +133,7 @@ public class Settings extends AppCompatActivity implements PreferenceFragmentCom
 			if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
 			{
 				Preference fullscreenPref = findPreference("immersive");
-				if(fullscreenPref != null)
+				if(settingsCategory != null && fullscreenPref != null)
 					settingsCategory.removePreference(fullscreenPref);
 			}
 
