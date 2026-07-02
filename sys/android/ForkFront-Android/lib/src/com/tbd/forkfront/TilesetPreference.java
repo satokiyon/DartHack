@@ -253,7 +253,7 @@ public class TilesetPreference extends Preference
 		for(int i = mRoot.getChildCount() - 1; i >= 0; i--)
 		{
 			View child = mRoot.getChildAt(i);
-			if(child instanceof RadioButton)
+			if(child instanceof RadioButton && child.getId() != R.id.custom_tiles)
 			{
 				mRoot.removeViewAt(i);
 			}
