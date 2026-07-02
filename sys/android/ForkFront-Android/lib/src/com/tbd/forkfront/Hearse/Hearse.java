@@ -6,15 +6,10 @@ import android.text.TextUtils;
 import android.widget.Toast;
 import com.tbd.forkfront.Log;
 import com.tbd.forkfront.R;
-import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.HttpEntity;
-import cz.msebera.android.httpclient.HttpResponse;
-import cz.msebera.android.httpclient.client.HttpClient;
-import cz.msebera.android.httpclient.client.methods.HttpGet;
-import cz.msebera.android.httpclient.client.methods.HttpPost;
-import cz.msebera.android.httpclient.entity.ByteArrayEntity;
-import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
-import cz.msebera.android.httpclient.message.BasicHeader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -32,7 +27,6 @@ import java.util.regex.Pattern;
  * This class communicates with the Hearse server and provides all Hearse functionality.
  * @author Ranbato
  */
-@SuppressWarnings("deprecation") // 外部ライブラリ cz.msebera.android.httpclient の非推奨 API (DefaultHttpClient, consumeContent) のため抑制
 public class Hearse {
 
 	private final String CLIENT_ID;
@@ -97,7 +91,6 @@ public class Hearse {
 	private String userToken;
 	private boolean keepUploaded;
 	private long lastUpload;
-	private HttpClient httpClient;
 	private boolean mLittleEndian;
 	private String mNethackVersion;
 
@@ -128,7 +121,6 @@ public class Hearse {
 		userNick = prefs.getString(PREFS_HEARSE_NAME, "");
 		keepUploaded = prefs.getBoolean(PREFS_HEARSE_KEEP_UPLOADED, false);
 		lastUpload = prefs.getLong(PREFS_HEARSE_LAST_UPLOAD, 0);
-		httpClient = new DefaultHttpClient();
 
 		prefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
 
@@ -310,32 +302,28 @@ public class Hearse {
 	}
 
 	private String createNewUser() throws IOException {
-		List<Header> headerList = new ArrayList<Header>();
+		Map<String, String> headerMap = new LinkedHashMap<>();
+		headerMap.put(HEADER_TOKEN, userEmail);
+		headerMap.put(HEADER_NICK, userNick);
 
-
-		headerList.add(new BasicHeader(HEADER_TOKEN, userEmail));
-
-		headerList.add(new BasicHeader(HEADER_NICK, userNick));
-
-		HttpResponse resp = doGet(BASE_URL, NEW_USER, headerList);
+		HearseResponse resp = doGet(BASE_URL, NEW_USER, headerMap);
 
 		if (resp.getFirstHeader(HEADER_HEARSE) == null) {
-			consumeContent(resp);
+			resp.close();
 			return "";
 		}
 		if (resp.getFirstHeader(HEADER_ERROR) != null) {
 			printContent(resp);
-			consumeContent(resp);
+			resp.close();
 			return "";
-
 		}
 
-		Header tokenHeader = resp.getFirstHeader(HEADER_TOKEN);
+		String token = resp.getFirstHeader(HEADER_TOKEN);
 		SharedPreferences.Editor ed = prefs.edit();
-		ed.putString(PREFS_HEARSE_ID, tokenHeader.getValue());
+		ed.putString(PREFS_HEARSE_ID, token);
 		ed.commit();
-		consumeContent(resp);
-		return tokenHeader.getValue();
+		resp.close();
+		return token;
 	}
 
 	private int downloadBones() throws IOException {
@@ -352,47 +340,39 @@ public class Hearse {
 
 		while (true) {
 
-			List<Header> headerList = new ArrayList<Header>();
-
-			headerList.add(new BasicHeader(HEADER_TOKEN, userToken));
-			if(existingBonesSet.length() > 0)
-				headerList.add(new BasicHeader(HEADER_USER_LEVELS, existingBonesSet));
-			//isEmpty requires API 9
+			Map<String, String> headerMap = new LinkedHashMap<>();
+			headerMap.put(HEADER_TOKEN, userToken);
+			if (existingBonesSet.length() > 0)
+				headerMap.put(HEADER_USER_LEVELS, existingBonesSet);
 			if (!"".equals(hackver)) {
-				headerList.add(new BasicHeader(HEADER_NETHACKVER, hackver));
+				headerMap.put(HEADER_NETHACKVER, hackver);
 			}
 
-			HttpResponse resp = doGet(BASE_URL, DOWNLOAD, headerList);
+			HearseResponse resp = doGet(BASE_URL, DOWNLOAD, headerMap);
 
 			if (resp.getFirstHeader(HEADER_HEARSE) == null) {
-				consumeContent(resp);
+				resp.close();
 				return 0;
 			}
-			Header header = resp.getFirstHeader(HEADER_ERROR);
-			if (header != null) {
-
-				if (header.getValue().equals(F_ERROR_INFO)) {
-					// This is a warning so pretend we succeeded.
-					printContent(resp);
-				} else {
-					printContent(resp);
-				}
-				consumeContent(resp);
+			String errorHeader = resp.getFirstHeader(HEADER_ERROR);
+			if (errorHeader != null) {
+				// INFOは警告のみ、FATALも同様にメッセージ表示して終了
+				printContent(resp);
+				resp.close();
 				break;
 			} else {
+				String fileName = resp.getFirstHeader(HEADER_FILE_NAME);
+				String md5 = resp.getFirstHeader(HEADER_BONES_CRC);
 
-				Header fileName = resp.getFirstHeader(HEADER_FILE_NAME);
-				Header md5 = resp.getFirstHeader(HEADER_BONES_CRC);
-
-				File bonesFile = new File(dataDirString, fileName.getValue());
-				// For thread safety, don't download as real name.  Nethack might try to load it before complete
+				File bonesFile = new File(dataDirString, fileName);
+				// スレッド安全のため一時ファイル名でダウンロード
 				File tmpBonesFile = new File(dataDirString, bonesFile.getName() + ".tmp");
 
 				BufferedOutputStream out = null;
 				InputStream in = null;
 				try {
 					tmpBonesFile.createNewFile();
-					in = resp.getEntity().getContent();
+					in = resp.getInputStream();
 					out = new BufferedOutputStream(new FileOutputStream(tmpBonesFile));
 					int c;
 					while ((c = in.read()) != -1) {
@@ -401,36 +381,25 @@ public class Hearse {
 				} catch (IOException e) {
 					e.printStackTrace();
 				} finally {
-					// I miss try-with-resources :)
 					if (out != null) {
-						try {
-							out.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+						try { out.close(); } catch (IOException e) { e.printStackTrace(); }
 					}
 					if (in != null) {
-						try {
-							in.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+						try { in.close(); } catch (IOException e) { e.printStackTrace(); }
 					}
 				}
 
-				if(checkMD5(md5.getValue(), tmpBonesFile)) {
+				if (checkMD5(md5, tmpBonesFile)) {
 					tmpBonesFile.renameTo(bonesFile);
 					Log.print("Downloaded " + bonesFile.getName());
 					existingBonesSet = existingBonesSet + bonesFile.getName() + ",";
 					nDownloaded++;
 				} else {
-					//arg
 					Log.print("Bad bones downloaded");
 					tmpBonesFile.delete();
 				}
 
-				consumeContent(resp);
-
+				resp.close();
 			}
 		}
 
@@ -462,12 +431,11 @@ public class Hearse {
 
 			currentFileName = files.get(i).getName();
 
-			List<Header> headerList = new ArrayList<Header>();
-
-			headerList.add(new BasicHeader(HEADER_TOKEN, userToken));
-			headerList.add(new BasicHeader(HEADER_FILE_NAME, currentFileName));
+			Map<String, String> headerMap = new LinkedHashMap<>();
+			headerMap.put(HEADER_TOKEN, userToken);
+			headerMap.put(HEADER_FILE_NAME, currentFileName);
 			if (i == 0) {
-				headerList.add(new BasicHeader(HEADER_WANTS_INFO, "Y"));
+				headerMap.put(HEADER_WANTS_INFO, "Y");
 			}
 
 			NHFileInfo info = loadFile(files.get(i));
@@ -476,48 +444,39 @@ public class Hearse {
 			String info2 = info.get2();
 			String info3 = info.get3();
 			String info4 = info.get4();
-//            headerList.add(new BasicHeader(HEADER_VERSION + 1, info.get1()));
-//            headerList.add(new BasicHeader(HEADER_VERSION + 2, info.get2()));
-//            headerList.add(new BasicHeader(HEADER_VERSION + 3, info.get3()));
-//            headerList.add(new BasicHeader(HEADER_VERSION + 4, info.get4()));
-			headerList.add(new BasicHeader(HEADER_VERSIONCRC, getStringMD5(info1 + "," + info2 + "," + info3 + "," + info4)));
+			headerMap.put(HEADER_VERSIONCRC, getStringMD5(info1 + "," + info2 + "," + info3 + "," + info4));
+			headerMap.put(HEADER_BONES_CRC, info.md5);
 
-			headerList.add(new BasicHeader(HEADER_BONES_CRC, info.md5));
-
-			HttpResponse resp;
+			HearseResponse resp;
 			try {
-				resp = doPost(BASE_URL, UPLOAD, headerList, info.data);
+				resp = doPost(BASE_URL, UPLOAD, headerMap, info.data);
 			} catch (IOException e) {
-				// Log exception
 				e.printStackTrace();
 				continue;
 			}
 
 			if (resp.getFirstHeader(HEADER_HEARSE) == null) {
-				consumeContent(resp);
+				resp.close();
 				return 0;
 			}
 
-			Header header = resp.getFirstHeader(HEADER_ERROR);
-			if (header != null) {
-
-				if (header.getValue().equals(F_ERROR_INFO)) {
-					// This is a warning so pretend we succeeded.
+			String errorHeader = resp.getFirstHeader(HEADER_ERROR);
+			if (errorHeader != null) {
+				if (errorHeader.equals(F_ERROR_INFO)) {
+					// 警告なので成功扱い
 					nUploaded++;
-
 					if (!keepUploaded) {
 						files.get(i).delete();
 					}
-
 					printContent(resp);
 				} else {
 					printContent(resp);
 				}
 			} else {
-				// Save the version for requests. Will help prevent bad bones.
-				header = resp.getFirstHeader(HEADER_NETHACKVER);
-				if (header != null) {
-					ed.putString(HEADER_NETHACKVER, header.getValue());
+				// バージョン情報を保存
+				String nethackVer = resp.getFirstHeader(HEADER_NETHACKVER);
+				if (nethackVer != null) {
+					ed.putString(HEADER_NETHACKVER, nethackVer);
 				}
 				Log.print("Uploaded " + currentFileName);
 				nUploaded++;
@@ -526,13 +485,12 @@ public class Hearse {
 					files.get(i).delete();
 				}
 
-				header = resp.getFirstHeader(HEADER_MOTD);
-				if (header != null) {
-					Log.print(header.getName() + ":" + header.getValue()); //@todo output this to screen
+				String motd = resp.getFirstHeader(HEADER_MOTD);
+				if (motd != null) {
+					Log.print(HEADER_MOTD + ":" + motd);
 				}
-
 			}
-			consumeContent(resp);
+			resp.close();
 		}
 
 		ed.commit();
@@ -579,38 +537,45 @@ public class Hearse {
 		return results;
 	}
 
-	private HttpResponse doGet(String baseUrl, String action, List<Header> headers) throws IOException {
-		HttpGet httpGet = new HttpGet(baseUrl + action);
-
-		httpGet.setHeaders(headers.toArray(new Header[headers.size()]));
-		httpGet.addHeader(HEADER_HEARSE_CRC, HEARSE_CRC);
-		httpGet.addHeader(HEADER_CLIENT, CLIENT_ID);
-
-		//making GET request.
-		HttpResponse response = httpClient.execute(httpGet);
-		// write response to log
-		Log.print("Http Get Response:" + response.toString());
-		return response;
+	private HearseResponse doGet(String baseUrl, String action, Map<String, String> headers)
+			throws IOException {
+		URL url = new URL(baseUrl + action);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestMethod("GET");
+		// 共通ヘッダー
+		conn.setRequestProperty(HEADER_HEARSE_CRC, HEARSE_CRC);
+		conn.setRequestProperty(HEADER_CLIENT, CLIENT_ID);
+		// 呼び出し元から渡されたヘッダー
+		for (Map.Entry<String, String> entry : headers.entrySet()) {
+			conn.setRequestProperty(entry.getKey(), entry.getValue());
+		}
+		conn.connect();
+		Log.print("Http Get Response: " + conn.getResponseCode());
+		return new HearseResponse(conn);
 	}
 
-	private HttpResponse doPost(String baseUrl, String action, List<Header> headers, byte[] data) throws IOException {
-
-		HttpPost httpPost = new HttpPost(baseUrl + action);
-
-
-		httpPost.setHeaders(headers.toArray(new Header[headers.size()]));
-		httpPost.addHeader(HEADER_HEARSE_CRC, HEARSE_CRC);
-		httpPost.addHeader(HEADER_CLIENT, CLIENT_ID);
-		if (data != null) {
-			ByteArrayEntity entity = new ByteArrayEntity(data);
-			httpPost.setEntity(entity);
+	private HearseResponse doPost(String baseUrl, String action, Map<String, String> headers,
+			byte[] data) throws IOException {
+		URL url = new URL(baseUrl + action);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestMethod("POST");
+		// 共通ヘッダー
+		conn.setRequestProperty(HEADER_HEARSE_CRC, HEARSE_CRC);
+		conn.setRequestProperty(HEADER_CLIENT, CLIENT_ID);
+		// 呼び出し元から渡されたヘッダー
+		for (Map.Entry<String, String> entry : headers.entrySet()) {
+			conn.setRequestProperty(entry.getKey(), entry.getValue());
 		}
-
-		//making POST request.
-		HttpResponse response = httpClient.execute(httpPost);
-		// write response to log
-		Log.print("Http Post Response:" + response.toString());
-		return response;
+		if (data != null) {
+			conn.setDoOutput(true);
+			conn.setRequestProperty("Content-Length", String.valueOf(data.length));
+			try (OutputStream os = conn.getOutputStream()) {
+				os.write(data);
+			}
+		}
+		conn.connect();
+		Log.print("Http Post Response: " + conn.getResponseCode());
+		return new HearseResponse(conn);
 	}
 
 	private boolean isValidBonesFileName(String name) {
@@ -624,43 +589,54 @@ public class Hearse {
 	private void changeUserInfo() throws IOException {
 		Log.print("Hearse updating user info: " + userNick + ", " + userEmail);
 
-		List<Header> headerList = new ArrayList<Header>();
+		Map<String, String> headerMap = new LinkedHashMap<>();
+		headerMap.put(HEADER_EMAIL, userEmail);
+		headerMap.put(HEADER_NICK, userNick);
+		headerMap.put(HEADER_TOKEN, userToken);
 
-		headerList.add(new BasicHeader(HEADER_EMAIL, userEmail));
-
-		headerList.add(new BasicHeader(HEADER_NICK, userNick));
-
-		headerList.add(new BasicHeader(HEADER_TOKEN, userToken));
-
-		HttpResponse resp = doGet(BASE_URL, UPDATE_USER, headerList);
+		HearseResponse resp = doGet(BASE_URL, UPDATE_USER, headerMap);
 
 		if (resp.getFirstHeader(HEADER_HEARSE) != null && resp.getFirstHeader(HEADER_ERROR) != null) {
-
 			printContent(resp);
 		}
 
-		consumeContent(resp);
+		resp.close();
 	}
 
-	private void consumeContent(HttpResponse resp)
-	{
-		try {
-			HttpEntity entity = resp.getEntity();
-			if(entity != null)
-				entity.consumeContent();
-		} catch(IOException e) {
-			e.printStackTrace();
+	/**
+	 * HttpURLConnection を HttpResponse 風に扱うための内部ラッパークラス。
+	 * cz.msebera.android.httpclient を廃止し、尚標準ライブラリのみで実装する。
+	 */
+	private static class HearseResponse {
+		private final HttpURLConnection conn;
+
+		HearseResponse(HttpURLConnection conn) {
+			this.conn = conn;
+		}
+
+		/** 指定名のレスポンスヘッダ値を返す。存在しない場合は null。 */
+		String getFirstHeader(String name) {
+			return conn.getHeaderField(name);
+		}
+
+		/** レスポンスボディの InputStream。エラー時は ErrorStream。 */
+		InputStream getInputStream() throws IOException {
+			int code = conn.getResponseCode();
+			return (code >= 400) ? conn.getErrorStream() : conn.getInputStream();
+		}
+
+		/** 接続を閉じる（consumeContent の代替）。 */
+		void close() {
+			conn.disconnect();
 		}
 	}
 
-	private void printContent(HttpResponse resp) {
-		try {
-			HttpEntity entity = resp.getEntity();
-			BufferedReader in = new BufferedReader(new InputStreamReader(entity.getContent()));
+	private void printContent(HearseResponse resp) {
+		try (BufferedReader in = new BufferedReader(new InputStreamReader(resp.getInputStream()))) {
 			StringBuilder message = new StringBuilder();
 			String line;
 			while ((line = in.readLine()) != null) {
-				if(message.length() > 0)
+				if (message.length() > 0)
 					message.append('\n');
 				message.append(line);
 			}
