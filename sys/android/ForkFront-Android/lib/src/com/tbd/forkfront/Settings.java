@@ -10,8 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceScreen;
 
-public class Settings extends AppCompatActivity
+public class Settings extends AppCompatActivity implements PreferenceFragmentCompat.OnPreferenceStartScreenCallback
 {
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -40,7 +41,21 @@ public class Settings extends AppCompatActivity
 			fragment.handleActivityResult(requestCode, resultCode, data);
 		}
 	}
+	@Override
+	public boolean onPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref)
+	{
+		SettingsFragment fragment = new SettingsFragment();
+		Bundle args = new Bundle();
+		args.putString(PreferenceFragmentCompat.ARG_PREFERENCE_ROOT, pref.getKey());
+		fragment.setArguments(args);
 
+		getSupportFragmentManager()
+				.beginTransaction()
+				.replace(R.id.settings_container, fragment)
+				.addToBackStack(pref.getKey())
+				.commit();
+		return true;
+	}
 	public static class SettingsFragment extends PreferenceFragmentCompat implements OnSharedPreferenceChangeListener
 	{
 		private TilesetPreference mTilesetPref;
