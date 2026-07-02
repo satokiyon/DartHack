@@ -32,7 +32,8 @@
 		</activity>
 		<activity
 			android:name="com.tbd.forkfront.Settings"
-			android:label="NetHackJP Settings">
+			android:label="NetHackJP Settings"
+			android:theme="@style/Theme.AppCompat">
 		</activity>
 	</application>
 </manifest>
