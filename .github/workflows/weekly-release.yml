@@ -1,9 +1,9 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13.
-name: Daily Release
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-02.
+name: Weekly Release
 
 on:
   schedule:
-    - cron: '0 18 * * *' # AM 03:00 JST (UTC 18:00)
+    - cron: '0 18 * * SAT' # AM 03:00 JST (UTC 18:00)
   workflow_dispatch:
 
 jobs:
@@ -54,7 +54,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG_NAME }}
-          name: NetHackJP 5.0.0 Daily Build (${{ env.DATE_STR }})
+          name: NetHackJP 5.0.0 Weekly Build (${{ env.DATE_STR }})
           body_path: release_readme.txt
           generate_release_notes: true
           files: ${{ env.ZIP_PATH }}
