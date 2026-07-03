@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-03. */
 /* NetHack 5.0	restore.c	$NHDT-Date: 1781973064 2026/06/20 16:31:04 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.265 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -1141,7 +1141,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
     Sfi_dest_area(nhfp, &svu.updest, "lev-updest");
     Sfi_dest_area(nhfp, &svd.dndest, "lev-dndest");
     Sfi_levelflags(nhfp, &svl.level.flags, "lev-level_flags");
-    rest_adjust_levelflags();
+    rest_adjust_levelflags(elapsed);
     if (svd.doors) {
         free(svd.doors);
         svd.doors = 0;
@@ -1349,11 +1349,13 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
 }
 
 void
-rest_adjust_levelflags(void)
+rest_adjust_levelflags(long elapsed)
 {
     /* adjust timestamps */
     relative_time_to_moves(&svl.level.flags.stasis_until);
+    svl.level.flags.stasis_until -= elapsed;
 }
+
 void
 moves_to_relative_time(long *timestamp)
 {
