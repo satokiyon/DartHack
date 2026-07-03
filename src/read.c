@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-03. */
 /* NetHack 5.0	read.c	$NHDT-Date: 1782083451 2026/06/21 18:10:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.334 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -254,7 +254,7 @@ jp_tshirt_text_for_display(struct obj *tshirt, char *buf)
         "連続昇天者",
         "真の男はワルキューレだ",
         "若者洞窟掘削協会",
-        "占拠せよフォート・ルーディオス",
+        "占拠せよフォート・ローディオス",
         "このTシャツは高くて買えなかったので盗んだ!",
         "マインドフレイヤーなんて大嫌いだ",
         "私はズボンをはいていない",
