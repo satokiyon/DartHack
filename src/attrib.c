@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-03. */
 /* NetHack 5.0	attrib.c	$NHDT-Date: 1781973041 2026/06/20 16:30:41 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.142 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -647,7 +647,7 @@ static NEARDATA const char *const exertext[A_MAX][2] = {
     { "熱心に鍛えていた", "きちんと鍛えていなかった" },           /* Str */
     { 0, 0 },                                                     /* Int */
     { "注意深く観察していた", "注意を払っていなかった" },           /* Wis */
-    { "反射神経を鍛えていた", "最近は反射神経を鍛えていなかった" }, /* Dex */
+    { "反射神経を鍛えていた", "反射神経を鍛えていなかった" },       /* Dex */
     { "健康的に暮らしていた", "健康管理を怠っていた" },             /* Con */
     { 0, 0 },                                                     /* Cha */
 };
