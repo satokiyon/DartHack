@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-04. */
 /* NetHack 5.0	do.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.411 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -962,8 +962,8 @@ better_not_try_to_drop_that(struct obj *otmp)
     if (otmp->otyp == CORPSE && !u_safe_from_fatal_corpse(otmp, st_all)) {
         Snprintf(
             buf, sizeof buf,
-            "Drop the %s corpse without %s protection on?",
-            obj_pmname(otmp), jp_body_part(HAND));
+            "%sの防護なしで%sの死体を置きますか?",
+            jp_body_part(HAND), obj_pmname(otmp));
         return (paranoid_ynq(TRUE, buf, FALSE) != 'y');
     }
     return FALSE;
@@ -999,7 +999,7 @@ menu_drop(int retry)
         all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
-        n = query_category("Drop what type of items?", gi.invent,
+        n = query_category("どの種類のアイテムを置きますか?", gi.invent,
                            (UNPAID_TYPES | ALL_TYPES | CHOOSE_ALL
                             | BUC_BLESSED | BUC_CURSED | BUC_UNCURSED
                             | BUC_UNKNOWN | JUSTPICKED | INCLUDE_VENOM),
@@ -2040,7 +2040,8 @@ void
 maybe_lvltport_feedback(void)
 {
     if (gd.dfr_post_msg
-        && !strncmpi(gd.dfr_post_msg, "You materialize", 15)) {
+        && (!strncmpi(gd.dfr_post_msg, "You materialize", 15)
+            || !strcmpi(gd.dfr_post_msg, "あなたは別の階に実体化した!"))) {
         /* "You materialize on a different level." */
         pline("%s", gd.dfr_post_msg);
         free((genericptr_t) gd.dfr_post_msg), gd.dfr_post_msg = 0;
@@ -2171,11 +2172,11 @@ revive_corpse(struct obj *corpse)
                 const char *effect = "";
 
                 if (mtmp->data == &mons[PM_DEATH])
-                    effect = " in a whirl of spectral skulls";
+                    effect = "、亡霊のドクロの渦と共に";
                 else if (mtmp->data == &mons[PM_PESTILENCE])
-                    effect = " in a churning pillar of flies";
+                    effect = "、蠢くハエの柱と共に";
                 else if (mtmp->data == &mons[PM_FAMINE])
-                    effect = " in a ring of withered crops";
+                    effect = "、枯れ果てた作物の輪と共に";
 
                 if (canseemon(mtmp)) {
                     pline("うわっ、%sが死体から這い出してきた%s!",
@@ -2183,7 +2184,7 @@ revive_corpse(struct obj *corpse)
                                  : Monnam(mtmp),
                           effect);
                 } else {
-                    pline("%sは煙の中に%s消えた%s!", The(cname), effect);
+                    pline("%sは煙の中に%s消えた!", The(cname), effect);
                 }
             }
             break;
