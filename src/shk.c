@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-04. */
 /* NetHack 5.0	shk.c	$NHDT-Date: 1781973066 2026/06/20 16:31:06 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.323 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1408,7 +1408,7 @@ rouse_shk(struct monst *shkp, boolean verbosely)
     if (helpless(shkp)) {
         /* greed induced recovery... */
         if (verbosely && canspotmon(shkp))
-            pline("%s %s.", jp_shkname_for_display(shkp),
+            pline("%sは%s。", jp_shkname_for_display(shkp),
                   shkp->msleeping ? "目を覚ました" : "再び動けるようになった");
         shkp->msleeping = 0;
         shkp->mfrozen = 0;
@@ -3859,10 +3859,10 @@ stolen_value(
                     You("信用残高がなかった.");
                     return 0;
                 }
-                still = "still ";
+                still = "まだ ";
             }
             Sprintf(buf, "あなたは%s%sに%ld %sの借りがある",
-                    credit_use ? "まだ " : "", jp_shkname_for_display(shkp),
+                    still, jp_shkname_for_display(shkp),
                     value, currency(value));
             if (u_count) /* u_count > 0 implies Has_contents(obj) */
                 Sprintf(eos(buf), "（%sとその中身の分）",
@@ -5430,7 +5430,7 @@ price_quote(struct obj *first_obj)
         return;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    putstr(tmpwin, 0, "Fine goods for sale:");
+    putstr(tmpwin, 0, "販売中の商品:");
     putstr(tmpwin, 0, "");
     for (otmp = first_obj; otmp; otmp = otmp->nexthere) {
         if (otmp->oclass == COIN_CLASS)
