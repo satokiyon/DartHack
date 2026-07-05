@@ -68,7 +68,7 @@ class NetHackScreen extends ChangeNotifier {
   final List<String> _textLines = [];
   List<String> get textLines => _textLines;
   bool _isTextWindowVisible = false;
-  bool get isTextWindowVisible => _isTextWindowVisible;
+  bool get isTextWindowVisible => _isTextWindowVisible && _menuItems.isEmpty;
 
   // メニュー表示用バッファ (NHW_MENU 用)
   final List<MenuItemData> _menuItems = [];
@@ -102,10 +102,11 @@ class NetHackScreen extends ChangeNotifier {
 
   void createWindow(int winId, int type) {
     _winTypes[winId] = type;
-    if (type == nhwText) {
+    if (type == nhwText || type == nhwMenu) {
       _textLines.clear();
       _isTextWindowVisible = true;
-    } else if (type == nhwMenu) {
+    }
+    if (type == nhwMenu) {
       _menuItems.clear();
       _menuPrompt = "";
     }
@@ -121,9 +122,10 @@ class NetHackScreen extends ChangeNotifier {
     } else if (type == nhwStatus) {
       _statusLines[0] = "";
       _statusLines[1] = "";
-    } else if (type == nhwText) {
+    } else if (type == nhwText || type == nhwMenu) {
       _textLines.clear();
-    } else if (type == nhwMenu) {
+    }
+    if (type == nhwMenu) {
       _menuItems.clear();
       _menuPrompt = "";
     }
@@ -133,10 +135,11 @@ class NetHackScreen extends ChangeNotifier {
   void destroyWindow(int winId) {
     final type = _winTypes[winId];
     _winTypes.remove(winId);
-    if (type == nhwText) {
+    if (type == nhwText || type == nhwMenu) {
       _isTextWindowVisible = false;
       _textLines.clear();
-    } else if (type == nhwMenu) {
+    }
+    if (type == nhwMenu) {
       _isMenuWindowVisible = false;
       _menuItems.clear();
       _menuPrompt = "";
@@ -169,7 +172,7 @@ class NetHackScreen extends ChangeNotifier {
         _statusLines[0] = _statusLines[1];
         _statusLines[1] = text;
       }
-    } else if (type == nhwText) {
+    } else if (type == nhwText || type == nhwMenu) {
       _textLines.add(text);
     }
     notifyListeners();

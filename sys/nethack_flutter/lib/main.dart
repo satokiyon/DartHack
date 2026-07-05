@@ -232,20 +232,23 @@ class _MyHomePageState extends State<MyHomePage> {
                       ? "${String.fromCharCode(item.accelerator)} - " 
                       : "";
 
-                  return ListTile(
-                    dense: true,
-                    title: Text(
-                      "$accLabel${item.text}",
-                      style: TextStyle(
-                        color: isSelectable ? Colors.white : Colors.grey,
-                        fontFamily: 'monospace',
-                        fontSize: 14,
-                        fontWeight: isSelectable ? FontWeight.bold : FontWeight.normal,
+                  return Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      dense: true,
+                      title: Text(
+                        "$accLabel${item.text}",
+                        style: TextStyle(
+                          color: isSelectable ? Colors.white : Colors.grey,
+                          fontFamily: 'monospace',
+                          fontSize: 14,
+                          fontWeight: isSelectable ? FontWeight.bold : FontWeight.normal,
+                        ),
                       ),
+                      onTap: isSelectable
+                          ? () => _sendMenuSelection(item.ident)
+                          : null,
                     ),
-                    onTap: isSelectable
-                        ? () => _sendMenuSelection(item.ident)
-                        : null,
                   );
                 },
               ),
