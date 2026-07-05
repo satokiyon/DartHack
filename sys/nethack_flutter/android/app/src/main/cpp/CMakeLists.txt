@@ -163,10 +163,11 @@ set(NETHACK_CORE_SOURCES
 set(NETHACK_OS_SOURCES
     "${NHSROOT}/sys/share/ioctl.c"
     "${NHSROOT}/sys/share/unixtty.c"
-    "${NHSROOT}/sys/share/posixregex.c" # 正規表現ライブラリソースを追加
+    "${NHSROOT}/sys/share/posixregex.c"
     "${NHSROOT}/sys/android/androidmain.c"
     "${NHSROOT}/sys/android/androidunix.c"
     "${NHSROOT}/sys/android/winandroid.c"
+    "winflutter.c"
 )
 
 # Lua 5.4.8 Sources (excluding standalone executables lua.c and luac.c)

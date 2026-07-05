@@ -88,7 +88,10 @@ class _MyHomePageState extends State<MyHomePage> {
         if (type == 'ready') {
           _workerSendPort = message['sendPort'];
           _addLog("Worker Isolate Ready. Starting Game...");
-          _workerSendPort?.send({'type': 'start'});
+          _workerSendPort?.send({
+            'type': 'start',
+            'assetsPath': _assetsPath,
+          });
         } else if (type == 'print') {
           _addLog(message['message']);
         } else if (type == 'request_input') {

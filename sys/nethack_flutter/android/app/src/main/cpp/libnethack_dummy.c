@@ -12,8 +12,10 @@
 #endif
 
 typedef void (*PrintCallback)(const char* message);
+typedef void (*DartNotifyInputCallback)(int requestId);
 
 static PrintCallback g_print_callback = NULL;
+static DartNotifyInputCallback g_input_callback = NULL;
 static volatile int g_next_key = 0;
 static volatile int g_input_request_id = 0;
 static volatile int g_thread_running = 0;
@@ -30,6 +32,23 @@ DLL_EXPORT int get_input_request_id() {
     return g_input_request_id;
 }
 
+// ----------------------------------------------------
+// Flutter-compatible APIs (for seamless local Windows testing)
+// ----------------------------------------------------
+
+DLL_EXPORT void RegisterFlutterCallbacks(PrintCallback print_cb, DartNotifyInputCallback input_cb) {
+    g_print_callback = print_cb;
+    g_input_callback = input_cb;
+}
+
+DLL_EXPORT void SendKeyToFlutter(int key) {
+    g_next_key = key;
+}
+
+DLL_EXPORT int GetFlutterInputRequestId() {
+    return g_input_request_id;
+}
+
 void run_dummy_game_loop() {
     g_thread_running = 1;
     if (g_print_callback) {
@@ -41,6 +60,9 @@ void run_dummy_game_loop() {
     while (g_thread_running) {
         // Increment input request ID to notify Dart
         g_input_request_id++;
+        if (g_input_callback) {
+            g_input_callback(g_input_request_id);
+        }
 
         // Wait for key from Dart
         while (g_next_key == 0 && g_thread_running) {
@@ -81,6 +103,10 @@ DLL_EXPORT void start_dummy_game() {
     if (g_thread_running) return;
     CreateThread(NULL, 0, thread_func, NULL, 0, NULL);
 }
+DLL_EXPORT void StartNetHackFlutter(const char* path, const char* username) {
+    if (g_thread_running) return;
+    CreateThread(NULL, 0, thread_func, NULL, 0, NULL);
+}
 DLL_EXPORT void stop_dummy_game() {
     g_thread_running = 0;
 }
@@ -90,6 +116,12 @@ void* thread_func(void* arg) {
     return NULL;
 }
 DLL_EXPORT void start_dummy_game() {
+    if (g_thread_running) return;
+    pthread_t thread;
+    pthread_create(&thread, NULL, thread_func, NULL);
+    pthread_detach(thread);
+}
+DLL_EXPORT void StartNetHackFlutter(const char* path, const char* username) {
     if (g_thread_running) return;
     pthread_t thread;
     pthread_create(&thread, NULL, thread_func, NULL);

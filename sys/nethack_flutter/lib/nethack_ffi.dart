@@ -1,49 +1,61 @@
-import 'dart:ffi' as ffi;
+import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
-// C関数の型定義
-typedef RegisterPrintCallbackC = ffi.Void Function(ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Utf8>)>> callback);
-typedef RegisterPrintCallbackDart = void Function(ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Utf8>)>> callback);
+// コールバックの型定義
+typedef PrintCallback = Void Function(Pointer<Utf8> msg);
+typedef NotifyInputCallback = Void Function(Int32 requestId);
 
-typedef StartDummyGameC = ffi.Void Function();
-typedef StartDummyGameDart = void Function();
+// C側起動関数
+typedef StartNetHackFunc = Void Function(Pointer<Utf8> path, Pointer<Utf8> username);
+typedef StartNetHackDart = void Function(Pointer<Utf8> path, Pointer<Utf8> username);
 
-typedef StopDummyGameC = ffi.Void Function();
-typedef StopDummyGameDart = void Function();
+// コールバック登録関数
+typedef RegisterCallbacksFunc = Void Function(
+  Pointer<NativeFunction<PrintCallback>> printCb,
+  Pointer<NativeFunction<NotifyInputCallback>> inputCb,
+);
+typedef RegisterCallbacksDart = void Function(
+  Pointer<NativeFunction<PrintCallback>> printCb,
+  Pointer<NativeFunction<NotifyInputCallback>> inputCb,
+);
 
-typedef SendKeyToCC = ffi.Void Function(ffi.Int32 key);
-typedef SendKeyToCDart = void Function(int key);
+// キー送信
+typedef SendKeyFunc = Void Function(Int32 key);
+typedef SendKeyDart = void Function(int key);
 
-typedef GetInputRequestIdC = ffi.Int32 Function();
+// カウンタ取得
+typedef GetInputRequestIdFunc = Int32 Function();
 typedef GetInputRequestIdDart = int Function();
 
-class NetHackFFI {
-  final ffi.DynamicLibrary dyLib;
-  late final RegisterPrintCallbackDart registerPrintCallback;
-  late final StartDummyGameDart startDummyGame;
-  late final StopDummyGameDart stopDummyGame;
-  late final SendKeyToCDart sendKeyToC;
+class NetHackFfi {
+  late final DynamicLibrary _lib;
+  late final StartNetHackDart startNetHack;
+  late final RegisterCallbacksDart registerCallbacks;
+  late final SendKeyDart sendKeyToC;
   late final GetInputRequestIdDart getInputRequestId;
 
-  NetHackFFI(this.dyLib) {
-    registerPrintCallback = dyLib
-        .lookup<ffi.NativeFunction<RegisterPrintCallbackC>>('register_print_callback')
-        .asFunction<RegisterPrintCallbackDart>();
+  NetHackFfi() {
+    try {
+      _lib = DynamicLibrary.open('libnethack.so');
+    } catch (_) {
+      // Windows デバッグ用フォールバック
+      _lib = DynamicLibrary.open('nethack_dummy.dll');
+    }
 
-    startDummyGame = dyLib
-        .lookup<ffi.NativeFunction<StartDummyGameC>>('start_dummy_game')
-        .asFunction<StartDummyGameDart>();
+    startNetHack = _lib
+        .lookup<NativeFunction<StartNetHackFunc>>('StartNetHackFlutter')
+        .asFunction();
 
-    stopDummyGame = dyLib
-        .lookup<ffi.NativeFunction<StopDummyGameC>>('stop_dummy_game')
-        .asFunction<StopDummyGameDart>();
+    registerCallbacks = _lib
+        .lookup<NativeFunction<RegisterCallbacksFunc>>('RegisterFlutterCallbacks')
+        .asFunction();
 
-    sendKeyToC = dyLib
-        .lookup<ffi.NativeFunction<SendKeyToCC>>('send_key_to_c')
-        .asFunction<SendKeyToCDart>();
+    sendKeyToC = _lib
+        .lookup<NativeFunction<SendKeyFunc>>('SendKeyToFlutter')
+        .asFunction();
 
-    getInputRequestId = dyLib
-        .lookup<ffi.NativeFunction<GetInputRequestIdC>>('get_input_request_id')
-        .asFunction<GetInputRequestIdDart>();
+    getInputRequestId = _lib
+        .lookup<NativeFunction<GetInputRequestIdFunc>>('GetFlutterInputRequestId')
+        .asFunction();
   }
 }
