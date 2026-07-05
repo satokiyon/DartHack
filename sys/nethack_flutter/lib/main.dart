@@ -1,10 +1,15 @@
 import 'dart:isolate';
 import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'nethack_assets.dart';
 import 'nethack_screen.dart';
 import 'nethack_worker.dart';
+import 'nethack_map_painter.dart';
+import 'nethack_dpad.dart';
+import 'nethack_cmd_panel.dart';
+import 'nethack_keyboard.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,9 +22,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'NetHackJP Flutter Port',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+      theme: ThemeData.dark(useMaterial3: true).copyWith(
+        colorScheme: const ColorScheme.dark(
+          primary: Colors.deepPurple,
+          secondary: Colors.amber,
+        ),
       ),
       home: const MyHomePage(),
     );
@@ -35,7 +42,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<String> _logs = [];
-  final TextEditingController _inputController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final NetHackScreen _screen = NetHackScreen();
   
@@ -45,12 +51,18 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _assetsReady = false;
   String _assetsPath = '';
 
+  // タイルセット用変数
+  ui.Image? _tileImage;
+  bool _useTiles = true; // デフォルトでタイル表示を有効化
+  int _tileSize = 32;
+  String _selectedTileset = 'nevanda_32x32';
+  bool _isKeyboardVisible = true; // デフォルトで仮想キーボードを表示
+
   @override
   void initState() {
     super.initState();
     _focusNode.addListener(() {
-      if (!_focusNode.hasFocus && _isGameRunning && _waitingForInput) {
-        // キーボードフォーカスを失わないようにする
+      if (!_focusNode.hasFocus && _isGameRunning && _waitingForInput && !_isKeyboardVisible) {
         _focusNode.requestFocus();
       }
     });
@@ -66,8 +78,33 @@ class _MyHomePageState extends State<MyHomePage> {
         _assetsReady = true;
       });
       _addLog("Assets initialized at: $_assetsPath");
+      // タイル画像のロード
+      await _loadTileset(_selectedTileset);
     } catch (e) {
       _addLog("Error initializing assets: $e");
+    }
+  }
+
+  Future<ui.Image> _loadTileImageFromAsset(String assetPath) async {
+    final data = await rootBundle.load(assetPath);
+    final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+    final frame = await codec.getNextFrame();
+    return frame.image;
+  }
+
+  Future<void> _loadTileset(String tilesetName) async {
+    _addLog("Loading tileset: $tilesetName...");
+    try {
+      final size = tilesetName.contains('32x32') ? 32 : (tilesetName.contains('15x25') ? 15 : 16);
+      final img = await _loadTileImageFromAsset('assets/tiles/$tilesetName.png');
+      setState(() {
+        _tileImage = img;
+        _tileSize = size;
+        _selectedTileset = tilesetName;
+      });
+      _addLog("Tileset loaded successfully: $tilesetName");
+    } catch (e) {
+      _addLog("Failed to load tileset $tilesetName: $e");
     }
   }
 
@@ -127,7 +164,9 @@ class _MyHomePageState extends State<MyHomePage> {
           setState(() {
             _waitingForInput = true;
           });
-          _focusNode.requestFocus();
+          if (!_isKeyboardVisible) {
+            _focusNode.requestFocus();
+          }
         } else if (type == 'startMenu') {
           _screen.startMenu(message['winId']);
         } else if (type == 'addMenu') {
@@ -166,11 +205,9 @@ class _MyHomePageState extends State<MyHomePage> {
     // メニュー表示中は、メニューショートカットキー判定を行う
     if (_screen.isMenuWindowVisible) {
       if (code == 32 || code == 10 || code == 13 || code == 27) {
-        // Space, Enter, ESC はキャンセル
         _sendMenuSelection(-1);
         return;
       }
-      // accelerator との一致を確認
       for (final item in _screen.menuItems) {
         if (item.accelerator != 0 && item.accelerator == code) {
           _sendMenuSelection(item.ident);
@@ -204,6 +241,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildMenuOverlay() {
+    // 拡張コマンド選択のメタコマンド（#や?など）をフィルタリングして除外する（開発制約 9）
+    final filteredItems = _screen.menuItems.where((item) {
+      final text = item.text.trim();
+      return !text.startsWith('#') && !text.startsWith('?');
+    }).toList();
+
     return Positioned.fill(
       child: Container(
         color: Colors.black.withValues(alpha: 0.95),
@@ -224,9 +267,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
             Expanded(
               child: ListView.builder(
-                itemCount: _screen.menuItems.length,
+                itemCount: filteredItems.length,
                 itemBuilder: (context, index) {
-                  final item = _screen.menuItems[index];
+                  final item = filteredItems[index];
                   final isSelectable = item.ident != 0;
                   final accLabel = item.accelerator != 0 
                       ? "${String.fromCharCode(item.accelerator)} - " 
@@ -236,6 +279,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.transparent,
                     child: ListTile(
                       dense: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
                       title: Text(
                         "$accLabel${item.text}",
                         style: TextStyle(
@@ -275,94 +319,77 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context, _) {
         return Stack(
           children: [
-            Container(
-              color: Colors.black,
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 1. メッセージ領域 (直近3行)
-                  Container(
-                    height: 60,
-                    width: double.infinity,
-                    color: Colors.black,
-                    child: Text(
-                      _screen.messages.isEmpty
-                          ? ""
-                          : _screen.messages.sublist(
-                              _screen.messages.length > 3 ? _screen.messages.length - 3 : 0
-                            ).join("\n"),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'monospace',
-                        fontSize: 14,
-                      ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 1. メッセージ領域
+                Container(
+                  height: 54,
+                  width: double.infinity,
+                  color: Colors.black,
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  child: Text(
+                    _screen.messages.isEmpty
+                        ? ""
+                        : _screen.messages.sublist(
+                            _screen.messages.length > 3 ? _screen.messages.length - 3 : 0
+                          ).join("\n"),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'monospace',
+                      fontSize: 13,
                     ),
                   ),
-                  const Divider(color: Colors.grey),
-                  // 2. マップグリッド領域 (21行 x 80列)
-                  Expanded(
-                    child: Center(
-                      child: FittedBox(
-                        fit: BoxFit.contain,
-                        child: Container(
-                          width: 80 * 8.5,
-                          height: 21 * 16.0,
-                          color: Colors.black,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: List.generate(NetHackScreen.mapRows, (row) {
-                              return Row(
-                                children: List.generate(NetHackScreen.mapCols, (col) {
-                                  final glyph = _screen.mapGrid[row][col];
-                                  Color textColor = Color(glyph.color | 0xFF000000);
-                                  if (glyph.color == 0) {
-                                    textColor = Colors.white;
-                                  }
-                                  
-                                  return SizedBox(
-                                    width: 8.5,
-                                    height: 16.0,
-                                    child: Center(
-                                      child: Text(
-                                        glyph.char,
-                                        style: TextStyle(
-                                          color: textColor,
-                                          fontFamily: 'monospace',
-                                          fontSize: 14,
-                                          fontWeight: (glyph.special & 0x01 != 0)
-                                              ? FontWeight.bold
-                                              : FontWeight.normal,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }),
-                              );
-                            }),
+                ),
+                const Divider(color: Colors.white12, height: 1),
+                // 2. マップ描画（タイル/ASCII の CustomPaint）
+                Expanded(
+                  child: Container(
+                    color: Colors.black,
+                    child: InteractiveViewer(
+                      maxScale: 6.0,
+                      minScale: 0.5,
+                      child: Center(
+                        child: CustomPaint(
+                          size: const Size(80 * 16.0, 21 * 16.0), // アスペクト比を固定
+                          painter: NetHackMapPainter(
+                            screen: _screen,
+                            tileImage: _tileImage,
+                            tileSize: _tileSize,
+                            useTiles: _useTiles,
                           ),
                         ),
                       ),
                     ),
                   ),
-                  const Divider(color: Colors.grey),
-                  // 3. ステータス領域 (2行)
-                  Container(
-                    height: 40,
-                    width: double.infinity,
-                    color: Colors.black,
-                    child: Text(
-                      _screen.statusLines.join("\n"),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'monospace',
-                        fontSize: 14,
-                      ),
+                ),
+                const Divider(color: Colors.white12, height: 1),
+                // 3. ステータス領域
+                Container(
+                  height: 38,
+                  width: double.infinity,
+                  color: Colors.black,
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  child: Text(
+                    _screen.statusLines.join("\n"),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'monospace',
+                      fontSize: 13,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
+            // 移動用の半透明 D-Pad (入力待ちでメニュー等がない場合のみ表示)
+            if (_isGameRunning && _waitingForInput && !_screen.isMenuWindowVisible && !_screen.isTextWindowVisible)
+              Positioned(
+                right: 12,
+                bottom: 12,
+                child: NetHackDPad(
+                  onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                ),
+              ),
             // テキスト/ヘルプウィンドウのオーバーレイ表示
             if (_screen.isTextWindowVisible)
               Positioned.fill(
@@ -379,7 +406,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             style: const TextStyle(
                               color: Colors.white,
                               fontFamily: 'monospace',
-                              fontSize: 14,
+                              fontSize: 13,
                             ),
                           ),
                         ),
@@ -391,7 +418,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           style: TextStyle(
                             color: Colors.amber,
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 15,
                           ),
                         ),
                       ),
@@ -412,7 +439,46 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('NetHackJP Flutter Port'),
+        title: const Text('NetHackJP Flutter'),
+        actions: [
+          if (_isGameRunning) ...[
+            // タイルとASCIIの切り替えトグル
+            IconButton(
+              icon: Icon(_useTiles ? Icons.grid_view : Icons.text_fields),
+              tooltip: _useTiles ? 'Switch to ASCII Map' : 'Switch to Tile Map',
+              onPressed: () {
+                setState(() {
+                  _useTiles = !_useTiles;
+                });
+              },
+            ),
+            // タイルセット選択メニュー
+            if (_useTiles)
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.palette),
+                onSelected: _loadTileset,
+                itemBuilder: (context) => [
+                  const PopupMenuItem(value: 'nevanda_32x32', child: Text('Nevanda (32x32)')),
+                  const PopupMenuItem(value: 'pixelhack_32x32', child: Text('PixelHack (32x32)')),
+                  const PopupMenuItem(value: 'default_16x16', child: Text('Default (16x16)')),
+                  const PopupMenuItem(value: 'geoduck_15x25', child: Text('Geoduck (15x25)')),
+                ],
+              ),
+            // 仮想キーボード表示切り替え
+            IconButton(
+              icon: Icon(_isKeyboardVisible ? Icons.keyboard_hide : Icons.keyboard),
+              tooltip: _isKeyboardVisible ? 'Hide Keyboard' : 'Show Keyboard',
+              onPressed: () {
+                setState(() {
+                  _isKeyboardVisible = !_isKeyboardVisible;
+                });
+                if (!_isKeyboardVisible) {
+                  _focusNode.requestFocus();
+                }
+              },
+            ),
+          ]
+        ],
       ),
       body: KeyboardListener(
         focusNode: _focusNode,
@@ -441,67 +507,54 @@ class _MyHomePageState extends State<MyHomePage> {
             }
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: _isGameRunning
-                    ? _buildGameScreen()
-                    : SingleChildScrollView(
+        child: Column(
+          children: [
+            Expanded(
+              child: _isGameRunning
+                  ? _buildGameScreen()
+                  : Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: SingleChildScrollView(
                         child: Text(
                           _logs.join('\n'),
                           style: const TextStyle(fontFamily: 'monospace'),
                         ),
                       ),
-              ),
-              const SizedBox(height: 16),
-              if (!_isGameRunning)
-                if (!_assetsReady)
-                  const Center(
-                    child: Column(
-                      children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 8),
-                        Text("Preparing assets..."),
-                      ],
                     ),
-                  )
-                else
-                  ElevatedButton(
-                    onPressed: _startGame,
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50),
-                    ),
-                    child: const Text('Start NetHack Game'),
-                  )
-              else
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _inputController,
-                        decoration: InputDecoration(
-                          hintText: _waitingForInput 
-                              ? (_screen.isMenuWindowVisible ? 'Select menu item...' : 'Waiting for key input...')
-                              : 'Game running...',
-                          border: const OutlineInputBorder(),
-                          enabled: _waitingForInput,
+            ),
+            if (!_isGameRunning)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: !_assetsReady
+                    ? const Center(
+                        child: Column(
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(height: 8),
+                            Text("Preparing assets..."),
+                          ],
                         ),
-                        maxLength: 1,
-                        onChanged: (text) {
-                          if (text.isNotEmpty) {
-                            final code = text.codeUnitAt(0);
-                            _sendFfiKey(code, text);
-                            _inputController.clear();
-                          }
-                        },
+                      )
+                    : ElevatedButton(
+                        onPressed: _startGame,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
+                        child: const Text('Start NetHack Game'),
                       ),
-                    ),
-                  ],
-                ),
+              ),
+            // ゲーム進行中の操作盤 (横一列コマンドバー + 仮想キーボード)
+            if (_isGameRunning && _isKeyboardVisible) ...[
+              NetHackCmdPanel(
+                onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
+              ),
+              NetHackKeyboard(
+                onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+              ),
             ],
-          ),
+          ],
         ),
       ),
     );
