@@ -1,5 +1,6 @@
 import 'dart:isolate';
 import 'package:flutter/material.dart';
+import 'nethack_assets.dart';
 import 'nethack_worker.dart';
 
 void main() {
@@ -38,6 +39,28 @@ class _MyHomePageState extends State<MyHomePage> {
   SendPort? _workerSendPort;
   bool _isGameRunning = false;
   bool _waitingForInput = false;
+  bool _assetsReady = false;
+  String _assetsPath = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _initAssets();
+  }
+
+  Future<void> _initAssets() async {
+    _addLog("Initializing game assets...");
+    try {
+      final dstDir = await NetHackAssets.initialize();
+      setState(() {
+        _assetsPath = dstDir.path;
+        _assetsReady = true;
+      });
+      _addLog("Assets initialized at: $_assetsPath");
+    } catch (e) {
+      _addLog("Error initializing assets: $e");
+    }
+  }
 
   void _addLog(String msg) {
     setState(() {
@@ -161,13 +184,24 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             const SizedBox(height: 16),
             if (!_isGameRunning)
-              ElevatedButton(
-                onPressed: _startGame,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                child: const Text('Start Dummy Game'),
-              )
+              if (!_assetsReady)
+                const Center(
+                  child: Column(
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 8),
+                      Text("Preparing assets..."),
+                    ],
+                  ),
+                )
+              else
+                ElevatedButton(
+                  onPressed: _startGame,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
+                  child: const Text('Start Dummy Game'),
+                )
             else
               Row(
                 children: [

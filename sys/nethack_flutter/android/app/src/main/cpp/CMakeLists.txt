@@ -1,12 +1,220 @@
 cmake_minimum_required(VERSION 3.10.2)
+project(nethack VERSION 5.0.0 LANGUAGES C)
 
-project(nethack_dummy VERSION 1.0.0 LANGUAGES C)
+set(NHSROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../../")
 
-add_library(nethack_dummy SHARED
-            libnethack_dummy.c)
+# Compile flags
+add_definitions(
+    -DANDROID
+    -DSND_LIB_ANDROIDSOUND
+    -DAND_GUI
+    -DLINKED_BINS
+    -DHACKLIB
+)
 
-# ログ出力用（必要に応じて）
+# Include directories
+include_directories(
+    "${NHSROOT}/include"
+    "${NHSROOT}/sys/android"
+    "${NHSROOT}/lib/lua-5.4.8/src"
+)
+
+# NetHack C Core Sources
+set(NETHACK_CORE_SOURCES
+    "${NHSROOT}/src/allmain.c"
+    "${NHSROOT}/src/alloc.c"
+    "${NHSROOT}/src/apply.c"
+    "${NHSROOT}/src/artifact.c"
+    "${NHSROOT}/src/attrib.c"
+    "${NHSROOT}/src/ball.c"
+    "${NHSROOT}/src/bones.c"
+    "${NHSROOT}/src/botl.c"
+    "${NHSROOT}/src/calendar.c"
+    "${NHSROOT}/src/cfgfiles.c"
+    "${NHSROOT}/src/cmd.c"
+    "${NHSROOT}/src/coloratt.c"
+    "${NHSROOT}/src/date.c"
+    "${NHSROOT}/src/dbridge.c"
+    "${NHSROOT}/src/decl.c"
+    "${NHSROOT}/src/detect.c"
+    "${NHSROOT}/src/dig.c"
+    "${NHSROOT}/src/display.c"
+    "${NHSROOT}/src/dlb.c"
+    "${NHSROOT}/src/do.c"
+    "${NHSROOT}/src/do_name.c"
+    "${NHSROOT}/src/do_wear.c"
+    "${NHSROOT}/src/dog.c"
+    "${NHSROOT}/src/dogmove.c"
+    "${NHSROOT}/src/dokick.c"
+    "${NHSROOT}/src/dothrow.c"
+    "${NHSROOT}/src/drawing.c"
+    "${NHSROOT}/src/dungeon.c"
+    "${NHSROOT}/src/earlyarg.c"
+    "${NHSROOT}/src/eat.c"
+    "${NHSROOT}/src/end.c"
+    "${NHSROOT}/src/engrave.c"
+    "${NHSROOT}/src/exper.c"
+    "${NHSROOT}/src/explode.c"
+    "${NHSROOT}/src/extralev.c"
+    "${NHSROOT}/src/files.c"
+    "${NHSROOT}/src/fountain.c"
+    "${NHSROOT}/src/hack.c"
+    "${NHSROOT}/src/hacklib.c"
+    "${NHSROOT}/src/getpos.c"
+    "${NHSROOT}/src/glyphs.c"
+    "${NHSROOT}/src/iactions.c"
+    "${NHSROOT}/src/insight.c"
+    "${NHSROOT}/src/invent.c"
+    "${NHSROOT}/src/isaac64.c"
+    "${NHSROOT}/src/light.c"
+    "${NHSROOT}/src/lock.c"
+    "${NHSROOT}/src/mail.c"
+    "${NHSROOT}/src/makemon.c"
+    "${NHSROOT}/src/mcastu.c"
+    "${NHSROOT}/src/mdlib.c"
+    "${NHSROOT}/src/mhitm.c"
+    "${NHSROOT}/src/mhitu.c"
+    "${NHSROOT}/src/minion.c"
+    "${NHSROOT}/src/mklev.c"
+    "${NHSROOT}/src/mkmap.c"
+    "${NHSROOT}/src/mkmaze.c"
+    "${NHSROOT}/src/mkobj.c"
+    "${NHSROOT}/src/mkroom.c"
+    "${NHSROOT}/src/mon.c"
+    "${NHSROOT}/src/mondata.c"
+    "${NHSROOT}/src/monmove.c"
+    "${NHSROOT}/src/monst.c"
+    "${NHSROOT}/src/mplayer.c"
+    "${NHSROOT}/src/mthrowu.c"
+    "${NHSROOT}/src/muse.c"
+    "${NHSROOT}/src/music.c"
+    "${NHSROOT}/src/nhlobj.c"
+    "${NHSROOT}/src/nhlsel.c"
+    "${NHSROOT}/src/nhlua.c"
+    "${NHSROOT}/src/nhmd4.c"
+    "${NHSROOT}/src/o_init.c"
+    "${NHSROOT}/src/objects.c"
+    "${NHSROOT}/src/objnam.c"
+    "${NHSROOT}/src/options.c"
+    "${NHSROOT}/src/pager.c"
+    "${NHSROOT}/src/pickup.c"
+    "${NHSROOT}/src/pline.c"
+    "${NHSROOT}/src/polyself.c"
+    "${NHSROOT}/src/potion.c"
+    "${NHSROOT}/src/pray.c"
+    "${NHSROOT}/src/priest.c"
+    "${NHSROOT}/src/quest.c"
+    "${NHSROOT}/src/questpgr.c"
+    "${NHSROOT}/src/read.c"
+    "${NHSROOT}/src/rect.c"
+    "${NHSROOT}/src/region.c"
+    "${NHSROOT}/src/report.c"
+    "${NHSROOT}/src/restore.c"
+    "${NHSROOT}/src/revision.c"
+    "${NHSROOT}/src/rip.c"
+    "${NHSROOT}/src/rnd.c"
+    "${NHSROOT}/src/role.c"
+    "${NHSROOT}/src/rumors.c"
+    "${NHSROOT}/src/save.c"
+    "${NHSROOT}/src/selvar.c"
+    "${NHSROOT}/src/sfbase.c"
+    "${NHSROOT}/src/sfstruct.c"
+    "${NHSROOT}/src/shk.c"
+    "${NHSROOT}/src/shknam.c"
+    "${NHSROOT}/src/sit.c"
+    "${NHSROOT}/src/sounds.c"
+    "${NHSROOT}/src/sp_lev.c"
+    "${NHSROOT}/src/spell.c"
+    "${NHSROOT}/src/stairs.c"
+    "${NHSROOT}/src/steal.c"
+    "${NHSROOT}/src/steed.c"
+    "${NHSROOT}/src/strutil.c"
+    "${NHSROOT}/src/symbols.c"
+    "${NHSROOT}/src/sys.c"
+    "${NHSROOT}/src/teleport.c"
+    "${NHSROOT}/src/timeout.c"
+    "${NHSROOT}/src/topten.c"
+    "${NHSROOT}/src/track.c"
+    "${NHSROOT}/src/trap.c"
+    "${NHSROOT}/src/u_init.c"
+    "${NHSROOT}/src/utf8map.c"
+    "${NHSROOT}/src/uhitm.c"
+    "${NHSROOT}/src/vault.c"
+    "${NHSROOT}/src/version.c"
+    "${NHSROOT}/src/vision.c"
+    "${NHSROOT}/src/weapon.c"
+    "${NHSROOT}/src/were.c"
+    "${NHSROOT}/src/wield.c"
+    "${NHSROOT}/src/windows.c"
+    "${NHSROOT}/src/wizard.c"
+    "${NHSROOT}/src/wizcmds.c"
+    "${NHSROOT}/src/worm.c"
+    "${NHSROOT}/src/worn.c"
+    "${NHSROOT}/src/write.c"
+    "${NHSROOT}/src/zap.c"
+    "${NHSROOT}/src/jp_data_lookup.c"
+    "${NHSROOT}/src/mon_jp.c"
+    "${NHSROOT}/src/obj_jp.c"
+    "${NHSROOT}/src/spell_jp.c"
+    "${NHSROOT}/src/tile.c"
+)
+
+# OS & Window Port Sources
+set(NETHACK_OS_SOURCES
+    "${NHSROOT}/sys/share/ioctl.c"
+    "${NHSROOT}/sys/share/unixtty.c"
+    "${NHSROOT}/sys/share/posixregex.c" # 正規表現ライブラリソースを追加
+    "${NHSROOT}/sys/android/androidmain.c"
+    "${NHSROOT}/sys/android/androidunix.c"
+    "${NHSROOT}/sys/android/winandroid.c"
+)
+
+# Lua 5.4.8 Sources (excluding standalone executables lua.c and luac.c)
+set(LUA_SOURCES
+    "${NHSROOT}/lib/lua-5.4.8/src/lapi.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lcode.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lctype.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/ldebug.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/ldo.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/ldump.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lfunc.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lgc.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/llex.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lmem.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lobject.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lopcodes.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lparser.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lstate.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lstring.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/ltable.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/ltm.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lundump.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lvm.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lzio.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lauxlib.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lbaselib.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lcorolib.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/ldblib.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/liolib.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lmathlib.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/loadlib.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/loslib.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lstrlib.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/ltablib.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/lutf8lib.c"
+    "${NHSROOT}/lib/lua-5.4.8/src/linit.c"
+)
+
+add_library(nethack SHARED
+    ${NETHACK_CORE_SOURCES}
+    ${NETHACK_OS_SOURCES}
+    ${LUA_SOURCES}
+)
+
 find_library(log-lib log)
-if(log-lib)
-    target_link_libraries(nethack_dummy ${log-lib})
-endif()
+find_library(z-lib z)
+target_link_libraries(nethack
+    ${log-lib}
+    ${z-lib}
+    m
+)
