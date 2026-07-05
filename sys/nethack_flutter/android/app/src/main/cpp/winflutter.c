@@ -63,17 +63,27 @@ static volatile int g_last_received_key = 0;
 static volatile int g_key_available = 0;
 static volatile long g_selected_menu_item = -2; // -2: 未選択, -1: キャンセル
 
-// CP437混在文字列を完全に正しいUTF-8に変換するヘルパー関数 (winandroid.cのcreate_bytearrayと同等のロジック)
+#define NUM_CONV_BUFS 16
+#define CONV_BUF_SIZE 4096
+
+// CP437混在文字列を完全に正しいUTF-8に変換するヘルパー関数 (静的リングバッファで非同期セーフ化)
 static char* convert_cp437_to_utf8(const char* str) {
     if (!str) return NULL;
+
+    static char bufs[NUM_CONV_BUFS][CONV_BUF_SIZE];
+    static int buf_idx = 0;
+
+    char* dst_buf = bufs[buf_idx];
+    buf_idx = (buf_idx + 1) % NUM_CONV_BUFS;
+
     int len = strlen(str);
-    // 最悪の場合、すべてのバイトがCP437から3バイトのUTF-8文字に変換されるため、len * 3 + 1の領域を確保する
-    unsigned char *temp_buf = (unsigned char *)malloc(len * 3 + 1);
-    if (!temp_buf) return NULL;
+    if (len * 3 >= CONV_BUF_SIZE) {
+        return (char*)str; // バッファサイズ超過時はフォールバック
+    }
 
     const unsigned char *p = (const unsigned char *)str;
     const unsigned char *end = p + len;
-    unsigned char *dst = temp_buf;
+    unsigned char *dst = (unsigned char*)dst_buf;
 
     while (p < end) {
         unsigned char c = *p;
@@ -89,7 +99,6 @@ static char* convert_cp437_to_utf8(const char* str) {
         }
 
         if (char_len > 0 && p + char_len <= end) {
-            // 後続バイトが正しいUTF-8パターンか検証する
             int valid = 1;
             for (int i = 1; i < char_len; i++) {
                 if ((p[i] & 0xC0) != 0x80) {
@@ -98,7 +107,6 @@ static char* convert_cp437_to_utf8(const char* str) {
                 }
             }
             if (valid) {
-                // 正しいUTF-8シーケンスはそのままコピー
                 memcpy(dst, p, char_len);
                 dst += char_len;
                 p += char_len;
@@ -106,7 +114,6 @@ static char* convert_cp437_to_utf8(const char* str) {
             }
         }
 
-        // 不正なUTF-8シーケンス、または孤立した非ASCIIバイトはCP437文字としてUnicode経由でUTF-8に変換
         unsigned short unicode_val = cp437_to_unicode[c];
         int encoded_len = 0;
         unsigned char utf8_bytes[4];
@@ -129,7 +136,7 @@ static char* convert_cp437_to_utf8(const char* str) {
     }
 
     *dst = '\0';
-    return (char*)temp_buf;
+    return dst_buf;
 }
 
 // FFI からコールバックを登録する関数
@@ -259,7 +266,6 @@ static void flutter_putstr(winid window, int attr, const char* str) {
     if (g_putstr_cb && str) {
         char* conv = convert_cp437_to_utf8(str);
         g_putstr_cb((int)window, attr, conv ? conv : str);
-        if (conv) free(conv);
     }
 }
 
@@ -268,7 +274,6 @@ static void flutter_raw_print(const char* str) {
     if (g_putstr_cb && str) {
         char* conv = convert_cp437_to_utf8(str);
         g_putstr_cb(WIN_MESSAGE, ATR_NONE, conv ? conv : str);
-        if (conv) free(conv);
     }
 }
 
@@ -277,7 +282,6 @@ static void flutter_raw_print_bold(const char* str) {
     if (g_putstr_cb && str) {
         char* conv = convert_cp437_to_utf8(str);
         g_putstr_cb(WIN_MESSAGE, ATR_BOLD, conv ? conv : str);
-        if (conv) free(conv);
     }
 }
 
@@ -314,7 +318,6 @@ static char flutter_yn_function(const char* question, const char* choices, char 
     if (g_putstr_cb && question) {
         char* conv = convert_cp437_to_utf8(question);
         g_putstr_cb(WIN_MESSAGE, ATR_NONE, conv ? conv : question);
-        if (conv) free(conv);
     }
     
     return (char)flutter_nhgetch();
@@ -325,7 +328,6 @@ static void flutter_getlin(const char* prompt, char* buf) {
     if (g_putstr_cb && prompt) {
         char* conv = convert_cp437_to_utf8(prompt);
         g_putstr_cb(WIN_MESSAGE, ATR_NONE, conv ? conv : prompt);
-        if (conv) free(conv);
     }
     strcpy(buf, "a");
 }
@@ -373,7 +375,6 @@ static void flutter_add_menu(winid wid, const glyph_info *glyphinfo, const anyth
             (itemflags & MENU_ITEMFLAGS_SELECTED) ? 1 : 0,
             color
         );
-        if (conv) free(conv);
     }
 }
 
@@ -382,7 +383,6 @@ static void flutter_end_menu(winid wid, const char *prompt) {
     if (g_end_menu_cb) {
         char* conv = prompt ? convert_cp437_to_utf8(prompt) : NULL;
         g_end_menu_cb((int)wid, conv ? conv : (prompt ? prompt : ""));
-        if (conv) free(conv);
     }
 }
 
