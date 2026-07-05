@@ -31,12 +31,11 @@ public class EditFilePreference extends Preference implements DialogInterface.On
 	public EditFilePreference(Context context, AttributeSet attrs, int defStyle)
 	{
 		super(context, attrs, defStyle);
-		setSummary("Manually specify options in " + getContext().getResources().getString(R.string.defaultsFile));
 	}
 
 	public EditFilePreference(Context context, AttributeSet attrs)
 	{
-		this(context, attrs, 0);
+		super(context, attrs);
 	}
 
 	private void showDialog()

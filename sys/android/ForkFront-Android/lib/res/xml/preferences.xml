@@ -2,7 +2,9 @@
 <!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. -->
 <PreferenceScreen
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:forkfront="forkfront">
+	xmlns:forkfront="forkfront"
+	android:title="Settings">
+	
 	<PreferenceCategory
 		android:title="Settings"
 		android:key="settings">
@@ -859,7 +861,7 @@
 
 		<com.tbd.forkfront.EditFilePreference
 			android:title="Edit options file"
-			android:summary=""/>
+			android:summary="Manually specify options in defaults.nh"/>
 	
 		<CheckBoxPreference
 			android:title="Use fallback renderer"
