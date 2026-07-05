@@ -35,10 +35,12 @@ class NetHackScreen extends ChangeNotifier {
   final List<String> _statusLines = ["", ""];
   List<String> get statusLines => _statusLines;
 
-  // マップ (21行 x 80列)
   static const int mapRows = 21;
   static const int mapCols = 80;
-  late final List<List<GlyphData>> _mapGrid;
+  final List<List<GlyphData>> _mapGrid = List.generate(
+    mapRows,
+    (_) => List.generate(mapCols, (_) => GlyphData.empty()),
+  );
   List<List<GlyphData>> get mapGrid => _mapGrid;
 
   // テキスト表示用バッファ (NHW_TEXT 用)
@@ -58,15 +60,16 @@ class NetHackScreen extends ChangeNotifier {
   }
 
   void _clearMapGrid() {
-    _mapGrid = List.generate(
-      mapRows,
-      (_) => List.generate(mapCols, (_) => GlyphData.empty()),
-    );
+    for (int r = 0; r < mapRows; r++) {
+      for (int c = 0; c < mapCols; c++) {
+        _mapGrid[r][c] = GlyphData.empty();
+      }
+    }
   }
 
   void createWindow(int winId, int type) {
     _winTypes[winId] = type;
-    if (type == nhwText) {
+    if (type == nhwText || type == nhwMenu) {
       _textLines.clear();
       _isTextWindowVisible = true;
     }
@@ -82,7 +85,7 @@ class NetHackScreen extends ChangeNotifier {
     } else if (type == nhwStatus) {
       _statusLines[0] = "";
       _statusLines[1] = "";
-    } else if (type == nhwText) {
+    } else if (type == nhwText || type == nhwMenu) {
       _textLines.clear();
     }
     notifyListeners();
@@ -91,8 +94,9 @@ class NetHackScreen extends ChangeNotifier {
   void destroyWindow(int winId) {
     final type = _winTypes[winId];
     _winTypes.remove(winId);
-    if (type == nhwText) {
+    if (type == nhwText || type == nhwMenu) {
       _isTextWindowVisible = false;
+      _textLines.clear();
     }
     notifyListeners();
   }
@@ -122,7 +126,7 @@ class NetHackScreen extends ChangeNotifier {
         _statusLines[0] = _statusLines[1];
         _statusLines[1] = text;
       }
-    } else if (type == nhwText) {
+    } else if (type == nhwText || type == nhwMenu) {
       _textLines.add(text);
     }
     notifyListeners();

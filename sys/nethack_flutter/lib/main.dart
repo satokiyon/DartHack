@@ -1,4 +1,5 @@
 import 'dart:isolate';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'nethack_assets.dart';
@@ -38,7 +39,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final FocusNode _focusNode = FocusNode();
   final NetHackScreen _screen = NetHackScreen();
   
-  Isolate? _workerIsolate;
   SendPort? _workerSendPort;
   bool _isGameRunning = false;
   bool _waitingForInput = false;
@@ -83,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _addLog("Spawning NetHack Worker Isolate...");
 
     final receivePort = ReceivePort();
-    _workerIsolate = await Isolate.spawn(NetHackWorker.start, receivePort.sendPort);
+    await Isolate.spawn(NetHackWorker.start, receivePort.sendPort);
 
     receivePort.listen((message) {
       if (message is Map) {
@@ -100,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (type == 'clearWindow') {
           _screen.clearWindow(message['winId']);
         } else if (type == 'displayWindow') {
-          // blocking の場合は getch を待つ処理が C 側で走る
+          // C側の blocking に基づく
         } else if (type == 'destroyWindow') {
           _screen.destroyWindow(message['winId']);
         } else if (type == 'curs') {
@@ -131,14 +131,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _stopGame() {
-    _workerIsolate?.kill(priority: Isolate.beforeNextEvent);
-    _workerIsolate = null;
-    _workerSendPort = null;
-    setState(() {
-      _isGameRunning = false;
-      _waitingForInput = false;
-    });
-    _addLog("Game stopped.");
+    // NetHack はグローバルシングルトン構造であり、同一プロセスでの二重起動は不可のため、
+    // ゲーム終了時はアプリケーション自体を完全に終了します（従来のAndroid移植と同様）
+    exit(0);
   }
 
   void _sendFfiKey(int code, String label) {
@@ -157,93 +152,133 @@ class _MyHomePageState extends State<MyHomePage> {
     return ListenableBuilder(
       listenable: _screen,
       builder: (context, _) {
-        return Container(
-          color: Colors.black,
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. メッセージ領域 (直近3行)
-              Container(
-                height: 60,
-                width: double.infinity,
-                color: Colors.black,
-                child: Text(
-                  _screen.messages.isEmpty
-                      ? ""
-                      : _screen.messages.sublist(
-                          _screen.messages.length > 3 ? _screen.messages.length - 3 : 0
-                        ).join("\n"),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'monospace',
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              const Divider(color: Colors.grey),
-              // 2. マップグリッド領域 (21行 x 80列)
-              Expanded(
-                child: Center(
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: Container(
-                      width: 80 * 8.5,
-                      height: 21 * 16.0,
-                      color: Colors.black,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: List.generate(NetHackScreen.mapRows, (row) {
-                          return Row(
-                            children: List.generate(NetHackScreen.mapCols, (col) {
-                              final glyph = _screen.mapGrid[row][col];
-                              Color textColor = Color(glyph.color | 0xFF000000);
-                              if (glyph.color == 0) {
-                                textColor = Colors.white;
-                              }
-                              
-                              return SizedBox(
-                                width: 8.5,
-                                height: 16.0,
-                                child: Center(
-                                  child: Text(
-                                    glyph.char,
-                                    style: TextStyle(
-                                      color: textColor,
-                                      fontFamily: 'monospace',
-                                      fontSize: 14,
-                                      fontWeight: (glyph.special & 0x01 != 0)
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }),
-                          );
-                        }),
+        return Stack(
+          children: [
+            Container(
+              color: Colors.black,
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 1. メッセージ領域 (直近3行)
+                  Container(
+                    height: 60,
+                    width: double.infinity,
+                    color: Colors.black,
+                    child: Text(
+                      _screen.messages.isEmpty
+                          ? ""
+                          : _screen.messages.sublist(
+                              _screen.messages.length > 3 ? _screen.messages.length - 3 : 0
+                            ).join("\n"),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'monospace',
+                        fontSize: 14,
                       ),
                     ),
                   ),
-                ),
+                  const Divider(color: Colors.grey),
+                  // 2. マップグリッド領域 (21行 x 80列)
+                  Expanded(
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: Container(
+                          width: 80 * 8.5,
+                          height: 21 * 16.0,
+                          color: Colors.black,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: List.generate(NetHackScreen.mapRows, (row) {
+                              return Row(
+                                children: List.generate(NetHackScreen.mapCols, (col) {
+                                  final glyph = _screen.mapGrid[row][col];
+                                  Color textColor = Color(glyph.color | 0xFF000000);
+                                  if (glyph.color == 0) {
+                                    textColor = Colors.white;
+                                  }
+                                  
+                                  return SizedBox(
+                                    width: 8.5,
+                                    height: 16.0,
+                                    child: Center(
+                                      child: Text(
+                                        glyph.char,
+                                        style: TextStyle(
+                                          color: textColor,
+                                          fontFamily: 'monospace',
+                                          fontSize: 14,
+                                          fontWeight: (glyph.special & 0x01 != 0)
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              );
+                            }),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const Divider(color: Colors.grey),
+                  // 3. ステータス領域 (2行)
+                  Container(
+                    height: 40,
+                    width: double.infinity,
+                    color: Colors.black,
+                    child: Text(
+                      _screen.statusLines.join("\n"),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'monospace',
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const Divider(color: Colors.grey),
-              // 3. ステータス領域 (2行)
-              Container(
-                height: 40,
-                width: double.infinity,
-                color: Colors.black,
-                child: Text(
-                  _screen.statusLines.join("\n"),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'monospace',
-                    fontSize: 14,
+            ),
+            // テキスト/メニューウィンドウのオーバーレイ表示
+            if (_screen.isTextWindowVisible)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.black.withOpacity(0.95),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Text(
+                            _screen.textLines.join('\n'),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'monospace',
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Center(
+                        child: Text(
+                          "-- [Space] or [Enter] to continue --",
+                          style: const TextStyle(
+                            color: Colors.amber,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
+          ],
         );
       },
     );
@@ -254,13 +289,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('NetHackJP Flutter Port'),
-        actions: [
-          if (_isGameRunning)
-            IconButton(
-              icon: const Icon(Icons.stop),
-              onPressed: _stopGame,
-            ),
-        ],
       ),
       body: KeyboardListener(
         focusNode: _focusNode,

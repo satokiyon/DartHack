@@ -1,9 +1,26 @@
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:isolate';
 import 'package:ffi/ffi.dart';
 import 'nethack_ffi.dart';
 
 class NetHackWorker {
+  /// 不正なバイトを含む文字列でもクラッシュさせずにデコードする安全なヘルパー
+  static String _utf8DecodeLossy(Pointer<Utf8> ptr) {
+    if (ptr == nullptr) return "";
+    final List<int> bytes = [];
+    final Pointer<Uint8> bytePtr = ptr.cast<Uint8>();
+    int i = 0;
+    while (true) {
+      final byte = bytePtr[i];
+      if (byte == 0) break;
+      bytes.add(byte);
+      i++;
+    }
+    // allowMalformed: true を指定してデコードすることで FormatException を防ぐ
+    return const Utf8Decoder(allowMalformed: true).convert(bytes);
+  }
+
   /// Worker Isolate のエントリーポイント
   static void start(SendPort uiSendPort) {
     final receivePort = ReceivePort();
@@ -73,7 +90,7 @@ class NetHackWorker {
             if (msgPtr == nullptr) {
               return;
             }
-            final msg = msgPtr.toDartString();
+            final msg = _utf8DecodeLossy(msgPtr);
             uiSendPort.send({
               'type': 'putstr',
               'winId': winId,
