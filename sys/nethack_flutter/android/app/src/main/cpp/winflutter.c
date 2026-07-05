@@ -39,6 +39,10 @@ typedef void (*DartCursCallback)(int winId, int x, int y);
 typedef void (*DartPutStrCallback)(int winId, int attr, const char* str);
 typedef void (*DartPrintGlyphCallback)(int winId, int x, int y, int tile, int ch, int color, int special);
 typedef void (*DartNotifyInputCallback)(int requestId);
+typedef void (*DartStartMenuCallback)(int winId);
+typedef void (*DartAddMenuCallback)(int winId, long ident, int accelerator, int groupacc, int attr, const char* str, int preselected, int color);
+typedef void (*DartEndMenuCallback)(int winId, const char* prompt);
+typedef void (*DartSelectMenuCallback)(int winId, int how);
 
 static DartCreateWindowCallback g_create_window_cb = NULL;
 static DartClearWindowCallback g_clear_window_cb = NULL;
@@ -48,11 +52,16 @@ static DartCursCallback g_curs_cb = NULL;
 static DartPutStrCallback g_putstr_cb = NULL;
 static DartPrintGlyphCallback g_print_glyph_cb = NULL;
 static DartNotifyInputCallback g_dart_notify_input_cb = NULL;
+static DartStartMenuCallback g_start_menu_cb = NULL;
+static DartAddMenuCallback g_add_menu_cb = NULL;
+static DartEndMenuCallback g_end_menu_cb = NULL;
+static DartSelectMenuCallback g_select_menu_cb = NULL;
 
 // 双方向通信用変数
 static volatile int g_input_request_id = 0;
 static volatile int g_last_received_key = 0;
 static volatile int g_key_available = 0;
+static volatile long g_selected_menu_item = -2; // -2: 未選択, -1: キャンセル
 
 // FFI からコールバックを登録する関数
 void RegisterFlutterCallbacks(
@@ -63,7 +72,11 @@ void RegisterFlutterCallbacks(
     DartCursCallback curs_cb,
     DartPutStrCallback putstr_cb,
     DartPrintGlyphCallback glyph_cb,
-    DartNotifyInputCallback input_cb
+    DartNotifyInputCallback input_cb,
+    DartStartMenuCallback start_menu_cb,
+    DartAddMenuCallback add_menu_cb,
+    DartEndMenuCallback end_menu_cb,
+    DartSelectMenuCallback select_menu_cb
 ) {
     g_create_window_cb = create_cb;
     g_clear_window_cb = clear_cb;
@@ -73,7 +86,11 @@ void RegisterFlutterCallbacks(
     g_putstr_cb = putstr_cb;
     g_print_glyph_cb = glyph_cb;
     g_dart_notify_input_cb = input_cb;
-    debuglog("Flutter window callbacks registered.");
+    g_start_menu_cb = start_menu_cb;
+    g_add_menu_cb = add_menu_cb;
+    g_end_menu_cb = end_menu_cb;
+    g_select_menu_cb = select_menu_cb;
+    debuglog("Flutter window and menu callbacks registered.");
 }
 
 // Dart 側からキー入力を受け取る関数
@@ -81,6 +98,12 @@ void SendKeyToFlutter(int key) {
     g_last_received_key = key;
     g_key_available = 1;
     debuglog("C core received key: %d", key);
+}
+
+// Dart 側からメニュー選択結果を受け取る関数
+void SendMenuSelection(long ident) {
+    g_selected_menu_item = ident;
+    debuglog("C core received menu selection: %ld", ident);
 }
 
 // カウンタ取得関数
@@ -187,7 +210,6 @@ static void flutter_raw_print_bold(const char* str) {
 static int flutter_nhgetch(void) {
     debuglog("flutter_nhgetch called. Waiting for key...");
     
-    // カウンタを上げて Dart に入力待ちを通知
     g_input_request_id++;
     g_key_available = 0;
 
@@ -195,7 +217,6 @@ static int flutter_nhgetch(void) {
         g_dart_notify_input_cb(g_input_request_id);
     }
 
-    // キーが来るまでスリープポーリング
     while (!g_key_available) {
         usleep(10000); // 10ms
     }
@@ -246,11 +267,81 @@ static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_inf
     }
 }
 
+// ----------------------------------------------------
+// メニューウィンドウ用のハイジャック関数群
+// ----------------------------------------------------
+
+static void flutter_start_menu(winid wid, unsigned long behavior) {
+    debuglog("flutter_start_menu win=%d", wid);
+    if (g_start_menu_cb) {
+        g_start_menu_cb((int)wid);
+    }
+}
+
+static void flutter_add_menu(winid wid, const glyph_info *glyphinfo, const anything *ident, char accelerator, char groupacc, int attr, int color, const char *str, unsigned int itemflags) {
+    debuglog("flutter_add_menu win=%d, acc=%c, str=%s", wid, accelerator, str);
+    int tile = (glyphinfo == &nul_glyphinfo) ? -1 : glyphinfo->gm.tileidx;
+    
+    if (g_add_menu_cb && str) {
+        g_add_menu_cb(
+            (int)wid,
+            ident->a_long,
+            (int)accelerator,
+            (int)groupacc,
+            attr,
+            str,
+            (itemflags & MENU_ITEMFLAGS_SELECTED) ? 1 : 0,
+            color
+        );
+    }
+}
+
+static void flutter_end_menu(winid wid, const char *prompt) {
+    debuglog("flutter_end_menu win=%d, prompt=%s", wid, prompt ? prompt : "");
+    if (g_end_menu_cb) {
+        g_end_menu_cb((int)wid, prompt ? prompt : "");
+    }
+}
+
+static int flutter_select_menu(winid wid, int how, menu_item **selected) {
+    debuglog("flutter_select_menu win=%d, how=%d", wid, how);
+    
+    g_selected_menu_item = -2; // 未選択状態
+
+    // Dart 側に入力モードを「メニュー選択モード」にするよう通知
+    if (g_select_menu_cb) {
+        g_select_menu_cb((int)wid, how);
+    }
+
+    // カウンタを上げてキー入力可能にする
+    g_input_request_id++;
+    if (g_dart_notify_input_cb) {
+        g_dart_notify_input_cb(g_input_request_id);
+    }
+
+    // ユーザーが選択を完了するかキャンセルするまで待機
+    while (g_selected_menu_item == -2) {
+        usleep(10000); // 10ms
+    }
+
+    if (g_selected_menu_item == -1) {
+        *selected = NULL;
+        return -1; // キャンセル / ABORT
+    }
+
+    // 選択された項目を格納して返す
+    *selected = (menu_item*)alloc(sizeof(menu_item));
+    (*selected)[0].item = cg.zeroany;
+    (*selected)[0].item.a_long = g_selected_menu_item;
+    (*selected)[0].count = 1;
+
+    return 1; // 1個選択された
+}
+
 // windowprocs と and_procs を同時にハイジャックする関数
 static void HijackWindowProcs(void) {
     debuglog("Hijacking and_procs...");
 
-    // and_procs (元の定義構造体) の関数ポインタを直接上書き
     and_procs.win_init_nhwindows = flutter_init_nhwindows;
     and_procs.win_player_selection = flutter_player_selection;
     and_procs.win_askname = flutter_askname;
@@ -272,7 +363,12 @@ static void HijackWindowProcs(void) {
     and_procs.win_getlin = flutter_getlin;
     and_procs.win_print_glyph = flutter_print_glyph;
 
-    // 現在アクティブな windowprocs も上書き
+    // メニュー用の関数ポインタも完全にハイジャック！
+    and_procs.win_start_menu = flutter_start_menu;
+    and_procs.win_add_menu = flutter_add_menu;
+    and_procs.win_end_menu = flutter_end_menu;
+    and_procs.win_select_menu = flutter_select_menu;
+
     windowprocs = and_procs;
     
     debuglog("Hijack completed.");
@@ -295,7 +391,6 @@ static void* NetHackThreadFunc(void* arg) {
         debuglog("chdir failed in thread!");
     }
 
-    // windowprocs をハイジャック！
     HijackWindowProcs();
 
     char* params[2];

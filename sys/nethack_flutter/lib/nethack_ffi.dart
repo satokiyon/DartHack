@@ -11,11 +11,26 @@ typedef PutStrCallback = Void Function(Int32 winId, Int32 attr, Pointer<Utf8> ms
 typedef PrintGlyphCallback = Void Function(Int32 winId, Int32 x, Int32 y, Int32 tile, Int32 ch, Int32 color, Int32 special);
 typedef NotifyInputCallback = Void Function(Int32 requestId);
 
+// メニュー関連コールバック
+typedef StartMenuCallback = Void Function(Int32 winId);
+typedef AddMenuCallback = Void Function(
+  Int32 winId,
+  Int64 ident,
+  Int32 accelerator,
+  Int32 groupacc,
+  Int32 attr,
+  Pointer<Utf8> str,
+  Int32 preselected,
+  Int32 color
+);
+typedef EndMenuCallback = Void Function(Int32 winId, Pointer<Utf8> prompt);
+typedef SelectMenuCallback = Void Function(Int32 winId, Int32 how);
+
 // C側起動関数
 typedef StartNetHackFunc = Void Function(Pointer<Utf8> path, Pointer<Utf8> username);
 typedef StartNetHackDart = void Function(Pointer<Utf8> path, Pointer<Utf8> username);
 
-// コールバック登録関数
+// コールバック登録関数 (12個の引数)
 typedef RegisterCallbacksFunc = Void Function(
   Pointer<NativeFunction<CreateWindowCallback>> createCb,
   Pointer<NativeFunction<ClearWindowCallback>> clearCb,
@@ -25,6 +40,10 @@ typedef RegisterCallbacksFunc = Void Function(
   Pointer<NativeFunction<PutStrCallback>> putstrCb,
   Pointer<NativeFunction<PrintGlyphCallback>> glyphCb,
   Pointer<NativeFunction<NotifyInputCallback>> inputCb,
+  Pointer<NativeFunction<StartMenuCallback>> startMenuCb,
+  Pointer<NativeFunction<AddMenuCallback>> addMenuCb,
+  Pointer<NativeFunction<EndMenuCallback>> endMenuCb,
+  Pointer<NativeFunction<SelectMenuCallback>> selectMenuCb,
 );
 typedef RegisterCallbacksDart = void Function(
   Pointer<NativeFunction<CreateWindowCallback>> createCb,
@@ -35,11 +54,19 @@ typedef RegisterCallbacksDart = void Function(
   Pointer<NativeFunction<PutStrCallback>> putstrCb,
   Pointer<NativeFunction<PrintGlyphCallback>> glyphCb,
   Pointer<NativeFunction<NotifyInputCallback>> inputCb,
+  Pointer<NativeFunction<StartMenuCallback>> startMenuCb,
+  Pointer<NativeFunction<AddMenuCallback>> addMenuCb,
+  Pointer<NativeFunction<EndMenuCallback>> endMenuCb,
+  Pointer<NativeFunction<SelectMenuCallback>> selectMenuCb,
 );
 
 // キー送信
 typedef SendKeyFunc = Void Function(Int32 key);
 typedef SendKeyDart = void Function(int key);
+
+// メニュー選択結果送信
+typedef SendMenuSelectionFunc = Void Function(Int64 ident);
+typedef SendMenuSelectionDart = void Function(int ident);
 
 // カウンタ取得
 typedef GetInputRequestIdFunc = Int32 Function();
@@ -50,6 +77,7 @@ class NetHackFfi {
   late final StartNetHackDart startNetHack;
   late final RegisterCallbacksDart registerCallbacks;
   late final SendKeyDart sendKeyToC;
+  late final SendMenuSelectionDart sendMenuSelection;
   late final GetInputRequestIdDart getInputRequestId;
 
   NetHackFfi() {
@@ -70,6 +98,10 @@ class NetHackFfi {
 
     sendKeyToC = _lib
         .lookup<NativeFunction<SendKeyFunc>>('SendKeyToFlutter')
+        .asFunction();
+
+    sendMenuSelection = _lib
+        .lookup<NativeFunction<SendMenuSelectionFunc>>('SendMenuSelection')
         .asFunction();
 
     getInputRequestId = _lib

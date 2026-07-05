@@ -38,6 +38,12 @@ class NetHackWorker {
     late final NativeCallable<PrintGlyphCallback> glyphCallable;
     late final NativeCallable<NotifyInputCallback> inputCallable;
 
+    // 新しいメニュー用の NativeCallable
+    late final NativeCallable<StartMenuCallback> startMenuCallable;
+    late final NativeCallable<AddMenuCallback> addMenuCallable;
+    late final NativeCallable<EndMenuCallback> endMenuCallable;
+    late final NativeCallable<SelectMenuCallback> selectMenuCallable;
+
     receivePort.listen((message) {
       if (message is Map) {
         final type = message['type'];
@@ -116,6 +122,55 @@ class NetHackWorker {
             uiSendPort.send({'type': 'request_input'});
           });
 
+          // メニュー関連コールバックの初期化
+          startMenuCallable = NativeCallable<StartMenuCallback>.listener((int winId) {
+            uiSendPort.send({
+              'type': 'startMenu',
+              'winId': winId,
+            });
+          });
+
+          addMenuCallable = NativeCallable<AddMenuCallback>.listener((
+            int winId,
+            int ident,
+            int accelerator,
+            int groupacc,
+            int attr,
+            Pointer<Utf8> strPtr,
+            int preselected,
+            int color,
+          ) {
+            final str = _utf8DecodeLossy(strPtr);
+            uiSendPort.send({
+              'type': 'addMenu',
+              'winId': winId,
+              'ident': ident,
+              'accelerator': accelerator,
+              'groupacc': groupacc,
+              'attr': attr,
+              'text': str,
+              'preselected': preselected,
+              'color': color,
+            });
+          });
+
+          endMenuCallable = NativeCallable<EndMenuCallback>.listener((int winId, Pointer<Utf8> promptPtr) {
+            final prompt = _utf8DecodeLossy(promptPtr);
+            uiSendPort.send({
+              'type': 'endMenu',
+              'winId': winId,
+              'prompt': prompt,
+            });
+          });
+
+          selectMenuCallable = NativeCallable<SelectMenuCallback>.listener((int winId, int how) {
+            uiSendPort.send({
+              'type': 'selectMenu',
+              'winId': winId,
+              'how': how,
+            });
+          });
+
           // コールバックをC側に登録
           ffi.registerCallbacks(
             createCallable.nativeFunction,
@@ -126,6 +181,10 @@ class NetHackWorker {
             putstrCallable.nativeFunction,
             glyphCallable.nativeFunction,
             inputCallable.nativeFunction,
+            startMenuCallable.nativeFunction,
+            addMenuCallable.nativeFunction,
+            endMenuCallable.nativeFunction,
+            selectMenuCallable.nativeFunction,
           );
 
           // NetHack コアを起動
@@ -136,6 +195,9 @@ class NetHackWorker {
         } else if (type == 'key') {
           final key = message['key'] as int;
           ffi.sendKeyToC(key);
+        } else if (type == 'menu_select') {
+          final ident = message['ident'] as int;
+          ffi.sendMenuSelection(ident);
         }
       }
     });

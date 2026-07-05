@@ -48,6 +48,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus && _isGameRunning && _waitingForInput) {
+        // キーボードフォーカスを失わないようにする
+        _focusNode.requestFocus();
+      }
+    });
     _initAssets();
   }
 
@@ -122,6 +128,26 @@ class _MyHomePageState extends State<MyHomePage> {
             _waitingForInput = true;
           });
           _focusNode.requestFocus();
+        } else if (type == 'startMenu') {
+          _screen.startMenu(message['winId']);
+        } else if (type == 'addMenu') {
+          _screen.addMenu(
+            message['winId'],
+            message['ident'],
+            message['accelerator'],
+            message['groupacc'],
+            message['attr'],
+            message['text'],
+            message['preselected'],
+            message['color'],
+          );
+        } else if (type == 'endMenu') {
+          _screen.endMenu(message['winId'], message['prompt']);
+        } else if (type == 'selectMenu') {
+          _screen.selectMenu(message['winId'], message['how']);
+          setState(() {
+            _waitingForInput = true;
+          });
         } else if (type == 'error') {
           _addLog("ERROR: ${message['message']}");
           _stopGame();
@@ -131,13 +157,29 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _stopGame() {
-    // NetHack はグローバルシングルトン構造であり、同一プロセスでの二重起動は不可のため、
-    // ゲーム終了時はアプリケーション自体を完全に終了します（従来のAndroid移植と同様）
     exit(0);
   }
 
   void _sendFfiKey(int code, String label) {
     if (!_waitingForInput) return;
+
+    // メニュー表示中は、メニューショートカットキー判定を行う
+    if (_screen.isMenuWindowVisible) {
+      if (code == 32 || code == 10 || code == 13 || code == 27) {
+        // Space, Enter, ESC はキャンセル
+        _sendMenuSelection(-1);
+        return;
+      }
+      // accelerator との一致を確認
+      for (final item in _screen.menuItems) {
+        if (item.accelerator != 0 && item.accelerator == code) {
+          _sendMenuSelection(item.ident);
+          return;
+        }
+      }
+      return; // メニュー表示中は他のキーは無視
+    }
+
     setState(() {
       _waitingForInput = false;
     });
@@ -146,6 +188,82 @@ class _MyHomePageState extends State<MyHomePage> {
       'type': 'key',
       'key': code,
     });
+  }
+
+  void _sendMenuSelection(int ident) {
+    if (!_waitingForInput || !_screen.isMenuWindowVisible) return;
+    setState(() {
+      _waitingForInput = false;
+    });
+    _addLog("> Menu Select: ID $ident");
+    _workerSendPort?.send({
+      'type': 'menu_select',
+      'ident': ident,
+    });
+    _screen.clearMenu();
+  }
+
+  Widget _buildMenuOverlay() {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black.withValues(alpha: 0.95),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_screen.menuPrompt.isNotEmpty) ...[
+              Text(
+                _screen.menuPrompt,
+                style: const TextStyle(
+                  color: Colors.amber,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            Expanded(
+              child: ListView.builder(
+                itemCount: _screen.menuItems.length,
+                itemBuilder: (context, index) {
+                  final item = _screen.menuItems[index];
+                  final isSelectable = item.ident != 0;
+                  final accLabel = item.accelerator != 0 
+                      ? "${String.fromCharCode(item.accelerator)} - " 
+                      : "";
+
+                  return ListTile(
+                    dense: true,
+                    title: Text(
+                      "$accLabel${item.text}",
+                      style: TextStyle(
+                        color: isSelectable ? Colors.white : Colors.grey,
+                        fontFamily: 'monospace',
+                        fontSize: 14,
+                        fontWeight: isSelectable ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                    onTap: isSelectable
+                        ? () => _sendMenuSelection(item.ident)
+                        : null,
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () => _sendMenuSelection(-1),
+                  child: const Text("Cancel"),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildGameScreen() {
@@ -242,11 +360,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-            // テキスト/メニューウィンドウのオーバーレイ表示
+            // テキスト/ヘルプウィンドウのオーバーレイ表示
             if (_screen.isTextWindowVisible)
               Positioned.fill(
                 child: Container(
-                  color: Colors.black.withOpacity(0.95),
+                  color: Colors.black.withValues(alpha: 0.95),
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,7 +385,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       const Center(
                         child: Text(
                           "-- [Space] or [Enter] to continue --",
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.amber,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -278,6 +396,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
+            // メニュー選択ウィンドウのオーバーレイ表示
+            if (_screen.isMenuWindowVisible)
+              _buildMenuOverlay(),
           ],
         );
       },
@@ -309,6 +430,7 @@ class _MyHomePageState extends State<MyHomePage> {
               else if (event.logicalKey == LogicalKeyboardKey.arrowRight) { code = 108; name = "l"; }
               else if (event.logicalKey == LogicalKeyboardKey.enter) { code = 10; name = "Enter"; }
               else if (event.logicalKey == LogicalKeyboardKey.escape) { code = 27; name = "ESC"; }
+              else if (event.logicalKey == LogicalKeyboardKey.space) { code = 32; name = "Space"; }
               
               if (code != null) {
                 _sendFfiKey(code, name ?? "");
@@ -357,7 +479,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: TextField(
                         controller: _inputController,
                         decoration: InputDecoration(
-                          hintText: _waitingForInput ? 'Waiting for key input...' : 'Game running...',
+                          hintText: _waitingForInput 
+                              ? (_screen.isMenuWindowVisible ? 'Select menu item...' : 'Waiting for key input...')
+                              : 'Game running...',
                           border: const OutlineInputBorder(),
                           enabled: _waitingForInput,
                         ),
