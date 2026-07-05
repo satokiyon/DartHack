@@ -20,11 +20,15 @@ $WslRepoPath = (wsl -d Ubuntu-26.04 wslpath ($RepoRoot.Replace('\', '/'))).Trim(
 Write-Host "WSL repository path: $WslRepoPath" -ForegroundColor Gray
 
 # Clean and make install in WSL (Run setup.sh and fetch Lua first)
-wsl -d Ubuntu-26.04 bash -lc "cd '$WslRepoPath/sys/android' && sh ./setup.sh && cd '$WslRepoPath' && make fetch-lua && make clean && make -j4 install"
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "WSL compilation failed. Check the errors above."
-    exit 1
+wsl -d Ubuntu-26.04 bash -lc "cd '$WslRepoPath/sys/android' && sh ./setup.sh && cd '$WslRepoPath' && make fetch-lua"
+# $abilist = @("arm64-v8a", "armeabi-v7a", "armeabi", "x86_64", "x86")
+$abilist = @("arm64-v8a")
+foreach($abi in $abilist) {
+    wsl -d Ubuntu-26.04 bash -lc "cd '$WslRepoPath' && make clean && make ABI=$abi install"
+    if ($LASTEXITCODE -ne 0) {
+      Write-Error "WSL compilation failed. Check the errors above."
+      exit 1
+  }
 }
 
 # 2. Windows Gradle packaging

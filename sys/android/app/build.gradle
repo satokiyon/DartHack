@@ -5,21 +5,19 @@ plugins {
 android {
 
   namespace = "jp.satokiyon.NetHackJP"
-  compileSdk { 
-    version = release(36)
-  }
+  compileSdk = 36
   buildToolsVersion = "36.0.0"
 
   defaultConfig {
-    minSdkVersion = 7
-    targetSdkVersion = 34
+    minSdkVersion  30
+    targetSdkVersion  36
     versionName = '5.0.0'
     versionCode = 5000
   }
 
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
   }
 
   lintOptions {

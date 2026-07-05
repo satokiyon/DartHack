@@ -2,10 +2,10 @@
 <!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. -->
 <resources>
     <string-array name="tileNames">
-    	<item>Ascii (no tiles)</item>
+    	<item>PixelHack</item>
     </string-array>
     <string-array name="tileValues">
-        <item>TTY</item>
+        <item>pixelhack_32x32</item>
     </string-array>
 
 </resources>
