@@ -9,6 +9,7 @@
 // 前方宣言
 static int flutter_nhgetch(void);
 extern int nhcolor_to_RGB(int c); // winandroid.c の関数を参照
+extern struct window_procs and_procs; // winandroid.c で定義されている元の WindowPort 構造体
 
 static const unsigned short cp437_to_unicode[256] = {
     0x00A0, 0x263A, 0x263B, 0x2665, 0x2666, 0x2663, 0x2660, 0x2022, 0x25D8, 0x25CB, 0x25D9, 0x2660, 0x2661, 0x266A, 0x266B, 0x2609,
@@ -52,9 +53,6 @@ static DartNotifyInputCallback g_dart_notify_input_cb = NULL;
 static volatile int g_input_request_id = 0;
 static volatile int g_last_received_key = 0;
 static volatile int g_key_available = 0;
-
-// ハイジャック前の元のプロシージャを退避
-static struct window_procs orig_procs;
 
 // FFI からコールバックを登録する関数
 void RegisterFlutterCallbacks(
@@ -248,31 +246,34 @@ static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_inf
     }
 }
 
-// windowprocs をハイジャックする関数
+// windowprocs と and_procs を同時にハイジャックする関数
 static void HijackWindowProcs(void) {
-    debuglog("Hijacking windowprocs...");
-    orig_procs = windowprocs; // 元のをバックアップ
+    debuglog("Hijacking and_procs...");
 
-    windowprocs.win_init_nhwindows = flutter_init_nhwindows;
-    windowprocs.win_player_selection = flutter_player_selection;
-    windowprocs.win_askname = flutter_askname;
-    windowprocs.win_exit_nhwindows = flutter_exit_nhwindows;
-    windowprocs.win_suspend_nhwindows = flutter_suspend_nhwindows;
-    windowprocs.win_resume_nhwindows = flutter_resume_nhwindows;
-    windowprocs.win_create_nhwindow = flutter_create_nhwindow;
-    windowprocs.win_clear_nhwindow = flutter_clear_nhwindow;
-    windowprocs.win_display_nhwindow = flutter_display_nhwindow;
-    windowprocs.win_destroy_nhwindow = flutter_destroy_nhwindow;
-    windowprocs.win_curs = flutter_curs;
-    windowprocs.win_putstr = flutter_putstr;
-    windowprocs.win_raw_print = flutter_raw_print;
-    windowprocs.win_raw_print_bold = flutter_raw_print_bold;
-    windowprocs.win_nhgetch = flutter_nhgetch;
-    windowprocs.win_nh_poskey = flutter_nh_poskey;
-    windowprocs.win_nhbell = flutter_nhbell;
-    windowprocs.win_yn_function = flutter_yn_function;
-    windowprocs.win_getlin = flutter_getlin;
-    windowprocs.win_print_glyph = flutter_print_glyph;
+    // and_procs (元の定義構造体) の関数ポインタを直接上書き
+    and_procs.win_init_nhwindows = flutter_init_nhwindows;
+    and_procs.win_player_selection = flutter_player_selection;
+    and_procs.win_askname = flutter_askname;
+    and_procs.win_exit_nhwindows = flutter_exit_nhwindows;
+    and_procs.win_suspend_nhwindows = flutter_suspend_nhwindows;
+    and_procs.win_resume_nhwindows = flutter_resume_nhwindows;
+    and_procs.win_create_nhwindow = flutter_create_nhwindow;
+    and_procs.win_clear_nhwindow = flutter_clear_nhwindow;
+    and_procs.win_display_nhwindow = flutter_display_nhwindow;
+    and_procs.win_destroy_nhwindow = flutter_destroy_nhwindow;
+    and_procs.win_curs = flutter_curs;
+    and_procs.win_putstr = flutter_putstr;
+    and_procs.win_raw_print = flutter_raw_print;
+    and_procs.win_raw_print_bold = flutter_raw_print_bold;
+    and_procs.win_nhgetch = flutter_nhgetch;
+    and_procs.win_nh_poskey = flutter_nh_poskey;
+    and_procs.win_nhbell = flutter_nhbell;
+    and_procs.win_yn_function = flutter_yn_function;
+    and_procs.win_getlin = flutter_getlin;
+    and_procs.win_print_glyph = flutter_print_glyph;
+
+    // 現在アクティブな windowprocs も上書き
+    windowprocs = and_procs;
     
     debuglog("Hijack completed.");
 }
