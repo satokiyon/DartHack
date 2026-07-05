@@ -226,6 +226,9 @@ static const unsigned short cp437_to_unicode[256] = {
 
 jbyteArray create_bytearray(const char* str)
 {
+	if (jEnv == NULL) {
+		return NULL;
+	}
 	if (!str) {
 		return (*jEnv)->NewByteArray(jEnv, 0);
 	}
@@ -307,12 +310,14 @@ jbyteArray create_bytearray(const char* str)
 //____________________________________________________________________________________
 void destroy_jobject(jstring jstr)
 {
-	(*jEnv)->DeleteLocalRef(jEnv, jstr);
+	if (jEnv != NULL && jstr != NULL) {
+		(*jEnv)->DeleteLocalRef(jEnv, jstr);
+	}
 }
 
-#define JNICallV(func, ...) (*jEnv)->CallVoidMethod(jEnv, jAppInstance, func, ## __VA_ARGS__);
-#define JNICallI(func, ...) (*jEnv)->CallIntMethod(jEnv, jAppInstance, func, ## __VA_ARGS__);
-#define JNICallO(func, ...) (*jEnv)->CallObjectMethod(jEnv, jAppInstance, func, ## __VA_ARGS__);
+#define JNICallV(func, ...) if (jEnv != NULL) (*jEnv)->CallVoidMethod(jEnv, jAppInstance, func, ## __VA_ARGS__);
+#define JNICallI(func, ...) ((jEnv != NULL) ? (*jEnv)->CallIntMethod(jEnv, jAppInstance, func, ## __VA_ARGS__) : 0);
+#define JNICallO(func, ...) ((jEnv != NULL) ? (*jEnv)->CallObjectMethod(jEnv, jAppInstance, func, ## __VA_ARGS__) : NULL);
 
 //____________________________________________________________________________________
 void Java_com_tbd_forkfront_NetHackIO_RunNetHack(JNIEnv* env, jobject thiz, jstring path, jstring username)
@@ -499,6 +504,14 @@ void debuglog(const char *fmt, ...)
 	else
 	{
 		strcpy(buf, "(null)");
+	}
+
+	if (jEnv == NULL) {
+#ifdef ANDROID
+		extern int __android_log_print(int prio, const char *tag, const char *fmt, ...);
+		__android_log_print(3, "NetHackAndroid", "%s", buf);
+#endif
+		return;
 	}
 
 	jbyteArray jstr = create_bytearray(buf);
