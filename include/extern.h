@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-03. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2797,7 +2797,7 @@ void restore_gamelog(NHFILE *);
 boolean restgamestate(NHFILE *);
 void restore_msghistory(NHFILE *);
 #endif
-extern void rest_adjust_levelflags(void);
+extern void rest_adjust_levelflags(long);
 extern void moves_to_relative_time(long *);
 extern void relative_time_to_moves(long *);
 extern boolean revision_increment(int, int, uchar *);

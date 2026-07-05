@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-03. */
 /* NetHack 5.0	save.c	$NHDT-Date: 1781973065 2026/06/20 16:31:05 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.263 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -532,7 +532,7 @@ savelev_core(NHFILE *nhfp, xint8 lev)
     Sfo_dest_area(nhfp, &svd.dndest, "lev-dndest");
     save_adjust_levelflags();
     Sfo_levelflags(nhfp, &svl.level.flags, "lev-level_flags");
-    rest_adjust_levelflags();
+    rest_adjust_levelflags(0L);
 
     Sfo_int(nhfp, &svd.doors_alloc, "lev-doors_alloc");
     /* don't rely on underlying write() behavior to write
