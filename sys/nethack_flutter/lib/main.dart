@@ -342,7 +342,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 const Divider(color: Colors.white12, height: 1),
-                // 2. マップ描画（タイル/ASCII の CustomPaint）
                 Expanded(
                   child: Container(
                     color: Colors.black,
@@ -350,13 +349,16 @@ class _MyHomePageState extends State<MyHomePage> {
                       maxScale: 6.0,
                       minScale: 0.5,
                       child: Center(
-                        child: CustomPaint(
-                          size: const Size(80 * 16.0, 21 * 16.0), // アスペクト比を固定
-                          painter: NetHackMapPainter(
-                            screen: _screen,
-                            tileImage: _tileImage,
-                            tileSize: _tileSize,
-                            useTiles: _useTiles,
+                        child: SizedBox(
+                          width: 80 * (_useTiles ? 16.0 : 9.0),
+                          height: 21 * 16.0,
+                          child: CustomPaint(
+                            painter: NetHackMapPainter(
+                              screen: _screen,
+                              tileImage: _tileImage,
+                              tileSize: _tileSize,
+                              useTiles: _useTiles,
+                            ),
                           ),
                         ),
                       ),
