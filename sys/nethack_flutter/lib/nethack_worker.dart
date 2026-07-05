@@ -70,6 +70,9 @@ class NetHackWorker {
           });
 
           putstrCallable = NativeCallable<PutStrCallback>.listener((int winId, int attr, Pointer<Utf8> msgPtr) {
+            if (msgPtr == nullptr) {
+              return;
+            }
             final msg = msgPtr.toDartString();
             uiSendPort.send({
               'type': 'putstr',

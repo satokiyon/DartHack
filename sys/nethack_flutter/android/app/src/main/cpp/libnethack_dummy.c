@@ -11,7 +11,7 @@
 #define DLL_EXPORT
 #endif
 
-typedef void (*PrintCallback)(const char* message);
+typedef void (*PrintCallback)(int winId, int attr, const char* message);
 typedef void (*DartNotifyInputCallback)(int requestId);
 
 static PrintCallback g_print_callback = NULL;
@@ -61,9 +61,9 @@ DLL_EXPORT int GetFlutterInputRequestId() {
 void run_dummy_game_loop() {
     g_thread_running = 1;
     if (g_print_callback) {
-        g_print_callback("=== NetHack Flutter Dummy Core Started ===");
-        g_print_callback("You see a dark room. What do you want to do?");
-        g_print_callback("(Press any key to walk, 'q' to quit)");
+        g_print_callback(1, 0, "=== NetHack Flutter Dummy Core Started ===");
+        g_print_callback(1, 0, "You see a dark room. What do you want to do?");
+        g_print_callback(1, 0, "(Press any key to walk, 'q' to quit)");
     }
 
     while (g_thread_running) {
@@ -89,14 +89,14 @@ void run_dummy_game_loop() {
 
         if (ch == 'q') {
             if (g_print_callback) {
-                g_print_callback("Goodbye!");
+                g_print_callback(1, 0, "Goodbye!");
             }
             break;
         } else {
             char buf[128];
             snprintf(buf, sizeof(buf), "You pressed '%c'. You walk forward.", ch);
             if (g_print_callback) {
-                g_print_callback(buf);
+                g_print_callback(1, 0, buf);
             }
         }
     }
