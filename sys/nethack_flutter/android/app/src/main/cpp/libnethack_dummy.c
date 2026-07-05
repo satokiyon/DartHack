@@ -36,8 +36,17 @@ DLL_EXPORT int get_input_request_id() {
 // Flutter-compatible APIs (for seamless local Windows testing)
 // ----------------------------------------------------
 
-DLL_EXPORT void RegisterFlutterCallbacks(PrintCallback print_cb, DartNotifyInputCallback input_cb) {
-    g_print_callback = print_cb;
+DLL_EXPORT void RegisterFlutterCallbacks(
+    void* create_cb,
+    void* clear_cb,
+    void* display_cb,
+    void* destroy_cb,
+    void* curs_cb,
+    PrintCallback putstr_cb,
+    void* glyph_cb,
+    DartNotifyInputCallback input_cb
+) {
+    g_print_callback = putstr_cb;
     g_input_callback = input_cb;
 }
 

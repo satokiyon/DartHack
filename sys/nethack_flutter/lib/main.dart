@@ -1,6 +1,8 @@
 import 'dart:isolate';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'nethack_assets.dart';
+import 'nethack_screen.dart';
 import 'nethack_worker.dart';
 
 void main() {
@@ -13,10 +15,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'NetHack Flutter FFI Demo',
+      title: 'NetHackJP Flutter Port',
       theme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.blue,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
       ),
       home: const MyHomePage(),
     );
@@ -34,6 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<String> _logs = [];
   final TextEditingController _inputController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  final NetHackScreen _screen = NetHackScreen();
   
   Isolate? _workerIsolate;
   SendPort? _workerSendPort;
@@ -92,8 +95,28 @@ class _MyHomePageState extends State<MyHomePage> {
             'type': 'start',
             'assetsPath': _assetsPath,
           });
-        } else if (type == 'print') {
-          _addLog(message['message']);
+        } else if (type == 'createWindow') {
+          _screen.createWindow(message['winId'], message['winType']);
+        } else if (type == 'clearWindow') {
+          _screen.clearWindow(message['winId']);
+        } else if (type == 'displayWindow') {
+          // blocking の場合は getch を待つ処理が C 側で走る
+        } else if (type == 'destroyWindow') {
+          _screen.destroyWindow(message['winId']);
+        } else if (type == 'curs') {
+          _screen.setCursor(message['winId'], message['x'], message['y']);
+        } else if (type == 'putstr') {
+          _screen.putString(message['winId'], message['attr'], message['text']);
+        } else if (type == 'printGlyph') {
+          _screen.printGlyph(
+            message['winId'],
+            message['x'],
+            message['y'],
+            message['tile'],
+            message['ch'],
+            message['color'],
+            message['special'],
+          );
         } else if (type == 'request_input') {
           setState(() {
             _waitingForInput = true;
@@ -101,7 +124,6 @@ class _MyHomePageState extends State<MyHomePage> {
           _focusNode.requestFocus();
         } else if (type == 'error') {
           _addLog("ERROR: ${message['message']}");
-          _addLog(message['stack'] ?? "");
           _stopGame();
         }
       }
@@ -119,37 +141,119 @@ class _MyHomePageState extends State<MyHomePage> {
     _addLog("Game stopped.");
   }
 
-  void _sendInput() {
-    final text = _inputController.text;
-    if (text.isEmpty) return;
-
-    final charCode = text.codeUnitAt(0);
-    _inputController.clear();
-
-    _addLog("> Send Key: '$text' ($charCode)");
-    _workerSendPort?.send({
-      'type': 'key',
-      'key': charCode,
-    });
-
+  void _sendFfiKey(int code, String label) {
+    if (!_waitingForInput) return;
     setState(() {
       _waitingForInput = false;
     });
+    _addLog("> Send Key: '$label' ($code)");
+    _workerSendPort?.send({
+      'type': 'key',
+      'key': code,
+    });
   }
 
-  @override
-  void dispose() {
-    _stopGame();
-    _inputController.dispose();
-    _focusNode.dispose();
-    super.dispose();
+  Widget _buildGameScreen() {
+    return ListenableBuilder(
+      listenable: _screen,
+      builder: (context, _) {
+        return Container(
+          color: Colors.black,
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. メッセージ領域 (直近3行)
+              Container(
+                height: 60,
+                width: double.infinity,
+                color: Colors.black,
+                child: Text(
+                  _screen.messages.isEmpty
+                      ? ""
+                      : _screen.messages.sublist(
+                          _screen.messages.length > 3 ? _screen.messages.length - 3 : 0
+                        ).join("\n"),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'monospace',
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              const Divider(color: Colors.grey),
+              // 2. マップグリッド領域 (21行 x 80列)
+              Expanded(
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: Container(
+                      width: 80 * 8.5,
+                      height: 21 * 16.0,
+                      color: Colors.black,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: List.generate(NetHackScreen.mapRows, (row) {
+                          return Row(
+                            children: List.generate(NetHackScreen.mapCols, (col) {
+                              final glyph = _screen.mapGrid[row][col];
+                              Color textColor = Color(glyph.color | 0xFF000000);
+                              if (glyph.color == 0) {
+                                textColor = Colors.white;
+                              }
+                              
+                              return SizedBox(
+                                width: 8.5,
+                                height: 16.0,
+                                child: Center(
+                                  child: Text(
+                                    glyph.char,
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontFamily: 'monospace',
+                                      fontSize: 14,
+                                      fontWeight: (glyph.special & 0x01 != 0)
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
+                          );
+                        }),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const Divider(color: Colors.grey),
+              // 3. ステータス領域 (2行)
+              Container(
+                height: 40,
+                width: double.infinity,
+                color: Colors.black,
+                child: Text(
+                  _screen.statusLines.join("\n"),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'monospace',
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('NetHack Flutter FFI Demo'),
+        title: const Text('NetHackJP Flutter Port'),
         actions: [
           if (_isGameRunning)
             IconButton(
@@ -158,80 +262,91 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  border: Border.all(color: Colors.grey.shade800),
-                  borderRadius: BorderRadius.circular(4.0),
-                ),
-                child: ListView.builder(
-                  itemCount: _logs.length,
-                  itemBuilder: (context, index) {
-                    return Text(
-                      _logs[index],
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        color: Colors.lightGreenAccent,
+      body: KeyboardListener(
+        focusNode: _focusNode,
+        autofocus: true,
+        onKeyEvent: (KeyEvent event) {
+          if (!_isGameRunning || !_waitingForInput) return;
+          if (event is KeyDownEvent) {
+            final char = event.character;
+            if (char != null && char.isNotEmpty) {
+              final code = char.codeUnitAt(0);
+              _sendFfiKey(code, char);
+            } else {
+              int? code;
+              String? name;
+              if (event.logicalKey == LogicalKeyboardKey.arrowUp) { code = 107; name = "k"; }
+              else if (event.logicalKey == LogicalKeyboardKey.arrowDown) { code = 106; name = "j"; }
+              else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) { code = 104; name = "h"; }
+              else if (event.logicalKey == LogicalKeyboardKey.arrowRight) { code = 108; name = "l"; }
+              else if (event.logicalKey == LogicalKeyboardKey.enter) { code = 10; name = "Enter"; }
+              else if (event.logicalKey == LogicalKeyboardKey.escape) { code = 27; name = "ESC"; }
+              
+              if (code != null) {
+                _sendFfiKey(code, name ?? "");
+              }
+            }
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Expanded(
+                child: _isGameRunning
+                    ? _buildGameScreen()
+                    : SingleChildScrollView(
+                        child: Text(
+                          _logs.join('\n'),
+                          style: const TextStyle(fontFamily: 'monospace'),
+                        ),
                       ),
-                    );
-                  },
-                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            if (!_isGameRunning)
-              if (!_assetsReady)
-                const Center(
-                  child: Column(
-                    children: [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 8),
-                      Text("Preparing assets..."),
-                    ],
-                  ),
-                )
-              else
-                ElevatedButton(
-                  onPressed: _startGame,
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50),
-                  ),
-                  child: const Text('Start Dummy Game'),
-                )
-            else
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _inputController,
-                      focusNode: _focusNode,
-                      decoration: InputDecoration(
-                        hintText: _waitingForInput ? 'Waiting for input...' : 'Game running...',
-                        border: const OutlineInputBorder(),
-                        enabled: _waitingForInput,
-                      ),
-                      maxLength: 1,
-                      onSubmitted: (_) => _sendInput(),
+              const SizedBox(height: 16),
+              if (!_isGameRunning)
+                if (!_assetsReady)
+                  const Center(
+                    child: Column(
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 8),
+                        Text("Preparing assets..."),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 8),
+                  )
+                else
                   ElevatedButton(
-                    onPressed: _waitingForInput ? _sendInput : null,
+                    onPressed: _startGame,
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(80, 50),
+                      minimumSize: const Size(double.infinity, 50),
                     ),
-                    child: const Text('Send'),
-                  ),
-                ],
-              ),
-          ],
+                    child: const Text('Start NetHack Game'),
+                  )
+              else
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _inputController,
+                        decoration: InputDecoration(
+                          hintText: _waitingForInput ? 'Waiting for key input...' : 'Game running...',
+                          border: const OutlineInputBorder(),
+                          enabled: _waitingForInput,
+                        ),
+                        maxLength: 1,
+                        onChanged: (text) {
+                          if (text.isNotEmpty) {
+                            final code = text.codeUnitAt(0);
+                            _sendFfiKey(code, text);
+                            _inputController.clear();
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
         ),
       ),
     );

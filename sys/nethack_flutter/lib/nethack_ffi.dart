@@ -2,7 +2,13 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
 // コールバックの型定義
-typedef PrintCallback = Void Function(Pointer<Utf8> msg);
+typedef CreateWindowCallback = Void Function(Int32 winId, Int32 type);
+typedef ClearWindowCallback = Void Function(Int32 winId);
+typedef DisplayWindowCallback = Void Function(Int32 winId, Int32 blocking);
+typedef DestroyWindowCallback = Void Function(Int32 winId);
+typedef CursCallback = Void Function(Int32 winId, Int32 x, Int32 y);
+typedef PutStrCallback = Void Function(Int32 winId, Int32 attr, Pointer<Utf8> msg);
+typedef PrintGlyphCallback = Void Function(Int32 winId, Int32 x, Int32 y, Int32 tile, Int32 ch, Int32 color, Int32 special);
 typedef NotifyInputCallback = Void Function(Int32 requestId);
 
 // C側起動関数
@@ -11,11 +17,23 @@ typedef StartNetHackDart = void Function(Pointer<Utf8> path, Pointer<Utf8> usern
 
 // コールバック登録関数
 typedef RegisterCallbacksFunc = Void Function(
-  Pointer<NativeFunction<PrintCallback>> printCb,
+  Pointer<NativeFunction<CreateWindowCallback>> createCb,
+  Pointer<NativeFunction<ClearWindowCallback>> clearCb,
+  Pointer<NativeFunction<DisplayWindowCallback>> displayCb,
+  Pointer<NativeFunction<DestroyWindowCallback>> destroyCb,
+  Pointer<NativeFunction<CursCallback>> cursCb,
+  Pointer<NativeFunction<PutStrCallback>> putstrCb,
+  Pointer<NativeFunction<PrintGlyphCallback>> glyphCb,
   Pointer<NativeFunction<NotifyInputCallback>> inputCb,
 );
 typedef RegisterCallbacksDart = void Function(
-  Pointer<NativeFunction<PrintCallback>> printCb,
+  Pointer<NativeFunction<CreateWindowCallback>> createCb,
+  Pointer<NativeFunction<ClearWindowCallback>> clearCb,
+  Pointer<NativeFunction<DisplayWindowCallback>> displayCb,
+  Pointer<NativeFunction<DestroyWindowCallback>> destroyCb,
+  Pointer<NativeFunction<CursCallback>> cursCb,
+  Pointer<NativeFunction<PutStrCallback>> putstrCb,
+  Pointer<NativeFunction<PrintGlyphCallback>> glyphCb,
   Pointer<NativeFunction<NotifyInputCallback>> inputCb,
 );
 
