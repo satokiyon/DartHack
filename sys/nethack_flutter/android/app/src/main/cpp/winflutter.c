@@ -63,6 +63,75 @@ static volatile int g_last_received_key = 0;
 static volatile int g_key_available = 0;
 static volatile long g_selected_menu_item = -2; // -2: 未選択, -1: キャンセル
 
+// CP437混在文字列を完全に正しいUTF-8に変換するヘルパー関数 (winandroid.cのcreate_bytearrayと同等のロジック)
+static char* convert_cp437_to_utf8(const char* str) {
+    if (!str) return NULL;
+    int len = strlen(str);
+    // 最悪の場合、すべてのバイトがCP437から3バイトのUTF-8文字に変換されるため、len * 3 + 1の領域を確保する
+    unsigned char *temp_buf = (unsigned char *)malloc(len * 3 + 1);
+    if (!temp_buf) return NULL;
+
+    const unsigned char *p = (const unsigned char *)str;
+    const unsigned char *end = p + len;
+    unsigned char *dst = temp_buf;
+
+    while (p < end) {
+        unsigned char c = *p;
+        int char_len = 0;
+        if (c < 0x80) {
+            char_len = 1;
+        } else if ((c & 0xE0) == 0xC0) {
+            char_len = 2;
+        } else if ((c & 0xF0) == 0xE0) {
+            char_len = 3;
+        } else if ((c & 0xF8) == 0xF0) {
+            char_len = 4;
+        }
+
+        if (char_len > 0 && p + char_len <= end) {
+            // 後続バイトが正しいUTF-8パターンか検証する
+            int valid = 1;
+            for (int i = 1; i < char_len; i++) {
+                if ((p[i] & 0xC0) != 0x80) {
+                    valid = 0;
+                    break;
+                }
+            }
+            if (valid) {
+                // 正しいUTF-8シーケンスはそのままコピー
+                memcpy(dst, p, char_len);
+                dst += char_len;
+                p += char_len;
+                continue;
+            }
+        }
+
+        // 不正なUTF-8シーケンス、または孤立した非ASCIIバイトはCP437文字としてUnicode経由でUTF-8に変換
+        unsigned short unicode_val = cp437_to_unicode[c];
+        int encoded_len = 0;
+        unsigned char utf8_bytes[4];
+        if (unicode_val < 0x80) {
+            utf8_bytes[0] = (unsigned char)unicode_val;
+            encoded_len = 1;
+        } else if (unicode_val < 0x800) {
+            utf8_bytes[0] = (unsigned char)(0xC0 | ((unicode_val >> 6) & 0x1F));
+            utf8_bytes[1] = (unsigned char)(0x80 | (unicode_val & 0x3F));
+            encoded_len = 2;
+        } else {
+            utf8_bytes[0] = (unsigned char)(0xE0 | ((unicode_val >> 12) & 0x0F));
+            utf8_bytes[1] = (unsigned char)(0x80 | ((unicode_val >> 6) & 0x3F));
+            utf8_bytes[2] = (unsigned char)(0x80 | (unicode_val & 0x3F));
+            encoded_len = 3;
+        }
+        memcpy(dst, utf8_bytes, encoded_len);
+        dst += encoded_len;
+        p++;
+    }
+
+    *dst = '\0';
+    return (char*)temp_buf;
+}
+
 // FFI からコールバックを登録する関数
 void RegisterFlutterCallbacks(
     DartCreateWindowCallback create_cb,
@@ -188,21 +257,27 @@ static void flutter_curs(winid window, int x, int y) {
 static void flutter_putstr(winid window, int attr, const char* str) {
     debuglog("flutter_putstr [%d]: %s", window, str);
     if (g_putstr_cb && str) {
-        g_putstr_cb((int)window, attr, str);
+        char* conv = convert_cp437_to_utf8(str);
+        g_putstr_cb((int)window, attr, conv ? conv : str);
+        if (conv) free(conv);
     }
 }
 
 static void flutter_raw_print(const char* str) {
     debuglog("flutter_raw_print: %s", str ? str : "NULL");
     if (g_putstr_cb && str) {
-        g_putstr_cb(WIN_MESSAGE, ATR_NONE, str);
+        char* conv = convert_cp437_to_utf8(str);
+        g_putstr_cb(WIN_MESSAGE, ATR_NONE, conv ? conv : str);
+        if (conv) free(conv);
     }
 }
 
 static void flutter_raw_print_bold(const char* str) {
     debuglog("flutter_raw_print_bold: %s", str ? str : "NULL");
     if (g_putstr_cb && str) {
-        g_putstr_cb(WIN_MESSAGE, ATR_BOLD, str);
+        char* conv = convert_cp437_to_utf8(str);
+        g_putstr_cb(WIN_MESSAGE, ATR_BOLD, conv ? conv : str);
+        if (conv) free(conv);
     }
 }
 
@@ -237,7 +312,9 @@ static char flutter_yn_function(const char* question, const char* choices, char 
     debuglog("flutter_yn_function: %s (%s) def=%c", question, choices, def);
     
     if (g_putstr_cb && question) {
-        g_putstr_cb(WIN_MESSAGE, ATR_NONE, question);
+        char* conv = convert_cp437_to_utf8(question);
+        g_putstr_cb(WIN_MESSAGE, ATR_NONE, conv ? conv : question);
+        if (conv) free(conv);
     }
     
     return (char)flutter_nhgetch();
@@ -246,7 +323,9 @@ static char flutter_yn_function(const char* question, const char* choices, char 
 static void flutter_getlin(const char* prompt, char* buf) {
     debuglog("flutter_getlin: %s", prompt);
     if (g_putstr_cb && prompt) {
-        g_putstr_cb(WIN_MESSAGE, ATR_NONE, prompt);
+        char* conv = convert_cp437_to_utf8(prompt);
+        g_putstr_cb(WIN_MESSAGE, ATR_NONE, conv ? conv : prompt);
+        if (conv) free(conv);
     }
     strcpy(buf, "a");
 }
@@ -283,23 +362,27 @@ static void flutter_add_menu(winid wid, const glyph_info *glyphinfo, const anyth
     int tile = (glyphinfo == &nul_glyphinfo) ? -1 : glyphinfo->gm.tileidx;
     
     if (g_add_menu_cb && str) {
+        char* conv = convert_cp437_to_utf8(str);
         g_add_menu_cb(
             (int)wid,
             ident->a_long,
             (int)accelerator,
             (int)groupacc,
             attr,
-            str,
+            conv ? conv : str,
             (itemflags & MENU_ITEMFLAGS_SELECTED) ? 1 : 0,
             color
         );
+        if (conv) free(conv);
     }
 }
 
 static void flutter_end_menu(winid wid, const char *prompt) {
     debuglog("flutter_end_menu win=%d, prompt=%s", wid, prompt ? prompt : "");
     if (g_end_menu_cb) {
-        g_end_menu_cb((int)wid, prompt ? prompt : "");
+        char* conv = prompt ? convert_cp437_to_utf8(prompt) : NULL;
+        g_end_menu_cb((int)wid, conv ? conv : (prompt ? prompt : ""));
+        if (conv) free(conv);
     }
 }
 

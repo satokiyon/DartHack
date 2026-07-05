@@ -156,12 +156,9 @@ class NetHackScreen extends ChangeNotifier {
   void putString(int winId, int attr, String text) {
     final type = _winTypes[winId];
     if (type == nhwMessage || winId == 1 /* WIN_MESSAGE */) {
-      // 連続する重複したウェルカムメッセージ等の追加を簡易的に防止
-      if (_messages.isEmpty || _messages.last != text) {
-        _messages.add(text);
-        if (_messages.length > 100) {
-          _messages.removeAt(0);
-        }
+      _messages.add(text);
+      if (_messages.length > 100) {
+        _messages.removeAt(0);
       }
     } else if (type == nhwStatus || winId == 2 /* WIN_STATUS */) {
       if (_statusLines[0].isEmpty) {
