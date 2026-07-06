@@ -132,3 +132,27 @@
       1. `onGetDefaultValue(TypedArray a, int index)`: XML からデフォルト値を正しく取得して返す。
       2. `onSetInitialValue(boolean restore, Object defaultValue)`: `restore` が `false`（デフォルト値設定時）の際、引数から受け取った `defaultValue` を設定した上で、 `persistInt` / `persistString` / `persistBoolean` を明示的に呼び出して SharedPreferences に値を保存する。
 
+
+## Flutter移植版におけるCスレッド連携・UI同期設計方針
+
+NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（メインスレッド）間で FFI を用いて画面同期や連携処理を実装する際は、以下の設計方針を遵守してください。
+
+1. **ステータス表示（win_status_update）のジェネリック化**:
+   - Android/Javaポートで実装されている JNI 経由での構造化されたステータス更新処理（JNICallOを用いるもの）は、JNI 環境が NULL になる Flutter版では利用できず、そのまま呼ぶと JNI ヌルポインタによる SIGSEGV クラッシュを引き起こします。
+   - 対策として、 `HijackWindowProcs()` 内で `and_procs.win_status_update` を NetHack 汎用の `genl_status_update` に差し替えて（ハイジャックして）ください。これにより、ステータス更新時に `putstr` / `putmixed` を介して `WIN_STATUS` (ID: 2) 宛てに自動的にフォーマット済みのテキスト（通常2行）が送信されるようになります。
+   - `genl_status_update` を使用する際は、ヘッダーまたはファイル冒頭で `extern void genl_status_update(...)` の前方宣言を行ってください。
+
+2. **ステータス行（WIN_STATUS）のカーソル追跡と上書き処理**:
+   - `genl_status_update` はステータス各行を出力する際、 `curs(WIN_STATUS, 1, 0)`（1行目）または `curs(WIN_STATUS, 1, 1)`（2行目）を呼んでから `putstr` を実行します。
+   - Dart側の画面バッファ管理クラス（`NetHackScreen` 等）では、 `curs(WIN_STATUS)` が呼び出された際の `y` 座標を状態（インデックス）として保持してください。その後に来る `putString(WIN_STATUS)` では、保持したインデックス行を直接上書き更新するように実装することで、ステータス行の順序反転や表示崩れを完全に防ぐことができます。
+
+3. **Cスレッド終了（セーブ・ゲームオーバー）のUI中継とフリーズ防止**:
+   - "S"キーによるセーブ終了や通常のゲーム終了時、C側のスレッド（NetHackMain）がリターンまたは `exit_nhwindows` を経由して終了した事実を UI 側に通知しないと、画面が「セーブ中...」などのゲーム中状態のまま停止してフリーズしてしまいます。
+   - 対策として、 FFI に `ExitCallback` (シグネチャ: `Void Function()`) を追加し、 `flutter_exit_nhwindows` および `NetHackThreadFunc` の終了時にこれを呼び出して Dart 側に通知を中継してください。
+   - Dart 側では終了イベントを受け取った際、 `_isGameRunning` や各種入力フラグを直ちにリセットし、開始画面に安全かつスムーズに戻るようにステート更新を行ってください。
+
+4. **はみ出し（RenderFlex overflow）の防止と自動縮小フィット**:
+   - モバイル端末の多様な画面幅に対応するため、YN質問などのボタン配置は `Row` を避け、自動折り返しが発生する `Wrap` を使用してください。
+   - ステータス表示部など、はみ出しが深刻な長文領域については、以下の2つのモードを選択・設定できるように構成してください：
+     - **自動縮小フィット（Fit / デフォルト）**: `FittedBox` (`fit: BoxFit.scaleDown`) を用い、固定された高さの中でテキストを画面幅に合わせて自動的に縮小・圧縮する。
+     - **領域の可変高さ（Wrap）**: テキストの長さに応じて自動的に折り返し、表示領域の高さ自体を動的に拡張する。
