@@ -2,7 +2,9 @@
 <!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. -->
 <PreferenceScreen
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:forkfront="forkfront">
+	xmlns:forkfront="forkfront"
+	android:title="設定">
+
 	<PreferenceCategory
 		android:title="設定"
 		android:key="settings">
@@ -859,7 +861,7 @@
 
 		<com.tbd.forkfront.EditFilePreference
 			android:title="設定ファイル(defaults.nh)の編集"
-			android:summary=""/>
+			android:summary="設定ファイルを直接編集します"/>
 	
 		<CheckBoxPreference
 			android:title="代替レンダラーを使用"

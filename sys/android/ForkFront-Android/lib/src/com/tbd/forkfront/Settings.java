@@ -17,7 +17,6 @@ public class Settings extends AppCompatActivity implements PreferenceFragmentCom
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.settings_container);
@@ -56,6 +55,39 @@ public class Settings extends AppCompatActivity implements PreferenceFragmentCom
 				.commit();
 		return true;
 	}
+
+	@Override
+	public boolean onSupportNavigateUp()
+	{
+		if (getSupportFragmentManager().getBackStackEntryCount() > 0)
+		{
+			getSupportFragmentManager().popBackStack();
+		}
+		else
+		{
+			finish();
+		}
+		return true;
+	}
+
+	public void updateActionBar()
+	{
+		androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
+		if (actionBar != null)
+		{
+			actionBar.setDisplayHomeAsUpEnabled(true);
+			SettingsFragment fragment = (SettingsFragment) getSupportFragmentManager().findFragmentById(R.id.settings_container);
+			if (fragment != null && fragment.getPreferenceScreen() != null)
+			{
+				actionBar.setTitle(fragment.getPreferenceScreen().getTitle());
+			}
+			else
+			{
+				actionBar.setTitle(getTitle());
+			}
+		}
+	}
+
 	public static class SettingsFragment extends PreferenceFragmentCompat implements OnSharedPreferenceChangeListener
 	{
 		private TilesetPreference mTilesetPref;
@@ -92,6 +124,11 @@ public class Settings extends AppCompatActivity implements PreferenceFragmentCom
 		public void onResume()
 		{
 			super.onResume();
+
+			if (getActivity() instanceof Settings)
+			{
+				((Settings) getActivity()).updateActionBar();
+			}
 
 			SharedPreferences sharedPreferences = getPreferenceScreen().getSharedPreferences();
 

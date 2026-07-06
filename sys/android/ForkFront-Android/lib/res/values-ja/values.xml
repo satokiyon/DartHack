@@ -100,4 +100,21 @@
 		<item>1</item>
 		<item>2</item>
 	</string-array>
+
+	<string name="menu_change_condensed">変更...</string>
+	<string name="menu_change">コマンド変更...</string>
+	<string name="menu_label_condensed">ラベル...</string>
+	<string name="menu_label">カスタムラベルを設定...</string>
+	<string name="menu_add_condensed">新規...</string>
+	<string name="menu_add">新規コマンド...</string>
+	<string name="menu_add_kbd_condensed">キー追加</string>
+	<string name="menu_add_kbd">キーボードコマンドを追加</string>
+	<string name="menu_add_settings_condensed">メニュー追加...</string>
+	<string name="menu_add_settings">メニューコマンドを追加</string>
+	<string name="menu_remove_condensed">削除</string>
+	<string name="menu_remove">コマンドを削除</string>
+	<string name="menu_opacity_condensed">不透明度...</string>
+	<string name="menu_opacity">不透明度を変更...</string>
+	<string name="menu_resize_condensed">サイズ変更...</string>
+	<string name="menu_resize">パネルサイズを変更...</string>
 </resources>

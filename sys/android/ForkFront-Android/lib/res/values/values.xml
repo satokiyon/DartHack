@@ -100,4 +100,21 @@
 		<item>1</item>
 		<item>2</item>
 	</string-array>
+
+	<string name="menu_change_condensed">Change...</string>
+	<string name="menu_change">Change command...</string>
+	<string name="menu_label_condensed">Label...</string>
+	<string name="menu_label">Set custom label...</string>
+	<string name="menu_add_condensed">New command...</string>
+	<string name="menu_add">New command...</string>
+	<string name="menu_add_kbd_condensed">Add kbd</string>
+	<string name="menu_add_kbd">Add keyboard command</string>
+	<string name="menu_add_settings_condensed">Add menu...</string>
+	<string name="menu_add_settings">Add menu command</string>
+	<string name="menu_remove_condensed">Remove</string>
+	<string name="menu_remove">Remove command</string>
+	<string name="menu_opacity_condensed">Opacity...</string>
+	<string name="menu_opacity">Change opacity...</string>
+	<string name="menu_resize_condensed">Resize...</string>
+	<string name="menu_resize">Resize panel...</string>
 </resources>
