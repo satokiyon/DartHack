@@ -1,4 +1,5 @@
 #include "hack.h"
+#include "func_tab.h"   /* for extended commands */
 #include <unistd.h>
 #include <pthread.h>
 #include <android/log.h>
@@ -10,6 +11,15 @@
 static int flutter_nhgetch(void);
 extern int nhcolor_to_RGB(int c); // winandroid.c の関数を参照
 extern struct window_procs and_procs; // winandroid.c で定義されている元の WindowPort 構造体
+
+static winid flutter_create_nhwindow(int type);
+static void flutter_start_menu(winid wid, unsigned long behavior);
+static void flutter_add_menu(winid wid, const glyph_info *glyphinfo, const anything *ident, char accelerator, char groupacc, int attr, int color, const char *str, unsigned int itemflags);
+static void flutter_end_menu(winid wid, const char *prompt);
+static int flutter_select_menu(winid wid, int how, menu_item **selected);
+static void flutter_destroy_nhwindow(winid window);
+static void flutter_exit_nhwindows(const char* str);
+extern void genl_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, unsigned long *colormasks);
 
 static const unsigned short cp437_to_unicode[256] = {
     0x00A0, 0x263A, 0x263B, 0x2665, 0x2666, 0x2663, 0x2660, 0x2022, 0x25D8, 0x25CB, 0x25D9, 0x2660, 0x2661, 0x266A, 0x266B, 0x2609,
@@ -43,6 +53,10 @@ typedef void (*DartStartMenuCallback)(int winId);
 typedef void (*DartAddMenuCallback)(int winId, long ident, int accelerator, int groupacc, int attr, const char* str, int preselected, int color);
 typedef void (*DartEndMenuCallback)(int winId, const char* prompt);
 typedef void (*DartSelectMenuCallback)(int winId, int how);
+typedef void (*DartYnFunctionCallback)(const char* question, const char* choices, int def);
+typedef void (*DartGetLineCallback)(const char* prompt, const char* initText);
+typedef void (*DartAskNameCallback)(const char* saves, int maxChars);
+typedef void (*DartExitCallback)(void);
 
 static DartCreateWindowCallback g_create_window_cb = NULL;
 static DartClearWindowCallback g_clear_window_cb = NULL;
@@ -56,6 +70,18 @@ static DartStartMenuCallback g_start_menu_cb = NULL;
 static DartAddMenuCallback g_add_menu_cb = NULL;
 static DartEndMenuCallback g_end_menu_cb = NULL;
 static DartSelectMenuCallback g_select_menu_cb = NULL;
+static DartYnFunctionCallback g_yn_function_cb = NULL;
+static DartGetLineCallback g_getline_cb = NULL;
+static DartAskNameCallback g_askname_cb = NULL;
+static DartExitCallback g_exit_cb = NULL;
+
+// 同期待信用変数
+static volatile char g_yn_result = 0;
+static volatile int g_yn_done = 0;
+static char g_getline_result[512] = {0};
+static volatile int g_getline_done = 0;
+static char g_askname_result[256] = {0};
+static volatile int g_askname_done = 0;
 
 // 双方向通信用変数
 static volatile int g_input_request_id = 0;
@@ -152,7 +178,11 @@ void RegisterFlutterCallbacks(
     DartStartMenuCallback start_menu_cb,
     DartAddMenuCallback add_menu_cb,
     DartEndMenuCallback end_menu_cb,
-    DartSelectMenuCallback select_menu_cb
+    DartSelectMenuCallback select_menu_cb,
+    DartYnFunctionCallback yn_cb,
+    DartGetLineCallback getline_cb,
+    DartAskNameCallback askname_cb,
+    DartExitCallback exit_cb
 ) {
     g_create_window_cb = create_cb;
     g_clear_window_cb = clear_cb;
@@ -166,7 +196,65 @@ void RegisterFlutterCallbacks(
     g_add_menu_cb = add_menu_cb;
     g_end_menu_cb = end_menu_cb;
     g_select_menu_cb = select_menu_cb;
-    debuglog("Flutter window and menu callbacks registered.");
+    g_yn_function_cb = yn_cb;
+    g_getline_cb = getline_cb;
+    g_askname_cb = askname_cb;
+    g_exit_cb = exit_cb;
+    debuglog("Flutter window, menu and sync callbacks registered.");
+}
+
+// Dart 側から結果を受け取る関数
+void SendYnResultToC(int result) {
+    g_yn_result = (char)result;
+    g_yn_done = 1;
+    debuglog("C core received YN result: %d (%c)", result, g_yn_result);
+}
+
+void SendGetLineResultToC(const char* result) {
+    if (result) {
+        strncpy(g_getline_result, result, sizeof(g_getline_result) - 1);
+        g_getline_result[sizeof(g_getline_result) - 1] = '\0';
+    } else {
+        g_getline_result[0] = '\0';
+    }
+    g_getline_done = 1;
+    debuglog("C core received GetLine result: %s", g_getline_result);
+}
+
+void SendAskNameResultToC(const char* result) {
+    if (result) {
+        strncpy(g_askname_result, result, sizeof(g_askname_result) - 1);
+        g_askname_result[sizeof(g_askname_result) - 1] = '\0';
+    } else {
+        g_askname_result[0] = '\0';
+    }
+    g_askname_done = 1;
+    debuglog("C core received AskName result: %s", g_askname_result);
+}
+
+// 拡張コマンド一覧の取得
+const char* GetExtCmdsFlutter(void) {
+    static char buf[4096] = {0};
+    buf[0] = '\0';
+    int i;
+    int first = 1;
+    for(i = 0; extcmdlist[i].ef_txt; i++)
+    {
+        int flgs = extcmdlist[i].flags;
+        if(flgs & (CMD_NOT_AVAILABLE | INTERNALCMD))
+            continue;
+        if((flgs & WIZMODECMD) && !wizard)
+            continue;
+        if(strcmp(extcmdlist[i].ef_txt, "#") == 0 || strcmp(extcmdlist[i].ef_txt, "?") == 0)
+            continue;
+            
+        if (!first) {
+            strcat(buf, ";");
+        }
+        strcat(buf, extcmdlist[i].ef_txt);
+        first = 0;
+    }
+    return buf;
 }
 
 // Dart 側からキー入力を受け取る関数
@@ -197,19 +285,223 @@ static void flutter_init_nhwindows(int* argc, char** argv) {
 
 static void flutter_player_selection(void) {
     debuglog("flutter_player_selection called");
-    flags.initrole = 0; // デフォルトの職業 (Archaeologist 等)
-    flags.initrace = 0; // デフォルトの種族
-    flags.initgend = 0; // デフォルトの性別
-    flags.initalign = 0; // デフォルトのアライメント
+    
+    int i, result;
+    char pick4u = 'n', thisch, lastch = 0;
+    int state = 0;
+    winid win;
+    anything any;
+    menu_item *selected = 0;
+
+    /* prevent an unnecessary prompt */
+    rigid_role_checks();
+
+    while(flags.initalign < 0)
+    {
+        if(state < 2)
+        {
+            if(!state)
+                flags.initrole = -1;
+            flags.initrace = -1;
+            state = 0;
+        }
+        else
+            state &= 1;
+        flags.initgend = -1;
+        flags.initalign = -1;
+
+        /* Select a role */
+        result = 1;
+        if(flags.initrole < 0)
+        {
+            /* Prompt for a role */
+            win = flutter_create_nhwindow(NHW_MENU);
+            flutter_start_menu(win, MENU_BEHAVE_STANDARD);
+            any.a_void = 0; /* zero out all bits */
+            any.a_int = randrole(TRUE)+1;
+            flutter_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "ランダム", 0);
+            for(i = 0; roles[i].name.m; i++)
+            {
+                if(ok_role(i, flags.initrace, flags.initgend, flags.initalign))
+                {
+                    any.a_int = i + 1; /* must be non-zero */
+                    thisch = lowc(roles[i].name.m[0]);
+                    if(thisch == lastch)
+                        thisch = highc(thisch);
+                    flutter_add_menu(win, &nul_glyphinfo, &any, thisch, 0, ATR_NONE, NO_COLOR, jp_role_name_for_display(i, flags.initgend >= 0 ? flags.initgend : (flags.female ? 1 : 0)), 0);
+                    lastch = thisch;
+                }
+            }
+            flutter_end_menu(win, "職業を選んでください");
+            result = flutter_select_menu(win, PICK_ONE, &selected);
+            flutter_destroy_nhwindow(win);
+
+            if(result > 0)
+                flags.initrole = selected[0].item.a_int - 1;
+            free((genericptr_t)selected), selected = 0;
+        }
+
+        if(result <= 0)
+        {
+            clearlocks();
+            flutter_exit_nhwindows("bye");
+            exit(0);
+        }
+
+        /* Select a race, if necessary */
+        if(flags.initrace < 0)
+            flags.initrace = pick_race(flags.initrole, flags.initgend, flags.initalign, PICK_RIGID);
+
+        result = 1;
+        if(flags.initrace < 0)
+        {
+            win = flutter_create_nhwindow(NHW_MENU);
+            flutter_start_menu(win, MENU_BEHAVE_STANDARD);
+            any.a_void = 0; /* zero out all bits */
+            any.a_int = randrace(flags.initrole)+1;
+            flutter_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "ランダム", 0);
+            for(i = 0; races[i].noun; i++)
+                if(ok_race(flags.initrole, i, flags.initgend, flags.initalign))
+                {
+                    any.a_int = i + 1; /* must be non-zero */
+                    thisch = lowc(races[i].noun[0]);
+                    if(thisch == lastch)
+                        thisch = highc(thisch);
+                    flutter_add_menu(win, &nul_glyphinfo, &any, thisch, 0, ATR_NONE, NO_COLOR, jp_race_noun_for_display(i), 0);
+                    lastch = thisch;
+                }
+            flutter_end_menu(win, "種族を選んでください");
+            result = flutter_select_menu(win, PICK_ONE, &selected);
+            flutter_destroy_nhwindow(win);
+
+            if(result > 0)
+                flags.initrace = selected[0].item.a_int - 1;
+            free((genericptr_t)selected), selected = 0;
+        }
+
+        if(result <= 0)
+        {
+            state = 0;
+            continue;
+        }
+        state = 2;
+
+        /* Select a gender, if necessary */
+        if(flags.initgend < 0)
+            flags.initgend = pick_gend(flags.initrole, flags.initrace, flags.initalign, PICK_RIGID);
+
+        result = 1;
+        if(flags.initgend < 0)
+        {
+            win = flutter_create_nhwindow(NHW_MENU);
+            flutter_start_menu(win, MENU_BEHAVE_STANDARD);
+            any.a_void = 0; /* zero out all bits */
+            any.a_int = randgend(flags.initrole, flags.initrace)+1;
+            flutter_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "ランダム", 0);
+            for(i = 0; i < ROLE_GENDERS; i++)
+                if(ok_gend(flags.initrole, flags.initrace, i, flags.initalign))
+                {
+                    any.a_int = i + 1;
+                    flutter_add_menu(win, &nul_glyphinfo, &any, "mf"[i], 0, ATR_NONE, NO_COLOR, i == 0 ? "男性" : "女性", 0);
+                }
+            flutter_end_menu(win, "性別を選んでください");
+            result = flutter_select_menu(win, PICK_ONE, &selected);
+            flutter_destroy_nhwindow(win);
+
+            if(result > 0)
+                flags.initgend = selected[0].item.a_int - 1;
+            free((genericptr_t)selected), selected = 0;
+        }
+
+        if(result <= 0)
+        {
+            state = 1;
+            continue;
+        }
+        state = 3;
+
+        /* Select an alignment, if necessary */
+        if(flags.initalign < 0)
+            flags.initalign = pick_align(flags.initrole, flags.initrace, flags.initgend, PICK_RIGID);
+
+        result = 1;
+        if(flags.initalign < 0)
+        {
+            win = flutter_create_nhwindow(NHW_MENU);
+            flutter_start_menu(win, MENU_BEHAVE_STANDARD);
+            any.a_void = 0; /* zero out all bits */
+            any.a_int = randalign(flags.initrole, flags.initrace)+1;
+            flutter_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "ランダム", 0);
+            for(i = 0; i < ROLE_ALIGNS; i++)
+                if(ok_align(flags.initrole, flags.initrace, flags.initgend, i))
+                {
+                    any.a_int = i + 1;
+                    flutter_add_menu(win, &nul_glyphinfo, &any, "lcn"[i], 0, ATR_NONE, NO_COLOR, i == 0 ? "秩序" : (i == 1 ? "中立" : "混沌"), 0);
+                }
+            flutter_end_menu(win, "属性（アライメント）を選んでください");
+            result = flutter_select_menu(win, PICK_ONE, &selected);
+            flutter_destroy_nhwindow(win);
+
+            if(result > 0)
+                flags.initalign = selected[0].item.a_int - 1;
+            free((genericptr_t)selected), selected = 0;
+        }
+
+        if(result <= 0)
+        {
+            state = 2;
+            continue;
+        }
+    }
 }
+
+extern char** get_saved_games(void);
+extern void clearlocks(void);
 
 static void flutter_askname(void) {
     debuglog("flutter_askname called");
-    strncpy(svp.plname, "Player", sizeof(svp.plname) - 1);
+    g_askname_result[0] = '\0';
+    g_askname_done = 0;
+    
+    // セーブファイル一覧を取得してセミコロン区切りにする
+    char** saves = get_saved_games();
+    char saves_buf[4096] = {0};
+    int idx = 0;
+    while (saves && saves[idx]) {
+        char* first_del = strchr(saves[idx], '-');
+        if (first_del) *first_del = '\0';
+        if (idx > 0) {
+            strcat(saves_buf, ";");
+        }
+        strcat(saves_buf, saves[idx]);
+        idx++;
+    }
+    
+    if (g_askname_cb) {
+        g_askname_cb(saves_buf, PL_NSIZ);
+    } else {
+        strncpy(svp.plname, "Player", sizeof(svp.plname) - 1);
+        return;
+    }
+    
+    while (!g_askname_done) {
+        usleep(10000); // 10ms
+    }
+    
+    if (g_askname_result[0] == '\033' || (unsigned char)g_askname_result[0] == 0x80 || g_askname_result[0] == '\0') {
+        clearlocks();
+        exit(0);
+    }
+    
+    strncpy(svp.plname, g_askname_result, sizeof(svp.plname) - 1);
+    svp.plname[sizeof(svp.plname) - 1] = '\0';
 }
 
 static void flutter_exit_nhwindows(const char* str) {
     debuglog("flutter_exit_nhwindows: %s", str ? str : "NULL");
+    if (g_exit_cb) {
+        g_exit_cb();
+    }
 }
 
 static void flutter_suspend_nhwindows(const char* str) {
@@ -315,21 +607,42 @@ static void flutter_nhbell(void) {
 static char flutter_yn_function(const char* question, const char* choices, char def) {
     debuglog("flutter_yn_function: %s (%s) def=%c", question, choices, def);
     
-    if (g_putstr_cb && question) {
-        char* conv = convert_cp437_to_utf8(question);
-        g_putstr_cb(WIN_MESSAGE, ATR_NONE, conv ? conv : question);
+    g_yn_result = 0;
+    g_yn_done = 0;
+    
+    if (g_yn_function_cb) {
+        char* q_utf8 = convert_cp437_to_utf8(question);
+        g_yn_function_cb(q_utf8 ? q_utf8 : question, choices, (int)def);
+    } else {
+        return def;
     }
     
-    return (char)flutter_nhgetch();
+    while (!g_yn_done) {
+        usleep(10000); // 10ms
+    }
+    
+    return g_yn_result;
 }
 
 static void flutter_getlin(const char* prompt, char* buf) {
     debuglog("flutter_getlin: %s", prompt);
-    if (g_putstr_cb && prompt) {
-        char* conv = convert_cp437_to_utf8(prompt);
-        g_putstr_cb(WIN_MESSAGE, ATR_NONE, conv ? conv : prompt);
+    
+    g_getline_result[0] = '\0';
+    g_getline_done = 0;
+    
+    if (g_getline_cb) {
+        char* p_utf8 = convert_cp437_to_utf8(prompt);
+        g_getline_cb(p_utf8 ? p_utf8 : prompt, buf);
+    } else {
+        strcpy(buf, "a");
+        return;
     }
-    strcpy(buf, "a");
+    
+    while (!g_getline_done) {
+        usleep(10000); // 10ms
+    }
+    
+    strcpy(buf, g_getline_result);
 }
 
 static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_info* glyphinfo, const glyph_info* bkglyphinfo) {
@@ -452,6 +765,9 @@ static void HijackWindowProcs(void) {
     and_procs.win_end_menu = flutter_end_menu;
     and_procs.win_select_menu = flutter_select_menu;
 
+    // ステータス表示用に genl_status_update にリダイレクト！
+    and_procs.win_status_update = genl_status_update;
+
     windowprocs = and_procs;
     
     debuglog("Hijack completed.");
@@ -485,6 +801,9 @@ static void* NetHackThreadFunc(void* arg) {
     NetHackMain(1, params);
 
     debuglog("NetHackMain exited.");
+    if (g_exit_cb) {
+        g_exit_cb();
+    }
     free(args);
     return NULL;
 }

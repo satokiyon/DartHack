@@ -44,6 +44,12 @@ class NetHackWorker {
     late final NativeCallable<EndMenuCallback> endMenuCallable;
     late final NativeCallable<SelectMenuCallback> selectMenuCallable;
 
+    // 新しい同期待信用 NativeCallable
+    late final NativeCallable<YnFunctionCallback> ynCallable;
+    late final NativeCallable<GetLineCallback> getlineCallable;
+    late final NativeCallable<AskNameCallback> asknameCallable;
+    late final NativeCallable<ExitCallback> exitCallable;
+
     receivePort.listen((message) {
       if (message is Map) {
         final type = message['type'];
@@ -171,6 +177,43 @@ class NetHackWorker {
             });
           });
 
+          // 同期待信用コールバックの初期化
+          ynCallable = NativeCallable<YnFunctionCallback>.listener((Pointer<Utf8> questionPtr, Pointer<Utf8> choicesPtr, int def) {
+            final question = _utf8DecodeLossy(questionPtr);
+            final choices = choicesPtr != nullptr ? choicesPtr.toDartString() : "";
+            uiSendPort.send({
+              'type': 'yn_function',
+              'question': question,
+              'choices': choices,
+              'def': def,
+            });
+          });
+
+          getlineCallable = NativeCallable<GetLineCallback>.listener((Pointer<Utf8> promptPtr, Pointer<Utf8> initTextPtr) {
+            final prompt = _utf8DecodeLossy(promptPtr);
+            final initText = _utf8DecodeLossy(initTextPtr);
+            uiSendPort.send({
+              'type': 'getline',
+              'prompt': prompt,
+              'initText': initText,
+            });
+          });
+
+          asknameCallable = NativeCallable<AskNameCallback>.listener((Pointer<Utf8> savesPtr, int maxChars) {
+            final saves = _utf8DecodeLossy(savesPtr);
+            uiSendPort.send({
+              'type': 'askname',
+              'saves': saves,
+              'maxChars': maxChars,
+            });
+          });
+
+          exitCallable = NativeCallable<ExitCallback>.listener(() {
+            uiSendPort.send({
+              'type': 'game_exit',
+            });
+          });
+
           // コールバックをC側に登録
           ffi.registerCallbacks(
             createCallable.nativeFunction,
@@ -185,6 +228,10 @@ class NetHackWorker {
             addMenuCallable.nativeFunction,
             endMenuCallable.nativeFunction,
             selectMenuCallable.nativeFunction,
+            ynCallable.nativeFunction,
+            getlineCallable.nativeFunction,
+            asknameCallable.nativeFunction,
+            exitCallable.nativeFunction,
           );
 
           // NetHack コアを起動
@@ -198,6 +245,27 @@ class NetHackWorker {
         } else if (type == 'menu_select') {
           final ident = message['ident'] as int;
           ffi.sendMenuSelection(ident);
+        } else if (type == 'yn_result') {
+          final result = message['result'] as int;
+          ffi.sendYnResult(result);
+        } else if (type == 'getline_result') {
+          final result = message['result'] as String?;
+          if (result != null) {
+            final resultPtr = result.toNativeUtf8();
+            ffi.sendGetLineResult(resultPtr);
+            calloc.free(resultPtr);
+          } else {
+            ffi.sendGetLineResult(nullptr);
+          }
+        } else if (type == 'askname_result') {
+          final result = message['result'] as String?;
+          if (result != null) {
+            final resultPtr = result.toNativeUtf8();
+            ffi.sendAskNameResult(resultPtr);
+            calloc.free(resultPtr);
+          } else {
+            ffi.sendAskNameResult(nullptr);
+          }
         }
       }
     });

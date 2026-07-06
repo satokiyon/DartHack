@@ -87,6 +87,7 @@ class NetHackScreen extends ChangeNotifier {
   int _cursorY = 0;
   int get cursorX => _cursorX;
   int get cursorY => _cursorY;
+  int _statusCursorY = 0;
 
   NetHackScreen() {
     _clearMapGrid();
@@ -149,10 +150,12 @@ class NetHackScreen extends ChangeNotifier {
 
   void setCursor(int winId, int x, int y) {
     final type = _winTypes[winId];
-    if (type == nhwMap) {
+    if (type == nhwMap || winId == 3 /* WIN_MAP */) {
       _cursorX = x;
       _cursorY = y;
       notifyListeners();
+    } else if (type == nhwStatus || winId == 2 /* WIN_STATUS */) {
+      _statusCursorY = y;
     }
   }
 
@@ -164,13 +167,18 @@ class NetHackScreen extends ChangeNotifier {
         _messages.removeAt(0);
       }
     } else if (type == nhwStatus || winId == 2 /* WIN_STATUS */) {
-      if (_statusLines[0].isEmpty) {
-        _statusLines[0] = text;
-      } else if (_statusLines[1].isEmpty) {
-        _statusLines[1] = text;
+      if (_statusCursorY >= 0 && _statusCursorY < _statusLines.length) {
+        _statusLines[_statusCursorY] = text;
       } else {
-        _statusLines[0] = _statusLines[1];
-        _statusLines[1] = text;
+        // フォールバック
+        if (_statusLines[0].isEmpty) {
+          _statusLines[0] = text;
+        } else if (_statusLines[1].isEmpty) {
+          _statusLines[1] = text;
+        } else {
+          _statusLines[0] = _statusLines[1];
+          _statusLines[1] = text;
+        }
       }
     } else if (type == nhwText || type == nhwMenu) {
       _textLines.add(text);

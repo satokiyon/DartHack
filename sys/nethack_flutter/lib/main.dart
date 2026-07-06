@@ -11,6 +11,10 @@ import 'nethack_dpad.dart';
 import 'nethack_cmd_panel.dart';
 import 'nethack_keyboard.dart';
 import 'nethack_shortcut_pad.dart';
+import 'nethack_ffi.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:ffi' hide Size;
+import 'package:ffi/ffi.dart';
 
 void main() {
   runApp(const MyApp());
@@ -68,6 +72,32 @@ class _MyHomePageState extends State<MyHomePage> {
   late TransformationController _transformationController;
   double _currentScale = 1.0; // ピンチズームで設定された現在のズーム率を保持する状態変数
 
+  // --- 新規同期ダイアログ用状態変数 ---
+  bool _isYnVisible = false;
+  String _ynQuestion = "";
+  String _ynChoices = "";
+  int _ynDefault = 0;
+
+  bool _isGetLineVisible = false;
+  String _getlinePrompt = "";
+  final TextEditingController _getlineController = TextEditingController();
+
+  bool _isAskNameVisible = false;
+  List<String> _askNameSaves = [];
+  int _askNameMaxChars = 0;
+  final TextEditingController _askNameController = TextEditingController();
+
+  // 拡張コマンドサジェスト用
+  List<String> _extCmdList = [];
+  List<String> _filteredExtCmds = [];
+  final TextEditingController _extCmdFilterController = TextEditingController();
+
+  // 詳細な操作設定（shared_preferences用）
+  double _padOpacity = 0.8;
+  double _padScale = 1.0;
+  int _autoSaveInterval = 0;
+  int _statusDisplayMode = 0; // 0: 領域に合わせて文字サイズ縮小(Fit), 1: 領域の可変高さ(Wrap)
+
   @override
   void initState() {
     super.initState();
@@ -77,7 +107,86 @@ class _MyHomePageState extends State<MyHomePage> {
         _focusNode.requestFocus();
       }
     });
-    _initAssets();
+    _loadPreferences().then((_) => _initAssets());
+  }
+
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _useTiles = prefs.getBool('use_tiles') ?? true;
+      _selectedTileset = prefs.getString('selected_tileset') ?? 'nevanda_32x32';
+      _isKeyboardVisible = prefs.getBool('keyboard_visible') ?? true;
+      final controllerModeStr = prefs.getString('controller_mode') ?? 'pad';
+      _controllerMode = controllerModeStr == 'keyboard' ? ControllerMode.keyboard : ControllerMode.pad;
+      _padOpacity = prefs.getDouble('pad_opacity') ?? 0.8;
+      _padScale = prefs.getDouble('pad_scale') ?? 1.0;
+      _autoSaveInterval = prefs.getInt('auto_save_interval') ?? 0;
+      _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
+    });
+  }
+
+  Future<void> _savePreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('use_tiles', _useTiles);
+    await prefs.setString('selected_tileset', _selectedTileset);
+    await prefs.setBool('keyboard_visible', _isKeyboardVisible);
+    await prefs.setString('controller_mode', _controllerMode == ControllerMode.keyboard ? 'keyboard' : 'pad');
+    await prefs.setDouble('pad_opacity', _padOpacity);
+    await prefs.setDouble('pad_scale', _padScale);
+    await prefs.setInt('auto_save_interval', _autoSaveInterval);
+    await prefs.setInt('status_display_mode', _statusDisplayMode);
+  }
+
+  void _loadExtCmds() {
+    try {
+      final ffi = NetHackFfi();
+      final ptr = ffi.getExtCmdsFlutter();
+      if (ptr != nullptr) {
+        final extCmdsStr = ptr.toDartString();
+        setState(() {
+          _extCmdList = extCmdsStr.split(';');
+          _filteredExtCmds = List.from(_extCmdList);
+        });
+        _extCmdFilterController.clear();
+      }
+    } catch (e) {
+      debugPrint("Error loading extcmds: $e");
+    }
+  }
+
+  void _sendYnResult(int result) {
+    _workerSendPort?.send({
+      'type': 'yn_result',
+      'result': result,
+    });
+    setState(() {
+      _isYnVisible = false;
+    });
+  }
+
+  void _sendGetLineResult(String? result) {
+    _workerSendPort?.send({
+      'type': 'getline_result',
+      'result': result,
+    });
+    setState(() {
+      _isGetLineVisible = false;
+    });
+  }
+
+  void _sendAskNameResult(String? result) {
+    _workerSendPort?.send({
+      'type': 'askname_result',
+      'result': result,
+    });
+    setState(() {
+      _isAskNameVisible = false;
+    });
+    if (result != null && result.isNotEmpty) {
+      SharedPreferences.getInstance().then((prefs) {
+        prefs.setString("lastUsername", result);
+      });
+    }
   }
 
   @override
@@ -228,8 +337,49 @@ class _MyHomePageState extends State<MyHomePage> {
             _focusNode.requestFocus();
           }
           _triggerCenterOnPlayer();
+        } else if (type == 'yn_function') {
+          setState(() {
+            _ynQuestion = message['question'];
+            _ynChoices = message['choices'];
+            _ynDefault = message['def'];
+            _isYnVisible = true;
+          });
+        } else if (type == 'getline') {
+          final prompt = message['prompt'] as String;
+          final initText = message['initText'] as String;
+          _getlineController.text = initText;
+          if (prompt.contains("extended command") || prompt.contains("拡張コマンド")) {
+            _loadExtCmds();
+          } else {
+            _extCmdList = [];
+            _filteredExtCmds = [];
+          }
+          setState(() {
+            _getlinePrompt = prompt;
+            _isGetLineVisible = true;
+          });
+        } else if (type == 'askname') {
+          final savesStr = message['saves'] as String;
+          final saves = savesStr.isNotEmpty ? savesStr.split(';') : <String>[];
+          setState(() {
+            _askNameSaves = saves;
+            _askNameMaxChars = message['maxChars'];
+            _isAskNameVisible = true;
+            _askNameController.text = saves.isNotEmpty ? saves[0] : "Player";
+          });
         } else if (type == 'startMenu') {
           _screen.startMenu(message['winId']);
+        } else if (type == 'game_exit') {
+          setState(() {
+            _isGameRunning = false;
+            _isKeyboardVisible = false;
+            _waitingForInput = false;
+            _isYnVisible = false;
+            _isGetLineVisible = false;
+            _isAskNameVisible = false;
+            _logs.clear();
+            _logs.add("セーブ完了またはゲームが終了しました。また遊びましょう！");
+          });
         } else if (type == 'addMenu') {
           _screen.addMenu(
             message['winId'],
@@ -375,6 +525,424 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget _buildYnOverlay() {
+    final choices = _ynChoices.split('');
+    final isYesNo = _ynChoices.toLowerCase() == 'yn' || _ynChoices.toLowerCase() == 'ynq';
+    
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black54,
+        child: Center(
+          child: Card(
+            margin: const EdgeInsets.all(24),
+            color: Colors.grey[900],
+            elevation: 8,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _ynQuestion,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  if (isYesNo)
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () => _sendYnResult('y'.codeUnitAt(0)),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.green[800], foregroundColor: Colors.white),
+                          child: const Text('はい (y)', style: TextStyle(fontSize: 16)),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => _sendYnResult('n'.codeUnitAt(0)),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.red[800], foregroundColor: Colors.white),
+                          child: const Text('いいえ (n)', style: TextStyle(fontSize: 16)),
+                        ),
+                        if (_ynChoices.toLowerCase().contains('q'))
+                          ElevatedButton(
+                            onPressed: () => _sendYnResult('q'.codeUnitAt(0)),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[800], foregroundColor: Colors.white),
+                            child: const Text('やめる (q)'),
+                          ),
+                      ],
+                    )
+                  else
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        ...choices.map((ch) {
+                          final isDefault = ch.codeUnitAt(0) == _ynDefault;
+                          return ElevatedButton(
+                            onPressed: () => _sendYnResult(ch.codeUnitAt(0)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isDefault ? Colors.deepPurple : Colors.grey[800],
+                              foregroundColor: Colors.white,
+                            ),
+                            child: Text(ch),
+                          );
+                        }),
+                        ElevatedButton(
+                          onPressed: () => _sendYnResult(27), // ESC
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[900], foregroundColor: Colors.grey),
+                          child: const Text('キャンセル'),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGetLineOverlay() {
+    final isExtCmd = _extCmdList.isNotEmpty;
+    
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black87,
+        child: Center(
+          child: Card(
+            margin: const EdgeInsets.all(16),
+            color: Colors.grey[950],
+            elevation: 12,
+            child: Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    _getlinePrompt,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.amber),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _getlineController,
+                    autofocus: true,
+                    maxLength: 100,
+                    decoration: InputDecoration(
+                      hintText: 'テキストを入力してください',
+                      filled: true,
+                      fillColor: Colors.grey[900],
+                      border: const OutlineInputBorder(),
+                    ),
+                    onSubmitted: (val) {
+                      _sendGetLineResult(val);
+                    },
+                  ),
+                  if (isExtCmd) ...[
+                    const SizedBox(height: 8),
+                    const Text("拡張コマンドの選択:", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    const SizedBox(height: 4),
+                    TextField(
+                      controller: _extCmdFilterController,
+                      decoration: InputDecoration(
+                        hintText: 'コマンドを絞り込み...',
+                        prefixIcon: const Icon(Icons.search, size: 18),
+                        isDense: true,
+                        filled: true,
+                        fillColor: Colors.grey[900],
+                        border: const OutlineInputBorder(),
+                      ),
+                      onChanged: (val) {
+                        setState(() {
+                          _filteredExtCmds = _extCmdList
+                              .where((cmd) => cmd.toLowerCase().contains(val.toLowerCase()))
+                              .toList();
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white10),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: _filteredExtCmds.length,
+                          itemBuilder: (context, index) {
+                            final cmd = _filteredExtCmds[index];
+                            return ListTile(
+                              title: Text(cmd, style: const TextStyle(fontFamily: 'monospace', color: Colors.white)),
+                              dense: true,
+                              visualDensity: VisualDensity.compact,
+                              onTap: () {
+                                _getlineController.text = cmd;
+                                _sendGetLineResult(cmd);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => _sendGetLineResult(null),
+                        child: const Text('キャンセル'),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () => _sendGetLineResult(_getlineController.text),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
+                        child: const Text('決定'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAskNameOverlay() {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black87,
+        child: Center(
+          child: Card(
+            margin: const EdgeInsets.all(20),
+            color: Colors.grey[950],
+            elevation: 12,
+            child: Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text(
+                    "お名前は？",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _askNameController,
+                    autofocus: true,
+                    maxLength: _askNameMaxChars,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[900],
+                      border: const OutlineInputBorder(),
+                    ),
+                    onSubmitted: (val) {
+                      _sendAskNameResult(val);
+                    },
+                  ),
+                  if (_askNameSaves.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    const Text("既存のセーブデータ:", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    const SizedBox(height: 6),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white10),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: ListView.builder(
+                          itemCount: _askNameSaves.length,
+                          itemBuilder: (context, index) {
+                            final name = _askNameSaves[index];
+                            return ListTile(
+                              title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                              leading: const Icon(Icons.account_circle, color: Colors.deepPurpleAccent),
+                              dense: true,
+                              onTap: () {
+                                _askNameController.text = name;
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => _sendAskNameResult(null),
+                        child: const Text('キャンセル'),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () => _sendAskNameResult(_askNameController.text),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
+                        child: const Text('ゲーム開始'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showSettingsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Row(
+                children: [
+                  Icon(Icons.settings, color: Colors.amber),
+                  SizedBox(width: 8),
+                  Text("ゲーム設定"),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SwitchListTile(
+                      title: const Text("タイル表示"),
+                      value: _useTiles,
+                      onChanged: (val) {
+                        setState(() {
+                          _useTiles = val;
+                        });
+                        setDialogState(() {});
+                        _savePreferences();
+                      },
+                    ),
+                    if (_useTiles)
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: "タイルセット"),
+                        initialValue: _selectedTileset,
+                        items: const [
+                          DropdownMenuItem(value: 'nevanda_32x32', child: Text('Nevanda (32x32)')),
+                          DropdownMenuItem(value: 'pixelhack_32x32', child: Text('PixelHack (32x32)')),
+                          DropdownMenuItem(value: 'default_16x16', child: Text('Default (16x16)')),
+                          DropdownMenuItem(value: 'geoduck_15x25', child: Text('Geoduck (15x25)')),
+                        ],
+                        onChanged: (val) {
+                          if (val != null) {
+                            setState(() {
+                              _selectedTileset = val;
+                            });
+                            setDialogState(() {});
+                            _loadTileset(val);
+                            _savePreferences();
+                          }
+                        },
+                      ),
+                    const Divider(),
+                    ListTile(
+                      title: const Text("操作モード"),
+                      trailing: DropdownButton<ControllerMode>(
+                        value: _controllerMode,
+                        items: const [
+                          DropdownMenuItem(value: ControllerMode.pad, child: Text('ボタンパッド')),
+                          DropdownMenuItem(value: ControllerMode.keyboard, child: Text('フルキーボード')),
+                        ],
+                        onChanged: (val) {
+                          if (val != null) {
+                            setState(() {
+                              _controllerMode = val;
+                            });
+                            setDialogState(() {});
+                            _savePreferences();
+                          }
+                        },
+                      ),
+                    ),
+                    ListTile(
+                      title: const Text("ボタン不透明度"),
+                      subtitle: Slider(
+                        value: _padOpacity,
+                        min: 0.1,
+                        max: 1.0,
+                        divisions: 9,
+                        label: _padOpacity.toStringAsFixed(1),
+                        onChanged: (val) {
+                          setState(() {
+                            _padOpacity = val;
+                          });
+                          setDialogState(() {});
+                          _savePreferences();
+                        },
+                      ),
+                    ),
+                    ListTile(
+                      title: const Text("ボタンサイズ倍率"),
+                      subtitle: Slider(
+                        value: _padScale,
+                        min: 0.6,
+                        max: 1.5,
+                        divisions: 9,
+                        label: _padScale.toStringAsFixed(1),
+                        onChanged: (val) {
+                          setState(() {
+                            _padScale = val;
+                          });
+                          setDialogState(() {});
+                          _savePreferences();
+                        },
+                      ),
+                    ),
+                    const Divider(),
+                    ListTile(
+                      title: const Text("ステータス表示モード"),
+                      trailing: DropdownButton<int>(
+                        value: _statusDisplayMode,
+                        items: const [
+                          DropdownMenuItem(value: 0, child: Text('自動縮小フィット')),
+                          DropdownMenuItem(value: 1, child: Text('領域の可変高さ')),
+                        ],
+                        onChanged: (val) {
+                          if (val != null) {
+                            setState(() {
+                              _statusDisplayMode = val;
+                            });
+                            setDialogState(() {});
+                            _savePreferences();
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("閉じる"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget _buildGameScreen() {
     return ListenableBuilder(
       listenable: _screen,
@@ -384,7 +952,42 @@ class _MyHomePageState extends State<MyHomePage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. メッセージ領域
+                // 1. ステータス領域 (Java版に合わせて最上部に配置)
+                _statusDisplayMode == 0
+                    ? Container(
+                        height: 38,
+                        width: double.infinity,
+                        color: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        alignment: Alignment.centerLeft,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            _screen.statusLines.join("\n"),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'monospace',
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Container(
+                        width: double.infinity,
+                        color: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        child: Text(
+                          _screen.statusLines.join("\n"),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'monospace',
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                const Divider(color: Colors.white12, height: 1),
+                // 2. メッセージ領域
                 Container(
                   height: 54,
                   width: double.infinity,
@@ -404,6 +1007,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 const Divider(color: Colors.white12, height: 1),
+                // 3. マップ表示
                 Expanded(
                   child: Container(
                     key: _mapViewportKey,
@@ -432,22 +1036,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                ),
-                const Divider(color: Colors.white12, height: 1),
-                // 3. ステータス領域
-                Container(
-                  height: 38,
-                  width: double.infinity,
-                  color: Colors.black,
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  child: Text(
-                    _screen.statusLines.join("\n"),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'monospace',
-                      fontSize: 13,
                     ),
                   ),
                 ),
@@ -510,9 +1098,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-            // メニュー選択ウィンドウのオーバーレイ表示
+            // メニュアル選択ウィンドウのオーバーレイ表示
             if (_screen.isMenuWindowVisible)
               _buildMenuOverlay(),
+            // 同期型ダイアログオーバーレイ
+            if (_isYnVisible) _buildYnOverlay(),
+            if (_isGetLineVisible) _buildGetLineOverlay(),
+            if (_isAskNameVisible) _buildAskNameOverlay(),
           ],
         );
       },
@@ -525,6 +1117,11 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text('NetHackJP Flutter'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'ゲーム設定',
+            onPressed: _showSettingsDialog,
+          ),
           if (_isGameRunning) ...[
             // タイルとASCIIの切り替えトグル
             IconButton(
@@ -600,7 +1197,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: const EdgeInsets.all(16.0),
                       child: SingleChildScrollView(
                         child: Text(
-                          _logs.join('\n'),
+                           _logs.join('\n'),
                           style: const TextStyle(fontFamily: 'monospace'),
                         ),
                       ),
@@ -619,54 +1216,78 @@ class _MyHomePageState extends State<MyHomePage> {
                           ],
                         ),
                       )
-                    : ElevatedButton(
-                        onPressed: _startGame,
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 50),
-                        ),
-                        child: const Text('Start NetHack Game'),
+                    : Column(
+                        children: [
+                          ElevatedButton(
+                            onPressed: _startGame,
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 50),
+                              backgroundColor: Colors.deepPurple,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('Start NetHack Game', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          ),
+                          const SizedBox(height: 12),
+                          OutlinedButton.icon(
+                            onPressed: _showSettingsDialog,
+                            icon: const Icon(Icons.settings),
+                            label: const Text("ゲーム設定を開く"),
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 45),
+                            ),
+                          ),
+                        ],
                       ),
               ),
             // ゲーム進行中の操作盤 (キーボードモード vs ボタンモード)
             if (_isGameRunning && _isKeyboardVisible && _waitingForInput) ...[
-              if (_controllerMode == ControllerMode.keyboard)
-                NetHackKeyboard(
-                  onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                  onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                  onToggleMode: () {
-                    setState(() {
-                      _controllerMode = ControllerMode.pad;
-                    });
-                  },
-                )
-              else ...[
-                // ボタンモード (左端に D-Pad, 右端に 3x3 ショートカットパッド)
-                Container(
-                  color: Colors.grey[950],
-                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      NetHackDPad(
-                        onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                      ),
-                      NetHackShortcutPad(
-                        onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                        onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                      ),
-                    ],
-                  ),
+              Opacity(
+                opacity: _padOpacity,
+                child: Transform.scale(
+                  scale: _padScale,
+                  alignment: Alignment.bottomCenter,
+                  child: _controllerMode == ControllerMode.keyboard
+                      ? NetHackKeyboard(
+                          onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                          onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                          onToggleMode: () {
+                            setState(() {
+                              _controllerMode = ControllerMode.pad;
+                            });
+                          },
+                        )
+                      : Column(
+                          children: [
+                            // ボタンモード (左端に D-Pad, 右端に 3x3 ショートカットパッド)
+                            Container(
+                              color: Colors.grey[950],
+                              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  NetHackDPad(
+                                    onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                                  ),
+                                  NetHackShortcutPad(
+                                    onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                                    onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            NetHackCmdPanel(
+                              onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                              onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
+                              onToggleMode: () {
+                                setState(() {
+                                  _controllerMode = ControllerMode.keyboard;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
                 ),
-                NetHackCmdPanel(
-                  onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                  onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
-                  onToggleMode: () {
-                    setState(() {
-                      _controllerMode = ControllerMode.keyboard;
-                    });
-                  },
-                ),
-              ],
+              ),
             ],
           ],
         ),

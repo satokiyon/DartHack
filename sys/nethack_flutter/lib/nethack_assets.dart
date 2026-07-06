@@ -17,6 +17,12 @@ class NetHackAssets {
       await dstDir.create(recursive: true);
     }
 
+    // セーブ用ディレクトリの作成
+    final saveDir = Directory('${dstDir.path}/save');
+    if (!await saveDir.exists()) {
+      await saveDir.create(recursive: true);
+    }
+
     // 1. アセット側のバージョンを取得 (assets/ver)
     String assetVerStr = "0";
     try {

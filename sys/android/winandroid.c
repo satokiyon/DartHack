@@ -2437,7 +2437,19 @@ void and_get_dumplog_dir(char* buf)
 	const jchar* pChars;
 	jstring jstr;
 
+	if (jEnv == NULL)
+	{
+		buf[0] = '\0';
+		return;
+	}
+
 	jstr = (jstring)JNICallO(jGetDumplogDir);
+	if (jstr == NULL)
+	{
+		buf[0] = '\0';
+		return;
+	}
+
 	n = (*jEnv)->GetStringLength(jEnv, jstr);
 
 	if(n > 0 && n < BUFSZ - 1)

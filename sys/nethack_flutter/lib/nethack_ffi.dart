@@ -26,11 +26,17 @@ typedef AddMenuCallback = Void Function(
 typedef EndMenuCallback = Void Function(Int32 winId, Pointer<Utf8> prompt);
 typedef SelectMenuCallback = Void Function(Int32 winId, Int32 how);
 
+// 新規追加コールバック
+typedef YnFunctionCallback = Void Function(Pointer<Utf8> question, Pointer<Utf8> choices, Int32 def);
+typedef GetLineCallback = Void Function(Pointer<Utf8> prompt, Pointer<Utf8> initText);
+typedef AskNameCallback = Void Function(Pointer<Utf8> saves, Int32 maxChars);
+typedef ExitCallback = Void Function();
+
 // C側起動関数
 typedef StartNetHackFunc = Void Function(Pointer<Utf8> path, Pointer<Utf8> username);
 typedef StartNetHackDart = void Function(Pointer<Utf8> path, Pointer<Utf8> username);
 
-// コールバック登録関数 (12個の引数)
+// コールバック登録関数 (16個の引数へ拡張)
 typedef RegisterCallbacksFunc = Void Function(
   Pointer<NativeFunction<CreateWindowCallback>> createCb,
   Pointer<NativeFunction<ClearWindowCallback>> clearCb,
@@ -44,6 +50,10 @@ typedef RegisterCallbacksFunc = Void Function(
   Pointer<NativeFunction<AddMenuCallback>> addMenuCb,
   Pointer<NativeFunction<EndMenuCallback>> endMenuCb,
   Pointer<NativeFunction<SelectMenuCallback>> selectMenuCb,
+  Pointer<NativeFunction<YnFunctionCallback>> ynCb,
+  Pointer<NativeFunction<GetLineCallback>> getlineCb,
+  Pointer<NativeFunction<AskNameCallback>> asknameCb,
+  Pointer<NativeFunction<ExitCallback>> exitCb,
 );
 typedef RegisterCallbacksDart = void Function(
   Pointer<NativeFunction<CreateWindowCallback>> createCb,
@@ -58,6 +68,10 @@ typedef RegisterCallbacksDart = void Function(
   Pointer<NativeFunction<AddMenuCallback>> addMenuCb,
   Pointer<NativeFunction<EndMenuCallback>> endMenuCb,
   Pointer<NativeFunction<SelectMenuCallback>> selectMenuCb,
+  Pointer<NativeFunction<YnFunctionCallback>> ynCb,
+  Pointer<NativeFunction<GetLineCallback>> getlineCb,
+  Pointer<NativeFunction<AskNameCallback>> asknameCb,
+  Pointer<NativeFunction<ExitCallback>> exitCb,
 );
 
 // キー送信
@@ -72,6 +86,20 @@ typedef SendMenuSelectionDart = void Function(int ident);
 typedef GetInputRequestIdFunc = Int32 Function();
 typedef GetInputRequestIdDart = int Function();
 
+// 結果返信用関数
+typedef SendYnResultFunc = Void Function(Int8 result);
+typedef SendYnResultDart = void Function(int result);
+
+typedef SendGetLineResultFunc = Void Function(Pointer<Utf8> result);
+typedef SendGetLineResultDart = void Function(Pointer<Utf8> result);
+
+typedef SendAskNameResultFunc = Void Function(Pointer<Utf8> result);
+typedef SendAskNameResultDart = void Function(Pointer<Utf8> result);
+
+// 拡張コマンド取得
+typedef GetExtCmdsFunc = Pointer<Utf8> Function();
+typedef GetExtCmdsDart = Pointer<Utf8> Function();
+
 class NetHackFfi {
   late final DynamicLibrary _lib;
   late final StartNetHackDart startNetHack;
@@ -79,6 +107,11 @@ class NetHackFfi {
   late final SendKeyDart sendKeyToC;
   late final SendMenuSelectionDart sendMenuSelection;
   late final GetInputRequestIdDart getInputRequestId;
+  
+  late final SendYnResultDart sendYnResult;
+  late final SendGetLineResultDart sendGetLineResult;
+  late final SendAskNameResultDart sendAskNameResult;
+  late final GetExtCmdsDart getExtCmdsFlutter;
 
   NetHackFfi() {
     try {
@@ -106,6 +139,22 @@ class NetHackFfi {
 
     getInputRequestId = _lib
         .lookup<NativeFunction<GetInputRequestIdFunc>>('GetFlutterInputRequestId')
+        .asFunction();
+
+    sendYnResult = _lib
+        .lookup<NativeFunction<SendYnResultFunc>>('SendYnResultToC')
+        .asFunction();
+
+    sendGetLineResult = _lib
+        .lookup<NativeFunction<SendGetLineResultFunc>>('SendGetLineResultToC')
+        .asFunction();
+
+    sendAskNameResult = _lib
+        .lookup<NativeFunction<SendAskNameResultFunc>>('SendAskNameResultToC')
+        .asFunction();
+
+    getExtCmdsFlutter = _lib
+        .lookup<NativeFunction<GetExtCmdsFunc>>('GetExtCmdsFlutter')
         .asFunction();
   }
 }
