@@ -98,23 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final playerX = cursorX * cellWidth + (cellWidth / 2);
     final playerY = cursorY * cellHeight + (cellHeight / 2);
 
-    final mapWidth = 80 * cellWidth;
-    final mapHeight = 21 * cellHeight;
-
-    double tx = (viewportSize.width / 2) - playerX;
-    double ty = (viewportSize.height / 2) - playerY;
-
-    if (mapWidth > viewportSize.width) {
-      tx = tx.clamp(-(mapWidth - viewportSize.width), 0.0);
-    } else {
-      tx = (viewportSize.width - mapWidth) / 2;
-    }
-
-    if (mapHeight > viewportSize.height) {
-      ty = ty.clamp(-(mapHeight - viewportSize.height), 0.0);
-    } else {
-      ty = (viewportSize.height - mapHeight) / 2;
-    }
+    final tx = (viewportSize.width / 2) - playerX;
+    final ty = (viewportSize.height / 2) - playerY;
 
     _transformationController.value = Matrix4.translationValues(tx, ty, 0.0);
   }
