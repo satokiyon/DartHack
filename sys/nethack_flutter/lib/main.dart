@@ -10,6 +10,7 @@ import 'nethack_map_painter.dart';
 import 'nethack_dpad.dart';
 import 'nethack_cmd_panel.dart';
 import 'nethack_keyboard.dart';
+import 'nethack_shortcut_bar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -340,6 +341,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       fontSize: 13,
                     ),
                   ),
+                ),
+                const Divider(color: Colors.white12, height: 1),
+                // 9つのショートカットボタン (キーボードの状態にかかわらず常時表示)
+                NetHackShortcutBar(
+                  onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                  onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
                 ),
                 const Divider(color: Colors.white12, height: 1),
                 Expanded(

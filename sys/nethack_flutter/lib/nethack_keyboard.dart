@@ -20,11 +20,6 @@ class _NetHackKeyboardState extends State<NetHackKeyboard> {
   bool _isMetaEnabled = false;
   bool _isSymbolsMode = false;
 
-  // デフォルトのショートカットバーボタン割り当て (Java版初期設定参考)
-  final List<String> _shortcuts = [
-    'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', 'o', 'd', 'e', 'r'
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -32,50 +27,11 @@ class _NetHackKeyboardState extends State<NetHackKeyboard> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildShortcutBar(),
           if (_isSymbolsMode)
             _buildSymbolsLayout()
           else
             _buildQwertyLayout(),
         ],
-      ),
-    );
-  }
-
-  // ショートカットバーの描画
-  Widget _buildShortcutBar() {
-    return Container(
-      height: 38,
-      color: Colors.black45,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _shortcuts.length,
-        itemBuilder: (context, index) {
-          final shortcut = _shortcuts[index];
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
-            child: Material(
-              color: Colors.blueGrey[900],
-              borderRadius: BorderRadius.circular(4),
-              child: InkWell(
-                onTap: () => _handleMacroPress(shortcut),
-                borderRadius: BorderRadius.circular(4),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  alignment: Alignment.center,
-                  child: Text(
-                    shortcut,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
       ),
     );
   }
@@ -275,20 +231,6 @@ class _NetHackKeyboardState extends State<NetHackKeyboard> {
       setState(() {
         _isSymbolsMode = false;
       });
-    }
-  }
-
-  void _handleMacroPress(String shortcut) {
-    // ショートカットマクロ送信
-    if (shortcut.startsWith('#')) {
-      for (int i = 0; i < shortcut.length; i++) {
-        widget.onKeyPress(shortcut[i]);
-      }
-      widget.onRawKeyCode(10); // 送信完了のEnter
-    } else {
-      for (int i = 0; i < shortcut.length; i++) {
-        widget.onKeyPress(shortcut[i]);
-      }
     }
   }
 }
