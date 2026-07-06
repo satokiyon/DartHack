@@ -63,15 +63,71 @@ class _MyHomePageState extends State<MyHomePage> {
   String _selectedTileset = 'nevanda_32x32';
   bool _isKeyboardVisible = true; // デフォルトで仮想キーボードを表示
 
+  // 主人公追従・スクロール用変数
+  final GlobalKey _mapViewportKey = GlobalKey();
+  late TransformationController _transformationController;
+
   @override
   void initState() {
     super.initState();
+    _transformationController = TransformationController();
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus && _isGameRunning && _waitingForInput && !_isKeyboardVisible) {
         _focusNode.requestFocus();
       }
     });
     _initAssets();
+  }
+
+  @override
+  void dispose() {
+    _transformationController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _centerOnPlayer(Size viewportSize) {
+    if (!_isGameRunning) return;
+
+    final cellWidth = _useTiles ? 32.0 : 9.0;
+    final cellHeight = 16.0;
+
+    final cursorX = _screen.cursorX;
+    final cursorY = _screen.cursorY;
+
+    final playerX = cursorX * cellWidth + (cellWidth / 2);
+    final playerY = cursorY * cellHeight + (cellHeight / 2);
+
+    final mapWidth = 80 * cellWidth;
+    final mapHeight = 21 * cellHeight;
+
+    double tx = (viewportSize.width / 2) - playerX;
+    double ty = (viewportSize.height / 2) - playerY;
+
+    if (mapWidth > viewportSize.width) {
+      tx = tx.clamp(-(mapWidth - viewportSize.width), 0.0);
+    } else {
+      tx = (viewportSize.width - mapWidth) / 2;
+    }
+
+    if (mapHeight > viewportSize.height) {
+      ty = ty.clamp(-(mapHeight - viewportSize.height), 0.0);
+    } else {
+      ty = (viewportSize.height - mapHeight) / 2;
+    }
+
+    _transformationController.value = Matrix4.translationValues(tx, ty, 0.0);
+  }
+
+  void _triggerCenterOnPlayer() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final renderBox = _mapViewportKey.currentContext?.findRenderObject() as RenderBox?;
+        if (renderBox != null) {
+          _centerOnPlayer(renderBox.size);
+        }
+      }
+    });
   }
 
   Future<void> _initAssets() async {
@@ -172,6 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
           if (!_isKeyboardVisible) {
             _focusNode.requestFocus();
           }
+          _triggerCenterOnPlayer();
         } else if (type == 'startMenu') {
           _screen.startMenu(message['winId']);
         } else if (type == 'addMenu') {
@@ -192,6 +249,7 @@ class _MyHomePageState extends State<MyHomePage> {
           setState(() {
             _waitingForInput = true;
           });
+          _triggerCenterOnPlayer();
         } else if (type == 'error') {
           _addLog("ERROR: ${message['message']}");
           _stopGame();
@@ -349,8 +407,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 const Divider(color: Colors.white12, height: 1),
                 Expanded(
                   child: Container(
+                    key: _mapViewportKey,
                     color: Colors.black,
                     child: InteractiveViewer(
+                      transformationController: _transformationController,
                       constrained: false, // 子が親(画面幅)に制限されずunconstrainedでスクロール可能にする
                       maxScale: 6.0,
                       minScale: 0.5,
