@@ -17,8 +17,14 @@ class NetHackMapPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final cellW = size.width / NetHackScreen.mapCols;
-    final cellH = size.height / NetHackScreen.mapRows;
+    final cellW = useTiles ? 32.0 : 9.0;
+    final cellH = 16.0;
+
+    final mapWidth = NetHackScreen.mapCols * cellW;
+    final mapHeight = NetHackScreen.mapRows * cellH;
+
+    final offsetX = (size.width - mapWidth) / 2;
+    final offsetY = (size.height - mapHeight) / 2;
 
     if (useTiles && tileImage != null) {
       final cols = tileImage!.width ~/ tileSize;
@@ -26,7 +32,6 @@ class NetHackMapPainter extends CustomPainter {
       for (int y = 0; y < NetHackScreen.mapRows; y++) {
         for (int x = 0; x < NetHackScreen.mapCols; x++) {
           final glyph = screen.mapGrid[y][x];
-          // tileが0以上の場合のみタイル描画
           if (glyph.tile >= 0) {
             final iRow = glyph.tile ~/ cols;
             final iCol = glyph.tile % cols;
@@ -39,8 +44,8 @@ class NetHackMapPainter extends CustomPainter {
             );
 
             final destRect = Rect.fromLTWH(
-              x * cellW,
-              y * cellH,
+              offsetX + x * cellW,
+              offsetY + y * cellH,
               cellW,
               cellH,
             );
@@ -52,25 +57,22 @@ class NetHackMapPainter extends CustomPainter {
               Paint()..isAntiAlias = false,
             );
           } else {
-            // タイルがない場合のフォールバック描画
-            _drawTextCell(canvas, glyph.char, glyph.color, x, y, cellW, cellH);
+            _drawTextCell(canvas, glyph.char, glyph.color, x, y, cellW, cellH, offsetX, offsetY);
           }
         }
       }
     } else {
-      // 従来の ASCII モードでの描画
       for (int y = 0; y < NetHackScreen.mapRows; y++) {
         for (int x = 0; x < NetHackScreen.mapCols; x++) {
           final glyph = screen.mapGrid[y][x];
-          _drawTextCell(canvas, glyph.char, glyph.color, x, y, cellW, cellH);
+          _drawTextCell(canvas, glyph.char, glyph.color, x, y, cellW, cellH, offsetX, offsetY);
         }
       }
     }
 
-    // カーソル（プレイヤー位置のハイライト等）の描画
     final cursorRect = Rect.fromLTWH(
-      screen.cursorX * cellW,
-      screen.cursorY * cellH,
+      offsetX + screen.cursorX * cellW,
+      offsetY + screen.cursorY * cellH,
       cellW,
       cellH,
     );
@@ -83,7 +85,7 @@ class NetHackMapPainter extends CustomPainter {
     );
   }
 
-  void _drawTextCell(Canvas canvas, String char, int colorVal, int x, int y, double cellW, double cellH) {
+  void _drawTextCell(Canvas canvas, String char, int colorVal, int x, int y, double cellW, double cellH, double offsetX, double offsetY) {
     if (char == ' ' || char.isEmpty) return;
 
     final textPainter = TextPainter(
@@ -102,8 +104,8 @@ class NetHackMapPainter extends CustomPainter {
     textPainter.paint(
       canvas,
       Offset(
-        x * cellW + (cellW - textPainter.width) / 2,
-        y * cellH + (cellH - textPainter.height) / 2,
+        offsetX + x * cellW + (cellW - textPainter.width) / 2,
+        offsetY + y * cellH + (cellH - textPainter.height) / 2,
       ),
     );
   }

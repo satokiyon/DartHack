@@ -66,6 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // 主人公追従・スクロール用変数
   final GlobalKey _mapViewportKey = GlobalKey();
   late TransformationController _transformationController;
+  double _currentScale = 1.0; // ピンチズームで設定された現在のズーム率を保持する状態変数
 
   @override
   void initState() {
@@ -95,17 +96,23 @@ class _MyHomePageState extends State<MyHomePage> {
     final cursorX = _screen.cursorX;
     final cursorY = _screen.cursorY;
 
-    final playerX = cursorX * cellWidth + (cellWidth / 2);
-    final playerY = cursorY * cellHeight + (cellHeight / 2);
+    // 巨大キャンバス (4000x3000) 内でのマップ全体のサイズと余白オフセット
+    final mapWidth = 80 * cellWidth;
+    final mapHeight = 21 * cellHeight;
+    final mapOffsetX = (4000.0 - mapWidth) / 2;
+    final mapOffsetY = (3000.0 - mapHeight) / 2;
 
-    final double currentScale = _transformationController.value.getMaxScaleOnAxis();
+    // キャンバス上のプレイヤー絶対ピクセル座標
+    final playerX = mapOffsetX + cursorX * cellWidth + (cellWidth / 2);
+    final playerY = mapOffsetY + cursorY * cellHeight + (cellHeight / 2);
 
-    final tx = (viewportSize.width / 2) - (playerX * currentScale);
-    final ty = (viewportSize.height / 2) - (playerY * currentScale);
+    // 下部コントローラの遮りを考慮し、視覚的中心（上から35%の高さ）に主人公が来るよう調整
+    final tx = (viewportSize.width / 2) - (playerX * _currentScale);
+    final ty = (viewportSize.height * 0.35) - (playerY * _currentScale);
 
     _transformationController.value = Matrix4(
-      currentScale, 0.0, 0.0, 0.0, // column 1
-      0.0, currentScale, 0.0, 0.0, // column 2
+      _currentScale, 0.0, 0.0, 0.0, // column 1
+      0.0, _currentScale, 0.0, 0.0, // column 2
       0.0, 0.0, 1.0, 0.0,          // column 3
       tx, ty, 0.0, 1.0,            // column 4
     );
@@ -407,10 +414,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       constrained: false, // 子が親(画面幅)に制限されずunconstrainedでスクロール可能にする
                       maxScale: 6.0,
                       minScale: 0.5,
+                      onInteractionUpdate: (details) {
+                        // ユーザーがピンチズームしたズーム倍率をリアルタイムに保存
+                        _currentScale = _transformationController.value.getMaxScaleOnAxis();
+                      },
                       child: Center(
                         child: SizedBox(
-                          width: 80 * (_useTiles ? 32.0 : 9.0),
-                          height: 21 * (_useTiles ? 32.0 : 16.0),
+                          width: 4000.0, // 巨大キャンバスでくるみ InteractiveViewer のクランプを完全無効化
+                          height: 3000.0,
                           child: CustomPaint(
                             painter: NetHackMapPainter(
                               screen: _screen,
