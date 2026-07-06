@@ -421,6 +421,27 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 12),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: () => _sendFfiKey(32, "Space"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple[900],
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            "OK",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -543,7 +564,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
               ),
             // ゲーム進行中の操作盤 (キーボードモード vs ボタンモード)
-            if (_isGameRunning && _isKeyboardVisible && _waitingForInput && !_screen.isMenuWindowVisible && !_screen.isTextWindowVisible) ...[
+            if (_isGameRunning && _isKeyboardVisible && _waitingForInput) ...[
               if (_controllerMode == ControllerMode.keyboard)
                 NetHackKeyboard(
                   onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
