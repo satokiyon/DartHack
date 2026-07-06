@@ -351,8 +351,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       minScale: 0.5,
                       child: Center(
                         child: SizedBox(
-                          width: 80 * (_useTiles ? 16.0 : 9.0),
-                          height: 21 * 16.0,
+                          width: 80 * (_useTiles ? 32.0 : 9.0),
+                          height: 21 * (_useTiles ? 32.0 : 16.0),
                           child: CustomPaint(
                             painter: NetHackMapPainter(
                               screen: _screen,
