@@ -18,7 +18,7 @@ class NetHackMapPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final cellW = useTiles ? 32.0 : 9.0;
-    final cellH = 16.0;
+    final cellH = useTiles ? 32.0 : 16.0;
 
     final mapWidth = NetHackScreen.mapCols * cellW;
     final mapHeight = NetHackScreen.mapRows * cellH;

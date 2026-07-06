@@ -91,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (!_isGameRunning) return;
 
     final cellWidth = _useTiles ? 32.0 : 9.0;
-    final cellHeight = 16.0;
+    final cellHeight = _useTiles ? 32.0 : 16.0;
 
     final cursorX = _screen.cursorX;
     final cursorY = _screen.cursorY;
