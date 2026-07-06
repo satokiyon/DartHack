@@ -346,6 +346,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Container(
                     color: Colors.black,
                     child: InteractiveViewer(
+                      constrained: false, // 子が親(画面幅)に制限されずunconstrainedでスクロール可能にする
                       maxScale: 6.0,
                       minScale: 0.5,
                       child: Center(
