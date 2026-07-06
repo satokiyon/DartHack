@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class NetHackKeyboard extends StatefulWidget {
   final Function(String) onKeyPress;
   final Function(int) onRawKeyCode;
+  final VoidCallback onToggleMode;
 
   const NetHackKeyboard({
     super.key,
     required this.onKeyPress,
     required this.onRawKeyCode,
+    required this.onToggleMode,
   });
 
   @override
@@ -102,6 +104,7 @@ class _NetHackKeyboardState extends State<NetHackKeyboard> {
           _buildSpecialButton('Meta', flex: 2, isActivated: _isMetaEnabled),
           _buildKeyButton('Space', flex: 4),
           _buildSpecialButton('Ctrl', flex: 2, isActivated: _isCtrlEnabled),
+          _buildSpecialButton('Pad', flex: 2),
           _buildSpecialButton('Enter', flex: 2),
         ],
       ),
@@ -141,6 +144,8 @@ class _NetHackKeyboardState extends State<NetHackKeyboard> {
     Color? btnColor = Colors.grey[850];
     if (isActivated) {
       btnColor = Colors.blueGrey[700];
+    } else if (label == 'Pad') {
+      btnColor = Colors.deepPurple[900];
     }
     return Expanded(
       flex: flex,
@@ -231,6 +236,8 @@ class _NetHackKeyboardState extends State<NetHackKeyboard> {
       setState(() {
         _isSymbolsMode = false;
       });
+    } else if (label == 'Pad') {
+      widget.onToggleMode();
     }
   }
 }

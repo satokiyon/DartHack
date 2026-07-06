@@ -3,15 +3,17 @@ import 'package:flutter/material.dart';
 class NetHackCmdPanel extends StatelessWidget {
   final Function(String) onKeyPress;
   final Function(int) onRawKeyCode;
+  final VoidCallback onToggleMode;
 
   const NetHackCmdPanel({
     super.key,
     required this.onKeyPress,
     required this.onRawKeyCode,
+    required this.onToggleMode,
   });
 
   static const List<String> defaultCmds = [
-    '#', '20s', '.', ':', ';', ',', 'e', 'd', 'r', 'z', 'Z', 'q',
+    '[Kbd]', '#', '20s', '.', ':', ';', ',', 'e', 'd', 'r', 'z', 'Z', 'q',
     't', 'f', 'w', 'x', 'i', 'E', 'Q', 'P', 'R', 'W', 'T', 'o', '^d', '^p',
     'a', 'A', '^t', 'D', 'F', 'p', '^x', '^o', '?'
   ];
@@ -38,10 +40,11 @@ class NetHackCmdPanel extends StatelessWidget {
   }
 
   Widget _buildCmdButton(BuildContext context, String cmd) {
+    final isKbdToggle = cmd == '[Kbd]';
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 2),
       child: Material(
-        color: Colors.grey[900],
+        color: isKbdToggle ? Colors.deepPurple[900] : Colors.grey[900],
         borderRadius: BorderRadius.circular(4),
         child: InkWell(
           onTap: () => _handleCmdPress(cmd),
@@ -52,8 +55,8 @@ class NetHackCmdPanel extends StatelessWidget {
             constraints: const BoxConstraints(minWidth: 36),
             child: Text(
               cmd,
-              style: const TextStyle(
-                color: Colors.white70,
+              style: TextStyle(
+                color: isKbdToggle ? Colors.amber : Colors.white70,
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
               ),
@@ -65,7 +68,9 @@ class NetHackCmdPanel extends StatelessWidget {
   }
 
   void _handleCmdPress(String cmd) {
-    if (cmd.startsWith('^') && cmd.length == 2) {
+    if (cmd == '[Kbd]') {
+      onToggleMode();
+    } else if (cmd.startsWith('^') && cmd.length == 2) {
       // Ctrlキーコード (a-z -> 1-26)
       final charCode = cmd.codeUnitAt(1);
       if (charCode >= 97 && charCode <= 122) { // a-z

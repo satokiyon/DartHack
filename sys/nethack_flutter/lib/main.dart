@@ -10,7 +10,7 @@ import 'nethack_map_painter.dart';
 import 'nethack_dpad.dart';
 import 'nethack_cmd_panel.dart';
 import 'nethack_keyboard.dart';
-import 'nethack_shortcut_bar.dart';
+import 'nethack_shortcut_pad.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,6 +34,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
+enum ControllerMode { keyboard, pad }
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
@@ -42,6 +44,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  ControllerMode _controllerMode = ControllerMode.pad; // デフォルトはボタンモード
+
   final List<String> _logs = [];
   final FocusNode _focusNode = FocusNode();
   final NetHackScreen _screen = NetHackScreen();
@@ -343,12 +347,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 const Divider(color: Colors.white12, height: 1),
-                // 9つのショートカットボタン (キーボードの状態にかかわらず常時表示)
-                NetHackShortcutBar(
-                  onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                  onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                ),
-                const Divider(color: Colors.white12, height: 1),
                 Expanded(
                   child: Container(
                     color: Colors.black,
@@ -391,15 +389,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-            // 移動用の半透明 D-Pad (入力待ちでメニュー等がない場合のみ表示)
-            if (_isGameRunning && _waitingForInput && !_screen.isMenuWindowVisible && !_screen.isTextWindowVisible)
-              Positioned(
-                right: 12,
-                bottom: 12,
-                child: NetHackDPad(
-                  onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                ),
-              ),
             // テキスト/ヘルプウィンドウのオーバーレイ表示
             if (_screen.isTextWindowVisible)
               Positioned.fill(
@@ -553,16 +542,46 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: const Text('Start NetHack Game'),
                       ),
               ),
-            // ゲーム進行中の操作盤 (横一列コマンドバー + 仮想キーボード)
-            if (_isGameRunning && _isKeyboardVisible) ...[
-              NetHackCmdPanel(
-                onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
-              ),
-              NetHackKeyboard(
-                onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-              ),
+            // ゲーム進行中の操作盤 (キーボードモード vs ボタンモード)
+            if (_isGameRunning && _isKeyboardVisible && _waitingForInput && !_screen.isMenuWindowVisible && !_screen.isTextWindowVisible) ...[
+              if (_controllerMode == ControllerMode.keyboard)
+                NetHackKeyboard(
+                  onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                  onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                  onToggleMode: () {
+                    setState(() {
+                      _controllerMode = ControllerMode.pad;
+                    });
+                  },
+                )
+              else ...[
+                // ボタンモード (左端に D-Pad, 右端に 3x3 ショートカットパッド)
+                Container(
+                  color: Colors.grey[950],
+                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      NetHackDPad(
+                        onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                      ),
+                      NetHackShortcutPad(
+                        onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                        onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                      ),
+                    ],
+                  ),
+                ),
+                NetHackCmdPanel(
+                  onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                  onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
+                  onToggleMode: () {
+                    setState(() {
+                      _controllerMode = ControllerMode.keyboard;
+                    });
+                  },
+                ),
+              ],
             ],
           ],
         ),
