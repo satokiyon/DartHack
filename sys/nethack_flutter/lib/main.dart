@@ -98,10 +98,17 @@ class _MyHomePageState extends State<MyHomePage> {
     final playerX = cursorX * cellWidth + (cellWidth / 2);
     final playerY = cursorY * cellHeight + (cellHeight / 2);
 
-    final tx = (viewportSize.width / 2) - playerX;
-    final ty = (viewportSize.height / 2) - playerY;
+    final double currentScale = _transformationController.value.getMaxScaleOnAxis();
 
-    _transformationController.value = Matrix4.translationValues(tx, ty, 0.0);
+    final tx = (viewportSize.width / 2) - (playerX * currentScale);
+    final ty = (viewportSize.height / 2) - (playerY * currentScale);
+
+    _transformationController.value = Matrix4(
+      currentScale, 0.0, 0.0, 0.0, // column 1
+      0.0, currentScale, 0.0, 0.0, // column 2
+      0.0, 0.0, 1.0, 0.0,          // column 3
+      tx, ty, 0.0, 1.0,            // column 4
+    );
   }
 
   void _triggerCenterOnPlayer() {
@@ -396,6 +403,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.black,
                     child: InteractiveViewer(
                       transformationController: _transformationController,
+                      boundaryMargin: const EdgeInsets.all(2000.0), // 十分なマージンを設けて枠外への無限移動（クランプ解除）を許可
                       constrained: false, // 子が親(画面幅)に制限されずunconstrainedでスクロール可能にする
                       maxScale: 6.0,
                       minScale: 0.5,
