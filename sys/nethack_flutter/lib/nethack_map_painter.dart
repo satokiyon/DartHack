@@ -26,20 +26,22 @@ class NetHackMapPainter extends CustomPainter {
     final offsetX = (size.width - mapWidth) / 2;
     final offsetY = (size.height - mapHeight) / 2;
 
-    final mapRect = Rect.fromLTWH(offsetX, offsetY, mapWidth, mapHeight);
-    canvas.drawRect(
-      mapRect,
-      Paint()
-        ..color = useTiles ? const Color(0xFF000000) : const Color(0xFF111111)
-        ..style = PaintingStyle.fill,
-    );
-    canvas.drawRect(
-      mapRect,
-      Paint()
-        ..color = Colors.grey[800]!
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.0,
-    );
+    if (!useTiles) {
+      final mapRect = Rect.fromLTWH(offsetX, offsetY, mapWidth, mapHeight);
+      canvas.drawRect(
+        mapRect,
+        Paint()
+          ..color = const Color(0xFF111111)
+          ..style = PaintingStyle.fill,
+      );
+      canvas.drawRect(
+        mapRect,
+        Paint()
+          ..color = Colors.grey[800]!
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.0,
+      );
+    }
 
     if (useTiles && tileImage != null) {
       final cols = tileImage!.width ~/ tileSize;
@@ -58,11 +60,11 @@ class NetHackMapPainter extends CustomPainter {
               tileSize.toDouble(),
             );
 
-            final destRect = Rect.fromLTRB(
-              offsetX + x * cellW - 0.2,
-              offsetY + y * cellH - 0.2,
-              offsetX + (x + 1) * cellW + 0.2,
-              offsetY + (y + 1) * cellH + 0.2,
+            final destRect = Rect.fromLTWH(
+              offsetX + x * cellW,
+              offsetY + y * cellH,
+              cellW,
+              cellH,
             );
 
             canvas.drawImageRect(
