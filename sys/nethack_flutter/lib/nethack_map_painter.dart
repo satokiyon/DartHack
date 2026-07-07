@@ -58,11 +58,11 @@ class NetHackMapPainter extends CustomPainter {
               tileSize.toDouble(),
             );
 
-            final destRect = Rect.fromLTWH(
-              offsetX + x * cellW,
-              offsetY + y * cellH,
-              cellW,
-              cellH,
+            final destRect = Rect.fromLTRB(
+              offsetX + x * cellW - 0.2,
+              offsetY + y * cellH - 0.2,
+              offsetX + (x + 1) * cellW + 0.2,
+              offsetY + (y + 1) * cellH + 0.2,
             );
 
             canvas.drawImageRect(
