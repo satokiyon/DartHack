@@ -103,7 +103,7 @@ class NetHackScreen extends ChangeNotifier {
 
   void createWindow(int winId, int type) {
     _winTypes[winId] = type;
-    if (type == nhwText || type == nhwMenu) {
+    if (type == nhwText) {
       _textLines.clear();
       _isTextWindowVisible = true;
     }
@@ -246,6 +246,7 @@ class NetHackScreen extends ChangeNotifier {
 
   void clearMenu() {
     _isMenuWindowVisible = false;
+    _isTextWindowVisible = false;
     _menuItems.clear();
     _menuPrompt = "";
     _activeMenuWinId = -1;

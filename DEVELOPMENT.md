@@ -169,3 +169,11 @@ git push origin NetHackJP-Android-5.0.0-20260629
 
 ### GitHub Release の作成
 GitHub上の Releases ページから新規リリースを作成し、ビルドされた APK ファイル（`sys/android/app/build/outputs/apk/release/app-release.apk`）をアタッチして公開します。
+
+---
+
+## 7. 今後の課題・将来の検討事項
+
+### 骨ファイル（Bones）のオンライン共有
+- ゲーム内の骨ファイル（bones）をインターネット経由で他のプレイヤーと交換・共有する機能（Java版の Hearse 連携相当）については、通信の暗号化（HTTPS）やファイル名の検証を含むセキュリティ上の堅牢性確保、およびデバイス間のパース仕様の整合性を十分に考慮した上で、将来的な導入を検討します。
+

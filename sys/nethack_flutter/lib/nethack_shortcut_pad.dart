@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class NetHackShortcutPad extends StatelessWidget {
+class NetHackShortcutPad extends StatefulWidget {
   final Function(String) onKeyPress;
   final Function(int) onRawKeyCode;
 
@@ -10,12 +11,48 @@ class NetHackShortcutPad extends StatelessWidget {
     required this.onRawKeyCode,
   });
 
-  static const List<String> shortcuts = [
+  @override
+  State<NetHackShortcutPad> createState() => _NetHackShortcutPadState();
+}
+
+class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
+  final List<String> _shortcuts = List.filled(9, "");
+  final List<String> _defaultShortcuts = [
     'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', 'o', 'd', 'e', 'r'
   ];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadShortcuts();
+  }
+
+  Future<void> _loadShortcuts() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      for (int i = 0; i < 9; i++) {
+        _shortcuts[i] = prefs.getString('shortcut_btn_$i') ?? _defaultShortcuts[i];
+      }
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Container(
+        width: 150,
+        height: 150,
+        alignment: Alignment.center,
+        child: const SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
+    }
+
     return Container(
       width: 150,
       height: 150,
@@ -30,13 +67,16 @@ class NetHackShortcutPad extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         mainAxisSpacing: 4,
         crossAxisSpacing: 4,
-        children: shortcuts.map((shortcut) => _buildShortcutButton(shortcut)).toList(),
+        children: List.generate(9, (index) => _buildShortcutButton(_shortcuts[index])),
       ),
     );
   }
 
   Widget _buildShortcutButton(String shortcut) {
-    // 拡張コマンドは長いので表示ラベルを省略形にする
+    if (shortcut.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     String label = shortcut;
     if (shortcut.startsWith('#')) {
       if (shortcut == '#terrain') {
@@ -45,6 +85,12 @@ class NetHackShortcutPad extends StatelessWidget {
         label = 'there';
       } else if (shortcut == '#herecmdmenu') {
         label = 'here';
+      } else if (shortcut == '#chronicle') {
+        label = 'chron';
+      } else if (shortcut == '#overview') {
+        label = 'overv';
+      } else if (shortcut == '#attributes') {
+        label = 'attr';
       } else {
         label = shortcut.substring(1);
       }
@@ -76,12 +122,12 @@ class NetHackShortcutPad extends StatelessWidget {
   void _handleMacroPress(String shortcut) {
     if (shortcut.startsWith('#')) {
       for (int i = 0; i < shortcut.length; i++) {
-        onKeyPress(shortcut[i]);
+        widget.onKeyPress(shortcut[i]);
       }
-      onRawKeyCode(10); // Enter (\n)
+      widget.onRawKeyCode(10); // Enter (\n)
     } else {
       for (int i = 0; i < shortcut.length; i++) {
-        onKeyPress(shortcut[i]);
+        widget.onKeyPress(shortcut[i]);
       }
     }
   }

@@ -12,6 +12,8 @@ import 'nethack_cmd_panel.dart';
 import 'nethack_keyboard.dart';
 import 'nethack_shortcut_pad.dart';
 import 'nethack_ffi.dart';
+import 'settings_page.dart';
+import 'amount_selector_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ffi' hide Size;
 import 'package:ffi/ffi.dart';
@@ -98,6 +100,14 @@ class _MyHomePageState extends State<MyHomePage> {
   int _autoSaveInterval = 0;
   int _statusDisplayMode = 0; // 0: 領域に合わせて文字サイズ縮小(Fit), 1: 領域の可変高さ(Wrap)
 
+  // 物理キー割り当て設定
+  int _volupAction = 0;
+  int _voldownAction = 0;
+  int _backAction = 0;
+
+  // 設定変更の即時反映用バージョンカウンター
+  int _controlsVersion = 0;
+
   @override
   void initState() {
     super.initState();
@@ -122,7 +132,17 @@ class _MyHomePageState extends State<MyHomePage> {
       _padScale = prefs.getDouble('pad_scale') ?? 1.0;
       _autoSaveInterval = prefs.getInt('auto_save_interval') ?? 0;
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
+
+      // 物理キーのロード
+      _volupAction = prefs.getInt('key_volup_action') ?? 0;
+      _voldownAction = prefs.getInt('key_voldown_action') ?? 0;
+      _backAction = prefs.getInt('key_back_action') ?? 0;
+
+      // コントロールのバージョンを更新
+      _controlsVersion++;
     });
+    _syncNativeKeySettings();
+    _loadTileset(_selectedTileset);
   }
 
   Future<void> _savePreferences() async {
@@ -135,6 +155,75 @@ class _MyHomePageState extends State<MyHomePage> {
     await prefs.setDouble('pad_scale', _padScale);
     await prefs.setInt('auto_save_interval', _autoSaveInterval);
     await prefs.setInt('status_display_mode', _statusDisplayMode);
+  }
+
+  Future<void> _syncNativeKeySettings() async {
+    try {
+      await const MethodChannel('com.tbd.nethackjp/key_interceptor')
+          .invokeMethod('updateInterceptorSettings', {
+        'volumeUp': _volupAction != 0,
+        'volumeDown': _voldownAction != 0,
+        'back': _backAction != 0,
+      });
+    } catch (e) {
+      debugPrint("Native key settings sync failed: $e");
+    }
+  }
+
+  void _handleNativeKeyEvent(String key) {
+    if (!_isGameRunning || !_waitingForInput) return;
+
+    int action = 0;
+    if (key == 'volume_up') {
+      action = _volupAction;
+    } else if (key == 'volume_down') {
+      action = _voldownAction;
+    } else if (key == 'back') {
+      action = _backAction;
+    }
+
+    if (action != 0) {
+      _sendFfiKey(action, "PhysicalKey($key)");
+    }
+  }
+
+  int _parseMaxCount(String text) {
+    final trimmed = text.trim();
+    int count = 0;
+    int i = 0;
+    while (i < trimmed.length) {
+      final code = trimmed.codeUnitAt(i);
+      if (code >= 48 && code <= 57) {
+        count = count * 10 + (code - 48);
+        i++;
+      } else {
+        break;
+      }
+    }
+    return i > 0 && count > 0 ? count : 1;
+  }
+
+  String _cleanItemText(String text) {
+    final trimmed = text.trim();
+    int i = 0;
+    while (i < trimmed.length) {
+      final code = trimmed.codeUnitAt(i);
+      if (code >= 48 && code <= 57) {
+        i++;
+      } else {
+        break;
+      }
+    }
+    return i > 0 ? trimmed.substring(i).trim() : trimmed;
+  }
+
+  void _handleAmountSelection(MenuItemData item, int amount) {
+    if (amount <= 0) return;
+    final amountStr = amount.toString();
+    for (int i = 0; i < amountStr.length; i++) {
+      _sendFfiKey(amountStr.codeUnitAt(i), amountStr[i]);
+    }
+    _sendFfiKey(item.accelerator, String.fromCharCode(item.accelerator));
   }
 
   void _loadExtCmds() {
@@ -804,143 +893,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _showSettingsDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              title: const Row(
-                children: [
-                  Icon(Icons.settings, color: Colors.amber),
-                  SizedBox(width: 8),
-                  Text("ゲーム設定"),
-                ],
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SwitchListTile(
-                      title: const Text("タイル表示"),
-                      value: _useTiles,
-                      onChanged: (val) {
-                        setState(() {
-                          _useTiles = val;
-                        });
-                        setDialogState(() {});
-                        _savePreferences();
-                      },
-                    ),
-                    if (_useTiles)
-                      DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(labelText: "タイルセット"),
-                        initialValue: _selectedTileset,
-                        items: const [
-                          DropdownMenuItem(value: 'nevanda_32x32', child: Text('Nevanda (32x32)')),
-                          DropdownMenuItem(value: 'pixelhack_32x32', child: Text('PixelHack (32x32)')),
-                          DropdownMenuItem(value: 'default_16x16', child: Text('Default (16x16)')),
-                          DropdownMenuItem(value: 'geoduck_15x25', child: Text('Geoduck (15x25)')),
-                        ],
-                        onChanged: (val) {
-                          if (val != null) {
-                            setState(() {
-                              _selectedTileset = val;
-                            });
-                            setDialogState(() {});
-                            _loadTileset(val);
-                            _savePreferences();
-                          }
-                        },
-                      ),
-                    const Divider(),
-                    ListTile(
-                      title: const Text("操作モード"),
-                      trailing: DropdownButton<ControllerMode>(
-                        value: _controllerMode,
-                        items: const [
-                          DropdownMenuItem(value: ControllerMode.pad, child: Text('ボタンパッド')),
-                          DropdownMenuItem(value: ControllerMode.keyboard, child: Text('フルキーボード')),
-                        ],
-                        onChanged: (val) {
-                          if (val != null) {
-                            setState(() {
-                              _controllerMode = val;
-                            });
-                            setDialogState(() {});
-                            _savePreferences();
-                          }
-                        },
-                      ),
-                    ),
-                    ListTile(
-                      title: const Text("ボタン不透明度"),
-                      subtitle: Slider(
-                        value: _padOpacity,
-                        min: 0.1,
-                        max: 1.0,
-                        divisions: 9,
-                        label: _padOpacity.toStringAsFixed(1),
-                        onChanged: (val) {
-                          setState(() {
-                            _padOpacity = val;
-                          });
-                          setDialogState(() {});
-                          _savePreferences();
-                        },
-                      ),
-                    ),
-                    ListTile(
-                      title: const Text("ボタンサイズ倍率"),
-                      subtitle: Slider(
-                        value: _padScale,
-                        min: 0.6,
-                        max: 1.5,
-                        divisions: 9,
-                        label: _padScale.toStringAsFixed(1),
-                        onChanged: (val) {
-                          setState(() {
-                            _padScale = val;
-                          });
-                          setDialogState(() {});
-                          _savePreferences();
-                        },
-                      ),
-                    ),
-                    const Divider(),
-                    ListTile(
-                      title: const Text("ステータス表示モード"),
-                      trailing: DropdownButton<int>(
-                        value: _statusDisplayMode,
-                        items: const [
-                          DropdownMenuItem(value: 0, child: Text('自動縮小フィット')),
-                          DropdownMenuItem(value: 1, child: Text('領域の可変高さ')),
-                        ],
-                        onChanged: (val) {
-                          if (val != null) {
-                            setState(() {
-                              _statusDisplayMode = val;
-                            });
-                            setDialogState(() {});
-                            _savePreferences();
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("閉じる"),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => SettingsPage(
+          defaultsFilePath: '$_assetsPath/defaults.nh',
+          dataDirString: _assetsPath,
+        ),
+      ),
+    ).then((_) {
+      _loadPreferences();
+    });
   }
 
   Widget _buildGameScreen() {
@@ -1268,14 +1230,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                   NetHackDPad(
                                     onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
                                   ),
-                                  NetHackShortcutPad(
+                                  NetHackShortcutPad(key: ValueKey(_controlsVersion),
                                     onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
                                     onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
                                   ),
                                 ],
                               ),
                             ),
-                            NetHackCmdPanel(
+                            NetHackCmdPanel(key: ValueKey(_controlsVersion),
                               onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
                               onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
                               onToggleMode: () {
