@@ -26,22 +26,20 @@ class NetHackMapPainter extends CustomPainter {
     final offsetX = (size.width - mapWidth) / 2;
     final offsetY = (size.height - mapHeight) / 2;
 
-    if (!useTiles) {
-      final mapRect = Rect.fromLTWH(offsetX, offsetY, mapWidth, mapHeight);
-      canvas.drawRect(
-        mapRect,
-        Paint()
-          ..color = const Color(0xFF111111)
-          ..style = PaintingStyle.fill,
-      );
-      canvas.drawRect(
-        mapRect,
-        Paint()
-          ..color = Colors.grey[800]!
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.0,
-      );
-    }
+    final mapRect = Rect.fromLTWH(offsetX, offsetY, mapWidth, mapHeight);
+    canvas.drawRect(
+      mapRect,
+      Paint()
+        ..color = const Color(0xFF111111)
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawRect(
+      mapRect,
+      Paint()
+        ..color = Colors.grey[800]!
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.0,
+    );
 
     if (useTiles && tileImage != null) {
       final cols = tileImage!.width ~/ tileSize;
