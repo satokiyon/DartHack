@@ -18,6 +18,7 @@ static void flutter_add_menu(winid wid, const glyph_info *glyphinfo, const anyth
 static void flutter_end_menu(winid wid, const char *prompt);
 static int flutter_select_menu(winid wid, int how, menu_item **selected);
 static void flutter_destroy_nhwindow(winid window);
+static void flutter_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, unsigned long *colormasks);
 static void flutter_exit_nhwindows(const char* str);
 extern void genl_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, unsigned long *colormasks);
 
@@ -765,12 +766,145 @@ static void HijackWindowProcs(void) {
     and_procs.win_end_menu = flutter_end_menu;
     and_procs.win_select_menu = flutter_select_menu;
 
-    // ステータス表示用に genl_status_update にリダイレクト！
-    and_procs.win_status_update = genl_status_update;
+    // ステータス表示用のハンドラを独自の実装に差し替え
+    and_procs.win_status_init = genl_status_init;
+    and_procs.win_status_finish = genl_status_finish;
+    and_procs.win_status_enablefield = genl_status_enablefield;
+    and_procs.win_status_update = flutter_status_update;
 
     windowprocs = and_procs;
     
     debuglog("Hijack completed.");
+}
+
+// NetHackステータスハイライト用 static 変数とハンドラ実装
+#define MAXBLSTATS 30
+static char flutter_status_vals[MAXBLSTATS][256];
+static int flutter_status_colors[MAXBLSTATS];
+static unsigned long *flutter_cond_hilites = NULL;
+
+extern void genl_status_init(void);
+extern void genl_status_finish(void);
+extern void genl_status_enablefield(int, const char *, const char *, boolean);
+
+static void append_status_field(char* buf, int idx, int* is_first) {
+    if (idx == BL_CONDITION) {
+        long active_conds = 0;
+        sscanf(flutter_status_vals[idx], "%ld", &active_conds);
+        
+        for (int i = 0; i < CONDITION_COUNT; i++) {
+            unsigned long mask = conditions[i].mask;
+            if (active_conds & mask) {
+                strcat(buf, " ");
+                int color = CLR_WHITE;
+                if (flutter_cond_hilites) {
+                    for (int c = 0; c < CLR_MAX; c++) {
+                        if (flutter_cond_hilites[c] & mask) {
+                            color = c;
+                            break;
+                        }
+                    }
+                }
+                char markup[64];
+                sprintf(markup, "\\C%08X%s\\c", color, conditions[i].text[1]);
+                strcat(buf, markup);
+            }
+        }
+    } else {
+        const char* val = flutter_status_vals[idx];
+        if (!val || !*val) return;
+        
+        if (*is_first && *val == ' ') {
+            val++;
+        } else if (idx == BL_LEVELDESC && !*is_first) {
+            strcat(buf, " ");
+        }
+        
+        while (*val == ' ') {
+            strcat(buf, " ");
+            val++;
+        }
+        
+        if (!*val) return;
+        
+        int color = flutter_status_colors[idx] & 0xFF;
+        if (color == NO_COLOR || color == CLR_WHITE) {
+            strcat(buf, val);
+        } else {
+            char markup[512];
+            sprintf(markup, "\\C%08X%s\\c", color, val);
+            strcat(buf, markup);
+        }
+        *is_first = 0;
+    }
+}
+
+static void flutter_status_flush(void) {
+    char line1[1024] = "";
+    char line2[1024] = "";
+    int is_first = 1;
+    
+    static enum statusfields fieldorder_line1[] = {
+        BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN, BL_SCORE,
+        BL_FLUSH
+    };
+    
+    static enum statusfields fieldorder_line2[] = {
+        BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC, BL_XP,
+        BL_EXP, BL_HD, BL_TIME, BL_HUNGER, BL_CAP, BL_CONDITION, BL_FLUSH
+    };
+    
+    is_first = 1;
+    for (int i = 0; fieldorder_line1[i] != BL_FLUSH; i++) {
+        append_status_field(line1, fieldorder_line1[i], &is_first);
+    }
+    
+    is_first = 1;
+    for (int i = 0; fieldorder_line2[i] != BL_FLUSH; i++) {
+        int idx = fieldorder_line2[i];
+        if (idx == BL_HPMAX) {
+            int color = flutter_status_colors[BL_HPMAX] & 0xFF;
+            if (color == NO_COLOR) {
+                flutter_status_colors[BL_HPMAX] = flutter_status_colors[BL_HP];
+            }
+        } else if (idx == BL_ENEMAX) {
+            int color = flutter_status_colors[BL_ENEMAX] & 0xFF;
+            if (color == NO_COLOR) {
+                flutter_status_colors[BL_ENEMAX] = flutter_status_colors[BL_ENE];
+            }
+        }
+        append_status_field(line2, idx, &is_first);
+    }
+    
+    flutter_curs(2 /* WIN_STATUS */, 1, 0);
+    flutter_putstr(2 /* WIN_STATUS */, 0, line1);
+    
+    flutter_curs(2 /* WIN_STATUS */, 1, 1);
+    flutter_putstr(2 /* WIN_STATUS */, 0, line2);
+}
+
+static void flutter_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, unsigned long *colormasks) {
+    extern const char *status_fieldfmt[MAXBLSTATS];
+    char *text = (char *) ptr;
+    if (idx == BL_FLUSH) {
+        flutter_status_flush();
+    } else if (idx >= 0 && idx < MAXBLSTATS) {
+        if (idx == BL_CONDITION) {
+            long *condptr = (long *) ptr;
+            long cond = condptr ? *condptr : 0L;
+            flutter_cond_hilites = colormasks;
+            sprintf(flutter_status_vals[idx], "%ld", cond);
+            flutter_status_colors[idx] = color;
+        } else if (idx == BL_GOLD && text && *text == '\\') {
+            const char* fmt = status_fieldfmt[idx] ? status_fieldfmt[idx] : "$%s";
+            sprintf(flutter_status_vals[idx], fmt, text + 10);
+            flutter_status_colors[idx] = color;
+        } else {
+            const char* fmt = status_fieldfmt[idx] ? status_fieldfmt[idx] : "%s";
+            sprintf(flutter_status_vals[idx], fmt, text ? text : "");
+            flutter_status_colors[idx] = color;
+        }
+    }
 }
 
 // ----------------------------------------------------

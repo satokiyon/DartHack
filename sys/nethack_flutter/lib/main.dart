@@ -577,6 +577,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       ? "${String.fromCharCode(item.accelerator)} - " 
                       : "";
 
+                  // defaults.nhのmenucolors色を反映
+                  Color itemColor = isSelectable ? Colors.white : Colors.grey;
+                  if (item.color >= 0 && item.color < 16) {
+                    itemColor = _getNhColor(item.color);
+                  }
+
                   return Material(
                     color: Colors.transparent,
                     child: ListTile(
@@ -585,7 +591,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: Text(
                         "$accLabel${item.text}",
                         style: TextStyle(
-                          color: isSelectable ? Colors.white : Colors.grey,
+                          color: itemColor,
                           fontFamily: 'monospace',
                           fontSize: 14,
                           fontWeight: isSelectable ? FontWeight.bold : FontWeight.normal,
@@ -926,12 +932,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.centerLeft,
-                          child: Text(
-                            _screen.statusLines.join("\n"),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'monospace',
-                              fontSize: 13,
+                          child: Text.rich(
+                            TextSpan(
+                              children: _screen.statusLines.map((line) => _parseStatusLine(line)).toList().fold<List<InlineSpan>>([], (prev, element) {
+                                if (prev.isNotEmpty) {
+                                  prev.add(const TextSpan(text: '\n'));
+                                }
+                                prev.add(element);
+                                return prev;
+                              }),
                             ),
                           ),
                         ),
@@ -940,12 +949,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         width: double.infinity,
                         color: Colors.black,
                         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                        child: Text(
-                          _screen.statusLines.join("\n"),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'monospace',
-                            fontSize: 13,
+                        child: Text.rich(
+                          TextSpan(
+                            children: _screen.statusLines.map((line) => _parseStatusLine(line)).toList().fold<List<InlineSpan>>([], (prev, element) {
+                              if (prev.isNotEmpty) {
+                                prev.add(const TextSpan(text: '\n'));
+                              }
+                              prev.add(element);
+                              return prev;
+                            }),
                           ),
                         ),
                       ),
@@ -1255,6 +1267,77 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+    );
+  }
+
+  // NetHackカラーテーブル
+  Color _getNhColor(int colorIndex) {
+    switch (colorIndex) {
+      case 0: return Colors.black; // CLR_BLACK
+      case 1: return Colors.red; // CLR_RED
+      case 2: return Colors.green; // CLR_GREEN
+      case 3: return const Color(0xFF8B4513); // CLR_BROWN (サドルブラウン等)
+      case 4: return Colors.blue; // CLR_BLUE
+      case 5: return Colors.purple; // CLR_MAGENTA
+      case 6: return Colors.cyan; // CLR_CYAN
+      case 7: return Colors.grey; // CLR_GRAY
+      case 8: return Colors.white70; // CLR_NO_COLOR
+      case 9: return Colors.orange; // CLR_ORANGE
+      case 10: return Colors.lightGreen; // CLR_BRIGHT_GREEN
+      case 11: return Colors.yellow; // CLR_YELLOW
+      case 12: return Colors.lightBlue; // CLR_BRIGHT_BLUE
+      case 13: return Colors.pinkAccent; // CLR_BRIGHT_MAGENTA
+      case 14: return Colors.cyanAccent; // CLR_BRIGHT_CYAN
+      case 15: return Colors.white; // CLR_WHITE
+      default: return Colors.white;
+    }
+  }
+
+  // ステータス行の \CXXXXXXXX と \c マークアップパース処理
+  TextSpan _parseStatusLine(String line) {
+    // 1. まず、金貨のエスケープ \G が残っていれば $ に置換する (フォールバック)
+    var processedLine = line.replaceAll(RegExp(r'\\G([0-9a-fA-F]{8}):?'), '\$ ');
+    
+    // 2. \\CXXXXXXXX と \\c のマークアップをパースして TextSpan を構築
+    final spans = <InlineSpan>[];
+    final regex = RegExp(r'\\C([0-9a-fA-F]{8})|\\c');
+    
+    int lastIndex = 0;
+    Color currentColor = Colors.white;
+    
+    for (final match in regex.allMatches(processedLine)) {
+      if (match.start > lastIndex) {
+        spans.add(TextSpan(
+          text: processedLine.substring(lastIndex, match.start),
+          style: TextStyle(color: currentColor),
+        ));
+      }
+      
+      final matchedText = match.group(0);
+      if (matchedText == '\\c') {
+        currentColor = Colors.white;
+      } else {
+        final hexStr = match.group(1)!;
+        final colorIndex = int.tryParse(hexStr, radix: 16) ?? 15;
+        currentColor = _getNhColor(colorIndex);
+      }
+      
+      lastIndex = match.end;
+    }
+    
+    if (lastIndex < processedLine.length) {
+      spans.add(TextSpan(
+        text: processedLine.substring(lastIndex),
+        style: TextStyle(color: currentColor),
+      ));
+    }
+    
+    return TextSpan(
+      style: const TextStyle(
+        fontFamily: 'monospace',
+        fontSize: 13,
+      ),
+      children: spans,
     );
   }
 }
