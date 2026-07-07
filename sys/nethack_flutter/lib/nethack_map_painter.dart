@@ -30,7 +30,7 @@ class NetHackMapPainter extends CustomPainter {
     canvas.drawRect(
       mapRect,
       Paint()
-        ..color = const Color(0xFF111111)
+        ..color = useTiles ? const Color(0xFF000000) : const Color(0xFF111111)
         ..style = PaintingStyle.fill,
     );
     canvas.drawRect(
