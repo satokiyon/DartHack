@@ -143,6 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     _syncNativeKeySettings();
     _loadTileset(_selectedTileset);
+    _triggerCenterOnPlayer();
   }
 
   Future<void> _savePreferences() async {
