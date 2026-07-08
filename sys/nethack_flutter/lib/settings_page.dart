@@ -366,6 +366,7 @@ class _SettingsPageState extends State<SettingsPage> {
             value: _menuButtonPosition,
             dropdownColor: Colors.grey[900],
             style: const TextStyle(color: Colors.white),
+            items: const [
               DropdownMenuItem(value: 'top_left', child: Text('左上', style: TextStyle(color: Colors.white))),
               DropdownMenuItem(value: 'top_right', child: Text('右上', style: TextStyle(color: Colors.white))),
               DropdownMenuItem(value: 'left_edge', child: Text('左端(中央)', style: TextStyle(color: Colors.white))),
