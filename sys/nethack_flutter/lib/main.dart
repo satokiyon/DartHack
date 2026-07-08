@@ -833,8 +833,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 itemBuilder: (context, index) {
                   final item = filteredItems[index];
                   final isSelectable = item.ident != 0;
-                  final accLabel = item.accelerator != 0 
-                      ? "${String.fromCharCode(item.accelerator)} - " 
+                  final isPrintableAccel = item.accelerator >= 0x21 && item.accelerator <= 0x7E;
+                  final accLabel = isPrintableAccel
+                      ? "${String.fromCharCode(item.accelerator)} - "
                       : "";
                   final itemText = item.text.trim();
 
@@ -850,33 +851,41 @@ class _MyHomePageState extends State<MyHomePage> {
 
                   // defaults.nhのmenucolors色を反映
                   Color itemColor = isSelectable ? Colors.white : Colors.grey;
-                  if (item.color >= 0 && item.color < 16) {
+                  if (!isExtCmdMenu && item.color >= 0 && item.color < 16) {
                     itemColor = _getNhColor(item.color);
                   }
+
+                  final descIndent = " " * accLabel.length;
 
                   return Material(
                     color: Colors.transparent,
                     child: ListTile(
                       dense: true,
                       contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-                      title: Text(
-                        "$accLabel$commandText",
-                        style: TextStyle(
-                          color: itemColor,
-                          fontFamily: 'monospace',
-                          fontSize: 14,
-                          fontWeight: isSelectable ? FontWeight.bold : FontWeight.normal,
-                        ),
-                      ),
-                      subtitle: isExtCmdMenu && descriptionText.isNotEmpty
-                          ? Text(
-                              descriptionText,
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "$accLabel$commandText",
+                            style: TextStyle(
+                              color: itemColor,
+                              fontFamily: 'monospace',
+                              fontSize: 14,
+                              fontWeight: isSelectable ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          ),
+                          if (isExtCmdMenu && descriptionText.isNotEmpty)
+                            Text(
+                              "$descIndent$descriptionText",
                               style: const TextStyle(
                                 color: Colors.white70,
+                                fontFamily: 'monospace',
                                 fontSize: 12,
                               ),
-                            )
-                          : null,
+                            ),
+                        ],
+                      ),
                       onTap: isSelectable
                           ? () => _sendMenuSelection(item.ident)
                           : null,
@@ -904,7 +913,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildYnOverlay() {
     final choices = _ynChoices.split('');
     final isYesNo = _ynChoices.toLowerCase() == 'yn' || _ynChoices.toLowerCase() == 'ynq';
-    
+
     return Positioned.fill(
       child: Container(
         color: Colors.black54,
@@ -914,44 +923,53 @@ class _MyHomePageState extends State<MyHomePage> {
             color: Colors.grey[900],
             elevation: 8,
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     _ynQuestion,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   if (isYesNo)
                     Wrap(
                       spacing: 12,
-                      runSpacing: 8,
+                      runSpacing: 12,
                       alignment: WrapAlignment.center,
                       children: [
                         ElevatedButton(
                           onPressed: () => _sendYnResult('y'.codeUnitAt(0)),
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.green[800], foregroundColor: Colors.white),
-                          child: const Text('はい (y)', style: TextStyle(fontSize: 16)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: (_ynDefault == 'y'.codeUnitAt(0)) ? Colors.deepPurple : Colors.grey[800],
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Yes'),
                         ),
                         ElevatedButton(
                           onPressed: () => _sendYnResult('n'.codeUnitAt(0)),
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.red[800], foregroundColor: Colors.white),
-                          child: const Text('いいえ (n)', style: TextStyle(fontSize: 16)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: (_ynDefault == 'n'.codeUnitAt(0)) ? Colors.deepPurple : Colors.grey[800],
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('No'),
                         ),
                         if (_ynChoices.toLowerCase().contains('q'))
                           ElevatedButton(
                             onPressed: () => _sendYnResult('q'.codeUnitAt(0)),
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[800], foregroundColor: Colors.white),
-                            child: const Text('やめる (q)'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: (_ynDefault == 'q'.codeUnitAt(0)) ? Colors.deepPurple : Colors.grey[800],
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('Quit'),
                           ),
                       ],
                     )
                   else
                     Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: 10,
+                      runSpacing: 10,
                       alignment: WrapAlignment.center,
                       children: [
                         ...choices.map((ch) {

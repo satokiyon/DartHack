@@ -775,6 +775,8 @@ static int flutter_do_ext_cmd_menu(boolean complete) {
             continue;
         if ((flgs & WIZMODECMD) && !wizard)
             continue;
+        if (strcmp(ptr, "#") == 0 || strcmp(ptr, "?") == 0)
+            continue;
         if (!complete && !(flgs & AUTOCOMPLETE) && !(flgs & WIZMODECMD))
             continue;
 
@@ -794,7 +796,7 @@ static int flutter_do_ext_cmd_menu(boolean complete) {
         if (accelerator == 'z')
             accelerator = 'A';
         else if (accelerator == 'Z')
-            accelerator = 0;
+            accelerator = '!';
         else
             accelerator++;
     }
