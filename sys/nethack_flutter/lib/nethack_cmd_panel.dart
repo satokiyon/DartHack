@@ -5,12 +5,14 @@ class NetHackCmdPanel extends StatefulWidget {
   final Function(String) onKeyPress;
   final Function(int) onRawKeyCode;
   final VoidCallback onToggleMode;
+  final ValueChanged<double>? onPanelHeightChanged;
 
   const NetHackCmdPanel({
     super.key,
     required this.onKeyPress,
     required this.onRawKeyCode,
     required this.onToggleMode,
+    this.onPanelHeightChanged,
   });
 
   @override
@@ -21,6 +23,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   final List<Map<String, dynamic>> _panels = [];
   bool _isLoading = true;
   bool _isExpanded = false;
+  double _lastReportedHeight = -1;
 
   static const List<String> defaultCmds = [
     '[Kbd]', '#', '20s', '.', ':', ';', ',', 'e', 'd', 'r', 'z', 'Z', 'q',
@@ -64,6 +67,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
+      _reportPanelHeight(50);
       return Container(
         height: 50,
         color: Colors.grey[950],
@@ -81,6 +85,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
     const double headerHeight = 18;
     const double rowHeight = 40;
     final double totalHeight = headerHeight + (visiblePanels.length * rowHeight);
+    _reportPanelHeight(totalHeight);
 
     return GestureDetector(
       onVerticalDragEnd: (details) {
@@ -192,6 +197,22 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
         ),
       ),
     );
+  }
+
+  void _reportPanelHeight(double height) {
+    if (widget.onPanelHeightChanged == null) {
+      return;
+    }
+    if ((_lastReportedHeight - height).abs() < 0.1) {
+      return;
+    }
+    _lastReportedHeight = height;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      widget.onPanelHeightChanged?.call(height);
+    });
   }
 
   Widget _buildCmdButton(BuildContext context, String cmd) {

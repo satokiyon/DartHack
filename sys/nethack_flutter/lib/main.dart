@@ -105,6 +105,8 @@ class _MyHomePageState extends State<MyHomePage> {
   List<ExtCmdEntry> _extCmdList = [];
   List<ExtCmdEntry> _filteredExtCmds = [];
   final TextEditingController _extCmdFilterController = TextEditingController();
+  final TextEditingController _extCmdMenuFilterController = TextEditingController();
+  String _extCmdMenuFilter = "";
 
   // 詳細な操作設定（shared_preferences用）
   double _padOpacity = 0.8;
@@ -125,6 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // 設定変更の即時反映用バージョンカウンター
   int _controlsVersion = 0;
+  double _cmdPanelHeight = 58.0;
 
   @override
   void initState() {
@@ -350,10 +353,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final mediaQuery = MediaQuery.of(context);
     final topOffset = 100.0; // ステータス(38px)+メッセージ(54px)+マージン
 
-    // コントローラが表示されているか判定
-    final bool controllerVisible = _isGameRunning && _isKeyboardVisible && _waitingForInput;
-    // コントローラ表示時の下部からのオフセット（高さ250px程度を想定して270px）
-    final double bottomOffset = controllerVisible ? 270.0 : 16.0;
+    // コントローラ表示時は重なりを避けるために十分な下余白を確保する
+    final double bottomOffset = _dialogBottomInset(context);
 
     switch (_menuButtonPosition) {
       case 'top_left':
@@ -403,6 +404,24 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       ),
     );
+  }
+
+  double _controllerReservedHeight() {
+    final controllerVisible = _isGameRunning && _isKeyboardVisible && _waitingForInput;
+    if (!controllerVisible) {
+      return 0.0;
+    }
+    if (_controllerMode == ControllerMode.keyboard) {
+      return 230.0 * _padScale;
+    }
+    const padAndShortcutHeight = 162.0;
+    return (padAndShortcutHeight + _cmdPanelHeight) * _padScale;
+  }
+
+  double _dialogBottomInset(BuildContext context) {
+    final safeBottom = MediaQuery.of(context).padding.bottom;
+    final reserved = _controllerReservedHeight();
+    return reserved > 0.0 ? reserved + safeBottom + 12.0 : 16.0;
   }
 
   void _handleNativeKeyEvent(String key) {
@@ -533,6 +552,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void dispose() {
     _transformationController.dispose();
     _focusNode.dispose();
+    _getlineController.dispose();
+    _askNameController.dispose();
+    _extCmdFilterController.dispose();
+    _extCmdMenuFilterController.dispose();
     super.dispose();
   }
 
@@ -805,6 +828,8 @@ class _MyHomePageState extends State<MyHomePage> {
           _screen.selectMenu(message['winId'], message['how']);
           setState(() {
             _waitingForInput = true;
+            _extCmdMenuFilter = "";
+            _extCmdMenuFilterController.clear();
           });
           _triggerCenterOnPlayer();
         } else if (type == 'error') {
@@ -851,6 +876,8 @@ class _MyHomePageState extends State<MyHomePage> {
     if (!_waitingForInput || !_screen.isMenuWindowVisible) return;
     setState(() {
       _waitingForInput = false;
+      _extCmdMenuFilter = "";
+      _extCmdMenuFilterController.clear();
     });
     _addLog("> Menu Select: ID $ident");
     _workerSendPort?.send({
@@ -862,12 +889,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildMenuOverlay() {
     final isExtCmdMenu = _screen.menuPrompt.contains("拡張コマンド");
+    final extCmdQuery = _extCmdMenuFilter.trim().toLowerCase();
 
     // 拡張コマンド選択のメタコマンド（#や?など）をフィルタリングして除外する（開発制約 9）
     final filteredItems = _screen.menuItems.where((item) {
       final text = item.text.trim();
       if (isExtCmdMenu) {
-        return text != "#" && text != "?";
+        if (text == "#" || text == "?") {
+          return false;
+        }
+        if (extCmdQuery.isEmpty) {
+          return true;
+        }
+        final tabIndex = text.indexOf('\t');
+        final commandText = (tabIndex >= 0 ? text.substring(0, tabIndex) : text).trim().toLowerCase();
+        final descriptionText = (tabIndex >= 0 ? text.substring(tabIndex + 1) : "").trim().toLowerCase();
+        return commandText.contains(extCmdQuery) || descriptionText.contains(extCmdQuery);
       }
       return !text.startsWith('#') && !text.startsWith('?');
     }).toList();
@@ -875,7 +912,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Positioned.fill(
       child: Container(
         color: Colors.black.withValues(alpha: 0.95),
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.fromLTRB(16, 16, 16, _dialogBottomInset(context)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -887,6 +924,26 @@ class _MyHomePageState extends State<MyHomePage> {
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            if (isExtCmdMenu) ...[
+              TextField(
+                controller: _extCmdMenuFilterController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: '拡張コマンドを検索...',
+                  prefixIcon: const Icon(Icons.search, size: 18),
+                  isDense: true,
+                  filled: true,
+                  fillColor: Colors.grey[900],
+                  border: const OutlineInputBorder(),
+                ),
+                onChanged: (val) {
+                  setState(() {
+                    _extCmdMenuFilter = val;
+                  });
+                },
               ),
               const SizedBox(height: 8),
             ],
@@ -980,80 +1037,83 @@ class _MyHomePageState extends State<MyHomePage> {
     return Positioned.fill(
       child: Container(
         color: Colors.black54,
-        child: Center(
-          child: Card(
-            margin: const EdgeInsets.all(24),
-            color: Colors.grey[900],
-            elevation: 8,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _ynQuestion,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  if (isYesNo)
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      alignment: WrapAlignment.center,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () => _sendYnResult('y'.codeUnitAt(0)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: (_ynDefault == 'y'.codeUnitAt(0)) ? Colors.deepPurple : Colors.grey[800],
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text('Yes'),
-                        ),
-                        ElevatedButton(
-                          onPressed: () => _sendYnResult('n'.codeUnitAt(0)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: (_ynDefault == 'n'.codeUnitAt(0)) ? Colors.deepPurple : Colors.grey[800],
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text('No'),
-                        ),
-                        if (_ynChoices.toLowerCase().contains('q'))
-                          ElevatedButton(
-                            onPressed: () => _sendYnResult('q'.codeUnitAt(0)),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: (_ynDefault == 'q'.codeUnitAt(0)) ? Colors.deepPurple : Colors.grey[800],
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text('Quit'),
-                          ),
-                      ],
-                    )
-                  else
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      alignment: WrapAlignment.center,
-                      children: [
-                        ...choices.map((ch) {
-                          final isDefault = ch.codeUnitAt(0) == _ynDefault;
-                          return ElevatedButton(
-                            onPressed: () => _sendYnResult(ch.codeUnitAt(0)),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: isDefault ? Colors.deepPurple : Colors.grey[800],
-                              foregroundColor: Colors.white,
-                            ),
-                            child: Text(ch),
-                          );
-                        }),
-                        ElevatedButton(
-                          onPressed: () => _sendYnResult(27), // ESC
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[900], foregroundColor: Colors.grey),
-                          child: const Text('キャンセル'),
-                        ),
-                      ],
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, _dialogBottomInset(context)),
+          child: Center(
+            child: Card(
+              margin: const EdgeInsets.all(24),
+              color: Colors.grey[900],
+              elevation: 8,
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _ynQuestion,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
                     ),
-                ],
+                    const SizedBox(height: 16),
+                    if (isYesNo)
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => _sendYnResult('y'.codeUnitAt(0)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: (_ynDefault == 'y'.codeUnitAt(0)) ? Colors.deepPurple : Colors.grey[800],
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('Yes'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => _sendYnResult('n'.codeUnitAt(0)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: (_ynDefault == 'n'.codeUnitAt(0)) ? Colors.deepPurple : Colors.grey[800],
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('No'),
+                          ),
+                          if (_ynChoices.toLowerCase().contains('q'))
+                            ElevatedButton(
+                              onPressed: () => _sendYnResult('q'.codeUnitAt(0)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: (_ynDefault == 'q'.codeUnitAt(0)) ? Colors.deepPurple : Colors.grey[800],
+                                foregroundColor: Colors.white,
+                              ),
+                              child: const Text('Quit'),
+                            ),
+                        ],
+                      )
+                    else
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          ...choices.map((ch) {
+                            final isDefault = ch.codeUnitAt(0) == _ynDefault;
+                            return ElevatedButton(
+                              onPressed: () => _sendYnResult(ch.codeUnitAt(0)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isDefault ? Colors.deepPurple : Colors.grey[800],
+                                foregroundColor: Colors.white,
+                              ),
+                              child: Text(ch),
+                            );
+                          }),
+                          ElevatedButton(
+                            onPressed: () => _sendYnResult(27), // ESC
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[900], foregroundColor: Colors.grey),
+                            child: const Text('キャンセル'),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -1068,19 +1128,21 @@ class _MyHomePageState extends State<MyHomePage> {
     return Positioned.fill(
       child: Container(
         color: Colors.black87,
-        child: Center(
-          child: Card(
-            margin: const EdgeInsets.all(16),
-            color: Colors.grey[950],
-            elevation: 12,
-            child: Container(
-              width: double.infinity,
-              constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, _dialogBottomInset(context)),
+          child: Center(
+            child: Card(
+              margin: const EdgeInsets.all(16),
+              color: Colors.grey[950],
+              elevation: 12,
+              child: Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
                   Text(
                     _getlinePrompt,
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.amber),
@@ -1177,7 +1239,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ],
                   ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -1190,19 +1253,21 @@ class _MyHomePageState extends State<MyHomePage> {
     return Positioned.fill(
       child: Container(
         color: Colors.black87,
-        child: Center(
-          child: Card(
-            margin: const EdgeInsets.all(20),
-            color: Colors.grey[950],
-            elevation: 12,
-            child: Container(
-              width: double.infinity,
-              constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, _dialogBottomInset(context)),
+          child: Center(
+            child: Card(
+              margin: const EdgeInsets.all(20),
+              color: Colors.grey[950],
+              elevation: 12,
+              child: Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
                   const Text(
                     "お名前は？",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber),
@@ -1264,7 +1329,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ],
                   ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -1395,7 +1461,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Positioned.fill(
                 child: Container(
                   color: Colors.black.withValues(alpha: 0.95),
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, _dialogBottomInset(context)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1507,6 +1573,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     NetHackCmdPanel(key: ValueKey(_controlsVersion),
                       onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
                       onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
+                      onPanelHeightChanged: (height) {
+                        if ((_cmdPanelHeight - height).abs() < 0.1) {
+                          return;
+                        }
+                        if (!mounted) {
+                          return;
+                        }
+                        setState(() {
+                          _cmdPanelHeight = height;
+                        });
+                      },
                       onToggleMode: () {
                         setState(() {
                           _controllerMode = ControllerMode.keyboard;
