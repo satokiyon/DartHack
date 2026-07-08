@@ -13,7 +13,6 @@ import 'nethack_keyboard.dart';
 import 'nethack_shortcut_pad.dart';
 import 'nethack_ffi.dart';
 import 'settings_page.dart';
-import 'amount_selector_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ffi' hide Size;
 import 'package:ffi/ffi.dart';
@@ -460,16 +459,7 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (type == 'startMenu') {
           _screen.startMenu(message['winId']);
         } else if (type == 'game_exit') {
-          setState(() {
-            _isGameRunning = false;
-            _isKeyboardVisible = false;
-            _waitingForInput = false;
-            _isYnVisible = false;
-            _isGetLineVisible = false;
-            _isAskNameVisible = false;
-            _logs.clear();
-            _logs.add("セーブ完了またはゲームが終了しました。また遊びましょう！");
-          });
+          _stopGame();
         } else if (type == 'addMenu') {
           _screen.addMenu(
             message['winId'],
@@ -1089,52 +1079,76 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('NetHackJP Flutter'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: 'ゲーム設定',
-            onPressed: _showSettingsDialog,
-          ),
-          if (_isGameRunning) ...[
-            // タイルとASCIIの切り替えトグル
-            IconButton(
-              icon: Icon(_useTiles ? Icons.grid_view : Icons.text_fields),
-              tooltip: _useTiles ? 'Switch to ASCII Map' : 'Switch to Tile Map',
-              onPressed: () {
-                setState(() {
-                  _useTiles = !_useTiles;
-                });
-              },
-            ),
-            // タイルセット選択メニュー
-            if (_useTiles)
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.palette),
-                onSelected: _loadTileset,
-                itemBuilder: (context) => [
-                  const PopupMenuItem(value: 'nevanda_32x32', child: Text('Nevanda (32x32)')),
-                  const PopupMenuItem(value: 'pixelhack_32x32', child: Text('PixelHack (32x32)')),
-                  const PopupMenuItem(value: 'default_16x16', child: Text('Default (16x16)')),
-                  const PopupMenuItem(value: 'geoduck_15x25', child: Text('Geoduck (15x25)')),
-                ],
+      drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2,
+      drawer: Drawer(
+        child: Container(
+          color: Colors.grey[950],
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.deepPurple[900],
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.sports_esports, size: 48, color: Colors.amber),
+                    SizedBox(height: 8),
+                    Text(
+                      'NetHackメニュー',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            // 仮想キーボード表示切り替え
-            IconButton(
-              icon: Icon(_isKeyboardVisible ? Icons.keyboard_hide : Icons.keyboard),
-              tooltip: _isKeyboardVisible ? 'Hide Keyboard' : 'Show Keyboard',
-              onPressed: () {
-                setState(() {
-                  _isKeyboardVisible = !_isKeyboardVisible;
-                });
-                if (!_isKeyboardVisible) {
-                  _focusNode.requestFocus();
-                }
-              },
-            ),
-          ]
-        ],
+              if (_isGameRunning) ...[
+                ListTile(
+                  leading: const Icon(Icons.save, color: Colors.greenAccent),
+                  title: const Text('セーブして終了', style: TextStyle(color: Colors.white)),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _sendFfiKey(83, "S");
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.dangerous, color: Colors.redAccent),
+                  title: const Text('セーブせず終了 (放棄)', style: TextStyle(color: Colors.white)),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _sendFfiKey(81, "Q");
+                  },
+                ),
+                ListTile(
+                  leading: Icon(_isKeyboardVisible ? Icons.keyboard_hide : Icons.keyboard, color: Colors.blueAccent),
+                  title: Text(_isKeyboardVisible ? '仮想キーボードを非表示' : '仮想キーボードを表示', style: const TextStyle(color: Colors.white)),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _isKeyboardVisible = !_isKeyboardVisible;
+                    });
+                    if (!_isKeyboardVisible) {
+                      _focusNode.requestFocus();
+                    }
+                  },
+                ),
+              ],
+              ListTile(
+                leading: const Icon(Icons.settings, color: Colors.grey),
+                title: const Text('ゲーム設定を開く', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _showSettingsDialog();
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: KeyboardListener(
         focusNode: _focusNode,
@@ -1163,107 +1177,133 @@ class _MyHomePageState extends State<MyHomePage> {
             }
           }
         },
-        child: Column(
+        child: Stack(
           children: [
-            Expanded(
-              child: _isGameRunning
-                  ? _buildGameScreen()
-                  : Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: SingleChildScrollView(
-                        child: Text(
-                           _logs.join('\n'),
-                          style: const TextStyle(fontFamily: 'monospace'),
-                        ),
-                      ),
-                    ),
-            ),
-            if (!_isGameRunning)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: !_assetsReady
-                    ? const Center(
-                        child: Column(
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 8),
-                            Text("Preparing assets..."),
-                          ],
-                        ),
-                      )
-                    : Column(
-                        children: [
-                          ElevatedButton(
-                            onPressed: _startGame,
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(double.infinity, 50),
-                              backgroundColor: Colors.deepPurple,
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text('Start NetHack Game', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                          ),
-                          const SizedBox(height: 12),
-                          OutlinedButton.icon(
-                            onPressed: _showSettingsDialog,
-                            icon: const Icon(Icons.settings),
-                            label: const Text("ゲーム設定を開く"),
-                            style: OutlinedButton.styleFrom(
-                              minimumSize: const Size(double.infinity, 45),
+            Column(
+              children: [
+                Expanded(
+                  child: _isGameRunning
+                      ? _buildGameScreen()
+                      : Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: SingleChildScrollView(
+                            child: Text(
+                               _logs.join('\n'),
+                              style: const TextStyle(fontFamily: 'monospace'),
                             ),
                           ),
-                        ],
-                      ),
-              ),
-            // ゲーム進行中の操作盤 (キーボードモード vs ボタンモード)
-            if (_isGameRunning && _isKeyboardVisible && _waitingForInput) ...[
-              Opacity(
-                opacity: _padOpacity,
-                child: Transform.scale(
-                  scale: _padScale,
-                  alignment: Alignment.bottomCenter,
-                  child: _controllerMode == ControllerMode.keyboard
-                      ? NetHackKeyboard(
-                          onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                          onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                          onToggleMode: () {
-                            setState(() {
-                              _controllerMode = ControllerMode.pad;
-                            });
-                          },
-                        )
-                      : Column(
-                          children: [
-                            // ボタンモード (左端に D-Pad, 右端に 3x3 ショートカットパッド)
-                            Container(
-                              color: Colors.grey[950],
-                              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  NetHackDPad(
-                                    onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                                  ),
-                                  NetHackShortcutPad(key: ValueKey(_controlsVersion),
-                                    onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                                    onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            NetHackCmdPanel(key: ValueKey(_controlsVersion),
-                              onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                              onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
-                              onToggleMode: () {
-                                setState(() {
-                                  _controllerMode = ControllerMode.keyboard;
-                                });
-                              },
-                            ),
-                          ],
                         ),
                 ),
+                if (!_isGameRunning)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: !_assetsReady
+                        ? const Center(
+                            child: Column(
+                              children: [
+                                CircularProgressIndicator(),
+                                SizedBox(height: 8),
+                                Text("Preparing assets..."),
+                              ],
+                            ),
+                          )
+                        : Column(
+                            children: [
+                              ElevatedButton(
+                                onPressed: _startGame,
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: const Size(double.infinity, 50),
+                                  backgroundColor: Colors.deepPurple,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text('Start NetHack Game', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              ),
+                              const SizedBox(height: 12),
+                              OutlinedButton.icon(
+                                onPressed: _showSettingsDialog,
+                                icon: const Icon(Icons.settings),
+                                label: const Text("ゲーム設定を開く"),
+                                style: OutlinedButton.styleFrom(
+                                  minimumSize: const Size(double.infinity, 45),
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
+                // ゲーム進行中の操作盤 (キーボードモード vs ボタンモード)
+                if (_isGameRunning && _isKeyboardVisible && _waitingForInput) ...[
+                  Opacity(
+                    opacity: _padOpacity,
+                    child: Transform.scale(
+                      scale: _padScale,
+                      alignment: Alignment.bottomCenter,
+                      child: _controllerMode == ControllerMode.keyboard
+                          ? NetHackKeyboard(
+                              onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                              onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                              onToggleMode: () {
+                                setState(() {
+                                  _controllerMode = ControllerMode.pad;
+                                });
+                              },
+                            )
+                          : Column(
+                              children: [
+                                // ボタンモード (左端に D-Pad, 右端に 3x3 ショートカットパッド)
+                                Container(
+                                  color: Colors.grey[950],
+                                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      NetHackDPad(
+                                        onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                                      ),
+                                      NetHackShortcutPad(key: ValueKey(_controlsVersion),
+                                        onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                                        onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                NetHackCmdPanel(key: ValueKey(_controlsVersion),
+                                  onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                                  onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
+                                  onToggleMode: () {
+                                    setState(() {
+                                      _controllerMode = ControllerMode.keyboard;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            if (_isGameRunning)
+              Positioned(
+                top: 100, // ステータス表示(38px)+メッセージ(54px)の下、マップ領域の左上に配置
+                left: 8,
+                child: Builder(
+                  builder: (context) {
+                    return Opacity(
+                      opacity: 0.6,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.black87,
+                        radius: 20,
+                        child: IconButton(
+                          icon: const Icon(Icons.menu, color: Colors.white, size: 20),
+                          onPressed: () {
+                            Scaffold.of(context).openDrawer();
+                          },
+                        ),
+                      ),
+                    );
+                  }
+                ),
               ),
-            ],
           ],
         ),
       ),
