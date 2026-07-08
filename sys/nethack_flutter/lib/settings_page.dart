@@ -27,6 +27,8 @@ class _SettingsPageState extends State<SettingsPage> {
   int _statusDisplayMode = 0;
   double _padOpacity = 0.8;
   double _padScale = 1.0;
+  String _drawerPosition = 'left';
+  String _menuButtonPosition = 'top_left';
 
   // 物理キー割り当て (デフォルト: 0 = なし)
   int _volupAction = 0;
@@ -65,6 +67,8 @@ class _SettingsPageState extends State<SettingsPage> {
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
       _padOpacity = prefs.getDouble('pad_opacity') ?? 0.8;
       _padScale = prefs.getDouble('pad_scale') ?? 1.0;
+      _drawerPosition = prefs.getString('drawer_position') ?? 'left';
+      _menuButtonPosition = prefs.getString('menu_button_position') ?? 'top_left';
 
       _volupAction = prefs.getInt('key_volup_action') ?? 0;
       _voldownAction = prefs.getInt('key_voldown_action') ?? 0;
@@ -333,6 +337,46 @@ class _SettingsPageState extends State<SettingsPage> {
             onChanged: (val) {
               setState(() => _padScale = val);
               _saveSetting('pad_scale', val);
+            },
+          ),
+        ),
+        ListTile(
+          title: const Text("メニュー(ドロワー)の引き出し位置"),
+          trailing: DropdownButton<String>(
+            value: _drawerPosition,
+            dropdownColor: Colors.grey[900],
+            style: const TextStyle(color: Colors.white),
+            items: const [
+              DropdownMenuItem(value: 'left', child: Text('左側 (スワイプ可)', style: TextStyle(color: Colors.white))),
+              DropdownMenuItem(value: 'right', child: Text('右側 (スワイプ可)', style: TextStyle(color: Colors.white))),
+              DropdownMenuItem(value: 'top', child: Text('上部', style: TextStyle(color: Colors.white))),
+              DropdownMenuItem(value: 'bottom', child: Text('下部', style: TextStyle(color: Colors.white))),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _drawerPosition = val);
+                _saveSetting('drawer_position', val);
+              }
+            },
+          ),
+        ),
+        ListTile(
+          title: const Text("半透明メニューボタンの配置位置"),
+          trailing: DropdownButton<String>(
+            value: _menuButtonPosition,
+            dropdownColor: Colors.grey[900],
+            style: const TextStyle(color: Colors.white),
+            items: const [
+              DropdownMenuItem(value: 'top_left', child: Text('左上', style: TextStyle(color: Colors.white))),
+              DropdownMenuItem(value: 'top_right', child: Text('右上', style: TextStyle(color: Colors.white))),
+              DropdownMenuItem(value: 'left_edge', child: Text('左端(中央)', style: TextStyle(color: Colors.white))),
+              DropdownMenuItem(value: 'right_edge', child: Text('右端(中央)', style: TextStyle(color: Colors.white))),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _menuButtonPosition = val);
+                _saveSetting('menu_button_position', val);
+              }
             },
           ),
         ),

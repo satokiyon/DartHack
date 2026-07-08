@@ -98,6 +98,10 @@ class _MyHomePageState extends State<MyHomePage> {
   double _padScale = 1.0;
   int _autoSaveInterval = 0;
   int _statusDisplayMode = 0; // 0: 領域に合わせて文字サイズ縮小(Fit), 1: 領域の可変高さ(Wrap)
+  String _drawerPosition = 'left';
+  String _menuButtonPosition = 'top_left';
+  bool _isTopDrawerOpen = false;
+  bool _isBottomDrawerOpen = false;
 
   // 物理キー割り当て設定
   int _volupAction = 0;
@@ -131,6 +135,8 @@ class _MyHomePageState extends State<MyHomePage> {
       _padScale = prefs.getDouble('pad_scale') ?? 1.0;
       _autoSaveInterval = prefs.getInt('auto_save_interval') ?? 0;
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
+      _drawerPosition = prefs.getString('drawer_position') ?? 'left';
+      _menuButtonPosition = prefs.getString('menu_button_position') ?? 'top_left';
 
       // 物理キーのロード
       _volupAction = prefs.getInt('key_volup_action') ?? 0;
@@ -155,6 +161,8 @@ class _MyHomePageState extends State<MyHomePage> {
     await prefs.setDouble('pad_scale', _padScale);
     await prefs.setInt('auto_save_interval', _autoSaveInterval);
     await prefs.setInt('status_display_mode', _statusDisplayMode);
+    await prefs.setString('drawer_position', _drawerPosition);
+    await prefs.setString('menu_button_position', _menuButtonPosition);
   }
 
   Future<void> _syncNativeKeySettings() async {
@@ -168,6 +176,206 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       debugPrint("Native key settings sync failed: $e");
     }
+  }
+
+  void _openMenu(BuildContext context) {
+    if (_drawerPosition == 'left') {
+      Scaffold.of(context).openDrawer();
+    } else if (_drawerPosition == 'right') {
+      Scaffold.of(context).openEndDrawer();
+    } else if (_drawerPosition == 'top') {
+      setState(() {
+        _isTopDrawerOpen = true;
+      });
+    } else if (_drawerPosition == 'bottom') {
+      setState(() {
+        _isBottomDrawerOpen = true;
+      });
+    }
+  }
+
+  void _closeDrawer() {
+    if (_drawerPosition == 'left' || _drawerPosition == 'right') {
+      Navigator.of(context).pop();
+    } else {
+      setState(() {
+        _isTopDrawerOpen = false;
+        _isBottomDrawerOpen = false;
+      });
+    }
+  }
+
+  Widget _buildDrawerContent() {
+    return ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        DrawerHeader(
+          decoration: BoxDecoration(
+            color: Colors.deepPurple[900],
+          ),
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.sports_esports, size: 48, color: Colors.amber),
+              SizedBox(height: 8),
+              Text(
+                'NetHackメニュー',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (_isGameRunning) ...[
+          ListTile(
+            leading: const Icon(Icons.save, color: Colors.greenAccent),
+            title: const Text('セーブして終了', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              _closeDrawer();
+              _sendFfiKey(83, "S");
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.dangerous, color: Colors.redAccent),
+            title: const Text('セーブせず終了 (放棄)', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              _closeDrawer();
+              _sendFfiKey(81, "Q");
+            },
+          ),
+          ListTile(
+            leading: Icon(_isKeyboardVisible ? Icons.keyboard_hide : Icons.keyboard, color: Colors.blueAccent),
+            title: Text(_isKeyboardVisible ? '仮想キーボードを非表示' : '仮想キーボードを表示', style: const TextStyle(color: Colors.white)),
+            onTap: () {
+              _closeDrawer();
+              setState(() {
+                _isKeyboardVisible = !_isKeyboardVisible;
+              });
+              if (!_isKeyboardVisible) {
+                _focusNode.requestFocus();
+              }
+            },
+          ),
+        ],
+        ListTile(
+          leading: const Icon(Icons.settings, color: Colors.grey),
+          title: const Text('ゲーム設定を開く', style: TextStyle(color: Colors.white)),
+          onTap: () {
+            _closeDrawer();
+            _showSettingsDialog();
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTopDrawer() {
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      top: _isTopDrawerOpen ? 0 : -MediaQuery.of(context).size.height,
+      left: 0,
+      right: 0,
+      height: MediaQuery.of(context).size.height * 0.75,
+      child: Material(
+        color: Colors.grey[950],
+        elevation: 16,
+        child: Container(
+          decoration: const BoxDecoration(
+            border: Border(bottom: BorderSide(color: Colors.white12)),
+          ),
+          child: _buildDrawerContent(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomDrawer() {
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      bottom: _isBottomDrawerOpen ? 0 : -MediaQuery.of(context).size.height,
+      left: 0,
+      right: 0,
+      height: MediaQuery.of(context).size.height * 0.75,
+      child: Material(
+        color: Colors.grey[950],
+        elevation: 16,
+        child: Container(
+          decoration: const BoxDecoration(
+            border: Border(top: BorderSide(color: Colors.white12)),
+          ),
+          child: _buildDrawerContent(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerBarrier(bool isOpen, VoidCallback onClose) {
+    if (!isOpen) return const SizedBox.shrink();
+    return Positioned.fill(
+      child: GestureDetector(
+        onTap: onClose,
+        child: Container(
+          color: Colors.black54,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuButton() {
+    double? top;
+    double? bottom;
+    double? left;
+    double? right;
+
+    final mediaQuery = MediaQuery.of(context);
+    final topOffset = 100.0; // ステータス(38px)+メッセージ(54px)+マージン
+
+    switch (_menuButtonPosition) {
+      case 'top_left':
+        top = topOffset;
+        left = 8;
+        break;
+      case 'top_right':
+        top = topOffset;
+        right = 8;
+        break;
+      case 'left_edge':
+        top = mediaQuery.size.height * 0.4;
+        left = 8;
+        break;
+      case 'right_edge':
+        top = mediaQuery.size.height * 0.4;
+        right = 8;
+        break;
+    }
+
+    return Positioned(
+      top: top,
+      bottom: bottom,
+      left: left,
+      right: right,
+      child: Builder(
+        builder: (context) {
+          return Opacity(
+            opacity: 0.6,
+            child: CircleAvatar(
+              backgroundColor: Colors.black87,
+              radius: 20,
+              child: IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white, size: 20),
+                onPressed: () => _openMenu(context),
+              ),
+            ),
+          );
+        }
+      ),
+    );
   }
 
   void _handleNativeKeyEvent(String key) {
@@ -1112,77 +1320,19 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       },
       child: Scaffold(
-      drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2,
-      drawer: Drawer(
-        child: Container(
-          color: Colors.grey[950],
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.deepPurple[900],
-                ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.sports_esports, size: 48, color: Colors.amber),
-                    SizedBox(height: 8),
-                    Text(
-                      'NetHackメニュー',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (_isGameRunning) ...[
-                ListTile(
-                  leading: const Icon(Icons.save, color: Colors.greenAccent),
-                  title: const Text('セーブして終了', style: TextStyle(color: Colors.white)),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _sendFfiKey(83, "S");
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.dangerous, color: Colors.redAccent),
-                  title: const Text('セーブせず終了 (放棄)', style: TextStyle(color: Colors.white)),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _sendFfiKey(81, "Q");
-                  },
-                ),
-                ListTile(
-                  leading: Icon(_isKeyboardVisible ? Icons.keyboard_hide : Icons.keyboard, color: Colors.blueAccent),
-                  title: Text(_isKeyboardVisible ? '仮想キーボードを非表示' : '仮想キーボードを表示', style: const TextStyle(color: Colors.white)),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    setState(() {
-                      _isKeyboardVisible = !_isKeyboardVisible;
-                    });
-                    if (!_isKeyboardVisible) {
-                      _focusNode.requestFocus();
-                    }
-                  },
-                ),
-              ],
-              ListTile(
-                leading: const Icon(Icons.settings, color: Colors.grey),
-                title: const Text('ゲーム設定を開く', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _showSettingsDialog();
-                },
-              ),
-            ],
+        drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2,
+        drawer: _drawerPosition == 'left' ? Drawer(
+          child: Container(
+            color: Colors.grey[950],
+            child: _buildDrawerContent(),
           ),
-        ),
-      ),
+        ) : null,
+        endDrawer: _drawerPosition == 'right' ? Drawer(
+          child: Container(
+            color: Colors.grey[950],
+            child: _buildDrawerContent(),
+          ),
+        ) : null,
       body: KeyboardListener(
         focusNode: _focusNode,
         autofocus: true,
@@ -1315,28 +1465,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ],
             ),
-            if (_isGameRunning)
-              Positioned(
-                top: 100, // ステータス表示(38px)+メッセージ(54px)の下、マップ領域の左上に配置
-                left: 8,
-                child: Builder(
-                  builder: (context) {
-                    return Opacity(
-                      opacity: 0.6,
-                      child: CircleAvatar(
-                        backgroundColor: Colors.black87,
-                        radius: 20,
-                        child: IconButton(
-                          icon: const Icon(Icons.menu, color: Colors.white, size: 20),
-                          onPressed: () {
-                            Scaffold.of(context).openDrawer();
-                          },
-                        ),
-                      ),
-                    );
-                  }
-                ),
-              ),
+            if (_isGameRunning) ...[
+              _buildMenuButton(),
+              _buildDrawerBarrier(_isTopDrawerOpen, () => setState(() => _isTopDrawerOpen = false)),
+              _buildDrawerBarrier(_isBottomDrawerOpen, () => setState(() => _isBottomDrawerOpen = false)),
+              _buildTopDrawer(),
+              _buildBottomDrawer(),
+            ],
           ],
         ),
       ),
