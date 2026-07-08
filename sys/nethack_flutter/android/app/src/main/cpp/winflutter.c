@@ -59,7 +59,7 @@ typedef void (*DartSelectMenuCallback)(int winId, int how);
 typedef void (*DartYnFunctionCallback)(const char* question, const char* choices, int def);
 typedef void (*DartGetLineCallback)(const char* prompt, const char* initText);
 typedef void (*DartAskNameCallback)(const char* saves, int maxChars);
-typedef void (*DartExitCallback)(void);
+typedef void (*DartExitCallback)(const char* msg);
 
 static DartCreateWindowCallback g_create_window_cb = NULL;
 static DartClearWindowCallback g_clear_window_cb = NULL;
@@ -91,6 +91,7 @@ static volatile int g_input_request_id = 0;
 static volatile int g_last_received_key = 0;
 static volatile int g_key_available = 0;
 static volatile long g_selected_menu_item = -2; // -2: 未選択, -1: キャンセル
+static volatile int g_exit_notified = 0;
 
 #define NUM_CONV_BUFS 16
 #define CONV_BUF_SIZE 4096
@@ -522,8 +523,10 @@ static void flutter_askname(void) {
 
 static void flutter_exit_nhwindows(const char* str) {
     debuglog("flutter_exit_nhwindows: %s", str ? str : "NULL");
-    if (g_exit_cb) {
-        g_exit_cb();
+    if (g_exit_cb && !g_exit_notified) {
+        g_exit_notified = 1;
+        char* conv = str ? convert_cp437_to_utf8(str) : NULL;
+        g_exit_cb(conv ? conv : (str ? str : ""));
     }
 }
 
@@ -1026,8 +1029,9 @@ static void* NetHackThreadFunc(void* arg) {
     NetHackMain(1, params);
 
     debuglog("NetHackMain exited.");
-    if (g_exit_cb) {
-        g_exit_cb();
+    if (g_exit_cb && !g_exit_notified) {
+        g_exit_notified = 1;
+        g_exit_cb("");
     }
     free(args);
     return NULL;
@@ -1035,6 +1039,8 @@ static void* NetHackThreadFunc(void* arg) {
 
 void StartNetHackFlutter(const char* path, const char* username) {
     debuglog("StartNetHackFlutter: path=%s, user=%s", path, username);
+
+    g_exit_notified = 0;
 
     struct StartArgs* args = malloc(sizeof(struct StartArgs));
     strncpy(args->path, path, sizeof(args->path) - 1);

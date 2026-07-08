@@ -208,9 +208,11 @@ class NetHackWorker {
             });
           });
 
-          exitCallable = NativeCallable<ExitCallback>.listener(() {
+          exitCallable = NativeCallable<ExitCallback>.listener((Pointer<Utf8> msgPtr) {
+            final msg = _utf8DecodeLossy(msgPtr);
             uiSendPort.send({
               'type': 'game_exit',
+              'message': msg,
             });
           });
 

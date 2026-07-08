@@ -30,7 +30,7 @@ typedef SelectMenuCallback = Void Function(Int32 winId, Int32 how);
 typedef YnFunctionCallback = Void Function(Pointer<Utf8> question, Pointer<Utf8> choices, Int32 def);
 typedef GetLineCallback = Void Function(Pointer<Utf8> prompt, Pointer<Utf8> initText);
 typedef AskNameCallback = Void Function(Pointer<Utf8> saves, Int32 maxChars);
-typedef ExitCallback = Void Function();
+typedef ExitCallback = Void Function(Pointer<Utf8> msg);
 
 // C側起動関数
 typedef StartNetHackFunc = Void Function(Pointer<Utf8> path, Pointer<Utf8> username);

@@ -44,8 +44,30 @@ DLL_EXPORT void RegisterFlutterCallbacks(
     void* curs_cb,
     PrintCallback putstr_cb,
     void* glyph_cb,
-    DartNotifyInputCallback input_cb
+    DartNotifyInputCallback input_cb,
+    void* start_menu_cb,
+    void* add_menu_cb,
+    void* end_menu_cb,
+    void* select_menu_cb,
+    void* yn_cb,
+    void* getline_cb,
+    void* askname_cb,
+    void* exit_cb
 ) {
+    (void)create_cb;
+    (void)clear_cb;
+    (void)display_cb;
+    (void)destroy_cb;
+    (void)curs_cb;
+    (void)glyph_cb;
+    (void)start_menu_cb;
+    (void)add_menu_cb;
+    (void)end_menu_cb;
+    (void)select_menu_cb;
+    (void)yn_cb;
+    (void)getline_cb;
+    (void)askname_cb;
+    (void)exit_cb;
     g_print_callback = putstr_cb;
     g_input_callback = input_cb;
 }
