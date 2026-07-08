@@ -70,4 +70,10 @@ class MainActivity : FlutterActivity() {
 
         return super.dispatchKeyEvent(event)
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        android.os.Process.killProcess(android.os.Process.myPid())
+    }
 }
+

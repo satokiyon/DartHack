@@ -1078,7 +1078,40 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        if (_isGameRunning) {
+          final bool? exitConfirmed = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: Colors.grey[900],
+              title: const Text("ゲームの終了", style: TextStyle(color: Colors.white)),
+              content: const Text(
+                "本当に終了しますか？\n（進行状況はセーブされません。セーブして終了するにはメニューの「セーブして終了」を使用してください。）",
+                style: TextStyle(color: Colors.white70),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text("キャンセル", style: TextStyle(color: Colors.blueAccent)),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text("終了する", style: TextStyle(color: Colors.redAccent)),
+                ),
+              ],
+            ),
+          );
+          if (exitConfirmed == true) {
+            _stopGame();
+          }
+        } else {
+          _stopGame();
+        }
+      },
+      child: Scaffold(
       drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2,
       drawer: Drawer(
         child: Container(
@@ -1307,7 +1340,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-    );
+    ),);
   }
 
   // NetHackカラーテーブル
