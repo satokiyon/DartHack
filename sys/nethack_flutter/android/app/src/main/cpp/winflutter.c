@@ -770,7 +770,7 @@ static void HijackWindowProcs(void) {
     and_procs.win_status_init = genl_status_init;
     and_procs.win_status_finish = genl_status_finish;
     and_procs.win_status_enablefield = genl_status_enablefield;
-    and_procs.win_status_update = flutter_status_update;
+    and_procs.win_status_update = genl_status_update;
 
     windowprocs = and_procs;
     
