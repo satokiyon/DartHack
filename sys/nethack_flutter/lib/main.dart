@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:isolate';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -40,6 +41,16 @@ class MyApp extends StatelessWidget {
 }
 
 enum ControllerMode { keyboard, pad }
+
+class ExtCmdEntry {
+  final String command;
+  final String description;
+
+  const ExtCmdEntry({
+    required this.command,
+    required this.description,
+  });
+}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -89,8 +100,8 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _askNameController = TextEditingController();
 
   // 拡張コマンドサジェスト用
-  List<String> _extCmdList = [];
-  List<String> _filteredExtCmds = [];
+  List<ExtCmdEntry> _extCmdList = [];
+  List<ExtCmdEntry> _filteredExtCmds = [];
   final TextEditingController _extCmdFilterController = TextEditingController();
 
   // 詳細な操作設定（shared_preferences用）
@@ -149,7 +160,6 @@ class _MyHomePageState extends State<MyHomePage> {
       _controlsVersion++;
     });
     _syncNativeKeySettings();
-    _loadTileset(_selectedTileset);
     _triggerCenterOnPlayer();
   }
 
@@ -455,9 +465,25 @@ class _MyHomePageState extends State<MyHomePage> {
       final ptr = ffi.getExtCmdsFlutter();
       if (ptr != nullptr) {
         final extCmdsStr = ptr.toDartString();
+        final parsed = <ExtCmdEntry>[];
+        final rawItems = extCmdsStr.split(';');
+
+        for (final raw in rawItems) {
+          final item = raw.trim();
+          if (item.isEmpty) continue;
+
+          final tabIndex = item.indexOf('\t');
+          final rawCommand = tabIndex >= 0 ? item.substring(0, tabIndex).trim() : item;
+          if (rawCommand.isEmpty) continue;
+
+          final command = rawCommand.startsWith('#') ? rawCommand : '#$rawCommand';
+          final description = tabIndex >= 0 ? item.substring(tabIndex + 1).trim() : '';
+          parsed.add(ExtCmdEntry(command: command, description: description));
+        }
+
         setState(() {
-          _extCmdList = extCmdsStr.split(';');
-          _filteredExtCmds = List.from(_extCmdList);
+          _extCmdList = parsed;
+          _filteredExtCmds = List.from(parsed);
         });
         _extCmdFilterController.clear();
       }
@@ -559,8 +585,8 @@ class _MyHomePageState extends State<MyHomePage> {
         _assetsReady = true;
       });
       _addLog("Assets initialized at: $_assetsPath");
-      // タイル画像のロード
-      await _loadTileset(_selectedTileset);
+      // 初期フレーム描画を阻害しないようタイル読み込みは非同期で後追いする
+      unawaited(_loadTileset(_selectedTileset));
     } catch (e) {
       _addLog("Error initializing assets: $e");
     }
@@ -671,8 +697,12 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (type == 'getline') {
           final prompt = message['prompt'] as String;
           final initText = message['initText'] as String;
+          final lowerPrompt = prompt.toLowerCase();
+          final isExtCmdPrompt = lowerPrompt.contains("extended command")
+              || prompt.contains("拡張コマンド")
+              || initText.trimLeft().startsWith('#');
           _getlineController.text = initText;
-          if (prompt.contains("extended command") || prompt.contains("拡張コマンド")) {
+          if (isExtCmdPrompt) {
             _loadExtCmds();
           } else {
             _extCmdList = [];
@@ -768,9 +798,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildMenuOverlay() {
+    final isExtCmdMenu = _screen.menuPrompt.contains("拡張コマンド");
+
     // 拡張コマンド選択のメタコマンド（#や?など）をフィルタリングして除外する（開発制約 9）
     final filteredItems = _screen.menuItems.where((item) {
       final text = item.text.trim();
+      if (isExtCmdMenu) {
+        return text != "#" && text != "?";
+      }
       return !text.startsWith('#') && !text.startsWith('?');
     }).toList();
 
@@ -801,6 +836,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   final accLabel = item.accelerator != 0 
                       ? "${String.fromCharCode(item.accelerator)} - " 
                       : "";
+                  final itemText = item.text.trim();
+
+                  String commandText = itemText;
+                  String descriptionText = "";
+                  if (isExtCmdMenu) {
+                    final tabIndex = itemText.indexOf('\t');
+                    if (tabIndex >= 0) {
+                      commandText = itemText.substring(0, tabIndex).trim();
+                      descriptionText = itemText.substring(tabIndex + 1).trim();
+                    }
+                  }
 
                   // defaults.nhのmenucolors色を反映
                   Color itemColor = isSelectable ? Colors.white : Colors.grey;
@@ -814,7 +860,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       dense: true,
                       contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
                       title: Text(
-                        "$accLabel${item.text}",
+                        "$accLabel$commandText",
                         style: TextStyle(
                           color: itemColor,
                           fontFamily: 'monospace',
@@ -822,6 +868,15 @@ class _MyHomePageState extends State<MyHomePage> {
                           fontWeight: isSelectable ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
+                      subtitle: isExtCmdMenu && descriptionText.isNotEmpty
+                          ? Text(
+                              descriptionText,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                            )
+                          : null,
                       onTap: isSelectable
                           ? () => _sendMenuSelection(item.ident)
                           : null,
@@ -979,9 +1034,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         border: const OutlineInputBorder(),
                       ),
                       onChanged: (val) {
+                        final query = val.toLowerCase();
                         setState(() {
                           _filteredExtCmds = _extCmdList
-                              .where((cmd) => cmd.toLowerCase().contains(val.toLowerCase()))
+                              .where((entry) {
+                                return entry.command.toLowerCase().contains(query)
+                                    || entry.description.toLowerCase().contains(query);
+                              })
                               .toList();
                         });
                       },
@@ -997,14 +1056,23 @@ class _MyHomePageState extends State<MyHomePage> {
                           shrinkWrap: true,
                           itemCount: _filteredExtCmds.length,
                           itemBuilder: (context, index) {
-                            final cmd = _filteredExtCmds[index];
+                            final entry = _filteredExtCmds[index];
                             return ListTile(
-                              title: Text(cmd, style: const TextStyle(fontFamily: 'monospace', color: Colors.white)),
+                              title: Text(
+                                entry.command,
+                                style: const TextStyle(fontFamily: 'monospace', color: Colors.white),
+                              ),
+                              subtitle: entry.description.isNotEmpty
+                                  ? Text(
+                                      entry.description,
+                                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                                    )
+                                  : null,
                               dense: true,
                               visualDensity: VisualDensity.compact,
                               onTap: () {
-                                _getlineController.text = cmd;
-                                _sendGetLineResult(cmd);
+                                _getlineController.text = entry.command;
+                                _sendGetLineResult(entry.command);
                               },
                             );
                           },
@@ -1360,146 +1428,148 @@ class _MyHomePageState extends State<MyHomePage> {
             child: _buildDrawerContent(),
           ),
         ) : null,
-      body: KeyboardListener(
-        focusNode: _focusNode,
-        autofocus: true,
-        onKeyEvent: (KeyEvent event) {
-          if (!_isGameRunning || !_waitingForInput) return;
-          if (event is KeyDownEvent) {
-            final char = event.character;
-            if (char != null && char.isNotEmpty) {
-              final code = char.codeUnitAt(0);
-              _sendFfiKey(code, char);
-            } else {
-              int? code;
-              String? name;
-              if (event.logicalKey == LogicalKeyboardKey.arrowUp) { code = 107; name = "k"; }
-              else if (event.logicalKey == LogicalKeyboardKey.arrowDown) { code = 106; name = "j"; }
-              else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) { code = 104; name = "h"; }
-              else if (event.logicalKey == LogicalKeyboardKey.arrowRight) { code = 108; name = "l"; }
-              else if (event.logicalKey == LogicalKeyboardKey.enter) { code = 10; name = "Enter"; }
-              else if (event.logicalKey == LogicalKeyboardKey.escape) { code = 27; name = "ESC"; }
-              else if (event.logicalKey == LogicalKeyboardKey.space) { code = 32; name = "Space"; }
-              
-              if (code != null) {
-                _sendFfiKey(code, name ?? "");
+      body: SafeArea(
+        child: KeyboardListener(
+          focusNode: _focusNode,
+          autofocus: true,
+          onKeyEvent: (KeyEvent event) {
+            if (!_isGameRunning || !_waitingForInput) return;
+            if (event is KeyDownEvent) {
+              final char = event.character;
+              if (char != null && char.isNotEmpty) {
+                final code = char.codeUnitAt(0);
+                _sendFfiKey(code, char);
+              } else {
+                int? code;
+                String? name;
+                if (event.logicalKey == LogicalKeyboardKey.arrowUp) { code = 107; name = "k"; }
+                else if (event.logicalKey == LogicalKeyboardKey.arrowDown) { code = 106; name = "j"; }
+                else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) { code = 104; name = "h"; }
+                else if (event.logicalKey == LogicalKeyboardKey.arrowRight) { code = 108; name = "l"; }
+                else if (event.logicalKey == LogicalKeyboardKey.enter) { code = 10; name = "Enter"; }
+                else if (event.logicalKey == LogicalKeyboardKey.escape) { code = 27; name = "ESC"; }
+                else if (event.logicalKey == LogicalKeyboardKey.space) { code = 32; name = "Space"; }
+                
+                if (code != null) {
+                  _sendFfiKey(code, name ?? "");
+                }
               }
             }
-          }
-        },
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                Expanded(
-                  child: _isGameRunning
-                      ? _buildGameScreen()
-                      : Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: SingleChildScrollView(
-                            child: Text(
-                               _logs.join('\n'),
-                              style: const TextStyle(fontFamily: 'monospace'),
-                            ),
-                          ),
-                        ),
-                ),
-                if (!_isGameRunning)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: !_assetsReady
-                        ? const Center(
-                            child: Column(
-                              children: [
-                                CircularProgressIndicator(),
-                                SizedBox(height: 8),
-                                Text("Preparing assets..."),
-                              ],
-                            ),
-                          )
-                        : Column(
-                            children: [
-                              ElevatedButton(
-                                onPressed: _startGame,
-                                style: ElevatedButton.styleFrom(
-                                  minimumSize: const Size(double.infinity, 50),
-                                  backgroundColor: Colors.deepPurple,
-                                  foregroundColor: Colors.white,
-                                ),
-                                child: const Text('Start NetHack Game', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          },
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  Expanded(
+                    child: _isGameRunning
+                        ? _buildGameScreen()
+                        : Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: SingleChildScrollView(
+                              child: Text(
+                                 _logs.join('\n'),
+                                style: const TextStyle(fontFamily: 'monospace'),
                               ),
-                              const SizedBox(height: 12),
-                              OutlinedButton.icon(
-                                onPressed: _showSettingsDialog,
-                                icon: const Icon(Icons.settings),
-                                label: const Text("ゲーム設定を開く"),
-                                style: OutlinedButton.styleFrom(
-                                  minimumSize: const Size(double.infinity, 45),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                   ),
-                // ゲーム進行中の操作盤 (キーボードモード vs ボタンモード)
-                if (_isGameRunning && _isKeyboardVisible && _waitingForInput) ...[
-                  Opacity(
-                    opacity: _padOpacity,
-                    child: Transform.scale(
-                      scale: _padScale,
-                      alignment: Alignment.bottomCenter,
-                      child: _controllerMode == ControllerMode.keyboard
-                          ? NetHackKeyboard(
-                              onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                              onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                              onToggleMode: () {
-                                setState(() {
-                                  _controllerMode = ControllerMode.pad;
-                                });
-                              },
+                  if (!_isGameRunning)
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: !_assetsReady
+                          ? const Center(
+                              child: Column(
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(height: 8),
+                                  Text("Preparing assets..."),
+                                ],
+                              ),
                             )
                           : Column(
                               children: [
-                                // ボタンモード (左端に D-Pad, 右端に 3x3 ショートカットパッド)
-                                Container(
-                                  color: Colors.grey[950],
-                                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      NetHackDPad(
-                                        onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                                      ),
-                                      NetHackShortcutPad(key: ValueKey(_controlsVersion),
-                                        onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                                        onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                                      ),
-                                    ],
+                                  ElevatedButton(
+                                  onPressed: _startGame,
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: const Size(double.infinity, 50),
+                                    backgroundColor: Colors.deepPurple,
+                                    foregroundColor: Colors.white,
                                   ),
+                                  child: const Text('Start NetHack Game', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                                 ),
-                                NetHackCmdPanel(key: ValueKey(_controlsVersion),
-                                  onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                                  onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
-                                  onToggleMode: () {
-                                    setState(() {
-                                      _controllerMode = ControllerMode.keyboard;
-                                    });
-                                  },
+                                const SizedBox(height: 12),
+                                OutlinedButton.icon(
+                                  onPressed: _showSettingsDialog,
+                                  icon: const Icon(Icons.settings),
+                                  label: const Text("ゲーム設定を開く"),
+                                  style: OutlinedButton.styleFrom(
+                                    minimumSize: const Size(double.infinity, 45),
+                                  ),
                                 ),
                               ],
                             ),
                     ),
-                  ),
+                  // ゲーム進行中の操作盤 (キーボードモード vs ボタンモード)
+                  if (_isGameRunning && _isKeyboardVisible && _waitingForInput) ...[
+                    Opacity(
+                      opacity: _padOpacity,
+                      child: Transform.scale(
+                        scale: _padScale,
+                        alignment: Alignment.bottomCenter,
+                        child: _controllerMode == ControllerMode.keyboard
+                            ? NetHackKeyboard(
+                                onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                                onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                                onToggleMode: () {
+                                  setState(() {
+                                    _controllerMode = ControllerMode.pad;
+                                  });
+                                },
+                              )
+                            : Column(
+                                children: [
+                                  // ボタンモード (左端に D-Pad, 右端に 3x3 ショートカットパッド)
+                                  Container(
+                                    color: Colors.grey[950],
+                                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        NetHackDPad(
+                                          onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                                        ),
+                                        NetHackShortcutPad(key: ValueKey(_controlsVersion),
+                                          onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                                          onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  NetHackCmdPanel(key: ValueKey(_controlsVersion),
+                                    onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                                    onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
+                                    onToggleMode: () {
+                                      setState(() {
+                                        _controllerMode = ControllerMode.keyboard;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ),
+                  ],
                 ],
+              ),
+              if (_isGameRunning && _isMainGameStarted) ...[
+                _buildMenuButton(),
+                _buildDrawerBarrier(_isTopDrawerOpen, () => setState(() => _isTopDrawerOpen = false)),
+                _buildDrawerBarrier(_isBottomDrawerOpen, () => setState(() => _isBottomDrawerOpen = false)),
+                _buildTopDrawer(),
+                _buildBottomDrawer(),
               ],
-            ),
-            if (_isGameRunning && _isMainGameStarted) ...[
-              _buildMenuButton(),
-              _buildDrawerBarrier(_isTopDrawerOpen, () => setState(() => _isTopDrawerOpen = false)),
-              _buildDrawerBarrier(_isBottomDrawerOpen, () => setState(() => _isBottomDrawerOpen = false)),
-              _buildTopDrawer(),
-              _buildBottomDrawer(),
             ],
-          ],
+          ),
         ),
       ),
     ),);

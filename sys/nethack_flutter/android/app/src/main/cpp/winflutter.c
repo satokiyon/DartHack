@@ -17,6 +17,8 @@ static void flutter_start_menu(winid wid, unsigned long behavior);
 static void flutter_add_menu(winid wid, const glyph_info *glyphinfo, const anything *ident, char accelerator, char groupacc, int attr, int color, const char *str, unsigned int itemflags);
 static void flutter_end_menu(winid wid, const char *prompt);
 static int flutter_select_menu(winid wid, int how, menu_item **selected);
+static int flutter_get_ext_cmd(void);
+static int flutter_do_ext_cmd_menu(boolean complete);
 static void flutter_destroy_nhwindow(winid window);
 static void flutter_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, unsigned long *colormasks);
 static void flutter_exit_nhwindows(const char* str);
@@ -236,9 +238,12 @@ void SendAskNameResultToC(const char* result) {
 // 拡張コマンド一覧の取得
 const char* GetExtCmdsFlutter(void) {
     static char buf[4096] = {0};
-    buf[0] = '\0';
+    size_t used = 0;
     int i;
     int first = 1;
+
+    buf[0] = '\0';
+
     for(i = 0; extcmdlist[i].ef_txt; i++)
     {
         int flgs = extcmdlist[i].flags;
@@ -248,13 +253,30 @@ const char* GetExtCmdsFlutter(void) {
             continue;
         if(strcmp(extcmdlist[i].ef_txt, "#") == 0 || strcmp(extcmdlist[i].ef_txt, "?") == 0)
             continue;
-            
-        if (!first) {
-            strcat(buf, ";");
+
+        {
+            const char* cmd = extcmdlist[i].ef_txt;
+            const char* desc = (extcmdlist[i].ef_desc && *extcmdlist[i].ef_desc)
+                               ? extcmdlist[i].ef_desc
+                               : "";
+            int n = snprintf(
+                buf + used,
+                sizeof(buf) - used,
+                "%s%s\t%s",
+                first ? "" : ";",
+                cmd,
+                desc
+            );
+
+            if (n < 0 || (size_t) n >= (sizeof(buf) - used)) {
+                break;
+            }
+            used += (size_t) n;
         }
-        strcat(buf, extcmdlist[i].ef_txt);
+
         first = 0;
     }
+
     return buf;
 }
 
@@ -735,6 +757,72 @@ static int flutter_select_menu(winid wid, int how, menu_item **selected) {
     return 1; // 1個選択された
 }
 
+static int flutter_do_ext_cmd_menu(boolean complete) {
+    winid wid;
+    int i, count, what, flgs;
+    menu_item *selected = NULL;
+    anything any = cg.zeroany;
+    char accelerator = 'a';
+    const char *ptr;
+    long show_all_ident = -1;
+
+    wid = flutter_create_nhwindow(NHW_MENU);
+    flutter_start_menu(wid, MENU_BEHAVE_STANDARD);
+
+    for (i = 0; (ptr = extcmdlist[i].ef_txt); i++) {
+        flgs = extcmdlist[i].flags;
+        if ((flgs & (CMD_NOT_AVAILABLE | INTERNALCMD)) != 0)
+            continue;
+        if ((flgs & WIZMODECMD) && !wizard)
+            continue;
+        if (!complete && !(flgs & AUTOCOMPLETE) && !(flgs & WIZMODECMD))
+            continue;
+
+        any.a_long = (long) (i + 1);
+
+        {
+            char buf[BUFSZ];
+            if (extcmdlist[i].ef_desc && *extcmdlist[i].ef_desc) {
+                Sprintf(buf, "#%s\t%s", ptr, extcmdlist[i].ef_desc);
+            } else {
+                Sprintf(buf, "#%s", ptr);
+            }
+            flutter_add_menu(wid, &nul_glyphinfo, &any, accelerator, 0,
+                             ATR_NONE, NO_COLOR, buf, MENU_ITEMFLAGS_NONE);
+        }
+
+        if (accelerator == 'z')
+            accelerator = 'A';
+        else if (accelerator == 'Z')
+            accelerator = 0;
+        else
+            accelerator++;
+    }
+
+    if (!complete) {
+        show_all_ident = (long) (i + 1);
+        any.a_long = show_all_ident;
+        flutter_add_menu(wid, &nul_glyphinfo, &any, '*', 0, ATR_NONE,
+                         NO_COLOR, "(すべて表示)", MENU_ITEMFLAGS_NONE);
+    }
+
+    flutter_end_menu(wid, "拡張コマンド");
+    count = flutter_select_menu(wid, PICK_ONE, &selected);
+    what = count > 0 ? (int) selected[0].item.a_long - 1 : -1;
+    if (selected)
+        free((genericptr_t) selected);
+    flutter_destroy_nhwindow(wid);
+
+    if (!complete && what == (int) show_all_ident - 1)
+        return flutter_do_ext_cmd_menu(TRUE);
+    return what;
+}
+
+static int flutter_get_ext_cmd(void) {
+    debuglog("flutter_get_ext_cmd: using Flutter-native ext command menu");
+    return flutter_do_ext_cmd_menu(FALSE);
+}
+
 // windowprocs と and_procs を同時にハイジャックする関数
 static void HijackWindowProcs(void) {
     debuglog("Hijacking and_procs...");
@@ -758,6 +846,7 @@ static void HijackWindowProcs(void) {
     and_procs.win_nhbell = flutter_nhbell;
     and_procs.win_yn_function = flutter_yn_function;
     and_procs.win_getlin = flutter_getlin;
+    and_procs.win_get_ext_cmd = flutter_get_ext_cmd;
     and_procs.win_print_glyph = flutter_print_glyph;
 
     // メニュー用の関数ポインタも完全にハイジャック！
