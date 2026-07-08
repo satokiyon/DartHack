@@ -336,6 +336,11 @@ class _MyHomePageState extends State<MyHomePage> {
     final mediaQuery = MediaQuery.of(context);
     final topOffset = 100.0; // ステータス(38px)+メッセージ(54px)+マージン
 
+    // コントローラが表示されているか判定
+    final bool controllerVisible = _isGameRunning && _isKeyboardVisible && _waitingForInput;
+    // コントローラ表示時の下部からのオフセット（高さ250px程度を想定して270px）
+    final double bottomOffset = controllerVisible ? 270.0 : 16.0;
+
     switch (_menuButtonPosition) {
       case 'top_left':
         top = topOffset;
@@ -351,6 +356,14 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       case 'right_edge':
         top = mediaQuery.size.height * 0.4;
+        right = 8;
+        break;
+      case 'bottom_left':
+        bottom = bottomOffset;
+        left = 8;
+        break;
+      case 'bottom_right':
+        bottom = bottomOffset;
         right = 8;
         break;
     }
