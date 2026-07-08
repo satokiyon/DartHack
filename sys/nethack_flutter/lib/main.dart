@@ -102,6 +102,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String _menuButtonPosition = 'top_left';
   bool _isTopDrawerOpen = false;
   bool _isBottomDrawerOpen = false;
+  bool _isMainGameStarted = false;
+  int? _mapWinId;
 
   // 物理キー割り当て設定
   int _volupAction = 0;
@@ -600,6 +602,10 @@ class _MyHomePageState extends State<MyHomePage> {
       _logs.clear();
       _isGameRunning = true;
       _waitingForInput = false;
+      _isMainGameStarted = false;
+      _mapWinId = null;
+      _isTopDrawerOpen = false;
+      _isBottomDrawerOpen = false;
     });
 
     _addLog("Spawning NetHack Worker Isolate...");
@@ -619,10 +625,18 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         } else if (type == 'createWindow') {
           _screen.createWindow(message['winId'], message['winType']);
+          if (message['winType'] == 3) { // 3 == NHW_MAP
+            _mapWinId = message['winId'];
+          }
         } else if (type == 'clearWindow') {
           _screen.clearWindow(message['winId']);
         } else if (type == 'displayWindow') {
           // C側の blocking に基づく
+          if (_mapWinId != null && message['winId'] == _mapWinId) {
+            setState(() {
+              _isMainGameStarted = true;
+            });
+          }
         } else if (type == 'destroyWindow') {
           _screen.destroyWindow(message['winId']);
         } else if (type == 'curs') {
@@ -1303,7 +1317,7 @@ class _MyHomePageState extends State<MyHomePage> {
       canPop: false,
       onPopInvoked: (didPop) async {
         if (didPop) return;
-        if (_isGameRunning) {
+        if (_isGameRunning && _isMainGameStarted) {
           final bool? exitConfirmed = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
@@ -1334,13 +1348,13 @@ class _MyHomePageState extends State<MyHomePage> {
       },
       child: Scaffold(
         drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2,
-        drawer: _drawerPosition == 'left' ? Drawer(
+        drawer: _isMainGameStarted && _drawerPosition == 'left' ? Drawer(
           child: Container(
             color: Colors.grey[950],
             child: _buildDrawerContent(),
           ),
         ) : null,
-        endDrawer: _drawerPosition == 'right' ? Drawer(
+        endDrawer: _isMainGameStarted && _drawerPosition == 'right' ? Drawer(
           child: Container(
             color: Colors.grey[950],
             child: _buildDrawerContent(),
@@ -1478,7 +1492,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ],
             ),
-            if (_isGameRunning) ...[
+            if (_isGameRunning && _isMainGameStarted) ...[
               _buildMenuButton(),
               _buildDrawerBarrier(_isTopDrawerOpen, () => setState(() => _isTopDrawerOpen = false)),
               _buildDrawerBarrier(_isBottomDrawerOpen, () => setState(() => _isBottomDrawerOpen = false)),
