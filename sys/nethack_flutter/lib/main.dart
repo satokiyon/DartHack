@@ -71,6 +71,8 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _waitingForInput = false;
   bool _assetsReady = false;
   String _assetsPath = '';
+  bool _autoAdvanceSavePending = false;
+  bool _exitDialogShown = false;
 
   // タイルセット用変数
   ui.Image? _tileImage;
@@ -621,6 +623,48 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  bool _isSaveInProgressMessage(String text) {
+    final normalized = text.trim();
+    if (normalized.isEmpty) return false;
+    return normalized.contains('セーブ中')
+        || normalized.toLowerCase().contains('saving');
+  }
+
+  Future<void> _showExitDialogAndTerminate(String message) async {
+    if (!mounted || _exitDialogShown) return;
+    _exitDialogShown = true;
+
+    final dialogMessage = message.trim().isEmpty ? 'また会いましょう...' : message.trim();
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return PopScope(
+          canPop: false,
+          child: AlertDialog(
+            backgroundColor: Colors.grey[900],
+            title: const Text('終了', style: TextStyle(color: Colors.white)),
+            content: Text(
+              dialogMessage,
+              style: const TextStyle(color: Colors.white70),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK', style: TextStyle(color: Colors.blueAccent)),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (mounted) {
+      _stopGame();
+    }
+  }
+
   Future<void> _startGame() async {
     if (_isGameRunning) return;
 
@@ -632,6 +676,8 @@ class _MyHomePageState extends State<MyHomePage> {
       _mapWinId = null;
       _isTopDrawerOpen = false;
       _isBottomDrawerOpen = false;
+      _autoAdvanceSavePending = false;
+      _exitDialogShown = false;
     });
 
     _addLog("Spawning NetHack Worker Isolate...");
@@ -668,7 +714,11 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (type == 'curs') {
           _screen.setCursor(message['winId'], message['x'], message['y']);
         } else if (type == 'putstr') {
-          _screen.putString(message['winId'], message['attr'], message['text']);
+          final text = (message['text'] as String?) ?? '';
+          _screen.putString(message['winId'], message['attr'], text);
+          if (_isSaveInProgressMessage(text)) {
+            _autoAdvanceSavePending = true;
+          }
         } else if (type == 'printGlyph') {
           _screen.printGlyph(
             message['winId'],
@@ -683,6 +733,14 @@ class _MyHomePageState extends State<MyHomePage> {
           setState(() {
             _waitingForInput = true;
           });
+          if (_autoAdvanceSavePending && !_screen.isMenuWindowVisible && !_isYnVisible && !_isGetLineVisible && !_isAskNameVisible) {
+            _autoAdvanceSavePending = false;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted && _waitingForInput) {
+                _sendFfiKey(32, 'Space(auto)');
+              }
+            });
+          }
           if (!_isKeyboardVisible) {
             _focusNode.requestFocus();
           }
@@ -724,7 +782,12 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (type == 'startMenu') {
           _screen.startMenu(message['winId']);
         } else if (type == 'game_exit') {
-          _stopGame();
+          final exitMessage = (message['message'] as String?) ?? '';
+          setState(() {
+            _waitingForInput = false;
+            _isGameRunning = false;
+          });
+          unawaited(_showExitDialogAndTerminate(exitMessage));
         } else if (type == 'addMenu') {
           _screen.addMenu(
             message['winId'],
@@ -1397,6 +1460,66 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget _buildControllerOverlay() {
+    if (!_isGameRunning || !_isKeyboardVisible || !_waitingForInput) {
+      return const SizedBox.shrink();
+    }
+
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Opacity(
+        opacity: _padOpacity,
+        child: Transform.scale(
+          scale: _padScale,
+          alignment: Alignment.bottomCenter,
+          child: _controllerMode == ControllerMode.keyboard
+              ? NetHackKeyboard(
+                  onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                  onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                  onToggleMode: () {
+                    setState(() {
+                      _controllerMode = ControllerMode.pad;
+                    });
+                  },
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // ボタンモード (左端に D-Pad, 右端に 3x3 ショートカットパッド)
+                    Container(
+                      color: Colors.grey[950],
+                      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          NetHackDPad(
+                            onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                          ),
+                          NetHackShortcutPad(key: ValueKey(_controlsVersion),
+                            onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                            onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                          ),
+                        ],
+                      ),
+                    ),
+                    NetHackCmdPanel(key: ValueKey(_controlsVersion),
+                      onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                      onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
+                      onToggleMode: () {
+                        setState(() {
+                          _controllerMode = ControllerMode.keyboard;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -1527,58 +1650,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
                     ),
-                  // ゲーム進行中の操作盤 (キーボードモード vs ボタンモード)
-                  if (_isGameRunning && _isKeyboardVisible && _waitingForInput) ...[
-                    Opacity(
-                      opacity: _padOpacity,
-                      child: Transform.scale(
-                        scale: _padScale,
-                        alignment: Alignment.bottomCenter,
-                        child: _controllerMode == ControllerMode.keyboard
-                            ? NetHackKeyboard(
-                                onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                                onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                                onToggleMode: () {
-                                  setState(() {
-                                    _controllerMode = ControllerMode.pad;
-                                  });
-                                },
-                              )
-                            : Column(
-                                children: [
-                                  // ボタンモード (左端に D-Pad, 右端に 3x3 ショートカットパッド)
-                                  Container(
-                                    color: Colors.grey[950],
-                                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        NetHackDPad(
-                                          onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                                        ),
-                                        NetHackShortcutPad(key: ValueKey(_controlsVersion),
-                                          onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                                          onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  NetHackCmdPanel(key: ValueKey(_controlsVersion),
-                                    onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
-                                    onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
-                                    onToggleMode: () {
-                                      setState(() {
-                                        _controllerMode = ControllerMode.keyboard;
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                      ),
-                    ),
-                  ],
                 ],
               ),
+              _buildControllerOverlay(),
               if (_isGameRunning && _isMainGameStarted) ...[
                 _buildMenuButton(),
                 _buildDrawerBarrier(_isTopDrawerOpen, () => setState(() => _isTopDrawerOpen = false)),
