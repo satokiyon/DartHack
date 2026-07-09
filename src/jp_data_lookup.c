@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. */
 /* NetHack 5.0	jp_data_lookup.c */
 /* Japanese aliases for data.base lookup.
  * Keep data.base keys in English and only map player input for lookup.
@@ -531,10 +531,10 @@ static const struct jp_data_lookup_alias jp_data_lookup_aliases[] = {
     { "こんばっと", "combat" },
     { "せんとう", "combat" },
     { "戦闘", "combat" },
-    { "えんすいぼう", "conical hat" },
+    { "えんすいけいのぼうし", "conical hat" },
     { "こにかる", "conical hat" },
     { "こにかるはっと", "conical hat" },
-    { "円錐帽", "conical hat" },
+    { "円錐形の帽子", "conical hat" },
     { "こんじゅらー", "conjurer" },
     { "じゅじゅつし", "conjurer" },
     { "呪術師", "conjurer" },
@@ -550,6 +550,7 @@ static const struct jp_data_lookup_alias jp_data_lookup_aliases[] = {
     { "ほうじょうのかく", "cornucopia" },
     { "豊穣の角", "cornucopia" },
     { "こるぬたうむ", "cornuthaum" },
+    { "こーぬさむ", "cornuthaum" },
     { "うもうへび", "couatl" },
     { "こうあとる", "couatl" },
     { "羽毛蛇", "couatl" },
@@ -1420,6 +1421,8 @@ static const struct jp_data_lookup_alias jp_data_lookup_aliases[] = {
     { "あいあんちぇいん", "iron chain" },
     { "てっさ", "iron chain" },
     { "鉄鎖", "iron chain" },
+    { "てつのくさり", "iron chain" },
+    { "鉄の鎖", "iron chain" },
     { "あいろんごーれむ", "iron golem" },
     { "てつのごーれむ", "iron golem" },
     { "鉄のごーれむ", "iron golem" },
