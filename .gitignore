@@ -133,6 +133,8 @@ GEMINI.md
 .github/hooks/
 .vscode/
 
+.idea/
+
 #github workflow file for NetHackJP 
 .github\workflows\weekly-release.yml
 
