@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. -->
 # NetHackJP-Android 開発メモ
 
 本ドキュメントは、Android ポートの日本語化リポジトリである `NetHackJP-Android` の開発環境の構築、ビルド、マージ運用およびリリース手順についてまとめたものです。
@@ -68,6 +68,31 @@ $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\sys\android\buil
 
 ### defaults.nh のオプション名エイリアス整合性
 - `sys/android/defaults.nh` で日本語版独自のステータス表示オプションを使用する場合、`src/botl.c` 内のフィールド名テーブルに対応するエイリアスが登録されていないと、起動時に警告が出力されます。エイリアスの登録漏れに注意してください。
+
+### Flutter版のヘルプメニュー表示経路
+- `?` メニューの項目はすべて同じ経路ではなく、`NetHackについて` や `ゲームオプション一覧` のように `display_file()` へ進むものと、`ゲームオプションの詳細説明` のように `NHW_TEXT` に直接出力されるものが混在しています。
+- Flutter ポートでは `win_display_file` を必ず実装し、Java版と同じくヘルプファイルを `NHW_TEXT` に流し込んで表示してください。`display_file()` を未実装にすると、`?` メニューの一部だけが表示されない不具合になります。
+- `display_nhwindow()` は Java版と同様に、`WIN_MESSAGE` / `WIN_STATUS` / `WIN_MAP` 以外のウィンドウでは強制的に blocking 扱いにしてください。これを外すと、ヘルプ本文が表示直後に破棄されて見えなくなります。
+
+### Flutter版の PICK_ANY メニュー見出しと選択行
+- `PICK_ANY` のメニューには、カテゴリ見出しや区切り行と、実際に選択できるアイテム行が混在します。
+- `ident == 0` の行は選択対象ではない見出し・区切りとして扱い、チェックボックスや選択ハイライトの対象にしないでください。
+- 見出し行は別スタイルで描画し、食料・魔法書などのカテゴリ名と個別アイテムの違いが見た目で分かるようにしてください。
+
+### Flutter版 DPad の移動モード互換（Java版準拠）
+- Flutter の DPad は Java版と同様に、方向キーラベルを固定矢印ではなく可変文字列で描画し、移動モードに応じて `yuhjklbn` / `12346789` / `g+方向` / `G+方向` / `^+方向` / `m+方向` / `F+方向` を切り替えて表示してください。
+- 中央ボタンは Java版同様に「短押し: 有効モード循環」「長押し: 使用する移動モード選択ダイアログ表示」を割り当てます。利用可能モードは最低でも `NORMAL,UPPER,G_LOWER,G_UPPER,CTRL,M_CMD,F_CMD` を扱えるようにします。
+- 設定キーは Java版と揃えて `dpad_move_mode` と `dpad_enabled_move_modes` を使用し、Flutter 側でも同じフォーマット（カンマ区切りの enum 名）で保存・復元します。これにより Android(Java) と Flutter 間で設定互換を保てます。
+- DPad の方向ロング押しは Java版同様に `g<dir>`（走る）を送る挙動を基本とします。
+
+### Flutter版 方向問い合わせ時の入力ルール
+- `winflutter.c` の `flutter_yn_function()` は「どの方向 / what direction」を通常のYNダイアログとして送らず、`WIN_MESSAGE` に文面を出して `flutter_nhgetch()` で直接1キー待機します。
+- このため Flutter UI 側では、方向問い合わせ中は移動モード設定に関係なく `yuhjklbn` をそのまま送信する必要があります（`G` や `^` などの前置コマンドを送らない）。
+- 方向問い合わせ中判定は、少なくとも `WIN_MESSAGE` への `putstr` 文面に `what direction` / `どの方向` が含まれるかで追跡してください。
+
+### Flutter版 複合キー送信（前置コマンド + 方向）時の待機制御
+- `g<dir>` / `m<dir>` / `F<dir>` のように2キー連続送信する場合、1キー目送信で入力待機フラグを落とすと2キー目が送れなくなるため、UI 側送信関数に「待機解除しない送信（prefix送信用）」を用意してください。
+- 最終キー送信時だけ待機解除する設計にすると、Java版と同様の移動モード入力を安定して再現できます。
 
 ---
 
