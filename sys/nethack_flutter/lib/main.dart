@@ -42,6 +42,8 @@ class MyApp extends StatelessWidget {
 
 enum ControllerMode { keyboard, pad }
 
+enum DPadMoveMode { normal, upper, gLower, gUpper, ctrl, mCmd, fCmd }
+
 class ExtCmdEntry {
   final String command;
   final String description;
@@ -60,6 +62,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  static const List<DPadMoveMode> _allDPadMoveModes = [
+    DPadMoveMode.normal,
+    DPadMoveMode.upper,
+    DPadMoveMode.gLower,
+    DPadMoveMode.gUpper,
+    DPadMoveMode.ctrl,
+    DPadMoveMode.mCmd,
+    DPadMoveMode.fCmd,
+  ];
+
   ControllerMode _controllerMode = ControllerMode.pad; // デフォルトはボタンモード
 
   final List<String> _logs = [];
@@ -72,6 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _assetsReady = false;
   String _assetsPath = '';
   bool _autoAdvanceSavePending = false;
+  int _autoAdvanceSavePendingUntilMs = 0;
   bool _exitDialogShown = false;
 
   // タイルセット用変数
@@ -100,6 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> _askNameSaves = [];
   int _askNameMaxChars = 0;
   final TextEditingController _askNameController = TextEditingController();
+  int _numberPadMode = 0;
 
   // 拡張コマンドサジェスト用
   List<ExtCmdEntry> _extCmdList = [];
@@ -107,6 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _extCmdFilterController = TextEditingController();
   final TextEditingController _extCmdMenuFilterController = TextEditingController();
   String _extCmdMenuFilter = "";
+  Set<int> _menuSelectedIds = <int>{};
 
   // 詳細な操作設定（shared_preferences用）
   double _padOpacity = 0.8;
@@ -128,6 +143,9 @@ class _MyHomePageState extends State<MyHomePage> {
   // 設定変更の即時反映用バージョンカウンター
   int _controlsVersion = 0;
   double _cmdPanelHeight = 58.0;
+  DPadMoveMode _dPadMoveMode = DPadMoveMode.normal;
+  List<DPadMoveMode> _enabledDPadMoveModes = List<DPadMoveMode>.from(_allDPadMoveModes);
+  bool _isDirectionPromptActive = false;
 
   @override
   void initState() {
@@ -155,6 +173,15 @@ class _MyHomePageState extends State<MyHomePage> {
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
       _drawerPosition = prefs.getString('drawer_position') ?? 'left';
       _menuButtonPosition = prefs.getString('menu_button_position') ?? 'top_left';
+      _enabledDPadMoveModes = _parseEnabledMoveModes(
+        prefs.getString('dpad_enabled_move_modes') ??
+            'NORMAL,UPPER,G_LOWER,G_UPPER,CTRL,M_CMD,F_CMD',
+      );
+      final savedMoveModeName = prefs.getString('dpad_move_mode') ?? 'NORMAL';
+      _dPadMoveMode = _parseMoveMode(savedMoveModeName);
+      if (!_enabledDPadMoveModes.contains(_dPadMoveMode)) {
+        _dPadMoveMode = _enabledDPadMoveModes.first;
+      }
 
       // 物理キーのロード
       _volupAction = prefs.getInt('key_volup_action') ?? 0;
@@ -180,6 +207,65 @@ class _MyHomePageState extends State<MyHomePage> {
     await prefs.setInt('status_display_mode', _statusDisplayMode);
     await prefs.setString('drawer_position', _drawerPosition);
     await prefs.setString('menu_button_position', _menuButtonPosition);
+    await prefs.setString('dpad_move_mode', _moveModeName(_dPadMoveMode));
+    await prefs.setString(
+      'dpad_enabled_move_modes',
+      _enabledDPadMoveModes.map(_moveModeName).join(','),
+    );
+  }
+
+  DPadMoveMode _parseMoveMode(String name) {
+    switch (name.trim()) {
+      case 'UPPER':
+        return DPadMoveMode.upper;
+      case 'G_LOWER':
+        return DPadMoveMode.gLower;
+      case 'G_UPPER':
+        return DPadMoveMode.gUpper;
+      case 'CTRL':
+        return DPadMoveMode.ctrl;
+      case 'M_CMD':
+        return DPadMoveMode.mCmd;
+      case 'F_CMD':
+        return DPadMoveMode.fCmd;
+      case 'NORMAL':
+      default:
+        return DPadMoveMode.normal;
+    }
+  }
+
+  String _moveModeName(DPadMoveMode mode) {
+    switch (mode) {
+      case DPadMoveMode.normal:
+        return 'NORMAL';
+      case DPadMoveMode.upper:
+        return 'UPPER';
+      case DPadMoveMode.gLower:
+        return 'G_LOWER';
+      case DPadMoveMode.gUpper:
+        return 'G_UPPER';
+      case DPadMoveMode.ctrl:
+        return 'CTRL';
+      case DPadMoveMode.mCmd:
+        return 'M_CMD';
+      case DPadMoveMode.fCmd:
+        return 'F_CMD';
+    }
+  }
+
+  List<DPadMoveMode> _parseEnabledMoveModes(String raw) {
+    final modes = raw
+        .split(',')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .map(_parseMoveMode)
+        .toSet()
+        .toList();
+
+    if (modes.isEmpty) {
+      return <DPadMoveMode>[DPadMoveMode.normal];
+    }
+    return modes;
   }
 
   Future<void> _syncNativeKeySettings() async {
@@ -726,6 +812,10 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (type == 'clearWindow') {
           _screen.clearWindow(message['winId']);
         } else if (type == 'displayWindow') {
+          _screen.displayWindow(
+            message['winId'],
+            (message['blocking'] as int? ?? 0) != 0,
+          );
           // C側の blocking に基づく
           if (_mapWinId != null && message['winId'] == _mapWinId) {
             setState(() {
@@ -739,8 +829,17 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (type == 'putstr') {
           final text = (message['text'] as String?) ?? '';
           _screen.putString(message['winId'], message['attr'], text);
+          final winId = message['winId'] as int? ?? -1;
+          if (winId == NetHackScreen.nhwMessage || winId == 1) {
+            if (_isDirectionPromptText(text)) {
+              _isDirectionPromptActive = true;
+            } else if (text.trim().isNotEmpty) {
+              _isDirectionPromptActive = false;
+            }
+          }
           if (_isSaveInProgressMessage(text)) {
             _autoAdvanceSavePending = true;
+            _autoAdvanceSavePendingUntilMs = DateTime.now().millisecondsSinceEpoch + 5000;
           }
         } else if (type == 'printGlyph') {
           _screen.printGlyph(
@@ -756,13 +855,35 @@ class _MyHomePageState extends State<MyHomePage> {
           setState(() {
             _waitingForInput = true;
           });
-          if (_autoAdvanceSavePending && !_screen.isMenuWindowVisible && !_isYnVisible && !_isGetLineVisible && !_isAskNameVisible) {
-            _autoAdvanceSavePending = false;
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted && _waitingForInput) {
-                _sendFfiKey(32, 'Space(auto)');
-              }
-            });
+          if (_autoAdvanceSavePending) {
+            final nowMs = DateTime.now().millisecondsSinceEpoch;
+            final canAutoAdvance =
+                nowMs <= _autoAdvanceSavePendingUntilMs
+                && !_screen.isMenuWindowVisible
+                && !_screen.isTextWindowVisible
+                && _screen.textLines.isEmpty
+                && !_isYnVisible
+                && !_isGetLineVisible
+                && !_isAskNameVisible;
+
+            if (canAutoAdvance) {
+              _autoAdvanceSavePending = false;
+              _autoAdvanceSavePendingUntilMs = 0;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted && _waitingForInput) {
+                  _sendFfiKey(32, 'Space(auto)');
+                }
+              });
+            } else if (nowMs > _autoAdvanceSavePendingUntilMs
+                || _screen.isMenuWindowVisible
+                || _screen.isTextWindowVisible
+                || _screen.textLines.isNotEmpty
+                || _isYnVisible
+                || _isGetLineVisible
+                || _isAskNameVisible) {
+              _autoAdvanceSavePending = false;
+              _autoAdvanceSavePendingUntilMs = 0;
+            }
           }
           if (!_isKeyboardVisible) {
             _focusNode.requestFocus();
@@ -802,6 +923,12 @@ class _MyHomePageState extends State<MyHomePage> {
             _isAskNameVisible = true;
             _askNameController.text = saves.isNotEmpty ? saves[0] : "Player";
           });
+        } else if (type == 'number_pad_mode') {
+          final state = message['state'] as int? ?? 0;
+          setState(() {
+            _numberPadMode = state;
+          });
+          _addLog("number_pad mode: $state");
         } else if (type == 'startMenu') {
           _screen.startMenu(message['winId']);
         } else if (type == 'game_exit') {
@@ -830,6 +957,10 @@ class _MyHomePageState extends State<MyHomePage> {
             _waitingForInput = true;
             _extCmdMenuFilter = "";
             _extCmdMenuFilterController.clear();
+            _menuSelectedIds = _screen.menuItems
+                .where((item) => item.ident != 0 && item.preselected != 0)
+                .map((item) => item.ident)
+                .toSet();
           });
           _triggerCenterOnPlayer();
         } else if (type == 'error') {
@@ -844,11 +975,254 @@ class _MyHomePageState extends State<MyHomePage> {
     exit(0);
   }
 
-  void _sendFfiKey(int code, String label) {
+  bool _isDirectionPromptText(String text) {
+    final lower = text.toLowerCase();
+    return lower.contains('what direction') || text.contains('どの方向');
+  }
+
+  String _moveModeLabel(DPadMoveMode mode) {
+    switch (mode) {
+      case DPadMoveMode.normal:
+        return '標準';
+      case DPadMoveMode.upper:
+        return '大文字';
+      case DPadMoveMode.gLower:
+        return 'g';
+      case DPadMoveMode.gUpper:
+        return 'G';
+      case DPadMoveMode.ctrl:
+        return '^(Ctrl)';
+      case DPadMoveMode.mCmd:
+        return 'm';
+      case DPadMoveMode.fCmd:
+        return 'F';
+    }
+  }
+
+  String _viToNumPad(String viKey) {
+    switch (viKey) {
+      case 'y':
+        return '7';
+      case 'k':
+        return '8';
+      case 'u':
+        return '9';
+      case 'h':
+        return '4';
+      case 'l':
+        return '6';
+      case 'b':
+        return '1';
+      case 'j':
+        return '2';
+      case 'n':
+        return '3';
+      default:
+        return viKey;
+    }
+  }
+
+  int _ctrlFromVi(String viKey) {
+    final code = viKey.codeUnitAt(0);
+    return code - 'a'.codeUnitAt(0) + 1;
+  }
+
+  String _applyMoveModeForDisplay(String baseDir) {
+    switch (_dPadMoveMode) {
+      case DPadMoveMode.normal:
+        return baseDir;
+      case DPadMoveMode.upper:
+        return baseDir.toUpperCase();
+      case DPadMoveMode.gLower:
+        return 'g$baseDir';
+      case DPadMoveMode.gUpper:
+        return 'G$baseDir';
+      case DPadMoveMode.ctrl:
+        return '^$baseDir';
+      case DPadMoveMode.mCmd:
+        return 'm$baseDir';
+      case DPadMoveMode.fCmd:
+        return 'F$baseDir';
+    }
+  }
+
+  String _directionDisplayLabel(String viKey) {
+    final baseDir = _numberPadMode != 0 ? _viToNumPad(viKey) : viKey;
+    return _applyMoveModeForDisplay(baseDir);
+  }
+
+  Map<String, String> _buildDirectionLabels() {
+    return <String, String>{
+      'y': _directionDisplayLabel('y'),
+      'k': _directionDisplayLabel('k'),
+      'u': _directionDisplayLabel('u'),
+      'h': _directionDisplayLabel('h'),
+      'l': _directionDisplayLabel('l'),
+      'b': _directionDisplayLabel('b'),
+      'j': _directionDisplayLabel('j'),
+      'n': _directionDisplayLabel('n'),
+    };
+  }
+
+  Future<void> _saveDPadModePrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('dpad_move_mode', _moveModeName(_dPadMoveMode));
+    await prefs.setString(
+      'dpad_enabled_move_modes',
+      _enabledDPadMoveModes.map(_moveModeName).join(','),
+    );
+  }
+
+  void _cycleDPadMoveMode() {
+    if (_enabledDPadMoveModes.isEmpty) {
+      _enabledDPadMoveModes = <DPadMoveMode>[DPadMoveMode.normal];
+    }
+    final currentIdx = _enabledDPadMoveModes.indexOf(_dPadMoveMode);
+    final nextIdx = (currentIdx + 1) % _enabledDPadMoveModes.length;
+    setState(() {
+      _dPadMoveMode = _enabledDPadMoveModes[nextIdx];
+    });
+    unawaited(_saveDPadModePrefs());
+  }
+
+  Future<void> _showMoveModeSelectDialog() async {
+    final selected = Set<DPadMoveMode>.from(_enabledDPadMoveModes);
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('使用する移動モードの選択'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: _allDPadMoveModes.map((mode) {
+                    return CheckboxListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      value: selected.contains(mode),
+                      title: Text(_moveModeLabel(mode)),
+                      onChanged: (checked) {
+                        setDialogState(() {
+                          if (checked == true) {
+                            selected.add(mode);
+                          } else {
+                            selected.remove(mode);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text('キャンセル'),
+                ),
+                FilledButton(
+                  onPressed: () {
+                    final newModes = _allDPadMoveModes
+                        .where((mode) => selected.contains(mode))
+                        .toList();
+                    if (newModes.isEmpty) {
+                      newModes.add(DPadMoveMode.normal);
+                    }
+                    setState(() {
+                      _enabledDPadMoveModes = newModes;
+                      if (!_enabledDPadMoveModes.contains(_dPadMoveMode)) {
+                        _dPadMoveMode = _enabledDPadMoveModes.first;
+                      }
+                    });
+                    unawaited(_saveDPadModePrefs());
+                    Navigator.of(dialogContext).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _sendModeAppliedDirection(String viKey, {bool useLongPressRun = false}) {
+    if (useLongPressRun && !_isDirectionPromptActive) {
+      _sendFfiKey('g'.codeUnitAt(0), 'g', keepWaiting: true);
+      _sendFfiKey(viKey.codeUnitAt(0), viKey);
+      return;
+    }
+
+    if (_isDirectionPromptActive) {
+      _sendFfiKey(viKey.codeUnitAt(0), viKey);
+      _isDirectionPromptActive = false;
+      return;
+    }
+
+    final baseKey = _numberPadMode != 0 ? _viToNumPad(viKey) : viKey;
+
+    switch (_dPadMoveMode) {
+      case DPadMoveMode.normal:
+        _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
+        break;
+      case DPadMoveMode.upper:
+        if (_numberPadMode != 0) {
+          final runKey = viKey.toUpperCase();
+          _sendFfiKey(runKey.codeUnitAt(0), runKey);
+        } else {
+          final key = viKey.toUpperCase();
+          _sendFfiKey(key.codeUnitAt(0), key);
+        }
+        break;
+      case DPadMoveMode.gLower:
+        _sendFfiKey('g'.codeUnitAt(0), 'g', keepWaiting: true);
+        _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
+        break;
+      case DPadMoveMode.gUpper:
+        _sendFfiKey('G'.codeUnitAt(0), 'G', keepWaiting: true);
+        _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
+        break;
+      case DPadMoveMode.ctrl:
+        _sendFfiKey(_ctrlFromVi(viKey), '^$viKey');
+        break;
+      case DPadMoveMode.mCmd:
+        _sendFfiKey('m'.codeUnitAt(0), 'm', keepWaiting: true);
+        _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
+        break;
+      case DPadMoveMode.fCmd:
+        _sendFfiKey('F'.codeUnitAt(0), 'F', keepWaiting: true);
+        _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
+        break;
+    }
+  }
+
+  void _sendFfiKey(int code, String label, {bool keepWaiting = false}) {
     if (!_waitingForInput) return;
 
     // メニュー表示中は、メニューショートカットキー判定を行う
     if (_screen.isMenuWindowVisible) {
+      final isMultiSelectMenu = _screen.menuHow > 1;
+      if (isMultiSelectMenu) {
+        if (code == 27) {
+          _sendMenuSelection(-1);
+          return;
+        }
+        if (code == 10 || code == 13) {
+          _sendMenuSelections(_menuSelectedIds.toList(growable: false));
+          return;
+        }
+        for (final item in _screen.menuItems) {
+          if (item.ident != 0 && item.accelerator != 0 && item.accelerator == code) {
+            _toggleMenuSelection(item.ident);
+            return;
+          }
+        }
+        return;
+      }
+
       if (code == 32 || code == 10 || code == 13 || code == 27) {
         _sendMenuSelection(-1);
         return;
@@ -863,7 +1237,9 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     setState(() {
-      _waitingForInput = false;
+      if (!keepWaiting) {
+        _waitingForInput = false;
+      }
     });
     _addLog("> Send Key: '$label' ($code)");
     _workerSendPort?.send({
@@ -885,10 +1261,79 @@ class _MyHomePageState extends State<MyHomePage> {
       'ident': ident,
     });
     _screen.clearMenu();
+    _menuSelectedIds = <int>{};
+  }
+
+  void _sendMenuSelections(List<int> idents) {
+    if (!_waitingForInput || !_screen.isMenuWindowVisible) return;
+    setState(() {
+      _waitingForInput = false;
+      _extCmdMenuFilter = "";
+      _extCmdMenuFilterController.clear();
+    });
+    _addLog("> Menu Selects: ${idents.length} item(s)");
+    _workerSendPort?.send({
+      'type': 'menu_selects',
+      'idents': idents,
+    });
+    _screen.clearMenu();
+    _menuSelectedIds = <int>{};
+  }
+
+  void _toggleMenuSelection(int ident) {
+    if (ident == 0) return;
+    setState(() {
+      if (_menuSelectedIds.contains(ident)) {
+        _menuSelectedIds.remove(ident);
+      } else {
+        _menuSelectedIds.add(ident);
+      }
+    });
+  }
+
+  bool _isMenuDividerText(String text) {
+    final t = text.trim();
+    if (t.isEmpty) return true;
+    return RegExp(r'^[-=\s]+$').hasMatch(t);
+  }
+
+  bool _isMenuCategoryItem(MenuItemData item) {
+    if (item.ident != 0) return false;
+    return !_isMenuDividerText(item.text);
+  }
+
+  Widget _buildMenuCategoryRow(String text) {
+    return Container(
+      margin: const EdgeInsets.only(top: 8, bottom: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E2A3A),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.lightBlueAccent.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.category_outlined, size: 16, color: Colors.lightBlueAccent),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              text.trim(),
+              style: const TextStyle(
+                color: Colors.lightBlueAccent,
+                fontFamily: 'monospace',
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildMenuOverlay() {
     final isExtCmdMenu = _screen.menuPrompt.contains("拡張コマンド");
+    final isMultiSelectMenu = !isExtCmdMenu && _screen.menuHow > 1;
     final extCmdQuery = _extCmdMenuFilter.trim().toLowerCase();
 
     // 拡張コマンド選択のメタコマンド（#や?など）をフィルタリングして除外する（開発制約 9）
@@ -911,120 +1356,217 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withValues(alpha: 0.95),
+        color: Colors.black.withValues(alpha: 0.92),
         padding: EdgeInsets.fromLTRB(16, 16, 16, _dialogBottomInset(context)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_screen.menuPrompt.isNotEmpty) ...[
-              Text(
-                _screen.menuPrompt,
-                style: const TextStyle(
-                  color: Colors.amber,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-            if (isExtCmdMenu) ...[
-              TextField(
-                controller: _extCmdMenuFilterController,
-                autofocus: true,
-                decoration: InputDecoration(
-                  hintText: '拡張コマンドを検索...',
-                  prefixIcon: const Icon(Icons.search, size: 18),
-                  isDense: true,
-                  filled: true,
-                  fillColor: Colors.grey[900],
-                  border: const OutlineInputBorder(),
-                ),
-                onChanged: (val) {
-                  setState(() {
-                    _extCmdMenuFilter = val;
-                  });
-                },
-              ),
-              const SizedBox(height: 8),
-            ],
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredItems.length,
-                itemBuilder: (context, index) {
-                  final item = filteredItems[index];
-                  final isSelectable = item.ident != 0;
-                  final isPrintableAccel = item.accelerator >= 0x21 && item.accelerator <= 0x7E;
-                  final accLabel = isPrintableAccel
-                      ? "${String.fromCharCode(item.accelerator)} - "
-                      : "";
-                  final itemText = item.text.trim();
-
-                  String commandText = itemText;
-                  String descriptionText = "";
-                  if (isExtCmdMenu) {
-                    final tabIndex = itemText.indexOf('\t');
-                    if (tabIndex >= 0) {
-                      commandText = itemText.substring(0, tabIndex).trim();
-                      descriptionText = itemText.substring(tabIndex + 1).trim();
-                    }
-                  }
-
-                  // defaults.nhのmenucolors色を反映
-                  Color itemColor = isSelectable ? Colors.white : Colors.grey;
-                  if (!isExtCmdMenu && item.color >= 0 && item.color < 16) {
-                    itemColor = _getNhColor(item.color);
-                  }
-
-                  final descIndent = " " * accLabel.length;
-
-                  return Material(
-                    color: Colors.transparent,
-                    child: ListTile(
-                      dense: true,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            "$accLabel$commandText",
-                            style: TextStyle(
-                              color: itemColor,
-                              fontFamily: 'monospace',
-                              fontSize: 14,
-                              fontWeight: isSelectable ? FontWeight.bold : FontWeight.normal,
-                            ),
+        child: Card(
+          margin: EdgeInsets.zero,
+          color: const Color(0xFF12161D),
+          elevation: 12,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_screen.menuPrompt.isNotEmpty) ...[
+                  Row(
+                    children: [
+                      Icon(
+                        isMultiSelectMenu ? Icons.checklist_rounded : Icons.menu_book_rounded,
+                        size: 18,
+                        color: Colors.amber[300],
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _screen.menuPrompt,
+                          style: const TextStyle(
+                            color: Colors.amber,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
-                          if (isExtCmdMenu && descriptionText.isNotEmpty)
-                            Text(
-                              "$descIndent$descriptionText",
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontFamily: 'monospace',
-                                fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Divider(color: Colors.white.withValues(alpha: 0.15), height: 1),
+                  const SizedBox(height: 8),
+                ],
+                if (isExtCmdMenu) ...[
+                  TextField(
+                    controller: _extCmdMenuFilterController,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: '拡張コマンドを検索...',
+                      prefixIcon: const Icon(Icons.search, size: 18),
+                      isDense: true,
+                      filled: true,
+                      fillColor: const Color(0xFF0E1117),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onChanged: (val) {
+                      setState(() {
+                        _extCmdMenuFilter = val;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                ],
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                    ),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                      itemCount: filteredItems.length,
+                      itemBuilder: (context, index) {
+                        final item = filteredItems[index];
+                        final isSelectable = item.ident != 0;
+                        final isCategory = _isMenuCategoryItem(item);
+                        final isDivider = !isSelectable && !isCategory;
+                        final isPrintableAccel = item.accelerator >= 0x21 && item.accelerator <= 0x7E;
+                        final accLabel = isPrintableAccel
+                            ? "${String.fromCharCode(item.accelerator)} - "
+                            : "";
+                        final itemText = item.text.trim();
+
+                        String commandText = itemText;
+                        String descriptionText = "";
+                        if (isExtCmdMenu) {
+                          final tabIndex = itemText.indexOf('\t');
+                          if (tabIndex >= 0) {
+                            commandText = itemText.substring(0, tabIndex).trim();
+                            descriptionText = itemText.substring(tabIndex + 1).trim();
+                          }
+                        }
+
+                        if (isCategory) {
+                          return _buildMenuCategoryRow(commandText);
+                        }
+                        if (isDivider) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                            child: Divider(color: Colors.white.withValues(alpha: 0.14), height: 1),
+                          );
+                        }
+
+                        Color itemColor = Colors.white;
+                        if (!isExtCmdMenu && item.color >= 0 && item.color < 16) {
+                          itemColor = _getNhColor(item.color);
+                        }
+
+                        final descIndent = " " * accLabel.length;
+
+                        if (isMultiSelectMenu) {
+                          final checked = _menuSelectedIds.contains(item.ident);
+                          return Material(
+                            color: Colors.transparent,
+                            child: CheckboxListTile(
+                              dense: true,
+                              contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                              value: checked,
+                              onChanged: (_) => _toggleMenuSelection(item.ident),
+                              activeColor: Colors.tealAccent[400],
+                              checkColor: Colors.black,
+                              controlAffinity: ListTileControlAffinity.leading,
+                              title: Text(
+                                "$accLabel$commandText",
+                                style: TextStyle(
+                                  color: itemColor,
+                                  fontFamily: 'monospace',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
-                        ],
-                      ),
-                      onTap: isSelectable
-                          ? () => _sendMenuSelection(item.ident)
-                          : null,
+                          );
+                        }
+
+                        return Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            dense: true,
+                            contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  "$accLabel$commandText",
+                                  style: TextStyle(
+                                    color: itemColor,
+                                    fontFamily: 'monospace',
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                if (isExtCmdMenu && descriptionText.isNotEmpty)
+                                  Text(
+                                    "$descIndent$descriptionText",
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontFamily: 'monospace',
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            onTap: () => _sendMenuSelection(item.ident),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () => _sendMenuSelection(-1),
-                  child: const Text("Cancel"),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    if (isMultiSelectMenu) ...[
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _menuSelectedIds = filteredItems
+                                .where((item) => item.ident != 0)
+                                .map((item) => item.ident)
+                                .toSet();
+                          });
+                        },
+                        child: const Text("全て選択"),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _menuSelectedIds.clear();
+                          });
+                        },
+                        child: const Text("解除"),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => _sendMenuSelections(_menuSelectedIds.toList(growable: false)),
+                        child: const Text("OK"),
+                      ),
+                    ],
+                    ElevatedButton(
+                      onPressed: () => _sendMenuSelection(-1),
+                      child: const Text("Cancel"),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -1036,22 +1578,41 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Positioned.fill(
       child: Container(
-        color: Colors.black54,
+        color: Colors.black.withValues(alpha: 0.78),
         child: Padding(
           padding: EdgeInsets.fromLTRB(16, 16, 16, _dialogBottomInset(context)),
           child: Center(
             child: Card(
               margin: const EdgeInsets.all(24),
-              color: Colors.grey[900],
-              elevation: 8,
+              color: const Color(0xFF141A22),
+              elevation: 12,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    Row(
+                      children: [
+                        Icon(Icons.help_outline_rounded, color: Colors.amber[300], size: 18),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            '確認',
+                            style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Divider(color: Colors.white.withValues(alpha: 0.16), height: 1),
+                    const SizedBox(height: 14),
                     Text(
                       _ynQuestion,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
@@ -1064,7 +1625,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ElevatedButton(
                             onPressed: () => _sendYnResult('y'.codeUnitAt(0)),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: (_ynDefault == 'y'.codeUnitAt(0)) ? Colors.deepPurple : Colors.grey[800],
+                              backgroundColor: (_ynDefault == 'y'.codeUnitAt(0)) ? Colors.teal[500] : Colors.blueGrey[800],
                               foregroundColor: Colors.white,
                             ),
                             child: const Text('Yes'),
@@ -1072,7 +1633,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ElevatedButton(
                             onPressed: () => _sendYnResult('n'.codeUnitAt(0)),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: (_ynDefault == 'n'.codeUnitAt(0)) ? Colors.deepPurple : Colors.grey[800],
+                              backgroundColor: (_ynDefault == 'n'.codeUnitAt(0)) ? Colors.teal[500] : Colors.blueGrey[800],
                               foregroundColor: Colors.white,
                             ),
                             child: const Text('No'),
@@ -1081,7 +1642,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ElevatedButton(
                               onPressed: () => _sendYnResult('q'.codeUnitAt(0)),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: (_ynDefault == 'q'.codeUnitAt(0)) ? Colors.deepPurple : Colors.grey[800],
+                                backgroundColor: (_ynDefault == 'q'.codeUnitAt(0)) ? Colors.teal[500] : Colors.blueGrey[800],
                                 foregroundColor: Colors.white,
                               ),
                               child: const Text('Quit'),
@@ -1099,7 +1660,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             return ElevatedButton(
                               onPressed: () => _sendYnResult(ch.codeUnitAt(0)),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: isDefault ? Colors.deepPurple : Colors.grey[800],
+                                backgroundColor: isDefault ? Colors.teal[500] : Colors.blueGrey[800],
                                 foregroundColor: Colors.white,
                               ),
                               child: Text(ch),
@@ -1107,7 +1668,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           }),
                           ElevatedButton(
                             onPressed: () => _sendYnResult(27), // ESC
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[900], foregroundColor: Colors.grey),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.black54, foregroundColor: Colors.white70),
                             child: const Text('キャンセル'),
                           ),
                         ],
@@ -1127,14 +1688,18 @@ class _MyHomePageState extends State<MyHomePage> {
     
     return Positioned.fill(
       child: Container(
-        color: Colors.black87,
+        color: Colors.black.withValues(alpha: 0.84),
         child: Padding(
           padding: EdgeInsets.fromLTRB(16, 16, 16, _dialogBottomInset(context)),
           child: Center(
             child: Card(
               margin: const EdgeInsets.all(16),
-              color: Colors.grey[950],
+              color: const Color(0xFF141A22),
               elevation: 12,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+              ),
               child: Container(
                 width: double.infinity,
                 constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
@@ -1143,10 +1708,20 @@ class _MyHomePageState extends State<MyHomePage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                  Text(
-                    _getlinePrompt,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.amber),
+                  Row(
+                    children: [
+                      Icon(Icons.edit_note_rounded, size: 18, color: Colors.amber[300]),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _getlinePrompt,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.amber),
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 8),
+                  Divider(color: Colors.white.withValues(alpha: 0.16), height: 1),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _getlineController,
@@ -1155,8 +1730,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     decoration: InputDecoration(
                       hintText: 'テキストを入力してください',
                       filled: true,
-                      fillColor: Colors.grey[900],
-                      border: const OutlineInputBorder(),
+                      fillColor: const Color(0xFF0E1117),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     onSubmitted: (val) {
                       _sendGetLineResult(val);
@@ -1173,8 +1750,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         prefixIcon: const Icon(Icons.search, size: 18),
                         isDense: true,
                         filled: true,
-                        fillColor: Colors.grey[900],
-                        border: const OutlineInputBorder(),
+                        fillColor: const Color(0xFF0E1117),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       onChanged: (val) {
                         final query = val.toLowerCase();
@@ -1192,8 +1771,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     Expanded(
                       child: Container(
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white10),
-                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.white24),
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.black.withValues(alpha: 0.2),
                         ),
                         child: ListView.builder(
                           shrinkWrap: true,
@@ -1234,7 +1814,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(width: 8),
                       ElevatedButton(
                         onPressed: () => _sendGetLineResult(_getlineController.text),
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.teal[500]),
                         child: const Text('決定'),
                       ),
                     ],
@@ -1252,14 +1832,18 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildAskNameOverlay() {
     return Positioned.fill(
       child: Container(
-        color: Colors.black87,
+        color: Colors.black.withValues(alpha: 0.84),
         child: Padding(
           padding: EdgeInsets.fromLTRB(16, 16, 16, _dialogBottomInset(context)),
           child: Center(
             child: Card(
               margin: const EdgeInsets.all(20),
-              color: Colors.grey[950],
+              color: const Color(0xFF141A22),
               elevation: 12,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+              ),
               child: Container(
                 width: double.infinity,
                 constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
@@ -1268,10 +1852,20 @@ class _MyHomePageState extends State<MyHomePage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                  const Text(
-                    "お名前は？",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber),
+                  Row(
+                    children: [
+                      Icon(Icons.badge_outlined, size: 18, color: Colors.amber[300]),
+                      const SizedBox(width: 8),
+                      const Expanded(
+                        child: Text(
+                          "お名前は？",
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber),
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 8),
+                  Divider(color: Colors.white.withValues(alpha: 0.16), height: 1),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _askNameController,
@@ -1279,8 +1873,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     maxLength: _askNameMaxChars,
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: Colors.grey[900],
-                      border: const OutlineInputBorder(),
+                      fillColor: const Color(0xFF0E1117),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     onSubmitted: (val) {
                       _sendAskNameResult(val);
@@ -1293,8 +1889,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     Expanded(
                       child: Container(
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white10),
-                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.white24),
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.black.withValues(alpha: 0.2),
                         ),
                         child: ListView.builder(
                           itemCount: _askNameSaves.length,
@@ -1302,7 +1899,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             final name = _askNameSaves[index];
                             return ListTile(
                               title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                              leading: const Icon(Icons.account_circle, color: Colors.deepPurpleAccent),
+                              leading: const Icon(Icons.account_circle, color: Colors.lightBlueAccent),
                               dense: true,
                               onTap: () {
                                 _askNameController.text = name;
@@ -1324,7 +1921,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(width: 8),
                       ElevatedButton(
                         onPressed: () => _sendAskNameResult(_askNameController.text),
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.teal[500]),
                         child: const Text('ゲーム開始'),
                       ),
                     ],
@@ -1460,56 +2057,94 @@ class _MyHomePageState extends State<MyHomePage> {
             if (_screen.isTextWindowVisible)
               Positioned.fill(
                 child: Container(
-                  color: Colors.black.withValues(alpha: 0.95),
+                  color: Colors.black.withValues(alpha: 0.92),
                   padding: EdgeInsets.fromLTRB(16, 16, 16, _dialogBottomInset(context)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Text(
-                            _screen.textLines.join('\n'),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'monospace',
-                              fontSize: 13,
+                  child: Card(
+                    margin: EdgeInsets.zero,
+                    color: const Color(0xFF12161D),
+                    elevation: 12,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.description_outlined, size: 18, color: Colors.amber[300]),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'テキスト表示',
+                                style: TextStyle(
+                                  color: Colors.amber,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Divider(color: Colors.white.withValues(alpha: 0.15), height: 1),
+                          const SizedBox(height: 8),
+                          Expanded(
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.18),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              child: SingleChildScrollView(
+                                child: Text(
+                                  _screen.textLines.join('\n'),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'monospace',
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Center(
-                        child: Text(
-                          "-- [Space] or [Enter] to continue --",
-                          style: TextStyle(
-                            color: Colors.amber,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () => _sendFfiKey(32, "Space"),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple[900],
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                          const SizedBox(height: 8),
+                          const Center(
+                            child: Text(
+                              "-- [Space] or [Enter] to continue --",
+                              style: TextStyle(
+                                color: Colors.amber,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
                             ),
                           ),
-                          child: const Text(
-                            "OK",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                          const SizedBox(height: 12),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () => _sendFfiKey(32, "Space"),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.teal[500],
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                "OK",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -1561,7 +2196,18 @@ class _MyHomePageState extends State<MyHomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           NetHackDPad(
-                            onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                            directionLabels: _buildDirectionLabels(),
+                            centerLabel: _moveModeLabel(_dPadMoveMode),
+                            onDirectionPress: (viKey) {
+                              _sendModeAppliedDirection(viKey);
+                            },
+                            onDirectionLongPress: (viKey) {
+                              _sendModeAppliedDirection(viKey, useLongPressRun: true);
+                            },
+                            onCenterTap: _cycleDPadMoveMode,
+                            onCenterLongPress: () {
+                              _showMoveModeSelectDialog();
+                            },
                           ),
                           NetHackShortcutPad(key: ValueKey(_controlsVersion),
                             onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),

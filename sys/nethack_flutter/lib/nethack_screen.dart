@@ -108,6 +108,8 @@ class NetHackScreen extends ChangeNotifier {
       _isTextWindowVisible = true;
     }
     if (type == nhwMenu) {
+      _textLines.clear();
+      _isTextWindowVisible = false;
       _menuItems.clear();
       _menuPrompt = "";
     }
@@ -186,6 +188,29 @@ class NetHackScreen extends ChangeNotifier {
     notifyListeners();
   }
 
+  void displayWindow(int winId, bool blocking) {
+    final type = _winTypes[winId];
+
+    if (type == nhwText) {
+      _isTextWindowVisible = true;
+      _isMenuWindowVisible = false;
+      notifyListeners();
+      return;
+    }
+
+    if (type == nhwMenu) {
+      if (_menuItems.isNotEmpty) {
+        _isMenuWindowVisible = true;
+        _isTextWindowVisible = false;
+      } else if (_textLines.isNotEmpty) {
+        _isTextWindowVisible = true;
+        _isMenuWindowVisible = false;
+      }
+      notifyListeners();
+      return;
+    }
+  }
+
   void printGlyph(int winId, int x, int y, int tile, int ch, int color, int special) {
     final type = _winTypes[winId];
     if ((type == nhwMap || winId == 3 /* WIN_MAP */) && x >= 0 && x < mapCols && y >= 0 && y < mapRows) {
@@ -205,6 +230,9 @@ class NetHackScreen extends ChangeNotifier {
   // ----------------------------------------------------
 
   void startMenu(int winId) {
+    _textLines.clear();
+    _isTextWindowVisible = false;
+    _isMenuWindowVisible = false;
     _menuItems.clear();
     _menuPrompt = "";
     notifyListeners();

@@ -52,7 +52,8 @@ DLL_EXPORT void RegisterFlutterCallbacks(
     void* yn_cb,
     void* getline_cb,
     void* askname_cb,
-    void* exit_cb
+    void* exit_cb,
+    void* number_pad_cb
 ) {
     (void)create_cb;
     (void)clear_cb;
@@ -68,12 +69,21 @@ DLL_EXPORT void RegisterFlutterCallbacks(
     (void)getline_cb;
     (void)askname_cb;
     (void)exit_cb;
+    (void)number_pad_cb;
     g_print_callback = putstr_cb;
     g_input_callback = input_cb;
 }
 
 DLL_EXPORT void SendKeyToFlutter(int key) {
     g_next_key = key;
+}
+
+DLL_EXPORT void SendMenuSelection(long ident) {
+    (void)ident;
+}
+
+DLL_EXPORT void SendMenuSelectionsToC(const char* csv) {
+    (void)csv;
 }
 
 DLL_EXPORT int GetFlutterInputRequestId() {

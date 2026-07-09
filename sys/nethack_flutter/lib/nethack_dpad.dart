@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
 
 class NetHackDPad extends StatelessWidget {
-  final Function(String) onKeyPress;
+  final Map<String, String> directionLabels;
+  final String centerLabel;
+  final void Function(String) onDirectionPress;
+  final void Function(String)? onDirectionLongPress;
+  final VoidCallback onCenterTap;
+  final VoidCallback onCenterLongPress;
 
-  const NetHackDPad({super.key, required this.onKeyPress});
+  const NetHackDPad({
+    super.key,
+    required this.directionLabels,
+    required this.centerLabel,
+    required this.onDirectionPress,
+    required this.onCenterTap,
+    required this.onCenterLongPress,
+    this.onDirectionLongPress,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,23 +35,26 @@ class NetHackDPad extends StatelessWidget {
         mainAxisSpacing: 2,
         crossAxisSpacing: 2,
         children: [
-          _buildDpadButton('y', '↖'),
-          _buildDpadButton('k', '▲'),
-          _buildDpadButton('u', '↗'),
-          _buildDpadButton('h', '◀'),
-          _buildDpadButton('.', '●'),
-          _buildDpadButton('l', '▶'),
-          _buildDpadButton('b', '↙'),
-          _buildDpadButton('j', '▼'),
-          _buildDpadButton('n', '↘'),
+          _buildDirectionButton('y'),
+          _buildDirectionButton('k'),
+          _buildDirectionButton('u'),
+          _buildDirectionButton('h'),
+          _buildCenterButton(),
+          _buildDirectionButton('l'),
+          _buildDirectionButton('b'),
+          _buildDirectionButton('j'),
+          _buildDirectionButton('n'),
         ],
       ),
     );
   }
 
-  Widget _buildDpadButton(String key, String label) {
+  Widget _buildDirectionButton(String viKey) {
     return GestureDetector(
-      onTapDown: (_) => onKeyPress(key),
+      onTap: () => onDirectionPress(viKey),
+      onLongPress: onDirectionLongPress == null
+          ? null
+          : () => onDirectionLongPress!(viKey),
       child: Container(
         decoration: const BoxDecoration(
           color: Colors.white10,
@@ -46,11 +62,39 @@ class NetHackDPad extends StatelessWidget {
         ),
         alignment: Alignment.center,
         child: Text(
-          label,
+          directionLabels[viKey] ?? viKey,
           style: const TextStyle(
             color: Colors.white70,
-            fontSize: 18,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCenterButton() {
+    return GestureDetector(
+      onTap: onCenterTap,
+      onLongPress: onCenterLongPress,
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white10,
+          shape: BoxShape.circle,
+        ),
+        alignment: Alignment.center,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: Text(
+              centerLabel,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
       ),

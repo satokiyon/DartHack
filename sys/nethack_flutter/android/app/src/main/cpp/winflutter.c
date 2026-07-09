@@ -1,5 +1,6 @@
 #include "hack.h"
 #include "func_tab.h"   /* for extended commands */
+#include "dlb.h"
 #include <unistd.h>
 #include <pthread.h>
 #include <android/log.h>
@@ -20,8 +21,16 @@ static int flutter_select_menu(winid wid, int how, menu_item **selected);
 static int flutter_get_ext_cmd(void);
 static int flutter_do_ext_cmd_menu(boolean complete);
 static void flutter_destroy_nhwindow(winid window);
+static void flutter_display_file(const char *name, boolean complain);
+static void flutter_putstr(winid window, int attr, const char* str);
 static void flutter_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, unsigned long *colormasks);
 static void flutter_exit_nhwindows(const char* str);
+static int flutter_doprev_message(void);
+static void flutter_number_pad(int state);
+static void flutter_delay_output(void);
+static char* flutter_getmsghistory(boolean init);
+static void flutter_putmsghistory(const char *msg, boolean restoring);
+static void flutter_save_message(const char* msg);
 extern void genl_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, unsigned long *colormasks);
 
 static const unsigned short cp437_to_unicode[256] = {
@@ -60,6 +69,7 @@ typedef void (*DartYnFunctionCallback)(const char* question, const char* choices
 typedef void (*DartGetLineCallback)(const char* prompt, const char* initText);
 typedef void (*DartAskNameCallback)(const char* saves, int maxChars);
 typedef void (*DartExitCallback)(const char* msg);
+typedef void (*DartNumberPadModeCallback)(int state);
 
 static DartCreateWindowCallback g_create_window_cb = NULL;
 static DartClearWindowCallback g_clear_window_cb = NULL;
@@ -77,6 +87,7 @@ static DartYnFunctionCallback g_yn_function_cb = NULL;
 static DartGetLineCallback g_getline_cb = NULL;
 static DartAskNameCallback g_askname_cb = NULL;
 static DartExitCallback g_exit_cb = NULL;
+static DartNumberPadModeCallback g_number_pad_mode_cb = NULL;
 
 // 同期待信用変数
 static volatile char g_yn_result = 0;
@@ -92,6 +103,16 @@ static volatile int g_last_received_key = 0;
 static volatile int g_key_available = 0;
 static volatile long g_selected_menu_item = -2; // -2: 未選択, -1: キャンセル
 static volatile int g_exit_notified = 0;
+
+#define FLUTTER_MAX_SELECTED_MENU 512
+static volatile int g_selected_menu_count = -2; // -2: 待機, -1: キャンセル, 0以上: 件数
+static long g_selected_menu_items[FLUTTER_MAX_SELECTED_MENU] = {0};
+
+#define FLUTTER_MSG_HISTORY_MAX 64
+static char* g_msg_history[FLUTTER_MSG_HISTORY_MAX] = {0};
+static int g_msg_history_idx = 0;
+static int g_msg_history_count = 0;
+static int g_msg_history_iter = 0;
 
 #define NUM_CONV_BUFS 16
 #define CONV_BUF_SIZE 4096
@@ -186,7 +207,8 @@ void RegisterFlutterCallbacks(
     DartYnFunctionCallback yn_cb,
     DartGetLineCallback getline_cb,
     DartAskNameCallback askname_cb,
-    DartExitCallback exit_cb
+    DartExitCallback exit_cb,
+    DartNumberPadModeCallback number_pad_cb
 ) {
     g_create_window_cb = create_cb;
     g_clear_window_cb = clear_cb;
@@ -204,6 +226,7 @@ void RegisterFlutterCallbacks(
     g_getline_cb = getline_cb;
     g_askname_cb = askname_cb;
     g_exit_cb = exit_cb;
+    g_number_pad_mode_cb = number_pad_cb;
     debuglog("Flutter window, menu and sync callbacks registered.");
 }
 
@@ -234,6 +257,56 @@ void SendAskNameResultToC(const char* result) {
     }
     g_askname_done = 1;
     debuglog("C core received AskName result: %s", g_askname_result);
+}
+
+static void flutter_save_message(const char* msg) {
+    if (!msg || !*msg || !strcmp(msg, "Restoring save file...")) {
+        return;
+    }
+
+    if (g_msg_history[g_msg_history_idx]) {
+        free(g_msg_history[g_msg_history_idx]);
+        g_msg_history[g_msg_history_idx] = NULL;
+    }
+
+    g_msg_history[g_msg_history_idx] = strdup(msg);
+    if (g_msg_history[g_msg_history_idx]) {
+        g_msg_history_idx = (g_msg_history_idx + 1) % FLUTTER_MSG_HISTORY_MAX;
+        if (g_msg_history_count < FLUTTER_MSG_HISTORY_MAX) {
+            g_msg_history_count++;
+        }
+    }
+}
+
+static char* flutter_getmsghistory(boolean init) {
+    if (g_msg_history_count <= 0) {
+        return 0;
+    }
+
+    if (init) {
+        g_msg_history_iter =
+            (g_msg_history_idx - g_msg_history_count + FLUTTER_MSG_HISTORY_MAX)
+            % FLUTTER_MSG_HISTORY_MAX;
+        return g_msg_history[g_msg_history_iter];
+    }
+
+    g_msg_history_iter = (g_msg_history_iter + 1) % FLUTTER_MSG_HISTORY_MAX;
+    if (g_msg_history_iter == g_msg_history_idx) {
+        return 0;
+    }
+
+    return g_msg_history[g_msg_history_iter];
+}
+
+static void flutter_putmsghistory(const char *msg, boolean restoring) {
+    if (!msg) {
+        return;
+    }
+
+    if (restoring) {
+        flutter_putstr(WIN_MESSAGE, ATR_NONE, msg);
+    }
+    flutter_save_message(msg);
 }
 
 // 拡張コマンド一覧の取得
@@ -291,7 +364,56 @@ void SendKeyToFlutter(int key) {
 // Dart 側からメニュー選択結果を受け取る関数
 void SendMenuSelection(long ident) {
     g_selected_menu_item = ident;
+    if (ident == -1) {
+        g_selected_menu_count = -1;
+    } else {
+        g_selected_menu_items[0] = ident;
+        g_selected_menu_count = 1;
+    }
     debuglog("C core received menu selection: %ld", ident);
+}
+
+void SendMenuSelectionsToC(const char* csv) {
+    int count = 0;
+    const char* p = csv;
+
+    if (!csv) {
+        g_selected_menu_count = -1;
+        debuglog("C core received menu selections: CANCEL(null)");
+        return;
+    }
+
+    while (*p && count < FLUTTER_MAX_SELECTED_MENU) {
+        char* endptr;
+        long v;
+
+        while (*p == ',' || *p == ' ' || *p == '\t') {
+            ++p;
+        }
+        if (!*p) {
+            break;
+        }
+
+        v = strtol(p, &endptr, 10);
+        if (endptr == p) {
+            while (*p && *p != ',') {
+                ++p;
+            }
+            continue;
+        }
+
+        g_selected_menu_items[count++] = v;
+        p = endptr;
+        while (*p && *p != ',') {
+            ++p;
+        }
+        if (*p == ',') {
+            ++p;
+        }
+    }
+
+    g_selected_menu_count = count;
+    debuglog("C core received menu selections count=%d", count);
 }
 
 // カウンタ取得関数
@@ -557,6 +679,13 @@ static void flutter_clear_nhwindow(winid window) {
 }
 
 static void flutter_display_nhwindow(winid window, boolean blocking) {
+    /* Match Android Java port behavior: non-map/status/message windows
+       must block until acknowledged, otherwise text/help windows can be
+       destroyed immediately after display_nhwindow(FALSE). */
+    if (window != WIN_MESSAGE && window != WIN_STATUS && window != WIN_MAP) {
+        blocking = TRUE;
+    }
+
     debuglog("flutter_display_nhwindow win=%d, block=%d", window, blocking);
     if (g_display_window_cb) {
         g_display_window_cb((int)window, blocking ? 1 : 0);
@@ -573,6 +702,39 @@ static void flutter_destroy_nhwindow(winid window) {
     }
 }
 
+static void flutter_display_file(const char *name, boolean complain) {
+    debuglog("flutter_display_file: %s, complain=%d", name ? name : "NULL", complain);
+
+    dlb *f;
+    char buf[BUFSZ];
+    char *cr;
+
+    flutter_clear_nhwindow(WIN_MESSAGE);
+    f = dlb_fopen(name, "r");
+    if (f) {
+        winid datawin = flutter_create_nhwindow(NHW_TEXT);
+        boolean empty = TRUE;
+
+        while (dlb_fgets(buf, BUFSZ, f)) {
+            if ((cr = strchr(buf, '\n')) != NULL) {
+                *cr = '\0';
+            }
+            if (strchr(buf, '\t') != NULL) {
+                (void) tabexpand(buf);
+            }
+            empty = FALSE;
+            flutter_putstr(datawin, ATR_NONE, buf);
+        }
+        (void) dlb_fclose(f);
+        if (!empty) {
+            flutter_display_nhwindow(datawin, TRUE);
+        }
+        flutter_destroy_nhwindow(datawin);
+    } else if (complain) {
+        flutter_putstr(WIN_MESSAGE, ATR_NONE, "ファイルを開けませんでした.");
+    }
+}
+
 static void flutter_curs(winid window, int x, int y) {
     if (g_curs_cb) {
         g_curs_cb((int)window, x, y);
@@ -581,6 +743,9 @@ static void flutter_curs(winid window, int x, int y) {
 
 static void flutter_putstr(winid window, int attr, const char* str) {
     debuglog("flutter_putstr [%d]: %s", window, str);
+    if ((int) window == WIN_MESSAGE && str) {
+        flutter_save_message(str);
+    }
     if (g_putstr_cb && str) {
         char* conv = convert_cp437_to_utf8(str);
         g_putstr_cb((int)window, attr, conv ? conv : str);
@@ -589,6 +754,9 @@ static void flutter_putstr(winid window, int attr, const char* str) {
 
 static void flutter_raw_print(const char* str) {
     debuglog("flutter_raw_print: %s", str ? str : "NULL");
+    if (str) {
+        flutter_save_message(str);
+    }
     if (g_putstr_cb && str) {
         char* conv = convert_cp437_to_utf8(str);
         g_putstr_cb(WIN_MESSAGE, ATR_NONE, conv ? conv : str);
@@ -597,10 +765,52 @@ static void flutter_raw_print(const char* str) {
 
 static void flutter_raw_print_bold(const char* str) {
     debuglog("flutter_raw_print_bold: %s", str ? str : "NULL");
+    if (str) {
+        flutter_save_message(str);
+    }
     if (g_putstr_cb && str) {
         char* conv = convert_cp437_to_utf8(str);
         g_putstr_cb(WIN_MESSAGE, ATR_BOLD, conv ? conv : str);
     }
+}
+
+static int flutter_doprev_message(void) {
+    winid wid;
+
+    wid = flutter_create_nhwindow(NHW_MENU);
+    if (!wid) {
+        return 0;
+    }
+
+    if (g_msg_history_count <= 0) {
+        flutter_putstr(wid, ATR_NONE, "メッセージ履歴はまだありません.");
+    } else {
+        int start = (g_msg_history_idx - g_msg_history_count + FLUTTER_MSG_HISTORY_MAX)
+                    % FLUTTER_MSG_HISTORY_MAX;
+        flutter_putstr(wid, ATR_BOLD, "メッセージ履歴:");
+        flutter_putstr(wid, ATR_NONE, "");
+        for (int i = 0; i < g_msg_history_count; i++) {
+            int idx = (start + i) % FLUTTER_MSG_HISTORY_MAX;
+            if (g_msg_history[idx] && *g_msg_history[idx]) {
+                flutter_putstr(wid, ATR_NONE, g_msg_history[idx]);
+            }
+        }
+    }
+
+    flutter_display_nhwindow(wid, TRUE);
+    flutter_destroy_nhwindow(wid);
+    return 0;
+}
+
+static void flutter_number_pad(int state) {
+    debuglog("flutter_number_pad: state=%d", state);
+    if (g_number_pad_mode_cb) {
+        g_number_pad_mode_cb(state);
+    }
+}
+
+static void flutter_delay_output(void) {
+    usleep(50000);
 }
 
 // ユーザー入力待ち (キー取得)
@@ -630,8 +840,50 @@ static void flutter_nhbell(void) {
     debuglog("flutter_nhbell");
 }
 
+static boolean flutter_is_direction_prompt(const char* question) {
+    if (!question || !*question) {
+        return FALSE;
+    }
+
+    if (strstr(question, "what direction")
+        || strstr(question, "What direction")
+        || strstr(question, "どの方向")) {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 static char flutter_yn_function(const char* question, const char* choices, char def) {
     debuglog("flutter_yn_function: %s (%s) def=%c", question, choices, def);
+
+    if (flutter_is_direction_prompt(question)) {
+        char message[BUFSZ];
+
+        if (choices && *choices) {
+            char choicebuf[QBUFSZ];
+            intptr_t esc;
+
+            strncpy(choicebuf, choices, sizeof(choicebuf) - 1);
+            choicebuf[sizeof(choicebuf) - 1] = '\0';
+
+            esc = (intptr_t) strchr(choicebuf, '\033');
+            if (esc) {
+                choicebuf[esc - (intptr_t) choicebuf] = '\0';
+            }
+
+            Snprintf(message, sizeof message, "%s [%s]", question, choicebuf);
+            if (def) {
+                Snprintf(eos(message), BUFSZ - strlen(message), "(%c) ", def);
+            }
+        } else {
+            Snprintf(message, sizeof message, "%s ", question);
+        }
+
+        flutter_clear_nhwindow(WIN_MESSAGE);
+        flutter_putstr(WIN_MESSAGE, ATR_BOLD, message);
+        return (char) flutter_nhgetch();
+    }
     
     g_yn_result = 0;
     g_yn_done = 0;
@@ -729,6 +981,7 @@ static int flutter_select_menu(winid wid, int how, menu_item **selected) {
     debuglog("flutter_select_menu win=%d, how=%d", wid, how);
     
     g_selected_menu_item = -2; // 未選択状態
+    g_selected_menu_count = -2;
 
     // Dart 側に入力モードを「メニュー選択モード」にするよう通知
     if (g_select_menu_cb) {
@@ -742,22 +995,29 @@ static int flutter_select_menu(winid wid, int how, menu_item **selected) {
     }
 
     // ユーザーが選択を完了するかキャンセルするまで待機
-    while (g_selected_menu_item == -2) {
+    while (g_selected_menu_count == -2) {
         usleep(10000); // 10ms
     }
 
-    if (g_selected_menu_item == -1) {
+    if (g_selected_menu_count == -1) {
         *selected = NULL;
         return -1; // キャンセル / ABORT
     }
 
-    // 選択された項目を格納して返す
-    *selected = (menu_item*)alloc(sizeof(menu_item));
-    (*selected)[0].item = cg.zeroany;
-    (*selected)[0].item.a_long = g_selected_menu_item;
-    (*selected)[0].count = 1;
+    if (g_selected_menu_count == 0) {
+        *selected = NULL;
+        return 0;
+    }
 
-    return 1; // 1個選択された
+    // 選択された項目を格納して返す
+    *selected = (menu_item*)alloc(sizeof(menu_item) * g_selected_menu_count);
+    for (int i = 0; i < g_selected_menu_count; ++i) {
+        (*selected)[i].item = cg.zeroany;
+        (*selected)[i].item.a_long = g_selected_menu_items[i];
+        (*selected)[i].count = 1;
+    }
+
+    return g_selected_menu_count;
 }
 
 static int flutter_do_ext_cmd_menu(boolean complete) {
@@ -846,12 +1106,16 @@ static void HijackWindowProcs(void) {
     and_procs.win_putstr = flutter_putstr;
     and_procs.win_raw_print = flutter_raw_print;
     and_procs.win_raw_print_bold = flutter_raw_print_bold;
+    and_procs.win_display_file = flutter_display_file;
     and_procs.win_nhgetch = flutter_nhgetch;
     and_procs.win_nh_poskey = flutter_nh_poskey;
     and_procs.win_nhbell = flutter_nhbell;
+    and_procs.win_doprev_message = flutter_doprev_message;
     and_procs.win_yn_function = flutter_yn_function;
     and_procs.win_getlin = flutter_getlin;
     and_procs.win_get_ext_cmd = flutter_get_ext_cmd;
+    and_procs.win_number_pad = flutter_number_pad;
+    and_procs.win_delay_output = flutter_delay_output;
     and_procs.win_print_glyph = flutter_print_glyph;
 
     // メニュー用の関数ポインタも完全にハイジャック！
@@ -865,6 +1129,8 @@ static void HijackWindowProcs(void) {
     and_procs.win_status_finish = genl_status_finish;
     and_procs.win_status_enablefield = genl_status_enablefield;
     and_procs.win_status_update = genl_status_update;
+    and_procs.win_getmsghistory = flutter_getmsghistory;
+    and_procs.win_putmsghistory = flutter_putmsghistory;
 
     windowprocs = and_procs;
     

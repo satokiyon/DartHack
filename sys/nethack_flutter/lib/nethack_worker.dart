@@ -49,6 +49,7 @@ class NetHackWorker {
     late final NativeCallable<GetLineCallback> getlineCallable;
     late final NativeCallable<AskNameCallback> asknameCallable;
     late final NativeCallable<ExitCallback> exitCallable;
+    late final NativeCallable<NumberPadModeCallback> numberPadCallable;
 
     receivePort.listen((message) {
       if (message is Map) {
@@ -216,6 +217,13 @@ class NetHackWorker {
             });
           });
 
+          numberPadCallable = NativeCallable<NumberPadModeCallback>.listener((int state) {
+            uiSendPort.send({
+              'type': 'number_pad_mode',
+              'state': state,
+            });
+          });
+
           // コールバックをC側に登録
           ffi.registerCallbacks(
             createCallable.nativeFunction,
@@ -234,6 +242,7 @@ class NetHackWorker {
             getlineCallable.nativeFunction,
             asknameCallable.nativeFunction,
             exitCallable.nativeFunction,
+            numberPadCallable.nativeFunction,
           );
 
           // NetHack コアを起動
@@ -247,6 +256,13 @@ class NetHackWorker {
         } else if (type == 'menu_select') {
           final ident = message['ident'] as int;
           ffi.sendMenuSelection(ident);
+        } else if (type == 'menu_selects') {
+          final ids = (message['idents'] as List<dynamic>? ?? const <dynamic>[])
+              .map((e) => e as int)
+              .toList();
+          final csv = ids.join(',').toNativeUtf8();
+          ffi.sendMenuSelections(csv);
+          calloc.free(csv);
         } else if (type == 'yn_result') {
           final result = message['result'] as int;
           ffi.sendYnResult(result);

@@ -31,6 +31,7 @@ typedef YnFunctionCallback = Void Function(Pointer<Utf8> question, Pointer<Utf8>
 typedef GetLineCallback = Void Function(Pointer<Utf8> prompt, Pointer<Utf8> initText);
 typedef AskNameCallback = Void Function(Pointer<Utf8> saves, Int32 maxChars);
 typedef ExitCallback = Void Function(Pointer<Utf8> msg);
+typedef NumberPadModeCallback = Void Function(Int32 state);
 
 // C側起動関数
 typedef StartNetHackFunc = Void Function(Pointer<Utf8> path, Pointer<Utf8> username);
@@ -54,6 +55,7 @@ typedef RegisterCallbacksFunc = Void Function(
   Pointer<NativeFunction<GetLineCallback>> getlineCb,
   Pointer<NativeFunction<AskNameCallback>> asknameCb,
   Pointer<NativeFunction<ExitCallback>> exitCb,
+  Pointer<NativeFunction<NumberPadModeCallback>> numberPadCb,
 );
 typedef RegisterCallbacksDart = void Function(
   Pointer<NativeFunction<CreateWindowCallback>> createCb,
@@ -72,6 +74,7 @@ typedef RegisterCallbacksDart = void Function(
   Pointer<NativeFunction<GetLineCallback>> getlineCb,
   Pointer<NativeFunction<AskNameCallback>> asknameCb,
   Pointer<NativeFunction<ExitCallback>> exitCb,
+  Pointer<NativeFunction<NumberPadModeCallback>> numberPadCb,
 );
 
 // キー送信
@@ -81,6 +84,9 @@ typedef SendKeyDart = void Function(int key);
 // メニュー選択結果送信
 typedef SendMenuSelectionFunc = Void Function(Int64 ident);
 typedef SendMenuSelectionDart = void Function(int ident);
+
+typedef SendMenuSelectionsFunc = Void Function(Pointer<Utf8> csv);
+typedef SendMenuSelectionsDart = void Function(Pointer<Utf8> csv);
 
 // カウンタ取得
 typedef GetInputRequestIdFunc = Int32 Function();
@@ -106,6 +112,7 @@ class NetHackFfi {
   late final RegisterCallbacksDart registerCallbacks;
   late final SendKeyDart sendKeyToC;
   late final SendMenuSelectionDart sendMenuSelection;
+  late final SendMenuSelectionsDart sendMenuSelections;
   late final GetInputRequestIdDart getInputRequestId;
   
   late final SendYnResultDart sendYnResult;
@@ -136,6 +143,10 @@ class NetHackFfi {
     sendMenuSelection = _lib
         .lookup<NativeFunction<SendMenuSelectionFunc>>('SendMenuSelection')
         .asFunction();
+
+    sendMenuSelections = _lib
+      .lookup<NativeFunction<SendMenuSelectionsFunc>>('SendMenuSelectionsToC')
+      .asFunction();
 
     getInputRequestId = _lib
         .lookup<NativeFunction<GetInputRequestIdFunc>>('GetFlutterInputRequestId')
