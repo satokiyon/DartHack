@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. */
 /* NetHack 5.0    NetHackW.c    $NHDT-Date: 1693359674 2023/08/30 01:41:14 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.79 $ */
 /* Copyright (C) 2001 by Alex Kompel      */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -219,6 +219,12 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
         free(savefile);
     }
     GUILaunched = 1;
+    /* emergency IO */
+    windowprocs.win_raw_print = mswin_raw_print;
+    windowprocs.win_raw_print_bold = mswin_raw_print_bold;
+    windowprocs.win_nhgetch = mswin_nhgetch;
+    windowprocs.win_wait_synch = mswin_wait_synch;
+    windowprocs.win_number_pad = mswin_number_pad;
 
     /* let nethackw_main do the argument processing */
     nethackw_main(argc, argv);
