@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. */
 /* NetHack 5.0	windmain.c	$NHDT-Date: 1693359653 2023/08/30 01:40:53 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.189 $ */
 /* Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -201,8 +201,8 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #endif
 #endif
 
-    set_emergency_io();
 #ifndef MSWIN_GRAPHICS
+    set_emergency_io();
     early_init(argc, argv); /* already in WinMain for MSWIN_GRAPHICS */
 #endif
 
@@ -252,6 +252,15 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         windowtype = "tty";
 #endif
     }
+#ifdef MSWIN_GRAPHICS
+    if (!strcmp(windowtype, "tty"))
+        windowtype = "mswin";
+#endif
+#ifdef TTY_GRAPHICS
+    if (!strcmp(windowtype, "mswin"))
+        windowtype = "tty";
+#endif
+
     choose_windows(
         windowtype); /* sets all the window port function pointers */
 
