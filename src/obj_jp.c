@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -74,6 +74,7 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [CRAM_RATION] = "携帯糧食",
     [CREAM_PIE] = "クリームパイ",
     [CREDIT_CARD] = "クレジットカード",
+    [CORNUTHAUM] = "コーヌサム",
     [CROSSBOW] = "クロスボゥ",
     [CROSSBOW_BOLT] = "クロスボゥボルト",
     [CRYSKNIFE] = "クリスナイフ",
@@ -82,6 +83,7 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [DAGGER] = "短剣",
     [DART] = "投げ矢",
     [DENTED_POT] = "くぼんだ鍋",
+    [DUNCE_CAP] = "愚者の帽子",
     [DIAMOND] = "ダイヤモンド",
     [DILITHIUM_CRYSTAL] = "ディリジウムの結晶",
     [DRUM_OF_EARTHQUAKE] = "地震の太鼓",
@@ -144,10 +146,12 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [HELM_OF_CAUTION] = "知性の兜",
     [HELM_OF_OPPOSITE_ALIGNMENT] = "逆属性の兜",
     [HELM_OF_TELEPATHY] = "テレパシーの兜",
+    [HEAVY_IRON_BALL] = "重い鉄球",
     [HELMET] = "兜",
     [HIGH_BOOTS] = "かかとの高い靴",
     [HORN_OF_PLENTY] = "恵みのホルン",
     [ICE_BOX] = "アイスボックス",
+    [IRON_CHAIN] = "鉄の鎖",
     [IRON_SHOES] = "鉄の靴",
     [JACINTH] = "橙水晶",
     [JADE] = "ひすい",
@@ -374,8 +378,10 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [SPETUM] = "スペタム",
     [SPLINT_MAIL] = "鉄片の鎧",
     [SPRIG_OF_WOLFSBANE] = "トリカブト",
+    [STATUE] = "石像",
     [STETHOSCOPE] = "聴診器",
     [STILETTO] = "スティレット",
+    [STRANGE_OBJECT] = "奇妙な物体",
     [STUDDED_LEATHER_ARMOR] = "鋲付き革鎧",
     [T_SHIRT] = "Ｔシャツ",
     [TALLOW_CANDLE] = "獣脂のろうそく",
@@ -476,6 +482,7 @@ const char *const obj_jp_descrs[NUM_OBJECTS + 1] = {
     [BILL_GUISARME] = "鈎付き長斧",
     [BLACK_OPAL] = "黒い石",
     [BLINDING_VENOM] = "毒液の飛沫",
+    [CORNUTHAUM] = "円錐形の帽子",
     [CANDELABRUM_OF_INVOCATION] = "燭台",
     [CHRYSOBERYL] = "黄色い石",
     [CITRINE] = "黄色い石",
@@ -487,6 +494,7 @@ const char *const obj_jp_descrs[NUM_OBJECTS + 1] = {
     [DIAMOND] = "白い石",
     [DILITHIUM_CRYSTAL] = "白い石",
     [DRUM_OF_EARTHQUAKE] = "太鼓",
+    [DUNCE_CAP] = "円錐形の帽子",
     [DWARVISH_CLOAK] = "フードつきのクローク",
     [DWARVISH_IRON_HELM] = "固い帽子",
     [DWARVISH_MATTOCK] = "幅広のつるはし",

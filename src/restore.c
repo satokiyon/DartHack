@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-03. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. */
 /* NetHack 5.0	restore.c	$NHDT-Date: 1781973064 2026/06/20 16:31:04 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.265 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -1224,8 +1224,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
             u.usteed_mid = 0;
         } else {
             if (mtmp->m_id == u.ustuck_mid) {
-                set_ustuck(mtmp);
-                u.ustuck_mid = 0;
+                set_ustuck(mtmp); /* set_ustuck clears u.ustuck_mid */
             }
             place_monster(mtmp, mtmp->mx, mtmp->my);
             if (mtmp->wormno)

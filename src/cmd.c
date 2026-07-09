@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. */
 /* NetHack 5.0	cmd.c	$NHDT-Date: 1781973043 2026/06/20 16:30:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.772 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -858,7 +858,7 @@ extcmd_via_menu(void)
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
                      ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
         }
-        Snprintf(prompt, sizeof(prompt), "Extended Command: %s", cbuf);
+        Snprintf(prompt, sizeof(prompt), "拡張コマンド: %s", cbuf);
         end_menu(win, prompt);
         n = select_menu(win, PICK_ONE, &pick_list);
         destroy_nhwindow(win);
@@ -4416,11 +4416,16 @@ enum menucmd {
     MCMD_REST,
     MCMD_LOOK_HERE,
     MCMD_LOOK_AT,
+    MCMD_PRAY,
+    MCMD_ENGRAVE,
+    MCMD_ATTRIBUTES,
+    MCMD_PREVIOUS_MESSAGES,
     MCMD_ATTACK_NEXT2U,
     MCMD_UNTRAP_HERE,
     MCMD_OFFER,
     MCMD_INVENTORY,
     MCMD_CAST_SPELL,
+    MCMD_JUMP,
 
     MCMD_THROW_OBJ,
     MCMD_TRAVEL,
@@ -4517,6 +4522,10 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
     mcmd_addmenu(win, MCMD_REST, "1ターン休む"), ++K;
     mcmd_addmenu(win, MCMD_SEARCH, "周囲を探す"), ++K;
     mcmd_addmenu(win, MCMD_LOOK_HERE, "ここにあるものを見る"), ++K;
+    mcmd_addmenu(win, MCMD_PRAY, "ここで祈る"), ++K;
+    mcmd_addmenu(win, MCMD_ENGRAVE, "ここに文字を彫る"), ++K;
+    mcmd_addmenu(win, MCMD_ATTRIBUTES, "能力値を見る"), ++K;
+    mcmd_addmenu(win, MCMD_PREVIOUS_MESSAGES, "最近のメッセージを見る"), ++K;
 
     if (num_spells() > 0)
         mcmd_addmenu(win, MCMD_CAST_SPELL, "呪文を唱える"), ++K;
@@ -4525,6 +4534,9 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
         if (ttmp->ttyp != VIBRATING_SQUARE)
             mcmd_addmenu(win, MCMD_UNTRAP_HERE,
                          "罠を解除しようとする"), ++K;
+    }
+    if (Jumping) {
+        mcmd_addmenu(win, MCMD_JUMP, "跳ぶ"), ++K;
     }
     return K;
 }
@@ -4815,7 +4827,7 @@ act_on_act(
         cmdq_add_key(CQ_CANNED, 'y'); /* "There is foo here; eat it?" */
         break;
     case MCMD_DROP:
-        cmdq_add_ec(CQ_CANNED, dodrop);
+        cmdq_add_ec(CQ_CANNED, doddrop);
         break;
     case MCMD_INVENTORY:
         cmdq_add_ec(CQ_CANNED, ddoinv);
@@ -4831,6 +4843,18 @@ act_on_act(
         gc.clicklook_cc.y = u.uy + dy;
         cmdq_add_ec(CQ_CANNED, doclicklook);
         break;
+    case MCMD_PRAY:
+        cmdq_add_ec(CQ_CANNED, dopray);
+        break;
+    case MCMD_ENGRAVE:
+        cmdq_add_ec(CQ_CANNED, doengrave);
+        break;
+    case MCMD_ATTRIBUTES:
+        cmdq_add_ec(CQ_CANNED, doattributes);
+        break;
+    case MCMD_PREVIOUS_MESSAGES:
+        cmdq_add_key(CQ_CANNED, C('p'));
+        break;
     case MCMD_UNTRAP_HERE:
         cmdq_add_ec(CQ_CANNED, dountrap);
         cmdq_add_dir(CQ_CANNED, 0, 0, 1);
@@ -4841,6 +4865,9 @@ act_on_act(
         break;
     case MCMD_CAST_SPELL:
         cmdq_add_ec(CQ_CANNED, docast);
+        break;
+    case MCMD_JUMP:
+        cmdq_add_ec(CQ_CANNED, dojump);
         break;
     default:
         break;
