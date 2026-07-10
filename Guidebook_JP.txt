@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-10.
                          脅威の迷宮へのガイド
                         (NetHackガイドブック)
 
@@ -6,7 +6,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
                        オリジナル版 - Eric S. Raymond
      (NetHack 5.0.0用に Mike Stephenson その他によって編集・拡張)
 
-                                  2026年6月23日
+                                  2026年7月4日
 
 
 
@@ -293,8 +293,8 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
           失神（Fainting）です。普通の場合は表示されません。
 
           荷重（Encumbrance）: 持ち運んでいるものが移動能力にどのように影響
-          しているかの指標。値は、荷重なし（Unencumbered）、負荷（Burdened）、
-          重荷（Stressed）、苦慮（Strained）、超過（Overtaxed）、過積載
+          しているかの指標。値は、無荷重（Unencumbered）、重荷（Burdened）、
+          圧迫（Stressed）、過重（Strained）、超過重（Overtaxed）、過積載
           （Overloaded）です。荷重なしの場合は表示されません。
 
           致命的な状態: 石化（Stone: 石に変わりつつある）、スライム（Slime:
@@ -2153,8 +2153,8 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
 
           NetHackは、あなたがどの程度ひどく荷物を積んでいるかを教えてくれ
      ます。もし荷重がかかっている場合、最下行のステータス表示に「負荷
-     （Burdened）」、「重荷（Stressed）」、「苦慮（Strained）」、
-     「超過（Overtaxed）」、または「過積載（Overloaded）」のいずれかの
+     （Burdened）」、「圧迫（Stressed）」、「過重（Strained）」、
+     「超過重（Overtaxed）」、または「過積載（Overloaded）」のいずれかの
      状態が表示されます。
 
           アイテムを拾い上げると、所持品記号（アルファベット）が割り当て
@@ -3994,9 +3994,9 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
        場合にのみ有効になります。「O」コマンドでは設定できません。
 
      pickup_burden
-       この負荷レベル（Unencumbered（負荷なし）、Burdened（負荷あり）、
-       streSsed（重荷）、straiNed（かなりの重荷）、overTaxed（過重）、
-       または overLoaded（超過重））を超えるアイテムを拾おうとした際に、
+       この負荷レベル（Unencumbered（無重荷）、Burdened（重荷）、
+       streSsed（圧迫）、straiNed（過重）、overTaxed（超過重）、
+       または overLoaded（過積載））を超えるアイテムを拾おうとした際に、
        続行するかどうかを尋ねます（デフォルトは「S」）。永続的。
 
      pickup_stolen
@@ -5642,10 +5642,13 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
        SHELLERS = シェルエスケープコマンド（!）の使用を許可する
        ユーザーのリスト。構文は WIZARDS と同じです。
 
-       EXPLORERS = エクスプローラーモードの使用を許可するユーザーの
-       リスト。構文は WIZARDS と同じです。
+        EXPLORERS = エクスプローラーモードの使用を許可するユーザーの
+        リスト。構文は WIZARDS と同じです。
 
-       MSGHANDLER = 実行可能ファイルのパスとファイル名。メッセージ
+        GENERICUSERS = キャラクター名として使用されるのではなく、
+        「お名前は？」とプロンプトを表示すべきユーザー名のリスト。
+
+        MSGHANDLER = 実行可能ファイルのパスとファイル名。メッセージ
        ウィンドウにメッセージが表示されるたびに、NetHackはこの
        プログラムを実行します。プログラムはメッセージを唯一の
        パラメータとして受け取ります。
