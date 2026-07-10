@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-10. */
 /* NetHack 5.0	options.c	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.782 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
@@ -116,7 +116,7 @@ static boolean opt_set_in_config[OPTCOUNT];
 static char *roleoptvals[MAX_ROLEOPT][num_opt_phases];
 
 static NEARDATA const char *OptS_type[OptS_Advanced+1] = {
-    "General", "Behavior", "Map", "Status", "Advanced"
+    "一般", "行動", "マップ", "ステータス", "高度な設定"
 };
 
 static const char def_inv_order[MAXOCLASSES] = {
@@ -151,68 +151,68 @@ static const struct paranoia_opts {
        if any entry or alias beginning with 'n' gets added, aside from "none",
        the parsing to accept "nofoo" to mean "!foo" will need fixing */
     { PARANOID_CONFIRM, "Confirm", 1, "Paranoia", 2,
-      "for \"yes\" confirmations, require \"no\" to reject" },
+      "確認に「yes」を使用する際、拒否する場合は「no」を要求する" },
     { PARANOID_QUIT, "quit", 1, "explore", 2,
-      "yes vs y to quit or to enter explore mode" },
+      "終了・探索モード移行時に yes と y を区別する" },
     { PARANOID_DIE, "die", 1, "death", 2,
-      "yes vs y to die (explore mode or debug mode)" },
+      "死亡確認時に yes と y を区別する（探索／デバッグモード）" },
     { PARANOID_BONES, "bones", 1, 0, 0,
-      "yes vs y to save bones data when dying in debug mode" },
+      "デバッグモード死亡時の bones 保存で yes と y を区別する" },
     { PARANOID_HIT, "attack", 1, "hit", 1,
-      "yes vs y to attack a peaceful monster" },
+      "友好的モンスター攻撃時に yes と y を区別する" },
     { PARANOID_BREAKWAND, "wand-break", 2, "break-wand", 2,
-      "yes vs y to break a wand via (a)pply" },
+      "杖を折る際に yes と y を区別する" },
     { PARANOID_EATING, "eat", 1, "continue", 4,
-      "yes vs y to continue eating after first bite when satiated" },
+      "満腹時に食事を続けるか yes と y を区別する" },
     { PARANOID_WERECHANGE, "Were-change", 2, (const char *) 0, 0,
-      "yes vs y to change form when lycanthropy is controllable" },
+      "変身可能な獣人症時に yes と y を区別する" },
     /* extra y/n questions rather than changing y/n to yes/n[o];
        they switch to yes/no if paranoid:confirm is also set */
     { PARANOID_PRAY, "pray", 1, 0, 0,
-      "y required to pray (supersedes old \"prayconfirm\" option)" },
+      "祈りに y を要求する（古い prayconfirm オプションの後継）" },
     { PARANOID_TRAP, "trap", 1, "move-trap", 1,
-      "y required to enter known trap unless considered harmless" },
+      "無害と見なされない既知の罠に入るのに y を要求する" },
     { PARANOID_AUTOALL, "Autoall", 2, "autoselect-all", 2,
-      "y required to pick filter choice 'A' for menustyle:Full" },
+      "menustyle:full のフィルタ選択 'A' に y を要求する" },
     /* not a yes/n[o] vs y/n change nor a y/n addition */
     { PARANOID_SWIM, "swim", 1, 0, 0,
-      "'m' prefix necessary to deliberately walk into lava or water" },
+      "溶岩や水に意図的に入るには 'm' 前置が必要" },
     { PARANOID_REMOVE, "Remove", 1, "Takeoff", 1,
       /* normally when there is only 1 candidate it's chosen automatically */
-      "always pick from inventory for Remove and Takeoff" },
+      "装備を外す際に常に所持品から選択する" },
     /* for config file parsing; interactive menu skips these */
     { 0, "none", 4, 0, 0, 0 }, /* require full word match */
     { ~0, "all", 3, 0, 0, 0 }, /* ditto */
 };
 
 static NEARDATA const char *menutype[][3] = { /* 'menustyle' settings */
-    { "traditional",  "[prompt for object class(es), then",
-                      " ask y/n for each item in those classes]" },
-    { "combination",  "[prompt for object class(es), then",
-                      " use menu for items in those classes]" },
-    { "full",         "[use menu to choose class(es), then",
-                      " use another menu for items in those]" },
-    { "partial",      "[skip class filtering; always",
-                      " use menu of all available items]" }
+    { "traditional",  "[オブジェクト分類を入力して",
+                      " その分類の各アイテムを y/n で確認]" },
+    { "combination",  "[オブジェクト分類を入力して",
+                      " その分類のアイテムをメニューで選ぶ]" },
+    { "full",         "[メニューで分類を選び",
+                      " さらに別のメニューでアイテムを選ぶ]" },
+    { "partial",      "[分類フィルタを省略し",
+                      " 常に全アイテムのメニューを使う]" }
 };
 #if PREV_MSGS /* tty supports all four settings, curses just final two */
 static NEARDATA const char *msgwind[][3] = { /* 'msg_window' settings */
-    { "single",       "[show one old message at a time,",
-                      " most recent first]" },
-    { "combination",  "[for consecutive ^P requests, use",
-                      " 'single' for first two, then 'full']" },
-    { "full",         "[show all available messages,",
-                      " oldest first and most recent last]" },
-    { "reversed",     "[show all available messages,",
-                      " most recent first]" }
+    { "single",       "[古いメッセージを1つずつ表示",
+                      " 新しいものから順に]" },
+    { "combination",  "[連続した ^P では最初2回は single",
+                      " それ以降は full]" },
+    { "full",         "[利用可能なメッセージを全て表示",
+                      " 古い順に最後が最新]" },
+    { "reversed",     "[利用可能なメッセージを全て表示",
+                      " 最新から順に]" }
 };
 #endif
 /* autounlock settings */
 static NEARDATA const char *unlocktypes[][2] = {
-    { "untrap",    "(might fail)" },
+    { "untrap",    "（失敗する可能性あり）" },
     { "apply-key", "" },
-    { "kick",      "(doors only)" },
-    { "force",     "(chests/boxes only)" },
+    { "kick",      "（扉のみ）" },
+    { "force",     "（箱のみ）" },
 };
 static NEARDATA const char *burdentype[] = {
     "unencumbered", "burdened",     "stressed",
@@ -227,20 +227,20 @@ static NEARDATA const char *sortltype[] = {
 /* second column is an alias for the first; third is brief explanation;
    entries 5 and 6 are 1|4 and 2|4 (tty only) */
 static NEARDATA const char *perminv_modes[][3] = {
-  /*0*/ { "none",      "off",        "no permanent inventory window" },
-  /*1*/ { "all" ,      "on",         "all inventory except for gold" },
-  /*2*/ { "full",      "gold",       "full inventory including gold" },
+  /*0*/ { "none",      "off",        "永続的インベントリウィンドウを表示しない" },
+  /*1*/ { "all" ,      "on",         "所持品全体（金貨を除く）" },
+  /*2*/ { "full",      "gold",       "所持品全体（金貨を含む）" },
   /*3*/ { NULL,        NULL,         NULL },
   /*4*/ { NULL,        NULL,         NULL },
 #ifdef TTY_PERM_INVENT
-  /*5*/ { "on+grid",   "all+grid",   "all except gold, plus unused letters" },
-  /*6*/ { "gold+grid", "full+grid",  "full inventory, plus unused letters" },
+  /*5*/ { "on+grid",   "all+grid",   "所持品全体（金貨除く）と未使用文字" },
+  /*6*/ { "gold+grid", "full+grid",  "所持品全体（金貨含む）と未使用文字" },
 #else
   /*5*/ { NULL,        NULL,         NULL },
   /*6*/ { NULL,        NULL,         NULL },
 #endif
   /*7*/ { NULL,        NULL,         NULL },
-  /*8*/ { "in-use",    "inuse-only", "subset: items currently in use" },
+  /*8*/ { "in-use",    "inuse-only", "使用中のアイテムのみ" },
 };
 
 struct objsymopt {
@@ -275,12 +275,12 @@ struct objsymopt {
  *        b [ Hawaiian shirt         b [ Hawaiian shirt
  */
 static const struct objsymopt objsymvals[] = {
-    { 0, "none",         "don't show object symbols in menus" },
-    { 1, "headers",      "show object symbols in menu header lines" },
-    { 2, "entries",      "show object symbols in individual menu entries" },
-    { 3, "both",         "show object symbols in headers and menu entries" },
-    { 4, "conditional",  "show objsyms in entries if no headers are shown" },
-    { 5, "one-or-other", "show objsyms in header, in entries if no header" },
+    { 0, "none",         "メニューにオブジェクトシンボルを表示しない" },
+    { 1, "headers",      "メニューの見出し行にオブジェクトシンボルを表示" },
+    { 2, "entries",      "各メニュー項目にオブジェクトシンボルを表示" },
+    { 3, "both",         "見出し行と各項目の両方に表示" },
+    { 4, "conditional",  "見出しがない場合は項目に表示" },
+    { 5, "one-or-other", "見出しには表示し、見出しがない場合は項目に表示" },
 };
 
 /*
@@ -5626,7 +5626,7 @@ handler_menustyle(void)
         Sprintf(buf, "%4s%-12.12s%c%.60s", "", "", sep, menutype[i][2]);
         add_menu_str(tmpwin, buf);
     }
-    end_menu(tmpwin, "Select menustyle:");
+    end_menu(tmpwin, "メニュースタイルを選択:");
     n = select_menu(tmpwin, PICK_ONE, &style_pick);
     if (n > 0) {
         i = style_pick[0].item.a_int - 1;
@@ -5657,19 +5657,19 @@ handler_align_misc(int optidx)
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     any.a_int = ALIGN_TOP;
-    add_menu(tmpwin, &nul_glyphinfo, &any, 't', 0, ATR_NONE, clr, "top",
+    add_menu(tmpwin, &nul_glyphinfo, &any, 't', 0, ATR_NONE, clr, "上",
              MENU_ITEMFLAGS_NONE);
     any.a_int = ALIGN_BOTTOM;
-    add_menu(tmpwin, &nul_glyphinfo, &any, 'b', 0, ATR_NONE, clr, "bottom",
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'b', 0, ATR_NONE, clr, "下",
              MENU_ITEMFLAGS_NONE);
     any.a_int = ALIGN_LEFT;
-    add_menu(tmpwin, &nul_glyphinfo, &any, 'l', 0, ATR_NONE, clr, "left",
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'l', 0, ATR_NONE, clr, "左",
              MENU_ITEMFLAGS_NONE);
     any.a_int = ALIGN_RIGHT;
-    add_menu(tmpwin, &nul_glyphinfo, &any, 'r', 0, ATR_NONE, clr, "right",
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'r', 0, ATR_NONE, clr, "右",
              MENU_ITEMFLAGS_NONE);
-    Sprintf(abuf, "Select %s window placement relative to the map:",
-            (optidx == opt_align_message) ? "message" : "status");
+    Sprintf(abuf, "マップに対する%sウィンドウの配置を選択:",
+            (optidx == opt_align_message) ? "メッセージ" : "ステータス");
     end_menu(tmpwin, abuf);
     if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
         if (optidx == opt_align_message)
@@ -5707,7 +5707,7 @@ handler_autounlock(int optidx)
                  ATR_NONE, clr, buf,
                  (presel ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE));
     }
-    Sprintf(buf, "Select '%.20s' actions:", optname);
+    Sprintf(buf, "「%.20s」のアクションを選択:", optname);
     end_menu(tmpwin, buf);
     n = select_menu(tmpwin, PICK_ANY, &window_pick);
     if (n > 0) {
@@ -5727,8 +5727,8 @@ handler_autounlock(int optidx)
     chngd = (flags.autounlock != oldflags);
     if ((chngd || flags.verbose) && give_opt_msg) {
         optfn_autounlock(optidx, get_val, FALSE, buf, (char *) NULL);
-        pline("'%s' %s '%s'.", optname,
-              chngd ? "changed to" : "is still", buf);
+        pline("'%s' は '%s' %s.", optname, buf,
+              chngd ? "に変更されました" : "のままです");
     }
     return res;
 }
@@ -5743,8 +5743,8 @@ handler_disclose(void)
     /* order of disclose_names[] must correspond to
        disclosure_options in decl.c */
     static const char *const disclosure_names[] = {
-        "inventory", "attributes", "vanquished",
-        "genocides", "conduct",    "overview",
+        "所持品", "能力値", "倒したモンスター",
+        "虐殺",   "行動",   "概要",
     };
     int disc_cat[NUM_DISCLOSURE_OPTIONS];
     int pick_cnt, pick_idx, opt_idx;
@@ -5763,7 +5763,7 @@ handler_disclose(void)
                  0, ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
         disc_cat[i] = 0;
     }
-    end_menu(tmpwin, "Change which disclosure options categories:");
+    end_menu(tmpwin, "開示オプションのカテゴリを変更:");
     pick_cnt = select_menu(tmpwin, PICK_ANY, &disclosure_pick);
     if (pick_cnt > 0) {
         for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
@@ -5778,7 +5778,7 @@ handler_disclose(void)
     for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
         if (disc_cat[i]) {
             c = flags.end_disclose[i];
-            Sprintf(buf, "Disclosure options for %s:",
+            Sprintf(buf, "%sの開示オプション:",
                     disclosure_names[i]);
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin, MENU_BEHAVE_STANDARD);
@@ -5787,40 +5787,40 @@ handler_disclose(void)
             any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                      any.a_char, ATR_NONE, clr,
-                     "Never disclose, without prompting",
+                     "確認なしで開示しない",
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                      any.a_char, ATR_NONE, clr,
-                     "Always disclose, without prompting",
+                     "確認なしで常に開示",
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
-            if (*disclosure_names[i] == 'v' || *disclosure_names[i] == 'g') {
+            if (i == 2 || i == 3) {
                 any.a_char = DISCLOSE_SPECIAL_WITHOUT_PROMPT; /* '#' */
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                          any.a_char, ATR_NONE, clr,
-                         "Always disclose, pick sort order from menu",
+                         "常に開示し、ソート順をメニューから選ぶ",
                          (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                            : MENU_ITEMFLAGS_NONE);
             }
             any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                      any.a_char, ATR_NONE, clr,
-                     "Prompt, with default answer of \"No\"",
+                     "確認し、デフォルトは「いいえ」",
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                      any.a_char, ATR_NONE, clr,
-                     "Prompt, with default answer of \"Yes\"",
+                     "確認し、デフォルトは「はい」",
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
-            if (*disclosure_names[i] == 'v' || *disclosure_names[i] == 'g') {
+            if (i == 2 || i == 3) {
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_SPECIAL; /* '?' */
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                          any.a_char, ATR_NONE, clr,
-                "Prompt, with default answer of \"Ask\" to request sort menu",
+                 "確認し、デフォルトは「順序を指定」",
                          (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                            : MENU_ITEMFLAGS_NONE);
             }
@@ -5842,7 +5842,7 @@ staticfn int
 handler_menu_headings(void)
 {
     boolean gotca = query_color_attr(&iflags.menu_headings,
-                                     "How to highlight menu headings:");
+                                     "メニュー見出しの強調表示方法:");
 
     if (gotca) {
         /* header highlighting affects persistent inventory display */
@@ -5876,7 +5876,7 @@ handler_menu_objsyms(void)
                  (j == iflags.menuobjsyms) ? MENU_ITEMFLAGS_SELECTED
                                            : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Set object symbols in menus to what?");
+    end_menu(tmpwin, "メニュー内のオブジェクトシンボル表示を設定:");
     n = select_menu(tmpwin, PICK_ONE, &picklist);
     if (n > 0) {
         i = picklist[0].item.a_int - 1;
@@ -5926,7 +5926,7 @@ handler_msg_window(void)
             Sprintf(buf, "%4s%-12.12s%c%.60s", "", "", sep, msgwind[i][2]);
             add_menu_str(tmpwin, buf);
         }
-        end_menu(tmpwin, "Select message history display type:");
+        end_menu(tmpwin, "以前のメッセージ表示方式を選択:");
         n = select_menu(tmpwin, PICK_ONE, &window_pick);
         if (n > 0) {
             c = window_pick[0].item.a_char;
@@ -5958,10 +5958,10 @@ handler_number_pad(void)
     anything any;
     int i;
     static const char *const npchoices[] = {
-        " 0 (off)", " 1 (on)", " 2 (on, MSDOS compatible)",
-        " 3 (on, phone-style digit layout)",
-        " 4 (on, phone-style layout, MSDOS compatible)",
-        "-1 (off, 'z' to move upper-left, 'y' to zap wands)"
+        " 0 (オフ)", " 1 (オン)", " 2 (オン、MSDOS 互換)",
+        " 3 (オン、携帯電話風の数字配列)",
+        " 4 (オン、携帯電話風配列、MSDOS 互換)",
+        "-1 (オフ、'z' で左上移動、'y' で杖を撃つ)"
     };
     menu_item *mode_pick = (menu_item *) 0;
     int clr = NO_COLOR;
@@ -5974,7 +5974,7 @@ handler_number_pad(void)
         add_menu(tmpwin, &nul_glyphinfo, &any, 'a' + i, '0' + i,
                  ATR_NONE, clr, npchoices[i], MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Select number_pad mode:");
+    end_menu(tmpwin, "ナンバーパッドモードを選択:");
     if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
         switch (mode_pick->item.a_int - 1) {
         case 0:
@@ -6051,7 +6051,7 @@ handler_paranoid_confirmation(void)
                      ? MENU_ITEMFLAGS_SELECTED
                      : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Actions requiring extra confirmation:");
+    end_menu(tmpwin, "追加確認が必要な行動:");
     i = select_menu(tmpwin, PICK_ANY, &paranoia_picks);
     if (i >= 0) {
         /* player didn't cancel; we reset all the paranoia options
@@ -6107,7 +6107,7 @@ handler_perminv_mode(void)
                  buf, (i == old_pi) ? MENU_ITEMFLAGS_SELECTED
                                     : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Choose permanent inventory mode:");
+    end_menu(tmpwin, "永続的インベントリの表示モードを選択:");
     n = select_menu(tmpwin, PICK_ONE, &pi_pick);
     destroy_nhwindow(tmpwin);
     if (n > 0) {
@@ -6154,16 +6154,20 @@ handler_pickup_burden(void)
     menu_item *burden_pick = (menu_item *) 0;
     int clr = NO_COLOR;
 
+    static const char *burdentype_jp[] = {
+        "無重荷", "重荷", "圧迫", "過重", "超過重", "過積載"
+    };
+
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     for (i = 0; i < SIZE(burdentype); i++) {
-        burden_name = burdentype[i];
+        burden_name = burdentype_jp[i];
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, burden_letters[i],
                  0, ATR_NONE, clr, burden_name, MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Select encumbrance level:");
+    end_menu(tmpwin, "拾い上げる負担の上限を選択:");
     if (select_menu(tmpwin, PICK_ONE, &burden_pick) > 0) {
         flags.pickup_burden = burden_pick->item.a_int - 1;
         free((genericptr_t) burden_pick);
@@ -6192,16 +6196,20 @@ handler_runmode(void)
     menu_item *mode_pick = (menu_item *) 0;
     int clr = NO_COLOR;
 
+    static const char *runmodes_jp[] = {
+        "テレポート", "走る", "歩く", "這う"
+    };
+
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     for (i = 0; i < SIZE(runmodes); i++) {
-        mode_name = runmodes[i];
+        mode_name = runmodes_jp[i];
         any.a_int = i + 1;
-        add_menu(tmpwin, &nul_glyphinfo, &any, *mode_name,
+        add_menu(tmpwin, &nul_glyphinfo, &any, *runmodes[i],
                  0, ATR_NONE, clr, mode_name, MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Select run/travel display mode:");
+    end_menu(tmpwin, "run/travel 時の表示頻度を選択:");
     if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
         flags.runmode = mode_pick->item.a_int - 1;
         free((genericptr_t) mode_pick);
@@ -6214,7 +6222,7 @@ staticfn int
 handler_petattr(void)
 {
     int tmp
-        = query_attr("Select pet highlight attribute", iflags.wc2_petattr);
+        = query_attr("ペットのハイライト属性を選択", iflags.wc2_petattr);
 
     if (tmp != -1) {
         iflags.wc2_petattr = tmp;
@@ -6235,19 +6243,23 @@ handler_sortloot(void)
     menu_item *sortl_pick = (menu_item *) 0;
     int clr = NO_COLOR;
 
+    static const char *sortltype_jp[] = {
+        "ソートなし", "略奪時のみソート", "完全にソート"
+    };
+
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     for (i = 0; i < SIZE(sortltype); i++) {
-        sortl_name = sortltype[i];
-        any.a_char = *sortl_name;
-        add_menu(tmpwin, &nul_glyphinfo, &any, *sortl_name,
+        sortl_name = sortltype_jp[i];
+        any.a_char = *sortltype[i];
+        add_menu(tmpwin, &nul_glyphinfo, &any, *sortltype[i],
                  0, ATR_NONE, clr,
-                 sortl_name, (flags.sortloot == *sortl_name)
+                 sortl_name, (flags.sortloot == *sortltype[i])
                                 ? MENU_ITEMFLAGS_SELECTED
                                 : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Select loot sorting type:");
+    end_menu(tmpwin, "略奪リストのソート方法を選択:");
     n = select_menu(tmpwin, PICK_ONE, &sortl_pick);
     if (n > 0) {
         char c = sortl_pick[0].item.a_char;
@@ -6281,50 +6293,50 @@ handler_whatis_coord(void)
     any.a_char = GPCOORDS_COMPASS;
     add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_COMPASS,
              0, ATR_NONE, clr,
-             "compass ('east' or '3s' or '2n,4w')",
+             "方角（'east' や '3s' や '2n,4w'）",
              (gpc == GPCOORDS_COMPASS)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_COMFULL;
     add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_COMFULL,
              0, ATR_NONE, clr,
-             "full compass ('east' or '3south' or '2north,4west')",
+             "完全方角（'east' や '3south' や '2north,4west'）",
              (gpc == GPCOORDS_COMFULL)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_MAP;
     add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_MAP,
-             0, ATR_NONE, clr, "map <x,y>",
+             0, ATR_NONE, clr, "マップ座標 <x,y>",
              (gpc == GPCOORDS_MAP)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_SCREEN;
     add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_SCREEN,
-             0, ATR_NONE, clr, "screen [row,column]",
+             0, ATR_NONE, clr, "画面座標 [行,列]",
              (gpc == GPCOORDS_SCREEN)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_NONE;
     add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_NONE,
-             0, ATR_NONE, clr, "none (no coordinates displayed)",
+             0, ATR_NONE, clr, "なし（座標を表示しない）",
              (gpc == GPCOORDS_NONE)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     add_menu_str(tmpwin, "");
-    Sprintf(buf, "map: upper-left: <%d,%d>, lower-right: <%d,%d>%s",
+    Sprintf(buf, "マップ: 左上 <%d,%d>, 右下 <%d,%d>%s",
             1, 0, COLNO - 1, ROWNO - 1,
-            flags.verbose ? "; column 0 unused, off left edge" : "");
+            flags.verbose ? "; 列 0 は未使用、左端の外" : "");
     add_menu_str(tmpwin, buf);
     if (strcmp(windowprocs.name, "tty")) /* only show for non-tty */
         add_menu_str(tmpwin,
-      "screen: row is offset to accommodate tty interface's use of top line");
+      "画面: 行は tty インターフェースの最上行を考慮してずれています");
 #if COLNO == 80
-#define COL80ARG flags.verbose ? "; column 80 is not used" : ""
+#define COL80ARG flags.verbose ? "; 列 80 は未使用" : ""
 #else
 #define COL80ARG ""
 #endif
-    Sprintf(buf, "screen: upper-left: [%02d,%02d], lower-right: [%d,%d]%s",
+    Sprintf(buf, "画面: 左上 [%02d,%02d], 右下 [%d,%d]%s",
             0 + 2, 1, ROWNO - 1 + 2, COLNO - 1, COL80ARG);
 #undef COL80ARG
     add_menu_str(tmpwin, buf);
     add_menu_str(tmpwin, "");
     end_menu(tmpwin,
-        "Select coordinate display when auto-describing a map position:");
+        "マップ位置を自動説明する際の座標表示を選択:");
     if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &window_pick)) > 0) {
         iflags.getpos_coords = window_pick[0].item.a_char;
         /* PICK_ONE doesn't unselect preselected entry when
@@ -6352,21 +6364,21 @@ handler_whatis_filter(void)
     any = cg.zeroany;
     any.a_char = (GFILTER_NONE + 1);
     add_menu(tmpwin, &nul_glyphinfo, &any, 'n',
-             0, ATR_NONE, clr, "no filtering",
+             0, ATR_NONE, clr, "フィルタなし",
              (gfilt == GFILTER_NONE)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = (GFILTER_VIEW + 1);
     add_menu(tmpwin, &nul_glyphinfo, &any, 'v',
-             0, ATR_NONE, clr, "in view only",
+             0, ATR_NONE, clr, "視界内のみ",
              (gfilt == GFILTER_VIEW)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = (GFILTER_AREA + 1);
     add_menu(tmpwin, &nul_glyphinfo, &any, 'a',
-             0, ATR_NONE, clr, "in same area",
+             0, ATR_NONE, clr, "同じエリア内のみ",
              (gfilt == GFILTER_AREA)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     end_menu(tmpwin,
-      "Select location filtering when going for next/previous map position:");
+      "次／前のマップ位置へ移動時の位置フィルタを選択:");
     if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &window_pick)) > 0) {
         iflags.getloc_filter = (window_pick[0].item.a_char - 1);
         /* PICK_ONE doesn't unselect preselected entry when
@@ -6402,14 +6414,14 @@ handler_autopickup_exception(void)
 
  ape_again:
     numapes = count_apes();
-    opt_idx = handle_add_list_remove("autopickup exception", numapes);
+    opt_idx = handle_add_list_remove("自動拾いの例外", numapes);
     if (opt_idx == 3) { /* done */
         return TRUE;
     } else if (opt_idx == 0) { /* add new */
         /* EDIT_GETLIN:  assume user doesn't user want previous
            exception used as default input string for this one... */
         apebuf[0] = apebuf[1] = '\0';
-        getlin("What new autopickup exception pattern?", &apebuf[1]);
+        getlin("新しい自動拾いの例外パターンは?", &apebuf[1]);
         mungspaces(&apebuf[1]); /* regularize whitespace */
         if (apebuf[1] == '\033')
             return TRUE;
@@ -6433,7 +6445,7 @@ handler_autopickup_exception(void)
             ape = ga.apelist;
             any = cg.zeroany;
             add_menu_heading(tmpwin,
-                             "Always pickup '<'; never pickup '>'");
+                             "「<」は常に拾う、「>」は拾わない");
             for (i = 0; i < numapes && ape; i++) {
                 any.a_void = (opt_idx == 1) ? 0 : ape;
                 /* length of pattern plus quotes (plus '<'/'>') is
@@ -6445,8 +6457,9 @@ handler_autopickup_exception(void)
                 ape = ape->next;
             }
         }
-        Sprintf(apebuf, "%s autopickup exceptions",
-                (opt_idx == 1) ? "List of" : "Remove which");
+        Sprintf(apebuf, "%s",
+                (opt_idx == 1) ? "自動拾いの例外一覧"
+                               : "どの自動拾いの例外を削除しますか？");
         end_menu(tmpwin, apebuf);
         pick_cnt = select_menu(tmpwin,
                                (opt_idx == 1) ? PICK_NONE : PICK_ANY,
@@ -6477,7 +6490,7 @@ handler_menu_colors(void)
 
  menucolors_again:
     nmc = count_menucolors();
-    opt_idx = handle_add_list_remove("menucolor", nmc);
+    opt_idx = handle_add_list_remove("メニュー色分け", nmc);
     if (opt_idx == 3) { /* done */
  menucolors_done:
         /* in case we've made a change which impacts current persistent
@@ -6502,7 +6515,7 @@ handler_menu_colors(void)
             && (mcclr = query_color((char *) 0, NO_COLOR)) != -1
                 && (mcattr = query_attr((char *) 0, ATR_NONE)) != -1
             && !add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {
-            pline("Error adding the menu color.");
+            pline("メニュー色分けの追加中にエラーが発生しました。");
             wait_synch();
         }
         goto menucolors_again;
@@ -6542,8 +6555,9 @@ handler_menu_colors(void)
                      ATR_NONE, clr, mcbuf, MENU_ITEMFLAGS_NONE);
             tmp = tmp->next;
         }
-        Sprintf(mcbuf, "%s menu colors",
-                (opt_idx == 1) ? "List of" : "Remove which");
+        Sprintf(mcbuf, "%s",
+                (opt_idx == 1) ? "メニュー色分け一覧"
+                               : "どのメニュー色分けを削除しますか？");
         end_menu(tmpwin, mcbuf);
         pick_cnt = select_menu(tmpwin,
                                (opt_idx == 1) ? PICK_NONE : PICK_ANY,
@@ -6571,7 +6585,7 @@ handler_msgtype(void)
 
  msgtypes_again:
     nmt = msgtype_count();
-    opt_idx = handle_add_list_remove("message type", nmt);
+    opt_idx = handle_add_list_remove("メッセージ種類", nmt);
     if (opt_idx == 3) { /* done */
         return TRUE;
     } else if (opt_idx == 0) { /* add new */
@@ -6613,8 +6627,9 @@ handler_msgtype(void)
                      ATR_NONE, clr, mtbuf, MENU_ITEMFLAGS_NONE);
             tmp = tmp->next;
         }
-        Sprintf(mtbuf, "%s message types",
-                (opt_idx == 1) ? "List of" : "Remove which");
+        Sprintf(mtbuf, "%s",
+                (opt_idx == 1) ? "メッセージ種類一覧"
+                               : "どのメッセージ種類を削除しますか？");
         end_menu(tmpwin, mtbuf);
         pick_cnt = select_menu(tmpwin,
                                (opt_idx == 1) ? PICK_NONE : PICK_ANY,
@@ -6647,23 +6662,23 @@ handler_versinfo(void)
 
     any.a_int = n = VI_NUMBER; /* 1 */
     add_menu(tmpwin, &nul_glyphinfo, &any, 'n', n + '0', ATR_NONE, NO_COLOR,
-             "version number",
+             "バージョン番号",
              (vi & n) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_int = n = VI_NAME; /* 2 */
     add_menu(tmpwin, &nul_glyphinfo, &any, 'g', n + '0', ATR_NONE, NO_COLOR,
-             "game name",
+             "ゲーム名",
              (vi & n) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_int = n = VI_BRANCH; /* 4 */
     add_menu(tmpwin, &nul_glyphinfo, &any, 'b', n + '0', ATR_NONE, NO_COLOR,
-             (have_branch ? "development branch"
+             (have_branch ? "開発ブランチ"
 #if (NH_DEVEL_STATUS == NH_STATUS_RELEASED)
-                          : "(not applicable)"
+                           : "(該当なし)"
 #else
-                          : "(not available)"
+                           : "(利用不可)"
 #endif
               ), (vi & n) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
 
-    end_menu(tmpwin, "Select version information flags:");
+    end_menu(tmpwin, "表示するバージョン情報を選択:");
     n = select_menu(tmpwin, PICK_ANY, &vi_pick);
     if (n > 0) {
         int i, newval = 0;
@@ -6689,11 +6704,11 @@ handler_windowborders(void)
     menu_item *mode_pick = (menu_item *) 0;
     int clr = NO_COLOR;
     static const char *const windowborders_text[] = {
-        "Off, never show borders",
-        "On, always show borders",
-        "Auto, on if display is at least (24+2)x(80+2)",
-        "On, except forced off for perm_invent",
-        "Auto, except forced off for perm_invent"
+        "オフ、枠線を常に表示しない",
+        "オン、枠線を常に表示する",
+        "自動、表示領域が (24+2)x(80+2) 以上なら表示",
+        "オン、ただし perm_invent では強制オフ",
+        "自動、ただし perm_invent では強制オフ"
     };
 
     tmpwin = create_nhwindow(NHW_MENU);
@@ -6707,7 +6722,7 @@ handler_windowborders(void)
         add_menu(tmpwin, &nul_glyphinfo, &any, 'a' + i, '0' + i,
                  ATR_NONE, clr, mode_name, MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Select window borders mode:");
+    end_menu(tmpwin, "ウィンドウ枠線モードを選択:");
     if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
         iflags.wc2_windowborders = mode_pick->item.a_int - 1;
         free((genericptr_t) mode_pick);
@@ -7780,12 +7795,12 @@ static const struct {
     xint8 msgtyp;
     const char *descr;
 } msgtype_names[] = {
-    { "show", MSGTYP_NORMAL, "Show message normally" },
-    { "hide", MSGTYP_NOSHOW, "Hide message" },
+    { "show", MSGTYP_NORMAL, "通常通りメッセージを表示" },
+    { "hide", MSGTYP_NOSHOW, "メッセージを隠す" },
     { "noshow", MSGTYP_NOSHOW, NULL },
-    { "stop", MSGTYP_STOP, "Prompt for more after the message" },
+    { "stop", MSGTYP_STOP, "メッセージの後に続行確認を入れる" },
     { "more", MSGTYP_STOP, NULL },
-    { "norep", MSGTYP_NOREP, "Do not repeat the message" }
+    { "norep", MSGTYP_NOREP, "メッセージを繰り返さない" }
 };
 
 staticfn const char *
@@ -7818,7 +7833,7 @@ query_msgtype(void)
                      ATR_NONE, clr,
                      msgtype_names[i].descr, MENU_ITEMFLAGS_NONE);
         }
-    end_menu(tmpwin, "How to show the message");
+    end_menu(tmpwin, "メッセージの表示方法");
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
     if (pick_cnt > 0) {
@@ -8670,14 +8685,14 @@ doset_simple_menu(void)
            and show that, or whether #reqmenu and #options are both still
            bound to keys and show those, but if meta keys are involved
            the player might not know how to type them; keep this simple */
-        Strcpy(buf, "Use command '#optionsfull'"
-                    " to get the complete options list.");
+        Strcpy(buf, "#optionsfull コマンドで"
+                    " 完全なオプション一覧を表示できます。");
         add_menu_str(tmpwin, buf);
     }
     any = cg.zeroany;
     any.a_int = -2 + 1;
     add_menu(tmpwin, &nul_glyphinfo, &any, '?', 0, ATR_NONE, NO_COLOR,
-             gs.simple_options_help ? "hide help" : "show help",
+             gs.simple_options_help ? "ヘルプを隠す" : "ヘルプを表示",
              MENU_ITEMFLAGS_NONE);
 
     for (section = OptS_General; section < OptS_Advanced; section++) {
@@ -8731,7 +8746,7 @@ doset_simple_menu(void)
                 || allopt[i].idx == opt_pickup_thrown
                 || allopt[i].idx == opt_pickup_stolen
                 || allopt[i].idx == opt_dropped_nopick)
-                Strcat(buf, "  (for autopickup)");
+                Strcat(buf, "  （自動拾い用）");
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                      ATR_NONE, NO_COLOR, buf, MENU_ITEMFLAGS_NONE);
             if (gs.simple_options_help && allopt[i].descr) {
@@ -8741,7 +8756,7 @@ doset_simple_menu(void)
             }
         }
     }
-    end_menu(tmpwin, "Options");
+    end_menu(tmpwin, "オプション");
 
     go.opt_need_redraw = FALSE;
     go.opt_need_glyph_reset = FALSE;
@@ -8771,7 +8786,7 @@ doset_simple_menu(void)
                 if (reslt == optn_ok && allopt[k].idx != pfx_cond_)
                     opt_set_in_config[k] = TRUE;
             } else {
-                Sprintf(buf, "Set %s to what?", allopt[k].name);
+                Sprintf(buf, "%s の値を何にしますか？", allopt[k].name);
                 getlin(buf, abuf);
                 if (abuf[0] != '\033') { /* ESC */
                     Sprintf(buf, "%s:", allopt[k].name);
@@ -8842,8 +8857,8 @@ term_for_boolean(int idx, boolean *b)
     int i, f_t = (*b) ? 1: 0;
     const char *boolean_term;
     static const char *const booleanterms[2][num_terms] = {
-        { "false", "off", "disabled", "excluded from build" },
-        { "true", "on", "enabled", "included"},
+        { "偽", "オフ", "無効", "ビルドから除外" },
+        { "真", "オン", "有効", "含まれる" },
     };
 
     boolean_term = booleanterms[f_t][0];
@@ -8890,11 +8905,11 @@ doset(void) /* changing options via menu by Per Liboriussen */
     if (!skiphelp) {
         /* help text surrounding '?' choice should have exactly one NULL */
         static const char *const helptext[] = {
-            "For a brief explanation of how this works, type '?' to select",
-            "the next menu choice, then press <enter> or <return>.",
+            "簡単な説明を表示するには '?' を選び、",
+            "<enter> または <return> を押してください。",
             NULL, /* actual '?' menu entry gets inserted here */
-            ("[To suppress this menu help,"
-             " toggle off the 'cmdassist' option.]"),
+            ("[このメニューヘルプを表示したくない場合は、"
+             " 'cmdassist' オプションをオフにしてください。]"),
             "",
         };
         any = cg.zeroany;
@@ -8905,7 +8920,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
             } else {
                 any.a_int = HELP_IDX + 1; /* handling pick_list subtracts 1 */
                 add_menu(tmpwin, &nul_glyphinfo, &any, '?', '?', ATR_NONE,
-                         clr, "view help for options menu",
+                         clr, "オプションメニューのヘルプを表示",
                          MENU_ITEMFLAGS_SKIPINVERT);
             }
         }
@@ -8930,7 +8945,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
 
     indexoffset = 1;
     any = cg.zeroany;
-    add_menu_heading(tmpwin, "Booleans (selecting will toggle value):");
+    add_menu_heading(tmpwin, "真偽値オプション（選択で値を切り替え）:");
     any.a_int = 0;
     /* first list any other non-modifiable booleans, then modifiable ones */
     for (pass = 0; pass <= 1; pass++)
@@ -8963,7 +8978,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
 
     add_menu_str(tmpwin, "");
     add_menu_heading(tmpwin,
-                     "Compounds (selecting will prompt for new value):");
+                     "複合オプション（選択で新しい値を入力）:");
 
     for (pass = startpass; pass <= endpass; pass++)
         for (i = 0; (name = allopt[i].name) != 0; i++) {
@@ -8998,11 +9013,11 @@ doset(void) /* changing options via menu by Per Liboriussen */
 
 #ifdef PREFIXES_IN_USE
     add_menu_str(tmpwin, "");
-    add_menu_heading(tmpwin, "Variable playground locations:");
+    add_menu_heading(tmpwin, "可変プレイ場所の設定:");
     for (i = 0; i < PREFIX_COUNT; i++)
         doset_add_menu(tmpwin, fqn_prefix_names[i], fmtstr_doset, -1, 0);
 #endif
-    end_menu(tmpwin, "Set what options?");
+    end_menu(tmpwin, "どのオプションを設定しますか？");
     go.opt_need_redraw = FALSE;
     go.opt_need_glyph_reset = FALSE;
 
@@ -9043,7 +9058,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
                 } else {
                     char abuf[BUFSZ];
 
-                    Sprintf(buf, "Set %s to what?", allopt[opt_indx].name);
+                    Sprintf(buf, "%s の値を何にしますか？", allopt[opt_indx].name);
                     abuf[0] = '\0';
                     getlin(buf, abuf);
                     if (abuf[0] == '\033')
@@ -9318,10 +9333,10 @@ handle_add_list_remove(const char *optname, int numtotal)
         char letr;
         const char *desc;
     } action_titles[] = {
-        { 'a', "add new %s" },         /* [0] */
-        { 'l', "list %s" },            /* [1] */
-        { 'r', "remove existing %s" }, /* [2] */
-        { 'x', "exit this menu" },     /* [3] */
+        { 'a', "%sを追加" },         /* [0] */
+        { 'l', "%sの一覧" },         /* [1] */
+        { 'r', "%sを削除" },         /* [2] */
+        { 'x', "このメニューを終了" }, /* [3] */
     };
     int clr = NO_COLOR;
 
@@ -9335,13 +9350,12 @@ handle_add_list_remove(const char *optname, int numtotal)
         /* omit list and remove if there aren't any yet */
         if (!numtotal && (i == 1 || i == 2))
             continue;
-        Sprintf(tmpbuf, action_titles[i].desc,
-                (i == 1) ? makeplural(optname) : optname);
+        Sprintf(tmpbuf, action_titles[i].desc, optname);
         add_menu(tmpwin, &nul_glyphinfo,&any, action_titles[i].letr,
                  0, ATR_NONE, clr, tmpbuf,
                  (i == 3) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Do what?");
+    end_menu(tmpwin, "どうしますか？");
     if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list)) > 0) {
         opt_idx = pick_list[0].item.a_int - 1;
         if (pick_cnt > 1 && opt_idx == 3)
@@ -9363,16 +9377,16 @@ dotogglepickup(void)
     flags.pickup = !flags.pickup;
     if (flags.pickup) {
         oc_to_str(flags.pickup_types, ocl);
-        Sprintf(buf, "ON, for %s objects%s", ocl[0] ? ocl : "all",
+        Sprintf(buf, "オン、%sのオブジェクト%s", ocl[0] ? ocl : "すべて",
                 (ga.apelist)
                     ? ((count_apes() == 1)
-                           ? ", with one exception"
-                           : ", with some exceptions")
+                           ? "（1つの例外あり）"
+                           : "（いくつかの例外あり）")
                     : "");
     } else {
-        Strcpy(buf, "OFF");
+        Strcpy(buf, "オフ");
     }
-    pline("Autopickup: %s.", buf);
+    pline("自動拾い: %s。", buf);
     return ECMD_OK;
 }
 
@@ -9403,8 +9417,8 @@ int
 add_autopickup_exception(const char *mapping)
 {
     static const char
-        APE_regex_error[] = "regex error in AUTOPICKUP_EXCEPTION",
-        APE_syntax_error[] = "syntax error in AUTOPICKUP_EXCEPTION";
+        APE_regex_error[] = "AUTOPICKUP_EXCEPTION の正規表現エラー",
+        APE_syntax_error[] = "AUTOPICKUP_EXCEPTION の構文エラー";
 
     struct autopickup_exception *ape;
     char text[256], end;
@@ -10199,15 +10213,15 @@ wc_set_window_colors(char *op)
                 }
                 if (wcolors_opt[j] != 0) {
                     config_error_add(
-                       "windowcolors for %s windows specified multiple times",
-                                     wcnames[j]);
+                        "%s ウィンドウの windowcolors が複数回指定されています",
+                                      wcnames[j]);
                 }
                 wcolors_opt[j]++;
                 break;
             }
         }
         if (j == WC_COUNT) {
-            config_error_add("windowcolors for unrecognized window type: %s",
+            config_error_add("認識できないウィンドウタイプの windowcolors: %s",
                              wn);
         }
     }
