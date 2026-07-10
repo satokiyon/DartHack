@@ -51,6 +51,9 @@ class NetHackWorker {
     late final NativeCallable<ExitCallback> exitCallable;
     late final NativeCallable<NumberPadModeCallback> numberPadCallable;
 
+    // プレイヤー位置通知用 NativeCallable (マップタップの #herecmdmenu 連動で使用)
+    late final NativeCallable<CliparoundCallback> cliparoundCallable;
+
     receivePort.listen((message) {
       if (message is Map) {
         final type = message['type'];
@@ -224,6 +227,19 @@ class NetHackWorker {
             });
           });
 
+          // プレイヤー位置通知: C 側から (x, y, u.ux-1, u.uy) を受け取り
+          // Dart 側に転送。マップの主人公タップ検出 (#herecmdmenu) で利用する。
+          // C 側でマップグリッド座標系 (0-based) に変換済み。
+          cliparoundCallable = NativeCallable<CliparoundCallback>.listener((int x, int y, int playerX, int playerY) {
+            uiSendPort.send({
+              'type': 'cliparound',
+              'x': x,
+              'y': y,
+              'playerX': playerX,
+              'playerY': playerY,
+            });
+          });
+
           // コールバックをC側に登録
           ffi.registerCallbacks(
             createCallable.nativeFunction,
@@ -243,6 +259,7 @@ class NetHackWorker {
             asknameCallable.nativeFunction,
             exitCallable.nativeFunction,
             numberPadCallable.nativeFunction,
+            cliparoundCallable.nativeFunction,
           );
 
           // NetHack コアを起動
@@ -253,6 +270,11 @@ class NetHackWorker {
         } else if (type == 'key') {
           final key = message['key'] as int;
           ffi.sendKeyToC(key);
+        } else if (type == 'pos_cmd') {
+          final x = message['x'] as int;
+          final y = message['y'] as int;
+          final mod = message['mod'] as int? ?? 1;
+          ffi.sendPosCmdToC(x, y, mod);
         } else if (type == 'menu_select') {
           final ident = message['ident'] as int;
           ffi.sendMenuSelection(ident);

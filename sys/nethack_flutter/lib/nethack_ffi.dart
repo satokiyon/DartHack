@@ -32,12 +32,13 @@ typedef GetLineCallback = Void Function(Pointer<Utf8> prompt, Pointer<Utf8> init
 typedef AskNameCallback = Void Function(Pointer<Utf8> saves, Int32 maxChars);
 typedef ExitCallback = Void Function(Pointer<Utf8> msg);
 typedef NumberPadModeCallback = Void Function(Int32 state);
+typedef CliparoundCallback = Void Function(Int32 x, Int32 y, Int32 playerX, Int32 playerY);
 
 // C側起動関数
 typedef StartNetHackFunc = Void Function(Pointer<Utf8> path, Pointer<Utf8> username);
 typedef StartNetHackDart = void Function(Pointer<Utf8> path, Pointer<Utf8> username);
 
-// コールバック登録関数 (16個の引数へ拡張)
+// コールバック登録関数 (17個の引数: CliparoundCallback を追加)
 typedef RegisterCallbacksFunc = Void Function(
   Pointer<NativeFunction<CreateWindowCallback>> createCb,
   Pointer<NativeFunction<ClearWindowCallback>> clearCb,
@@ -56,6 +57,7 @@ typedef RegisterCallbacksFunc = Void Function(
   Pointer<NativeFunction<AskNameCallback>> asknameCb,
   Pointer<NativeFunction<ExitCallback>> exitCb,
   Pointer<NativeFunction<NumberPadModeCallback>> numberPadCb,
+  Pointer<NativeFunction<CliparoundCallback>> cliparoundCb,
 );
 typedef RegisterCallbacksDart = void Function(
   Pointer<NativeFunction<CreateWindowCallback>> createCb,
@@ -75,6 +77,7 @@ typedef RegisterCallbacksDart = void Function(
   Pointer<NativeFunction<AskNameCallback>> asknameCb,
   Pointer<NativeFunction<ExitCallback>> exitCb,
   Pointer<NativeFunction<NumberPadModeCallback>> numberPadCb,
+  Pointer<NativeFunction<CliparoundCallback>> cliparoundCb,
 );
 
 // キー送信
@@ -106,6 +109,10 @@ typedef SendAskNameResultDart = void Function(Pointer<Utf8> result);
 typedef GetExtCmdsFunc = Pointer<Utf8> Function();
 typedef GetExtCmdsDart = Pointer<Utf8> Function();
 
+// PosCmd (座標クリック) 送信
+typedef SendPosCmdFunc = Void Function(Int32 x, Int32 y, Int32 mod);
+typedef SendPosCmdDart = void Function(int x, int y, int mod);
+
 class NetHackFfi {
   late final DynamicLibrary _lib;
   late final StartNetHackDart startNetHack;
@@ -114,11 +121,12 @@ class NetHackFfi {
   late final SendMenuSelectionDart sendMenuSelection;
   late final SendMenuSelectionsDart sendMenuSelections;
   late final GetInputRequestIdDart getInputRequestId;
-  
+
   late final SendYnResultDart sendYnResult;
   late final SendGetLineResultDart sendGetLineResult;
   late final SendAskNameResultDart sendAskNameResult;
   late final GetExtCmdsDart getExtCmdsFlutter;
+  late final SendPosCmdDart sendPosCmdToC;
 
   NetHackFfi() {
     try {
@@ -166,6 +174,10 @@ class NetHackFfi {
 
     getExtCmdsFlutter = _lib
         .lookup<NativeFunction<GetExtCmdsFunc>>('GetExtCmdsFlutter')
+        .asFunction();
+
+    sendPosCmdToC = _lib
+        .lookup<NativeFunction<SendPosCmdFunc>>('SendPosCmdToFlutter')
         .asFunction();
   }
 }

@@ -53,7 +53,8 @@ DLL_EXPORT void RegisterFlutterCallbacks(
     void* getline_cb,
     void* askname_cb,
     void* exit_cb,
-    void* number_pad_cb
+    void* number_pad_cb,
+    void* cliparound_cb
 ) {
     (void)create_cb;
     (void)clear_cb;
@@ -70,6 +71,7 @@ DLL_EXPORT void RegisterFlutterCallbacks(
     (void)askname_cb;
     (void)exit_cb;
     (void)number_pad_cb;
+    (void)cliparound_cb;
     g_print_callback = putstr_cb;
     g_input_callback = input_cb;
 }

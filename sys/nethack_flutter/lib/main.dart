@@ -853,6 +853,10 @@ class _MyHomePageState extends State<MyHomePage> {
             message['color'],
             message['special'],
           );
+        } else if (type == 'cliparound') {
+          // C 側からプレイヤー位置 (u.ux, u.uy) を受信。
+          // マップの主人公タップ → #herecmdmenu 起動の判定に使用する。
+          _screen.setPlayerPos(message['playerX'], message['playerY']);
         } else if (type == 'request_input') {
           setState(() {
             _waitingForInput = true;
@@ -872,7 +876,16 @@ class _MyHomePageState extends State<MyHomePage> {
               _autoAdvanceSavePending = false;
               _autoAdvanceSavePendingUntilMs = 0;
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted && _waitingForInput) {
+                // メニューやテキストウィンドウが表示されている場合は
+                // 自動 Space 送信をスキップ (メニュー項目タップを
+                // 妨げないため、またキャンセルを誤発動させないため)。
+                if (mounted && _waitingForInput
+                    && !_screen.isMenuWindowVisible
+                    && !_screen.isTextWindowVisible
+                    && _screen.textLines.isEmpty
+                    && !_isYnVisible
+                    && !_isGetLineVisible
+                    && !_isAskNameVisible) {
                   _sendFfiKey(32, 'Space(auto)');
                 }
               });
@@ -1247,6 +1260,84 @@ class _MyHomePageState extends State<MyHomePage> {
     _workerSendPort?.send({
       'type': 'key',
       'key': code,
+    });
+  }
+
+  // 拡張コマンド (#herecmdmenu 等) を C 側に送信する。
+  // 各文字 + 末尾の改行 (LF) を順次 worker に送る。複数文字を
+  // 送るため `keepWaiting: true` を使って _waitingForInput フラグの
+  // 早期解放による取りこぼしを防ぐ。
+  void _sendExtendedCommand(String cmd) {
+    if (!_waitingForInput) return;
+    if (_screen.isMenuWindowVisible) return;
+    if (_screen.isTextWindowVisible) return;
+    if (_isYnVisible) return;
+    if (_isGetLineVisible) return;
+    if (_isAskNameVisible) return;
+
+    _addLog("> Send Extended Command: '$cmd'");
+    for (int i = 0; i < cmd.length; i++) {
+      // C 側の nhgetch は順次入力を消費するため、
+      // 最後の改行以外は keepWaiting: true を維持する。
+      final isLast = (i == cmd.length - 1);
+      _sendFfiKey(cmd.codeUnitAt(i), cmd[i], keepWaiting: !isLast);
+    }
+    // 末尾に LF (改行) を送って拡張コマンドを確定。
+    _sendFfiKey(10, '${cmd}\\n', keepWaiting: true);
+  }
+
+  // マップ座標 (SizedBox 4000x3000 ローカル) を 0-based タイル座標に変換する。
+  // NetHackMapPainter.paint() と同じ計算式を共有する。
+  ({int tileX, int tileY, bool inMap})? _mapLocalToTile(Offset localPosition) {
+    final cellW = _useTiles ? 32.0 : 9.0;
+    final cellH = _useTiles ? 32.0 : 16.0;
+    const canvasW = 4000.0;
+    const canvasH = 3000.0;
+    final mapWidth = NetHackScreen.mapCols * cellW;
+    final mapHeight = NetHackScreen.mapRows * cellH;
+    final offsetX = (canvasW - mapWidth) / 2;
+    final offsetY = (canvasH - mapHeight) / 2;
+
+    final tileX = ((localPosition.dx - offsetX) / cellW).floor();
+    final tileY = ((localPosition.dy - offsetY) / cellH).floor();
+
+    if (tileX < 0 || tileX >= NetHackScreen.mapCols
+        || tileY < 0 || tileY >= NetHackScreen.mapRows) {
+      return null; // マップ領域外
+    }
+    return (tileX: tileX, tileY: tileY, inMap: true);
+  }
+
+  // マップタップ処理。主人公タイルをタップしたとき Java 版と同じ流れで
+  // PosCmd(x, y, mod) を C コアに送信し、C コア側の click_to_cmd 経由で
+  // #herecmdmenu (主人公) / #therecmdmenu (隣接) を起動する。
+  // (拡張コマンド "#herecmdmenu" の文字列送信は Flutter 版の get_ext_cmd
+  //  実装 (メニュー起動型) と整合せず、メニュー表示前の残文字が暴走する
+  //  ため廃止。Java 版の PosCmd 送信方式を踏襲する。)
+  void _handleMapTap(TapUpDetails details) {
+    if (!_isMainGameStarted) return;
+    final px = _screen.playerX;
+    final py = _screen.playerY;
+    if (px < 0 || py < 0) return;
+
+    final tile = _mapLocalToTile(details.localPosition);
+    if (tile == null) return;
+
+    // 主人公タイルでも隣接タイルでも、tap したタイル座標をそのまま送信する。
+    // C コア側 click_to_cmd → dotherecmdmenu が u.ux/uy 一致で here_cmd_menu
+    // を呼び分ける。
+    sendPosCmd(tile.tileX, tile.tileY, 1 /* CLICK_1 */);
+  }
+
+  // マップ座標クリック (PosCmd) を C コアに送信する。
+  // C コアの flutter_nh_poskey が PosCmd キューを消費し、click_to_cmd 経由で
+  // #therecmdmenu (および主人公タイル時は #herecmdmenu) を起動する。
+  void sendPosCmd(int x, int y, int mod) {
+    _workerSendPort?.send({
+      'type': 'pos_cmd',
+      'x': x,
+      'y': y,
+      'mod': mod,
     });
   }
 
@@ -2040,12 +2131,20 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: SizedBox(
                           width: 4000.0, // 巨大キャンバスでくるみ InteractiveViewer のクランプを完全無効化
                           height: 3000.0,
-                          child: CustomPaint(
-                            painter: NetHackMapPainter(
-                              screen: _screen,
-                              tileImage: _tileImage,
-                              tileSize: _tileSize,
-                              useTiles: _useTiles,
+                          // マップタップ検出: 主人公タイルをタップで
+                          // #herecmdmenu を発動する (Java 版と同じ挙動)。
+                          // 単発タップのみ拾う (onTapUp) ことで
+                          // InteractiveViewer のパン/ピンチ操作と競合させない。
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTapUp: _handleMapTap,
+                            child: CustomPaint(
+                              painter: NetHackMapPainter(
+                                screen: _screen,
+                                tileImage: _tileImage,
+                                tileSize: _tileSize,
+                                useTiles: _useTiles,
+                              ),
                             ),
                           ),
                         ),

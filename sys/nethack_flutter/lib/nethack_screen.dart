@@ -89,6 +89,13 @@ class NetHackScreen extends ChangeNotifier {
   int get cursorY => _cursorY;
   int _statusCursorY = 0;
 
+  // プレイヤー位置 (u.ux, u.uy)。C 側の flutter_cliparound から通知される。
+  // 未初期化時は -1 とし、マップタップでの #herecmdmenu 判定に使用する。
+  int _playerX = -1;
+  int _playerY = -1;
+  int get playerX => _playerX;
+  int get playerY => _playerY;
+
   NetHackScreen() {
     _clearMapGrid();
   }
@@ -159,6 +166,18 @@ class NetHackScreen extends ChangeNotifier {
     } else if (type == nhwStatus || winId == 2 /* WIN_STATUS */) {
       _statusCursorY = y;
     }
+  }
+
+  // プレイヤー位置 (u.ux, u.uy) を C 側から受け取り保持する。
+  // マップの主人公タップ → #herecmdmenu 起動の判定に利用する。
+  // 値が変わったときのみ notifyListeners() を呼んで再描画を抑える。
+  void setPlayerPos(int x, int y) {
+    if (_playerX == x && _playerY == y) {
+      return;
+    }
+    _playerX = x;
+    _playerY = y;
+    notifyListeners();
   }
 
   void putString(int winId, int attr, String text) {

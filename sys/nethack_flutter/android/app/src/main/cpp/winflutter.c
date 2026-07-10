@@ -70,6 +70,7 @@ typedef void (*DartGetLineCallback)(const char* prompt, const char* initText);
 typedef void (*DartAskNameCallback)(const char* saves, int maxChars);
 typedef void (*DartExitCallback)(const char* msg);
 typedef void (*DartNumberPadModeCallback)(int state);
+typedef void (*DartCliparoundCallback)(int x, int y, int playerX, int playerY);
 
 static DartCreateWindowCallback g_create_window_cb = NULL;
 static DartClearWindowCallback g_clear_window_cb = NULL;
@@ -88,6 +89,7 @@ static DartGetLineCallback g_getline_cb = NULL;
 static DartAskNameCallback g_askname_cb = NULL;
 static DartExitCallback g_exit_cb = NULL;
 static DartNumberPadModeCallback g_number_pad_mode_cb = NULL;
+static DartCliparoundCallback g_cliparound_cb = NULL;
 
 // 同期待信用変数
 static volatile char g_yn_result = 0;
@@ -105,6 +107,28 @@ static volatile long g_selected_menu_item = -2; // -2: 未選択, -1: キャン�
 static volatile int g_exit_notified = 0;
 
 #define FLUTTER_MAX_SELECTED_MENU 512
+#define FLUTTER_MAX_POSCMD 32
+
+// PosCmd (座標クリック) キュー
+typedef struct {
+    int x;
+    int y;
+    int mod;
+} PosCmdEntry;
+
+static PosCmdEntry g_poscmd_queue[FLUTTER_MAX_POSCMD];
+static volatile int g_poscmd_head = 0;
+static volatile int g_poscmd_tail = 0;
+static volatile int g_poscmd_count = 0;
+
+// flutter_nhgetch 内で PosCmd を消費した時に、その情報を
+// flutter_nh_poskey に橋渡しするためのグローバル変数。
+// (nhgetch からは x,y,mod ポインタを返せないため、nh_poskey が
+//  次の readchar サイクルでクリックイベントとして配送する。)
+static volatile int g_pending_poscmd_x = 0;
+static volatile int g_pending_poscmd_y = 0;
+static volatile int g_pending_poscmd_mod = 1;
+static volatile int g_pending_poscmd = 0;
 static volatile int g_selected_menu_count = -2; // -2: 待機, -1: キャンセル, 0以上: 件数
 static long g_selected_menu_items[FLUTTER_MAX_SELECTED_MENU] = {0};
 
@@ -208,7 +232,8 @@ void RegisterFlutterCallbacks(
     DartGetLineCallback getline_cb,
     DartAskNameCallback askname_cb,
     DartExitCallback exit_cb,
-    DartNumberPadModeCallback number_pad_cb
+    DartNumberPadModeCallback number_pad_cb,
+    DartCliparoundCallback cliparound_cb
 ) {
     g_create_window_cb = create_cb;
     g_clear_window_cb = clear_cb;
@@ -227,6 +252,7 @@ void RegisterFlutterCallbacks(
     g_askname_cb = askname_cb;
     g_exit_cb = exit_cb;
     g_number_pad_mode_cb = number_pad_cb;
+    g_cliparound_cb = cliparound_cb;
     debuglog("Flutter window, menu and sync callbacks registered.");
 }
 
@@ -359,6 +385,21 @@ void SendKeyToFlutter(int key) {
     g_last_received_key = key;
     g_key_available = 1;
     debuglog("C core received key: %d", key);
+}
+
+// Dart 側から PosCmd (座標クリック) を受け取る関数。
+// マップタップ時の herecmdmenu/therecmdmenu 連動のために使用。
+void SendPosCmdToFlutter(int x, int y, int mod) {
+    if (g_poscmd_count >= FLUTTER_MAX_POSCMD) {
+        debuglog("SendPosCmdToFlutter: queue full, dropping pos_cmd x=%d y=%d mod=%d", x, y, mod);
+        return;
+    }
+    g_poscmd_queue[g_poscmd_tail].x = x;
+    g_poscmd_queue[g_poscmd_tail].y = y;
+    g_poscmd_queue[g_poscmd_tail].mod = mod;
+    g_poscmd_tail = (g_poscmd_tail + 1) % FLUTTER_MAX_POSCMD;
+    g_poscmd_count++;
+    debuglog("C core received PosCmd: x=%d, y=%d, mod=%d (queued=%d)", x, y, mod, g_poscmd_count);
 }
 
 // Dart 側からメニュー選択結果を受け取る関数
@@ -741,6 +782,18 @@ static void flutter_curs(winid window, int x, int y) {
     }
 }
 
+// プレイヤー位置 (u.ux, u.uy) を Dart 側に通知する cliparound 実装。
+// マップ上の主人公タップ検出 (#herecmdmenu 連動) のために必要。
+static void flutter_cliparound(int x, int y) {
+    if (g_cliparound_cb) {
+        // (x, y) はフォーカス座標、続いてプレイヤー位置を渡す。
+        // u.ux は 1-based (1..COLNO-1)、u.uy は 0-based (0..ROWNO-1)
+        // (src/cmd.c の isok() 参照)。
+        // マップグリッド座標系 (0-based for both) に合わせるため x は -1。
+        g_cliparound_cb(x, y, (int) u.ux - 1, (int) u.uy);
+    }
+}
+
 static void flutter_putstr(winid window, int attr, const char* str) {
     debuglog("flutter_putstr [%d]: %s", window, str);
     if ((int) window == WIN_MESSAGE && str) {
@@ -816,7 +869,7 @@ static void flutter_delay_output(void) {
 // ユーザー入力待ち (キー取得)
 static int flutter_nhgetch(void) {
     debuglog("flutter_nhgetch called. Waiting for key...");
-    
+
     g_input_request_id++;
     g_key_available = 0;
 
@@ -825,6 +878,27 @@ static int flutter_nhgetch(void) {
     }
 
     while (!g_key_available) {
+        // PosCmd キューにエントリがあれば、それを消費してクリックイベント
+        // (戻り値 0) として返す。readchar_core は sym == 0 をクリックイベント
+        // として扱う (click_to_cmd 呼び出し) ため、nhgetch 戻り値 0 でも
+        // therecmdmenu/clicklook 等のクリック系コマンドが起動される。
+        // なお、x/y/mod は nhgetch からはポインタで返せないため、
+        // グローバル g_pending_poscmd_* に退避し、flutter_nh_poskey 側で
+        // 次の readchar サイクル時に復元する。
+        if (g_poscmd_count > 0) {
+            PosCmdEntry cmd = g_poscmd_queue[g_poscmd_head];
+            g_poscmd_head = (g_poscmd_head + 1) % FLUTTER_MAX_POSCMD;
+            g_poscmd_count--;
+            g_pending_poscmd_x = cmd.x;
+            g_pending_poscmd_y = cmd.y;
+            g_pending_poscmd_mod = cmd.mod;
+            g_pending_poscmd = 1;
+            g_key_available = 1;
+            g_last_received_key = 0; // クリックイベント
+            debuglog("flutter_nhgetch: forwarded PosCmd to pending x=%d y=%d mod=%d (remaining=%d)",
+                     cmd.x, cmd.y, cmd.mod, g_poscmd_count);
+            break;
+        }
         usleep(10000); // 10ms
     }
 
@@ -833,6 +907,30 @@ static int flutter_nhgetch(void) {
 }
 
 static int flutter_nh_poskey(coordxy* x, coordxy* y, int* event) {
+    // まず PosCmd キューにエントリがあれば、それを優先的に消費する。
+    if (g_poscmd_count > 0) {
+        PosCmdEntry cmd = g_poscmd_queue[g_poscmd_head];
+        g_poscmd_head = (g_poscmd_head + 1) % FLUTTER_MAX_POSCMD;
+        g_poscmd_count--;
+        *x = (coordxy) cmd.x;
+        *y = (coordxy) cmd.y;
+        *event = cmd.mod;
+        debuglog("flutter_nh_poskey: dispatched PosCmd x=%d y=%d mod=%d (remaining=%d)",
+                 cmd.x, cmd.y, cmd.mod, g_poscmd_count);
+        return 0; // 0 = クリックイベント (readchar_core で click_to_cmd 経由)
+    }
+    // 既に nhgetch が PosCmd を消費して pending に積んでいるケース。
+    // (readchar_core は nhgetch 戻り値 0 だけでは x/y/mod を取り出せない
+    //  ため、次の readchar サイクル (= 次の nh_poskey 呼び出し) で復元する。)
+    if (g_pending_poscmd) {
+        g_pending_poscmd = 0;
+        *x = (coordxy) g_pending_poscmd_x;
+        *y = (coordxy) g_pending_poscmd_y;
+        *event = g_pending_poscmd_mod;
+        debuglog("flutter_nh_poskey: restored pending PosCmd x=%d y=%d mod=%d",
+                 g_pending_poscmd_x, g_pending_poscmd_y, g_pending_poscmd_mod);
+        return 0; // クリックイベント
+    }
     return flutter_nhgetch();
 }
 
@@ -1117,6 +1215,9 @@ static void HijackWindowProcs(void) {
     and_procs.win_number_pad = flutter_number_pad;
     and_procs.win_delay_output = flutter_delay_output;
     and_procs.win_print_glyph = flutter_print_glyph;
+
+    // プレイヤー位置を Dart 側へ通知 (マップタップの #herecmdmenu 連動で使用)
+    and_procs.win_cliparound = flutter_cliparound;
 
     // メニュー用の関数ポインタも完全にハイジャック！
     and_procs.win_start_menu = flutter_start_menu;
