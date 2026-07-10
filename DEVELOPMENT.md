@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-10. -->
 # NetHackJP-Android 開発メモ
 
 本ドキュメントは、Android ポートの日本語化リポジトリである `NetHackJP-Android` の開発環境の構築、ビルド、マージ運用およびリリース手順についてまとめたものです。
@@ -93,6 +93,18 @@ $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\sys\android\buil
 ### Flutter版 複合キー送信（前置コマンド + 方向）時の待機制御
 - `g<dir>` / `m<dir>` / `F<dir>` のように2キー連続送信する場合、1キー目送信で入力待機フラグを落とすと2キー目が送れなくなるため、UI 側送信関数に「待機解除しない送信（prefix送信用）」を用意してください。
 - 最終キー送信時だけ待機解除する設計にすると、Java版と同様の移動モード入力を安定して再現できます。
+
+### Flutter版キーボードの4レイアウト設計（Java版準拠）
+- Flutter版の仮想キーボード（`nethack_keyboard.dart`）は、Java版（`SoftKeyboard.java`）と同様に **QWERTY / Symbols / Meta / Ctrl の4レイアウト**を切り替えて使用します。Meta や Ctrl をトグル修飾子（次の1キーだけを変換する方式）ではなく、**専用レイアウトに切り替える方式**にしてください。
+- **Meta キー**: `char | 0x80`（128〜255）のコードを `onRawKeyCode` で直接送信します。例えば `M-a` = 225、`M-2` = 178 です。NetHack のメタコマンド（`M-c` = chat、`M-o` = open、`M-v` = invoke 等）はこの形式で送信されます。
+- **Ctrl キー**: `char & 0x1F`（1〜26）の制御コードを `onRawKeyCode` で直接送信します。例えば `^A` = 1、`^D` = 4、`^P` = 16 です。
+- **ESC キー**: ASCII 27 を `onRawKeyCode` で送信します。Symbols / Meta / Ctrl レイアウトの下段に配置してください。
+- **ゲーム必須キー**: QWERTY 下段に `<` `>` `:` `,` を、Symbols レイアウトに `#` `@` `$` `^` `[` `+` `/` `?` `.` `*` を配置し、NetHack の主要コマンド（階段昇降、look、pick up、拡張コマンド、autopickup、呪文、what-is 等）をキーボードから直接入力できるようにしてください。
+
+### Flutter Colors スウォッチの null 安全性問題
+- Flutter の `Colors.grey` などの Material Color スウォッチは、**有効なインデックスが 50, 100, 200, 300, 400, 500, 600, 700, 800, 850, 900 のみ**です。`Colors.grey[950]` のように存在しないインデックスを指定すると `null` を返します。
+- この `null` に対して `!`（null check 演算子）を使用すると、実行時に **"Null check operator used on a null value"** エラーが発生し、Flutter のエラーウィジェット（真っ赤な画面）が表示されます。ゲーム画面全体が赤く覆われ、キーボードも表示されなくなります。
+- **対策**: `Colors.grey[950]!` のような記述を避け、`const Color(0xFF121212)` のように **`const Color(...)` 定数**を使用して色を指定してください。これにより null 安全性が保証され、コンパイル時定数として効率的に扱われます。
 
 ---
 
