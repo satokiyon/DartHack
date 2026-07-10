@@ -156,3 +156,40 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
    - ステータス表示部など、はみ出しが深刻な長文領域については、以下の2つのモードを選択・設定できるように構成してください：
      - **自動縮小フィット（Fit / デフォルト）**: `FittedBox` (`fit: BoxFit.scaleDown`) を用い、固定された高さの中でテキストを画面幅に合わせて自動的に縮小・圧縮する。
      - **領域の可変高さ（Wrap）**: テキストの長さに応じて自動的に折り返し、表示領域の高さ自体を動的に拡張する。
+
+5. **マップタップ時の C コア送信 (PosCmd キュー方式)**:
+   - 主人公タイルやマップタイルをタップした時に `#herecmdmenu` などの拡張コマンド**文字列**を 1 文字ずつ送信するのは **禁止**です。Flutter版 `get_ext_cmd` は `flutter_do_ext_cmd_menu`（拡張コマンド一覧を即座にメニュー起動）にハイジャックされており、文字列補完を行う `extcmd_via_menu` とは挙動が異なります。残り文字が `doread`/`doeat`/`doclose` 等の個別コマンドとして連続実行され、UX を破壊します。
+   - **正しい実装**: Java版互換の `PosCmd(x, y, mod)` 送信方式を採用してください。
+     - C側 `winflutter.c`:
+       - `PosCmdEntry` 構造体と `g_poscmd_queue` リングバッファ（`FLUTTER_MAX_POSCMD = 32` 程度）を用意。
+       - `SendPosCmdToFlutter(int x, int y, int mod)` 関数を追加し、FFI 経由で Dart 側から呼び出せるようにする。
+       - `flutter_nhgetch` 内で PosCmd キューもチェックし、エントリがあれば消費して `g_pending_poscmd_x/y/mod` グローバル変数に座標を退避、戻り値 0（クリックイベント）として返す。
+       - `flutter_nh_poskey` 内で PosCmd キューを先にチェックし、なければ `g_pending_poscmd` フラグを確認して復元、戻り値 0 で `x, y, mod` を `readchar_core` に渡す（`readchar_core` は `sym == 0` を `click_to_cmd` 経由でクリック系コマンドとして処理）。
+     - Dart側 `main.dart`:
+       - `sendPosCmd(int x, int y, int mod)` 関数を追加し、worker 経由で C コアの `SendPosCmdToFlutter` を呼び出す。
+       - `_handleMapTap` で `_sendExtendedCommand('#herecmdmenu')` ではなく `sendPosCmd(tile.tileX, tile.tileY, 1 /* CLICK_1 */)` を呼ぶ。
+     - 主人公の座標判定は C側 `flutter_cliparound` から Dart側 `setPlayerPos` へ通知される `(u.ux - 1, u.uy)`（0-based マップグリッド座標）を使用し、`dx == 0 && dy == 0` で同一タイルを判定します。
+   - `flutter_nh_poskey` から `readchar_core` への座標引き渡し: `nhgetch` 戻り値 0 はクリックイベントとして処理されますが、座標ポインタを返せないため、`g_pending_poscmd_*` グローバル変数経由で `nh_poskey` 側（次の readchar サイクル）に復元します。これにより PosCmd 1 個に対し `readchar` が 2 回呼ばれますが、機能上問題ありません（1 回目は `nhgetch` で PosCmd 消費、2 回目で `nh_poskey` が pending 復元して `click_to_cmd` 実行）。
+
+6. **`request_input` 受信時の自動 `Space(auto)` 送信とメニュー表示中のスキップ**:
+   - `request_input` 受信時のセーブ自動アドバンス処理で、一定条件を満たす場合に `WidgetsBinding.instance.addPostFrameCallback` 経由で `_sendFfiKey(32, 'Space(auto)')` を自動送信するロジックがあります（セーブ進行中のテキストを自動で進める用途）。
+   - この `Space(auto)` は `_sendFfiKey` 内のメニューガード（`if (_screen.isMenuWindowVisible)`）を通過し、Space/Enter/ESC として `_sendMenuSelection(-1)`（キャンセル）を発動するため、**メニューやテキストウィンドウが表示されている最中に `request_input` が届くと、即座にメニューが閉じてしまう**重大な UX 破壊を引き起こします。
+   - **対策**: `addPostFrameCallback` の中で Space を送信する直前に、**メニュー/テキストウィンドウが表示されていないことを再度チェック**してください（`canAutoAdvance` の判定時点と `addPostFrameCallback` 実行時点で状態が変わり得るため、二重チェックが必須）。
+     ```dart
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+       if (mounted && _waitingForInput
+           && !_screen.isMenuWindowVisible
+           && !_screen.isTextWindowVisible
+           && _screen.textLines.isEmpty
+           && !_isYnVisible
+           && !_isGetLineVisible
+           && !_isAskNameVisible) {
+         _sendFfiKey(32, 'Space(auto)');
+       }
+     });
+     ```
+
+7. **Dart 側デバッグログの出力先**:
+   - 既存の `_addLog(String msg)` は Flutter UI 内のログ表示エリア専用で、`adb logcat` や `flutter run` のコンソールには**出力されません**。
+   - デバッグ目的で `flutter run` のコンソールや logcat に出力したい場合は **`debugPrint`（`package:flutter/foundation.dart` 標準）** を使用してください。`print` も使用可能ですが、`debugPrint` の方が長い文字列を自動的に分割してくれるため推奨されます。
+   - デバッグログは **原因特定後、必ず削除してからコミット** してください（方針 6 参照）。

@@ -106,6 +106,21 @@ $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\sys\android\buil
 - この `null` に対して `!`（null check 演算子）を使用すると、実行時に **"Null check operator used on a null value"** エラーが発生し、Flutter のエラーウィジェット（真っ赤な画面）が表示されます。ゲーム画面全体が赤く覆われ、キーボードも表示されなくなります。
 - **対策**: `Colors.grey[950]!` のような記述を避け、`const Color(0xFF121212)` のように **`const Color(...)` 定数**を使用して色を指定してください。これにより null 安全性が保証され、コンパイル時定数として効率的に扱われます。
 
+### Flutter版 マップタップ時のメニュー表示（Java版 PosCmd 送信方式の踏襲）
+- Java版（`NHW_Map.onTouched` → `mNHState.sendPosCmd(x, y)` → `NetHackIO.sendPosCmd` → Cコア `and_nh_poskey` → `click_to_cmd` → `therecmdmenu` → メニュー）と互換のフローを採用しています。
+- **してはいけない実装**: 拡張コマンド `#herecmdmenu` の文字列を 1 文字ずつ送信する方式。Flutter版 `get_ext_cmd` は `flutter_do_ext_cmd_menu` (= 拡張コマンド一覧を即座にメニュー起動) でハイジャックされており、文字列補完を行う `extcmd_via_menu` とは挙動が異なります。結果として、`#` 受信時に拡張コマンド一覧が起動し、メニューが見えないまま残り文字 (`h e r e c m d m e n u`) が `doread`/`doeat`/`doclose` 等の個別コマンドとして連続実行され、`doclose` の「どの方向ですか?」プロンプトが出力されるなど、UX 破壊が発生します。
+- **正しい実装**: Cコアに `SendPosCmdToFlutter(x, y, mod)` 関数を追加し、Dart側 `sendPosCmd` 経由で PosCmd キュー（リングバッファ）に積み、`flutter_nh_poskey` が消費して `readchar_core` の `sym == 0` 経路（`click_to_cmd`）経由で `therecmdmenu` → `here_cmd_menu`（主人公タイル一致時）を起動します。
+- 主人公の座標判定には C側 `flutter_cliparound` から Dart側 `setPlayerPos` へ通知される `(u.ux - 1, u.uy)`（0-based マップグリッド座標）を使用します。
+
+### Flutter版 `nhgetch` 戻り値 0 と `readchar_core` のクリックイベント処理
+- NetHack の `readchar_core`（`src/cmd.c`）は `sym = nh_poskey(x, y, mod);` の戻り値が 0 の場合を**クリックイベント**として扱い、`click_to_cmd(*x, *y, *mod)` を呼び出します。`nhgetch` 戻り値 0 も同様にクリックイベントとして処理されますが、`nhgetch` からは `x, y, mod` ポインタ経由で座標を渡せません。
+- Flutter版では、PosCmd を `flutter_nhgetch` 側で先に消費し、座標情報を `g_pending_poscmd_x/y/mod` グローバル変数に退避した上で `nhgetch` 戻り値 0 を返します。次の `readchar` サイクルで `flutter_nh_poskey` が `g_pending_poscmd` を確認し、座標を復元してクリックイベント（戻り値 0）として `readchar_core` に渡します。
+- **副作用**: 1 回目の `readchar` で `nhgetch` が 0 を返した時点で `readchar_core` が `click_to_cmd(u.ux, u.uy, 0)` を呼び出し（`mod=0` は無効なクリック種別）、`nhbell`（ベル音）が 1 回鳴ります。機能上の問題はありません（2 回目の `readchar` で pending PosCmd が復元されて正常なメニューが起動する）が、ユーザーには「ベル音が鳴る」程度の副作用として観測されます。完全除去には NetHack 内部の変更が必要で、今回は見送っています。
+
+### Flutter版 マップ座標の座標系統一
+- 主人公位置・タップ座標は **すべて 0-based マップグリッド座標系**で扱ってください。C 側 `flutter_cliparound` で `u.ux - 1` して 0-based に変換し、Dart 側 `setPlayerPos(x, y)` に渡します（`u.ux` は 1-based、`u.uy` は 0-based のため、グリッド表示に合わせて x だけ `-1`）。
+- 主人公の同一タイル判定は `_handleMapTap` 内で `dx == 0 && dy == 0` で行います。Java 版の `mSelfRadiusSquared` 相当の半径判定は未実装（タイル座標完全一致のみ）ですが、必要に応じて `dx * dx + dy * dy <= radius * radius` 形式で拡張可能です。
+
 ---
 
 ## 4. オブジェクト名ローカライズ方針
