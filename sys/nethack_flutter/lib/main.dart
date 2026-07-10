@@ -143,6 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // 設定変更の即時反映用バージョンカウンター
   int _controlsVersion = 0;
   double _cmdPanelHeight = 58.0;
+  bool _showPanelNames = true;
   DPadMoveMode _dPadMoveMode = DPadMoveMode.normal;
   List<DPadMoveMode> _enabledDPadMoveModes = List<DPadMoveMode>.from(_allDPadMoveModes);
   bool _isDirectionPromptActive = false;
@@ -171,6 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _padScale = prefs.getDouble('pad_scale') ?? 1.0;
       _autoSaveInterval = prefs.getInt('auto_save_interval') ?? 0;
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
+      _showPanelNames = prefs.getBool('show_panel_names') ?? true;
       _drawerPosition = prefs.getString('drawer_position') ?? 'left';
       _menuButtonPosition = prefs.getString('menu_button_position') ?? 'top_left';
       _enabledDPadMoveModes = _parseEnabledMoveModes(
@@ -2217,6 +2219,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     NetHackCmdPanel(key: ValueKey(_controlsVersion),
+                      showPanelNames: _showPanelNames,
                       onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
                       onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
                       onPanelHeightChanged: (height) {

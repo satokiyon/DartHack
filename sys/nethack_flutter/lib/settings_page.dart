@@ -48,6 +48,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   final _channel = const MethodChannel('com.tbd.nethackjp/key_interceptor');
 
+  bool _showPanelNames = true;
+
   // コマンドパネル編集用
   final List<Map<String, dynamic>> _panels = [];
 
@@ -77,6 +79,8 @@ class _SettingsPageState extends State<SettingsPage> {
       for (int i = 0; i < 9; i++) {
         _shortcuts[i] = prefs.getString('shortcut_btn_$i') ?? _defaultShortcuts[i];
       }
+
+      _showPanelNames = prefs.getBool('show_panel_names') ?? true;
 
       // コマンドパネル情報のロード
       final int panelCount = prefs.getInt('panel_count') ?? 1;
@@ -655,6 +659,15 @@ class _SettingsPageState extends State<SettingsPage> {
       title: const Text("コマンドパネル編集"),
       subtitle: const Text("ゲーム下部スワイプ対応のボタン群を管理"),
       children: [
+        SwitchListTile(
+          title: const Text("パネル名を表示"),
+          subtitle: const Text("各パネル行の左端に名前バッジを表示"),
+          value: _showPanelNames,
+          onChanged: (val) {
+            setState(() => _showPanelNames = val);
+            _saveSetting('show_panel_names', val);
+          },
+        ),
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

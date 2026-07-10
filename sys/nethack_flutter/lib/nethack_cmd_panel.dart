@@ -6,6 +6,7 @@ class NetHackCmdPanel extends StatefulWidget {
   final Function(int) onRawKeyCode;
   final VoidCallback onToggleMode;
   final ValueChanged<double>? onPanelHeightChanged;
+  final bool showPanelNames;
 
   const NetHackCmdPanel({
     super.key,
@@ -13,6 +14,7 @@ class NetHackCmdPanel extends StatefulWidget {
     required this.onRawKeyCode,
     required this.onToggleMode,
     this.onPanelHeightChanged,
+    this.showPanelNames = true,
   });
 
   @override
@@ -164,19 +166,19 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                     ),
                     child: Row(
                       children: [
-                        // パネル名のバッジ
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          margin: const EdgeInsets.only(left: 6, right: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[800],
-                            borderRadius: BorderRadius.circular(4),
+                        if (widget.showPanelNames)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            margin: const EdgeInsets.only(left: 6, right: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[800],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              panel['name'],
+                              style: const TextStyle(color: Colors.amberAccent, fontSize: 9, fontWeight: FontWeight.bold),
+                            ),
                           ),
-                          child: Text(
-                            panel['name'],
-                            style: const TextStyle(color: Colors.amberAccent, fontSize: 9, fontWeight: FontWeight.bold),
-                          ),
-                        ),
                         // 横スクロール可能なボタン行
                         Expanded(
                           child: SingleChildScrollView(
