@@ -98,6 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey _mapViewportKey = GlobalKey();
   late TransformationController _transformationController;
   double _currentScale = 1.0; // ピンチズームで設定された現在のズーム率を保持する状態変数
+  TapDownDetails? _lastMapTapDownDetails; // マップタップ時の座標一時保持用
 
   // --- 新規同期ダイアログ用状態変数 ---
   bool _isYnVisible = false;
@@ -1398,7 +1399,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // (拡張コマンド "#herecmdmenu" の文字列送信は Flutter 版の get_ext_cmd
   //  実装 (メニュー起動型) と整合せず、メニュー表示前の残文字が暴走する
   //  ため廃止。Java 版の PosCmd 送信方式を踏襲する。)
-  void _handleMapTap(TapUpDetails details) {
+  void _handleMapTap(TapDownDetails details) {
     if (!_isMainGameStarted) return;
     final px = _screen.playerX;
     final py = _screen.playerY;
@@ -2350,7 +2351,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           // InteractiveViewer のパン/ピンチ操作と競合させない。
                           child: GestureDetector(
                             behavior: HitTestBehavior.translucent,
-                            onTapUp: _handleMapTap,
+                            onTapDown: (details) {
+                              _lastMapTapDownDetails = details;
+                            },
+                            onTap: () {
+                              if (_lastMapTapDownDetails != null) {
+                                _handleMapTap(_lastMapTapDownDetails!);
+                              }
+                            },
                             child: CustomPaint(
                               painter: NetHackMapPainter(
                                 screen: _screen,

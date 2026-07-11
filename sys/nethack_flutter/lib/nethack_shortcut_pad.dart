@@ -85,7 +85,7 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
     }
 
     return GestureDetector(
-      onTapDown: (_) => _handleMacroPress(shortcut),
+      onTap: () => _handleMacroPress(shortcut),
       onLongPress: () {
         if (widget.onShortcutLongPress != null) {
           widget.onShortcutLongPress!(index);
