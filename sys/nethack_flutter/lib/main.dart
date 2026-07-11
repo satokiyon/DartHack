@@ -869,6 +869,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // C 側からプレイヤー位置 (u.ux, u.uy) を受信。
           // マップの主人公タップ → #herecmdmenu 起動の判定に使用する。
           _screen.setPlayerPos(message['playerX'], message['playerY']);
+          _triggerCenterOnPlayer();
         } else if (type == 'request_input') {
           setState(() {
             _waitingForInput = true;
@@ -1178,8 +1179,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _sendModeAppliedDirection(String viKey, {bool useLongPressRun = false}) {
     if (useLongPressRun && !_isDirectionPromptActive) {
-      _sendFfiKey('g'.codeUnitAt(0), 'g', keepWaiting: true);
-      _sendFfiKey(viKey.codeUnitAt(0), viKey);
+      _sendFfiKeys(['g'.codeUnitAt(0), viKey.codeUnitAt(0)], 'g$viKey');
       return;
     }
 
@@ -1205,28 +1205,24 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         break;
       case DPadMoveMode.gLower:
-        _sendFfiKey('g'.codeUnitAt(0), 'g', keepWaiting: true);
-        _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
+        _sendFfiKeys(['g'.codeUnitAt(0), baseKey.codeUnitAt(0)], 'g$baseKey');
         break;
       case DPadMoveMode.gUpper:
-        _sendFfiKey('G'.codeUnitAt(0), 'G', keepWaiting: true);
-        _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
+        _sendFfiKeys(['G'.codeUnitAt(0), baseKey.codeUnitAt(0)], 'G$baseKey');
         break;
       case DPadMoveMode.ctrl:
         _sendFfiKey(_ctrlFromVi(viKey), '^$viKey');
         break;
       case DPadMoveMode.mCmd:
-        _sendFfiKey('m'.codeUnitAt(0), 'm', keepWaiting: true);
-        _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
+        _sendFfiKeys(['m'.codeUnitAt(0), baseKey.codeUnitAt(0)], 'm$baseKey');
         break;
       case DPadMoveMode.fCmd:
-        _sendFfiKey('F'.codeUnitAt(0), 'F', keepWaiting: true);
-        _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
+        _sendFfiKeys(['F'.codeUnitAt(0), baseKey.codeUnitAt(0)], 'F$baseKey');
         break;
     }
   }
 
-  void _sendFfiKey(int code, String label, {bool keepWaiting = false}) {
+  void _sendFfiKey(int code, String label) {
     if (!_waitingForInput) return;
 
     // メニュー表示中は、メニューショートカットキー判定を行う
@@ -1264,14 +1260,26 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     setState(() {
-      if (!keepWaiting) {
-        _waitingForInput = false;
-      }
+      _waitingForInput = false;
     });
     _addLog("> Send Key: '$label' ($code)");
     _workerSendPort?.send({
       'type': 'key',
       'key': code,
+    });
+  }
+
+  void _sendFfiKeys(List<int> codes, String label) {
+    if (!_waitingForInput) return;
+    if (_screen.isMenuWindowVisible) return;
+
+    setState(() {
+      _waitingForInput = false;
+    });
+    _addLog("> Send Keys: '$label' ($codes)");
+    _workerSendPort?.send({
+      'type': 'keys',
+      'keys': codes,
     });
   }
 
