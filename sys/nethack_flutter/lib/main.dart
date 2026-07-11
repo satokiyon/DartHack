@@ -2330,77 +2330,78 @@ class _MyHomePageState extends State<MyHomePage> {
       left: 0,
       right: 0,
       bottom: 0,
-      child: Opacity(
-        opacity: _padOpacity,
-        child: Transform.scale(
-          scale: _padScale,
-          alignment: Alignment.bottomCenter,
-          child: _controllerMode == ControllerMode.keyboard
-              ? NetHackKeyboard(
-                  onKeyPress: (key) => _sendKeysToC(key),
-                  onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                  onToggleMode: () {
-                    setState(() {
-                      _controllerMode = ControllerMode.pad;
-                    });
-                  },
-                )
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // ボタンモード (左端に D-Pad, 右端に 3x3 ショートカットパッド)
-                    Container(
-                      color: Colors.grey[950],
-                      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          NetHackDPad(
-                            directionLabels: _buildDirectionLabels(),
-                            centerLabel: _moveModeLabel(_dPadMoveMode),
-                            onDirectionPress: (viKey) {
-                              _sendModeAppliedDirection(viKey);
-                            },
-                            onDirectionLongPress: (viKey) {
-                              _sendModeAppliedDirection(viKey, useLongPressRun: true);
-                            },
-                            onCenterTap: _cycleDPadMoveMode,
-                            onCenterLongPress: () {
-                              _showMoveModeSelectDialog();
-                            },
-                          ),
-                          NetHackShortcutPad(key: ValueKey(_controlsVersion),
-                            onKeyPress: (key) => _sendKeysToC(key),
-                            onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                            onShortcut: (cmd) => _sendShortcutToC(cmd),
-                          ),
-                        ],
-                      ),
+      child: Transform.scale(
+        scale: _padScale,
+        alignment: Alignment.bottomCenter,
+        child: _controllerMode == ControllerMode.keyboard
+            ? NetHackKeyboard(
+                opacity: _padOpacity,
+                onKeyPress: (key) => _sendKeysToC(key),
+                onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                onToggleMode: () {
+                  setState(() {
+                    _controllerMode = ControllerMode.pad;
+                  });
+                },
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // ボタンモード (左端に D-Pad, 右端に 3x3 ショートカットパッド)
+                  Container(
+                    color: Colors.transparent,
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        NetHackDPad(
+                          opacity: _padOpacity,
+                          directionLabels: _buildDirectionLabels(),
+                          centerLabel: _moveModeLabel(_dPadMoveMode),
+                          onDirectionPress: (viKey) {
+                            _sendModeAppliedDirection(viKey);
+                          },
+                          onDirectionLongPress: (viKey) {
+                            _sendModeAppliedDirection(viKey, useLongPressRun: true);
+                          },
+                          onCenterTap: _cycleDPadMoveMode,
+                          onCenterLongPress: () {
+                            _showMoveModeSelectDialog();
+                          },
+                        ),
+                        NetHackShortcutPad(key: ValueKey(_controlsVersion),
+                          opacity: _padOpacity,
+                          onKeyPress: (key) => _sendKeysToC(key),
+                          onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                          onShortcut: (cmd) => _sendShortcutToC(cmd),
+                        ),
+                      ],
                     ),
-                    NetHackCmdPanel(key: ValueKey(_controlsVersion),
-                      showPanelNames: _showPanelNames,
-                      onKeyPress: (key) => _sendKeysToC(key),
-                      onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
-                      onPanelHeightChanged: (height) {
-                        if ((_cmdPanelHeight - height).abs() < 0.1) {
-                          return;
-                        }
-                        if (!mounted) {
-                          return;
-                        }
-                        setState(() {
-                          _cmdPanelHeight = height;
-                        });
-                      },
-                      onToggleMode: () {
-                        setState(() {
-                          _controllerMode = ControllerMode.keyboard;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-        ),
+                  ),
+                  NetHackCmdPanel(key: ValueKey(_controlsVersion),
+                    opacity: _padOpacity,
+                    showPanelNames: _showPanelNames,
+                    onKeyPress: (key) => _sendKeysToC(key),
+                    onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
+                    onPanelHeightChanged: (height) {
+                      if ((_cmdPanelHeight - height).abs() < 0.1) {
+                        return;
+                      }
+                      if (!mounted) {
+                        return;
+                      }
+                      setState(() {
+                        _cmdPanelHeight = height;
+                      });
+                    },
+                    onToggleMode: () {
+                      setState(() {
+                        _controllerMode = ControllerMode.keyboard;
+                      });
+                    },
+                  ),
+                ],
+              ),
       ),
     );
   }

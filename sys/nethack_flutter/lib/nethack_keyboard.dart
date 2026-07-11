@@ -21,12 +21,14 @@ class NetHackKeyboard extends StatefulWidget {
   final Function(String) onKeyPress;
   final Function(int) onRawKeyCode;
   final VoidCallback onToggleMode;
+  final double opacity;
 
   const NetHackKeyboard({
     super.key,
     required this.onKeyPress,
     required this.onRawKeyCode,
     required this.onToggleMode,
+    this.opacity = 1.0,
   });
 
   @override
@@ -132,7 +134,7 @@ class _NetHackKeyboardState extends State<NetHackKeyboard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: _bgColor(),
+      color: _bgColor().withValues(alpha: widget.opacity),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: _buildLayout(),
@@ -279,7 +281,7 @@ class _NetHackKeyboardState extends State<NetHackKeyboard> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 1.5),
         child: Material(
-          color: _keyBg,
+          color: _keyBg.withValues(alpha: widget.opacity),
           borderRadius: BorderRadius.circular(4),
           child: InkWell(
             onTap: () => _tapKey(label, code),
@@ -307,7 +309,7 @@ class _NetHackKeyboardState extends State<NetHackKeyboard> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 1.5),
         child: Material(
-          color: _metaKeyBg,
+          color: _metaKeyBg.withValues(alpha: widget.opacity),
           borderRadius: BorderRadius.circular(4),
           child: InkWell(
             onTap: () => widget.onRawKeyCode(k.code),
@@ -335,7 +337,7 @@ class _NetHackKeyboardState extends State<NetHackKeyboard> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 1.5),
         child: Material(
-          color: _ctrlKeyBg,
+          color: _ctrlKeyBg.withValues(alpha: widget.opacity),
           borderRadius: BorderRadius.circular(4),
           child: InkWell(
             onTap: () => widget.onRawKeyCode(k.code),
@@ -387,7 +389,7 @@ class _NetHackKeyboardState extends State<NetHackKeyboard> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 1.5),
         child: Material(
-          color: bg,
+          color: bg.withValues(alpha: widget.opacity),
           borderRadius: BorderRadius.circular(4),
           child: InkWell(
             onTap: () => _tapNav(label),

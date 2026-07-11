@@ -8,6 +8,8 @@ class NetHackCmdPanel extends StatefulWidget {
   final ValueChanged<double>? onPanelHeightChanged;
   final bool showPanelNames;
 
+  final double opacity;
+
   const NetHackCmdPanel({
     super.key,
     required this.onKeyPress,
@@ -15,6 +17,7 @@ class NetHackCmdPanel extends StatefulWidget {
     required this.onToggleMode,
     this.onPanelHeightChanged,
     this.showPanelNames = true,
+    this.opacity = 1.0,
   });
 
   @override
@@ -112,11 +115,11 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
         duration: const Duration(milliseconds: 200),
         curve: Curves.fastOutSlowIn,
         height: totalHeight,
-        decoration: const BoxDecoration(
-          color: Colors.black87,
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.87 * widget.opacity),
           border: Border(
-            top: BorderSide(color: Colors.white10, width: 0.5),
-            bottom: BorderSide(color: Colors.white10, width: 0.5),
+            top: BorderSide(color: Colors.white.withValues(alpha: 0.1 * widget.opacity), width: 0.5),
+            bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1 * widget.opacity), width: 0.5),
           ),
         ),
         child: Column(
@@ -125,7 +128,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
             Container(
               height: headerHeight,
               width: double.infinity,
-              color: Colors.grey[900],
+              color: (Colors.grey[900] ?? const Color(0xFF212121)).withValues(alpha: widget.opacity),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -160,7 +163,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: index < visiblePanels.length - 1
-                            ? const BorderSide(color: Colors.white10, width: 0.5)
+                            ? BorderSide(color: Colors.white.withValues(alpha: 0.1 * widget.opacity), width: 0.5)
                             : BorderSide.none,
                       ),
                     ),
@@ -171,7 +174,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             margin: const EdgeInsets.only(left: 6, right: 2),
                             decoration: BoxDecoration(
-                              color: Colors.grey[800],
+                              color: (Colors.grey[800] ?? const Color(0xFF424242)).withValues(alpha: widget.opacity),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -219,10 +222,15 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
 
   Widget _buildCmdButton(BuildContext context, String cmd) {
     final isKbdToggle = cmd == '[Kbd]';
+    final buttonColor = isKbdToggle
+        ? (Colors.deepPurple[900] ?? const Color(0xFF311B92))
+        : (Colors.grey[900] ?? const Color(0xFF212121));
+    final textColor = isKbdToggle ? Colors.amber : Colors.white70;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 1.5, vertical: 3),
       child: Material(
-        color: isKbdToggle ? Colors.deepPurple[900] : Colors.grey[900],
+        color: buttonColor.withValues(alpha: widget.opacity),
         borderRadius: BorderRadius.circular(4),
         child: InkWell(
           onTap: () => _handleCmdPress(cmd),
@@ -234,7 +242,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
             child: Text(
               cmd,
               style: TextStyle(
-                color: isKbdToggle ? Colors.amber : Colors.white70,
+                color: textColor,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),

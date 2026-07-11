@@ -6,11 +6,14 @@ class NetHackShortcutPad extends StatefulWidget {
   final Function(int) onRawKeyCode;
   final Function(String) onShortcut;
 
+  final double opacity;
+
   const NetHackShortcutPad({
     super.key,
     required this.onKeyPress,
     required this.onRawKeyCode,
     required this.onShortcut,
+    this.opacity = 1.0,
   });
 
   @override
@@ -20,7 +23,7 @@ class NetHackShortcutPad extends StatefulWidget {
 class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
   final List<String> _shortcuts = List.filled(9, "");
   final List<String> _defaultShortcuts = [
-    'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', 'o', 'd', 'e', 'r'
+    'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', '#attributes'
   ];
   bool _isLoading = true;
 
@@ -59,9 +62,9 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
       width: 150,
       height: 150,
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.3),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white12, width: 1.5),
+        border: Border.all(color: const Color(0xFF3E3E3E).withValues(alpha: widget.opacity), width: 1.5),
       ),
       padding: const EdgeInsets.all(6),
       child: GridView.count(
@@ -83,7 +86,7 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
       onTapDown: (_) => _handleMacroPress(shortcut),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white10,
+          color: const Color(0xFF1E1E1E).withValues(alpha: widget.opacity),
           borderRadius: BorderRadius.circular(6),
         ),
         alignment: Alignment.center,

@@ -8,6 +8,8 @@ class NetHackDPad extends StatelessWidget {
   final VoidCallback onCenterTap;
   final VoidCallback onCenterLongPress;
 
+  final double opacity;
+
   const NetHackDPad({
     super.key,
     required this.directionLabels,
@@ -16,6 +18,7 @@ class NetHackDPad extends StatelessWidget {
     required this.onCenterTap,
     required this.onCenterLongPress,
     this.onDirectionLongPress,
+    this.opacity = 1.0,
   });
 
   @override
@@ -24,9 +27,9 @@ class NetHackDPad extends StatelessWidget {
       width: 150,
       height: 150,
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.3),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(75),
-        border: Border.all(color: Colors.white12, width: 1.5),
+        border: Border.all(color: const Color(0xFF3E3E3E).withValues(alpha: opacity), width: 1.5),
       ),
       padding: const EdgeInsets.all(8),
       child: GridView.count(
@@ -56,8 +59,8 @@ class NetHackDPad extends StatelessWidget {
           ? null
           : () => onDirectionLongPress!(viKey),
       child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white10,
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E1E1E).withValues(alpha: opacity),
           shape: BoxShape.circle,
         ),
         alignment: Alignment.center,
@@ -78,8 +81,8 @@ class NetHackDPad extends StatelessWidget {
       onTap: onCenterTap,
       onLongPress: onCenterLongPress,
       child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white10,
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E1E1E).withValues(alpha: opacity),
           shape: BoxShape.circle,
         ),
         alignment: Alignment.center,
