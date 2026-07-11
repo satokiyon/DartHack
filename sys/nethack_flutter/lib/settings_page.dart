@@ -28,7 +28,7 @@ class _SettingsPageState extends State<SettingsPage> {
   double _padOpacity = 0.8;
   double _padScale = 1.0;
   String _drawerPosition = 'left';
-  String _menuButtonPosition = 'top_left';
+  String _menuButtonPosition = 'bottom_left';
 
   // 物理キー割り当て (デフォルト: 0 = なし)
   int _volupAction = 0;
@@ -38,7 +38,7 @@ class _SettingsPageState extends State<SettingsPage> {
   // ショートカット設定 (0～8)
   final List<String> _shortcuts = List.filled(9, "");
   final List<String> _defaultShortcuts = [
-    'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', 'o', 'd', 'e', 'r'
+    'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', '#attributes'
   ];
   final List<String> _shortcutLabels = [
     "左上ボタン (0)", "上中央ボタン (1)", "右上ボタン (2)",
@@ -70,7 +70,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _padOpacity = prefs.getDouble('pad_opacity') ?? 0.8;
       _padScale = prefs.getDouble('pad_scale') ?? 1.0;
       _drawerPosition = prefs.getString('drawer_position') ?? 'left';
-      _menuButtonPosition = prefs.getString('menu_button_position') ?? 'top_left';
+      _menuButtonPosition = prefs.getString('menu_button_position') ?? 'bottom_left';
 
       _volupAction = prefs.getInt('key_volup_action') ?? 0;
       _voldownAction = prefs.getInt('key_voldown_action') ?? 0;
