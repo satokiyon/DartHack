@@ -80,6 +80,18 @@ DLL_EXPORT void SendKeyToFlutter(int key) {
     g_next_key = key;
 }
 
+DLL_EXPORT void SendKeysToFlutter(const int* keys, int len) {
+    if (keys && len > 0) {
+        g_next_key = keys[0];
+    }
+}
+
+DLL_EXPORT void SendShortcutToFlutter(const int* keys, int len) {
+    if (keys && len > 0) {
+        g_next_key = keys[0];
+    }
+}
+
 DLL_EXPORT void SendMenuSelection(long ident) {
     (void)ident;
 }

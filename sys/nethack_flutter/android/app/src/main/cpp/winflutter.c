@@ -121,6 +121,13 @@ static volatile int g_poscmd_head = 0;
 static volatile int g_poscmd_tail = 0;
 static volatile int g_poscmd_count = 0;
 
+#define FLUTTER_MAX_KEYS 64
+static int g_key_queue[FLUTTER_MAX_KEYS];
+static volatile int g_key_head = 0;
+static volatile int g_key_tail = 0;
+static volatile int g_key_count = 0;
+static volatile int g_pending_extcmd_mode = 0;
+
 // flutter_nhgetch 内で PosCmd を消費した時に、その情報を
 // flutter_nh_poskey に橋渡しするためのグローバル変数。
 // (nhgetch からは x,y,mod ポインタを返せないため、nh_poskey が
@@ -385,6 +392,47 @@ void SendKeyToFlutter(int key) {
     g_last_received_key = key;
     g_key_available = 1;
     debuglog("C core received key: %d", key);
+}
+
+void SendKeysToFlutter(const int* keys, int len) {
+    if (!keys || len <= 0) return;
+    int enqueued = 0;
+    for (int i = 0; i < len; i++) {
+        if (g_key_count >= FLUTTER_MAX_KEYS) {
+            debuglog("SendKeysToFlutter: queue full, dropping key=%d (i=%d, queued=%d)", keys[i], i, enqueued);
+            return;
+        }
+        g_key_queue[g_key_tail] = keys[i];
+        g_key_tail = (g_key_tail + 1) % FLUTTER_MAX_KEYS;
+        g_key_count++;
+        enqueued++;
+    }
+    debuglog("C core received %d keys via SendKeysToFlutter (total queued=%d)", enqueued, g_key_count);
+}
+
+void SendShortcutToFlutter(const int* keys, int len) {
+    if (!keys || len <= 0) return;
+    int enqueued = 0;
+    for (int i = 0; i < len; i++) {
+        if (g_key_count >= FLUTTER_MAX_KEYS) {
+            debuglog("SendShortcutToFlutter: queue full, dropping key=%d (i=%d, queued=%d)", keys[i], i, enqueued);
+            return;
+        }
+        g_key_queue[g_key_tail] = keys[i];
+        g_key_tail = (g_key_tail + 1) % FLUTTER_MAX_KEYS;
+        g_key_count++;
+        enqueued++;
+    }
+    if (enqueued > 1 && keys[0] == '#') {
+        g_pending_extcmd_mode = 1;
+        debuglog("SendShortcutToFlutter: extcmd shortcut detected (len=%d, first='#'), set g_pending_extcmd_mode=1", enqueued);
+    }
+}
+
+void SetExtMenuFlutter(int enable) {
+    iflags.extmenu = enable;
+    __sync_synchronize();
+    debuglog("SetExtMenuFlutter: iflags.extmenu = %d", enable);
 }
 
 // Dart 側から PosCmd (座標クリック) を受け取る関数。
@@ -870,6 +918,31 @@ static void flutter_delay_output(void) {
 static int flutter_nhgetch(void) {
     debuglog("flutter_nhgetch called. Waiting for key...");
 
+    if (g_poscmd_count > 0) {
+        PosCmdEntry cmd = g_poscmd_queue[g_poscmd_head];
+        g_poscmd_head = (g_poscmd_head + 1) % FLUTTER_MAX_POSCMD;
+        g_poscmd_count--;
+        g_pending_poscmd_x = cmd.x;
+        g_pending_poscmd_y = cmd.y;
+        g_pending_poscmd_mod = cmd.mod;
+        g_pending_poscmd = 1;
+        g_key_available = 1;
+        g_last_received_key = 0;
+        debuglog("flutter_nhgetch: forwarded PosCmd to pending x=%d y=%d mod=%d (remaining=%d)",
+                 cmd.x, cmd.y, cmd.mod, g_poscmd_count);
+        return 0;
+    }
+
+    if (g_key_count > 0) {
+        int key = g_key_queue[g_key_head];
+        g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
+        g_key_count--;
+        g_key_available = 1;
+        g_last_received_key = key;
+        debuglog("flutter_nhgetch: dispatched from key queue: %d (remaining=%d)", key, g_key_count);
+        return key;
+    }
+
     g_input_request_id++;
     g_key_available = 0;
 
@@ -878,13 +951,6 @@ static int flutter_nhgetch(void) {
     }
 
     while (!g_key_available) {
-        // PosCmd キューにエントリがあれば、それを消費してクリックイベント
-        // (戻り値 0) として返す。readchar_core は sym == 0 をクリックイベント
-        // として扱う (click_to_cmd 呼び出し) ため、nhgetch 戻り値 0 でも
-        // therecmdmenu/clicklook 等のクリック系コマンドが起動される。
-        // なお、x/y/mod は nhgetch からはポインタで返せないため、
-        // グローバル g_pending_poscmd_* に退避し、flutter_nh_poskey 側で
-        // 次の readchar サイクル時に復元する。
         if (g_poscmd_count > 0) {
             PosCmdEntry cmd = g_poscmd_queue[g_poscmd_head];
             g_poscmd_head = (g_poscmd_head + 1) % FLUTTER_MAX_POSCMD;
@@ -894,12 +960,21 @@ static int flutter_nhgetch(void) {
             g_pending_poscmd_mod = cmd.mod;
             g_pending_poscmd = 1;
             g_key_available = 1;
-            g_last_received_key = 0; // クリックイベント
-            debuglog("flutter_nhgetch: forwarded PosCmd to pending x=%d y=%d mod=%d (remaining=%d)",
+            g_last_received_key = 0;
+            debuglog("flutter_nhgetch: forwarded PosCmd from wait loop x=%d y=%d mod=%d (remaining=%d)",
                      cmd.x, cmd.y, cmd.mod, g_poscmd_count);
-            break;
+            return 0;
         }
-        usleep(10000); // 10ms
+        if (g_key_count > 0) {
+            int key = g_key_queue[g_key_head];
+            g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
+            g_key_count--;
+            g_key_available = 1;
+            g_last_received_key = key;
+            debuglog("flutter_nhgetch: dispatched from key queue in wait loop: %d (remaining=%d)", key, g_key_count);
+            return key;
+        }
+        usleep(10000);
     }
 
     debuglog("flutter_nhgetch returning key: %d", g_last_received_key);
@@ -1118,6 +1193,110 @@ static int flutter_select_menu(winid wid, int how, menu_item **selected) {
     return g_selected_menu_count;
 }
 
+static const char* flutter_complete_ext_cmd(const char* base) {
+    int i, icmd = -1;
+    int baselen;
+
+    if (!base) return 0;
+    baselen = (int) strlen(base);
+    if (baselen == 0) return 0;
+
+    for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++) {
+        if (!strncmpi(base, extcmdlist[i].ef_txt, baselen)) {
+            if (icmd == -1) {
+                icmd = i;
+            } else {
+                return 0;
+            }
+        }
+    }
+
+    if (icmd >= 0) {
+        return extcmdlist[icmd].ef_txt;
+    }
+    return 0;
+}
+
+static void flutter_get_ext_cmd_auto(const char* query, char* bufp) {
+    int n = 0, nl = 0;
+    const char* complete = 0;
+    int c;
+    const int maxc = COLNO >= BUFSZ ? BUFSZ - 1 : COLNO;
+    char display[BUFSZ];
+    char prompt[BUFSZ];
+
+    Snprintf(prompt, sizeof(prompt), "%s ", query);
+    flutter_putstr(WIN_MESSAGE, ATR_NONE, prompt);
+    bufp[0] = 0;
+
+    for (;;) {
+        c = flutter_nhgetch();
+        if (c == EOF || c == '\n') {
+            bufp[n] = 0;
+            if (complete) {
+                strcpy(bufp, complete);
+            }
+            flutter_save_message(bufp);
+            break;
+        }
+        if (c == '\033') {
+            bufp[0] = (char) c;
+            bufp[1] = 0;
+            break;
+        }
+        if (c == 0x7f) {
+            if (n > 0) {
+                bufp[--n] = 0;
+            }
+        } else if ((unsigned char) c >= ' ' && n < maxc) {
+            bufp[n] = (char) c;
+            bufp[++n] = 0;
+        }
+        complete = flutter_complete_ext_cmd(bufp);
+        if (complete) {
+            Snprintf(display, sizeof(display), "%s%s", bufp, complete + n);
+            flutter_putstr(WIN_MESSAGE, ATR_NONE, display);
+        } else {
+            flutter_putstr(WIN_MESSAGE, ATR_NONE, bufp);
+        }
+        nl = complete ? (int) strlen(complete) : n;
+    }
+    clear_nhwindow(WIN_MESSAGE);
+}
+
+static int do_ext_cmd_text_flutter(void) {
+    int i;
+    char buf[BUFSZ];
+
+    flutter_get_ext_cmd_auto("#", buf);
+
+    (void) mungspaces(buf);
+    if (buf[0] == 0 || buf[0] == '\033') {
+        return -1;
+    }
+
+    if (!gi.in_doagain) {
+        int j;
+        for (j = 0; buf[j]; j++) {
+            cmdq_add_key(CQ_REPEAT, buf[j]);
+        }
+        cmdq_add_key(CQ_REPEAT, '\n');
+    }
+
+    for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++) {
+        if (!strcmpi(buf, extcmdlist[i].ef_txt)) break;
+    }
+
+    if (extcmdlist[i].ef_txt == (char *)0) {
+        char err[BUFSZ];
+        Snprintf(err, sizeof(err), "%s: unknown extended command.", buf);
+        flutter_putstr(WIN_MESSAGE, ATR_NONE, err);
+        i = -1;
+    }
+
+    return i;
+}
+
 static int flutter_do_ext_cmd_menu(boolean complete) {
     winid wid;
     int i, count, what, flgs;
@@ -1182,8 +1361,16 @@ static int flutter_do_ext_cmd_menu(boolean complete) {
 }
 
 static int flutter_get_ext_cmd(void) {
-    debuglog("flutter_get_ext_cmd: using Flutter-native ext command menu");
-    return flutter_do_ext_cmd_menu(FALSE);
+    debuglog("flutter_get_ext_cmd: g_pending_extcmd_mode = %d, iflags.extmenu = %d",
+             g_pending_extcmd_mode, iflags.extmenu);
+    if (g_pending_extcmd_mode) {
+        g_pending_extcmd_mode = 0;
+        return do_ext_cmd_text_flutter();
+    }
+    if (iflags.extmenu) {
+        return flutter_do_ext_cmd_menu(FALSE);
+    }
+    return do_ext_cmd_text_flutter();
 }
 
 // windowprocs と and_procs を同時にハイジャックする関数
