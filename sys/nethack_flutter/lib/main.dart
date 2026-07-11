@@ -737,8 +737,8 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isSaveInProgressMessage(String text) {
     final normalized = text.trim();
     if (normalized.isEmpty) return false;
-    return normalized.contains('セーブ中')
-        || normalized.toLowerCase().contains('saving');
+    return normalized.startsWith('セーブ中')
+        || normalized.startsWith('Saving...');
   }
 
   Future<void> _showExitDialogAndTerminate(String message) async {
