@@ -494,8 +494,20 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  bool get _hasAnyActiveOverlay {
+    return _screen.isMenuWindowVisible ||
+        _screen.isTextWindowVisible ||
+        _isYnVisible ||
+        _isGetLineVisible ||
+        _isAskNameVisible;
+  }
+
+  bool get _shouldShowController {
+    return _isGameRunning && _isKeyboardVisible && !_hasAnyActiveOverlay;
+  }
+
   double _controllerReservedHeight() {
-    final controllerVisible = _isGameRunning && _isKeyboardVisible && _waitingForInput;
+    final controllerVisible = _shouldShowController;
     if (!controllerVisible) {
       return 0.0;
     }
@@ -2322,7 +2334,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildControllerOverlay() {
-    if (!_isGameRunning || !_isKeyboardVisible || !_waitingForInput) {
+    if (!_shouldShowController) {
       return const SizedBox.shrink();
     }
 
