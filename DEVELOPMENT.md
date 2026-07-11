@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-10. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-11. -->
 # NetHackJP-Android 開発メモ
 
 本ドキュメントは、Android ポートの日本語化リポジトリである `NetHackJP-Android` の開発環境の構築、ビルド、マージ運用およびリリース手順についてまとめたものです。
@@ -256,4 +256,103 @@ GitHub上の Releases ページから新規リリースを作成し、ビルド�
     - リスク: NetHack 仕様への深い理解が必要。`getline` や他の `nhgetch` 呼び出し箇所の挙動が変わる可能性。
 - **現状の見送り理由**: 機能上の問題はなく、副作用は「ベル音 1 回」のみで UX への実害は限定的。完全除去案はいずれも NetHack 内部の既存ロジックへの干渉が避けられず、回帰テストの工数が大きい。将来的にユーザーからベル音への苦情が寄せられた場合や、コア側のメンテナンスで再検討可能なタイミングで再評価する。
 
+---
 
+## Flutter版ショートカット多文字入力修正 (2026-07-11)
+
+Flutter 移植版において、ショートカットボタンに登録された拡張コマンド (`#herecmdmenu` 等) や複数文字マクロ (`100g` 等) を C コアに送信すると、最初の 1 文字しか届かないバグの修正作業記録と、そこから得られた知見をまとめます。
+
+### 問題
+
+ショートカットボタンの押下により Dart 側 `_handleMacroPress` の for ループで `worker.send(...)` を呼んで複数文字を連続送信しても、C コア側では最初の 1 文字 (`#`) だけを受信して拡張コマンドモードが起動し、残りの文字列 (`herecmdmenu`) が別コマンドとして連続実行される問題が発生していました。
+
+根本原因は、Flutter 版の `get_ext_cmd` 実装が **メニュー即起動方式 (`flutter_do_ext_cmd_menu`)** にハイジャックされており、上流版 (`extcmd_via_menu`) が持っている「`#` 直後に来た文字列を 1 つの拡張コマンド名に補完する」テキストパスが存在しないこと。一方、Java 版 (`Cmd.KeySequnece.execute` → `NHState.sendCmdString`) は **`#` 受信時に `iflags.extmenu` を一旦 OFF にしてからテキストを送信** し、テキスト入力経路で 1 つの拡張コマンドとして解釈させる、という設計でこれを回避していました。
+
+### 解決アプローチ
+
+Java 版と等価のフローを Flutter 版でも実現する方針を採りました。
+
+1. **状態管理を C 側 NetHack スレッドに集約**: 別スレッド (Dart isolate や Worker) から `iflags.extmenu` を直接書き換えるアプローチはメモリ可視性問題で失敗するため、状態を C 側 1 スレッドで完結させます。
+2. **C 側フラグ (`g_pending_extcmd_mode`) 方式**: `SendKeysToFlutter` / `SendShortcutToFlutter` 内で投入文字列の先頭が `#` の場合にフラグをセットし、`flutter_get_ext_cmd` 入口でフラグを判定して「テキスト入力パス (`extcmd_via_menu` 相当)」を強制起動します。
+3. **用途別 FFI 関数の新設**: 通常のマクロ送信用 `SendKeysToFlutter` と、ショートカットボタン専用の `SendShortcutToFlutter` を分離し、コマンドパネルの `#` ボタンやキーボード `#` が誤って拡張コマンドテキストパスを起動しないようにします。
+
+`winflutter.c:124` 付近の `flutter_get_ext_cmd` 実装が、フラグ判定→テキストパス強制起動のエントリポイントです。
+
+```c
+// flutter_get_ext_cmd: フラグが立っていればテキストパスに強制分岐
+if (g_pending_extcmd_mode) {
+    g_pending_extcmd_mode = 0;
+    return do_ext_cmd_text_flutter();  // 残りの文字列を g_key_queue から消費
+}
+```
+
+### 実装のイテレーション履歴
+
+同一目的の修正を 4 回失敗し、5 回目で成功しました。各段階の失敗理由を記録しておきます。
+
+#### 失敗 1: Dart UI スレッドから `setExtMenuFlutter(0)` を直接呼ぶ
+- 症状: C 側 NetHack スレッドが古い `iflags.extmenu=1` を読むメモリ可視性問題。
+- 教訓: 別スレッドから共有変数を変更しても、`__sync_synchronize()` を入れても反映されないケースがある。
+
+#### 失敗 2: `__sync_synchronize()` メモリバリアを追加
+- 症状: 依然として反映されない。メモリバリアでは **Dart isolate → Worker → C 側 FFI** という FFI 呼び出し順序が保証されないことが判明。
+
+#### 失敗 3: `setExtMenuFlutter(0)` を Worker 経由に統一
+- 症状: ログが出ない = 古い Worker コードが動作していた。Flutter のビルドキャッシュが dart 側に古いバージョンを保持しており、再起動後も反映されない。
+
+#### 失敗 4: `SendKeysWithExtMenuToFlutter` を新設 (1 回の FFI 呼び出しで完結)
+- 症状: ログが出ない = まだキャッシュ問題。`flutter clean && flutter pub get && flutter run` を実行するまで反映されず。
+
+#### 成功: C 側 1 スレッド完結の `g_pending_extcmd_mode` フラグ方式
+- Dart 側からの `SendShortcutToFlutter` 内でショートカット文字列を `g_key_queue` リングバッファに投入し、`g_pending_extcmd_mode` フラグをセット。
+- C 側 `flutter_get_ext_cmd` 入口でフラグを判定し、テキストパス強制起動 (残りの文字列を `g_key_queue` から逐次消費)。
+- **ポイント**: フラグのセットも読み取りも C 側 NetHack スレッド内で行うため、メモリ可視性問題が発生しない。
+
+#### 追加バグ修正: コマンドパネル `#` ボタンとキーボード `#` の誤扱い
+- 失敗後の実装で `SendKeysToFlutter` を通常マクロとショートカットの両方で使用していたため、コマンドパネルの `#` 単発ボタン (拡張コマンドメニュー起動用) も `g_pending_extcmd_mode` フラグを立ててしまい、テキストパスが誤起動。
+- **対策**: ショートカットボタン専用の `SendShortcutToFlutter` を新設し、フラグセット処理をショートカット経由でのみ行うよう分離。コマンドパネル `#` は通常マクロ送信 (`SendKeysToFlutter`) 経由のままにし、フラグを立てない。
+
+#### 追加調整: `#` 単体のショートカットはメニュー表示にする
+- ユーザー指示により、ショートカットに登録された `#` 単体 (1 文字) はメニュー表示にし、複数文字 (例: `#herecmdmenu`) のときだけテキストパスを起動するよう変更。
+- **実装**: C 側 `SendShortcutToFlutter` 内で `enqueued > 1 && keys[0] == '#'` を判定し、Dart 側ショートカットボタン UI で `#` 単体のときは末尾 `\n` を付けない。
+
+### 学び
+
+#### 1. メモリ可視性に関する教訓
+Flutter isolate 経由の FFI 呼び出しと C 側 NetHack スレッド間で状態を共有する場合、**スレッド跨ぎによる可視性問題** が発生します。`__sync_synchronize()` のようなメモリバリアだけでは Dart isolate の FFI 呼び出し順序を保証できず、別スレッドから書き込んだ値が別スレッドから読める保証はありません。**最も確実な解決策は、状態管理を C 側 1 スレッドに集約する設計**です。書き込みも読み取りも同じスレッド (NetHack メインループ) で行えば、可視性問題を原理的に回避できます。
+
+#### 2. 過剰実装を避ける
+今回、同一目的 (`#` 入力時に拡張コマンドテキストパスを起動) の実装を 4 回変更しました。各段階で「前の実装では不十分」と判断して新方式を追加しましたが、最初の設計 (別スレッドから `iflags.extmenu` を書く) はそもそも根本的に間違っていました。**別スレッドから状態を変更する設計は避け、同一スレッド内で完結する設計を優先する** ことが、同種バグの混入を防ぐ鍵です。最初の段階でこの原則に立ち返っていれば、3 回の失敗を回避できました。
+
+#### 3. FFI 設計の単一責任原則
+1 つの FFI 関数を複数の用途で使い回した結果、意図しない呼び出し元が混入してバグになりました (`SendKeysToFlutter` を通常マクロとショートカット両方で使った結果、コマンドパネル `#` ボタンもショートカット扱いになった)。**用途別に専用 FFI 関数を新設する** ことで、責務を明確に分離できます。「1 回の FFI 呼び出しで複数操作を完結させる」アプローチ (`SendKeysWithExtMenuToFlutter`) も試しましたが、結局スレッド跨ぎ問題は解決できず、最終的に C 側フラグ方式に落ち着いた経緯があります。
+
+#### 4. Flutter 開発のビルド・検証
+`AGENTS.md` 方針 2 には Windows (MSVC) 開発向けの `build_one.bat` や、Android ビルド向けの `build_android.ps1` が記載されていますが、Flutter 移植版での開発では **`flutter clean && flutter pub get && flutter run` で十分** です。`flutter run` は Dart コードと CMake 経由の C 側コードの両方を自動再ビルドします。ビルドキャッシュ問題 (古い Worker コードが動作し続ける事象) が発生した場合は **`flutter clean` で `.dart_tool/`, `build/` を削除するだけで OK** です。既存ドキュメントの推奨手順が現在のツールに合っていない場合は、ユーザーの実際の開発フローに合わせる柔軟性も必要です。
+
+#### 5. デバッグログの重要性
+機能しなかった原因の特定に、`SetExtMenuFlutter: iflags.extmenu = 0` の debuglog が **出ない** ことが決定的な手がかりになりました。「関数が呼ばれていない」と「関数が呼ばれたが値が反映されない」は別の問題であり、debuglog の有無で区別できます。**状態を変更するすべての FFI 関数には debuglog を入れ、呼ばれたかどうかを追跡可能にする** ことが、複数イテレーションが予想される問題での原因切り分けを劇的に効率化します。なお、`AGENTS.md` 方針 6 に従い、原因特定後は debuglog を必ず削除してからコミットします。
+
+#### 6. コミット分割の教訓
+変更が C コア / FFI バインディング / Dart UI の 3 層にまたがる場合、**依存関係に沿った順序** でコミットを分割しました (C コア → FFI → UI)。各コミットが独立してビルド可能な状態になるよう、ビルド中断が起きない粒度で分割することがレビューしやすさの鍵です。`AGENTS.md` 方針 3 にもある通り、PowerShell 環境での日本語コミットメッセージは UTF-8 ファイル経由で記述します (`git commit -F <ファイルパス>`)。今回は以下 3 コミットに分割:
+
+1. **C 側コア変更**: `g_pending_extcmd_mode` フラグの追加、`SendKeysToFlutter` / `SendShortcutToFlutter` の新設、`flutter_nhgetch` のキュー消費対応、`do_ext_cmd_text_flutter` 等の拡張コマンドテキストパス移植、`flutter_get_ext_cmd` の分岐処理追加。
+2. **FFI + Worker 変更**: `sendKeysToC` / `sendShortcutToC` FFI バインディング追加、Dart 側 Worker `'keys'` / `'shortcut'` ハンドラの追加。
+3. **UI 変更**: `_sendKeysToC` / `_sendShortcutToC` / `_sendExtendedCommand` / `_parseKeys` ヘルパ追加、ショートカットボタンの短縮形 `here` → `#herecmdmenu` 完全表記への変更、コマンドパネルの for ループ送信廃止。
+
+### 関連ファイル
+
+- C 側コア:
+  - `sys/nethack_flutter/android/app/src/main/cpp/winflutter.c:124` 付近 - `flutter_get_ext_cmd` の分岐処理
+  - `sys/nethack_flutter/android/app/src/main/cpp/winflutter.c:SendShortcutToFlutter` - ショートカット専用 FFI 関数
+  - `sys/nethack_flutter/android/app/src/main/cpp/winflutter.c:SendKeysToFlutter` - 通常マクロ用 FFI 関数
+- Dart 側 FFI バインディング / Worker:
+  - `sys/nethack_flutter/lib/nethack_ffi.dart` - FFI シグネチャ宣言
+  - `sys/nethack_flutter/lib/nethack_worker.dart` - Worker 経由呼び出し
+- Dart 側 UI:
+  - `sys/nethack_flutter/lib/main.dart` - `_sendKeysToC` / `_sendShortcutToC` / `_sendExtendedCommand` / `_parseKeys` ヘルパ
+  - `sys/nethack_flutter/lib/nethack_shortcut_pad.dart` - ショートカットボタン UI
+  - `sys/nethack_flutter/lib/nethack_cmd_panel.dart` - コマンドパネル UI
+- 関連方針:
+  - `AGENTS.md` 方針 3 - PowerShell での日本語コミットメッセージ
+  - `AGENTS.md` 方針 6 - デバッグログのクリーンアップ
