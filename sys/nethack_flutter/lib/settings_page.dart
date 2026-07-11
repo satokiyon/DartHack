@@ -1,9 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:ffi';
+import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'defaults_editor.dart';
+import 'nethack_ffi.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -53,11 +55,67 @@ class _SettingsPageState extends State<SettingsPage> {
   // コマンドパネル編集用
   final List<Map<String, dynamic>> _panels = [];
 
+  static const List<String> _fallbackExtCommands = [
+    'adjust', 'annotate', 'apply', 'attributes', 'cast', 'chat', 'chronicle',
+    'close', 'force', 'invoke', 'jump', 'loot', 'monster', 'name', 'offer',
+    'open', 'overview', 'pay', 'pray', 'quaff', 'quit', 'read', 'rest',
+    'ride', 'rub', 'search', 'sit', 'surrender', 'takeoff', 'teleport',
+    'terrain', 'therecmdmenu', 'turn', 'untrap', 'version', 'wear', 'wield',
+    'wipe'
+  ];
+
+  List<Map<String, String>> _extCommands = [];
+
+  void _loadExtCmds() {
+    try {
+      final ffi = NetHackFfi();
+      final ptr = ffi.getExtCmdsFlutter();
+      if (ptr != nullptr) {
+        final extCmdsStr = ptr.toDartString();
+        final parsed = <Map<String, String>>[];
+        final rawItems = extCmdsStr.split(';');
+        for (final item in rawItems) {
+          if (item.isEmpty) continue;
+          final parts = item.split('\t');
+          var command = parts[0];
+          final description = parts.length > 1 ? parts[1] : '';
+
+          if (!command.startsWith('#') && !command.startsWith('?')) {
+            command = '#$command';
+          }
+          parsed.add({'command': command, 'description': description});
+        }
+        if (parsed.isNotEmpty) {
+          setState(() {
+            _extCommands = parsed;
+          });
+          return;
+        }
+      }
+    } catch (e) {
+      debugPrint("Error loading extcmds from FFI: $e");
+    }
+
+    // フォールバック
+    final parsed = <Map<String, String>>[];
+    for (final cmd in _fallbackExtCommands) {
+      var command = cmd;
+      if (!command.startsWith('#') && !command.startsWith('?')) {
+        command = '#$command';
+      }
+      parsed.add({'command': command, 'description': ''});
+    }
+    setState(() {
+      _extCommands = parsed;
+    });
+  }
+
 
   @override
   void initState() {
     super.initState();
     _loadAllSettings();
+    _loadExtCmds();
   }
 
   Future<void> _loadAllSettings() async {
@@ -206,18 +264,65 @@ class _SettingsPageState extends State<SettingsPage> {
 
   // ショートカット編集ダイアログ
   void _editShortcut(int index) {
+    if (_extCommands.isEmpty) {
+      _loadExtCmds();
+    }
     final controller = TextEditingController(text: _shortcuts[index]);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text("${_shortcutLabels[index]} を編集"),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            hintText: "例: i, d, #terrain, #herecmdmenu 等",
-            helperText: "#で始まるものは拡張コマンドとして入力送信されます",
-          ),
-          autofocus: true,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                hintText: "例: i, d, #terrain, #herecmdmenu 等",
+                helperText: "#で始まるものは拡張コマンドとして入力送信されます",
+              ),
+              autofocus: true,
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text("拡張コマンド"),
+                    content: SizedBox(
+                      width: double.maxFinite,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: _extCommands.length,
+                        itemBuilder: (context, idx) {
+                          final item = _extCommands[idx];
+                          final cmd = item['command'] ?? '';
+                          final desc = item['description'] ?? '';
+                          final displayText = desc.isNotEmpty ? "$cmd ($desc)" : cmd;
+                          return ListTile(
+                            title: Text(displayText),
+                            onTap: () {
+                              controller.text = cmd;
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("キャンセル"),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              child: const Text("拡張コマンドから選択..."),
+            ),
+          ],
         ),
         actions: [
           TextButton(

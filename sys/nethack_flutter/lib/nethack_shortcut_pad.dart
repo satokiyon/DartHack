@@ -5,6 +5,7 @@ class NetHackShortcutPad extends StatefulWidget {
   final Function(String) onKeyPress;
   final Function(int) onRawKeyCode;
   final Function(String) onShortcut;
+  final Function(int)? onShortcutLongPress;
 
   final double opacity;
 
@@ -13,6 +14,7 @@ class NetHackShortcutPad extends StatefulWidget {
     required this.onKeyPress,
     required this.onRawKeyCode,
     required this.onShortcut,
+    this.onShortcutLongPress,
     this.opacity = 1.0,
   });
 
@@ -72,18 +74,23 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
         physics: const NeverScrollableScrollPhysics(),
         mainAxisSpacing: 4,
         crossAxisSpacing: 4,
-        children: List.generate(9, (index) => _buildShortcutButton(_shortcuts[index])),
+        children: List.generate(9, (index) => _buildShortcutButton(index, _shortcuts[index])),
       ),
     );
   }
 
-  Widget _buildShortcutButton(String shortcut) {
+  Widget _buildShortcutButton(int index, String shortcut) {
     if (shortcut.isEmpty) {
       return const SizedBox.shrink();
     }
 
     return GestureDetector(
       onTapDown: (_) => _handleMacroPress(shortcut),
+      onLongPress: () {
+        if (widget.onShortcutLongPress != null) {
+          widget.onShortcutLongPress!(index);
+        }
+      },
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF1E1E1E).withValues(alpha: widget.opacity),

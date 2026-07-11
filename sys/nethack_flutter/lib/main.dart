@@ -162,9 +162,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
+    final newTileset = prefs.getString('selected_tileset') ?? 'nevanda_32x32';
+    final tilesetChanged = newTileset != _selectedTileset;
     setState(() {
       _useTiles = prefs.getBool('use_tiles') ?? true;
-      _selectedTileset = prefs.getString('selected_tileset') ?? 'nevanda_32x32';
+      _selectedTileset = newTileset;
       _isKeyboardVisible = prefs.getBool('keyboard_visible') ?? true;
       final controllerModeStr = prefs.getString('controller_mode') ?? 'pad';
       _controllerMode = controllerModeStr == 'keyboard' ? ControllerMode.keyboard : ControllerMode.pad;
@@ -174,7 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
       _showPanelNames = prefs.getBool('show_panel_names') ?? true;
       _drawerPosition = prefs.getString('drawer_position') ?? 'left';
-      _menuButtonPosition = prefs.getString('menu_button_position') ?? 'top_left';
+      _menuButtonPosition = prefs.getString('menu_button_position') ?? 'bottom_left';
       _enabledDPadMoveModes = _parseEnabledMoveModes(
         prefs.getString('dpad_enabled_move_modes') ??
             'NORMAL,UPPER,G_LOWER,G_UPPER,CTRL,M_CMD,F_CMD',
@@ -193,6 +195,9 @@ class _MyHomePageState extends State<MyHomePage> {
       // コントロールのバージョンを更新
       _controlsVersion++;
     });
+    if (tilesetChanged && _assetsReady) {
+      unawaited(_loadTileset(newTileset));
+    }
     _syncNativeKeySettings();
     _triggerCenterOnPlayer();
   }
@@ -2108,6 +2113,135 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  static const List<String> _fallbackExtCommands = [
+    'adjust', 'annotate', 'apply', 'attributes', 'cast', 'chat', 'chronicle',
+    'close', 'force', 'invoke', 'jump', 'loot', 'monster', 'name', 'offer',
+    'open', 'overview', 'pay', 'pray', 'quaff', 'quit', 'read', 'rest',
+    'ride', 'rub', 'search', 'sit', 'surrender', 'takeoff', 'teleport',
+    'terrain', 'therecmdmenu', 'turn', 'untrap', 'version', 'wear', 'wield',
+    'wipe'
+  ];
+
+  void _showShortcutEditDialog(int index) {
+    if (_extCmdList.isEmpty) {
+      _loadExtCmds();
+    }
+
+    final List<Map<String, String>> extCommands = [];
+    if (_extCmdList.isNotEmpty) {
+      for (final entry in _extCmdList) {
+        var cmd = entry.command;
+        if (!cmd.startsWith('#') && !cmd.startsWith('?')) {
+          cmd = '#$cmd';
+        }
+        extCommands.add({
+          'command': cmd,
+          'description': entry.description,
+        });
+      }
+    } else {
+      for (final cmd in _fallbackExtCommands) {
+        var command = cmd;
+        if (!command.startsWith('#') && !command.startsWith('?')) {
+          command = '#$command';
+        }
+        extCommands.add({'command': command, 'description': ''});
+      }
+    }
+
+    final shortcutLabels = [
+      "左上ボタン (0)", "上中央ボタン (1)", "右上ボタン (2)",
+      "中段左ボタン (3)", "中段中央ボタン (4)", "中段右ボタン (5)",
+      "下段左ボタン (6)", "下段中央ボタン (7)", "下段右ボタン (8)"
+    ];
+
+    SharedPreferences.getInstance().then((prefs) {
+      if (!mounted) return;
+      final defaultShortcuts = [
+        'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', '#attributes'
+      ];
+      final currentVal = prefs.getString('shortcut_btn_$index') ?? defaultShortcuts[index];
+      final controller = TextEditingController(text: currentVal);
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("${shortcutLabels[index]} を編集"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  hintText: "例: i, d, #terrain, #herecmdmenu 等",
+                  helperText: "#で始まるものは拡張コマンドとして入力送信されます",
+                ),
+                autofocus: true,
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("拡張コマンド"),
+                      content: SizedBox(
+                        width: double.maxFinite,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: extCommands.length,
+                          itemBuilder: (context, idx) {
+                            final item = extCommands[idx];
+                            final cmd = item['command'] ?? '';
+                            final desc = item['description'] ?? '';
+                            final displayText = desc.isNotEmpty ? "$cmd ($desc)" : cmd;
+                            return ListTile(
+                              title: Text(displayText),
+                              onTap: () {
+                                controller.text = cmd;
+                                Navigator.pop(context);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("キャンセル"),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: const Text("拡張コマンドから選択..."),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("キャンセル"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final val = controller.text.trim();
+                prefs.setString('shortcut_btn_$index', val).then((_) {
+                  setState(() {
+                    _controlsVersion++;
+                  });
+                });
+                Navigator.pop(context);
+              },
+              child: const Text("保存"),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
   void _showSettingsDialog() {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -2394,6 +2528,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onKeyPress: (key) => _sendKeysToC(key),
                           onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
                           onShortcut: (cmd) => _sendShortcutToC(cmd),
+                          onShortcutLongPress: (index) => _showShortcutEditDialog(index),
                         ),
                       ],
                     ),
