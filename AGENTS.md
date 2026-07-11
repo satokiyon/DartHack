@@ -193,3 +193,7 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
    - 既存の `_addLog(String msg)` は Flutter UI 内のログ表示エリア専用で、`adb logcat` や `flutter run` のコンソールには**出力されません**。
    - デバッグ目的で `flutter run` のコンソールや logcat に出力したい場合は **`debugPrint`（`package:flutter/foundation.dart` 標準）** を使用してください。`print` も使用可能ですが、`debugPrint` の方が長い文字列を自動的に分割してくれるため推奨されます。
    - デバッグログは **原因特定後、必ず削除してからコミット** してください（方針 6 参照）。
+
+8. **Flutter における MaterialColor スウォッチアクセスの安全性（Null クラッシュ防止）**:
+   - `Colors.grey[950]` のように、Flutter 標準の `MaterialColor` スウォッチ（50, 100〜900）に定義されていないキーへのアクセスや、その他のスウォッチから取得したカラーに対して `!` 演算子を用いた強制アンラップ（例：`Colors.grey[900]!`）を行うのは禁止です。`null` が返された場合に `Null check operator used on a null value` 例外を引き起こし、画面がクラッシュする原因になります。
+   - スウォッチから色を取得して不透明度などを調整する際は、必ず `(Colors.grey[950] ?? const Color(0xFF0D0D0D))` のように `??` を用いて安全なフォールバック用 `Color` を設定した上で、`withValues` や `withOpacity` などのメソッドを呼び出すように徹底してください。
