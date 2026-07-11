@@ -1263,11 +1263,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  // 拡張コマンド (#herecmdmenu 等) を C 側に送信する。
-  // 各文字 + 末尾の改行 (LF) を順次 worker に送る。複数文字を
-  // 送るため `keepWaiting: true` を使って _waitingForInput フラグの
-  // 早期解放による取りこぼしを防ぐ。
-  void _sendExtendedCommand(String cmd) {
+  void _sendKeysToC(String command) {
     if (!_waitingForInput) return;
     if (_screen.isMenuWindowVisible) return;
     if (_screen.isTextWindowVisible) return;
@@ -1275,15 +1271,78 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_isGetLineVisible) return;
     if (_isAskNameVisible) return;
 
-    _addLog("> Send Extended Command: '$cmd'");
-    for (int i = 0; i < cmd.length; i++) {
-      // C 側の nhgetch は順次入力を消費するため、
-      // 最後の改行以外は keepWaiting: true を維持する。
-      final isLast = (i == cmd.length - 1);
-      _sendFfiKey(cmd.codeUnitAt(i), cmd[i], keepWaiting: !isLast);
+    final List<int> keys = _parseKeys(command);
+    if (keys.isEmpty) return;
+
+    _addLog("> Send Keys: '${command}' (${keys.length} keys)");
+    setState(() {
+      _waitingForInput = false;
+    });
+    _workerSendPort?.send({
+      'type': 'keys',
+      'keys': keys,
+    });
+  }
+
+  void _sendShortcutToC(String command) {
+    if (!_waitingForInput) return;
+    if (_screen.isMenuWindowVisible) return;
+    if (_screen.isTextWindowVisible) return;
+    if (_isYnVisible) return;
+    if (_isGetLineVisible) return;
+    if (_isAskNameVisible) return;
+
+    final List<int> keys = _parseKeys(command);
+    if (keys.isEmpty) return;
+
+    _addLog("> Send Shortcut: '${command}' (${keys.length} keys)");
+    setState(() {
+      _waitingForInput = false;
+    });
+    _workerSendPort?.send({
+      'type': 'shortcut',
+      'keys': keys,
+    });
+  }
+
+  List<int> _parseKeys(String command) {
+    final List<int> keys = [];
+    int i = 0;
+    while (i < command.length) {
+      final c = command[i];
+      if (c == '^' && i + 1 < command.length && command[i + 1] != ' ') {
+        keys.add(command.codeUnitAt(i + 1) & 0x1f);
+        i += 2;
+      } else if (c == 'M' && i + 2 < command.length && command[i + 1] == '-') {
+        keys.add(command.codeUnitAt(i + 2) | 0x80);
+        i += 3;
+      } else if (c == r'\' && i + 1 < command.length) {
+        switch (command[i + 1]) {
+          case 'e':
+            keys.add(0x1B);
+            break;
+          case 'n':
+            keys.add(0x0A);
+            break;
+          case 'b':
+            keys.add(0x7F);
+            break;
+          default:
+            keys.add(command.codeUnitAt(i + 1));
+            break;
+        }
+        i += 2;
+      } else {
+        keys.add(c.codeUnitAt(0));
+        i += 1;
+      }
     }
-    // 末尾に LF (改行) を送って拡張コマンドを確定。
-    _sendFfiKey(10, '${cmd}\\n', keepWaiting: true);
+    return keys;
+  }
+
+  void _sendExtendedCommand(String cmd) {
+    _addLog("> Send Extended Command: '$cmd'");
+    _sendShortcutToC('$cmd\n');
   }
 
   // マップ座標 (SizedBox 4000x3000 ローカル) を 0-based タイル座標に変換する。
@@ -2278,7 +2337,7 @@ class _MyHomePageState extends State<MyHomePage> {
           alignment: Alignment.bottomCenter,
           child: _controllerMode == ControllerMode.keyboard
               ? NetHackKeyboard(
-                  onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                  onKeyPress: (key) => _sendKeysToC(key),
                   onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
                   onToggleMode: () {
                     setState(() {
@@ -2311,15 +2370,16 @@ class _MyHomePageState extends State<MyHomePage> {
                             },
                           ),
                           NetHackShortcutPad(key: ValueKey(_controlsVersion),
-                            onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                            onKeyPress: (key) => _sendKeysToC(key),
                             onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                            onShortcut: (cmd) => _sendShortcutToC(cmd),
                           ),
                         ],
                       ),
                     ),
                     NetHackCmdPanel(key: ValueKey(_controlsVersion),
                       showPanelNames: _showPanelNames,
-                      onKeyPress: (key) => _sendFfiKey(key.codeUnitAt(0), key),
+                      onKeyPress: (key) => _sendKeysToC(key),
                       onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
                       onPanelHeightChanged: (height) {
                         if ((_cmdPanelHeight - height).abs() < 0.1) {

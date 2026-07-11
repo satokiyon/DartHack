@@ -4,11 +4,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 class NetHackShortcutPad extends StatefulWidget {
   final Function(String) onKeyPress;
   final Function(int) onRawKeyCode;
+  final Function(String) onShortcut;
 
   const NetHackShortcutPad({
     super.key,
     required this.onKeyPress,
     required this.onRawKeyCode,
+    required this.onShortcut,
   });
 
   @override
@@ -77,25 +79,6 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
       return const SizedBox.shrink();
     }
 
-    String label = shortcut;
-    if (shortcut.startsWith('#')) {
-      if (shortcut == '#terrain') {
-        label = 'terr';
-      } else if (shortcut == '#therecmdmenu') {
-        label = 'there';
-      } else if (shortcut == '#herecmdmenu') {
-        label = 'here';
-      } else if (shortcut == '#chronicle') {
-        label = 'chron';
-      } else if (shortcut == '#overview') {
-        label = 'overv';
-      } else if (shortcut == '#attributes') {
-        label = 'attr';
-      } else {
-        label = shortcut.substring(1);
-      }
-    }
-
     return GestureDetector(
       onTapDown: (_) => _handleMacroPress(shortcut),
       child: Container(
@@ -105,7 +88,7 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
         ),
         alignment: Alignment.center,
         child: Text(
-          label,
+          shortcut,
           style: const TextStyle(
             color: Colors.white70,
             fontSize: 11,
@@ -121,14 +104,9 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
 
   void _handleMacroPress(String shortcut) {
     if (shortcut.startsWith('#')) {
-      for (int i = 0; i < shortcut.length; i++) {
-        widget.onKeyPress(shortcut[i]);
-      }
-      widget.onRawKeyCode(10); // Enter (\n)
+      widget.onShortcut(shortcut.length > 1 ? '$shortcut\n' : shortcut);
     } else {
-      for (int i = 0; i < shortcut.length; i++) {
-        widget.onKeyPress(shortcut[i]);
-      }
+      widget.onKeyPress(shortcut);
     }
   }
 }

@@ -250,18 +250,12 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
       widget.onToggleMode();
     } else if (cmd.startsWith('^') && cmd.length == 2) {
       final charCode = cmd.codeUnitAt(1);
-      if (charCode >= 97 && charCode <= 122) { // a-z
+      if (charCode >= 97 && charCode <= 122) {
         final ctrlCode = charCode - 96;
         widget.onRawKeyCode(ctrlCode);
       }
-    } else if (cmd == '20s') {
-      widget.onKeyPress('2');
-      widget.onKeyPress('0');
-      widget.onKeyPress('s');
     } else {
-      for (int i = 0; i < cmd.length; i++) {
-        widget.onKeyPress(cmd[i]);
-      }
+      widget.onKeyPress(cmd);
     }
   }
 }
