@@ -270,6 +270,38 @@ class NetHackWorker {
         } else if (type == 'key') {
           final key = message['key'] as int;
           ffi.sendKeyToC(key);
+        } else if (type == 'keys') {
+          final raw = message['keys'];
+          if (raw is List) {
+            final int length = raw.length;
+            if (length > 0) {
+              final Pointer<Int32> ptr = calloc<Int32>(length);
+              try {
+                for (int i = 0; i < length; i++) {
+                  ptr[i] = raw[i] as int;
+                }
+                ffi.sendKeysToC(ptr, length);
+              } finally {
+                calloc.free(ptr);
+              }
+            }
+          }
+        } else if (type == 'shortcut') {
+          final raw = message['keys'];
+          if (raw is List) {
+            final int length = raw.length;
+            if (length > 0) {
+              final Pointer<Int32> ptr = calloc<Int32>(length);
+              try {
+                for (int i = 0; i < length; i++) {
+                  ptr[i] = raw[i] as int;
+                }
+                ffi.sendShortcutToC(ptr, length);
+              } finally {
+                calloc.free(ptr);
+              }
+            }
+          }
         } else if (type == 'pos_cmd') {
           final x = message['x'] as int;
           final y = message['y'] as int;

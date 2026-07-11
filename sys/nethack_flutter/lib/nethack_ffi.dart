@@ -113,11 +113,21 @@ typedef GetExtCmdsDart = Pointer<Utf8> Function();
 typedef SendPosCmdFunc = Void Function(Int32 x, Int32 y, Int32 mod);
 typedef SendPosCmdDart = void Function(int x, int y, int mod);
 
+// 複数キー送信
+typedef SendKeysFunc = Void Function(Pointer<Int32> keys, Int32 len);
+typedef SendKeysDart = void Function(Pointer<Int32> keys, int len);
+
+// ショートカットボタン用送信 (extcmd テキストパスを強制)
+typedef SendShortcutFunc = Void Function(Pointer<Int32> keys, Int32 len);
+typedef SendShortcutDart = void Function(Pointer<Int32> keys, int len);
+
 class NetHackFfi {
   late final DynamicLibrary _lib;
   late final StartNetHackDart startNetHack;
   late final RegisterCallbacksDart registerCallbacks;
   late final SendKeyDart sendKeyToC;
+  late final SendKeysDart sendKeysToC;
+  late final SendShortcutDart sendShortcutToC;
   late final SendMenuSelectionDart sendMenuSelection;
   late final SendMenuSelectionsDart sendMenuSelections;
   late final GetInputRequestIdDart getInputRequestId;
@@ -146,6 +156,14 @@ class NetHackFfi {
 
     sendKeyToC = _lib
         .lookup<NativeFunction<SendKeyFunc>>('SendKeyToFlutter')
+        .asFunction();
+
+    sendKeysToC = _lib
+        .lookup<NativeFunction<SendKeysFunc>>('SendKeysToFlutter')
+        .asFunction();
+
+    sendShortcutToC = _lib
+        .lookup<NativeFunction<SendShortcutFunc>>('SendShortcutToFlutter')
         .asFunction();
 
     sendMenuSelection = _lib
