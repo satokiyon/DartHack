@@ -1521,7 +1521,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool _isMenuCategoryItem(MenuItemData item) {
     if (item.ident != 0) return false;
-    return !_isMenuDividerText(item.text);
+    if (_isMenuDividerText(item.text)) return false;
+    // add_menu_heading() は attr != ATR_NONE (= 0) でアイテムを追加するため、
+    // attr > 0 ならメニューのタイトル行として判定する
+    if (item.attr > 0) return true;
+    // nhwText ウィンドウで putstr で流れてくる行（attr=0）は
+    // コロンで終わる行をタイトル行として扱う
+    final t = item.text.trim();
+    return t.endsWith(':') || t.endsWith('：');
   }
 
   Widget _buildMenuCategoryRow(String text) {
@@ -1654,7 +1661,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         final item = filteredItems[index];
                         final isSelectable = item.ident != 0;
                         final isCategory = _isMenuCategoryItem(item);
-                        final isDivider = !isSelectable && !isCategory;
+                        final isDivider = !isSelectable && _isMenuDividerText(item.text);
+                        final isPlain = !isSelectable && !isCategory && !isDivider;
                         final isPrintableAccel = item.accelerator >= 0x21 && item.accelerator <= 0x7E;
                         final accLabel = isPrintableAccel
                             ? "${String.fromCharCode(item.accelerator)} - "
@@ -1684,6 +1692,21 @@ class _MyHomePageState extends State<MyHomePage> {
                         Color itemColor = Colors.white;
                         if (!isExtCmdMenu && item.color >= 0 && item.color < 16) {
                           itemColor = _getNhColor(item.color);
+                        }
+
+                        if (isPlain) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            child: Text(
+                              "$accLabel$commandText",
+                              style: TextStyle(
+                                color: itemColor,
+                                fontFamily: 'monospace',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          );
                         }
 
                         if (isMultiSelectMenu) {
@@ -1833,8 +1856,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildYnOverlay() {
-    final choices = _ynChoices.split('');
-    final isYesNo = _ynChoices.toLowerCase() == 'yn' || _ynChoices.toLowerCase() == 'ynq';
+    final displayChoices = _ynChoices.contains('\x1b')
+        ? _ynChoices.substring(0, _ynChoices.indexOf('\x1b'))
+        : _ynChoices;
+    final choices = displayChoices.split('');
+    final isYesNo = displayChoices.toLowerCase() == 'yn' || displayChoices.toLowerCase() == 'ynq';
 
     return Positioned.fill(
       child: Container(
@@ -2553,15 +2579,41 @@ class _MyHomePageState extends State<MyHomePage> {
                                 border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
                               ),
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                              child: SingleChildScrollView(
-                                child: Text(
-                                  _screen.textLines.join('\n'),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'monospace',
-                                    fontSize: 13,
-                                  ),
-                                ),
+                              child: ListView.builder(
+                                padding: EdgeInsets.zero,
+                                itemCount: _screen.textLines.length,
+                                itemBuilder: (context, index) {
+                                  final line = _screen.textLines[index];
+                                  final trimmed = line.trim();
+                                  final isDivider = trimmed.isEmpty || RegExp(r'^[-=\s]+$').hasMatch(trimmed);
+                                  final isCategory = !isDivider && (trimmed.endsWith(':') || trimmed.endsWith('：'));
+
+                                  if (isCategory) {
+                                    return _buildMenuCategoryRow(line);
+                                  }
+                                  if (isDivider) {
+                                    if (trimmed.isEmpty) {
+                                      return const SizedBox(height: 8);
+                                    }
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 6),
+                                      child: Divider(color: Colors.white.withValues(alpha: 0.14), height: 1),
+                                    );
+                                  }
+
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 4),
+                                    child: Text(
+                                      line,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: 'monospace',
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ),
