@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-12. */
 /* NetHack 5.0	cmd.c	$NHDT-Date: 1781973043 2026/06/20 16:30:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.772 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -4938,8 +4938,10 @@ click_to_cmd(coordxy x, coordxy y, int mod)
     gc.clicklook_cc.x = x;
     gc.clicklook_cc.y = y;
 
-    if (gc.Cmd.mousebtn[mod-1])
-        cmdq_add_ec(CQ_CANNED, gc.Cmd.mousebtn[mod-1]->ef_funct);
+    if (mod >= 1 && mod <= NUM_MOUSE_BUTTONS) {
+        if (gc.Cmd.mousebtn[mod-1])
+            cmdq_add_ec(CQ_CANNED, gc.Cmd.mousebtn[mod-1]->ef_funct);
+    }
 }
 
 staticfn int
