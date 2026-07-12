@@ -1006,7 +1006,16 @@ static int flutter_nh_poskey(coordxy* x, coordxy* y, int* event) {
                  g_pending_poscmd_x, g_pending_poscmd_y, g_pending_poscmd_mod);
         return 0; // クリックイベント
     }
-    return flutter_nhgetch();
+    int ret = flutter_nhgetch();
+    if (ret == 0 && g_pending_poscmd) {
+        g_pending_poscmd = 0;
+        *x = (coordxy) g_pending_poscmd_x;
+        *y = (coordxy) g_pending_poscmd_y;
+        *event = g_pending_poscmd_mod;
+        debuglog("flutter_nh_poskey: consumed PosCmd from nhgetch x=%d y=%d mod=%d",
+                 g_pending_poscmd_x, g_pending_poscmd_y, g_pending_poscmd_mod);
+    }
+    return ret;
 }
 
 static void flutter_nhbell(void) {
