@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-12. */
 /* NetHack 5.0	mhitm.c	$NHDT-Date: 1781973054 2026/06/20 16:30:54 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.269 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -777,8 +777,7 @@ gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
         Sprintf(buf, "%sが%sをにらみつけた",
                 altmesg ? Adjmonnam(magr, "盲目の") : Monnam(magr),
             altmesg ? "周囲" : "相手");
-        pline("%s...", buf,
-              canspotmon(mdef) ? mon_nam(mdef) : "何か");
+        pline("%s...", buf);
     }
 
     if (magr->mcan || !mdef->mcansee

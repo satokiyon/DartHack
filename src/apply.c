@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-12. */
 /* NetHack 5.0	apply.c	$NHDT-Date: 1781973040 2026/06/20 16:30:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.482 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1343,8 +1343,7 @@ use_candelabrum(struct obj *obj)
         return;
     }
     if (obj->spe < 7) {
-          There("%sには%d本しか%sがなかった.", xname(obj), obj->spe, s,
-              xname(obj));
+          There("%sには%d本しか%sがなかった.", xname(obj), obj->spe, s);
         if (!Blind)
             pline("火が付いた.  それは淡く光った.");
     } else {
