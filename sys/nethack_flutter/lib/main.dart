@@ -2486,13 +2486,15 @@ class _MyHomePageState extends State<MyHomePage> {
                           )
                         : ListView.builder(
                             controller: scrollController,
+                            reverse: true,
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             itemCount: messages.length,
-                            // 新しいメッセージが下に来るよう、インデックスをそのまま使う
+                            // reverse: true により index=0 が一番下になるため、逆順でデータ参照
                             itemBuilder: (_, index) {
-                              final line = messages[index];
+                              final dataIndex = messages.length - 1 - index;
+                              final line = messages[dataIndex];
                               // 最新メッセージは白、古いものはグレーでフェード表示
-                              final ratio = (index + 1) / messages.length;
+                              final ratio = (dataIndex + 1) / messages.length;
                               final color = Color.lerp(Colors.white38, Colors.white, ratio)!;
                               return Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 2),

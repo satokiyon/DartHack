@@ -189,14 +189,18 @@ class NetHackScreen extends ChangeNotifier {
 
   void putString(int winId, int attr, String text) {
     final type = _winTypes[winId];
+    final bool noHistory = (attr & 0x8000) != 0;
+
     if (type == nhwMessage || winId == 1 /* WIN_MESSAGE */) {
       _messages.add(text);
       if (_messages.length > 100) {
         _messages.removeAt(0);
       }
-      _messageHistory.add(text);
-      if (_messageHistory.length > 100) {
-        _messageHistory.removeAt(0);
+      if (!noHistory) {
+        _messageHistory.add(text);
+        if (_messageHistory.length > 100) {
+          _messageHistory.removeAt(0);
+        }
       }
     } else if (type == nhwStatus || winId == 2 /* WIN_STATUS */) {
       if (_statusCursorY >= 0 && _statusCursorY < _statusLines.length) {

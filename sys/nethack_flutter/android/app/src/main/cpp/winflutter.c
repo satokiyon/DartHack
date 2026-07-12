@@ -127,6 +127,8 @@ static volatile int g_key_head = 0;
 static volatile int g_key_tail = 0;
 static volatile int g_key_count = 0;
 static volatile int g_pending_extcmd_mode = 0;
+static volatile int g_in_display_blocking = 0;
+static volatile int g_in_input_prompt = 0;
 
 // flutter_nhgetch 内で PosCmd を消費した時に、その情報を
 // flutter_nh_poskey に橋渡しするためのグローバル変数。
@@ -780,7 +782,9 @@ static void flutter_display_nhwindow(winid window, boolean blocking) {
         g_display_window_cb((int)window, blocking ? 1 : 0);
     }
     if (blocking) {
+        g_in_display_blocking = 1;
         flutter_nhgetch();
+        g_in_display_blocking = 0;
     }
 }
 
@@ -849,7 +853,11 @@ static void flutter_putstr(winid window, int attr, const char* str) {
     }
     if (g_putstr_cb && str) {
         char* conv = convert_cp437_to_utf8(str);
-        g_putstr_cb((int)window, attr, conv ? conv : str);
+        int final_attr = attr;
+        if (g_in_input_prompt) {
+            final_attr |= 0x8000;
+        }
+        g_putstr_cb((int)window, final_attr, conv ? conv : str);
     }
 }
 
@@ -933,6 +941,19 @@ static int flutter_nhgetch(void) {
         return 0;
     }
 
+    if (g_in_display_blocking) {
+        while (g_key_count > 0) {
+            int key = g_key_queue[g_key_head];
+            if (key != 32 && key != 27 && key != 10 && key != 13) {
+                g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
+                g_key_count--;
+                debuglog("flutter_nhgetch: dropped key %d during display blocking", key);
+            } else {
+                break;
+            }
+        }
+    }
+
     if (g_key_count > 0) {
         int key = g_key_queue[g_key_head];
         g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
@@ -967,6 +988,12 @@ static int flutter_nhgetch(void) {
         }
         if (g_key_count > 0) {
             int key = g_key_queue[g_key_head];
+            if (g_in_display_blocking && key != 32 && key != 27 && key != 10 && key != 13) {
+                g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
+                g_key_count--;
+                debuglog("flutter_nhgetch (wait loop): dropped key %d during display blocking", key);
+                continue;
+            }
             g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
             g_key_count--;
             g_key_available = 1;
@@ -1234,6 +1261,8 @@ static void flutter_get_ext_cmd_auto(const char* query, char* bufp) {
     char display[BUFSZ];
     char prompt[BUFSZ];
 
+    g_in_input_prompt = 1;
+
     Snprintf(prompt, sizeof(prompt), "%s ", query);
     flutter_putstr(WIN_MESSAGE, ATR_NONE, prompt);
     bufp[0] = 0;
@@ -1271,6 +1300,7 @@ static void flutter_get_ext_cmd_auto(const char* query, char* bufp) {
         nl = complete ? (int) strlen(complete) : n;
     }
     clear_nhwindow(WIN_MESSAGE);
+    g_in_input_prompt = 0;
 }
 
 static int do_ext_cmd_text_flutter(void) {
