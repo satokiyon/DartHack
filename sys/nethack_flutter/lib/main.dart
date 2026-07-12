@@ -136,6 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isBottomDrawerOpen = false;
   bool _isMainGameStarted = false;
   int? _mapWinId;
+  int? _messageWinId;
 
   // 物理キー割り当て設定
   int _volupAction = 0;
@@ -815,6 +816,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _waitingForInput = false;
       _isMainGameStarted = false;
       _mapWinId = null;
+      _messageWinId = null;
       _isTopDrawerOpen = false;
       _isBottomDrawerOpen = false;
       _autoAdvanceSavePending = false;
@@ -840,6 +842,8 @@ class _MyHomePageState extends State<MyHomePage> {
           _screen.createWindow(message['winId'], message['winType']);
           if (message['winType'] == 3) { // 3 == NHW_MAP
             _mapWinId = message['winId'];
+          } else if (message['winType'] == 1) { // 1 == NHW_MESSAGE
+            _messageWinId = message['winId'];
           }
         } else if (type == 'clearWindow') {
           _screen.clearWindow(message['winId']);
@@ -862,7 +866,7 @@ class _MyHomePageState extends State<MyHomePage> {
           final text = (message['text'] as String?) ?? '';
           _screen.putString(message['winId'], message['attr'], text);
           final winId = message['winId'] as int? ?? -1;
-          if (winId == NetHackScreen.nhwMessage || winId == 1) {
+          if (winId == _messageWinId || winId == 1) {
             if (_isDirectionPromptText(text)) {
               _isDirectionPromptActive = true;
             } else if (text.trim().isNotEmpty) {
@@ -1195,15 +1199,37 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  bool _isTextOrPromptInputActive() {
+    if (_isDirectionPromptActive ||
+        _isYnVisible ||
+        _isGetLineVisible ||
+        _isAskNameVisible ||
+        _screen.isMenuWindowVisible ||
+        _screen.isTextWindowVisible) {
+      return true;
+    }
+    if (_screen.messages.isNotEmpty) {
+      final lastMsg = _screen.messages.last.toLowerCase();
+      if (lastMsg.contains('[y/n]') ||
+          lastMsg.contains('[yn]') ||
+          lastMsg.contains('(y/n)') ||
+          lastMsg.contains('[y/n?]')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   void _sendModeAppliedDirection(String viKey, {bool useLongPressRun = false}) {
-    if (useLongPressRun && !_isDirectionPromptActive) {
-      _sendFfiKeys(['g'.codeUnitAt(0), viKey.codeUnitAt(0)], 'g$viKey');
+    if (_isTextOrPromptInputActive()) {
+      final baseKey = _numberPadMode != 0 ? _viToNumPad(viKey) : viKey;
+      _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
+      _isDirectionPromptActive = false;
       return;
     }
 
-    if (_isDirectionPromptActive) {
-      _sendFfiKey(viKey.codeUnitAt(0), viKey);
-      _isDirectionPromptActive = false;
+    if (useLongPressRun) {
+      _sendFfiKeys(['g'.codeUnitAt(0), viKey.codeUnitAt(0)], 'g$viKey');
       return;
     }
 
