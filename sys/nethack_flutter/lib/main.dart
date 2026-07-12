@@ -129,7 +129,6 @@ class _MyHomePageState extends State<MyHomePage> {
   // 詳細な操作設定（shared_preferences用）
   double _padOpacity = 0.8;
   double _padScale = 1.0;
-  int _autoSaveInterval = 0;
   int _statusDisplayMode = 0; // 0: 領域に合わせて文字サイズ縮小(Fit), 1: 領域の可変高さ(Wrap)
   String _drawerPosition = 'left';
   String _menuButtonPosition = 'top_left';
@@ -156,6 +155,15 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _transformationController = TransformationController();
+    const MethodChannel('com.tbd.nethackjp/key_interceptor')
+        .setMethodCallHandler((call) async {
+      if (call.method == 'onKeyEvent') {
+        final String? key = call.arguments['key'];
+        if (key != null) {
+          _handleNativeKeyEvent(key);
+        }
+      }
+    });
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus && _isGameRunning && _waitingForInput && !_isKeyboardVisible) {
         _focusNode.requestFocus();
@@ -176,7 +184,6 @@ class _MyHomePageState extends State<MyHomePage> {
       _controllerMode = controllerModeStr == 'keyboard' ? ControllerMode.keyboard : ControllerMode.pad;
       _padOpacity = prefs.getDouble('pad_opacity') ?? 0.8;
       _padScale = prefs.getDouble('pad_scale') ?? 1.0;
-      _autoSaveInterval = prefs.getInt('auto_save_interval') ?? 0;
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
       _showPanelNames = prefs.getBool('show_panel_names') ?? true;
       _drawerPosition = prefs.getString('drawer_position') ?? 'left';
