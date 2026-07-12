@@ -138,6 +138,11 @@ class _MyHomePageState extends State<MyHomePage> {
   int? _mapWinId;
   int? _messageWinId;
 
+  // メッセージ領域設定
+  int _msgLineCount = 5;         // 表示行数 (1〜15)
+  double _msgOpacity = 0.70;     // 背景透過度 (0.0〜1.0)
+  double _msgFontSize = 13.0;    // フォントサイズ (pt)
+
   // 物理キー割り当て設定
   int _volupAction = 0;
   int _voldownAction = 0;
@@ -202,6 +207,11 @@ class _MyHomePageState extends State<MyHomePage> {
       _volupAction = prefs.getInt('key_volup_action') ?? 0;
       _voldownAction = prefs.getInt('key_voldown_action') ?? 0;
       _backAction = prefs.getInt('key_back_action') ?? 0;
+
+      // メッセージ領域設定のロード
+      _msgLineCount = prefs.getInt('msg_line_count') ?? 5;
+      _msgOpacity = prefs.getDouble('msg_opacity') ?? 0.70;
+      _msgFontSize = prefs.getDouble('msg_font_size') ?? 13.0;
 
       // コントロールのバージョンを更新
       _controlsVersion++;
@@ -2402,6 +2412,130 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  /// メッセージ履歴パネルを表示する。
+  /// 画面下半部（約60%）をスライドアップして _screen.messages の全履歴を表示。
+  /// ゲームに入力を送らずに閉じることができる。
+  void _showMsgHistoryPanel() {
+    if (!mounted) return;
+    final messages = List<String>.from(_screen.messages);
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      // 領域外タップで閉じる（ゲームに入力は送らない）
+      isDismissible: true,
+      enableDrag: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.3,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (_, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF12161D),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+              ),
+              child: Column(
+                children: [
+                  // ドラッグハンドル
+                  const SizedBox(height: 8),
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.white38,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // タイトル行
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: Row(
+                      children: [
+                        Icon(Icons.history, size: 18, color: Colors.amber[300]),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'メッセージ履歴',
+                          style: TextStyle(
+                            color: Colors.amber,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          '${messages.length}件',
+                          style: const TextStyle(color: Colors.white54, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(color: Colors.white.withValues(alpha: 0.14), height: 1),
+                  // メッセージ一覧（新しいメッセージが下）
+                  Expanded(
+                    child: messages.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'メッセージ履歴はありません',
+                              style: TextStyle(color: Colors.white54),
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: scrollController,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            itemCount: messages.length,
+                            // 新しいメッセージが下に来るよう、インデックスをそのまま使う
+                            itemBuilder: (_, index) {
+                              final line = messages[index];
+                              // 最新メッセージは白、古いものはグレーでフェード表示
+                              final ratio = (index + 1) / messages.length;
+                              final color = Color.lerp(Colors.white38, Colors.white, ratio)!;
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 2),
+                                child: Text(
+                                  line,
+                                  style: TextStyle(
+                                    color: color,
+                                    fontFamily: 'monospace',
+                                    fontSize: _msgFontSize,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                  // 閉じるボタン
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16, 8, 16, MediaQuery.of(sheetContext).padding.bottom + 12),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(sheetContext),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white70,
+                          side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text('閉じる'),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _showSettingsDialog() {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -2464,72 +2598,84 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ),
-                const Divider(color: Colors.white12, height: 1),
-                // 2. メッセージ領域
-                Container(
-                  height: 54,
-                  width: double.infinity,
-                  color: Colors.black,
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  child: Text(
-                    _screen.messages.isEmpty
-                        ? ""
-                        : _screen.messages.sublist(
-                            _screen.messages.length > 3 ? _screen.messages.length - 3 : 0
-                          ).join("\n"),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'monospace',
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-                const Divider(color: Colors.white12, height: 1),
-                // 3. マップ表示
+                // 2(旧). メッセージ領域は廃止 — マップ上のオーバーレイで表示
+                // 3. マップ表示（メッセージオーバーレイを重ねるため Stack でラップ）
                 Expanded(
-                  child: Container(
-                    key: _mapViewportKey,
-                    color: Colors.black,
-                    child: InteractiveViewer(
-                      transformationController: _transformationController,
-                      boundaryMargin: const EdgeInsets.all(2000.0), // 十分なマージンを設けて枠外への無限移動（クランプ解除）を許可
-                      constrained: false, // 子が親(画面幅)に制限されずunconstrainedでスクロール可能にする
-                      maxScale: 6.0,
-                      minScale: 0.5,
-                      onInteractionUpdate: (details) {
-                        // ユーザーがピンチズームしたズーム倍率をリアルタイムに保存
-                        _currentScale = _transformationController.value.getMaxScaleOnAxis();
-                      },
-                      child: Center(
-                        child: SizedBox(
-                          width: 4000.0, // 巨大キャンバスでくるみ InteractiveViewer のクランプを完全無効化
-                          height: 3000.0,
-                          // マップタップ検出: 主人公タイルをタップで
-                          // #herecmdmenu を発動する (Java 版と同じ挙動)。
-                          // 単発タップのみ拾う (onTapUp) ことで
-                          // InteractiveViewer のパン/ピンチ操作と競合させない。
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTapDown: (details) {
-                              _lastMapTapDownDetails = details;
-                            },
-                            onTap: () {
-                              if (_lastMapTapDownDetails != null) {
-                                _handleMapTap(_lastMapTapDownDetails!);
-                              }
-                            },
-                            child: CustomPaint(
-                              painter: NetHackMapPainter(
-                                screen: _screen,
-                                tileImage: _tileImage,
-                                tileSize: _tileSize,
-                                useTiles: _useTiles,
+                  child: Stack(
+                    children: [
+                      // マップ本体
+                      Container(
+                        key: _mapViewportKey,
+                        color: Colors.black,
+                        child: InteractiveViewer(
+                          transformationController: _transformationController,
+                          boundaryMargin: const EdgeInsets.all(2000.0), // 十分なマージンを設けて枠外への無限移動（クランプ解除）を許可
+                          constrained: false, // 子が親(画面幅)に制限されずunconstrainedでスクロール可能にする
+                          maxScale: 6.0,
+                          minScale: 0.5,
+                          onInteractionUpdate: (details) {
+                            // ユーザーがピンチズームしたズーム倍率をリアルタイムに保存
+                            _currentScale = _transformationController.value.getMaxScaleOnAxis();
+                          },
+                          child: Center(
+                            child: SizedBox(
+                              width: 4000.0, // 巨大キャンバスでくるみ InteractiveViewer のクランプを完全無効化
+                              height: 3000.0,
+                              // マップタップ検出: 主人公タイルをタップで
+                              // #herecmdmenu を発動する (Java 版と同じ挙動)。
+                              // 単発タップのみ拾う (onTapUp) ことで
+                              // InteractiveViewer のパン/ピンチ操作と競合させない。
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                onTapDown: (details) {
+                                  _lastMapTapDownDetails = details;
+                                },
+                                onTap: () {
+                                  if (_lastMapTapDownDetails != null) {
+                                    _handleMapTap(_lastMapTapDownDetails!);
+                                  }
+                                },
+                                child: CustomPaint(
+                                  painter: NetHackMapPainter(
+                                    screen: _screen,
+                                    tileImage: _tileImage,
+                                    tileSize: _tileSize,
+                                    useTiles: _useTiles,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
+                      // メッセージオーバーレイ（マップ上部に半透明で重ねる）
+                      // タップすると履歴パネルを表示する
+                      if (_screen.messages.isNotEmpty)
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: _showMsgHistoryPanel,
+                            child: Container(
+                              color: Colors.black.withValues(alpha: _msgOpacity),
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                              child: Text(
+                                _screen.messages.sublist(
+                                  _screen.messages.length > _msgLineCount
+                                      ? _screen.messages.length - _msgLineCount
+                                      : 0,
+                                ).join('\n'),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'monospace',
+                                  fontSize: _msgFontSize,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ],

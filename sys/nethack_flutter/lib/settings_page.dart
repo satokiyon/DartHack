@@ -32,6 +32,11 @@ class _SettingsPageState extends State<SettingsPage> {
   String _drawerPosition = 'left';
   String _menuButtonPosition = 'bottom_left';
 
+  // メッセージ領域設定
+  int _msgLineCount = 5;      // 表示行数 (1〜15)
+  double _msgOpacity = 0.70;  // 背景透過度 (0.0〜1.0)
+  double _msgFontSize = 13.0; // フォントサイズ (pt)
+
   // 物理キー割り当て (デフォルト: 0 = なし)
   int _volupAction = 0;
   int _voldownAction = 0;
@@ -144,6 +149,11 @@ class _SettingsPageState extends State<SettingsPage> {
       _volupAction = prefs.getInt('key_volup_action') ?? 0;
       _voldownAction = prefs.getInt('key_voldown_action') ?? 0;
       _backAction = prefs.getInt('key_back_action') ?? 0;
+
+      // メッセージ領域設定のロード
+      _msgLineCount = prefs.getInt('msg_line_count') ?? 5;
+      _msgOpacity = prefs.getDouble('msg_opacity') ?? 0.70;
+      _msgFontSize = prefs.getDouble('msg_font_size') ?? 13.0;
 
       for (int i = 0; i < 9; i++) {
         _shortcuts[i] = prefs.getString('shortcut_btn_$i') ?? _defaultShortcuts[i];
@@ -578,6 +588,158 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  /// メッセージ領域の表示設定セクション
+  Widget _buildMessageSection() {
+    return ExpansionTile(
+      leading: const Icon(Icons.chat_bubble_outline, color: Colors.tealAccent),
+      title: const Text('メッセージ設定'),
+      subtitle: const Text('オーバーレイ表示の行数・透過度・フォントサイズ'),
+      children: [
+        // 行数スライダー（1〜15）
+        ListTile(
+          title: const Text('表示行数'),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Slider(
+                value: _msgLineCount.toDouble(),
+                min: 1,
+                max: 15,
+                divisions: 14,
+                label: '$_msgLineCount 行',
+                onChanged: (val) {
+                  final intVal = val.round();
+                  setState(() => _msgLineCount = intVal);
+                  _saveSetting('msg_line_count', intVal);
+                },
+              ),
+              Text(
+                '現在: $_msgLineCount 行（最新メッセージを$_msgLineCount行表示）',
+                style: const TextStyle(fontSize: 12, color: Colors.white54),
+              ),
+            ],
+          ),
+        ),
+        // 透過度スライダー（0〜100、実際は 0.0〜1.0 で保存）
+        ListTile(
+          title: const Text('背景透過度'),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Slider(
+                value: _msgOpacity,
+                min: 0.0,
+                max: 1.0,
+                divisions: 20,
+                label: '${(_msgOpacity * 100).round()}%',
+                onChanged: (val) {
+                  setState(() => _msgOpacity = val);
+                  _saveSetting('msg_opacity', val);
+                },
+              ),
+              Text(
+                '現在: ${(_msgOpacity * 100).round()}%'
+                '（0% = 完全透明 / 100% = 不透明）',
+                style: const TextStyle(fontSize: 12, color: Colors.white54),
+              ),
+            ],
+          ),
+        ),
+        // フォントサイズスライダー（8〜24）
+        ListTile(
+          title: const Text('フォントサイズ'),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Slider(
+                value: _msgFontSize,
+                min: 8.0,
+                max: 24.0,
+                divisions: 16,
+                label: '${_msgFontSize.round()} pt',
+                onChanged: (val) {
+                  setState(() => _msgFontSize = val);
+                  _saveSetting('msg_font_size', val);
+                },
+              ),
+              Text(
+                '現在: ${_msgFontSize.round()} pt',
+                style: const TextStyle(fontSize: 12, color: Colors.white54),
+              ),
+            ],
+          ),
+        ),
+        // プレビュー
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'プレビュー',
+                style: TextStyle(fontSize: 12, color: Colors.white38),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey[900],
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.white12),
+                ),
+                padding: const EdgeInsets.all(6),
+                child: Stack(
+                  children: [
+                    // 背景（マップのイメージ）
+                    Container(
+                      height: 80,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.blueGrey[900]!, Colors.blueGrey[800]!],
+                        ),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          '.  .  .  @  .  .\n.  .  .  .  .  .\n.  .  .  .  d  .',
+                          style: TextStyle(
+                            color: Colors.white24,
+                            fontFamily: 'monospace',
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                    // メッセージオーバーレイのプレビュー
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        color: Colors.black.withValues(alpha: _msgOpacity),
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        child: Text(
+                          'メッセージのサンプルテキストです。\nWelcome to NetHackJP!',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'monospace',
+                            fontSize: _msgFontSize,
+                          ),
+                          maxLines: _msgLineCount,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildKeyActionSection() {
     const volActions = {
       0: "機能なし (通常音量変化)",
@@ -772,6 +934,7 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildTilesetSection(),
           _buildControllerSection(),
           _buildCmdPanelSection(), // 追加
+          _buildMessageSection(),  // メッセージ設定
           _buildKeyActionSection(),
           _buildShortcutSection(),
           _buildAdvancedSection(),
