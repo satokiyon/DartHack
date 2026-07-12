@@ -346,7 +346,7 @@ class _MyHomePageState extends State<MyHomePage> {
             title: const Text('セーブせず終了 (放棄)', style: TextStyle(color: Colors.white)),
             onTap: () {
               _closeDrawer();
-              _sendFfiKey(81, "Q");
+              _sendShortcutToC("#quit\n");
             },
           ),
           ListTile(
@@ -863,6 +863,8 @@ class _MyHomePageState extends State<MyHomePage> {
           if (_mapWinId != null && message['winId'] == _mapWinId) {
             setState(() {
               _isMainGameStarted = true;
+              _autoAdvanceSavePending = false;
+              _autoAdvanceSavePendingUntilMs = 0;
             });
           }
         } else if (type == 'destroyWindow') {
