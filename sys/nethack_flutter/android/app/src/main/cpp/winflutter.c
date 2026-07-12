@@ -344,7 +344,7 @@ static void flutter_putmsghistory(const char *msg, boolean restoring) {
 
 // 拡張コマンド一覧の取得
 const char* GetExtCmdsFlutter(void) {
-    static char buf[4096] = {0};
+    static char buf[16384] = {0};
     size_t used = 0;
     int i;
     int first = 1;
@@ -364,13 +364,13 @@ const char* GetExtCmdsFlutter(void) {
         {
             const char* cmd = extcmdlist[i].ef_txt;
             const char* desc = (extcmdlist[i].ef_desc && *extcmdlist[i].ef_desc)
-                               ? extcmdlist[i].ef_desc
+                               ? convert_cp437_to_utf8(extcmdlist[i].ef_desc)
                                : "";
             int n = snprintf(
                 buf + used,
                 sizeof(buf) - used,
                 "%s%s\t%s",
-                first ? "" : ";",
+                first ? "" : "\n",
                 cmd,
                 desc
             );

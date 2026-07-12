@@ -16,6 +16,7 @@ import 'nethack_ffi.dart';
 import 'settings_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ffi' hide Size;
+import 'dart:convert';
 import 'package:ffi/ffi.dart';
 
 void main() {
@@ -586,14 +587,25 @@ class _MyHomePageState extends State<MyHomePage> {
     _sendFfiKey(item.accelerator, String.fromCharCode(item.accelerator));
   }
 
+  String _utf8DecodeLossy(Pointer<Utf8> ptr) {
+    if (ptr == nullptr) return '';
+    final Pointer<Uint8> temp = ptr.cast<Uint8>();
+    int len = 0;
+    while (temp[len] != 0) {
+      len++;
+    }
+    final bytes = temp.asTypedList(len);
+    return const Utf8Decoder(allowMalformed: true).convert(bytes);
+  }
+
   void _loadExtCmds() {
     try {
       final ffi = NetHackFfi();
       final ptr = ffi.getExtCmdsFlutter();
       if (ptr != nullptr) {
-        final extCmdsStr = ptr.toDartString();
+        final extCmdsStr = _utf8DecodeLossy(ptr);
         final parsed = <ExtCmdEntry>[];
-        final rawItems = extCmdsStr.split(';');
+        final rawItems = extCmdsStr.split('\n');
 
         for (final raw in rawItems) {
           final item = raw.trim();
@@ -1642,8 +1654,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           itemColor = _getNhColor(item.color);
                         }
 
-                        final descIndent = " " * accLabel.length;
-
                         if (isMultiSelectMenu) {
                           final checked = _menuSelectedIds.contains(item.ident);
                           return Material(
@@ -1669,6 +1679,47 @@ class _MyHomePageState extends State<MyHomePage> {
                           );
                         }
 
+                        if (isExtCmdMenu) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: Material(
+                              color: const Color(0xFF2C2C2C),
+                              borderRadius: BorderRadius.circular(8.0),
+                              clipBehavior: Clip.antiAlias,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.white12, width: 1.0),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: ListTile(
+                                  dense: true,
+                                  contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                                  title: Text(
+                                    "$accLabel$commandText",
+                                    style: TextStyle(
+                                      color: itemColor,
+                                      fontFamily: 'monospace',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  subtitle: descriptionText.isNotEmpty
+                                      ? Text(
+                                          descriptionText,
+                                          style: const TextStyle(
+                                            color: Colors.white70,
+                                            fontFamily: 'monospace',
+                                            fontSize: 12,
+                                          ),
+                                        )
+                                      : null,
+                                  onTap: () => _sendMenuSelection(item.ident),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
                         return Material(
                           color: Colors.transparent,
                           child: ListTile(
@@ -1687,15 +1738,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                                if (isExtCmdMenu && descriptionText.isNotEmpty)
-                                  Text(
-                                    "$descIndent$descriptionText",
-                                    style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontFamily: 'monospace',
-                                      fontSize: 12,
-                                    ),
-                                  ),
                               ],
                             ),
                             onTap: () => _sendMenuSelection(item.ident),
@@ -2114,40 +2156,19 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  static const List<String> _fallbackExtCommands = [
-    'adjust', 'annotate', 'apply', 'attributes', 'cast', 'chat', 'chronicle',
-    'close', 'force', 'invoke', 'jump', 'loot', 'monster', 'name', 'offer',
-    'open', 'overview', 'pay', 'pray', 'quaff', 'quit', 'read', 'rest',
-    'ride', 'rub', 'search', 'sit', 'surrender', 'takeoff', 'teleport',
-    'terrain', 'therecmdmenu', 'turn', 'untrap', 'version', 'wear', 'wield',
-    'wipe'
-  ];
-
   void _showShortcutEditDialog(int index) {
-    if (_extCmdList.isEmpty) {
-      _loadExtCmds();
-    }
+    _loadExtCmds();
 
     final List<Map<String, String>> extCommands = [];
-    if (_extCmdList.isNotEmpty) {
-      for (final entry in _extCmdList) {
-        var cmd = entry.command;
-        if (!cmd.startsWith('#') && !cmd.startsWith('?')) {
-          cmd = '#$cmd';
-        }
-        extCommands.add({
-          'command': cmd,
-          'description': entry.description,
-        });
+    for (final entry in _extCmdList) {
+      var cmd = entry.command;
+      if (!cmd.startsWith('#') && !cmd.startsWith('?')) {
+        cmd = '#$cmd';
       }
-    } else {
-      for (final cmd in _fallbackExtCommands) {
-        var command = cmd;
-        if (!command.startsWith('#') && !command.startsWith('?')) {
-          command = '#$command';
-        }
-        extCommands.add({'command': command, 'description': ''});
-      }
+      extCommands.add({
+        'command': cmd,
+        'description': entry.description,
+      });
     }
 
     final shortcutLabels = [
@@ -2185,35 +2206,107 @@ class _MyHomePageState extends State<MyHomePage> {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text("拡張コマンド"),
-                      content: SizedBox(
-                        width: double.maxFinite,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: extCommands.length,
-                          itemBuilder: (context, idx) {
-                            final item = extCommands[idx];
-                            final cmd = item['command'] ?? '';
-                            final desc = item['description'] ?? '';
-                            final displayText = desc.isNotEmpty ? "$cmd ($desc)" : cmd;
-                            return ListTile(
-                              title: Text(displayText),
-                              onTap: () {
-                                controller.text = cmd;
-                                Navigator.pop(context);
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text("キャンセル"),
-                        ),
-                      ],
-                    ),
+                    builder: (context) {
+                      String filterText = '';
+                      return StatefulBuilder(
+                        builder: (context, setStateDialog) {
+                          final filtered = extCommands.where((item) {
+                            final cmd = (item['command'] ?? '').toLowerCase();
+                            final desc = (item['description'] ?? '').toLowerCase();
+                            final query = filterText.toLowerCase();
+                            return cmd.contains(query) || desc.contains(query);
+                          }).toList();
+
+                          return AlertDialog(
+                            title: const Text("拡張コマンド"),
+                            content: SizedBox(
+                              width: double.maxFinite,
+                              height: 350,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TextField(
+                                    decoration: const InputDecoration(
+                                      hintText: "コマンド名や説明で検索...",
+                                      prefixIcon: Icon(Icons.search),
+                                      isDense: true,
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    onChanged: (val) {
+                                      setStateDialog(() {
+                                        filterText = val;
+                                      });
+                                    },
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Expanded(
+                                    child: filtered.isEmpty
+                                        ? const Center(
+                                            child: Text(
+                                              "見つかりませんでした",
+                                              style: TextStyle(color: Colors.grey),
+                                            ),
+                                          )
+                                        : ListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount: filtered.length,
+                                            itemBuilder: (context, idx) {
+                                              final item = filtered[idx];
+                                              final cmd = item['command'] ?? '';
+                                              final desc = item['description'] ?? '';
+                                              return Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                                child: Material(
+                                                  color: const Color(0xFF2C2C2C),
+                                                  borderRadius: BorderRadius.circular(8.0),
+                                                  clipBehavior: Clip.antiAlias,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(color: Colors.white12, width: 1.0),
+                                                      borderRadius: BorderRadius.circular(8.0),
+                                                    ),
+                                                    child: ListTile(
+                                                      title: Text(
+                                                        cmd,
+                                                        style: const TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          color: Colors.white,
+                                                          fontSize: 15,
+                                                        ),
+                                                      ),
+                                                      subtitle: desc.isNotEmpty
+                                                          ? Text(
+                                                              desc,
+                                                              style: const TextStyle(
+                                                                color: Colors.white70,
+                                                                fontSize: 12,
+                                                              ),
+                                                            )
+                                                          : null,
+                                                      onTap: () {
+                                                        controller.text = cmd;
+                                                        Navigator.pop(context);
+                                                      },
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("キャンセル"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                   );
                 },
                 child: const Text("拡張コマンドから選択..."),

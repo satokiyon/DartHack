@@ -66,14 +66,25 @@ class _SettingsPageState extends State<SettingsPage> {
 
   List<Map<String, String>> _extCommands = [];
 
+  String _utf8DecodeLossy(Pointer<Utf8> ptr) {
+    if (ptr == nullptr) return '';
+    final Pointer<Uint8> temp = ptr.cast<Uint8>();
+    int len = 0;
+    while (temp[len] != 0) {
+      len++;
+    }
+    final bytes = temp.asTypedList(len);
+    return const Utf8Decoder(allowMalformed: true).convert(bytes);
+  }
+
   void _loadExtCmds() {
     try {
       final ffi = NetHackFfi();
       final ptr = ffi.getExtCmdsFlutter();
       if (ptr != nullptr) {
-        final extCmdsStr = ptr.toDartString();
+        final extCmdsStr = _utf8DecodeLossy(ptr);
         final parsed = <Map<String, String>>[];
-        final rawItems = extCmdsStr.split(';');
+        final rawItems = extCmdsStr.split('\n');
         for (final item in rawItems) {
           if (item.isEmpty) continue;
           final parts = item.split('\t');
@@ -289,35 +300,107 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text("拡張コマンド"),
-                    content: SizedBox(
-                      width: double.maxFinite,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: _extCommands.length,
-                        itemBuilder: (context, idx) {
-                          final item = _extCommands[idx];
-                          final cmd = item['command'] ?? '';
-                          final desc = item['description'] ?? '';
-                          final displayText = desc.isNotEmpty ? "$cmd ($desc)" : cmd;
-                          return ListTile(
-                            title: Text(displayText),
-                            onTap: () {
-                              controller.text = cmd;
-                              Navigator.pop(context);
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("キャンセル"),
-                      ),
-                    ],
-                  ),
+                  builder: (context) {
+                    String filterText = '';
+                    return StatefulBuilder(
+                      builder: (context, setStateDialog) {
+                        final filtered = _extCommands.where((item) {
+                          final cmd = (item['command'] ?? '').toLowerCase();
+                          final desc = (item['description'] ?? '').toLowerCase();
+                          final query = filterText.toLowerCase();
+                          return cmd.contains(query) || desc.contains(query);
+                        }).toList();
+
+                        return AlertDialog(
+                          title: const Text("拡張コマンド"),
+                          content: SizedBox(
+                            width: double.maxFinite,
+                            height: 350,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextField(
+                                  decoration: const InputDecoration(
+                                    hintText: "コマンド名や説明で検索...",
+                                    prefixIcon: Icon(Icons.search),
+                                    isDense: true,
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  onChanged: (val) {
+                                    setStateDialog(() {
+                                      filterText = val;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(height: 12),
+                                Expanded(
+                                  child: filtered.isEmpty
+                                      ? const Center(
+                                          child: Text(
+                                            "見つかりませんでした",
+                                            style: TextStyle(color: Colors.grey),
+                                          ),
+                                        )
+                                      : ListView.builder(
+                                          shrinkWrap: true,
+                                          itemCount: filtered.length,
+                                          itemBuilder: (context, idx) {
+                                            final item = filtered[idx];
+                                            final cmd = item['command'] ?? '';
+                                            final desc = item['description'] ?? '';
+                                            return Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                              child: Material(
+                                                color: const Color(0xFF2C2C2C),
+                                                borderRadius: BorderRadius.circular(8.0),
+                                                clipBehavior: Clip.antiAlias,
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(color: Colors.white12, width: 1.0),
+                                                    borderRadius: BorderRadius.circular(8.0),
+                                                  ),
+                                                  child: ListTile(
+                                                    title: Text(
+                                                      cmd,
+                                                      style: const TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.white,
+                                                        fontSize: 15,
+                                                      ),
+                                                    ),
+                                                    subtitle: desc.isNotEmpty
+                                                        ? Text(
+                                                            desc,
+                                                            style: const TextStyle(
+                                                              color: Colors.white70,
+                                                              fontSize: 12,
+                                                            ),
+                                                          )
+                                                        : null,
+                                                    onTap: () {
+                                                      controller.text = cmd;
+                                                      Navigator.pop(context);
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("キャンセル"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
                 );
               },
               child: const Text("拡張コマンドから選択..."),
