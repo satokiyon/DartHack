@@ -209,3 +209,13 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
       - `onTapDown` でタップされたローカル座標を一時変数（ステート）に保存する.
       - `onTap`（引数なし、ジェスチャー競合でタップとして確定した瞬間に発火）を契機とし、一時保存した座標を取り出してタップ処理を実行する.
 
+11. **Gradle / Kotlin 関連警告に対する gradle.properties 設定の維持**:
+    - **現象と制約**:
+      Android Gradle Plugin (AGP) 9.0 以降への移行に伴い、`org.jetbrains.kotlin.android` プラグイン非推奨の警告が出力される場合がありますが、これを解消するために `gradle.properties` から `android.newDsl=false` や `android.builtInKotlin=false` を削除してはなりません。
+    - **影響**:
+      - `android.newDsl=false` を削除すると、Flutter Gradle Plugin 側が DSL 非互換により `ClassCastException` でクラッシュします。
+      - `android.builtInKotlin=false` を削除すると、外部依存モジュール（例：`:jni` プラグイン）が古い Kotlin プラグインの適用チェックにより `IllegalStateException` をスローしてビルドが失敗します。
+    - **対策**:
+      ビルド成功を維持するため、これらの警告は一時的に許容し、両方のフラグを `gradle.properties` に残したまま維持してください。
+
+
