@@ -83,8 +83,9 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: !_hasChanges,
-      onPopInvoked: (didPop) async {
+      onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
+        final navigator = Navigator.of(context);
         final discard = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
@@ -104,7 +105,7 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
           ),
         );
         if (discard == true && mounted) {
-          Navigator.of(context).pop();
+          navigator.pop();
         }
       },
       child: Scaffold(

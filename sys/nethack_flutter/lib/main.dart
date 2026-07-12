@@ -15,6 +15,7 @@ import 'nethack_shortcut_pad.dart';
 import 'nethack_ffi.dart';
 import 'settings_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'amount_selector_dialog.dart';
 import 'dart:ffi' hide Size;
 import 'dart:convert';
 import 'package:ffi/ffi.dart';
@@ -203,25 +204,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     _syncNativeKeySettings();
     _triggerCenterOnPlayer();
-  }
-
-  Future<void> _savePreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('use_tiles', _useTiles);
-    await prefs.setString('selected_tileset', _selectedTileset);
-    await prefs.setBool('keyboard_visible', _isKeyboardVisible);
-    await prefs.setString('controller_mode', _controllerMode == ControllerMode.keyboard ? 'keyboard' : 'pad');
-    await prefs.setDouble('pad_opacity', _padOpacity);
-    await prefs.setDouble('pad_scale', _padScale);
-    await prefs.setInt('auto_save_interval', _autoSaveInterval);
-    await prefs.setInt('status_display_mode', _statusDisplayMode);
-    await prefs.setString('drawer_position', _drawerPosition);
-    await prefs.setString('menu_button_position', _menuButtonPosition);
-    await prefs.setString('dpad_move_mode', _moveModeName(_dPadMoveMode));
-    await prefs.setString(
-      'dpad_enabled_move_modes',
-      _enabledDPadMoveModes.map(_moveModeName).join(','),
-    );
   }
 
   DPadMoveMode _parseMoveMode(String name) {
@@ -586,6 +568,24 @@ class _MyHomePageState extends State<MyHomePage> {
       _sendFfiKey(amountStr.codeUnitAt(i), amountStr[i]);
     }
     _sendFfiKey(item.accelerator, String.fromCharCode(item.accelerator));
+  }
+
+  Future<void> _onMenuItemLongPress(MenuItemData item) async {
+    if (item.ident == 0) return;
+    final maxCount = _parseMaxCount(item.text);
+    if (maxCount <= 1) return;
+
+    final selected = await showDialog<int>(
+      context: context,
+      builder: (context) => AmountSelectorDialog(
+        itemName: _cleanItemText(item.text),
+        maxCount: maxCount,
+      ),
+    );
+
+    if (selected != null && selected > 0) {
+      _handleAmountSelection(item, selected);
+    }
   }
 
   String _utf8DecodeLossy(Pointer<Utf8> ptr) {
@@ -1338,7 +1338,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final List<int> keys = _parseKeys(command);
     if (keys.isEmpty) return;
 
-    _addLog("> Send Keys: '${command}' (${keys.length} keys)");
+    _addLog("> Send Keys: '$command' (${keys.length} keys)");
     setState(() {
       _waitingForInput = false;
     });
@@ -1359,7 +1359,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final List<int> keys = _parseKeys(command);
     if (keys.isEmpty) return;
 
-    _addLog("> Send Shortcut: '${command}' (${keys.length} keys)");
+    _addLog("> Send Shortcut: '$command' (${keys.length} keys)");
     setState(() {
       _waitingForInput = false;
     });
@@ -1404,10 +1404,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return keys;
   }
 
-  void _sendExtendedCommand(String cmd) {
-    _addLog("> Send Extended Command: '$cmd'");
-    _sendShortcutToC('$cmd\n');
-  }
+
 
   // マップ座標 (SizedBox 4000x3000 ローカル) を 0-based タイル座標に変換する。
   // NetHackMapPainter.paint() と同じ計算式を共有する。
@@ -1684,14 +1681,19 @@ class _MyHomePageState extends State<MyHomePage> {
                           final checked = _menuSelectedIds.contains(item.ident);
                           return Material(
                             color: Colors.transparent,
-                            child: CheckboxListTile(
+                            child: ListTile(
                               dense: true,
                               contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-                              value: checked,
-                              onChanged: (_) => _toggleMenuSelection(item.ident),
-                              activeColor: Colors.tealAccent[400],
-                              checkColor: Colors.black,
-                              controlAffinity: ListTileControlAffinity.leading,
+                              leading: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: Checkbox(
+                                  value: checked,
+                                  onChanged: (_) => _toggleMenuSelection(item.ident),
+                                  activeColor: Colors.tealAccent[400],
+                                  checkColor: Colors.black,
+                                ),
+                              ),
                               title: Text(
                                 "$accLabel$commandText",
                                 style: TextStyle(
@@ -1701,6 +1703,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
+                              onTap: () => _toggleMenuSelection(item.ident),
+                              onLongPress: () => _onMenuItemLongPress(item),
                             ),
                           );
                         }
@@ -1767,6 +1771,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
                             onTap: () => _sendMenuSelection(item.ident),
+                            onLongPress: () => _onMenuItemLongPress(item),
                           ),
                         );
                       },
@@ -2692,7 +2697,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) async {
+      onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         if (_isGameRunning && _isMainGameStarted) {
           final bool? exitConfirmed = await showDialog<bool>(

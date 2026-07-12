@@ -448,7 +448,7 @@ class _SettingsPageState extends State<SettingsPage> {
             key: const ValueKey("tileset_dropdown"),
             child: DropdownButtonFormField<String>(
               decoration: const InputDecoration(labelText: "タイルセットの選択"),
-              value: _selectedTileset,
+              initialValue: _selectedTileset,
               items: const [
                 DropdownMenuItem(value: 'nevanda_32x32', child: Text('Nevanda (32x32)')),
                 DropdownMenuItem(value: 'pixelhack_32x32', child: Text('PixelHack (32x32)')),
