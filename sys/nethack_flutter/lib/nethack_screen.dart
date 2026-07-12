@@ -51,6 +51,10 @@ class NetHackScreen extends ChangeNotifier {
   final List<String> _messages = [];
   List<String> get messages => _messages;
 
+  // メッセージ履歴 (clearWindow で消去されない永続バッファ)
+  final List<String> _messageHistory = [];
+  List<String> get messageHistory => _messageHistory;
+
   // ステータス (通常2行)
   final List<String> _statusLines = ["", ""];
   List<String> get statusLines => _statusLines;
@@ -120,6 +124,9 @@ class NetHackScreen extends ChangeNotifier {
       _menuItems.clear();
       _menuPrompt = "";
     }
+    if (type == nhwMessage) {
+      _messageHistory.clear();
+    }
     notifyListeners();
   }
 
@@ -186,6 +193,10 @@ class NetHackScreen extends ChangeNotifier {
       _messages.add(text);
       if (_messages.length > 100) {
         _messages.removeAt(0);
+      }
+      _messageHistory.add(text);
+      if (_messageHistory.length > 100) {
+        _messageHistory.removeAt(0);
       }
     } else if (type == nhwStatus || winId == 2 /* WIN_STATUS */) {
       if (_statusCursorY >= 0 && _statusCursorY < _statusLines.length) {

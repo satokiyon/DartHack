@@ -2413,11 +2413,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   /// メッセージ履歴パネルを表示する。
-  /// 画面下半部（約60%）をスライドアップして _screen.messages の全履歴を表示。
+  /// 画面下半部（約60%）をスライドアップして _screen.messageHistory の全履歴を表示。
   /// ゲームに入力を送らずに閉じることができる。
   void _showMsgHistoryPanel() {
     if (!mounted) return;
-    final messages = List<String>.from(_screen.messages);
+    final messages = List<String>.from(_screen.messageHistory);
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -2650,28 +2650,45 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       // メッセージオーバーレイ（マップ上部に半透明で重ねる）
                       // タップすると履歴パネルを表示する
-                      if (_screen.messages.isNotEmpty)
+                      if (_screen.messageHistory.isNotEmpty)
                         Positioned(
                           top: 0,
                           left: 0,
                           right: 0,
                           child: GestureDetector(
                             onTap: _showMsgHistoryPanel,
-                            child: Container(
-                              color: Colors.black.withValues(alpha: _msgOpacity),
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                              child: Text(
-                                _screen.messages.sublist(
-                                  _screen.messages.length > _msgLineCount
-                                      ? _screen.messages.length - _msgLineCount
+                            child: Builder(
+                              builder: (context) {
+                                final displayedLines = _screen.messageHistory.sublist(
+                                  _screen.messageHistory.length > _msgLineCount
+                                      ? _screen.messageHistory.length - _msgLineCount
                                       : 0,
-                                ).join('\n'),
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'monospace',
-                                  fontSize: _msgFontSize,
-                                ),
-                              ),
+                                );
+                                return Container(
+                                  color: Colors.black.withValues(alpha: _msgOpacity),
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                  child: Text.rich(
+                                    TextSpan(
+                                      children: displayedLines.asMap().entries.map((entry) {
+                                        final index = entry.key;
+                                        final line = entry.value;
+                                        final double ratio = displayedLines.length > 1
+                                            ? index / (displayedLines.length - 1)
+                                            : 1.0;
+                                        final color = Color.lerp(Colors.white30, Colors.white, ratio)!;
+                                        return TextSpan(
+                                          text: line + (index < displayedLines.length - 1 ? '\n' : ''),
+                                          style: TextStyle(
+                                            color: color,
+                                            fontFamily: 'monospace',
+                                            fontSize: _msgFontSize,
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ),
