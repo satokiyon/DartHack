@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. */
 /* NetHack 5.0	hacklib.h	$NHDT-Date: 1781973081 2026/06/20 16:31:21 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -73,6 +73,7 @@ extern void nh_snprintf_w_impossible(const char *func, int line, char *str,
                         size_t size, const char *fmt, ...) PRINTF_F(5, 6);
 extern size_t utf8_truncation_point(const char *, size_t) NONNULLARG1;
 extern void utf8_truncate(char *, size_t) NONNULLARG1;
+extern boolean utf8_decode_codepoint(const char *, unsigned *, int *) NONNULLPTRS;
 extern const char *utf8_prev_char_start(const char *, const char *)
     NONNULLARG12;
 extern void utf8_hiragana_to_katakana(char *) NONNULLARG1;
