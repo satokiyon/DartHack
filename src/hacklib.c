@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. */
 /* NetHack 5.0	hacklib.c	$NHDT-Date: 1781973051 2026/06/20 16:30:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.133 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
@@ -965,6 +965,39 @@ void
 utf8_truncate(char *str, size_t maxbytes)
 {
     str[utf8_truncation_point(str, maxbytes)] = '\0';
+}
+
+/* returns a safe byte index for a string truncated to at most maxchars
+   UTF-8 characters (a halfwidth char, a fullwidth char, and an emoji
+   are each counted as 1 character), avoiding mid-sequence cuts */
+size_t
+utf8_char_truncation_point(const char *str, size_t maxchars)
+{
+    size_t cut = 0;
+    size_t char_count = 0;
+    int cp_len;
+
+    if (maxchars == 0)
+        return 0;
+
+    while (str[cut] && char_count < maxchars) {
+        cp_len = utf8_sequence_expected_len((uchar) str[cut]);
+        if (cp_len <= 0)
+            break; /* invalid UTF-8 lead byte */
+
+        cut += (size_t) cp_len;
+        char_count++;
+    }
+    return cut;
+}
+
+/* in-place truncate to at most maxchars UTF-8 characters,
+   preserving UTF-8 boundaries.  The destination buffer must be large
+   enough to hold maxchars characters (worst case 4 bytes each). */
+void
+utf8_char_truncate(char *str, size_t maxchars)
+{
+    str[utf8_char_truncation_point(str, maxchars)] = '\0';
 }
 
 /* given [start, pos], return start of previous UTF-8 character */

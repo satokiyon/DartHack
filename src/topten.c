@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -30,9 +30,16 @@ static long final_fpos; /* [note: do not move this to the 'g' struct] */
 #define newttentry() (struct toptenentry *) alloc(sizeof (struct toptenentry))
 #define dealloc_ttentry(ttent) free((genericptr_t) (ttent))
 #ifndef NAMSZ
-/* Changing NAMSZ can break your existing record/logfile */
-#define NAMSZ 10
+/* NAMSZ はハイスコアレコード (record ファイル) におけるプレイヤー名
+   フィールドのバッファサイズ (バイト単位) である。NAMSZ_CHARS で指定
+   された最大文字数 (UTF-8 文字) を格納できるだけのバイト数が必要で、
+   最もバイト幅が大きい UTF-8 文字 (4 バイト絵文字等) でも
+   NAMSZ_CHARS 文字分保持できるよう 4 * NAMSZ_CHARS としている。 */
+#define NAMSZ 40
 #endif
+/* NAMSZ_CHARS はレコードに保存するプレイヤー名の最大 UTF-8 文字数。
+   全角・半角・絵文字のいずれも 1 文字として数える。 */
+#define NAMSZ_CHARS 10
 #define DTHSZ 100
 #define ROLESZ 3
 
@@ -55,9 +62,17 @@ struct toptenentry {
     char death[DTHSZ + 1];
 };
 static struct toptenentry *tt_head;
+/* record ファイル 1 行分のヘッダー (バージョン番号、点数、ダンジョン番号、
+   階層、HP、最大HP、死亡回数、日付、UID 等) の最大長を十分カバーする
+   バッファ。1 行は "%d.%d.%d %ld %d %d %d %d %d %d %ld %ld %d " 形式の
+   ヘッダー + 4 つの役割フィールド + 名前 + 死因 + 改行で構成され、値
+   によっては理論上 130 バイト超となり得るため、80 バイト程度を確保して
+   おくと典型ケースで fgets による行末欠落を避けられる。 */
+#define TT_HDR_MAX 80
 /* size big enough to read in all the string fields at once; includes
-   room for separating space or trailing newline plus string terminator */
-#define SCANBUFSZ (4 * (ROLESZ + 1) + (NAMSZ + 1) + (DTHSZ + 1) + 1)
+   room for separating space or trailing newline plus string terminator
+   and the leading header fields (version/points/dungeon/level/...) */
+#define SCANBUFSZ (TT_HDR_MAX + 4 * (ROLESZ + 1) + (NAMSZ + 1) + (DTHSZ + 1) + 1)
 
 static struct toptenentry zerott;
 
@@ -1342,6 +1357,9 @@ readentry(FILE *rfile, struct toptenentry *tt)
                 tt->plrole[1] = tt->plgend[1] = '\0'; /* read via %c */
                 copynchars(tt->name, s1, (int) (sizeof tt->name) - 1);
                 copynchars(tt->death, s2, (int) (sizeof tt->death) - 1);
+                /* 旧バージョン record の場合も同様に UTF-8 文字数の上限を
+                   強制する (破損データ対策) */
+                utf8_char_truncate(tt->name, NAMSZ_CHARS);
             } else
                 tt->points = 0;
             tt->plrole[1] = '\0';
@@ -1357,6 +1375,11 @@ readentry(FILE *rfile, struct toptenentry *tt)
             copynchars(tt->plalign, s4, (int) (sizeof tt->plalign) - 1);
             copynchars(tt->name, s5, (int) (sizeof tt->name) - 1);
             copynchars(tt->death, s6, (int) (sizeof tt->death) - 1);
+            /* 読み込んだ名前が破損 (例: 別バージョンで保存された長い名前や
+               編集された record ファイル) していても、ここで UTF-8 文字
+               数の上限 (NAMSZ_CHARS) を強制することで、後段の strncmp や
+               表示処理への不整合伝播を防ぐ。 */
+            utf8_char_truncate(tt->name, NAMSZ_CHARS);
         } else
             tt->points = 0;
 #ifdef NO_SCAN_BRACK
@@ -1769,7 +1792,12 @@ topten(int how, time_t when)
     copynchars(t0->plrace, gu.urace.filecode, ROLESZ);
     copynchars(t0->plgend, genders[flags.female].filecode, ROLESZ);
     copynchars(t0->plalign, aligns[1 - u.ualign.type].filecode, ROLESZ);
+    /* プレイヤー名は UTF-8 文字数の上限 (NAMSZ_CHARS) まで保持する。
+       まずバイト単位 (NAMSZ) でバッファオーバーフローを防いだ後、
+       UTF-8 文字単位で切り詰めることで、全角文字・半角文字・絵文字の
+       いずれが含まれていても 10 文字を超える分は文字境界で切り詰める。 */
     copynchars(t0->name, svp.plname, NAMSZ);
+    utf8_char_truncate(t0->name, NAMSZ_CHARS);
     formatkiller(t0->death, sizeof t0->death, how, TRUE);
     t0->birthdate = yyyymmdd(ubirthday);
     t0->deathdate = yyyymmdd(when);
@@ -1837,6 +1865,9 @@ topten(int how, time_t when)
         t0->points = 0;
 
     t1 = tt_head = newttentry();
+    *t1 = zerott; /* t0 と同様、NUL 終端以降の未初期化バイトが残らないように
+                     構造体全体をゼロ初期化しておく (strncmp の精度拡大に
+                     伴う比較バグの防止) */
     tprev = 0;
     /* rank0: -1 undefined, 0 not_on_list, n n_th on list */
     for (rank = 1; ; ) {
@@ -1884,6 +1915,7 @@ topten(int how, time_t when)
         }
         if (rank <= sysopt.entrymax) {
             t1->tt_next = newttentry();
+            *t1->tt_next = zerott; /* 新規ノードも同様にゼロ初期化 */
             t1 = t1->tt_next;
             rank++;
         }
@@ -2037,8 +2069,12 @@ outentry(int rank, struct toptenentry *t1, boolean so)
     else
         Strcat(linebuf, "   ");
 
-    Sprintf(eos(linebuf), " %10ld  %.10s", t1->points ? t1->points : u.urexp,
-            t1->name);
+    /* 名前は最大 NAMSZ_CHARS (10) 文字保持され、バイト長は最大
+       4 * NAMSZ_CHARS (40) バイトとなり得るため、表示用のバイト長
+       上限を NAMSZ (40) に合わせて拡張する。行が長くなる場合は
+       topten_wrapsplit() が折り返し処理を行う。 */
+    Sprintf(eos(linebuf), " %10ld  %.*s", t1->points ? t1->points : u.urexp,
+            (int) NAMSZ, t1->name);
     Snprintf(profilebuf, sizeof profilebuf, "%s",
              tt_role_name_from_filecode(t1->plrole, t1->plgend));
     if (t1->plrace[0] != '?')
@@ -2310,6 +2346,7 @@ prscore(int argc, char **argv)
     raw_print("");
 
     t1 = tt_head = newttentry();
+    *t1 = zerott; /* t0 と同様、構造体全体をゼロ初期化 */
     for (rank = 1; ; rank++) {
         readentry(rfile, t1);
         if (t1->points == 0)
@@ -2318,6 +2355,7 @@ prscore(int argc, char **argv)
             && score_wanted(current_ver, rank, t1, playerct, players, uid))
             match_found = TRUE;
         t1->tt_next = newttentry();
+        *t1->tt_next = zerott; /* 新規ノードも同様にゼロ初期化 */
         t1 = t1->tt_next;
     }
 
