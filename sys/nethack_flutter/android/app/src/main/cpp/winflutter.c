@@ -798,7 +798,9 @@ static void flutter_display_nhwindow(winid window, boolean blocking) {
         g_display_window_cb((int)window, blocking ? 1 : 0);
     }
     if (blocking) {
-        g_in_display_blocking = 1;
+        if (window != WIN_MAP && window != WIN_STATUS) {
+            g_in_display_blocking = 1;
+        }
         flutter_nhgetch();
         g_in_display_blocking = 0;
     }
@@ -1008,6 +1010,11 @@ static int flutter_nhgetch(void) {
                 g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
                 g_key_count--;
                 debuglog("flutter_nhgetch (wait loop): dropped key %d during display blocking", key);
+                // キーを破棄したため、Dart側に入力可能状態に戻すよう再通知する
+                g_input_request_id++;
+                if (g_dart_notify_input_cb) {
+                    g_dart_notify_input_cb(g_input_request_id);
+                }
                 continue;
             }
             g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
