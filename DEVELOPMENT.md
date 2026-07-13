@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. -->
 # NetHackJP 開発メモ
 
 本ドキュメントは、Windows ポート（CUI/GUI）の日本語化リポジトリである `NetHackJP` の開発環境の構築、ビルド、マージ運用およびリリース手順についてまとめたものです。
@@ -68,6 +68,29 @@ Windows版において、複数のセーブファイルが存在する際に一�
 * **マーカータグ**: `/* NetHackJP: update buffer for each file */`
 * **対象ファイルと削除手順**:
   1. **`src/files.c`**: `get_saved_games()` 関数内の `foundfile_buffer()` の呼び出し箇所をアップストリームに合わせて差し戻し。
+
+### 3. ハイスコアレコードの UTF-8 文字数ベースの切り詰め対応
+プレイヤー名に日本語 (UTF-8) を含む場合に、ハイスコアレコード (record ファイル) 内で 10 バイトで丸ごと切られてしまう問題を修正し、UTF-8 文字数ベースで 10 文字まで保持できるようにした独自拡張です。
+* **マーカータグ**: `/* NetHackJP: UTF-8 char truncation for topten name */`
+* **背景**:
+  - 従来は `src/topten.c` の `NAMSZ = 10` (バイト単位) で `copynchars(t0->name, svp.plname, NAMSZ)` により切り詰めていたため、日本語名は 3〜4 文字程度で切られていた。
+  - これを `NAMSZ = 40` バイト + `NAMSZ_CHARS = 10` 文字の二段構えにし、`utf8_char_truncate()` で文字境界を保護しながら切り詰めるようにした。
+  - ついでに、レビューで指摘された `readentry` での `t1` バッファの未初期化バイトが `strncmp` 比較に悪影響を及ぼす問題、および `SCANBUFSZ` にはヘッダー領域が算入されておらず行末が `fgets` で欠落し得る問題も併せて修正している。
+* **対象ファイル**:
+  - **`src/hacklib.c`**: `utf8_char_truncation_point()` / `utf8_char_truncate()` を新規追加。
+  - **`include/hacklib.h`**: 上記 2 関数の `extern` 宣言を追加。
+  - **`src/topten.c`**:
+    - `NAMSZ` を `10` → `40` に拡大し、`NAMSZ_CHARS = 10` を新設。
+    - 名前保存を `copynchars(NAMSZ)` + `utf8_char_truncate(NAMSZ_CHARS)` に変更。
+    - `readentry()` の両分岐 (旧 `fmt32` / 現行 `fmt33`) で読み込み後に `utf8_char_truncate()` を適用。
+    - `topten()` / `prscore()` で `newttentry()` 直後に `*t1 = zerott;` を追加 (4 箇所)。
+    - `outentry()` の表示用フォーマットを `%.10s` → `%.*s` (NAMSZ) に変更。
+    - `SCANBUFSZ` の算出式に `TT_HDR_MAX = 80` を加算。
+* **アップストリーム追従手順**:
+  1. アップストリーム (`upstream/NetHack-5.0`) で本件と同等の修正が入ったか確認する (例: `NAMSZ` 拡大、`SCANBUFSZ` のヘッダー領域算入、`strncmp` 対象のバッファゼロ化、UTF-8 文字数での切り詰めなど)。
+  2. アップストリームに修正がある場合は、本独自拡張 (上記マーカータグで囲まれた変更) を取り消してアップストリームの実装に追従する。
+  3. アップストリームに部分的な修正しかない場合は、重複する変更 (例: 既にアップストリームが `NAMSZ` を変更済みなら本件の `NAMSZ = 40` 化は重複) のみを取り消し、残りは維持する。
+  4. `utf8_char_truncate` 等の独自 API が他で利用されている場合は、アップストリーム API との整合性を確認の上でリネームまたはラッパー化を検討する。
 
 ---
 
