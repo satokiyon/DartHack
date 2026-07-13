@@ -36,6 +36,28 @@ class MyApp extends StatelessWidget {
           primary: Colors.deepPurple,
           secondary: Colors.amber,
         ),
+        highlightColor: Colors.white.withValues(alpha: 0.25),
+        splashColor: Colors.white.withValues(alpha: 0.15),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom().copyWith(
+            overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+              if (states.contains(WidgetState.pressed)) {
+                return Colors.white.withValues(alpha: 0.25);
+              }
+              return null;
+            }),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom().copyWith(
+            overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+              if (states.contains(WidgetState.pressed)) {
+                return Colors.white.withValues(alpha: 0.25);
+              }
+              return null;
+            }),
+          ),
+        ),
       ),
       home: const MyHomePage(),
     );

@@ -84,29 +84,35 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
       return const SizedBox.shrink();
     }
 
-    return GestureDetector(
-      onTap: () => _handleMacroPress(shortcut),
-      onLongPress: () {
-        if (widget.onShortcutLongPress != null) {
-          widget.onShortcutLongPress!(index);
-        }
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E).withValues(alpha: widget.opacity),
-          borderRadius: BorderRadius.circular(6),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          shortcut,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E1E).withValues(alpha: widget.opacity),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _handleMacroPress(shortcut),
+          onLongPress: () {
+            if (widget.onShortcutLongPress != null) {
+              widget.onShortcutLongPress!(index);
+            }
+          },
+          child: Container(
+            alignment: Alignment.center,
+            child: Text(
+              shortcut,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         ),
       ),
     );

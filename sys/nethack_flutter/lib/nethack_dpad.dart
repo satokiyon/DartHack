@@ -53,23 +53,30 @@ class NetHackDPad extends StatelessWidget {
   }
 
   Widget _buildDirectionButton(String viKey) {
-    return GestureDetector(
-      onTap: () => onDirectionPress(viKey),
-      onLongPress: onDirectionLongPress == null
-          ? null
-          : () => onDirectionLongPress!(viKey),
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E).withValues(alpha: opacity),
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          directionLabels[viKey] ?? viKey,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E1E).withValues(alpha: opacity),
+        shape: BoxShape.circle,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: () => onDirectionPress(viKey),
+          onLongPress: onDirectionLongPress == null
+              ? null
+              : () => onDirectionLongPress!(viKey),
+          child: Container(
+            alignment: Alignment.center,
+            child: Text(
+              directionLabels[viKey] ?? viKey,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
       ),
@@ -77,25 +84,32 @@ class NetHackDPad extends StatelessWidget {
   }
 
   Widget _buildCenterButton() {
-    return GestureDetector(
-      onTap: onCenterTap,
-      onLongPress: onCenterLongPress,
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E).withValues(alpha: opacity),
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2),
-            child: Text(
-              centerLabel,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E1E).withValues(alpha: opacity),
+        shape: BoxShape.circle,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onCenterTap,
+          onLongPress: onCenterLongPress,
+          child: Container(
+            alignment: Alignment.center,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: Text(
+                  centerLabel,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
           ),
