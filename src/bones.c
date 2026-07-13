@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. */
 /* NetHack 5.0	bones.c	$NHDT-Date: 1781973041 2026/06/20 16:30:41 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -198,26 +198,43 @@ resetobjs(struct obj *ochain, boolean restore)
 void
 sanitize_name(char *namebuf)
 {
-    int c;
+    char *p = namebuf;
+    char *dest = namebuf;
+    unsigned cp;
+    int seqlen;
     boolean strip_8th_bit = (WINDOWPORT(tty)
                              && !iflags.wc_eight_bit_input);
 
-    /* it's tempting to skip this for single-user platforms, since
-       only the current player could have left these bones--except
-       things like "hearse" and other bones exchange schemes make
-       that assumption false */
-    while (*namebuf) {
-        c = *namebuf & 0177;
-        if (c < ' ' || c == '\177') {
-            /* non-printable or undesirable */
-            *namebuf = '.';
-        } else if (c != *namebuf) {
-            /* expected to be printable if user wants such things */
-            if (strip_8th_bit)
-                *namebuf = '_';
+    /* 墓ファイルをロードする際、表示を乱す可能性のある制御文字をサニタイズする。
+       UTF-8 マルチバイト文字を正しくデコードして判定する。 */
+    while (*p) {
+        if (utf8_decode_codepoint(p, &cp, &seqlen)) {
+            if (cp < ' ' || cp == 127) {
+                /* 制御文字の場合は '.' に置換する。
+                   UTF-8 の制御文字は 1 バイトなので、1 バイトの '.' に置換して進める */
+                *dest++ = '.';
+                p += seqlen;
+            } else if (cp > 127 && strip_8th_bit) {
+                /* 8ビット目をストリップする場合。
+                   マルチバイト文字なので、'_' に置換して進める */
+                *dest++ = '_';
+                p += seqlen;
+            } else {
+                /* 正常な文字（ASCII または UTF-8 マルチバイト）。
+                   そのままコピーする */
+                if (dest != p) {
+                    (void) memmove((genericptr_t) dest, (genericptr_t) p, (size_t) seqlen);
+                }
+                dest += seqlen;
+                p += seqlen;
+            }
+        } else {
+            /* 不正な UTF-8 シーケンスの場合は 1 バイトずつ処理して '.' に置換する */
+            *dest++ = '.';
+            p++;
         }
-        ++namebuf;
     }
+    *dest = '\0';
 }
 
 /* Give object to a random object-liking monster on or adjacent to x,y

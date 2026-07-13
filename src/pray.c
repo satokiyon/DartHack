@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. */
 /* NetHack 5.0	pray.c	$NHDT-Date: 1781973062 2026/06/20 16:31:02 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.253 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -916,7 +916,7 @@ gcrownu(void)
                 u.ugifts++;
                 livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
                                "装備していた%sが%sへと変化した",
-                               lbuf, artiname(ART_EXCALIBUR));
+                               lbuf, jp_artiname(ART_EXCALIBUR));
             }
         }
         /* acquire Excalibur's skill regardless of weapon or gift */
@@ -940,7 +940,7 @@ gcrownu(void)
         u.ugifts++;
         livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
                        "%sを授かった",
-                       artiname(ART_VORPAL_BLADE));
+                       jp_artiname(ART_VORPAL_BLADE));
     }
     /* acquire Vorpal Blade's skill regardless of weapon or gift */
     unrestrict_weapon_skill(P_LONG_SWORD);
@@ -966,7 +966,7 @@ gcrownu(void)
         u.ugifts++;
         livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
                        "%sを授かった",
-                       artiname(ART_STORMBRINGER));
+                       jp_artiname(ART_STORMBRINGER));
     }
     /* acquire Stormbringer's skill regardless of weapon or gift */
     unrestrict_weapon_skill(P_BROAD_SWORD);
@@ -1826,7 +1826,7 @@ bestow_artifact(uchar max_giftvalue)
             livelog_printf (LL_DIVINEGIFT | LL_ARTIFACT,
                             "%sより%sを授かった",
                             jp_align_gname_for_display(u.ualign.type),
-                            artiname(otmp->oartifact));
+                            jp_artiname(otmp->oartifact));
             /* make sure we can use this weapon */
             unrestrict_weapon_skill(weapon_type(otmp));
             if (!Hallucination && !Blind) {

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. */
 /* NetHack 5.0	artifact.c	$NHDT-Date: 1781973041 2026/06/20 16:30:41 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.264 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1190,8 +1190,8 @@ disp_artifact_discoveries(
         else if (!strcmp(algnstr, "unaligned"))
             algnstr = "無属性";
 
-        Sprintf(buf, "  %s [%s %s]", artiname(m),
-                algnstr, simple_typename(otyp));
+        Sprintf(buf, "  %s [%s %s]", jp_artiname(m),
+                algnstr, jp_item_name(otyp));
         putstr(tmpwin, 0, buf);
     }
     return i;
@@ -1222,11 +1222,11 @@ dump_artifact_info(winid tmpwin)
                      artiexist[m].rndm   ? " ランダム" : "");
 #if 0   /* 'tmpwin' here is a text window, not a menu */
         if (iflags.menu_tab_sep)
-            Sprintf(buf, "  %s\t%s", artiname(m), buf2);
+            Sprintf(buf, "  %s\t%s", jp_artiname(m), buf2);
         else
 #else
             /* "The Platinum Yendorian Express Card" is 35 characters */
-            Snprintf(buf, sizeof buf, "  %-36.36s%s", artiname(m), buf2);
+            Snprintf(buf, sizeof buf, "  %-36.36s%s", jp_artiname(m), buf2);
 #endif
         putstr(tmpwin, 0, buf);
     }

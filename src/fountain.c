@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. */
 /* NetHack 5.0	fountain.c	$NHDT-Date: 1781973050 2026/06/20 16:30:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.121 $ */
 /*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -420,7 +420,7 @@ dipfountain(struct obj *obj)
             exercise(A_WIS, FALSE);
             livelog_printf(LL_ARTIFACT,
                            "%sを与えるのは拒まれた!  %sはあなたをふさわしくないとみなした",
-                           artiname(ART_EXCALIBUR), lady);
+                           jp_artiname(ART_EXCALIBUR), lady);
         } else {
             /* The lady of the lake acts! - Eric Backus */
             /* Be *REAL* nice */
