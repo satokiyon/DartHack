@@ -1288,6 +1288,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void _sendFfiKey(int code, String label) {
     if (!_waitingForInput) return;
 
+    if (_screen.isMoreActive) {
+      if (code == 32 || code == 10 || code == 13 || code == 27) {
+        _screen.setMoreActive(false);
+      }
+    }
+
     // メニュー表示中は、メニューショートカットキー判定を行う
     if (_screen.isMenuWindowVisible) {
       final isMultiSelectMenu = _screen.menuHow > 1;
@@ -2653,21 +2659,33 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       // メッセージオーバーレイ（マップ上部に半透明で重ねる）
-                      // タップすると履歴パネルを表示する
+                      // タップすると履歴パネルを表示する、またはMORE状態を解除する
                       if (_screen.messageHistory.isNotEmpty)
                         Positioned(
                           top: 0,
                           left: 0,
                           right: 0,
                           child: GestureDetector(
-                            onTap: _showMsgHistoryPanel,
+                            onTap: () {
+                              if (_screen.isMoreActive) {
+                                _sendFfiKey(32, 'Space');
+                                _screen.setMoreActive(false);
+                              } else {
+                                _showMsgHistoryPanel();
+                              }
+                            },
                             child: Builder(
                               builder: (context) {
-                                final displayedLines = _screen.messageHistory.sublist(
-                                  _screen.messageHistory.length > _msgLineCount
-                                      ? _screen.messageHistory.length - _msgLineCount
-                                      : 0,
+                                final displayedLines = List<String>.from(
+                                  _screen.messageHistory.sublist(
+                                    _screen.messageHistory.length > _msgLineCount
+                                        ? _screen.messageHistory.length - _msgLineCount
+                                        : 0,
+                                  ),
                                 );
+                                if (_screen.isMoreActive) {
+                                  displayedLines.add(" -- MORE --");
+                                }
                                 return Container(
                                   color: Colors.black.withValues(alpha: _msgOpacity),
                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -2676,16 +2694,20 @@ class _MyHomePageState extends State<MyHomePage> {
                                       children: displayedLines.asMap().entries.map((entry) {
                                         final index = entry.key;
                                         final line = entry.value;
+                                        final isMoreLine = _screen.isMoreActive && index == displayedLines.length - 1;
                                         final double ratio = displayedLines.length > 1
                                             ? index / (displayedLines.length - 1)
                                             : 1.0;
-                                        final color = Color.lerp(Colors.white30, Colors.white, ratio)!;
+                                        final color = isMoreLine
+                                            ? Colors.amber[400]!
+                                            : Color.lerp(Colors.white30, Colors.white, ratio)!;
                                         return TextSpan(
                                           text: line + (index < displayedLines.length - 1 ? '\n' : ''),
                                           style: TextStyle(
                                             color: color,
                                             fontFamily: 'monospace',
                                             fontSize: _msgFontSize,
+                                            fontWeight: isMoreLine ? FontWeight.bold : FontWeight.normal,
                                           ),
                                         );
                                       }).toList(),

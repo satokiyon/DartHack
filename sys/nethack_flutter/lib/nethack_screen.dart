@@ -55,6 +55,17 @@ class NetHackScreen extends ChangeNotifier {
   final List<String> _messageHistory = [];
   List<String> get messageHistory => _messageHistory;
 
+  // MORE（メッセージ入力待ち）状態
+  bool _isMoreActive = false;
+  bool get isMoreActive => _isMoreActive;
+
+  void setMoreActive(bool active) {
+    if (_isMoreActive != active) {
+      _isMoreActive = active;
+      notifyListeners();
+    }
+  }
+
   // ステータス (通常2行)
   final List<String> _statusLines = ["", ""];
   List<String> get statusLines => _statusLines;
@@ -224,6 +235,14 @@ class NetHackScreen extends ChangeNotifier {
 
   void displayWindow(int winId, bool blocking) {
     final type = _winTypes[winId];
+
+    if (type == nhwMessage || winId == 1 /* WIN_MESSAGE */) {
+      if (blocking) {
+        _isMoreActive = true;
+        notifyListeners();
+      }
+      return;
+    }
 
     if (type == nhwText) {
       _isTextWindowVisible = true;
