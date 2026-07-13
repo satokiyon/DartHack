@@ -82,6 +82,8 @@ class NetHackScreen extends ChangeNotifier {
   // テキスト表示用バッファ (NHW_TEXT 用)
   final List<String> _textLines = [];
   List<String> get textLines => _textLines;
+  final List<int> _textAttrs = [];
+  List<int> get textAttrs => _textAttrs;
   bool _isTextWindowVisible = false;
   bool get isTextWindowVisible => _isTextWindowVisible && _menuItems.isEmpty;
 
@@ -128,10 +130,12 @@ class NetHackScreen extends ChangeNotifier {
     if (type == nhwText) {
       // テキストウィンドウはまだ非表示。display_nhwindow が呼ばれた時に表示する。
       _textLines.clear();
+      _textAttrs.clear();
       _isTextWindowVisible = false;
     }
     if (type == nhwMenu) {
       _textLines.clear();
+      _textAttrs.clear();
       _isTextWindowVisible = false;
       _menuItems.clear();
       _menuPrompt = "";
@@ -153,6 +157,7 @@ class NetHackScreen extends ChangeNotifier {
       _statusLines[1] = "";
     } else if (type == nhwText || type == nhwMenu) {
       _textLines.clear();
+      _textAttrs.clear();
     }
     if (type == nhwMenu) {
       _menuItems.clear();
@@ -167,6 +172,7 @@ class NetHackScreen extends ChangeNotifier {
     if (type == nhwText || type == nhwMenu) {
       _isTextWindowVisible = false;
       _textLines.clear();
+      _textAttrs.clear();
     }
     if (type == nhwMenu) {
       _isMenuWindowVisible = false;
@@ -230,6 +236,7 @@ class NetHackScreen extends ChangeNotifier {
       }
     } else if (type == nhwText || type == nhwMenu) {
       _textLines.add(text);
+      _textAttrs.add(attr);
     }
     notifyListeners();
   }
