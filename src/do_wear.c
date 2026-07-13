@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. */
 /* NetHack 5.0	do_wear.c	$NHDT-Date: 1781973047 2026/06/20 16:30:47 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.212 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -353,8 +353,9 @@ Cloak_on(void)
         /* Note: it's already being worn, so we have to cheat here. */
         if ((HInvis || EInvis) && !Blind) {
             newsym(u.ux, u.uy);
-            You("%s!", See_invisible ? "もう自分の向こうが見えない"
-                                      : see_yourself);
+            pline("突然、あなたは%s.",
+                  See_invisible ? "もう自分の向こうが見えなくなった"
+                                : "自分の姿が見えるようになった");
         }
         break;
     case CLOAK_OF_INVISIBILITY:
@@ -363,7 +364,7 @@ Cloak_on(void)
         if (!oldprop && !HInvis && !Blind) {
             makeknown(uarmc->otyp);
             newsym(u.ux, u.uy);
-            pline("突然%s.",
+            pline("突然、あなたは%s.",
                 See_invisible ? "自分の向こうが見えるようになった"
                           : "自分の姿が見えなくなった");
         }
@@ -413,17 +414,18 @@ Cloak_off(void)
     case MUMMY_WRAPPING:
         if (Invis && !Blind) {
             newsym(u.ux, u.uy);
-            You("%s.", See_invisible ? "自分の向こうが見える"
-                                     : "もう自分の姿が見えない");
+            pline("突然、あなたは%s.",
+                  See_invisible ? "自分の向こうが見えるようになった"
+                                : "自分の姿が見えなくなった");
         }
         break;
     case CLOAK_OF_INVISIBILITY:
         if (!oldprop && !HInvis && !Blind) {
             makeknown(CLOAK_OF_INVISIBILITY);
             newsym(u.ux, u.uy);
-            pline("突然%s.",
+            pline("突然、あなたは%s.",
                   See_invisible ? "もう自分の向こうが見えなくなった"
-                                : see_yourself);
+                                : "自分の姿が見えるようになった");
         }
         break;
     /* Alchemy smock gives poison _and_ acid resistance */
@@ -1400,7 +1402,7 @@ Ring_off_or_gone(struct obj *obj, boolean gone)
 
         if (Invisible && !Blind) {
             newsym(u.ux, u.uy);
-            pline("突然自分の姿が見えなくなった.");
+            pline("突然、あなたは自分の姿が見えなくなった.");
             learnring(obj, TRUE);
         }
         break;
@@ -2723,16 +2725,18 @@ select_off(struct obj *otmp)
         glibdummy = cg.zeroobj;
         why = 0; /* the item which prevents ring removal */
         if (welded(uwep) && ((otmp == RING_ON_PRIMARY) || bimanual(uwep))) {
-                Sprintf(buf, "武器を持つ%sを空ける", jp_body_part(HAND));
-            why = uwep;
-        } else if (uarmg && (uarmg->cursed || Glib)) {
-                Sprintf(buf, "%s%sを脱ぐ",
-                    Glib ? "滑りやすい" : "", gloves_simple_name(uarmg));
-            why = !Glib ? uarmg : &glibdummy;
-        }
-        if (why) {
-            You("指輪を外すために%sできない.", buf);
-            set_bknown(why, 1);
+            You("指輪を外すために武器を持つ%sを空けられない.",
+                jp_body_part(HAND));
+            set_bknown(uwep, 1);
+            return 0;
+        } else if (uarmg && Glib) {
+            Your("%sは滑りすぎるため指輪を外せない.",
+                 gloves_simple_name(uarmg));
+            set_bknown(&glibdummy, 1);
+            return 0;
+        } else if (uarmg && uarmg->cursed) {
+            You("指輪を外すために%sを外せない.", c_gloves);
+            set_bknown(uarmg, 1);
             return 0;
         }
     }

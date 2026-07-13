@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. */
 /* NetHack 5.0	mhitm.c	$NHDT-Date: 1781973054 2026/06/20 16:30:54 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.269 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -106,10 +106,10 @@ missmm(
 
         jp_mm_name(magr_name, magr, (struct monst *) 0);
         jp_mm_name(mdef_name, mdef, magr);
-        pline("%sが%sへの攻撃を%s.", magr_name, mdef_name,
-              (magr->mcan || !could_seduce(magr, mdef, mattk))
-                  ? "外した"
-                  : "なれなれしく口説いた");
+        if (magr->mcan || !could_seduce(magr, mdef, mattk))
+            pline("%sの攻撃は%sから外れた.", magr_name, mdef_name);
+        else
+            pline("%sは%sをなれなれしく口説いた.", magr_name, mdef_name);
     } else {
         noises(magr, mattk);
     }
