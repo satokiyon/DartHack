@@ -942,6 +942,16 @@ class _MyHomePageState extends State<MyHomePage> {
           setState(() {
             _waitingForInput = true;
           });
+
+          final isGameOver = message['gameover'] as bool? ?? false;
+          if (isGameOver && _screen.isMoreActive && !_screen.isTextWindowVisible) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted && _waitingForInput) {
+                _sendFfiKey(32, 'Space(auto)');
+              }
+            });
+          }
+
           if (_autoAdvanceSavePending) {
             final nowMs = DateTime.now().millisecondsSinceEpoch;
             final canAutoAdvance =

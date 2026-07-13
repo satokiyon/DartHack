@@ -95,6 +95,9 @@ typedef SendMenuSelectionsDart = void Function(Pointer<Utf8> csv);
 typedef GetInputRequestIdFunc = Int32 Function();
 typedef GetInputRequestIdDart = int Function();
 
+typedef GetIsGameOverFunc = Int32 Function();
+typedef GetIsGameOverDart = int Function();
+
 // 結果返信用関数
 typedef SendYnResultFunc = Void Function(Int8 result);
 typedef SendYnResultDart = void Function(int result);
@@ -131,6 +134,7 @@ class NetHackFfi {
   late final SendMenuSelectionDart sendMenuSelection;
   late final SendMenuSelectionsDart sendMenuSelections;
   late final GetInputRequestIdDart getInputRequestId;
+  late final GetIsGameOverDart getIsGameOver;
 
   late final SendYnResultDart sendYnResult;
   late final SendGetLineResultDart sendGetLineResult;
@@ -176,6 +180,10 @@ class NetHackFfi {
 
     getInputRequestId = _lib
         .lookup<NativeFunction<GetInputRequestIdFunc>>('GetFlutterInputRequestId')
+        .asFunction();
+
+    getIsGameOver = _lib
+        .lookup<NativeFunction<GetIsGameOverFunc>>('GetIsGameOver')
         .asFunction();
 
     sendYnResult = _lib

@@ -129,7 +129,11 @@ class NetHackWorker {
           });
 
           inputCallable = NativeCallable<NotifyInputCallback>.listener((int requestId) {
-            uiSendPort.send({'type': 'request_input'});
+            final gameover = ffi.getIsGameOver() != 0;
+            uiSendPort.send({
+              'type': 'request_input',
+              'gameover': gameover,
+            });
           });
 
           // メニュー関連コールバックの初期化

@@ -522,6 +522,10 @@ int GetFlutterInputRequestId(void) {
     return g_input_request_id;
 }
 
+int GetIsGameOver(void) {
+    return program_state.gameover ? 1 : 0;
+}
+
 // ----------------------------------------------------
 // ハイジャック用のスタブ・中継コールバック群
 // ----------------------------------------------------
