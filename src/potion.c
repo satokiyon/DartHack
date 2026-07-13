@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. */
 /* NetHack 5.0	potion.c	$NHDT-Date: 1781973062 2026/06/20 16:31:02 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.288 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -470,11 +470,10 @@ make_glib(int xtime)
 void
 self_invis_message(void)
 {
-    pline("%s %s.",
-          Hallucination ? "すごい! あなたは"
-                        : "あれっ! 突然、あなたは",
-          See_invisible ? "自分の向こう側まで見通せる"
-                        : "自分の姿が見えない");
+    pline("%s一瞬、自分の%s.",
+          Hallucination ? "すごい!" : "あれっ!突然、",
+          See_invisible ? "向こう側まで見通せるようになった"
+                        : "姿が見えなくなった");
 }
 
 staticfn void
@@ -2032,9 +2031,9 @@ potionbreathe(struct obj *obj)
     case POT_INVISIBILITY:
         if (!Blind && !Invis) {
             kn++;
-            pline("一瞬%s!",
-                  See_invisible ? "自分の向こう側が見えた"
-                                : "自分の姿が見えなくなった");
+            pline("一瞬、自分の%s.",
+                  See_invisible ? "向こう側が見えた"
+                                : "姿が見えなくなった");
         }
         break;
     case POT_PARALYSIS:

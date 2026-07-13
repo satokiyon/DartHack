@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 

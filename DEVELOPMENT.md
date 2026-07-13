@@ -1,3 +1,5 @@
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. -->
+# NetHackJP 開発メモ
 <!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-11. -->
 # NetHackJP-Android 開発メモ
 
