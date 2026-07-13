@@ -1821,41 +1821,43 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    if (isMultiSelectMenu) ...[
+                Center(
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      if (isMultiSelectMenu) ...[
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _menuSelectedIds = filteredItems
+                                  .where((item) => item.ident != 0)
+                                  .map((item) => item.ident)
+                                  .toSet();
+                            });
+                          },
+                          child: const Text("全て選択"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _menuSelectedIds.clear();
+                            });
+                          },
+                          child: const Text("解除"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => _sendMenuSelections(_menuSelectedIds.toList(growable: false)),
+                          child: const Text("OK"),
+                        ),
+                      ],
                       ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            _menuSelectedIds = filteredItems
-                                .where((item) => item.ident != 0)
-                                .map((item) => item.ident)
-                                .toSet();
-                          });
-                        },
-                        child: const Text("全て選択"),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            _menuSelectedIds.clear();
-                          });
-                        },
-                        child: const Text("解除"),
-                      ),
-                      ElevatedButton(
-                        onPressed: () => _sendMenuSelections(_menuSelectedIds.toList(growable: false)),
-                        child: const Text("OK"),
+                        onPressed: () => _sendMenuSelection(-1),
+                        child: const Text("キャンセル"),
                       ),
                     ],
-                    ElevatedButton(
-                      onPressed: () => _sendMenuSelection(-1),
-                      child: const Text("Cancel"),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
@@ -2718,23 +2720,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Icon(Icons.description_outlined, size: 18, color: Colors.amber[300]),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'テキスト表示',
-                                style: TextStyle(
-                                  color: Colors.amber,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Divider(color: Colors.white.withValues(alpha: 0.15), height: 1),
-                          const SizedBox(height: 8),
                           Expanded(
                             child: Container(
                               width: double.infinity,
@@ -2779,17 +2764,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                     ),
                                   );
                                 },
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Center(
-                            child: Text(
-                              "-- [Space] or [Enter] to continue --",
-                              style: TextStyle(
-                                color: Colors.amber,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
                               ),
                             ),
                           ),
