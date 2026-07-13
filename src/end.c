@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. */
 /* NetHack 5.0	end.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.349 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -950,8 +950,8 @@ artifact_score(
                 /* assumes artifacts don't have quan > 1 */
                 Sprintf(pbuf, "%s%s（価値 %ld %s、%ld 点）",
                     the_unique_obj(otmp) ? "" : "",
-                        otmp->oartifact ? artiname(otmp->oartifact)
-                                        : OBJ_NAME(objects[otmp->otyp]),
+                        otmp->oartifact ? jp_artiname(otmp->oartifact)
+                                        : jp_item_name(otmp->otyp),
                         value, currency(value), points);
                 putstr(endwin, 0, pbuf);
             }

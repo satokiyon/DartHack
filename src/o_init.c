@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. */
 /* NetHack 5.0	o_init.c	$NHDT-Date: 1781973060 2026/06/20 16:31:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -657,36 +657,11 @@ choose_disco_sort(
     return n;
 }
 
-/* augment obj_typename() with explanation of Japanese item names */
+/* return Japanese typename for discovered items list */
 staticfn char *
 disco_typename(int otyp)
 {
-    char *result = obj_typename(otyp);
-
-    if (Role_if(PM_SAMURAI) && Japanese_item_name(otyp, (const char *) 0)) {
-        char buf[BUFSZ];
-        const char *actualn = (((otyp != MAGIC_HARP && otyp != WOODEN_HARP)
-                                || objects[otyp].oc_name_known)
-                               ? OBJ_NAME(objects[otyp])
-                               /* undiscovered harp (since wooden harp is
-                                  non-magic so pre-discovered, only applies
-                                  to magic harp and will only be seen if
-                                  magic harp has been 'called' something) */
-                               : "harp");
-
-        if (!actualn) { /* won't happen; used to pacify static analyzer */
-            ;
-        } else if (strstri(result, " called")) {
-            Sprintf(buf, " [%s] called", actualn);
-            (void) strsubst(result, " called", buf);
-        } else if (strstri(result, " (")) {
-            Sprintf(buf, " [%s] (", actualn);
-            (void) strsubst(result, " (", buf);
-        } else {
-            Sprintf(eos(result), " [%s]", actualn);
-        }
-    }
-    return result;
+    return obj_typename(otyp);
 }
 
 /* append typename(dis) to buf[], possibly truncating in the process;
