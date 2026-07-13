@@ -887,19 +887,24 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (type == 'clearWindow') {
           _screen.clearWindow(message['winId']);
         } else if (type == 'displayWindow') {
-          _screen.displayWindow(
-            message['winId'],
-            (message['blocking'] as int? ?? 0) != 0,
-          );
+          final winId = message['winId'] as int;
+          final blocking = (message['blocking'] as int? ?? 0) != 0;
+          _addLog("displayWindow: winId=$winId, blocking=$blocking, textVisible=${_screen.isTextWindowVisible}, menuVisible=${_screen.isMenuWindowVisible}");
+          _screen.displayWindow(winId, blocking);
+          _addLog("displayWindow after: textVisible=${_screen.isTextWindowVisible}, menuVisible=${_screen.isMenuWindowVisible}");
           // C側の blocking に基づく
-          if (_mapWinId != null && message['winId'] == _mapWinId) {
+          if (_mapWinId != null && winId == _mapWinId) {
             setState(() {
               _isMainGameStarted = true;
               _autoAdvanceSavePending = false;
               _autoAdvanceSavePendingUntilMs = 0;
             });
+          } else {
+            // テキスト/メニューウィンドウの場合も setState を呼んで確実に UI を更新
+            setState(() {});
           }
         } else if (type == 'destroyWindow') {
+          _addLog("destroyWindow: winId=${message['winId']}");
           _screen.destroyWindow(message['winId']);
         } else if (type == 'curs') {
           _screen.setCursor(message['winId'], message['x'], message['y']);
@@ -2591,16 +2596,38 @@ class _MyHomePageState extends State<MyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 1. ステータス領域 (Java版に合わせて最上部に配置)
-                _statusDisplayMode == 0
-                    ? Container(
-                        height: 38,
-                        width: double.infinity,
-                        color: Colors.black,
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                        alignment: Alignment.centerLeft,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _isGameRunning && _isMainGameStarted && _waitingForInput
+                      ? () => _sendShortcutToC('#attributes\n')
+                      : null,
+                  child: _statusDisplayMode == 0
+                      ? Container(
+                          height: 38,
+                          width: double.infinity,
+                          color: Colors.black,
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                           alignment: Alignment.centerLeft,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text.rich(
+                              TextSpan(
+                                children: _screen.statusLines.map((line) => _parseStatusLine(line)).toList().fold<List<InlineSpan>>([], (prev, element) {
+                                  if (prev.isNotEmpty) {
+                                    prev.add(const TextSpan(text: '\n'));
+                                  }
+                                  prev.add(element);
+                                  return prev;
+                                }),
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          width: double.infinity,
+                          color: Colors.black,
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                           child: Text.rich(
                             TextSpan(
                               children: _screen.statusLines.map((line) => _parseStatusLine(line)).toList().fold<List<InlineSpan>>([], (prev, element) {
@@ -2613,23 +2640,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           ),
                         ),
-                      )
-                    : Container(
-                        width: double.infinity,
-                        color: Colors.black,
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                        child: Text.rich(
-                          TextSpan(
-                            children: _screen.statusLines.map((line) => _parseStatusLine(line)).toList().fold<List<InlineSpan>>([], (prev, element) {
-                              if (prev.isNotEmpty) {
-                                prev.add(const TextSpan(text: '\n'));
-                              }
-                              prev.add(element);
-                              return prev;
-                            }),
-                          ),
-                        ),
-                      ),
+                ),
                 // 2(旧). メッセージ領域は廃止 — マップ上のオーバーレイで表示
                 // 3. マップ表示（メッセージオーバーレイを重ねるため Stack でラップ）
                 Expanded(

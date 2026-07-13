@@ -126,8 +126,9 @@ class NetHackScreen extends ChangeNotifier {
   void createWindow(int winId, int type) {
     _winTypes[winId] = type;
     if (type == nhwText) {
+      // テキストウィンドウはまだ非表示。display_nhwindow が呼ばれた時に表示する。
       _textLines.clear();
-      _isTextWindowVisible = true;
+      _isTextWindowVisible = false;
     }
     if (type == nhwMenu) {
       _textLines.clear();

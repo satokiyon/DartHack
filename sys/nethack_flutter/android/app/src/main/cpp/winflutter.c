@@ -182,6 +182,12 @@ static char* convert_cp437_to_utf8(const char* str) {
             char_len = 4;
         }
 
+        if (char_len > 1 && p + char_len > end) {
+            // 文字列の末尾で不完全に切り捨てられた UTF-8 マルチバイト文字の断片。
+            // 文字化けを防ぐために無視する。
+            break;
+        }
+
         if (char_len > 0 && p + char_len <= end) {
             int valid = 1;
             for (int i = 1; i < char_len; i++) {
@@ -194,6 +200,10 @@ static char* convert_cp437_to_utf8(const char* str) {
                 memcpy(dst, p, char_len);
                 dst += char_len;
                 p += char_len;
+                continue;
+            }
+            if (char_len > 1) {
+                p++;
                 continue;
             }
         }
@@ -518,6 +528,7 @@ int GetFlutterInputRequestId(void) {
 
 static void flutter_init_nhwindows(int* argc, char** argv) {
     debuglog("flutter_init_nhwindows called");
+    iflags.window_inited = TRUE;
 }
 
 static void flutter_player_selection(void) {
@@ -736,6 +747,7 @@ static void flutter_askname(void) {
 
 static void flutter_exit_nhwindows(const char* str) {
     debuglog("flutter_exit_nhwindows: %s", str ? str : "NULL");
+    iflags.window_inited = FALSE;
     if (g_exit_cb && !g_exit_notified) {
         g_exit_notified = 1;
         char* conv = str ? convert_cp437_to_utf8(str) : NULL;
@@ -1648,3 +1660,5 @@ void StartNetHackFlutter(const char* path, const char* username) {
         debuglog("NetHack thread spawned successfully.");
     }
 }
+
+
