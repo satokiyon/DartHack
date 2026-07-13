@@ -3500,7 +3500,7 @@ class TopTenWidget extends StatelessWidget {
               const Icon(Icons.emoji_events, color: Colors.amber, size: 24),
               const SizedBox(width: 8),
               Text(
-                "殿堂入り（トップテン一覧）",
+                "スコアボード",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
