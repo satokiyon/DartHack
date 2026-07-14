@@ -147,7 +147,7 @@ static int g_msg_history_idx = 0;
 static int g_msg_history_count = 0;
 static int g_msg_history_iter = 0;
 
-#define NUM_CONV_BUFS 16
+#define NUM_CONV_BUFS 256
 #define CONV_BUF_SIZE 4096
 
 // CP437混在文字列を完全に正しいUTF-8に変換するヘルパー関数 (静的リングバッファで非同期セーフ化)
