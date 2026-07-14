@@ -21,7 +21,8 @@ typedef AddMenuCallback = Void Function(
   Int32 attr,
   Pointer<Utf8> str,
   Int32 preselected,
-  Int32 color
+  Int32 color,
+  Int32 tile
 );
 typedef EndMenuCallback = Void Function(Int32 winId, Pointer<Utf8> prompt);
 typedef SelectMenuCallback = Void Function(Int32 winId, Int32 how);

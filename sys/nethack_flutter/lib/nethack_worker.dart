@@ -153,6 +153,7 @@ class NetHackWorker {
             Pointer<Utf8> strPtr,
             int preselected,
             int color,
+            int tile,
           ) {
             final str = _utf8DecodeLossy(strPtr);
             uiSendPort.send({
@@ -165,6 +166,7 @@ class NetHackWorker {
               'text': str,
               'preselected': preselected,
               'color': color,
+              'tile': tile,
             });
           });
 

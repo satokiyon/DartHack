@@ -24,6 +24,7 @@ class MenuItemData {
   final String text;
   final int preselected;
   final int color;
+  final int tile;
 
   MenuItemData({
     required this.ident,
@@ -33,6 +34,7 @@ class MenuItemData {
     required this.text,
     required this.preselected,
     required this.color,
+    required this.tile,
   });
 }
 
@@ -308,6 +310,7 @@ class NetHackScreen extends ChangeNotifier {
     String text,
     int preselected,
     int color,
+    int tile,
   ) {
     _menuItems.add(MenuItemData(
       ident: ident,
@@ -317,6 +320,7 @@ class NetHackScreen extends ChangeNotifier {
       text: text,
       preselected: preselected,
       color: color,
+      tile: tile,
     ));
     notifyListeners();
   }

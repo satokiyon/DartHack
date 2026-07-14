@@ -62,7 +62,7 @@ typedef void (*DartPutStrCallback)(int winId, int attr, const char* str);
 typedef void (*DartPrintGlyphCallback)(int winId, int x, int y, int tile, int ch, int color, int special);
 typedef void (*DartNotifyInputCallback)(int requestId);
 typedef void (*DartStartMenuCallback)(int winId);
-typedef void (*DartAddMenuCallback)(int winId, long ident, int accelerator, int groupacc, int attr, const char* str, int preselected, int color);
+typedef void (*DartAddMenuCallback)(int winId, long ident, int accelerator, int groupacc, int attr, const char* str, int preselected, int color, int tile);
 typedef void (*DartEndMenuCallback)(int winId, const char* prompt);
 typedef void (*DartSelectMenuCallback)(int winId, int how);
 typedef void (*DartYnFunctionCallback)(const char* question, const char* choices, int def);
@@ -1196,7 +1196,8 @@ static void flutter_add_menu(winid wid, const glyph_info *glyphinfo, const anyth
             attr,
             conv ? conv : str,
             (itemflags & MENU_ITEMFLAGS_SELECTED) ? 1 : 0,
-            color
+            color,
+            tile
         );
     }
 }
