@@ -358,3 +358,229 @@ Flutter isolate 経由の FFI 呼び出しと C 側 NetHack スレッド間で�
 - 関連方針:
   - `AGENTS.md` 方針 3 - PowerShell での日本語コミットメッセージ
   - `AGENTS.md` 方針 6 - デバッグログのクリーンアップ
+
+---
+
+## Flutter版 コントローラ UI 独立 scale 化と画面外はみ出し防止 (2026-07-14)
+
+Flutter 移植版において、設定メニューの「ボタンサイズ倍率」を大きくすると、画面下端に配置されている D-Pad とショートカットパッドの一部が画面外にはみ出す問題を修正した作業記録と、そこから得られた知見をまとめます。
+
+### 問題
+
+設定メニューの「ボタンサイズ倍率」を大きくすると、移動パッド (D-Pad) とショートカットパッド (ShortcutPad) の一部が画面からはみ出して操作不能になる問題が発生していました。
+
+#### 根本原因
+
+旧実装では `D-Pad + ShortcutPad + CmdPanel` を 1 つの `Transform.scale` でまとめて拡大していました。これにより以下の問題が発生:
+
+1. **位置計算の破綻**: 両端の padding/margin を起点とした拡大ができないため、片方がはみ出すと反対側が画面中央側に押し込まれる。
+2. **クランプ機構の欠如**: 設定値を入力値としてそのまま反映するため、端末幅を超える scale を指定すると物理的に画面外に出る。
+3. **予約高さ計算の不整合**: `(162 + cmdPanelHeight) * scale` という式が CmdPanel 自身の拡大も含めてしまい、scale 変更時に UI の上下関係にずれが生じる。
+
+加えて、ソフトウェアキーボード（`nethack_keyboard.dart`）も同じ scale で拡大されており、ユーザーの希望（「ソフトウェアキーボードは拡大縮小しない」）と乖離していました。
+
+### 解決アプローチ
+
+#### 1. UI 要素の 3 分割と Positioned 構造への書き換え
+
+D-Pad・ShortcutPad・CmdPanel の 3 つを独立の `Positioned` に分割し、それぞれが画面端点（`Alignment.bottomLeft` / `Alignment.bottomRight`）を起点にスケールする構造に変更しました。
+
+```dart
+// D-Pad: 左下端点を起点に拡大
+Positioned(
+  left: 8,                              // 端点からのマージン (minGap)
+  bottom: cmdPanelHeight + 6,           // 縦位置 (CmdPanel の上 6px)
+  child: Padding(
+    padding: const EdgeInsets.only(top: 6),  // 上方向の余白
+    child: Transform.scale(
+      scale: _dpadEffectiveScale,       // 独立 scale
+      alignment: Alignment.bottomLeft,  // 端点と一致
+      child: NetHackDPad(...),
+    ),
+  ),
+)
+
+// ShortcutPad: 右下端点を起点に拡大
+Positioned(
+  right: 8,                             // 端点からのマージン (minGap)
+  bottom: cmdPanelHeight + 6,
+  child: Padding(
+    padding: const EdgeInsets.only(top: 6),
+    child: Transform.scale(
+      scale: _shortcutPadEffectiveScale,
+      alignment: Alignment.bottomRight,
+      child: NetHackShortcutPad(...),
+    ),
+  ),
+)
+
+// CmdPanel: 画面下端全体を覆う
+Positioned(
+  left: 0,
+  right: 0,
+  bottom: 0,
+  child: Transform.scale(
+    scale: _cmdPanelEffectiveScale,
+    alignment: Alignment.bottomLeft,
+    child: NetHackCmdPanel(...),
+  ),
+)
+```
+
+#### 2. 等倍クランプ機構 (`calculatePadClamp`) の追加
+
+両端起点で拡大する D-Pad と ShortcutPad が中央で衝突するのを防ぐため、設定値から実効値を計算する純関数を共通ヘルパーに切り出しました。
+
+```dart
+// sys/nethack_flutter/lib/utils/scale_clamp.dart
+PadClampResult calculatePadClamp({
+  required double dpadScale,
+  required double shortcutPadScale,
+  required double screenWidth,
+  double baseSize = 150.0,
+  double minGap = 8.0,
+}) {
+  final availableWidth = screenWidth - minGap;
+  final combinedScaledWidth =
+      baseSize * dpadScale + baseSize * shortcutPadScale;
+
+  if (combinedScaledWidth > availableWidth) {
+    final equalScale = availableWidth / (2 * baseSize);
+    return PadClampResult(
+      dpadEffectiveScale: equalScale,
+      shortcutPadEffectiveScale: equalScale,
+      isClamped: true,
+    );
+  }
+
+  return PadClampResult(
+    dpadEffectiveScale: dpadScale,
+    shortcutPadEffectiveScale: shortcutPadScale,
+    isClamped: false,
+  );
+}
+```
+
+- 衝突判定: `combinedScaledWidth > screenWidth - 8`
+- 衝突時のクランプ: `equalScale = (screenWidth - 8) / 300` で両者を等倍に揃える
+- minGap = 8px: `Positioned` の `left` / `right` の値と一致
+
+#### 3. 設定 UI の 3 分割
+
+`pad_scale`（1 つの値）を廃止し、`dpad_scale` / `shortcut_pad_scale` / `cmd_panel_scale` の 3 つの独立キーに分割。`settings_page.dart` の Slider も 3 つに増やし、各スライダー下に「⚠ 画面幅により自動調整」を `Colors.amber[300]` で表示する通知を追加。
+
+#### 4. ソフトウェアキーボードは scale 1.0 固定
+
+旧: `return 230.0 * _padScale;`
+新: `return 230.0;`
+
+ユーザー指示（「ソフトウェアキーボードは拡大縮小しない」）に従い、キーボードモードの予約高さ計算から scale を排除。
+
+#### 5. 予約高さ計算の数値等価性検証
+
+リファクタリングにより予約高さ計算式が変わりましたが、scale=1.0 のとき旧式と新式が完全に同じ値を返すことを数式で確認:
+
+| 項目 | 旧式 | 新式 |
+|------|------|------|
+| 式 | `(162.0 + cmdPanelHeight) * padScale` | `cmdPanelHeight * cmdPanelEffective + 12 + max(150 * dpadEffective, 150 * shortcutPadEffective)` |
+| scale=1.0, cmdPanelHeight=58 | `(162.0 + 58) * 1.0 = 220` | `58 * 1.0 + 12 + max(150 * 1.0, 150 * 1.0) = 58 + 12 + 150 = 220` ✓ |
+
+旧レイアウトで `Padding(EdgeInsets.all(6))` を使っていた箇所は、新レイアウトでは `Padding(EdgeInsets.only(top: 6))` に分解し、予約高さ計算式の `+ 6` の定数項も同じ結果になるよう再構築しました。
+
+### 直面した課題と解決策
+
+#### 課題 1: コミット粒度の計画と実態の乖離
+
+- 計画では 3 コミット分割（レイアウト → クランプ → 設定 UI）を予定。
+- 実際には `main.dart` の変更が 3 段階すべてにまたがるため、1 ファイルを手動で 3 状態に分割するのが複雑。
+- **解決策**: 安全性・確実性を優先して 1 コミットに統合。コミットメッセージで 3 段階の構造（コア → クランプ → 設定 UI）を明示。
+
+#### 課題 2: キーボードモードの scale 方針
+
+- ユーザーは当初「ソフトウェアキーボードは拡大縮小しない」と明言。
+- 旧コードでは `return 230.0 * _padScale` でキーボードも scale していた。
+- **解決策**: `_controllerReservedHeight` でキーボードモードは `return 230.0`（scale なし）に変更。
+
+#### 課題 3: 予約高さ計算の整合性
+
+- 旧: `(162.0 + _cmdPanelHeight) * _padScale`（150 pad + 12 padding + cmdPanel）
+- 新: `cmdPanelHeight * cmdPanelEffective + 12 + max(150 * dpadEffective, 150 * shortcutPadEffective)`
+- 旧 6+6 の Padding を「gap 6 + top padding 6」に分割して再構築。
+- 数値上は等価（scale 1.0 で 220、cmdPanel 58px）。
+
+#### 課題 4: AGENTS.md への追記タイミング
+
+- 計画段階で AGENTS.md 方針 16 の追記を決定していたが、実装は別コミットに分類。
+- **解決策**: コミット時にまとめて追記（AGENTS.md の更新と実装コミットは分離）。
+
+#### 課題 5: SettingsPage の helper method 追加場所
+
+- `_buildControllerSection` の直後に `_previewDpadEffectiveScale`, `_previewShortcutPadEffectiveScale`, `_buildAppliedScaleLabel` を追加。
+- `label` パラメータが実は使われていない（コード警告は出ないが、将来的な拡張用）。
+- **振り返り**: もっと良い配置があったかもしれないが、現状で機能的には問題なし。
+
+### 学び
+
+#### 1. ファイル構造の確認を最初に
+
+- 計画書では `lib/screens/`, `lib/widgets/`, `lib/utils/` のサブディレクトリ構造を前提としていた。
+- 実際は `lib/` 直下に全ファイルがフラットに配置されていた。
+- **教訓**: 計画段階で必ず `ls lib/` 等でファイル構造を確認する。AGENTS.md 方針 19 として明文化。
+
+#### 2. コミット粒度の判断
+
+- 1 ファイルに複数段階の変更が混在する場合、コミット分割のコストが高くなる。
+- 「コミット粒度の理想」と「実装の簡潔さ」のバランスを取る。
+- 安全性を最優先するなら、1 コミットにまとめても許容可能。
+- **教訓**: 計画段階でファイル別の影響範囲を明確にし、コミット粒度を決める。AGENTS.md 方針 19 の「前提確認」と組み合わせて判断。
+
+#### 3. レイアウト変更時の数値検証
+
+- 新旧レイアウトで同じ scale 値で同じ描画結果になることを確認するため、数式レベルで一致を検証。
+- 旧 `(162 + cmdPanelHeight) * scale` = 新 `(cmdPanelHeight + 150) * scale + 12`（scale=1.0, cmdPanel=58 で 220）
+- **教訓**: リファクタリングでは数値レベルでの等価性を確認する。AGENTS.md 方針 17 として明文化。
+
+#### 4. PowerShell 環境での日本語コミット
+
+- AGENTS.md 方針 3 に既載の手順（一時ファイル + `git commit -F`）が有効。
+- `$env:APPDATA\brain\opencode\scratch\commit_msg.txt` に UTF-8 で書き出し、コミット後に削除。
+- **教訓**: 既存の手順を遵守する。
+
+#### 5. ユニットテストの粒度
+
+- 純関数（`calculatePadClamp`）は境界値、非対称値、カスタムパラメータ、極値まで含めてテスト。
+- 9 ケースで主要シナリオをカバー。
+- **教訓**: 純関数は網羅的にテストする。AGENTS.md 方針 18 として明文化。
+
+#### 6. 既存テストの取り扱い
+
+- pre-existing で失敗しているテスト（`widget_test.dart` の counter テスト）は、本変更と無関係だが、新規実装時に気づける。
+- **教訓**: ベースラインの確認と、pre-existing 問題との切り分け。AGENTS.md 方針 19 として「既存テストの一覧取得」を明文化。
+
+#### 7. AGENTS.md の早期更新
+
+- 新しい設計パターンを確立したら、実装後ではなく、計画確定後すぐに AGENTS.md に追記すべき。
+- 将来の開発者が同じ問題に遭遇した際に参照できる。
+- **教訓**: 方針化（design pattern の確立）と AGENTS.md 追記をセットで行う。
+
+#### 8. レイアウト refactor 時の視覚的互換性
+
+- `Padding(EdgeInsets.only(top: 6))` を使って元の 6px top padding を再現。
+- 予約高さ計算も同じ結果になるよう数式を調整。
+- **教訓**: レイアウト refactor では元の視覚表現を完全に維持することを目標にする（最小限の差で済ませる）。AGENTS.md 方針 17 として明文化。
+
+### 関連ファイル
+
+- Flutter UI:
+  - `sys/nethack_flutter/lib/main.dart` - `_buildControllerOverlay`, `_controllerReservedHeight`, 3 つの scale state
+  - `sys/nethack_flutter/lib/settings_page.dart` - 3 つの独立 Slider, `_buildAppliedScaleLabel`, `_preview*EffectiveScale` getter
+- 共通ヘルパー:
+  - `sys/nethack_flutter/lib/utils/scale_clamp.dart` - `PadClampResult`, `calculatePadClamp` 純関数
+  - `sys/nethack_flutter/test/utils/scale_clamp_test.dart` - 9 ケースのユニットテスト
+- 関連方針:
+  - `AGENTS.md` 方針 16 - 複数 UI 要素の独立 scale 化と衝突回避クランプ
+  - `AGENTS.md` 方針 17 - レイアウト refactor 時の数値等価性検証
+  - `AGENTS.md` 方針 18 - 純関数化された共通ヘルパーの境界値テストパターン
+  - `AGENTS.md` 方針 19 - 計画策定段階で前提条件を必ず確認する
+  - `AGENTS.md` 方針 3 - PowerShell での日本語コミットメッセージ
+  - `AGENTS.md` 方針 6 - デバッグログのクリーンアップ
