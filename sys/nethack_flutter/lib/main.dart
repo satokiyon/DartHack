@@ -152,6 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
   double _padOpacity = 0.8;
   double _padScale = 1.0;
   int _statusDisplayMode = 0; // 0: 領域に合わせて文字サイズ縮小(Fit), 1: 領域の可変高さ(Wrap)
+  int _tombstoneDisplayMode = 0; // 0: 画像+文字オーバーレイ, 1: Cコア出力そのまま(テキスト)
   String _drawerPosition = 'left';
   String _menuButtonPosition = 'top_left';
   bool _isTopDrawerOpen = false;
@@ -212,6 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _padOpacity = prefs.getDouble('pad_opacity') ?? 0.8;
       _padScale = prefs.getDouble('pad_scale') ?? 1.0;
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
+      _tombstoneDisplayMode = _loadTombstoneDisplayMode(prefs.getInt('tombstone_display_mode'));
       _showPanelNames = prefs.getBool('show_panel_names') ?? true;
       _drawerPosition = prefs.getString('drawer_position') ?? 'left';
       _menuButtonPosition = prefs.getString('menu_button_position') ?? 'bottom_left';
@@ -263,6 +265,12 @@ class _MyHomePageState extends State<MyHomePage> {
       default:
         return DPadMoveMode.normal;
     }
+  }
+
+  int _loadTombstoneDisplayMode(int? raw) {
+    if (raw == 0) return 0;
+    if (raw == 1) return 1;
+    return 0;
   }
 
   String _moveModeName(DPadMoveMode mode) {
@@ -2800,8 +2808,17 @@ class _MyHomePageState extends State<MyHomePage> {
                                   _screen.textLines.any((line) => line.contains('REST    \\')));
 
                               if (isTombstone) {
-                                final data = TombstoneData.parse(_screen.textLines);
-                                return TombstoneWidget(data: data);
+                                if (_tombstoneDisplayMode == 0) {
+                                  final data = TombstoneData.parse(_screen.textLines);
+                                  return UniversalTombstoneWidget(
+                                    mode: TombstoneDisplayMode.image,
+                                    data: data,
+                                  );
+                                }
+                                return UniversalTombstoneWidget(
+                                  mode: TombstoneDisplayMode.text,
+                                  lines: _screen.textLines,
+                                );
                               }
 
                               final isTopTen = _screen.textLines.any((line) =>
@@ -3205,6 +3222,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+enum TombstoneDisplayMode {
+  image,
+  text,
+}
+
 class TombstoneData {
   final String name;
   final String gold;
@@ -3254,13 +3276,55 @@ class TombstoneData {
   }
 }
 
-class TombstoneWidget extends StatelessWidget {
-  final TombstoneData data;
+class UniversalTombstoneWidget extends StatelessWidget {
+  final TombstoneDisplayMode mode;
+  final TombstoneData? data;
+  final List<String>? lines;
 
-  const TombstoneWidget({super.key, required this.data});
+  const UniversalTombstoneWidget({
+    super.key,
+    this.mode = TombstoneDisplayMode.image,
+    this.data,
+    this.lines,
+  }) : assert(
+          mode == TombstoneDisplayMode.image ? data != null : lines != null,
+          'image mode requires data, text mode requires lines',
+        );
 
   @override
   Widget build(BuildContext context) {
+    if (mode == TombstoneDisplayMode.text) {
+      return _buildTextMode();
+    }
+    return _buildImageMode();
+  }
+
+  Widget _buildTextMode() {
+    final source = lines ?? const <String>[];
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.35),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+      ),
+      child: SingleChildScrollView(
+        child: SelectableText(
+          source.join('\n'),
+          style: const TextStyle(
+            fontFamily: 'monospace',
+            fontSize: 12,
+            color: Colors.white,
+            height: 1.25,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageMode() {
+    final d = data!;
     return Center(
       child: Container(
         constraints: const BoxConstraints(maxWidth: 450),
@@ -3294,7 +3358,7 @@ class TombstoneWidget extends StatelessWidget {
                           children: [
                             SizedBox(height: height * 0.32),
                             Text(
-                              data.name,
+                              d.name,
                               style: TextStyle(
                                 fontFamily: 'serif',
                                 fontSize: 20 * scale,
@@ -3314,7 +3378,7 @@ class TombstoneWidget extends StatelessWidget {
                             ),
                             SizedBox(height: height * 0.02),
                             Text(
-                              data.gold,
+                              d.gold,
                               style: TextStyle(
                                 fontFamily: 'serif',
                                 fontSize: 16 * scale,
@@ -3335,7 +3399,7 @@ class TombstoneWidget extends StatelessWidget {
                             Expanded(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
-                                children: data.deathLines.map((line) {
+                                children: d.deathLines.map((line) {
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(vertical: 2),
                                     child: Text(
@@ -3363,7 +3427,7 @@ class TombstoneWidget extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              data.year,
+                              d.year,
                               style: TextStyle(
                                 fontFamily: 'serif',
                                 fontSize: 15 * scale,

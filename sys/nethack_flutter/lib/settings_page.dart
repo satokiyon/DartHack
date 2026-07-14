@@ -27,6 +27,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String _selectedTileset = 'nevanda_32x32';
   String _controllerMode = 'pad';
   int _statusDisplayMode = 0;
+  int _tombstoneDisplayMode = 0; // 0: 画像+文字オーバーレイ, 1: Cコア出力そのまま(テキスト)
   double _padOpacity = 0.8;
   double _padScale = 1.0;
   String _drawerPosition = 'left';
@@ -141,6 +142,8 @@ class _SettingsPageState extends State<SettingsPage> {
       _selectedTileset = prefs.getString('selected_tileset') ?? 'nevanda_32x32';
       _controllerMode = prefs.getString('controller_mode') ?? 'pad';
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
+      final tombstoneModeRaw = prefs.getInt('tombstone_display_mode');
+      _tombstoneDisplayMode = (tombstoneModeRaw == 1) ? 1 : 0;
       _padOpacity = prefs.getDouble('pad_opacity') ?? 0.8;
       _padScale = prefs.getDouble('pad_scale') ?? 1.0;
       _drawerPosition = prefs.getString('drawer_position') ?? 'left';
@@ -856,6 +859,31 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  Widget _buildOtherSection() {
+    return ExpansionTile(
+      leading: const Icon(Icons.more_horiz, color: Colors.lightBlueAccent),
+      title: const Text("その他の設定"),
+      children: [
+        ListTile(
+          title: const Text("死亡時の墓表示モード"),
+          trailing: DropdownButton<int>(
+            value: _tombstoneDisplayMode,
+            items: const [
+              DropdownMenuItem(value: 0, child: Text('画像表示')),
+              DropdownMenuItem(value: 1, child: Text('テキスト表示')),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _tombstoneDisplayMode = val);
+                _saveSetting('tombstone_display_mode', val);
+              }
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildAdvancedSection() {
     return ExpansionTile(
       leading: const Icon(Icons.tune, color: Colors.orangeAccent),
@@ -938,6 +966,7 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildKeyActionSection(),
           _buildShortcutSection(),
           _buildAdvancedSection(),
+          _buildOtherSection(),
           _buildCreditsSection(),
           const SizedBox(height: 40),
         ],
