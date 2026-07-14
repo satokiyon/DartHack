@@ -132,6 +132,8 @@
       1. `onGetDefaultValue(TypedArray a, int index)`: XML からデフォルト値を正しく取得して返す。
       2. `onSetInitialValue(boolean restore, Object defaultValue)`: `restore` が `false`（デフォルト値設定時）の際、引数から受け取った `defaultValue` を設定した上で、 `persistInt` / `persistString` / `persistBoolean` を明示的に呼び出して SharedPreferences に値を保存する。
 
+   **関連**: C コア ↔ Flutter FFI におけるウィンドウ API とタイル描画の設計方針（後述）も合わせて参照してください。`#ifndef ANDROID` ガードの配置や、`flutter_putmixed_with_tile` のような Android 専用 C シンボルを共通ファイルに置く際の二重定義回避パターンを記載しています。
+
 
 ## Flutter移植版におけるCスレッド連携・UI同期設計方針
 
@@ -305,7 +307,58 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
       - 既存テスト（pre-existing failures）が残存しており、新規実装と無関係な失敗を本変更に起因する失敗と誤認する。
     - **対策**: 計画書の冒頭に「**前提確認**」セクションを設け、確認した内容を記載してください。コミット粒度の決定は、この確認結果を基に行います。
 
+    **関連**: C コア ↔ Flutter FFI におけるウィンドウ API とタイル描画の設計方針（次セクション）も合わせて参照してください。タイル表示や putmixed 拡張など、ウィンドウ API への機能追加パターンを記載しています。
+
+
+## NetHack C コア ↔ Flutter FFI におけるウィンドウ API とタイル描画の設計方針
+
+NetHack C コア（バックグラウンドスレッド）と Flutter/Dart UI 間で、ウィンドウ API を拡張してタイル表示などの付加情報をやり取りする際の方針です。前述の「Flutter移植版におけるCスレッド連携・UI同期設計方針」の姉妹ドキュメントとして位置付け、ウィンドウ API レベルでの設計判断・実装パターン・典型的なハマりポイントを整理します。
+
+1. **NetHack ウィンドウ API の使い分け（NHW_MENU vs NHW_TEXT）**:
+   - **`NHW_MENU` + `add_menu(glyphinfo, ...)`**: タイル ID を `glyphinfo->gm.tileidx` で **直接取得可能**。インベントリ系メニュー（i, d, e, w, #loot 等）の各行にタイルを表示する場合はこちらを使う。
+   - **`NHW_TEXT` + `putmixed(win, attr, str)`**: 標準 API にはタイル引数が **存在しない**。テキストに `\GXXXXNNNN` 形式のエンコード済みグリフを埋込み、`genl_putmixed` が showsym 1 文字にデコードする仕組み。
+   - → `NHW_TEXT` 経由でタイル表示を追加するには、 `win_putmixed` の **シグネチャ拡張** か **新 API 追加** が必要。
+   - → 関連: タイル ID 計算パターン（本セクション内 4.）、グリフエンコード形式（本セクション内 5.）。
+
+2. **FFI 拡張の追加ルール**:
+   - 新ウィンドウプロックを追加する場合、既存 FFI typedef に新パラメータを追加すると **FFI breaking change** になります（既存コードがすべて再ビルド必要になる）。
+   - → 既存 typedef はそのまま、 **新 typedef を別経路で追加** することで既存 FFI シグネチャを破壊しません。
+   - → 例: 既存の `DartAddMenuCallback` を変更せず、新しく `DartPutMixedWithTileCallback` を定義して登録する。
+   - → 新 typedef は既存と類似の引数並び（`winId, attr, tile, msg` など）にして、同じ実装パターン（`flutter_save_message` + `g_*_cb` 経由）で書けます。
+   - → 関連: 前述の「Flutter移植版におけるCスレッド連携・UI同期設計方針」セクション全体。
+
+3. **Flutter ポート特有のハマりポイント**:
+   - **`static` キーワード**: `winflutter.c` 内の関数を `static` 定義すると、他ファイル（例: `src/pager.c`）から **直接呼び出せません**。pager.c 等の他ファイルから直接呼び出される関数は、必ず **`static` を外して外部リンケージ化** してください。
+   - **`and_procs.win_putmixed` の型**: upstream `include/winprocs.h` で `void (*)(winid, int, const char *)`（3 引数）のため、4 引数関数は **代入不可**（型不一致エラーになる）。シグネチャ拡張は upstream 変更を伴うため、 **クロスプロジェクトでは避ける**。
+   - **`#ifndef ANDROID` ガード**: `src/windows.c` 等の共通ファイルに置いた Android 専用シンボルの非 Android 用デフォルト実装を、Android ビルド時に **コンパイル対象外** にするために必要です。ガードなしだと `flutter_putmixed_with_tile` 等のシンボルが **二重定義** になり、リンクエラーになります。
+   - → 関連: 前述の「Windows (MSVC) 開発における C コード記述とビルドの制約」セクション全体（`#ifndef ANDROID` ガードのビルド検証手順など）。
+
+4. **タイル ID 計算パターン**:
+   - 各種エンティティから対応する NetHack グリフを生成し、`map_glyphinfo` でタイル ID を取得するパターンです。
+   - **怪物**: `mon_to_glyph(mtmp, rn2_on_display_rng)` + `map_glyphinfo`。
+   - **物体**: `vobj_at(x, y)` → `obj_to_glyph(otmp, rn2_on_display_rng)` + `map_glyphinfo`。
+   - **罠**: `trap_to_glyph(t)` または元の trap シンボル + `map_glyphinfo`。
+   - **刻印**: `engraving_to_glyph(e)` または `cmap_to_glyph(S_grave)` + `map_glyphinfo`。
+   - **自分自身**: `hero_glyph` + `map_glyphinfo`。
+   - **不可視/警告マーカー**: 元の `glyph` をそのまま使用。
+   - → 関連: NHW_TEXT 経由の場合、グリフを `\GXXXXNNNN` にエンコードしてから `putmixed` する（本セクション内 5.）。
+
+5. **グリフエンコード形式**:
+   - `encglyph(glyph, buf)` は `\G` + 4 桁 hex（ランダムエンコード）+ 4 桁 hex（glyph 値）= `\GXXXXNNNN` を出力します。
+   - `genl_putmixed` は `decode_mixed` でこれを showsym 1 文字にデコードします。
+   - Flutter 側で `\GXXXXNNNN` をパースするには `RegExp(r'\\G[0-9A-Fa-f]{8}')` で検出する（8 文字分）のが確実です。
+
+6. **putmixed 経由のタイル ID 引き渡し実装ガイド**:
+   - インベントリ系メニュー以外のテキスト系ウィンドウ（`/` コマンドの結果リスト等）の各行頭にタイルを表示する場合の手順:
+     1. **新 FFI typedef 追加**（本セクション 2. のパターンに従う）: 例 `DartPutMixedWithTileCallback`。
+     2. **C 側実装**: `winflutter.c` に新 API 関数（例 `flutter_putmixed_with_tile`）を追加し、`static` を **付けない**。Dart 側 FFI 関数テーブル（`FlutterFfiTable` 等）に新コールバックを登録。
+     3. **呼び出し元の修正**（例 `src/pager.c` の `look_all`, `look_traps`, `look_engrs`）: 各エンティティのポインタから `*_to_glyph` + `map_glyphinfo` でタイル ID を計算し、 `putmixed(win, attr, str)` の代わりに新 API（例 `flutter_putmixed_with_tile(win, attr, tile, str)`）を **直接呼び出す**。`and_procs.win_putmixed` の Hijack は **行わない**（本セクション 3. の型不一致問題回避）。
+     4. **非 Android 環境向けデフォルト実装**: 共通ファイル（`src/windows.c` 等）に新 API のスタブ実装を `#ifndef ANDROID` ガード付きで配置し、Android ビルドで二重定義にならないようにする（本セクション 3. の二重定義問題回避）。
+   - **コミット粒度の参考**: 枠組み確立（FFI 拡張）→ 機能有効化（呼び出し元修正）の **2 段階** に分割すると、ロールバック容易でレビューしやすくなります。
+   - **upstream との競合**: NetHackJP-Android 固有のシンボル（例 `flutter_putmixed_with_tile`）を `src/`, `include/` 配下に追加する場合は、NetHackJP の `DEVELOPMENT.md` §4 のポリシーに従い、 `/* NetHackJP: ... */` マーカーで独自実装マーキングしてください。
+
 ## 将来の検討事項
 - レイアウト関連: CmdPanel の Y 軸方向クランプ（マップ下端保護）の実装。方針 16 の「現状の制限」を解消する。
+- ウィンドウ API 拡張: `flutter_putmixed_with_tile` のような NetHackJP-Android 独自シンボル（`src/`, `include/` 配下に追加）の upstream 還元可否の検討。
 
 
