@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. */
 /* NetHack 5.0	windows.c	$NHDT-Date: 1781973074 2026/06/20 16:31:14 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.147 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1534,6 +1534,24 @@ genl_putmixed(winid window, int attr, const char *str)
     /* now send it to the normal putstr */
     putstr(window, attr, decode_mixed(buf, str));
 }
+
+/* flutter_putmixed_with_tile: `look_all` / `look_traps` / `look_engrs` の
+ * 結果リスト (NHW_TEXT) に各エンティティの代表タイルを添えて出力する。
+ * Flutter ポート (win/winflutter.c) は FFI 経由で Dart 側に
+ * (winId, attr, tile, msg) を送信する。 それ以外のポートでは
+ * 単に putmixed を呼び出すフォールバック実装を使う (tile は無視)。
+ * Android ビルド (CMakeLists.txt で -DANDROID 定義あり) では
+ * win/winflutter.c 内の同名関数がリンクされるため、 ここの
+ * デフォルト実装はコンパイルされない。
+ */
+#ifndef ANDROID
+void
+flutter_putmixed_with_tile(winid window, int attr, int tile, const char *str)
+{
+    (void) tile; /* unused for non-Flutter ports */
+    putmixed(window, attr, str);
+}
+#endif
 
 /* possibly called to show usage info during command line processing when
    an interface hasn't yet been chosen and set up */
