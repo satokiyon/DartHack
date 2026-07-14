@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. */
 /* NetHack 5.0	pager.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.302 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -2012,6 +2012,95 @@ add_quoted_engraving(
 /* also used by getpos hack in getpos.c */
 const char what_is_a_location[] = "怪物、物体、または場所";
 
+/*
+ * Compute a representative glyph_info for one of the lootabc "what to
+ * look at" submenu categories (m, M, o, O, t, T, e, E) so that the
+ * tile-aware windowports (Flutter, curses, win32 GUI, Qt, X11) can
+ * display a sample tile next to each category label.
+ *
+ * Lowercase ('m', 'o', 't', 'e') restricts the search to entities that
+ * are "nearby" (within BOLT_LIM of the hero), matching the semantics of
+ * the look_xxx() routines that the submenu dispatches to.  Uppercase
+ * ('M', 'O', 'T', 'E') allows samples from anywhere on the current
+ * level.  The caller is expected to be inside the !u.uswallow &&
+ * !Hallucination guard that the lootabc block already enforces, so
+ * hallucination-safe macros (mon_to_glyph) are acceptable.
+ *
+ * Returns a pointer to a static glyph_info; the value is valid until
+ * the next call to this function, so each result must be consumed by
+ * add_menu() before the following call.  If no matching sample exists
+ * on the level, &nul_glyphinfo is returned (each windowport will then
+ * render no tile for that row).
+ */
+static const glyph_info *
+lookat_category_sample_glyph(char cat)
+{
+    static glyph_info gi;
+    int glyph = NO_GLYPH;
+    struct monst *mtmp;
+    struct obj *otmp;
+    struct trap *trap;
+    struct engr *engr;
+    coordxy x, y;
+    boolean near_only = (cat >= 'a' && cat <= 'z');
+
+    switch (cat) {
+    case 'm':
+    case 'M':
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (DEADMONSTER(mtmp) || mtmp->mx < 0 || mtmp->my < 0)
+                continue;
+            if (near_only && distu(mtmp->mx, mtmp->my) > BOLT_LIM * BOLT_LIM)
+                continue;
+            glyph = mon_to_glyph(mtmp, rn2_on_display_rng);
+            goto found;
+        }
+        break;
+    case 'o':
+    case 'O':
+        for (otmp = fobj; otmp; otmp = otmp->nobj) {
+            if (otmp->ox < 0 || otmp->oy < 0)
+                continue;
+            if (near_only && distu(otmp->ox, otmp->oy) > BOLT_LIM * BOLT_LIM)
+                continue;
+            glyph = obj_to_glyph(otmp, rn2_on_display_rng);
+            goto found;
+        }
+        break;
+    case 't':
+    case 'T':
+        for (trap = gf.ftrap; trap; trap = trap->ntrap) {
+            if (trap->tx < 0 || trap->ty < 0)
+                continue;
+            if (near_only && distu(trap->tx, trap->ty) > BOLT_LIM * BOLT_LIM)
+                continue;
+            glyph = trap_to_glyph(trap);
+            goto found;
+        }
+        break;
+    case 'e':
+    case 'E':
+        for (x = 0; x < COLNO; ++x) {
+            for (y = 0; y < ROWNO; ++y) {
+                if (near_only && distu(x, y) > BOLT_LIM * BOLT_LIM)
+                    continue;
+                if ((engr = engr_at(x, y)) != 0) {
+                    glyph = engraving_to_glyph(engr);
+                    goto found;
+                }
+            }
+        }
+        break;
+    default:
+        break;
+    }
+    return &nul_glyphinfo;
+
+found:
+    map_glyphinfo(0, 0, glyph, 0U, &gi);
+    return &gi;
+}
+
 int
 do_look(int mode, coord *click_cc)
 {
@@ -2098,46 +2187,46 @@ do_look(int mode, coord *click_cc)
                    symbol/monster class letter doesn't match up with
                    bogus monster type, so suppress when hallucinating */
                 any.a_char = 'm';
-                add_menu(win, &nul_glyphinfo, &any,
+                add_menu(win, lookat_category_sample_glyph('m'), &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
                          clr, "近くの怪物", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'M';
-                add_menu(win, &nul_glyphinfo, &any,
+                add_menu(win, lookat_category_sample_glyph('M'), &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
                          clr, "地図に表示中の怪物すべて",
                          MENU_ITEMFLAGS_NONE);
                 any.a_char = 'o';
-                add_menu(win, &nul_glyphinfo, &any,
+                add_menu(win, lookat_category_sample_glyph('o'), &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
                          clr, "近くの物体", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'O';
-                add_menu(win, &nul_glyphinfo, &any,
+                add_menu(win, lookat_category_sample_glyph('O'), &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
                          clr, "地図に表示中の物体すべて",
                          MENU_ITEMFLAGS_NONE);
                 any.a_char = 't';
-                add_menu(win, &nul_glyphinfo, &any,
+                add_menu(win, lookat_category_sample_glyph('t'), &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : '^', ATR_NONE,
                          clr, "近くの罠", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'T';
-                add_menu(win, &nul_glyphinfo, &any,
+                add_menu(win, lookat_category_sample_glyph('T'), &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : '\"', ATR_NONE,
                          clr, "視認済み・記憶済みの罠すべて",
                          MENU_ITEMFLAGS_NONE);
                 any.a_char = 'e';
-                add_menu(win, &nul_glyphinfo, &any,
+                add_menu(win, lookat_category_sample_glyph('e'), &any,
                          flags.lootabc ? 0 : any.a_char,
                          /* [don't use 'e' as lootabc group accelerator] */
                          flags.lootabc ? 0 : '`', ATR_NONE,
                          clr, "近くの刻印", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'E';
-                add_menu(win, &nul_glyphinfo, &any,
+                add_menu(win, lookat_category_sample_glyph('E'), &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : '|', ATR_NONE,
                          clr, "視認済み・記憶済みの刻印すべて",
