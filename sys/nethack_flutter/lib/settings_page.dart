@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'defaults_editor.dart';
 import 'nethack_ffi.dart';
+import 'utils/scale_clamp.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -29,7 +30,9 @@ class _SettingsPageState extends State<SettingsPage> {
   int _statusDisplayMode = 0;
   int _tombstoneDisplayMode = 0; // 0: 画像+文字オーバーレイ, 1: Cコア出力そのまま(テキスト)
   double _padOpacity = 0.8;
-  double _padScale = 1.0;
+  double _dpadScale = 1.0;
+  double _shortcutPadScale = 1.0;
+  double _cmdPanelScale = 1.0;
   String _drawerPosition = 'left';
   String _menuButtonPosition = 'bottom_left';
 
@@ -145,7 +148,9 @@ class _SettingsPageState extends State<SettingsPage> {
       final tombstoneModeRaw = prefs.getInt('tombstone_display_mode');
       _tombstoneDisplayMode = (tombstoneModeRaw == 1) ? 1 : 0;
       _padOpacity = prefs.getDouble('pad_opacity') ?? 0.8;
-      _padScale = prefs.getDouble('pad_scale') ?? 1.0;
+      _dpadScale = prefs.getDouble('dpad_scale') ?? 1.0;
+      _shortcutPadScale = prefs.getDouble('shortcut_pad_scale') ?? 1.0;
+      _cmdPanelScale = prefs.getDouble('cmd_panel_scale') ?? 1.0;
       _drawerPosition = prefs.getString('drawer_position') ?? 'left';
       _menuButtonPosition = prefs.getString('menu_button_position') ?? 'bottom_left';
 
@@ -251,7 +256,10 @@ class _SettingsPageState extends State<SettingsPage> {
         } else if (value is double) {
           await prefs.setDouble(key, value);
         } else if (value is int) {
-          if (key == 'pad_opacity' || key == 'pad_scale') {
+          if (key == 'pad_opacity' ||
+              key == 'dpad_scale' ||
+              key == 'shortcut_pad_scale' ||
+              key == 'cmd_panel_scale') {
             await prefs.setDouble(key, value.toDouble());
           } else {
             await prefs.setInt(key, value);
@@ -532,17 +540,75 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         ListTile(
-          title: const Text("ボタンサイズ倍率"),
-          subtitle: Slider(
-            value: _padScale,
-            min: 0.6,
-            max: 1.5,
-            divisions: 9,
-            label: _padScale.toStringAsFixed(1),
-            onChanged: (val) {
-              setState(() => _padScale = val);
-              _saveSetting('pad_scale', val);
-            },
+          title: const Text("移動ボタンサイズ倍率"),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Slider(
+                value: _dpadScale,
+                min: 0.6,
+                max: 1.5,
+                divisions: 9,
+                label: _dpadScale.toStringAsFixed(1),
+                onChanged: (val) {
+                  setState(() => _dpadScale = val);
+                  _saveSetting('dpad_scale', val);
+                },
+              ),
+              _buildAppliedScaleLabel(
+                setting: _dpadScale,
+                effective: _previewDpadEffectiveScale,
+                label: '移動',
+              ),
+            ],
+          ),
+        ),
+        ListTile(
+          title: const Text("ショートカットボタンサイズ倍率"),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Slider(
+                value: _shortcutPadScale,
+                min: 0.6,
+                max: 1.5,
+                divisions: 9,
+                label: _shortcutPadScale.toStringAsFixed(1),
+                onChanged: (val) {
+                  setState(() => _shortcutPadScale = val);
+                  _saveSetting('shortcut_pad_scale', val);
+                },
+              ),
+              _buildAppliedScaleLabel(
+                setting: _shortcutPadScale,
+                effective: _previewShortcutPadEffectiveScale,
+                label: 'ショートカット',
+              ),
+            ],
+          ),
+        ),
+        ListTile(
+          title: const Text("コマンドパネルサイズ倍率"),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Slider(
+                value: _cmdPanelScale,
+                min: 0.6,
+                max: 1.5,
+                divisions: 9,
+                label: _cmdPanelScale.toStringAsFixed(1),
+                onChanged: (val) {
+                  setState(() => _cmdPanelScale = val);
+                  _saveSetting('cmd_panel_scale', val);
+                },
+              ),
+              _buildAppliedScaleLabel(
+                setting: _cmdPanelScale,
+                effective: _cmdPanelScale,
+                label: 'コマンドパネル',
+              ),
+            ],
           ),
         ),
         ListTile(
@@ -588,6 +654,62 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
       ],
+    );
+  }
+
+  double get _previewDpadEffectiveScale {
+    if (!mounted) return _dpadScale;
+    final width = MediaQuery.of(context).size.width;
+    return calculatePadClamp(
+      dpadScale: _dpadScale,
+      shortcutPadScale: _shortcutPadScale,
+      screenWidth: width,
+    ).dpadEffectiveScale;
+  }
+
+  double get _previewShortcutPadEffectiveScale {
+    if (!mounted) return _shortcutPadScale;
+    final width = MediaQuery.of(context).size.width;
+    return calculatePadClamp(
+      dpadScale: _dpadScale,
+      shortcutPadScale: _shortcutPadScale,
+      screenWidth: width,
+    ).shortcutPadEffectiveScale;
+  }
+
+  Widget _buildAppliedScaleLabel({
+    required double setting,
+    required double effective,
+    required String label,
+  }) {
+    final isClamped = (setting - effective).abs() > 0.01;
+    final clampedColor = Colors.amber[300] ?? const Color(0xFFFFD54F);
+    final color = isClamped ? clampedColor : Colors.white60;
+    final fontWeight = isClamped ? FontWeight.bold : FontWeight.normal;
+    return Padding(
+      padding: const EdgeInsets.only(top: 2, bottom: 4),
+      child: Row(
+        children: [
+          Text(
+            '適用倍率: ${effective.toStringAsFixed(2)}',
+            style: TextStyle(
+              fontSize: 11,
+              color: color,
+              fontWeight: fontWeight,
+            ),
+          ),
+          if (isClamped) ...[
+            const SizedBox(width: 6),
+            Text(
+              '⚠ 画面幅により自動調整',
+              style: TextStyle(
+                fontSize: 10,
+                color: clampedColor,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 

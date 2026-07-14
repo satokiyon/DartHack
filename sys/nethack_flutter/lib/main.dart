@@ -16,6 +16,7 @@ import 'nethack_ffi.dart';
 import 'settings_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'amount_selector_dialog.dart';
+import 'utils/scale_clamp.dart';
 import 'dart:ffi' hide Size;
 import 'dart:convert';
 import 'package:ffi/ffi.dart';
@@ -150,7 +151,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // 詳細な操作設定（shared_preferences用）
   double _padOpacity = 0.8;
-  double _padScale = 1.0;
+  double _dpadScale = 1.0;
+  double _shortcutPadScale = 1.0;
+  double _cmdPanelScale = 1.0;
+  // 実効 scale（クランプ適用後、build 内で更新）
+  double _dpadEffectiveScale = 1.0;
+  double _shortcutPadEffectiveScale = 1.0;
+  double _cmdPanelEffectiveScale = 1.0;
   int _statusDisplayMode = 0; // 0: 領域に合わせて文字サイズ縮小(Fit), 1: 領域の可変高さ(Wrap)
   int _tombstoneDisplayMode = 0; // 0: 画像+文字オーバーレイ, 1: Cコア出力そのまま(テキスト)
   String _drawerPosition = 'left';
@@ -211,7 +218,9 @@ class _MyHomePageState extends State<MyHomePage> {
       final controllerModeStr = prefs.getString('controller_mode') ?? 'pad';
       _controllerMode = controllerModeStr == 'keyboard' ? ControllerMode.keyboard : ControllerMode.pad;
       _padOpacity = prefs.getDouble('pad_opacity') ?? 0.8;
-      _padScale = prefs.getDouble('pad_scale') ?? 1.0;
+      _dpadScale = prefs.getDouble('dpad_scale') ?? 1.0;
+      _shortcutPadScale = prefs.getDouble('shortcut_pad_scale') ?? 1.0;
+      _cmdPanelScale = prefs.getDouble('cmd_panel_scale') ?? 1.0;
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
       _tombstoneDisplayMode = _loadTombstoneDisplayMode(prefs.getInt('tombstone_display_mode'));
       _showPanelNames = prefs.getBool('show_panel_names') ?? true;
@@ -549,10 +558,27 @@ class _MyHomePageState extends State<MyHomePage> {
       return 0.0;
     }
     if (_controllerMode == ControllerMode.keyboard) {
-      return 230.0 * _padScale;
+      return 230.0; // ソフトウェアキーボードは scale 1.0 固定
     }
-    const padAndShortcutHeight = 162.0;
-    return (padAndShortcutHeight + _cmdPanelHeight) * _padScale;
+    // 新レイアウト: コマンドパネル(scaled) + 6(gap) + 6(上padding) + max(D-Pad, ShortcutPad) scaled
+    // = cmdPanelHeight * cmdPanelEffective + 12 + max(150 * dpadEffective, 150 * shortcutPadEffective)
+    final cmdPanelScaledHeight = _cmdPanelHeight * _cmdPanelEffectiveScale;
+    final dpadOrShortcutScaledHeight =
+        150.0 * (_dpadEffectiveScale > _shortcutPadEffectiveScale
+                ? _dpadEffectiveScale
+                : _shortcutPadEffectiveScale);
+    return cmdPanelScaledHeight + 12.0 + dpadOrShortcutScaledHeight;
+  }
+
+  void _updateEffectiveScales(double screenWidth) {
+    final result = calculatePadClamp(
+      dpadScale: _dpadScale,
+      shortcutPadScale: _shortcutPadScale,
+      screenWidth: screenWidth,
+    );
+    _dpadEffectiveScale = result.dpadEffectiveScale;
+    _shortcutPadEffectiveScale = result.shortcutPadEffectiveScale;
+    _cmdPanelEffectiveScale = _cmdPanelScale; // CmdPanel はクランプなし
   }
 
   double _dialogBottomInset(BuildContext context) {
@@ -2923,88 +2949,118 @@ class _MyHomePageState extends State<MyHomePage> {
       return const SizedBox.shrink();
     }
 
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      child: Transform.scale(
-        scale: _padScale,
-        alignment: Alignment.bottomCenter,
-        child: _controllerMode == ControllerMode.keyboard
-            ? NetHackKeyboard(
+    if (_controllerMode == ControllerMode.keyboard) {
+      return Positioned(
+        left: 0,
+        right: 0,
+        bottom: 0,
+        child: NetHackKeyboard(
+          opacity: _padOpacity,
+          onKeyPress: (key) => _sendKeysToC(key),
+          onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+          onToggleMode: () {
+            setState(() {
+              _controllerMode = ControllerMode.pad;
+            });
+          },
+        ),
+      );
+    }
+
+    final cmdPanelScaledHeight = _cmdPanelHeight * _cmdPanelEffectiveScale;
+    const padTopPadding = 6.0;
+    const sideMargin = 8.0;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // コマンドパネル: 画面最下端、左下起点で scale
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: Transform.scale(
+            scale: _cmdPanelEffectiveScale,
+            alignment: Alignment.bottomLeft,
+            child: NetHackCmdPanel(
+              key: ValueKey(_controlsVersion),
+              opacity: _padOpacity,
+              showPanelNames: _showPanelNames,
+              onKeyPress: (key) => _sendKeysToC(key),
+              onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
+              onPanelHeightChanged: (height) {
+                if ((_cmdPanelHeight - height).abs() < 0.1) {
+                  return;
+                }
+                if (!mounted) {
+                  return;
+                }
+                setState(() {
+                  _cmdPanelHeight = height;
+                });
+              },
+              onToggleMode: () {
+                setState(() {
+                  _controllerMode = ControllerMode.keyboard;
+                });
+              },
+            ),
+          ),
+        ),
+        // 移動パッド: コマンドパネルの上、左下起点で scale
+        Positioned(
+          left: sideMargin,
+          bottom: cmdPanelScaledHeight + padTopPadding,
+          child: Padding(
+            padding: const EdgeInsets.only(top: padTopPadding),
+            child: Transform.scale(
+              scale: _dpadEffectiveScale,
+              alignment: Alignment.bottomLeft,
+              child: NetHackDPad(
+                opacity: _padOpacity,
+                directionLabels: _buildDirectionLabels(),
+                centerLabel: _moveModeLabel(_dPadMoveMode),
+                onDirectionPress: (viKey) {
+                  _sendModeAppliedDirection(viKey);
+                },
+                onDirectionLongPress: (viKey) {
+                  _sendModeAppliedDirection(viKey, useLongPressRun: true);
+                },
+                onCenterTap: _cycleDPadMoveMode,
+                onCenterLongPress: () {
+                  _showMoveModeSelectDialog();
+                },
+              ),
+            ),
+          ),
+        ),
+        // ショートカットパッド: コマンドパネルの上、右下起点で scale
+        Positioned(
+          right: sideMargin,
+          bottom: cmdPanelScaledHeight + padTopPadding,
+          child: Padding(
+            padding: const EdgeInsets.only(top: padTopPadding),
+            child: Transform.scale(
+              scale: _shortcutPadEffectiveScale,
+              alignment: Alignment.bottomRight,
+              child: NetHackShortcutPad(
+                key: ValueKey(_controlsVersion),
                 opacity: _padOpacity,
                 onKeyPress: (key) => _sendKeysToC(key),
                 onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                onToggleMode: () {
-                  setState(() {
-                    _controllerMode = ControllerMode.pad;
-                  });
-                },
-              )
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // ボタンモード (左端に D-Pad, 右端に 3x3 ショートカットパッド)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        NetHackDPad(
-                          opacity: _padOpacity,
-                          directionLabels: _buildDirectionLabels(),
-                          centerLabel: _moveModeLabel(_dPadMoveMode),
-                          onDirectionPress: (viKey) {
-                            _sendModeAppliedDirection(viKey);
-                          },
-                          onDirectionLongPress: (viKey) {
-                            _sendModeAppliedDirection(viKey, useLongPressRun: true);
-                          },
-                          onCenterTap: _cycleDPadMoveMode,
-                          onCenterLongPress: () {
-                            _showMoveModeSelectDialog();
-                          },
-                        ),
-                        NetHackShortcutPad(key: ValueKey(_controlsVersion),
-                          opacity: _padOpacity,
-                          onKeyPress: (key) => _sendKeysToC(key),
-                          onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                          onShortcut: (cmd) => _sendShortcutToC(cmd),
-                          onShortcutLongPress: (index) => _showShortcutEditDialog(index),
-                        ),
-                      ],
-                    ),
-                  ),
-                  NetHackCmdPanel(key: ValueKey(_controlsVersion),
-                    opacity: _padOpacity,
-                    showPanelNames: _showPanelNames,
-                    onKeyPress: (key) => _sendKeysToC(key),
-                    onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
-                    onPanelHeightChanged: (height) {
-                      if ((_cmdPanelHeight - height).abs() < 0.1) {
-                        return;
-                      }
-                      if (!mounted) {
-                        return;
-                      }
-                      setState(() {
-                        _cmdPanelHeight = height;
-                      });
-                    },
-                    onToggleMode: () {
-                      setState(() {
-                        _controllerMode = ControllerMode.keyboard;
-                      });
-                    },
-                  ),
-                ],
+                onShortcut: (cmd) => _sendShortcutToC(cmd),
+                onShortcutLongPress: (index) => _showShortcutEditDialog(index),
               ),
-      ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    _updateEffectiveScales(MediaQuery.of(context).size.width);
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {

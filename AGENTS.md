@@ -244,6 +244,32 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
     - 具体的には、領域全体を覆うような `GestureDetector` や `Container` の使用を避け、`Column` や `Wrap` などのレイアウトウィジェットを用いて、実際に文字が描画されている各行（または各要素）ごとに個別に `GestureDetector` と半透明背景（`BoxDecoration` 等）を配置してください。
     - これにより、ユーザーが文字のない空白部分に触れた際は、下層のマップ等のタップイベントとして通常通り判定されるようになり、直感的な操作性とマップ視認性を両立できます。
 
+16. **複数 UI 要素の独立 scale 化と衝突回避クランプ**:
+    - 画面下端に配置する D-Pad・ShortcutPad・CmdPanel のような「複数の独立 UI 要素に個別の scale 設定を持たせる」場合、各 Widget を画面端点（`Alignment.bottomLeft` / `Alignment.bottomRight`）を起点に拡大する設計が有効です。
+    - **基本パターン**:
+      ```dart
+      Positioned(
+        left: 8,                              // 端点からのマージン
+        bottom: cmdPanelHeight + 6,           // 縦位置 (CmdPanel の上 6px)
+        child: Padding(
+          padding: const EdgeInsets.only(top: 6),  // 上方向の余白（元レイアウト互換）
+          child: Transform.scale(
+            scale: _dpadEffectiveScale,       // 独立 scale
+            alignment: Alignment.bottomLeft,  // 端点と一致
+            child: NetHackDPad(...),
+          ),
+        ),
+      )
+      ```
+    - **衝突回避クランプ**: 両端起点のパッド群が中央で衝突する可能性がある場合、`combinedScaledWidth > availableWidth` を判定し、両者を等倍で `equalScale = availableWidth / totalBaseSize` にクランプします。共通関数 `sys/nethack_flutter/lib/utils/scale_clamp.dart` の `calculatePadClamp()` を必ず使用してください。
+    - **minGap**: 両端からの最小間隔（minGap = 8px 程度 = `Positioned` の `left` / `right`）を確保し、視覚的な窮屈さと誤タップを防ぎます。
+    - **クランプ通知**: 設定値と実効値が乖離する場合、設定画面の Slider 下に「⚠ 画面幅により自動調整」を薄いオレンジ色（`Colors.amber[300]`）で表示します。
+    - **してはいけないこと**:
+      - 全 UI 要素を単一の `Transform.scale` でまとめて拡大する（位置計算が破綻しやすい）
+      - スケール拡大時のクランプを行わず、`RenderFlex overflow` 例外を許容する
+      - 拡大後の Widget が画面外にはみ出すことを許容する
+    - **現状の制限**: Y 軸方向の CmdPanel 拡張時にマップ下端が見切れる可能性があります。完全な縦方向保護は未実装です（将来の改善課題）。
+
 
 
 
