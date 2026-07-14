@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. */
 /* NetHack 5.0	pager.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.302 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -11,6 +11,15 @@
 
 #include "hack.h"
 #include "dlb.h"
+
+/* flutter_putmixed_with_tile: `look_all` / `look_traps` / `look_engrs` の
+ * 結果リスト (NHW_TEXT) に各エンティティの代表タイルを添えて出力する。
+ * Flutter ポート (win/winflutter.c) は FFI 経由で Dart 側に
+ * (winId, attr, tile, msg) を送信する。 デフォルト実装は
+ * src/windows.c にあり、 そこでは単に putmixed を呼び出す
+ * (tile は無視される)。
+ */
+extern void flutter_putmixed_with_tile(winid, int, int, const char *);
 
 staticfn boolean is_swallow_sym(int);
 staticfn int append_str(char *, const char *) NONNULLPTRS;
@@ -2364,6 +2373,8 @@ look_all(
             }
             if (*lookbuf) {
                 char coordbuf[20], which[12], cmode;
+                int tile = -1;
+                glyph_info tileinfo = nul_glyphinfo;
 
                 cmode = (iflags.getpos_coords != GPCOORDS_NONE)
                            ? iflags.getpos_coords : GPCOORDS_MAP;
@@ -2404,7 +2415,35 @@ look_all(
                 /* guard against potential overflow */
                 lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
                 Strcat(outbuf, lookbuf);
-                putmixed(win, 0, outbuf);
+
+                /* タイル ID 計算: 怪物は mon_to_glyph, 物体は obj_to_glyph.
+                 * サンプルが見つからないケース (例: 不可視マーカーや
+                 * 警告マーカー) は元の glyph をそのまま使う。 */
+                if (do_mons) {
+                    if (u_at(x, y) && canspotself()) {
+                        map_glyphinfo(0, 0, hero_glyph, 0U, &tileinfo);
+                    } else {
+                        struct monst *mm = m_at(x, y);
+                        if (mm) {
+                            int gg = mon_to_glyph(mm, rn2_on_display_rng);
+                            map_glyphinfo(0, 0, gg, 0U, &tileinfo);
+                        } else {
+                            /* 不可視/警告マーカー: 元の glyph を使う */
+                            map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
+                        }
+                    }
+                } else {
+                    struct obj *oo = vobj_at(x, y);
+                    if (oo) {
+                        int gg = obj_to_glyph(oo, rn2_on_display_rng);
+                        map_glyphinfo(0, 0, gg, 0U, &tileinfo);
+                    } else {
+                        map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
+                    }
+                }
+                tile = tileinfo.gm.tileidx;
+
+                flutter_putmixed_with_tile(win, 0, tile, outbuf);
             }
         }
     }
@@ -2449,6 +2488,8 @@ look_traps(boolean nearby)
             }
             if (*lookbuf) {
                 char coordbuf[20], cmode;
+                int tile = -1;
+                glyph_info tileinfo = nul_glyphinfo;
 
                 cmode = (iflags.getpos_coords != GPCOORDS_NONE)
                            ? iflags.getpos_coords : GPCOORDS_MAP;
@@ -2471,7 +2512,13 @@ look_traps(boolean nearby)
                 /* guard against potential overflow */
                 lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
                 Strcat(outbuf, lookbuf);
-                putmixed(win, 0, outbuf);
+
+                /* タイル ID 計算: トラップは表示用 glyph (= trap_to_glyph
+                 * または trap シンボル) をそのまま使う。 */
+                map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
+                tile = tileinfo.gm.tileidx;
+
+                flutter_putmixed_with_tile(win, 0, tile, outbuf);
             }
         }
     }
@@ -2538,6 +2585,8 @@ look_engrs(boolean nearby)
             }
             if (*lookbuf) { /* (redundant) */
                 char coordbuf[20], cmode;
+                int tile = -1;
+                glyph_info tileinfo = nul_glyphinfo;
 
                 cmode = (iflags.getpos_coords != GPCOORDS_NONE)
                            ? iflags.getpos_coords : GPCOORDS_MAP;
@@ -2560,7 +2609,14 @@ look_engrs(boolean nearby)
                 /* guard against potential overflow */
                 lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
                 Strcat(outbuf, lookbuf);
-                putmixed(win, 0, outbuf);
+
+                /* タイル ID 計算: 刻印/墓石は表示用 glyph (= engraving_to_glyph
+                 * または cmap_to_glyph(S_grave)、 もしくは元マップの刻印
+                 * シンボル) をそのまま使う。 */
+                map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
+                tile = tileinfo.gm.tileidx;
+
+                flutter_putmixed_with_tile(win, 0, tile, outbuf);
             }
         }
     }
