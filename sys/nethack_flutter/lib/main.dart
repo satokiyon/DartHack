@@ -2708,57 +2708,64 @@ class _MyHomePageState extends State<MyHomePage> {
                           top: 0,
                           left: 0,
                           right: 0,
-                          child: GestureDetector(
-                            onTap: () {
+                          child: Builder(
+                            builder: (context) {
+                              final displayedLines = List<String>.from(
+                                _screen.messageHistory.sublist(
+                                  _screen.messageHistory.length > _msgLineCount
+                                      ? _screen.messageHistory.length - _msgLineCount
+                                      : 0,
+                                ),
+                              );
                               if (_screen.isMoreActive) {
-                                _sendFfiKey(32, 'Space');
-                                _screen.setMoreActive(false);
-                              } else {
-                                _showMsgHistoryPanel();
+                                displayedLines.add(" -- MORE --");
                               }
-                            },
-                            child: Builder(
-                              builder: (context) {
-                                final displayedLines = List<String>.from(
-                                  _screen.messageHistory.sublist(
-                                    _screen.messageHistory.length > _msgLineCount
-                                        ? _screen.messageHistory.length - _msgLineCount
-                                        : 0,
-                                  ),
-                                );
-                                if (_screen.isMoreActive) {
-                                  displayedLines.add(" -- MORE --");
-                                }
-                                return Container(
-                                  color: Colors.black.withValues(alpha: _msgOpacity),
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                                  child: Text.rich(
-                                    TextSpan(
-                                      children: displayedLines.asMap().entries.map((entry) {
-                                        final index = entry.key;
-                                        final line = entry.value;
-                                        final isMoreLine = _screen.isMoreActive && index == displayedLines.length - 1;
-                                        final double ratio = displayedLines.length > 1
-                                            ? index / (displayedLines.length - 1)
-                                            : 1.0;
-                                        final color = isMoreLine
-                                            ? Colors.amber[400]!
-                                            : Color.lerp(Colors.white30, Colors.white, ratio)!;
-                                        return TextSpan(
-                                          text: line + (index < displayedLines.length - 1 ? '\n' : ''),
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: displayedLines.asMap().entries.map((entry) {
+                                  final index = entry.key;
+                                  final line = entry.value;
+                                  final isMoreLine = _screen.isMoreActive && index == displayedLines.length - 1;
+                                  final double ratio = displayedLines.length > 1
+                                      ? index / (displayedLines.length - 1)
+                                      : 1.0;
+                                  final color = isMoreLine
+                                      ? Colors.amber[400]!
+                                      : Color.lerp(Colors.white30, Colors.white, ratio)!;
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 2.0),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        if (_screen.isMoreActive) {
+                                          _sendFfiKey(32, 'Space');
+                                          _screen.setMoreActive(false);
+                                        } else {
+                                          _showMsgHistoryPanel();
+                                        }
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withValues(alpha: _msgOpacity),
+                                          borderRadius: BorderRadius.circular(4.0),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                        child: Text(
+                                          line,
                                           style: TextStyle(
                                             color: color,
                                             fontFamily: 'monospace',
                                             fontSize: _msgFontSize,
                                             fontWeight: isMoreLine ? FontWeight.bold : FontWeight.normal,
                                           ),
-                                        );
-                                      }).toList(),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
+                                  );
+                                }).toList(),
+                              );
+                            },
                           ),
                         ),
                     ],
