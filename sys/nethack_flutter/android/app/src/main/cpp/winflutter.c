@@ -23,6 +23,7 @@ static int flutter_do_ext_cmd_menu(boolean complete);
 static void flutter_destroy_nhwindow(winid window);
 static void flutter_display_file(const char *name, boolean complain);
 static void flutter_putstr(winid window, int attr, const char* str);
+static void flutter_putmixed_with_tile(winid window, int attr, int tile, const char* str);
 static void flutter_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, unsigned long *colormasks);
 static void flutter_exit_nhwindows(const char* str);
 static int flutter_doprev_message(void);
@@ -71,6 +72,7 @@ typedef void (*DartAskNameCallback)(const char* saves, int maxChars);
 typedef void (*DartExitCallback)(const char* msg);
 typedef void (*DartNumberPadModeCallback)(int state);
 typedef void (*DartCliparoundCallback)(int x, int y, int playerX, int playerY);
+typedef void (*DartPutMixedWithTileCallback)(int winId, int attr, int tile, const char* str);
 
 static DartCreateWindowCallback g_create_window_cb = NULL;
 static DartClearWindowCallback g_clear_window_cb = NULL;
@@ -90,6 +92,7 @@ static DartAskNameCallback g_askname_cb = NULL;
 static DartExitCallback g_exit_cb = NULL;
 static DartNumberPadModeCallback g_number_pad_mode_cb = NULL;
 static DartCliparoundCallback g_cliparound_cb = NULL;
+static DartPutMixedWithTileCallback g_putmixed_cb = NULL;
 
 // 同期待信用変数
 static volatile char g_yn_result = 0;
@@ -252,7 +255,8 @@ void RegisterFlutterCallbacks(
     DartAskNameCallback askname_cb,
     DartExitCallback exit_cb,
     DartNumberPadModeCallback number_pad_cb,
-    DartCliparoundCallback cliparound_cb
+    DartCliparoundCallback cliparound_cb,
+    DartPutMixedWithTileCallback putmixed_cb
 ) {
     g_create_window_cb = create_cb;
     g_clear_window_cb = clear_cb;
@@ -272,6 +276,7 @@ void RegisterFlutterCallbacks(
     g_exit_cb = exit_cb;
     g_number_pad_mode_cb = number_pad_cb;
     g_cliparound_cb = cliparound_cb;
+    g_putmixed_cb = putmixed_cb;
     debuglog("Flutter window, menu and sync callbacks registered.");
 }
 
@@ -879,6 +884,21 @@ static void flutter_putstr(winid window, int attr, const char* str) {
     }
 }
 
+static void flutter_putmixed_with_tile(winid window, int attr, int tile, const char* str) {
+    debuglog("flutter_putmixed_with_tile [%d, attr=%d, tile=%d]: %s", window, attr, tile, str);
+    if ((int) window == WIN_MESSAGE && str) {
+        flutter_save_message(str);
+    }
+    if (g_putmixed_cb && str) {
+        char* conv = convert_cp437_to_utf8(str);
+        int final_attr = attr;
+        if (g_in_input_prompt) {
+            final_attr |= 0x8000;
+        }
+        g_putmixed_cb((int)window, final_attr, tile, conv ? conv : str);
+    }
+}
+
 static void flutter_raw_print(const char* str) {
     debuglog("flutter_raw_print: %s", str ? str : "NULL");
     if (str) {
@@ -1452,6 +1472,7 @@ static void HijackWindowProcs(void) {
     and_procs.win_destroy_nhwindow = flutter_destroy_nhwindow;
     and_procs.win_curs = flutter_curs;
     and_procs.win_putstr = flutter_putstr;
+    and_procs.win_putmixed = flutter_putmixed_with_tile;
     and_procs.win_raw_print = flutter_raw_print;
     and_procs.win_raw_print_bold = flutter_raw_print_bold;
     and_procs.win_display_file = flutter_display_file;

@@ -960,6 +960,28 @@ class _MyHomePageState extends State<MyHomePage> {
             _autoAdvanceSavePending = true;
             _autoAdvanceSavePendingUntilMs = DateTime.now().millisecondsSinceEpoch + 5000;
           }
+        } else if (type == 'putMixed') {
+          // putmixed タイル ID 付き送信 (`/` 結果リスト用)。
+          // putstr と同じダイアログ検出 (方向プロンプト、 セーブ進行) も行う。
+          final text = (message['text'] as String?) ?? '';
+          _screen.putMixedWithTile(
+            message['winId'],
+            message['attr'],
+            message['tile'] ?? -1,
+            text,
+          );
+          final winId = message['winId'] as int? ?? -1;
+          if (winId == _messageWinId || winId == 1) {
+            if (_isDirectionPromptText(text)) {
+              _isDirectionPromptActive = true;
+            } else if (text.trim().isNotEmpty) {
+              _isDirectionPromptActive = false;
+            }
+          }
+          if (_isSaveInProgressMessage(text)) {
+            _autoAdvanceSavePending = true;
+            _autoAdvanceSavePendingUntilMs = DateTime.now().millisecondsSinceEpoch + 5000;
+          }
         } else if (type == 'printGlyph') {
           _screen.printGlyph(
             message['winId'],
@@ -2925,16 +2947,43 @@ class _MyHomePageState extends State<MyHomePage> {
                                       );
                                     }
 
+                                    // putmixed 経由のテキスト (例: `/` 結果リスト) は
+                                    // テキスト内に `\GXXXXNNNN` のグリフコードを含む。
+                                    // 該当部分を抽出してタイル画像に置換する。
+                                    // タイル ID は _textTiles[index] から取得 (putstr
+                                    // 経由の行は -1 が入っている)。
+                                    // tile < 0 の場合は \G 部分をそのまま残し、 従来の
+                                    // showsym 表示にフォールバックする (現時点では素の
+                                    // \G が残るが、 C 側で tile を渡す Commit 3 適用
+                                    // 以降は表示されない)。
+                                    final tile = (index < _screen.textTiles.length)
+                                        ? _screen.textTiles[index]
+                                        : -1;
+                                    final hasGlyphCode = RegExp(r'\\G[0-9A-Fa-f]{8}').hasMatch(line);
+                                    final displayLine = (tile >= 0 && hasGlyphCode)
+                                        ? line.replaceAll(RegExp(r'\\G[0-9A-Fa-f]{8}'), '')
+                                        : line;
+                                    final displayTile = tile;
+
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 4),
-                                      child: Text(
-                                        line,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontFamily: 'monospace',
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          _buildMenuItemTile(displayTile),
+                                          const SizedBox(width: 4),
+                                          Expanded(
+                                            child: Text(
+                                              displayLine,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontFamily: 'monospace',
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     );
                                   },

@@ -54,6 +54,9 @@ class NetHackWorker {
     // プレイヤー位置通知用 NativeCallable (マップタップの #herecmdmenu 連動で使用)
     late final NativeCallable<CliparoundCallback> cliparoundCallable;
 
+    // putmixed タイル ID 付き送信用 NativeCallable (`/` 結果リスト表示用)
+    late final NativeCallable<PutMixedWithTileCallback> putMixedCallable;
+
     receivePort.listen((message) {
       if (message is Map) {
         final type = message['type'];
@@ -246,6 +249,26 @@ class NetHackWorker {
             });
           });
 
+          // putmixed タイル ID 付き送信: C 側の `look_all` / `look_traps` /
+          // `look_engrs` 結果リストから、 タイル ID 付きのテキスト (例:
+          // "(12,05)  \G00560042  ジャッカル") を受け取り Dart 側に転送する。
+          // Dart 側は \G をパースしてタイル列を表示する。
+          putMixedCallable = NativeCallable<PutMixedWithTileCallback>.listener(
+            (int winId, int attr, int tile, Pointer<Utf8> msgPtr) {
+              if (msgPtr == nullptr) {
+                return;
+              }
+              final msg = _utf8DecodeLossy(msgPtr);
+              uiSendPort.send({
+                'type': 'putMixed',
+                'winId': winId,
+                'attr': attr,
+                'tile': tile,
+                'text': msg,
+              });
+            },
+          );
+
           // コールバックをC側に登録
           ffi.registerCallbacks(
             createCallable.nativeFunction,
@@ -266,6 +289,7 @@ class NetHackWorker {
             exitCallable.nativeFunction,
             numberPadCallable.nativeFunction,
             cliparoundCallable.nativeFunction,
+            putMixedCallable.nativeFunction,
           );
 
           // NetHack コアを起動

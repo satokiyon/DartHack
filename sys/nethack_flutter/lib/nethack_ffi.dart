@@ -34,12 +34,13 @@ typedef AskNameCallback = Void Function(Pointer<Utf8> saves, Int32 maxChars);
 typedef ExitCallback = Void Function(Pointer<Utf8> msg);
 typedef NumberPadModeCallback = Void Function(Int32 state);
 typedef CliparoundCallback = Void Function(Int32 x, Int32 y, Int32 playerX, Int32 playerY);
+typedef PutMixedWithTileCallback = Void Function(Int32 winId, Int32 attr, Int32 tile, Pointer<Utf8> msg);
 
 // C側起動関数
 typedef StartNetHackFunc = Void Function(Pointer<Utf8> path, Pointer<Utf8> username);
 typedef StartNetHackDart = void Function(Pointer<Utf8> path, Pointer<Utf8> username);
 
-// コールバック登録関数 (17個の引数: CliparoundCallback を追加)
+// コールバック登録関数 (19個の引数: CliparoundCallback と PutMixedWithTileCallback を追加)
 typedef RegisterCallbacksFunc = Void Function(
   Pointer<NativeFunction<CreateWindowCallback>> createCb,
   Pointer<NativeFunction<ClearWindowCallback>> clearCb,
@@ -59,6 +60,7 @@ typedef RegisterCallbacksFunc = Void Function(
   Pointer<NativeFunction<ExitCallback>> exitCb,
   Pointer<NativeFunction<NumberPadModeCallback>> numberPadCb,
   Pointer<NativeFunction<CliparoundCallback>> cliparoundCb,
+  Pointer<NativeFunction<PutMixedWithTileCallback>> putMixedCb,
 );
 typedef RegisterCallbacksDart = void Function(
   Pointer<NativeFunction<CreateWindowCallback>> createCb,
@@ -79,6 +81,7 @@ typedef RegisterCallbacksDart = void Function(
   Pointer<NativeFunction<ExitCallback>> exitCb,
   Pointer<NativeFunction<NumberPadModeCallback>> numberPadCb,
   Pointer<NativeFunction<CliparoundCallback>> cliparoundCb,
+  Pointer<NativeFunction<PutMixedWithTileCallback>> putMixedCb,
 );
 
 // キー送信

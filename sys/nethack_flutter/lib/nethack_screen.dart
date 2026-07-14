@@ -86,6 +86,10 @@ class NetHackScreen extends ChangeNotifier {
   List<String> get textLines => _textLines;
   final List<int> _textAttrs = [];
   List<int> get textAttrs => _textAttrs;
+  // テキスト行に対応するタイル ID (`/` 結果リストの putmixed 経由)。
+  // -1 のときはタイル無し (テキストのみ表示)。
+  final List<int> _textTiles = [];
+  List<int> get textTiles => _textTiles;
   bool _isTextWindowVisible = false;
   bool get isTextWindowVisible => _isTextWindowVisible && _menuItems.isEmpty;
 
@@ -133,11 +137,13 @@ class NetHackScreen extends ChangeNotifier {
       // テキストウィンドウはまだ非表示。display_nhwindow が呼ばれた時に表示する。
       _textLines.clear();
       _textAttrs.clear();
+      _textTiles.clear();
       _isTextWindowVisible = false;
     }
     if (type == nhwMenu) {
       _textLines.clear();
       _textAttrs.clear();
+      _textTiles.clear();
       _isTextWindowVisible = false;
       _menuItems.clear();
       _menuPrompt = "";
@@ -160,6 +166,7 @@ class NetHackScreen extends ChangeNotifier {
     } else if (type == nhwText || type == nhwMenu) {
       _textLines.clear();
       _textAttrs.clear();
+      _textTiles.clear();
     }
     if (type == nhwMenu) {
       _menuItems.clear();
@@ -175,6 +182,7 @@ class NetHackScreen extends ChangeNotifier {
       _isTextWindowVisible = false;
       _textLines.clear();
       _textAttrs.clear();
+      _textTiles.clear();
     }
     if (type == nhwMenu) {
       _isMenuWindowVisible = false;
@@ -239,6 +247,48 @@ class NetHackScreen extends ChangeNotifier {
     } else if (type == nhwText || type == nhwMenu) {
       _textLines.add(text);
       _textAttrs.add(attr);
+      // putstr 経路では tile 情報は無いので -1 を入れて長さを合わせる。
+      _textTiles.add(-1);
+    }
+    notifyListeners();
+  }
+
+  // putmixed タイル ID 付き送信 (`/` 結果リスト用)。
+  // WIN_MESSAGE / WIN_STATUS では従来の putstr 相当の処理を行い、
+  // NHW_TEXT / NHW_MENU では _textLines と並列に _textTiles を更新する。
+  void putMixedWithTile(int winId, int attr, int tile, String text) {
+    final type = _winTypes[winId];
+    final bool noHistory = (attr & 0x8000) != 0;
+
+    if (type == nhwMessage || winId == 1 /* WIN_MESSAGE */) {
+      _messages.add(text);
+      if (_messages.length > 100) {
+        _messages.removeAt(0);
+      }
+      if (!noHistory) {
+        _messageHistory.add(text);
+        if (_messageHistory.length > 100) {
+          _messageHistory.removeAt(0);
+        }
+      }
+    } else if (type == nhwStatus || winId == 2 /* WIN_STATUS */) {
+      if (_statusCursorY >= 0 && _statusCursorY < _statusLines.length) {
+        _statusLines[_statusCursorY] = text;
+      } else {
+        // フォールバック
+        if (_statusLines[0].isEmpty) {
+          _statusLines[0] = text;
+        } else if (_statusLines[1].isEmpty) {
+          _statusLines[1] = text;
+        } else {
+          _statusLines[0] = _statusLines[1];
+          _statusLines[1] = text;
+        }
+      }
+    } else if (type == nhwText || type == nhwMenu) {
+      _textLines.add(text);
+      _textAttrs.add(attr);
+      _textTiles.add(tile);
     }
     notifyListeners();
   }
@@ -294,6 +344,8 @@ class NetHackScreen extends ChangeNotifier {
 
   void startMenu(int winId) {
     _textLines.clear();
+    _textAttrs.clear();
+    _textTiles.clear();
     _isTextWindowVisible = false;
     _isMenuWindowVisible = false;
     _menuItems.clear();
