@@ -12,6 +12,28 @@
 #include "hack.h"
 #include "dlb.h"
 
+/* NetHackJP: putmixed with tile for look result list
+ *
+ * `look_all` / `look_traps` / `look_engrs` が生成する結果リスト
+ * (NHW_TEXT) に各エンティティ (怪物 / 物体 / 罠 / 刻印) の代表
+ * タイルを添えて出力するための独自 API。 アップストリーム NetHack
+ * には `putmixed(win, attr, str)` という API しかなく、 タイル ID
+ * を直接渡せないため、 `flutter_putmixed_with_tile(win, attr, tile, str)`
+ * を新規追加している。
+ *
+ * - Flutter ポート (win/winflutter.c) は FFI 経由で Dart 側に
+ *   (winId, attr, tile, msg) を送信し、 UI 側でタイル画像を表示する。
+ * - それ以外のポート (tty, curses, win32, Qt, X11 等) では
+ *   src/windows.c のデフォルト実装がリンクされ、 単に putmixed
+ *   を呼び出す (tile 引数は無視される)。 Android ビルド
+ *   (CMakeLists.txt で -DANDROID 定義あり) では src/windows.c
+ *   側の実装はコンパイルされず、 win/winflutter.c 側の同名関数が
+ *   リンクされる。
+ *
+ * 詳細とアップストリーム追従手順は DEVELOPMENT.md §4.4 を参照。
+ */
+extern void flutter_putmixed_with_tile(winid, int, int, const char *);
+
 staticfn boolean is_swallow_sym(int);
 staticfn int append_str(char *, const char *) NONNULLPTRS;
 staticfn void trap_description(char *, int, coordxy, coordxy) NONNULLARG1;
@@ -2011,95 +2033,6 @@ add_quoted_engraving(
 /* also used by getpos hack in getpos.c */
 const char what_is_a_location[] = "怪物、物体、または場所";
 
-/*
- * Compute a representative glyph_info for one of the lootabc "what to
- * look at" submenu categories (m, M, o, O, t, T, e, E) so that the
- * tile-aware windowports (Flutter, curses, win32 GUI, Qt, X11) can
- * display a sample tile next to each category label.
- *
- * Lowercase ('m', 'o', 't', 'e') restricts the search to entities that
- * are "nearby" (within BOLT_LIM of the hero), matching the semantics of
- * the look_xxx() routines that the submenu dispatches to.  Uppercase
- * ('M', 'O', 'T', 'E') allows samples from anywhere on the current
- * level.  The caller is expected to be inside the !u.uswallow &&
- * !Hallucination guard that the lootabc block already enforces, so
- * hallucination-safe macros (mon_to_glyph) are acceptable.
- *
- * Returns a pointer to a static glyph_info; the value is valid until
- * the next call to this function, so each result must be consumed by
- * add_menu() before the following call.  If no matching sample exists
- * on the level, &nul_glyphinfo is returned (each windowport will then
- * render no tile for that row).
- */
-static const glyph_info *
-lookat_category_sample_glyph(char cat)
-{
-    static glyph_info gi;
-    int glyph = NO_GLYPH;
-    struct monst *mtmp;
-    struct obj *otmp;
-    struct trap *trap;
-    struct engr *engr;
-    coordxy x, y;
-    boolean near_only = (cat >= 'a' && cat <= 'z');
-
-    switch (cat) {
-    case 'm':
-    case 'M':
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-            if (DEADMONSTER(mtmp) || mtmp->mx < 0 || mtmp->my < 0)
-                continue;
-            if (near_only && distu(mtmp->mx, mtmp->my) > BOLT_LIM * BOLT_LIM)
-                continue;
-            glyph = mon_to_glyph(mtmp, rn2_on_display_rng);
-            goto found;
-        }
-        break;
-    case 'o':
-    case 'O':
-        for (otmp = fobj; otmp; otmp = otmp->nobj) {
-            if (otmp->ox < 0 || otmp->oy < 0)
-                continue;
-            if (near_only && distu(otmp->ox, otmp->oy) > BOLT_LIM * BOLT_LIM)
-                continue;
-            glyph = obj_to_glyph(otmp, rn2_on_display_rng);
-            goto found;
-        }
-        break;
-    case 't':
-    case 'T':
-        for (trap = gf.ftrap; trap; trap = trap->ntrap) {
-            if (trap->tx < 0 || trap->ty < 0)
-                continue;
-            if (near_only && distu(trap->tx, trap->ty) > BOLT_LIM * BOLT_LIM)
-                continue;
-            glyph = trap_to_glyph(trap);
-            goto found;
-        }
-        break;
-    case 'e':
-    case 'E':
-        for (x = 0; x < COLNO; ++x) {
-            for (y = 0; y < ROWNO; ++y) {
-                if (near_only && distu(x, y) > BOLT_LIM * BOLT_LIM)
-                    continue;
-                if ((engr = engr_at(x, y)) != 0) {
-                    glyph = engraving_to_glyph(engr);
-                    goto found;
-                }
-            }
-        }
-        break;
-    default:
-        break;
-    }
-    return &nul_glyphinfo;
-
-found:
-    map_glyphinfo(0, 0, glyph, 0U, &gi);
-    return &gi;
-}
-
 int
 do_look(int mode, coord *click_cc)
 {
@@ -2186,46 +2119,46 @@ do_look(int mode, coord *click_cc)
                    symbol/monster class letter doesn't match up with
                    bogus monster type, so suppress when hallucinating */
                 any.a_char = 'm';
-                add_menu(win, lookat_category_sample_glyph('m'), &any,
+                add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
                          clr, "近くの怪物", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'M';
-                add_menu(win, lookat_category_sample_glyph('M'), &any,
+                add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
                          clr, "地図に表示中の怪物すべて",
                          MENU_ITEMFLAGS_NONE);
                 any.a_char = 'o';
-                add_menu(win, lookat_category_sample_glyph('o'), &any,
+                add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
                          clr, "近くの物体", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'O';
-                add_menu(win, lookat_category_sample_glyph('O'), &any,
+                add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
                          clr, "地図に表示中の物体すべて",
                          MENU_ITEMFLAGS_NONE);
                 any.a_char = 't';
-                add_menu(win, lookat_category_sample_glyph('t'), &any,
+                add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : '^', ATR_NONE,
                          clr, "近くの罠", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'T';
-                add_menu(win, lookat_category_sample_glyph('T'), &any,
+                add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : '\"', ATR_NONE,
                          clr, "視認済み・記憶済みの罠すべて",
                          MENU_ITEMFLAGS_NONE);
                 any.a_char = 'e';
-                add_menu(win, lookat_category_sample_glyph('e'), &any,
+                add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          /* [don't use 'e' as lootabc group accelerator] */
                          flags.lootabc ? 0 : '`', ATR_NONE,
                          clr, "近くの刻印", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'E';
-                add_menu(win, lookat_category_sample_glyph('E'), &any,
+                add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : '|', ATR_NONE,
                          clr, "視認済み・記憶済みの刻印すべて",
@@ -2452,6 +2385,8 @@ look_all(
             }
             if (*lookbuf) {
                 char coordbuf[20], which[12], cmode;
+                int tile = -1;
+                glyph_info tileinfo = nul_glyphinfo;
 
                 cmode = (iflags.getpos_coords != GPCOORDS_NONE)
                            ? iflags.getpos_coords : GPCOORDS_MAP;
@@ -2492,7 +2427,37 @@ look_all(
                 /* guard against potential overflow */
                 lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
                 Strcat(outbuf, lookbuf);
-                putmixed(win, 0, outbuf);
+
+                /* NetHackJP: putmixed with tile for look result list
+                 * タイル ID 計算: 怪物は mon_to_glyph, 物体は obj_to_glyph.
+                 * サンプルが見つからないケース (例: 不可視マーカーや
+                 * 警告マーカー) は元の glyph をそのまま使う。
+                 * 詳細とアップストリーム追従手順は DEVELOPMENT.md §4.4 を参照。 */
+                if (do_mons) {
+                    if (u_at(x, y) && canspotself()) {
+                        map_glyphinfo(0, 0, hero_glyph, 0U, &tileinfo);
+                    } else {
+                        struct monst *mm = m_at(x, y);
+                        if (mm) {
+                            int gg = mon_to_glyph(mm, rn2_on_display_rng);
+                            map_glyphinfo(0, 0, gg, 0U, &tileinfo);
+                        } else {
+                            /* 不可視/警告マーカー: 元の glyph を使う */
+                            map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
+                        }
+                    }
+                } else {
+                    struct obj *oo = vobj_at(x, y);
+                    if (oo) {
+                        int gg = obj_to_glyph(oo, rn2_on_display_rng);
+                        map_glyphinfo(0, 0, gg, 0U, &tileinfo);
+                    } else {
+                        map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
+                    }
+                }
+                tile = tileinfo.gm.tileidx;
+
+                flutter_putmixed_with_tile(win, 0, tile, outbuf);
             }
         }
     }
@@ -2537,6 +2502,8 @@ look_traps(boolean nearby)
             }
             if (*lookbuf) {
                 char coordbuf[20], cmode;
+                int tile = -1;
+                glyph_info tileinfo = nul_glyphinfo;
 
                 cmode = (iflags.getpos_coords != GPCOORDS_NONE)
                            ? iflags.getpos_coords : GPCOORDS_MAP;
@@ -2559,7 +2526,15 @@ look_traps(boolean nearby)
                 /* guard against potential overflow */
                 lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
                 Strcat(outbuf, lookbuf);
-                putmixed(win, 0, outbuf);
+
+                /* NetHackJP: putmixed with tile for look result list
+                 * タイル ID 計算: トラップは表示用 glyph (= trap_to_glyph
+                 * または trap シンボル) をそのまま使う。
+                 * 詳細とアップストリーム追従手順は DEVELOPMENT.md §4.4 を参照。 */
+                map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
+                tile = tileinfo.gm.tileidx;
+
+                flutter_putmixed_with_tile(win, 0, tile, outbuf);
             }
         }
     }
@@ -2626,6 +2601,8 @@ look_engrs(boolean nearby)
             }
             if (*lookbuf) { /* (redundant) */
                 char coordbuf[20], cmode;
+                int tile = -1;
+                glyph_info tileinfo = nul_glyphinfo;
 
                 cmode = (iflags.getpos_coords != GPCOORDS_NONE)
                            ? iflags.getpos_coords : GPCOORDS_MAP;
@@ -2648,7 +2625,16 @@ look_engrs(boolean nearby)
                 /* guard against potential overflow */
                 lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
                 Strcat(outbuf, lookbuf);
-                putmixed(win, 0, outbuf);
+
+                /* NetHackJP: putmixed with tile for look result list
+                 * タイル ID 計算: 刻印/墓石は表示用 glyph (= engraving_to_glyph
+                 * または cmap_to_glyph(S_grave)、 もしくは元マップの刻印
+                 * シンボル) をそのまま使う。
+                 * 詳細とアップストリーム追従手順は DEVELOPMENT.md §4.4 を参照。 */
+                map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
+                tile = tileinfo.gm.tileidx;
+
+                flutter_putmixed_with_tile(win, 0, tile, outbuf);
             }
         }
     }
