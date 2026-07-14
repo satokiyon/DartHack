@@ -2921,8 +2921,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // ボタンモード (左端に D-Pad, 右端に 3x3 ショートカットパッド)
-                  Container(
-                    color: Colors.transparent,
+                  Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
