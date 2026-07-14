@@ -653,6 +653,9 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context) => AmountSelectorDialog(
         itemName: _cleanItemText(item.text),
         maxCount: maxCount,
+        tileImage: _tileImage,
+        tileSize: _tileSize,
+        tileIndex: item.tile,
       ),
     );
 
@@ -1088,6 +1091,7 @@ class _MyHomePageState extends State<MyHomePage> {
             message['text'],
             message['preselected'],
             message['color'],
+            message['tile'] ?? -1,
           );
         } else if (type == 'endMenu') {
           _screen.endMenu(message['winId'], message['prompt']);
@@ -1618,6 +1622,23 @@ class _MyHomePageState extends State<MyHomePage> {
     return t.endsWith(':') || t.endsWith('：');
   }
 
+  Widget _buildMenuItemTile(int tile) {
+    if (!_useTiles || _tileImage == null || tile < 0) {
+      return const SizedBox(width: 24, height: 24);
+    }
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: CustomPaint(
+        painter: _MenuItemTilePainter(
+          image: _tileImage!,
+          tileIndex: tile,
+          tileSize: _tileSize,
+        ),
+      ),
+    );
+  }
+
   Widget _buildMenuCategoryRow(String text) {
     return Container(
       margin: const EdgeInsets.only(top: 8, bottom: 4),
@@ -1784,14 +1805,22 @@ class _MyHomePageState extends State<MyHomePage> {
                         if (isPlain) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            child: Text(
-                              "$accLabel$commandText",
-                              style: TextStyle(
-                                color: itemColor,
-                                fontFamily: 'monospace',
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                              ),
+                            child: Row(
+                              children: [
+                                _buildMenuItemTile(item.tile),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    "$accLabel$commandText",
+                                    style: TextStyle(
+                                      color: itemColor,
+                                      fontFamily: 'monospace',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           );
                         }
@@ -1803,15 +1832,22 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: ListTile(
                               dense: true,
                               contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-                              leading: SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: Checkbox(
-                                  value: checked,
-                                  onChanged: (_) => _toggleMenuSelection(item.ident),
-                                  activeColor: Colors.tealAccent[400],
-                                  checkColor: Colors.black,
-                                ),
+                              leading: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _buildMenuItemTile(item.tile),
+                                  const SizedBox(width: 4),
+                                  SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: Checkbox(
+                                      value: checked,
+                                      onChanged: (_) => _toggleMenuSelection(item.ident),
+                                      activeColor: Colors.tealAccent[400],
+                                      checkColor: Colors.black,
+                                    ),
+                                  ),
+                                ],
                               ),
                               title: Text(
                                 "$accLabel$commandText",
@@ -1843,6 +1879,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 child: ListTile(
                                   dense: true,
                                   contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                                  leading: _buildMenuItemTile(item.tile),
                                   title: Text(
                                     "$accLabel$commandText",
                                     style: TextStyle(
@@ -1874,6 +1911,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: ListTile(
                             dense: true,
                             contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                            leading: _buildMenuItemTile(item.tile),
                             title: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
@@ -3764,6 +3802,48 @@ class TopTenWidget extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class _MenuItemTilePainter extends CustomPainter {
+  final ui.Image image;
+  final int tileIndex;
+  final int tileSize;
+
+  _MenuItemTilePainter({
+    required this.image,
+    required this.tileIndex,
+    required this.tileSize,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cols = image.width ~/ tileSize;
+    final iRow = tileIndex ~/ cols;
+    final iCol = tileIndex % cols;
+
+    final srcRect = Rect.fromLTWH(
+      (iCol * tileSize).toDouble(),
+      (iRow * tileSize).toDouble(),
+      tileSize.toDouble(),
+      tileSize.toDouble(),
+    );
+
+    final destRect = Rect.fromLTWH(0, 0, size.width, size.height);
+
+    canvas.drawImageRect(
+      image,
+      srcRect,
+      destRect,
+      Paint()..isAntiAlias = false,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _MenuItemTilePainter oldDelegate) {
+    return oldDelegate.image != image ||
+           oldDelegate.tileIndex != tileIndex ||
+           oldDelegate.tileSize != tileSize;
   }
 }
 
