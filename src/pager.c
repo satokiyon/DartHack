@@ -12,12 +12,25 @@
 #include "hack.h"
 #include "dlb.h"
 
-/* flutter_putmixed_with_tile: `look_all` / `look_traps` / `look_engrs` の
- * 結果リスト (NHW_TEXT) に各エンティティの代表タイルを添えて出力する。
- * Flutter ポート (win/winflutter.c) は FFI 経由で Dart 側に
- * (winId, attr, tile, msg) を送信する。 デフォルト実装は
- * src/windows.c にあり、 そこでは単に putmixed を呼び出す
- * (tile は無視される)。
+/* NetHackJP: putmixed with tile for look result list
+ *
+ * `look_all` / `look_traps` / `look_engrs` が生成する結果リスト
+ * (NHW_TEXT) に各エンティティ (怪物 / 物体 / 罠 / 刻印) の代表
+ * タイルを添えて出力するための独自 API。 アップストリーム NetHack
+ * には `putmixed(win, attr, str)` という API しかなく、 タイル ID
+ * を直接渡せないため、 `flutter_putmixed_with_tile(win, attr, tile, str)`
+ * を新規追加している。
+ *
+ * - Flutter ポート (win/winflutter.c) は FFI 経由で Dart 側に
+ *   (winId, attr, tile, msg) を送信し、 UI 側でタイル画像を表示する。
+ * - それ以外のポート (tty, curses, win32, Qt, X11 等) では
+ *   src/windows.c のデフォルト実装がリンクされ、 単に putmixed
+ *   を呼び出す (tile 引数は無視される)。 Android ビルド
+ *   (CMakeLists.txt で -DANDROID 定義あり) では src/windows.c
+ *   側の実装はコンパイルされず、 win/winflutter.c 側の同名関数が
+ *   リンクされる。
+ *
+ * 詳細とアップストリーム追従手順は DEVELOPMENT.md §4.4 を参照。
  */
 extern void flutter_putmixed_with_tile(winid, int, int, const char *);
 
@@ -2416,9 +2429,11 @@ look_all(
                 lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
                 Strcat(outbuf, lookbuf);
 
-                /* タイル ID 計算: 怪物は mon_to_glyph, 物体は obj_to_glyph.
+                /* NetHackJP: putmixed with tile for look result list
+                 * タイル ID 計算: 怪物は mon_to_glyph, 物体は obj_to_glyph.
                  * サンプルが見つからないケース (例: 不可視マーカーや
-                 * 警告マーカー) は元の glyph をそのまま使う。 */
+                 * 警告マーカー) は元の glyph をそのまま使う。
+                 * 詳細とアップストリーム追従手順は DEVELOPMENT.md §4.4 を参照。 */
                 if (do_mons) {
                     if (u_at(x, y) && canspotself()) {
                         map_glyphinfo(0, 0, hero_glyph, 0U, &tileinfo);
@@ -2513,8 +2528,10 @@ look_traps(boolean nearby)
                 lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
                 Strcat(outbuf, lookbuf);
 
-                /* タイル ID 計算: トラップは表示用 glyph (= trap_to_glyph
-                 * または trap シンボル) をそのまま使う。 */
+                /* NetHackJP: putmixed with tile for look result list
+                 * タイル ID 計算: トラップは表示用 glyph (= trap_to_glyph
+                 * または trap シンボル) をそのまま使う。
+                 * 詳細とアップストリーム追従手順は DEVELOPMENT.md §4.4 を参照。 */
                 map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
                 tile = tileinfo.gm.tileidx;
 
@@ -2610,9 +2627,11 @@ look_engrs(boolean nearby)
                 lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
                 Strcat(outbuf, lookbuf);
 
-                /* タイル ID 計算: 刻印/墓石は表示用 glyph (= engraving_to_glyph
+                /* NetHackJP: putmixed with tile for look result list
+                 * タイル ID 計算: 刻印/墓石は表示用 glyph (= engraving_to_glyph
                  * または cmap_to_glyph(S_grave)、 もしくは元マップの刻印
-                 * シンボル) をそのまま使う。 */
+                 * シンボル) をそのまま使う。
+                 * 詳細とアップストリーム追従手順は DEVELOPMENT.md §4.4 を参照。 */
                 map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
                 tile = tileinfo.gm.tileidx;
 

@@ -1,4 +1,33 @@
 <!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. -->
+<!--
+  IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
+  =================================================
+  When adding changes to src/ or include/ that are *not* present in
+  upstream NetHack (NetHack/NetHack @ NetHack-5.0), follow these rules:
+
+  1. Mark all such custom code regions with a /* NetHackJP: ... */ comment
+     in the source file itself, so future readers can quickly identify
+     NetHackJP-specific code vs. upstream code.
+
+  2. Add a dedicated subsection below (§4.x) that documents:
+     - the marker tag used in the source,
+     - which file(s) and roughly which lines contain the custom code,
+     - how to "remove" the customization (so we can drop the change
+       cleanly if upstream eventually adds an equivalent feature), and
+     - how to follow upstream if upstream adds the same or a similar
+       change later.
+
+  3. Priority rule: when upstream introduces a change that overlaps with
+     a NetHackJP-only customization, the upstream version takes
+     precedence — we drop the NetHackJP code and follow upstream.
+     Upstream compatibility is the primary goal; NetHackJP-specific
+     behavior is secondary.
+
+  This policy is enforced for every commit that touches shared
+  upstream files (src/, include/).  Local changes that live entirely
+  under sys/ (e.g. win/flutter, sys/android) are exempt because they
+  are not part of upstream NetHack.
+-->
 # NetHackJP 開発メモ
 
 本ドキュメントは、Windows ポート（CUI/GUI）の日本語化リポジトリである `NetHackJP` の開発環境の構築、ビルド、マージ運用およびリリース手順についてまとめたものです。
@@ -91,6 +120,54 @@ Windows版において、複数のセーブファイルが存在する際に一�
   2. アップストリームに修正がある場合は、本独自拡張 (上記マーカータグで囲まれた変更) を取り消してアップストリームの実装に追従する。
   3. アップストリームに部分的な修正しかない場合は、重複する変更 (例: 既にアップストリームが `NAMSZ` を変更済みなら本件の `NAMSZ = 40` 化は重複) のみを取り消し、残りは維持する。
   4. `utf8_char_truncate` 等の独自 API が他で利用されている場合は、アップストリーム API との整合性を確認の上でリネームまたはラッパー化を検討する。
+
+### 4. `look` コマンド結果リストへのタイル ID 引き渡し (Android/Flutter 向け)
+
+Android/Flutter ポート (`NetHackJP-Android`) で `look_all` / `look_traps`
+/ `look_engrs` が生成する結果リスト (NHW_TEXT ウィンドウ) の各行に
+対応するエンティティ (怪物 / 物体 / 罠 / 刻印) の代表タイルを表示する
+ための独自拡張です。 アップストリーム NetHack には `putmixed(win, attr,
+str)` という API しかなく、 タイル ID を直接渡せないため、 タイル ID
+を引数に取る `flutter_putmixed_with_tile(win, attr, tile, str)` を
+新規追加しています。
+
+* **マーカータグ**: `/* NetHackJP: putmixed with tile for look result list */`
+* **対象ファイル**:
+  1. **`src/pager.c`**:
+     - ファイル先頭付近に `flutter_putmixed_with_tile` の `extern` 宣言を追加。
+     - `look_all()` (怪物 / 物体 結果リスト) の `putmixed` 呼び出しを
+       `flutter_putmixed_with_tile` に置換、 タイル ID を `mon_to_glyph`
+       / `hero_glyph` / `obj_to_glyph` / 元 glyph から `map_glyphinfo`
+       経由で計算。
+     - `look_traps()` (罠 結果リスト) で同様に置換と計算。
+     - `look_engrs()` (刻印 結果リスト) で同様に置換と計算。
+  2. **`src/windows.c`**:
+     - 非 Android 環境向けデフォルト実装 `flutter_putmixed_with_tile`
+       を `#ifndef ANDROID` ガード付きで追加 (単に `putmixed` を呼ぶだけ、
+       tile 引数は無視)。
+* **背景**:
+  - 既存の `putmixed(win, attr, str)` にはタイル ID 引き渡し口がない。
+  - 新 API `flutter_putmixed_with_tile` は Android/Flutter ポート
+    (`win/winflutter.c`) でのみ FFI 経由で Dart 側にタイル ID を渡し、
+    それ以外のポート (tty, curses, win32, Qt, X11 等) では src/windows.c
+    のデフォルト実装が使われる。
+  - Android 判定は CMake の `add_definitions(-DANDROID)` に従う。
+    そのため、 `src/windows.c` 側の実装は Android ビルドでは
+    コンパイルされず、 `win/winflutter.c` 側の同名関数がリンクされる。
+* **アップストリーム追従手順**:
+  1. アップストリームが `putmixed` の拡張 (例: `glyph_info` 引き渡しや
+     新ウィンドウプロック `win_putmixed_with_tile` 追加) を入れたかを
+     確認する。
+  2. アップストリーム版と本独自実装が衝突する場合は、 本独自実装を
+     取り消してアップストリーム版に追従する (新ウィンドウプロックが
+     追加されたなら `winprocs.win_putmixed_with_tile` を使う形に
+     置換するのが望ましい)。
+  3. `flutter_putmixed_with_tile` シンボル自体が他で使われていないかを
+     `git grep` で確認し、 残骸が残らないようにする。
+  4. 一方で、 「`look_all` / `look_traps` / `look_engrs` の結果リストに
+     タイルを添える」 という仕様自体は Android/Flutter ポートの
+     ユーザ体験に直結するため、 アップストリームが同等の機能を
+     入れても問題なければ本独自実装は削除して良い (動作は同等のため)。
 
 ---
 
