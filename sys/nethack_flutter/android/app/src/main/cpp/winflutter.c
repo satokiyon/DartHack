@@ -23,7 +23,7 @@ static int flutter_do_ext_cmd_menu(boolean complete);
 static void flutter_destroy_nhwindow(winid window);
 static void flutter_display_file(const char *name, boolean complain);
 static void flutter_putstr(winid window, int attr, const char* str);
-static void flutter_putmixed_with_tile(winid window, int attr, int tile, const char* str);
+void flutter_putmixed_with_tile(winid window, int attr, int tile, const char* str);
 static void flutter_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, unsigned long *colormasks);
 static void flutter_exit_nhwindows(const char* str);
 static int flutter_doprev_message(void);
@@ -884,7 +884,7 @@ static void flutter_putstr(winid window, int attr, const char* str) {
     }
 }
 
-static void flutter_putmixed_with_tile(winid window, int attr, int tile, const char* str) {
+void flutter_putmixed_with_tile(winid window, int attr, int tile, const char* str) {
     debuglog("flutter_putmixed_with_tile [%d, attr=%d, tile=%d]: %s", window, attr, tile, str);
     if ((int) window == WIN_MESSAGE && str) {
         flutter_save_message(str);
@@ -1472,7 +1472,13 @@ static void HijackWindowProcs(void) {
     and_procs.win_destroy_nhwindow = flutter_destroy_nhwindow;
     and_procs.win_curs = flutter_curs;
     and_procs.win_putstr = flutter_putstr;
-    and_procs.win_putmixed = flutter_putmixed_with_tile;
+    /* win_putmixed の Hijack は行わない。 src/pager.c の look_all /
+     * look_traps / look_engrs は flutter_putmixed_with_tile(win, attr,
+     * tile, str) を直接呼び出すため、 結果リストへのタイル ID 引き渡しは
+     * Hijack なしで実現できている。 他の putmixed 呼び出し
+     * (例: botl.c::putmixed(WIN_STATUS, ...)) は upstream の
+     * genl_putmixed (\G を showsym 1 文字にデコードして putstr) を経由
+     * して従来通り動作させる (tile 引数を取らない型のため Hijack 不能)。 */
     and_procs.win_raw_print = flutter_raw_print;
     and_procs.win_raw_print_bold = flutter_raw_print_bold;
     and_procs.win_display_file = flutter_display_file;
