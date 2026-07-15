@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-15. */
 /* NetHack 5.0	shk.c	$NHDT-Date: 1781973066 2026/06/20 16:31:06 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.323 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -896,14 +896,16 @@ u_entered_shop(char *enterstring)
             }
             if (!Deaf && !muteshk(shkp)) {
                 SetVoice(shkp, 0, 80, 0);
+                /* NetHackJP: Remove plur(cnt) to avoid trailing 's' in Japanese */
                 verbalize(not_upset
-                              ? "%s%sは外に置いてきてくれますか?"
-                              : "%s%sは外に置いてこい。",
-                          tool, plur(cnt));
+                              ? "%sは外に置いてきてくれますか?"
+                              : "%sは外に置いてこい。",
+                          tool);
             } else {
-                pline("%sは%sためらった。%s%sを持ったまま入るのは困るようだ。",
+                /* NetHackJP: Remove plur(cnt) to avoid trailing 's' in Japanese */
+                pline("%sは%sためらった。%sを持ったまま入るのは困るようだ。",
                       jp_shkname_for_display(shkp),
-                      not_upset ? "少し" : "きっぱり", tool, plur(cnt));
+                      not_upset ? "少し" : "きっぱり", tool);
             }
             should_block = TRUE;
         } else if (u.usteed) {
@@ -3460,9 +3462,11 @@ shk_names_obj(
         Sprintf(fmtbuf, "%%s; あなたは%s", fmt);
         obj_name[0] = highc(obj_name[0]);
         pline(fmtbuf, obj_name, (obj->quan > 1L) ? "それら" : "それ", amt,
-              plur(amt), arg);
+              /* NetHackJP: Pass currency(amt) instead of plur(amt) to display proper currency unit */
+              currency(amt), arg);
     } else {
-        You(fmt, obj_name, amt, plur(amt), arg);
+        /* NetHackJP: Pass currency(amt) instead of plur(amt) to display proper currency unit */
+        You(fmt, obj_name, amt, currency(amt), arg);
     }
 }
 
@@ -5625,8 +5629,9 @@ kops_gone(boolean silent)
         }
     }
     if (cnt && !silent)
-        pline_The("コップ%sは落胆してかき消すように消えた.",
-                  plur(cnt));
+        /* NetHackJP: Distinguish singular/plural for Kop in Japanese */
+        pline_The(cnt == 1 ? "コップは落胆してかき消すように消えた."
+                           : "コップ達は落胆してかき消すように消えた.");
 }
 
 staticfn long

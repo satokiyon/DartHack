@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-15. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1781973060 2026/06/20 16:31:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.464 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -2152,7 +2152,8 @@ killer_xname(struct obj *obj)
            devnull tournament, suppress player supplied fruit names because
            those can be used to fake other objects and dungeon features */
         buf = nextobuf();
-        Sprintf(buf, "危険なスライムモールド%s", plur(obj->quan));
+        /* NetHackJP: Remove plur(obj->quan) to avoid trailing 's' in Japanese */
+        Sprintf(buf, "危険なスライムモールド");
     } else {
         buf = xname(obj);
     }

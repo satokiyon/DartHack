@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-15. */
 /* NetHack 5.0	polyself.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1237,7 +1237,8 @@ break_armor(void)
                 char hornbuf[BUFSZ];
 
                 /* Future possibilities: This could damage/destroy helmet */
-                Sprintf(hornbuf, "horn%s", plur(num_horns(uptr)));
+                /* NetHackJP: Sprintf hornbuf to "角" instead of "horn(s)" to make it Japanese */
+                Sprintf(hornbuf, "角");
                                 Your("%sが%sを%s.", hornbuf, xname(otmp), "突き破った");
             } else {
                 if (donning(otmp))
@@ -1836,8 +1837,9 @@ dohide(void)
                 corpse_name = an(corpse_name);
             /* no need to check poly_when_stoned(); no hide-underers can
                turn into stone golems instead of becoming petrified */
-                pline("%s%sの下に隠れるのは致命的な失敗だ...",
-                  corpse_name, plur(ct));
+                /* NetHackJP: Remove plur(ct) from pline to avoid trailing 's' in Japanese */
+                pline("%sの下に隠れるのは致命的な失敗だ...",
+                  corpse_name);
             Sprintf(kbuf, "hiding under %s%s", corpse_name, plur(ct));
             instapetrify(kbuf);
             /* only reach here if life-saved */
