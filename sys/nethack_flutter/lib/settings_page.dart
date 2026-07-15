@@ -371,15 +371,15 @@ class _SettingsPageState extends State<SettingsPage> {
                                             final desc = item['description'] ?? '';
                                             return Padding(
                                               padding: const EdgeInsets.symmetric(vertical: 4.0),
-                                              child: Material(
-                                                color: const Color(0xFF2C2C2C),
-                                                borderRadius: BorderRadius.circular(8.0),
-                                                clipBehavior: Clip.antiAlias,
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(color: Colors.white12, width: 1.0),
-                                                    borderRadius: BorderRadius.circular(8.0),
-                                                  ),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(color: Colors.white12, width: 1.0),
+                                                  borderRadius: BorderRadius.circular(8.0),
+                                                ),
+                                                child: Material(
+                                                  color: const Color(0xFF2C2C2C),
+                                                  borderRadius: BorderRadius.circular(8.0),
+                                                  clipBehavior: Clip.antiAlias,
                                                   child: ListTile(
                                                     title: Text(
                                                       cmd,

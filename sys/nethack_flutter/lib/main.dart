@@ -1907,15 +1907,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         if (isExtCmdMenu) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: Material(
-                              color: const Color(0xFF2C2C2C),
-                              borderRadius: BorderRadius.circular(8.0),
-                              clipBehavior: Clip.antiAlias,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.white12, width: 1.0),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.white12, width: 1.0),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: Material(
+                                color: const Color(0xFF2C2C2C),
+                                borderRadius: BorderRadius.circular(8.0),
+                                clipBehavior: Clip.antiAlias,
                                 child: ListTile(
                                   dense: true,
                                   contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
@@ -2235,23 +2235,26 @@ class _MyHomePageState extends State<MyHomePage> {
                           itemCount: _filteredExtCmds.length,
                           itemBuilder: (context, index) {
                             final entry = _filteredExtCmds[index];
-                            return ListTile(
-                              title: Text(
-                                entry.command,
-                                style: const TextStyle(fontFamily: 'monospace', color: Colors.white),
+                            return Material(
+                              color: Colors.transparent,
+                              child: ListTile(
+                                title: Text(
+                                  entry.command,
+                                  style: const TextStyle(fontFamily: 'monospace', color: Colors.white),
+                                ),
+                                subtitle: entry.description.isNotEmpty
+                                    ? Text(
+                                        entry.description,
+                                        style: const TextStyle(color: Colors.white70, fontSize: 12),
+                                      )
+                                    : null,
+                                dense: true,
+                                visualDensity: VisualDensity.compact,
+                                onTap: () {
+                                  _getlineController.text = entry.command;
+                                  _sendGetLineResult(entry.command);
+                                },
                               ),
-                              subtitle: entry.description.isNotEmpty
-                                  ? Text(
-                                      entry.description,
-                                      style: const TextStyle(color: Colors.white70, fontSize: 12),
-                                    )
-                                  : null,
-                              dense: true,
-                              visualDensity: VisualDensity.compact,
-                              onTap: () {
-                                _getlineController.text = entry.command;
-                                _sendGetLineResult(entry.command);
-                              },
                             );
                           },
                         ),
@@ -2352,13 +2355,16 @@ class _MyHomePageState extends State<MyHomePage> {
                           itemCount: _askNameSaves.length,
                           itemBuilder: (context, index) {
                             final name = _askNameSaves[index];
-                            return ListTile(
-                              title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                              leading: const Icon(Icons.account_circle, color: Colors.lightBlueAccent),
-                              dense: true,
-                              onTap: () {
-                                _askNameController.text = name;
-                              },
+                            return Material(
+                              color: Colors.transparent,
+                              child: ListTile(
+                                title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                leading: const Icon(Icons.account_circle, color: Colors.lightBlueAccent),
+                                dense: true,
+                                onTap: () {
+                                  _askNameController.text = name;
+                                },
+                              ),
                             );
                           },
                         ),
@@ -2491,15 +2497,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                               final desc = item['description'] ?? '';
                                               return Padding(
                                                 padding: const EdgeInsets.symmetric(vertical: 4.0),
-                                                child: Material(
-                                                  color: const Color(0xFF2C2C2C),
-                                                  borderRadius: BorderRadius.circular(8.0),
-                                                  clipBehavior: Clip.antiAlias,
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(color: Colors.white12, width: 1.0),
-                                                      borderRadius: BorderRadius.circular(8.0),
-                                                    ),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(color: Colors.white12, width: 1.0),
+                                                    borderRadius: BorderRadius.circular(8.0),
+                                                  ),
+                                                  child: Material(
+                                                    color: const Color(0xFF2C2C2C),
+                                                    borderRadius: BorderRadius.circular(8.0),
+                                                    clipBehavior: Clip.antiAlias,
                                                     child: ListTile(
                                                       title: Text(
                                                         cmd,
