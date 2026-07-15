@@ -885,7 +885,12 @@ static void flutter_cliparound(int x, int y) {
 static void flutter_putstr(winid window, int attr, const char* str) {
     debuglog("flutter_putstr [%d]: %s", window, str);
     if ((int) window == WIN_MESSAGE && str) {
-        flutter_save_message(str);
+        /* NetHackJP: ATR_NOHISTORY 付き putstr (farlook 説明など)
+         * は C 側履歴 (^P 用) にも積まず Dart 側の topline にだけ
+         * 表示する。 */
+        if (!(attr & ATR_NOHISTORY)) {
+            flutter_save_message(str);
+        }
     }
     if (g_putstr_cb && str) {
         char* conv = convert_cp437_to_utf8(str);
@@ -909,7 +914,12 @@ void flutter_putmixed_with_tile(winid window, int attr, int tile, const char* st
     char decoded[BUFSZ];
     decode_mixed(decoded, str);
     if ((int) window == WIN_MESSAGE) {
-        flutter_save_message(decoded);
+        /* NetHackJP: ATR_NOHISTORY 付き putmixed も C 側履歴を skip。
+         * 現在は farlook 説明 (pager.c:2288) と autodescribe
+         * (getpos.c:652) が該当。 */
+        if (!(attr & ATR_NOHISTORY)) {
+            flutter_save_message(decoded);
+        }
     }
     if (g_putmixed_cb) {
         char* conv = convert_cp437_to_utf8(decoded);
