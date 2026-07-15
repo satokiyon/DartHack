@@ -2285,7 +2285,10 @@ do_look(int mode, coord *click_cc)
         if (found) {
             jp_translate_screen_desc(out_str);
             /* use putmixed() because there may be an encoded glyph present */
-            putmixed(WIN_MESSAGE, 0, out_str);
+            /* NetHackJP: farlook カーソル移動時の説明は履歴に積まず
+             * topline として扱うため ATR_NOHISTORY を付与する
+             * (Flutter ポート向け)。 upstream では attr=0 のまま。 */
+            putmixed(WIN_MESSAGE, ATR_NOHISTORY, out_str);
 #ifdef DUMPLOG_CORE
             {
                 char dmpbuf[BUFSZ];
