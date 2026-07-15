@@ -144,6 +144,7 @@ static volatile int g_pending_poscmd_mod = 1;
 static volatile int g_pending_poscmd = 0;
 static volatile int g_selected_menu_count = -2; // -2: 待機, -1: キャンセル, 0以上: 件数
 static long g_selected_menu_items[FLUTTER_MAX_SELECTED_MENU] = {0};
+static long g_selected_menu_counts[FLUTTER_MAX_SELECTED_MENU] = {0};
 
 #define FLUTTER_MSG_HISTORY_MAX 64
 static char* g_msg_history[FLUTTER_MSG_HISTORY_MAX] = {0};
@@ -469,15 +470,16 @@ void SendPosCmdToFlutter(int x, int y, int mod) {
 }
 
 // Dart 側からメニュー選択結果を受け取る関数
-void SendMenuSelection(long ident) {
+void SendMenuSelection(long ident, long count) {
     g_selected_menu_item = ident;
     if (ident == -1) {
         g_selected_menu_count = -1;
     } else {
         g_selected_menu_items[0] = ident;
+        g_selected_menu_counts[0] = count;
         g_selected_menu_count = 1;
     }
-    debuglog("C core received menu selection: %ld", ident);
+    debuglog("C core received menu selection: %ld (count=%ld)", ident, count);
 }
 
 void SendMenuSelectionsToC(const char* csv) {
@@ -509,8 +511,18 @@ void SendMenuSelectionsToC(const char* csv) {
             continue;
         }
 
-        g_selected_menu_items[count++] = v;
+        long count_val = 1;
         p = endptr;
+        if (*p == ':') {
+            ++p;
+            count_val = strtol(p, &endptr, 10);
+            p = endptr;
+        }
+
+        g_selected_menu_items[count] = v;
+        g_selected_menu_counts[count] = count_val;
+        count++;
+
         while (*p && *p != ',') {
             ++p;
         }
@@ -1161,7 +1173,16 @@ static char flutter_yn_function(const char* question, const char* choices, char 
         usleep(10000); // 10ms
     }
     
-    return g_yn_result;
+    char res = g_yn_result;
+    if (res == '\033') {
+        if (choices && strchr(choices, 'q'))
+            res = 'q';
+        else if (choices && strchr(choices, 'n'))
+            res = 'n';
+        else
+            res = def;
+    }
+    return res;
 }
 
 static void flutter_getlin(const char* prompt, char* buf) {
@@ -1277,7 +1298,7 @@ static int flutter_select_menu(winid wid, int how, menu_item **selected) {
     for (int i = 0; i < g_selected_menu_count; ++i) {
         (*selected)[i].item = cg.zeroany;
         (*selected)[i].item.a_long = g_selected_menu_items[i];
-        (*selected)[i].count = 1;
+        (*selected)[i].count = g_selected_menu_counts[i];
     }
 
     return g_selected_menu_count;

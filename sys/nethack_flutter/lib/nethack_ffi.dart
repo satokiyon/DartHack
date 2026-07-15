@@ -89,8 +89,8 @@ typedef SendKeyFunc = Void Function(Int32 key);
 typedef SendKeyDart = void Function(int key);
 
 // メニュー選択結果送信
-typedef SendMenuSelectionFunc = Void Function(Int64 ident);
-typedef SendMenuSelectionDart = void Function(int ident);
+typedef SendMenuSelectionFunc = Void Function(Int64 ident, Int64 count);
+typedef SendMenuSelectionDart = void Function(int ident, int count);
 
 typedef SendMenuSelectionsFunc = Void Function(Pointer<Utf8> csv);
 typedef SendMenuSelectionsDart = void Function(Pointer<Utf8> csv);

@@ -339,12 +339,19 @@ class NetHackWorker {
           ffi.sendPosCmdToC(x, y, mod);
         } else if (type == 'menu_select') {
           final ident = message['ident'] as int;
-          ffi.sendMenuSelection(ident);
+          final count = message['count'] as int? ?? 1;
+          ffi.sendMenuSelection(ident, count);
         } else if (type == 'menu_selects') {
-          final ids = (message['idents'] as List<dynamic>? ?? const <dynamic>[])
-              .map((e) => e as int)
-              .toList();
-          final csv = ids.join(',').toNativeUtf8();
+          final selections = message['selections'] as List<dynamic>? ?? const <dynamic>[];
+          final List<String> pairs = [];
+          for (final sel in selections) {
+            if (sel is Map) {
+              final id = sel['ident'] as int;
+              final count = sel['count'] as int? ?? 1;
+              pairs.add('$id:$count');
+            }
+          }
+          final csv = pairs.join(',').toNativeUtf8();
           ffi.sendMenuSelections(csv);
           calloc.free(csv);
         } else if (type == 'yn_result') {

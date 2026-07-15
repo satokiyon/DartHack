@@ -147,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _extCmdFilterController = TextEditingController();
   final TextEditingController _extCmdMenuFilterController = TextEditingController();
   String _extCmdMenuFilter = "";
-  Set<int> _menuSelectedIds = <int>{};
+  Map<int, int> _menuSelectedCounts = <int, int>{};
 
   // 詳細な操作設定（shared_preferences用）
   double _padOpacity = 0.8;
@@ -636,11 +636,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _handleAmountSelection(MenuItemData item, int amount) {
     if (amount <= 0) return;
-    final amountStr = amount.toString();
-    for (int i = 0; i < amountStr.length; i++) {
-      _sendFfiKey(amountStr.codeUnitAt(i), amountStr[i]);
+    final isMultiSelectMenu = !_screen.menuPrompt.contains("拡張コマンド") && _screen.menuHow > 1;
+    if (isMultiSelectMenu) {
+      setState(() {
+        _menuSelectedCounts[item.ident] = amount;
+      });
+    } else {
+      _sendMenuSelection(item.ident, amount);
     }
-    _sendFfiKey(item.accelerator, String.fromCharCode(item.accelerator));
   }
 
   Future<void> _onMenuItemLongPress(MenuItemData item) async {
@@ -1123,10 +1126,12 @@ class _MyHomePageState extends State<MyHomePage> {
             _waitingForInput = true;
             _extCmdMenuFilter = "";
             _extCmdMenuFilterController.clear();
-            _menuSelectedIds = _screen.menuItems
-                .where((item) => item.ident != 0 && item.preselected != 0)
-                .map((item) => item.ident)
-                .toSet();
+            _menuSelectedCounts = <int, int>{};
+            for (final item in _screen.menuItems) {
+              if (item.ident != 0 && item.preselected != 0) {
+                _menuSelectedCounts[item.ident] = _parseMaxCount(item.text);
+              }
+            }
           });
           _triggerCenterOnPlayer();
         } else if (type == 'error') {
@@ -1400,7 +1405,7 @@ class _MyHomePageState extends State<MyHomePage> {
           return;
         }
         if (code == 10 || code == 13) {
-          _sendMenuSelections(_menuSelectedIds.toList(growable: false));
+          _sendMenuSelections(_menuSelectedCounts);
           return;
         }
         for (final item in _screen.menuItems) {
@@ -1583,45 +1588,55 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _sendMenuSelection(int ident) {
+  void _sendMenuSelection(int ident, [int count = 1]) {
     if (!_waitingForInput || !_screen.isMenuWindowVisible) return;
     setState(() {
       _waitingForInput = false;
       _extCmdMenuFilter = "";
       _extCmdMenuFilterController.clear();
     });
-    _addLog("> Menu Select: ID $ident");
+    _addLog("> Menu Select: ID $ident (count: $count)");
     _workerSendPort?.send({
       'type': 'menu_select',
       'ident': ident,
+      'count': count,
     });
     _screen.clearMenu();
-    _menuSelectedIds = <int>{};
+    _menuSelectedCounts = <int, int>{};
   }
 
-  void _sendMenuSelections(List<int> idents) {
+  void _sendMenuSelections(Map<int, int> selections) {
     if (!_waitingForInput || !_screen.isMenuWindowVisible) return;
     setState(() {
       _waitingForInput = false;
       _extCmdMenuFilter = "";
       _extCmdMenuFilterController.clear();
     });
-    _addLog("> Menu Selects: ${idents.length} item(s)");
+    _addLog("> Menu Selects: ${selections.length} item(s)");
+    final List<Map<String, int>> payload = selections.entries
+        .map((e) => {'ident': e.key, 'count': e.value})
+        .toList();
     _workerSendPort?.send({
       'type': 'menu_selects',
-      'idents': idents,
+      'selections': payload,
     });
     _screen.clearMenu();
-    _menuSelectedIds = <int>{};
+    _menuSelectedCounts = <int, int>{};
   }
 
   void _toggleMenuSelection(int ident) {
     if (ident == 0) return;
     setState(() {
-      if (_menuSelectedIds.contains(ident)) {
-        _menuSelectedIds.remove(ident);
+      if (_menuSelectedCounts.containsKey(ident)) {
+        _menuSelectedCounts.remove(ident);
       } else {
-        _menuSelectedIds.add(ident);
+        try {
+          final item = _screen.menuItems.firstWhere((i) => i.ident == ident);
+          final maxCount = _parseMaxCount(item.text);
+          _menuSelectedCounts[ident] = maxCount;
+        } catch (_) {
+          _menuSelectedCounts[ident] = 1;
+        }
       }
     });
   }
@@ -1848,7 +1863,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         }
 
                         if (isMultiSelectMenu) {
-                          final checked = _menuSelectedIds.contains(item.ident);
+                          final checked = _menuSelectedCounts.containsKey(item.ident);
+                          final selectedCount = _menuSelectedCounts[item.ident] ?? 0;
+                          final maxCount = _parseMaxCount(item.text);
+                          final countLabel = checked ? " ($selectedCount個選択中 / $maxCount)" : "";
                           return Material(
                             color: Colors.transparent,
                             child: ListTile(
@@ -1872,9 +1890,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ],
                               ),
                               title: Text(
-                                "$accLabel$commandText",
+                                "$accLabel$commandText$countLabel",
                                 style: TextStyle(
-                                  color: itemColor,
+                                  color: checked ? Colors.tealAccent[400] : itemColor,
                                   fontFamily: 'monospace',
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
@@ -1968,10 +1986,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         ElevatedButton(
                           onPressed: () {
                             setState(() {
-                              _menuSelectedIds = filteredItems
-                                  .where((item) => item.ident != 0)
-                                  .map((item) => item.ident)
-                                  .toSet();
+                              _menuSelectedCounts = <int, int>{};
+                              for (final item in filteredItems) {
+                                if (item.ident != 0) {
+                                  _menuSelectedCounts[item.ident] = _parseMaxCount(item.text);
+                                }
+                              }
                             });
                           },
                           child: const Text("全て選択"),
@@ -1979,13 +1999,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         ElevatedButton(
                           onPressed: () {
                             setState(() {
-                              _menuSelectedIds.clear();
+                              _menuSelectedCounts.clear();
                             });
                           },
                           child: const Text("解除"),
                         ),
                         ElevatedButton(
-                          onPressed: () => _sendMenuSelections(_menuSelectedIds.toList(growable: false)),
+                          onPressed: () => _sendMenuSelections(_menuSelectedCounts),
                           child: const Text("OK"),
                         ),
                       ],
