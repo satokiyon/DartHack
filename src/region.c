@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-15. */
 /* NetHack 5.0	region.c	$NHDT-Date: 1781973064 2026/06/20 16:31:04 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.112 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -467,9 +467,9 @@ run_regions(void)
         gg.gas_cloud_diss_within = FALSE;
     }
     if (gg.gas_cloud_diss_seen) {
-        You_see("%s%sガスの雲が消散しているのを見た.",
-                (gg.gas_cloud_diss_seen == 1) ? "一つの" : "いくつかの",
-                plur(gg.gas_cloud_diss_seen));
+        /* NetHackJP: Remove plur(gg.gas_cloud_diss_seen) to avoid trailing 's' in Japanese */
+        You_see("%sガスの雲が消散しているのを見た.",
+                (gg.gas_cloud_diss_seen == 1) ? "一つの" : "いくつかの");
         gg.gas_cloud_diss_seen = 0;
     }
 }

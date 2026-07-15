@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-15. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -212,6 +212,28 @@ str)` という API しかなく、 タイル ID を直接渡せないため、 
      タイルを添える」 という仕様自体は Android/Flutter ポートの
      ユーザ体験に直結するため、 アップストリームが同等の機能を
      入れても問題なければ本独自実装は削除して良い (動作は同等のため)。
+
+### 5. 日本語メッセージ内の複数形 "s" (plur) の排除と日本語化
+日本語メッセージが表示される箇所において、英語の複数形接尾辞 `"s"`（`plur()` マクロ）がそのまま表示されてしまう翻訳バグや、英語の単語がそのまま出力されてしまっていた箇所を修正しました。
+* **マーカータグ**: 
+  - `/* NetHackJP: Pass currency(amt) instead of plur(amt) to display proper currency unit */` (通貨表示の修正)
+  - `/* NetHackJP: Remove plur(...) to avoid trailing 's' in Japanese */` (複数形 "s" の排除)
+  - `/* NetHackJP: Sprintf hornbuf to "角" instead of "horn(s)" to make it Japanese */` (角のヘルメット突き破りメッセージの日本語化)
+  - `/* NetHackJP: Distinguish singular/plural for Kop in Japanese */` (コップ消滅メッセージの単複切り分け)
+* **対象ファイル**:
+  1. **`src/shk.c`**:
+     - `shk_names_obj()` 内で `plur(amt)` の代わりに `currency(amt)` を渡すように変更。
+     - 店主の道具持ち込み拒否時のセリフおよびメッセージから `plur(cnt)` 排除。
+     - コップ消滅時のメッセージで `cnt` に応じて「コップ」と「コップ達」を切り分けるよう修正。
+  2. **`src/objnam.c`**:
+     - `killer_xname()` 内で危険なスライムモールドの名称フォーマットから `plur(obj->quan)` を排除。
+  3. **`src/polyself.c`**:
+     - 角がヘルメット等を突き破った時のメッセージを「角」として日本語化。
+     - コカトリス等の死体の下に隠れて石化した際の pline メッセージから `plur(ct)` を排除。
+  4. **`src/region.c`**:
+     - ガス雲消散時のメッセージから `plur(gg.gas_cloud_diss_seen)` を排除。
+* **アップストリーム追従手順**:
+  1. 本件は日本語メッセージのフォーマットに合わせた修正（日本語化特有の対応）であるため、アップストリームマージ時に競合した場合は、日本語側の文脈に合わせて `plur` や英語表記を排除する変更を維持するように競合解決を行ってください。
 
 ---
 
