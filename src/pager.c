@@ -2265,11 +2265,20 @@ do_look(int mode, coord *click_cc)
 
         if (from_screen || clicklook) {
             if (from_screen) {
+                /* NetHackJP: do_look ループは各カーソル移動で
+                 * ここを通るため、 通常 pline() だと Dart 側の
+                 * topline commit ロジックが発動して説明文が
+                 * 履歴に流れ落ちる。 SUPPRESS_HISTORY 付き
+                 * custompline() (ATR_NOHISTORY 化) で topline 化
+                 * し、 説明文 (下の putmixed) と交互に top
+                 * line を上書きするだけで履歴を汚さない。 */
                 if (flags.verbose)
-                    pline("カーソルを%sへ移動して.",
-                          what_is_a_location);
+                    custompline(SUPPRESS_HISTORY,
+                                "カーソルを%sへ移動して.",
+                                what_is_a_location);
                 else
-                    pline("%sを選んで.", what_is_a_location);
+                    custompline(SUPPRESS_HISTORY, "%sを選んで.",
+                                what_is_a_location);
 
                 ans = getpos(&cc, quick, what_is_a_location);
                 if (ans < 0 || cc.x < 0)
