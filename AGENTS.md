@@ -357,6 +357,13 @@ NetHack C コア（バックグラウンドスレッド）と Flutter/Dart UI �
    - **コミット粒度の参考**: 枠組み確立（FFI 拡張）→ 機能有効化（呼び出し元修正）の **2 段階** に分割すると、ロールバック容易でレビューしやすくなります。
    - **upstream との競合**: NetHackJP-Android 固有のシンボル（例 `flutter_putmixed_with_tile`）を `src/`, `include/` 配下に追加する場合は、NetHackJP の `DEVELOPMENT.md` §4 のポリシーに従い、 `/* NetHackJP: ... */` マーカーで独自実装マーキングしてください。
 
+## Android版におけるセーブデータ一覧（get_saved_games）のフィルタリング方針
+
+1. **バックアップファイル（.bak）の除外**:
+   - Android/Flutterポートでは、ゲームロード直後にクラッシュ救済用のバックアップファイルとして `save/[UID][PlayerName].bak` が自動生成されます。
+   - `get_saved_games()` (in `src/files.c`) でセーブデータ一覧を走査・スキャンする際は、重複表示や死亡後の無効データ残存を防ぐため、必ずファイル名末尾が `".bak"` であるものをスキップ・除外してください。
+   - アップストリーム（本家）の更新をマージする際、このフィルタリングロジックが上書きされて消失（先祖返り）しないよう厳重に注意してください。
+
 ## 将来の検討事項
 - レイアウト関連: CmdPanel の Y 軸方向クランプ（マップ下端保護）の実装。方針 16 の「現状の制限」を解消する。
 - ウィンドウ API 拡張: `flutter_putmixed_with_tile` のような NetHackJP-Android 独自シンボル（`src/`, `include/` 配下に追加）の upstream 還元可否の検討。
