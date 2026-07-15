@@ -2948,33 +2948,25 @@ class _MyHomePageState extends State<MyHomePage> {
                                     }
 
                                     // putmixed 経由のテキスト (例: `/` 結果リスト) は
-                                    // テキスト内に `\GXXXXNNNN` のグリフコードを含む。
-                                    // 該当部分を抽出してタイル画像に置換する。
-                                    // タイル ID は _textTiles[index] から取得 (putstr
-                                    // 経由の行は -1 が入っている)。
-                                    // tile < 0 の場合は \G 部分をそのまま残し、 従来の
-                                    // showsym 表示にフォールバックする (現時点では素の
-                                    // \G が残るが、 C 側で tile を渡す Commit 3 適用
-                                    // 以降は表示されない)。
+                                    // C 側 (`winflutter.c::flutter_putmixed_with_tile`)
+                                    // で `decode_mixed()` により showsym 1 文字
+                                    // (CP437) にデコード済み。 そのまま表示する。
+                                    // タイルモード時のみ、 テキスト先頭にタイル画像を
+                                    // 並べて表示する (showsym 文字と重複しない)。
                                     final tile = (index < _screen.textTiles.length)
                                         ? _screen.textTiles[index]
                                         : -1;
-                                    final hasGlyphCode = RegExp(r'\\G[0-9A-Fa-f]{8}').hasMatch(line);
-                                    final displayLine = (tile >= 0 && hasGlyphCode)
-                                        ? line.replaceAll(RegExp(r'\\G[0-9A-Fa-f]{8}'), '')
-                                        : line;
-                                    final displayTile = tile;
 
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 4),
                                       child: Row(
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
-                                          _buildMenuItemTile(displayTile),
+                                          _buildMenuItemTile(tile),
                                           const SizedBox(width: 4),
                                           Expanded(
                                             child: Text(
-                                              displayLine,
+                                              line,
                                               style: const TextStyle(
                                                 color: Colors.white,
                                                 fontFamily: 'monospace',

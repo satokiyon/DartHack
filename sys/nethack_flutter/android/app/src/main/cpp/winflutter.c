@@ -12,6 +12,7 @@
 static int flutter_nhgetch(void);
 extern int nhcolor_to_RGB(int c); // winandroid.c の関数を参照
 extern struct window_procs and_procs; // winandroid.c で定義されている元の WindowPort 構造体
+extern char *decode_mixed(char *, const char *); // src/windows.c の関数 (\GXXXXNNNN → showsym 1 文字)
 
 static winid flutter_create_nhwindow(int type);
 static void flutter_start_menu(winid wid, unsigned long behavior);
@@ -886,16 +887,25 @@ static void flutter_putstr(winid window, int attr, const char* str) {
 
 void flutter_putmixed_with_tile(winid window, int attr, int tile, const char* str) {
     debuglog("flutter_putmixed_with_tile [%d, attr=%d, tile=%d]: %s", window, attr, tile, str);
-    if ((int) window == WIN_MESSAGE && str) {
-        flutter_save_message(str);
+    if (!str) {
+        return;
     }
-    if (g_putmixed_cb && str) {
-        char* conv = convert_cp437_to_utf8(str);
+    /* \GXXXXNNNN (encglyph() 由来) を showsym 1 文字 (CP437) に
+     * デコードしてから UTF-8 変換する。 pager.c の outbuf には \G
+     * 以外の特殊シーケンス (\033 ANSI 等) は含まれないため、
+     * decode_mixed はそのまま使える。 */
+    char decoded[BUFSZ];
+    decode_mixed(decoded, str);
+    if ((int) window == WIN_MESSAGE) {
+        flutter_save_message(decoded);
+    }
+    if (g_putmixed_cb) {
+        char* conv = convert_cp437_to_utf8(decoded);
         int final_attr = attr;
         if (g_in_input_prompt) {
             final_attr |= 0x8000;
         }
-        g_putmixed_cb((int)window, final_attr, tile, conv ? conv : str);
+        g_putmixed_cb((int)window, final_attr, tile, conv ? conv : decoded);
     }
 }
 
