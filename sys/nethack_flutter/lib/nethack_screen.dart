@@ -57,6 +57,13 @@ class NetHackScreen extends ChangeNotifier {
   final List<String> _messageHistory = [];
   List<String> get messageHistory => _messageHistory;
 
+  // Topline (ATR_NOHISTORY 付き putstr)。
+  // farlook カーソル移動時の説明や autodescribe のような
+  // 「履歴に積まず、 現在の最下行だけ更新する」 用途で使われる。
+  // null のときは topline 未アクティブ。
+  String? _topline;
+  String? get topline => _topline;
+
   // MORE（メッセージ入力待ち）状態
   bool _isMoreActive = false;
   bool get isMoreActive => _isMoreActive;
@@ -150,6 +157,7 @@ class NetHackScreen extends ChangeNotifier {
     }
     if (type == nhwMessage) {
       _messageHistory.clear();
+      _topline = null;
     }
     notifyListeners();
   }
@@ -218,8 +226,25 @@ class NetHackScreen extends ChangeNotifier {
   void putString(int winId, int attr, String text) {
     final type = _winTypes[winId];
     final bool noHistory = (attr & 0x8000) != 0;
+    final bool isTopline = (attr & 0x0020) != 0; /* ATR_NOHISTORY */
 
     if (type == nhwMessage || winId == 1 /* WIN_MESSAGE */) {
+      if (isTopline) {
+        // farlook カーソル移動時の説明や autodescribe など、
+        // 「履歴に積まず現在の最下行だけ更新」 する用途。
+        _topline = text;
+        notifyListeners();
+        return;
+      }
+      // 通常メッセージが届いたら、 以前の topline があれば
+      // 履歴に commit してから新しいメッセージを積む。
+      if (_topline != null) {
+        _messageHistory.add(_topline!);
+        if (_messageHistory.length > 100) {
+          _messageHistory.removeAt(0);
+        }
+        _topline = null;
+      }
       _messages.add(text);
       if (_messages.length > 100) {
         _messages.removeAt(0);
@@ -259,8 +284,21 @@ class NetHackScreen extends ChangeNotifier {
   void putMixedWithTile(int winId, int attr, int tile, String text) {
     final type = _winTypes[winId];
     final bool noHistory = (attr & 0x8000) != 0;
+    final bool isTopline = (attr & 0x0020) != 0; /* ATR_NOHISTORY */
 
     if (type == nhwMessage || winId == 1 /* WIN_MESSAGE */) {
+      if (isTopline) {
+        _topline = text;
+        notifyListeners();
+        return;
+      }
+      if (_topline != null) {
+        _messageHistory.add(_topline!);
+        if (_messageHistory.length > 100) {
+          _messageHistory.removeAt(0);
+        }
+        _topline = null;
+      }
       _messages.add(text);
       if (_messages.length > 100) {
         _messages.removeAt(0);

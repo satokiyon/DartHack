@@ -2823,7 +2823,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       // メッセージオーバーレイ（マップ上部に半透明で重ねる）
                       // タップすると履歴パネルを表示する、またはMORE状態を解除する
-                      if (_screen.messageHistory.isNotEmpty)
+                      if (_screen.messageHistory.isNotEmpty || _screen.topline != null)
                         Positioned(
                           top: 0,
                           left: 0,
@@ -2837,6 +2837,18 @@ class _MyHomePageState extends State<MyHomePage> {
                                       : 0,
                                 ),
                               );
+                              // topline (farlook 説明など) があれば
+                              // 履歴の最下行を上書きする。 履歴が空なら
+                              // topline 単独で 1 行表示。
+                              final topline = _screen.topline;
+                              final isToplineActive = topline != null;
+                              if (isToplineActive) {
+                                if (displayedLines.isNotEmpty) {
+                                  displayedLines[displayedLines.length - 1] = topline;
+                                } else {
+                                  displayedLines.add(topline);
+                                }
+                              }
                               if (_screen.isMoreActive) {
                                 displayedLines.add(" -- MORE --");
                               }
@@ -2847,12 +2859,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                   final index = entry.key;
                                   final line = entry.value;
                                   final isMoreLine = _screen.isMoreActive && index == displayedLines.length - 1;
+                                  final isToplineLine = isToplineActive &&
+                                      index == displayedLines.length - 1 - (_screen.isMoreActive ? 1 : 0);
                                   final double ratio = displayedLines.length > 1
                                       ? index / (displayedLines.length - 1)
                                       : 1.0;
                                   final color = isMoreLine
                                       ? Colors.amber[400]!
-                                      : Color.lerp(Colors.white30, Colors.white, ratio)!;
+                                      : isToplineLine
+                                          ? Colors.cyanAccent[200]!
+                                          : Color.lerp(Colors.white30, Colors.white, ratio)!;
 
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 2.0),
@@ -2877,7 +2893,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                             color: color,
                                             fontFamily: 'monospace',
                                             fontSize: _msgFontSize,
-                                            fontWeight: isMoreLine ? FontWeight.bold : FontWeight.normal,
+                                            fontWeight: (isMoreLine || isToplineLine)
+                                                ? FontWeight.bold
+                                                : FontWeight.normal,
                                           ),
                                         ),
                                       ),
