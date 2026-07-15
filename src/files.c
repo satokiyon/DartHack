@@ -1572,6 +1572,11 @@ get_saved_games(void)
     for (i=0; i<n1; i++) {
         if ( sscanf( namelist[i]->d_name, "%d%63s", &uid, name ) == 2 ) {
             if ( uid == myuid ) {
+                /* .bak で終わるバックアップファイルを除外 */
+                size_t name_len = strlen(name);
+                if (name_len > 4 && strcmp(name + name_len - 4, ".bak") == 0) {
+                    continue;
+                }
                 char filename[BUFSZ];
                 char* r;
                 Sprintf(filename,"save/%d%s", uid, name);
