@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-16. */
 /* NetHack 5.0  makedefs.c  $NHDT-Date: 1702948590 2023/12/19 01:16:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
@@ -886,13 +886,13 @@ do_grep_control(char *buf)
     case GREP_MAGIC: /* ^^ -> ^ */
         return buf0;
     default: {
-        char str[10];
+        char str[16]; /* NetHackJP: expand str buffer to prevent overflow */
 
         if (isprint((uchar) buf[0])) {
             str[0] = buf[0];
             str[1] = '\0';
         } else {
-            sprintf(str, "0x%02x", buf[0]);
+            sprintf(str, "0x%02x", (unsigned char) buf[0]);
         }
         Fprintf(stderr, "unknown control ^%s at line %d.\n", str,
                 grep_lineno);

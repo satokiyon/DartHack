@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-16. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -109,3 +109,27 @@ NetHackJP は本家 NetHack (アップストリーム) の Windows 日本語化�
 3. **マージ時の競合解決**:
    - アップストリームマージで本独自拡張と衝突した場合は、まず本独自拡張側の意図をコメントから読み取り、アップストリーム版に本独自拡張の差分 (UTF-8 対応やヘッダーバッファ追加など) を移植する形での解決を優先してください。
    - 結果として本独自拡張の大部分が不要になった場合は、マーカータグと対応する `DEVELOPMENT.md` エントリも削除し、ドキュメントと実装の整合性を保ってください。
+## GitHub Code Scanning アラートの取得と分析に関する方針
+
+GitHub Actions等で実行される CodeQL のコードスキャン警告（Code scanning alerts）を GitHub CLI (`gh`) 経由で取得・分析する際は、以下のルールを徹底してください。
+
+1. **404 Not Found エラー発生時の対処**:
+   - `gh api repos/{owner}/{repo}/code-scanning/alerts` 実行時に `404 Not Found` が返る場合、GitHub CLI の認証トークンに `security_events` スコープ、または Code Scanning の Read 権限が不足していることが原因です。
+   - 解決のため、ユーザーに以下の手順による認証の更新を依頼してください。
+     1. GitHub の個人設定（PAT）等で、トークンに **code scanning (Read)** 権限を付与する。
+     2. トークンをテキストファイルに書き出し、PowerShell 等で以下のコマンドを実行して `gh` にトークンを読み込ませて再ログインする。
+        ```powershell
+        get-content -path <トークンファイルのパス> | gh auth login --with-token
+        ```
+     3. ログイン完了後、再度 `gh api` コマンドを実行して情報を取得する。
+
+2. **git blame による真の警告混入コミット者の特定**:
+   - API が返す `most_recent_instance.commit_sha` は、警告が検出された時の最新コミット（HEAD）を指すことが多く、警告を実際に混入させたコミットであるとは限りません。
+   - 警告が検出された行（`location.path` の `start_line`）に対して必ず以下のコマンドを実行し、その行を最後に変更した真のコミット者（Author）を正確に特定してください。
+     ```bash
+     git blame -L <line>,<line> -p -- <path>
+     ```
+
+3. **日本語ドキュメント（Markdown等）の安全な置換処理**:
+   - `replace_file_content` などの置換ツールを日本語の Markdown や C コードで使用する際、句読点の些細な不一致（「。」と「.」など）があると、無関係な箇所に誤マッチしてファイルを破損させるリスクが高くなります。
+   - 文字列の一部を安全に置換・挿入する際は、Node.js スクリプトを用いてファイルを読み込み、行配列（`split(/\r?\n/)`）に分解して条件判定を伴う挿入を行い、元の改行コードを保持して書き戻す方法（`lines.join(originalEnding)`）を最優先してください。

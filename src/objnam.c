@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-15. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-16. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1781973060 2026/06/20 16:31:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.464 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1551,7 +1551,7 @@ doname_base(
             break;
         }
         if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
-            char suffix[24];
+            char suffix[32]; /* NetHackJP: expand suffix buffer size to prevent overflow in Japanese */
 
             /* separately formatted suffix avoids need for ConcatF3() */
             Sprintf(suffix, "%s", !obj->lamplit ? "装着済み" : "装着済み・点灯中");
