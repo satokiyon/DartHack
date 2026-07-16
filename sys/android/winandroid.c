@@ -68,7 +68,13 @@ int NetHackMain(int argc, char** argv);
 struct window_procs and_procs = {
     WPID(and),
 	WC_COLOR | WC_HILITE_PET | WC_INVERSE,	/* window port capability options supported */
-	WC2_HILITE_STATUS | WC2_FLUSH_STATUS,	/* additional window port capability options supported */
+	/* NetHackJP: WC2_SUPPRESS_HIST を追加。 これがないと
+	 * src/pline.c:77 の `if (... && (windowprocs.wincap2 & WC2_SUPPRESS_HIST) != 0)`
+	 * チェックで常に false になり、 custompline(SUPPRESS_HISTORY, ...)
+	 * 経路 (farlook の verbose/short プロンプトや autodescribe) が
+	 * 全て通常 pline 扱いとなり、 ATR_NOHISTORY が付かず Dart 側の
+	 * topline 化に失敗する。 */
+	WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_SUPPRESS_HIST,	/* additional window port capability options supported */
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
 	and_init_nhwindows,
 	and_player_selection,
