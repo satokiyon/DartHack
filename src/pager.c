@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-16. */
 /* NetHack 5.0	pager.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.302 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -2266,9 +2266,9 @@ do_look(int mode, coord *click_cc)
         if (from_screen || clicklook) {
             if (from_screen) {
                 /* NetHackJP: do_look ループは各カーソル移動で
-                 * ここを通るため、 通常 pline() だと Dart 側の
-                 * topline commit ロジックが発動して説明文が
-                 * 履歴に流れ落ちる。 SUPPRESS_HISTORY 付き
+                 * ここを通るため、 通常 pline() だと画面のメッセージ
+                 * 履歴 (^P / --More-- のログ) に毎回のプロンプトが
+                 * 積まれてスクロールしてしまう。 SUPPRESS_HISTORY 付き
                  * custompline() (ATR_NOHISTORY 化) で topline 化
                  * し、 説明文 (下の putmixed) と交互に top
                  * line を上書きするだけで履歴を汚さない。 */
@@ -2294,9 +2294,8 @@ do_look(int mode, coord *click_cc)
         if (found) {
             jp_translate_screen_desc(out_str);
             /* use putmixed() because there may be an encoded glyph present */
-            /* NetHackJP: farlook カーソル移動時の説明は履歴に積まず
-             * topline として扱うため ATR_NOHISTORY を付与する
-             * (Flutter ポート向け)。 upstream では attr=0 のまま。 */
+            /* NetHackJP: farlook カーソル移動時の説明はメッセージ
+             * 履歴に積まず topline (ATR_NOHISTORY) として扱う。 */
             putmixed(WIN_MESSAGE, ATR_NOHISTORY, out_str);
 #ifdef DUMPLOG_CORE
             {
