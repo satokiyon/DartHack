@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nethack_flutter/utils/scale_clamp.dart';
+import 'package:darthack/utils/scale_clamp.dart';
 
 void main() {
   group('calculatePadClamp', () {

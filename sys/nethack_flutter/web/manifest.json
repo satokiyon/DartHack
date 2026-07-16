@@ -1,6 +1,6 @@
 {
-    "name": "nethack_flutter",
-    "short_name": "nethack_flutter",
+    "name": "DartHack",
+    "short_name": "DartHack",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -57,7 +57,7 @@ class _SettingsPageState extends State<SettingsPage> {
     "下段左ボタン (6)", "下段中央ボタン (7)", "下段右ボタン (8)"
   ];
 
-  final _channel = const MethodChannel('com.tbd.nethackjp/key_interceptor');
+  final _channel = const MethodChannel('jp.satokiyo.darthack/key_interceptor');
 
   bool _showPanelNames = true;
 

@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.tbd.nethackjp" "\0"
-            VALUE "FileDescription", "nethack_flutter" "\0"
+            VALUE "CompanyName", "jp.satokiyo.darthack" "\0"
+            VALUE "FileDescription", "DartHack" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "nethack_flutter" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.tbd.nethackjp. All rights reserved." "\0"
-            VALUE "OriginalFilename", "nethack_flutter.exe" "\0"
-            VALUE "ProductName", "nethack_flutter" "\0"
+            VALUE "InternalName", "darthack" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 jp.satokiyo.darthack. All rights reserved." "\0"
+            VALUE "OriginalFilename", "darthack.exe" "\0"
+            VALUE "ProductName", "DartHack" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

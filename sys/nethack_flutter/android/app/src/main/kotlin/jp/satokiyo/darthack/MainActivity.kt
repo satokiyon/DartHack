@@ -1,4 +1,4 @@
-package com.tbd.nethackjp.nethack_flutter
+package jp.satokiyo.darthack
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -6,7 +6,7 @@ import io.flutter.plugin.common.MethodChannel
 import android.view.KeyEvent
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "com.tbd.nethackjp/key_interceptor"
+    private val CHANNEL = "jp.satokiyo.darthack/key_interceptor"
     private var channel: MethodChannel? = null
 
     private var interceptVolumeUp = false
@@ -76,4 +76,3 @@ class MainActivity : FlutterActivity() {
         android.os.Process.killProcess(android.os.Process.myPid())
     }
 }
-

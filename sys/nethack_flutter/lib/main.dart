@@ -191,7 +191,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _transformationController = TransformationController();
-    const MethodChannel('com.tbd.nethackjp/key_interceptor')
+    const MethodChannel('jp.satokiyo.darthack/key_interceptor')
         .setMethodCallHandler((call) async {
       if (call.method == 'onKeyEvent') {
         final String? key = call.arguments['key'];
@@ -319,7 +319,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _syncNativeKeySettings() async {
     try {
-      await const MethodChannel('com.tbd.nethackjp/key_interceptor')
+      await const MethodChannel('jp.satokiyo.darthack/key_interceptor')
           .invokeMethod('updateInterceptorSettings', {
         'volumeUp': _volupAction != 0,
         'volumeDown': _voldownAction != 0,
