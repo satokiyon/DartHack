@@ -105,6 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
   
   SendPort? _workerSendPort;
   bool _isGameRunning = false;
+  bool _isGameFinished = false;
   bool _waitingForInput = false;
   bool _assetsReady = false;
   String _assetsPath = '';
@@ -892,6 +893,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _logs.clear();
       _isGameRunning = true;
+      _isGameFinished = false;
       _waitingForInput = false;
       _isMainGameStarted = false;
       _mapWinId = null;
@@ -1104,6 +1106,7 @@ class _MyHomePageState extends State<MyHomePage> {
           setState(() {
             _waitingForInput = false;
             _isGameRunning = false;
+            _isGameFinished = true;
           });
           unawaited(_showExitDialogAndTerminate(exitMessage));
         } else if (type == 'addMenu') {
@@ -3181,6 +3184,155 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget _buildStartScreen() {
+    return Stack(
+      children: [
+        // 背景画像
+        Positioned.fill(
+          child: Image.asset(
+            'assets/darthack_title.png',
+            fit: BoxFit.cover,
+          ),
+        ),
+        // 暗めのオーバーレイ
+        Positioned.fill(
+          child: Container(
+            color: Colors.black.withValues(alpha: 0.45),
+          ),
+        ),
+        // タイトルロゴとボタンと設定アイコン
+        Positioned.fill(
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              child: Column(
+                children: [
+                  // 上部（右端に設定アイコンを配置）
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                      icon: const Icon(Icons.settings, color: Colors.white70, size: 28),
+                      onPressed: _showSettingsDialog,
+                      tooltip: "ゲーム設定",
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.black38,
+                        padding: const EdgeInsets.all(8),
+                      ),
+                    ),
+                  ),
+                  const Spacer(flex: 2),
+                  // 中央：ロゴ画像
+                  Image.asset(
+                    'assets/darthack_logo.png',
+                    width: MediaQuery.of(context).size.width * 0.75,
+                    fit: BoxFit.contain,
+                  ),
+                  const Spacer(flex: 3),
+                  // 下部：進捗インジケータまたは「冒険を始める」ボタン
+                  if (!_assetsReady)
+                    const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
+                          ),
+                          SizedBox(height: 12),
+                          Text(
+                            "アセットを準備中...",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              shadows: [
+                                Shadow(blurRadius: 4, color: Colors.black, offset: Offset(1, 1)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // 「冒険を始める」ボタン
+                        Container(
+                          width: double.infinity,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Colors.deepPurple, Colors.indigo],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(28),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.deepPurple.withValues(alpha: 0.5),
+                                blurRadius: 12,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: _startGame,
+                              borderRadius: BorderRadius.circular(28),
+                              child: const Center(
+                                child: Text(
+                                  '冒険を始める',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    letterSpacing: 1.5,
+                                    shadows: [
+                                      Shadow(
+                                        blurRadius: 4,
+                                        color: Colors.black38,
+                                        offset: Offset(1, 1),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEndScreen() {
+    return Stack(
+      children: [
+        // 終了時専用の背景画像
+        Positioned.fill(
+          child: Image.asset(
+            'assets/darthack_end.png',
+            fit: BoxFit.cover,
+          ),
+        ),
+        // 暗めのオーバーレイ
+        Positioned.fill(
+          child: Container(
+            color: Colors.black.withValues(alpha: 0.35),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     _updateEffectiveScales(MediaQuery.of(context).size.width);
@@ -3261,59 +3413,15 @@ class _MyHomePageState extends State<MyHomePage> {
           },
           child: Stack(
             children: [
-              Column(
-                children: [
-                  Expanded(
-                    child: _isGameRunning
-                        ? _buildGameScreen()
-                        : Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: SingleChildScrollView(
-                              child: Text(
-                                 _logs.join('\n'),
-                                style: const TextStyle(fontFamily: 'monospace'),
-                              ),
-                            ),
-                          ),
-                  ),
-                  if (!_isGameRunning)
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: !_assetsReady
-                          ? const Center(
-                              child: Column(
-                                children: [
-                                  CircularProgressIndicator(),
-                                  SizedBox(height: 8),
-                                  Text("Preparing assets..."),
-                                ],
-                              ),
-                            )
-                          : Column(
-                              children: [
-                                  ElevatedButton(
-                                  onPressed: _startGame,
-                                  style: ElevatedButton.styleFrom(
-                                    minimumSize: const Size(double.infinity, 50),
-                                    backgroundColor: Colors.deepPurple,
-                                    foregroundColor: Colors.white,
-                                  ),
-                                  child: const Text('Start NetHack Game', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                ),
-                                const SizedBox(height: 12),
-                                OutlinedButton.icon(
-                                  onPressed: _showSettingsDialog,
-                                  icon: const Icon(Icons.settings),
-                                  label: const Text("ゲーム設定を開く"),
-                                  style: OutlinedButton.styleFrom(
-                                    minimumSize: const Size(double.infinity, 45),
-                                  ),
-                                ),
-                              ],
-                            ),
-                    ),
-                ],
-              ),
+              _isGameRunning
+                  ? Column(
+                      children: [
+                        Expanded(
+                          child: _buildGameScreen(),
+                        ),
+                      ],
+                    )
+                  : (_isGameFinished ? _buildEndScreen() : _buildStartScreen()),
               _buildControllerOverlay(),
               if (_isGameRunning && _isMainGameStarted) ...[
                 _buildMenuButton(),
