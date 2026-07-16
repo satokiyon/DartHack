@@ -263,7 +263,7 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
         ),
       )
       ```
-    - **衝突回避クランプ**: 両端起点のパッド群が中央で衝突する可能性がある場合、`combinedScaledWidth > availableWidth` を判定し、両者を等倍で `equalScale = availableWidth / totalBaseSize` にクランプします。共通関数 `sys/nethack_flutter/lib/utils/scale_clamp.dart` の `calculatePadClamp()` を必ず使用してください。
+    - **衝突回避クランプ**: 両端起点のパッド群が中央で衝突する可能性がある場合、`combinedScaledWidth > availableWidth` を判定し、両者を等倍で `equalScale = availableWidth / totalBaseSize` にクランプします。共通関数 `sys/flutter/lib/utils/scale_clamp.dart` の `calculatePadClamp()` を必ず使用してください。
     - **minGap**: 両端からの最小間隔（minGap = 8px 程度 = `Positioned` の `left` / `right`）を確保し、視覚的な窮屈さと誤タップを防ぎます。
     - **クランプ通知**: 設定値と実効値が乖離する場合、設定画面の Slider 下に「⚠ 画面幅により自動調整」を薄いオレンジ色（`Colors.amber[300]`）で表示します。
     - **してはいけないこと**:

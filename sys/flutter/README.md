@@ -1,5 +1,5 @@
 <!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-11. -->
-# nethack_flutter (Flutter 移植版)
+# DartHack (Flutter 移植版)
 
 NetHackJP 5.0.0 を **Flutter / Dart** 上で動作させるための移植プロジェクトです。
 
@@ -14,7 +14,7 @@ NetHackJP 5.0.0 を **Flutter / Dart** 上で動作させるための移植プ�
 ## 📁 フォルダ構成
 
 ```
-sys/nethack_flutter/
+sys/flutter/
 ├── lib/                         # Dart / Flutter ソース（UI・FFI ブリッジ）
 │   ├── main.dart                # アプリ起動・メイン画面・状態管理
 │   ├── nethack_ffi.dart         # C コア ↔ Dart の FFI 型定義・シンボル解決
@@ -241,7 +241,7 @@ cd sys\android
 フル C コアをビルドせず、**Flutter UI のみをローカルで高速にデバッグ** したい場合は、Flutter の Windows ターゲットを使います。
 
 ```powershell
-cd sys\nethack_flutter
+cd sys\flutter
 flutter pub get
 flutter run -d windows
 ```
@@ -266,7 +266,7 @@ flutter run -d windows
 ## 🧪 テスト
 
 ```powershell
-cd sys\nethack_flutter
+cd sys\flutter
 flutter test
 ```
 

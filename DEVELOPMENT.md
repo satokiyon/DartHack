@@ -444,16 +444,16 @@ Flutter isolate 経由の FFI 呼び出しと C 側 NetHack スレッド間で�
 ### 関連ファイル
 
 - C 側コア:
-  - `sys/nethack_flutter/android/app/src/main/cpp/winflutter.c:124` 付近 - `flutter_get_ext_cmd` の分岐処理
-  - `sys/nethack_flutter/android/app/src/main/cpp/winflutter.c:SendShortcutToFlutter` - ショートカット専用 FFI 関数
-  - `sys/nethack_flutter/android/app/src/main/cpp/winflutter.c:SendKeysToFlutter` - 通常マクロ用 FFI 関数
+  - `sys/flutter/android/app/src/main/cpp/winflutter.c:124` 付近 - `flutter_get_ext_cmd` の分岐処理
+  - `sys/flutter/android/app/src/main/cpp/winflutter.c:SendShortcutToFlutter` - ショートカット専用 FFI 関数
+  - `sys/flutter/android/app/src/main/cpp/winflutter.c:SendKeysToFlutter` - 通常マクロ用 FFI 関数
 - Dart 側 FFI バインディング / Worker:
-  - `sys/nethack_flutter/lib/nethack_ffi.dart` - FFI シグネチャ宣言
-  - `sys/nethack_flutter/lib/nethack_worker.dart` - Worker 経由呼び出し
+  - `sys/flutter/lib/nethack_ffi.dart` - FFI シグネチャ宣言
+  - `sys/flutter/lib/nethack_worker.dart` - Worker 経由呼び出し
 - Dart 側 UI:
-  - `sys/nethack_flutter/lib/main.dart` - `_sendKeysToC` / `_sendShortcutToC` / `_sendExtendedCommand` / `_parseKeys` ヘルパ
-  - `sys/nethack_flutter/lib/nethack_shortcut_pad.dart` - ショートカットボタン UI
-  - `sys/nethack_flutter/lib/nethack_cmd_panel.dart` - コマンドパネル UI
+  - `sys/flutter/lib/main.dart` - `_sendKeysToC` / `_sendShortcutToC` / `_sendExtendedCommand` / `_parseKeys` ヘルパ
+  - `sys/flutter/lib/nethack_shortcut_pad.dart` - ショートカットボタン UI
+  - `sys/flutter/lib/nethack_cmd_panel.dart` - コマンドパネル UI
 - 関連方針:
   - `AGENTS.md` 方針 3 - PowerShell での日本語コミットメッセージ
   - `AGENTS.md` 方針 6 - デバッグログのクリーンアップ
@@ -531,7 +531,7 @@ Positioned(
 両端起点で拡大する D-Pad と ShortcutPad が中央で衝突するのを防ぐため、設定値から実効値を計算する純関数を共通ヘルパーに切り出しました。
 
 ```dart
-// sys/nethack_flutter/lib/utils/scale_clamp.dart
+// sys/flutter/lib/utils/scale_clamp.dart
 PadClampResult calculatePadClamp({
   required double dpadScale,
   required double shortcutPadScale,
@@ -671,11 +671,11 @@ PadClampResult calculatePadClamp({
 ### 関連ファイル
 
 - Flutter UI:
-  - `sys/nethack_flutter/lib/main.dart` - `_buildControllerOverlay`, `_controllerReservedHeight`, 3 つの scale state
-  - `sys/nethack_flutter/lib/settings_page.dart` - 3 つの独立 Slider, `_buildAppliedScaleLabel`, `_preview*EffectiveScale` getter
+  - `sys/flutter/lib/main.dart` - `_buildControllerOverlay`, `_controllerReservedHeight`, 3 つの scale state
+  - `sys/flutter/lib/settings_page.dart` - 3 つの独立 Slider, `_buildAppliedScaleLabel`, `_preview*EffectiveScale` getter
 - 共通ヘルパー:
-  - `sys/nethack_flutter/lib/utils/scale_clamp.dart` - `PadClampResult`, `calculatePadClamp` 純関数
-  - `sys/nethack_flutter/test/utils/scale_clamp_test.dart` - 9 ケースのユニットテスト
+  - `sys/flutter/lib/utils/scale_clamp.dart` - `PadClampResult`, `calculatePadClamp` 純関数
+  - `sys/flutter/test/utils/scale_clamp_test.dart` - 9 ケースのユニットテスト
 - 関連方針:
   - `AGENTS.md` 方針 16 - 複数 UI 要素の独立 scale 化と衝突回避クランプ
   - `AGENTS.md` 方針 17 - レイアウト refactor 時の数値等価性検証
