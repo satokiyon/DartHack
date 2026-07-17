@@ -85,7 +85,7 @@ sys/flutter/
 ├── pubspec.lock
 ├── analysis_options.yaml        # Lint 設定 (flutter_lints)
 ├── .gitignore / .metadata /
-├── nethack_flutter.iml /
+├── darthack.iml /
 ├── README.md                    # 本ドキュメント
 ```
 
