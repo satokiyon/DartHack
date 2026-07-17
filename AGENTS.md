@@ -379,7 +379,7 @@ Flutter 版には、ゲーム画面のステータスバーの表示を制御す
 | **通常 (0)** | 表示 | 通常 | 表示 |
 | **イマーシブ (1)** | **非表示**（黒帯） | 通常 | 表示 |
 
-- **適用スコープ**: ゲーム画面のみ（タイトル画面・設定ダイアログ・墓石・エンディングは **通常モード固定**）
+- **適用スコープ**: ユーザ設定に従い全画面で適用（タイトル画面・設定ダイアログ・墓石・エンディングも、イマーシブ設定時はイマーシブモードで表示される）
 - **デフォルト値**: 0 (通常)
 - **3ボタンモード・ジェスチャーモード共通**: `SystemUiOverlay.bottom` を全モードで維持し、操作不能を防止
 
@@ -401,7 +401,7 @@ Flutter 版には、ゲーム画面のステータスバーの表示を制御す
 
 - **設定画面 pop 後に反映**: `Navigator.push(...).then((_) => _loadPreferences().then((_) { if (_isGameRunning) _applyScreenMode(_screenMode); }))` 経由で適用
 - **ゲーム開始時に反映**: `_startGame()` 内で `setState` 直後に `_applyScreenMode(_screenMode)` を呼ぶ
-- **アプリ起動時**: `initState` の `_loadPreferences` 完了後に `_applyScreenMode(ScreenMode.normal)`（タイトル画面では通常モードに固定）
+- **アプリ起動時**: `initState` の `_loadPreferences` 完了後に `_applyScreenMode(_screenMode)` を呼ぶ（ユーザ設定に従い、タイトル画面から一貫して適用）
 
 ### 5. 設定キー
 

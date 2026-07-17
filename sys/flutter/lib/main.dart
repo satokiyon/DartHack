@@ -207,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
     _loadPreferences().then((_) {
-      _applyScreenMode(ScreenMode.normal);
+      _applyScreenMode(_screenMode);
       _initAssets();
     });
   }
