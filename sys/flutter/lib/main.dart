@@ -3406,9 +3406,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
-          // タイトルロゴを画面上から10%の位置に配置
+          // タイトルロゴを画面上から15%の位置に配置
           Positioned(
-            top: screenHeight * 0.10,
+            top: screenHeight * 0.15,
             left: 24,
             right: 24,
             child: Center(
