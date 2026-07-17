@@ -368,4 +368,52 @@ NetHack C コア（バックグラウンドスレッド）と Flutter/Dart UI �
 - レイアウト関連: CmdPanel の Y 軸方向クランプ（マップ下端保護）の実装。方針 16 の「現状の制限」を解消する。
 - ウィンドウ API 拡張: `flutter_putmixed_with_tile` のような NetHackJP-Android 独自シンボル（`src/`, `include/` 配下に追加）の upstream 還元可否の検討。
 
+## 画面表示モード設計方針（Flutter 版）
+
+Flutter 版には、ゲーム画面のステータスバーの表示を制御する 2 つの画面モードを実装しています。
+
+### 1. 2 つのモード定義
+
+| モード | ステータスバー | ゲーム画面レイアウト | ナビゲーションバー |
+|---|---|---|---|
+| **通常 (0)** | 表示 | 通常 | 表示 |
+| **イマーシブ (1)** | **非表示**（黒帯） | 通常 | 表示 |
+
+- **適用スコープ**: ゲーム画面のみ（タイトル画面・設定ダイアログ・墓石・エンディングは **通常モード固定**）
+- **デフォルト値**: 0 (通常)
+- **3ボタンモード・ジェスチャーモード共通**: `SystemUiOverlay.bottom` を全モードで維持し、操作不能を防止
+
+### 2. 設計上の重要な決定
+
+- **フルスクリーンモード（描画領域をステータスバー領域まで拡張）は採用しない**: Android 12 (Pixel 5) での `setDecorFitsSystemWindows(false)` の互換性问题和、および Android 14+ (Pixel 9a) での `Transform.scale` を介した内部レイアウトずれの解决困難のため。见送り。
+- **ジェスチャーモードでも OS ジェスチャー（予測型「戻る」を含む）は OS 側で消費される**: `enableOnBackInvokedCallback="false"` の既存設定と相まって、`WindowInsetsControllerCompat.hide(navigationBars)` を呼ばない方針でジェスチャーと本実装の競合を完全に回避
+- **Android 16+ (targetSdk = 36) で `SystemChrome.setEnabledSystemUIMode` はほぼ無視される**: Flutter 内部の旧 `View.setSystemUiVisibility()` が API 36+ で NoOp になるため、**MethodChannel + `WindowInsetsControllerCompat`（AndroidX 経由）** を必ず使用
+- **minSdk = 24 を維持**: `WindowInsetsControllerCompat` 内部で API 30+ は新 API、API 24-29 は旧 `setSystemUiVisibility` に自動フォールバック。Kotlin 側で API レベル分岐を書く必要なし
+
+### 3. MethodChannel パターン
+
+- **チャンネル名**: `jp.satokiyo.darthack/screen_mode`
+- **メソッド**: `setScreenMode(mode: Int)` — mode は 0/1
+- **Kotlin 側実装**: `MainActivity.kt` の `applyScreenMode(mode: Int)` で `WindowCompat.setDecorFitsSystemWindows` + `WindowInsetsControllerCompat.hide(statusBars)` を呼ぶ
+- **iOS フォールバック**: Dart 側で `Platform.isAndroid` 判定、`else` 分岐で `SystemChrome.setEnabledSystemUIMode(manual, overlays: [...])` を使用
+
+### 4. 反映タイミング
+
+- **設定画面 pop 後に反映**: `Navigator.push(...).then((_) => _loadPreferences().then((_) { if (_isGameRunning) _applyScreenMode(_screenMode); }))` 経由で適用
+- **ゲーム開始時に反映**: `_startGame()` 内で `setState` 直後に `_applyScreenMode(_screenMode)` を呼ぶ
+- **アプリ起動時**: `initState` の `_loadPreferences` 完了後に `_applyScreenMode(ScreenMode.normal)`（タイトル画面では通常モードに固定）
+
+### 5. 設定キー
+
+- **SharedPreferences キー**: `screen_mode`（int, 0/1）
+- **デフォルト値**: 0 (normal)
+- **保存形式**: int（既存 `status_display_mode`, `tombstone_display_mode` と同じパターン）
+- **値検証**: `_loadScreenMode(int?)` で 0/1 以外を `ScreenMode.normal` にフォールバック
+- **マイグレーション**: 過去に `screen_mode = 2`（フルスクリーン）が保存されている端末では、ロード時に範囲外として自動的に `normal` にフォールバックされる
+
+### 6. 関連ファイル
+
+- `sys/flutter/lib/main.dart`: enum `ScreenMode`, state, `_loadScreenMode`, `_applyScreenMode`
+- `sys/flutter/lib/settings_page.dart`: 新セクション「画面表示モード」追加（タイルセット設定の後、2 番目）
+- `sys/flutter/android/app/src/main/kotlin/jp/satokiyo/darthack/MainActivity.kt`: `applyScreenMode(Int)` 実装
 
