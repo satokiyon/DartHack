@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-17. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -728,8 +728,9 @@ jp_translate_killer_text_for_display(
         char buf[BUFSZ];
         Snprintf(buf, sizeof buf, "%s", what);
         int mndx, gend, otyp;
-        mndx = name_to_mon(buf, &gend);
-        if (mndx >= 0) {
+        if (!strcmpi(buf, "lava") || !strcmpi(buf, "molten lava")) {
+            Snprintf(outmain, sizeof outmain, "溶岩で焼死した");
+        } else if ((mndx = name_to_mon(buf, &gend)) >= 0) {
             Snprintf(outmain, sizeof outmain, "%sで焼死した",
                      jp_pmname_from_idx(mndx, 0));
         } else {
