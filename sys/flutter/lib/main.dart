@@ -3113,6 +3113,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   return UniversalTombstoneWidget(
                                     mode: TombstoneDisplayMode.image,
                                     data: data,
+                                    lines: _screen.textLines,
                                   );
                                 }
                                 return UniversalTombstoneWidget(
@@ -3895,13 +3896,18 @@ class UniversalTombstoneWidget extends StatelessWidget {
         border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
       ),
       child: SingleChildScrollView(
-        child: SelectableText(
-          source.join('\n'),
-          style: const TextStyle(
-            fontFamily: 'monospace',
-            fontSize: 12,
-            color: Colors.white,
-            height: 1.25,
+        scrollDirection: Axis.vertical,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Text(
+            source.join('\n'),
+            softWrap: false,
+            style: const TextStyle(
+              fontFamily: 'monospace',
+              fontSize: 12,
+              color: Colors.white,
+              height: 1.25,
+            ),
           ),
         ),
       ),
@@ -3910,133 +3916,186 @@ class UniversalTombstoneWidget extends StatelessWidget {
 
   Widget _buildImageMode() {
     final d = data!;
-    return Center(
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 450),
-        child: AspectRatio(
-          aspectRatio: 3 / 4,
-          child: Card(
-            margin: EdgeInsets.zero,
-            clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-            ),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.asset(
-                  'assets/tombstone.png',
-                  fit: BoxFit.cover,
-                ),
-                Positioned.fill(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final width = constraints.maxWidth;
-                      final height = constraints.maxHeight;
-                      final scale = width / 400;
+    final source = lines ?? const <String>[];
 
-                      return Padding(
-                        padding: EdgeInsets.symmetric(horizontal: width * 0.12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SizedBox(height: height * 0.32),
-                            Text(
-                              d.name,
-                              style: TextStyle(
-                                fontFamily: 'serif',
-                                fontSize: 20 * scale,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFFCCCCCC),
-                                shadows: [
-                                  Shadow(
-                                    offset: const Offset(1, 1),
-                                    blurRadius: 2.0,
-                                    color: Colors.black.withValues(alpha: 0.8),
-                                  ),
-                                ],
-                              ),
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            SizedBox(height: height * 0.02),
-                            Text(
-                              d.gold,
-                              style: TextStyle(
-                                fontFamily: 'serif',
-                                fontSize: 16 * scale,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFFB0B0B0),
-                                shadows: [
-                                  Shadow(
-                                    offset: const Offset(1, 1),
-                                    blurRadius: 2.0,
-                                    color: Colors.black.withValues(alpha: 0.8),
-                                  ),
-                                ],
-                              ),
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                            ),
-                            SizedBox(height: height * 0.03),
-                            Expanded(
+    // 墓石アスキーアートの芝生部分（底辺）のインデックスを探す
+    int bottomIndex = source.indexWhere((line) => line.contains('_________'));
+    if (bottomIndex == -1) {
+      bottomIndex = 14;
+    }
+
+    // 底辺以降のテキストを取得
+    List<String> belowTombstoneLines = [];
+    if (source.length > bottomIndex + 1) {
+      belowTombstoneLines = source.sublist(bottomIndex + 1);
+    }
+
+    // トリミング：先頭と末尾の空行を削除
+    while (belowTombstoneLines.isNotEmpty && belowTombstoneLines.first.trim().isEmpty) {
+      belowTombstoneLines.removeAt(0);
+    }
+    while (belowTombstoneLines.isNotEmpty && belowTombstoneLines.last.trim().isEmpty) {
+      belowTombstoneLines.removeLast();
+    }
+
+    final belowTombstoneText = belowTombstoneLines.join('\n');
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 450),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AspectRatio(
+                aspectRatio: 3 / 4,
+                child: Card(
+                  margin: EdgeInsets.zero,
+                  clipBehavior: Clip.antiAlias,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                  ),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.asset(
+                        'assets/tombstone.png',
+                        fit: BoxFit.cover,
+                      ),
+                      Positioned.fill(
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final width = constraints.maxWidth;
+                            final height = constraints.maxHeight;
+                            final scale = width / 400;
+
+                            return Padding(
+                              padding: EdgeInsets.symmetric(horizontal: width * 0.12),
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: d.deathLines.map((line) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 2),
-                                    child: Text(
-                                      line,
-                                      style: TextStyle(
-                                        fontFamily: 'serif',
-                                        fontSize: 13 * scale,
-                                        fontWeight: FontWeight.normal,
-                                        color: const Color(0xFFAAAAAA),
-                                        height: 1.3,
-                                        shadows: [
-                                          Shadow(
-                                            offset: const Offset(1, 1),
-                                            blurRadius: 1.5,
-                                            color: Colors.black.withValues(alpha: 0.8),
-                                          ),
-                                        ],
-                                      ),
-                                      textAlign: TextAlign.center,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(height: height * 0.32),
+                                  Text(
+                                    d.name,
+                                    style: TextStyle(
+                                      fontFamily: 'serif',
+                                      fontSize: 20 * scale,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFFCCCCCC),
+                                      shadows: [
+                                        Shadow(
+                                          offset: const Offset(1, 1),
+                                          blurRadius: 2.0,
+                                          color: Colors.black.withValues(alpha: 0.8),
+                                        ),
+                                      ],
                                     ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                            Text(
-                              d.year,
-                              style: TextStyle(
-                                fontFamily: 'serif',
-                                fontSize: 15 * scale,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF999999),
-                                shadows: [
-                                  Shadow(
-                                    offset: const Offset(1, 1),
-                                    blurRadius: 1.5,
-                                    color: Colors.black.withValues(alpha: 0.8),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
+                                  SizedBox(height: height * 0.02),
+                                  Text(
+                                    d.gold,
+                                    style: TextStyle(
+                                      fontFamily: 'serif',
+                                      fontSize: 16 * scale,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFFB0B0B0),
+                                      shadows: [
+                                        Shadow(
+                                          offset: const Offset(1, 1),
+                                          blurRadius: 2.0,
+                                          color: Colors.black.withValues(alpha: 0.8),
+                                        ),
+                                      ],
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                  ),
+                                  SizedBox(height: height * 0.03),
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: d.deathLines.map((line) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 2),
+                                          child: Text(
+                                            line,
+                                            style: TextStyle(
+                                              fontFamily: 'serif',
+                                              fontSize: 13 * scale,
+                                              fontWeight: FontWeight.normal,
+                                              color: const Color(0xFFAAAAAA),
+                                              height: 1.3,
+                                              shadows: [
+                                                Shadow(
+                                                  offset: const Offset(1, 1),
+                                                  blurRadius: 1.5,
+                                                  color: Colors.black.withValues(alpha: 0.8),
+                                                ),
+                                              ],
+                                            ),
+                                            textAlign: TextAlign.center,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                  Text(
+                                    d.year,
+                                    style: TextStyle(
+                                      fontFamily: 'serif',
+                                      fontSize: 15 * scale,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF999999),
+                                      shadows: [
+                                        Shadow(
+                                          offset: const Offset(1, 1),
+                                          blurRadius: 1.5,
+                                          color: Colors.black.withValues(alpha: 0.8),
+                                        ),
+                                      ],
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  SizedBox(height: height * 0.08),
                                 ],
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(height: height * 0.08),
-                          ],
+                            );
+                          },
                         ),
-                      );
-                    },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (belowTombstoneText.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                  ),
+                  child: SelectableText(
+                    belowTombstoneText,
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 13,
+                      color: Colors.white,
+                      height: 1.3,
+                    ),
                   ),
                 ),
               ],
-            ),
+            ],
           ),
         ),
       ),
