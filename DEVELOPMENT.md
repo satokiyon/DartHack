@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-15. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-16. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -220,6 +220,7 @@ str)` という API しかなく、 タイル ID を直接渡せないため、 
   - `/* NetHackJP: Remove plur(...) to avoid trailing 's' in Japanese */` (複数形 "s" の排除)
   - `/* NetHackJP: Sprintf hornbuf to "角" instead of "horn(s)" to make it Japanese */` (角のヘルメット突き破りメッセージの日本語化)
   - `/* NetHackJP: Distinguish singular/plural for Kop in Japanese */` (コップ消滅メッセージの単複切り分け)
+  - `/* NetHackJP: expand suffix buffer size to prevent overflow in Japanese */` (呼び出しの燭台の日本語表示用バッファサイズ拡張)
 * **対象ファイル**:
   1. **`src/shk.c`**:
      - `shk_names_obj()` 内で `plur(amt)` の代わりに `currency(amt)` を渡すように変更。
@@ -227,6 +228,7 @@ str)` という API しかなく、 タイル ID を直接渡せないため、 
      - コップ消滅時のメッセージで `cnt` に応じて「コップ」と「コップ達」を切り分けるよう修正。
   2. **`src/objnam.c`**:
      - `killer_xname()` 内で危険なスライムモールドの名称フォーマットから `plur(obj->quan)` を排除。
+     - `xname()` 内で呼び出しの燭台（`CANDELABRUM_OF_INVOCATION`）の `suffix` バッファサイズを `24` から `32` に拡張。
   3. **`src/polyself.c`**:
      - 角がヘルメット等を突き破った時のメッセージを「角」として日本語化。
      - コカトリス等の死体の下に隠れて石化した際の pline メッセージから `plur(ct)` を排除。

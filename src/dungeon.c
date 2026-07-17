@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-17. */
 /* NetHack 5.0	dungeon.c	$NHDT-Date: 1781973047 2026/06/20 16:30:47 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.239 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -3403,6 +3403,8 @@ jp_dungeon_name_for_display(const char *dname)
     if (!dname || !*dname)
         return "<ダンジョン>";
 
+    if (!strcmp(dname, "The Tutorial"))
+        return "チュートリアル";
     if (!strcmp(dname, "The Dungeons of Doom"))
         return "運命の大迷宮";
     if (!strcmp(dname, "The Gnomish Mines"))
