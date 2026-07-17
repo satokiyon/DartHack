@@ -551,6 +551,7 @@ int GetIsGameOver(void) {
 static void flutter_init_nhwindows(int* argc, char** argv) {
     debuglog("flutter_init_nhwindows called");
     iflags.window_inited = TRUE;
+    iflags.menu_tab_sep = TRUE;
 }
 
 static void flutter_player_selection(void) {

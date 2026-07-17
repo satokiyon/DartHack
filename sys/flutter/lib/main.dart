@@ -1679,7 +1679,107 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget _buildTabSeparatedRow(
+    String text,
+    TextStyle baseStyle, {
+    bool isHeader = false,
+    String accLabel = "",
+    String suffixLabel = "",
+  }) {
+    final parts = text.split('\t');
+    if (parts.length < 2) {
+      return Text(
+        "$accLabel$text$suffixLabel",
+        style: baseStyle,
+      );
+    }
+
+    final children = <Widget>[];
+
+    // カラム数に応じた幅のリストを定義する
+    final List<double> colWidths;
+    final List<TextAlign> colAligns;
+
+    if (parts.length == 5) {
+      // 呪文一覧などの 5カラム構成
+      // 呪文名, レベル, 系統, 失敗率, 記憶
+      colWidths = [0, 50, 45, 55, 45]; // 0 は Expanded
+      colAligns = [
+        TextAlign.left,
+        TextAlign.right,
+        TextAlign.left,
+        TextAlign.right,
+        TextAlign.right,
+      ];
+    } else if (parts.length == 3) {
+      // インベントリなどの 3カラム構成
+      // 名前, 重量, 説明
+      colWidths = [0, 60, 120];
+      colAligns = [
+        TextAlign.left,
+        TextAlign.right,
+        TextAlign.left,
+      ];
+    } else if (parts.length == 2) {
+      // 2カラム構成
+      colWidths = [0, 100];
+      colAligns = [
+        TextAlign.left,
+        TextAlign.right,
+      ];
+    } else {
+      // 汎用フォールバック
+      colWidths = List.generate(parts.length, (index) => index == 0 ? 0.0 : 80.0);
+      colAligns = List.generate(parts.length, (index) => index == 0 ? TextAlign.left : TextAlign.right);
+    }
+
+    for (int i = 0; i < parts.length; i++) {
+      final partText = parts[i].trim();
+      final displayStyle = isHeader
+          ? baseStyle.copyWith(
+              color: baseStyle.color?.withValues(alpha: 0.8) ?? Colors.white70,
+              fontWeight: FontWeight.bold,
+            )
+          : baseStyle;
+
+      // 最初の列にのみアクセラレータを付与し、最後の列にのみ suffixLabel を付与する
+      var colText = partText;
+      if (i == 0 && accLabel.isNotEmpty) {
+        colText = "$accLabel$colText";
+      }
+      if (i == parts.length - 1 && suffixLabel.isNotEmpty) {
+        colText = "$colText$suffixLabel";
+      }
+
+      final widget = Text(
+        colText,
+        style: displayStyle,
+        textAlign: colAligns[i],
+        overflow: TextOverflow.ellipsis,
+      );
+
+      if (colWidths[i] == 0) {
+        children.add(Expanded(child: widget));
+      } else {
+        children.add(SizedBox(
+          width: colWidths[i],
+          child: widget,
+        ));
+      }
+
+      // 列間のパディング
+      if (i < parts.length - 1) {
+        children.add(const SizedBox(width: 8));
+      }
+    }
+
+    return Row(
+      children: children,
+    );
+  }
+
   Widget _buildMenuCategoryRow(String text) {
+    final hasTab = text.contains('\t');
     return Container(
       margin: const EdgeInsets.only(top: 8, bottom: 4),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -1691,17 +1791,29 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Row(
         children: [
           const Icon(Icons.category_outlined, size: 16, color: Colors.lightBlueAccent),
-          const SizedBox(width: 6),
+          // 左端インセットを 40px に揃える (padding.left=10 + icon=16 + SizedBox=14)
+          SizedBox(width: hasTab ? 14 : 6),
           Expanded(
-            child: Text(
-              text.trim(),
-              style: const TextStyle(
-                color: Colors.lightBlueAccent,
-                fontFamily: 'monospace',
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            child: hasTab
+                ? _buildTabSeparatedRow(
+                    text,
+                    const TextStyle(
+                      color: Colors.lightBlueAccent,
+                      fontFamily: 'monospace',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    isHeader: true,
+                  )
+                : Text(
+                    text.trim(),
+                    style: const TextStyle(
+                      color: Colors.lightBlueAccent,
+                      fontFamily: 'monospace',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
           ),
         ],
       ),
@@ -1730,6 +1842,8 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       return !text.startsWith('#') && !text.startsWith('?');
     }).toList();
+
+    final hasTabMenu = filteredItems.any((item) => item.text.contains('\t'));
 
     return Positioned.fill(
       child: Container(
@@ -1802,178 +1916,231 @@ class _MyHomePageState extends State<MyHomePage> {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
                     ),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                      itemCount: filteredItems.length,
-                      itemBuilder: (context, index) {
-                        final item = filteredItems[index];
-                        final isSelectable = item.ident != 0;
-                        final isCategory = _isMenuCategoryItem(item);
-                        final isDivider = !isSelectable && _isMenuDividerText(item.text);
-                        final isPlain = !isSelectable && !isCategory && !isDivider;
-                        final isPrintableAccel = item.accelerator >= 0x21 && item.accelerator <= 0x7E;
-                        final accLabel = isPrintableAccel
-                            ? "${String.fromCharCode(item.accelerator)} - "
-                            : "";
-                        final itemText = item.text.trim();
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final listView = ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                          itemCount: filteredItems.length,
+                          itemBuilder: (context, index) {
+                            final item = filteredItems[index];
+                            final isSelectable = item.ident != 0;
+                            final isCategory = _isMenuCategoryItem(item);
+                            final isDivider = !isSelectable && _isMenuDividerText(item.text);
+                            final isPlain = !isSelectable && !isCategory && !isDivider;
+                            final isPrintableAccel = item.accelerator >= 0x21 && item.accelerator <= 0x7E;
+                            final accLabel = isPrintableAccel
+                                ? "${String.fromCharCode(item.accelerator)} - "
+                                : "";
+                            final itemText = item.text.trim();
 
-                        String commandText = itemText;
-                        String descriptionText = "";
-                        if (isExtCmdMenu) {
-                          final tabIndex = itemText.indexOf('\t');
-                          if (tabIndex >= 0) {
-                            commandText = itemText.substring(0, tabIndex).trim();
-                            descriptionText = itemText.substring(tabIndex + 1).trim();
-                          }
-                        }
+                            String commandText = itemText;
+                            String descriptionText = "";
+                            if (isExtCmdMenu) {
+                              final tabIndex = itemText.indexOf('\t');
+                              if (tabIndex >= 0) {
+                                commandText = itemText.substring(0, tabIndex).trim();
+                                descriptionText = itemText.substring(tabIndex + 1).trim();
+                              }
+                            }
 
-                        if (isCategory) {
-                          return _buildMenuCategoryRow(commandText);
-                        }
-                        if (isDivider) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                            child: Divider(color: Colors.white.withValues(alpha: 0.14), height: 1),
-                          );
-                        }
+                            if (isCategory) {
+                              return _buildMenuCategoryRow(commandText);
+                            }
+                            if (isDivider) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                child: Divider(color: Colors.white.withValues(alpha: 0.14), height: 1),
+                              );
+                            }
 
-                        Color itemColor = Colors.white;
-                        if (!isExtCmdMenu && item.color >= 0 && item.color < 16) {
-                          itemColor = _getNhColor(item.color);
-                        }
+                            Color itemColor = Colors.white;
+                            if (!isExtCmdMenu && item.color >= 0 && item.color < 16) {
+                              itemColor = _getNhColor(item.color);
+                            }
 
-                        if (isPlain) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            child: Row(
-                              children: [
-                                _buildMenuItemTile(item.tile),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    "$accLabel$commandText",
-                                    style: TextStyle(
-                                      color: itemColor,
-                                      fontFamily: 'monospace',
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
+                            if (isPlain) {
+                              final hasTab = commandText.contains('\t');
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                child: Row(
+                                  children: [
+                                    _buildMenuItemTile(item.tile),
+                                    const SizedBox(width: 6),
+                                    Expanded(
+                                      child: hasTab
+                                          ? _buildTabSeparatedRow(
+                                              commandText,
+                                              TextStyle(
+                                                color: itemColor,
+                                                fontFamily: 'monospace',
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                              accLabel: accLabel,
+                                            )
+                                          : Text(
+                                              "$accLabel$commandText",
+                                              style: TextStyle(
+                                                color: itemColor,
+                                                fontFamily: 'monospace',
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
                                     ),
-                                  ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          );
-                        }
+                              );
+                            }
 
-                        if (isMultiSelectMenu) {
-                          final checked = _menuSelectedCounts.containsKey(item.ident);
-                          final selectedCount = _menuSelectedCounts[item.ident] ?? 0;
-                          final maxCount = _parseMaxCount(item.text);
-                          final countLabel = checked ? " ($selectedCount個選択中 / $maxCount)" : "";
-                          return Material(
-                            color: Colors.transparent,
-                            child: ListTile(
-                              dense: true,
-                              contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-                              leading: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  _buildMenuItemTile(item.tile),
-                                  const SizedBox(width: 4),
-                                  SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: Checkbox(
-                                      value: checked,
-                                      onChanged: (_) => _toggleMenuSelection(item.ident),
-                                      activeColor: Colors.tealAccent[400],
-                                      checkColor: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              title: Text(
-                                "$accLabel$commandText$countLabel",
-                                style: TextStyle(
-                                  color: checked ? Colors.tealAccent[400] : itemColor,
-                                  fontFamily: 'monospace',
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              onTap: () => _toggleMenuSelection(item.ident),
-                              onLongPress: () => _onMenuItemLongPress(item),
-                            ),
-                          );
-                        }
-
-                        if (isExtCmdMenu) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.white12, width: 1.0),
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              child: Material(
-                                color: const Color(0xFF2C2C2C),
-                                borderRadius: BorderRadius.circular(8.0),
-                                clipBehavior: Clip.antiAlias,
+                            if (isMultiSelectMenu) {
+                              final checked = _menuSelectedCounts.containsKey(item.ident);
+                              final selectedCount = _menuSelectedCounts[item.ident] ?? 0;
+                              final maxCount = _parseMaxCount(item.text);
+                              final countLabel = checked ? " ($selectedCount個選択中 / $maxCount)" : "";
+                              final hasTab = commandText.contains('\t');
+                              return Material(
+                                color: Colors.transparent,
                                 child: ListTile(
                                   dense: true,
                                   contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-                                  leading: _buildMenuItemTile(item.tile),
-                                  title: Text(
-                                    "$accLabel$commandText",
-                                    style: TextStyle(
-                                      color: itemColor,
-                                      fontFamily: 'monospace',
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
+                                  horizontalTitleGap: 8,
+                                  leading: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _buildMenuItemTile(item.tile),
+                                      const SizedBox(width: 4),
+                                      SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: Checkbox(
+                                          value: checked,
+                                          onChanged: (_) => _toggleMenuSelection(item.ident),
+                                          activeColor: Colors.tealAccent[400],
+                                          checkColor: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  title: hasTab
+                                      ? _buildTabSeparatedRow(
+                                          commandText,
+                                          TextStyle(
+                                            color: checked ? Colors.tealAccent[400] : itemColor,
+                                            fontFamily: 'monospace',
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                          accLabel: accLabel,
+                                          suffixLabel: countLabel,
+                                        )
+                                      : Text(
+                                          "$accLabel$commandText$countLabel",
+                                          style: TextStyle(
+                                            color: checked ? Colors.tealAccent[400] : itemColor,
+                                            fontFamily: 'monospace',
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                  onTap: () => _toggleMenuSelection(item.ident),
+                                  onLongPress: () => _onMenuItemLongPress(item),
+                                ),
+                              );
+                            }
+
+                            if (isExtCmdMenu) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.white12, width: 1.0),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  child: Material(
+                                    color: const Color(0xFF2C2C2C),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: ListTile(
+                                      dense: true,
+                                      contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                                      horizontalTitleGap: 8,
+                                      leading: _buildMenuItemTile(item.tile),
+                                      title: Text(
+                                        "$accLabel$commandText",
+                                        style: TextStyle(
+                                          color: itemColor,
+                                          fontFamily: 'monospace',
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      subtitle: descriptionText.isNotEmpty
+                                          ? Text(
+                                              descriptionText,
+                                              style: const TextStyle(
+                                                color: Colors.white70,
+                                                fontFamily: 'monospace',
+                                                fontSize: 12,
+                                              ),
+                                            )
+                                          : null,
+                                      onTap: () => _sendMenuSelection(item.ident),
                                     ),
                                   ),
-                                  subtitle: descriptionText.isNotEmpty
-                                      ? Text(
-                                          descriptionText,
-                                          style: const TextStyle(
-                                            color: Colors.white70,
-                                            fontFamily: 'monospace',
-                                            fontSize: 12,
-                                          ),
-                                        )
-                                      : null,
-                                  onTap: () => _sendMenuSelection(item.ident),
                                 ),
-                              ),
-                            ),
-                          );
-                        }
+                              );
+                            }
 
-                        return Material(
-                          color: Colors.transparent,
-                          child: ListTile(
-                            dense: true,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-                            leading: _buildMenuItemTile(item.tile),
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  "$accLabel$commandText",
-                                  style: TextStyle(
-                                    color: itemColor,
-                                    fontFamily: 'monospace',
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                            final hasTab = commandText.contains('\t');
+                            return Material(
+                              color: Colors.transparent,
+                              child: ListTile(
+                                dense: true,
+                                contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                                horizontalTitleGap: 8,
+                                leading: _buildMenuItemTile(item.tile),
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    hasTab
+                                        ? _buildTabSeparatedRow(
+                                            commandText,
+                                            TextStyle(
+                                              color: itemColor,
+                                              fontFamily: 'monospace',
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                            accLabel: accLabel,
+                                          )
+                                        : Text(
+                                            "$accLabel$commandText",
+                                            style: TextStyle(
+                                              color: itemColor,
+                                              fontFamily: 'monospace',
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            onTap: () => _sendMenuSelection(item.ident),
-                            onLongPress: () => _onMenuItemLongPress(item),
-                          ),
+                                onTap: () => _sendMenuSelection(item.ident),
+                                onLongPress: () => _onMenuItemLongPress(item),
+                              ),
+                            );
+                          },
                         );
+                        return hasTabMenu
+                            ? SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: SizedBox(
+                                  width: constraints.maxWidth > 480 ? constraints.maxWidth : 480,
+                                  child: listView,
+                                ),
+                              )
+                            : listView;
                       },
                     ),
                   ),
