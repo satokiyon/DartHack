@@ -161,6 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
   double _cmdPanelEffectiveScale = 1.0;
   int _statusDisplayMode = 0; // 0: 領域に合わせて文字サイズ縮小(Fit), 1: 領域の可変高さ(Wrap)
   int _tombstoneDisplayMode = 0; // 0: 画像+文字オーバーレイ, 1: Cコア出力そのまま(テキスト)
+  ScreenMode _screenMode = ScreenMode.normal; // 0: 通常, 1: イマーシブ
   String _drawerPosition = 'left';
   String _menuButtonPosition = 'top_left';
   bool _isTopDrawerOpen = false;
@@ -205,7 +206,10 @@ class _MyHomePageState extends State<MyHomePage> {
         _focusNode.requestFocus();
       }
     });
-    _loadPreferences().then((_) => _initAssets());
+    _loadPreferences().then((_) {
+      _applyScreenMode(ScreenMode.normal);
+      _initAssets();
+    });
   }
 
   Future<void> _loadPreferences() async {
@@ -224,6 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _cmdPanelScale = prefs.getDouble('cmd_panel_scale') ?? 1.0;
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
       _tombstoneDisplayMode = _loadTombstoneDisplayMode(prefs.getInt('tombstone_display_mode'));
+      _screenMode = _loadScreenMode(prefs.getInt('screen_mode'));
       _showPanelNames = prefs.getBool('show_panel_names') ?? true;
       _drawerPosition = prefs.getString('drawer_position') ?? 'left';
       _menuButtonPosition = prefs.getString('menu_button_position') ?? 'bottom_left';
@@ -281,6 +286,24 @@ class _MyHomePageState extends State<MyHomePage> {
     if (raw == 0) return 0;
     if (raw == 1) return 1;
     return 0;
+  }
+
+  ScreenMode _loadScreenMode(int? raw) {
+    if (raw == 0) return ScreenMode.normal;
+    if (raw == 1) return ScreenMode.immersive;
+    return ScreenMode.normal;
+  }
+
+  void _applyScreenMode(ScreenMode mode) {
+    if (Platform.isAndroid) {
+      const MethodChannel('jp.satokiyo.darthack/screen_mode')
+          .invokeMethod('setScreenMode', <String, int>{'mode': mode.index});
+    } else {
+      final overlays = (mode == ScreenMode.normal)
+          ? <SystemUiOverlay>[SystemUiOverlay.top, SystemUiOverlay.bottom]
+          : <SystemUiOverlay>[SystemUiOverlay.bottom];
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: overlays);
+    }
   }
 
   String _moveModeName(DPadMoveMode mode) {
@@ -903,6 +926,8 @@ class _MyHomePageState extends State<MyHomePage> {
       _autoAdvanceSavePending = false;
       _exitDialogShown = false;
     });
+
+    _applyScreenMode(_screenMode);
 
     _addLog("Spawning NetHack Worker Isolate...");
 
@@ -2882,7 +2907,11 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     ).then((_) {
-      _loadPreferences();
+      _loadPreferences().then((_) {
+        if (_isGameRunning) {
+          _applyScreenMode(_screenMode);
+        }
+      });
     });
   }
 
@@ -3811,6 +3840,11 @@ class _MyHomePageState extends State<MyHomePage> {
 enum TombstoneDisplayMode {
   image,
   text,
+}
+
+enum ScreenMode {
+  normal,
+  immersive,
 }
 
 class TombstoneData {
