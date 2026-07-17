@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-16. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-17. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -98,7 +98,7 @@
 NetHackJP は本家 NetHack (アップストリーム) の Windows 日本語化リポジトリであり、`DEVELOPMENT.md` §4 の通り、独自拡張には「`/* NetHackJP: ... */`」形式のマーカータグを付けて管理しています。AI エージェントは独自拡張を追加・修正する際、以下の点に留意してください。
 
 1. **マーカータグの徹底**:
-   - 独自拡張には、対応ファイルと処理内容を表すマーカータグ (例: `/* NetHackJP: UTF-8 char truncation for topten name */`) を必ず付与し、`DEVELOPMENT.md` §4 にもエントリを追加してください。
+   - 独自拡張には、対応ファイルと処理内容を表すマーカータグ (例: `/* NetHackJP: UTF-8 char truncation for topten name */`) を必ず付与し、`DEVELOPMENT.md` §4 にもエントリを追加してください。**ただし、単純な日本語訳の追加や翻訳テーブルの更新といった「翻訳に関する処理」については、マーカータグの付与や `DEVELOPMENT.md` への記述は不要です。** 翻訳とは関係なくプログラムのロジック（仕様や挙動）を変更する場合にのみ、このルールを適用してください。
    - マーカータグが付与されていない独自変更は、将来のアップストリームマージ時に意図しない衝突や上書きの温床となります。
 
 2. **アップストリーム修正の取り消しと追従**:
