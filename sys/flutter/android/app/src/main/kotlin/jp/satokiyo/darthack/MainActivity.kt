@@ -4,10 +4,14 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import android.view.KeyEvent
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "jp.satokiyo.darthack/key_interceptor"
+    private val SCREEN_MODE_CHANNEL = "jp.satokiyo.darthack/screen_mode"
     private var channel: MethodChannel? = null
+    private var screenModeChannel: MethodChannel? = null
 
     private var interceptVolumeUp = false
     private var interceptVolumeDown = false
@@ -25,6 +29,37 @@ class MainActivity : FlutterActivity() {
                     result.success(null)
                 }
                 else -> result.notImplemented()
+            }
+        }
+
+        screenModeChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, SCREEN_MODE_CHANNEL)
+        screenModeChannel?.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "setScreenMode" -> {
+                    val mode = call.argument<Number>("mode")?.toInt() ?: 0
+                    applyScreenMode(mode)
+                    result.success(null)
+                }
+                else -> result.notImplemented()
+            }
+        }
+    }
+
+    private fun applyScreenMode(mode: Int) {
+        val window = window ?: return
+        val controller = WindowInsetsControllerCompat(window, window.decorView)
+        when (mode) {
+            0 -> {
+                WindowCompat.setDecorFitsSystemWindows(window, true)
+                controller.show(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            }
+            1 -> {
+                WindowCompat.setDecorFitsSystemWindows(window, true)
+                controller.hide(androidx.core.view.WindowInsetsCompat.Type.statusBars())
+            }
+            else -> {
+                WindowCompat.setDecorFitsSystemWindows(window, true)
+                controller.show(androidx.core.view.WindowInsetsCompat.Type.systemBars())
             }
         }
     }
