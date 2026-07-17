@@ -29,6 +29,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String _controllerMode = 'pad';
   int _statusDisplayMode = 0;
   int _tombstoneDisplayMode = 0; // 0: 画像+文字オーバーレイ, 1: Cコア出力そのまま(テキスト)
+  int _screenMode = 0; // 0: 通常, 1: イマーシブ
   double _padOpacity = 0.8;
   double _dpadScale = 1.0;
   double _shortcutPadScale = 1.0;
@@ -147,6 +148,8 @@ class _SettingsPageState extends State<SettingsPage> {
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
       final tombstoneModeRaw = prefs.getInt('tombstone_display_mode');
       _tombstoneDisplayMode = (tombstoneModeRaw == 1) ? 1 : 0;
+      final screenModeRaw = prefs.getInt('screen_mode');
+      _screenMode = (screenModeRaw == 1) ? 1 : 0;
       _padOpacity = prefs.getDouble('pad_opacity') ?? 0.8;
       _dpadScale = prefs.getDouble('dpad_scale') ?? 1.0;
       _shortcutPadScale = prefs.getDouble('shortcut_pad_scale') ?? 1.0;
@@ -446,6 +449,32 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildScreenModeSection() {
+    return ExpansionTile(
+      leading: const Icon(Icons.crop_landscape, color: Colors.greenAccent),
+      title: const Text("画面表示モード"),
+      subtitle: const Text("ゲーム画面のステータスバーの表示を切替えます（タイトル/設定画面には適用されません）"),
+      children: [
+        ListTile(
+          title: const Text("モード選択"),
+          trailing: DropdownButton<int>(
+            value: _screenMode,
+            items: const [
+              DropdownMenuItem(value: 0, child: Text('通常')),
+              DropdownMenuItem(value: 1, child: Text('イマーシブ')),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _screenMode = val);
+                _saveSetting('screen_mode', val);
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -1082,6 +1111,7 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ListView(
         children: [
           _buildTilesetSection(),
+          _buildScreenModeSection(),
           _buildControllerSection(),
           _buildCmdPanelSection(), // 追加
           _buildMessageSection(),  // メッセージ設定
