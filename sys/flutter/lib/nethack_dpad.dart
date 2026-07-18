@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-class NetHackDPad extends StatelessWidget {
+class NetHackDPad extends StatefulWidget {
   final Map<String, String> directionLabels;
   final String centerLabel;
   final void Function(String) onDirectionPress;
@@ -23,29 +23,104 @@ class NetHackDPad extends StatelessWidget {
   });
 
   @override
+  State<NetHackDPad> createState() => _NetHackDPadState();
+}
+
+class _NetHackDPadState extends State<NetHackDPad> {
+  // 現在押されているキー（ハイライト表示用）
+  String? _pressedKey;
+
+  // 9分割セルのキー配置（左上→右下の順）
+  // 'c' は中央ボタン
+  static const List<String> _keys = [
+    'y', 'k', 'u',
+    'h', 'c', 'l',
+    'b', 'j', 'n',
+  ];
+
+  void _onCellTapDown(String key) {
+    setState(() => _pressedKey = key);
+  }
+
+  void _onCellTapUp(String key) {
+    if (key == 'c') {
+      widget.onCenterTap();
+    } else {
+      widget.onDirectionPress(key);
+    }
+    setState(() => _pressedKey = null);
+  }
+
+  void _onCellTapCancel() {
+    setState(() => _pressedKey = null);
+  }
+
+  void _onCellLongPress(String key) {
+    setState(() => _pressedKey = null);
+    if (key == 'c') {
+      widget.onCenterLongPress();
+    } else {
+      widget.onDirectionLongPress?.call(key);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 150,
-      height: 150,
-      decoration: const BoxDecoration(
-        color: Colors.transparent,
-      ),
-      padding: const EdgeInsets.all(4),
-      child: GridView.count(
-        crossAxisCount: 3,
-        physics: const NeverScrollableScrollPhysics(),
-        mainAxisSpacing: 2,
-        crossAxisSpacing: 2,
+    const double padSize = 150.0;
+    const double cellSize = padSize / 3;
+
+    return SizedBox(
+      width: padSize,
+      height: padSize,
+      child: Stack(
         children: [
-          _buildDirectionButton('y'),
-          _buildDirectionButton('k'),
-          _buildDirectionButton('u'),
-          _buildDirectionButton('h'),
-          _buildCenterButton(),
-          _buildDirectionButton('l'),
-          _buildDirectionButton('b'),
-          _buildDirectionButton('j'),
-          _buildDirectionButton('n'),
+          // ─── 見た目レイヤー ──────────────────────────────────
+          // GridView で五角形/円ボタンを描画（タッチ判定なし・見た目のみ）
+          Positioned.fill(
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              child: GridView.count(
+                crossAxisCount: 3,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 2,
+                crossAxisSpacing: 2,
+                children: [
+                  _buildDirectionVisual('y'),
+                  _buildDirectionVisual('k'),
+                  _buildDirectionVisual('u'),
+                  _buildDirectionVisual('h'),
+                  _buildCenterVisual(),
+                  _buildDirectionVisual('l'),
+                  _buildDirectionVisual('b'),
+                  _buildDirectionVisual('j'),
+                  _buildDirectionVisual('n'),
+                ],
+              ),
+            ),
+          ),
+
+          // ─── タッチ判定レイヤー ──────────────────────────────
+          // 9分割の透明な四角形をすき間なく並べ、各方向・中央ボタンの判定を担う
+          ...List.generate(9, (i) {
+            final col = i % 3;
+            final row = i ~/ 3;
+            final key = _keys[i];
+            return Positioned(
+              left: col * cellSize,
+              top: row * cellSize,
+              width: cellSize,
+              height: cellSize,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque, // 透明領域でもヒット判定あり
+                onTapDown: (_) => _onCellTapDown(key),
+                onTapUp: (_) => _onCellTapUp(key),
+                onTapCancel: _onCellTapCancel,
+                onLongPress: () => _onCellLongPress(key),
+                onLongPressStart: (_) => setState(() => _pressedKey = key),
+                onLongPressEnd: (_) => setState(() => _pressedKey = null),
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -74,37 +149,33 @@ class NetHackDPad extends StatelessWidget {
     }
   }
 
-  Widget _buildDirectionButton(String viKey) {
+  /// 見た目のみの方向ボタン（五角形）。タッチ判定は持たない
+  Widget _buildDirectionVisual(String viKey) {
     final angle = _getAngle(viKey);
+    final isPressed = _pressedKey == viKey;
+    final baseColor = isPressed
+        ? const Color(0xFF4E4E4E) // 押下時は少し明るく
+        : const Color(0xFF1E1E1E);
     return ClipPath(
       clipper: ArrowClipper(angle),
       child: CustomPaint(
         painter: ArrowPainter(
           angle: angle,
-          borderColor: const Color(0xFF3E3E3E).withValues(alpha: opacity),
+          borderColor: const Color(0xFF3E3E3E).withValues(alpha: widget.opacity),
           borderWidth: 3.0,
         ),
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1E1E1E).withValues(alpha: opacity),
+            color: baseColor.withValues(alpha: widget.opacity),
           ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => onDirectionPress(viKey),
-              onLongPress: onDirectionLongPress == null
-                  ? null
-                  : () => onDirectionLongPress!(viKey),
-              child: Container(
-                alignment: Alignment.center,
-                child: Text(
-                  directionLabels[viKey] ?? viKey,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+          child: Container(
+            alignment: Alignment.center,
+            child: Text(
+              widget.directionLabels[viKey] ?? viKey,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -113,37 +184,34 @@ class NetHackDPad extends StatelessWidget {
     );
   }
 
-  Widget _buildCenterButton() {
+  /// 見た目のみの中央ボタン（円）。タッチ判定は持たない
+  Widget _buildCenterVisual() {
+    final isPressed = _pressedKey == 'c';
+    final baseColor = isPressed
+        ? const Color(0xFF4E4E4E) // 押下時は少し明るく
+        : const Color(0xFF1E1E1E);
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E).withValues(alpha: opacity),
+        color: baseColor.withValues(alpha: widget.opacity),
         shape: BoxShape.circle,
         border: Border.all(
-          color: const Color(0xFF3E3E3E).withValues(alpha: opacity),
+          color: const Color(0xFF3E3E3E).withValues(alpha: widget.opacity),
           width: 1.5,
         ),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: onCenterTap,
-          onLongPress: onCenterLongPress,
-          child: Container(
-            alignment: Alignment.center,
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: Text(
-                  centerLabel,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+      child: Container(
+        alignment: Alignment.center,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: Text(
+              widget.centerLabel,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
