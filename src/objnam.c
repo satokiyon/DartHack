@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-16. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-18. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1781973060 2026/06/20 16:31:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.464 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1759,7 +1759,7 @@ doname_base(
     if (iflags.suppress_price || program_state.restoring) {
         ; /* don't attempt to obtain any shop pricing, even if 'with_price' */
     } else if (is_unpaid(obj)) { /* in inventory or in container in invent */
-        char pricebuf[40];
+        char pricebuf[BUFSZ];
         long quotedprice = unpaid_cost(obj, COST_CONTENTS);
 
         /* separately formatted suffix avoids need for ConcatF3() */
@@ -1773,7 +1773,7 @@ doname_base(
         long price = get_cost_of_shop_item(obj, &nochrg);
 
         if (price > 0L) {
-            char pricebuf[40];
+            char pricebuf[BUFSZ];
 
             Sprintf(pricebuf, "%ld %s", price, currency(price));
             ConcatF2(bp, 0, " (%s, %s)",
