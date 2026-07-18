@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-02. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-19. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsのみ)
@@ -58,20 +58,22 @@ NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.net
 Windows版では、ゲーム内での日本語入力・表示に対応しています。以下の項目で日本語と英語のどちらも使用可能です。
 * 主人公キャラの名前
 * アイテムやモンスターへの命名（名前付け）
+* 階層ごとのメモ
 * 「願い（wishing）」の指定
-* 「虐殺（extinction）」の指定
+* 「虐殺（genocide）」の指定
 * データベースの検索
-
+* その他いろいろ
 ---
 
 ### 3. タイルセット（画像）で遊ぶ
 NetHack はテキスト（ASCII文字）だけでなく、美しいグラフィック（タイル）でプレイすることも可能です。
 
+※NetHack 5.0対応のタイルセットを使用する必要があります
+
 #### 設定手順
 1. 好みのタイルセットをダウンロードし、BMP形式に変換します。
    * 参考リンク
      * [NetHackWiki Tileset 一覧](https://nethackwiki.com/wiki/Tileset)
-     * [Geoduck Tile Set](http://www.geoduckthings.net/nhack/nhack.html)
 2. `.nethackrc` を開き、以下の例のように設定を追記または修正します。
    ```ini
    OPTIONS=map_mode:tiles
@@ -136,7 +138,7 @@ OPTIONS=align_message:top,msw_msg_rows:6
 OPTIONS=align_status:right,msw_stat_cols:15
 ```
 
-より多くの設定例が `.nethackrc`（または `nethackrc.template`）に記載されていますので、そちらも参考にしてください。その他の詳細なオプション等については `Guidebook_JP.txt` を参照してください。
+設定例が `.nethackrc`（または `nethackrc.CUI`、`nethackrc.GUI`）に記載されていますので、そちらも参考にしてください。その他の詳細なオプション等については `Guidebook_JP.txt` を参照してください。
 
 ----
 
