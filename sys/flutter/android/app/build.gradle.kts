@@ -49,3 +49,14 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+tasks.register<Exec>("syncDatAssets") {
+    workingDir = file("$rootDir/../../..")
+    commandLine("powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", file("$rootDir/../scripts/sync_dat_assets.ps1").absolutePath)
+}
+
+
+tasks.named("preBuild") {
+    dependsOn("syncDatAssets")
+}
+

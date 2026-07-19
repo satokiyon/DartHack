@@ -122,3 +122,11 @@ add_custom_command(TARGET nethack_dummy POST_BUILD
 )
 install(TARGETS nethack_dummy DESTINATION "${INSTALL_BUNDLE_LIB_DIR}" COMPONENT Runtime)
 
+# Add custom target for syncing dat assets before build
+add_custom_target(sync_dat_assets ALL
+  COMMAND powershell -NoProfile -ExecutionPolicy Bypass -File "${CMAKE_CURRENT_SOURCE_DIR}/../scripts/sync_dat_assets.ps1"
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../.."
+  COMMENT "Checking and syncing NetHack dat assets..."
+)
+
+
