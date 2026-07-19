@@ -196,7 +196,13 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
    - デバッグ目的で `flutter run` のコンソールや logcat に出力したい場合は **`debugPrint`（`package:flutter/foundation.dart` 標準）** を使用してください。`print` も使用可能ですが、`debugPrint` の方が長い文字列を自動的に分割してくれるため推奨されます。
    - デバッグログは **原因特定後、必ず削除してからコミット** してください（方針 6 参照）。
 
-8. **Flutter における MaterialColor スウォッチアクセスの安全性（Null クラッシュ防止）**:
+8. **sys/flutter における sys/android 完全分離と C 補完シンボルの定義原則**:
+   - `sys/flutter`（Flutter ポート）は `sys/android` の C コード（`androidmain.c`, `androidunix.c`, `winandroid.c`）へ一切依存せず、独自の `fluttermain.c`, `flutterunix.c`, `winflutter.c` を `CMakeLists.txt` に指定して完全独立・自己完結させてください。
+   - NetHack C コア (`src/`) 内部の `#ifdef ANDROID` 領域が参照する Android 固有のグローバル変数・関数（`and_procs`, `and_get_dumplog_dir`, `and_you_die`, `load_usersound`, `androidsound_procs`, `quit_possible`, `lock_mouse_cursor`, `set_username`, `debuglog` 等）は、`sys/android` なしでリンクエラーを出さないよう、`sys/flutter` 側（`winflutter.c` / `fluttermain.c` / `flutterunix.c`）で適切な型・シグネチャを伴う補完シンボルとして定義・実装してください。
+   - 特に `debuglog` は `androidconf.h` にて `#define error debuglog` とマクロ展開され C コアから可変長引数関数として参照されるため、単なるマクロではなく `winflutter.c` で `<stdarg.h>` / `<android/log.h>` を用いた実態関数 `void debuglog(const char *fmt, ...)` として定義してください。
+   - `and_get_dumplog_dir(char *buf)` 等の補完関数は、`include/extern.h` 等にある宣言の戻り値型・引数型と完全に一致させてください。
+
+9. **Flutter における MaterialColor スウォッチアクセスの安全性（Null クラッシュ防止）**:
    - `Colors.grey[950]` のように、Flutter 標準の `MaterialColor` スウォッチ（50, 100〜900）に定義されていないキーへのアクセスや、その他のスウォッチから取得したカラーに対して `!` 演算子を用いた強制アンラップ（例：`Colors.grey[900]!`）を行うのは禁止です。`null` が返された場合に `Null check operator used on a null value` 例外を引き起こし、画面がクラッシュする原因になります。
    - スウォッチから色を取得して不透明度などを調整する際は、必ず `(Colors.grey[950] ?? const Color(0xFF0D0D0D))` のように `??` を用いて安全なフォールバック用 `Color` を設定した上で、`withValues` や `withOpacity` などのメソッドを呼び出すように徹底してください。
 
