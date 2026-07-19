@@ -46,7 +46,13 @@ int nhcolor_to_RGB(int c)
 }
 
 // NetHack Core 参照用の補完シンボル群（sys/android 非依存化用）
-struct window_procs and_procs;
+struct window_procs and_procs = {
+    "and",
+    (enum wp_ids) 0,
+    WC_COLOR | WC_HILITE_PET | WC_INVERSE,
+    WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_SUPPRESS_HIST,
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+};
 int quit_possible = 0;
 
 void and_get_dumplog_dir(char *buf) {
@@ -955,7 +961,21 @@ static void flutter_cliparound(int x, int y) {
     }
 }
 
+static char g_topten_capture_buf[32768];
+static int g_is_topten_capturing = 0;
+
 static void flutter_putstr(winid window, int attr, const char* str) {
+    if (g_is_topten_capturing) {
+        if (str) {
+            char* conv = convert_cp437_to_utf8(str);
+            const char* target = conv ? conv : str;
+            if (strlen(g_topten_capture_buf) + strlen(target) + 2 < sizeof(g_topten_capture_buf)) {
+                strcat(g_topten_capture_buf, target);
+                strcat(g_topten_capture_buf, "\n");
+            }
+        }
+        return;
+    }
     debuglog("flutter_putstr [%d]: %s", window, str);
     if ((int) window == WIN_MESSAGE && str) {
         /* NetHackJP: ATR_NOHISTORY 付き putstr (farlook 説明など)
@@ -1570,6 +1590,20 @@ static int flutter_get_ext_cmd(void) {
     return do_ext_cmd_text_flutter();
 }
 
+static void flutter_get_nh_event(void) {}
+static void flutter_mark_synch(void) {}
+static void flutter_wait_synch(void) {}
+static void flutter_update_inventory(int status UNUSED) {}
+static win_request_info *flutter_ctrl_nhwindow(winid window UNUSED, int request UNUSED, win_request_info *wri UNUSED) {
+    return (win_request_info *) 0;
+}
+
+extern void genl_putmixed(winid, int, const char *);
+extern char genl_message_menu(char, int, const char *);
+extern void genl_outrip(winid, int, time_t);
+extern void genl_preference_update(const char *);
+extern boolean genl_can_suspend_no(void);
+
 // windowprocs を Flutter 用にセットアップする関数
 static void HijackWindowProcs(void) {
     debuglog("Setting up flutter_procs...");
@@ -1577,6 +1611,7 @@ static void HijackWindowProcs(void) {
     flutter_procs.win_init_nhwindows = flutter_init_nhwindows;
     flutter_procs.win_player_selection = flutter_player_selection;
     flutter_procs.win_askname = flutter_askname;
+    flutter_procs.win_get_nh_event = flutter_get_nh_event;
     flutter_procs.win_exit_nhwindows = flutter_exit_nhwindows;
     flutter_procs.win_suspend_nhwindows = flutter_suspend_nhwindows;
     flutter_procs.win_resume_nhwindows = flutter_resume_nhwindows;
@@ -1586,6 +1621,7 @@ static void HijackWindowProcs(void) {
     flutter_procs.win_destroy_nhwindow = flutter_destroy_nhwindow;
     flutter_procs.win_curs = flutter_curs;
     flutter_procs.win_putstr = flutter_putstr;
+    flutter_procs.win_putmixed = genl_putmixed;
     flutter_procs.win_raw_print = flutter_raw_print;
     flutter_procs.win_raw_print_bold = flutter_raw_print_bold;
     flutter_procs.win_display_file = flutter_display_file;
@@ -1608,6 +1644,12 @@ static void HijackWindowProcs(void) {
     flutter_procs.win_add_menu = flutter_add_menu;
     flutter_procs.win_end_menu = flutter_end_menu;
     flutter_procs.win_select_menu = flutter_select_menu;
+    flutter_procs.win_message_menu = genl_message_menu;
+
+    flutter_procs.win_mark_synch = flutter_mark_synch;
+    flutter_procs.win_wait_synch = flutter_wait_synch;
+    flutter_procs.win_outrip = genl_outrip;
+    flutter_procs.win_preference_update = genl_preference_update;
 
     // ステータス表示用のハンドラを独自の実装に差し替え
     flutter_procs.win_status_init = genl_status_init;
@@ -1617,6 +1659,12 @@ static void HijackWindowProcs(void) {
     flutter_procs.win_getmsghistory = flutter_getmsghistory;
     flutter_procs.win_putmsghistory = flutter_putmsghistory;
 
+    flutter_procs.win_can_suspend = genl_can_suspend_no;
+    flutter_procs.win_update_inventory = flutter_update_inventory;
+    flutter_procs.win_ctrl_nhwindow = flutter_ctrl_nhwindow;
+
+    and_procs = flutter_procs;
+    and_procs.name = "and";
     windowprocs = flutter_procs;
     
     debuglog("flutter_procs setup completed.");
@@ -1806,5 +1854,34 @@ void StartNetHackFlutter(const char* path, const char* username) {
         debuglog("NetHack thread spawned successfully.");
     }
 }
+
+extern void prscore(int argc, char **argv);
+
+const char* GetTopTenTextFlutter(void) {
+    g_topten_capture_buf[0] = '\0';
+
+    winid old_toptenwin = gt.toptenwin;
+    gt.toptenwin = 9999;
+    g_is_topten_capturing = 1;
+
+    char *score_argv[2];
+    score_argv[0] = "scores";
+    score_argv[1] = "-sall";
+    prscore(2, score_argv);
+
+    g_is_topten_capturing = 0;
+    gt.toptenwin = old_toptenwin;
+
+    return g_topten_capture_buf;
+}
+
+void TriggerDatabaseSearchFlutter(void) {
+    extern void cmdq_add_key(int q, char key);
+    cmdq_add_key(0 /* CQ_CANNED */, '?');
+    int key = '/';
+    SendKeysToFlutter(&key, 1);
+}
+
+
 
 

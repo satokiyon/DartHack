@@ -116,6 +116,12 @@ typedef SendAskNameResultDart = void Function(Pointer<Utf8> result);
 typedef GetExtCmdsFunc = Pointer<Utf8> Function();
 typedef GetExtCmdsDart = Pointer<Utf8> Function();
 
+typedef GetTopTenTextFunc = Pointer<Utf8> Function();
+typedef GetTopTenTextDart = Pointer<Utf8> Function();
+
+typedef TriggerDatabaseSearchFunc = Void Function();
+typedef TriggerDatabaseSearchDart = void Function();
+
 // PosCmd (座標クリック) 送信
 typedef SendPosCmdFunc = Void Function(Int32 x, Int32 y, Int32 mod);
 typedef SendPosCmdDart = void Function(int x, int y, int mod);
@@ -145,6 +151,8 @@ class NetHackFfi {
   late final SendAskNameResultDart sendAskNameResult;
   late final GetExtCmdsDart getExtCmdsFlutter;
   late final SendPosCmdDart sendPosCmdToC;
+  late final GetTopTenTextDart getTopTenTextFlutter;
+  late final TriggerDatabaseSearchDart triggerDatabaseSearch;
 
   NetHackFfi() {
     try {
@@ -208,6 +216,14 @@ class NetHackFfi {
 
     sendPosCmdToC = _lib
         .lookup<NativeFunction<SendPosCmdFunc>>('SendPosCmdToFlutter')
+        .asFunction();
+
+    getTopTenTextFlutter = _lib
+        .lookup<NativeFunction<GetTopTenTextFunc>>('GetTopTenTextFlutter')
+        .asFunction();
+
+    triggerDatabaseSearch = _lib
+        .lookup<NativeFunction<TriggerDatabaseSearchFunc>>('TriggerDatabaseSearchFlutter')
         .asFunction();
   }
 }

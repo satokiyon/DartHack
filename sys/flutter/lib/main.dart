@@ -405,7 +405,36 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         ),
+        ListTile(
+          leading: const Icon(Icons.emoji_events, color: Colors.amber),
+          title: const Text('スコアボード', style: TextStyle(color: Colors.white)),
+          onTap: () {
+            _closeDrawer();
+            _showScoreboardDialog();
+          },
+        ),
         if (_isGameRunning) ...[
+          ListTile(
+            leading: const Icon(Icons.help_outline, color: Colors.tealAccent),
+            title: const Text('ヘルプを表示 (?)', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              _closeDrawer();
+              _sendFfiKey('?'.codeUnitAt(0), "?");
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.search, color: Colors.orangeAccent),
+            title: const Text('データベース検索 ( /? )', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              _closeDrawer();
+              try {
+                NetHackFfi().triggerDatabaseSearch();
+              } catch (_) {
+                _sendFfiKeys(['/'.codeUnitAt(0), '?'.codeUnitAt(0)], "/?");
+              }
+            },
+          ),
+          const Divider(color: Colors.white24, height: 1),
           ListTile(
             leading: const Icon(Icons.save, color: Colors.greenAccent),
             title: const Text('セーブして終了', style: TextStyle(color: Colors.white)),
@@ -436,6 +465,7 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
         ],
+        const Divider(color: Colors.white24, height: 1),
         ListTile(
           leading: const Icon(Icons.settings, color: Colors.grey),
           title: const Text('ゲーム設定を開く', style: TextStyle(color: Colors.white)),
@@ -2898,6 +2928,91 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void _showScoreboardDialog() {
+    List<TopTenEntry> entries = [];
+    try {
+      final ffi = NetHackFfi();
+      final ptr = ffi.getTopTenTextFlutter();
+      if (ptr != nullptr) {
+        final text = ptr.toDartString();
+        if (text.trim().isNotEmpty) {
+          final lines = text.split('\n');
+          entries = TopTenEntry.parse(lines, const []);
+        }
+      }
+    } catch (e) {
+      debugPrint('getTopTenTextFlutter fetch info/error: $e');
+    }
+
+    if (entries.isEmpty) {
+      final recordPath = _findRecordFilePath();
+      if (recordPath != null) {
+        entries = _parseRecordFile(recordPath);
+      }
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: const Color(0xFF12161D),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+          ),
+          child: Container(
+            width: double.infinity,
+            constraints: const BoxConstraints(maxWidth: 600, maxHeight: 600),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: entries.isNotEmpty
+                      ? TopTenWidget(entries: entries)
+                      : Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.emoji_events_outlined, size: 64, color: Colors.grey),
+                              const SizedBox(height: 16),
+                              const Text(
+                                'スコア記録がありません',
+                                style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'ゲームをプレイしてハイスコアを目指しましょう！',
+                                style: TextStyle(color: Colors.white38, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ),
+                ),
+                const SizedBox(height: 12),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal[600],
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text('閉じる', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _showSettingsDialog() {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -4430,4 +4545,177 @@ class _MenuItemTilePainter extends CustomPainter {
            oldDelegate.tileSize != tileSize;
   }
 }
+
+class _RecordRawEntry {
+  final int points;
+  final int dnum;
+  final int dlev;
+  final int maxlvl;
+  final int hp;
+  final int maxhp;
+  final String role;
+  final String race;
+  final String gend;
+  final String align;
+  final String name;
+  final String death;
+
+  _RecordRawEntry({
+    required this.points,
+    required this.dnum,
+    required this.dlev,
+    required this.maxlvl,
+    required this.hp,
+    required this.maxhp,
+    required this.role,
+    required this.race,
+    required this.gend,
+    required this.align,
+    required this.name,
+    required this.death,
+  });
+}
+
+String? _findRecordFilePath() {
+  final candidatePaths = [
+    'record',
+    './record',
+    '../record',
+    'sys/flutter/record',
+  ];
+
+  for (final path in candidatePaths) {
+    if (File(path).existsSync()) {
+      return path;
+    }
+  }
+  return null;
+}
+
+String _translateRoleCode(String code) {
+  const map = {
+    'Arc': '考古学者', 'Bar': '野蛮人', 'Cav': '洞窟人', 'Hea': '師',
+    'Kni': '騎士', 'Mon': '修道士', 'Pri': '僧侶', 'Rog': '盗賊',
+    'Ran': '旅人', 'Sam': '侍', 'Tou': '観光客', 'Val': 'バルキリー', 'Wiz': '魔法使い'
+  };
+  return map[code] ?? code;
+}
+
+String _translateRaceCode(String code) {
+  const map = {'Hum': '人間', 'Elf': 'エルフ', 'Dwa': 'ドワーフ', 'Gno': 'ノーム', 'Orc': 'オーク'};
+  return map[code] ?? code;
+}
+
+String _translateGendCode(String code) {
+  if (code.startsWith('Mal') || code == 'M') return '男性';
+  if (code.startsWith('Fem') || code == 'F') return '女性';
+  return code;
+}
+
+String _translateAlignCode(String code) {
+  if (code.startsWith('Law') || code == 'L') return '秩序';
+  if (code.startsWith('Neu') || code == 'N') return '中立';
+  if (code.startsWith('Cha') || code == 'C') return '混沌';
+  return code;
+}
+
+String _translateDeathText(String death) {
+  if (death == 'quit') return '自決した';
+  if (death == 'starved') return '餓死した';
+  if (death.startsWith('escaped')) return '脱出した';
+  if (death.startsWith('ascended')) return '昇天した';
+  if (death.startsWith('killed by a ')) return '${death.substring(12)}に殺された';
+  if (death.startsWith('killed by an ')) return '${death.substring(13)}に殺された';
+  if (death.startsWith('killed by ')) return '${death.substring(10)}に殺された';
+  return death;
+}
+
+List<TopTenEntry> _parseRecordFile(String filePath) {
+  final file = File(filePath);
+  if (!file.existsSync()) return [];
+
+  try {
+    final lines = file.readAsLinesSync();
+    final rawEntries = <_RecordRawEntry>[];
+
+    for (final line in lines) {
+      final trimmed = line.trim();
+      if (trimmed.isEmpty) continue;
+
+      final parts = trimmed.split(RegExp(r'\s+'));
+      if (parts.length < 15) continue;
+
+      final points = int.tryParse(parts[1]) ?? 0;
+      final dnum = int.tryParse(parts[2]) ?? 1;
+      final dlev = int.tryParse(parts[3]) ?? 1;
+      final maxlvl = int.tryParse(parts[4]) ?? 1;
+      final hp = int.tryParse(parts[5]) ?? 0;
+      final maxhp = int.tryParse(parts[6]) ?? 0;
+      final role = parts[11];
+      final race = parts[12];
+      final gend = parts[13];
+      final align = parts[14];
+
+      final rest = parts.sublist(15).join(' ');
+      String name = rest;
+      String death = '';
+      final commaIdx = rest.indexOf(',');
+      if (commaIdx != -1) {
+        name = rest.substring(0, commaIdx).trim();
+        death = rest.substring(commaIdx + 1).trim();
+      }
+
+      rawEntries.add(_RecordRawEntry(
+        points: points,
+        dnum: dnum,
+        dlev: dlev,
+        maxlvl: maxlvl,
+        hp: hp,
+        maxhp: maxhp,
+        role: role,
+        race: race,
+        gend: gend,
+        align: align,
+        name: name,
+        death: death,
+      ));
+    }
+
+    rawEntries.sort((a, b) => b.points.compareTo(a.points));
+
+    final entries = <TopTenEntry>[];
+    for (int i = 0; i < rawEntries.length; i++) {
+      final e = rawEntries[i];
+      final rank = i + 1;
+      final roleJp = _translateRoleCode(e.role);
+      final raceJp = _translateRaceCode(e.race);
+      final gendJp = _translateGendCode(e.gend);
+      final alignJp = _translateAlignCode(e.align);
+
+      final profile = '$roleJp/$raceJp/$gendJp/$alignJp';
+      final nameAndProfile = '${e.name} $profile';
+
+      final deathJp = _translateDeathText(e.death);
+      final details = <String>[];
+      if (deathJp.isNotEmpty) {
+        details.add('$deathJp (メインダンジョン ${e.dlev}階)');
+      } else {
+        details.add('メインダンジョン ${e.dlev}階 [HP: ${e.hp}/${e.maxhp}]');
+      }
+
+      entries.add(TopTenEntry(
+        rank: rank,
+        score: '${e.points}',
+        nameAndProfile: nameAndProfile,
+        details: details,
+        isCurrent: false,
+      ));
+    }
+
+    return entries;
+  } catch (e) {
+    return [];
+  }
+}
+
 
