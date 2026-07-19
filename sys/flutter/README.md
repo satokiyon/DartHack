@@ -99,7 +99,9 @@ sys/flutter/
 | `android/app/src/main/cpp/winflutter.c` | NetHack の `window_procs` をハイジャックして、ウィンドウ描画・キー入力等を Dart 側へコールバックで通知する実体。`HijackWindowProcs()` で `and_procs` を上書き。 |
 | `android/app/src/main/cpp/CMakeLists.txt` | NetHack C コア（`src/*.c`, `win/android/*.c`, `lib/lua-5.4.8/src/*.c`）と `winflutter.c` を `libnethack.so` としてビルド。 |
 | `dummy/libnethack_dummy.c` | C コアをビルドせずに FFI 接続を検証するためのスタブ実装。Windows ローカル開発時に `nethack_dummy.dll` として読み込まれる。 |
-| `assets/ver` | Flutter 側 (`lib/nethack_assets.dart`) が参照するアセットバージョン番号。`assets/nethackdir/` 配下を更新したら必ずインクリメントする。 |
+| `scripts/sync_dat_assets.ps1` | `dat` (`src/dat`) の変更を検知し、データファイルの自動生成・日本語ファイル名標準化変換・アセット同期・`assets/ver` のインクリメントを行うスクリプト。 |
+| `assets/ver` | Flutter 側 (`lib/nethack_assets.dart`) が参照するアセットバージョン番号。`assets/nethackdir/` 配下更新時に自動インクリメントされる。 |
+
 
 ---
 
@@ -307,13 +309,18 @@ flutter test
 2. `lib/main.dart` のタイルセット一覧と `lib/nethack_screen.dart` の読み込みロジックを追加。
 3. タイル名（固有名詞）は日本語化せず英語表記を維持してください（`AGENTS.md` の方針 9）。
 
-### データファイル更新時の注意
+### データファイル更新時の自動同期・バージョン管理
 
-`assets/nethackdir/` 配下のファイルを更新した場合:
+NetHack のデータファイル（`dat/` または `src/dat/` 内の `data.raw`, `rumors.tru`, `oracles.txt` 等）に変更を加えた場合、**`flutter run` や `flutter build` を実行するだけで全自動でアセットに反映されます**。
 
-1. **必ず** `assets/ver` の整数値をインクリメントする。
-2. APK に同梱されるアセットは Flutter の `pubspec.yaml` 経由で参照されるため、APK 再ビルド時は `flutter clean && flutter pub get` を推奨。
-3. 既存端末ではインストール時に `assets/ver` の差分を検出して自動で再展開されます（`lib/nethack_assets.dart` の `initialize()` を参照）。
+1. **自動検知と生成**: Android Gradle (`preBuild`) および Windows CMake の事前ビルドフックにより、`scripts/sync_dat_assets.ps1` が起動します。ソースデータに更新があれば WSL 経由でデータファイルを再ビルドします。
+2. **日本語ファイル名の標準化**: 生成された `data_jp` や `rumors_jp` などの日本語データファイルは、自動的に標準のファイル名（`data`, `rumors` 等）へ上書き変換されて `assets/nethackdir/` に配置されます。
+3. **バージョン自動インクリメント**: `assets/nethackdir/` 配下が更新された場合、`assets/ver` の数値が自動的に `+1` カウントアップされます。
+4. **差分がない場合の高速化**: `dat/` に変更がない場合は同期処理が自動的にスキップされるため、ビルド時間を遅延させません。
+5. **手動で同期する場合**:
+   ```powershell
+   powershell -NoProfile -ExecutionPolicy Bypass -File .\sys\flutter\scripts\sync_dat_assets.ps1
+   ```
 
 ---
 
