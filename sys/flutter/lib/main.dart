@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'NetHackJP Flutter Port',
+      title: 'DartHack',
       theme: ThemeData.dark(useMaterial3: true).copyWith(
         colorScheme: const ColorScheme.dark(
           primary: Colors.deepPurple,
@@ -395,7 +395,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Icon(Icons.sports_esports, size: 48, color: Colors.amber),
               SizedBox(height: 8),
               Text(
-                'NetHackメニュー',
+                'DartHackメニュー',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -3765,7 +3765,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ),);
   }
 
-  // NetHackカラーテーブル
+  // DartHackカラーテーブル
   Color _getNhColor(int colorIndex) {
     switch (colorIndex) {
       case 0: return Colors.black; // CLR_BLACK
