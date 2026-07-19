@@ -139,3 +139,10 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
 - **補完シンボルの要件**: NetHack C コア (`src/`) 内部の `#ifdef ANDROID` 領域が参照する Android 固有のグローバル変数・関数（`and_procs`, `and_get_dumplog_dir`, `and_you_die`, `load_usersound`, `androidsound_procs`, `quit_possible`, `lock_mouse_cursor`, `set_username`, `debuglog` 等）は、`sys/android` なしでリンクエラーを出さないよう、`sys/flutter` 側（`winflutter.c` / `fluttermain.c` / `flutterunix.c`）で適切な型・シグネチャを伴う補完シンボルとして定義・実装してください。
 - **debuglog 実態関数化**: 特に `debuglog` は `androidconf.h` にて `#define error debuglog` とマクロ展開され C コアから可変長引数関数として参照されるため、単なるマクロではなく `winflutter.c` で `<stdarg.h>` / `<android/log.h>` を用いた実態関数 `void debuglog(const char *fmt, ...)` として定義してください。
 - **シグネチャ厳密一致**: `and_get_dumplog_dir(char *buf)` 等の補完関数は、`include/extern.h` 等にある宣言の戻り値型・引数型と完全に一致させてください。
+
+## 22. Flutter 版におけるアプリアイコン設定・構成方針
+- **`flutter_launcher_icons` パッケージの利用**:
+  `pubspec.yaml` の `dev_dependencies` に `flutter_launcher_icons` を追加し、`dart run flutter_launcher_icons` コマンドで全プラットフォーム（Android, iOS, Windows, Web）用のアセットを生成してください。
+- **Android アダプティブアイコン（Adaptive Icons）の背景色指定**:
+  デフォルトのまま構成すると Android アダプティブアイコンの背景色が白になり、デザイン意図と異なる表示（白い枠枠や白背景）になる場合があります。`pubspec.yaml` の `flutter_launcher_icons` 設定において、必ず明示的に `adaptive_icon_background: "#000000"` (黒) および `adaptive_icon_foreground: "assets/icon/darthack_icon_1024x1024.png"` を設定してください。
+

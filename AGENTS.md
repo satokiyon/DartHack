@@ -423,3 +423,15 @@ Flutter 版には、ゲーム画面のステータスバーの表示を制御す
 - `sys/flutter/lib/settings_page.dart`: 新セクション「画面表示モード」追加（タイルセット設定の後、2 番目）
 - `sys/flutter/android/app/src/main/kotlin/jp/satokiyo/darthack/MainActivity.kt`: `applyScreenMode(Int)` 実装
 
+
+## Flutter 版におけるアプリアイコン設定・構成方針
+
+Flutter アプリ（`sys/flutter`）のアプリアイコンを設定・生成する際は、以下の構成方針を遵守してください。
+
+1. **`flutter_launcher_icons` パッケージの利用**:
+   - `pubspec.yaml` の `dev_dependencies` に `flutter_launcher_icons` を追加し、`dart run flutter_launcher_icons` コマンドで全プラットフォーム（Android, iOS, Windows, Web）用のアセットを生成します。
+
+2. **Android アダプティブアイコン（Adaptive Icons）の背景色指定**:
+   - デフォルトのまま構成すると、Android アダプティブアイコンの背景色が白になり、デザイン意図と異なる表示（白い枠枠や白背景）になる場合があります。
+   - `pubspec.yaml` の `flutter_launcher_icons` 設定において、必ず明示的に `adaptive_icon_background: "#000000"` (黒) および `adaptive_icon_foreground: "assets/icon/darthack_icon_1024x1024.png"` を設定してください。
+
