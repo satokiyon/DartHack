@@ -3,16 +3,88 @@
 #include "dlb.h"
 #include <unistd.h>
 #include <pthread.h>
+#include <stdarg.h>
 #include <android/log.h>
 
 #define LOG_TAG "NetHackFlutter"
-#define debuglog(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+
+void debuglog(const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    __android_log_vprint(ANDROID_LOG_DEBUG, LOG_TAG, fmt, args);
+    va_end(args);
+}
 
 // 前方宣言
 static int flutter_nhgetch(void);
-extern int nhcolor_to_RGB(int c); // winandroid.c の関数を参照
-extern struct window_procs and_procs; // winandroid.c で定義されている元の WindowPort 構造体
 extern char *decode_mixed(char *, const char *); // src/windows.c の関数 (\GXXXXNNNN → showsym 1 文字)
+
+static int palette[CLR_MAX] = {
+	0xFF555555,	// CLR_BLACK
+	0xFFFF0000,	// CLR_RED
+	0xFF008800,	// CLR_GREEN
+	0xFF664411, // CLR_BROWN
+	0xFF0000FF,	// CLR_BLUE
+	0xFFFF00FF,	// CLR_MAGENTA
+	0xFF00FFFF,	// CLR_CYAN
+	0xFF888888,	// CLR_GRAY
+	0xFFFFFFFF,	// NO_COLOR
+	0xFFFF9900,	// CLR_ORANGE
+	0xFF00FF00,	// CLR_BRIGHT_GREEN
+	0xFFFFFF00,	// CLR_YELLOW
+	0xFF0088FF,	// CLR_BRIGHT_BLUE
+	0xFFFF77FF,	// CLR_BRIGHT_MAGENTA
+	0xFF77FFFF,	// CLR_BRIGHT_CYAN
+	0xFFFFFFFF	// CLR_WHITE
+};
+
+int nhcolor_to_RGB(int c)
+{
+	if(c >= 0 && c < CLR_MAX)
+		return palette[c];
+	return 0xFF000000;
+}
+
+// NetHack Core 参照用の補完シンボル群（sys/android 非依存化用）
+struct window_procs and_procs;
+int quit_possible = 0;
+
+void and_get_dumplog_dir(char *buf) {
+    if (buf) {
+        Strcpy(buf, ".");
+    }
+}
+
+void and_you_die(void) {
+}
+
+void lock_mouse_cursor(boolean lock UNUSED) {
+}
+
+void load_usersound(const char *filename UNUSED) {
+}
+
+struct sound_procs androidsound_procs = {
+    "androidsound",
+    soundlib_nosound,
+    0L,
+    (void (*)(void)) 0,
+    (void (*)(const char *)) 0,
+    (void (*)(schar, schar, int32_t)) 0,
+    (void (*)(char *, int32_t, int32_t)) 0,
+    (void (*)(int32_t, const char *, int32_t)) 0,
+    (void (*)(char *, int32_t, int32_t)) 0,
+    (void (*)(int32_t, int32_t, int32_t)) 0,
+    (void (*)(char *, int32_t, int32_t, int32_t, int32_t)) 0,
+};
+
+static struct window_procs flutter_procs = {
+    "flutter",
+    (enum wp_ids) 0,
+    WC_COLOR | WC_HILITE_PET | WC_INVERSE,
+    WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_SUPPRESS_HIST,
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+};
 
 static winid flutter_create_nhwindow(int type);
 static void flutter_start_menu(winid wid, unsigned long behavior);
@@ -1498,63 +1570,56 @@ static int flutter_get_ext_cmd(void) {
     return do_ext_cmd_text_flutter();
 }
 
-// windowprocs と and_procs を同時にハイジャックする関数
+// windowprocs を Flutter 用にセットアップする関数
 static void HijackWindowProcs(void) {
-    debuglog("Hijacking and_procs...");
+    debuglog("Setting up flutter_procs...");
 
-    and_procs.win_init_nhwindows = flutter_init_nhwindows;
-    and_procs.win_player_selection = flutter_player_selection;
-    and_procs.win_askname = flutter_askname;
-    and_procs.win_exit_nhwindows = flutter_exit_nhwindows;
-    and_procs.win_suspend_nhwindows = flutter_suspend_nhwindows;
-    and_procs.win_resume_nhwindows = flutter_resume_nhwindows;
-    and_procs.win_create_nhwindow = flutter_create_nhwindow;
-    and_procs.win_clear_nhwindow = flutter_clear_nhwindow;
-    and_procs.win_display_nhwindow = flutter_display_nhwindow;
-    and_procs.win_destroy_nhwindow = flutter_destroy_nhwindow;
-    and_procs.win_curs = flutter_curs;
-    and_procs.win_putstr = flutter_putstr;
-    /* win_putmixed の Hijack は行わない。 src/pager.c の look_all /
-     * look_traps / look_engrs は flutter_putmixed_with_tile(win, attr,
-     * tile, str) を直接呼び出すため、 結果リストへのタイル ID 引き渡しは
-     * Hijack なしで実現できている。 他の putmixed 呼び出し
-     * (例: botl.c::putmixed(WIN_STATUS, ...)) は upstream の
-     * genl_putmixed (\G を showsym 1 文字にデコードして putstr) を経由
-     * して従来通り動作させる (tile 引数を取らない型のため Hijack 不能)。 */
-    and_procs.win_raw_print = flutter_raw_print;
-    and_procs.win_raw_print_bold = flutter_raw_print_bold;
-    and_procs.win_display_file = flutter_display_file;
-    and_procs.win_nhgetch = flutter_nhgetch;
-    and_procs.win_nh_poskey = flutter_nh_poskey;
-    and_procs.win_nhbell = flutter_nhbell;
-    and_procs.win_doprev_message = flutter_doprev_message;
-    and_procs.win_yn_function = flutter_yn_function;
-    and_procs.win_getlin = flutter_getlin;
-    and_procs.win_get_ext_cmd = flutter_get_ext_cmd;
-    and_procs.win_number_pad = flutter_number_pad;
-    and_procs.win_delay_output = flutter_delay_output;
-    and_procs.win_print_glyph = flutter_print_glyph;
+    flutter_procs.win_init_nhwindows = flutter_init_nhwindows;
+    flutter_procs.win_player_selection = flutter_player_selection;
+    flutter_procs.win_askname = flutter_askname;
+    flutter_procs.win_exit_nhwindows = flutter_exit_nhwindows;
+    flutter_procs.win_suspend_nhwindows = flutter_suspend_nhwindows;
+    flutter_procs.win_resume_nhwindows = flutter_resume_nhwindows;
+    flutter_procs.win_create_nhwindow = flutter_create_nhwindow;
+    flutter_procs.win_clear_nhwindow = flutter_clear_nhwindow;
+    flutter_procs.win_display_nhwindow = flutter_display_nhwindow;
+    flutter_procs.win_destroy_nhwindow = flutter_destroy_nhwindow;
+    flutter_procs.win_curs = flutter_curs;
+    flutter_procs.win_putstr = flutter_putstr;
+    flutter_procs.win_raw_print = flutter_raw_print;
+    flutter_procs.win_raw_print_bold = flutter_raw_print_bold;
+    flutter_procs.win_display_file = flutter_display_file;
+    flutter_procs.win_nhgetch = flutter_nhgetch;
+    flutter_procs.win_nh_poskey = flutter_nh_poskey;
+    flutter_procs.win_nhbell = flutter_nhbell;
+    flutter_procs.win_doprev_message = flutter_doprev_message;
+    flutter_procs.win_yn_function = flutter_yn_function;
+    flutter_procs.win_getlin = flutter_getlin;
+    flutter_procs.win_get_ext_cmd = flutter_get_ext_cmd;
+    flutter_procs.win_number_pad = flutter_number_pad;
+    flutter_procs.win_delay_output = flutter_delay_output;
+    flutter_procs.win_print_glyph = flutter_print_glyph;
 
     // プレイヤー位置を Dart 側へ通知 (マップタップの #herecmdmenu 連動で使用)
-    and_procs.win_cliparound = flutter_cliparound;
+    flutter_procs.win_cliparound = flutter_cliparound;
 
-    // メニュー用の関数ポインタも完全にハイジャック！
-    and_procs.win_start_menu = flutter_start_menu;
-    and_procs.win_add_menu = flutter_add_menu;
-    and_procs.win_end_menu = flutter_end_menu;
-    and_procs.win_select_menu = flutter_select_menu;
+    // メニュー用の関数ポインタもセット！
+    flutter_procs.win_start_menu = flutter_start_menu;
+    flutter_procs.win_add_menu = flutter_add_menu;
+    flutter_procs.win_end_menu = flutter_end_menu;
+    flutter_procs.win_select_menu = flutter_select_menu;
 
     // ステータス表示用のハンドラを独自の実装に差し替え
-    and_procs.win_status_init = genl_status_init;
-    and_procs.win_status_finish = genl_status_finish;
-    and_procs.win_status_enablefield = genl_status_enablefield;
-    and_procs.win_status_update = flutter_status_update;
-    and_procs.win_getmsghistory = flutter_getmsghistory;
-    and_procs.win_putmsghistory = flutter_putmsghistory;
+    flutter_procs.win_status_init = genl_status_init;
+    flutter_procs.win_status_finish = genl_status_finish;
+    flutter_procs.win_status_enablefield = genl_status_enablefield;
+    flutter_procs.win_status_update = flutter_status_update;
+    flutter_procs.win_getmsghistory = flutter_getmsghistory;
+    flutter_procs.win_putmsghistory = flutter_putmsghistory;
 
-    windowprocs = and_procs;
+    windowprocs = flutter_procs;
     
-    debuglog("Hijack completed.");
+    debuglog("flutter_procs setup completed.");
 }
 
 // NetHackステータスハイライト用 static 変数とハンドラ実装

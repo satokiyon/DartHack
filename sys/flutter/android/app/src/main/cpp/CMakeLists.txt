@@ -15,7 +15,6 @@ add_definitions(
 # Include directories
 include_directories(
     "${NHSROOT}/include"
-    "${NHSROOT}/sys/android"
     "${NHSROOT}/lib/lua-5.4.8/src"
 )
 
@@ -164,9 +163,8 @@ set(NETHACK_OS_SOURCES
     "${NHSROOT}/sys/share/ioctl.c"
     "${NHSROOT}/sys/share/unixtty.c"
     "${NHSROOT}/sys/share/posixregex.c"
-    "${NHSROOT}/sys/android/androidmain.c"
-    "${NHSROOT}/sys/android/androidunix.c"
-    "${NHSROOT}/sys/android/winandroid.c"
+    "fluttermain.c"
+    "flutterunix.c"
     "winflutter.c"
 )
 
