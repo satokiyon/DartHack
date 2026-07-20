@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-20. */
 /* NetHack 5.0	do_name.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.339 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -2185,6 +2185,21 @@ noveltitle(int *novidx)
     return jp_sir_Terry_novels[j];
 }
 
+const char *
+noveltitle_eng(int *novidx)
+{
+    int j, k = SIZE(sir_Terry_novels);
+
+    j = rn2(k);
+    if (novidx) {
+        if (*novidx == -1)
+            *novidx = j;
+        else if (*novidx >= 0 && *novidx < k)
+            j = *novidx;
+    }
+    return sir_Terry_novels[j];
+}
+
 /* figure out canonical novel title from player-specified one */
 const char *
 lookup_novel(const char *lookname, int *idx)
@@ -2210,7 +2225,8 @@ lookup_novel(const char *lookname, int *idx)
 
     for (k = 0; k < SIZE(sir_Terry_novels); ++k) {
         if (!strcmpi(lookname, sir_Terry_novels[k])
-            || !strcmpi(The(lookname), sir_Terry_novels[k])) {
+            || !strcmpi(The(lookname), sir_Terry_novels[k])
+            || !strcmpi(lookname, jp_sir_Terry_novels[k])) {
             if (idx)
                 *idx = k;
             return sir_Terry_novels[k];

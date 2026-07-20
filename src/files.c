@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-21. */
 /* NetHack 5.0	files.c	$NHDT-Date: 1781973049 2026/06/20 16:30:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.448 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -3559,6 +3559,7 @@ choose_passage(int passagecnt, /* total of available passages */
 /* Returns True if you were able to read something. */
 boolean
 read_tribute(const char *tribsection, const char *tribtitle,
+             const char *jptribtitle,
              int tribpassage, char *nowin_buf, int bufsz,
              unsigned oid) /* book identifier */
 {
@@ -3567,7 +3568,8 @@ read_tribute(const char *tribsection, const char *tribtitle,
 
     int scope = 0;
     int linect = 0, passagecnt = 0, targetpassage = 0;
-    const char *badtranslation = "an incomprehensible foreign translation";
+    const char *badtranslation = "理解不能な外国語訳";
+    const char *display_title = jptribtitle ? jptribtitle : tribtitle;
     boolean matchedsection = FALSE, matchedtitle = FALSE;
     winid tribwin = WIN_ERR;
     boolean grasped = FALSE;
@@ -3576,17 +3578,23 @@ read_tribute(const char *tribsection, const char *tribtitle,
     if (nowin_buf)
         *nowin_buf = '\0';
 
+    if (!display_title)
+        display_title = "";
+
     /* check for mandatories */
     if (!tribsection || !tribtitle) {
         if (!nowin_buf)
-            pline("It's %s of \"%s\"!", badtranslation, tribtitle);
+            pline("「%s」の%sのようだ！", display_title, badtranslation);
         return grasped;
     }
 
     debugpline3("read_tribute %s, %s, %d.", tribsection, tribtitle,
                 tribpassage);
 
-    fp = dlb_fopen(TRIBUTEFILE, "r");
+    /* NetHackJP: try tribute_jp first, fallback to TRIBUTEFILE */
+    fp = dlb_fopen("tribute_jp", "r");
+    if (!fp)
+        fp = dlb_fopen(TRIBUTEFILE, "r");
     if (!fp) {
         /* this is actually an error - cannot open tribute file! */
         if (!nowin_buf)
@@ -3716,9 +3724,9 @@ read_tribute(const char *tribsection, const char *tribtitle,
                 if (strchr(lastline, '['))
                     mungspaces(lastline); /* to remove leading spaces */
                 else /* construct one if necessary */
-                    Sprintf(lastline, "[%s, by Terry Pratchett]", tribtitle);
+                    Sprintf(lastline, "[%s (テリー・プラチェット著)]", display_title);
                 if ((p = strrchr(lastline, ']')) != 0)
-                    Sprintf(p, "; passage #%d]", targetpassage);
+                    Sprintf(p, " 第%d節]", targetpassage);
                 putmsghistory(lastline, FALSE);
                 grasped = TRUE;
             }
@@ -3726,7 +3734,7 @@ read_tribute(const char *tribsection, const char *tribtitle,
         }
         if (!grasped)
             /* multi-line window, problem */
-            pline("It seems to be %s of \"%s\"!", badtranslation, tribtitle);
+            pline("それは「%s」の%sのようだ！", display_title, badtranslation);
     }
     return grasped;
 }
@@ -3736,7 +3744,7 @@ Death_quote(char *buf, int bufsz)
 {
     unsigned death_oid = 1; /* chance of oid #1 being a novel is negligible */
 
-    return read_tribute("Death", "Death Quotes", 0, buf, bufsz, death_oid);
+    return read_tribute("Death", "Death Quotes", (const char *) 0, 0, buf, bufsz, death_oid);
 }
 
 /* ----------  END TRIBUTE ----------- */
@@ -3762,7 +3770,7 @@ livelog_add(long ll_type, const char *str)
 
     if (lock_file(LIVELOGFILE, SCOREPREFIX, 10)) {
         if (!(livelogfile = fopen_datafile(LIVELOGFILE, "a", SCOREPREFIX))) {
-            pline("Cannot open live log file!");
+            pline("ライブログファイルを開けません！");
             unlock_file(LIVELOGFILE);
             return;
         }
