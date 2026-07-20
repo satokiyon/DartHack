@@ -435,3 +435,52 @@ Flutter アプリ（`sys/flutter`）のアプリアイコンを設定・生成�
    - デフォルトのまま構成すると、Android アダプティブアイコンの背景色が白になり、デザイン意図と異なる表示（白い枠枠や白背景）になる場合があります。
    - `pubspec.yaml` の `flutter_launcher_icons` 設定において、必ず明示的に `adaptive_icon_background: "#000000"` (黒) および `adaptive_icon_foreground: "assets/icon/darthack_icon_1024x1024.png"` を設定してください。
 
+## Flutter 版におけるダイアログへのメッセージ履歴ボタン追加（実装ガイド）
+
+Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの「過去のメッセージを遡って確認したい」という要望に対応するため、ゲーム中に突然表示される 3 種類のオーバーレイダイアログに「**履歴ボタン**」を追加しています。コミット `3f56d3480` で導入され、既存のメッセージ履歴ボトムシート（`_showMsgHistoryPanel`）を再利用します。
+
+実装の背景・コード位置・拡張手順は `docs/feature_msg_history_button.md` に詳細を記載しています。本セクションは方針の要点をまとめたものです。
+
+1. **履歴ボタンが付いているオーバーレイ**:
+   - **YN 確認オーバーレイ**（`_buildYnOverlay` at `sys/flutter/lib/main.dart:2252`）: Yes/No/Quit Wrap の末尾に常時表示（`main.dart:2330`, `main.dart:2355`）。死亡時の「持ち物を識別しますか?」「能力値を表示しますか?」など 5-6 個の YN 確認すべてに出ます。
+   - **テキストウィンドウ・オーバーレイ**（墓石・結果表示・通常テキストページ）: OK ボタンの左に常時表示（`main.dart:3395-3423`、ユーザーは 3229-3371 と言ったが実際のボタン配置は 3395-3423）。死亡時の墓石・識別一覧・能力値表・倒した怪物・行為と実績・ダンジョン概要などの結果表示に加え、`#overview` 等の通常テキストページでも出ます。
+   - **getline オーバーレイ**（`_buildGetLineOverlay` at `sys/flutter/lib/main.dart:2368`）: 下部 Row を `spaceBetween` 構成にし、call/name 系のプロンプト時のみ左に履歴ボタンを表示（`main.dart:2492-2517`）。
+
+2. **getline プロンプトのフィルタリング**:
+   - 共通ヘルパー `_isCallOrNamePrompt(String prompt)`（`main.dart:2972-2979`）で判定。
+   - 拾うパターン:
+     - `"%sを何と呼びますか?"`（アイテム命名・call: `src/do_name.c:253` `docall` / `:650` `build_docall_prompt`）
+     - `"%s%sを何と名付けますか?"`（アイテム命名・name: `src/do_name.c:305` `do_oname`）
+     - `"この液体を何と呼びますか?"`（流し台の药水: `src/do_name.c:647`）
+     - `"このダンジョン階層にどのような名前を付けますか?"`（`src/nhlua.c:693`）
+     - 英語版: `"call this"`, `"name this"`（フォールバック）
+   - **除外対象**: 銘刻（engraving）、ウィッシュ、虐殺（genocide）、拡張コマンド補完、askname（"お名前は?"）、その他自由入力。これらに履歴ボタンを出すと UX ノイズになります。
+
+3. **共通ヘルパー `_buildMsgHistoryButton`**（`main.dart:2944-2961`）:
+   - 戻り値は `Widget`。引数 `label`（デフォルト `'履歴'`）でラベル変更可能。
+   - Amber のアウトライン `OutlinedButton.icon`（アイコンは `Icons.history`）で「応答ボタン」と視覚的に区別します。
+   - 押下時は既存の `_showMsgHistoryPanel()` を呼び出すだけ。
+   - **新規ダイアログに履歴ボタンを足す手順**:
+     1. 既存の `_buildMsgHistoryButton()` をそのまま呼び出す。
+     2. 配置位置は「応答ボタン群の末尾」または「OK ボタンの左」（`_buildYnOverlay`, テキストオーバーレイのパターン）を踏襲。
+     3. 自由入力系（`getline` の call/name 以外）は **フィルタ必須**。判定ヘルパーが増えたら `_isCallOrNamePrompt` を更新。
+
+4. **既存資産（変更不要）**:
+   - **`_showMsgHistoryPanel()`**（`main.dart:2821` 以降）: 画面下半部 ~60% を `showModalBottomSheet` + `DraggableScrollableSheet` で表示。ゲームに入力を送らずに閉じられる（`isDismissible: true`）。
+   - **`_messageHistory`**（`sys/flutter/lib/nethack_screen.dart:57`）: 最大 100 件の永続バッファ。`ChangeNotifier` 配下。`clearWindow(WIN_MESSAGE)` ではクリアされず、ゲーム開始/再開時の `createWindow(WIN_MESSAGE)` でのみリセット（方針 12）。
+   - **履歴表示ダイアログ内の `reverse: true`**（`ListView`）: 履歴パネルで最新メッセージが最初から表示されるよう、インデックスを逆順（`length - 1 - index`）で参照する設計（方針 12）。
+
+5. **デザイン判断（なぜ「共通ラッパ」ではなく「直接編集」か）**:
+   - 当初検討した「13 箇所の `showDialog` 呼び出しを共通ラッパで包む」方式は、ラッパ自体の認知負荷・間接化・デバッグ困難性が見合わないため不採用。
+   - 実際のダイアログ呼び出しは 12 個が `AlertDialog`、1 個が生 `Dialog` で散在しているが、その 95% は `Positioned.fill` ベースの「オーバーレイ」（`showDialog` 経由ではない）であり、死亡時のフローは 2 つのオーバーレイ（`_buildYnOverlay` + テキストウィンドウ・オーバーレイ）に集約されている。
+   - そのため「オーバーレイ側を直接編集」するほうが変更点が見通しやすく、後からラッパを被せたくなったときも追加で抽出可能。
+
+6. **アーキテクチャ上の注意点**:
+   - ダイアログ呼び出しが散らばっているように見えても、実体は 2-3 個のオーバーレイ生成関数に集約されている。`grep -n "showDialog\|_build.*Overlay" sys/flutter/lib/main.dart` で俯瞰可能。
+   - 履歴ボタンは「応答ボタン」と視覚的に区別するため Amber アウトライン。色を変えたい場合は `_buildMsgHistoryButton` を 1 箇所修正すれば全体に反映。
+   - テキストオーバーレイの履歴ボタンは死亡時に限らず常時表示。UX 一貫性のため（`#overview` 等の通常テキストページでも「いままでのメッセージ何があったっけ?」が起きたときに確認できる）。
+
+7. **検証手順**:
+   - `dart analyze` で 0 issues を確認（本機能追加時）。
+   - 実機確認: 死亡 → YN 確認で「持ち物を識別しますか?」などに履歴ボタンが出る。墓石画面の OK の左にも出る。`\call` で任意アイテムを呼び名し、そのプロンプトでも履歴ボタンが出る。銘刻プロンプト（`\e -lorem` 等）では出ない。
+
