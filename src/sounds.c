@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-20. */
 /* NetHack 5.0	sounds.c	$NHDT-Date: 1781973067 2026/06/20 16:31:07 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.172 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1291,11 +1291,13 @@ domonnoise(struct monst *mtmp)
         /* 3.6 tribute */
         if (ms_Death && !svc.context.tribute.Deathnotice
             && (book = u_have_novel()) != 0) {
-            if ((tribtitle = noveltitle(&book->novelidx)) != 0) {
+            const char *eng_tribtitle = noveltitle_eng(&book->novelidx);
+            tribtitle = noveltitle(&book->novelidx);
+            if (tribtitle != 0) {
                 Sprintf(verbuf, "ほう、/%s/を持っているのか.", tribtitle);
                 /* no Death featured in these two, so exclude them */
-                if (strcmpi(tribtitle, "Snuff")
-                    && strcmpi(tribtitle, "The Wee Free Men"))
+                if (eng_tribtitle && strcmpi(eng_tribtitle, "Snuff")
+                    && strcmpi(eng_tribtitle, "The Wee Free Men"))
                     Strcat(verbuf, "  あれでは少し誤って引用されていたかもしれない。" );
                 verbl_msg = verbuf;
             }
