@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-03. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-20. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -745,6 +745,7 @@ extern char *rndorcname(char *);
 extern struct monst *christen_orc(struct monst *, const char *,
                                   const char *) NONNULLARG1;
 extern const char *noveltitle(int *);
+extern const char *noveltitle_eng(int *);
 extern const char *lookup_novel(const char *, int *) NONNULLARG1;
 #ifndef PMNAME_MACROS
 extern int Mgender(struct monst *) NONNULLARG1;
@@ -1147,7 +1148,7 @@ extern int nhclose(int);
 extern boolean debugcore(const char *, boolean);
 #endif
 extern void reveal_paths(int);
-extern boolean read_tribute(const char *, const char *, int, char *, int,
+extern boolean read_tribute(const char *, const char *, const char *, int, char *, int,
                             unsigned);
 extern boolean Death_quote(char *, int) NONNULLARG1;
 extern void livelog_add(long ll_type, const char *) NONNULLARG2;

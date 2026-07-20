@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-20. */
 /* NetHack 5.0	spell.c	$NHDT-Date: 1781973068 2026/06/20 16:31:08 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.189 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -513,8 +513,9 @@ study_book(struct obj *spellbook)
         if (booktype == SPE_NOVEL) {
             /* Obtain current Terry Pratchett book title */
             const char *tribtitle = noveltitle(&spellbook->novelidx);
+            const char *eng_tribtitle = noveltitle_eng(&spellbook->novelidx);
 
-            if (read_tribute("books", tribtitle, 0, (char *) 0, 0,
+            if (read_tribute("books", eng_tribtitle, tribtitle, 0, (char *) 0, 0,
                              spellbook->o_id)) {
                 if (!u.uconduct.literate++)
                     livelog_printf(LL_CONDUCT,
