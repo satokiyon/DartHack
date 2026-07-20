@@ -2327,6 +2327,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               child: const Text('Quit'),
                             ),
+                          _buildMsgHistoryButton(),
                         ],
                       )
                     else
@@ -2351,6 +2352,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             style: ElevatedButton.styleFrom(backgroundColor: Colors.black54, foregroundColor: Colors.white70),
                             child: const Text('キャンセル'),
                           ),
+                          _buildMsgHistoryButton(),
                         ],
                       ),
                   ],
@@ -2488,17 +2490,28 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                   const SizedBox(height: 16),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextButton(
-                        onPressed: () => _sendGetLineResult(null),
-                        child: const Text('キャンセル'),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () => _sendGetLineResult(_getlineController.text),
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.teal[500]),
-                        child: const Text('決定'),
+                      // 道具/階層への命名入力時のみ履歴ボタンを表示。
+                      // 銘刻/拡張コマンド/ウィッシュ/その他自由入力では出さない (UX ノイズ回避)。
+                      if (_isCallOrNamePrompt(_getlinePrompt))
+                        _buildMsgHistoryButton()
+                      else
+                        const SizedBox.shrink(),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextButton(
+                            onPressed: () => _sendGetLineResult(null),
+                            child: const Text('キャンセル'),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () => _sendGetLineResult(_getlineController.text),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.teal[500]),
+                            child: const Text('決定'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -2928,6 +2941,43 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  // 履歴ボタン。YN/getline/テキストウィンドウ オーバーレイに共通で載せる。
+  // 押下で既存の _showMsgHistoryPanel() (ボトムシート) を開く。
+  // 視覚的に応答ボタンと区別するため、Amber 系のアウトラインで「補助操作」感を出す。
+  Widget _buildMsgHistoryButton({String label = '履歴'}) {
+    return OutlinedButton.icon(
+      onPressed: _showMsgHistoryPanel,
+      icon: const Icon(Icons.history, size: 18, color: Colors.amber),
+      label: Text(label, style: const TextStyle(color: Colors.amber)),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: Colors.amber,
+        side: BorderSide(color: Colors.amber.withValues(alpha: 0.6)),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  // getline のプロンプトが「アイテム/階層に名前を付ける」系か判定する。
+  // 該当する場合のみ getline オーバーレイに履歴ボタンを表示する。
+  // 対応パターン (C 側 src/do_name.c, src/nhlua.c 由来):
+  //   "%sを何と呼びますか?" (docall / do_oname 経由の call)
+  //   "%s%sを何と名付けますか?" (do_oname 経由の name)
+  //   "この液体を何と呼びますか?" (流し台の药水)
+  //   "このダンジョン階層にどのような名前を付けますか?" (nhlua.c:693)
+  //   英語版: "What do you want to call/name this ___?" も念のため拾う。
+  // 銘刻/ウィッシュ/虐殺/拡張コマンドは除外。
+  bool _isCallOrNamePrompt(String prompt) {
+    if (prompt.isEmpty) return false;
+    return prompt.contains('何と呼びますか')
+        || prompt.contains('何と名付けますか')
+        || prompt.contains('名前を付け')
+        || prompt.toLowerCase().contains('call this')
+        || prompt.toLowerCase().contains('name this');
+  }
+
   void _showScoreboardDialog() {
     List<TopTenEntry> entries = [];
     try {
@@ -3344,23 +3394,31 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           const SizedBox(height: 12),
                           Center(
-                            child: ElevatedButton(
-                              onPressed: () => _sendFfiKey(32, "Space"),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.teal[500],
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildMsgHistoryButton(),
+                                const SizedBox(width: 12),
+                                ElevatedButton(
+                                  onPressed: () => _sendFfiKey(32, "Space"),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.teal[500],
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "OK",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              child: const Text(
-                                "OK",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              ],
                             ),
                           ),
                         ],
