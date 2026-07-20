@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-20. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-21. */
 /* NetHack 5.0	files.c	$NHDT-Date: 1781973049 2026/06/20 16:30:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.448 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -3500,7 +3500,10 @@ read_tribute(const char *tribsection, const char *tribtitle,
     debugpline3("read_tribute %s, %s, %d.", tribsection, tribtitle,
                 tribpassage);
 
-    fp = dlb_fopen(TRIBUTEFILE, "r");
+    /* NetHackJP: try tribute_jp first, fallback to TRIBUTEFILE */
+    fp = dlb_fopen("tribute_jp", "r");
+    if (!fp)
+        fp = dlb_fopen(TRIBUTEFILE, "r");
     if (!fp) {
         /* this is actually an error - cannot open tribute file! */
         if (!nowin_buf)

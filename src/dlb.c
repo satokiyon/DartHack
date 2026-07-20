@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-21. */
 /* NetHack 5.0	dlb.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -504,7 +504,7 @@ should_try_jp_datafile(const char *name)
     static const char *const names[] = {
         "help", "hh", "keyhelp", "wizhelp", "cmdhelp", "history",
         "opthelp", "optmenu", "usagehlp", "rumors", "oracles",
-        "engrave", "epitaph", "data"
+        "engrave", "epitaph", "data", "tribute"
     };
     size_t i;
 
