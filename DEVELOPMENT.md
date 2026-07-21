@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-16. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-21. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -151,6 +151,28 @@ $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\sys\android\buil
 ### Flutter版 マップ座標の座標系統一
 - 主人公位置・タップ座標は **すべて 0-based マップグリッド座標系**で扱ってください。C 側 `flutter_cliparound` で `u.ux - 1` して 0-based に変換し、Dart 側 `setPlayerPos(x, y)` に渡します（`u.ux` は 1-based、`u.uy` は 0-based のため、グリッド表示に合わせて x だけ `-1`）。
 - 主人公の同一タイル判定は `_handleMapTap` 内で `dx == 0 && dy == 0` で行います。Java 版の `mSelfRadiusSquared` 相当の半径判定は未実装（タイル座標完全一致のみ）ですが、必要に応じて `dx * dx + dy * dy <= radius * radius` 形式で拡張可能です。
+
+### TODO (今後の翻訳改善タスク)
+* **`dat/tribute_jp` 内の冗長な「だった」表現の全般見直しと簡潔化**:
+  - 現在 `dat/tribute_jp` には、過去の機械翻訳等に起因する「〜のだった」「〜だったのだった」といった冗長な文末表現が多数残存しています。
+  - 今後、これらをより読みやすくスッキリとした自然な過去形表現（例: 「判断したのだった」➔「判断した」、「確信を持っているのだった」➔「確信を持っていた」、「握りしめていたのだった」➔「握りしめていた」等）へ段階的に全件再翻訳・簡潔化するタスクを実行する予定です。
+
+  #### 今後再翻訳タスクを実行する際の手順・スクリプト・プロンプトガイドライン:
+  1. **対象文の抽出スクリプト構造**:
+     - `dat/tribute_jp` / `scratch/tribute_progress.json` から対象語尾（例: 「だった」）を含む行を抽出し、前後のコンテキスト（前行・次行）および対応する原文パッセージ（`dat/tribute`）をバインドした構造化 JSON（例: `reinspect_dattastart_all.json`）を生成します。
+  2. **10件単位の段階的提示（プロンプト方針）**:
+     - 大規模修正によるデグレを防ぐため、全抽出件数を 10 件ずつのフェーズに分割し、以下の表形式でユーザーに提示して「承認する」を仰ぎます：
+       `| ID | Passage | 現在の文（修正前） | 判定 / 修正案（「だった」節約・スッキリ化） | 理由・変更内容 |`
+  3. **アトミック書き込みと構造保護（適用手順）**:
+     - ユーザー承認後、`tribute_progress.json` の `jpLines` 配列をパッセージ単位でプログラム的に更新し、一時ファイル `dat/tribute_jp.tmp` へ書き出した後、`fs.copyFileSync` で `dat/tribute_jp` を安全に置き換えます。
+  4. **表示幅（75文字以内）と制御行の自動検証 (`validate_tribute.js`)**:
+     - 修正適用ごと、および完了時に自動検証スクリプトを実行し、以下を検証します：
+       - **表示幅の厳守**: 各行の表示幅（全角2, 半角1）が 75 表示幅を超過していないこと。
+       - **制御行の完全一致**: 全 561 パッセージおよび 2,249 行の制御行（`%section`, `%title`, `%passage`, `%e` 等）のシーケンスが原本と完全一致していること。
+  5. **データビルドツールによる最終実地検証**:
+     - 全フェーズ完了時に `cmd /c "cd dat && ..\tools\Release\x64\makedefs.exe --make d"` を実行し、データ変換エラーが 0 件で正常コンパイルされることを確認します。
+
+
 
 ---
 
