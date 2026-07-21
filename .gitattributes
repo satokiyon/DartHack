@@ -5,6 +5,7 @@ sys/android/make_all_abi.sh text eol=lf
 
 # Merge strategy for documentation files
 AGENTS.md merge=ours
+.agents/AGENTS.md merge=ours
 DEVELOPMENT.md merge=ours
 
 
