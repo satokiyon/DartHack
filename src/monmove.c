@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-22. */
 /* NetHack 5.0	monmove.c	$NHDT-Date: 1781973056 2026/06/20 16:30:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.284 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -183,10 +183,10 @@ watch_on_duty(struct monst *mtmp)
             && (levl[x][y].doormask & D_LOCKED)) {
             if (couldsee(mtmp->mx, mtmp->my)) {
                 if (levl[x][y].looted & D_WARNED) {
-                    mon_yells(mtmp, "Halt, thief!  You're under arrest!");
+                    mon_yells(mtmp, "止まれ、盗人!  逮捕する!");
                     (void) angry_guards(!!Deaf);
                 } else {
-                    mon_yells(mtmp, "Hey, stop picking that lock!");
+                    mon_yells(mtmp, "おい、その鍵を開けるな!");
                     levl[x][y].looted |= D_WARNED;
                 }
                 stop_occupation();
