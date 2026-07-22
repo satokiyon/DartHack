@@ -1025,6 +1025,17 @@ void flutter_putmixed_with_tile(winid window, int attr, int tile, const char* st
 }
 
 static void flutter_raw_print(const char* str) {
+    if (g_is_topten_capturing) {
+        if (str) {
+            char* conv = convert_cp437_to_utf8(str);
+            const char* target = conv ? conv : str;
+            if (strlen(g_topten_capture_buf) + strlen(target) + 2 < sizeof(g_topten_capture_buf)) {
+                strcat(g_topten_capture_buf, target);
+                strcat(g_topten_capture_buf, "\n");
+            }
+        }
+        return;
+    }
     debuglog("flutter_raw_print: %s", str ? str : "NULL");
     if (str) {
         flutter_save_message(str);
@@ -1036,6 +1047,17 @@ static void flutter_raw_print(const char* str) {
 }
 
 static void flutter_raw_print_bold(const char* str) {
+    if (g_is_topten_capturing) {
+        if (str) {
+            char* conv = convert_cp437_to_utf8(str);
+            const char* target = conv ? conv : str;
+            if (strlen(g_topten_capture_buf) + strlen(target) + 2 < sizeof(g_topten_capture_buf)) {
+                strcat(g_topten_capture_buf, target);
+                strcat(g_topten_capture_buf, "\n");
+            }
+        }
+        return;
+    }
     debuglog("flutter_raw_print_bold: %s", str ? str : "NULL");
     if (str) {
         flutter_save_message(str);

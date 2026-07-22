@@ -4331,14 +4331,26 @@ class TopTenEntry {
 
     // " 順位      点数  名前" などのヘッダー行は除外して、数字で始まる行からパースする
     final entryRegExp = RegExp(r'^\s*([0-9]+)\s+([0-9]+)\s+(.*)$');
+    // 行末の HP 表示を検出する正規表現（" - [103]" や " 15 [120]" 等）
+    final hpSuffixRegExp = RegExp(r'\s+(-|[0-9]+)\s+\[([0-9]+)\]\s*$');
 
     for (int i = 0; i < lines.length; i++) {
-      final line = lines[i];
+      var line = lines[i];
       if (line.trim().isEmpty) continue;
 
       // ヘッダーやその他のタイトル行は無視
       if (line.contains('順位') && line.contains('点数') && line.contains('名前')) {
         continue;
+      }
+
+      // 行末の HP 表示をチェック・抽出
+      String? extractedHpInfo;
+      final hpMatch = hpSuffixRegExp.firstMatch(line);
+      if (hpMatch != null) {
+        final hpVal = hpMatch.group(1);
+        final maxHpVal = hpMatch.group(2);
+        extractedHpInfo = 'HP/最大HP: $hpVal/$maxHpVal';
+        line = line.substring(0, hpMatch.start);
       }
 
       final match = entryRegExp.firstMatch(line);
@@ -4348,7 +4360,7 @@ class TopTenEntry {
         }
         final rank = int.tryParse(match.group(1)!) ?? 0;
         final score = match.group(2)!;
-        final nameAndProfile = match.group(3)!;
+        final nameAndProfile = match.group(3)!.trim();
         
         final attr = i < attrs.length ? attrs[i] : 0;
         final isBold = (attr & 1) != 0; // ATR_BOLD (1)
@@ -4359,9 +4371,18 @@ class TopTenEntry {
           nameAndProfile: nameAndProfile,
           isCurrent: isBold,
         );
+        if (extractedHpInfo != null) {
+          builder.details.add(extractedHpInfo);
+        }
       } else {
         if (builder != null) {
-          builder.details.add(line.trim());
+          final trimmed = line.trim();
+          if (trimmed.isNotEmpty) {
+            builder.details.add(trimmed);
+          }
+          if (extractedHpInfo != null) {
+            builder.details.add(extractedHpInfo);
+          }
           final attr = i < attrs.length ? attrs[i] : 0;
           final isBold = (attr & 1) != 0;
           if (isBold) {
