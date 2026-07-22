@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-22. */
 /* NetHack 5.0	lock.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -418,7 +418,6 @@ pick_lock(
     if (u_at(cc.x, cc.y)) { /* pick lock on a container */
         const char *verb;
         char qsfx[QBUFSZ];
-        boolean it;
         int count;
 
         if (u.dz < 0 && !autounlock) { /* beware stale u.dz value */
@@ -448,15 +447,14 @@ pick_lock(
                              xname(otmp));
                     return PICKLOCK_LEARNED_SOMETHING;
                 }
-                it = 0;
                 if (otmp->obroken)
-                    verb = "直す";
+                    verb = "直しますか";
                 else if (!otmp->olocked)
-                    verb = "施錠する", it = 1;
+                    verb = "鍵をかけますか";
                 else if (picktyp != LOCK_PICK)
-                    verb = "解錠する", it = 1;
+                    verb = "鍵を開けますか";
                 else
-                    verb = "鍵開けする";
+                    verb = "鍵開けを試みますか";
 
                 if (autounlock && (flags.autounlock & AUTOUNLOCK_UNTRAP) != 0
                     && could_untrap(FALSE, TRUE)
@@ -480,12 +478,10 @@ pick_lock(
                     if (c != 'y')
                         return PICKLOCK_DID_NOTHING;
                 } else {
-                    /* "There is <a box> here; <verb> <it|its lock>?" */
-                        Sprintf(qsfx, "がここにある; %s %s?",
-                            verb,
-                            it ? "それ" : "鍵");
-                        (void) safe_qbuf(qbuf, "", qsfx, otmp, doname,
-                                 ansimpleoname, "箱");
+                    /* "There is <a box> here; <verb>?" */
+                    Sprintf(qsfx, "がここにある; %s?", verb);
+                    (void) safe_qbuf(qbuf, "", qsfx, otmp, doname,
+                             ansimpleoname, "箱");
                     otmp->lknown = 1;
 
                     c = ynq(qbuf);
@@ -710,12 +706,12 @@ doforce(void)
                    since we're about to set lknown, there's no need to
                    remember and then reset its current value */
                 otmp->lknown = 0;
-                    There("ここに%sがあったが、その鍵は既に%sた.",
-                        doname(otmp), otmp->obroken ? "壊れてい" : "開いてい");
+                    There("ここに%sがあったが、%s.",
+                        doname(otmp), otmp->obroken ? "その鍵は既に壊れていた" : "既に鍵は開いていた");
                 otmp->lknown = 1;
                 continue;
             }
-            (void) safe_qbuf(qbuf, "", "がここにある; 鍵をこじ開ける?",
+            (void) safe_qbuf(qbuf, "", "がここにある; 鍵をこじ開けますか?",
                              otmp, doname, ansimpleoname, "箱");
             otmp->lknown = 1;
 

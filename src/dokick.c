@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-22. */
 /* NetHack 5.0	dokick.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.237 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1594,18 +1594,17 @@ impact_drop(
     }
 
     if (dct && cansee(x, y)) { /* at least one object fell */
-        const char *what = (dct == 1L ? "物体が落ちる" : "物体が落ちる");
+        const char *gate = gg.gate_str ? gg.gate_str : "";
 
         if (missile)
-            pline("衝撃で、%s%s.",
-                dct == oct ? "すべての" : dct == 1L ? "ほかの1つの" : "ほかの", what);
+            pline("衝撃で、%s物体が%s落ちた.",
+                dct == oct ? "すべての" : dct == 1L ? "ほかの1つの" : "ほかの", gate);
         else if (oct == dct)
-            pline("隣接する%s%s%s.", dct == 1L ? "その" : "すべての", what,
-                  gg.gate_str);
+            pline("隣接する%s物体が%s落ちた.",
+                dct == 1L ? "その" : "すべての", gate);
         else
-            pline("隣接する%s%s%s.",
-                dct == 1L ? "いずれか1つの" : "いくつかの",
-                dct == 1L ? "物体が落ちる" : what, gg.gate_str);
+            pline("隣接する%s物体が%s落ちた.",
+                dct == 1L ? "いずれか1つの" : "いくつかの", gate);
     }
 
     if (costly && shkp && price) {
@@ -1934,10 +1933,10 @@ otransit_msg(struct obj *otmp, boolean nodrop, boolean chainthere, long num)
         if (nodrop)
             Sprintf(eos(xbuf), ".");
         else
-            Sprintf(eos(xbuf), " そして%sへ落ちた.", gg.gate_str);
+            Sprintf(eos(xbuf), " そして%s落ちた.", gg.gate_str);
         pline("%s%s", obuf, xbuf);
     } else if (!nodrop)
-        pline("%sは%sへ落ちた.", obuf, gg.gate_str);
+        pline("%sは%s落ちた.", obuf, gg.gate_str);
 }
 
 /* migration destination for objects which fall down to next level */
@@ -1953,12 +1952,12 @@ down_gate(coordxy x, coordxy y)
         return MIGR_NOWHERE;
     }
     if (stway && !stway->up && !stway->isladder) {
-        gg.gate_str = "階段下";
+        gg.gate_str = "階段の下へ";
         return (stway->tolev.dnum == u.uz.dnum) ? MIGR_STAIRS_UP
                                                 : MIGR_SSTAIRS;
     }
     if (stway && !stway->up && stway->isladder) {
-        gg.gate_str = "はしごの下";
+        gg.gate_str = "はしごの下へ";
         return MIGR_LADDER_UP;
     }
     /* hole will always be flagged as seen; trap drop might or might not */

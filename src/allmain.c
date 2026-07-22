@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-22. */
 /* NetHack 5.0	allmain.c	$NHDT-Date: 1781973040 2026/06/20 16:30:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.304 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -619,7 +619,7 @@ regen_pw(int wtcap)
             u.uen = u.uenmax;
         disp.botl = TRUE;
         if (u.uen == u.uenmax)
-            interrupt_multi("エネルギーが満ちあふれているのを感じた.");
+            interrupt_multi("エネルギーが満ちあふれるのを感じた.");
     }
 }
 
@@ -680,7 +680,7 @@ regen_hp(int wtcap)
     }
 
     if (reached_full)
-        interrupt_multi("体力は完全に回復していた.");
+        interrupt_multi("体力は完全に回復した.");
 }
 
 #undef U_CAN_REGEN
