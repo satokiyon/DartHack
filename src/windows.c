@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-22. */
 /* NetHack 5.0	windows.c	$NHDT-Date: 1781973074 2026/06/20 16:31:14 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.147 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -43,6 +43,9 @@ extern struct window_procs Gnome_procs;
 #endif
 #ifdef MSWIN_GRAPHICS
 extern struct window_procs mswin_procs;
+#endif
+#ifdef ANDROID_GRAPHICS
+extern struct window_procs and_procs;
 #endif
 #ifdef SHIM_GRAPHICS
 extern struct window_procs shim_procs;
@@ -130,6 +133,9 @@ static struct win_choices {
 #endif
 #ifdef MSWIN_GRAPHICS
     { &mswin_procs, 0 CHAINR(0) },
+#endif
+#ifdef ANDROID_GRAPHICS
+    { &and_procs, 0 CHAINR(0) },
 #endif
 #ifdef SHIM_GRAPHICS
     { &shim_procs, 0 CHAINR(0) },
@@ -1254,10 +1260,23 @@ dump_open_log(time_t now)
     if (!sysopt.dumplogfile)
         return;
     fname = dump_fmtstr(sysopt.dumplogfile, buf, TRUE);
+#elif defined(ANDROID)
+	if(iflags.dumplog)
+    {
+        char buf_[BUFSZ];
+        dump_fmtstr(DUMPLOG_FILE, buf_, TRUE);
+        and_get_dumplog_dir(buf);
+        if(strlen(buf_) + strlen(buf) < BUFSZ - 1)
+	        fname = strcat(buf, buf_);
+	    else
+	    	fname = strcpy(buf, buf_);
+    }
+    else
+	    fname = 0;
 #else
     fname = dump_fmtstr(DUMPLOG_FILE, buf, TRUE);
 #endif
-    dumplog_file = fopen(fname, "w");
+    dumplog_file = fname ? fopen(fname, "w") : 0;
     dumplog_windowprocs_backup = windowprocs;
 
 #else /*!DUMPLOG*/
@@ -1566,8 +1585,16 @@ flutter_putmixed_with_tile(winid window, int attr, int tile, const char *str)
 void
 genl_display_file(const char *fname, boolean complain)
 {
-    char buf[BUFSZ];
-    dlb *f = dlb_fopen(fname, "r");
+    char buf[BUFSZ], fname_jp[BUFSZ];
+    dlb *f = (dlb *) 0;
+
+    if (!strstr(fname, "_jp") && (strlen(fname) + 3 < sizeof fname_jp)) {
+        Strcpy(fname_jp, fname);
+        Strcat(fname_jp, "_jp");
+        f = dlb_fopen(fname_jp, "r");
+    }
+    if (!f)
+        f = dlb_fopen(fname, "r");
 
     if (!f) {
         if (complain) /* send complaint to stdout rather than to stderr */
