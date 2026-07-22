@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-22. */
 /* NetHack 5.0	dlb.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -444,6 +444,8 @@ dlb_init(void)
 
         if (dlb_procs)
             dlb_initialized = do_dlb_init();
+        else
+            dlb_initialized = TRUE;
     }
 
     return dlb_initialized;
@@ -453,7 +455,8 @@ void
 dlb_cleanup(void)
 {
     if (dlb_initialized) {
-        do_dlb_cleanup();
+        if (dlb_procs)
+            do_dlb_cleanup();
         dlb_initialized = FALSE;
     }
 }
@@ -465,8 +468,21 @@ dlb_fopen(const char *name, const char *mode)
     dlb *dp;
     char jpname[512];
 
-    if (!dlb_initialized)
-        return (dlb *) 0;
+    if (!dlb_initialized) {
+        (void) dlb_init();
+    }
+
+#ifdef ANDROID
+#include <android/log.h>
+#include <string.h>
+#include <errno.h>
+#ifndef LOG_TAG
+#define LOG_TAG "NetHackFlutter"
+#endif
+#ifndef debuglog
+#define debuglog(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#endif
+#endif
 
     /* only support reading; ignore possible binary flag */
     if (!mode || mode[0] != 'r')
@@ -474,23 +490,49 @@ dlb_fopen(const char *name, const char *mode)
 
     dp = (dlb *) alloc(sizeof(dlb));
 
-    if (should_try_jp_datafile(name)
-        && make_jp_datafile_name(name, jpname, sizeof jpname)) {
+#ifdef ANDROID
+    debuglog("dlb_fopen called with name: %s", name);
+#endif
+
+    /* ファイル名に _jp が含まれていなければ、まず _jp を付与した名前でのオープンを試みる */
+    if (make_jp_datafile_name(name, jpname, sizeof jpname)) {
+#ifdef ANDROID
+        debuglog("dlb_fopen: trying jp datafile name: %s", jpname);
+#endif
         if (do_dlb_fopen(dp, jpname, mode)) {
             dp->fp = (FILE *) 0;
+#ifdef ANDROID
+            debuglog("dlb_fopen: successfully opened jp file in DLB: %s", jpname);
+#endif
             return dp;
         } else if ((fp = fopen_datafile(jpname, mode, DATAPREFIX)) != 0) {
             dp->fp = fp;
+#ifdef ANDROID
+            debuglog("dlb_fopen: successfully opened jp file directly: %s", jpname);
+#endif
             return dp;
         }
+#ifdef ANDROID
+        else {
+            debuglog("dlb_fopen: failed to open jp file: %s (errno=%d: %s)", jpname, errno, strerror(errno));
+        }
+#endif
     }
 
+    /* 日本語版が開けなければ、元のファイル名（英語版）でフォールバックオープン */
     if (do_dlb_fopen(dp, name, mode))
         dp->fp = (FILE *) 0;
-    else if ((fp = fopen_datafile(name, mode, DATAPREFIX)) != 0)
+    else if ((fp = fopen_datafile(name, mode, DATAPREFIX)) != 0) {
         dp->fp = fp;
+#ifdef ANDROID
+        debuglog("dlb_fopen: fallback opened name: %s", name);
+#endif
+    }
     else {
         /* can't find anything */
+#ifdef ANDROID
+        debuglog("dlb_fopen: failed to open fallback file: %s (errno=%d: %s)", name, errno, strerror(errno));
+#endif
         free((genericptr_t) dp);
         dp = (dlb *) 0;
     }
@@ -499,54 +541,28 @@ dlb_fopen(const char *name, const char *mode)
 }
 
 staticfn boolean
-should_try_jp_datafile(const char *name)
+should_try_jp_datafile(const char *name UNUSED)
 {
-    static const char *const names[] = {
-        "help", "hh", "keyhelp", "wizhelp", "cmdhelp", "history",
-        "opthelp", "optmenu", "usagehlp", "rumors", "oracles",
-        "engrave", "epitaph", "data", "tribute"
-    };
-    size_t i;
-
-    if (!name || !*name)
-        return FALSE;
-
-    for (i = 0; i < sizeof names / sizeof names[0]; ++i)
-        if (!strcmp(name, names[i]))
-            return TRUE;
-
-    return FALSE;
+    return TRUE;
 }
 
+/*
+ * ファイル名末尾にシンプルに "_jp" を付与するヘルパー。
+ * 例: "data" -> "data_jp", "help" -> "help_jp"
+ * すでに "_jp" が付いている場合は FALSE を返す。
+ */
 staticfn boolean
 make_jp_datafile_name(const char *name, char *buf, size_t bufsz)
 {
-    const char *dot;
-    size_t base_len, ext_len;
-
     if (!name || !buf || bufsz < 8)
         return FALSE;
     if (strstr(name, "_jp"))
         return FALSE;
-
-    dot = strrchr(name, '.');
-    if (!dot) {
-        if (strlen(name) + 3 >= bufsz)
-            return FALSE;
-        strcpy(buf, name);
-        strcat(buf, "_jp");
-        return TRUE;
-    }
-
-    base_len = (size_t) (dot - name);
-    ext_len = strlen(dot);
-    if (base_len + 3 + ext_len >= bufsz)
+    if (strlen(name) + 3 >= bufsz)
         return FALSE;
 
-    memcpy(buf, name, base_len);
-    buf[base_len] = '\0';
-    strcat(buf, "_jp");
-    strcat(buf, dot);
+    Strcpy(buf, name);
+    Strcat(buf, "_jp");
     return TRUE;
 }
 
