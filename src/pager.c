@@ -1414,10 +1414,13 @@ checkfile(
                 yes_to_moreinfo = FALSE;
                 if (!user_typed_name && !without_asking) {
                     char *entrytext = pass ? alt : dbase_str;
+                    char disptext[BUFSZ];
                     char question[QBUFSZ];
 
+                    Strcpy(disptext, entrytext);
+                    jp_translate_screen_desc(disptext);
                     Snprintf(question, sizeof question,
-                             "\"%s\"の詳細を見る?", entrytext);
+                             "\"%s\"の詳細を見る?", disptext);
                     if (y_n(question) == 'y')
                         yes_to_moreinfo = TRUE;
                 }
@@ -2719,8 +2722,12 @@ do_supplemental_info(
         if (bp || bp2) {
             Strcpy(fullname, name);
             if (!without_asking) {
+                char disptext[BUFSZ];
+
+                Strcpy(disptext, entrytext);
+                jp_translate_screen_desc(disptext);
                 Snprintf(question, sizeof question,
-                         "\"%s\"の詳細を見る?", entrytext);
+                         "\"%s\"の詳細を見る?", disptext);
                 if (y_n(question) == 'y')
                 yes_to_moreinfo = TRUE;
             }
