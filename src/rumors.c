@@ -130,7 +130,10 @@ getrumor(
     if (gt.true_rumor_size < 0L) /* a previous try failed to open RUMORFILE */
         return rumor_buf;
 
-    rumors = dlb_fopen(RUMORFILE, "r");
+    /* NetHackJP: try rumors_jp first, fallback to RUMORFILE */
+    rumors = dlb_fopen("rumors_jp", "r");
+    if (!rumors)
+        rumors = dlb_fopen(RUMORFILE, "r");
     if (rumors) {
         int count = 0;
         int adjtruth;
@@ -200,7 +203,10 @@ rumor_check(void)
     winid tmpwin = WIN_ERR;
     char *endp, line[BUFSZ], xbuf[BUFSZ], rumor_buf[BUFSZ];
 
-    rumors = (gt.true_rumor_size >= 0) ? dlb_fopen(RUMORFILE, "r") : 0;
+    /* NetHackJP: try rumors_jp first, fallback to RUMORFILE */
+    rumors = (gt.true_rumor_size >= 0) ? dlb_fopen("rumors_jp", "r") : 0;
+    if (!rumors && gt.true_rumor_size >= 0)
+        rumors = dlb_fopen(RUMORFILE, "r");
     if (rumors) {
         long ftell_rumor_start = 0L;
 
@@ -675,7 +681,10 @@ outoracle(boolean special, boolean delphi)
     if (go.oracle_flg < 0 || (go.oracle_flg > 0 && svo.oracle_cnt == 0))
         return;
 
-    oracles = dlb_fopen(ORACLEFILE, "r");
+    /* NetHackJP: try oracles_jp first, fallback to ORACLEFILE */
+    oracles = dlb_fopen("oracles_jp", "r");
+    if (!oracles)
+        oracles = dlb_fopen(ORACLEFILE, "r");
 
     if (oracles) {
         if (go.oracle_flg == 0) { /* if this is the first outoracle() */

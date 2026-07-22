@@ -1585,8 +1585,16 @@ flutter_putmixed_with_tile(winid window, int attr, int tile, const char *str)
 void
 genl_display_file(const char *fname, boolean complain)
 {
-    char buf[BUFSZ];
-    dlb *f = dlb_fopen(fname, "r");
+    char buf[BUFSZ], fname_jp[BUFSZ];
+    dlb *f = (dlb *) 0;
+
+    if (!strstr(fname, "_jp") && (strlen(fname) + 3 < sizeof fname_jp)) {
+        Strcpy(fname_jp, fname);
+        Strcat(fname_jp, "_jp");
+        f = dlb_fopen(fname_jp, "r");
+    }
+    if (!f)
+        f = dlb_fopen(fname, "r");
 
     if (!f) {
         if (complain) /* send complaint to stdout rather than to stderr */

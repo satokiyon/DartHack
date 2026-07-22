@@ -1193,7 +1193,10 @@ checkfile(
     winid datawin = WIN_ERR;
     boolean res = FALSE;
 
-    fp = dlb_fopen(DATAFILE, "r");
+    /* NetHackJP: try data_jp first, fallback to DATAFILE */
+    fp = dlb_fopen("data_jp", "r");
+    if (!fp)
+        fp = dlb_fopen(DATAFILE, "r");
     if (!fp) {
         pline("'data'ファイルを開けなかった!");
         return res;
@@ -2850,7 +2853,10 @@ whatdoes_help(void)
     char *p, buf[BUFSZ];
     winid tmpwin;
 
-    fp = dlb_fopen(KEYHELP, "r");
+    /* NetHackJP: try keyhelp_jp first, fallback to KEYHELP */
+    fp = dlb_fopen("keyhelp_jp", "r");
+    if (!fp)
+        fp = dlb_fopen(KEYHELP, "r");
     if (!fp) {
         pline("\"%s\"データファイルを開けなかった!", KEYHELP);
         display_nhwindow(WIN_MESSAGE, TRUE);
