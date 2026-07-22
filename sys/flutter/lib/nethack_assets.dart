@@ -62,9 +62,6 @@ class NetHackAssets {
     final nethackAssets = assets.where((key) => key.startsWith('assets/nethackdir/')).toList();
     debugPrint("NetHackAssets: Found ${nethackAssets.length} assets in nethackdir.");
     for (final assetKey in nethackAssets) {
-      if (assetKey.contains('data') || assetKey.contains('tribute')) {
-        debugPrint("NetHackAssets: Copying asset: $assetKey");
-      }
       // 展開先のファイルパスを生成
       final relativePath = assetKey.replaceFirst('assets/nethackdir/', '');
       final dstFile = File('${dstDir.path}/$relativePath');
