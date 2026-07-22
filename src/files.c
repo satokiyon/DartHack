@@ -3666,9 +3666,18 @@ read_tribute(const char *tribsection, const char *tribtitle,
                     if (matchedtitle && passagenum == targetpassage) {
                         foundpassage = TRUE;
                         if (!nowin_buf) {
+#ifdef AND_GUI
+                            /* DartHack: set plain text dialog flag for flutter tribute reading */
+                            extern void set_flutter_plain_text_dialog(int);
+                            set_flutter_plain_text_dialog(1);
+#endif
                             tribwin = create_nhwindow(NHW_MENU);
-                            if (tribwin == WIN_ERR)
+                            if (tribwin == WIN_ERR) {
+#ifdef AND_GUI
+                                set_flutter_plain_text_dialog(0);
+#endif
                                 goto cleanup;
+                            }
                         }
                     }
                 }
@@ -3719,6 +3728,9 @@ read_tribute(const char *tribsection, const char *tribtitle,
                 char *p;
 
                 display_nhwindow(tribwin, FALSE);
+#ifdef AND_GUI
+                set_flutter_plain_text_dialog(0);
+#endif
                 /* put the final attribution line into message history,
                    analogous to the summary line from long quest messages */
                 if (strchr(lastline, '['))
@@ -3730,6 +3742,9 @@ read_tribute(const char *tribsection, const char *tribtitle,
                 putmsghistory(lastline, FALSE);
                 grasped = TRUE;
             }
+#ifdef AND_GUI
+            set_flutter_plain_text_dialog(0);
+#endif
             destroy_nhwindow(tribwin);
         }
         if (!grasped)

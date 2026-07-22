@@ -986,8 +986,9 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (type == 'displayWindow') {
           final winId = message['winId'] as int;
           final blocking = (message['blocking'] as int? ?? 0) != 0;
-          _addLog("displayWindow: winId=$winId, blocking=$blocking, textVisible=${_screen.isTextWindowVisible}, menuVisible=${_screen.isMenuWindowVisible}");
-          _screen.displayWindow(winId, blocking);
+          final isPlain = (message['isPlain'] as int? ?? 0) != 0;
+          _addLog("displayWindow: winId=$winId, blocking=$blocking, isPlain=$isPlain, textVisible=${_screen.isTextWindowVisible}, menuVisible=${_screen.isMenuWindowVisible}");
+          _screen.displayWindow(winId, blocking, isPlain: isPlain);
           _addLog("displayWindow after: textVisible=${_screen.isTextWindowVisible}, menuVisible=${_screen.isMenuWindowVisible}");
           // C側の blocking に基づく
           if (_mapWinId != null && winId == _mapWinId) {
@@ -3341,7 +3342,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     final line = _screen.textLines[index];
                                     final trimmed = line.trim();
                                     final isDivider = trimmed.isEmpty || RegExp(r'^[-=\s]+$').hasMatch(trimmed);
-                                    final isCategory = !isDivider && (trimmed.endsWith(':') || trimmed.endsWith('：'));
+                                    final isCategory = !_screen.isPlainDialog && !isDivider && (trimmed.endsWith(':') || trimmed.endsWith('：'));
 
                                     if (isCategory) {
                                       return _buildMenuCategoryRow(line);

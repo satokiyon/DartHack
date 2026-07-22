@@ -25,7 +25,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _useTiles = true;
-  String _selectedTileset = 'nevanda_32x32';
+  String _selectedTileset = 'pixelhack_32x32';
   String _controllerMode = 'pad';
   int _statusDisplayMode = 0;
   int _tombstoneDisplayMode = 0; // 0: 画像+文字オーバーレイ, 1: Cコア出力そのまま(テキスト)
@@ -143,7 +143,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _useTiles = prefs.getBool('use_tiles') ?? true;
-      _selectedTileset = prefs.getString('selected_tileset') ?? 'nevanda_32x32';
+      _selectedTileset = prefs.getString('selected_tileset') ?? 'pixelhack_32x32';
       _controllerMode = prefs.getString('controller_mode') ?? 'pad';
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
       final tombstoneModeRaw = prefs.getInt('tombstone_display_mode');

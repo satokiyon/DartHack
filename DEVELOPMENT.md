@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-21. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-22. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -258,6 +258,25 @@ str)` という API しかなく、 タイル ID を直接渡せないため、 
      - ガス雲消散時のメッセージから `plur(gg.gas_cloud_diss_seen)` を排除。
 * **アップストリーム追従手順**:
   1. 本件は日本語メッセージのフォーマットに合わせた修正（日本語化特有の対応）であるため、アップストリームマージ時に競合した場合は、日本語側の文脈に合わせて `plur` や英語表記を排除する変更を維持するように競合解決を行ってください。
+
+### 6. Flutter版専用のテキスト表示制御（データベース検索結果・小説表示時のプレーンテキストフラグ設定）
+
+Flutter版において、データベースの検索結果（`checkfile()`）および小説（`read_tribute()`）を表示する際、文中の「`:`」で終わる行（例: "Notes:" や "Description:" など）がメニューカテゴリヘッダーとして太字・大フォント装飾されてしまうのを防ぎ、全行を均一なプレーンテキストとして Flutter UI に渡すための Flutter 専用フラグ設定です。
+
+* **マーカータグ**: 
+  - `/* DartHack: set plain text dialog flag for flutter lookup result */`
+  - `/* DartHack: set plain text dialog flag for flutter tribute reading */`
+* **対象ファイル**:
+  1. **`src/pager.c`**:
+     - `checkfile()` 関数内で `create_nhwindow(NHW_MENU)` の直前および `display_nhwindow` 直後に `#ifdef AND_GUI` ガード付きで `set_flutter_plain_text_dialog(1)` / `(0)` の呼び出しを追加。
+  2. **`src/files.c`**:
+     - `read_tribute()` 関数内で `create_nhwindow(NHW_MENU)` の直前および `display_nhwindow` 直後に `#ifdef AND_GUI` ガード付きで `set_flutter_plain_text_dialog(1)` / `(0)` の呼び出しを追加。
+* **背景と注意事項**:
+  - `set_flutter_plain_text_dialog` の実体は `sys/flutter` 配下（`winflutter.c`）にのみ存在し、共有コアの `src/windows.c` や `include/extern.h` を汚染しないよう局所宣言（`#ifdef AND_GUI` 内での `extern` 宣言）を併用しています。
+  - ヘルプファイル表示（`display_file()`）などでは本フラグは設定されず、従来通りのヘッダー装飾が維持されます。
+* **アップストリーム追従手順**:
+  - 本変更は `#ifdef AND_GUI` マクロで完全に囲まれており、かつ呼び出し箇所も `checkfile()` と `read_tribute()` の数行に限定されています。
+  - アップストリーム（NetHack 本家 / NetHackJP）の更新により `pager.c` や `files.c` が変更された場合でも、`#ifdef AND_GUI` ブロック内の `set_flutter_plain_text_dialog(1)` / `(0)` の呼び出し位置を維持したままマージを完了させてください。
 
 ---
 

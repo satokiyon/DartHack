@@ -1431,6 +1431,11 @@ checkfile(
                     if (ia_checking)
                         goto checkfile_done;
 
+#ifdef AND_GUI
+                    /* DartHack: set plain text dialog flag for flutter lookup result */
+                    extern void set_flutter_plain_text_dialog(int);
+                    set_flutter_plain_text_dialog(1);
+#endif
                     datawin = create_nhwindow(NHW_MENU);
                     for (i = 0; i < entry_count; i++) {
                         /* room for 1-tab or 8-space prefix + BUFSZ-1 + \0 */
@@ -1464,6 +1469,9 @@ checkfile(
                         putstr(datawin, 0, tp);
                     }
                     display_nhwindow(datawin, FALSE);
+#ifdef AND_GUI
+                    set_flutter_plain_text_dialog(0);
+#endif
                     destroy_nhwindow(datawin), datawin = WIN_ERR;
                 }
             } else if (user_typed_name && pass == 0 && !pass1found_in_file) {
@@ -1489,6 +1497,9 @@ checkfile(
  bad_data_file:
     impossible("'data' file in wrong format or corrupted");
  checkfile_done:
+#ifdef AND_GUI
+    set_flutter_plain_text_dialog(0);
+#endif
     if (datawin != WIN_ERR)
         destroy_nhwindow(datawin);
     (void) dlb_fclose(fp);

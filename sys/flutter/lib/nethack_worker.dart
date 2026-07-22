@@ -81,11 +81,12 @@ class NetHackWorker {
             });
           });
 
-          displayCallable = NativeCallable<DisplayWindowCallback>.listener((int winId, int blocking) {
+          displayCallable = NativeCallable<DisplayWindowCallback>.listener((int winId, int blocking, int isPlain) {
             uiSendPort.send({
               'type': 'displayWindow',
               'winId': winId,
               'blocking': blocking,
+              'isPlain': isPlain,
             });
           });
 

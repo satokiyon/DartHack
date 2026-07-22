@@ -135,7 +135,7 @@ static const unsigned short cp437_to_unicode[256] = {
 // Dart側への中継用コールバック関数の型定義
 typedef void (*DartCreateWindowCallback)(int winId, int type);
 typedef void (*DartClearWindowCallback)(int winId);
-typedef void (*DartDisplayWindowCallback)(int winId, int blocking);
+typedef void (*DartDisplayWindowCallback)(int winId, int blocking, int isPlain);
 typedef void (*DartDestroyWindowCallback)(int winId);
 typedef void (*DartCursCallback)(int winId, int x, int y);
 typedef void (*DartPutStrCallback)(int winId, int attr, const char* str);
@@ -172,6 +172,12 @@ static DartExitCallback g_exit_cb = NULL;
 static DartNumberPadModeCallback g_number_pad_mode_cb = NULL;
 static DartCliparoundCallback g_cliparound_cb = NULL;
 static DartPutMixedWithTileCallback g_putmixed_cb = NULL;
+static int g_is_plain_text_dialog = 0;
+
+void set_flutter_plain_text_dialog(int enable) {
+    g_is_plain_text_dialog = enable;
+    debuglog("set_flutter_plain_text_dialog: %d", enable);
+}
 
 // 同期待信用変数
 static volatile char g_yn_result = 0;
@@ -892,7 +898,7 @@ static void flutter_display_nhwindow(winid window, boolean blocking) {
 
     debuglog("flutter_display_nhwindow win=%d, block=%d", window, blocking);
     if (g_display_window_cb) {
-        g_display_window_cb((int)window, blocking ? 1 : 0);
+        g_display_window_cb((int)window, blocking ? 1 : 0, g_is_plain_text_dialog);
     }
     if (blocking) {
         if (window != WIN_MAP && window != WIN_STATUS) {
@@ -1086,12 +1092,14 @@ static int flutter_doprev_message(void) {
         return 0;
     }
 
+    set_flutter_plain_text_dialog(1);
+
     if (g_msg_history_count <= 0) {
         flutter_putstr(wid, ATR_NONE, "メッセージ履歴はまだありません.");
     } else {
         int start = (g_msg_history_idx - g_msg_history_count + FLUTTER_MSG_HISTORY_MAX)
                     % FLUTTER_MSG_HISTORY_MAX;
-        flutter_putstr(wid, ATR_BOLD, "メッセージ履歴:");
+        flutter_putstr(wid, ATR_NONE, "メッセージ履歴:");
         flutter_putstr(wid, ATR_NONE, "");
         for (int i = 0; i < g_msg_history_count; i++) {
             int idx = (start + i) % FLUTTER_MSG_HISTORY_MAX;
@@ -1102,6 +1110,7 @@ static int flutter_doprev_message(void) {
     }
 
     flutter_display_nhwindow(wid, TRUE);
+    set_flutter_plain_text_dialog(0);
     flutter_destroy_nhwindow(wid);
     return 0;
 }

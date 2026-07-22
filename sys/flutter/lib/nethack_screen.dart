@@ -99,6 +99,8 @@ class NetHackScreen extends ChangeNotifier {
   List<int> get textTiles => _textTiles;
   bool _isTextWindowVisible = false;
   bool get isTextWindowVisible => _isTextWindowVisible && _menuItems.isEmpty;
+  bool _isPlainDialog = false;
+  bool get isPlainDialog => _isPlainDialog;
 
   // メニュー表示用バッファ (NHW_MENU 用)
   final List<MenuItemData> _menuItems = [];
@@ -331,8 +333,9 @@ class NetHackScreen extends ChangeNotifier {
     notifyListeners();
   }
 
-  void displayWindow(int winId, bool blocking) {
+  void displayWindow(int winId, bool blocking, {bool isPlain = false}) {
     final type = _winTypes[winId];
+    _isPlainDialog = isPlain;
 
     if (type == nhwMessage || winId == 1 /* WIN_MESSAGE */) {
       if (blocking) {

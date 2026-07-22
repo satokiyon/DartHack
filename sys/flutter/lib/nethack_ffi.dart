@@ -4,7 +4,7 @@ import 'package:ffi/ffi.dart';
 // コールバックの型定義
 typedef CreateWindowCallback = Void Function(Int32 winId, Int32 type);
 typedef ClearWindowCallback = Void Function(Int32 winId);
-typedef DisplayWindowCallback = Void Function(Int32 winId, Int32 blocking);
+typedef DisplayWindowCallback = Void Function(Int32 winId, Int32 blocking, Int32 isPlain);
 typedef DestroyWindowCallback = Void Function(Int32 winId);
 typedef CursCallback = Void Function(Int32 winId, Int32 x, Int32 y);
 typedef PutStrCallback = Void Function(Int32 winId, Int32 attr, Pointer<Utf8> msg);

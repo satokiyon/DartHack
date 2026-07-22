@@ -148,4 +148,11 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
     - **指示代名詞誤訳（「色」など）の解明と修復**: 過去の機械翻訳ツール等により、英語の指示代名詞 `this`, `it`, `he` などが「色」と誤直訳されているケースがあります。翻訳文の再点検時には原文の英語構造を確認し、無関係な「色」を排除して本来の文脈（「これ」「それ」「彼」等）に再構築してください。
     - **表示幅上限（75文字以内）の厳守**: `dat/tribute_jp` などのデータファイルを修正・更新する際は、各行の表示幅（全角2, 半角1）が 75 表示幅を超過しないよう、助詞の整理や文節の分割・調整を徹底してください。
 
+## 23. 共有コード変更時のマーカータグ命名規則 (`DartHack`)
+- Upstream (NetHackJP や NetHack 本家) からの変更と区別するため、`src/`, `include/` 等の共有ディレクトリ内のコードを変更・追記する際は、必ず `/* DartHack: ... */` というコメントマーカーを明記してください (`/* NetHackJP: ... */` ではなく `DartHack` を使用)。
+
+## 24. sys/flutter における C コア完全分離と二重定義 (Duplicate Symbol) 回避原則
+- `set_flutter_plain_text_dialog` などの Flutter 固有の C 関数・定義・フラグは、`src/windows.c` や `include/extern.h` を変更せず、すべて `sys/flutter` (`winflutter.c`) 内に完全に閉じて実装・保持してください。
+- 共有コア (`src/pager.c`, `src/files.c` 等) から Flutter 固有の C 関数を呼び出す必要がある場合は、`#ifdef AND_GUI` ガード内でローカル（ブロック内） `extern` 宣言と呼び出しを行い、`src/windows.c` へのスタブ関数の追加や `include/extern.h` への追加を避けてください。これにより、Release ビルドでの duplicate symbol リンカーエラーを防止し、Upstream マージ時の競合を最小化できます。
+
 

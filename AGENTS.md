@@ -479,7 +479,13 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
    - 履歴ボタンは「応答ボタン」と視覚的に区別するため Amber アウトライン。色を変えたい場合は `_buildMsgHistoryButton` を 1 箇所修正すれば全体に反映。
    - テキストオーバーレイの履歴ボタンは死亡時に限らず常時表示。UX 一貫性のため（`#overview` 等の通常テキストページでも「いままでのメッセージ何があったっけ?」が起きたときに確認できる）。
 
+## 共有コード変更時のマーカータグ命名規則 (`DartHack`)
+- Upstream (NetHackJP や NetHack 本家) からの変更と区別するため、`src/`, `include/` 等の共有ディレクトリ内のコードを変更・追記する際は、必ず `/* DartHack: ... */` というコメントマーカーを明記してください (`/* NetHackJP: ... */` ではなく `DartHack` を使用)。
+
+## sys/flutter における C コア完全分離と二重定義 (Duplicate Symbol) 回避原則
+- `set_flutter_plain_text_dialog` などの Flutter 固有の C 関数・定義・フラグは、`src/windows.c` や `include/extern.h` を変更せず、すべて `sys/flutter` (`winflutter.c`) 内に完全に閉じて実装・保持してください。
+- 共有コア (`src/pager.c`, `src/files.c` 等) から Flutter 固有の C 関数を呼び出す必要がある場合は、`#ifdef AND_GUI` ガード内でローカル（ブロック内） `extern` 宣言と呼び出しを行い、`src/windows.c` へのスタブ関数の追加や `include/extern.h` への追加を避けてください。これにより、Release ビルドでの duplicate symbol リンカーエラーを防止し、Upstream マージ時の競合を最小化できます。
+
 7. **検証手順**:
    - `dart analyze` で 0 issues を確認（本機能追加時）。
    - 実機確認: 死亡 → YN 確認で「持ち物を識別しますか?」などに履歴ボタンが出る。墓石画面の OK の左にも出る。`\call` で任意アイテムを呼び名し、そのプロンプトでも履歴ボタンが出る。銘刻プロンプト（`\e -lorem` 等）では出ない。
-
