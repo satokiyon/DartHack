@@ -61,6 +61,19 @@ flutter:
   assets:
     - assets/ver
     - assets/nethackdir/
+    - assets/nethackdir/data_jp
+    - assets/nethackdir/oracles_jp
+    - assets/nethackdir/rumors_jp
+    - assets/nethackdir/tribute_jp
+    - assets/nethackdir/help_jp
+    - assets/nethackdir/hh_jp
+    - assets/nethackdir/cmdhelp_jp
+    - assets/nethackdir/keyhelp_jp
+    - assets/nethackdir/history_jp
+    - assets/nethackdir/opthelp_jp
+    - assets/nethackdir/optmenu_jp
+    - assets/nethackdir/usagehlp_jp
+    - assets/nethackdir/wizhelp_jp
     - assets/tiles/
     - assets/tombstone.png
     - assets/darthack_title.png

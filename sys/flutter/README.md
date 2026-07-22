@@ -204,9 +204,9 @@ flutter.versionCode=1
    - `sys/android/gradlew.bat assembleDebug` を実行
 3. 生成物: `sys/android/app/build/outputs/apk/debug/app-debug.apk`
 
-> **NOTE:** Android ポートでは英語版データファイル (`data`, `help`, ... 等) は **完全に除去** され、日本語版データが `data` / `help` 等の標準ファイル名でアセット化されています。データ更新時は `sys/android/Makefile.top` の `dofiles-nodlb` ターゲット配下のアセットコピー処理で `_jp` ファイルを英語名へリネーム（`mv -f`）していることを確認してください。
+> **NOTE:** Android / Flutter ポートでは Windows 版と同様に、英語版データファイル (`data`, `help`, ... 等) と日本語版データファイル (`data_jp`, `help_jp`, ... 等) の **両方がアセットとして同梱** されます。C コアが動的に `_jp` ファイルを優先検索し、見つからなければ英語版に自動フォールバックしてロードします。
 >
-> データファイルを変更した際は **必ず `sys/android/app/assets/ver` のバージョン番号をインクリメント** してください（Flutter 側 `lib/nethack_assets.dart` のアセット展開判定基準となる）。
+> データファイルを変更した際は **必ず `assets/ver` のバージョン番号をインクリメント** してください（Flutter 側 `lib/nethack_assets.dart` のアセット展開判定基準となる）。
 
 #### 個別にビルドする場合
 
@@ -314,7 +314,7 @@ flutter test
 NetHack のデータファイル（`dat/` または `src/dat/` 内の `data.raw`, `rumors.tru`, `oracles.txt` 等）に変更を加えた場合、**`flutter run` や `flutter build` を実行するだけで全自動でアセットに反映されます**。
 
 1. **自動検知と生成**: Android Gradle (`preBuild`) および Windows CMake の事前ビルドフックにより、`scripts/sync_dat_assets.ps1` が起動します。ソースデータに更新があれば WSL 経由でデータファイルを再ビルドします。
-2. **日本語ファイル名の標準化**: 生成された `data_jp` や `rumors_jp` などの日本語データファイルは、自動的に標準のファイル名（`data`, `rumors` 等）へ上書き変換されて `assets/nethackdir/` に配置されます。
+2. **両言語アセットの同期**: 生成された `data_jp` や `rumors_jp` などの日本語データファイルと `data` や `rumors` 等の英語版データファイルの両方がそのまま `assets/nethackdir/` に配置されます。
 3. **バージョン自動インクリメント**: `assets/nethackdir/` 配下が更新された場合、`assets/ver` の数値が自動的に `+1` カウントアップされます。
 4. **差分がない場合の高速化**: `dat/` に変更がない場合は同期処理が自動的にスキップされるため、ビルド時間を遅延させません。
 5. **手動で同期する場合**:

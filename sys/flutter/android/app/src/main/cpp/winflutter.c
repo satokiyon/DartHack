@@ -913,12 +913,22 @@ static void flutter_destroy_nhwindow(winid window) {
 static void flutter_display_file(const char *name, boolean complain) {
     debuglog("flutter_display_file: %s, complain=%d", name ? name : "NULL", complain);
 
-    dlb *f;
+    dlb *f = (dlb *) 0;
     char buf[BUFSZ];
+    char name_jp[512];
     char *cr;
 
     flutter_clear_nhwindow(WIN_MESSAGE);
-    f = dlb_fopen(name, "r");
+
+    if (name && !strstr(name, "_jp") && (strlen(name) + 3 < sizeof name_jp)) {
+        Strcpy(name_jp, name);
+        Strcat(name_jp, "_jp");
+        f = dlb_fopen(name_jp, "r");
+    }
+    if (!f && name) {
+        f = dlb_fopen(name, "r");
+    }
+
     if (f) {
         winid datawin = flutter_create_nhwindow(NHW_TEXT);
         boolean empty = TRUE;

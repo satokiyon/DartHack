@@ -103,7 +103,7 @@ SPEC_LEVS = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
 QUEST_LEVS = ???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua
 
 DATNODLB = $(VARDATND) license symbols
-DATDLB = $(DATHELP) dungeon.lua tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
+DATDLB = $(DATHELP) dungeon.lua tribute tribute_jp $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
 DAT = $(DATNODLB) $(DATDLB)
 
 # These get set only if they weren't already set above or in a hints file
@@ -373,12 +373,6 @@ dofiles-dlb: check-dlb
 dofiles-nodlb:
 # copy over the game files
 	( cd dat ; cp $(DAT) $(INSTDIR) )
-	-( cd $(INSTDIR) ; \
-	  for f in help hh cmdhelp keyhelp history opthelp optmenu usagehlp wizhelp data rumors oracles; do \
-	    if [ -f $${f}_jp ]; then \
-	      mv -f $${f}_jp $$f ; \
-	    fi ; \
-	  done )
 # set up their permissions
 	#-( cd $(INSTDIR) ; $(CHOWN) $(GAMEUID) $(DAT) ; \
 			#$(CHGRP) $(GAMEGRP) $(DAT) ; \
