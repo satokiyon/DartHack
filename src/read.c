@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-23. */
 /* NetHack 5.0	read.c	$NHDT-Date: 1782083451 2026/06/21 18:10:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.334 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -3014,7 +3014,7 @@ do_class_genocide(void)
                         if (i == PM_HIGH_CLERIC)
                             uniq = FALSE;
 
-                        You("%s%sの絶滅は許されていない。",
+                        pline("%s%sの絶滅は許されていない。",
                             (uniq && !named) ? "" : "",
                             (uniq || named) ? jp_pmname(&mons[i], NEUTRAL) : nam);
                     }

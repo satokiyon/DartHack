@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-23. */
 /* NetHack 5.0	wizcmds.c	$NHDT-Date: 1781973074 2026/06/20 16:31:14 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.36 $ */
 /*-Copyright (c) Robert Patrick Rankin, 2024. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -363,7 +363,7 @@ wiz_load_lua(void)
                 16*1024*1024, 0, 16*1024*1024};
 
         buf[0] = '\0';
-        getlin("Load which lua file?", buf);
+        getlin("どのLuaファイルを読み込みますか？", buf);
         if (buf[0] == '\033' || buf[0] == '\0')
             return ECMD_CANCEL;
         if (!strchr(buf, '.'))
@@ -382,7 +382,7 @@ wiz_load_splua(void)
         char buf[BUFSZ];
 
         buf[0] = '\0';
-        getlin("Load which des lua file?", buf);
+        getlin("どのdes Luaファイルを読み込みますか？", buf);
         if (buf[0] == '\033' || buf[0] == '\0')
             return ECMD_CANCEL;
         if (!strchr(buf, '.'))
@@ -415,7 +415,7 @@ int
 wiz_flip_level(void)
 {
     static const char choices[] = "0123",
-        prmpt[] = "Flip 0=randomly, 1=vertically, 2=horizontally, 3=both:";
+        prmpt[] = "階層を反転 0=ランダム, 1=垂直, 2=水平, 3=両方:";
 
     /*
      * Does not handle
@@ -503,15 +503,15 @@ wiz_telekinesis(void)
     cc.x = u.ux;
     cc.y = u.uy;
 
-    pline("Pick a monster to hurtle.");
+    pline("投げつけるモンスターを選択してください。");
     do {
-        ans = getpos(&cc, TRUE, "a monster");
+        ans = getpos(&cc, TRUE, "モンスター");
         if (ans < 0 || cc.x < 1)
             return ECMD_CANCEL;
 
         if ((((mtmp = m_at(cc.x, cc.y)) != 0) && canspotmon(mtmp))
             || u_at(cc.x, cc.y)) {
-            if (!getdir("which direction?"))
+            if (!getdir("どの方向？"))
                 return ECMD_CANCEL;
 
             if (mtmp) {
@@ -542,8 +542,8 @@ wiz_panic(void)
         return ECMD_OK;
     }
     if (paranoid_query(TRUE,
-                       "Do you want to call panic() and end your game?"))
-        panic("Crash test (#panic).");
+                       "panic()を呼び出してゲームを終了しますか？"))
+        panic("クラッシュテスト (#panic).");
     return ECMD_OK;
 }
 
@@ -552,12 +552,12 @@ int
 wiz_fuzzer(void)
 {
     if (flags.suppress_alert < FEATURE_NOTICE_VER(3,7,0)) {
-        pline("The fuzz tester will make NetHack execute random keypresses.");
+        pline("ファズテスターはNetHackにランダムなキー入力を実行させます。");
         There("にはこのモードから抜け出す通常の方法はない.");
     }
-    if (paranoid_query(TRUE, "Do you want to start fuzz testing?")) {
+    if (paranoid_query(TRUE, "ファズテストを開始しますか？")) {
         /* Thoth, take the reins */
-        if (y_n("Do you want to call panic() after impossible()?") == 'n') {
+        if (y_n("impossible()の後にpanic()を呼び出しますか？") == 'n') {
             iflags.debug_fuzzer = fuzzer_impossible_continue;
         } else {
             iflags.debug_fuzzer = fuzzer_impossible_panic;
@@ -902,8 +902,8 @@ wiz_smell(void)
 
     You("匂いを嗅ぎたいモンスターへカーソルを動かせた.");
     do {
-        pline("Pick a monster to smell.");
-        ans = getpos(&cc, TRUE, "a monster");
+        pline("匂いを嗅ぐモンスターを選択してください。");
+        ans = getpos(&cc, TRUE, "モンスター");
         if (ans < 0 || cc.x < 0) {
             return ECMD_CANCEL; /* done */
         }
@@ -927,9 +927,12 @@ wiz_smell(void)
         if (mptr) {
             if (is_you)
                 You("こっそり%sの下を嗅いだ.", jp_body_part(ARM));
-            if (!usmellmon(mptr))
-                pline("%s to not give off any smell.",
-                      is_you ? "You seem" : "That monster seems");
+            if (!usmellmon(mptr)) {
+                if (is_you)
+                    pline("あなたからは何の匂いも漂ってこないようだ。");
+                else
+                    pline("そのモンスターからは何の匂いも漂ってこないようだ。");
+            }
             if (!glyph_is_monster(glyph))
                 map_invisible(cc.x, cc.y);
         } else {
@@ -1076,8 +1079,8 @@ wiz_intrinsic(void)
                 if (p != GLIB)
                     incr_itimeout(&u.uprops[p].intrinsic, amt);
                 disp.botl = TRUE; /* have pline() do a status update */
-                pline("Timeout for %s %s %d.", propname,
-                      oldtimeout ? "increased by" : "set to", amt);
+                pline("%sのタイムアウトが%d %s。", propname, amt,
+                      oldtimeout ? "増加した" : "に設定された");
                 break;
             }
             /* this has to be after incr_itimeout() */
@@ -1527,11 +1530,10 @@ list_migrating_mons(
             ++other;
     }
     if (here + nxtlv + other == 0) {
-        pline("No monsters currently migrating.");
+        pline("現在移動中のモンスターはいません。");
     } else {
-        pline(
-      "%d mon%s pending for current level, %d for next level, %d for others.",
-              here, plur(here), nxtlv, other);
+        pline("現在の階層へ移動予定: %d体、次の階層: %d体、その他の階層: %d体。",
+              here, nxtlv, other);
         prmpt[0] = xtra[0] = '\0';
         (void) strkitten(here ? prmpt : xtra, 'c');
         (void) strkitten(nxtlv ? prmpt : xtra, 'n');
@@ -1539,7 +1541,7 @@ list_migrating_mons(
         Strcat(prmpt, "a q");
         if (*xtra)
             Sprintf(eos(prmpt), "%c%s", '\033', xtra);
-        c = yn_function("List which?", prmpt, 'q', TRUE);
+        c = yn_function("どれを一覧表示しますか？", prmpt, 'q', TRUE);
         n = (c == 'c') ? here
             : (c == 'n') ? nxtlv
               : (c == 'o') ? other
@@ -1551,13 +1553,13 @@ list_migrating_mons(
             case 'c':
             case 'n':
             case 'o':
-                Sprintf(buf, "Monster%s migrating to %s:", plur(n),
-                        (c == 'c') ? "current level"
-                        : (c == 'n') ? "next level"
-                          : "'other' levels");
+                Sprintf(buf, "%sへ移動中のモンスター:",
+                        (c == 'c') ? "現在の階層"
+                        : (c == 'n') ? "次の階層"
+                          : "その他の階層");
                 break;
             default:
-                Strcpy(buf, "All migrating monsters:");
+                Strcpy(buf, "すべての移動中モンスター:");
                 break;
             }
             putstr(win, 0, buf);
@@ -1593,12 +1595,12 @@ list_migrating_mons(
                 if (has_mgivenname(mtmp)) /* if mtmp is named, include that */
                     Sprintf(eos(buf), "（%s）", MGIVENNAME(mtmp));
                 if (c == 'o' || c == 'a')
-                    Sprintf(eos(buf), " to %d:%d", mtmp->mux, mtmp->muy);
+                    Sprintf(eos(buf), "（移動先 %d:%d）", mtmp->mux, mtmp->muy);
                 xyloc = mtmp->mtrack[0].x; /* (for legibility) */
                 if (xyloc == MIGR_EXACT_XY) {
                     x = mtmp->mtrack[1].x;
                     y = mtmp->mtrack[1].y;
-                    Sprintf(eos(buf), " at <%d,%d>", (int) x, (int) y);
+                    Sprintf(eos(buf), " 位置 <%d,%d>", (int) x, (int) y);
                 }
                 putstr(win, 0, buf);
             }
@@ -1606,7 +1608,7 @@ list_migrating_mons(
             display_nhwindow(win, FALSE);
             destroy_nhwindow(win);
         } else if (c != 'q') {
-            pline("None.");
+            pline("なし。");
         }
 
     }
@@ -1784,7 +1786,7 @@ wiz_display_macros(void)
 int
 wiz_show_nhuuid(void)
 {
-    pline("The NHUUID for this game is { %s }.", svn.nhuuid);
+    pline("このゲームのNHUUIDは { %s } です。", svn.nhuuid);
     return ECMD_OK;
 }
 
@@ -1824,7 +1826,7 @@ wiz_mon_diff(void)
         }
     }
     if (!trouble)
-        putstr(win, 0, "No monster difficulty discrepancies were detected.");
+        putstr(win, 0, "モンスターの難易度の不一致は検出されませんでした。");
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
     return ECMD_OK;
@@ -1897,7 +1899,7 @@ wiz_migrate_mons(void)
 #ifdef DEBUG_MIGRATING_MONS
     inbuf[0] = inbuf[1] = '\0';
     if (tolevel.dnum || tolevel.dlevel)
-        getlin("How many random monsters to migrate to next level? [0]",
+        getlin("次の階へ移動させるランダムモンスターの数は？ [0]",
                inbuf);
     else
         pline("ここからはそこへ行けません。");
