@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-23. */
 /* NetHack 5.0	pline.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -616,12 +616,12 @@ impossible(const char *s, ...)
     pline("%s", pbuf2);
     pline("これらのメッセージを %s まで報告してください.", DEVTEAM_EMAIL);
     if (sysopt.support) {
-        pline("Alternatively, contact local support: %s", sysopt.support);
+        pline("または、ローカルサポート（%s）に連絡してください。", sysopt.support);
     }
 
 #ifdef CRASHREPORT
     if (sysopt.crashreporturl) {
-        boolean report = ('y' == yn_function("Report now?", ynchars,
+        boolean report = ('y' == yn_function("今すぐ報告しますか?", ynchars,
                                              'n', FALSE));
 
         raw_print(""); /* prove to the user the character was accepted */
