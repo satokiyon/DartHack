@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-23. */
 /* NetHack 5.0	unixmain.c	$NHDT-Date: 1711213891 2024/03/23 17:11:31 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.127 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -257,16 +257,16 @@ main(int argc, char *argv[])
         /* if there are early trouble-messages issued, let's
          * not go overtop of them with a pline just yet */
         if (ge.early_raw_messages)
-            raw_print("Restoring save file...");
+            raw_print("セーブファイルを復元中...");
         else
-            pline("Restoring save file...");
+            pline("セーブファイルを復元中...");
         mark_synch(); /* flush output */
         if (dorecover(nhfp)) {
             resuming = TRUE; /* not starting new game */
             wd_message();
             if (discover || wizard) {
                 /* this seems like a candidate for paranoid_confirmation... */
-                if (y_n("Do you want to keep the save file?") == 'n') {
+                if (y_n("セーブファイルを保存しておきますか？") == 'n') {
                     (void) delete_savefile();
                 } else {
                     (void) chmod(fq_save, FCMASK); /* back to readable */
@@ -658,20 +658,19 @@ wd_message(void)
     if (iflags.wiz_error_flag) {
         if (sysopt.wizards && sysopt.wizards[0]) {
             char *tmp = build_english_list(sysopt.wizards);
-            pline("Only user%s %s may access debug (wizard) mode.",
-                  strchr(sysopt.wizards, ' ') ? "s" : "", tmp);
+            pline("ユーザー %s のみがデバッグ（ウィザード）モードを利用できます。", tmp);
             free(tmp);
         } else {
-            You("デバッグモード（ウィザードモード）にはアクセスできなかった。");
+            pline("デバッグモード（ウィザードモード）にはアクセスできませんでした。");
         }
         wizard = FALSE; /* (paranoia) */
         if (!iflags.explore_error_flag)
-            pline("Entering explore/discovery mode instead.");
+            pline("代わりに探索モードに入ります。");
     } else if (iflags.explore_error_flag) {
-        You("探索モードにはアクセスできなかった。"); /* same as enter_explore_mode */
+        pline("探索モードにはアクセスできませんでした。"); /* same as enter_explore_mode */
         discover = iflags.deferred_X = FALSE; /* (more paranoia) */
     } else if (discover)
-        You("スコアが記録されない探索・探検モードだった。");
+        pline("スコアが記録されない探索モードです。");
 }
 
 /*
