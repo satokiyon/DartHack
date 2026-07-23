@@ -188,6 +188,8 @@ class _MyHomePageState extends State<MyHomePage> {
   DPadMoveMode _dPadLongPressMoveMode = DPadMoveMode.gUpper;
   List<DPadMoveMode> _enabledDPadMoveModes = List<DPadMoveMode>.from(_allDPadMoveModes);
   bool _isDirectionPromptActive = false;
+  String _mapTapTravelMode = 'always';
+  bool _isMapScrolledOrZoomed = false;
 
   @override
   void initState() {
@@ -244,6 +246,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       final savedLongPressMoveModeName = prefs.getString('dpad_long_press_move_mode') ?? 'G_UPPER';
       _dPadLongPressMoveMode = _parseMoveMode(savedLongPressMoveModeName);
+      _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'always';
 
       // 物理キーのロード
       _volupAction = prefs.getInt('key_volup_action') ?? 0;
@@ -843,6 +846,7 @@ class _MyHomePageState extends State<MyHomePage> {
       0.0, 0.0, 1.0, 0.0,          // column 3
       tx, ty, 0.0, 1.0,            // column 4
     );
+    _isMapScrolledOrZoomed = false;
   }
 
   void _triggerCenterOnPlayer() {
@@ -1659,9 +1663,25 @@ class _MyHomePageState extends State<MyHomePage> {
     final tile = _mapLocalToTile(details.localPosition);
     if (tile == null) return;
 
-    // 主人公タイルでも隣接タイルでも、tap したタイル座標をそのまま送信する。
-    // C コア側 click_to_cmd → dotherecmdmenu が u.ux/uy 一致で here_cmd_menu
-    // を呼び分ける。
+    // farlookモード (/) や ; コマンド、ターゲット選択（getpos等）入力待ち中の判定
+    // toplineプロンプト、またはメッセージ末尾が?で終わる場合はターゲット選択中とみなす
+    final bool isGetposOrTargetingMode = _screen.topline != null ||
+        (_screen.messages.isNotEmpty && _screen.messages.last.trim().endsWith("?"));
+
+    // 主人公タイルまたは隣接8マスの判定
+    final dx = (tile.tileX - px).abs();
+    final dy = (tile.tileY - py).abs();
+    final bool isAdjacentOrSelf = (dx <= 1 && dy <= 1);
+
+    // 自動トラベル（2マス以上離れた場所への移動）の制限判定
+    if (!isGetposOrTargetingMode && !isAdjacentOrSelf && _mapTapTravelMode == 'after_scroll') {
+      if (!_isMapScrolledOrZoomed) {
+        _addLog("Map tap travel ignored: scroll or zoom required");
+        return;
+      }
+      _isMapScrolledOrZoomed = false;
+    }
+
     sendPosCmd(tile.tileX, tile.tileY, 1 /* CLICK_1 */);
   }
 
@@ -3181,9 +3201,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           constrained: false, // 子が親(画面幅)に制限されずunconstrainedでスクロール可能にする
                           maxScale: 6.0,
                           minScale: 0.5,
+                          onInteractionStart: (details) {
+                            _isMapScrolledOrZoomed = true;
+                          },
                           onInteractionUpdate: (details) {
                             // ユーザーがピンチズームしたズーム倍率をリアルタイムに保存
                             _currentScale = _transformationController.value.getMaxScaleOnAxis();
+                            _isMapScrolledOrZoomed = true;
                           },
                           child: Center(
                             child: SizedBox(

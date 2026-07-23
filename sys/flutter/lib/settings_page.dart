@@ -37,6 +37,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String _drawerPosition = 'left';
   String _menuButtonPosition = 'bottom_left';
   String _dpadLongPressMoveMode = 'G_UPPER';
+  String _mapTapTravelMode = 'always';
 
   // メッセージ領域設定
   int _msgLineCount = 5;      // 表示行数 (1〜15)
@@ -158,6 +159,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _drawerPosition = prefs.getString('drawer_position') ?? 'left';
       _menuButtonPosition = prefs.getString('menu_button_position') ?? 'bottom_left';
       _dpadLongPressMoveMode = prefs.getString('dpad_long_press_move_mode') ?? 'G_UPPER';
+      _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'always';
 
       _volupAction = prefs.getInt('key_volup_action') ?? 0;
       _voldownAction = prefs.getInt('key_voldown_action') ?? 0;
@@ -611,6 +613,22 @@ class _SettingsPageState extends State<SettingsPage> {
               if (val != null) {
                 setState(() => _dpadLongPressMoveMode = val);
                 _saveSetting('dpad_long_press_move_mode', val);
+              }
+            },
+          ),
+        ),
+        ListTile(
+          title: const Text("マップタップでの自動トラベル"),
+          trailing: DropdownButton<String>(
+            value: _mapTapTravelMode,
+            items: const [
+              DropdownMenuItem(value: 'always', child: Text('常に有効')),
+              DropdownMenuItem(value: 'after_scroll', child: Text('スクロール・ズーム時のみ有効')),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _mapTapTravelMode = val);
+                _saveSetting('map_tap_travel_mode', val);
               }
             },
           ),
