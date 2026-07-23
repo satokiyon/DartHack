@@ -191,6 +191,19 @@ static char g_getline_result[512] = {0};
 static volatile int g_getline_done = 0;
 static char g_askname_result[256] = {0};
 static volatile int g_askname_done = 0;
+static int g_askname_mode = 0;
+
+void SendAskNameResultToC(const char* result, int mode) {
+    g_askname_mode = mode;
+    if (result) {
+        strncpy(g_askname_result, result, sizeof(g_askname_result) - 1);
+        g_askname_result[sizeof(g_askname_result) - 1] = '\0';
+    } else {
+        g_askname_result[0] = '\0';
+    }
+    g_askname_done = 1;
+    debuglog("C core received AskName result: %s (mode: %d)", g_askname_result, mode);
+}
 
 // 双方向通信用変数
 static volatile int g_input_request_id = 0;
@@ -389,16 +402,6 @@ void SendGetLineResultToC(const char* result) {
     debuglog("C core received GetLine result: %s", g_getline_result);
 }
 
-void SendAskNameResultToC(const char* result) {
-    if (result) {
-        strncpy(g_askname_result, result, sizeof(g_askname_result) - 1);
-        g_askname_result[sizeof(g_askname_result) - 1] = '\0';
-    } else {
-        g_askname_result[0] = '\0';
-    }
-    g_askname_done = 1;
-    debuglog("C core received AskName result: %s", g_askname_result);
-}
 
 static void flutter_save_message(const char* msg) {
     if (!msg || !*msg || !strcmp(msg, "Restoring save file...")) {
@@ -853,8 +856,24 @@ static void flutter_askname(void) {
         exit(0);
     }
     
-    strncpy(svp.plname, g_askname_result, sizeof(svp.plname) - 1);
-    svp.plname[sizeof(svp.plname) - 1] = '\0';
+    if (g_askname_mode == 1) {
+        discover = TRUE;
+        wizard = FALSE;
+    } else if (g_askname_mode == 2) {
+        wizard = TRUE;
+        discover = FALSE;
+        strncpy(svp.plname, "wizard", sizeof(svp.plname) - 1);
+        svp.plname[sizeof(svp.plname) - 1] = '\0';
+        set_playmode();
+    } else {
+        discover = FALSE;
+        wizard = FALSE;
+    }
+
+    if (g_askname_mode != 2) {
+        strncpy(svp.plname, g_askname_result, sizeof(svp.plname) - 1);
+        svp.plname[sizeof(svp.plname) - 1] = '\0';
+    }
 }
 
 static void flutter_exit_nhwindows(const char* str) {

@@ -272,7 +272,8 @@ Flutter版において、データベースの検索結果（`checkfile()`）お
   2. **`src/files.c`**:
      - `read_tribute()` 関数内で `create_nhwindow(NHW_MENU)` の直前および `display_nhwindow` 直後に `#ifdef AND_GUI` ガード付きで `set_flutter_plain_text_dialog(1)` / `(0)` の呼び出しを追加。
 * **背景と注意事項**:
-  - `set_flutter_plain_text_dialog` の実体は `sys/flutter` 配下（`winflutter.c`）にのみ存在し、共有コアの `src/windows.c` や `include/extern.h` を汚染しないよう局所宣言（`#ifdef AND_GUI` 内での `extern` 宣言）を併用しています。
+  - `set_flutter_plain_text_dialog` は `include/extern.h` で標準的にプロトタイプ宣言されており、`src/windows.c` に非Flutter/非Android環境用の空スタブ（`(void)enable;`）、`sys/flutter`（`winflutter.c`）にFlutter環境用の実体が実装されています。
+  - 共有コア（`src/pager.c` や `src/files.c`）からは `include/extern.h` 経由で `#ifdef AND_GUI` ガード付きで呼び出します。
   - ヘルプファイル表示（`display_file()`）などでは本フラグは設定されず、従来通りのヘッダー装飾が維持されます。
 * **アップストリーム追従手順**:
   - 本変更は `#ifdef AND_GUI` マクロで完全に囲まれており、かつ呼び出し箇所も `checkfile()` と `read_tribute()` の数行に限定されています。

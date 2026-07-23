@@ -102,6 +102,11 @@ DLL_EXPORT void SendMenuSelectionsToC(const char* csv) {
     (void)csv;
 }
 
+DLL_EXPORT void SendAskNameResultToC(const char* result, int mode) {
+    (void)result;
+    (void)mode;
+}
+
 DLL_EXPORT int GetFlutterInputRequestId() {
     return g_input_request_id;
 }

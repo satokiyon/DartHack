@@ -369,12 +369,13 @@ class NetHackWorker {
           }
         } else if (type == 'askname_result') {
           final result = message['result'] as String?;
+          final mode = (message['mode'] as int?) ?? 0;
           if (result != null) {
             final resultPtr = result.toNativeUtf8();
-            ffi.sendAskNameResult(resultPtr);
+            ffi.sendAskNameResult(resultPtr, mode);
             calloc.free(resultPtr);
           } else {
-            ffi.sendAskNameResult(nullptr);
+            ffi.sendAskNameResult(nullptr, mode);
           }
         }
       }

@@ -302,10 +302,8 @@ staticfn void process_options(int argc, char *argv[])
 		switch(argv[0][1])
 		{
 		case 'D':
-#ifdef WIZARD
 			wizard = TRUE;
 		break;
-#endif
 		case 'X':
 			discover = TRUE;
 		break;

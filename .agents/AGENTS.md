@@ -151,8 +151,8 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
 ## 23. 共有コード変更時のマーカータグ命名規則 (`DartHack`)
 - Upstream (NetHackJP や NetHack 本家) からの変更と区別するため、`src/`, `include/` 等の共有ディレクトリ内のコードを変更・追記する際は、必ず `/* DartHack: ... */` というコメントマーカーを明記してください (`/* NetHackJP: ... */` ではなく `DartHack` を使用)。
 
-## 24. sys/flutter における C コア完全分離と二重定義 (Duplicate Symbol) 回避原則
-- `set_flutter_plain_text_dialog` などの Flutter 固有の C 関数・定義・フラグは、`src/windows.c` や `include/extern.h` を変更せず、すべて `sys/flutter` (`winflutter.c`) 内に完全に閉じて実装・保持してください。
-- 共有コア (`src/pager.c`, `src/files.c` 等) から Flutter 固有の C 関数を呼び出す必要がある場合は、`#ifdef AND_GUI` ガード内でローカル（ブロック内） `extern` 宣言と呼び出しを行い、`src/windows.c` へのスタブ関数の追加や `include/extern.h` への追加を避けてください。これにより、Release ビルドでの duplicate symbol リンカーエラーを防止し、Upstream マージ時の競合を最小化できます。
+## 24. sys/flutter における Flutter 固有 C 関数の共通宣言とスタブ提供原則
+- `set_flutter_plain_text_dialog` などの共有コアから参照される Flutter/GUI 関連 C 関数は、`include/extern.h` にプロトタイプ宣言を配置し、`src/windows.c` に非Flutter/非Android環境用の空スタブ（例: `void set_flutter_plain_text_dialog(int enable) { (void) enable; }`）、および `sys/flutter` (`winflutter.c`) 内に Flutter 用の実体を実装してください。
+- 共有コア (`src/pager.c`, `src/files.c` 等) から呼び出す際は、`include/extern.h` を経由し、Flutter/GUI ビルド時のみ実行されるよう `#ifdef AND_GUI` ガードを付与して呼び出します。これにより、非GUIビルドでのリンクエラーや不要な局所宣言の散在を防ぎつつ、安全で標準的な NetHack C 関数共有構造を維持できます。
 
 

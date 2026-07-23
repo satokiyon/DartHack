@@ -109,8 +109,8 @@ typedef SendYnResultDart = void Function(int result);
 typedef SendGetLineResultFunc = Void Function(Pointer<Utf8> result);
 typedef SendGetLineResultDart = void Function(Pointer<Utf8> result);
 
-typedef SendAskNameResultFunc = Void Function(Pointer<Utf8> result);
-typedef SendAskNameResultDart = void Function(Pointer<Utf8> result);
+typedef SendAskNameResultFunc = Void Function(Pointer<Utf8> result, Int32 mode);
+typedef SendAskNameResultDart = void Function(Pointer<Utf8> result, int mode);
 
 // 拡張コマンド取得
 typedef GetExtCmdsFunc = Pointer<Utf8> Function();
