@@ -200,6 +200,7 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
    - NetHack C コア (`src/`) 内部の `#ifdef ANDROID` 領域が参照する Android 固有のグローバル変数・関数（`and_procs`, `and_get_dumplog_dir`, `and_you_die`, `load_usersound`, `androidsound_procs`, `quit_possible`, `lock_mouse_cursor`, `set_username`, `debuglog` 等）は、`sys/android` なしでリンクエラーを出さないよう、`sys/flutter` 側（`winflutter.c` / `fluttermain.c` / `flutterunix.c`）で適切な型・シグネチャを伴う補完シンボルとして定義・実装してください。
    - 特に `debuglog` は `androidconf.h` にて `#define error debuglog` とマクロ展開され C コアから可変長引数関数として参照されるため、単なるマクロではなく `winflutter.c` で `<stdarg.h>` / `<android/log.h>` を用いた実態関数 `void debuglog(const char *fmt, ...)` として定義してください。
    - `and_get_dumplog_dir(char *buf)` 等の補完関数は、`include/extern.h` 等にある宣言の戻り値型・引数型と完全に一致させてください。
+   - **【型不一致による .bss 実行クラッシュ防止】**: Cコア (`src/`) 側で `extern void func(void);` のように関数として宣言・呼び出されている補完シンボルを、`sys/flutter` 側で誤って `int func = 0;` のようにスカラー変数として定義してはなりません。Cコアが変数のメモリ領域 (`.bss`) へ関数ジャンプを行い、`SIGSEGV (SEGV_ACCERR)` でクラッシュする原因になります。呼び出し側が関数の場合は、必ずシグネチャが一致する空のスタブ関数（例：`void func(void) { return; }`）として定義してください。
 
 9. **Flutter における MaterialColor スウォッチアクセスの安全性（Null クラッシュ防止）**:
    - `Colors.grey[950]` のように、Flutter 標準の `MaterialColor` スウォッチ（50, 100〜900）に定義されていないキーへのアクセスや、その他のスウォッチから取得したカラーに対して `!` 演算子を用いた強制アンラップ（例：`Colors.grey[900]!`）を行うのは禁止です。`null` が返された場合に `Null check operator used on a null value` 例外を引き起こし、画面がクラッシュする原因になります。
@@ -489,3 +490,9 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
 7. **検証手順**:
    - `dart analyze` で 0 issues を確認（本機能追加時）。
    - 実機確認: 死亡 → YN 確認で「持ち物を識別しますか?」などに履歴ボタンが出る。墓石画面の OK の左にも出る。`\call` で任意アイテムを呼び名し、そのプロンプトでも履歴ボタンが出る。銘刻プロンプト（`\e -lorem` 等）では出ない。
+
+## Farlook モード等における画面表示バッファ (gg.gbuf) の同期原則
+- **現象とメカニズム**:
+  ゲーム開始直後（一歩も移動していない状態）で `/` や `;` により Farlook モード（`do_look`）に入った際、Cコアの画面表示用バッファ `gg.gbuf` の主人公以外のマスが未同期（`GLYPH_UNEXPLORED`）のままであり、`auto_describe` が情報を取得できずタップ地点の説明が表示されない問題が発生します。
+- **対策**:
+  Farlook モード（`do_look()` 等）のように画面バッファ `gg.gbuf` の内容を参照するモーダル処理を開始する際は、冒頭で必ず `docrt()`（画面全再描画・バッファ全同期処理）を呼び出し、一歩も歩いていない初期状態であっても画面バッファ全体がダンジョン状態と完全同期されるように設計してください。

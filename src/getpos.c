@@ -801,6 +801,7 @@ getpos(coord *ccp, boolean force, const char *goal)
     int sidx;
     coordxy cx, cy;
     coordxy tx = u.ux, ty = u.uy;
+    boolean initial_state = TRUE; /* DartHack: track initial state before user input */
     boolean msg_given = TRUE; /* clear message window by default */
     boolean show_goal_msg = FALSE;
     coord *garr[NUM_GLOCS] = DUMMY;
@@ -840,8 +841,9 @@ getpos(coord *ccp, boolean force, const char *goal)
 
     if (!goal)
         goal = "目的の場所";
-    if (flags.verbose) {
-          pline("(操作説明は '%s' を入力)",
+    /* DartHack: show initial help message as ordinary message and suppress initial auto_describe */
+    if (flags.verbose || force) {
+        pline("(操作説明は '%s' を入力)",
               visctrl(gc.Cmd.spkeys[NHKF_GETPOS_HELP]));
         msg_given = TRUE;
     }
@@ -902,10 +904,16 @@ getpos(coord *ccp, boolean force, const char *goal)
         if (c == 0) {
             if (!isok(tx, ty))
                 continue;
-            /* a mouse click event, just assign and return */
+            /* DartHack: 初期状態 (initial_state == TRUE) で主人公マスをタップした場合は
+               確定終了せず、説明表示に移行する。 ユーザー操作後 (!initial_state) の
+               同一マス再タップのみ確定選択 (break) とする。 */
+            if (!initial_state && cx == tx && cy == ty) {
+                break;
+            }
             cx = tx;
             cy = ty;
-            break;
+            msg_given = FALSE;
+            goto nxtc;
         }
         if ((cp = strchr(pick_chars, c)) != 0) {
             /* '.' => 0, ',' => 1, ';' => 2, ':' => 3 */
@@ -1142,6 +1150,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             break;
         }
  nxtc:
+        initial_state = FALSE;
         gg.getposx = cx, gg.getposy = cy;
 #ifdef CLIPPING
         cliparound(cx, cy);

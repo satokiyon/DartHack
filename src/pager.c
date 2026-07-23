@@ -1436,7 +1436,6 @@ checkfile(
 
 #ifdef AND_GUI
                     /* DartHack: set plain text dialog flag for flutter lookup result */
-                    extern void set_flutter_plain_text_dialog(int);
                     set_flutter_plain_text_dialog(1);
 #endif
                     datawin = create_nhwindow(NHW_MENU);
@@ -2069,6 +2068,9 @@ do_look(int mode, coord *click_cc)
 
     cc.x = 0;
     cc.y = 0;
+
+    /* DartHack: force map screen redraw on do_look start to sync gbuf */
+    docrt();
 
     if ((cmdq = cmdq_pop()) != 0) {
         cq = *cmdq;

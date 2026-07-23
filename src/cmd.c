@@ -4942,6 +4942,10 @@ here_cmd_menu(void)
 void
 click_to_cmd(coordxy x, coordxy y, int mod)
 {
+    /* DartHack: ignore click events outside valid map coordinates */
+    if (!isok(x, y))
+        return;
+
     gc.clicklook_cc.x = x;
     gc.clicklook_cc.y = y;
 
@@ -4957,6 +4961,12 @@ domouseaction(void)
     coordxy x, y;
     struct obj *o;
     int dir;
+
+    /* DartHack: safety guard against invalid map coordinates */
+    if (!isok(gc.clicklook_cc.x, gc.clicklook_cc.y)) {
+        reset_cmd_vars(TRUE);
+        return ECMD_OK;
+    }
 
     x = gc.clicklook_cc.x - u.ux;
     y = gc.clicklook_cc.y - u.uy;
@@ -5299,8 +5309,13 @@ readchar_core(coordxy *x, coordxy *y, int *mod)
 #endif /*ALTMETA*/
     } else if (sym == 0) {
         /* click event */
+        /* DartHack: click_to_cmd は通常のコマンド入力待ち
+           (program_state.input_state == commandInp) の場合のみ呼び出し、
+           getpos や getdir 等のターゲット・方向選択モーダル中での
+           メインコマンドのキュー誤混入を防ぐ。 */
         gc.clicklook_cc.x = gc.clicklook_cc.y = -1;
-        click_to_cmd(*x, *y, *mod);
+        if (program_state.input_state == commandInp)
+            click_to_cmd(*x, *y, *mod);
     }
 
  readchar_done:

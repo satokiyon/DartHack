@@ -1578,6 +1578,13 @@ flutter_putmixed_with_tile(winid window, int attr, int tile, const char *str)
     (void) tile; /* unused for non-Flutter ports */
     putmixed(window, attr, str);
 }
+
+/* DartHack: stub implementation for non-Android/Flutter builds */
+void
+set_flutter_plain_text_dialog(int enable)
+{
+    (void) enable; /* unused for non-Flutter ports */
+}
 #endif
 
 /* possibly called to show usage info during command line processing when

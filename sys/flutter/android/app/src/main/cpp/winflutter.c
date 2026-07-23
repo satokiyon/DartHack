@@ -53,7 +53,12 @@ struct window_procs and_procs = {
     WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_SUPPRESS_HIST,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 };
-int quit_possible = 0;
+/* DartHack: implement quit_possible as a proper function stub instead of an int variable */
+void
+quit_possible(void)
+{
+    return;
+}
 
 void and_get_dumplog_dir(char *buf) {
     if (buf) {
@@ -1207,12 +1212,24 @@ static int flutter_nhgetch(void) {
             g_key_count--;
             g_key_available = 1;
             g_last_received_key = key;
+            if (key == 27) {
+                g_poscmd_count = 0;
+                g_poscmd_head = 0;
+                g_poscmd_tail = 0;
+                g_pending_poscmd = 0;
+            }
             debuglog("flutter_nhgetch: dispatched from key queue in wait loop: %d (remaining=%d)", key, g_key_count);
             return key;
         }
         usleep(10000);
     }
 
+    if (g_last_received_key == 27) {
+        g_poscmd_count = 0;
+        g_poscmd_head = 0;
+        g_poscmd_tail = 0;
+        g_pending_poscmd = 0;
+    }
     debuglog("flutter_nhgetch returning key: %d", g_last_received_key);
     return g_last_received_key;
 }
