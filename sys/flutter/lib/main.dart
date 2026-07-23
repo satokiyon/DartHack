@@ -65,6 +65,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
+enum PlayMode { normal, explore, wizard }
+
 enum ControllerMode { keyboard, pad }
 
 enum DPadMoveMode { normal, upper, gLower, gUpper, ctrl, mCmd, fCmd }
@@ -140,6 +142,8 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> _askNameSaves = [];
   int _askNameMaxChars = 0;
   final TextEditingController _askNameController = TextEditingController();
+  PlayMode _selectedPlayMode = PlayMode.normal;
+  String _previousCustomName = "Player";
   int _numberPadMode = 0;
 
   // 拡張コマンドサジェスト用
@@ -795,6 +799,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _workerSendPort?.send({
       'type': 'askname_result',
       'result': result,
+      'mode': _selectedPlayMode.index,
     });
     setState(() {
       _isAskNameVisible = false;
@@ -1150,11 +1155,14 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (type == 'askname') {
           final savesStr = message['saves'] as String;
           final saves = savesStr.isNotEmpty ? savesStr.split(';') : <String>[];
+          final defaultName = saves.isNotEmpty ? saves[0] : "Player";
           setState(() {
             _askNameSaves = saves;
             _askNameMaxChars = message['maxChars'];
             _isAskNameVisible = true;
-            _askNameController.text = saves.isNotEmpty ? saves[0] : "Player";
+            _selectedPlayMode = PlayMode.normal;
+            _previousCustomName = defaultName;
+            _askNameController.text = defaultName;
           });
         } else if (type == 'number_pad_mode') {
           final state = message['state'] as int? ?? 0;
@@ -1606,7 +1614,11 @@ class _MyHomePageState extends State<MyHomePage> {
             keys.add(0x1B);
             break;
           case 'n':
+          case 'r':
             keys.add(0x0A);
+            break;
+          case 's':
+            keys.add(0x20);
             break;
           case 'b':
             keys.add(0x7F);
@@ -2577,14 +2589,31 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildAskNameOverlay() {
+    String modeDescText;
+    Color modeDescBorderColor;
+    switch (_selectedPlayMode) {
+      case PlayMode.normal:
+        modeDescText = "🏆 通常のスコアアタック・標準プレイ用。死亡するとゲームオーバーになります。";
+        modeDescBorderColor = Colors.amber.withValues(alpha: 0.4);
+        break;
+      case PlayMode.explore:
+        modeDescText = "🔍 死亡時に復活を選択できる練習用モード。スコアはハイスコア一覧に記録されません。";
+        modeDescBorderColor = Colors.lightBlueAccent.withValues(alpha: 0.4);
+        break;
+      case PlayMode.wizard:
+        modeDescText = "🧙 デバッグ・検証用モード。任意のアイテム生成や無敵化コマンドなどのデバッグ機能が使用できます（名前は wizard に固定）。";
+        modeDescBorderColor = Colors.purpleAccent.withValues(alpha: 0.4);
+        break;
+    }
+
     return Positioned.fill(
       child: Container(
         color: Colors.black.withValues(alpha: 0.84),
         child: Padding(
-          padding: EdgeInsets.fromLTRB(16, 16, 16, _dialogBottomInset(context)),
+          padding: EdgeInsets.fromLTRB(12, 12, 12, _dialogBottomInset(context)),
           child: Center(
             child: Card(
-              margin: const EdgeInsets.all(20),
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               color: const Color(0xFF141A22),
               elevation: 12,
               shape: RoundedRectangleBorder(
@@ -2593,90 +2622,157 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               child: Container(
                 width: double.infinity,
-                constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                  Row(
+                constraints: const BoxConstraints(maxWidth: 440, maxHeight: 600),
+                padding: const EdgeInsets.all(16),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Icon(Icons.badge_outlined, size: 18, color: Colors.amber[300]),
-                      const SizedBox(width: 8),
-                      const Expanded(
-                        child: Text(
-                          "お名前は？",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber),
+                      Row(
+                        children: [
+                          Icon(Icons.badge_outlined, size: 18, color: Colors.amber[300]),
+                          const SizedBox(width: 8),
+                          const Expanded(
+                            child: Text(
+                              "お名前は？",
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Divider(color: Colors.white.withValues(alpha: 0.16), height: 1),
+                      const SizedBox(height: 12),
+                      const Text("プレイモード:", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      const SizedBox(height: 6),
+                      SegmentedButton<PlayMode>(
+                        segments: const [
+                          ButtonSegment<PlayMode>(
+                            value: PlayMode.normal,
+                            label: Text("通常", style: TextStyle(fontSize: 12)),
+                            icon: Icon(Icons.emoji_events_outlined, size: 15),
+                          ),
+                          ButtonSegment<PlayMode>(
+                            value: PlayMode.explore,
+                            label: Text("探索", style: TextStyle(fontSize: 12)),
+                            icon: Icon(Icons.search, size: 15),
+                          ),
+                          ButtonSegment<PlayMode>(
+                            value: PlayMode.wizard,
+                            label: Text("ウィザード", style: TextStyle(fontSize: 12)),
+                            icon: Icon(Icons.auto_fix_high, size: 15),
+                          ),
+                        ],
+                        selected: {_selectedPlayMode},
+                        onSelectionChanged: (Set<PlayMode> newSelection) {
+                          final newMode = newSelection.first;
+                          setState(() {
+                            if (newMode == PlayMode.wizard) {
+                              if (_selectedPlayMode != PlayMode.wizard) {
+                                _previousCustomName = _askNameController.text;
+                              }
+                              _askNameController.text = "wizard";
+                            } else {
+                              if (_selectedPlayMode == PlayMode.wizard) {
+                                _askNameController.text = _previousCustomName.isNotEmpty ? _previousCustomName : "Player";
+                              }
+                            }
+                            _selectedPlayMode = newMode;
+                          });
+                        },
+                        style: const ButtonStyle(
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Divider(color: Colors.white.withValues(alpha: 0.16), height: 1),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _askNameController,
-                    autofocus: true,
-                    maxLength: _askNameMaxChars,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: const Color(0xFF0E1117),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onSubmitted: (val) {
-                      _sendAskNameResult(val);
-                    },
-                  ),
-                  if (_askNameSaves.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    const Text("既存のセーブデータ:", style: TextStyle(color: Colors.grey, fontSize: 12)),
-                    const SizedBox(height: 6),
-                    Expanded(
-                      child: Container(
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white24),
+                          color: const Color(0xFF0E1117),
                           borderRadius: BorderRadius.circular(8),
-                          color: Colors.black.withValues(alpha: 0.2),
+                          border: Border.all(color: modeDescBorderColor),
                         ),
-                        child: ListView.builder(
-                          itemCount: _askNameSaves.length,
-                          itemBuilder: (context, index) {
-                            final name = _askNameSaves[index];
-                            return Material(
-                              color: Colors.transparent,
-                              child: ListTile(
-                                title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                                leading: const Icon(Icons.account_circle, color: Colors.lightBlueAccent),
-                                dense: true,
-                                onTap: () {
-                                  _askNameController.text = name;
-                                },
-                              ),
-                            );
-                          },
+                        child: Text(
+                          modeDescText,
+                          style: const TextStyle(color: Colors.white70, fontSize: 11, height: 1.3),
                         ),
                       ),
-                    ),
-                  ],
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => _sendAskNameResult(null),
-                        child: const Text('キャンセル'),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _askNameController,
+                        autofocus: true,
+                        enabled: _selectedPlayMode != PlayMode.wizard,
+                        maxLength: _askNameMaxChars,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: _selectedPlayMode == PlayMode.wizard
+                              ? const Color(0xFF1E2530)
+                              : const Color(0xFF0E1117),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        ),
+                        onSubmitted: (val) {
+                          _sendAskNameResult(val);
+                        },
                       ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () => _sendAskNameResult(_askNameController.text),
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.teal[500]),
-                        child: const Text('ゲーム開始'),
+                      if (_askNameSaves.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        const Text("既存のセーブデータ:", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                        const SizedBox(height: 6),
+                        Container(
+                          constraints: const BoxConstraints(maxHeight: 140),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white24),
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.black.withValues(alpha: 0.2),
+                          ),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _askNameSaves.length,
+                            itemBuilder: (context, index) {
+                              final name = _askNameSaves[index];
+                              return Material(
+                                color: Colors.transparent,
+                                child: ListTile(
+                                  title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                  leading: const Icon(Icons.account_circle, color: Colors.lightBlueAccent, size: 20),
+                                  dense: true,
+                                  onTap: () {
+                                    if (_selectedPlayMode == PlayMode.wizard) {
+                                      _previousCustomName = name;
+                                    } else {
+                                      _askNameController.text = name;
+                                      _previousCustomName = name;
+                                    }
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () => _sendAskNameResult(null),
+                            child: const Text('キャンセル'),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () => _sendAskNameResult(_askNameController.text),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.teal[500]),
+                            child: const Text('ゲーム開始'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  ],
                 ),
               ),
             ),
@@ -2730,6 +2826,24 @@ class _MyHomePageState extends State<MyHomePage> {
                   helperText: "#で始まるものは拡張コマンドとして入力送信されます",
                 ),
                 autofocus: true,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: [
+                  ActionChip(
+                    label: const Text('Enter'),
+                    onPressed: () => controller.text = r'\n',
+                  ),
+                  ActionChip(
+                    label: const Text('Space'),
+                    onPressed: () => controller.text = r'\s',
+                  ),
+                  ActionChip(
+                    label: const Text('Esc'),
+                    onPressed: () => controller.text = r'\e',
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               OutlinedButton(
@@ -3537,6 +3651,7 @@ class _MyHomePageState extends State<MyHomePage> {
               key: ValueKey(_controlsVersion),
               opacity: _padOpacity,
               showPanelNames: _showPanelNames,
+              extCmdList: _extCmdList.map((e) => {'command': e.command, 'description': e.description}).toList(),
               onKeyPress: (key) => _sendKeysToC(key),
               onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
               onPanelHeightChanged: (height) {

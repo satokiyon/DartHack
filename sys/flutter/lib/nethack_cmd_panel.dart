@@ -1,14 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class CmdItem {
+  final String command;
+  final String label;
+
+  const CmdItem({required this.command, this.label = ''});
+
+  String get displayLabel {
+    if (label.isNotEmpty) return label;
+    if (command == r'\n' || command == r'\r' || command == '\n' || command == '\r') return 'Enter';
+    if (command == r'\s' || command == ' ') return 'Space';
+    if (command == r'\e' || command == '\x1b' || command == '^[') return 'Esc';
+    return command;
+  }
+  bool get hasLabel => label.isNotEmpty;
+
+  static String escape(String str) {
+    return str.replaceAll('\\', '\\\\').replaceAll('|', '\\|').replaceAll(' ', '\\ ');
+  }
+
+  static List<CmdItem> parseCmds(String cmds) {
+    if (cmds.trim().isEmpty) return [];
+    final List<CmdItem> items = [];
+    final List<String> parts = [];
+    StringBuffer sb = StringBuffer();
+    bool esc = false;
+    bool hasLabel = false;
+
+    for (int i = 0; i < cmds.length; i++) {
+      final char = cmds[i];
+      if (esc) {
+        sb.write(char);
+        esc = false;
+      } else if (char == '\\') {
+        esc = true;
+      } else if (char == '|') {
+        parts.add(sb.toString());
+        sb = StringBuffer();
+        hasLabel = true;
+      } else if (char == ' ') {
+        parts.add(sb.toString());
+        sb = StringBuffer();
+        if (!hasLabel) parts.add("");
+        hasLabel = false;
+      } else {
+        sb.write(char);
+      }
+    }
+    if (sb.isNotEmpty || hasLabel) {
+      parts.add(sb.toString());
+      if (!hasLabel) parts.add("");
+    }
+
+    for (int i = 0; i < parts.length - 1; i += 2) {
+      items.add(CmdItem(command: parts[i], label: parts[i + 1]));
+    }
+    return items;
+  }
+
+  static String serializeCmds(List<CmdItem> items) {
+    final List<String> encoded = [];
+    for (final item in items) {
+      String s = escape(item.command);
+      if (item.hasLabel) {
+        s += '|${escape(item.label)}';
+      }
+      encoded.add(s);
+    }
+    return encoded.join(' ');
+  }
+}
+
 class NetHackCmdPanel extends StatefulWidget {
   final Function(String) onKeyPress;
   final Function(int) onRawKeyCode;
   final VoidCallback onToggleMode;
   final ValueChanged<double>? onPanelHeightChanged;
   final bool showPanelNames;
-
   final double opacity;
+  final List<Map<String, String>>? extCmdList;
 
   const NetHackCmdPanel({
     super.key,
@@ -18,6 +89,7 @@ class NetHackCmdPanel extends StatefulWidget {
     this.onPanelHeightChanged,
     this.showPanelNames = true,
     this.opacity = 1.0,
+    this.extCmdList,
   });
 
   @override
@@ -30,10 +102,51 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   bool _isExpanded = false;
   double _lastReportedHeight = -1;
 
-  static const List<String> defaultCmds = [
+  static const List<String> defaultCmdsStr = [
     '[Kbd]', '#', '20s', '.', ':', ';', ',', 'e', 'd', 'r', 'z', 'Z', 'q',
     't', 'f', 'w', 'x', 'i', 'E', 'Q', 'P', 'R', 'W', 'T', 'o', '^d', '^p',
     'a', 'A', '^t', 'D', 'F', 'p', '^x', '^o', '?'
+  ];
+
+  static const List<Map<String, String>> fallbackExtCmds = [
+    {'command': '#adjust', 'description': 'アイテムの文字を付け替える'},
+    {'command': '#annotate', 'description': 'レベル注釈'},
+    {'command': '#apply', 'description': '道具を使う'},
+    {'command': '#attributes', 'description': '属性・状態'},
+    {'command': '#cast', 'description': '呪文を唱える'},
+    {'command': '#chat', 'description': '話しかける'},
+    {'command': '#chronicle', 'description': '出来事の記録'},
+    {'command': '#close', 'description': 'ドアを閉める'},
+    {'command': '#force', 'description': '鍵を壊す'},
+    {'command': '#invoke', 'description': '発動する'},
+    {'command': '#jump', 'description': 'ジャンプする'},
+    {'command': '#loot', 'description': 'あさる'},
+    {'command': '#monster', 'description': 'モンスターの特殊能力'},
+    {'command': '#name', 'description': '名前をつける'},
+    {'command': '#offer', 'description': '捧げる'},
+    {'command': '#open', 'description': 'ドアを開ける'},
+    {'command': '#overview', 'description': 'ダンジョン概要'},
+    {'command': '#pay', 'description': '支払う'},
+    {'command': '#pray', 'description': '祈る'},
+    {'command': '#quaff', 'description': '飲む'},
+    {'command': '#quit', 'description': 'ゲームを終了'},
+    {'command': '#read', 'description': '読む'},
+    {'command': '#rest', 'description': '待機'},
+    {'command': '#ride', 'description': '乗る'},
+    {'command': '#rub', 'description': 'こする'},
+    {'command': '#search', 'description': '探す'},
+    {'command': '#sit', 'description': '座る'},
+    {'command': '#surrender', 'description': '投降する'},
+    {'command': '#takeoff', 'description': '脱ぐ'},
+    {'command': '#teleport', 'description': 'テレポート'},
+    {'command': '#terrain', 'description': '地形を表示'},
+    {'command': '#therecmdmenu', 'description': 'カーソル位置のメニュー'},
+    {'command': '#turn', 'description': 'アンデッド退散'},
+    {'command': '#untrap', 'description': '罠を解除'},
+    {'command': '#version', 'description': 'バージョン情報'},
+    {'command': '#wear', 'description': '着る'},
+    {'command': '#wield', 'description': '構える'},
+    {'command': '#wipe', 'description': '顔を拭く'},
   ];
 
   @override
@@ -45,14 +158,14 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   Future<void> _loadPanels() async {
     final prefs = await SharedPreferences.getInstance();
     final int count = prefs.getInt('panel_count') ?? 1;
-    
+
     _panels.clear();
-    
+
     final p0Name = prefs.getString('pName_0') ?? "標準パネル";
-    final p0CmdsStr = prefs.getString('pCmdString_0') ?? defaultCmds.join(' ');
+    final p0CmdsStr = prefs.getString('pCmdString_0') ?? defaultCmdsStr.join(' ');
     _panels.add({
       'name': p0Name,
-      'cmds': p0CmdsStr.split(' ').where((s) => s.isNotEmpty).toList(),
+      'cmds': CmdItem.parseCmds(p0CmdsStr),
     });
 
     for (int i = 1; i < count; i++) {
@@ -60,13 +173,40 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
       final cmdsStr = prefs.getString('pCmdString_$i') ?? "";
       _panels.add({
         'name': name,
-        'cmds': cmdsStr.split(' ').where((s) => s.isNotEmpty).toList(),
+        'cmds': CmdItem.parseCmds(cmdsStr),
       });
     }
 
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> _savePanel(int panelIndex) async {
+    final prefs = await SharedPreferences.getInstance();
+    final cmds = _panels[panelIndex]['cmds'] as List<CmdItem>;
+    final serialized = CmdItem.serializeCmds(cmds);
+    await prefs.setString('pCmdString_$panelIndex', serialized);
+    setState(() {});
+  }
+
+  Future<void> _resetPanelToDefault(int panelIndex) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (panelIndex == 0) {
+      await prefs.remove('pCmdString_0');
+      _panels[0]['cmds'] = CmdItem.parseCmds(defaultCmdsStr.join(' '));
+    } else {
+      await prefs.remove('pCmdString_$panelIndex');
+      _panels[panelIndex]['cmds'] = <CmdItem>[];
+    }
+    setState(() {});
+  }
+
+  List<Map<String, String>> get _effectiveExtCmds {
+    if (widget.extCmdList != null && widget.extCmdList!.isNotEmpty) {
+      return widget.extCmdList!;
+    }
+    return fallbackExtCmds;
   }
 
   @override
@@ -85,7 +225,6 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
       );
     }
 
-    // 表示するパネルの数
     final visiblePanels = _isExpanded ? _panels : [_panels.first];
     const double headerHeight = 18;
     const double rowHeight = 40;
@@ -96,14 +235,12 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
       onVerticalDragEnd: (details) {
         if (details.primaryVelocity == null) return;
         if (details.primaryVelocity! < -100) {
-          // 上にスワイプ -> 展開
           if (_panels.length > 1 && !_isExpanded) {
             setState(() {
               _isExpanded = true;
             });
           }
         } else if (details.primaryVelocity! > 100) {
-          // 下にスワイプ -> 縮小
           if (_isExpanded) {
             setState(() {
               _isExpanded = false;
@@ -124,7 +261,6 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
         ),
         child: Column(
           children: [
-            // ドラッグガイドバー
             Container(
               height: headerHeight,
               width: double.infinity,
@@ -141,28 +277,27 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                     const SizedBox(width: 4),
                   ],
                   Text(
-                    _isExpanded 
-                        ? "パネルを引き下げる" 
+                    _isExpanded
+                        ? "パネルを引き下げる"
                         : (_panels.length > 1 ? "上にスワイプして全パネルを表示" : _panels.first['name']),
                     style: const TextStyle(color: Colors.white60, fontSize: 9, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
-            // パネルリスト
             Expanded(
               child: ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: visiblePanels.length,
-                itemBuilder: (context, index) {
-                  final panel = visiblePanels[index];
-                  final List<String> cmds = panel['cmds'] as List<String>;
-                  
+                itemBuilder: (context, pIdx) {
+                  final panel = visiblePanels[pIdx];
+                  final List<CmdItem> cmds = panel['cmds'] as List<CmdItem>;
+
                   return Container(
                     height: rowHeight,
                     decoration: BoxDecoration(
                       border: Border(
-                        bottom: index < visiblePanels.length - 1
+                        bottom: pIdx < visiblePanels.length - 1
                             ? BorderSide(color: Colors.white.withValues(alpha: 0.1 * widget.opacity), width: 0.5)
                             : BorderSide.none,
                       ),
@@ -182,13 +317,16 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                               style: const TextStyle(color: Colors.amberAccent, fontSize: 9, fontWeight: FontWeight.bold),
                             ),
                           ),
-                        // 横スクロール可能なボタン行
                         Expanded(
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             padding: const EdgeInsets.symmetric(horizontal: 2),
                             child: Row(
-                              children: cmds.map((cmd) => _buildCmdButton(context, cmd)).toList(),
+                              children: cmds
+                                  .asMap()
+                                  .entries
+                                  .map((entry) => _buildCmdButton(context, pIdx, entry.key, entry.value))
+                                  .toList(),
                             ),
                           ),
                         ),
@@ -220,8 +358,8 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
     });
   }
 
-  Widget _buildCmdButton(BuildContext context, String cmd) {
-    final isKbdToggle = cmd == '[Kbd]';
+  Widget _buildCmdButton(BuildContext context, int panelIndex, int itemIndex, CmdItem item) {
+    final isKbdToggle = item.command == '[Kbd]';
     final buttonColor = isKbdToggle
         ? (Colors.deepPurple[900] ?? const Color(0xFF311B92))
         : (Colors.grey[900] ?? const Color(0xFF212121));
@@ -233,18 +371,19 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
         color: buttonColor.withValues(alpha: widget.opacity),
         borderRadius: BorderRadius.circular(4),
         child: InkWell(
-          onTap: () => _handleCmdPress(cmd),
+          onTap: () => _handleCmdPress(item.command),
+          onLongPress: () => _showButtonCustomizeDialog(panelIndex, itemIndex, item),
           borderRadius: BorderRadius.circular(4),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             alignment: Alignment.center,
             constraints: const BoxConstraints(minWidth: 32, minHeight: 34),
             child: Text(
-              cmd,
+              item.displayLabel,
               style: TextStyle(
                 color: textColor,
                 fontSize: 12,
-                fontWeight: FontWeight.bold,
+                fontWeight: item.hasLabel ? FontWeight.bold : FontWeight.normal,
               ),
             ),
           ),
@@ -265,5 +404,408 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
     } else {
       widget.onKeyPress(cmd);
     }
+  }
+
+  void _showButtonCustomizeDialog(int panelIndex, int itemIndex, CmdItem item) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text("ボタン編集: ${item.displayLabel}"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.edit, color: Colors.blueAccent),
+              title: const Text("コマンドを変更"),
+              subtitle: Text("現在: ${item.command}"),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showCommandEditDialog(panelIndex, itemIndex, item);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.label, color: Colors.amberAccent),
+              title: const Text("表示ラベルを変更"),
+              subtitle: Text(item.hasLabel ? "現在: ${item.label}" : "未設定 (コマンド名を表示)"),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showLabelEditDialog(panelIndex, itemIndex, item);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.playlist_add, color: Colors.greenAccent),
+              title: const Text("前にボタンを追加"),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showAddButtonDialog(panelIndex, itemIndex, isBefore: true);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.playlist_add, color: Colors.tealAccent),
+              title: const Text("後にボタンを追加"),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showAddButtonDialog(panelIndex, itemIndex + 1, isBefore: false);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.redAccent),
+              title: const Text("ボタンを削除"),
+              onTap: () {
+                Navigator.pop(ctx);
+                _removeButton(panelIndex, itemIndex);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.refresh, color: Colors.orangeAccent),
+              title: const Text("パネルをデフォルトに戻す"),
+              onTap: () {
+                Navigator.pop(ctx);
+                _confirmResetPanel(panelIndex);
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("キャンセル"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCommandEditDialog(int panelIndex, int itemIndex, CmdItem item) {
+    final controller = TextEditingController(text: item.command);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("コマンドの変更"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                hintText: "例: e, d, #adjust, #terrain 等",
+                helperText: "#で始まるものは拡張コマンドとして実行されます",
+              ),
+              autofocus: true,
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [
+                ActionChip(
+                  label: const Text('Enter'),
+                  onPressed: () => controller.text = r'\n',
+                ),
+                ActionChip(
+                  label: const Text('Space'),
+                  onPressed: () => controller.text = r'\s',
+                ),
+                ActionChip(
+                  label: const Text('Esc'),
+                  onPressed: () => controller.text = r'\e',
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              icon: const Icon(Icons.list),
+              label: const Text("拡張コマンドから選択..."),
+              onPressed: () {
+                _selectExtCmdDialog((selectedCmd) {
+                  controller.text = selectedCmd;
+                });
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("キャンセル"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newCmd = controller.text.trim();
+              if (newCmd.isNotEmpty) {
+                final cmds = _panels[panelIndex]['cmds'] as List<CmdItem>;
+                cmds[itemIndex] = CmdItem(command: newCmd, label: item.label);
+                _savePanel(panelIndex);
+              }
+              Navigator.pop(ctx);
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLabelEditDialog(int panelIndex, int itemIndex, CmdItem item) {
+    final controller = TextEditingController(text: item.label);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("表示ラベルの変更"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                hintText: "例: 食べる, 道具, #整理",
+                helperText: "空にするとコマンド名がそのまま表示されます",
+              ),
+              autofocus: true,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("キャンセル"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newLabel = controller.text.trim();
+              final cmds = _panels[panelIndex]['cmds'] as List<CmdItem>;
+              cmds[itemIndex] = CmdItem(command: item.command, label: newLabel);
+              _savePanel(panelIndex);
+              Navigator.pop(ctx);
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddButtonDialog(int panelIndex, int insertIndex, {required bool isBefore}) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(isBefore ? "前にボタンを追加" : "後にボタンを追加"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                hintText: "例: e, d, #adjust 等",
+                helperText: "#で始まるものは拡張コマンドとして実行されます",
+              ),
+              autofocus: true,
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [
+                ActionChip(
+                  label: const Text('Enter'),
+                  onPressed: () => controller.text = r'\n',
+                ),
+                ActionChip(
+                  label: const Text('Space'),
+                  onPressed: () => controller.text = r'\s',
+                ),
+                ActionChip(
+                  label: const Text('Esc'),
+                  onPressed: () => controller.text = r'\e',
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              icon: const Icon(Icons.list),
+              label: const Text("拡張コマンドから選択..."),
+              onPressed: () {
+                _selectExtCmdDialog((selectedCmd) {
+                  controller.text = selectedCmd;
+                });
+              },
+            ),
+            const SizedBox(height: 4),
+            OutlinedButton.icon(
+              icon: const Icon(Icons.keyboard),
+              label: const Text("[Kbd] (キーボード切替) を追加"),
+              onPressed: () {
+                controller.text = '[Kbd]';
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("キャンセル"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newCmd = controller.text.trim();
+              if (newCmd.isNotEmpty) {
+                final cmds = _panels[panelIndex]['cmds'] as List<CmdItem>;
+                final idx = insertIndex.clamp(0, cmds.length);
+                cmds.insert(idx, CmdItem(command: newCmd));
+                _savePanel(panelIndex);
+              }
+              Navigator.pop(ctx);
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _removeButton(int panelIndex, int itemIndex) {
+    final cmds = _panels[panelIndex]['cmds'] as List<CmdItem>;
+    if (cmds.length <= 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("これ以上ボタンを削除できません")),
+      );
+      return;
+    }
+    cmds.removeAt(itemIndex);
+    _savePanel(panelIndex);
+  }
+
+  void _confirmResetPanel(int panelIndex) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("パネル初期化の確認"),
+        content: const Text("このパネルのボタン配置を初期設定に戻しますか？"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("キャンセル"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () {
+              Navigator.pop(ctx);
+              _resetPanelToDefault(panelIndex);
+            },
+            child: const Text("初期化", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _selectExtCmdDialog(Function(String) onSelect) {
+    String filterText = '';
+    final extCmds = _effectiveExtCmds;
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        return StatefulBuilder(
+          builder: (ctx, setStateDialog) {
+            final filtered = extCmds.where((item) {
+              final cmd = (item['command'] ?? '').toLowerCase();
+              final desc = (item['description'] ?? '').toLowerCase();
+              final query = filterText.toLowerCase();
+              return cmd.contains(query) || desc.contains(query);
+            }).toList();
+
+            return AlertDialog(
+              title: const Text("拡張コマンドから選択"),
+              content: SizedBox(
+                width: double.maxFinite,
+                height: 350,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      decoration: const InputDecoration(
+                        hintText: "コマンド名や説明で検索...",
+                        prefixIcon: Icon(Icons.search),
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (val) {
+                        setStateDialog(() {
+                          filterText = val;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    Expanded(
+                      child: filtered.isEmpty
+                          ? const Center(
+                              child: Text(
+                                "該当するコマンドがありません",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: filtered.length,
+                              itemBuilder: (context, idx) {
+                                final item = filtered[idx];
+                                var cmd = item['command'] ?? '';
+                                final desc = item['description'] ?? '';
+                                if (!cmd.startsWith('#') && !cmd.startsWith('?')) {
+                                  cmd = '#$cmd';
+                                }
+
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                                  child: Material(
+                                    color: const Color(0xFF2C2C2C),
+                                    borderRadius: BorderRadius.circular(6.0),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: ListTile(
+                                      title: Text(
+                                        cmd,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      subtitle: desc.isNotEmpty
+                                          ? Text(
+                                              desc,
+                                              style: const TextStyle(
+                                                color: Colors.white70,
+                                                fontSize: 11,
+                                              ),
+                                            )
+                                          : null,
+                                      onTap: () {
+                                        onSelect(cmd);
+                                        Navigator.pop(dialogCtx);
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogCtx),
+                  child: const Text("キャンセル"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 }

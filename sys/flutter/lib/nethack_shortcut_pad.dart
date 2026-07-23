@@ -102,7 +102,7 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
           child: Container(
             alignment: Alignment.center,
             child: Text(
-              shortcut,
+              _formatShortcutLabel(shortcut),
               style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 11,
@@ -124,5 +124,18 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
     } else {
       widget.onKeyPress(shortcut);
     }
+  }
+
+  String _formatShortcutLabel(String shortcut) {
+    if (shortcut == r'\n' || shortcut == r'\r' || shortcut == '\n' || shortcut == '\r') {
+      return 'Enter';
+    }
+    if (shortcut == r'\s' || shortcut == ' ') {
+      return 'Space';
+    }
+    if (shortcut == r'\e' || shortcut == '\x1b' || shortcut == '^[') {
+      return 'Esc';
+    }
+    return shortcut;
   }
 }
