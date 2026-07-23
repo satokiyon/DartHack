@@ -404,7 +404,7 @@ void SendGetLineResultToC(const char* result) {
 
 
 static void flutter_save_message(const char* msg) {
-    if (!msg || !*msg || !strcmp(msg, "Restoring save file...")) {
+    if (!msg || !*msg || !strcmp(msg, "Restoring save file...") || !strcmp(msg, "セーブファイルを復元中...")) {
         return;
     }
 

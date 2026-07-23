@@ -158,7 +158,7 @@ int NetHackMain(int argc, char** argv)
 	nhfp = create_levelfile(0, (char *)0);
 	if(!nhfp)
 	{
-		raw_print("Cannot create lock file");
+		raw_print("ロックファイルを作成できません");
 	}
 	else
 	{
@@ -215,12 +215,12 @@ backup_clean:
 		if (fq_save_fd != -1) close(fq_save_fd);
 
         if (ge.early_raw_messages)
-            raw_print("Restoring save file...");
+            raw_print("セーブファイルを復元中...");
         else
-            pline("Restoring save file...");
+            pline("セーブファイルを復元中...");
 		mark_synch();
 		if(!dorecover(nhfp)) {
-			pline("Failed to recover save file.");
+			pline("セーブファイルの復元に失敗しました。");
 			goto not_recovered;
 		}
 		if (fq_save_contents) {
@@ -257,7 +257,7 @@ backup_clean:
 
 		if(discover || wizard)
 		{
-			if(y_n("Do you want to keep the save file?") == 'n')
+			if(y_n("セーブファイルを保持しますか？") == 'n')
 			{
 				(void)delete_savefile();
 			}
@@ -388,7 +388,7 @@ staticfn boolean whoami(void)
 staticfn void wd_message(void)
 {
 	if(discover)
-		You("are in non-scoring discovery mode.");
+		pline("スコアが記録されない探索モードです。");
 }
 
 void append_slash(char *name)

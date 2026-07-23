@@ -75,6 +75,7 @@ class CmdItem {
 class NetHackCmdPanel extends StatefulWidget {
   final Function(String) onKeyPress;
   final Function(int) onRawKeyCode;
+  final Function(String)? onShortcut;
   final VoidCallback onToggleMode;
   final ValueChanged<double>? onPanelHeightChanged;
   final bool showPanelNames;
@@ -85,6 +86,7 @@ class NetHackCmdPanel extends StatefulWidget {
     super.key,
     required this.onKeyPress,
     required this.onRawKeyCode,
+    this.onShortcut,
     required this.onToggleMode,
     this.onPanelHeightChanged,
     this.showPanelNames = true,
@@ -395,6 +397,12 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   void _handleCmdPress(String cmd) {
     if (cmd == '[Kbd]') {
       widget.onToggleMode();
+    } else if (cmd.startsWith('#')) {
+      if (widget.onShortcut != null) {
+        widget.onShortcut!(cmd.length > 1 && !cmd.endsWith('\n') ? '$cmd\n' : cmd);
+      } else {
+        widget.onKeyPress(cmd);
+      }
     } else if (cmd.startsWith('^') && cmd.length == 2) {
       final charCode = cmd.codeUnitAt(1);
       if (charCode >= 97 && charCode <= 122) {
@@ -411,62 +419,64 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text("ボタン編集: ${item.displayLabel}"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.edit, color: Colors.blueAccent),
-              title: const Text("コマンドを変更"),
-              subtitle: Text("現在: ${item.command}"),
-              onTap: () {
-                Navigator.pop(ctx);
-                _showCommandEditDialog(panelIndex, itemIndex, item);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.label, color: Colors.amberAccent),
-              title: const Text("表示ラベルを変更"),
-              subtitle: Text(item.hasLabel ? "現在: ${item.label}" : "未設定 (コマンド名を表示)"),
-              onTap: () {
-                Navigator.pop(ctx);
-                _showLabelEditDialog(panelIndex, itemIndex, item);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.playlist_add, color: Colors.greenAccent),
-              title: const Text("前にボタンを追加"),
-              onTap: () {
-                Navigator.pop(ctx);
-                _showAddButtonDialog(panelIndex, itemIndex, isBefore: true);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.playlist_add, color: Colors.tealAccent),
-              title: const Text("後にボタンを追加"),
-              onTap: () {
-                Navigator.pop(ctx);
-                _showAddButtonDialog(panelIndex, itemIndex + 1, isBefore: false);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete, color: Colors.redAccent),
-              title: const Text("ボタンを削除"),
-              onTap: () {
-                Navigator.pop(ctx);
-                _removeButton(panelIndex, itemIndex);
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.refresh, color: Colors.orangeAccent),
-              title: const Text("パネルをデフォルトに戻す"),
-              onTap: () {
-                Navigator.pop(ctx);
-                _confirmResetPanel(panelIndex);
-              },
-            ),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.edit, color: Colors.blueAccent),
+                title: const Text("コマンドを変更"),
+                subtitle: Text("現在: ${item.command}"),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _showCommandEditDialog(panelIndex, itemIndex, item);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.label, color: Colors.amberAccent),
+                title: const Text("表示ラベルを変更"),
+                subtitle: Text(item.hasLabel ? "現在: ${item.label}" : "未設定 (コマンド名を表示)"),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _showLabelEditDialog(panelIndex, itemIndex, item);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.playlist_add, color: Colors.greenAccent),
+                title: const Text("前にボタンを追加"),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _showAddButtonDialog(panelIndex, itemIndex, isBefore: true);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.playlist_add, color: Colors.tealAccent),
+                title: const Text("後にボタンを追加"),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _showAddButtonDialog(panelIndex, itemIndex + 1, isBefore: false);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.redAccent),
+                title: const Text("ボタンを削除"),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _removeButton(panelIndex, itemIndex);
+                },
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.refresh, color: Colors.orangeAccent),
+                title: const Text("パネルをデフォルトに戻す"),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _confirmResetPanel(panelIndex);
+                },
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -484,47 +494,49 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text("コマンドの変更"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                hintText: "例: e, d, #adjust, #terrain 等",
-                helperText: "#で始まるものは拡張コマンドとして実行されます",
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  hintText: "例: e, d, #adjust, #terrain 等",
+                  helperText: "#で始まるものは拡張コマンドとして実行されます",
+                ),
+                autofocus: true,
               ),
-              autofocus: true,
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children: [
-                ActionChip(
-                  label: const Text('Enter'),
-                  onPressed: () => controller.text = r'\n',
-                ),
-                ActionChip(
-                  label: const Text('Space'),
-                  onPressed: () => controller.text = r'\s',
-                ),
-                ActionChip(
-                  label: const Text('Esc'),
-                  onPressed: () => controller.text = r'\e',
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              icon: const Icon(Icons.list),
-              label: const Text("拡張コマンドから選択..."),
-              onPressed: () {
-                _selectExtCmdDialog((selectedCmd) {
-                  controller.text = selectedCmd;
-                });
-              },
-            ),
-          ],
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: [
+                  ActionChip(
+                    label: const Text('Enter'),
+                    onPressed: () => controller.text = r'\n',
+                  ),
+                  ActionChip(
+                    label: const Text('Space'),
+                    onPressed: () => controller.text = r'\s',
+                  ),
+                  ActionChip(
+                    label: const Text('Esc'),
+                    onPressed: () => controller.text = r'\e',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.list),
+                label: const Text("拡張コマンドから選択..."),
+                onPressed: () {
+                  _selectExtCmdDialog((selectedCmd) {
+                    controller.text = selectedCmd;
+                  });
+                },
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -554,18 +566,20 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text("表示ラベルの変更"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                hintText: "例: 食べる, 道具, #整理",
-                helperText: "空にするとコマンド名がそのまま表示されます",
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  hintText: "例: 食べる, 道具, #整理",
+                  helperText: "空にするとコマンド名がそのまま表示されます",
+                ),
+                autofocus: true,
               ),
-              autofocus: true,
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -593,55 +607,57 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(isBefore ? "前にボタンを追加" : "後にボタンを追加"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                hintText: "例: e, d, #adjust 等",
-                helperText: "#で始まるものは拡張コマンドとして実行されます",
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  hintText: "例: e, d, #adjust 等",
+                  helperText: "#で始まるものは拡張コマンドとして実行されます",
+                ),
+                autofocus: true,
               ),
-              autofocus: true,
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children: [
-                ActionChip(
-                  label: const Text('Enter'),
-                  onPressed: () => controller.text = r'\n',
-                ),
-                ActionChip(
-                  label: const Text('Space'),
-                  onPressed: () => controller.text = r'\s',
-                ),
-                ActionChip(
-                  label: const Text('Esc'),
-                  onPressed: () => controller.text = r'\e',
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              icon: const Icon(Icons.list),
-              label: const Text("拡張コマンドから選択..."),
-              onPressed: () {
-                _selectExtCmdDialog((selectedCmd) {
-                  controller.text = selectedCmd;
-                });
-              },
-            ),
-            const SizedBox(height: 4),
-            OutlinedButton.icon(
-              icon: const Icon(Icons.keyboard),
-              label: const Text("[Kbd] (キーボード切替) を追加"),
-              onPressed: () {
-                controller.text = '[Kbd]';
-              },
-            ),
-          ],
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: [
+                  ActionChip(
+                    label: const Text('Enter'),
+                    onPressed: () => controller.text = r'\n',
+                  ),
+                  ActionChip(
+                    label: const Text('Space'),
+                    onPressed: () => controller.text = r'\s',
+                  ),
+                  ActionChip(
+                    label: const Text('Esc'),
+                    onPressed: () => controller.text = r'\e',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.list),
+                label: const Text("拡張コマンドから選択..."),
+                onPressed: () {
+                  _selectExtCmdDialog((selectedCmd) {
+                    controller.text = selectedCmd;
+                  });
+                },
+              ),
+              const SizedBox(height: 4),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.keyboard),
+                label: const Text("[Kbd] (キーボード切替) を追加"),
+                onPressed: () {
+                  controller.text = '[Kbd]';
+                },
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(

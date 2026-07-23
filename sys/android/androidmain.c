@@ -210,13 +210,13 @@ backup_clean:
 		}
 #endif
         if (ge.early_raw_messages)
-            raw_print("Restoring save file...");
+            raw_print("セーブファイルを復元中...");
         else
-            pline("Restoring save file...");
+            pline("セーブファイルを復元中...");
 		mark_synch(); /* flush output */
 		if(!dorecover(nhfp)) {
-			pline("You may have a backup save file in your save directory. Make a backup and then remove the .bak suffix and restart the app to try again.");
-			pline("if you have any questions, open up a github issue, I would be happy to help. Unfortunately this process is probably not automatable in a good way.");
+			pline("セーブディレクトリにバックアップファイルが存在する可能性があります。バックアップを作成し、.bakの拡張子を削除して再起動を試みてください。");
+			pline("不明な点がある場合はGitHubのIssue等でお問い合わせください。");
 			goto not_recovered;
 		}
 		if (fq_save_contents) {
@@ -264,7 +264,7 @@ write_backup_cleanup:
 
 		if(discover || wizard)
 		{
-			if(y_n("Do you want to keep the save file?") == 'n')
+			if(y_n("セーブファイルを保持しますか？") == 'n')
 			{
 				(void)delete_savefile();
 			}
@@ -431,7 +431,7 @@ port_help()
 staticfn void wd_message(void)
 {
 	if(discover)
-		You("are in non-scoring discovery mode.");
+		pline("スコアが記録されない探索モードです。");
 }
 
 /*

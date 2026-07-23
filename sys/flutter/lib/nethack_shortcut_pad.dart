@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'nethack_cmd_panel.dart';
 
 class NetHackShortcutPad extends StatefulWidget {
   final Function(String) onKeyPress;
@@ -23,7 +24,7 @@ class NetHackShortcutPad extends StatefulWidget {
 }
 
 class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
-  final List<String> _shortcuts = List.filled(9, "");
+  final List<CmdItem> _shortcuts = List.filled(9, const CmdItem(command: ""));
   final List<String> _defaultShortcuts = [
     'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', '#attributes'
   ];
@@ -39,7 +40,9 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       for (int i = 0; i < 9; i++) {
-        _shortcuts[i] = prefs.getString('shortcut_btn_$i') ?? _defaultShortcuts[i];
+        final raw = prefs.getString('shortcut_btn_$i') ?? _defaultShortcuts[i];
+        final parsed = CmdItem.parseCmds(raw);
+        _shortcuts[i] = parsed.isNotEmpty ? parsed.first : CmdItem(command: raw);
       }
       _isLoading = false;
     });
@@ -79,8 +82,8 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
     );
   }
 
-  Widget _buildShortcutButton(int index, String shortcut) {
-    if (shortcut.isEmpty) {
+  Widget _buildShortcutButton(int index, CmdItem item) {
+    if (item.command.isEmpty && item.label.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -93,7 +96,7 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => _handleMacroPress(shortcut),
+          onTap: () => _handleMacroPress(item.command),
           onLongPress: () {
             if (widget.onShortcutLongPress != null) {
               widget.onShortcutLongPress!(index);
@@ -102,11 +105,11 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
           child: Container(
             alignment: Alignment.center,
             child: Text(
-              _formatShortcutLabel(shortcut),
-              style: const TextStyle(
+              item.displayLabel,
+              style: TextStyle(
                 color: Colors.white70,
                 fontSize: 11,
-                fontWeight: FontWeight.bold,
+                fontWeight: item.hasLabel ? FontWeight.bold : FontWeight.normal,
               ),
               textAlign: TextAlign.center,
               maxLines: 1,
@@ -124,18 +127,5 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
     } else {
       widget.onKeyPress(shortcut);
     }
-  }
-
-  String _formatShortcutLabel(String shortcut) {
-    if (shortcut == r'\n' || shortcut == r'\r' || shortcut == '\n' || shortcut == '\r') {
-      return 'Enter';
-    }
-    if (shortcut == r'\s' || shortcut == ' ') {
-      return 'Space';
-    }
-    if (shortcut == r'\e' || shortcut == '\x1b' || shortcut == '^[') {
-      return 'Esc';
-    }
-    return shortcut;
   }
 }

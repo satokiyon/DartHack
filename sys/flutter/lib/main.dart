@@ -2644,62 +2644,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(height: 8),
                       Divider(color: Colors.white.withValues(alpha: 0.16), height: 1),
                       const SizedBox(height: 12),
-                      const Text("プレイモード:", style: TextStyle(color: Colors.grey, fontSize: 12)),
-                      const SizedBox(height: 6),
-                      SegmentedButton<PlayMode>(
-                        segments: const [
-                          ButtonSegment<PlayMode>(
-                            value: PlayMode.normal,
-                            label: Text("通常", style: TextStyle(fontSize: 12)),
-                            icon: Icon(Icons.emoji_events_outlined, size: 15),
-                          ),
-                          ButtonSegment<PlayMode>(
-                            value: PlayMode.explore,
-                            label: Text("探索", style: TextStyle(fontSize: 12)),
-                            icon: Icon(Icons.search, size: 15),
-                          ),
-                          ButtonSegment<PlayMode>(
-                            value: PlayMode.wizard,
-                            label: Text("ウィザード", style: TextStyle(fontSize: 12)),
-                            icon: Icon(Icons.auto_fix_high, size: 15),
-                          ),
-                        ],
-                        selected: {_selectedPlayMode},
-                        onSelectionChanged: (Set<PlayMode> newSelection) {
-                          final newMode = newSelection.first;
-                          setState(() {
-                            if (newMode == PlayMode.wizard) {
-                              if (_selectedPlayMode != PlayMode.wizard) {
-                                _previousCustomName = _askNameController.text;
-                              }
-                              _askNameController.text = "wizard";
-                            } else {
-                              if (_selectedPlayMode == PlayMode.wizard) {
-                                _askNameController.text = _previousCustomName.isNotEmpty ? _previousCustomName : "Player";
-                              }
-                            }
-                            _selectedPlayMode = newMode;
-                          });
-                        },
-                        style: const ButtonStyle(
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF0E1117),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: modeDescBorderColor),
-                        ),
-                        child: Text(
-                          modeDescText,
-                          style: const TextStyle(color: Colors.white70, fontSize: 11, height: 1.3),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
                       TextField(
                         controller: _askNameController,
                         autofocus: true,
@@ -2756,6 +2700,62 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ],
                       const SizedBox(height: 12),
+                      const Text("プレイモード:", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      const SizedBox(height: 6),
+                      SegmentedButton<PlayMode>(
+                        segments: const [
+                          ButtonSegment<PlayMode>(
+                            value: PlayMode.normal,
+                            label: Text("通常", style: TextStyle(fontSize: 12)),
+                            icon: Icon(Icons.emoji_events_outlined, size: 15),
+                          ),
+                          ButtonSegment<PlayMode>(
+                            value: PlayMode.explore,
+                            label: Text("探索", style: TextStyle(fontSize: 12)),
+                            icon: Icon(Icons.search, size: 15),
+                          ),
+                          ButtonSegment<PlayMode>(
+                            value: PlayMode.wizard,
+                            label: Text("ウィザード", style: TextStyle(fontSize: 12)),
+                            icon: Icon(Icons.auto_fix_high, size: 15),
+                          ),
+                        ],
+                        selected: {_selectedPlayMode},
+                        onSelectionChanged: (Set<PlayMode> newSelection) {
+                          final newMode = newSelection.first;
+                          setState(() {
+                            if (newMode == PlayMode.wizard) {
+                              if (_selectedPlayMode != PlayMode.wizard) {
+                                _previousCustomName = _askNameController.text;
+                              }
+                              _askNameController.text = "wizard";
+                            } else {
+                              if (_selectedPlayMode == PlayMode.wizard) {
+                                _askNameController.text = _previousCustomName.isNotEmpty ? _previousCustomName : "Player";
+                              }
+                            }
+                            _selectedPlayMode = newMode;
+                          });
+                        },
+                        style: const ButtonStyle(
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0E1117),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: modeDescBorderColor),
+                        ),
+                        child: Text(
+                          modeDescText,
+                          style: const TextStyle(color: Colors.white70, fontSize: 11, height: 1.3),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -2809,16 +2809,21 @@ class _MyHomePageState extends State<MyHomePage> {
         'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', '#attributes'
       ];
       final currentVal = prefs.getString('shortcut_btn_$index') ?? defaultShortcuts[index];
-      final controller = TextEditingController(text: currentVal);
+      final parsed = CmdItem.parseCmds(currentVal);
+      final currentCmdItem = parsed.isNotEmpty ? parsed.first : CmdItem(command: currentVal);
+
+      final controller = TextEditingController(text: currentCmdItem.command);
+      final labelController = TextEditingController(text: currentCmdItem.label);
 
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: Text("${shortcutLabels[index]} を編集"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               TextField(
                 controller: controller,
                 decoration: const InputDecoration(
@@ -2955,21 +2960,37 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
                 child: const Text("拡張コマンドから選択..."),
               ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: labelController,
+                decoration: const InputDecoration(
+                  labelText: "表示ラベル (任意)",
+                  hintText: "例: 道具, 地形, #メニュー",
+                  helperText: "空にするとコマンド名がそのまま表示されます",
+                ),
+              ),
             ],
           ),
-          actions: [
+        ),
+        actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text("キャンセル"),
             ),
             ElevatedButton(
               onPressed: () {
-                final val = controller.text.trim();
-                prefs.setString('shortcut_btn_$index', val).then((_) {
-                  setState(() {
-                    _controlsVersion++;
+                final cmdVal = controller.text.trim();
+                final labelVal = labelController.text.trim();
+                if (cmdVal.isNotEmpty || labelVal.isNotEmpty) {
+                  final serialized = CmdItem.serializeCmds([CmdItem(command: cmdVal, label: labelVal)]);
+                  prefs.setString('shortcut_btn_$index', serialized).then((_) {
+                    if (mounted) {
+                      setState(() {
+                        _controlsVersion++;
+                      });
+                    }
                   });
-                });
+                }
                 Navigator.pop(context);
               },
               child: const Text("保存"),

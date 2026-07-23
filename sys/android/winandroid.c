@@ -2394,7 +2394,7 @@ void and_putmsghistory(const char *msg, boolean restoring)
 
 void save_msg(const char* msg)
 {
-	if(!msg || !*msg || !strcmp("Restoring save file...", msg))
+	if(!msg || !*msg || !strcmp("Restoring save file...", msg) || !strcmp("セーブファイルを復元中...", msg))
 		return;
 	if(msghistory[msghistory_idx])
 		free(msghistory[msghistory_idx]);
