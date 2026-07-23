@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-23. */
 /* NetHack 5.0	pcmain.c	$NHDT-Date: 1693359605 2023/08/30 01:40:05 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.133 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -457,15 +457,15 @@ attempt_restore:
             iflags.news = FALSE;
         }
 #endif
-        pline("Restoring save file...");
+        pline("セーブファイルを復元中...");
         mark_synch(); /* flush output */
 
         if (dorecover(nhfp)) {
             resuming = TRUE; /* not starting new game */
             if (discover)
-                You("スコアが記録されない探索モードだった。");
+                pline("スコアが記録されない探索モードです。");
             if (discover || wizard) {
-                if (y_n("Do you want to keep the save file?") == 'n')
+                if (y_n("セーブファイルを保存しておきますか？") == 'n')
                     (void) delete_savefile();
                 else {
                     nh_compress(fqname(gs.SAVEF, SAVEPREFIX, 0));
@@ -494,7 +494,7 @@ attempt_restore:
         }
         newgame();
         if (discover)
-            You("スコアが記録されない探索モードだった。");
+            pline("スコアが記録されない探索モードです。");
     }
 
 #ifndef NO_SIGNAL

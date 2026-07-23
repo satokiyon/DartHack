@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-23. */
 /* NetHack 5.0	vmsmain.c	$NHDT-Date: 1693359633 2023/08/30 01:40:33 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -207,13 +207,13 @@ attempt_restore:
             iflags.news = FALSE; /* in case dorecover() fails */
         }
 #endif
-        pline("Restoring save file...");
+        pline("セーブファイルを復元中...");
         mark_synch(); /* flush output */
         if (dorecover(nhfp)) {
             resuming = TRUE; /* not starting new game */
             wd_message();
             if (discover || wizard) {
-                if (y_n("Do you want to keep the save file?") == 'n')
+                if (y_n("セーブファイルを保存しておきますか？") == 'n')
                     (void) delete_savefile();
                 else
                     (void) chmod(fq_save, FCMASK); /* back to readable */
@@ -490,12 +490,12 @@ static void
 wd_message(void)
 {
     if (wiz_error_flag) {
-        pline("Only user \"%s\" may access debug (wizard) mode.",
+        pline("ユーザー \"%s\" のみがデバッグ（ウィザード）モードを利用できます。",
               WIZARD_NAME);
-        pline("Entering explore/discovery mode instead.");
+        pline("代わりに探索モードに入ります。");
         wizard = 0, discover = 1; /* (paranoia) */
     } else if (discover)
-        You("スコアが記録されない探索・探検モードだった。");
+        pline("スコアが記録されない探索モードです。");
 }
 
 unsigned long
