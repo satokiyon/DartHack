@@ -185,6 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
   double _cmdPanelHeight = 58.0;
   bool _showPanelNames = true;
   DPadMoveMode _dPadMoveMode = DPadMoveMode.normal;
+  DPadMoveMode _dPadLongPressMoveMode = DPadMoveMode.gUpper;
   List<DPadMoveMode> _enabledDPadMoveModes = List<DPadMoveMode>.from(_allDPadMoveModes);
   bool _isDirectionPromptActive = false;
 
@@ -241,6 +242,8 @@ class _MyHomePageState extends State<MyHomePage> {
       if (!_enabledDPadMoveModes.contains(_dPadMoveMode)) {
         _dPadMoveMode = _enabledDPadMoveModes.first;
       }
+      final savedLongPressMoveModeName = prefs.getString('dpad_long_press_move_mode') ?? 'G_UPPER';
+      _dPadLongPressMoveMode = _parseMoveMode(savedLongPressMoveModeName);
 
       // 物理キーのロード
       _volupAction = prefs.getInt('key_volup_action') ?? 0;
@@ -1229,6 +1232,25 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  String _moveModeDescription(DPadMoveMode mode) {
+    switch (mode) {
+      case DPadMoveMode.normal:
+        return '指定方向へ1マス移動 (yuhjklbn)';
+      case DPadMoveMode.upper:
+        return '指定方向へ、壁に当たるか何かにぶつかるまで進む (YUHJKLBN)';
+      case DPadMoveMode.gLower:
+        return '指定方向へ、何か興味深いものを見つけるまで進む (g<dir>)';
+      case DPadMoveMode.gUpper:
+        return '指定方向へ、何か興味深いものを見つけるまで進む（分岐無視） (G<dir>)';
+      case DPadMoveMode.ctrl:
+        return '指定方向へ、何か興味深いものを見つけるまで進む（分岐無視） (^<dir>)';
+      case DPadMoveMode.mCmd:
+        return 'アイテムを拾わずに移動、危険な地形でも移動 (m<dir>)';
+      case DPadMoveMode.fCmd:
+        return 'モンスターを感知していなくても攻撃 (F<dir>)';
+    }
+  }
+
   String _viToNumPad(String viKey) {
     switch (viKey) {
       case 'y':
@@ -1315,6 +1337,17 @@ class _MyHomePageState extends State<MyHomePage> {
     unawaited(_saveDPadModePrefs());
   }
 
+  void _handleCenterTap() {
+    if (_isDirectionPromptActive) {
+      _sendFfiKey('.'.codeUnitAt(0), '.');
+      setState(() {
+        _isDirectionPromptActive = false;
+      });
+    } else {
+      _cycleDPadMoveMode();
+    }
+  }
+
   Future<void> _showMoveModeSelectDialog() async {
     final selected = Set<DPadMoveMode>.from(_enabledDPadMoveModes);
 
@@ -1334,6 +1367,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       contentPadding: EdgeInsets.zero,
                       value: selected.contains(mode),
                       title: Text(_moveModeLabel(mode)),
+                      subtitle: Text(_moveModeDescription(mode)),
                       onChanged: (checked) {
                         setDialogState(() {
                           if (checked == true) {
@@ -1400,7 +1434,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return false;
   }
 
-  void _sendModeAppliedDirection(String viKey, {bool useLongPressRun = false}) {
+  void _sendModeAppliedDirection(String viKey, {DPadMoveMode? modeOverride}) {
     if (_isTextOrPromptInputActive()) {
       final baseKey = _numberPadMode != 0 ? _viToNumPad(viKey) : viKey;
       _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
@@ -1408,14 +1442,10 @@ class _MyHomePageState extends State<MyHomePage> {
       return;
     }
 
-    if (useLongPressRun) {
-      _sendFfiKeys(['g'.codeUnitAt(0), viKey.codeUnitAt(0)], 'g$viKey');
-      return;
-    }
-
+    final mode = modeOverride ?? _dPadMoveMode;
     final baseKey = _numberPadMode != 0 ? _viToNumPad(viKey) : viKey;
 
-    switch (_dPadMoveMode) {
+    switch (mode) {
       case DPadMoveMode.normal:
         _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
         break;
@@ -3516,14 +3546,14 @@ class _MyHomePageState extends State<MyHomePage> {
               child: NetHackDPad(
                 opacity: _padOpacity,
                 directionLabels: _buildDirectionLabels(),
-                centerLabel: _moveModeLabel(_dPadMoveMode),
+                centerLabel: _isDirectionPromptActive ? '.' : _moveModeLabel(_dPadMoveMode),
                 onDirectionPress: (viKey) {
                   _sendModeAppliedDirection(viKey);
                 },
                 onDirectionLongPress: (viKey) {
-                  _sendModeAppliedDirection(viKey, useLongPressRun: true);
+                  _sendModeAppliedDirection(viKey, modeOverride: _dPadLongPressMoveMode);
                 },
-                onCenterTap: _cycleDPadMoveMode,
+                onCenterTap: _handleCenterTap,
                 onCenterLongPress: () {
                   _showMoveModeSelectDialog();
                 },

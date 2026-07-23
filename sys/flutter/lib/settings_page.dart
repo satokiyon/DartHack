@@ -36,6 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
   double _cmdPanelScale = 1.0;
   String _drawerPosition = 'left';
   String _menuButtonPosition = 'bottom_left';
+  String _dpadLongPressMoveMode = 'G_UPPER';
 
   // メッセージ領域設定
   int _msgLineCount = 5;      // 表示行数 (1〜15)
@@ -156,6 +157,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _cmdPanelScale = prefs.getDouble('cmd_panel_scale') ?? 1.0;
       _drawerPosition = prefs.getString('drawer_position') ?? 'left';
       _menuButtonPosition = prefs.getString('menu_button_position') ?? 'bottom_left';
+      _dpadLongPressMoveMode = prefs.getString('dpad_long_press_move_mode') ?? 'G_UPPER';
 
       _volupAction = prefs.getInt('key_volup_action') ?? 0;
       _voldownAction = prefs.getInt('key_voldown_action') ?? 0;
@@ -590,6 +592,27 @@ class _SettingsPageState extends State<SettingsPage> {
                 label: '移動',
               ),
             ],
+          ),
+        ),
+        ListTile(
+          title: const Text("移動パッド長押し時の移動モード"),
+          trailing: DropdownButton<String>(
+            value: _dpadLongPressMoveMode,
+            items: const [
+              DropdownMenuItem(value: 'NORMAL', child: Text('標準')),
+              DropdownMenuItem(value: 'UPPER', child: Text('大文字')),
+              DropdownMenuItem(value: 'G_LOWER', child: Text('g')),
+              DropdownMenuItem(value: 'G_UPPER', child: Text('G')),
+              DropdownMenuItem(value: 'CTRL', child: Text('^(Ctrl)')),
+              DropdownMenuItem(value: 'M_CMD', child: Text('m')),
+              DropdownMenuItem(value: 'F_CMD', child: Text('F')),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _dpadLongPressMoveMode = val);
+                _saveSetting('dpad_long_press_move_mode', val);
+              }
+            },
           ),
         ),
         ListTile(
