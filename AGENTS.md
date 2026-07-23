@@ -131,6 +131,16 @@
       1. `onGetDefaultValue(TypedArray a, int index)`: XML からデフォルト値を正しく取得して返す。
       2. `onSetInitialValue(boolean restore, Object defaultValue)`: `restore` が `false`（デフォルト値設定時）の際、引数から受け取った `defaultValue` を設定した上で、 `persistInt` / `persistString` / `persistBoolean` を明示的に呼び出して SharedPreferences に値を保存する。
 
+12. **NetHack 5.0 におけるウィザードモード（Wizard Mode）・探索モードの設定方針**:
+    - **`#ifdef WIZARD` マクロの記述禁止**:
+      - NetHack 5.0 ではデバッグ機能のビルドが常時無条件で有効化されており、従来の `#ifdef WIZARD` プリプロセッサマクロはコードベースから廃止されています。
+      - Cコードや移植層（`winflutter.c` 等）で `#ifdef WIZARD` ガードを使用するとコンパイル時にブロック内（`wizard = TRUE` や `svp.plname` への名前コピー）が消去されるため、`#ifdef WIZARD` は使用しないでください。
+    - **Windows版 `-D -u wizard` 同等のフラグ初期化**:
+      - 移植層からウィザードモードを適用する際は、以下のステップを順に実行してください：
+        1) `wizard = TRUE; discover = FALSE;`
+        2) `svp.plname` に小文字の `"wizard"` をセット
+        3) `set_playmode();` を呼び出して C コアの認証状態を完了させる
+
    **関連**: C コア ↔ Flutter FFI におけるウィンドウ API とタイル描画の設計方針（後述）も合わせて参照してください。`#ifndef ANDROID` ガードの配置や、`flutter_putmixed_with_tile` のような Android 専用 C シンボルを共通ファイルに置く際の二重定義回避パターンを記載しています。
 
 
