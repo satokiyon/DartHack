@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-23. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -92,6 +92,10 @@
 3. **Windows (PowerShell) 環境での Git コミット・コマンド実行の制約**:
    - `run_command` 等でコマンドを連結する際、PowerShell では `&&` を使用すると構文エラーになるため、1行ずつ実行するかセミコロン `;` 等で区切ってください。
    - 日本語のコミットメッセージを指定する場合、PowerShell 上で文字化けが発生するのを防ぐため、メッセージを一時ファイル（UTF-8）を artifacts の scratch ディレクトリ（例：`<appDataDir>\brain\<conversation-id>\scratch\commit_msg.txt`）に書き込み、`git commit -F <ファイルパス>` でコミットを行ってください。コミット完了後、一時ファイルは削除してください。
+
+4. **Clang / Emscripten (Wasm) 互換性と C 言語規格の厳格遵守**:
+   - **マルチバイト文字定数 (' ') の使用禁止**: `'。'` や `'あ'` のように 1 バイトを超える UTF-8 マルチバイト文字をシングルクォーテーション `' '` で囲む記述は、Clang 等で `error: character constant too long for its type` になります。マルチバイト文字を出力・指定する場合は必ずダブルクォーテーション `" "`（文字列リテラル）を使用し、フォーマット指定子も `%s` に変更してください。
+   - **関数宣言（extern）と定義（staticfn）のリンケージ一致**: ヘッダーファイル等で `extern` (非 static) 宣言されている関数を `.c` ファイル内で `staticfn` (static) として定義すると、Clang 等で `error: static declaration follows non-static declaration` になります。ヘッダーの公開宣言と実装のリンケージ（可視性）を必ず一致させてください。
 
 ## 巨大なデータファイルや設定ファイルの安全な編集方針
 
