@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0	cmd.c	$NHDT-Date: 1781973043 2026/06/20 16:30:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.772 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -971,14 +971,14 @@ enter_explore_mode(void)
                 /* keep going */
             }
         }
-          pline("注意!  探索モードに入ると%sへ戻れなかった.",
+          pline("注意!  探索モードに入ると%sへ戻れません.",
               oldmode);
         if (paranoid_query(ParanoidQuit,
                    "探索モードに入るか?")) {
             discover = TRUE;
             wizard = FALSE;
             clear_nhwindow(WIN_MESSAGE);
-            You("得点なしの探索モードになった.");
+            pline("スコアが記録されない探索モードに入りました.");
         } else {
             clear_nhwindow(WIN_MESSAGE);
             pline("%sを続行した.", oldmode);
@@ -2962,7 +2962,7 @@ dokeylist(void)
     Sprintf(buf, "%-7s", key2txt(key, buf2));
 #else
     /* first of the keyless commands */
-    Sprintf(buf2, "[%s]", key2txt(key, buf));
+    Snprintf(buf2, sizeof buf2, "[%s]", key2txt(key, buf));
     Sprintf(buf, "%-21s", buf2);
 #endif
     Strcat(buf, " 中断: NetHackを中断する (SIGINT)");

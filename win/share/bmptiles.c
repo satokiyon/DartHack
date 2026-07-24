@@ -1,9 +1,12 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0    bmptiles.c    $NHDT-Date: 1781973097 2026/06/20 16:31:37 $ $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.6 $ */
 /* Copyright (c) Ray Chason, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"
+
+#ifdef TILES_IN_GLYPHMAP
+
 #include "tileset.h"
 
 /* First BMP file header */
@@ -593,3 +596,5 @@ pixel_element(uint32 mask, uint32 color)
     color &= mask;
     return color * 255 / mask;
 }
+
+#endif /* TILES_IN_GLYPHMAP */

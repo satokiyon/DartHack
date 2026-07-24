@@ -1,9 +1,12 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0    tileset.c    $NHDT-Date: 1781973099 2026/06/20 16:31:39 $ $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.6 $ */
 /* Copyright (c) Ray Chason, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"
+
+#ifdef TILES_IN_GLYPHMAP
+
 #include "objclass.h"
 #include "flag.h"
 #include "tileset.h"
@@ -349,3 +352,5 @@ read_png_tiles(const char *filename UNUSED, struct TileSetImage *image UNUSED)
     /* stub */
     return FALSE;
 }
+
+#endif /* TILES_IN_GLYPHMAP */
