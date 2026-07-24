@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'defaults_editor.dart';
 import 'nethack_ffi.dart';
+import 'utils/defaults_helper.dart';
 import 'utils/scale_clamp.dart';
 
 
@@ -38,6 +39,37 @@ class _SettingsPageState extends State<SettingsPage> {
   String _menuButtonPosition = 'bottom_left';
   String _dpadLongPressMoveMode = 'G_UPPER';
   String _mapTapTravelMode = 'always';
+
+  // defaults.nh 連動ゲームオプション
+  bool _optTutorial = true;
+  bool _optAutopickup = false;
+  String _optPickupTypes = r'$"=/!?+';
+  bool _optTime = true;
+  bool _optShowexp = true;
+  bool _optPriceQuotes = true;
+  bool _optHiliteStatus = true;
+  bool _optMenucolor = true;
+  String _optDogname = '';
+  String _optCatname = '';
+  String _optHorsename = '';
+  String _optFruit = '';
+
+  static const Map<String, String> _itemTypeSymbols = {
+    '\$': '金貨 (\$)',
+    '"': '首飾り/アミュレット (")',
+    '[': '防具 ([)',
+    '%': '食料 (%)',
+    '?': '巻物 (?)',
+    '+': '呪文の書 (+)',
+    '/': '杖 (/)',
+    '=': '指輪 (=)',
+    '!': '薬 (!)',
+    '(': '道具 (()',
+    '*': '宝石 (*)',
+    '0': '弾薬/コンポーネント (0)',
+    ')': '武器 ()',
+    '_': 'その他 (_)',
+  };
 
   // メッセージ領域設定
   int _msgLineCount = 5;      // 表示行数 (1〜15)
@@ -142,6 +174,9 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _loadAllSettings() async {
+    final defaultsHelper = DefaultsHelper();
+    await defaultsHelper.syncFromFileToPrefs(widget.defaultsFilePath);
+
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _useTiles = prefs.getBool('use_tiles') ?? true;
@@ -169,6 +204,20 @@ class _SettingsPageState extends State<SettingsPage> {
       _msgLineCount = prefs.getInt('msg_line_count') ?? 5;
       _msgOpacity = prefs.getDouble('msg_opacity') ?? 0.70;
       _msgFontSize = prefs.getDouble('msg_font_size') ?? 13.0;
+
+      // ゲームオプション (defaults.nh 連動) のロード
+      _optTutorial = prefs.getBool('nh_opt_tutorial') ?? true;
+      _optAutopickup = prefs.getBool('nh_opt_autopickup') ?? false;
+      _optPickupTypes = prefs.getString('nh_opt_pickup_types') ?? r'$"=/!?+';
+      _optTime = prefs.getBool('nh_opt_time') ?? true;
+      _optShowexp = prefs.getBool('nh_opt_showexp') ?? true;
+      _optPriceQuotes = prefs.getBool('nh_opt_price_quotes') ?? true;
+      _optHiliteStatus = prefs.getBool('nh_opt_hilite_status') ?? true;
+      _optMenucolor = prefs.getBool('nh_opt_menucolor') ?? true;
+      _optDogname = prefs.getString('nh_opt_dogname') ?? '';
+      _optCatname = prefs.getString('nh_opt_catname') ?? '';
+      _optHorsename = prefs.getString('nh_opt_horsename') ?? '';
+      _optFruit = prefs.getString('nh_opt_fruit') ?? '';
 
       for (int i = 0; i < 9; i++) {
         _shortcuts[i] = prefs.getString('shortcut_btn_$i') ?? _defaultShortcuts[i];
@@ -210,6 +259,12 @@ class _SettingsPageState extends State<SettingsPage> {
     } else if (value is String) {
       await prefs.setString(key, value);
     }
+  }
+
+  Future<void> _saveGameOption<T>(String key, T value) async {
+    await _saveSetting(key, value);
+    final defaultsHelper = DefaultsHelper();
+    await defaultsHelper.syncFromPrefsToFile(widget.defaultsFilePath);
   }
 
   Future<void> _syncNativeKeySettings() async {
@@ -1084,14 +1139,15 @@ class _SettingsPageState extends State<SettingsPage> {
         ListTile(
           leading: const Icon(Icons.edit_note, color: Colors.white),
           title: const Text("defaults.nh を手動で編集"),
-          subtitle: const Text("詳細なゲームオプションファイルを直接記述します"),
+          subtitle: const Text("詳細なゲームオプションファイルを直接記述します（※反映には再起動が必要です）"),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () {
-            Navigator.of(context).push(
+          onTap: () async {
+            await Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => DefaultsEditor(defaultsFilePath: widget.defaultsFilePath),
               ),
             );
+            _loadAllSettings();
           },
         ),
         const Divider(),
@@ -1106,6 +1162,261 @@ class _SettingsPageState extends State<SettingsPage> {
           title: const Text("設定をインポート"),
           subtitle: const Text("クリップボードの設定JSONを読み込んで適用します"),
           onTap: _importSettings,
+        ),
+      ],
+    );
+  }
+
+  void _editPickupTypes() {
+    final controller = TextEditingController(text: _optPickupTypes);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            final currentText = controller.text;
+
+            return AlertDialog(
+              title: const Text("自動拾い対象アイテム"),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: controller,
+                        decoration: const InputDecoration(
+                          labelText: "直接入力 (記号の羅列)",
+                          hintText: r'例: $"=/!?+',
+                          helperText: "拾いたいアイテムの記号を入力してください",
+                        ),
+                        onChanged: (val) {
+                          setStateDialog(() {});
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "または選択肢からトグル選択:",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      const SizedBox(height: 8),
+                      ..._itemTypeSymbols.entries.map((entry) {
+                        final char = entry.key;
+                        final label = entry.value;
+                        final isSelected = currentText.contains(char);
+
+                        return CheckboxListTile(
+                          dense: true,
+                          title: Text(label),
+                          value: isSelected,
+                          onChanged: (checked) {
+                            var text = controller.text;
+                            if (checked == true) {
+                              if (!text.contains(char)) {
+                                text += char;
+                              }
+                            } else {
+                              text = text.replaceAll(char, '');
+                            }
+                            controller.text = text;
+                            setStateDialog(() {});
+                          },
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("キャンセル"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    final val = controller.text.trim();
+                    setState(() {
+                      _optPickupTypes = val;
+                    });
+                    _saveGameOption('nh_opt_pickup_types', val);
+                    Navigator.pop(context);
+                  },
+                  child: const Text("保存"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _editStringOption(String title, String prefKey, String currentVal, int maxChars) {
+    final controller = TextEditingController(text: currentVal);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            final charCount = controller.text.characters.length;
+
+            return AlertDialog(
+              title: Text(title),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: controller,
+                    decoration: InputDecoration(
+                      hintText: "未指定の場合は空欄",
+                      counterText: "$charCount / $maxChars 文字",
+                      counterStyle: TextStyle(
+                        color: charCount >= maxChars ? Colors.orangeAccent : Colors.white70,
+                      ),
+                    ),
+                    onChanged: (val) {
+                      if (val.characters.length > maxChars) {
+                        final truncated = DefaultsHelper.truncateUtf8Chars(val, maxChars);
+                        controller.value = TextEditingValue(
+                          text: truncated,
+                          selection: TextSelection.collapsed(offset: truncated.length),
+                        );
+                      }
+                      setStateDialog(() {});
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("キャンセル"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    final val = controller.text.trim();
+                    setState(() {
+                      if (prefKey == 'nh_opt_dogname') _optDogname = val;
+                      if (prefKey == 'nh_opt_catname') _optCatname = val;
+                      if (prefKey == 'nh_opt_horsename') _optHorsename = val;
+                      if (prefKey == 'nh_opt_fruit') _optFruit = val;
+                    });
+                    _saveGameOption(prefKey, val);
+                    Navigator.pop(context);
+                  },
+                  child: const Text("保存"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildGameRulesSection() {
+    return ExpansionTile(
+      leading: const Icon(Icons.sports_esports, color: Colors.tealAccent),
+      title: const Text("ゲームルール・プレイ設定 (defaults.nh)"),
+      subtitle: const Text("ゲーム本体の動作オプションを設定します（※反映には再起動が必要です）"),
+      children: [
+        SwitchListTile(
+          title: const Text("チュートリアル開始確認"),
+          subtitle: const Text("起動時/ゲーム開始時にチュートリアルを始めるか確認します"),
+          value: _optTutorial,
+          onChanged: (val) {
+            setState(() => _optTutorial = val);
+            _saveGameOption('nh_opt_tutorial', val);
+          },
+        ),
+        SwitchListTile(
+          title: const Text("自動拾い (autopickup)"),
+          subtitle: const Text("足元のアイテムを自動的に拾います"),
+          value: _optAutopickup,
+          onChanged: (val) {
+            setState(() => _optAutopickup = val);
+            _saveGameOption('nh_opt_autopickup', val);
+          },
+        ),
+        ListTile(
+          enabled: _optAutopickup,
+          title: const Text("自動拾い対象のアイテム種別 (pickup_types)"),
+          subtitle: Text(
+            _optAutopickup
+                ? (_optPickupTypes.isEmpty ? "すべて拾う" : "対象記号: $_optPickupTypes")
+                : "※自動拾いが有効な場合のみ設定できます",
+            style: TextStyle(
+              color: _optAutopickup ? Colors.white70 : Colors.grey,
+            ),
+          ),
+          onTap: _optAutopickup ? _editPickupTypes : null,
+        ),
+        SwitchListTile(
+          title: const Text("経過ターン表示 (time)"),
+          subtitle: const Text("ステータス表示に行動ターン数を表示します"),
+          value: _optTime,
+          onChanged: (val) {
+            setState(() => _optTime = val);
+            _saveGameOption('nh_opt_time', val);
+          },
+        ),
+        SwitchListTile(
+          title: const Text("経験値表示 (showexp)"),
+          subtitle: const Text("ステータス表示に獲得経験値を表示します"),
+          value: _optShowexp,
+          onChanged: (val) {
+            setState(() => _optShowexp = val);
+            _saveGameOption('nh_opt_showexp', val);
+          },
+        ),
+        SwitchListTile(
+          title: const Text("価格見積表示 (price_quotes)"),
+          subtitle: const Text("店での売買時に価格の見積もりを表示します"),
+          value: _optPriceQuotes,
+          onChanged: (val) {
+            setState(() => _optPriceQuotes = val);
+            _saveGameOption('nh_opt_price_quotes', val);
+          },
+        ),
+        SwitchListTile(
+          title: const Text("ステータスハイライト表示 (hilite_status)"),
+          subtitle: const Text("HPや各種状態変化を色付きでハイライト表示します"),
+          value: _optHiliteStatus,
+          onChanged: (val) {
+            setState(() => _optHiliteStatus = val);
+            _saveGameOption('nh_opt_hilite_status', val);
+          },
+        ),
+        SwitchListTile(
+          title: const Text("メニューのカラー表示 (MENUCOLOR)"),
+          subtitle: const Text("インベントリやダイアログの各項目を色付き表示します"),
+          value: _optMenucolor,
+          onChanged: (val) {
+            setState(() => _optMenucolor = val);
+            _saveGameOption('nh_opt_menucolor', val);
+          },
+        ),
+        ListTile(
+          title: const Text("犬の名前 (dogname)"),
+          subtitle: Text(_optDogname.isEmpty ? "デフォルト (未指定)" : _optDogname),
+          onTap: () => _editStringOption("犬の名前 (dogname)", 'nh_opt_dogname', _optDogname, 16),
+        ),
+        ListTile(
+          title: const Text("猫の名前 (catname)"),
+          subtitle: Text(_optCatname.isEmpty ? "デフォルト (未指定)" : _optCatname),
+          onTap: () => _editStringOption("猫の名前 (catname)", 'nh_opt_catname', _optCatname, 16),
+        ),
+        ListTile(
+          title: const Text("馬の名前 (horsename)"),
+          subtitle: Text(_optHorsename.isEmpty ? "デフォルト (未指定)" : _optHorsename),
+          onTap: () => _editStringOption("馬の名前 (horsename)", 'nh_opt_horsename', _optHorsename, 16),
+        ),
+        ListTile(
+          title: const Text("果物の名前 (fruit)"),
+          subtitle: Text(_optFruit.isEmpty ? "デフォルト (slime mold)" : _optFruit),
+          onTap: () => _editStringOption("果物の名前 (fruit)", 'nh_opt_fruit', _optFruit, 16),
         ),
       ],
     );
@@ -1154,6 +1465,7 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildTilesetSection(),
           _buildScreenModeSection(),
           _buildControllerSection(),
+          _buildGameRulesSection(),
           _buildCmdPanelSection(), // 追加
           _buildMessageSection(),  // メッセージ設定
           _buildKeyActionSection(),

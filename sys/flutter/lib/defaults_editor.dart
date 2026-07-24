@@ -133,30 +133,53 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
                       ),
                     ),
                   )
-                : Container(
-                    padding: const EdgeInsets.all(12.0),
-                    color: Colors.grey[950],
-                    child: TextField(
-                      controller: _controller,
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 14,
-                        color: Colors.white70,
+                : Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        color: Colors.amber.withValues(alpha: 0.15),
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.info_outline, color: Colors.amber, size: 20),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                "※ defaults.nh の編集内容を反映するにはゲームの再起動が必要です",
+                                style: TextStyle(color: Colors.amber, fontSize: 13),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "オプションを入力してください...",
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(12.0),
+                          color: Colors.grey[950],
+                          child: TextField(
+                            controller: _controller,
+                            maxLines: null,
+                            keyboardType: TextInputType.multiline,
+                            style: const TextStyle(
+                              fontFamily: 'monospace',
+                              fontSize: 14,
+                              color: Colors.white70,
+                            ),
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "オプションを入力してください...",
+                            ),
+                            onChanged: (val) {
+                              if (!_hasChanges) {
+                                setState(() {
+                                  _hasChanges = true;
+                                });
+                              }
+                            },
+                          ),
+                        ),
                       ),
-                      onChanged: (val) {
-                        if (!_hasChanges) {
-                          setState(() {
-                            _hasChanges = true;
-                          });
-                        }
-                      },
-                    ),
+                    ],
                   ),
       ),
     );

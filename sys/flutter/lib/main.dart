@@ -14,6 +14,7 @@ import 'nethack_keyboard.dart';
 import 'nethack_shortcut_pad.dart';
 import 'nethack_ffi.dart';
 import 'settings_page.dart';
+import 'utils/defaults_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'amount_selector_dialog.dart';
 import 'utils/scale_clamp.dart';
@@ -874,6 +875,11 @@ class _MyHomePageState extends State<MyHomePage> {
         _assetsReady = true;
       });
       _addLog("Assets initialized at: $_assetsPath");
+
+      final defaultsHelper = DefaultsHelper();
+      await defaultsHelper.syncFromFileToPrefs('$_assetsPath/defaults.nh');
+      await defaultsHelper.syncFromPrefsToFile('$_assetsPath/defaults.nh');
+
       // 初期フレーム描画を阻害しないようタイル読み込みは非同期で後追いする
       unawaited(_loadTileset(_selectedTileset));
     } catch (e) {
