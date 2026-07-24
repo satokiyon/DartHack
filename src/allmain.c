@@ -83,8 +83,6 @@ moveloop_preamble(boolean resuming)
     if (resuming) { /* restoring old game */
         read_engr_at(u.ux, u.uy); /* subset of pickup() */
         fix_shop_damage();
-        /* DartHack: セーブデータ復元後も最新の defaults.nh 設定を即座に上書き反映する */
-        (void) read_config_file(get_configfile(), set_in_config);
     }
 
     encumber_msg(); /* in case they auto-picked up something */

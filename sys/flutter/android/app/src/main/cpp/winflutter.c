@@ -447,10 +447,10 @@ static void flutter_putmsghistory(const char *msg, boolean restoring) {
         return;
     }
 
-    if (restoring) {
+    if (!restoring) {
         flutter_putstr(WIN_MESSAGE, ATR_NONE, msg);
+        flutter_save_message(msg);
     }
-    flutter_save_message(msg);
 }
 
 // 拡張コマンド一覧の取得
