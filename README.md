@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-19. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-25. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsのみ)
@@ -180,6 +180,7 @@ OPTIONS=align_status:right,msw_stat_cols:15
 
 ## 他の日本語化プロジェクト
 * [JNetHack](https://github.com/jnethack): 言わずと知れたNetHack日本語版の偉大なる総本山
+* [NetHack-wasm-webUI](https://github.com/e3sh/Nethack-wasm-webUI): ブラウザでプレイできる。日本語はリアルタイムに翻訳(変換)して表示している。
 * [NetHack-brass](https://github.com/youkan700/NetHack-brass): 3.4.3ベースを日本語化してさらにいろいろ改造したもの
 * …他にあれば追記する
 
