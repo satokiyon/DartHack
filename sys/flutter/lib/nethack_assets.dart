@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'utils/defaults_helper.dart';
 
 class NetHackAssets {
   static const String _verKey = "verDat";
@@ -60,9 +61,12 @@ class NetHackAssets {
       // セーブデータの安全保護/確認
       await _checkAndBackupSaveFiles(saveDir, isUpgrade: deployedVer != -1 || deployedBuildId.isNotEmpty);
 
-      // アセットファイルのコピー・置換
+      // アセットファイルのコピー・置換（ユーザーのスコア・ログ・defaults.nhは保護）
       await _copyAssets(dstDir, deployedVer != -1);
       
+      // defaults.nh の安全マージ（ユーザー設定の維持・新項目の補完・廃止項目の削除）
+      await _mergeDefaultsFile(dstDir);
+
       // バージョンと展開先パス・ビルドIDを保存
       await prefs.setInt(_verKey, assetVer);
       await prefs.setString(_dataDirKey, dstDir.path);
@@ -78,6 +82,16 @@ class NetHackAssets {
     return dstDir;
   }
 
+  static const Set<String> _protectedDataFiles = {
+    'record',
+    'logfile',
+    'xlogfile',
+    'history',
+    'paniclog',
+    'perm',
+    'defaults.nh',
+  };
+
   static Future<void> _copyAssets(Directory dstDir, bool isUpgrade) async {
     // AssetManifest をロードして nethackdir 配下のアセットを列挙
     final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
@@ -89,18 +103,10 @@ class NetHackAssets {
       final relativePath = assetKey.replaceFirst('assets/nethackdir/', '');
       final dstFile = File('${dstDir.path}/$relativePath');
 
-      // defaults.nh の特別処理
-      if (relativePath == 'defaults.nh' && await dstFile.exists()) {
-        if (isUpgrade) {
-          // アップグレード時は既存の defaults.nh をバックアップ
-          final bakFile = File('${dstFile.path}.bak');
-          if (await bakFile.exists()) {
-            await bakFile.delete();
-          }
-          await dstFile.rename(bakFile.path);
-          debugPrint("NetHackAssets: Backed up existing defaults.nh to defaults.nh.bak");
-        } else {
-          // 初回起動時（何らかの理由でファイルだけ残っていた場合等）は上書きせずスキップ
+      // 既存のユーザーデータファイル（スコア、ログ、設定ファイル等）の上書き保護
+      if (await dstFile.exists()) {
+        if (_protectedDataFiles.contains(relativePath) || relativePath.startsWith('save/')) {
+          debugPrint("NetHackAssets: Skipping overwrite for existing file '$relativePath'");
           continue;
         }
       }
@@ -141,5 +147,27 @@ class NetHackAssets {
       debugPrint("Warning: Exception while checking/backing up save files: $e");
     }
   }
+
+  /// アセットの defaults.nh と端末の defaults.nh / SharedPreferences を安全にマージする
+  static Future<void> _mergeDefaultsFile(Directory dstDir) async {
+    try {
+      final tmpAssetFile = File('${dstDir.path}/defaults.nh.asset_tmp');
+      final byteData = await rootBundle.load('assets/nethackdir/defaults.nh');
+      final bytes = byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
+      await tmpAssetFile.writeAsBytes(bytes, flush: true);
+
+      final targetFile = File('${dstDir.path}/defaults.nh');
+      final defaultsHelper = DefaultsHelper();
+      await defaultsHelper.mergeAssetDefaultsWithPrefs(tmpAssetFile.path, targetFile.path);
+
+      if (await tmpAssetFile.exists()) {
+        await tmpAssetFile.delete();
+      }
+      debugPrint("NetHackAssets: Safely merged defaults.nh with user preferences.");
+    } catch (e) {
+      debugPrint("Warning: Exception during defaults.nh merge: $e");
+    }
+  }
 }
+
 

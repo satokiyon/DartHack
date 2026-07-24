@@ -899,8 +899,8 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       final defaultsHelper = DefaultsHelper();
-      await defaultsHelper.syncFromFileToPrefs('$_assetsPath/defaults.nh');
       await defaultsHelper.syncFromPrefsToFile('$_assetsPath/defaults.nh');
+      await defaultsHelper.syncFromFileToPrefs('$_assetsPath/defaults.nh');
 
       // 初期フレーム描画を阻害しないようタイル読み込みは非同期で後追いする
       unawaited(_loadTileset(_selectedTileset));

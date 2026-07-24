@@ -431,4 +431,62 @@ class DefaultsHelper {
 
     await saveToFile(filePath);
   }
+
+  /// アセットの defaults.nh と SharedPreferences のユーザー設定を安全に双方向マージする
+  /// - 新規キー: アセットのデフォルト値を補完追加
+  /// - 廃止キー: SharedPreferences から削除
+  /// - 無効値: デフォルト値にフォールバック
+  /// - 有効な既存設定: そのまま優先維持
+  Future<void> mergeAssetDefaultsWithPrefs(String assetFilePath, String targetFilePath) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // 1. アセット側の最新 defaults.nh を読込
+    await loadFromFile(assetFilePath);
+    final Map<String, String> assetDefaults = Map.from(_options);
+
+    // 2. 廃止された nh_opt_* キーの削除クリーンアップ
+    final allKeys = prefs.getKeys().where((k) => k.startsWith('nh_opt_')).toList();
+    for (final prefKey in allKeys) {
+      final optKey = prefKey.substring('nh_opt_'.length);
+      if (!managedKeys.contains(optKey)) {
+        await prefs.remove(prefKey);
+        debugPrint("DefaultsHelper: Removed obsolete option key '$prefKey'");
+      }
+    }
+
+    // 3. 各 managedKeys の比較・補完・検証
+    for (final optKey in managedKeys) {
+      final prefKey = 'nh_opt_$optKey';
+      final assetDefaultVal = assetDefaults[optKey];
+
+      if (!prefs.containsKey(prefKey)) {
+        // 新規キーの補完追加
+        if (assetDefaultVal != null) {
+          if (optKey == 'pickup_types' || optKey == 'dogname' || optKey == 'catname' || optKey == 'horsename' || optKey == 'fruit') {
+            await prefs.setString(prefKey, assetDefaultVal);
+          } else {
+            final bool bVal = assetDefaultVal.toLowerCase() == 'true';
+            await prefs.setBool(prefKey, bVal);
+          }
+          debugPrint("DefaultsHelper: Added new option '$prefKey' = $assetDefaultVal");
+        }
+      } else {
+        // 既存設定の検証と範囲外値のフォールバック
+        if (optKey == 'pickup_types') {
+          final currentVal = prefs.getString(prefKey) ?? '';
+          // 有効なピックアップ文字以外の不正文字が含まれる場合はデフォルトへリセット
+          final validChars = RegExp(r'^[a-zA-Z0-9\$\"=/!\?\+\*\-\%\`\[\]\)\(\@\_\#]+$');
+          if (currentVal.isNotEmpty && !validChars.hasMatch(currentVal)) {
+            final defaultPickup = assetDefaultVal ?? r'$"=/!?+';
+            await prefs.setString(prefKey, defaultPickup);
+            debugPrint("DefaultsHelper: Invalid pickup_types '$currentVal' reset to '$defaultPickup'");
+          }
+        }
+      }
+    }
+
+    // 4. マージ完了後の最新設定をターゲットdefaults.nhファイルに書き出し
+    await syncFromPrefsToFile(targetFilePath);
+  }
 }
+
