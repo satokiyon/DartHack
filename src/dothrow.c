@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0	dothrow.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.318 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -597,10 +597,10 @@ endmultishot(boolean verbose)
 {
     if (gm.m_shot.i < gm.m_shot.n) {
         if (verbose && !svc.context.mon_moving) {
-            You("%d%sの%sで%sのをやめた.",
-                gm.m_shot.i, ordin(gm.m_shot.i),
+            You("%d%sで%sつのをやめた.",
+                gm.m_shot.i,
                 gm.m_shot.s ? "射目" : "投目",
-                gm.m_shot.s ? "撃つ" : "投げる");
+                gm.m_shot.s ? "撃" : "投げ");
         }
         gm.m_shot.n = gm.m_shot.i; /* make current shot be the last */
     }

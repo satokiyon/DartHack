@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0	do.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.411 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -1248,7 +1248,7 @@ dodown(void)
         }
     }
     if (on_level(&valley_level, &u.uz) && !u.uevent.gehennom_entered) {
-        You("あなたはゲヘナムの上に立っている.");
+        You("ゲヘナムの上に立っている.");
         pline("口にできないほどの残虐さと害悪が下に潜んでいた.");
         if (y_n("本当に入るつもりか?") != 'y')
             return ECMD_OK;
@@ -1257,7 +1257,7 @@ dodown(void)
     }
 
     if (!next_to_u()) {
-        You("あなたのペットが止そうとした!");
+        pline("ペットが止めようとした!");
         return ECMD_OK;
     }
 
@@ -1341,7 +1341,7 @@ doup(void)
             return ECMD_OK;
     }
     if (!next_to_u()) {
-        You("あなたのペットが止そうとした!");
+        pline("ペットが止めようとした!");
         return ECMD_OK;
     }
     ga.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
@@ -1901,7 +1901,7 @@ goto_level(
     } else if (Is_knox(&u.uz)) {
         /* alarm stops working once Croesus has died */
         if (new || !svm.mvitals[PM_CROESUS].died) {
-            You("あなたは一気に介入した!");
+            You("一気に介入した!");
             Soundeffect(se_alarm, 100);
             pline("警報が鳴り響いた!");
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
