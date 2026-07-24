@@ -155,4 +155,15 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
 - `set_flutter_plain_text_dialog` などの共有コアから参照される Flutter/GUI 関連 C 関数は、`include/extern.h` にプロトタイプ宣言を配置し、`src/windows.c` に非Flutter/非Android環境用の空スタブ（例: `void set_flutter_plain_text_dialog(int enable) { (void) enable; }`）、および `sys/flutter` (`winflutter.c`) 内に Flutter 用の実体を実装してください。
 - 共有コア (`src/pager.c`, `src/files.c` 等) から呼び出す際は、`include/extern.h` を経由し、Flutter/GUI ビルド時のみ実行されるよう `#ifdef AND_GUI` ガードを付与して呼び出します。これにより、非GUIビルドでのリンクエラーや不要な局所宣言の散在を防ぎつつ、安全で標準的な NetHack C 関数共有構造を維持できます。
 
+## 25. Lua 5.4.8 コンパイルにおける LUA_USE_POSIX の指定徹底
+- **現象**: Android NDK (clang) 等で Lua 5.4.8 をビルドする際、`LUA_USE_POSIX` フラグが未定義だと ISO C の `tmpnam()` にフォールバックし、`tmpnam is deprecated` 警告が出力されます。
+- **対策**: `CMakeLists.txt` やビルド定義の `add_definitions` に必ず `-DLUA_USE_POSIX` を指定してください。これにより Lua 内部で安全な `mkstemp()` が使用され、警告が防止されます。
+
+## 26. Flutter版 Cコア・アセットの自動確実更新（二重チェック）設計原則
+- **構成と自動同期**:
+  `sys/flutter` において C コアソース (`src/`, `include/`) が変更された場合も、`sync_dat_assets.ps1` が自動検知して `assets/ver` をインクリメントし、`build.gradle.kts` がそれを読み取って Android の `versionCode` を動的増分させる構成を維持してください。
+- **FFI ビルド ID 判定**:
+  C コア側（`winflutter.c`）で `flutter_get_build_id()` を提供し、Dart 側で `assets/ver` と C コアビルド ID の両重チェックを行うことで、実機端末上でのアセット最新展開と `.so` ファイルの確実な置換・反映を達成します。
+
+
 

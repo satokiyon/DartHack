@@ -51,3 +51,8 @@ DLL_EXPORT void start_dummy_game() {
         }
     }
 }
+
+DLL_EXPORT const char* flutter_get_build_id() {
+    return "dummy_build_1.0";
+}
+

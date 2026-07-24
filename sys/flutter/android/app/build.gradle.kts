@@ -21,7 +21,13 @@ android {
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
+        val verFile = file("../../assets/ver")
+        val assetVersion = if (verFile.exists()) {
+            verFile.readText().trim().toIntOrNull() ?: 0
+        } else {
+            0
+        }
+        versionCode = (flutter.versionCode ?: 1) + assetVersion
         versionName = flutter.versionName
     }
 

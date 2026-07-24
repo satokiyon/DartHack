@@ -869,12 +869,34 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _initAssets() async {
     _addLog("Initializing game assets...");
     try {
-      final dstDir = await NetHackAssets.initialize();
+      String? currentBuildId;
+      try {
+        final ffi = NetHackFfi();
+        currentBuildId = ffi.getBuildId();
+      } catch (e) {
+        debugPrint("Ffi buildId lookup: $e");
+      }
+
+      final dstDir = await NetHackAssets.initialize(currentBuildId: currentBuildId);
       setState(() {
         _assetsPath = dstDir.path;
         _assetsReady = true;
       });
-      _addLog("Assets initialized at: $_assetsPath");
+      _addLog("Assets initialized at: $_assetsPath (Build ID: ${currentBuildId ?? 'unknown'})");
+
+      if (NetHackAssets.wasUpdated && mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("NetHackコアが更新されました"),
+                duration: Duration(seconds: 4),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+        });
+      }
 
       final defaultsHelper = DefaultsHelper();
       await defaultsHelper.syncFromFileToPrefs('$_assetsPath/defaults.nh');

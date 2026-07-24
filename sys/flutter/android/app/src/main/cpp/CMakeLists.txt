@@ -3,6 +3,10 @@ project(nethack VERSION 5.0.0 LANGUAGES C)
 
 set(NHSROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../../")
 
+if(NOT DEFINED BUILD_ID)
+    string(TIMESTAMP BUILD_ID "%Y%m%d_%H%M%S")
+endif()
+
 # Compile flags
 add_definitions(
     -DANDROID
@@ -10,6 +14,8 @@ add_definitions(
     -DAND_GUI
     -DLINKED_BINS
     -DHACKLIB
+    -DNETHACK_BUILD_ID="${BUILD_ID}"
+    -DLUA_USE_POSIX
 )
 
 # Include directories

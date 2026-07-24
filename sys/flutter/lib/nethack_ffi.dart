@@ -1,5 +1,6 @@
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
+import 'package:flutter/foundation.dart';
 
 // コールバックの型定義
 typedef CreateWindowCallback = Void Function(Int32 winId, Int32 type);
@@ -130,6 +131,10 @@ typedef SendPosCmdDart = void Function(int x, int y, int mod);
 typedef SendKeysFunc = Void Function(Pointer<Int32> keys, Int32 len);
 typedef SendKeysDart = void Function(Pointer<Int32> keys, int len);
 
+// CコアビルドID取得
+typedef GetBuildIdFunc = Pointer<Utf8> Function();
+typedef GetBuildIdDart = Pointer<Utf8> Function();
+
 // ショートカットボタン用送信 (extcmd テキストパスを強制)
 typedef SendShortcutFunc = Void Function(Pointer<Int32> keys, Int32 len);
 typedef SendShortcutDart = void Function(Pointer<Int32> keys, int len);
@@ -153,6 +158,7 @@ class NetHackFfi {
   late final SendPosCmdDart sendPosCmdToC;
   late final GetTopTenTextDart getTopTenTextFlutter;
   late final TriggerDatabaseSearchDart triggerDatabaseSearch;
+  late final GetBuildIdDart getBuildIdNative;
 
   NetHackFfi() {
     try {
@@ -160,6 +166,14 @@ class NetHackFfi {
     } catch (_) {
       // Windows デバッグ用フォールバック
       _lib = DynamicLibrary.open('nethack_dummy.dll');
+    }
+
+    try {
+      getBuildIdNative = _lib
+          .lookup<NativeFunction<GetBuildIdFunc>>('flutter_get_build_id')
+          .asFunction();
+    } catch (e) {
+      getBuildIdNative = () => nullptr;
     }
 
     startNetHack = _lib
@@ -226,4 +240,17 @@ class NetHackFfi {
         .lookup<NativeFunction<TriggerDatabaseSearchFunc>>('TriggerDatabaseSearchFlutter')
         .asFunction();
   }
+
+  String getBuildId() {
+    try {
+      final ptr = getBuildIdNative();
+      if (ptr != nullptr) {
+        return ptr.toDartString();
+      }
+    } catch (e) {
+      debugPrint("Warning: Failed to get build id: $e");
+    }
+    return "unknown";
+  }
 }
+

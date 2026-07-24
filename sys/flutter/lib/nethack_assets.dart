@@ -7,9 +7,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 class NetHackAssets {
   static const String _verKey = "verDat";
   static const String _dataDirKey = "datadir";
+  static const String _buildIdKey = "cCoreBuildId";
+
+  /// 今回の起動で Cコア/アセットの更新が発生したか
+  static bool wasUpdated = false;
+  static String updatedBuildId = "";
 
   /// アセットの展開を行い、展開先の File パス（ディレクトリ）を返す。
-  static Future<Directory> initialize() async {
+  static Future<Directory> initialize({String? currentBuildId}) async {
     final docDir = await getApplicationSupportDirectory();
     // NetHackのデータフォルダ名
     final dstDir = Directory('${docDir.path}/nethackdir');
@@ -33,22 +38,40 @@ class NetHackAssets {
     }
     final int assetVer = int.tryParse(assetVerStr) ?? 0;
 
-    // 2. 展開済みのバージョンを取得
+    // 2. 展開済みのバージョンおよびビルドIDを取得
     final prefs = await SharedPreferences.getInstance();
     final int deployedVer = prefs.getInt(_verKey) ?? -1;
+    final String deployedBuildId = prefs.getString(_buildIdKey) ?? "";
 
-    debugPrint("NetHackAssets: Asset version = $assetVer, Deployed version = $deployedVer");
+    final String buildIdToUse = currentBuildId ?? "unknown";
 
-    // 3. バージョンチェックとアセットコピーの実行
-    if (deployedVer < assetVer) {
-      debugPrint("NetHackAssets: Copying assets to ${dstDir.path}...");
+    debugPrint("NetHackAssets: Asset ver = $assetVer (Deployed: $deployedVer), Build ID = $buildIdToUse (Deployed: $deployedBuildId)");
+
+    // 3. バージョンまたは Cコア Build ID の変更チェック
+    final bool isVersionUpdated = deployedVer < assetVer;
+    final bool isBuildIdUpdated = buildIdToUse != "unknown" && buildIdToUse != deployedBuildId;
+    final bool isCoreUpdated = isVersionUpdated || isBuildIdUpdated;
+
+    if (isCoreUpdated) {
+      wasUpdated = true;
+      updatedBuildId = buildIdToUse;
+      debugPrint("NetHackAssets: Updating core assets in ${dstDir.path}...");
+
+      // セーブデータの安全保護/確認
+      await _checkAndBackupSaveFiles(saveDir, isUpgrade: deployedVer != -1 || deployedBuildId.isNotEmpty);
+
+      // アセットファイルのコピー・置換
       await _copyAssets(dstDir, deployedVer != -1);
       
-      // バージョンと展開先パスを保存
+      // バージョンと展開先パス・ビルドIDを保存
       await prefs.setInt(_verKey, assetVer);
       await prefs.setString(_dataDirKey, dstDir.path);
-      debugPrint("NetHackAssets: Copying completed.");
+      if (buildIdToUse != "unknown") {
+        await prefs.setString(_buildIdKey, buildIdToUse);
+      }
+      debugPrint("NetHackAssets: Core & asset update completed.");
     } else {
+      wasUpdated = false;
       debugPrint("NetHackAssets: Assets are up to date.");
     }
 
@@ -94,4 +117,29 @@ class NetHackAssets {
       await dstFile.writeAsBytes(bytes, flush: true);
     }
   }
+
+  /// Cコア更新時にセーブデータの保護とバックアップを行う
+  static Future<void> _checkAndBackupSaveFiles(Directory saveDir, {required bool isUpgrade}) async {
+    if (!await saveDir.exists()) return;
+    try {
+      final entries = await saveDir.list().toList();
+      final saveFiles = entries.whereType<File>().where((f) {
+        final name = f.path.split(Platform.pathSeparator).last;
+        return name.endsWith('.sav') || name.endsWith('.0') || name.contains('save');
+      }).toList();
+
+      if (saveFiles.isNotEmpty && isUpgrade) {
+        final backupDir = Directory('${saveDir.parent.path}/save_bak_${DateTime.now().millisecondsSinceEpoch}');
+        await backupDir.create(recursive: true);
+        debugPrint("NetHackAssets: Backing up ${saveFiles.length} save files to ${backupDir.path}");
+        for (final saveFile in saveFiles) {
+          final fileName = saveFile.path.split(Platform.pathSeparator).last;
+          await saveFile.copy('${backupDir.path}/$fileName');
+        }
+      }
+    } catch (e) {
+      debugPrint("Warning: Exception while checking/backing up save files: $e");
+    }
+  }
 }
+

@@ -512,3 +512,14 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
   ゲーム開始直後（一歩も移動していない状態）で `/` や `;` により Farlook モード（`do_look`）に入った際、Cコアの画面表示用バッファ `gg.gbuf` の主人公以外のマスが未同期（`GLYPH_UNEXPLORED`）のままであり、`auto_describe` が情報を取得できずタップ地点の説明が表示されない問題が発生します。
 - **対策**:
   Farlook モード（`do_look()` 等）のように画面バッファ `gg.gbuf` の内容を参照するモーダル処理を開始する際は、冒頭で必ず `docrt()`（画面全再描画・バッファ全同期処理）を呼び出し、一歩も歩いていない初期状態であっても画面バッファ全体がダンジョン状態と完全同期されるように設計してください。
+
+## 25. Lua 5.4.8 コンパイルにおける LUA_USE_POSIX の指定徹底
+- **現象**: Android NDK (clang) 等で Lua 5.4.8 をビルドする際、`LUA_USE_POSIX` フラグが未定義だと ISO C の `tmpnam()` にフォールバックし、`tmpnam is deprecated` 警告が出力されます。
+- **対策**: `CMakeLists.txt` やビルド定義の `add_definitions` に必ず `-DLUA_USE_POSIX` を指定してください。これにより Lua 内部で安全な `mkstemp()` が使用され、警告が防止されます。
+
+## 26. Flutter版 Cコア・アセットの自動確実更新（二重チェック）設計原則
+- **構成と自動同期**:
+  `sys/flutter` において C コアソース (`src/`, `include/`) が変更された場合も、`sync_dat_assets.ps1` が自動検知して `assets/ver` をインクリメントし、`build.gradle.kts` がそれを読み取って Android の `versionCode` を動的増分させる構成を維持してください。
+- **FFI ビルド ID 判定**:
+  C コア側（`winflutter.c`）で `flutter_get_build_id()` を提供し、Dart 側で `assets/ver` と C コアビルド ID の両重チェックを行うことで、実機端末上でのアセット最新展開と `.so` ファイルの確実な置換・反映を達成します。
+

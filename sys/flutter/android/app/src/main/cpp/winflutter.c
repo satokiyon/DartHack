@@ -1959,6 +1959,15 @@ void TriggerDatabaseSearchFlutter(void) {
     SendKeysToFlutter(&key, 1);
 }
 
+#ifndef NETHACK_BUILD_ID
+#define NETHACK_BUILD_ID "unknown_build"
+#endif
+
+const char* flutter_get_build_id(void) {
+    return NETHACK_BUILD_ID;
+}
+
+
 
 
 
