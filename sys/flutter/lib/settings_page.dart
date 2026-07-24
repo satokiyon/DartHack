@@ -1139,7 +1139,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ListTile(
           leading: const Icon(Icons.edit_note, color: Colors.white),
           title: const Text("defaults.nh を手動で編集"),
-          subtitle: const Text("詳細なゲームオプションファイルを直接記述します（※反映には再起動が必要です）"),
+          subtitle: const Text("詳細なゲームオプションファイルを直接記述します（※反映には新規ゲームの開始が必要です）"),
           trailing: const Icon(Icons.chevron_right),
           onTap: () async {
             await Navigator.of(context).push(
@@ -1320,7 +1320,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return ExpansionTile(
       leading: const Icon(Icons.sports_esports, color: Colors.tealAccent),
       title: const Text("ゲームルール・プレイ設定 (defaults.nh)"),
-      subtitle: const Text("ゲーム本体の動作オプションを設定します（※反映には再起動が必要です）"),
+      subtitle: const Text("ゲーム本体の動作オプションを設定します（※反映には新規ゲームの開始が必要です）"),
       children: [
         SwitchListTile(
           title: const Text("チュートリアル開始確認"),

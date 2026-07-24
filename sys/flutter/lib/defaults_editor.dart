@@ -145,7 +145,7 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
                             SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                "※ defaults.nh の編集内容を反映するにはゲームの再起動が必要です",
+                                "※ defaults.nh の編集内容を反映するには新規ゲームの開始が必要です",
                                 style: TextStyle(color: Colors.amber, fontSize: 13),
                               ),
                             ),
