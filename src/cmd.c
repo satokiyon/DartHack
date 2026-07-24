@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0	cmd.c	$NHDT-Date: 1781973043 2026/06/20 16:30:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.772 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -2958,7 +2958,7 @@ dokeylist(void)
     Sprintf(buf, "%-7s", key2txt(key, buf2));
 #else
     /* first of the keyless commands */
-    Sprintf(buf2, "[%s]", key2txt(key, buf));
+    Snprintf(buf2, sizeof buf2, "[%s]", key2txt(key, buf));
     Sprintf(buf, "%-21s", buf2);
 #endif
     Strcat(buf, " 中断: NetHackを中断する (SIGINT)");

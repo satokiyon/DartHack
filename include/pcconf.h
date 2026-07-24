@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0	pcconf.h	$NHDT-Date: 1781973085 2026/06/20 16:31:25 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -75,10 +75,10 @@
  * 下記オプションは任意で有効化できる。
  *
  */
-#ifndef SUPPRESS_GRAPHICS
+#if defined(TTY_GRAPHICS) && !defined(SUPPRESS_GRAPHICS)
 #if (defined(SCREEN_BIOS) || defined(SCREEN_DJGPPFAST)) && !defined(PC9800)
-#ifdef TILES_IN_GLYPHMAP
-#define SCREEN_VGA /* ビルドに VGA グラフィックスルーチンを含める */
+#if defined(TILES_IN_GLYPHMAP) || defined(ENHANCED_SYMBOLS)
+#define SCREEN_VGA /* Include VGA graphics routines in the build */
 #define SCREEN_VESA
 #endif
 #endif
@@ -286,6 +286,10 @@
 #define SMALL_MAP
 #endif
 #endif /* End of sanity check block */
+
+#if defined(MSDOS) && defined(SUPPRESS_GRAPHICS)
+#define NO_TERMCAP_HEADERS
+#endif
 
 #if defined(MSDOS) && defined(DLB)
 #define FILENAME_CMP stricmp /* 大文字小文字を区別しない */

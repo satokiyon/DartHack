@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0	glyphs.c	TODO: add NHDT branch/date/revision tags */
 /* Copyright (c) Michael Allison, 2021. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -712,8 +712,10 @@ apply_customizations(
     struct customization_detail *details;
     struct symset_customization *sc;
     boolean at_least_one = FALSE,
-            do_colors = ((docustomize & do_custom_colors) != 0),
-            do_symbols = ((docustomize & do_custom_symbols) != 0);
+            do_colors = ((docustomize & do_custom_colors) != 0);
+#ifdef ENHANCED_SYMBOLS
+    boolean do_symbols = ((docustomize & do_custom_symbols) != 0);
+#endif
     int custs;
 
     for (custs = 0; custs < (int) custom_count; ++custs) {

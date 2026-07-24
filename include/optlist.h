@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0	optlist.h */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -835,7 +835,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
            (char *)0)
     NHOPTC(versinfo, Advanced, 80, opt_out, set_in_game,
            No, Yes, No, Yes, NoAlias, "'showvers' 用の追加情報")
-#ifdef MSDOS
+#if defined(MSDOS) && defined(NO_TERMS)
     NHOPTC(video, Advanced, 20, opt_in, set_in_config,
                 No, Yes, No, No, NoAlias, "画面更新方式")
 #endif

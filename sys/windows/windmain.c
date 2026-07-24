@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0	windmain.c	$NHDT-Date: 1693359653 2023/08/30 01:40:53 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.189 $ */
 /* Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -296,6 +296,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         raw_printf("終了します。");
         nethack_exit(EXIT_FAILURE);
     }
+
+    genl_prag(argc, argv); /* command line options for profession, race,
+                            * alignment, gender */
 
     /* Finished processing options, lock all directory paths */
     for (int i = 0; i < PREFIX_COUNT; i++)

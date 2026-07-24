@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0	wintty.c	$NHDT-Date: 1781973100 2026/06/20 16:31:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.438 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -184,7 +184,7 @@ static const char winpanicstr[] = "Bad window Id %d (%s)";
 char defmorestr[] = "--More--";
 
 #ifdef CLIPPING
-#if defined(TILES_IN_GLYPHMAP) && defined(MSDOS)
+#if (defined(TILES_IN_GLYPHMAP) || defined(ENHANCED_SYMBOLS)) && defined(MSDOS)
 boolean clipping = FALSE; /* clipping on? */
 int clipx = 0, clipxmax = 0;
 int clipy = 0, clipymax = 0;
@@ -195,7 +195,7 @@ static int clipy = 0, clipymax = 0;
 #endif
 #endif /* CLIPPING */
 
-#if defined(TILES_IN_GLYPHMAP) && defined(MSDOS)
+#if defined(NO_TERMS) && defined(MSDOS)
 extern void adjust_cursor_flags(struct WinDesc *);
 #endif
 
@@ -2300,7 +2300,7 @@ tty_curs(
 
     print_vt_code2(AVTC_SELECT_WINDOW, window);
 
-#if defined(TILES_IN_GLYPHMAP) && defined(MSDOS)
+#if defined(NO_TERMS) && defined(MSDOS)
     adjust_cursor_flags(cw);
 #endif
 
