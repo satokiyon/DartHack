@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0    giftiles.c    $NHDT-Date: 1781973097 2026/06/20 16:31:37 $ $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $ */
 /* Copyright (c) Ray Chason, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8,6 +8,9 @@
  * http://www.w3.org/Graphics/GIF/spec-gif89a.txt */
 
 #include "config.h"
+
+#ifdef TILES_IN_GLYPHMAP
+
 #include "tileset.h"
 
 #define MIN_LZW_BITS 3
@@ -498,3 +501,5 @@ free_data_block(struct DataBlock *block)
     block->size = 0;
     block->data = NULL;
 }
+
+#endif /* TILES_IN_GLYPHMAP */

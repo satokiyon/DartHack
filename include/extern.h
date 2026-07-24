@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-20. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -963,6 +963,7 @@ extern void early_options(int *argc_p, char ***argv_p, char **hackdir_p);
 #ifdef WIN32
 int windows_early_options(const char *);
 #endif
+extern void genl_prag(int, char **); /* profession, race, align, gender */
 
 /* ### eat.c ### */
 
@@ -2003,9 +2004,6 @@ extern void mplayer_talk(struct monst *) NONNULLARG1;
 #ifndef WIN32
 extern int tgetch(void);
 #endif
-#ifndef TOS
-extern char switchar(void);
-#endif
 #ifndef __GO32__
 extern long freediskspace(char *);
 #ifdef MSDOS
@@ -2446,6 +2444,9 @@ extern void gettty(void);
 extern void settty(const char *);
 extern void setftty(void);
 ATTRNORETURN extern void error(const char *, ...) PRINTF_F(1, 2) NORETURN;
+#ifdef ENHANCED_SYMBOLS
+extern void tty_utf8graphics_fixup(void);
+#endif
 #if defined(TIMED_DELAY) && defined(_MSC_VER)
 extern void msleep(unsigned);
 #endif

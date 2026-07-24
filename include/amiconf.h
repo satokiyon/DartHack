@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-16. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 3.6	amiconf.h	$NHDT-Date: 1432512775 2015/05/25 00:12:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1990, 1991, 1992, 1993.
  */
@@ -74,6 +74,7 @@ extern void ami_wininit_data(int);
 #define HACKFONT  /* Use special hack.font */
 #define MAIL      /* Get mail at unexpected occasions */
 #define AMIFLUSH /* toss typeahead (select flush in .cnf) */
+#define SFSTRUCT_BUFFERING /* buffered stdio writes for structlevel files */
 
 /* 新しいウィンドウシステムオプション */
 /* 誤り - AMIGA_INTUITION は将来的に削除されるべき */
