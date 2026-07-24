@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0	fountain.c	$NHDT-Date: 1781973050 2026/06/20 16:30:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.121 $ */
 /*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -21,12 +21,12 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 void
 floating_above(const char *what)
 {
-    const char *umsg = "は%sのかなり上に浮かんでいる.";
+    const char *umsg = "%sのかなり上に浮かんでいる.";
 
     if (u.utrap && (u.utraptype == TT_INFLOOR || u.utraptype == TT_LAVA)) {
         /* when stuck in floor (not possible at fountain or sink location,
            so must be attempting to move down), override the usual message */
-        umsg = "は%sにはまり込んでいる.";
+        umsg = "%sにはまり込んでいる.";
         what = surface(u.ux, u.uy); /* probably redundant */
     }
     You(umsg, what);
