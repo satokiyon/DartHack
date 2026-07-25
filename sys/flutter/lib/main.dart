@@ -119,7 +119,8 @@ class _MyHomePageState extends State<MyHomePage> {
   // タイルセット用変数
   ui.Image? _tileImage;
   bool _useTiles = true; // デフォルトでタイル表示を有効化
-  int _tileSize = 32;
+  int _tileWidth = 32;
+  int _tileHeight = 32;
   String _selectedTileset = 'nevanda_32x32';
   bool _isKeyboardVisible = true; // デフォルトで仮想キーボードを表示
 
@@ -722,7 +723,8 @@ class _MyHomePageState extends State<MyHomePage> {
         itemName: _cleanItemText(item.text),
         maxCount: maxCount,
         tileImage: _tileImage,
-        tileSize: _tileSize,
+        tileWidth: _tileWidth,
+        tileHeight: _tileHeight,
         tileIndex: item.tile,
       ),
     );
@@ -919,14 +921,21 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _loadTileset(String tilesetName) async {
     _addLog("Loading tileset: $tilesetName...");
     try {
-      final size = tilesetName.contains('32x32') ? 32 : (tilesetName.contains('15x25') ? 15 : 16);
+      int width = 32;
+      int height = 32;
+      final match = RegExp(r'(\d+)x(\d+)').firstMatch(tilesetName);
+      if (match != null) {
+        width = int.parse(match.group(1)!);
+        height = int.parse(match.group(2)!);
+      }
       final img = await _loadTileImageFromAsset('assets/tiles/$tilesetName.png');
       setState(() {
         _tileImage = img;
-        _tileSize = size;
+        _tileWidth = width;
+        _tileHeight = height;
         _selectedTileset = tilesetName;
       });
-      _addLog("Tileset loaded successfully: $tilesetName");
+      _addLog("Tileset loaded successfully: $tilesetName (${width}x$height)");
     } catch (e) {
       _addLog("Failed to load tileset $tilesetName: $e");
     }
@@ -1819,7 +1828,8 @@ class _MyHomePageState extends State<MyHomePage> {
         painter: _MenuItemTilePainter(
           image: _tileImage!,
           tileIndex: tile,
-          tileSize: _tileSize,
+          tileWidth: _tileWidth,
+          tileHeight: _tileHeight,
         ),
       ),
     );
@@ -3394,7 +3404,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   painter: NetHackMapPainter(
                                     screen: _screen,
                                     tileImage: _tileImage,
-                                    tileSize: _tileSize,
+                                    tileWidth: _tileWidth,
+                                    tileHeight: _tileHeight,
                                     useTiles: _useTiles,
                                   ),
                                 ),
@@ -4806,25 +4817,27 @@ class TopTenWidget extends StatelessWidget {
 class _MenuItemTilePainter extends CustomPainter {
   final ui.Image image;
   final int tileIndex;
-  final int tileSize;
+  final int tileWidth;
+  final int tileHeight;
 
   _MenuItemTilePainter({
     required this.image,
     required this.tileIndex,
-    required this.tileSize,
+    required this.tileWidth,
+    required this.tileHeight,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final cols = image.width ~/ tileSize;
+    final cols = image.width ~/ tileWidth;
     final iRow = tileIndex ~/ cols;
     final iCol = tileIndex % cols;
 
     final srcRect = Rect.fromLTWH(
-      (iCol * tileSize).toDouble(),
-      (iRow * tileSize).toDouble(),
-      tileSize.toDouble(),
-      tileSize.toDouble(),
+      (iCol * tileWidth).toDouble(),
+      (iRow * tileHeight).toDouble(),
+      tileWidth.toDouble(),
+      tileHeight.toDouble(),
     );
 
     final destRect = Rect.fromLTWH(0, 0, size.width, size.height);
@@ -4841,7 +4854,8 @@ class _MenuItemTilePainter extends CustomPainter {
   bool shouldRepaint(covariant _MenuItemTilePainter oldDelegate) {
     return oldDelegate.image != image ||
            oldDelegate.tileIndex != tileIndex ||
-           oldDelegate.tileSize != tileSize;
+           oldDelegate.tileWidth != tileWidth ||
+           oldDelegate.tileHeight != tileHeight;
   }
 }
 

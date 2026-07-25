@@ -5,13 +5,15 @@ import 'nethack_screen.dart';
 class NetHackMapPainter extends CustomPainter {
   final NetHackScreen screen;
   final ui.Image? tileImage;
-  final int tileSize;
+  final int tileWidth;
+  final int tileHeight;
   final bool useTiles;
 
   NetHackMapPainter({
     required this.screen,
     required this.tileImage,
-    required this.tileSize,
+    required this.tileWidth,
+    required this.tileHeight,
     required this.useTiles,
   }) : super(repaint: screen);
 
@@ -44,7 +46,7 @@ class NetHackMapPainter extends CustomPainter {
     }
 
     if (useTiles && tileImage != null) {
-      final cols = tileImage!.width ~/ tileSize;
+      final cols = tileImage!.width ~/ tileWidth;
 
       for (int y = 0; y < NetHackScreen.mapRows; y++) {
         for (int x = 0; x < NetHackScreen.mapCols; x++) {
@@ -54,10 +56,10 @@ class NetHackMapPainter extends CustomPainter {
             final iCol = glyph.tile % cols;
 
             final srcRect = Rect.fromLTWH(
-              (iCol * tileSize).toDouble(),
-              (iRow * tileSize).toDouble(),
-              tileSize.toDouble(),
-              tileSize.toDouble(),
+              (iCol * tileWidth).toDouble(),
+              (iRow * tileHeight).toDouble(),
+              tileWidth.toDouble(),
+              tileHeight.toDouble(),
             );
 
             final destRect = Rect.fromLTWH(
@@ -132,6 +134,7 @@ class NetHackMapPainter extends CustomPainter {
     return oldDelegate.screen != screen ||
            oldDelegate.tileImage != tileImage ||
            oldDelegate.useTiles != useTiles ||
-           oldDelegate.tileSize != tileSize;
+           oldDelegate.tileWidth != tileWidth ||
+           oldDelegate.tileHeight != tileHeight;
   }
 }

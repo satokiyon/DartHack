@@ -5,7 +5,8 @@ class AmountSelectorDialog extends StatefulWidget {
   final String itemName;
   final int maxCount;
   final ui.Image? tileImage;
-  final int tileSize;
+  final int tileWidth;
+  final int tileHeight;
   final int tileIndex; // 0以上のときタイル表示、それ以外は非表示
 
   const AmountSelectorDialog({
@@ -13,7 +14,8 @@ class AmountSelectorDialog extends StatefulWidget {
     required this.itemName,
     required this.maxCount,
     this.tileImage,
-    this.tileSize = 32,
+    this.tileWidth = 32,
+    this.tileHeight = 32,
     this.tileIndex = -1,
   });
 
@@ -67,7 +69,8 @@ class _AmountSelectorDialogState extends State<AmountSelectorDialog> {
                 painter: _TilePainter(
                   image: widget.tileImage!,
                   tileIndex: widget.tileIndex,
-                  tileSize: widget.tileSize,
+                  tileWidth: widget.tileWidth,
+                  tileHeight: widget.tileHeight,
                 ),
               ),
             ),
@@ -188,25 +191,27 @@ class _AmountSelectorDialogState extends State<AmountSelectorDialog> {
 class _TilePainter extends CustomPainter {
   final ui.Image image;
   final int tileIndex;
-  final int tileSize;
+  final int tileWidth;
+  final int tileHeight;
 
   _TilePainter({
     required this.image,
     required this.tileIndex,
-    required this.tileSize,
+    required this.tileWidth,
+    required this.tileHeight,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final cols = image.width ~/ tileSize;
+    final cols = image.width ~/ tileWidth;
     final iRow = tileIndex ~/ cols;
     final iCol = tileIndex % cols;
 
     final srcRect = Rect.fromLTWH(
-      (iCol * tileSize).toDouble(),
-      (iRow * tileSize).toDouble(),
-      tileSize.toDouble(),
-      tileSize.toDouble(),
+      (iCol * tileWidth).toDouble(),
+      (iRow * tileHeight).toDouble(),
+      tileWidth.toDouble(),
+      tileHeight.toDouble(),
     );
 
     final destRect = Rect.fromLTWH(0, 0, size.width, size.height);
@@ -223,6 +228,7 @@ class _TilePainter extends CustomPainter {
   bool shouldRepaint(covariant _TilePainter oldDelegate) {
     return oldDelegate.image != image ||
            oldDelegate.tileIndex != tileIndex ||
-           oldDelegate.tileSize != tileSize;
+           oldDelegate.tileWidth != tileWidth ||
+           oldDelegate.tileHeight != tileHeight;
   }
 }
