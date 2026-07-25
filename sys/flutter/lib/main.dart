@@ -3805,7 +3805,7 @@ class _MyHomePageState extends State<MyHomePage> {
             right: 24,
             child: Center(
               child: Image.asset(
-                'assets/darthack_logo.png',
+                'assets/images/darthack_logo.png',
                 width: screenWidth * 0.75,
                 fit: BoxFit.contain,
               ),
@@ -3918,7 +3918,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     flex: 5,
                     child: Center(
                       child: Image.asset(
-                        'assets/darthack_logo.png',
+                        'assets/images/darthack_logo.png',
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -4010,10 +4010,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Stack(
       children: [
-        // 背景画像
+        // 背景画像（縦長・横長で切り替え）
         Positioned.fill(
           child: Image.asset(
-            'assets/darthack_title.png',
+            isPortrait ? 'assets/images/darthack_title.png' : 'assets/images/darthack_title_yoko.png',
             fit: BoxFit.cover,
           ),
         ),
@@ -4034,12 +4034,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildEndScreen() {
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return Stack(
       children: [
-        // 終了時専用の背景画像
+        // 終了時専用の背景画像（縦長・横長で切り替え）
         Positioned.fill(
           child: Image.asset(
-            'assets/darthack_end.png',
+            isPortrait ? 'assets/images/darthack_end.png' : 'assets/images/darkhack_end_yoko.png',
             fit: BoxFit.cover,
           ),
         ),
@@ -4388,7 +4389,7 @@ class UniversalTombstoneWidget extends StatelessWidget {
                     fit: StackFit.expand,
                     children: [
                       Image.asset(
-                        'assets/tombstone.png',
+                        'assets/images/tombstone.png',
                         fit: BoxFit.cover,
                       ),
                       Positioned.fill(

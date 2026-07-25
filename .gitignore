@@ -139,4 +139,6 @@ GEMINI.md
 .github\workflows\weekly-release.yml
 
 sys/flutter/assets/
+sys/flutter/tmp
+
 
