@@ -543,7 +543,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ExpansionTile(
         leading: const Icon(Icons.crop_landscape, color: Colors.greenAccent),
         title: const Text("画面表示モード"),
-        subtitle: const Text("ゲーム画面のステータスバーの表示を切替えます（タイトル/設定画面には適用されません）"),
+        subtitle: const Text("ゲーム画面のステータスバーの表示を切替えます"),
         children: _withDividers([
           ListTile(
             title: const Text("モード選択"),
@@ -705,12 +705,12 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ListTile(
-            title: const Text("マップタップでの自動トラベル"),
+            title: const Text("マップタップでの自動移動"),
             trailing: DropdownButton<String>(
               value: _mapTapTravelMode,
               items: const [
                 DropdownMenuItem(value: 'always', child: Text('常に有効')),
-                DropdownMenuItem(value: 'after_scroll', child: Text('スクロール・ズーム時のみ有効')),
+                DropdownMenuItem(value: 'after_scroll', child: Text('スクロール・ズーム直後のみ有効')),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -1478,7 +1478,7 @@ class _SettingsPageState extends State<SettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "NetHackJP Flutter Port",
+                  "DartHack (NetHackJP Flutter Port)",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.amberAccent),
                 ),
                 SizedBox(height: 8),
@@ -1486,7 +1486,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 SizedBox(height: 8),
                 Text("本アプリは、NetHack General Public License (NGPL) に基づき配布されています。ソースコードは次のサイトにて公開しています：https://github.com/satokiyon/DartHack"),
                 SizedBox(height: 8),
-                Text("本アプリのUIは gurrhack の ForkFront によるUIデザインからインスピレーションを受けています。"),
+                Text("本アプリのUIは gurrhack の ForkFront を参考にしました。"),
                 SizedBox(height: 12),
                 Text(
                   "Contributors:",
@@ -1494,7 +1494,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 SizedBox(height: 4),
                 Text("• @satokiyon (NetHackJP Contributor)"),
-                Text("• with Google Antigravity"),
+                Text("• with Google Antigravity and Gemini"),
               ],
             ),
           ),
