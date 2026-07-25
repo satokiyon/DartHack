@@ -31,7 +31,7 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
 - **注意**: 上流の NetHack 本家リポジトリからの更新で `tradstdc.h` が変更された際に、この修正が維持されていることを確認してください。
 
 ## 6. defaults.nh のオプション名エイリアス整合性
-- **現象**: `sys/android/defaults.nh` で日本語版独自のステータス表示オプション（例: `statuslines`）を使用している場合、`src/botl.c` の `status_hilite_menu_fld()` 内のフィールド名テーブルに対応するエイリアスが未登録だと、起動時に `Unknown status field` 警告が出力されます。
+- **現象**: `defaults.nh`（`sys/flutter/assets/nethackdir/defaults.nh` 等）で日本語版独自のステータス表示オプション（例: `statuslines`）を使用している場合、`src/botl.c` の `status_hilite_menu_fld()` 内のフィールド名テーブルに対応するエイリアスが未登録だと、起動時に `Unknown status field` 警告が出力されます。
 - **対策**: `defaults.nh` に新しいステータスフィールド名やエイリアスを追加する場合は、対応する C コード側（`src/botl.c` 等）のフィールド名テーブルにもエイリアスを登録し、パーサーが認識できるようにしてください。
 
 ## 7. Android / Flutter版における日本語・英語版データファイルの配置と優先ロード方針
@@ -132,9 +132,10 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
   - 置換ツールのミスマッチによるバグを避けるために Node.js や Python などの置換スクリプトを一時生成して実行する手法は有効ですが、セキュリティと透明性を維持するため、ユーザーにスクリプトの内容と実行目的を事前に説明し、明示的な許可を得てから実行してください。
   - 事前合意のないまま、裏で作成したスクリプトの実行コマンドを唐突に提案してはなりません。
 
-## 21. sys/flutter における sys/android 完全分離と C 補完シンボルの定義原則
-- **構成方針**: `sys/flutter`（Flutter ポート）は `sys/android` の C コード（`androidmain.c`, `androidunix.c`, `winandroid.c`）へ一切依存せず、独自の `fluttermain.c`, `flutterunix.c`, `winflutter.c` を `CMakeLists.txt` に指定して完全独立・自己完結させてください。
-- **補完シンボルの要件**: NetHack C コア (`src/`) 内部の `#ifdef ANDROID` 領域が参照する Android 固有のグローバル変数・関数（`and_procs`, `and_get_dumplog_dir`, `and_you_die`, `load_usersound`, `androidsound_procs`, `quit_possible`, `lock_mouse_cursor`, `set_username`, `debuglog` 等）は、`sys/android` なしでリンクエラーを出さないよう、`sys/flutter` 側（`winflutter.c` / `fluttermain.c` / `flutterunix.c`）で適切な型・シグネチャを伴う補完シンボルとして定義・実装してください。
+## 21. sys/flutter における完全自己完結とデータ構築・C補完シンボルの定義原則
+- **構成方針**: `sys/flutter`（Flutter ポート）は旧 `sys/android` への依存を持たず、専用の `setup.sh` / `Makefile.*` および C コード（`fluttermain.c`, `flutterunix.c`, `winflutter.c`）を備えた完全独立・自己完結構成として運用してください。
+- **データファイル構築・アセット同期**: WSL でのデータファイル生成（`data`, `rumors`, `oracles` 等）は `sys/flutter/setup.sh` からルートへ Makefile 群を配置し、`HACKDIR` 生成物（`sys/flutter/assets/nethackdir`）に書き出します。データファイルの同期やアセットバージョンのインクリメントには、必ず `sys/flutter/scripts/sync_dat_assets.ps1` を使用してください。
+- **補完シンボルの要件**: NetHack C コア (`src/`) 内部の `#ifdef ANDROID` 領域が参照する Android 固有のグローバル変数・関数（`and_procs`, `and_get_dumplog_dir`, `and_you_die`, `load_usersound`, `androidsound_procs`, `quit_possible`, `lock_mouse_cursor`, `set_username`, `debuglog` 等）は、`sys/flutter` 側（`winflutter.c` / `fluttermain.c` / `flutterunix.c`）で適切な型・シグネチャを伴う補完シンボルとして定義・実装してください。
 - **debuglog 実態関数化**: 特に `debuglog` は `androidconf.h` にて `#define error debuglog` とマクロ展開され C コアから可変長引数関数として参照されるため、単なるマクロではなく `winflutter.c` で `<stdarg.h>` / `<android/log.h>` を用いた実態関数 `void debuglog(const char *fmt, ...)` として定義してください。
 - **シグネチャ厳密一致**: `and_get_dumplog_dir(char *buf)` 等の補完関数は、`include/extern.h` 等にある宣言の戻り値型・引数型と完全に一致させてください。
 

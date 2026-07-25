@@ -1,7 +1,0 @@
-plugins {
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
-}
-include(':app')
-include(':lib')
-project(':lib').projectDir = file('ForkFront-Android/lib')
-rootProject.name = 'NetHackJP-Android'

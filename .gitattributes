@@ -1,7 +1,5 @@
 # Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28.
-sys/android/setup.sh text eol=lf
-sys/android/gradlew text eol=lf
-sys/android/make_all_abi.sh text eol=lf
+sys/flutter/setup.sh text eol=lf
 
 # Merge strategy for documentation files
 AGENTS.md merge=ours

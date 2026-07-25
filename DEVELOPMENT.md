@@ -69,17 +69,17 @@ git submodule update --init --recursive
 ### 自動ビルドスクリプトの実行
 PowerShell から、リポジトリルートにあるビルド自動化スクリプトを実行します。
 ```powershell
-$env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\sys\android\build_android.ps1
+powershell -ExecutionPolicy Bypass -File sys/flutter/scripts/sync_dat_assets.ps1
+cd sys/flutter
+flutter build apk
 ```
 - **内部処理**:
-  1. WSL (Ubuntu-26.04) 上で `sys/android/setup.sh` を実行し、必要な Makefile 群を自動生成・ルートに配置します。
-  2. WSL 上で `make fetch-lua` を実行し、依存する Lua 5.4.8 ライブラリを取得します。
-  3. C ソースコードをコンパイルし、静的ライブラリ（`nethack.a`）などをビルドします。
-  4. Windows 側で Gradle (`gradlew.bat`) を用いて JNI 連携と APK のパッケージング（デバッグビルド）を行います。
+  1. WSL (Ubuntu-26.04) 上で `sys/flutter/setup.sh` を実行し、必要な Makefile 群を配置します。
+  2. WSL 上で `make fetch-lua && make lua_support && make -C dat && make dofiles` を実行し、データファイルを `sys/flutter/assets/nethackdir` に書き出します。
+  3. Flutter 側で NDK CMake により `libnethack.so` をコンパイルし、APK をパッケージングします。
 
 ### データファイルの変更・追加時
-- `/dat/options` や `/dat/rumors_jp` などのテキストファイルを変更または追加した場合は、端末へのアセット上書きコピーを強制するため、必ず `sys/android/app/assets/ver` の中にある数値（整数値）をインクリメント（+1）してください。
-- 端末内に古いアセットがキャッシュされていると、変更が反映されません。
+- `/dat/options` や `/dat/rumors_jp` などのテキストファイルを変更または追加した場合は、`sys/flutter/scripts/sync_dat_assets.ps1` を実行してください。自動的に WSL 上で再生成され、`sys/flutter/assets/ver` のバージョン値がインクリメントされます。
 
 ---
 
@@ -89,16 +89,12 @@ $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\sys\android\buil
 - **制限**: NDK コンパイラでは、`'。'` などのマルチバイト文字をシングルクォーテーションで囲んで文字定数（`char`）として定義すると `character too large` エラーになります。
 - **対策**: 全角文字や記号を条件によって切り替えて出力したい場合は、必ず文字列リテラル（例: `"。"`）を使用し、フォーマット指定子を `%c` から `%s` に変更してください。
 
-### CP437デコーダの無効化（日本語文字化け対策）
-- Android版 NetHack は `sys/android/app/res/values/config.xml` の `useCP437Decoder` が `true` の場合、テキスト出力を CP437 としてデコードします。日本語テキストは UTF-8 でエンコードされているため、CP437 デコードでは文字化けが発生します。
-- **対策**: `useCP437Decoder` を **`false`** に設定してください。上流リポジトリの同期時にこの設定が巻き戻らないよう注意が必要です。
-
 ### FALLTHROUGH マクロの NDK (clang) 互換性
 - `include/tradstdc.h` の `FALLTHROUGH` マクロ定義が `__attribute__((fallthrough))` のみだと、特定の文脈（`case` ラベル直後など）で NDK の clang が「expected expression」エラーを出すことがあります。
 - **対策**: マクロ定義の先頭にセミコロンを付与し、`; __attribute__((fallthrough))` とします。
 
 ### defaults.nh のオプション名エイリアス整合性
-- `sys/android/defaults.nh` で日本語版独自のステータス表示オプションを使用する場合、`src/botl.c` 内のフィールド名テーブルに対応するエイリアスが登録されていないと、起動時に警告が出力されます。エイリアスの登録漏れに注意してください。
+- `sys/flutter/assets/nethackdir/defaults.nh` で日本語版独自のステータス表示オプションを使用する場合、`src/botl.c` 内のフィールド名テーブルに対応するエイリアスが登録されていないと、起動時に警告が出力されます。エイリアスの登録漏れに注意してください。
 
 ### Flutter版のヘルプメニュー表示経路
 - `?` メニューの項目はすべて同じ経路ではなく、`NetHackについて` や `ゲームオプション一覧` のように `display_file()` へ進むものと、`ゲームオプションの詳細説明` のように `NHW_TEXT` に直接出力されるものが混在しています。
@@ -342,30 +338,31 @@ Android 移植元のバグ修正や機能追加を取り込みます。
 - **`sys/android/` 以下のリソースやビルド設定ファイル**
   - 日本語化固有の調整（レイアウト XML やキーボード対策）を入れているため、Jodi-Android側の更新と衝突した場合は日本語化側のコードを優先またはマージしてください。
 - **コンフリクト解消後のビルド検証**
-  - 競合を解消した後は、必ず `./sys/android/build_android.ps1` を実行し、Cビルド・Gradleビルドの双方がエラーなく成功することを確認した上でプッシュしてください。
+  - 競合を解消した後は、必ず `powershell -ExecutionPolicy Bypass -File sys/flutter/scripts/sync_dat_assets.ps1` を実行し、データファイルの同期が成功することを確認した上でプッシュしてください。
 
 ---
 
 ## 6. リリース・タグ手順
 
-### リリース用 APK のビルド
-1. リリース用キーストアの署名情報を環境変数または `local.properties` に準備します。
-2. 以下の Gradle タスクを実行してリリース用バイナリをビルドします。
+### リリース用 AAB / APK のビルド
+1. リリース用キーストアの署名情報を `sys/flutter/android/key.properties` に準備します。
+2. 以下のビルドスクリプトを実行してリリース用 App Bundle (AAB) / APK をビルドします。
    ```powershell
-   cd sys/android
-   $env:ANDROID_HOME="C:\Users\satok\AppData\Local\Android\Sdk"; .\gradlew assembleRelease
+   cd sys/flutter
+   powershell -ExecutionPolicy Bypass -File scripts/build_aab.ps1
+   flutter build apk --release
    ```
 
 ### タグの作成とプッシュ
 リリース用コミットが `main` ブランチにプッシュされた後、リリース用タグを作成してプッシュします。
-- Android版のタグ命名規則: `NetHackJP-Android-[Version]-[Date]` (例: `NetHackJP-Android-5.0.0-20260629`)
+- Flutter Android版のタグ命名規則: `NetHackJP-Flutter-[Version]-[Date]` (例: `NetHackJP-Flutter-5.0.0-20260725`)
 ```bash
-git tag NetHackJP-Android-5.0.0-20260629
-git push origin NetHackJP-Android-5.0.0-20260629
+git tag NetHackJP-Flutter-5.0.0-20260725
+git push origin NetHackJP-Flutter-5.0.0-20260725
 ```
 
 ### GitHub Release の作成
-GitHub上の Releases ページから新規リリースを作成し、ビルドされた APK ファイル（`sys/android/app/build/outputs/apk/release/app-release.apk`）をアタッチして公開します。
+GitHub上の Releases ページから新規リリースを作成し、ビルドされた AAB ファイル（`sys/flutter/build/app/outputs/bundle/release/app-release.aab`）および APK ファイルをアタッチして公開します。
 
 ---
 

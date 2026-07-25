@@ -96,9 +96,8 @@
      - `git filter-repo` などの履歴書き換えコマンドは、実行完了後に書き換え後のコミットツリーを作業ツリーへ自動チェックアウト（上書き）するため、履歴から除去されたファイルがローカルのディスク上からも削除されます。
      - 履歴抹消を行う際は、実行前に必ず対象のフォルダ・ファイルを Git 管理外の安全な一時ディレクトリ（例：`<appDataDir>\brain\<conversation-id>\scratch\`）へ手動でバックアップ（コピー）し、`git filter-repo` の完了後に元のローカル位置へ復元する手順を徹底してください。
 
-4. **Android (WSL + Gradle) 環境での自動ビルドスクリプトの利用**:
-   - Android環境向けに `libnethack.so` のコンパイルおよびAPKビルドを行う際は、用意されているPowerShellスクリプト `sys/android/build_android.ps1` を実行してください。
-   - このスクリプトを実行する際は、PowerShell上で `& .\sys\android\build_android.ps1` の形式で呼び出します。これにより、自動的に WSL (Ubuntu-26.04) 上での C ライブラリのビルドと、Windows 側での `ANDROID_HOME` の設定を伴う `gradlew.bat` による APK パッケージングが一貫して行われます。
+4. **Flutter Android (WSL + Flutter) 環境での自動ビルド・同期スクリプトの利用**:
+   - Flutter Android環境向けにアセットデータ同期および AAB/APK ビルドを行う際は、`sys/flutter/scripts/sync_dat_assets.ps1` や `sys/flutter/scripts/build_aab.ps1` を使用してください。
 
 5. **Android / Flutter版における日本語・英語版データファイルの配置と優先ロード方針**:
    - AndroidおよびFlutterポートでは、データファイル群（`data`, `rumors`, `oracles` 等）およびヘルプ・メニューなどのデータファイル群を個別のファイルとして `assets/nethackdir/` にパッケージングし、アプリ起動時に端末のストレージ（データディレクトリ）にコピーして読み込みます。
@@ -214,9 +213,10 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
    - デバッグ目的で `flutter run` のコンソールや logcat に出力したい場合は **`debugPrint`（`package:flutter/foundation.dart` 標準）** を使用してください。`print` も使用可能ですが、`debugPrint` の方が長い文字列を自動的に分割してくれるため推奨されます。
    - デバッグログは **原因特定後、必ず削除してからコミット** してください（方針 6 参照）。
 
-8. **sys/flutter における sys/android 完全分離と C 補完シンボルの定義原則**:
-   - `sys/flutter`（Flutter ポート）は `sys/android` の C コード（`androidmain.c`, `androidunix.c`, `winandroid.c`）へ一切依存せず、独自の `fluttermain.c`, `flutterunix.c`, `winflutter.c` を `CMakeLists.txt` に指定して完全独立・自己完結させてください。
-   - NetHack C コア (`src/`) 内部の `#ifdef ANDROID` 領域が参照する Android 固有のグローバル変数・関数（`and_procs`, `and_get_dumplog_dir`, `and_you_die`, `load_usersound`, `androidsound_procs`, `quit_possible`, `lock_mouse_cursor`, `set_username`, `debuglog` 等）は、`sys/android` なしでリンクエラーを出さないよう、`sys/flutter` 側（`winflutter.c` / `fluttermain.c` / `flutterunix.c`）で適切な型・シグネチャを伴う補完シンボルとして定義・実装してください。
+8. **sys/flutter における完全自己完結とデータ構築・C補完シンボルの定義原則**:
+   - `sys/flutter`（Flutter ポート）は旧 `sys/android` への依存を持たず、専用の `setup.sh` / `Makefile.*` および C コード（`fluttermain.c`, `flutterunix.c`, `winflutter.c`）を備えた完全独立・自己完結構成として運用してください。
+   - WSL でのデータファイル生成（`data`, `rumors`, `oracles` 等）は `sys/flutter/setup.sh` からルートへ Makefile 群を配置し、`HACKDIR` 生成物（`sys/flutter/assets/nethackdir`）に書き出します。データファイルの同期やアセットバージョンのインクリメントには、必ず `sys/flutter/scripts/sync_dat_assets.ps1` を使用してください。
+   - NetHack C コア (`src/`) 内部の `#ifdef ANDROID` 領域が参照する Android 固有のグローバル変数・関数（`and_procs`, `and_get_dumplog_dir`, `and_you_die`, `load_usersound`, `androidsound_procs`, `quit_possible`, `lock_mouse_cursor`, `set_username`, `debuglog` 等）は、`sys/flutter` 側（`winflutter.c` / `fluttermain.c` / `flutterunix.c`）で適切な型・シグネチャを伴う補完シンボルとして定義・実装してください。
    - 特に `debuglog` は `androidconf.h` にて `#define error debuglog` とマクロ展開され C コアから可変長引数関数として参照されるため、単なるマクロではなく `winflutter.c` で `<stdarg.h>` / `<android/log.h>` を用いた実態関数 `void debuglog(const char *fmt, ...)` として定義してください。
    - `and_get_dumplog_dir(char *buf)` 等の補完関数は、`include/extern.h` 等にある宣言の戻り値型・引数型と完全に一致させてください。
    - **【型不一致による .bss 実行クラッシュ防止】**: Cコア (`src/`) 側で `extern void func(void);` のように関数として宣言・呼び出されている補完シンボルを、`sys/flutter` 側で誤って `int func = 0;` のようにスカラー変数として定義してはなりません。Cコアが変数のメモリ領域 (`.bss`) へ関数ジャンプを行い、`SIGSEGV (SEGV_ACCERR)` でクラッシュする原因になります。呼び出し側が関数の場合は、必ずシグネチャが一致する空のスタブ関数（例：`void func(void) { return; }`）として定義してください。

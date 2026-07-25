@@ -189,54 +189,53 @@ flutter.versionCode=1
 
 ```powershell
 # リポジトリ直下 (Windows PowerShell)
-& .\sys\android\build_android.ps1
+powershell -ExecutionPolicy Bypass -File sys/flutter/scripts/sync_dat_assets.ps1
+cd sys/flutter
+flutter build apk
 ```
 
 このスクリプトは内部で次のことを行います。
 
-1. **WSL (Ubuntu-26.04) で C コアをクロスコンパイル**
-   - `sys/android/setup.sh` の実行
-   - `make fetch-lua` で Lua 5.4.8 ソースを取得
-   - `make clean && make ABI=<abi> install` で `libnethack.so` を生成
-   - 既定では `arm64-v8a` のみ（必要に応じて `$abilist` を編集）
-2. **Windows 側で Gradle パッケージング**
-   - `ANDROID_HOME` を設定
-   - `sys/android/gradlew.bat assembleDebug` を実行
-3. 生成物: `sys/android/app/build/outputs/apk/debug/app-debug.apk`
+1. **WSL (Ubuntu-26.04) でデータファイル群を生成**
+   - `sys/flutter/setup.sh` の実行
+   - `make fetch-lua && make lua_support && make -C dat && make dofiles` で `data`, `rumors`, `oracles` 等を `sys/flutter/assets/nethackdir` に書き出し
+2. **Flutter 側でネイティブ（NDK CMake）＋ Dart パッケージング**
+   - `sys/flutter/android/app/src/main/cpp/CMakeLists.txt` により `libnethack.so` を NDK で自動ビルド
+3. 生成物: `sys/flutter/build/app/outputs/flutter-apk/app-release.apk`
 
 > **NOTE:** Android / Flutter ポートでは Windows 版と同様に、英語版データファイル (`data`, `help`, ... 等) と日本語版データファイル (`data_jp`, `help_jp`, ... 等) の **両方がアセットとして同梱** されます。C コアが動的に `_jp` ファイルを優先検索し、見つからなければ英語版に自動フォールバックしてロードします。
 >
-> データファイルを変更した際は **必ず `assets/ver` のバージョン番号をインクリメント** してください（Flutter 側 `lib/nethack_assets.dart` のアセット展開判定基準となる）。
+> データファイルを変更した際は **`sync_dat_assets.ps1` が自動的に `assets/ver` のバージョン番号をインクリメント** します（Flutter 側 `lib/nethack_assets.dart` のアセット展開判定基準となる）。
 
 #### 個別にビルドする場合
 
-**Step 1: C コアのクロスコンパイル（WSL）**
+**Step 1: データファイル群の同期（WSL）**
 
 ```bash
 # WSL 上で
-cd /path/to/NetHackJP-Android
-cd sys/android
+cd /path/to/NetHackJP
+cd sys/flutter
 sh ./setup.sh
 cd ../..
 make fetch-lua
-make clean
-make ABI=arm64-v8a install
+make lua_support
+make -C dat
+make dofiles
 ```
 
 成果物:
-- `sys/android/app/src/main/jniLibs/arm64-v8a/libnethack.so`
+- `sys/flutter/assets/nethackdir/*` (データファイル群)
 
-**Step 2: Flutter アプリ（APK）のパッケージング**
+**Step 2: Flutter アプリ（APK）のビルド**
 
 ```powershell
 # Windows PowerShell
-$env:ANDROID_HOME = "C:\Users\<user>\AppData\Local\Android\Sdk"
-cd sys\android
-.\gradlew.bat assembleDebug
+cd sys\flutter
+flutter build apk
 ```
 
 成果物:
-- `sys/android/app/build/outputs/apk/debug/app-debug.apk`
+- `sys/flutter/build/app/outputs/flutter-apk/app-release.apk`
 
 ### B. Windows ローカルでの UI デバッグ（ダミーコア）
 
@@ -329,7 +328,6 @@ NetHack のデータファイル（`dat/` または `src/dat/` 内の `data.raw`
 - ルート [README.md](../../../README.md) — プロジェクト全体の概要・プレイヤー向け手順
 - [DEVELOPMENT.md](../../../DEVELOPMENT.md) — 開発者向けビルド・翻訳方針の詳細
 - [AGENTS.md](../../../AGENTS.md) — AI エージェント / 開発者共通のコーディング・翻訳・命名規約
-- 既存の Android 移植: [`sys/android/`](../../android/) — `libnethack.so` ビルド手順
 
 ---
 
