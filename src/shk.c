@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-18. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-26. */
 /* NetHack 5.0	shk.c	$NHDT-Date: 1781973066 2026/06/20 16:31:06 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.323 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -3586,8 +3586,9 @@ addtobill(
             return;
         }
         if (!ininv) {
-            pline("それは%ld %sかかるぞ%s。", ltmp,
-                  currency(ltmp), (obj->quan > 1L) ? "（1個あたり）" : "");
+            pline("それは%s%ld %sかかるぞ。",
+                  (obj->quan > 1L) ? "（1個あたり）" : "",
+                  ltmp, currency(ltmp));
         } else {
             long save_quan = obj->quan;
 
@@ -3600,21 +3601,22 @@ addtobill(
             }
             obj->quan = 1L; /* fool xname() into giving singular */
             set_voice(shkp, 0, 80, 0);
-            pline("%sこの%s%sは%ld %s%sだ.\"", buf, xname(obj),
+            pline("%sこの%s%sは%s%ld %sだ.\"", buf, xname(obj),
                   (contentscount && obj->unpaid) ? and_its_contents :
                   (contentscount && !obj->unpaid) ? "の中身" : "",
-                  ltmp, currency(ltmp),
-                  (save_quan > 1L) ? "（1個あたり）" : "");
+                  (save_quan > 1L) ? "（1個あたり）" : "",
+                  ltmp, currency(ltmp));
             obj->quan = save_quan;
         }
     } else if (!silent) {
         if (ltmp) {
             set_voice(shkp, 0, 80, 0);
-            pline_The("%s%s%sの定価は%ld %s%sだ.",
+            pline_The("%s%s%sの%s定価は%ld %sだ.",
                       (contentscount && !obj->unpaid) ? the_contents_of : "",
                       the(xname(obj)),
                       (contentscount && obj->unpaid) ? and_its_contents : "",
-                      ltmp, currency(ltmp), (obj->quan > 1L) ? "個あたり" : "");
+                      (obj->quan > 1L) ? "（1個あたり）" : "",
+                      ltmp, currency(ltmp));
         } else {
             pline("%sは気づかなかった。", jp_shkname_for_display(shkp));
         }
@@ -5470,8 +5472,9 @@ price_quote(struct obj *first_obj)
             Sprintf(buf, "%s%s", contentsonly ? the_contents_of : "",
                     doname(first_obj));
             SetVoice(shkp, 0, 80, 0);
-            verbalize("%s、値段は%ld %s%s%s", upstart(buf), cost,
-                      currency(cost), (first_obj->quan > 1L) ? "（1つあたり）" : "",
+            verbalize("%s、%s値段は%ld %s%s", upstart(buf),
+                      (first_obj->quan > 1L) ? "（1つあたり）" : "", cost,
+                      currency(cost),
                       contentsonly ? "." : shk_embellish(first_obj, cost));
         }
     }

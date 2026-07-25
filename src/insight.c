@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-26. */
 /* NetHack 5.0	insight.c	$NHDT-Date: 1781973051 2026/06/20 16:30:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -237,7 +237,7 @@ enlght_halfdmg(int category, int final)
         category_name = "不明";
         break;
     }
-    Sprintf(buf, " %s%sダメージ",
+    Sprintf(buf, "%s%sダメージ",
             (final || wizard) ? "半減した" : "軽減された",
             category_name);
     enl_msg(You_, "", "", buf, from_what(category));
@@ -358,27 +358,19 @@ fmt_elapsed_time(char *outbuf, int final)
     edays = etim / 24L;
     fieldcnt = !!edays + !!ehours + !!eminutes + !!eseconds;
 
-    Strcpy(outbuf, fieldcnt ? "" : " なし"); /* 'none' should never happen */
+    Strcpy(outbuf, fieldcnt ? "" : "なし"); /* 'none' should never happen */
     if (edays) {
-        Sprintf(eos(outbuf), " %ld日", edays);
-        if (fieldcnt > 1) /* hours and/or minutes and/or seconds to follow */
-            Strcat(outbuf, (fieldcnt == 2) ? " と" : "、");
-        --fieldcnt; /* edays has been processed */
+        Sprintf(eos(outbuf), "%s%ld日", *outbuf ? " " : "", edays);
     }
     if (ehours) {
-        Sprintf(eos(outbuf), " %ld時間", ehours);
-        if (fieldcnt > 1) /* minutes and/or seconds to follow */
-            Strcat(outbuf, (fieldcnt == 2) ? " と" : "、");
-        --fieldcnt; /* ehours has been processed */
+        Sprintf(eos(outbuf), "%s%ld時間", *outbuf ? " " : "", ehours);
     }
     if (eminutes) {
-        Sprintf(eos(outbuf), " %ld分", eminutes);
-        if (fieldcnt > 1) /* seconds to follow */
-            Strcat(outbuf, " と");
-        /* eminutes has been processed but no need to decrement fieldcnt */
+        Sprintf(eos(outbuf), "%s%ld分", *outbuf ? " " : "", eminutes);
     }
-    if (eseconds)
-        Sprintf(eos(outbuf), " %ld秒", eseconds);
+    if (eseconds) {
+        Sprintf(eos(outbuf), "%s%ld秒", *outbuf ? " " : "", eseconds);
+    }
     return outbuf;
 }
 
@@ -470,7 +462,7 @@ enlightenment(
         }
     }
     (void) fmt_elapsed_time(buf, final);
-    enl_msg("総プレイ経過時間 ", "は", "は", buf, "");
+    enl_msg("総プレイ経過時間", "は", "は", buf, "");
 
     if (!ge.en_via_menu) {
         display_nhwindow(ge.en_win, TRUE);
@@ -545,7 +537,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
     /* report alignment (bypass you_are() in order to omit ending period);
        adverb is used to distinguish between temporary change (helm of opp.
        alignment), permanent change (one-time conversion), and original */
-    Sprintf(buf, " %s%s%sで、%s %s に仕えている",
+    Sprintf(buf, "%s%s%sで、%s%sに仕えている",
             You_, !final ? are : were,
             align_str(u.ualign.type),
             /* helm of opposite alignment (might hide conversion) */
@@ -569,7 +561,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
     /* show the rest of this game's pantheon (finishes previous sentence)
        [appending "also Moloch" at the end would allow for straightforward
        trailing "and" on all three aligned entries but looks too verbose] */
-    Sprintf(buf, " 対立する神格:");
+    Sprintf(buf, "対立する神格:");
     if (u.ualign.type != A_LAWFUL)
         Sprintf(eos(buf), " %s（%s）", jp_align_gname_for_display(A_LAWFUL),
                 align_str(A_LAWFUL));
@@ -596,7 +588,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
         difalgn &= ~1; /* suppress helm from "started out <foo>" message */
     }
     if (difgend || difalgn) { /* sex change or perm align change or both */
-        Sprintf(buf, " 最初は%s%s%sだった.",
+        Sprintf(buf, "最初は%s%s%sだった。",
             difgend ? jp_gender_for_display(flags.initgend) : "",
                 (difgend && difalgn) ? "で" : "",
                 difalgn ? align_str(u.ualignbase[A_ORIGINAL]) : "");
@@ -654,9 +646,9 @@ background_enlightenment(int unused_mode UNUSED, int final)
        won't vary if user leaves a disclosure prompt or --More-- unanswered
        long enough for the dynamic value to change between then and now */
     if (final ? iflags.at_midnight : midnight()) {
-        enl_msg("現在 ", "は", "は", "真夜中だ", "");
+        enl_msg("現在", "は", "は", "真夜中だ", "");
     } else if (final ? iflags.at_night : night()) {
-        enl_msg("現在 ", "は", "は", "夜だ", "");
+        enl_msg("現在", "は", "は", "夜だ", "");
     }
     /* other environmental factors */
     if (flags.moonphase == FULL_MOON || flags.moonphase == NEW_MOON) {
@@ -676,7 +668,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
                 /* we don't have access to 'how' here--aside from survived
                    vs died--so settle for general platitude */
             final ? "（冒険終了時）" : "");
-        enl_msg("現在 ", "は", "は", buf, "");
+        enl_msg("現在", "は", "は", buf, "");
     }
     if (flags.friday13) {
         /* let player know that friday13 penalty is/was in effect;
@@ -684,7 +676,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
            the start of the session and it might be past midnight (or
            days later if the game has been paused without save/restore),
            so phrase this similar to the start up message */
-        Sprintf(buf, " 13日の金曜日の不運%s.",
+        Sprintf(buf, "13日の金曜日の不運%s。",
             !final ? "が起こり得る"
             : (final == ENL_GAMEOVERALIVE) ? "が起こり得た"
                   /* there's no may to tell whether -1 Luck made a
@@ -713,7 +705,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
 
                 Sprintf(eos(expbuf), "（次のレベル%dまであと%ld）", (ulvl + 1), delta);
         }
-        enl_msg("あなたの", "経験は ", "経験は ", expbuf, "");
+        enl_msg("あなたの", "経験は", "経験は", expbuf, "");
     }
 #ifdef SCORE_ON_BOTL
     if (flags.showscore) {
@@ -788,9 +780,9 @@ basics_enlightenment(int mode UNUSED, int final)
         long umoney = money_cnt(gi.invent), hmoney = hidden_gold(final);
 
         if (!umoney) {
-            Sprintf(buf, " 財布は空だ");
+            Sprintf(buf, "財布は空だ");
         } else {
-            Sprintf(buf, " 財布には%ld %s入っている", umoney, currency(umoney));
+            Sprintf(buf, "財布には%ld%s入っている", umoney, currency(umoney));
         }
         /* terminate the wallet line if appropriate, otherwise add an
            introduction to subsequent continuation; output now either way */
@@ -800,7 +792,7 @@ basics_enlightenment(int mode UNUSED, int final)
         /* put contained gold on its own line to avoid excessive width; it's
            phrased as a continuation of the wallet line so not capitalized */
         if (hmoney) {
-            Sprintf(buf, "荷物の中に%ld %s隠してある",
+            Sprintf(buf, "荷物の中に%ld%s隠してある",
                 hmoney, umoney ? "追加で" : currency(hmoney));
             enl_msg("あなたは", "", "", buf, "");
         }
@@ -824,7 +816,7 @@ basics_enlightenment(int mode UNUSED, int final)
         }
     } else
         Strcpy(buf, "オフ");
-    enl_msg("自動取得 ", "は", "は", buf, "");
+    enl_msg("自動取得", "は", "は", buf, "");
 }
 
 /* characteristics: expanded version of bottom line strength, dexterity, &c */
@@ -1028,7 +1020,7 @@ status_enlightenment(int mode, int final)
             you_are("埋まっている", "");
         } else {
             if (final && (Strangled & I_SPECIAL)) {
-                enlght_out(" 絞殺で死亡した。");
+                enlght_out("絞殺で死亡した。");
             } else {
                 Strcpy(buf, "首を絞められている");
                 if (wizard)
@@ -1043,7 +1035,7 @@ status_enlightenment(int mode, int final)
            puts TermIll before FoodPois and death due to timeout reports
            terminal illness if both are in effect, so do the same here */
         if (final && (Sick & I_SPECIAL)) {
-            Sprintf(buf, " %s%sで死亡した.", You_, /* has trailing space */
+            Sprintf(buf, "%s%sで死亡した。", You_,
                     (u.usick_type & SICK_NONVOMITABLE)
                 ? "致命的な病" : "食中毒");
             enlght_out(buf);
@@ -1449,7 +1441,7 @@ item_resistance_message(
     if (protection) {
         boolean somewhat = protection < 99;
 
-        enl_msg("装備品 ",
+        enl_msg("装備品",
             somewhat ? "はやや" : "は",
             somewhat ? "はやや" : "は",
                 prot_message, item_what(adtyp));
@@ -1487,8 +1479,8 @@ attributes_enlightenment(
         you_are(buf, "");
 
     if (wizard) {
-        Sprintf(buf, " %d", u.ualign.record);
-        enl_msg("属性値 ", "は", "は", buf, "");
+        Sprintf(buf, "%d", u.ualign.record);
+        enl_msg("属性値", "は", "は", buf, "");
     }
 
     /*** Resistances to troubles ***/
@@ -1800,7 +1792,7 @@ attributes_enlightenment(
             Strcpy(cast_adj, " ローブで詠唱が安定する");
 
         if (*cast_adj)
-            enl_msg("呪文詠唱 ", "は", "は", cast_adj, "");
+            enl_msg("呪文詠唱", "は", "は", cast_adj, "");
     }
     /* polymorph and other shape change */
     if (Protection_from_shape_changers)
@@ -1875,7 +1867,7 @@ attributes_enlightenment(
     if (Fixed_abil)
         you_have("能力値が固定されている", from_what(FIXED_ABIL));
     if (Lifesaved)
-        enl_msg("あなたの命 ", "は", "は", "救われる", "");
+        enl_msg("あなたの命", "は", "は", "救われる", "");
 
     /*** Miscellany ***/
     if (Luck) {
@@ -1887,7 +1879,7 @@ attributes_enlightenment(
             Sprintf(eos(buf), " (%d)", Luck);
         you_are(buf, "");
     } else if (wizard)
-        enl_msg("運 ", "は", "は", "0だ", "");
+        enl_msg("運", "は", "は", "0だ", "");
     if (u.moreluck > 0)
         you_have("追加の幸運がある", "");
     else if (u.moreluck < 0)
@@ -1895,13 +1887,13 @@ attributes_enlightenment(
     if (carrying(LUCKSTONE) || stone_luck(TRUE)) {
         ltmp = stone_luck(FALSE);
         if (ltmp <= 0)
-            enl_msg("不運 ", "は", "は", "時間経過で消えない", "");
+            enl_msg("不運", "は", "は", "時間経過で消えない", "");
         if (ltmp >= 0)
-            enl_msg("幸運 ", "は", "は", "時間経過で消えない", "");
+            enl_msg("幸運", "は", "は", "時間経過で消えない", "");
     }
 
     if (u.ugangr) {
-        Sprintf(buf, " あなたに%s怒っている",
+        Sprintf(buf, "あなたに%s怒っている",
             u.ugangr > 6 ? "激しく" : u.ugangr > 3 ? "かなり" : "");
         if (wizard)
             Sprintf(eos(buf), " (%d)", u.ugangr);
@@ -1940,9 +1932,9 @@ attributes_enlightenment(
             Sprintf(buf, "果物 #%d ", f->fid);
             enl_msg(buf, "は", "は", f->fname, "");
         }
-        enl_msg("現在の果物 ", "は", "は", svp.pl_fruit, "");
+        enl_msg("現在の果物", "は", "は", svp.pl_fruit, "");
         Sprintf(buf, "%d", flags.made_fruit);
-        enl_msg("作成済み果物フラグ ", "は", "は", buf, "");
+        enl_msg("作成済み果物フラグ", "は", "は", buf, "");
     }
 #endif
 
