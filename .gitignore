@@ -138,3 +138,5 @@ GEMINI.md
 #github workflow file for NetHackJP 
 .github\workflows\weekly-release.yml
 
+sys/flutter/assets/
+
