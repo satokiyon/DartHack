@@ -233,7 +233,12 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
       - `onTapDown` でタップされたローカル座標を一時変数（ステート）に保存する.
       - `onTap`（引数なし、ジェスチャー競合でタップとして確定した瞬間に発火）を契機とし、一時保存した座標を取り出してタップ処理を実行する.
 
-11. **Gradle / Kotlin 関連警告に対する gradle.properties 設定の維持**:
+11. **非正方形タイルセット（Geoduck 15x25等）の幅・高さ独立管理方針**:
+    - NetHack のタイルセットには `nevanda_32x32` や `default_16x16` のような正方形タイルのほか、`geoduck_15x25` などの非正方形タイルが含まれます。
+    - タイルサイズを単一の `tileSize` (int) で保持して正方形前提で切り出し座標（`iRow * tileSize`）を計算すると、非正方形タイル選択時に表示が崩れます。
+    - UI層および各 Painter クラス（`NetHackMapPainter` 等）では、必ず `tileWidth` と `tileHeight` を独立して保持し、アセット名から `RegExp(r'(\d+)x(\d+)')` 等で幅と高さを動的にパースして正確な `srcRect` (切り出し領域) を算出してください。
+
+12. **Gradle / Kotlin 関連警告に対する gradle.properties 設定の維持**:
     - **現象と制約**:
       Android Gradle Plugin (AGP) 9.0 以降への移行に伴い、`org.jetbrains.kotlin.android` プラグイン非推奨の警告が出力される場合がありますが、これを解消するために `gradle.properties` から `android.newDsl=false` や `android.builtInKotlin=false` を削除してはなりません。
     - **影響**:
