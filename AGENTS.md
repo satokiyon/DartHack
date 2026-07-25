@@ -92,6 +92,9 @@
 3. **Windows (PowerShell) 環境での Git コミット・コマンド実行の制約**:
    - `run_command` 等でコマンドを連結する際、PowerShell では `&&` を使用すると構文エラーになるため、1行ずつ実行するかセミコロン `;` 等で区切ってください。
    - 日本語のコミットメッセージを指定する場合、PowerShell 上で文字化けが発生するのを防ぐため、メッセージを一時ファイル（UTF-8）を artifacts の scratch ディレクトリ（例：`<appDataDir>\brain\<conversation-id>\scratch\commit_msg.txt`）に書き込み、`git commit -F <ファイルパス>` でコミットを行ってください。コミット完了後、一時ファイルは削除してください。
+   - **Git 履歴抹消 (`git filter-repo` / `git filter-branch`) 実行時のローカルファイル保護原則**:
+     - `git filter-repo` などの履歴書き換えコマンドは、実行完了後に書き換え後のコミットツリーを作業ツリーへ自動チェックアウト（上書き）するため、履歴から除去されたファイルがローカルのディスク上からも削除されます。
+     - 履歴抹消を行う際は、実行前に必ず対象のフォルダ・ファイルを Git 管理外の安全な一時ディレクトリ（例：`<appDataDir>\brain\<conversation-id>\scratch\`）へ手動でバックアップ（コピー）し、`git filter-repo` の完了後に元のローカル位置へ復元する手順を徹底してください。
 
 4. **Android (WSL + Gradle) 環境での自動ビルドスクリプトの利用**:
    - Android環境向けに `libnethack.so` のコンパイルおよびAPKビルドを行う際は、用意されているPowerShellスクリプト `sys/android/build_android.ps1` を実行してください。

@@ -165,5 +165,12 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
 - **FFI ビルド ID 判定**:
   C コア側（`winflutter.c`）で `flutter_get_build_id()` を提供し、Dart 側で `assets/ver` と C コアビルド ID の両重チェックを行うことで、実機端末上でのアセット最新展開と `.so` ファイルの確実な置換・反映を達成します。
 
+## 27. Git 履歴抹消 (`git filter-repo` / `git filter-branch`) 実行時のローカルファイル保護原則
+- **現象とリスク**:
+  `git filter-repo` などの履歴書き換えコマンドは、実行完了後に書き換え後のコミットツリーを作業ツリーへ自動チェックアウト（上書き）するため、履歴から除去されたファイルがローカルのディスク上からも削除されます。
+- **対策**:
+  履歴抹消を行う際は、実行前に必ず対象のフォルダ・ファイルを Git 管理外の安全な一時ディレクトリ（例：`<appDataDir>\brain\<conversation-id>\scratch\`）へ手動でバックアップ（コピー）し、`git filter-repo` の完了後に元のローカル位置へ復元する手順を徹底してください。
+
+
 
 
