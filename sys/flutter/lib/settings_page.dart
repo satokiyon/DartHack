@@ -511,274 +511,307 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildScreenModeSection() {
-    return ExpansionTile(
-      leading: const Icon(Icons.crop_landscape, color: Colors.greenAccent),
-      title: const Text("画面表示モード"),
-      subtitle: const Text("ゲーム画面のステータスバーの表示を切替えます（タイトル/設定画面には適用されません）"),
-      children: [
-        ListTile(
-          title: const Text("モード選択"),
-          trailing: DropdownButton<int>(
-            value: _screenMode,
-            items: const [
-              DropdownMenuItem(value: 0, child: Text('通常')),
-              DropdownMenuItem(value: 1, child: Text('イマーシブ')),
-            ],
-            onChanged: (val) {
-              if (val != null) {
-                setState(() => _screenMode = val);
-                _saveSetting('screen_mode', val);
-              }
-            },
-          ),
-        ),
-      ],
+  Widget _buildSectionCard(Widget child) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      clipBehavior: Clip.antiAlias,
+      child: child,
     );
   }
 
-  Widget _buildTilesetSection() {
-    return ExpansionTile(
-      leading: const Icon(Icons.palette, color: Colors.deepPurpleAccent),
-      title: const Text("タイルセット設定"),
-      children: [
-        SwitchListTile(
-          title: const Text("タイル表示を使用"),
-          subtitle: const Text("無効時はアスキー（文字）マップになります"),
-          value: _useTiles,
-          onChanged: (val) {
-            setState(() => _useTiles = val);
-            _saveSetting('use_tiles', val);
-          },
-        ),
-        if (_useTiles)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            key: const ValueKey("tileset_dropdown"),
-            child: DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: "タイルセットの選択"),
-              initialValue: _selectedTileset,
+  List<Widget> _withDividers(List<Widget> children) {
+    if (children.isEmpty) return children;
+    final List<Widget> result = [];
+    for (int i = 0; i < children.length; i++) {
+      result.add(children[i]);
+      if (i < children.length - 1) {
+        result.add(const Divider(
+          height: 1,
+          indent: 16,
+          endIndent: 16,
+          color: Colors.white12,
+        ));
+      }
+    }
+    return result;
+  }
+
+  Widget _buildScreenModeSection() {
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.crop_landscape, color: Colors.greenAccent),
+        title: const Text("画面表示モード"),
+        subtitle: const Text("ゲーム画面のステータスバーの表示を切替えます（タイトル/設定画面には適用されません）"),
+        children: _withDividers([
+          ListTile(
+            title: const Text("モード選択"),
+            trailing: DropdownButton<int>(
+              value: _screenMode,
               items: const [
-                DropdownMenuItem(value: 'nevanda_32x32', child: Text('Nevanda (32x32)')),
-                DropdownMenuItem(value: 'pixelhack_32x32', child: Text('PixelHack (32x32)')),
-                DropdownMenuItem(value: 'default_16x16', child: Text('Default (16x16)')),
-                DropdownMenuItem(value: 'geoduck_15x25', child: Text('Geoduck (15x25)')),
+                DropdownMenuItem(value: 0, child: Text('通常')),
+                DropdownMenuItem(value: 1, child: Text('イマーシブ')),
               ],
               onChanged: (val) {
                 if (val != null) {
-                  setState(() => _selectedTileset = val);
-                  _saveSetting('selected_tileset', val);
+                  setState(() => _screenMode = val);
+                  _saveSetting('screen_mode', val);
                 }
               },
             ),
           ),
-      ],
+        ]),
+      ),
+    );
+  }
+
+  Widget _buildTilesetSection() {
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.palette, color: Colors.deepPurpleAccent),
+        title: const Text("タイルセット設定"),
+        children: _withDividers([
+          SwitchListTile(
+            title: const Text("タイル表示を使用"),
+            subtitle: const Text("無効時はアスキー（文字）マップになります"),
+            value: _useTiles,
+            onChanged: (val) {
+              setState(() => _useTiles = val);
+              _saveSetting('use_tiles', val);
+            },
+          ),
+          if (_useTiles)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              key: const ValueKey("tileset_dropdown"),
+              child: DropdownButtonFormField<String>(
+                decoration: const InputDecoration(labelText: "タイルセットの選択"),
+                initialValue: _selectedTileset,
+                items: const [
+                  DropdownMenuItem(value: 'nevanda_32x32', child: Text('Nevanda (32x32)')),
+                  DropdownMenuItem(value: 'pixelhack_32x32', child: Text('PixelHack (32x32)')),
+                  DropdownMenuItem(value: 'default_16x16', child: Text('Default (16x16)')),
+                  DropdownMenuItem(value: 'geoduck_15x25', child: Text('Geoduck (15x25)')),
+                ],
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() => _selectedTileset = val);
+                    _saveSetting('selected_tileset', val);
+                  }
+                },
+              ),
+            ),
+        ]),
+      ),
     );
   }
 
   Widget _buildControllerSection() {
-    return ExpansionTile(
-      leading: const Icon(Icons.gamepad, color: Colors.amber),
-      title: const Text("操作盤・ステータス設定"),
-      children: [
-        ListTile(
-          title: const Text("操作モード"),
-          trailing: DropdownButton<String>(
-            value: _controllerMode,
-            items: const [
-              DropdownMenuItem(value: 'pad', child: Text('ボタンパッド')),
-              DropdownMenuItem(value: 'keyboard', child: Text('フルキーボード')),
-            ],
-            onChanged: (val) {
-              if (val != null) {
-                setState(() => _controllerMode = val);
-                _saveSetting('controller_mode', val);
-              }
-            },
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.gamepad, color: Colors.amber),
+        title: const Text("操作盤・ステータス設定"),
+        children: _withDividers([
+          ListTile(
+            title: const Text("操作モード"),
+            trailing: DropdownButton<String>(
+              value: _controllerMode,
+              items: const [
+                DropdownMenuItem(value: 'pad', child: Text('ボタンパッド')),
+                DropdownMenuItem(value: 'keyboard', child: Text('フルキーボード')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _controllerMode = val);
+                  _saveSetting('controller_mode', val);
+                }
+              },
+            ),
           ),
-        ),
-        ListTile(
-          title: const Text("ステータス表示モード"),
-          trailing: DropdownButton<int>(
-            value: _statusDisplayMode,
-            items: const [
-              DropdownMenuItem(value: 0, child: Text('自動縮小フィット')),
-              DropdownMenuItem(value: 1, child: Text('領域の可変高さ')),
-            ],
-            onChanged: (val) {
-              if (val != null) {
-                setState(() => _statusDisplayMode = val);
-                _saveSetting('status_display_mode', val);
-              }
-            },
+          ListTile(
+            title: const Text("ステータス表示モード"),
+            trailing: DropdownButton<int>(
+              value: _statusDisplayMode,
+              items: const [
+                DropdownMenuItem(value: 0, child: Text('自動縮小フィット')),
+                DropdownMenuItem(value: 1, child: Text('領域の可変高さ')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _statusDisplayMode = val);
+                  _saveSetting('status_display_mode', val);
+                }
+              },
+            ),
           ),
-        ),
-        ListTile(
-          title: const Text("ボタン不透明度"),
-          subtitle: Slider(
-            value: _padOpacity,
-            min: 0.1,
-            max: 1.0,
-            divisions: 9,
-            label: _padOpacity.toStringAsFixed(1),
-            onChanged: (val) {
-              setState(() => _padOpacity = val);
-              _saveSetting('pad_opacity', val);
-            },
+          ListTile(
+            title: const Text("ボタン不透明度"),
+            subtitle: Slider(
+              value: _padOpacity,
+              min: 0.1,
+              max: 1.0,
+              divisions: 9,
+              label: _padOpacity.toStringAsFixed(1),
+              onChanged: (val) {
+                setState(() => _padOpacity = val);
+                _saveSetting('pad_opacity', val);
+              },
+            ),
           ),
-        ),
-        ListTile(
-          title: const Text("移動ボタンサイズ倍率"),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: _dpadScale,
-                min: 0.6,
-                max: 1.5,
-                divisions: 9,
-                label: _dpadScale.toStringAsFixed(1),
-                onChanged: (val) {
-                  setState(() => _dpadScale = val);
-                  _saveSetting('dpad_scale', val);
-                },
-              ),
-              _buildAppliedScaleLabel(
-                setting: _dpadScale,
-                effective: _previewDpadEffectiveScale,
-                label: '移動',
-              ),
-            ],
+          ListTile(
+            title: const Text("移動ボタンサイズ倍率"),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Slider(
+                  value: _dpadScale,
+                  min: 0.6,
+                  max: 1.5,
+                  divisions: 9,
+                  label: _dpadScale.toStringAsFixed(1),
+                  onChanged: (val) {
+                    setState(() => _dpadScale = val);
+                    _saveSetting('dpad_scale', val);
+                  },
+                ),
+                _buildAppliedScaleLabel(
+                  setting: _dpadScale,
+                  effective: _previewDpadEffectiveScale,
+                  label: '移動',
+                ),
+              ],
+            ),
           ),
-        ),
-        ListTile(
-          title: const Text("移動パッド長押し時の移動モード"),
-          trailing: DropdownButton<String>(
-            value: _dpadLongPressMoveMode,
-            items: const [
-              DropdownMenuItem(value: 'NORMAL', child: Text('標準')),
-              DropdownMenuItem(value: 'UPPER', child: Text('大文字')),
-              DropdownMenuItem(value: 'G_LOWER', child: Text('g')),
-              DropdownMenuItem(value: 'G_UPPER', child: Text('G')),
-              DropdownMenuItem(value: 'CTRL', child: Text('^(Ctrl)')),
-              DropdownMenuItem(value: 'M_CMD', child: Text('m')),
-              DropdownMenuItem(value: 'F_CMD', child: Text('F')),
-            ],
-            onChanged: (val) {
-              if (val != null) {
-                setState(() => _dpadLongPressMoveMode = val);
-                _saveSetting('dpad_long_press_move_mode', val);
-              }
-            },
+          ListTile(
+            title: const Text("移動パッド長押し時の移動モード"),
+            trailing: DropdownButton<String>(
+              value: _dpadLongPressMoveMode,
+              items: const [
+                DropdownMenuItem(value: 'NORMAL', child: Text('標準')),
+                DropdownMenuItem(value: 'UPPER', child: Text('大文字')),
+                DropdownMenuItem(value: 'G_LOWER', child: Text('g')),
+                DropdownMenuItem(value: 'G_UPPER', child: Text('G')),
+                DropdownMenuItem(value: 'CTRL', child: Text('^(Ctrl)')),
+                DropdownMenuItem(value: 'M_CMD', child: Text('m')),
+                DropdownMenuItem(value: 'F_CMD', child: Text('F')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _dpadLongPressMoveMode = val);
+                  _saveSetting('dpad_long_press_move_mode', val);
+                }
+              },
+            ),
           ),
-        ),
-        ListTile(
-          title: const Text("マップタップでの自動トラベル"),
-          trailing: DropdownButton<String>(
-            value: _mapTapTravelMode,
-            items: const [
-              DropdownMenuItem(value: 'always', child: Text('常に有効')),
-              DropdownMenuItem(value: 'after_scroll', child: Text('スクロール・ズーム時のみ有効')),
-            ],
-            onChanged: (val) {
-              if (val != null) {
-                setState(() => _mapTapTravelMode = val);
-                _saveSetting('map_tap_travel_mode', val);
-              }
-            },
+          ListTile(
+            title: const Text("マップタップでの自動トラベル"),
+            trailing: DropdownButton<String>(
+              value: _mapTapTravelMode,
+              items: const [
+                DropdownMenuItem(value: 'always', child: Text('常に有効')),
+                DropdownMenuItem(value: 'after_scroll', child: Text('スクロール・ズーム時のみ有効')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _mapTapTravelMode = val);
+                  _saveSetting('map_tap_travel_mode', val);
+                }
+              },
+            ),
           ),
-        ),
-        ListTile(
-          title: const Text("ショートカットボタンサイズ倍率"),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: _shortcutPadScale,
-                min: 0.6,
-                max: 1.5,
-                divisions: 9,
-                label: _shortcutPadScale.toStringAsFixed(1),
-                onChanged: (val) {
-                  setState(() => _shortcutPadScale = val);
-                  _saveSetting('shortcut_pad_scale', val);
-                },
-              ),
-              _buildAppliedScaleLabel(
-                setting: _shortcutPadScale,
-                effective: _previewShortcutPadEffectiveScale,
-                label: 'ショートカット',
-              ),
-            ],
+          ListTile(
+            title: const Text("ショートカットボタンサイズ倍率"),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Slider(
+                  value: _shortcutPadScale,
+                  min: 0.6,
+                  max: 1.5,
+                  divisions: 9,
+                  label: _shortcutPadScale.toStringAsFixed(1),
+                  onChanged: (val) {
+                    setState(() => _shortcutPadScale = val);
+                    _saveSetting('shortcut_pad_scale', val);
+                  },
+                ),
+                _buildAppliedScaleLabel(
+                  setting: _shortcutPadScale,
+                  effective: _previewShortcutPadEffectiveScale,
+                  label: 'ショートカット',
+                ),
+              ],
+            ),
           ),
-        ),
-        ListTile(
-          title: const Text("コマンドパネルサイズ倍率"),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: _cmdPanelScale,
-                min: 0.6,
-                max: 1.5,
-                divisions: 9,
-                label: _cmdPanelScale.toStringAsFixed(1),
-                onChanged: (val) {
-                  setState(() => _cmdPanelScale = val);
-                  _saveSetting('cmd_panel_scale', val);
-                },
-              ),
-              _buildAppliedScaleLabel(
-                setting: _cmdPanelScale,
-                effective: _cmdPanelScale,
-                label: 'コマンドパネル',
-              ),
-            ],
+          ListTile(
+            title: const Text("コマンドパネルサイズ倍率"),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Slider(
+                  value: _cmdPanelScale,
+                  min: 0.6,
+                  max: 1.5,
+                  divisions: 9,
+                  label: _cmdPanelScale.toStringAsFixed(1),
+                  onChanged: (val) {
+                    setState(() => _cmdPanelScale = val);
+                    _saveSetting('cmd_panel_scale', val);
+                  },
+                ),
+                _buildAppliedScaleLabel(
+                  setting: _cmdPanelScale,
+                  effective: _cmdPanelScale,
+                  label: 'コマンドパネル',
+                ),
+              ],
+            ),
           ),
-        ),
-        ListTile(
-          title: const Text("メニュー(ドロワー)の引き出し位置"),
-          trailing: DropdownButton<String>(
-            value: _drawerPosition,
-            dropdownColor: Colors.grey[900],
-            style: const TextStyle(color: Colors.white),
-            items: const [
-              DropdownMenuItem(value: 'left', child: Text('左側 (スワイプ可)', style: TextStyle(color: Colors.white))),
-              DropdownMenuItem(value: 'right', child: Text('右側 (スワイプ可)', style: TextStyle(color: Colors.white))),
-              DropdownMenuItem(value: 'top', child: Text('上部', style: TextStyle(color: Colors.white))),
-              DropdownMenuItem(value: 'bottom', child: Text('下部', style: TextStyle(color: Colors.white))),
-            ],
-            onChanged: (val) {
-              if (val != null) {
-                setState(() => _drawerPosition = val);
-                _saveSetting('drawer_position', val);
-              }
-            },
+          ListTile(
+            title: const Text("メニュー(ドロワー)の引き出し位置"),
+            trailing: DropdownButton<String>(
+              value: _drawerPosition,
+              dropdownColor: Colors.grey[900],
+              style: const TextStyle(color: Colors.white),
+              items: const [
+                DropdownMenuItem(value: 'left', child: Text('左側 (スワイプ可)', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'right', child: Text('右側 (スワイプ可)', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'top', child: Text('上部', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'bottom', child: Text('下部', style: TextStyle(color: Colors.white))),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _drawerPosition = val);
+                  _saveSetting('drawer_position', val);
+                }
+              },
+            ),
           ),
-        ),
-        ListTile(
-          title: const Text("半透明メニューボタンの配置位置"),
-          trailing: DropdownButton<String>(
-            value: _menuButtonPosition,
-            dropdownColor: Colors.grey[900],
-            style: const TextStyle(color: Colors.white),
-            items: const [
-              DropdownMenuItem(value: 'top_left', child: Text('左上', style: TextStyle(color: Colors.white))),
-              DropdownMenuItem(value: 'top_right', child: Text('右上', style: TextStyle(color: Colors.white))),
-              DropdownMenuItem(value: 'left_edge', child: Text('左端(中央)', style: TextStyle(color: Colors.white))),
-              DropdownMenuItem(value: 'right_edge', child: Text('右端(中央)', style: TextStyle(color: Colors.white))),
-              DropdownMenuItem(value: 'bottom_left', child: Text('左下', style: TextStyle(color: Colors.white))),
-              DropdownMenuItem(value: 'bottom_right', child: Text('右下', style: TextStyle(color: Colors.white))),
-            ],
-            onChanged: (val) {
-              if (val != null) {
-                setState(() => _menuButtonPosition = val);
-                _saveSetting('menu_button_position', val);
-              }
-            },
+          ListTile(
+            title: const Text("半透明メニューボタンの配置位置"),
+            trailing: DropdownButton<String>(
+              value: _menuButtonPosition,
+              dropdownColor: Colors.grey[900],
+              style: const TextStyle(color: Colors.white),
+              items: const [
+                DropdownMenuItem(value: 'top_left', child: Text('左上', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'top_right', child: Text('右上', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'left_edge', child: Text('左端(中央)', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'right_edge', child: Text('右端(中央)', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'bottom_left', child: Text('左下', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'bottom_right', child: Text('右下', style: TextStyle(color: Colors.white))),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _menuButtonPosition = val);
+                  _saveSetting('menu_button_position', val);
+                }
+              },
+            ),
           ),
-        ),
-      ],
+        ]),
+      ),
     );
   }
 
@@ -840,153 +873,155 @@ class _SettingsPageState extends State<SettingsPage> {
 
   /// メッセージ領域の表示設定セクション
   Widget _buildMessageSection() {
-    return ExpansionTile(
-      leading: const Icon(Icons.chat_bubble_outline, color: Colors.tealAccent),
-      title: const Text('メッセージ設定'),
-      subtitle: const Text('オーバーレイ表示の行数・透過度・フォントサイズ'),
-      children: [
-        // 行数スライダー（1〜15）
-        ListTile(
-          title: const Text('表示行数'),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: _msgLineCount.toDouble(),
-                min: 1,
-                max: 15,
-                divisions: 14,
-                label: '$_msgLineCount 行',
-                onChanged: (val) {
-                  final intVal = val.round();
-                  setState(() => _msgLineCount = intVal);
-                  _saveSetting('msg_line_count', intVal);
-                },
-              ),
-              Text(
-                '現在: $_msgLineCount 行（最新メッセージを$_msgLineCount行表示）',
-                style: const TextStyle(fontSize: 12, color: Colors.white54),
-              ),
-            ],
-          ),
-        ),
-        // 透過度スライダー（0〜100、実際は 0.0〜1.0 で保存）
-        ListTile(
-          title: const Text('背景透過度'),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: _msgOpacity,
-                min: 0.0,
-                max: 1.0,
-                divisions: 20,
-                label: '${(_msgOpacity * 100).round()}%',
-                onChanged: (val) {
-                  setState(() => _msgOpacity = val);
-                  _saveSetting('msg_opacity', val);
-                },
-              ),
-              Text(
-                '現在: ${(_msgOpacity * 100).round()}%'
-                '（0% = 完全透明 / 100% = 不透明）',
-                style: const TextStyle(fontSize: 12, color: Colors.white54),
-              ),
-            ],
-          ),
-        ),
-        // フォントサイズスライダー（8〜24）
-        ListTile(
-          title: const Text('フォントサイズ'),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: _msgFontSize,
-                min: 8.0,
-                max: 24.0,
-                divisions: 16,
-                label: '${_msgFontSize.round()} pt',
-                onChanged: (val) {
-                  setState(() => _msgFontSize = val);
-                  _saveSetting('msg_font_size', val);
-                },
-              ),
-              Text(
-                '現在: ${_msgFontSize.round()} pt',
-                style: const TextStyle(fontSize: 12, color: Colors.white54),
-              ),
-            ],
-          ),
-        ),
-        // プレビュー
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'プレビュー',
-                style: TextStyle(fontSize: 12, color: Colors.white38),
-              ),
-              const SizedBox(height: 4),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.blueGrey[900],
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.white12),
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.chat_bubble_outline, color: Colors.tealAccent),
+        title: const Text('メッセージ設定'),
+        subtitle: const Text('オーバーレイ表示の行数・透過度・フォントサイズ'),
+        children: _withDividers([
+          // 行数スライダー（1〜15）
+          ListTile(
+            title: const Text('表示行数'),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Slider(
+                  value: _msgLineCount.toDouble(),
+                  min: 1,
+                  max: 15,
+                  divisions: 14,
+                  label: '$_msgLineCount 行',
+                  onChanged: (val) {
+                    final intVal = val.round();
+                    setState(() => _msgLineCount = intVal);
+                    _saveSetting('msg_line_count', intVal);
+                  },
                 ),
-                padding: const EdgeInsets.all(6),
-                child: Stack(
-                  children: [
-                    // 背景（マップのイメージ）
-                    Container(
-                      height: 80,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Colors.blueGrey[900]!, Colors.blueGrey[800]!],
-                        ),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '.  .  .  @  .  .\n.  .  .  .  .  .\n.  .  .  .  d  .',
-                          style: TextStyle(
-                            color: Colors.white24,
-                            fontFamily: 'monospace',
-                            fontSize: 12,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    // メッセージオーバーレイのプレビュー
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        color: Colors.black.withValues(alpha: _msgOpacity),
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                        child: Text(
-                          'メッセージのサンプルテキストです。\nWelcome to NetHackJP!',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'monospace',
-                            fontSize: _msgFontSize,
-                          ),
-                          maxLines: _msgLineCount,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                  ],
+                Text(
+                  '現在: $_msgLineCount 行（最新メッセージを$_msgLineCount行表示）',
+                  style: const TextStyle(fontSize: 12, color: Colors.white54),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+          // 透過度スライダー（0〜100、実際は 0.0〜1.0 で保存）
+          ListTile(
+            title: const Text('背景透過度'),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Slider(
+                  value: _msgOpacity,
+                  min: 0.0,
+                  max: 1.0,
+                  divisions: 20,
+                  label: '${(_msgOpacity * 100).round()}%',
+                  onChanged: (val) {
+                    setState(() => _msgOpacity = val);
+                    _saveSetting('msg_opacity', val);
+                  },
+                ),
+                Text(
+                  '現在: ${(_msgOpacity * 100).round()}%'
+                  '（0% = 完全透明 / 100% = 不透明）',
+                  style: const TextStyle(fontSize: 12, color: Colors.white54),
+                ),
+              ],
+            ),
+          ),
+          // フォントサイズスライダー（8〜24）
+          ListTile(
+            title: const Text('フォントサイズ'),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Slider(
+                  value: _msgFontSize,
+                  min: 8.0,
+                  max: 24.0,
+                  divisions: 16,
+                  label: '${_msgFontSize.round()} pt',
+                  onChanged: (val) {
+                    setState(() => _msgFontSize = val);
+                    _saveSetting('msg_font_size', val);
+                  },
+                ),
+                Text(
+                  '現在: ${_msgFontSize.round()} pt',
+                  style: const TextStyle(fontSize: 12, color: Colors.white54),
+                ),
+              ],
+            ),
+          ),
+          // プレビュー
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'プレビュー',
+                  style: TextStyle(fontSize: 12, color: Colors.white38),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.blueGrey[900],
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: Colors.white12),
+                  ),
+                  padding: const EdgeInsets.all(6),
+                  child: Stack(
+                    children: [
+                      // 背景（マップのイメージ）
+                      Container(
+                        height: 80,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.blueGrey[900]!, Colors.blueGrey[800]!],
+                          ),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            '.  .  .  @  .  .\n.  .  .  .  .  .\n.  .  .  .  d  .',
+                            style: TextStyle(
+                              color: Colors.white24,
+                              fontFamily: 'monospace',
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      // メッセージオーバーレイのプレビュー
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          color: Colors.black.withValues(alpha: _msgOpacity),
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          child: Text(
+                            'メッセージのサンプルテキストです。\nWelcome to NetHackJP!',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'monospace',
+                              fontSize: _msgFontSize,
+                            ),
+                            maxLines: _msgLineCount,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ]),
+      ),
     );
   }
 
@@ -1008,162 +1043,169 @@ class _SettingsPageState extends State<SettingsPage> {
       115: "周囲の探索 (s)",
     };
 
-    return ExpansionTile(
-      leading: const Icon(Icons.keyboard, color: Colors.blueAccent),
-      title: const Text("物理キーカスタムアクション"),
-      subtitle: const Text("音量ボタンや戻るキーにゲームコマンドを割り当てます"),
-      children: [
-        ListTile(
-          title: const Text("音量アップキー"),
-          trailing: DropdownButton<int>(
-            value: _volupAction,
-            items: volActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
-            onChanged: (val) {
-              if (val != null) {
-                setState(() => _volupAction = val);
-                _saveSetting('key_volup_action', val);
-                _syncNativeKeySettings();
-              }
-            },
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.keyboard, color: Colors.blueAccent),
+        title: const Text("物理キーカスタムアクション"),
+        subtitle: const Text("音量ボタンや戻るキーにゲームコマンドを割り当てます"),
+        children: _withDividers([
+          ListTile(
+            title: const Text("音量アップキー"),
+            trailing: DropdownButton<int>(
+              value: _volupAction,
+              items: volActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _volupAction = val);
+                  _saveSetting('key_volup_action', val);
+                  _syncNativeKeySettings();
+                }
+              },
+            ),
           ),
-        ),
-        ListTile(
-          title: const Text("音量ダウンキー"),
-          trailing: DropdownButton<int>(
-            value: _voldownAction,
-            items: volActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
-            onChanged: (val) {
-              if (val != null) {
-                setState(() => _voldownAction = val);
-                _saveSetting('key_voldown_action', val);
-                _syncNativeKeySettings();
-              }
-            },
+          ListTile(
+            title: const Text("音量ダウンキー"),
+            trailing: DropdownButton<int>(
+              value: _voldownAction,
+              items: volActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _voldownAction = val);
+                  _saveSetting('key_voldown_action', val);
+                  _syncNativeKeySettings();
+                }
+              },
+            ),
           ),
-        ),
-        ListTile(
-          title: const Text("戻るボタン"),
-          trailing: DropdownButton<int>(
-            value: _backAction,
-            items: backActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
-            onChanged: (val) {
-              if (val != null) {
-                setState(() => _backAction = val);
-                _saveSetting('key_back_action', val);
-                _syncNativeKeySettings();
-              }
-            },
+          ListTile(
+            title: const Text("戻るボタン"),
+            trailing: DropdownButton<int>(
+              value: _backAction,
+              items: backActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _backAction = val);
+                  _saveSetting('key_back_action', val);
+                  _syncNativeKeySettings();
+                }
+              },
+            ),
           ),
-        ),
-      ],
+        ]),
+      ),
     );
   }
 
   Widget _buildShortcutSection() {
-    return ExpansionTile(
-      leading: const Icon(Icons.grid_3x3, color: Colors.cyanAccent),
-      title: const Text("ショートカットカスタマイズ"),
-      subtitle: const Text("3x3ショートカットパッドに割り当てるキーを設定"),
-      children: [
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(12),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 2.2,
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.grid_3x3, color: Colors.cyanAccent),
+        title: const Text("ショートカットカスタマイズ"),
+        subtitle: const Text("3x3ショートカットパッドに割り当てるキーを設定"),
+        children: _withDividers([
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(12),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 2.2,
+            ),
+            itemCount: 9,
+            itemBuilder: (context, index) {
+              final cmd = _shortcuts[index];
+              return ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[900],
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                ),
+                onPressed: () => _editShortcut(index),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _shortcutLabels[index].split(' ')[0],
+                      style: const TextStyle(fontSize: 10, color: Colors.grey),
+                    ),
+                    Text(
+                      cmd.isEmpty ? "(未設定)" : cmd,
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.amberAccent),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
-          itemCount: 9,
-          itemBuilder: (context, index) {
-            final cmd = _shortcuts[index];
-            return ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[900],
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-              ),
-              onPressed: () => _editShortcut(index),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _shortcutLabels[index].split(' ')[0],
-                    style: const TextStyle(fontSize: 10, color: Colors.grey),
-                  ),
-                  Text(
-                    cmd.isEmpty ? "(未設定)" : cmd,
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.amberAccent),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      ],
+        ]),
+      ),
     );
   }
 
   Widget _buildOtherSection() {
-    return ExpansionTile(
-      leading: const Icon(Icons.more_horiz, color: Colors.lightBlueAccent),
-      title: const Text("その他の設定"),
-      children: [
-        ListTile(
-          title: const Text("死亡時の墓表示モード"),
-          trailing: DropdownButton<int>(
-            value: _tombstoneDisplayMode,
-            items: const [
-              DropdownMenuItem(value: 0, child: Text('画像表示')),
-              DropdownMenuItem(value: 1, child: Text('テキスト表示')),
-            ],
-            onChanged: (val) {
-              if (val != null) {
-                setState(() => _tombstoneDisplayMode = val);
-                _saveSetting('tombstone_display_mode', val);
-              }
-            },
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.more_horiz, color: Colors.lightBlueAccent),
+        title: const Text("その他の設定"),
+        children: _withDividers([
+          ListTile(
+            title: const Text("死亡時の墓表示モード"),
+            trailing: DropdownButton<int>(
+              value: _tombstoneDisplayMode,
+              items: const [
+                DropdownMenuItem(value: 0, child: Text('画像表示')),
+                DropdownMenuItem(value: 1, child: Text('テキスト表示')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _tombstoneDisplayMode = val);
+                  _saveSetting('tombstone_display_mode', val);
+                }
+              },
+            ),
           ),
-        ),
-      ],
+        ]),
+      ),
     );
   }
 
   Widget _buildAdvancedSection() {
-    return ExpansionTile(
-      leading: const Icon(Icons.tune, color: Colors.orangeAccent),
-      title: const Text("高度な設定"),
-      children: [
-        ListTile(
-          leading: const Icon(Icons.edit_note, color: Colors.white),
-          title: const Text("defaults.nh を手動で編集"),
-          subtitle: const Text("詳細なゲームオプションファイルを直接記述します（※反映には新規ゲームの開始が必要です）"),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () async {
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => DefaultsEditor(defaultsFilePath: widget.defaultsFilePath),
-              ),
-            );
-            _loadAllSettings();
-          },
-        ),
-        const Divider(),
-        ListTile(
-          leading: const Icon(Icons.file_upload, color: Colors.lightBlueAccent),
-          title: const Text("設定をエクスポート"),
-          subtitle: const Text("現在の設定をJSON文字列でクリップボードにコピー"),
-          onTap: _exportSettings,
-        ),
-        ListTile(
-          leading: const Icon(Icons.file_download, color: Colors.lightGreenAccent),
-          title: const Text("設定をインポート"),
-          subtitle: const Text("クリップボードの設定JSONを読み込んで適用します"),
-          onTap: _importSettings,
-        ),
-      ],
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.tune, color: Colors.orangeAccent),
+        title: const Text("高度な設定"),
+        children: _withDividers([
+          ListTile(
+            leading: const Icon(Icons.edit_note, color: Colors.white),
+            title: const Text("defaults.nh を手動で編集"),
+            subtitle: const Text("詳細なゲームオプションファイルを直接記述します（※反映には新規ゲームの開始が必要です）"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DefaultsEditor(defaultsFilePath: widget.defaultsFilePath),
+                ),
+              );
+              _loadAllSettings();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.file_upload, color: Colors.lightBlueAccent),
+            title: const Text("設定をエクスポート"),
+            subtitle: const Text("現在の設定をJSON文字列でクリップボードにコピー"),
+            onTap: _exportSettings,
+          ),
+          ListTile(
+            leading: const Icon(Icons.file_download, color: Colors.lightGreenAccent),
+            title: const Text("設定をインポート"),
+            subtitle: const Text("クリップボードの設定JSONを読み込んで適用します"),
+            onTap: _importSettings,
+          ),
+        ]),
+      ),
     );
   }
 
@@ -1317,140 +1359,147 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildGameRulesSection() {
-    return ExpansionTile(
-      leading: const Icon(Icons.sports_esports, color: Colors.tealAccent),
-      title: const Text("ゲームルール・プレイ設定 (defaults.nh)"),
-      subtitle: const Text("ゲーム本体の動作オプションを設定します（※反映には新規ゲームの開始が必要です）"),
-      children: [
-        SwitchListTile(
-          title: const Text("チュートリアル開始確認"),
-          subtitle: const Text("起動時/ゲーム開始時にチュートリアルを始めるか確認します"),
-          value: _optTutorial,
-          onChanged: (val) {
-            setState(() => _optTutorial = val);
-            _saveGameOption('nh_opt_tutorial', val);
-          },
-        ),
-        SwitchListTile(
-          title: const Text("自動拾い (autopickup)"),
-          subtitle: const Text("足元のアイテムを自動的に拾います"),
-          value: _optAutopickup,
-          onChanged: (val) {
-            setState(() => _optAutopickup = val);
-            _saveGameOption('nh_opt_autopickup', val);
-          },
-        ),
-        ListTile(
-          enabled: _optAutopickup,
-          title: const Text("自動拾い対象のアイテム種別 (pickup_types)"),
-          subtitle: Text(
-            _optAutopickup
-                ? (_optPickupTypes.isEmpty ? "すべて拾う" : "対象記号: $_optPickupTypes")
-                : "※自動拾いが有効な場合のみ設定できます",
-            style: TextStyle(
-              color: _optAutopickup ? Colors.white70 : Colors.grey,
-            ),
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.sports_esports, color: Colors.tealAccent),
+        title: const Text("ゲームルール・プレイ設定 (defaults.nh)"),
+        subtitle: const Text("ゲーム本体の動作オプションを設定します（※反映には新規ゲームの開始が必要です）"),
+        children: _withDividers([
+          SwitchListTile(
+            title: const Text("チュートリアル開始確認"),
+            subtitle: const Text("起動時/ゲーム開始時にチュートリアルを始めるか確認します"),
+            value: _optTutorial,
+            onChanged: (val) {
+              setState(() => _optTutorial = val);
+              _saveGameOption('nh_opt_tutorial', val);
+            },
           ),
-          onTap: _optAutopickup ? _editPickupTypes : null,
-        ),
-        SwitchListTile(
-          title: const Text("経過ターン表示 (time)"),
-          subtitle: const Text("ステータス表示に行動ターン数を表示します"),
-          value: _optTime,
-          onChanged: (val) {
-            setState(() => _optTime = val);
-            _saveGameOption('nh_opt_time', val);
-          },
-        ),
-        SwitchListTile(
-          title: const Text("経験値表示 (showexp)"),
-          subtitle: const Text("ステータス表示に獲得経験値を表示します"),
-          value: _optShowexp,
-          onChanged: (val) {
-            setState(() => _optShowexp = val);
-            _saveGameOption('nh_opt_showexp', val);
-          },
-        ),
-        SwitchListTile(
-          title: const Text("価格見積表示 (price_quotes)"),
-          subtitle: const Text("店での売買時に価格の見積もりを表示します"),
-          value: _optPriceQuotes,
-          onChanged: (val) {
-            setState(() => _optPriceQuotes = val);
-            _saveGameOption('nh_opt_price_quotes', val);
-          },
-        ),
-        SwitchListTile(
-          title: const Text("ステータスハイライト表示 (hilite_status)"),
-          subtitle: const Text("HPや各種状態変化を色付きでハイライト表示します"),
-          value: _optHiliteStatus,
-          onChanged: (val) {
-            setState(() => _optHiliteStatus = val);
-            _saveGameOption('nh_opt_hilite_status', val);
-          },
-        ),
-        SwitchListTile(
-          title: const Text("メニューのカラー表示 (MENUCOLOR)"),
-          subtitle: const Text("インベントリやダイアログの各項目を色付き表示します"),
-          value: _optMenucolor,
-          onChanged: (val) {
-            setState(() => _optMenucolor = val);
-            _saveGameOption('nh_opt_menucolor', val);
-          },
-        ),
-        ListTile(
-          title: const Text("犬の名前 (dogname)"),
-          subtitle: Text(_optDogname.isEmpty ? "デフォルト (未指定)" : _optDogname),
-          onTap: () => _editStringOption("犬の名前 (dogname)", 'nh_opt_dogname', _optDogname, 16),
-        ),
-        ListTile(
-          title: const Text("猫の名前 (catname)"),
-          subtitle: Text(_optCatname.isEmpty ? "デフォルト (未指定)" : _optCatname),
-          onTap: () => _editStringOption("猫の名前 (catname)", 'nh_opt_catname', _optCatname, 16),
-        ),
-        ListTile(
-          title: const Text("馬の名前 (horsename)"),
-          subtitle: Text(_optHorsename.isEmpty ? "デフォルト (未指定)" : _optHorsename),
-          onTap: () => _editStringOption("馬の名前 (horsename)", 'nh_opt_horsename', _optHorsename, 16),
-        ),
-        ListTile(
-          title: const Text("果物の名前 (fruit)"),
-          subtitle: Text(_optFruit.isEmpty ? "デフォルト (slime mold)" : _optFruit),
-          onTap: () => _editStringOption("果物の名前 (fruit)", 'nh_opt_fruit', _optFruit, 16),
-        ),
-      ],
+          SwitchListTile(
+            title: const Text("自動拾い (autopickup)"),
+            subtitle: const Text("足元のアイテムを自動的に拾います"),
+            value: _optAutopickup,
+            onChanged: (val) {
+              setState(() => _optAutopickup = val);
+              _saveGameOption('nh_opt_autopickup', val);
+            },
+          ),
+          ListTile(
+            enabled: _optAutopickup,
+            title: const Text("自動拾い対象のアイテム種別 (pickup_types)"),
+            subtitle: Text(
+              _optAutopickup
+                  ? (_optPickupTypes.isEmpty ? "すべて拾う" : "対象記号: $_optPickupTypes")
+                  : "※自動拾いが有効な場合のみ設定できます",
+              style: TextStyle(
+                color: _optAutopickup ? Colors.white70 : Colors.grey,
+              ),
+            ),
+            onTap: _optAutopickup ? _editPickupTypes : null,
+          ),
+          SwitchListTile(
+            title: const Text("経過ターン表示 (time)"),
+            subtitle: const Text("ステータス表示に行動ターン数を表示します"),
+            value: _optTime,
+            onChanged: (val) {
+              setState(() => _optTime = val);
+              _saveGameOption('nh_opt_time', val);
+            },
+          ),
+          SwitchListTile(
+            title: const Text("経験値表示 (showexp)"),
+            subtitle: const Text("ステータス表示に獲得経験値を表示します"),
+            value: _optShowexp,
+            onChanged: (val) {
+              setState(() => _optShowexp = val);
+              _saveGameOption('nh_opt_showexp', val);
+            },
+          ),
+          SwitchListTile(
+            title: const Text("価格見積表示 (price_quotes)"),
+            subtitle: const Text("店での売買時に価格の見積もりを表示します"),
+            value: _optPriceQuotes,
+            onChanged: (val) {
+              setState(() => _optPriceQuotes = val);
+              _saveGameOption('nh_opt_price_quotes', val);
+            },
+          ),
+          SwitchListTile(
+            title: const Text("ステータスハイライト表示 (hilite_status)"),
+            subtitle: const Text("HPや各種状態変化を色付きでハイライト表示します"),
+            value: _optHiliteStatus,
+            onChanged: (val) {
+              setState(() => _optHiliteStatus = val);
+              _saveGameOption('nh_opt_hilite_status', val);
+            },
+          ),
+          SwitchListTile(
+            title: const Text("メニューのカラー表示 (MENUCOLOR)"),
+            subtitle: const Text("インベントリやダイアログの各項目を色付き表示します"),
+            value: _optMenucolor,
+            onChanged: (val) {
+              setState(() => _optMenucolor = val);
+              _saveGameOption('nh_opt_menucolor', val);
+            },
+          ),
+          ListTile(
+            title: const Text("犬の名前 (dogname)"),
+            subtitle: Text(_optDogname.isEmpty ? "デフォルト (未指定)" : _optDogname),
+            onTap: () => _editStringOption("犬の名前 (dogname)", 'nh_opt_dogname', _optDogname, 16),
+          ),
+          ListTile(
+            title: const Text("猫の名前 (catname)"),
+            subtitle: Text(_optCatname.isEmpty ? "デフォルト (未指定)" : _optCatname),
+            onTap: () => _editStringOption("猫の名前 (catname)", 'nh_opt_catname', _optCatname, 16),
+          ),
+          ListTile(
+            title: const Text("馬の名前 (horsename)"),
+            subtitle: Text(_optHorsename.isEmpty ? "デフォルト (未指定)" : _optHorsename),
+            onTap: () => _editStringOption("馬の名前 (horsename)", 'nh_opt_horsename', _optHorsename, 16),
+          ),
+          ListTile(
+            title: const Text("果物の名前 (fruit)"),
+            subtitle: Text(_optFruit.isEmpty ? "デフォルト (slime mold)" : _optFruit),
+            onTap: () => _editStringOption("果物の名前 (fruit)", 'nh_opt_fruit', _optFruit, 16),
+          ),
+        ]),
+      ),
     );
   }
 
   Widget _buildCreditsSection() {
-    return ExpansionTile(
-      leading: const Icon(Icons.info_outline, color: Colors.pinkAccent),
-      title: const Text("クレジット"),
-      children: const [
-        Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "NetHackJP Android/Flutter Port",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.amberAccent),
-              ),
-              SizedBox(height: 8),
-              Text("このアプリは NetHackJP を Android および Flutter に移植したものです。"),
-              SizedBox(height: 12),
-              Text(
-                "Contributors:",
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white70),
-              ),
-              SizedBox(height: 4),
-              Text("• TBD (Original ForkFront Developer)"),
-              Text("• @satokiyon (NetHackJP Contributor)"),
-              Text("• Google DeepMind Advanced Agentic Coding Team"),
-            ],
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.info_outline, color: Colors.pinkAccent),
+        title: const Text("クレジット"),
+        children: const [
+          Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "NetHackJP Flutter Port",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.amberAccent),
+                ),
+                SizedBox(height: 8),
+                Text("本アプリは NetHackJP を元に Flutter で再構築したものです。NetHackJPは、非公式に日本語化された NetHack 5.0.0 のフォークであり、オリジナルの NetHack 5.0.0 の機能をベースにしています。公式のNetHack開発チーム（The NetHack DevTeam）とは関係ありません。"),
+                SizedBox(height: 8),
+                Text("本アプリは、NetHack General Public License (NGPL) に基づき配布されています。ソースコードは次のサイトにて公開しています：https://github.com/satokiyon/DartHack"),
+                SizedBox(height: 8),
+                Text("本アプリのUIは gurrhack の ForkFront によるUIデザインからインスピレーションを受けています。"),
+                SizedBox(height: 12),
+                Text(
+                  "Contributors:",
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white70),
+                ),
+                SizedBox(height: 4),
+                Text("• @satokiyon (NetHackJP Contributor)"),
+                Text("• with Google Antigravity"),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -1539,69 +1588,71 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildCmdPanelSection() {
-    return ExpansionTile(
-      leading: const Icon(Icons.dashboard_customize, color: Colors.indigoAccent),
-      title: const Text("コマンドパネル編集"),
-      subtitle: const Text("ゲーム下部スワイプ対応のボタン群を管理"),
-      children: [
-        SwitchListTile(
-          title: const Text("パネル名を表示"),
-          subtitle: const Text("各パネル行の左端に名前バッジを表示"),
-          value: _showPanelNames,
-          onChanged: (val) {
-            setState(() => _showPanelNames = val);
-            _saveSetting('show_panel_names', val);
-          },
-        ),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _panels.length,
-          itemBuilder: (context, index) {
-            final panel = _panels[index];
-            return ListTile(
-              title: Text(panel['name']),
-              subtitle: Text(
-                panel['cmds'].toString().isEmpty ? "(ボタンなし)" : panel['cmds'].toString(),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.amber),
-                    onPressed: () => _editPanel(index),
-                  ),
-                  if (_panels.length > 1)
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.dashboard_customize, color: Colors.indigoAccent),
+        title: const Text("コマンドパネル編集"),
+        subtitle: const Text("ゲーム下部スワイプ対応のボタン群を管理"),
+        children: _withDividers([
+          SwitchListTile(
+            title: const Text("パネル名を表示"),
+            subtitle: const Text("各パネル行の左端に名前バッジを表示"),
+            value: _showPanelNames,
+            onChanged: (val) {
+              setState(() => _showPanelNames = val);
+              _saveSetting('show_panel_names', val);
+            },
+          ),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _panels.length,
+            itemBuilder: (context, index) {
+              final panel = _panels[index];
+              return ListTile(
+                title: Text(panel['name']),
+                subtitle: Text(
+                  panel['cmds'].toString().isEmpty ? "(ボタンなし)" : panel['cmds'].toString(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                     IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () {
-                        setState(() {
-                          _panels.removeAt(index);
-                        });
-                        _savePanels();
-                      },
+                      icon: const Icon(Icons.edit, color: Colors.amber),
+                      onPressed: () => _editPanel(index),
                     ),
-                ],
-              ),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.add, color: Colors.green),
-          title: const Text("新しいコマンドパネルを追加"),
-          onTap: () {
-            setState(() {
-              _panels.add({
-                'name': "パネル ${_panels.length + 1}",
-                'cmds': "e d r z Z q t f w x i",
+                    if (_panels.length > 1)
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          setState(() {
+                            _panels.removeAt(index);
+                          });
+                          _savePanels();
+                        },
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.add, color: Colors.green),
+            title: const Text("新しいコマンドパネルを追加"),
+            onTap: () {
+              setState(() {
+                _panels.add({
+                  'name': "パネル ${_panels.length + 1}",
+                  'cmds': "e d r z Z q t f w x i",
+                });
               });
-            });
-            _savePanels();
-          },
-        ),
-      ],
+              _savePanels();
+            },
+          ),
+        ]),
+      ),
     );
   }
 }
