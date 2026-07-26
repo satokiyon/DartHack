@@ -886,20 +886,6 @@ class _MyHomePageState extends State<MyHomePage> {
       });
       _addLog("Assets initialized at: $_assetsPath (Build ID: ${currentBuildId ?? 'unknown'})");
 
-      if (NetHackAssets.wasUpdated && mounted) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("NetHackコアが更新されました"),
-                duration: Duration(seconds: 4),
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-          }
-        });
-      }
-
       final defaultsHelper = DefaultsHelper();
       await defaultsHelper.syncFromPrefsToFile('$_assetsPath/defaults.nh');
       await defaultsHelper.syncFromFileToPrefs('$_assetsPath/defaults.nh');
