@@ -19,6 +19,7 @@ class DefaultsHelper {
     'fruit',
     'hilite_status',
     'menucolor',
+    'number_pad',
   };
 
   static const String managedHeaderComment = '# *** Managed Options by Settings ***';
@@ -107,7 +108,13 @@ class DefaultsHelper {
       if (key == 'hilite_status' || key == 'menucolor') continue;
 
       if (managedKeys.contains(key)) {
-        if (isBool) {
+        if (key == 'number_pad') {
+          if (isBool) {
+            _options[key] = boolVal ? '1' : '0';
+          } else {
+            _options[key] = val;
+          }
+        } else if (isBool) {
           _options[key] = boolVal ? 'true' : 'false';
         } else {
           _options[key] = val;
@@ -280,7 +287,13 @@ class DefaultsHelper {
     _options.forEach((key, val) {
       if (key == 'hilite_status' || key == 'menucolor') return;
 
-      if (val.toLowerCase() == 'true') {
+      if (key == 'number_pad') {
+        if (val == '0') {
+          pendingLines.add('OPTIONS=!number_pad');
+        } else {
+          pendingLines.add('OPTIONS=number_pad:$val');
+        }
+      } else if (val.toLowerCase() == 'true') {
         pendingLines.add('OPTIONS=$key');
       } else if (val.toLowerCase() == 'false') {
         pendingLines.add('OPTIONS=!$key');
@@ -385,6 +398,17 @@ class DefaultsHelper {
     if (fruitVal != null) {
       await prefs.setString('nh_opt_fruit', fruitVal);
     }
+
+    // テンキー移動 (number_pad): int型 (デフォルト: 0)
+    final numberPadVal = getOption('number_pad');
+    if (numberPadVal != null) {
+      final parsedInt = int.tryParse(numberPadVal) ?? (numberPadVal.toLowerCase() == 'true' ? 1 : 0);
+      await prefs.setInt('nh_opt_number_pad', parsedInt);
+    } else {
+      if (!prefs.containsKey('nh_opt_number_pad')) {
+        await prefs.setInt('nh_opt_number_pad', 0);
+      }
+    }
   }
 
   /// SharedPreferences の現在値を defaults.nh ファイルに反映保存する
@@ -428,6 +452,9 @@ class DefaultsHelper {
     if (prefs.containsKey('nh_opt_fruit')) {
       setOption('fruit', prefs.getString('nh_opt_fruit') ?? '');
     }
+    if (prefs.containsKey('nh_opt_number_pad')) {
+      setOption('number_pad', (prefs.getInt('nh_opt_number_pad') ?? 0).toString());
+    }
 
     await saveToFile(filePath);
   }
@@ -462,7 +489,10 @@ class DefaultsHelper {
       if (!prefs.containsKey(prefKey)) {
         // 新規キーの補完追加
         if (assetDefaultVal != null) {
-          if (optKey == 'pickup_types' || optKey == 'dogname' || optKey == 'catname' || optKey == 'horsename' || optKey == 'fruit') {
+          if (optKey == 'number_pad') {
+            final int iVal = int.tryParse(assetDefaultVal) ?? 0;
+            await prefs.setInt(prefKey, iVal);
+          } else if (optKey == 'pickup_types' || optKey == 'dogname' || optKey == 'catname' || optKey == 'horsename' || optKey == 'fruit') {
             await prefs.setString(prefKey, assetDefaultVal);
           } else {
             final bool bVal = assetDefaultVal.toLowerCase() == 'true';
@@ -472,7 +502,12 @@ class DefaultsHelper {
         }
       } else {
         // 既存設定の検証と範囲外値のフォールバック
-        if (optKey == 'pickup_types') {
+        if (optKey == 'number_pad') {
+          final currentVal = prefs.getInt(prefKey);
+          if (currentVal == null || currentVal < -1 || currentVal > 4) {
+            await prefs.setInt(prefKey, 0);
+          }
+        } else if (optKey == 'pickup_types') {
           final currentVal = prefs.getString(prefKey) ?? '';
           // 有効なピックアップ文字以外の不正文字が含まれる場合はデフォルトへリセット
           final validChars = RegExp(r'^[a-zA-Z0-9\$\"=/!\?\+\*\-\%\`\[\]\)\(\@\_\#]+$');

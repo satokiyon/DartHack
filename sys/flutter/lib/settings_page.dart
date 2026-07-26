@@ -53,6 +53,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String _optCatname = '';
   String _optHorsename = '';
   String _optFruit = '';
+  int _optNumberPad = 0;
 
   static const Map<String, String> _itemTypeSymbols = {
     '\$': '金貨 (\$)',
@@ -218,6 +219,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _optCatname = prefs.getString('nh_opt_catname') ?? '';
       _optHorsename = prefs.getString('nh_opt_horsename') ?? '';
       _optFruit = prefs.getString('nh_opt_fruit') ?? '';
+      _optNumberPad = prefs.getInt('nh_opt_number_pad') ?? 0;
 
       for (int i = 0; i < 9; i++) {
         _shortcuts[i] = prefs.getString('shortcut_btn_$i') ?? _defaultShortcuts[i];
@@ -1415,8 +1417,8 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           SwitchListTile(
-            title: const Text("価格見積表示 (price_quotes)"),
-            subtitle: const Text("店での売買時に価格の見積もりを表示します"),
+            title: const Text("オブジェクトの価格表示 (price_quotes)"),
+            subtitle: const Text("未識別オブジェクトに記憶済み価格情報を表示します"),
             value: _optPriceQuotes,
             onChanged: (val) {
               setState(() => _optPriceQuotes = val);
@@ -1433,7 +1435,7 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           SwitchListTile(
-            title: const Text("メニューのカラー表示 (MENUCOLOR)"),
+            title: const Text("アイテム名のカラー表示 (MENUCOLOR)"),
             subtitle: const Text("インベントリやダイアログの各項目を色付き表示します"),
             value: _optMenucolor,
             onChanged: (val) {
@@ -1460,6 +1462,27 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text("果物の名前 (fruit)"),
             subtitle: Text(_optFruit.isEmpty ? "デフォルト (slime mold)" : _optFruit),
             onTap: () => _editStringOption("果物の名前 (fruit)", 'nh_opt_fruit', _optFruit, 16),
+          ),
+          ListTile(
+            title: const Text("テンキー移動 (number_pad)"),
+            subtitle: const Text("テンキー（1-9）での移動やレイアウトを設定します"),
+            trailing: DropdownButton<int>(
+              value: _optNumberPad,
+              items: const [
+                DropdownMenuItem(value: 0, child: Text('OFF (!number_pad)')),
+                DropdownMenuItem(value: 1, child: Text('1: 標準テンキー')),
+                DropdownMenuItem(value: 2, child: Text('2: PC Hack互換')),
+                DropdownMenuItem(value: 3, child: Text('3: 電話配列')),
+                DropdownMenuItem(value: 4, child: Text('4: 電話+PC Hack')),
+                DropdownMenuItem(value: -1, child: Text('-1: ドイツ語配列')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _optNumberPad = val);
+                  _saveGameOption('nh_opt_number_pad', val);
+                }
+              },
+            ),
           ),
         ]),
       ),
