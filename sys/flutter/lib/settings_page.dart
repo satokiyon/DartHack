@@ -571,11 +571,11 @@ class _SettingsPageState extends State<SettingsPage> {
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.crop_landscape, color: Colors.greenAccent),
-        title: const Text("画面表示モード"),
-        subtitle: const Text("ゲーム画面のステータスバーの表示を切替えます"),
+        title: const Text("ステータス表示設定"),
+        subtitle: const Text("ゲーム画面のステータス領域の表示を切替えます"),
         children: _withDividers([
           ListTile(
-            title: const Text("モード選択"),
+            title: const Text("画面モード選択"),
             trailing: DropdownButton<int>(
               value: _screenMode,
               items: const [
@@ -590,6 +590,22 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
           ),
+          ListTile(
+            title: const Text("ステータス領域表示モード"),
+            trailing: DropdownButton<int>(
+              value: _statusDisplayMode,
+              items: const [
+                DropdownMenuItem(value: 0, child: Text('自動縮小フィット')),
+                DropdownMenuItem(value: 1, child: Text('領域の可変高さ')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _statusDisplayMode = val);
+                  _saveSetting('status_display_mode', val);
+                }
+              },
+            ),
+          ), 
         ]),
       ),
     );
@@ -640,7 +656,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.gamepad, color: Colors.amber),
-        title: const Text("操作盤・ステータス設定"),
+        title: const Text("コントローラ設定"),
         children: _withDividers([
           ListTile(
             title: const Text("操作モード"),
@@ -654,22 +670,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 if (val != null) {
                   setState(() => _controllerMode = val);
                   _saveSetting('controller_mode', val);
-                }
-              },
-            ),
-          ),
-          ListTile(
-            title: const Text("ステータス表示モード"),
-            trailing: DropdownButton<int>(
-              value: _statusDisplayMode,
-              items: const [
-                DropdownMenuItem(value: 0, child: Text('自動縮小フィット')),
-                DropdownMenuItem(value: 1, child: Text('領域の可変高さ')),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _statusDisplayMode = val);
-                  _saveSetting('status_display_mode', val);
                 }
               },
             ),
@@ -900,14 +900,14 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  /// メッセージ領域の表示設定セクション
+  /// ステータス・メッセージ領域の表示設定セクション
   Widget _buildMessageSection() {
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.chat_bubble_outline, color: Colors.tealAccent),
         title: const Text('メッセージ設定'),
-        subtitle: const Text('オーバーレイ表示の行数・透過度・フォントサイズ'),
-        children: _withDividers([
+        subtitle: const Text('メッセージ領域の行数・透過度・フォントサイズ'),
+        children: _withDividers([         
           // 行数スライダー（1〜15）
           ListTile(
             title: const Text('表示行数'),
@@ -1583,7 +1583,7 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ListView(
         children: [
           _buildTilesetSection(), //タイルセット設定
-          _buildScreenModeSection(), //画面表示モード
+          _buildScreenModeSection(), //イマーシブ・ステータス表示モード・
           _buildMessageSection(),  // メッセージ設定
           const Divider(height: 1),   //区切り線
           _buildControllerSection(), //コントローラー設定
