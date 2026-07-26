@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'defaults_editor.dart';
+import 'nethack_cmd_panel.dart';
 import 'nethack_ffi.dart';
 import 'utils/defaults_helper.dart';
 import 'utils/scale_clamp.dart';
@@ -363,7 +364,10 @@ class _SettingsPageState extends State<SettingsPage> {
     if (_extCommands.isEmpty) {
       _loadExtCmds();
     }
-    final controller = TextEditingController(text: _shortcuts[index]);
+    final rawVal = _shortcuts[index];
+    final parsed = CmdItem.parseCmds(rawVal);
+    final currentCmdItem = parsed.isNotEmpty ? parsed.first : CmdItem(command: rawVal);
+    final controller = TextEditingController(text: currentCmdItem.command);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -520,10 +524,11 @@ class _SettingsPageState extends State<SettingsPage> {
           ElevatedButton(
             onPressed: () {
               final val = controller.text.trim();
+              final serialized = CmdItem.serializeCmds([CmdItem(command: val)]);
               setState(() {
-                _shortcuts[index] = val;
+                _shortcuts[index] = serialized;
               });
-              _saveSetting('shortcut_btn_$index', val);
+              _saveSetting('shortcut_btn_$index', serialized);
               Navigator.pop(context);
             },
             child: const Text("保存"),
@@ -1137,7 +1142,10 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             itemCount: 9,
             itemBuilder: (context, index) {
-              final cmd = _shortcuts[index];
+              final raw = _shortcuts[index];
+              final parsed = CmdItem.parseCmds(raw);
+              final item = parsed.isNotEmpty ? parsed.first : CmdItem(command: raw);
+              final displayStr = item.displayLabel;
               return ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[900],
@@ -1153,7 +1161,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       style: const TextStyle(fontSize: 10, color: Colors.grey),
                     ),
                     Text(
-                      cmd.isEmpty ? "(未設定)" : cmd,
+                      displayStr.isEmpty ? "(未設定)" : displayStr,
                       style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.amberAccent),
                       overflow: TextOverflow.ellipsis,
                     ),

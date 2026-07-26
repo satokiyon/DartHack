@@ -221,6 +221,57 @@ class _NetHackDPadState extends State<NetHackDPad> {
   }
 }
 
+/// 上向き基準の釣り鐘型パス（中心 (0,0) 基準）を作成する関数
+Path _createBellPath(double w, double h) {
+  final arrowWidth = w * 0.75;
+  final halfW = arrowWidth / 2;
+  final topY = -h * 0.46;
+  final shoulderY = -h * 0.05;
+  final bottomY = h * 0.46;
+  const r = 5.0; // 底角の丸み半径
+
+  final path = Path();
+  path.moveTo(0, topY);
+
+  // 右側のドーム状アーチ
+  path.cubicTo(
+    halfW * 0.55,
+    topY,
+    halfW,
+    topY + (shoulderY - topY) * 0.35,
+    halfW,
+    shoulderY,
+  );
+
+  // 右側面
+  path.lineTo(halfW, bottomY - r);
+
+  // 右下角丸
+  path.quadraticBezierTo(halfW, bottomY, halfW - r, bottomY);
+
+  // 底辺
+  path.lineTo(-halfW + r, bottomY);
+
+  // 左下角丸
+  path.quadraticBezierTo(-halfW, bottomY, -halfW, bottomY - r);
+
+  // 左側面
+  path.lineTo(-halfW, shoulderY);
+
+  // 左側のドーム状アーチ
+  path.cubicTo(
+    -halfW,
+    topY + (shoulderY - topY) * 0.35,
+    -halfW * 0.55,
+    topY,
+    0,
+    topY,
+  );
+
+  path.close();
+  return path;
+}
+
 class ArrowClipper extends CustomClipper<Path> {
   final double angle;
 
@@ -233,17 +284,7 @@ class ArrowClipper extends CustomClipper<Path> {
     final centerX = w / 2;
     final centerY = h / 2;
 
-    final arrowWidth = w * 0.75;
-    final halfW = arrowWidth / 2;
-
-    // 基本の上向き矢印（五角形）のパス（中心 (0,0) 基準）
-    final path = Path();
-    path.moveTo(0, -h / 2);
-    path.lineTo(halfW, -h * 0.1);
-    path.lineTo(halfW, h / 2);
-    path.lineTo(-halfW, h / 2);
-    path.lineTo(-halfW, -h * 0.1);
-    path.close();
+    final path = _createBellPath(w, h);
 
     final matrix = Matrix4.translationValues(centerX, centerY, 0.0)
       ..rotateZ(angle);
@@ -273,16 +314,7 @@ class ArrowPainter extends CustomPainter {
     final centerX = w / 2;
     final centerY = h / 2;
 
-    final arrowWidth = w * 0.75;
-    final halfW = arrowWidth / 2;
-
-    final path = Path();
-    path.moveTo(0, -h / 2);
-    path.lineTo(halfW, -h * 0.1);
-    path.lineTo(halfW, h / 2);
-    path.lineTo(-halfW, h / 2);
-    path.lineTo(-halfW, -h * 0.1);
-    path.close();
+    final path = _createBellPath(w, h);
 
     final matrix = Matrix4.translationValues(centerX, centerY, 0.0)
       ..rotateZ(angle);
@@ -306,3 +338,4 @@ class ArrowPainter extends CustomPainter {
         oldDelegate.borderWidth != borderWidth;
   }
 }
+

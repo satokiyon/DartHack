@@ -1199,6 +1199,12 @@ class _MyHomePageState extends State<MyHomePage> {
           final state = message['state'] as int? ?? 0;
           setState(() {
             _numberPadMode = state;
+            if (_numberPadMode > 0 &&
+                (_dPadMoveMode == DPadMoveMode.upper ||
+                    _dPadMoveMode == DPadMoveMode.ctrl)) {
+              _dPadMoveMode = DPadMoveMode.normal;
+              unawaited(_saveDPadModePrefs());
+            }
           });
           _addLog("number_pad mode: $state");
         } else if (type == 'startMenu') {
@@ -1403,13 +1409,20 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _cycleDPadMoveMode() {
-    if (_enabledDPadMoveModes.isEmpty) {
-      _enabledDPadMoveModes = <DPadMoveMode>[DPadMoveMode.normal];
+    List<DPadMoveMode> modes = _enabledDPadMoveModes.isEmpty
+        ? <DPadMoveMode>[DPadMoveMode.normal]
+        : List<DPadMoveMode>.from(_enabledDPadMoveModes);
+    if (_numberPadMode > 0) {
+      modes.remove(DPadMoveMode.upper);
+      modes.remove(DPadMoveMode.ctrl);
+      if (modes.isEmpty) {
+        modes = <DPadMoveMode>[DPadMoveMode.normal];
+      }
     }
-    final currentIdx = _enabledDPadMoveModes.indexOf(_dPadMoveMode);
-    final nextIdx = (currentIdx + 1) % _enabledDPadMoveModes.length;
+    final currentIdx = modes.indexOf(_dPadMoveMode);
+    final nextIdx = (currentIdx < 0) ? 0 : (currentIdx + 1) % modes.length;
     setState(() {
-      _dPadMoveMode = _enabledDPadMoveModes[nextIdx];
+      _dPadMoveMode = modes[nextIdx];
     });
     unawaited(_saveDPadModePrefs());
   }
@@ -1528,8 +1541,7 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       case DPadMoveMode.upper:
         if (_numberPadMode > 0) {
-          final runKey = viKey.toUpperCase();
-          _sendFfiKey(runKey.codeUnitAt(0), runKey);
+          _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
         } else {
           final key = baseKey.toUpperCase();
           _sendFfiKey(key.codeUnitAt(0), key);
@@ -1542,7 +1554,11 @@ class _MyHomePageState extends State<MyHomePage> {
         _sendFfiKeys(['G'.codeUnitAt(0), baseKey.codeUnitAt(0)], 'G$baseKey');
         break;
       case DPadMoveMode.ctrl:
-        _sendFfiKey(_ctrlFromVi(viKey), '^$viKey');
+        if (_numberPadMode > 0) {
+          _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
+        } else {
+          _sendFfiKey(_ctrlFromVi(baseKey), '^$baseKey');
+        }
         break;
       case DPadMoveMode.mCmd:
         _sendFfiKeys(['m'.codeUnitAt(0), baseKey.codeUnitAt(0)], 'm$baseKey');
