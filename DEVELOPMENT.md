@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-21. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-26. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -224,6 +224,15 @@ GitHub CodeQL によるコードスキャン警告（Critical）を修正する�
    - **背景**: control 文字の 16進出力バッファ `str[10]` に、負の値の char が渡された場合に `sprintf` で 11 バイト書き込もうとしてオーバーフローする問題を、バッファ拡張とキャストで回避しました。
    - **アップストリーム追従手順**:
      1. アップストリーム（本家）で同等のバッファサイズ変更やキャスト修正が入った場合は、本修正を削除して追従します。
+
+### 7. ステータスハイライトメニューにおけるキャンセル時の無限ループ修正
+ステータスハイライトルール追加時 (`status_hilite_menu_add()`) に、文字列型フィールドや値入力のない動作で色選択をキャンセル（`-1`）した際、`goto choose_value` からそのまま `choose_color` に直線落下して即座に色選択が再表示される無限ループバグの修正です。
+
+* **マーカータグ**: `/* NetHackJP: Fix infinite loop on cancel in status_hilite_menu_add */`
+* **対象ファイル**:
+  - **`src/botl.c`**: `status_hilite_menu_add()` 内の色選択キャンセル判定を修正し、数値入力を行わない動作または文字列型フィールドの場合は `goto choose_behavior` へジャンプして動作選択メニューへ復帰するよう変更。
+* **アップストリーム追従手順**:
+  1. アップストリーム（本家）で `status_hilite_menu_add()` のキャンセルフロー（`clr == -1` 時のジャンプ先分岐）に関する修正が入った場合は、本独自修正を削除してアップストリームの実装に追従します。
 
 ---
 
