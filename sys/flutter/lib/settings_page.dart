@@ -368,19 +368,38 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text("${_shortcutLabels[index]} を編集"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                hintText: "例: i, d, #terrain, #herecmdmenu 等",
-                helperText: "#で始まるものは拡張コマンドとして入力送信されます",
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  hintText: "例: i, d, #terrain, #herecmdmenu 等",
+                  helperText: "#で始まるものは拡張コマンドとして入力送信されます",
+                ),
+                autofocus: true,
               ),
-              autofocus: true,
-            ),
-            const SizedBox(height: 12),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: [
+                  ActionChip(
+                    label: const Text('Enter'),
+                    onPressed: () => controller.text = r'\n',
+                  ),
+                  ActionChip(
+                    label: const Text('Space'),
+                    onPressed: () => controller.text = r'\s',
+                  ),
+                  ActionChip(
+                    label: const Text('Esc'),
+                    onPressed: () => controller.text = r'\e',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
             OutlinedButton(
               onPressed: () {
                 showDialog(
@@ -492,6 +511,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ],
         ),
+      ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

@@ -446,6 +446,14 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.tune, color: Colors.cyanAccent),
+            title: const Text('オプション設定 ( O )', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              _closeDrawer();
+              _sendFfiKey('O'.codeUnitAt(0), "O");
+            },
+          ),
           const Divider(color: Colors.white24, height: 1),
           ListTile(
             leading: const Icon(Icons.save, color: Colors.greenAccent),
@@ -463,21 +471,21 @@ class _MyHomePageState extends State<MyHomePage> {
               _sendShortcutToC("#quit\n");
             },
           ),
-          ListTile(
-            leading: Icon(_isKeyboardVisible ? Icons.keyboard_hide : Icons.keyboard, color: Colors.blueAccent),
-            title: Text(_isKeyboardVisible ? '仮想キーボードを非表示' : '仮想キーボードを表示', style: const TextStyle(color: Colors.white)),
-            onTap: () {
-              _closeDrawer();
-              setState(() {
-                _isKeyboardVisible = !_isKeyboardVisible;
-              });
-              if (!_isKeyboardVisible) {
-                _focusNode.requestFocus();
-              }
-            },
-          ),
         ],
         const Divider(color: Colors.white24, height: 1),
+        ListTile(
+          leading: Icon(_isKeyboardVisible ? Icons.keyboard_hide : Icons.keyboard, color: Colors.blueAccent),
+          title: Text(_isKeyboardVisible ? '仮想キーボードを非表示' : '仮想キーボードを表示', style: const TextStyle(color: Colors.white)),
+          onTap: () {
+            _closeDrawer();
+            setState(() {
+              _isKeyboardVisible = !_isKeyboardVisible;
+            });
+            if (!_isKeyboardVisible) {
+              _focusNode.requestFocus();
+            }
+          },
+        ),
         ListTile(
           leading: const Icon(Icons.settings, color: Colors.grey),
           title: const Text('ゲーム設定を開く', style: TextStyle(color: Colors.white)),
