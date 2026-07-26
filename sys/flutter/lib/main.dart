@@ -1295,26 +1295,60 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String _viToNumPad(String viKey) {
-    switch (viKey) {
-      case 'y':
-        return '7';
-      case 'k':
-        return '8';
-      case 'u':
-        return '9';
-      case 'h':
-        return '4';
-      case 'l':
-        return '6';
-      case 'b':
-        return '1';
-      case 'j':
-        return '2';
-      case 'n':
-        return '3';
-      default:
-        return viKey;
+    if (_numberPadMode == 3 || _numberPadMode == 4) {
+      // 電話配列 (phone keypad layout: 12346789)
+      switch (viKey) {
+        case 'y':
+          return '1';
+        case 'k':
+          return '2';
+        case 'u':
+          return '3';
+        case 'h':
+          return '4';
+        case 'l':
+          return '6';
+        case 'b':
+          return '7';
+        case 'j':
+          return '8';
+        case 'n':
+          return '9';
+        default:
+          return viKey;
+      }
+    } else if (_numberPadMode == -1) {
+      // ドイツ語 QWERTZ 配列 (y <-> z)
+      switch (viKey) {
+        case 'y':
+          return 'z';
+        default:
+          return viKey;
+      }
+    } else if (_numberPadMode != 0) {
+      // 標準テンキー (1, 2)
+      switch (viKey) {
+        case 'y':
+          return '7';
+        case 'k':
+          return '8';
+        case 'u':
+          return '9';
+        case 'h':
+          return '4';
+        case 'l':
+          return '6';
+        case 'b':
+          return '1';
+        case 'j':
+          return '2';
+        case 'n':
+          return '3';
+        default:
+          return viKey;
+      }
     }
+    return viKey;
   }
 
   int _ctrlFromVi(String viKey) {
@@ -1342,7 +1376,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String _directionDisplayLabel(String viKey) {
-    final baseDir = _numberPadMode != 0 ? _viToNumPad(viKey) : viKey;
+    final baseDir = _viToNumPad(viKey);
     return _applyMoveModeForDisplay(baseDir);
   }
 
@@ -1479,25 +1513,25 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _sendModeAppliedDirection(String viKey, {DPadMoveMode? modeOverride}) {
     if (_isTextOrPromptInputActive()) {
-      final baseKey = _numberPadMode != 0 ? _viToNumPad(viKey) : viKey;
+      final baseKey = _viToNumPad(viKey);
       _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
       _isDirectionPromptActive = false;
       return;
     }
 
     final mode = modeOverride ?? _dPadMoveMode;
-    final baseKey = _numberPadMode != 0 ? _viToNumPad(viKey) : viKey;
+    final baseKey = _viToNumPad(viKey);
 
     switch (mode) {
       case DPadMoveMode.normal:
         _sendFfiKey(baseKey.codeUnitAt(0), baseKey);
         break;
       case DPadMoveMode.upper:
-        if (_numberPadMode != 0) {
+        if (_numberPadMode > 0) {
           final runKey = viKey.toUpperCase();
           _sendFfiKey(runKey.codeUnitAt(0), runKey);
         } else {
-          final key = viKey.toUpperCase();
+          final key = baseKey.toUpperCase();
           _sendFfiKey(key.codeUnitAt(0), key);
         }
         break;

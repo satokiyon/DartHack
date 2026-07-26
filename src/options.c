@@ -2624,7 +2624,7 @@ optfn_number_pad(
             }
         }
         reset_commands(FALSE);
-        number_pad(iflags.num_pad ? 1 : 0);
+        number_pad(iflags.num_pad ? (1 + iflags.num_pad_mode) : (-1 * iflags.num_pad_mode));
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
@@ -6004,7 +6004,7 @@ handler_number_pad(void)
             break;
         }
         reset_commands(FALSE);
-        number_pad(iflags.num_pad ? 1 : 0);
+        number_pad(iflags.num_pad ? (1 + iflags.num_pad_mode) : (-1 * iflags.num_pad_mode));
         free((genericptr_t) mode_pick);
     }
     destroy_nhwindow(tmpwin);
