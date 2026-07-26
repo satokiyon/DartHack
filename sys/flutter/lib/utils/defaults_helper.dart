@@ -7,6 +7,7 @@ class DefaultsHelper {
   /// アプリの設定画面から管理・変更を行うオプションキーの集合
   /// これ以外のオプション（例: color, dumplog 等）は一切改変せず保持する
   static const Set<String> managedKeys = {
+    'name',
     'tutorial',
     'autopickup',
     'pickup_types',
@@ -381,7 +382,11 @@ class DefaultsHelper {
       }
     }
 
-    // ペット名 & 果物名
+    // 主人公名 & ペット名 & 果物名
+    final nameVal = getOption('name');
+    if (nameVal != null) {
+      await prefs.setString('nh_opt_name', nameVal);
+    }
     final dognameVal = getOption('dogname');
     if (dognameVal != null) {
       await prefs.setString('nh_opt_dogname', dognameVal);
@@ -440,6 +445,9 @@ class DefaultsHelper {
     if (prefs.containsKey('nh_opt_menucolor')) {
       setBoolOption('menucolor', prefs.getBool('nh_opt_menucolor') ?? true);
     }
+    if (prefs.containsKey('nh_opt_name')) {
+      setOption('name', prefs.getString('nh_opt_name') ?? '');
+    }
     if (prefs.containsKey('nh_opt_dogname')) {
       setOption('dogname', prefs.getString('nh_opt_dogname') ?? '');
     }
@@ -492,7 +500,7 @@ class DefaultsHelper {
           if (optKey == 'number_pad') {
             final int iVal = int.tryParse(assetDefaultVal) ?? 0;
             await prefs.setInt(prefKey, iVal);
-          } else if (optKey == 'pickup_types' || optKey == 'dogname' || optKey == 'catname' || optKey == 'horsename' || optKey == 'fruit') {
+          } else if (optKey == 'name' || optKey == 'pickup_types' || optKey == 'dogname' || optKey == 'catname' || optKey == 'horsename' || optKey == 'fruit') {
             await prefs.setString(prefKey, assetDefaultVal);
           } else {
             final bool bVal = assetDefaultVal.toLowerCase() == 'true';

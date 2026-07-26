@@ -2688,6 +2688,10 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
     }
 
+    final askNameBytes = utf8.encode(_askNameController.text).length;
+    final maxAskNameBytes = _askNameMaxChars > 0 ? _askNameMaxChars - 1 : 31;
+    final isAskNameOverflow = askNameBytes > maxAskNameBytes;
+
     return Positioned.fill(
       child: Container(
         color: Colors.black.withValues(alpha: 0.84),
@@ -2730,7 +2734,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         controller: _askNameController,
                         autofocus: true,
                         enabled: _selectedPlayMode != PlayMode.wizard,
-                        maxLength: _askNameMaxChars,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: _selectedPlayMode == PlayMode.wizard
@@ -2740,11 +2743,32 @@ class _MyHomePageState extends State<MyHomePage> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          counterText: "$askNameBytes / $maxAskNameBytes バイト",
+                          counterStyle: TextStyle(
+                            color: isAskNameOverflow ? Colors.red : Colors.white70,
+                            fontWeight: isAskNameOverflow ? FontWeight.bold : FontWeight.normal,
+                          ),
                         ),
+                        onChanged: (val) {
+                          setState(() {});
+                        },
                         onSubmitted: (val) {
-                          _sendAskNameResult(val);
+                          if (!isAskNameOverflow) {
+                            _sendAskNameResult(val);
+                          }
                         },
                       ),
+                      if (isAskNameOverflow) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          "名前が長すぎます。$maxAskNameBytes バイト以内で入力してください。",
+                          style: const TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                       if (_askNameSaves.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         const Text("既存のセーブデータ:", style: TextStyle(color: Colors.grey, fontSize: 12)),
@@ -2774,6 +2798,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       _askNameController.text = name;
                                       _previousCustomName = name;
                                     }
+                                    setState(() {});
                                   },
                                 ),
                               );
@@ -2847,7 +2872,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton(
-                            onPressed: () => _sendAskNameResult(_askNameController.text),
+                            onPressed: isAskNameOverflow
+                                ? null
+                                : () => _sendAskNameResult(_askNameController.text),
                             style: ElevatedButton.styleFrom(backgroundColor: Colors.teal[500]),
                             child: const Text('ゲーム開始'),
                           ),

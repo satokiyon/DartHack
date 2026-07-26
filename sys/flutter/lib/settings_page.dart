@@ -50,6 +50,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _optPriceQuotes = true;
   bool _optHiliteStatus = true;
   bool _optMenucolor = true;
+  String _optName = '';
   String _optDogname = '';
   String _optCatname = '';
   String _optHorsename = '';
@@ -216,6 +217,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _optPriceQuotes = prefs.getBool('nh_opt_price_quotes') ?? true;
       _optHiliteStatus = prefs.getBool('nh_opt_hilite_status') ?? true;
       _optMenucolor = prefs.getBool('nh_opt_menucolor') ?? true;
+      _optName = prefs.getString('nh_opt_name') ?? '';
       _optDogname = prefs.getString('nh_opt_dogname') ?? '';
       _optCatname = prefs.getString('nh_opt_catname') ?? '';
       _optHorsename = prefs.getString('nh_opt_horsename') ?? '';
@@ -1326,12 +1328,15 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _editStringOption(String title, String prefKey, String currentVal, int maxChars) {
     final controller = TextEditingController(text: currentVal);
+    final maxBytes = maxChars > 0 ? maxChars - 1 : 31;
+
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-            final charCount = controller.text.characters.length;
+            final bytesCount = utf8.encode(controller.text).length;
+            final isOverflow = bytesCount > maxBytes;
 
             return AlertDialog(
               title: Text(title),
@@ -1343,22 +1348,29 @@ class _SettingsPageState extends State<SettingsPage> {
                     controller: controller,
                     decoration: InputDecoration(
                       hintText: "未指定の場合は空欄",
-                      counterText: "$charCount / $maxChars 文字",
+                      counterText: "$bytesCount / $maxBytes バイト",
                       counterStyle: TextStyle(
-                        color: charCount >= maxChars ? Colors.orangeAccent : Colors.white70,
+                        color: isOverflow ? Colors.red : Colors.white70,
+                        fontWeight: isOverflow ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
                     onChanged: (val) {
-                      if (val.characters.length > maxChars) {
-                        final truncated = DefaultsHelper.truncateUtf8Chars(val, maxChars);
-                        controller.value = TextEditingValue(
-                          text: truncated,
-                          selection: TextSelection.collapsed(offset: truncated.length),
-                        );
-                      }
                       setStateDialog(() {});
                     },
                   ),
+                  if (isOverflow) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      prefKey == 'nh_opt_name'
+                          ? "名前が長すぎます。$maxBytesバイト以内してください。"
+                          : "文字数が多すぎます。$maxBytesバイト以内で入力してください。",
+                      style: const TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ],
               ),
               actions: [
@@ -1367,17 +1379,20 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: const Text("キャンセル"),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    final val = controller.text.trim();
-                    setState(() {
-                      if (prefKey == 'nh_opt_dogname') _optDogname = val;
-                      if (prefKey == 'nh_opt_catname') _optCatname = val;
-                      if (prefKey == 'nh_opt_horsename') _optHorsename = val;
-                      if (prefKey == 'nh_opt_fruit') _optFruit = val;
-                    });
-                    _saveGameOption(prefKey, val);
-                    Navigator.pop(context);
-                  },
+                  onPressed: isOverflow
+                      ? null
+                      : () {
+                          final val = controller.text.trim();
+                          setState(() {
+                            if (prefKey == 'nh_opt_name') _optName = val;
+                            if (prefKey == 'nh_opt_dogname') _optDogname = val;
+                            if (prefKey == 'nh_opt_catname') _optCatname = val;
+                            if (prefKey == 'nh_opt_horsename') _optHorsename = val;
+                            if (prefKey == 'nh_opt_fruit') _optFruit = val;
+                          });
+                          _saveGameOption(prefKey, val);
+                          Navigator.pop(context);
+                        },
                   child: const Text("保存"),
                 ),
               ],
@@ -1403,6 +1418,27 @@ class _SettingsPageState extends State<SettingsPage> {
               setState(() => _optTutorial = val);
               _saveGameOption('nh_opt_tutorial', val);
             },
+          ),
+          ListTile(
+            title: const Text("テンキー移動 (number_pad)"),
+            subtitle: const Text("テンキー（1-9）での移動やレイアウトを設定します"),
+            trailing: DropdownButton<int>(
+              value: _optNumberPad,
+              items: const [
+                DropdownMenuItem(value: 0, child: Text('OFF (!number_pad)')),
+                DropdownMenuItem(value: 1, child: Text('1: 標準テンキー')),
+                DropdownMenuItem(value: 2, child: Text('2: PC Hack互換')),
+                DropdownMenuItem(value: 3, child: Text('3: 電話配列')),
+                DropdownMenuItem(value: 4, child: Text('4: 電話+PC Hack')),
+                DropdownMenuItem(value: -1, child: Text('-1: ドイツ語配列')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _optNumberPad = val);
+                  _saveGameOption('nh_opt_number_pad', val);
+                }
+              },
+            ),
           ),
           SwitchListTile(
             title: const Text("自動拾い (autopickup)"),
@@ -1472,6 +1508,11 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           ListTile(
+            title: const Text("主人公のデフォルト名 (name)"),
+            subtitle: Text(_optName.isEmpty ? "デフォルト (未指定)" : _optName),
+            onTap: () => _editStringOption("主人公のデフォルト名 (name)", 'nh_opt_name', _optName, 32),
+          ),
+          ListTile(
             title: const Text("犬の名前 (dogname)"),
             subtitle: Text(_optDogname.isEmpty ? "デフォルト (未指定)" : _optDogname),
             onTap: () => _editStringOption("犬の名前 (dogname)", 'nh_opt_dogname', _optDogname, 16),
@@ -1490,27 +1531,6 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text("果物の名前 (fruit)"),
             subtitle: Text(_optFruit.isEmpty ? "デフォルト (slime mold)" : _optFruit),
             onTap: () => _editStringOption("果物の名前 (fruit)", 'nh_opt_fruit', _optFruit, 16),
-          ),
-          ListTile(
-            title: const Text("テンキー移動 (number_pad)"),
-            subtitle: const Text("テンキー（1-9）での移動やレイアウトを設定します"),
-            trailing: DropdownButton<int>(
-              value: _optNumberPad,
-              items: const [
-                DropdownMenuItem(value: 0, child: Text('OFF (!number_pad)')),
-                DropdownMenuItem(value: 1, child: Text('1: 標準テンキー')),
-                DropdownMenuItem(value: 2, child: Text('2: PC Hack互換')),
-                DropdownMenuItem(value: 3, child: Text('3: 電話配列')),
-                DropdownMenuItem(value: 4, child: Text('4: 電話+PC Hack')),
-                DropdownMenuItem(value: -1, child: Text('-1: ドイツ語配列')),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _optNumberPad = val);
-                  _saveGameOption('nh_opt_number_pad', val);
-                }
-              },
-            ),
           ),
         ]),
       ),
@@ -1562,17 +1582,20 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       body: ListView(
         children: [
-          _buildTilesetSection(),
-          _buildScreenModeSection(),
-          _buildControllerSection(),
-          _buildGameRulesSection(),
-          _buildCmdPanelSection(), // 追加
+          _buildTilesetSection(), //タイルセット設定
+          _buildScreenModeSection(), //画面表示モード
           _buildMessageSection(),  // メッセージ設定
-          _buildKeyActionSection(),
-          _buildShortcutSection(),
-          _buildAdvancedSection(),
-          _buildOtherSection(),
-          _buildCreditsSection(),
+          const Divider(height: 1),   //区切り線
+          _buildControllerSection(), //コントローラー設定
+          _buildShortcutSection(), // ショートカットカスタマイズ
+          _buildCmdPanelSection(), //コマンドパネル編集
+          _buildKeyActionSection(), // 物理キーカスタムアクション
+          const Divider(height: 1),   //区切り線
+          _buildGameRulesSection(), //ゲームルール・プレイ設定
+          _buildAdvancedSection(), // 高度な設定
+          _buildOtherSection(), // その他の設定
+          const Divider(height: 1),   //区切り線
+          _buildCreditsSection(),  // クレジット
           const SizedBox(height: 40),
         ],
       ),
