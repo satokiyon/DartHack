@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-26. */
 /* NetHack 5.0	end.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.349 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1443,10 +1443,11 @@ really_done(int how)
         /* don't bother counting to see whether it should be plural */
     }
 
-    Sprintf(pbuf, "%s %s %s...", Goodbye(), svp.plname,
+    Sprintf(pbuf, "%s %sの%s...", Goodbye(),
             (how != ASCENDED)
                 ? jp_role_name_for_display(flags.initrole, flags.female ? 1 : 0)
-                : (const char *) (flags.female ? "半女神" : "半神"));
+                : (const char *) (flags.female ? "半女神" : "半神"),
+            svp.plname);
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     dump_forward_putstr(endwin, 0, "", done_stopprint);
 
@@ -1498,7 +1499,7 @@ really_done(int how)
         } else {
             Strcat(pbuf, " ");
         }
-        Sprintf(eos(pbuf), "は%s。得点は %ld 点,",
+        Sprintf(eos(pbuf), "は%s。得点は%ld点,",
             (how == ASCENDED) ? "報いを受けた"
                       : "ダンジョンから脱出した",
             u.urexp);
@@ -1562,14 +1563,14 @@ really_done(int how)
                         In_quest(&u.uz) ? dunlev(&u.uz) : depth(&u.uz));
         }
 
-        Sprintf(eos(pbuf), "。得点は %ld 点,", u.urexp);
+        Sprintf(eos(pbuf), "。得点は%ld点,", u.urexp);
         dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     }
 
-    Sprintf(pbuf, "所持金 %ld 枚、行動回数 %ld 回.", umoney, svm.moves);
+    Sprintf(pbuf, "所持金%ld枚、行動回数%ld回。", umoney, svm.moves);
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     Sprintf(pbuf,
-            "%s時点でのレベルは %d、最大 HP は %d だった.",
+            "%s時点でのレベルは%d、最大HPは%dだった。",
             ends[how], u.ulevel, u.uhpmax);
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     dump_forward_putstr(endwin, 0, "", done_stopprint);

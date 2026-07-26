@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
 /* NetHack 5.0	hacklib.c	$NHDT-Date: 1781973051 2026/06/20 16:30:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.133 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
@@ -1021,7 +1021,7 @@ utf8_prev_char_start(const char *start, const char *pos)
     return p;
 }
 
-staticfn boolean
+boolean
 utf8_decode_codepoint(const char *s, unsigned *cp, int *seqlen)
 {
     uchar b0, b1, b2, b3;

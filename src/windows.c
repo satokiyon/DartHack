@@ -1587,6 +1587,32 @@ set_flutter_plain_text_dialog(int enable)
 }
 #endif
 
+/* NetHackJP: putmixed with tile for look result list
+ *
+ * `look_all` / `look_traps` / `look_engrs` の結果リスト (NHW_TEXT) に
+ * 各エンティティの代表タイルを添えて出力する独自 API の
+ * デフォルト実装 (非 Android 環境向け)。
+ *
+ * - Flutter ポート (win/winflutter.c) は同名関数を FFI 経由で実装し、
+ *   (winId, attr, tile, msg) を Dart 側に送信する。
+ * - それ以外のポート (tty, curses, win32, Qt, X11 等) では
+ *   ここのデフォルト実装がリンクされ、 単に putmixed を呼び出す
+ *   (tile 引数は無視)。
+ * - Android ビルド (CMakeLists.txt で -DANDROID 定義あり) では
+ *   win/winflutter.c 内の同名関数がリンクされるため、 ここの
+ *   実装は `#ifndef ANDROID` ガードでコンパイルされない。
+ *
+ * 詳細とアップストリーム追従手順は DEVELOPMENT.md §4.4 を参照。
+ */
+#ifndef ANDROID
+void
+flutter_putmixed_with_tile(winid window, int attr, int tile, const char *str)
+{
+    (void) tile; /* unused for non-Flutter ports */
+    putmixed(window, attr, str);
+}
+#endif
+
 /* possibly called to show usage info during command line processing when
    an interface hasn't yet been chosen and set up */
 void

@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
 #!/usr/bin/perl
 # $NHDT-Date: 1693357449 2023/08/30 01:04:09 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland

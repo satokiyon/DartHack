@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
 #!/usr/bin/perl
 
 # NetHack 5.0  recover.pl $NHDT-Date: 1596498329 2020/08/03 23:45:29 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.13 $
