@@ -1,3 +1,4 @@
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-26. -->
 <!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-22. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
