@@ -130,6 +130,13 @@ NetHackJP は本家 NetHack (アップストリーム) の Windows 日本語化�
 3. **マージ時の競合解決**:
    - アップストリームマージで本独自拡張と衝突した場合は、まず本独自拡張側の意図をコメントから読み取り、アップストリーム版に本独自拡張の差分 (UTF-8 対応やヘッダーバッファ追加など) を移植する形での解決を優先してください。
    - 結果として本独自拡張の大部分が不要になった場合は、マーカータグと対応する `DEVELOPMENT.md` エントリも削除し、ドキュメントと実装の整合性を保ってください。
+
+4. **アップストリーム本家への Pull Request 送信手順と制約**:
+   - `satokiyon/NetHackJP` は GitHub 上で独立したリポジトリ (`isFork: false`) であるため、`NetHackJP` から直接本家 (`NetHack/NetHack`) へ PR を送信しようとすると `There isn’t anything to compare` エラーが発生します。
+   - 本家へ PR を送信する際は、ユーザーの GitHub アカウント上に作成された NetHack 本家の公式 Fork リポジトリ (`satokiyon/NetHack`) にブランチをプッシュし、そこから `NetHack/NetHack` への Cross-Repository PR を作成してください。
+   - **アップストリーム専用クリーンブランチの作成**: 本家提出用のブランチは `upstream/NetHack-5.0` (または対象ベース) から直接チェックアウトして作成し、`/* NetHackJP: ... */` マーカータグや `DEVELOPMENT.md` の日本語記述を含めない純粋な C コード差分のみをコミットしてください。
+   - **NetHack コミット規約 (50/72 ルール) および PR テンプレートの厳守**: コミットメッセージおよび PR タイトルの1行目（Subject）は 50 文字以内、コミットメッセージ本文は1行 72 文字以内で折り返し、PR 本文は `.github/pull_request_template.md` のフォーマット（Summary, Scope, Validation, Checklist）に厳格に準拠して作成してください。
+
 ## GitHub Code Scanning アラートの取得と分析に関する方針
 
 GitHub Actions等で実行される CodeQL のコードスキャン警告（Code scanning alerts）を GitHub CLI (`gh`) 経由で取得・分析する際は、以下のルールを徹底してください。
