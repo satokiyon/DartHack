@@ -138,6 +138,7 @@ GEMINI.md
 #github workflow file for NetHackJP 
 .github\workflows\weekly-release.yml
 
+# Flutter project ignores
 sys/flutter/assets/
 sys/flutter/tmp
 

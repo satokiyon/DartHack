@@ -1,0 +1,62 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-02.
+name: Weekly Release
+
+on:
+  schedule:
+    - cron: '0 18 * * SAT' # AM 03:00 JST (UTC 18:00)
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build NetHack (x64 Release)
+        run: msbuild sys/windows/vs/NetHack.sln /p:Configuration=Release /p:Platform=x64
+
+      - name: Get current date
+        id: date
+        run: |
+          $date = Get-Date -Format "yyyyMMdd"
+          echo "DATE_STR=$date" >> $env:GITHUB_ENV
+          echo "TAG_NAME=NetHackJP-5.0.0-$date" >> $env:GITHUB_ENV
+        shell: powershell
+
+      - name: Prepare package
+        run: |
+          $outDir = "binary/Release/x64"
+          $zipPath = "NetHackJP-5.0.0-${{ env.DATE_STR }}.zip"
+          
+          # Copy Guidebook_JP.txt to the output directory
+          if (Test-Path "Guidebook_JP.txt") {
+            Copy-Item "Guidebook_JP.txt" -Destination "$outDir\"
+          } else {
+            Write-Warning "Guidebook_JP.txt not found!"
+          }
+          
+          # Create ZIP archive
+          Compress-Archive -Path "$outDir\*" -DestinationPath $zipPath
+          
+          echo "ZIP_PATH=$zipPath" >> $env:GITHUB_ENV
+        shell: powershell
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          name: NetHackJP 5.0.0 Weekly Build (${{ env.DATE_STR }})
+          body_path: release_readme.txt
+          generate_release_notes: true
+          files: ${{ env.ZIP_PATH }}
+          draft: false
+          prerelease: false
