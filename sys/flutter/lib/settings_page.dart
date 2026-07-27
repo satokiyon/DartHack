@@ -1584,15 +1584,15 @@ class _SettingsPageState extends State<SettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "DartHack (NetHackJP Flutter Port)",
+                  "DartHack",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.amberAccent),
                 ),
                 SizedBox(height: 8),
-                Text("本アプリは NetHackJP を元に Flutter で再構築したものです。NetHackJPは、非公式に日本語化された NetHack 5.0.0 のフォークであり、オリジナルの NetHack 5.0.0 の機能をベースにしています。公式のNetHack開発チーム（The NetHack DevTeam）とは関係ありません。"),
+                Text("DartHack は、NetHack をベースとしつつ、Flutter/Dart によって再構築した独自実装のモバイル版です。本アプリはオリジナルの NetHack を深く敬意をもって参照し活用していますが、NetHack 開発チーム（The NetHack DevTeam）とは一切の関係ありません。"),
                 SizedBox(height: 8),
-                Text("本アプリは、NetHack General Public License (NGPL) に基づき配布されています。ソースコードは次のサイトにて公開しています：https://github.com/satokiyon/DartHack"),
+                Text("本アプリは NetHack General Public License (NGPL) に基づき配布されています。  ソースコードは以下にて公開しています：https://github.com/satokiyon/DartHack"),
                 SizedBox(height: 8),
-                Text("本アプリのUIは gurrhack の ForkFront を参考にしました。"),
+                Text("UI デザインの一部は、gurrhack の ForkFront を参考にしています。"),
                 SizedBox(height: 12),
                 Text(
                   "Contributors:",
