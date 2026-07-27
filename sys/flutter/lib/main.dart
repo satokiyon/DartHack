@@ -421,6 +421,25 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         ),
+        if (_isGameRunning) ...[
+          ListTile(
+            leading: const Icon(Icons.save, color: Colors.greenAccent),
+            title: const Text('セーブして終了', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              _closeDrawer();
+              _sendFfiKey(83, "S");
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.dangerous, color: Colors.redAccent),
+            title: const Text('セーブせず終了 (放棄)', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              _closeDrawer();
+              _sendShortcutToC("#quit\n");
+            },
+          ),
+        ],
+        const Divider(color: Colors.white24, height: 1),        
         ListTile(
           leading: const Icon(Icons.emoji_events, color: Colors.amber),
           title: const Text('スコアボード', style: TextStyle(color: Colors.white)),
@@ -456,23 +475,6 @@ class _MyHomePageState extends State<MyHomePage> {
             onTap: () {
               _closeDrawer();
               _sendFfiKey('O'.codeUnitAt(0), "O");
-            },
-          ),
-          const Divider(color: Colors.white24, height: 1),
-          ListTile(
-            leading: const Icon(Icons.save, color: Colors.greenAccent),
-            title: const Text('セーブして終了', style: TextStyle(color: Colors.white)),
-            onTap: () {
-              _closeDrawer();
-              _sendFfiKey(83, "S");
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.dangerous, color: Colors.redAccent),
-            title: const Text('セーブせず終了 (放棄)', style: TextStyle(color: Colors.white)),
-            onTap: () {
-              _closeDrawer();
-              _sendShortcutToC("#quit\n");
             },
           ),
         ],
