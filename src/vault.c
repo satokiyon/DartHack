@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	vault.c	$NHDT-Date: 1781973072 2026/06/20 16:31:12 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -477,7 +477,7 @@ invault(void)
                               mimic_obj_name(&gy.youmonst));
                 }
             /* You're mimicking some object or you're hidden. */
-            pline("怪訝そうに、%sは向きを変えて去った.", mhe(guard));
+            pline("怪訝そうに、%sは向きを変えて去った.", Monnam(guard));
             mongone(guard);
             return;
         }
@@ -576,9 +576,8 @@ invault(void)
             if (Deaf) {
                 if (!Blind)
                     pline(
-                       "%sは%s手のひらを差し出し、%sもう一方の手で手招きした.",
-                          noit_Monnam(guard), noit_mhis(guard),
-                          noit_mhis(guard));
+                       "%sは片方の手のひらを差し出し、もう一方の手で手招きした.",
+                           noit_Monnam(guard));
             } else {
                 SetVoice(guard, 0, 80, 0);
                 verbalize(
@@ -1030,8 +1029,8 @@ gd_move(struct monst *grd)
                 egrd->warncnt = 6;
                 if (Deaf) {
                     if (!Blind)
-                        pline("%sは%s手のひらを突き出し、強く要求してきた!",
-                              noit_Monnam(grd), noit_mhis(grd));
+                        pline("%sは手のひらを突き出し、強く要求してきた!",
+                               noit_Monnam(grd));
                 } else {
                     SetVoice(grd, 0, 80, 0);
                     verbalize("金を全部落とせ、この悪党め!");
@@ -1040,8 +1039,8 @@ gd_move(struct monst *grd)
             } else {
                 if (Deaf) {
                     if (!Blind)
-                        pline("%sは激怒しつつ嬉々として%s手をこすり合わせた!",
-                              noit_Monnam(grd), noit_mhis(grd));
+                        pline("%sは激怒しつつ嬉々として両手をこすり合わせた!",
+                               noit_Monnam(grd));
                 } else {
                     SetVoice(grd, 0, 80, 0);
                     verbalize("ならばよい、無頼漢め!");

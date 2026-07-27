@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	mhitu.c	$NHDT-Date: 1781973054 2026/06/20 16:30:54 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.347 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2044,8 +2044,8 @@ doseduce(struct monst *mon)
     char qbuf[QBUFSZ], Who[QBUFSZ];
 
     if (mon->mcan || mon->mspec_used) {
-        pline_mon(mon, "%sは%sが%s頭痛に苦しんでいるように振る舞った.",
-                  Monnam(mon), mhe(mon), mon->mcan ? "ひどい" : "");
+        pline_mon(mon, "%sは%s頭痛に苦しんでいる振りをした.",
+                  Monnam(mon), mon->mcan ? "ひどい" : "");
         return 0;
     }
     if (unresponsive()) {
@@ -2314,8 +2314,8 @@ doseduce(struct monst *mon)
     if (mon->mtame) { /* don't charge */
         ;
     } else if (rn2(20) < ACURR(A_CHA)) {
-        pline("%sは%sに支払いを求めたが、あなたは断った...",
-              noit_Monnam(mon), noit_mhim(mon));
+        pline("%sは支払いを求めたが、あなたは断った...",
+              noit_Monnam(mon));
     } else if (u.umonnum == PM_LEPRECHAUN) {
         pline_mon(mon, "%sはあなたの金を奪おうとしたが失敗した...",
                   noit_Monnam(mon));
