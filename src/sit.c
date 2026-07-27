@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	sit.c	$NHDT-Date: 1781973067 2026/06/20 16:31:07 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.112 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -424,9 +424,9 @@ dosit(void)
         /* holding monster is next to hero rather than beneath, but
            hero is in no condition to actually sit at has/her own spot */
         if (humanoid(u.ustuck->data))
-            pline("%s won't offer %s lap.", Monnam(u.ustuck), mhis(u.ustuck));
+            pline("%sはひざを貸してくれそうにない.", Monnam(u.ustuck));
         else
-            pline("%s has no lap.", Monnam(u.ustuck));
+            pline("%sには座る場所がない.", Monnam(u.ustuck));
         return ECMD_OK;
     } else if (is_pool(u.ux, u.uy) && !Underwater) { /* water walking */
         goto in_water;

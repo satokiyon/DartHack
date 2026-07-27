@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	muse.c	$NHDT-Date: 1781973057 2026/06/20 16:30:57 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.248 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
@@ -283,7 +283,7 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
     }
     if (mtmp->mconf) /* (note: won't get if not seen and hero can't hear) */
           pline("混乱しているため、%sは魔法の言葉を言い間違えた...",
-              vismon ? mon_nam(mtmp) : mhe(mtmp));
+              vismon ? mon_nam(mtmp) : "相手");
 }
 
 staticfn void
@@ -1070,8 +1070,8 @@ use_defensive(struct monst *mtmp)
         if (Inhell && mon_has_amulet(mtmp) && !rn2(4)
             && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3)) {
             if (vismon)
-                    pline("%sが階段を上ると、謎の力が一瞬%sを包んだ...",
-                      l_monnam(mtmp), mhim(mtmp));
+                    pline("%sが階段を上ると、謎の力が一瞬その体を包んだ...",
+                      l_monnam(mtmp));
             /* simpler than for the player; this will usually be
                the Wizard and he'll immediately go right to the
                upstairs, so there's not much point in having any
@@ -2344,7 +2344,7 @@ mloot_container(
                     pline_mon(mon, "%sは%sから%sを取り出した.", Monnam(mon),
                           contnr_nam, doname(xobj));
                 else /* adjacent, additional items */
-                    pline("%sは%sを取り出した.", upstart(mpronounbuf),
+                    pline("さらに%sを取り出した.",
                           doname(xobj));
             }
             if (container->otyp == ICE_BOX)
@@ -3153,7 +3153,6 @@ muse_unslime(
             dmg = 0; /* damage has been applied by explode() */
         }
     } else if (otyp == POT_OIL) {
-        char Pronoun[40];
         boolean was_lit = obj->lamplit ? TRUE : FALSE, saw_lit = FALSE;
         /*
          * If not already lit, requires two actions.  We cheat and let
@@ -3177,9 +3176,8 @@ muse_unslime(
         if (vis) {
             if (!Unaware)
                 observe_object(obj); /* hero is watching mon drink obj */
-            pline("%sは燃える%sを飲み干した",
-                saw_lit ? upstart(strcpy(Pronoun, mhe(mon))) : Monnam(mon),
-                simpleonames(obj));
+            pline_mon(mon, "%sは燃える%sを飲み干した.",
+                      Monnam(mon), simpleonames(obj));
             makeknown(POT_OIL);
         }
         dmg = d(3, 4); /* [**TEMP** (different from hero)] */

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-20. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	sounds.c	$NHDT-Date: 1781973067 2026/06/20 16:31:07 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.172 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -36,7 +36,7 @@ throne_mon_sound(struct monst *mtmp)
         static const char *const throne_msg[4] = {
             "宮廷の会話が聞こえる.",
             "笏で裁きを告げる音が聞こえる.",
-            "誰かが「%sの首をはねろ!」と叫ぶ声が聞こえる.",
+            "誰かが「そいつの首をはねろ!」と叫ぶ声が聞こえる.",
             "ベルシエル女王の猫の声が聞こえる!",
         };
         int which = rn2(3) + (Hallucination ? 1 : 0);
@@ -50,7 +50,7 @@ throne_mon_sound(struct monst *mtmp)
             You_hear1(throne_msg[which]);
         } else {
             DISABLE_WARNING_FORMAT_NONLITERAL
-            pline(throne_msg[2], uhis());
+            pline1(throne_msg[2]);
             RESTORE_WARNING_FORMAT_NONLITERAL
         }
         return TRUE;
@@ -915,8 +915,8 @@ domonnoise(struct monst *mtmp)
     }
     case MS_WERE:
         if (flags.moonphase == FULL_MOON && (night() ^ !rn2(13))) {
-            pline("%sは%s頭を反らし、血も凍るような%sを上げた!",
-                  Monnam(mtmp), mhis(mtmp),
+            pline("%sは頭を反らし、血も凍るような%sを上げた!",
+                  Monnam(mtmp),
                   (ptr == &mons[PM_HUMAN_WERERAT]) ? "悲鳴" : "遠吠え");
             Soundeffect((ptr == &mons[PM_HUMAN_WERERAT]) ? se_scream
                                                          : se_canine_howl,
@@ -1100,8 +1100,7 @@ domonnoise(struct monst *mtmp)
         if (!mtmp->mpeaceful) {
             switch (rn2(4)) {
             case 0:
-                pline("%sは%s宝石の収集を自慢した.", Monnam(mtmp),
-                      mhis(mtmp));
+                pline("%sは宝石のコレクションを自慢した.", Monnam(mtmp));
                 break;
             case 1:
                 pline_msg = "羊肉ばかりの食事に文句を言った.";
@@ -1603,12 +1602,12 @@ tiphat(void)
             if ((otmp = which_armor(mtmp, W_ARMH)) == 0) {
                 pline("%sは手を振った.", Monnam(mtmp));
             } else if (otmp->cursed) {
-                pline("%sは%s%sをつかんだが外せなかった.", Monnam(mtmp),
-                      mhis(mtmp), helm_simple_name(otmp));
+                pline("%sは%sをつかんだが外せなかった.", Monnam(mtmp),
+                      helm_simple_name(otmp));
                 otmp->bknown = 1;
             } else {
-                pline("%sは返礼として%s%sをちょいと持ち上げた.", Monnam(mtmp),
-                      mhis(mtmp), helm_simple_name(otmp));
+                pline("%sは返礼として%sをちょいと持ち上げた.", Monnam(mtmp),
+                      helm_simple_name(otmp));
             }
         } else if (vismon && humanoid(mtmp->data)) {
             static const char *const reaction[3] = {

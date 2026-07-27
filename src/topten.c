@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -669,6 +669,8 @@ jp_translate_killer_text_for_display(
                 Snprintf(outmain, sizeof outmain, "%sに倒された", kbuf);
             }
         }
+    } else if (!strncmpi(core, "whipping ", 9)) {
+        Snprintf(outmain, sizeof outmain, "むちで自分を打って死んだ");
     } else if (!strncmpi(core, "choked on ", 10)) {
         const char *what = skip_english_article(core + 10);
         char buf[BUFSZ];

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	uhitm.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.503 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2206,19 +2206,17 @@ steal_it(struct monst *mdef, struct attack *mattk)
     gold = findgold(mdef->minvent);
 
     if (ustealo) { /* we will be taking everything */
-        char heshe[20];
-
         /* 5.0: this uses hero's base gender rather than nymph femininity
            but was using hardcoded pronouns She/her for target monster;
            switch to dynamic pronoun */
         if (gender(mdef) == (int) u.mfemale
             && gy.youmonst.data->mlet == S_NYMPH)
-            You("%sを魅了した. %sは喜んで%s所持品を差し出した.",
-                l_monnam(mdef), upstart(strcpy(heshe, mhe(mdef))),
+            You("%sを魅了した. 相手は喜んで%s所持品を差し出した.",
+                l_monnam(mdef),
                 !gold ? "" : "ほとんどの");
         else
-            You("%sを誘惑し、%sは服を脱ぎ始めた.",
-                l_monnam(mdef), mhe(mdef));
+            You("%sを誘惑すると、相手は服を脱ぎ始めた.",
+                l_monnam(mdef));
     }
 
     /* prevent gold from being stolen so that steal-item isn't a superset

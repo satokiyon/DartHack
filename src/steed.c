@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	steed.c	$NHDT-Date: 1781973068 2026/06/20 16:31:08 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -306,8 +306,8 @@ mount_steed(
     if (mtmp->mtrapped) {
         struct trap *t = t_at(mtmp->mx, mtmp->my);
 
-        You_cant("%sに乗ることはできない。%sが%sに引っ掛かっている。", l_monnam(mtmp),
-                 mhe(mtmp), jp_trapname_for_display(t->ttyp, FALSE));
+        You_cant("%sに乗ることはできない。それが%sに引っ掛かっている。", l_monnam(mtmp),
+                 jp_trapname_for_display(t->ttyp, FALSE));
         return (FALSE);
     }
 
@@ -428,13 +428,13 @@ kick_steed(void)
                 u.usteed->mcanmove = 1;
             }
             if (helpless(u.usteed))
-                pline("%sは身じろぎした.", He);
+                pline("%sは身じろぎした.", Monnam(u.usteed));
             else
                 /* if hallucinating, might yield "He rouses herself" or
                    "She rouses himself" */
                 pline("%sは目を覚ました!", Monnam(u.usteed));
         } else
-            pline("%sは反応しない.", He);
+            pline("%sは反応しない.", Monnam(u.usteed));
         return;
     }
 

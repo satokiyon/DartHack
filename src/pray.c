@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	pray.c	$NHDT-Date: 1781973062 2026/06/20 16:31:02 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.253 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -690,7 +690,7 @@ god_zaps_you(aligntyp resp_god)
             summon_minion(resp_god, FALSE);
             summon_minion(resp_god, FALSE);
             SetVoice((struct monst *) 0, 0, 80, voice_deity);
-            verbalize("%sを滅ぼせ、我がしもべたちよ！", uhim());
+            verbalize("奴を滅ぼせ、我がしもべたちよ！");
         }
     }
 }

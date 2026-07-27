@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-22. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	monmove.c	$NHDT-Date: 1781973056 2026/06/20 16:30:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.284 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -110,10 +110,8 @@ mon_yells(struct monst *mon, const char *shout)
             /* Sidenote on "A watchman angrily waves her arms!"
              * Female being called watchman is correct (career name).
              */
-            pline_mon(mon, "%s angrily %s %s %s!",
+            pline_mon(mon, "%sは怒って%sを振った!",
                 Amonnam(mon),
-                nolimbs(mon->data) ? "shakes" : "waves",
-                mhis(mon),
                 nolimbs(mon->data) ? jp_mbodypart(mon, HEAD)
                                    : jp_mbodypart_plural(mon, ARM));
     } else {

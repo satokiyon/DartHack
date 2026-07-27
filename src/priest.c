@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	priest.c	$NHDT-Date: 1781973062 2026/06/20 16:31:02 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -585,8 +585,7 @@ priest_talk(struct monst *priest)
         };
 
         if (helpless(priest)) {
-            pline("%sは%sの放心状態から我に返った!", Monnam(priest),
-                  mhis(priest));
+            pline("%sは放心状態から我に返った!", Monnam(priest));
             priest->mfrozen = priest->msleeping = 0;
             priest->mcanmove = 1;
         }
