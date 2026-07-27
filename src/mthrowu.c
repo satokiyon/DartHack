@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	mthrowu.c	$NHDT-Date: 1781973057 2026/06/20 16:30:57 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
@@ -901,9 +901,9 @@ return_from_mtoss(
             dmg = rn2(2);
             if (!dmg) {
                 if (canseemon(magr)) {
-                    pline("%sは%sのもとへ戻り、%s%sの%sに落ちた.",
+                    pline("%sは%sのもとへ戻り、%sの%sに落ちた.",
                           Doname2(otmp), mon_nam(magr),
-                          mlevitating ? "下" : "足元", mhis(magr),
+                          mlevitating ? "下" : "足元",
                           jp_mbodypart_plural(magr, FOOT));
                 } else if (!Deaf) {
                     You_hear("%sが%sの近くに落ちる音が聞こえた.",
@@ -912,9 +912,9 @@ return_from_mtoss(
             } else {
                 dmg += rnd(3);
                 if (canseemon(magr)) {
-                    pline("%sは%sへ飛び戻り、%sの%sに当たった!",
+                    pline("%sは%sへ飛び戻り、その%sに当たった!",
                           Doname2(otmp), mon_nam(magr),
-                          mhis(magr), jp_body_part(ARM));
+                          jp_body_part(ARM));
                 } else if (!Deaf) {
                     You_hear("%sが%sに鈍い音を立てて当たったのが聞こえた!",
                              something, mon_nam(magr));

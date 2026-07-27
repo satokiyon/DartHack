@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	mcastu.c	$NHDT-Date: 1781973053 2026/06/20 16:30:53 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.122 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -394,7 +394,7 @@ death_inflicted_by(
 staticfn void
 mcast_death_touch(struct monst *mtmp)
 {
-    pline("しまった、%sが死の接触を使っている！", mhe(mtmp));
+    pline_mon(mtmp, "しまった、%sが死の接触を使っている！", Monnam(mtmp));
     if (nonliving(gy.youmonst.data) || is_demon(gy.youmonst.data)) {
         You("少しも死んだ気はしなかった.");
     } else if (!Antimagic && rn2(mtmp->m_lev) > 12) {

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-22. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	dokick.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.237 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -330,8 +330,8 @@ ghitm(struct monst *mtmp, struct obj *gold)
                 robbed -= value;
                 if (robbed < 0L)
                     robbed = 0L;
-                pline_The("その額は%s%sの最近の損失を埋め合わせた.",
-                          !robbed ? "" : "一部だけ", mhis(mtmp));
+                pline_The("その額は%s店主の最近の損失を補填した.",
+                          !robbed ? "" : "一部だけ");
                 ESHK(mtmp)->robbed = robbed;
                 if (!robbed)
                     make_happy_shk(mtmp, FALSE);

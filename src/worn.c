@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	worn.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1181,7 +1181,6 @@ mon_break_armor(struct monst *mon, boolean polyspot)
     boolean vis = cansee(mon->mx, mon->my),
             handless_or_tiny = (nohands(mdat) || verysmall(mdat)),
             noride = FALSE;
-    const char *pronoun = mhim(mon), *ppronoun = mhis(mon);
 
     if (breakarm(mdat)) {
         if ((otmp = which_armor(mon, W_ARM)) != 0) {
@@ -1193,8 +1192,8 @@ mon_break_armor(struct monst *mon, boolean polyspot)
             } else {
                 Soundeffect(se_cracking_sound, 100);
                 if (vis)
-                    pline_mon(mon, "%s breaks out of %s armor!",
-                              Monnam(mon), ppronoun);
+                    pline_mon(mon, "%sは鎧を破って飛び出した!",
+                              Monnam(mon));
                 else
                     You_hear("何かがひび割れる音が聞こえた.");
             }
@@ -1205,13 +1204,13 @@ mon_break_armor(struct monst *mon, boolean polyspot)
             && (otmp->otyp != MUMMY_WRAPPING || !WrappingAllowed(mdat))) {
             if (otmp->oartifact) {
                 if (vis)
-                    pline_mon(mon, "%s %s falls off!", s_suffix(Monnam(mon)),
+                    pline_mon(mon, "%sの%sが脱げ落ちた!", Monnam(mon),
                           cloak_simple_name(otmp));
                 m_lose_armor(mon, otmp, polyspot);
             } else {
                 Soundeffect(se_ripping_sound, 100);
                 if (vis)
-                    pline_mon(mon, "%s %s tears apart!", s_suffix(Monnam(mon)),
+                    pline_mon(mon, "%sの%sが破れ散った!", Monnam(mon),
                           cloak_simple_name(otmp));
                 else
                     You_hear("何かが裂ける音が聞こえた.");
@@ -1220,8 +1219,8 @@ mon_break_armor(struct monst *mon, boolean polyspot)
         }
         if ((otmp = which_armor(mon, W_ARMU)) != 0) {
             if (vis)
-                pline_mon(mon, "%s shirt rips to shreds!",
-                          s_suffix(Monnam(mon)));
+                pline_mon(mon, "%sのシャツがズタズタに裂けた!",
+                          Monnam(mon));
             else
                 You_hear("何かが裂ける音が聞こえた.");
             m_useup(mon, otmp);
@@ -1233,8 +1232,8 @@ mon_break_armor(struct monst *mon, boolean polyspot)
         if ((otmp = which_armor(mon, W_ARM)) != 0) {
             Soundeffect(se_thud, 50);
             if (vis)
-                pline_mon(mon, "%s armor falls around %s!",
-                          s_suffix(Monnam(mon)), pronoun);
+                pline_mon(mon, "%sの鎧が足元に落ちた!",
+                          Monnam(mon));
             else
                 You_hear("何かがどさりと落ちる音が聞こえた.");
             m_lose_armor(mon, otmp, polyspot);
@@ -1244,11 +1243,11 @@ mon_break_armor(struct monst *mon, boolean polyspot)
             && (otmp->otyp != MUMMY_WRAPPING || !WrappingAllowed(mdat))) {
             if (vis) {
                 if (is_whirly(mon->data))
-                    pline_mon(mon, "%s %s falls, unsupported!",
-                              s_suffix(Monnam(mon)), cloak_simple_name(otmp));
+                    pline_mon(mon, "%sの%sが支えを失って落ちた!",
+                              Monnam(mon), cloak_simple_name(otmp));
                 else
-                    pline_mon(mon, "%s shrinks out of %s %s!",
-                              Monnam(mon), ppronoun,
+                    pline_mon(mon, "%sは体が縮んで%sから抜け出た!",
+                              Monnam(mon),
                               cloak_simple_name(otmp));
             }
             m_lose_armor(mon, otmp, polyspot);
@@ -1256,11 +1255,11 @@ mon_break_armor(struct monst *mon, boolean polyspot)
         if ((otmp = which_armor(mon, W_ARMU)) != 0) {
             if (vis) {
                 if (passes_thru_clothes)
-                    pline_mon(mon, "%s seeps right through %s shirt!",
-                              Monnam(mon), ppronoun);
+                    pline_mon(mon, "%sはシャツをすり抜けた!",
+                              Monnam(mon));
                 else
-                    pline_mon(mon, "%s becomes much too small for %s shirt!",
-                          Monnam(mon), ppronoun);
+                    pline_mon(mon, "%sは体が縮んでシャツが合わなくなった!",
+                          Monnam(mon));
             }
             m_lose_armor(mon, otmp, polyspot);
         }
@@ -1269,16 +1268,16 @@ mon_break_armor(struct monst *mon, boolean polyspot)
         /* [caller needs to handle weapon checks] */
         if ((otmp = which_armor(mon, W_ARMG)) != 0) {
             if (vis)
-                pline_mon(mon, "%s drops %s gloves%s!",
-                          Monnam(mon), ppronoun,
-                          MON_WEP(mon) ? " and weapon" : "");
+                pline_mon(mon, "%sは手袋%sを落とした!",
+                          Monnam(mon),
+                          MON_WEP(mon) ? "と武器" : "");
             m_lose_armor(mon, otmp, polyspot);
         }
         if ((otmp = which_armor(mon, W_ARMS)) != 0) {
             Soundeffect(se_clank, 50);
             if (vis)
-                pline_mon(mon, "%s can no longer hold %s shield!",
-                          Monnam(mon), ppronoun);
+                pline_mon(mon, "%sはもはや盾を持っていられなくなった!",
+                          Monnam(mon));
             else
                 You_hear("がちゃんという音が聞こえた.");
             m_lose_armor(mon, otmp, polyspot);
@@ -1289,8 +1288,8 @@ mon_break_armor(struct monst *mon, boolean polyspot)
             /* flimsy test for horns matches polyself handling */
             && (handless_or_tiny || !is_flimsy(otmp))) {
             if (vis)
-                pline_mon(mon, "%s helmet falls to the %s!",
-                          s_suffix(Monnam(mon)), surface(mon->mx, mon->my));
+                pline_mon(mon, "%sの兜が%sに落ちた!",
+                          Monnam(mon), surface(mon->mx, mon->my));
             else
                 You_hear("がちゃんという音が聞こえた.");
             m_lose_armor(mon, otmp, polyspot);
@@ -1300,12 +1299,11 @@ mon_break_armor(struct monst *mon, boolean polyspot)
         if ((otmp = which_armor(mon, W_ARMF)) != 0) {
             if (vis) {
                 if (is_whirly(mon->data))
-                    pline_mon(mon, "%s boots fall away!",
-                              s_suffix(Monnam(mon)));
+                    pline_mon(mon, "%sのブーツが脱げ落ちた!",
+                              Monnam(mon));
                 else
-                    pline_mon(mon, "%s boots %s off %s feet!",
-                              s_suffix(Monnam(mon)),
-                          verysmall(mdat) ? "slide" : "are pushed", ppronoun);
+                    pline_mon(mon, "%sのブーツが足から脱げ落ちた!",
+                              Monnam(mon));
             }
             m_lose_armor(mon, otmp, polyspot);
         }
@@ -1314,7 +1312,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
         if ((otmp = which_armor(mon, W_SADDLE)) != 0) {
             m_lose_armor(mon, otmp, polyspot);
             if (vis)
-                pline_mon(mon, "%s saddle falls off.", s_suffix(Monnam(mon)));
+                pline_mon(mon, "%sの鞍が落ちた.", Monnam(mon));
         }
         if (mon == u.usteed)
             noride = TRUE;

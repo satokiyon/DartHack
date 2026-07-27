@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
 /* NetHack 5.0	apply.c	$NHDT-Date: 1781973040 2026/06/20 16:30:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.482 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -726,8 +726,8 @@ m_unleash(struct monst *mtmp, boolean feedback)
 
     if (feedback) {
         if (canseemon(mtmp))
-            pline_mon(mtmp, "%sは%s綱から抜け出した!",
-                      l_monnam(mtmp), mhis(mtmp));
+            pline_mon(mtmp, "%sは綱から抜け出した!",
+                      l_monnam(mtmp));
         else
             Your("綱がゆるんだ.");
     }
@@ -1149,10 +1149,8 @@ use_mirror(struct obj *obj)
     } else if (monable && (mlet == S_NYMPH
                            || mtmp->data == &mons[PM_AMOROUS_DEMON])) {
         if (vis) {
-            char buf[BUFSZ]; /* "She" or "He" */
-
             pline("%sはあなたの%sに見とれた.", l_monnam(mtmp), mirror);
-            pline("%sはそれを奪った!", upstart(strcpy(buf, mhe(mtmp))));
+            pline("そしてそれを奪い去った!");
         } else
             pline("それはあなたの%sを盗んだ!", mirror);
         setnotworn(obj); /* in case mirror was wielded */
@@ -1184,10 +1182,9 @@ use_mirror(struct obj *obj)
         else if ((mtmp->minvis && !perceives(mtmp->data))
                  /* redundant: can't get here if these are true */
                  || !haseyes(mtmp->data) || gn.notonhead || !mtmp->mcansee)
-            pline("%sは%s自身の姿に気づかないようだった.", l_monnam(mtmp),
-                  mhis(mtmp));
+            pline("%sは自分の姿に気づかないようだった.", l_monnam(mtmp));
         else
-            pline("%sは%s自身の姿を無視した.", l_monnam(mtmp), mhis(mtmp));
+            pline("%sは自分の姿を無視した.", l_monnam(mtmp));
     }
     return ECMD_TIME;
 #undef SEENMON
@@ -3053,7 +3050,7 @@ use_whip(struct obj *obj)
         if (dam <= 0)
             dam = 1;
         You("むちで自分の%sを叩いてしまった.", jp_body_part(FOOT));
-        Sprintf(buf, "むちで%s自身を打って死んだ", uhim());
+        Sprintf(buf, "whipping %sself", uhim());
         losehp(Maybe_Half_Phys(dam), buf, NO_KILLER_PREFIX);
         return ECMD_TIME;
 
@@ -3160,9 +3157,8 @@ use_whip(struct obj *obj)
 
             You("%sにむちを巻きつけた.", xname(otmp));
             if (gotit && mwelded(otmp)) {
-                pline("それは%s %sに溶接されていた%c",
-                    mhis(mtmp),
-                      mon_hand, !otmp->bknown ? '!' : '.');
+                pline("それは相手の%sに溶接されていた%s",
+                      mon_hand, !otmp->bknown ? "!" : ".");
                 set_bknown(otmp, 1);
                 gotit = FALSE; /* can't pull it free */
             }
