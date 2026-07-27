@@ -38,6 +38,8 @@ class _SettingsPageState extends State<SettingsPage> {
   double _cmdPanelScale = 1.0;
   String _drawerPosition = 'left';
   String _menuButtonPosition = 'bottom_left';
+  bool _showMapButton = true;
+  String _mapButtonPosition = 'bottom_right';
   String _dpadLongPressMoveMode = 'G_UPPER';
   String _mapTapTravelMode = 'always';
 
@@ -196,6 +198,8 @@ class _SettingsPageState extends State<SettingsPage> {
       _cmdPanelScale = prefs.getDouble('cmd_panel_scale') ?? 1.0;
       _drawerPosition = prefs.getString('drawer_position') ?? 'left';
       _menuButtonPosition = prefs.getString('menu_button_position') ?? 'bottom_left';
+      _showMapButton = prefs.getBool('show_map_button') ?? true;
+      _mapButtonPosition = prefs.getString('map_button_position') ?? 'bottom_right';
       _dpadLongPressMoveMode = prefs.getString('dpad_long_press_move_mode') ?? 'G_UPPER';
       _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'always';
 
@@ -835,6 +839,37 @@ class _SettingsPageState extends State<SettingsPage> {
                 if (val != null) {
                   setState(() => _menuButtonPosition = val);
                   _saveSetting('menu_button_position', val);
+                }
+              },
+            ),
+          ),
+          SwitchListTile(
+            title: const Text("半透明地図ボタンを表示"),
+            subtitle: const Text("今いる階層の全体地図を開くボタンを表示します"),
+            value: _showMapButton,
+            onChanged: (val) {
+              setState(() => _showMapButton = val);
+              _saveSetting('show_map_button', val);
+            },
+          ),
+          ListTile(
+            title: const Text("半透明地図ボタンの配置位置"),
+            trailing: DropdownButton<String>(
+              value: _mapButtonPosition,
+              dropdownColor: Colors.grey[900],
+              style: const TextStyle(color: Colors.white),
+              items: const [
+                DropdownMenuItem(value: 'top_left', child: Text('左上', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'top_right', child: Text('右上', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'left_edge', child: Text('左端(中央)', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'right_edge', child: Text('右端(中央)', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'bottom_left', child: Text('左下', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'bottom_right', child: Text('右下', style: TextStyle(color: Colors.white))),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _mapButtonPosition = val);
+                  _saveSetting('map_button_position', val);
                 }
               },
             ),

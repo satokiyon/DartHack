@@ -170,6 +170,8 @@ class _MyHomePageState extends State<MyHomePage> {
   ScreenMode _screenMode = ScreenMode.normal; // 0: 通常, 1: イマーシブ
   String _drawerPosition = 'left';
   String _menuButtonPosition = 'top_left';
+  bool _showMapButton = true;
+  String _mapButtonPosition = 'bottom_right';
   bool _isTopDrawerOpen = false;
   bool _isBottomDrawerOpen = false;
   bool _isMainGameStarted = false;
@@ -241,6 +243,8 @@ class _MyHomePageState extends State<MyHomePage> {
       _showPanelNames = prefs.getBool('show_panel_names') ?? true;
       _drawerPosition = prefs.getString('drawer_position') ?? 'left';
       _menuButtonPosition = prefs.getString('menu_button_position') ?? 'bottom_left';
+      _showMapButton = prefs.getBool('show_map_button') ?? true;
+      _mapButtonPosition = prefs.getString('map_button_position') ?? 'bottom_right';
       _enabledDPadMoveModes = _parseEnabledMoveModes(
         prefs.getString('dpad_enabled_move_modes') ??
             'NORMAL,UPPER,G_LOWER,G_UPPER,CTRL,M_CMD,F_CMD',
@@ -473,6 +477,16 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
         const Divider(color: Colors.white24, height: 1),
+        if (_isGameRunning) ...[
+          ListTile(
+            leading: const Icon(Icons.map, color: Colors.amberAccent),
+            title: const Text('階層の全体地図を表示', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              _closeDrawer();
+              _showFullMapDialog();
+            },
+          ),
+        ],
         ListTile(
           leading: Icon(_isKeyboardVisible ? Icons.keyboard_hide : Icons.keyboard, color: Colors.blueAccent),
           title: Text(_isKeyboardVisible ? '仮想キーボードを非表示' : '仮想キーボードを表示', style: const TextStyle(color: Colors.white)),
@@ -611,6 +625,160 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         }
       ),
+    );
+  }
+
+  Widget _buildMapButton() {
+    if (!_showMapButton || !_isMainGameStarted || !_isGameRunning) {
+      return const SizedBox.shrink();
+    }
+
+    double? top;
+    double? bottom;
+    double? left;
+    double? right;
+
+    final mediaQuery = MediaQuery.of(context);
+    final topOffset = 100.0; // ステータス(38px)+メッセージ(54px)+マージン
+
+    // コントローラ表示時は重なりを避けるために十分な下余白を確保する
+    final double bottomOffset = _dialogBottomInset(context);
+
+    switch (_mapButtonPosition) {
+      case 'top_left':
+        top = topOffset;
+        left = 8;
+        break;
+      case 'top_right':
+        top = topOffset;
+        right = 8;
+        break;
+      case 'left_edge':
+        top = mediaQuery.size.height * 0.4;
+        left = 8;
+        break;
+      case 'right_edge':
+        top = mediaQuery.size.height * 0.4;
+        right = 8;
+        break;
+      case 'bottom_left':
+        bottom = bottomOffset;
+        left = 8;
+        break;
+      case 'bottom_right':
+        bottom = bottomOffset;
+        right = 8;
+        break;
+    }
+
+    return Positioned(
+      top: top,
+      bottom: bottom,
+      left: left,
+      right: right,
+      child: Builder(
+        builder: (context) {
+          return Opacity(
+            opacity: 0.6,
+            child: CircleAvatar(
+              backgroundColor: Colors.black87,
+              radius: 20,
+              child: IconButton(
+                tooltip: '階層全体地図',
+                icon: const Icon(Icons.map, color: Colors.white, size: 20),
+                onPressed: _showFullMapDialog,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showFullMapDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        final cellW = _useTiles ? 32.0 : 9.0;
+        final cellH = _useTiles ? 32.0 : 16.0;
+        final mapWidth = NetHackScreen.mapCols * cellW;
+        final mapHeight = NetHackScreen.mapRows * cellH;
+
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: const EdgeInsets.all(12),
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: Colors.deepPurpleAccent, width: 1.5),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                color: Colors.deepPurple[900],
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    const Icon(Icons.map, color: Colors.amberAccent, size: 20),
+                    const SizedBox(width: 8),
+                    const Text(
+                      '階層の全体地図',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white, size: 20),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              ),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: InteractiveViewer(
+                    minScale: 0.8,
+                    maxScale: 4.0,
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: SizedBox(
+                        width: mapWidth,
+                        height: mapHeight,
+                        child: CustomPaint(
+                          painter: NetHackMapPainter(
+                            screen: _screen,
+                            tileImage: _tileImage,
+                            tileWidth: _tileWidth,
+                            tileHeight: _tileHeight,
+                            useTiles: _useTiles,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                color: Colors.black54,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '※ ピンチで拡大縮小可能 / タップ・[X]で戻る',
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -4228,6 +4396,7 @@ class _MyHomePageState extends State<MyHomePage> {
               _buildControllerOverlay(),
               if (_isGameRunning && _isMainGameStarted) ...[
                 _buildMenuButton(),
+                _buildMapButton(),
                 _buildDrawerBarrier(_isTopDrawerOpen, () => setState(() => _isTopDrawerOpen = false)),
                 _buildDrawerBarrier(_isBottomDrawerOpen, () => setState(() => _isBottomDrawerOpen = false)),
                 _buildTopDrawer(),
