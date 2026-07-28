@@ -782,6 +782,60 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
           ),
+          // メニューボタン・地図ボタンの配置設定
+          ListTile(
+            title: const Text("半透明メニューボタンの配置位置"),
+            trailing: DropdownButton<String>(
+              value: _menuButtonPosition,
+              dropdownColor: Colors.grey[900],
+              style: const TextStyle(color: Colors.white),
+              items: const [
+                DropdownMenuItem(value: 'top_left', child: Text('左上', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'top_right', child: Text('右上', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'left_edge', child: Text('左端(中央)', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'right_edge', child: Text('右端(中央)', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'bottom_left', child: Text('左下', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'bottom_right', child: Text('右下', style: TextStyle(color: Colors.white))),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _menuButtonPosition = val);
+                  _saveSetting('menu_button_position', val);
+                }
+              },
+            ),
+          ),
+          SwitchListTile(
+            title: const Text("半透明地図ボタンを表示"),
+            subtitle: const Text("今いる階層の全体地図を開くボタンを表示します"),
+            value: _showMapButton,
+            onChanged: (val) {
+              setState(() => _showMapButton = val);
+              _saveSetting('show_map_button', val);
+            },
+          ),
+          ListTile(
+            title: const Text("半透明地図ボタンの配置位置"),
+            trailing: DropdownButton<String>(
+              value: _mapButtonPosition,
+              dropdownColor: Colors.grey[900],
+              style: const TextStyle(color: Colors.white),
+              items: const [
+                DropdownMenuItem(value: 'top_left', child: Text('左上', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'top_right', child: Text('右上', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'left_edge', child: Text('左端(中央)', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'right_edge', child: Text('右端(中央)', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'bottom_left', child: Text('左下', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'bottom_right', child: Text('右下', style: TextStyle(color: Colors.white))),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _mapButtonPosition = val);
+                  _saveSetting('map_button_position', val);
+                }
+              },
+            ),
+          ),
         ]),
       ),
     );
@@ -948,59 +1002,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 if (val != null) {
                   setState(() => _drawerPosition = val);
                   _saveSetting('drawer_position', val);
-                }
-              },
-            ),
-          ),
-          ListTile(
-            title: const Text("半透明メニューボタンの配置位置"),
-            trailing: DropdownButton<String>(
-              value: _menuButtonPosition,
-              dropdownColor: Colors.grey[900],
-              style: const TextStyle(color: Colors.white),
-              items: const [
-                DropdownMenuItem(value: 'top_left', child: Text('左上', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'top_right', child: Text('右上', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'left_edge', child: Text('左端(中央)', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'right_edge', child: Text('右端(中央)', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'bottom_left', child: Text('左下', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'bottom_right', child: Text('右下', style: TextStyle(color: Colors.white))),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _menuButtonPosition = val);
-                  _saveSetting('menu_button_position', val);
-                }
-              },
-            ),
-          ),
-          SwitchListTile(
-            title: const Text("半透明地図ボタンを表示"),
-            subtitle: const Text("今いる階層の全体地図を開くボタンを表示します"),
-            value: _showMapButton,
-            onChanged: (val) {
-              setState(() => _showMapButton = val);
-              _saveSetting('show_map_button', val);
-            },
-          ),
-          ListTile(
-            title: const Text("半透明地図ボタンの配置位置"),
-            trailing: DropdownButton<String>(
-              value: _mapButtonPosition,
-              dropdownColor: Colors.grey[900],
-              style: const TextStyle(color: Colors.white),
-              items: const [
-                DropdownMenuItem(value: 'top_left', child: Text('左上', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'top_right', child: Text('右上', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'left_edge', child: Text('左端(中央)', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'right_edge', child: Text('右端(中央)', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'bottom_left', child: Text('左下', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'bottom_right', child: Text('右下', style: TextStyle(color: Colors.white))),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _mapButtonPosition = val);
-                  _saveSetting('map_button_position', val);
                 }
               },
             ),
@@ -1719,7 +1720,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.amberAccent),
                 ),
                 SizedBox(height: 8),
-                Text("DartHack は、NetHack をベースとしつつ、Flutter/Dart によって再構築したモバイル版です。本アプリはオリジナルの NetHack をゲームコアとして使用していますが、NetHack 開発チーム（The NetHack DevTeam）とは一切の関係ありません。"),
+                Text("DartHack は、NetHack をベースとしつつ、Flutter/Dart によって再構築したモバイル版です。本アプリはオリジナルの NetHack をゲームコアとして使用していますが、NetHack 開発チーム（The NetHack DevTeam）とは一切関係ありません。"),
                 SizedBox(height: 8),
                 Text("本アプリは NetHack General Public License (NGPL) に基づき配布されています。  ソースコードは以下にて公開しています：https://github.com/satokiyon/DartHack"),
                 SizedBox(height: 8),

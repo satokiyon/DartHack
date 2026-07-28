@@ -599,19 +599,34 @@ class _MyHomePageState extends State<MyHomePage> {
     final statusRightShift = (_statusPosition == 'right') ? _statusWidth : 0.0;
 
     final cmdTopShift = (_cmdPanelPosition == 'top') ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
+    final cmdBottomShift = (_cmdPanelPosition == 'bottom') ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
     final cmdLeftShift = (_cmdPanelPosition == 'left') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
     final cmdRightShift = (_cmdPanelPosition == 'right') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
+
+    // SafeAreaのbottom（ナビゲーションバー等）
+    final safeBottom = mediaQuery.padding.bottom;
 
     double dpadShift(String pos) => (_dpadPosition == pos) ? (150.0 * _dpadEffectiveScale + 8.0) : 0.0;
     double scShift(String pos) => (_shortcutPosition == pos) ? (150.0 * _shortcutPadEffectiveScale + 8.0) : 0.0;
 
+    // メッセージ領域が上部に配置されている場合のシフト量
+    // 全幅('top')は全コーナーに影響、部分幅('top_left'/'top_right')は同コーナーのみ
+    final estimatedMsgHeight = (_msgFontSize + 2.0) * _msgLineCount + 12.0;
+    double msgTopShift(String buttonCorner) {
+      if (_msgPosition == 'top') return estimatedMsgHeight;
+      if (_msgPosition == buttonCorner) return estimatedMsgHeight;
+      return 0.0;
+    }
+
     switch (_menuButtonPosition) {
       case 'top_left':
-        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_left') + scShift('top_left');
+        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_left') + scShift('top_left')
+            + msgTopShift('top_left');
         left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'top_right':
-        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_right') + scShift('top_right');
+        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_right') + scShift('top_right')
+            + msgTopShift('top_right');
         right = 8.0 + statusRightShift + cmdRightShift;
         break;
       case 'left_edge':
@@ -623,11 +638,15 @@ class _MyHomePageState extends State<MyHomePage> {
         right = 8.0 + statusRightShift + cmdRightShift;
         break;
       case 'bottom_left':
-        bottom = 8.0 + statusBottomShift + _dialogBottomInset(context) + dpadShift('bottom_left') + scShift('bottom_left');
+        // _dialogBottomInset は使用しない（二重加算バグを防ぐため）
+        // safeBottom + ステータス + コマンドパネル + 同コーナーのDPad/Shortcut のみ積む
+        bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift
+               + dpadShift('bottom_left') + scShift('bottom_left');
         left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'bottom_right':
-        bottom = 8.0 + statusBottomShift + _dialogBottomInset(context) + dpadShift('bottom_right') + scShift('bottom_right');
+        bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift
+               + dpadShift('bottom_right') + scShift('bottom_right');
         right = 8.0 + statusRightShift + cmdRightShift;
         break;
     }
@@ -672,20 +691,36 @@ class _MyHomePageState extends State<MyHomePage> {
     final statusRightShift = (_statusPosition == 'right') ? _statusWidth : 0.0;
 
     final cmdTopShift = (_cmdPanelPosition == 'top') ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
+    final cmdBottomShift = (_cmdPanelPosition == 'bottom') ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
     final cmdLeftShift = (_cmdPanelPosition == 'left') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
     final cmdRightShift = (_cmdPanelPosition == 'right') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
 
+    // SafeAreaのbottom（ナビゲーションバー等）
+    final safeBottom = mediaQuery.padding.bottom;
+
     double dpadShift(String pos) => (_dpadPosition == pos) ? (150.0 * _dpadEffectiveScale + 8.0) : 0.0;
     double scShift(String pos) => (_shortcutPosition == pos) ? (150.0 * _shortcutPadEffectiveScale + 8.0) : 0.0;
+    // メニューボタンが同じコーナーにある場合のみシフト
     double menuShift(String pos) => (_menuButtonPosition == pos) ? 48.0 : 0.0;
+
+    // メッセージ領域が上部に配置されている場合のシフト量
+    // 全幅('top')は全コーナーに影響、部分幅('top_left'/'top_right')は同コーナーのみ
+    final estimatedMsgHeight = (_msgFontSize + 2.0) * _msgLineCount + 12.0;
+    double msgTopShift(String buttonCorner) {
+      if (_msgPosition == 'top') return estimatedMsgHeight;
+      if (_msgPosition == buttonCorner) return estimatedMsgHeight;
+      return 0.0;
+    }
 
     switch (_mapButtonPosition) {
       case 'top_left':
-        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_left') + scShift('top_left') + menuShift('top_left');
+        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_left') + scShift('top_left')
+            + msgTopShift('top_left') + menuShift('top_left');
         left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'top_right':
-        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_right') + scShift('top_right') + menuShift('top_right');
+        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_right') + scShift('top_right')
+            + msgTopShift('top_right') + menuShift('top_right');
         right = 8.0 + statusRightShift + cmdRightShift;
         break;
       case 'left_edge':
@@ -697,11 +732,14 @@ class _MyHomePageState extends State<MyHomePage> {
         right = 8.0 + statusRightShift + cmdRightShift;
         break;
       case 'bottom_left':
-        bottom = 8.0 + statusBottomShift + _dialogBottomInset(context) + dpadShift('bottom_left') + scShift('bottom_left') + menuShift('bottom_left');
+        // _dialogBottomInset は使用しない（二重加算バグを防ぐため）
+        bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift
+               + dpadShift('bottom_left') + scShift('bottom_left') + menuShift('bottom_left');
         left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'bottom_right':
-        bottom = 8.0 + statusBottomShift + _dialogBottomInset(context) + dpadShift('bottom_right') + scShift('bottom_right') + menuShift('bottom_right');
+        bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift
+               + dpadShift('bottom_right') + scShift('bottom_right') + menuShift('bottom_right');
         right = 8.0 + statusRightShift + cmdRightShift;
         break;
     }
