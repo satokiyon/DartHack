@@ -40,6 +40,12 @@ class _SettingsPageState extends State<SettingsPage> {
   String _menuButtonPosition = 'bottom_left';
   bool _showMapButton = true;
   String _mapButtonPosition = 'bottom_right';
+  String _dpadPosition = 'bottom_left';
+  String _shortcutPosition = 'bottom_right';
+  String _msgPosition = 'bottom';
+  int _msgCharWidth = 30;
+  String _statusPosition = 'bottom';
+  String _cmdPanelPosition = 'top';
   String _dpadLongPressMoveMode = 'G_UPPER';
   String _mapTapTravelMode = 'always';
 
@@ -200,6 +206,12 @@ class _SettingsPageState extends State<SettingsPage> {
       _menuButtonPosition = prefs.getString('menu_button_position') ?? 'bottom_left';
       _showMapButton = prefs.getBool('show_map_button') ?? true;
       _mapButtonPosition = prefs.getString('map_button_position') ?? 'bottom_right';
+      _dpadPosition = prefs.getString('dpad_position') ?? 'bottom_left';
+      _shortcutPosition = prefs.getString('shortcut_position') ?? 'bottom_right';
+      _msgPosition = prefs.getString('msg_position') ?? 'top';
+      _msgCharWidth = prefs.getInt('msg_char_width') ?? 30;
+      _statusPosition = prefs.getString('status_position') ?? 'top';
+      _cmdPanelPosition = prefs.getString('cmd_panel_position') ?? 'bottom';
       _dpadLongPressMoveMode = prefs.getString('dpad_long_press_move_mode') ?? 'G_UPPER';
       _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'always';
 
@@ -651,6 +663,125 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
               ),
             ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _buildUILayoutSection() {
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.dashboard_customize, color: Colors.cyanAccent),
+        title: const Text("UI配置カスタマイズ"),
+        subtitle: const Text("各UIエレメントの画面上の位置を指定します"),
+        children: _withDividers([
+          ListTile(
+            title: const Text("移動パッド位置"),
+            trailing: DropdownButton<String>(
+              value: _dpadPosition,
+              items: const [
+                DropdownMenuItem(value: 'bottom_left', child: Text('画面左下')),
+                DropdownMenuItem(value: 'top_left', child: Text('画面左上')),
+                DropdownMenuItem(value: 'bottom_right', child: Text('画面右下')),
+                DropdownMenuItem(value: 'top_right', child: Text('画面右上')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _dpadPosition = val);
+                  _saveSetting('dpad_position', val);
+                }
+              },
+            ),
+          ),
+          ListTile(
+            title: const Text("ショートカットボタン位置"),
+            trailing: DropdownButton<String>(
+              value: _shortcutPosition,
+              items: const [
+                DropdownMenuItem(value: 'bottom_right', child: Text('画面右下')),
+                DropdownMenuItem(value: 'top_right', child: Text('画面右上')),
+                DropdownMenuItem(value: 'bottom_left', child: Text('画面左下')),
+                DropdownMenuItem(value: 'top_left', child: Text('画面左上')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _shortcutPosition = val);
+                  _saveSetting('shortcut_position', val);
+                }
+              },
+            ),
+          ),
+          ListTile(
+            title: const Text("ステータス領域位置"),
+            trailing: DropdownButton<String>(
+              value: _statusPosition,
+              items: const [
+                DropdownMenuItem(value: 'top', child: Text('画面上部 (横型)')),
+                DropdownMenuItem(value: 'bottom', child: Text('画面下部 (横型)')),
+                DropdownMenuItem(value: 'left', child: Text('画面左 (縦型)')),
+                DropdownMenuItem(value: 'right', child: Text('画面右 (縦型)')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _statusPosition = val);
+                  _saveSetting('status_position', val);
+                }
+              },
+            ),
+          ),
+          ListTile(
+            title: const Text("メッセージ領域位置"),
+            trailing: DropdownButton<String>(
+              value: _msgPosition,
+              items: const [
+                DropdownMenuItem(value: 'top', child: Text('画面上部 (幅フル)')),
+                DropdownMenuItem(value: 'bottom', child: Text('画面下部 (幅フル)')),
+                DropdownMenuItem(value: 'top_left', child: Text('画面左上')),
+                DropdownMenuItem(value: 'bottom_left', child: Text('画面左下')),
+                DropdownMenuItem(value: 'top_right', child: Text('画面右上')),
+                DropdownMenuItem(value: 'bottom_right', child: Text('画面右下')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _msgPosition = val);
+                  _saveSetting('msg_position', val);
+                }
+              },
+            ),
+          ),
+          if (_msgPosition != 'bottom' && _msgPosition != 'top')
+            ListTile(
+              title: const Text("メッセージ1行あたりの文字数 (横幅)"),
+              subtitle: Slider(
+                value: _msgCharWidth.toDouble(),
+                min: 20,
+                max: 60,
+                divisions: 40,
+                label: "$_msgCharWidth 文字",
+                onChanged: (val) {
+                  setState(() => _msgCharWidth = val.toInt());
+                  _saveSetting('msg_char_width', val.toInt());
+                },
+              ),
+            ),
+          ListTile(
+            title: const Text("コマンドパネル位置"),
+            trailing: DropdownButton<String>(
+              value: _cmdPanelPosition,
+              items: const [
+                DropdownMenuItem(value: 'bottom', child: Text('画面下部 (横型)')),
+                DropdownMenuItem(value: 'top', child: Text('画面上部 (横型)')),
+                DropdownMenuItem(value: 'left', child: Text('画面左 (縦型)')),
+                DropdownMenuItem(value: 'right', child: Text('画面右 (縦型)')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _cmdPanelPosition = val);
+                  _saveSetting('cmd_panel_position', val);
+                }
+              },
+            ),
+          ),
         ]),
       ),
     );
@@ -1588,7 +1719,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.amberAccent),
                 ),
                 SizedBox(height: 8),
-                Text("DartHack は、NetHack をベースとしつつ、Flutter/Dart によって再構築した独自実装のモバイル版です。本アプリはオリジナルの NetHack を深く敬意をもって参照し活用していますが、NetHack 開発チーム（The NetHack DevTeam）とは一切の関係ありません。"),
+                Text("DartHack は、NetHack をベースとしつつ、Flutter/Dart によって再構築したモバイル版です。本アプリはオリジナルの NetHack をゲームコアとして使用していますが、NetHack 開発チーム（The NetHack DevTeam）とは一切の関係ありません。"),
                 SizedBox(height: 8),
                 Text("本アプリは NetHack General Public License (NGPL) に基づき配布されています。  ソースコードは以下にて公開しています：https://github.com/satokiyon/DartHack"),
                 SizedBox(height: 8),
@@ -1599,7 +1730,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white70),
                 ),
                 SizedBox(height: 4),
-                Text("• @satokiyon (NetHackJP Contributor)"),
+                Text("• @satokiyon"),
                 Text("• with Google Antigravity and Gemini"),
               ],
             ),
@@ -1621,6 +1752,7 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildScreenModeSection(), //イマーシブ・ステータス表示モード・
           _buildMessageSection(),  // メッセージ設定
           const Divider(height: 1),   //区切り線
+          _buildUILayoutSection(), // UI配置カスタマイズ
           _buildControllerSection(), //コントローラー設定
           _buildShortcutSection(), // ショートカットカスタマイズ
           _buildCmdPanelSection(), //コマンドパネル編集

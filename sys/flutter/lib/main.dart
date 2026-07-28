@@ -21,8 +21,12 @@ import 'utils/scale_clamp.dart';
 import 'dart:ffi' hide Size;
 import 'dart:convert';
 import 'package:ffi/ffi.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'widgets/exit_ad_banner.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  unawaited(MobileAds.instance.initialize());
   runApp(const MyApp());
 }
 
@@ -172,6 +176,12 @@ class _MyHomePageState extends State<MyHomePage> {
   String _menuButtonPosition = 'top_left';
   bool _showMapButton = true;
   String _mapButtonPosition = 'bottom_right';
+  String _dpadPosition = 'bottom_left';
+  String _shortcutPosition = 'bottom_right';
+  String _msgPosition = 'top';
+  int _msgCharWidth = 30;
+  String _statusPosition = 'top';
+  String _cmdPanelPosition = 'bottom';
   bool _isTopDrawerOpen = false;
   bool _isBottomDrawerOpen = false;
   bool _isMainGameStarted = false;
@@ -191,6 +201,8 @@ class _MyHomePageState extends State<MyHomePage> {
   // 設定変更の即時反映用バージョンカウンター
   int _controlsVersion = 0;
   double _cmdPanelHeight = 58.0;
+  double _statusHeight = 38.0;
+  double _statusWidth = 70.0;
   bool _showPanelNames = true;
   DPadMoveMode _dPadMoveMode = DPadMoveMode.normal;
   DPadMoveMode _dPadLongPressMoveMode = DPadMoveMode.gUpper;
@@ -245,6 +257,12 @@ class _MyHomePageState extends State<MyHomePage> {
       _menuButtonPosition = prefs.getString('menu_button_position') ?? 'bottom_left';
       _showMapButton = prefs.getBool('show_map_button') ?? true;
       _mapButtonPosition = prefs.getString('map_button_position') ?? 'bottom_right';
+      _dpadPosition = prefs.getString('dpad_position') ?? 'bottom_left';
+      _shortcutPosition = prefs.getString('shortcut_position') ?? 'bottom_right';
+      _msgPosition = prefs.getString('msg_position') ?? 'top';
+      _msgCharWidth = prefs.getInt('msg_char_width') ?? 30;
+      _statusPosition = prefs.getString('status_position') ?? 'top';
+      _cmdPanelPosition = prefs.getString('cmd_panel_position') ?? 'bottom';
       _enabledDPadMoveModes = _parseEnabledMoveModes(
         prefs.getString('dpad_enabled_move_modes') ??
             'NORMAL,UPPER,G_LOWER,G_UPPER,CTRL,M_CMD,F_CMD',
@@ -575,35 +593,42 @@ class _MyHomePageState extends State<MyHomePage> {
     double? right;
 
     final mediaQuery = MediaQuery.of(context);
-    final topOffset = 100.0; // ステータス(38px)+メッセージ(54px)+マージン
+    final statusTopShift = (_statusPosition == 'top') ? _statusHeight : 0.0;
+    final statusBottomShift = (_statusPosition == 'bottom') ? _statusHeight : 0.0;
+    final statusLeftShift = (_statusPosition == 'left') ? _statusWidth : 0.0;
+    final statusRightShift = (_statusPosition == 'right') ? _statusWidth : 0.0;
 
-    // コントローラ表示時は重なりを避けるために十分な下余白を確保する
-    final double bottomOffset = _dialogBottomInset(context);
+    final cmdTopShift = (_cmdPanelPosition == 'top') ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
+    final cmdLeftShift = (_cmdPanelPosition == 'left') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
+    final cmdRightShift = (_cmdPanelPosition == 'right') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
+
+    double dpadShift(String pos) => (_dpadPosition == pos) ? (150.0 * _dpadEffectiveScale + 8.0) : 0.0;
+    double scShift(String pos) => (_shortcutPosition == pos) ? (150.0 * _shortcutPadEffectiveScale + 8.0) : 0.0;
 
     switch (_menuButtonPosition) {
       case 'top_left':
-        top = topOffset;
-        left = 8;
+        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_left') + scShift('top_left');
+        left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'top_right':
-        top = topOffset;
-        right = 8;
+        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_right') + scShift('top_right');
+        right = 8.0 + statusRightShift + cmdRightShift;
         break;
       case 'left_edge':
         top = mediaQuery.size.height * 0.4;
-        left = 8;
+        left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'right_edge':
         top = mediaQuery.size.height * 0.4;
-        right = 8;
+        right = 8.0 + statusRightShift + cmdRightShift;
         break;
       case 'bottom_left':
-        bottom = bottomOffset;
-        left = 8;
+        bottom = 8.0 + statusBottomShift + _dialogBottomInset(context) + dpadShift('bottom_left') + scShift('bottom_left');
+        left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'bottom_right':
-        bottom = bottomOffset;
-        right = 8;
+        bottom = 8.0 + statusBottomShift + _dialogBottomInset(context) + dpadShift('bottom_right') + scShift('bottom_right');
+        right = 8.0 + statusRightShift + cmdRightShift;
         break;
     }
 
@@ -641,35 +666,43 @@ class _MyHomePageState extends State<MyHomePage> {
     double? right;
 
     final mediaQuery = MediaQuery.of(context);
-    final topOffset = 100.0; // ステータス(38px)+メッセージ(54px)+マージン
+    final statusTopShift = (_statusPosition == 'top') ? _statusHeight : 0.0;
+    final statusBottomShift = (_statusPosition == 'bottom') ? _statusHeight : 0.0;
+    final statusLeftShift = (_statusPosition == 'left') ? _statusWidth : 0.0;
+    final statusRightShift = (_statusPosition == 'right') ? _statusWidth : 0.0;
 
-    // コントローラ表示時は重なりを避けるために十分な下余白を確保する
-    final double bottomOffset = _dialogBottomInset(context);
+    final cmdTopShift = (_cmdPanelPosition == 'top') ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
+    final cmdLeftShift = (_cmdPanelPosition == 'left') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
+    final cmdRightShift = (_cmdPanelPosition == 'right') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
+
+    double dpadShift(String pos) => (_dpadPosition == pos) ? (150.0 * _dpadEffectiveScale + 8.0) : 0.0;
+    double scShift(String pos) => (_shortcutPosition == pos) ? (150.0 * _shortcutPadEffectiveScale + 8.0) : 0.0;
+    double menuShift(String pos) => (_menuButtonPosition == pos) ? 48.0 : 0.0;
 
     switch (_mapButtonPosition) {
       case 'top_left':
-        top = topOffset;
-        left = 8;
+        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_left') + scShift('top_left') + menuShift('top_left');
+        left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'top_right':
-        top = topOffset;
-        right = 8;
+        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_right') + scShift('top_right') + menuShift('top_right');
+        right = 8.0 + statusRightShift + cmdRightShift;
         break;
       case 'left_edge':
-        top = mediaQuery.size.height * 0.4;
-        left = 8;
+        top = mediaQuery.size.height * 0.4 + menuShift('left_edge');
+        left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'right_edge':
-        top = mediaQuery.size.height * 0.4;
-        right = 8;
+        top = mediaQuery.size.height * 0.4 + menuShift('right_edge');
+        right = 8.0 + statusRightShift + cmdRightShift;
         break;
       case 'bottom_left':
-        bottom = bottomOffset;
-        left = 8;
+        bottom = 8.0 + statusBottomShift + _dialogBottomInset(context) + dpadShift('bottom_left') + scShift('bottom_left') + menuShift('bottom_left');
+        left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'bottom_right':
-        bottom = bottomOffset;
-        right = 8;
+        bottom = 8.0 + statusBottomShift + _dialogBottomInset(context) + dpadShift('bottom_right') + scShift('bottom_right') + menuShift('bottom_right');
+        right = 8.0 + statusRightShift + cmdRightShift;
         break;
     }
 
@@ -1133,9 +1166,16 @@ class _MyHomePageState extends State<MyHomePage> {
           child: AlertDialog(
             backgroundColor: Colors.grey[900],
             title: const Text('終了', style: TextStyle(color: Colors.white)),
-            content: Text(
-              dialogMessage,
-              style: const TextStyle(color: Colors.white70),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  dialogMessage,
+                  style: const TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 16),
+                const ExitAdBanner(),
+              ],
             ),
             actions: [
               TextButton(
@@ -3432,7 +3472,6 @@ class _MyHomePageState extends State<MyHomePage> {
   //   "%s%sを何と名付けますか?" (do_oname 経由の name)
   //   "この液体を何と呼びますか?" (流し台の药水)
   //   "このダンジョン階層にどのような名前を付けますか?" (nhlua.c:693)
-  //   英語版: "What do you want to call/name this ___?" も念のため拾う。
   // 銘刻/ウィッシュ/虐殺/拡張コマンドは除外。
   bool _isCallOrNamePrompt(String prompt) {
     if (prompt.isEmpty) return false;
@@ -3441,6 +3480,149 @@ class _MyHomePageState extends State<MyHomePage> {
         || prompt.contains('名前を付け')
         || prompt.toLowerCase().contains('call this')
         || prompt.toLowerCase().contains('name this');
+  }
+
+  Widget _buildGameScreen() {
+    return ListenableBuilder(
+      listenable: _screen,
+      builder: (context, _) {
+        final mapWidget = Container(
+          key: _mapViewportKey,
+          color: Colors.black,
+          child: InteractiveViewer(
+            transformationController: _transformationController,
+            boundaryMargin: const EdgeInsets.all(2000.0),
+            constrained: false,
+            maxScale: 6.0,
+            minScale: 0.5,
+            onInteractionStart: (details) {
+              _isMapScrolledOrZoomed = true;
+            },
+            onInteractionUpdate: (details) {
+              _currentScale = _transformationController.value.getMaxScaleOnAxis();
+              _isMapScrolledOrZoomed = true;
+            },
+            child: Center(
+              child: SizedBox(
+                width: 4000.0,
+                height: 3000.0,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTapDown: (details) {
+                    _lastMapTapDownDetails = details;
+                  },
+                  onTap: () {
+                    if (_lastMapTapDownDetails != null) {
+                      _handleMapTap(_lastMapTapDownDetails!);
+                    }
+                  },
+                  child: CustomPaint(
+                    painter: NetHackMapPainter(
+                      screen: _screen,
+                      tileImage: _tileImage,
+                      tileWidth: _tileWidth,
+                      tileHeight: _tileHeight,
+                      useTiles: _useTiles,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        final horizontalStatusWidget = LayoutBuilder(
+          builder: (context, constraints) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                final RenderBox? box = context.findRenderObject() as RenderBox?;
+                if (box != null && box.hasSize) {
+                  final h = box.size.height;
+                  if ((_statusHeight - h).abs() > 0.5) {
+                    setState(() => _statusHeight = h);
+                  }
+                }
+              }
+            });
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: _isGameRunning && _isMainGameStarted && _waitingForInput
+                  ? () => _sendShortcutToC('#attributes\n')
+                  : null,
+              child: _statusDisplayMode == 0
+                  ? Container(
+                      height: 38,
+                      width: double.infinity,
+                      color: Colors.black,
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      alignment: Alignment.centerLeft,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text.rich(
+                          TextSpan(
+                            children: _screen.statusLines.map((line) => _parseStatusLine(line)).toList().fold<List<InlineSpan>>([], (prev, element) {
+                              if (prev.isNotEmpty) {
+                                prev.add(const TextSpan(text: '\n'));
+                              }
+                              prev.add(element);
+                              return prev;
+                            }),
+                          ),
+                        ),
+                      ),
+                    )
+                  : Container(
+                      width: double.infinity,
+                      color: Colors.black,
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      child: Text.rich(
+                        TextSpan(
+                          children: _screen.statusLines.map((line) => _parseStatusLine(line)).toList().fold<List<InlineSpan>>([], (prev, element) {
+                            if (prev.isNotEmpty) {
+                              prev.add(const TextSpan(text: '\n'));
+                            }
+                            prev.add(element);
+                            return prev;
+                          }),
+                        ),
+                      ),
+                    ),
+            );
+          },
+        );
+
+        if (_statusPosition == 'left') {
+          return Row(
+            children: [
+              _buildVerticalStatusPanel(false),
+              Expanded(child: mapWidget),
+            ],
+          );
+        } else if (_statusPosition == 'right') {
+          return Row(
+            children: [
+              Expanded(child: mapWidget),
+              _buildVerticalStatusPanel(true),
+            ],
+          );
+        } else if (_statusPosition == 'bottom') {
+          return Column(
+            children: [
+              Expanded(child: mapWidget),
+              horizontalStatusWidget,
+            ],
+          );
+        }
+
+        return Column(
+          children: [
+            horizontalStatusWidget,
+            Expanded(child: mapWidget),
+          ],
+        );
+      },
+    );
   }
 
   void _showScoreboardDialog() {
@@ -3528,6 +3710,57 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget _buildVerticalStatusPanel(bool isRight) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            final RenderBox? box = context.findRenderObject() as RenderBox?;
+            if (box != null && box.hasSize) {
+              final w = box.size.width;
+              if ((_statusWidth - w).abs() > 0.5) {
+                setState(() => _statusWidth = w);
+              }
+            }
+          }
+        });
+
+        final statusText = _screen.statusLines.join('\n');
+        final lines = statusText.split(RegExp(r'[\n\r]+')).expand((l) {
+          // 1行に複数項目がスペース区切りで入っている場合、適度に改行に分割する
+          final parts = l.split(RegExp(r'\s{2,}')).where((p) => p.trim().isNotEmpty);
+          return parts.isEmpty ? [l] : parts;
+        }).toList();
+
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: _isGameRunning && _isMainGameStarted && _waitingForInput
+              ? () => _sendShortcutToC('#attributes\n')
+              : null,
+          child: Container(
+            width: 115.0,
+            height: double.infinity,
+            color: Colors.black.withValues(alpha: 0.85),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+            alignment: isRight ? Alignment.topRight : Alignment.topLeft,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: lines.map((line) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 1.5),
+                    child: Text.rich(_parseStatusLine(line)),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _showSettingsDialog() {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -3545,369 +3778,252 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Widget _buildGameScreen() {
-    return ListenableBuilder(
-      listenable: _screen,
-      builder: (context, _) {
-        return Stack(
-          children: [
-            Column(
+  Widget _buildTextOverlay() {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black.withValues(alpha: 0.92),
+        padding: EdgeInsets.fromLTRB(16, 16, 16, _dialogBottomInset(context)),
+        child: Card(
+          margin: EdgeInsets.zero,
+          color: const Color(0xFF12161D),
+          elevation: 12,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. ステータス領域 (Java版に合わせて最上部に配置)
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: _isGameRunning && _isMainGameStarted && _waitingForInput
-                      ? () => _sendShortcutToC('#attributes\n')
-                      : null,
-                  child: _statusDisplayMode == 0
-                      ? Container(
-                          height: 38,
-                          width: double.infinity,
-                          color: Colors.black,
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                          alignment: Alignment.centerLeft,
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: Text.rich(
-                              TextSpan(
-                                children: _screen.statusLines.map((line) => _parseStatusLine(line)).toList().fold<List<InlineSpan>>([], (prev, element) {
-                                  if (prev.isNotEmpty) {
-                                    prev.add(const TextSpan(text: '\n'));
-                                  }
-                                  prev.add(element);
-                                  return prev;
-                                }),
-                              ),
-                            ),
-                          ),
-                        )
-                      : Container(
-                          width: double.infinity,
-                          color: Colors.black,
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                          child: Text.rich(
-                            TextSpan(
-                              children: _screen.statusLines.map((line) => _parseStatusLine(line)).toList().fold<List<InlineSpan>>([], (prev, element) {
-                                if (prev.isNotEmpty) {
-                                  prev.add(const TextSpan(text: '\n'));
-                                }
-                                prev.add(element);
-                                return prev;
-                              }),
-                            ),
-                          ),
-                        ),
-                ),
-                // 2(旧). メッセージ領域は廃止 — マップ上のオーバーレイで表示
-                // 3. マップ表示（メッセージオーバーレイを重ねるため Stack でラップ）
                 Expanded(
-                  child: Stack(
-                    children: [
-                      // マップ本体
-                      Container(
-                        key: _mapViewportKey,
-                        color: Colors.black,
-                        child: InteractiveViewer(
-                          transformationController: _transformationController,
-                          boundaryMargin: const EdgeInsets.all(2000.0), // 十分なマージンを設けて枠外への無限移動（クランプ解除）を許可
-                          constrained: false, // 子が親(画面幅)に制限されずunconstrainedでスクロール可能にする
-                          maxScale: 6.0,
-                          minScale: 0.5,
-                          onInteractionStart: (details) {
-                            _isMapScrolledOrZoomed = true;
-                          },
-                          onInteractionUpdate: (details) {
-                            // ユーザーがピンチズームしたズーム倍率をリアルタイムに保存
-                            _currentScale = _transformationController.value.getMaxScaleOnAxis();
-                            _isMapScrolledOrZoomed = true;
-                          },
-                          child: Center(
-                            child: SizedBox(
-                              width: 4000.0, // 巨大キャンバスでくるみ InteractiveViewer のクランプを完全無効化
-                              height: 3000.0,
-                              // マップタップ検出: 主人公タイルをタップで
-                              // #herecmdmenu を発動する (Java 版と同じ挙動)。
-                              // 単発タップのみ拾う (onTapUp) ことで
-                              // InteractiveViewer のパン/ピンチ操作と競合させない。
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.translucent,
-                                onTapDown: (details) {
-                                  _lastMapTapDownDetails = details;
-                                },
-                                onTap: () {
-                                  if (_lastMapTapDownDetails != null) {
-                                    _handleMapTap(_lastMapTapDownDetails!);
-                                  }
-                                },
-                                child: CustomPaint(
-                                  painter: NetHackMapPainter(
-                                    screen: _screen,
-                                    tileImage: _tileImage,
-                                    tileWidth: _tileWidth,
-                                    tileHeight: _tileHeight,
-                                    useTiles: _useTiles,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                  child: () {
+                    final isTombstone = _screen.textLines.length >= 13 &&
+                        ((_screen.textLines.any((line) => line.contains('REST')) &&
+                            _screen.textLines.any((line) => line.contains('PEACE'))) ||
+                        _screen.textLines.any((line) => line.contains('REST    \\')));
+
+                    if (isTombstone) {
+                      if (_tombstoneDisplayMode == 0) {
+                        final data = TombstoneData.parse(_screen.textLines);
+                        return UniversalTombstoneWidget(
+                          mode: TombstoneDisplayMode.image,
+                          data: data,
+                          lines: _screen.textLines,
+                        );
+                      }
+                      return UniversalTombstoneWidget(
+                        mode: TombstoneDisplayMode.text,
+                        lines: _screen.textLines,
+                      );
+                    }
+
+                    final isTopTen = _screen.textLines.any((line) =>
+                        line.contains('順位') &&
+                        line.contains('点数') &&
+                        line.contains('名前'));
+
+                    if (isTopTen) {
+                      final data = TopTenEntry.parse(_screen.textLines, _screen.textAttrs);
+                      return TopTenWidget(entries: data);
+                    }
+
+                    return Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
                       ),
-                      // メッセージオーバーレイ（マップ上部に半透明で重ねる）
-                      // タップすると履歴パネルを表示する、またはMORE状態を解除する
-                      if (_screen.messageHistory.isNotEmpty || _screen.topline != null)
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          child: Builder(
-                            builder: (context) {
-                              final displayedLines = List<String>.from(
-                                _screen.messageHistory.sublist(
-                                  _screen.messageHistory.length > _msgLineCount
-                                      ? _screen.messageHistory.length - _msgLineCount
-                                      : 0,
-                                ),
-                              );
-                              // topline (farlook 説明など) があれば
-                              // 履歴の最下行を上書きする。 履歴が空なら
-                              // topline 単独で 1 行表示。
-                              final topline = _screen.topline;
-                              final isToplineActive = topline != null;
-                              if (isToplineActive) {
-                                if (displayedLines.isNotEmpty) {
-                                  displayedLines[displayedLines.length - 1] = topline;
-                                } else {
-                                  displayedLines.add(topline);
-                                }
-                              }
-                              if (_screen.isMoreActive) {
-                                displayedLines.add(" -- MORE --");
-                              }
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: displayedLines.asMap().entries.map((entry) {
-                                  final index = entry.key;
-                                  final line = entry.value;
-                                  final isMoreLine = _screen.isMoreActive && index == displayedLines.length - 1;
-                                  final isToplineLine = isToplineActive &&
-                                      index == displayedLines.length - 1 - (_screen.isMoreActive ? 1 : 0);
-                                  final double ratio = displayedLines.length > 1
-                                      ? index / (displayedLines.length - 1)
-                                      : 1.0;
-                                  final color = isMoreLine
-                                      ? Colors.amber[400]!
-                                      : isToplineLine
-                                          ? Colors.cyanAccent[200]!
-                                          : Color.lerp(Colors.white30, Colors.white, ratio)!;
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        itemCount: _screen.textLines.length,
+                        itemBuilder: (context, index) {
+                          final line = _screen.textLines[index];
+                          final trimmed = line.trim();
+                          final isDivider = trimmed.isEmpty || RegExp(r'^[-=\s]+$').hasMatch(trimmed);
+                          final isCategory = !_screen.isPlainDialog && !isDivider && (trimmed.endsWith(':') || trimmed.endsWith('：'));
 
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 2.0),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        if (_screen.isMoreActive) {
-                                          _sendFfiKey(32, 'Space');
-                                          _screen.setMoreActive(false);
-                                        } else {
-                                          _showMsgHistoryPanel();
-                                        }
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.black.withValues(alpha: _msgOpacity),
-                                          borderRadius: BorderRadius.circular(4.0),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                                        child: Text(
-                                          line,
-                                          style: TextStyle(
-                                            color: color,
-                                            fontFamily: 'monospace',
-                                            fontSize: _msgFontSize,
-                                            fontWeight: (isMoreLine || isToplineLine)
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              );
-                            },
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            // テキスト/ヘルプウィンドウのオーバーレイ表示
-            if (_screen.isTextWindowVisible)
-              Positioned.fill(
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.92),
-                  padding: EdgeInsets.fromLTRB(16, 16, 16, _dialogBottomInset(context)),
-                  child: Card(
-                    margin: EdgeInsets.zero,
-                    color: const Color(0xFF12161D),
-                    elevation: 12,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: () {
-                              final isTombstone = _screen.textLines.length >= 13 &&
-                                  ((_screen.textLines.any((line) => line.contains('REST')) &&
-                                      _screen.textLines.any((line) => line.contains('PEACE'))) ||
-                                  _screen.textLines.any((line) => line.contains('REST    \\')));
+                          if (isCategory) {
+                            return _buildMenuCategoryRow(line);
+                          }
+                          if (isDivider) {
+                            if (trimmed.isEmpty) {
+                              return const SizedBox(height: 8);
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Divider(color: Colors.white.withValues(alpha: 0.14), height: 1),
+                            );
+                          }
 
-                              if (isTombstone) {
-                                if (_tombstoneDisplayMode == 0) {
-                                  final data = TombstoneData.parse(_screen.textLines);
-                                  return UniversalTombstoneWidget(
-                                    mode: TombstoneDisplayMode.image,
-                                    data: data,
-                                    lines: _screen.textLines,
-                                  );
-                                }
-                                return UniversalTombstoneWidget(
-                                  mode: TombstoneDisplayMode.text,
-                                  lines: _screen.textLines,
-                                );
-                              }
+                          final tile = (index < _screen.textTiles.length)
+                              ? _screen.textTiles[index]
+                              : -1;
 
-                              final isTopTen = _screen.textLines.any((line) =>
-                                  line.contains('順位') &&
-                                  line.contains('点数') &&
-                                  line.contains('名前'));
-
-                              if (isTopTen) {
-                                final data = TopTenEntry.parse(_screen.textLines, _screen.textAttrs);
-                                return TopTenWidget(entries: data);
-                              }
-
-                              return Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.18),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-                                ),
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                child: ListView.builder(
-                                  padding: EdgeInsets.zero,
-                                  itemCount: _screen.textLines.length,
-                                  itemBuilder: (context, index) {
-                                    final line = _screen.textLines[index];
-                                    final trimmed = line.trim();
-                                    final isDivider = trimmed.isEmpty || RegExp(r'^[-=\s]+$').hasMatch(trimmed);
-                                    final isCategory = !_screen.isPlainDialog && !isDivider && (trimmed.endsWith(':') || trimmed.endsWith('：'));
-
-                                    if (isCategory) {
-                                      return _buildMenuCategoryRow(line);
-                                    }
-                                    if (isDivider) {
-                                      if (trimmed.isEmpty) {
-                                        return const SizedBox(height: 8);
-                                      }
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 6),
-                                        child: Divider(color: Colors.white.withValues(alpha: 0.14), height: 1),
-                                      );
-                                    }
-
-                                    // putmixed 経由のテキスト (例: `/` 結果リスト) は
-                                    // C 側 (`winflutter.c::flutter_putmixed_with_tile`)
-                                    // で `decode_mixed()` により showsym 1 文字
-                                    // (CP437) にデコード済み。 そのまま表示する。
-                                    // タイルモード時のみ、 テキスト先頭にタイル画像を
-                                    // 並べて表示する (showsym 文字と重複しない)。
-                                    final tile = (index < _screen.textTiles.length)
-                                        ? _screen.textTiles[index]
-                                        : -1;
-
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 4),
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          _buildMenuItemTile(tile),
-                                          const SizedBox(width: 4),
-                                          Expanded(
-                                            child: Text(
-                                              line,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontFamily: 'monospace',
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                              );
-                            }(),
-                          ),
-                          const SizedBox(height: 12),
-                          Center(
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
                             child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                _buildMsgHistoryButton(),
-                                const SizedBox(width: 12),
-                                ElevatedButton(
-                                  onPressed: () => _sendFfiKey(32, "Space"),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.teal[500],
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    "OK",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                _buildMenuItemTile(tile),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    line,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'monospace',
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
+                    );
+                  }(),
+                ),
+                const SizedBox(height: 12),
+                Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildMsgHistoryButton(),
+                      const SizedBox(width: 12),
+                      ElevatedButton(
+                        onPressed: () => _sendFfiKey(32, "Space"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.teal[500],
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          "OK",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMessageWidget() {
+    return ListenableBuilder(
+      listenable: _screen,
+      builder: (context, _) {
+        final displayedLines = List<String>.from(
+          _screen.messageHistory.sublist(
+            _screen.messageHistory.length > _msgLineCount
+                ? _screen.messageHistory.length - _msgLineCount
+                : 0,
+          ),
+        );
+        final topline = _screen.topline;
+        final isToplineActive = topline != null;
+        if (isToplineActive) {
+          if (displayedLines.isNotEmpty) {
+            displayedLines[displayedLines.length - 1] = topline;
+          } else {
+            displayedLines.add(topline);
+          }
+        }
+        if (_screen.isMoreActive) {
+          displayedLines.add(" -- MORE --");
+        }
+
+        if (displayedLines.isEmpty) return const SizedBox.shrink();
+
+        final screenWidth = MediaQuery.of(context).size.width;
+        final double? targetWidth = (_msgPosition == 'bottom' || _msgPosition == 'top')
+            ? null
+            : (screenWidth * (_msgCharWidth / 60.0)).clamp(180.0, screenWidth - 16.0);
+
+        return Container(
+          width: targetWidth,
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: _msgOpacity),
+            borderRadius: BorderRadius.circular(6.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: displayedLines.asMap().entries.map((entry) {
+              final index = entry.key;
+              final line = entry.value;
+              final isMoreLine = _screen.isMoreActive && index == displayedLines.length - 1;
+              final isToplineLine = isToplineActive &&
+                  index == displayedLines.length - 1 - (_screen.isMoreActive ? 1 : 0);
+              final double ratio = displayedLines.length > 1
+                  ? index / (displayedLines.length - 1)
+                  : 1.0;
+              final color = isMoreLine
+                  ? Colors.amber[400]!
+                  : isToplineLine
+                      ? Colors.cyanAccent[200]!
+                      : Color.lerp(Colors.white30, Colors.white, ratio)!;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 2.0),
+                child: GestureDetector(
+                  onTap: () {
+                    if (_screen.isMoreActive) {
+                      _sendFfiKey(32, 'Space');
+                      _screen.setMoreActive(false);
+                    } else {
+                      _showMsgHistoryPanel();
+                    }
+                  },
+                  child: Text(
+                    line,
+                    style: TextStyle(
+                      color: color,
+                      fontFamily: 'monospace',
+                      fontSize: _msgFontSize,
+                      fontWeight: (isMoreLine || isToplineLine)
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
                 ),
-              ),
-            // メニュアル選択ウィンドウのオーバーレイ表示
-            if (_screen.isMenuWindowVisible)
-              _buildMenuOverlay(),
-            // 同期型ダイアログオーバーレイ
-            if (_isYnVisible) _buildYnOverlay(),
-            if (_isGetLineVisible) _buildGetLineOverlay(),
-            if (_isAskNameVisible) _buildAskNameOverlay(),
-          ],
+              );
+            }).toList(),
+          ),
         );
       },
     );
+  }
+  Alignment _getAlignment(String position) {
+    switch (position) {
+      case 'top_left':
+        return Alignment.topLeft;
+      case 'top_right':
+        return Alignment.topRight;
+      case 'bottom_left':
+        return Alignment.bottomLeft;
+      case 'bottom_right':
+        return Alignment.bottomRight;
+      default:
+        return Alignment.bottomLeft;
+    }
   }
 
   Widget _buildControllerOverlay() {
@@ -3933,25 +4049,111 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
 
+    final statusTopOffset = (_statusPosition == 'top') ? _statusHeight : 0.0;
+    final statusBottomOffset = (_statusPosition == 'bottom') ? _statusHeight : 0.0;
+    final statusLeftOffset = (_statusPosition == 'left') ? _statusWidth : 0.0;
+    final statusRightOffset = (_statusPosition == 'right') ? _statusWidth : 0.0;
+
     final cmdPanelScaledHeight = _cmdPanelHeight * _cmdPanelEffectiveScale;
+    final cmdPanelScaledWidth = 130.0 * _cmdPanelEffectiveScale;
     const padTopPadding = 6.0;
     const sideMargin = 8.0;
+
+    // オフセット算出用
+    double cmdPanelTopOffset = 0.0;
+    double cmdPanelLeftOffset = 0.0;
+    double cmdPanelRightOffset = 0.0;
+
+    if (_cmdPanelPosition == 'top') {
+      cmdPanelTopOffset = cmdPanelScaledHeight;
+    } else if (_cmdPanelPosition == 'left') {
+      cmdPanelLeftOffset = cmdPanelScaledWidth;
+    } else if (_cmdPanelPosition == 'right') {
+      cmdPanelRightOffset = cmdPanelScaledWidth;
+    }
+
+    // DPad オフセット計算
+    double? dpadTop, dpadBottom, dpadLeft, dpadRight;
+    if (_dpadPosition.startsWith('top')) {
+      dpadTop = statusTopOffset + padTopPadding + (_cmdPanelPosition == 'top' ? cmdPanelTopOffset : 0.0);
+    } else {
+      dpadBottom = statusBottomOffset + padTopPadding + (_cmdPanelPosition == 'bottom' ? cmdPanelScaledHeight : 0.0);
+    }
+
+    if (_dpadPosition.endsWith('left')) {
+      dpadLeft = statusLeftOffset + sideMargin + (_cmdPanelPosition == 'left' ? cmdPanelLeftOffset : 0.0);
+    } else {
+      dpadRight = statusRightOffset + sideMargin + (_cmdPanelPosition == 'right' ? cmdPanelRightOffset : 0.0);
+    }
+
+    // ShortcutPad オフセット計算
+    double? scTop, scBottom, scLeft, scRight;
+    bool sameAsDpad = _shortcutPosition == _dpadPosition;
+    double dpadSizeShift = sameAsDpad ? (150.0 * _dpadEffectiveScale + 12.0) : 0.0;
+
+    if (_shortcutPosition.startsWith('top')) {
+      scTop = statusTopOffset + padTopPadding + (_cmdPanelPosition == 'top' ? cmdPanelTopOffset : 0.0) + (sameAsDpad && _dpadPosition.startsWith('top') ? dpadSizeShift : 0.0);
+    } else {
+      scBottom = statusBottomOffset + padTopPadding + (_cmdPanelPosition == 'bottom' ? cmdPanelScaledHeight : 0.0) + (sameAsDpad && _dpadPosition.startsWith('bottom') ? dpadSizeShift : 0.0);
+    }
+
+    if (_shortcutPosition.endsWith('left')) {
+      scLeft = statusLeftOffset + sideMargin + (_cmdPanelPosition == 'left' ? cmdPanelLeftOffset : 0.0);
+    } else {
+      scRight = statusRightOffset + sideMargin + (_cmdPanelPosition == 'right' ? cmdPanelRightOffset : 0.0);
+    }
+
+    // メッセージ領域 オフセット計算
+    double? msgTop, msgBottom, msgLeft, msgRight;
+    if (_msgPosition == 'bottom') {
+      msgBottom = statusBottomOffset + (_cmdPanelPosition == 'bottom' ? cmdPanelScaledHeight : 0.0) +
+          (_dpadPosition.startsWith('bottom') ? (150.0 * _dpadEffectiveScale) : 0.0) + 12.0;
+      msgLeft = statusLeftOffset;
+      msgRight = statusRightOffset;
+    } else if (_msgPosition == 'top') {
+      msgTop = statusTopOffset + padTopPadding + (_cmdPanelPosition == 'top' ? cmdPanelTopOffset : 0.0);
+      msgLeft = statusLeftOffset;
+      msgRight = statusRightOffset;
+    } else {
+      if (_msgPosition.startsWith('top')) {
+        msgTop = statusTopOffset + padTopPadding + (_cmdPanelPosition == 'top' ? cmdPanelTopOffset : 0.0);
+      } else {
+        msgBottom = statusBottomOffset + padTopPadding + (_cmdPanelPosition == 'bottom' ? cmdPanelScaledHeight : 0.0);
+      }
+
+      if (_msgPosition.endsWith('left')) {
+        msgLeft = statusLeftOffset + sideMargin + (_cmdPanelPosition == 'left' ? cmdPanelLeftOffset : 0.0);
+      } else {
+        msgRight = statusRightOffset + sideMargin + (_cmdPanelPosition == 'right' ? cmdPanelRightOffset : 0.0);
+      }
+    }
 
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        // コマンドパネル: 画面最下端、左下起点で scale
+        // 1. コマンドパネル
         Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
+          left: _cmdPanelPosition == 'right' ? null : statusLeftOffset,
+          right: _cmdPanelPosition == 'left' ? null : statusRightOffset,
+          top: _cmdPanelPosition == 'top'
+              ? statusTopOffset
+              : (_cmdPanelPosition == 'left' || _cmdPanelPosition == 'right' ? statusTopOffset : null),
+          bottom: _cmdPanelPosition == 'bottom'
+              ? statusBottomOffset
+              : (_cmdPanelPosition == 'left' || _cmdPanelPosition == 'right' ? statusBottomOffset : null),
           child: Transform.scale(
             scale: _cmdPanelEffectiveScale,
-            alignment: Alignment.bottomLeft,
+            alignment: _cmdPanelPosition == 'top'
+                ? Alignment.topCenter
+                : (_cmdPanelPosition == 'bottom'
+                    ? Alignment.bottomCenter
+                    : (_cmdPanelPosition == 'left' ? Alignment.centerLeft : Alignment.centerRight)),
             child: NetHackCmdPanel(
               key: ValueKey(_controlsVersion),
               opacity: _padOpacity,
               showPanelNames: _showPanelNames,
+              position: _cmdPanelPosition,
+              isVertical: _cmdPanelPosition == 'left' || _cmdPanelPosition == 'right',
               extCmdList: _extCmdList.map((e) => {'command': e.command, 'description': e.description}).toList(),
               onKeyPress: (key) => _sendKeysToC(key),
               onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
@@ -3974,15 +4176,17 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-        // 移動パッド: コマンドパネルの上、左下起点で scale
+        // 2. 移動パッド (DPad)
         Positioned(
-          left: sideMargin,
-          bottom: cmdPanelScaledHeight + padTopPadding,
+          top: dpadTop,
+          bottom: dpadBottom,
+          left: dpadLeft,
+          right: dpadRight,
           child: Padding(
             padding: const EdgeInsets.only(top: padTopPadding),
             child: Transform.scale(
               scale: _dpadEffectiveScale,
-              alignment: Alignment.bottomLeft,
+              alignment: _getAlignment(_dpadPosition),
               child: NetHackDPad(
                 opacity: _padOpacity,
                 directionLabels: _buildDirectionLabels(),
@@ -4001,15 +4205,17 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-        // ショートカットパッド: コマンドパネルの上、右下起点で scale
+        // 3. ショートカットパッド
         Positioned(
-          right: sideMargin,
-          bottom: cmdPanelScaledHeight + padTopPadding,
+          top: scTop,
+          bottom: scBottom,
+          left: scLeft,
+          right: scRight,
           child: Padding(
             padding: const EdgeInsets.only(top: padTopPadding),
             child: Transform.scale(
               scale: _shortcutPadEffectiveScale,
-              alignment: Alignment.bottomRight,
+              alignment: _getAlignment(_shortcutPosition),
               child: NetHackShortcutPad(
                 key: ValueKey(_controlsVersion),
                 opacity: _padOpacity,
@@ -4020,6 +4226,14 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
+        ),
+        // 4. メッセージ領域
+        Positioned(
+          top: msgTop,
+          bottom: msgBottom,
+          left: msgLeft,
+          right: msgRight,
+          child: _buildMessageWidget(),
         ),
       ],
     );
@@ -4404,12 +4618,19 @@ class _MyHomePageState extends State<MyHomePage> {
                 _buildTopDrawer(),
                 _buildBottomDrawer(),
               ],
+              // ★ダイアログ・メニュー・テキストオーバーレイ（最前面・ゲーム全フェーズで描画可能）
+              if (_screen.isMenuWindowVisible) _buildMenuOverlay(),
+              if (_isYnVisible) _buildYnOverlay(),
+              if (_isGetLineVisible) _buildGetLineOverlay(),
+              if (_isAskNameVisible) _buildAskNameOverlay(),
+              if (_screen.isTextWindowVisible) _buildTextOverlay(),
             ],
           ),
         ),
       ),
-    ),);
-  }
+    ),
+  );
+}
 
   // DartHackカラーテーブル
   Color _getNhColor(int colorIndex) {

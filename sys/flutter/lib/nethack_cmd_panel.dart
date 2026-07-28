@@ -82,6 +82,9 @@ class NetHackCmdPanel extends StatefulWidget {
   final double opacity;
   final List<Map<String, String>>? extCmdList;
 
+  final bool isVertical;
+  final String position;
+
   const NetHackCmdPanel({
     super.key,
     required this.onKeyPress,
@@ -92,6 +95,8 @@ class NetHackCmdPanel extends StatefulWidget {
     this.showPanelNames = true,
     this.opacity = 1.0,
     this.extCmdList,
+    this.isVertical = false,
+    this.position = 'top',
   });
 
   @override
@@ -228,6 +233,102 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
     }
 
     final visiblePanels = _isExpanded ? _panels : [_panels.first];
+
+    if (widget.isVertical) {
+      const double panelWidth = 130.0;
+      _reportPanelHeight(panelWidth);
+
+      return GestureDetector(
+        onHorizontalDragEnd: (details) {
+          if (details.primaryVelocity == null) return;
+          final velocity = details.primaryVelocity!;
+          if (widget.position == 'left') {
+            if (velocity > 100 && _panels.length > 1) {
+              setState(() => _isExpanded = true);
+            } else if (velocity < -100) {
+              setState(() => _isExpanded = false);
+            }
+          } else if (widget.position == 'right') {
+            if (velocity < -100 && _panels.length > 1) {
+              setState(() => _isExpanded = true);
+            } else if (velocity > 100) {
+              setState(() => _isExpanded = false);
+            }
+          }
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.fastOutSlowIn,
+          width: panelWidth,
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.87 * widget.opacity),
+            border: Border(
+              left: BorderSide(color: Colors.white.withValues(alpha: 0.1 * widget.opacity), width: 0.5),
+              right: BorderSide(color: Colors.white.withValues(alpha: 0.1 * widget.opacity), width: 0.5),
+            ),
+          ),
+          child: Column(
+            children: [
+              Container(
+                height: 20,
+                width: double.infinity,
+                color: (Colors.grey[900] ?? const Color(0xFF212121)).withValues(alpha: widget.opacity),
+                alignment: Alignment.center,
+                child: Text(
+                  widget.position == 'left'
+                      ? (_isExpanded ? "← 閉じる" : "内側(→)スワイプで展開")
+                      : (_isExpanded ? "閉じる →" : "内側(←)スワイプで展開"),
+                  style: const TextStyle(color: Colors.white60, fontSize: 9, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  itemCount: visiblePanels.length,
+                  itemBuilder: (context, pIdx) {
+                    final panel = visiblePanels[pIdx];
+                    final List<CmdItem> cmds = panel['cmds'] as List<CmdItem>;
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 6),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1 * widget.opacity), width: 0.5),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (widget.showPanelNames)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              child: Text(
+                                panel['name'],
+                                style: const TextStyle(color: Colors.amberAccent, fontSize: 9, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          Wrap(
+                            spacing: 3,
+                            runSpacing: 3,
+                            alignment: WrapAlignment.start,
+                            children: cmds
+                                .asMap()
+                                .entries
+                                .map((entry) => _buildCmdButton(context, pIdx, entry.key, entry.value))
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     const double headerHeight = 18;
     const double rowHeight = 40;
     final double totalHeight = headerHeight + (visiblePanels.length * rowHeight);
@@ -236,17 +337,25 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
     return GestureDetector(
       onVerticalDragEnd: (details) {
         if (details.primaryVelocity == null) return;
-        if (details.primaryVelocity! < -100) {
-          if (_panels.length > 1 && !_isExpanded) {
-            setState(() {
-              _isExpanded = true;
-            });
+        if (widget.position == 'top') {
+          if (details.primaryVelocity! > 100) {
+            if (_panels.length > 1 && !_isExpanded) {
+              setState(() => _isExpanded = true);
+            }
+          } else if (details.primaryVelocity! < -100) {
+            if (_isExpanded) {
+              setState(() => _isExpanded = false);
+            }
           }
-        } else if (details.primaryVelocity! > 100) {
-          if (_isExpanded) {
-            setState(() {
-              _isExpanded = false;
-            });
+        } else {
+          if (details.primaryVelocity! < -100) {
+            if (_panels.length > 1 && !_isExpanded) {
+              setState(() => _isExpanded = true);
+            }
+          } else if (details.primaryVelocity! > 100) {
+            if (_isExpanded) {
+              setState(() => _isExpanded = false);
+            }
           }
         }
       },
@@ -280,8 +389,10 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                   ],
                   Text(
                     _isExpanded
-                        ? "パネルを引き下げる"
-                        : (_panels.length > 1 ? "上にスワイプして全パネルを表示" : _panels.first['name']),
+                        ? "パネルを閉じる"
+                        : (_panels.length > 1
+                            ? (widget.position == 'top' ? "下へスワイプして全パネルを表示" : "上へスワイプして全パネルを表示")
+                            : _panels.first['name']),
                     style: const TextStyle(color: Colors.white60, fontSize: 9, fontWeight: FontWeight.bold),
                   ),
                 ],
