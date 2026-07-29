@@ -547,4 +547,14 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
   - `LayoutBuilder` やレンダリングオブジェクトの実測値（`addPostFrameCallback` 内で安全に状態更新）を用いて、対象領域の描画高さ (`_statusHeight`) および描画幅 (`_statusWidth`) をリアルタイムに自動計測してください。
   - 計測された実サイズから `statusTopOffset`, `statusBottomOffset`, `statusLeftOffset`, `statusRightOffset` などのベースオフセットを算出し、コマンドパネル、DPad、ショートカット、メッセージ、ボタン類など他のすべてのオーバーレイUIの基準位置に加算・動的シフト追従させて重なりを完全に防止してください。
 
+## 30. Dart/Flutter メインファイル (`main.dart`) のモジュール分割・構造化設計および非同期コンテキスト安全性原則
+- **モジュール分割の構成標準**:
+  `main.dart` が肥大化した場合は、以下の標準ディレクトリ構造に沿ってコンポーネントを分割・整理し、1ファイルあたりの規模を抑制してください：
+  - `models/`: 列挙型・データモデル・パース関数
+  - `widgets/`: 独立表示コンポーネント・ダイアログ関数
+  - `widgets/overlays/`: ゲーム応答・ダイアログオーバーレイ
+  - `screens/`: タイトル・終了等の画面フェーズ
+- **非同期コンテキスト (`BuildContext`) の安全性チェック**:
+  非同期処理（`Future` / `SharedPreferences` / FFI 呼び出し等）を跨いで `showDialog` や `context` を参照・操作する際は、必ず事前に `if (!context.mounted) return;` （または `if (!mounted) return;`）を挿入し、アンマウント済みのコンテキスト参照によるクラッシュや型解析警告を徹底して回避してください。
+
 
