@@ -609,19 +609,22 @@ class _MyHomePageState extends State<MyHomePage> {
     double dpadShift(String pos) => (_dpadPosition == pos) ? (150.0 * _dpadEffectiveScale + 8.0) : 0.0;
     double scShift(String pos) => (_shortcutPosition == pos) ? (150.0 * _shortcutPadEffectiveScale + 8.0) : 0.0;
 
-    // メッセージ領域が上部に配置されている場合のシフト量
-    // 全幅('top')は全コーナーに影響、部分幅('top_left'/'top_right')は同コーナーのみ
-    final estimatedMsgHeight = (_msgFontSize + 2.0) * _msgLineCount + 12.0;
+    // メッセージ領域の高さ見積もり（フォントサイズ・行数・コンテナPadding・マージンから正確に算出）
+    final estimatedMsgHeight = (_msgFontSize * 1.35 + 2.0) * _msgLineCount + 14.0;
+
+    // メッセージ領域が上部に配置されている場合のシフト量 (padTopPadding 6.0px を含む)
     double msgTopShift(String buttonCorner) {
-      if (_msgPosition == 'top') return estimatedMsgHeight;
-      if (_msgPosition == buttonCorner) return estimatedMsgHeight;
+      if (_msgPosition == 'top' || _msgPosition == buttonCorner) {
+        return estimatedMsgHeight + 6.0;
+      }
       return 0.0;
     }
 
-    // メッセージ領域が下部（全幅 'bottom'）に配置されているときのシフト量
-    // 全幅の場合のみ bottom_* コーナー全体に影響する
+    // メッセージ領域が下部に配置されている場合のシフト量 (メッセージ領域オフセット 12.0px を含む)
     double msgBottomShift(String buttonCorner) {
-      if (buttonCorner.startsWith('bottom') && _msgPosition == 'bottom') return estimatedMsgHeight;
+      if ((buttonCorner.startsWith('bottom') && _msgPosition == 'bottom') || _msgPosition == buttonCorner) {
+        return estimatedMsgHeight + 12.0;
+      }
       return 0.0;
     }
 
@@ -712,18 +715,22 @@ class _MyHomePageState extends State<MyHomePage> {
     // メニューボタンが同じコーナーにある場合のみシフト
     double menuShift(String pos) => (_menuButtonPosition == pos) ? 48.0 : 0.0;
 
-    // メッセージ領域が上部に配置されている場合のシフト量
-    // 全幅('top')は全コーナーに影響、部分幅('top_left'/'top_right')は同コーナーのみ
-    final estimatedMsgHeight = (_msgFontSize + 2.0) * _msgLineCount + 12.0;
+    // メッセージ領域の高さ見積もり（フォントサイズ・行数・コンテナPadding・マージンから正確に算出）
+    final estimatedMsgHeight = (_msgFontSize * 1.35 + 2.0) * _msgLineCount + 14.0;
+
+    // メッセージ領域が上部に配置されている場合のシフト量 (padTopPadding 6.0px を含む)
     double msgTopShift(String buttonCorner) {
-      if (_msgPosition == 'top') return estimatedMsgHeight;
-      if (_msgPosition == buttonCorner) return estimatedMsgHeight;
+      if (_msgPosition == 'top' || _msgPosition == buttonCorner) {
+        return estimatedMsgHeight + 6.0;
+      }
       return 0.0;
     }
 
-    // メッセージ領域が下部（全幅 'bottom'）に配置されているときのシフト量
+    // メッセージ領域が下部に配置されている場合のシフト量 (メッセージ領域オフセット 12.0px を含む)
     double msgBottomShift(String buttonCorner) {
-      if (buttonCorner.startsWith('bottom') && _msgPosition == 'bottom') return estimatedMsgHeight;
+      if ((buttonCorner.startsWith('bottom') && _msgPosition == 'bottom') || _msgPosition == buttonCorner) {
+        return estimatedMsgHeight + 12.0;
+      }
       return 0.0;
     }
 
