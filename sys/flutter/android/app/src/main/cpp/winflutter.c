@@ -402,6 +402,56 @@ void SendGetLineResultToC(const char* result) {
     debuglog("C core received GetLine result: %s", g_getline_result);
 }
 
+// 新階層リワード用コールバックおよび関数
+typedef void (*DartNewLevelRestCallback)(void);
+static DartNewLevelRestCallback g_new_level_rest_cb = NULL;
+static volatile int g_new_level_rest_done = 0;
+static volatile int g_new_level_rest_reward_amount = 0;
+
+void RegisterNewLevelRestCallback(DartNewLevelRestCallback cb) {
+    g_new_level_rest_cb = cb;
+    debuglog("NewLevelRestCallback registered.");
+}
+
+void SendNewLevelRestResultToC(int reward_amount) {
+    g_new_level_rest_reward_amount = reward_amount;
+    g_new_level_rest_done = 1;
+    debuglog("C core received NewLevelRest result: %d", reward_amount);
+}
+
+static void flutter_apply_ad_reward(int amount) {
+    boolean is_hp = (rn2(2) == 0);
+    if (is_hp) {
+        healup(amount, 0, FALSE, FALSE);
+        u.uconduct.rested_by_ad++;
+        pline("広告を見て休息した！体力(HP)が回復した。");
+    } else {
+        u.uen += amount;
+        if (u.uen > u.uenmax)
+            u.uen = u.uenmax;
+        disp.botl = TRUE;
+        u.uconduct.rested_by_ad++;
+        pline("広告を見て休息した！魔力(Pw)が回復した。");
+    }
+}
+
+void flutter_check_new_level_rest(void) {
+    if (!g_new_level_rest_cb) return;
+
+    g_new_level_rest_done = 0;
+    g_new_level_rest_reward_amount = 0;
+
+    g_new_level_rest_cb();
+
+    while (!g_new_level_rest_done) {
+        usleep(10000); // 10ms ブロック待機
+    }
+
+    if (g_new_level_rest_reward_amount > 0) {
+        flutter_apply_ad_reward(g_new_level_rest_reward_amount);
+    }
+}
+
 
 static void flutter_save_message(const char* msg) {
     if (!msg || !*msg || !strcmp(msg, "Restoring save file...") || !strcmp(msg, "セーブファイルを復元中...")) {
@@ -927,6 +977,11 @@ static void flutter_display_nhwindow(winid window, boolean blocking) {
     if (blocking) {
         if (window != WIN_MAP && window != WIN_STATUS) {
             g_in_display_blocking = 1;
+        }
+        if (program_state.savefile_completed > 0 && window == WIN_MESSAGE) {
+            debuglog("flutter_display_nhwindow: auto-bypassing nhgetch for save completed display");
+            g_in_display_blocking = 0;
+            return;
         }
         flutter_nhgetch();
         g_in_display_blocking = 0;

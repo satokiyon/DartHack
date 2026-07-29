@@ -23,6 +23,7 @@ import 'dart:convert';
 import 'package:ffi/ffi.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'widgets/exit_highlight_dialog.dart';
+import 'utils/rewarded_ad_manager.dart';
 
 import 'models/game_enums.dart';
 import 'models/ext_cmd_entry.dart';
@@ -118,8 +119,6 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _waitingForInput = false;
   bool _assetsReady = false;
   String _assetsPath = '';
-  bool _autoAdvanceSavePending = false;
-  int _autoAdvanceSavePendingUntilMs = 0;
   bool _exitDialogShown = false;
 
   // タイルセット用変数
@@ -1039,13 +1038,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  bool _isSaveInProgressMessage(String text) {
-    final normalized = text.trim();
-    if (normalized.isEmpty) return false;
-    return normalized.startsWith('セーブ中')
-        || normalized.startsWith('Saving...');
-  }
-
   Future<void> _showExitDialogAndTerminate(String message) async {
     if (!mounted || _exitDialogShown) return;
     _exitDialogShown = true;
@@ -1068,6 +1060,108 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> _showNewLevelRestDialog() async {
+    if (!mounted) return;
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[950],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.explore_rounded, color: Colors.amber),
+              SizedBox(width: 8),
+              Text('未知の階層に到達'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                '新しい階層に足を踏み入れた。\n広告を見て少し休息しますか？',
+                style: TextStyle(fontSize: 14, height: 1.4),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.play_circle_fill_rounded, size: 22),
+                label: const Text(
+                  '広告を見て休む (体力/魔力を回復)',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple.shade700,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 4,
+                ),
+                onPressed: () {
+                  Navigator.of(dialogContext).pop(true);
+                },
+              ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.arrow_forward_rounded, size: 20),
+                label: const Text('そのまま進む'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white70,
+                  side: const BorderSide(color: Colors.white38),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(dialogContext).pop(false);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (result == true) {
+      RewardedAdManager.showRewardedAd(
+        onUserEarnedReward: (int amount) {
+          _workerSendPort?.send({
+            'type': 'new_level_rest_result',
+            'rewardAmount': amount,
+          });
+        },
+        onAdClosed: (bool hasEarnedReward) {
+          if (!hasEarnedReward) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('広告を表示できませんでした。そのまま進行します。'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            }
+            _workerSendPort?.send({
+              'type': 'new_level_rest_result',
+              'rewardAmount': 0,
+            });
+          }
+        },
+      );
+    } else {
+      _workerSendPort?.send({
+        'type': 'new_level_rest_result',
+        'rewardAmount': 0,
+      });
+    }
+  }
+
   Future<void> _startGame() async {
     if (_isGameRunning) return;
 
@@ -1081,7 +1175,6 @@ class _MyHomePageState extends State<MyHomePage> {
       _messageWinId = null;
       _isTopDrawerOpen = false;
       _isBottomDrawerOpen = false;
-      _autoAdvanceSavePending = false;
       _exitDialogShown = false;
     });
 
@@ -1122,8 +1215,6 @@ class _MyHomePageState extends State<MyHomePage> {
           if (_mapWinId != null && winId == _mapWinId) {
             setState(() {
               _isMainGameStarted = true;
-              _autoAdvanceSavePending = false;
-              _autoAdvanceSavePendingUntilMs = 0;
             });
           } else {
             // テキスト/メニューウィンドウの場合も setState を呼んで確実に UI を更新
@@ -1145,13 +1236,9 @@ class _MyHomePageState extends State<MyHomePage> {
               _isDirectionPromptActive = false;
             }
           }
-          if (_isSaveInProgressMessage(text)) {
-            _autoAdvanceSavePending = true;
-            _autoAdvanceSavePendingUntilMs = DateTime.now().millisecondsSinceEpoch + 5000;
-          }
         } else if (type == 'putMixed') {
           // putmixed タイル ID 付き送信 (`/` 結果リスト用)。
-          // putstr と同じダイアログ検出 (方向プロンプト、 セーブ進行) も行う。
+          // putstr と同じダイアログ検出 (方向プロンプト) も行う。
           final text = (message['text'] as String?) ?? '';
           _screen.putMixedWithTile(
             message['winId'],
@@ -1166,10 +1253,6 @@ class _MyHomePageState extends State<MyHomePage> {
             } else if (text.trim().isNotEmpty) {
               _isDirectionPromptActive = false;
             }
-          }
-          if (_isSaveInProgressMessage(text)) {
-            _autoAdvanceSavePending = true;
-            _autoAdvanceSavePendingUntilMs = DateTime.now().millisecondsSinceEpoch + 5000;
           }
         } else if (type == 'printGlyph') {
           _screen.printGlyph(
@@ -1198,46 +1281,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 _sendFfiKey(32, 'Space(auto)');
               }
             });
-          }
-
-          if (_autoAdvanceSavePending) {
-            final nowMs = DateTime.now().millisecondsSinceEpoch;
-            final canAutoAdvance =
-                nowMs <= _autoAdvanceSavePendingUntilMs
-                && !_screen.isMenuWindowVisible
-                && !_screen.isTextWindowVisible
-                && _screen.textLines.isEmpty
-                && !_isYnVisible
-                && !_isGetLineVisible
-                && !_isAskNameVisible;
-
-            if (canAutoAdvance) {
-              _autoAdvanceSavePending = false;
-              _autoAdvanceSavePendingUntilMs = 0;
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                // メニューやテキストウィンドウが表示されている場合は
-                // 自動 Space 送信をスキップ (メニュー項目タップを
-                // 妨げないため、またキャンセルを誤発動させないため)。
-                if (mounted && _waitingForInput
-                    && !_screen.isMenuWindowVisible
-                    && !_screen.isTextWindowVisible
-                    && _screen.textLines.isEmpty
-                    && !_isYnVisible
-                    && !_isGetLineVisible
-                    && !_isAskNameVisible) {
-                  _sendFfiKey(32, 'Space(auto)');
-                }
-              });
-            } else if (nowMs > _autoAdvanceSavePendingUntilMs
-                || _screen.isMenuWindowVisible
-                || _screen.isTextWindowVisible
-                || _screen.textLines.isNotEmpty
-                || _isYnVisible
-                || _isGetLineVisible
-                || _isAskNameVisible) {
-              _autoAdvanceSavePending = false;
-              _autoAdvanceSavePendingUntilMs = 0;
-            }
           }
           if (!_isKeyboardVisible) {
             _focusNode.requestFocus();
@@ -1290,6 +1333,8 @@ class _MyHomePageState extends State<MyHomePage> {
             }
           });
           _addLog("number_pad mode: $state");
+        } else if (type == 'new_level_rest') {
+          unawaited(_showNewLevelRestDialog());
         } else if (type == 'startMenu') {
           _screen.startMenu(message['winId']);
         } else if (type == 'game_exit') {

@@ -9,6 +9,7 @@ class DefaultsHelper {
   static const Set<String> managedKeys = {
     'name',
     'tutorial',
+    'tutorial_mode',
     'autopickup',
     'pickup_types',
     'time',
@@ -288,6 +289,15 @@ class DefaultsHelper {
     _options.forEach((key, val) {
       if (key == 'hilite_status' || key == 'menucolor') return;
 
+      if (key == 'tutorial' || key == 'tutorial_mode') {
+        if (val == 'always_tutorial' || val == 'true') {
+          pendingLines.add('OPTIONS=tutorial');
+        } else if (val == 'always_normal' || val == 'false') {
+          pendingLines.add('OPTIONS=!tutorial');
+        }
+        return;
+      }
+
       if (key == 'number_pad') {
         if (val == '0') {
           pendingLines.add('OPTIONS=!number_pad');
@@ -298,7 +308,7 @@ class DefaultsHelper {
         pendingLines.add('OPTIONS=$key');
       } else if (val.toLowerCase() == 'false') {
         pendingLines.add('OPTIONS=!$key');
-      } else {
+      } else if (val.trim().isNotEmpty) {
         pendingLines.add('OPTIONS=$key:$val');
       }
     });
@@ -322,13 +332,17 @@ class DefaultsHelper {
     await loadFromFile(filePath);
     final prefs = await SharedPreferences.getInstance();
 
-    // チュートリアル確認
+    // チュートリアル確認 (0: 毎回確認, 1: 常に開始, 2: 常に通常プレイ)
     final tutorialVal = getOption('tutorial');
     if (tutorialVal != null) {
-      await prefs.setBool('nh_opt_tutorial', tutorialVal.toLowerCase() == 'true');
+      if (tutorialVal.startsWith('!')) {
+        await prefs.setInt('nh_opt_tutorial_mode', 2);
+      } else {
+        await prefs.setInt('nh_opt_tutorial_mode', 1);
+      }
     } else {
-      if (!prefs.containsKey('nh_opt_tutorial')) {
-        await prefs.setBool('nh_opt_tutorial', true);
+      if (!prefs.containsKey('nh_opt_tutorial_mode')) {
+        await prefs.setInt('nh_opt_tutorial_mode', 0);
       }
     }
 
@@ -421,8 +435,13 @@ class DefaultsHelper {
     await loadFromFile(filePath);
     final prefs = await SharedPreferences.getInstance();
 
-    if (prefs.containsKey('nh_opt_tutorial')) {
-      setBoolOption('tutorial', prefs.getBool('nh_opt_tutorial') ?? true);
+    final tutorialMode = prefs.getInt('nh_opt_tutorial_mode') ?? 0;
+    if (tutorialMode == 1) {
+      setOption('tutorial', 'always_tutorial');
+    } else if (tutorialMode == 2) {
+      setOption('tutorial', 'always_normal');
+    } else {
+      setOption('tutorial', 'ask');
     }
     if (prefs.containsKey('nh_opt_autopickup')) {
       setBoolOption('autopickup', prefs.getBool('nh_opt_autopickup') ?? false);
@@ -497,8 +516,8 @@ class DefaultsHelper {
       if (!prefs.containsKey(prefKey)) {
         // 新規キーの補完追加
         if (assetDefaultVal != null) {
-          if (optKey == 'number_pad') {
-            final int iVal = int.tryParse(assetDefaultVal) ?? 0;
+          if (optKey == 'number_pad' || optKey == 'tutorial_mode') {
+            final int iVal = int.tryParse(assetDefaultVal ?? '0') ?? 0;
             await prefs.setInt(prefKey, iVal);
           } else if (optKey == 'name' || optKey == 'pickup_types' || optKey == 'dogname' || optKey == 'catname' || optKey == 'horsename' || optKey == 'fruit') {
             await prefs.setString(prefKey, assetDefaultVal);
@@ -513,6 +532,11 @@ class DefaultsHelper {
         if (optKey == 'number_pad') {
           final currentVal = prefs.getInt(prefKey);
           if (currentVal == null || currentVal < -1 || currentVal > 4) {
+            await prefs.setInt(prefKey, 0);
+          }
+        } else if (optKey == 'tutorial_mode') {
+          final currentVal = prefs.getInt(prefKey);
+          if (currentVal == null || currentVal < 0 || currentVal > 2) {
             await prefs.setInt(prefKey, 0);
           }
         } else if (optKey == 'pickup_types') {

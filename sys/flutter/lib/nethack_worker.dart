@@ -57,6 +57,9 @@ class NetHackWorker {
     // putmixed タイル ID 付き送信用 NativeCallable (`/` 結果リスト表示用)
     late final NativeCallable<PutMixedWithTileCallback> putMixedCallable;
 
+    // 新階層リワード用 NativeCallable
+    late final NativeCallable<NewLevelRestCallback> newLevelRestCallable;
+
     receivePort.listen((message) {
       if (message is Map) {
         final type = message['type'];
@@ -270,6 +273,12 @@ class NetHackWorker {
             },
           );
 
+          newLevelRestCallable = NativeCallable<NewLevelRestCallback>.listener(() {
+            uiSendPort.send({
+              'type': 'new_level_rest',
+            });
+          });
+
           // コールバックをC側に登録
           ffi.registerCallbacks(
             createCallable.nativeFunction,
@@ -292,6 +301,8 @@ class NetHackWorker {
             cliparoundCallable.nativeFunction,
             putMixedCallable.nativeFunction,
           );
+
+          ffi.registerNewLevelRest(newLevelRestCallable.nativeFunction);
 
           // NetHack コアを起動
           final pathPtr = assetsPath.toNativeUtf8();
@@ -358,6 +369,9 @@ class NetHackWorker {
         } else if (type == 'yn_result') {
           final result = message['result'] as int;
           ffi.sendYnResult(result);
+        } else if (type == 'new_level_rest_result') {
+          final rewardAmount = message['rewardAmount'] as int? ?? 0;
+          ffi.sendNewLevelRestResult(rewardAmount);
         } else if (type == 'getline_result') {
           final result = message['result'] as String?;
           if (result != null) {

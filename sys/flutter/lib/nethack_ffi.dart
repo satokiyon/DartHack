@@ -139,6 +139,14 @@ typedef GetBuildIdDart = Pointer<Utf8> Function();
 typedef SendShortcutFunc = Void Function(Pointer<Int32> keys, Int32 len);
 typedef SendShortcutDart = void Function(Pointer<Int32> keys, int len);
 
+// 新階層リワード用コールバックおよび FFI
+typedef NewLevelRestCallback = Void Function();
+typedef RegisterNewLevelRestFunc = Void Function(Pointer<NativeFunction<NewLevelRestCallback>> cb);
+typedef RegisterNewLevelRestDart = void Function(Pointer<NativeFunction<NewLevelRestCallback>> cb);
+
+typedef SendNewLevelRestResultFunc = Void Function(Int32 rewardAmount);
+typedef SendNewLevelRestResultDart = void Function(int rewardAmount);
+
 class NetHackFfi {
   late final DynamicLibrary _lib;
   late final StartNetHackDart startNetHack;
@@ -159,6 +167,8 @@ class NetHackFfi {
   late final GetTopTenTextDart getTopTenTextFlutter;
   late final TriggerDatabaseSearchDart triggerDatabaseSearch;
   late final GetBuildIdDart getBuildIdNative;
+  late final RegisterNewLevelRestDart registerNewLevelRest;
+  late final SendNewLevelRestResultDart sendNewLevelRestResult;
 
   NetHackFfi() {
     try {
@@ -166,6 +176,22 @@ class NetHackFfi {
     } catch (_) {
       // Windows デバッグ用フォールバック
       _lib = DynamicLibrary.open('nethack_dummy.dll');
+    }
+
+    try {
+      registerNewLevelRest = _lib
+          .lookup<NativeFunction<RegisterNewLevelRestFunc>>('RegisterNewLevelRestCallback')
+          .asFunction();
+    } catch (e) {
+      registerNewLevelRest = (_) {};
+    }
+
+    try {
+      sendNewLevelRestResult = _lib
+          .lookup<NativeFunction<SendNewLevelRestResultFunc>>('SendNewLevelRestResultToC')
+          .asFunction();
+    } catch (e) {
+      sendNewLevelRestResult = (_) {};
     }
 
     try {

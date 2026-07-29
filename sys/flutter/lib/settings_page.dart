@@ -54,7 +54,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String _mapTapTravelMode = 'always';
 
   // defaults.nh 連動ゲームオプション
-  bool _optTutorial = true;
+  int _optTutorialMode = 0;
   bool _optAutopickup = false;
   String _optPickupTypes = r'$"=/!?+';
   bool _optTime = true;
@@ -246,7 +246,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _msgFontSize = prefs.getDouble('msg_font_size') ?? 13.0;
 
       // ゲームオプション (defaults.nh 連動) のロード
-      _optTutorial = prefs.getBool('nh_opt_tutorial') ?? true;
+      _optTutorialMode = prefs.getInt('nh_opt_tutorial_mode') ?? 0;
       _optAutopickup = prefs.getBool('nh_opt_autopickup') ?? false;
       _optPickupTypes = prefs.getString('nh_opt_pickup_types') ?? r'$"=/!?+';
       _optTime = prefs.getBool('nh_opt_time') ?? true;
@@ -1600,14 +1600,23 @@ class _SettingsPageState extends State<SettingsPage> {
         title: const Text("ゲームルール・プレイ設定 (defaults.nh)"),
         subtitle: const Text("ゲーム本体の動作オプションを設定します（※反映には新規ゲームの開始が必要です）"),
         children: _withDividers([
-          SwitchListTile(
-            title: const Text("チュートリアル開始確認"),
-            subtitle: const Text("起動時/ゲーム開始時にチュートリアルを始めるか確認します"),
-            value: _optTutorial,
-            onChanged: (val) {
-              setState(() => _optTutorial = val);
-              _saveGameOption('nh_opt_tutorial', val);
-            },
+          ListTile(
+            title: const Text("チュートリアル動作モード"),
+            subtitle: const Text("ゲーム開始時のチュートリアル問いかけ・開始動作を設定します"),
+            trailing: DropdownButton<int>(
+              value: _optTutorialMode,
+              items: const [
+                DropdownMenuItem(value: 0, child: Text('毎回確認する\n (標準)')),
+                DropdownMenuItem(value: 1, child: Text('常に開始する\n (OPTIONS=tutorial)')),
+                DropdownMenuItem(value: 2, child: Text('常に通常プレイ\n (OPTIONS=!tutorial)')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _optTutorialMode = val);
+                  _saveGameOption('nh_opt_tutorial_mode', val);
+                }
+              },
+            ),
           ),
           ListTile(
             title: const Text("テンキー移動 (number_pad)"),
