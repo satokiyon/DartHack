@@ -1976,6 +1976,9 @@ goto_level(
 #ifdef INSURANCE
     save_currentstate();
 #endif
+    if (new && at_stairs) {
+        flutter_check_new_level_rest();
+    }
     notice_mon_on();
     notice_all_mons(TRUE);
 

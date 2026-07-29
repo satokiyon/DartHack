@@ -2169,6 +2169,12 @@ show_conduct(int final)
             enl_msg(You_, "", "", "どのアーティファクトも願っていない", "");
     }
 
+    if (u.uconduct.rested_by_ad) {
+        Sprintf(buf, "%ld回広告を見て休息した", u.uconduct.rested_by_ad);
+        you_have_X(buf);
+    }
+
+
     /* only report Sokoban conduct if the Sokoban branch has been entered */
     if (sokoban_in_play()) {
         const char *presentverb = "", *pastverb = "";

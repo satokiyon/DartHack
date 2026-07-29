@@ -161,7 +161,7 @@ struct u_conduct {     /* number of times... */
     long sokocheat;    /* violated special 'rules' in Sokoban */
     long pets;         /* obtained a pet */
     /* genocides already listed at end of game */
-    long reserved1;
+    long rested_by_ad; /* rested by watching rewarded ad */
     long reserved2;
     long reserved3;
     long reserved4;

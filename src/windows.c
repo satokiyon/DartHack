@@ -1585,6 +1585,12 @@ set_flutter_plain_text_dialog(int enable)
 {
     (void) enable; /* unused for non-Flutter ports */
 }
+
+void
+flutter_check_new_level_rest(void)
+{
+    /* unused for non-Flutter ports */
+}
 #endif
 
 /* NetHackJP: putmixed with tile for look result list

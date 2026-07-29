@@ -3883,6 +3883,7 @@ extern boolean mwelded(struct obj *) NO_NNARGS;
 
 /* DartHack: set plain text dialog flag for flutter */
 extern void set_flutter_plain_text_dialog(int);
+extern void flutter_check_new_level_rest(void);
 extern void choose_windows(const char *) NONNULLARG1;
 #ifdef WINCHAIN
 void addto_windowchain(const char *s) NONNULLARG1;
