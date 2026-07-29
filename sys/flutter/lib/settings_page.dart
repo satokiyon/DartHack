@@ -88,7 +88,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   // メッセージ領域設定
   int _msgLineCount = 5;      // 表示行数 (1〜15)
-  double _msgOpacity = 0.70;  // 背景透過度 (0.0〜1.0)
+  double _msgOpacity = 0.40;  // 背景透過度 (0.0〜1.0)
   double _msgFontSize = 13.0; // フォントサイズ (pt)
 
   // 物理キー割り当て (デフォルト: 0 = なし)
@@ -242,7 +242,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
       // メッセージ領域設定のロード
       _msgLineCount = prefs.getInt('msg_line_count') ?? 5;
-      _msgOpacity = prefs.getDouble('msg_opacity') ?? 0.70;
+      _msgOpacity = prefs.getDouble('msg_opacity') ?? 0.40;
       _msgFontSize = prefs.getDouble('msg_font_size') ?? 13.0;
 
       // ゲームオプション (defaults.nh 連動) のロード

@@ -125,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _useTiles = true; // デフォルトでタイル表示を有効化
   int _tileWidth = 32;
   int _tileHeight = 32;
-  String _selectedTileset = 'nevanda_32x32';
+  String _selectedTileset = 'pixelhack_32x32';
   bool _isKeyboardVisible = true; // デフォルトで仮想キーボードを表示
 
   // 主人公追従・スクロール用変数
@@ -238,7 +238,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    final newTileset = prefs.getString('selected_tileset') ?? 'nevanda_32x32';
+    final newTileset = prefs.getString('selected_tileset') ?? 'pixelhack_32x32';
     final tilesetChanged = newTileset != _selectedTileset;
     setState(() {
       _useTiles = prefs.getBool('use_tiles') ?? true;
@@ -4098,24 +4098,6 @@ class _MyHomePageState extends State<MyHomePage> {
       return const SizedBox.shrink();
     }
 
-    if (_controllerMode == ControllerMode.keyboard) {
-      return Positioned(
-        left: 0,
-        right: 0,
-        bottom: 0,
-        child: NetHackKeyboard(
-          opacity: _padOpacity,
-          onKeyPress: (key) => _sendKeysToC(key),
-          onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-          onToggleMode: () {
-            setState(() {
-              _controllerMode = ControllerMode.pad;
-            });
-          },
-        ),
-      );
-    }
-
     final statusTopOffset = (_statusPosition == 'top') ? _statusHeight : 0.0;
     final statusBottomOffset = (_statusPosition == 'bottom') ? _statusHeight : 0.0;
     final statusLeftOffset = (_statusPosition == 'left') ? _statusWidth : 0.0;
@@ -4198,7 +4180,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        // 1. コマンドパネル
+        // 1. コマンドパネル (常時表示)
         Positioned(
           left: _cmdPanelPosition == 'right' ? null : statusLeftOffset,
           right: _cmdPanelPosition == 'left' ? null : statusRightOffset,
@@ -4237,64 +4219,91 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               onToggleMode: () {
                 setState(() {
-                  _controllerMode = ControllerMode.keyboard;
+                  _controllerMode = _controllerMode == ControllerMode.keyboard
+                      ? ControllerMode.pad
+                      : ControllerMode.keyboard;
                 });
               },
             ),
           ),
         ),
-        // 2. 移動パッド (DPad)
-        Positioned(
-          top: dpadTop,
-          bottom: dpadBottom,
-          left: dpadLeft,
-          right: dpadRight,
-          child: Padding(
-            padding: const EdgeInsets.only(top: padTopPadding),
-            child: Transform.scale(
-              scale: _dpadEffectiveScale,
-              alignment: _getAlignment(_dpadPosition),
-              child: NetHackDPad(
-                opacity: _padOpacity,
-                directionLabels: _buildDirectionLabels(),
-                centerLabel: _isDirectionPromptActive ? '.' : _moveModeLabel(_dPadMoveMode),
-                onDirectionPress: (viKey) {
-                  _sendModeAppliedDirection(viKey);
-                },
-                onDirectionLongPress: (viKey) {
-                  _sendModeAppliedDirection(viKey, modeOverride: _dPadLongPressMoveMode);
-                },
-                onCenterTap: _handleCenterTap,
-                onCenterLongPress: () {
-                  _showMoveModeSelectDialog();
-                },
+        // 2. キーボード (キーボードモード時のみ)
+        if (_controllerMode == ControllerMode.keyboard) ...[
+          Positioned(
+            left: 0,
+            right: 0,
+            top: _cmdPanelPosition == 'top'
+                ? (statusTopOffset + cmdPanelScaledHeight)
+                : null,
+            bottom: _cmdPanelPosition != 'top'
+                ? (statusBottomOffset + cmdPanelScaledHeight)
+                : null,
+            child: NetHackKeyboard(
+              opacity: _padOpacity,
+              onKeyPress: (key) => _sendKeysToC(key),
+              onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+              onToggleMode: () {
+                setState(() {
+                  _controllerMode = ControllerMode.pad;
+                });
+              },
+            ),
+          ),
+        ],
+        // 3. 移動パッド (DPad) (パッドモード時のみ)
+        if (_controllerMode != ControllerMode.keyboard) ...[
+          Positioned(
+            top: dpadTop,
+            bottom: dpadBottom,
+            left: dpadLeft,
+            right: dpadRight,
+            child: Padding(
+              padding: const EdgeInsets.only(top: padTopPadding),
+              child: Transform.scale(
+                scale: _dpadEffectiveScale,
+                alignment: _getAlignment(_dpadPosition),
+                child: NetHackDPad(
+                  opacity: _padOpacity,
+                  directionLabels: _buildDirectionLabels(),
+                  centerLabel: _isDirectionPromptActive ? '.' : _moveModeLabel(_dPadMoveMode),
+                  onDirectionPress: (viKey) {
+                    _sendModeAppliedDirection(viKey);
+                  },
+                  onDirectionLongPress: (viKey) {
+                    _sendModeAppliedDirection(viKey, modeOverride: _dPadLongPressMoveMode);
+                  },
+                  onCenterTap: _handleCenterTap,
+                  onCenterLongPress: () {
+                    _showMoveModeSelectDialog();
+                  },
+                ),
               ),
             ),
           ),
-        ),
-        // 3. ショートカットパッド
-        Positioned(
-          top: scTop,
-          bottom: scBottom,
-          left: scLeft,
-          right: scRight,
-          child: Padding(
-            padding: const EdgeInsets.only(top: padTopPadding),
-            child: Transform.scale(
-              scale: _shortcutPadEffectiveScale,
-              alignment: _getAlignment(_shortcutPosition),
-              child: NetHackShortcutPad(
-                key: ValueKey(_controlsVersion),
-                opacity: _padOpacity,
-                onKeyPress: (key) => _sendKeysToC(key),
-                onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                onShortcut: (cmd) => _sendShortcutToC(cmd),
-                onShortcutLongPress: (index) => _showShortcutEditDialog(index),
+          // 4. ショートカットパッド (パッドモード時のみ)
+          Positioned(
+            top: scTop,
+            bottom: scBottom,
+            left: scLeft,
+            right: scRight,
+            child: Padding(
+              padding: const EdgeInsets.only(top: padTopPadding),
+              child: Transform.scale(
+                scale: _shortcutPadEffectiveScale,
+                alignment: _getAlignment(_shortcutPosition),
+                child: NetHackShortcutPad(
+                  key: ValueKey(_controlsVersion),
+                  opacity: _padOpacity,
+                  onKeyPress: (key) => _sendKeysToC(key),
+                  onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                  onShortcut: (cmd) => _sendShortcutToC(cmd),
+                  onShortcutLongPress: (index) => _showShortcutEditDialog(index),
+                ),
               ),
             ),
           ),
-        ),
-        // 4. メッセージ領域
+        ],
+        // 5. メッセージ領域
         Positioned(
           top: msgTop,
           bottom: msgBottom,
