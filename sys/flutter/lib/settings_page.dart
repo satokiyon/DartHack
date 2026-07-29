@@ -43,9 +43,11 @@ class _SettingsPageState extends State<SettingsPage> {
   String _dpadPosition = 'bottom_left';
   String _shortcutPosition = 'bottom_right';
   String _msgPosition = 'bottom';
-  int _msgCharWidth = 30;
+  // ignore: unused_field
+  int _msgCharWidth = 30; // main.dart での設定ロード互換のため保持
   String _statusPosition = 'bottom';
   String _cmdPanelPosition = 'top';
+  int _layoutPattern = 1; // UIレイアウトパターン (1 or 2)
   String _dpadLongPressMoveMode = 'G_UPPER';
   String _mapTapTravelMode = 'always';
 
@@ -212,6 +214,16 @@ class _SettingsPageState extends State<SettingsPage> {
       _msgCharWidth = prefs.getInt('msg_char_width') ?? 30;
       _statusPosition = prefs.getString('status_position') ?? 'top';
       _cmdPanelPosition = prefs.getString('cmd_panel_position') ?? 'bottom';
+      _layoutPattern = prefs.getInt('layout_pattern') ?? 1;
+      // パターン番号から各配置変数を復元
+      final patternDef = _layoutPatterns[_layoutPattern];
+      if (patternDef != null) {
+        _dpadPosition       = patternDef['dpad_position'] ?? _dpadPosition;
+        _shortcutPosition   = patternDef['shortcut_position'] ?? _shortcutPosition;
+        _msgPosition        = patternDef['msg_position'] ?? _msgPosition;
+        _statusPosition     = patternDef['status_position'] ?? _statusPosition;
+        _cmdPanelPosition   = patternDef['cmd_panel_position'] ?? _cmdPanelPosition;
+      }
       _dpadLongPressMoveMode = prefs.getString('dpad_long_press_move_mode') ?? 'G_UPPER';
       _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'always';
 
@@ -267,6 +279,54 @@ class _SettingsPageState extends State<SettingsPage> {
     });
 
     _syncNativeKeySettings();
+  }
+
+  // UIレイアウトパターン定義
+  // キー: パターン番号 (1, 2, ...)
+  // 値: SharedPreferences キー -> 設定値 の Map
+  static const Map<int, Map<String, String>> _layoutPatterns = {
+    1: {
+      'status_position':   'top',
+      'msg_position':      'top',
+      'dpad_position':     'bottom_left',
+      'shortcut_position': 'bottom_right',
+      'cmd_panel_position':'bottom',
+      'menu_button_position': 'bottom_left',
+      'map_button_position':  'bottom_right',
+    },
+    2: {
+      'status_position':   'bottom',
+      'msg_position':      'bottom',
+      'dpad_position':     'top_left',
+      'shortcut_position': 'top_right',
+      'cmd_panel_position':'top',
+      'menu_button_position': 'top_left',
+      'map_button_position':  'top_right',
+    },
+  };
+
+  /// パターンを適用して個別設定キーを一括保存し、UIに反映する
+  Future<void> _applyPattern(int pattern) async {
+    final def = _layoutPatterns[pattern];
+    if (def == null) return;
+
+    setState(() {
+      _layoutPattern        = pattern;
+      _statusPosition       = def['status_position']!;
+      _msgPosition          = def['msg_position']!;
+      _dpadPosition         = def['dpad_position']!;
+      _shortcutPosition     = def['shortcut_position']!;
+      _cmdPanelPosition     = def['cmd_panel_position']!;
+      _menuButtonPosition   = def['menu_button_position']!;
+      _mapButtonPosition    = def['map_button_position']!;
+    });
+
+    // 個別キーとパターン番号を SharedPreferences に一括保存
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('layout_pattern', pattern);
+    for (final entry in def.entries) {
+      await prefs.setString(entry.key, entry.value);
+    }
   }
 
   Future<void> _saveSetting<T>(String key, T value) async {
@@ -669,120 +729,49 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildUILayoutSection() {
+    // パターンの概要説明テキスト
+    const patternDescriptions = {
+      1: 'ステータス・メッセージ: 上部 / 移動パッド・ショートカット: 下部',
+      2: 'ステータス・メッセージ: 下部 / 移動パッド・ショートカット: 上部',
+    };
+
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.dashboard_customize, color: Colors.cyanAccent),
         title: const Text("UI配置カスタマイズ"),
-        subtitle: const Text("各UIエレメントの画面上の位置を指定します"),
+        subtitle: const Text("画面レイアウトのパターンを選択します"),
         children: _withDividers([
-          ListTile(
-            title: const Text("移動パッド位置"),
-            trailing: DropdownButton<String>(
-              value: _dpadPosition,
-              items: const [
-                DropdownMenuItem(value: 'bottom_left', child: Text('画面左下')),
-                DropdownMenuItem(value: 'top_left', child: Text('画面左上')),
-                DropdownMenuItem(value: 'bottom_right', child: Text('画面右下')),
-                DropdownMenuItem(value: 'top_right', child: Text('画面右上')),
+          // パターン選択 (RadioGroup)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 16.0, bottom: 4.0),
+                  child: Text('レイアウトパターン', style: TextStyle(fontSize: 14, color: Colors.white70)),
+                ),
+                // ignore: deprecated_member_use
+                for (final entry in patternDescriptions.entries)
+                  // ignore: deprecated_member_use
+                  ListTile(
+                    leading: Radio<int>(
+                      value: entry.key,
+                      // ignore: deprecated_member_use
+                      groupValue: _layoutPattern,
+                      // ignore: deprecated_member_use
+                      onChanged: (val) {
+                        if (val != null) _applyPattern(val);
+                      },
+                    ),
+                    title: Text('パターン ${entry.key}'),
+                    subtitle: Text(entry.value, style: const TextStyle(fontSize: 12)),
+                    onTap: () => _applyPattern(entry.key),
+                  ),
               ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _dpadPosition = val);
-                  _saveSetting('dpad_position', val);
-                }
-              },
             ),
           ),
-          ListTile(
-            title: const Text("ショートカットボタン位置"),
-            trailing: DropdownButton<String>(
-              value: _shortcutPosition,
-              items: const [
-                DropdownMenuItem(value: 'bottom_right', child: Text('画面右下')),
-                DropdownMenuItem(value: 'top_right', child: Text('画面右上')),
-                DropdownMenuItem(value: 'bottom_left', child: Text('画面左下')),
-                DropdownMenuItem(value: 'top_left', child: Text('画面左上')),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _shortcutPosition = val);
-                  _saveSetting('shortcut_position', val);
-                }
-              },
-            ),
-          ),
-          ListTile(
-            title: const Text("ステータス領域位置"),
-            trailing: DropdownButton<String>(
-              value: _statusPosition,
-              items: const [
-                DropdownMenuItem(value: 'top', child: Text('画面上部 (横型)')),
-                DropdownMenuItem(value: 'bottom', child: Text('画面下部 (横型)')),
-                DropdownMenuItem(value: 'left', child: Text('画面左 (縦型)')),
-                DropdownMenuItem(value: 'right', child: Text('画面右 (縦型)')),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _statusPosition = val);
-                  _saveSetting('status_position', val);
-                }
-              },
-            ),
-          ),
-          ListTile(
-            title: const Text("メッセージ領域位置"),
-            trailing: DropdownButton<String>(
-              value: _msgPosition,
-              items: const [
-                DropdownMenuItem(value: 'top', child: Text('画面上部 (幅フル)')),
-                DropdownMenuItem(value: 'bottom', child: Text('画面下部 (幅フル)')),
-                DropdownMenuItem(value: 'top_left', child: Text('画面左上')),
-                DropdownMenuItem(value: 'bottom_left', child: Text('画面左下')),
-                DropdownMenuItem(value: 'top_right', child: Text('画面右上')),
-                DropdownMenuItem(value: 'bottom_right', child: Text('画面右下')),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _msgPosition = val);
-                  _saveSetting('msg_position', val);
-                }
-              },
-            ),
-          ),
-          if (_msgPosition != 'bottom' && _msgPosition != 'top')
-            ListTile(
-              title: const Text("メッセージ1行あたりの文字数 (横幅)"),
-              subtitle: Slider(
-                value: _msgCharWidth.toDouble(),
-                min: 20,
-                max: 60,
-                divisions: 40,
-                label: "$_msgCharWidth 文字",
-                onChanged: (val) {
-                  setState(() => _msgCharWidth = val.toInt());
-                  _saveSetting('msg_char_width', val.toInt());
-                },
-              ),
-            ),
-          ListTile(
-            title: const Text("コマンドパネル位置"),
-            trailing: DropdownButton<String>(
-              value: _cmdPanelPosition,
-              items: const [
-                DropdownMenuItem(value: 'bottom', child: Text('画面下部 (横型)')),
-                DropdownMenuItem(value: 'top', child: Text('画面上部 (横型)')),
-                DropdownMenuItem(value: 'left', child: Text('画面左 (縦型)')),
-                DropdownMenuItem(value: 'right', child: Text('画面右 (縦型)')),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _cmdPanelPosition = val);
-                  _saveSetting('cmd_panel_position', val);
-                }
-              },
-            ),
-          ),
-          // メニューボタン・地図ボタンの配置設定
+          // メニューボタン・地図ボタンの配置設定（個別設定として残す）
           ListTile(
             title: const Text("半透明メニューボタンの配置位置"),
             trailing: DropdownButton<String>(
