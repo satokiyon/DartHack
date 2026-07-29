@@ -22,7 +22,7 @@ import 'dart:ffi' hide Size;
 import 'dart:convert';
 import 'package:ffi/ffi.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'widgets/exit_ad_banner.dart';
+import 'widgets/exit_highlight_dialog.dart';
 
 import 'models/game_enums.dart';
 import 'models/ext_cmd_entry.dart';
@@ -1056,29 +1056,9 @@ class _MyHomePageState extends State<MyHomePage> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return PopScope(
-          canPop: false,
-          child: AlertDialog(
-            backgroundColor: Colors.grey[900],
-            title: const Text('終了', style: TextStyle(color: Colors.white)),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  dialogMessage,
-                  style: const TextStyle(color: Colors.white70),
-                ),
-                const SizedBox(height: 16),
-                const ExitAdBanner(),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('OK', style: TextStyle(color: Colors.blueAccent)),
-              ),
-            ],
-          ),
+        return ExitHighlightDialog(
+          dialogMessage: dialogMessage,
+          messageHistory: List<String>.from(_screen.messageHistory),
         );
       },
     );

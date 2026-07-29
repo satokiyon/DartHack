@@ -3,7 +3,14 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../config/ad_config.dart';
 
 class ExitAdBanner extends StatefulWidget {
-  const ExitAdBanner({super.key});
+  final VoidCallback? onAdLoaded;
+  final VoidCallback? onAdFailedToLoad;
+
+  const ExitAdBanner({
+    super.key,
+    this.onAdLoaded,
+    this.onAdFailedToLoad,
+  });
 
   @override
   State<ExitAdBanner> createState() => _ExitAdBannerState();
@@ -21,7 +28,10 @@ class _ExitAdBannerState extends State<ExitAdBanner> {
 
   void _loadAd() {
     final adUnitId = AdConfig.bannerAdUnitId;
-    if (adUnitId.isEmpty) return;
+    if (adUnitId.isEmpty) {
+      widget.onAdFailedToLoad?.call();
+      return;
+    }
 
     _bannerAd = BannerAd(
       adUnitId: adUnitId,
@@ -33,6 +43,7 @@ class _ExitAdBannerState extends State<ExitAdBanner> {
             setState(() {
               _isAdLoaded = true;
             });
+            widget.onAdLoaded?.call();
           }
         },
         onAdFailedToLoad: (ad, error) {
@@ -43,6 +54,7 @@ class _ExitAdBannerState extends State<ExitAdBanner> {
               _bannerAd = null;
               _isAdLoaded = false;
             });
+            widget.onAdFailedToLoad?.call();
           }
         },
       ),
