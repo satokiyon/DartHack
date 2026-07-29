@@ -609,8 +609,8 @@ class _MyHomePageState extends State<MyHomePage> {
     double dpadShift(String pos) => (_dpadPosition == pos) ? (150.0 * _dpadEffectiveScale + 8.0) : 0.0;
     double scShift(String pos) => (_shortcutPosition == pos) ? (150.0 * _shortcutPadEffectiveScale + 8.0) : 0.0;
 
-    // メッセージ領域の高さ見積もり（フォントサイズ・行数・コンテナPadding・マージンから正確に算出）
-    final estimatedMsgHeight = (_msgFontSize * 1.35 + 2.0) * _msgLineCount + 14.0;
+    // メッセージ領域の高さ見積もり（フォントサイズ・行数+1行分・コンテナPadding・マージンから正確に算出）
+    final estimatedMsgHeight = (_msgFontSize * 1.35 + 2.0) * (_msgLineCount + 1) + 14.0;
 
     // メッセージ領域が上部に配置されている場合のシフト量 (padTopPadding 6.0px を含む)
     double msgTopShift(String buttonCorner) {
@@ -715,8 +715,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // メニューボタンが同じコーナーにある場合のみシフト
     double menuShift(String pos) => (_menuButtonPosition == pos) ? 48.0 : 0.0;
 
-    // メッセージ領域の高さ見積もり（フォントサイズ・行数・コンテナPadding・マージンから正確に算出）
-    final estimatedMsgHeight = (_msgFontSize * 1.35 + 2.0) * _msgLineCount + 14.0;
+    // メッセージ領域の高さ見積もり（フォントサイズ・行数+1行分・コンテナPadding・マージンから正確に算出）
+    final estimatedMsgHeight = (_msgFontSize * 1.35 + 2.0) * (_msgLineCount + 1) + 14.0;
 
     // メッセージ領域が上部に配置されている場合のシフト量 (padTopPadding 6.0px を含む)
     double msgTopShift(String buttonCorner) {
