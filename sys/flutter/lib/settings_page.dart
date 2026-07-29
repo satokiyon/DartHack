@@ -38,6 +38,7 @@ class _SettingsPageState extends State<SettingsPage> {
   double _cmdPanelScale = 1.0;
   String _drawerPosition = 'left';
   String _menuButtonPosition = 'bottom_left';
+  // ignore: unused_field
   bool _showMapButton = true;
   String _mapButtonPosition = 'bottom_right';
   String _dpadPosition = 'bottom_left';
@@ -48,6 +49,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String _statusPosition = 'bottom';
   String _cmdPanelPosition = 'top';
   int _layoutPattern = 1; // UIレイアウトパターン (1 or 2)
+  bool _swapPadSide = false; // 移動パッドとショートカットパッドの左右反転
   String _dpadLongPressMoveMode = 'G_UPPER';
   String _mapTapTravelMode = 'always';
 
@@ -215,11 +217,18 @@ class _SettingsPageState extends State<SettingsPage> {
       _statusPosition = prefs.getString('status_position') ?? 'top';
       _cmdPanelPosition = prefs.getString('cmd_panel_position') ?? 'bottom';
       _layoutPattern = prefs.getInt('layout_pattern') ?? 1;
-      // パターン番号から各配置変数を復元
+      _swapPadSide = prefs.getBool('swap_pad_side') ?? false;
+      // パターン番号から各配置変数を復元（左右反転も反映）
       final patternDef = _layoutPatterns[_layoutPattern];
       if (patternDef != null) {
-        _dpadPosition       = patternDef['dpad_position'] ?? _dpadPosition;
-        _shortcutPosition   = patternDef['shortcut_position'] ?? _shortcutPosition;
+        var dpadPos = patternDef['dpad_position'] ?? _dpadPosition;
+        var scPos = patternDef['shortcut_position'] ?? _shortcutPosition;
+        if (_swapPadSide) {
+          dpadPos = _swapPositionLeftRight(dpadPos);
+          scPos = _swapPositionLeftRight(scPos);
+        }
+        _dpadPosition       = dpadPos;
+        _shortcutPosition   = scPos;
         _msgPosition        = patternDef['msg_position'] ?? _msgPosition;
         _statusPosition     = patternDef['status_position'] ?? _statusPosition;
         _cmdPanelPosition   = patternDef['cmd_panel_position'] ?? _cmdPanelPosition;
@@ -305,17 +314,34 @@ class _SettingsPageState extends State<SettingsPage> {
     },
   };
 
+  /// 位置文字列の left と right を入れ替える
+  String _swapPositionLeftRight(String pos) {
+    if (pos.endsWith('left')) {
+      return pos.replaceAll('left', 'right');
+    } else if (pos.endsWith('right')) {
+      return pos.replaceAll('right', 'left');
+    }
+    return pos;
+  }
+
   /// パターンを適用して個別設定キーを一括保存し、UIに反映する
   Future<void> _applyPattern(int pattern) async {
     final def = _layoutPatterns[pattern];
     if (def == null) return;
 
+    var dpadPos = def['dpad_position']!;
+    var scPos = def['shortcut_position']!;
+    if (_swapPadSide) {
+      dpadPos = _swapPositionLeftRight(dpadPos);
+      scPos = _swapPositionLeftRight(scPos);
+    }
+
     setState(() {
       _layoutPattern        = pattern;
       _statusPosition       = def['status_position']!;
       _msgPosition          = def['msg_position']!;
-      _dpadPosition         = def['dpad_position']!;
-      _shortcutPosition     = def['shortcut_position']!;
+      _dpadPosition         = dpadPos;
+      _shortcutPosition     = scPos;
       _cmdPanelPosition     = def['cmd_panel_position']!;
       _menuButtonPosition   = def['menu_button_position']!;
       _mapButtonPosition    = def['map_button_position']!;
@@ -325,7 +351,13 @@ class _SettingsPageState extends State<SettingsPage> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('layout_pattern', pattern);
     for (final entry in def.entries) {
-      await prefs.setString(entry.key, entry.value);
+      if (entry.key == 'dpad_position') {
+        await prefs.setString('dpad_position', dpadPos);
+      } else if (entry.key == 'shortcut_position') {
+        await prefs.setString('shortcut_position', scPos);
+      } else {
+        await prefs.setString(entry.key, entry.value);
+      }
     }
   }
 
@@ -771,6 +803,17 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
+          // 移動パッドとショートカットの左右入れ替えスイッチ
+          SwitchListTile(
+            title: const Text("移動パッドとショートカットの左右を入れ替える"),
+            subtitle: const Text("移動パッドを右側、ショートカットボタンを左側に配置します"),
+            value: _swapPadSide,
+            onChanged: (val) {
+              setState(() => _swapPadSide = val);
+              _saveSetting('swap_pad_side', val);
+              _applyPattern(_layoutPattern);
+            },
+          ),
           // メニューボタン・地図ボタンの配置設定（個別設定として残す）
           ListTile(
             title: const Text("半透明メニューボタンの配置位置"),
@@ -793,15 +836,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 }
               },
             ),
-          ),
-          SwitchListTile(
-            title: const Text("半透明地図ボタンを表示"),
-            subtitle: const Text("今いる階層の全体地図を開くボタンを表示します"),
-            value: _showMapButton,
-            onChanged: (val) {
-              setState(() => _showMapButton = val);
-              _saveSetting('show_map_button', val);
-            },
           ),
           ListTile(
             title: const Text("半透明地図ボタンの配置位置"),

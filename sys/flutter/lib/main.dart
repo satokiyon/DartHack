@@ -182,6 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _msgCharWidth = 30;
   String _statusPosition = 'top';
   String _cmdPanelPosition = 'bottom';
+  int _layoutPattern = 1; // UIレイアウトパターン (1 or 2)
   bool _isTopDrawerOpen = false;
   bool _isBottomDrawerOpen = false;
   bool _isMainGameStarted = false;
@@ -263,6 +264,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _msgCharWidth = prefs.getInt('msg_char_width') ?? 30;
       _statusPosition = prefs.getString('status_position') ?? 'top';
       _cmdPanelPosition = prefs.getString('cmd_panel_position') ?? 'bottom';
+      _layoutPattern = prefs.getInt('layout_pattern') ?? 1;
       _enabledDPadMoveModes = _parseEnabledMoveModes(
         prefs.getString('dpad_enabled_move_modes') ??
             'NORMAL,UPPER,G_LOWER,G_UPPER,CTRL,M_CMD,F_CMD',
@@ -1117,9 +1119,12 @@ class _MyHomePageState extends State<MyHomePage> {
     final playerX = mapOffsetX + cursorX * cellWidth + (cellWidth / 2);
     final playerY = mapOffsetY + cursorY * cellHeight + (cellHeight / 2);
 
-    // 下部コントローラの遮りを考慮し、視覚的中心（上から35%の高さ）に主人公が来るよう調整
+    // コントローラの遮りを考慮し、視覚的中心に主人公が来るよう調整
+    // パターン1（下部コントローラ等）: 上から40% (0.40)
+    // パターン2（上部コントローラ等）: 上から60% (0.60)
+    final double yRatio = (_layoutPattern == 2 || _dpadPosition.startsWith('top')) ? 0.60 : 0.40;
     final tx = (viewportSize.width / 2) - (playerX * _currentScale);
-    final ty = (viewportSize.height * 0.35) - (playerY * _currentScale);
+    final ty = (viewportSize.height * yRatio) - (playerY * _currentScale);
 
     _transformationController.value = Matrix4(
       _currentScale, 0.0, 0.0, 0.0, // column 1
