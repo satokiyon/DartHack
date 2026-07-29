@@ -618,6 +618,13 @@ class _MyHomePageState extends State<MyHomePage> {
       return 0.0;
     }
 
+    // メッセージ領域が下部（全幅 'bottom'）に配置されているときのシフト量
+    // 全幅の場合のみ bottom_* コーナー全体に影響する
+    double msgBottomShift(String buttonCorner) {
+      if (buttonCorner.startsWith('bottom') && _msgPosition == 'bottom') return estimatedMsgHeight;
+      return 0.0;
+    }
+
     switch (_menuButtonPosition) {
       case 'top_left':
         top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_left') + scShift('top_left')
@@ -639,14 +646,16 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       case 'bottom_left':
         // _dialogBottomInset は使用しない（二重加算バグを防ぐため）
-        // safeBottom + ステータス + コマンドパネル + 同コーナーのDPad/Shortcut のみ積む
+        // safeBottom + ステータス + コマンドパネル + 同コーナーのDPad/Shortcut + メッセージを積む
         bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift
-               + dpadShift('bottom_left') + scShift('bottom_left');
+               + dpadShift('bottom_left') + scShift('bottom_left')
+               + msgBottomShift('bottom_left');
         left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'bottom_right':
         bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift
-               + dpadShift('bottom_right') + scShift('bottom_right');
+               + dpadShift('bottom_right') + scShift('bottom_right')
+               + msgBottomShift('bottom_right');
         right = 8.0 + statusRightShift + cmdRightShift;
         break;
     }
@@ -712,6 +721,12 @@ class _MyHomePageState extends State<MyHomePage> {
       return 0.0;
     }
 
+    // メッセージ領域が下部（全幅 'bottom'）に配置されているときのシフト量
+    double msgBottomShift(String buttonCorner) {
+      if (buttonCorner.startsWith('bottom') && _msgPosition == 'bottom') return estimatedMsgHeight;
+      return 0.0;
+    }
+
     switch (_mapButtonPosition) {
       case 'top_left':
         top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_left') + scShift('top_left')
@@ -734,12 +749,14 @@ class _MyHomePageState extends State<MyHomePage> {
       case 'bottom_left':
         // _dialogBottomInset は使用しない（二重加算バグを防ぐため）
         bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift
-               + dpadShift('bottom_left') + scShift('bottom_left') + menuShift('bottom_left');
+               + dpadShift('bottom_left') + scShift('bottom_left')
+               + msgBottomShift('bottom_left') + menuShift('bottom_left');
         left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'bottom_right':
         bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift
-               + dpadShift('bottom_right') + scShift('bottom_right') + menuShift('bottom_right');
+               + dpadShift('bottom_right') + scShift('bottom_right')
+               + msgBottomShift('bottom_right') + menuShift('bottom_right');
         right = 8.0 + statusRightShift + cmdRightShift;
         break;
     }
