@@ -46,3 +46,9 @@ app.*.map.json
 assets/.dat_last_sync
 ad_config.json
 
+# Private build files and auto-generated tools
+Makefile.*
+setup.sh
+scripts/
+android/.kotlin/
+
