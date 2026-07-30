@@ -67,20 +67,12 @@ Android ビルドを行う前に、外部依存サブモジュールをチェッ
 git submodule update --init --recursive
 ```
 
-### 自動ビルドスクリプトの実行
-PowerShell から、リポジトリルートにあるビルド自動化スクリプトを実行します。
+### ビルドの実行
+ビルドは、プライベートリポジトリ `DartHack_private` 内に配置されている `android_build.ps1` を実行することで行われます。
 ```powershell
-powershell -ExecutionPolicy Bypass -File sys/flutter/scripts/sync_dat_assets.ps1
-cd sys/flutter
-flutter build apk
+# DartHack_private ディレクトリにて
+.\android_build.ps1
 ```
-- **内部処理**:
-  1. WSL (Ubuntu-26.04) 上で `sys/flutter/setup.sh` を実行し、必要な Makefile 群を配置します。
-  2. WSL 上で `make fetch-lua && make lua_support && make -C dat && make dofiles` を実行し、データファイルを `sys/flutter/assets/nethackdir` に書き出します。
-  3. Flutter 側で NDK CMake により `libnethack.so` をコンパイルし、APK をパッケージングします。
-
-### データファイルの変更・追加時
-- `/dat/options` や `/dat/rumors_jp` などのテキストファイルを変更または追加した場合は、`sys/flutter/scripts/sync_dat_assets.ps1` を実行してください。自動的に WSL 上で再生成され、`sys/flutter/assets/ver` のバージョン値がインクリメントされます。
 
 ---
 

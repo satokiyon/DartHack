@@ -162,7 +162,7 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
 
 ## 26. Flutter版 Cコア・アセットの自動確実更新（二重チェック）設計原則
 - **構成と自動同期**:
-  `sys/flutter` において C コアソース (`src/`, `include/`) が変更された場合も、`sync_dat_assets.ps1` が自動検知して `assets/ver` をインクリメントし、`build.gradle.kts` がそれを読み取って Android の `versionCode` を動的増分させる構成を維持してください。
+  `sys/flutter` において C コアソース (`src/`, `include/`) が変更された場合も、`DartHack_private` 内の `android_build.ps1` によるビルド時に自動検知して `assets/ver` をインクリメントし、`build.gradle.kts` がそれを読み取って Android の `versionCode` を動的増分させる構成を維持してください。
 - **FFI ビルド ID 判定**:
   C コア側（`winflutter.c`）で `flutter_get_build_id()` を提供し、Dart 側で `assets/ver` と C コアビルド ID の両重チェックを行うことで、実機端末上でのアセット最新展開と `.so` ファイルの確実な置換・反映を達成します。
 
