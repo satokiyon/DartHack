@@ -1091,7 +1091,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ElevatedButton.icon(
                 icon: const Icon(Icons.play_circle_fill_rounded, size: 22),
                 label: const Text(
-                  '広告を見て休む (体力/魔力を回復)',
+                  '広告を見て休む (体力か魔力を回復)',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
