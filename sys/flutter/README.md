@@ -1,19 +1,17 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-11. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-30. -->
 # DartHack (Flutter 移植版)
 
 NetHackJP 5.0.0 を **Flutter / Dart** 上で動作させるための移植プロジェクトです。
 
-- ゲーム本体（C コア）はリポジトリ直下の NetHack C ソース (`src/`、`win/android/`) をそのまま使用します。
+- ゲーム本体（C コア）はリポジトリ直下の NetHack C ソース (`src/`) を使用します。
 - 画面表示・キー入力・メニュー等は **Flutter UI（Dart）** で行い、C コアとは **Dart FFI** で双方向通信します。
-- モバイル（Android）を第一ターゲットとしつつ、Windows ローカルでの UI デバッグも同じ FFI 経路で行えるよう設計されています。
-
-このドキュメントでは、本フォルダ配下の構成と、ビルド手順を説明します。
+- モバイル（Android）およびデスクトップ（Windows 等）で同じ FFI 経路を用いて動作するよう設計されています。
 
 ---
 
 ## 📁 フォルダ構成
 
-```
+```text
 sys/flutter/
 ├── lib/                         # Dart / Flutter ソース（UI・FFI ブリッジ）
 │   ├── main.dart                # アプリ起動・メイン画面・状態管理
@@ -24,7 +22,7 @@ sys/flutter/
 │   ├── nethack_dpad.dart        # 仮想方向パッド
 │   ├── nethack_cmd_panel.dart   # 拡張コマンドパネル
 │   ├── nethack_shortcut_pad.dart# ショートカットキーパッド
-│   ├── nethack_keyboard.dart    # 仮想キーボード (SoftKeyboard 相当)
+│   ├── nethack_keyboard.dart    # 仮想キーボード
 │   ├── amount_selector_dialog.dart # 個数選択ダイアログ
 │   ├── defaults_editor.dart     # NetHack 起動オプション編集
 │   └── settings_page.dart       # 設定画面
@@ -34,59 +32,25 @@ sys/flutter/
 │   ├── settings.gradle.kts      # Flutter Plugin Loader / AGP / Kotlin 宣言
 │   ├── gradle.properties
 │   ├── local.properties         # flutter.sdk / sdk.dir など環境依存設定
-│   ├── gradle/                  # Gradle Wrapper
 │   └── app/
 │       ├── build.gradle.kts     # アプリモジュール設定
-│       └── src/
-│           ├── main/
-│           │   ├── AndroidManifest.xml
-│           │   ├── kotlin/      # MainActivity 等の Kotlin コード
-│           │   ├── res/         # アイコン・テーマ等の Android リソース
-│           │   └── cpp/         # ★ C コアと Flutter を橋渡しするソース
-│           │       ├── CMakeLists.txt   # ネイティブビルド定義
-│           │       ├── winflutter.c     # Flutter 用 window port（実体）
-│           │       └── libnethack_dummy.c # ダミーコア（Windows 開発用）
-│           ├── debug/ / profile/        # ビルドバリアント別 Manifest
+│       └── src/main/cpp/        # C コアと Flutter を橋渡しするソース (winflutter.c)
 │
-├── ios/                         # iOS Runner (Xcode プロジェクト、自動生成)
-│   ├── Flutter/                 # Flutter フレームワーク組み込み
-│   └── Runner/                  # AppDelegate / Info.plist
+├── ios/                         # iOS Runner (Xcode プロジェクト)
+├── windows/                     # Windows ランナー
+├── dummy/                       # FFI 検証用スタブ実装
+│   └── libnethack_dummy.c
 │
-├── windows/                     # Windows ローカル FFI デバッグ用
-│   ├── CMakeLists.txt           # ※ libnethack_dummy.c を流用して DLL を生成
-│   ├── runner/                  # Win32 エントリポイント (Flutter Windows)
-│   └── flutter/                 # Flutter Windows ツール用設定
+├── assets/                      # アプリに同梱する静的アセット
+│   ├── ver                      # アセットバージョン番号
+│   ├── nethackdir/              # NetHack データファイル一式
+│   ├── tiles/                   # タイルセット (16x16, Geoduck, Nevanda, PixelHack 等)
+│   └── fonts/                   # フォントファイル
 │
-├── web/                         # Web 版（アイコン・index.html のみ。動作未対応）
-├── dummy/                       # Windows 用 FFI 検証用スタブの原本
-│   └── libnethack_dummy.c       # android/app/src/main/cpp/ と同期
-│
-├── assets/                      # Flutter 経由でアプリに同梱する静的アセット
-│   ├── ver                      # アセットバージョン番号（更新時にインクリメント）
-│   ├── nethackdir/              # NetHack データ一式 (152 ファイル)
-│   │                            #   data, rumors, oracles, help, opthelp, cmdhelp,
-│   │                            #   keyhelp, engrive, epitaph, history, license,
-│   │                            #   wizhelp, tribute, symbols, bogusmon, hh,
-│   │                            #   opthelp, optmenu, defaults.nh, options 等
-│   │                            #   ※日本語版データを標準ファイル名で配置
-│   │                            #   ※タウンの *.lua (medusa, kox, soko1-1 等) も同梱
-│   ├── tiles/                   # タイルセット
-│   │   ├── default_16x16.png    #   16x16 ASCII
-│   │   ├── geoduck_15x25.png    #   15x25 Geoduck
-│   │   ├── nevanda_32x32.png    #   32x32 Nevanda
-│   │   ├── pixelhack_32x32.png  #   32x32 PixelHack
-│   │   └── overlays.png         #   ステータスアイコン等のオーバーレイ
-│   └── fonts/
-│       └── monobold.ttf         # ステータス行用等幅フォント
-│
-├── test/                        # Flutter 自動テスト (デフォルト)
-│
-├── pubspec.yaml                 # Flutter パッケージ設定（依存・assets 宣言）
+├── pubspec.yaml                 # Flutter パッケージ設定
 ├── pubspec.lock
-├── analysis_options.yaml        # Lint 設定 (flutter_lints)
-├── .gitignore / .metadata /
-├── darthack.iml /
-├── README.md                    # 本ドキュメント
+├── analysis_options.yaml        # Lint 設定
+└── README.md                    # 本ドキュメント
 ```
 
 ### 主要ファイルの説明
@@ -97,17 +61,14 @@ sys/flutter/
 | `lib/nethack_ffi.dart` | C コアが公開する関数（`StartNetHackFlutter`, `RegisterFlutterCallbacks`, `SendKeyToFlutter`, `SendPosCmdToFlutter` 等）の FFI バインディングを定義。 |
 | `lib/nethack_worker.dart` | Dart Isolate 上で FFI コールバック（ウィンドウ操作・メニュー・YN 等）を受け取り、UI 側 (`SendPort`) に転送する。 |
 | `android/app/src/main/cpp/winflutter.c` | NetHack の `window_procs` をハイジャックして、ウィンドウ描画・キー入力等を Dart 側へコールバックで通知する実体。`HijackWindowProcs()` で `and_procs` を上書き。 |
-| `android/app/src/main/cpp/CMakeLists.txt` | NetHack C コア（`src/*.c`, `win/android/*.c`, `lib/lua-5.4.8/src/*.c`）と `winflutter.c` を `libnethack.so` としてビルド。 |
-| `dummy/libnethack_dummy.c` | C コアをビルドせずに FFI 接続を検証するためのスタブ実装。Windows ローカル開発時に `nethack_dummy.dll` として読み込まれる。 |
-| `scripts/sync_dat_assets.ps1` | `dat` (`src/dat`) の変更を検知し、データファイルの自動生成・日本語ファイル名標準化変換・アセット同期・`assets/ver` のインクリメントを行うスクリプト。 |
-| `assets/ver` | Flutter 側 (`lib/nethack_assets.dart`) が参照するアセットバージョン番号。`assets/nethackdir/` 配下更新時に自動インクリメントされる。 |
-
+| `android/app/src/main/cpp/CMakeLists.txt` | NetHack C コアと `winflutter.c` を `libnethack.so` として構成。 |
+| `dummy/libnethack_dummy.c` | C コアをビルドせずに FFI 接続を検証するためのスタブ実装。 |
 
 ---
 
 ## 🏗️ アーキテクチャ概要
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────┐
 │  Dart / Flutter (UI スレッド)                                │
 │                                                              │
@@ -120,7 +81,7 @@ sys/flutter/
 └───────────────────────┼──────────────────────────────────────┘
                         │  FFI call
 ┌───────────────────────▼──────────────────────────────────────┐
-│  libnethack.so  (C コア + winflutter.c)                      │
+│  libnethack.so / dll  (C コア + winflutter.c)                │
 │                                                              │
 │  NetHackMain() ─→ 既存の NetHack C ロジック                  │
 │       │                                                      │
@@ -153,125 +114,8 @@ sys/flutter/
 
 - C コア側は `HijackWindowProcs()` で `and_procs`（Android ネイティブ実装）を丸ごと Flutter 用テーブルに差し替えています。
 - Dart ↔ C 間の双方向通信は「C → Dart コールバック + Dart → C エクスポート関数」の二系統で実現しています。
-- ステータス更新は `genl_status_update` をハイジャックして `WIN_STATUS` への `putstr` 2 行送信に統一されています（`AGENTS.md` の方針 1 を参照）。
-- マップタップは `SendPosCmdToFlutter(x, y, mod)` でクリックコマンドをキューに積み、`readchar_core` 経由で `#herecmdmenu` 相当のクリック系コマンドに変換します（`AGENTS.md` の方針 5）。
-
----
-
-## 🛠️ ビルド方法
-
-### 前提条件
-
-| 種別 | 必須環境 |
-|---|---|
-| OS | Windows 10/11 (推奨) |
-| Flutter SDK | 3.12 以降（`dart:ffi`, `flutter: 3.x`） |
-| Android SDK | API 21 以上（Flutter デフォルトで OK） |
-| Android NDK | Flutter が指定するバージョン（`flutter.ndkVersion`） |
-| WSL | Ubuntu-26.04（C コアを Linux 用にクロスコンパイルするため） |
-| JDK | 17（`JavaVersion.VERSION_17`） |
-| Kotlin | 2.3.20（`android/settings.gradle.kts`） |
-| Android Gradle Plugin | 9.0.1 |
-
-`android/local.properties` に `flutter.sdk` と `sdk.dir` のパスが記載されていることを確認してください（環境に合わせて書き換えてください）。
-
-```properties
-sdk.dir=C\:\\Users\\<user>\\AppData\\Local\\Android\\Sdk
-flutter.sdk=C\:\\Users\\<user>\\flutter
-flutter.buildMode=debug
-flutter.versionName=1.0.0
-flutter.versionCode=1
-```
-
-### A. Android 向け APK のビルド
-
-リポジトリ直下に用意されている **統合ビルドスクリプト** を使うと、C コアの WSL クロスコンパイルから Gradle APK パッケージングまでを 1 コマンドで実行できます。
-
-```powershell
-# リポジトリ直下 (Windows PowerShell)
-powershell -ExecutionPolicy Bypass -File sys/flutter/scripts/sync_dat_assets.ps1
-cd sys/flutter
-flutter build apk
-```
-
-このスクリプトは内部で次のことを行います。
-
-1. **WSL (Ubuntu-26.04) でデータファイル群を生成**
-   - `sys/flutter/setup.sh` の実行
-   - `make fetch-lua && make lua_support && make -C dat && make dofiles` で `data`, `rumors`, `oracles` 等を `sys/flutter/assets/nethackdir` に書き出し
-2. **Flutter 側でネイティブ（NDK CMake）＋ Dart パッケージング**
-   - `sys/flutter/android/app/src/main/cpp/CMakeLists.txt` により `libnethack.so` を NDK で自動ビルド
-3. 生成物: `sys/flutter/build/app/outputs/flutter-apk/app-release.apk`
-
-> **NOTE:** Android / Flutter ポートでは Windows 版と同様に、英語版データファイル (`data`, `help`, ... 等) と日本語版データファイル (`data_jp`, `help_jp`, ... 等) の **両方がアセットとして同梱** されます。C コアが動的に `_jp` ファイルを優先検索し、見つからなければ英語版に自動フォールバックしてロードします。
->
-> データファイルを変更した際は **`sync_dat_assets.ps1` が自動的に `assets/ver` のバージョン番号をインクリメント** します（Flutter 側 `lib/nethack_assets.dart` のアセット展開判定基準となる）。
-
-#### 個別にビルドする場合
-
-**Step 1: データファイル群の同期（WSL）**
-
-```bash
-# WSL 上で
-cd /path/to/NetHackJP
-cd sys/flutter
-sh ./setup.sh
-cd ../..
-make fetch-lua
-make lua_support
-make -C dat
-make dofiles
-```
-
-成果物:
-- `sys/flutter/assets/nethackdir/*` (データファイル群)
-
-**Step 2: Flutter アプリ（APK）のビルド**
-
-```powershell
-# Windows PowerShell
-cd sys\flutter
-flutter build apk
-```
-
-成果物:
-- `sys/flutter/build/app/outputs/flutter-apk/app-release.apk`
-
-### B. Windows ローカルでの UI デバッグ（ダミーコア）
-
-フル C コアをビルドせず、**Flutter UI のみをローカルで高速にデバッグ** したい場合は、Flutter の Windows ターゲットを使います。
-
-```powershell
-cd sys\flutter
-flutter pub get
-flutter run -d windows
-```
-
-このとき `lib/nethack_ffi.dart` は以下の順でネイティブライブラリを探索します。
-
-1. `libnethack.so` (Android 実機 / Linux)
-2. 見つからなければ `nethack_dummy.dll` (Windows デバッグ用)
-
-`nethack_dummy.dll` は `windows/CMakeLists.txt` が `dummy/libnethack_dummy.c` をビルドして生成し、Flutter 実行ファイルと同じフォルダへ自動コピーされます。
-
-- 起動すると「You see a dark room. What do you want to do?」等の仮想シナリオが流れます。
-- メニュー・YN 等の UI フローの動作確認ができます。
-- 実際の NetHack の挙動を確認したい場合は A. の手順で `libnethack.so` を用意し、Android 端末 / エミュレータで `flutter run -d android` を使ってください。
-
-### C. iOS / Web / macOS
-
-`ios/` `web/` フォルダは Flutter ツールが自動生成した雛形です。現時点では本プロジェクトは **Android および Windows (デバッグ用) を主ターゲット** としており、iOS / Web / macOS の動作は未検証です（Issue 等で要相談）。
-
----
-
-## 🧪 テスト
-
-```powershell
-cd sys\flutter
-flutter test
-```
-
-`test/widget_test.dart` のみが含まれているデフォルトの Flutter ウィジェットテストが実行されます。
+- ステータス更新は `genl_status_update` をハイジャックして `WIN_STATUS` への `putstr` 2 行送信に統一されています（`AGENTS.md` の方針参照）。
+- マップタップは `SendPosCmdToFlutter(x, y, mod)` でクリックコマンドをキューに積み、`readchar_core` 経由で入力として処理されます。
 
 ---
 
@@ -280,11 +124,11 @@ flutter test
 ### ログ・クラッシュ解析
 
 - **C 側のデバッグログ**: `winflutter.c` 冒頭に `debuglog()` マクロを定義し、Android Logcat へ `NetHackFlutter` タグで出力しています。`adb logcat -s NetHackFlutter:V` で確認できます。
-- **Dart 側のデバッグログ**: `lib/nethack_assets.dart` 等で `debugPrint()` を使用（`flutter run` コンソール / logcat に出力）。
+- **Dart 側のデバッグログ**: `lib/nethack_assets.dart` 等で `debugPrint()` を使用。
   - 問題特定の目的以外で残したデバッグログは、**原因特定後に必ず削除してからコミット** してください（リポジトリ方針）。
 - **クラッシュ時の確認ポイント**:
   - 画面が「セーブ中...」のまま止まる → C コアの `ExitCallback` が Dart 側に届いたか確認。
-  - メニューが勝手に閉じる → `request_input` 受信時の自動 `Space(auto)` 送信による誤発動の可能性（`AGENTS.md` の方針 6）。
+  - メニューが勝手に閉じる → `request_input` 受信時の自動 `Space(auto)` 送信による誤発動の可能性。
 
 ### 新しい C ↔ Dart コールバックを追加する手順
 
@@ -306,28 +150,15 @@ flutter test
 
 1. PNG ファイルを `assets/tiles/<name>_<w>x<h>.png` として配置。
 2. `lib/main.dart` のタイルセット一覧と `lib/nethack_screen.dart` の読み込みロジックを追加。
-3. タイル名（固有名詞）は日本語化せず英語表記を維持してください（`AGENTS.md` の方針 9）。
-
-### データファイル更新時の自動同期・バージョン管理
-
-NetHack のデータファイル（`dat/` または `src/dat/` 内の `data.raw`, `rumors.tru`, `oracles.txt` 等）に変更を加えた場合、**`flutter run` や `flutter build` を実行するだけで全自動でアセットに反映されます**。
-
-1. **自動検知と生成**: Android Gradle (`preBuild`) および Windows CMake の事前ビルドフックにより、`scripts/sync_dat_assets.ps1` が起動します。ソースデータに更新があれば WSL 経由でデータファイルを再ビルドします。
-2. **両言語アセットの同期**: 生成された `data_jp` や `rumors_jp` などの日本語データファイルと `data` や `rumors` 等の英語版データファイルの両方がそのまま `assets/nethackdir/` に配置されます。
-3. **バージョン自動インクリメント**: `assets/nethackdir/` 配下が更新された場合、`assets/ver` の数値が自動的に `+1` カウントアップされます。
-4. **差分がない場合の高速化**: `dat/` に変更がない場合は同期処理が自動的にスキップされるため、ビルド時間を遅延させません。
-5. **手動で同期する場合**:
-   ```powershell
-   powershell -NoProfile -ExecutionPolicy Bypass -File .\sys\flutter\scripts\sync_dat_assets.ps1
-   ```
+3. タイル名（固有名詞）は日本語化せず英語表記を維持してください。
 
 ---
 
 ## 🔗 関連ドキュメント
 
-- ルート [README.md](../../../README.md) — プロジェクト全体の概要・プレイヤー向け手順
-- [DEVELOPMENT.md](../../../DEVELOPMENT.md) — 開発者向けビルド・翻訳方針の詳細
-- [AGENTS.md](../../../AGENTS.md) — AI エージェント / 開発者共通のコーディング・翻訳・命名規約
+- ルート [README.md](../../README.md) — プロジェクト全体の概要・プレイヤー向け手順
+- [DEVELOPMENT.md](../../DEVELOPMENT.md) — 開発者向け方針の詳細
+- [AGENTS.md](../../AGENTS.md) — AI エージェント / 開発者共通のコーディング・翻訳・命名規約
 
 ---
 
