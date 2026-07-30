@@ -17,6 +17,7 @@ void debuglog(const char *fmt, ...) {
 
 // 前方宣言
 static int flutter_nhgetch(void);
+static void flutter_nhbell(void);
 extern char *decode_mixed(char *, const char *); // src/windows.c の関数 (\GXXXXNNNN → showsym 1 文字)
 
 static int palette[CLR_MAX] = {
@@ -557,6 +558,14 @@ void SendKeyToFlutter(int key) {
 
 void SendKeysToFlutter(const int* keys, int len) {
     if (!keys || len <= 0) return;
+
+    if (program_state.input_state != commandInp && len > 1 && keys[0] == '#') {
+        debuglog("SendKeysToFlutter: ignored extcmd '%c' (len=%d) during prompt (input_state=%d)",
+                 keys[0], len, program_state.input_state);
+        flutter_nhbell();
+        return;
+    }
+
     int enqueued = 0;
     for (int i = 0; i < len; i++) {
         if (g_key_count >= FLUTTER_MAX_KEYS) {
@@ -573,6 +582,14 @@ void SendKeysToFlutter(const int* keys, int len) {
 
 void SendShortcutToFlutter(const int* keys, int len) {
     if (!keys || len <= 0) return;
+
+    if (program_state.input_state != commandInp && len > 1 && keys[0] == '#') {
+        debuglog("SendShortcutToFlutter: ignored extcmd shortcut '%c' (len=%d) during prompt (input_state=%d)",
+                 keys[0], len, program_state.input_state);
+        flutter_nhbell();
+        return;
+    }
+
     int enqueued = 0;
     for (int i = 0; i < len; i++) {
         if (g_key_count >= FLUTTER_MAX_KEYS) {
@@ -1239,12 +1256,22 @@ static int flutter_nhgetch(void) {
 
     if (g_key_count > 0) {
         int key = g_key_queue[g_key_head];
-        g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
-        g_key_count--;
-        g_key_available = 1;
-        g_last_received_key = key;
-        debuglog("flutter_nhgetch: dispatched from key queue: %d (remaining=%d)", key, g_key_count);
-        return key;
+        if (program_state.input_state != commandInp && (key == '#' || g_pending_extcmd_mode)) {
+            debuglog("flutter_nhgetch: purging key queue due to extcmd key '%c' during prompt (input_state=%d, remaining=%d)",
+                     key, program_state.input_state, g_key_count);
+            g_key_head = 0;
+            g_key_tail = 0;
+            g_key_count = 0;
+            g_pending_extcmd_mode = 0;
+            flutter_nhbell();
+        } else {
+            g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
+            g_key_count--;
+            g_key_available = 1;
+            g_last_received_key = key;
+            debuglog("flutter_nhgetch: dispatched from key queue: %d (remaining=%d)", key, g_key_count);
+            return key;
+        }
     }
 
     g_input_request_id++;
@@ -1271,6 +1298,20 @@ static int flutter_nhgetch(void) {
         }
         if (g_key_count > 0) {
             int key = g_key_queue[g_key_head];
+            if (program_state.input_state != commandInp && (key == '#' || g_pending_extcmd_mode)) {
+                debuglog("flutter_nhgetch (wait loop): purging key queue due to extcmd key '%c' during prompt (input_state=%d, remaining=%d)",
+                         key, program_state.input_state, g_key_count);
+                g_key_head = 0;
+                g_key_tail = 0;
+                g_key_count = 0;
+                g_pending_extcmd_mode = 0;
+                flutter_nhbell();
+                g_input_request_id++;
+                if (g_dart_notify_input_cb) {
+                    g_dart_notify_input_cb(g_input_request_id);
+                }
+                continue;
+            }
             if (g_in_display_blocking && key != 32 && key != 27 && key != 10 && key != 13) {
                 g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
                 g_key_count--;

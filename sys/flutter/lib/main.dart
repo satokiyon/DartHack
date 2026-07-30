@@ -1387,7 +1387,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool _isDirectionPromptText(String text) {
     final lower = text.toLowerCase();
-    return lower.contains('what direction') || text.contains('どの方向');
+    return lower.contains('what direction') ||
+        lower.contains('which direction') ||
+        text.contains('どの方向');
   }
 
   String _moveModeLabel(DPadMoveMode mode) {
@@ -1772,6 +1774,11 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_isGetLineVisible) return;
     if (_isAskNameVisible) return;
 
+    if (command.startsWith('#') && _isDirectionPromptActive) {
+      _addLog("> Ignored extcmd '$command' during direction prompt");
+      return;
+    }
+
     final List<int> keys = _parseKeys(command);
     if (keys.isEmpty) return;
 
@@ -1792,6 +1799,11 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_isYnVisible) return;
     if (_isGetLineVisible) return;
     if (_isAskNameVisible) return;
+
+    if (command.startsWith('#') && _isDirectionPromptActive) {
+      _addLog("> Ignored extcmd shortcut '$command' during direction prompt");
+      return;
+    }
 
     final List<int> keys = _parseKeys(command);
     if (keys.isEmpty) return;
