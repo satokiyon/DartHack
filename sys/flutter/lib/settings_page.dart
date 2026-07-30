@@ -1643,9 +1643,19 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text("自動拾い (autopickup)"),
             subtitle: const Text("足元のアイテムを自動的に拾います"),
             value: _optAutopickup,
-            onChanged: (val) {
-              setState(() => _optAutopickup = val);
-              _saveGameOption('nh_opt_autopickup', val);
+            onChanged: (val) async {
+              setState(() {
+                _optAutopickup = val;
+                if (val && _optPickupTypes.isEmpty) {
+                  _optPickupTypes = r'$"=/!?+';
+                }
+              });
+              await _saveSetting('nh_opt_autopickup', val);
+              if (val) {
+                await _saveSetting('nh_opt_pickup_types', _optPickupTypes);
+              }
+              final defaultsHelper = DefaultsHelper();
+              await defaultsHelper.syncFromPrefsToFile(widget.defaultsFilePath);
             },
           ),
           ListTile(

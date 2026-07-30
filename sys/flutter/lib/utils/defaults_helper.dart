@@ -356,6 +356,8 @@ class DefaultsHelper {
     final pickupTypesVal = getOption('pickup_types');
     if (pickupTypesVal != null) {
       await prefs.setString('nh_opt_pickup_types', pickupTypesVal);
+    } else if (!prefs.containsKey('nh_opt_pickup_types')) {
+      await prefs.setString('nh_opt_pickup_types', r'$"=/!?+');
     }
 
     // 経過ターン表示 (time)
@@ -447,7 +449,11 @@ class DefaultsHelper {
       setBoolOption('autopickup', prefs.getBool('nh_opt_autopickup') ?? false);
     }
     if (prefs.containsKey('nh_opt_pickup_types')) {
-      setOption('pickup_types', prefs.getString('nh_opt_pickup_types') ?? '');
+      final pTypes = prefs.getString('nh_opt_pickup_types') ?? '';
+      setOption('pickup_types', pTypes.isEmpty ? r'$"=/!?+' : pTypes);
+    } else if (prefs.getBool('nh_opt_autopickup') == true) {
+      setOption('pickup_types', r'$"=/!?+');
+      await prefs.setString('nh_opt_pickup_types', r'$"=/!?+');
     }
     if (prefs.containsKey('nh_opt_time')) {
       setBoolOption('time', prefs.getBool('nh_opt_time') ?? true);
@@ -515,17 +521,20 @@ class DefaultsHelper {
 
       if (!prefs.containsKey(prefKey)) {
         // 新規キーの補完追加
-        if (assetDefaultVal != null) {
+        final defaultVal = (optKey == 'pickup_types' && (assetDefaultVal == null || assetDefaultVal.isEmpty))
+            ? r'$"=/!?+'
+            : assetDefaultVal;
+        if (defaultVal != null) {
           if (optKey == 'number_pad' || optKey == 'tutorial_mode') {
-            final int iVal = int.tryParse(assetDefaultVal ?? '0') ?? 0;
+            final int iVal = int.tryParse(defaultVal) ?? 0;
             await prefs.setInt(prefKey, iVal);
           } else if (optKey == 'name' || optKey == 'pickup_types' || optKey == 'dogname' || optKey == 'catname' || optKey == 'horsename' || optKey == 'fruit') {
-            await prefs.setString(prefKey, assetDefaultVal);
+            await prefs.setString(prefKey, defaultVal);
           } else {
-            final bool bVal = assetDefaultVal.toLowerCase() == 'true';
+            final bool bVal = defaultVal.toLowerCase() == 'true';
             await prefs.setBool(prefKey, bVal);
           }
-          debugPrint("DefaultsHelper: Added new option '$prefKey' = $assetDefaultVal");
+          debugPrint("DefaultsHelper: Added new option '$prefKey' = $defaultVal");
         }
       } else {
         // 既存設定の検証と範囲外値のフォールバック
