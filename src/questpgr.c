@@ -606,7 +606,10 @@ deliver_by_window(const char *msg, int how)
 {
     char in_line[BUFSZ], out_line[BUFSZ];
     const char *msgp = msg, *msgend = eos((char *) msg);
-    winid datawin = create_nhwindow(how);
+    winid datawin;
+
+    set_flutter_plain_text_dialog(1);
+    datawin = create_nhwindow(how);
 
     while (msgp < msgend) {
         /* copynchars() will stop at newline if it finds one */
@@ -619,6 +622,7 @@ deliver_by_window(const char *msg, int how)
 
     display_nhwindow(datawin, TRUE);
     destroy_nhwindow(datawin);
+    set_flutter_plain_text_dialog(0);
 }
 
 staticfn boolean

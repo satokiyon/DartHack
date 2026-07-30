@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/guidebook_dialog.dart';
 
 class StartScreen extends StatelessWidget {
   final bool assetsReady;
@@ -24,6 +25,19 @@ class StartScreen extends StatelessWidget {
     if (isPortrait) {
       startScreenContent = Stack(
         children: [
+          Positioned(
+            top: 16,
+            left: 24,
+            child: IconButton(
+              icon: const Icon(Icons.menu_book, color: Colors.white70, size: 28),
+              onPressed: () => GuidebookDialog.show(context),
+              tooltip: "ガイドブック",
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.black38,
+                padding: const EdgeInsets.all(8),
+              ),
+            ),
+          ),
           Positioned(
             top: 16,
             right: 24,
@@ -129,6 +143,19 @@ class StartScreen extends StatelessWidget {
     } else {
       startScreenContent = Stack(
         children: [
+          Positioned(
+            top: 16,
+            left: 24,
+            child: IconButton(
+              icon: const Icon(Icons.menu_book, color: Colors.white70, size: 28),
+              onPressed: () => GuidebookDialog.show(context),
+              tooltip: "ガイドブック",
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.black38,
+                padding: const EdgeInsets.all(8),
+              ),
+            ),
+          ),
           Positioned(
             top: 16,
             right: 24,

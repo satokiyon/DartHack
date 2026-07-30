@@ -135,6 +135,8 @@ class TextOverlay extends StatelessWidget {
                       return TopTenWidget(entries: data);
                     }
 
+                    final hasAnyTile = useTiles && tileImage != null && textTiles.any((t) => t >= 0);
+
                     return Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
@@ -150,14 +152,14 @@ class TextOverlay extends StatelessWidget {
                           final line = textLines[index];
                           final trimmed = line.trim();
                           final isDivider = trimmed.isEmpty || RegExp(r'^[-=\s]+$').hasMatch(trimmed);
-                          final isCategory = !isPlainDialog && !isDivider && (trimmed.endsWith(':') || trimmed.endsWith('：'));
+                          final isCategory = !isDivider && (trimmed.endsWith(':') || trimmed.endsWith('：'));
 
                           if (isCategory) {
                             return _buildMenuCategoryRow(line);
                           }
                           if (isDivider) {
                             if (trimmed.isEmpty) {
-                              return const SizedBox(height: 8);
+                              return const SizedBox(height: 6);
                             }
                             return Padding(
                               padding: const EdgeInsets.symmetric(vertical: 6),
@@ -170,12 +172,14 @@ class TextOverlay extends StatelessWidget {
                               : -1;
 
                           return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            padding: const EdgeInsets.symmetric(vertical: 3),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                _buildMenuItemTile(tile),
-                                const SizedBox(width: 4),
+                                if (hasAnyTile) ...[
+                                  _buildMenuItemTile(tile),
+                                  const SizedBox(width: 6),
+                                ],
                                 Expanded(
                                   child: Text(
                                     line,
@@ -183,7 +187,8 @@ class TextOverlay extends StatelessWidget {
                                       color: Colors.white,
                                       fontFamily: 'monospace',
                                       fontSize: 13,
-                                      fontWeight: FontWeight.w700,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.35,
                                     ),
                                   ),
                                 ),
