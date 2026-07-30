@@ -29,33 +29,17 @@
   under sys/ (e.g. win/flutter, sys/android) are exempt because they
   are not part of upstream NetHack.
 -->
-# NetHackJP 開発メモ
+# DartHack 開発メモ
 <!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-11. -->
-# NetHackJP-Android 開発メモ
+# DartHack 開発メモ
 
-本ドキュメントは、Android ポートの日本語化リポジトリである `NetHackJP-Android` の開発環境の構築、ビルド、マージ運用およびリリース手順についてまとめたものです。
+本ドキュメントは、`DartHack` の開発環境の構築、ビルド、マージ運用およびリリース手順についてまとめたものです。
 
 ---
 
 ## 1. 開発環境の要件（事前準備）
 
-ビルドを実行する前に、Windows環境およびWSL環境に以下のソフトウェアをインストールし、セットアップを完了させてください。
-
-### Windows 環境
-- **Android Studio** (または Android SDK Command-Line Tools)
-  - Android SDK が必要です。通常は `C:\Users\<ユーザー名>\AppData\Local\Android\Sdk` に配置されます。
-- **Java Development Kit (JDK)**
-  - Gradle の動作に必要な JDK (Java 17 以上を推奨) をインストールしてください（Android Studio 同梱のものでも構いません）。
-- **Git for Windows**
-- **PowerShell** (自動ビルドスクリプトの実行に必要)
-
-### WSL 環境 (Windows Subsystem for Linux)
-- **Ubuntu** (ビルド自動化スクリプトは `Ubuntu-26.04` ディストリビューションをデフォルトとして動作します)
-- WSLのUbuntu上に、Cライブラリコンパイルに必要なパッケージ群をインストールしてください。
-  ```bash
-  sudo apt update
-  sudo apt install build-essential curl
-  ```
+ビルドを実行する前に、Android Studio等のソフトウェアをインストールし、セットアップを完了させてください。
 
 ---
 
