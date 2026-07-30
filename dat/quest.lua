@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-30.
 -- NetHack quest.lua	$NHDT-Date: 1781994887 2026/06/20 22:34:47 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
 -- Copyright (c) 2021 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
@@ -133,7 +133,7 @@ questtext = {
          "\"そちらへ向けて屁でもしてやりたいが, むしろお前の臭いがましになるかもしれんな!\"",
       },
       legacy = {
-         synopsis = "[%dCは%dIのためにイェンダーの魔除けを取り戻す者としてあなたを選んだ.]",
+         synopsis = "[%dCは自身のためにイェンダーの魔除けを取り戻す者としてあなたを選んだ.]",
          output = "menu",
          text = [[%dの書にはこう記されている:
 
@@ -155,7 +155,7 @@ questtext = {
       },
 -- starting with 'pauper' option set, last paragraph differs from normal legacy
       pauper_legacy = {
-         synopsis = "[%dCは%dIのためにイェンダーの魔除けを取り戻す者としてあなたを選んだ.]",
+         synopsis = "[%dCは自身のためにイェンダーの魔除けを取り戻す者としてあなたを選んだ.]",
          output = "menu",
          text = [[%dの書にはこう記されている:
 
