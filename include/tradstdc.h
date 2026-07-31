@@ -455,7 +455,7 @@ typedef genericptr genericptr_t; /* (void *) または (char *) */
 #ifndef FALLTHROUGH
 #if defined(__clang_major__)
 #if __clang_major__ >= 9
-#define FALLTHROUGH ; __attribute__((fallthrough))
+#define FALLTHROUGH __attribute__((fallthrough))
 /* #warning FALLTHROUGH __attribute__((fallthrough)) from clang */
 #endif  /* __clang_major__ greater than or equal to 9 */
 #endif  /* __clang_major__ is defined */
@@ -506,7 +506,6 @@ typedef genericptr genericptr_t; /* (void *) または (char *) */
 
 #if !defined(UNUSED) && defined(ATTRUNUSED)
 #define UNUSED ATTRUNUSED
-#endif
 #endif
 
 /* フォールバック実装 */

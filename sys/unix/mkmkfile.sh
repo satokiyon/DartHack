@@ -1,4 +1,3 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26.
 #!/bin/sh
 # NetHack 5.0  mkmkfile.sh	$NHDT-Date: 1597332770 2020/08/13 15:32:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.15 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.

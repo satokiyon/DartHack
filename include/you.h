@@ -162,6 +162,7 @@ struct u_conduct {     /* number of times... */
     long pets;         /* obtained a pet */
     /* genocides already listed at end of game */
     long rested_by_ad; /* rested by watching rewarded ad */
+    long reserved1;
     long reserved2;
     long reserved3;
     long reserved4;

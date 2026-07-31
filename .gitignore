@@ -1,10 +1,12 @@
 # Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31.
 # CVS default ignores begin
 tags
 TAGS
 .make.state
 .nse_depinfo
 *~
+\#*
 \#*
 .#*
 ,*

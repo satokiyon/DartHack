@@ -172,7 +172,7 @@
  *  xpmtoppm <x11tiles.xpm | pnmscale 1.25 | ppmquant 90 | \
  *      ppmtoxpm >x11tiles_big.xpm
  */
-#define USE_XPM /* Disable if you do not have the XPM library */
+/* # define USE_XPM */ /* Disable if you do not have the XPM library */
 #ifdef USE_XPM
 #ifndef GRAPHIC_TOMBSTONE
 #define GRAPHIC_TOMBSTONE /* Use graphical tombstone (rip.xpm) */
@@ -244,8 +244,8 @@
 #endif
 
 #ifndef SYSCF
-//#define SYSCF                /* use a global configuration */
-//#define SYSCF_FILE "sysconf" /* global configuration is in a file */
+#define SYSCF                /* use a global configuration */
+#define SYSCF_FILE "sysconf" /* global configuration is in a file */
 #endif
 
 #ifndef GDBPATH
@@ -351,7 +351,7 @@
  *      maximum number of scores to keep, for example) if SYSCF is enabled.
  */
 #ifndef PERSMAX
-#define PERSMAX 30 /* entries per name/uid per char. allowed */
+#define PERSMAX 3 /* entries per name/uid per char. allowed */
 #endif
 #ifndef POINTSMIN
 #define POINTSMIN 1 /* must be > 0 */
@@ -675,7 +675,6 @@ typedef unsigned char uchar;
    whole thing, then type a new end for the text. */
 /* #define EDIT_GETLIN */
 
-#define DUMPLOG  /* End-of-game dump logs */
 #ifndef NO_CHRONICLE
 /* CHRONICLE - enable #chronicle command, a log of major game events.
    The logged messages will also appear in DUMPLOG. */
@@ -687,6 +686,8 @@ typedef unsigned char uchar;
 #else
 #undef LIVELOG
 #endif /* NO_CHRONICLE */
+
+/* #define DUMPLOG */  /* End-of-game dump logs */
 
 #define USE_ISAAC64 /* Use cross-platform, bundled RNG */
 
