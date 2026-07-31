@@ -206,7 +206,10 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _showPanelNames = true;
   DPadMoveMode _dPadMoveMode = DPadMoveMode.normal;
   DPadMoveMode _dPadLongPressMoveMode = DPadMoveMode.gUpper;
-  List<DPadMoveMode> _enabledDPadMoveModes = List<DPadMoveMode>.from(_allDPadMoveModes);
+  List<DPadMoveMode> _enabledDPadMoveModes = [
+    DPadMoveMode.normal,
+    DPadMoveMode.fCmd,
+  ];
   bool _isDirectionPromptActive = false;
   String _mapTapTravelMode = 'always';
   bool _isMapScrolledOrZoomed = false;
@@ -265,8 +268,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _cmdPanelPosition = prefs.getString('cmd_panel_position') ?? 'bottom';
       _layoutPattern = prefs.getInt('layout_pattern') ?? 1;
       _enabledDPadMoveModes = _parseEnabledMoveModes(
-        prefs.getString('dpad_enabled_move_modes') ??
-            'NORMAL,UPPER,G_LOWER,G_UPPER,CTRL,M_CMD,F_CMD',
+        prefs.getString('dpad_enabled_move_modes') ?? 'NORMAL,F_CMD',
       );
       final savedMoveModeName = prefs.getString('dpad_move_mode') ?? 'NORMAL';
       _dPadMoveMode = _parseMoveMode(savedMoveModeName);
