@@ -1563,7 +1563,7 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #endif
 
 #define DEVTEAM_EMAIL "darthack823@gmail.com"
-#define DEVTEAM_URL "https://satokiyon.github.io/nethackjp-site/"
+#define DEVTEAM_URL "https://satokiyon.github.io/darthack-site/"
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 #include "nhlua.h"
 #endif
