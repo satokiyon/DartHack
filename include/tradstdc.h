@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-31. */
 /* NetHack 5.0	tradstdc.h	$NHDT-Date: 1781973090 2026/06/20 16:31:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2006. */
@@ -418,6 +418,7 @@ typedef genericptr genericptr_t; /* (void *) または (char *) */
 #define PRINTF_F(f,v) __attribute__ ((format (__printf__, f, v)))
 #elif (__GNUC__ >= 2) && !defined(USE_OLDARGS)
 #define PRINTF_F(f, v) __attribute__((format(printf, f, v)))
+#endif
 #if (__GNUC__ > 3) || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1)
 #define PRINTF_F_PTR(f, v) PRINTF_F(f, v)
 #endif
@@ -441,7 +442,7 @@ typedef genericptr genericptr_t; /* (void *) または (char *) */
 #endif  /* __GNUC__ greater than or equal to 5 */
 #if (!defined(__linux__) && !defined(MACOS)) || defined(GCC_URWARN)
  /* disable gcc's __attribute__((__warn_unused_result__)) since explicitly
-   discarding the result by casting to (void) is not accepted as a 'use' */
+    discarding the result by casting to (void) is not accepted as a 'use' */
 #define __warn_unused_result__ /*empty*/
 #define warn_unused_result /*empty*/
 #endif  /* GCC_URWARN || !__linux || !MACOS */
@@ -455,7 +456,7 @@ typedef genericptr genericptr_t; /* (void *) または (char *) */
 #ifndef FALLTHROUGH
 #if defined(__clang_major__)
 #if __clang_major__ >= 9
-#define FALLTHROUGH __attribute__((fallthrough))
+#define FALLTHROUGH ; __attribute__((fallthrough))
 /* #warning FALLTHROUGH __attribute__((fallthrough)) from clang */
 #endif  /* __clang_major__ greater than or equal to 9 */
 #endif  /* __clang_major__ is defined */
@@ -579,4 +580,3 @@ extern char *rindex(const char *s, int c) __attribute__ ((unavailable));
 
 
 #endif /* TRADSTDC_H */
-

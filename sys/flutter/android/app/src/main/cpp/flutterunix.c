@@ -84,3 +84,42 @@ gotlock:
 		}
 	}
 }
+
+boolean
+file_exists(const char *path)
+{
+	struct stat stbuf;
+
+	return (boolean) (stat(path, &stbuf) == 0);
+}
+
+boolean
+check_user_string(const char *optstr)
+{
+	int pwlen;
+	const char *eop, *w;
+	char *pwname = svp.plname;
+
+	if (!*optstr)
+		return FALSE;
+	if (optstr[0] == '*')
+		return TRUE; /* allow any user */
+	if (!pwname || !*pwname)
+		return FALSE;
+	pwlen = (int) strlen(pwname);
+	eop = eos((char *) optstr);
+	w = optstr;
+	while (w + pwlen <= eop) {
+		if (!*w)
+			break;
+		if (!strncmpi(w, pwname, pwlen)
+		    && (w[pwlen] == ',' || w[pwlen] == '\0'))
+			return TRUE;
+		while (*w && *w != ',')
+			w++;
+		if (*w == ',')
+			w++;
+	}
+	return FALSE;
+}
+
