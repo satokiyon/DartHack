@@ -16,11 +16,19 @@ __attribute__((visibility("default"))) void RegisterDartLogCallback(DartLogCallb
     g_dart_log_cb = cb;
 }
 
+#define NUM_LOG_BUFS 32
+#define LOG_BUF_SIZE 2048
+
 void debuglog(const char *fmt, ...) {
-    char buf[1024];
+    static char log_bufs[NUM_LOG_BUFS][LOG_BUF_SIZE];
+    static int log_buf_idx = 0;
+
+    char* buf = log_bufs[log_buf_idx];
+    log_buf_idx = (log_buf_idx + 1) % NUM_LOG_BUFS;
+
     va_list args;
     va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    vsnprintf(buf, LOG_BUF_SIZE, fmt, args);
     va_end(args);
 
     __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "%s", buf);
@@ -1847,11 +1855,7 @@ void set_flutter_config_error_msg(const char* msg) {
 static void flutter_wait_synch(void) {
     debuglog("flutter_wait_synch called! opt_initial=%d, msg='%s'", go.opt_initial, g_last_config_error_msg);
     if (g_last_config_error_msg[0] != '\0') {
-        char full_log[1200];
-        snprintf(full_log, sizeof(full_log), "CONFIG_ERROR_ALERT:%s", g_last_config_error_msg);
-        if (g_dart_log_cb) {
-            g_dart_log_cb(full_log);
-        }
+        debuglog("CONFIG_ERROR_ALERT:%s", g_last_config_error_msg);
         g_last_config_error_msg[0] = '\0';
     }
     if (go.opt_initial) {
