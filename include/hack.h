@@ -774,14 +774,13 @@ struct selectionvar {
 };
 
 /* structure for 'program_state'; not saved and restored */
+/* DartHack-FIX: Ensure struct sinfo field layout and byte offsets are 100% identical
+   across all translation units by removing conditional #ifdefs from member definitions. */
 struct sinfo {
     int gameover;               /* self-explanatory? */
     int stopprint;              /* inhibit further end of game disclosure */
-#ifdef HANGUPHANDLING
-    volatile int done_hup;      /* SIGHUP or moral equivalent received
-                                 * -- no more screen output */
+    volatile int done_hup;      /* SIGHUP or moral equivalent received -- no more screen output */
     int preserve_locks;         /* don't remove level files prior to exit */
-#endif
     int something_worth_saving; /* in case of panic */
     int panicking;              /* `panic' is in progress */
     int exiting;                /* an exit handler is executing */
@@ -802,9 +801,7 @@ struct sinfo {
     int beyond_savefile_load;   /* set when past savefile loading */
     int savefile_completed;     /* savefile has completed writing */
     int reading_bonesfile;      /* in the midst of trying to read bones file */
-#ifdef PANICLOG
     int in_paniclog;            /* writing a panicloc entry */
-#endif
     int wizkit_wishing;         /* starting wizard mode game w/ WIZKIT file */
     /* input_state:  used in the core for the 'altmeta' option to process ESC;
        used in the curses interface to avoid arrow keys when user is doing
@@ -813,13 +810,8 @@ struct sinfo {
        readchar() always resets it to 'otherInp' prior to returning */
     int input_state; /* whether next key pressed will be entering a command */
     int early_options; /* inside early_options processing */
-#ifdef TTY_GRAPHICS
-    /* resize_pending only matters when handling a SIGWINCH signal for tty;
-       getting_char is used along with that and also separately for UNIX;
-       we minimize #if conditionals for them to avoid unnecessary clutter */
     volatile int resize_pending; /* set by signal handler */
     volatile int getting_char;  /* referenced during signal handling */
-#endif
 };
 
 /* structure for current 'level_status'; not saved and restored */
@@ -1573,6 +1565,11 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #include "extern.h"
 #include "savefile.h"
 #include "decl.h"
+
+#ifndef LOG_TAG
+#define LOG_TAG "NetHackFlutter"
+#endif
+extern void debuglog(const char *fmt, ...);
 
 #endif  /* RECOVER_C */
 

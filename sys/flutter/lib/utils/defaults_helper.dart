@@ -299,11 +299,7 @@ class DefaultsHelper {
       }
 
       if (key == 'number_pad') {
-        if (val == '0') {
-          pendingLines.add('OPTIONS=!number_pad');
-        } else {
-          pendingLines.add('OPTIONS=number_pad:$val');
-        }
+        pendingLines.add('OPTIONS=number_pad:$val');
       } else if (val.toLowerCase() == 'true') {
         pendingLines.add('OPTIONS=$key');
       } else if (val.toLowerCase() == 'false') {
@@ -473,6 +469,7 @@ class DefaultsHelper {
     if (prefs.containsKey('nh_opt_name')) {
       setOption('name', prefs.getString('nh_opt_name') ?? '');
     }
+
     if (prefs.containsKey('nh_opt_dogname')) {
       setOption('dogname', prefs.getString('nh_opt_dogname') ?? '');
     }

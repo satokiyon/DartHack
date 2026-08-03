@@ -7,7 +7,9 @@
 #ifndef ANDROIDCONF_H
 #define ANDROIDCONF_H
 
-#define error debuglog
+/* NetHack 5.0 では error は Fatal エラー処理関数(noreturn)として extern.h で定義されているため、
+   debuglog への置換マクロを廃止し -Winvalid-noreturn 警告を防止する */
+//#define error debuglog
 
 #define NO_FILE_LINKS /* if no hard links */
 #define LOCKDIR "." /* where to put locks */ 

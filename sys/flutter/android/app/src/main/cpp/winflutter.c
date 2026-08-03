@@ -4,15 +4,29 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <stdarg.h>
+#include <errno.h>
 #include <android/log.h>
 
 #define LOG_TAG "NetHackFlutter"
 
+typedef void (*DartLogCallback)(const char* msg);
+static DartLogCallback g_dart_log_cb = NULL;
+
+__attribute__((visibility("default"))) void RegisterDartLogCallback(DartLogCallback cb) {
+    g_dart_log_cb = cb;
+}
+
 void debuglog(const char *fmt, ...) {
+    char buf[1024];
     va_list args;
     va_start(args, fmt);
-    __android_log_vprint(ANDROID_LOG_DEBUG, LOG_TAG, fmt, args);
+    vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
+
+    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "%s", buf);
+    if (g_dart_log_cb) {
+        g_dart_log_cb(buf);
+    }
 }
 
 // 前方宣言
@@ -98,6 +112,8 @@ static struct window_procs flutter_procs = {
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 };
 
+struct window_procs tty_procs;
+
 static winid flutter_create_nhwindow(int type);
 static void flutter_start_menu(winid wid, unsigned long behavior);
 static void flutter_add_menu(winid wid, const glyph_info *glyphinfo, const anything *ident, char accelerator, char groupacc, int attr, int color, const char *str, unsigned int itemflags);
@@ -158,6 +174,9 @@ typedef void (*DartExitCallback)(const char* msg);
 typedef void (*DartNumberPadModeCallback)(int state);
 typedef void (*DartCliparoundCallback)(int x, int y, int playerX, int playerY);
 typedef void (*DartPutMixedWithTileCallback)(int winId, int attr, int tile, const char* str);
+typedef void (*DartNewLevelRestCallback)(void);
+
+static DartNewLevelRestCallback g_new_level_rest_cb = NULL;
 
 static DartCreateWindowCallback g_create_window_cb = NULL;
 static DartClearWindowCallback g_clear_window_cb = NULL;
@@ -341,7 +360,55 @@ static char* convert_cp437_to_utf8(const char* str) {
     return dst_buf;
 }
 
-// FFI からコールバックを登録する関数
+typedef struct {
+    DartCreateWindowCallback create_cb;
+    DartClearWindowCallback clear_cb;
+    DartDisplayWindowCallback display_cb;
+    DartDestroyWindowCallback destroy_cb;
+    DartCursCallback curs_cb;
+    DartPutStrCallback putstr_cb;
+    DartPrintGlyphCallback glyph_cb;
+    DartNotifyInputCallback input_cb;
+    DartStartMenuCallback start_menu_cb;
+    DartAddMenuCallback add_menu_cb;
+    DartEndMenuCallback end_menu_cb;
+    DartSelectMenuCallback select_menu_cb;
+    DartYnFunctionCallback yn_cb;
+    DartGetLineCallback getline_cb;
+    DartAskNameCallback askname_cb;
+    DartExitCallback exit_cb;
+    DartNumberPadModeCallback number_pad_cb;
+    DartCliparoundCallback cliparound_cb;
+    DartPutMixedWithTileCallback putmixed_cb;
+    DartNewLevelRestCallback newlevel_rest_cb;
+} FlutterCallbacksStruct;
+
+void RegisterFlutterCallbacksStruct(const FlutterCallbacksStruct *cbs) {
+    if (!cbs) return;
+    g_create_window_cb = cbs->create_cb;
+    g_clear_window_cb = cbs->clear_cb;
+    g_display_window_cb = cbs->display_cb;
+    g_destroy_window_cb = cbs->destroy_cb;
+    g_curs_cb = cbs->curs_cb;
+    g_putstr_cb = cbs->putstr_cb;
+    g_print_glyph_cb = cbs->glyph_cb;
+    g_dart_notify_input_cb = cbs->input_cb;
+    g_start_menu_cb = cbs->start_menu_cb;
+    g_add_menu_cb = cbs->add_menu_cb;
+    g_end_menu_cb = cbs->end_menu_cb;
+    g_select_menu_cb = cbs->select_menu_cb;
+    g_yn_function_cb = cbs->yn_cb;
+    g_getline_cb = cbs->getline_cb;
+    g_askname_cb = cbs->askname_cb;
+    g_exit_cb = cbs->exit_cb;
+    g_number_pad_mode_cb = cbs->number_pad_cb;
+    g_cliparound_cb = cbs->cliparound_cb;
+    g_putmixed_cb = cbs->putmixed_cb;
+    g_new_level_rest_cb = cbs->newlevel_rest_cb;
+    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "All Flutter callbacks registered successfully via struct!");
+}
+
+// 後方互換用
 void RegisterFlutterCallbacks(
     DartCreateWindowCallback create_cb,
     DartClearWindowCallback clear_cb,
@@ -363,26 +430,27 @@ void RegisterFlutterCallbacks(
     DartCliparoundCallback cliparound_cb,
     DartPutMixedWithTileCallback putmixed_cb
 ) {
-    g_create_window_cb = create_cb;
-    g_clear_window_cb = clear_cb;
-    g_display_window_cb = display_cb;
-    g_destroy_window_cb = destroy_cb;
-    g_curs_cb = curs_cb;
-    g_putstr_cb = putstr_cb;
-    g_print_glyph_cb = glyph_cb;
-    g_dart_notify_input_cb = input_cb;
-    g_start_menu_cb = start_menu_cb;
-    g_add_menu_cb = add_menu_cb;
-    g_end_menu_cb = end_menu_cb;
-    g_select_menu_cb = select_menu_cb;
-    g_yn_function_cb = yn_cb;
-    g_getline_cb = getline_cb;
-    g_askname_cb = askname_cb;
-    g_exit_cb = exit_cb;
-    g_number_pad_mode_cb = number_pad_cb;
-    g_cliparound_cb = cliparound_cb;
-    g_putmixed_cb = putmixed_cb;
-    debuglog("Flutter window, menu and sync callbacks registered.");
+    FlutterCallbacksStruct cbs;
+    cbs.create_cb = create_cb;
+    cbs.clear_cb = clear_cb;
+    cbs.display_cb = display_cb;
+    cbs.destroy_cb = destroy_cb;
+    cbs.curs_cb = curs_cb;
+    cbs.putstr_cb = putstr_cb;
+    cbs.glyph_cb = glyph_cb;
+    cbs.input_cb = input_cb;
+    cbs.start_menu_cb = start_menu_cb;
+    cbs.add_menu_cb = add_menu_cb;
+    cbs.end_menu_cb = end_menu_cb;
+    cbs.select_menu_cb = select_menu_cb;
+    cbs.yn_cb = yn_cb;
+    cbs.getline_cb = getline_cb;
+    cbs.askname_cb = askname_cb;
+    cbs.exit_cb = exit_cb;
+    cbs.number_pad_cb = number_pad_cb;
+    cbs.cliparound_cb = cliparound_cb;
+    cbs.putmixed_cb = putmixed_cb;
+    RegisterFlutterCallbacksStruct(&cbs);
 }
 
 // Dart 側から結果を受け取る関数
@@ -404,8 +472,6 @@ void SendGetLineResultToC(const char* result) {
 }
 
 // 新階層リワード用コールバックおよび関数
-typedef void (*DartNewLevelRestCallback)(void);
-static DartNewLevelRestCallback g_new_level_rest_cb = NULL;
 static volatile int g_new_level_rest_done = 0;
 static volatile int g_new_level_rest_reward_amount = 0;
 
@@ -889,7 +955,7 @@ extern char** get_saved_games(void);
 extern void clearlocks(void);
 
 static void flutter_askname(void) {
-    debuglog("flutter_askname called");
+    debuglog("flutter_askname called: svp.plname='%s', g_askname_cb=%p", svp.plname, g_askname_cb);
     g_askname_result[0] = '\0';
     g_askname_done = 0;
     
@@ -908,8 +974,10 @@ static void flutter_askname(void) {
     }
     
     if (g_askname_cb) {
+        debuglog("flutter_askname calling g_askname_cb with saves='%s'", saves_buf);
         g_askname_cb(saves_buf, PL_NSIZ);
     } else {
+        debuglog("flutter_askname: g_askname_cb is NULL! Fallback to Player");
         strncpy(svp.plname, "Player", sizeof(svp.plname) - 1);
         return;
     }
@@ -917,6 +985,8 @@ static void flutter_askname(void) {
     while (!g_askname_done) {
         usleep(10000); // 10ms
     }
+    
+    debuglog("flutter_askname finished wait: result='%s', mode=%d", g_askname_result, g_askname_mode);
     
     if (g_askname_result[0] == '\033' || (unsigned char)g_askname_result[0] == 0x80 || g_askname_result[0] == '\0') {
         clearlocks();
@@ -1765,7 +1835,29 @@ static int flutter_get_ext_cmd(void) {
 
 static void flutter_get_nh_event(void) {}
 static void flutter_mark_synch(void) {}
-static void flutter_wait_synch(void) {}
+static char g_last_config_error_msg[1024] = {0};
+
+void set_flutter_config_error_msg(const char* msg) {
+    if (msg) {
+        strncpy(g_last_config_error_msg, msg, sizeof(g_last_config_error_msg) - 1);
+        g_last_config_error_msg[sizeof(g_last_config_error_msg) - 1] = '\0';
+    }
+}
+
+static void flutter_wait_synch(void) {
+    debuglog("flutter_wait_synch called! opt_initial=%d, msg='%s'", go.opt_initial, g_last_config_error_msg);
+    if (g_last_config_error_msg[0] != '\0') {
+        char full_log[1200];
+        snprintf(full_log, sizeof(full_log), "CONFIG_ERROR_ALERT:%s", g_last_config_error_msg);
+        if (g_dart_log_cb) {
+            g_dart_log_cb(full_log);
+        }
+        g_last_config_error_msg[0] = '\0';
+    }
+    if (go.opt_initial) {
+        debuglog("flutter_wait_synch: early init phase, returning to allow progress.");
+    }
+}
 static void flutter_update_inventory(int status UNUSED) {}
 static win_request_info *flutter_ctrl_nhwindow(winid window UNUSED, int request UNUSED, win_request_info *wri UNUSED) {
     return (win_request_info *) 0;
@@ -1774,12 +1866,11 @@ static win_request_info *flutter_ctrl_nhwindow(winid window UNUSED, int request 
 extern void genl_putmixed(winid, int, const char *);
 extern char genl_message_menu(char, int, const char *);
 extern void genl_outrip(winid, int, time_t);
-extern void genl_preference_update(const char *);
-extern boolean genl_can_suspend_no(void);
+extern void genl_status_update(int, genericptr_t, int, int, int, unsigned long *);
 
 // windowprocs を Flutter 用にセットアップする関数
 static void HijackWindowProcs(void) {
-    debuglog("Setting up flutter_procs...");
+    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "HijackWindowProcs 1.1");
 
     flutter_procs.win_init_nhwindows = flutter_init_nhwindows;
     flutter_procs.win_player_selection = flutter_player_selection;
@@ -1794,6 +1885,9 @@ static void HijackWindowProcs(void) {
     flutter_procs.win_destroy_nhwindow = flutter_destroy_nhwindow;
     flutter_procs.win_curs = flutter_curs;
     flutter_procs.win_putstr = flutter_putstr;
+
+    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "HijackWindowProcs 1.2");
+
     flutter_procs.win_putmixed = genl_putmixed;
     flutter_procs.win_raw_print = flutter_raw_print;
     flutter_procs.win_raw_print_bold = flutter_raw_print_bold;
@@ -1808,6 +1902,8 @@ static void HijackWindowProcs(void) {
     flutter_procs.win_number_pad = flutter_number_pad;
     flutter_procs.win_delay_output = flutter_delay_output;
     flutter_procs.win_print_glyph = flutter_print_glyph;
+
+    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "HijackWindowProcs 1.3");
 
     // プレイヤー位置を Dart 側へ通知 (マップタップの #herecmdmenu 連動で使用)
     flutter_procs.win_cliparound = flutter_cliparound;
@@ -1824,7 +1920,9 @@ static void HijackWindowProcs(void) {
     flutter_procs.win_outrip = genl_outrip;
     flutter_procs.win_preference_update = genl_preference_update;
 
-    // ステータス表示用のハンドラを独自の実装に差し替え
+    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "HijackWindowProcs 1.4 (Status handlers)");
+
+    // ステータス表示用のハンドラを Flutter 専用実装 (ハイライト対応) に設定
     flutter_procs.win_status_init = genl_status_init;
     flutter_procs.win_status_finish = genl_status_finish;
     flutter_procs.win_status_enablefield = genl_status_enablefield;
@@ -1838,9 +1936,12 @@ static void HijackWindowProcs(void) {
 
     and_procs = flutter_procs;
     and_procs.name = "and";
+    tty_procs = flutter_procs;
+    tty_procs.name = "tty";
     windowprocs = flutter_procs;
+    iflags.windowtype_locked = TRUE;
     
-    debuglog("flutter_procs setup completed.");
+    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "flutter_procs setup completed! windowtype_locked set to TRUE.");
 }
 
 // NetHackステータスハイライト用 static 変数とハンドラ実装
@@ -1984,10 +2085,48 @@ struct StartArgs {
 
 static void* NetHackThreadFunc(void* arg) {
     struct StartArgs* args = (struct StartArgs*)arg;
-    debuglog("NetHack Thread started. Chdir to: %s", args->path);
+    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "NetHack Thread Function is RUNNING! Chdir to: %s", args->path);
 
     if (chdir(args->path) != 0) {
-        debuglog("chdir failed in thread!");
+        __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "chdir failed in thread! errno=%d", errno);
+    }
+
+    // sysconf ファイルを毎回最新の完全正当内容で確実に更新・展開
+    char syscf_path[512];
+    snprintf(syscf_path, sizeof(syscf_path), "%s/sysconf", args->path);
+    FILE* f_syscf = fopen(syscf_path, "w");
+    if (f_syscf) {
+        fputs("# NetHack 5.0 System Configuration File\n"
+              "WIZARDS=*\n"
+              "EXPLORERS=*\n"
+              "SHELLERS=*\n"
+              "GENERICUSERS=*\n"
+              "SUPPORT=https://nethack.org\n"
+              "MAXPLAYERS=25\n"
+              "PERSMAX=10\n"
+              "POINTSMIN=1\n"
+              "PERS_IS_UID=0\n"
+              "ENTRYMAX=100\n"
+              "MAX_REROLL_RATE=10\n"
+              "SEDUCE=1\n"
+              "HIDEUSAGE=0\n", f_syscf);
+        fclose(f_syscf);
+        __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "sysconf file updated to latest valid content at: %s", syscf_path);
+    }
+
+    // perm ファイルが存在しなければ自動作成して getlock() での Fatal 終了を完全防止
+    char perm_path[512];
+    snprintf(perm_path, sizeof(perm_path), "%s/perm", args->path);
+    FILE* f_perm = fopen(perm_path, "r");
+    if (!f_perm) {
+        f_perm = fopen(perm_path, "w");
+        if (f_perm) {
+            fputs("# NetHack 5.0 Permanent Locks File\n", f_perm);
+            fclose(f_perm);
+            __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "perm file created at: %s", perm_path);
+        }
+    } else {
+        fclose(f_perm);
     }
 
     HijackWindowProcs();
@@ -1996,7 +2135,7 @@ static void* NetHackThreadFunc(void* arg) {
     params[0] = "nethack";
     params[1] = NULL;
 
-    debuglog("Calling NetHackMain...");
+    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "Calling NetHackMain... (initial svp.plname='%s')", svp.plname);
     extern int NetHackMain(int argc, char** argv);
     NetHackMain(1, params);
 
@@ -2010,21 +2149,33 @@ static void* NetHackThreadFunc(void* arg) {
 }
 
 void StartNetHackFlutter(const char* path, const char* username) {
-    debuglog("StartNetHackFlutter: path=%s, user=%s", path, username);
+    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "StartNetHackFlutter: path=%s, user=%s", path, username);
 
     g_exit_notified = 0;
 
     struct StartArgs* args = malloc(sizeof(struct StartArgs));
+    if (!args) {
+        __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "Failed to malloc StartArgs!");
+        return;
+    }
     strncpy(args->path, path, sizeof(args->path) - 1);
     strncpy(args->username, username, sizeof(args->username) - 1);
 
     pthread_t thread;
-    if (pthread_create(&thread, NULL, NetHackThreadFunc, args) != 0) {
-        debuglog("Failed to create NetHack thread!");
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    // NetHack Cコアの巨大なスタック消費に耐えるため 8MB に拡張
+    pthread_attr_setstacksize(&attr, 8 * 1024 * 1024);
+
+    int rc = pthread_create(&thread, &attr, NetHackThreadFunc, args);
+    pthread_attr_destroy(&attr);
+
+    if (rc != 0) {
+        __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "Failed to create NetHack thread! rc=%d", rc);
         free(args);
     } else {
         pthread_detach(thread);
-        debuglog("NetHack thread spawned successfully.");
+        __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "NetHack thread spawned successfully with 8MB stack.");
     }
 }
 

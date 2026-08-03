@@ -23,6 +23,17 @@ class NetHackAssets {
       await dstDir.create(recursive: true);
     }
 
+    // sysconf アセットを端末ストレージへ常に強制上書き更新
+    try {
+      final syscfData = await rootBundle.load('assets/nethackdir/sysconf');
+      final syscfBytes = syscfData.buffer.asUint8List(syscfData.offsetInBytes, syscfData.lengthInBytes);
+      final syscfDst = File('${dstDir.path}/sysconf');
+      await syscfDst.writeAsBytes(syscfBytes, flush: true);
+      debugPrint("NetHackAssets: Always forcibly updated sysconf to ${syscfDst.path}");
+    } catch (e) {
+      debugPrint("Warning: Could not force update sysconf asset: $e");
+    }
+
     // セーブ用ディレクトリの作成
     final saveDir = Directory('${dstDir.path}/save');
     if (!await saveDir.exists()) {
@@ -151,12 +162,21 @@ class NetHackAssets {
   /// アセットの defaults.nh と端末の defaults.nh / SharedPreferences を安全にマージする
   static Future<void> _mergeDefaultsFile(Directory dstDir) async {
     try {
+      final targetFile = File('${dstDir.path}/defaults.nh');
+      if (await targetFile.exists()) {
+        final content = await targetFile.readAsString();
+        if (content.contains('OPTIONS=!number_pad')) {
+          final fixedContent = content.replaceAll('OPTIONS=!number_pad', 'OPTIONS=number_pad:0');
+          await targetFile.writeAsString(fixedContent, flush: true);
+          debugPrint("NetHackAssets: Fixed legacy OPTIONS=!number_pad in existing defaults.nh");
+        }
+      }
+
       final tmpAssetFile = File('${dstDir.path}/defaults.nh.asset_tmp');
       final byteData = await rootBundle.load('assets/nethackdir/defaults.nh');
       final bytes = byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
       await tmpAssetFile.writeAsBytes(bytes, flush: true);
 
-      final targetFile = File('${dstDir.path}/defaults.nh');
       final defaultsHelper = DefaultsHelper();
       await defaultsHelper.mergeAssetDefaultsWithPrefs(tmpAssetFile.path, targetFile.path);
 

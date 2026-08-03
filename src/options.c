@@ -7186,29 +7186,30 @@ initoptions(void)
     if (go.opt_phase != builtin_opt)
          initoptions_init();
 #ifdef SYSCF
-/* someday there may be other SYSCF alternatives besides text file */
 #ifdef SYSCF_FILE
-    /* If SYSCF_FILE is specified, it _must_ exist... */
     assure_syscf_file();
     config_error_init(TRUE, SYSCF_FILE, FALSE);
 
-    /* ... and _must_ parse correctly. */
     go.opt_phase = syscf_opt;
     if (!read_config_file(SYSCF_FILE, set_in_sysconf)) {
         if (config_error_done() && !iflags.initoptions_noterminate)
             nh_terminate(EXIT_FAILURE);
+    } else {
+        config_error_done();
     }
-    config_error_done();
-    /*
-     * TODO [maybe]: parse the sysopt entries which are space-separated
-     * lists of usernames into arrays with one name per element.
-     */
 #endif
 #endif /* SYSCF */
 
-    /* Carry out options that got deferred from early_options */
-    if (gd.deferred_showpaths)
+    /* Carry out options that got deferred from early_options safely */
+    boolean safe_deferred = FALSE;
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Warray-bounds"
+    safe_deferred = gd.deferred_showpaths;
+    #pragma GCC diagnostic pop
+
+    if (safe_deferred) {
         do_deferred_showpaths(0);  /* does not return */
+    }
 
     initoptions_finish();
 }
@@ -7423,9 +7424,13 @@ initoptions_init(void)
 void
 initoptions_finish(void)
 {   nhsym sym = 0;
+    debuglog("FACT 11: initoptions_finish ENTERED SUCCESSFULLY!");
 
+    debuglog("FACT 12: calling disregard_this_option...");
     disregard_this_option(opt_mention_decor);  /* defer this */
+    debuglog("FACT 13: calling rcfile()...");
     rcfile();
+    debuglog("FACT 14: rcfile() done.");
 
     (void) fruitadd(svp.pl_fruit, (struct fruit *) 0);
     /*
@@ -7475,12 +7480,15 @@ initoptions_finish(void)
         iflags.wc_ascii_map = FALSE, iflags.wc_tiled_map = TRUE;
 
 #ifdef ENHANCED_SYMBOLS
+    debuglog("initoptions_finish: calling apply_customizations...");
     if (glyphname_hash_indices_loaded())
         empty_glyphname_hash_indices();
     apply_customizations(gc.currentgraphics,
                          do_custom_symbols | do_custom_colors);
+    debuglog("initoptions_finish: apply_customizations done.");
 #endif
     go.opt_initial = FALSE;
+    debuglog("initoptions_finish: completed successfully.");
     return;
 }
 

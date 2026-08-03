@@ -41,6 +41,37 @@ typedef PutMixedWithTileCallback = Void Function(Int32 winId, Int32 attr, Int32 
 typedef StartNetHackFunc = Void Function(Pointer<Utf8> path, Pointer<Utf8> username);
 typedef StartNetHackDart = void Function(Pointer<Utf8> path, Pointer<Utf8> username);
 
+typedef DartLogCallback = Void Function(Pointer<Utf8> msg);
+typedef RegisterDartLogFunc = Void Function(Pointer<NativeFunction<DartLogCallback>> cb);
+typedef RegisterDartLogDart = void Function(Pointer<NativeFunction<DartLogCallback>> cb);
+
+// ★19個の引数による ARM64 スタック破綻を回避する構造体定義
+final class FlutterCallbacksStruct extends Struct {
+  external Pointer<NativeFunction<CreateWindowCallback>> createCb;
+  external Pointer<NativeFunction<ClearWindowCallback>> clearCb;
+  external Pointer<NativeFunction<DisplayWindowCallback>> displayCb;
+  external Pointer<NativeFunction<DestroyWindowCallback>> destroyCb;
+  external Pointer<NativeFunction<CursCallback>> cursCb;
+  external Pointer<NativeFunction<PutStrCallback>> putstrCb;
+  external Pointer<NativeFunction<PrintGlyphCallback>> glyphCb;
+  external Pointer<NativeFunction<NotifyInputCallback>> inputCb;
+  external Pointer<NativeFunction<StartMenuCallback>> startMenuCb;
+  external Pointer<NativeFunction<AddMenuCallback>> addMenuCb;
+  external Pointer<NativeFunction<EndMenuCallback>> endMenuCb;
+  external Pointer<NativeFunction<SelectMenuCallback>> selectMenuCb;
+  external Pointer<NativeFunction<YnFunctionCallback>> ynCb;
+  external Pointer<NativeFunction<GetLineCallback>> getlineCb;
+  external Pointer<NativeFunction<AskNameCallback>> asknameCb;
+  external Pointer<NativeFunction<ExitCallback>> exitCb;
+  external Pointer<NativeFunction<NumberPadModeCallback>> numberPadCb;
+  external Pointer<NativeFunction<CliparoundCallback>> cliparoundCb;
+  external Pointer<NativeFunction<PutMixedWithTileCallback>> putMixedCb;
+  external Pointer<NativeFunction<NewLevelRestCallback>> newLevelRestCb;
+}
+
+typedef RegisterCallbacksStructFunc = Void Function(Pointer<FlutterCallbacksStruct> cbs);
+typedef RegisterCallbacksStructDart = void Function(Pointer<FlutterCallbacksStruct> cbs);
+
 // コールバック登録関数 (19個の引数: CliparoundCallback と PutMixedWithTileCallback を追加)
 typedef RegisterCallbacksFunc = Void Function(
   Pointer<NativeFunction<CreateWindowCallback>> createCb,
@@ -169,6 +200,8 @@ class NetHackFfi {
   late final GetBuildIdDart getBuildIdNative;
   late final RegisterNewLevelRestDart registerNewLevelRest;
   late final SendNewLevelRestResultDart sendNewLevelRestResult;
+  late final RegisterDartLogDart registerDartLog;
+  late final RegisterCallbacksStructDart registerCallbacksStruct;
 
   NetHackFfi() {
     try {
@@ -181,7 +214,7 @@ class NetHackFfi {
     try {
       registerNewLevelRest = _lib
           .lookup<NativeFunction<RegisterNewLevelRestFunc>>('RegisterNewLevelRestCallback')
-          .asFunction();
+          .asFunction<RegisterNewLevelRestDart>();
     } catch (e) {
       registerNewLevelRest = (_) {};
     }
@@ -189,7 +222,7 @@ class NetHackFfi {
     try {
       sendNewLevelRestResult = _lib
           .lookup<NativeFunction<SendNewLevelRestResultFunc>>('SendNewLevelRestResultToC')
-          .asFunction();
+          .asFunction<SendNewLevelRestResultDart>();
     } catch (e) {
       sendNewLevelRestResult = (_) {};
     }
@@ -202,9 +235,28 @@ class NetHackFfi {
       getBuildIdNative = () => nullptr;
     }
 
+    try {
+      registerDartLog = _lib
+          .lookup<NativeFunction<RegisterDartLogFunc>>('RegisterDartLogCallback')
+          .asFunction<RegisterDartLogDart>();
+    } catch (e) {
+      registerDartLog = (_) {};
+    }
+
     startNetHack = _lib
         .lookup<NativeFunction<StartNetHackFunc>>('StartNetHackFlutter')
         .asFunction();
+
+    try {
+      registerCallbacksStruct = _lib
+          .lookup<NativeFunction<RegisterCallbacksStructFunc>>('RegisterFlutterCallbacksStruct')
+          .asFunction<RegisterCallbacksStructDart>();
+    } catch (e) {
+      print("[FFI ERROR] Failed to lookup RegisterFlutterCallbacksStruct: $e");
+      registerCallbacksStruct = (ptr) {
+        print("[FFI FATAL] registerCallbacksStruct dummy fallback called! Symbol missing in SO!");
+      };
+    }
 
     registerCallbacks = _lib
         .lookup<NativeFunction<RegisterCallbacksFunc>>('RegisterFlutterCallbacks')

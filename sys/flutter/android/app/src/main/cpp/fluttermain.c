@@ -124,11 +124,15 @@ int NetHackMain(int argc, char** argv)
 	fp = fopen_datafile(RECORD, "a", SCOREPREFIX);
 	if (fp) fclose(fp);
 
+	debuglog("STEP 1: choose_windows starting...");
 	choose_windows(DEFAULT_WINDOW_SYS);
 
+	debuglog("STEP 1.1: initoptions starting...");
 	initoptions();
+	debuglog("STEP 1.2: initoptions done. Calling init_nhwindows...");
 
 	init_nhwindows(&argc, argv);
+	debuglog("STEP 1.3: init_nhwindows done. Calling process_options & plnamesuffix...");
 
 	/*
 	 * It seems you really want to play.
@@ -143,7 +147,9 @@ int NetHackMain(int argc, char** argv)
 #endif
 
     gp.plnamelen = 0;
+    debuglog("STEP 4: calling plnamesuffix()... (svp.plname='%s')", svp.plname);
 	plnamesuffix(); /* strip suffix from name; calls askname() */
+    debuglog("STEP 4: plnamesuffix() done. svp.plname='%s'", svp.plname);
 
 #ifdef WIZARD
 	if(!wizard)
@@ -151,13 +157,17 @@ int NetHackMain(int argc, char** argv)
 	set_username();
 
 	Sprintf(gl.lock, "%d%s", (int)getuid(), svp.plname);
+	debuglog("STEP 5: calling getlock() with lock='%s'...", gl.lock);
 	getlock();
+	debuglog("STEP 5: getlock() done.");
 
 	/* Set up level 0 file to keep the game state.
 	 */
+	debuglog("STEP 6: calling create_levelfile(0)...");
 	nhfp = create_levelfile(0, (char *)0);
 	if(!nhfp)
 	{
+		debuglog("STEP 6 ERROR: create_levelfile(0) failed!");
 		raw_print("ロックファイルを作成できません");
 	}
 	else
@@ -166,8 +176,11 @@ int NetHackMain(int argc, char** argv)
 		Sfo_int(nhfp, &svh.hackpid, "svh.hackpid");
 		close_nhfile(nhfp);
 	}
+	debuglog("STEP 6: create_levelfile done.");
 
+	debuglog("STEP 7: calling dlb_init()...");
 	dlb_init(); /* must be before newgame() */
+	debuglog("STEP 7: dlb_init() done.");
 
 	/*
 	 * Initialization of the boundaries of the mazes
@@ -187,8 +200,10 @@ int NetHackMain(int argc, char** argv)
 
 	init_sound_disp_gamewindows();
 
+    debuglog("STEP 8: calling restore_saved_game()...");
 	if((nhfp = restore_saved_game()) != 0)
 	{
+        debuglog("STEP 8: restore_saved_game SUCCESS! Resuming game...");
 #ifdef WIZARD
 		boolean remember_wiz_mode = wizard;
 #endif
@@ -269,9 +284,12 @@ backup_clean:
 	}
 	else
 	{
+		debuglog("STEP 9: restore_saved_game returned NULL. Calling player_selection()...");
 		not_recovered: player_selection();
+		debuglog("STEP 9: player_selection() done. Calling newgame()...");
 		resuming = FALSE;
 		newgame();
+		debuglog("STEP 9: newgame() done.");
 		wd_message();
 	}
 

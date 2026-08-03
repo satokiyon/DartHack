@@ -9,6 +9,10 @@
 #include "hack.h"
 #include "dlb.h"
 #include <errno.h>
+#include <android/log.h>
+#ifndef LOG_TAG
+#define LOG_TAG "NetHackFlutter"
+#endif
 
 #if (!defined(MAC68K) && !defined(O_WRONLY) && !defined(AZTEC_C)) \
     || defined(USE_FCNTL)
@@ -18,6 +22,8 @@
 #define BIGBUFSZ (5 * BUFSZ) /* big enough to format a 4*BUFSZ string (from
                               * config file parsing) with modest decoration;
                               * result will then be truncated to BUFSZ-1 */
+
+extern void set_flutter_config_error_msg(const char* msg);
 
 #ifdef USER_SOUNDS
 extern char *sounddir; /* defined in sounds.c */
@@ -1603,6 +1609,9 @@ config_erradd(const char *buf)
     } else
         lineno[0] = '\0';
 
+    char err_buf[512];
+    snprintf(err_buf, sizeof(err_buf), "%s: %s%s%s", *config_error_data->source ? config_error_data->source : "config", lineno, buf, punct);
+    set_flutter_config_error_msg(err_buf);
     pline("%s %s%s%s", config_error_data->secure ? "Error:" : " *",
           lineno, buf, punct);
 }
@@ -1627,14 +1636,16 @@ config_error_done(void)
 #endif
     if (n) {
         boolean cmdline = !strcmp(config_error_data->source, "command line");
-
         pline("\n%d error%s %s %s.\n", n, plur(n), cmdline ? "on" : "in",
               *config_error_data->source ? config_error_data->source
                                          : configfile);
-        wait_synch();
+
+        if (!go.opt_initial) {
+            wait_synch();
+        }
     }
     config_error_data = tmp->next;
-    free(tmp);
+    free((genericptr_t) tmp);
     program_state.config_error_ready = (config_error_data != 0);
     return n;
 }
@@ -1912,6 +1923,7 @@ vconfig_error_add(const char *str, va_list the_args)
 void
 rcfile(void)
 {
+    debuglog("rcfile() ENTERED!");
     char *opts = 0, *xtraopts = 0;
     const char *envname, *namesrc, *nameval;
 
@@ -1960,8 +1972,11 @@ rcfile(void)
     }
 
     config_error_init(TRUE, nameval, nameval ? CONFIG_ERROR_SECURE : FALSE);
-    (void) read_config_file(nameval, set_in_config);
+    debuglog("FACT 15: rcfile calling read_config_file(defaults.nh)...");
+    boolean rc_ok = read_config_file(nameval, set_in_config);
+    debuglog("FACT 16: read_config_file(defaults.nh) returned %d. Calling config_error_done...", rc_ok);
     config_error_done();
+    debuglog("FACT 17: rcfile config_error_done completed.");
     if (xtraopts) {
         /* NETHACKOPTIONS is present and not a file name */
         go.opt_phase = environ_opt;
@@ -1972,6 +1987,7 @@ rcfile(void)
 
     if (gc.cmdline_rcfile)
         free((genericptr_t) gc.cmdline_rcfile), gc.cmdline_rcfile = 0;
+    debuglog("rcfile() COMPLETED SUCCESSFULLY!");
     /*[end of nethackrc handling]*/
 }
 

@@ -2301,8 +2301,11 @@ role_init(void)
 
     /* Strip the role letter out of the player name.
      * This is included for backwards compatibility.
+     * DartHack-FIX: Skip plnamesuffix() if name is already set to prevent redundant name dialog.
      */
-    plnamesuffix();
+    if (!svp.plname[0]) {
+        plnamesuffix();
+    }
 
     /* Check for a valid role.  Try flags.initrole first. */
     if (!validrole(flags.initrole)) {

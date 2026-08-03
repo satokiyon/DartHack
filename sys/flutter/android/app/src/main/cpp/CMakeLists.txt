@@ -1,20 +1,25 @@
 cmake_minimum_required(VERSION 3.10.2)
 project(nethack VERSION 5.0.0 LANGUAGES C)
 
-set(NHSROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../../")
+get_filename_component(NHSROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../.." ABSOLUTE)
+message(STATUS "NetHack Root Path (NHSROOT): ${NHSROOT}")
 
 if(NOT DEFINED BUILD_ID)
     string(TIMESTAMP BUILD_ID "%Y%m%d_%H%M%S")
 endif()
 
 # Compile flags
+string(TIMESTAMP FORCE_REBUILD_TS "%Y%m%d%H%M%S")
 add_definitions(
     -DANDROID
     -DSND_LIB_ANDROIDSOUND
     -DAND_GUI
     -DLINKED_BINS
     -DHACKLIB
+    -DSYSCF
+    -DSYSCF_FILE="sysconf"
     -DNETHACK_BUILD_ID="${BUILD_ID}"
+    -DFORCE_REBUILD_TS="${FORCE_REBUILD_TS}"
     -DLUA_USE_POSIX
 )
 
