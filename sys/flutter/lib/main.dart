@@ -33,6 +33,7 @@ import 'widgets/full_map_dialog.dart';
 import 'widgets/msg_history_dialog.dart';
 import 'widgets/shortcut_edit_dialog.dart';
 import 'widgets/game_drawer.dart';
+import 'widgets/guidebook_dialog.dart';
 import 'widgets/overlays/menu_overlay.dart';
 import 'widgets/overlays/yn_overlay.dart';
 import 'widgets/overlays/getline_overlay.dart';
@@ -425,6 +426,7 @@ class _MyHomePageState extends State<MyHomePage> {
       onSaveAndExit: () => _sendFfiKey(83, "S"),
       onQuit: () => _sendShortcutToC("#quit\n"),
       onShowScoreboard: _showScoreboardDialog,
+      onShowGuidebook: () => GuidebookDialog.show(context),
       onShowHelp: () => _sendFfiKey('?'.codeUnitAt(0), "?"),
       onDatabaseSearch: () {
         try {
@@ -1165,6 +1167,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _startGame() async {
+    print("[UI] _startGame called! _isGameRunning=$_isGameRunning, assetsPath='$_assetsPath'");
     if (_isGameRunning) return;
 
     setState(() {
@@ -1185,12 +1188,17 @@ class _MyHomePageState extends State<MyHomePage> {
     _addLog("Spawning NetHack Worker Isolate...");
 
     final receivePort = ReceivePort();
-    await Isolate.spawn(NetHackWorker.start, receivePort.sendPort);
 
     receivePort.listen((message) {
       if (message is Map) {
         final type = message['type'];
-        if (type == 'ready') {
+        print("[UI Msg] received message type='$type'");
+        if (type == 'worker_log') {
+          print("[WorkerIsolate Log] ${message['text']}");
+        } else if (type == 'worker_error') {
+          print("[UI WORKER ERROR] ${message['error']}\n${message['stack']}");
+          _addLog("Worker Exception: ${message['error']}");
+        } else if (type == 'ready') {
           _workerSendPort = message['sendPort'];
           _addLog("Worker Isolate Ready. Starting Game...");
           _workerSendPort?.send({
@@ -1316,6 +1324,7 @@ class _MyHomePageState extends State<MyHomePage> {
           final savesStr = message['saves'] as String;
           final saves = savesStr.isNotEmpty ? savesStr.split(';') : <String>[];
           final defaultName = saves.isNotEmpty ? saves[0] : "Player";
+          _addLog("UI Isolate: askname event received, setting _isAskNameVisible = true (defaultName=$defaultName)");
           setState(() {
             _askNameSaves = saves;
             _askNameMaxChars = message['maxChars'];
@@ -1323,6 +1332,9 @@ class _MyHomePageState extends State<MyHomePage> {
             _selectedPlayMode = PlayMode.normal;
             _askNameController.text = defaultName;
           });
+        } else if (type == 'config_error_alert') {
+          final alertMsg = message['message'] as String? ?? '設定ファイルで警告が検出されました。';
+          _showConfigErrorAlertDialog(alertMsg);
         } else if (type == 'number_pad_mode') {
           final state = message['state'] as int? ?? 0;
           setState(() {
@@ -1363,6 +1375,7 @@ class _MyHomePageState extends State<MyHomePage> {
           _screen.endMenu(message['winId'], message['prompt']);
         } else if (type == 'selectMenu') {
           _screen.selectMenu(message['winId'], message['how']);
+          print("[UI Render] selectMenu received! prompt='${_screen.menuPrompt}', items=${_screen.menuItems.length}, isMenuVisible=${_screen.isMenuWindowVisible}");
           setState(() {
             _waitingForInput = true;
             _extCmdMenuFilter = "";
@@ -1381,10 +1394,78 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
     });
+
+    await Isolate.spawn(NetHackWorker.start, receivePort.sendPort);
   }
 
   void _stopGame() {
     exit(0);
+  }
+
+  void _showConfigErrorAlertDialog(String errorMsg) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1E1E1E),
+          title: const Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent),
+              SizedBox(width: 8),
+              Text('設定ファイルの確認・警告', style: TextStyle(color: Colors.white, fontSize: 16)),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '起動時のファイルチェックで以下のメッセージが検出されました。OKを押して処理を継続します：',
+                  style: TextStyle(fontSize: 13, color: Colors.white70),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: Colors.orange.withOpacity(0.5)),
+                  ),
+                  child: SelectableText(
+                    errorMsg,
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      color: Colors.yellowAccent,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber[800],
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // OK ボタンが押されたらスペースキー (code 32) を Cコアに送信して待機を解除・進行させる
+                _workerSendPort?.send({
+                  'type': 'key',
+                  'key': 32,
+                });
+              },
+              child: const Text('OK (継続)'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   bool _isDirectionPromptText(String text) {

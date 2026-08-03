@@ -7,6 +7,7 @@ class GameDrawerContent extends StatelessWidget {
   final VoidCallback onSaveAndExit;
   final VoidCallback onQuit;
   final VoidCallback onShowScoreboard;
+  final VoidCallback onShowGuidebook;
   final VoidCallback onShowHelp;
   final VoidCallback onDatabaseSearch;
   final VoidCallback onOpenOptions;
@@ -22,6 +23,7 @@ class GameDrawerContent extends StatelessWidget {
     required this.onSaveAndExit,
     required this.onQuit,
     required this.onShowScoreboard,
+    required this.onShowGuidebook,
     required this.onShowHelp,
     required this.onDatabaseSearch,
     required this.onOpenOptions,
@@ -81,6 +83,14 @@ class GameDrawerContent extends StatelessWidget {
           onTap: () {
             onClose();
             onShowScoreboard();
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.menu_book, color: Colors.lightBlueAccent),
+          title: const Text('ガイドブックを読む', style: TextStyle(color: Colors.white)),
+          onTap: () {
+            onClose();
+            onShowGuidebook();
           },
         ),
         if (isGameRunning) ...[
