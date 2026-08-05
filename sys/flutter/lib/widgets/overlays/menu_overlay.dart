@@ -114,13 +114,9 @@ class _MenuOverlayState extends State<MenuOverlay> {
     if (item.ident <= 0 || item.ident == 4294967294 || _isMenuCategoryItem(item)) {
       return false;
     }
-    // A, B, C, U などのメタ・フィルタ項目を除外
+    // 大文字 A(65), B(66), C(67), U(85) などのメタ・フィルタ項目のみを除外 (小文字 b, c は除外しない)
     if (item.ident == 65 || item.ident == 66 || item.ident == 67 || item.ident == 85 ||
         item.accelerator == 65 || item.accelerator == 66 || item.accelerator == 67 || item.accelerator == 85) {
-      return false;
-    }
-    final accChar = item.accelerator > 0 ? String.fromCharCode(item.accelerator).toUpperCase() : "";
-    if (accChar == 'A' || accChar == 'B' || accChar == 'C' || accChar == 'U') {
       return false;
     }
     return true;
@@ -139,7 +135,12 @@ class _MenuOverlayState extends State<MenuOverlay> {
             }
           }
         } else {
-          _selectedCounts.clear();
+          _selectedCounts.remove(-2);
+          for (final item in widget.menuItems) {
+            if (_isPureItemCategoryItem(item)) {
+              _selectedCounts.remove(item.ident);
+            }
+          }
         }
       } else {
         if (_selectedCounts.containsKey(ident)) {
