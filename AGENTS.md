@@ -170,7 +170,18 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
    - 対策として、 FFI に `ExitCallback` (シグネチャ: `Void Function()`) を追加し、 `flutter_exit_nhwindows` および `NetHackThreadFunc` の終了時にこれを呼び出して Dart 側に通知を中継してください。
    - Dart 側では終了イベントを受け取った際、 `_isGameRunning` や各種入力フラグを直ちにリセットし、開始画面に安全かつスムーズに戻るようにステート更新を行ってください。
 
-4. **はみ出し（RenderFlex overflow）の防止と自動縮小フィット**:
+4. **オリジナル NetHack Cコア（src/）コード保護と移植層での吸収原則**:
+   - バグ修正や例外対処を行う際、オリジナルの NetHack C コープラグイン・ロジック（`src/` 配下の C コード）は原則として改変せずそのまま保護・維持してください。
+   - 異種型変換や入力ガード、パース例外処理は、NetHack C コア側（`src/`）に過剰なチェックや条件分岐を追加するのではなく、必ず移植層（`sys/flutter/` 配下の C FFI `winflutter.c` や Dart UI コード）側で型変換・符号拡張・フィルタリングを行って安全に吸収する設計を徹底してください。
+
+5. **NetHack Cコア `union any` と Dart FFI 間の識別子（`ident`）符号拡張・フィルタリング方針**:
+   - **`union any` の 32bit/64bit 符号拡張**:
+     - NetHack Cコアの `anything` 共用体 (`union any`) において、`a_int` (32bit signed int) として負の特殊識別子（`ALL_TYPES_SELECTED` = `-2` や選択補助 ID 等）が設定された場合、64ビット環境で `ident->a_long` を参照すると上位32bitが0のまま `4294967294` (`0xFFFFFFFE`) 等の正の巨大数に符号破壊されます。
+     - `flutter_add_menu` 等で FFI 経由で `ident` を Dart に渡す際は、`ident->a_int < 0` の場合に `(long)ident->a_int` へ明示的に符号拡張を行い、C側の受け取り関数でも `strtoll` (64-bit signed) で復元してください。
+   - **Dart / UI層でのメタ識別子・カテゴリ除外**:
+     - Dart / UI層（`main.dart`, `menu_overlay.dart` 等）で「全て選択」、キーアクセラレータートグル、`preselected` 初期選択集計等を行う際は、`item.ident != 0` のみの単純判定を行わず、必ず `item.ident > 0 && item.ident != 4294967294 && !_isMenuCategoryItem(item)` を用いてカテゴリヘッダーや負のメタ識別子が選択リストに紛れ込まないよう厳格にフィルタリングしてください。
+
+6. **はみ出し（RenderFlex overflow）の防止と自動縮小フィット**:
    - モバイル端末の多様な画面幅に対応するため、YN質問などのボタン配置は `Row` を避け、自動折り返しが発生する `Wrap` を使用してください。
    - ステータス表示部など、はみ出しが深刻な長文領域については、以下の2つのモードを選択・設定できるように構成してください：
      - **自動縮小フィット（Fit / デフォルト）**: `FittedBox` (`fit: BoxFit.scaleDown`) を用い、固定された高さの中でテキストを画面幅に合わせて自動的に縮小・圧縮する。
