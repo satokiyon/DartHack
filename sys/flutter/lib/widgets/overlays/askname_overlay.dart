@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../models/game_enums.dart';
+import '../../utils/utf8_length_limiting_formatter.dart';
 
 class AskNameOverlay extends StatefulWidget {
   final TextEditingController nameController;
@@ -99,6 +100,7 @@ class _AskNameOverlayState extends State<AskNameOverlay> {
                         controller: widget.nameController,
                         autofocus: true,
                         enabled: _selectedPlayMode != PlayMode.wizard,
+                        inputFormatters: [Utf8LengthLimitingTextInputFormatter(maxAskNameBytes)],
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: _selectedPlayMode == PlayMode.wizard

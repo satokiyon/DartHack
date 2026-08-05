@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:ui' as ui;
 
 class AmountSelectorDialog extends StatefulWidget {
@@ -107,6 +108,10 @@ class _AmountSelectorDialogState extends State<AmountSelectorDialog> {
                 child: TextField(
                   controller: _textController,
                   keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(widget.maxCount.toString().length),
+                  ],
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
                   decoration: const InputDecoration(

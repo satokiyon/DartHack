@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../models/ext_cmd_entry.dart';
+import '../../utils/utf8_length_limiting_formatter.dart';
 
 class GetLineOverlay extends StatefulWidget {
   final String prompt;
@@ -86,13 +88,23 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                     TextField(
                       controller: widget.inputController,
                       autofocus: true,
-                      maxLength: 100,
+                      inputFormatters: [Utf8LengthLimitingTextInputFormatter(100)],
                       decoration: InputDecoration(
                         hintText: 'テキストを入力してください',
                         filled: true,
                         fillColor: const Color(0xFF0E1117),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
+                        ),
+                        counter: ValueListenableBuilder<TextEditingValue>(
+                          valueListenable: widget.inputController,
+                          builder: (context, value, child) {
+                            final byteCount = utf8.encode(value.text).length;
+                            return Text(
+                              '$byteCount / 100 バイト',
+                              style: const TextStyle(color: Colors.grey, fontSize: 12),
+                            );
+                          },
                         ),
                       ),
                       onSubmitted: (val) {

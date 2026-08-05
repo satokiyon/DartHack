@@ -170,6 +170,171 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
    - 対策として、 FFI に `ExitCallback` (シグネチャ: `Void Function()`) を追加し、 `flutter_exit_nhwindows` および `NetHackThreadFunc` の終了時にこれを呼び出して Dart 側に通知を中継してください。
    - Dart 側では終了イベントを受け取った際、 `_isGameRunning` や各種入力フラグを直ちにリセットし、開始画面に安全かつスムーズに戻るようにステート更新を行ってください。
 
+<!-- agent-ninja-END -->
+
+## 死因（killer.name）の日本語化と英語交じり回避方針
+
+ハイスコア（`record`）との互換性を維持するため、死因を表す `svk.killer.name` や `multi_reason` は、原則として元の英語キーのままコード内で設定し、表示時に動的に翻訳するアプローチを徹底してください。
+
+1. **共通翻訳関数の利用**:
+   - すべての死因表示（墓石、ダンジョン概要、ゲームオーバー、トップテン一覧）は、共通して `src/topten.c` の `jp_translate_killer_text_for_display` を経由します。翻訳のルールはすべてこの関数内に集約してください。
+
+2. **動的日本語翻訳の適用**:
+   - 死因テキストにモンスター名やアイテム名が含まれる場合、文字列の静的なハードコードでの置換ではなく、以下の検索関数を組み合わせて動的に日本語名を解決してください。
+     - モンスター名: `name_to_mon(eng_name, &gend)` でIDを取得し、`jp_pmname_from_idx(mndx, 0)` で日本語名に翻訳。
+     - オブジェクト名: `name_to_otyp(eng_name)`（`topten.c` 内のヘルパー）でIDを取得し、`jp_item_name(otyp)` で日本語名に翻訳。
+
+3. **定型パターンへの対応**:
+   - `tripping over a [Monster] corpse`（死体につまずく）や `kicking a [Monster] barefoot`（裸足で蹴る）などの定型的な死因表現も、モンスター名部分を動的に切り出して日本語文（例：「〜の死体につまずいたことで石化した」）に再構築してください。
+
+## 神の名前の日本語表示方針
+
+神の名前（`align_gname()` や `u_gname()` が返す文字列）をプレイヤーへの表示メッセージやログ（`livelog`など）に含める際は、英語のまま表示されてしまうのを防ぐため、必ず日本語の表示用変換関数を経由させてください。
+
+1. **アライメントに対応する神の名の取得**:
+   - アライメント値（`aligntyp`）から日本語の神の名前を取得して表示する場合は、`jp_align_gname_for_display(alignment)` を使用してください。
+
+2. **英語の神の名の文字列からの翻訳**:
+   - 既に英語の神の名前の文字列（`gnam`）がある場合は、`jp_gname_for_display(gnam)` を通して日本語名（カタカナ）に変換してから表示してください。
+
+3. **例外（内部ロジックでの英語の維持）**:
+   - 死因 (`svk.killer.name`) など、セーブデータ互換性やスコア判定で内部的に使われる識別キーとして設定する場合は、表示時以外は英語のままとします。
+
+## イベント履歴（livelog）および画面メッセージの日本語表示方針
+
+ゲーム内イベント履歴（livelog / chronicle）や画面に表示されるメッセージを日本語化・翻訳する際は、以下のルールを徹底してください。
+
+1. **固有名詞の翻訳統一**:
+   - `Sokoban` の翻訳は必ず「倉庫番」を使用してください。「ソコバン」などのカタカナ表記は避けてください。
+
+2. **英語特有の表現・関数の排除**:
+   - 日本語化に伴い不要となる英語の不定冠詞付与関数 `an()` や、代名詞取得関数 `uhis()`, `uhim()` は削除し、日本語の助詞や「あなた」などに適宜置き換えてください。
+   - 店主などのモンスターの代名詞を返す関数 `noit_mhe()`, `noit_mhim()`, `noit_mhis()` なども同様にメッセージ内で使用せず、日本語の「自分」「相手」などに置き換えるか、プレースホルダー自体を削除して文章を整理してください。
+
+3. **日本語の語順への再構築**:
+   - 英語の語順（例: `entered <Level>`）をそのまま直訳せず、日本語として自然な語順（例: `<Level>に入った`）にフォーマット文字列と引数の順序を再構築してください。
+
+4. **動的な日本語名の解決**:
+   - 職業名、肩書、種族名などのプレイヤー情報は、イベント履歴（livelog）や画面に表示される通常メッセージ（`pline` 等での出力）において、英語の文字列（`gu.urole.name.m` など）をそのまま出力して英語交じりになるのを防ぐため、必ず以下の表示用日本語化関数を経由させてください。
+     - 職業名: `jp_role_name_for_display(flags.initrole, gender)`
+     - 肩書: `jp_rank_of_for_display(u.ulevel, Role_switch, gender)`
+     - 種族名: `jp_race_noun_for_display(Race_switch)`
+
+5. **可変引数マクロのフォーマットと引数の完全一致確認**:
+   - `pline()`, `You()`, `pline_The()`, `impossible()` などの可変引数マクロを日本語化・修正する際は、フォーマット文字列内の指定子（`%s`, `%c`, `%d`等）と、渡す実引数の個数および型が完全に一致していることを必ず確認してください。
+   - 特に英語メッセージの `%c`（文字型、`.` や `!` など）をそのまま残すか `%s`（文字列型）に誤って変更してしまうと、メモリアクセス違反（`strnlen` でのクラッシュ）を引き起こします。
+   - フォーマット文字列の順序を入れ替える場合は、渡す引数の順序もそれに合わせて並び替えてください。
+
+6. **genocide の翻訳統一**:
+   - ゲーム内メッセージ、イベント履歴、コマンド説明文（`cmd.c`の`#genocided`など）において、`genocide`（根絶、虐殺等）の訳語は必ず「**虐殺**」に統一してください。
+   - プレイモード（通常プレイかデバッグモードか）によってコマンド一覧等の説明文を動的に切り替える処理を行う場合も、「虐殺」の文字列を対象として置換するように実装してください。
+
+7. **行動中断メッセージ（occupation text）の日本語化と助詞重複防止**:
+   - 複数ターンにわたる自動行動（`set_occupation`で処理されるもの）のテキストを定義する際は、中断時のメッセージ「あなたは%sをやめた.」と自然に繋がる名詞（体言）または「〜するの」の形で設定してください（例: 「探索」「待機」「缶を開けるの」など）。
+   - 「脱衣」「武装解除」などのように、完了・継続メッセージで「を」を用いる行動については、中断時に「〜ををやめた」という助詞の重複が発生するのを防ぐため、活動テキスト自体から「を」を排除し（例: 「脱衣」）、完了・継続メッセージの出力側（例: `You("%sを終えた.", ...)`）で「を」を補う設計を徹底してください。
+
+8. **`You()` マクロによる主語「あなたは」の自動付与に伴う文脈・接続の不自然さの防止**:
+   - `You(str)` マクロは自動的に先頭へ「あなたは」を付加して出力します (`pline("あなたは%s", str)`)。
+   - 「スコアが記録されない探索モードです。」や「〜の絶滅は許されていない。」のように「あなたは」という主語を伴わない状態通知・客観的なメッセージを出力する際は、`You()` ではなく `pline()` を使用してください。
+   - `You()` を使用する場合は、動詞句（例: 「〜にいる。」「〜を得た。」）を渡し、「あなたは〜」と繋がった際に自然な日本語文になるよう設計してください。
+   - `You("are in ...")` のように英文をそのまま `You()` に渡すと「あなたはare in ...」という英語交じりの壊れたメッセージになるため、必ず `pline()` で日本語化するか自然な動詞句に置き換えてください。
+
+
+## アイテムの日本語助数詞（単位）表示方針
+
+1. **GEM_CLASS オブジェクトの助数詞**:
+   - 石（`rock`）や宝石（`gem`）など、スリングなどで投射可能な武器属性（`is_ammo` や `is_missile`）を持つ `GEM_CLASS` のアイテムについても、日本語の助数詞（単位）は「本」ではなく「個」と表示されるようにしてください（例: 「10個の石」、「2個の紫の石」）。
+
+## Windows (MSVC) 開発における C コード記述とビルドの制約
+
+1. **strcasecmp の使用禁止と strcmpi / strncmpi の徹底**:
+   - Windows (MSVC) ビルド環境では `strcasecmp` や `strncasecmp` は利用できず、リンクエラー（外部シンボル未解決）になります。
+   - 大文字小文字を無視した文字列比較を行う場合は、NetHackで定義されているマクロである `strcmpi` / `strncmpi` を必ず使用してください。
+
+2. **AIエージェント用ビルドスクリプトの利用**:
+   - Windows環境でコードのビルド確認を行う際は、ルートのCMakeではなく、用意されているエージェント用バッチファイル `sys\windows\vs\build_one.bat` を優先して実行してください。これにより、環境の自動セットアップと `Release|x64` 構成でのビルドが一貫して行われます。
+
+3. **Windows (PowerShell) 環境での Git コミット・コマンド実行の制約**:
+   - `run_command` 等でコマンドを連結する際、PowerShell では `&&` を使用すると構文エラーになるため、1行ずつ実行するかセミコロン `;` 等で区切ってください。
+   - 日本語のコミットメッセージを指定する場合、PowerShell 上で文字化けが発生するのを防ぐため、メッセージを一時ファイル（UTF-8）を artifacts の scratch ディレクトリ（例：`<appDataDir>\brain\<conversation-id>\scratch\commit_msg.txt`）に書き込み、`git commit -F <ファイルパス>` でコミットを行ってください。コミット完了後、一時ファイルは削除してください。
+   - **Git 履歴抹消 (`git filter-repo` / `git filter-branch`) 実行時のローカルファイル保護原則**:
+     - `git filter-repo` などの履歴書き換えコマンドは、実行完了後に書き換え後のコミットツリーを作業ツリーへ自動チェックアウト（上書き）するため、履歴から除去されたファイルがローカルのディスク上からも削除されます。
+     - 履歴抹消を行う際は、実行前に必ず対象のフォルダ・ファイルを Git 管理外の安全な一時ディレクトリ（例：`<appDataDir>\brain\<conversation-id>\scratch\`）へ手動でバックアップ（コピー）し、`git filter-repo` の完了後に元のローカル位置へ復元する手順を徹底してください。
+
+4. **Flutter Android 環境でのビルド方針**:
+   - Flutter Android環境向けのビルドを行う際は、`DartHack_private` 内の `android_build.ps1` を実行してください。
+
+5. **Android / Flutter版における日本語・英語版データファイルの配置と優先ロード方針**:
+   - AndroidおよびFlutterポートでは、データファイル群（`data`, `rumors`, `oracles` 等）およびヘルプ・メニューなどのデータファイル群を個別のファイルとして `assets/nethackdir/` にパッケージングし、アプリ起動時に端末のストレージ（データディレクトリ）にコピーして読み込みます。
+   - Windows版と同様に、英語版（`data`, `oracles`, `rumors`, `tribute` 等）と日本語版（`data_jp`, `oracles_jp`, `rumors_jp`, `tribute_jp` 等）の両方のファイルを `assets/nethackdir/` に同梱します。
+   - Cコア側（`dlb.c` / `files.c`）でデータファイルをロードする際、日本語版（`_jp`）が存在すれば自動的に優先して読み込み、無ければ英語版にフォールバックして読み込みます。
+   - データファイルアセットを変更・追加した際は、上書きインストール時に強制的にアセットコピーがトリガーされるよう、必ず `assets/ver` 内のバージョン値（整数値）をインクリメントしてください。
+
+6. **デバッグ用一時コード・ログ出力のクリーンアップ**:
+   - デバッグや診断の目的で一時的に埋め込んだログ出力処理（例：Cコード内の `__android_log_print` や print文など）や、ログ出力のためだけに一時的に追加したリンクライブラリ指定（例：`-llog` 等）は、**原因の特定および問題の解決が完了した段階で、必ずすべて削除し、元のクリーンな状態に復元した上でコミット**してください。
+
+7. **独自のバーチャルキーボード（SoftKeyboard）の非表示漏れとプレビュー残存バグ対策**:
+   - 独自のバーチャルキーボード（`SoftKeyboard` / `KeyboardView`）が非表示になる際、拡大キープレビュー（`PopupWindow`）が消えずに画面上に残り、システムキーボード（IME）へのタッチ入力を阻害するバグ。また、初期化されていない状態で `hide()` を呼んだ際に `kbd_frame` の非表示（`GONE`）化がスキップされ、システムキーボードの直上のタッチを阻害するバグ。
+   - 対策：
+     - `mainwindow.xml` の `kbd_frame` の初期可視性を `gone` にする。
+     - `SoftKeyboard.java` のコンストラクタで `mKeyboardFrame.setVisibility(View.GONE)` を呼び出す。
+     - `SoftKeyboard.show()` 時に `setPreviewEnabled(true)` でプレビューを有効化。
+     - `SoftKeyboard.hide()` 時に `setPreviewEnabled(false)` でプレビューを無効化し、かつ `closing()` を明示的に呼び出してプレビューウィンドウを破棄・クローズした上で、`mKeyboardFrame.setVisibility(View.GONE)` でフレームを非表示にする。
+
+8. **外部モジュール ForkFront-Android のローカルモジュール化と修正の適用**:
+   - 背景：以前はビルド時に `sourceControl` で GitHub から直接取得されていたため、ローカルの Java ソースコード修正をビルドに反映できませんでした。
+   - 構成：
+     - `settings.gradle` で `sourceControl` を削除し、`include(':lib')` と `project(':lib').projectDir = file('ForkFront-Android/lib')` を設定。
+     - `app/build.gradle` の `dependencies` に `implementation project(':lib')` を指定。
+     - `ForkFront-Android` は `.git` を削除したうえで、NetHackJPの通常のローカルディレクトリとして Git 追跡対象とします。
+
+9. **固有名詞の英語表記の維持方針**:
+   - タイルセット名（Geoduck, Nevanda, PixelHack など）のような固有名詞は、日本語化リソース（xmlなど）を作成する際にもカタカナなどに翻訳せず、元の英語表記のまま維持してください。
+
+10. **プレイヤー状態（Condition）表示の日本語化と表示制限の回避**:
+    - ステータスライン等で盲目や混乱、石化などの状態表示を日本語化する際は、英語の文字列を個別にハードコードして翻訳するのではなく、ゲームコア側（`src/botl.c`）の `conditions[i].text[1]` の日本語定義を直接参照してください。
+    - 表示ループの上限には古いハードコード値（13など）を使用せず、必ず `CONDITION_COUNT` (30) を使用し、すべての状態異常が正しく表示されるようにしてください。
+    - ビットマスク処理の安全性のために、状態判定用の変数や関数の引数型は、マスク幅に合わせた `unsigned long` 等を使用してください。
+
+11. **Android 独自設定（Preference）におけるデフォルト値の永続化徹底**:
+    - 現象と制約：
+      `SliderPreference` などのカスタム Preference を実装する場合、単に XML で `android:defaultValue` を設定しただけでは、インストール直後の初回起動時（`PreferenceManager.setDefaultValues` 実行時）に初期値が SharedPreferences に保存されず、設定値が反映されなくなる（キーが存在しない状態になる）問題が発生します。
+    - 対策：
+      カスタム Preference クラスを定義・修正する際は、必ず以下の2つのメソッドをオーバーライドしてください。
+      1. `onGetDefaultValue(TypedArray a, int index)`: XML からデフォルト値を正しく取得して返す。
+      2. `onSetInitialValue(boolean restore, Object defaultValue)`: `restore` が `false`（デフォルト値設定時）の際、引数から受け取った `defaultValue` を設定した上で、 `persistInt` / `persistString` / `persistBoolean` を明示的に呼び出して SharedPreferences に値を保存する。
+
+12. **NetHack 5.0 におけるウィザードモード（Wizard Mode）・探索モードの設定方針**:
+    - **`#ifdef WIZARD` マクロの記述禁止**:
+      - NetHack 5.0 ではデバッグ機能のビルドが常時無条件で有効化されており、従来の `#ifdef WIZARD` プリプロセッサマクロはコードベースから廃止されています。
+      - Cコードや移植層（`winflutter.c` 等）で `#ifdef WIZARD` ガードを使用するとコンパイル時にブロック内（`wizard = TRUE` や `svp.plname` への名前コピー）が消去されるため、`#ifdef WIZARD` は使用しないでください。
+    - **Windows版 `-D -u wizard` 同等のフラグ初期化**:
+      - 移植層からウィザードモードを適用する際は、以下のステップを順に実行してください：
+        1) `wizard = TRUE; discover = FALSE;`
+        2) `svp.plname` に小文字の `"wizard"` をセット
+        3) `set_playmode();` を呼び出して C コアの認証状態を完了させる
+
+   **関連**: C コア ↔ Flutter FFI におけるウィンドウ API とタイル描画の設計方針（後述）も合わせて参照してください。`#ifndef ANDROID` ガードの配置や、`flutter_putmixed_with_tile` のような Android 専用 C シンボルを共通ファイルに置く際の二重定義回避パターンを記載しています。
+
+
+## Flutter移植版におけるCスレッド連携・UI同期設計方針
+
+NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（メインスレッド）間で FFI を用いて画面同期や連携処理を実装する際は、以下の設計方針を遵守してください。
+
+1. **ステータス表示（win_status_update）のジェネリック化**:
+   - Android/Javaポートで実装されている JNI 経由での構造化されたステータス更新処理（JNICallOを用いるもの）は、JNI 環境が NULL になる Flutter版では利用できず、そのまま呼ぶと JNI ヌルポインタによる SIGSEGV クラッシュを引き起こします。
+   - 対策として、 `HijackWindowProcs()` 内で `and_procs.win_status_update` を NetHack 汎用の `genl_status_update` に差し替えて（ハイジャックして）ください。これにより、ステータス更新時に `putstr` / `putmixed` を介して `WIN_STATUS` (ID: 2) 宛てに自動的にフォーマット済みのテキスト（通常2行）が送信されるようになります。
+   - `genl_status_update` を使用する際は、ヘッダーまたはファイル冒頭で `extern void genl_status_update(...)` の前方宣言を行ってください。
+
+2. **ステータス行（WIN_STATUS）のカーソル追跡と上書き処理**:
+   - `genl_status_update` はステータス各行を出力する際、 `curs(WIN_STATUS, 1, 0)`（1行目）または `curs(WIN_STATUS, 1, 1)`（2行目）を呼んでから `putstr` を実行します。
+   - Dart側の画面バッファ管理クラス（`NetHackScreen` 等）では、 `curs(WIN_STATUS)` が呼び出された際の `y` 座標を状態（インデックス）として保持してください。その後に来る `putString(WIN_STATUS)` では、保持したインデックス行を直接上書き更新するように実装することで、ステータス行の順序反転や表示崩れを完全に防ぐことができます。
+
+3. **Cスレッド終了（セーブ・ゲームオーバー）のUI中継とフリーズ防止**:
+   - "S"キーによるセーブ終了や通常のゲーム終了時、C側のスレッド（NetHackMain）がリターンまたは `exit_nhwindows` を経由して終了した事実を UI 側に通知しないと、画面が「セーブ中...」などのゲーム中状態のまま停止してフリーズしてしまいます。
+   - 対策として、 FFI に `ExitCallback` (シグネチャ: `Void Function()`) を追加し、 `flutter_exit_nhwindows` および `NetHackThreadFunc` の終了時にこれを呼び出して Dart 側に通知を中継してください。
+   - Dart 側では終了イベントを受け取った際、 `_isGameRunning` や各種入力フラグを直ちにリセットし、開始画面に安全かつスムーズに戻るようにステート更新を行ってください。
+
 4. **オリジナル NetHack Cコア（src/）コード保護と移植層での吸収原則**:
    - バグ修正や例外対処を行う際、オリジナルの NetHack C コープラグイン・ロジック（`src/` 配下の C コード）は原則として改変せずそのまま保護・維持してください。
    - 異種型変換や入力ガード、パース例外処理は、NetHack C コア側（`src/`）に過剰なチェックや条件分岐を追加するのではなく、必ず移植層（`sys/flutter/` 配下の C FFI `winflutter.c` や Dart UI コード）側で型変換・符号拡張・フィルタリングを行って安全に吸収する設計を徹底してください。
@@ -181,8 +346,6 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
    - **Dart / UI層でのメタ識別子・カテゴリ除外**:
      - Dart / UI層（`main.dart`, `menu_overlay.dart` 等）で「全て選択」、キーアクセラレータートグル、`preselected` 初期選択集計等を行う際は、`item.ident != 0` のみの単純判定を行わず、必ず `item.ident > 0 && item.ident != 4294967294 && !_isMenuCategoryItem(item)` を用いてカテゴリヘッダーや負のメタ識別子が選択リストに紛れ込まないよう厳格にフィルタリングしてください。
 
-6. **はみ出し（RenderFlex overflow）の防止と自動縮小フィット**:
-   - モバイル端末の多様な画面幅に対応するため、YN質問などのボタン配置は `Row` を避け、自動折り返しが発生する `Wrap` を使用してください。
    - ステータス表示部など、はみ出しが深刻な長文領域については、以下の2つのモードを選択・設定できるように構成してください：
      - **自動縮小フィット（Fit / デフォルト）**: `FittedBox` (`fit: BoxFit.scaleDown`) を用い、固定された高さの中でテキストを画面幅に合わせて自動的に縮小・圧縮する。
      - **領域の可変高さ（Wrap）**: テキストの長さに応じて自動的に折り返し、表示領域の高さ自体を動的に拡張する。
@@ -198,17 +361,6 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
      - Dart側 `main.dart`:
        - `sendPosCmd(int x, int y, int mod)` 関数を追加し、worker 経由で C コアの `SendPosCmdToFlutter` を呼び出す。
        - `_handleMapTap` で `_sendExtendedCommand('#herecmdmenu')` ではなく `sendPosCmd(tile.tileX, tile.tileY, 1 /* CLICK_1 */)` を呼ぶ。
-     - 主人公の座標判定は C側 `flutter_cliparound` から Dart側 `setPlayerPos` へ通知される `(u.ux - 1, u.uy)`（0-based マップグリッド座標）を使用し、`dx == 0 && dy == 0` で同一タイルを判定します。
-   - `flutter_nh_poskey` から `readchar_core` への座標引き渡し: `nhgetch` 戻り値 0 はクリックイベントとして処理されますが、座標ポインタを返せないため、`g_pending_poscmd_*` グローバル変数経由で `nh_poskey` 側（次の readchar サイクル）に復元します。これにより PosCmd 1 個に対し `readchar` が 2 回呼ばれますが、機能上問題ありません（1 回目は `nhgetch` で PosCmd 消費、2 回目で `nh_poskey` が pending 復元して `click_to_cmd` 実行）。
-
-6. **`request_input` 受信時の自動 `Space(auto)` 送信とメニュー表示中のスキップ**:
-   - `request_input` 受信時のセーブ自動アドバンス処理で、一定条件を満たす場合に `WidgetsBinding.instance.addPostFrameCallback` 経由で `_sendFfiKey(32, 'Space(auto)')` を自動送信するロジックがあります（セーブ進行中のテキストを自動で進める用途）。
-   - この `Space(auto)` は `_sendFfiKey` 内のメニューガード（`if (_screen.isMenuWindowVisible)`）を通過し、Space/Enter/ESC として `_sendMenuSelection(-1)`（キャンセル）を発動するため、**メニューやテキストウィンドウが表示されている最中に `request_input` が届くと、即座にメニューが閉じてしまう**重大な UX 破壊を引き起こします。
-   - **対策**: `addPostFrameCallback` の中で Space を送信する直前に、**メニュー/テキストウィンドウが表示されていないことを再度チェック**してください（`canAutoAdvance` の判定時点と `addPostFrameCallback` 実行時点で状態が変わり得るため、二重チェックが必須）。
-     ```dart
-     WidgetsBinding.instance.addPostFrameCallback((_) {
-       if (mounted && _waitingForInput
-           && !_screen.isMenuWindowVisible
            && !_screen.isTextWindowVisible
            && _screen.textLines.isEmpty
            && !_isYnVisible
@@ -217,20 +369,6 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
          _sendFfiKey(32, 'Space(auto)');
        }
      });
-     ```
-
-7. **Dart 側デバッグログの出力先**:
-   - 既存の `_addLog(String msg)` は Flutter UI 内のログ表示エリア専用で、`adb logcat` や `flutter run` のコンソールには**出力されません**。
-   - デバッグ目的で `flutter run` のコンソールや logcat に出力したい場合は **`debugPrint`（`package:flutter/foundation.dart` 標準）** を使用してください。`print` も使用可能ですが、`debugPrint` の方が長い文字列を自動的に分割してくれるため推奨されます。
-   - デバッグログは **原因特定後、必ず削除してからコミット** してください（方針 6 参照）。
-
-8. **sys/flutter における完全自己完結と C 補完シンボルの定義原則**:
-   - `sys/flutter`（Flutter ポート）は旧 `sys/android` への依存を持たず、C コード（`fluttermain.c`, `flutterunix.c`, `winflutter.c`）を備えた完全独立・自己完結構成として運用してください。データ構築やビルドは `DartHack_private` 内の `android_build.ps1` から実行されます。
-   - NetHack C コア (`src/`) 内部の `#ifdef ANDROID` 領域が参照する Android 固有のグローバル変数・関数（`and_procs`, `and_get_dumplog_dir`, `and_you_die`, `load_usersound`, `androidsound_procs`, `quit_possible`, `lock_mouse_cursor`, `set_username`, `debuglog` 等）は、`sys/flutter` 側（`winflutter.c` / `fluttermain.c` / `flutterunix.c`）で適切な型・シグネチャを伴う補完シンボルとして定義・実装してください。
-   - 特に `debuglog` は `androidconf.h` にて `#define error debuglog` とマクロ展開され C コアから可変長引数関数として参照されるため、単なるマクロではなく `winflutter.c` で `<stdarg.h>` / `<android/log.h>` を用いた実態関数 `void debuglog(const char *fmt, ...)` として定義してください。
-   - `and_get_dumplog_dir(char *buf)` 等の補完関数は、`include/extern.h` 等にある宣言の戻り値型・引数型と完全に一致させてください。
-   - **【型不一致による .bss 実行クラッシュ防止】**: Cコア (`src/`) 側で `extern void func(void);` のように関数として宣言・呼び出されている補完シンボルを、`sys/flutter` 側で誤って `int func = 0;` のようにスカラー変数として定義してはなりません。Cコアが変数のメモリ領域 (`.bss`) へ関数ジャンプを行い、`SIGSEGV (SEGV_ACCERR)` でクラッシュする原因になります。呼び出し側が関数の場合は、必ずシグネチャが一致する空のスタブ関数（例：`void func(void) { return; }`）として定義してください。
-
 9. **Flutter における MaterialColor スウォッチアクセスの安全性（Null クラッシュ防止）**:
    - `Colors.grey[950]` のように、Flutter 標準の `MaterialColor` スウォッチ（50, 100〜900）に定義されていないキーへのアクセスや、その他のスウォッチから取得したカラーに対して `!` 演算子を用いた強制アンラップ（例：`Colors.grey[900]!`）を行うのは禁止です。`null` が返された場合に `Null check operator used on a null value` 例外を引き起こし、画面がクラッシュする原因になります。
    - スウォッチから色を取得して不透明度などを調整する際は、必ず `(Colors.grey[950] ?? const Color(0xFF0D0D0D))` のように `??` を用いて安全なフォールバック用 `Color` を設定した上で、`withValues` や `withOpacity` などのメソッドを呼び出すように徹底してください。
@@ -568,3 +706,9 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
   非同期処理（`Future` / `SharedPreferences` / FFI 呼び出し等）を跨いで `showDialog` や `context` を参照・操作する際は、必ず事前に `if (!context.mounted) return;` （または `if (!mounted) return;`）を挿入し、アンマウント済みのコンテキスト参照によるクラッシュや型解析警告を徹底して回避してください。
 
 
+
+## 31. Flutter TextField における UTF-8 バイト数制限とカウンタ表示方針
+- **現象と制約**:
+  Flutter の `TextField` に単に `maxLength: N` を指定すると、Flutter 標準で Unicode コードポイント数（文字数）制限およびカウンタ表記が行われます。これにより、全角日本語（UTF-8 で 3 バイト/文字）などのマルチバイト文字が 1 文字 1 カウント（1 バイト扱い）となり、C コア側のバッファ上限（`PL_PSIZ` = 63 バイト、`PL_CSIZ` = 32 バイト、`BUFSZ` 等）を超えるバイト数の文字列が入力できてしまう問題が発生します。
+- **対策**:
+  テキスト入力（`getlin` オーバーレイや名前入力ダイアログ等）で UTF-8 バイト数による上限制限を行う際は、単なる `maxLength` を使用せず、`Utf8LengthLimitingTextInputFormatter(maxBytes)` (`sys/flutter/lib/utils/utf8_length_limiting_formatter.dart`) を `inputFormatters` に設定し、`counter` または `buildCounter` プロパティで `utf8.encode(text).length` による正確な UTF-8 バイト数のカウント表示（例: `$byteCount / $maxBytes バイト`）を実装してください。
