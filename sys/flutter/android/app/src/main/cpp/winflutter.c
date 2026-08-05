@@ -736,7 +736,7 @@ void SendMenuSelectionsToC(const char* csv) {
             break;
         }
 
-        v = strtol(p, &endptr, 10);
+        v = strtoll(p, &endptr, 10);
         if (endptr == p) {
             while (*p && *p != ',') {
                 ++p;
@@ -1593,9 +1593,10 @@ static void flutter_add_menu(winid wid, const glyph_info *glyphinfo, const anyth
     
     if (g_add_menu_cb && str) {
         char* conv = convert_cp437_to_utf8(str);
+        long menu_ident = ident ? ((ident->a_int < 0) ? (long)ident->a_int : ident->a_long) : 0L;
         g_add_menu_cb(
             (int)wid,
-            ident->a_long,
+            menu_ident,
             (int)accelerator,
             (int)groupacc,
             attr,
