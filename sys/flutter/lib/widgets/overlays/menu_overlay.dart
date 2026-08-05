@@ -110,14 +110,31 @@ class _MenuOverlayState extends State<MenuOverlay> {
     return t.endsWith(':') || t.endsWith('：');
   }
 
+  bool _isPureItemCategoryItem(MenuItemData item) {
+    if (item.ident <= 0 || item.ident == 4294967294 || _isMenuCategoryItem(item)) {
+      return false;
+    }
+    // A, B, C, U などのメタ・フィルタ項目を除外
+    if (item.ident == 65 || item.ident == 66 || item.ident == 67 || item.ident == 85 ||
+        item.accelerator == 65 || item.accelerator == 66 || item.accelerator == 67 || item.accelerator == 85) {
+      return false;
+    }
+    final accChar = item.accelerator > 0 ? String.fromCharCode(item.accelerator).toUpperCase() : "";
+    if (accChar == 'A' || accChar == 'B' || accChar == 'C' || accChar == 'U') {
+      return false;
+    }
+    return true;
+  }
+
   void _toggleSelection(int ident) {
     if (ident == 0 || ident == 4294967294) return;
     setState(() {
       if (ident == -2) {
         final isCurrentlySelected = _selectedCounts.containsKey(-2);
         if (!isCurrentlySelected) {
+          _selectedCounts[-2] = 1;
           for (final item in widget.menuItems) {
-            if (item.ident != 0 && item.ident != 4294967294 && !_isMenuCategoryItem(item)) {
+            if (_isPureItemCategoryItem(item)) {
               _selectedCounts[item.ident] = _parseMaxCount(item.text);
             }
           }
@@ -139,11 +156,11 @@ class _MenuOverlayState extends State<MenuOverlay> {
 
         final hasAllTypesItem = widget.menuItems.any((i) => i.ident == -2);
         if (hasAllTypesItem) {
-          final selectableCategoryItems = widget.menuItems
-              .where((i) => i.ident > 0 && !_isMenuCategoryItem(i))
+          final pureCategoryItems = widget.menuItems
+              .where((i) => _isPureItemCategoryItem(i))
               .toList();
-          if (selectableCategoryItems.isNotEmpty) {
-            final allCategorySelected = selectableCategoryItems
+          if (pureCategoryItems.isNotEmpty) {
+            final allCategorySelected = pureCategoryItems
                 .every((i) => _selectedCounts.containsKey(i.ident));
             if (allCategorySelected) {
               _selectedCounts[-2] = 1;
