@@ -342,9 +342,9 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
 5. **NetHack Cコア `union any` と Dart FFI 間の識別子（`ident`）符号拡張・フィルタリング方針**:
    - **`union any` の 32bit/64bit 符号拡張**:
      - NetHack Cコアの `anything` 共用体 (`union any`) において、`a_int` (32bit signed int) として負の特殊識別子（`ALL_TYPES_SELECTED` = `-2` や選択補助 ID 等）が設定された場合、64ビット環境で `ident->a_long` を参照すると上位32bitが0のまま `4294967294` (`0xFFFFFFFE`) 等の正の巨大数に符号破壊されます。
-     - `flutter_add_menu` 等で FFI 経由で `ident` を Dart に渡す際は、`ident->a_int < 0` の場合に `(long)ident->a_int` へ明示的に符号拡張を行い、C側の受け取り関数でも `strtoll` (64-bit signed) で復元してください。
+     - `flutter_add_menu` 等で FFI 経由で `ident` を Dart に渡す際は、64ビットポインタ（`a_obj`）を破壊しないよう、`((ident->a_ulong & 0xFFFFFFFF00000000ULL) == 0) && (((int)ident->a_int) < 0)` の条件（上位32bitが0かつ下位32bitが負数）を満たす場合のみ `(long)(int)ident->a_int` へ符号拡張を行い、C側の受け取り関数でも `strtoll` (64-bit signed) で復元してください。
    - **Dart / UI層でのメタ識別子・カテゴリ除外**:
-     - Dart / UI層（`main.dart`, `menu_overlay.dart` 等）で「全て選択」、キーアクセラレータートグル、`preselected` 初期選択集計等を行う際は、`item.ident != 0` のみの単純判定を行わず、必ず `item.ident > 0 && item.ident != 4294967294 && !_isMenuCategoryItem(item)` を用いてカテゴリヘッダーや負のメタ識別子が選択リストに紛れ込まないよう厳格にフィルタリングしてください。
+     - Dart / UI層（`main.dart`, `menu_overlay.dart` 等）で「全て選択」、キーアクセラレータートグル、`preselected` 初期選択集計等を行う際は、`item.ident != 0` のみの単純判定を行わず、必ず `item.ident != 0 && item.ident != -2 && item.ident != 4294967294 && !_isMenuCategoryItem(item)` を用いてカテゴリヘッダーや負のメタ識別子が選択リストに紛れ込まないよう厳格にフィルタリングしてください。
 
    - ステータス表示部など、はみ出しが深刻な長文領域については、以下の2つのモードを選択・設定できるように構成してください：
      - **自動縮小フィット（Fit / デフォルト）**: `FittedBox` (`fit: BoxFit.scaleDown`) を用い、固定された高さの中でテキストを画面幅に合わせて自動的に縮小・圧縮する。

@@ -1593,7 +1593,8 @@ static void flutter_add_menu(winid wid, const glyph_info *glyphinfo, const anyth
     
     if (g_add_menu_cb && str) {
         char* conv = convert_cp437_to_utf8(str);
-        long menu_ident = ident ? ((ident->a_int < 0) ? (long)ident->a_int : ident->a_long) : 0L;
+        bool is_negative_a_int = ident && ((ident->a_ulong & 0xFFFFFFFF00000000ULL) == 0) && (((int)ident->a_int) < 0);
+        long menu_ident = ident ? (is_negative_a_int ? (long)(int)ident->a_int : ident->a_long) : 0L;
         g_add_menu_cb(
             (int)wid,
             menu_ident,
