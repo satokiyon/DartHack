@@ -191,6 +191,11 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
 - **非同期コンテキスト (`BuildContext`) の安全性チェック**:
   非同期処理（`Future` / `SharedPreferences` / FFI 呼び出し等）を跨いで `showDialog` や `context` を参照・操作する際は、必ず事前に `if (!context.mounted) return;` （または `if (!mounted) return;`）を挿入し、アンマウント済みのコンテキスト参照によるクラッシュや型解析警告を徹底して回避してください。
 
+## 31. Cコアコードの非侵襲原則と Flutter UI層におけるメニュー識別子（ident）の安全管理
+- **Cコア非侵襲原則**: バグや機能改善の原因が Flutter 移植層（`sys/flutter` 配下の Dart / C 連携部）に存在する場合、本家 NetHack の C コアコード（`src/` 配下）に過剰な修正を施さず、修正は `sys/flutter` 側で完結させてください。
+- **メニュー識別子 (`ident`) の型・文脈検証**: NetHack C コアのメニューには、カテゴリ選択（`query_category`：`int` 識別子）とアイテム選択（`query_objlist`：`struct obj *` ポインタアドレス）の2種類が存在します。アイテム選択メニューにおいて `ident = -2`（`ALL_TYPES_SELECTED`）などのメタ識別子が送信されると SEGV クラッシュを引き起こすため、Flutter UI 側（`menu_overlay.dart` / `main.dart`）で全選択時や送信時に `ident > 0` の純粋なアイテム識別子のみを抽出・送信し、メニュー切替時には選択状態を確実にクリアしてください。
+
+
 
 
 

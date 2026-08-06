@@ -1382,7 +1382,7 @@ class _MyHomePageState extends State<MyHomePage> {
             _extCmdMenuFilterController.clear();
             _menuSelectedCounts = <int, int>{};
             for (final item in _screen.menuItems) {
-              if (item.ident != 0 && item.ident != 4294967294 && item.preselected != 0) {
+              if (item.ident > 0 && item.ident != 4294967294 && item.preselected != 0) {
                 _menuSelectedCounts[item.ident] = _parseMaxCount(item.text);
               }
             }
@@ -2037,8 +2037,12 @@ class _MyHomePageState extends State<MyHomePage> {
       _extCmdMenuFilter = "";
       _extCmdMenuFilterController.clear();
     });
-    _addLog("> Menu Selects: ${selections.length} item(s)");
-    final List<Map<String, int>> payload = selections.entries
+    final validEntries = selections.entries.where((e) =>
+        e.key != 0 &&
+        e.key != 4294967294 &&
+        _screen.menuItems.any((item) => item.ident == e.key));
+    _addLog("> Menu Selects: ${validEntries.length} item(s)");
+    final List<Map<String, int>> payload = validEntries
         .map((e) => {'ident': e.key, 'count': e.value})
         .toList();
     _workerSendPort?.send({
@@ -2531,7 +2535,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     }
                   },
                   child: Text(
-                    line,
+                    line.replaceAll('\r', '').replaceAll('\n', ' '),
                     style: TextStyle(
                       color: color,
                       fontFamily: 'monospace',

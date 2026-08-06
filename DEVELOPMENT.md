@@ -162,7 +162,7 @@ git submodule update --init --recursive
 
 ### 4. `look` コマンド結果リストへのタイル ID 引き渡し (Android/Flutter 向け)
 
-Android/Flutter ポート (`NetHackJP-Android`) で `look_all` / `look_traps`
+Android/Flutter ポート (`DartHack`) で `look_all` / `look_traps`
 / `look_engrs` が生成する結果リスト (NHW_TEXT ウィンドウ) の各行に
 対応するエンティティ (怪物 / 物体 / 罠 / 刻印) の代表タイルを表示する
 ための独自拡張です。 アップストリーム NetHack には `putmixed(win, attr,
@@ -256,33 +256,28 @@ Flutter版において、データベースの検索結果（`checkfile()`）お
 
 ## 5. リポジトリ構成とマージ運用
 
-本リポジトリは、Windows版日本語化リポジトリ `NetHackJP` と、Android移植元の `JodiJodington/NetHack-Android` の2つを統合し、`main` ブランクで一本化して開発を進めます。
+本リポジトリ (`DartHack`) は、Windows版日本語化・本家追従リポジトリ `NetHackJP` の更新を取り込みつつ、Flutter (Dart) 移植版として `main` ブランチで一本化して開発を進めます。
 
 ```mermaid
 graph TD
-    NetHackJP[NetHackJP<br>nethack-jp/main] -->|日本語化・本家マージ| NetHackJPAndroid[NetHackJP-Android<br>main]
-    JodiAndroid[Jodi-Android<br>jodi-android/master] -->|Android移植元更新| NetHackJPAndroid
+    NetHackJP[NetHackJP<br>nethack-jp/main] -->|日本語化・本家更新マージ| DartHack[DartHack<br>origin/main]
 ```
 
 ### リモート設定
 マージ作業を行う前に、以下のリモート設定を確認してください。
-- **`origin`**: `https://github.com/satokiyon/NetHackJP-Android.git` (自身のAndroidリポジトリ)
-- **`nethack-jp`**: `https://github.com/satokiyon/NetHackJP.git` (日本語翻訳・共通処理元)
-- **`jodi-android`**: `https://github.com/JodiJodington/NetHack-Android.git` (Android移植元)
+- **`origin`**: `https://github.com/satokiyon/DartHack.git` (自身のリポジトリ)
+- **`nethack-jp`**: `https://github.com/satokiyon/NetHackJP.git` (日本語翻訳・共通処理・本家追従元)
 
-設定されていない場合は、以下のコマンドで追加します。
+`nethack-jp` が設定されていない場合は、以下のコマンドで追加します。
 ```bash
 git remote add nethack-jp https://github.com/satokiyon/NetHackJP.git
-git remote add jodi-android https://github.com/JodiJodington/NetHack-Android.git
 git fetch --all
 ```
 
 ### マージのルール
-> [!IMPORTANT]
-> 競合（コンフリクト）が発生した場合のデバッグを容易にし、Gitの変更履歴をクリーンに保つため、**`nethack-jp` からのマージと `jodi-android` からのマージは、絶対に同じコミットにまとめず、個別に実行してコミットを分けてください**。
 
-#### A. 日本語化（NetHackJP）の更新を取り込む手順
-`NetHackJP` 側で NetHack 本家の更新や、日本語翻訳データの修正が行われた場合、それを取り込みます。
+#### 日本語化・本家更新（NetHackJP）の取り込み手順
+`NetHackJP` 側で NetHack 本家の更新や、日本語翻訳データ・共通 C コアの修正が行われた場合、それを取り込みます。
 
 1. `nethack-jp` から最新のコミットをフェッチします。
    ```bash
@@ -293,29 +288,15 @@ git fetch --all
    git checkout main
    git merge nethack-jp/main -m "Merge updates from NetHackJP (main)"
    ```
-3. 競合が発生した場合は手動で解消し、ビルドテストを行った上でコミットします。
-
-#### B. Android移植元（JodiJodington/NetHack-Android）の更新を取り込む手順
-Android 移植元のバグ修正や機能追加を取り込みます。
-
-1. `jodi-android` から最新のコミットをフェッチします。
-   ```bash
-   git fetch jodi-android
-   ```
-2. `main` ブランチにいることを確認し、マージを実行します。
-   ```bash
-   git checkout main
-   git merge jodi-android/master -m "Merge updates from JodiJodington/NetHack-Android (master)"
-   ```
-3. 競合が発生した場合は手動で解消し、ビルドテストを行った上でコミットします。
+3. 競合が発生した場合は手動で解消し、ビルドテストおよびデータファイル同期を行った上でコミットします。
 
 ### 競合（コンフリクト）が発生しやすい箇所と対処
 - **`sys/share/unixtty.c` / `src/tty.c`**
-  - Android版の仮想ターミナル制御と Windows/TUI 側の制御ロジックでコードが衝突しやすい部分です。競合時は Android 側の挙動を壊さないように慎重にマージしてください。
-- **`sys/android/` 以下のリソースやビルド設定ファイル**
-  - 日本語化固有の調整（レイアウト XML やキーボード対策）を入れているため、Jodi-Android側の更新と衝突した場合は日本語化側のコードを優先またはマージしてください。
+  - Flutter/Unix 側のターミナル制御と Windows/TUI 側の制御ロジックでコードが衝突しやすい部分です。競合時は Flutter ポート側の挙動を壊さないように慎重にマージしてください。
+- **`sys/flutter/` 以下のファイル**
+  - Flutter 移植固有の C / Dart コード（`winflutter.c` や Dart UI）を配置しているため、共通コアの変更と競合した場合は Flutter ポート側のインターフェースとの整合性を保ってマージしてください。
 - **コンフリクト解消後のビルド検証**
-  - 競合を解消した後は、必ず `powershell -ExecutionPolicy Bypass -File sys/flutter/scripts/sync_dat_assets.ps1` を実行し、データファイルの同期が成功することを確認した上でプッシュしてください。
+  - 競合を解消した後は、必ず `powershell -ExecutionPolicy Bypass -File sys/flutter/scripts/sync_dat_assets.ps1` を実行し、データファイルの同期が成功することを確認した上でビルドテストを行い、プッシュしてください。
 
 ---
 

@@ -234,7 +234,7 @@ class NetHackScreen extends ChangeNotifier {
       if (isTopline) {
         // farlook カーソル移動時の説明や autodescribe など、
         // 「履歴に積まず現在の最下行だけ更新」 する用途。
-        _topline = text;
+        _topline = text.replaceAll('\r', '').replaceAll('\n', ' ').trim();
         notifyListeners();
         return;
       }
@@ -247,14 +247,17 @@ class NetHackScreen extends ChangeNotifier {
         }
         _topline = null;
       }
-      _messages.add(text);
-      if (_messages.length > 100) {
-        _messages.removeAt(0);
-      }
-      if (!noHistory) {
-        _messageHistory.add(text);
-        if (_messageHistory.length > 100) {
-          _messageHistory.removeAt(0);
+      final lines = text.split(RegExp(r'[\r\n]+')).map((l) => l.trim()).where((l) => l.isNotEmpty);
+      for (final line in lines) {
+        _messages.add(line);
+        if (_messages.length > 100) {
+          _messages.removeAt(0);
+        }
+        if (!noHistory) {
+          _messageHistory.add(line);
+          if (_messageHistory.length > 100) {
+            _messageHistory.removeAt(0);
+          }
         }
       }
     } else if (type == nhwStatus || winId == 2 /* WIN_STATUS */) {
@@ -272,10 +275,13 @@ class NetHackScreen extends ChangeNotifier {
         }
       }
     } else if (type == nhwText || type == nhwMenu) {
-      _textLines.add(text);
-      _textAttrs.add(attr);
-      // putstr 経路では tile 情報は無いので -1 を入れて長さを合わせる。
-      _textTiles.add(-1);
+      final lines = text.split(RegExp(r'[\r\n]+'));
+      for (final l in lines) {
+        _textLines.add(l);
+        _textAttrs.add(attr);
+        // putstr 経路では tile 情報は無いので -1 を入れて長さを合わせる。
+        _textTiles.add(-1);
+      }
     }
     notifyListeners();
   }

@@ -110,65 +110,18 @@ class _MenuOverlayState extends State<MenuOverlay> {
     return t.endsWith(':') || t.endsWith('：');
   }
 
-  bool _isPureItemCategoryItem(MenuItemData item) {
-    if (item.ident <= 0 || item.ident == 4294967294 || _isMenuCategoryItem(item)) {
-      return false;
-    }
-    // 大文字 A(65), B(66), C(67), U(85) などのメタ・フィルタ項目のみを除外 (小文字 b, c は除外しない)
-    if (item.ident == 65 || item.ident == 66 || item.ident == 67 || item.ident == 85 ||
-        item.accelerator == 65 || item.accelerator == 66 || item.accelerator == 67 || item.accelerator == 85) {
-      return false;
-    }
-    return true;
-  }
-
   void _toggleSelection(int ident) {
     if (ident == 0 || ident == 4294967294) return;
     setState(() {
-      if (ident == -2) {
-        final isCurrentlySelected = _selectedCounts.containsKey(-2);
-        if (!isCurrentlySelected) {
-          _selectedCounts[-2] = 1;
-          for (final item in widget.menuItems) {
-            if (_isPureItemCategoryItem(item)) {
-              _selectedCounts[item.ident] = _parseMaxCount(item.text);
-            }
-          }
-        } else {
-          _selectedCounts.remove(-2);
-          for (final item in widget.menuItems) {
-            if (_isPureItemCategoryItem(item)) {
-              _selectedCounts.remove(item.ident);
-            }
-          }
-        }
+      if (_selectedCounts.containsKey(ident)) {
+        _selectedCounts.remove(ident);
       } else {
-        if (_selectedCounts.containsKey(ident)) {
-          _selectedCounts.remove(ident);
-        } else {
-          try {
-            final item = widget.menuItems.firstWhere((i) => i.ident == ident);
-            final maxCount = _parseMaxCount(item.text);
-            _selectedCounts[ident] = maxCount;
-          } catch (_) {
-            _selectedCounts[ident] = 1;
-          }
-        }
-
-        final hasAllTypesItem = widget.menuItems.any((i) => i.ident == -2);
-        if (hasAllTypesItem) {
-          final pureCategoryItems = widget.menuItems
-              .where((i) => _isPureItemCategoryItem(i))
-              .toList();
-          if (pureCategoryItems.isNotEmpty) {
-            final allCategorySelected = pureCategoryItems
-                .every((i) => _selectedCounts.containsKey(i.ident));
-            if (allCategorySelected) {
-              _selectedCounts[-2] = 1;
-            } else {
-              _selectedCounts.remove(-2);
-            }
-          }
+        try {
+          final item = widget.menuItems.firstWhere((i) => i.ident == ident);
+          final maxCount = _parseMaxCount(item.text);
+          _selectedCounts[ident] = maxCount;
+        } catch (_) {
+          _selectedCounts[ident] = 1;
         }
       }
     });
@@ -676,7 +629,15 @@ class _MenuOverlayState extends State<MenuOverlay> {
                           child: const Text("解除"),
                         ),
                         ElevatedButton(
-                          onPressed: () => widget.onMultiSelect(_selectedCounts),
+                          onPressed: () {
+                            final cleanCounts = <int, int>{};
+                            _selectedCounts.forEach((ident, count) {
+                              if (ident != 0 && ident != 4294967294) {
+                                cleanCounts[ident] = count;
+                              }
+                            });
+                            widget.onMultiSelect(cleanCounts);
+                          },
                           child: const Text("OK"),
                         ),
                       ],
