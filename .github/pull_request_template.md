@@ -1,31 +1,27 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31. -->
-## Summary
+## 📌 概要 / Summary
+変更の目的や対応した Issue、修正のサマリーを簡潔に記述してください。
 
-- What changed?
-- Why is this needed?
+- 関連する Issue: #
 
-## Scope
+## 🛠️ 変更内容 / Changes
+どのような変更を行ったか具体的に記述してください。
 
-- [ ] Source code (`src/`, `include/`, `sys/`)
-- [ ] Translation/text (`dat/`, `docs/`, README)
-- [ ] Build/config only
+- [ ] 
+- [ ] 
 
-## Validation
+## 🧪 動作確認・テスト / Testing
+どのような環境・手順で検証したかを記述してください。
 
-- [ ] Build succeeds locally
-- [ ] Relevant runtime behavior checked
-- [ ] No unintended file changes included
+- [ ] Windows (MSVC) ビルドおよび動作確認
+- [ ] Android (Flutter) ビルドおよび動作確認
 
-Commands run (if any):
+## 📋 セルフチェックリスト / Checklist
+PRを送信する前に、以下の項目を確認してください。
 
-```
-# example
-# msbuild sys\\windows\\vs\\NetHack.sln '/t:NetHack;NetHackW' /p:Configuration=Debug /p:Platform=x64
-```
+- [ ] NetHack Cコアと Dart/Flutter UI の連携ルールに沿っているか
+- [ ] 日本語メッセージのフォーマット文字列と引数（`pline`, `You`等）が一致しているか
+- [ ] デバッグ用の不要なログ出力・一時コードが残っていないか
+- [ ] ドキュメントやコメントが適切に更新・記述されているか
 
-## Checklist
-
-- [ ] Security-sensitive changes reviewed
-- [ ] License/notice impact checked
-- [ ] Related issue linked
-
+## 📸 スクリーンショット / Screenshots (任意)
+UIの変更がある場合は、変更前後のスクショや動画像（GIF等）を貼り付けてください。
