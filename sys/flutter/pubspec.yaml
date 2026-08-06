@@ -77,12 +77,7 @@ flutter:
     - assets/nethackdir/usagehlp_jp
     - assets/nethackdir/wizhelp_jp
     - assets/tiles/
-    - assets/images/tombstone.png
-    - assets/images/darthack_title.png
-    - assets/images/darthack_title_yoko.png
-    - assets/images/darthack_logo.png
-    - assets/images/darthack_end.png
-    - assets/images/darkhack_end_yoko.png
+    - assets/images/
     - assets/icon/
 
 flutter_launcher_icons:

@@ -57,8 +57,9 @@ class StartScreen extends StatelessWidget {
             right: 24,
             child: Center(
               child: Image.asset(
-                'assets/images/darthack_logo.png',
+                'assets/images/darthack_logo.webp',
                 width: screenWidth * 0.75,
+                cacheWidth: (screenWidth * 0.75 * MediaQuery.of(context).devicePixelRatio).round(),
                 fit: BoxFit.contain,
               ),
             ),
@@ -178,7 +179,8 @@ class StartScreen extends StatelessWidget {
                     flex: 5,
                     child: Center(
                       child: Image.asset(
-                        'assets/images/darthack_logo.png',
+                        'assets/images/darthack_logo.webp',
+                        cacheWidth: (screenWidth * 0.4 * MediaQuery.of(context).devicePixelRatio).round(),
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -271,7 +273,8 @@ class StartScreen extends StatelessWidget {
       children: [
         Positioned.fill(
           child: Image.asset(
-            isPortrait ? 'assets/images/darthack_title.png' : 'assets/images/darthack_title_yoko.png',
+            isPortrait ? 'assets/images/darthack_title.webp' : 'assets/images/darthack_title_yoko.webp',
+            cacheWidth: (screenWidth * MediaQuery.of(context).devicePixelRatio).round(),
             fit: BoxFit.cover,
           ),
         ),

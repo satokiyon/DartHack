@@ -21,7 +21,7 @@ class UniversalTombstoneWidget extends StatelessWidget {
     if (mode == TombstoneDisplayMode.text) {
       return _buildTextMode();
     }
-    return _buildImageMode();
+    return _buildImageMode(context);
   }
 
   Widget _buildTextMode() {
@@ -53,7 +53,7 @@ class UniversalTombstoneWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildImageMode() {
+  Widget _buildImageMode(BuildContext context) {
     final d = data!;
     final source = lines ?? const <String>[];
 
@@ -101,7 +101,8 @@ class UniversalTombstoneWidget extends StatelessWidget {
                     fit: StackFit.expand,
                     children: [
                       Image.asset(
-                        'assets/images/tombstone.png',
+                        'assets/images/tombstone.webp',
+                        cacheWidth: (400 * MediaQuery.of(context).devicePixelRatio).round(),
                         fit: BoxFit.cover,
                       ),
                       Positioned.fill(

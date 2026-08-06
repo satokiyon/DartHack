@@ -1023,7 +1023,12 @@ class _MyHomePageState extends State<MyHomePage> {
         width = int.parse(match.group(1)!);
         height = int.parse(match.group(2)!);
       }
-      final img = await _loadTileImageFromAsset('assets/tiles/$tilesetName.png');
+      ui.Image img;
+      try {
+        img = await _loadTileImageFromAsset('assets/tiles/$tilesetName.webp');
+      } catch (_) {
+        img = await _loadTileImageFromAsset('assets/tiles/$tilesetName.png');
+      }
       setState(() {
         _tileImage = img;
         _tileWidth = width;

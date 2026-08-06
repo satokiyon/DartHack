@@ -10,7 +10,8 @@ class EndScreen extends StatelessWidget {
       children: [
         Positioned.fill(
           child: Image.asset(
-            isPortrait ? 'assets/images/darthack_end.png' : 'assets/images/darkhack_end_yoko.png',
+            isPortrait ? 'assets/images/darthack_end.webp' : 'assets/images/darkhack_end_yoko.webp',
+            cacheWidth: (MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio).round(),
             fit: BoxFit.cover,
           ),
         ),
