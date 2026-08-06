@@ -187,6 +187,8 @@ class DefaultsHelper {
     final hiliteStatusOn = getBoolOption('hilite_status', defaultValue: true);
     final menucolorOn = getBoolOption('menucolor', defaultValue: true);
 
+    bool hasSymsetOption = false;
+
     for (var line in lines) {
       var trimmed = line.trim();
 
@@ -251,7 +253,7 @@ class DefaultsHelper {
         continue;
       }
 
-      // 3. 一般 OPTIONS= 行の単独管理キーの更新処理
+      // 3. 一般 OPTIONS= 行の単独管理キーの更新およびグラフィック設定の正規化処理
       if (trimmed.startsWith('OPTIONS=')) {
         final content = trimmed.substring('OPTIONS='.length);
         final tokens = _splitCommaTokens(content);
@@ -271,6 +273,12 @@ class DefaultsHelper {
           // 管理対象キー（hilite_status, menucolor を除く単独オプション）はスキップ
           if (managedKeys.contains(key) && key != 'hilite_status' && key != 'menucolor') {
             continue;
+          } else if (t == 'DECgraphics' || t == 'IBMgraphics' || key == 'symset') {
+            // 旧グラフィック設定 (DECgraphics/IBMgraphics等) を symset:IBMGraphics_2 へ正規化
+            if (!hasSymsetOption) {
+              remainingTokens.add('symset:IBMGraphics_2');
+              hasSymsetOption = true;
+            }
           } else {
             remainingTokens.add(token);
           }
@@ -308,6 +316,10 @@ class DefaultsHelper {
         pendingLines.add('OPTIONS=$key:$val');
       }
     });
+
+    if (!hasSymsetOption) {
+      pendingLines.add('OPTIONS=symset:IBMGraphics_2');
+    }
 
     if (pendingLines.isNotEmpty) {
       if (!headerAlreadyPresent) {
