@@ -1,4 +1,5 @@
-// NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-30.
+// NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06.
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -22,8 +23,15 @@ class GuidebookDialog extends StatefulWidget {
 class _GuidebookSection {
   final int lineIndex;
   final String title;
+  final String number;
+  final int level;
 
-  _GuidebookSection({required this.lineIndex, required this.title});
+  _GuidebookSection({
+    required this.lineIndex,
+    required this.title,
+    required this.number,
+    required this.level,
+  });
 }
 
 class _GuidebookDialogState extends State<GuidebookDialog> {
@@ -38,6 +46,9 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
   List<int> _searchResults = [];
   int _currentSearchMatchIndex = -1;
 
+  int? _highlightedLineIndex;
+  Timer? _flashTimer;
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +57,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
 
   @override
   void dispose() {
+    _flashTimer?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -54,22 +66,34 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     try {
       final content =
           await rootBundle.loadString('assets/nethackdir/Guidebook_JP.txt');
-      final lines = content.split('\n');
+      final rawLines = content.split('\n');
+      final lines = <String>[];
       final sections = <_GuidebookSection>[];
 
-      // 目次セクション抽出の正規表現（例: "1. はじめに", "5.4. 店と買い物", "5.4.1. 店の特異な点"）
-      final sectionRegex = RegExp(r'^\s*(\d+(?:\.\d+)*\.)\s+(.+)$');
+      // 数字見出しの抽出正規表現 (例: "1. はじめに", "5.4. 店と買い物", "5.4.1. 店の特異な点")
+      final sectionRegex = RegExp(r'^(\d+(?:\.\d+)*\.)[ \t\u3000]+(.+)$');
 
-      for (int i = 0; i < lines.length; i++) {
-        final line = lines[i];
-        final match = sectionRegex.firstMatch(line);
+      for (int i = 0; i < rawLines.length; i++) {
+        final line = rawLines[i].replaceAll('\r', '');
+        lines.add(line);
+
+        // 行頭の全角・半角スペース、タブを除去した文字列で見出し判定
+        final trimmedLeading = line.replaceAll(RegExp(r'^[ \t\u3000]+'), '');
+        final match = sectionRegex.firstMatch(trimmedLeading);
         if (match != null) {
           final number = match.group(1)!;
           final title = match.group(2)!.trim();
+          final numClean = number.endsWith('.')
+              ? number.substring(0, number.length - 1)
+              : number;
+          final level = numClean.split('.').length;
+
           sections.add(
             _GuidebookSection(
               lineIndex: i,
               title: '$number $title',
+              number: number,
+              level: level,
             ),
           );
         }
@@ -99,6 +123,43 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOutCubic,
     );
+  }
+
+  void _jumpToSection(int lineIndex) {
+    _flashTimer?.cancel();
+    setState(() {
+      _highlightedLineIndex = lineIndex;
+    });
+
+    _scrollToLine(lineIndex);
+
+    _flashTimer = Timer(const Duration(milliseconds: 1600), () {
+      if (mounted) {
+        setState(() {
+          _highlightedLineIndex = null;
+        });
+      }
+    });
+  }
+
+  int _getCurrentSectionIndex() {
+    if (_sections.isEmpty) return -1;
+    final positions = _itemPositionsListener.itemPositions.value;
+    if (positions.isEmpty) return 0;
+
+    int topVisibleLine = positions
+        .map((p) => p.index)
+        .reduce((a, b) => a < b ? a : b);
+
+    int activeIndex = 0;
+    for (int i = 0; i < _sections.length; i++) {
+      if (_sections[i].lineIndex <= topVisibleLine) {
+        activeIndex = i;
+      } else {
+        break;
+      }
+    }
+    return activeIndex;
   }
 
   void _onSearchChanged(String query) {
@@ -145,57 +206,146 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
   }
 
   void _showTOCModal() {
+    final activeIndex = _getCurrentSectionIndex();
+    final tocScrollController = ScrollController();
+
+    // モーダル表示後にアクティブセクションまで自動スクロール
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (activeIndex > 0 && tocScrollController.hasClients) {
+        final targetOffset = (activeIndex * 44.0).clamp(
+          0.0,
+          tocScrollController.position.maxScrollExtent,
+        );
+        tocScrollController.jumpTo(targetOffset);
+      }
+    });
+
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1E2430),
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) {
+        final screenHeight = MediaQuery.of(context).size.height;
         return Container(
+          constraints: BoxConstraints(maxHeight: screenHeight * 0.75),
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12),
-                child: Text(
-                  '目次',
-                  style: TextStyle(
-                    color: Colors.amberAccent,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.toc, color: Colors.amberAccent, size: 22),
+                        const SizedBox(width: 8),
+                        Text(
+                          '目次 (${_sections.length}項目)',
+                          style: const TextStyle(
+                            color: Colors.amberAccent,
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white70, size: 20),
+                      onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
                 ),
               ),
+              const SizedBox(height: 8),
               const Divider(color: Colors.white24, height: 1),
               Expanded(
                 child: ListView.builder(
+                  controller: tocScrollController,
                   itemCount: _sections.length,
                   itemBuilder: (context, index) {
                     final sec = _sections[index];
-                    final isSubSection =
-                        sec.title.contains(RegExp(r'^\d+\.\d+'));
-                    return ListTile(
-                      dense: true,
-                      contentPadding: EdgeInsets.only(
-                        left: isSubSection ? 32.0 : 16.0,
-                        right: 16.0,
-                      ),
-                      title: Text(
-                        sec.title,
-                        style: TextStyle(
-                          color: isSubSection ? Colors.white70 : Colors.white,
-                          fontSize: isSubSection ? 13 : 14,
-                          fontWeight: isSubSection
-                              ? FontWeight.normal
-                              : FontWeight.bold,
+                    final isActive = index == activeIndex;
+                    final level = sec.level;
+
+                    double paddingLeft = 16.0;
+                    double fontSize = 14.0;
+                    FontWeight fontWeight = FontWeight.normal;
+                    IconData iconData = Icons.short_text;
+
+                    if (level == 1) {
+                      paddingLeft = 16.0;
+                      fontSize = 14.5;
+                      fontWeight = FontWeight.bold;
+                      iconData = Icons.article;
+                    } else if (level == 2) {
+                      paddingLeft = 32.0;
+                      fontSize = 13.5;
+                      fontWeight = FontWeight.w600;
+                      iconData = Icons.subdirectory_arrow_right;
+                    } else {
+                      paddingLeft = 48.0;
+                      fontSize = 13.0;
+                      fontWeight = FontWeight.normal;
+                      iconData = Icons.short_text;
+                    }
+
+                    return Material(
+                      color: isActive
+                          ? Colors.amberAccent.withValues(alpha: 0.18)
+                          : Colors.transparent,
+                      child: ListTile(
+                        dense: true,
+                        contentPadding: EdgeInsets.only(
+                          left: paddingLeft,
+                          right: 16.0,
                         ),
+                        leading: Icon(
+                          iconData,
+                          size: 16,
+                          color: isActive
+                              ? Colors.amberAccent
+                              : (level == 1 ? Colors.white70 : Colors.white38),
+                        ),
+                        title: Text(
+                          sec.title,
+                          style: TextStyle(
+                            color: isActive
+                                ? Colors.amberAccent
+                                : (level == 1 ? Colors.white : Colors.white70),
+                            fontSize: fontSize,
+                            fontWeight: isActive ? FontWeight.bold : fontWeight,
+                          ),
+                        ),
+                        trailing: isActive
+                            ? Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.amberAccent.withValues(alpha: 0.3),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  '現在地',
+                                  style: TextStyle(
+                                    color: Colors.amberAccent,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              )
+                            : null,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _jumpToSection(sec.lineIndex);
+                        },
                       ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        _scrollToLine(sec.lineIndex);
-                      },
                     );
                   },
                 ),
@@ -223,7 +373,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
           color: const Color(0xFF12161F),
           borderRadius: BorderRadius.circular(16),
           border:
-              Border.all(color: Colors.amberAccent.withOpacity(0.4), width: 1.5),
+              Border.all(color: Colors.amberAccent.withValues(alpha: 0.4), width: 1.5),
           boxShadow: const [
             BoxShadow(
               color: Colors.black54,
@@ -259,10 +409,10 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                   ),
                   if (_sections.isNotEmpty)
                     IconButton(
-                      icon: const Icon(Icons.format_list_bulleted,
-                          color: Colors.amberAccent, size: 22),
+                      icon: const Icon(Icons.toc,
+                          color: Colors.amberAccent, size: 24),
                       onPressed: _showTOCModal,
-                      tooltip: '目次',
+                      tooltip: '目次を開く',
                       padding: const EdgeInsets.all(6),
                       constraints: const BoxConstraints(),
                     ),
@@ -372,6 +522,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                                     index;
                         final isOtherSearchMatch =
                             _searchResults.contains(index);
+                        final isFlashMatch = _highlightedLineIndex == index;
 
                         // 見出し行かの判定（目次に含まれているか）
                         final isHeader =
@@ -388,27 +539,39 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                         }
 
                         BoxDecoration? decoration;
-                        if (isCurrentSearchMatch) {
+                        if (isFlashMatch) {
                           decoration = BoxDecoration(
-                            color: Colors.amberAccent.withOpacity(0.35),
+                            color: Colors.amberAccent.withValues(alpha: 0.45),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                                color: Colors.amberAccent, width: 1.5),
+                          );
+                        } else if (isCurrentSearchMatch) {
+                          decoration = BoxDecoration(
+                            color: Colors.amberAccent.withValues(alpha: 0.35),
                             borderRadius: BorderRadius.circular(4),
                           );
                         } else if (isOtherSearchMatch) {
                           decoration = BoxDecoration(
-                            color: Colors.blueAccent.withOpacity(0.25),
+                            color: Colors.blueAccent.withValues(alpha: 0.25),
                             borderRadius: BorderRadius.circular(4),
                           );
                         }
 
-                        return Container(
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
                           decoration: decoration,
-                          padding: const EdgeInsets.symmetric(vertical: 1.0),
+                          padding: const EdgeInsets.symmetric(vertical: 2.0),
                           child: Text(
                             line.isEmpty ? ' ' : line,
                             style: TextStyle(
                               fontFamily: 'monospace',
-                              color: textColor,
-                              fontWeight: fontWeight,
+                              color: isFlashMatch
+                                  ? Colors.black
+                                  : textColor,
+                              fontWeight: isFlashMatch
+                                  ? FontWeight.bold
+                                  : fontWeight,
                               fontSize: fontSize,
                               height: 1.4,
                             ),
@@ -423,3 +586,4 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     );
   }
 }
+
