@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
 /* NetHack 5.0	muse.c	$NHDT-Date: 1781973057 2026/06/20 16:30:57 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.248 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
@@ -2789,19 +2789,19 @@ mon_reflects(struct monst *mon, const char *str)
 
     if (orefl && orefl->otyp == SHIELD_OF_REFLECTION) {
         if (str) {
-            pline(str, s_suffix(mon_nam(mon)), "盾");
+            pline(str, mon_nam(mon), "盾");
             makeknown(SHIELD_OF_REFLECTION);
         }
         return TRUE;
     } else if (arti_reflects(MON_WEP(mon))) {
         /* due to wielded artifact weapon */
         if (str)
-            pline(str, s_suffix(mon_nam(mon)), "武器");
+            pline(str, mon_nam(mon), "武器");
         return TRUE;
     } else if ((orefl = which_armor(mon, W_AMUL))
                && orefl->otyp == AMULET_OF_REFLECTION) {
         if (str) {
-            pline(str, s_suffix(mon_nam(mon)), "メダリオン");
+            pline(str, mon_nam(mon), "メダリオン");
             makeknown(AMULET_OF_REFLECTION);
         }
         return TRUE;
@@ -2809,13 +2809,13 @@ mon_reflects(struct monst *mon, const char *str)
                && (orefl->otyp == SILVER_DRAGON_SCALES
                    || orefl->otyp == SILVER_DRAGON_SCALE_MAIL)) {
         if (str)
-            pline(str, s_suffix(mon_nam(mon)), "鎧");
+            pline(str, mon_nam(mon), "鎧");
         return TRUE;
     } else if (mon->data == &mons[PM_SILVER_DRAGON]
                || mon->data == &mons[PM_CHROMATIC_DRAGON]) {
         /* Silver dragons only reflect when mature; babies do not */
         if (str)
-            pline(str, s_suffix(mon_nam(mon)), "鱗");
+            pline(str, mon_nam(mon), "鱗");
         return TRUE;
     }
     return FALSE;

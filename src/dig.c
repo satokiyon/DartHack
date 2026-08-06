@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
 /* NetHack 5.0	dig.c	$NHDT-Date: 1781973044 2026/06/20 16:30:44 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.236 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
@@ -1569,7 +1569,7 @@ zap_dig(void)
 
         if (!is_whirly(mtmp->data)) {
             if (digests(mtmp->data))
-                You("%sの%sの壁を突き破った!", s_suffix(mon_nam(mtmp)),
+                You("%sの%sの壁を突き破った!", mon_nam(mtmp),
                     jp_mbodypart(mtmp, STOMACH));
             if (unique_corpstat(mtmp->data))
                 mtmp->mhp = (mtmp->mhp + 1) / 2;

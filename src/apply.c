@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
 /* NetHack 5.0	apply.c	$NHDT-Date: 1781973040 2026/06/20 16:30:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.482 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -95,7 +95,7 @@ use_camera(struct obj *obj)
     if (obj->cursed && !rn2(2)) {
         (void) zapyourself(obj, TRUE);
     } else if (u.uswallow) {
-        You("%sの%sを撮影した.", s_suffix(mon_nam(u.ustuck)),
+        You("%sの%sを撮影した.", mon_nam(u.ustuck),
             jp_mbodypart(u.ustuck, STOMACH));
     } else if (u.dz) {
         You("%sを撮影した.",
@@ -970,7 +970,7 @@ check_leash(coordxy x, coordxy y)
                 }
             } else {
                 if (um_dist(mtmp->mx, mtmp->my, 5)) {
-                    pline("%sの綱がはずれた!", s_suffix(Monnam(mtmp)));
+                    pline("%sの綱がはずれた!", Monnam(mtmp));
                     m_unleash(mtmp, FALSE);
                 } else {
                     You("綱を引いた.");
@@ -1078,7 +1078,7 @@ use_mirror(struct obj *obj)
     }
     if (u.uswallow) {
         if (useeit)
-            You("%sの%sを映した.", s_suffix(mon_nam(u.ustuck)),
+            You("%sの%sを映した.", mon_nam(u.ustuck),
                 jp_mbodypart(u.ustuck, STOMACH));
         return ECMD_TIME;
     }

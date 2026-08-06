@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-15. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
 /* NetHack 5.0	polyself.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -804,10 +804,10 @@ polymon(int mntmp)
     if (dochange) {
         flags.female = !flags.female;
         Strcat(buf, (is_male(&mons[mntmp]) || is_female(&mons[mntmp]))
-                       ? "" : flags.female ? "female " : "male ");
+                       ? "" : flags.female ? "メスの" : "オスの");
     }
     Strcat(buf, jp_pmname(&mons[mntmp], flags.female ? FEMALE : MALE));
-    You("%s %s!", (u.umonnum != mntmp) ? "変身する" : "気がした", an(buf));
+    pline("あなたは%sに%s!", buf, (u.umonnum != mntmp) ? "変身した" : "変身する気がした");
 
     if (Stoned && poly_when_stoned(&mons[mntmp])) {
         /* poly_when_stoned already checked stone golem genocide */
@@ -1931,10 +1931,10 @@ domindblast(void)
                unless it will survive the psychic blast, otherwise hero
                would avoid the penalty for killing it while peaceful */
             wakeup(mtmp, (dmg > mtmp->mhp) ? TRUE : FALSE);
-                        You("%sの%sを捉えた.", s_suffix(mon_nam(mtmp)),
-                                u_sen ? "テレパシー"
-                                : telepathic(mtmp->data) ? "潜在テレパシー"
-                                    : "精神");
+            You("%sの%sを捉えた.", mon_nam(mtmp),
+                u_sen ? "テレパシー"
+                : telepathic(mtmp->data) ? "潜在テレパシー"
+                    : "精神");
             mtmp->mhp -= dmg;
             if (DEADMONSTER(mtmp))
                 killed(mtmp);

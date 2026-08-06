@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2619,7 +2619,9 @@ extern const char *jp_u_gname_for_display(void);
 extern int doturn(void);
 extern int altarmask_at(coordxy, coordxy);
 extern const char *a_gname(void);
+extern const char *jp_a_gname_for_display(void);
 extern const char *a_gname_at(coordxy x, coordxy y);
+extern const char *jp_a_gname_at_for_display(coordxy x, coordxy y);
 extern const char *align_gname(aligntyp);
 extern const char *jp_align_gname_for_display(aligntyp);
 extern const char *jp_gname_for_display(const char *);

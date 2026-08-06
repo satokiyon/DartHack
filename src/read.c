@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
 /* NetHack 5.0	read.c	$NHDT-Date: 1782083451 2026/06/21 18:10:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.334 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1584,7 +1584,7 @@ seffect_destroy_armor(struct obj **sobjp)
             struct obj *atmp;
 
             if (!objects[sobj->otyp].oc_name_known)
-                pline("これは%sだ!", an(actualoname(sobj)));
+                pline("これは%sだ!", actualoname(sobj));
             gk.known = TRUE;
             atmp = getobj("destroy", any_worn_armor_ok, GETOBJ_PROMPT);
             /* check the return value, if user picked non-valid obj */
@@ -2767,7 +2767,7 @@ litroom(
             if (Blind)
                 ; /* no feedback */
             else if (digests(u.ustuck->data))
-                pline("%s %s is lit.", s_suffix(Monnam(u.ustuck)),
+                pline("%sの%sが輝いた.", Monnam(u.ustuck),
                       jp_mbodypart(u.ustuck, STOMACH));
             else if (is_whirly(u.ustuck->data))
                 pline("%sは一瞬だけ輝いた.", l_monnam(u.ustuck));

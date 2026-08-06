@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.645 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -4676,7 +4676,7 @@ acid_damage(struct obj *obj)
                 if (victim == &gy.youmonst)
                     Your("%sが消えた.", cxname(obj));
                 else if (vismon)
-                    pline("%sの%sが消えた.", s_suffix(Monnam(victim)),
+                    pline("%sの%sが消えた.", Monnam(victim),
                           cxname(obj));
             }
         }
