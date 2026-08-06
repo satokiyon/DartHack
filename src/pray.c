@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
 /* NetHack 5.0	pray.c	$NHDT-Date: 1781973062 2026/06/20 16:31:02 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.253 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -844,7 +844,7 @@ gcrownu(void)
         verbalize("汝に冠を授けよう……エルベレスの御手よ！");
         livelog_printf(LL_DIVINEGIFT,
                        "%sより\"エルベレスの御手\"の戴冠を受けた",
-                       u_gname());
+                       jp_u_gname_for_display());
         break;
     case A_NEUTRAL:
         u.uevent.uhand_of_elbereth = 2;
@@ -854,7 +854,7 @@ gcrownu(void)
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("汝は我がバランスの使者となれ！");
         livelog_printf(LL_DIVINEGIFT, "%sのバランスの使者となった",
-                       u_gname());
+                       jp_u_gname_for_display());
         break;
     case A_CHAOTIC:
         u.uevent.uhand_of_elbereth = 3;
@@ -869,7 +869,7 @@ gcrownu(void)
                   (((already_exists && !in_hand) || class_gift != STRANGE_OBJECT)
                        ? "命を奪う" : "魂を奪う"));
         livelog_printf(LL_DIVINEGIFT, "%sの栄光のために%sよう選ばれた",
-                       u_gname(),
+                       jp_u_gname_for_display(),
                        (strcmp(what, "take lives") == 0) ? "命を奪う" : "魂を奪う");
         break;
     }
@@ -1189,7 +1189,7 @@ pleased(aligntyp g_align)
                               hcolor(NH_AMBER), repair_buf);
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
                     } else
-                        You_feel("%sの力が%sに宿るのを感じた.", u_gname(),
+                        You_feel("%sの力が%sに宿るのを感じた.", jp_u_gname_for_display(),
                                  xname(uwep));
                     uncurse(uwep);
                     uwep->bknown = 1; /* ok to bypass set_bknown() */
@@ -1198,10 +1198,10 @@ pleased(aligntyp g_align)
                     if (!Blind) {
                         pline("%sが%sのオーラに包まれた%s.",
                               Yobjnam2(uwep, (char *)0),
-                              an(hcolor(NH_LIGHT_BLUE)), repair_buf);
+                              hcolor(NH_LIGHT_BLUE), repair_buf);
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
                     } else
-                        You_feel("%sの祝福が%sに宿るのを感じた.", u_gname(),
+                        You_feel("%sの祝福が%sに宿るのを感じた.", jp_u_gname_for_display(),
                                  xname(uwep));
                     bless(uwep);
                     uwep->bknown = 1; /* ok to bypass set_bknown() */
@@ -1250,7 +1250,7 @@ pleased(aligntyp g_align)
             /*FALLTHRU*/
         case 2:
             if (!Blind)
-                You("%s光に包まれた.", an(hcolor(NH_GOLDEN)));
+                pline("あなたは%s色の光に包まれた.", hcolor(NH_GOLDEN));
             /* if any levels have been lost (and not yet regained),
                treat this effect like blessed full healing */
             if (u.ulevel < u.ulevelmax) {
@@ -1290,9 +1290,9 @@ pleased(aligntyp g_align)
             int any = 0;
 
             if (Blind)
-                You_feel("%sの力を感じる.", u_gname());
+                You_feel("%sの力を感じる.", jp_u_gname_for_display());
             else
-                You("%sオーラに包まれた.", an(hcolor(NH_LIGHT_BLUE)));
+                pline("あなたは%s色のオーラに包まれた.", hcolor(NH_LIGHT_BLUE));
             for (otmp = gi.invent; otmp; otmp = nextobj) {
                 nextobj = otmp->nobj;
                 if (otmp->cursed
@@ -1544,7 +1544,7 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
     else
         useupf(otmp, 1L);
 
-    You("%sにイェンダーの魔除けを捧げた...", a_gname());
+    You("%sにイェンダーの魔除けを捧げた...", jp_a_gname_for_display());
 
     if (altaralign == A_NONE) {
         /* Moloch's high altar at the bottom of Gehennom. */
@@ -1552,13 +1552,13 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
             u.ualign.record = -99;
         pline("見えない聖歌隊が詠唱し、あなたは暗闇に包まれた...");
         /*[apparently shrug/snarl can be sensed without being seen]*/
-        pline("%sは肩をすくめ、なおも%sを支配した,", Moloch, u_gname());
+        pline("%sは肩をすくめ、なおも%sを支配した,", jp_gname_for_display(Moloch), jp_u_gname_for_display());
         pline("そして容赦なくあなたの命が消えた.");
         Sprintf(svk.killer.name, "%s indifference", s_suffix(Moloch));
         svk.killer.format = KILLED_BY;
         done(DIED);
         /* life-saved (or declined to die in wizard/explore mode) */
-        pline("%sはうなり声を上げ、もう一度仕掛けてきた...", Moloch);
+        pline("%sはうなり声を上げ、もう一度仕掛けてきた...", jp_gname_for_display(Moloch));
         fry_by_god(A_NONE, TRUE); /* wrath of Moloch */
         /* declined to die in wizard or explore mode */
         pline(cloud_of_smoke, hcolor(NH_BLACK));
@@ -1569,9 +1569,9 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
            on their shoulders. */
         adjalign(-99);
           pline("%sはあなたの捧げ物を受け取り、%sへの支配を得た...",
-              a_gname(), u_gname());
-          pline("%sは激怒した...", u_gname());
-        pline("幸いにも、%sはあなたが生きることを許してくれた...", a_gname());
+              jp_a_gname_for_display(), jp_u_gname_for_display());
+          pline("%sは激怒した...", jp_u_gname_for_display());
+        pline("幸いにも、%sはあなたが生きることを許してくれた...", jp_a_gname_for_display());
         pline(cloud_of_smoke, hcolor(NH_ORANGE));
         done(ESCAPED);
         /*NOTREACHED*/
@@ -1642,9 +1642,9 @@ offer_different_alignment_altar(
     if (ugod_is_angry() || (altaralign == A_NONE && Inhell)) {
         if (u.ualignbase[A_CURRENT] == u.ualignbase[A_ORIGINAL]
             && altaralign != A_NONE) {
-            You("%sが怒っているに違いないと思った...", u_gname());
+            You("%sが怒っているに違いないと思った...", jp_u_gname_for_display());
             consume_offering(otmp);
-            pline("%sはあなたの帰依を受け入れた.", a_gname());
+            pline("%sはあなたの帰依を受け入れた.", jp_a_gname_for_display());
 
             uchangealign(altaralign, A_CG_CONVERT);
             /* Beware, Conversion is costly */
@@ -1653,7 +1653,7 @@ offer_different_alignment_altar(
         } else {
             u.ugangr += 3;
             adjalign(-5);
-            pline("%sはあなたの供物を退けた!", a_gname());
+            pline("%sはあなたの供物を退けた!", jp_a_gname_for_display());
             godvoice(altaralign, "異教徒よ、苦しめ！");
             change_luck(-5);
             (void) adjattrib(A_WIS, -2, TRUE);
@@ -1662,12 +1662,12 @@ offer_different_alignment_altar(
         }
     } else {
         consume_offering(otmp);
-        You("%sと%sの対立を感じる.", u_gname(), a_gname());
+        You("%sと%sの対立を感じる.", jp_u_gname_for_display(), jp_a_gname_for_display());
         if (rn2(8 + u.ulevel) > 5) {
             struct monst *pri;
             boolean shrine;
 
-            You_feel("%sの力が増したのを感じる.", u_gname());
+            You_feel("%sの力が増したのを感じる.", jp_u_gname_for_display());
             exercise(A_WIS, TRUE);
             change_luck(1);
             shrine = on_shrine();
@@ -1689,7 +1689,7 @@ offer_different_alignment_altar(
                 && !p_coaligned(pri))
                 angry_priest();
         } else {
-            pline("不運にも、%sの力が弱まる感覚があった.", u_gname());
+            pline("不運にも、%sの力が弱まる感覚があった.", jp_u_gname_for_display());
             change_luck(-1);
             exercise(A_WIS, FALSE);
             if (rnl(u.ulevel) > 6 && u.ualign.record > 0
@@ -1981,7 +1981,7 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
     /* KMH, conduct */
     if (!u.uconduct.gnostic++)
         livelog_printf(LL_CONDUCT, "%sの祭壇に%sを捧げることで、無神論を破った",
-                       a_gname(),
+                       jp_a_gname_for_display(),
                        jp_corpse_xname(otmp, (const char *) 0, CXN_ARTICLE));
 
     /* you're handling this corpse, even if it was killed upon the altar
@@ -2040,13 +2040,13 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
             u.ugangr = 0;
         if (u.ugangr != saved_anger) {
             if (u.ugangr) {
-                pline("%sは%sようだ.", u_gname(),
+                pline("%sは%sようだ.", jp_u_gname_for_display(),
                       Hallucination ? "ごきげん" : "少しだけ怒りが和らいだ");
 
                 if ((int) u.uluck < 0)
                     change_luck(1);
             } else {
-                pline("%sは%sようだ.", u_gname(),
+                pline("%sは%sようだ.", jp_u_gname_for_display(),
                       Hallucination ? "とてつもなく壮大だ"
                                     : "怒りを収めた");
 
@@ -2619,6 +2619,18 @@ const char *
 jp_u_gname_for_display(void)
 {
     return jp_gname_for_display(u_gname());
+}
+
+const char *
+jp_a_gname_for_display(void)
+{
+    return jp_gname_for_display(a_gname());
+}
+
+const char *
+jp_a_gname_at_for_display(coordxy x, coordxy y)
+{
+    return jp_gname_for_display(a_gname_at(x, y));
 }
 
 const char *

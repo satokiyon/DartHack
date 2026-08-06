@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
 /* NetHack 5.0	weapon.c	$NHDT-Date: 1781973073 2026/06/20 16:31:13 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.147 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1111,7 +1111,7 @@ wet_a_towel(
                 pline("%sは%s.", Yobjnam2(obj, (const char *) 0),
                       wetness);
             else if (mcarried(obj) && canseemon(obj->ocarry))
-                pline("%sの%sは%s.", s_suffix(Monnam(obj->ocarry)),
+                pline("%sの%sは%s.", Monnam(obj->ocarry),
                       xname(obj), wetness);
         }
     }
@@ -1137,7 +1137,7 @@ dry_a_towel(
                 pline("%sは%s.", Yobjnam2(obj, (const char *) 0),
                       dryness);
             else if (mcarried(obj) && canseemon(obj->ocarry))
-                pline("%sの%sは%s.", s_suffix(Monnam(obj->ocarry)),
+                pline("%sの%sは%s.", Monnam(obj->ocarry),
                       xname(obj), dryness);
         }
     }

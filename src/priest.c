@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
 /* NetHack 5.0	priest.c	$NHDT-Date: 1781973062 2026/06/20 16:31:02 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -844,15 +844,15 @@ ghod_hitsu(struct monst *priest)
     switch (rn2(3)) {
     case 0:
         pline("%sは怒りに咆えた:  \"汝は罰を受けるがよい!\"",
-              a_gname_at(ax, ay));
+              jp_a_gname_at_for_display(ax, ay));
         break;
     case 1:
         pline("%sの声が轟いた:  \"よくも我がしもべを傷つけたな!\"",
-              s_suffix(a_gname_at(ax, ay)));
+              jp_a_gname_at_for_display(ax, ay));
         break;
     default:
         pline("%sは咆えた:  \"汝は我が神殿を穢した!\"",
-              a_gname_at(ax, ay));
+              jp_a_gname_at_for_display(ax, ay));
         break;
     }
 

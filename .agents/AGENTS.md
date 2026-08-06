@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-26. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. -->
 # NetHackJP 開発ルール
 
 ## イベント履歴（livelog）および画面メッセージの日本語表示方針
@@ -38,3 +38,7 @@
 
 14. **経過時間表示 (`fmt_elapsed_time`) における接続詞「と」と不要空白の排除**:
     - 経過時間（日数・時間・分・秒）を表示する際、英語の `and` を直訳した接続詞「と」（例: 「59分 と 25秒」）や各要素の不要なスペースを排除し、「59分 25秒」または「59分25秒」などの自然でシンプルな単位連結表記を使用してください。
+
+15. **神の名前の日本語表示および英語所有格（`s_suffix()`）・冠詞（`an()`）の排除**:
+    - プレイヤーの神を表示する場合は `jp_u_gname_for_display()`、祭壇の神を表示する場合は `jp_a_gname_for_display()` または `jp_a_gname_at_for_display(x, y)` を必ず経由させ、英語の神の名前がメッセージや `livelog` にそのまま表示されるのを防いでください。
+    - 日本語メッセージ内で英語所有格（`'s`）を付与する関数 `s_suffix()` を使用すると「モンスター名'sの...」等の不自然な文字列が生成されるため、`s_suffix()` は排除して日本語の助詞（「〜の」等）に統一してください。また、`an(hcolor(...))` 等の不要な不定冠詞関数 `an()` も排除してください。
