@@ -1435,8 +1435,8 @@ checkfile(
                         goto checkfile_done;
 
 #ifdef AND_GUI
-                    /* DartHack: set plain text dialog flag for flutter lookup result */
-                    set_flutter_plain_text_dialog(1);
+                    /* DartHack: set plain text dialog flag for flutter lookup result (3 = PLAIN_TEXT_DATABASE) */
+                    set_flutter_plain_text_dialog(3);
 #endif
                     datawin = create_nhwindow(NHW_MENU);
                     for (i = 0; i < entry_count; i++) {

@@ -219,4 +219,29 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
    - **ダイアログ内固定高さの回避**:
      `content` 内に高さ制限付きリストを配置する場合は、`SizedBox(height: 350)` などの固定ピクセル指定を避け、`SizedBox(height: MediaQuery.of(context).size.height * 0.45)` などの画面サイズ相対高に設定してください。
 
+## 34. C 移植層 (`winflutter.c` 等) における CRLF 改行コード (`\r\n`) の完全トリミング原則
+- **現象と影響**:
+  データファイル (`history_jp`, `license` 等) を C 側の `dlb_fgets` で読み込んで Dart 側に FFI 送信する場合、`strchr(buf, '\n')` で `\n` のみ `\0` に置換し末尾の `\r` を残してしまうと、Dart 側で 1 行ごとにゴーストの空行 (`""`) が混入する結果となり、`TextFormatter` などの段落結合ロジックが誤作動を起こします。
+- **対策方針**:
+  C 移植層のファイル読み込み処理（`flutter_display_file` 等）では、取得した文字列末尾の `\r` および `\n` を以下のように末尾から確実にトリミングして除去する実装を徹底してください：
+  ```c
+  int len = (int) strlen(buf);
+  while (len > 0 && (buf[len - 1] == '\r' || buf[len - 1] == '\n')) {
+      buf[--len] = '\0';
+  }
+  ```
+
+## 35. Cコア ↔ Flutter FFI におけるプレーンテキスト種別フラグ (`isPlain` / `plainType`) の伝達同調
+- **現象と影響**:
+  C コアで `set_flutter_plain_text_dialog(2)` (クエスト文章等) をセットして FFI コールバック (`isPlain` 整数値) で渡す際、Dart 側の受取部 (`main.dart`) で `message['plainType']` という未存在キーを参照していたため、`plainType` が `0` に落とされてクエストの自動改行整形が動作しませんでした。
+- **対策方針**:
+  FFI メッセージからダイアログの表示属性を受信・伝達する際は、送信キー名（`isPlain` 整数値）と受信側プロパティ（`plainType`）の同調を保つため、以下のようにフォールバック付きで値を取得して画面管理モデル (`NetHackScreen`) へ伝達してください：
+  ```dart
+  final plainVal = message['isPlain'] as int? ?? 0;
+  final isPlain = plainVal != 0;
+  final plainType = (message['plainType'] as int?) ?? plainVal;
+  _screen.displayWindow(winId, blocking, isPlain: isPlain, plainType: plainType);
+  ```
+
+
 

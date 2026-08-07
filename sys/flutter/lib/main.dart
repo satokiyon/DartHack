@@ -1222,9 +1222,11 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (type == 'displayWindow') {
           final winId = message['winId'] as int;
           final blocking = (message['blocking'] as int? ?? 0) != 0;
-          final isPlain = (message['isPlain'] as int? ?? 0) != 0;
-          _addLog("displayWindow: winId=$winId, blocking=$blocking, isPlain=$isPlain, textVisible=${_screen.isTextWindowVisible}, menuVisible=${_screen.isMenuWindowVisible}");
-          _screen.displayWindow(winId, blocking, isPlain: isPlain);
+          final plainVal = message['isPlain'] as int? ?? 0;
+          final isPlain = plainVal != 0;
+          final plainType = (message['plainType'] as int?) ?? plainVal;
+          _addLog("displayWindow: winId=$winId, blocking=$blocking, isPlain=$isPlain, plainType=$plainType, textVisible=${_screen.isTextWindowVisible}, menuVisible=${_screen.isMenuWindowVisible}");
+          _screen.displayWindow(winId, blocking, isPlain: isPlain, plainType: plainType);
           _addLog("displayWindow after: textVisible=${_screen.isTextWindowVisible}, menuVisible=${_screen.isMenuWindowVisible}");
           // C側の blocking に基づく
           if (_mapWinId != null && winId == _mapWinId) {
@@ -2461,6 +2463,7 @@ class _MyHomePageState extends State<MyHomePage> {
       textAttrs: _screen.textAttrs,
       textTiles: _screen.textTiles,
       isPlainDialog: _screen.isPlainDialog,
+      plainType: _screen.plainType,
       tombstoneDisplayMode: _tombstoneDisplayMode,
       onDismiss: () => _sendFfiKey(32, "Space"),
       onShowMsgHistory: _showMsgHistoryPanel,

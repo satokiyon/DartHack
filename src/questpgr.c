@@ -608,7 +608,7 @@ deliver_by_window(const char *msg, int how)
     const char *msgp = msg, *msgend = eos((char *) msg);
     winid datawin;
 
-    set_flutter_plain_text_dialog(1);
+    set_flutter_plain_text_dialog(2); // 2 = PLAIN_TEXT_QUEST
     datawin = create_nhwindow(how);
 
     while (msgp < msgend) {

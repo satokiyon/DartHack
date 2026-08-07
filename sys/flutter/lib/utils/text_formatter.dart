@@ -2,8 +2,8 @@
 
 /// PC用80桁固定改行テキストをスマートフォン画面向けに自然に整形するユーティリティクラス
 class TextFormatter {
-  // 改行をそのまま保持する末尾記号（句読点、感嘆符・疑問符、コロン）
-  static final RegExp _keepBreakCharRegex = RegExp(r'[。\.、,!！?？:：]\s*$');
+  // 改行をそのまま保持する末尾記号（句点、感嘆符・疑問符、コロン）
+  static final RegExp _keepBreakCharRegex = RegExp(r'[。\.!！?？:：]\s*$');
   
   // 区切り線（---, === などが連続する行）
   static final RegExp _dividerRegex = RegExp(r'^\s*([-=*#~_+]){3,}\s*$');
@@ -30,6 +30,21 @@ class TextFormatter {
 
       // 空白行の場合: 現在の段落をフラッシュして、空行をそのまま保持
       if (trimmed.isEmpty) {
+        if (currentParagraph.isNotEmpty) {
+          result.add(currentParagraph);
+          currentParagraph = '';
+        }
+        result.add(rawLine);
+        continue;
+      }
+
+      // アスキーマップ・枠線・図表行（+---+ や |...| 行など）の判定
+      final isCodeBlockOrAsciiArt =
+          RegExp(r'^\s*[\+|].*[\+|]\s*$').hasMatch(rawLine) ||
+          RegExp(r'^\s*\+[-+=]+\s*$').hasMatch(rawLine) ||
+          RegExp(r'^\s*\\ \| /\s*$').hasMatch(rawLine);
+
+      if (isCodeBlockOrAsciiArt) {
         if (currentParagraph.isNotEmpty) {
           result.add(currentParagraph);
           currentParagraph = '';

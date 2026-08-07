@@ -205,6 +205,7 @@ static DartExitCallback g_exit_cb = NULL;
 static DartNumberPadModeCallback g_number_pad_mode_cb = NULL;
 static DartCliparoundCallback g_cliparound_cb = NULL;
 static DartPutMixedWithTileCallback g_putmixed_cb = NULL;
+// プレーンテキストダイアログの種別: 0: なし, 1: 一般(メッセージ履歴等), 2: クエスト文章, 3: データベース
 static int g_is_plain_text_dialog = 0;
 
 void set_flutter_plain_text_dialog(int enable) {
@@ -1096,7 +1097,6 @@ static void flutter_display_file(const char *name, boolean complain) {
     dlb *f = (dlb *) 0;
     char buf[BUFSZ];
     char name_jp[512];
-    char *cr;
 
     flutter_clear_nhwindow(WIN_MESSAGE);
 
@@ -1114,8 +1114,9 @@ static void flutter_display_file(const char *name, boolean complain) {
         boolean empty = TRUE;
 
         while (dlb_fgets(buf, BUFSZ, f)) {
-            if ((cr = strchr(buf, '\n')) != NULL) {
-                *cr = '\0';
+            int len = (int) strlen(buf);
+            while (len > 0 && (buf[len - 1] == '\r' || buf[len - 1] == '\n')) {
+                buf[--len] = '\0';
             }
             if (strchr(buf, '\t') != NULL) {
                 (void) tabexpand(buf);

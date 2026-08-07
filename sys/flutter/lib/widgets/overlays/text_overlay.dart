@@ -12,6 +12,7 @@ class TextOverlay extends StatelessWidget {
   final List<int> textAttrs;
   final List<int> textTiles;
   final bool isPlainDialog;
+  final int plainType;
   final int tombstoneDisplayMode;
   final VoidCallback onDismiss;
   final VoidCallback onShowMsgHistory;
@@ -27,6 +28,7 @@ class TextOverlay extends StatelessWidget {
     required this.textAttrs,
     required this.textTiles,
     required this.isPlainDialog,
+    this.plainType = 0,
     required this.tombstoneDisplayMode,
     required this.onDismiss,
     required this.onShowMsgHistory,
@@ -55,35 +57,7 @@ class TextOverlay extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuCategoryRow(String text) {
-    final hasTab = text.contains('\t');
-    return Container(
-      margin: const EdgeInsets.only(top: 8, bottom: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E2A3A),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.lightBlueAccent.withValues(alpha: 0.35)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.category_outlined, size: 16, color: Colors.lightBlueAccent),
-          SizedBox(width: hasTab ? 14 : 6),
-          Expanded(
-            child: Text(
-              text.trim(),
-              style: const TextStyle(
-                color: Colors.lightBlueAccent,
-                fontFamily: 'monospace',
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -138,35 +112,41 @@ class TextOverlay extends StatelessWidget {
 
                     final hasAnyTile = useTiles && tileImage != null && textTiles.any((t) => t >= 0);
 
-                    bool shouldSkipReformat = false;
-                    if (textLines.any((l) =>
-                        l.contains('<- ここで倒れた。') ||
-                        l.contains('<- ここから脱出した。') ||
-                        l.contains('最終能力:'))) {
-                      shouldSkipReformat = true;
+                    bool shouldReformat = false;
+
+                    // 1. Cコアからの明示的なプレーンテキスト種別フラグ判定
+                    // PLAIN_TEXT_QUEST = 2 (クエスト文章), PLAIN_TEXT_DATABASE = 3 (データベース検索結果)
+                    if (plainType == 2 || plainType == 3) {
+                      shouldReformat = true;
                     } else {
-                      for (int i = 0; i < textLines.length && i < 5; i++) {
+                      // 2. 先頭10行のスキャンによるオプトイン判定 (小説、歴史、ライセンスのみ)
+                      for (int i = 0; i < textLines.length && i < 10; i++) {
                         final l = textLines[i].trim();
-                        if (l.contains('現在のキー割り当て一覧') ||
-                            l.startsWith('メニュー操作キー:') ||
-                            l.startsWith('倒した怪物:') ||
-                            l.startsWith('虐殺した怪物種:') ||
-                            l.startsWith('絶滅した怪物種:') ||
-                            l.startsWith('虐殺・絶滅した怪物種:') ||
-                            l.startsWith('自主的な縛り:') ||
-                            l.startsWith('達成事項:') ||
-                            l.startsWith('記録済みイベント:') ||
-                            l.startsWith('主要イベント:') ||
-                            l.contains('死亡数 生成数')) {
-                          shouldSkipReformat = true;
+
+                        // 小説 (tribute / tribute_jp)
+                        if (l.contains('Terry Pratchett') ||
+                            l.contains('テリー・プラチェット 著') ||
+                            l.contains('『魔法の色』')) {
+                          shouldReformat = true;
+                          break;
+                        }
+
+                        // 一般ヘルプのうち「NetHack の簡易な歴史」と「NetHack ライセンス」
+                        if (l.contains('NetHack 5.0 版履歴ファイル') ||
+                            l.contains('NetHack History file for release') ||
+                            l.contains('見よ、定命の者よ。NetHackの起源を') ||
+                            l.contains('Behold, mortal, the origins of NetHack') ||
+                            l.contains('NETHACK GENERAL PUBLIC LICENSE') ||
+                            l.contains('NetHack General Public License')) {
+                          shouldReformat = true;
                           break;
                         }
                       }
                     }
 
-                    final displayLines = shouldSkipReformat
-                        ? textLines
-                        : TextFormatter.reformatLines(textLines);
+                    final displayLines = shouldReformat
+                        ? TextFormatter.reformatLines(textLines)
+                        : textLines;
 
                     return Container(
                       width: double.infinity,
@@ -183,11 +163,7 @@ class TextOverlay extends StatelessWidget {
                           final line = displayLines[index];
                           final trimmed = line.trim();
                           final isDivider = trimmed.isEmpty || RegExp(r'^[-=\s]+$').hasMatch(trimmed);
-                          final isCategory = !isDivider && (trimmed.endsWith(':') || trimmed.endsWith('：'));
 
-                          if (isCategory) {
-                            return _buildMenuCategoryRow(line);
-                          }
                           if (isDivider) {
                             if (trimmed.isEmpty) {
                               return const SizedBox(height: 6);
