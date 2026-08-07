@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-08.
 NetHack JP README
 
 
@@ -32,3 +32,4 @@ NetHack JP README
      
 設定ファイルに指定できるオプションや、ゲーム内容に関する説明は、Guidebook_JP.txtを参照してください。
 
+Android版をプレイしたい場合はGoogle PlayのDartHackのページ( https://play.google.com/store/apps/details?id=jp.satokiyo.darthack )からインストールしてください。

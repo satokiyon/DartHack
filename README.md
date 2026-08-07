@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-26. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-08. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsのみ)
@@ -27,6 +27,8 @@ NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.net
 ### 1. 導入手順
 
 ゲームをプレイするには、[GitHubのReleasesページ](https://github.com/satokiyon/NetHackJP/releases) からビルド済みのWindows用実行ファイル（`NetHack.exe` / `NetHackW.exe`）を含むZIPファイルをダウンロードしてください。
+
+※Android版をプレイしたい場合は[Google PlayのDartHackのページ](https://play.google.com/store/apps/details?id=jp.satokiyo.darthack)からインストールしてください
 
 ※最新の開発版をプレイしたい場合はご自身でビルドする必要があります（ビルド方法は後述の「開発者向け情報」を参照してください）。
 
