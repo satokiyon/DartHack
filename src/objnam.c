@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-18. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-07. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1781973060 2026/06/20 16:31:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.464 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -804,10 +804,13 @@ xname_flags(
         ConcUpdate(buf);
 
         if (typ == FIGURINE && omndx != NON_PM) {
-            char anbuf[10]; /* [4] would be enough: 'a','n',' ','\0' */
             const char *pm_name = obj_pmname(obj);
+            char namebuf[BUFSZ];
 
-            ConcatF2(buf, 0, " of %s%s", just_an(anbuf, pm_name), pm_name);
+            Strcpy(namebuf, buf);
+            buf[0] = '\0';
+            ConcUpdate(buf);
+            ConcatF2(buf, 0, "%sの%s", pm_name, namebuf);
         } else if (is_wet_towel(obj)) {
             if (wizard)
                 ConcatF1(buf, 0, " (%d)", obj->spe);
@@ -1068,19 +1071,41 @@ xname_flags(
         switch (obj->otyp) {
         case T_SHIRT:
         case ALCHEMY_SMOCK:
-            ConcatF1(buf, 0, " 「%s」と書かれた",
-                     (obj->otyp == T_SHIRT)
-                         ? jp_tshirt_text_for_display(obj, tmpbuf)
-                         : jp_apron_text_for_display(obj, tmpbuf));
+            {
+                char namebuf[BUFSZ];
+
+                Strcpy(namebuf, buf);
+                buf[0] = '\0';
+                ConcUpdate(buf);
+                ConcatF2(buf, 0, "「%s」と書かれた%s",
+                         (obj->otyp == T_SHIRT)
+                             ? jp_tshirt_text_for_display(obj, tmpbuf)
+                             : jp_apron_text_for_display(obj, tmpbuf),
+                         namebuf);
+            }
             break;
         case CANDY_BAR:
             lbl = jp_candy_wrapper_text_for_display(obj);
-            if (*lbl)
-                ConcatF1(buf, 0, " 「%s」ラベル付き", lbl);
+            if (*lbl) {
+                char namebuf[BUFSZ];
+
+                Strcpy(namebuf, buf);
+                buf[0] = '\0';
+                ConcUpdate(buf);
+                ConcatF2(buf, 0, "「%s」ラベル付きの%s", lbl, namebuf);
+            }
             break;
         case HAWAIIAN_SHIRT:
-            ConcatF1(buf, 0, " %s",
-                     jp_hawaiian_design_for_display(obj, tmpbuf));
+            {
+                char namebuf[BUFSZ];
+
+                Strcpy(namebuf, buf);
+                buf[0] = '\0';
+                ConcUpdate(buf);
+                ConcatF2(buf, 0, "%sの%s",
+                         jp_hawaiian_design_for_display(obj, tmpbuf),
+                         namebuf);
+            }
             break;
         default:
             break;
