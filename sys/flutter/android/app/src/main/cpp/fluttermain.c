@@ -28,6 +28,8 @@ static jmp_buf env;
 
 extern struct passwd *getpwuid(uid_t);
 extern struct passwd *getpwnam(const char *);
+extern int eraseoldlocks(void);
+extern boolean getlock_failed(void);
 
 staticfn boolean whoami(void);
 staticfn void process_options(int, char **);
@@ -159,6 +161,10 @@ int NetHackMain(int argc, char** argv)
 	Sprintf(gl.lock, "%d%s", (int)getuid(), svp.plname);
 	debuglog("STEP 5: calling getlock() with lock='%s'...", gl.lock);
 	getlock();
+	if (getlock_failed()) {
+		debuglog("STEP 5: getlock failed (recovery failed/impossible). Exiting NetHackMain...");
+		return 0;
+	}
 	debuglog("STEP 5: getlock() done.");
 
 	/* Set up level 0 file to keep the game state.
@@ -200,92 +206,109 @@ int NetHackMain(int argc, char** argv)
 
 	init_sound_disp_gamewindows();
 
-    debuglog("STEP 8: calling restore_saved_game()...");
-	if((nhfp = restore_saved_game()) != 0)
+	set_savefile_name(TRUE);
+	const char *fq_save = fqname(gs.SAVEF, SAVEPREFIX, 1);
+	boolean save_exists = file_exists(fq_save);
+
+	if (save_exists)
 	{
-        debuglog("STEP 8: restore_saved_game SUCCESS! Resuming game...");
-#ifdef WIZARD
-		boolean remember_wiz_mode = wizard;
-#endif
-		const char *fq_save = fqname(gs.SAVEF, SAVEPREFIX, 1);
-		int fq_save_fd = open(fq_save, O_RDONLY);
-		if (fq_save_fd == -1) {
-			debuglog("failed to open save file: %s", strerror(errno));
-			goto backup_error;
-		}
-		struct stat sb;
-		if (fstat(fq_save_fd, &sb) < 0) {
-			debuglog("failed to stat save file: %s", strerror(errno));
-			goto backup_error;
-		}
-		size_t fq_save_length = sb.st_size;
-		char *fq_save_contents = mmap(NULL, fq_save_length, PROT_READ, MAP_PRIVATE, fq_save_fd, 0);
-		if (fq_save_contents == MAP_FAILED) {
-			debuglog("failed to mmap save file: %s", strerror(errno));
-			goto backup_error;
-		} else goto backup_clean;
-backup_error:
-		debuglog("WARNING: failed to make a backup save file.");
-backup_clean:
-		if (fq_save_fd != -1) close(fq_save_fd);
-
-        if (ge.early_raw_messages)
-            raw_print("セーブファイルを復元中...");
-        else
-            pline("セーブファイルを復元中...");
-		mark_synch();
-		if(!dorecover(nhfp)) {
-			pline("セーブファイルの復元に失敗しました。");
-			goto not_recovered;
-		}
-		if (fq_save_contents) {
-			char *fq_save_backup = (char *)alloc(strlen(fq_save) + 4 + 1);
-			if (fq_save_backup) {
-				Sprintf(fq_save_backup, "%s.bak", fq_save);
-				int fq_save_backup_fd = creat(fq_save_backup, FCMASK);
-				if (fq_save_backup_fd != -1) {
-					size_t written_total = 0;
-					while (written_total < fq_save_length) {
-						ssize_t written_just_now = write(fq_save_backup_fd, fq_save_contents + written_total, fq_save_length - written_total);
-						if (written_just_now < 0) {
-							if (errno == EINTR) continue;
-							break;
-						} else if (written_just_now == 0) {
-							break;
-						} else {
-							written_total += written_just_now;
-						}
-					}
-					close(fq_save_backup_fd);
-				}
-				free(fq_save_backup);
-			}
-			munmap(fq_save_contents, fq_save_length);
-		}
-		resuming = TRUE;
-#ifdef WIZARD
-		if(!wizard && remember_wiz_mode)
-			wizard = TRUE;
-#endif
-		check_special_room(FALSE);
-		wd_message();
-
-		if(discover || wizard)
+		debuglog("STEP 8: Savefile exists (%s). Calling restore_saved_game()...", fq_save);
+		if ((nhfp = restore_saved_game()) != 0)
 		{
-			if(y_n("セーブファイルを保持しますか？") == 'n')
-			{
-				(void)delete_savefile();
+			debuglog("STEP 8: restore_saved_game SUCCESS! Resuming game...");
+#ifdef WIZARD
+			boolean remember_wiz_mode = wizard;
+#endif
+			int fq_save_fd = open(fq_save, O_RDONLY);
+			size_t fq_save_length = 0;
+			char *fq_save_contents = MAP_FAILED;
+			if (fq_save_fd != -1) {
+				struct stat sb;
+				if (fstat(fq_save_fd, &sb) >= 0) {
+					fq_save_length = sb.st_size;
+					fq_save_contents = mmap(NULL, fq_save_length, PROT_READ, MAP_PRIVATE, fq_save_fd, 0);
+				}
 			}
+
+			if (ge.early_raw_messages)
+				raw_print("セーブファイルを復元中...");
 			else
-			{
-				nh_compress(fq_save);
+				pline("セーブファイルを復元中...");
+			mark_synch();
+
+			if (!dorecover(nhfp)) {
+				debuglog("ERROR: dorecover failed for %s. Cleaning up and exiting...", fq_save);
+				if (fq_save_contents != MAP_FAILED) munmap(fq_save_contents, fq_save_length);
+				if (fq_save_fd != -1) close(fq_save_fd);
+				(void) delete_savefile();
+				(void) eraseoldlocks();
+				unlock_file(HLOCK);
+				clearlocks();
+				exit_nhwindows("セーブデータの復元に失敗したため破損データを削除しました。次回起動時は新規ゲームから開始します。");
+				return 0;
 			}
+
+			if (fq_save_contents != MAP_FAILED) {
+				char *fq_save_backup = (char *)alloc(strlen(fq_save) + 4 + 1);
+				if (fq_save_backup) {
+					Sprintf(fq_save_backup, "%s.bak", fq_save);
+					int fq_save_backup_fd = creat(fq_save_backup, FCMASK);
+					if (fq_save_backup_fd != -1) {
+						size_t written_total = 0;
+						while (written_total < fq_save_length) {
+							ssize_t written_just_now = write(fq_save_backup_fd, fq_save_contents + written_total, fq_save_length - written_total);
+							if (written_just_now < 0) {
+								if (errno == EINTR) continue;
+								break;
+							} else if (written_just_now == 0) {
+								break;
+							} else {
+								written_total += written_just_now;
+							}
+						}
+						close(fq_save_backup_fd);
+					}
+					free(fq_save_backup);
+				}
+				munmap(fq_save_contents, fq_save_length);
+			}
+			if (fq_save_fd != -1) close(fq_save_fd);
+
+			resuming = TRUE;
+#ifdef WIZARD
+			if (!wizard && remember_wiz_mode)
+				wizard = TRUE;
+#endif
+			check_special_room(FALSE);
+			wd_message();
+
+			if (discover || wizard)
+			{
+				if (y_n("セーブファイルを保持しますか？") == 'n')
+				{
+					(void)delete_savefile();
+				}
+				else
+				{
+					nh_compress(fq_save);
+				}
+			}
+		}
+		else
+		{
+			debuglog("ERROR: Savefile exists (%s) but restore_saved_game failed! Cleaning up and exiting...", fq_save);
+			(void) delete_savefile();
+			(void) eraseoldlocks();
+			unlock_file(HLOCK);
+			clearlocks();
+			exit_nhwindows("セーブデータの復元に失敗したため破損データを削除しました。次回起動時は新規ゲームから開始します。");
+			return 0;
 		}
 	}
 	else
 	{
-		debuglog("STEP 9: restore_saved_game returned NULL. Calling player_selection()...");
-		not_recovered: player_selection();
+		debuglog("STEP 9: Savefile does not exist. Calling player_selection()...");
+		player_selection();
 		debuglog("STEP 9: player_selection() done. Calling newgame()...");
 		resuming = FALSE;
 		newgame();

@@ -18,7 +18,7 @@ void regularize(char *s)
 		*lp = '_';
 }
 
-static int eraseoldlocks(void)
+int eraseoldlocks(void)
 {
 	register int i;
 
@@ -32,10 +32,19 @@ static int eraseoldlocks(void)
 	return(1);
 }
 
+static boolean g_getlock_failed = FALSE;
+
+boolean getlock_failed(void)
+{
+	return g_getlock_failed;
+}
+
 void getlock(void)
 {
 	register int i = 0, fd, c;
 	const char *fq_lock;
+
+	g_getlock_failed = FALSE;
 
 	if (!lock_file(HLOCK, LOCKPREFIX, 10))
 	{
@@ -61,7 +70,9 @@ void getlock(void)
 	{
 		(void) eraseoldlocks();
 		unlock_file(HLOCK);
-		error("Couldn't recover old game.");
+		g_getlock_failed = TRUE;
+		exit_nhwindows("セーブデータの復元に失敗したため破損データを削除しました。次回起動時は新規ゲームから開始します。");
+		return;
 	}
 
 gotlock:
