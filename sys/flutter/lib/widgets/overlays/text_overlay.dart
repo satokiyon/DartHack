@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import '../../utils/text_formatter.dart';
 import '../../models/tombstone_data.dart';
 import '../../models/topten_entry.dart';
 import '../tombstone_widget.dart';
@@ -137,6 +138,36 @@ class TextOverlay extends StatelessWidget {
 
                     final hasAnyTile = useTiles && tileImage != null && textTiles.any((t) => t >= 0);
 
+                    bool shouldSkipReformat = false;
+                    if (textLines.any((l) =>
+                        l.contains('<- ここで倒れた。') ||
+                        l.contains('<- ここから脱出した。') ||
+                        l.contains('最終能力:'))) {
+                      shouldSkipReformat = true;
+                    } else {
+                      for (int i = 0; i < textLines.length && i < 5; i++) {
+                        final l = textLines[i].trim();
+                        if (l.contains('現在のキー割り当て一覧') ||
+                            l.startsWith('メニュー操作キー:') ||
+                            l.startsWith('倒した怪物:') ||
+                            l.startsWith('虐殺した怪物種:') ||
+                            l.startsWith('絶滅した怪物種:') ||
+                            l.startsWith('虐殺・絶滅した怪物種:') ||
+                            l.startsWith('自主的な縛り:') ||
+                            l.startsWith('達成事項:') ||
+                            l.startsWith('記録済みイベント:') ||
+                            l.startsWith('主要イベント:') ||
+                            l.contains('死亡数 生成数')) {
+                          shouldSkipReformat = true;
+                          break;
+                        }
+                      }
+                    }
+
+                    final displayLines = shouldSkipReformat
+                        ? textLines
+                        : TextFormatter.reformatLines(textLines);
+
                     return Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
@@ -147,9 +178,9 @@ class TextOverlay extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       child: ListView.builder(
                         padding: EdgeInsets.zero,
-                        itemCount: textLines.length,
+                        itemCount: displayLines.length,
                         itemBuilder: (context, index) {
-                          final line = textLines[index];
+                          final line = displayLines[index];
                           final trimmed = line.trim();
                           final isDivider = trimmed.isEmpty || RegExp(r'^[-=\s]+$').hasMatch(trimmed);
                           final isCategory = !isDivider && (trimmed.endsWith(':') || trimmed.endsWith('：'));

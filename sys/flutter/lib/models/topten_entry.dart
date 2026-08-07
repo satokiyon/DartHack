@@ -1,3 +1,4 @@
+// NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-07.
 import 'dart:io';
 
 class TopTenEntry {
@@ -17,73 +18,93 @@ class TopTenEntry {
 
   static List<TopTenEntry> parse(List<String> lines, List<int> attrs) {
     final entries = <TopTenEntry>[];
-    TopTenEntryBuilder? builder;
 
-    // " 順位      点数  名前" などのヘッダー行は除外して、数字で始まる行からパースする
-    final entryRegExp = RegExp(r'^\s*([0-9]+)\s+([0-9]+)\s+(.*)$');
+    // 順位は空スペースの場合もあるため ([0-9]*) とし、スコア ([0-9]+) にマッチさせる
+    final entryRegExp = RegExp(r'^\s*([0-9]*)\s+([0-9]+)\s+(.*)$');
+    // 名前とプロフィールの境界を特定する正規表現 ("名前 職業/種族/性別/神")
+    final profileRegex = RegExp(r'^(.*?\s+[^\s\/]+\/[^\s\/]+\/[^\s\/]+\/[^\s]+)(.*)$');
     // 行末の HP 表示を検出する正規表現（" - [103]" や " 15 [120]" 等）
     final hpSuffixRegExp = RegExp(r'\s+(-|[0-9]+)\s+\[([0-9]+)\]\s*$');
 
-    for (int i = 0; i < lines.length; i++) {
-      var line = lines[i];
-      if (line.trim().isEmpty) continue;
+    int index = 0;
+    while (index < lines.length) {
+      final rawLine = lines[index];
+      final trimmed = rawLine.trim();
 
-      // ヘッダーやその他のタイトル行は無視
-      if (line.contains('順位') && line.contains('点数') && line.contains('名前')) {
+      if (trimmed.isEmpty || (trimmed.contains('順位') && trimmed.contains('点数') && trimmed.contains('名前'))) {
+        index++;
         continue;
       }
 
-      // 行末の HP 表示をチェック・抽出
-      String? extractedHpInfo;
-      final hpMatch = hpSuffixRegExp.firstMatch(line);
-      if (hpMatch != null) {
-        final hpVal = hpMatch.group(1);
-        final maxHpVal = hpMatch.group(2);
-        extractedHpInfo = 'HP/最大HP: $hpVal/$maxHpVal';
-        line = line.substring(0, hpMatch.start);
-      }
+      final entryMatch = entryRegExp.firstMatch(rawLine);
+      if (entryMatch != null) {
+        final rankStr = entryMatch.group(1)!;
+        final rank = rankStr.isNotEmpty ? (int.tryParse(rankStr) ?? 0) : 0;
+        final score = entryMatch.group(2)!;
+        final rest = entryMatch.group(3)!;
 
-      final match = entryRegExp.firstMatch(line);
-      if (match != null) {
-        if (builder != null) {
-          entries.add(builder.build());
+        String nameAndProfile = rest.trim();
+        String inlineDeathPart = '';
+
+        final profileMatch = profileRegex.firstMatch(rest);
+        if (profileMatch != null) {
+          nameAndProfile = profileMatch.group(1)!.trim();
+          inlineDeathPart = profileMatch.group(2)!.trim();
         }
-        final rank = int.tryParse(match.group(1)!) ?? 0;
-        final score = match.group(2)!;
-        final nameAndProfile = match.group(3)!.trim();
-        
-        final attr = i < attrs.length ? attrs[i] : 0;
-        final isBold = (attr & 1) != 0; // ATR_BOLD (1)
 
-        builder = TopTenEntryBuilder(
+        final attr = index < attrs.length ? attrs[index] : 0;
+        bool isBold = (attr & 1) != 0; // ATR_BOLD (1)
+
+        String deathDetailPart = '';
+        String? hpInfo;
+
+        // 次の行（死因の続き行）があればチェック
+        if (index + 1 < lines.length) {
+          var nextLine = lines[index + 1];
+          final hpMatch = hpSuffixRegExp.firstMatch(nextLine);
+          if (hpMatch != null) {
+            final hpVal = hpMatch.group(1);
+            final maxHpVal = hpMatch.group(2);
+            hpInfo = 'HP/最大HP: $hpVal/$maxHpVal';
+            nextLine = nextLine.substring(0, hpMatch.start);
+          }
+          final nextTrimmed = nextLine.trim();
+          if (nextTrimmed.isNotEmpty && !entryRegExp.hasMatch(nextLine) && !nextTrimmed.contains('順位')) {
+            deathDetailPart = nextTrimmed;
+            index++; // 2行目を消費
+          }
+        }
+
+        // 食い込んだ死因テキストと2行目の続きを結合
+        String fullDeathText = '';
+        if (inlineDeathPart.isNotEmpty && deathDetailPart.isNotEmpty) {
+          final lastCode = inlineDeathPart.codeUnitAt(inlineDeathPart.length - 1);
+          final firstCode = deathDetailPart.codeUnitAt(0);
+          bool isAsciiBoth = (lastCode >= 0x20 && lastCode <= 0x7E) && (firstCode >= 0x20 && firstCode <= 0x7E);
+          fullDeathText = isAsciiBoth ? '$inlineDeathPart $deathDetailPart' : '$inlineDeathPart$deathDetailPart';
+        } else if (inlineDeathPart.isNotEmpty) {
+          fullDeathText = inlineDeathPart;
+        } else if (deathDetailPart.isNotEmpty) {
+          fullDeathText = deathDetailPart;
+        }
+
+        final details = <String>[];
+        if (fullDeathText.isNotEmpty) {
+          details.add(fullDeathText);
+        }
+        if (hpInfo != null) {
+          details.add(hpInfo);
+        }
+
+        entries.add(TopTenEntry(
           rank: rank,
           score: score,
           nameAndProfile: nameAndProfile,
+          details: details,
           isCurrent: isBold,
-        );
-        if (extractedHpInfo != null) {
-          builder.details.add(extractedHpInfo);
-        }
-      } else {
-        if (builder != null) {
-          final trimmed = line.trim();
-          if (trimmed.isNotEmpty) {
-            builder.details.add(trimmed);
-          }
-          if (extractedHpInfo != null) {
-            builder.details.add(extractedHpInfo);
-          }
-          final attr = i < attrs.length ? attrs[i] : 0;
-          final isBold = (attr & 1) != 0;
-          if (isBold) {
-            builder.isCurrent = true;
-          }
-        }
+        ));
       }
-    }
-
-    if (builder != null) {
-      entries.add(builder.build());
+      index++;
     }
 
     return entries;

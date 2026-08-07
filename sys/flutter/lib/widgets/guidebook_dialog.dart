@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+import '../utils/text_formatter.dart';
+
 /// 日本語ガイドブック（Guidebook_JP.txt）を閲覧するためのダイアログウィジェット
 class GuidebookDialog extends StatefulWidget {
   const GuidebookDialog({super.key});
@@ -67,15 +69,14 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
       final content =
           await rootBundle.loadString('assets/nethackdir/Guidebook_JP.txt');
       final rawLines = content.split('\n');
-      final lines = <String>[];
+      final lines = TextFormatter.reformatLines(rawLines);
       final sections = <_GuidebookSection>[];
 
       // 数字見出しの抽出正規表現 (例: "1. はじめに", "5.4. 店と買い物", "5.4.1. 店の特異な点")
       final sectionRegex = RegExp(r'^(\d+(?:\.\d+)*\.)[ \t\u3000]+(.+)$');
 
-      for (int i = 0; i < rawLines.length; i++) {
-        final line = rawLines[i].replaceAll('\r', '');
-        lines.add(line);
+      for (int i = 0; i < lines.length; i++) {
+        final line = lines[i];
 
         // 行頭の全角・半角スペース、タブを除去した文字列で見出し判定
         final trimmedLeading = line.replaceAll(RegExp(r'^[ \t\u3000]+'), '');
