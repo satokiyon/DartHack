@@ -208,3 +208,15 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
    - タイルセット画像（`assets/tiles/`）は、切り出しロジック（`srcRect`）が固定ピクセルサイズ（32x32 等）に依存しているため、デコード時のダウンサンプリングや解像度のリサイズ（ピクセル数の削減）を行うと座標がズレて表示が崩れます。
    - タイルセット画像については、**ピクセル解像度を完全に維持したまま**、ロスレス（無劣化）WebP 形式へ変換してアセット容量のみを削減してください。
 
+## 33. Flutter AlertDialog におけるソフトキーボード・横画面オーバーフロー防止原則
+1. **現象と原因**:
+   `AlertDialog` 内に `TextField` や入力チップ群が含まれる場合、ソフトキーボード（IME）の自動立ち上がり（`autofocus: true` 等）や横画面（Landscape）表示によって画面の縦サイズが激減した際、`AlertDialog` のデフォルト枠固定計算（`scrollable: false`）および上下の外枠マージン (`insetPadding`) により `BOTTOM OVERFLOWED BY X PIXELS` エラーが発生します。
+2. **標準設計ルール**:
+   - **`scrollable: true` の指定**:
+     入力項目やリスト要素を持つダイアログでは、原則として `AlertDialog(scrollable: true, ...)` を指定し、ダイアログ全域（タイトル・コンテンツ・下部ボタン）を可視領域内でダイナミックにスクロール可能にします。
+   - **`insetPadding` の最適化**:
+     横画面時のマージン圧迫を防ぐため、`insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8)` を指定して上下余白を約 32px 節約・最適化してください。
+   - **ダイアログ内固定高さの回避**:
+     `content` 内に高さ制限付きリストを配置する場合は、`SizedBox(height: 350)` などの固定ピクセル指定を避け、`SizedBox(height: MediaQuery.of(context).size.height * 0.45)` などの画面サイズ相対高に設定してください。
+
+
