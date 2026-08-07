@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-07. */
 /* NetHack 5.0	read.c	$NHDT-Date: 1782083451 2026/06/21 18:10:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.334 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -435,7 +435,7 @@ jp_apron_text_for_display(struct obj *apron, char *buf)
 {
     static const char *const apron_msgs_ja[] = {
         "料理人にキス",
-        "私は今、サイエンス してる!",
+        "私は今、サイエンスしてる!",
         "料理長をなめるな",
         "私に毒を盛らせないで",
         "ゲヘナのキッチン",
@@ -633,15 +633,15 @@ doread(void)
             return ECMD_OK;
         }
           if (!Blind)
-            pline("その%sには%sと書かれている.",
+            pline("その%sには%sと書かれている。",
                 simpleonames(scroll), cap_text);
           else
-            pline("その%sに文字があるのを感じた. %sと読めるようだ.",
+            pline("その%sに文字があるのを感じた。%sと読めるようだ。",
                 simpleonames(scroll), cap_text);
         if (!u.uconduct.literate++)
-            livelog_printf(LL_CONDUCT, "became literate by reading %s",
-                           (otyp == DUNCE_CAP) ? "a dunce cap"
-                                               : "a cornuthaum");
+            livelog_printf(LL_CONDUCT, "%sを読むことで、読み書きができるようになった",
+                           (otyp == DUNCE_CAP) ? "とんがり帽子"
+                                               : "魔法使いの帽子");
 
         /* yet another note: despite the fact that player will recognize
            the object type, don't make it become a discovery for hero */
