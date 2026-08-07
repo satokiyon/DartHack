@@ -2683,6 +2683,7 @@ class _MyHomePageState extends State<MyHomePage> {
               showPanelNames: _showPanelNames,
               position: _cmdPanelPosition,
               isVertical: _cmdPanelPosition == 'left' || _cmdPanelPosition == 'right',
+              isKeyboardMode: _controllerMode == ControllerMode.keyboard,
               extCmdList: _extCmdList.map((e) => {'command': e.command, 'description': e.description}).toList(),
               onKeyPress: (key) => _sendKeysToC(key),
               onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),

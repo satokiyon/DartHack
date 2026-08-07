@@ -84,6 +84,7 @@ class NetHackCmdPanel extends StatefulWidget {
 
   final bool isVertical;
   final String position;
+  final bool isKeyboardMode;
 
   const NetHackCmdPanel({
     super.key,
@@ -97,6 +98,7 @@ class NetHackCmdPanel extends StatefulWidget {
     this.extCmdList,
     this.isVertical = false,
     this.position = 'top',
+    this.isKeyboardMode = false,
   });
 
   @override
@@ -471,12 +473,20 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
     });
   }
 
+  bool _isKbdToggleCmd(String cmd) {
+    final lower = cmd.toLowerCase();
+    return lower == '[kbd]' || lower == '[pad]';
+  }
+
   Widget _buildCmdButton(BuildContext context, int panelIndex, int itemIndex, CmdItem item) {
-    final isKbdToggle = item.command == '[Kbd]';
+    final isKbdToggle = _isKbdToggleCmd(item.command);
     final buttonColor = isKbdToggle
         ? (Colors.deepPurple[900] ?? const Color(0xFF311B92))
         : (Colors.grey[900] ?? const Color(0xFF212121));
     final textColor = isKbdToggle ? Colors.amber : Colors.white70;
+    final displayLabel = isKbdToggle
+        ? (widget.isKeyboardMode ? '[pad]' : '[kbd]')
+        : item.displayLabel;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 1.5, vertical: 3),
@@ -492,11 +502,11 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
             alignment: Alignment.center,
             constraints: const BoxConstraints(minWidth: 32, minHeight: 34),
             child: Text(
-              item.displayLabel,
+              displayLabel,
               style: TextStyle(
                 color: textColor,
                 fontSize: 12,
-                fontWeight: item.hasLabel ? FontWeight.bold : FontWeight.normal,
+                fontWeight: (item.hasLabel || isKbdToggle) ? FontWeight.bold : FontWeight.normal,
               ),
             ),
           ),
@@ -506,7 +516,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   }
 
   void _handleCmdPress(String cmd) {
-    if (cmd == '[Kbd]') {
+    if (_isKbdToggleCmd(cmd)) {
       widget.onToggleMode();
     } else if (cmd.startsWith('#')) {
       if (widget.onShortcut != null) {
@@ -762,9 +772,9 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
               const SizedBox(height: 4),
               OutlinedButton.icon(
                 icon: const Icon(Icons.keyboard),
-                label: const Text("[Kbd] (キーボード切替) を追加"),
+                label: const Text("[kbd] / [pad] (キーボード切替) を追加"),
                 onPressed: () {
-                  controller.text = '[Kbd]';
+                  controller.text = '[kbd]';
                 },
               ),
             ],
