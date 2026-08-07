@@ -54,6 +54,8 @@ class _AmountSelectorDialogState extends State<AmountSelectorDialog> {
     final showTile = widget.tileIndex >= 0 && widget.tileImage != null;
 
     return AlertDialog(
+      scrollable: true,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       backgroundColor: Colors.grey[950],
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Row(

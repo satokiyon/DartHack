@@ -614,11 +614,12 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         title: const Text("コマンドの変更"),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: controller,
@@ -631,6 +632,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
+                runSpacing: 4,
                 children: [
                   ActionChip(
                     label: const Text('Enter'),
@@ -643,6 +645,10 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                   ActionChip(
                     label: const Text('Esc'),
                     onPressed: () => controller.text = r'\e',
+                  ),
+                  ActionChip(
+                    label: const Text('[kbd] / [pad]'),
+                    onPressed: () => controller.text = '[kbd]',
                   ),
                 ],
               ),
@@ -657,7 +663,6 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                 },
               ),
             ],
-          ),
         ),
         actions: [
           TextButton(
@@ -686,10 +691,12 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         title: const Text("表示ラベルの変更"),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: controller,
@@ -700,7 +707,6 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                 autofocus: true,
               ),
             ],
-          ),
         ),
         actions: [
           TextButton(
@@ -727,11 +733,12 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         title: Text(isBefore ? "前にボタンを追加" : "後にボタンを追加"),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: controller,
@@ -744,6 +751,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
+                runSpacing: 4,
                 children: [
                   ActionChip(
                     label: const Text('Enter'),
@@ -756,6 +764,10 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                   ActionChip(
                     label: const Text('Esc'),
                     onPressed: () => controller.text = r'\e',
+                  ),
+                  ActionChip(
+                    label: const Text('[kbd] / [pad]'),
+                    onPressed: () => controller.text = '[kbd]',
                   ),
                 ],
               ),
@@ -778,7 +790,6 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                 },
               ),
             ],
-          ),
         ),
         actions: [
           TextButton(
@@ -856,10 +867,11 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
             }).toList();
 
             return AlertDialog(
+              insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               title: const Text("拡張コマンドから選択"),
               content: SizedBox(
                 width: double.maxFinite,
-                height: 350,
+                height: MediaQuery.of(context).size.height * 0.45,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [

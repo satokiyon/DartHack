@@ -43,11 +43,12 @@ void showShortcutEditDialog({
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        scrollable: true,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         title: Text("${shortcutLabels[index]} を編集"),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: controller,
@@ -92,10 +93,11 @@ void showShortcutEditDialog({
                           }).toList();
 
                           return AlertDialog(
+                            insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                             title: const Text("拡張コマンド"),
                             content: SizedBox(
                               width: double.maxFinite,
-                              height: 350,
+                              height: MediaQuery.of(context).size.height * 0.45,
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -196,7 +198,6 @@ void showShortcutEditDialog({
               ),
             ],
           ),
-        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),

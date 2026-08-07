@@ -481,11 +481,12 @@ class _SettingsPageState extends State<SettingsPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         title: Text("${_shortcutLabels[index]} を編集"),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: controller,
@@ -530,10 +531,11 @@ class _SettingsPageState extends State<SettingsPage> {
                         }).toList();
 
                         return AlertDialog(
+                          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                           title: const Text("拡張コマンド"),
                           content: SizedBox(
                             width: double.maxFinite,
-                            height: 350,
+                            height: MediaQuery.of(context).size.height * 0.45,
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -625,7 +627,6 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ],
         ),
-      ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -1441,6 +1442,8 @@ class _SettingsPageState extends State<SettingsPage> {
             final currentText = controller.text;
 
             return AlertDialog(
+              scrollable: true,
+              insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               title: const Text("自動拾い対象アイテム"),
               content: SizedBox(
                 width: double.maxFinite,
@@ -1529,6 +1532,8 @@ class _SettingsPageState extends State<SettingsPage> {
             final isOverflow = bytesCount > maxBytes;
 
             return AlertDialog(
+              scrollable: true,
+              insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               title: Text(title),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1825,15 +1830,48 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  void _appendCmdToController(TextEditingController controller, String cmdToAppend) {
+    final text = controller.text;
+    final selection = controller.selection;
+    if (selection.isValid && selection.start >= 0 && selection.end >= 0) {
+      final before = text.substring(0, selection.start);
+      final after = text.substring(selection.end);
+      String insertText = cmdToAppend;
+      if (before.isNotEmpty && !before.endsWith(' ')) {
+        insertText = ' $insertText';
+      }
+      if (after.isNotEmpty && !after.startsWith(' ')) {
+        insertText = '$insertText ';
+      }
+      final newText = before + insertText + after;
+      controller.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: selection.start + insertText.length),
+      );
+    } else {
+      if (text.isEmpty) {
+        controller.text = cmdToAppend;
+      } else if (text.endsWith(' ')) {
+        controller.text = '$text$cmdToAppend';
+      } else {
+        controller.text = '$text $cmdToAppend';
+      }
+      controller.selection = TextSelection.collapsed(offset: controller.text.length);
+    }
+  }
+
   void _editPanel(int index) {
     final nameController = TextEditingController(text: _panels[index]['name']);
     final cmdsController = TextEditingController(text: _panels[index]['cmds']);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         title: Text("パネル ${index + 1} を編集"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
               controller: nameController,
@@ -1847,6 +1885,29 @@ class _SettingsPageState extends State<SettingsPage> {
                 labelText: "ボタンコマンド一覧",
                 helperText: "スペース区切りでコマンドを入力してください",
               ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                ActionChip(
+                  label: const Text('Enter'),
+                  onPressed: () => _appendCmdToController(cmdsController, r'\n'),
+                ),
+                ActionChip(
+                  label: const Text('Space'),
+                  onPressed: () => _appendCmdToController(cmdsController, r'\s'),
+                ),
+                ActionChip(
+                  label: const Text('Esc'),
+                  onPressed: () => _appendCmdToController(cmdsController, r'\e'),
+                ),
+                ActionChip(
+                  label: const Text('[kbd] / [pad]'),
+                  onPressed: () => _appendCmdToController(cmdsController, '[kbd]'),
+                ),
+              ],
             ),
           ],
         ),
