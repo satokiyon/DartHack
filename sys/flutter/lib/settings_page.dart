@@ -1261,6 +1261,8 @@ class _SettingsPageState extends State<SettingsPage> {
       27: "エスケープ (Esc/ダイアログ閉じ)",
       105: "インベントリ (i)",
       115: "周囲の探索 (s)",
+      46: "待機する (.)",
+      83: "セーブして終了する (S)",
     };
 
     return _buildSectionCard(
