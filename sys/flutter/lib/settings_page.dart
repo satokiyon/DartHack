@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'defaults_editor.dart';
+import 'models/ext_cmd_entry.dart';
 import 'nethack_cmd_panel.dart';
 import 'nethack_ffi.dart';
 import 'utils/defaults_helper.dart';
 import 'utils/scale_clamp.dart';
+import 'widgets/shortcut_edit_dialog.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -474,178 +476,23 @@ class _SettingsPageState extends State<SettingsPage> {
     if (_extCommands.isEmpty) {
       _loadExtCmds();
     }
-    final rawVal = _shortcuts[index];
-    final parsed = CmdItem.parseCmds(rawVal);
-    final currentCmdItem = parsed.isNotEmpty ? parsed.first : CmdItem(command: rawVal);
-    final controller = TextEditingController(text: currentCmdItem.command);
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        scrollable: true,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        title: Text("${_shortcutLabels[index]} を編集"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextField(
-                controller: controller,
-                decoration: const InputDecoration(
-                  hintText: "例: i, d, #terrain, #herecmdmenu 等",
-                  helperText: "#で始まるものは拡張コマンドとして入力送信されます",
-                ),
-                autofocus: true,
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: [
-                  ActionChip(
-                    label: const Text('Enter'),
-                    onPressed: () => controller.text = r'\n',
-                  ),
-                  ActionChip(
-                    label: const Text('Space'),
-                    onPressed: () => controller.text = r'\s',
-                  ),
-                  ActionChip(
-                    label: const Text('Esc'),
-                    onPressed: () => controller.text = r'\e',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-            OutlinedButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    String filterText = '';
-                    return StatefulBuilder(
-                      builder: (context, setStateDialog) {
-                        final filtered = _extCommands.where((item) {
-                          final cmd = (item['command'] ?? '').toLowerCase();
-                          final desc = (item['description'] ?? '').toLowerCase();
-                          final query = filterText.toLowerCase();
-                          return cmd.contains(query) || desc.contains(query);
-                        }).toList();
+    final extCmdEntries = _extCommands
+        .map((e) => ExtCmdEntry(
+              command: e['command'] ?? '',
+              description: e['description'] ?? '',
+            ))
+        .toList();
 
-                        return AlertDialog(
-                          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                          title: const Text("拡張コマンド"),
-                          content: SizedBox(
-                            width: double.maxFinite,
-                            height: MediaQuery.of(context).size.height * 0.45,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                TextField(
-                                  decoration: const InputDecoration(
-                                    hintText: "コマンド名や説明で検索...",
-                                    prefixIcon: Icon(Icons.search),
-                                    isDense: true,
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  onChanged: (val) {
-                                    setStateDialog(() {
-                                      filterText = val;
-                                    });
-                                  },
-                                ),
-                                const SizedBox(height: 12),
-                                Expanded(
-                                  child: filtered.isEmpty
-                                      ? const Center(
-                                          child: Text(
-                                            "見つかりませんでした",
-                                            style: TextStyle(color: Colors.grey),
-                                          ),
-                                        )
-                                      : ListView.builder(
-                                          shrinkWrap: true,
-                                          itemCount: filtered.length,
-                                          itemBuilder: (context, idx) {
-                                            final item = filtered[idx];
-                                            final cmd = item['command'] ?? '';
-                                            final desc = item['description'] ?? '';
-                                            return Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 4.0),
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(color: Colors.white12, width: 1.0),
-                                                  borderRadius: BorderRadius.circular(8.0),
-                                                ),
-                                                child: Material(
-                                                  color: const Color(0xFF2C2C2C),
-                                                  borderRadius: BorderRadius.circular(8.0),
-                                                  clipBehavior: Clip.antiAlias,
-                                                  child: ListTile(
-                                                    title: Text(
-                                                      cmd,
-                                                      style: const TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        color: Colors.white,
-                                                        fontSize: 15,
-                                                      ),
-                                                    ),
-                                                    subtitle: desc.isNotEmpty
-                                                        ? Text(
-                                                            desc,
-                                                            style: const TextStyle(
-                                                              color: Colors.white70,
-                                                              fontSize: 12,
-                                                            ),
-                                                          )
-                                                        : null,
-                                                    onTap: () {
-                                                      controller.text = cmd;
-                                                      Navigator.pop(context);
-                                                    },
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text("キャンセル"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                );
-              },
-              child: const Text("拡張コマンドから選択..."),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("キャンセル"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final val = controller.text.trim();
-              final serialized = CmdItem.serializeCmds([CmdItem(command: val)]);
-              setState(() {
-                _shortcuts[index] = serialized;
-              });
-              _saveSetting('shortcut_btn_$index', serialized);
-              Navigator.pop(context);
-            },
-            child: const Text("保存"),
-          ),
-        ],
-      ),
+    showShortcutEditDialog(
+      context: context,
+      index: index,
+      extCmdList: extCmdEntries,
+      onSaved: () async {
+        final prefs = await SharedPreferences.getInstance();
+        setState(() {
+          _shortcuts[index] = prefs.getString('shortcut_btn_$index') ?? _defaultShortcuts[index];
+        });
+      },
     );
   }
 
