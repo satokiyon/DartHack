@@ -9,6 +9,12 @@ class NetHackCoreLoader {
   /// Returns the current active language code ('ja' or 'en')
   static String get currentLanguage => _currentLanguage ?? 'ja';
 
+  /// Returns the sub-asset directory path ('jp' or 'en')
+  static String getAssetSubdir([String? langCode]) {
+    final lang = langCode ?? currentLanguage;
+    return (lang == 'ja') ? 'jp' : 'en';
+  }
+
   /// Loads the appropriate NetHack C-core shared library based on [langCode].
   /// On Android: loads 'libnethack_jp.so' or 'libnethack_en.so'
   /// On iOS: loads Dynamic Framework 'nethack_jp.framework/nethack_jp' or 'nethack_en.framework/nethack_en'

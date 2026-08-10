@@ -178,7 +178,6 @@ function(configure_nethack_target TARGET_NAME CORE_ROOT EXTRA_SOURCES IS_JP_TARG
         "src/zap.c"
         "src/tile.c"
         "sys/share/ioctl.c"
-        "sys/share/unixtty.c"
         "sys/share/posixregex.c"
     )
 
@@ -226,8 +225,8 @@ set(JP_EXTRA_SOURCES
 )
 configure_nethack_target(nethack_jp "${JPROOT}" "${JP_EXTRA_SOURCES}" TRUE)
 
-# 2. Target: nethack (libnethack.so - Default Fallback Alias Target)
-configure_nethack_target(nethack "${JPROOT}" "${JP_EXTRA_SOURCES}" TRUE)
+# 2. Target: nethack_en (libnethack_en.so - English Core Target)
+configure_nethack_target(nethack_en "${ENROOT}" "" FALSE)
 
-# 3. Target: nethack_en (libnethack_en.so - English Core Target, disabled for initial JP-first build)
-# configure_nethack_target(nethack_en "${ENROOT}" "" FALSE)
+# 3. Target: nethack (libnethack.so - Default Fallback Alias Target)
+configure_nethack_target(nethack "${JPROOT}" "${JP_EXTRA_SOURCES}" TRUE)

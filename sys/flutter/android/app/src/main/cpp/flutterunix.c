@@ -135,3 +135,12 @@ check_user_string(const char *optstr)
 	return FALSE;
 }
 
+/* Missing Unix / Terminal Compatibility Stubs for Flutter Port */
+void sethanguphandler(void (*f)(int)) { (void)f; }
+void introff(void) {}
+void intron(void) {}
+int child(int x) { (void)x; return 0; }
+void more(void) {}
+void linux_mapon(void) {}
+void linux_mapoff(void) {}
+void win_tty_init(void) {}
