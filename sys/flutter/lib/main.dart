@@ -179,7 +179,6 @@ class _MyHomePageState extends State<MyHomePage> {
   String _dpadPosition = 'bottom_left';
   String _shortcutPosition = 'bottom_right';
   String _msgPosition = 'top';
-  int _msgCharWidth = 30;
   String _statusPosition = 'top';
   String _cmdPanelPosition = 'bottom';
   int _layoutPattern = 1; // UIレイアウトパターン (1 or 2)
@@ -264,7 +263,6 @@ class _MyHomePageState extends State<MyHomePage> {
       _dpadPosition = prefs.getString('dpad_position') ?? 'bottom_left';
       _shortcutPosition = prefs.getString('shortcut_position') ?? 'bottom_right';
       _msgPosition = prefs.getString('msg_position') ?? 'top';
-      _msgCharWidth = prefs.getInt('msg_char_width') ?? 30;
       _statusPosition = prefs.getString('status_position') ?? 'top';
       _cmdPanelPosition = prefs.getString('cmd_panel_position') ?? 'bottom';
       _layoutPattern = prefs.getInt('layout_pattern') ?? 1;
@@ -2502,60 +2500,63 @@ class _MyHomePageState extends State<MyHomePage> {
         if (displayedLines.isEmpty) return const SizedBox.shrink();
 
         final screenWidth = MediaQuery.of(context).size.width;
-        final double? targetWidth = (_msgPosition == 'bottom' || _msgPosition == 'top')
-            ? null
-            : (screenWidth * (_msgCharWidth / 60.0)).clamp(180.0, screenWidth - 16.0);
+        final double maxWidth = screenWidth - 16.0;
 
-        return Container(
-          width: targetWidth,
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: _msgOpacity),
-            borderRadius: BorderRadius.circular(6.0),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: displayedLines.asMap().entries.map((entry) {
-              final index = entry.key;
-              final line = entry.value;
-              final isMoreLine = _screen.isMoreActive && index == displayedLines.length - 1;
-              final isToplineLine = isToplineActive &&
-                  index == displayedLines.length - 1 - (_screen.isMoreActive ? 1 : 0);
-              final double ratio = displayedLines.length > 1
-                  ? index / (displayedLines.length - 1)
-                  : 1.0;
-              final color = isMoreLine
-                  ? Colors.amber[400]!
-                  : isToplineLine
-                      ? Colors.cyanAccent[200]!
-                      : Color.lerp(Colors.white30, Colors.white, ratio)!;
+        return Align(
+          alignment: _getAlignment(_msgPosition),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxWidth),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: _msgOpacity),
+                borderRadius: BorderRadius.circular(6.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: displayedLines.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final line = entry.value;
+                  final isMoreLine = _screen.isMoreActive && index == displayedLines.length - 1;
+                  final isToplineLine = isToplineActive &&
+                      index == displayedLines.length - 1 - (_screen.isMoreActive ? 1 : 0);
+                  final double ratio = displayedLines.length > 1
+                      ? index / (displayedLines.length - 1)
+                      : 1.0;
+                  final color = isMoreLine
+                      ? Colors.amber[400]!
+                      : isToplineLine
+                          ? Colors.cyanAccent[200]!
+                          : Color.lerp(Colors.white30, Colors.white, ratio)!;
 
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 2.0),
-                child: GestureDetector(
-                  onTap: () {
-                    if (_screen.isMoreActive) {
-                      _sendFfiKey(32, 'Space');
-                      _screen.setMoreActive(false);
-                    } else {
-                      _showMsgHistoryPanel();
-                    }
-                  },
-                  child: Text(
-                    line.replaceAll('\r', '').replaceAll('\n', ' '),
-                    style: TextStyle(
-                      color: color,
-                      fontFamily: 'monospace',
-                      fontSize: _msgFontSize,
-                      fontWeight: (isMoreLine || isToplineLine)
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 2.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (_screen.isMoreActive) {
+                          _sendFfiKey(32, 'Space');
+                          _screen.setMoreActive(false);
+                        } else {
+                          _showMsgHistoryPanel();
+                        }
+                      },
+                      child: Text(
+                        line.replaceAll('\r', '').replaceAll('\n', ' '),
+                        style: TextStyle(
+                          color: color,
+                          fontFamily: 'monospace',
+                          fontSize: _msgFontSize,
+                          fontWeight: (isMoreLine || isToplineLine)
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              );
-            }).toList(),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
         );
       },
@@ -2563,10 +2564,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
   Alignment _getAlignment(String position) {
     switch (position) {
+      case 'top':
       case 'top_left':
         return Alignment.topLeft;
       case 'top_right':
         return Alignment.topRight;
+      case 'bottom':
       case 'bottom_left':
         return Alignment.bottomLeft;
       case 'bottom_right':
@@ -2581,10 +2584,17 @@ class _MyHomePageState extends State<MyHomePage> {
       return const SizedBox.shrink();
     }
 
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
+    final screenHeight = screenSize.height;
+
     final statusTopOffset = (_statusPosition == 'top') ? _statusHeight : 0.0;
     final statusBottomOffset = (_statusPosition == 'bottom') ? _statusHeight : 0.0;
     final statusLeftOffset = (_statusPosition == 'left') ? _statusWidth : 0.0;
     final statusRightOffset = (_statusPosition == 'right') ? _statusWidth : 0.0;
+
+    final cmdWidth = screenWidth - statusLeftOffset - statusRightOffset;
+    final cmdHeight = screenHeight - statusTopOffset - statusBottomOffset;
 
     final cmdPanelScaledHeight = _cmdPanelHeight * _cmdPanelEffectiveScale;
     final cmdPanelScaledWidth = 130.0 * _cmdPanelEffectiveScale;
@@ -2673,41 +2683,53 @@ class _MyHomePageState extends State<MyHomePage> {
           bottom: _cmdPanelPosition == 'bottom'
               ? statusBottomOffset
               : (_cmdPanelPosition == 'left' || _cmdPanelPosition == 'right' ? statusBottomOffset : null),
-          child: Transform.scale(
-            scale: _cmdPanelEffectiveScale,
-            alignment: _cmdPanelPosition == 'top'
-                ? Alignment.topCenter
-                : (_cmdPanelPosition == 'bottom'
-                    ? Alignment.bottomCenter
-                    : (_cmdPanelPosition == 'left' ? Alignment.centerLeft : Alignment.centerRight)),
-            child: NetHackCmdPanel(
-              key: ValueKey(_controlsVersion),
-              opacity: _padOpacity,
-              showPanelNames: _showPanelNames,
-              position: _cmdPanelPosition,
-              isVertical: _cmdPanelPosition == 'left' || _cmdPanelPosition == 'right',
-              isKeyboardMode: _controllerMode == ControllerMode.keyboard,
-              extCmdList: _extCmdList.map((e) => {'command': e.command, 'description': e.description}).toList(),
-              onKeyPress: (key) => _sendKeysToC(key),
-              onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
-              onPanelHeightChanged: (height) {
-                if ((_cmdPanelHeight - height).abs() < 0.1) {
-                  return;
-                }
-                if (!mounted) {
-                  return;
-                }
-                setState(() {
-                  _cmdPanelHeight = height;
-                });
-              },
-              onToggleMode: () {
-                setState(() {
-                  _controllerMode = _controllerMode == ControllerMode.keyboard
-                      ? ControllerMode.pad
-                      : ControllerMode.keyboard;
-                });
-              },
+          child: SizedBox(
+            width: (_cmdPanelPosition == 'left' || _cmdPanelPosition == 'right')
+                ? (130.0 * _cmdPanelEffectiveScale)
+                : cmdWidth,
+            height: (_cmdPanelPosition == 'top' || _cmdPanelPosition == 'bottom')
+                ? (_cmdPanelHeight * _cmdPanelEffectiveScale)
+                : cmdHeight,
+            child: FittedBox(
+              fit: BoxFit.fill,
+              alignment: _cmdPanelPosition == 'top'
+                  ? Alignment.topCenter
+                  : (_cmdPanelPosition == 'bottom'
+                      ? Alignment.bottomCenter
+                      : (_cmdPanelPosition == 'left' ? Alignment.centerLeft : Alignment.centerRight)),
+              child: SizedBox(
+                width: (_cmdPanelPosition == 'left' || _cmdPanelPosition == 'right') ? 130.0 : cmdWidth,
+                height: (_cmdPanelPosition == 'top' || _cmdPanelPosition == 'bottom') ? _cmdPanelHeight : cmdHeight,
+                child: NetHackCmdPanel(
+                  key: ValueKey(_controlsVersion),
+                  opacity: _padOpacity,
+                  showPanelNames: _showPanelNames,
+                  position: _cmdPanelPosition,
+                  isVertical: _cmdPanelPosition == 'left' || _cmdPanelPosition == 'right',
+                  isKeyboardMode: _controllerMode == ControllerMode.keyboard,
+                  extCmdList: _extCmdList.map((e) => {'command': e.command, 'description': e.description}).toList(),
+                  onKeyPress: (key) => _sendKeysToC(key),
+                  onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
+                  onPanelHeightChanged: (height) {
+                    if ((_cmdPanelHeight - height).abs() < 0.1) {
+                      return;
+                    }
+                    if (!mounted) {
+                      return;
+                    }
+                    setState(() {
+                      _cmdPanelHeight = height;
+                    });
+                  },
+                  onToggleMode: () {
+                    setState(() {
+                      _controllerMode = _controllerMode == ControllerMode.keyboard
+                          ? ControllerMode.pad
+                          : ControllerMode.keyboard;
+                    });
+                  },
+                ),
+              ),
             ),
           ),
         ),
@@ -2743,23 +2765,31 @@ class _MyHomePageState extends State<MyHomePage> {
             right: dpadRight,
             child: Padding(
               padding: const EdgeInsets.only(top: padTopPadding),
-              child: Transform.scale(
-                scale: _dpadEffectiveScale,
-                alignment: _getAlignment(_dpadPosition),
-                child: NetHackDPad(
-                  opacity: _padOpacity,
-                  directionLabels: _buildDirectionLabels(),
-                  centerLabel: _isDirectionPromptActive ? '.' : _moveModeLabel(_dPadMoveMode),
-                  onDirectionPress: (viKey) {
-                    _sendModeAppliedDirection(viKey);
-                  },
-                  onDirectionLongPress: (viKey) {
-                    _sendModeAppliedDirection(viKey, modeOverride: _dPadLongPressMoveMode);
-                  },
-                  onCenterTap: _handleCenterTap,
-                  onCenterLongPress: () {
-                    _showMoveModeSelectDialog();
-                  },
+              child: SizedBox(
+                width: 150.0 * _dpadEffectiveScale,
+                height: 150.0 * _dpadEffectiveScale,
+                child: FittedBox(
+                  fit: BoxFit.fill,
+                  alignment: _getAlignment(_dpadPosition),
+                  child: SizedBox(
+                    width: 150.0,
+                    height: 150.0,
+                    child: NetHackDPad(
+                      opacity: _padOpacity,
+                      directionLabels: _buildDirectionLabels(),
+                      centerLabel: _isDirectionPromptActive ? '.' : _moveModeLabel(_dPadMoveMode),
+                      onDirectionPress: (viKey) {
+                        _sendModeAppliedDirection(viKey);
+                      },
+                      onDirectionLongPress: (viKey) {
+                        _sendModeAppliedDirection(viKey, modeOverride: _dPadLongPressMoveMode);
+                      },
+                      onCenterTap: _handleCenterTap,
+                      onCenterLongPress: () {
+                        _showMoveModeSelectDialog();
+                      },
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -2772,16 +2802,24 @@ class _MyHomePageState extends State<MyHomePage> {
             right: scRight,
             child: Padding(
               padding: const EdgeInsets.only(top: padTopPadding),
-              child: Transform.scale(
-                scale: _shortcutPadEffectiveScale,
-                alignment: _getAlignment(_shortcutPosition),
-                child: NetHackShortcutPad(
-                  key: ValueKey(_controlsVersion),
-                  opacity: _padOpacity,
-                  onKeyPress: (key) => _sendKeysToC(key),
-                  onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
-                  onShortcut: (cmd) => _sendShortcutToC(cmd),
-                  onShortcutLongPress: (index) => _showShortcutEditDialog(index),
+              child: SizedBox(
+                width: 150.0 * _shortcutPadEffectiveScale,
+                height: 150.0 * _shortcutPadEffectiveScale,
+                child: FittedBox(
+                  fit: BoxFit.fill,
+                  alignment: _getAlignment(_shortcutPosition),
+                  child: SizedBox(
+                    width: 150.0,
+                    height: 150.0,
+                    child: NetHackShortcutPad(
+                      key: ValueKey(_controlsVersion),
+                      opacity: _padOpacity,
+                      onKeyPress: (key) => _sendKeysToC(key),
+                      onRawKeyCode: (code) => _sendFfiKey(code, "Raw($code)"),
+                      onShortcut: (cmd) => _sendShortcutToC(cmd),
+                      onShortcutLongPress: (index) => _showShortcutEditDialog(index),
+                    ),
+                  ),
                 ),
               ),
             ),
