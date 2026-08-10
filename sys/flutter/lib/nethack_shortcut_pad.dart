@@ -26,7 +26,7 @@ class NetHackShortcutPad extends StatefulWidget {
 class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
   final List<CmdItem> _shortcuts = List.filled(9, const CmdItem(command: ""));
   final List<String> _defaultShortcuts = [
-    'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', '#attributes'
+    'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', r'\\e'
   ];
   bool _isLoading = true;
 

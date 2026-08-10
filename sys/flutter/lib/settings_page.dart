@@ -99,7 +99,7 @@ class _SettingsPageState extends State<SettingsPage> {
   // ショートカット設定 (0～8)
   final List<String> _shortcuts = List.filled(9, "");
   final List<String> _defaultShortcuts = [
-    'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', '#attributes'
+    'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', r'\\e'
   ];
   final List<String> _shortcutLabels = [
     "左上ボタン (0)", "上中央ボタン (1)", "右上ボタン (2)",

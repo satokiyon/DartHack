@@ -29,7 +29,7 @@ void showShortcutEditDialog({
 
   SharedPreferences.getInstance().then((prefs) {
     final defaultShortcuts = [
-      'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', '#attributes'
+      'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', r'\\e'
     ];
     final currentVal = prefs.getString('shortcut_btn_$index') ?? defaultShortcuts[index];
     final parsed = CmdItem.parseCmds(currentVal);
