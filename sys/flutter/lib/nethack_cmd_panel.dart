@@ -86,6 +86,9 @@ class NetHackCmdPanel extends StatefulWidget {
   final String position;
   final bool isKeyboardMode;
 
+  final bool? isExpanded;
+  final ValueChanged<bool>? onExpandedChanged;
+
   const NetHackCmdPanel({
     super.key,
     required this.onKeyPress,
@@ -99,6 +102,8 @@ class NetHackCmdPanel extends StatefulWidget {
     this.isVertical = false,
     this.position = 'top',
     this.isKeyboardMode = false,
+    this.isExpanded,
+    this.onExpandedChanged,
   });
 
   @override
@@ -110,6 +115,19 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   bool _isLoading = true;
   bool _isExpanded = false;
   double _lastReportedHeight = -1;
+
+  bool get _effectiveIsExpanded => widget.isExpanded ?? _isExpanded;
+
+  void _setExpanded(bool value) {
+    if (widget.isExpanded != null) {
+      widget.onExpandedChanged?.call(value);
+    } else {
+      setState(() {
+        _isExpanded = value;
+      });
+      widget.onExpandedChanged?.call(value);
+    }
+  }
 
   static const List<String> defaultCmdsStr = [
     '[Kbd]', '#', '20s', '.', ':', ';', ',', 'e', 'd', 'r', 'z', 'Z', 'q',
@@ -234,7 +252,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
       );
     }
 
-    final visiblePanels = _isExpanded ? _panels : [_panels.first];
+    final visiblePanels = _effectiveIsExpanded ? _panels : [_panels.first];
 
     if (widget.isVertical) {
       const double panelWidth = 130.0;
@@ -246,15 +264,15 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
           final velocity = details.primaryVelocity!;
           if (widget.position == 'left') {
             if (velocity > 100 && _panels.length > 1) {
-              setState(() => _isExpanded = true);
+              _setExpanded(true);
             } else if (velocity < -100) {
-              setState(() => _isExpanded = false);
+              _setExpanded(false);
             }
           } else if (widget.position == 'right') {
             if (velocity < -100 && _panels.length > 1) {
-              setState(() => _isExpanded = true);
+              _setExpanded(true);
             } else if (velocity > 100) {
-              setState(() => _isExpanded = false);
+              _setExpanded(false);
             }
           }
         },
@@ -278,8 +296,8 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                 alignment: Alignment.center,
                 child: Text(
                   widget.position == 'left'
-                      ? (_isExpanded ? "← 閉じる" : "内側(→)スワイプで展開")
-                      : (_isExpanded ? "閉じる →" : "内側(←)スワイプで展開"),
+                      ? (_effectiveIsExpanded ? "← 閉じる" : "内側(→)スワイプで展開")
+                      : (_effectiveIsExpanded ? "閉じる →" : "内側(←)スワイプで展開"),
                   style: const TextStyle(color: Colors.white60, fontSize: 9, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -341,22 +359,22 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
         if (details.primaryVelocity == null) return;
         if (widget.position == 'top') {
           if (details.primaryVelocity! > 100) {
-            if (_panels.length > 1 && !_isExpanded) {
-              setState(() => _isExpanded = true);
+            if (_panels.length > 1 && !_effectiveIsExpanded) {
+              _setExpanded(true);
             }
           } else if (details.primaryVelocity! < -100) {
-            if (_isExpanded) {
-              setState(() => _isExpanded = false);
+            if (_effectiveIsExpanded) {
+              _setExpanded(false);
             }
           }
         } else {
           if (details.primaryVelocity! < -100) {
-            if (_panels.length > 1 && !_isExpanded) {
-              setState(() => _isExpanded = true);
+            if (_panels.length > 1 && !_effectiveIsExpanded) {
+              _setExpanded(true);
             }
           } else if (details.primaryVelocity! > 100) {
-            if (_isExpanded) {
-              setState(() => _isExpanded = false);
+            if (_effectiveIsExpanded) {
+              _setExpanded(false);
             }
           }
         }
@@ -383,14 +401,14 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                 children: [
                   if (_panels.length > 1) ...[
                     Icon(
-                      _isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up,
+                      _effectiveIsExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up,
                       color: Colors.white60,
                       size: 14,
                     ),
                     const SizedBox(width: 4),
                   ],
                   Text(
-                    _isExpanded
+                    _effectiveIsExpanded
                         ? "パネルを閉じる"
                         : (_panels.length > 1
                             ? (widget.position == 'top' ? "下へスワイプして全パネルを表示" : "上へスワイプして全パネルを表示")

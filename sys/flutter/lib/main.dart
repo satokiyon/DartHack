@@ -201,6 +201,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // 設定変更の即時反映用バージョンカウンター
   int _controlsVersion = 0;
   double _cmdPanelHeight = 58.0;
+  bool _isCmdPanelExpanded = false;
   double _statusHeight = 38.0;
   double _statusWidth = 70.0;
   bool _showPanelNames = true;
@@ -265,6 +266,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _msgPosition = prefs.getString('msg_position') ?? 'top';
       _statusPosition = prefs.getString('status_position') ?? 'top';
       _cmdPanelPosition = prefs.getString('cmd_panel_position') ?? 'bottom';
+      _isCmdPanelExpanded = prefs.getBool('cmd_panel_expanded') ?? false;
       _layoutPattern = prefs.getInt('layout_pattern') ?? 1;
       _enabledDPadMoveModes = _parseEnabledMoveModes(
         prefs.getString('dpad_enabled_move_modes') ?? 'NORMAL,F_CMD',
@@ -2707,6 +2709,16 @@ class _MyHomePageState extends State<MyHomePage> {
                   position: _cmdPanelPosition,
                   isVertical: _cmdPanelPosition == 'left' || _cmdPanelPosition == 'right',
                   isKeyboardMode: _controllerMode == ControllerMode.keyboard,
+                  isExpanded: _isCmdPanelExpanded,
+                  onExpandedChanged: (expanded) async {
+                    if (_isCmdPanelExpanded != expanded) {
+                      setState(() {
+                        _isCmdPanelExpanded = expanded;
+                      });
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setBool('cmd_panel_expanded', expanded);
+                    }
+                  },
                   extCmdList: _extCmdList.map((e) => {'command': e.command, 'description': e.description}).toList(),
                   onKeyPress: (key) => _sendKeysToC(key),
                   onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
