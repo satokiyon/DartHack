@@ -7,3 +7,6 @@
 [submodule "submodules/pdcursesmod"]
 	path = submodules/pdcursesmod
 	url = https://github.com/Bill-Gray/PDCursesMod.git
+[submodule "c_core/nethack_en"]
+	path = c_core/nethack_en
+	url = https://github.com/NetHack/NetHack.git

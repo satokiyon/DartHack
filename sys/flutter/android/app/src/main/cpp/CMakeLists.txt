@@ -2,7 +2,15 @@ cmake_minimum_required(VERSION 3.10.2)
 project(nethack VERSION 5.0.0 LANGUAGES C)
 
 get_filename_component(NHSROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../.." ABSOLUTE)
+set(JPROOT "${NHSROOT}/c_core/nethack_jp")
+set(ENROOT "${NHSROOT}/c_core/nethack_en")
+set(LUAROOT "${NHSROOT}/submodules/lua")
+set(PDCURSESROOT "${NHSROOT}/submodules/pdcurses")
+set(PDCURSESMODROOT "${NHSROOT}/submodules/pdcursesmod")
+
 message(STATUS "NetHack Root Path (NHSROOT): ${NHSROOT}")
+message(STATUS "NetHack JP Core Path (JPROOT): ${JPROOT}")
+message(STATUS "NetHack EN Core Path (ENROOT): ${ENROOT}")
 
 if(NOT DEFINED BUILD_ID)
     string(TIMESTAMP BUILD_ID "%Y%m%d_%H%M%S")
@@ -23,208 +31,203 @@ add_definitions(
     -DLUA_USE_POSIX
 )
 
-# Include directories
-include_directories(
-    "${NHSROOT}/include"
-    "${NHSROOT}/lib/lua-5.4.8/src"
-)
-
-# NetHack C Core Sources
-set(NETHACK_CORE_SOURCES
-    "${NHSROOT}/src/allmain.c"
-    "${NHSROOT}/src/alloc.c"
-    "${NHSROOT}/src/apply.c"
-    "${NHSROOT}/src/artifact.c"
-    "${NHSROOT}/src/attrib.c"
-    "${NHSROOT}/src/ball.c"
-    "${NHSROOT}/src/bones.c"
-    "${NHSROOT}/src/botl.c"
-    "${NHSROOT}/src/calendar.c"
-    "${NHSROOT}/src/cfgfiles.c"
-    "${NHSROOT}/src/cmd.c"
-    "${NHSROOT}/src/coloratt.c"
-    "${NHSROOT}/src/date.c"
-    "${NHSROOT}/src/dbridge.c"
-    "${NHSROOT}/src/decl.c"
-    "${NHSROOT}/src/detect.c"
-    "${NHSROOT}/src/dig.c"
-    "${NHSROOT}/src/display.c"
-    "${NHSROOT}/src/dlb.c"
-    "${NHSROOT}/src/do.c"
-    "${NHSROOT}/src/do_name.c"
-    "${NHSROOT}/src/do_wear.c"
-    "${NHSROOT}/src/dog.c"
-    "${NHSROOT}/src/dogmove.c"
-    "${NHSROOT}/src/dokick.c"
-    "${NHSROOT}/src/dothrow.c"
-    "${NHSROOT}/src/drawing.c"
-    "${NHSROOT}/src/dungeon.c"
-    "${NHSROOT}/src/earlyarg.c"
-    "${NHSROOT}/src/eat.c"
-    "${NHSROOT}/src/end.c"
-    "${NHSROOT}/src/engrave.c"
-    "${NHSROOT}/src/exper.c"
-    "${NHSROOT}/src/explode.c"
-    "${NHSROOT}/src/extralev.c"
-    "${NHSROOT}/src/files.c"
-    "${NHSROOT}/src/fountain.c"
-    "${NHSROOT}/src/hack.c"
-    "${NHSROOT}/src/hacklib.c"
-    "${NHSROOT}/src/getpos.c"
-    "${NHSROOT}/src/glyphs.c"
-    "${NHSROOT}/src/iactions.c"
-    "${NHSROOT}/src/insight.c"
-    "${NHSROOT}/src/invent.c"
-    "${NHSROOT}/src/isaac64.c"
-    "${NHSROOT}/src/light.c"
-    "${NHSROOT}/src/lock.c"
-    "${NHSROOT}/src/mail.c"
-    "${NHSROOT}/src/makemon.c"
-    "${NHSROOT}/src/mcastu.c"
-    "${NHSROOT}/src/mdlib.c"
-    "${NHSROOT}/src/mhitm.c"
-    "${NHSROOT}/src/mhitu.c"
-    "${NHSROOT}/src/minion.c"
-    "${NHSROOT}/src/mklev.c"
-    "${NHSROOT}/src/mkmap.c"
-    "${NHSROOT}/src/mkmaze.c"
-    "${NHSROOT}/src/mkobj.c"
-    "${NHSROOT}/src/mkroom.c"
-    "${NHSROOT}/src/mon.c"
-    "${NHSROOT}/src/mondata.c"
-    "${NHSROOT}/src/monmove.c"
-    "${NHSROOT}/src/monst.c"
-    "${NHSROOT}/src/mplayer.c"
-    "${NHSROOT}/src/mthrowu.c"
-    "${NHSROOT}/src/muse.c"
-    "${NHSROOT}/src/music.c"
-    "${NHSROOT}/src/nhlobj.c"
-    "${NHSROOT}/src/nhlsel.c"
-    "${NHSROOT}/src/nhlua.c"
-    "${NHSROOT}/src/nhmd4.c"
-    "${NHSROOT}/src/o_init.c"
-    "${NHSROOT}/src/objects.c"
-    "${NHSROOT}/src/objnam.c"
-    "${NHSROOT}/src/options.c"
-    "${NHSROOT}/src/pager.c"
-    "${NHSROOT}/src/pickup.c"
-    "${NHSROOT}/src/pline.c"
-    "${NHSROOT}/src/polyself.c"
-    "${NHSROOT}/src/potion.c"
-    "${NHSROOT}/src/pray.c"
-    "${NHSROOT}/src/priest.c"
-    "${NHSROOT}/src/quest.c"
-    "${NHSROOT}/src/questpgr.c"
-    "${NHSROOT}/src/read.c"
-    "${NHSROOT}/src/rect.c"
-    "${NHSROOT}/src/region.c"
-    "${NHSROOT}/src/report.c"
-    "${NHSROOT}/src/restore.c"
-    "${NHSROOT}/src/revision.c"
-    "${NHSROOT}/src/rip.c"
-    "${NHSROOT}/src/rnd.c"
-    "${NHSROOT}/src/role.c"
-    "${NHSROOT}/src/rumors.c"
-    "${NHSROOT}/src/save.c"
-    "${NHSROOT}/src/selvar.c"
-    "${NHSROOT}/src/sfbase.c"
-    "${NHSROOT}/src/sfstruct.c"
-    "${NHSROOT}/src/shk.c"
-    "${NHSROOT}/src/shknam.c"
-    "${NHSROOT}/src/sit.c"
-    "${NHSROOT}/src/sounds.c"
-    "${NHSROOT}/src/sp_lev.c"
-    "${NHSROOT}/src/spell.c"
-    "${NHSROOT}/src/stairs.c"
-    "${NHSROOT}/src/steal.c"
-    "${NHSROOT}/src/steed.c"
-    "${NHSROOT}/src/strutil.c"
-    "${NHSROOT}/src/symbols.c"
-    "${NHSROOT}/src/sys.c"
-    "${NHSROOT}/src/teleport.c"
-    "${NHSROOT}/src/timeout.c"
-    "${NHSROOT}/src/topten.c"
-    "${NHSROOT}/src/track.c"
-    "${NHSROOT}/src/trap.c"
-    "${NHSROOT}/src/u_init.c"
-    "${NHSROOT}/src/utf8map.c"
-    "${NHSROOT}/src/uhitm.c"
-    "${NHSROOT}/src/vault.c"
-    "${NHSROOT}/src/version.c"
-    "${NHSROOT}/src/vision.c"
-    "${NHSROOT}/src/weapon.c"
-    "${NHSROOT}/src/were.c"
-    "${NHSROOT}/src/wield.c"
-    "${NHSROOT}/src/windows.c"
-    "${NHSROOT}/src/wizard.c"
-    "${NHSROOT}/src/wizcmds.c"
-    "${NHSROOT}/src/worm.c"
-    "${NHSROOT}/src/worn.c"
-    "${NHSROOT}/src/write.c"
-    "${NHSROOT}/src/zap.c"
-    "${NHSROOT}/src/jp_data_lookup.c"
-    "${NHSROOT}/src/mon_jp.c"
-    "${NHSROOT}/src/obj_jp.c"
-    "${NHSROOT}/src/spell_jp.c"
-    "${NHSROOT}/src/tile.c"
-)
-
-# OS & Window Port Sources
+# Common OS & Window Port Sources
 set(NETHACK_OS_SOURCES
-    "${NHSROOT}/sys/share/ioctl.c"
-    "${NHSROOT}/sys/share/unixtty.c"
-    "${NHSROOT}/sys/share/posixregex.c"
     "fluttermain.c"
     "flutterunix.c"
     "winflutter.c"
 )
 
-# Lua 5.4.8 Sources (excluding standalone executables lua.c and luac.c)
-set(LUA_SOURCES
-    "${NHSROOT}/lib/lua-5.4.8/src/lapi.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lcode.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lctype.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/ldebug.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/ldo.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/ldump.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lfunc.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lgc.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/llex.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lmem.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lobject.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lopcodes.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lparser.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lstate.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lstring.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/ltable.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/ltm.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lundump.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lvm.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lzio.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lauxlib.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lbaselib.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lcorolib.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/ldblib.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/liolib.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lmathlib.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/loadlib.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/loslib.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lstrlib.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/ltablib.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/lutf8lib.c"
-    "${NHSROOT}/lib/lua-5.4.8/src/linit.c"
-)
+# Lua 5.4 Sources (Exclude lua.c, luac.c, and onelua.c)
+file(GLOB LUA_SOURCES "${LUAROOT}/*.c")
+list(FILTER LUA_SOURCES EXCLUDE REGEX ".*/(lua|luac|onelua)\\.c$")
 
-add_library(nethack SHARED
-    ${NETHACK_CORE_SOURCES}
-    ${NETHACK_OS_SOURCES}
-    ${LUA_SOURCES}
-)
+# Helper function to configure target safely with file existence checks
+function(configure_nethack_target TARGET_NAME CORE_ROOT EXTRA_SOURCES IS_JP_TARGET)
+    set(POTENTIAL_CORE_SOURCES
+        "src/allmain.c"
+        "src/alloc.c"
+        "src/apply.c"
+        "src/artifact.c"
+        "src/attrib.c"
+        "src/ball.c"
+        "src/bones.c"
+        "src/botl.c"
+        "src/calendar.c"
+        "src/cfgfiles.c"
+        "src/cmd.c"
+        "src/coloratt.c"
+        "src/date.c"
+        "src/dbridge.c"
+        "src/decl.c"
+        "src/detect.c"
+        "src/dig.c"
+        "src/display.c"
+        "src/dlb.c"
+        "src/do.c"
+        "src/do_name.c"
+        "src/do_wear.c"
+        "src/dog.c"
+        "src/dogmove.c"
+        "src/dokick.c"
+        "src/dothrow.c"
+        "src/drawing.c"
+        "src/dungeon.c"
+        "src/earlyarg.c"
+        "src/eat.c"
+        "src/end.c"
+        "src/engrave.c"
+        "src/exper.c"
+        "src/explode.c"
+        "src/extralev.c"
+        "src/files.c"
+        "src/fountain.c"
+        "src/hack.c"
+        "src/hacklib.c"
+        "src/getpos.c"
+        "src/glyphs.c"
+        "src/iactions.c"
+        "src/insight.c"
+        "src/invent.c"
+        "src/isaac64.c"
+        "src/light.c"
+        "src/lock.c"
+        "src/mail.c"
+        "src/makemon.c"
+        "src/mcastu.c"
+        "src/mdlib.c"
+        "src/mhitm.c"
+        "src/mhitu.c"
+        "src/minion.c"
+        "src/mklev.c"
+        "src/mkmap.c"
+        "src/mkmaze.c"
+        "src/mkobj.c"
+        "src/mkroom.c"
+        "src/mon.c"
+        "src/mondata.c"
+        "src/monmove.c"
+        "src/monst.c"
+        "src/mplayer.c"
+        "src/mthrowu.c"
+        "src/muse.c"
+        "src/music.c"
+        "src/nhlobj.c"
+        "src/nhlsel.c"
+        "src/nhlua.c"
+        "src/nhmd4.c"
+        "src/o_init.c"
+        "src/objects.c"
+        "src/objnam.c"
+        "src/options.c"
+        "src/pager.c"
+        "src/pickup.c"
+        "src/pline.c"
+        "src/polyself.c"
+        "src/potion.c"
+        "src/pray.c"
+        "src/priest.c"
+        "src/quest.c"
+        "src/questpgr.c"
+        "src/read.c"
+        "src/rect.c"
+        "src/region.c"
+        "src/report.c"
+        "src/restore.c"
+        "src/revision.c"
+        "src/rip.c"
+        "src/rnd.c"
+        "src/role.c"
+        "src/rumors.c"
+        "src/save.c"
+        "src/selvar.c"
+        "src/sfbase.c"
+        "src/sfstruct.c"
+        "src/shk.c"
+        "src/shknam.c"
+        "src/sit.c"
+        "src/sounds.c"
+        "src/sp_lev.c"
+        "src/spell.c"
+        "src/stairs.c"
+        "src/steal.c"
+        "src/steed.c"
+        "src/strutil.c"
+        "src/symbols.c"
+        "src/sys.c"
+        "src/teleport.c"
+        "src/timeout.c"
+        "src/topten.c"
+        "src/track.c"
+        "src/trap.c"
+        "src/u_init.c"
+        "src/utf8map.c"
+        "src/uhitm.c"
+        "src/vault.c"
+        "src/version.c"
+        "src/vision.c"
+        "src/weapon.c"
+        "src/were.c"
+        "src/wield.c"
+        "src/windows.c"
+        "src/wizard.c"
+        "src/wizcmds.c"
+        "src/worm.c"
+        "src/worn.c"
+        "src/write.c"
+        "src/zap.c"
+        "src/tile.c"
+        "sys/share/ioctl.c"
+        "sys/share/unixtty.c"
+        "sys/share/posixregex.c"
+    )
 
-find_library(log-lib log)
-find_library(z-lib z)
-target_link_libraries(nethack
-    ${log-lib}
-    ${z-lib}
-    m
+    set(RESOLVED_CORE_SOURCES "")
+    foreach(src_rel IN LISTS POTENTIAL_CORE_SOURCES)
+        set(full_path "${CORE_ROOT}/${src_rel}")
+        if(EXISTS "${full_path}")
+            list(APPEND RESOLVED_CORE_SOURCES "${full_path}")
+        endif()
+    endforeach()
+
+    add_library(${TARGET_NAME} SHARED
+        ${RESOLVED_CORE_SOURCES}
+        ${EXTRA_SOURCES}
+        ${NETHACK_OS_SOURCES}
+        ${LUA_SOURCES}
+    )
+
+    if(${IS_JP_TARGET})
+        target_compile_definitions(${TARGET_NAME} PRIVATE NETHACK_JP)
+    endif()
+
+    target_include_directories(${TARGET_NAME} PRIVATE
+        "${CORE_ROOT}/include"
+        "${LUAROOT}"
+        "${PDCURSESROOT}"
+        "${PDCURSESMODROOT}"
+    )
+
+    find_library(log-lib log)
+    find_library(z-lib z)
+    target_link_libraries(${TARGET_NAME}
+        ${log-lib}
+        ${z-lib}
+        m
+    )
+endfunction()
+
+# 1. Target: nethack_jp (libnethack_jp.so - Japanese Core Target)
+set(JP_EXTRA_SOURCES
+    "${JPROOT}/src/jp_data_lookup.c"
+    "${JPROOT}/src/mon_jp.c"
+    "${JPROOT}/src/obj_jp.c"
+    "${JPROOT}/src/spell_jp.c"
 )
+configure_nethack_target(nethack_jp "${JPROOT}" "${JP_EXTRA_SOURCES}" TRUE)
+
+# 2. Target: nethack (libnethack.so - Default Fallback Alias Target)
+configure_nethack_target(nethack "${JPROOT}" "${JP_EXTRA_SOURCES}" TRUE)
+
+# 3. Target: nethack_en (libnethack_en.so - English Core Target, disabled for initial JP-first build)
+# configure_nethack_target(nethack_en "${ENROOT}" "" FALSE)

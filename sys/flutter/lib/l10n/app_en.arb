@@ -1,0 +1,9 @@
+{
+  "@@locale": "en",
+  "appTitle": "DartHack",
+  "selectLanguage": "Select Language",
+  "japanese": "日本語 (Japanese)",
+  "english": "English",
+  "startGame": "Start Game",
+  "settings": "Settings"
+}

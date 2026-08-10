@@ -1,6 +1,7 @@
 #include "hack.h"
 
 extern void debuglog(const char *fmt, ...);
+extern boolean recover_savefile(void);
 
 #include <errno.h>
 #include <sys/stat.h>

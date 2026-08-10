@@ -42,6 +42,14 @@ static int flutter_nhgetch(void);
 static void flutter_nhbell(void);
 extern char *decode_mixed(char *, const char *); // src/windows.c の関数 (\GXXXXNNNN → showsym 1 文字)
 
+#ifdef NETHACK_JP
+extern const char *jp_role_name_for_display(int role_idx, int gender);
+extern const char *jp_race_noun_for_display(int race_idx);
+#else
+#define jp_role_name_for_display(r, g) (roles[(r)].name.m)
+#define jp_race_noun_for_display(r) (races[(r)].noun)
+#endif
+
 static int palette[CLR_MAX] = {
 	0xFF555555,	// CLR_BLACK
 	0xFFFF0000,	// CLR_RED
@@ -499,14 +507,18 @@ static void flutter_apply_ad_reward(int amount) {
     boolean is_hp = (rn2(2) == 0);
     if (is_hp) {
         healup(amount, 0, FALSE, FALSE);
+#ifdef NETHACK_JP
         u.uconduct.rested_by_ad++;
+#endif
         pline("広告を見て休息した！体力(HP)が回復した。");
     } else {
         u.uen += amount;
         if (u.uen > u.uenmax)
             u.uen = u.uenmax;
         disp.botl = TRUE;
+#ifdef NETHACK_JP
         u.uconduct.rested_by_ad++;
+#endif
         pline("広告を見て休息した！魔力(Pw)が回復した。");
     }
 }
