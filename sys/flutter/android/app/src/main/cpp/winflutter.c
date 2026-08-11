@@ -48,9 +48,6 @@ extern const char *jp_race_noun_for_display(int race_idx);
 #else
 #define jp_role_name_for_display(r, g) (roles[(r)].name.m)
 #define jp_race_noun_for_display(r) (races[(r)].noun)
-
-int dosh(void) { return 0; }
-boolean recover_savefile(void) { return FALSE; }
 #endif
 
 static int palette[CLR_MAX] = {

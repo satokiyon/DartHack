@@ -144,3 +144,9 @@ void more(void) {}
 void linux_mapon(void) {}
 void linux_mapoff(void) {}
 void win_tty_init(void) {}
+int dosh(void) { return 0; }
+
+#ifndef NETHACK_JP
+boolean recover_savefile(void) { return FALSE; }
+#endif
+
