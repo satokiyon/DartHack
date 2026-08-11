@@ -1,6 +1,7 @@
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
+import 'nethack_core_loader.dart';
 
 // コールバックの型定義
 typedef CreateWindowCallback = Void Function(Int32 winId, Int32 type);
@@ -203,12 +204,16 @@ class NetHackFfi {
   late final RegisterDartLogDart registerDartLog;
   late final RegisterCallbacksStructDart registerCallbacksStruct;
 
-  NetHackFfi() {
+  NetHackFfi([String langCode = 'ja']) {
     try {
-      _lib = DynamicLibrary.open('libnethack.so');
+      _lib = NetHackCoreLoader.loadCore(langCode: langCode);
     } catch (_) {
-      // Windows デバッグ用フォールバック
-      _lib = DynamicLibrary.open('nethack_dummy.dll');
+      // Fallback for single library or debug
+      try {
+        _lib = DynamicLibrary.open('libnethack.so');
+      } catch (e) {
+        _lib = DynamicLibrary.open('nethack_dummy.dll');
+      }
     }
 
     try {

@@ -3,15 +3,103 @@ import '../widgets/guidebook_dialog.dart';
 
 class StartScreen extends StatelessWidget {
   final bool assetsReady;
+  final String selectedLanguage;
+  final ValueChanged<String> onLanguageChanged;
   final VoidCallback onStartGame;
   final VoidCallback onShowSettings;
 
   const StartScreen({
     super.key,
     required this.assetsReady,
+    required this.selectedLanguage,
+    required this.onLanguageChanged,
     required this.onStartGame,
     required this.onShowSettings,
   });
+
+  Widget _buildLanguageSelector(BuildContext context) {
+    final isJp = (selectedLanguage == 'ja');
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white24, width: 1),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () => onLanguageChanged('ja'),
+            borderRadius: BorderRadius.circular(16),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: isJp ? Colors.deepPurple : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: isJp
+                    ? [
+                        BoxShadow(
+                          color: Colors.deepPurple.withValues(alpha: 0.5),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        )
+                      ]
+                    : [],
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    '🇯🇵 日本語',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: isJp ? FontWeight.bold : FontWeight.normal,
+                      color: isJp ? Colors.white : Colors.white60,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          InkWell(
+            onTap: () => onLanguageChanged('en'),
+            borderRadius: BorderRadius.circular(16),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: !isJp ? Colors.deepPurple : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: !isJp
+                    ? [
+                        BoxShadow(
+                          color: Colors.deepPurple.withValues(alpha: 0.5),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        )
+                      ]
+                    : [],
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    '🇺🇸 English',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: !isJp ? FontWeight.bold : FontWeight.normal,
+                      color: !isJp ? Colors.white : Colors.white60,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +107,7 @@ class StartScreen extends StatelessWidget {
     final isPortrait = mediaQuery.orientation == Orientation.portrait;
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
+    final isJp = (selectedLanguage == 'ja');
 
     Widget startScreenContent;
 
@@ -31,7 +120,7 @@ class StartScreen extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.menu_book, color: Colors.white70, size: 28),
               onPressed: () => GuidebookDialog.show(context),
-              tooltip: "ガイドブック",
+              tooltip: isJp ? "ガイドブック" : "Guidebook",
               style: IconButton.styleFrom(
                 backgroundColor: Colors.black38,
                 padding: const EdgeInsets.all(8),
@@ -44,7 +133,7 @@ class StartScreen extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.settings, color: Colors.white70, size: 28),
               onPressed: onShowSettings,
-              tooltip: "ゲーム設定",
+              tooltip: isJp ? "ゲーム設定" : "Settings",
               style: IconButton.styleFrom(
                 backgroundColor: Colors.black38,
                 padding: const EdgeInsets.all(8),
@@ -65,20 +154,20 @@ class StartScreen extends StatelessWidget {
             ),
           ),
           Positioned(
-            bottom: 40,
+            bottom: 36,
             left: 24,
             right: 24,
             child: !assetsReady
-                ? const Column(
+                ? Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      CircularProgressIndicator(
+                      const CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Text(
-                        "アセットを準備中...",
-                        style: TextStyle(
+                        isJp ? "アセットを準備中..." : "Preparing assets...",
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -92,6 +181,8 @@ class StartScreen extends StatelessWidget {
                 : Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      _buildLanguageSelector(context),
+                      const SizedBox(height: 16),
                       Container(
                         width: double.infinity,
                         height: 56,
@@ -115,10 +206,10 @@ class StartScreen extends StatelessWidget {
                           child: InkWell(
                             onTap: onStartGame,
                             borderRadius: BorderRadius.circular(28),
-                            child: const Center(
+                            child: Center(
                               child: Text(
-                                '冒険を始める',
-                                style: TextStyle(
+                                isJp ? '冒険を始める' : 'Start Adventure',
+                                style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -150,7 +241,7 @@ class StartScreen extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.menu_book, color: Colors.white70, size: 28),
               onPressed: () => GuidebookDialog.show(context),
-              tooltip: "ガイドブック",
+              tooltip: isJp ? "ガイドブック" : "Guidebook",
               style: IconButton.styleFrom(
                 backgroundColor: Colors.black38,
                 padding: const EdgeInsets.all(8),
@@ -163,7 +254,7 @@ class StartScreen extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.settings, color: Colors.white70, size: 28),
               onPressed: onShowSettings,
-              tooltip: "ゲーム設定",
+              tooltip: isJp ? "ゲーム設定" : "Settings",
               style: IconButton.styleFrom(
                 backgroundColor: Colors.black38,
                 padding: const EdgeInsets.all(8),
@@ -190,16 +281,16 @@ class StartScreen extends StatelessWidget {
                     flex: 5,
                     child: Center(
                       child: !assetsReady
-                          ? const Column(
+                          ? Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                CircularProgressIndicator(
+                                const CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
                                 ),
-                                SizedBox(height: 12),
+                                const SizedBox(height: 12),
                                 Text(
-                                  "アセットを準備中...",
-                                  style: TextStyle(
+                                  isJp ? "アセットを準備中..." : "Preparing assets...",
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -213,6 +304,8 @@ class StartScreen extends StatelessWidget {
                           : Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
+                                _buildLanguageSelector(context),
+                                const SizedBox(height: 16),
                                 Container(
                                   width: double.infinity,
                                   height: 56,
@@ -236,10 +329,10 @@ class StartScreen extends StatelessWidget {
                                     child: InkWell(
                                       onTap: onStartGame,
                                       borderRadius: BorderRadius.circular(28),
-                                      child: const Center(
+                                      child: Center(
                                         child: Text(
-                                          '冒険を始める',
-                                          style: TextStyle(
+                                          isJp ? '冒険を始める' : 'Start Adventure',
+                                          style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.white,

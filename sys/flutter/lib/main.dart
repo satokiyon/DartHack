@@ -182,6 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _statusPosition = 'top';
   String _cmdPanelPosition = 'bottom';
   int _layoutPattern = 1; // UIレイアウトパターン (1 or 2)
+  String _selectedLanguage = 'ja'; // 'ja' または 'en'
   bool _isTopDrawerOpen = false;
   bool _isBottomDrawerOpen = false;
   bool _isMainGameStarted = false;
@@ -290,6 +291,9 @@ class _MyHomePageState extends State<MyHomePage> {
       _msgOpacity = prefs.getDouble('msg_opacity') ?? 0.70;
       _msgFontSize = prefs.getDouble('msg_font_size') ?? 13.0;
 
+      // 言語設定のロード
+      _selectedLanguage = prefs.getString('selected_language') ?? 'ja';
+
       // コントロールのバージョンを更新
       _controlsVersion++;
     });
@@ -298,6 +302,15 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     _syncNativeKeySettings();
     _triggerCenterOnPlayer();
+  }
+
+  Future<void> _changeLanguage(String lang) async {
+    if (lang != 'ja' && lang != 'en') return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selected_language', lang);
+    setState(() {
+      _selectedLanguage = lang;
+    });
   }
 
   DPadMoveMode _parseMoveMode(String name) {
@@ -1209,6 +1222,7 @@ class _MyHomePageState extends State<MyHomePage> {
           _workerSendPort?.send({
             'type': 'start',
             'assetsPath': _assetsPath,
+            'langCode': _selectedLanguage,
           });
         } else if (type == 'createWindow') {
           _screen.createWindow(message['winId'], message['winType']);
@@ -2852,6 +2866,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildStartScreen() {
     return StartScreen(
       assetsReady: _assetsReady,
+      selectedLanguage: _selectedLanguage,
+      onLanguageChanged: _changeLanguage,
       onStartGame: _startGame,
       onShowSettings: _showSettingsDialog,
     );

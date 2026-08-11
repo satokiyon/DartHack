@@ -297,42 +297,6 @@ class NetHackWorker {
       });
     });
 
-    // FFI とコールバックの初期化（1回のみ）
-    wlog("Initializing NetHackFfi and registering callbacks via struct...");
-    ffi = NetHackFfi();
-
-    ffi.registerDartLog(logCallable.nativeFunction);
-
-    final structPtr = calloc<FlutterCallbacksStruct>();
-    structPtr.ref.createCb = createCallable.nativeFunction;
-    structPtr.ref.clearCb = clearCallable.nativeFunction;
-    structPtr.ref.displayCb = displayCallable.nativeFunction;
-    structPtr.ref.destroyCb = destroyCallable.nativeFunction;
-    structPtr.ref.cursCb = cursCallable.nativeFunction;
-    structPtr.ref.putstrCb = putstrCallable.nativeFunction;
-    structPtr.ref.glyphCb = glyphCallable.nativeFunction;
-    structPtr.ref.inputCb = inputCallable.nativeFunction;
-    structPtr.ref.startMenuCb = startMenuCallable.nativeFunction;
-    structPtr.ref.addMenuCb = addMenuCallable.nativeFunction;
-    structPtr.ref.endMenuCb = endMenuCallable.nativeFunction;
-    structPtr.ref.selectMenuCb = selectMenuCallable.nativeFunction;
-    structPtr.ref.ynCb = ynCallable.nativeFunction;
-    structPtr.ref.getlineCb = getlineCallable.nativeFunction;
-    structPtr.ref.asknameCb = asknameCallable.nativeFunction;
-    structPtr.ref.exitCb = exitCallable.nativeFunction;
-    structPtr.ref.numberPadCb = numberPadCallable.nativeFunction;
-    structPtr.ref.cliparoundCb = cliparoundCallable.nativeFunction;
-    structPtr.ref.putMixedCb = putMixedCallable.nativeFunction;
-    structPtr.ref.newLevelRestCb = newLevelRestCallable.nativeFunction;
-
-    wlog("Calling ffi.registerCallbacksStruct...");
-    ffi.registerCallbacksStruct(structPtr);
-    wlog("ffi.registerCallbacksStruct returned.");
-
-    wlog("Freeing structPtr...");
-    calloc.free(structPtr);
-    wlog("calloc.free completed.");
-
     wlog("Sending ready message to UI Isolate...");
     uiSendPort.send({'type': 'ready', 'sendPort': receivePort.sendPort});
     wlog("uiSendPort.send ready completed.");
@@ -344,9 +308,46 @@ class NetHackWorker {
           final type = message['type'];
           if (type == 'start') {
             final assetsPath = message['assetsPath'] as String;
+            final langCode = (message['langCode'] as String?) ?? 'ja';
+
+            wlog("Initializing NetHackFfi for langCode='$langCode' and registering callbacks via struct...");
+            ffi = NetHackFfi(langCode);
+
+            ffi.registerDartLog(logCallable.nativeFunction);
+
+            final structPtr = calloc<FlutterCallbacksStruct>();
+            structPtr.ref.createCb = createCallable.nativeFunction;
+            structPtr.ref.clearCb = clearCallable.nativeFunction;
+            structPtr.ref.displayCb = displayCallable.nativeFunction;
+            structPtr.ref.destroyCb = destroyCallable.nativeFunction;
+            structPtr.ref.cursCb = cursCallable.nativeFunction;
+            structPtr.ref.putstrCb = putstrCallable.nativeFunction;
+            structPtr.ref.glyphCb = glyphCallable.nativeFunction;
+            structPtr.ref.inputCb = inputCallable.nativeFunction;
+            structPtr.ref.startMenuCb = startMenuCallable.nativeFunction;
+            structPtr.ref.addMenuCb = addMenuCallable.nativeFunction;
+            structPtr.ref.endMenuCb = endMenuCallable.nativeFunction;
+            structPtr.ref.selectMenuCb = selectMenuCallable.nativeFunction;
+            structPtr.ref.ynCb = ynCallable.nativeFunction;
+            structPtr.ref.getlineCb = getlineCallable.nativeFunction;
+            structPtr.ref.asknameCb = asknameCallable.nativeFunction;
+            structPtr.ref.exitCb = exitCallable.nativeFunction;
+            structPtr.ref.numberPadCb = numberPadCallable.nativeFunction;
+            structPtr.ref.cliparoundCb = cliparoundCallable.nativeFunction;
+            structPtr.ref.putMixedCb = putMixedCallable.nativeFunction;
+            structPtr.ref.newLevelRestCb = newLevelRestCallable.nativeFunction;
+
+            wlog("Calling ffi.registerCallbacksStruct...");
+            ffi.registerCallbacksStruct(structPtr);
+            wlog("ffi.registerCallbacksStruct returned.");
+
+            wlog("Freeing structPtr...");
+            calloc.free(structPtr);
+            wlog("calloc.free completed.");
+
             final pathPtr = assetsPath.toNativeUtf8();
             final userPtr = "Player".toNativeUtf8();
-            
+
             wlog("Calling ffi.startNetHack with path='$assetsPath'...");
             ffi.startNetHack(pathPtr, userPtr);
             wlog("ffi.startNetHack returned.");

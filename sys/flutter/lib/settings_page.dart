@@ -29,6 +29,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _useTiles = true;
+  String _selectedLanguage = 'ja';
   String _selectedTileset = 'pixelhack_32x32';
   String _controllerMode = 'pad';
   int _statusDisplayMode = 0;
@@ -197,6 +198,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _useTiles = prefs.getBool('use_tiles') ?? true;
+      _selectedLanguage = prefs.getString('selected_language') ?? 'ja';
       _selectedTileset = prefs.getString('selected_tileset') ?? 'pixelhack_32x32';
       _controllerMode = prefs.getString('controller_mode') ?? 'pad';
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
@@ -530,6 +532,23 @@ class _SettingsPageState extends State<SettingsPage> {
         title: const Text("ステータス表示設定"),
         subtitle: const Text("ゲーム画面のステータス領域の表示を切替えます"),
         children: _withDividers([
+          ListTile(
+            title: const Text("表示言語 / Language"),
+            subtitle: const Text("アプリ・ゲームコアの表示言語を切替えます"),
+            trailing: DropdownButton<String>(
+              value: _selectedLanguage,
+              items: const [
+                DropdownMenuItem(value: 'ja', child: Text('🇯🇵 日本語')),
+                DropdownMenuItem(value: 'en', child: Text('🇺🇸 English')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _selectedLanguage = val);
+                  _saveSetting('selected_language', val);
+                }
+              },
+            ),
+          ),
           ListTile(
             title: const Text("画面モード選択"),
             trailing: DropdownButton<int>(
