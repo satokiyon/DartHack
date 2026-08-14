@@ -22,7 +22,7 @@
 #define getchar nhgetch
 #undef tgetch
 #define tgetch nhgetch
-#define getuid() 1
+//#define getuid() 1
 
 #undef SHELL				/* we do not support the '!' command */
 

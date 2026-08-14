@@ -207,15 +207,10 @@ int NetHackMain(int argc, char** argv)
 	init_sound_disp_gamewindows();
 
 	set_savefile_name(TRUE);
-	const char *fq_save = fqname(gs.SAVEF, SAVEPREFIX, 1);
-	boolean save_exists = file_exists(fq_save);
-
-	if (save_exists)
+	if ((nhfp = restore_saved_game()) != 0)
 	{
-		debuglog("STEP 8: Savefile exists (%s). Calling restore_saved_game()...", fq_save);
-		if ((nhfp = restore_saved_game()) != 0)
-		{
-			debuglog("STEP 8: restore_saved_game SUCCESS! Resuming game...");
+		const char *fq_save = fqname(gs.SAVEF, SAVEPREFIX, 1);
+		debuglog("STEP 8: restore_saved_game SUCCESS (%s)! Resuming game...", fq_save);
 #ifdef WIZARD
 			boolean remember_wiz_mode = wizard;
 #endif
@@ -294,17 +289,6 @@ int NetHackMain(int argc, char** argv)
 				}
 			}
 		}
-		else
-		{
-			debuglog("ERROR: Savefile exists (%s) but restore_saved_game failed! Cleaning up and exiting...", fq_save);
-			(void) delete_savefile();
-			(void) eraseoldlocks();
-			unlock_file(HLOCK);
-			clearlocks();
-			exit_nhwindows("セーブデータの復元に失敗したため破損データを削除しました。次回起動時は新規ゲームから開始します。");
-			return 0;
-		}
-	}
 	else
 	{
 		debuglog("STEP 9: Savefile does not exist. Calling player_selection()...");

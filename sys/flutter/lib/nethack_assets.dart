@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -39,6 +40,9 @@ class NetHackAssets {
     if (!await saveDir.exists()) {
       await saveDir.create(recursive: true);
     }
+
+    // 旧バージョンのセーブファイル (uid=1) を現行 UID に安全マイグレーション
+    await _migrateLegacySaveFiles(saveDir);
 
     // 1. アセット側のバージョンを取得 (assets/ver)
     String assetVerStr = "0";
@@ -187,6 +191,48 @@ class NetHackAssets {
     } catch (e) {
       debugPrint("Warning: Exception during defaults.nh merge: $e");
     }
+  }
+
+  /// 旧バージョンのセーブファイル (先頭UID=1) を現行プロセスの UID へ安全にリネーム移行する
+  static Future<void> _migrateLegacySaveFiles(Directory saveDir) async {
+    if (!await saveDir.exists()) return;
+    final currentUid = _getCurrentUid();
+    if (currentUid == 1) return;
+
+    try {
+      final entries = await saveDir.list().toList();
+      final regExp = RegExp(r'^1([^\d].*)$');
+      for (final entry in entries) {
+        if (entry is File) {
+          final fileName = entry.path.split(Platform.pathSeparator).last;
+          final match = regExp.firstMatch(fileName);
+          if (match != null) {
+            final restName = match.group(1);
+            final newFileName = '$currentUid$restName';
+            final newFile = File('${saveDir.path}/$newFileName');
+            if (!await newFile.exists()) {
+              await entry.rename(newFile.path);
+              debugPrint("NetHackAssets: Successfully migrated legacy save file '$fileName' -> '$newFileName'");
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint("Warning: Exception during save file migration: $e");
+    }
+  }
+
+  static int _getCurrentUid() {
+    if (Platform.isAndroid || Platform.isLinux) {
+      try {
+        final libc = DynamicLibrary.process();
+        final getuid = libc.lookupFunction<Uint32 Function(), int Function()>('getuid');
+        return getuid();
+      } catch (e) {
+        debugPrint("Warning: Could not lookup getuid via FFI: $e");
+      }
+    }
+    return 10470;
   }
 }
 
