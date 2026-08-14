@@ -65,6 +65,7 @@ flutter:
 
   assets:
     - assets/ver
+    - assets/nethackdir/
     - assets/nethackdir/common/
     - assets/nethackdir/en/
     - assets/nethackdir/jp/
