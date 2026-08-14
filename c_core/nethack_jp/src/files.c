@@ -1588,7 +1588,7 @@ get_saved_games(void)
     }
     for (i=0; i<n2; i++) {
         if ( sscanf( namelist2[i]->d_name, "%d%63[^.].0", &uid, name ) == 2 ) {
-            if ( uid==myuid ) {
+            if ( uid == myuid ) {
                 char* r;
                 r = plname_from_running(namelist2[i]->d_name);
                 if ( r )

@@ -982,9 +982,11 @@ static void flutter_askname(void) {
     
     // セーブファイル一覧を取得してセミコロン区切りにする
     char** saves = get_saved_games();
+    debuglog("flutter_askname: get_saved_games() returned saves pointer=%p", saves);
     char saves_buf[4096] = {0};
     int idx = 0;
     while (saves && saves[idx]) {
+        debuglog("flutter_askname: saves[%d] = '%s'", idx, saves[idx]);
         char* first_del = strchr(saves[idx], '-');
         if (first_del) *first_del = '\0';
         if (idx > 0) {
