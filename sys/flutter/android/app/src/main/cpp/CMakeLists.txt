@@ -31,7 +31,6 @@ add_definitions(
     -DNETHACK_BUILD_ID="${BUILD_ID}"
     -DFORCE_REBUILD_TS="${FORCE_REBUILD_TS}"
     -DLUA_USE_POSIX
-    -DZLIB_COMP
 )
 
 # Common OS & Window Port Sources
