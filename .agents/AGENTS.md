@@ -240,8 +240,23 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
   final plainVal = message['isPlain'] as int? ?? 0;
   final isPlain = plainVal != 0;
   final plainType = (message['plainType'] as int?) ?? plainVal;
-  _screen.displayWindow(winId, blocking, isPlain: isPlain, plainType: plainType);
-  ```
+
+## 36. Android / Flutter版におけるセーブデータ・UID管理とアセット・復元処理の原則
+1. **`#define getuid() 1` などの固定値マクロの禁止**:
+   - `androidconf.h` や `hack.h` 等で `#define getuid() 1` などの固定値ダミーマクロを定義してはなりません。
+   - Android OS の本物の Linux プロセス UID (Bionic libc `getuid()`) をそのまま使用してください。マクロで固定化すると、言語モード間（日本語/英語）で `myuid` の不一致 (`uid mismatch`) が発生し、セーブデータが表示されなくなります。
+
+2. **圧縮セーブ (`.gz`) と `restore_saved_game` 直接判定の徹底**:
+   - `CMakeLists.txt` には必ず `-DZLIB_COMP` を定義して `nh_compress` / `nh_uncompress` を有効化してください。
+   - Cコア起動層 (`fluttermain.c` 等) で `restore_saved_game()` を呼ぶ直前に、非圧縮のセーブファイル名に対して `file_exists(fq_save)` で存在チェックを行わないでください。圧縮セーブ (`.gz`) が存在しても `FALSE` と判定され、セーブデータが存在しないと誤認して新規キャラメイクに進むバグを引き起こします。必ず本家 NetHack の設計通り `restore_saved_game()` の戻り値成否を直接判定してください。
+
+3. **`pubspec.yaml` における `assets/nethackdir/` 直下アセットの指定徹底**:
+   - NetHack 5.0 (Cコア) の起動・新規ゲーム開始には `nhlib.lua` や `nhcore.lua` などのルート直下 Lua スクリプト群が必須です。
+   - `pubspec.yaml` の `assets:` にサブフォルダ（`common/`, `en/`, `jp/`）だけを指定するとルート直下の Lua ファイルが APK に含まれず `nhl_loadlua` パニッククラッシュを起こします。必ず `- assets/nethackdir/` (末尾スラッシュ付き) を指定してください。
+
+4. **旧セーブデータ (UID=1) の起動時自動マイグレーション維持**:
+   - 旧バージョン等で UID=`1`（`1Player.gz`, `1Player.bak`）として保存されたセーブファイルを救済するため、`nethack_assets.dart` で起動時に `_migrateLegacySaveFiles` を呼び出し、現行プロセスの UID へ自動一括リネーム移行させるロジックを維持してください。
+
 
 
 
