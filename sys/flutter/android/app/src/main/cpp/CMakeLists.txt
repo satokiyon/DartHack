@@ -20,6 +20,8 @@ endif()
 string(TIMESTAMP FORCE_REBUILD_TS "%Y%m%d%H%M%S")
 add_definitions(
     -DANDROID
+    -DANDROID_GRAPHICS
+    -DTILES_IN_GLYPHMAP
     -DSND_LIB_ANDROIDSOUND
     -DAND_GUI
     -DLINKED_BINS

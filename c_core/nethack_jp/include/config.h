@@ -61,7 +61,9 @@
 /* #define X11_GRAPHICS */   /* X11 interface */
 /* #define QT_GRAPHICS */    /* Qt interface */
 /* #define MSWIN_GRAPHICS */ /* Windows NT, CE, Graphics */
+#ifndef ANDROID_GRAPHICS
 #define ANDROID_GRAPHICS
+#endif
 
 /*
  * Define the default window system.  This should be one that is compiled
@@ -133,7 +135,9 @@
 #endif
 
 #ifdef ANDROID
+#ifndef ANDROID_GRAPHICS
 #define ANDROID_GRAPHICS
+#endif
 #ifdef TTY_GRAPHICS
 #undef TTY_GRAPHICS
 #endif
