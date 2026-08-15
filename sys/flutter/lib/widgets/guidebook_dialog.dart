@@ -1,12 +1,13 @@
-// NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06.
+// NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-15.
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/text_formatter.dart';
 
-/// 日本語ガイドブック（Guidebook_JP.txt）を閲覧するためのダイアログウィジェット
+/// ガイドブック（日本語 Guidebook_JP.txt / 英語 Guidebook.txt）を閲覧するためのダイアログウィジェット
 class GuidebookDialog extends StatefulWidget {
   const GuidebookDialog({super.key});
 
@@ -38,6 +39,7 @@ class _GuidebookSection {
 
 class _GuidebookDialogState extends State<GuidebookDialog> {
   bool _isLoading = true;
+  bool _isJp = true;
   List<String> _lines = [];
   List<_GuidebookSection> _sections = [];
   final ItemScrollController _itemScrollController = ItemScrollController();
@@ -66,13 +68,30 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
 
   Future<void> _loadGuidebook() async {
     try {
-      final content =
-          await rootBundle.loadString('assets/nethackdir/Guidebook_JP.txt');
+      final prefs = await SharedPreferences.getInstance();
+      final lang = prefs.getString('selected_language') ?? 'ja';
+      final isJp = (lang == 'ja');
+
+      final primaryPath = isJp
+          ? 'assets/nethackdir/jp/Guidebook_JP.txt'
+          : 'assets/nethackdir/en/Guidebook.txt';
+
+      String content;
+      try {
+        content = await rootBundle.loadString(primaryPath);
+      } catch (_) {
+        if (isJp) {
+          content = await rootBundle.loadString('assets/nethackdir/jp/Guidebook_jp.txt');
+        } else {
+          rethrow;
+        }
+      }
+
       final rawLines = content.split('\n');
       final lines = TextFormatter.reformatLines(rawLines);
       final sections = <_GuidebookSection>[];
 
-      // 数字見出しの抽出正規表現 (例: "1. はじめに", "5.4. 店と買い物", "5.4.1. 店の特異な点")
+      // 数字見出しの抽出正規表現 (例: "1. はじめに", "1. Introduction", "5.4. 店と買い物", "5.4. Shops")
       final sectionRegex = RegExp(r'^(\d+(?:\.\d+)*\.)[ \t\u3000]+(.+)$');
 
       for (int i = 0; i < lines.length; i++) {
@@ -102,6 +121,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
 
       if (mounted) {
         setState(() {
+          _isJp = isJp;
           _lines = lines;
           _sections = sections;
           _isLoading = false;
@@ -110,7 +130,11 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _lines = ['ガイドブックの読み込みに失敗しました: $e'];
+          _lines = [
+            _isJp
+                ? 'ガイドブックの読み込みに失敗しました: $e'
+                : 'Failed to load Guidebook: $e'
+          ];
           _isLoading = false;
         });
       }
@@ -246,7 +270,9 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                         const Icon(Icons.toc, color: Colors.amberAccent, size: 22),
                         const SizedBox(width: 8),
                         Text(
-                          '目次 (${_sections.length}項目)',
+                          _isJp
+                              ? '目次 (${_sections.length}項目)'
+                              : 'Table of Contents (${_sections.length} items)',
                           style: const TextStyle(
                             color: Colors.amberAccent,
                             fontSize: 17,
@@ -332,9 +358,9 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                                   color: Colors.amberAccent.withValues(alpha: 0.3),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: const Text(
-                                  '現在地',
-                                  style: TextStyle(
+                                child: Text(
+                                  _isJp ? '現在地' : 'Current',
+                                  style: const TextStyle(
                                     color: Colors.amberAccent,
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
@@ -397,10 +423,10 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                   const Icon(Icons.menu_book,
                       color: Colors.amberAccent, size: 22),
                   const SizedBox(width: 8),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'NetHack ガイドブック',
-                      style: TextStyle(
+                      _isJp ? 'NetHack ガイドブック' : 'NetHack Guidebook',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -413,7 +439,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                       icon: const Icon(Icons.toc,
                           color: Colors.amberAccent, size: 24),
                       onPressed: _showTOCModal,
-                      tooltip: '目次を開く',
+                      tooltip: _isJp ? '目次を開く' : 'Open Table of Contents',
                       padding: const EdgeInsets.all(6),
                       constraints: const BoxConstraints(),
                     ),
@@ -422,7 +448,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                     icon:
                         const Icon(Icons.close, color: Colors.white70, size: 22),
                     onPressed: () => Navigator.pop(context),
-                    tooltip: '閉じる',
+                    tooltip: _isJp ? '閉じる' : 'Close',
                     padding: const EdgeInsets.all(6),
                     constraints: const BoxConstraints(),
                   ),
@@ -441,7 +467,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                       controller: _searchController,
                       style: const TextStyle(color: Colors.white, fontSize: 13),
                       decoration: InputDecoration(
-                        hintText: 'ガイドブック内を検索...',
+                        hintText: _isJp ? 'ガイドブック内を検索...' : 'Search Guidebook...',
                         hintStyle:
                             const TextStyle(color: Colors.white38, fontSize: 13),
                         prefixIcon: const Icon(Icons.search,
@@ -481,7 +507,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                       icon: const Icon(Icons.keyboard_arrow_up,
                           color: Colors.white70, size: 20),
                       onPressed: () => _navigateSearchMatch(-1),
-                      tooltip: '前の一致',
+                      tooltip: _isJp ? '前の一致' : 'Previous match',
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                     ),
@@ -489,7 +515,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                       icon: const Icon(Icons.keyboard_arrow_down,
                           color: Colors.white70, size: 20),
                       onPressed: () => _navigateSearchMatch(1),
-                      tooltip: '次の一致',
+                      tooltip: _isJp ? '次の一致' : 'Next match',
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                     ),
@@ -525,7 +551,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                             _searchResults.contains(index);
                         final isFlashMatch = _highlightedLineIndex == index;
 
-                        // 見出し行かの判定（目次に含まれているか）
+                        // 見出し行かの判定（目十分に含まれているか）
                         final isHeader =
                             _sections.any((s) => s.lineIndex == index);
 
@@ -587,4 +613,3 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     );
   }
 }
-
