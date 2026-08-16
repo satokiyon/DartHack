@@ -18,6 +18,8 @@
 #define LOG_TAG "NetHackFlutter"
 #define debuglog(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 
+extern int g_language_is_jp;
+
 void set_username(void) {
     if (!*svp.plname) {
         Strcpy(svp.plname, "player");
@@ -226,9 +228,9 @@ int NetHackMain(int argc, char** argv)
 			}
 
 			if (ge.early_raw_messages)
-				raw_print("セーブファイルを復元中...");
+				raw_print(g_language_is_jp ? "セーブファイルを復元中..." : "Restoring save file...");
 			else
-				pline("セーブファイルを復元中...");
+				pline(g_language_is_jp ? "セーブファイルを復元中..." : "Restoring save file...");
 			mark_synch();
 
 			if (!dorecover(nhfp)) {
@@ -239,7 +241,7 @@ int NetHackMain(int argc, char** argv)
 				(void) eraseoldlocks();
 				unlock_file(HLOCK);
 				clearlocks();
-				exit_nhwindows("セーブデータの復元に失敗したため破損データを削除しました。次回起動時は新規ゲームから開始します。");
+				exit_nhwindows(g_language_is_jp ? "セーブデータの復元に失敗したため破損データを削除しました。次回起動時は新規ゲームから開始します。" : "Failed to restore save file. Damaged save data has been removed.");
 				return 0;
 			}
 
@@ -279,7 +281,7 @@ int NetHackMain(int argc, char** argv)
 
 			if (discover || wizard)
 			{
-				if (y_n("セーブファイルを保持しますか？") == 'n')
+				if (y_n(g_language_is_jp ? "セーブファイルを保持しますか？" : "Keep saved game?") == 'n')
 				{
 					(void)delete_savefile();
 				}
@@ -413,7 +415,7 @@ staticfn boolean whoami(void)
 staticfn void wd_message(void)
 {
 	if(discover)
-		pline("スコアが記録されない探索モードです。");
+		pline(g_language_is_jp ? "スコアが記録されない探索モードです。" : "You are in explore mode; your score will not be saved.");
 }
 
 void append_slash(char *name)

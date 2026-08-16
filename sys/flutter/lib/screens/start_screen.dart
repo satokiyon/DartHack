@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../widgets/guidebook_dialog.dart';
 
 class StartScreen extends StatelessWidget {
@@ -103,11 +104,11 @@ class StartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final mediaQuery = MediaQuery.of(context);
     final isPortrait = mediaQuery.orientation == Orientation.portrait;
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
-    final isJp = (selectedLanguage == 'ja');
 
     Widget startScreenContent;
 
@@ -120,7 +121,7 @@ class StartScreen extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.menu_book, color: Colors.white70, size: 28),
               onPressed: () => GuidebookDialog.show(context),
-              tooltip: isJp ? "ガイドブック" : "Guidebook",
+              tooltip: l10n.guidebookTooltip,
               style: IconButton.styleFrom(
                 backgroundColor: Colors.black38,
                 padding: const EdgeInsets.all(8),
@@ -133,7 +134,7 @@ class StartScreen extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.settings, color: Colors.white70, size: 28),
               onPressed: onShowSettings,
-              tooltip: isJp ? "ゲーム設定" : "Settings",
+              tooltip: l10n.settingsTooltip,
               style: IconButton.styleFrom(
                 backgroundColor: Colors.black38,
                 padding: const EdgeInsets.all(8),
@@ -166,7 +167,7 @@ class StartScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        isJp ? "アセットを準備中..." : "Preparing assets...",
+                        l10n.preparingAssets,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -208,7 +209,7 @@ class StartScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(28),
                             child: Center(
                               child: Text(
-                                isJp ? '冒険を始める' : 'Start Adventure',
+                                l10n.startAdventure,
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -241,7 +242,7 @@ class StartScreen extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.menu_book, color: Colors.white70, size: 28),
               onPressed: () => GuidebookDialog.show(context),
-              tooltip: isJp ? "ガイドブック" : "Guidebook",
+              tooltip: l10n.guidebookTooltip,
               style: IconButton.styleFrom(
                 backgroundColor: Colors.black38,
                 padding: const EdgeInsets.all(8),
@@ -254,7 +255,7 @@ class StartScreen extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.settings, color: Colors.white70, size: 28),
               onPressed: onShowSettings,
-              tooltip: isJp ? "ゲーム設定" : "Settings",
+              tooltip: l10n.settingsTooltip,
               style: IconButton.styleFrom(
                 backgroundColor: Colors.black38,
                 padding: const EdgeInsets.all(8),
@@ -289,7 +290,7 @@ class StartScreen extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 12),
                                 Text(
-                                  isJp ? "アセットを準備中..." : "Preparing assets...",
+                                  l10n.preparingAssets,
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
@@ -331,7 +332,7 @@ class StartScreen extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(28),
                                       child: Center(
                                         child: Text(
-                                          isJp ? '冒険を始める' : 'Start Adventure',
+                                          l10n.startAdventure,
                                           style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,

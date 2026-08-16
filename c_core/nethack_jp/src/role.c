@@ -2050,9 +2050,15 @@ select_saved_game(const char *buffer)
 void
 role_selection_prolog(int which, winid where)
 {
-    static const char NEARDATA choosing[] = " 選択中",
-                               not_yet[] = " 未指定",
-                               rand_choice[] = " ランダム";
+    static const char NEARDATA choosing_jp[] = " 選択中",
+                               not_yet_jp[] = " 未指定",
+                               rand_choice_jp[] = " ランダム",
+                               choosing_en[] = " choosing",
+                               not_yet_en[] = " unselected",
+                               rand_choice_en[] = " Random";
+    const char *choosing = g_language_is_jp ? choosing_jp : choosing_en;
+    const char *not_yet = g_language_is_jp ? not_yet_jp : not_yet_en;
+    const char *rand_choice = g_language_is_jp ? rand_choice_jp : rand_choice_en;
     char buf[BUFSZ];
     int r, c, gend, a, allowmask;
 
@@ -2093,11 +2099,11 @@ role_selection_prolog(int which, winid where)
     /* [g and a don't constrain anything sufficiently
        to narrow something done to a single choice] */
 
-    Strcpy(buf, "名前: ");
+    Strcpy(buf, g_language_is_jp ? "名前: " : "Name: ");
     Strcat(buf, (which == RS_NAME) ? choosing
                 : !*svp.plname ? not_yet : svp.plname);
     putstr(where, 0, buf);
-    Strcpy(buf, "職業: ");
+    Strcpy(buf, g_language_is_jp ? "職業: " : "Role: ");
     assert(which == RS_ROLE || r == ROLE_NONE || r == ROLE_RANDOM
            || IndexOkT(r, roles));
         Strcat(buf, (which == RS_ROLE) ? choosing
@@ -2105,7 +2111,7 @@ role_selection_prolog(int which, winid where)
                                     : (r == ROLE_RANDOM) ? rand_choice
                                         : jp_role_name_for_display(r, gend));
     putstr(where, 0, buf);
-    Strcpy(buf, "種族: ");
+    Strcpy(buf, g_language_is_jp ? "種族: " : "Race: ");
     assert(which == RS_RACE || c == ROLE_NONE || c == ROLE_RANDOM
            || IndexOkT(c, races));
         Strcat(buf, (which == RS_RACE) ? choosing
@@ -2113,13 +2119,13 @@ role_selection_prolog(int which, winid where)
                                     : (c == ROLE_RANDOM) ? rand_choice
                                         : jp_race_noun_for_display(c));
     putstr(where, 0, buf);
-    Strcpy(buf, "性別: ");
+    Strcpy(buf, g_language_is_jp ? "性別: " : "Gender: ");
         Strcat(buf, (which == RS_GENDER) ? choosing
                                 : (gend == ROLE_NONE) ? not_yet
                                     : (gend == ROLE_RANDOM) ? rand_choice
                                         : jp_gender_for_display(gend));
     putstr(where, 0, buf);
-    Strcpy(buf, "属性: ");
+    Strcpy(buf, g_language_is_jp ? "属性: " : "Alignment: ");
         Strcat(buf, (which == RS_ALGNMNT) ? choosing
                                 : (a == ROLE_NONE) ? not_yet
                                     : (a == ROLE_RANDOM) ? rand_choice
@@ -2148,21 +2154,21 @@ role_menu_extra(int which, winid where, boolean preselect)
     c = flags.initrace;
     switch (which) {
     case RS_NAME:
-        what = "名前";
+        what = g_language_is_jp ? "名前" : "Name";
         break;
     case RS_ROLE:
-        what = "職業";
+        what = g_language_is_jp ? "職業" : "Role";
         f = r;
         for (i = 0; i < SIZE(roles) - 1; ++i)
             if (i != f && !gr.rfilter.roles[i])
                 break;
         if (i == SIZE(roles) - 1) {
-            constrainer = "絞り込み";
-            forcedvalue = "職業";
+            constrainer = g_language_is_jp ? "絞り込み" : "Filter";
+            forcedvalue = g_language_is_jp ? "職業" : "Role";
         }
         break;
     case RS_RACE:
-        what = "種族";
+        what = g_language_is_jp ? "種族" : "Race";
         f = flags.initrace;
         c = ROLE_NONE; /* override player's setting */
         if (r >= 0) {
@@ -2170,19 +2176,19 @@ role_menu_extra(int which, winid where, boolean preselect)
             if (allowmask == MH_HUMAN)
                 c = 0; /* races[human] */
             if (c >= 0) {
-                constrainer = "職業";
+                constrainer = g_language_is_jp ? "職業" : "Role";
                 forcedvalue = jp_race_noun_for_display(c);
             } else if (f >= 0 && ((allowmask & ~gr.rfilter.mask)
                                   == races[f].selfmask)) {
                 /* if there is only one race choice available due to user
                    options disallowing others, race menu entry is disabled */
-                constrainer = "絞り込み";
-                forcedvalue = "種族";
+                constrainer = g_language_is_jp ? "絞り込み" : "Filter";
+                forcedvalue = g_language_is_jp ? "種族" : "Race";
             }
         }
         break;
     case RS_GENDER:
-        what = "性別";
+        what = g_language_is_jp ? "性別" : "Gender";
         f = flags.initgend;
         gend = ROLE_NONE;
         if (r >= 0) {
@@ -2192,19 +2198,19 @@ role_menu_extra(int which, winid where, boolean preselect)
             else if (allowmask == ROLE_FEMALE)
                 gend = 1; /* genders[female] */
             if (gend >= 0) {
-                constrainer = "職業";
+                constrainer = g_language_is_jp ? "職業" : "Role";
                 forcedvalue = jp_gender_for_display(gend);
             } else if (f >= 0 && ((allowmask & ~gr.rfilter.mask)
                                   == genders[f].allow)) {
                 /* if there is only one gender choice available due to user
                    options disallowing other, gender menu entry is disabled */
-                constrainer = "絞り込み";
-                forcedvalue = "性別";
+                constrainer = g_language_is_jp ? "絞り込み" : "Filter";
+                forcedvalue = g_language_is_jp ? "性別" : "Gender";
             }
         }
         break;
     case RS_ALGNMNT:
-        what = "属性";
+        what = g_language_is_jp ? "属性" : "Alignment";
         f = flags.initalign;
         a = ROLE_NONE;
         if (r >= 0) {
@@ -2216,7 +2222,7 @@ role_menu_extra(int which, winid where, boolean preselect)
             else if (allowmask == AM_CHAOTIC)
                 a = 2; /* aligns[chaotic] */
             if (a >= 0)
-                constrainer = "職業";
+                constrainer = g_language_is_jp ? "職業" : "Role";
         }
         if (c >= 0 && !constrainer) {
             allowmask = races[c].allow & ROLE_ALIGNMASK;
@@ -2227,14 +2233,14 @@ role_menu_extra(int which, winid where, boolean preselect)
             else if (allowmask == AM_CHAOTIC)
                 a = 2; /* aligns[chaotic] */
             if (a >= 0)
-                constrainer = "種族";
+                constrainer = g_language_is_jp ? "種族" : "Race";
         }
         if (f >= 0 && !constrainer
             && (ROLE_ALIGNMASK & ~gr.rfilter.mask) == aligns[f].allow) {
             /* if there is only one alignment choice available due to user
                options disallowing others, algn menu entry is disabled */
-            constrainer = "絞り込み";
-            forcedvalue = "属性";
+            constrainer = g_language_is_jp ? "絞り込み" : "Filter";
+            forcedvalue = g_language_is_jp ? "属性" : "Alignment";
         }
         if (a >= 0)
             forcedvalue = jp_align_for_display(a);
@@ -2245,31 +2251,42 @@ role_menu_extra(int which, winid where, boolean preselect)
     if (constrainer) {
         any.a_int = 0;
         /* use four spaces of padding to fake a grayed out menu choice */
-        Sprintf(buf, "%4s%sにより%sに固定", "", constrainer, forcedvalue);
+        if (g_language_is_jp)
+            Sprintf(buf, "%4s%sにより%sに固定", "", constrainer, forcedvalue);
+        else
+            Sprintf(buf, "%4sForced to %s by %s", "", forcedvalue, constrainer);
         add_menu_str(where, buf);
     } else if (what) {
         any.a_int = RS_menu_arg(which);
-        Sprintf(buf, "%sを%s選ぶ",
-                what, (f >= 0) ? "もう一度" : "先に");
+        if (g_language_is_jp)
+            Sprintf(buf, "%sを%s選ぶ",
+                    what, (f >= 0) ? "もう一度" : "先に");
+        else
+            Sprintf(buf, "Pick %s %s",
+                    what, (f >= 0) ? "again" : "first");
         add_menu(where, &nul_glyphinfo, &any, RS_menu_let[which], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     } else if (which == RS_filter) {
         char setfiltering[40];
 
         any.a_int = RS_menu_arg(RS_filter);
-        Sprintf(setfiltering, "絞り込み設定を%sする",
-                gotrolefilter() ? "解除" : "適用");
+        if (g_language_is_jp)
+            Sprintf(setfiltering, "絞り込み設定を%sする",
+                    gotrolefilter() ? "解除" : "適用");
+        else
+            Sprintf(setfiltering, "%s role filtering",
+                    gotrolefilter() ? "Reset" : "Apply");
         add_menu(where, &nul_glyphinfo, &any, '~', 0, ATR_NONE,
                  clr, setfiltering, MENU_ITEMFLAGS_NONE);
     } else if (which == ROLE_RANDOM) {
         any.a_int = ROLE_RANDOM;
         add_menu(where, &nul_glyphinfo, &any, '*', 0,
-                 ATR_NONE, clr, "ランダム",
+                 ATR_NONE, clr, g_language_is_jp ? "ランダム" : "Random",
                  preselect ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     } else if (which == ROLE_NONE) {
         any.a_int = ROLE_NONE;
         add_menu(where, &nul_glyphinfo, &any, 'q', 0,
-                 ATR_NONE, clr, "終了",
+                 ATR_NONE, clr, g_language_is_jp ? "終了" : "Quit",
                  preselect ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     } else {
         impossible("role_menu_extra: bad arg (%d)", which);

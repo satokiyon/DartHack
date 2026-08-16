@@ -65,6 +65,7 @@ extern const char *fqn_prefix_names[PREFIX_COUNT];
 
 extern NEARDATA boolean has_strong_rngseed;
 extern struct engr *head_engr;
+extern NEARDATA int g_language_is_jp;
 
 /* used by coloratt.c, options.c, utf8map.c, windows.c */
 extern const char hexdd[33];

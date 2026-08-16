@@ -11,6 +11,8 @@ import 'nethack_ffi.dart';
 import 'utils/defaults_helper.dart';
 import 'utils/scale_clamp.dart';
 import 'widgets/shortcut_edit_dialog.dart';
+import 'l10n/app_localizations.dart';
+import 'main.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -526,36 +528,47 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildScreenModeSection() {
+    final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.crop_landscape, color: Colors.greenAccent),
-        title: const Text("ステータス表示設定"),
-        subtitle: const Text("ゲーム画面のステータス領域の表示を切替えます"),
+        title: Text(l10n.secStatusTitle),
+        subtitle: Text(l10n.secStatusSub),
         children: _withDividers([
           ListTile(
-            title: const Text("表示言語 / Language"),
-            subtitle: const Text("アプリ・ゲームコアの表示言語を切替えます"),
+            title: Text(l10n.displayLanguage),
+            subtitle: Text(l10n.displayLanguageSub),
             trailing: DropdownButton<String>(
               value: _selectedLanguage,
-              items: const [
-                DropdownMenuItem(value: 'ja', child: Text('🇯🇵 日本語')),
-                DropdownMenuItem(value: 'en', child: Text('🇺🇸 English')),
+              items: [
+                DropdownMenuItem(value: 'ja', child: Text(l10n.japanese)),
+                DropdownMenuItem(value: 'en', child: Text(l10n.english)),
               ],
               onChanged: (val) {
                 if (val != null) {
                   setState(() => _selectedLanguage = val);
                   _saveSetting('selected_language', val);
+                  if (mounted) {
+                    MyApp.of(context)?.setLocale(val);
+                  }
                 }
               },
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+            child: Text(
+              l10n.coreLangNote,
+              style: const TextStyle(fontSize: 12, color: Colors.amberAccent),
+            ),
+          ),
           ListTile(
-            title: const Text("画面モード選択"),
+            title: Text(l10n.screenMode),
             trailing: DropdownButton<int>(
               value: _screenMode,
-              items: const [
-                DropdownMenuItem(value: 0, child: Text('通常')),
-                DropdownMenuItem(value: 1, child: Text('イマーシブ')),
+              items: [
+                DropdownMenuItem(value: 0, child: Text(l10n.screenModeNormal)),
+                DropdownMenuItem(value: 1, child: Text(l10n.screenModeImmersive)),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -566,12 +579,12 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ListTile(
-            title: const Text("ステータス領域表示モード"),
+            title: Text(l10n.statusDisplayMode),
             trailing: DropdownButton<int>(
               value: _statusDisplayMode,
-              items: const [
-                DropdownMenuItem(value: 0, child: Text('自動縮小フィット')),
-                DropdownMenuItem(value: 1, child: Text('領域の可変高さ')),
+              items: [
+                DropdownMenuItem(value: 0, child: Text(l10n.statusModeAuto)),
+                DropdownMenuItem(value: 1, child: Text(l10n.statusModeVariable)),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -587,14 +600,15 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildTilesetSection() {
+    final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.palette, color: Colors.deepPurpleAccent),
-        title: const Text("タイルセット設定"),
+        title: Text(l10n.secTilesetTitle),
         children: _withDividers([
           SwitchListTile(
-            title: const Text("タイル表示を使用"),
-            subtitle: const Text("無効時はアスキー（文字）マップになります"),
+            title: Text(l10n.useTiles),
+            subtitle: Text(l10n.useTilesSub),
             value: _useTiles,
             onChanged: (val) {
               setState(() => _useTiles = val);
@@ -606,7 +620,7 @@ class _SettingsPageState extends State<SettingsPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               key: const ValueKey("tileset_dropdown"),
               child: DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: "タイルセットの選択"),
+                decoration: InputDecoration(labelText: l10n.tilesetSelect),
                 initialValue: _selectedTileset,
                 items: const [
                   DropdownMenuItem(value: 'nevanda_32x32', child: Text('Nevanda (32x32)')),

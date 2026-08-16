@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/game_enums.dart';
 import '../../utils/utf8_length_limiting_formatter.dart';
 
@@ -37,19 +38,20 @@ class _AskNameOverlayState extends State<AskNameOverlay> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     String modeDescText;
     Color modeDescBorderColor;
     switch (_selectedPlayMode) {
       case PlayMode.normal:
-        modeDescText = "🏆 通常のスコアアタック・標準プレイ用。死亡するとゲームオーバーになります。";
+        modeDescText = l10n.modeDescNormal;
         modeDescBorderColor = Colors.amber.withValues(alpha: 0.4);
         break;
       case PlayMode.explore:
-        modeDescText = "🔍 死亡時に復活を選択できる練習用モード。スコアはハイスコア一覧に記録されません。";
+        modeDescText = l10n.modeDescExplore;
         modeDescBorderColor = Colors.lightBlueAccent.withValues(alpha: 0.4);
         break;
       case PlayMode.wizard:
-        modeDescText = "🧙 デバッグ・検証用モード。任意のアイテム生成や無敵化コマンドなどのデバッグ機能が使用できます（名前は wizard に固定）。";
+        modeDescText = l10n.modeDescWizard;
         modeDescBorderColor = Colors.purpleAccent.withValues(alpha: 0.4);
         break;
     }
@@ -85,10 +87,10 @@ class _AskNameOverlayState extends State<AskNameOverlay> {
                         children: [
                           Icon(Icons.badge_outlined, size: 18, color: Colors.amber[300]),
                           const SizedBox(width: 8),
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              "お名前は？",
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber),
+                              l10n.whoAreYou,
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber),
                             ),
                           ),
                         ],
@@ -110,7 +112,7 @@ class _AskNameOverlayState extends State<AskNameOverlay> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          counterText: "$askNameBytes / $maxAskNameBytes バイト",
+                          counterText: l10n.bytesCount(askNameBytes, maxAskNameBytes),
                           counterStyle: TextStyle(
                             color: isAskNameOverflow ? Colors.red : Colors.white70,
                             fontWeight: isAskNameOverflow ? FontWeight.bold : FontWeight.normal,
@@ -128,7 +130,7 @@ class _AskNameOverlayState extends State<AskNameOverlay> {
                       if (isAskNameOverflow) ...[
                         const SizedBox(height: 4),
                         Text(
-                          "名前が長すぎます。$maxAskNameBytes バイト以内で入力してください。",
+                          l10n.nameTooLong(maxAskNameBytes),
                           style: const TextStyle(
                             color: Colors.redAccent,
                             fontSize: 12,
@@ -138,7 +140,7 @@ class _AskNameOverlayState extends State<AskNameOverlay> {
                       ],
                       if (widget.saves.isNotEmpty) ...[
                         const SizedBox(height: 8),
-                        const Text("既存のセーブデータ:", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                        Text(l10n.savedGames, style: const TextStyle(color: Colors.grey, fontSize: 12)),
                         const SizedBox(height: 6),
                         Container(
                           constraints: const BoxConstraints(maxHeight: 140),
@@ -174,24 +176,24 @@ class _AskNameOverlayState extends State<AskNameOverlay> {
                         ),
                       ],
                       const SizedBox(height: 12),
-                      const Text("プレイモード:", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text(l10n.playMode, style: const TextStyle(color: Colors.grey, fontSize: 12)),
                       const SizedBox(height: 6),
                       SegmentedButton<PlayMode>(
-                        segments: const [
+                        segments: [
                           ButtonSegment<PlayMode>(
                             value: PlayMode.normal,
-                            label: Text("通常", style: TextStyle(fontSize: 12)),
-                            icon: Icon(Icons.emoji_events_outlined, size: 15),
+                            label: Text(l10n.playModeNormal, style: const TextStyle(fontSize: 12)),
+                            icon: const Icon(Icons.emoji_events_outlined, size: 15),
                           ),
                           ButtonSegment<PlayMode>(
                             value: PlayMode.explore,
-                            label: Text("探索", style: TextStyle(fontSize: 12)),
-                            icon: Icon(Icons.search, size: 15),
+                            label: Text(l10n.playModeExplore, style: const TextStyle(fontSize: 12)),
+                            icon: const Icon(Icons.search, size: 15),
                           ),
                           ButtonSegment<PlayMode>(
                             value: PlayMode.wizard,
-                            label: Text("ウィザード", style: TextStyle(fontSize: 12)),
-                            icon: Icon(Icons.auto_fix_high, size: 15),
+                            label: Text(l10n.playModeWizard, style: const TextStyle(fontSize: 12)),
+                            icon: const Icon(Icons.auto_fix_high, size: 15),
                           ),
                         ],
                         selected: {_selectedPlayMode},
@@ -235,7 +237,7 @@ class _AskNameOverlayState extends State<AskNameOverlay> {
                         children: [
                           TextButton(
                             onPressed: () => widget.onSubmit(_selectedPlayMode, null),
-                            child: const Text('キャンセル'),
+                            child: Text(l10n.cancel),
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton(
@@ -243,7 +245,7 @@ class _AskNameOverlayState extends State<AskNameOverlay> {
                                 ? null
                                 : () => widget.onSubmit(_selectedPlayMode, widget.nameController.text),
                             style: ElevatedButton.styleFrom(backgroundColor: Colors.teal[500]),
-                            child: const Text('ゲーム開始'),
+                            child: Text(l10n.startGame),
                           ),
                         ],
                       ),

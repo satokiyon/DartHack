@@ -179,8 +179,12 @@ typedef RegisterNewLevelRestDart = void Function(Pointer<NativeFunction<NewLevel
 typedef SendNewLevelRestResultFunc = Void Function(Int32 rewardAmount);
 typedef SendNewLevelRestResultDart = void Function(int rewardAmount);
 
+typedef SetLanguageModeFunc = Void Function(Int32 isJp);
+typedef SetLanguageModeDart = void Function(int isJp);
+
 class NetHackFfi {
-  late final DynamicLibrary _lib;
+  late DynamicLibrary _lib;
+
   late final StartNetHackDart startNetHack;
   late final RegisterCallbacksDart registerCallbacks;
   late final SendKeyDart sendKeyToC;
@@ -190,7 +194,6 @@ class NetHackFfi {
   late final SendMenuSelectionsDart sendMenuSelections;
   late final GetInputRequestIdDart getInputRequestId;
   late final GetIsGameOverDart getIsGameOver;
-
   late final SendYnResultDart sendYnResult;
   late final SendGetLineResultDart sendGetLineResult;
   late final SendAskNameResultDart sendAskNameResult;
@@ -203,6 +206,7 @@ class NetHackFfi {
   late final SendNewLevelRestResultDart sendNewLevelRestResult;
   late final RegisterDartLogDart registerDartLog;
   late final RegisterCallbacksStructDart registerCallbacksStruct;
+  late final SetLanguageModeDart setLanguageMode;
 
   NetHackFfi([String langCode = 'ja']) {
     try {
@@ -319,9 +323,21 @@ class NetHackFfi {
         .lookup<NativeFunction<GetTopTenTextFunc>>('GetTopTenTextFlutter')
         .asFunction();
 
-    triggerDatabaseSearch = _lib
-        .lookup<NativeFunction<TriggerDatabaseSearchFunc>>('TriggerDatabaseSearchFlutter')
-        .asFunction();
+    try {
+      triggerDatabaseSearch = _lib
+          .lookup<NativeFunction<TriggerDatabaseSearchFunc>>('TriggerDatabaseSearchFlutter')
+          .asFunction();
+    } catch (e) {
+      triggerDatabaseSearch = () {};
+    }
+
+    try {
+      setLanguageMode = _lib
+          .lookup<NativeFunction<SetLanguageModeFunc>>('flutter_set_language_mode')
+          .asFunction<SetLanguageModeDart>();
+    } catch (e) {
+      setLanguageMode = (_) {};
+    }
   }
 
   String getBuildId() {

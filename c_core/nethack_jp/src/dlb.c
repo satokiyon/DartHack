@@ -479,7 +479,7 @@ dlb_fopen(const char *name, const char *mode)
     dp = (dlb *) alloc(sizeof(dlb));
 
     /* ファイル名に _jp が含まれていなければ、まず _jp を付与した名前でのオープンを試みる */
-    if (make_jp_datafile_name(name, jpname, sizeof jpname)) {
+    if (should_try_jp_datafile(name) && make_jp_datafile_name(name, jpname, sizeof jpname)) {
         if (do_dlb_fopen(dp, jpname, mode)) {
             dp->fp = (FILE *) 0;
             return dp;
@@ -507,7 +507,8 @@ dlb_fopen(const char *name, const char *mode)
 staticfn boolean
 should_try_jp_datafile(const char *name UNUSED)
 {
-    return TRUE;
+    extern int g_language_is_jp;
+    return g_language_is_jp ? TRUE : FALSE;
 }
 
 /*

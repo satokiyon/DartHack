@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../nethack_screen.dart';
 import '../nethack_map_painter.dart';
 
@@ -11,6 +12,7 @@ void showFullMapDialog({
   required int tileWidth,
   required int tileHeight,
 }) {
+  final l10n = AppLocalizations.of(context)!;
   showDialog(
     context: context,
     barrierDismissible: true,
@@ -38,9 +40,9 @@ void showFullMapDialog({
                 children: [
                   const Icon(Icons.map, color: Colors.amberAccent, size: 20),
                   const SizedBox(width: 8),
-                  const Text(
-                    '階層の全体地図',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  Text(
+                    l10n.fullLevelMap,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   const Spacer(),
                   IconButton(
@@ -80,12 +82,12 @@ void showFullMapDialog({
             Container(
               color: Colors.black54,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'ピンチ操作でズームイン/ズームアウトが可能です',
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                    l10n.pinchToZoom,
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ],
               ),

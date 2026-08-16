@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../../nethack_screen.dart';
 import '../menu_item_tile_painter.dart';
 
@@ -618,7 +619,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                               }
                             });
                           },
-                          child: const Text("全て選択"),
+                          child: Text(AppLocalizations.of(context)!.selectAll),
                         ),
                         ElevatedButton(
                           onPressed: () {
@@ -626,7 +627,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                               _selectedCounts.clear();
                             });
                           },
-                          child: const Text("解除"),
+                          child: Text(AppLocalizations.of(context)!.deselectAll),
                         ),
                         ElevatedButton(
                           onPressed: () {
@@ -643,7 +644,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                       ],
                       ElevatedButton(
                         onPressed: () => widget.onSingleSelect(-1),
-                        child: const Text("キャンセル"),
+                        child: Text(AppLocalizations.of(context)!.cancel),
                       ),
                     ],
                   ),

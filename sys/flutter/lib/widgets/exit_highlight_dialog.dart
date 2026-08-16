@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import 'exit_ad_banner.dart';
 
 class ExitHighlightDialog extends StatefulWidget {
@@ -23,16 +24,15 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
   Timer? _timeoutTimer;
   Timer? _animTimer;
   int _animFrame = 0;
-  late final List<String> _selectedHighlights;
+  late List<String> _selectedHighlights;
 
   static const List<String> _animChars = ['.', '..', '...', '....'];
 
   @override
   void initState() {
     super.initState();
-    _selectedHighlights = _selectHighlights(widget.messageHistory);
+    _selectedHighlights = [];
 
-    // アニメーション更新用タイマー (300ms間隔)
     _animTimer = Timer.periodic(const Duration(milliseconds: 300), (timer) {
       if (mounted && !_isHighlightReady) {
         setState(() {
@@ -41,10 +41,18 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
       }
     });
 
-    // じっくり広告を待つため、5秒のタイムアウトを設定
     _timeoutTimer = Timer(const Duration(seconds: 5), () {
       _completeLoading();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_selectedHighlights.isEmpty) {
+      final noneText = AppLocalizations.of(context)?.none ?? 'なし';
+      _selectedHighlights = _selectHighlights(widget.messageHistory, noneText);
+    }
   }
 
   @override
@@ -66,8 +74,7 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
     }
   }
 
-  static List<String> _selectHighlights(List<String> rawHistory) {
-    // 1. 空白除去および重複排除
+  static List<String> _selectHighlights(List<String> rawHistory, String noneText) {
     final Set<String> uniqueMessages = {};
     for (final msg in rawHistory) {
       final trimmed = msg.trim();
@@ -79,7 +86,7 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
     final filteredList = uniqueMessages.toList();
 
     if (filteredList.isEmpty) {
-      return ['なし'];
+      return [noneText];
     }
 
     final random = Random();
@@ -93,7 +100,6 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
       picked.addAll(temp.take(3));
     }
 
-    // 各メッセージの先頭にランキング数字(1. 〜 3. )を付加
     final List<String> result = [];
     for (int i = 0; i < picked.length; i++) {
       result.add('${i + 1}. ${picked[i]}');
@@ -104,15 +110,15 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
 
   @override
   Widget build(BuildContext context) {
-    final dots = _animChars[_animFrame];
+    final l10n = AppLocalizations.of(context)!;
 
     return PopScope(
       canPop: false,
       child: AlertDialog(
         backgroundColor: Colors.grey[900],
-        title: const Text(
-          '終了',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        title: Text(
+          l10n.quit,
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         content: SingleChildScrollView(
           child: Column(
@@ -127,10 +133,9 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
               const Divider(color: Colors.white24),
               const SizedBox(height: 8),
 
-              // 「今回のハイライト」セクション
-              const Text(
-                '【今回のハイライト】',
-                style: TextStyle(
+              Text(
+                l10n.runHighlights,
+                style: const TextStyle(
                   color: Colors.amberAccent,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
@@ -139,7 +144,6 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
               const SizedBox(height: 8),
 
               if (!_isHighlightReady) ...[
-                // NetHackらしいアニメーション表示領域
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                   decoration: BoxDecoration(
@@ -149,7 +153,6 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
                   ),
                   child: Row(
                     children: [
-                      // NetHackのプレイヤー記号 `@` の点滅表現
                       Text(
                         '[@]',
                         style: TextStyle(
@@ -161,7 +164,7 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'ダンジョンの記憶を辿っています$dots',
+                          l10n.recallingMemories,
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 13,
@@ -172,7 +175,6 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
                   ),
                 ),
               ] else ...[
-                // ハイライト表示領域
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(10),
@@ -184,12 +186,13 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: _selectedHighlights.map((text) {
+                      final isNone = text == l10n.none || text == 'なし';
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 3),
                         child: Text(
                           text,
                           style: TextStyle(
-                            color: text == 'なし' ? Colors.grey : Colors.white,
+                            color: isNone ? Colors.grey : Colors.white,
                             fontSize: 13,
                           ),
                         ),
@@ -200,7 +203,6 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
               ],
 
               const SizedBox(height: 16),
-              // 広告バナー領域
               ExitAdBanner(
                 onAdLoaded: _completeLoading,
                 onAdFailedToLoad: _completeLoading,

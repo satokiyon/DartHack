@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 void showMsgHistoryPanel({
   required BuildContext context,
   required List<String> messages,
   required double msgFontSize,
 }) {
+  final l10n = AppLocalizations.of(context)!;
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -42,9 +44,9 @@ void showMsgHistoryPanel({
                     children: [
                       Icon(Icons.history, size: 18, color: Colors.amber[300]),
                       const SizedBox(width: 8),
-                      const Text(
-                        'メッセージ履歴',
-                        style: TextStyle(
+                      Text(
+                        l10n.msgHistoryTitle,
+                        style: const TextStyle(
                           color: Colors.amber,
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
@@ -52,7 +54,7 @@ void showMsgHistoryPanel({
                       ),
                       const Spacer(),
                       Text(
-                        '${messages.length}件',
+                        l10n.entriesCount(messages.length),
                         style: const TextStyle(color: Colors.white54, fontSize: 12),
                       ),
                     ],
@@ -61,10 +63,10 @@ void showMsgHistoryPanel({
                 Divider(color: Colors.white.withValues(alpha: 0.14), height: 1),
                 Expanded(
                   child: messages.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
-                            'メッセージ履歴はありません',
-                            style: TextStyle(color: Colors.white54),
+                            l10n.noMsgHistory,
+                            style: const TextStyle(color: Colors.white54),
                           ),
                         )
                       : ListView.builder(
@@ -105,7 +107,7 @@ void showMsgHistoryPanel({
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: const Text('閉じる'),
+                      child: Text(l10n.close),
                     ),
                   ),
                 ),

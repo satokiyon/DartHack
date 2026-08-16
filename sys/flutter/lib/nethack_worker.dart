@@ -345,6 +345,9 @@ class NetHackWorker {
             calloc.free(structPtr);
             wlog("calloc.free completed.");
 
+            wlog("Setting C core language mode for langCode='$langCode'");
+            ffi.setLanguageMode(langCode == 'ja' ? 1 : 0);
+
             final pathPtr = assetsPath.toNativeUtf8();
             final userPtr = "Player".toNativeUtf8();
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui' as ui;
+import 'l10n/app_localizations.dart';
 
 class AmountSelectorDialog extends StatefulWidget {
   final String itemName;
@@ -51,6 +52,7 @@ class _AmountSelectorDialogState extends State<AmountSelectorDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final showTile = widget.tileIndex >= 0 && widget.tileImage != null;
 
     return AlertDialog(
@@ -92,9 +94,9 @@ class _AmountSelectorDialogState extends State<AmountSelectorDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            "個数を選択してください",
-            style: TextStyle(color: Colors.grey, fontSize: 13),
+          Text(
+            l10n.howMany,
+            style: const TextStyle(color: Colors.grey, fontSize: 13),
           ),
           const SizedBox(height: 16),
           Row(
@@ -162,8 +164,8 @@ class _AmountSelectorDialogState extends State<AmountSelectorDialog> {
       actionsAlignment: MainAxisAlignment.spaceBetween,
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(-1), // キャンセルは -1 を返却
-          child: const Text("キャンセル", style: TextStyle(color: Colors.grey)),
+          onPressed: () => Navigator.of(context).pop(-1),
+          child: Text(l10n.cancel, style: const TextStyle(color: Colors.grey)),
         ),
         Row(
           children: [
@@ -173,14 +175,14 @@ class _AmountSelectorDialogState extends State<AmountSelectorDialog> {
                   backgroundColor: Colors.grey[800],
                   foregroundColor: Colors.white,
                 ),
-                onPressed: () => Navigator.of(context).pop(widget.maxCount), // 全て
-                child: const Text("全て"),
+                onPressed: () => Navigator.of(context).pop(widget.maxCount),
+                child: Text(l10n.all),
               ),
             const SizedBox(width: 8),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber[800],
-                foregroundColor: Colors.white,
+                backgroundColor: Colors.amber,
+                foregroundColor: Colors.black,
               ),
               onPressed: () {
                 final amount = int.tryParse(_textController.text) ?? _currentAmount;

@@ -1627,7 +1627,8 @@ genl_display_file(const char *fname, boolean complain)
     char buf[BUFSZ], fname_jp[BUFSZ];
     dlb *f = (dlb *) 0;
 
-    if (!strstr(fname, "_jp") && (strlen(fname) + 3 < sizeof fname_jp)) {
+    extern int g_language_is_jp;
+    if (g_language_is_jp && !strstr(fname, "_jp") && (strlen(fname) + 3 < sizeof fname_jp)) {
         Strcpy(fname_jp, fname);
         Strcat(fname_jp, "_jp");
         f = dlb_fopen(fname_jp, "r");

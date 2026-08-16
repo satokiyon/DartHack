@@ -3281,28 +3281,29 @@ domenucontrols(void)
 /* data for dohelp() */
 static const struct {
     void (*f)(void);
-    const char *text;
+    const char *text_jp;
+    const char *text_en;
 } help_menu_items[] = {
-    { hmenu_doextversion, "NetHack について(バージョン情報)." },
-    { dispfile_help, "ゲームとコマンドの詳細説明." },
-    { dispfile_shelp, "ゲームコマンド一覧." },
-    { hmenu_dohistory, "NetHack の簡易な歴史." },
-    { hmenu_dowhatis, "画面上の文字情報を調べる." },
-    { hmenu_dowhatdoes, "指定したキーの機能を調べる." },
-    { option_help, "ゲームオプション一覧." },
-    { dispfile_optionfile, "ゲームオプションの詳細説明." },
-    { dispfile_optmenu, "%s コマンドでオプションを設定する方法." },
-    { dokeylist, "キーボードコマンド完全一覧." },
-    { hmenu_doextlist, "拡張コマンド一覧." },
-    { domenucontrols, "メニュー操作キー一覧." },
-    { dispfile_usagehelp, "NetHack のコマンドライン説明." },
-    { dispfile_license, "NetHack ライセンス." },
-    { docontact, "サポート情報." },
+    { hmenu_doextversion, "NetHack について(バージョン情報).", "About NetHack (version information)." },
+    { dispfile_help, "ゲームとコマンドの詳細説明.", "Long description of the game and commands." },
+    { dispfile_shelp, "ゲームコマンド一覧.", "List of game commands." },
+    { hmenu_dohistory, "NetHack の簡易な歴史.", "Concise history of NetHack." },
+    { hmenu_dowhatis, "画面上の文字情報を調べる.", "Info about a character on the screen." },
+    { hmenu_dowhatdoes, "指定したキーの機能を調べる.", "What a command key does." },
+    { option_help, "ゲームオプション一覧.", "List of game options." },
+    { dispfile_optionfile, "ゲームオプションの詳細説明.", "Longer explanation of game options." },
+    { dispfile_optmenu, "%s コマンドでオプションを設定する方法.", "Using the '%s' command to set options." },
+    { dokeylist, "キーボードコマンド完全一覧.", "Complete list of keyboard commands." },
+    { hmenu_doextlist, "拡張コマンド一覧.", "List of extended commands." },
+    { domenucontrols, "メニュー操作キー一覧.", "List of menu control keys." },
+    { dispfile_usagehelp, "NetHack のコマンドライン説明.", "Description of NetHack's command line." },
+    { dispfile_license, "NetHack ライセンス.", "NetHack license." },
+    { docontact, "サポート情報.", "Support information." },
 #ifdef PORT_HELP
-    { port_help, "%s 固有のヘルプとコマンド." },
+    { port_help, "%s 固有のヘルプとコマンド.", "%s-specific help and commands." },
 #endif
-    { dispfile_debughelp, "ウィザードモードコマンド一覧." },
-    { (void (*)(void)) 0, (char *) 0 }
+    { dispfile_debughelp, "ウィザードモードコマンド一覧.", "List of wizard-mode commands." },
+    { (void (*)(void)) 0, (char *) 0, (char *) 0 }
 };
 
 DISABLE_WARNING_FORMAT_NONLITERAL
@@ -3311,6 +3312,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 int
 dohelp(void)
 {
+    extern int g_language_is_jp;
     winid tmpwin = create_nhwindow(NHW_MENU);
     char helpbuf[BUFSZ], tmpbuf[QBUFSZ];
     int i, n;
@@ -3322,26 +3324,28 @@ dohelp(void)
     any = cg.zeroany; /* zero all bits */
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
-    for (i = 0; help_menu_items[i].text; i++) {
+    for (i = 0; help_menu_items[i].text_jp; i++) {
         if (!wizard && help_menu_items[i].f == dispfile_debughelp)
             continue;
         if (sysopt.hideusage && help_menu_items[i].f == dispfile_usagehelp)
             continue;
 
-        if (help_menu_items[i].text[0] == '%') {
-            Snprintf(helpbuf, sizeof helpbuf, help_menu_items[i].text,
+        const char *item_text = g_language_is_jp ? help_menu_items[i].text_jp : help_menu_items[i].text_en;
+
+        if (item_text[0] == '%') {
+            Snprintf(helpbuf, sizeof helpbuf, item_text,
                      PORT_ID);
         } else if (help_menu_items[i].f == dispfile_optmenu) {
-            Snprintf(helpbuf, sizeof helpbuf, help_menu_items[i].text,
+            Snprintf(helpbuf, sizeof helpbuf, item_text,
                      setopt_cmd(tmpbuf));
         } else {
-            Snprintf(helpbuf, sizeof helpbuf, "%s", help_menu_items[i].text);
+            Snprintf(helpbuf, sizeof helpbuf, "%s", item_text);
         }
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  helpbuf, MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "項目を選んでください:");
+    end_menu(tmpwin, g_language_is_jp ? "項目を選んでください:" : "Select help item:");
     n = select_menu(tmpwin, PICK_ONE, &selected);
     destroy_nhwindow(tmpwin);
     if (n > 0) {

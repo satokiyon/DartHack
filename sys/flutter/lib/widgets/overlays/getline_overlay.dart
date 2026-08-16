@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/ext_cmd_entry.dart';
 import '../../utils/utf8_length_limiting_formatter.dart';
 
@@ -46,6 +47,7 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isExtCmd = widget.extCmdList.isNotEmpty;
 
     return Positioned.fill(
@@ -90,7 +92,7 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                       autofocus: true,
                       inputFormatters: [Utf8LengthLimitingTextInputFormatter(100)],
                       decoration: InputDecoration(
-                        hintText: 'テキストを入力してください',
+                        hintText: l10n.enterText,
                         filled: true,
                         fillColor: const Color(0xFF0E1117),
                         border: OutlineInputBorder(
@@ -101,7 +103,7 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                           builder: (context, value, child) {
                             final byteCount = utf8.encode(value.text).length;
                             return Text(
-                              '$byteCount / 100 バイト',
+                              l10n.bytesCount(byteCount, 100),
                               style: const TextStyle(color: Colors.grey, fontSize: 12),
                             );
                           },
@@ -113,12 +115,12 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                     ),
                     if (isExtCmd) ...[
                       const SizedBox(height: 8),
-                      const Text("拡張コマンドの選択:", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text(l10n.selectExtCmd, style: const TextStyle(color: Colors.grey, fontSize: 12)),
                       const SizedBox(height: 4),
                       TextField(
                         controller: _extCmdFilterController,
                         decoration: InputDecoration(
-                          hintText: 'コマンドを絞り込み...',
+                          hintText: l10n.filterCmds,
                           prefixIcon: const Icon(Icons.search, size: 18),
                           isDense: true,
                           filled: true,
@@ -186,7 +188,7 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                           ElevatedButton.icon(
                             onPressed: widget.onShowMsgHistory,
                             icon: const Icon(Icons.history_rounded, size: 16),
-                            label: const Text('履歴'),
+                            label: Text(l10n.history),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blueGrey[900],
                               foregroundColor: Colors.amber[200],
@@ -200,13 +202,13 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                           children: [
                             TextButton(
                               onPressed: () => widget.onSubmit(null),
-                              child: const Text('キャンセル'),
+                              child: Text(l10n.cancel),
                             ),
                             const SizedBox(width: 8),
                             ElevatedButton(
                               onPressed: () => widget.onSubmit(widget.inputController.text),
                               style: ElevatedButton.styleFrom(backgroundColor: Colors.teal[500]),
-                              child: const Text('決定'),
+                              child: Text(l10n.confirm),
                             ),
                           ],
                         ),

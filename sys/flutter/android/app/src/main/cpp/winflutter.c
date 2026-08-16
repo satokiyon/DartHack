@@ -11,9 +11,14 @@
 
 typedef void (*DartLogCallback)(const char* msg);
 static DartLogCallback g_dart_log_cb = NULL;
+int g_language_is_jp = 1;
 
 __attribute__((visibility("default"))) void RegisterDartLogCallback(DartLogCallback cb) {
     g_dart_log_cb = cb;
+}
+
+__attribute__((visibility("default"))) void flutter_set_language_mode(int is_jp) {
+    g_language_is_jp = is_jp ? 1 : 0;
 }
 
 #define NUM_LOG_BUFS 32
@@ -836,7 +841,7 @@ static void flutter_player_selection(void) {
             flutter_start_menu(win, MENU_BEHAVE_STANDARD);
             any.a_void = 0; /* zero out all bits */
             any.a_int = randrole(TRUE)+1;
-            flutter_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "ランダム", 0);
+            flutter_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, g_language_is_jp ? "ランダム" : "Random", 0);
             for(i = 0; roles[i].name.m; i++)
             {
                 if(ok_role(i, flags.initrace, flags.initgend, flags.initalign))
@@ -849,7 +854,7 @@ static void flutter_player_selection(void) {
                     lastch = thisch;
                 }
             }
-            flutter_end_menu(win, "職業を選んでください");
+            flutter_end_menu(win, g_language_is_jp ? "職業を選んでください" : "Pick a role");
             result = flutter_select_menu(win, PICK_ONE, &selected);
             flutter_destroy_nhwindow(win);
 
@@ -876,7 +881,7 @@ static void flutter_player_selection(void) {
             flutter_start_menu(win, MENU_BEHAVE_STANDARD);
             any.a_void = 0; /* zero out all bits */
             any.a_int = randrace(flags.initrole)+1;
-            flutter_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "ランダム", 0);
+            flutter_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, g_language_is_jp ? "ランダム" : "Random", 0);
             for(i = 0; races[i].noun; i++)
                 if(ok_race(flags.initrole, i, flags.initgend, flags.initalign))
                 {
@@ -887,7 +892,7 @@ static void flutter_player_selection(void) {
                     flutter_add_menu(win, &nul_glyphinfo, &any, thisch, 0, ATR_NONE, NO_COLOR, jp_race_noun_for_display(i), 0);
                     lastch = thisch;
                 }
-            flutter_end_menu(win, "種族を選んでください");
+            flutter_end_menu(win, g_language_is_jp ? "種族を選んでください" : "Pick a race");
             result = flutter_select_menu(win, PICK_ONE, &selected);
             flutter_destroy_nhwindow(win);
 
@@ -914,14 +919,14 @@ static void flutter_player_selection(void) {
             flutter_start_menu(win, MENU_BEHAVE_STANDARD);
             any.a_void = 0; /* zero out all bits */
             any.a_int = randgend(flags.initrole, flags.initrace)+1;
-            flutter_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "ランダム", 0);
+            flutter_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, g_language_is_jp ? "ランダム" : "Random", 0);
             for(i = 0; i < ROLE_GENDERS; i++)
                 if(ok_gend(flags.initrole, flags.initrace, i, flags.initalign))
                 {
                     any.a_int = i + 1;
-                    flutter_add_menu(win, &nul_glyphinfo, &any, "mf"[i], 0, ATR_NONE, NO_COLOR, i == 0 ? "男性" : "女性", 0);
+                    flutter_add_menu(win, &nul_glyphinfo, &any, "mf"[i], 0, ATR_NONE, NO_COLOR, g_language_is_jp ? (i == 0 ? "男性" : "女性") : (i == 0 ? "Male" : "Female"), 0);
                 }
-            flutter_end_menu(win, "性別を選んでください");
+            flutter_end_menu(win, g_language_is_jp ? "性別を選んでください" : "Pick a gender");
             result = flutter_select_menu(win, PICK_ONE, &selected);
             flutter_destroy_nhwindow(win);
 
@@ -948,14 +953,14 @@ static void flutter_player_selection(void) {
             flutter_start_menu(win, MENU_BEHAVE_STANDARD);
             any.a_void = 0; /* zero out all bits */
             any.a_int = randalign(flags.initrole, flags.initrace)+1;
-            flutter_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, "ランダム", 0);
+            flutter_add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR, g_language_is_jp ? "ランダム" : "Random", 0);
             for(i = 0; i < ROLE_ALIGNS; i++)
                 if(ok_align(flags.initrole, flags.initrace, flags.initgend, i))
                 {
                     any.a_int = i + 1;
-                    flutter_add_menu(win, &nul_glyphinfo, &any, "lcn"[i], 0, ATR_NONE, NO_COLOR, i == 0 ? "秩序" : (i == 1 ? "中立" : "混沌"), 0);
+                    flutter_add_menu(win, &nul_glyphinfo, &any, "lcn"[i], 0, ATR_NONE, NO_COLOR, g_language_is_jp ? (i == 0 ? "秩序" : (i == 1 ? "中立" : "混沌")) : (i == 0 ? "Lawful" : (i == 1 ? "Neutral" : "Chaotic")), 0);
                 }
-            flutter_end_menu(win, "属性（アライメント）を選んでください");
+            flutter_end_menu(win, g_language_is_jp ? "属性（アライメント）を選んでください" : "Pick an alignment");
             result = flutter_select_menu(win, PICK_ONE, &selected);
             flutter_destroy_nhwindow(win);
 
@@ -1114,7 +1119,7 @@ static void flutter_display_file(const char *name, boolean complain) {
 
     flutter_clear_nhwindow(WIN_MESSAGE);
 
-    if (name && !strstr(name, "_jp") && (strlen(name) + 3 < sizeof name_jp)) {
+    if (g_language_is_jp && name && !strstr(name, "_jp") && (strlen(name) + 3 < sizeof name_jp)) {
         Strcpy(name_jp, name);
         Strcat(name_jp, "_jp");
         f = dlb_fopen(name_jp, "r");

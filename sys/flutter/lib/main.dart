@@ -39,6 +39,7 @@ import 'widgets/overlays/yn_overlay.dart';
 import 'widgets/overlays/getline_overlay.dart';
 import 'widgets/overlays/askname_overlay.dart';
 import 'widgets/overlays/text_overlay.dart';
+import 'l10n/app_localizations.dart';
 import 'screens/start_screen.dart';
 import 'screens/end_screen.dart';
 
@@ -49,13 +50,47 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  static MyAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<MyAppState>();
+
+  @override
+  State<MyApp> createState() => MyAppState();
+}
+
+class MyAppState extends State<MyApp> {
+  String _localeStr = 'ja';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLocale();
+  }
+
+  Future<void> _loadLocale() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _localeStr = prefs.getString('selected_language') ?? 'ja';
+    });
+  }
+
+  void setLocale(String lang) {
+    if (_localeStr != lang) {
+      setState(() {
+        _localeStr = lang;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'DartHack',
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: Locale(_localeStr),
       theme: ThemeData.dark(useMaterial3: true).copyWith(
         colorScheme: const ColorScheme.dark(
           primary: Colors.deepPurple,
@@ -311,6 +346,9 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _selectedLanguage = lang;
     });
+    if (mounted) {
+      MyApp.of(context)?.setLocale(lang);
+    }
   }
 
   DPadMoveMode _parseMoveMode(String name) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 class GameDrawerContent extends StatelessWidget {
   final bool isGameRunning;
@@ -34,6 +35,7 @@ class GameDrawerContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ListView(
       padding: EdgeInsets.zero,
       children: [
@@ -41,15 +43,15 @@ class GameDrawerContent extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.deepPurple[900],
           ),
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.sports_esports, size: 48, color: Colors.amber),
-              SizedBox(height: 8),
+              const Icon(Icons.sports_esports, size: 48, color: Colors.amber),
+              const SizedBox(height: 8),
               Text(
-                'DartHackメニュー',
-                style: TextStyle(
+                l10n.drawerTitle,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -61,7 +63,7 @@ class GameDrawerContent extends StatelessWidget {
         if (isGameRunning) ...[
           ListTile(
             leading: const Icon(Icons.save, color: Colors.greenAccent),
-            title: const Text('セーブして終了', style: TextStyle(color: Colors.white)),
+            title: Text(l10n.menuSaveQuit, style: const TextStyle(color: Colors.white)),
             onTap: () {
               onClose();
               onSaveAndExit();
@@ -69,7 +71,7 @@ class GameDrawerContent extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.dangerous, color: Colors.redAccent),
-            title: const Text('セーブせず終了 (放棄)', style: TextStyle(color: Colors.white)),
+            title: Text(l10n.menuQuitWithoutSave, style: const TextStyle(color: Colors.white)),
             onTap: () {
               onClose();
               onQuit();
@@ -79,7 +81,7 @@ class GameDrawerContent extends StatelessWidget {
         const Divider(color: Colors.white24, height: 1),
         ListTile(
           leading: const Icon(Icons.emoji_events, color: Colors.amber),
-          title: const Text('スコアボード', style: TextStyle(color: Colors.white)),
+          title: Text(l10n.scoreboard, style: const TextStyle(color: Colors.white)),
           onTap: () {
             onClose();
             onShowScoreboard();
@@ -87,7 +89,7 @@ class GameDrawerContent extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.menu_book, color: Colors.lightBlueAccent),
-          title: const Text('ガイドブックを読む', style: TextStyle(color: Colors.white)),
+          title: Text(l10n.readGuidebook, style: const TextStyle(color: Colors.white)),
           onTap: () {
             onClose();
             onShowGuidebook();
@@ -96,7 +98,7 @@ class GameDrawerContent extends StatelessWidget {
         if (isGameRunning) ...[
           ListTile(
             leading: const Icon(Icons.help_outline, color: Colors.tealAccent),
-            title: const Text('ヘルプを表示 (?)', style: TextStyle(color: Colors.white)),
+            title: Text(l10n.showHelp, style: const TextStyle(color: Colors.white)),
             onTap: () {
               onClose();
               onShowHelp();
@@ -104,7 +106,7 @@ class GameDrawerContent extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.search, color: Colors.orangeAccent),
-            title: const Text('データベース検索 ( /? )', style: TextStyle(color: Colors.white)),
+            title: Text(l10n.dbSearch, style: const TextStyle(color: Colors.white)),
             onTap: () {
               onClose();
               onDatabaseSearch();
@@ -112,7 +114,7 @@ class GameDrawerContent extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.tune, color: Colors.cyanAccent),
-            title: const Text('オプション設定 ( O )', style: TextStyle(color: Colors.white)),
+            title: Text(l10n.gameOptions, style: const TextStyle(color: Colors.white)),
             onTap: () {
               onClose();
               onOpenOptions();
@@ -123,7 +125,7 @@ class GameDrawerContent extends StatelessWidget {
         if (isGameRunning) ...[
           ListTile(
             leading: const Icon(Icons.map, color: Colors.amberAccent),
-            title: const Text('階層の全体地図を表示', style: TextStyle(color: Colors.white)),
+            title: Text(l10n.showFullMap, style: const TextStyle(color: Colors.white)),
             onTap: () {
               onClose();
               onShowFullMap();
@@ -132,7 +134,7 @@ class GameDrawerContent extends StatelessWidget {
         ],
         ListTile(
           leading: Icon(isKeyboardVisible ? Icons.keyboard_hide : Icons.keyboard, color: Colors.blueAccent),
-          title: Text(isKeyboardVisible ? '仮想キーボードを非表示' : '仮想キーボードを表示', style: const TextStyle(color: Colors.white)),
+          title: Text(isKeyboardVisible ? l10n.hideKeyboard : l10n.showKeyboard, style: const TextStyle(color: Colors.white)),
           onTap: () {
             onClose();
             onToggleKeyboard();
@@ -140,7 +142,7 @@ class GameDrawerContent extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.settings, color: Colors.grey),
-          title: const Text('ゲーム設定を開く', style: TextStyle(color: Colors.white)),
+          title: Text(l10n.openSettings, style: const TextStyle(color: Colors.white)),
           onTap: () {
             onClose();
             onShowSettings();

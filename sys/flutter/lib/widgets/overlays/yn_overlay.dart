@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 
 class YnOverlay extends StatelessWidget {
   final String question;
@@ -20,6 +21,7 @@ class YnOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final displayChoices = choices.contains('\x1b')
         ? choices.substring(0, choices.indexOf('\x1b'))
         : choices;
@@ -49,10 +51,10 @@ class YnOverlay extends StatelessWidget {
                       children: [
                         Icon(Icons.help_outline_rounded, color: Colors.amber[300], size: 18),
                         const SizedBox(width: 8),
-                        const Expanded(
+                        Expanded(
                           child: Text(
-                            '確認',
-                            style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold),
+                            l10n.confirmTitle,
+                            style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -100,7 +102,7 @@ class YnOverlay extends StatelessWidget {
                           ElevatedButton.icon(
                             onPressed: onShowMsgHistory,
                             icon: const Icon(Icons.history_rounded, size: 16),
-                            label: const Text('履歴'),
+                            label: Text(l10n.history),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blueGrey[900],
                               foregroundColor: Colors.amber[200],
@@ -129,12 +131,12 @@ class YnOverlay extends StatelessWidget {
                           ElevatedButton(
                             onPressed: () => onSelect(27), // ESC
                             style: ElevatedButton.styleFrom(backgroundColor: Colors.black54, foregroundColor: Colors.white70),
-                            child: const Text('キャンセル'),
+                            child: Text(l10n.cancel),
                           ),
                           ElevatedButton.icon(
                             onPressed: onShowMsgHistory,
                             icon: const Icon(Icons.history_rounded, size: 16),
-                            label: const Text('履歴'),
+                            label: Text(l10n.history),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blueGrey[900],
                               foregroundColor: Colors.amber[200],
