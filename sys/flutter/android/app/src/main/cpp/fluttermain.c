@@ -124,6 +124,21 @@ int NetHackMain(int argc, char** argv)
 	// remove all dangling locks on startup in Flutter mobile environment
 	remove_all_lock_files();
 
+	// Migration: record_jp が存在し、record がまだ無い場合は record_jp を record に自動リネームして移行
+	const char* fq_rec = fqname(RECORD, SCOREPREFIX, 0);
+	FILE* test_rec = fopen(fq_rec, "r");
+	if (test_rec) {
+		fclose(test_rec);
+	} else {
+		const char* fq_rec_jp = fqname("record_jp", SCOREPREFIX, 0);
+		FILE* test_rec_jp = fopen(fq_rec_jp, "r");
+		if (test_rec_jp) {
+			fclose(test_rec_jp);
+			rename(fq_rec_jp, fq_rec);
+			debuglog("Migrated record_jp to unified record file.");
+		}
+	}
+
 	// make sure RECORD exists
 	fp = fopen_datafile(RECORD, "a", SCOREPREFIX);
 	if (fp) fclose(fp);

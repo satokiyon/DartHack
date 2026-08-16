@@ -3,11 +3,14 @@ import '../models/topten_entry.dart';
 
 class TopTenWidget extends StatelessWidget {
   final List<TopTenEntry> entries;
+  final bool? isJp;
 
-  const TopTenWidget({super.key, required this.entries});
+  const TopTenWidget({super.key, required this.entries, this.isJp});
 
   @override
   Widget build(BuildContext context) {
+    final jaMode = isJp ?? (Localizations.localeOf(context).languageCode == 'ja');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -18,7 +21,7 @@ class TopTenWidget extends StatelessWidget {
               const Icon(Icons.emoji_events, color: Colors.amber, size: 24),
               const SizedBox(width: 8),
               Text(
-                "スコアボード",
+                jaMode ? "スコアボード" : "Scoreboard",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -85,7 +88,7 @@ class TopTenWidget extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "${entry.score} 点",
+                                      jaMode ? "${entry.score} 点" : "${entry.score} pts",
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
@@ -137,9 +140,9 @@ class TopTenWidget extends StatelessWidget {
                               color: const Color(0xFFFFB300),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Text(
-                              "今回の記録",
-                              style: TextStyle(
+                            child: Text(
+                              jaMode ? "今回の記録" : "Current Game",
+                              style: const TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,

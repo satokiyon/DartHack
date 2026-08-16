@@ -172,6 +172,9 @@ String? findRecordFilePath() {
     './record',
     '../record',
     'sys/flutter/record',
+    'record_jp',
+    './record_jp',
+    '../record_jp',
   ];
 
   for (final path in candidatePaths) {
@@ -182,34 +185,53 @@ String? findRecordFilePath() {
   return null;
 }
 
-String _translateRoleCode(String code) {
-  const map = {
+String _translateRoleCode(String code, bool isJp) {
+  if (!isJp) {
+    const mapEn = {
+      'Arc': 'Archeologist', 'Bar': 'Barbarian', 'Cav': 'Caveman', 'Hea': 'Healer',
+      'Kni': 'Knight', 'Mon': 'Monk', 'Pri': 'Priest', 'Rog': 'Rogue',
+      'Ran': 'Ranger', 'Sam': 'Samurai', 'Tou': 'Tourist', 'Val': 'Valkyrie', 'Wiz': 'Wizard'
+    };
+    return mapEn[code] ?? code;
+  }
+  const mapJp = {
     'Arc': '考古学者', 'Bar': '野蛮人', 'Cav': '洞窟人', 'Hea': '師',
     'Kni': '騎士', 'Mon': '修道士', 'Pri': '僧侶', 'Rog': '盗賊',
     'Ran': '旅人', 'Sam': '侍', 'Tou': '観光客', 'Val': 'バルキリー', 'Wiz': '魔法使い'
   };
-  return map[code] ?? code;
+  return mapJp[code] ?? code;
 }
 
-String _translateRaceCode(String code) {
-  const map = {'Hum': '人間', 'Elf': 'エルフ', 'Dwa': 'ドワーフ', 'Gno': 'ノーム', 'Orc': 'オーク'};
-  return map[code] ?? code;
+String _translateRaceCode(String code, bool isJp) {
+  if (!isJp) {
+    const mapEn = {'Hum': 'Human', 'Elf': 'Elf', 'Dwa': 'Dwarf', 'Gno': 'Gnome', 'Orc': 'Orc'};
+    return mapEn[code] ?? code;
+  }
+  const mapJp = {'Hum': '人間', 'Elf': 'エルフ', 'Dwa': 'ドワーフ', 'Gno': 'ノーム', 'Orc': 'オーク'};
+  return mapJp[code] ?? code;
 }
 
-String _translateGendCode(String code) {
-  if (code.startsWith('Mal') || code == 'M') return '男性';
-  if (code.startsWith('Fem') || code == 'F') return '女性';
+String _translateGendCode(String code, bool isJp) {
+  if (code.startsWith('Mal') || code == 'M') return isJp ? '男性' : 'Male';
+  if (code.startsWith('Fem') || code == 'F') return isJp ? '女性' : 'Female';
   return code;
 }
 
-String _translateAlignCode(String code) {
-  if (code.startsWith('Law') || code == 'L') return '秩序';
-  if (code.startsWith('Neu') || code == 'N') return '中立';
-  if (code.startsWith('Cha') || code == 'C') return '混沌';
+String _translateAlignCode(String code, bool isJp) {
+  if (code.startsWith('Law') || code == 'L') return isJp ? '秩序' : 'Lawful';
+  if (code.startsWith('Neu') || code == 'N') return isJp ? '中立' : 'Neutral';
+  if (code.startsWith('Cha') || code == 'C') return isJp ? '混沌' : 'Chaotic';
   return code;
 }
 
-String _translateDeathText(String death) {
+String _translateDeathText(String death, bool isJp) {
+  if (!isJp) {
+    if (death == 'quit') return 'Quit';
+    if (death == 'starved') return 'Starved';
+    if (death.startsWith('escaped')) return 'Escaped';
+    if (death.startsWith('ascended')) return 'Ascended';
+    return death;
+  }
   if (death == 'quit') return '自決した';
   if (death == 'starved') return '餓死した';
   if (death.startsWith('escaped')) return '脱出した';
@@ -220,7 +242,7 @@ String _translateDeathText(String death) {
   return death;
 }
 
-List<TopTenEntry> parseRecordFile(String filePath) {
+List<TopTenEntry> parseRecordFile(String filePath, {bool isJp = true}) {
   final file = File(filePath);
   if (!file.existsSync()) return [];
 
@@ -277,20 +299,28 @@ List<TopTenEntry> parseRecordFile(String filePath) {
     for (int i = 0; i < rawEntries.length; i++) {
       final e = rawEntries[i];
       final rank = i + 1;
-      final roleJp = _translateRoleCode(e.role);
-      final raceJp = _translateRaceCode(e.race);
-      final gendJp = _translateGendCode(e.gend);
-      final alignJp = _translateAlignCode(e.align);
+      final roleStr = _translateRoleCode(e.role, isJp);
+      final raceStr = _translateRaceCode(e.race, isJp);
+      final gendStr = _translateGendCode(e.gend, isJp);
+      final alignStr = _translateAlignCode(e.align, isJp);
 
-      final profile = '$roleJp/$raceJp/$gendJp/$alignJp';
+      final profile = '$roleStr/$raceStr/$gendStr/$alignStr';
       final nameAndProfile = '${e.name} $profile';
 
-      final deathJp = _translateDeathText(e.death);
+      final deathStr = _translateDeathText(e.death, isJp);
       final details = <String>[];
-      if (deathJp.isNotEmpty) {
-        details.add('$deathJp (メインダンジョン ${e.dlev}階)');
+      if (isJp) {
+        if (deathStr.isNotEmpty) {
+          details.add('$deathStr (メインダンジョン ${e.dlev}階)');
+        } else {
+          details.add('メインダンジョン ${e.dlev}階 [HP: ${e.hp}/${e.maxhp}]');
+        }
       } else {
-        details.add('メインダンジョン ${e.dlev}階 [HP: ${e.hp}/${e.maxhp}]');
+        if (deathStr.isNotEmpty) {
+          details.add('$deathStr (Dungeon level ${e.dlev})');
+        } else {
+          details.add('Dungeon level ${e.dlev} [HP: ${e.hp}/${e.maxhp}]');
+        }
       }
 
       entries.add(TopTenEntry(

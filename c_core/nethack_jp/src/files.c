@@ -467,6 +467,14 @@ make_jp_datafile_name(const char *name, char *buf, size_t bufsz)
 #endif
 
     filename = last_slash ? (last_slash + 1) : name;
+
+    /* ユーザー記録ファイル (record, logfile 等) は言語共通の単一ファイルとするため _jp 変換を行わない */
+    if (!strcmpi(filename, RECORD) || !strcmpi(filename, LOGFILE)
+        || !strcmpi(filename, XLOGFILE) || !strcmpi(filename, LIVELOGFILE)
+        || !strcmpi(filename, PANICLOG)) {
+        return FALSE;
+    }
+
     dot = strrchr(filename, '.');
 
     if (dot && dot > filename) {

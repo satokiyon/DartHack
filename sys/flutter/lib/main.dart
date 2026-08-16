@@ -2363,25 +2363,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _showScoreboardDialog() {
     List<TopTenEntry> entries = [];
-    try {
-      final ffi = NetHackFfi();
-      final ptr = ffi.getTopTenTextFlutter();
-      if (ptr != nullptr) {
-        final text = ptr.toDartString();
-        if (text.trim().isNotEmpty) {
-          final lines = text.split('\n');
-          entries = TopTenEntry.parse(lines, const []);
-        }
-      }
-    } catch (e) {
-      debugPrint('getTopTenTextFlutter fetch info/error: $e');
-    }
+    final isJp = _selectedLanguage == 'ja';
 
-    if (entries.isEmpty) {
+    try {
       final recordPath = findRecordFilePath();
       if (recordPath != null) {
-        entries = parseRecordFile(recordPath);
+        entries = parseRecordFile(recordPath, isJp: isJp);
       }
+    } catch (e) {
+      debugPrint('parseRecordFile error: $e');
     }
 
     showDialog(
@@ -2403,21 +2393,21 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 Expanded(
                   child: entries.isNotEmpty
-                      ? TopTenWidget(entries: entries)
+                      ? TopTenWidget(entries: entries, isJp: isJp)
                       : Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Icon(Icons.emoji_events_outlined, size: 64, color: Colors.grey),
                               const SizedBox(height: 16),
-                              const Text(
-                                'スコア記録がありません',
-                                style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
+                              Text(
+                                isJp ? 'スコア記録がありません' : 'No score records found',
+                                style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 8),
-                              const Text(
-                                'ゲームをプレイしてハイスコアを目指しましょう！',
-                                style: TextStyle(color: Colors.white38, fontSize: 12),
+                              Text(
+                                isJp ? 'ゲームをプレイしてハイスコアを目指しましょう！' : 'Play games to set high scores!',
+                                style: const TextStyle(color: Colors.white38, fontSize: 12),
                               ),
                             ],
                           ),
@@ -2435,7 +2425,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text('閉じる', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text(isJp ? '閉じる' : 'Close', style: const TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
