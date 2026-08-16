@@ -100,9 +100,12 @@
    - Flutter Android環境向けのビルドを行う際は、`DartHack_private` 内の `android_build.ps1` を実行してください。
 
 5. **Android / Flutter版における日本語・英語版データファイルの配置と優先ロード方針**:
-   - AndroidおよびFlutterポートでは、データファイル群（`data`, `rumors`, `oracles` 等）およびヘルプ・メニューなどのデータファイル群を個別のファイルとして `assets/nethackdir/` にパッケージングし、アプリ起動時に端末のストレージ（データディレクトリ）にコピーして読み込みます。
-   - Windows版と同様に、英語版（`data`, `oracles`, `rumors`, `tribute` 等）と日本語版（`data_jp`, `oracles_jp`, `rumors_jp`, `tribute_jp` 等）の両方のファイルを `assets/nethackdir/` に同梱します。
-   - Cコア側（`dlb.c` / `files.c`）でデータファイルをロードする際、日本語版（`_jp`）が存在すれば自動的に優先して読み込み、無ければ英語版にフォールバックして読み込みます。
+   - AndroidおよびFlutterポートでは、データファイル群（`data`, `rumors`, `oracles`, `quest.lua`, `bogusmon`, `engrave`, `epitaph`, `tut-1.lua` 等）を個別のファイルとして `assets/nethackdir/` にパッケージングし、アプリ起動時に端末のストレージ（データディレクトリ）にコピーして読み込みます。
+   - 英語版（`data`, `oracles`, `rumors`, `quest.lua`, `bogusmon` 等）と日本語版（`data_jp`, `oracles_jp`, `rumors_jp`, `quest_jp.lua`, `bogusmon_jp` 等）の両方のファイルを `assets/nethackdir/` に同梱します。
+   - **Cコア側における自動優先ロードの実装原則 (`files.c` / `fopen_datafile`)**:
+     - DLB (Data Librarian Archive) が未定義の環境では、`include/dlb.h` において `dlb_fopen` が `fopen_datafile(name, mode, DATAPREFIX)` へ展開されます。
+     - そのため、データファイルの自動言語切り替え（`g_language_is_jp == 1` 時に `_jp` 付きファイルを優先オープンする処理）は `dlb.c` ではなく、全プラットフォーム共通のディスクオープン関数である **`src/files.c` の `fopen_datafile`** 内に実装してください。これにより、メモリ構造体への副作用を一切生じさせずに `quest_jp.lua` 等を含む全データファイルの自動バイリンガル切り替えが保証されます。
+     - **パス・拡張子判定の注意**: `_jp` ファイル名の生成（`make_jp_datafile_name`）時は、`./quest.lua` や `dat/quest.lua` などのパス区切り文字 (`/`, `\`) を考慮し、ファイル名部分末尾の拡張子ドットのみを判別して手前に `_jp` を挿入する設計を徹底してください。
    - データファイルアセットを変更・追加した際は、上書きインストール時に強制的にアセットコピーがトリガーされるよう、必ず `assets/ver` 内のバージョン値（整数値）をインクリメントしてください。
 
 6. **デバッグ用一時コード・ログ出力のクリーンアップ**:
@@ -265,9 +268,12 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
    - Flutter Android環境向けのビルドを行う際は、`DartHack_private` 内の `android_build.ps1` を実行してください。
 
 5. **Android / Flutter版における日本語・英語版データファイルの配置と優先ロード方針**:
-   - AndroidおよびFlutterポートでは、データファイル群（`data`, `rumors`, `oracles` 等）およびヘルプ・メニューなどのデータファイル群を個別のファイルとして `assets/nethackdir/` にパッケージングし、アプリ起動時に端末のストレージ（データディレクトリ）にコピーして読み込みます。
-   - Windows版と同様に、英語版（`data`, `oracles`, `rumors`, `tribute` 等）と日本語版（`data_jp`, `oracles_jp`, `rumors_jp`, `tribute_jp` 等）の両方のファイルを `assets/nethackdir/` に同梱します。
-   - Cコア側（`dlb.c` / `files.c`）でデータファイルをロードする際、日本語版（`_jp`）が存在すれば自動的に優先して読み込み、無ければ英語版にフォールバックして読み込みます。
+   - AndroidおよびFlutterポートでは、データファイル群（`data`, `rumors`, `oracles`, `quest.lua`, `bogusmon`, `engrave`, `epitaph`, `tut-1.lua` 等）を個別のファイルとして `assets/nethackdir/` にパッケージングし、アプリ起動時に端末のストレージ（データディレクトリ）にコピーして読み込みます。
+   - 英語版（`data`, `oracles`, `rumors`, `quest.lua`, `bogusmon` 等）と日本語版（`data_jp`, `oracles_jp`, `rumors_jp`, `quest_jp.lua`, `bogusmon_jp` 等）の両方のファイルを `assets/nethackdir/` に同梱します。
+   - **Cコア側における自動優先ロードの実装原則 (`files.c` / `fopen_datafile`)**:
+     - DLB (Data Librarian Archive) が未定義の環境では、`include/dlb.h` において `dlb_fopen` が `fopen_datafile(name, mode, DATAPREFIX)` へ展開されます。
+     - そのため、データファイルの自動言語切り替え（`g_language_is_jp == 1` 時に `_jp` 付きファイルを優先オープンする処理）は `dlb.c` ではなく、全プラットフォーム共通のディスクオープン関数である **`src/files.c` の `fopen_datafile`** 内に実装してください。これにより、メモリ構造体への副作用を一切生じさせずに `quest_jp.lua` 等を含む全データファイルの自動バイリンガル切り替えが保証されます。
+     - **パス・拡張子判定の注意**: `_jp` ファイル名の生成（`make_jp_datafile_name`）時は、`./quest.lua` や `dat/quest.lua` などのパス区切り文字 (`/`, `\`) を考慮し、ファイル名部分末尾の拡張子ドットのみを判別して手前に `_jp` を挿入する設計を徹底してください。
    - データファイルアセットを変更・追加した際は、上書きインストール時に強制的にアセットコピーがトリガーされるよう、必ず `assets/ver` 内のバージョン値（整数値）をインクリメントしてください。
 
 6. **デバッグ用一時コード・ログ出力のクリーンアップ**:
