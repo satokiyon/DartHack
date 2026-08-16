@@ -7,25 +7,33 @@
 
 <!-- agent-ninja-END -->
 
-## c_core/nethack_jp の Git Subtree 管理方針
+## c_core/nethack_jp および c_core/nethack_en の Git Subtree 管理方針
 
-`c_core/nethack_jp` は DartHack 独自の拡張や修正が含まれるため、git submodule 化を行わず **Git Subtree** 方式で管理します。
+`c_core/nethack_jp` および `c_core/nethack_en` は DartHack 独自の拡張や修正（UTF-8化、Android/FFI互換処理など）が含まれるため、git submodule 化を行わず **Git Subtree** 方式で管理します。
 
 1. **基本方針**:
-   - `c_core/nethack_jp` のソースコードは親リポジトリ（DartHack）内で直接コミット・維持します。
-   - 本家 [satokiyon/NetHackJP](https://github.com/satokiyon/NetHackJP.git) の更新を取り込む際は Git Subtree を用いてマージします。
+   - ソースコードは親リポジトリ（DartHack）内で直接コミット・維持します。
+   - 本家リポジトリの更新を取り込む際は Git Subtree を用いてマージします。
 
-2. **本家更新の同期方法**:
+2. **NetHackJP 本家更新の同期方法 (`c_core/nethack_jp`)**:
    - リモート名: `nethack-jp` (`https://github.com/satokiyon/NetHackJP.git`)
    - 同期スクリプト: `c_core/sync_nethack_jp.ps1` を実行してください。
      ```powershell
      powershell -ExecutionPolicy Bypass -File c_core/sync_nethack_jp.ps1
      ```
+
+3. **NetHack 本家更新の同期方法 (`c_core/nethack_en`)**:
+   - リモート名: `nethack-en` (`https://github.com/NetHack/NetHack.git`)
+   - 同期スクリプト: `c_core/sync_nethack_en.ps1` を実行してください。
+     ```powershell
+     powershell -ExecutionPolicy Bypass -File c_core/sync_nethack_en.ps1
+     ```
    - 手動で同期を行う場合:
      ```powershell
-     git fetch nethack-jp
-     git subtree pull --prefix=c_core/nethack_jp nethack-jp main --squash
+     git fetch nethack-en
+     git subtree pull --prefix=c_core/nethack_en nethack-en main --squash
      ```
+
 
 
 ## 死因（killer.name）の日本語化と英語交じり回避方針
