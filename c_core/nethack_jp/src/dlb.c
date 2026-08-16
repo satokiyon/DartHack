@@ -482,9 +482,11 @@ dlb_fopen(const char *name, const char *mode)
     if (should_try_jp_datafile(name)) {
         if (make_jp_datafile_name(name, jpname, sizeof jpname)) {
             if (do_dlb_fopen(dp, jpname, mode)) {
+                debuglog("dlb_fopen: opened via dlb '%s' (req '%s')", jpname, name);
                 dp->fp = (FILE *) 0;
                 return dp;
             } else if ((fp = fopen_datafile(jpname, mode, DATAPREFIX)) != 0) {
+                debuglog("dlb_fopen: opened via file '%s' (req '%s')", jpname, name);
                 dp->fp = fp;
                 return dp;
             }
@@ -494,9 +496,11 @@ dlb_fopen(const char *name, const char *mode)
             Strcpy(jpname, name);
             Strcat(jpname, "_jp");
             if (do_dlb_fopen(dp, jpname, mode)) {
+                debuglog("dlb_fopen: opened via dlb fallback '%s' (req '%s')", jpname, name);
                 dp->fp = (FILE *) 0;
                 return dp;
             } else if ((fp = fopen_datafile(jpname, mode, DATAPREFIX)) != 0) {
+                debuglog("dlb_fopen: opened via file fallback '%s' (req '%s')", jpname, name);
                 dp->fp = fp;
                 return dp;
             }
@@ -504,13 +508,15 @@ dlb_fopen(const char *name, const char *mode)
     }
 
     /* 日本語版が開けなければ、元のファイル名（英語版）でフォールバックオープン */
-    if (do_dlb_fopen(dp, name, mode))
+    if (do_dlb_fopen(dp, name, mode)) {
+        debuglog("dlb_fopen: opened via dlb original '%s'", name);
         dp->fp = (FILE *) 0;
-    else if ((fp = fopen_datafile(name, mode, DATAPREFIX)) != 0) {
+    } else if ((fp = fopen_datafile(name, mode, DATAPREFIX)) != 0) {
+        debuglog("dlb_fopen: opened via file original '%s'", name);
         dp->fp = fp;
-    }
-    else {
+    } else {
         /* can't find anything */
+        debuglog("dlb_fopen: failed to open '%s'", name);
         free((genericptr_t) dp);
         dp = (dlb *) 0;
     }
@@ -527,14 +533,18 @@ should_try_jp_datafile(const char *name UNUSED)
 
 /*
  * 日本語版データファイル名を生成するヘルパー。
- * 拡張子のあるファイルの場合 (例: "quest.lua" -> "quest_jp.lua") は拡張子の手前に "_jp" を挿入し、
- * 拡張子のないファイルの場合 (例: "data" -> "data_jp") は末尾に "_jp" を付与する。
+ * パス区切り文字 (/) や (\) を考慮し、ファイル名末尾の拡張子部分の手前に "_jp" を挿入する。
+ * 例: "quest.lua" -> "quest_jp.lua"
+ * 例: "./quest.lua" -> "./quest_jp.lua"
+ * 例: "dat/quest.lua" -> "dat/quest_jp.lua"
+ * 例: "data" -> "data_jp"
  * すでに "_jp" が付いている場合は FALSE を返す。
  */
 staticfn boolean
 make_jp_datafile_name(const char *name, char *buf, size_t bufsz)
 {
-    const char *dot;
+    const char *last_slash, *dot, *filename;
+
     if (!name || !buf || bufsz < 8)
         return FALSE;
     if (strstr(name, "_jp"))
@@ -542,14 +552,28 @@ make_jp_datafile_name(const char *name, char *buf, size_t bufsz)
     if (strlen(name) + 3 >= bufsz)
         return FALSE;
 
-    dot = strrchr(name, '.');
-    if (dot) {
+    /* 最後のパスセパレータ (/) または (\) の位置を特定 */
+    last_slash = strrchr(name, '/');
+#ifdef WIN32
+    {
+        const char *bslash = strrchr(name, '\\');
+        if (bslash && (!last_slash || bslash > last_slash))
+            last_slash = bslash;
+    }
+#endif
+
+    filename = last_slash ? (last_slash + 1) : name;
+    dot = strrchr(filename, '.');
+
+    if (dot && dot > filename) {
+        /* ファイル名部分に拡張子がある場合 */
         size_t baselen = (size_t)(dot - name);
         copynchars(buf, name, (int) baselen);
         buf[baselen] = '\0';
         Strcat(buf, "_jp");
         Strcat(buf, dot);
     } else {
+        /* 拡張子がない場合 */
         Strcpy(buf, name);
         Strcat(buf, "_jp");
     }
