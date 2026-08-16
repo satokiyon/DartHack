@@ -479,13 +479,27 @@ dlb_fopen(const char *name, const char *mode)
     dp = (dlb *) alloc(sizeof(dlb));
 
     /* ファイル名に _jp が含まれていなければ、まず _jp を付与した名前でのオープンを試みる */
-    if (should_try_jp_datafile(name) && make_jp_datafile_name(name, jpname, sizeof jpname)) {
-        if (do_dlb_fopen(dp, jpname, mode)) {
-            dp->fp = (FILE *) 0;
-            return dp;
-        } else if ((fp = fopen_datafile(jpname, mode, DATAPREFIX)) != 0) {
-            dp->fp = fp;
-            return dp;
+    if (should_try_jp_datafile(name)) {
+        if (make_jp_datafile_name(name, jpname, sizeof jpname)) {
+            if (do_dlb_fopen(dp, jpname, mode)) {
+                dp->fp = (FILE *) 0;
+                return dp;
+            } else if ((fp = fopen_datafile(jpname, mode, DATAPREFIX)) != 0) {
+                dp->fp = fp;
+                return dp;
+            }
+        }
+        /* 予備パターン: シンプルな末尾_jp (例: quest.lua_jp) */
+        if (!strstr(name, "_jp") && strlen(name) + 3 < sizeof jpname) {
+            Strcpy(jpname, name);
+            Strcat(jpname, "_jp");
+            if (do_dlb_fopen(dp, jpname, mode)) {
+                dp->fp = (FILE *) 0;
+                return dp;
+            } else if ((fp = fopen_datafile(jpname, mode, DATAPREFIX)) != 0) {
+                dp->fp = fp;
+                return dp;
+            }
         }
     }
 
@@ -512,13 +526,15 @@ should_try_jp_datafile(const char *name UNUSED)
 }
 
 /*
- * ファイル名末尾にシンプルに "_jp" を付与するヘルパー。
- * 例: "data" -> "data_jp", "help" -> "help_jp"
+ * 日本語版データファイル名を生成するヘルパー。
+ * 拡張子のあるファイルの場合 (例: "quest.lua" -> "quest_jp.lua") は拡張子の手前に "_jp" を挿入し、
+ * 拡張子のないファイルの場合 (例: "data" -> "data_jp") は末尾に "_jp" を付与する。
  * すでに "_jp" が付いている場合は FALSE を返す。
  */
 staticfn boolean
 make_jp_datafile_name(const char *name, char *buf, size_t bufsz)
 {
+    const char *dot;
     if (!name || !buf || bufsz < 8)
         return FALSE;
     if (strstr(name, "_jp"))
@@ -526,8 +542,17 @@ make_jp_datafile_name(const char *name, char *buf, size_t bufsz)
     if (strlen(name) + 3 >= bufsz)
         return FALSE;
 
-    Strcpy(buf, name);
-    Strcat(buf, "_jp");
+    dot = strrchr(name, '.');
+    if (dot) {
+        size_t baselen = (size_t)(dot - name);
+        Copyn(buf, name, (int) baselen);
+        buf[baselen] = '\0';
+        Strcat(buf, "_jp");
+        Strcat(buf, dot);
+    } else {
+        Strcpy(buf, name);
+        Strcat(buf, "_jp");
+    }
     return TRUE;
 }
 

@@ -53,14 +53,14 @@ moveloop_preamble(boolean resuming)
     /* side-effects from the real world */
     flags.moonphase = phase_of_the_moon();
     if (flags.moonphase == FULL_MOON) {
-        pline("ラッキー！今夜は満月だ!");
+        pline("%s", g_language_is_jp ? "ラッキー！今夜は満月だ!" : "You are lucky! It is a full moon tonight.");
         change_luck(1);
     } else if (flags.moonphase == NEW_MOON) {
-        pline("気をつけろ!  今夜は新月だ.");
+        pline("%s", g_language_is_jp ? "気をつけろ!  今夜は新月だ." : "Be careful! It is a new moon tonight.");
     }
     flags.friday13 = friday_13th();
     if (flags.friday13) {
-        pline("警戒しろ!  13日の金曜日には悪いことが起きやすい.");
+        pline("%s", g_language_is_jp ? "警戒しろ!  13日の金曜日には悪いことが起きやすい." : "Watch out! Bad things can happen on Friday the 13th.");
         change_luck(-1);
     }
 
