@@ -435,15 +435,79 @@ validate_prefix_locations(char *reasonbuf)
         return 1;
 }
 
+/*
+ * 日本語版データファイル名を生成するヘルパー。
+ * パス区切り文字 (/) や (\) を考慮し、ファイル名末尾の拡張子部分の手前に "_jp" を挿入する。
+ * 例: "quest.lua" -> "quest_jp.lua"
+ * 例: "./quest.lua" -> "./quest_jp.lua"
+ * 例: "dat/quest.lua" -> "dat/quest_jp.lua"
+ * 例: "data" -> "data_jp"
+ * すでに "_jp" が付いている場合は FALSE を返す。
+ */
+staticfn boolean
+make_jp_datafile_name(const char *name, char *buf, size_t bufsz)
+{
+    const char *last_slash, *dot, *filename;
+
+    if (!name || !buf || bufsz < 8)
+        return FALSE;
+    if (strstr(name, "_jp"))
+        return FALSE;
+    if (strlen(name) + 3 >= bufsz)
+        return FALSE;
+
+    /* 最後のパスセパレータ (/) または (\) の位置を特定 */
+    last_slash = strrchr(name, '/');
+#ifdef WIN32
+    {
+        const char *bslash = strrchr(name, '\\');
+        if (bslash && (!last_slash || bslash > last_slash))
+            last_slash = bslash;
+    }
+#endif
+
+    filename = last_slash ? (last_slash + 1) : name;
+    dot = strrchr(filename, '.');
+
+    if (dot && dot > filename) {
+        /* ファイル名部分に拡張子がある場合 */
+        size_t baselen = (size_t)(dot - name);
+        copynchars(buf, name, (int) baselen);
+        buf[baselen] = '\0';
+        Strcat(buf, "_jp");
+        Strcat(buf, dot);
+    } else {
+        /* 拡張子がない場合 */
+        Strcpy(buf, name);
+        Strcat(buf, "_jp");
+    }
+    return TRUE;
+}
+
 /* fopen a file, with OS-dependent bells and whistles */
 /* NOTE: a simpler version of this routine also exists in util/dlb_main.c */
 FILE *
 fopen_datafile(const char *filename, const char *mode, int prefix)
 {
     FILE *fp;
+    char jpfilename[BUFSZ];
+    const char *fq_name;
+    extern int g_language_is_jp;
 
-    filename = fqname(filename, prefix, prefix == TROUBLEPREFIX ? 3 : 0);
-    fp = fopen(filename, mode);
+    if (g_language_is_jp && make_jp_datafile_name(filename, jpfilename, sizeof jpfilename)) {
+        fq_name = fqname(jpfilename, prefix, prefix == TROUBLEPREFIX ? 3 : 0);
+        fp = fopen(fq_name, mode);
+        if (fp) {
+            debuglog("fopen_datafile: successfully opened '%s' (requested '%s')", jpfilename, filename);
+            return fp;
+        }
+    }
+
+    fq_name = fqname(filename, prefix, prefix == TROUBLEPREFIX ? 3 : 0);
+    fp = fopen(fq_name, mode);
+    if (fp && g_language_is_jp) {
+        debuglog("fopen_datafile: opened original '%s'", filename);
+    }
     return fp;
 }
 #endif /* !SFCTOOL */
