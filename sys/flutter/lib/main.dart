@@ -1102,7 +1102,9 @@ class _MyHomePageState extends State<MyHomePage> {
     if (!mounted || _exitDialogShown) return;
     _exitDialogShown = true;
 
-    final dialogMessage = message.trim().isEmpty ? 'また会いましょう...' : message.trim();
+    final isJp = (_selectedLanguage == 'ja');
+    final defaultMsg = isJp ? 'また会いましょう...' : 'See you again...';
+    final dialogMessage = message.trim().isEmpty ? defaultMsg : message.trim();
 
     await showDialog<void>(
       context: context,
@@ -1123,6 +1125,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _showNewLevelRestDialog() async {
     if (!mounted) return;
 
+    final isJp = (_selectedLanguage == 'ja');
+
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -1132,27 +1136,27 @@ class _MyHomePageState extends State<MyHomePage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.explore_rounded, color: Colors.amber),
-              SizedBox(width: 8),
-              Text('未知の階層に到達'),
+              const Icon(Icons.explore_rounded, color: Colors.amber),
+              const SizedBox(width: 8),
+              Text(isJp ? '未知の階層に到達' : 'Reached New Floor'),
             ],
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                '新しい階層に足を踏み入れた。\n広告を見て少し休息しますか？',
-                style: TextStyle(fontSize: 14, height: 1.4),
+              Text(
+                isJp ? '新しい階層に足を踏み入れた。\n広告を見て少し休息しますか？' : 'Stepped onto a new floor.\nWould you like to rest briefly by watching an ad?',
+                style: const TextStyle(fontSize: 14, height: 1.4),
               ),
               const SizedBox(height: 20),
               ElevatedButton.icon(
                 icon: const Icon(Icons.play_circle_fill_rounded, size: 22),
-                label: const Text(
-                  '広告を見て休む (体力か魔力を回復)',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                label: Text(
+                  isJp ? '広告を見て休む (体力か魔力を回復)' : 'Rest by watching ad (Restore HP/PW)',
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple.shade700,
@@ -1170,7 +1174,7 @@ class _MyHomePageState extends State<MyHomePage> {
               const SizedBox(height: 10),
               OutlinedButton.icon(
                 icon: const Icon(Icons.arrow_forward_rounded, size: 20),
-                label: const Text('そのまま進む'),
+                label: Text(isJp ? 'そのまま進む' : 'Proceed as is'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white70,
                   side: const BorderSide(color: Colors.white38),
@@ -1554,21 +1558,22 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String _moveModeDescription(DPadMoveMode mode) {
+    final isJp = (_selectedLanguage == 'ja');
     switch (mode) {
       case DPadMoveMode.normal:
-        return '指定方向へ1マス移動 (yuhjklbn)';
+        return isJp ? '指定方向へ1マス移動 (yuhjklbn)' : 'Move 1 step in specified direction (yuhjklbn)';
       case DPadMoveMode.upper:
-        return '指定方向へ、壁に当たるか何かにぶつかるまで進む (YUHJKLBN)';
+        return isJp ? '指定方向へ、壁に当たるか何かにぶつかるまで進む (YUHJKLBN)' : 'Run in direction until hitting wall/obstacle (YUHJKLBN)';
       case DPadMoveMode.gLower:
-        return '指定方向へ、何か興味深いものを見つけるまで進む (g<dir>)';
+        return isJp ? '指定方向へ、何か興味深いものを見つけるまで進む (g<dir>)' : 'Move until something interesting is found (g<dir>)';
       case DPadMoveMode.gUpper:
-        return '指定方向へ、何か興味深いものを見つけるまで進む（分岐無視） (G<dir>)';
+        return isJp ? '指定方向へ、何か興味深いものを見つけるまで進む（分岐無視） (G<dir>)' : 'Move until something interesting is found, ignore forks (G<dir>)';
       case DPadMoveMode.ctrl:
-        return '指定方向へ、何か興味深いものを見つけるまで進む（分岐無視） (^<dir>)';
+        return isJp ? '指定方向へ、何か興味深いものを見つけるまで進む（分岐無視） (^<dir>)' : 'Move until something interesting is found, ignore forks (^<dir>)';
       case DPadMoveMode.mCmd:
-        return 'アイテムを拾わずに移動、危険な地形でも移動 (m<dir>)';
+        return isJp ? 'アイテムを拾わずに移動、危険な地形でも移動 (m<dir>)' : 'Move without picking items or entering danger (m<dir>)';
       case DPadMoveMode.fCmd:
-        return 'モンスターを感知していなくても攻撃 (F<dir>)';
+        return isJp ? 'モンスターを感知していなくても攻撃 (F<dir>)' : 'Fight even if monster is unperceived (F<dir>)';
     }
   }
 
@@ -2923,23 +2928,26 @@ class _MyHomePageState extends State<MyHomePage> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         if (_isGameRunning && _isMainGameStarted) {
+          final isJp = (_selectedLanguage == 'ja');
           final bool? exitConfirmed = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
               backgroundColor: Colors.grey[900],
-              title: const Text("ゲームの終了", style: TextStyle(color: Colors.white)),
-              content: const Text(
-                "本当に終了しますか？\n（進行状況はセーブされません。セーブして終了するにはメニューの「セーブして終了」を使用してください。）",
-                style: TextStyle(color: Colors.white70),
+              title: Text(isJp ? "ゲームの終了" : "Quit Game", style: const TextStyle(color: Colors.white)),
+              content: Text(
+                isJp
+                    ? "本当に終了しますか？\n（進行状況はセーブされません。セーブして終了するにはメニューの「セーブして終了」を使用してください。）"
+                    : "Really quit?\n(Progress will not be saved. To save and quit, use 'Save and Quit' from the menu.)",
+                style: const TextStyle(color: Colors.white70),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text("キャンセル", style: TextStyle(color: Colors.blueAccent)),
+                  child: Text(isJp ? "キャンセル" : "Cancel", style: const TextStyle(color: Colors.blueAccent)),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text("終了する", style: TextStyle(color: Colors.redAccent)),
+                  child: Text(isJp ? "終了する" : "Quit", style: const TextStyle(color: Colors.redAccent)),
                 ),
               ],
             ),

@@ -43,14 +43,15 @@ staticfn void save_adjust_levelflags(void);
 int
 dosave(void)
 {
+    extern int g_language_is_jp;
     clear_nhwindow(WIN_MESSAGE);
-    if (y_n("本当にセーブしますか?") == 'n') {
+    if (y_n(g_language_is_jp ? "本当にセーブしますか?" : "Really save?") == 'n') {
         clear_nhwindow(WIN_MESSAGE);
         if (gm.multi > 0)
             nomul(0);
     } else {
         clear_nhwindow(WIN_MESSAGE);
-        pline("セーブ中...");
+        pline(g_language_is_jp ? "セーブ中..." : "Saving...");
 #if defined(HANGUPHANDLING)
         program_state.done_hup = 0;
 #endif
@@ -62,7 +63,7 @@ dosave(void)
 
             /* make sure they see the Saving message */
             display_nhwindow(WIN_MESSAGE, TRUE);
-            exit_nhwindows("また会いましょう...");
+            exit_nhwindows(g_language_is_jp ? "また会いましょう..." : "See you again...");
             nh_terminate(EXIT_SUCCESS);
         } else
             docrt();

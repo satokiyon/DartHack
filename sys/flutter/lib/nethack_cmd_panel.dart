@@ -135,7 +135,48 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
     'a', 'A', '^t', 'D', 'F', 'p', '^x', '^o', '?'
   ];
 
-  static const List<Map<String, String>> fallbackExtCmds = [
+  static const List<Map<String, String>> fallbackExtCmdsEn = [
+    {'command': '#adjust', 'description': 'Adjust item letter'},
+    {'command': '#annotate', 'description': 'Name level'},
+    {'command': '#apply', 'description': 'Apply item'},
+    {'command': '#attributes', 'description': 'Attributes'},
+    {'command': '#cast', 'description': 'Cast spell'},
+    {'command': '#chat', 'description': 'Chat/Talk'},
+    {'command': '#chronicle', 'description': 'Record events'},
+    {'command': '#close', 'description': 'Close door'},
+    {'command': '#force', 'description': 'Force lock'},
+    {'command': '#invoke', 'description': 'Invoke object'},
+    {'command': '#jump', 'description': 'Jump'},
+    {'command': '#loot', 'description': 'Loot container'},
+    {'command': '#monster', 'description': 'Monster power'},
+    {'command': '#name', 'description': 'Name item/monster'},
+    {'command': '#offer', 'description': 'Offer sacrifice'},
+    {'command': '#open', 'description': 'Open door'},
+    {'command': '#overview', 'description': 'Dungeon overview'},
+    {'command': '#pay', 'description': 'Pay bill'},
+    {'command': '#pray', 'description': 'Pray to god'},
+    {'command': '#quaff', 'description': 'Quaff potion'},
+    {'command': '#quit', 'description': 'Quit game'},
+    {'command': '#read', 'description': 'Read scroll/book'},
+    {'command': '#rest', 'description': 'Rest/Wait'},
+    {'command': '#ride', 'description': 'Ride steed'},
+    {'command': '#rub', 'description': 'Rub lamp/stone'},
+    {'command': '#search', 'description': 'Search area'},
+    {'command': '#sit', 'description': 'Sit down'},
+    {'command': '#surrender', 'description': 'Surrender'},
+    {'command': '#takeoff', 'description': 'Take off armor'},
+    {'command': '#teleport', 'description': 'Teleport'},
+    {'command': '#terrain', 'description': 'Show terrain'},
+    {'command': '#therecmdmenu', 'description': 'Menu at cursor'},
+    {'command': '#turn', 'description': 'Turn undead'},
+    {'command': '#untrap', 'description': 'Untrap'},
+    {'command': '#version', 'description': 'Version info'},
+    {'command': '#wear', 'description': 'Wear armor'},
+    {'command': '#wield', 'description': 'Wield weapon'},
+    {'command': '#wipe', 'description': 'Wipe face'},
+  ];
+
+  static const List<Map<String, String>> fallbackExtCmdsJp = [
     {'command': '#adjust', 'description': 'アイテムの文字を付け替える'},
     {'command': '#annotate', 'description': 'レベル注釈'},
     {'command': '#apply', 'description': '道具を使う'},
@@ -233,7 +274,8 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
     if (widget.extCmdList != null && widget.extCmdList!.isNotEmpty) {
       return widget.extCmdList!;
     }
-    return fallbackExtCmds;
+    final lang = Localizations.localeOf(context).languageCode;
+    return lang == 'ja' ? fallbackExtCmdsJp : fallbackExtCmdsEn;
   }
 
   @override
