@@ -1,8 +1,8 @@
 # NetHackJP 本家リポジトリから c_core/nethack_jp へ Git Subtree で更新を取り込むスクリプト
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 param (
     [string]$Branch = "main"
 )
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 $ErrorActionPreference = "Stop"
 
