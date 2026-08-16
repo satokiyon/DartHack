@@ -5,90 +5,89 @@
 #
 Elbereth
 # trap engravings
-ヴラドここにあり
+Vlad was here
 ad aerarium
 
 # take-offs and other famous engravings
 Owlbreath
 Galadriel
-キルロイここにあり
-フロドは生きている
+Kilroy was here
+Frodo lives
 
 # Journey to the Center of the Earth
 A.S. ->
 <- A.S.
 # Adventure
-それを階段の上には運べない
+You won't get it up the steps
 # Inferno
-ここに入る者は一切の希望を捨てよ.
+Lasciate ogni speranza o voi ch'entrate.
 # Prisoner
-ようこそ
+Well Come
 # God's Final Message to His Creation (from "So Long, and Thanks for All
 # the Fish" by Douglas Adams):
-ご不便をおかけして申し訳ない.
+We apologize for the inconvenience.
 # Thriller
-また来週の水曜日に会おう
+See you next Wednesday
 # Smokey Stover
-公証人ソジャック
+notary sojak
 
-楽しみたいなら 8?7-5309 に電話しろ
+For a good time call 8?7-5309
 # Various zoos around the world
-動物に餌を与えないでくれ.
+Please don't feed the animals.
 # A palindrome
-エデンの淑女よ、私はアダムだ.
+Madam, in Eden, I'm Adam.
 # Siskel & Ebert
-大絶賛!
+Two thumbs up!
 # The First C Program
-Hello,　world!
+Hello, World!
 ^?MAIL
 # AOL
-メールが届いていた!
+You've got mail!
 ^.
 # Clueless
-まさか!
+As if!
 # 200x incarnation of Dr.Who
-悪い狼
+BAD WOLF
 
 # Gang tag
-アオーン!  イェンダーの狼男たちだ!
+Arooo!  Werewolves of Yendor!
 
 # Strategy and pun
-ここで掘って勝利をつかめ
+Dig for Victory here
 
 # Pompeii
-ガイウス・ユリウス・プリミゲニウスここにあり.  なぜ遅れた?
+Gaius Julius Primigenius was here.  Why are you late?
 
 # Helpful guiding
-こっちへ行くな
-左へ進め --->
-<--- 右へ進め
-X が目印だ
-X <--- あなたはここにいる.
-ここにはドラゴンがいる
-今セーブして、宿題をしろ!
-ここには穴があった.  いまはもうない.
-振動する正方形
-ここは落とし穴だ!
-ここは探しているダンジョンではない.
-気をつけろ、その扉の向こうには死の杖を持ったノームがいた!
+Don't go this way
+Go left --->
+<--- Go right
+X marks the spot
+X <--- You are here.
+Here be dragons
+Save now, and do your homework!
+There was a hole here.  It's gone now.
+The Vibrating Square
+This is a pit!
+This is not the dungeon you are looking for.
+Watch out, there's a gnome with a wand of death behind that door!
 
 # Misc fun
-このマスは意図的に空白にしてある.
+This square deliberately left blank.
 
 # Viking graffiti
-ヘアムンド・ハードアックスがこのルーンを刻んだ
+Haermund Hardaxe carved these runes
 
 # Advertising
-明かりは要るか?  ミネタウンのイツァク照明店へようこそ!
-アストラル界の蛇たち - 近日、あなたの近くのダンジョンで公開
-あなたはこの場所の100万人目の来訪者だ!  願いの杖を受け取るまで200ターン待ってくれ.
+Need a light?  Come visit the Minetown branch of Izchak's Lighting Store!
+Snakes on the Astral Plane - Soon in a dungeon near you
+You are the one millionth visitor to this place!  Please wait 200 turns for your wand of wishing.
 
 # DnD
-警告、爆発するルーンだ!
+Warning, Exploding runes!
 
 # "Whispers Underground" Ben Aaronovitch
-この文字が読めるなら、あなたはオタクなだけでなく、おそらく死んでいる.
+If you can read these words then you are not only a nerd but probably dead.
 
 # Portal
-ケーキは嘘だ
-
+The cake is a lie

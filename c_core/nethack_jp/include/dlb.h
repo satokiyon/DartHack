@@ -107,7 +107,7 @@ long rsrc_dlb_ftell(dlb *dp);
 #define dlb_init()
 #define dlb_cleanup()
 
-#define dlb_fopen fopen
+#define dlb_fopen(name, mode) fopen_datafile((name), (mode), DATAPREFIX)
 #define dlb_fclose fclose
 #define dlb_fread fread
 #define dlb_fseek fseek
