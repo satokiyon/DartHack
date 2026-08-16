@@ -545,7 +545,7 @@ make_jp_datafile_name(const char *name, char *buf, size_t bufsz)
     dot = strrchr(name, '.');
     if (dot) {
         size_t baselen = (size_t)(dot - name);
-        Copyn(buf, name, (int) baselen);
+        copynchars(buf, name, (int) baselen);
         buf[baselen] = '\0';
         Strcat(buf, "_jp");
         Strcat(buf, dot);
