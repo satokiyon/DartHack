@@ -17,7 +17,7 @@ Write-Host "===> NetHack 本家の最新コミット情報を取得中 (git fetc
 git fetch nethack-en
 
 Write-Host "===> c_core/nethack_en に NetHack ($Branch ブランチ) の更新をマージ中 (git subtree pull)..." -ForegroundColor Cyan
-git subtree pull --prefix=c_core/nethack_en nethack-en $Branch --squash
+git subtree pull --prefix=c_core/nethack_en nethack-en $Branch
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "===> 正常に NetHack 本家の更新を取り込みました！" -ForegroundColor Green

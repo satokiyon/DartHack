@@ -31,7 +31,7 @@
    - 手動で同期を行う場合:
      ```powershell
      git fetch nethack-en
-     git subtree pull --prefix=c_core/nethack_en nethack-en NetHack-5.0 --squash
+     git subtree pull --prefix=c_core/nethack_en nethack-en NetHack-5.0
      ```
 
 
