@@ -41,6 +41,9 @@ class NetHackAssets {
       await saveDir.create(recursive: true);
     }
 
+    // 旧バージョンの各種ユーザーデータ（セーブ、スコアログ、defaults.nh等）を包括的マイグレーション
+    await _migrateAllLegacyUserData(dstDir, docDir);
+
     // 旧バージョンのセーブファイル (uid=1) を現行 UID に安全マイグレーション
     await _migrateLegacySaveFiles(saveDir);
 
@@ -163,6 +166,150 @@ class NetHackAssets {
     }
   }
 
+  /// defaults.nh が空または不完全（MENUCOLORやhilite_status等の詳細ルールが欠落）かを判定
+  static Future<bool> _isDefaultsIncomplete(File file) async {
+    if (!await file.exists()) return true;
+    try {
+      final content = await file.readAsString();
+      if (content.length < 500) return true;
+      final hasMenuColor = content.contains('MENUCOLOR=') || content.contains('MENUCOLOR ');
+      final hasHiliteStatus = content.contains('OPTIONS=hilite_status:');
+      return !hasMenuColor || !hasHiliteStatus;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  /// テキストログファイル（record, logfile, xlogfile等）の重複排除結合（マージ）
+  static Future<void> _mergeTextLogFiles(File srcFile, File dstFile) async {
+    try {
+      final srcLines = await srcFile.readAsLines();
+      if (srcLines.isEmpty) return;
+
+      if (!await dstFile.exists()) {
+        await srcFile.copy(dstFile.path);
+        return;
+      }
+
+      final dstLines = await dstFile.readAsLines();
+      final existingLinesSet = Set<String>.from(dstLines.map((l) => l.trim()));
+      final newLinesToAppend = <String>[];
+
+      for (final line in srcLines) {
+        final trimmed = line.trim();
+        if (trimmed.isNotEmpty && !existingLinesSet.contains(trimmed)) {
+          newLinesToAppend.add(line);
+          existingLinesSet.add(trimmed);
+        }
+      }
+
+      if (newLinesToAppend.isNotEmpty) {
+        final sink = dstFile.openWrite(mode: FileMode.append);
+        for (final line in newLinesToAppend) {
+          sink.writeln(line);
+        }
+        await sink.flush();
+        await sink.close();
+        debugPrint("NetHackAssets: Merged ${newLinesToAppend.length} new log lines from '${srcFile.path}' -> '${dstFile.path}'");
+      }
+    } catch (e) {
+      debugPrint("Warning: Could not merge text log files: $e");
+    }
+  }
+
+  /// 旧バージョンの各種ユーザーデータ（セーブ、スコアログ、defaults.nh等）を包括的に自動マイグレーション
+  static Future<void> _migrateAllLegacyUserData(Directory dstDir, Directory docDir) async {
+    final candidateDirs = <Directory>[
+      docDir,
+      Directory('${docDir.path}/nethack'),
+    ];
+
+    try {
+      final docsDir = await getApplicationDocumentsDirectory();
+      candidateDirs.add(docsDir);
+      candidateDirs.add(Directory('${docsDir.path}/NetHack'));
+      candidateDirs.add(Directory('${docsDir.path}/nethackdir'));
+    } catch (e) {
+      debugPrint("Warning: Could not get ApplicationDocumentsDirectory for migration: $e");
+    }
+
+    final targetSaveDir = Directory('${dstDir.path}/save');
+    if (!await targetSaveDir.exists()) {
+      await targetSaveDir.create(recursive: true);
+    }
+
+    const logFiles = ['record', 'logfile', 'xlogfile', 'history', 'paniclog'];
+
+    for (final candidateDir in candidateDirs) {
+      if (candidateDir.path == dstDir.path) continue;
+      if (!await candidateDir.exists()) continue;
+
+      try {
+        // 1. スコア・ログファイルのマイグレーション（重複排除マージ）
+        for (final logName in logFiles) {
+          final legacyLogFile = File('${candidateDir.path}/$logName');
+          if (await legacyLogFile.exists()) {
+            final targetLogFile = File('${dstDir.path}/$logName');
+            await _mergeTextLogFiles(legacyLogFile, targetLogFile);
+            try {
+              await legacyLogFile.delete();
+            } catch (_) {}
+          }
+        }
+
+        // 2. defaults.nh のマイグレーション
+        final legacyDefaults = File('${candidateDir.path}/defaults.nh');
+        final targetDefaults = File('${dstDir.path}/defaults.nh');
+        if (await legacyDefaults.exists()) {
+          if (await _isDefaultsIncomplete(targetDefaults)) {
+            final content = await legacyDefaults.readAsString();
+            if (content.trim().isNotEmpty) {
+              await targetDefaults.writeAsString(content, flush: true);
+              debugPrint("NetHackAssets: Migrated legacy defaults.nh from '${legacyDefaults.path}' -> '${targetDefaults.path}'");
+            }
+          }
+          try {
+            await legacyDefaults.delete();
+          } catch (_) {}
+        }
+
+        // 3. perm (永続ロックファイル) のマイグレーション
+        final legacyPerm = File('${candidateDir.path}/perm');
+        final targetPerm = File('${dstDir.path}/perm');
+        if (await legacyPerm.exists()) {
+          if (!await targetPerm.exists() || (await targetPerm.length()) < 50) {
+            await legacyPerm.copy(targetPerm.path);
+            debugPrint("NetHackAssets: Migrated legacy perm lock file -> '${targetPerm.path}'");
+          }
+          try {
+            await legacyPerm.delete();
+          } catch (_) {}
+        }
+
+        // 4. セーブデータ (save/ ディレクトリ配下) のマイグレーション
+        final legacySaveDir = Directory('${candidateDir.path}/save');
+        if (await legacySaveDir.exists()) {
+          final entries = await legacySaveDir.list().toList();
+          for (final entry in entries) {
+            if (entry is File) {
+              final fileName = entry.path.split(Platform.pathSeparator).last;
+              final targetSaveFile = File('${targetSaveDir.path}/$fileName');
+              if (!await targetSaveFile.exists()) {
+                await entry.copy(targetSaveFile.path);
+                debugPrint("NetHackAssets: Migrated legacy save file '$fileName' -> '${targetSaveFile.path}'");
+              }
+              try {
+                await entry.delete();
+              } catch (_) {}
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint("Warning: Exception while migrating legacy user data from '${candidateDir.path}': $e");
+      }
+    }
+  }
+
   /// アセットの defaults.nh と端末の defaults.nh / SharedPreferences を安全にマージする
   static Future<void> _mergeDefaultsFile(Directory dstDir) async {
     try {
@@ -176,10 +323,19 @@ class NetHackAssets {
         }
       }
 
+      // 端末の defaults.nh が存在しない、または不完全な場合はフルテンプレートで初期化
+      final bool incomplete = await _isDefaultsIncomplete(targetFile);
+
       final tmpAssetFile = File('${dstDir.path}/defaults.nh.asset_tmp');
-      final byteData = await rootBundle.load('assets/nethackdir/defaults.nh');
+      final byteData = await rootBundle.load('assets/nethackdir/common/defaults.nh');
       final bytes = byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
       await tmpAssetFile.writeAsBytes(bytes, flush: true);
+
+      if (incomplete) {
+        // フルテンプレートをそのままベースとしてコピー
+        await tmpAssetFile.copy(targetFile.path);
+        debugPrint("NetHackAssets: Initialized/Repaired target defaults.nh with full asset template.");
+      }
 
       final defaultsHelper = DefaultsHelper();
       await defaultsHelper.mergeAssetDefaultsWithPrefs(tmpAssetFile.path, targetFile.path);
@@ -193,26 +349,48 @@ class NetHackAssets {
     }
   }
 
-  /// 旧バージョンのセーブファイル (先頭UID=1) を現行プロセスの UID へ安全にリネーム移行する
+  /// 旧UIDで作成されたセーブデータ関連ファイル（Player, テスト, .0, .sav, .bak等）を現行プロセスの UID へリネーム移行する
   static Future<void> _migrateLegacySaveFiles(Directory saveDir) async {
     if (!await saveDir.exists()) return;
     final currentUid = _getCurrentUid();
-    if (currentUid == 1) return;
 
     try {
       final entries = await saveDir.list().toList();
-      final regExp = RegExp(r'^1([^\d].*)$');
+      // 先頭が数字列 (\d+) で始まり、その後にプレイヤー名および拡張子 (.0, .sav, .bak 等) が続くファイルを検出
+      final regExp = RegExp(r'^(\d+)(.+)$');
+
       for (final entry in entries) {
         if (entry is File) {
           final fileName = entry.path.split(Platform.pathSeparator).last;
           final match = regExp.firstMatch(fileName);
           if (match != null) {
-            final restName = match.group(1);
-            final newFileName = '$currentUid$restName';
-            final newFile = File('${saveDir.path}/$newFileName');
-            if (!await newFile.exists()) {
-              await entry.rename(newFile.path);
-              debugPrint("NetHackAssets: Successfully migrated legacy save file '$fileName' -> '$newFileName'");
+            final oldUidStr = match.group(1)!;
+            final restName = match.group(2)!; // プレイヤー名 + 拡張子 (.0, .sav, .bak 等)
+
+            final int? oldUid = int.tryParse(oldUidStr);
+            if (oldUid != null && oldUid != currentUid) {
+              final newFileName = '$currentUid$restName';
+              final newFile = File('${saveDir.path}/$newFileName');
+
+              if (await newFile.exists()) {
+                // リネーム先ファイルが既に存在する場合は日付の新しい方を優先しバックアップを保管
+                final newModTime = await newFile.lastModified();
+                final oldModTime = await entry.lastModified();
+                if (oldModTime.isAfter(newModTime)) {
+                  final bakFile = File('${saveDir.path}/$newFileName.bak_${DateTime.now().millisecondsSinceEpoch}');
+                  await newFile.copy(bakFile.path);
+                  await entry.copy(newFile.path);
+                  await entry.delete();
+                  debugPrint("NetHackAssets: Updated save file '$fileName' -> '$newFileName' (newer timestamp)");
+                } else {
+                  final oldBak = File('${entry.path}.old_bak');
+                  await entry.rename(oldBak.path);
+                  debugPrint("NetHackAssets: Preserved existing '$newFileName', backed up older '$fileName'");
+                }
+              } else {
+                await entry.rename(newFile.path);
+                debugPrint("NetHackAssets: Successfully migrated legacy save file '$fileName' -> '$newFileName'");
+              }
             }
           }
         }

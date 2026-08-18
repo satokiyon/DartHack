@@ -570,7 +570,30 @@ class DefaultsHelper {
       }
     }
 
-    // 4. マージ完了後の最新設定をターゲットdefaults.nhファイルに書き出し
+    // 4. ターゲットファイルが存在しないか不完全（MENUCOLOR/hilite_status等のルールが不足）な場合はアセットのフルテンプレートで初期化
+    final targetFile = File(targetFilePath);
+    if (!await targetFile.exists()) {
+      final assetFile = File(assetFilePath);
+      if (await assetFile.exists()) {
+        await assetFile.copy(targetFilePath);
+        debugPrint("DefaultsHelper: Target defaults.nh did not exist. Copied full asset template to '$targetFilePath'");
+      }
+    } else {
+      try {
+        final content = await targetFile.readAsString();
+        if (content.length < 500 || (!content.contains('MENUCOLOR=') && !content.contains('MENUCOLOR ')) || !content.contains('OPTIONS=hilite_status:')) {
+          final assetFile = File(assetFilePath);
+          if (await assetFile.exists()) {
+            await assetFile.copy(targetFilePath);
+            debugPrint("DefaultsHelper: Target defaults.nh was incomplete (<500 chars or missing rules). Reset with full asset template.");
+          }
+        }
+      } catch (e) {
+        debugPrint("Warning: Exception while checking target defaults.nh completeness: $e");
+      }
+    }
+
+    // 5. マージ完了後の最新設定をターゲットdefaults.nhファイルに書き出し
     await syncFromPrefsToFile(targetFilePath);
   }
 }
