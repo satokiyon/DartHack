@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../../utils/text_formatter.dart';
 import '../../models/tombstone_data.dart';
 import '../../models/topten_entry.dart';
@@ -61,6 +62,7 @@ class TextOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Positioned.fill(
       child: Container(
         color: Colors.black.withValues(alpha: 0.92),
@@ -216,7 +218,7 @@ class TextOverlay extends StatelessWidget {
                       ElevatedButton.icon(
                         onPressed: onShowMsgHistory,
                         icon: const Icon(Icons.history_rounded, size: 16),
-                        label: const Text('履歴'),
+                        label: Text(l10n?.history ?? 'History'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blueGrey[900],
                           foregroundColor: Colors.amber[200],

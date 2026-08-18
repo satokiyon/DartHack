@@ -11,6 +11,8 @@
 #include "hack.h"
 #include "dlb.h"
 
+extern void flutter_putmixed_with_tile(winid, int, int, const char *);
+
 staticfn boolean is_swallow_sym(int);
 staticfn int append_str(char *, const char *) NONNULLPTRS;
 staticfn void trap_description(char *, int, coordxy, coordxy) NONNULLARG1;
@@ -2069,7 +2071,34 @@ look_all(
                 /* guard against potential overflow */
                 lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
                 Strcat(outbuf, lookbuf);
-                putmixed(win, 0, outbuf);
+
+                int tile = -1;
+                glyph_info tileinfo = nul_glyphinfo;
+
+                if (do_mons) {
+                    if (u_at(x, y) && canspotself()) {
+                        map_glyphinfo(0, 0, hero_glyph, 0U, &tileinfo);
+                    } else {
+                        struct monst *mm = m_at(x, y);
+                        if (mm) {
+                            int gg = mon_to_glyph(mm, rn2_on_display_rng);
+                            map_glyphinfo(0, 0, gg, 0U, &tileinfo);
+                        } else {
+                            map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
+                        }
+                    }
+                } else {
+                    struct obj *oo = vobj_at(x, y);
+                    if (oo) {
+                        int gg = obj_to_glyph(oo, rn2_on_display_rng);
+                        map_glyphinfo(0, 0, gg, 0U, &tileinfo);
+                    } else {
+                        map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
+                    }
+                }
+                tile = tileinfo.gm.tileidx;
+
+                flutter_putmixed_with_tile(win, 0, tile, outbuf);
             }
         }
     }
@@ -2136,7 +2165,14 @@ look_traps(boolean nearby)
                 /* guard against potential overflow */
                 lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
                 Strcat(outbuf, lookbuf);
-                putmixed(win, 0, outbuf);
+
+                int tile = -1;
+                glyph_info tileinfo = nul_glyphinfo;
+
+                map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
+                tile = tileinfo.gm.tileidx;
+
+                flutter_putmixed_with_tile(win, 0, tile, outbuf);
             }
         }
     }
@@ -2225,7 +2261,14 @@ look_engrs(boolean nearby)
                 /* guard against potential overflow */
                 lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
                 Strcat(outbuf, lookbuf);
-                putmixed(win, 0, outbuf);
+
+                int tile = -1;
+                glyph_info tileinfo = nul_glyphinfo;
+
+                map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
+                tile = tileinfo.gm.tileidx;
+
+                flutter_putmixed_with_tile(win, 0, tile, outbuf);
             }
         }
     }
