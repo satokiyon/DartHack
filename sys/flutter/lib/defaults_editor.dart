@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'l10n/app_localizations.dart';
 
 class DefaultsEditor extends StatefulWidget {
   final String defaultsFilePath;
@@ -14,7 +15,8 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
   late TextEditingController _controller;
   bool _isLoading = true;
   bool _hasChanges = false;
-  String _errorMessage = "";
+  String? _errorMessageKey;
+  String? _errorParam;
 
   @override
   void initState() {
@@ -35,19 +37,21 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
         });
       } else {
         setState(() {
-          _errorMessage = "defaults.nh が見つかりませんでした。";
+          _errorMessageKey = 'defaultsNotFound';
           _isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = "ファイルの読み込みエラー: $e";
+        _errorMessageKey = 'fileReadError';
+        _errorParam = e.toString();
         _isLoading = false;
       });
     }
   }
 
   Future<void> _saveFile() async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final file = File(widget.defaultsFilePath);
       await file.writeAsString(_controller.text, flush: true);
@@ -56,7 +60,7 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("defaults.nh を保存しました。")),
+          SnackBar(content: Text(l10n.defaultsSaved)),
         );
         Navigator.of(context).pop(true);
       }
@@ -65,12 +69,12 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text("保存エラー"),
-            content: Text("ファイルを保存できませんでした。\n$e"),
+            title: Text(l10n.saveErrorTitle),
+            content: Text(l10n.saveErrorMsg(e.toString())),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text("OK"),
+                child: Text(l10n.ok),
               )
             ],
           ),
@@ -79,8 +83,20 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
     }
   }
 
+  String _getErrorMessage(AppLocalizations l10n) {
+    if (_errorMessageKey == 'defaultsNotFound') {
+      return l10n.defaultsNotFound;
+    } else if (_errorMessageKey == 'fileReadError') {
+      return l10n.fileReadError(_errorParam ?? '');
+    }
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final errMsg = _getErrorMessage(l10n);
+
     return PopScope(
       canPop: !_hasChanges,
       onPopInvokedWithResult: (didPop, result) async {
@@ -89,17 +105,17 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
         final discard = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text("変更の破棄"),
-            content: const Text("編集内容が保存されていません。破棄して戻りますか？"),
+            title: Text(l10n.discardChangesTitle),
+            content: Text(l10n.discardChangesMsg),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text("キャンセル"),
+                child: Text(l10n.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
-                child: const Text("破棄"),
+                child: Text(l10n.discard),
               ),
             ],
           ),
@@ -110,24 +126,24 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("defaults.nh を編集"),
+          title: Text(l10n.editDefaultsTitle),
           actions: [
-            if (!_isLoading && _errorMessage.isEmpty)
+            if (!_isLoading && errMsg.isEmpty)
               IconButton(
                 icon: const Icon(Icons.save),
-                tooltip: "保存",
+                tooltip: l10n.saveTooltip,
                 onPressed: _saveFile,
               ),
           ],
         ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
-            : _errorMessage.isNotEmpty
+            : errMsg.isNotEmpty
                 ? Center(
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
                       child: Text(
-                        _errorMessage,
+                        errMsg,
                         style: const TextStyle(color: Colors.red, fontSize: 16),
                         textAlign: TextAlign.center,
                       ),
@@ -139,14 +155,14 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
                         width: double.infinity,
                         color: Colors.amber.withValues(alpha: 0.15),
                         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Icon(Icons.info_outline, color: Colors.amber, size: 20),
-                            SizedBox(width: 8),
+                            const Icon(Icons.info_outline, color: Colors.amber, size: 20),
+                            const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                "※ defaults.nh の編集内容を反映するには新規ゲームの開始が必要です",
-                                style: TextStyle(color: Colors.amber, fontSize: 13),
+                                l10n.defaultsEditNotice,
+                                style: const TextStyle(color: Colors.amber, fontSize: 13),
                               ),
                             ),
                           ],
@@ -165,9 +181,9 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
                               fontSize: 14,
                               color: Colors.white70,
                             ),
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: "オプションを入力してください...",
+                              hintText: l10n.enterOptionHint,
                             ),
                             onChanged: (val) {
                               if (!_hasChanges) {
@@ -185,3 +201,4 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
     );
   }
 }
+

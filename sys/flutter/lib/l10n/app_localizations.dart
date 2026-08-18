@@ -1003,6 +1003,1062 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'見つかりませんでした'**
   String get noCmdFound;
+
+  /// No description provided for @detailedSettings.
+  ///
+  /// In ja, this message translates to:
+  /// **'詳細ゲーム設定'**
+  String get detailedSettings;
+
+  /// No description provided for @secUILayoutTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'UI配置カスタマイズ'**
+  String get secUILayoutTitle;
+
+  /// No description provided for @secUILayoutSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'画面レイアウトのパターンを選択します'**
+  String get secUILayoutSub;
+
+  /// No description provided for @layoutPatternLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'レイアウトパターン'**
+  String get layoutPatternLabel;
+
+  /// No description provided for @layoutPatternDesc1.
+  ///
+  /// In ja, this message translates to:
+  /// **'ステータス・メッセージ: 上部 / 移動パッド・ショートカット: 下部'**
+  String get layoutPatternDesc1;
+
+  /// No description provided for @layoutPatternDesc2.
+  ///
+  /// In ja, this message translates to:
+  /// **'ステータス・メッセージ: 下部 / 移動パッド・ショートカット: 上部'**
+  String get layoutPatternDesc2;
+
+  /// No description provided for @swapPadSideTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'移動パッドとショートカットの左右を入れ替える'**
+  String get swapPadSideTitle;
+
+  /// No description provided for @swapPadSideDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'移動パッドを右側、ショートカットボタンを左側に配置します'**
+  String get swapPadSideDesc;
+
+  /// No description provided for @menuButtonPos.
+  ///
+  /// In ja, this message translates to:
+  /// **'半透明メニューボタンの配置位置'**
+  String get menuButtonPos;
+
+  /// No description provided for @mapButtonPos.
+  ///
+  /// In ja, this message translates to:
+  /// **'半透明地図ボタンの配置位置'**
+  String get mapButtonPos;
+
+  /// No description provided for @posTopLeft.
+  ///
+  /// In ja, this message translates to:
+  /// **'左上'**
+  String get posTopLeft;
+
+  /// No description provided for @posTopRight.
+  ///
+  /// In ja, this message translates to:
+  /// **'右上'**
+  String get posTopRight;
+
+  /// No description provided for @posLeftEdge.
+  ///
+  /// In ja, this message translates to:
+  /// **'左端(中央)'**
+  String get posLeftEdge;
+
+  /// No description provided for @posRightEdge.
+  ///
+  /// In ja, this message translates to:
+  /// **'右端(中央)'**
+  String get posRightEdge;
+
+  /// No description provided for @posBottomLeft.
+  ///
+  /// In ja, this message translates to:
+  /// **'左下'**
+  String get posBottomLeft;
+
+  /// No description provided for @posBottomRight.
+  ///
+  /// In ja, this message translates to:
+  /// **'右下'**
+  String get posBottomRight;
+
+  /// No description provided for @posTop.
+  ///
+  /// In ja, this message translates to:
+  /// **'上部'**
+  String get posTop;
+
+  /// No description provided for @posBottom.
+  ///
+  /// In ja, this message translates to:
+  /// **'下部'**
+  String get posBottom;
+
+  /// No description provided for @posLeft.
+  ///
+  /// In ja, this message translates to:
+  /// **'左側 (スワイプ可)'**
+  String get posLeft;
+
+  /// No description provided for @posRight.
+  ///
+  /// In ja, this message translates to:
+  /// **'右側 (スワイプ可)'**
+  String get posRight;
+
+  /// No description provided for @padOpacityTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'ボタン不透明度'**
+  String get padOpacityTitle;
+
+  /// No description provided for @dpadScaleTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'移動ボタンサイズ倍率'**
+  String get dpadScaleTitle;
+
+  /// No description provided for @dpadScaleLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'移動'**
+  String get dpadScaleLabel;
+
+  /// No description provided for @dpadLongPressTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'移動パッド長押し時の移動モード'**
+  String get dpadLongPressTitle;
+
+  /// No description provided for @dpadModeNormal.
+  ///
+  /// In ja, this message translates to:
+  /// **'標準'**
+  String get dpadModeNormal;
+
+  /// No description provided for @dpadModeUpper.
+  ///
+  /// In ja, this message translates to:
+  /// **'大文字'**
+  String get dpadModeUpper;
+
+  /// No description provided for @dpadModeGLower.
+  ///
+  /// In ja, this message translates to:
+  /// **'g'**
+  String get dpadModeGLower;
+
+  /// No description provided for @dpadModeGUpper.
+  ///
+  /// In ja, this message translates to:
+  /// **'G'**
+  String get dpadModeGUpper;
+
+  /// No description provided for @dpadModeCtrl.
+  ///
+  /// In ja, this message translates to:
+  /// **'^(Ctrl)'**
+  String get dpadModeCtrl;
+
+  /// No description provided for @dpadModeMCmd.
+  ///
+  /// In ja, this message translates to:
+  /// **'m'**
+  String get dpadModeMCmd;
+
+  /// No description provided for @dpadModeFCmd.
+  ///
+  /// In ja, this message translates to:
+  /// **'F'**
+  String get dpadModeFCmd;
+
+  /// No description provided for @mapTapTravelTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'マップタップでの自動移動'**
+  String get mapTapTravelTitle;
+
+  /// No description provided for @mapTapAlways.
+  ///
+  /// In ja, this message translates to:
+  /// **'常に有効'**
+  String get mapTapAlways;
+
+  /// No description provided for @mapTapAfterScroll.
+  ///
+  /// In ja, this message translates to:
+  /// **'スクロール・ズーム直後のみ有効'**
+  String get mapTapAfterScroll;
+
+  /// No description provided for @shortcutPadScaleTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'ショートカットボタンサイズ倍率'**
+  String get shortcutPadScaleTitle;
+
+  /// No description provided for @shortcutPadScaleLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'ショートカット'**
+  String get shortcutPadScaleLabel;
+
+  /// No description provided for @cmdPanelScaleTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'コマンドパネルサイズ倍率'**
+  String get cmdPanelScaleTitle;
+
+  /// No description provided for @cmdPanelScaleLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'コマンドパネル'**
+  String get cmdPanelScaleLabel;
+
+  /// No description provided for @drawerPosTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'メニュー(ドロワー)の引き出し位置'**
+  String get drawerPosTitle;
+
+  /// No description provided for @appliedScale.
+  ///
+  /// In ja, this message translates to:
+  /// **'適用倍率: {scale}'**
+  String appliedScale(Object scale);
+
+  /// No description provided for @autoAdjustedScreen.
+  ///
+  /// In ja, this message translates to:
+  /// **'⚠ 画面幅により自動調整'**
+  String get autoAdjustedScreen;
+
+  /// No description provided for @secMsgSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'メッセージ領域の行数・透過度・フォントサイズ'**
+  String get secMsgSub;
+
+  /// No description provided for @msgLineCountLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'現在: {count} 行（最新メッセージを{count}行表示）'**
+  String msgLineCountLabel(Object count);
+
+  /// No description provided for @msgOpacityLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'現在: {percent}%（0% = 完全透明 / 100% = 不透明）'**
+  String msgOpacityLabel(Object percent);
+
+  /// No description provided for @msgFontSizeLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'現在: {size} pt'**
+  String msgFontSizeLabel(Object size);
+
+  /// No description provided for @preview.
+  ///
+  /// In ja, this message translates to:
+  /// **'プレビュー'**
+  String get preview;
+
+  /// No description provided for @msgSampleText.
+  ///
+  /// In ja, this message translates to:
+  /// **'メッセージのサンプルテキストです。\nWelcome to NetHackJP!'**
+  String get msgSampleText;
+
+  /// No description provided for @secKeySub.
+  ///
+  /// In ja, this message translates to:
+  /// **'音量ボタンや戻るキーにゲームコマンドを割り当てます'**
+  String get secKeySub;
+
+  /// No description provided for @keyVolUpTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'音量アップキー'**
+  String get keyVolUpTitle;
+
+  /// No description provided for @keyVolDownTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'音量ダウンキー'**
+  String get keyVolDownTitle;
+
+  /// No description provided for @keyBackTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'戻るボタン'**
+  String get keyBackTitle;
+
+  /// No description provided for @volActNone.
+  ///
+  /// In ja, this message translates to:
+  /// **'機能なし (通常音量変化)'**
+  String get volActNone;
+
+  /// No description provided for @volActEnter.
+  ///
+  /// In ja, this message translates to:
+  /// **'決定 (Enter)'**
+  String get volActEnter;
+
+  /// No description provided for @volActSpace.
+  ///
+  /// In ja, this message translates to:
+  /// **'スペース'**
+  String get volActSpace;
+
+  /// No description provided for @volActEsc.
+  ///
+  /// In ja, this message translates to:
+  /// **'エスケープ (Esc)'**
+  String get volActEsc;
+
+  /// No description provided for @volActInv.
+  ///
+  /// In ja, this message translates to:
+  /// **'インベントリ (i)'**
+  String get volActInv;
+
+  /// No description provided for @volActSearch.
+  ///
+  /// In ja, this message translates to:
+  /// **'周囲の探索 (s)'**
+  String get volActSearch;
+
+  /// No description provided for @volActRedraw.
+  ///
+  /// In ja, this message translates to:
+  /// **'画面再描画 (^R)'**
+  String get volActRedraw;
+
+  /// No description provided for @backActNone.
+  ///
+  /// In ja, this message translates to:
+  /// **'機能なし (通常通りアプリを閉じる)'**
+  String get backActNone;
+
+  /// No description provided for @backActEsc.
+  ///
+  /// In ja, this message translates to:
+  /// **'エスケープ (Esc/ダイアログ閉じ)'**
+  String get backActEsc;
+
+  /// No description provided for @backActInv.
+  ///
+  /// In ja, this message translates to:
+  /// **'インベントリ (i)'**
+  String get backActInv;
+
+  /// No description provided for @backActSearch.
+  ///
+  /// In ja, this message translates to:
+  /// **'周囲の探索 (s)'**
+  String get backActSearch;
+
+  /// No description provided for @backActWait.
+  ///
+  /// In ja, this message translates to:
+  /// **'待機する (.)'**
+  String get backActWait;
+
+  /// No description provided for @backActSave.
+  ///
+  /// In ja, this message translates to:
+  /// **'セーブして終了する (S)'**
+  String get backActSave;
+
+  /// No description provided for @secShortcutSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'3x3ショートカットパッドに割り当てるキーを設定'**
+  String get secShortcutSub;
+
+  /// No description provided for @shortcutNotSet.
+  ///
+  /// In ja, this message translates to:
+  /// **'(未設定)'**
+  String get shortcutNotSet;
+
+  /// No description provided for @shortcutLabelFormat.
+  ///
+  /// In ja, this message translates to:
+  /// **'{position} ボタン ({index})'**
+  String shortcutLabelFormat(Object index, Object position);
+
+  /// No description provided for @shortcutBtnTL.
+  ///
+  /// In ja, this message translates to:
+  /// **'左上'**
+  String get shortcutBtnTL;
+
+  /// No description provided for @shortcutBtnTC.
+  ///
+  /// In ja, this message translates to:
+  /// **'上中央'**
+  String get shortcutBtnTC;
+
+  /// No description provided for @shortcutBtnTR.
+  ///
+  /// In ja, this message translates to:
+  /// **'右上'**
+  String get shortcutBtnTR;
+
+  /// No description provided for @shortcutBtnML.
+  ///
+  /// In ja, this message translates to:
+  /// **'中段左'**
+  String get shortcutBtnML;
+
+  /// No description provided for @shortcutBtnMC.
+  ///
+  /// In ja, this message translates to:
+  /// **'中段中央'**
+  String get shortcutBtnMC;
+
+  /// No description provided for @shortcutBtnMR.
+  ///
+  /// In ja, this message translates to:
+  /// **'中段右'**
+  String get shortcutBtnMR;
+
+  /// No description provided for @shortcutBtnBL.
+  ///
+  /// In ja, this message translates to:
+  /// **'下段左'**
+  String get shortcutBtnBL;
+
+  /// No description provided for @shortcutBtnBC.
+  ///
+  /// In ja, this message translates to:
+  /// **'下段中央'**
+  String get shortcutBtnBC;
+
+  /// No description provided for @shortcutBtnBR.
+  ///
+  /// In ja, this message translates to:
+  /// **'下段右'**
+  String get shortcutBtnBR;
+
+  /// No description provided for @secCmdPanelSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'ゲーム下部スワイプ対応のボタン群を管理'**
+  String get secCmdPanelSub;
+
+  /// No description provided for @showPanelNamesTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'パネル名を表示'**
+  String get showPanelNamesTitle;
+
+  /// No description provided for @showPanelNamesSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'各パネル行の左端に名前バッジを表示'**
+  String get showPanelNamesSub;
+
+  /// No description provided for @noButtons.
+  ///
+  /// In ja, this message translates to:
+  /// **'(ボタンなし)'**
+  String get noButtons;
+
+  /// No description provided for @addNewPanel.
+  ///
+  /// In ja, this message translates to:
+  /// **'新しいコマンドパネルを追加'**
+  String get addNewPanel;
+
+  /// No description provided for @editPanelTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'パネル {index} を編集'**
+  String editPanelTitle(Object index);
+
+  /// No description provided for @panelNameLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'パネル名'**
+  String get panelNameLabel;
+
+  /// No description provided for @cmdListLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'ボタンコマンド一覧'**
+  String get cmdListLabel;
+
+  /// No description provided for @cmdListHelper.
+  ///
+  /// In ja, this message translates to:
+  /// **'スペース区切りでコマンドを入力してください'**
+  String get cmdListHelper;
+
+  /// No description provided for @defaultPanelName.
+  ///
+  /// In ja, this message translates to:
+  /// **'標準パネル'**
+  String get defaultPanelName;
+
+  /// No description provided for @panelNName.
+  ///
+  /// In ja, this message translates to:
+  /// **'パネル {index}'**
+  String panelNName(Object index);
+
+  /// No description provided for @secGameRulesTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'ゲームルール・プレイ設定 (defaults.nh)'**
+  String get secGameRulesTitle;
+
+  /// No description provided for @secGameRulesSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'ゲーム本体の動作オプションを設定します（※反映には新規ゲームの開始が必要です）'**
+  String get secGameRulesSub;
+
+  /// No description provided for @tutorialModeTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'チュートリアル動作モード'**
+  String get tutorialModeTitle;
+
+  /// No description provided for @tutorialModeSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'ゲーム開始時のチュートリアル問いかけ・開始動作を設定します'**
+  String get tutorialModeSub;
+
+  /// No description provided for @tutorialAsk.
+  ///
+  /// In ja, this message translates to:
+  /// **'毎回確認する\n (標準)'**
+  String get tutorialAsk;
+
+  /// No description provided for @tutorialAlways.
+  ///
+  /// In ja, this message translates to:
+  /// **'常に開始する\n (OPTIONS=tutorial)'**
+  String get tutorialAlways;
+
+  /// No description provided for @tutorialNever.
+  ///
+  /// In ja, this message translates to:
+  /// **'常に通常プレイ\n (OPTIONS=!tutorial)'**
+  String get tutorialNever;
+
+  /// No description provided for @numberPadTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'テンキー移動 (number_pad)'**
+  String get numberPadTitle;
+
+  /// No description provided for @numberPadSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'テンキー（1-9）での移動やレイアウトを設定します'**
+  String get numberPadSub;
+
+  /// No description provided for @numPadOff.
+  ///
+  /// In ja, this message translates to:
+  /// **'OFF (!number_pad)'**
+  String get numPadOff;
+
+  /// No description provided for @numPadStandard.
+  ///
+  /// In ja, this message translates to:
+  /// **'1: 標準テンキー'**
+  String get numPadStandard;
+
+  /// No description provided for @numPadPCHack.
+  ///
+  /// In ja, this message translates to:
+  /// **'2: PC Hack互換'**
+  String get numPadPCHack;
+
+  /// No description provided for @numPadPhone.
+  ///
+  /// In ja, this message translates to:
+  /// **'3: 電話配列'**
+  String get numPadPhone;
+
+  /// No description provided for @numPadPhonePCHack.
+  ///
+  /// In ja, this message translates to:
+  /// **'4: 電話+PC Hack'**
+  String get numPadPhonePCHack;
+
+  /// No description provided for @numPadGerman.
+  ///
+  /// In ja, this message translates to:
+  /// **'-1: ドイツ語配列'**
+  String get numPadGerman;
+
+  /// No description provided for @autopickupSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'足元のアイテムを自動的に拾います'**
+  String get autopickupSub;
+
+  /// No description provided for @pickupTypesTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'自動拾い対象のアイテム種別 (pickup_types)'**
+  String get pickupTypesTitle;
+
+  /// No description provided for @pickupTypesAll.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべて拾う'**
+  String get pickupTypesAll;
+
+  /// No description provided for @pickupTypesSymbols.
+  ///
+  /// In ja, this message translates to:
+  /// **'対象記号: {symbols}'**
+  String pickupTypesSymbols(Object symbols);
+
+  /// No description provided for @pickupTypesDisabledNote.
+  ///
+  /// In ja, this message translates to:
+  /// **'※自動拾いが有効な場合のみ設定できます'**
+  String get pickupTypesDisabledNote;
+
+  /// No description provided for @timeSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'ステータス表示に行動ターン数を表示します'**
+  String get timeSub;
+
+  /// No description provided for @showexpSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'ステータス表示に獲得経験値を表示します'**
+  String get showexpSub;
+
+  /// No description provided for @priceQuotesSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'未識別オブジェクトに記憶済み価格情報を表示します'**
+  String get priceQuotesSub;
+
+  /// No description provided for @hiliteStatusSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'HPや各種状態変化を色付きでハイライト表示します'**
+  String get hiliteStatusSub;
+
+  /// No description provided for @menucolorSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'インベントリやダイアログの各項目を色付き表示します'**
+  String get menucolorSub;
+
+  /// No description provided for @nameSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'主人公のデフォルト名 (name)'**
+  String get nameSub;
+
+  /// No description provided for @dognameSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'犬の名前 (dogname)'**
+  String get dognameSub;
+
+  /// No description provided for @catnameSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'猫の名前 (catname)'**
+  String get catnameSub;
+
+  /// No description provided for @horsenameSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'馬の名前 (horsename)'**
+  String get horsenameSub;
+
+  /// No description provided for @fruitSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'果物の名前 (fruit)'**
+  String get fruitSub;
+
+  /// No description provided for @defaultUnspecified.
+  ///
+  /// In ja, this message translates to:
+  /// **'デフォルト (未指定)'**
+  String get defaultUnspecified;
+
+  /// No description provided for @defaultSlimeMold.
+  ///
+  /// In ja, this message translates to:
+  /// **'デフォルト (slime mold)'**
+  String get defaultSlimeMold;
+
+  /// No description provided for @pickupTypesDialogTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'自動拾い対象アイテム'**
+  String get pickupTypesDialogTitle;
+
+  /// No description provided for @directInputLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'直接入力 (記号の羅列)'**
+  String get directInputLabel;
+
+  /// No description provided for @directInputHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'例: \$\"=/!?+'**
+  String get directInputHint;
+
+  /// No description provided for @directInputHelper.
+  ///
+  /// In ja, this message translates to:
+  /// **'拾いたいアイテムの記号を入力してください'**
+  String get directInputHelper;
+
+  /// No description provided for @toggleFromOptions.
+  ///
+  /// In ja, this message translates to:
+  /// **'または選択肢からトグル選択:'**
+  String get toggleFromOptions;
+
+  /// No description provided for @save.
+  ///
+  /// In ja, this message translates to:
+  /// **'保存'**
+  String get save;
+
+  /// No description provided for @nameTooLongMaxBytes.
+  ///
+  /// In ja, this message translates to:
+  /// **'名前が長すぎます。{maxBytes}バイト以内で入力してください。'**
+  String nameTooLongMaxBytes(Object maxBytes);
+
+  /// No description provided for @textTooLongMaxBytes.
+  ///
+  /// In ja, this message translates to:
+  /// **'文字数が多すぎます。{maxBytes}バイト以内で入力してください。'**
+  String textTooLongMaxBytes(Object maxBytes);
+
+  /// No description provided for @hintEmptyDefault.
+  ///
+  /// In ja, this message translates to:
+  /// **'未指定の場合は空欄'**
+  String get hintEmptyDefault;
+
+  /// No description provided for @itemGold.
+  ///
+  /// In ja, this message translates to:
+  /// **'金貨 (\$)'**
+  String get itemGold;
+
+  /// No description provided for @itemAmulet.
+  ///
+  /// In ja, this message translates to:
+  /// **'首飾り/アミュレット (\")'**
+  String get itemAmulet;
+
+  /// No description provided for @itemArmor.
+  ///
+  /// In ja, this message translates to:
+  /// **'防具 ([)'**
+  String get itemArmor;
+
+  /// No description provided for @itemFood.
+  ///
+  /// In ja, this message translates to:
+  /// **'食料 (%)'**
+  String get itemFood;
+
+  /// No description provided for @itemScroll.
+  ///
+  /// In ja, this message translates to:
+  /// **'巻物 (?)'**
+  String get itemScroll;
+
+  /// No description provided for @itemSpellbook.
+  ///
+  /// In ja, this message translates to:
+  /// **'呪文の書 (+)'**
+  String get itemSpellbook;
+
+  /// No description provided for @itemWand.
+  ///
+  /// In ja, this message translates to:
+  /// **'杖 (/)'**
+  String get itemWand;
+
+  /// No description provided for @itemRing.
+  ///
+  /// In ja, this message translates to:
+  /// **'指輪 (=)'**
+  String get itemRing;
+
+  /// No description provided for @itemPotion.
+  ///
+  /// In ja, this message translates to:
+  /// **'薬 (!)'**
+  String get itemPotion;
+
+  /// No description provided for @itemTool.
+  ///
+  /// In ja, this message translates to:
+  /// **'道具 (()'**
+  String get itemTool;
+
+  /// No description provided for @itemGem.
+  ///
+  /// In ja, this message translates to:
+  /// **'宝石 (*)'**
+  String get itemGem;
+
+  /// No description provided for @itemBall.
+  ///
+  /// In ja, this message translates to:
+  /// **'弾薬/コンポーネント (0)'**
+  String get itemBall;
+
+  /// No description provided for @itemWeapon.
+  ///
+  /// In ja, this message translates to:
+  /// **'武器 ()'**
+  String get itemWeapon;
+
+  /// No description provided for @itemOther.
+  ///
+  /// In ja, this message translates to:
+  /// **'その他 (_)'**
+  String get itemOther;
+
+  /// No description provided for @secAdvancedTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'高度な設定'**
+  String get secAdvancedTitle;
+
+  /// No description provided for @secOtherTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'その他の設定'**
+  String get secOtherTitle;
+
+  /// No description provided for @tombstoneModeTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'死亡時の墓表示モード'**
+  String get tombstoneModeTitle;
+
+  /// No description provided for @tombstoneModeImage.
+  ///
+  /// In ja, this message translates to:
+  /// **'画像表示'**
+  String get tombstoneModeImage;
+
+  /// No description provided for @tombstoneModeText.
+  ///
+  /// In ja, this message translates to:
+  /// **'テキスト表示'**
+  String get tombstoneModeText;
+
+  /// No description provided for @manualEditDefaults.
+  ///
+  /// In ja, this message translates to:
+  /// **'defaults.nh を手動で編集'**
+  String get manualEditDefaults;
+
+  /// No description provided for @manualEditDefaultsSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'詳細なゲームオプションファイルを直接記述します（※反映には新規ゲームの開始が必要です）'**
+  String get manualEditDefaultsSub;
+
+  /// No description provided for @exportSettings.
+  ///
+  /// In ja, this message translates to:
+  /// **'設定をエクスポート'**
+  String get exportSettings;
+
+  /// No description provided for @exportSettingsSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'現在の設定をJSON文字列でクリップボードにコピー'**
+  String get exportSettingsSub;
+
+  /// No description provided for @importSettings.
+  ///
+  /// In ja, this message translates to:
+  /// **'設定をインポート'**
+  String get importSettings;
+
+  /// No description provided for @importSettingsSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'クリップボードの設定JSONを読み込んで適用します'**
+  String get importSettingsSub;
+
+  /// No description provided for @copiedJsonSuccess.
+  ///
+  /// In ja, this message translates to:
+  /// **'設定JSONをクリップボードにコピーしました。'**
+  String get copiedJsonSuccess;
+
+  /// No description provided for @noTextInClipboard.
+  ///
+  /// In ja, this message translates to:
+  /// **'クリップボードにテキストがありません。'**
+  String get noTextInClipboard;
+
+  /// No description provided for @importedSuccess.
+  ///
+  /// In ja, this message translates to:
+  /// **'設定をインポートしました。'**
+  String get importedSuccess;
+
+  /// No description provided for @importErrorTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'インポートエラー'**
+  String get importErrorTitle;
+
+  /// No description provided for @importErrorMsg.
+  ///
+  /// In ja, this message translates to:
+  /// **'インポートに失敗しました。無効なJSONフォーマットです。\n{error}'**
+  String importErrorMsg(Object error);
+
+  /// No description provided for @secCreditsTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'クレジット'**
+  String get secCreditsTitle;
+
+  /// No description provided for @creditsBody1.
+  ///
+  /// In ja, this message translates to:
+  /// **'DartHack は、NetHack をベースとしつつ、Flutter/Dart によって再構築したモバイル版です。本アプリはオリジナルの NetHack をゲームコアとして使用していますが、NetHack 開発チーム（The NetHack DevTeam）とは一切関係ありません。'**
+  String get creditsBody1;
+
+  /// No description provided for @creditsBody2.
+  ///
+  /// In ja, this message translates to:
+  /// **'本アプリは NetHack General Public License (NGPL) に基づき配布されています。  ソースコードは以下にて公開しています：https://github.com/satokiyon/DartHack'**
+  String get creditsBody2;
+
+  /// No description provided for @creditsBody3.
+  ///
+  /// In ja, this message translates to:
+  /// **'UI デザインの一部は、gurrhack の ForkFront を参考にしています。'**
+  String get creditsBody3;
+
+  /// No description provided for @creditsContributors.
+  ///
+  /// In ja, this message translates to:
+  /// **'Contributors:'**
+  String get creditsContributors;
+
+  /// No description provided for @creditsContributorList.
+  ///
+  /// In ja, this message translates to:
+  /// **'• @satokiyon\n• with Google Antigravity and Gemini'**
+  String get creditsContributorList;
+
+  /// No description provided for @editDefaultsTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'defaults.nh を編集'**
+  String get editDefaultsTitle;
+
+  /// No description provided for @saveTooltip.
+  ///
+  /// In ja, this message translates to:
+  /// **'保存'**
+  String get saveTooltip;
+
+  /// No description provided for @defaultsSaved.
+  ///
+  /// In ja, this message translates to:
+  /// **'defaults.nh を保存しました。'**
+  String get defaultsSaved;
+
+  /// No description provided for @saveErrorTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'保存エラー'**
+  String get saveErrorTitle;
+
+  /// No description provided for @saveErrorMsg.
+  ///
+  /// In ja, this message translates to:
+  /// **'ファイルを保存できませんでした。\n{error}'**
+  String saveErrorMsg(Object error);
+
+  /// No description provided for @discardChangesTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'変更の破棄'**
+  String get discardChangesTitle;
+
+  /// No description provided for @discardChangesMsg.
+  ///
+  /// In ja, this message translates to:
+  /// **'編集内容が保存されていません。破棄して戻りますか？'**
+  String get discardChangesMsg;
+
+  /// No description provided for @discard.
+  ///
+  /// In ja, this message translates to:
+  /// **'破棄'**
+  String get discard;
+
+  /// No description provided for @defaultsNotFound.
+  ///
+  /// In ja, this message translates to:
+  /// **'defaults.nh が見つかりませんでした。'**
+  String get defaultsNotFound;
+
+  /// No description provided for @fileReadError.
+  ///
+  /// In ja, this message translates to:
+  /// **'ファイルの読み込みエラー: {error}'**
+  String fileReadError(Object error);
+
+  /// No description provided for @defaultsEditNotice.
+  ///
+  /// In ja, this message translates to:
+  /// **'※ defaults.nh の編集内容を反映するには新規ゲームの開始が必要です'**
+  String get defaultsEditNotice;
+
+  /// No description provided for @enterOptionHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'オプションを入力してください...'**
+  String get enterOptionHint;
 }
 
 class _AppLocalizationsDelegate

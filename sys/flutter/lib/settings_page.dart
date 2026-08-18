@@ -74,21 +74,21 @@ class _SettingsPageState extends State<SettingsPage> {
   String _optFruit = '';
   int _optNumberPad = 0;
 
-  static const Map<String, String> _itemTypeSymbols = {
-    '\$': '金貨 (\$)',
-    '"': '首飾り/アミュレット (")',
-    '[': '防具 ([)',
-    '%': '食料 (%)',
-    '?': '巻物 (?)',
-    '+': '呪文の書 (+)',
-    '/': '杖 (/)',
-    '=': '指輪 (=)',
-    '!': '薬 (!)',
-    '(': '道具 (()',
-    '*': '宝石 (*)',
-    '0': '弾薬/コンポーネント (0)',
-    ')': '武器 ()',
-    '_': 'その他 (_)',
+  Map<String, String> _getItemTypeSymbols(AppLocalizations l10n) => {
+    '\$': l10n.itemGold,
+    '"': l10n.itemAmulet,
+    '[': l10n.itemArmor,
+    '%': l10n.itemFood,
+    '?': l10n.itemScroll,
+    '+': l10n.itemSpellbook,
+    '/': l10n.itemWand,
+    '=': l10n.itemRing,
+    '!': l10n.itemPotion,
+    '(': l10n.itemTool,
+    '*': l10n.itemGem,
+    '0': l10n.itemBall,
+    ')': l10n.itemWeapon,
+    '_': l10n.itemOther,
   };
 
   // メッセージ領域設定
@@ -106,11 +106,15 @@ class _SettingsPageState extends State<SettingsPage> {
   final List<String> _defaultShortcuts = [
     'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', r'\\e'
   ];
-  final List<String> _shortcutLabels = [
-    "左上ボタン (0)", "上中央ボタン (1)", "右上ボタン (2)",
-    "中段左ボタン (3)", "中段中央ボタン (4)", "中段右ボタン (5)",
-    "下段左ボタン (6)", "下段中央ボタン (7)", "下段右ボタン (8)"
-  ];
+
+  String _getShortcutButtonLabel(AppLocalizations l10n, int index) {
+    final positions = [
+      l10n.shortcutBtnTL, l10n.shortcutBtnTC, l10n.shortcutBtnTR,
+      l10n.shortcutBtnML, l10n.shortcutBtnMC, l10n.shortcutBtnMR,
+      l10n.shortcutBtnBL, l10n.shortcutBtnBC, l10n.shortcutBtnBR,
+    ];
+    return l10n.shortcutLabelFormat(positions[index], index.toString());
+  }
 
   final _channel = const MethodChannel('jp.satokiyo.darthack/key_interceptor');
 
@@ -400,6 +404,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   // クリップボードへエクスポート
   Future<void> _exportSettings() async {
+    final l10n = AppLocalizations.of(context)!;
     final prefs = await SharedPreferences.getInstance();
     final keys = prefs.getKeys();
     final Map<String, dynamic> settingsMap = {};
@@ -412,16 +417,17 @@ class _SettingsPageState extends State<SettingsPage> {
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("設定JSONをクリップボードにコピーしました。")),
+        SnackBar(content: Text(l10n.copiedJsonSuccess)),
       );
     }
   }
 
   // クリップボードからインポート
   Future<void> _importSettings() async {
+    final l10n = AppLocalizations.of(context)!;
     final data = await Clipboard.getData(Clipboard.kTextPlain);
     if (data == null || data.text == null || data.text!.isEmpty) {
-      _showErrorDialog("クリップボードにテキストがありません。");
+      _showErrorDialog(l10n.noTextInClipboard);
       return;
     }
 
@@ -454,22 +460,23 @@ class _SettingsPageState extends State<SettingsPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("設定をインポートしました。")),
+          SnackBar(content: Text(l10n.importedSuccess)),
         );
       }
     } catch (e) {
-      _showErrorDialog("インポートに失敗しました。無効なJSONフォーマットです。\n$e");
+      _showErrorDialog(l10n.importErrorMsg(e.toString()));
     }
   }
 
   void _showErrorDialog(String msg) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("インポートエラー"),
+        title: Text(l10n.importErrorTitle),
         content: Text(msg),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK")),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.ok)),
         ],
       ),
     );
@@ -642,17 +649,17 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildUILayoutSection() {
-    // パターンの概要説明テキスト
-    const patternDescriptions = {
-      1: 'ステータス・メッセージ: 上部 / 移動パッド・ショートカット: 下部',
-      2: 'ステータス・メッセージ: 下部 / 移動パッド・ショートカット: 上部',
+    final l10n = AppLocalizations.of(context)!;
+    final patternDescriptions = {
+      1: l10n.layoutPatternDesc1,
+      2: l10n.layoutPatternDesc2,
     };
 
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.dashboard_customize, color: Colors.cyanAccent),
-        title: const Text("UI配置カスタマイズ"),
-        subtitle: const Text("画面レイアウトのパターンを選択します"),
+        title: Text(l10n.secUILayoutTitle),
+        subtitle: Text(l10n.secUILayoutSub),
         children: _withDividers([
           // パターン選択 (RadioGroup)
           Padding(
@@ -660,9 +667,9 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(left: 16.0, bottom: 4.0),
-                  child: Text('レイアウトパターン', style: TextStyle(fontSize: 14, color: Colors.white70)),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16.0, bottom: 4.0),
+                  child: Text(l10n.layoutPatternLabel, style: const TextStyle(fontSize: 14, color: Colors.white70)),
                 ),
                 // ignore: deprecated_member_use
                 for (final entry in patternDescriptions.entries)
@@ -677,7 +684,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         if (val != null) _applyPattern(val);
                       },
                     ),
-                    title: Text('パターン ${entry.key}'),
+                    title: Text(entry.key == 1 ? l10n.layoutPattern1 : l10n.layoutPattern2),
                     subtitle: Text(entry.value, style: const TextStyle(fontSize: 12)),
                     onTap: () => _applyPattern(entry.key),
                   ),
@@ -686,8 +693,8 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           // 移動パッドとショートカットの左右入れ替えスイッチ
           SwitchListTile(
-            title: const Text("移動パッドとショートカットの左右を入れ替える"),
-            subtitle: const Text("移動パッドを右側、ショートカットボタンを左側に配置します"),
+            title: Text(l10n.swapPadSideTitle),
+            subtitle: Text(l10n.swapPadSideDesc),
             value: _swapPadSide,
             onChanged: (val) {
               setState(() => _swapPadSide = val);
@@ -697,18 +704,18 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           // メニューボタン・地図ボタンの配置設定（個別設定として残す）
           ListTile(
-            title: const Text("半透明メニューボタンの配置位置"),
+            title: Text(l10n.menuButtonPos),
             trailing: DropdownButton<String>(
               value: _menuButtonPosition,
               dropdownColor: Colors.grey[900],
               style: const TextStyle(color: Colors.white),
-              items: const [
-                DropdownMenuItem(value: 'top_left', child: Text('左上', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'top_right', child: Text('右上', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'left_edge', child: Text('左端(中央)', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'right_edge', child: Text('右端(中央)', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'bottom_left', child: Text('左下', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'bottom_right', child: Text('右下', style: TextStyle(color: Colors.white))),
+              items: [
+                DropdownMenuItem(value: 'top_left', child: Text(l10n.posTopLeft, style: const TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'top_right', child: Text(l10n.posTopRight, style: const TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'left_edge', child: Text(l10n.posLeftEdge, style: const TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'right_edge', child: Text(l10n.posRightEdge, style: const TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'bottom_left', child: Text(l10n.posBottomLeft, style: const TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'bottom_right', child: Text(l10n.posBottomRight, style: const TextStyle(color: Colors.white))),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -719,18 +726,18 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ListTile(
-            title: const Text("半透明地図ボタンの配置位置"),
+            title: Text(l10n.mapButtonPos),
             trailing: DropdownButton<String>(
               value: _mapButtonPosition,
               dropdownColor: Colors.grey[900],
               style: const TextStyle(color: Colors.white),
-              items: const [
-                DropdownMenuItem(value: 'top_left', child: Text('左上', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'top_right', child: Text('右上', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'left_edge', child: Text('左端(中央)', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'right_edge', child: Text('右端(中央)', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'bottom_left', child: Text('左下', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'bottom_right', child: Text('右下', style: TextStyle(color: Colors.white))),
+              items: [
+                DropdownMenuItem(value: 'top_left', child: Text(l10n.posTopLeft, style: const TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'top_right', child: Text(l10n.posTopRight, style: const TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'left_edge', child: Text(l10n.posLeftEdge, style: const TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'right_edge', child: Text(l10n.posRightEdge, style: const TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'bottom_left', child: Text(l10n.posBottomLeft, style: const TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'bottom_right', child: Text(l10n.posBottomRight, style: const TextStyle(color: Colors.white))),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -746,18 +753,19 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildControllerSection() {
+    final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.gamepad, color: Colors.amber),
-        title: const Text("コントローラ設定"),
+        title: Text(l10n.secControllerTitle),
         children: _withDividers([
           ListTile(
-            title: const Text("操作モード"),
+            title: Text(l10n.controllerMode),
             trailing: DropdownButton<String>(
               value: _controllerMode,
-              items: const [
-                DropdownMenuItem(value: 'pad', child: Text('ボタンパッド')),
-                DropdownMenuItem(value: 'keyboard', child: Text('フルキーボード')),
+              items: [
+                DropdownMenuItem(value: 'pad', child: Text(l10n.modePad)),
+                DropdownMenuItem(value: 'keyboard', child: Text(l10n.modeKeyboard)),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -768,7 +776,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ListTile(
-            title: const Text("ボタン不透明度"),
+            title: Text(l10n.padOpacityTitle),
             subtitle: Slider(
               value: _padOpacity,
               min: 0.1,
@@ -782,7 +790,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ListTile(
-            title: const Text("移動ボタンサイズ倍率"),
+            title: Text(l10n.dpadScaleTitle),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -800,23 +808,23 @@ class _SettingsPageState extends State<SettingsPage> {
                 _buildAppliedScaleLabel(
                   setting: _dpadScale,
                   effective: _previewDpadEffectiveScale,
-                  label: '移動',
+                  label: l10n.dpadScaleLabel,
                 ),
               ],
             ),
           ),
           ListTile(
-            title: const Text("移動パッド長押し時の移動モード"),
+            title: Text(l10n.dpadLongPressTitle),
             trailing: DropdownButton<String>(
               value: _dpadLongPressMoveMode,
-              items: const [
-                DropdownMenuItem(value: 'NORMAL', child: Text('標準')),
-                DropdownMenuItem(value: 'UPPER', child: Text('大文字')),
-                DropdownMenuItem(value: 'G_LOWER', child: Text('g')),
-                DropdownMenuItem(value: 'G_UPPER', child: Text('G')),
-                DropdownMenuItem(value: 'CTRL', child: Text('^(Ctrl)')),
-                DropdownMenuItem(value: 'M_CMD', child: Text('m')),
-                DropdownMenuItem(value: 'F_CMD', child: Text('F')),
+              items: [
+                DropdownMenuItem(value: 'NORMAL', child: Text(l10n.dpadModeNormal)),
+                DropdownMenuItem(value: 'UPPER', child: Text(l10n.dpadModeUpper)),
+                DropdownMenuItem(value: 'G_LOWER', child: Text(l10n.dpadModeGLower)),
+                DropdownMenuItem(value: 'G_UPPER', child: Text(l10n.dpadModeGUpper)),
+                DropdownMenuItem(value: 'CTRL', child: Text(l10n.dpadModeCtrl)),
+                DropdownMenuItem(value: 'M_CMD', child: Text(l10n.dpadModeMCmd)),
+                DropdownMenuItem(value: 'F_CMD', child: Text(l10n.dpadModeFCmd)),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -827,12 +835,12 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ListTile(
-            title: const Text("マップタップでの自動移動"),
+            title: Text(l10n.mapTapTravelTitle),
             trailing: DropdownButton<String>(
               value: _mapTapTravelMode,
-              items: const [
-                DropdownMenuItem(value: 'always', child: Text('常に有効')),
-                DropdownMenuItem(value: 'after_scroll', child: Text('スクロール・ズーム直後のみ有効')),
+              items: [
+                DropdownMenuItem(value: 'always', child: Text(l10n.mapTapAlways)),
+                DropdownMenuItem(value: 'after_scroll', child: Text(l10n.mapTapAfterScroll)),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -843,7 +851,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ListTile(
-            title: const Text("ショートカットボタンサイズ倍率"),
+            title: Text(l10n.shortcutPadScaleTitle),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -861,13 +869,13 @@ class _SettingsPageState extends State<SettingsPage> {
                 _buildAppliedScaleLabel(
                   setting: _shortcutPadScale,
                   effective: _previewShortcutPadEffectiveScale,
-                  label: 'ショートカット',
+                  label: l10n.shortcutPadScaleLabel,
                 ),
               ],
             ),
           ),
           ListTile(
-            title: const Text("コマンドパネルサイズ倍率"),
+            title: Text(l10n.cmdPanelScaleTitle),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -885,22 +893,22 @@ class _SettingsPageState extends State<SettingsPage> {
                 _buildAppliedScaleLabel(
                   setting: _cmdPanelScale,
                   effective: _cmdPanelScale,
-                  label: 'コマンドパネル',
+                  label: l10n.cmdPanelScaleLabel,
                 ),
               ],
             ),
           ),
           ListTile(
-            title: const Text("メニュー(ドロワー)の引き出し位置"),
+            title: Text(l10n.drawerPosTitle),
             trailing: DropdownButton<String>(
               value: _drawerPosition,
               dropdownColor: Colors.grey[900],
               style: const TextStyle(color: Colors.white),
-              items: const [
-                DropdownMenuItem(value: 'left', child: Text('左側 (スワイプ可)', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'right', child: Text('右側 (スワイプ可)', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'top', child: Text('上部', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'bottom', child: Text('下部', style: TextStyle(color: Colors.white))),
+              items: [
+                DropdownMenuItem(value: 'left', child: Text(l10n.posLeft, style: const TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'right', child: Text(l10n.posRight, style: const TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'top', child: Text(l10n.posTop, style: const TextStyle(color: Colors.white))),
+                DropdownMenuItem(value: 'bottom', child: Text(l10n.posBottom, style: const TextStyle(color: Colors.white))),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -940,6 +948,7 @@ class _SettingsPageState extends State<SettingsPage> {
     required double effective,
     required String label,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     final isClamped = (setting - effective).abs() > 0.01;
     final clampedColor = Colors.amber[300] ?? const Color(0xFFFFD54F);
     final color = isClamped ? clampedColor : Colors.white60;
@@ -949,7 +958,7 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Row(
         children: [
           Text(
-            '適用倍率: ${effective.toStringAsFixed(2)}',
+            l10n.appliedScale(effective.toStringAsFixed(2)),
             style: TextStyle(
               fontSize: 11,
               color: color,
@@ -959,7 +968,7 @@ class _SettingsPageState extends State<SettingsPage> {
           if (isClamped) ...[
             const SizedBox(width: 6),
             Text(
-              '⚠ 画面幅により自動調整',
+              l10n.autoAdjustedScreen,
               style: TextStyle(
                 fontSize: 10,
                 color: clampedColor,
@@ -973,15 +982,16 @@ class _SettingsPageState extends State<SettingsPage> {
 
   /// ステータス・メッセージ領域の表示設定セクション
   Widget _buildMessageSection() {
+    final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.chat_bubble_outline, color: Colors.tealAccent),
-        title: const Text('メッセージ設定'),
-        subtitle: const Text('メッセージ領域の行数・透過度・フォントサイズ'),
+        title: Text(l10n.secMsgTitle),
+        subtitle: Text(l10n.secMsgSub),
         children: _withDividers([         
           // 行数スライダー（1〜15）
           ListTile(
-            title: const Text('表示行数'),
+            title: Text(l10n.msgLineCount),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -990,7 +1000,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   min: 1,
                   max: 15,
                   divisions: 14,
-                  label: '$_msgLineCount 行',
+                  label: '$_msgLineCount',
                   onChanged: (val) {
                     final intVal = val.round();
                     setState(() => _msgLineCount = intVal);
@@ -998,7 +1008,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 ),
                 Text(
-                  '現在: $_msgLineCount 行（最新メッセージを$_msgLineCount行表示）',
+                  l10n.msgLineCountLabel(_msgLineCount.toString()),
                   style: const TextStyle(fontSize: 12, color: Colors.white54),
                 ),
               ],
@@ -1006,7 +1016,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           // 透過度スライダー（0〜100、実際は 0.0〜1.0 で保存）
           ListTile(
-            title: const Text('背景透過度'),
+            title: Text(l10n.msgOpacity),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1022,8 +1032,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 ),
                 Text(
-                  '現在: ${(_msgOpacity * 100).round()}%'
-                  '（0% = 完全透明 / 100% = 不透明）',
+                  l10n.msgOpacityLabel((_msgOpacity * 100).round().toString()),
                   style: const TextStyle(fontSize: 12, color: Colors.white54),
                 ),
               ],
@@ -1031,7 +1040,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           // フォントサイズスライダー（8〜24）
           ListTile(
-            title: const Text('フォントサイズ'),
+            title: Text(l10n.msgFontSize),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1047,7 +1056,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 ),
                 Text(
-                  '現在: ${_msgFontSize.round()} pt',
+                  l10n.msgFontSizeLabel(_msgFontSize.round().toString()),
                   style: const TextStyle(fontSize: 12, color: Colors.white54),
                 ),
               ],
@@ -1059,9 +1068,9 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'プレビュー',
-                  style: TextStyle(fontSize: 12, color: Colors.white38),
+                Text(
+                  l10n.preview,
+                  style: const TextStyle(fontSize: 12, color: Colors.white38),
                 ),
                 const SizedBox(height: 4),
                 Container(
@@ -1103,7 +1112,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           color: Colors.black.withValues(alpha: _msgOpacity),
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                           child: Text(
-                            'メッセージのサンプルテキストです。\nWelcome to NetHackJP!',
+                            l10n.msgSampleText,
                             style: TextStyle(
                               color: Colors.white,
                               fontFamily: 'monospace',
@@ -1126,33 +1135,34 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildKeyActionSection() {
-    const volActions = {
-      0: "機能なし (通常音量変化)",
-      10: "決定 (Enter)",
-      32: "スペース",
-      27: "エスケープ (Esc)",
-      105: "インベントリ (i)",
-      115: "周囲の探索 (s)",
-      18: "画面再描画 (^R)",
+    final l10n = AppLocalizations.of(context)!;
+    final volActions = {
+      0: l10n.volActNone,
+      10: l10n.volActEnter,
+      32: l10n.volActSpace,
+      27: l10n.volActEsc,
+      105: l10n.volActInv,
+      115: l10n.volActSearch,
+      18: l10n.volActRedraw,
     };
 
-    const backActions = {
-      0: "機能なし (通常通りアプリを閉じる)",
-      27: "エスケープ (Esc/ダイアログ閉じ)",
-      105: "インベントリ (i)",
-      115: "周囲の探索 (s)",
-      46: "待機する (.)",
-      83: "セーブして終了する (S)",
+    final backActions = {
+      0: l10n.backActNone,
+      27: l10n.backActEsc,
+      105: l10n.backActInv,
+      115: l10n.backActSearch,
+      46: l10n.backActWait,
+      83: l10n.backActSave,
     };
 
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.keyboard, color: Colors.blueAccent),
-        title: const Text("物理キーカスタムアクション"),
-        subtitle: const Text("音量ボタンや戻るキーにゲームコマンドを割り当てます"),
+        title: Text(l10n.secKeyTitle),
+        subtitle: Text(l10n.secKeySub),
         children: _withDividers([
           ListTile(
-            title: const Text("音量アップキー"),
+            title: Text(l10n.keyVolUpTitle),
             trailing: DropdownButton<int>(
               value: _volupAction,
               items: volActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
@@ -1166,7 +1176,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ListTile(
-            title: const Text("音量ダウンキー"),
+            title: Text(l10n.keyVolDownTitle),
             trailing: DropdownButton<int>(
               value: _voldownAction,
               items: volActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
@@ -1180,7 +1190,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ListTile(
-            title: const Text("戻るボタン"),
+            title: Text(l10n.keyBackTitle),
             trailing: DropdownButton<int>(
               value: _backAction,
               items: backActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
@@ -1199,11 +1209,12 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildShortcutSection() {
+    final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.grid_3x3, color: Colors.cyanAccent),
-        title: const Text("ショートカットカスタマイズ"),
-        subtitle: const Text("3x3ショートカットパッドに割り当てるキーを設定"),
+        title: Text(l10n.secShortcutTitle),
+        subtitle: Text(l10n.secShortcutSub),
         children: _withDividers([
           GridView.builder(
             shrinkWrap: true,
@@ -1232,11 +1243,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      _shortcutLabels[index].split(' ')[0],
+                      _getShortcutButtonLabel(l10n, index).split(' ')[0],
                       style: const TextStyle(fontSize: 10, color: Colors.grey),
                     ),
                     Text(
-                      displayStr.isEmpty ? "(未設定)" : displayStr,
+                      displayStr.isEmpty ? l10n.shortcutNotSet : displayStr,
                       style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.amberAccent),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -1251,18 +1262,19 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildOtherSection() {
+    final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.more_horiz, color: Colors.lightBlueAccent),
-        title: const Text("その他の設定"),
+        title: Text(l10n.secOtherTitle),
         children: _withDividers([
           ListTile(
-            title: const Text("死亡時の墓表示モード"),
+            title: Text(l10n.tombstoneModeTitle),
             trailing: DropdownButton<int>(
               value: _tombstoneDisplayMode,
-              items: const [
-                DropdownMenuItem(value: 0, child: Text('画像表示')),
-                DropdownMenuItem(value: 1, child: Text('テキスト表示')),
+              items: [
+                DropdownMenuItem(value: 0, child: Text(l10n.tombstoneModeImage)),
+                DropdownMenuItem(value: 1, child: Text(l10n.tombstoneModeText)),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -1278,15 +1290,16 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildAdvancedSection() {
+    final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.tune, color: Colors.orangeAccent),
-        title: const Text("高度な設定"),
+        title: Text(l10n.secAdvancedTitle),
         children: _withDividers([
           ListTile(
             leading: const Icon(Icons.edit_note, color: Colors.white),
-            title: const Text("defaults.nh を手動で編集"),
-            subtitle: const Text("詳細なゲームオプションファイルを直接記述します（※反映には新規ゲームの開始が必要です）"),
+            title: Text(l10n.manualEditDefaults),
+            subtitle: Text(l10n.manualEditDefaultsSub),
             trailing: const Icon(Icons.chevron_right),
             onTap: () async {
               await Navigator.of(context).push(
@@ -1299,14 +1312,14 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           ListTile(
             leading: const Icon(Icons.file_upload, color: Colors.lightBlueAccent),
-            title: const Text("設定をエクスポート"),
-            subtitle: const Text("現在の設定をJSON文字列でクリップボードにコピー"),
+            title: Text(l10n.exportSettings),
+            subtitle: Text(l10n.exportSettingsSub),
             onTap: _exportSettings,
           ),
           ListTile(
             leading: const Icon(Icons.file_download, color: Colors.lightGreenAccent),
-            title: const Text("設定をインポート"),
-            subtitle: const Text("クリップボードの設定JSONを読み込んで適用します"),
+            title: Text(l10n.importSettings),
+            subtitle: Text(l10n.importSettingsSub),
             onTap: _importSettings,
           ),
         ]),
@@ -1315,6 +1328,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _editPickupTypes() {
+    final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController(text: _optPickupTypes);
     showDialog(
       context: context,
@@ -1322,11 +1336,12 @@ class _SettingsPageState extends State<SettingsPage> {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             final currentText = controller.text;
+            final symbolsMap = _getItemTypeSymbols(l10n);
 
             return AlertDialog(
               scrollable: true,
               insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              title: const Text("自動拾い対象アイテム"),
+              title: Text(l10n.pickupTypesDialogTitle),
               content: SizedBox(
                 width: double.maxFinite,
                 child: SingleChildScrollView(
@@ -1335,22 +1350,22 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       TextField(
                         controller: controller,
-                        decoration: const InputDecoration(
-                          labelText: "直接入力 (記号の羅列)",
-                          hintText: r'例: $"=/!?+',
-                          helperText: "拾いたいアイテムの記号を入力してください",
+                        decoration: InputDecoration(
+                          labelText: l10n.directInputLabel,
+                          hintText: l10n.directInputHint,
+                          helperText: l10n.directInputHelper,
                         ),
                         onChanged: (val) {
                           setStateDialog(() {});
                         },
                       ),
                       const SizedBox(height: 16),
-                      const Text(
-                        "または選択肢からトグル選択:",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      Text(
+                        l10n.toggleFromOptions,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                       ),
                       const SizedBox(height: 8),
-                      ..._itemTypeSymbols.entries.map((entry) {
+                      ...symbolsMap.entries.map((entry) {
                         final char = entry.key;
                         final label = entry.value;
                         final isSelected = currentText.contains(char);
@@ -1380,7 +1395,7 @@ class _SettingsPageState extends State<SettingsPage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text("キャンセル"),
+                  child: Text(l10n.cancel),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -1391,7 +1406,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     _saveGameOption('nh_opt_pickup_types', val);
                     Navigator.pop(context);
                   },
-                  child: const Text("保存"),
+                  child: Text(l10n.save),
                 ),
               ],
             );
@@ -1402,6 +1417,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _editStringOption(String title, String prefKey, String currentVal, int maxChars) {
+    final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController(text: currentVal);
     final maxBytes = maxChars > 0 ? maxChars - 1 : 31;
 
@@ -1424,8 +1440,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   TextField(
                     controller: controller,
                     decoration: InputDecoration(
-                      hintText: "未指定の場合は空欄",
-                      counterText: "$bytesCount / $maxBytes バイト",
+                      hintText: l10n.hintEmptyDefault,
+                      counterText: l10n.bytesCount(bytesCount, maxBytes),
                       counterStyle: TextStyle(
                         color: isOverflow ? Colors.red : Colors.white70,
                         fontWeight: isOverflow ? FontWeight.bold : FontWeight.normal,
@@ -1439,8 +1455,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     const SizedBox(height: 6),
                     Text(
                       prefKey == 'nh_opt_name'
-                          ? "名前が長すぎます。$maxBytesバイト以内してください。"
-                          : "文字数が多すぎます。$maxBytesバイト以内で入力してください。",
+                          ? l10n.nameTooLongMaxBytes(maxBytes.toString())
+                          : l10n.textTooLongMaxBytes(maxBytes.toString()),
                       style: const TextStyle(
                         color: Colors.redAccent,
                         fontSize: 12,
@@ -1453,7 +1469,7 @@ class _SettingsPageState extends State<SettingsPage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text("キャンセル"),
+                  child: Text(l10n.cancel),
                 ),
                 ElevatedButton(
                   onPressed: isOverflow
@@ -1470,7 +1486,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           _saveGameOption(prefKey, val);
                           Navigator.pop(context);
                         },
-                  child: const Text("保存"),
+                  child: Text(l10n.save),
                 ),
               ],
             );
@@ -1481,21 +1497,22 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildGameRulesSection() {
+    final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.sports_esports, color: Colors.tealAccent),
-        title: const Text("ゲームルール・プレイ設定 (defaults.nh)"),
-        subtitle: const Text("ゲーム本体の動作オプションを設定します（※反映には新規ゲームの開始が必要です）"),
+        title: Text(l10n.secGameRulesTitle),
+        subtitle: Text(l10n.secGameRulesSub),
         children: _withDividers([
           ListTile(
-            title: const Text("チュートリアル動作モード"),
-            subtitle: const Text("ゲーム開始時のチュートリアル問いかけ・開始動作を設定します"),
+            title: Text(l10n.tutorialModeTitle),
+            subtitle: Text(l10n.tutorialModeSub),
             trailing: DropdownButton<int>(
               value: _optTutorialMode,
-              items: const [
-                DropdownMenuItem(value: 0, child: Text('毎回確認する\n (標準)')),
-                DropdownMenuItem(value: 1, child: Text('常に開始する\n (OPTIONS=tutorial)')),
-                DropdownMenuItem(value: 2, child: Text('常に通常プレイ\n (OPTIONS=!tutorial)')),
+              items: [
+                DropdownMenuItem(value: 0, child: Text(l10n.tutorialAsk)),
+                DropdownMenuItem(value: 1, child: Text(l10n.tutorialAlways)),
+                DropdownMenuItem(value: 2, child: Text(l10n.tutorialNever)),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -1506,17 +1523,17 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ListTile(
-            title: const Text("テンキー移動 (number_pad)"),
-            subtitle: const Text("テンキー（1-9）での移動やレイアウトを設定します"),
+            title: Text(l10n.numberPadTitle),
+            subtitle: Text(l10n.numberPadSub),
             trailing: DropdownButton<int>(
               value: _optNumberPad,
-              items: const [
-                DropdownMenuItem(value: 0, child: Text('OFF (!number_pad)')),
-                DropdownMenuItem(value: 1, child: Text('1: 標準テンキー')),
-                DropdownMenuItem(value: 2, child: Text('2: PC Hack互換')),
-                DropdownMenuItem(value: 3, child: Text('3: 電話配列')),
-                DropdownMenuItem(value: 4, child: Text('4: 電話+PC Hack')),
-                DropdownMenuItem(value: -1, child: Text('-1: ドイツ語配列')),
+              items: [
+                DropdownMenuItem(value: 0, child: Text(l10n.numPadOff)),
+                DropdownMenuItem(value: 1, child: Text(l10n.numPadStandard)),
+                DropdownMenuItem(value: 2, child: Text(l10n.numPadPCHack)),
+                DropdownMenuItem(value: 3, child: Text(l10n.numPadPhone)),
+                DropdownMenuItem(value: 4, child: Text(l10n.numPadPhonePCHack)),
+                DropdownMenuItem(value: -1, child: Text(l10n.numPadGerman)),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -1527,8 +1544,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           SwitchListTile(
-            title: const Text("自動拾い (autopickup)"),
-            subtitle: const Text("足元のアイテムを自動的に拾います"),
+            title: Text(l10n.optAutopickup),
+            subtitle: Text(l10n.autopickupSub),
             value: _optAutopickup,
             onChanged: (val) async {
               setState(() {
@@ -1547,11 +1564,11 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           ListTile(
             enabled: _optAutopickup,
-            title: const Text("自動拾い対象のアイテム種別 (pickup_types)"),
+            title: Text(l10n.pickupTypesTitle),
             subtitle: Text(
               _optAutopickup
-                  ? (_optPickupTypes.isEmpty ? "すべて拾う" : "対象記号: $_optPickupTypes")
-                  : "※自動拾いが有効な場合のみ設定できます",
+                  ? (_optPickupTypes.isEmpty ? l10n.pickupTypesAll : l10n.pickupTypesSymbols(_optPickupTypes))
+                  : l10n.pickupTypesDisabledNote,
               style: TextStyle(
                 color: _optAutopickup ? Colors.white70 : Colors.grey,
               ),
@@ -1559,8 +1576,8 @@ class _SettingsPageState extends State<SettingsPage> {
             onTap: _optAutopickup ? _editPickupTypes : null,
           ),
           SwitchListTile(
-            title: const Text("経過ターン表示 (time)"),
-            subtitle: const Text("ステータス表示に行動ターン数を表示します"),
+            title: Text(l10n.optTime),
+            subtitle: Text(l10n.timeSub),
             value: _optTime,
             onChanged: (val) {
               setState(() => _optTime = val);
@@ -1568,8 +1585,8 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           SwitchListTile(
-            title: const Text("経験値表示 (showexp)"),
-            subtitle: const Text("ステータス表示に獲得経験値を表示します"),
+            title: Text(l10n.optShowexp),
+            subtitle: Text(l10n.showexpSub),
             value: _optShowexp,
             onChanged: (val) {
               setState(() => _optShowexp = val);
@@ -1577,8 +1594,8 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           SwitchListTile(
-            title: const Text("オブジェクトの価格表示 (price_quotes)"),
-            subtitle: const Text("未識別オブジェクトに記憶済み価格情報を表示します"),
+            title: Text(l10n.optPriceQuotes),
+            subtitle: Text(l10n.priceQuotesSub),
             value: _optPriceQuotes,
             onChanged: (val) {
               setState(() => _optPriceQuotes = val);
@@ -1586,8 +1603,8 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           SwitchListTile(
-            title: const Text("ステータスハイライト表示 (hilite_status)"),
-            subtitle: const Text("HPや各種状態変化を色付きでハイライト表示します"),
+            title: Text(l10n.optHiliteStatus),
+            subtitle: Text(l10n.hiliteStatusSub),
             value: _optHiliteStatus,
             onChanged: (val) {
               setState(() => _optHiliteStatus = val);
@@ -1595,8 +1612,8 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           SwitchListTile(
-            title: const Text("アイテム名のカラー表示 (MENUCOLOR)"),
-            subtitle: const Text("インベントリやダイアログの各項目を色付き表示します"),
+            title: Text(l10n.optMenucolor),
+            subtitle: Text(l10n.menucolorSub),
             value: _optMenucolor,
             onChanged: (val) {
               setState(() => _optMenucolor = val);
@@ -1604,29 +1621,29 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           ListTile(
-            title: const Text("主人公のデフォルト名 (name)"),
-            subtitle: Text(_optName.isEmpty ? "デフォルト (未指定)" : _optName),
-            onTap: () => _editStringOption("主人公のデフォルト名 (name)", 'nh_opt_name', _optName, 32),
+            title: Text(l10n.nameSub),
+            subtitle: Text(_optName.isEmpty ? l10n.defaultUnspecified : _optName),
+            onTap: () => _editStringOption(l10n.nameSub, 'nh_opt_name', _optName, 32),
           ),
           ListTile(
-            title: const Text("犬の名前 (dogname)"),
-            subtitle: Text(_optDogname.isEmpty ? "デフォルト (未指定)" : _optDogname),
-            onTap: () => _editStringOption("犬の名前 (dogname)", 'nh_opt_dogname', _optDogname, 16),
+            title: Text(l10n.dognameSub),
+            subtitle: Text(_optDogname.isEmpty ? l10n.defaultUnspecified : _optDogname),
+            onTap: () => _editStringOption(l10n.dognameSub, 'nh_opt_dogname', _optDogname, 16),
           ),
           ListTile(
-            title: const Text("猫の名前 (catname)"),
-            subtitle: Text(_optCatname.isEmpty ? "デフォルト (未指定)" : _optCatname),
-            onTap: () => _editStringOption("猫の名前 (catname)", 'nh_opt_catname', _optCatname, 16),
+            title: Text(l10n.catnameSub),
+            subtitle: Text(_optCatname.isEmpty ? l10n.defaultUnspecified : _optCatname),
+            onTap: () => _editStringOption(l10n.catnameSub, 'nh_opt_catname', _optCatname, 16),
           ),
           ListTile(
-            title: const Text("馬の名前 (horsename)"),
-            subtitle: Text(_optHorsename.isEmpty ? "デフォルト (未指定)" : _optHorsename),
-            onTap: () => _editStringOption("馬の名前 (horsename)", 'nh_opt_horsename', _optHorsename, 16),
+            title: Text(l10n.horsenameSub),
+            subtitle: Text(_optHorsename.isEmpty ? l10n.defaultUnspecified : _optHorsename),
+            onTap: () => _editStringOption(l10n.horsenameSub, 'nh_opt_horsename', _optHorsename, 16),
           ),
           ListTile(
-            title: const Text("果物の名前 (fruit)"),
-            subtitle: Text(_optFruit.isEmpty ? "デフォルト (slime mold)" : _optFruit),
-            onTap: () => _editStringOption("果物の名前 (fruit)", 'nh_opt_fruit', _optFruit, 16),
+            title: Text(l10n.fruitSub),
+            subtitle: Text(_optFruit.isEmpty ? l10n.defaultSlimeMold : _optFruit),
+            onTap: () => _editStringOption(l10n.fruitSub, 'nh_opt_fruit', _optFruit, 16),
           ),
         ]),
       ),
@@ -1634,34 +1651,34 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildCreditsSection() {
+    final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.info_outline, color: Colors.pinkAccent),
-        title: const Text("クレジット"),
-        children: const [
+        title: Text(l10n.secCreditsTitle),
+        children: [
           Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   "DartHack",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.amberAccent),
                 ),
-                SizedBox(height: 8),
-                Text("DartHack は、NetHack をベースとしつつ、Flutter/Dart によって再構築したモバイル版です。本アプリはオリジナルの NetHack をゲームコアとして使用していますが、NetHack 開発チーム（The NetHack DevTeam）とは一切関係ありません。"),
-                SizedBox(height: 8),
-                Text("本アプリは NetHack General Public License (NGPL) に基づき配布されています。  ソースコードは以下にて公開しています：https://github.com/satokiyon/DartHack"),
-                SizedBox(height: 8),
-                Text("UI デザインの一部は、gurrhack の ForkFront を参考にしています。"),
-                SizedBox(height: 12),
+                const SizedBox(height: 8),
+                Text(l10n.creditsBody1),
+                const SizedBox(height: 8),
+                Text(l10n.creditsBody2),
+                const SizedBox(height: 8),
+                Text(l10n.creditsBody3),
+                const SizedBox(height: 12),
                 Text(
-                  "Contributors:",
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white70),
+                  l10n.creditsContributors,
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white70),
                 ),
-                SizedBox(height: 4),
-                Text("• @satokiyon"),
-                Text("• with Google Antigravity and Gemini"),
+                const SizedBox(height: 4),
+                Text(l10n.creditsContributorList),
               ],
             ),
           ),
@@ -1672,9 +1689,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("詳細ゲーム設定"),
+        title: Text(l10n.detailedSettings),
       ),
       body: ListView(
         children: [
@@ -1743,6 +1761,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _editPanel(int index) {
+    final l10n = AppLocalizations.of(context)!;
     final nameController = TextEditingController(text: _panels[index]['name']);
     final cmdsController = TextEditingController(text: _panels[index]['cmds']);
     showDialog(
@@ -1750,22 +1769,22 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (context) => AlertDialog(
         scrollable: true,
         insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        title: Text("パネル ${index + 1} を編集"),
+        title: Text(l10n.editPanelTitle((index + 1).toString())),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(labelText: "パネル名"),
+              decoration: InputDecoration(labelText: l10n.panelNameLabel),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: cmdsController,
               maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: "ボタンコマンド一覧",
-                helperText: "スペース区切りでコマンドを入力してください",
+              decoration: InputDecoration(
+                labelText: l10n.cmdListLabel,
+                helperText: l10n.cmdListHelper,
               ),
             ),
             const SizedBox(height: 8),
@@ -1796,7 +1815,7 @@ class _SettingsPageState extends State<SettingsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("キャンセル"),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1807,7 +1826,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _savePanels();
               Navigator.pop(context);
             },
-            child: const Text("保存"),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -1815,15 +1834,16 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildCmdPanelSection() {
+    final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.dashboard_customize, color: Colors.indigoAccent),
-        title: const Text("コマンドパネル編集"),
-        subtitle: const Text("ゲーム下部スワイプ対応のボタン群を管理"),
+        title: Text(l10n.secCmdPanelTitle),
+        subtitle: Text(l10n.secCmdPanelSub),
         children: _withDividers([
           SwitchListTile(
-            title: const Text("パネル名を表示"),
-            subtitle: const Text("各パネル行の左端に名前バッジを表示"),
+            title: Text(l10n.showPanelNamesTitle),
+            subtitle: Text(l10n.showPanelNamesSub),
             value: _showPanelNames,
             onChanged: (val) {
               setState(() => _showPanelNames = val);
@@ -1839,7 +1859,7 @@ class _SettingsPageState extends State<SettingsPage> {
               return ListTile(
                 title: Text(panel['name']),
                 subtitle: Text(
-                  panel['cmds'].toString().isEmpty ? "(ボタンなし)" : panel['cmds'].toString(),
+                  panel['cmds'].toString().isEmpty ? l10n.noButtons : panel['cmds'].toString(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -1867,11 +1887,11 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           ListTile(
             leading: const Icon(Icons.add, color: Colors.green),
-            title: const Text("新しいコマンドパネルを追加"),
+            title: Text(l10n.addNewPanel),
             onTap: () {
               setState(() {
                 _panels.add({
-                  'name': "パネル ${_panels.length + 1}",
+                  'name': l10n.panelNName((_panels.length + 1).toString()),
                   'cmds': "e d r z Z q t f w x i",
                 });
               });
