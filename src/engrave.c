@@ -1,10 +1,11 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-18. */
 /* NetHack 5.0	engrave.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "jp_rubouts.h"
 
 /* doengrave() data */
 struct _doengrave_ctx {
@@ -119,70 +120,154 @@ static const struct {
                 { '8', "3o" } };
 
 /* degrade some of the characters in a string */
+
+/* UTF-8 helper functions for Japanese rubout support */
+staticfn int
+utf8_charlen(const char *str)
+{
+    unsigned char c = (unsigned char) *str;
+    if (c == 0) return 0;
+    if (c < 0x80) return 1;
+    if ((c & 0xE0) == 0xC0) return 2;
+    if ((c & 0xF0) == 0xE0) return 3;
+    if ((c & 0xF8) == 0xF0) return 4;
+    return 1;
+}
+
+staticfn int
+utf8_strlen_chars(const char *str)
+{
+    int count = 0;
+    while (*str) {
+        int len = utf8_charlen(str);
+        str += len;
+        count++;
+    }
+    return count;
+}
+
+staticfn const char *
+utf8_char_at(const char *str, int char_idx, int *char_len)
+{
+    int idx = 0;
+    while (*str) {
+        int len = utf8_charlen(str);
+        if (idx == char_idx) {
+            if (char_len) *char_len = len;
+            return str;
+        }
+        str += len;
+        idx++;
+    }
+    if (char_len) *char_len = 0;
+    return NULL;
+}
+
 void
-wipeout_text(
-    char *engr,    /* engraving text */
-    int cnt,       /* number of chars to degrade */
-    unsigned seed) /* for semi-controlled randomization */
+wipeout_text(char *engr, int cnt, unsigned seed)
 {
     char *s;
-    int i, j, nxt, use_rubout;
-    unsigned lth = (unsigned) strlen(engr);
+    int old_charlen, new_charlen, char_count, nxt, i;
+    const char *old_char_ptr;
+    char replacement[16];
+    boolean use_rubout;
 
-    if (lth && cnt > 0) {
-        while (cnt--) {
-            /* pick next character */
-            if (!seed) {
-                /* random */
-                nxt = rn2((int) lth);
-                use_rubout = rn2(4);
-            } else {
-                /* predictable; caller can reproduce the same sequence by
-                   supplying the same arguments later, or a pseudo-random
-                   sequence by varying any of them */
-                nxt = seed % lth;
-                seed *= 31, seed %= (BUFSZ - 1);
-                use_rubout = seed & 3;
-            }
-            s = &engr[nxt];
-            if (*s == ' ')
+    if (cnt <= 0 || !engr || !*engr)
+        return;
+
+    char_count = utf8_strlen_chars(engr);
+
+    while (cnt-- > 0) {
+        if (char_count <= 0)
+            break;
+
+        if (!seed) {
+            nxt = rn2(char_count);
+            use_rubout = (rn2(4) < 3);
+        } else {
+            nxt = (int) (seed % char_count);
+            seed *= 31;
+            seed %= (BUFSZ - 1);
+            use_rubout = ((seed & 3) < 3);
+        }
+
+        old_char_ptr = utf8_char_at(engr, nxt, &old_charlen);
+        if (!old_char_ptr || old_charlen <= 0)
+            continue;
+
+        s = (char *) old_char_ptr;
+        replacement[0] = '\0';
+
+        if (old_charlen == 1) {
+            char c = *s;
+            if (c == ' ')
                 continue;
 
-            /* rub out unreadable & small punctuation marks */
-            if (strchr("?.,'`-|_", *s)) {
-                *s = ' ';
-                continue;
-            }
-
-            if (!use_rubout) {
-                i = SIZE(rubouts);
-            } else {
-                for (i = 0; i < SIZE(rubouts); i++)
-                    if (*s == rubouts[i].wipefrom) {
-                        unsigned ln = (unsigned) strlen(rubouts[i].wipeto);
-                        /*
-                         * Pick one of the substitutes at random.
-                         */
-                        if (!seed) {
-                            j = rn2((int) ln);
-                        } else {
-                            seed *= 31, seed %= (BUFSZ - 1);
-                            j = seed % ln;
+            if (strchr("?.,'`-|_", c)) {
+                replacement[0] = ' ';
+                replacement[1] = '\0';
+            } else if (use_rubout) {
+                for (i = 0; i < SIZE(rubouts); i++) {
+                    if (c == rubouts[i].wipefrom) {
+                        int rlen = (int) strlen(rubouts[i].wipeto);
+                        if (rlen > 0) {
+                            int rpick = !seed ? rn2(rlen) : (int)(seed % rlen);
+                            replacement[0] = rubouts[i].wipeto[rpick];
+                            replacement[1] = '\0';
                         }
-                        *s = rubouts[i].wipeto[j];
                         break;
                     }
+                }
+            }
+            if (!replacement[0]) {
+                replacement[0] = '?';
+                replacement[1] = '\0';
+            }
+        } else {
+            if (old_charlen == 3 &&
+                (unsigned char)s[0] == 0xE3 &&
+                (unsigned char)s[1] == 0x80 &&
+                (unsigned char)s[2] == 0x80) {
+                continue;
             }
 
-            /* didn't pick rubout; use '?' for unreadable character */
-            if (i == SIZE(rubouts))
-                *s = '?';
-        }
-    }
+            if (use_rubout) {
+                for (i = 0; i < SIZE(jp_rubouts); i++) {
+                    if (strncmp(s, jp_rubouts[i].wipefrom, old_charlen) == 0 &&
+                        jp_rubouts[i].wipefrom[old_charlen] == '\0') {
+                        int num_cand = utf8_strlen_chars(jp_rubouts[i].wipeto);
+                        if (num_cand > 0) {
+                            int pick = !seed ? rn2(num_cand) : (int)(seed % num_cand);
+                            int cand_len;
+                            const char *cand_ptr = utf8_char_at(jp_rubouts[i].wipeto, pick, &cand_len);
+                            if (cand_ptr && cand_len > 0 && cand_len < (int)sizeof(replacement)) {
+                                memcpy(replacement, cand_ptr, cand_len);
+                                replacement[cand_len] = '\0';
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
 
-    /* trim trailing spaces */
-    while (lth && engr[lth - 1] == ' ')
-        engr[--lth] = '\0';
+            if (!replacement[0]) {
+                strcpy(replacement, "？");
+            }
+        }
+
+        new_charlen = (int) strlen(replacement);
+        int diff = new_charlen - old_charlen;
+
+        if (diff != 0) {
+            int current_bytes = (int) strlen(engr);
+            if (current_bytes + diff >= BUFSZ)
+                continue;
+
+            memmove(s + new_charlen, s + old_charlen, strlen(s + old_charlen) + 1);
+        }
+
+        memcpy(s, replacement, new_charlen);
+    }
 }
 
 /* check whether hero can reach something at ground level */
