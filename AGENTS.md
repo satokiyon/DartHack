@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-18. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -162,3 +162,13 @@ GitHub Actions等で実行される CodeQL のコードスキャン警告（Code
 3. **日本語ドキュメント（Markdown等）の安全な置換処理**:
    - `replace_file_content` などの置換ツールを日本語の Markdown や C コードで使用する際、句読点の些細な不一致（「。」と「.」など）があると、無関係な箇所に誤マッチしてファイルを破損させるリスクが高くなります。
    - 文字列の一部を安全に置換・挿入する際は、Node.js スクリプトを用いてファイルを読み込み、行配列（`split(/\r?\n/)`）に分解して条件判定を伴う挿入を行い、元の改行コードを保持して書き戻す方法（`lines.join(originalEnding)`）を最優先してください。
+
+## 日本語データ抽出および大規模辞書データ構築方針
+
+1. **日本語データ・文字抽出時の対象ブランチとテキストファイルの選定**:
+   - 刻印・噂・メッセージ等の日本語テキストから全角文字や漢字一覧を再抽出する際は、日本語化データが含まれない `upstream-base` ブランチではなく、必ず日本語化データが存在する `main` ブランチを対象としてください。
+   - `makedefs` で暗号化・生成されるバイナリファイル（`dat/engrave` や `dat/rumors_jp` 等）を除外し、生のテキストソース（`dat/engrave.txt`, `dat/epitaph.txt`, `dat/rumors_jp.tru/fal`, `dat/oracles_jp.txt`, `dat/*.lua`, `src/*.c` 等）から抽出を行ってください。
+
+2. **大規模辞書・配列データの段階的バッチ確認（50件単位）**:
+   - `jp_rubouts.h` のように数百〜数千件に及ぶ変換データや辞書を構築・改修する際は、一括置換によるデータ破損を防ぐため、50件程度のバッチ単位で確認・保存（`wipeto_dictionary.json` 等の進捗管理ファイル利用）を行いながら慎重に進めてください。
+
