@@ -1871,7 +1871,7 @@ plnamesuffix(void)
 #endif
 
     /* some generic user names will be ignored in favor of prompting */
-    if (sysopt.genericusers) {
+    if (sysopt.genericusers && !svp.plname[0]) {
         if (*sysopt.genericusers == '*') {
             svp.plname[0] = '\0';
         } else {

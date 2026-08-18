@@ -2126,7 +2126,6 @@ static void* NetHackThreadFunc(void* arg) {
               "WIZARDS=*\n"
               "EXPLORERS=*\n"
               "SHELLERS=*\n"
-              "GENERICUSERS=*\n"
               "SUPPORT=https://satokiyon.github.io/darthack-site/\n"
               "MAXPLAYERS=25\n"
               "PERSMAX=10\n"

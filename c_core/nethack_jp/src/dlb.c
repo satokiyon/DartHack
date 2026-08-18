@@ -21,6 +21,14 @@
  * in a given library, look for it outside the libraries.
  */
 
+#if defined(DLB_MAIN) || defined(DLB_UTIL)
+int g_language_is_jp = 0;
+#endif
+
+#ifndef debuglog
+#define debuglog(...) (void)0
+#endif
+
 typedef struct dlb_procs {
     boolean (*dlb_init_proc)(void);
     void (*dlb_cleanup_proc)(void);
@@ -568,7 +576,7 @@ make_jp_datafile_name(const char *name, char *buf, size_t bufsz)
     if (dot && dot > filename) {
         /* ファイル名部分に拡張子がある場合 */
         size_t baselen = (size_t)(dot - name);
-        copynchars(buf, name, (int) baselen);
+        (void) strncpy(buf, name, baselen);
         buf[baselen] = '\0';
         Strcat(buf, "_jp");
         Strcat(buf, dot);
