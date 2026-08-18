@@ -51,4 +51,5 @@ Makefile.*
 setup.sh
 scripts/
 android/.kotlin/
+AGENTS.md
 
