@@ -513,11 +513,10 @@ class DefaultsHelper {
     await loadFromFile(assetFilePath);
     final Map<String, String> assetDefaults = Map.from(_options);
 
-    // 2. 廃止された nh_opt_* キーの削除クリーンアップ
-    final allKeys = prefs.getKeys().where((k) => k.startsWith('nh_opt_')).toList();
-    for (final prefKey in allKeys) {
-      final optKey = prefKey.substring('nh_opt_'.length);
-      if (!managedKeys.contains(optKey)) {
+    // 2. 廃止された旧オプションキーの安全クリーンアップ (無差別削除は行わず、明示的廃止キーのみ対処)
+    const obsoleteKeys = <String>{'nh_opt_old_unused_key'};
+    for (final prefKey in obsoleteKeys) {
+      if (prefs.containsKey(prefKey)) {
         await prefs.remove(prefKey);
         debugPrint("DefaultsHelper: Removed obsolete option key '$prefKey'");
       }
@@ -581,11 +580,11 @@ class DefaultsHelper {
     } else {
       try {
         final content = await targetFile.readAsString();
-        if (content.length < 500 || (!content.contains('MENUCOLOR=') && !content.contains('MENUCOLOR ')) || !content.contains('OPTIONS=hilite_status:')) {
+        if (content.trim().isEmpty) {
           final assetFile = File(assetFilePath);
           if (await assetFile.exists()) {
             await assetFile.copy(targetFilePath);
-            debugPrint("DefaultsHelper: Target defaults.nh was incomplete (<500 chars or missing rules). Reset with full asset template.");
+            debugPrint("DefaultsHelper: Target defaults.nh was empty. Reset with full asset template.");
           }
         }
       } catch (e) {

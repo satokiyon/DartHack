@@ -104,6 +104,7 @@ class NetHackAssets {
     'record',
     'logfile',
     'xlogfile',
+    'livelog',
     'history',
     'paniclog',
     'perm',
@@ -166,15 +167,12 @@ class NetHackAssets {
     }
   }
 
-  /// defaults.nh が空または不完全（MENUCOLORやhilite_status等の詳細ルールが欠落）かを判定
+  /// defaults.nh が存在しない、または空かを判定
   static Future<bool> _isDefaultsIncomplete(File file) async {
     if (!await file.exists()) return true;
     try {
       final content = await file.readAsString();
-      if (content.length < 500) return true;
-      final hasMenuColor = content.contains('MENUCOLOR=') || content.contains('MENUCOLOR ');
-      final hasHiliteStatus = content.contains('OPTIONS=hilite_status:');
-      return !hasMenuColor || !hasHiliteStatus;
+      return content.trim().isEmpty;
     } catch (e) {
       return true;
     }
@@ -238,7 +236,7 @@ class NetHackAssets {
       await targetSaveDir.create(recursive: true);
     }
 
-    const logFiles = ['record', 'logfile', 'xlogfile', 'history', 'paniclog'];
+    const logFiles = ['record', 'logfile', 'xlogfile', 'livelog', 'history', 'paniclog'];
 
     for (final candidateDir in candidateDirs) {
       if (candidateDir.path == dstDir.path) continue;

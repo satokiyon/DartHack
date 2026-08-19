@@ -60,7 +60,7 @@ const
     extern int errno;
 #endif
 
-#ifdef ZLIB_COMP /* RLC 09 Mar 1999: Support internal ZLIB */
+#if defined(ZLIB_COMP) || defined(ANDROID) /* RLC 09 Mar 1999: Support internal ZLIB */
 #include "zlib.h"
 #ifndef COMPRESS_EXTENSION
 #define COMPRESS_EXTENSION ".gz"
@@ -1576,6 +1576,39 @@ get_saved_games(void)
                 if (name_len > 4 && strcmp(name + name_len - 4, ".bak") == 0) {
                     continue;
                 }
+                
+                /* 旧バージョンの .gz 残存ファイルの自動マイグレーション／クリーンアップ */
+                if (name_len > 3 && strcmp(name + name_len - 3, ".gz") == 0) {
+                    char gz_path[BUFSZ];
+                    char uncomp_path[BUFSZ];
+                    Sprintf(gz_path, "save/%s", namelist[i]->d_name);
+                    
+                    /* .gz を取り除いた非圧縮パスを作成 (例: save/10222Player) */
+                    Sprintf(uncomp_path, "save/%d%.*s", uid, (int)(name_len - 3), name);
+                    
+                    /* 非圧縮ファイルが既に存在する場合は不要な旧 .gz を削除 */
+                    if (file_exists(uncomp_path)) {
+                        (void) unlink(gz_path);
+                        continue;
+                    } else {
+                        /* 非圧縮ファイルが存在しない場合は .gz を解凍して復元し、.gz を削除 */
+                        gzFile gz_in = gzopen(gz_path, "rb");
+                        if (gz_in) {
+                            FILE *f_out = fopen(uncomp_path, WRBMODE);
+                            if (f_out) {
+                                char buf[1024];
+                                int bytes_read;
+                                while ((bytes_read = gzread(gz_in, buf, sizeof(buf))) > 0) {
+                                    fwrite(buf, 1, bytes_read, f_out);
+                                }
+                                fclose(f_out);
+                            }
+                            gzclose(gz_in);
+                            (void) unlink(gz_path);
+                        }
+                    }
+                }
+
                 char filename[BUFSZ];
                 char* r;
                 Sprintf(filename,"save/%d%s", uid, name);
