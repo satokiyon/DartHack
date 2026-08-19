@@ -26,10 +26,18 @@ class StartScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white24, width: 1),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          const Padding(
+            padding: EdgeInsets.only(left: 4, right: 6),
+            child: Icon(
+              Icons.translate,
+              color: Colors.white70,
+              size: 20,
+            ),
+          ),
           InkWell(
             onTap: () => onLanguageChanged('ja'),
             borderRadius: BorderRadius.circular(16),
@@ -49,17 +57,13 @@ class StartScreen extends StatelessWidget {
                       ]
                     : [],
               ),
-              child: Row(
-                children: [
-                  Text(
-                    '🇯🇵 日本語',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: isJp ? FontWeight.bold : FontWeight.normal,
-                      color: isJp ? Colors.white : Colors.white60,
-                    ),
-                  ),
-                ],
+              child: Text(
+                '日本語',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: isJp ? FontWeight.bold : FontWeight.normal,
+                  color: isJp ? Colors.white : Colors.white60,
+                ),
               ),
             ),
           ),
@@ -83,17 +87,13 @@ class StartScreen extends StatelessWidget {
                       ]
                     : [],
               ),
-              child: Row(
-                children: [
-                  Text(
-                    '🇺🇸 English',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: !isJp ? FontWeight.bold : FontWeight.normal,
-                      color: !isJp ? Colors.white : Colors.white60,
-                    ),
-                  ),
-                ],
+              child: Text(
+                'English',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: !isJp ? FontWeight.bold : FontWeight.normal,
+                  color: !isJp ? Colors.white : Colors.white60,
+                ),
               ),
             ),
           ),
