@@ -126,15 +126,18 @@ static boolean ignore_errors_on_unmatched = FALSE,
 
 /* ----------  BEGIN CONFIG FILE HANDLING ----------- */
 
-/* used for messaging. Also used in options.c */
+#ifndef CONFIG_FILE
+#define CONFIG_FILE "defaults.nh"
+#endif
+
 static const char *default_configfile =
-#ifdef UNIX
+#if defined(UNIX) && !defined(ANDROID)
     ".nethackrc";
 #else
 #if defined(MAC68K) || defined(__BEOS__)
     "NetHack Defaults";
 #else
-#if defined(MSDOS) || defined(WIN32)
+#if defined(MSDOS) || defined(WIN32) || defined(ANDROID)
     CONFIG_FILE;
 #else
     "NetHack.cnf";

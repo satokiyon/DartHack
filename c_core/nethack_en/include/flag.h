@@ -487,6 +487,9 @@ struct instance_flags {
     Bitfield(save_uswallow, 1);
     Bitfield(save_uinwater, 1);
     Bitfield(save_uburied, 1);
+#ifdef ANDROID
+	boolean dumplog; /* enable/disable dump logs */
+#endif
     struct debug_flags debug;
     boolean windowtype_locked;   /* windowtype can't change from configfile */
     boolean windowtype_deferred; /* pick a windowport and store it in
