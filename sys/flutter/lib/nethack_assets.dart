@@ -167,12 +167,12 @@ class NetHackAssets {
     }
   }
 
-  /// defaults.nh が存在しない、または空かを判定
+  /// defaults.nh が存在しない、空、または過去の処理で短縮破壊された状態（50行未満）かを判定
   static Future<bool> _isDefaultsIncomplete(File file) async {
     if (!await file.exists()) return true;
     try {
-      final content = await file.readAsString();
-      return content.trim().isEmpty;
+      final lines = await file.readAsLines();
+      return lines.length < 50;
     } catch (e) {
       return true;
     }

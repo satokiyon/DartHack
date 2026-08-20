@@ -55,12 +55,14 @@ class DefaultsHelper {
       for (var line in lines) {
         final trimmed = line.trim();
 
-        // hilite_status と MENUCOLOR の有効行（先頭コメントなし）の存在チェック
-        if (trimmed.startsWith('OPTIONS=hilite_status:')) {
-          hasActiveHiliteStatus = true;
-        }
-        if (trimmed.startsWith('MENUCOLOR=') || trimmed.startsWith('MENUCOLOR ')) {
-          hasActiveMenuColor = true;
+        // hilite_status と MENUCOLOR / menucolors の有効行（先頭コメントなし）の存在チェック
+        if (!trimmed.startsWith('#')) {
+          if (trimmed.startsWith('OPTIONS=hilite_status:') || trimmed.startsWith('OPTIONS=statushilites')) {
+            hasActiveHiliteStatus = true;
+          }
+          if (trimmed.startsWith('MENUCOLOR=') || trimmed.startsWith('MENUCOLOR ') || trimmed.contains('menucolors') || trimmed.contains('menucolor')) {
+            hasActiveMenuColor = true;
+          }
         }
 
         // コメント行や空行はパースからはスキップ
@@ -72,9 +74,9 @@ class DefaultsHelper {
         }
       }
 
-      // hilite_status および menucolor の全体判定結果を保存
-      _options['hilite_status'] = hasActiveHiliteStatus ? 'true' : 'false';
-      _options['menucolor'] = hasActiveMenuColor ? 'true' : 'false';
+      // hilite_status および menucolor の全体判定結果を保存（テンプレートが存在する限りデフォルト ON (true)）
+      _options['hilite_status'] = hasActiveHiliteStatus ? 'true' : 'true';
+      _options['menucolor'] = hasActiveMenuColor ? 'true' : 'true';
     } catch (e) {
       debugPrint("Error reading defaults.nh: $e");
     }
@@ -187,7 +189,7 @@ class DefaultsHelper {
     final hiliteStatusOn = getBoolOption('hilite_status', defaultValue: true);
     final menucolorOn = getBoolOption('menucolor', defaultValue: true);
 
-    bool hasSymsetOption = false;
+    final handledKeys = <String>{'hilite_status', 'menucolor'};
 
     for (var line in lines) {
       var trimmed = line.trim();
@@ -210,7 +212,6 @@ class DefaultsHelper {
 
       if (isHiliteLine) {
         if (hiliteStatusOn) {
-          // ON の場合: コメント '#' を除去して有効化
           if (trimmed.startsWith('#')) {
             var activeLine = trimmed.substring(1).trim();
             newLines.add(activeLine);
@@ -218,7 +219,6 @@ class DefaultsHelper {
             newLines.add(line);
           }
         } else {
-          // OFF の場合: 先頭に '#' を追加してコメントアウト
           if (!trimmed.startsWith('#')) {
             newLines.add('#$trimmed');
           } else {
@@ -234,11 +234,12 @@ class DefaultsHelper {
           trimmed.startsWith('#MENUCOLOR=') ||
           trimmed.startsWith('# MENUCOLOR=') ||
           trimmed.startsWith('#MENUCOLOR ') ||
-          trimmed.startsWith('# MENUCOLOR ');
+          trimmed.startsWith('# MENUCOLOR ') ||
+          trimmed.contains('menucolors') ||
+          trimmed.contains('menucolor');
 
       if (isMenuColorLine) {
         if (menucolorOn) {
-          // ON の場合: コメント '#' を除去して有効化
           if (trimmed.startsWith('#')) {
             var activeLine = trimmed.substring(1).trim();
             newLines.add(activeLine);
@@ -246,7 +247,6 @@ class DefaultsHelper {
             newLines.add(line);
           }
         } else {
-          // OFF の場合: 先頭に '#' を追加してコメントアウト
           if (!trimmed.startsWith('#')) {
             newLines.add('#$trimmed');
           } else {
@@ -256,14 +256,17 @@ class DefaultsHelper {
         continue;
       }
 
-      // 3. 一般 OPTIONS= 行の単独管理キーの更新およびグラフィック設定の正規化処理
+      // 3. 既存の OPTIONS= 行内のインプレース（その場）直接更新・置換処理
       if (trimmed.startsWith('OPTIONS=')) {
         final content = trimmed.substring('OPTIONS='.length);
         final tokens = _splitCommaTokens(content);
-        final remainingTokens = <String>[];
+        final updatedTokens = <String>[];
+        bool lineModified = false;
 
         for (var token in tokens) {
           final t = token.trim();
+          if (t.isEmpty) continue;
+
           String key = '';
           if (t.contains(':')) {
             key = t.substring(0, t.indexOf(':')).trim();
@@ -273,32 +276,53 @@ class DefaultsHelper {
             key = t.trim();
           }
 
-          // 管理対象キー（hilite_status, menucolor を除く単独オプション）はスキップ
-          if (managedKeys.contains(key) && key != 'hilite_status' && key != 'menucolor') {
-            continue;
-          } else if (t == 'DECgraphics' || t == 'IBMgraphics' || key == 'symset') {
-            // 旧グラフィック設定 (DECgraphics/IBMgraphics等) を symset:IBMGraphics_2 へ正規化
-            if (!hasSymsetOption) {
-              remainingTokens.add('symset:IBMGraphics_2');
-              hasSymsetOption = true;
+          if (managedKeys.contains(key) && _options.containsKey(key)) {
+            final val = _options[key]!;
+            handledKeys.add(key);
+            lineModified = true;
+
+            if (key == 'number_pad') {
+              updatedTokens.add('number_pad:$val');
+            } else if (key == 'tutorial' || key == 'tutorial_mode') {
+              if (val == 'always_tutorial' || val == 'true') {
+                updatedTokens.add('tutorial');
+              } else if (val == 'always_normal' || val == 'false') {
+                updatedTokens.add('!tutorial');
+              } else {
+                updatedTokens.add('tutorial');
+              }
+            } else if (val.toLowerCase() == 'true') {
+              updatedTokens.add(key);
+            } else if (val.toLowerCase() == 'false') {
+              updatedTokens.add('!$key');
+            } else if (val.trim().isNotEmpty) {
+              updatedTokens.add('$key:$val');
+            } else {
+              updatedTokens.add(token);
             }
+          } else if (t == 'DECgraphics' || t == 'IBMgraphics' || key == 'symset') {
+            handledKeys.add('symset');
+            lineModified = true;
+            updatedTokens.add('symset:IBMGraphics_2');
           } else {
-            remainingTokens.add(token);
+            updatedTokens.add(token);
           }
         }
 
-        if (remainingTokens.isNotEmpty) {
-          newLines.add('OPTIONS=${remainingTokens.join(', ')}');
+        if (lineModified) {
+          newLines.add('OPTIONS=${updatedTokens.join(', ')}');
+          continue;
         }
-      } else {
-        newLines.add(line);
       }
+
+      // その他のコメント・空行・未処理行はそのまま100%保持
+      newLines.add(line);
     }
 
-    // 単独管理キーの新しいオプション設定行を準備（hilite_status, menucolor を除く）
+    // ファイル内に一度も登場しなかった「完全未処理の新規キー」のみを末尾管理セクションに追加
     final pendingLines = <String>[];
     _options.forEach((key, val) {
-      if (key == 'hilite_status' || key == 'menucolor') return;
+      if (handledKeys.contains(key)) return;
 
       if (key == 'tutorial' || key == 'tutorial_mode') {
         if (val == 'always_tutorial' || val == 'true') {
@@ -320,7 +344,7 @@ class DefaultsHelper {
       }
     });
 
-    if (!hasSymsetOption) {
+    if (!handledKeys.contains('symset')) {
       pendingLines.add('OPTIONS=symset:IBMGraphics_2');
     }
 
