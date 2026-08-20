@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
-    <!-- nethackdir 内（スコアファイル record, logfile や骨ファイル bon* 等）をバックアップ対象にする -->
+    <!-- nethackdir 内全体（セーブデータ、スコアファイル record, logfile、骨ファイル bon* 等）を自動バックアップ＆リストア対象にする -->
     <include domain="file" path="nethackdir" />
-    <!-- セーブデータ用ディレクトリ (save/) をバックアップから除外する -->
-    <exclude domain="file" path="nethackdir/save" />
 </full-backup-content>

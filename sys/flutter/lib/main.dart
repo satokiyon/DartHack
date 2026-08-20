@@ -829,19 +829,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   int _parseMaxCount(String text) {
-    final trimmed = text.trim();
-    int count = 0;
-    int i = 0;
-    while (i < trimmed.length) {
-      final code = trimmed.codeUnitAt(i);
-      if (code >= 48 && code <= 57) {
-        count = count * 10 + (code - 48);
-        i++;
-      } else {
-        break;
+    final match = RegExp(r'(\d+)').firstMatch(text);
+    if (match != null) {
+      final val = int.tryParse(match.group(1)!);
+      if (val != null && val > 0) {
+        return val;
       }
     }
-    return i > 0 && count > 0 ? count : 1;
+    return 1;
   }
 
   String _cleanItemText(String text) {
@@ -1204,10 +1199,11 @@ class _MyHomePageState extends State<MyHomePage> {
         onAdClosed: (bool hasEarnedReward) {
           if (!hasEarnedReward) {
             if (mounted) {
+              final isJp = _selectedLanguage == 'ja';
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('広告を表示できませんでした。そのまま進行します。'),
-                  duration: Duration(seconds: 2),
+                SnackBar(
+                  content: Text(isJp ? '広告を表示できませんでした。そのまま進行します。' : 'Could not display ad. Proceeding game.'),
+                  duration: const Duration(seconds: 2),
                 ),
               );
             }
@@ -1466,17 +1462,18 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _showConfigErrorAlertDialog(String errorMsg) {
+    final isJp = _selectedLanguage == 'ja';
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1E1E1E),
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent),
-              SizedBox(width: 8),
-              Text('設定ファイルの確認・警告', style: TextStyle(color: Colors.white, fontSize: 16)),
+              const Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent),
+              const SizedBox(width: 8),
+              Text(isJp ? '設定ファイルの確認・警告' : 'Configuration Check & Warning', style: const TextStyle(color: Colors.white, fontSize: 16)),
             ],
           ),
           content: SingleChildScrollView(
@@ -1484,9 +1481,9 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  '起動時のファイルチェックで以下のメッセージが検出されました。OKを押して処理を継続します：',
-                  style: TextStyle(fontSize: 13, color: Colors.white70),
+                Text(
+                  isJp ? '起動時のファイルチェックで以下のメッセージが検出されました。OKを押して処理を継続します：' : 'The following message was detected during startup file check. Press OK to proceed:',
+                  style: const TextStyle(fontSize: 13, color: Colors.white70),
                 ),
                 const SizedBox(height: 12),
                 Container(
@@ -1495,7 +1492,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   decoration: BoxDecoration(
                     color: Colors.black54,
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Colors.orange.withOpacity(0.5)),
+                    border: Border.all(color: Colors.orange.withValues(alpha: 0.5)),
                   ),
                   child: SelectableText(
                     errorMsg,
@@ -1523,7 +1520,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   'key': 32,
                 });
               },
-              child: const Text('OK (継続)'),
+              child: Text(isJp ? 'OK (継続)' : 'OK (Proceed)'),
             ),
           ],
         );
@@ -1718,13 +1715,16 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _showMoveModeSelectDialog() async {
     final selected = Set<DPadMoveMode>.from(_enabledDPadMoveModes);
 
+    final isJp = _selectedLanguage == 'ja';
+    final l10n = AppLocalizations.of(context);
+
     await showDialog<void>(
       context: context,
       builder: (dialogContext) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: const Text('使用する移動モードの選択'),
+              title: Text(isJp ? '使用する移動モードの選択' : 'Select Movement Modes to Use'),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -1751,7 +1751,7 @@ class _MyHomePageState extends State<MyHomePage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text('キャンセル'),
+                  child: Text(l10n?.cancel ?? (isJp ? 'キャンセル' : 'Cancel')),
                 ),
                 FilledButton(
                   onPressed: () {

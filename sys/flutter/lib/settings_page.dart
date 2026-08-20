@@ -1687,6 +1687,23 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  String _getPanelDisplayName(int index, String rawName) {
+    final l10n = AppLocalizations.of(context);
+    final isJp = Localizations.localeOf(context).languageCode == 'ja';
+    if (index == 0) {
+      if (rawName.isEmpty || rawName == "標準パネル" || rawName == "Default Panel") {
+        return l10n?.defaultPanelName ?? (isJp ? "標準パネル" : "Default Panel");
+      }
+    } else {
+      final defaultJp = "パネル ${index + 1}";
+      final defaultEn = "Panel ${index + 1}";
+      if (rawName.isEmpty || rawName == defaultJp || rawName == defaultEn) {
+        return l10n?.panelNName((index + 1).toString()) ?? (isJp ? defaultJp : defaultEn);
+      }
+    }
+    return rawName;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -1762,7 +1779,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _editPanel(int index) {
     final l10n = AppLocalizations.of(context)!;
-    final nameController = TextEditingController(text: _panels[index]['name']);
+    final nameController = TextEditingController(text: _getPanelDisplayName(index, _panels[index]['name']));
     final cmdsController = TextEditingController(text: _panels[index]['cmds']);
     showDialog(
       context: context,
@@ -1857,7 +1874,7 @@ class _SettingsPageState extends State<SettingsPage> {
             itemBuilder: (context, index) {
               final panel = _panels[index];
               return ListTile(
-                title: Text(panel['name']),
+                title: Text(_getPanelDisplayName(index, panel['name'])),
                 subtitle: Text(
                   panel['cmds'].toString().isEmpty ? l10n.noButtons : panel['cmds'].toString(),
                   maxLines: 1,

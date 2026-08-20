@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'l10n/app_localizations.dart';
 
 class CmdItem {
   final String command;
@@ -278,8 +279,26 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
     return lang == 'ja' ? fallbackExtCmdsJp : fallbackExtCmdsEn;
   }
 
+  String _getPanelDisplayName(int index, String rawName, AppLocalizations? l10n, bool isJp) {
+    if (index == 0) {
+      if (rawName.isEmpty || rawName == "標準パネル" || rawName == "Default Panel") {
+        return l10n?.defaultPanelName ?? (isJp ? "標準パネル" : "Default Panel");
+      }
+    } else {
+      final defaultJp = "パネル ${index + 1}";
+      final defaultEn = "Panel ${index + 1}";
+      if (rawName.isEmpty || rawName == defaultJp || rawName == defaultEn) {
+        return l10n?.panelNName(index + 1) ?? (isJp ? defaultJp : defaultEn);
+      }
+    }
+    return rawName;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final isJp = Localizations.localeOf(context).languageCode == 'ja';
+
     if (_isLoading) {
       _reportPanelHeight(50);
       return Container(
@@ -338,8 +357,8 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                 alignment: Alignment.center,
                 child: Text(
                   widget.position == 'left'
-                      ? (_effectiveIsExpanded ? "← 閉じる" : "内側(→)スワイプで展開")
-                      : (_effectiveIsExpanded ? "閉じる →" : "内側(←)スワイプで展開"),
+                      ? (_effectiveIsExpanded ? (isJp ? "← 閉じる" : "← Close") : (isJp ? "内側(→)スワイプで展開" : "Swipe right to expand"))
+                      : (_effectiveIsExpanded ? (isJp ? "閉じる →" : "Close →") : (isJp ? "内側(←)スワイプで展開" : "Swipe left to expand")),
                   style: const TextStyle(color: Colors.white60, fontSize: 9, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -365,7 +384,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                               child: Text(
-                                panel['name'],
+                                _getPanelDisplayName(pIdx, panel['name'], l10n, isJp),
                                 style: const TextStyle(color: Colors.amberAccent, fontSize: 9, fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -451,10 +470,12 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                   ],
                   Text(
                     _effectiveIsExpanded
-                        ? "パネルを閉じる"
+                        ? (isJp ? "パネルを閉じる" : "Close Panel")
                         : (_panels.length > 1
-                            ? (widget.position == 'top' ? "下へスワイプして全パネルを表示" : "上へスワイプして全パネルを表示")
-                            : _panels.first['name']),
+                            ? (widget.position == 'top'
+                                ? (isJp ? "下へスワイプして全パネルを表示" : "Swipe down to show all panels")
+                                : (isJp ? "上へスワイプして全パネルを表示" : "Swipe up to show all panels"))
+                            : _getPanelDisplayName(0, _panels.first['name'], l10n, isJp)),
                     style: const TextStyle(color: Colors.white60, fontSize: 9, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -488,7 +509,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              panel['name'],
+                              _getPanelDisplayName(pIdx, panel['name'], l10n, isJp),
                               style: const TextStyle(color: Colors.amberAccent, fontSize: 9, fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -596,10 +617,12 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   }
 
   void _showButtonCustomizeDialog(int panelIndex, int itemIndex, CmdItem item) {
+    final l10n = AppLocalizations.of(context);
+    final isJp = Localizations.localeOf(context).languageCode == 'ja';
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text("ボタン編集: ${item.displayLabel}"),
+        title: Text(isJp ? "ボタン編集: ${item.displayLabel}" : "Edit Button: ${item.displayLabel}"),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -607,8 +630,8 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
             children: [
               ListTile(
                 leading: const Icon(Icons.edit, color: Colors.blueAccent),
-                title: const Text("コマンドを変更"),
-                subtitle: Text("現在: ${item.command}"),
+                title: Text(isJp ? "コマンドを変更" : "Change Command"),
+                subtitle: Text(isJp ? "現在: ${item.command}" : "Current: ${item.command}"),
                 onTap: () {
                   Navigator.pop(ctx);
                   _showCommandEditDialog(panelIndex, itemIndex, item);
@@ -616,8 +639,10 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
               ),
               ListTile(
                 leading: const Icon(Icons.label, color: Colors.amberAccent),
-                title: const Text("表示ラベルを変更"),
-                subtitle: Text(item.hasLabel ? "現在: ${item.label}" : "未設定 (コマンド名を表示)"),
+                title: Text(isJp ? "表示ラベルを変更" : "Change Display Label"),
+                subtitle: Text(isJp
+                    ? (item.hasLabel ? "現在: ${item.label}" : "未設定 (コマンド名を表示)")
+                    : (item.hasLabel ? "Current: ${item.label}" : "Not set (Show command name)")),
                 onTap: () {
                   Navigator.pop(ctx);
                   _showLabelEditDialog(panelIndex, itemIndex, item);
@@ -625,7 +650,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
               ),
               ListTile(
                 leading: const Icon(Icons.playlist_add, color: Colors.greenAccent),
-                title: const Text("前にボタンを追加"),
+                title: Text(isJp ? "前にボタンを追加" : "Add Button Before"),
                 onTap: () {
                   Navigator.pop(ctx);
                   _showAddButtonDialog(panelIndex, itemIndex, isBefore: true);
@@ -633,7 +658,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
               ),
               ListTile(
                 leading: const Icon(Icons.playlist_add, color: Colors.tealAccent),
-                title: const Text("後にボタンを追加"),
+                title: Text(isJp ? "後にボタンを追加" : "Add Button After"),
                 onTap: () {
                   Navigator.pop(ctx);
                   _showAddButtonDialog(panelIndex, itemIndex + 1, isBefore: false);
@@ -641,7 +666,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
               ),
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.redAccent),
-                title: const Text("ボタンを削除"),
+                title: Text(isJp ? "ボタンを削除" : "Delete Button"),
                 onTap: () {
                   Navigator.pop(ctx);
                   _removeButton(panelIndex, itemIndex);
@@ -650,7 +675,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
               const Divider(),
               ListTile(
                 leading: const Icon(Icons.refresh, color: Colors.orangeAccent),
-                title: const Text("パネルをデフォルトに戻す"),
+                title: Text(isJp ? "パネルをデフォルトに戻す" : "Reset Panel to Default"),
                 onTap: () {
                   Navigator.pop(ctx);
                   _confirmResetPanel(panelIndex);
@@ -662,7 +687,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("キャンセル"),
+            child: Text(l10n?.cancel ?? (isJp ? "キャンセル" : "Cancel")),
           ),
         ],
       ),
@@ -670,22 +695,24 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   }
 
   void _showCommandEditDialog(int panelIndex, int itemIndex, CmdItem item) {
+    final l10n = AppLocalizations.of(context);
+    final isJp = Localizations.localeOf(context).languageCode == 'ja';
     final controller = TextEditingController(text: item.command);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         scrollable: true,
         insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        title: const Text("コマンドの変更"),
+        title: Text(isJp ? "コマンドの変更" : "Change Command"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: controller,
-                decoration: const InputDecoration(
-                  hintText: "例: e, d, #adjust, #terrain 等",
-                  helperText: "#で始まるものは拡張コマンドとして実行されます",
+                decoration: InputDecoration(
+                  hintText: isJp ? "例: e, d, #adjust, #terrain 等" : "e.g. e, d, #adjust, #terrain etc.",
+                  helperText: isJp ? "#で始まるものは拡張コマンドとして実行されます" : "Commands starting with # are run as extended commands",
                 ),
                 autofocus: true,
               ),
@@ -715,7 +742,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 icon: const Icon(Icons.list),
-                label: const Text("拡張コマンドから選択..."),
+                label: Text(isJp ? "拡張コマンドから選択..." : "Select from extended commands..."),
                 onPressed: () {
                   _selectExtCmdDialog((selectedCmd) {
                     controller.text = selectedCmd;
@@ -727,7 +754,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("キャンセル"),
+            child: Text(l10n?.cancel ?? (isJp ? "キャンセル" : "Cancel")),
           ),
           ElevatedButton(
             onPressed: () {
@@ -747,22 +774,24 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   }
 
   void _showLabelEditDialog(int panelIndex, int itemIndex, CmdItem item) {
+    final l10n = AppLocalizations.of(context);
+    final isJp = Localizations.localeOf(context).languageCode == 'ja';
     final controller = TextEditingController(text: item.label);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         scrollable: true,
         insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        title: const Text("表示ラベルの変更"),
+        title: Text(isJp ? "表示ラベルの変更" : "Change Display Label"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: controller,
-                decoration: const InputDecoration(
-                  hintText: "例: 食べる, 道具, #整理",
-                  helperText: "空にするとコマンド名がそのまま表示されます",
+                decoration: InputDecoration(
+                  hintText: isJp ? "例: 食べる, 道具, #整理" : "e.g. Eat, Tools, #adjust",
+                  helperText: isJp ? "空にするとコマンド名がそのまま表示されます" : "Leave empty to use command name",
                 ),
                 autofocus: true,
               ),
@@ -771,7 +800,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("キャンセル"),
+            child: Text(l10n?.cancel ?? (isJp ? "キャンセル" : "Cancel")),
           ),
           ElevatedButton(
             onPressed: () {
@@ -789,22 +818,26 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   }
 
   void _showAddButtonDialog(int panelIndex, int insertIndex, {required bool isBefore}) {
+    final l10n = AppLocalizations.of(context);
+    final isJp = Localizations.localeOf(context).languageCode == 'ja';
     final controller = TextEditingController();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         scrollable: true,
         insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        title: Text(isBefore ? "前にボタンを追加" : "後にボタンを追加"),
+        title: Text(isBefore
+            ? (isJp ? "前にボタンを追加" : "Add Button Before")
+            : (isJp ? "後にボタンを追加" : "Add Button After")),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: controller,
-                decoration: const InputDecoration(
-                  hintText: "例: e, d, #adjust 等",
-                  helperText: "#で始まるものは拡張コマンドとして実行されます",
+                decoration: InputDecoration(
+                  hintText: isJp ? "例: e, d, #adjust 等" : "e.g. e, d, #adjust etc.",
+                  helperText: isJp ? "#で始まるものは拡張コマンドとして実行されます" : "Commands starting with # are run as extended commands",
                 ),
                 autofocus: true,
               ),
@@ -834,7 +867,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 icon: const Icon(Icons.list),
-                label: const Text("拡張コマンドから選択..."),
+                label: Text(isJp ? "拡張コマンドから選択..." : "Select from extended commands..."),
                 onPressed: () {
                   _selectExtCmdDialog((selectedCmd) {
                     controller.text = selectedCmd;
@@ -844,7 +877,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
               const SizedBox(height: 4),
               OutlinedButton.icon(
                 icon: const Icon(Icons.keyboard),
-                label: const Text("[kbd] / [pad] (キーボード切替) を追加"),
+                label: Text(isJp ? "[kbd] / [pad] (キーボード切替) を追加" : "Add [kbd] / [pad] (Toggle Keyboard)"),
                 onPressed: () {
                   controller.text = '[kbd]';
                 },
@@ -854,7 +887,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("キャンセル"),
+            child: Text(l10n?.cancel ?? (isJp ? "キャンセル" : "Cancel")),
           ),
           ElevatedButton(
             onPressed: () {
@@ -875,10 +908,11 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   }
 
   void _removeButton(int panelIndex, int itemIndex) {
+    final isJp = Localizations.localeOf(context).languageCode == 'ja';
     final cmds = _panels[panelIndex]['cmds'] as List<CmdItem>;
     if (cmds.length <= 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("これ以上ボタンを削除できません")),
+        SnackBar(content: Text(isJp ? "これ以上ボタンを削除できません" : "Cannot delete any more buttons")),
       );
       return;
     }
@@ -887,15 +921,17 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   }
 
   void _confirmResetPanel(int panelIndex) {
+    final l10n = AppLocalizations.of(context);
+    final isJp = Localizations.localeOf(context).languageCode == 'ja';
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("パネル初期化の確認"),
-        content: const Text("このパネルのボタン配置を初期設定に戻しますか？"),
+        title: Text(isJp ? "パネル初期化の確認" : "Confirm Panel Reset"),
+        content: Text(isJp ? "このパネルのボタン配置を初期設定に戻しますか？" : "Reset button layout for this panel to default?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("キャンセル"),
+            child: Text(l10n?.cancel ?? (isJp ? "キャンセル" : "Cancel")),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
@@ -903,7 +939,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
               Navigator.pop(ctx);
               _resetPanelToDefault(panelIndex);
             },
-            child: const Text("初期化", style: TextStyle(color: Colors.white)),
+            child: Text(isJp ? "初期化" : "Reset", style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -911,6 +947,8 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   }
 
   void _selectExtCmdDialog(Function(String) onSelect) {
+    final l10n = AppLocalizations.of(context);
+    final isJp = Localizations.localeOf(context).languageCode == 'ja';
     String filterText = '';
     final extCmds = _effectiveExtCmds;
 
@@ -928,7 +966,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
 
             return AlertDialog(
               insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              title: const Text("拡張コマンドから選択"),
+              title: Text(isJp ? "拡張コマンドから選択" : "Select Extended Command"),
               content: SizedBox(
                 width: double.maxFinite,
                 height: MediaQuery.of(context).size.height * 0.45,
@@ -936,11 +974,11 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
-                      decoration: const InputDecoration(
-                        hintText: "コマンド名や説明で検索...",
-                        prefixIcon: Icon(Icons.search),
+                      decoration: InputDecoration(
+                        hintText: l10n?.searchCmdOrDesc ?? (isJp ? "コマンド名や説明で検索..." : "Search by command or description..."),
+                        prefixIcon: const Icon(Icons.search),
                         isDense: true,
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       onChanged: (val) {
                         setStateDialog(() {
@@ -951,10 +989,10 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                     const SizedBox(height: 12),
                     Expanded(
                       child: filtered.isEmpty
-                          ? const Center(
+                          ? Center(
                               child: Text(
-                                "該当するコマンドがありません",
-                                style: TextStyle(color: Colors.grey),
+                                l10n?.noCmdFound ?? (isJp ? "該当するコマンドがありません" : "No matching commands found."),
+                                style: const TextStyle(color: Colors.grey),
                               ),
                             )
                           : ListView.builder(
@@ -1008,7 +1046,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogCtx),
-                  child: const Text("キャンセル"),
+                  child: Text(l10n?.cancel ?? (isJp ? "キャンセル" : "Cancel")),
                 ),
               ],
             );

@@ -1027,4 +1027,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get enterOptionHint => 'オプションを入力してください...';
+
+  @override
+  String selectedCountLabel(Object maxCount, Object selectedCount) {
+    return ' ($selectedCount個選択中 / $maxCount)';
+  }
 }

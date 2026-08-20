@@ -105,13 +105,29 @@ val copyDefaultsNh = tasks.register("copyDefaultsNh") {
     }
 }
 
+val copySysconf = tasks.register("copySysconf") {
+    val srcFile = file("../../config/sysconf")
+    val destFile = file("../../assets/nethackdir/common/sysconf")
+    inputs.file(srcFile)
+    outputs.file(destFile)
+
+    doLast {
+        copy {
+            from(srcFile)
+            into(destFile.parentFile)
+        }
+    }
+}
+
 tasks.named("preBuild") {
     dependsOn(copyDefaultsNh)
+    dependsOn(copySysconf)
 }
 
 tasks.configureEach {
     if (name.startsWith("compileFlutterBuild")) {
         dependsOn(copyDefaultsNh)
+        dependsOn(copySysconf)
     }
 }
 

@@ -2059,6 +2059,12 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'オプションを入力してください...'**
   String get enterOptionHint;
+
+  /// No description provided for @selectedCountLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **' ({selectedCount}個選択中 / {maxCount})'**
+  String selectedCountLabel(Object maxCount, Object selectedCount);
 }
 
 class _AppLocalizationsDelegate

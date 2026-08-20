@@ -347,5 +347,6 @@
   "defaultsNotFound": "defaults.nh not found.",
   "fileReadError": "File read error: {error}",
   "defaultsEditNotice": "*Editing defaults.nh requires starting a new game to take effect",
-  "enterOptionHint": "Enter options here..."
+  "enterOptionHint": "Enter options here...",
+  "selectedCountLabel": " ({selectedCount} selected / {maxCount})"
 }

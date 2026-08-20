@@ -82,19 +82,14 @@ class _MenuOverlayState extends State<MenuOverlay> {
   }
 
   int _parseMaxCount(String text) {
-    final trimmed = text.trim();
-    int count = 0;
-    int i = 0;
-    while (i < trimmed.length) {
-      final code = trimmed.codeUnitAt(i);
-      if (code >= 48 && code <= 57) {
-        count = count * 10 + (code - 48);
-        i++;
-      } else {
-        break;
+    final match = RegExp(r'(\d+)').firstMatch(text);
+    if (match != null) {
+      final val = int.tryParse(match.group(1)!);
+      if (val != null && val > 0) {
+        return val;
       }
     }
-    return count > 0 ? count : 1;
+    return 1;
   }
 
   bool _isMenuDividerText(String text) {
@@ -277,7 +272,9 @@ class _MenuOverlayState extends State<MenuOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    final isExtCmdMenu = widget.menuPrompt.contains("拡張コマンド");
+    final l10n = AppLocalizations.of(context);
+    final isExtCmdMenu = widget.menuPrompt.contains("拡張コマンド") ||
+        widget.menuPrompt.toLowerCase().contains("extended");
     final isMultiSelectMenu = !isExtCmdMenu && widget.menuHow > 1;
     final extCmdQuery = _filterQuery.trim().toLowerCase();
 
@@ -347,7 +344,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                     controller: _filterController,
                     autofocus: true,
                     decoration: InputDecoration(
-                      hintText: '拡張コマンドを検索...',
+                      hintText: l10n?.filterCmds ?? '拡張コマンドを検索...',
                       prefixIcon: const Icon(Icons.search, size: 18),
                       isDense: true,
                       filled: true,
@@ -452,7 +449,9 @@ class _MenuOverlayState extends State<MenuOverlay> {
                               final checked = _selectedCounts.containsKey(item.ident);
                               final selectedCount = _selectedCounts[item.ident] ?? 0;
                               final maxCount = _parseMaxCount(item.text);
-                              final countLabel = checked ? " ($selectedCount個選択中 / $maxCount)" : "";
+                              final countLabel = checked
+                                  ? (l10n?.selectedCountLabel(selectedCount, maxCount) ?? " ($selectedCount個選択中 / $maxCount)")
+                                  : "";
                               final hasTab = commandText.contains('\t');
                               return Material(
                                 color: Colors.transparent,

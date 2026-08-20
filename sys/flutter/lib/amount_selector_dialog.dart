@@ -188,7 +188,7 @@ class _AmountSelectorDialogState extends State<AmountSelectorDialog> {
                 final amount = int.tryParse(_textController.text) ?? _currentAmount;
                 Navigator.of(context).pop(amount.clamp(1, widget.maxCount));
               },
-              child: const Text("決定"),
+              child: Text(l10n.confirm),
             ),
           ],
         ),

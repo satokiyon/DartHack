@@ -803,6 +803,7 @@ static void flutter_init_nhwindows(int* argc, char** argv) {
     debuglog("flutter_init_nhwindows called");
     iflags.window_inited = TRUE;
     iflags.menu_tab_sep = TRUE;
+    sysopt.check_save_uid = 0;
 }
 
 static void flutter_player_selection(void) {

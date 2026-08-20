@@ -1043,4 +1043,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enterOptionHint => 'Enter options here...';
+
+  @override
+  String selectedCountLabel(Object maxCount, Object selectedCount) {
+    return ' ($selectedCount selected / $maxCount)';
+  }
 }
