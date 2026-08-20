@@ -652,9 +652,13 @@ void SendKeysToFlutter(const int* keys, int len) {
     if (!keys || len <= 0) return;
 
     if (program_state.input_state != commandInp && len > 1 && keys[0] == '#') {
-        debuglog("SendKeysToFlutter: ignored extcmd '%c' (len=%d) during prompt (input_state=%d)",
+        debuglog("SendKeysToFlutter: converting extcmd '%c' (len=%d) to Space (32) during prompt (input_state=%d)",
                  keys[0], len, program_state.input_state);
-        flutter_nhbell();
+        if (g_key_count < FLUTTER_MAX_KEYS) {
+            g_key_queue[g_key_tail] = 32;
+            g_key_tail = (g_key_tail + 1) % FLUTTER_MAX_KEYS;
+            g_key_count++;
+        }
         return;
     }
 
@@ -676,9 +680,13 @@ void SendShortcutToFlutter(const int* keys, int len) {
     if (!keys || len <= 0) return;
 
     if (program_state.input_state != commandInp && len > 1 && keys[0] == '#') {
-        debuglog("SendShortcutToFlutter: ignored extcmd shortcut '%c' (len=%d) during prompt (input_state=%d)",
+        debuglog("SendShortcutToFlutter: converting extcmd shortcut '%c' (len=%d) to Space (32) during prompt (input_state=%d)",
                  keys[0], len, program_state.input_state);
-        flutter_nhbell();
+        if (g_key_count < FLUTTER_MAX_KEYS) {
+            g_key_queue[g_key_tail] = 32;
+            g_key_tail = (g_key_tail + 1) % FLUTTER_MAX_KEYS;
+            g_key_count++;
+        }
         return;
     }
 
@@ -1341,14 +1349,15 @@ static int flutter_nhgetch(void) {
     }
 
     if (g_in_display_blocking) {
-        while (g_key_count > 0) {
+        if (g_key_count > 0) {
             int key = g_key_queue[g_key_head];
             if (key != 32 && key != 27 && key != 10 && key != 13) {
                 g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
                 g_key_count--;
-                debuglog("flutter_nhgetch: dropped key %d during display blocking", key);
-            } else {
-                break;
+                g_key_available = 1;
+                g_last_received_key = 32;
+                debuglog("flutter_nhgetch: converting key %d to Space (32) during display blocking", key);
+                return 32;
             }
         }
     }
@@ -1356,13 +1365,15 @@ static int flutter_nhgetch(void) {
     if (g_key_count > 0) {
         int key = g_key_queue[g_key_head];
         if (program_state.input_state != commandInp && (key == '#' || g_pending_extcmd_mode)) {
-            debuglog("flutter_nhgetch: purging key queue due to extcmd key '%c' during prompt (input_state=%d, remaining=%d)",
+            debuglog("flutter_nhgetch: converting extcmd key '%c' to Space (32) during prompt (input_state=%d, remaining=%d)",
                      key, program_state.input_state, g_key_count);
             g_key_head = 0;
             g_key_tail = 0;
             g_key_count = 0;
             g_pending_extcmd_mode = 0;
-            flutter_nhbell();
+            g_key_available = 1;
+            g_last_received_key = 32;
+            return 32;
         } else {
             g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
             g_key_count--;
@@ -1398,29 +1409,23 @@ static int flutter_nhgetch(void) {
         if (g_key_count > 0) {
             int key = g_key_queue[g_key_head];
             if (program_state.input_state != commandInp && (key == '#' || g_pending_extcmd_mode)) {
-                debuglog("flutter_nhgetch (wait loop): purging key queue due to extcmd key '%c' during prompt (input_state=%d, remaining=%d)",
-                         key, program_state.input_state, g_key_count);
+                debuglog("flutter_nhgetch (wait loop): converting extcmd key '%c' to Space (32) during prompt (input_state=%d)",
+                         key, program_state.input_state);
                 g_key_head = 0;
                 g_key_tail = 0;
                 g_key_count = 0;
                 g_pending_extcmd_mode = 0;
-                flutter_nhbell();
-                g_input_request_id++;
-                if (g_dart_notify_input_cb) {
-                    g_dart_notify_input_cb(g_input_request_id);
-                }
-                continue;
+                g_key_available = 1;
+                g_last_received_key = 32;
+                return 32;
             }
             if (g_in_display_blocking && key != 32 && key != 27 && key != 10 && key != 13) {
                 g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
                 g_key_count--;
-                debuglog("flutter_nhgetch (wait loop): dropped key %d during display blocking", key);
-                // キーを破棄したため、Dart側に入力可能状態に戻すよう再通知する
-                g_input_request_id++;
-                if (g_dart_notify_input_cb) {
-                    g_dart_notify_input_cb(g_input_request_id);
-                }
-                continue;
+                g_key_available = 1;
+                g_last_received_key = 32;
+                debuglog("flutter_nhgetch (wait loop): converting key %d to Space (32) during display blocking", key);
+                return 32;
             }
             g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
             g_key_count--;
