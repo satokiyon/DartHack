@@ -399,8 +399,13 @@ jp_translate_multi_reason_for_display(
         return out;
 
     if (!strncmp(reason, "paralyzed by ", 13)) {
+        int mndx, gend;
         who = skip_english_article(reason + 13);
-        Snprintf(out, outsz, "%sに麻痺させられていた", who);
+        mndx = name_to_mon(who, &gend);
+        if (mndx >= 0)
+            Snprintf(out, outsz, "%sに麻痺させられていた", jp_pmname_from_idx(mndx, 0));
+        else
+            Snprintf(out, outsz, "%sに麻痺させられていた", who);
         return out;
     }
     if (!strncmp(reason, "frozen by ", 10)) {
@@ -423,9 +428,20 @@ jp_translate_multi_reason_for_display(
             else if (baselen >= 1 && who_buf[baselen - 1] == '\'')
                 who_buf[baselen - 1] = '\0';
             who = skip_english_article(who_buf);
-            Snprintf(out, outsz, "%sの視線で凍りついていた", who);
+
+            int mndx, gend;
+            mndx = name_to_mon(who, &gend);
+            if (mndx >= 0)
+                Snprintf(out, outsz, "%sの視線で凍りついていた", jp_pmname_from_idx(mndx, 0));
+            else
+                Snprintf(out, outsz, "%sの視線で凍りついていた", who);
         } else {
-            Snprintf(out, outsz, "%sに凍りつかされていた", who);
+            int mndx, gend;
+            mndx = name_to_mon(who, &gend);
+            if (mndx >= 0)
+                Snprintf(out, outsz, "%sに凍りつかされていた", jp_pmname_from_idx(mndx, 0));
+            else
+                Snprintf(out, outsz, "%sに凍りつかされていた", who);
         }
         return out;
     }
@@ -450,11 +466,7 @@ jp_translate_killer_text_for_display(
         return;
 
     if (!g_language_is_jp) {
-        if (in && strstr(in, "毒ガスの雲")) {
-            Snprintf(out, outsz, "gas cloud");
-        } else {
-            Snprintf(out, outsz, "%s", in ? in : "");
-        }
+        Snprintf(out, outsz, "%s", in ? in : "");
         return;
     }
 
@@ -548,6 +560,22 @@ jp_translate_killer_text_for_display(
             Snprintf(outmain, sizeof outmain, "肉食の袋に倒された");
         } else if (!strcmpi(killer, "magical explosion")) {
             Snprintf(outmain, sizeof outmain, "魔法の爆発に倒された");
+        } else if (!strcmpi(killer, "arrow")) {
+            Snprintf(outmain, sizeof outmain, "矢に倒された");
+        } else if (!strcmpi(killer, "little dart") || !strcmpi(killer, "dart")) {
+            Snprintf(outmain, sizeof outmain, "吹き矢に倒された");
+        } else if (!strcmpi(killer, "poisoned needle") || !strcmpi(killer, "needle")) {
+            Snprintf(outmain, sizeof outmain, "毒針に刺されて倒された");
+        } else if (!strcmpi(killer, "land mine")) {
+            Snprintf(outmain, sizeof outmain, "地雷の爆発で倒された");
+        } else if (!strcmpi(killer, "electric shock")) {
+            Snprintf(outmain, sizeof outmain, "電撃で倒された");
+        } else if (!strcmpi(killer, "bear trap")) {
+            Snprintf(outmain, sizeof outmain, "熊罠で倒された");
+        } else if (!strcmpi(killer, "rusting away")) {
+            Snprintf(outmain, sizeof outmain, "錆び崩れて倒された");
+        } else if (!strcmpi(killer, "dangerous winds")) {
+            Snprintf(outmain, sizeof outmain, "危険な突風で倒された");
         } else if (!strcmpi(killer, "strangulation")) {
             Snprintf(outmain, sizeof outmain, "首を絞められて倒された");
         } else if (!strcmpi(killer, "suffocation")) {

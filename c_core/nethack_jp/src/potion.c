@@ -494,7 +494,7 @@ ghost_from_bottle(void)
     if (flags.verbose)
         You("恐怖で動けなくなった.");
     nomul(-3);
-    gm.multi_reason = "恐怖で身がすくんでいる";
+    gm.multi_reason = "paralyzed by fear";
     gn.nomovemsg = "ようやく落ち着きを取り戻した.";
 }
 
@@ -890,7 +890,7 @@ peffect_paralysis(struct obj *otmp)
             Your("%sは%sに貼りついて凍りついた!", jp_body_part_plural(FOOT),
                  surface(u.ux, u.uy));
         nomul(-(rn1(10, 25 - 12 * bcsign(otmp))));
-        gm.multi_reason = "薬で凍りついた";
+        gm.multi_reason = "frozen by a potion";
         gn.nomovemsg = You_can_move_again;
         exercise(A_DEX, FALSE);
     }
@@ -967,7 +967,7 @@ peffect_sickness(struct obj *otmp)
         pline("(実際は少し古くなった%sだった.)", fruitname(TRUE));
         if (!Role_if(PM_HEALER)) {
             /* NB: blessed otmp->fromsink is not possible */
-            losehp(1, "少し汚染された薬", KILLED_BY);
+            losehp(1, "mildly contaminated potion", KILLED_BY);
         }
     } else {
         if (Poison_resistance)
@@ -1203,7 +1203,7 @@ peffect_levitation(struct obj *otmp)
 
             You("%sを%sにぶつけた.", jp_body_part(HEAD),
                 ceiling(u.ux, u.uy));
-            losehp(Maybe_Half_Phys(dmg), "天井への衝突", KILLED_BY_AN);
+            losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling", KILLED_BY_AN);
             gp.potion_nothing = 0; /* not nothing after all */
         }
     } else if (otmp->blessed) {
@@ -1307,7 +1307,7 @@ peffect_acid(struct obj *otmp)
               otmp->blessed ? "少し" : otmp->cursed ? "かなり"
                                                     : "焼けるように");
         dmg = d(otmp->cursed ? 2 : 1, otmp->blessed ? 4 : 8);
-        losehp(Maybe_Half_Phys(dmg), "酸の薬", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
         exercise(A_CON, FALSE);
     }
     if (Stoned)
@@ -1700,7 +1700,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                       obj->blessed ? "少し"
                                    : obj->cursed ? "かなり" : "");
                 dmg = d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
-                losehp(Maybe_Half_Phys(dmg), "酸の薬", KILLED_BY_AN);
+                losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
             }
             break;
         }

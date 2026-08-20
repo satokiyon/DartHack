@@ -172,7 +172,7 @@ wipeout_text(char *engr, int cnt, unsigned seed)
     char replacement[16];
     boolean use_rubout;
 
-    if (cnt <= 0 || !engr || !*engr)
+    if (cnt <= 0 || !*engr)
         return;
 
     char_count = utf8_strlen_chars(engr);

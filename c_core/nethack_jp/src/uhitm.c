@@ -107,12 +107,16 @@ dynamic_multi_reason(struct monst *mon, const char *verb, boolean by_gaze)
     /* combination of noname_monnam() and m_monnam(), more or less;
        accurate regardless of visibility or hallucination (only seen
        if game ends) and without personal name (M2_PNAME excepted) */
-    char *who = x_monnam(mon, ARTICLE_A, (char *) 0,
-                         (SUPPRESS_IT | SUPPRESS_INVISIBLE
-                          | SUPPRESS_HALLUCINATION | SUPPRESS_SADDLE
-                          | SUPPRESS_NAME),
-                         FALSE),
-         *p = gm.multireasonbuf;
+    char *who, *p = gm.multireasonbuf;
+    int save_lang = g_language_is_jp;
+
+    g_language_is_jp = 0;
+    who = x_monnam(mon, ARTICLE_A, (char *) 0,
+                   (SUPPRESS_IT | SUPPRESS_INVISIBLE
+                    | SUPPRESS_HALLUCINATION | SUPPRESS_SADDLE
+                    | SUPPRESS_NAME),
+                   FALSE);
+    g_language_is_jp = save_lang;
 
     /* prefix info for done_in_by() */
     Sprintf(p, "%u:", mon->m_id);
@@ -3156,7 +3160,7 @@ mhitm_ad_drst(
         if (!negated && !rn2(8)) {
             Sprintf(buf, "%sの%s", l_monnam(magr),
                     mpoisons_subj(magr, mattk));
-            poisoned(buf, ptmp, jp_pmname(pa, Mgender(magr)), 30, FALSE);
+            poisoned(buf, ptmp, pmname(pa, Mgender(magr)), 30, FALSE);
         }
     } else {
         /* mhitm */
@@ -4114,7 +4118,7 @@ mhitm_ad_phys(
                      * strength-based. With hpdamchance = 10, HP damage occurs
                      * 1/2 of the time and it will hit Str rest of the time.
                      * (This is the same as poisoned ammo.) */
-                    poisoned(buf, A_STR, jp_pmname(magr->data, Mgender(magr)),
+                    poisoned(buf, A_STR, pmname(magr->data, Mgender(magr)),
                              10, FALSE);
                 }
             } else if (mattk->aatyp != AT_TUCH || mhm->damage != 0

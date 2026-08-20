@@ -130,10 +130,7 @@ getrumor(
     if (gt.true_rumor_size < 0L) /* a previous try failed to open RUMORFILE */
         return rumor_buf;
 
-    /* NetHackJP: try rumors_jp first, fallback to RUMORFILE */
-    rumors = dlb_fopen("rumors_jp", "r");
-    if (!rumors)
-        rumors = dlb_fopen(RUMORFILE, "r");
+    rumors = dlb_fopen(RUMORFILE, "r");
     if (rumors) {
         int count = 0;
         int adjtruth;
@@ -203,10 +200,7 @@ rumor_check(void)
     winid tmpwin = WIN_ERR;
     char *endp, line[BUFSZ], xbuf[BUFSZ], rumor_buf[BUFSZ];
 
-    /* NetHackJP: try rumors_jp first, fallback to RUMORFILE */
-    rumors = (gt.true_rumor_size >= 0) ? dlb_fopen("rumors_jp", "r") : 0;
-    if (!rumors && gt.true_rumor_size >= 0)
-        rumors = dlb_fopen(RUMORFILE, "r");
+    rumors = (gt.true_rumor_size >= 0) ? dlb_fopen(RUMORFILE, "r") : 0;
     if (rumors) {
         long ftell_rumor_start = 0L;
 

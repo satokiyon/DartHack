@@ -746,7 +746,12 @@ m_throw(
                 char onmbuf[BUFSZ], knmbuf[BUFSZ];
 
                 Strcpy(onmbuf, xname(singleobj));
-                Strcpy(knmbuf, killer_xname(singleobj));
+                {
+                    int save_lang = g_language_is_jp;
+                    g_language_is_jp = 0;
+                    Strcpy(knmbuf, killer_xname(singleobj));
+                    g_language_is_jp = save_lang;
+                }
                 poisoned(onmbuf, A_STR, knmbuf,
                          /* if damage triggered life-saving,
                             poison is limited to attrib loss */

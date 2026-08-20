@@ -755,8 +755,8 @@ savelife(int how)
        again (perhaps due to zap rebound); this text will be appended to
           "killed by <something>, while "
        in high scores entry, if any, and in logfile (but not on tombstone) */
-    gm.multi_reason = Role_if(PM_TOURIST) ? "運命にもてあそばれていた"
-                                          : "死をごまかそうとしていた";
+    gm.multi_reason = Role_if(PM_TOURIST) ? "toyed with by fate"
+                                          : "cheating death";
 
     if (u.utrap && u.utraptype == TT_LAVA)
         reset_utrap(FALSE);

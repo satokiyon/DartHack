@@ -1018,7 +1018,7 @@ recharge(struct obj *obj, int curse_bless)
                 Ring_gone(obj);
             s = rnd(3 * abs(obj->spe)); /* amount of damage */
             useup(obj), obj = 0;
-            losehp(Maybe_Half_Phys(s), "指輪の爆発", KILLED_BY_AN);
+            losehp(Maybe_Half_Phys(s), "exploding ring", KILLED_BY_AN);
         } else {
             long mask = is_on ? (obj == uleft ? LEFT_RING : RIGHT_RING) : 0L;
 
@@ -2096,7 +2096,7 @@ seffect_fire(struct obj **sobjp)
             monstunseesu(M_SEEN_FIRE);
             pline_The("巻物は燃え上がり、あなたの%sが焼けた.",
                       jp_body_part_plural(HAND));
-            losehp(1, "火炎の巻物", KILLED_BY_AN);
+            losehp(1, "scroll of fire", KILLED_BY_AN);
         }
         return;
     }
@@ -2547,7 +2547,7 @@ drop_boulder_on_player(
         newsym(u.ux, u.uy);
     }
     if (dmg)
-        losehp(Maybe_Half_Phys(dmg), "大地の巻物", KILLED_BY);
+        losehp(Maybe_Half_Phys(dmg), "scroll of earth", KILLED_BY);
 }
 
 boolean
@@ -2663,7 +2663,7 @@ wand_explode(struct obj *obj, int chg /* recharging */)
     dmg = d(n, k);
     obj->in_use = TRUE; /* in case losehp() is fatal (or --More--^C) */
     pline("%sが%s爆発した!", xname(obj), expl);
-    losehp(Maybe_Half_Phys(dmg), "杖の爆発", KILLED_BY_AN);
+    losehp(Maybe_Half_Phys(dmg), "exploding wand", KILLED_BY_AN);
     useup(obj);
     /* obscure side-effect */
     exercise(A_STR, FALSE);

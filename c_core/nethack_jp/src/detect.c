@@ -1261,7 +1261,7 @@ use_crystal_ball(struct obj **optr)
 
     if (Hallucination) {
         nomul(-rnd(charged ? 4 : 2));
-        gm.multi_reason = "魔法の8ボールをのぞき込んでいる";
+        gm.multi_reason = "looking into a magic 8-ball";
         gn.nomovemsg = "";
 
         if (!charged) {
@@ -1314,7 +1314,7 @@ use_crystal_ball(struct obj **optr)
 
     You("%sをのぞき込んだ...", xname(obj));
     nomul(-rnd(charged ? 10 : 2));
-    gm.multi_reason = "水晶玉をのぞき込んでいる";
+    gm.multi_reason = "looking into a crystal ball";
     gn.nomovemsg = "";
 
     if (!charged) {

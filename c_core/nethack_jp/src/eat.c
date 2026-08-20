@@ -1352,7 +1352,7 @@ cpostfx(int pm)
             if (u.usteed)
                 dismount_steed(DISMOUNT_FELL);
             nomul(-tmp);
-            gm.multi_reason = "金貨の山のふりをしている";
+            gm.multi_reason = "feigning a pile of gold coins";
             Sprintf(buf,
                     Hallucination
                        ? "皮をむかれるのが急に怖くなり、再び%sに化けた!"
@@ -2005,7 +2005,7 @@ consume_tin(const char *mesg)
         incr_itimeout(&HDeaf, duration);
         disp.botl = TRUE;
         nomul(-duration);
-        gm.multi_reason = "腐った食べ物で意識を失っている";
+        gm.multi_reason = "unconscious from rotten food";
         gn.nomovemsg = "意識を取り戻した.";
         ga.afternmv = Hear_again;
         return 1;
@@ -3587,7 +3587,7 @@ newuhs(boolean incr)
                 incr_itimeout(&HDeaf, duration);
                 disp.botl = TRUE;
                 nomul(-duration);
-                gm.multi_reason = "空腹のあまり失神している";
+                gm.multi_reason = "fainting from hunger";
                 gn.nomovemsg = "意識を取り戻した.";
                 ga.afternmv = unfaint;
                 newhs = FAINTED;
@@ -3932,7 +3932,7 @@ vomit(void) /* A good idea from David Neves */
        be immobilized for some other reason at the time vomit() is called */
     if (gm.multi >= -2) {
         nomul(-2);
-        gm.multi_reason = "吐いている";
+        gm.multi_reason = "vomiting";
         gn.nomovemsg = You_can_move_again;
     }
 

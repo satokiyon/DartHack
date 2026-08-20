@@ -496,7 +496,12 @@ kick_object(coordxy x, coordxy y, char *kickobjnam)
     gk.kickedobj = svl.level.objects[x][y];
     if (gk.kickedobj) {
         /* formatted object name matters iff res==0 */
-        Strcpy(kickobjnam, killer_xname(gk.kickedobj));
+        {
+            int save_lang = g_language_is_jp;
+            g_language_is_jp = 0;
+            Strcpy(kickobjnam, killer_xname(gk.kickedobj));
+            g_language_is_jp = save_lang;
+        }
         /* kick object; if fatal, done() will clean up kickedobj */
         res = really_kick_object(x, y);
         gk.kickedobj = (struct obj *) 0;

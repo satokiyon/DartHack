@@ -1238,7 +1238,7 @@ trapeffect_arrow_trap(
         dam = dmgval(otmp, &gy.youmonst);
         if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
             ; /* nothing */
-        } else if (thitu(8, Maybe_Half_Phys(dam), &otmp, "矢")) {
+        } else if (thitu(8, Maybe_Half_Phys(dam), &otmp, "arrow")) {
             if (otmp)
                 obfree(otmp, (struct obj *) 0);
         } else {
@@ -1303,10 +1303,10 @@ trapeffect_dart_trap(
         dam = dmgval(otmp, &gy.youmonst);
         if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
             ; /* nothing */
-        } else if (thitu(7, Maybe_Half_Phys(dam), &otmp, "小さな吹き矢")) {
+        } else if (thitu(7, Maybe_Half_Phys(dam), &otmp, "little dart")) {
             if (otmp) {
                 if (otmp->opoisoned)
-                    poisoned("吹き矢", A_CON, "小さな吹き矢",
+                    poisoned("dart", A_CON, "little dart",
                              /* if damage triggered life-saving,
                                 poison is limited to attrib loss */
                              (u.umortality > oldumort) ? 0 : 10, TRUE);
@@ -1396,7 +1396,7 @@ trapeffect_rocktrap(
             newsym(u.ux, u.uy); /* map the rock */
 
             if (!harmless) {
-                losehp(Maybe_Half_Phys(dmg), "落石", KILLED_BY_AN);
+                losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
                 exercise(A_STR, FALSE);
             }
         }
@@ -1544,7 +1544,7 @@ trapeffect_bear_trap(
                 pline("%sはあなたの脚を守ってくれた.", xname(uarmf));
             else {
                 set_wounded_legs(rn2(2) ? RIGHT_SIDE : LEFT_SIDE, rn1(10, 10));
-                losehp(Maybe_Half_Phys(dmg), "熊罠", KILLED_BY_AN);
+                losehp(Maybe_Half_Phys(dmg), "bear trap", KILLED_BY_AN);
             }
         }
         exercise(A_DEX, FALSE);
@@ -1674,7 +1674,7 @@ trapeffect_rust_trap(
             int dam = u.mhmax;
 
             You("錆に覆われた!");
-            losehp(Maybe_Half_Phys(dam), "錆び崩れ", KILLED_BY);
+            losehp(Maybe_Half_Phys(dam), "rusting away", KILLED_BY);
         } else if (u.umonnum == PM_GREMLIN && rn2(3)) {
             (void) split_mon(&gy.youmonst, (struct monst *) 0);
         }
@@ -1964,10 +1964,10 @@ trapeffect_pit(
                                                      : "鉄の棘だらけの落とし穴へ落ちた",
                        NO_KILLER_PREFIX);
                 if (!rn2(6))
-                          poisoned("棘", A_STR,
-                                      (conj_pit || adj_pit || deliberate)
-                                      ? "毒の棘を踏んだ"
-                                      : "毒の棘へ落ちた",
+                    poisoned("spikes", A_STR,
+                             (conj_pit || adj_pit || deliberate)
+                             ? "stepping on poison spikes"
+                             : "fall onto poison spikes",
                              /* if damage triggered life-saving,
                                 poison is limited to attrib loss */
                              (u.umortality > oldumort) ? 0 : 8, FALSE);
@@ -2328,7 +2328,7 @@ trapeffect_magic_trap(
             deltrap(trap);
             newsym(u.ux, u.uy); /* update position */
             You("魔法の爆発に巻き込まれた!");
-            losehp(rnd(10), "魔法の爆発", KILLED_BY_AN);
+            losehp(rnd(10), "magical explosion", KILLED_BY_AN);
             Your("体が魔法エネルギーの一部を吸収した!");
             u.uen = (u.uenmax += 2);
             if (u.uenmax > u.uenpeak)
@@ -2402,7 +2402,7 @@ trapeffect_anti_magic(
                      : (dmgval2 >= hp / 4) ? "ひどくだるい."
                        : "動きが鈍い.");
             /* opposite of magical explosion */
-            losehp(dmgval2, "反魔法の収縮", KILLED_BY_AN);
+            losehp(dmgval2, "anti-magic implosion", KILLED_BY_AN);
         }
 
         /* if the drain amount is more than hero's maximum energy then up
@@ -2614,7 +2614,7 @@ trapeffect_landmine(
            blow_up_landmine() will remove pit afterwards if inappropriate */
         trap->ttyp = PIT;
         trap->madeby_u = FALSE;
-        losehp(Maybe_Half_Phys(damage), "地雷", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(damage), "land mine", KILLED_BY_AN);
         blow_up_landmine(trap);
         if (steed_mid && saddle && !u.usteed)
             (void) keep_saddle_with_steedcorpse(steed_mid, fobj, saddle);
@@ -4163,7 +4163,7 @@ float_down(
                         pline("しまった! 墜落した.");
                     else
                         You("倒れ込んだ.");
-                    losehp(rnd(2), "危険な突風", KILLED_BY);
+                    losehp(rnd(2), "dangerous winds", KILLED_BY);
                     if (u.usteed)
                         dismount_steed(DISMOUNT_FELL);
                     selftouch("倒れ込んだ拍子に、あなたは");
@@ -4282,7 +4282,7 @@ dofiretrap(
         if (Fire_resistance)
             You("無傷だった.");
         else
-            losehp(rnd(3), "熱湯", KILLED_BY);
+            losehp(rnd(3), "boiling water", KILLED_BY);
         return;
     }
     pline("%sが%sから%s!", tower_of_flame, box ? "噴き上がり" : "噴き出し",
@@ -5129,7 +5129,7 @@ drown(void)
         i = Maybe_Half_Phys(d(2, 6));
         if (u.mhmax > i)
             u.mhmax -= i;
-        losehp(i, "錆び崩れ", KILLED_BY);
+        losehp(i, "rusting away", KILLED_BY);
     }
     if (inpool_ok)
         return FALSE;
@@ -6465,7 +6465,7 @@ chest_trap(
         case 14:
         case 13:
             You_feel("針が%sを刺したのを感じた.", jp_body_part(bodypart));
-            poisoned("針", A_CON, "毒針", 10, FALSE);
+            poisoned("needle", A_CON, "poisoned needle", 10, FALSE);
             exercise(A_CON, FALSE);
             break;
         case 12:
@@ -6490,7 +6490,7 @@ chest_trap(
             }
             (void) destroy_items(&gy.youmonst, AD_ELEC, orig_dmg);
             if (dmg)
-                losehp(dmg, "電撃", KILLED_BY_AN);
+                losehp(dmg, "electric shock", KILLED_BY_AN);
             break;
         } /* case 6 */
         case 5:
@@ -6736,7 +6736,7 @@ b_trapped(const char *item, int bodypart)
     Soundeffect(se_kaboom, 80);
     pline("ドカーン!!  %sにはブービートラップが仕掛けられていた!", The(item));
     wake_nearby(FALSE);
-    losehp(Maybe_Half_Phys(dmg), "爆発", KILLED_BY_AN);
+    losehp(Maybe_Half_Phys(dmg), "explosion", KILLED_BY_AN);
     exercise(A_STR, FALSE);
     if (bodypart != NO_PART)
         exercise(A_CON, FALSE);

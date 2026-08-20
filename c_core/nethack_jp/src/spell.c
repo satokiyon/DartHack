@@ -175,7 +175,7 @@ cursed_book(struct obj *bp)
         } else {
             pline("本を読んでいると、それはあなたの顔の前で爆発した!");
             dmg = 2 * rnd(10) + 5;
-            losehp(Maybe_Half_Phys(dmg), "ルーンの爆発", KILLED_BY_AN);
+            losehp(Maybe_Half_Phys(dmg), "exploding rune", KILLED_BY_AN);
         }
         return TRUE;
     default:
