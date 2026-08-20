@@ -449,6 +449,15 @@ jp_translate_killer_text_for_display(
     if (!out || outsz == 0)
         return;
 
+    if (!g_language_is_jp) {
+        if (in && strstr(in, "毒ガスの雲")) {
+            Snprintf(out, outsz, "gas cloud");
+        } else {
+            Snprintf(out, outsz, "%s", in ? in : "");
+        }
+        return;
+    }
+
     out[0] = '\0';
     Snprintf(tmp, sizeof tmp, "%s", in ? in : "");
     whilebuf[0] = '\0';
@@ -514,9 +523,31 @@ jp_translate_killer_text_for_display(
         } else if (!strcmpi(killer, "system shock")) {
             Snprintf(outmain, sizeof outmain, "システムショックで倒された");
         } else if (!strcmpi(killer, "psychic blast")) {
-            Snprintf(outmain, sizeof outmain, "精神波の爆破に倒された");
+            Snprintf(outmain, sizeof outmain, "精神波の爆発に倒された");
         } else if (!strcmpi(killer, "exhaustion")) {
             Snprintf(outmain, sizeof outmain, "過労で倒された");
+        } else if (!strcmpi(killer, "cloud of poison gas")) {
+            Snprintf(outmain, sizeof outmain, "毒ガスの雲に倒された");
+        } else if (!strcmpi(killer, "jumping out of a bear trap")) {
+            Snprintf(outmain, sizeof outmain, "熊罠からの脱出で倒された");
+        } else if (!strcmpi(killer, "crunched in the head by an iron ball")) {
+            Snprintf(outmain, sizeof outmain, "鉄球に頭を打ち砕かれた");
+        } else if (!strcmpi(killer, "iron ball collision")) {
+            Snprintf(outmain, sizeof outmain, "鉄球との衝突で倒された");
+        } else if (!strcmpi(killer, "exploding crystal ball")) {
+            Snprintf(outmain, sizeof outmain, "水晶玉の爆発で倒された");
+        } else if (!strcmpi(killer, "axing a hard object")) {
+            Snprintf(outmain, sizeof outmain, "硬いものを斧で叩いたこと");
+        } else if (!strcmpi(killer, "falling down a mine shaft")) {
+            Snprintf(outmain, sizeof outmain, "坑道への落下で倒された");
+        } else if (!strcmpi(killer, "unrefrigerated sip of juice")) {
+            Snprintf(outmain, sizeof outmain, "冷やされていない果汁をすすったこと");
+        } else if (!strcmpi(killer, "sipping boiling water")) {
+            Snprintf(outmain, sizeof outmain, "煮えたぎる湯をすすったこと");
+        } else if (!strcmpi(killer, "carnivorous bag")) {
+            Snprintf(outmain, sizeof outmain, "肉食の袋に倒された");
+        } else if (!strcmpi(killer, "magical explosion")) {
+            Snprintf(outmain, sizeof outmain, "魔法の爆発に倒された");
         } else if (!strcmpi(killer, "strangulation")) {
             Snprintf(outmain, sizeof outmain, "首を絞められて倒された");
         } else if (!strcmpi(killer, "suffocation")) {
@@ -1133,6 +1164,11 @@ tt_role_name_from_filecode(const char *rolefc, const char *gendfc)
     int roleidx = str2role(rolefc);
     int gidx = tt_gend_from_filecode(gendfc);
 
+    if (!g_language_is_jp)
+        return (roleidx >= 0)
+                ? ((gidx == 1 && roles[roleidx].name.f) ? roles[roleidx].name.f : roles[roleidx].name.m)
+                : rolefc;
+
     return (roleidx >= 0)
             ? jp_role_name_for_display(roleidx, gidx)
             : rolefc;
@@ -1143,12 +1179,17 @@ tt_race_name_from_filecode(const char *racefc)
 {
     int raceidx = str2race(racefc);
 
+    if (!g_language_is_jp)
+        return (raceidx >= 0 && races[raceidx].noun) ? races[raceidx].noun : racefc;
+
     return (raceidx >= 0) ? jp_race_adj_for_display(raceidx) : racefc;
 }
 
 staticfn const char *
 tt_gender_name_from_filecode(const char *gendfc)
 {
+    if (!g_language_is_jp)
+        return gendfc;
     return jp_gender_for_display(tt_gend_from_filecode(gendfc));
 }
 
@@ -1184,12 +1225,12 @@ tt_align_name_from_filecode(const char *alignfc, const char *rolefc)
     if (gnam && *gnam) {
         if (*gnam == '_')
             ++gnam;
-        return jp_gname_for_display(gnam);
+        return g_language_is_jp ? jp_gname_for_display(gnam) : gnam;
     }
 
     /* Fallback when role has no fixed pantheon (for example, some Priest
        configurations) or role code is unavailable: show alignment label. */
-    return jp_align_for_display(aidx);
+    return g_language_is_jp ? jp_align_for_display(aidx) : alignfc;
 }
 
 staticfn void
@@ -2089,45 +2130,89 @@ outentry(int rank, struct toptenentry *t1, boolean so)
     Sprintf(eos(linebuf), " %s ", profilebuf);
 
     jp_translate_killer_text_for_display(deathbuf, sizeof deathbuf, t1->death);
-    if (!strncmp("escaped", t1->death, 7)) {
-        Sprintf(eos(linebuf), "%s（最大到達 %d階）", deathbuf, t1->maxlvl);
-    } else if (!strncmp("ascended", t1->death, 8)) {
-        Strcat(linebuf, deathbuf);
-    } else {
-        Sprintf(eos(linebuf), "%s", deathbuf);
-
-        if (t1->deathdnum == astral_level.dnum) {
-            const char *fmt = "（%s）";
-
-            switch (t1->deathlev) {
-            case -5:
-                arg = "星界";
-                break;
-            case -4:
-                arg = "水界";
-                break;
-            case -3:
-                arg = "火界";
-                break;
-            case -2:
-                arg = "風界";
-                break;
-            case -1:
-                arg = "地界";
-                break;
-            default:
-                arg = "虚無";
-                break;
-            }
-            Sprintf(eos(linebuf), fmt, arg);
+    if (!g_language_is_jp) {
+        if (!strncmp("escaped", t1->death, 7)) {
+            Sprintf(eos(linebuf), "%s [max level %d]", deathbuf, t1->maxlvl);
+        } else if (!strncmp("ascended", t1->death, 8)) {
+            Strcat(linebuf, deathbuf);
         } else {
-            Sprintf(eos(linebuf), "（%s",
-                    jp_dungeon_name_by_dnum(t1->deathdnum));
-            if (t1->deathdnum != knox_level.dnum)
-                Sprintf(eos(linebuf), " %d階", t1->deathlev);
-            if (t1->deathlev != t1->maxlvl)
-                Sprintf(eos(linebuf), ", 最大到達 %d階", t1->maxlvl);
-            Strcat(linebuf, "）");
+            Sprintf(eos(linebuf), "%s", deathbuf);
+
+            if (t1->deathdnum == astral_level.dnum) {
+                const char *arg, *fmt = " on the Plane of %s";
+
+                switch (t1->deathlev) {
+                case -5:
+                    fmt = " on the %s Plane";
+                    arg = "Astral";
+                    break;
+                case -4:
+                    arg = "Water";
+                    break;
+                case -3:
+                    arg = "Fire";
+                    break;
+                case -2:
+                    arg = "Air";
+                    break;
+                case -1:
+                    arg = "Earth";
+                    break;
+                default:
+                    arg = "Void";
+                    break;
+                }
+                Sprintf(eos(linebuf), fmt, arg);
+            } else {
+                Sprintf(eos(linebuf), " in %s",
+                        svd.dungeons[t1->deathdnum].dname);
+                if (t1->deathdnum != knox_level.dnum)
+                    Sprintf(eos(linebuf), " on level %d", t1->deathlev);
+                if (t1->deathlev != t1->maxlvl)
+                    Sprintf(eos(linebuf), " [max level %d]", t1->maxlvl);
+            }
+        }
+    } else {
+        if (!strncmp("escaped", t1->death, 7)) {
+            Sprintf(eos(linebuf), "%s（最大到達 %d階）", deathbuf, t1->maxlvl);
+        } else if (!strncmp("ascended", t1->death, 8)) {
+            Strcat(linebuf, deathbuf);
+        } else {
+            Sprintf(eos(linebuf), "%s", deathbuf);
+
+            if (t1->deathdnum == astral_level.dnum) {
+                const char *fmt = "（%s）";
+
+                switch (t1->deathlev) {
+                case -5:
+                    arg = "星界";
+                    break;
+                case -4:
+                    arg = "水界";
+                    break;
+                case -3:
+                    arg = "火界";
+                    break;
+                case -2:
+                    arg = "風界";
+                    break;
+                case -1:
+                    arg = "地界";
+                    break;
+                default:
+                    arg = "虚無";
+                    break;
+                }
+                Sprintf(eos(linebuf), fmt, arg);
+            } else {
+                Sprintf(eos(linebuf), "（%s",
+                        jp_dungeon_name_by_dnum(t1->deathdnum));
+                if (t1->deathdnum != knox_level.dnum)
+                    Sprintf(eos(linebuf), " %d階", t1->deathlev);
+                if (t1->deathlev != t1->maxlvl)
+                    Sprintf(eos(linebuf), ", 最大到達 %d階", t1->maxlvl);
+                Strcat(linebuf, "）");
+            }
         }
     }
     Strcat(linebuf, ".");

@@ -1242,7 +1242,7 @@ use_pick_axe2(struct obj *obj)
                           vibrate ? "  斧の柄が激しく震えた!"
                                   : "");
                     if (vibrate)
-                        losehp(Maybe_Half_Phys(2), "斧で硬いものを叩いたこと",
+                        losehp(Maybe_Half_Phys(2), "axing a hard object",
                                KILLED_BY);
                     wake_nearby(FALSE);
                 } else {
@@ -1593,7 +1593,7 @@ zap_dig(void)
                 You("%sの岩を緩めた.", ceiling(u.ux, u.uy));
                 pline("それが自分の%sに落ちてきた!", jp_body_part(HEAD));
                 dmg = rnd(hard_helmet(uarmh) ? 2 : 6);
-                losehp(Maybe_Half_Phys(dmg), "落石", KILLED_BY_AN);
+                losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
                 otmp = mksobj_at(ROCK, u.ux, u.uy, FALSE, FALSE);
                 if (otmp) {
                     (void) xname(otmp); /* set dknown, maybe bknown */

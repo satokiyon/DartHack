@@ -1250,7 +1250,7 @@ use_crystal_ball(struct obj **optr)
             useup(obj);
             *optr = obj = 0; /* it's gone */
             /* physical damage cause by the shards and force */
-            losehp(Maybe_Half_Phys(rnd(30)), "爆発した水晶玉",
+            losehp(Maybe_Half_Phys(rnd(30)), "exploding crystal ball",
                    KILLED_BY_AN);
             break;
         }

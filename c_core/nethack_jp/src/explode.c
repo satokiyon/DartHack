@@ -739,34 +739,24 @@ explode(
             } else {
                 if (olet == MON_EXPLODE) {
                     if (generic) /* explosion was unseen; str=="explosion", */
-                        ; /* svk.killer.name=="胞子ガスの爆発" など。 */
+                        ; /* svk.killer.name=="gas spore's explosion". */
                     else if (str != svk.killer.name && str != hallu_buf)
-                        jp_set_explosion_killer_name(svk.killer.name,
-                                                     sizeof svk.killer.name,
-                                                     str);
+                        Strcpy(svk.killer.name, str);
                     svk.killer.format = KILLED_BY_AN;
                 } else if (olet == TRAP_EXPLODE) {
-                    const char *dispstr = jp_explosion_text_for_display(
-                        str, disp_buf, sizeof disp_buf);
-
                     svk.killer.format = NO_KILLER_PREFIX;
                     Snprintf(svk.killer.name, sizeof svk.killer.name,
-                             "%sに巻き込まれた", dispstr);
+                             "caught in a %s", str);
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
-                    const char *dispstr = jp_explosion_text_for_display(
-                        str, disp_buf, sizeof disp_buf);
-
                     svk.killer.format = NO_KILLER_PREFIX;
                     Snprintf(svk.killer.name, sizeof svk.killer.name,
-                             "自分の%sに巻き込まれた", dispstr);
+                             "caught in own %s", str);
                 } else {
                     svk.killer.format = (!strcmpi(str, "tower of flame")
                                      || !strcmpi(str, "fireball"))
                                         ? KILLED_BY_AN
                                         : KILLED_BY;
-                    jp_set_explosion_killer_name(svk.killer.name,
-                                                 sizeof svk.killer.name,
-                                                 str);
+                    Strcpy(svk.killer.name, str);
                 }
                 if (iflags.last_msg == PLNMSG_CAUGHT_IN_EXPLOSION
                     || iflags.last_msg == PLNMSG_TOWER_OF_FLAME) /*seffects()*/
@@ -1160,8 +1150,8 @@ mon_explodes(
 
     /* This might end up killing you, too; you never know...
      * also, it is used in explode() messages */
-        Sprintf(svk.killer.name, "%sの爆発",
-            jp_pmname(mon->data, Mgender(mon)));
+        Sprintf(svk.killer.name, "%s explosion",
+            pmname(mon->data, Mgender(mon)));
     svk.killer.format = KILLED_BY_AN;
 
     explode(mon->mx, mon->my, type, dmg, MON_EXPLODE,

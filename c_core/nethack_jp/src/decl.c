@@ -14,6 +14,10 @@ const char * const nhcb_name[NUM_NHCB] = {
 };
 
 int nhcb_counts[NUM_NHCB] = DUMMY;
+#ifndef ANDROID
+NEARDATA int g_language_is_jp = 1;
+#endif
+
 NEARDATA const struct c_color_names c_color_names = {
     "black",  "amber", "golden", "light blue", "red",   "green",
     "silver", "blue",  "purple", "white",      "orange"

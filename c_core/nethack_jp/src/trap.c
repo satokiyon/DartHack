@@ -6454,7 +6454,7 @@ chest_trap(
         case 17:
             pline("有毒ガスの雲が%sから噴き出した.", xname(obj));
             if (rn2(3))
-                poisoned("ガス雲", A_STR, "毒ガスの雲", 15,
+                poisoned("gas cloud", A_STR, "cloud of poison gas", 15,
                          FALSE);
             else
                 create_gas_cloud(obj->ox, obj->oy, 1, 8);

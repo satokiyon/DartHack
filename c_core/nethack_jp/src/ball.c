@@ -62,7 +62,7 @@ ballfall(void)
             } else if (flags.verbose)
                     pline("%sでは身を守れなかった.", xname(uarmh));
         }
-        losehp(Maybe_Half_Phys(dmg), "鉄球に頭を打ち砕かれた",
+        losehp(Maybe_Half_Phys(dmg), "crunched in the head by an iron ball",
                NO_KILLER_PREFIX);
     }
 }
@@ -1021,7 +1021,7 @@ drag_down(void)
         if (rn2(2)) {
             Soundeffect(se_iron_ball_hits_you, 25);
             pline_The("鉄球があなたに激突した!");
-            losehp(Maybe_Half_Phys(rnd(20)), "鉄球との衝突",
+            losehp(Maybe_Half_Phys(rnd(20)), "iron ball collision",
                    KILLED_BY_AN);
             exercise(A_STR, FALSE);
             dragchance -= 2;

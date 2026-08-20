@@ -2060,7 +2060,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
             case TT_BEARTRAP:
                 side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
                 You("熊罠を引き裂いて脱出した!  痛い!");
-                losehp(Maybe_Half_Phys(rnd(10)), "熊罠からの脱出",
+                losehp(Maybe_Half_Phys(rnd(10)), "jumping out of a bear trap",
                        KILLED_BY_AN);
                 set_wounded_legs(side, rn1(1000, 500));
                 break;

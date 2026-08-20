@@ -1805,7 +1805,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
                 break;
             urgent_pline("あなたは石になっていく...");
             svk.killer.format = KILLED_BY;
-            Strcpy(svk.killer.name, jp_pmname(mtmp->data, Mgender(mtmp)));
+            Strcpy(svk.killer.name, pmname(mtmp->data, Mgender(mtmp)));
             done(STONING);
         }
         break;
@@ -2268,7 +2268,7 @@ doseduce(struct monst *mon)
             You_feel("へとへとになった.");
             exercise(A_STR, FALSE);
             tmp = rn1(10, 6);
-            losehp(Maybe_Half_Phys(tmp), "過労", KILLED_BY);
+            losehp(Maybe_Half_Phys(tmp), "exhaustion", KILLED_BY);
             break;
         } /* case 4 */
         } /* switch */

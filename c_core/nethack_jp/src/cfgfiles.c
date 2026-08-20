@@ -9,10 +9,7 @@
 #include "hack.h"
 #include "dlb.h"
 #include <errno.h>
-#include <android/log.h>
-#ifndef LOG_TAG
-#define LOG_TAG "NetHackFlutter"
-#endif
+
 
 #if (!defined(MAC68K) && !defined(O_WRONLY) && !defined(AZTEC_C)) \
     || defined(USE_FCNTL)

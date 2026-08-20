@@ -21,6 +21,8 @@ ATTRNORETURN static void xexit(int) NORETURN;
 ATTRNORETURN extern void panic(const char *, ...) NORETURN;
 FILE *fopen_datafile(const char *, const char *, int);
 
+int g_language_is_jp = 0;
+
 #ifdef DLB
 #ifdef DLBLIB
 static void grow_ld(libdir **, int *, int);

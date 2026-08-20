@@ -3217,8 +3217,8 @@ corpse_chance(
                    engulfer; suppress usual explosion since it's contained */
                 if (magr == &gy.youmonst) {
                     There("%sの中で爆発が起きた!", jp_body_part(STOMACH));
-                    Sprintf(svk.killer.name, "%sの爆発",
-                            s_suffix(jp_pmname(mdat, Mgender(mon))));
+                    Sprintf(svk.killer.name, "%s explosion",
+                            s_suffix(pmname(mdat, Mgender(mon))));
                     losehp(Maybe_Half_Phys(tmp), svk.killer.name,
                            KILLED_BY_AN);
                 } else {

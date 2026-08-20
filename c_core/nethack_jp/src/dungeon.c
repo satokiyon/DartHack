@@ -3836,23 +3836,45 @@ print_mapseen(
             if (bp->bonesknown || wizard || final > 0)
                 ++kncnt;
         if (kncnt) {
-            Sprintf(buf, "%s%s", PREFIX, "最期の場所:");
-            add_menu_str(win, buf);
-            if (died_here) {
-                /* disclosure occurs before bones creation, so listing dead
-                   hero here doesn't give away whether bones are produced */
-                jp_formatkiller_for_display(tmpbuf, sizeof tmpbuf, how, TRUE);
-                Snprintf(buf, sizeof(buf), "%s%sあなた（%s）%s", PREFIX, TAB,
-                         tmpbuf, --kncnt ? "、" : "。");
+            if (!g_language_is_jp) {
+                Sprintf(buf, "%s%s", PREFIX, "Final resting place for");
                 add_menu_str(win, buf);
-            }
-            for (bp = mptr->final_resting_place; bp; bp = bp->next) {
-                if (bp->bonesknown || wizard || final > 0) {
-                    jp_translate_killer_text_for_display(tmpbuf, sizeof tmpbuf,
-                                                         bp->how);
-                    Sprintf(buf, "%s%s%s（%s）%s", PREFIX, TAB, bp->who,
-                            tmpbuf, --kncnt ? "、" : "。");
+                if (died_here) {
+                    formatkiller(tmpbuf, sizeof tmpbuf, how, TRUE);
+                    (void) strsubst(tmpbuf, " himself", " yourself");
+                    (void) strsubst(tmpbuf, " herself", " yourself");
+                    (void) strsubst(tmpbuf, " his ", " your ");
+                    (void) strsubst(tmpbuf, " her ", " your ");
+                    Snprintf(buf, sizeof(buf), "%s%syou, %s%c", PREFIX, TAB,
+                             tmpbuf, --kncnt ? ',' : '.');
                     add_menu_str(win, buf);
+                }
+                for (bp = mptr->final_resting_place; bp; bp = bp->next) {
+                    if (bp->bonesknown || wizard || final > 0) {
+                        Sprintf(buf, "%s%s%s, %s%c", PREFIX, TAB, bp->who,
+                                bp->how, --kncnt ? ',' : '.');
+                        add_menu_str(win, buf);
+                    }
+                }
+            } else {
+                Sprintf(buf, "%s%s", PREFIX, "最期の場所:");
+                add_menu_str(win, buf);
+                if (died_here) {
+                    /* disclosure occurs before bones creation, so listing dead
+                       hero here doesn't give away whether bones are produced */
+                    jp_formatkiller_for_display(tmpbuf, sizeof tmpbuf, how, TRUE);
+                    Snprintf(buf, sizeof(buf), "%s%sあなた（%s）%s", PREFIX, TAB,
+                             tmpbuf, --kncnt ? "、" : "。");
+                    add_menu_str(win, buf);
+                }
+                for (bp = mptr->final_resting_place; bp; bp = bp->next) {
+                    if (bp->bonesknown || wizard || final > 0) {
+                        jp_translate_killer_text_for_display(tmpbuf, sizeof tmpbuf,
+                                                             bp->how);
+                        Sprintf(buf, "%s%s%s（%s）%s", PREFIX, TAB, bp->who,
+                                tmpbuf, --kncnt ? "、" : "。");
+                        add_menu_str(win, buf);
+                    }
                 }
             }
         }

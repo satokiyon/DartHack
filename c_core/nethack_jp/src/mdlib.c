@@ -676,6 +676,9 @@ build_options(void)
 {
     char buf[COLBUFSZ];
     int i, length, winsyscnt, cnt = 0;
+#ifndef DEFAULT_WINDOW_SYS
+#define DEFAULT_WINDOW_SYS "tty"
+#endif
     const char *defwinsys = DEFAULT_WINDOW_SYS;
 #if !defined(MAKEDEFS_C) && defined(FOR_RUNTIME)
     int soundlibcnt;

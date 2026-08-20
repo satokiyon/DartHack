@@ -2198,7 +2198,7 @@ do_loot_cont(
         You("慎重に%sを開けた...", xname(cobj));
         pline("それは巨大な歯を生やしてあなたを噛んだ!");
         tmp = rnd(10);
-        losehp(Maybe_Half_Phys(tmp), "肉食の袋", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(tmp), "carnivorous bag", KILLED_BY_AN);
         makeknown(BAG_OF_TRICKS);
         ga.abort_looting = TRUE;
         return ECMD_TIME;
@@ -2733,7 +2733,7 @@ in_container(struct obj *obj)
         else
             panic("in_container:  bag not found.");
 
-        losehp(d(6, 6), "魔法の爆発", KILLED_BY_AN);
+        losehp(d(6, 6), "magical explosion", KILLED_BY_AN);
         gc.current_container = 0; /* baggone = TRUE; */
     }
 

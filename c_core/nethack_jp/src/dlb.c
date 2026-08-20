@@ -21,9 +21,7 @@
  * in a given library, look for it outside the libraries.
  */
 
-#if defined(DLB_MAIN) || defined(DLB_UTIL)
-int g_language_is_jp = 0;
-#endif
+
 
 #ifndef debuglog
 #define debuglog(...) (void)0

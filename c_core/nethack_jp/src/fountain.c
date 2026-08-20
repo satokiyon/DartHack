@@ -300,7 +300,7 @@ drinkfountain(void)
             if (Poison_resistance) {
                 pline("近くの%s農園から流れ込んだ水なのかもしれない.",
                       fruitname(FALSE));
-                losehp(rnd(4), "冷やされていない果汁をひと口すすった", KILLED_BY_AN);
+                losehp(rnd(4), "unrefrigerated sip of juice", KILLED_BY_AN);
                 break;
             }
             poison_strdmg(rn1(4, 3), rnd(10), "汚染された水",
@@ -613,7 +613,7 @@ drinksink(void)
             pline("かなりおいしく感じた.");
             monstseesu(M_SEEN_FIRE);
         } else {
-            losehp(rnd(6), "煮えたぎる湯をひと口すすった", KILLED_BY);
+            losehp(rnd(6), "sipping boiling water", KILLED_BY);
             monstunseesu(M_SEEN_FIRE);
         }
         /* boiling water burns considered fire damage */

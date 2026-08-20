@@ -1426,7 +1426,7 @@ toss_up(struct obj *obj, boolean hitsroof)
         hitfloor(obj, TRUE);
         gt.thrownobj = 0;
         if (!harmless)
-            losehp(dmg, "落下物", KILLED_BY_AN);
+            losehp(dmg, "falling object", KILLED_BY_AN);
     }
     return TRUE;
 }

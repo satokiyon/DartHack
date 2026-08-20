@@ -2001,7 +2001,7 @@ goto_level(
         int dmg = d(max(dist, 1), 6);
 
         dmg = Maybe_Half_Phys(dmg);
-        losehp(dmg, "坑道を落下したこと", KILLED_BY);
+        losehp(dmg, "falling down a mine shaft", KILLED_BY);
     }
 
     (void) pickup(1);
