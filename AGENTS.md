@@ -136,6 +136,12 @@
      - そのため、データファイルの自動言語切り替え（`g_language_is_jp == 1` 時に `_jp` 付きファイルを優先オープンする処理）は `dlb.c` ではなく、全プラットフォーム共通のディスクオープン関数である **`src/files.c` の `fopen_datafile`** 内に実装してください。これにより、メモリ構造体への副作用を一切生じさせずに `quest_jp.lua` 等を含む全データファイルの自動バイリンガル切り替えが保証されます。
      - **パス・拡張子判定の注意**: `_jp` ファイル名の生成（`make_jp_datafile_name`）時は、`./quest.lua` や `dat/quest.lua` などのパス区切り文字 (`/`, `\`) を考慮し、ファイル名部分末尾の拡張子ドットのみを判別して手前に `_jp` を挿入する設計を徹底してください。
    - データファイルアセットを変更・追加した際は、上書きインストール時に強制的にアセットコピーがトリガーされるよう、必ず `assets/ver` 内のバージョン値（整数値）をインクリメントしてください。
+   - **デフォルト設定ファイル名（`defaults.nh`）と `cfgfiles.c` の Android 整合性**:
+     - Cコアの `src/cfgfiles.c` において、`default_configfile` のマクロ定義分岐に `defined(ANDROID)` が含まれていない場合、Linux/Unixデフォルトの `".nethackrc"` を開こうとして失敗し、パッケージングされた [`defaults.nh`](file:///c:/Users/satok/DartHack/sys/flutter/assets/nethackdir/common/defaults.nh) が一切読み込まれなくなります（ステータスカラーやメニューカラーが無効化される原因となります）。
+     - 英語コア (`c_core/nethack_en`) および日本語コア (`c_core/nethack_jp`) の両方の `cfgfiles.c` において、`defined(ANDROID)` 時に `CONFIG_FILE` (または `"defaults.nh"`) が割り当てられる定義を維持してください。
+   - **`defaults.nh` に記述されるオプション（`dumplog` 等）の二重コア間同期**:
+     - [`defaults.nh`](file:///c:/Users/satok/DartHack/sys/flutter/assets/nethackdir/common/defaults.nh) で指定されるオプション（例: `dumplog` 等）が、日本語コア (`nethack_jp`) のみに定義されていて英語コア (`nethack_en`) に定義されていない場合、英語モード起動時に `Unknown option` エラーが発生します。
+     - [`defaults.nh`](file:///c:/Users/satok/DartHack/sys/flutter/assets/nethackdir/common/defaults.nh) で利用するオプションやフラグは、英語コア・日本語コア両方の `include/optlist.h` および `include/flag.h` に正しく定義・同期されていることを徹底してください。
 
 6. **デバッグ用一時コード・ログ出力のクリーンアップ**:
    - デバッグや診断の目的で一時的に埋め込んだログ出力処理（例：Cコード内の `__android_log_print` や print文など）や、ログ出力のためだけに一時的に追加したリンクライブラリ指定（例：`-llog` 等）は、**原因の特定および問題の解決が完了した段階で、必ずすべて削除し、元のクリーンな状態に復元した上でコミット**してください。
