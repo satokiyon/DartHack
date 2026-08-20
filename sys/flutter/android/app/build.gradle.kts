@@ -91,5 +91,30 @@ flutter {
     source = "../.."
 }
 
+val copyDefaultsNh = tasks.register("copyDefaultsNh") {
+    val srcFile = file("../../config/defaults.nh")
+    val destFile = file("../../assets/nethackdir/common/defaults.nh")
+    inputs.file(srcFile)
+    outputs.file(destFile)
+
+    doLast {
+        copy {
+            from(srcFile)
+            into(destFile.parentFile)
+        }
+    }
+}
+
+tasks.named("preBuild") {
+    dependsOn(copyDefaultsNh)
+}
+
+tasks.configureEach {
+    if (name.startsWith("compileFlutterBuild")) {
+        dependsOn(copyDefaultsNh)
+    }
+}
+
+
 
 
