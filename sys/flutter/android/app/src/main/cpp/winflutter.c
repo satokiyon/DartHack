@@ -1960,6 +1960,8 @@ static void HijackWindowProcs(void) {
     flutter_procs.win_update_inventory = flutter_update_inventory;
     flutter_procs.win_ctrl_nhwindow = flutter_ctrl_nhwindow;
 
+    flutter_procs.wincap2 |= (WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_HITPOINTBAR);
+
     and_procs = flutter_procs;
     and_procs.name = "and";
     tty_procs = flutter_procs;

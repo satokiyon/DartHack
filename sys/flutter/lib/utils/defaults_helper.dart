@@ -203,7 +203,10 @@ class DefaultsHelper {
       // 1. hilite_status 行のコメントアウト／コメント解除トグル処理
       final isHiliteLine = trimmed.startsWith('OPTIONS=hilite_status:') ||
           trimmed.startsWith('#OPTIONS=hilite_status:') ||
-          trimmed.startsWith('# OPTIONS=hilite_status:');
+          trimmed.startsWith('# OPTIONS=hilite_status:') ||
+          trimmed.startsWith('OPTIONS=statushilites') ||
+          trimmed.startsWith('#OPTIONS=statushilites') ||
+          trimmed.startsWith('# OPTIONS=statushilites');
 
       if (isHiliteLine) {
         if (hiliteStatusOn) {
