@@ -261,6 +261,10 @@ do_autosave(void)
         u.uburied = 1, iflags.save_uburied = 0;
     done_object_cleanup();
 
+    /* Clear deleted objects queue before saving */
+    if (go.objs_deleted)
+        dobjsfree();
+
     if (!program_state.something_worth_saving || !gs.SAVEF[0])
         goto done;
 
@@ -303,6 +307,7 @@ do_autosave(void)
     set_ustuck((struct monst *) 0);
     u.usteed = (struct monst *) 0;
 
+    /* Copy other level files directly into savefile without getlev() to avoid memory corruption */
     for (ltmp = (xint8) 1; ltmp <= maxledgerno(); ltmp++) {
         if (ltmp == ledger_no(&gu.uz_save))
             continue;
@@ -315,10 +320,14 @@ do_autosave(void)
             (void) unlink(fq_tmp);
             goto done;
         }
-        getlev(onhfp, svh.hackpid, ltmp);
+        if (onhfp->structlevel && onhfp->fd >= 0) {
+            char buf[4096];
+            int nread;
+            while ((nread = read(onhfp->fd, buf, sizeof(buf))) > 0) {
+                bwrite(nhfp->fd, (genericptr_t) buf, (unsigned) nread);
+            }
+        }
         close_nhfile(onhfp);
-        Sfo_xint8(nhfp, &ltmp, "gamestate-level_number");
-        savelev(nhfp, ltmp);
     }
     close_nhfile(nhfp);
 
@@ -337,12 +346,7 @@ do_autosave(void)
     (void) rename(fq_tmp, fq_save);
 #endif
 
-    /* Restore current level into memory for active play */
-    onhfp = open_levelfile(ledger_no(&gu.uz_save), whynot);
-    if (onhfp) {
-        getlev(onhfp, svh.hackpid, ledger_no(&gu.uz_save));
-        close_nhfile(onhfp);
-    }
+    /* Keep active in-memory level intact */
     u.uz = gu.uz_save;
     gu.uz_save.dnum = gu.uz_save.dlevel = 0;
 

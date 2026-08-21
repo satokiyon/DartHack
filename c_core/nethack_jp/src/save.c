@@ -263,6 +263,10 @@ do_autosave(void)
         u.uburied = 1, iflags.save_uburied = 0;
     done_object_cleanup();
 
+    /* 削除予約されたオブジェクトを事前に完全解放 */
+    if (go.objs_deleted)
+        dobjsfree();
+
     if (!program_state.something_worth_saving || !gs.SAVEF[0])
         goto done;
 
@@ -305,6 +309,8 @@ do_autosave(void)
     set_ustuck((struct monst *) 0);
     u.usteed = (struct monst *) 0;
 
+    /* 他階層の保存: getlev() によるゲームメモリの汚染を避けるため、
+       レベルファイルをバイナリコピーでそのまま統合セーブデータへ追加する */
     for (ltmp = (xint8) 1; ltmp <= maxledgerno(); ltmp++) {
         if (ltmp == ledger_no(&gu.uz_save))
             continue;
@@ -317,10 +323,14 @@ do_autosave(void)
             (void) unlink(fq_tmp);
             goto done;
         }
-        getlev(onhfp, svh.hackpid, ltmp);
+        if (onhfp->structlevel && onhfp->fd >= 0) {
+            char buf[4096];
+            int nread;
+            while ((nread = read(onhfp->fd, buf, sizeof(buf))) > 0) {
+                bwrite(nhfp->fd, (genericptr_t) buf, (unsigned) nread);
+            }
+        }
         close_nhfile(onhfp);
-        Sfo_xint8(nhfp, &ltmp, "gamestate-level_number");
-        savelev(nhfp, ltmp);
     }
     close_nhfile(nhfp);
 
@@ -339,12 +349,7 @@ do_autosave(void)
     (void) rename(fq_tmp, fq_save);
 #endif
 
-    /* 現在レベルの復元 */
-    onhfp = open_levelfile(ledger_no(&gu.uz_save), whynot);
-    if (onhfp) {
-        getlev(onhfp, svh.hackpid, ledger_no(&gu.uz_save));
-        close_nhfile(onhfp);
-    }
+    /* 現在レベルの復元 (ゲームメモリ上の状態を維持するため getlev() によるディスク再読み込みは不要) */
     u.uz = gu.uz_save;
     gu.uz_save.dnum = gu.uz_save.dlevel = 0;
 
