@@ -34,6 +34,11 @@
      git subtree pull --prefix=c_core/nethack_en nethack-en NetHack-5.0
      ```
 
+4. **Git Subtree 同期時のマージコンフリクト・本家宣言消去の防止策**:
+   - `DartHack` 内で `c_core/nethack_jp` や `c_core/nethack_en` 配下のファイル（特に `extern.h` や `do_name.c` 等）に独自コード（Flutter/Androidフックやオートセーブ機能等）を追加しているため、`git subtree pull` 時の 3-way merge において本家の新しい関数宣言や定義がマージ競合解消時に消去・ドロップされるリスクがあります。
+   - `sync_nethack_jp.ps1` および `sync_nethack_en.ps1` には、マージ実行後に本家の `extern.h` に存在する宣言がローカル側に欠落していないか自動検出する整合性チェック機能が組み込まれています。
+   - 同期実行後に警告が表示された場合は、`git diff nethack-jp/main:include/extern.h c_core/nethack_jp/include/extern.h` 等で差分を確認し、消去された本家側の宣言や定義を手動で復元してください。
+
 
 
 ## 死因（killer.name）の日本語化と英語交じり回避方針
