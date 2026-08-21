@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
 /* NetHack 5.0	do.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.411 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */

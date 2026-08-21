@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
 /*
  * Copyright 1991 University of Wisconsin-Madison
  *

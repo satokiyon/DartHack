@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
 /* NetHack 5.0	zap.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.596 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -3587,7 +3587,7 @@ miss(const char *str, struct monst *mtmp)
 {
     pline("%sは%sに当たらなかった.", The(str),
           ((cansee(gb.bhitpos.x, gb.bhitpos.y) || canspotmon(mtmp))
-           && flags.verbose) ? mon_nam(mtmp) : "何か");
+           && flags.verbose) ? ((mtmp->mtame) ? noit_mon_nam(mtmp) : mon_nam(mtmp)) : "何か");
 }
 
 staticfn void

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
 /* NetHack 5.0	pcconf.h	$NHDT-Date: 1781973085 2026/06/20 16:31:25 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -150,8 +150,12 @@
                              SCOREDIR, LOCKDIR, CONFIGDIR, TROUBLEDIR に \
                              パス指定を許可する。 \
                              */
+#endif /* MSDOS configuration stuff */
 
-#endif /* MSDOS 設定部分 */
+/* include early argument processing --dumpenums etc. */
+#if defined(MSDOS)
+#define PC_EARLY_OPTIONS
+#endif
 
 #ifndef PATHLEN
 #define PATHLEN 64  /* 最大パス長 */
