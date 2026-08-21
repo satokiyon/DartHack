@@ -376,9 +376,7 @@ class DefaultsHelper {
         await prefs.setInt('nh_opt_tutorial_mode', 1);
       }
     } else {
-      if (!prefs.containsKey('nh_opt_tutorial_mode')) {
-        await prefs.setInt('nh_opt_tutorial_mode', 0);
-      }
+      await prefs.setInt('nh_opt_tutorial_mode', 0);
     }
 
     // 自動拾い (autopickup)
@@ -433,27 +431,21 @@ class DefaultsHelper {
       }
     }
 
-    // 主人公名 & ペット名 & 果物名
+    // 主人公名 & ペット名 & 果物名 (defaults.nh に指定がない場合は空文字＝設定なしに更新)
     final nameVal = getOption('name');
-    if (nameVal != null) {
-      await prefs.setString('nh_opt_name', nameVal);
-    }
+    await prefs.setString('nh_opt_name', nameVal ?? '');
+
     final dognameVal = getOption('dogname');
-    if (dognameVal != null) {
-      await prefs.setString('nh_opt_dogname', dognameVal);
-    }
+    await prefs.setString('nh_opt_dogname', dognameVal ?? '');
+
     final catnameVal = getOption('catname');
-    if (catnameVal != null) {
-      await prefs.setString('nh_opt_catname', catnameVal);
-    }
+    await prefs.setString('nh_opt_catname', catnameVal ?? '');
+
     final horsenameVal = getOption('horsename');
-    if (horsenameVal != null) {
-      await prefs.setString('nh_opt_horsename', horsenameVal);
-    }
+    await prefs.setString('nh_opt_horsename', horsenameVal ?? '');
+
     final fruitVal = getOption('fruit');
-    if (fruitVal != null) {
-      await prefs.setString('nh_opt_fruit', fruitVal);
-    }
+    await prefs.setString('nh_opt_fruit', fruitVal ?? '');
 
     // テンキー移動 (number_pad): int型 (デフォルト: 0)
     final numberPadVal = getOption('number_pad');
