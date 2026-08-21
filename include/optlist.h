@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
 /* NetHack 5.0	optlist.h */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -432,7 +432,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
            On, Yes, No, No, NoAlias, &flags.biff, Term_False,
            "メールデーモンを有効にする")
     NHOPTC(map_mode, Advanced, 20, opt_in, set_gameview,
-                Yes, Yes, No, No, NoAlias, "Windows でのマップ表示モード")
+                Yes, Yes, Yes, No, NoAlias, "map display mode under Windows")
     NHOPTB(mention_decor, Advanced, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &flags.mention_decor, Term_False,
            "興味深い特徴の上を歩いたときにフィードバックを与える")

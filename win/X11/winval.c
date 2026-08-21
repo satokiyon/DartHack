@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
 /* NetHack 5.0	winval.c	$NHDT-Date: 1781973110 2026/06/20 16:31:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -58,7 +58,7 @@ create_value(Widget parent, const char *name_value)
     num_args++;
     name =
         XtCreateManagedWidget(WNAME, labelWidgetClass, form, args, num_args);
-    X11_wrap_widget(name);
+    X11_wrap_widget(name, NHW_STATUS);
 
     num_args = 0;
     XtSetArg(args[num_args], XtNjustify, XtJustifyRight);
@@ -71,7 +71,7 @@ create_value(Widget parent, const char *name_value)
     num_args++;
     Widget value = XtCreateManagedWidget(WVALUE, labelWidgetClass, form, args,
                                          num_args);
-    X11_wrap_widget(value);
+    X11_wrap_widget(value, NHW_STATUS);
     return form;
 }
 

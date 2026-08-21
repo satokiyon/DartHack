@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
 /* NetHack 5.0  mdlib.c  $NHDT-Date: 1781973053 2026/06/20 16:30:53 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
@@ -576,6 +576,9 @@ static const char *const build_opts[] = {
 #endif /*TTY_GRAPHICS*/
 #ifdef USE_XPM
     "tiles file in XPM format",
+#endif
+#ifdef USE_XFT
+    "font rendering with Xft",
 #endif
 #ifdef GRAPHIC_TOMBSTONE
     "graphical RIP screen",

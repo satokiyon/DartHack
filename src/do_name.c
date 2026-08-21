@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-20. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
 /* NetHack 5.0	do_name.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.339 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -1094,6 +1094,15 @@ noit_mon_nam(struct monst *mtmp)
                     FALSE);
 }
 
+char *
+noit_or_your_mon_nam(struct monst *mtmp)
+{
+    return x_monnam(mtmp, ARTICLE_THE, (char *) 0,
+                    (has_mgivenname(mtmp) ? (SUPPRESS_SADDLE | SUPPRESS_IT)
+                                          : SUPPRESS_IT),
+                    FALSE);
+}
+
 /* in between noit_mon_nam() and mon_nam(); if the latter would pick "it",
    use "someone" (for humanoids) or "something" (for others) instead */
 char *
@@ -1118,6 +1127,15 @@ char *
 noit_Monnam(struct monst *mtmp)
 {
     char *bp = noit_mon_nam(mtmp);
+
+    *bp = highc(*bp);
+    return bp;
+}
+
+char *
+noit_or_your_Monnam(struct monst *mtmp)
+{
+    char *bp = noit_or_your_mon_nam(mtmp);
 
     *bp = highc(*bp);
     return bp;

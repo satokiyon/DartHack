@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
 /* NetHack 5.0	pcmain.c	$NHDT-Date: 1693359605 2023/08/30 01:40:05 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.133 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -117,6 +117,10 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     startup();
 #endif
 
+#if defined(PC_EARLY_OPTIONS)
+  program_state.early_options = 1;
+#endif
+
 #ifdef TOS
     if (*argv[0]) { /* only a CLI can give us argv[0] */
         gh.hname = argv[0];
@@ -126,7 +130,6 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         gh.hname = "NetHack"; /* used for syntax messages */
 
     choose_windows(DEFAULT_WINDOW_SYS);
-
 
 #if !defined(AMIGA) && !defined(GNUDOS)
     /* Save current directory and make sure it gets restored when
@@ -267,6 +270,12 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #endif
     ami_wininit_data(WININIT);
 #endif
+
+#if defined(PC_EARLY_OPTIONS)
+    early_options(&argc, &argv, &dir);
+    program_state.early_options = 0;
+#endif
+
     initoptions();
 
 #ifdef NOCWD_ASSUMPTIONS

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
 /* NetHack 5.0	winmenu.c	$NHDT-Date: 1781973109 2026/06/20 16:31:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -90,9 +90,9 @@ static const char menu_entry_translations[] = "#override\n\
      <Btn4Down>: scroll(8)\n\
      <Btn5Down>: scroll(2)";
 
-XtTranslations menu_entry_translation_table = (XtTranslations) 0;
-XtTranslations menu_translation_table = (XtTranslations) 0;
-XtTranslations menu_del_translation_table = (XtTranslations) 0;
+static XtTranslations menu_entry_translation_table = (XtTranslations) 0;
+static XtTranslations menu_translation_table = (XtTranslations) 0;
+static XtTranslations menu_del_translation_table = (XtTranslations) 0;
 
 static void
 create_menu_translation_tables(void)
@@ -1026,6 +1026,9 @@ X11_select_menu(winid window, int how, menu_item **menu_list)
                                                 labelWidgetClass, form,
                                                 args, num_args)
                         : (Widget) 0;
+        if (label) {
+            X11_wrap_widget_if_Xft(label, NHW_MENU);
+        }
 
         all = menu_create_buttons(wp, form, label);
 
@@ -1195,6 +1198,7 @@ menu_create_buttons(struct xwindow *wp, Widget form, Widget under)
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     ok = XtCreateManagedWidget("OK", commandWidgetClass, form,
                                args, num_args);
+    X11_wrap_widget_if_Xft(ok, NHW_MENU);
     XtAddCallback(ok, XtNcallback, menu_ok, (XtPointer) wp);
     XtSetArg(args[0], XtNwidth, &lblwidth[0]);
     XtGetValues(lblwidget[0] = ok, args, ONE);
@@ -1213,6 +1217,7 @@ menu_create_buttons(struct xwindow *wp, Widget form, Widget under)
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     cancel = XtCreateManagedWidget("cancel", commandWidgetClass, form,
                                    args, num_args);
+    X11_wrap_widget_if_Xft(cancel, NHW_MENU);
     XtAddCallback(cancel, XtNcallback, menu_cancel, (XtPointer) wp);
     XtSetArg(args[0], XtNwidth, &lblwidth[1]);
     XtGetValues(lblwidget[1] = cancel, args, ONE);
@@ -1230,6 +1235,7 @@ menu_create_buttons(struct xwindow *wp, Widget form, Widget under)
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     all = XtCreateManagedWidget("all", commandWidgetClass, form,
                                 args, num_args);
+    X11_wrap_widget_if_Xft(all, NHW_MENU);
     XtAddCallback(all, XtNcallback, menu_all, (XtPointer) wp);
     XtSetArg(args[0], XtNwidth, &lblwidth[2]);
     XtGetValues(lblwidget[2] = all, args, ONE);
@@ -1246,6 +1252,7 @@ menu_create_buttons(struct xwindow *wp, Widget form, Widget under)
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     none = XtCreateManagedWidget("none", commandWidgetClass, form,
                                  args, num_args);
+    X11_wrap_widget_if_Xft(none, NHW_MENU);
     XtAddCallback(none, XtNcallback, menu_none, (XtPointer) wp);
     XtSetArg(args[0], XtNwidth, &lblwidth[3]);
     XtGetValues(lblwidget[3] = none, args, ONE);
@@ -1262,6 +1269,7 @@ menu_create_buttons(struct xwindow *wp, Widget form, Widget under)
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     invert = XtCreateManagedWidget("invert", commandWidgetClass, form,
                                    args, num_args);
+    X11_wrap_widget_if_Xft(invert, NHW_MENU);
     XtAddCallback(invert, XtNcallback, menu_invert, (XtPointer) wp);
     XtSetArg(args[0], XtNwidth, &lblwidth[4]);
     XtGetValues(lblwidget[4] = invert, args, ONE);
@@ -1279,6 +1287,7 @@ menu_create_buttons(struct xwindow *wp, Widget form, Widget under)
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     search = XtCreateManagedWidget("search", commandWidgetClass, form,
                                    args, num_args);
+    X11_wrap_widget_if_Xft(search, NHW_MENU);
     XtAddCallback(search, XtNcallback, menu_search, (XtPointer) wp);
     XtSetArg(args[0], XtNwidth, &lblwidth[5]);
     XtGetValues(lblwidget[5] = search, args, ONE);
@@ -1358,13 +1367,17 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
 
         menulineidx++;
         Sprintf(tmpbuf, "menuline_%s", (canpick) ? "command" : "label");
-        curr->w = linewidget = XtCreateManagedWidget(tmpbuf,
-                                                     canpick
-                                                       ? commandWidgetClass
-                                                       : labelWidgetClass,
-                                                     wp->w, args, num_args);
-        X11_wrap_widget(curr->w);
+        /* Need to create the widget unmanaged, set up the pixmap, and then
+           manage it, or else items in the inventory window get the wrong
+           size */
+        curr->w = linewidget = XtCreateWidget(tmpbuf,
+                                              canpick
+                                                ? commandWidgetClass
+                                                : labelWidgetClass,
+                                              wp->w, args, num_args);
+        X11_wrap_widget(curr->w, NHW_MENU);
         X11_set_attrs(curr->w, 0x1 << attr);
+        XtManageChild(curr->w);
 
         if (canpick)
             XtAddCallback(linewidget, XtNcallback, menu_select,
