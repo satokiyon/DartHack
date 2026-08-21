@@ -391,7 +391,18 @@ poisoned(
        "poison dart", etc have implicitly given poison messages too... */
     if (!blast && !strstri(reason, "poison")) {
         /* avoid "The" Orcus's sting was poisoned... */
-        pline("%sは毒を帯びていた!", reason);
+        const char *rjp = reason;
+        if (g_language_is_jp) {
+            if (!strcmpi(reason, "dart") || !strcmpi(reason, "little dart"))
+                rjp = "吹き矢";
+            else if (!strcmpi(reason, "needle") || !strcmpi(reason, "poisoned needle"))
+                rjp = "針";
+            else if (!strcmpi(reason, "spikes"))
+                rjp = "毒の棘";
+            else if (!strcmpi(reason, "gas cloud"))
+                rjp = "毒ガス";
+        }
+        pline("%sは毒を帯びていた!", rjp);
     }
     if (Poison_resistance) {
         if (blast)

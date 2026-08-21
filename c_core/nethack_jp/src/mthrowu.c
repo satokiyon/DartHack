@@ -102,6 +102,26 @@ thitu(
     onm = (obj && obj_is_pname(obj)) ? the(name)
           : (obj && obj->quan > 1L) ? name
             : an(name);
+    if (g_language_is_jp) {
+        if (!strcmpi(name, "arrow"))
+            onm = "矢";
+        else if (!strcmpi(name, "little dart") || !strcmpi(name, "dart"))
+            onm = "吹き矢";
+        else if (!strcmpi(name, "poisoned needle") || !strcmpi(name, "needle"))
+            onm = "毒針";
+        else if (!strcmpi(name, "spikes"))
+            onm = "毒の棘";
+        else if (!strcmpi(name, "falling rock"))
+            onm = "落石";
+        else if (!strcmpi(name, "bear trap"))
+            onm = "熊罠";
+        else if (!strcmpi(name, "land mine"))
+            onm = "地雷";
+        else if (!strcmpi(name, "electric shock"))
+            onm = "電撃";
+        else if (!strcmpi(name, "explosion"))
+            onm = "爆発";
+    }
     is_acid = (obj && obj->otyp == ACID_VENOM);
 
     if (u.uac + tlev <= (dieroll = rnd(20))) {
