@@ -1145,15 +1145,13 @@ set_error_savefile(void)
 }
 #endif
 
-/* create save file, overwriting one if it already exists */
+/* create save file with specified filename, overwriting one if it already exists */
 NHFILE *
-create_savefile(void)
+create_savefile_by_name(const char *fq_save)
 {
-    const char *fq_save;
     NHFILE *nhfp = (NHFILE *) 0;
     boolean do_historical = TRUE;
 
-    fq_save = fqname(gs.SAVEF, SAVEPREFIX, 0);
     nhfp = new_nhfile();
     if (nhfp) {
         nhfp->ftype = NHF_SAVEFILE;
@@ -1201,6 +1199,13 @@ create_savefile(void)
 
     nhfp = viable_nhfile(nhfp);
     return nhfp;
+}
+
+/* create save file, overwriting one if it already exists */
+NHFILE *
+create_savefile(void)
+{
+    return create_savefile_by_name(fqname(gs.SAVEF, SAVEPREFIX, 0));
 }
 
 /* open savefile for reading */

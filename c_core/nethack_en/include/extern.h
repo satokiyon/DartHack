@@ -1098,6 +1098,7 @@ extern void save_savefile_name(NHFILE *) NONNULLARG1;
 extern void set_error_savefile(void);
 #endif
 extern NHFILE *create_savefile(void);
+extern NHFILE *create_savefile_by_name(const char *);
 extern NHFILE *open_savefile(void);
 extern int delete_savefile(void);
 extern NHFILE *get_freeing_nhfile(void);
@@ -2848,6 +2849,7 @@ extern void free_CapMons(void);
 
 extern int dosave(void);
 extern int dosave0(void);
+extern int do_autosave(void);
 extern boolean tricked_fileremoved(NHFILE *, char *) NONNULLARG2;
 #ifdef INSURANCE
 extern void savestateinlock(void);

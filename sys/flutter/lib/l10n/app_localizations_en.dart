@@ -1048,4 +1048,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String selectedCountLabel(Object maxCount, Object selectedCount) {
     return ' ($selectedCount selected / $maxCount)';
   }
+
+  @override
+  String get resetAppSettingsTitle => 'Reset UI & Control Settings';
+
+  @override
+  String get resetAppSettingsSub =>
+      'Reset UI layout, pads, message lines, and key bindings to default';
+
+  @override
+  String get resetAppSettingsConfirm =>
+      'Are you sure you want to reset all UI & control settings to default?';
+
+  @override
+  String get resetDefaultsFileTitle => 'Reset defaults.nh to Default File';
+
+  @override
+  String get resetDefaultsFileSub =>
+      'Overwrite defaults.nh file with the initial asset template';
+
+  @override
+  String get resetDefaultsFileConfirm =>
+      'Are you sure you want to reset defaults.nh to its initial state? Custom settings will be overwritten.';
+
+  @override
+  String get resetAppSettingsSuccess =>
+      'UI & control settings reset to defaults.';
+
+  @override
+  String get resetDefaultsFileSuccess => 'defaults.nh reset to default file.';
+
+  @override
+  String get btnResetConfirm => 'Reset';
+
+  @override
+  String get btnCancel => 'Cancel';
 }

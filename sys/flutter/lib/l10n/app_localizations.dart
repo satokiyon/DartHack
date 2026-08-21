@@ -2065,6 +2065,66 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **' ({selectedCount}個選択中 / {maxCount})'**
   String selectedCountLabel(Object maxCount, Object selectedCount);
+
+  /// No description provided for @resetAppSettingsTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'UI・操作設定を初期値に戻す'**
+  String get resetAppSettingsTitle;
+
+  /// No description provided for @resetAppSettingsSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'UI配置、操作パッド、メッセージ行数などをデフォルトに戻します'**
+  String get resetAppSettingsSub;
+
+  /// No description provided for @resetAppSettingsConfirm.
+  ///
+  /// In ja, this message translates to:
+  /// **'UI・操作設定をデフォルトの初期値に戻しますか？'**
+  String get resetAppSettingsConfirm;
+
+  /// No description provided for @resetDefaultsFileTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'defaults.nhを初期ファイルに戻す'**
+  String get resetDefaultsFileTitle;
+
+  /// No description provided for @resetDefaultsFileSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'defaults.nhファイルを初期のアセットファイルで上書きします'**
+  String get resetDefaultsFileSub;
+
+  /// No description provided for @resetDefaultsFileConfirm.
+  ///
+  /// In ja, this message translates to:
+  /// **'defaults.nhファイルを初期状態に戻しますか？既存のカスタム設定は上書きされます。'**
+  String get resetDefaultsFileConfirm;
+
+  /// No description provided for @resetAppSettingsSuccess.
+  ///
+  /// In ja, this message translates to:
+  /// **'UI・操作設定を初期値に戻しました。'**
+  String get resetAppSettingsSuccess;
+
+  /// No description provided for @resetDefaultsFileSuccess.
+  ///
+  /// In ja, this message translates to:
+  /// **'defaults.nhを初期ファイルに戻しました。'**
+  String get resetDefaultsFileSuccess;
+
+  /// No description provided for @btnResetConfirm.
+  ///
+  /// In ja, this message translates to:
+  /// **'初期化'**
+  String get btnResetConfirm;
+
+  /// No description provided for @btnCancel.
+  ///
+  /// In ja, this message translates to:
+  /// **'キャンセル'**
+  String get btnCancel;
 }
 
 class _AppLocalizationsDelegate

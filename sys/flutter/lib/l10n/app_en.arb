@@ -348,5 +348,16 @@
   "fileReadError": "File read error: {error}",
   "defaultsEditNotice": "*Editing defaults.nh requires starting a new game to take effect",
   "enterOptionHint": "Enter options here...",
-  "selectedCountLabel": " ({selectedCount} selected / {maxCount})"
+  "selectedCountLabel": " ({selectedCount} selected / {maxCount})",
+
+  "resetAppSettingsTitle": "Reset UI & Control Settings",
+  "resetAppSettingsSub": "Reset UI layout, pads, message lines, and key bindings to default",
+  "resetAppSettingsConfirm": "Are you sure you want to reset all UI & control settings to default?",
+  "resetDefaultsFileTitle": "Reset defaults.nh to Default File",
+  "resetDefaultsFileSub": "Overwrite defaults.nh file with the initial asset template",
+  "resetDefaultsFileConfirm": "Are you sure you want to reset defaults.nh to its initial state? Custom settings will be overwritten.",
+  "resetAppSettingsSuccess": "UI & control settings reset to defaults.",
+  "resetDefaultsFileSuccess": "defaults.nh reset to default file.",
+  "btnResetConfirm": "Reset",
+  "btnCancel": "Cancel"
 }

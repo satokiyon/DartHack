@@ -1329,9 +1329,52 @@ static void flutter_delay_output(void) {
     usleep(50000);
 }
 
+static int g_autosave_enabled = 1;
+static int g_autosave_interval = 50;
+static long g_last_autosave_turn = -1;
+static volatile int g_autosave_requested = 0;
+static int g_last_autosave_level = -1;
+
+static void check_and_perform_autosave(void) {
+    if (!g_autosave_enabled || !program_state.something_worth_saving)
+        return;
+
+    if (program_state.input_state != commandInp)
+        return;
+
+    int cur_level = ledger_no(&u.uz);
+    long cur_turn = svm.moves;
+
+    int should_save = 0;
+
+    if (g_autosave_requested) {
+        should_save = 1;
+        g_autosave_requested = 0;
+    } else if (g_last_autosave_level > 0 && cur_level != g_last_autosave_level) {
+        should_save = 1;
+    } else if (g_autosave_interval > 0 && g_last_autosave_turn >= 0 &&
+               (cur_turn - g_last_autosave_turn >= g_autosave_interval)) {
+        should_save = 1;
+    }
+
+    if (g_last_autosave_level <= 0)
+        g_last_autosave_level = cur_level;
+    if (g_last_autosave_turn < 0)
+        g_last_autosave_turn = cur_turn;
+
+    if (should_save) {
+        g_last_autosave_level = cur_level;
+        g_last_autosave_turn = cur_turn;
+        debuglog("check_and_perform_autosave: triggering do_autosave() at turn %ld, level %d", cur_turn, cur_level);
+        do_autosave();
+    }
+}
+
 // ユーザー入力待ち (キー取得)
 static int flutter_nhgetch(void) {
     debuglog("flutter_nhgetch called. Waiting for key...");
+
+    check_and_perform_autosave();
 
     if (g_poscmd_count > 0) {
         PosCmdEntry cmd = g_poscmd_queue[g_poscmd_head];
@@ -2245,6 +2288,17 @@ void TriggerDatabaseSearchFlutter(void) {
 
 const char* flutter_get_build_id(void) {
     return NETHACK_BUILD_ID;
+}
+
+__attribute__((visibility("default"))) void flutter_trigger_autosave(void) {
+    g_autosave_requested = 1;
+    debuglog("flutter_trigger_autosave requested");
+}
+
+__attribute__((visibility("default"))) void flutter_set_autosave_settings(int enabled, int interval_turns) {
+    g_autosave_enabled = enabled;
+    g_autosave_interval = interval_turns;
+    debuglog("flutter_set_autosave_settings: enabled=%d, interval=%d", enabled, interval_turns);
 }
 
 

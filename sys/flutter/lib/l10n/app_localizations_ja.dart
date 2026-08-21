@@ -1032,4 +1032,35 @@ class AppLocalizationsJa extends AppLocalizations {
   String selectedCountLabel(Object maxCount, Object selectedCount) {
     return ' ($selectedCount個選択中 / $maxCount)';
   }
+
+  @override
+  String get resetAppSettingsTitle => 'UI・操作設定を初期値に戻す';
+
+  @override
+  String get resetAppSettingsSub => 'UI配置、操作パッド、メッセージ行数などをデフォルトに戻します';
+
+  @override
+  String get resetAppSettingsConfirm => 'UI・操作設定をデフォルトの初期値に戻しますか？';
+
+  @override
+  String get resetDefaultsFileTitle => 'defaults.nhを初期ファイルに戻す';
+
+  @override
+  String get resetDefaultsFileSub => 'defaults.nhファイルを初期のアセットファイルで上書きします';
+
+  @override
+  String get resetDefaultsFileConfirm =>
+      'defaults.nhファイルを初期状態に戻しますか？既存のカスタム設定は上書きされます。';
+
+  @override
+  String get resetAppSettingsSuccess => 'UI・操作設定を初期値に戻しました。';
+
+  @override
+  String get resetDefaultsFileSuccess => 'defaults.nhを初期ファイルに戻しました。';
+
+  @override
+  String get btnResetConfirm => '初期化';
+
+  @override
+  String get btnCancel => 'キャンセル';
 }

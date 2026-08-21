@@ -237,6 +237,125 @@ dosave0(void)
     return res;
 }
 
+/* オートセーブ処理: ゲームを終了せずにアトミックにセーブを行う */
+int
+do_autosave(void)
+{
+    const char *fq_save;
+    char fq_tmp[BUFSZ], fq_bak[BUFSZ];
+    xint8 ltmp;
+    char whynot[BUFSZ];
+    NHFILE *nhfp, *onhfp;
+    int res = 0;
+
+    if (program_state.saving)
+        return 0;
+
+    program_state.saving++;
+    notice_mon_off();
+
+    u.uinvulnerable = 0;
+    if (iflags.save_uswallow)
+        u.uswallow = 1, iflags.save_uswallow = 0;
+    if (iflags.save_uinwater)
+        u.uinwater = 1, iflags.save_uinwater = 0;
+    if (iflags.save_uburied)
+        u.uburied = 1, iflags.save_uburied = 0;
+    done_object_cleanup();
+
+    if (!program_state.something_worth_saving || !gs.SAVEF[0])
+        goto done;
+
+    fq_save = fqname(gs.SAVEF, SAVEPREFIX, 1);
+    Strcpy(fq_tmp, fq_save);
+    Strcat(fq_tmp, ".tmp");
+    Strcpy(fq_bak, fq_save);
+    Strcat(fq_bak, ".bak");
+
+    mark_synch();
+
+    /* 一時ファイル (.tmp) を作成 */
+    nhfp = create_savefile_by_name(fq_tmp);
+    if (!nhfp) {
+        goto done;
+    }
+    if (nhfp->fplog) {
+        nhfp->rcount = nhfp->wcount = 0L;
+    }
+
+    vision_recalc(2);
+
+    if (flags.moonphase == FULL_MOON)
+        change_luck(-1);
+    if (flags.friday13)
+        change_luck(1);
+
+    nhfp->mode = WRITING; /* FREEING は含めないことでメモリを解放しない */
+
+    store_version(nhfp);
+    store_plname_in_file(nhfp);
+
+    gl.looseball = BALL_IN_MON ? uball : 0;
+    gl.loosechain = CHAIN_IN_MON ? uchain : 0;
+    savelev(nhfp, ledger_no(&u.uz));
+    savegamestate(nhfp);
+
+    gu.uz_save = u.uz;
+    u.uz.dnum = u.uz.dlevel = 0;
+    set_ustuck((struct monst *) 0);
+    u.usteed = (struct monst *) 0;
+
+    for (ltmp = (xint8) 1; ltmp <= maxledgerno(); ltmp++) {
+        if (ltmp == ledger_no(&gu.uz_save))
+            continue;
+        if (!(svl.level_info[ltmp].flags & LFILE_EXISTS))
+            continue;
+
+        onhfp = open_levelfile(ltmp, whynot);
+        if (!onhfp) {
+            close_nhfile(nhfp);
+            (void) unlink(fq_tmp);
+            goto done;
+        }
+        getlev(onhfp, svh.hackpid, ltmp);
+        close_nhfile(onhfp);
+        Sfo_xint8(nhfp, &ltmp, "gamestate-level_number");
+        savelev(nhfp, ltmp);
+    }
+    close_nhfile(nhfp);
+
+    nh_sfconvert(fq_tmp);
+    nh_compress(fq_tmp);
+
+    /* --- アトミック置換 & バックアップ処理 --- */
+#if defined(WIN32)
+    (void) DeleteFileA(fq_bak);
+    (void) MoveFileA(fq_save, fq_bak);
+    (void) DeleteFileA(fq_save);
+    (void) MoveFileA(fq_tmp, fq_save);
+#else
+    (void) unlink(fq_bak);
+    (void) rename(fq_save, fq_bak);
+    (void) rename(fq_tmp, fq_save);
+#endif
+
+    /* 現在レベルの復元 */
+    onhfp = open_levelfile(ledger_no(&gu.uz_save), whynot);
+    if (onhfp) {
+        getlev(onhfp, svh.hackpid, ledger_no(&gu.uz_save));
+        close_nhfile(onhfp);
+    }
+    u.uz = gu.uz_save;
+    gu.uz_save.dnum = gu.uz_save.dlevel = 0;
+
+    res = 1;
+
+ done:
+    notice_mon_on();
+    program_state.saving--;
+    return res;
+}
+
 staticfn void
 save_gamelog(NHFILE *nhfp)
 {

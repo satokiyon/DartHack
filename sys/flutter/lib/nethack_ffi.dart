@@ -46,6 +46,11 @@ typedef DartLogCallback = Void Function(Pointer<Utf8> msg);
 typedef RegisterDartLogFunc = Void Function(Pointer<NativeFunction<DartLogCallback>> cb);
 typedef RegisterDartLogDart = void Function(Pointer<NativeFunction<DartLogCallback>> cb);
 
+typedef TriggerAutosaveFunc = Void Function();
+typedef TriggerAutosaveDart = void Function();
+typedef SetAutosaveSettingsFunc = Void Function(Int32 enabled, Int32 intervalTurns);
+typedef SetAutosaveSettingsDart = void Function(int enabled, int intervalTurns);
+
 // ★19個の引数による ARM64 スタック破綻を回避する構造体定義
 final class FlutterCallbacksStruct extends Struct {
   external Pointer<NativeFunction<CreateWindowCallback>> createCb;
@@ -207,6 +212,8 @@ class NetHackFfi {
   late final RegisterDartLogDart registerDartLog;
   late final RegisterCallbacksStructDart registerCallbacksStruct;
   late final SetLanguageModeDart setLanguageMode;
+  late final TriggerAutosaveDart triggerAutosave;
+  late final SetAutosaveSettingsDart setAutosaveSettings;
 
   NetHackFfi([String langCode = 'ja']) {
     try {
@@ -337,6 +344,22 @@ class NetHackFfi {
           .asFunction<SetLanguageModeDart>();
     } catch (e) {
       setLanguageMode = (_) {};
+    }
+
+    try {
+      triggerAutosave = _lib
+          .lookup<NativeFunction<TriggerAutosaveFunc>>('flutter_trigger_autosave')
+          .asFunction<TriggerAutosaveDart>();
+    } catch (e) {
+      triggerAutosave = () {};
+    }
+
+    try {
+      setAutosaveSettings = _lib
+          .lookup<NativeFunction<SetAutosaveSettingsFunc>>('flutter_set_autosave_settings')
+          .asFunction<SetAutosaveSettingsDart>();
+    } catch (e) {
+      setAutosaveSettings = (_, __) {};
     }
   }
 

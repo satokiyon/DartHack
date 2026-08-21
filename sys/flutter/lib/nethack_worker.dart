@@ -436,6 +436,14 @@ class NetHackWorker {
           } else {
             ffi.sendAskNameResult(nullptr, mode);
           }
+        } else if (type == 'trigger_autosave') {
+          wlog("trigger_autosave message received in Worker");
+          ffi.triggerAutosave();
+        } else if (type == 'set_autosave_settings') {
+          final enabled = (message['enabled'] as bool? ?? true) ? 1 : 0;
+          final interval = message['interval'] as int? ?? 50;
+          wlog("set_autosave_settings message received: enabled=$enabled, interval=$interval");
+          ffi.setAutosaveSettings(enabled, interval);
         }
         }
       } catch (e, st) {

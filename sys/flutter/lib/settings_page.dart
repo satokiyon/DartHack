@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:io';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -57,6 +58,8 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _swapPadSide = false; // 移動パッドとショートカットパッドの左右反転
   String _dpadLongPressMoveMode = 'G_UPPER';
   String _mapTapTravelMode = 'always';
+  bool _autosaveEnabled = true;
+  int _autosaveInterval = 50;
 
   // defaults.nh 連動ゲームオプション
   int _optTutorialMode = 0;
@@ -245,6 +248,8 @@ class _SettingsPageState extends State<SettingsPage> {
       }
       _dpadLongPressMoveMode = prefs.getString('dpad_long_press_move_mode') ?? 'G_UPPER';
       _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'always';
+      _autosaveEnabled = prefs.getBool('autosave_enabled') ?? true;
+      _autosaveInterval = prefs.getInt('autosave_interval') ?? 50;
 
       _volupAction = prefs.getInt('key_volup_action') ?? 0;
       _voldownAction = prefs.getInt('key_voldown_action') ?? 0;
@@ -509,11 +514,21 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildSectionCard(Widget child) {
     return Card(
+      color: const Color(0xFF25262E),
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Colors.white12, width: 1.0),
+      ),
       clipBehavior: Clip.antiAlias,
-      child: child,
+      child: ExpansionTileTheme(
+        data: const ExpansionTileThemeData(
+          backgroundColor: Color(0xFF1E1F24),
+          collapsedBackgroundColor: Color(0xFF25262E),
+        ),
+        child: child,
+      ),
     );
   }
 
@@ -1285,9 +1300,104 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
           ),
+          ListTile(
+            leading: const Icon(Icons.restore, color: Colors.orangeAccent),
+            title: Text(l10n.resetAppSettingsTitle),
+            subtitle: Text(l10n.resetAppSettingsSub),
+            onTap: _resetAppSettings,
+          ),
+          ListTile(
+            leading: const Icon(Icons.restore_page, color: Colors.deepOrangeAccent),
+            title: Text(l10n.resetDefaultsFileTitle),
+            subtitle: Text(l10n.resetDefaultsFileSub),
+            onTap: _resetDefaultsFile,
+          ),
         ]),
       ),
     );
+  }
+
+  Future<void> _resetAppSettings() async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.resetAppSettingsTitle),
+        content: Text(l10n.resetAppSettingsConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.btnCancel),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.btnResetConfirm, style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final keys = prefs.getKeys().toList();
+    for (final key in keys) {
+      if (!key.startsWith('nh_opt_')) {
+        await prefs.remove(key);
+      }
+    }
+
+    await _loadAllSettings();
+    _syncNativeKeySettings();
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.resetAppSettingsSuccess)),
+      );
+    }
+  }
+
+  Future<void> _resetDefaultsFile() async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.resetDefaultsFileTitle),
+        content: Text(l10n.resetDefaultsFileConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.btnCancel),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.btnResetConfirm, style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      final initialContent = await rootBundle.loadString('assets/nethackdir/common/defaults.nh');
+      final targetFile = File(widget.defaultsFilePath);
+      await targetFile.writeAsString(initialContent, flush: true);
+
+      final defaultsHelper = DefaultsHelper();
+      await defaultsHelper.syncFromFileToPrefs(widget.defaultsFilePath);
+      await _loadAllSettings();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.resetDefaultsFileSuccess)),
+        );
+      }
+    } catch (e) {
+      _showErrorDialog(l10n.fileReadError(e.toString()));
+    }
   }
 
   Widget _buildAdvancedSection() {
@@ -1705,12 +1815,61 @@ class _SettingsPageState extends State<SettingsPage> {
     return rawName;
   }
 
+  Widget _buildAutosaveSection() {
+    final isJa = Localizations.localeOf(context).languageCode == 'ja';
+
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.save, color: Colors.lightBlueAccent),
+        initiallyExpanded: false,
+        title: Text(isJa ? '自動セーブ' : 'Autosave'),
+        children: _withDividers([
+          SwitchListTile(
+            title: Text(isJa ? '自動セーブを有効化' : 'Enable Autosave'),
+            subtitle: Text(isJa
+                ? '階層移動時、バックグラウンド移行時、および一定ターン毎に入力待ち状態で自動セーブします'
+                : 'Autosave on level transition, backgrounding, and after set turns'),
+            value: _autosaveEnabled,
+            onChanged: (val) {
+              setState(() => _autosaveEnabled = val);
+              _saveSetting('autosave_enabled', val);
+            },
+          ),
+          if (_autosaveEnabled)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: DropdownButtonFormField<int>(
+                decoration: InputDecoration(
+                  labelText: isJa ? '自動セーブのターン間隔' : 'Autosave Turn Interval',
+                ),
+                initialValue: _autosaveInterval,
+                items: [
+                  DropdownMenuItem(value: 20, child: Text(isJa ? '20 ターン毎' : 'Every 20 turns')),
+                  DropdownMenuItem(value: 50, child: Text(isJa ? '50 ターン毎 (推奨)' : 'Every 50 turns (Recommended)')),
+                  DropdownMenuItem(value: 100, child: Text(isJa ? '100 ターン毎' : 'Every 100 turns')),
+                  DropdownMenuItem(value: 0, child: Text(isJa ? 'ターン毎のセーブ無効（階層移動/バックグラウンド時のみ）' : 'Disabled (Level transition / Background only)')),
+                ],
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() => _autosaveInterval = val);
+                    _saveSetting('autosave_interval', val);
+                  }
+                },
+              ),
+            ),
+        ]),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
+      backgroundColor: const Color(0xFF121214),
       appBar: AppBar(
         title: Text(l10n.detailedSettings),
+        backgroundColor: const Color(0xFF1A1A1E),
       ),
       body: ListView(
         children: [
@@ -1724,6 +1883,7 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildCmdPanelSection(), //コマンドパネル編集
           _buildKeyActionSection(), // 物理キーカスタムアクション
           const Divider(height: 1),   //区切り線
+          _buildAutosaveSection(), // 自動セーブ設定
           _buildGameRulesSection(), //ゲームルール・プレイ設定
           _buildAdvancedSection(), // 高度な設定
           _buildOtherSection(), // その他の設定

@@ -132,7 +132,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   static const List<DPadMoveMode> _allDPadMoveModes = [
     DPadMoveMode.normal,
     DPadMoveMode.upper,
@@ -254,6 +254,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _transformationController = TransformationController();
     const MethodChannel('jp.satokiyo.darthack/key_interceptor')
         .setMethodCallHandler((call) async {
@@ -968,6 +969,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _transformationController.dispose();
     _focusNode.dispose();
     _getlineController.dispose();
@@ -975,6 +977,26 @@ class _MyHomePageState extends State<MyHomePage> {
     _extCmdFilterController.dispose();
     _extCmdMenuFilterController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      debugPrint("[Main] AppLifecycleState.paused detected. Triggering autosave...");
+      _workerSendPort?.send({'type': 'trigger_autosave'});
+    }
+  }
+
+  Future<void> _sendAutosaveSettingsToWorker() async {
+    final prefs = await SharedPreferences.getInstance();
+    final enabled = prefs.getBool('autosave_enabled') ?? true;
+    final interval = prefs.getInt('autosave_interval') ?? 50;
+    _workerSendPort?.send({
+      'type': 'set_autosave_settings',
+      'enabled': enabled,
+      'interval': interval,
+    });
   }
 
   void _centerOnPlayer(Size viewportSize) {
@@ -1257,6 +1279,7 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (type == 'ready') {
           _workerSendPort = message['sendPort'];
           _addLog("Worker Isolate Ready. Starting Game...");
+          _sendAutosaveSettingsToWorker();
           _workerSendPort?.send({
             'type': 'start',
             'assetsPath': _assetsPath,
@@ -2499,6 +2522,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _loadPreferences().then((_) {
         if (_isGameRunning) {
           _applyScreenMode(_screenMode);
+          _sendAutosaveSettingsToWorker();
         }
       });
     });
