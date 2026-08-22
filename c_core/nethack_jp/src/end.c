@@ -1271,6 +1271,7 @@ really_done(int how)
         taken = FALSE; /* lint; assert( !bones_ok ); */
 
     clearlocks();
+    delete_savefile();
 
     if (have_windows)
         display_nhwindow(WIN_MESSAGE, FALSE);

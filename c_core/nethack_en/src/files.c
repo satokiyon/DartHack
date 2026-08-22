@@ -529,6 +529,7 @@ close_nhfile(NHFILE *nhfp)
 void
 rewind_nhfile(NHFILE *nhfp)
 {
+    nhfp->eof = FALSE;
     if (nhfp->structlevel) {
 #ifdef BSD
         (void) lseek(nhfp->fd, 0L, 0);
@@ -1255,9 +1256,19 @@ int
 delete_savefile(void)
 {
     const char *sfname = fqname(gs.SAVEF, SAVEPREFIX, 0);
+    char buf[BUFSZ];
 
     (void) unlink(sfname);
     (void) delete_convertedfile(sfname);
+
+    Strcpy(buf, sfname);
+    Strcat(buf, ".bak");
+    (void) unlink(buf);
+
+    Strcpy(buf, sfname);
+    Strcat(buf, ".tmp");
+    (void) unlink(buf);
+
     return 0; /* for restore_saved_game() (ex-xxxmain.c) test */
 }
 
@@ -1902,8 +1913,14 @@ docompress_file(const char *filename, boolean uncomp)
 void
 nh_compress(const char *filename UNUSED_if_not_COMPRESS)
 {
+#if defined(ANDROID)
+    /* Android / Flutter ポートではセーブファイルを非圧縮のまま管理し、
+       get_saved_games() 等での連続解凍・再圧縮によるファイル競合や消去・破損を防ぐ */
+    return;
+#else
 #if defined(COMPRESS) || defined(ZLIB_COMP)
     docompress_file(filename, FALSE);
+#endif
 #endif
 }
 
@@ -1911,8 +1928,19 @@ nh_compress(const char *filename UNUSED_if_not_COMPRESS)
 void
 nh_uncompress(const char *filename UNUSED_if_not_COMPRESS)
 {
+#if defined(ANDROID)
+    /* 旧バージョンの .gz ファイルがディスクに残っている場合のみ1回解凍して復元 */
+#if defined(ZLIB_COMP)
+    char cfn[256];
+    if (make_compressed_name(filename, cfn) && file_exists(cfn)) {
+        docompress_file(filename, TRUE);
+    }
+#endif
+    return;
+#else
 #if defined(COMPRESS) || defined(ZLIB_COMP)
     docompress_file(filename, TRUE);
+#endif
 #endif
 }
 

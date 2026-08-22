@@ -159,11 +159,10 @@ dosave0(void)
     store_version(nhfp);
     store_plname_in_file(nhfp);
     /* savelev() might save uball and uchain, releasing their memory if
-       FREEING, so we need to check their status now; if hero is swallowed,
-       uball and uchain will persist beyond saving map floor and inventory
-       so these copies of their pointers will be valid and savegamestate()
-       will know to save them separately (from floor and invent); when not
-       swallowed, uchain will be stale by then, and uball will be too if
+       they were on the floor, or doing nothing to them if they are carried.
+       looseball and loosechain track whether they are on the floor.
+       It can also free u.ustuck if it is a monster on the floor, but not if
+       it is carried (such as a ball-and-chain carrying monster).
        ball is on the floor rather than carried */
     gl.looseball = BALL_IN_MON ? uball : 0;
     gl.loosechain = CHAIN_IN_MON ? uchain : 0;
@@ -171,10 +170,9 @@ dosave0(void)
     savegamestate(nhfp);
 
     /* While copying level files around, zero out u.uz to keep
-     * parts of the restore code from completely initializing all
-     * in-core data structures, since all we're doing is copying.
-     * This also avoids at least one nasty core dump.
-     * [gu.uz_save is used by save_bubbles() as well as to restore u.uz]
+     * savelev() from erasing them.  Also, clear u.ustuck & u.usteed
+     * so that wait_synch() won't attempt to write unneeded messages
+     * about pet horses & pet stuck monsters.  --jgm
      */
     gu.uz_save = u.uz;
     u.uz.dnum = u.uz.dlevel = 0;
@@ -246,7 +244,7 @@ do_autosave(void)
     NHFILE *nhfp, *onhfp;
     int res = 0;
 
-    if (program_state.saving)
+    if (program_state.saving || program_state.gameover || u.uhp <= 0 || program_state.panicking || program_state.restoring)
         return 0;
 
     program_state.saving++;

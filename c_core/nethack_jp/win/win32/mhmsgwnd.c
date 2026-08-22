@@ -841,7 +841,7 @@ mswin_message_window_size(HWND hWnd, LPSIZE sz)
     GetClientRect(hWnd, &client_rt);
 
     if (iflags.wc_align_message == ALIGN_TOP || iflags.wc_align_message == ALIGN_BOTTOM) {
-        int num_lines = iflags.msw_msg_rows;
+        int num_lines = 0;
         if (num_lines <= 0) num_lines = iflags.wc2_term_rows;
 
         if (num_lines > 0) {
@@ -853,7 +853,7 @@ mswin_message_window_size(HWND hWnd, LPSIZE sz)
         }
         sz->cx = 0; /* Fill width */
     } else {
-        int msg_width = iflags.msw_msg_cols;
+        int msg_width = 0;
         if (msg_width <= 0) msg_width = iflags.wc2_term_cols;
 
         if (msg_width > 0) {

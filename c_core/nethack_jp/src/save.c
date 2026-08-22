@@ -248,7 +248,7 @@ do_autosave(void)
     NHFILE *nhfp, *onhfp;
     int res = 0;
 
-    if (program_state.saving)
+    if (program_state.saving || program_state.gameover || u.uhp <= 0 || program_state.panicking || program_state.restoring)
         return 0;
 
     program_state.saving++;

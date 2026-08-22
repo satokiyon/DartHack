@@ -982,10 +982,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.paused) {
-      debugPrint("[Main] AppLifecycleState.paused detected. Triggering autosave...");
-      _workerSendPort?.send({'type': 'trigger_autosave'});
-    }
   }
 
   Future<void> _sendAutosaveSettingsToWorker() async {

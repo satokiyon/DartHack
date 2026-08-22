@@ -2005,6 +2005,7 @@ goto_level(
     }
 
     (void) pickup(1);
+    do_autosave();
     return;
 }
 

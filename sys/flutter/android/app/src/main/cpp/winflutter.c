@@ -1339,6 +1339,9 @@ static void check_and_perform_autosave(void) {
     if (!g_autosave_enabled || !program_state.something_worth_saving)
         return;
 
+    if (program_state.gameover || u.uhp <= 0 || program_state.panicking)
+        return;
+
     if (program_state.input_state != commandInp)
         return;
 
@@ -1435,6 +1438,7 @@ static int flutter_nhgetch(void) {
     }
 
     while (!g_key_available) {
+        check_and_perform_autosave();
         if (g_poscmd_count > 0) {
             PosCmdEntry cmd = g_poscmd_queue[g_poscmd_head];
             g_poscmd_head = (g_poscmd_head + 1) % FLUTTER_MAX_POSCMD;
@@ -2291,8 +2295,7 @@ const char* flutter_get_build_id(void) {
 }
 
 __attribute__((visibility("default"))) void flutter_trigger_autosave(void) {
-    g_autosave_requested = 1;
-    debuglog("flutter_trigger_autosave requested");
+    /* No-op: Background autosave has been disabled to prevent file corruption during OS process kill. */
 }
 
 __attribute__((visibility("default"))) void flutter_set_autosave_settings(int enabled, int interval_turns) {

@@ -474,10 +474,6 @@ struct instance_flags {
     int wc_mouse_support;       /* allow mouse support */
     int wc2_term_cols;          /* terminal width, in characters */
     int wc2_term_rows;          /* terminal height, in characters */
-    int msw_msg_cols;           /* Win32 GUI: message window width */
-    int msw_msg_rows;           /* Win32 GUI: message window height */
-    int msw_stat_cols;          /* Win32 GUI: status window width */
-    int msw_stat_rows;          /* Win32 GUI: status window height */
     int wc2_statuslines;        /* default = 2, curses can handle 3 */
     int wc2_windowborders;      /* display borders on NetHack windows */
     int wc2_petattr;            /* text attributes for pet */

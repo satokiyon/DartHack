@@ -44,6 +44,7 @@ void getlock(void)
 {
 	register int i = 0, fd, c;
 	const char *fq_lock;
+	const char *fq_save;
 
 	g_getlock_failed = FALSE;
 
@@ -56,7 +57,14 @@ void getlock(void)
 	regularize(gl.lock);
 	set_levelfile_name(gl.lock, 0);
 
-	fq_lock = fqname(gl.lock, LEVELPREFIX, 0);
+	set_savefile_name(TRUE);
+	fq_save = fqname(gs.SAVEF, SAVEPREFIX, 0);
+	fq_lock = fqname(gl.lock, LEVELPREFIX, 1);
+	if (file_exists(fq_save)) {
+		debuglog("getlock: valid savefile '%s' exists. Bypassing recover_savefile.", fq_save);
+		goto gotlock;
+	}
+
 	if((fd = open(fq_lock, 0)) == -1)
 	{
 		if(errno == ENOENT)
