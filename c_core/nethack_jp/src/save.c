@@ -325,6 +325,7 @@ do_autosave(void)
             (void) unlink(fq_tmp);
             goto done;
         }
+        Sfo_xint8(nhfp, &ltmp, "gamestate-level_number");
         if (onhfp->structlevel && onhfp->fd >= 0) {
             char buf[4096];
             int nread;
