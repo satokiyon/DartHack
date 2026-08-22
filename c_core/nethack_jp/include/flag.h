@@ -251,6 +251,7 @@ enum debug_fuzzer_states {
  */
 struct instance_flags {
     boolean defer_plname;  /* X11 hack: askname() might not set svp.plname */
+    boolean autosaved;     /* savefile was created by auto-save */
     boolean fuzzerpending; /* fuzzing requested on command line but not active
                             * yet (to allow interactive initialization prior
                             * to input becoming taken over);

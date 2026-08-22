@@ -879,6 +879,7 @@ newgame(void)
     save_currentstate();
 #endif
     program_state.something_worth_saving++; /* useful data now exists */
+    set_savefile_name(TRUE); /* 確立したプレイヤー名に基づき gs.SAVEF を確定 */
 
     /* Success! */
     welcome(TRUE);

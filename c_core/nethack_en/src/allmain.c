@@ -873,6 +873,7 @@ newgame(void)
     urealtime.realtime = 0L;
     urealtime.start_timing = getnow();
     program_state.something_worth_saving++; /* useful data now exists */
+    set_savefile_name(TRUE);
 #ifdef INSURANCE
     save_currentstate();
 #endif

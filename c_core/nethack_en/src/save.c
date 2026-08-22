@@ -155,6 +155,7 @@ dosave0(void)
     if (!WINDOWPORT(X11))
         putstr(WIN_MAP, 0, "Saving:");
 #endif
+    iflags.autosaved = FALSE;
     nhfp->mode = WRITING | FREEING;
     store_version(nhfp);
     store_plname_in_file(nhfp);
@@ -247,6 +248,7 @@ do_autosave(void)
     if (program_state.saving || program_state.gameover || u.uhp <= 0 || program_state.panicking || program_state.restoring)
         return 0;
 
+    iflags.autosaved = TRUE;
     program_state.saving++;
     notice_mon_off();
 
@@ -506,6 +508,7 @@ savestateinlock(void)
     if (!program_state.something_worth_saving || program_state.in_self_recover)
         return;
 
+    iflags.autosaved = FALSE;
     program_state.saving++; /* inhibit status and perm_invent updates */
     /* When checkpointing is on, the full state needs to be written
      * on each checkpoint.  When checkpointing is off, only the pid
@@ -1167,7 +1170,11 @@ store_plname_in_file(NHFILE *nhfp)
     /* insert playmode into final slot of hero[];
        'D','X','-' are the same characters as are used for paniclog entries */
     assert(hero[PL_NSIZ_PLUS - 1 - 1] == '\0');
-    hero[PL_NSIZ_PLUS - 1] = wizard ? 'D' : discover ? 'X' : '-';
+    if (iflags.autosaved) {
+        hero[PL_NSIZ_PLUS - 1] = wizard ? 'd' : discover ? 'x' : 'a';
+    } else {
+        hero[PL_NSIZ_PLUS - 1] = wizard ? 'D' : discover ? 'X' : '-';
+    }
 
     if (nhfp->structlevel)
         bufoff(nhfp->fd);  /* bwrite() before bufon() uses plain write() */
