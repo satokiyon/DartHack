@@ -1082,6 +1082,7 @@ extern void splatter_burning_oil(coordxy, coordxy, boolean);
 extern void explode_oil(struct obj *, coordxy, coordxy) NONNULLARG1;
 extern int adtyp_to_expltype(const int);
 extern void mon_explodes(struct monst *, struct attack *) NONNULLPTRS;
+extern const char *jp_explosion_text_for_display(const char *, char *, size_t);
 
 /* ### extralev.c ### */
 
