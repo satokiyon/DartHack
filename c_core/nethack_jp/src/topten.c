@@ -276,6 +276,33 @@ jp_translate_food_or_corpse(char *out, unsigned outsz, const char *in)
                 Snprintf(noun, sizeof noun, "%sの卵", mname);
             }
         }
+    } else if (!strncmpi(p, "statue of ", 10)) {
+        const char *mname = skip_english_article(p + 10);
+        int mndx, gend;
+        mndx = name_to_mon(mname, &gend);
+        if (mndx >= 0) {
+            Snprintf(noun, sizeof noun, "%sの石像", jp_pmname_from_idx(mndx, 0));
+        } else {
+            Snprintf(noun, sizeof noun, "%sの石像", mname);
+        }
+    } else if (!strncmpi(p, "body of ", 8)) {
+        const char *mname = skip_english_article(p + 8);
+        int mndx, gend;
+        mndx = name_to_mon(mname, &gend);
+        if (mndx >= 0) {
+            Snprintf(noun, sizeof noun, "%sの体", jp_pmname_from_idx(mndx, 0));
+        } else {
+            Snprintf(noun, sizeof noun, "%sの体", mname);
+        }
+    } else if (!strncmpi(p, "brain of ", 9)) {
+        const char *mname = skip_english_article(p + 9);
+        int mndx, gend;
+        mndx = name_to_mon(mname, &gend);
+        if (mndx >= 0) {
+            Snprintf(noun, sizeof noun, "%sの脳", jp_pmname_from_idx(mndx, 0));
+        } else {
+            Snprintf(noun, sizeof noun, "%sの脳", mname);
+        }
     } else if (!strcmpi(p, "glob")) {
         Snprintf(noun, sizeof noun, "塊");
     } else if (!strcmpi(p, "lump of royal jelly")) {
@@ -339,11 +366,17 @@ jp_translate_multi_reason_exact(
         { "dressing up", "着替えていた" },
         { "moving through the air", "空中を移動していた" },
         { "pretending to be a pile of gold", "金貨の山のふりをしていた" },
+        { "feigning a pile of gold coins", "金貨の山のふりをしていた" },
         { "unconscious from rotten food", "腐った食べ物で意識を失っていた" },
         { "fainted from lack of food", "食料不足で気絶していた" },
+        { "fainting from hunger", "飢えで気絶していた" },
         { "vomiting", "吐いていた" },
         { "opening a container", "容器を開けていた" },
         { "tipping a container", "容器を傾けていた" },
+        { "looking into a magic 8-ball", "マジック8ボールを覗き込んでいた" },
+        { "looking into a crystal ball", "水晶玉を覗き込んでいた" },
+        { "toyed with by fate", "運命に翻弄されていた" },
+        { "paralyzed by fear", "恐怖で身動きできなかった" },
         { "being scared stiff", "恐怖で身動きできなかった" },
         { "being frightened to death", "恐怖で死にかけていた" },
         { "sleeping off a magical draught", "魔法の薬で眠っていた" },
@@ -489,7 +522,19 @@ jp_translate_killer_text_for_display(
 
     core = tmp;
     outmain[0] = '\0';
-    if (!strcmpi(core, "crushed to death underneath a drawbridge")) {
+    if (!strncmpi(core, "caught in a ", 12)) {
+        char expbuf[BUFSZ];
+        const char *jpexp = jp_explosion_text_for_display(core + 12, expbuf, sizeof expbuf);
+        Snprintf(outmain, sizeof outmain, "%sに巻き込まれた", jpexp);
+    } else if (!strncmpi(core, "caught in own ", 14)) {
+        char expbuf[BUFSZ];
+        const char *jpexp = jp_explosion_text_for_display(core + 14, expbuf, sizeof expbuf);
+        Snprintf(outmain, sizeof outmain, "自分の%sに巻き込まれた", jpexp);
+    } else if (!strncmpi(core, "caught in ", 10)) {
+        char expbuf[BUFSZ];
+        const char *jpexp = jp_explosion_text_for_display(core + 10, expbuf, sizeof expbuf);
+        Snprintf(outmain, sizeof outmain, "%sに巻き込まれた", jpexp);
+    } else if (!strcmpi(core, "crushed to death underneath a drawbridge")) {
         Snprintf(outmain, sizeof outmain, "跳ね橋の下敷きになった");
     } else if (!strcmpi(core, "fell from a drawbridge")) {
         Snprintf(outmain, sizeof outmain, "跳ね橋から落ちた");
@@ -518,6 +563,22 @@ jp_translate_killer_text_for_display(
             Snprintf(outmain, sizeof outmain, "聖水に倒された");
         } else if (!strcmpi(killer, "potion of unholy water")) {
             Snprintf(outmain, sizeof outmain, "不浄な水に倒された");
+        } else if (!strcmpi(killer, "potion of poison")) {
+            Snprintf(outmain, sizeof outmain, "毒薬に倒された");
+        } else if (!strcmpi(killer, "potion of polymorph")) {
+            Snprintf(outmain, sizeof outmain, "へんげの薬に倒された");
+        } else if (!strcmpi(killer, "scroll of genocide")) {
+            Snprintf(outmain, sizeof outmain, "虐殺の巻物に倒された");
+        } else if (!strcmpi(killer, "elementary physics")) {
+            Snprintf(outmain, sizeof outmain, "物理法則に倒された");
+        } else if (!strcmpi(killer, "colliding with the ceiling")) {
+            Snprintf(outmain, sizeof outmain, "天井への激突で倒された");
+        } else if (!strcmpi(killer, "splash of acid")) {
+            Snprintf(outmain, sizeof outmain, "酸の飛沫に倒された");
+        } else if (!strcmpi(killer, "death field")) {
+            Snprintf(outmain, sizeof outmain, "死の領域に倒された");
+        } else if (!strcmpi(killer, "disintegration field")) {
+            Snprintf(outmain, sizeof outmain, "分解領域に倒された");
         } else if (!strcmpi(killer, "falling rock")) {
             Snprintf(outmain, sizeof outmain, "落石に倒された");
         } else if (!strcmpi(killer, "falling object")) {
@@ -572,6 +633,22 @@ jp_translate_killer_text_for_display(
             Snprintf(outmain, sizeof outmain, "電撃で倒された");
         } else if (!strcmpi(killer, "bear trap")) {
             Snprintf(outmain, sizeof outmain, "熊罠で倒された");
+        } else if (!strcmpi(killer, "rolling boulder trap")) {
+            Snprintf(outmain, sizeof outmain, "転がる大岩の罠に倒された");
+        } else if (!strcmpi(killer, "statue trap")) {
+            Snprintf(outmain, sizeof outmain, "石像の罠に倒された");
+        } else if (!strcmpi(killer, "spiked pit")) {
+            Snprintf(outmain, sizeof outmain, "杭のある落とし穴に落ちて倒された");
+        } else if (!strcmpi(killer, "pit")) {
+            Snprintf(outmain, sizeof outmain, "落とし穴に落ちて倒された");
+        } else if (!strcmpi(killer, "fire trap")) {
+            Snprintf(outmain, sizeof outmain, "火の罠で焼死した");
+        } else if (!strcmpi(killer, "magic trap")) {
+            Snprintf(outmain, sizeof outmain, "魔法の罠に倒された");
+        } else if (!strcmpi(killer, "anti-magic trap")) {
+            Snprintf(outmain, sizeof outmain, "反魔法の罠に倒された");
+        } else if (!strcmpi(killer, "polymorph trap")) {
+            Snprintf(outmain, sizeof outmain, "へんげの罠に倒された");
         } else if (!strcmpi(killer, "rusting away")) {
             Snprintf(outmain, sizeof outmain, "錆び崩れて倒された");
         } else if (!strcmpi(killer, "dangerous winds")) {
@@ -743,6 +820,17 @@ jp_translate_killer_text_for_display(
     } else if (!strncmpi(core, "died of ", 8)) {
         Snprintf(outmain, sizeof outmain, "%sで死亡した",
                  skip_english_article(core + 8));
+    } else if (!strncmpi(core, "unwisely drank from ", 20)) {
+        const char *what = skip_english_article(core + 20);
+        const char *place_jp = "水場";
+        if (!strcmpi(what, "fountain")) place_jp = "泉";
+        else if (!strcmpi(what, "pool of water") || !strcmpi(what, "pool")) place_jp = "水たまり";
+        else if (!strcmpi(what, "moat")) place_jp = "堀";
+        else if (!strcmpi(what, "swamp")) place_jp = "沼";
+        else if (!strcmpi(what, "river")) place_jp = "川";
+        else if (!strcmpi(what, "lake")) place_jp = "湖";
+        else if (!strcmpi(what, "water")) place_jp = "水";
+        Snprintf(outmain, sizeof outmain, "%sから飲んだ不心得", place_jp);
     } else if (!strncmpi(core, "drowned in ", 11)) {
         const char *what = skip_english_article(core + 11);
         const char *by_ptr = strstr(what, " by ");
@@ -762,18 +850,30 @@ jp_translate_killer_text_for_display(
 
             const char *place_jp = "水";
             if (!strcmpi(place, "moat")) place_jp = "堀";
-            else if (!strcmpi(place, "pool of water")) place_jp = "水たまり";
+            else if (!strcmpi(place, "pool of water") || !strcmpi(place, "pool")) place_jp = "水たまり";
             else if (!strcmpi(place, "deep water")) place_jp = "深い水";
             else if (!strcmpi(place, "limitless water")) place_jp = "果てしない水";
+            else if (!strcmpi(place, "swamp")) place_jp = "沼";
+            else if (!strcmpi(place, "bog")) place_jp = "湿地";
+            else if (!strcmpi(place, "river")) place_jp = "川";
+            else if (!strcmpi(place, "lake")) place_jp = "湖";
+            else if (!strcmpi(place, "sea") || !strcmpi(place, "ocean")) place_jp = "海";
+            else if (!strcmpi(place, "fountain")) place_jp = "泉";
             else if (!strcmpi(place, "water")) place_jp = "水";
 
             Snprintf(outmain, sizeof outmain, "%sで%sに溺れさせられた", place_jp, monster_jp);
         } else {
             const char *place_jp = NULL;
             if (!strcmpi(what, "moat")) place_jp = "堀";
-            else if (!strcmpi(what, "pool of water")) place_jp = "水たまり";
+            else if (!strcmpi(what, "pool of water") || !strcmpi(what, "pool")) place_jp = "水たまり";
             else if (!strcmpi(what, "deep water")) place_jp = "深い水";
             else if (!strcmpi(what, "limitless water")) place_jp = "果てしない水";
+            else if (!strcmpi(what, "swamp")) place_jp = "沼";
+            else if (!strcmpi(what, "bog")) place_jp = "湿地";
+            else if (!strcmpi(what, "river")) place_jp = "川";
+            else if (!strcmpi(what, "lake")) place_jp = "湖";
+            else if (!strcmpi(what, "sea") || !strcmpi(what, "ocean")) place_jp = "海";
+            else if (!strcmpi(what, "fountain")) place_jp = "泉";
             else if (!strcmpi(what, "water")) place_jp = "水";
 
             if (place_jp) {
@@ -907,6 +1007,26 @@ jp_translate_killer_text_for_display(
         } else {
             Snprintf(outmain, sizeof outmain, "%sでスライム化した", buf);
         }
+    } else if (!strncmpi(core, "reverting to unhealthy ", 23)
+               && strstr(core, " form")) {
+        char rbuf[BUFSZ];
+        const char *p = strstr(core, " form");
+        size_t rlen = p - (core + 23);
+        if (rlen < sizeof rbuf) {
+            memcpy(rbuf, core + 23, rlen);
+            rbuf[rlen] = '\0';
+            const char *rname = skip_english_article(rbuf);
+            int mndx, gend;
+            mndx = name_to_mon(rname, &gend);
+            if (mndx >= LOW_PM && mndx < NUMMONS) {
+                Snprintf(outmain, sizeof outmain, "不健康な%sの姿に戻って倒れた",
+                         jp_pmname_from_idx(mndx, 0));
+            } else {
+                Snprintf(outmain, sizeof outmain, "不健康な姿に戻って倒れた");
+            }
+        } else {
+            Snprintf(outmain, sizeof outmain, "不健康な姿に戻って倒れた");
+        }
     } else if (!strcmpi(core, "reverting to unhealthy human form")
                || !strcmpi(core, "reverting to unhealthy elf form")
                || !strcmpi(core, "reverting to unhealthy dwarf form")
@@ -916,9 +1036,9 @@ jp_translate_killer_text_for_display(
     } else if (!strcmpi(core, "killed while stuck in creature form")) {
         Snprintf(outmain, sizeof outmain, "怪物の姿から戻れずに倒れた");
     } else if (!strcmpi(core, "unsuccessful polymorph")) {
-        Snprintf(outmain, sizeof outmain, "変身の失敗で倒れた");
+        Snprintf(outmain, sizeof outmain, "へんげの失敗で倒された");
     } else if (!strcmpi(core, "self-genocide")) {
-        Snprintf(outmain, sizeof outmain, "自分自身の抹殺");
+        Snprintf(outmain, sizeof outmain, "自分自身の虐殺");
     } else if (!strcmpi(core, "system shock")) {
         Snprintf(outmain, sizeof outmain, "システムショック");
     } else if (!strcmpi(core, "alchemic blast")) {
@@ -978,7 +1098,7 @@ jp_translate_killer_text_for_display(
     } else if (!strcmpi(core, "residual undead turning effect")) {
         Snprintf(outmain, sizeof outmain, "アンデッド退散の残留効果");
     } else if (!strcmpi(core, "genocidal confusion")) {
-        Snprintf(outmain, sizeof outmain, "抹殺による混乱");
+        Snprintf(outmain, sizeof outmain, "虐殺による混乱");
     } else if (!strcmpi(core, "imperious order")) {
         Snprintf(outmain, sizeof outmain, "傲慢な命令");
     } else if (!strcmpi(core, "removing gloves")) {
@@ -1088,7 +1208,34 @@ jp_translate_killer_text_for_display(
         }
     } else if (!strncmp(core, "the wrath of ", 13)) {
         Snprintf(outmain, sizeof outmain, "%sの怒り",
-                 jp_gname_for_display(core + 13));
+                 jp_gname_for_display(skip_english_article(core + 13)));
+    } else if (!strncmp(core, "the anger of ", 13)) {
+        Snprintf(outmain, sizeof outmain, "%sの怒り",
+                 jp_gname_for_display(skip_english_article(core + 13)));
+    } else if (strstr(core, "'s anger")) {
+        char gbuf[BUFSZ];
+        const char *p = strstr(core, "'s anger");
+        size_t glen = p - core;
+        if (glen < sizeof gbuf) {
+            memcpy(gbuf, core, glen);
+            gbuf[glen] = '\0';
+            Snprintf(outmain, sizeof outmain, "%sの怒り",
+                     jp_gname_for_display(skip_english_article(gbuf)));
+        } else {
+            Snprintf(outmain, sizeof outmain, "神の怒り");
+        }
+    } else if (strstr(core, "'s wrath")) {
+        char gbuf[BUFSZ];
+        const char *p = strstr(core, "'s wrath");
+        size_t glen = p - core;
+        if (glen < sizeof gbuf) {
+            memcpy(gbuf, core, glen);
+            gbuf[glen] = '\0';
+            Snprintf(outmain, sizeof outmain, "%sの怒り",
+                     jp_gname_for_display(skip_english_article(gbuf)));
+        } else {
+            Snprintf(outmain, sizeof outmain, "神の怒り");
+        }
     } else if (strstr(core, " indifference")) {
         char gbuf[BUFSZ];
         const char *p = strstr(core, " indifference");
@@ -1133,8 +1280,43 @@ jp_translate_killer_text_for_display(
         Snprintf(outmain, sizeof outmain, "中断した（%s）", core + 5);
     } else if (!strncmp(core, "died", 4)) {
         Snprintf(outmain, sizeof outmain, "死亡した");
+    } else if (strstr(core, " own player")) {
+        Snprintf(outmain, sizeof outmain, "自分自身のプレイヤー");
+    } else if (!strcmpi(core, "committed suicide")) {
+        Snprintf(outmain, sizeof outmain, "自殺");
+    } else if (!strcmpi(core, "went to heaven prematurely")) {
+        Snprintf(outmain, sizeof outmain, "早すぎる天国への旅");
     } else {
-        Snprintf(outmain, sizeof outmain, "%s", core);
+        const char *mname = skip_english_article(core);
+        int mndx, gend, otyp, artinum;
+
+        artinum = jp_artiname_to_num(mname);
+        if (artinum > 0) {
+            Snprintf(outmain, sizeof outmain, "%sで倒された", jp_artiname(artinum));
+        } else if ((mndx = name_to_mon(mname, &gend)) >= LOW_PM && mndx < NUMMONS) {
+            Snprintf(outmain, sizeof outmain, "%sに倒された", jp_pmname_from_idx(mndx, 0));
+        } else if ((otyp = name_to_otyp(mname)) >= 0 && otyp < NUM_OBJECTS) {
+            Snprintf(outmain, sizeof outmain, "%sで倒された", jp_item_name(otyp));
+        } else if (strstr(mname, "'s ghost") || strstr(mname, "'s shade")) {
+            char gbuf[BUFSZ];
+            const char *p = strstr(mname, "'s ");
+            size_t glen = p - mname;
+            if (glen < sizeof gbuf) {
+                memcpy(gbuf, mname, glen);
+                gbuf[glen] = '\0';
+                const char *gm = skip_english_article(gbuf);
+                int gmndx = name_to_mon(gm, &gend);
+                if (gmndx >= LOW_PM && gmndx < NUMMONS) {
+                    Snprintf(outmain, sizeof outmain, "%sの幽霊に倒された", jp_pmname_from_idx(gmndx, 0));
+                } else {
+                    Snprintf(outmain, sizeof outmain, "%sに倒された", mname);
+                }
+            } else {
+                Snprintf(outmain, sizeof outmain, "%sに倒された", mname);
+            }
+        } else {
+            Snprintf(outmain, sizeof outmain, "%s", core);
+        }
     }
 
     if (*wieldingbuf) {

@@ -2882,7 +2882,7 @@ lifesaved_monster(struct monst *mtmp)
         if (!surviver) {
             /* genocided monster can't be life-saved */
             if (cansee(mtmp->mx, mtmp->my))
-                pline("残念ながら、%sはまだ抹殺されたままだ...",
+                pline("残念ながら、%sはまだ虐殺されたままだ...",
                       l_monnam(mtmp));
             mtmp->mhp = 0;
         }
