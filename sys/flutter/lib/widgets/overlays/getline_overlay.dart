@@ -31,18 +31,31 @@ class GetLineOverlay extends StatefulWidget {
 class _GetLineOverlayState extends State<GetLineOverlay> {
   late TextEditingController _extCmdFilterController;
   late List<ExtCmdEntry> _filteredExtCmds;
+  late FocusNode _inputFocusNode;
 
   @override
   void initState() {
     super.initState();
     _extCmdFilterController = TextEditingController();
     _filteredExtCmds = List.from(widget.extCmdList);
+    _inputFocusNode = FocusNode();
   }
 
   @override
   void dispose() {
     _extCmdFilterController.dispose();
+    _inputFocusNode.dispose();
     super.dispose();
+  }
+
+  void _handleShowHistory() {
+    widget.onShowMsgHistory();
+    // 履歴パネルから復帰した際に入力フィールドへのフォーカスを自動復元
+    Future.microtask(() {
+      if (mounted) {
+        _inputFocusNode.requestFocus();
+      }
+    });
   }
 
   @override
@@ -89,6 +102,7 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                     const SizedBox(height: 12),
                     TextField(
                       controller: widget.inputController,
+                      focusNode: _inputFocusNode,
                       autofocus: true,
                       inputFormatters: [Utf8LengthLimitingTextInputFormatter(100)],
                       decoration: InputDecoration(
@@ -181,22 +195,22 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                       ),
                     ],
                     const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 8,
                       children: [
-                        if (widget.isCallOrNamePrompt(widget.prompt))
-                          ElevatedButton.icon(
-                            onPressed: widget.onShowMsgHistory,
-                            icon: const Icon(Icons.history_rounded, size: 16),
-                            label: Text(l10n.history),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blueGrey[900],
-                              foregroundColor: Colors.amber[200],
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                            ),
-                          )
-                        else
-                          const SizedBox.shrink(),
+                        ElevatedButton.icon(
+                          onPressed: _handleShowHistory,
+                          icon: const Icon(Icons.history_rounded, size: 16),
+                          label: Text(l10n.history),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueGrey[900],
+                            foregroundColor: Colors.amber[200],
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          ),
+                        ),
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [

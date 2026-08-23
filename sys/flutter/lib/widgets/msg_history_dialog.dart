@@ -141,9 +141,14 @@ Widget buildMsgHistoryButton({
 
 bool isCallOrNamePrompt(String prompt) {
   if (prompt.isEmpty) return false;
+  final p = prompt.toLowerCase();
   return prompt.contains('何と呼びますか')
       || prompt.contains('何と名付けますか')
       || prompt.contains('名前を付け')
-      || prompt.toLowerCase().contains('call this')
-      || prompt.toLowerCase().contains('name this');
+      || p.contains('call ')
+      || p.contains('name ')
+      || p.contains('call this')
+      || p.contains('name this')
+      || p.contains('what do you want to call')
+      || p.contains('what do you want to name');
 }
