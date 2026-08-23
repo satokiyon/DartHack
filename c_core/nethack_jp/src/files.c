@@ -1466,6 +1466,23 @@ plname_from_file(
             ln = (unsigned) PL_NSIZ_PLUS;
             result = memset((genericptr_t) alloc(ln), '\0', ln);
             get_plname_from_file(nhfp, result, FALSE);
+            if (result) {
+                char mode = result[PL_NSIZ_PLUS - 1];
+                char *first_dash = strchr(result, '-');
+                if (first_dash) *first_dash = '\0';
+                if (mode == 'a' || mode == 'x' || mode == 'd') {
+                    if (strncmp(result, "[自動セーブ] ", 18) != 0 && strncmp(result, "[Autosave] ", 11) != 0) {
+                        extern int g_language_is_jp;
+                        const char *prefix = (g_language_is_jp == 1) ? "[自動セーブ] " : "[Autosave] ";
+                        size_t new_len = strlen(prefix) + strlen(result) + 1;
+                        char *new_res = (char *) alloc(new_len);
+                        Strcpy(new_res, prefix);
+                        Strcat(new_res, result);
+                        free(result);
+                        result = new_res;
+                    }
+                }
+            }
         }
         close_nhfile(nhfp);
     }

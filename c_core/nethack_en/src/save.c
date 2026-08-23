@@ -1158,16 +1158,23 @@ store_plname_in_file(NHFILE *nhfp)
     int plsiztmp = (int) sizeof hero;
 
     (void) memset((genericptr_t) hero, '\0', sizeof hero);
+    const char *clean_plname = svp.plname;
+    if (strncmp(clean_plname, "[自動セーブ] ", 18) == 0) {
+        clean_plname += 18;
+    } else if (strncmp(clean_plname, "[Autosave] ", 11) == 0) {
+        clean_plname += 11;
+    }
+
     /* augment svp.plname[]; the gender and alignment values reflect those
        in effect at time of saving rather than at start of game */
     Snprintf(hero, sizeof hero, "%s-%.3s-%.3s-%.3s-%.3s",
-            svp.plname, gu.urole.filecode,
+            clean_plname, gu.urole.filecode,
             gu.urace.filecode, genders[flags.female].filecode,
             aligns[1 - u.ualign.type].filecode);
     /* replace "-role-race..." with "\0role-race..." so that we can include
        or exclude the role-&c suffix easily, without worrying about whether
        plname contains any dashes; but don't rely on snprintf() for this */
-    hero[strlen(svp.plname)] = '\0';
+    hero[strlen(clean_plname)] = '\0';
     /* insert playmode into final slot of hero[];
        'D','X','-' are the same characters as are used for paniclog entries */
     assert(hero[PL_NSIZ_PLUS - 1 - 1] == '\0');

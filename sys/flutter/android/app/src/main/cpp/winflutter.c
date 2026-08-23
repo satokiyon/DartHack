@@ -1001,27 +1001,10 @@ static void flutter_askname(void) {
     int idx = 0;
     while (saves && saves[idx]) {
         debuglog("flutter_askname: saves[%d] = '%s'", idx, saves[idx]);
-        size_t slen = strlen(saves[idx]);
-        int is_auto = 0;
-        if (slen >= PL_NSIZ_PLUS) {
-            char m = saves[idx][PL_NSIZ_PLUS - 1];
-            if (m == 'a' || m == 'x' || m == 'd') {
-                is_auto = 1;
-            }
-        }
-
-        char* first_del = strchr(saves[idx], '-');
-        if (first_del) *first_del = '\0';
-
         if (idx > 0) {
-            strcat(saves_buf, ";");
+            strncat(saves_buf, ";", sizeof(saves_buf) - strlen(saves_buf) - 1);
         }
-
-        if (is_auto) {
-            const char* prefix = (g_language_is_jp == 1) ? "[自動セーブ] " : "[Autosave] ";
-            strcat(saves_buf, prefix);
-        }
-        strcat(saves_buf, saves[idx]);
+        strncat(saves_buf, saves[idx], sizeof(saves_buf) - strlen(saves_buf) - 1);
         idx++;
     }
     
@@ -1061,10 +1044,15 @@ static void flutter_askname(void) {
 
     if (g_askname_mode != 2) {
         const char *name_ptr = g_askname_result;
-        if (strncmp(name_ptr, "[自動セーブ] ", 19) == 0) {
-            name_ptr += 19;
-        } else if (strncmp(name_ptr, "[Autosave] ", 11) == 0) {
-            name_ptr += 11;
+        const char *prefix_jp = "[自動セーブ] ";
+        const char *prefix_en = "[Autosave] ";
+        size_t len_jp = strlen(prefix_jp);
+        size_t len_en = strlen(prefix_en);
+
+        if (strncmp(name_ptr, prefix_jp, len_jp) == 0) {
+            name_ptr += len_jp;
+        } else if (strncmp(name_ptr, prefix_en, len_en) == 0) {
+            name_ptr += len_en;
         }
         strncpy(svp.plname, name_ptr, sizeof(svp.plname) - 1);
         svp.plname[sizeof(svp.plname) - 1] = '\0';
