@@ -255,30 +255,23 @@ genl_outrip(winid tmpwin, int how, time_t when)
             i0 = byte_idx;
         } else if (is_last_line) {
             /* 4行目（最終行）で、まだテキストが残っている場合：
-               省略記号（日本語 "…" 2幅、英語 "..." 3幅）を付与して切り詰める */
-            const char *ellipsis = g_language_is_jp ? "…" : "...";
+               省略記号（"…" 2表示幅）を付与して切り詰める */
+            const char *ellipsis = "…";
             int ellipsis_w = rip_utf8_str_width(ellipsis);
             int target_w = STONE_LINE_LEN - ellipsis_w;
 
             int e_byte = 0;
             int e_width = 0;
-            int e_last_space = 0;
             while (dpx[e_byte] != '\0') {
                 unsigned cp = rip_utf8_decode(&dpx[e_byte], &seqlen);
                 int char_w = rip_utf8_char_width(cp);
                 if (e_width + char_w > target_w)
                     break;
-                if (cp == ' ')
-                    e_last_space = e_byte + seqlen;
                 e_width += char_w;
                 e_byte += seqlen;
             }
 
-            if (!g_language_is_jp && e_last_space > 0) {
-                i0 = e_last_space;
-            } else {
-                i0 = e_byte;
-            }
+            i0 = e_byte;
 
             char linebuf[BUFSZ];
             int copylen = (i0 < (int)sizeof(linebuf) - 8) ? i0 : (int)sizeof(linebuf) - 8;
@@ -291,7 +284,7 @@ genl_outrip(winid tmpwin, int how, time_t when)
         } else {
             /* 途中で切れる場合 */
             if (last_space_byte > 0) {
-                if (g_language_is_jp && last_space_width < 10 && count_width >= 12) {
+                if (last_space_width < 10 && count_width >= 12) {
                     i0 = byte_idx;
                 } else {
                     i0 = last_space_byte;
