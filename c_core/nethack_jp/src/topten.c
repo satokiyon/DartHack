@@ -1279,6 +1279,10 @@ jp_translate_killer_text_for_display(
         Snprintf(outmain, sizeof outmain, "中断した（%s）", core + 5);
     } else if (!strncmp(core, "died", 4)) {
         Snprintf(outmain, sizeof outmain, "死亡した");
+    } else if (!strcmpi(core, "trickery")) {
+        Snprintf(outmain, sizeof outmain, "不正行為");
+    } else if (!strcmpi(core, "panic")) {
+        Snprintf(outmain, sizeof outmain, "パニック");
     } else if (strstr(core, " own player")) {
         Snprintf(outmain, sizeof outmain, "自分自身のプレイヤー");
     } else if (!strcmpi(core, "committed suicide")) {
