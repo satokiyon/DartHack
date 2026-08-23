@@ -30,8 +30,11 @@ class TopTenEntry {
     while (index < lines.length) {
       final rawLine = lines[index];
       final trimmed = rawLine.trim();
+      final trimmedLower = trimmed.toLowerCase();
 
-      if (trimmed.isEmpty || (trimmed.contains('順位') && trimmed.contains('点数') && trimmed.contains('名前'))) {
+      if (trimmed.isEmpty ||
+          (trimmed.contains('順位') && trimmed.contains('点数') && trimmed.contains('名前')) ||
+          (trimmedLower.contains('no') && trimmedLower.contains('points') && trimmedLower.contains('name'))) {
         index++;
         continue;
       }
@@ -46,10 +49,35 @@ class TopTenEntry {
         String nameAndProfile = rest.trim();
         String inlineDeathPart = '';
 
-        final profileMatch = profileRegex.firstMatch(rest);
-        if (profileMatch != null) {
-          nameAndProfile = profileMatch.group(1)!.trim();
-          inlineDeathPart = profileMatch.group(2)!.trim();
+        final profileMatchSlash = profileRegex.firstMatch(rest);
+        final hyphenRegex = RegExp(r'^([^\s\-]+)\-([^\s\-]+(?:\-[^\s\-]+){2,4})(?:\s+(.*))?$');
+        final profileMatchHyphen = hyphenRegex.firstMatch(rest);
+
+        if (profileMatchSlash != null) {
+          nameAndProfile = profileMatchSlash.group(1)!.trim();
+          inlineDeathPart = profileMatchSlash.group(2)!.trim();
+        } else if (profileMatchHyphen != null) {
+          final rawName = profileMatchHyphen.group(1)!.trim();
+          final profileStr = profileMatchHyphen.group(2)!.trim();
+          inlineDeathPart = (profileMatchHyphen.group(3) ?? '').trim();
+
+          final parts = profileStr.split('-');
+          final translatedParts = <String>[];
+          for (int pIdx = 0; pIdx < parts.length; pIdx++) {
+            final code = parts[pIdx];
+            if (pIdx == 0) {
+              translatedParts.add(_translateRoleCode(code, false));
+            } else if (pIdx == 1) {
+              translatedParts.add(_translateRaceCode(code, false));
+            } else if (pIdx == 2) {
+              translatedParts.add(_translateGendCode(code, false));
+            } else if (pIdx == 3) {
+              translatedParts.add(_translateAlignCode(code, false));
+            } else {
+              translatedParts.add(code);
+            }
+          }
+          nameAndProfile = '$rawName ${translatedParts.join(' / ')}';
         }
 
         final attr = index < attrs.length ? attrs[index] : 0;
@@ -62,15 +90,27 @@ class TopTenEntry {
         if (index + 1 < lines.length) {
           var nextLine = lines[index + 1];
           final hpMatch = hpSuffixRegExp.firstMatch(nextLine);
+          bool consumedNextLine = false;
+
           if (hpMatch != null) {
             final hpVal = hpMatch.group(1);
             final maxHpVal = hpMatch.group(2);
             hpInfo = 'HP/最大HP: $hpVal/$maxHpVal';
             nextLine = nextLine.substring(0, hpMatch.start);
+            consumedNextLine = true;
           }
+
           final nextTrimmed = nextLine.trim();
-          if (nextTrimmed.isNotEmpty && !entryRegExp.hasMatch(nextLine) && !nextTrimmed.contains('順位')) {
+          final nextTrimmedLower = nextTrimmed.toLowerCase();
+          final isHeaderLine = nextTrimmed.contains('順位') ||
+              (nextTrimmedLower.contains('no') && nextTrimmedLower.contains('points'));
+
+          if (nextTrimmed.isNotEmpty && !entryRegExp.hasMatch(nextLine) && !isHeaderLine) {
             deathDetailPart = nextTrimmed;
+            consumedNextLine = true;
+          }
+
+          if (consumedNextLine) {
             index++; // 2行目を消費
           }
         }

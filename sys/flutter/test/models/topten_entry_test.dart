@@ -47,5 +47,41 @@ void main() {
         'HP/最大HP: 16/16',
       ]);
     });
+
+    test('英語モードのスコアボードヘッダーとハイフンプロフィールの正しいパース', () {
+      final inputLines = [
+        ' No  Points     Name',
+        '  1      12345  satok-Wiz-Elf-Mal-Cha died in The Dungeons of Doom on level 5.',
+        '                Killed by a goblin. - [25]',
+        '  2       6789  hero-Kni-Hum-Fem-Law quit in The Dungeons of Doom on level 2.',
+        '                12 [30]',
+      ];
+      final attrs = List.filled(inputLines.length, 0);
+      attrs[1] = 1; // ATR_BOLD for current game
+
+      final entries = TopTenEntry.parse(inputLines, attrs);
+
+      expect(entries.length, 2);
+
+      // Entry 1
+      expect(entries[0].rank, 1);
+      expect(entries[0].score, '12345');
+      expect(entries[0].nameAndProfile, 'satok Wizard / Elf / Male / Chaotic');
+      expect(entries[0].isCurrent, true);
+      expect(entries[0].details, [
+        'died in The Dungeons of Doom on level 5. Killed by a goblin.',
+        'HP/最大HP: -/25',
+      ]);
+
+      // Entry 2
+      expect(entries[1].rank, 2);
+      expect(entries[1].score, '6789');
+      expect(entries[1].nameAndProfile, 'hero Knight / Human / Female / Lawful');
+      expect(entries[1].isCurrent, false);
+      expect(entries[1].details, [
+        'quit in The Dungeons of Doom on level 2.',
+        'HP/最大HP: 12/30',
+      ]);
+    });
   });
 }

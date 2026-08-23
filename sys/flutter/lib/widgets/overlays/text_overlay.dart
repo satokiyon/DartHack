@@ -102,10 +102,11 @@ class TextOverlay extends StatelessWidget {
                       );
                     }
 
-                    final isTopTen = textLines.any((line) =>
-                        line.contains('順位') &&
-                        line.contains('点数') &&
-                        line.contains('名前'));
+                    final isTopTen = textLines.any((line) {
+                      final l = line.toLowerCase();
+                      return (line.contains('順位') && line.contains('点数') && line.contains('名前')) ||
+                          (l.contains('no') && l.contains('points') && l.contains('name'));
+                    });
 
                     if (isTopTen) {
                       final data = TopTenEntry.parse(textLines, textAttrs);
