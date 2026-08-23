@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-23. */
 /* NetHack 5.0	rip.c	$NHDT-Date: 1781973064 2026/06/20 16:31:04 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
@@ -136,6 +136,28 @@ rip_utf8_str_width(const char *str)
     return w;
 }
 
+/* UTF-8 文字列を指定表示幅 max_width に収まるよう文字境界で切り詰める */
+staticfn void
+rip_truncate_utf8_width(char *dst, const char *src, int max_width)
+{
+    int current_width = 0;
+    const char *p = src;
+    char *d = dst;
+    int seqlen = 0;
+
+    while (*p != '\0') {
+        unsigned cp = rip_utf8_decode(p, &seqlen);
+        int w = rip_utf8_char_width(cp);
+        if (current_width + w > max_width)
+            break;
+        for (int i = 0; i < seqlen; i++) {
+            *d++ = *p++;
+        }
+        current_width += w;
+    }
+    *d = '\0';
+}
+
 staticfn void
 center(int line, char *text)
 {
@@ -175,8 +197,8 @@ genl_outrip(winid tmpwin, int how, time_t when)
     }
     dp[x] = (char *) 0;
 
-    /* Put name on stone */
-    Sprintf(buf, "%.*s", (int) STONE_LINE_LEN, svp.plname);
+    /* Put name on stone (UTF-8 表示幅 16 カラム内で安全切断) */
+    rip_truncate_utf8_width(buf, svp.plname, STONE_LINE_LEN);
     center(NAME_LINE, buf);
 
     /* Put $ on stone */
@@ -196,6 +218,16 @@ genl_outrip(winid tmpwin, int how, time_t when)
         int i0 = 0;
         int count_width = 0;
         int last_space_byte = 0;
+        int last_space_width = 0;
+        boolean is_last_line = (line == YEAR_LINE - 1);
+
+        /* 先頭の余分なスペースをスキップ */
+        while (*dpx == ' ')
+            dpx++;
+
+        if (*dpx == '\0') {
+            break;
+        }
 
         /* 文字境界と表示幅を考慮しながら、STONE_LINE_LEN に収まる位置を探す */
         int byte_idx = 0;
@@ -210,6 +242,7 @@ genl_outrip(winid tmpwin, int how, time_t when)
 
             if (cp == ' ') {
                 last_space_byte = byte_idx + seqlen;
+                last_space_width = count_width + char_w;
             }
 
             count_width += char_w;
@@ -220,12 +253,50 @@ genl_outrip(winid tmpwin, int how, time_t when)
         if (dpx[byte_idx] == '\0') {
             /* 文字列全体が収まる場合 */
             i0 = byte_idx;
-        } else {
-            /* 途中で切れる場合：英語のようにスペースがあればそこで切る */
-            if (last_space_byte > 0) {
-                i0 = last_space_byte;
+        } else if (is_last_line) {
+            /* 4行目（最終行）で、まだテキストが残っている場合：
+               省略記号（日本語 "…" 2幅、英語 "..." 3幅）を付与して切り詰める */
+            const char *ellipsis = g_language_is_jp ? "…" : "...";
+            int ellipsis_w = rip_utf8_str_width(ellipsis);
+            int target_w = STONE_LINE_LEN - ellipsis_w;
+
+            int e_byte = 0;
+            int e_width = 0;
+            int e_last_space = 0;
+            while (dpx[e_byte] != '\0') {
+                unsigned cp = rip_utf8_decode(&dpx[e_byte], &seqlen);
+                int char_w = rip_utf8_char_width(cp);
+                if (e_width + char_w > target_w)
+                    break;
+                if (cp == ' ')
+                    e_last_space = e_byte + seqlen;
+                e_width += char_w;
+                e_byte += seqlen;
+            }
+
+            if (!g_language_is_jp && e_last_space > 0) {
+                i0 = e_last_space;
             } else {
-                /* スペースがない場合は表示幅の上限での境界で切る */
+                i0 = e_byte;
+            }
+
+            char linebuf[BUFSZ];
+            int copylen = (i0 < (int)sizeof(linebuf) - 8) ? i0 : (int)sizeof(linebuf) - 8;
+            (void) memcpy(linebuf, dpx, copylen);
+            linebuf[copylen] = '\0';
+            Strcat(linebuf, ellipsis);
+            center(line, linebuf);
+            dpx += strlen(dpx);
+            continue;
+        } else {
+            /* 途中で切れる場合 */
+            if (last_space_byte > 0) {
+                if (g_language_is_jp && last_space_width < 10 && count_width >= 12) {
+                    i0 = byte_idx;
+                } else {
+                    i0 = last_space_byte;
+                }
+            } else {
                 i0 = byte_idx;
             }
         }
@@ -244,7 +315,6 @@ genl_outrip(winid tmpwin, int how, time_t when)
             dpx[i0] = tmpchar;
             dpx = &dpx[i0];
         } else {
-            /* 区切りがスペースだった場合は、スペースをスキップ */
             dpx[i0] = tmpchar;
             dpx = &dpx[i0 + 1];
         }
