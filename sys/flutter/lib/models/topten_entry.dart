@@ -224,6 +224,51 @@ String _translateAlignCode(String code, bool isJp) {
   return code;
 }
 
+String _translateDungeonName(int dnum, bool isJp) {
+  if (!isJp) {
+    switch (dnum) {
+      case 0:
+        return 'The Dungeons of Doom';
+      case 1:
+        return 'Gehennom';
+      case 2:
+        return 'The Gnomish Mines';
+      case 3:
+        return 'The Quest';
+      case 4:
+        return 'Sokoban';
+      case 5:
+        return 'Fort Ludios';
+      case 6:
+        return "Vlad's Tower";
+      case 7:
+        return 'The Elemental Planes';
+      default:
+        return 'Dungeon';
+    }
+  }
+  switch (dnum) {
+    case 0:
+      return '運命の大迷宮';
+    case 1:
+      return 'ゲヘナ';
+    case 2:
+      return 'ノームの鉱山';
+    case 3:
+      return 'クエスト';
+    case 4:
+      return '倉庫番';
+    case 5:
+      return 'ローディオス砦';
+    case 6:
+      return 'ヴラド侯の塔';
+    case 7:
+      return '精霊界';
+    default:
+      return 'ダンジョン';
+  }
+}
+
 String _translateDeathText(String death, bool isJp) {
   if (!isJp) {
     if (death == 'quit') return 'Quit';
@@ -258,7 +303,7 @@ List<TopTenEntry> parseRecordFile(String filePath, {bool isJp = true}) {
       if (parts.length < 15) continue;
 
       final points = int.tryParse(parts[1]) ?? 0;
-      final dnum = int.tryParse(parts[2]) ?? 1;
+      final dnum = int.tryParse(parts[2]) ?? 0;
       final dlev = int.tryParse(parts[3]) ?? 1;
       final maxlvl = int.tryParse(parts[4]) ?? 1;
       final hp = int.tryParse(parts[5]) ?? 0;
@@ -308,18 +353,19 @@ List<TopTenEntry> parseRecordFile(String filePath, {bool isJp = true}) {
       final nameAndProfile = '${e.name} $profile';
 
       final deathStr = _translateDeathText(e.death, isJp);
+      final dungeonName = _translateDungeonName(e.dnum, isJp);
       final details = <String>[];
       if (isJp) {
         if (deathStr.isNotEmpty) {
-          details.add('$deathStr (メインダンジョン ${e.dlev}階)');
+          details.add('$deathStr ($dungeonName ${e.dlev}階)');
         } else {
-          details.add('メインダンジョン ${e.dlev}階 [HP: ${e.hp}/${e.maxhp}]');
+          details.add('$dungeonName ${e.dlev}階 [HP: ${e.hp}/${e.maxhp}]');
         }
       } else {
         if (deathStr.isNotEmpty) {
-          details.add('$deathStr (Dungeon level ${e.dlev})');
+          details.add('$deathStr ($dungeonName level ${e.dlev})');
         } else {
-          details.add('Dungeon level ${e.dlev} [HP: ${e.hp}/${e.maxhp}]');
+          details.add('$dungeonName level ${e.dlev} [HP: ${e.hp}/${e.maxhp}]');
         }
       }
 
