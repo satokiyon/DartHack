@@ -158,28 +158,6 @@ rip_truncate_utf8_width(char *dst, const char *src, int max_width)
     *d = '\0';
 }
 
-/* UTF-8 文字列を指定表示幅 max_width に収まるよう文字境界で切り詰める */
-staticfn void
-rip_truncate_utf8_width(char *dst, const char *src, int max_width)
-{
-    int current_width = 0;
-    const char *p = src;
-    char *d = dst;
-    int seqlen = 0;
-
-    while (*p != '\0') {
-        unsigned cp = rip_utf8_decode(p, &seqlen);
-        int w = rip_utf8_char_width(cp);
-        if (current_width + w > max_width)
-            break;
-        for (int i = 0; i < seqlen; i++) {
-            *d++ = *p++;
-        }
-        current_width += w;
-    }
-    *d = '\0';
-}
-
 staticfn void
 center(int line, char *text)
 {
