@@ -115,14 +115,43 @@ genl_outrip(winid tmpwin, int how, time_t when)
     /* Put death type on stone */
     for (line = DEATH_LINE, dpx = buf; line < YEAR_LINE; line++) {
         char tmpchar;
-        int i, i0 = (int) strlen(dpx);
+        int i, i0;
+        boolean is_last_line = (line == YEAR_LINE - 1);
+
+        while (*dpx == ' ')
+            dpx++;
+
+        if (*dpx == '\0')
+            break;
+
+        i0 = (int) strlen(dpx);
 
         if (i0 > STONE_LINE_LEN) {
-            for (i = STONE_LINE_LEN; (i > 0) && (i0 > STONE_LINE_LEN); --i)
-                if (dpx[i] == ' ')
-                    i0 = i;
-            if (!i)
-                i0 = STONE_LINE_LEN;
+            if (is_last_line) {
+                /* 4th line overflow: append '...' to fit within STONE_LINE_LEN (16) */
+                int target_w = STONE_LINE_LEN - 3; /* 13 chars */
+                int e_i = target_w;
+                for (i = target_w; i > 0; --i) {
+                    if (dpx[i] == ' ') {
+                        e_i = i;
+                        break;
+                    }
+                }
+                char linebuf[BUFSZ];
+                int copylen = (e_i < (int)sizeof(linebuf) - 8) ? e_i : (int)sizeof(linebuf) - 8;
+                (void) memcpy(linebuf, dpx, copylen);
+                linebuf[copylen] = '\0';
+                Strcat(linebuf, "...");
+                center(line, linebuf);
+                dpx += strlen(dpx);
+                continue;
+            } else {
+                for (i = STONE_LINE_LEN; (i > 0) && (i0 > STONE_LINE_LEN); --i)
+                    if (dpx[i] == ' ')
+                        i0 = i;
+                if (!i)
+                    i0 = STONE_LINE_LEN;
+            }
         }
         tmpchar = dpx[i0];
         dpx[i0] = 0;
