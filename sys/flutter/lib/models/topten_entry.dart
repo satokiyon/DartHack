@@ -269,6 +269,39 @@ String _translateDungeonName(int dnum, bool isJp) {
   }
 }
 
+String _translateEndgameLevel(int dlev, bool isJp) {
+  if (!isJp) {
+    switch (dlev) {
+      case -5:
+        return 'Astral Plane';
+      case -4:
+        return 'Plane of Water';
+      case -3:
+        return 'Plane of Fire';
+      case -2:
+        return 'Plane of Air';
+      case -1:
+        return 'Plane of Earth';
+      default:
+        return 'Elemental Planes';
+    }
+  }
+  switch (dlev) {
+    case -5:
+      return 'アストラル界';
+    case -4:
+      return '水の精霊界';
+    case -3:
+      return '火の精霊界';
+    case -2:
+      return '風の精霊界';
+    case -1:
+      return '地の精霊界';
+    default:
+      return '精霊界';
+  }
+}
+
 String _translateDeathText(String death, bool isJp) {
   if (!isJp) {
     if (death == 'quit') return 'Quit';
@@ -353,19 +386,26 @@ List<TopTenEntry> parseRecordFile(String filePath, {bool isJp = true}) {
       final nameAndProfile = '${e.name} $profile';
 
       final deathStr = _translateDeathText(e.death, isJp);
-      final dungeonName = _translateDungeonName(e.dnum, isJp);
+      String locationStr;
+      if (e.dnum == 7 || e.dlev < 0) {
+        locationStr = _translateEndgameLevel(e.dlev, isJp);
+      } else {
+        final dungeonName = _translateDungeonName(e.dnum, isJp);
+        locationStr = isJp ? '$dungeonName ${e.dlev}階' : '$dungeonName level ${e.dlev}';
+      }
+
       final details = <String>[];
       if (isJp) {
         if (deathStr.isNotEmpty) {
-          details.add('$deathStr ($dungeonName ${e.dlev}階)');
+          details.add('$deathStr ($locationStr)');
         } else {
-          details.add('$dungeonName ${e.dlev}階 [HP: ${e.hp}/${e.maxhp}]');
+          details.add('$locationStr [HP: ${e.hp}/${e.maxhp}]');
         }
       } else {
         if (deathStr.isNotEmpty) {
-          details.add('$deathStr ($dungeonName level ${e.dlev})');
+          details.add('$deathStr ($locationStr)');
         } else {
-          details.add('$dungeonName level ${e.dlev} [HP: ${e.hp}/${e.maxhp}]');
+          details.add('$locationStr [HP: ${e.hp}/${e.maxhp}]');
         }
       }
 

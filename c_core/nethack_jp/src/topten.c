@@ -2398,19 +2398,19 @@ outentry(int rank, struct toptenentry *t1, boolean so)
 
                 switch (t1->deathlev) {
                 case -5:
-                    arg = "星界";
+                    arg = "アストラル界";
                     break;
                 case -4:
-                    arg = "水界";
+                    arg = "水の精霊界";
                     break;
                 case -3:
-                    arg = "火界";
+                    arg = "火の精霊界";
                     break;
                 case -2:
-                    arg = "風界";
+                    arg = "風の精霊界";
                     break;
                 case -1:
-                    arg = "地界";
+                    arg = "地の精霊界";
                     break;
                 default:
                     arg = "虚無";
