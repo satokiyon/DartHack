@@ -289,12 +289,7 @@ do_autosave(void)
         nhfp->rcount = nhfp->wcount = 0L;
     }
 
-    vision_recalc(2);
-
-    if (flags.moonphase == FULL_MOON)
-        change_luck(-1);
-    if (flags.friday13)
-        change_luck(1);
+    /* オートセーブ中は視界を停止させず、ゲーム状態を安全に維持する */
 
     nhfp->mode = WRITING; /* FREEING は含めないことでメモリを解放しない */
 
@@ -306,15 +301,10 @@ do_autosave(void)
     savelev(nhfp, ledger_no(&u.uz));
     savegamestate(nhfp);
 
-    gu.uz_save = u.uz;
-    u.uz.dnum = u.uz.dlevel = 0;
-    set_ustuck((struct monst *) 0);
-    u.usteed = (struct monst *) 0;
-
     /* 他階層の保存: getlev() によるゲームメモリの汚染を避けるため、
        レベルファイルをバイナリコピーでそのまま統合セーブデータへ追加する */
     for (ltmp = (xint8) 1; ltmp <= maxledgerno(); ltmp++) {
-        if (ltmp == ledger_no(&gu.uz_save))
+        if (ltmp == ledger_no(&u.uz))
             continue;
         if (!(svl.level_info[ltmp].flags & LFILE_EXISTS))
             continue;
@@ -352,14 +342,13 @@ do_autosave(void)
     (void) rename(fq_tmp, fq_save);
 #endif
 
-    /* 現在レベルの復元 (ゲームメモリ上の状態を維持するため getlev() によるディスク再読み込みは不要) */
-    u.uz = gu.uz_save;
-    gu.uz_save.dnum = gu.uz_save.dlevel = 0;
-
     res = 1;
 
  done:
+    vision_recalc(0); /* 視界マップを再計算して確実に復元 */
     notice_mon_on();
+    see_monsters();   /* 周囲のモンスターの視認状態を再計算 */
+    newsym(u.ux, u.uy); /* 画面上の主人公周囲の表示を更新 */
     program_state.saving--;
     return res;
 }
@@ -424,17 +413,14 @@ savegamestate(NHFILE *nhfp)
      * only to flag that they are were set, but the pointers
      * must not be dereferenced.
      */
-    if (program_state.in_checkpoint) {
-        /*
-         * It is critical to ensure that u.ustuck_mid and u.usteed_mid
-         * hold current and correct data, in case this is needed by
-         * recover. The pointers, if set, are still pointing at
-         * valid data during a checkpoint operation, unlike during
-         * a synchronized save operation.
-         */
-        u.ustuck_mid = (u.ustuck) ? u.ustuck->m_id : 0;
-        u.usteed_mid = (u.usteed) ? u.usteed->m_id : 0;
-    }
+    /* オートセーブやチェックポイントセーブ時にも u.ustuck_mid / u.usteed_mid / polearm.m_id を確実にセーブデータに記録する */
+    if (u.ustuck)
+        u.ustuck_mid = u.ustuck->m_id;
+    if (u.usteed)
+        u.usteed_mid = u.usteed->m_id;
+    if (svc.context.polearm.hitmon)
+        svc.context.polearm.m_id = svc.context.polearm.hitmon->m_id;
+
     Sfo_you(nhfp, &u, "gamestate-you");
 
     /* clear the in-memory value of these, now that they have been
