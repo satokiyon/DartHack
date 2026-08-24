@@ -130,7 +130,8 @@ class TopTenEntry {
 
         final details = <String>[];
         if (fullDeathText.isNotEmpty) {
-          details.add(fullDeathText);
+          final translatedDeath = _translateDeathText(fullDeathText, true);
+          details.add(translatedDeath);
         }
         if (hpInfo != null) {
           details.add(hpInfo);
@@ -349,6 +350,161 @@ String _stripEnglishArticle(String s) {
   return s;
 }
 
+String _translateMonsterOrItemName(String raw) {
+  var s = _stripEnglishArticle(raw.trim());
+  if (s.isEmpty) return s;
+
+  if (s.startsWith('ghost of ')) {
+    return '${_translateMonsterOrItemName(s.substring(9))}の幽霊';
+  }
+  if (s.startsWith('shade of ')) {
+    return '${_translateMonsterOrItemName(s.substring(9))}の影';
+  }
+  if (s.startsWith('zombie of ')) {
+    return '${_translateMonsterOrItemName(s.substring(10))}のゾンビ';
+  }
+  if (s.startsWith('mummy of ')) {
+    return '${_translateMonsterOrItemName(s.substring(9))}のマミー';
+  }
+  if (s.startsWith('skeleton of ')) {
+    return '${_translateMonsterOrItemName(s.substring(12))}のスケルトン';
+  }
+  if (s.contains("'s ghost") || s.contains("'s shade")) {
+    final idx = s.indexOf("'s ");
+    if (idx != -1) {
+      final base = s.substring(0, idx);
+      final isGhost = s.contains('ghost');
+      return '${_translateMonsterOrItemName(base)}${isGhost ? 'の幽霊' : 'の影'}';
+    }
+  }
+  if (s.startsWith('hallucinatory ')) {
+    return '幻覚の${_translateMonsterOrItemName(s.substring(14))}';
+  }
+  if (s.startsWith('invisible ')) {
+    return '不可視の${_translateMonsterOrItemName(s.substring(10))}';
+  }
+  if (s.startsWith('displaced ')) {
+    return '位置のずれた${_translateMonsterOrItemName(s.substring(10))}';
+  }
+  if (s.startsWith('tame ')) {
+    return 'ペットの${_translateMonsterOrItemName(s.substring(5))}';
+  }
+  if (s.startsWith('peaceful ')) {
+    return '大人しい${_translateMonsterOrItemName(s.substring(9))}';
+  }
+  if (s.endsWith(' zombie')) {
+    return '${_translateMonsterOrItemName(s.substring(0, s.length - 7))}のゾンビ';
+  }
+  if (s.endsWith(' mummy')) {
+    return '${_translateMonsterOrItemName(s.substring(0, s.length - 6))}のマミー';
+  }
+  if (s.endsWith(' skeleton')) {
+    return '${_translateMonsterOrItemName(s.substring(0, s.length - 9))}のスケルトン';
+  }
+
+  if (s.endsWith(' corpse')) {
+    return '${_translateMonsterOrItemName(s.substring(0, s.length - 7))}の死体';
+  }
+  if (s.endsWith(' egg')) {
+    return '${_translateMonsterOrItemName(s.substring(0, s.length - 4))}の卵';
+  }
+  if (s.startsWith('statue of ')) {
+    return '${_translateMonsterOrItemName(s.substring(10))}の石像';
+  }
+  if (s.startsWith('body of ')) {
+    return '${_translateMonsterOrItemName(s.substring(8))}の体';
+  }
+
+  const monsterMap = {
+    'goblin': 'ゴブリン',
+    'hobgoblin': 'ホブゴブリン',
+    'goblin leader': 'ゴブリンの首領',
+    'kobold': 'コボルド',
+    'large kobold': '大型コボルド',
+    'kobold lord': 'コボルドの君主',
+    'kobold shaman': 'コボルドの呪術師',
+    'orc': 'オーク',
+    'hill orc': '丘オーク',
+    'orc captain': 'オークの隊長',
+    'orc shaman': 'オークの呪術師',
+    'mirkwood orc': '闇の森のオーク',
+    'mirkwood spider': '闇の森のクモ',
+    'watchman': 'ウォッチマン',
+    'watch captain': '警備隊長',
+    'shopkeeper': '店主',
+    'jackal': 'ジャッカル',
+    'fox': 'キツネ',
+    'coyote': 'コヨーテ',
+    'werejackal': '狼人間（ジャッカル）',
+    'little dog': '子犬',
+    'dog': '犬',
+    'large dog': '大型犬',
+    'kitten': '子猫',
+    'housecat': '猫',
+    'large cat': '大型猫',
+    'cave spider': '洞窟クモ',
+    'giant spider': '巨大クモ',
+    'grid bug': 'グリッドバグ',
+    'giant ant': '巨大アリ',
+    'soldier ant': '兵隊アリ',
+    'fire ant': '火アリ',
+    'floating eye': '浮遊する目',
+    'lichen': '地衣類',
+    'newt': 'イモリ',
+    'gecko': 'ヤモリ',
+    'iguana': 'イグアナ',
+    'chameleon': 'カメレオン',
+    'crocodile': 'ワニ',
+    'baby dragon': '赤ん坊ドラゴン',
+    'dragon': 'ドラゴン',
+    'red dragon': 'レッドドラゴン',
+    'blue dragon': 'ブルードラゴン',
+    'white dragon': 'ホワイトドラゴン',
+    'black dragon': 'ブラックドラゴン',
+    'green dragon': 'グリーンドラゴン',
+    'yellow dragon': 'イエロードラゴン',
+    'orange dragon': 'オレンジドラゴン',
+    'gray dragon': 'グレードラゴン',
+    'silver dragon': 'シルバードラゴン',
+    'cockatrice': 'コッカトリス',
+    'chickatrice': 'ヒヨッカトリス',
+    'pyrolisk': 'パイロリスク',
+    'gargoyle': 'ガーゴイル',
+    'wingless gargoyle': '羽無しのガーゴイル',
+    'golem': 'ゴーレム',
+    'straw golem': '藁ゴーレム',
+    'rope golem': '縄ゴーレム',
+    'leather golem': '革ゴーレム',
+    'wood golem': '木ゴーレム',
+    'flesh golem': '肉ゴーレム',
+    'clay golem': '土ゴーレム',
+    'stone golem': '石ゴーレム',
+    'glass golem': 'ガラスゴーレム',
+    'iron golem': '鉄ゴーレム',
+    'wizard': '魔法使い',
+    'archeologist': '考古学者',
+    'barbarian': '野蛮人',
+    'caveman': '洞窟人',
+    'cavewoman': '洞窟人',
+    'healer': '師',
+    'knight': '騎士',
+    'monk': '修道士',
+    'priest': '僧侶',
+    'priestess': '僧侶',
+    'rogue': '盗賊',
+    'ranger': '旅人',
+    'samurai': '侍',
+    'tourist': '観光客',
+    'valkyrie': 'バルキリー',
+  };
+
+  if (monsterMap.containsKey(s)) {
+    return monsterMap[s]!;
+  }
+
+  return s;
+}
+
 String _translateDeathText(String death, bool isJp) {
   if (death.isEmpty) return death;
   if (!isJp) {
@@ -359,6 +515,49 @@ String _translateDeathText(String death, bool isJp) {
     return death;
   }
 
+  String mainDeath = death.trim();
+  String locSuffix = '';
+
+  int cutIdx = -1;
+  final parenIdx = mainDeath.lastIndexOf(' (');
+  final jpParenIdx = mainDeath.lastIndexOf('（');
+  if (parenIdx != -1) cutIdx = parenIdx;
+  if (jpParenIdx != -1 && (cutIdx == -1 || jpParenIdx > cutIdx)) cutIdx = jpParenIdx;
+
+  if (cutIdx != -1) {
+    locSuffix = mainDeath.substring(cutIdx).trim();
+    mainDeath = mainDeath.substring(0, cutIdx).trim();
+  }
+
+  bool hadDot = mainDeath.endsWith('.');
+  if (hadDot) {
+    mainDeath = mainDeath.substring(0, mainDeath.length - 1).trim();
+  }
+
+  final translatedMain = _translateDeathTextInternal(mainDeath, isJp);
+
+  var result = translatedMain;
+  if (locSuffix.isNotEmpty) {
+    if (locSuffix.startsWith('（')) {
+      result = '$translatedMain$locSuffix';
+    } else {
+      result = '$translatedMain $locSuffix';
+    }
+  }
+
+  if (hadDot && !result.endsWith('.')) {
+    final lastChar = result.codeUnitAt(result.length - 1);
+    if ((lastChar >= 0x61 && lastChar <= 0x7A) ||
+        (lastChar >= 0x41 && lastChar <= 0x5A) ||
+        (lastChar >= 0x30 && lastChar <= 0x39)) {
+      result += '.';
+    }
+  }
+
+  return result;
+}
+
+String _translateDeathTextInternal(String death, bool isJp) {
   const exactMap = {
     'quit': '中断した',
     'starved': '餓死した',
@@ -423,40 +622,100 @@ String _translateDeathText(String death, bool isJp) {
   }
   if (death.startsWith('ascended')) return '昇天した';
 
-  if (death.startsWith('killed by a ')) return '${_stripEnglishArticle(death.substring(12))}に倒された';
-  if (death.startsWith('killed by an ')) return '${_stripEnglishArticle(death.substring(13))}に倒された';
-  if (death.startsWith('killed by ')) return '${_stripEnglishArticle(death.substring(10))}に倒された';
-  if (death.startsWith('petrified by ')) return '${_stripEnglishArticle(death.substring(13))}による石化';
-  if (death.startsWith('turned to slime by ')) return '${_stripEnglishArticle(death.substring(19))}によるスライム化';
-  if (death.startsWith('choked on ')) return '${_stripEnglishArticle(death.substring(10))}で窒息した';
-  if (death.startsWith('poisoned by ')) return '${_stripEnglishArticle(death.substring(12))}で毒に侵された';
-  if (death.startsWith('died of ')) return '${_stripEnglishArticle(death.substring(8))}で死亡した';
-  if (death.startsWith('drowned in ')) return '${_stripEnglishArticle(death.substring(11))}で溺死した';
-  if (death.startsWith('unwisely drank from ')) return '${_stripEnglishArticle(death.substring(20))}から飲んだ不心得';
-  if (death.startsWith('unwisely ate ')) return '無謀にも${_stripEnglishArticle(death.substring(13))}を食べようとした';
+  if (death.startsWith('killed by a ')) {
+    final tr = _translateMonsterOrItemName(death.substring(12));
+    return tr.endsWith('倒された') || tr.endsWith('石化した') || tr.endsWith('死んだ') ? tr : '$trに倒された';
+  }
+  if (death.startsWith('killed by an ')) {
+    final tr = _translateMonsterOrItemName(death.substring(13));
+    return tr.endsWith('倒された') || tr.endsWith('石化した') || tr.endsWith('死んだ') ? tr : '$trに倒された';
+  }
+  if (death.startsWith('killed by ')) {
+    final tr = _translateMonsterOrItemName(death.substring(10));
+    return tr.endsWith('倒された') || tr.endsWith('石化した') || tr.endsWith('死んだ') ? tr : '$trに倒された';
+  }
+  if (death.startsWith('petrified by ')) {
+    final tr = _translateMonsterOrItemName(death.substring(13));
+    return tr.endsWith('石化した') ? tr : '$trによる石化';
+  }
+  if (death.startsWith('turned to slime by ')) {
+    final tr = _translateMonsterOrItemName(death.substring(19));
+    return '$trによるスライム化';
+  }
+  if (death.startsWith('choked on ')) {
+    final tr = _translateMonsterOrItemName(death.substring(10));
+    return '$trで窒息した';
+  }
+  if (death.startsWith('poisoned by ')) {
+    final tr = _translateMonsterOrItemName(death.substring(12));
+    return '$trで毒に侵された';
+  }
+  if (death.startsWith('died of ')) {
+    final tr = _translateMonsterOrItemName(death.substring(8));
+    return '$trで死亡した';
+  }
+  if (death.startsWith('drowned in ')) {
+    final tr = _translateMonsterOrItemName(death.substring(11));
+    return '$trで溺死した';
+  }
+  if (death.startsWith('unwisely drank from ')) {
+    final tr = _translateMonsterOrItemName(death.substring(20));
+    return '$trから飲んだ不心得';
+  }
+  if (death.startsWith('unwisely ate ')) {
+    final tr = _translateMonsterOrItemName(death.substring(13));
+    return '無謀にも$trを食べようとした';
+  }
   if (death.startsWith('kicking ') && death.endsWith(' barefoot')) {
     final item = death.substring(8, death.length - 9);
-    return '裸足で${_stripEnglishArticle(item)}を蹴ったこと';
+    final tr = _translateMonsterOrItemName(item);
+    return '裸足で$trを蹴ったこと';
   }
   if (death.startsWith('throwing ') && death.endsWith(' bare-handed')) {
     final item = death.substring(9, death.length - 12);
-    return '素手で${_stripEnglishArticle(item)}を投げたこと';
+    final tr = _translateMonsterOrItemName(item);
+    return '素手で$trを投げたこと';
   }
   if (death.startsWith('wielding ') && death.endsWith(' bare-handed')) {
     final item = death.substring(9, death.length - 12);
-    return '素手で${_stripEnglishArticle(item)}を装備したこと';
+    final tr = _translateMonsterOrItemName(item);
+    return '素手で$trを装備したこと';
   }
-  if (death.startsWith('caught in own ')) return '自分の${_stripEnglishArticle(death.substring(14))}の爆発に巻き込まれた';
-  if (death.startsWith('caught in a ')) return '${_stripEnglishArticle(death.substring(12))}の爆発に巻き込まれた';
-  if (death.startsWith('caught in an ')) return '${_stripEnglishArticle(death.substring(13))}の爆発に巻き込まれた';
-  if (death.startsWith('caught in ')) return '${_stripEnglishArticle(death.substring(10))}の爆発に巻き込まれた';
+  if (death.startsWith('caught in own ')) {
+    final tr = _translateMonsterOrItemName(death.substring(14));
+    return '自分の$trの爆発に巻き込まれた';
+  }
+  if (death.startsWith('caught in a ')) {
+    final tr = _translateMonsterOrItemName(death.substring(12));
+    return '$trの爆発に巻き込まれた';
+  }
+  if (death.startsWith('caught in an ')) {
+    final tr = _translateMonsterOrItemName(death.substring(13));
+    return '$trの爆発に巻き込まれた';
+  }
+  if (death.startsWith('caught in ')) {
+    final tr = _translateMonsterOrItemName(death.substring(10));
+    return '$trの爆発に巻き込まれた';
+  }
 
-  if (death.startsWith('the wrath of ')) return '${_stripEnglishArticle(death.substring(13))}の怒り';
-  if (death.startsWith('the anger of ')) return '${_stripEnglishArticle(death.substring(13))}の怒り';
-  if (death.contains("'s anger")) return '${_stripEnglishArticle(death.replaceAll("'s anger", ''))}の怒り';
-  if (death.contains("'s wrath")) return '${_stripEnglishArticle(death.replaceAll("'s wrath", ''))}の怒り';
+  if (death.startsWith('the wrath of ')) {
+    final tr = _translateMonsterOrItemName(death.substring(13));
+    return '$trの怒り';
+  }
+  if (death.startsWith('the anger of ')) {
+    final tr = _translateMonsterOrItemName(death.substring(13));
+    return '$trの怒り';
+  }
+  if (death.contains("'s anger")) {
+    final tr = _translateMonsterOrItemName(death.replaceAll("'s anger", ''));
+    return '$trの怒り';
+  }
+  if (death.contains("'s wrath")) {
+    final tr = _translateMonsterOrItemName(death.replaceAll("'s wrath", ''));
+    return '$trの怒り';
+  }
 
-  return death;
+  return _translateMonsterOrItemName(death);
 }
 
 List<TopTenEntry> parseRecordFile(String filePath, {bool isJp = true}) {

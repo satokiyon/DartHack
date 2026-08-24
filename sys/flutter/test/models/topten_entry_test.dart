@@ -83,5 +83,22 @@ void main() {
         'HP/最大HP: 12/30',
       ]);
     });
+
+    test('Cコアから届く英語死因テキストの日本語化フォールバックテスト', () {
+      final inputLines = [
+        '順位      点数  名前                                                   HP[最大]',
+        '  1       1000  Player 魔法使い/人間/男性/秩序 killed by a goblin (運命の大迷宮 5階).',
+        '                                                                       -  [25]',
+        '  2        800  Player 侍/人間/女性/天照大神 killed by a ghost of a wizard (運命の大迷宮 3階).',
+        '                                                                       -  [30]',
+      ];
+      final attrs = List.filled(inputLines.length, 0);
+
+      final entries = TopTenEntry.parse(inputLines, attrs);
+
+      expect(entries.length, 2);
+      expect(entries[0].details[0], contains('ゴブリンに倒された'));
+      expect(entries[1].details[0], contains('魔法使いの幽霊に倒された'));
+    });
   });
 }

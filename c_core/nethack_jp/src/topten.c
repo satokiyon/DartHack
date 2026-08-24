@@ -482,6 +482,170 @@ jp_translate_multi_reason_for_display(
     return out;
 }
 
+staticfn const char *
+jp_translate_killer_name_or_monster(const char *in, char *out, unsigned outsz)
+{
+    char tmp[BUFSZ];
+    const char *p;
+    int mndx, gend, otyp, artinum;
+
+    if (!out || outsz == 0)
+        return "";
+    out[0] = '\0';
+    if (!in || !*in)
+        return out;
+
+    p = skip_english_article(in);
+    Snprintf(tmp, sizeof tmp, "%s", p);
+
+    artinum = jp_artiname_to_num(tmp);
+    if (artinum > 0) {
+        Snprintf(out, outsz, "%s", jp_artiname(artinum));
+        return out;
+    }
+
+    mndx = name_to_mon(tmp, &gend);
+    if (mndx >= LOW_PM && mndx < NUMMONS) {
+        Snprintf(out, outsz, "%s", jp_pmname_from_idx(mndx, 0));
+        return out;
+    }
+
+    otyp = name_to_otyp(tmp);
+    if (otyp >= 0 && otyp < NUM_OBJECTS) {
+        Snprintf(out, outsz, "%s", jp_item_name(otyp));
+        return out;
+    }
+
+    /* 修飾語・名詞句の動的パース */
+    if (!strncmpi(tmp, "ghost of ", 9)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 9, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "%sの幽霊", nbuf);
+        return out;
+    }
+    if (!strncmpi(tmp, "shade of ", 9)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 9, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "%sの影", nbuf);
+        return out;
+    }
+    if (!strncmpi(tmp, "zombie of ", 10)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 10, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "%sのゾンビ", nbuf);
+        return out;
+    }
+    if (!strncmpi(tmp, "mummy of ", 9)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 9, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "%sのマミー", nbuf);
+        return out;
+    }
+    if (!strncmpi(tmp, "skeleton of ", 12)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 12, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "%sのスケルトン", nbuf);
+        return out;
+    }
+
+    if (strstr(tmp, "'s ghost") || strstr(tmp, "'s shade")) {
+        char gbuf[BUFSZ];
+        const char *gp = strstr(tmp, "'s ");
+        size_t glen = gp - tmp;
+        if (glen < sizeof gbuf) {
+            memcpy(gbuf, tmp, glen);
+            gbuf[glen] = '\0';
+            char nbuf[BUFSZ];
+            jp_translate_killer_name_or_monster(gbuf, nbuf, sizeof nbuf);
+            if (strstr(tmp, "ghost"))
+                Snprintf(out, outsz, "%sの幽霊", nbuf);
+            else
+                Snprintf(out, outsz, "%sの影", nbuf);
+            return out;
+        }
+    }
+
+    if (!strncmpi(tmp, "hallucinatory ", 14)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 14, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "幻覚の%s", nbuf);
+        return out;
+    }
+    if (!strncmpi(tmp, "invisible ", 10)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 10, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "不可視の%s", nbuf);
+        return out;
+    }
+    if (!strncmpi(tmp, "displaced ", 10)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 10, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "位置のずれた%s", nbuf);
+        return out;
+    }
+    if (!strncmpi(tmp, "tame ", 5)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 5, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "ペットの%s", nbuf);
+        return out;
+    }
+    if (!strncmpi(tmp, "peaceful ", 9)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 9, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "大人しい%s", nbuf);
+        return out;
+    }
+
+    /* 末尾サフィックスパターン */
+    size_t tlen = strlen(tmp);
+    if (tlen > 7 && !strcmpi(tmp + tlen - 7, " zombie")) {
+        char base[BUFSZ];
+        size_t blen = tlen - 7;
+        if (blen < sizeof base) {
+            memcpy(base, tmp, blen);
+            base[blen] = '\0';
+            char nbuf[BUFSZ];
+            jp_translate_killer_name_or_monster(base, nbuf, sizeof nbuf);
+            Snprintf(out, outsz, "%sのゾンビ", nbuf);
+            return out;
+        }
+    }
+    if (tlen > 6 && !strcmpi(tmp + tlen - 6, " mummy")) {
+        char base[BUFSZ];
+        size_t blen = tlen - 6;
+        if (blen < sizeof base) {
+            memcpy(base, tmp, blen);
+            base[blen] = '\0';
+            char nbuf[BUFSZ];
+            jp_translate_killer_name_or_monster(base, nbuf, sizeof nbuf);
+            Snprintf(out, outsz, "%sのマミー", nbuf);
+            return out;
+        }
+    }
+    if (tlen > 9 && !strcmpi(tmp + tlen - 9, " skeleton")) {
+        char base[BUFSZ];
+        size_t blen = tlen - 9;
+        if (blen < sizeof base) {
+            memcpy(base, tmp, blen);
+            base[blen] = '\0';
+            char nbuf[BUFSZ];
+            jp_translate_killer_name_or_monster(base, nbuf, sizeof nbuf);
+            Snprintf(out, outsz, "%sのスケルトン", nbuf);
+            return out;
+        }
+    }
+
+    /* 死体・卵・石像などの名詞句 */
+    if (strstr(tmp, " corpse") || strstr(tmp, " egg") || !strncmpi(tmp, "statue of ", 10) || !strncmpi(tmp, "body of ", 8)) {
+        jp_translate_food_or_corpse(out, outsz, tmp);
+        if (*out)
+            return out;
+    }
+
+    Snprintf(out, outsz, "%s", tmp);
+    return out;
+}
+
 void
 jp_translate_killer_text_for_display(
     char *out,
@@ -783,23 +947,14 @@ jp_translate_killer_text_for_display(
             }
         } else {
             char kbuf[BUFSZ];
-            int mndx, gend, otyp;
-            mndx = name_to_mon(killer, &gend);
-            if (mndx >= 0) {
-                Snprintf(kbuf, sizeof kbuf, "%s", jp_pmname_from_idx(mndx, 0));
-            } else {
-                otyp = name_to_otyp(killer);
-                if (otyp >= 0 && otyp < NUM_OBJECTS) {
-                    Snprintf(kbuf, sizeof kbuf, "%s", jp_item_name(otyp));
-                } else {
-                    Snprintf(kbuf, sizeof kbuf, "%s", killer);
-                }
-            }
+            jp_translate_killer_name_or_monster(killer, kbuf, sizeof kbuf);
 
             char *p;
             if ((p = strstr(kbuf, "に触れたこと")) != 0 && p[12] == '\0') {
                 /* 「～に触れたことに倒された」を「～に触れたことで倒された」に改善 */
                 Snprintf(outmain, sizeof outmain, "%sで倒された", kbuf);
+            } else if (strstr(kbuf, "倒された") || strstr(kbuf, "石化した") || strstr(kbuf, "死んだ") || strstr(kbuf, "失敗")) {
+                Snprintf(outmain, sizeof outmain, "%s", kbuf);
             } else {
                 Snprintf(outmain, sizeof outmain, "%sに倒された", kbuf);
             }
@@ -1291,34 +1446,12 @@ jp_translate_killer_text_for_display(
         Snprintf(outmain, sizeof outmain, "早すぎる天国への旅");
     } else {
         const char *mname = skip_english_article(core);
-        int mndx, gend, otyp, artinum;
-
-        artinum = jp_artiname_to_num(mname);
-        if (artinum > 0) {
-            Snprintf(outmain, sizeof outmain, "%sで倒された", jp_artiname(artinum));
-        } else if ((mndx = name_to_mon(mname, &gend)) >= LOW_PM && mndx < NUMMONS) {
-            Snprintf(outmain, sizeof outmain, "%sに倒された", jp_pmname_from_idx(mndx, 0));
-        } else if ((otyp = name_to_otyp(mname)) >= 0 && otyp < NUM_OBJECTS) {
-            Snprintf(outmain, sizeof outmain, "%sで倒された", jp_item_name(otyp));
-        } else if (strstr(mname, "'s ghost") || strstr(mname, "'s shade")) {
-            char gbuf[BUFSZ];
-            const char *p = strstr(mname, "'s ");
-            size_t glen = p - mname;
-            if (glen < sizeof gbuf) {
-                memcpy(gbuf, mname, glen);
-                gbuf[glen] = '\0';
-                const char *gm = skip_english_article(gbuf);
-                int gmndx = name_to_mon(gm, &gend);
-                if (gmndx >= LOW_PM && gmndx < NUMMONS) {
-                    Snprintf(outmain, sizeof outmain, "%sの幽霊に倒された", jp_pmname_from_idx(gmndx, 0));
-                } else {
-                    Snprintf(outmain, sizeof outmain, "%sに倒された", mname);
-                }
-            } else {
-                Snprintf(outmain, sizeof outmain, "%sに倒された", mname);
-            }
+        char kbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(mname, kbuf, sizeof kbuf);
+        if (strstr(kbuf, "倒された") || strstr(kbuf, "石化した") || strstr(kbuf, "死んだ") || strstr(kbuf, "失敗")) {
+            Snprintf(outmain, sizeof outmain, "%s", kbuf);
         } else {
-            Snprintf(outmain, sizeof outmain, "%s", core);
+            Snprintf(outmain, sizeof outmain, "%sに倒された", kbuf);
         }
     }
 
