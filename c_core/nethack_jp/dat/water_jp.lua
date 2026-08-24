@@ -1,3 +1,4 @@
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
 -- NetHack endgame water.lua	$NHDT-Date: 1781994890 2026/06/20 22:34:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.2 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992,1993 by Izchak Miller, David Cohrs,
@@ -7,7 +8,7 @@
 des.level_init({ style = "solidfill", fg = " " });
 
 des.level_flags("mazelevel", "noteleport", "hardfloor", "shortsighted")
-des.message("You find yourself suspended in an air bubble surrounded by water.")
+des.message("気づくと、水に囲まれた空気の泡の中に浮かんでいた.")
 -- The player lands upon arrival to an air bubble
 -- within the leftmost third of the level.  The
 -- portal to the next level is randomly located in an air
