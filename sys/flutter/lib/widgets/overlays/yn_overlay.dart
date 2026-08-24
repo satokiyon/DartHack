@@ -19,14 +19,52 @@ class YnOverlay extends StatelessWidget {
     required this.bottomInset,
   });
 
+  String _parseEffectiveChoices() {
+    final rawChoices = choices.contains('\x1b')
+        ? choices.substring(0, choices.indexOf('\x1b'))
+        : choices;
+    if (rawChoices.isNotEmpty) {
+      return rawChoices;
+    }
+
+    final lowerQ = question.toLowerCase();
+    // [y|n], [y/n], (y/n), [y/n/q] などの y/n 問合せパターンの検知
+    if (lowerQ.contains('[y|n]') ||
+        lowerQ.contains('[y/n]') ||
+        lowerQ.contains('(y/n)') ||
+        lowerQ.contains('[y/n/q]') ||
+        lowerQ.contains('[y|n|q]') ||
+        lowerQ.contains('adjust?')) {
+      if (lowerQ.contains('q')) {
+        return 'ynq';
+      }
+      return 'yn';
+    }
+
+    // ブラケット [x|y] や [x/y] から選択キーを抽出する処理
+    final match = RegExp(r'\[([a-zA-Z0-9/|]+)\]').firstMatch(question);
+    if (match != null) {
+      final inside = match.group(1)!;
+      final extracted = inside.replaceAll(RegExp(r'[/|]'), '');
+      if (extracted.isNotEmpty) {
+        return extracted;
+      }
+    }
+
+    // デフォルト値が 'y' や 'n' の場合のフォールバック
+    if (defaultChoice == 'y'.codeUnitAt(0) || defaultChoice == 'n'.codeUnitAt(0)) {
+      return 'yn';
+    }
+
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final displayChoices = choices.contains('\x1b')
-        ? choices.substring(0, choices.indexOf('\x1b'))
-        : choices;
-    final choiceList = displayChoices.split('');
-    final isYesNo = displayChoices.toLowerCase() == 'yn' || displayChoices.toLowerCase() == 'ynq';
+    final effectiveChoices = _parseEffectiveChoices();
+    final choiceList = effectiveChoices.split('');
+    final isYesNo = effectiveChoices.toLowerCase() == 'yn' || effectiveChoices.toLowerCase() == 'ynq';
 
     return Positioned.fill(
       child: Container(
@@ -90,7 +128,7 @@ class YnOverlay extends StatelessWidget {
                             ),
                             child: const Text('No'),
                           ),
-                          if (choices.toLowerCase().contains('q'))
+                          if (effectiveChoices.toLowerCase().contains('q'))
                             ElevatedButton(
                               onPressed: () => onSelect('q'.codeUnitAt(0)),
                               style: ElevatedButton.styleFrom(

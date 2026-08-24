@@ -1598,9 +1598,17 @@ static char flutter_yn_function(const char* question, const char* choices, char 
     g_yn_result = 0;
     g_yn_done = 0;
     
+    const char* effective_choices = choices;
+    if ((!effective_choices || !*effective_choices) && question) {
+        if (strstr(question, "[y|n]") || strstr(question, "[y/n]") ||
+            strstr(question, "(y/n)") || strstr(question, "adjust?")) {
+            effective_choices = "yn";
+        }
+    }
+    
     if (g_yn_function_cb) {
         char* q_utf8 = convert_cp437_to_utf8(question);
-        g_yn_function_cb(q_utf8 ? q_utf8 : question, choices, (int)def);
+        g_yn_function_cb(q_utf8 ? q_utf8 : question, effective_choices, (int)def);
     } else {
         return def;
     }

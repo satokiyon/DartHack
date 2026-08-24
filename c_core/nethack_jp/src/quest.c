@@ -165,7 +165,7 @@ is_pure(boolean talk)
         } else if (u.ualign.record < MIN_QUEST_ALIGN) {
             You("現在%dで必要値は%d.", u.ualign.record,
                 MIN_QUEST_ALIGN);
-            if (yn_function("アライメント値を調整しますか？ [y|n]", (char *) 0, 'y', TRUE) == 'y')
+            if (yn_function("アライメント値を調整しますか？ [y|n]", ynchars, 'y', TRUE) == 'y')
                 u.ualign.record = MIN_QUEST_ALIGN;
         }
     }
