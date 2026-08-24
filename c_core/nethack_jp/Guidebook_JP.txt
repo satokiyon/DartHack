@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-23.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-24.
                          脅威の迷宮へのガイド
                         (NetHackガイドブック)
 
@@ -2337,7 +2337,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
           投げると戻ってくる武器もあります。ブーメラン（何にも当たらな
      かった場合）はその代表例です。アクリス（紐付きの棍棒）を装備した
      状態で投げると、何かに当たったとしても戻ってきます。十分に強い
-     英雄なら戦槌ミョルニルを投げることができ、ヴァルキリーが投げた
+     主人公なら戦槌ミョルニルを投げることができ、ヴァルキリーが投げた
      場合はそれも戻ってきます。しかし、アクリスやミョルニルも時折
      戻ってこないことがあります。戻ってきた投げた物体をキャッチし
      損ねることもあり、時には投げた本人に当たることもありますが、
@@ -2535,13 +2535,13 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
      使えるかを判断するのに使えます。微妙な魔力がかかった物体の中には、
      これらなしでは識別が難しいものもあります。
 
-          題名が判明しているスクロールは、英雄が盲目であっても読む
+          題名が判明しているスクロールは、主人公が盲目であっても読む
      ことができます。スクロールが発見済みの場合、インベントリには
      題名ではなく種類でリストされますが、表示されていなくてもその
      状況では題名は既知とみなされます。
 
           多くのスクロールは、祝福されているか呪われているか、あるいは
-     英雄が混乱しているときに読むかによって、通常とは異なる効果を
+     主人公が混乱しているときに読むかによって、通常とは異なる効果を
      もたらします。
 
           メールデーモンが駆け寄ってきて、メールのスクロールとして
@@ -3773,7 +3773,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
        デフォルトは「}」。
 
      mon_movement
-       英雄がモンスターの動きに気づいたときにメッセージを表示します
+       主人公がモンスターの動きに気づいたときにメッセージを表示します
        （デフォルトはオフ）。
 
      monpolycontrol
@@ -3898,7 +3898,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
                      ために、「y」ではなく「yes」を要求します。
        eating      - 食べ続けるかどうかを確認するために、「y」ではなく
                      「yes」を要求します。
-       Were-change - 英雄が変化制御能力を持っている際に、ライカンス
+       Were-change - 主人公が変化制御能力を持っている際に、ライカンス
                      ロピー（獣化病）によって姿が変わることを確認
                      するために、「y」ではなく「yes」を要求します。
        pray        - すぐに祈るのではなく、祈りの試行を確認するために
@@ -4268,7 +4268,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
        きらめく効果を表示します（デフォルトはオン）。永続的。
 
      spot_monsters
-       英雄がモンスターに気づいたときにメッセージを表示します
+       主人公がモンスターに気づいたときにメッセージを表示します
        （デフォルトはオフ）。
 
      standout
@@ -4296,7 +4296,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
        使用してください。
 
      terrainstatus
-       英雄の足元の場所を説明する追加のステータス条件を表示します
+       主人公の足元の場所を説明する追加のステータス条件を表示します
        （デフォルトはオフ。すべてのインターフェースでサポートされて
        いるわけではありません）。
 
@@ -4532,11 +4532,11 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
        設定できません。
 
      scroll_amount
-       NetHackが可能であれば、英雄が scroll_margin に達したときに、
+       NetHackが可能であれば、主人公が scroll_margin に達したときに、
        このセル数分だけ表示をスクロールさせます。
 
      scroll_margin
-       NetHackが可能であれば、英雄またはカーソルがウィンドウの端から
+       NetHackが可能であれば、主人公またはカーソルがウィンドウの端から
        このセル数だけ離れたときに、表示をスクロールさせます。
 
      selectsaved
@@ -5487,7 +5487,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
         Z  S_zombie               (ゾンビ)
         z  S_zruty                (ズルーティ)
            S_pet_override         (ACCESSIBILITY=1 設定時のすべてのペット)
-           S_hero_override        (ACCESSIBILITY=1 設定時の英雄)
+           S_hero_override        (ACCESSIBILITY=1 設定時の主人公)
 
      注：
 
@@ -5584,11 +5584,11 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
        メッセージに方向や場所の情報を追加します。
 
      spot_monsters
-       英雄がモンスターに気づいたときにメッセージを表示します。
+       主人公がモンスターに気づいたときにメッセージを表示します。
        accessiblemsg と組み合わせてください。
 
      mon_movement
-       英雄がモンスターの動きに気づいたときにメッセージを表示します。
+       主人公がモンスターの動きに気づいたときにメッセージを表示します。
        spot_monsters および accessiblemsg と組み合わせてください。
 
      autodescribe
@@ -5787,7 +5787,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
 
           一部のシステムでは、デバッグモードの使用を許可されるために
      特定のユーザー名でログインしている必要があります。他のシステム
-     では、英雄に特定のキャラクター名を付ける必要があります（職業は
+     では、主人公に特定のキャラクター名を付ける必要があります（職業は
      何でも構いません。「ウィザードモード」と魔法使い（Wizard）の職業
      には何の関係もありません）。許可されていない、あるいは利用でき
      ない場合にデバッグモードでゲームを開始しようとすると、代わりに

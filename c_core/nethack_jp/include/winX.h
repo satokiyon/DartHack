@@ -520,4 +520,54 @@ extern XFontStruct *X11_italic_font(Display *, XFontStruct *);
 extern XFontStruct *X11_unicode_font(Display *, XFontStruct *);
 #endif
 
+#ifdef USE_XFT
+extern XftFont *X11_new_font(Widget w, unsigned attrs, int win_type);
+extern void X11_release_font(Widget w, XftFont *font);
+extern void X11_new_color(Widget w, Pixel pixel, XftColor *color);
+#endif
+
+/* ### winlabel.c ### */
+/* Functions for management of enhanced labels */
+extern void X11_wrap_widget(Widget, int);
+extern void X11_update_label(Widget);
+extern void X11_set_attrs(Widget, unsigned);
+extern void X11_set_highlight(Widget, boolean);
+extern void X11_set_percent(Widget, unsigned, Pixel);
+extern void X11_set_column_widths(Widget, const int *, unsigned);
+extern void X11_blink_labels(void);
+extern int X11_font_height(X11_Font *);
+extern int X11_column_width(Display *, X11_Font *, const char *, size_t);
+
+/*
+ * These are for widgets that use the enhanced label services only for text
+ * rendering; not for percentage bars, underlines and such. They only need
+ * these services if XFT is in use.
+ */
+#ifdef USE_XFT
+static inline void
+X11_wrap_widget_if_Xft(Widget w, int win_type)
+{
+    X11_wrap_widget(w, win_type);
+}
+
+static inline void
+X11_update_label_if_Xft(Widget w)
+{
+    X11_update_label(w);
+}
+#else /* !USE_XFT */
+static inline void
+X11_wrap_widget_if_Xft(Widget w, int win_type)
+{
+    nhUse(w);
+    nhUse(win_type);
+}
+
+static inline void
+X11_update_label_if_Xft(Widget w)
+{
+    nhUse(w);
+}
+#endif /* ?USE_XFT */
+
 #endif /* WINX_H */

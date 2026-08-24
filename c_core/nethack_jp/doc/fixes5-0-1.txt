@@ -245,6 +245,15 @@ Windows: in the event that there is a collision between a menu group
 X11: obey timed_delay
 X11: improve TTY-style status line with text attributes for status hilites,
 	hitpointbar, some unicode support, 3-line status
+X11: fix menu windows being taller than the screen
+X11: allow menu scrolling by pageup/pagedown/home/end keys
+X11: toggle off perm_invent if user closes the perm inventory window
+X11: fix menu group accelerators
+X11: implement all text attributes for menus
+X11: fix crash when loading a nonexistent font
+X11: use xft to render fonts
+X11: support tab-separated menu columns
+Unix: don't complain about MAXPLAYERS with unknown command line param
 
 
 General New Features
