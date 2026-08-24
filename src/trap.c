@@ -7159,7 +7159,7 @@ trapname(
         "ハエ取り罠", "掟の罠", "蛇穴の罠", "オタマジャクシの罠",
         "滑り坂罠", "渇きの罠", "太陽の罠",
     };
-    static char roletrap[33]; /* [17 + 5 + 1] should suffice */
+    static char roletrap[80]; /* NetHackJP: expanded for localized trap names */
 
     if (Hallucination && !override) {
         int total_names = TRAPNUM + SIZE(halu_trapnames),

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
 /* NetHack 5.0	mkmaze.c	$NHDT-Date: 1781973055 2026/06/20 16:30:55 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.185 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -1127,7 +1127,7 @@ populate_maze(void)
 void
 makemaz(const char *s)
 {
-    char protofile[20];
+    char protofile[64]; /* NetHackJP: expanded for prototype file names */
     s_level *sp = Is_special(&u.uz);
     coord mm;
 
