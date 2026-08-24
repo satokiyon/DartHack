@@ -190,6 +190,13 @@ Flutter ポートにおけるハイスコア・スコアボード表示には、
 5. **Android / Flutter版における日本語・英語版データファイルの配置と優先ロード方針**:
    - AndroidおよびFlutterポートでは、データファイル群（`data`, `rumors`, `oracles`, `quest.lua`, `bogusmon`, `engrave`, `epitaph`, `tut-1.lua` 等）を個別のファイルとして `assets/nethackdir/` にパッケージングし、アプリ起動時に端末のストレージ（データディレクトリ）にコピーして読み込みます。
    - 英語版（`data`, `oracles`, `rumors`, `quest.lua`, `bogusmon` 等）と日本語版（`data_jp`, `oracles_jp`, `rumors_jp`, `quest_jp.lua`, `bogusmon_jp` 等）の両方のファイルを `assets/nethackdir/` に同梱します。
+   - **データファイルおよび Lua スクリプトの `_jp` ペア分離とバイリンガル原則**:
+     `c_core/nethack_jp/dat/` 配下のデータファイルおよび Lua スクリプト（`tut-1.lua`, `air.lua`, `Arc-loca.lua` 等）に日本語メッセージが含まれる場合は、原本ファイル（例: `tut-1.lua`）に直接日本語を埋め込まず、英語版メッセージの原本 `.lua` と、日本語メッセージの `*_jp.lua`（例: `tut-1_jp.lua`）のペア構成に分離してください。
+     分離した `*_jp.lua` および原本 `.lua` の双方は、必ず Flutter アセット (`sys/flutter/assets/nethackdir/`) に同期・同梱してください。
+   - **アセット同期スクリプト (`sync_dat_assets.ps1`) のパスと運用原則**:
+     アセット同期スクリプトの実体は `DartHack_private` リポジトリ配下の `build_files/sys/flutter/scripts/sync_dat_assets.ps1` です。
+     新しい `_jp` データファイルや Lua スクリプトを追加・改修した際は、必ず本スクリプト内の `$syncItems` 配列に同期定義を追加し、実行して `sys/flutter/assets/ver` をインクリメントさせてください。
+     なお、Windows PowerShell 上で本スクリプトを編集する際は、改行コードを CRLF (`\r\n`) に保つことで構文エラーを防いでください。
    - **Cコア側における自動優先ロードの実装原則 (`files.c` / `fopen_datafile`)**:
      - DLB (Data Librarian Archive) が未定義の環境では、`include/dlb.h` において `dlb_fopen` が `fopen_datafile(name, mode, DATAPREFIX)` へ展開されます。
      - そのため、データファイルの自動言語切り替え（`g_language_is_jp == 1` 時に `_jp` 付きファイルを優先オープンする処理）は `dlb.c` ではなく、全プラットフォーム共通のディスクオープン関数である **`src/files.c` の `fopen_datafile`** 内に実装してください。これにより、メモリ構造体への副作用を一切生じさせずに `quest_jp.lua` 等を含む全データファイルの自動バイリンガル切り替えが保証されます。
