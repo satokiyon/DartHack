@@ -55,13 +55,15 @@ void main() {
         '                Killed by a goblin. - [25]',
         '  2       6789  hero-Kni-Hum-Fem-Law quit in The Dungeons of Doom on level 2.',
         '                12 [30]',
+        '  3       5000  escaped-Tou-Gno-Mal-Neu escaped (with the Amulet) [max level 10].',
+        '                25 [40]',
       ];
       final attrs = List.filled(inputLines.length, 0);
       attrs[1] = 1; // ATR_BOLD for current game
 
-      final entries = TopTenEntry.parse(inputLines, attrs);
+      final entries = TopTenEntry.parse(inputLines, attrs, isJp: false);
 
-      expect(entries.length, 2);
+      expect(entries.length, 3);
 
       // Entry 1
       expect(entries[0].rank, 1);
@@ -69,8 +71,8 @@ void main() {
       expect(entries[0].nameAndProfile, 'satok Wizard / Elf / Male / Chaotic');
       expect(entries[0].isCurrent, true);
       expect(entries[0].details, [
-        'died in The Dungeons of Doom on level 5. Killed by a goblin.',
-        'HP/最大HP: -/25',
+        'Died in The Dungeons of Doom on level 5. Killed by a goblin.',
+        'HP/Max HP: -/25',
       ]);
 
       // Entry 2
@@ -79,8 +81,18 @@ void main() {
       expect(entries[1].nameAndProfile, 'hero Knight / Human / Female / Lawful');
       expect(entries[1].isCurrent, false);
       expect(entries[1].details, [
-        'quit in The Dungeons of Doom on level 2.',
-        'HP/最大HP: 12/30',
+        'Quit in The Dungeons of Doom on level 2.',
+        'HP/Max HP: 12/30',
+      ]);
+
+      // Entry 3
+      expect(entries[2].rank, 3);
+      expect(entries[2].score, '5000');
+      expect(entries[2].nameAndProfile, 'escaped Tourist / Gnome / Male / Neutral');
+      expect(entries[2].isCurrent, false);
+      expect(entries[2].details, [
+        'Escaped (with the Amulet) [max level 10].',
+        'HP/Max HP: 25/40',
       ]);
     });
 

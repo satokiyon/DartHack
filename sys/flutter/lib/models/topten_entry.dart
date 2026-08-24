@@ -16,7 +16,7 @@ class TopTenEntry {
     required this.isCurrent,
   });
 
-  static List<TopTenEntry> parse(List<String> lines, List<int> attrs) {
+  static List<TopTenEntry> parse(List<String> lines, List<int> attrs, {bool isJp = true}) {
     final entries = <TopTenEntry>[];
 
     // 順位は空スペースの場合もあるため ([0-9]*) とし、スコア ([0-9]+) にマッチさせる
@@ -66,13 +66,13 @@ class TopTenEntry {
           for (int pIdx = 0; pIdx < parts.length; pIdx++) {
             final code = parts[pIdx];
             if (pIdx == 0) {
-              translatedParts.add(_translateRoleCode(code, false));
+              translatedParts.add(_translateRoleCode(code, isJp));
             } else if (pIdx == 1) {
-              translatedParts.add(_translateRaceCode(code, false));
+              translatedParts.add(_translateRaceCode(code, isJp));
             } else if (pIdx == 2) {
-              translatedParts.add(_translateGendCode(code, false));
+              translatedParts.add(_translateGendCode(code, isJp));
             } else if (pIdx == 3) {
-              translatedParts.add(_translateAlignCode(code, false));
+              translatedParts.add(_translateAlignCode(code, isJp));
             } else {
               translatedParts.add(code);
             }
@@ -95,7 +95,7 @@ class TopTenEntry {
           if (hpMatch != null) {
             final hpVal = hpMatch.group(1);
             final maxHpVal = hpMatch.group(2);
-            hpInfo = 'HP/最大HP: $hpVal/$maxHpVal';
+            hpInfo = isJp ? 'HP/最大HP: $hpVal/$maxHpVal' : 'HP/Max HP: $hpVal/$maxHpVal';
             nextLine = nextLine.substring(0, hpMatch.start);
             consumedNextLine = true;
           }
@@ -130,7 +130,7 @@ class TopTenEntry {
 
         final details = <String>[];
         if (fullDeathText.isNotEmpty) {
-          final translatedDeath = _translateDeathText(fullDeathText, true);
+          final translatedDeath = _translateDeathText(fullDeathText, isJp);
           details.add(translatedDeath);
         }
         if (hpInfo != null) {
@@ -877,14 +877,22 @@ String _translateMonsterOrItemName(String raw) {
   return s;
 }
 
+String _capitalizeFirst(String text) {
+  if (text.isEmpty) return text;
+  return text[0].toUpperCase() + text.substring(1);
+}
+
 String _translateDeathText(String death, bool isJp) {
   if (death.isEmpty) return death;
   if (!isJp) {
-    if (death == 'quit') return 'Quit';
-    if (death == 'starved') return 'Starved';
-    if (death.startsWith('escaped')) return 'Escaped';
-    if (death.startsWith('ascended')) return 'Ascended';
-    return death;
+    final d = death.trim();
+    if (d.startsWith('escaped')) {
+      return 'Escaped${d.substring(7)}';
+    }
+    if (d.startsWith('ascended')) {
+      return 'Ascended${d.substring(8)}';
+    }
+    return _capitalizeFirst(d);
   }
 
   String mainDeath = death.trim();

@@ -110,8 +110,9 @@ class TextOverlay extends StatelessWidget {
                     });
 
                     if (isTopTen) {
-                      final data = TopTenEntry.parse(textLines, textAttrs);
-                      return TopTenWidget(entries: data);
+                      final isJp = Localizations.localeOf(context).languageCode == 'ja';
+                      final data = TopTenEntry.parse(textLines, textAttrs, isJp: isJp);
+                      return TopTenWidget(entries: data, isJp: isJp);
                     }
 
                     final hasAnyTile = useTiles && tileImage != null && textTiles.any((t) => t >= 0);
