@@ -75,8 +75,8 @@ class DefaultsHelper {
       }
 
       // hilite_status および menucolor の全体判定結果を保存（テンプレートが存在する限りデフォルト ON (true)）
-      _options['hilite_status'] = hasActiveHiliteStatus ? 'true' : 'true';
-      _options['menucolor'] = hasActiveMenuColor ? 'true' : 'true';
+      _options['hilite_status'] = hasActiveHiliteStatus ? 'true' : 'false';
+      _options['menucolor'] = hasActiveMenuColor ? 'true' : 'false';
     } catch (e) {
       debugPrint("Error reading defaults.nh: $e");
     }
@@ -289,7 +289,7 @@ class DefaultsHelper {
               } else if (val == 'always_normal' || val == 'false') {
                 updatedTokens.add('!tutorial');
               } else {
-                updatedTokens.add('tutorial');
+                // ask (0: 毎回確認) や未設定の場合はトークンを除外する
               }
             } else if (val.toLowerCase() == 'true') {
               updatedTokens.add(key);
@@ -298,7 +298,7 @@ class DefaultsHelper {
             } else if (val.trim().isNotEmpty) {
               updatedTokens.add('$key:${val.trim()}');
             } else {
-              updatedTokens.add(t);
+              // 空文字列（設定解除・削除）の場合はトークンを追加せず除外する
             }
           } else if (t == 'DECgraphics' || t == 'IBMgraphics' || key == 'symset') {
             handledKeys.add('symset');
@@ -309,9 +309,14 @@ class DefaultsHelper {
           }
         }
 
-        final normalizedLine = 'OPTIONS=${updatedTokens.join(', ')}';
-        if (lineModified || normalizedLine != line.trim()) {
-          newLines.add(normalizedLine);
+        if (updatedTokens.isNotEmpty) {
+          final normalizedLine = 'OPTIONS=${updatedTokens.join(', ')}';
+          if (lineModified || normalizedLine != line.trim()) {
+            newLines.add(normalizedLine);
+            continue;
+          }
+        } else if (lineModified) {
+          // その OPTIONS= 行の全トークンが削除されて空になった場合は行自体を除去する
           continue;
         }
       }
