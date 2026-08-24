@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/text_formatter.dart';
+import '../../utils/dialog_header_helper.dart';
 import '../../models/tombstone_data.dart';
 import '../../models/topten_entry.dart';
 import '../tombstone_widget.dart';
@@ -175,6 +176,10 @@ class TextOverlay extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(vertical: 6),
                               child: Divider(color: Colors.white.withValues(alpha: 0.14), height: 1),
                             );
+                          }
+
+                          if (DialogHeaderHelper.isDialogTitleHeader(line)) {
+                            return DialogHeaderHelper.buildTitleHeaderBadge(line);
                           }
 
                           final tile = (index < textTiles.length)

@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import '../../nethack_screen.dart';
+import '../../utils/dialog_header_helper.dart';
 import '../menu_item_tile_painter.dart';
 
 class MenuOverlay extends StatefulWidget {
@@ -102,8 +103,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
     if (item.ident != 0) return false;
     if (_isMenuDividerText(item.text)) return false;
     if (item.attr > 0) return true;
-    final t = item.text.trim();
-    return t.endsWith(':') || t.endsWith('：');
+    return DialogHeaderHelper.isDialogTitleHeader(item.text);
   }
 
   void _toggleSelection(int ident) {
@@ -231,39 +231,32 @@ class _MenuOverlayState extends State<MenuOverlay> {
 
   Widget _buildMenuCategoryRow(String text) {
     final hasTab = text.contains('\t');
+    if (!hasTab) {
+      return DialogHeaderHelper.buildTitleHeaderBadge(text);
+    }
     return Container(
       margin: const EdgeInsets.only(top: 8, bottom: 4),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E2A3A),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.lightBlueAccent.withValues(alpha: 0.35)),
+        color: const Color(0xFF2E2214),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFFFFC107).withValues(alpha: 0.45)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.category_outlined, size: 16, color: Colors.lightBlueAccent),
+          const Icon(Icons.label_important_outline_rounded, size: 16, color: Color(0xFFFFD54F)),
           SizedBox(width: hasTab ? 14 : 6),
           Expanded(
-            child: hasTab
-                ? _buildTabSeparatedRow(
-                    text,
-                    const TextStyle(
-                      color: Colors.lightBlueAccent,
-                      fontFamily: 'monospace',
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    isHeader: true,
-                  )
-                : Text(
-                    text.trim(),
-                    style: const TextStyle(
-                      color: Colors.lightBlueAccent,
-                      fontFamily: 'monospace',
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+            child: _buildTabSeparatedRow(
+              text,
+              const TextStyle(
+                color: Color(0xFFFFD54F),
+                fontFamily: 'monospace',
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+              isHeader: true,
+            ),
           ),
         ],
       ),
