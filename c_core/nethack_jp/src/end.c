@@ -138,7 +138,7 @@ done2(void)
         return ECMD_OK;
     }
 
-#if (defined(UNIX) || defined(VMS) || defined(LATTICE))
+#if (defined(UNIX) || defined(VMS) || defined(LATTICE)) && !defined(ANDROID) && !defined(WINFLUTTER)
     if (wizard) {
         int c;
 #ifdef VMS
