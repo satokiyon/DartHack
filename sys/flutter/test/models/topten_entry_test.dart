@@ -97,17 +97,47 @@ void main() {
         '                                                                       -  [16]',
         '  5        300  Player 盗賊/人間/女性/混沌 choked on a poisonous corpse (運命の大迷宮 1階).',
         '                                                                       -  [20]',
+        '  6        250  Player 騎士/人間/男性/秩序 killed by a guard (運命の大迷宮 1階).',
+        '                                                                       -  [18]',
+        '  7        200  Player 旅人/ノーム/女性/混沌 killed by a giant bat (運命の大迷宮 1階).',
+        '                                                                       -  [10]',
+        '  8        150  Player 考古学者/ドワーフ/男性/中立 killed by a sewer rat (運命の大迷宮 1階).',
+        '                                                                       -  [12]',
+        '  9        120  Player 魔法使い/エルフ/女性/混沌 killed by an arrow (運命の大迷宮 1階).',
+        '                                                                       -  [8]',
+        ' 10        100  Player 盗賊/人間/男性/中立 killed by a poisoned needle (運命の大迷宮 2階).',
+        '                                                                       -  [5]',
+        ' 11         90  Player 侍/人間/男性/秩序 drowned in a pool of water (運命の大迷宮 3階).',
+        '                                                                       -  [10]',
+        ' 12         80  Player 騎士/人間/男性/秩序 drowned in a moat (運命の大迷宮 4階).',
+        '                                                                       -  [15]',
+        ' 13         70  Player 野蛮人/人間/男性/中立 killed by a land mine (運命の大迷宮 2階).',
+        '                                                                       -  [10]',
+        ' 14         50  Player 騎士/人間/男性/秩序 killed by Excalibur (運命の大迷宮 5階).',
+        '                                                                       -  [20]',
+        ' 15         30  Player 修道士/人間/男性/秩序 crunched in the head by an iron ball (運命の大迷宮 1階).',
+        '                                                                       -  [0]',
       ];
       final attrs = List.filled(inputLines.length, 0);
 
       final entries = TopTenEntry.parse(inputLines, attrs);
 
-      expect(entries.length, 5);
+      expect(entries.length, 15);
       expect(entries[0].details[0], contains('ゴブリンに倒された'));
       expect(entries[1].details[0], contains('魔法使いの幽霊に倒された'));
       expect(entries[2].details[0], contains('有毒な死体に倒された'));
       expect(entries[3].details[0], contains('酸性の塊に倒された'));
       expect(entries[4].details[0], contains('有毒な死体で窒息した'));
+      expect(entries[5].details[0], contains('番兵に倒された'));
+      expect(entries[6].details[0], contains('巨大コウモリに倒された'));
+      expect(entries[7].details[0], contains('ドブネズミに倒された'));
+      expect(entries[8].details[0], contains('矢に倒された'));
+      expect(entries[9].details[0], contains('毒針に倒された'));
+      expect(entries[10].details[0], contains('水たまりで溺死した'));
+      expect(entries[11].details[0], contains('お堀で溺死した'));
+      expect(entries[12].details[0], contains('地雷に倒された'));
+      expect(entries[13].details[0], contains('エクスカリバーに倒された'));
+      expect(entries[14].details[0], contains('鉄球に頭を打ち砕かれた'));
     });
   });
 }
