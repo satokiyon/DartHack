@@ -311,7 +311,8 @@ class DefaultsHelper {
 
         if (updatedTokens.isNotEmpty) {
           final normalizedLine = 'OPTIONS=${updatedTokens.join(', ')}';
-          if (lineModified || normalizedLine != line.trim()) {
+          // 管理対象キーを含む行、または100文字を超える危険な長大OPTIONS行のみを安全に正規化・修復する
+          if (lineModified || (line.trim().length > 100 && normalizedLine != line.trim())) {
             newLines.add(normalizedLine);
             continue;
           }

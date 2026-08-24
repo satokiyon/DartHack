@@ -83,6 +83,73 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
     }
   }
 
+  void _formatContent() {
+    final lines = _controller.text.split('\n');
+    final formattedLines = <String>[];
+    bool modified = false;
+
+    for (var line in lines) {
+      final trimmed = line.trim();
+      if (trimmed.startsWith('OPTIONS=') && !trimmed.startsWith('#')) {
+        final prefix = line.substring(0, line.indexOf('OPTIONS=') + 'OPTIONS='.length);
+        final content = line.substring(line.indexOf('OPTIONS=') + 'OPTIONS='.length);
+
+        final buffer = StringBuffer();
+        final tokens = <String>[];
+        bool inQuote = false;
+
+        for (int i = 0; i < content.length; i++) {
+          final char = content[i];
+          if (char == '"' || char == "'") {
+            inQuote = !inQuote;
+            buffer.write(char);
+          } else if (char == ',' && !inQuote) {
+            tokens.add(buffer.toString());
+            buffer.clear();
+          } else {
+            buffer.write(char);
+          }
+        }
+        if (buffer.isNotEmpty) {
+          tokens.add(buffer.toString());
+        }
+
+        final cleanedTokens = tokens.map((tok) => tok.trim()).where((tok) => tok.isNotEmpty).toList();
+        final newLine = '$prefix${cleanedTokens.join(', ')}';
+        if (newLine != line) {
+          modified = true;
+          formattedLines.add(newLine);
+          continue;
+        }
+      }
+      formattedLines.add(line);
+    }
+
+    if (modified) {
+      setState(() {
+        _controller.text = formattedLines.join('\n');
+        _hasChanges = true;
+      });
+      if (mounted) {
+        final isJp = Localizations.localeOf(context).languageCode == 'ja';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(isJp ? 'defaults.nh の記述を整頓しました（保存ボタンで反映されます）' : 'Formatted defaults.nh OPTIONS (press Save to apply)'),
+          ),
+        );
+      }
+    } else {
+      if (mounted) {
+        final isJp = Localizations.localeOf(context).languageCode == 'ja';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(isJp ? '整頓が必要な OPTIONS= 行はありません' : 'No OPTIONS= lines required formatting'),
+          ),
+        );
+      }
+    }
+  }
+
   String _getErrorMessage(AppLocalizations l10n) {
     if (_errorMessageKey == 'defaultsNotFound') {
       return l10n.defaultsNotFound;
@@ -128,12 +195,18 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
         appBar: AppBar(
           title: Text(l10n.editDefaultsTitle),
           actions: [
-            if (!_isLoading && errMsg.isEmpty)
+            if (!_isLoading && errMsg.isEmpty) ...[
+              IconButton(
+                icon: const Icon(Icons.auto_fix_high),
+                tooltip: Localizations.localeOf(context).languageCode == 'ja' ? '記述の整頓（フォーマット）' : 'Format OPTIONS',
+                onPressed: _formatContent,
+              ),
               IconButton(
                 icon: const Icon(Icons.save),
                 tooltip: l10n.saveTooltip,
                 onPressed: _saveFile,
               ),
+            ],
           ],
         ),
         body: _isLoading
