@@ -222,17 +222,35 @@ jp_translate_food_or_corpse(char *out, unsigned outsz, const char *in)
     p = skip_english_article(tmp);
 
     /* 形容詞の抽出 */
-    if (!strncmpi(p, "rotted ", 7)) {
+    if (!strncmpi(p, "poisonous ", 10)) {
+        Snprintf(adj, sizeof adj, "有毒な");
+        p += 10;
+    } else if (!strncmpi(p, "acidic ", 7)) {
+        Snprintf(adj, sizeof adj, "酸性の");
+        p += 7;
+    } else if (!strncmpi(p, "rotted ", 7)) {
         Snprintf(adj, sizeof adj, "腐った");
         p += 7;
     } else if (!strncmpi(p, "rotten ", 7)) {
         Snprintf(adj, sizeof adj, "腐った");
         p += 7;
+    } else if (!strncmpi(p, "tainted ", 8)) {
+        Snprintf(adj, sizeof adj, "汚染された");
+        p += 8;
+    } else if (!strncmpi(p, "diseased ", 9)) {
+        Snprintf(adj, sizeof adj, "病気の");
+        p += 9;
+    } else if (!strncmpi(p, "petrifying ", 11)) {
+        Snprintf(adj, sizeof adj, "石化させる");
+        p += 11;
+    } else if (!strncmpi(p, "hallucinogenic ", 15)) {
+        Snprintf(adj, sizeof adj, "幻覚作用のある");
+        p += 15;
+    } else if (!strncmpi(p, "deadly ", 7)) {
+        Snprintf(adj, sizeof adj, "致命的な");
+        p += 7;
     } else if (!strncmpi(p, "stolen ", 7)) {
         Snprintf(adj, sizeof adj, "奪った");
-        p += 7;
-    } else if (!strncmpi(p, "acidic ", 7)) {
-        Snprintf(adj, sizeof adj, "酸性の");
         p += 7;
     } else if (!strncmpi(p, "very rich ", 10)) {
         Snprintf(adj, sizeof adj, "豪華すぎる");
@@ -245,7 +263,9 @@ jp_translate_food_or_corpse(char *out, unsigned outsz, const char *in)
     p = skip_english_article(p);
 
     /* 名詞の判定 */
-    if ((q = strstr(p, " corpse")) != 0) {
+    if (!strcmpi(p, "corpse")) {
+        Snprintf(noun, sizeof noun, "死体");
+    } else if ((q = strstr(p, " corpse")) != 0) {
         char mbuf[BUFSZ];
         size_t len = q - p;
         if (len < sizeof mbuf) {
@@ -253,13 +273,16 @@ jp_translate_food_or_corpse(char *out, unsigned outsz, const char *in)
             mbuf[len] = '\0';
             const char *mname = skip_english_article(mbuf);
             int mndx, gend;
-            mndx = name_to_mon(mname, &gend);
-            if (mndx >= 0) {
+            if (!*mname) {
+                Snprintf(noun, sizeof noun, "死体");
+            } else if ((mndx = name_to_mon(mname, &gend)) >= 0) {
                 Snprintf(noun, sizeof noun, "%sの死体", jp_pmname_from_idx(mndx, 0));
             } else {
                 Snprintf(noun, sizeof noun, "%sの死体", mname);
             }
         }
+    } else if (!strcmpi(p, "egg")) {
+        Snprintf(noun, sizeof noun, "卵");
     } else if ((q = strstr(p, " egg")) != 0) {
         char mbuf[BUFSZ];
         size_t len = q - p;
@@ -268,8 +291,9 @@ jp_translate_food_or_corpse(char *out, unsigned outsz, const char *in)
             mbuf[len] = '\0';
             const char *mname = skip_english_article(mbuf);
             int mndx, gend;
-            mndx = name_to_mon(mname, &gend);
-            if (mndx >= 0) {
+            if (!*mname) {
+                Snprintf(noun, sizeof noun, "卵");
+            } else if ((mndx = name_to_mon(mname, &gend)) >= 0) {
                 Snprintf(noun, sizeof noun, "%sの卵", jp_pmname_from_idx(mndx, 0));
             } else {
                 Snprintf(noun, sizeof noun, "%sの卵", mname);

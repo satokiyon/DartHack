@@ -91,14 +91,23 @@ void main() {
         '                                                                       -  [25]',
         '  2        800  Player 侍/人間/女性/天照大神 killed by a ghost of a wizard (運命の大迷宮 3階).',
         '                                                                       -  [30]',
+        '  3        500  Player 洞窟人/ノーム/男性/イシュタル killed by a poisonous corpse (運命の大迷宮 2階).',
+        '                                                                       -  [15]',
+        '  4        400  Player 野蛮人/人間/男性/クロム killed by an acidic glob (運命の大迷宮 1階).',
+        '                                                                       -  [16]',
+        '  5        300  Player 盗賊/人間/女性/混沌 choked on a poisonous corpse (運命の大迷宮 1階).',
+        '                                                                       -  [20]',
       ];
       final attrs = List.filled(inputLines.length, 0);
 
       final entries = TopTenEntry.parse(inputLines, attrs);
 
-      expect(entries.length, 2);
+      expect(entries.length, 5);
       expect(entries[0].details[0], contains('ゴブリンに倒された'));
       expect(entries[1].details[0], contains('魔法使いの幽霊に倒された'));
+      expect(entries[2].details[0], contains('有毒な死体に倒された'));
+      expect(entries[3].details[0], contains('酸性の塊に倒された'));
+      expect(entries[4].details[0], contains('有毒な死体で窒息した'));
     });
   });
 }

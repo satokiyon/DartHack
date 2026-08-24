@@ -402,11 +402,56 @@ String _translateMonsterOrItemName(String raw) {
     return '${_translateMonsterOrItemName(s.substring(0, s.length - 9))}のスケルトン';
   }
 
+  if (s.startsWith('poisonous ')) {
+    return '有毒な${_translateMonsterOrItemName(s.substring(10))}';
+  }
+  if (s.startsWith('acidic ')) {
+    return '酸性の${_translateMonsterOrItemName(s.substring(7))}';
+  }
+  if (s.startsWith('rotted ')) {
+    return '腐った${_translateMonsterOrItemName(s.substring(7))}';
+  }
+  if (s.startsWith('rotten ')) {
+    return '腐った${_translateMonsterOrItemName(s.substring(7))}';
+  }
+  if (s.startsWith('tainted ')) {
+    return '汚染された${_translateMonsterOrItemName(s.substring(8))}';
+  }
+  if (s.startsWith('diseased ')) {
+    return '病気の${_translateMonsterOrItemName(s.substring(9))}';
+  }
+  if (s.startsWith('petrifying ')) {
+    return '石化させる${_translateMonsterOrItemName(s.substring(11))}';
+  }
+  if (s.startsWith('hallucinogenic ')) {
+    return '幻覚作用のある${_translateMonsterOrItemName(s.substring(15))}';
+  }
+  if (s.startsWith('deadly ')) {
+    return '致命的な${_translateMonsterOrItemName(s.substring(7))}';
+  }
+  if (s.startsWith('stolen ')) {
+    return '奪った${_translateMonsterOrItemName(s.substring(7))}';
+  }
+  if (s.startsWith('very rich ')) {
+    return '豪華すぎる${_translateMonsterOrItemName(s.substring(10))}';
+  }
+  if (s.startsWith('quick ')) {
+    return '軽い${_translateMonsterOrItemName(s.substring(6))}';
+  }
+
+  if (s == 'corpse') return '死体';
+  if (s == 'glob') return '塊';
+  if (s == 'egg') return '卵';
+
   if (s.endsWith(' corpse')) {
-    return '${_translateMonsterOrItemName(s.substring(0, s.length - 7))}の死体';
+    final sub = s.substring(0, s.length - 7);
+    final tr = _translateMonsterOrItemName(sub);
+    return tr.isEmpty ? '死体' : '$trの死体';
   }
   if (s.endsWith(' egg')) {
-    return '${_translateMonsterOrItemName(s.substring(0, s.length - 4))}の卵';
+    final sub = s.substring(0, s.length - 4);
+    final tr = _translateMonsterOrItemName(sub);
+    return tr.isEmpty ? '卵' : '$trの卵';
   }
   if (s.startsWith('statue of ')) {
     return '${_translateMonsterOrItemName(s.substring(10))}の石像';
