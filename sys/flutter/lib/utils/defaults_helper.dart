@@ -282,7 +282,7 @@ class DefaultsHelper {
             lineModified = true;
 
             if (key == 'number_pad') {
-              updatedTokens.add('number_pad:$val');
+              updatedTokens.add('number_pad:${val.trim()}');
             } else if (key == 'tutorial' || key == 'tutorial_mode') {
               if (val == 'always_tutorial' || val == 'true') {
                 updatedTokens.add('tutorial');
@@ -296,21 +296,22 @@ class DefaultsHelper {
             } else if (val.toLowerCase() == 'false') {
               updatedTokens.add('!$key');
             } else if (val.trim().isNotEmpty) {
-              updatedTokens.add('$key:$val');
+              updatedTokens.add('$key:${val.trim()}');
             } else {
-              updatedTokens.add(token);
+              updatedTokens.add(t);
             }
           } else if (t == 'DECgraphics' || t == 'IBMgraphics' || key == 'symset') {
             handledKeys.add('symset');
             lineModified = true;
             updatedTokens.add('symset:IBMGraphics_2');
           } else {
-            updatedTokens.add(token);
+            updatedTokens.add(t);
           }
         }
 
-        if (lineModified) {
-          newLines.add('OPTIONS=${updatedTokens.join(', ')}');
+        final normalizedLine = 'OPTIONS=${updatedTokens.join(', ')}';
+        if (lineModified || normalizedLine != line.trim()) {
+          newLines.add(normalizedLine);
           continue;
         }
       }
