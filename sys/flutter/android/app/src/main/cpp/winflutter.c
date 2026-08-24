@@ -85,7 +85,7 @@ int nhcolor_to_RGB(int c)
 struct window_procs and_procs = {
     "and",
     (enum wp_ids) 0,
-    WC_COLOR | WC_HILITE_PET | WC_INVERSE,
+    WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN,
     WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_SUPPRESS_HIST,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 };
@@ -128,7 +128,7 @@ struct sound_procs androidsound_procs = {
 static struct window_procs flutter_procs = {
     "flutter",
     (enum wp_ids) 0,
-    WC_COLOR | WC_HILITE_PET | WC_INVERSE,
+    WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN,
     WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_SUPPRESS_HIST,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 };

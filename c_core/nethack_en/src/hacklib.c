@@ -1012,4 +1012,86 @@ what_datamodel_is_this(int retidx, int szshort, int szint, int szlong, int szll,
     return unknown;
 }
 #undef MAX_D
+
+/* Unicode routines */
+
+staticfn int
+utf8_sequence_expected_len(uchar lead)
+{
+    if (lead < 0x80)
+        return 1;
+    if (lead >= 0xC2 && lead <= 0xDF)
+        return 2;
+    if (lead >= 0xE0 && lead <= 0xEF)
+        return 3;
+    if (lead >= 0xF0 && lead <= 0xF4)
+        return 4;
+    return 0;
+}
+
+boolean
+utf8_decode_codepoint(const char *s, unsigned *cp, int *seqlen)
+{
+    uchar b0, b1, b2, b3;
+    int len;
+
+    b0 = (uchar) s[0];
+    if (b0 < 0x80U) {
+        *cp = b0;
+        *seqlen = 1;
+        return TRUE;
+    }
+
+    len = utf8_sequence_expected_len(b0);
+    if (len == 0) {
+        *cp = b0;
+        *seqlen = 1;
+        return FALSE;
+    }
+    if (len >= 2 && s[1] == '\0')
+        goto bad_utf8;
+    if (len >= 3 && s[2] == '\0')
+        goto bad_utf8;
+    if (len >= 4 && s[3] == '\0')
+        goto bad_utf8;
+
+    b1 = (uchar) s[1];
+    if ((b1 & 0xC0U) != 0x80U)
+        goto bad_utf8;
+
+    if (len == 2) {
+        *cp = ((unsigned) (b0 & 0x1FU) << 6) | (unsigned) (b1 & 0x3FU);
+        *seqlen = 2;
+        return TRUE;
+    }
+
+    b2 = (uchar) s[2];
+    if ((b2 & 0xC0U) != 0x80U)
+        goto bad_utf8;
+
+    if (len == 3) {
+        *cp = ((unsigned) (b0 & 0x0FU) << 12)
+              | ((unsigned) (b1 & 0x3FU) << 6)
+              | (unsigned) (b2 & 0x3FU);
+        *seqlen = 3;
+        return TRUE;
+    }
+
+    b3 = (uchar) s[3];
+    if ((b3 & 0xC0U) != 0x80U)
+        goto bad_utf8;
+
+    *cp = ((unsigned) (b0 & 0x07U) << 18)
+          | ((unsigned) (b1 & 0x3FU) << 12)
+          | ((unsigned) (b2 & 0x3FU) << 6)
+          | (unsigned) (b3 & 0x3FU);
+    *seqlen = 4;
+    return TRUE;
+
+bad_utf8:
+    *cp = b0;
+    *seqlen = 1;
+    return FALSE;
+}
+
 /*hacklib.c*/

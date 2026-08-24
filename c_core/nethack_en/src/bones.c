@@ -197,26 +197,36 @@ resetobjs(struct obj *ochain, boolean restore)
 void
 sanitize_name(char *namebuf)
 {
-    int c;
+    char *p = namebuf;
+    char *dest = namebuf;
+    unsigned cp;
+    int seqlen;
     boolean strip_8th_bit = (WINDOWPORT(tty)
                              && !iflags.wc_eight_bit_input);
 
-    /* it's tempting to skip this for single-user platforms, since
-       only the current player could have left these bones--except
-       things like "hearse" and other bones exchange schemes make
-       that assumption false */
-    while (*namebuf) {
-        c = *namebuf & 0177;
-        if (c < ' ' || c == '\177') {
-            /* non-printable or undesirable */
-            *namebuf = '.';
-        } else if (c != *namebuf) {
-            /* expected to be printable if user wants such things */
-            if (strip_8th_bit)
-                *namebuf = '_';
+    /* while loading bones or setting options, strip out control chars
+       that might disrupt display, preserving valid UTF-8 sequences. */
+    while (*p) {
+        if (utf8_decode_codepoint(p, &cp, &seqlen)) {
+            if (cp < ' ' || cp == 127) {
+                *dest++ = '.';
+                p += seqlen;
+            } else if (cp > 127 && strip_8th_bit) {
+                *dest++ = '_';
+                p += seqlen;
+            } else {
+                if (dest != p) {
+                    (void) memmove((genericptr_t) dest, (genericptr_t) p, (size_t) seqlen);
+                }
+                dest += seqlen;
+                p += seqlen;
+            }
+        } else {
+            *dest++ = '.';
+            p++;
         }
-        ++namebuf;
     }
+    *dest = '\0';
 }
 
 /* Give object to a random object-liking monster on or adjacent to x,y
