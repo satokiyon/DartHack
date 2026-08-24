@@ -8,14 +8,20 @@ void main() {
     test('日本語タイトルキーワードが正しく true と判定されること', () {
       expect(DialogHeaderHelper.isDialogTitleHeader('背景:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('基本情報:'), isTrue);
+      expect(DialogHeaderHelper.isDialogTitleHeader('能力値:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('現在の能力値:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('最終能力値:'), isTrue);
+      expect(DialogHeaderHelper.isDialogTitleHeader('状態:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('現在の状態:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('最終状態:'), isTrue);
+      expect(DialogHeaderHelper.isDialogTitleHeader('能力:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('現在の能力:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('最終能力:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('その他:'), isTrue);
+      expect(DialogHeaderHelper.isDialogTitleHeader('達成事項:'), isTrue);
+      expect(DialogHeaderHelper.isDialogTitleHeader('Satokの能力値（魔法使い）:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('所持品:'), isTrue);
+      expect(DialogHeaderHelper.isDialogTitleHeader('最新メッセージ:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('武器'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('防具'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('食べ物'), isTrue);
@@ -25,19 +31,26 @@ void main() {
       expect(DialogHeaderHelper.isDialogTitleHeader('魔法書'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('巨石/彫像'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('倒した怪物:'), isTrue);
+      expect(DialogHeaderHelper.isDialogTitleHeader('虐殺した怪物種:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('自主的な縛り:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('革のリュック の中身:'), isTrue);
     });
 
     test('英語タイトルキーワードが正しく true と判定されること', () {
       expect(DialogHeaderHelper.isDialogTitleHeader('Background:'), isTrue);
+      expect(DialogHeaderHelper.isDialogTitleHeader('Basics:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('Base Attributes:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('Current Attributes:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('Final Attributes:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('Current Status:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('Final Status:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('Other Properties:'), isTrue);
+      expect(DialogHeaderHelper.isDialogTitleHeader('Miscellaneous:'), isTrue);
+      expect(DialogHeaderHelper.isDialogTitleHeader('Achievement:'), isTrue);
+      expect(DialogHeaderHelper.isDialogTitleHeader('Achievements:'), isTrue);
+      expect(DialogHeaderHelper.isDialogTitleHeader("Satok's attributes (Wizard):"), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('Inventory:'), isTrue);
+      expect(DialogHeaderHelper.isDialogTitleHeader('Latest messages:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('Weapons'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('Armor'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('Food'), isTrue);
@@ -46,6 +59,7 @@ void main() {
       expect(DialogHeaderHelper.isDialogTitleHeader('Gems/Stones'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('Boulders/Statues'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('Vanquished creatures:'), isTrue);
+      expect(DialogHeaderHelper.isDialogTitleHeader('Genocided species:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('Voluntary challenges:'), isTrue);
       expect(DialogHeaderHelper.isDialogTitleHeader('Contents of sack:'), isTrue);
     });

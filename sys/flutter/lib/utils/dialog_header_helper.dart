@@ -6,29 +6,39 @@ import 'package:flutter/material.dart';
 class DialogHeaderHelper {
   /// タイトルヘッダーとして完全一致判定するキーワード（日本語・英語）
   static const Set<String> _titleKeywords = {
-    // --- 開示・能力・状態系 ---
+    // --- 開示・能力・状態・実績系 ---
     '背景:',
     'Background:',
     '基本情報:',
-    'Base Attributes:',
+    'Basics:',
+    '能力値:',
     '現在の能力値:',
-    'Current Attributes:',
     '最終能力値:',
+    'Base Attributes:',
+    'Current Attributes:',
     'Final Attributes:',
+    '状態:',
     '現在の状態:',
-    'Current Status:',
     '最終状態:',
+    'Current Status:',
     'Final Status:',
+    '能力:',
     '現在の能力:',
-    'Current Characteristics:',
     '最終能力:',
+    'Current Characteristics:',
     'Final Characteristics:',
     'その他:',
     'Other Properties:',
+    'Miscellaneous:',
+    '達成事項:',
+    'Achievement:',
+    'Achievements:',
 
     // --- 持ち物・アイテムカテゴリ系 ---
     '所持品:',
     'Inventory:',
+    '最新メッセージ:',
+    'Latest messages:',
     '武器',
     'Weapons',
     '防具',
@@ -78,16 +88,49 @@ class DialogHeaderHelper {
     'Vanquished creatures:',
     '生成されたが倒していない怪物:',
     'Vanquished species:',
+    '虐殺した怪物種:',
+    '絶滅した怪物種:',
+    '虐殺・絶滅した怪物種:',
     '根絶された種族:',
     '虐殺された種族:',
     'Genocided species:',
+    'Extinct species:',
+    'Genocided or extinct species:',
 
     // --- 自主的な縛り系 ---
     '自主的な縛り:',
     'Voluntary challenges:',
     '挑戦:',
     'Conduct:',
+
+    // --- ショップ・オプション・ヘルプ系セクションヘッダー ---
+    '販売中の商品:',
+    'Fine goods for sale:',
+    'すでに使用した未払い品:',
+    'Unpaid articles already used up:',
+    '方向キー:',
+    'Directional keys:',
+    'その他のキー:',
+    'Miscellaneous keys:',
+    '一般コマンド:',
+    'General commands:',
+    'ゲームコマンド:',
+    'Game commands:',
+    'デバッグモードのコマンド:',
+    'Debug mode commands:',
+    'メニュー操作キー:',
+    'Menu control keys:',
+    '複合オプション:',
+    'Compound options:',
+    'その他の設定:',
+    'Other settings:',
   };
+
+  /// プレイヤー能力値ダイアログの動的ヘッダー（例: "Satokの能力値（魔法使い）:", "Satok's attributes (Wizard):"）
+  static final RegExp _playerAttributesRegex = RegExp(
+    r"^(.+\s*の能力値（.+）:|.+\s*'s\s+attributes\s*\(.+\):)\s*$",
+    caseSensitive: false,
+  );
 
   /// 容器の中身ヘッダーの動的パターン（例: "袋 の中身:", "Contents of bag:"）
   static final RegExp _containerContentsRegex = RegExp(
@@ -105,8 +148,9 @@ class DialogHeaderHelper {
       return true;
     }
 
-    // 容器の中身などの動的パターンチェック
-    if (_containerContentsRegex.hasMatch(trimmed)) {
+    // プレイヤー能力値タイトルや容器の中身などの動的パターンチェック
+    if (_playerAttributesRegex.hasMatch(trimmed) ||
+        _containerContentsRegex.hasMatch(trimmed)) {
       return true;
     }
 
