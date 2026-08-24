@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-24. */
 /* NetHack 5.0	rip.c	$NHDT-Date: 1781973064 2026/06/20 16:31:04 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
@@ -84,8 +84,8 @@ rip_utf8_char_width(unsigned cp)
     /* 半角カタカナ */
     if (cp >= 0xFF61 && cp <= 0xFF9F)
         return 1;
-    /* 主要な東アジア文字（日本語のひらがな、カタカナ、漢字、全角記号など）は幅2とする */
-    if (cp >= 0x1100) {
+    /* 一般句読点・記号(0x2000〜0x206F)や CJK/東アジア文字(0x1100〜)は幅2とする */
+    if ((cp >= 0x2000 && cp <= 0x206F) || cp >= 0x1100) {
         return 2;
     }
     return 1;
@@ -277,6 +277,10 @@ genl_outrip(winid tmpwin, int how, time_t when)
             int copylen = (i0 < (int)sizeof(linebuf) - 8) ? i0 : (int)sizeof(linebuf) - 8;
             (void) memcpy(linebuf, dpx, copylen);
             linebuf[copylen] = '\0';
+            int rlen = (int) strlen(linebuf);
+            while (rlen > 0 && linebuf[rlen - 1] == ' ') {
+                linebuf[--rlen] = '\0';
+            }
             Strcat(linebuf, ellipsis);
             center(line, linebuf);
             dpx += strlen(dpx);
@@ -302,7 +306,15 @@ genl_outrip(winid tmpwin, int how, time_t when)
 
         tmpchar = dpx[i0];
         dpx[i0] = 0;
-        center(line, dpx);
+
+        /* center() に渡す前に行末の余分なスペースを除去（RTrim） */
+        char linebuf[BUFSZ];
+        Strcpy(linebuf, dpx);
+        int rlen = (int) strlen(linebuf);
+        while (rlen > 0 && linebuf[rlen - 1] == ' ') {
+            linebuf[--rlen] = '\0';
+        }
+        center(line, linebuf);
 
         if (tmpchar != ' ') {
             dpx[i0] = tmpchar;
