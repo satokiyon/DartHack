@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
 /* NetHack 5.0	mhmenu.c	$NHDT-Date: 1781973104 2026/06/20 16:31:44 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Alex Kompel, 2002                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -686,11 +686,16 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
                 DrawText(hDC, NH_A2W(p1, wbuf, BUFSZ), _tcslen(wbuf), &drawRect,
                          DT_CALCRECT | DT_LEFT | DT_VCENTER | DT_EXPANDTABS
                              | DT_SINGLELINE);
-                data->menui.menu.tab_stop_size[column] =
-                    max(data->menui.menu.tab_stop_size[column],
-                        drawRect.right - drawRect.left);
-
-                menuitemwidth += data->menui.menu.tab_stop_size[column];
+                int width = drawRect.right - drawRect.left;
+                /* The last column overhangs any subsequent columns in other
+                   lines */
+                if (p != NULL) {
+                    data->menui.menu.tab_stop_size[column] =
+                        max(data->menui.menu.tab_stop_size[column], width);
+                    menuitemwidth += data->menui.menu.tab_stop_size[column];
+                } else {
+                    menuitemwidth += width;
+                }
 
                 if (p != NULL)
                     *p = '\t';
@@ -1184,7 +1189,8 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     p = strchr(item->str, '\t');
     column = 0;
     SetRect(&drawRect, x, lpdis->rcItem.top,
-            min(x + data->menui.menu.tab_stop_size[0], lpdis->rcItem.right),
+            p != NULL ? x + data->menui.menu.tab_stop_size[0]
+                      : lpdis->rcItem.right,
             lpdis->rcItem.bottom);
     for (;;) {
         TCHAR wbuf2[BUFSZ];
@@ -1202,8 +1208,8 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
         p = strchr(p1, '\t');
         drawRect.left = drawRect.right + TAB_SEPARATION;
         ++column;
-        drawRect.right = min(drawRect.left + data->menui.menu.tab_stop_size[column],
-                             lpdis->rcItem.right);
+        drawRect.right = p != NULL ? drawRect.left + data->menui.menu.tab_stop_size[column]
+                                   : lpdis->rcItem.right;
     }
 
     /* draw focused item */

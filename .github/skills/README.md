@@ -9,7 +9,7 @@
 
 | Skill | Description |
 |-------|-------------|
-| [nethackjp-message-translation](./nethackjp-message-translation/SKILL.md) | NetHackJP のメッセージ翻訳作業で、内部キー互換を壊さず自然な日本語へ改善し、最小変更で検証まで行うための実務手順。 \| 以下の依頼で使う:; 表示文の英語残存を日本語化したい; 日本語として不自然な文を自然化したい; `You(...)`, `You_feel(...)`, `You_hear(...)`, `You_see(...)`, `pline(...)`, `pline_... |
+| [nethackjp-message-translation](nethackjp-message-translation/SKILL.md) | NetHackJP のメッセージ翻訳作業で、内部キー互換を壊さず自然な日本語へ改善し、最小変更で検証まで行うための実務手順。 \| 以下の依頼で使う:; 表示文の英語残存を日本語化したい; 日本語として不自然な文を自然化したい; `You(...)`, `You_feel(...)`, `You_hear(...)`, `You_see(...)`, `pline(...)`, `pline_... |
 
 <!-- agent-ninja-END -->
 

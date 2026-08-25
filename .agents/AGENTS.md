@@ -39,12 +39,12 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
   AndroidおよびFlutterポートでは、データファイル群（`data`, `rumors`, `oracles` 等）およびヘルプ・メニューなどのデータファイル群を個別のファイルとして `assets/nethackdir/` にパッケージングし、アプリ起動時に端末のストレージ（データディレクトリ）にコピーして読み込みます。
   Windows版と同様に、英語版（`data`, `oracles`, `rumors`, `tribute` 等）と日本語版（`data_jp`, `oracles_jp`, `rumors_jp`, `tribute_jp` 等）の両方のファイルを `assets/nethackdir/` に同梱します。
   Cコア側（`dlb.c` / `files.c`）でデータファイルをロードする際、日本語版（`_jp`）が存在すれば自動的に優先して読み込み、無ければ英語版にフォールバックして読み込みます。
-- **データファイルおよび Lua スクリプトの `_jp` ペア分離とバイリンガル原則**:
-  `c_core/nethack_jp/dat/` 配下のデータファイルおよび Lua スクリプト（`tut-1.lua`, `air.lua`, `Arc-loca.lua` 等）に日本語メッセージが含まれる場合は、原本ファイル（例: `tut-1.lua`）に直接日本語を埋め込まず、英語版メッセージの原本 `.lua` と、日本語メッセージの `*_jp.lua`（例: `tut-1_jp.lua`）のペア構成に分離してください。
-  分離した `*_jp.lua` および原本 `.lua` の双方は、必ず Flutter アセット (`sys/flutter/assets/nethackdir/`) に同期・同梱してください。
+- **データファイルおよび Lua スクリプトの NetHackJP マージ互換とアセットマッピング原則**:
+  `NetHackJP` 本家リポジトリ (`c_core/nethack_jp/dat/`) との Git Subtree マージ互換性を維持するため、原本ファイル名（`_jp` なし。例: `quest.lua`, `tut-1.lua`, `air.lua` 等）で直接日本語化されているファイルは、`c_core/nethack_jp/dat/` 配下でもそのまま原本名（`_jp` なし）で日本語コンテンツを保持してください（元々本家で `data_jp` や `oracles_jp` 等として管理されているファイルはそのまま `_jp` 付きで保持します）。
+  ビルド時（アセット同期スクリプト `sync_dat_assets.ps1`）において、`c_core/nethack_jp/dat/<name>.lua` (日本語版) を `sys/flutter/assets/nethackdir/<name>_jp.lua` に、`c_core/nethack_en/dat/<name>.lua` (英語版) を `sys/flutter/assets/nethackdir/<name>.lua` にマッピングして両方をアセットへ同期・同梱してください。
 - **アセット同期スクリプト (`sync_dat_assets.ps1`) のパスと運用原則**:
   アセット同期スクリプトの実体は `DartHack_private` リポジトリ配下の `build_files/sys/flutter/scripts/sync_dat_assets.ps1` です。
-  新しい `_jp` データファイルや Lua スクリプトを追加・改修した際は、必ず本スクリプト内の `$syncItems` 配列に同期定義を追加し、実行して `sys/flutter/assets/ver` をインクリメントさせてください。
+  新しいデータファイルや Lua スクリプトを追加・改修した際は、必ず本スクリプト内の `$syncItems` 配列に同期定義を追加し、実行して `sys/flutter/assets/ver` をインクリメントさせてください。
   なお、Windows PowerShell 上で本スクリプトを編集する際は、改行コードを CRLF (`\r\n`) に保つことで構文エラーを防いでください。
 - **アセットバージョン（ver）のインクリメント**:
   データファイルアセットを変更・追加した際は、上書きインストール時に強制的にアセットコピーがトリガーされるよう、必ず `assets/ver` 内のバージョン値（整数値）をインクリメントしてください。

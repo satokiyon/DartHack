@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
 /* NetHack 5.0	polyself.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1529,7 +1529,7 @@ dospinweb(void)
             if (i == NATTK)
                 impossible("Swallower has no engulfing attack?");
             else {
-                char sweep[30];
+                char sweep[64]; /* NetHackJP: expanded for localized text */
 
                 sweep[0] = '\0';
                 switch (u.ustuck->data->mattk[i].adtyp) {

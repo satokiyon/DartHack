@@ -7,7 +7,7 @@
 des.level_init({ style = "solidfill", fg = " " });
 
 des.level_flags("mazelevel", "noteleport", "hardfloor", "shortsighted")
-des.message("You find yourself suspended in an air bubble surrounded by water.")
+des.message("気づくと、水に囲まれた空気の泡の中に浮かんでいた.")
 -- The player lands upon arrival to an air bubble
 -- within the leftmost third of the level.  The
 -- portal to the next level is randomly located in an air

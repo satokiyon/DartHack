@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2006,7 +2006,7 @@ add_achieveX(char *buf, const char *achievement, boolean condition)
 staticfn char *
 encode_extended_achievements(char *buf)
 {
-    char rnkbuf[40];
+    char rnkbuf[80]; /* NetHackJP: expanded for rank titles */
     const char *achievement = NULL;
     int i, achidx, absidx;
 

@@ -1056,16 +1056,20 @@ function make_dig_engraving(data)
    local ty = data.y - pos.y;
    local dig = "";
    if (tx == 0 and ty == 0) then
-      dig = " here";
+      dig = "ここを";
    else
       if (tx < 0 or tx > 0) then
-         dig = string.format(" %i %s", math.abs(tx), (tx > 0) and "east" or "west");
+         dig = string.format("%sに%i", (tx > 0) and "東" or "西", math.abs(tx));
       end
       if (ty < 0 or ty > 0) then
-         dig = dig .. string.format(" %i %s", math.abs(ty), (ty > 0) and "south" or "north");
+         if (dig ~= "") then
+            dig = dig .. "、"
+         end
+         dig = dig .. string.format("%sに%i", (ty > 0) and "南" or "北", math.abs(ty));
       end
+      dig = dig .. "、"
    end
-   des.engraving({ coord = pos, type = "burn", text = "Dig" .. dig });
+   des.engraving({ coord = pos, type = "burn", text = dig .. "を掘れ" });
 end
 
 -- postprocess callback: turn room walls into trees

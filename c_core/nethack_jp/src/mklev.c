@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
 /* NetHack 5.0	mklev.c	$NHDT-Date: 1781973055 2026/06/20 16:30:55 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
@@ -1277,7 +1277,7 @@ makelevel(void)
     } else if (svd.dungeons[u.uz.dnum].fill_lvl[0]) {
         makemaz(svd.dungeons[u.uz.dnum].fill_lvl);
     } else if (In_quest(&u.uz)) {
-        char fillname[9];
+        char fillname[32]; /* NetHackJP: expanded for file code */
         s_level *loc_lev;
 
         Sprintf(fillname, "%s-loca", gu.urole.filecode);

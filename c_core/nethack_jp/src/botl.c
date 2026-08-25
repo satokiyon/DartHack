@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
 /* NetHack 5.0	botl.c	$NHDT-Date: 1781973042 2026/06/20 16:30:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.286 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -5103,9 +5103,14 @@ status_hilite_menu(void)
 #endif
         any = cg.zeroany;
         any.a_int = fld + 1;
-        Sprintf(buf, "%-18s", status_field_label_for_display(fld));
+        if (iflags.menu_tab_sep) {
+            Sprintf(buf, "%s\t", status_field_label_for_display(fld));
+        } else {
+            Sprintf(buf, "%-18s ", status_field_label_for_display(fld));
+        }
         if (count)
-            Sprintf(eos(buf), " (%d件)", count);
+            Sprintf(eos(buf), "(%d件)", count);
+            
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  clr, buf, MENU_ITEMFLAGS_NONE);
     }

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
 /* NetHack 5.0	cmd.c	$NHDT-Date: 1781973043 2026/06/20 16:30:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.772 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -679,10 +679,15 @@ doextlist(void)
                     add_menu_heading(menuwin, buf);
                     menushown[pass] = 1;
                 }
-                /* longest ef_txt at present is "wizrumorcheck" (13 chars);
-                   2nd field will be "    " or " [A]" or " [m]" or "[mA]" */
-                Sprintf(buf, " %-14s %4s %s", efp->ef_txt,
-                        doc_extcmd_flagstr(menuwin, efp), cmd_desc);
+                if (iflags.menu_tab_sep) {
+                    Sprintf(buf, " %s\t%s\t%s", efp->ef_txt,
+                            doc_extcmd_flagstr(menuwin, efp), cmd_desc);
+                } else {
+                    /* longest ef_txt at present is "wizrumorcheck" (13 chars);
+                       2nd field will be "    " or " [A]" or " [m]" or "[mA]" */
+                    Sprintf(buf, " %-14s %4s %s", efp->ef_txt,
+                            doc_extcmd_flagstr(menuwin, efp), cmd_desc);
+                }
                 add_menu_str(menuwin, buf);
                 ++n;
             }

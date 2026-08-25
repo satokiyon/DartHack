@@ -14,9 +14,9 @@ des.level_init({ style = "solidfill", fg = " " });
 
 des.level_flags("mazelevel", "noteleport", "hardfloor", "shortsighted")
 
-des.message("Well done, mortal!")
-des.message("But now thou must face the final Test...")
-des.message("Prove thyself worthy or perish!")
+des.message("よくぞ来た、宿命の者よ!")
+des.message("だが、汝は最後の試練に立ち向かわねばならぬ...")
+des.message("汝の価値を証明するか、さもなくば滅びよ!")
 
 -- The player lands, upon arrival, in the
 -- lower-right cavern.  The location of the

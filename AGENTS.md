@@ -39,8 +39,6 @@
    - `sync_nethack_jp.ps1` および `sync_nethack_en.ps1` には、マージ実行後に本家の `extern.h` に存在する宣言がローカル側に欠落していないか自動検出する整合性チェック機能が組み込まれています。
    - 同期実行後に警告が表示された場合は、`git diff nethack-jp/main:include/extern.h c_core/nethack_jp/include/extern.h` 等で差分を確認し、消去された本家側の宣言や定義を手動で復元してください。
 
-
-
 ## Flutter スコアボード・死因表示における Cコアと Flutter UI 間の二重同期ルール
 
 Flutter ポートにおけるハイスコア・スコアボード表示には、以下の2系統の表示経路（パス）が存在します。
@@ -163,7 +161,6 @@ Flutter ポートにおけるハイスコア・スコアボード表示には、
    - `You()` を使用する場合は、動詞句（例: 「〜にいる。」「〜を得た。」）を渡し、「あなたは〜」と繋がった際に自然な日本語文になるよう設計してください。
    - `You("are in ...")` のように英文をそのまま `You()` に渡すと「あなたはare in ...」という英語交じりの壊れたメッセージになるため、必ず `pline()` で日本語化するか自然な動詞句に置き換えてください。
 
-
 ## アイテムの日本語助数詞（単位）表示方針
 
 1. **GEM_CLASS オブジェクトの助数詞**:
@@ -191,12 +188,12 @@ Flutter ポートにおけるハイスコア・スコアボード表示には、
 5. **Android / Flutter版における日本語・英語版データファイルの配置と優先ロード方針**:
    - AndroidおよびFlutterポートでは、データファイル群（`data`, `rumors`, `oracles`, `quest.lua`, `bogusmon`, `engrave`, `epitaph`, `tut-1.lua` 等）を個別のファイルとして `assets/nethackdir/` にパッケージングし、アプリ起動時に端末のストレージ（データディレクトリ）にコピーして読み込みます。
    - 英語版（`data`, `oracles`, `rumors`, `quest.lua`, `bogusmon` 等）と日本語版（`data_jp`, `oracles_jp`, `rumors_jp`, `quest_jp.lua`, `bogusmon_jp` 等）の両方のファイルを `assets/nethackdir/` に同梱します。
-   - **データファイルおよび Lua スクリプトの `_jp` ペア分離とバイリンガル原則**:
-     `c_core/nethack_jp/dat/` 配下のデータファイルおよび Lua スクリプト（`tut-1.lua`, `air.lua`, `Arc-loca.lua` 等）に日本語メッセージが含まれる場合は、原本ファイル（例: `tut-1.lua`）に直接日本語を埋め込まず、英語版メッセージの原本 `.lua` と、日本語メッセージの `*_jp.lua`（例: `tut-1_jp.lua`）のペア構成に分離してください。
-     分離した `*_jp.lua` および原本 `.lua` の双方は、必ず Flutter アセット (`sys/flutter/assets/nethackdir/`) に同期・同梱してください。
+   - **データファイルおよび Lua スクリプトの NetHackJP マージ互換とアセットマッピング原則**:
+     `NetHackJP` 本家リポジトリ (`c_core/nethack_jp/dat/`) との Git Subtree マージ互換性を維持するため、原本ファイル名（`_jp` なし。例: `quest.lua`, `tut-1.lua`, `air.lua` 等）で直接日本語化されているファイルは、`c_core/nethack_jp/dat/` 配下でもそのまま原本名（`_jp` なし）で日本語コンテンツを保持してください（元々本家で `data_jp` や `oracles_jp` 等として管理されているファイルはそのまま `_jp` 付きで保持します）。
+     ビルド時（アセット同期スクリプト `sync_dat_assets.ps1`）において、`c_core/nethack_jp/dat/<name>.lua` (日本語版) を `sys/flutter/assets/nethackdir/<name>_jp.lua` に、`c_core/nethack_en/dat/<name>.lua` (英語版) を `sys/flutter/assets/nethackdir/<name>.lua` にマッピングして両方をアセットへ同期・同梱してください。
    - **アセット同期スクリプト (`sync_dat_assets.ps1`) のパスと運用原則**:
      アセット同期スクリプトの実体は `DartHack_private` リポジトリ配下の `build_files/sys/flutter/scripts/sync_dat_assets.ps1` です。
-     新しい `_jp` データファイルや Lua スクリプトを追加・改修した際は、必ず本スクリプト内の `$syncItems` 配列に同期定義を追加し、実行して `sys/flutter/assets/ver` をインクリメントさせてください。
+     新しいデータファイルや Lua スクリプトを追加・改修した際は、必ず本スクリプト内の `$syncItems` 配列に同期定義を追加し、実行して `sys/flutter/assets/ver` をインクリメントさせてください。
      なお、Windows PowerShell 上で本スクリプトを編集する際は、改行コードを CRLF (`\r\n`) に保つことで構文エラーを防いでください。
    - **Cコア側における自動優先ロードの実装原則 (`files.c` / `fopen_datafile`)**:
      - DLB (Data Librarian Archive) が未定義の環境では、`include/dlb.h` において `dlb_fopen` が `fopen_datafile(name, mode, DATAPREFIX)` へ展開されます。
@@ -255,7 +252,6 @@ Flutter ポートにおけるハイスコア・スコアボード表示には、
         3) `set_playmode();` を呼び出して C コアの認証状態を完了させる
 
    **関連**: C コア ↔ Flutter FFI におけるウィンドウ API とタイル描画の設計方針（後述）も合わせて参照してください。`#ifndef ANDROID` ガードの配置や、`flutter_putmixed_with_tile` のような Android 専用 C シンボルを共通ファイルに置く際の二重定義回避パターンを記載しています。
-
 
 ## Flutter移植版におけるCスレッド連携・UI同期設計方針
 
@@ -344,7 +340,6 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
    - `You()` を使用する場合は、動詞句（例: 「〜にいる。」「〜を得た。」）を渡し、「あなたは〜」と繋がった際に自然な日本語文になるよう設計してください。
    - `You("are in ...")` のように英文をそのまま `You()` に渡すと「あなたはare in ...」という英語交じりの壊れたメッセージになるため、必ず `pline()` で日本語化するか自然な動詞句に置き換えてください。
 
-
 ## アイテムの日本語助数詞（単位）表示方針
 
 1. **GEM_CLASS オブジェクトの助数詞**:
@@ -423,7 +418,6 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
         3) `set_playmode();` を呼び出して C コアの認証状態を完了させる
 
    **関連**: C コア ↔ Flutter FFI におけるウィンドウ API とタイル描画の設計方針（後述）も合わせて参照してください。`#ifndef ANDROID` ガードの配置や、`flutter_putmixed_with_tile` のような Android 専用 C シンボルを共通ファイルに置く際の二重定義回避パターンを記載しています。
-
 
 ## Flutter移植版におけるCスレッド連携・UI同期設計方針
 
@@ -595,7 +589,6 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
 
     **関連**: C コア ↔ Flutter FFI におけるウィンドウ API とタイル描画の設計方針（次セクション）も合わせて参照してください。タイル表示や putmixed 拡張など、ウィンドウ API への機能追加パターンを記載しています。
 
-
 ## NetHack C コア ↔ Flutter FFI におけるウィンドウ API とタイル描画の設計方針
 
 NetHack C コア（バックグラウンドスレッド）と Flutter/Dart UI 間で、ウィンドウ API を拡張してタイル表示などの付加情報をやり取りする際の方針です。前述の「Flutter移植版におけるCスレッド連携・UI同期設計方針」の姉妹ドキュメントとして位置付け、ウィンドウ API レベルでの設計判断・実装パターン・典型的なハマりポイントを整理します。
@@ -702,7 +695,6 @@ Flutter 版には、ゲーム画面のステータスバーの表示を制御す
 - `sys/flutter/lib/main.dart`: enum `ScreenMode`, state, `_loadScreenMode`, `_applyScreenMode`
 - `sys/flutter/lib/settings_page.dart`: 新セクション「画面表示モード」追加（タイルセット設定の後、2 番目）
 - `sys/flutter/android/app/src/main/kotlin/jp/satokiyo/darthack/MainActivity.kt`: `applyScreenMode(Int)` 実装
-
 
 ## Flutter 版におけるアプリアイコン設定・構成方針
 
@@ -813,8 +805,6 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
 - **非同期コンテキスト (`BuildContext`) の安全性チェック**:
   非同期処理（`Future` / `SharedPreferences` / FFI 呼び出し等）を跨いで `showDialog` や `context` を参照・操作する際は、必ず事前に `if (!context.mounted) return;` （または `if (!mounted) return;`）を挿入し、アンマウント済みのコンテキスト参照によるクラッシュや型解析警告を徹底して回避してください。
 
-
-
 ## 31. Flutter TextField における UTF-8 バイト数制限とカウンタ表示方針
 - **現象と制約**:
   Flutter の `TextField` に単に `maxLength: N` を指定すると、Flutter 標準で Unicode コードポイント数（文字数）制限およびカウンタ表記が行われます。これにより、全角日本語（UTF-8 で 3 バイト/文字）などのマルチバイト文字が 1 文字 1 カウント（1 バイト扱い）となり、C コア側のバッファ上限（`PL_PSIZ` = 63 バイト、`PL_CSIZ` = 32 バイト、`BUFSZ` 等）を超えるバイト数の文字列が入力できてしまう問題が発生します。
@@ -833,7 +823,6 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
 
 3. **4行オーバーフロー時の省略記号（… / ...）付き安全切り詰め**:
    - 死因が 4 行（最大64表示幅カラム）を超える場合、単に5行目以降を捨てるのではなく、4行目（最終行）の末尾に省略記号（日本語モード: `…` (2幅) / 英語モード: `...` (3幅)）を付与して切り詰め、墓石の右枠 `|` (Column 37) を維持したまま省略を明確に示してください。
-
 
 ## 33. DartHack と NetHackJP における言語フラグ（g_language_is_jp）の設計・コード分離方針
 
