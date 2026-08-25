@@ -2321,6 +2321,10 @@ __attribute__((visibility("default"))) void flutter_set_autosave_settings(int en
     debuglog("flutter_set_autosave_settings: enabled=%d, interval=%d", enabled, interval_turns);
 }
 
+__attribute__((visibility("default"))) void flutter_lookup_key_description(int code) {
+    dowhatdoes_key((char)code);
+}
+
 
 
 

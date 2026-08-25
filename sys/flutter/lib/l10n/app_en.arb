@@ -359,5 +359,10 @@
   "resetAppSettingsSuccess": "UI & control settings reset to defaults.",
   "resetDefaultsFileSuccess": "defaults.nh reset to default file.",
   "btnResetConfirm": "Reset",
-  "btnCancel": "Cancel"
+  "btnCancel": "Cancel",
+  "anyKeyPromptTitle": "Check Key Function",
+  "anyKeyPromptSubtitle": "Type a key to get info, or select below:",
+  "anyKeyPlaceholder": "Type a key...",
+  "searchAnotherKey": "Check another key",
+  "close": "Close"
 }

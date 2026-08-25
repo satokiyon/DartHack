@@ -2125,6 +2125,30 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'キャンセル'**
   String get btnCancel;
+
+  /// No description provided for @anyKeyPromptTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'キー機能の確認'**
+  String get anyKeyPromptTitle;
+
+  /// No description provided for @anyKeyPromptSubtitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'調べたいキーを入力するか、下から選択してください:'**
+  String get anyKeyPromptSubtitle;
+
+  /// No description provided for @anyKeyPlaceholder.
+  ///
+  /// In ja, this message translates to:
+  /// **'キーを入力...'**
+  String get anyKeyPlaceholder;
+
+  /// No description provided for @searchAnotherKey.
+  ///
+  /// In ja, this message translates to:
+  /// **'他のキーを調べる'**
+  String get searchAnotherKey;
 }
 
 class _AppLocalizationsDelegate

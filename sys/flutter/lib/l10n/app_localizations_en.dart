@@ -1083,4 +1083,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get btnCancel => 'Cancel';
+
+  @override
+  String get anyKeyPromptTitle => 'Check Key Function';
+
+  @override
+  String get anyKeyPromptSubtitle => 'Type a key to get info, or select below:';
+
+  @override
+  String get anyKeyPlaceholder => 'Type a key...';
+
+  @override
+  String get searchAnotherKey => 'Check another key';
 }

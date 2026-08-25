@@ -414,6 +414,10 @@ class NetHackWorker {
         } else if (type == 'yn_result') {
           final result = message['result'] as int;
           ffi.sendYnResult(result);
+        } else if (type == 'lookup_key') {
+          final code = message['code'] as int;
+          wlog("lookup_key invoked for code: $code");
+          ffi.lookupKeyDescription(code);
         } else if (type == 'new_level_rest_result') {
           final rewardAmount = message['rewardAmount'] as int? ?? 0;
           ffi.sendNewLevelRestResult(rewardAmount);

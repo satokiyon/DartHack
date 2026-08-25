@@ -187,6 +187,9 @@ typedef SendNewLevelRestResultDart = void Function(int rewardAmount);
 typedef SetLanguageModeFunc = Void Function(Int32 isJp);
 typedef SetLanguageModeDart = void Function(int isJp);
 
+typedef LookupKeyDescriptionFunc = Void Function(Int32 code);
+typedef LookupKeyDescriptionDart = void Function(int code);
+
 class NetHackFfi {
   late DynamicLibrary _lib;
 
@@ -214,6 +217,7 @@ class NetHackFfi {
   late final SetLanguageModeDart setLanguageMode;
   late final TriggerAutosaveDart triggerAutosave;
   late final SetAutosaveSettingsDart setAutosaveSettings;
+  late final LookupKeyDescriptionDart lookupKeyDescription;
 
   NetHackFfi([String langCode = 'ja']) {
     try {
@@ -360,6 +364,14 @@ class NetHackFfi {
           .asFunction<SetAutosaveSettingsDart>();
     } catch (e) {
       setAutosaveSettings = (_, __) {};
+    }
+
+    try {
+      lookupKeyDescription = _lib
+          .lookup<NativeFunction<LookupKeyDescriptionFunc>>('flutter_lookup_key_description')
+          .asFunction<LookupKeyDescriptionDart>();
+    } catch (e) {
+      lookupKeyDescription = (_) {};
     }
   }
 

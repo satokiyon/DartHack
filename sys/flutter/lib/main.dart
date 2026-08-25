@@ -36,6 +36,7 @@ import 'widgets/game_drawer.dart';
 import 'widgets/guidebook_dialog.dart';
 import 'widgets/overlays/menu_overlay.dart';
 import 'widgets/overlays/yn_overlay.dart';
+import 'widgets/overlays/any_key_overlay.dart';
 import 'widgets/overlays/getline_overlay.dart';
 import 'widgets/overlays/askname_overlay.dart';
 import 'widgets/overlays/text_overlay.dart';
@@ -173,6 +174,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   // --- 新規同期ダイアログ用状態変数 ---
   bool _isYnVisible = false;
+  bool _isAnyKeyVisible = false;
+  String? _anyKeyDescription;
+  int? _anyKeyPendingCode;
   String _ynQuestion = "";
   String _ynChoices = "";
   int _ynDefault = 0;
@@ -938,6 +942,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
     setState(() {
       _isYnVisible = false;
+      _isAnyKeyVisible = false;
+      _anyKeyDescription = null;
     });
   }
 
@@ -1324,6 +1330,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               _isDirectionPromptActive = false;
             }
           }
+          if (_isAnyKeyVisible && text.trim().isNotEmpty && !text.contains("Ask about") && !text.contains("説明を読める") && !text.contains("どのコマンド")) {
+            setState(() {
+              _anyKeyDescription = text;
+            });
+          }
         } else if (type == 'putMixed') {
           // putmixed タイル ID 付き送信 (`/` 結果リスト用)。
           // putstr と同じダイアログ検出 (方向プロンプト) も行う。
@@ -1375,12 +1386,31 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           }
           _triggerCenterOnPlayer();
         } else if (type == 'yn_function') {
-          setState(() {
-            _ynQuestion = message['question'];
-            _ynChoices = message['choices'];
-            _ynDefault = message['def'];
-            _isYnVisible = true;
-          });
+          final question = (message['question'] as String?) ?? '';
+          final choices = (message['choices'] as String?) ?? '';
+          final def = (message['def'] as int?) ?? 0;
+          if (_isWhatCommandPrompt(question)) {
+            final pending = _anyKeyPendingCode;
+            _anyKeyPendingCode = null;
+            if (pending != null) {
+              _workerSendPort?.send({'type': 'yn_result', 'result': pending});
+            }
+            setState(() {
+              _ynQuestion = question;
+              _ynChoices = choices;
+              _ynDefault = def;
+              _isAnyKeyVisible = true;
+              _isYnVisible = false;
+            });
+          } else {
+            setState(() {
+              _ynQuestion = question;
+              _ynChoices = choices;
+              _ynDefault = def;
+              _isYnVisible = true;
+              _isAnyKeyVisible = false;
+            });
+          }
         } else if (type == 'getline') {
           final prompt = message['prompt'] as String;
           final initText = message['initText'] as String;
@@ -2173,12 +2203,66 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     );
   }
 
+  bool _isWhatCommandPrompt(String question) {
+    final lowerQ = question.toLowerCase();
+    return lowerQ.contains("what command") ||
+           question.contains("どのコマンド") ||
+           question.contains("which command") ||
+           question == "]";
+  }
+
   Widget _buildYnOverlay() {
     return YnOverlay(
       question: _ynQuestion,
       choices: _ynChoices,
       defaultChoice: _ynDefault,
       onSelect: (choiceCode) => _sendYnResult(choiceCode),
+      onShowMsgHistory: _showMsgHistoryPanel,
+      bottomInset: _dialogBottomInset(context),
+    );
+  }
+
+  void _sendAnyKeyLookup(int choiceCode) {
+    if (choiceCode == 27) {
+      _closeAnyKeyOverlay();
+      return;
+    }
+    if (!_waitingForInput) {
+      // 初回 (Cコアが yn_function 待機中): キャンセルではなく選択キーを直ちに yn_result で返送してエラー ^@ を回避
+      _workerSendPort?.send({
+        'type': 'yn_result',
+        'result': choiceCode,
+      });
+    } else {
+      // 2回目以降 (Cコアがメインループ中): FFI 直通 lookup_key を送信
+      _workerSendPort?.send({
+        'type': 'lookup_key',
+        'code': choiceCode,
+      });
+    }
+  }
+
+  void _closeAnyKeyOverlay() {
+    if (!_waitingForInput) {
+      _workerSendPort?.send({
+        'type': 'yn_result',
+        'result': 27,
+      });
+    }
+    setState(() {
+      _isAnyKeyVisible = false;
+      _anyKeyDescription = null;
+      _anyKeyPendingCode = null;
+    });
+  }
+
+  Widget _buildAnyKeyOverlay() {
+    return AnyKeyOverlay(
+      question: _ynQuestion,
+      defaultChoice: _ynDefault,
+      descriptionText: _anyKeyDescription,
+      onSelect: (choiceCode) => _sendAnyKeyLookup(choiceCode),
+      onClose: _closeAnyKeyOverlay,
       onShowMsgHistory: _showMsgHistoryPanel,
       bottomInset: _dialogBottomInset(context),
     );
@@ -3034,6 +3118,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               // ★ダイアログ・メニュー・テキストオーバーレイ（最前面・ゲーム全フェーズで描画可能）
               if (_screen.isMenuWindowVisible) _buildMenuOverlay(),
               if (_isYnVisible) _buildYnOverlay(),
+              if (_isAnyKeyVisible) _buildAnyKeyOverlay(),
               if (_isGetLineVisible) _buildGetLineOverlay(),
               if (_isAskNameVisible) _buildAskNameOverlay(),
               if (_screen.isTextWindowVisible) _buildTextOverlay(),

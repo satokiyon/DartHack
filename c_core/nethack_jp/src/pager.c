@@ -3166,6 +3166,32 @@ dowhatdoes(void)
     return ECMD_OK;
 }
 
+void
+dowhatdoes_key(char q)
+{
+    char bufr[BUFSZ];
+    char *reslt;
+
+    if (q == '\0' || q == '\033')
+        return;
+
+    reslt = dowhatdoes_core(q, bufr);
+    if (reslt) {
+        char *p = strchr(reslt, '\n');
+
+        if (!p) {
+            pline("%s", reslt);
+        } else {
+            *p = '\0';
+            pline("%s,", reslt);
+            pline("%8.8s%s", reslt, p + 1);
+        }
+    } else {
+        pline("そのコマンド'%s'は存在しなかった. 文字コード %d (0%03o または 0x%02x).",
+              visctrl(q), (uchar) q, (uchar) q, (uchar) q);
+    }
+}
+
 staticfn void
 docontact(void)
 {

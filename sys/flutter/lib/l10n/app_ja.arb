@@ -359,5 +359,10 @@
   "resetAppSettingsSuccess": "UI・操作設定を初期値に戻しました。",
   "resetDefaultsFileSuccess": "defaults.nhを初期ファイルに戻しました。",
   "btnResetConfirm": "初期化",
-  "btnCancel": "キャンセル"
+  "btnCancel": "キャンセル",
+  "anyKeyPromptTitle": "キー機能の確認",
+  "anyKeyPromptSubtitle": "調べたいキーを入力するか、下から選択してください:",
+  "anyKeyPlaceholder": "キーを入力...",
+  "searchAnotherKey": "他のキーを調べる",
+  "close": "閉じる"
 }

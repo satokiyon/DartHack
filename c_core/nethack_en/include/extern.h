@@ -2382,6 +2382,7 @@ extern int dowhatis(void);
 extern int doquickwhatis(void);
 extern int doidtrap(void);
 extern int dowhatdoes(void);
+extern void dowhatdoes_key(char);
 extern char *dowhatdoes_core(char, char *) NONNULLARG2; /*might return NULL*/
 extern int dohelp(void);
 extern int dohistory(void);

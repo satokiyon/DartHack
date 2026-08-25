@@ -1063,4 +1063,16 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get btnCancel => 'キャンセル';
+
+  @override
+  String get anyKeyPromptTitle => 'キー機能の確認';
+
+  @override
+  String get anyKeyPromptSubtitle => '調べたいキーを入力するか、下から選択してください:';
+
+  @override
+  String get anyKeyPlaceholder => 'キーを入力...';
+
+  @override
+  String get searchAnotherKey => '他のキーを調べる';
 }
