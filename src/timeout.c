@@ -659,7 +659,7 @@ nh_timeout(void)
 
     if (u.ugallop) {
         if (--u.ugallop == 0L && u.usteed)
-            pline("%s stops galloping.", Monnam(u.usteed));
+            pline("%sは全速力で走るのをやめた.", Monnam(u.usteed));
     }
 
     was_flying = Flying;

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-26. */
 /* NetHack 5.0	steal.c	$NHDT-Date: 1781973068 2026/06/20 16:31:08 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.142 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -88,21 +88,21 @@ stealgold(struct monst *mtmp)
         newsym(u.ux, u.uy);
         if (u.usteed) {
             who = u.usteed;
-            whose = s_suffix(y_monnam(who));
+            whose = y_monnam(who);
             what = jp_mbodypart_plural(who, FOOT);
         } else {
             who = &gy.youmonst;
-            whose = "your";
+            whose = "あなた";
             what = jp_body_part_plural(FOOT);
         }
         /* [ avoid "between your rear regions" :-] */
         if (slithy(who->data))
-            what = "coils";
+            what = "胴体";
         /* reduce "rear hooves/claws" to "hooves/claws" */
         if (!strncmp(what, "rear ", 5))
             what += 5;
-        pline("%s quickly snatches some gold from %s %s %s!", Monnam(mtmp),
-              (Levitation || Flying) ? "beneath" : "between", whose, what);
+        pline("%sは%sの%sの%sから素早く金を奪い取った!", Monnam(mtmp),
+              whose, what, (Levitation || Flying) ? "すぐ下" : "間");
         if (!ygold || !rn2(5)) {
             if (!tele_restrict(mtmp))
                 (void) rloc(mtmp, RLOC_MSG);
@@ -485,14 +485,14 @@ steal(struct monst *mtmp, char *objnambuf)
 
         if (ostuck || can_carry(mtmp, otmp) == 0) {
             static const char *const how[] = {
-                "steal", "snatch", "grab", "take"
+                "奪おう", "ひったくろう", "掴もう", "取ろう"
             };
  cant_take:
-            pline("%s tries to %s %s%s but gives up.", Monnambuf,
-                  ROLL_FROM(how),
-                  (otmp->owornmask & W_ARMOR) ? "your " : "",
+            pline("%sは%s%sを%sと試みたが諦めた.", Monnambuf,
+                  (otmp->owornmask & W_ARMOR) ? "あなたの" : "",
                   (otmp->owornmask & W_ARMOR) ? armor_simple_name(otmp)
-                                              : yname(otmp));
+                                              : yname(otmp),
+                  ROLL_FROM(how));
             /* the fewer items you have, the less likely the thief
                is going to stick around to try again (0) instead of
                running away (1) */
@@ -814,7 +814,7 @@ maybe_absorb_item(
     } else {
         /* not carried; presumably thrown or kicked */
         if (canspotmon(mon))
-            pline("%s absorbs %s!", Monnam(mon), yname(obj));
+            pline("%sは%sを吸収した!", Monnam(mon), yname(obj));
     }
     /* add to mon's inventory */
     (void) mpickobj(mon, obj);

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-26. */
 /* NetHack 5.0	worm.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
@@ -471,7 +471,7 @@ cutworm(struct monst *worm, coordxy x, coordxy y,
     place_wsegs(new_worm, worm);
 
     if (svc.context.mon_moving)
-        pline("%s is cut in half.", Monnam(worm));
+        pline("%sは真っ二つに切断された.", Monnam(worm));
     else
         You("%sを両断した。", l_monnam(worm));
 }
