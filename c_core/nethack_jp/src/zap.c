@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-26. */
 /* NetHack 5.0	zap.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.596 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -4661,7 +4661,7 @@ burn_floor_objects(
                     if (delquan > 1L)
                         pline("%ld個の%sが燃えた.", delquan, buf2);
                     else
-                        pline("%sが燃えた.", An(buf1));
+                        pline("%sが燃えた.", buf1);
                 }
             }
         }
@@ -5080,7 +5080,7 @@ melt_ice(coordxy x, coordxy y, const char *msg)
         Norep("%s", msg);
     if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
         if (cansee(x, y))
-            pline("%sが落ち着いた...", An(xname(otmp)));
+            pline("%sが落ち着いた...", xname(otmp));
         do {
             obj_extract_self(otmp); /* boulder isn't being pushed */
             if (!boulder_hits_pool(otmp, x, y, FALSE))
@@ -5563,7 +5563,7 @@ fracture_rock(struct obj *obj) /* no texts here! */
         if (billable(&shkp, obj, objroom, FALSE)) {
             /* shop message says "you owe <shk> <$> for it!" so we need
                to precede that with a message explaining what "it" is */
-            You("%sの%sを砕いてしまった.", s_suffix(jp_shkname_for_display(shkp)), xname(obj));
+            You("%sの%sを砕いてしまった.", jp_shkname_for_display(shkp), xname(obj));
             /* breakobj won't destroy fracturing statue or boulder but
                will charge for shop goods */
             (void) breakobj(obj, x, y, TRUE, FALSE);

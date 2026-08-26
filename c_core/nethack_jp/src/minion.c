@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-26. */
 /* NetHack 5.0	minion.c	$NHDT-Date: 1781973054 2026/06/20 16:30:54 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.88 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2008. */
@@ -124,7 +124,7 @@ msummon(struct monst *mon)
 
         if (u_wield_art(ART_DEMONBANE) && is_demon(ptr)) {
             if (canseemon(mon))
-                pline("%s looks puzzled for a moment.", Monnam(mon));
+                pline("%sは一瞬困惑したようだ.", Monnam(mon));
             return 0;
         }
 
@@ -321,7 +321,7 @@ demon_talk(struct monst *mtmp)
 
     if (u_wield_art(ART_EXCALIBUR) || u_wield_art(ART_DEMONBANE)) {
         if (canspotmon(mtmp))
-            pline("%s looks very angry.", Amonnam(mtmp));
+            pline("%sはとても怒っているようだ.", Amonnam(mtmp));
         else
             You_feel("緊張が高まるのを感じた.");
         mtmp->mpeaceful = mtmp->mtame = 0;
@@ -529,11 +529,11 @@ lose_guardian_angel(
     if (mon) {
         if (canspotmon(mon)) {
             if (!Deaf) {
-                pline("%s rebukes you, saying:", Monnam(mon));
+                pline("%sはあなたを非難して言った:", Monnam(mon));
                 SetVoice(mon, 0, 80, 0);
                 verbalize("争いを望むなら、もっとくれてやる！");
             } else {
-                pline("%s vanishes!", Monnam(mon));
+                pline("%sは消え去った!", Monnam(mon));
             }
         }
         mongone(mon);
