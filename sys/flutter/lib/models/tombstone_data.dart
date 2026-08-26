@@ -30,10 +30,15 @@ class TombstoneData {
       return content.trim();
     }
 
-    final name = lines.length > 6 ? clean(lines[6]) : "";
-    final gold = lines.length > 7 ? clean(lines[7]) : "";
+    int nameIndex = lines.indexWhere((line) => line.contains('|'));
+    if (nameIndex == -1) {
+      nameIndex = 6;
+    }
+
+    final name = lines.length > nameIndex ? clean(lines[nameIndex]) : "";
+    final gold = lines.length > nameIndex + 1 ? clean(lines[nameIndex + 1]) : "";
     final deathLines = <String>[];
-    for (int i = 8; i <= 11; i++) {
+    for (int i = nameIndex + 2; i <= nameIndex + 5; i++) {
       if (lines.length > i) {
         final c = clean(lines[i]);
         if (c.isNotEmpty && c != "." && c != "...") {
@@ -41,7 +46,7 @@ class TombstoneData {
         }
       }
     }
-    final year = lines.length > 12 ? clean(lines[12]) : "";
+    final year = lines.length > nameIndex + 6 ? clean(lines[nameIndex + 6]) : "";
 
     return TombstoneData(
       name: name,
