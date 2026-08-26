@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-26. */
 /* NetHack 5.0	lock.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -498,7 +498,7 @@ pick_lock(
                 } else if (picktyp == CREDIT_CARD && !otmp->olocked) {
                     /* credit cards are only good for unlocking */
                     You_cant("%sではそれはできなかった.",
-                             an(simple_typename(picktyp)));
+                             simple_typename(picktyp));
                     return PICKLOCK_LEARNED_SOMETHING;
                 } else if (autounlock
                            && !touch_artifact(pick, &gy.youmonst)) {
@@ -1304,7 +1304,7 @@ chest_shatter_msg(struct obj *otmp)
         disposition = "は破壊された";
         break;
     }
-    pline("%s %s!", An(thing), disposition);
+    pline("%s%s!", thing, disposition);
 }
 
 /*lock.c*/

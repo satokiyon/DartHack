@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-26. */
 /* NetHack 5.0	muse.c	$NHDT-Date: 1781973057 2026/06/20 16:30:57 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.248 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
@@ -3215,7 +3215,7 @@ muse_unslime(
     }
     if (vis) {
         if (res && !DEADMONSTER(mon))
-            pline_mon(mon, "%sのスライムは焼き払われた!", s_suffix(Monnam(mon)));
+            pline_mon(mon, "%sのスライムは焼き払われた!", Monnam(mon));
         if (otyp != STRANGE_OBJECT)
             makeknown(otyp);
     }

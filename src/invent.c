@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-26. */
 /* NetHack 5.0	invent.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.563 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -4488,17 +4488,18 @@ look_here(
         for (; otmp; otmp = otmp->nexthere) {
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
                 felt_cockatrice = TRUE;
-                Sprintf(buf, "%s...",
+                Sprintf(buf, "  %s...",
                         drop_english_article(
                             (puzzling_count) ? doname_with_cgender(otmp)
                                              : doname(otmp)));
                 putstr(tmpwin, 0, buf);
                 break;
             }
-            putstr(tmpwin, 0,
-                   drop_english_article(
-                       (puzzling_count) ? doname_with_price_and_cgender(otmp)
-                                        : doname_with_price(otmp)));
+            Sprintf(buf, "  %s",
+                    drop_english_article(
+                        (puzzling_count) ? doname_with_price_and_cgender(otmp)
+                                         : doname_with_price(otmp)));
+            putstr(tmpwin, 0, buf);
         }
         display_nhwindow(tmpwin, TRUE);
         destroy_nhwindow(tmpwin);

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-26. */
 /* NetHack 5.0	timeout.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.212 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -409,8 +409,8 @@ slime_dialogue(void)
                 if (!Blind) /* [what if you're already green?] */
                     urgent_pline(buf, hcolor(NH_GREEN));
             } else {
-                urgent_pline(buf, an(Hallucination ? rndmonnam(NULL)
-                                                   : "green slime"));
+                urgent_pline(buf, Hallucination ? rndmonnam(NULL)
+                                                : "グリーンスライム");
             }
         } else {
             urgent_pline("%s", buf);
@@ -1345,7 +1345,7 @@ see_lamp_flicker(struct obj *obj, const char *tailer)
         pline("%sが%s点滅している.", Yname2(obj), tailer);
         break;
     case OBJ_FLOOR:
-        You_see("%sが%s点滅している.", an(xname(obj)), tailer);
+        You_see("%sが%s点滅している.", xname(obj), tailer);
         break;
     }
 }
@@ -1492,7 +1492,7 @@ burn_object(anything *arg, long timeout)
                         pline("%sは今にも消えそうだ.", Yname2(obj));
                         break;
                     case OBJ_FLOOR:
-                        You_see("%sが消える寸前のを見た.", an(xname(obj)));
+                        You_see("%sが消える寸前なのを見た.", xname(obj));
                         break;
                     }
                 }
@@ -1517,7 +1517,7 @@ burn_object(anything *arg, long timeout)
                     if (obj->otyp == BRASS_LANTERN)
                         You_see("ランプの電池が切れるのを見た.");
                     else
-                        You_see("%sが消えるのを見た.", an(xname(obj)));
+                        You_see("%sが消えるのを見た.", xname(obj));
                     break;
                 }
             }
@@ -1610,7 +1610,7 @@ burn_object(anything *arg, long timeout)
                           You see a wax candle consumed!
                          */
                         You_see("%s%sが燃え尽きるのを見た!", many ? "いくつかの" : "",
-                                many ? xname(obj) : an(xname(obj)));
+                                xname(obj));
                         need_newsym = TRUE;
                         break;
                     }
