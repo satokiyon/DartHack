@@ -139,12 +139,48 @@ void main() {
         '                                                                       -  [0]',
         ' 20          5  Player 盗賊/人間/男性/中立 killed by doppelganger in goblin form (運命の大迷宮 3階).',
         '                                                                       -  [0]',
+        ' 21          4  Player 騎士/人間/男性/秩序 killed by a falling drawbridge (運命の大迷宮 10階).',
+        '                                                                       -  [0]',
+        ' 22          3  Player 洞窟人/人間/男性/中立 unwisely ate the body of cockatrice (運命の大迷宮 12階).',
+        '                                                                       -  [0]',
+        ' 23          2  Player 考古学者/人間/男性/中立 unwisely ate the brain of mind flayer (運命の大迷宮 15階).',
+        '                                                                       -  [0]',
+        ' 24          1  Player 侍/人間/男性/秩序 touching cockatrice corpse bare-handed (運命の大迷宮 12階).',
+        '                                                                       -  [0]',
+        ' 25          1  Player 侍/人間/男性/秩序 kicking cockatrice corpse barefoot (運命の大迷宮 12階).',
+        '                                                                       -  [0]',
+        ' 26          1  Player 魔法使い/人間/男性/中立 killed by alchemic blast (運命の大迷宮 5階).',
+        '                                                                       -  [0]',
+        ' 27          1  Player 騎士/人間/男性/秩序 killed by Vlad the Impaler (ゲヘナ 35階).',
+        '                                                                       -  [0]',
+        ' 28          1  Player 魔法使い/人間/男性/中立 shot himself with a death ray (運命の大迷宮 10階).',
+        '                                                                       -  [0]',
+        ' 29          1  Player 僧侶/人間/男性/秩序 killed by Moloch\'s indifference (アストラル界 1階).',
+        '                                                                       -  [0]',
+        ' 30          1  Player 侍/人間/男性/秩序 committed suicide (運命の大迷宮 1階).',
+        '                                                                       -  [0]',
+        ' 31          1  Player 探検家/人間/男性/中立 killed by brainlessness (運命の大迷宮 12階).',
+        '                                                                       -  [0]',
+        ' 32          1  Player 侍/人間/男性/秩序 escaped (with the Amulet).',
+        '                                                                       -  [0]',
+        ' 33          1  Player 魔法使い/人間/男性/中立 killed by self-genocide (運命の大迷宮 1階).',
+        '                                                                       -  [0]',
+        ' 34          1  Player 騎士/人間/男性/秩序 killed by unsuccessful polymorph (運命の大迷宮 2階).',
+        '                                                                       -  [0]',
+        ' 35          1  Player 探検家/人間/男性/中立 killed by elementary physics (運命の大迷宮 3階).',
+        '                                                                       -  [0]',
+        ' 36          1  Player 騎士/人間/男性/秩序 killed by vampire in bat form (運命の大迷宮 14階).',
+        '                                                                       -  [0]',
+        ' 37          1  Player 盗賊/人間/男性/混沌 killed by doppelganger disguised as goblin (運命の大迷宮 5階).',
+        '                                                                       -  [0]',
+        ' 38          1  Player 洞窟人/人間/男性/中立 killed by chameleon imitating giant ant (運命の大迷宮 8階).',
+        '                                                                       -  [0]',
       ];
       final attrs = List.filled(inputLines.length, 0);
 
       final entries = TopTenEntry.parse(inputLines, attrs);
 
-      expect(entries.length, 20);
+      expect(entries.length, 38);
       expect(entries[0].details[0], contains('ゴブリンに倒された'));
       expect(entries[1].details[0], contains('魔法使いの幽霊に倒された'));
       expect(entries[2].details[0], contains('有毒な死体に倒された'));
@@ -165,6 +201,24 @@ void main() {
       expect(entries[17].details[0], contains('モロクの高位神官に倒された'));
       expect(entries[18].details[0], contains('Tamaという名前の子猫に倒された'));
       expect(entries[19].details[0], contains('ゴブリンの姿をしたドッペルゲンガーに倒された'));
+      expect(entries[20].details[0], contains('落ちてくる跳ね橋に倒された'));
+      expect(entries[21].details[0], contains('軽率にもコカトリスの肉を食べたこと'));
+      expect(entries[22].details[0], contains('マインドフレアの脳を食べたこと'));
+      expect(entries[23].details[0], contains('素手でコカトリスの死体に触れたことで石化した'));
+      expect(entries[24].details[0], contains('裸足でコカトリスの死体を蹴ったことで石化した'));
+      expect(entries[25].details[0], contains('錬金術の爆発に倒された'));
+      expect(entries[26].details[0], contains('ヴラド公に倒された'));
+      expect(entries[27].details[0], contains('死の光線で自分を照射したこと'));
+      expect(entries[28].details[0], contains('モロクの冷淡さで倒された'));
+      expect(entries[29].details[0], contains('自殺'));
+      expect(entries[30].details[0], contains('脳の損失で倒された'));
+      expect(entries[31].details[0], contains('脱出した (魔除けを持ったまま)'));
+      expect(entries[32].details[0], contains('自己虐殺'));
+      expect(entries[33].details[0], contains('へんげの失敗'));
+      expect(entries[34].details[0], contains('基礎物理学'));
+      expect(entries[35].details[0], contains('コウモリの姿をしたヴァンパイアに倒された'));
+      expect(entries[36].details[0], contains('ゴブリンに変装したドッペルゲンガーに倒された'));
+      expect(entries[37].details[0], contains('巨大アリに擬態したカメレオンに倒された'));
     });
   });
 }

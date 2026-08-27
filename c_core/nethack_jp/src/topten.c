@@ -626,6 +626,144 @@ jp_translate_killer_name_or_monster(const char *in, char *out, unsigned outsz)
             return out;
         }
     }
+    if (strstr(tmp, " disguised as ")) {
+        char rbuf[BUFSZ], sbuf[BUFSZ];
+        const char *dp = strstr(tmp, " disguised as ");
+        size_t rlen = dp - tmp;
+        const char *sp = dp + 14;
+        if (rlen < sizeof rbuf) {
+            memcpy(rbuf, tmp, rlen);
+            rbuf[rlen] = '\0';
+            Snprintf(sbuf, sizeof sbuf, "%s", sp);
+            char rtr[BUFSZ], str[BUFSZ];
+            jp_translate_killer_name_or_monster(rbuf, rtr, sizeof rtr);
+            jp_translate_killer_name_or_monster(sbuf, str, sizeof str);
+            Snprintf(out, outsz, "%sに変装した%s", str, rtr);
+            return out;
+        }
+    }
+    if (strstr(tmp, " imitating ")) {
+        char rbuf[BUFSZ], sbuf[BUFSZ];
+        const char *ip = strstr(tmp, " imitating ");
+        size_t rlen = ip - tmp;
+        const char *sp = ip + 11;
+        if (rlen < sizeof rbuf) {
+            memcpy(rbuf, tmp, rlen);
+            rbuf[rlen] = '\0';
+            Snprintf(sbuf, sizeof sbuf, "%s", sp);
+            char rtr[BUFSZ], str[BUFSZ];
+            jp_translate_killer_name_or_monster(rbuf, rtr, sizeof rtr);
+            jp_translate_killer_name_or_monster(sbuf, str, sizeof str);
+            Snprintf(out, outsz, "%sに擬態した%s", str, rtr);
+            return out;
+        }
+    }
+
+    /* 素手・裸足での操作による石化 (e.g., "touching cockatrice corpse bare-handed", "kicking cockatrice corpse barefoot") */
+    if (strstr(tmp, "touching ") && strstr(tmp, " bare-handed")) {
+        char tbuf[BUFSZ];
+        const char *tp = tmp + 9;
+        const char *ep = strstr(tmp, " bare-handed");
+        size_t tlen = ep - tp;
+        if (tlen < sizeof tbuf) {
+            memcpy(tbuf, tp, tlen);
+            tbuf[tlen] = '\0';
+            char ttr[BUFSZ];
+            jp_translate_killer_name_or_monster(tbuf, ttr, sizeof ttr);
+            Snprintf(out, outsz, "素手で%sに触れたことで石化した", ttr);
+            return out;
+        }
+    }
+    if (strstr(tmp, "throwing ") && strstr(tmp, " bare-handed")) {
+        char tbuf[BUFSZ];
+        const char *tp = tmp + 9;
+        const char *ep = strstr(tmp, " bare-handed");
+        size_t tlen = ep - tp;
+        if (tlen < sizeof tbuf) {
+            memcpy(tbuf, tp, tlen);
+            tbuf[tlen] = '\0';
+            char ttr[BUFSZ];
+            jp_translate_killer_name_or_monster(tbuf, ttr, sizeof ttr);
+            Snprintf(out, outsz, "素手で%sを投げたことで石化した", ttr);
+            return out;
+        }
+    }
+    if (strstr(tmp, "kicking ") && strstr(tmp, " barefoot")) {
+        char tbuf[BUFSZ];
+        const char *tp = tmp + 8;
+        const char *ep = strstr(tmp, " barefoot");
+        size_t tlen = ep - tp;
+        if (tlen < sizeof tbuf) {
+            memcpy(tbuf, tp, tlen);
+            tbuf[tlen] = '\0';
+            char ttr[BUFSZ];
+            jp_translate_killer_name_or_monster(tbuf, ttr, sizeof ttr);
+            Snprintf(out, outsz, "裸足で%sを蹴ったことで石化した", ttr);
+            return out;
+        }
+    }
+    if (strstr(tmp, "wielding ") && strstr(tmp, " bare-handed")) {
+        char tbuf[BUFSZ];
+        const char *tp = tmp + 9;
+        const char *ep = strstr(tmp, " bare-handed");
+        size_t tlen = ep - tp;
+        if (tlen < sizeof tbuf) {
+            memcpy(tbuf, tp, tlen);
+            tbuf[tlen] = '\0';
+            char ttr[BUFSZ];
+            jp_translate_killer_name_or_monster(tbuf, ttr, sizeof ttr);
+            Snprintf(out, outsz, "素手で%sを装備したことで石化した", ttr);
+            return out;
+        }
+    }
+    if (!strncmpi(tmp, "bumping into ", 13)) {
+        char ttr[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 13, ttr, sizeof ttr);
+        Snprintf(out, outsz, "%sへの衝突で石化した", ttr);
+        return out;
+    }
+
+    /* 特殊な食事・脳食・卵食 */
+    if (!strncmpi(tmp, "unwisely ate the body of ", 25)) {
+        char ttr[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 25, ttr, sizeof ttr);
+        Snprintf(out, outsz, "軽率にも%sの肉を食べたこと", ttr);
+        return out;
+    }
+    if (!strncmpi(tmp, "unwisely ate the brain of ", 26)) {
+        char ttr[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 26, ttr, sizeof ttr);
+        Snprintf(out, outsz, "%sの脳を食べたこと", ttr);
+        return out;
+    }
+    if (!strncmpi(tmp, "tasting ", 8) && strstr(tmp, " meat")) {
+        char tbuf[BUFSZ];
+        const char *tp = tmp + 8;
+        const char *ep = strstr(tmp, " meat");
+        size_t tlen = ep - tp;
+        if (tlen < sizeof tbuf) {
+            memcpy(tbuf, tp, tlen);
+            tbuf[tlen] = '\0';
+            char ttr[BUFSZ];
+            jp_translate_killer_name_or_monster(tbuf, ttr, sizeof ttr);
+            Snprintf(out, outsz, "%sの肉の試食", ttr);
+            return out;
+        }
+    }
+    if (strstr(tmp, " egg") && !strstr(tmp, " ")) {
+        /* simple <Mon> egg */
+        char tbuf[BUFSZ];
+        const char *ep = strstr(tmp, " egg");
+        size_t tlen = ep - tmp;
+        if (tlen < sizeof tbuf) {
+            memcpy(tbuf, tmp, tlen);
+            tbuf[tlen] = '\0';
+            char ttr[BUFSZ];
+            jp_translate_killer_name_or_monster(tbuf, ttr, sizeof ttr);
+            Snprintf(out, outsz, "%sの卵", ttr);
+            return out;
+        }
+    }
 
     /* 修飾語・名詞句の動的パース */
     if (!strncmpi(tmp, "ghost of ", 9)) {
@@ -782,6 +920,20 @@ jp_translate_killer_text_for_display(
     whilebuf[0] = '\0';
     wieldingbuf[0] = '\0';
 
+    char sufbuf[BUFSZ];
+    sufbuf[0] = '\0';
+    char *sufp = strstr(tmp, " (with the Amulet)");
+    if (sufp) {
+        Snprintf(sufbuf, sizeof sufbuf, " (魔除けを持ったまま)");
+        *sufp = '\0';
+    } else if ((sufp = strstr(tmp, " (in celestial disgrace)")) != 0) {
+        Snprintf(sufbuf, sizeof sufbuf, " (神の不興を買って)");
+        *sufp = '\0';
+    } else if ((sufp = strstr(tmp, " (with a fake Amulet)")) != 0) {
+        Snprintf(sufbuf, sizeof sufbuf, " (偽物の魔除けを持ったまま)");
+        *sufp = '\0';
+    }
+
     wieldingp = strstr(tmp, " while wielding ");
     if (wieldingp) {
         Snprintf(wieldingbuf, sizeof wieldingbuf, "%s", wieldingp + 16);
@@ -865,10 +1017,39 @@ jp_translate_killer_text_for_display(
             Snprintf(outmain, sizeof outmain, "指輪の爆発で倒された");
         } else if (!strcmpi(killer, "exploding rune")) {
             Snprintf(outmain, sizeof outmain, "ルーンの爆発で倒された");
+        } else if (!strcmpi(killer, "alchemic blast")) {
+            Snprintf(outmain, sizeof outmain, "錬金術の爆発で倒された");
         } else if (!strcmpi(killer, "residual undead turning effect")) {
-            Snprintf(outmain, sizeof outmain, "アンデッド退散の残留効果に倒された");
+            Snprintf(outmain, sizeof outmain, "アンデッド退散の残留効果で倒された");
         } else if (!strcmpi(killer, "system shock")) {
             Snprintf(outmain, sizeof outmain, "システムショックで倒された");
+        } else if (!strcmpi(killer, "imperious order")) {
+            Snprintf(outmain, sizeof outmain, "傲慢な命令で倒された");
+        } else if (!strcmpi(killer, "resistance timing out")) {
+            Snprintf(outmain, sizeof outmain, "耐性の時間切れで倒された");
+        } else if (!strcmpi(killer, "quit while already on Charon's boat")) {
+            Snprintf(outmain, sizeof outmain, "カロンの船の上での自決");
+        } else if (!strcmpi(killer, "committed suicide")) {
+            Snprintf(outmain, sizeof outmain, "自殺したこと");
+        } else if (!strcmpi(killer, "brainlessness")) {
+            Snprintf(outmain, sizeof outmain, "脳の損失で倒された");
+        } else if (strstr(killer, "shot ") && strstr(killer, "self with a death ray")) {
+            Snprintf(outmain, sizeof outmain, "死の光線で自分を照射したこと");
+        } else if (strstr(killer, "disintegration breath by ")) {
+            Snprintf(outmain, sizeof outmain, "自分の分解のブレスで倒された");
+        } else if (strstr(killer, "magic missile by ")) {
+            Snprintf(outmain, sizeof outmain, "自分のマジックミサイルで倒された");
+        } else if (strstr(killer, "indifference")) {
+            char gbuf[BUFSZ];
+            size_t glen = strstr(killer, "'s indifference") ? (size_t)(strstr(killer, "'s indifference") - killer) : 0;
+            if (glen > 0 && glen < sizeof gbuf) {
+                memcpy(gbuf, killer, glen);
+                gbuf[glen] = '\0';
+                const char *gjp = jp_gname_for_display(gbuf);
+                Snprintf(outmain, sizeof outmain, "%sの冷淡さで倒された", gjp);
+            } else {
+                Snprintf(outmain, sizeof outmain, "神の冷淡さで倒された");
+            }
         } else if (!strcmpi(killer, "psychic blast")) {
             Snprintf(outmain, sizeof outmain, "精神波の爆発に倒された");
         } else if (!strcmpi(killer, "exhaustion")) {
@@ -1064,7 +1245,7 @@ jp_translate_killer_text_for_display(
             if ((p = strstr(kbuf, "に触れたこと")) != 0 && p[12] == '\0') {
                 /* 「～に触れたことに倒された」を「～に触れたことで倒された」に改善 */
                 Snprintf(outmain, sizeof outmain, "%sで倒された", kbuf);
-            } else if (strstr(kbuf, "倒された") || strstr(kbuf, "石化した") || strstr(kbuf, "死んだ") || strstr(kbuf, "失敗")) {
+            } else if (strstr(kbuf, "倒された") || strstr(kbuf, "石化した") || strstr(kbuf, "死んだ") || strstr(kbuf, "失敗") || strstr(kbuf, "食べたこと") || strstr(kbuf, "試食") || strstr(kbuf, "挟まれた") || strstr(kbuf, "卵")) {
                 Snprintf(outmain, sizeof outmain, "%s", kbuf);
             } else {
                 Snprintf(outmain, sizeof outmain, "%sに倒された", kbuf);
@@ -1531,13 +1712,13 @@ jp_translate_killer_text_for_display(
             Snprintf(outmain, sizeof outmain, "脱出した");
         } else if (!strcmp(etail, "(with the Amulet)")) {
             Snprintf(outmain, sizeof outmain,
-                     "アミュレットを持ったまま脱出した");
+                     "脱出した (魔除けを持ったまま)");
         } else if (!strcmp(etail, "(in celestial disgrace)")) {
             Snprintf(outmain, sizeof outmain,
-                     "天上界の不名誉を背負って脱出した");
+                     "脱出した (神の不興を買って)");
         } else if (!strcmp(etail, "(with a fake Amulet)")) {
             Snprintf(outmain, sizeof outmain,
-                     "偽物のアミュレットを持って脱出した");
+                     "脱出した (偽物の魔除けを持ったまま)");
         } else {
             Snprintf(outmain, sizeof outmain, "脱出した %s", etail);
         }
@@ -1587,6 +1768,9 @@ jp_translate_killer_text_for_display(
                                                       sizeof whilejp);
             Snprintf(out, outsz, "%s（%s）", outmain, whiletxt);
         }
+    }
+    if (*sufbuf) {
+        Strcat(out, sufbuf);
     }
 }
 

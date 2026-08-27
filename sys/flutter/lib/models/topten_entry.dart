@@ -516,6 +516,97 @@ String _translateMonsterOrItemName(String raw) {
       return '$shapeの姿をした$real';
     }
   }
+  if (s.contains(' disguised as ')) {
+    final parts = s.split(' disguised as ');
+    if (parts.length == 2) {
+      final real = _translateMonsterOrItemName(parts[0]);
+      final shape = _translateMonsterOrItemName(parts[1]);
+      return '$shapeに変装した$real';
+    }
+  }
+  if (s.contains(' imitating ')) {
+    final parts = s.split(' imitating ');
+    if (parts.length == 2) {
+      final real = _translateMonsterOrItemName(parts[0]);
+      final shape = _translateMonsterOrItemName(parts[1]);
+      return '$shapeに擬態した$real';
+    }
+  }
+
+  // 素手・裸足での操作による石化
+  if (s.contains('touching ') && s.contains(' bare-handed')) {
+    final ep = s.indexOf(' bare-handed');
+    final target = s.substring(9, ep);
+    final tr = _translateMonsterOrItemName(target);
+    return '素手で$trに触れたことで石化した';
+  }
+  if (s.contains('throwing ') && s.contains(' bare-handed')) {
+    final ep = s.indexOf(' bare-handed');
+    final target = s.substring(9, ep);
+    final tr = _translateMonsterOrItemName(target);
+    return '素手で$trを投げたことで石化した';
+  }
+  if (s.contains('kicking ') && s.contains(' barefoot')) {
+    final ep = s.indexOf(' barefoot');
+    final target = s.substring(8, ep);
+    final tr = _translateMonsterOrItemName(target);
+    return '裸足で$trを蹴ったことで石化した';
+  }
+  if (s.contains('wielding ') && s.contains(' bare-handed')) {
+    final ep = s.indexOf(' bare-handed');
+    final target = s.substring(9, ep);
+    final tr = _translateMonsterOrItemName(target);
+    return '素手で$trを装備したことで石化した';
+  }
+  if (s.startsWith('bumping into ')) {
+    final tr = _translateMonsterOrItemName(s.substring(13));
+    return '$trへの衝突で石化した';
+  }
+
+  // 特殊な食事・脳食・卵食
+  if (s.startsWith('unwisely ate the body of ')) {
+    final tr = _translateMonsterOrItemName(s.substring(25));
+    return '軽率にも$trの肉を食べたこと';
+  }
+  if (s.startsWith('unwisely ate the brain of ')) {
+    final tr = _translateMonsterOrItemName(s.substring(26));
+    return '$trの脳を食べたこと';
+  }
+  if (s.startsWith('tasting ') && s.endsWith(' meat')) {
+    final target = s.substring(8, s.length - 5);
+    final tr = _translateMonsterOrItemName(target);
+    return '$trの肉の試食';
+  }
+  if (s.endsWith(' egg') && !s.contains(' ')) {
+    final target = s.substring(0, s.length - 4);
+    final tr = _translateMonsterOrItemName(target);
+    return '$trの卵';
+  }
+
+  if (s == 'committed suicide') {
+    return '自殺したこと';
+  }
+  if (s == 'brainlessness') {
+    return '脳の損失で倒された';
+  }
+  if (s == 'self-genocide') return '自己虐殺';
+  if (s == 'unsuccessful polymorph') return 'へんげの失敗';
+  if (s == 'elementary physics') return '基礎物理学';
+  if (s == 'killed while stuck in creature form') return 'へんげした姿のまま死亡したこと';
+  if (s.contains('shot ') && s.contains('self with a death ray')) {
+    return '死の光線で自分を照射したこと';
+  }
+  if (s.startsWith('disintegration breath by ')) {
+    return '自分の分解のブレスで倒された';
+  }
+  if (s.startsWith('magic missile by ')) {
+    return '自分のマジックミサイルで倒された';
+  }
+  if (s.endsWith("'s indifference") || s.endsWith(" indifference")) {
+    final god = s.replaceAll("'s indifference", '').replaceAll(" indifference", '');
+    final tr = _translateMonsterOrItemName(god);
+    return '$trの冷淡さで倒された';
+  }
 
   if (s.startsWith('ghost of ')) {
     return '${_translateMonsterOrItemName(s.substring(9))}の幽霊';
@@ -639,7 +730,10 @@ String _translateMonsterOrItemName(String raw) {
     'giant bat': '巨大コウモリ',
     'vampire bat': '吸血コウモリ',
     'raven': 'オオガラス',
-    // C - Centaur, Cat, Chameleon
+    // C - Centaur, Cat, Chameleon, Cockatrice
+    'chickatrice': 'チカトリス',
+    'cockatrice': 'コカトリス',
+    'pyrolisk': 'パイロリスク',
     'plains centaur': '草原のケンタウロス',
     'forest centaur': '森のケンタウロス',
     'mountain centaur': '山のケンタウロス',
@@ -774,7 +868,9 @@ String _translateMonsterOrItemName(String raw) {
     'demilich': 'デミリッチ',
     'master lich': 'マスターリッチ',
     'arch-lich': 'アーチリッチ',
-    // M - Mummy, Naga
+    // M - Mind Flayer, Mummy, Naga
+    'mind flayer': 'マインドフレア',
+    'master mind flayer': 'マスター・マインドフレア',
     'red naga hatchling': 'レッドナーガの子供',
     'black naga hatchling': 'ブラックナーガの子供',
     'golden naga hatchling': 'ゴールデンナーガの子供',
@@ -1021,7 +1117,21 @@ String _translateMonsterOrItemName(String raw) {
     'Amulet of Yendor': 'イェンダーのアミュレット',
     'Amulet': 'アミュレット',
 
-    // Artifacts
+    // Artifacts & Unique Bosses
+    'wizard of Yendor': 'イェンダーの魔法使い',
+    'Wizard of Yendor': 'イェンダーの魔法使い',
+    'Vlad the Impaler': '串刺し公ヴラド',
+    'Medusa': 'メドゥーサ',
+    'Croesus': 'クロイソス',
+    'alchemic blast': '錬金術の爆発',
+    'system shock': 'システムショック',
+    'residual undead turning effect': 'アンデッド退散の残留効果',
+    'imperious order': '傲慢な命令',
+    'resistance timing out': '耐性の時間切れ',
+    'falling drawbridge': '落ちてくる跳ね橋',
+    'closing drawbridge': '閉まる跳ね橋',
+    'exploding drawbridge': '跳ね橋の爆発',
+    'collapsing drawbridge': '跳ね橋の崩壊',
     'Excalibur': 'エクスカリバー',
     'Stormbringer': 'ストームブリンガー',
     'Mjollnir': 'ミョルニル',
@@ -1107,6 +1217,18 @@ String _translateDeathText(String death, bool isJp) {
   String mainDeath = death.trim();
   String locSuffix = '';
 
+  String itemSuffix = '';
+  if (mainDeath.contains(' (with the Amulet)')) {
+    itemSuffix = ' (魔除けを持ったまま)';
+    mainDeath = mainDeath.replaceAll(' (with the Amulet)', '');
+  } else if (mainDeath.contains(' (in celestial disgrace)')) {
+    itemSuffix = ' (神の不興を買って)';
+    mainDeath = mainDeath.replaceAll(' (in celestial disgrace)', '');
+  } else if (mainDeath.contains(' (with a fake Amulet)')) {
+    itemSuffix = ' (偽物の魔除けを持ったまま)';
+    mainDeath = mainDeath.replaceAll(' (with a fake Amulet)', '');
+  }
+
   int cutIdx = -1;
   final parenIdx = mainDeath.lastIndexOf(' (');
   final jpParenIdx = mainDeath.lastIndexOf('（');
@@ -1123,7 +1245,7 @@ String _translateDeathText(String death, bool isJp) {
     mainDeath = mainDeath.substring(0, mainDeath.length - 1).trim();
   }
 
-  final translatedMain = _translateDeathTextInternal(mainDeath, isJp);
+  final translatedMain = '${_translateDeathTextInternal(mainDeath, isJp)}$itemSuffix';
 
   var result = translatedMain;
   if (locSuffix.isNotEmpty) {
@@ -1162,12 +1284,12 @@ String _translateDeathTextInternal(String death, bool isJp) {
     'turned to stone': '石になった',
     'turned into slime': 'スライムになった',
     'genocided': '虐殺された',
-    'self-genocide': '自分自身の虐殺',
+    'self-genocide': '自己虐殺',
     'unsuccessful polymorph': 'へんげの失敗',
     'genocidal confusion': '虐殺による混乱',
     'committed suicide': '自殺',
     'went to heaven prematurely': '早すぎる天国への旅',
-    'elementary physics': '物理法則',
+    'elementary physics': '基礎物理学',
     'colliding with the ceiling': '天井への激突',
     'system shock': 'システムショック',
     'alchemic blast': '錬金術の爆発',
@@ -1183,9 +1305,9 @@ String _translateDeathTextInternal(String death, bool isJp) {
     'cursed throne': '呪われた玉座',
     'cadaver': '腐った死体',
     'rotted glob': '腐った塊',
-    'rotten lump of royal jelly': '腐ったローヤルゼリー',
+    'rotten lump of royal jelly': '腐ったローヤルゼリーの塊',
     'very rich meal': '豪華すぎる食事',
-    'quick snack': '軽いスナック',
+    'quick snack': '手軽なおやつ',
     'axing a hard object': '硬いものを斧で叩いたこと',
     'crunched in the head by an iron ball': '鉄球に頭を打ち砕かれた',
     'iron ball collision': '鉄球との衝突で倒された',
@@ -1199,16 +1321,15 @@ String _translateDeathTextInternal(String death, bool isJp) {
     'removing boots': '靴を脱いだこと',
     'losing boots': '靴を失ったこと',
     'resistance timing out': '石化耐性が切れたこと',
+    'killed while stuck in creature form': 'へんげした姿のまま死亡したこと',
+    'scroll of genocide': '虐殺の巻物',
   };
 
   if (exactMap.containsKey(death)) {
     return exactMap[death]!;
   }
 
-  if (death.startsWith('escaped')) {
-    if (death == 'escaped (with the Amulet)') return 'アミュレットを持ったまま脱出した';
-    if (death == 'escaped (in celestial disgrace)') return '天上界の不名誉を背負って脱出した';
-    if (death == 'escaped (with a fake Amulet)') return '偽物のアミュレットを持って脱出した';
+  if (death == 'escaped' || death.startsWith('escaped ')) {
     return '脱出した';
   }
   if (death.startsWith('ascended')) return '昇天した';
@@ -1253,6 +1374,14 @@ String _translateDeathTextInternal(String death, bool isJp) {
     final tr = _translateMonsterOrItemName(death.substring(20));
     return '$trから飲んだ不心得';
   }
+  if (death.startsWith('unwisely ate the body of ')) {
+    final tr = _translateMonsterOrItemName(death.substring(25));
+    return '軽率にも$trの肉を食べたこと';
+  }
+  if (death.startsWith('unwisely ate the brain of ')) {
+    final tr = _translateMonsterOrItemName(death.substring(26));
+    return '$trの脳を食べたこと';
+  }
   if (death.startsWith('unwisely ate ')) {
     final tr = _translateMonsterOrItemName(death.substring(13));
     return '無謀にも$trを食べようとした';
@@ -1260,17 +1389,17 @@ String _translateDeathTextInternal(String death, bool isJp) {
   if (death.startsWith('kicking ') && death.endsWith(' barefoot')) {
     final item = death.substring(8, death.length - 9);
     final tr = _translateMonsterOrItemName(item);
-    return '裸足で$trを蹴ったこと';
+    return '裸足で$trを蹴ったことで石化した';
   }
   if (death.startsWith('throwing ') && death.endsWith(' bare-handed')) {
     final item = death.substring(9, death.length - 12);
     final tr = _translateMonsterOrItemName(item);
-    return '素手で$trを投げたこと';
+    return '素手で$trを投げたことで石化した';
   }
   if (death.startsWith('wielding ') && death.endsWith(' bare-handed')) {
     final item = death.substring(9, death.length - 12);
     final tr = _translateMonsterOrItemName(item);
-    return '素手で$trを装備したこと';
+    return '素手で$trを装備したことで石化した';
   }
   if (death.startsWith('caught in own ')) {
     final tr = _translateMonsterOrItemName(death.substring(14));
@@ -1287,6 +1416,27 @@ String _translateDeathTextInternal(String death, bool isJp) {
   if (death.startsWith('caught in ')) {
     final tr = _translateMonsterOrItemName(death.substring(10));
     return '$trの爆発に巻き込まれた';
+  }
+
+  if (death == 'committed suicide') {
+    return '自殺したこと';
+  }
+  if (death == 'brainlessness') {
+    return '脳の損失で倒された';
+  }
+  if (death.contains('shot ') && death.contains('self with a death ray')) {
+    return '死の光線で自分を照射したこと';
+  }
+  if (death.startsWith('disintegration breath by ')) {
+    return '自分の分解のブレスで倒された';
+  }
+  if (death.startsWith('magic missile by ')) {
+    return '自分のマジックミサイルで倒された';
+  }
+  if (death.endsWith("'s indifference") || death.endsWith(" indifference")) {
+    final god = death.replaceAll("'s indifference", '').replaceAll(" indifference", '');
+    final tr = _translateMonsterOrItemName(god);
+    return '$trの冷淡さで倒された';
   }
 
   if (death.startsWith('the wrath of ')) {
