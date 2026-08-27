@@ -160,8 +160,8 @@ void main() {
       expect(entries[12].details[0], contains('地雷に倒された'));
       expect(entries[13].details[0], contains('エクスカリバーに倒された'));
       expect(entries[14].details[0], contains('鉄球に頭を打ち砕かれた'));
-      expect(entries[15].details[0], contains('店主のMr. Shigatseに倒された'));
-      expect(entries[16].details[0], contains('幻覚でゆがんだ店主のMr. Shigatseに倒された'));
+      expect(entries[15].details[0], contains('店主のシガツェに倒された'));
+      expect(entries[16].details[0], contains('幻覚でゆがんだ店主のシガツェに倒された'));
       expect(entries[17].details[0], contains('モロクの高位神官に倒された'));
       expect(entries[18].details[0], contains('Tamaという名前の子猫に倒された'));
       expect(entries[19].details[0], contains('ゴブリンの姿をしたドッペルゲンガーに倒された'));

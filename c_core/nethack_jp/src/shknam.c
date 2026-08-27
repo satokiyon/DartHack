@@ -362,16 +362,28 @@ jp_shoptype_name_for_display(int shoptype)
 }
 
 const char *
+jp_shkname_from_str(const char *inname)
+{
+    const char *p = inname;
+    int i;
+
+    if (!p || !*p) return "";
+    p = skip_english_article(p);
+    if (!strncmpi(p, "Mr. ", 4)) p += 4;
+    else if (!strncmpi(p, "Ms. ", 4)) p += 4;
+
+    for (i = 0; i < (int) SIZE(jp_shkname_map); i++) {
+        if (!strcmpi(p, jp_shkname_map[i].eng))
+            return jp_shkname_map[i].jp;
+    }
+    return jp_katakana_name_fallback(p);
+}
+
+const char *
 jp_shkname_for_display(struct monst *mtmp)
 {
     const char *shknm = shkname(mtmp);
-    int i;
-
-    for (i = 0; i < (int) SIZE(jp_shkname_map); i++) {
-        if (!strcmp(shknm, jp_shkname_map[i].eng))
-            return jp_shkname_map[i].jp;
-    }
-    return jp_katakana_name_fallback(shknm);
+    return jp_shkname_from_str(shknm);
 }
 
 /*

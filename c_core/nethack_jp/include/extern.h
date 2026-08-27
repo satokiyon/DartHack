@@ -3074,6 +3074,7 @@ extern char *Shknam(struct monst *) NONNULLARG1;
 extern char *shkname(struct monst *) NONNULLARG1;
 extern boolean shkname_is_pname(struct monst *) NONNULLARG1;
 extern const char *jp_shkname_for_display(struct monst *) NONNULLARG1;
+extern const char *jp_shkname_from_str(const char *);
 extern const char *jp_shoptype_name_for_display(int);
 extern boolean is_izchak(struct monst *, boolean) NONNULLARG1;
 

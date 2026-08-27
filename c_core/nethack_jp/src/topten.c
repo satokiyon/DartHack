@@ -557,7 +557,7 @@ jp_translate_killer_name_or_monster(const char *in, char *out, unsigned outsz)
         if (slen < sizeof sbuf) {
             memcpy(sbuf, tmp, slen);
             sbuf[slen] = '\0';
-            const char *snm = skip_english_article(sbuf);
+            const char *snm = jp_shkname_from_str(sbuf);
             Snprintf(out, outsz, "店主の%s", snm);
             return out;
         }

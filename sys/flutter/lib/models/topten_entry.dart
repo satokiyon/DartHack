@@ -350,6 +350,113 @@ String _stripEnglishArticle(String s) {
   return s;
 }
 
+String _translateShkName(String rawName) {
+  var s = _stripEnglishArticle(rawName.trim());
+  if (s.toLowerCase().startsWith('mr. ')) {
+    s = s.substring(4).trim();
+  } else if (s.toLowerCase().startsWith('ms. ')) {
+    s = s.substring(4).trim();
+  }
+
+  const shkNameMap = {
+    'Shigatse': 'シガツェ',
+    'Asidonhopo': 'アシドンホポ',
+    'Hesiod': 'ヘシオド',
+    'Izchak': 'イズチャク',
+    'Dirk': 'ディルク',
+    'Lucrezia': 'ルクレツィア',
+    'Rikaze': 'リカゼ',
+    'Lhasa': 'ラサ',
+    'Skibbereen': 'スキベリーン',
+    'Kanturk': 'カンターク',
+    'Rath Luirc': 'ラス・ルアーク',
+    'Ennistymon': 'エニスタイモン',
+    'Lahinch': 'ラヒンチ',
+    'Voulgezac': 'ヴルジェザック',
+    'Rouffiac': 'ルフィアック',
+    'Lerignac': 'レリニャック',
+    'Touverac': 'トゥヴラック',
+    'Guizengeard': 'ギザンジャール',
+    'Djasinga': 'ジャシンガ',
+    'Tjibarusa': 'チバルサ',
+    'Tjiwidej': 'チウィデイ',
+    'Pengalengan': 'プンガレンガン',
+    'Bandjar': 'バンジャル',
+    'Feyfer': 'フェイファー',
+    'Flugi': 'フルギ',
+    'Gheel': 'ヒール',
+    'Havic': 'ハヴィク',
+    'Haynin': 'ヘイニン',
+    'Nairn': 'ネアン',
+    'Turriff': 'タリフ',
+    'Inverurie': 'インヴァルリー',
+    'Braemar': 'ブレーマー',
+    'Lochnagar': 'ロッホナガー',
+    'Ymla': 'イムラ',
+    'Eed-morra': 'イード・モラ',
+    'Cubask': 'キューバスク',
+    'Nieb': 'ニーブ',
+    'Yawolloh': 'ヤウォロ',
+    "Ga'er": 'ガエル',
+    'Zhangmu': 'チャンムー',
+  };
+
+  if (shkNameMap.containsKey(s)) {
+    return shkNameMap[s]!;
+  }
+  final capS = _capitalizeFirst(s);
+  if (shkNameMap.containsKey(capS)) {
+    return shkNameMap[capS]!;
+  }
+
+  return _katakanaFallback(s);
+}
+
+String _katakanaFallback(String name) {
+  final buf = StringBuffer();
+  for (int i = 0; i < name.length; i++) {
+    final c = name[i].toLowerCase();
+    switch (c) {
+      case 'a': buf.write('ア'); break;
+      case 'b': buf.write('ブ'); break;
+      case 'c': buf.write('ク'); break;
+      case 'd': buf.write('ド'); break;
+      case 'e': buf.write('エ'); break;
+      case 'f': buf.write('フ'); break;
+      case 'g': buf.write('グ'); break;
+      case 'h': buf.write('ハ'); break;
+      case 'i': buf.write('イ'); break;
+      case 'j': buf.write('ジ'); break;
+      case 'k': buf.write('ク'); break;
+      case 'l': buf.write('ル'); break;
+      case 'm': buf.write('ム'); break;
+      case 'n': buf.write('ン'); break;
+      case 'o': buf.write('オ'); break;
+      case 'p': buf.write('プ'); break;
+      case 'q': buf.write('ク'); break;
+      case 'r': buf.write('ル'); break;
+      case 's': buf.write('ス'); break;
+      case 't': buf.write('ト'); break;
+      case 'u': buf.write('ウ'); break;
+      case 'v': buf.write('ヴ'); break;
+      case 'w': buf.write('ワ'); break;
+      case 'x': buf.write('クス'); break;
+      case 'y': buf.write('イ'); break;
+      case 'z': buf.write('ズ'); break;
+      case ' ': case '-': case '\'':
+        if (buf.isNotEmpty && !buf.toString().endsWith('・')) {
+          buf.write('・');
+        }
+        break;
+    }
+  }
+  var res = buf.toString();
+  while (res.endsWith('・')) {
+    res = res.substring(0, res.length - 1);
+  }
+  return res.isNotEmpty ? res : name;
+}
+
 String _translateMonsterOrItemName(String raw) {
   var s = _stripEnglishArticle(raw.trim());
   if (s.isEmpty) return s;
@@ -363,8 +470,9 @@ String _translateMonsterOrItemName(String raw) {
     final idx = s.indexOf(', the shopkeeper');
     final altIdx = s.indexOf('; the shopkeeper');
     final cutPos = (idx != -1) ? idx : altIdx;
-    final base = _stripEnglishArticle(s.substring(0, cutPos));
-    return '店主の$base';
+    final base = s.substring(0, cutPos);
+    final shkJp = _translateShkName(base);
+    return '店主の$shkJp';
   }
 
   // 神官パターン (e.g., "high priest of Moloch", "priest of Anubis")
