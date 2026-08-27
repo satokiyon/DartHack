@@ -160,51 +160,56 @@ class UniversalTombstoneWidget extends StatelessWidget {
                                   Expanded(
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.start,
-                                      children: d.deathLines.map((line) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 2),
-                                          child: Text(
-                                            line,
+                                      children: [
+                                        ...d.deathLines.map((line) {
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 2),
+                                            child: Text(
+                                              line,
+                                              style: TextStyle(
+                                                fontFamily: 'serif',
+                                                fontSize: 13 * scale,
+                                                fontWeight: FontWeight.normal,
+                                                color: const Color(0xFFAAAAAA),
+                                                height: 1.3,
+                                                shadows: [
+                                                  const Shadow(
+                                                   offset: Offset(1, 1),
+                                                   blurRadius: 1.5,
+                                                   color: Color(0xCC000000),
+                                                 ),
+                                                ],
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          );
+                                        }),
+                                        if (d.year.isNotEmpty) ...[
+                                          SizedBox(height: 6 * scale),
+                                          Text(
+                                            d.year,
                                             style: TextStyle(
                                               fontFamily: 'serif',
-                                              fontSize: 13 * scale,
-                                              fontWeight: FontWeight.normal,
-                                              color: const Color(0xFFAAAAAA),
-                                              height: 1.3,
+                                              fontSize: 14 * scale,
+                                              fontWeight: FontWeight.bold,
+                                              color: const Color(0xFF999999),
                                               shadows: [
-                                                Shadow(
-                                                  offset: const Offset(1, 1),
+                                                const Shadow(
+                                                  offset: Offset(1, 1),
                                                   blurRadius: 1.5,
-                                                  color: Colors.black.withValues(alpha: 0.8),
+                                                  color: Color(0xCC000000),
                                                 ),
                                               ],
                                             ),
                                             textAlign: TextAlign.center,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                  Text(
-                                    d.year,
-                                    style: TextStyle(
-                                      fontFamily: 'serif',
-                                      fontSize: 15 * scale,
-                                      fontWeight: FontWeight.bold,
-                                      color: const Color(0xFF999999),
-                                      shadows: [
-                                        Shadow(
-                                          offset: const Offset(1, 1),
-                                          blurRadius: 1.5,
-                                          color: Colors.black.withValues(alpha: 0.8),
-                                        ),
+                                        ],
                                       ],
                                     ),
-                                    textAlign: TextAlign.center,
                                   ),
-                                  SizedBox(height: height * 0.08),
+                                  SizedBox(height: height * 0.30),
                                 ],
                               ),
                             );
