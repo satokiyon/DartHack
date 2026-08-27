@@ -129,12 +129,22 @@ void main() {
         '                                                                       -  [20]',
         ' 15         30  Player 修道士/人間/男性/秩序 crunched in the head by an iron ball (運命の大迷宮 1階).',
         '                                                                       -  [0]',
+        ' 16         25  Player 労働者/人間/男性/秩序 killed by Mr. Shigatse; the shopkeeper (ノームの鉱山 6階).',
+        '                                                                       -  [0]',
+        ' 17         20  Player 労働者/人間/男性/秩序 killed by 幻覚でゆがんだMr. Shigatse; the shopkeeper (ノームの鉱山 6階).',
+        '                                                                       -  [0]',
+        ' 18         15  Player 僧侶/人間/男性/秩序 killed by high priest of Moloch (アストラル界 1階).',
+        '                                                                       -  [0]',
+        ' 19         10  Player 魔法使い/エルフ/女性/混沌 killed by kitten called Tama (運命の大迷宮 1階).',
+        '                                                                       -  [0]',
+        ' 20          5  Player 盗賊/人間/男性/中立 killed by doppelganger in goblin form (運命の大迷宮 3階).',
+        '                                                                       -  [0]',
       ];
       final attrs = List.filled(inputLines.length, 0);
 
       final entries = TopTenEntry.parse(inputLines, attrs);
 
-      expect(entries.length, 15);
+      expect(entries.length, 20);
       expect(entries[0].details[0], contains('ゴブリンに倒された'));
       expect(entries[1].details[0], contains('魔法使いの幽霊に倒された'));
       expect(entries[2].details[0], contains('有毒な死体に倒された'));
@@ -150,6 +160,11 @@ void main() {
       expect(entries[12].details[0], contains('地雷に倒された'));
       expect(entries[13].details[0], contains('エクスカリバーに倒された'));
       expect(entries[14].details[0], contains('鉄球に頭を打ち砕かれた'));
+      expect(entries[15].details[0], contains('店主のMr. Shigatseに倒された'));
+      expect(entries[16].details[0], contains('幻覚でゆがんだ店主のMr. Shigatseに倒された'));
+      expect(entries[17].details[0], contains('モロクの高位神官に倒された'));
+      expect(entries[18].details[0], contains('Tamaという名前の子猫に倒された'));
+      expect(entries[19].details[0], contains('ゴブリンの姿をしたドッペルゲンガーに倒された'));
     });
   });
 }

@@ -540,6 +540,93 @@ jp_translate_killer_name_or_monster(const char *in, char *out, unsigned outsz)
         return out;
     }
 
+    /* 和文・英文混在接頭辞の対応 */
+    if (!strncmp(tmp, "幻覚でゆがんだ", 21)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 21, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "幻覚でゆがんだ%s", nbuf);
+        return out;
+    }
+
+    /* 店主パターン (e.g., "Mr. Shigatse, the shopkeeper", "Mr. Shigatse; the shopkeeper") */
+    if (strstr(tmp, ", the shopkeeper") || strstr(tmp, "; the shopkeeper")) {
+        char sbuf[BUFSZ];
+        const char *sp = strstr(tmp, ", the shopkeeper");
+        if (!sp) sp = strstr(tmp, "; the shopkeeper");
+        size_t slen = sp - tmp;
+        if (slen < sizeof sbuf) {
+            memcpy(sbuf, tmp, slen);
+            sbuf[slen] = '\0';
+            const char *snm = skip_english_article(sbuf);
+            Snprintf(out, outsz, "店主の%s", snm);
+            return out;
+        }
+    }
+
+    /* 神官パターン (e.g., "high priest of Moloch", "priest of Anubis") */
+    if (!strncmpi(tmp, "high priest of ", 15)) {
+        const char *gname = jp_gname_for_display(tmp + 15);
+        Snprintf(out, outsz, "%sの高位神官", gname);
+        return out;
+    }
+    if (!strncmpi(tmp, "high priestess of ", 17)) {
+        const char *gname = jp_gname_for_display(tmp + 17);
+        Snprintf(out, outsz, "%sの高位神官", gname);
+        return out;
+    }
+    if (!strncmpi(tmp, "priest of ", 10)) {
+        const char *gname = jp_gname_for_display(tmp + 10);
+        Snprintf(out, outsz, "%sの神官", gname);
+        return out;
+    }
+    if (!strncmpi(tmp, "priestess of ", 13)) {
+        const char *gname = jp_gname_for_display(tmp + 13);
+        Snprintf(out, outsz, "%sの神官", gname);
+        return out;
+    }
+    if (!strcmpi(tmp, "temple priest") || !strcmpi(tmp, "temple priestess")) {
+        Snprintf(out, outsz, "寺院の神官");
+        return out;
+    }
+
+    /* 名前付きペット・モンスター (e.g., "kitten called Tama", "dog named Pochi") */
+    if (strstr(tmp, " called ") || strstr(tmp, " named ")) {
+        char bbuf[BUFSZ];
+        const char *cp = strstr(tmp, " called ");
+        size_t clen = cp ? 8 : 7;
+        if (!cp) cp = strstr(tmp, " named ");
+        size_t blen = cp - tmp;
+        if (blen < sizeof bbuf) {
+            memcpy(bbuf, tmp, blen);
+            bbuf[blen] = '\0';
+            const char *givenname = cp + clen;
+            char btr[BUFSZ];
+            jp_translate_killer_name_or_monster(bbuf, btr, sizeof btr);
+            Snprintf(out, outsz, "%sという名前の%s", givenname, btr);
+            return out;
+        }
+    }
+
+    /* 擬態・フォームモンスター (e.g., "doppelganger in goblin form") */
+    if (strstr(tmp, " in ") && strstr(tmp, " form")) {
+        char rbuf[BUFSZ], sbuf[BUFSZ];
+        const char *ip = strstr(tmp, " in ");
+        const char *fp = strstr(tmp, " form");
+        size_t rlen = ip - tmp;
+        size_t slen = fp - (ip + 4);
+        if (rlen < sizeof rbuf && slen < sizeof sbuf) {
+            memcpy(rbuf, tmp, rlen);
+            rbuf[rlen] = '\0';
+            memcpy(sbuf, ip + 4, slen);
+            sbuf[slen] = '\0';
+            char rtr[BUFSZ], str[BUFSZ];
+            jp_translate_killer_name_or_monster(rbuf, rtr, sizeof rtr);
+            jp_translate_killer_name_or_monster(sbuf, str, sizeof str);
+            Snprintf(out, outsz, "%sの姿をした%s", str, rtr);
+            return out;
+        }
+    }
+
     /* 修飾語・名詞句の動的パース */
     if (!strncmpi(tmp, "ghost of ", 9)) {
         char nbuf[BUFSZ];

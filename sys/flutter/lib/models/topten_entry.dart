@@ -354,6 +354,61 @@ String _translateMonsterOrItemName(String raw) {
   var s = _stripEnglishArticle(raw.trim());
   if (s.isEmpty) return s;
 
+  if (s.startsWith('幻覚でゆがんだ')) {
+    return '幻覚でゆがんだ${_translateMonsterOrItemName(s.substring(7))}';
+  }
+
+  // 店主パターン (e.g., "Mr. Shigatse, the shopkeeper", "Mr. Shigatse; the shopkeeper")
+  if (s.contains(', the shopkeeper') || s.contains('; the shopkeeper')) {
+    final idx = s.indexOf(', the shopkeeper');
+    final altIdx = s.indexOf('; the shopkeeper');
+    final cutPos = (idx != -1) ? idx : altIdx;
+    final base = _stripEnglishArticle(s.substring(0, cutPos));
+    return '店主の$base';
+  }
+
+  // 神官パターン (e.g., "high priest of Moloch", "priest of Anubis")
+  if (s.startsWith('high priest of ')) {
+    final god = _translateMonsterOrItemName(s.substring(15));
+    return '$godの高位神官';
+  }
+  if (s.startsWith('high priestess of ')) {
+    final god = _translateMonsterOrItemName(s.substring(18));
+    return '$godの高位神官';
+  }
+  if (s.startsWith('priest of ')) {
+    final god = _translateMonsterOrItemName(s.substring(10));
+    return '$godの神官';
+  }
+  if (s.startsWith('priestess of ')) {
+    final god = _translateMonsterOrItemName(s.substring(13));
+    return '$godの神官';
+  }
+  if (s == 'temple priest' || s == 'temple priestess') {
+    return '寺院の神官';
+  }
+
+  // 名前付きペット・モンスター (e.g., "kitten called Tama", "dog named Pochi")
+  if (s.contains(' called ') || s.contains(' named ')) {
+    final isCalled = s.contains(' called ');
+    final parts = s.split(isCalled ? ' called ' : ' named ');
+    if (parts.length == 2) {
+      final base = _translateMonsterOrItemName(parts[0]);
+      final name = parts[1];
+      return '$nameという名前の$base';
+    }
+  }
+
+  // 擬態・フォームモンスター (e.g., "doppelganger in goblin form")
+  if (s.contains(' in ') && s.endsWith(' form')) {
+    final parts = s.substring(0, s.length - 5).split(' in ');
+    if (parts.length == 2) {
+      final real = _translateMonsterOrItemName(parts[0]);
+      final shape = _translateMonsterOrItemName(parts[1]);
+      return '$shapeの姿をした$real';
+    }
+  }
+
   if (s.startsWith('ghost of ')) {
     return '${_translateMonsterOrItemName(s.substring(9))}の幽霊';
   }
@@ -476,7 +531,7 @@ String _translateMonsterOrItemName(String raw) {
     'giant bat': '巨大コウモリ',
     'vampire bat': '吸血コウモリ',
     'raven': 'オオガラス',
-    // C - Centaur, Cat
+    // C - Centaur, Cat, Chameleon
     'plains centaur': '草原のケンタウロス',
     'forest centaur': '森のケンタウロス',
     'mountain centaur': '山のケンタウロス',
@@ -487,7 +542,8 @@ String _translateMonsterOrItemName(String raw) {
     'lynx': 'ヤマネコ',
     'panther': 'パンサー',
     'tiger': 'トラ',
-    // D - Dragon, Dog
+    // D - Dragon, Dog, Doppelganger
+    'doppelganger': 'ドッペルゲンガー',
     'baby red dragon': '赤ん坊レッドドラゴン',
     'baby white dragon': '赤ん坊ホワイトドラゴン',
     'baby blue dragon': '赤ん坊ブルードラゴン',
@@ -868,10 +924,55 @@ String _translateMonsterOrItemName(String raw) {
     'Grayswandir': 'グレイスワンディル',
     'Snickersnee': 'スニッカースニー',
     'Magicbane': 'マジックベイン',
+
+    // Gods
+    'Moloch': 'モロク',
+    'Anubis': 'アヌビス',
+    'Offler': 'オフラー',
+    'Ptah': 'プタハ',
+    'Tyr': 'ティール',
+    'Odin': 'オーディン',
+    'Loki': 'ロキ',
+    'Cthulhu': 'クトゥルフ',
+    'Elbereth': 'エルベレス',
+    'Ishtar': 'イシュタル',
+    'Anhur': 'アンフル',
+    'Thoth': 'トト',
+    'Set': 'セト',
+    'Athena': 'アテナ',
+    'Hermes': 'ヘルメス',
+    'Poseidon': 'ポセイドン',
+    'Quetzalcoatl': 'ケツァルコアトル',
+    'Camazotz': 'カマソッソ',
+    'Huitzilopochtli': 'ウィツィロポチトリ',
+    'Mitra': 'ミトラ',
+    'Crom': 'クロム',
+    'Lugh': 'ルー',
+    'Brigit': 'ブリギッド',
+    'Manannan Mac Lir': 'マナナン・マクリル',
+    'Shan Lai Ching': '山海経',
+    'Chih Sung Tzi': '赤松子',
+    'Huan Ti': '黄帝',
+    'Amaterasu Omikami': '天照大神',
+    'Raijin': '雷神',
+    'Blind Io': 'ブラインド・アイオー',
+    'The Lady': 'ザ・レディ',
+    'Fate': 'フェイト',
   };
+
+  if (monsterMap.containsKey(s)) {
+    return monsterMap[s]!;
+  }
+  final capS = _capitalizeFirst(s);
+  if (monsterMap.containsKey(capS)) {
+    return monsterMap[capS]!;
+  }
 
   if (itemAndEnvironmentMap.containsKey(s)) {
     return itemAndEnvironmentMap[s]!;
+  }
+  if (itemAndEnvironmentMap.containsKey(capS)) {
+    return itemAndEnvironmentMap[capS]!;
   }
 
   return s;
