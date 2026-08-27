@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
 /* NetHack 5.0	light.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.88 $ */
 /* Copyright (c) Dean Luick, 1994                                       */
 /* NetHack may be freely redistributed.  See license for details.       */
@@ -918,17 +918,17 @@ arti_light_description(struct obj *obj)
 {
     switch (arti_light_radius(obj)) {
     case 4:
-        return "radiantly"; /* blessed gold dragon scale mail */
+        return "まばゆく"; /* radiantly */
     case 3:
-        return "brilliantly"; /* blessed artifact, uncursed gold DSM */
+        return "燦然と"; /* brilliantly */
     case 2:
-        return "brightly"; /* uncursed artifact, cursed gold DSM */
+        return "明るく"; /* brightly */
     case 1:
-        return "dimly"; /* cursed artifact, embedded scales */
+        return "薄暗く"; /* dimly */
     default:
         break;
     }
-    return "strangely";
+    return "奇妙に";
 }
 
 /* the #lightsources command */

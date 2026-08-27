@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
 /* NetHack 5.0	worn.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -978,15 +978,13 @@ m_dowear_type(
             const char *adesc = arti_light_description(best);
 
             if (sawmon) /* could already see monster */
-                pline("%s %s to shine %s.", Yname2(best),
-                      otense(best, "begin"), adesc);
+                pline("%sは%s輝き始めた!", Yname2(best), adesc);
             else if (canseemon(mon)) /* didn't see it until new light */
-                pline("%s %s shining %s.", Yname2(best),
-                      otense(best, "are"), adesc);
+                pline("%sは%s輝いている!", Yname2(best), adesc);
             else if (sawloc) /* saw location but not invisible monster */
-                pline("%s begins to shine %s.", Something, adesc);
+                pline("何かが%s輝き始めた!", adesc);
             else /* didn't see location until new light */
-                pline("%s is shining %s.", Something, adesc);
+                pline("何かが%s輝いている!", adesc);
         }
     }
     update_mon_extrinsics(mon, best, TRUE, creation);

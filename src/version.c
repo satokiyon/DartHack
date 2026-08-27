@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
 /* NetHack 5.0	version.c	$NHDT-Date: 1781973072 2026/06/20 16:31:12 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2018. */
@@ -400,7 +400,7 @@ check_version(
         ) {
 #ifndef SFCTOOL
         if (complain) {
-            pline("Version mismatch for file \"%s\".", filename);
+            pline("ファイル\"%s\"のバージョンが一致しません。", filename);
             if (WIN_MESSAGE != WIN_ERR)
                  display_nhwindow(WIN_MESSAGE, TRUE);
         }

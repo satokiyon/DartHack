@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
 /* NetHack 5.0	sfstruct.c	$NHDT-Date: 1781973066 2026/06/20 16:31:06 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.28 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2025. */
@@ -593,7 +593,7 @@ mread(int fd, genericptr_t buf, unsigned len)
             return;
         } else {
 #ifndef SFCTOOL
-            pline("Read %d instead of %u bytes.", (int) rlen, len);
+            pline("セーブデータの読み込みサイズ不一致: %u バイトの予定が %d バイトでした。", len, (int) rlen);
             display_nhwindow(WIN_MESSAGE, TRUE); /* flush before error() */
             if (program_state.restoring) {
                 (void) nhclose(fd);

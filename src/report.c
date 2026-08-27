@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
 /* NetHack 5.0	report.c	$NHDT-Date: 1777240823 2026/04/26 22:00:23 $  $NHDT-Branch: to500 $:$NHDT-Revision: 1.19 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2024 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -461,7 +462,7 @@ int
 dobugreport(void)
 {
     if (!submit_web_report(2, NULL, "#bugreport command")) {
-        pline("Unable to send bug report.  Please visit %s instead.",
+        pline("バグ報告を送信できませんでした。代わりに %s をご覧ください。",
               (sysopt.crashreporturl && *sysopt.crashreporturl)
               ? sysopt.crashreporturl
               : DEVTEAM_URL
