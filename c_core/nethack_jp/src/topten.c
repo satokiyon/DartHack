@@ -108,7 +108,7 @@ staticfn char *topten_wrapsplit(char *, int);
 staticfn void nsb_mung_line(char *);
 staticfn void nsb_unmung_line(char *);
 #endif
-staticfn const char *skip_english_article(const char *);
+const char *skip_english_article(const char *);
 staticfn const char *jp_translate_multi_reason_exact(const char *, char *,
                                                      unsigned);
 staticfn const char *jp_translate_multi_reason_for_display(const char *,
@@ -356,7 +356,7 @@ jp_translate_food_or_corpse(char *out, unsigned outsz, const char *in)
     }
 }
 
-staticfn const char *
+const char *
 skip_english_article(const char *s)
 {
     if (!s)

@@ -3364,6 +3364,7 @@ extern void timer_sanity_check(void);
 
 /* ### topten.c ### */
 
+extern const char *skip_english_article(const char *);
 extern int name_to_otyp(const char *);
 extern void formatkiller(char *, unsigned, int, boolean) NONNULLARG1;
 extern void jp_translate_killer_text_for_display(char *, unsigned,
