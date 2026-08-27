@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
 /* NetHack 5.0	mail.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.80 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -133,7 +133,7 @@ getmailstatus(void)
 
     if (mailbox && stat(mailbox, &omstat)) {
 #ifdef PERMANENT_MAILBOX
-        pline("Cannot get status of MAIL=\"%s\".", mailbox);
+        pline("MAIL=\"%s\"のステータスを取得できません。", mailbox);
         free_maildata(); /* set 'mailbox' to Null */
 #else
         omstat.st_mtime = 0;
@@ -453,7 +453,7 @@ newmail(struct mail_info *info)
  give_up:
     /* deliver some classes of messages even if no daemon ever shows up */
     if (!message_seen && info->message_typ == MSG_OTHER)
-        pline("Hark!  \"%s.\"", info->display_txt);
+        pline("聞け！ 「%s」", info->display_txt);
 }
 
 #if !defined(UNIX) && !defined(VMS)
@@ -562,7 +562,7 @@ ckmailstatus(void)
     laststattime = svm.moves;
     if (stat(mailbox, &nmstat)) {
 #ifdef PERMANENT_MAILBOX
-        pline("Cannot get status of MAIL=\"%s\" anymore.", mailbox);
+        pline("MAIL=\"%s\"のステータスをこれ以上取得できません。", mailbox);
         free_maildata();
 #else
         nmstat.st_mtime = 0;
@@ -571,10 +571,10 @@ ckmailstatus(void)
         if (nmstat.st_size) {
             static struct mail_info deliver = {
 #ifndef NO_MAILREADER
-                MSG_MAIL, "I have some mail for you",
+                MSG_MAIL, "あなたへの手紙があります",
 #else
                 /* suppress creation and delivery of scroll of mail */
-                MSG_OTHER, "You have some mail in the outside world",
+                MSG_OTHER, "下界からあなた宛ての手紙が届いています",
 #endif
                 0, 0
             };
@@ -644,11 +644,11 @@ read_simplemail(const char *mbox, boolean adminmsg)
             endpunct = ".";
 
         if (adminmsg) {
-            urgent_pline("The voice of %s booms through the caverns:",
+            urgent_pline("洞窟全体に%sの声が高らかに響き渡った:",
                          curline);
         } else {
-            pline("この手紙は'%s'を送事者としている.", curline);
-            pline("後のように書かれている:");
+            pline("この手紙は'%s'を差出人としている.", curline);
+            pline("次のように書かれている:");
         }
         pline("\"%s\"%s", msg, endpunct);
 

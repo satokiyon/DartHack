@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
 /* NetHack 5.0	options.c	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.782 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
@@ -1765,7 +1765,7 @@ optfn_fruit(
                been created since the previous name was put in place */
             (void) fruitadd(svp.pl_fruit, forig);
             if (give_opt_msg)
-                pline("Fruit is now \"%s\".", svp.pl_fruit);
+                pline("果物の名前を「%s」に変更した。", svp.pl_fruit);
         }
         /* If initial, then initoptions is allowed to do it instead
          * of here (initoptions always has to do it even if there's
@@ -4015,10 +4015,10 @@ optfn_sortvanquished(
 
         /* return handler_sortvanquished(); */
         (void) set_vanq_order(TRUE); /* insight.c */
-        pline("'%s' %s \"%s: %s\".", optname,
+        pline("'%s' は%s「%s: %s」。", optname,
               (flags.vanq_sortmode == prev_sortmode)
-                 ? "not changed, still"
-                 : "changed to",
+                 ? "変更されず、そのまま"
+                 : "次へ変更されました: ",
               vanqorders[flags.vanq_sortmode][0],
               vanqorders[flags.vanq_sortmode][1]);
     }
@@ -5454,8 +5454,8 @@ optfn_boolean(
            still be pending at this point (mainly for opt_need_redraw);
            give the toggled message now regardless */
         if (give_opt_msg)
-            pline("'%s' option toggled %s.", allopt[optidx].name,
-                  !negated ? "on" : "off");
+            pline("'%s' オプションを%sに切り替えました。", allopt[optidx].name,
+                  !negated ? "オン" : "オフ");
 
         return optn_ok;
     }
@@ -5595,8 +5595,9 @@ handler_menustyle(void)
     destroy_nhwindow(tmpwin);
     chngd = (flags.menu_style != old_menu_style);
     if (chngd || flags.verbose)
-        pline("'menustyle' %s \"%s\".", chngd ? "changed to" : "is still",
-              menutype[(int) flags.menu_style][0]);
+        pline("'menustyle' を「%s」に%s。",
+              menutype[(int) flags.menu_style][0],
+              chngd ? "変更しました" : "維持しました");
     return optn_ok;
 }
 
@@ -5902,12 +5903,12 @@ handler_msg_window(void)
         if (chngd || flags.verbose) {
             (void) optfn_msg_window(opt_msg_window, get_val,
                                     FALSE, buf, empty_optstr);
-            pline("'msg_window' %.20s \"%.20s\".",
-                  chngd ? "changed to" : "is still", buf);
+            pline("'msg_window' を「%.20s」に%s。",
+                  buf, chngd ? "変更しました" : "維持しました");
         }
     } else
 #endif /* PREV_MSGS (for tty or curses) */
-        pline("'%s' option is not supported for '%s'.",
+        pline("'%s' オプションは '%s' ではサポートされていません。",
               allopt[opt_msg_window].name, windowprocs.name);
     return optn_ok;
 }
@@ -6081,9 +6082,9 @@ handler_perminv_mode(void)
     if (n >= 0) { /* not ESC */
         buf[0] = '\0';
         (void) optfn_perminv_mode(opt_perm_invent, get_val, FALSE, buf, NULL);
-        pline("'perminv_mode' %s '%s' (%s).",
-              (new_pi != old_pi) ? "changed to" : "is still",
-              perminv_modes[new_pi][0], buf);
+        pline("'perminv_mode' を '%s' (%s) に%s。",
+              perminv_modes[new_pi][0], buf,
+              (new_pi != old_pi) ? "変更しました" : "維持しました");
         if (new_pi != InvOptNone && !old_perm_invent)
             iflags.perm_invent = can_set_perm_invent();
         else if (new_pi == InvOptNone && old_perm_invent)
@@ -6851,9 +6852,9 @@ staticfn void
 rejectoption(const char *optname)
 {
 #ifdef MICRO
-    pline("\"%s\" settable only from %s.", optname, get_configfile());
+    pline("\"%s\" は %s からのみ設定可能です。", optname, get_configfile());
 #else
-    pline("%s can be set only from NETHACKOPTIONS or %s.", optname,
+    pline("%s は NETHACKOPTIONS または %s からのみ設定可能です。", optname,
           get_configfile());
 #endif
 }

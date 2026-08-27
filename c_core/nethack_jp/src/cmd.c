@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
 /* NetHack 5.0	cmd.c	$NHDT-Date: 1781973043 2026/06/20 16:30:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.772 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -657,7 +657,7 @@ doextlist(void)
                     && (efp->flags & GENERALCMD) != 0 /* minor optimization */
                     && strstri(cmd_desc, "虐殺"))
                     cmd_desc = strsubst(strcpy(descbuf, cmd_desc),
-                                        "絶滅または虐殺された",
+                                        "消滅あるいは虐殺された",
                                         "虐殺された");
                 /* if searching, skip this command if it doesn't match */
                 if (*searchbuf
@@ -1736,7 +1736,7 @@ struct ext_func_tab extcmdlist[] = {
     { M('f'), "force", "鍵をこじ開ける",
               doforce, AUTOCOMPLETE, NULL },
     { M('g'), "genocided",
-              "絶滅または虐殺されたモンスターを一覧表示する",
+              "消滅あるいは虐殺されたモンスターを一覧表示する",
               dogenocided,
               IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
     { ';',    "glance", "地図記号が何を表すか表示する",

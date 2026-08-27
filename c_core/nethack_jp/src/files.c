@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
 /* NetHack 5.0	files.c	$NHDT-Date: 1781973049 2026/06/20 16:30:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.448 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -1005,7 +1005,7 @@ commit_bonesfile(d_level *lev)
     ret = rename(tempname, fq_bones);
 #endif
     if (wizard && ret != 0)
-        pline("couldn't rename %s to %s.", tempname, fq_bones);
+        pline("%s から %s へのファイル名変更に失敗しました。", tempname, fq_bones);
 }
 
 NHFILE *
@@ -1918,7 +1918,7 @@ docompress_file(const char *filename, boolean uncomp)
         nh_terminate(EXIT_FAILURE);
     } else if (f == -1) {
         perror((char *) 0);
-        pline("Fork to %scompress %s failed.", uncomp ? "un" : "", filename);
+        pline("%s の%s処理のフォークに失敗しました。", filename, uncomp ? "解凍" : "圧縮");
         free((genericptr_t) cfn);
         return;
     }
@@ -2092,7 +2092,7 @@ docompress_file(const char *filename, boolean uncomp)
 
         uncompressedfile = fopen(filename, RDBMODE);
         if (!uncompressedfile) {
-            pline("Error in zlib docompress_file %s", filename);
+            pline("%s の zlib 圧縮処理でエラーが発生しました。", filename);
             return;
         }
         compressedfile = gzopen(cfn, "wb");
@@ -2114,8 +2114,8 @@ docompress_file(const char *filename, boolean uncomp)
         while (1) {
             len = fread(buf, 1, sizeof(buf), uncompressedfile);
             if (ferror(uncompressedfile)) {
-                pline("Failure reading uncompressed file");
-                pline("Can't compress %s.", filename);
+                pline("非圧縮ファイルの読み込みに失敗しました。");
+                pline("%s を圧縮できません。", filename);
                 fclose(uncompressedfile);
                 gzclose(compressedfile);
                 (void) unlink(cfn);
@@ -2129,8 +2129,8 @@ docompress_file(const char *filename, boolean uncomp)
 
             len2 = gzwrite(compressedfile, buf, len);
             if (len2 == 0) {
-                pline("Failure writing compressed file");
-                pline("Can't compress %s.", filename);
+                pline("圧縮ファイルの書き込みに失敗しました。");
+                pline("%s を圧縮できません。", filename);
                 fclose(uncompressedfile);
                 gzclose(compressedfile);
                 (void) unlink(cfn);
@@ -2169,7 +2169,7 @@ docompress_file(const char *filename, boolean uncomp)
         }
         uncompressedfile = fopen(filename, WRBMODE);
         if (!uncompressedfile) {
-            pline("Error in zlib docompress file uncompress %s", filename);
+            pline("%s の zlib 解凍処理でエラーが発生しました。", filename);
             gzclose(compressedfile);
 #ifdef SFCTOOL
             free(cfn);
@@ -2182,8 +2182,8 @@ docompress_file(const char *filename, boolean uncomp)
         while (1) {
             len = gzread(compressedfile, buf, sizeof(buf));
             if (len == (unsigned) -1) {
-                pline("Failure reading compressed file");
-                pline("Can't uncompress %s.", filename);
+                pline("圧縮ファイルの読み込みに失敗しました。");
+                pline("%s を解凍できません。", filename);
                 fclose(uncompressedfile);
                 gzclose(compressedfile);
                 (void) unlink(filename);
@@ -2197,8 +2197,8 @@ docompress_file(const char *filename, boolean uncomp)
 
             fwrite(buf, 1, len, uncompressedfile);
             if (ferror(uncompressedfile)) {
-                pline("Failure writing uncompressed file");
-                pline("Can't uncompress %s.", filename);
+                pline("非圧縮ファイルの書き込みに失敗しました。");
+                pline("%s を解凍できません。", filename);
                 fclose(uncompressedfile);
                 gzclose(compressedfile);
                 (void) unlink(filename);

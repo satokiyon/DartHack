@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
 /* NetHack 5.0	symbols.c	$NHDT-Date: 1781973069 2026/06/20 16:31:09 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) NetHack Development Team 2020.                   */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1120,11 +1120,11 @@ do_symset(boolean rogueflag)
             nothing_to_do = TRUE;
     } else if (!res) {
         /* The symbols file could not be accessed */
-        pline("Unable to access \"%s\" file.", SYMBOLS);
+        pline("\"%s\"ファイルにアクセスできません。", SYMBOLS);
         return TRUE;
     } else if (!gs.symset_list) {
         /* The symbols file was empty */
-        There("に\"%s\"のシンボルセットが見つからなかった.", SYMBOLS);
+        There("\"%s\"ファイル内にシンボルセットが見つからなかった.", SYMBOLS);
         return TRUE;
     }
 

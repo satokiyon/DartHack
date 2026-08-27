@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
 /* NetHack 5.0	mkobj.c	$NHDT-Date: 1781973055 2026/06/20 16:30:55 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.335 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -1623,13 +1623,9 @@ shrink_glob(
                however, always say the bag is lighter for the 'gone' case */
             if (gone || (shrink && topcontnr->owt != old_top_owt)
                 || near_capacity() != go.oldcap)
-                pline("%s %s%s lighter.", Yname2(topcontnr),
-                      /* containers also always have quantity 1 */
-                      (topcontnr->owt != old_top_owt) ? "becomes" : "seems",
-                      /* TODO?  maybe also skip "slightly" if description
-                         is changing (from "very large" to "large",
-                         "large" to "medium", or "medium to "small") */
-                      !gone ? " slightly" : "");
+                pline("%sは%s%s軽くなった。", Yname2(topcontnr),
+                      !gone ? "少し" : "",
+                      (topcontnr->owt != old_top_owt) ? "" : "ように思える");
             updinv = TRUE;
         }
     }
@@ -1650,7 +1646,7 @@ shrink_glob(
                 /* fortunately none of the glob adjectives warrant "An " */
                 (void) strsubst(globnambuf, "The ", "A ");
             /* again, quantity is always 1 so no need for otense()/vtense() */
-            pline("%s fades away.", globnambuf);
+            pline("%sは消えてなくなった。", globnambuf);
         }
     } else {
         /* schedule next shrink ~25 turns from now */
@@ -2879,11 +2875,7 @@ hornoplenty(
 #endif
         }
         ++objcount;
-#ifdef JAPAN
-        pline("%sこぼれ出した.", what);
-#else
-        pline("%s %s out.", what, vtense(what, "spill"));
-#endif
+        pline("%sがこぼれ出した.", what);
         obj->blessed = horn->blessed;
         obj->cursed = horn->cursed;
         obj->owt = weight(obj);
@@ -2924,8 +2916,8 @@ hornoplenty(
                 if (IS_ALTAR(levl[u.ux][u.uy].typ))
                     doaltarobj(obj); /* does its own drop message */
                 else
-                    pline("%s %s to the %s.", Doname2(obj),
-                          otense(obj, "drop"), surface(u.ux, u.uy));
+                    pline("%sが%sに落ちた.", Doname2(obj),
+                          surface(u.ux, u.uy));
                 dropy(obj);
             }
         }

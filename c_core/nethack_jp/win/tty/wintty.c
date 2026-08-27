@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
 /* NetHack 5.0	wintty.c	$NHDT-Date: 1781973100 2026/06/20 16:31:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.438 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2719,7 +2719,7 @@ tty_display_file(
 
         if (fd < 0) {
             if (complain)
-                pline("Cannot open %s.", fname);
+                pline("%sを開くことができません。", fname);
             else /* [is this refresh actually necessary?] */
                 docrt();
             return;
@@ -2760,7 +2760,7 @@ tty_display_file(
                 tty_wait_synch(); /* "Hit <space> to continue: " */
                 if (u.ux) /* if hero is on map, refresh the screen */
                     docrt();
-                pline("Cannot open \"%s\".", fname);
+                pline("\"%s\"を開くことができません。", fname);
             }
         } else {
             winid datawin = tty_create_nhwindow(NHW_TEXT);
@@ -3230,9 +3230,8 @@ ttyinv_create_window(int newid, struct WinDesc *newwin)
                    &newwin->maxrow)) {
         tty_destroy_nhwindow(newid);
         WIN_INVEN = WIN_ERR;
-        pline("%s.", "tty perm_invent could not be enabled");
-        pline("tty perm_invent needs a terminal that is at least %dx%d, "
-              "yours is %dx%d.",
+        pline("tty perm_invent を有効にできませんでした。");
+        pline("tty perm_invent には少なくとも %dx%d のターミナルが必要です。（現在: %dx%d）",
               (int) (minrow + 1 + ROWNO + StatusRows()), tty_perminv_mincol,
               ttyDisplay->rows, ttyDisplay->cols);
         tty_wait_synch();

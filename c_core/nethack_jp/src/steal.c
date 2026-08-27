@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
 /* NetHack 5.0	steal.c	$NHDT-Date: 1781973068 2026/06/20 16:31:08 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.142 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -802,12 +802,9 @@ maybe_absorb_item(
                   Some_Monnam(mon), /* Monnam() or "Something" */
                   yname(obj));
         } else {
-            const char *hand_s = jp_body_part(HAND);
+            const char *hand_s = bimanual(obj) ? jp_body_part_plural(HAND) : jp_body_part(HAND);
 
-            if (bimanual(obj))
-                hand_s = makeplural(hand_s);
-            pline("%s %s pulled from your %s!", upstart(yname(obj)),
-                  otense(obj, "are"), hand_s);
+            pline("%sがあなたの%sから引き抜かれた!", yname(obj), hand_s);
         }
         freeinv(obj);
         encumber_msg();
