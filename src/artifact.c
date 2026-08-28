@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-28. */
 /* NetHack 5.0	artifact.c	$NHDT-Date: 1781973041 2026/06/20 16:30:41 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.264 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1919,7 +1919,8 @@ invoke_create_portal(struct obj *obj)
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                  ATR_NONE, clr,
-                 svd.dungeons[i].dname, MENU_ITEMFLAGS_NONE);
+                 jp_dungeon_name_for_display(svd.dungeons[i].dname),
+                 MENU_ITEMFLAGS_NONE);
         num_ok_dungeons++;
         last_ok_dungeon = i;
     }

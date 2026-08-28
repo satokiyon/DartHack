@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-28. */
 /* NetHack 5.0	restore.c	$NHDT-Date: 1781973064 2026/06/20 16:31:04 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.265 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -873,7 +873,7 @@ dorecover(NHFILE *nhfp)
 #endif
     clear_nhwindow(WIN_MESSAGE);
     You("ダンジョン%d階の%sに戻った%s。", depth(&u.uz),
-        svd.dungeons[u.uz.dnum].dname,
+        jp_dungeon_name_by_dnum(u.uz.dnum),
         flags.debug ? "（デバッグモード中）"
                     : flags.explore ? "（探索モード中）" : "");
     curs(WIN_MAP, 1, 1);
