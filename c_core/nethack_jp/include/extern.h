@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-28. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -710,6 +710,7 @@ extern int docallcmd(void);
 extern void docall(struct obj *) NONNULLARG1;
 extern const char *rndghostname(void);
 extern const char *jp_mgivenname_for_display(struct monst *);
+extern const char *jp_bogusmon_for_display(const char *);
 extern char *x_monnam(struct monst *, int, const char *, int, boolean) NONNULLARG1;
 extern char *l_monnam(struct monst *) NONNULLARG1;
 extern char *mon_nam(struct monst *) NONNULLARG1;

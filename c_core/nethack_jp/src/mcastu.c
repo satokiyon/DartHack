@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-28. */
 /* NetHack 5.0	mcastu.c	$NHDT-Date: 1781973053 2026/06/20 16:30:53 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.122 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -680,7 +680,7 @@ mcast_insects(struct monst *mtmp)
     seecaster = canseemon(mtmp) || tp_sensemon(mtmp) || Detect_monsters;
     what = (let == S_SNAKE) ? "ヘビ" : "虫";
     if (Hallucination)
-        what = bogusmon(whatbuf, (char *) 0);
+        what = jp_bogusmon_for_display(bogusmon(whatbuf, (char *) 0));
 
     if (!seecaster) {
         if (newseen <= oldseen || Unaware) {

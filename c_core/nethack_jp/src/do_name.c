@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-28. */
 /* NetHack 5.0	do_name.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.339 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -15,7 +15,7 @@ staticfn const char *docall_target_name(struct obj *, char *, size_t) NONNULLPTR
 staticfn void build_docall_prompt(char *, size_t, struct obj *) NONNULLPTRS;
 staticfn void namefloorobj(void);
 staticfn const char *jp_default_dog_name_for_display(struct monst *, const char *);
-staticfn const char *jp_bogusmon_for_display(const char *);
+const char *jp_bogusmon_for_display(const char *);
 
 #define NUMMBUF 5
 
@@ -760,7 +760,7 @@ namefloorobj(void)
         unames[1] = jp_rank_of_for_display(rn2_on_display_rng(30) + 1,
                            Role_switch, flags.female);
         /* random fake monster */
-        unames[2] = bogusmon(tmpbuf, (char *) 0);
+        unames[2] = jp_bogusmon_for_display(bogusmon(tmpbuf, (char *) 0));
         /* increased chance for fake monster */
         unames[3] = unames[2];
         /* traditional */
@@ -1465,7 +1465,7 @@ jp_mgivenname_for_display(struct monst *mtmp)
     return jp_default_dog_name_for_display(mtmp, name);
 }
 
-staticfn const char *
+const char *
 jp_bogusmon_for_display(const char *name)
 {
     static const struct {
