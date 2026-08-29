@@ -1827,8 +1827,8 @@ class _SettingsPageState extends State<SettingsPage> {
           SwitchListTile(
             title: Text(isJa ? '自動セーブを有効化' : 'Enable Autosave'),
             subtitle: Text(isJa
-                ? '階層移動時、バックグラウンド移行時、および一定ターン毎に入力待ち状態で自動セーブします'
-                : 'Autosave on level transition, backgrounding, and after set turns'),
+                ? '階層移動時、および一定ターン毎に入力待ち状態で自動セーブします'
+                : 'Autosave on level transition, and after set turns'),
             value: _autosaveEnabled,
             onChanged: (val) {
               setState(() => _autosaveEnabled = val);
@@ -1847,7 +1847,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   DropdownMenuItem(value: 20, child: Text(isJa ? '20 ターン毎' : 'Every 20 turns')),
                   DropdownMenuItem(value: 50, child: Text(isJa ? '50 ターン毎 (推奨)' : 'Every 50 turns (Recommended)')),
                   DropdownMenuItem(value: 100, child: Text(isJa ? '100 ターン毎' : 'Every 100 turns')),
-                  DropdownMenuItem(value: 0, child: Text(isJa ? 'ターン毎のセーブ無効（階層移動/バックグラウンド時のみ）' : 'Disabled (Level transition / Background only)')),
+                  DropdownMenuItem(value: 0, child: Text(isJa ? 'ターン毎のセーブ無効（階層移動時のみ）' : 'Disabled (Level transition only)')),
                 ],
                 onChanged: (val) {
                   if (val != null) {
