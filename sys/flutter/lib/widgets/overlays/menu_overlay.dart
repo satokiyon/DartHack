@@ -263,6 +263,16 @@ class _MenuOverlayState extends State<MenuOverlay> {
     );
   }
 
+  String _adjustMenuIndent(String rawText, int minLeadingSpaces) {
+    if (minLeadingSpaces <= 0) return rawText.trimRight();
+    int spaces = 0;
+    while (spaces < rawText.length && rawText[spaces] == ' ') {
+      spaces++;
+    }
+    int spacesToRemove = spaces < minLeadingSpaces ? spaces : minLeadingSpaces;
+    return rawText.substring(spacesToRemove).trimRight();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -287,6 +297,21 @@ class _MenuOverlayState extends State<MenuOverlay> {
       }
       return !text.startsWith('#') && !text.startsWith('?');
     }).toList();
+
+    int minLeadingSpaces = 999;
+    for (final item in filteredItems) {
+      if (_isMenuCategoryItem(item) || _isMenuDividerText(item.text)) continue;
+      if (item.text.trim().isEmpty) continue;
+
+      int spaces = 0;
+      while (spaces < item.text.length && item.text[spaces] == ' ') {
+        spaces++;
+      }
+      if (spaces < minLeadingSpaces) {
+        minLeadingSpaces = spaces;
+      }
+    }
+    if (minLeadingSpaces == 999) minLeadingSpaces = 0;
 
     final hasTabMenu = filteredItems.any((item) => item.text.contains('\t'));
 
@@ -376,16 +401,20 @@ class _MenuOverlayState extends State<MenuOverlay> {
                             final accLabel = isPrintableAccel
                                 ? "${String.fromCharCode(item.accelerator)} - "
                                 : "";
-                            final itemText = item.text.trim();
 
-                            String commandText = itemText;
+                            String commandText;
                             String descriptionText = "";
                             if (isExtCmdMenu) {
+                              final itemText = item.text.trim();
                               final tabIndex = itemText.indexOf('\t');
                               if (tabIndex >= 0) {
                                 commandText = itemText.substring(0, tabIndex).trim();
                                 descriptionText = itemText.substring(tabIndex + 1).trim();
+                              } else {
+                                commandText = itemText;
                               }
+                            } else {
+                              commandText = _adjustMenuIndent(item.text, minLeadingSpaces);
                             }
 
                             if (isCategory) {

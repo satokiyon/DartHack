@@ -61,6 +61,16 @@ class TextOverlay extends StatelessWidget {
 
 
 
+  String _adjustTextIndent(String rawText, int minLeadingSpaces) {
+    if (minLeadingSpaces <= 0) return rawText.trimRight();
+    int spaces = 0;
+    while (spaces < rawText.length && rawText[spaces] == ' ') {
+      spaces++;
+    }
+    int spacesToRemove = spaces < minLeadingSpaces ? spaces : minLeadingSpaces;
+    return rawText.substring(spacesToRemove).trimRight();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -153,6 +163,22 @@ class TextOverlay extends StatelessWidget {
                         ? TextFormatter.reformatLines(textLines)
                         : textLines;
 
+                    int minLeadingSpaces = 999;
+                    for (final line in displayLines) {
+                      final trimmed = line.trim();
+                      if (trimmed.isEmpty || RegExp(r'^[-=\s]+$').hasMatch(trimmed)) continue;
+                      if (DialogHeaderHelper.isDialogTitleHeader(line)) continue;
+
+                      int spaces = 0;
+                      while (spaces < line.length && line[spaces] == ' ') {
+                        spaces++;
+                      }
+                      if (spaces < minLeadingSpaces) {
+                        minLeadingSpaces = spaces;
+                      }
+                    }
+                    if (minLeadingSpaces == 999) minLeadingSpaces = 0;
+
                     return Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
@@ -183,6 +209,7 @@ class TextOverlay extends StatelessWidget {
                             return DialogHeaderHelper.buildTitleHeaderBadge(line);
                           }
 
+                          final displayLine = _adjustTextIndent(line, minLeadingSpaces);
                           final tile = (index < textTiles.length)
                               ? textTiles[index]
                               : -1;
@@ -198,7 +225,7 @@ class TextOverlay extends StatelessWidget {
                                 ],
                                 Expanded(
                                   child: Text(
-                                    line,
+                                    displayLine,
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontFamily: 'monospace',
