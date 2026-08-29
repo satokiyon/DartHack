@@ -1,11 +1,35 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-16. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-29. -->
 # DartHack (Flutter 移植版)
 
-NetHackJP 5.0.0 を **Flutter / Dart** 上で動作させるための移植プロジェクトです。
+NetHack 5.0 (日本語版 / 英語版) を **Flutter / Dart** 上で動作させるための移植プロジェクトです。
 
-- ゲーム本体（C コア）はリポジトリ直下の NetHack C ソース (`src/`) を使用します。
-- 画面表示・キー入力・メニュー等は **Flutter UI（Dart）** で行い、C コアとは **Dart FFI** で双方向通信します。
-- モバイル（Android / iOS）およびデスクトップ（Windows 等）で同じ FFI 経路を用いて動作するよう設計されています。
+- ゲーム本体（C コア）は `c_core/nethack_jp`（日本語版）および `c_core/nethack_en`（英語版）を **Git Subtree** として配置・管理しており、アプリ内で動的に言語を切り替えてプレイ可能です。
+- 画面表示・キー入力・メニュー・ダイアログ等は **Flutter UI（Dart）** で行い、C コアとは **Dart FFI** で双方向通信します。
+- モバイル（Android / iOS）およびデスクトップ等で一貫した FFI 経路を用いて動作するよう設計されています。
+
+---
+
+## ✨ 主な取り込み機能・特徴
+
+1. **日本語版 / 英語版の二言語切り替え**:
+   - `c_core` 配下に配置された 2 系統の C コアソース (`nethack_jp` / `nethack_en`) およびアセットデータ (`assets/nethackdir/` 配下の `_jp` 優先ロード) により、設定画面から日本語・英語を切り替えてプレイ可能です。
+
+2. **カード型 UI & 日英バイリンガル対応 (墓石・ハイスコア)**:
+   - ゲームオーバー・クリア時のハイスコア (`TopTenWidget`) や墓石 (`TombstoneWidget`) をカード形式でレイアウト。
+   - 英語プロフィール (`Name-Role-Race-Gend-Align`) の自動分解・整形、日本語/英語双方のヘッダー検知、マルチ行エントリーの安全なパースに対応。
+
+3. **FFI メモリ安全 & 高速マルチスレッド通信**:
+   - Dart Worker Isolate との通信において 256 面以上の静的リングバッファを使用し、UTF-8 文字列の非同期 Use-After-Free (領域外参照) や文字化けを防止。
+   - C 側での CP437 から UTF-8 へのリアルタイム変換および Dart 側の安全なデコード層。
+
+4. **オートセーブ & 状態・視界保護**:
+   - オートセーブ (`do_autosave`) 実行時の視界マップ (`viz_array`) 自動全復元および画面同期。
+   - セーブデータへの乗馬・巻きつき ID (`m_id`) の確実な保持、セーブプレフィックスの自動クレンジング。
+
+5. **モバイル最適化 UI & スムーズなマップ操作**:
+   - **マップ移動**: 巨大キャンバス `InteractiveViewer` 設計により、極端なズーム時やマップ端でも主人公の位置を画面中心よりやや上方 (35% 位置) に確実センタリング。ズーム倍率を保持。
+   - **各種ダイアログ**: 個数選択ダイアログ (`AmountSelectorDialog`)、`defaults.nh` (起動オプション) エディタ、全体マップダイアログ、メッセージ履歴ダイアログ、ガイドブックダイアログ。
+   - **操作補助**: 仮想方向パッド (D-Pad)、拡張コマンドパネル、ショートカットキーパッド、仮想キーボード。
 
 ---
 
@@ -33,20 +57,12 @@ sys/flutter/
 │   │   ├── app_ja.arb           # 日本語リソース
 │   │   ├── app_en.arb           # 英語リソース
 │   │   └── app_localizations*.dart
-│   ├── models/                  # データモデル
-│   ├── screens/                 # 各種画面コンポーネント
-│   ├── widgets/                 # 再利用可能な UI ウィジェット
+│   ├── models/                  # データモデル (TopTenEntry, TombstoneData 等)
+│   ├── screens/                 # 各種画面コンポーネント (start_screen, end_screen 等)
+│   ├── widgets/                 # 再利用可能な UI ウィジェット (overlays, TopTenWidget 等)
 │   └── utils/                   # ユーティリティ関数
 │
-├── android/                     # Android ビルド設定 (Gradle / CMake)
-│   ├── build.gradle.kts         # プロジェクト共通設定
-│   ├── settings.gradle.kts      # Flutter Plugin Loader / AGP / Kotlin 宣言
-│   ├── gradle.properties
-│   ├── local.properties         # flutter.sdk / sdk.dir など環境依存設定
-│   └── app/
-│       ├── build.gradle.kts     # アプリモジュール設定
-│       └── src/main/cpp/        # C コアと Flutter を橋渡しするソース (winflutter.c)
-│
+├── android/                     # Android プロジェクト設定 (Gradle / CMake)
 ├── ios/                         # iOS Runner (Xcode プロジェクト)
 ├── windows/                     # Windows ランナー
 ├── dummy/                       # FFI 検証用スタブ実装
@@ -64,18 +80,6 @@ sys/flutter/
 ├── analysis_options.yaml        # Lint 設定
 └── README.md                    # 本ドキュメント
 ```
-
-### 主要ファイルの説明
-
-| ファイル / フォルダ | 役割 |
-|---|---|
-| `lib/main.dart` | アプリ全体の状態管理・画面遷移・設定画面。NetHack 起動から C コア起動までを行う。 |
-| `lib/nethack_ffi.dart` | C コアが公開する関数（`StartNetHackFlutter`, `RegisterFlutterCallbacks`, `SendKeyToFlutter` 等）の FFI バインディング定義。 |
-| `lib/nethack_worker.dart` | Dart Isolate 上で FFI コールバック（ウィンドウ操作・メニュー・YN 等）を受け取り、UI 側 (`SendPort`) に転送する。 |
-| `lib/l10n/` | Flutter の i18n 多言語対応リソース。`app_ja.arb`（日本語）および `app_en.arb`（英語）を管理。 |
-| `android/app/src/main/cpp/winflutter.c` | NetHack の `window_procs` をハイジャックして、ウィンドウ描画・キー入力等を Dart 側へコールバック通知する C ソース。 |
-| `android/app/src/main/cpp/CMakeLists.txt` | NetHack C コアと `winflutter.c` を `libnethack.so` として構成。 |
-| `dummy/libnethack_dummy.c` | C コアをビルドせずに FFI 接続を検証するためのスタブ実装。 |
 
 ---
 
@@ -125,14 +129,9 @@ sys/flutter/
 └──────────────────────────────────────────────────────────────┘
 ```
 
-- C コア側は `HijackWindowProcs()` で `and_procs`（Android/POSIX 共通移植テーブル）を Flutter 用テーブルに差し替えています。
-- Dart ↔ C 間の双方向通信は「C → Dart コールバック + Dart → C エクスポート関数」の二系統で実現しています。
-- ステータス更新は `genl_status_update` をハイジャックして `WIN_STATUS` への `putstr` 2 行送信に統一されています。
-- マップタップは `SendPosCmdToFlutter(x, y, mod)` でクリックコマンドをキューに積み、`readchar_core` 経由で入力として処理されます。
-
 ---
 
-## 🔄 c_core 配下（Cコアソース）の最新化方法
+## 🔄 c_core 配下（Cコアソース）の管理と取り込み方法
 
 `c_core/nethack_jp` および `c_core/nethack_en` は DartHack 独自の拡張・修正（UTF-8化、FFI互換処理、自動バイリンガル切替など）を含むため、`git submodule` ではなく **Git Subtree** 方式で管理されています。
 
@@ -190,57 +189,39 @@ git subtree pull --prefix=c_core/nethack_en nethack-en NetHack-5.0
 
 ---
 
-### 3. C コア同期後の注意事項・作業手順
+### 3. C コア同期後の注意事項
 
-1. **コンフリクトの解消**:
-   - `git subtree pull` 実行時にコンフリクトが発生した場合は、手動でマージ解消を行いコミットしてください。
-2. **データアセットの再生成とバージョンインクリメント**:
-   - 本家のデータファイル（`data`, `rumors`, `oracles`, `quest.lua` 等）に変更が入った場合は、データファイルを再構築し `sys/flutter/assets/nethackdir/` に同期してください。
-   - アセットファイルを変更・更新した際は、上書きインストール時にアプリ側でアセット再コピーが実行されるよう、必ず **`sys/flutter/assets/ver` の整数値をインクリメント (+1)** してください。
-3. **動作確認**:
-   - 変更後はビルド（Windows `sys\windows\vs\build_one.bat` や Android/iOS ビルド）を行い、C コアの動作および FFI 通信に問題がないことを検証してください。
+1. **整合性チェックと宣言失効の復元**:
+   - スクリプト内にて本家 `extern.h` などの関数宣言ドロップがないか自動検証されます。警告が表示された場合は `git diff` 等で解消してください。
+2. **データアセットの同期とバージョンインクリメント**:
+   - データファイル（`data`, `rumors`, `oracles`, `quest.lua` 等）に変更が入った場合は、`sys/flutter/assets/nethackdir/` にアセットを同期し、**`sys/flutter/assets/ver` の整数値をインクリメント (+1)** してください。
 
 ---
 
-## 🌐 多言語化（l10n / i18n）対応
+## 🧪 Flutter / Dart コードの検証手順
 
-Flutter UI 側の文字列多言語対応および C コア側のバイリンガル対応は以下の仕組みで実装されています。
+開発・コード変更時の Dart および Flutter UI 側の構文チェック・静的解析・テスト検証には以下の標準コマンドを使用します（※検証にあたって `build_one.bat` は使用しません）。
 
-### UI 側 (Flutter/Dart)
-- `flutter_localizations` と ARB (Application Resource Bundle) ファイルを使用しています。
-- リソース定義: `lib/l10n/app_ja.arb` (日本語) および `lib/l10n/app_en.arb` (英語)。
-- 新しい UI 文字列を追加した場合は `flutter gen-l10n` を実行するか、ビルド時に自動生成される `AppLocalizations` を参照します。
+### 1. 静的解析 (Lint チェック)
 
-### ゲームコア側 (C / FFI)
-- `assets/nethackdir/` 内に英語版 (`data`, `oracles` 等) と日本語版 (`data_jp`, `oracles_jp` 等) の両方を同梱しています。
-- C コアの `src/files.c` (`fopen_datafile`) にて、日本語モード設定時に `_jp` 付きファイルを自動優先ロードする処理が実装されています。
+```bash
+cd sys/flutter
+flutter analyze
+```
+エラーや警告が出力されないことを確認してください。
 
----
+### 2. 単体テスト・統合テスト
 
-## 📝 開発メモ & 規約
+```bash
+cd sys/flutter
+flutter test
+```
+すべてのテストケースがパスすることを確認してください。
 
-### ログ・クラッシュ解析
-
-- **C 側のデバッグログ**: `winflutter.c` 内の `debuglog()` で Logcat (`NetHackFlutter` タグ) や標準エラーに出力。
-- **ログのクリーンアップ規則**: 調査・デバッグ用に埋め込んだ一時的なログ出力コードは、原因特定および修正完了後に**必ず削除してからコミット**してください。
-
-### 新しい C ↔ Dart コールバックを追加する手順
-
-1. **C 側 (`winflutter.c`)**: `DartXxxCallback` typedef とハンドラ関数を宣言し、`RegisterFlutterCallbacks()` および `flutter_procs` に追加。
-2. **Dart FFI 側 (`lib/nethack_ffi.dart`)**: コールバック型定義と Lookup を追加。
-3. **Worker Isolate 側 (`lib/nethack_worker.dart`)**: `NativeCallable<XxxCallback>` を作成し UI スレッドへ中継。
-
----
-
-## 🔗 関連ドキュメント
-
-- [ルート README.md](../../README.md) — プロジェクト概要
-- [DEVELOPMENT.md](../../DEVELOPMENT.md) — 開発ガイドライン
-- [AGENTS.md](../../AGENTS.md) — AI エージェント / 開発者共通のコーディング・設計規約
+※野良ビルド（不正なパッケージ配布）を防止する観点から、アプリパッケージ（`apk`, `aab` 等）のビルドコマンド・ビルド手順については本ドキュメントには記載していません。
 
 ---
 
 ## ⚖️ ライセンス
 
 本ディレクトリ配下の Dart / Flutter コードおよび C 移植コードは NetHack General Public License に準じます。同梱アセットの権利は各著作者に帰属します。
-
