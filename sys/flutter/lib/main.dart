@@ -1076,6 +1076,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
   }
 
+  /// タイルセット画像（スプライトシート）を読み込むヘルパー関数。
+  /// ※ Play Console 等のダウンサンプリング推奨警告対象となりますが、
+  /// タイルセットはピクセル精度（32x32 等のグリッド切り出し）が重要なアトラス画像のため、
+  /// targetWidth / targetHeight によるダウンサンプリング・補間処理は行わず原寸デコードを維持します。
   Future<ui.Image> _loadTileImageFromAsset(String assetPath) async {
     final data = await rootBundle.load(assetPath);
     final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());

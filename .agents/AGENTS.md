@@ -209,15 +209,16 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
 
 
 ## 32. Flutter ポートにおける画像メモリ最適化とタイルセット解像度維持方針
-1. **Google Play Console `BitmapFactory` ダウンサンプリング警告対策**:
-   - `Image.asset` を用いて単体の大判画像（タイトル背景、ロゴ、墓石画面など）を表示する際は、必ず端末の物理画面幅に応じた `cacheWidth` / `cacheHeight` （例: `cacheWidth: (screenWidth * MediaQuery.of(context).devicePixelRatio).round()`）を指定してください。これにより、Flutter 内部のデコーダ（BitmapFactory）側で表示枠に合ったダウンサンプリングが行われ、メモリ（RAM）過大消費や OOM クラッシュを防止できます。
+1. **Google Play Console `BitmapFactory` ダウンサンプリング警告（`y.b.c` 等）の背景と対策**:
+   - Google Play Console に AAB をアップロードした際に検出される「`BitmapFactory.Options` なしでダウンサンプリングなしで BitmapFactory を使用している (例: `y.b.c`)」という警告は、Flutter Engine や Android ネイティブ層（プラグイン等）における `BitmapFactory.decode*` 呼び出しに対する静的スキャナーの判定です。
+   - `Image.asset` を用いて単体の大判画像（タイトル背景、ロゴ、墓石画面など）を表示する際は、必ず端末の物理画面幅に応じた `cacheWidth` / `cacheHeight` （例: `cacheWidth: (screenWidth * MediaQuery.of(context).devicePixelRatio).round()`）を指定してください。これにより、Flutter 内部のデコーダ（BitmapFactory）側で表示枠に合ったダウンサンプリングが行われ、メモリ（RAM）過大消費や OOM クラッシュを確実に防止できます。
 
 2. **単体画像の WebP 最適化**:
    - `assets/images/` 配下の単体画像は、最大幅 1920px 程度に事前リサイズし、WebP 形式（Quality 85〜90%）に変換してファイル容量を削減してください。
 
-3. **タイルセット（スプライトシート）画像の解像度維持とロスレス WebP**:
-   - タイルセット画像（`assets/tiles/`）は、切り出しロジック（`srcRect`）が固定ピクセルサイズ（32x32 等）に依存しているため、デコード時のダウンサンプリングや解像度のリサイズ（ピクセル数の削減）を行うと座標がズレて表示が崩れます。
-   - タイルセット画像については、**ピクセル解像度を完全に維持したまま**、ロスレス（無劣化）WebP 形式へ変換してアセット容量のみを削減してください。
+3. **タイルセット（スプライトシート）画像の解像度維持とダウンサンプリング非適用原則**:
+   - タイルセット画像（`assets/tiles/`）は、切り出しロジック（`srcRect`）が 32x32px 等の固定ピクセルグリッドに厳密に依存しているため、デコード時のダウンサンプリング（`instantiateImageCodec` での `targetWidth`/`targetHeight` 指定）や画像自体のリサイズを行うと、ピクセル補間や切り出し境界のズレ・にじみ・隙間が発生します。
+   - したがって、タイルセット画像については**ダウンサンプリングを行わず原寸デコードを維持**し、**ピクセル解像度を完全に維持したまま**ロスレス（無劣化）WebP 形式へ変換してアセット容量のみを削減してください。
 
 ## 33. Flutter AlertDialog におけるソフトキーボード・横画面オーバーフロー防止原則
 1. **現象と原因**:
