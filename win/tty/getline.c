@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-30. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
 /* NetHack 5.0	getline.c	$NHDT-Date: 1781973100 2026/06/20 16:31:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -81,7 +81,7 @@ getlin_utf8_cells(const char *str)
     return total;
 }
 
-static unsigned long UNUSED
+static unsigned long
 getlin_utf8_to_codepoint(const unsigned char *utf8str, int *ulen_out)
 {
     unsigned char c = utf8str[0];
