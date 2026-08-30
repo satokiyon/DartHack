@@ -32,6 +32,8 @@ endif
 # Enable curses / ncursesw (UTF-8) support by default for NetHackJP
 USE_CURSESLIB = 1
 CURSPKG = ncursesw
+WINTTYLIB := $(shell pkg-config --libs ncursesw 2>/dev/null || pkg-config --libs ncurses 2>/dev/null || echo "-lncursesw")
+WINLIB = $(WINTTYLIB)
 
 #-INCLUDE multiw-1.500
 #-INCLUDE dirs-perms.500
@@ -71,6 +73,7 @@ NHCFLAGS+=-DSELF_RECOVER
 
 # Enable UTF-8 graphics and curses unicode for Japanese display
 NHCFLAGS+=-DUTF8_GRAPHICS
+NHCFLAGS+=-DNO_TERMCAP_HEADERS
 
 ifeq "$(USE_CURSESLIB)" "1"
 NHCFLAGS+=$(NCURSES_CFLAGS)
@@ -106,9 +109,6 @@ VARDATND =
 VARDATND0 =
 
 ifdef MAKEFILE_SRC
-ifdef CURSESLIB
-WINLIB += $(CURSESLIB)
-endif
 
 ifneq "$(NO_NHUUID)" "1"
 UUID_LIB_CHECK := $(shell echo `/sbin/ldconfig -p | grep libuuid`)

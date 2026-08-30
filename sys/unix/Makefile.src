@@ -411,7 +411,7 @@ WINCURSESLIB ?= -lncurses
 
 #fallback values, only if these are not already set
 WINOBJ ?= $(WINTTYOBJ)
-WINLIB ?= $(WINTTYLIB) -lncurses
+WINLIB ?= $(WINTTYLIB)
 
 # make NetHack
 GAME     ?= nethack
@@ -521,14 +521,14 @@ HACKCSRC ?= allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   getpos.c glyphs.c iactions.c insight.c invent.c isaac64.c light.c \
 	   lock.c mail.c makemon.c mcastu.c mdlib.c mhitm.c \
 	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
-	   mondata.c monmove.c monst.c mplayer.c mthrowu.c muse.c music.c \
-	   nhlua.c nhlsel.c nhlobj.c nhmd4.c o_init.c objects.c objnam.c \
+	   mondata.c monmove.c mon_jp.c monst.c mplayer.c mthrowu.c muse.c music.c \
+	   nhlua.c nhlsel.c nhlobj.c nhmd4.c o_init.c objects.c objnam.c obj_jp.c \
 	   options.c jp_data_lookup.c pager.c pickup.c pline.c polyself.c \
 	   potion.c pray.c \
 	   priest.c quest.c questpgr.c read.c rect.c region.c report.c \
 	   restore.c revision.c  rip.c rnd.c role.c rumors.c save.c selvar.c \
 	   sfbase.c sfstruct.c shk.c shknam.c sit.c sounds.c sp_lev.c \
-	   spell.c stairs.c steal.c steed.c strutil.c symbols.c sys.c \
+	   spell.c spell_jp.c stairs.c steal.c steed.c strutil.c symbols.c sys.c \
 	   teleport.c timeout.c topten.c track.c trap.c u_init.c utf8map.c \
 	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c wizcmds.c worm.c worn.c write.c zap.c
@@ -608,11 +608,12 @@ HOBJ ?= $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)mhitu.o $(TARGETPFX)minion.o $(TARGETPFX)mklev.o \
 	$(TARGETPFX)mkmap.o $(TARGETPFX)mkmaze.o $(TARGETPFX)mkobj.o \
 	$(TARGETPFX)mkroom.o $(TARGETPFX)mon.o $(TARGETPFX)mondata.o \
-	$(TARGETPFX)monmove.o $(TARGETPFX)monst.o $(TARGETPFX)mplayer.o \
+	$(TARGETPFX)monmove.o $(TARGETPFX)mon_jp.o $(TARGETPFX)monst.o $(TARGETPFX)mplayer.o \
 	$(TARGETPFX)mthrowu.o $(TARGETPFX)muse.o $(TARGETPFX)music.o \
 	$(TARGETPFX)nhlua.o $(TARGETPFX)nhlsel.o $(TARGETPFX)nhlobj.o \
 	$(TARGETPFX)nhmd4.o $(TARGETPFX)objects.o $(TARGETPFX)o_init.o \
-	$(TARGETPFX)objnam.o $(TARGETPFX)options.o $(TARGETPFX)pager.o \
+	$(TARGETPFX)objnam.o $(TARGETPFX)obj_jp.o $(TARGETPFX)options.o \
+	$(TARGETPFX)jp_data_lookup.o $(TARGETPFX)pager.o \
 	$(TARGETPFX)pickup.o $(TARGETPFX)pline.o $(TARGETPFX)polyself.o \
 	$(TARGETPFX)potion.o $(TARGETPFX)pray.o $(TARGETPFX)priest.o \
 	$(TARGETPFX)quest.o $(TARGETPFX)questpgr.o $(TARGETPFX)read.o \
@@ -622,7 +623,7 @@ HOBJ ?= $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)save.o $(TARGETPFX)selvar.o $(TARGETPFX)sfbase.o \
 	$(TARGETPFX)sfstruct.o $(TARGETPFX)shk.o $(TARGETPFX)shknam.o \
 	$(TARGETPFX)sit.o $(TARGETPFX)sounds.o $(TARGETPFX)sp_lev.o \
-	$(TARGETPFX)spell.o $(TARGETPFX)stairs.o $(TARGETPFX)symbols.o \
+	$(TARGETPFX)spell.o $(TARGETPFX)spell_jp.o $(TARGETPFX)stairs.o $(TARGETPFX)symbols.o \
 	$(TARGETPFX)sys.o $(TARGETPFX)steal.o $(TARGETPFX)steed.o \
 	$(TARGETPFX)strutil.o $(TARGETPFX)teleport.o $(TARGETPFX)timeout.o \
 	$(TARGETPFX)topten.o $(TARGETPFX)track.o $(TARGETPFX)trap.o \
@@ -753,7 +754,7 @@ qt3tableview.moc: ../win/Qt3/qt3tableview.h
 	$(QTDIR)/bin/moc -o qt3tableview.moc ../win/Qt3/qt3tableview.h
 
 #	build monst.o and objects.o before executing '$(MAKE) makedefs'
-$(MAKEDEFS): $(FIRSTOBJ) \
+$(MAKEDEFS): $(FIRSTOBJ) $(TARGET_HACKLIB) \
 		../util/makedefs.c ../src/mdlib.c $(CONFIG_H) \
 		../include/permonst.h ../include/monsters.h \
 		../include/objclass.h ../include/objects.h ../include/sym.h \
@@ -771,7 +772,7 @@ $(MAKEDEFS): $(FIRSTOBJ) \
 	@( cd ../util ; $(MAKE) ../include/pm.h )
 #	Created at build time for configurations which support tiles,
 #	but not by makedefs so not connected to the others.
-../src/tile.c: ../win/share/tilemap.c $(HACK_H)
+../src/tile.c: ../win/share/tilemap.c $(HACK_H) $(TARGET_HACKLIB)
 	@( cd ../util ; $(MAKE) ../src/tile.c )
 
 #
@@ -1240,6 +1241,8 @@ $(TARGETPFX)o_init.o: o_init.c $(HACK_H)
 $(TARGETPFX)objects.o: objects.c $(CONFIG_H) ../include/defsym.h \
 		../include/obj.h ../include/objclass.h ../include/objects.h \
 		../include/prop.h ../include/skills.h
+$(TARGETPFX)mon_jp.o: mon_jp.c $(HACK_H)
+$(TARGETPFX)obj_jp.o: obj_jp.c $(HACK_H)
 $(TARGETPFX)objnam.o: objnam.c $(HACK_H)
 $(TARGETPFX)options.o: options.c $(CONFIG_H) $(HACK_H) ../include/defsym.h \
 		../include/flag.h ../include/objclass.h ../include/objects.h \
@@ -1273,6 +1276,7 @@ $(TARGETPFX)sit.o: sit.c $(HACK_H) ../include/artifact.h
 $(TARGETPFX)sounds.o: sounds.c $(HACK_H)
 $(TARGETPFX)sp_lev.o: sp_lev.c $(HACK_H) ../include/sp_lev.h
 $(TARGETPFX)spell.o: spell.c $(HACK_H)
+$(TARGETPFX)spell_jp.o: spell_jp.c $(HACK_H)
 $(TARGETPFX)stairs.o: stairs.c $(HACK_H)
 $(TARGETPFX)steal.o: steal.c $(HACK_H)
 $(TARGETPFX)steed.o: steed.c $(HACK_H)
