@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-30. */
 /* NetHack 5.0	mhitm.c	$NHDT-Date: 1781973054 2026/06/20 16:30:54 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.269 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -690,7 +690,7 @@ hitmm(
         return M_ATTK_MISS; /* bypass mdamagem() */
 
     if (gv.vis) {
-        char buf[BUFSZ], magr_name[BUFSZ];
+        char magr_name[BUFSZ];
         const char *action = 0;
         const char *target_particle = "を";
         char mdef_name[BUFSZ];
@@ -702,7 +702,6 @@ hitmm(
                   (compat == 2) ? "愛想よく語りかけた"
                                 : "色目を使って迫った");
         } else {
-            buf[0] = '\0';
             switch (mattk->aatyp) {
             case AT_BITE:
                 action = "かみついた";

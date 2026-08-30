@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-30. */
 /* NetHack 5.0	mhitu.c	$NHDT-Date: 1781973054 2026/06/20 16:30:54 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.347 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -188,7 +188,7 @@ staticfn void
 mswings(
     struct monst *mtmp, /* attacker */
     struct obj *otemp,  /* attacker's weapon */
-    boolean bash)       /* True: polearm used at too close range */
+    boolean bash UNUSED)       /* True: polearm used at too close range */
 {
     if (flags.verbose && !Blind && mon_visible(mtmp)) {
         pline_mon(mtmp, "%sは%s%sで攻撃した.", Monnam(mtmp),
@@ -1067,7 +1067,7 @@ summonmu(struct monst *mtmp, boolean youseeit)
                     if (numseen < 1) {
                         You_feel("取り囲まれたように感じた.");
                     } else {
-                        Sprintf(buf, "%s%sが現れた",
+                        Snprintf(buf, sizeof buf, "%s%sが現れた",
                                 genericwere, (numseen == 1) ? "" : "たち");
                         if (Deaf)
                             pline("%sがどこからともなく現れた!", buf);
