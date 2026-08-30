@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-30. */
 /* NetHack 5.0	wintty.c	$NHDT-Date: 1781973100 2026/06/20 16:31:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.438 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -676,7 +676,9 @@ void
 tty_askname(void)
 {
     static const char who_are_you[] = "お名前は? ";
+#ifdef WIN32CON
     int prompt_cols;
+#endif
     int c = 0, ct = 0, tryct = 0;
     uint8 utf8buf[8];
 
@@ -747,7 +749,11 @@ tty_askname(void)
                 if (ct) {
                     const char *prevcp = utf8_prev_char_start(svp.plname,
                                                               svp.plname + ct);
+#ifdef WIN32CON
                     int delcols = utf8_char_display_width((const unsigned char *) prevcp);
+#else
+                    int delcols = 1;
+#endif
 
                     if (delcols < 1)
                         delcols = 1;
