@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-30. */
 /* NetHack 5.0	end.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.349 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -35,6 +35,7 @@ staticfn void fixup_death(int);
 #endif /* SFCTOOL */
 staticfn int wordcount(char *);
 staticfn void bel_copy1(char **, char *);
+staticfn const char *death_label_for_display(int);
 
 #ifndef SFCTOOL
 #define done_stopprint program_state.stopprint

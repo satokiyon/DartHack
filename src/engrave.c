@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-18. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-30. */
 /* NetHack 5.0	engrave.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -50,6 +50,9 @@ staticfn void doengrave_ctx_verb(struct _doengrave_ctx *);
 staticfn const char *doengrave_prompt_verb(const struct _doengrave_ctx *);
 staticfn int engrave(void);
 staticfn const char *blengr(void);
+staticfn int utf8_charlen(const char *);
+staticfn int utf8_strlen_chars(const char *);
+staticfn const char *utf8_char_at(const char *, int, int *);
 
 char *
 random_engraving(char *outbuf, char *pristine_copy)
