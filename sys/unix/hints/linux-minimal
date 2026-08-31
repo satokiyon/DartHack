@@ -13,12 +13,14 @@ SHELLDIR=$(PREFIX)/games
 INSTDIR=$(HACKDIR)
 VARDIR=$(HACKDIR)
 
-CFLAGS=-g -I../include
+CFLAGS += -g -I../include $(NHCFLAGS)
 
 # when building liblua.a, avoid warning that use of tmpnam() should be
 # replaced by mkstemp(); the lua code doesn't use nethack's config.h so
 # this needs to be passed via make rather than defined in unixconf.h
 SYSCFLAGS=-DLUA_USE_POSIX
+SYSNHCFLAGS+=-DUTF8_GRAPHICS
+NHCFLAGS+=-DNO_TERMCAP_HEADERS
 
 LINK=$(CC)
 

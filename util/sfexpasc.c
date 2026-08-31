@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
 /* NetHack 5.0	sfexpasc.c.c $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
 /* Copyright (c) Michael Allison, 2025. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,6 +10,21 @@
 #include "integer.h"
 #include "sfprocs.h"
 #include "sfproto.h"
+staticfn void exportascii_sfo_xint8(NHFILE *nhfp, int8 *d_int8, const char *myname UNUSED);
+staticfn void exportascii_sfo_int64(NHFILE *nhfp, int64 *d_int64, const char *myname UNUSED);
+staticfn void exportascii_sfo_int(NHFILE *nhfp, int *d_int, const char *myname UNUSED);
+staticfn void exportascii_sfo_short(NHFILE *nhfp, short *d_short, const char *myname UNUSED);
+staticfn void exportascii_sfo_uint16(NHFILE *nhfp, uint16 *d_uint16, const char *myname UNUSED);
+staticfn void exportascii_sfo_uint64(NHFILE *nhfp, uint64 *d_uint64, const char *myname UNUSED);
+staticfn void exportascii_sfo_unsigned(NHFILE *nhfp, unsigned *d_unsigned, const char *myname UNUSED);
+staticfn void exportascii_sfi_int(NHFILE *nhfp, int *d_int, const char *myname UNUSED);
+staticfn void exportascii_sfi_int64(NHFILE *nhfp, int64 *d_int64, const char *myname UNUSED);
+staticfn void exportascii_sfi_uint16(NHFILE *nhfp, uint16 *d_uint16, const char *myname UNUSED);
+staticfn void exportascii_sfi_uint64(NHFILE *nhfp, uint64 *d_uint64, const char *myname UNUSED);
+staticfn void exportascii_sfi_unsigned(NHFILE *nhfp, unsigned *d_unsigned, const char *myname UNUSED);
+staticfn void exportascii_sfi_short(NHFILE *nhfp, short *d_short, const char *myname UNUSED);
+staticfn char * get_savefield(NHFILE *nhfp, char *inbuf, size_t inbufsz);
+staticfn void report_problem_ascii(NHFILE *nhfp, const char *s1, const char *s2, const char *s3);
 
 #if defined(MACOSX) || defined(VMS)
 extern long long atoll(const char *);

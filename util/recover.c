@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
 /* NetHack 5.0	recover.c	$NHDT-Date: 1687547437 2023/06/23 19:10:37 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Janet Walz, 1992.                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -25,6 +25,7 @@
 
 #if !defined(O_WRONLY) && !defined(LSC) && !defined(AZTEC_C)
 #include <fcntl.h>
+staticfn char * exepath(char *str);
 #endif
 
 #ifdef VMS

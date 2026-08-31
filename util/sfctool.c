@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
 /* NetHack 5.0	sfctool.c */
 /* Copyright (c) Michael Allison, 2025.                           */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -35,6 +36,10 @@
 
 #ifdef WIN32
 #include <UserEnv.h>
+staticfn NHFILE * open_srcfile(const char *fnam, enum saveformats mystyle);
+staticfn NHFILE * create_dstfile(char *fnam, enum saveformats mystyle);
+staticfn const char * briefname(const char *fnam);
+staticfn const char * style_to_text(enum saveformats style);
 #endif
 
 #ifndef RDTMODE

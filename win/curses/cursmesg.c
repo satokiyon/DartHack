@@ -401,10 +401,11 @@ curses_clear_unhighlight_message_window(void)
 #if defined(NCURSES_WIDECHAR) || defined(PDC_WIDE) || defined(CURSES_UNICODE)
                 cchar_t cch;
                 attr_t attr;
-                short color_pair;
+                short color_pair = 0;
+                wchar_t wbuf[10];
 
                 if (mvwin_wch(win, ry, rx, &cch) != ERR) {
-                    if (getcchar(&cch, NULL, &attr, &color_pair, NULL) != ERR) {
+                    if (getcchar(&cch, wbuf, &attr, &color_pair, NULL) == OK) {
                         mvwchgat(win, ry, rx, 1, A_NORMAL, color_pair, NULL);
                     }
                 }

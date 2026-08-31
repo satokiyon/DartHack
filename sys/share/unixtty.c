@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
 /* NetHack 5.0	unixtty.c	$NHDT-Date: 1596498288 2020/08/03 23:44:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -41,7 +42,9 @@
 #endif /* POSIX_TYPES */
 #ifdef LINUX
 #include <sys/ioctl.h>
+#ifndef NO_TERMCAP_HEADERS
 #include <curses.h>
+#endif
 #endif
 #define kill_sym c_cc[VKILL]
 #define erase_sym c_cc[VERASE]
@@ -458,8 +461,10 @@ init_linux_cons(void)
     if (WINDOWPORT(tty) && linux_flag_console) {
         atexit(linux_mapon);
         linux_mapoff();
+#ifndef NO_TERMCAP_HEADERS
         if (has_colors())
             iflags.use_color = TRUE;
+#endif
     }
 #endif
 }
