@@ -76,11 +76,11 @@ sudo apt install build-essential libncursesw5-dev liblua5.4-dev pkg-config gdb
 ### 2.2. Linux / WSL ポートの開発・ビルド (GNU Make / GCC)
 WSL または Linux 環境上で、ワンステップ用ビルドスクリプトを実行して Makefile の生成とビルドを一括で行うことができます。
 - **実行スクリプト**: `sh sys/unix/build_wsl.sh`
-- スクリプト実行により、日本語対応ヒントファイル `sys/unix/hints/linux-jp` が使用され、`src/nethack` に `tty` および `curses` の両インターフェースに対応した実行ファイルが生成されます。
+- スクリプト実行により、日本語対応ヒントファイル `sys/unix/hints/linux-jp` が使用され、`src/nethack` に `tty` および `curses`（`ncursesw` による UTF-8 日本語表示対応）の両インターフェースに対応した実行ファイルが生成されます。
 - *手動でステップを実行する場合*:
   ```bash
   sh sys/unix/setup.sh sys/unix/hints/linux-jp
-  make -j$(nproc) all
+  make -j$(nproc) WANT_WIN_CURSES=1 WANT_WIN_TTY=1 WANT_DEFAULT=tty all
   ```
 
 #### 2.2.1. インストール（`make install`）— 必須
@@ -111,7 +111,7 @@ make install
 | `cp sys/unix/sysconf playground/` | システム設定ファイルをコピー |
 | `touch playground/record` 等 | ハイスコア・ログ・ライブログファイルを新規作成 |
 
-#### 2.2.2. 実行
+#### 2.2.2. 実行とウィンドウポート（`windowtype`）設定
 
 `make install` が完了したら、`playground/nethack` を起動します。
 
@@ -126,18 +126,34 @@ export PATH="$PATH:$(pwd)/playground"
 nethack
 ```
 
+##### `windowtype` オプション設定（.nethackrc）
+`build_wsl.sh` でビルドされたバイナリは `tty` と `curses` の両ウィンドウポートに対応しています。
+ホームディレクトリ（`~/.nethackrc`）またはカレントディレクトリの `.nethackrc` にて `windowtype` を設定することで画面表示を切り替えることができます。
+
+- **curses インターフェース（推奨）**:
+  ```text
+  OPTIONS=windowtype:curses,align_message:top,align_status:right
+  ```
+- **tty インターフェース（デフォルト）**:
+  ```text
+  OPTIONS=windowtype:tty
+  ```
+
+> [!NOTE]
+> `hints/linux-jp` 内で `HAVE_NCURSESW = 1` が定義されているため、`curses` 使用時には自動的に `-DCURSES_UNICODE` が有効化され、`setlocale(LC_CTYPE, "")` により UTF-8 日本語テキストが正常に表示されます。
+
 #### 2.2.3. まとめ（WSL での初回セットアップ全体フロー）
 
 ```bash
 # (1) 依存パッケージのインストール（初回のみ）
 sudo apt update
-sudo apt install build-essential libncursesw5-dev liblua5.4-dev pkg-config gdb
+sudo apt install -y build-essential libncursesw5-dev liblua5.4-dev pkg-config gdb
 
 # (2) リポジトリのクローン（初回のみ）
 # git clone https://github.com/satokiyon/NetHackJP.git
 # cd NetHackJP
 
-# (3) ビルド
+# (3) ビルド（tty & curses 両対応バイナリの生成）
 sh sys/unix/build_wsl.sh
 
 # (4) インストール（playground/ を構築）
