@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -123,9 +123,10 @@
    - `run_command` 等でコマンドを連結する際、PowerShell では `&&` を使用すると構文エラーになるため、1行ずつ実行するかセミコロン `;` 等で区切ってください。
    - 日本語のコミットメッセージを指定する場合、PowerShell 上で文字化けが発生するのを防ぐため、メッセージを一時ファイル（UTF-8）を artifacts の scratch ディレクトリ（例：`<appDataDir>\brain\<conversation-id>\scratch\commit_msg.txt`）に書き込み、`git commit -F <ファイルパス>` でコミットを行ってください。コミット完了後、一時ファイルは削除してください。
 
-4. **Clang / Emscripten (Wasm) 互換性と C 言語規格の厳格遵守**:
+4. **Clang / Emscripten (Wasm) / C23 規格互換性と C 言語コード記述の厳格化**:
    - **マルチバイト文字定数 (' ') の使用禁止**: `'。'` や `'あ'` のように 1 バイトを超える UTF-8 マルチバイト文字をシングルクォーテーション `' '` で囲む記述は、Clang 等で `error: character constant too long for its type` になります。マルチバイト文字を出力・指定する場合は必ずダブルクォーテーション `" "`（文字列リテラル）を使用し、フォーマット指定子も `%s` に変更してください。
    - **関数宣言（extern）と定義（staticfn）のリンケージ一致**: ヘッダーファイル等で `extern` (非 static) 宣言されている関数を `.c` ファイル内で `staticfn` (static) として定義すると、Clang 等で `error: static declaration follows non-static declaration` になります。ヘッダーの公開宣言と実装のリンケージ（可視性）を必ず一致させてください。
+   - **C23 規格における旧式 K&R 空括弧 `()` 宣言の禁止**: GCC 14+ / Clang 18+ および C23 規格では `extern char *tparm();` などの空括弧 `()` 宣言は `(void)`（引数 0 個のプロトタイプ）と厳密に解釈され、可変長引数を渡すと `too many arguments to function` エラーになります。可変長引数を取る関数には必ず `(const char *, ...)` 等の厳格なプロトタイプ宣言を明記してください。
 
 ## 巨大なデータファイルや設定ファイルの安全な編集方針
 
@@ -137,9 +138,10 @@
 
 NetHackJP は本家 NetHack (アップストリーム) の Windows 日本語化リポジトリであり、`DEVELOPMENT.md` §4 の通り、独自拡張には「`/* NetHackJP: ... */`」形式のマーカータグを付けて管理しています。AI エージェントは独自拡張を追加・修正する際、以下の点に留意してください。
 
-1. **マーカータグの徹底**:
+1. **マーカータグと DEVELOPMENT.md 記録の徹底**:
    - 独自拡張には、対応ファイルと処理内容を表すマーカータグ (例: `/* NetHackJP: UTF-8 char truncation for topten name */`) を必ず付与し、`DEVELOPMENT.md` §4 にもエントリを追加してください。**ただし、単純な日本語訳の追加や翻訳テーブルの更新といった「翻訳に関する処理」については、マーカータグの付与や `DEVELOPMENT.md` への記述は不要です。** 翻訳とは関係なくプログラムのロジック（仕様や挙動）を変更する場合にのみ、このルールを適用してください。
    - マーカータグが付与されていない独自変更は、将来のアップストリームマージ時に意図しない衝突や上書きの温床となります。
+   - **マージ競合対策・C23/型修復の記録**: C23 規格対応（`tparm` プロトタイプ修復等）や UTF-8 バッファ拡大（`BUFSZ` 化）など、将来のアップストリーム (NetHack 本家) マージ時にコンフリクトや判断の迷いが生じるリスクがある独自修正を行った際は、必ず `DEVELOPMENT.md` §4 に修正の背景と競合解決・追従手順を記録してください。
 
 2. **アップストリーム修正の取り消しと追従**:
    - アップストリーム (`upstream/NetHack-5.0` 等のリモート追跡ブランチ) を `git fetch` して確認し、本独自拡張と同等の修正 (例: ハイスコアレコードの UTF-8 対応、`SCANBUFSZ` のヘッダー領域算入、`t1` バッファのゼロ初期化など) が既に入っている場合は、本独自拡張を**取り消してアップストリームの実装に追従**してください。

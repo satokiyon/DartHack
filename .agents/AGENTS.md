@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. -->
 # NetHackJP 開発ルール
 
 ## イベント履歴（livelog）および画面メッセージの日本語表示方針
@@ -61,6 +61,10 @@
 17. **日本語化に伴う固定長バッファ (`char buf[N]`) の UTF-8 バイト数超過・オーバーフロー防止**:
     - 英語表記から日本語（UTF-8）への翻訳や動的文字列（`jp_body_part`, `jp_rank_of_for_display`, `jp_role_name_for_display`, `mon_nam` 等）を組み込む際、全角1文字あたり 3 バイトを消費すること、および日本語の助詞・接続詞の付加によりバイト数が大きく膨らむことを常に留意してください。
     - 関数内で定義されるローカルまたは静的バッファ (`char buf[N]`, 特に N <= 64) に `Strcpy`, `Sprintf`, `Strcat` 等で書き込む処理を追加・変更する際は、日本語化後の最大バイト数（文字数 * 3 + NUL）を計算し、十分なマージンを持つバッファサイズ（例: 64〜128 バイト以上、または `BUFSZ`）を定義・拡張してください。
+
+18. **C23 規格 / GCC 14+ / Clang 18+ 互換性とプロトタイプ宣言の厳格遵守**:
+    - **旧式 K&R 空括弧 `()` 宣言の禁止**: GCC 14+ / Clang 18+ および C23 規格では `extern char *tparm();` などの空括弧 `()` 宣言は `(void)`（引数 0 個のプロトタイプ）と厳密に解釈され、可変長引数を渡すと `too many arguments to function` エラーになります。可変長引数を取る関数には必ず `(const char *, ...)` 等の厳格なプロトタイプ宣言を明記してください。
+    - **マージ競合対策・C23/型修復の DEVELOPMENT.md 記録**: C23 規格対応（`tparm` プロトタイプ修復等）や UTF-8 バッファ拡大（`BUFSZ` 化）など、将来のアップストリーム (NetHack 本家) マージ時にコンフリクトや判断の迷いが生じるリスクがある独自修正を行った際は、必ず `DEVELOPMENT.md` §4 に修正の背景と競合解決・追従手順を記録してください。
 
 ## リポジトリ・コミットにおけるクリーンアップとコミット対象の厳格化方針
 
