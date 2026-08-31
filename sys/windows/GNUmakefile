@@ -978,7 +978,7 @@ DLBOBJS = $(addprefix $(ODLB)/, alloc.o dlb.o dlb_main.o panic.o)
 DAT_CLEAN = $(addprefix $(DAT)/, data data_jp oracles oracles_jp options porthelp rumors rumors_jp engrave epitaph bogusmon)
 DAT_NOCLEAN = $(addprefix $(DAT)/, help hh cmdhelp keyhelp history opthelp optmenu \
 	      usagehlp wizhelp help_jp hh_jp cmdhelp_jp keyhelp_jp history_jp opthelp_jp optmenu_jp usagehlp_jp wizhelp_jp \
-	      license engrave epitaph bogusmon tribute)
+	      license engrave epitaph bogusmon tribute tribute_jp)
 DLBLST = $(DAT)/dlb.lst
 DLB = $(GAMEDIR)/nhdat$(NHV)
 DTARGETS = $(U)dlb.exe $(DAT_CLEAN) $(DLBLST) $(DLB)
@@ -1053,6 +1053,7 @@ $(DLBLST): $(LUAFILES) | $(DAT_CLEAN) $(DAT_NOCLEAN)
 	echo epitaph >> $(DLBLST)
 	echo bogusmon >> $(DLBLST)
 	echo tribute >> $(DLBLST)
+	echo tribute_jp >> $(DLBLST)
 	cd $(DAT) ; ls -1 *.lua >> $(DLBLST)
 
 $(DLB): $(U)dlb.exe $(DLBLST) | $(GAMEDIR)

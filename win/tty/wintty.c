@@ -2682,38 +2682,45 @@ tty_display_file(
     boolean complain)  /* whether to report problem if file can't be opened */
 {
 #ifdef DEF_PAGER /* this implies that UNIX is defined */
-    /* FIXME:  this won't work if fname is inside a dlb container */
+    /* NetHackJP: try _jp file first for DEF_PAGER, and fallback to dlb_fopen if open fails */
     {
-        /* use external pager; this may give security problems */
-        int fd = open(fname, O_RDONLY);
+        /* use external pager; try _jp filename first, then original filename */
+        char fname_jp[BUFSZ];
+        int fd = -1;
 
-        if (fd < 0) {
-            if (complain)
-                pline("%sを開くことができません。", fname);
-            else /* [is this refresh actually necessary?] */
-                docrt();
+        if (!strstr(fname, "_jp") && (strlen(fname) + 3 < sizeof fname_jp)) {
+            Strcpy(fname_jp, fname);
+            Strcat(fname_jp, "_jp");
+            fd = open(fname_jp, O_RDONLY);
+        }
+        if (fd < 0)
+            fd = open(fname, O_RDONLY);
+
+        if (fd >= 0) {
+            if (child(1)) {
+                /* Now that child() does a setuid(getuid()) and a chdir(),
+                   we may not be able to open file fname anymore, so make
+                   it stdin. */
+                (void) close(0);
+                if (dup(fd)) {
+                    if (complain)
+                        raw_printf("Cannot open %s as stdin.", fname);
+                } else {
+                    (void) execlp(gc.catmore, "page", (char *) 0);
+                    if (complain)
+                        raw_printf("Cannot exec %s.", gc.catmore);
+                }
+                if (complain)
+                    sleep(10); /* want to wait_synch() but stdin is gone */
+                nh_terminate(EXIT_FAILURE);
+            }
+            (void) close(fd);
             return;
         }
-        if (child(1)) {
-            /* Now that child() does a setuid(getuid()) and a chdir(),
-               we may not be able to open file fname anymore, so make
-               it stdin. */
-            (void) close(0);
-            if (dup(fd)) {
-                if (complain)
-                    raw_printf("Cannot open %s as stdin.", fname);
-            } else {
-                (void) execlp(gc.catmore, "page", (char *) 0);
-                if (complain)
-                    raw_printf("Cannot exec %s.", gc.catmore);
-            }
-            if (complain)
-                sleep(10); /* want to wait_synch() but stdin is gone */
-            nh_terminate(EXIT_FAILURE);
-        }
-        (void) close(fd);
+        /* If external pager open failed (e.g. file is inside DLB container),
+           fall through to internal dlb_fopen display below. */
     }
-#else /* DEF_PAGER */
+#endif /* DEF_PAGER */
     {
         dlb *f;
         char buf[BUFSZ];
@@ -2756,7 +2763,6 @@ tty_display_file(
             (void) dlb_fclose(f);
         }
     }
-#endif /* DEF_PAGER */
     return;
 }
 

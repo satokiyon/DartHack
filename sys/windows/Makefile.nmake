@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01.
 # NetHack 5.0 Makefile.nmake
 #       Copyright (c) NetHack Development Team 1993-2026
 #
@@ -1761,25 +1761,40 @@ binary.tag: 	$(DAT)data $(DAT)rumors $(DAT)oracles $(DLB) \
 ! ELSE
 	copy $(DAT)bogusmon $(GAMEDIR)
 	copy $(DAT)cmdhelp $(GAMEDIR)
+	if exist $(DAT)cmdhelp_jp copy $(DAT)cmdhelp_jp $(GAMEDIR)
 	copy $(DAT)data $(GAMEDIR)
+	if exist $(DAT)data_jp copy $(DAT)data_jp $(GAMEDIR)
 	copy $(DAT)engrave $(GAMEDIR)
 	copy $(DAT)epitaph $(GAMEDIR)
 	copy $(DAT)help $(GAMEDIR)
+	if exist $(DAT)help_jp copy $(DAT)help_jp $(GAMEDIR)
 	copy $(DAT)hh $(GAMEDIR)
+	if exist $(DAT)hh_jp copy $(DAT)hh_jp $(GAMEDIR)
 	copy $(DAT)history $(GAMEDIR)
+	if exist $(DAT)history_jp copy $(DAT)history_jp $(GAMEDIR)
 	copy $(DAT)license $(GAMEDIR)
 	copy $(DAT)optmenu $(GAMEDIR)
+	if exist $(DAT)optmenu_jp copy $(DAT)optmenu_jp $(GAMEDIR)
 	copy $(DAT)oracles $(GAMEDIR)
+	if exist $(DAT)oracles_jp copy $(DAT)oracles_jp $(GAMEDIR)
 	copy $(DAT)rumors $(GAMEDIR)
+	if exist $(DAT)rumors_jp copy $(DAT)rumors_jp $(GAMEDIR)
 	copy $(DAT)symbols $(GAMEDIR)
 	copy $(DAT)tribute $(GAMEDIR)
+	if exist $(DAT)tribute_jp copy $(DAT)tribute_jp $(GAMEDIR)
 	copy $(DAT)wizhelp $(GAMEDIR)
+	if exist $(DAT)wizhelp_jp copy $(DAT)wizhelp_jp $(GAMEDIR)
 	copy /Y $(DAT)*.lua $(GAMEDIR)
 	if exist $(DAT)guioptions copy $(DAT)guioptions $(GAMEDIR)
 	if exist $(DAT)keyhelp copy $(DAT)keyhelp $(GAMEDIR)
+	if exist $(DAT)keyhelp_jp copy $(DAT)keyhelp_jp $(GAMEDIR)
+	if exist $(DAT)opthelp copy $(DAT)opthelp $(GAMEDIR)
+	if exist $(DAT)opthelp_jp copy $(DAT)opthelp_jp $(GAMEDIR)
 	if exist $(DAT)options copy $(DAT)options $(GAMEDIR)
 	if exist $(DAT)porthelp copy $(DAT)porthelp $(GAMEDIR)
 	if exist $(DAT)ttyoptions copy $(DAT)ttyoptions $(GAMEDIR)
+	if exist $(DAT)usagehlp copy $(DAT)usagehlp $(GAMEDIR)
+	if exist $(DAT)usagehlp_jp copy $(DAT)usagehlp_jp $(GAMEDIR)
 ! ENDIF
 	echo binary built > $@
 
@@ -2177,7 +2192,7 @@ nhdat$(NHV):	$(U)dlb.exe $(DAT)data $(DAT)oracles $(OPTIONS_FILE) $(LUA_FILES) \
 	$(DAT)history $(DAT)opthelp $(DAT)optmenu $(DAT)usagehlp $(DAT)wizhelp \
 	$(DAT)help_jp $(DAT)hh_jp $(DAT)cmdhelp_jp $(DAT)keyhelp_jp \
 	$(DAT)history_jp $(DAT)opthelp_jp $(DAT)optmenu_jp $(DAT)usagehlp_jp $(DAT)wizhelp_jp $(DAT)porthelp \
-	$(DAT)license $(DAT)engrave $(DAT)epitaph $(DAT)bogusmon $(DAT)tribute
+	$(DAT)license $(DAT)engrave $(DAT)epitaph $(DAT)bogusmon $(DAT)tribute $(DAT)tribute_jp
 	@echo Building $@
 	@cd $(DAT)
 	@echo data >dlb.lst
@@ -2213,6 +2228,7 @@ nhdat$(NHV):	$(U)dlb.exe $(DAT)data $(DAT)oracles $(OPTIONS_FILE) $(LUA_FILES) \
 	@echo epitaph >>dlb.lst
 	@echo bogusmon >>dlb.lst
 	@echo tribute >>dlb.lst
+	@echo tribute_jp >>dlb.lst
 #	@for %%N in ($(luawildcards)) do dir /b %%N >>dlb.lst
 	@for %%N in (*.lua) do @echo %%N >>dlb.lst
 	@$(U)dlb cIf dlb.lst $(SRC)nhdat

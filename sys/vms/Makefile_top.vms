@@ -132,7 +132,7 @@ VARDAT = $(VARDATD) $(VARDATND)
 # end of configuration
 #
 
-DATHELP = help hh cmdhelp keyhelp history opthelp optmenu usagehlp wizhelp
+DATHELP = help help_jp hh hh_jp cmdhelp cmdhelp_jp keyhelp keyhelp_jp history history_jp opthelp opthelp_jp optmenu optmenu_jp usagehlp usagehlp_jp wizhelp wizhelp_jp
 
 SPEC_LEVS = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
 	juiblex.lua knox.lua medusa-?.lua minend-?.lua minefill.lua \
@@ -142,7 +142,7 @@ SPEC_LEVS = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
 QUEST_LEVS = ???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua
 
 DATNODLB = $(VARDATND) license symbols
-DATDLB = $(DATHELP) dungeon.lua tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
+DATDLB = $(DATHELP) dungeon.lua tribute tribute_jp $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
 DODAT = $(DATNODLB) $(DATDLB)
 
 ALLDEP = $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
