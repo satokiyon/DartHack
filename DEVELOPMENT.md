@@ -318,6 +318,19 @@ Linux/WSL や Android (Bionic libc) 環境において、Windows 側でチェッ
      - `tty_put_utf8_sequence(&cp)` ヘルパー関数を新設し、`tty_display_nhwindow()` 内のプラットフォーム非依存統一描画ループにて全環境（Windows/WSL/Linux/Android）で UTF-8 マルチバイト文字を安全にセル幅加算出力するようリファクタリング。
 * **アップストリーム追従手順**:
   - アップストリーム側で CRLF の取扱い向上や `utf8_text_wrap_index` の全 tty ポート対応、あるいは tty ディスプレイライブラリの UTF-8 行頭文字処理が入った場合は、本変更箇所のマーカータグを確認し追従または整理を行う。
+
+### 6. curses メッセージウィンドウの UTF-8 ワイド文字カラーペア取得修復
+ncursesw (Linux/WSL ワイド文字 curses) 環境において、`windowtype:curses` でターン経過時に過去メッセージがアンハイライト（ボールド解除）される際、古いメッセージの文字色が緑・紫・黄色・オレンジ等にランダム化けする現象を防止するための独自修復です。
+
+* **マーカータグ**: `/* NetHackJP: Wide-character (UTF-8) color pair extraction fix */`
+* **背景**:
+  - `win/curses/cursmesg.c` の `curses_clear_unhighlight_message_window()` 内で、1バイト ASCII 用関数 `mvwinch` と `PAIR_NUMBER` マクロを使って画面セルの既存カラーペアを取得していた。
+  - ncursesw 環境で全角漢字・ひらがな等（3バイト UTF-8）のセルに対して `mvwinch` を使うと、文字コードビットが `PAIR_NUMBER` が抽出するカラーペア番号領域に混入し、不正なカラーペア番号（緑、紫、黄色等）として計算され文字色が化けていた。
+  - ワイド文字用 API (`mvwin_wch` および `getcchar`) を利用してワイド文字セルから正確にカラーペア番号を取得するように修復した。
+* **対象ファイル**:
+  - **`win/curses/cursmesg.c`**: `curses_clear_unhighlight_message_window()` 内で `NCURSES_WIDECHAR` / `CURSES_UNICODE` 条件分岐を追加し、`mvwin_wch` / `getcchar` を用いてカラーペアを取得・再設定するよう修正。
+* **アップストリーム追従手順**:
+  - アップストリームで ncursesw のワイド文字セルに対する `mvwin_wch` / `getcchar` を用いたアンハイライト修復、あるいは `curses_clear_unhighlight_message_window` のリファクタリングが入った場合は本変更を取り消して追従する。
      タイルを添える」 という仕様自体は Android/Flutter ポートの
      ユーザ体験に直結するため、 アップストリームが同等の機能を
      入れても問題なければ本独自実装は削除して良い (動作は同等のため)。
