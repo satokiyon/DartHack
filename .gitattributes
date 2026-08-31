@@ -1,4 +1,31 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-16.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01.
+# Text file normalization: repo is LF, Windows specific scripts/projects are CRLF
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.sln text eol=crlf
+*.vcxproj text eol=crlf
+*.props text eol=crlf
+*.wapproj text eol=crlf
+*.appxmanifest text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.wav binary
+*.mp3 binary
+*.ogg binary
+*.ico binary
+*.bmp binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.uu -text
+*.hqx -text
+
+# Other specific NetHack files
 *.[ch] NHSUBST
 *.cpp NHSUBST
 *.sh NHSUBST
@@ -6,10 +33,6 @@
 *.md NHSUBST
 Porting NHSUBST
 README NHSUBST
-* text=auto
-*.hqx -text
-*.sln -text
-*.vcxproj -text
 *.doc !diff
 *.DOC !diff
 *.uu NH_header=no
@@ -19,4 +42,3 @@ README NHSUBST
 /dat/history -text
 * NH_filestag=(file%s_in_top_directory)
 NetHack.dsw NH_filestag=(file%s_for_win32_that_are_moved_into_._at_compile_time)
-
