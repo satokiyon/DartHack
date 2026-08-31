@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
 /* NetHack 5.0	botl.c	$NHDT-Date: 1781973042 2026/06/20 16:30:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.286 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -262,18 +262,19 @@ status_hilite2displaystr(const char *raw, char *out, size_t outsz)
     }
 #endif
 
+    const char *beh_disp = beh;
     if (!strcmpi(beh, "down"))
-        beh = "減少";
+        beh_disp = "減少";
     else if (!strcmpi(beh, "up"))
-        beh = "増加";
+        beh_disp = "増加";
     else if (!strcmpi(beh, "changed"))
-        beh = "変化";
+        beh_disp = "変化";
     else if (!strcmpi(beh, "always"))
-        beh = "常時";
+        beh_disp = "常時";
     else if (!strcmpi(beh, "criticalhp"))
-        beh = "危険域";
+        beh_disp = "危険域";
 
-    Snprintf(out, outsz, "%s/%s/%s", fld_disp, beh, clr);
+    Snprintf(out, outsz, "%s/%s/%s", fld_disp, beh_disp, clr);
     return out;
 }
 

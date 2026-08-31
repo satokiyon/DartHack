@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3920,6 +3920,7 @@ extern char *encglyph(int);
 extern int decode_glyph(const char *str, int *glyph_ptr) NONNULLPTRS;
 extern char *decode_mixed(char *, const char *) NONNULLARG1;
 extern void genl_putmixed(winid, int, const char *) NONNULLARG3;
+extern void flutter_putmixed_with_tile(winid, int, int, const char *);
 extern void genl_display_file(const char *, boolean) NONNULLARG1;
 extern boolean menuitem_invert_test(int, unsigned, boolean);
 extern const char *mixed_to_glyphinfo(const char *str,

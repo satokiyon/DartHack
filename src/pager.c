@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-22. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
 /* NetHack 5.0	pager.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.302 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -319,7 +319,7 @@ append_str(char *buf, const char *new_str)
     return 1; /* something was appended, possibly just part of " or " */
 }
 
-staticfn void
+static void
 jp_replace_desc_fragment(char *buf, const char *from, const char *to)
 {
     (void) strNsubst(buf, from, to, 0);
@@ -2456,8 +2456,8 @@ look_all(
                     } else {
                         struct monst *mm = m_at(x, y);
                         if (mm) {
-                            int gg = mon_to_glyph(mm, rn2_on_display_rng);
-                            map_glyphinfo(0, 0, gg, 0U, &tileinfo);
+                            int g_glyph = mon_to_glyph(mm, rn2_on_display_rng);
+                            map_glyphinfo(0, 0, g_glyph, 0U, &tileinfo);
                         } else {
                             /* 不可視/警告マーカー: 元の glyph を使う */
                             map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
@@ -2466,8 +2466,8 @@ look_all(
                 } else {
                     struct obj *oo = vobj_at(x, y);
                     if (oo) {
-                        int gg = obj_to_glyph(oo, rn2_on_display_rng);
-                        map_glyphinfo(0, 0, gg, 0U, &tileinfo);
+                        int g_glyph = obj_to_glyph(oo, rn2_on_display_rng);
+                        map_glyphinfo(0, 0, g_glyph, 0U, &tileinfo);
                     } else {
                         map_glyphinfo(0, 0, glyph, 0U, &tileinfo);
                     }

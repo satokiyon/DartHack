@@ -1,6 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
-#include "config.h"
-#include "permonst.h"
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
+#include "hack.h"
 
 /*
  * モンスター表示名の日本語テーブル。

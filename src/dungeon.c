@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
 /* NetHack 5.0	dungeon.c	$NHDT-Date: 1781973047 2026/06/20 16:30:47 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.239 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -3658,7 +3658,8 @@ print_mapseen(
     int how,   /* cause of death; only used if final==2 and mptr->lev==u.uz */
     boolean printdun)
 {
-    char buf[BUFSZ], tmpbuf[BUFSZ];
+    /* NetHackJP: Expand buf to BUFSZ * 2 for UTF-8 dungeon overview */
+    char buf[BUFSZ * 2], tmpbuf[BUFSZ];
     int i, depthstart, dnum;
     boolean died_here = (final == 2 && on_level(&u.uz, &mptr->lev));
     anything any;
