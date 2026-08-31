@@ -106,6 +106,9 @@ tmp/
 scratch/
 tools/
 .agent/
+submodules/
+playground/
+sys/lib/
 
 # Generated Windows nmake stamp files
 /*.tag
