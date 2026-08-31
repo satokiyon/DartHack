@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -48,8 +48,20 @@
 Linux (Ubuntu / Debian 等) 上でビルドを行う場合は、事前に以下のパッケージをインストールしてください。
 ```bash
 sudo apt update
-sudo apt install build-essential libncursesw5-dev liblua5.4-dev pkg-config
+sudo apt install build-essential libncursesw5-dev liblua5.4-dev pkg-config gdb
 ```
+
+| パッケージ | 用途 |
+|---|---|
+| `build-essential` | gcc / make 等のビルドツール一式 |
+| `libncursesw5-dev` | curses (UTF-8 対応) ターミナル UI ライブラリ |
+| `liblua5.4-dev` | Lua 5.4 組み込みスクリプトエンジン |
+| `pkg-config` | ライブラリのコンパイルフラグ解決 |
+| `gdb` | パニックトレース (`PANICTRACE_GDB`) によるクラッシュ解析。実行時に必要 |
+
+> [!NOTE]
+> `gdb` は **実行時**にも参照されます。`sysconf` の `PANICTRACE_GDB=1` が有効な状態で `gdb` が存在しない場合、クラッシュ時に追加のバックトレース情報が取れないだけでなく、起動に失敗するケースもあります。インストールしておくことを強く推奨します。
+
 *GUI ポート（X11 や Qt）のコンパイルも行う場合は、必要に応じて `libx11-dev`, `libxpm-dev`, `qtbase5-dev` 等も追加導入してください。*
 
 ---
@@ -70,6 +82,76 @@ WSL または Linux 環境上で、ワンステップ用ビルドスクリプト
   sh sys/unix/setup.sh sys/unix/hints/linux-jp
   make -j$(nproc) all
   ```
+
+#### 2.2.1. インストール（`make install`）— 必須
+
+ビルド完了後、**必ず `make install` を実行してください**。
+`src/nethack` を直接実行しても、起動直後に下記のようなエラーが発生して終了します。
+
+```
+/mnt/c/Users/satok/NetHackJP/playground: No such file or directory
+Cannot chdir to /mnt/c/Users/satok/NetHackJP/playground.
+```
+
+これは `nethack` 実行ファイルが起動時に `HACKDIR`（= `playground/`）へ `chdir()` しようとするためです。
+`playground/` ディレクトリとその中身は `make install` によって初めて作成されます。
+
+```bash
+make install
+```
+
+`make install` が行う主な処理：
+
+| 処理 | 内容 |
+|---|---|
+| `mkdir -p playground/` | HACKDIR（ゲーム実行ディレクトリ）を作成 |
+| `mkdir -p playground/save` | セーブファイル格納ディレクトリを作成 |
+| `cp src/nethack playground/` | 実行ファイルをコピー |
+| `cp dat/nhdat playground/` | 日本語データリソース（DLB）をコピー |
+| `cp sys/unix/sysconf playground/` | システム設定ファイルをコピー |
+| `touch playground/record` 等 | ハイスコア・ログ・ライブログファイルを新規作成 |
+
+#### 2.2.2. 実行
+
+`make install` が完了したら、`playground/nethack` を起動します。
+
+```bash
+playground/nethack
+```
+
+PATH に追加して短縮することも可能です。
+
+```bash
+export PATH="$PATH:$(pwd)/playground"
+nethack
+```
+
+#### 2.2.3. まとめ（WSL での初回セットアップ全体フロー）
+
+```bash
+# (1) 依存パッケージのインストール（初回のみ）
+sudo apt update
+sudo apt install build-essential libncursesw5-dev liblua5.4-dev pkg-config gdb
+
+# (2) リポジトリのクローン（初回のみ）
+# git clone https://github.com/satokiyon/NetHackJP.git
+# cd NetHackJP
+
+# (3) ビルド
+sh sys/unix/build_wsl.sh
+
+# (4) インストール（playground/ を構築）
+make install
+
+# (5) 起動
+playground/nethack
+```
+
+> [!TIP]
+> 再ビルド後も毎回 `make install` の実行が必要です。
+> `make all && make install` とまとめると便利です。
+
+
 
 ---
 
@@ -201,6 +283,25 @@ str)` という API しかなく、 タイル ID を直接渡せないため、 
   3. `flutter_putmixed_with_tile` シンボル自体が他で使われていないかを
      `git grep` で確認し、 残骸が残らないようにする。
   4. 一方で、 「`look_all` / `look_traps` / `look_engrs` の結果リストに
+     タイル ID を渡す」 というコンセプト自体は有用なため、
+     アップストリーム側の新設計に合わせつつ結果リストにタイル ID を
+     含める修正を継続検討する。
+
+### 5. Linux/WSL・Android における CRLF サニタイズおよび UTF-8 端末表示の崩れ防止
+Linux/WSL や Android (Bionic libc) 環境において、Windows 側でチェックアウトされた CRLF (`\r\n`) ファイルの読込時、および TTY 画面出力時に `\r` (0x0D) や `g_putch` への誤送信によって画面先頭文字が化ける (`␊`, `␌`, `␍`, `°` などのグラフィック制御記号表示やリードバイト破壊) 現象を防止するための独自修復です。
+
+* **マーカータグ**: `/* NetHackJP: CRLF and UTF-8 TTY display fixes for Linux/WSL/Android */`
+* **対象ファイル**:
+  1. **`src/nhlua.c`**: `nhl_loadlua()` で CRLF ファイルをバッファ読み込みする際の `\r` スキップ順序を修復（`\n` の前にある `\r` をスキップ）。
+  2. **`src/dlb.c`**: `lib_dlb_fgets()` および `dlb_fgets()` の `\r` 除去処理を `WIN32` 限定から全プラットフォーム対応に変更。
+  3. **`util/makedefs.c`**: `do_data_for()` および `do_oracles()` でのファイル生成モードを `WRBMODE` (バイナリ) に変更し、`ftell()` オフセット計算のズレを防止。
+  4. **`src/questpgr.c`**: `convert_line()` で `\r` に遭遇した際に早期 return せずスキップするよう修正。
+  5. **`win/tty/wintty.c`**:
+     - `tty_putstr()` の入口で `\r` を除去するサニタイズ処理を追加。
+     - `utf8_text_wrap_index()` を全プラットフォームで利用可能にし、非 WIN32CON (Linux/Android) 環境でもマルチバイト安全なテキスト折り返しを行えるよう修正。
+     - `tty_put_utf8_sequence(&cp)` ヘルパー関数を新設し、`tty_display_nhwindow()` 内のプラットフォーム非依存統一描画ループにて全環境（Windows/WSL/Linux/Android）で UTF-8 マルチバイト文字を安全にセル幅加算出力するようリファクタリング。
+* **アップストリーム追従手順**:
+  - アップストリーム側で CRLF の取扱い向上や `utf8_text_wrap_index` の全 tty ポート対応、あるいは tty ディスプレイライブラリの UTF-8 行頭文字処理が入った場合は、本変更箇所のマーカータグを確認し追従または整理を行う。
      タイルを添える」 という仕様自体は Android/Flutter ポートの
      ユーザ体験に直結するため、 アップストリームが同等の機能を
      入れても問題なければ本独自実装は削除して良い (動作は同等のため)。

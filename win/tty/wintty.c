@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
 /* NetHack 5.0	wintty.c	$NHDT-Date: 1781973100 2026/06/20 16:31:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.438 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -226,6 +226,8 @@ static tty_menu_item *reverse(tty_menu_item *);
 static const char *compress_str(const char *);
 static int utf8_sequence_len(const unsigned char *);
 static int utf8_char_display_width(const unsigned char *);
+static long utf8_text_wrap_index(const char *, int);
+static void tty_put_utf8_sequence(char **);
 
 #ifdef WIN32CON
 #define NH_C3_NONSPACING 0x0001U
@@ -238,7 +240,6 @@ static int utf8_char_display_width(const unsigned char *);
 static unsigned short utf8_char_chartype(const unsigned char *);
 static int win32con_utf8_strlen_cells(const char *);
 static int win32con_putstr_utf8(const char *);
-static long utf8_text_wrap_index(const char *, int);
 extern int __stdcall MultiByteToWideChar(unsigned int, unsigned long, 
                                          const char *, int, wchar_t *, int);
 extern int __stdcall GetStringTypeW(unsigned long, const wchar_t *, int,
@@ -1974,100 +1975,24 @@ process_text_window(winid window, struct WinDesc *cw)
                 ++ttyDisplay->curx;
             }
             term_start_attr(attr);
-#ifndef WIN32CON
-            for (cp = &cw->data[i][1], linestart = TRUE;
-                 *cp && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
-                 cp++
-                 ) {
-                /* message recall for msg_window:full/combination/reverse
-                   might have output from '/' in it (see redotoplin()) */
-                if (linestart) {
-                    if (SYMHANDLING(H_UTF8)) {
-                        /* FIXME: what is actually in that line? is it the \GNNNNNNNN or UTF-8? */
-                        g_putch(*cp);
-                    } else if ((*cp & 0x80) != 0) {
-                        g_putch(*cp);
-                        end_glyphout();
-                    } else {
-                        (void) putchar(*cp);
-                    }
-                    linestart = FALSE;
-                } else {
-                    (void) putchar(*cp);
-                }
-            }
-#else  /* WIN32CON */
+            /* NetHackJP: Unified UTF-8 safe line rendering loop across all platforms */
             for (cp = &cw->data[i][1], linestart = TRUE;
                  *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
                  ) {
-                unsigned char uch = (unsigned char) *cp;
-
                 if (linestart) {
-                    if (uch >= 0x80) {
-                        int ulen = utf8_sequence_len((const unsigned char *) cp);
-
-                        if (ulen > 1) {
-                            const unsigned char *utf8cp =
-                                (const unsigned char *) cp;
-                            int width = utf8_char_display_width(utf8cp);
-                            uint8 utf8seq[8];
-                            int k;
-
-                            for (k = 0; k < ulen && k < 7; ++k)
-                                utf8seq[k] = (uint8) cp[k];
-                            utf8seq[k] = '\0';
-                            if (!_isatty(_fileno(stdout)))
-                                (void) fwrite(utf8seq, 1, (size_t) ulen, stdout);
-                            else
-                                g_pututf8(utf8seq);
-                            cp += ulen;
-                            ttyDisplay->curx += width;
-                        } else if (SYMHANDLING(H_UTF8)) {
-                            g_putch(*cp++);
-                            ttyDisplay->curx++;
-                        } else {
-                            g_putch(*cp++);
-                            end_glyphout();
-                            ttyDisplay->curx++;
-                        }
-                    } else {
+                    if ((*cp & 0x80) != 0 && !SYMHANDLING(H_UTF8)
+                        && cw->type != NHW_TEXT && cw->type != NHW_MENU) {
                         g_putch(*cp++);
+                        end_glyphout();
                         ttyDisplay->curx++;
+                    } else {
+                        tty_put_utf8_sequence(&cp);
                     }
                     linestart = FALSE;
                     continue;
                 }
-
-                if (uch < 0x80) {
-                    g_putch(*cp++);
-                    ttyDisplay->curx++;
-                } else {
-                    int ulen = utf8_sequence_len((const unsigned char *) cp);
-
-                    if (ulen > 1) {
-                        const unsigned char *utf8cp =
-                            (const unsigned char *) cp;
-                        int width = utf8_char_display_width(utf8cp);
-                        uint8 utf8seq[8];
-                        int k;
-
-                        for (k = 0; k < ulen && k < 7; ++k)
-                            utf8seq[k] = (uint8) cp[k];
-                        utf8seq[k] = '\0';
-                        if (!_isatty(_fileno(stdout)))
-                            (void) fwrite(utf8seq, 1, (size_t) ulen, stdout);
-                        else
-                            g_pututf8(utf8seq);
-                        cp += ulen;
-                        ttyDisplay->curx += width;
-                    } else {
-                        g_putch(*cp++);
-                        end_glyphout();
-                        ttyDisplay->curx++;
-                    }
-                }
+                tty_put_utf8_sequence(&cp);
             }
-#endif /* WIN32CON */
             term_end_attr(attr);
         }
     }
@@ -2459,7 +2384,7 @@ compress_str(const char *str)
     return str;
 }
 
-#ifdef WIN32CON
+/* NetHackJP: utf8_text_wrap_index is enabled across all platforms for UTF-8 text wrapping */
 static long
 utf8_text_wrap_index(const char *str, int max_display_width)
 {
@@ -2492,7 +2417,38 @@ utf8_text_wrap_index(const char *str, int max_display_width)
     return 0L;
 }
 
-#endif
+/* NetHackJP: Helper to safely output one ASCII/UTF-8 character sequence
+   and update cursor column & pointer */
+static void
+tty_put_utf8_sequence(char **cpp)
+{
+    const unsigned char *cp;
+    if (!cpp || !*cpp)
+        return;
+    cp = (const unsigned char *) *cpp;
+    if (!*cp)
+        return;
+
+    if (*cp < 0x80U) {
+        (void) putchar(*cp);
+        ttyDisplay->curx++;
+        (*cpp)++;
+    } else {
+        int ulen = utf8_sequence_len(cp);
+        if (ulen > 1) {
+            int width = utf8_char_display_width(cp);
+            int k;
+            for (k = 0; k < ulen && (*cpp)[k]; ++k)
+                (void) putchar((*cpp)[k]);
+            *cpp += ulen;
+            ttyDisplay->curx += width;
+        } else {
+            (void) putchar(*cp);
+            ttyDisplay->curx++;
+            (*cpp)++;
+        }
+    }
+}
 
 void
 tty_putstr(winid window, int attr, const char *str)
@@ -2523,6 +2479,20 @@ tty_putstr(winid window, int attr, const char *str)
 #endif
        )
         str = compress_str(str);
+
+    /* NetHackJP: sanitize any CR characters to prevent cursor line-wrap/overwriting in TTY/curses */
+    static char clean_buf[BUFSZ];
+    if (str && strchr(str, '\r')) {
+        char *d = clean_buf, *d_end = clean_buf + sizeof(clean_buf) - 1;
+        const char *s = str;
+        while (*s && d < d_end) {
+            if (*s != '\r')
+                *d++ = *s;
+            s++;
+        }
+        *d = '\0';
+        str = clean_buf;
+    }
 
     ttyDisplay->lastwin = window;
 
@@ -2636,11 +2606,9 @@ tty_putstr(winid window, int attr, const char *str)
         break;
     case NHW_MENU:
     case NHW_TEXT:
-#ifdef WIN32CON
     {
         long wrap_index = 0L;
         int wrap_cols;
-#endif
 #ifdef H2344_BROKEN
         if (cw->type == NHW_TEXT
             && (cw->cury + cw->offy) == ttyDisplay->rows - 1)
@@ -2684,7 +2652,6 @@ tty_putstr(winid window, int attr, const char *str)
             cw->maxcol = n0;
         if (++cw->cury > cw->maxrow)
             cw->maxrow = cw->cury;
-#ifdef WIN32CON
         if (cw->type == NHW_TEXT) {
             wrap_cols = ((int) cw->cols > 1) ? (int) cw->cols - 1 : CO - 1;
             if (wrap_cols < 1)
@@ -2694,9 +2661,7 @@ tty_putstr(winid window, int attr, const char *str)
                 cw->data[cw->cury - 1][wrap_index + 1L] = '\0';
                 tty_putstr(window, attr, &str[wrap_index]);
             }
-        } else
-#endif
-        if (n0 > CO) {
+        } else if (n0 > CO) {
             /* attempt to break the line */
             for (i = CO - 1; i && str[i] != ' ' && str[i] != '\n';)
                 i--;
@@ -2705,9 +2670,7 @@ tty_putstr(winid window, int attr, const char *str)
                 tty_putstr(window, attr, &str[i]);
             }
         }
-#ifdef WIN32CON
     }
-#endif
         break;
     }
     return;

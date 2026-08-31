@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-22. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
 /* NetHack 5.0	dlb.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -373,12 +373,11 @@ lib_dlb_fgets(char *buf, int len, dlb *dp)
     }
     *bp = '\0';
 
-#if defined(MSDOS) || defined(WIN32)
+    /* NetHackJP: strip '\r' unconditionally across all platforms */
     if ((bp = strchr(buf, '\r')) != 0) {
         *bp++ = '\n';
         *bp = '\0';
     }
-#endif
 
     return buf;
 }
@@ -569,11 +568,28 @@ dlb_fseek(dlb *dp, long pos, int whence)
 char *
 dlb_fgets(char *buf, int len, dlb *dp)
 {
+    char *ret;
     if (!dlb_initialized)
         return (char *) 0;
     if (dp->fp)
-        return fgets(buf, len, dp->fp);
-    return do_dlb_fgets(buf, len, dp);
+        ret = fgets(buf, len, dp->fp);
+    else
+        ret = do_dlb_fgets(buf, len, dp);
+    /* NetHackJP: ensure '\r' is stripped even when reading directly via stdio fgets on Linux/WSL */
+    if (ret) {
+        char *rp = strchr(ret, '\r');
+        if (rp) {
+            if (*(rp + 1) == '\n' || *(rp + 1) == '\0') {
+                *rp++ = '\n';
+                *rp = '\0';
+            } else {
+                char *np = rp;
+                while ((*np = *(np + 1)) != '\0')
+                    np++;
+            }
+        }
+    }
+    return ret;
 }
 
 int

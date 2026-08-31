@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
 /* NetHack 5.0	questpgr.c	$NHDT-Date: 1704043695 2023/12/31 17:28:15 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.87 $ */
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -484,6 +484,7 @@ convert_line(char *in_line, char *out_line)
         *cc = 0;
         switch (*c) {
         case '\r':
+            break; /* NetHackJP: skip CR character instead of returning early */
         case '\n':
             *(++cc) = 0;
             return;

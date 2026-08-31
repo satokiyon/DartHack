@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-16. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
 /* NetHack 5.0  makedefs.c  $NHDT-Date: 1702948590 2023/12/19 01:16:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
@@ -40,6 +40,16 @@
 
 #ifdef MD_USE_TMPFILE_S
 #include <errno.h>
+staticfn ATTRNORETURN static void makedefs_exit(int how);
+staticfn const char * oldfunctionality(char sought);
+staticfn char * name_file(const char *template, const char *tag);
+staticfn FILE * getfp(const char *template, const char *tag, const char *mode, int flg);
+staticfn struct grep_var * grepsearch(const char *name);
+staticfn char * do_grep_control(char *buf);
+staticfn char * padline(char *line, unsigned padlength);
+staticfn char * fgetline(FILE *fd);
+staticfn char * macronamelimit(char *name, int pref);
+staticfn char * tmpdup(const char *str);
 #endif
 
 #define Fprintf (void) fprintf
@@ -1324,13 +1334,14 @@ do_data_for(const char *data_file)
         makedefs_exit(EXIT_FAILURE);
         /*NOTREACHED*/
     }
-    if (!(ofp = fopen(filename, WRTMODE))) { /* data */
+    /* NetHackJP: Use WRBMODE to ensure binary byte-exact ftell offsets across all OSs */
+    if (!(ofp = fopen(filename, WRBMODE))) { /* data */
         perror(filename);
         Fclose(ifp);
         makedefs_exit(EXIT_FAILURE);
         /*NOTREACHED*/
     }
-    if (!(tfp = fopen(tempfile, WRTMODE))) { /* database.tmp */
+    if (!(tfp = fopen(tempfile, WRBMODE))) { /* database.tmp */
         perror(tempfile);
         Fclose(ifp);
         Fclose(ofp);
@@ -1512,13 +1523,14 @@ do_oracles_for(const char *oracle_file)
         makedefs_exit(EXIT_FAILURE);
         /*NOTREACHED*/
     }
-    if (!(ofp = fopen(filename, WRTMODE))) {
+    /* NetHackJP: Use WRBMODE to ensure binary byte-exact ftell offsets across all OSs */
+    if (!(ofp = fopen(filename, WRBMODE))) {
         perror(filename);
         Fclose(ifp);
         makedefs_exit(EXIT_FAILURE);
         /*NOTREACHED*/
     }
-    if (!(tfp = fopen(tempfile, WRTMODE))) { /* oracles.tmp */
+    if (!(tfp = fopen(tempfile, WRBMODE))) { /* oracles.tmp */
         perror(tempfile);
         Fclose(ifp);
         Fclose(ofp);
