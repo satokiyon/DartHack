@@ -91,7 +91,12 @@
    - Linux / WSL 環境で curses インターフェースの日本語 UTF-8 表示を正しく機能させるには、ヒントファイル内で `HAVE_NCURSESW = 1` を明示的に設定してください。
    - `HAVE_NCURSESW` が未定義の場合、`-DCURSES_UNICODE` フラグが付与されず、起動時に `setlocale(LC_CTYPE, "");` が実行されないため、ncurses が C ロケール (ASCII) で動作し、日本語 UTF-8 文字が `~B`, `~C` 等にエスケープ文字化けします。
 
-3. **Linux/POSIX TTY UIにおける UTF-8 入力・エコー制御・文字幅判定方針**:
+3. **Curses / PDCursesMod における `getcchar()` の非NULLバッファ要求**:
+   - `getcchar(const cchar_t *wcval, wchar_t *wch, attr_t *attrs, short *color_pair, void *opts)` を用いてセルの属性やカラーペア番号を取得する際、第2引数 `wch` に `NULL` を渡さないでください。
+   - `ncurses` (Linux) と異なり、`PDCursesMod` (Windows) では `wch == NULL` の場合、文字長のみを返して `color_pair` や `attrs` への設定を行わずに早期リターンする仕様になっています。そのため `wch` に `NULL` を渡すと `color_pair` が未初期化のゴミ値となり、画面の色破壊を引き起こします。
+   - 必ず `wchar_t wbuf[10]` などの非NULLバッファを渡し、`short color_pair = 0;` と安全に初期化した上で呼び出してください。
+
+4. **Linux/POSIX TTY UIにおける UTF-8 入力・エコー制御・文字幅判定方針**:
    - **`tgetch()` からの文字受領と二重エンコード防止**: POSIX/Linux 環境における `tgetch()` の戻り値 `c >= 0x80` は、Unicode コードポイントではなく端末からの UTF-8 生バイト列の 1 バイトです。`WIN32CON` (Windowsコンソール) 以外では `unicodeval_to_utf8str(c)` に通さず、生バイトのまま入力バッファに受領して二重エンコード（`0xE3` ➔ `0xC3 0xA3` 'ã' 等の文字化け）を防止してください。
    - **打鍵時リアルタイムエコーの UTF-8 シーケンス組み立て**: 入力中の 1 バイト受領ごとに即座に画面出力関数 (`putsyms`) へ渡すと、不完全な UTF-8 バイト列が端末に出力されエコー欄に  (U+FFFD) が発生します。先頭リードバイトを特定し、その文字の期待バイト数（ASCII 1バイト, 2バイト文字, 3バイト日本語, 4バイト絵文字）が完全にバッファに揃った時点で一括エコー出力してください。
    - **バックスペース消去幅のロケール非依存 Unicode 直接判定**: POSIX 環境の消去幅計算関数 (`getlin_utf8_char_display_width`) において `mbrtowc` / `wcwidth` 等の C ライブラリ関数を使用しないでください。プログラムの実行時ロケールが "C" 等の場合に UTF-8 変換エラーとなり全角文字でも 1 幅 (半角) にフォールバックして消去残りが生じます。必ず `getlin_utf8_to_codepoint` で取得した Unicode コードポイントに基づく East Asian Width 判定（ひらがな・カタカナ・漢字・全角英数記号・絵文字 `0x1F000`〜`0x1FFFF` 等）を用いて、常に正しく全角 2 セル幅を取得して消去してください。
