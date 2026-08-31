@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01.
 #!/bin/sh
 # NetHackJP build script for WSL (Linux)
 # Usage: ./sys/unix/build_wsl.sh [hints_file]
@@ -54,10 +54,14 @@ rm -f src/hacklib.a src/*.o util/*.o
 echo "Building prerequisites (lua_support)..."
 make lua_support
 
-echo "Starting main build with sequential make (no parallel build)..."
+echo "Starting main build with sequential make (tty & curses interfaces)..."
 
-make all
+make WANT_WIN_CURSES=1 WANT_WIN_TTY=1 WANT_DEFAULT=tty all
 
 echo "=========================================="
-echo "Build complete! Executable is located at src/nethack"
+echo "Build complete! Executable is located at src/nethack."
+echo "Both 'tty' and 'curses' window ports are included."
+echo ""
+echo "Next step: Run 'make install' to install into playground/."
+echo "Then execute: ./playground/nethack"
 echo "=========================================="

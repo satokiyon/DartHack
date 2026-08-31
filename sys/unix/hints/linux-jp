@@ -31,11 +31,18 @@ endif
 
 # Enable curses / ncursesw (UTF-8) support by default for NetHackJP
 USE_CURSESLIB = 1
+HAVE_NCURSESW = 1
 CURSPKG = ncursesw
 WINTTYLIB := $(shell pkg-config --libs ncursesw 2>/dev/null || pkg-config --libs ncurses 2>/dev/null || echo "-lncursesw")
 WINLIB = $(WINTTYLIB)
 
 #-INCLUDE multiw-1.500
+
+# Window ports options for NetHackJP
+WANT_WIN_TTY=1
+WANT_WIN_CURSES=1
+WANT_DEFAULT=tty
+
 #-INCLUDE dirs-perms.500
 #-INCLUDE linuxdistro.500
 
@@ -144,8 +151,6 @@ endif
 endif
 
 # Window ports options (Uncomment desired GUI interfaces if needed)
-# WANT_WIN_TTY=1
-# WANT_WIN_CURSES=1
 # WANT_WIN_X11=1
 # WANT_WIN_QT=1
 

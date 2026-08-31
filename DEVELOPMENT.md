@@ -76,7 +76,7 @@ sudo apt install build-essential libncursesw5-dev liblua5.4-dev pkg-config gdb
 ### 2.2. Linux / WSL ポートの開発・ビルド (GNU Make / GCC)
 WSL または Linux 環境上で、ワンステップ用ビルドスクリプトを実行して Makefile の生成とビルドを一括で行うことができます。
 - **実行スクリプト**: `sh sys/unix/build_wsl.sh`
-- スクリプト実行により、日本語対応ヒントファイル `sys/unix/hints/linux-jp` が使用され、`src/nethack` に実行ファイルおよび `dat/nhdat` に日本語データリソースが生成されます。
+- スクリプト実行により、日本語対応ヒントファイル `sys/unix/hints/linux-jp` が使用され、`src/nethack` に `tty` および `curses` の両インターフェースに対応した実行ファイルが生成されます。
 - *手動でステップを実行する場合*:
   ```bash
   sh sys/unix/setup.sh sys/unix/hints/linux-jp

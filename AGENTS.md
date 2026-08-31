@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -191,4 +191,15 @@ GitHub Actions等で実行される CodeQL のコードスキャン警告（Code
 
 2. **大規模辞書・配列データの段階的バッチ確認（50件単位）**:
    - `jp_rubouts.h` のように数百〜数千件に及ぶ変換データや辞書を構築・改修する際は、一括置換によるデータ破損を防ぐため、50件程度のバッチ単位で確認・保存（`wipeto_dictionary.json` 等の進捗管理ファイル利用）を行いながら慎重に進めてください。
+
+## Linux / WSL 環境における Curses ウィンドウポート（`WANT_WIN_CURSES`）および UTF-8（`CURSES_UNICODE`）ビルド設定の制約
+
+1. **`WANT_WIN_CURSES=1` の記述位置**:
+   - `sys/unix/hints/` 内のヒントファイル（例: `linux-jp`）において、`WANT_WIN_CURSES=1` などのウィンドウポート有効化変数は、必ず `#-INCLUDE multiw-2.500` より**前**（`#-INCLUDE multiw-1.500` 直後）に記述してください。
+   - `multiw-2.500` の処理時点で変数が未定義だと、GNU Make の評価順序により `-DCURSES_GRAPHICS` マクロが `WINCFLAGS` に追加されず、`windowtype:curses` が認識されない tty 専用バイナリが生成されてしまいます。
+
+2. **ncursesw (UTF-8) 対応のための `HAVE_NCURSESW = 1` 指定**:
+   - Linux / WSL 環境で curses インターフェースの日本語 UTF-8 表示を正しく機能させるには、ヒントファイル内で `HAVE_NCURSESW = 1` を明示的に設定してください。
+   - `HAVE_NCURSESW` が未定義の場合、`-DCURSES_UNICODE` フラグが付与されず、起動時に `setlocale(LC_CTYPE, "");` が実行されないため、ncurses が C ロケール (ASCII) で動作し、日本語 UTF-8 文字が `~B`, `~C` 等にエスケープ文字化けします。
+
 
