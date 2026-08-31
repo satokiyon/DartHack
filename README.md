@@ -1,7 +1,7 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-08. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
-NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsのみ)
+NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsとUbuntu(WSL)のみ)
 
 <figure>
    <figcaption>GUI版 Nevanda_5.0.0_32x32タイル使用</figcaption>
