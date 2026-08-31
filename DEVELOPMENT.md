@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-10. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -44,13 +44,32 @@
   - ビルド設定の生成に必要です。インストール時にシステム PATH へ追加するオプションを選択するか、手動で PATH を通してください。
 - **Git for Windows**
 
+### Linux / WSL (Windows Subsystem for Linux) 環境の事前準備
+Linux (Ubuntu / Debian 等) 上でビルドを行う場合は、事前に以下のパッケージをインストールしてください。
+```bash
+sudo apt update
+sudo apt install build-essential libncursesw5-dev liblua5.4-dev pkg-config
+```
+*GUI ポート（X11 や Qt）のコンパイルも行う場合は、必要に応じて `libx11-dev`, `libxpm-dev`, `qtbase5-dev` 等も追加導入してください。*
+
 ---
 
-## 2. Windows ポートの開発・ビルドの実行
+## 2. ビルドの実行
 
+### 2.1. Windows ポートの開発・ビルド (MSVC)
 リポジトリに用意されている開発者用のバッチファイルを実行することで、ビルドとテストを安全に行うことができます。
 - **実行スクリプト**: `sys/windows/vs/build_one.bat`
 - このスクリプトは、MSVCのビルド環境（`Release|x64`）を自動セットアップした上で一貫したビルドを行います。
+
+### 2.2. Linux / WSL ポートの開発・ビルド (GNU Make / GCC)
+WSL または Linux 環境上で、ワンステップ用ビルドスクリプトを実行して Makefile の生成とビルドを一括で行うことができます。
+- **実行スクリプト**: `sh sys/unix/build_wsl.sh`
+- スクリプト実行により、日本語対応ヒントファイル `sys/unix/hints/linux-jp` が使用され、`src/nethack` に実行ファイルおよび `dat/nhdat` に日本語データリソースが生成されます。
+- *手動でステップを実行する場合*:
+  ```bash
+  sh sys/unix/setup.sh sys/unix/hints/linux-jp
+  make -j$(nproc) all
+  ```
 
 ---
 
@@ -227,7 +246,24 @@ GitHub CodeQL によるコードスキャン警告（Critical）を修正する�
 * **対象ファイル**:
   - **`src/botl.c`**: `status_hilite_menu_add()` 内の色選択キャンセル判定を修正し、数値入力を行わない動作または文字列型フィールドの場合は `goto choose_behavior` へジャンプして動作選択メニューへ復帰するよう変更。
 * **アップストリーム追従手順**:
-  1. アップストリーム（本家）で `status_hilite_menu_add()` のキャンセルフロー（`clr == -1` 時のジャンプ先分岐）に関する修正が入った場合は、本独自修正を削除してアップストリームの実装に追従します。
+### 8. C23 規格 / GCC 14+ / Clang 18+ 基準でのビルド警告・型厳格化対応
+現代の C コンパイラ（GCC 14+ / Clang 18+）および C23 規格でのビルド厳格化に伴うコンパイルエラー・警告の解体と、マルチプラットフォーム（Linux / WSL, Android NDK, Windows MSVC）互換性を維持するための修正です。アップストリーム（本家 NetHack）のマージ時にコンフリクトが発生した場合は、以下の指針に従って競合解決を行ってください。
+
+* **主な修正内容**:
+  1. **`win/tty/termcap.c` の `tparm` プロトタイプ修復**:
+     - C23 規格では `extern char *tparm();` の空括弧 `()` が `(void)`（引数0個）と解釈されコンパイルエラーとなるため、可変長引数プロトタイプ `extern char *tparm(const char *, ...);` に修正。
+  2. **バッファオーバーフロー防止 (`-Wformat-overflow=`)**:
+     - `src/insight.c`, `src/shk.c`, `src/dungeon.c`, `src/wizcmds.c` において、日本語 (UTF-8 全角3バイト) 出力時のオーバーフローを防ぐため `Sprintf` 用ローカルバッファを `BUFSZ` / `BUFSZ * 2` に拡大。
+  3. **プロトタイプ欠落の解消 (`-Wmissing-prototypes`)**:
+     - `src/mon_jp.c`, `src/objnam.c`, `src/nhlua.c`, `src/options.c`, `src/jp_data_lookup.c`, `src/pager.c`, `src/polyself.c`, `src/rip.c`, `src/shknam.c`, `src/topten.c`, `src/mondata.c` 内のモジュール内限定独自ヘルパー関数（`jp_*` 等）に `static` 宣言を明示。`include/extern.h` に `flutter_putmixed_with_tile` のプロトタイプを追加。
+  4. **型属性修復とシャドウイング防止 (`-Wdiscarded-qualifiers`, `-Wshadow`)**:
+     - `src/botl.c` の `const char *beh_disp` 導入、および `src/mondata.c`, `src/objnam.c`, `src/pager.c` のローカル変数リネーム（`g_idx`, `g_glyph`, `local_genders`）。
+
+* **アップストリーム追従・マージ判定手順**:
+  1. **`tparm()` プロトタイプ**: アップストリーム側で可変長引数プロトタイプへの変更や `ncurses` ヘッダー利用への切り替えが入った場合は、本修正を取り消してアップストリームの実装に追従してください。
+  2. **日本語固有関数 (`jp_*`) の `static` 宣言**: 日本語化固有のヘルパー関数に関する変更であるため、アップストリームマージ時もモジュール内閉塞（`static` 宣言）を維持してください。
+  3. **固定バッファ拡大 (`BUFSZ` / `BUFSZ * 2`)**: 日本語 UTF-8 表示に必要なバッファ長確保（全角文字のバイト数膨張対応）であるため、アップストリームのコードと競合した場合は、バッファサイズ拡大を維持する形で競合を解決してください。
+  4. **型修復・シャドウイング対策**: アップストリームで同等の型修正や変数名変更が入っている場合はアップストリームの表記に追従し、入っていない場合は型安全性維持のため本修正を保持してください。
 
 ---
 
