@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
 /* NetHack 3.6	sftags.c	$Date$ $Revision$	          */
 /* Copyright (c) Michael Allison, 2025                            */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -42,6 +43,12 @@
 #include "patchlev.h"
 #else
 #include "patchlevel.h"
+staticfn void quit(void);
+staticfn char * findtype(char *st, char *tag);
+staticfn char * fieldfix(char *f, char *ss);
+staticfn char * bfsize(const char *str);
+staticfn char * fgetline(FILE *fd);
+staticfn const char * fn(const char *f);
 #endif
 #endif
 

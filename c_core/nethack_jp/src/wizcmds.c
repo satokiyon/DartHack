@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
 /* NetHack 5.0	wizcmds.c	$NHDT-Date: 1781973074 2026/06/20 16:31:14 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.36 $ */
 /*-Copyright (c) Robert Patrick Rankin, 2024. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1291,7 +1291,8 @@ misc_stats(
     winid win,
     long *total_count, long *total_size)
 {
-    char buf[BUFSZ], hdrbuf[QBUFSZ];
+    /* NetHackJP: Expand hdrbuf to BUFSZ to prevent format overflow */
+    char buf[BUFSZ], hdrbuf[BUFSZ];
     long count, size;
     int idx;
     struct trap *tt;

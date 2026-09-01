@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
 /* NetHack 5.0	jp_data_lookup.c */
 /* Japanese aliases for data.base lookup.
  * Keep data.base keys in English and only map player input for lookup.
@@ -3143,7 +3143,7 @@ static const struct jp_data_lookup_alias jp_data_lookup_aliases[] = {
     { "ずるーてぃ", "zruty" },
 };
 
-staticfn boolean
+static boolean
 jp_data_lookup_has_nonascii(const char *s)
 {
     while (*s) {
@@ -3154,7 +3154,7 @@ jp_data_lookup_has_nonascii(const char *s)
     return FALSE;
 }
 
-staticfn void
+static void
 jp_data_lookup_normalize(char *s)
 {
     utf8_katakana_to_hiragana(s);

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
 /* NetHack 5.0	vault.c	$NHDT-Date: 1781973072 2026/06/20 16:31:12 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -516,7 +516,8 @@ invault(void)
         }
 
         if (!strcmpi(buf, "Croesus") || !strcmpi(buf, "Kroisos")
-            || !strcmpi(buf, "Creosote")) { /* Discworld */
+            || !strcmpi(buf, "クロイソス") /* 日本語入力対応 */
+            || !strcmpi(buf, "Creosote") || !strcmpi(buf, "クレオソート")) { /* Discworld（Croesusのパロディキャラ）*/
             if (!svm.mvitals[PM_CROESUS].died) {
                 if (Deaf) {
                     if (!Blind)

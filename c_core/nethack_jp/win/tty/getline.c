@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
 /* NetHack 5.0	getline.c	$NHDT-Date: 1781973100 2026/06/20 16:31:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -31,21 +31,6 @@ extern int extcmd_via_menu(void); /* cmd.c */
 
 extern char erase_char, kill_char; /* from appropriate tty.c file */
 
-#ifdef WIN32CON
-#define NH_C3_NONSPACING 0x0001U
-#define NH_C3_KATAKANA   0x0010U
-#define NH_C3_HIRAGANA   0x0020U
-#define NH_C3_HALFWIDTH  0x0040U
-#define NH_C3_FULLWIDTH  0x0080U
-#define NH_C3_IDEOGRAPH  0x0100U
-
-static unsigned short getlin_utf8_char_chartype(const unsigned char *);
-extern int __stdcall MultiByteToWideChar(unsigned int, unsigned long,
-                                         const char *, int, wchar_t *, int);
-extern int __stdcall GetStringTypeW(unsigned long, const wchar_t *, int,
-                                    unsigned short *);
-#endif
-
 static int
 getlin_utf8_sequence_len(const unsigned char *utf8str)
 {
@@ -61,6 +46,20 @@ getlin_utf8_sequence_len(const unsigned char *utf8str)
     if ((c & 0xF8U) == 0xF0U && (utf8str[1] & 0xC0U) == 0x80U
         && (utf8str[2] & 0xC0U) == 0x80U
         && (utf8str[3] & 0xC0U) == 0x80U)
+        return 4;
+    return 1;
+}
+
+static int
+getlin_utf8_lead_expected_len(unsigned char lead)
+{
+    if (lead < 0x80U)
+        return 1;
+    if (lead >= 0xC2U && lead <= 0xDFU)
+        return 2;
+    if (lead >= 0xE0U && lead <= 0xEFU)
+        return 3;
+    if (lead >= 0xF0U && lead <= 0xF4U)
         return 4;
     return 1;
 }
@@ -96,24 +95,48 @@ getlin_utf8_cells(const char *str)
     return total;
 }
 
-static int
-getlin_utf8_char_display_width(const unsigned char *utf8str)
+static unsigned long
+getlin_utf8_to_codepoint(const unsigned char *utf8str, int *ulen_out)
 {
-#ifdef WIN32CON
-    unsigned short chartype = getlin_utf8_char_chartype(utf8str);
+    unsigned char c = utf8str[0];
+    unsigned long cp = 0;
+    int len = 1;
 
-    if (chartype & NH_C3_NONSPACING)
-        return 0;
-    if (chartype & (NH_C3_FULLWIDTH | NH_C3_KATAKANA
-                    | NH_C3_HIRAGANA | NH_C3_IDEOGRAPH))
-        return 2;
-    if (chartype & NH_C3_HALFWIDTH)
-        return 1;
-#endif
-    return (*utf8str < 0x80U) ? 1 : 1;
+    if ((c & 0x80U) == 0) {
+        cp = c;
+        len = 1;
+    } else if ((c & 0xE0U) == 0xC0U && (utf8str[1] & 0xC0U) == 0x80U) {
+        cp = ((c & 0x1FU) << 6) | (utf8str[1] & 0x3FU);
+        len = 2;
+    } else if ((c & 0xF0U) == 0xE0U && (utf8str[1] & 0xC0U) == 0x80U
+               && (utf8str[2] & 0xC0U) == 0x80U) {
+        cp = ((c & 0x0FU) << 12) | ((utf8str[1] & 0x3FU) << 6) | (utf8str[2] & 0x3FU);
+        len = 3;
+    } else if ((c & 0xF8U) == 0xF0U && (utf8str[1] & 0xC0U) == 0x80U
+               && (utf8str[2] & 0xC0U) == 0x80U
+               && (utf8str[3] & 0xC0U) == 0x80U) {
+        cp = ((c & 0x07U) << 18) | ((utf8str[1] & 0x3FU) << 12)
+             | ((utf8str[2] & 0x3FU) << 6) | (utf8str[3] & 0x3FU);
+        len = 4;
+    } else {
+        cp = c;
+        len = 1;
+    }
+    if (ulen_out)
+        *ulen_out = len;
+    return cp;
 }
 
 #ifdef WIN32CON
+#include <windows.h>
+
+#define NH_C3_NONSPACING 0x0001U
+#define NH_C3_KATAKANA   0x0010U
+#define NH_C3_HIRAGANA   0x0020U
+#define NH_C3_HALFWIDTH  0x0040U
+#define NH_C3_FULLWIDTH  0x0080U
+#define NH_C3_IDEOGRAPH  0x0100U
+
 static unsigned short
 getlin_utf8_char_chartype(const unsigned char *utf8str)
 {
@@ -131,6 +154,94 @@ getlin_utf8_char_chartype(const unsigned char *utf8str)
         return 0;
     return chartype;
 }
+
+static int
+getlin_utf8_char_display_width(const unsigned char *utf8str)
+{
+    unsigned short chartype = getlin_utf8_char_chartype(utf8str);
+    wchar_t wch[2] = { 0, 0 };
+    int ulen = getlin_utf8_sequence_len(utf8str);
+
+    if (chartype & NH_C3_NONSPACING)
+        return 0;
+    if (chartype & (NH_C3_FULLWIDTH | NH_C3_KATAKANA
+                    | NH_C3_HIRAGANA | NH_C3_IDEOGRAPH))
+        return 2;
+    if (chartype & NH_C3_HALFWIDTH)
+        return 1;
+
+    if (ulen > 1
+        && MultiByteToWideChar(65001U, 0x00000008UL,
+                               (const char *) utf8str, ulen, wch, 1) == 1) {
+        switch (wch[0]) {
+        case 0x3005: /* 々 */
+        case 0x300E: /* 『 */
+        case 0x300F: /* 』 */
+        case 0x3010: /* 【 */
+        case 0x3011: /* 】 */
+            return 2;
+        default:
+            break;
+        }
+    }
+    return 1;
+}
+
+#else /* POSIX / Linux / Android NDK */
+
+static int
+getlin_utf8_char_display_width(const unsigned char *utf8str)
+{
+    int ulen = 1;
+    unsigned long cp;
+
+    if (!utf8str || *utf8str == '\0')
+        return 0;
+    if (*utf8str < 0x80U)
+        return 1;
+
+    cp = getlin_utf8_to_codepoint(utf8str, &ulen);
+    if (cp == 0)
+        return 0;
+
+    /* Combining characters (non-spacing) */
+    if ((cp >= 0x0300UL && cp <= 0x036FUL) || (cp >= 0x20D0UL && cp <= 0x20FFUL)
+        || (cp >= 0xFE20UL && cp <= 0xFE2FUL))
+        return 0;
+
+    /* Fullwidth CJK, Japanese Ideographs / Kana / Symbols & Emoji */
+    if ((cp >= 0x1100UL && cp <= 0x11FFUL)
+        || (cp >= 0x2600UL && cp <= 0x27BFUL)  /* Misc Symbols & Dingbats (⚔️, ❄️, ☀️ etc) */
+        || (cp >= 0x2E80UL && cp <= 0x2EFFUL)
+        || (cp >= 0x3000UL && cp <= 0x303FUL)  /* CJK Symbols and Punctuation (全角記号・句読点) */
+        || (cp >= 0x3040UL && cp <= 0x309FUL)  /* Hiragana */
+        || (cp >= 0x30A0UL && cp <= 0x30FFUL)  /* Katakana */
+        || (cp >= 0x3100UL && cp <= 0x312FUL)
+        || (cp >= 0x3130UL && cp <= 0x318FUL)
+        || (cp >= 0x3190UL && cp <= 0x319FUL)
+        || (cp >= 0x3200UL && cp <= 0x32FFUL)
+        || (cp >= 0x3300UL && cp <= 0x33FFUL)
+        || (cp >= 0x3400UL && cp <= 0x4DBFUL)
+        || (cp >= 0x4E00UL && cp <= 0x9FFFUL)  /* CJK Unified Ideographs (漢字) */
+        || (cp >= 0xA000UL && cp <= 0xA48FUL)
+        || (cp >= 0xA490UL && cp <= 0xA4CFUL)
+        || (cp >= 0xAC00UL && cp <= 0xD7A3UL)
+        || (cp >= 0xF900UL && cp <= 0xFAFFUL)
+        || (cp >= 0xFE10UL && cp <= 0xFE1FUL)
+        || (cp >= 0xFE30UL && cp <= 0xFE4FUL)
+        || (cp >= 0xFF01UL && cp <= 0xFF60UL)  /* Fullwidth ASCII / Punctuation (全角英数・記号) */
+        || (cp >= 0xFFE0UL && cp <= 0xFFE6UL)
+        || (cp >= 0x1F000UL && cp <= 0x1FFFFUL) /* Emoji & Pictographs (🐱, 🐉, 🗡️, 😀 etc) */
+        || (cp >= 0x20000UL && cp <= 0x2FA1FUL))
+        return 2;
+
+    /* Halfwidth Katakana */
+    if (cp >= 0xFF61UL && cp <= 0xFF9FUL)
+        return 1;
+
+    return 1;
+}
+
 #endif
 
 static void
@@ -317,6 +428,7 @@ hooked_tty_getlin(
             if (!append_query_space && c >= 0x80)
                 continue;
 
+#ifdef WIN32CON
             if (c < 0x80) {
                 utf8buf[0] = (uint8) c;
                 utf8buf[1] = '\0';
@@ -326,6 +438,15 @@ hooked_tty_getlin(
                 inbytes = (const char *) utf8buf;
                 inlen = (int) strlen(inbytes);
             }
+#else
+            /* POSIX / Linux: tgetch() returns raw bytes of incoming UTF-8
+             * stream one byte at a time. Do not pass c >= 0x80 through
+             * unicodeval_to_utf8str() to avoid double-encoding. */
+            utf8buf[0] = (uint8) c;
+            utf8buf[1] = '\0';
+            inbytes = (const char *) utf8buf;
+            inlen = 1;
+#endif
 
             if (!inbytes
                 || (bufp - obufp + inlen > BUFSZ - 1)
@@ -342,7 +463,31 @@ hooked_tty_getlin(
                    (size_t) inlen);
             bufp += inlen;
             *bufp = 0;
+#ifndef WIN32CON
+            /* POSIX / Linux UTF-8 echo handling:
+             * Backtrack past UTF-8 continuation bytes (10xxxxxx) to find the leading byte,
+             * and check if the expected number of bytes for the sequence has arrived. */
+            {
+                const unsigned char *last_char =
+                    (const unsigned char *) bufp - 1;
+
+                while (last_char > (const unsigned char *) obufp
+                       && (*last_char & 0xC0U) == 0x80U) {
+                    last_char--;
+                }
+
+                int req_len = getlin_utf8_lead_expected_len(*last_char);
+                int cur_len = (int) (bufp - (const char *) last_char);
+
+                if (cur_len >= req_len) {
+                    /* Complete UTF-8 character assembled! Echo the complete sequence. */
+                    putsyms((const char *) last_char);
+                }
+                /* If incomplete, wait for remaining UTF-8 bytes to arrive in subsequent tgetch() calls. */
+            }
+#else
             putsyms(inbytes);
+#endif
             if (hook && (*hook)(obufp)) {
                 putsyms(bufp);
 #ifndef NEWAUTOCOMP

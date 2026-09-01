@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-30. */
 /* NetHack 5.0	do_name.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.339 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -29,6 +29,9 @@ nextmbuf(void)
     bufidx = (bufidx + 1) % NUMMBUF;
     return bufs[bufidx];
 }
+
+staticfn void normalize_scroll_callname(struct obj *, char *, size_t);
+staticfn const char *jp_liquidname_for_display(const char *);
 
 /* allocate space for a monster's name; removes old name if there is one */
 void

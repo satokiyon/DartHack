@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
 /* NetHack 5.0	nhlua.c	$NHDT-Date: 1781973059 2026/06/20 16:30:59 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.168 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -815,7 +815,7 @@ nhl_menu(lua_State *L)
 }
 
 /* text("foo\nbar\nbaz") */
-staticfn int
+static int
 nhl_utf8_charlen(const char *s)
 {
     uchar c0;
@@ -837,13 +837,13 @@ nhl_utf8_charlen(const char *s)
     return 1;
 }
 
-staticfn int
+static int
 nhl_utf8_charwidth(const char *s)
 {
     return ((uchar) *s < 0x80) ? 1 : 2;
 }
 
-staticfn char *
+static char *
 nhl_text_wrapsplit(char *s, int maxw)
 {
     char *p = s, *last_space = (char *) 0, *first_over = (char *) 0;
@@ -2311,10 +2311,14 @@ nhl_loadlua(lua_State *L, const char *fname)
             if ((nl = strchr(bufin, '\n')) != 0) {
                 /* normal case, newline is present */
                 ct = (long) (nl - bufin + 1L); /* +1: keep the newline */
-                for (p = bufin; p <= nl; ++p)
-                    *bufout++ = *bufin++;
-                if (*bufin == '\r')
-                    ++bufin, ++ct;
+                /* NetHackJP: strip '\r' before '\n' for CRLF files on Linux/WSL */
+                for (p = bufin; p < nl; ++p) {
+                    if (*p == '\r' && p + 1 == nl)
+                        continue;
+                    *bufout++ = *p;
+                }
+                *bufout++ = '\n';
+                bufin = nl + 1;
                 /* update for next loop iteration */
                 cnt -= ct;
                 ct = 0;

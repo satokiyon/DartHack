@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-10. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmesg.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -397,9 +397,23 @@ curses_clear_unhighlight_message_window(void)
 
         for (ry = brdroffset; ry < mh; ry++) {
             for (rx = brdroffset; rx < mw; rx++) {
+                /* NetHackJP: Wide-character (UTF-8) color pair extraction fix */
+#if defined(NCURSES_WIDECHAR) || defined(PDC_WIDE) || defined(CURSES_UNICODE)
+                cchar_t cch;
+                attr_t attr;
+                short color_pair = 0;
+                wchar_t wbuf[10];
+
+                if (mvwin_wch(win, ry, rx, &cch) != ERR) {
+                    if (getcchar(&cch, wbuf, &attr, &color_pair, NULL) == OK) {
+                        mvwchgat(win, ry, rx, 1, A_NORMAL, color_pair, NULL);
+                    }
+                }
+#else
                 chtype cht = mvwinch(win, ry, rx);
 
                 mvwchgat(win, ry, rx, 1, A_NORMAL, PAIR_NUMBER(cht), NULL);
+#endif
             }
         }
 

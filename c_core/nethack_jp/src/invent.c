@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-30. */
 /* NetHack 5.0	invent.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.563 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -2809,7 +2809,7 @@ staticfn void
 menu_identify(int id_limit)
 {
     menu_item *pick_list;
-    int n, i, first = 1, tryct = 5;
+    int n, i, tryct = 5;
     char buf[BUFSZ];
     /* assumptions:  id_limit > 0 and at least one unID'd item is present */
 
@@ -2827,7 +2827,6 @@ menu_identify(int id_limit)
             free((genericptr_t) pick_list);
             if (id_limit)
                 wait_synch(); /* Before we loop to pop open another menu */
-            first = 0;
         } else if (n == -2) { /* player used ESC to quit menu */
             break;
         } else if (n == -1) { /* no eligible items found */

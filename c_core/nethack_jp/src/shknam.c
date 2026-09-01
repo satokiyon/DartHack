@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
 /* NetHack 5.0	shknam.c	$NHDT-Date: 1781973067 2026/06/20 16:31:07 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -286,7 +286,7 @@ static const struct {
     { "Lucrezia", "ルクレツィア" },
 };
 
-staticfn const char *
+static const char *
 jp_katakana_letter(char c)
 {
     switch (lowc(c)) {
@@ -322,7 +322,7 @@ jp_katakana_letter(char c)
     return 0;
 }
 
-staticfn const char *
+static const char *
 jp_katakana_name_fallback(const char *name)
 {
     static char outbuf[BUFSZ];

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
 /* NetHack 5.0	insight.c	$NHDT-Date: 1781973051 2026/06/20 16:30:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1289,7 +1289,7 @@ weapon_insight(int final)
             (void) jp_skill_level_name_for_display(wtype, sklvlbuf);
         /* "you have no/basic/expert/master/grand-master skill with <skill>"
            or "you are unskilled/skilled in <skill>" */
-        Sprintf(buf, "%sスキル: %s", jp_skill_name_for_display(wtype), sklvlbuf);
+        Snprintf(buf, sizeof buf, "%sスキル: %s", jp_skill_name_for_display(wtype), sklvlbuf);
 
         if (!u.twoweap) {
             if (can_advance(wtype, FALSE))
@@ -1301,7 +1301,8 @@ weapon_insight(int final)
                 you_are(buf, "");
 
         } else { /* two-weapon */
-            char pfx[QBUFSZ], sfx[QBUFSZ],
+            /* NetHackJP: Expand pfx and sfx buffers to BUFSZ to prevent UTF-8 format overflow */
+            char pfx[BUFSZ], sfx[BUFSZ],
                 sknambuf2[BUFSZ], sklvlbuf2[BUFSZ], twobuf[BUFSZ];
             const char *also3 = (char *) 0,
                        *verb_present, *verb_past;
@@ -1377,7 +1378,7 @@ weapon_insight(int final)
                        too; "you [also] have basic/expert/master/grand-master
                        skill with <skill>" or "you [also] are unskilled/
                        skilled in <skill> */
-                    Sprintf(buf, "%sスキル: %s（二刀流を含む）", sknambuf2, sklvlbuf2);
+                    Snprintf(buf, sizeof buf, "%sスキル: %s（二刀流を含む）", sknambuf2, sklvlbuf2);
                     if (also3) {
                         Strcpy(pfx, "さらに");
                         Snprintf(sfx, sizeof(sfx), " %s", buf), buf[0] = '\0';

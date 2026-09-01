@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
 /* NetHack 5.0	termcap.c	$NHDT-Date: 1781973100 2026/06/20 16:31:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -900,10 +900,13 @@ cl_eos(void) /* free after Robert Viduya */
 #undef FALSE
 #define m_move curses_m_move /* some curses.h decl m_move(), not used here */
 
+#ifndef NO_TERMCAP_HEADERS
 #include <curses.h>
+#endif
 
-#if defined(TPARM_WORKAROUND)
-extern char *tparm();
+#if defined(TPARM_WORKAROUND) || defined(NO_TERMCAP_HEADERS)
+/* NetHackJP: Variadic prototype for tparm to satisfy C23/GCC/Clang/MSVC */
+extern char *tparm(const char *, ...);
 #endif
 
 #ifndef COLOR_BLACK /* trust include file */

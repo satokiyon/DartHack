@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
 /* NetHack 5.0	mondata.c	$NHDT-Date: 1781973056 2026/06/20 16:30:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.148 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -878,7 +878,7 @@ struct alt_spl {
     int genderhint;
 };
 
-staticfn boolean
+static boolean
 jp_monname_has_nonascii(const char *str)
 {
     const unsigned char *p = (const unsigned char *) str;
@@ -893,16 +893,16 @@ jp_monname_has_nonascii(const char *str)
     return FALSE;
 }
 
-staticfn int
+static int
 jp_name_to_monplus(const char *str, size_t slen, int *len_p, int *gender_p)
 {
     static const int gorder[] = { MALE, FEMALE, NEUTRAL };
-    int i, gi, best_pm = NON_PM, best_len = 0, best_gend = -1;
+    int i, g_idx, best_pm = NON_PM, best_len = 0, best_gend = -1;
     boolean exact_match = FALSE;
 
     for (i = LOW_PM; i < NUMMONS; ++i) {
-        for (gi = 0; gi < (int) SIZE(gorder); ++gi) {
-            int mgend = gorder[gi];
+        for (g_idx = 0; g_idx < (int) SIZE(gorder); ++g_idx) {
+            int mgend = gorder[g_idx];
             const char *jpname = jp_pmname(&mons[i], mgend);
             int nlen;
 

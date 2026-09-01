@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-07. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1781973060 2026/06/20 16:31:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.464 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -61,9 +61,9 @@ staticfn void dbterrainmesg(const char *, coordxy, coordxy) NONNULLARG1;
 staticfn void readobjnam_init(char *, struct _readobjnam_data *);
 staticfn int readobjnam_preparse(struct _readobjnam_data *);
 staticfn void readobjnam_parse_charges(struct _readobjnam_data *);
-staticfn int jp_name_to_mon(const char *, int *);
-staticfn boolean jp_tin_match_special(const char *, struct _readobjnam_data *);
-staticfn int jp_tin_name_to_mon(char *, int *);
+static int jp_name_to_mon(const char *, int *);
+static boolean jp_tin_match_special(const char *, struct _readobjnam_data *);
+static int jp_tin_name_to_mon(char *, int *);
 staticfn int readobjnam_postparse1(struct _readobjnam_data *);
 staticfn int readobjnam_postparse2(struct _readobjnam_data *);
 staticfn int readobjnam_postparse3(struct _readobjnam_data *);
@@ -3739,7 +3739,7 @@ rnd_otyp_by_wpnskill(schar skill)
 }
 
 /* 日本語の「の」やスペース（半角/全角）、およびクラス接尾辞を取りよけて曖昧マッチングを行う */
-staticfn boolean
+static boolean
 jp_wish_match(const char *u_str, const char *jp_str)
 {
     char normalized_u_str[256] = {0};
@@ -4763,19 +4763,19 @@ readobjnam_parse_charges(struct _readobjnam_data *d)
         d->rechrg = 7; /* recharge_limit */
 }
 
-staticfn int
+static int
 jp_name_to_mon(const char *name, int *gender_p)
 {
-    int pm, gi;
-    static const int genders[] = { NEUTRAL, MALE, FEMALE };
+    int pm, g_idx;
+    static const int local_genders[] = { NEUTRAL, MALE, FEMALE };
 
     for (pm = LOW_PM; pm < NUMMONS; ++pm) {
-        for (gi = 0; gi < (int) SIZE(genders); ++gi) {
-            const char *jpname = jp_pmname(&mons[pm], genders[gi]);
+        for (g_idx = 0; g_idx < (int) SIZE(local_genders); ++g_idx) {
+            const char *jpname = jp_pmname(&mons[pm], local_genders[g_idx]);
 
             if (jpname && !strcmpi(name, jpname)) {
                 if (gender_p)
-                    *gender_p = genders[gi];
+                    *gender_p = local_genders[g_idx];
                 return pm;
             }
         }

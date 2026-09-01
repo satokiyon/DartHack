@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-30. */
 /* NetHack 5.0	topl.c	$NHDT-Date: 1781973100 2026/06/20 16:31:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.94 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -13,27 +13,6 @@
 
 static void redotoplin(const char *);
 static void topl_putsym(char);
-#ifdef WIN32CON
-#define NH_C3_NONSPACING 0x0001U
-#define NH_C3_KATAKANA   0x0010U
-#define NH_C3_HIRAGANA   0x0020U
-#define NH_C3_HALFWIDTH  0x0040U
-#define NH_C3_FULLWIDTH  0x0080U
-#define NH_C3_IDEOGRAPH  0x0100U
-
-static int utf8_sequence_len(const unsigned char *);
-static unsigned short utf8_char_chartype(const unsigned char *);
-static int utf8_char_display_width(const unsigned char *);
-extern int __stdcall MultiByteToWideChar(unsigned int, unsigned long,
-                                         const char *, int, wchar_t *, int);
-extern int __stdcall GetStringTypeW(unsigned long, const wchar_t *, int,
-                                    unsigned short *);
-#endif
-static void removetopl(int);
-static void msghistory_snapshot(boolean);
-static void free_msghistory_snapshot(boolean);
-
-#ifdef WIN32CON
 static int
 utf8_sequence_len(const unsigned char *utf8str)
 {
@@ -53,41 +32,81 @@ utf8_sequence_len(const unsigned char *utf8str)
     return 1;
 }
 
+static unsigned long
+topl_utf8_to_codepoint(const unsigned char *utf8str, int *ulen_out)
+{
+    unsigned char c = utf8str[0];
+    unsigned long cp = 0;
+    int len = 1;
+
+    if ((c & 0x80U) == 0) {
+        cp = c;
+        len = 1;
+    } else if ((c & 0xE0U) == 0xC0U && (utf8str[1] & 0xC0U) == 0x80U) {
+        cp = ((c & 0x1FU) << 6) | (utf8str[1] & 0x3FU);
+        len = 2;
+    } else if ((c & 0xF0U) == 0xE0U && (utf8str[1] & 0xC0U) == 0x80U
+               && (utf8str[2] & 0xC0U) == 0x80U) {
+        cp = ((c & 0x0FU) << 12) | ((utf8str[1] & 0x3FU) << 6) | (utf8str[2] & 0x3FU);
+        len = 3;
+    } else if ((c & 0xF8U) == 0xF0U && (utf8str[1] & 0xC0U) == 0x80U
+               && (utf8str[2] & 0xC0U) == 0x80U
+               && (utf8str[3] & 0xC0U) == 0x80U) {
+        cp = ((c & 0x07U) << 18) | ((utf8str[1] & 0x3FU) << 12)
+             | ((utf8str[2] & 0x3FU) << 6) | (utf8str[3] & 0x3FU);
+        len = 4;
+    } else {
+        cp = c;
+        len = 1;
+    }
+    if (ulen_out)
+        *ulen_out = len;
+    return cp;
+}
+
 static int
 utf8_char_display_width(const unsigned char *utf8str)
 {
-    unsigned short chartype = utf8_char_chartype(utf8str);
+    int ulen = 1;
+    unsigned long cp = topl_utf8_to_codepoint(utf8str, &ulen);
 
-    if (chartype & NH_C3_NONSPACING)
+    if (cp == 0)
         return 0;
-    /* Match wintty.c so top-line messages and help text advance the cursor
-       consistently for Japanese full-width scripts. */
-    if (chartype & (NH_C3_FULLWIDTH | NH_C3_KATAKANA
-                    | NH_C3_HIRAGANA | NH_C3_IDEOGRAPH))
-        return 2;
-    if (chartype & NH_C3_HALFWIDTH)
+    if (cp < 0x80)
         return 1;
+
+    if ((cp >= 0x0300 && cp <= 0x036F) || (cp >= 0x20D0 && cp <= 0x20FF)
+        || (cp >= 0xFE20 && cp <= 0xFE2F))
+        return 0;
+
+    if ((cp >= 0x1100 && cp <= 0x11FF)
+        || (cp >= 0x2E80 && cp <= 0x2EFF)
+        || (cp >= 0x3000 && cp <= 0x303F)
+        || (cp >= 0x3040 && cp <= 0x309F)
+        || (cp >= 0x30A0 && cp <= 0x30FF)
+        || (cp >= 0x3100 && cp <= 0x312F)
+        || (cp >= 0x3130 && cp <= 0x318F)
+        || (cp >= 0x3190 && cp <= 0x319F)
+        || (cp >= 0x3200 && cp <= 0x32FF)
+        || (cp >= 0x3300 && cp <= 0x33FF)
+        || (cp >= 0x3400 && cp <= 0x4DBF)
+        || (cp >= 0x4E00 && cp <= 0x9FFF)
+        || (cp >= 0xA000 && cp <= 0xA48F)
+        || (cp >= 0xA490 && cp <= 0xA4CF)
+        || (cp >= 0xAC00 && cp <= 0xD7A3)
+        || (cp >= 0xF900 && cp <= 0xFAFF)
+        || (cp >= 0xFE10 && cp <= 0xFE1F)
+        || (cp >= 0xFE30 && cp <= 0xFE4F)
+        || (cp >= 0xFF01 && cp <= 0xFF60)
+        || (cp >= 0xFFE0 && cp <= 0xFFE6)
+        || (cp >= 0x20000 && cp <= 0x2FA1F))
+        return 2;
+
+    if (cp >= 0xFF61 && cp <= 0xFF9F)
+        return 1;
+
     return 1;
 }
-
-static unsigned short
-utf8_char_chartype(const unsigned char *utf8str)
-{
-    wchar_t wch[2] = { 0, 0 };
-    unsigned short chartype = 0;
-    int ulen = utf8_sequence_len(utf8str);
-
-    if (ulen <= 1)
-        return 0;
-    if (MultiByteToWideChar(65001U, 0x00000008UL,
-                            (const char *) utf8str, ulen, wch, 1)
-        != 1)
-        return 0;
-    if (!GetStringTypeW(0x0004UL, wch, 1, &chartype))
-        return 0;
-    return chartype;
-}
-#endif
 
 int
 tty_doprev_message(void)
@@ -420,7 +439,6 @@ topl_putsym(char c)
 void
 putsyms(const char *str)
 {
-#ifdef WIN32CON
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
     while (*str) {
@@ -455,10 +473,6 @@ putsyms(const char *str)
         }
         topl_putsym(*str++);
     }
-#else
-    while (*str)
-        topl_putsym(*str++);
-#endif
 }
 
 static void

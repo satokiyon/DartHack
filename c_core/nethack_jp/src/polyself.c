@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
 /* NetHack 5.0	polyself.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2151,7 +2151,7 @@ body_part(int part)
     return mbodypart(&gy.youmonst, part);
 }
 
-staticfn const char *
+static const char *
 jp_bodypart_default(int part)
 {
     switch (part) {
@@ -2198,7 +2198,7 @@ jp_bodypart_default(int part)
     }
 }
 
-staticfn boolean
+static boolean
 jp_has_nonascii(const char *str)
 {
     const uchar *p = (const uchar *) str;
@@ -2213,7 +2213,7 @@ jp_has_nonascii(const char *str)
     return FALSE;
 }
 
-staticfn const char *
+static const char *
 jp_translate_bodypart_name(const char *part, int part_id)
 {
     static const struct {
@@ -2386,7 +2386,7 @@ jp_translate_bodypart_name(const char *part, int part_id)
     return jp_bodypart_default(part_id);
 }
 
-staticfn const char *
+static const char *
 jp_bodypart_pluralized(const char *jpname, int part)
 {
     static char bufs[8][BUFSZ];

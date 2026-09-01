@@ -1,0 +1,269 @@
+# NetHackJP 5.0  linux-jp $NHDT-Date: 2026/08/29 $
+# Copyright (c) NetHackJP Project.
+# NetHack may be freely redistributed. See license for details.
+#
+# Japanese Linux hints file with support for multiple window ports (interfaces)
+# Tested on:
+#     - Ubuntu / Debian under WSL (Windows Subsystem for Linux)
+#
+
+#-PRE xxxx
+
+WHICH_OS=Linux
+HINTSVERSION := 500
+
+ifdef MAKEFILE_TOP
+LUA_VERSION=5.4.8
+ifeq ($(MAKELEVEL),0)
+PRECHECK+=checkmakefiles
+# all files included from this hints file get listed
+# in HINTSINCLNAMES (without suffix and without a path)
+HINTSINCLNAMES := dirs-perms \
+		compiler cross-pre1 cross-pre2 cross-post \
+		gbdates-pre gbdates-post \
+		linuxdistro \
+		multiw-1 multiw-2 misc \
+		multisnd1-pre multisnd2-pre multisnd-post \
+		response
+HINTSINCLFILES := $(addsuffix .$(HINTSVERSION), $(HINTSINCLNAMES))
+endif
+endif
+
+# Enable curses / ncursesw (UTF-8) support by default for NetHackJP
+USE_CURSESLIB = 1
+HAVE_NCURSESW = 1
+CURSPKG = ncursesw
+WINTTYLIB := $(shell pkg-config --libs ncursesw 2>/dev/null || pkg-config --libs ncurses 2>/dev/null || echo "-lncursesw")
+WINLIB = $(WINTTYLIB)
+
+#-INCLUDE multiw-1.500
+
+# Window ports options for NetHackJP
+WANT_WIN_TTY=1
+WANT_WIN_CURSES=1
+WANT_DEFAULT=tty
+
+#-INCLUDE dirs-perms.500
+#-INCLUDE linuxdistro.500
+
+ifndef LIBXPM
+LIBXPM= -L/opt/X11/lib -lXpm
+endif
+
+GAMEUID  = $(USER)
+GAMEGRP  = games
+
+USE_NOSTATICFN = 0
+
+#-INCLUDE cross-pre1.500
+
+#-INCLUDE multiw-2.500
+
+ifdef WANT_WIN_QT6
+CPLUSPLUS_NEED20=1
+ADDITIONAL_NO_WARN_GPPCCX=-Wno-sfinae-incomplete
+ADDITIONAL_NO_WARN_CLANGCCX=-Wno-c++26-extensions
+endif
+
+#-INCLUDE compiler.500
+
+# NetHack sources control & UTF-8 Japanese support
+NHCFLAGS+=-DDLB
+NHCFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
+NHCFLAGS+=-DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\"
+NHCFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+NHCFLAGS+=-DTIMED_DELAY
+NHCFLAGS+=-DDUMPLOG
+NHCFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
+NHCFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
+NHCFLAGS+=-DSELF_RECOVER
+
+# Enable UTF-8 graphics and curses unicode for Japanese display
+NHCFLAGS+=-DUTF8_GRAPHICS
+NHCFLAGS+=-DNO_TERMCAP_HEADERS
+
+ifeq "$(USE_CURSESLIB)" "1"
+NHCFLAGS+=$(NCURSES_CFLAGS)
+ifeq "$(HAVE_NCURSESW)" "1"
+NHCFLAGS+=-DCURSES_UNICODE
+else
+ifdef MAKEFILE_SRC
+$(info Attention: CURSES_UNICODE is not being defined without ncursesw)
+endif
+endif
+endif
+
+#-INCLUDE multisnd1-pre.500
+
+ifeq "$(CCISCLANG)" "1"
+else
+ifndef MUSL
+LIBCFLAGS+=-DSIG_RET_TYPE=__sighandler_t
+endif
+endif
+
+CFLAGS+= $(WINCFLAGS)
+CFLAGS+= $(SNDCFLAGS)
+CFLAGS+= $(NHCFLAGS)
+CFLAGS+= $(LIBCFLAGS)
+
+CCXXFLAGS+= $(WINCFLAGS)
+CCXXFLAGS+= $(SNDCFLAGS)
+CCXXFLAGS+= $(NHCFLAGS)
+CCXXFLAGS+= $(LIBCFLAGS)
+
+VARDATND =
+VARDATND0 =
+
+ifdef MAKEFILE_SRC
+
+ifneq "$(NO_NHUUID)" "1"
+UUID_LIB_CHECK := $(shell echo `/sbin/ldconfig -p | grep libuuid`)
+ifneq "$(UUID_LIB_CHECK)" ""
+UUID_LIB=1
+else
+UUID_LIB=0
+endif
+UUID_HEADERS_CHECK := $(wildcard /usr/include/uuid/uuid.h)
+ifneq "$(UUID_HEADERS_CHECK)" ""
+UUID_HEADERS = 1
+else
+UUID_HEADERS = 0
+endif
+
+ifeq "$(UUID_LIB)" "1"
+ifeq "$(UUID_HEADERS)" "1"
+ifndef WANT_NHUUID
+WANT_NHUUID=1
+endif
+endif
+endif
+else
+WANT_NHUUID=0
+endif
+
+ifeq "$(WANT_NHUUID)" "1"
+CFLAGS+= -DNHUUID
+LIBS+=-luuid
+else
+$(info Attention - No NHUUID support will be included)
+endif
+endif
+
+# Window ports options (Uncomment desired GUI interfaces if needed)
+# WANT_WIN_X11=1
+# WANT_WIN_QT=1
+
+ifdef WANT_WIN_X11
+USE_XPM=1
+USE_XFT=1
+WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
+VARDATND0 += x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
+ifndef CROSSCOMPILE
+GENTILEOFILE = $(SRCDIR)/tile.o
+endif
+POSTINSTALL += bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; ( cd $(HACKDIR); mkfontdir -x .lev );
+X11CFLAGS = -I/opt/X11/include
+X11CFLAGS += -Wno-variadic-macros
+ifdef USE_XFT
+CFLAGS += -DUSE_XFT
+X11CFLAGS += $(shell pkg-config --cflags xft fontconfig)
+WINX11LIB += $(shell pkg-config --libs xft fontconfig)
+endif
+ifdef USE_XPM
+CFLAGS += -DUSE_XPM
+WINX11LIB += -lXpm
+VARDATND0 += rip.xpm
+endif
+WINLIB += $(WINX11LIB)
+LFLAGS+=-L/opt/X11/lib
+endif
+
+ifdef WANT_WIN_QT
+LINK = $(CXX)
+ifndef CROSSCOMPILE
+GENTILEOFILE = $(SRCDIR)/tile.o
+endif
+ifdef WANT_WIN_QT5
+QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
+WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
+endif
+ifdef WANT_WIN_QT6
+QTCXXFLAGS += $(shell pkg-config --cflags Qt6Multimedia)
+WINLIB += $(shell pkg-config --libs Qt6Core Qt6Gui Qt6Widgets Qt6Multimedia)
+MOCPATH = $(shell pkg-config --variable=libexecdir Qt6Core)/moc
+endif
+
+QTCXXFLAGS += -fPIC
+POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; \
+		( cd $(INSTDIR); mkfontdir -x .lev );
+VARDATND0 += nhtiles.bmp rip.xpm nhsplash.xpm
+else
+LINK = $(CC)
+endif
+
+WINOBJ = $(WINOBJ0)
+VARDATND += $(sort $(VARDATND0))
+
+HAVE_GIT := $(shell command -v git 2>/dev/null)
+ifneq "$(HAVE_GIT)" ""
+GIT_HASH := $(shell git rev-parse --verify HEAD 2>/dev/null)
+GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD 2>/dev/null)
+GIT_PREFIX := $(shell git config nethack.substprefix 2>/dev/null)
+
+ifdef GIT_HASH
+GITHASH = -DNETHACK_GIT_SHA=\"$(GIT_HASH)\"
+endif
+ifdef GIT_BRANCH
+GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
+endif
+ifdef GIT_PREFIX
+GITPREFIX = -DNETHACK_GIT_PREFIX=\"$(GIT_PREFIX)\"
+endif
+endif
+
+SYSCONFCREATE = cp sys/unix/sysconf $(INSTDIR)/sysconf
+SYSCONFINSTALL = $(SYSCONFCREATE) && \
+	 $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf && \
+	 $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf && \
+	 chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+SYSCONFENSURE = (if ! test -f $(INSTDIR)/sysconf ; then \
+	 $(SYSCONFCREATE) && \
+	 $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf && \
+	 $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf && \
+	 chmod $(VARFILEPERM) $(INSTDIR)/sysconf; fi );
+
+ifeq '$(USE_NONOSTATICFN)' '1'
+CFLAGS += -DNONOSTATICFN
+else
+ifeq '$(USE_NOSTATICFN)' '1'
+CFLAGS += -DNOSTATICFN
+endif
+endif
+
+SYSCFLAGS=-DLUA_USE_LINUX
+DLLIB = -ldl
+LFLAGS+=-rdynamic
+
+CHOWN=true
+CHGRP=true
+MANDIR=/usr/share/man/man6
+
+#-INCLUDE cross-pre2.500
+#-INCLUDE gbdates-pre.500
+#-INCLUDE multisnd2-pre.500
+#-INCLUDE response.500
+
+#-POST
+
+#-INCLUDE gbdates-post.500
+#-INCLUDE multisnd-post.500
+
+ifdef MAKEFILE_TOP
+ifeq ($(MAKELEVEL),0)
+.PHONY: checkmakefiles
+checkmakefiles:
+	@$(MAKE) -f sys/unix/Makefile.check \
+		HINTSFILE="$(HINTSFILE)" HINTSINCLFILES="$(HINTSINCLFILES)"
+endif
+endif
