@@ -2,5 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/submodules/lua" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/submodules/pdcurses" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/submodules/pdcursesmod" vcs="Git" />
   </component>
 </project>
