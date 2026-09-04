@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-03. */
 /* NetHack 5.0	options.c	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.782 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
@@ -2455,6 +2455,50 @@ optfn_mouse_support(
     }
     if (req == get_cnf_val) {
         Sprintf(opts, "%i", iflags.wc_mouse_support);
+        return optn_ok;
+    }
+    return optn_ok;
+}
+
+/* NetHackJP: Phase 7 - OPTIONS=xim 実行時トグル.
+ *
+ * on (デフォルト): win/X11/winxim.c が XOpenIM を呼んで fcitx5 / ibus と
+ *   通信する。fcitx5 が起動していない / XMODIFIERS 未設定の場合は
+ *   警告ログのみ出して ASCII フォールバック動作。
+ * off: XIM を完全に無効化。XOpenIM を呼ばず、XCreateIC 等の XIM API
+ *   も一切呼ばない。キーボード入力は常に ASCII のみ。
+ *
+ * WINCAP ではなく WC2_ のビットを使う（WC_ は全て埋まっている）。
+ */
+staticfn int
+optfn_use_xim(
+    int optidx UNUSED,
+    int req,
+    boolean negated,
+    char *opts,
+    char *op)
+{
+    nhUse(op);
+
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+        if (negated) {
+            iflags.wc_use_xim = 0;
+        } else {
+            iflags.wc_use_xim = 1;
+        }
+        return optn_ok;
+    }
+    if (req == get_val) {
+        Strcpy(opts, iflags.wc_use_xim ? "on" : "off");
+        return optn_ok;
+    }
+    if (req == get_cnf_val) {
+        opts[0] = '\0';
+        if (iflags.wc_use_xim)
+            (void) strkitten(opts, '1');
         return optn_ok;
     }
     return optn_ok;
@@ -7304,6 +7348,13 @@ initoptions_init(void)
     iflags.menu_headings.color = NO_COLOR;
     iflags.getpos_coords = GPCOORDS_NONE;
 
+    /* NetHackJP: Phase 7 - default to XIM enabled.  This must run
+     * before initoptions() parses .nethackrc so that an explicit
+     * `OPTIONS=use_xim:off` in the user's config file correctly
+     * overrides the default.  The X11 port (win/X11/winxim.c) reads
+     * iflags.wc_use_xim in xim_init() and skips XOpenIM when off. */
+    iflags.wc_use_xim = 1;
+
     /* hero's role, race, &c haven't been chosen yet */
     flags.initrole = flags.initrace = flags.initgend = flags.initalign
         = ROLE_NONE;
@@ -9977,6 +10028,8 @@ static struct wc_Opt wc2_options[] = {
     { "term_rows", WC2_TERM_SIZE },
     { "terrainstatus", WC2_EXTRASTATUS },
     { "use_darkgray", WC2_DARKGRAY },
+    /* NetHackJP: Phase 7 - XIM (X Input Method) toggle. */
+    { "use_xim", WC2_USE_XIM },
     { "weaponstatus", WC2_EXTRASTATUS },
     { "windowborders", WC2_WINDOWBORDERS },
     { "wraptext", WC2_WRAPTEXT },

@@ -1,0 +1,142 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-02.
+# NetHack 5.0  defaults.nh
+# Sample config file for Linux / WSL X11 GUI NetHackJP
+# A '#' at the beginning of a line means the rest of the line is a comment.
+
+# *** WINDOW PORT & GENERAL OPTIONS ***
+# Set windowtype to X11 for Graphical UI
+OPTIONS=windowtype:X11
+# Note: The X11 window port controls window background & border colors via X11 resources or command line arguments.
+#       NetHack.ad is copied to the game directory (e.g. playground) upon installation.
+#       To start NetHack X11 with a dark background and white window borders, run from the game directory:
+#       XAPPLRESDIR=. ./nethack -wX11 -bg black -fg white -bd white
+#       (Or from the repository root: XAPPLRESDIR=./playground ./playground/nethack -wX11 -bg black -fg white -bd white)
+# OPTIONS=align_message:top
+# OPTIONS=align_status:right
+OPTIONS=symset:Enhanced2,roguesymset:RogueEpyx
+
+# General options
+OPTIONS=time,showexp,number_pad:0,lit_corridor,mouse_support:1
+OPTIONS=force_invmenu
+OPTIONS=suppress_alert:3.3.1
+
+# *** X11 GUI & FONT OPTIONS ***
+# Fontconfig / Xft fonts for Linux/WSL X11 (supports Noto Sans CJK JP, DejaVu Sans, etc.)
+# If no font is specified, NetHack.ad / Fontconfig default fallbacks will be used.
+OPTIONS=font_map:mono-10
+OPTIONS=font_menu:Noto Sans CJK JP-10
+OPTIONS=font_message:Noto Sans CJK JP-10
+OPTIONS=font_status:Noto Sans CJK JP-10
+OPTIONS=font_text:Noto Sans CJK JP-10
+
+# *** XIM (Input Method) - fcitx5 / ibus ***
+# Phase 7 実装。`OPTIONS=use_xim:off` でXIMを無効化できる。
+# デフォルトはON。fcitx5 が起動していない / XMODIFIERS 未設定時は
+# ASCII フォールバック動作になる。
+# OPTIONS=use_xim:on
+
+
+OPTIONS=hilite_pet,toptenwin
+OPTIONS=splash_screen,player_selection:prompts
+
+# *** Personal Preferences ***
+#OPTIONS=name:Janet,role:Valkyrie,race:Human,gender:female,align:lawful
+#OPTIONS=dogname:Fido,catname:Morris,fruit:guava
+#OPTIONS=horsename:Silver
+
+# Enable autopickup
+OPTIONS=autopickup
+
+# When autopickup is on, automatically pick up these types of objects
+#OPTIONS=pickup_types:$"=/!?+
+
+# Set the default boulder symbol to '0'
+OPTIONS=boulder:0
+
+# Disable the prompt for a tutorial
+OPTIONS=!tutorial
+
+# Menu headings style
+OPTIONS=menucolors
+
+# Highlight menu lines with different colors.
+MENUCOLOR="祝福された" = green
+MENUCOLOR="聖水" = green
+MENUCOLOR="呪われた" = red
+MENUCOLOR="穢れた水" = red
+MENUCOLOR="呪われた.*装備中" = orange&underline
+
+# 重要・便利なアイテムの強調表示
+MENUCOLOR="願いの杖" = orange&bold
+MENUCOLOR="魔力のランプ" = orange
+MENUCOLOR="軽量化の鞄" = orange
+MENUCOLOR="韋駄天の靴" = brown
+MENUCOLOR="命の魔除け" = brown
+MENUCOLOR="反射の(魔除け|盾)" = purple
+MENUCOLOR="魔法を防ぐクローク" = purple
+MENUCOLOR="完全回復の薬" = blue
+MENUCOLOR="能力獲得の薬" = blue
+MENUCOLOR="識別の巻物" = brown
+MENUCOLOR="解呪の巻物" = brown
+MENUCOLOR="死者の書" = orange
+MENUCOLOR="開放の鐘" = orange
+MENUCOLOR="ろうそく" = orange
+
+# アーティファクト
+MENUCOLOR="(エクスカリバー|ストームブリンガー|ミョルニル|マジックベイン|フロストブランド|ファイアブランド|グレイスワンダー|ヴォーパルブレード)" = orange&bold
+
+# 未払いアイテム
+MENUCOLOR="未払い" = blue
+
+# *** STATUS HILITES ***
+OPTIONS=statushilites
+OPTIONS=hitpointbar
+
+# HP
+OPTIONS=hilite_status:hitpoints/100%/gray&bold
+OPTIONS=hilite_status:hitpoints/<100%/green&bold
+OPTIONS=hilite_status:hitpoints/<66%/yellow&bold
+OPTIONS=hilite_status:hitpoints/<50%/orange&bold
+OPTIONS=hilite_status:hitpoints/<33%/red&bold
+OPTIONS=hilite_status:hitpoints/<15%/red&inverse&bold
+
+# Pw
+OPTIONS=hilite_status:power/100%/gray&normal
+OPTIONS=hilite_status:power/<100%/green&normal
+OPTIONS=hilite_status:power/<66%/yellow&normal
+OPTIONS=hilite_status:power/<50%/orange&normal
+OPTIONS=hilite_status:power/<33%/red&bold
+
+# Carry & Hunger
+OPTIONS=hilite_status:cap/burdened/yellow/stressed/orange/strained/red&bold/overtaxed/red&inverse&bold/overloaded/red&inverse&blink&bold
+OPTIONS=hilite_status:hunger/satiated/yellow/hungry/orange/weak/red&bold/fainting/red&inverse&bold/fainted/red&inverse&blink&bold
+
+# Conditions
+OPTIONS=hilite_status:condition/major_troubles/red&bold&inverse
+OPTIONS=hilite_status:condition/minor_troubles/yellow&bold&inverse
+OPTIONS=hilite_status:condition/movement/light-blue&bold
+
+# Gold & Stats
+OPTIONS=hilite_status:gold/up/yellow/down/brown
+OPTIONS=hilite_status:characteristics/up/green/down/red
+OPTIONS=hilite_status:armor-class/up/red/down/green
+OPTIONS=hilite_status:experience-level/up/green/down/red
+OPTIONS=hilite_status:HD/up/green/down/red
+OPTIONS=hilite_status:hitpoints-max/up/green/down/red
+OPTIONS=hilite_status:power-max/up/green/down/red
+OPTIONS=hilite_status:alignment/change/orange&bold
+OPTIONS=hilite_status:dungeon-level/change/light-blue&bold
+
+OPTIONS=statuslines:3
+OPTIONS=help
+OPTIONS=autodescribe
+OPTIONS=price_quotes
+OPTIONS=hilite_pile
+OPTIONS=selectsaved
+
+# *** SOUND OPTIONS (Linux / WSL) ***
+# Adjust sound path for Linux/WSL environment if sound files are present
+#SOUNDDIR=./sounds
+
+# SOUND=MESG "(ド♪)" "se_squeak_C.wav" 100
+# SOUND=MESG "(さようなら|ごきげんよう|アロハ) level [0-9]+\." "sa2_xpleveldown.wav" 100

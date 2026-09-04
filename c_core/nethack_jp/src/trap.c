@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-04. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.645 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -3918,6 +3918,8 @@ selftouch(const char *arg)
         jp_arg = "落ちながら、あなたは";
     else if (!strcmp(arg, "After losing your gloves, you"))
         jp_arg = "手袋を失ったあと、あなたは";
+    else if (!strcmp(arg, "No longer petrify-resistant, you"))
+        jp_arg = "もはや石化耐性がないため、あなたは";
 
     if (uwep && uwep->otyp == CORPSE && touch_petrifies(&mons[uwep->corpsenm])
         && !Stone_resistance) {

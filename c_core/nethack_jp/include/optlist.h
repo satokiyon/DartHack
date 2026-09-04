@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-03. */
 /* NetHack 5.0	optlist.h */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -518,6 +518,12 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTC(mouse_support, Advanced, 0, opt_in, set_in_game,
                 No, Yes, No, No, NoAlias,
                 "ゲームがマウスクリック情報を受け取る")
+    /* NetHackJP: Phase 7 - XIM (X Input Method) 実行時トグル.
+     * X11 ポートでのみ win/X11/winxim.c が iflags.wc_use_xim を参照する。
+     * デフォルトは on (XIM 接続を試みる、fcitx5 不在時は ASCII フォールバック)。 */
+    NHOPTC(use_xim, Advanced, 0, opt_in, set_in_game,
+                No, Yes, No, No, NoAlias,
+                "X11 XIM (fcitx5/ibus) による日本語入力を有効化")
 #if PREV_MSGS /* tty または curses */
     NHOPTC(msg_window, Advanced, 1, opt_in, set_in_game,
                 Yes, Yes, No, Yes, NoAlias,

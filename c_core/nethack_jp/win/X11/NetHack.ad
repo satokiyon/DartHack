@@ -18,6 +18,12 @@
 ! The rip window applies if the GRAPHIC_TOMBSTONE option is turned on, and
 ! requires a 12 pixel font for correct appearance.
 !
+NetHack*borderColor:         white
+NetHack*Paned*internalBorderColor: white
+NetHack*Paned*internalBorderWidth: 2
+NetHack*Paned*sashColor:           white
+NetHack*Paned*sash.background:     white
+NetHack*Paned*sash.borderColor:    white
 NetHack*font:              NETHACK_FONT
 NetHack*display_file*font: NETHACK_FONT
 NetHack*map*font:          NETHACK_FONT
@@ -26,6 +32,21 @@ NetHack*menu*font:         NETHACK_FONT
 NetHack*tombstone*font:    NETHACK_FONT
 NetHack*text*rip*font:     -*-times-medium-r-*-*-12-*-*-*-*-*-*-*
 NetHack*text*borderWidth:  0
+
+! Vector font to be used if Xft support is enabled
+! These correspond to the .nethackrc settings font_map, font_menu,
+! font_message, font_status and font_text
+! For Japanese display under NetHackJP, Fontconfig automatically falls back to CJK fonts
+! (e.g. Noto Sans CJK JP / IPAGothic), or you can explicitly specify them:
+! NetHack.font_menu: Noto Sans CJK JP-10,sans-10
+NetHack.font_map:     mono-10
+NetHack.font_menu:    sans-10
+NetHack.font_message: sans-10
+NetHack.font_status:  sans-10
+NetHack.font_text:    mono-10
+
+! No .nethackrc setting for this, but it gets the right size
+NetHack.font_rip:     sans,Noto Sans CJK JP-9
 
 ! tile_file names a file containing full-color tiles for the map.
 ! If you use a 100dpi (or greater) monitor you may wish to double the

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-03. */
 /* NetHack 5.0	winprocs.h	$NHDT-Date: 1781973091 2026/06/20 16:31:31 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) David Cohrs, 1992                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -267,7 +267,8 @@ extern
                                    /* 13 free bits */
 #define WC2_EXTRASTATUS  0x080000L /* 20 optional weaponstatus, armorstatus,
                                     *    terrainstatus */
-                                   /* 12 free bits */
+#define WC2_USE_XIM      0x100000L /* 21 XIM (X Input Method) for input     */
+                                   /* 11 free bits */
 
 #define ALIGN_LEFT   1
 #define ALIGN_RIGHT  2

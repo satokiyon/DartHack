@@ -1,4 +1,7 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-04. */
+/* NetHackJP: add X11_label_string_width() so wingetlin.c can measure
+ * the response field's text and enforce a minimum input-field width
+ * (DEVELOPMENT.md §4.12). */
 /* NetHack 5.0	winlabel.c	$NHDT-Date: 1781973110 2026/06/20 16:31:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Ray Chason, 2026                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -196,6 +199,46 @@ X11_set_column_widths(Widget w, const int *col_widths, unsigned num_cols)
         data->num_cols = num_cols;
         update_label(w, data);
     }
+}
+
+/*
+ * NetHackJP: measure the pixel width of `text` as rendered with the
+ * font used by the label widget `w`.  Used by wingetlin.c to enforce a
+ * minimum visible width on the getlin response field so that it reads
+ * as an input area even when empty.
+ *
+ * Returns 0 when the widget carries no wrapped font data and exposes
+ * no XtNfont resource; the caller applies a conservative fallback in
+ * that case.
+ */
+int
+X11_label_string_width(Widget w, const char *text)
+{
+    WidgetData *data;
+    X11_Font *font;
+    Arg arg;
+    size_t len;
+
+    if (w == (Widget) 0 || text == (char *) 0)
+        return 0;
+    len = strlen(text);
+
+    data = get_widget_data(w);
+    if (data != NULL && data->font[0] != NULL) {
+        return X11_column_width(XtDisplay(w), data->font[0], text, len);
+    }
+
+    /* Fallback for builds without Xft, where the widget was not
+     * wrapped by X11_wrap_widget_if_Xft(): query the widget's own
+     * font resource instead. */
+    font = (X11_Font *) 0;
+    XtSetArg(arg, XtNfont, &font);
+    XtGetValues(w, &arg, 1);
+    if (font != (X11_Font *) 0) {
+        return X11_column_width(XtDisplay(w), font, text, len);
+    }
+
+    return 0;
 }
 
 /* Update the label's pixmap */
@@ -425,8 +468,9 @@ update_label(Widget w, WidgetData *data)
                     pos = data->columns[min(col, data->num_cols)];
                 }
 #ifdef USE_XFT
-                XftDrawString8(draw, &fgcolor, font, x + pos, y,
-                               (const FcChar8 *) (label + i + j), line3);
+                /* NetHackJP: X11 UTF-8 text rendering and input support */
+                XftDrawStringUtf8(draw, &fgcolor, font, x + pos, y,
+                                  (const FcChar8 *) (label + i + j), line3);
 #else
                 XDrawString(display, new_pixmap, ggc,
                             x + pos, y,
@@ -578,7 +622,8 @@ int
 X11_column_width(Display *display, X11_Font *font, const char *text, size_t length)
 {
     XGlyphInfo extents;
-    XftTextExtents8(display, font, (const FcChar8*) text, length, &extents);
+    /* NetHackJP: X11 UTF-8 text rendering and input support */
+    XftTextExtentsUtf8(display, font, (const FcChar8*) text, length, &extents);
     return extents.width - extents.x;
 }
 

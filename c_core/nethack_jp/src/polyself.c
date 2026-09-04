@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-04. */
 /* NetHack 5.0	polyself.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -188,7 +188,7 @@ check_strangling(boolean on)
         if (Strangled && !can_be_strangled(&gy.youmonst)) {
             Strangled = 0L;
             disp.botl = TRUE;
-            You("もう綒澠騙けた。");
+            You("もう首を絞めつけられていなかった.");
         }
     }
 }
@@ -340,7 +340,6 @@ livelog_newform(boolean viapoly, int oldgend, int newgend)
 staticfn void
 newman(void)
 {
-    const char *newform;
     int i, oldlvl, newlvl, oldgend, newgend, hpmax, enmax;
 
     oldlvl = u.ulevel;
@@ -427,8 +426,7 @@ newman(void)
                 u.uhp = 1;
         } else {
  dead:      /* we come directly here if experience level went to 0 or less */
-            urgent_pline(
-                     "Your new form doesn't seem healthy enough to survive.");
+            urgent_pline("新たな姿は生き延びるには健全ではなかった.");
             svk.killer.format = KILLED_BY_AN;
             Strcpy(svk.killer.name, "unsuccessful polymorph");
             done(DIED);
@@ -439,13 +437,8 @@ newman(void)
         }
     }
     newuhs(FALSE);
-    /* use saved gender we're about to revert to, not current */
-    newform = ((Upolyd ? u.mfemale : flags.female) && gu.urace.individual.f)
-                ? gu.urace.individual.f
-                : (gu.urace.individual.m)
-                   ? gu.urace.individual.m
-                   : gu.urace.noun;
-    polyman("You feel like a new %s!", newform);
+    polyman("あなたは新たな%sになった気分だ!",
+            jp_race_noun_for_display(Race_switch));
 
     newgend = poly_gender();
     /* note: newman() bypasses achievements for new ranks attained and
@@ -571,7 +564,7 @@ polyself(int psflags)
                 if (!class)
                     pline("そんなモンスターは聞いたことがない.");
                 else
-                    You_cant("そのいずれにもポリモーフすることはできなかった。");
+                    You_cant("そのいずれにも変身することはできなかった.");
             } else if (wizard && Upolyd
                        && (mntmp == u.umonster
                            /* "priest" and "priestess" match the monster
@@ -611,11 +604,7 @@ polyself(int psflags)
                     ++tryct;
                 }
                 pm_name = jp_pmname(&mons[mntmp], flags.female ? FEMALE : MALE);
-                if (the_unique_pm(&mons[mntmp]))
-                    pm_name = the(pm_name);
-                else if (!type_is_pname(&mons[mntmp]))
-                    pm_name = an(pm_name);
-                You_cant("%sにポリモーフすることはできなかった。", pm_name);
+                You_cant("%sに変身することはできなかった.", pm_name);
             } else
                 break;
         } while (--tryct > 0);
@@ -812,7 +801,7 @@ polymon(int mntmp)
     if (Stoned && poly_when_stoned(&mons[mntmp])) {
         /* poly_when_stoned already checked stone golem genocide */
         mntmp = PM_STONE_GOLEM;
-        make_stoned(0L, "You turn to stone!", 0, (char *) 0);
+        make_stoned(0L, "あなたは石になった!", 0, (char *) 0);
     }
 
     u.mtimedone = rn1(500, 500);
@@ -959,7 +948,7 @@ polymon(int mntmp)
 
     if (u.usteed) {
         if (touch_petrifies(u.usteed->data) && !Stone_resistance && rnl(3)) {
-            pline("%sが%sに触れた.", no_longer_petrify_resistant,
+            pline("もはや石化耐性がないため、あなたは%sに触れた.",
                   mon_nam(u.usteed));
             Sprintf(buf, "riding %s",
                     an(pmname(u.usteed->data, Mgender(u.usteed))));
@@ -1008,7 +997,7 @@ polymon(int mntmp)
             || (gy.youmonst.data->msize <= MZ_SMALL
                 && u.utraptype == TT_BEARTRAP))) {
         You("もう%sにはまっていなかった.",
-            u.utraptype == TT_WEB ? "web" : "bear trap");
+            u.utraptype == TT_WEB ? "蜘蛛の巣" : "トラバサミ");
         /* probably should burn webs too if PM_FIRE_ELEMENTAL */
         reset_utrap(TRUE);
     }
@@ -1323,18 +1312,15 @@ drop_weapon(int alone)
             candropswapwep = !u.twoweap || canletgo(uswapwep, "");
             if (alone) {
                 what = (candropwep && candropswapwep) ? "落とす" : "手放す";
-                which = is_sword(uwep) ? "sword" : weapon_descr(uwep);
+                which = is_sword(uwep) ? "剣" : weapon_descr_jp(uwep);
                 if (u.twoweap) {
                     whichtoo =
-                        is_sword(uswapwep) ? "sword" : weapon_descr(uswapwep);
+                        is_sword(uswapwep) ? "剣" : weapon_descr_jp(uswapwep);
                     if (strcmp(which, whichtoo))
-                        which = "weapon";
+                        which = "武器";
                 }
-                if (uwep->quan != 1L || u.twoweap)
-                    which = makeplural(which);
 
-                You("%s%sを%s必要があることに気づいた!",
-                    the_your[!!strncmp(which, "corpse", 6)], which, what);
+                You("%sを%s必要があることに気づいた!", which, what);
             }
             /* if either uwep or wielded uswapwep is flagged as 'in_use'
                then don't drop it or explicitly update inventory; leave
@@ -1397,7 +1383,8 @@ rehumanize(void)
 
     if (emits_light(gy.youmonst.data))
         del_light_source(LS_MONSTER, monst_to_any(&gy.youmonst));
-    polyman("You return to %s form!", gu.urace.adj);
+    polyman("あなたは%sの姿に戻った!",
+            jp_race_noun_for_display(Race_switch));
 
     if (u.uhp < 1) {
         /* can only happen if some bit of code reduces u.uhp
@@ -1428,7 +1415,7 @@ dobreathe(void)
     struct attack *mattk;
 
     if (Strangled) {
-        You_cant("呼吸することはできなかった。申し訳ない。");
+        You_cant("呼吸することはできなかった. 申し訳ない.");
         return ECMD_OK;
     }
     if (u.uen < 15) {
@@ -1534,13 +1521,13 @@ dospinweb(void)
                 sweep[0] = '\0';
                 switch (u.ustuck->data->mattk[i].adtyp) {
                 case AD_FIRE:
-                    Strcpy(sweep, "ignites and ");
+                    Strcpy(sweep, "燃えて押し");
                     break;
                 case AD_ELEC:
-                    Strcpy(sweep, "fries and ");
+                    Strcpy(sweep, "感電して押し");
                     break;
                 case AD_COLD:
-                    Strcpy(sweep, "freezes, shatters and ");
+                    Strcpy(sweep, "凍りついて砕け散り、押し");
                     break;
                 }
                 pline_The("蜘蛛の巣は%s流された!", sweep);
@@ -1581,7 +1568,7 @@ dospinweb(void)
         case HOLE:
         case TRAPDOOR:
             You("%sを蜘蛛の巣で塞いだ.",
-                (ttmp->ttyp == TRAPDOOR) ? "trap door" : "hole");
+                (ttmp->ttyp == TRAPDOOR) ? "落とし扉" : "穴");
             deltrap(ttmp);
             newsym(x, y);
             return ECMD_TIME;
@@ -1664,10 +1651,10 @@ dogaze(void)
     }
 
     if (Blind) {
-        You_cant("見つめるものが見えなかった。");
+        You_cant("見つめるものが見えなかった.");
         return ECMD_OK;
     } else if (Hallucination) {
-        You_cant("見えるものに見つめることはできなかった。");
+        You_cant("見えるものに見つめることはできなかった.");
         return ECMD_OK;
     }
     if (u.uen < 15) {
@@ -1685,7 +1672,7 @@ dogaze(void)
             if (Invis && !perceives(mtmp->data)) {
                 pline("%sはあなたの視線に気づかないようだ.", l_monnam(mtmp));
             } else if (mtmp->minvis && !See_invisible) {
-                You_cant("%sをどこで見つめるのか見えなかった。", l_monnam(mtmp));
+                You_cant("%sをどこで見つめるのか見えなかった.", l_monnam(mtmp));
             } else if (M_AP_TYPE(mtmp) == M_AP_FURNITURE
                        || M_AP_TYPE(mtmp) == M_AP_OBJECT) {
                 looked--;
@@ -1742,7 +1729,7 @@ dogaze(void)
                 if (mtmp->data == &mons[PM_FLOATING_EYE] && !mtmp->mcan) {
                     if (!Free_action) {
                         You("%sの視線で凍りついた!",
-                            s_suffix(mon_nam(mtmp)));
+                            mon_nam(mtmp));
                         nomul((u.ulevel > 6 || rn2(4))
                                   ? -d((int) mtmp->m_lev + 1,
                                        (int) mtmp->data->mattk[0].damd)
@@ -1752,7 +1739,7 @@ dogaze(void)
                         return ECMD_TIME;
                     } else
                         You("%sの視線で一瞬体がこわばった.",
-                            s_suffix(mon_nam(mtmp)));
+                            mon_nam(mtmp));
                 }
                 /* Technically this one shouldn't affect you at all because
                  * the Medusa gaze is an active monster attack that only
@@ -1787,7 +1774,7 @@ dohide(void)
     /* can't hide while being held (or holding) or while trapped
        (except for floor hiders [trapper or mimic] in pits) */
     if (u.ustuck || (u.utrap && (u.utraptype != TT_PIT || on_ceiling))) {
-        You_cant("隠れることはできなかった。%sているから。",
+        You_cant("隠れることはできなかった. %sているから.",
                  !u.ustuck ? "引っ掛かっ"
                                      : u.uswallow ? (digests(u.ustuck->data) ? "消化され"
                                                                                                                      : "飲み込まれ")
@@ -1888,7 +1875,7 @@ dopoly(void)
         polyself(POLY_MONSTER);
         if (savedat != gy.youmonst.data) {
             You("%sへ変身した.",
-                an(jp_pmname(gy.youmonst.data, Ugender)));
+                jp_pmname(gy.youmonst.data, Ugender));
             newsym(u.ux, u.uy);
         }
     }

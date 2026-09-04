@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-02. */
 /* NetHack 5.0	wintext.c	$NHDT-Date: 1781973110 2026/06/20 16:31:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -553,6 +553,43 @@ rip_exposed(Widget w, XtPointer client_data UNUSED,
 
     x = appResources.tombtext_x;
     y = appResources.tombtext_y;
+#ifdef USE_XFT
+    Display *display = XtDisplay(w);
+    Screen *screen = DefaultScreenOfDisplay(display);
+    Visual *visual = DefaultVisualOfScreen(screen);
+    Colormap cmap = DefaultColormapOfScreen(screen);
+    XftDraw *draw = XftDrawCreate(display, XtWindow(w), visual, cmap);
+    /* NetHackJP: X11 UTF-8 tombstone RIP font rendering with CJK fallback */
+    char rip_font_name[512];
+    const char *text_font = iflags.wc_font_text ? iflags.wc_font_text : appResources.font_text;
+    if (text_font && *text_font) {
+        Snprintf(rip_font_name, sizeof(rip_font_name), "%.256s,%.256s",
+                 appResources.font_rip ? appResources.font_rip : "sans-9", text_font);
+    } else {
+        Snprintf(rip_font_name, sizeof(rip_font_name), "%.256s,Noto Sans CJK JP-9",
+                 appResources.font_rip ? appResources.font_rip : "sans-9");
+    }
+    XftFont *font = XftFontOpenName(display, DefaultScreen(display), rip_font_name);
+    XftColor foreground;
+    X11_new_color(w, values.foreground, &foreground);
+    for (i = 0; i <= YEAR_LINE; i++) {
+        size_t len = strlen(rip_line[i]);
+        XGlyphInfo extents;
+        /* NetHackJP: X11 UTF-8 text rendering and input support */
+        XftTextExtentsUtf8(display, font,
+                           (const FcChar8 *) rip_line[i], len,
+                           &extents);
+        int width = extents.width - extents.x;
+
+        XftDrawStringUtf8(draw, &foreground, font, x - width / 2, y,
+                          (const FcChar8 *) rip_line[i], len);
+        x += appResources.tombtext_dx;
+        y += appResources.tombtext_dy;
+    }
+    XftFontClose(display, font);
+    XftDrawDestroy(draw);
+    XftColorFree(display, visual, cmap, &foreground);
+#else /* !USE_XFT */
     for (i = 0; i <= YEAR_LINE; i++) {
         int len = strlen(rip_line[i]);
         XFontStruct *font = WindowFontStruct(w);

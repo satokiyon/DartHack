@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-02. */
 /*
  * Copyright 1991 University of Wisconsin-Madison
  *
@@ -150,6 +150,8 @@ CreateDialog(Widget parent, String name, XtCallbackProc okay_callback,
     XtSetArg(args[num_args], nhStr(XtNeditType), XawtextEdit); num_args++;
     XtSetArg(args[num_args], nhStr(XtNresize), XawtextResizeWidth); num_args++;
     XtSetArg(args[num_args], nhStr(XtNstring), ""); num_args++;
+    /* NetHackJP: X11 UTF-8 text rendering and input support */
+    XtSetArg(args[num_args], nhStr(XtNinternational), True); num_args++;
     response = XtCreateManagedWidget("response", asciiTextWidgetClass, form,
                                      args, num_args);
 
@@ -264,8 +266,9 @@ SetDialogResponse(Widget w, String s, unsigned ln)
 {
     Arg args[4];
     Widget response;
-    XFontStruct *font;
-    Dimension width, nwidth, leftMargin, rightMargin;
+    /* NetHackJP: uninitialized XFontStruct pointer guard under XtNinternational */
+    XFontStruct *font = (XFontStruct *) 0;
+    Dimension width = 0, nwidth = 0, leftMargin = 0, rightMargin = 0;
     unsigned s_len = strlen(s);
 
     if (s_len < ln)
@@ -277,7 +280,8 @@ SetDialogResponse(Widget w, String s, unsigned ln)
     XtSetArg(args[3], nhStr(XtNwidth), &width);
     XtGetValues(response, args, FOUR);
     /* width includes margins as per Xaw documentation */
-    nwidth = font->max_bounds.width * (s_len + 1) + leftMargin + rightMargin;
+    int char_width = (font && font->max_bounds.width > 0) ? font->max_bounds.width : 10;
+    nwidth = char_width * (s_len + 1) + leftMargin + rightMargin;
     if (nwidth < width)
         nwidth = width;
 

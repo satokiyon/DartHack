@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-04. */
 /* NetHack 5.0	potion.c	$NHDT-Date: 1781973062 2026/06/20 16:31:02 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.288 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -729,7 +729,7 @@ peffect_water(struct obj *otmp)
             exercise(A_CON, FALSE);
             if (ismnum(u.ulycn)) {
                  Your("%sへの親和性は消えた!",
-                     makeplural(mons[u.ulycn].pmnames[NEUTRAL]));
+                     jp_pmname(&mons[u.ulycn], 0));
                 if (gy.youmonst.data == &mons[u.ulycn])
                     you_unwere(FALSE);
                 set_ulycn(NON_PM); /* cure lycanthropy */

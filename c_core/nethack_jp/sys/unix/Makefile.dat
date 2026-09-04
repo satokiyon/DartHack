@@ -48,10 +48,10 @@ nhtiles.bmp: ../util/tile2bmp ../win/share/monsters.txt \
 
 NetHack.ad: ../win/X11/NetHack.ad
 # handle "#define foo bar" -lines
-	grep ^#define ../win/X11/NetHack.ad | \
+	grep ^#define ../win/X11/NetHack.ad | tr -d '\r' | \
 		sed -e 's/^#define/s/g' -e 's/  */ /g' \
 		    -e 's/$$/ g/g' > NetHack.ad.tmp
-	grep -v ^#define ../win/X11/NetHack.ad | \
+	grep -v ^#define ../win/X11/NetHack.ad | tr -d '\r' | \
 		sed -f NetHack.ad.tmp > NetHack.ad
 	-rm -f NetHack.ad.tmp
 

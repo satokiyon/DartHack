@@ -52,7 +52,7 @@ OPTIONS=symset:Enhanced2,roguesymset:RogueEpyx
 OPTIONS=!autopickup
 
 # When autopickup is on, automatically pick up these types of objects
-#OPTIONS=pickup_types:$"=/!?+
+OPTIONS=pickup_types:$"=/!?+
 
 #OPTIONS=packorder:")[%?+/=!(*0_`
 #OPTIONS=scores:10 top/2 around/own

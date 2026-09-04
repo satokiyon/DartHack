@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-04. */
 /* NetHack 5.0	winX.h	$NHDT-Date: 1781973092 2026/06/20 16:31:32 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.69 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -351,6 +351,56 @@ extern String GetDialogResponse(Widget);
 extern void SetDialogResponse(Widget, String, unsigned);
 extern void positionpopup(Widget, boolean);
 
+/* ### wingetlin.c ### (NetHackJP: XIM-aware getlin / askname dialog)
+ *
+ * Drop-in replacement for CreateDialog / GetDialogResponse /
+ * SetDialogResponse / SetDialogPrompt that talks to fcitx5 / ibus
+ * directly instead of relying on Xaw's XtNinternational flag, which
+ * does not engage on WSLg's XWayland.  Same signatures, different
+ * implementation.  See wingetlin.c for the rationale. */
+extern Widget CreateXimDialog(Widget, String, XtCallbackProc, XtCallbackProc);
+extern void XimDialogSetPrompt(Widget, String);
+extern void XimDialogSetResponse(Widget, String);
+extern String XimDialogGetResponse(Widget);
+extern void XimDialogFocusInput(Widget);
+/* NetHackJP: restore the X input focus the getlin/askname dialog
+ * grabbed (called from nh_XtPopdown; DEVELOPMENT.md §4.12). */
+extern void XimDialogReleaseInputFocus(void);
+
+/* ### winxim.c ### (NetHackJP: XIM integration)
+ *
+ * The XIM / XIC types come from <X11/Xlib.h> which we deliberately do
+ * NOT pull in here: winX.h is included by several .c files that have
+ * not yet included hack.h, and those files do not need the XIM types
+ * either.  All XIM handles are exposed as opaque pointers; callers
+ * only need to forward them between xim_create_ic / xim_lookup_utf8 /
+ * xim_focus_in / xim_focus_out / xim_destroy_ic.
+ */
+#ifdef HAVE_XIM
+extern int xim_is_active(void);     /* returns 1 if XOpenIM succeeded */
+extern void xim_init(void *);       /* arg: Display *  */
+extern void xim_cleanup(void);
+extern void *xim_create_ic(void *); /* arg: Widget; returns XIC */
+extern void xim_destroy_ic(void *); /* arg: XIC */
+extern void xim_focus_in(void *);   /* arg: XIC */
+extern void xim_focus_out(void *);  /* arg: XIC */
+extern void xim_focus_clear(void);  /* reset tracking w/o XUnsetICFocus */
+/* xim_lookup_utf8 has no in-source fallback - callers must #ifdef HAVE_XIM */
+extern int xim_lookup_utf8(void *, XKeyEvent *,
+                           char *, int,
+                           unsigned long *, int *);
+/* second-to-last arg is KeySym* (Xlib typedef), last is Status* */
+#else
+#define xim_is_active()           0
+#define xim_init(dpy)             ((void)0)
+#define xim_cleanup()             ((void)0)
+#define xim_create_ic(w)          ((void *)0)
+#define xim_destroy_ic(ic)        ((void)0)
+#define xim_focus_in(ic)          ((void)0)
+#define xim_focus_out(ic)         ((void)0)
+#define xim_focus_clear()         ((void)0)
+#endif
+
 /* ### winX.c ### */
 extern struct xwindow *find_widget(Widget);
 extern XColor get_nhcolor(struct xwindow *, int);
@@ -362,7 +412,12 @@ extern Boolean nhCvtStringToPixel(Display *, XrmValuePtr, Cardinal *,
 extern void get_window_frame_extents(Widget, long *, long *, long *, long *);
 extern void get_widget_window_geometry(Widget, int *, int *, int *, int *);
 extern char *fontname_boldify(const char *);
-extern Dimension nhFontHeight(Widget);
+extern Dimension nhFontHeight(Widget, int);
+/* NetHackJP: Phase 4 multi-byte support.  key_event_to_utf8 returns
+ * the full multi-byte UTF-8 sequence from a key event; the original
+ * key_event_to_char is a thin wrapper that returns only the first
+ * byte. */
+extern int key_event_to_utf8(XKeyEvent *, char *, int);
 extern char key_event_to_char(XKeyEvent *);
 extern void msgkey(Widget, XtPointer, XEvent *, Boolean *);
 extern void highlight_yn(boolean);
@@ -537,6 +592,10 @@ extern void X11_set_column_widths(Widget, const int *, unsigned);
 extern void X11_blink_labels(void);
 extern int X11_font_height(X11_Font *);
 extern int X11_column_width(Display *, X11_Font *, const char *, size_t);
+/* NetHackJP: measure the pixel width of a string with the label
+ * widget's font; used to enforce the getlin response field's minimum
+ * width (DEVELOPMENT.md §4.12). */
+extern int X11_label_string_width(Widget, const char *);
 
 /*
  * These are for widgets that use the enhanced label services only for text

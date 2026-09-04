@@ -41,6 +41,7 @@ WINLIB = $(WINTTYLIB)
 # Window ports options for NetHackJP
 WANT_WIN_TTY=1
 WANT_WIN_CURSES=1
+WANT_WIN_X11=1
 WANT_DEFAULT=tty
 
 #-INCLUDE dirs-perms.500
@@ -151,13 +152,18 @@ endif
 endif
 
 # Window ports options (Uncomment desired GUI interfaces if needed)
-# WANT_WIN_X11=1
+# WANT_WIN_X11=1 (Enabled above multiw-2.500)
 # WANT_WIN_QT=1
 
 ifdef WANT_WIN_X11
 USE_XPM=1
 USE_XFT=1
 WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
+# NetHackJP: XIM (X Input Method) infrastructure for fcitx5 / ibus integration.
+# Define HAVE_XIM to enable XOpenIM / XCreateIC / Xutf8LookupString support
+# in win/X11/winxim.c and related files. If fcitx5 is not available at runtime,
+# the X11 port falls back to plain XLookupString (ASCII-only) automatically.
+HAVE_XIM=1
 VARDATND0 += x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
 ifndef CROSSCOMPILE
 GENTILEOFILE = $(SRCDIR)/tile.o
@@ -174,6 +180,10 @@ ifdef USE_XPM
 CFLAGS += -DUSE_XPM
 WINX11LIB += -lXpm
 VARDATND0 += rip.xpm
+endif
+# NetHackJP: Enable XIM (X Input Method) compile-time flag for the X11 port.
+ifdef HAVE_XIM
+CFLAGS += -DHAVE_XIM
 endif
 WINLIB += $(WINX11LIB)
 LFLAGS+=-L/opt/X11/lib

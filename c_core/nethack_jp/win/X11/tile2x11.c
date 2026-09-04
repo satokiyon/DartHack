@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-02. */
 /* $NHDT-Date: 1546081295 2018/12/29 11:01:35 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.12 $ */
 /*      Copyright (c) 2017 by Pasi Kallinen                       */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -18,7 +19,7 @@
 /* #define PRINT_COLORMAP */ /* define to print the colormap */
 
 x11_header header;
-unsigned char tile_bytes[TILE_X * TILE_Y * (MAX_GLYPH + TILES_PER_ROW)];
+unsigned char tile_bytes[TILE_X * TILE_Y * 3000];
 unsigned char *curr_tb = tile_bytes;
 unsigned char x11_colormap[MAXCOLORMAPSIZE][3];
 
@@ -32,9 +33,9 @@ pix_to_colormap(pixel pix)
     unsigned long i;
 
     for (i = 0; i < header.ncolors; i++) {
-        if (pix.r == ColorMap[CM_RED][i]
-            && pix.g == ColorMap[CM_GREEN][i]
-            && pix.b == ColorMap[CM_BLUE][i])
+        if (pix.r == x11_colormap[i][CM_RED]
+            && pix.g == x11_colormap[i][CM_GREEN]
+            && pix.b == x11_colormap[i][CM_BLUE])
             break;
     }
 
@@ -51,26 +52,29 @@ static unsigned long
 convert_tiles(unsigned char **tb_ptr, /* pointer to a tile byte pointer */
               unsigned long total)    /* total tiles so far */
 {
-    unsigned char *tb = *tb_ptr;
+    unsigned char *tb;
     unsigned long count = 0;
     pixel tile[TILE_Y][TILE_X];
     int x, y;
 
     while (read_text_tile(tile)) {
-        count++;
-        total++;
+        tb = tile_bytes + 
+             (total / header.per_row) * (TILE_X * TILE_Y * header.per_row) +
+             (total % header.per_row) * TILE_X;
+
         for (y = 0; y < TILE_Y; y++) {
             for (x = 0; x < TILE_X; x++)
                 tb[x] = pix_to_colormap(tile[y][x]);
             tb += TILE_X * header.per_row;
         }
 
-        /* repoint at the upper-left corner of the next tile */
-        *tb_ptr += TILE_X;
-        if (header.per_row == 1 || (total % header.per_row) == 0)
-            *tb_ptr += TILE_X * (TILE_Y - 1) * header.per_row;
-        tb = *tb_ptr;
+        count++;
+        total++;
     }
+
+    *tb_ptr = tile_bytes + 
+              (total / header.per_row) * (TILE_X * TILE_Y * header.per_row) +
+              (total % header.per_row) * TILE_X;
 
     return count;
 }
@@ -131,11 +135,14 @@ xpm_write(FILE *fp)
 {
     unsigned long i, j;
     unsigned n;
+    static const char xpm_chars[] =
+        "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ#$"
+        "@&+=-_~.!?:;<>(){}[]|/^%`'*,";
 
-    if (header.ncolors > 64) {
-        Fprintf(stderr, "Sorry, only configured for up to 64 colors\n");
+    if (header.ncolors > sizeof(xpm_chars) - 1) {
+        Fprintf(stderr, "Sorry, only configured for up to %zu colors\n",
+                sizeof(xpm_chars) - 1);
         exit(1);
-        /* All you need to do is add more char per color - below */
     }
 
     Fprintf(fp, "/* XPM */\n");
@@ -145,7 +152,7 @@ xpm_write(FILE *fp)
             header.ncolors, 1 /* char per color */);
     for (i = 0; i < header.ncolors; i++)
         Fprintf(fp, "\"%c  c #%02x%02x%02x\",\n",
-                (char) (i + '0'), /* just one char per color */
+                xpm_chars[i],
                 x11_colormap[i][0], x11_colormap[i][1], x11_colormap[i][2]);
 
     n = 0;
@@ -153,8 +160,8 @@ xpm_write(FILE *fp)
          i++) {
         Fprintf(fp, "\"");
         for (j = 0; j < header.tile_width * header.per_row; j++) {
-            /* just one char per color */
-            fputc(tile_bytes[n++] + '0', fp);
+            unsigned char c_idx = tile_bytes[n++];
+            fputc(xpm_chars[c_idx], fp);
         }
 
         Fprintf(fp, "\",\n");
@@ -200,11 +207,14 @@ main(int argc, char *argv[])
     for (i = 1; i < argc; i++) {
         if (!strncmp(argv[i], "-grayscale", 10)) {
             set_grayscale(TRUE);
-            if (i < (argc - 1)) i++;
+            if (i < (argc - 1)) {
+                i++;
+                process_file(argv[i]);
+            }
         } else {
             set_grayscale(FALSE);
+            process_file(argv[i]);
         }
-        process_file(argv[i]);
     }
     Fprintf(stdout, "Total tiles: %ld\n", header.ntiles);
 

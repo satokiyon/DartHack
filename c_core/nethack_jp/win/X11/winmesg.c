@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-02. */
 /* NetHack 5.0	winmesg.c	$NHDT-Date: 1781973109 2026/06/20 16:31:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.19 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -152,6 +152,25 @@ create_message_window(struct xwindow *wp, /* window pointer */
      * is appResources.message_lines high and DEFAULT_MESSAGE_WIDTH wide.
      */
 
+    /* Save character information for fast use later. */
+#ifdef USE_XFT
+    XftFont *font = X11_new_font(wp->w, 0, NHW_MESSAGE);
+    XGlyphInfo extents;
+    mesg_info->char_width = font->max_advance_width;
+    mesg_info->char_height = X11_font_height(font);
+    mesg_info->char_ascent = font->ascent;
+    mesg_info->char_lbearing = 0;
+    /* Xft seems to offer no direct way to distinguish proportional from
+       monospaced fonts. Assume that "!" will be narrower than maximum. */
+    /* NetHackJP: X11 UTF-8 text rendering and input support */
+    XftTextExtentsUtf8(XtDisplay(wp->w), font, (const FcChar8*) "!", 1, &extents);
+    int min_width = extents.width - extents.x;
+    /* "Maximum" is likely to include things like Chinese characters that
+     * display at double width. Use the width of "M". */
+    XftTextExtentsUtf8(XtDisplay(wp->w), font, (const FcChar8*) "M", 1, &extents);
+    int max_width = extents.width - extents.x;
+    X11_release_font(wp->w, font);
+#else
     /* Get the font information. */
     num_args = 0;
     XtSetArg(args[num_args], XtNfont, &mesg_info->fs);
@@ -369,7 +388,19 @@ split(char *s,
     end = eos(s); /* point to null at end of string */
 
     /* assume that if end == s, XXXXXX returns 0) */
-    while ((Dimension) XTextWidth(fs, s, (int) strlen(s)) > pixel_width) {
+    while (TRUE) {
+#ifdef USE_XFT
+        XGlyphInfo extents;
+        /* NetHackJP: X11 UTF-8 text rendering and input support */
+        XftTextExtentsUtf8(XtDisplay(wp->w), font, (const FcChar8*) s, strlen(s), &extents);
+        if (extents.width - extents.x < pixel_width) {
+            break;
+        }
+#else
+        if ((Dimension) XTextWidth(fs, s, (int) strlen(s)) < pixel_width) {
+            break;
+        }
+#endif
         *end-- = save;
         while (*end != ' ') {
             if (end == s)
@@ -469,6 +500,14 @@ redraw_message_window(struct xwindow *wp)
     /* For now, just update the whole shootn' match. */
     for (y_base = row = 0, curr = mesg_info->head; row < mesg_info->num_lines;
          row++, y_base += mesg_info->char_height, curr = curr->next) {
+#ifdef USE_XFT
+        if (curr->line != NULL) {
+            /* NetHackJP: X11 UTF-8 text rendering and input support */
+            XftDrawStringUtf8(draw, &fgcolor, font,
+                        mesg_info->char_lbearing, mesg_info->char_ascent + y_base,
+                        (const FcChar8 *) curr->line, curr->str_length);
+        }
+#else /* !USE_XFT */
         XDrawString(XtDisplay(wp->w), XtWindow(wp->w), mesg_info->gc,
                     mesg_info->char_lbearing, mesg_info->char_ascent + y_base,
                     curr->line, curr->str_length);

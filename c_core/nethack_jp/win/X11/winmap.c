@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-04. */
 /* NetHack 5.0	winmap.c	$NHDT-Date: 1781973109 2026/06/20 16:31:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -46,7 +46,7 @@
 #endif
 
 /* from tile.c */
-extern int total_tiles_used, Tile_corr;
+extern int total_tiles_used, Tile_corr, Tile_unexplored, Tile_stone;
 
 /* Define these if you really want a lot of junk on your screen. */
 /* #define VERBOSE */        /* print various info & events as they happen */
@@ -211,6 +211,7 @@ X11_cliparound(int x UNUSED, int y UNUSED)
 
 /* End global functions =================================================== */
 
+#include <errno.h>
 #include "tile2x11.h"
 
 /*
@@ -352,17 +353,35 @@ init_tiles(struct xwindow *wp)
     attributes.valuemask = XpmCloseness;
     attributes.closeness = 25000;
 
-    errorcode = XpmReadFileToImage(dpy, appResources.tile_file, &tile_image,
+    /* NetHackJP: Trim trailing \r, \n, and spaces from tile_file name */
+    char clean_tile_file[BUFSZ];
+    Strcpy(clean_tile_file, appResources.tile_file);
+    char *cp_end = clean_tile_file + strlen(clean_tile_file) - 1;
+    while (cp_end >= clean_tile_file && (*cp_end == '\r' || *cp_end == '\n' || *cp_end == ' ' || *cp_end == '\t')) {
+        *cp_end-- = '\0';
+    }
+
+    const char *actual_tile_file = clean_tile_file;
+
+    FILE *tile_fp = fopen_datafile(actual_tile_file, "r", FALSE);
+    if (tile_fp) {
+        fclose(tile_fp);
+        actual_tile_file = fqname(actual_tile_file, DATAPREFIX, 0);
+        if (!actual_tile_file)
+            actual_tile_file = clean_tile_file;
+    }
+
+    errorcode = XpmReadFileToImage(dpy, (char *) actual_tile_file, &tile_image,
                                    0, &attributes);
 
     if (errorcode == XpmColorFailed) {
         Sprintf(buf, "Insufficient colors available to load %s.",
-                appResources.tile_file);
+                actual_tile_file);
         X11_raw_print(buf);
         X11_raw_print("Try closing other colorful applications and restart.");
         X11_raw_print("Attempting to load with inferior colors.");
         attributes.closeness = 50000;
-        errorcode = XpmReadFileToImage(dpy, appResources.tile_file,
+        errorcode = XpmReadFileToImage(dpy, actual_tile_file,
                                        &tile_image, 0, &attributes);
     }
 
@@ -398,12 +417,9 @@ init_tiles(struct xwindow *wp)
     image_width = tile_image->width;
     image_height = tile_image->height;
 
-    tile_count = total_tiles_used;
-    if ((tile_count % TILES_PER_ROW) != 0) {
-        tile_count += TILES_PER_ROW - (tile_count % TILES_PER_ROW);
-    }
+    /* NetHackJP: Calculate exact 1-tile size from actual XPM image width */
     tile_width = image_width / TILES_PER_ROW;
-    tile_height = image_height / (tile_count / TILES_PER_ROW);
+    tile_height = tile_width; /* XPM tiles are square (e.g. 16x16 or 32x32) */
 #else /* !USE_XPM */
     /* any less than 16 colours makes tiles useless */
     ddepth = DefaultDepthOfScreen(screen);
@@ -1133,6 +1149,15 @@ map_input(Widget w, XEvent *event, String *params, Cardinal *num_params)
             meta = !!(key->state & Mod1Mask);
             nbytes = XLookupString(key, keystring, MAX_KEY_STRING,
                                    (KeySym *) 0, (XComposeStatus *) 0);
+            /* NetHackJP: map input deliberately does NOT route through
+             * the input method.  Map commands are ASCII keystrokes; an
+             * IM engaged here (fcitx5 in its default Japanese mode for
+             * a fresh or never-toggled IC) ate the player's commands
+             * and popped the Japanese input UI up over the main window
+             * out of nowhere.  Japanese text input belongs in the
+             * getlin / askname dialogs, which drive the IM via
+             * wingetlin.c; the main window never focuses an IC, so the
+             * IM can never engage here (DEVELOPMENT.md §4.12). */
         }
  key_events:
         /* Modifier keys return a zero length string when pressed. */
@@ -1144,14 +1169,21 @@ map_input(Widget w, XEvent *event, String *params, Cardinal *num_params)
                 c = keystring[i];
 
                 if (incount < INBUF_SIZE) {
+                    /* NetHackJP: Meta (0x80) is applied only to the
+                     * first byte of a sequence.  Adding 0x80 to a UTF-8
+                     * continuation byte (0x80-0xBF) would corrupt the
+                     * encoding; adding it to a lead byte (0xC0-0xF7)
+                     * would push it into a reserved range.  The first
+                     * byte is sufficient for the core's meta-letter
+                     * detection. */
                     inbuf[(inptr + incount) % INBUF_SIZE] =
-                        ((int) c) + (meta ? 0x80 : 0);
+                        ((int) c) + (meta && i == 0 ? 0x80 : 0);
                     incount++;
                 } else {
                     X11_nhbell();
                 }
 #ifdef VERBOSE_INPUT
-                if (meta) /* meta will print as M<c> */
+                if (meta && i == 0) /* meta will print as M<c> */
                     (void) putchar('M');
                 if (c < ' ') { /* ctrl will print as ^<c> */
                     (void) putchar('^');
@@ -1316,24 +1348,22 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
 
         for (row = start_row; row <= stop_row; row++) {
             for (cur_col = start_col; cur_col <= stop_col; cur_col++) {
-#if 0
                 int glyph = tile_map->glyphs[row][cur_col].glyph;
-                int tile = glyph2tile[glyph];
-#else
                 int tile = tile_map->glyphs[row][cur_col].tileidx;
-#endif
-                int src_x, src_y;
                 int dest_x = (cur_col - COL0_OFFSET) * tile_map->square_width;
                 int dest_y = row * tile_map->square_height;
                 unsigned gflags = tile_map->glyphs[row][cur_col].glyphflags;
 
-#if 0
-                /* not required with the new glyph representations */
-                if ((gflags & MG_FEMALE) != 0)
-                    tile++; /* advance to the female tile variation */
-#endif
-                src_x = (tile % TILES_PER_ROW) * tile_width;
-                src_y = (tile / TILES_PER_ROW) * tile_height;
+                /* NetHackJP: Clear background with black for unexplored, nothing, or invalid tiles */
+                if (glyph <= 0 || tile < 0 || glyph == GLYPH_UNEXPLORED || glyph == GLYPH_NOTHING
+                    || tile == Tile_unexplored) {
+                    XFillRectangle(dpy, XtWindow(wp->w), tile_map->black_gc,
+                                   dest_x, dest_y, tile_map->square_width, tile_map->square_height);
+                    continue;
+                }
+
+                int src_x = (tile % TILES_PER_ROW) * tile_width;
+                int src_y = (tile / TILES_PER_ROW) * tile_height;
                 XCopyArea(dpy, tile_pixmap, XtWindow(wp->w),
                           tile_map->black_gc, /* no grapics_expose */
                           src_x, src_y, tile_width, tile_height,
@@ -1442,6 +1472,29 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
         }
     }
 }
+
+static void
+X11_draw_image_string(
+    XftDraw *draw, XftFont *font,
+    XftColor *fgcolor, XftColor *bgcolor,
+    int x, int y,
+    const X11_map_symbol *string, int length)
+{
+    XftDrawRect(draw, bgcolor, x, y,
+                length * font->max_advance_width,
+                X11_font_height(font));
+
+    int xt = x;
+    int yt = y + font->ascent;
+#ifdef ENHANCED_SYMBOLS
+    XftDrawString32(draw, fgcolor, font, xt, yt, string, length);
+#else /* !ENHANCED_SYMBOLS */
+    /* NetHackJP: X11 UTF-8 text rendering and input support */
+    XftDrawStringUtf8(draw, fgcolor, font, xt, yt, string, length);
+#endif /* ?ENHANCED_SYMBOLS */
+}
+
+#else /* !USE_XFT */
 
 static GC
 X11_make_gc(

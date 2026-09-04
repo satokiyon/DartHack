@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-03. */
 /* NetHack 5.0	winmisc.c	$NHDT-Date: 1781973109 2026/06/20 16:31:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1799,16 +1799,25 @@ ec_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     Arg arg[2];
     Widget hbar, vbar;
     XKeyEvent *xkey = (XKeyEvent *) event;
+    char buf[EC_NCHARS];
+    int n;
 
     nhUse(params);
     nhUse(num_params);
 
-    ch = key_event_to_char(xkey);
-
-    if (ch == '\0') { /* don't accept nul char/modifier event */
+    /* NetHackJP: read the key as a UTF-8 string (Phase 4).  For
+     * single-character keys (y/n/?/Esc/Return) the first byte of buf
+     * is the keysym.  For multi-byte input (e.g. Japanese command
+     * names) the whole UTF-8 sequence is appended to ec_chars and
+     * matched byte-wise against command_list[]. */
+    n = key_event_to_utf8(xkey, buf, (int) sizeof buf);
+    if (n <= 0) { /* modifier key, no useful data */
         /* don't beep */
         return;
-    } else if (ch == '?') {
+    }
+    ch = buf[0]; /* first byte for special-key dispatch */
+
+    if (ch == '?') {
         extend_help((Widget) 0, (XtPointer) 0, (XtPointer) 0);
         return;
     } else if (strchr("\033\n\r", ch)) {
@@ -1862,9 +1871,15 @@ ec_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     }
 
     ec_time = xkey->time;
-    ec_chars[ec_nchars++] = ch;
-    if (ec_nchars >= EC_NCHARS)
-        ec_nchars = EC_NCHARS - 1; /* don't overflow */
+    /* NetHackJP: append the full multi-byte UTF-8 string instead of
+     * just one byte. */
+    if (ec_nchars + n >= EC_NCHARS)
+        ec_nchars = EC_NCHARS - n - 1; /* don't overflow */
+    (void) memcpy(&ec_chars[ec_nchars], buf, (size_t) n);
+    ec_nchars += n;
+    /* ensure NUL termination for strncmp() below */
+    if (ec_nchars < EC_NCHARS)
+        ec_chars[ec_nchars] = '\0';
 
     for (pass = 0; pass < 2; pass++) {
         if (pass == 1) {
@@ -1873,8 +1888,28 @@ ec_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
             if (extended_cmd_selected >= 0)
                 swap_fg_bg(extended_commands[extended_cmd_selected]);
             extended_cmd_selected = -1; /* dismiss */
-            ec_chars[0] = ec_chars[ec_nchars - 1];
-            ec_nchars = 1;
+            /* For multi-byte input we drop the previous bytes and
+             * keep just the last UTF-8 sequence.  Walk back to the
+             * start of the last character so the next pass only
+             * compares the new bytes. */
+            {
+                int last_start = ec_nchars - n;
+                int k;
+
+                if (last_start < 0)
+                    last_start = 0;
+                /* find the lead byte of the last UTF-8 char */
+                k = ec_nchars - 1;
+                while (k > last_start
+                       && ((unsigned char) ec_chars[k] & 0xC0U) == 0x80U)
+                    k--;
+                last_start = k;
+                if (last_start > 0) {
+                    (void) memmove(ec_chars, &ec_chars[last_start],
+                                    (size_t) (ec_nchars - last_start));
+                    ec_nchars -= last_start;
+                }
+            }
         }
         for (i = 0; command_list[i]; ++i) {
             if (!strncmp(ec_chars, command_list[i], ec_nchars)) {

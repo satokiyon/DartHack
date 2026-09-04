@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-03. */
 /* NetHack 5.0	flag.h	$NHDT-Date: 1781973080 2026/06/20 16:31:20 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.265 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -473,6 +473,7 @@ struct instance_flags {
     boolean wc2_hitpointbar;  /* show graphical bar representing hit points */
     boolean wc2_guicolor;       /* allow colours in gui (outside map) */
     int wc_mouse_support;       /* allow mouse support */
+    int wc_use_xim;             /* X11/XIM: Phase 7 toggle (1=on, 0=off) */
     int wc2_term_cols;          /* terminal width, in characters */
     int wc2_term_rows;          /* terminal height, in characters */
     int msw_msg_cols;           /* Win32 GUI: message window width */

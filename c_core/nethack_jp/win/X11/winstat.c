@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-02. */
 /* NetHack 5.0	winstat.c	$NHDT-Date: 1781973110 2026/06/20 16:31:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -675,19 +675,19 @@ tty_render_field(Widget w, int x, int y, enum statusfields fld)
         const char *post;
     } formats[MAXBLSTATS] = {
         [BL_TITLE] = { NULL, NULL },
-        [BL_STR] = { "St:", NULL },
-        [BL_DX] = { "Dx:", NULL },
-        [BL_CO] = { "Co:", NULL },
-        [BL_IN] = { "In:", NULL },
-        [BL_WI] = { "Wi:", NULL },
-        [BL_CH] = { "Ch:", NULL },
+        [BL_STR] = { "筋:", NULL },
+        [BL_DX] = { "器:", NULL },
+        [BL_CO] = { "耐:", NULL },
+        [BL_IN] = { "知:", NULL },
+        [BL_WI] = { "賢:", NULL },
+        [BL_CH] = { "魅:", NULL },
         [BL_ALIGN] = { NULL, NULL },
-        [BL_SCORE] = { "S:", NULL },
+        [BL_SCORE] = { "得:", NULL },
         [BL_CAP] = { NULL, NULL },
         [BL_GOLD] = { NULL, NULL },
-        [BL_ENE] = { "Pw:", NULL },
+        [BL_ENE] = { "魔:", NULL },
         [BL_ENEMAX] = { "(", ")" },
-        [BL_XP] = { "Xp:", NULL },
+        [BL_XP] = { "LV:", NULL },
         [BL_AC] = { "AC:", NULL },
         [BL_HD] = { "HD:", NULL },
         [BL_TIME] = { "T:", NULL },
@@ -752,11 +752,116 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
     nhUse(attr);
 #endif
 
+    int goldwidth = 0;
+
+    /* Get the colors */
+    Pixel fgpixel, bgpixel;
+    tty_status_colors(w, color, attr, &fgpixel, &bgpixel);
+
+#ifdef USE_XFT
+
+    /* Get the font */
+    XftFont *font = X11_new_font(w, attr, NHW_STATUS);
+    int height = X11_font_height(font);
+
+    /* Get the drawing resources */
+    Display *display = XtDisplay(w);
+    Screen *screen = DefaultScreenOfDisplay(display);
+    Visual *visual = DefaultVisualOfScreen(screen);
+    Colormap cmap = DefaultColormapOfScreen(screen);
+    XftDraw *draw = XftDrawCreate(display, XtWindow(w), visual, cmap);
+
+    /* Convert the colors to Xft form */
+    XftColor fgcolor, bgcolor;
+    X11_new_color(w, fgpixel, &fgcolor);
+    X11_new_color(w, bgpixel, &bgcolor);
+
+    /* If drawing a hitpoint bar, we'll need a clipping rectangle */
+    if (clip != NULL) {
+        XftDrawSetClipRectangles(draw, 0, 0, clip, 1);
+    }
+
+    /* Gold will begin with a glyph string. Convert this to the proper
+       character, which might possibly be Unicode */
+    if (fld == BL_GOLD && memcmp(text, "\\G", 2) == 0) {
+        char *end;
+        unsigned long glyphcode = strtoul(text+2, &end, 16);
+        if ((glyphcode >> 16) == (unsigned) svc.context.rndencode && *end == ':') {
+            /* We have a proper glyph code */
+            glyph_info glyphinfo;
+            glyphcode &= 0xFFFF;
+            map_glyphinfo(0, 0, glyphcode, 0, &glyphinfo);
+            X11_map_symbol goldsym = X11_glyph_char(&glyphinfo);
+
+            /* Get the width of the gold symbol */
+            XGlyphInfo extents;
+#ifdef ENHANCED_SYMBOLS
+            FcChar32 goldch = goldsym;
+            XftTextExtents32(display, font, &goldch, 1, &extents);
+#else /* !ENHANCED_SYMBOLS */
+            FcChar8 goldch = goldsym;
+            XftTextExtents8(display, font, &goldch, 1, &extents);
+#endif /* ?ENHANCED_SYMBOLS */
+            goldwidth = extents.width - extents.x;
+
+            /* Render the gold symbol */
+            XftDrawRect(draw, &bgcolor, x, y, goldwidth, height);
+#ifdef ENHANCED_SYMBOLS
+            XftDrawString32(draw, &fgcolor, font, x, y + font->ascent, &goldch, 1);
+#else /* !ENHANCED_SYMBOLS */
+            XftDrawString8(draw, &fgcolor, font, x, y + font->ascent, &goldch, 1);
+#endif /* ?ENHANCED_SYMBOLS */
+
+            text = end;
+        }
+    }
+
+    /* Get the width of the rendered string, not including goldwidth */
+    XGlyphInfo extents;
+    /* NetHackJP: X11 UTF-8 text rendering and input support */
+    XftTextExtentsUtf8(display, font, (const FcChar8 *) text, strlen(text), &extents);
+    int width = extents.width - extents.x;
+
+    /* Place version on the right */
+    if (fld == BL_VERS) {
+        Cardinal num_args = 0;
+        Arg args[1];
+        Dimension wwidth;
+        XtSetArg(args[num_args], XtNwidth, &wwidth); num_args++;
+        XtGetValues(w, args, num_args);
+        int x2 = wwidth - width;
+        if (x2 > x) {
+            x = x2;
+        }
+    }
+
+    /* Render the string */
+    XftDrawRect(draw, &bgcolor, x + goldwidth, y, width, height);
+    XftDrawStringUtf8(draw, &fgcolor, font,
+                      x + goldwidth, y + font->ascent,
+                      (const FcChar8 *) text, strlen(text));
+    width += goldwidth;
+
+#ifdef STATUS_HILITES
+    /* Implement underline */
+    if (attr & HL_ULINE) {
+        XftDrawRect(draw, &fgcolor, x, y + font->ascent, width, 1);
+    }
+#endif /* STATUS_HILITES */
+
+    /* Release resources */
+
+    XftColorFree(display, visual, cmap, &fgcolor);
+    XftColorFree(display, visual, cmap, &bgcolor);
+    XftDrawDestroy(draw);
+    X11_release_font(w, font);
+
+#else /* !USE_XFT */
+
     Arg args[5];
     Cardinal num_args;
     XGCValues values;
-    Pixel fgpixel, bgpixel;
-    XFontStruct *font;
+    XFontStruct *font = (XFontStruct *) 0;
     XFontStruct *font_italic = NULL; /* custodial */
     int goldwidth = 0;
 
@@ -775,11 +880,12 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
     if (attr & HL_BOLD) {
         struct xwindow *wp = find_widget(w);
         load_boldfont(wp, w);
-        font = wp->boldfs;
+        if (wp->boldfs)
+            font = wp->boldfs;
     }
 
     /* Implement italic font */
-    if (attr & HL_ITALIC) {
+    if (attr & HL_ITALIC && font) {
         /* font may also be bold */
         font_italic = X11_italic_font(XtDisplay(w), font);
         if (font_italic != NULL) {
@@ -787,7 +893,8 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
         }
     }
 
-    values.font = font->fid;
+    /* Get a graphics context */
+    values.font = font ? font->fid : None;
     values.function = GXcopy;
     GC ggc = XtGetGC(w,
                      GCFunction | GCForeground | GCBackground | GCFont,
@@ -1056,10 +1163,11 @@ void
 create_status_window_fancy(struct xwindow *wp, /* window pointer */
                            boolean create_popup, Widget parent)
 {
-    XFontStruct *fs;
+    /* NetHackJP: uninitialized XFontStruct pointer guard */
+    XFontStruct *fs = (XFontStruct *) 0;
     Arg args[8];
     Cardinal num_args;
-    Position top_margin, bottom_margin, left_margin, right_margin;
+    Position top_margin = 0, bottom_margin = 0, left_margin = 0, right_margin = 0;
 
     wp->type = NHW_STATUS;
 
@@ -1121,8 +1229,9 @@ create_status_window_fancy(struct xwindow *wp, /* window pointer */
              &right_margin); num_args++;
     XtGetValues(wp->w, args, num_args);
 
-    wp->pixel_height = 2 * nhFontHeight(wp->w) + top_margin + bottom_margin;
-    wp->pixel_width = COLNO * fs->max_bounds.width
+    int font_width = (fs && fs->max_bounds.width > 0) ? fs->max_bounds.width : 10;
+    wp->pixel_height = 2 * nhFontHeight(wp->w, NHW_STATUS) + top_margin + bottom_margin;
+    wp->pixel_width = COLNO * font_width
                     + left_margin + right_margin;
 
     /* Set the new width and height. */
@@ -1247,66 +1356,80 @@ static struct X_status_value shown_stats[NUM_STATS] = {
     /* 0 */
     { "",             SV_NAME,  W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
     /* 1 */
-    { "Strength",     SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
-    { "Dexterity",    SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
-    { "Constitution", SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
-    { "Intelligence", SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "筋力",         SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "器用",         SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "耐久",         SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "知力",         SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
     /* 5 */
-    { "Wisdom",       SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
-    { "Charisma",     SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "賢明",         SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "魅力",         SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
     /* F_NAME: 7 */
     { "",             SV_LABEL, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
     /* F_DLEVEL: 8 */
     { "",             SV_LABEL, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
-    { "Gold",         SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "金貨",         SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
     /* F_HP: 10 */
-    { "Hit Points",   SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
-    { "Max HP",       SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
-    { "Power",        SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
-    { "Max Power",    SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
-    { "Armor Class",  SV_VALUE, W0, 256L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "HP",           SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "最大HP",       SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "PW",           SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "最大PW",       SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "AC",           SV_VALUE, W0, 256L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
     /* F_XP_LEVL: 15 */
-    { "Xp Level",     SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "レベル",       SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
     /* also 15 (overloaded field) */
     /*{ "Hit Dice",   SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },*/
     /* F_EXP_PTS: 16 (optionally displayed) */
-    { "Exp Points",   SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
-    { "Alignment",    SV_VALUE, W0,  -2L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "経験値",       SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "属性",         SV_VALUE, W0,  -2L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
     /* 18, optionally displayed */
-    { "Time",         SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "ターン",       SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
     /* 19, conditionally present, optionally displayed when present */
-    { "Score",        SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "スコア",       SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
     /* F_HUNGER: 20 (blank if 'normal') */
     { "",             SV_NAME,  W0,  -1L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
     /* F_ENCUMBER: 21 (blank if unencumbered) */
     { "",             SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
-    { "Trapped",      SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
-    { "Tethered",     SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
-    { "Levitating",   SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "罠",           SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "連結",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "浮遊",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
     /* 25 */
-    { "Flying",       SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
-    { "Riding",       SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
-    { "Grabbed!",     SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "飛行",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "騎乗",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "捕縛",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
     /* F_STONE: 28 */
-    { "Petrifying",   SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
-    { "Slimed",       SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "石化",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "粘液",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
     /* 30 */
-    { "Strangled",    SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
-    { "Food Pois",    SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
-    { "Term Ill",     SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "絞首",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "食中毒",       SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "病気",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
     /* F_IN_LAVA: 33 */
-    { "Sinking",      SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
-    { "Held",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "溶岩",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "拘束",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
     /* 35 */
-    { "Holding",      SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
-    { "Blind",        SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
-    { "Deaf",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
-    { "Stunned",      SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
-    { "Confused",     SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
-    /* F_HALLU: 40 (full spelling truncated due to space limitations) */
-    { "Hallucinat",   SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "保持",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "盲目",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "難聴",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "朦朧",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "混乱",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    /* F_HALLU: 40 */
+    { "幻覚",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
     /* F_VERS; optionally shown, generally treated as a pseudo-condition */
     { "Version 1.2.3", SV_LABEL, W0,  0L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "武器",         SV_NAME,  W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "防具",         SV_NAME,  W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "地形",         SV_NAME,  W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "素手",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "発光",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "氷上",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "多忙",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "麻痺",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "睡眠",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "失神",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "鉄過敏",       SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "滑手",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "水没",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "脚傷",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
 };
 #undef W0
 #undef P0
@@ -1485,10 +1608,10 @@ update_val(struct X_status_value *attr_rec, long new_value)
 
         /* special cases: hunger and encumbrance */
         if (attr_rec == &shown_stats[F_HUNGER]) {
-            Strcpy(buf, hu_stat[new_value]);
+            Strcpy(buf, jp_hunger_status_for_display((int) new_value, FALSE));
             (void) mungspaces(buf);
         } else if (attr_rec == &shown_stats[F_ENCUMBER]) {
-            Strcpy(buf, enc_stat[new_value]);
+            Strcpy(buf, encumbrance_display_text((int) new_value));
         } else if (new_value) {
             Strcpy(buf, attr_rec->name); /* condition name On */
         } else {
@@ -1552,7 +1675,7 @@ update_val(struct X_status_value *attr_rec, long new_value)
         } else if (attr_rec == &shown_stats[F_XP_LEVL]) {
             if (Upolyd && !Xp_was_HD) {
                 force_update = TRUE;
-                set_name(attr_rec->w, "Hit Dice");
+                set_name(attr_rec->w, "魔レベル");
                 Xp_was_HD = TRUE;
             } else if (!Upolyd && Xp_was_HD) {
                 force_update = TRUE;
@@ -1596,8 +1719,8 @@ update_val(struct X_status_value *attr_rec, long new_value)
                 Sprintf(buf, fmt, new_value, padding); /* 3..25 */
             }
         } else if (attr_rec == &shown_stats[F_ALIGN]) {
-            Strcpy(buf, (new_value == A_CHAOTIC) ? "Chaotic"
-                        : (new_value == A_NEUTRAL) ? "Neutral" : "Lawful");
+            Strcpy(buf, (new_value == A_CHAOTIC) ? "混沌"
+                        : (new_value == A_NEUTRAL) ? "中立" : "秩序");
         } else {
             Sprintf(buf, "%ld", new_value);
         }

@@ -46,8 +46,8 @@ OPTIONS=symset:Enhanced2,roguesymset:RogueEpyx
 #OPTIONS=dogname:Fido,catname:Morris,fruit:guava
 #OPTIONS=horsename:Silver
 
-# Disable autopickup
-OPTIONS=!autopickup
+# Enable autopickup
+OPTIONS=autopickup
 
 # When autopickup is on, automatically pick up these types of objects
 #OPTIONS=pickup_types:$"=/!?+
