@@ -1654,6 +1654,15 @@ static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_inf
     (void)bkglyphinfo;
     int tile = glyphinfo->gm.tileidx;
     unsigned int special = glyphinfo->gm.glyphflags;
+
+    /* defaults.nh および #options の hilite_pet / hilite_pile 設定に連動 */
+    if (!iflags.hilite_pet) {
+        special &= ~(MG_PET | MG_RIDDEN);
+    }
+    if (!iflags.hilite_pile) {
+        special &= ~MG_OBJPILE;
+    }
+
     int color = nhcolor_to_RGB(glyphinfo->gm.sym.color);
 
     int ch = glyphinfo->ttychar;
