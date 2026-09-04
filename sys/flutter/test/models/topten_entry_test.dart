@@ -1,4 +1,4 @@
-// NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-07.
+import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:darthack/models/topten_entry.dart';
 
@@ -219,6 +219,88 @@ void main() {
       expect(entries[35].details[0], contains('コウモリの姿をしたヴァンパイアに倒された'));
       expect(entries[36].details[0], contains('ゴブリンに変装したドッペルゲンガーに倒された'));
       expect(entries[37].details[0], contains('巨大アリに擬態したカメレオンに倒された'));
+    });
+
+    test('3行以上にまたがる長い死因テキストとHP/最大HPが途切れず全文結合・パースできる（ユーザー報告の症例）', () {
+      final inputLines = [
+        '順位      点数  名前                                                   HP[最大]',
+        '  1     12345  satok 侍/人間/男性/秩序',
+        '               幻覚でゆがんだ店主のスハイグアトスエに倒された（ノー',
+        '               ムの鉱山 1階）.                                          - [ 25]',
+        '  2       800  Player 洞窟人/ノーム/男性/イシュタル',
+        '               中断した（運命の大迷宮 2階）.                          15  [15]',
+      ];
+      final attrs = List.filled(inputLines.length, 0);
+
+      final entries = TopTenEntry.parse(inputLines, attrs);
+
+      expect(entries.length, 2);
+
+      // Entry 1 (3行に分割されたエントリ)
+      expect(entries[0].rank, 1);
+      expect(entries[0].score, '12345');
+      expect(entries[0].nameAndProfile, 'satok 侍/人間/男性/秩序');
+      expect(entries[0].details, [
+        '幻覚でゆがんだ店主のスハイグアトスエに倒された（ノームの鉱山 1階）.',
+        'HP/最大HP: -/25',
+      ]);
+
+      // Entry 2 (通常のエントリ)
+      expect(entries[1].rank, 2);
+      expect(entries[1].score, '800');
+      expect(entries[1].nameAndProfile, 'Player 洞窟人/ノーム/男性/イシュタル');
+      expect(entries[1].details, [
+        '中断した（運命の大迷宮 2階）.',
+        'HP/最大HP: 15/15',
+      ]);
+    });
+
+    test('4行に分割された非常に長い死因テキストでも正常に結合・パースできる', () {
+      final inputLines = [
+        '順位      点数  名前                                                   HP[最大]',
+        '  1     99999  Player 魔法使い/エルフ/女性/混沌',
+        '               長い死因の前半部分で始まって',
+        '               さらに中盤部分へと続き',
+        '               最後に終盤部分に到達した（ゲヘナ 35階）.                  - [ 50]',
+      ];
+      final attrs = List.filled(inputLines.length, 0);
+
+      final entries = TopTenEntry.parse(inputLines, attrs);
+
+      expect(entries.length, 1);
+      expect(entries[0].rank, 1);
+      expect(entries[0].details, [
+        '長い死因の前半部分で始まってさらに中盤部分へと続き最後に終盤部分に到達した（ゲヘナ 35階）.',
+        'HP/最大HP: -/25'.replaceAll('25', '50'),
+      ]);
+    });
+
+    test('parseRecordFileにおいて死因の有無に関わらずHP/最大HPが独立行として正常にパースされる', () {
+      // テスト用の一時ファイルを作成して検証
+      final tempDir = Directory.systemTemp.createTempSync('record_test_');
+      final recordFile = File('${tempDir.path}/record');
+      // record format:
+      // version points dnum dlev maxlvl hp maxhp deaths deathdate birthdate uid role race gend align name, death
+      final line1 = '5.0.0 12345 0 5 10 0 25 1 20260904 20260901 1000 Sam Hum Mal Cha satok, killed by a goblin';
+      final line2 = '5.0.0 50000 0 1 1 30 30 0 20260904 20260901 1000 Wiz Elf Fem Cha hero, ascended';
+      recordFile.writeAsStringSync('$line1\n$line2\n');
+
+      final entriesJp = parseRecordFile(recordFile.path, isJp: true);
+      expect(entriesJp.length, 2);
+
+      // Entry 1: points 50000 (昇天・生存)
+      expect(entriesJp[0].score, '50000');
+      expect(entriesJp[0].details.length, 2);
+      expect(entriesJp[0].details[0], contains('昇天した'));
+      expect(entriesJp[0].details[1], 'HP/最大HP: 30/30');
+
+      // Entry 2: points 12345 (死亡・HP <= 0)
+      expect(entriesJp[1].score, '12345');
+      expect(entriesJp[1].details.length, 2);
+      expect(entriesJp[1].details[0], contains('ゴブリンに倒された'));
+      expect(entriesJp[1].details[1], 'HP/最大HP: -/25');
+
+      tempDir.deleteSync(recursive: true);
     });
   });
 }

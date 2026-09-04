@@ -23,8 +23,9 @@ class TopTenEntry {
     final entryRegExp = RegExp(r'^\s*([0-9]*)\s+([0-9]+)\s+(.*)$');
     // 名前とプロフィールの境界を特定する正規表現 ("名前 職業/種族/性別/神")
     final profileRegex = RegExp(r'^(.*?\s+[^\s\/]+\/[^\s\/]+\/[^\s\/]+\/[^\s]+)(.*)$');
-    // 行末の HP 表示を検出する正規表現（" - [103]" や " 15 [120]" 等）
-    final hpSuffixRegExp = RegExp(r'\s+(-|[0-9]+)\s+\[([0-9]+)\]\s*$');
+    // 行末の HP 表示を検出する正規表現（" - [103]", " 15 [120]", " - [ 25]" 等）
+    final hpSuffixRegExp = RegExp(r'\s+(-|[0-9]+)\s+\[\s*([0-9]+)\]\s*$');
+    final hyphenRegex = RegExp(r'^([^\s\-]+)\-([^\s\-]+(?:\-[^\s\-]+){2,4})(?:\s+(.*))?$');
 
     int index = 0;
     while (index < lines.length) {
@@ -50,7 +51,6 @@ class TopTenEntry {
         String inlineDeathPart = '';
 
         final profileMatchSlash = profileRegex.firstMatch(rest);
-        final hyphenRegex = RegExp(r'^([^\s\-]+)\-([^\s\-]+(?:\-[^\s\-]+){2,4})(?:\s+(.*))?$');
         final profileMatchHyphen = hyphenRegex.firstMatch(rest);
 
         if (profileMatchSlash != null) {
@@ -83,49 +83,72 @@ class TopTenEntry {
         final attr = index < attrs.length ? attrs[index] : 0;
         bool isBold = (attr & 1) != 0; // ATR_BOLD (1)
 
-        String deathDetailPart = '';
         String? hpInfo;
+        final deathParts = <String>[];
+        if (inlineDeathPart.isNotEmpty) {
+          deathParts.add(inlineDeathPart);
+        }
 
-        // 次の行（死因の続き行）があればチェック
-        if (index + 1 < lines.length) {
-          var nextLine = lines[index + 1];
-          final hpMatch = hpSuffixRegExp.firstMatch(nextLine);
-          bool consumedNextLine = false;
+        // 後続行（死因の続き行やHP行）をすべてスキャンして消費
+        while (index + 1 < lines.length) {
+          final peekLine = lines[index + 1];
+          final peekTrimmed = peekLine.trim();
+          final peekTrimmedLower = peekTrimmed.toLowerCase();
+          final isHeaderLine = peekTrimmed.contains('順位') ||
+              (peekTrimmedLower.contains('no') && peekTrimmedLower.contains('points'));
 
+          if (peekTrimmed.isEmpty || isHeaderLine) {
+            break;
+          }
+
+          final hpMatch = hpSuffixRegExp.firstMatch(peekLine);
+
+          // HP情報を含まない行で、かつ新しいスコアエントリ（プロフィールを含む）であれば終了
+          if (hpMatch == null) {
+            final nextEntryMatch = entryRegExp.firstMatch(peekLine);
+            if (nextEntryMatch != null) {
+              final nextRest = nextEntryMatch.group(3)!.trim();
+              if (profileRegex.hasMatch(nextRest) || hyphenRegex.hasMatch(nextRest)) {
+                break;
+              }
+            }
+          }
+
+          var nextLine = peekLine;
           if (hpMatch != null) {
             final hpVal = hpMatch.group(1);
             final maxHpVal = hpMatch.group(2);
             hpInfo = isJp ? 'HP/最大HP: $hpVal/$maxHpVal' : 'HP/Max HP: $hpVal/$maxHpVal';
             nextLine = nextLine.substring(0, hpMatch.start);
-            consumedNextLine = true;
           }
 
           final nextTrimmed = nextLine.trim();
-          final nextTrimmedLower = nextTrimmed.toLowerCase();
-          final isHeaderLine = nextTrimmed.contains('順位') ||
-              (nextTrimmedLower.contains('no') && nextTrimmedLower.contains('points'));
-
-          if (nextTrimmed.isNotEmpty && !entryRegExp.hasMatch(nextLine) && !isHeaderLine) {
-            deathDetailPart = nextTrimmed;
-            consumedNextLine = true;
+          if (nextTrimmed.isNotEmpty) {
+            deathParts.add(nextTrimmed);
           }
 
-          if (consumedNextLine) {
-            index++; // 2行目を消費
+          index++; // 継続行を消費
+
+          // HP情報を消費したら、そのエントリの後続行は完了
+          if (hpMatch != null) {
+            break;
           }
         }
 
-        // 食い込んだ死因テキストと2行目の続きを結合
+        // 分割された死因テキストを自然に結合
         String fullDeathText = '';
-        if (inlineDeathPart.isNotEmpty && deathDetailPart.isNotEmpty) {
-          final lastCode = inlineDeathPart.codeUnitAt(inlineDeathPart.length - 1);
-          final firstCode = deathDetailPart.codeUnitAt(0);
-          bool isAsciiBoth = (lastCode >= 0x20 && lastCode <= 0x7E) && (firstCode >= 0x20 && firstCode <= 0x7E);
-          fullDeathText = isAsciiBoth ? '$inlineDeathPart $deathDetailPart' : '$inlineDeathPart$deathDetailPart';
-        } else if (inlineDeathPart.isNotEmpty) {
-          fullDeathText = inlineDeathPart;
-        } else if (deathDetailPart.isNotEmpty) {
-          fullDeathText = deathDetailPart;
+        for (int i = 0; i < deathParts.length; i++) {
+          final part = deathParts[i];
+          if (fullDeathText.isEmpty) {
+            fullDeathText = part;
+          } else {
+            final lastCode = fullDeathText.codeUnitAt(fullDeathText.length - 1);
+            final firstCode = part.codeUnitAt(0);
+            // 英数字・半角記号同士ならスペース1つを挟み、日本語（全角）が含まれる場合はそのまま結合
+            final isAsciiBoth = (lastCode >= 0x20 && lastCode <= 0x7E) &&
+                (firstCode >= 0x20 && firstCode <= 0x7E);
+            fullDeathText = isAsciiBoth ? '$fullDeathText $part' : '$fullDeathText$part';
+          }
         }
 
         final details = <String>[];
@@ -1534,19 +1557,15 @@ List<TopTenEntry> parseRecordFile(String filePath, {bool isJp = true}) {
       }
 
       final details = <String>[];
-      if (isJp) {
-        if (deathStr.isNotEmpty) {
-          details.add('$deathStr ($locationStr)');
-        } else {
-          details.add('$locationStr [HP: ${e.hp}/${e.maxhp}]');
-        }
+      if (deathStr.isNotEmpty) {
+        details.add('$deathStr ($locationStr)');
       } else {
-        if (deathStr.isNotEmpty) {
-          details.add('$deathStr ($locationStr)');
-        } else {
-          details.add('$locationStr [HP: ${e.hp}/${e.maxhp}]');
-        }
+        details.add(locationStr);
       }
+
+      final hpValStr = e.hp <= 0 ? '-' : '${e.hp}';
+      final hpInfo = isJp ? 'HP/最大HP: $hpValStr/${e.maxhp}' : 'HP/Max HP: $hpValStr/${e.maxhp}';
+      details.add(hpInfo);
 
       entries.add(TopTenEntry(
         rank: rank,
