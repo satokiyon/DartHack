@@ -1054,6 +1054,17 @@ jp_translate_killer_text_for_display(
             Snprintf(outmain, sizeof outmain, "精神波の爆発に倒された");
         } else if (!strcmpi(killer, "exhaustion")) {
             Snprintf(outmain, sizeof outmain, "過労で倒された");
+        } else if (!strcmpi(killer, "overexertion")) {
+            Snprintf(outmain, sizeof outmain, "精根尽き果てて倒された");
+        } else if (!strcmpi(killer, "a bad experience sitting on a throne")
+                   || !strcmpi(killer, "bad experience sitting on a throne")) {
+            Snprintf(outmain, sizeof outmain, "玉座に座った悪影響で倒された");
+        } else if (!strcmpi(killer, "sitting on lava") || !strcmpi(killer, "sitting in lava")) {
+            Snprintf(outmain, sizeof outmain, "溶岩に座ったことで倒された");
+        } else if (!strcmpi(killer, "mildly contaminated potion")) {
+            Snprintf(outmain, sizeof outmain, "少し古くなった薬で倒された");
+        } else if (!strcmpi(killer, "contusion from a small passage")) {
+            Snprintf(outmain, sizeof outmain, "狭い通路で頭を打ったことで倒された");
         } else if (!strcmpi(killer, "cloud of poison gas")) {
             Snprintf(outmain, sizeof outmain, "毒ガスの雲に倒された");
         } else if (!strcmpi(killer, "jumping out of a bear trap")) {
@@ -1491,6 +1502,17 @@ jp_translate_killer_text_for_display(
         Snprintf(outmain, sizeof outmain, "錬金術の爆発");
     } else if (!strcmpi(core, "exhaustion")) {
         Snprintf(outmain, sizeof outmain, "過労死");
+    } else if (!strcmpi(core, "overexertion")) {
+        Snprintf(outmain, sizeof outmain, "力尽きたこと");
+    } else if (!strcmpi(core, "life drainage")) {
+        Snprintf(outmain, sizeof outmain, "生命力吸収");
+    } else if (!strcmpi(core, "a bad experience sitting on a throne")
+               || !strcmpi(core, "bad experience sitting on a throne")) {
+        Snprintf(outmain, sizeof outmain, "玉座に座った悪影響");
+    } else if (!strcmpi(core, "mildly contaminated potion")) {
+        Snprintf(outmain, sizeof outmain, "少し古くなった薬");
+    } else if (!strcmpi(core, "contusion from a small passage")) {
+        Snprintf(outmain, sizeof outmain, "狭い通路で頭を打ったこと");
     } else if (!strcmpi(core, "starvation")) {
         Snprintf(outmain, sizeof outmain, "餓死");
     } else if (!strcmpi(core, "brainlessness")) {
@@ -1511,7 +1533,7 @@ jp_translate_killer_text_for_display(
         Snprintf(outmain, sizeof outmain, "グラップリングフック");
     } else if (!strcmpi(core, "jumping out of a bear trap")) {
         Snprintf(outmain, sizeof outmain, "熊罠からの脱出失敗");
-    } else if (!strcmpi(core, "sitting in lava")) {
+    } else if (!strcmpi(core, "sitting in lava") || !strcmpi(core, "sitting on lava")) {
         Snprintf(outmain, sizeof outmain, "溶岩に座ったこと");
     } else if (!strcmpi(core, "cursed throne")) {
         Snprintf(outmain, sizeof outmain, "呪われた玉座");

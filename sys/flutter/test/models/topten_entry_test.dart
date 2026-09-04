@@ -302,5 +302,62 @@ void main() {
 
       tempDir.deleteSync(recursive: true);
     });
+
+    test('レベルドレインおよび類似の未翻訳死因（overexertion, life drainage, throne, lava等）の日本語化テスト', () {
+      final inputLines = [
+        '順位      点数  名前                                                   HP[最大]',
+        '  1      1000  Player 魔法使い/人間/男性/中立 killed by overexertion (運命の大迷宮 1階).',
+        '                                                                       -  [10]',
+        '  2       900  Player 騎士/人間/男性/秩序 killed by life drainage (運命の大迷宮 5階).',
+        '                                                                       -  [20]',
+        '  3       800  Player 侍/人間/男性/秩序 killed by a bad experience sitting on a throne (運命の大迷宮 3階).',
+        '                                                                       -  [15]',
+        '  4       700  Player 洞窟人/人間/男性/中立 killed by sitting on lava (運命の大迷宮 8階).',
+        '                                                                       -  [12]',
+        '  5       600  Player 僧侶/人間/男性/秩序 killed by sitting in lava (運命の大迷宮 8階).',
+        '                                                                       -  [12]',
+        '  6       500  Player 治療師/人間/男性/中立 killed by a mildly contaminated potion (運命の大迷宮 2階).',
+        '                                                                       -  [10]',
+        '  7       400  Player 野蛮人/人間/男性/中立 killed by a contusion from a small passage (運命の大迷宮 4階).',
+        '                                                                       -  [30]',
+      ];
+      final attrs = List.filled(inputLines.length, 0);
+
+      final entries = TopTenEntry.parse(inputLines, attrs);
+
+      expect(entries.length, 7);
+      expect(entries[0].details[0], contains('精根尽き果てて倒された'));
+      expect(entries[1].details[0], contains('生命力吸収で倒された'));
+      expect(entries[2].details[0], contains('玉座に座った悪影響で倒された'));
+      expect(entries[3].details[0], contains('溶岩に座ったことで倒された'));
+      expect(entries[4].details[0], contains('溶岩に座ったことで倒された'));
+      expect(entries[5].details[0], contains('少し古くなった薬で倒された'));
+      expect(entries[6].details[0], contains('狭い通路で頭を打ったことで倒された'));
+    });
+
+    test('recordファイルにおける単体死因キー（overexertion, life drainage等）の日本語化テスト', () {
+      final tempDir = Directory.systemTemp.createTempSync('record_causes_test_');
+      final recordFile = File('${tempDir.path}/record');
+      final lines = [
+        '5.0.0 1000 0 1 1 0 10 1 20260905 20260905 1000 Wiz Hum Mal Neu p1, overexertion',
+        '5.0.0 900 0 5 5 0 20 1 20260905 20260905 1000 Kni Hum Mal Law p2, life drainage',
+        '5.0.0 800 0 3 3 0 15 1 20260905 20260905 1000 Sam Hum Mal Law p3, a bad experience sitting on a throne',
+        '5.0.0 700 0 8 8 0 12 1 20260905 20260905 1000 Cav Hum Mal Neu p4, sitting on lava',
+        '5.0.0 600 0 2 2 0 10 1 20260905 20260905 1000 Hea Hum Mal Neu p5, mildly contaminated potion',
+        '5.0.0 500 0 4 4 0 30 1 20260905 20260905 1000 Bar Hum Mal Neu p6, contusion from a small passage',
+      ];
+      recordFile.writeAsStringSync('${lines.join('\n')}\n');
+
+      final entries = parseRecordFile(recordFile.path, isJp: true);
+      expect(entries.length, 6);
+      expect(entries[0].details[0], contains('力尽きたこと'));
+      expect(entries[1].details[0], contains('生命力吸収'));
+      expect(entries[2].details[0], contains('玉座に座った悪影響'));
+      expect(entries[3].details[0], contains('溶岩に座ったこと'));
+      expect(entries[4].details[0], contains('少し古くなった薬'));
+      expect(entries[5].details[0], contains('狭い通路で頭を打ったこと'));
+
+      tempDir.deleteSync(recursive: true);
+    });
   });
 }

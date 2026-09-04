@@ -1148,6 +1148,10 @@ String _translateMonsterOrItemName(String raw) {
     'Croesus': 'クロイソス',
     'alchemic blast': '錬金術の爆発',
     'system shock': 'システムショック',
+    'overexertion': '力尽きたこと',
+    'life drainage': '生命力吸収',
+    'mildly contaminated potion': '少し古くなった薬',
+    'contusion from a small passage': '狭い通路で頭を打ったこと',
     'residual undead turning effect': 'アンデッド退散の残留効果',
     'imperious order': '傲慢な命令',
     'resistance timing out': '耐性の時間切れ',
@@ -1317,6 +1321,13 @@ String _translateDeathTextInternal(String death, bool isJp) {
     'system shock': 'システムショック',
     'alchemic blast': '錬金術の爆発',
     'exhaustion': '過労死',
+    'overexertion': '力尽きたこと',
+    'life drainage': '生命力吸収',
+    'a bad experience sitting on a throne': '玉座に座った悪影響',
+    'bad experience sitting on a throne': '玉座に座った悪影響',
+    'sitting on lava': '溶岩に座ったこと',
+    'mildly contaminated potion': '少し古くなった薬',
+    'contusion from a small passage': '狭い通路で頭を打ったこと',
     'brainlessness': '脳を失ったこと',
     'psychic blast': '精神波の爆発',
     'gas cloud': '毒ガスの雲',
@@ -1358,15 +1369,35 @@ String _translateDeathTextInternal(String death, bool isJp) {
   if (death.startsWith('ascended')) return '昇天した';
 
   if (death.startsWith('killed by a ')) {
-    final tr = _translateMonsterOrItemName(death.substring(12));
+    final raw = death.substring(12);
+    if (raw == 'bad experience sitting on a throne') return '玉座に座った悪影響で倒された';
+    if (raw == 'mildly contaminated potion') return '少し古くなった薬で倒された';
+    if (raw == 'contusion from a small passage') return '狭い通路で頭を打ったことで倒された';
+    final tr = _translateMonsterOrItemName(raw);
     return tr.endsWith('倒された') || tr.endsWith('石化した') || tr.endsWith('死んだ') ? tr : '$trに倒された';
   }
   if (death.startsWith('killed by an ')) {
-    final tr = _translateMonsterOrItemName(death.substring(13));
+    final raw = death.substring(13);
+    final tr = _translateMonsterOrItemName(raw);
     return tr.endsWith('倒された') || tr.endsWith('石化した') || tr.endsWith('死んだ') ? tr : '$trに倒された';
   }
   if (death.startsWith('killed by ')) {
-    final tr = _translateMonsterOrItemName(death.substring(10));
+    final raw = death.substring(10);
+    if (raw == 'overexertion') return '精根尽き果てて倒された';
+    if (raw == 'life drainage') return '生命力吸収で倒された';
+    if (raw == 'a bad experience sitting on a throne' || raw == 'bad experience sitting on a throne') {
+      return '玉座に座った悪影響で倒された';
+    }
+    if (raw == 'sitting on lava' || raw == 'sitting in lava') {
+      return '溶岩に座ったことで倒された';
+    }
+    if (raw == 'mildly contaminated potion' || raw == 'a mildly contaminated potion') {
+      return '少し古くなった薬で倒された';
+    }
+    if (raw == 'contusion from a small passage' || raw == 'a contusion from a small passage') {
+      return '狭い通路で頭を打ったことで倒された';
+    }
+    final tr = _translateMonsterOrItemName(raw);
     return tr.endsWith('倒された') || tr.endsWith('石化した') || tr.endsWith('死んだ') ? tr : '$trに倒された';
   }
   if (death.startsWith('petrified by ')) {
