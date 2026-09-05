@@ -884,8 +884,10 @@ jp_translate_killer_name_or_monster(const char *in, char *out, unsigned outsz)
         }
     }
 
-    /* 死体・卵・石像などの名詞句 */
-    if (strstr(tmp, " corpse") || strstr(tmp, " egg") || !strncmpi(tmp, "statue of ", 10) || !strncmpi(tmp, "body of ", 8)) {
+    /* 死体・卵・石像・塊などの名詞句 */
+    if (strstr(tmp, " corpse") || strstr(tmp, " egg") || !strncmpi(tmp, "statue of ", 10)
+        || !strncmpi(tmp, "body of ", 8) || !strcmpi(tmp, "cadaver") || strstr(tmp, "glob")
+        || strstr(tmp, "royal jelly")) {
         jp_translate_food_or_corpse(out, outsz, tmp);
         if (*out)
             return out;
@@ -1447,6 +1449,8 @@ jp_translate_killer_text_for_display(
             char fbuf[BUFSZ];
             jp_translate_food_or_corpse(fbuf, sizeof fbuf, what + 10);
             Snprintf(outmain, sizeof outmain, "%sを閉じ込めて石化した", fbuf);
+        } else if (!strcmpi(what, "deliberately meeting Medusa's gaze")) {
+            Snprintf(outmain, sizeof outmain, "意図的にメドゥーサの視線と目を合わせたことで石化した");
         } else {
             char fbuf[BUFSZ];
             jp_translate_food_or_corpse(fbuf, sizeof fbuf, what);
@@ -1473,23 +1477,28 @@ jp_translate_killer_text_for_display(
             memcpy(rbuf, core + 23, rlen);
             rbuf[rlen] = '\0';
             const char *rname = skip_english_article(rbuf);
-            int mndx, gend;
-            mndx = name_to_mon(rname, &gend);
-            if (mndx >= LOW_PM && mndx < NUMMONS) {
-                Snprintf(outmain, sizeof outmain, "不健康な%sの姿に戻って倒れた",
-                         jp_pmname_from_idx(mndx, 0));
+            const char *racename = NULL;
+            int i;
+            for (i = 0; races[i].noun; ++i) {
+                if (!strcmpi(rname, races[i].noun)) {
+                    racename = jp_pmname_from_idx(races[i].mnum, NEUTRAL);
+                    break;
+                }
+            }
+            if (!racename) {
+                int mndx, gend;
+                mndx = name_to_mon(rname, &gend);
+                if (mndx >= LOW_PM && mndx < NUMMONS)
+                    racename = jp_pmname_from_idx(mndx, 0);
+            }
+            if (racename) {
+                Snprintf(outmain, sizeof outmain, "不健康な%sの姿に戻って倒れた", racename);
             } else {
-                Snprintf(outmain, sizeof outmain, "不健康な姿に戻って倒れた");
+                Snprintf(outmain, sizeof outmain, "不健康な%sの姿に戻って倒れた", rname);
             }
         } else {
             Snprintf(outmain, sizeof outmain, "不健康な姿に戻って倒れた");
         }
-    } else if (!strcmpi(core, "reverting to unhealthy human form")
-               || !strcmpi(core, "reverting to unhealthy elf form")
-               || !strcmpi(core, "reverting to unhealthy dwarf form")
-               || !strcmpi(core, "reverting to unhealthy gnome form")
-               || !strcmpi(core, "reverting to unhealthy orc form")) {
-        Snprintf(outmain, sizeof outmain, "不健康な姿に戻って倒れた");
     } else if (!strcmpi(core, "killed while stuck in creature form")) {
         Snprintf(outmain, sizeof outmain, "怪物の姿から戻れずに倒れた");
     } else if (!strcmpi(core, "unsuccessful polymorph")) {
@@ -1635,6 +1644,8 @@ jp_translate_killer_text_for_display(
         Snprintf(outmain, sizeof outmain, "窒息");
     } else if (!strcmpi(core, "quit while already on Charon's boat")) {
         Snprintf(outmain, sizeof outmain, "カロンの舟の上で人生を諦めた");
+    } else if (!strncmpi(core, "teleported out of the dungeon and fell to ", 42)) {
+        Snprintf(outmain, sizeof outmain, "ダンジョン外へテレポートして落下死した");
     } else if (!strncmp(core, "unwisely ate the body of ", 25)) {
         const char *mname = skip_english_article(core + 25);
         int mndx, gend;

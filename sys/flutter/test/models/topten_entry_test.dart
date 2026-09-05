@@ -359,5 +359,39 @@ void main() {
 
       tempDir.deleteSync(recursive: true);
     });
+
+    test('実在死因（teleported out, Medusa gaze, scroll of genocide, acidic corpse, cadaver, unhealthy form）の日本語化テスト', () {
+      final inputLines = [
+        '  1      1000  Player 魔法使い/人間/男性/中立 teleported out of the dungeon and fell to his death (運命の大迷宮 1階).',
+        '                                                                       -  [10]',
+        '  2       950  Player 魔法使い/人間/女性/混沌 teleported out of the dungeon and fell to her death (運命の大迷宮 1階).',
+        '                                                                       -  [10]',
+        '  3       900  Player 騎士/人間/男性/秩序 petrified by deliberately meeting Medusa\'s gaze (運命の大迷宮 15階).',
+        '                                                                       -  [20]',
+        '  4       800  Player 侍/人間/男性/秩序 killed by a scroll of genocide (運命の大迷宮 5階).',
+        '                                                                       -  [15]',
+        '  5       700  Player 洞窟人/人間/男性/中立 killed by an acidic corpse (運命の大迷宮 3階).',
+        '                                                                       -  [12]',
+        '  6       600  Player 僧侶/人間/男性/中立 killed by a cadaver (運命の大迷宮 2階).',
+        '                                                                       -  [10]',
+        '  7       500  Player 盗賊/人間/男性/中立 reverting to unhealthy human form (運命の大迷宮 2階).',
+        '                                                                       -  [10]',
+        '  8       400  Player 旅人/エルフ/女性/混沌 reverting to unhealthy elf form (運命の大迷宮 2階).',
+        '                                                                       -  [10]',
+      ];
+      final attrs = List.filled(inputLines.length, 0);
+
+      final entries = TopTenEntry.parse(inputLines, attrs);
+
+      expect(entries.length, 8);
+      expect(entries[0].details[0], contains('ダンジョン外へテレポートして落下死した'));
+      expect(entries[1].details[0], contains('ダンジョン外へテレポートして落下死した'));
+      expect(entries[2].details[0], contains('意図的にメドゥーサの視線と目を合わせたことで石化した'));
+      expect(entries[3].details[0], contains('虐殺の巻物に倒された'));
+      expect(entries[4].details[0], contains('酸性の死体に倒された'));
+      expect(entries[5].details[0], contains('腐った死体に倒された'));
+      expect(entries[6].details[0], contains('不健康な人間の姿に戻って倒れた'));
+      expect(entries[7].details[0], contains('不健康なエルフの姿に戻って倒れた'));
+    });
   });
 }

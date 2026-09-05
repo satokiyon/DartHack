@@ -1134,9 +1134,15 @@ String _translateMonsterOrItemName(String raw) {
     'wand': '杖',
     'ring': '指輪',
     'scroll': '巻物',
+    'scroll of genocide': '虐殺の巻物',
     'potion': '薬',
     'spellbook': '魔法書',
-    'amulet': 'アミュレット',
+    'acidic corpse': '酸性の死体',
+    'acidic glob': '酸性の塊',
+    'cadaver': '腐った死体',
+    'rotted glob': '腐った塊',
+    'rotten lump of royal jelly': '腐ったローヤルゼリーの塊',
+    'deliberately meeting Medusa\'s gaze': '意図的にメドゥーサの視線と目を合わせたこと',
     'Amulet of Yendor': 'イェンダーのアミュレット',
     'Amulet': 'アミュレット',
 
@@ -1357,10 +1363,28 @@ String _translateDeathTextInternal(String death, bool isJp) {
     'resistance timing out': '石化耐性が切れたこと',
     'killed while stuck in creature form': 'へんげした姿のまま死亡したこと',
     'scroll of genocide': '虐殺の巻物',
+    'deliberately meeting Medusa\'s gaze': '意図的にメドゥーサの視線と目を合わせたこと',
   };
 
   if (exactMap.containsKey(death)) {
     return exactMap[death]!;
+  }
+
+  if (death.startsWith('teleported out of the dungeon and fell to ')) {
+    return 'ダンジョン外へテレポートして落下死した';
+  }
+
+  if (death.startsWith('reverting to unhealthy ') && death.endsWith(' form')) {
+    final raw = death.substring(23, death.length - 5);
+    const raceMap = {
+      'human': '人間',
+      'elf': 'エルフ',
+      'dwarf': 'ドワーフ',
+      'gnome': 'ノーム',
+      'orc': 'オーク',
+    };
+    final tr = raceMap[raw.toLowerCase()] ?? _translateMonsterOrItemName(raw);
+    return '不健康な$trの姿に戻って倒れた';
   }
 
   if (death == 'escaped' || death.startsWith('escaped ')) {
@@ -1370,6 +1394,7 @@ String _translateDeathTextInternal(String death, bool isJp) {
 
   if (death.startsWith('killed by a ')) {
     final raw = death.substring(12);
+    if (raw == 'scroll of genocide') return '虐殺の巻物に倒された';
     if (raw == 'bad experience sitting on a throne') return '玉座に座った悪影響で倒された';
     if (raw == 'mildly contaminated potion') return '少し古くなった薬で倒された';
     if (raw == 'contusion from a small passage') return '狭い通路で頭を打ったことで倒された';
@@ -1401,7 +1426,11 @@ String _translateDeathTextInternal(String death, bool isJp) {
     return tr.endsWith('倒された') || tr.endsWith('石化した') || tr.endsWith('死んだ') ? tr : '$trに倒された';
   }
   if (death.startsWith('petrified by ')) {
-    final tr = _translateMonsterOrItemName(death.substring(13));
+    final raw = death.substring(13);
+    if (raw == "deliberately meeting Medusa's gaze") {
+      return '意図的にメドゥーサの視線と目を合わせたことで石化した';
+    }
+    final tr = _translateMonsterOrItemName(raw);
     return tr.endsWith('石化した') ? tr : '$trによる石化';
   }
   if (death.startsWith('turned to slime by ')) {
