@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-30. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-06. */
 /* NetHack 5.0	do_name.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.339 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -746,7 +746,7 @@ namefloorobj(void)
        resulting in the "can't be assigned a type name" message */
     Strcpy(buf, (obj->otyp != STRANGE_OBJECT)
                  ? simpleonames(obj)
-                 : obj_descr[STRANGE_OBJECT].oc_name);
+                 : jp_item_name(STRANGE_OBJECT));
     use_plural = (obj->quan > 1L);
     if (Hallucination) {
         const char *unames[6];

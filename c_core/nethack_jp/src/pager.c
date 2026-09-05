@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-06. */
 /* NetHack 5.0	pager.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.302 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -574,7 +574,7 @@ mhidden_description(
             fakeobj = object_from_map(glyph, x, y, &otmp);
             what = (otmp && otmp->otyp != STRANGE_OBJECT)
                    ? simpleonames(otmp)
-                   : obj_descr[STRANGE_OBJECT].oc_name;
+                   : jp_item_name(STRANGE_OBJECT);
             if (incl_article && (!otmp || otmp->quan == 1L))
                 what = an(what);
             Strcat(outbuf, what);
@@ -745,7 +745,7 @@ look_at_object(
         Strcpy(buf, (otmp->otyp != STRANGE_OBJECT)
                      ? distant_name(otmp, otmp->dknown ? doname_with_price
                                                        : doname_vague_quan)
-                     : obj_descr[STRANGE_OBJECT].oc_name);
+                     : jp_item_name(STRANGE_OBJECT));
         if (fakeobj) {
             otmp->where = OBJ_FREE; /* object_from_map set it to OBJ_FLOOR */
             dealloc_obj(otmp), otmp = NULL; /* has no contents */

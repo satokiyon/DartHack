@@ -1024,6 +1024,8 @@ jp_translate_killer_text_for_display(
             Snprintf(outmain, sizeof outmain, "魔法の杖に倒された");
         } else if (!strcmpi(killer, "scroll of fire")) {
             Snprintf(outmain, sizeof outmain, "火炎の巻物に倒された");
+        } else if (!strcmpi(killer, "scroll of genocide")) {
+            Snprintf(outmain, sizeof outmain, "虐殺の巻物に倒された");
         } else if (!strcmpi(killer, "potion of acid")) {
             Snprintf(outmain, sizeof outmain, "酸の薬に倒された");
         } else if (!strcmpi(killer, "potion of holy water")) {
