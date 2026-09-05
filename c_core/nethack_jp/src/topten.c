@@ -547,6 +547,24 @@ jp_translate_killer_name_or_monster(const char *in, char *out, unsigned outsz)
         Snprintf(out, outsz, "幻覚でゆがんだ%s", nbuf);
         return out;
     }
+    if (!strncmpi(tmp, "hallucinogen-distorted ", 23)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 23, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "幻覚でゆがんだ%s", nbuf);
+        return out;
+    }
+    if (!strncmpi(tmp, "hallucinatory ", 14)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 14, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "幻覚でゆがんだ%s", nbuf);
+        return out;
+    }
+    if (!strncmpi(tmp, "invisible ", 10)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 10, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "不可視の%s", nbuf);
+        return out;
+    }
 
     /* 店主パターン (e.g., "Mr. Shigatse, the shopkeeper", "Mr. Shigatse; the shopkeeper") */
     if (strstr(tmp, ", the shopkeeper") || strstr(tmp, "; the shopkeeper")) {
@@ -814,10 +832,16 @@ jp_translate_killer_name_or_monster(const char *in, char *out, unsigned outsz)
         }
     }
 
+    if (!strncmpi(tmp, "hallucinogen-distorted ", 23)) {
+        char nbuf[BUFSZ];
+        jp_translate_killer_name_or_monster(tmp + 23, nbuf, sizeof nbuf);
+        Snprintf(out, outsz, "幻覚でゆがんだ%s", nbuf);
+        return out;
+    }
     if (!strncmpi(tmp, "hallucinatory ", 14)) {
         char nbuf[BUFSZ];
         jp_translate_killer_name_or_monster(tmp + 14, nbuf, sizeof nbuf);
-        Snprintf(out, outsz, "幻覚の%s", nbuf);
+        Snprintf(out, outsz, "幻覚でゆがんだ%s", nbuf);
         return out;
     }
     if (!strncmpi(tmp, "invisible ", 10)) {
@@ -913,7 +937,22 @@ jp_translate_killer_text_for_display(
         return;
 
     if (!g_language_is_jp) {
+        char *p;
         Snprintf(out, outsz, "%s", in ? in : "");
+        while ((p = strstr(out, "幻覚でゆがんだ")) != NULL) {
+            char temp[BUFSZ];
+            size_t prefix_len = p - out;
+            Snprintf(temp, sizeof temp, "%.*shallucinogen-distorted %s",
+                     (int) prefix_len, out, p + strlen("幻覚でゆがんだ"));
+            Snprintf(out, outsz, "%s", temp);
+        }
+        while ((p = strstr(out, "透明な")) != NULL) {
+            char temp[BUFSZ];
+            size_t prefix_len = p - out;
+            Snprintf(temp, sizeof temp, "%.*sinvisible %s",
+                     (int) prefix_len, out, p + strlen("透明な"));
+            Snprintf(out, outsz, "%s", temp);
+        }
         return;
     }
 

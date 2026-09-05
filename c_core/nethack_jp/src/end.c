@@ -239,9 +239,9 @@ done_in_by(struct monst *mtmp, int how)
     }
     (void) monhealthdescr(mtmp, TRUE, eos(buf));
     if (mtmp->minvis)
-        Strcat(buf, g_language_is_jp ? "透明な" : "invisible ");
+        Strcat(buf, "invisible ");
     if (distorted)
-        Strcat(buf, g_language_is_jp ? "幻覚でゆがんだ" : "hallucinatory ");
+        Strcat(buf, "hallucinogen-distorted ");
 
     if (imitator) {
         char shape[BUFSZ];

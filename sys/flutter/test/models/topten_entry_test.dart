@@ -393,5 +393,35 @@ void main() {
       expect(entries[6].details[0], contains('不健康な人間の姿に戻って倒れた'));
       expect(entries[7].details[0], contains('不健康なエルフの姿に戻って倒れた'));
     });
+
+    test('英語モードおよび日本語モードにおける幻覚（hallucinogen-distorted）・透明な（invisible）死因の相互言語変換テスト', () {
+      final englishInputLines = [
+        ' No  Points     Name',
+        '  1       582  Player Archeologist/Dwarf/Male/Lawful',
+        '                killed by 幻覚でゆがんだMr. Shigatse; the shopkeeper (The Gnomish Mines level 6). - [34]',
+        '  2       500  Player Archeologist/Dwarf/Male/Lawful',
+        '                killed by 透明なgiant ant (The Dungeons of Doom level 3). - [30]',
+      ];
+      final attrsEn = List.filled(englishInputLines.length, 0);
+      final entriesEn = TopTenEntry.parse(englishInputLines, attrsEn, isJp: false);
+
+      expect(entriesEn.length, 2);
+      expect(entriesEn[0].details[0], contains('Killed by hallucinogen-distorted Mr. Shigatse; the shopkeeper'));
+      expect(entriesEn[1].details[0], contains('Killed by invisible giant ant'));
+
+      final japaneseInputLines = [
+        ' 順位  点数     名前',
+        '  1       582  Player 考古学者/ドワーフ/男性/秩序',
+        '                killed by hallucinogen-distorted Mr. Shigatse; the shopkeeper (ノームの鉱山 6階). - [34]',
+        '  2       500  Player 考古学者/ドワーフ/男性/秩序',
+        '                killed by hallucinatory Mr. Shigatse; the shopkeeper (ノームの鉱山 6階). - [34]',
+      ];
+      final attrsJp = List.filled(japaneseInputLines.length, 0);
+      final entriesJp = TopTenEntry.parse(japaneseInputLines, attrsJp, isJp: true);
+
+      expect(entriesJp.length, 2);
+      expect(entriesJp[0].details[0], contains('幻覚でゆがんだ店主のシガツェに倒された'));
+      expect(entriesJp[1].details[0], contains('幻覚でゆがんだ店主のシガツェに倒された'));
+    });
   });
 }

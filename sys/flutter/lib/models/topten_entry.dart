@@ -487,6 +487,18 @@ String _translateMonsterOrItemName(String raw) {
   if (s.startsWith('幻覚でゆがんだ')) {
     return '幻覚でゆがんだ${_translateMonsterOrItemName(s.substring(7))}';
   }
+  if (s.startsWith('hallucinogen-distorted ')) {
+    return '幻覚でゆがんだ${_translateMonsterOrItemName(s.substring(23))}';
+  }
+  if (s.startsWith('hallucinatory ')) {
+    return '幻覚でゆがんだ${_translateMonsterOrItemName(s.substring(14))}';
+  }
+  if (s.startsWith('透明な')) {
+    return '不可視の${_translateMonsterOrItemName(s.substring(3))}';
+  }
+  if (s.startsWith('invisible ')) {
+    return '不可視の${_translateMonsterOrItemName(s.substring(10))}';
+  }
 
   // 店主パターン (e.g., "Mr. Shigatse, the shopkeeper", "Mr. Shigatse; the shopkeeper")
   if (s.contains(', the shopkeeper') || s.contains('; the shopkeeper')) {
@@ -654,8 +666,11 @@ String _translateMonsterOrItemName(String raw) {
       return '${_translateMonsterOrItemName(base)}${isGhost ? 'の幽霊' : 'の影'}';
     }
   }
+  if (s.startsWith('hallucinogen-distorted ')) {
+    return '幻覚でゆがんだ${_translateMonsterOrItemName(s.substring(23))}';
+  }
   if (s.startsWith('hallucinatory ')) {
-    return '幻覚の${_translateMonsterOrItemName(s.substring(14))}';
+    return '幻覚でゆがんだ${_translateMonsterOrItemName(s.substring(14))}';
   }
   if (s.startsWith('invisible ')) {
     return '不可視の${_translateMonsterOrItemName(s.substring(10))}';
@@ -1237,7 +1252,13 @@ String _capitalizeFirst(String text) {
 String _translateDeathText(String death, bool isJp) {
   if (death.isEmpty) return death;
   if (!isJp) {
-    final d = death.trim();
+    var d = death.trim();
+    if (d.contains('幻覚でゆがんだ')) {
+      d = d.replaceAll('幻覚でゆがんだ', 'hallucinogen-distorted ');
+    }
+    if (d.contains('透明な')) {
+      d = d.replaceAll('透明な', 'invisible ');
+    }
     if (d.startsWith('escaped')) {
       return 'Escaped${d.substring(7)}';
     }
