@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/ext_cmd_entry.dart';
-import '../../utils/utf8_length_limiting_formatter.dart';
 
 class GetLineOverlay extends StatefulWidget {
   final String prompt;
@@ -63,6 +62,9 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
     final l10n = AppLocalizations.of(context)!;
     final isExtCmd = widget.extCmdList.isNotEmpty;
 
+    final isCallOrName = widget.isCallOrNamePrompt(widget.prompt);
+    final maxBytes = isCallOrName ? 62 : 100;
+
     return Positioned.fill(
       child: Container(
         color: Colors.black.withValues(alpha: 0.84),
@@ -104,7 +106,6 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                       controller: widget.inputController,
                       focusNode: _inputFocusNode,
                       autofocus: true,
-                      inputFormatters: [Utf8LengthLimitingTextInputFormatter(100)],
                       decoration: InputDecoration(
                         hintText: l10n.enterText,
                         filled: true,
@@ -116,15 +117,23 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                           valueListenable: widget.inputController,
                           builder: (context, value, child) {
                             final byteCount = utf8.encode(value.text).length;
+                            final isOverLimit = byteCount > maxBytes;
                             return Text(
-                              l10n.bytesCount(byteCount, 100),
-                              style: const TextStyle(color: Colors.grey, fontSize: 12),
+                              l10n.bytesCount(byteCount, maxBytes),
+                              style: TextStyle(
+                                color: isOverLimit ? Colors.redAccent : Colors.grey,
+                                fontWeight: isOverLimit ? FontWeight.bold : FontWeight.normal,
+                                fontSize: 12,
+                              ),
                             );
                           },
                         ),
                       ),
                       onSubmitted: (val) {
-                        widget.onSubmit(val);
+                        final byteCount = utf8.encode(val).length;
+                        if (byteCount <= maxBytes) {
+                          widget.onSubmit(val);
+                        }
                       },
                     ),
                     if (isExtCmd) ...[
@@ -219,10 +228,22 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                               child: Text(l10n.cancel),
                             ),
                             const SizedBox(width: 8),
-                            ElevatedButton(
-                              onPressed: () => widget.onSubmit(widget.inputController.text),
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.teal[500]),
-                              child: Text(l10n.confirm),
+                            ValueListenableBuilder<TextEditingValue>(
+                              valueListenable: widget.inputController,
+                              builder: (context, value, child) {
+                                final byteCount = utf8.encode(value.text).length;
+                                final isOverLimit = byteCount > maxBytes;
+                                return ElevatedButton(
+                                  onPressed: isOverLimit
+                                      ? null
+                                      : () => widget.onSubmit(widget.inputController.text),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.teal[500],
+                                    disabledBackgroundColor: Colors.teal[500]?.withValues(alpha: 0.3),
+                                  ),
+                                  child: Text(l10n.confirm),
+                                );
+                              },
                             ),
                           ],
                         ),

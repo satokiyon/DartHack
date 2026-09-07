@@ -145,10 +145,14 @@ bool isCallOrNamePrompt(String prompt) {
   return prompt.contains('何と呼びますか')
       || prompt.contains('何と名付けますか')
       || prompt.contains('名前を付け')
+      || prompt.contains('注釈')
+      || prompt.contains('何に変更しますか')
       || p.contains('call ')
       || p.contains('name ')
       || p.contains('call this')
       || p.contains('name this')
       || p.contains('what do you want to call')
-      || p.contains('what do you want to name');
+      || p.contains('what do you want to name')
+      || p.contains('annotation')
+      || p.contains('replace annotation');
 }

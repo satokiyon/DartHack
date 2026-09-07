@@ -2518,15 +2518,19 @@ query_annotation(d_level *lev)
     nbuf[0] = '\0';
 #ifdef EDIT_GETLIN
     if (mptr->custom) {
-        (void) strncpy(nbuf, mptr->custom, BUFSZ);
+        (void) copynchars(nbuf, mptr->custom, BUFSZ - 1);
         nbuf[BUFSZ - 1] = '\0';
+        utf8_truncate(nbuf, PL_PSIZ - 1);
     }
 #else
     if (mptr->custom) {
-        char tmpbuf[BUFSZ];
+        char tmpbuf[BUFSZ], custom_sub[32];
 
-        Sprintf(tmpbuf, "注釈「%.30s%s」を何に変更しますか?", mptr->custom,
-                (strlen(mptr->custom) > 30) ? "..." : "");
+        copynchars(custom_sub, mptr->custom, 30);
+        custom_sub[30] = '\0';
+        utf8_truncate(custom_sub, 30);
+        Sprintf(tmpbuf, "注釈「%s%s」を何に変更しますか?", custom_sub,
+                (strlen(mptr->custom) > strlen(custom_sub)) ? "..." : "");
         getlin(tmpbuf, nbuf);
     } else
 #endif
@@ -2560,6 +2564,7 @@ query_annotation(d_level *lev)
         return;
     /* strip leading and trailing spaces, compress out consecutive spaces */
     (void) mungspaces(nbuf);
+    utf8_truncate(nbuf, PL_PSIZ - 1);
 
     /* discard old annotation, if any */
     if (mptr->custom) {
