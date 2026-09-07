@@ -1094,4 +1094,36 @@ bad_utf8:
     return FALSE;
 }
 
+/* returns a safe byte index <= maxbytes, avoiding UTF-8 mid-sequence cuts */
+size_t
+utf8_truncation_point(const char *str, size_t maxbytes)
+{
+    size_t cut, lead;
+    int cp_len;
+
+    if (maxbytes == 0)
+        return 0;
+
+    cut = 0;
+    while (str[cut]) {
+        lead = cut;
+        cp_len = utf8_sequence_expected_len((uchar) str[lead]);
+        if (cp_len <= 0)
+            break; /* invalid UTF-8 lead byte */
+
+        if (cut + (size_t) cp_len > maxbytes)
+            return lead; /* would exceed limit, return previous boundary */
+
+        cut += (size_t) cp_len;
+    }
+    return cut; /* reached end of string within limit */
+}
+
+/* in-place truncate to at most maxbytes bytes, preserving UTF-8 boundaries */
+void
+utf8_truncate(char *str, size_t maxbytes)
+{
+    str[utf8_truncation_point(str, maxbytes)] = '\0';
+}
+
 /*hacklib.c*/

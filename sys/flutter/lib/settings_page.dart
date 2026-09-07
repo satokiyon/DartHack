@@ -1739,22 +1739,25 @@ class _SettingsPageState extends State<SettingsPage> {
           ListTile(
             title: Text(l10n.dognameSub),
             subtitle: Text(_optDogname.isEmpty ? l10n.defaultUnspecified : _optDogname),
-            onTap: () => _editStringOption(l10n.dognameSub, 'nh_opt_dogname', _optDogname, 16),
+            onTap: () => _editStringOption(l10n.dognameSub, 'nh_opt_dogname', _optDogname, 63),
           ),
           ListTile(
             title: Text(l10n.catnameSub),
             subtitle: Text(_optCatname.isEmpty ? l10n.defaultUnspecified : _optCatname),
-            onTap: () => _editStringOption(l10n.catnameSub, 'nh_opt_catname', _optCatname, 16),
+            onTap: () => _editStringOption(l10n.catnameSub, 'nh_opt_catname', _optCatname, 63),
           ),
           ListTile(
             title: Text(l10n.horsenameSub),
             subtitle: Text(_optHorsename.isEmpty ? l10n.defaultUnspecified : _optHorsename),
-            onTap: () => _editStringOption(l10n.horsenameSub, 'nh_opt_horsename', _optHorsename, 16),
+            onTap: () => _editStringOption(l10n.horsenameSub, 'nh_opt_horsename', _optHorsename, 63),
           ),
           ListTile(
             title: Text(l10n.fruitSub),
             subtitle: Text(_optFruit.isEmpty ? l10n.defaultSlimeMold : _optFruit),
-            onTap: () => _editStringOption(l10n.fruitSub, 'nh_opt_fruit', _optFruit, 16),
+            onTap: () {
+              final isJp = Localizations.localeOf(context).languageCode == 'ja';
+              _editStringOption(l10n.fruitSub, 'nh_opt_fruit', _optFruit, isJp ? 64 : 32);
+            },
           ),
         ]),
       ),

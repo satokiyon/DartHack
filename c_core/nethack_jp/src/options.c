@@ -7014,11 +7014,12 @@ nh_getenv(const char *ev)
 }
 
 /* copy up to maxlen-1 characters; 'dest' must be able to hold maxlen;
-   treat comma as alternate end of 'src' */
+   treat comma as alternate end of 'src'; preserve UTF-8 character boundaries */
 staticfn void
 nmcpy(char *dest, const char *src, int maxlen)
 {
     int count;
+    char *orig_dest = dest;
 
     for (count = 1; count < maxlen; count++) {
         if (*src == ',' || *src == '\0')
@@ -7026,6 +7027,8 @@ nmcpy(char *dest, const char *src, int maxlen)
         *dest++ = *src++;
     }
     *dest = '\0';
+    if (maxlen > 1)
+        utf8_truncate(orig_dest, (size_t) (maxlen - 1));
 }
 
 /*

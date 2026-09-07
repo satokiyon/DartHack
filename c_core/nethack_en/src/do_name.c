@@ -122,8 +122,7 @@ name_from_player(
 
     /* strip leading and trailing spaces, condense internal sequences */
     (void) mungspaces(outbuf);
-    if (strlen(outbuf) >= PL_PSIZ)
-        outbuf[PL_PSIZ - 1] = '\0';
+    utf8_truncate(outbuf, PL_PSIZ - 1);
     return outbuf;
 }
 
@@ -138,9 +137,10 @@ christen_monst(struct monst *mtmp, const char *name)
     /* dogname & catname are PL_PSIZ arrays; object names have same limit */
     lth = (name && *name) ? ((int) strlen(name) + 1) : 0;
     if (lth > PL_PSIZ) {
-        lth = PL_PSIZ;
         name = strncpy(buf, name, PL_PSIZ - 1);
         buf[PL_PSIZ - 1] = '\0';
+        utf8_truncate(buf, PL_PSIZ - 1);
+        lth = (int) strlen(name) + 1;
     }
     new_mgivenname(mtmp, lth); /* removes old name if one is present */
     if (lth)
@@ -381,9 +381,10 @@ oname(
 
     lth = *name ? (int) (strlen(name) + 1) : 0;
     if (lth > PL_PSIZ) {
-        lth = PL_PSIZ;
         name = strncpy(buf, name, PL_PSIZ - 1);
         buf[PL_PSIZ - 1] = '\0';
+        utf8_truncate(buf, PL_PSIZ - 1);
+        lth = (int) strlen(name) + 1;
     }
     /* If named artifact exists in the game, do not create another.
        Also trying to create an artifact shouldn't de-artifact

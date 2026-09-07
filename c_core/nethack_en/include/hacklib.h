@@ -78,6 +78,8 @@ extern void nh_snprintf_w_impossible(const char *func, int line, char *str,
 extern unsigned Strlen_(const char *, const char *, int) NONNULLPTRS;
 #endif
 extern int unicodeval_to_utf8str(int, uint8 *, size_t);
+extern size_t utf8_truncation_point(const char *, size_t) NONNULLARG1;
+extern void utf8_truncate(char *, size_t) NONNULLARG1;
 extern boolean utf8_decode_codepoint(const char *, unsigned *, int *) NONNULLPTRS;
 extern boolean copy_bytes(int, int);
 extern const char *datamodel(int);
