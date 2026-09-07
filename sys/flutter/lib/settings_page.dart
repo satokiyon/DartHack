@@ -1754,10 +1754,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ListTile(
             title: Text(l10n.fruitSub),
             subtitle: Text(_optFruit.isEmpty ? l10n.defaultSlimeMold : _optFruit),
-            onTap: () {
-              final isJp = Localizations.localeOf(context).languageCode == 'ja';
-              _editStringOption(l10n.fruitSub, 'nh_opt_fruit', _optFruit, isJp ? 64 : 32);
-            },
+            onTap: () => _editStringOption(l10n.fruitSub, 'nh_opt_fruit', _optFruit, 64),
           ),
         ]),
       ),

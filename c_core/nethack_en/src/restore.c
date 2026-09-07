@@ -481,7 +481,26 @@ loadfruitchn(NHFILE *nhfp)
     flist = 0;
     for (;;) {
         fnext = newfruit();
-        Sfi_fruit(nhfp, fnext, "fruit");
+        if (nhfp->fruit_struct_size > 0
+            && nhfp->fruit_struct_size < (int) sizeof(struct fruit)) {
+            /* 旧バージョン（PL_FSIZ=32）形式の struct fruit を読み込んで新形式へ変換 */
+            char oldbuf[64];
+            int rsize = nhfp->fruit_struct_size;
+
+            if (rsize > (int) sizeof(oldbuf))
+                rsize = (int) sizeof(oldbuf);
+            memset(oldbuf, 0, sizeof(oldbuf));
+            mread(nhfp->fd, (genericptr_t) oldbuf, rsize);
+            if (restoreinfo.mread_flags == -1)
+                nhfp->eof = TRUE;
+            /* 旧形式: fname[32], fid(int), nextf(pointer) */
+            (void) strncpy(fnext->fname, oldbuf, 32);
+            fnext->fname[31] = '\0';
+            memcpy((genericptr_t) &fnext->fid, (genericptr_t) (oldbuf + 32), sizeof(int));
+            fnext->nextf = (struct fruit *) 0;
+        } else {
+            Sfi_fruit(nhfp, fnext, "fruit");
+        }
         if (fnext->fid != 0) {
             fnext->nextf = flist;
             flist = fnext;
@@ -729,7 +748,17 @@ restgamestate(NHFILE *nhfp)
         else
             Strcpy(svp.pl_character, gu.urole.name.m);
     }
-    Sfi_char(nhfp, svp.pl_fruit, "gamestate-pl_fruit", sizeof svp.pl_fruit);
+    if (nhfp->fruit_name_size == 32) {
+        /* 旧バージョン（PL_FSIZ=32）で保存された pl_fruit の読み込み */
+        char old_fruit[32];
+
+        memset(svp.pl_fruit, 0, sizeof svp.pl_fruit);
+        Sfi_char(nhfp, old_fruit, "gamestate-pl_fruit", sizeof old_fruit);
+        (void) strncpy(svp.pl_fruit, old_fruit, sizeof(old_fruit) - 1);
+        svp.pl_fruit[sizeof(old_fruit) - 1] = '\0';
+    } else {
+        Sfi_char(nhfp, svp.pl_fruit, "gamestate-pl_fruit", sizeof svp.pl_fruit);
+    }
     freefruitchn(gf.ffruit); /* clean up fruit(s) made by initoptions() */
     gf.ffruit = loadfruitchn(nhfp);
 

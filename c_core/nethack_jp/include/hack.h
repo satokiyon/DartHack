@@ -1003,6 +1003,8 @@ struct nh_file {
     FILE *fpdebug;        /* file pointer debug info */
     struct fieldlevel_content style;
     struct nh_file *nhfpconvert;
+    int fruit_struct_size;
+    int fruit_name_size;
 };
 
 typedef struct nh_file NHFILE;

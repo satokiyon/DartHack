@@ -400,7 +400,7 @@ extern struct nomakedefs_s nomakedefs;
 
 #define PL_NSIZ 32 /* name of player, ghost, shopkeeper */
 #define PL_CSIZ 32 /* sizeof pl_character */
-#define PL_FSIZ 32 /* fruit name */
+#define PL_FSIZ 64 /* fruit name */
 #define PL_PSIZ 63 /* player-given names for pets, other monsters, objects */
 /* room for "name-role-race-gend-algn" plus 1 character playmode code */
 #define PL_NSIZ_PLUS (PL_NSIZ + 4 * (1 + 3) + 1) /* 49 */

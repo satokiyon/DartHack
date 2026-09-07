@@ -61,28 +61,18 @@ void main() {
       expect(countBytes('🐱' * 16) > maxBytes, isTrue); // 64バイト
     });
 
-    test('果物の名前: 日本語モード上限63バイト（PL_FSIZ=64）の判定', () {
-      const maxBytesJp = 63;
+    test('果物の名前: 日英両モード上限63バイト（PL_FSIZ=64）の判定', () {
+      const maxBytes = 63;
 
       // 63バイト以内 -> OK
-      expect(countBytes('A' * 63) <= maxBytesJp, isTrue);
-      expect(countBytes('あ' * 21) <= maxBytesJp, isTrue); // 63バイト
-      expect(countBytes('🍎' * 15) <= maxBytesJp, isTrue); // 60バイト
+      expect(countBytes('A' * 63) <= maxBytes, isTrue);
+      expect(countBytes('apple') <= maxBytes, isTrue);
+      expect(countBytes('あ' * 21) <= maxBytes, isTrue); // 63バイト
+      expect(countBytes('🍎' * 15) <= maxBytes, isTrue); // 60バイト
 
       // 超過 -> Overflow
-      expect(countBytes('A' * 64) > maxBytesJp, isTrue); // 64バイト
-      expect(countBytes('あ' * 22) > maxBytesJp, isTrue); // 66バイト
-    });
-
-    test('果物の名前: 英語モード上限31バイト（PL_FSIZ=32）の判定', () {
-      const maxBytesEn = 31;
-
-      // 31バイト以内 -> OK
-      expect(countBytes('apple') <= maxBytesEn, isTrue);
-      expect(countBytes('A' * 31) <= maxBytesEn, isTrue);
-
-      // 超過 -> Overflow
-      expect(countBytes('A' * 32) > maxBytesEn, isTrue);
+      expect(countBytes('A' * 64) > maxBytes, isTrue); // 64バイト
+      expect(countBytes('あ' * 22) > maxBytes, isTrue); // 66バイト
     });
   });
 }

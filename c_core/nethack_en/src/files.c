@@ -483,6 +483,8 @@ init_nhfile(NHFILE *nhfp)
     nhfp->style.deflt = FALSE;
     nhfp->style.binary = TRUE;
     nhfp->nhfpconvert = 0;
+    nhfp->fruit_struct_size = 0;
+    nhfp->fruit_name_size = 0;
 }
 
 #ifndef SFCTOOL
