@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-08. */
 /* NetHack 5.0	getline.c	$NHDT-Date: 1781973100 2026/06/20 16:31:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -141,18 +141,24 @@ static unsigned short
 getlin_utf8_char_chartype(const unsigned char *utf8str)
 {
     wchar_t wch[2] = { 0, 0 };
-    unsigned short chartype = 0;
+    unsigned short chartype[2] = { 0, 0 };
     int ulen = getlin_utf8_sequence_len(utf8str);
+    int wn;
 
     if (ulen <= 1)
         return 0;
-    if (MultiByteToWideChar(65001U, 0x00000008UL,
-                            (const char *) utf8str, ulen, wch, 1)
-        != 1)
+    /* NetHackJP: MultiByteToWideChar buffer expanded to 2 for surrogate pair support */
+    wn = MultiByteToWideChar(65001U, 0x00000008UL,
+                            (const char *) utf8str, ulen, wch, 2);
+    if (wn <= 0)
         return 0;
-    if (!GetStringTypeW(0x0004UL, wch, 1, &chartype))
+    if (!GetStringTypeW(0x0004UL, wch, wn, chartype))
         return 0;
-    return chartype;
+    if (wn == 2) {
+        /* NetHackJP: Surrogate pairs (emoji and SMP supplementary ideographs) treated as fullwidth */
+        return (chartype[0] | chartype[1] | NH_C3_FULLWIDTH);
+    }
+    return chartype[0];
 }
 
 static int
@@ -170,18 +176,23 @@ getlin_utf8_char_display_width(const unsigned char *utf8str)
     if (chartype & NH_C3_HALFWIDTH)
         return 1;
 
-    if (ulen > 1
-        && MultiByteToWideChar(65001U, 0x00000008UL,
-                               (const char *) utf8str, ulen, wch, 1) == 1) {
-        switch (wch[0]) {
-        case 0x3005: /* 々 */
-        case 0x300E: /* 『 */
-        case 0x300F: /* 』 */
-        case 0x3010: /* 【 */
-        case 0x3011: /* 】 */
-            return 2;
-        default:
-            break;
+    /* NetHackJP: MultiByteToWideChar buffer expanded to 2 for surrogate pair support */
+    if (ulen > 1) {
+        int wn = MultiByteToWideChar(65001U, 0x00000008UL,
+                                     (const char *) utf8str, ulen, wch, 2);
+        if (wn == 2)
+            return 2; /* サロゲートペア（絵文字・追加漢字等）は全角幅 */
+        if (wn == 1) {
+            switch (wch[0]) {
+            case 0x3005: /* 々 */
+            case 0x300E: /* 『 */
+            case 0x300F: /* 』 */
+            case 0x3010: /* 【 */
+            case 0x3011: /* 】 */
+                return 2;
+            default:
+                break;
+            }
         }
     }
     return 1;

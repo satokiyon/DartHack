@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-03. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-08. */
 /* NetHack 5.0	options.c	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.782 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
@@ -2619,6 +2619,7 @@ optfn_name(
                 return optn_ok;
 #endif
             nmcpy(svp.plname, op, PL_NSIZ);
+            iflags.plname_from_os = FALSE;
         } else
             return optn_err;
         return optn_ok;
@@ -8392,7 +8393,11 @@ fruitadd(char *str, struct fruit *replace_fruit)
                       : 0;
         for (i = svb.bases[FOOD_CLASS]; objects[i].oc_class == FOOD_CLASS;
              i++) {
+            /* NetHackJP: Also check Japanese food item names to detect collisions */
+            const char *jpn = jp_item_name(i);
+
             if (!strcmp(OBJ_NAME(objects[i]), svp.pl_fruit)
+                || (jpn && !strcmp(jpn, svp.pl_fruit))
                 || (globpfx > 0 && !strcmp(OBJ_NAME(objects[i]),
                                            &svp.pl_fruit[globpfx]))) {
                 found = TRUE;
@@ -8424,9 +8429,23 @@ fruitadd(char *str, struct fruit *replace_fruit)
             || ((str_end_is(svp.pl_fruit, " corpse")
                  || str_end_is(svp.pl_fruit, " egg"))
                 && ismnum(name_to_mon(svp.pl_fruit, (int *) 0)))) {
+            boolean is_mb = FALSE;
+            const char *p;
+            for (p = svp.pl_fruit; *p; p++) {
+                if ((uchar) *p >= 0x80) {
+                    is_mb = TRUE;
+                    break;
+                }
+            }
+            /* NetHackJP: Use natural Japanese prefix "砂糖漬けの" for multibyte fruit names */
+            const char *pfx = is_mb ? "砂糖漬けの" : "candied ";
+            int pfx_len = (int) strlen(pfx);
+
             Strcpy(buf, svp.pl_fruit);
-            Strcpy(svp.pl_fruit, "candied ");
-            nmcpy(svp.pl_fruit + 8, buf, PL_FSIZ - 8);
+            Strcpy(svp.pl_fruit, pfx);
+            /* NetHackJP: copy remaining text safely and truncate at UTF-8 boundary */
+            copynchars(svp.pl_fruit + pfx_len, buf, PL_FSIZ - pfx_len);
+            utf8_truncate(svp.pl_fruit, PL_FSIZ - 1);
         }
         *altname = '\0';
         /* This flag indicates that a fruit has been made since the

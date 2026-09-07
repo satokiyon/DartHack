@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-08. */
 /* NetHack 5.0	global.h	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -405,7 +405,8 @@ extern struct nomakedefs_s nomakedefs;
 
 #define PL_NSIZ 32 /* name of player, ghost, shopkeeper */
 #define PL_CSIZ 32 /* sizeof pl_character */
-#define PL_FSIZ 32 /* fruit name */
+/* NetHackJP: expand PL_FSIZ from 32 to 64 for Japanese fruit names with "砂糖漬けの" prefix */
+#define PL_FSIZ 64 /* fruit name */
 #define PL_PSIZ 63 /* player-given names for pets, other monsters, objects */
 /* room for "name-role-race-gend-algn" plus 1 character playmode code */
 #define PL_NSIZ_PLUS (PL_NSIZ + 4 * (1 + 3) + 1) /* 49 */

@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-05.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-06.
 #!/bin/sh
 # NetHackJP build script for WSL (Linux)
 # Usage: ./sys/unix/build_wsl.sh [hints_file]
@@ -38,7 +38,9 @@ if [ $HAS_CURSES -eq 0 ]; then
     echo "--------------------------------------------------------"
     echo "[!] Error: ncurses development library/headers (libncursesw5-dev) not found."
     echo "    To fix this issue, please run the following command in WSL:"
-    echo "    sudo apt update && sudo apt install -y build-essential libncursesw5-dev liblua5.4-dev pkg-config libx11-dev libxft-dev libxpm-dev libxaw7-dev libxt-dev fonts-noto-cjk"
+    echo "    sudo apt update && sudo apt install -y build-essential libncursesw5-dev liblua5.4-dev pkg-config \\"
+    echo "         libx11-dev libxft-dev libxpm-dev libxaw7-dev libxt-dev fonts-noto-cjk \\"
+    echo "         fcitx5 fcitx5-modules fcitx5-mozc"
     echo "--------------------------------------------------------"
     exit 1
 fi
@@ -84,8 +86,8 @@ echo "Run './playground/nethack -wX11' and check stderr for one of:"
 echo "  XIM: connected to input method (XPreeditNothing / XStatusNothing)"
 echo "      -> fcitx5 / ibus connected; Japanese input will work after Phase 2+"
 echo "  XIM: no input method registered (XMODIFIERS unset or @im=none)"
-echo "      -> check 'export XMODIFIERS=@im=fcitx5' (or @im=ibus)"
+echo "      -> check 'export XMODIFIERS=@im=fcitx' (or @im=ibus)"
 echo "  XIM: XOpenIM failed; falling back to XLookupString (ASCII only)"
 echo "      -> IM server is set in XMODIFIERS but not actually running"
-echo "      -> e.g. 'fcitx5 -d' or 'ibus-daemon -drx'"
+echo "      -> e.g. 'fcitx5 --disable=wayland,waylandim -d' or 'ibus-daemon -drx'"
 echo "=========================================="

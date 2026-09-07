@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-06. */
 /* NetHackJP: recreate stale ICs when the owning widget's X window is
  * re-created.  positionpopup() unrealizes/re-realizes the getlin popup
  * on every dialog open, so Window IDs change; an IC bound to the old
@@ -205,7 +205,7 @@ xim_init(void *dpy_arg)
                  curloc, mods ? mods : "(null)");
         X11_raw_print(lbuf);
         X11_raw_print("XIM:   -> falling back to XLookupString (ASCII only)");
-        X11_raw_print("XIM:   -> check 'pgrep -a fcitx5' and 'fcitx5-remote -e'");
+        X11_raw_print("XIM:   -> check 'pgrep -a fcitx5' and 'fcitx5-diagnose'");
         xim_active_flag = FALSE;
         return;
     }

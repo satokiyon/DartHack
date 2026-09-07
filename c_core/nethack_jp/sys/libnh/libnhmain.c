@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-06. */
 /* NetHack 5.0  libnhmain.c $NHDT-Date: 1693359589 2023/08/30 01:39:49 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -380,11 +380,13 @@ process_options(int argc, char *argv[])
             if (argv[0][2]) {
                 (void) strncpy(svp.plname, argv[0] + 2, sizeof svp.plname - 1);
                 gp.plnamelen = 0; /* plname[] might have -role-race attached */
+                iflags.plname_from_os = FALSE;
             } else if (argc > 1) {
                 argc--;
                 argv++;
                 (void) strncpy(svp.plname, argv[0], sizeof svp.plname - 1);
                 gp.plnamelen = 0;
+                iflags.plname_from_os = FALSE;
             } else {
                 raw_print("Player name expected after -u");
             }
@@ -542,6 +544,7 @@ whoami(void)
 
         if (s && *s) {
             (void) strncpy(svp.plname, s, sizeof svp.plname - 1);
+            iflags.plname_from_os = TRUE;
             if (strchr(svp.plname, '-'))
                 return TRUE;
         }

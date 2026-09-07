@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-02.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-06.
 NetHack JP README
 
 
@@ -51,6 +51,12 @@ NetHack JP README
 
    ※ X11 GUI版のタイルセットはファイル名が「x11tiles」固定となっており、タイルの画像サイズは自動判定されます。
    ※ GUI使用時に日本語や墓石の死因が文字化け（豆腐文字表示）する場合は、環境に日本語 CJK フォント（Noto Sans CJK JP 等）をインストールしてください（例: sudo apt install -y fonts-noto-cjk）。
+   ※ GUI版で主人公名や各種ダイアログ（#名前、#記念碑、#虐殺 等）の日本語入力を行う場合は、fcitx5 を使用します:
+      1. 必要パッケージの導入:
+         sudo apt update && sudo apt install -y fcitx5 fcitx5-modules fcitx5-mozc fonts-noto-cjk
+      2. fcitx5 の起動（WSL環境では以下のコマンドでバックグラウンド起動）:
+         fcitx5 --disable=wayland,waylandim -d
+      3. ダイアログ入力欄で「Ctrl+Space」を押すことで、Mozc による日本語入力モードに切り替わります。
 
 
 4. 必要であれば、ご自身の環境に合わせてNetHackの設定ファイルを編集してください。

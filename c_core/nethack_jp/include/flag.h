@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-03. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-06. */
 /* NetHack 5.0	flag.h	$NHDT-Date: 1781973080 2026/06/20 16:31:20 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.265 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -252,6 +252,7 @@ enum debug_fuzzer_states {
 struct instance_flags {
     boolean defer_plname;  /* X11 hack: askname() might not set svp.plname */
     boolean autosaved;     /* savefile was created by auto-save */
+    boolean plname_from_os; /* NetHackJP: svp.plname was populated from OS login name */
     boolean fuzzerpending; /* fuzzing requested on command line but not active
                             * yet (to allow interactive initialization prior
                             * to input becoming taken over);
