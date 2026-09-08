@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-08. */
 /* NetHack 5.0	apply.c	$NHDT-Date: 1781973040 2026/06/20 16:30:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.482 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2409,7 +2409,7 @@ fig_transform(anything *arg, long timeout)
         struct obj *mshelter = svl.level.objects[mtmp->mx][mtmp->my];
 
         /* [m_monnam() yields accurate mon type, overriding hallucination] */
-        Sprintf(monnambuf, "%s", an(m_monnam(mtmp)));
+        Sprintf(monnambuf, "%s", m_monnam(mtmp));
         and_vanish[0] = '\0';
         if ((mtmp->minvis && !See_invisible)
             || (mtmp->data->mlet == S_MIMIC
@@ -2451,10 +2451,10 @@ fig_transform(anything *arg, long timeout)
                 if (suppress_see)
                     pline("%sは突然消えた!", xname(figurine));
                 else if (*and_vanish)
-                    You_see("フィギュリンが%sに変身し%s!", monnambuf,
+                    You_see("人形が%sに変身し%s!", monnambuf,
                             and_vanish);
                 else
-                    You_see("フィギュリンが%sに変身した!", monnambuf);
+                    You_see("人形が%sに変身した!", monnambuf);
                 redraw = TRUE; /* update figurine's map location */
             }
             break;
@@ -2515,20 +2515,20 @@ figurine_location_checks(struct obj *obj, coord *cc, boolean quietly)
     y = cc ? cc->y : u.uy;
     if (!isok(x, y)) {
         if (!quietly)
-            You("そこにはフィギュリンを置けなかった.");
+            You("そこには人形を置けなかった.");
         return FALSE;
     }
     if (IS_OBSTRUCTED(levl[x][y].typ)
         && !(passes_walls(&mons[obj->corpsenm]) && may_passwall(x, y))) {
         if (!quietly)
-            You("%sにはフィギュリンを置けなかった!",
-                IS_TREE(levl[x][y].typ) ? "木" : "岩");
+            You("%sには人形を置けなかった!",
+                IS_TREE(levl[x][y].typ) ? "木" : "壁");
         return FALSE;
     }
     if (sobj_at(BOULDER, x, y) && !passes_walls(&mons[obj->corpsenm])
         && !throws_rocks(&mons[obj->corpsenm])) {
         if (!quietly)
-            You("巨大な岩の上にはフィギュリンを置けなかった.");
+            You("巨大な岩の上には人形を置けなかった.");
         return FALSE;
     }
     return TRUE;
@@ -2557,13 +2557,13 @@ use_figurine(struct obj **optr)
     /* Passing FALSE arg here will result in messages displayed */
     if (!figurine_location_checks(obj, &cc, FALSE))
         return ECMD_TIME;
-    You("%sと、それは%s変身した.",
-        (u.dx || u.dy) ? "フィギュリンをそばに置いた"
+    You("%s。すると、それは%s変身した.",
+        (u.dx || u.dy) ? "人形をそばに置いた"
                        : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
                           || is_pool(cc.x, cc.y))
-                             ? "フィギュリンを放した"
-                             : (u.dz < 0 ? "フィギュリンを空中へ放り投げた"
-                                         : "フィギュリンを地面に置いた"),
+                             ? "人形を放した"
+                             : (u.dz < 0 ? "人形を空中へ放り投げた"
+                                         : "人形を地面に置いた"),
         Blind ? "たぶん" : "");
     (void) make_familiar(obj, cc.x, cc.y, FALSE);
     (void) stop_timer(FIG_TRANSFORM, obj_to_any(obj));
@@ -3042,8 +3042,8 @@ use_whip(struct obj *obj)
                 return ECMD_TIME;
             }
             if (otmp && proficient) {
-                You("%sの%sにむちを巻きつけた.",
-                    an(singular(otmp, xname)), surface(u.ux, u.uy));
+                You("%sの上の%sにむちを巻きつけた.",
+                    surface(u.ux, u.uy), singular(otmp, xname));
                 if (rnl(6) || pickup_object(otmp, 1L, TRUE) < 1)
                     pline1(msg_slipsfree);
                 return ECMD_TIME;
@@ -3192,7 +3192,7 @@ use_whip(struct obj *obj)
                                      &otmp, (char *) 0);
                         if (hitu) {
                             pline_The("%sが、ひったくろうとしたあなたに当たった!",
-                                      the(onambuf));
+                                      onambuf);
                         }
                         place_object(otmp, u.ux, u.uy);
                         stackobj(otmp);
@@ -3232,8 +3232,8 @@ use_whip(struct obj *obj)
                     break;
                 default:
                     /* to floor beneath mon */
-                    You("%sを%sの%sから引きはがした!", the(onambuf),
-                        s_suffix(mon_nam(mtmp)), mon_hand);
+                    You("%sを%sの%sから引きはがした!", onambuf,
+                        mon_nam(mtmp), mon_hand);
                     obj_no_longer_held(otmp);
                     place_object(otmp, mtmp->mx, mtmp->my);
                     stackobj(otmp);

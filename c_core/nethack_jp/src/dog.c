@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-08. */
 /* NetHack 5.0	dog.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.197 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -160,8 +160,7 @@ make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
             if (!mtmp) {
                 /* monster has been genocided or target spot is occupied */
                 if (!quietly)
-                    pline_The(
-                           "figurine writhes and then shatters into pieces!");
+                    pline_The("人形は身もだえし、粉々に砕け散った!");
                 break;
             } else if (mtmp->isminion) {
                 /* Fixup for figurine of an Angel:  makemon() is willing to

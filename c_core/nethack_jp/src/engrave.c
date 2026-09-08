@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-30. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-08. */
 /* NetHack 5.0	engrave.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1349,16 +1349,75 @@ doengrave(void)
             livelog_printf(LL_CONDUCT, "文字\"%s\"を刻むことで、読み書きができるようになった",
                            de->ebuf);
 
+    /* NetHackJP: UTF-8 safe engraving mix-up */
     /* Mix up engraving if surface or state of mind is unsound.
        Note: this won't add or remove any spaces. */
-    for (sp = de->ebuf; *sp; sp++) {
-        if (*sp == ' ')
-            continue;
-        if (((de->type == DUST || de->type == ENGR_BLOOD) && !rn2(25))
-            || (Blind && !rn2(11)) || (Confusion && !rn2(7))
-            || (Stunned && !rn2(4)) || (Hallucination && !rn2(2)))
-            *sp = ' ' + rnd(96 - 2); /* ASCII '!' thru '~'
-                                        (excludes ' ' and DEL) */
+    {
+        char mixed_buf[BUFSZ];
+        char *dest = mixed_buf;
+        const char *src = de->ebuf;
+        size_t rem = sizeof(mixed_buf) - 1;
+
+        while (*src && rem > 0) {
+            int orig_clen = utf8_charlen(src);
+            if (orig_clen <= 0)
+                break;
+
+            boolean mix = FALSE;
+            if (*src != ' ' &&
+                (((de->type == DUST || de->type == ENGR_BLOOD) && !rn2(25))
+                 || (Blind && !rn2(11)) || (Confusion && !rn2(7))
+                 || (Stunned && !rn2(4)) || (Hallucination && !rn2(2)))) {
+                mix = TRUE;
+            }
+
+            if (mix) {
+                if (orig_clen == 1) {
+                    if (rem >= 1) {
+                        *dest++ = ' ' + rnd(96 - 2); /* ASCII '!' thru '~' */
+                        rem--;
+                    }
+                } else {
+                    /* Multibyte (Japanese): substitute with rubout candidate or full-width '？' */
+                    char rep[16];
+                    rep[0] = '\0';
+                    for (int i = 0; i < SIZE(jp_rubouts); i++) {
+                        if (strncmp(src, jp_rubouts[i].wipefrom, orig_clen) == 0 &&
+                            jp_rubouts[i].wipefrom[orig_clen] == '\0') {
+                            int num_cand = utf8_strlen_chars(jp_rubouts[i].wipeto);
+                            if (num_cand > 0) {
+                                int pick = rn2(num_cand);
+                                int cand_len;
+                                const char *cand_ptr = utf8_char_at(jp_rubouts[i].wipeto, pick, &cand_len);
+                                if (cand_ptr && cand_len > 0 && cand_len < (int) sizeof(rep)) {
+                                    memcpy(rep, cand_ptr, cand_len);
+                                    rep[cand_len] = '\0';
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    if (!rep[0])
+                        strcpy(rep, "？");
+
+                    size_t rep_len = strlen(rep);
+                    if (rem >= rep_len) {
+                        memcpy(dest, rep, rep_len);
+                        dest += rep_len;
+                        rem -= rep_len;
+                    }
+                }
+            } else {
+                if (rem >= (size_t) orig_clen) {
+                    memcpy(dest, src, orig_clen);
+                    dest += orig_clen;
+                    rem -= orig_clen;
+                }
+            }
+            src += orig_clen;
+        }
+        *dest = '\0';
+        Strcpy(de->ebuf, mixed_buf);
     }
 
     /* Previous engraving is overwritten */
