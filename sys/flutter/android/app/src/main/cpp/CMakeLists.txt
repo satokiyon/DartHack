@@ -230,5 +230,3 @@ configure_nethack_target(nethack_jp "${JPROOT}" "${JP_EXTRA_SOURCES}" TRUE)
 # 2. Target: nethack_en (libnethack_en.so - English Core Target)
 configure_nethack_target(nethack_en "${ENROOT}" "" FALSE)
 
-# 3. Target: nethack (libnethack.so - Default Fallback Alias Target)
-configure_nethack_target(nethack "${JPROOT}" "${JP_EXTRA_SOURCES}" TRUE)

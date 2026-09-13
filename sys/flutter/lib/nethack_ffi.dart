@@ -219,16 +219,13 @@ class NetHackFfi {
   late final SetAutosaveSettingsDart setAutosaveSettings;
   late final LookupKeyDescriptionDart lookupKeyDescription;
 
-  NetHackFfi([String langCode = 'ja']) {
+  NetHackFfi([String? langCode]) {
+    final effectiveLang = langCode ?? NetHackCoreLoader.currentLanguage;
     try {
-      _lib = NetHackCoreLoader.loadCore(langCode: langCode);
+      _lib = NetHackCoreLoader.loadCore(langCode: effectiveLang);
     } catch (_) {
-      // Fallback for single library or debug
-      try {
-        _lib = DynamicLibrary.open('libnethack.so');
-      } catch (e) {
-        _lib = DynamicLibrary.open('nethack_dummy.dll');
-      }
+      // Fallback for debug / desktop dummy
+      _lib = DynamicLibrary.open('nethack_dummy.dll');
     }
 
     try {

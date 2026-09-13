@@ -2169,9 +2169,18 @@ static void flutter_status_update(int idx, genericptr_t ptr, int chg, int percen
             flutter_cond_hilites = colormasks;
             sprintf(flutter_status_vals[idx], "%ld", cond);
             flutter_status_colors[idx] = color;
-        } else if (idx == BL_GOLD && text && *text == '\\') {
-            const char* fmt = status_fieldfmt[idx] ? status_fieldfmt[idx] : "$%s";
-            sprintf(flutter_status_vals[idx], fmt, text + 10);
+        } else if (idx == BL_GOLD && text) {
+            const char *val_only = strchr(text, ':') ? strchr(text, ':') + 1 : text;
+            const char* fmt = status_fieldfmt[idx] ? status_fieldfmt[idx] : (g_language_is_jp ? " 金貨:%s" : " %s");
+            if (strstr(fmt, "金貨")) {
+                // 日本語モード: status_fieldfmt[BL_GOLD] は " 金貨:%s"
+                // val_only ("7") を適用して " 金貨:7" とし、二重コロンを防止する
+                sprintf(flutter_status_vals[idx], fmt, val_only);
+            } else {
+                // 英語モード: status_fieldfmt[BL_GOLD] は " %s"
+                // NetHack本家標準の "$:<gold>" (例: " $:7") を構成する
+                sprintf(flutter_status_vals[idx], " $:%s", val_only);
+            }
             flutter_status_colors[idx] = color;
         } else {
             const char* fmt = status_fieldfmt[idx] ? status_fieldfmt[idx] : "%s";
@@ -2305,7 +2314,7 @@ const char* GetTopTenTextFlutter(void) {
     return g_topten_capture_buf;
 }
 
-void TriggerDatabaseSearchFlutter(void) {
+__attribute__((visibility("default"))) void TriggerDatabaseSearchFlutter(void) {
     extern void cmdq_add_key(int q, char key);
     cmdq_add_key(0 /* CQ_CANNED */, '?');
     int key = '/';

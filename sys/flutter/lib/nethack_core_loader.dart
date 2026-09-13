@@ -28,12 +28,7 @@ class NetHackCoreLoader {
 
     if (Platform.isAndroid) {
       final libraryName = isJp ? 'libnethack_jp.so' : 'libnethack_en.so';
-      try {
-        _loadedLibrary = DynamicLibrary.open(libraryName);
-      } catch (e) {
-        // Fallback for single library or legacy build
-        _loadedLibrary = DynamicLibrary.open('libnethack.so');
-      }
+      _loadedLibrary = DynamicLibrary.open(libraryName);
     } else if (Platform.isIOS) {
       final frameworkPath = isJp
           ? 'Frameworks/nethack_jp.framework/nethack_jp'

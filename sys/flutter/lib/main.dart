@@ -484,13 +484,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       onShowScoreboard: _showScoreboardDialog,
       onShowGuidebook: () => GuidebookDialog.show(context),
       onShowHelp: () => _sendFfiKey('?'.codeUnitAt(0), "?"),
-      onDatabaseSearch: () {
-        try {
-          NetHackFfi().triggerDatabaseSearch();
-        } catch (_) {
-          _sendFfiKeys(['/'.codeUnitAt(0), '?'.codeUnitAt(0)], "/?");
-        }
-      },
+      onDatabaseSearch: _triggerDatabaseSearch,
       onOpenOptions: () => _sendFfiKey('O'.codeUnitAt(0), "O"),
       onShowFullMap: _showFullMapDialog,
       onToggleKeyboard: () {
@@ -905,7 +899,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   void _loadExtCmds() {
     try {
-      final ffi = NetHackFfi();
+      final ffi = NetHackFfi(_selectedLanguage);
       final ptr = ffi.getExtCmdsFlutter();
       if (ptr != nullptr) {
         final extCmdsStr = _utf8DecodeLossy(ptr);
@@ -1052,7 +1046,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     try {
       String? currentBuildId;
       try {
-        final ffi = NetHackFfi();
+        final ffi = NetHackFfi(_selectedLanguage);
         currentBuildId = ffi.getBuildId();
       } catch (e) {
         debugPrint("Ffi buildId lookup: $e");
@@ -2015,6 +2009,23 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     _workerSendPort?.send({
       'type': 'shortcut',
       'keys': keys,
+    });
+  }
+
+  void _triggerDatabaseSearch() {
+    if (!_waitingForInput) return;
+    if (_screen.isMenuWindowVisible) return;
+    if (_screen.isTextWindowVisible) return;
+    if (_isYnVisible) return;
+    if (_isGetLineVisible) return;
+    if (_isAskNameVisible) return;
+
+    setState(() {
+      _waitingForInput = false;
+    });
+    _addLog("> Database Search ( /? )");
+    _workerSendPort?.send({
+      'type': 'trigger_database_search',
     });
   }
 
@@ -3159,8 +3170,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   // ステータス行の \CXXXXXXXX と \c マークアップパース処理
   TextSpan _parseStatusLine(String line) {
-    // 1. まず、金貨のエスケープ \G が残っていれば $ に置換する (フォールバック)
-    var processedLine = line.replaceAll(RegExp(r'\\G([0-9a-fA-F]{8}):?'), '\$ ');
+    // 1. まず、金貨のエスケープ \G が残っていれば $: に置換する (フォールバック)
+    var processedLine = line.replaceAll(RegExp(r'\\G([0-9a-fA-F]{8}):?'), '\$:');
     
     // 2. \\CXXXXXXXX と \\c のマークアップをパースして TextSpan を構築
     final spans = <InlineSpan>[];

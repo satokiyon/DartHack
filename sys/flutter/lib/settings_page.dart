@@ -150,7 +150,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _loadExtCmds() {
     try {
-      final ffi = NetHackFfi();
+      final ffi = NetHackFfi(_selectedLanguage);
       final ptr = ffi.getExtCmdsFlutter();
       if (ptr != nullptr) {
         final extCmdsStr = _utf8DecodeLossy(ptr);
@@ -570,6 +570,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 if (val != null) {
                   setState(() => _selectedLanguage = val);
                   _saveSetting('selected_language', val);
+                  _extCommands = [];
+                  _loadExtCmds();
                   if (mounted) {
                     MyApp.of(context)?.setLocale(val);
                   }

@@ -445,6 +445,9 @@ class NetHackWorker {
           final interval = message['interval'] as int? ?? 50;
           wlog("set_autosave_settings message received: enabled=$enabled, interval=$interval");
           ffi.setAutosaveSettings(enabled, interval);
+        } else if (type == 'trigger_database_search') {
+          wlog("trigger_database_search message received in worker isolate");
+          ffi.triggerDatabaseSearch();
         }
         }
       } catch (e, st) {
