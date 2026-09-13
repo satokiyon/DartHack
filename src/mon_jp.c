@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 #include "hack.h"
 
 /*
@@ -441,9 +441,6 @@ jp_pmname(struct permonst *pm, int mgender)
 {
     int pmidx, gslot;
     const char *jp;
-
-    if (!pm)
-        return "";
 
     gslot = pmname_gender_slot(pm, mgender);
     pmidx = (int) pm->pmidx;
