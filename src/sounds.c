@@ -145,9 +145,9 @@ temple_priest_sound(struct monst *mtmp)
            care if telepathy or extended detection reveals that the
            priest is not currently standing on the altar; he's mobile). */
         static const char *const temple_msg[] = {
-            "*誰かが%sをたたえる声.", "*誰かが%sにすがる声.",
-            "#動物の死骸を供物としてささげる気配.",
-            "*寄進を求める鋭い声.",
+            "*誰かが%sをたたえる声が聞こえる.", "*誰かが%sにすがる声が聞こえる.",
+            "#動物の死骸を供物としてささげる音が聞こえる.",
+            "*寄進を求める鋭い声が聞こえる.",
         };
         const char *msg;
         int hallu = Hallucination ? 1 : 0;
@@ -189,11 +189,11 @@ oracle_sound(struct monst *mtmp)
     if (Hallucination || !canseemon(mtmp)) {
         int hallu = Hallucination ? 1 : 0;
         static const char *const ora_msg[5] = {
-            "不思議な風の音.", /* Jupiter at Dodona */
-            "取りつかれたようなたわごと.", /* Apollo at Delphi */
-            "蛇のいびき.", /* AEsculapius at Epidaurus */
-            "誰かが「ウッドチャックはもうたくさんだ!」と言う声.",
-            "大きなZOT!の音." /* both rec.humor.oracle */
+            "不思議な風の音が聞こえる.", /* Jupiter at Dodona */
+            "取りつかれたようなたわごとが聞こえる.", /* Apollo at Delphi */
+            "蛇のいびきが聞こえる.", /* AEsculapius at Epidaurus */
+            "誰かが「ウッドチャックはもうたくさんだ!」と言う声が聞こえる.",
+            "大きなZOT!の音が聞こえる." /* both rec.humor.oracle */
         };
         You_hear1(ora_msg[rn2(3) + hallu * 2]);
     }
@@ -272,7 +272,7 @@ dosounds(void)
                 You_hear("巡回中の衛兵の足音が聞こえる.");
                 break;
             case 2:
-                You_hear("エベネーザ・スクルージ!");
+                You_hear("誰かが「エベネーザ・スクルージ!」と叫ぶ声が聞こえる!");
                 break;
             }
         return;
@@ -443,6 +443,41 @@ growl_sound_jp(struct monst *mtmp)
     }
 }
 
+staticfn const char *
+growl_verb_jp(struct monst *mtmp)
+{
+    switch (mtmp->data->msound) {
+    case MS_MEW:
+    case MS_HISS:
+        return "シューッと威嚇した";
+    case MS_BARK:
+    case MS_GROWL:
+        return "うなった";
+    case MS_ROAR:
+        return "咆哮した";
+    case MS_BELLOW:
+        return "怒号を上げた";
+    case MS_BUZZ:
+        return "怒って羽音を立てた";
+    case MS_SQEEK:
+        return "悲鳴を上げた";
+    case MS_SQAWK:
+        return "金切り声を上げた";
+    case MS_NEIGH:
+        return "いなないた";
+    case MS_WAIL:
+        return "うめき声を上げた";
+    case MS_GROAN:
+        return "うなった";
+    case MS_MOO:
+        return "低くうなった";
+    case MS_SILENT:
+        return "大騒ぎした";
+    default:
+        return "叫び声を上げた";
+    }
+}
+
 /* the sounds of a seriously abused pet, including player attacking it */
 void
 growl(struct monst *mtmp)
@@ -459,7 +494,10 @@ growl(struct monst *mtmp)
         growl_verb = growl_sound(mtmp);
     if (growl_verb) {
         if (canseemon(mtmp) || !Deaf) {
-            pline("%s%s!", Monnam(mtmp), growl_sound_jp(mtmp));
+            if (Hallucination)
+                pline("%sは%s!", Monnam(mtmp), ROLL_FROM(h_sounds_jp));
+            else
+                pline("%sは%s!", Monnam(mtmp), growl_verb_jp(mtmp));
             iflags.last_msg = PLNMSG_GROWL;
             if (svc.context.run)
                 nomul(0);
@@ -1487,11 +1525,11 @@ dochat(void)
     }
     if (Deaf) {
         const char *xresponse = humanoid(gy.youmonst.data)
-                    ? "届かなかった"
+                    ? "耳に届かなかった"
                     : "聞こえなかった";
 
         if (canspotmon(mtmp))
-            pline("返事は%sには%s.", mon_nam(mtmp), xresponse);
+            pline("%sからの返事は%s.", mon_nam(mtmp), xresponse);
         else
             pline("返事は%s.", xresponse);
         return ECMD_OK;
