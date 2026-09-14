@@ -91,33 +91,63 @@ void main() {
   group('shouldShowRecentMessagesInDialog 判定テスト', () {
     test('アイテム名前付け・呼び名プロンプト（日英）で true を返すこと', () {
       expect(shouldShowRecentMessagesInDialog('この巻物を何と呼びますか?'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('この液体を何と呼びますか?'), isTrue);
       expect(shouldShowRecentMessagesInDialog('この薬を何と名付けますか?'), isTrue);
       expect(shouldShowRecentMessagesInDialog('このアイテムに名前を付けますか?'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('Call a scroll:'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('Call a potion:'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('Call a wand:'), isTrue);
       expect(shouldShowRecentMessagesInDialog('What do you want to call this scroll?'), isTrue);
-      expect(shouldShowRecentMessagesInDialog('Call the potion?'), isTrue);
-      expect(shouldShowRecentMessagesInDialog('Name this wand?'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('What do you want to name this sword?'), isTrue);
     });
 
-    test('死亡時の開示・確認プロンプト（日英）で true を返すこと', () {
-      expect(shouldShowRecentMessagesInDialog('持ち物を明らかにしますか? [y/n]'), isTrue);
-      expect(shouldShowRecentMessagesInDialog('リストを明らかにしますか?'), isTrue);
-      expect(shouldShowRecentMessagesInDialog('bones ファイルを保存しますか?'), isTrue);
-      expect(shouldShowRecentMessagesInDialog('墓石を見ますか?'), isTrue);
-      expect(shouldShowRecentMessagesInDialog('死因を記録しますか?'), isTrue);
-      expect(shouldShowRecentMessagesInDialog('Do you want to see what you had when you died?'), isTrue);
-      expect(shouldShowRecentMessagesInDialog('Save bones?'), isTrue);
+    test('死亡直後の持ち物識別表示および bones 保存プロンプト（日英）で true を返すこと', () {
+      // 日本語
+      expect(shouldShowRecentMessagesInDialog('持ち物を識別表示しますか? [ynq] (y)'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('死亡時点の所持品を表示しますか? [ynq] (y)'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('bones ファイルを保存しますか? [yn] (n)'), isTrue);
+
+      // 英語
+      expect(shouldShowRecentMessagesInDialog('Do you want your possessions identified? [ynq] (y)'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('Do you want to see what you had when you died? [ynq] (y)'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('Save bones? [yn] (n)'), isTrue);
+    });
+
+    test('死亡後の後続統計・記録ダイアログ（日英）で false を返すこと', () {
+      // 日本語（後続ダイアログは表示不要）
+      expect(shouldShowRecentMessagesInDialog('能力値を表示しますか? [yn] (n)'), isFalse);
+      expect(shouldShowRecentMessagesInDialog('倒した怪物の一覧を表示しますか? [yn] (n)'), isFalse);
+      expect(shouldShowRecentMessagesInDialog('行跡を表示しますか? [yn] (n)'), isFalse);
+      expect(shouldShowRecentMessagesInDialog('墓石を見ますか? [yn] (n)'), isFalse);
+
+      // 英語（後続ダイアログは表示不要）
+      expect(shouldShowRecentMessagesInDialog('Do you want to see your attributes? [yn] (n)'), isFalse);
+      expect(shouldShowRecentMessagesInDialog('Do you want to see the creatures vanquished? [yn] (n)'), isFalse);
+      expect(shouldShowRecentMessagesInDialog('Do you want to see your conduct? [yn] (n)'), isFalse);
     });
 
     test('危険行動警告およびテレポート確認（日英）で true を返すこと', () {
       expect(shouldShowRecentMessagesInDialog('本当に飲みますか?'), isTrue);
       expect(shouldShowRecentMessagesInDialog('本当に攻撃しますか?'), isTrue);
       expect(shouldShowRecentMessagesInDialog('本当に飛び込みますか?'), isTrue);
-      expect(shouldShowRecentMessagesInDialog('本当に装備しますか?'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('本当にその毒ガスの雲へ入るか?'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('本当にその溶岩へ進むか?'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('本当に祈りを捧げますか？'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('食事を続けますか?'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('テレポートしますか?'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('飛び込みますか?'), isTrue);
+
+      // 英語
       expect(shouldShowRecentMessagesInDialog('Really attack the peaceful dog?'), isTrue);
       expect(shouldShowRecentMessagesInDialog('Really drink this?'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('Really enter that cloud of gas?'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('Really move into the lava?'), isTrue);
       expect(shouldShowRecentMessagesInDialog('Are you sure you want to attack?'), isTrue);
-      expect(shouldShowRecentMessagesInDialog('テレポートしますか?'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('Are you sure you want to pray?'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('Are you really sure you want to break that wand?'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('Continue eating?'), isTrue);
       expect(shouldShowRecentMessagesInDialog('Teleport?'), isTrue);
+      expect(shouldShowRecentMessagesInDialog('Jump in?'), isTrue);
     });
 
     test('対象外プロンプト（拡張コマンド、注釈メモ、終了確認、通常確認）で false を返すこと', () {

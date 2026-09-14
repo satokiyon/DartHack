@@ -166,14 +166,18 @@ bool isItemCallOrNamePrompt(String prompt) {
   // マップ注釈メモは明確に除外
   if (prompt.contains('注釈') || p.contains('annotation')) return false;
 
+  // 英語の docall プロンプト: "Call <item>:" (例: "Call a scroll:")
+  final trimmed = p.trim();
+  if (trimmed.startsWith('call ') && trimmed.endsWith(':')) {
+    return true;
+  }
+
   return prompt.contains('何と呼びますか')
       || prompt.contains('何と名付けますか')
       || prompt.contains('何という名前にしますか')
       || prompt.contains('名前を付けますか')
       || prompt.contains('名前を付け')
       || prompt.contains('何に変更しますか')
-      || p.contains('call ')
-      || p.contains('name ')
       || p.contains('call this')
       || p.contains('name this')
       || p.contains('call the')
@@ -182,20 +186,29 @@ bool isItemCallOrNamePrompt(String prompt) {
       || p.contains('what do you want to name');
 }
 
-/// 死亡時の開示・bones・墓石等の確認プロンプトか判定する。
+/// 死亡直後の持ち物開示および bones 保存確認プロンプトか判定する。
+/// ※「能力値を表示しますか?」「倒した怪物の一覧を表示しますか?」などの後続ダイアログは除外
 bool isDeathConfirmationPrompt(String prompt) {
   if (prompt.isEmpty) return false;
   final p = prompt.toLowerCase();
-  return prompt.contains('持ち物を明らかにしますか')
-      || prompt.contains('リストを明らかにしますか')
+
+  // 後続の統計・記録開示ダイアログは明確に除外
+  if (prompt.contains('能力値') ||
+      prompt.contains('倒した怪物') ||
+      prompt.contains('行跡') ||
+      prompt.contains('墓石') ||
+      p.contains('attributes') ||
+      p.contains('creatures vanquished') ||
+      p.contains('conduct') ||
+      p.contains('tombstone')) {
+    return false;
+  }
+
+  return prompt.contains('持ち物を識別表示しますか')
+      || prompt.contains('死亡時点の所持品を表示しますか')
       || prompt.contains('bones ファイルを保存しますか')
-      || prompt.contains('墓石を見ますか')
-      || prompt.contains('死因を記録しますか')
-      || p.contains('see what you had')
-      || p.contains('what you were carrying')
-      || p.contains('see your attributes')
-      || p.contains('see your conduct')
-      || p.contains('creatures vanquished')
+      || p.contains('possessions identified')
+      || (p.contains('what you had when you') && p.contains('died'))
       || p.contains('save bones');
 }
 
@@ -210,34 +223,53 @@ bool isRiskyActionPrompt(String prompt) {
     return false;
   }
 
-  // テレポート確認
-  if (prompt.contains('テレポートしますか') || p.contains('teleport?')) {
+  // テレポート確認・飛び込み確認
+  if (prompt.contains('テレポートしますか') ||
+      prompt.contains('飛び込みますか') ||
+      p.contains('teleport?') ||
+      p.contains('jump in?')) {
     return true;
   }
 
-  // 日本語の危険行動警告（「本当に」＋危険動詞）
+  // 食事継続確認（満腹時の窒息危険）
+  if (prompt.contains('食事を続けますか') || p.contains('continue eating?')) {
+    return true;
+  }
+
+  // 日本語の危険行動警告（「本当に」＋危険動詞・名詞）
   if (prompt.contains('本当に') &&
-      (prompt.contains('飲みますか') ||
+      (prompt.contains('攻撃') ||
+       prompt.contains('入る') ||
+       prompt.contains('進む') ||
+       prompt.contains('祈り') ||
+       prompt.contains('飲みますか') ||
        prompt.contains('食べますか') ||
-       prompt.contains('攻撃しますか') ||
        prompt.contains('飛び込みますか') ||
        prompt.contains('装備しますか') ||
        prompt.contains('歩きますか') ||
        prompt.contains('振りますか') ||
        prompt.contains('撃ちますか') ||
        prompt.contains('潜りますか') ||
-       prompt.contains('祈りますか') ||
        prompt.contains('這い'))) {
     return true;
   }
 
-  // 英語の危険行動警告（really + 危険動詞、または are you sure you want to attack）
-  if (p.contains('are you sure you want to attack')) {
+  // 英語の杖破壊警告（日英共通で出力されるメッセージ）
+  if (p.contains('are you really sure you want to break')) {
     return true;
   }
 
+  // 英語の攻撃・祈り確認
+  if (p.contains('are you sure you want to attack') ||
+      p.contains('are you sure you want to pray')) {
+    return true;
+  }
+
+  // 英語の really + 動詞 (attack, enter, move, drink, eat, dive, crawl, wear, put on, shoot, jump)
   if (p.contains('really ') &&
       (p.contains('attack') ||
+       p.contains('enter') ||
+       p.contains('move') ||
        p.contains('drink') ||
        p.contains('eat') ||
        p.contains('dive') ||
@@ -245,7 +277,6 @@ bool isRiskyActionPrompt(String prompt) {
        p.contains('wear') ||
        p.contains('put on') ||
        p.contains('shoot') ||
-       p.contains('pray') ||
        p.contains('jump'))) {
     return true;
   }
