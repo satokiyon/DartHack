@@ -144,5 +144,8 @@ GEMINI.md
 sys/flutter/assets/
 sys/flutter/tmp
 
-
 backup.ab
+
+# ignore files for NetHackJP project
+c_core/nethack_jp/.agents/AGENTS.md
+c_core/nethack_jp/AGENTS.md
