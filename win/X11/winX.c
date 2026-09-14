@@ -1717,6 +1717,7 @@ X11_init_nhwindows(int *argcp, char **argv)
     /* We don't need to realize the top level widget. */
 
     old_error_handler = XSetErrorHandler(panic_on_error);
+    (void) XSetIOErrorHandler(X11_io_error_handler);
 
     /* add new color converter to deal with overused colormaps */
     XtSetTypeConverter(XtRString, XtRPixel, nhCvtStringToPixel,

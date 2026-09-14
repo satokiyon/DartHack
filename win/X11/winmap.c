@@ -584,7 +584,7 @@ read_xpm_tiles(const char *tile_file)
     XpmAttributes attributes;
     int errorcode;
 
-    char buf[BUFSZ];
+    char buf[BUFSZ * 2];
     Display *dpy = XtDisplay(toplevel);
     unsigned int image_height = 0, image_width = 0;
 
@@ -613,8 +613,8 @@ read_xpm_tiles(const char *tile_file)
                                    0, &attributes);
 
     if (errorcode == XpmColorFailed) {
-        Sprintf(buf, "Insufficient colors available to load %s.",
-                actual_tile_file);
+        Snprintf(buf, sizeof buf, "Insufficient colors available to load %s.",
+                 actual_tile_file);
         X11_raw_print(buf);
         X11_raw_print("Try closing other colorful applications and restart.");
         X11_raw_print("Attempting to load with inferior colors.");
@@ -625,12 +625,12 @@ read_xpm_tiles(const char *tile_file)
 
     if (errorcode != XpmSuccess) {
         if (errorcode == XpmColorFailed) {
-            Sprintf(buf, "Insufficient colors available to load %s.",
-                    actual_tile_file);
+            Snprintf(buf, sizeof buf, "Insufficient colors available to load %s.",
+                     actual_tile_file);
             X11_raw_print(buf);
         } else {
-            Sprintf(buf, "Failed to load %s: %s", actual_tile_file,
-                    XpmGetErrorString(errorcode));
+            Snprintf(buf, sizeof buf, "Failed to load %s: %s", actual_tile_file,
+                     XpmGetErrorString(errorcode));
             X11_raw_print(buf);
         }
         X11_raw_print("Switching to text-based mode.");
@@ -640,9 +640,9 @@ read_xpm_tiles(const char *tile_file)
     /* assume a fixed number of tiles per row */
     if (tile_image->width % TILES_PER_ROW != 0
         || tile_image->width <= TILES_PER_ROW) {
-        Sprintf(buf,
-               "%s is not a multiple of %d (number of tiles/row) pixels wide",
-                actual_tile_file, TILES_PER_ROW);
+        Snprintf(buf, sizeof buf,
+                "%s is not a multiple of %d (number of tiles/row) pixels wide",
+                 actual_tile_file, TILES_PER_ROW);
         X11_raw_print(buf);
         XDestroyImage(tile_image);
         tile_image = 0;
@@ -667,7 +667,7 @@ read_xpm_tiles(const char *tile_file)
         /* Windows-like validation: check if image dimensions match tile_width / tile_height */
         if ((image_width % (unsigned) req_width) != 0
             || (image_height % (unsigned) req_height) != 0) {
-            Sprintf(buf, "タイル画像が tile_width / tile_height 設定と一致しないため、テキスト表示に切り替えます。");
+            Snprintf(buf, sizeof buf, "タイル画像が tile_width / tile_height 設定と一致しないため、テキスト表示に切り替えます。");
             X11_raw_print(buf);
             XDestroyImage(tile_image);
             tile_image = 0;
@@ -676,7 +676,7 @@ read_xpm_tiles(const char *tile_file)
         int tl_num = (int) ((image_width / (unsigned) req_width)
                             * (image_height / (unsigned) req_height));
         if (tl_num < total_tiles_used) {
-            Sprintf(buf, "タイル画像内のタイル数がゲーム要件より少ないため、テキスト表示に切り替えます。");
+            Snprintf(buf, sizeof buf, "タイル画像内のタイル数がゲーム要件より少ないため、テキスト表示に切り替えます。");
             X11_raw_print(buf);
             XDestroyImage(tile_image);
             tile_image = 0;
