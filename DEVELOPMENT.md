@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-08. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -763,9 +763,10 @@ GitHub上の Releases ページから新規リリースを作成し、ビルド�
 
 WSL (Linux) 環境上の NetHack X11 ポート (`windowtype:X11`) において、タイル画像が未探索マスや一部グラフィックで崩れる問題、および生成される `x11tiles` 画像が途中で読み込み中断を起こす問題についての技術注釈です。
 
-* **タイル解像度の自動算出とファイル名固定仕様 (`win/X11/winmap.c`)**:
-  - X11 ポートで読み込まれるタイルセットのファイル名は `x11tiles` 固定です。
-  - 従来は 1 タイルのサイズを 16x16 固定と仮定していたが、読み込まれた `tile_image->width` から `tile_width = image_width / TILES_PER_ROW` を動的に算出し、32x32 タイルセット等の高解像度 XPM にも自動適応するように改善した。
+* **タイル解像度の設定ファイル対応と自動判定フォールバック (`win/X11/winmap.c`, `win/X11/winX.c`, `include/winX.h`, `win/X11/NetHack.ad`)**:
+  - Windows版と同様に、`.nethackrc` の `OPTIONS=tile_width:W,tile_height:H` および X11 リソース（`NetHack.tile_width` / `NetHack.tile_height`）での 1 タイルのピクセルサイズ明示指定に対応。
+  - 要求サイズが指定されている場合は、画像の幅・高さの割り切れチェックおよび総タイル数チェック（`total_tiles_used`）を行い、不一致時は警告を出してテキストモードにフォールバック。
+  - 省略（未指定）時は、従来の画像幅からの自動判定（`tile_width = image_width / TILES_PER_ROW`, `tile_height = tile_width`）をフォールバックとして継続サポート。
 * **`tile2x11` における XPM 色記号文字コード破壊の修正 (`win/X11/tile2x11.c`)**:
   - 単純な `(char)(i + '0')` による文字コード加算では、色数増加時に `"` (ダブルクォーテーション) 等の制御文字が混入して libXpm で構文エラーを起こし、画像ロードが途中で打ち切られていた。安全な ASCII キャラクターマップ (`xpm_chars[]`) を導入してエスケープ破綻を保護した。
 * **`convert_tiles` ポインタ移動計算の「絶対座標計算方式」への変更 (`win/X11/tile2x11.c`)**:

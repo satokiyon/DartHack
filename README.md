@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-06. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsとUbuntu(WSL)のみ)
@@ -147,16 +147,20 @@ NetHack はテキスト（ASCII文字）だけでなく、美しいグラフィ�
 #### Linux (X11 GUI) でのタイルセット変更手順
 Linux版 (X11 GUI) でグラフィックタイル表示を利用する場合のカスタム手順です。
 
-1. **ファイル名固定仕様 (`x11tiles`)**:
-   X11 ポートで読み込まれるタイル画像ファイル名は **`x11tiles`** (XPM形式) に固定されています。
+1. **タイル画像ファイル (`x11tiles`)**:
+   X11 ポートで標準で読み込まれるタイル画像ファイル名は **`x11tiles`** (XPM形式) です。
+   ※ `.nethackrc` の `OPTIONS=tile_file:ファイル名` や `NetHack.ad` の `NetHack.tile_file: ファイル名` で別のファイル名を指定することも可能です。
 2. **タイルセット画像の変更手順**:
-   お好みの XPM 画像を用意し、ファイル名を `x11tiles` に変更して、実行ディレクトリ（解凍したフォルダ内）の既存 `x11tiles` に上書き・置換します。
-3. **タイルサイズの自動判定**:
-   NetHackJP の X11 ポートは画像から 1 タイルのセルサイズ（16x16, 32x32 等）を自動判定します。設定ファイルでのサイズ固定指定は不要で、高解像度タイルを配置するだけで自動適応されます。
+   お好みの XPM 画像を用意し、ファイル名を `x11tiles` に変更して実行ディレクトリ（解凍したフォルダ内）の既存 `x11tiles` に上書き・置換するか、任意の名前で配置して `tile_file` に指定します。
+3. **タイルサイズ（幅・高さ）の指定**:
+   Windows版と同様に、`.nethackrc` の `OPTIONS=tile_width:32,tile_height:32` または X11 リソース（`NetHack.ad` の `NetHack.tile_width` / `NetHack.tile_height`）で 1 タイルのピクセルサイズ（例: 32x32 なら `32`）を指定できます。
+   ※ 省略（未指定）した場合は、タイル画像全体のサイズから自動判定されます。
 4. **設定ファイル (`.nethackrc`) 例**:
    ```ini
    OPTIONS=windowtype:X11
    OPTIONS=map_mode:tiles
+   OPTIONS=tile_width:32
+   OPTIONS=tile_height:32
    ```
 
 ---

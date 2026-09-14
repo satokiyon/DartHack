@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-02. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	wintext.c	$NHDT-Date: 1781973110 2026/06/20 16:31:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -171,7 +171,7 @@ display_text_window(struct xwindow *wp, boolean blocking)
     XtSetArg(args[num_args], XtNlabel, text_info->text.text);
     num_args++;
     XtSetValues(wp->w, args, num_args);
-    X11_update_label_if_Xft(wp->w);
+    X11_update_label(wp->w);
 
 #ifdef TRANSIENT_TEXT
     XtRealizeWidget(wp->popup);
@@ -260,7 +260,7 @@ create_text_window(struct xwindow *wp)
                                   form,      /* parent widget */
                                   args,      /* set some values */
                                   num_args); /* number of values to set */
-    X11_wrap_widget_if_Xft(wp->w, NHW_TEXT);
+    X11_wrap_widget(wp->w, NHW_TEXT);
 }
 
 void

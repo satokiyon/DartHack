@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	consoletty.c	$NHDT-Date: 1596498316 2020/08/03 23:45:16 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -162,6 +162,8 @@ void tty_ibmgraphics_fixup(void);
 extern void (*ibmgraphics_mode_callback)(void);  /* symbols.c */
 extern void (*utf8graphics_mode_callback)(void); /* symbols.c */
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
+
+static boolean OnWindows95_98_Me(void);
 
 static void init_custom_colors(void);
 static void free_custom_colors(void);
@@ -981,6 +983,12 @@ void buffer_write(cell_t * buffer, cell_t * cell, COORD pos)
     if ((iflags.debug.immediateflips || !program_state.in_moveloop)
         && buffer == console.back_buffer)
         back_buffer_flip();
+}
+
+static boolean
+OnWindows95_98_Me(void)
+{
+    return ((GetVersion() & 0x80000000) != 0);
 }
 
 /*
@@ -2741,7 +2749,8 @@ void nethack_enter_consoletty(void)
     buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
 
     /* determine whether OS version has unicode support */
-    console.has_unicode = (IsWindows8OrGreater());
+    /* console.has_unicode = (IsWindows8OrGreater()); */
+    console.has_unicode = !OnWindows95_98_Me();
 
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
     /* store the original code page*/

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -359,8 +359,13 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(
 	genderbox->layout()->addWidget(gender[i]);
 	gendergroup->addButton(gender[i], i);
     }
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    connect(gendergroup, SIGNAL(idClicked(int)),
+            this, SLOT(selectGender(int)));
+#else
     connect(gendergroup, SIGNAL(buttonClicked(int)),
             this, SLOT(selectGender(int)));
+#endif
 
     QLabel *alignlabel = new QLabel("属性");
     alignbox->layout()->addWidget(alignlabel);
@@ -371,8 +376,13 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(
 	alignbox->layout()->addWidget(alignment[i]);
 	aligngroup->addButton(alignment[i], i);
     }
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    connect(aligngroup, SIGNAL(idClicked(int)),
+            this, SLOT(selectAlignment(int)));
+#else
     connect(aligngroup, SIGNAL(buttonClicked(int)),
             this, SLOT(selectAlignment(int)));
+#endif
 
     l->addWidget(rand_btn, 4, 2);
     connect(rand_btn, SIGNAL(clicked()), this, SLOT(Randomize()));
@@ -558,7 +568,10 @@ void NetHackQtPlayerSelector::plnamePlayVsQuit()
 // the line edit widget for the name field has received input
 void NetHackQtPlayerSelector::selectName(const QString& n)
 {
-    const char *name_str = n.toLatin1().constData();
+    // the QByteArray has to outlive name_str; calling constData() on
+    // the temporary returned by toLatin1() leaves it dangling
+    QByteArray name_bytes = n.toLatin1();
+    const char *name_str = name_bytes.constData();
     // skip any leading spaces
     // (it would be better to set up a validator that rejects leading spaces)
     while (*name_str == ' ')

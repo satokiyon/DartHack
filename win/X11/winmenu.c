@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	winmenu.c	$NHDT-Date: 1781973109 2026/06/20 16:31:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1321,12 +1321,10 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
 
     /* Does any line have a selector? */
     boolean any_canpick = FALSE;
-    if (how != PICK_NONE) {
-        for (curr = curr_menu->base; curr; curr = curr->next) {
-            if (curr->identifier.a_void != NULL) {
-                any_canpick = TRUE;
-                break;
-            }
+    for (curr = curr_menu->base; curr; curr = curr->next) {
+        if (curr->identifier.a_void != NULL) {
+            any_canpick = TRUE;
+            break;
         }
     }
 
@@ -1343,7 +1341,7 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
         String str = (String) curr->str;
         int attr = ATR_NONE;
         int color = NO_COLOR;
-        boolean canpick = (how != PICK_NONE && curr->identifier.a_void);
+        boolean canpick = curr->identifier.a_void != NULL;
 
         /* Add tabs if needed to align non-selector lines with selector lines */
         if (any_canpick && !canpick) {

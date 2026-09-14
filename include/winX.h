@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	winX.h	$NHDT-Date: 1781973092 2026/06/20 16:31:32 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.69 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -324,6 +324,9 @@ typedef struct {
     Boolean highlight_prompt; /* if 'slow', highlight yn prompts */
     Boolean double_tile_size; /* double tile size */
     String tile_file;         /* name of file to open for tiles */
+    /* NetHackJP: X11 tile width and height support from config/resources */
+    int tile_width;           /* 1-tile width in pixels (0 = auto) */
+    int tile_height;          /* 1-tile height in pixels (0 = auto) */
     String icon;              /* name of desired icon */
     int message_lines;        /* number of lines to attempt to show */
     int extcmd_height_delta;  /* bottom margin for extended command menu */
@@ -446,6 +449,7 @@ extern void nh_XtPopup(Widget, int, Widget);
 extern void nh_XtPopdown(Widget);
 extern void win_X11_init(int);
 extern void find_scrollbars(Widget, Widget, Widget *, Widget *);
+extern Boolean nhApproxColor(Screen *, Colormap, char *, XColor *);
 
 /* ### winmesg.c ### */
 extern void set_message_slider(struct xwindow *);

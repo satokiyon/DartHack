@@ -59,6 +59,11 @@ NetHack.font_rip:     sans,Noto Sans CJK JP-9
 ! such as XV or preferably PBMplus.
 !
 NetHack.tile_file: x11tiles
+! tile_width and tile_height specify the pixel dimensions of a single tile (e.g. 16, 32).
+! When set to 0 (default), tile dimensions can be set via .nethackrc (OPTIONS=tile_width:...,tile_height:...)
+! or will be automatically detected from the tile image dimensions.
+!NetHack.tile_width: 0
+!NetHack.tile_height: 0
 !NetHack.double_tile_size: True
 
 ! The annotation of pets.

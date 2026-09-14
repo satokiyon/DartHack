@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	explode.c	$NHDT-Date: 1781973049 2026/06/20 16:30:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.128 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -738,12 +738,18 @@ explode(
                 rehumanize();
             } else {
                 if (olet == MON_EXPLODE) {
-                    if (generic) /* explosion was unseen; str=="explosion", */
-                        ; /* svk.killer.name=="胞子ガスの爆発" など。 */
-                    else if (str != svk.killer.name && str != hallu_buf)
+                    if (generic) {
+                        /* explosion was unseen; str=="explosion", */
+                        /* svk.killer.name=="胞子ガスの爆発" など。 */
+                        if (!strcmp(str, "explosion"))
+                            jp_set_explosion_killer_name(svk.killer.name,
+                                                         sizeof svk.killer.name,
+                                                         str);
+                    } else if (str != svk.killer.name && str != hallu_buf) {
                         jp_set_explosion_killer_name(svk.killer.name,
                                                      sizeof svk.killer.name,
                                                      str);
+                    }
                     svk.killer.format = KILLED_BY_AN;
                 } else if (olet == TRAP_EXPLODE) {
                     const char *dispstr = jp_explosion_text_for_display(
