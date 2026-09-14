@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	vault.c	$NHDT-Date: 1781973072 2026/06/20 16:31:12 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -430,7 +430,6 @@ invault(void)
            otherwise the hero wouldn't be able to push one to follow the
            guard out of the vault because that guard would be in its way */
         if ((otmp = sobj_at(BOULDER, guard->mx, guard->my)) != 0) {
-            void (*func)(const char *, ...) PRINTF_F_PTR(1, 2);
             const char *bname = simpleonames(otmp);
             int bcnt = 0;
 
@@ -440,9 +439,13 @@ invault(void)
                 otmp = sobj_at(BOULDER, guard->mx, guard->my);
             } while (otmp);
             /* You_hear() will handle Deaf/!Deaf */
-            func = !Blind ? You_see : You_hear;
-                (*func)("%sが砕けた.",
-                    (bcnt == 1) ? an(bname) : makeplural(bname));
+            if (!Blind) {
+                You_see("%sが砕けるのを見た.",
+                        (bcnt == 1) ? an(bname) : makeplural(bname));
+            } else {
+                You_hear("%sが砕ける音が聞こえた.",
+                         (bcnt == 1) ? an(bname) : makeplural(bname));
+            }
         }
         spotted = canspotmon(guard);
         if (spotted) {
@@ -874,7 +877,7 @@ staticfn void
 gd_letknow(struct monst *grd)
 {
     if (!cansee(grd->mx, grd->my) || !mon_visible(grd))
-        You_hear("%s.",
+        You_hear("%sが聞こえた.",
                     m_carrying(grd, TIN_WHISTLE)
                         ? "衛兵の笛の鋭い音"
                         : "怒声");

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	lock.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1230,7 +1230,7 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
                     pline_The("扉が激しく壊れて開いた!");
                 } else if (!Deaf) {
                     Soundeffect(se_crashing_sound, 100);
-                    You_hear("激しい破壊音.");
+                    You_hear("激しい破壊音が聞こえた.");
                 }
             }
             /* force vision recalc before printing more messages */
