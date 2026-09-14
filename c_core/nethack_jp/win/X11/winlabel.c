@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHackJP: add X11_label_string_width() so wingetlin.c can measure
  * the response field's text and enforce a minimum input-field width
  * (DEVELOPMENT.md §4.12). */

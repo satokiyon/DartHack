@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	wizcmds.c	$NHDT-Date: 1781973074 2026/06/20 16:31:14 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.36 $ */
 /*-Copyright (c) Robert Patrick Rankin, 2024. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1291,8 +1291,8 @@ misc_stats(
     winid win,
     long *total_count, long *total_size)
 {
-    /* NetHackJP: Expand hdrbuf to BUFSZ to prevent format overflow */
-    char buf[BUFSZ], hdrbuf[BUFSZ];
+    /* NetHackJP: Expand buf and hdrbuf to prevent format overflow */
+    char buf[BUFSZ * 2], hdrbuf[BUFSZ];
     long count, size;
     int idx;
     struct trap *tt;
@@ -1311,14 +1311,14 @@ misc_stats(
     *total_count += count;
     *total_size += size;
     Sprintf(hdrbuf, "traps, size %ld", (long) sizeof (struct trap));
-    Sprintf(buf, template, hdrbuf, count, size);
+    Snprintf(buf, sizeof buf, template, hdrbuf, count, size);
     putstr(win, 0, buf);
 
     count = size = 0L;
     engr_stats("engravings, size %ld+text", hdrbuf, &count, &size);
     *total_count += count;
     *total_size += size;
-    Sprintf(buf, template, hdrbuf, count, size);
+    Snprintf(buf, sizeof buf, template, hdrbuf, count, size);
     putstr(win, 0, buf);
 
     count = size = 0L;
@@ -1326,7 +1326,7 @@ misc_stats(
     if (count || size) {
         *total_count += count;
         *total_size += size;
-        Sprintf(buf, template, hdrbuf, count, size);
+        Snprintf(buf, sizeof buf, template, hdrbuf, count, size);
         putstr(win, 0, buf);
     }
 
@@ -1335,7 +1335,7 @@ misc_stats(
     if (count || size) {
         *total_count += count;
         *total_size += size;
-        Sprintf(buf, template, hdrbuf, count, size);
+        Snprintf(buf, sizeof buf, template, hdrbuf, count, size);
         putstr(win, 0, buf);
     }
 
@@ -1349,7 +1349,7 @@ misc_stats(
         *total_size += size;
         Sprintf(hdrbuf, "shop damage, size %ld",
                 (long) sizeof (struct damage));
-        Sprintf(buf, template, hdrbuf, count, size);
+        Snprintf(buf, sizeof buf, template, hdrbuf, count, size);
         putstr(win, 0, buf);
     }
 
@@ -1358,7 +1358,7 @@ misc_stats(
     if (count || size) {
         *total_count += count;
         *total_size += size;
-        Sprintf(buf, template, hdrbuf, count, size);
+        Snprintf(buf, sizeof buf, template, hdrbuf, count, size);
         putstr(win, 0, buf);
     }
 
@@ -1372,7 +1372,7 @@ misc_stats(
         *total_size += size;
         Sprintf(hdrbuf, "delayed killer%s, size %ld",
                 plur(count), (long) sizeof (struct kinfo));
-        Sprintf(buf, template, hdrbuf, count, size);
+        Snprintf(buf, sizeof buf, template, hdrbuf, count, size);
         putstr(win, 0, buf);
     }
 
@@ -1386,7 +1386,7 @@ misc_stats(
         *total_size += size;
         Sprintf(hdrbuf, "bones history, size %ld",
                 (long) sizeof (struct cemetery));
-        Sprintf(buf, template, hdrbuf, count, size);
+        Snprintf(buf, sizeof buf, template, hdrbuf, count, size);
         putstr(win, 0, buf);
     }
 
@@ -1400,7 +1400,7 @@ misc_stats(
         *total_count += count;
         *total_size += size;
         Strcpy(hdrbuf, "object type names, text");
-        Sprintf(buf, template, hdrbuf, count, size);
+        Snprintf(buf, sizeof buf, template, hdrbuf, count, size);
         putstr(win, 0, buf);
     }
 }

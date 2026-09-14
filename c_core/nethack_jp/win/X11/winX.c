@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	winX.c	$NHDT-Date: 1781973110 2026/06/20 16:31:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -130,7 +130,8 @@ static XtSignalId X11_sig_id;
 struct window_procs X11_procs = {
     WPID(X11),
     ( WC_COLOR | WC_INVERSE | WC_HILITE_PET | WC_ASCII_MAP | WC_TILED_MAP
-     | WC_PLAYER_SELECTION | WC_PERM_INVENT | WC_MOUSE_SUPPORT ),
+     | WC_PLAYER_SELECTION | WC_PERM_INVENT | WC_MOUSE_SUPPORT
+     | WC_TILE_WIDTH | WC_TILE_HEIGHT | WC_TILE_FILE ),
     /* status requires VIA_WINDOWPORT(); WC2_FLUSH_STATUS ensures that */
     ( WC2_FLUSH_STATUS | WC2_SELECTSAVED
 #ifdef STATUS_HILITES
@@ -1500,6 +1501,11 @@ static XtResource resources[] = {
       nhStr("False") },
     { nhStr("tile_file"), nhStr("Tile_file"), XtRString, sizeof(String),
       XtOffset(AppResources *, tile_file), XtRString, nhStr("x11tiles") },
+    /* NetHackJP: X11 tile width and height support from config/resources */
+    { nhStr("tile_width"), nhStr("Tile_width"), XtRInt, sizeof(int),
+      XtOffset(AppResources *, tile_width), XtRString, nhStr("0") },
+    { nhStr("tile_height"), nhStr("Tile_height"), XtRInt, sizeof(int),
+      XtOffset(AppResources *, tile_height), XtRString, nhStr("0") },
     { nhStr("icon"), nhStr("Icon"), XtRString, sizeof(String),
       XtOffset(AppResources *, icon), XtRString, nhStr("nh72") },
     { nhStr("message_lines"), nhStr("Message_lines"), XtRInt, sizeof(int),
@@ -1613,6 +1619,9 @@ X11_init_nhwindows(int *argcp, char **argv)
 
     /* add another option that can be set */
     set_wc_option_mod_status(WC_TILED_MAP, set_in_game);
+    /* NetHackJP: allow tile configuration options in .nethackrc */
+    set_wc_option_mod_status(WC_TILE_WIDTH | WC_TILE_HEIGHT | WC_TILE_FILE,
+                             set_gameview);
     set_option_mod_status("mouse_support", set_in_game);
 
     load_default_resources(); /* create default_resource_data[] */
@@ -1652,6 +1661,7 @@ X11_init_nhwindows(int *argcp, char **argv)
     /* We don't need to realize the top level widget. */
 
     old_error_handler = XSetErrorHandler(panic_on_error);
+    (void) XSetIOErrorHandler(X11_io_error_handler);
 
     /* add new color converter to deal with overused colormaps */
     XtSetTypeConverter(XtRString, XtRPixel, nhCvtStringToPixel,

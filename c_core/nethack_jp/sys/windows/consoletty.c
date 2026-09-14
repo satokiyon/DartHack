@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	consoletty.c	$NHDT-Date: 1596498316 2020/08/03 23:45:16 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
