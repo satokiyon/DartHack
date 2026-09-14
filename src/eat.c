@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	eat.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.354 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1352,13 +1352,13 @@ cpostfx(int pm)
             if (u.usteed)
                 dismount_steed(DISMOUNT_FELL);
             nomul(-tmp);
-            gm.multi_reason = "金貨の山のふりをしている";
+            gm.multi_reason = "pretending to be a pile of gold";
             Sprintf(buf,
                     Hallucination
-                       ? "皮をむかれるのが急に怖くなり、再び%sに化けた!"
-                       : "再び%sに化けるのがお似合いだと思った.",
+                       ? "皮をむかれるのが急に怖くなり、再び%sの姿に戻った!"
+                       : "やはり%sの姿に戻るほうがよいと思った.",
                     Upolyd ? jp_pmname(gy.youmonst.data, Ugender)
-                              : gu.urace.noun);
+                              : jp_race_noun_for_display(Race_switch));
             ge.eatmbuf = dupstr(buf);
             gn.nomovemsg = ge.eatmbuf;
             ga.afternmv = eatmdone;

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	steed.c	$NHDT-Date: 1781973068 2026/06/20 16:31:08 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -649,7 +649,7 @@ dismount_steed(
         }
         if (!has_mgivenname(mtmp)) {
             pline("%sという名もないまま、その背でここまで来たんだな.",
-                an(jp_pmname(mtmp->data, Mgender(mtmp))));
+                  jp_pmname(mtmp->data, Mgender(mtmp)));
             if (Hallucination)
                 pline("ふらついていても、ここまで来られた。");
         } else

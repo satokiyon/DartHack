@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-30. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	end.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.349 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1379,7 +1379,7 @@ really_done(int how)
              (u.ugrave_arise != PM_GREEN_SLIME)
                  ? "肉体が死からよみがえり"
                  : "怨霊が消えずに残り",
-            an(jp_pmname(&mons[u.ugrave_arise], Ugender)));
+             jp_pmname(&mons[u.ugrave_arise], Ugender));
         display_nhwindow(WIN_MESSAGE, FALSE);
     }
 

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	sounds.c	$NHDT-Date: 1781973067 2026/06/20 16:31:07 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.172 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -842,11 +842,7 @@ domonnoise(struct monst *mtmp)
         boolean nightchild = (Upolyd && (u.umonnum == PM_WOLF
                                          || u.umonnum == PM_WINTER_WOLF
                                          || u.umonnum == PM_WINTER_WOLF_CUB));
-        const char *racenoun = (flags.female && gu.urace.individual.f)
-                               ? gu.urace.individual.f
-                               : (gu.urace.individual.m)
-                                 ? gu.urace.individual.m
-                                 : gu.urace.noun;
+        const char *racenoun = jp_race_noun_for_display(Race_switch);
 
         if (mtmp->mtame) {
             if (kindred) {
@@ -901,9 +897,9 @@ domonnoise(struct monst *mtmp)
                     verbl_msg = verbuf;
                 } else if (vampindex == 1) {
                     Sprintf(verbuf, vampmsg[vampindex],
-                            Upolyd ? an(jp_pmname(&mons[u.umonnum],
-                                                       flags.female ? FEMALE : MALE))
-                                   : an(racenoun));
+                            Upolyd ? jp_pmname(&mons[u.umonnum],
+                                               flags.female ? FEMALE : MALE)
+                                   : racenoun);
                     verbl_msg = verbuf;
                 } else if (vampindex > 1) {
                     if (vampindex >= 0 && vampindex < SIZE(vampmsg))
@@ -1356,7 +1352,7 @@ dochat(void)
 
     if (is_silent(gy.youmonst.data)) {
         pline("あなたは%sなので、話すことができない.",
-              an(jp_pmname(gy.youmonst.data, flags.female ? FEMALE : MALE)));
+              jp_pmname(gy.youmonst.data, flags.female ? FEMALE : MALE));
         return ECMD_OK;
     }
     if (Strangled) {
