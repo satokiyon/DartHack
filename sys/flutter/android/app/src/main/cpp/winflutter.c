@@ -1557,7 +1557,10 @@ static boolean flutter_is_direction_prompt(const char* question) {
 
     if (strstr(question, "what direction")
         || strstr(question, "What direction")
-        || strstr(question, "どの方向")) {
+        || strstr(question, "which direction")
+        || strstr(question, "Which direction")
+        || strstr(question, "どの方向")
+        || strstr(question, "どちらの方向")) {
         return TRUE;
     }
 
@@ -1570,7 +1573,7 @@ static char flutter_yn_function(const char* question, const char* choices, char 
     if (flutter_is_direction_prompt(question)) {
         char message[BUFSZ];
 
-        if (choices && *choices) {
+        if (choices && *choices && !strchr(question, '[')) {
             char choicebuf[QBUFSZ];
             intptr_t esc;
 

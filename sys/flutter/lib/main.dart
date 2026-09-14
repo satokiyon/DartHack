@@ -1579,7 +1579,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final lower = text.toLowerCase();
     return lower.contains('what direction') ||
         lower.contains('which direction') ||
-        text.contains('どの方向');
+        text.contains('どの方向') ||
+        text.contains('どちらの方向');
   }
 
   String _moveModeLabel(DPadMoveMode mode, {bool shortLabel = false}) {
