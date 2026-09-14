@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	insight.c	$NHDT-Date: 1781973051 2026/06/20 16:30:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -18,6 +18,7 @@
 staticfn void enlght_out(const char *);
 staticfn void enlght_line(const char *, const char *, const char *,
                           const char *);
+staticfn boolean jp_insight_has_nonascii(const char *);
 staticfn char *enlght_combatinc(const char *, int, int, char *);
 staticfn void enlght_halfdmg(int, int);
 staticfn boolean walking_on_water(void);
@@ -1301,8 +1302,8 @@ weapon_insight(int final)
                 you_are(buf, "");
 
         } else { /* two-weapon */
-            /* NetHackJP: Expand pfx and sfx buffers to BUFSZ to prevent UTF-8 format overflow */
-            char pfx[BUFSZ], sfx[BUFSZ],
+            /* NetHackJP: Expand pfx and sfx buffers to BUFSZ * 2 to prevent UTF-8 format overflow */
+            char pfx[BUFSZ * 2], sfx[BUFSZ * 2],
                 sknambuf2[BUFSZ], sklvlbuf2[BUFSZ], twobuf[BUFSZ];
             const char *also3 = (char *) 0,
                        *verb_present, *verb_past;
@@ -1331,8 +1332,8 @@ weapon_insight(int final)
             pfx[0] = sfx[0] = '\0';
             if (twoskl < sklvl) {
                 /* twoskil won't be restricted so sklvl is at least basic */
-                Sprintf(pfx, "%sスキルは", jp_skill_name_for_display(wtype));
-                Sprintf(sfx, "二刀流スキル（%s）で制限される", twobuf);
+                Snprintf(pfx, sizeof pfx, "%sスキルは", jp_skill_name_for_display(wtype));
+                Snprintf(sfx, sizeof sfx, "二刀流スキル（%s）で制限される", twobuf);
             } else if (twoskl > sklvl) {
                 /* sklvl might be restricted */
                 Strcpy(pfx, "二刀流スキルは");
@@ -1362,8 +1363,8 @@ weapon_insight(int final)
                 pfx[0] = sfx[0] = buf[0] = '\0';
                 if (twoskl < sklvl2) {
                     /* twoskil is at least unskilled, sklvl2 at least basic */
-                    Sprintf(pfx, "%sスキルは", sknambuf2);
-                    Sprintf(sfx, "二刀流スキル（%s）で制限される", twobuf);
+                    Snprintf(pfx, sizeof pfx, "%sスキルは", sknambuf2);
+                    Snprintf(sfx, sizeof sfx, "二刀流スキル（%s）で制限される", twobuf);
                 } else if (twoskl > sklvl2) {
                     /* sklvl2 might be restricted */
                     Strcpy(pfx, "二刀流スキルは");
@@ -2152,17 +2153,17 @@ show_conduct(int final)
              *  N wishes (1 for an artifact)
              *  N wishes (M for artifacts)
              */
-            if (u.uconduct.wisharti == u.uconduct.wishes)
+            if (u.uconduct.wisharti == u.uconduct.wishes) {
                 Sprintf(eos(buf), "（%s",
                     (u.uconduct.wisharti > 2L) ? "すべて"
                       : (u.uconduct.wisharti == 2L) ? "両方"
                       : "");
-            else
+            } else {
                 Sprintf(eos(buf), "（%ld ", u.uconduct.wisharti);
-
-                Sprintf(eos(buf), "%sに使用）",
-                    (u.uconduct.wisharti == 1L) ? "アーティファクト"
-                                : "アーティファクト群");
+            }
+            Sprintf(eos(buf), "%sに使用）",
+                (u.uconduct.wisharti == 1L) ? "アーティファクト"
+                            : "アーティファクト群");
         }
         you_have_X(buf);
 
@@ -3438,15 +3439,16 @@ ustatusline(void)
     }
     if (!u.uswallow
         && (reg = visible_region_at(u.ux, u.uy)) != 0
-        && (ln = strlen(info)) < sizeof info)
+        && (ln = strlen(info)) < sizeof info) {
         Snprintf(eos(info), sizeof info - ln, ", %sの雲の中",
              reg_damg(reg) ? "毒ガス" : "蒸気");
+    }
 
-        Sprintf(alignbuf, "%sに従っている", align_str(u.ualign.type));
-        pline("%sのステータス (%s): レベル%d HP%d(%d) AC%d%s。", svp.plname,
-            piousness(FALSE, alignbuf),
-          Upolyd ? mons[u.umonnum].mlevel : u.ulevel, Upolyd ? u.mh : u.uhp,
-          Upolyd ? u.mhmax : u.uhpmax, u.uac, info);
+    Sprintf(alignbuf, "%sに従っている", align_str(u.ualign.type));
+    pline("%sのステータス (%s): レベル%d HP%d(%d) AC%d%s。", svp.plname,
+        piousness(FALSE, alignbuf),
+      Upolyd ? mons[u.umonnum].mlevel : u.ulevel, Upolyd ? u.mh : u.uhp,
+      Upolyd ? u.mhmax : u.uhpmax, u.uac, info);
 }
 
 /* for 'onefile' processing where end of this file isn't necessarily the

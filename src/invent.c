@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-30. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	invent.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.563 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -11,6 +11,11 @@ staticfn char *loot_xname(struct obj *);
 staticfn int invletter_value(char);
 staticfn int QSORTCALLBACK sortloot_cmp(const genericptr, const genericptr);
 staticfn const char *drop_english_article(const char *);
+staticfn const char *action_prompt_verb_jp(const char *);
+staticfn const char *action_label_jp(const char *);
+staticfn const char *action_prompt_jp(const char *);
+staticfn const char *action_missing_jp(const char *);
+staticfn const char *inv_class_name_core(char, boolean);
 
 staticfn const char *
 action_prompt_verb_jp(const char *word)
