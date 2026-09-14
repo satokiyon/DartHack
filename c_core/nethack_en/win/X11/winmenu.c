@@ -1317,13 +1317,29 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
     Cardinal num_args;
     Dimension cwidth, maxwidth = 0;
 
+    /* Does any line have a selector? */
+    boolean any_canpick = FALSE;
+    for (curr = curr_menu->base; curr; curr = curr->next) {
+        if (curr->identifier.a_void != NULL) {
+            any_canpick = TRUE;
+            break;
+        }
+    }
+
+    int *col_widths = NULL;
+    unsigned num_cols = 0;
+    X11_Font *font;
+#ifdef USE_XFT
+    font = X11_new_font(wp->w, 0, NHW_MENU);
+#endif
+
     for (curr = curr_menu->base; curr; curr = curr->next) {
         char tmpbuf[BUFSZ];
         Widget linewidget;
         String str = (String) curr->str;
         int attr = ATR_NONE;
         int color = NO_COLOR;
-        boolean canpick = (how != PICK_NONE && curr->identifier.a_void);
+        boolean canpick = curr->identifier.a_void != NULL;
 
         num_args = 0;
         XtSetArg(args[num_args], nhStr(XtNlabel), str); num_args++;

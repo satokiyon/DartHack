@@ -49,6 +49,7 @@ enum { font_bold = 1, font_italic = 2 };
 static boolean check_label(Widget);
 static void delete_callback(Widget, XtPointer, XtPointer);
 static void update_label(Widget, WidgetData *);
+static void set_tab_stops(Widget, WidgetData *, const char *);
 static void allocate_font(Widget, WidgetData *, unsigned);
 static void free_fonts(Widget, WidgetData *);
 
@@ -216,6 +217,11 @@ update_label(Widget w, WidgetData *data)
     unsigned attrs = data->attrs;
     if (!sens) {
         attrs |= HL_DIM;
+    }
+
+    /* Set the tab stops if needed */
+    if (data->columns == NULL && strchr(label, '\t') != NULL) {
+        set_tab_stops(w, data, label);
     }
 
     /* Dimensions of pixmap */
@@ -444,6 +450,66 @@ update_label(Widget w, WidgetData *data)
     data->pixmap = new_pixmap;
 }
 
+/* Set tab stops for text window */
+static void
+set_tab_stops(Widget w, WidgetData *data, const char *label)
+{
+    /* Count columns */
+    unsigned col = 0;
+    unsigned num_cols = 0;
+    size_t i = 0;
+    while (label[i] != '\0') {
+        size_t len = strcspn(label + i, "\t\n");
+        ++col;
+        i += len;
+        if (label[i] != '\t') {
+            /* The last column on its line */
+            num_cols = max(num_cols, col);
+            col = 0;
+        }
+        if (label[i] != '\0') {
+            ++i;
+        }
+    }
+
+    int *columns = (int *) alloc(num_cols * sizeof(columns[0]));
+    memset(columns, 0, num_cols * sizeof(columns[0]));
+
+    /* Determine column sizes */
+    col = 0;
+    i = 0;
+    Display *display = XtDisplay(w);
+    while (label[i] != '\0') {
+        size_t len = strcspn(label + i, "\t\n");
+        if (label[i+len] == '\t') {
+            /* A column from label+i to label+i+len */
+            int width = X11_column_width(display, data->font[0], label + i, len);
+            columns[col] = max(columns[col], width);
+            ++col;
+        } else {
+            /* Last column of the line */
+            /* This does not participate in sizing the column */
+            col = 0;
+        }
+        i += len;
+        if (label[i] != '\0') {
+            ++i;
+        }
+    }
+
+    /* Convert to column positions */
+    int pos = 0;
+    for (unsigned j = 0; j < num_cols; ++j) {
+        int rpos = pos + columns[j];
+        columns[j] = pos;
+        pos = rpos;
+    }
+
+    free(data->columns);
+    data->columns = columns;
+    data->num_cols = num_cols;
+}
+
 /* Allocate a bold or italic font */
 static void
 allocate_font(Widget w, WidgetData *data, unsigned font_idx)
@@ -530,9 +596,9 @@ typedef struct WidgetBucket {
     WidgetData *data;
 } WidgetBucket;
 
-#define MAX_WIDGETS 1024
-static WidgetBucket widget_table[MAX_WIDGETS];
-static unsigned num_widgets;
+static WidgetBucket *widget_table = NULL;
+static unsigned num_widgets = 0;
+static unsigned max_widgets = 0;
 
 /* bsearch compare function to search widget-table */
 static int
@@ -573,9 +639,12 @@ get_widget_data(Widget w)
 static WidgetData *
 add_widget(Widget w)
 {
-    /* Panic rather than overflow the array */
-    if (num_widgets >= MAX_WIDGETS) {
-        panic("Widget table is full\n");
+    /* If the array is full (or unallocated), add some new space to it */
+    if (num_widgets >= max_widgets) {
+        max_widgets = num_widgets + 1024;
+        widget_table = (WidgetBucket *) re_alloc(
+                (long *) widget_table,
+                max_widgets * sizeof(widget_table[0]));
     }
 
     /* Insert the widget into the table, maintaining its order */
@@ -608,7 +677,7 @@ delete_widget(Widget w)
 
     /* Remove the widget from the table */
     for (unsigned i = (unsigned)(bucket - widget_table);
-         i + 1 < MAX_WIDGETS;
+         i + 1 < num_widgets;
          ++i) {
         widget_table[i] = widget_table[i+1];
     }
