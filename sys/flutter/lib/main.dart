@@ -1582,12 +1582,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         text.contains('どの方向');
   }
 
-  String _moveModeLabel(DPadMoveMode mode) {
+  String _moveModeLabel(DPadMoveMode mode, {bool shortLabel = false}) {
+    final isJp = (_selectedLanguage == 'ja');
     switch (mode) {
       case DPadMoveMode.normal:
-        return '標準';
+        return isJp ? '標準' : 'Normal';
       case DPadMoveMode.upper:
-        return '大文字';
+        if (shortLabel && !isJp) {
+          return 'Upper';
+        }
+        return isJp ? '大文字' : 'Uppercase';
       case DPadMoveMode.gLower:
         return 'g';
       case DPadMoveMode.gUpper:
@@ -2227,6 +2231,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildYnOverlay() {
+    final recentMsgs = shouldShowRecentMessagesInDialog(_ynQuestion)
+        ? extractRecentContextMessages(
+            _screen.messageHistory,
+            prompt: _ynQuestion,
+          )
+        : const <String>[];
     return YnOverlay(
       question: _ynQuestion,
       choices: _ynChoices,
@@ -2234,6 +2244,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       onSelect: (choiceCode) => _sendYnResult(choiceCode),
       onShowMsgHistory: _showMsgHistoryPanel,
       bottomInset: _dialogBottomInset(context),
+      recentMessages: recentMsgs,
     );
   }
 
@@ -2284,6 +2295,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildGetLineOverlay() {
+    final recentMsgs = shouldShowRecentMessagesInDialog(_getlinePrompt)
+        ? extractRecentContextMessages(
+            _screen.messageHistory,
+            prompt: _getlinePrompt,
+          )
+        : const <String>[];
     return GetLineOverlay(
       prompt: _getlinePrompt,
       inputController: _getlineController,
@@ -2292,6 +2309,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       onShowMsgHistory: _showMsgHistoryPanel,
       bottomInset: _dialogBottomInset(context),
       isCallOrNamePrompt: isCallOrNamePrompt,
+      recentMessages: recentMsgs,
     );
   }
 
@@ -2955,7 +2973,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     child: NetHackDPad(
                       opacity: _padOpacity,
                       directionLabels: _buildDirectionLabels(),
-                      centerLabel: _isDirectionPromptActive ? '.' : _moveModeLabel(_dPadMoveMode),
+                      centerLabel: _isDirectionPromptActive ? '.' : _moveModeLabel(_dPadMoveMode, shortLabel: true),
                       onDirectionPress: (viKey) {
                         _sendModeAppliedDirection(viKey);
                       },

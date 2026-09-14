@@ -156,3 +156,147 @@ bool isCallOrNamePrompt(String prompt) {
       || p.contains('annotation')
       || p.contains('replace annotation');
 }
+
+/// アイテムの名前付け・呼び名プロンプト（巻物・薬・杖・魔法書など）か判定する。
+/// ※マップ注釈（annotation）や拡張コマンドは除外
+bool isItemCallOrNamePrompt(String prompt) {
+  if (prompt.isEmpty) return false;
+  final p = prompt.toLowerCase();
+
+  // マップ注釈メモは明確に除外
+  if (prompt.contains('注釈') || p.contains('annotation')) return false;
+
+  return prompt.contains('何と呼びますか')
+      || prompt.contains('何と名付けますか')
+      || prompt.contains('何という名前にしますか')
+      || prompt.contains('名前を付けますか')
+      || prompt.contains('名前を付け')
+      || prompt.contains('何に変更しますか')
+      || p.contains('call ')
+      || p.contains('name ')
+      || p.contains('call this')
+      || p.contains('name this')
+      || p.contains('call the')
+      || p.contains('name the')
+      || p.contains('what do you want to call')
+      || p.contains('what do you want to name');
+}
+
+/// 死亡時の開示・bones・墓石等の確認プロンプトか判定する。
+bool isDeathConfirmationPrompt(String prompt) {
+  if (prompt.isEmpty) return false;
+  final p = prompt.toLowerCase();
+  return prompt.contains('持ち物を明らかにしますか')
+      || prompt.contains('リストを明らかにしますか')
+      || prompt.contains('bones ファイルを保存しますか')
+      || prompt.contains('墓石を見ますか')
+      || prompt.contains('死因を記録しますか')
+      || p.contains('see what you had')
+      || p.contains('what you were carrying')
+      || p.contains('see your attributes')
+      || p.contains('see your conduct')
+      || p.contains('creatures vanquished')
+      || p.contains('save bones');
+}
+
+/// 危険行動の警告確認プロンプト、または状況確認プロンプトか判定する。
+/// ※ゲーム終了確認（Really quit?）などの日常確認は除外
+bool isRiskyActionPrompt(String prompt) {
+  if (prompt.isEmpty) return false;
+  final p = prompt.toLowerCase();
+
+  // ゲーム終了・中断は明確に除外
+  if (prompt.contains('終了') || prompt.contains('やめ') || p.contains('quit') || p.contains('stop')) {
+    return false;
+  }
+
+  // テレポート確認
+  if (prompt.contains('テレポートしますか') || p.contains('teleport?')) {
+    return true;
+  }
+
+  // 日本語の危険行動警告（「本当に」＋危険動詞）
+  if (prompt.contains('本当に') &&
+      (prompt.contains('飲みますか') ||
+       prompt.contains('食べますか') ||
+       prompt.contains('攻撃しますか') ||
+       prompt.contains('飛び込みますか') ||
+       prompt.contains('装備しますか') ||
+       prompt.contains('歩きますか') ||
+       prompt.contains('振りますか') ||
+       prompt.contains('撃ちますか') ||
+       prompt.contains('潜りますか') ||
+       prompt.contains('祈りますか') ||
+       prompt.contains('這い'))) {
+    return true;
+  }
+
+  // 英語の危険行動警告（really + 危険動詞、または are you sure you want to attack）
+  if (p.contains('are you sure you want to attack')) {
+    return true;
+  }
+
+  if (p.contains('really ') &&
+      (p.contains('attack') ||
+       p.contains('drink') ||
+       p.contains('eat') ||
+       p.contains('dive') ||
+       p.contains('crawl') ||
+       p.contains('wear') ||
+       p.contains('put on') ||
+       p.contains('shoot') ||
+       p.contains('pray') ||
+       p.contains('jump'))) {
+    return true;
+  }
+
+  return false;
+}
+
+/// ダイアログ内で直近メッセージ枠を表示すべき特定のプロンプト（アイテム名前付け、死亡時確認、危険行動確認）かどうかを判定する。
+bool shouldShowRecentMessagesInDialog(String prompt) {
+  if (prompt.isEmpty) return false;
+  return isItemCallOrNamePrompt(prompt) ||
+         isDeathConfirmationPrompt(prompt) ||
+         isRiskyActionPrompt(prompt);
+}
+
+/// ダイアログ表示の直前に出力された状況メッセージを抽出する。
+/// - 空行や制御用行（MOREなど）を除外
+/// - プロンプト文字列（ダイアログの質問文）との重複を除外
+/// - 直近の有効なメッセージを最大 [maxCount] 行取得し、時系列順（古い行→新しい行）で返却
+List<String> extractRecentContextMessages(
+  List<String> messageHistory, {
+  String? prompt,
+  int maxCount = 6,
+}) {
+  if (messageHistory.isEmpty) return const [];
+
+  final cleanedPrompt = prompt?.trim().toLowerCase();
+  final List<String> extracted = [];
+
+  for (int i = messageHistory.length - 1; i >= 0; i--) {
+    final rawLine = messageHistory[i];
+    final trimmed = rawLine.trim();
+
+    if (trimmed.isEmpty) continue;
+    if (trimmed == '-- MORE --' || trimmed.toLowerCase() == '--more--') continue;
+
+    // プロンプト文との重複・包含チェック（二重表示の防止）
+    if (cleanedPrompt != null && cleanedPrompt.isNotEmpty) {
+      final lowerLine = trimmed.toLowerCase();
+      if (lowerLine == cleanedPrompt ||
+          (lowerLine.length > 5 && cleanedPrompt.contains(lowerLine)) ||
+          (cleanedPrompt.length > 5 && lowerLine.contains(cleanedPrompt))) {
+        continue;
+      }
+    }
+
+    extracted.add(rawLine);
+    if (extracted.length >= maxCount) break;
+  }
+
+  // 古い行 → 新しい行 の時系列順に戻して返す
+  return extracted.reversed.toList();
+}
+

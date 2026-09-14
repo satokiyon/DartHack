@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
+import 'dialog_recent_messages_box.dart';
 
 class YnOverlay extends StatelessWidget {
   final String question;
@@ -8,6 +9,7 @@ class YnOverlay extends StatelessWidget {
   final Function(int choiceCode) onSelect;
   final VoidCallback onShowMsgHistory;
   final double bottomInset;
+  final List<String> recentMessages;
 
   const YnOverlay({
     super.key,
@@ -17,6 +19,7 @@ class YnOverlay extends StatelessWidget {
     required this.onSelect,
     required this.onShowMsgHistory,
     required this.bottomInset,
+    this.recentMessages = const [],
   });
 
   String _parseEffectiveChoices() {
@@ -80,32 +83,45 @@ class YnOverlay extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 side: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 420,
+                  maxHeight: MediaQuery.of(context).size.height - bottomInset - 32,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.help_outline_rounded, color: Colors.amber[300], size: 18),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            l10n.confirmTitle,
-                            style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold),
-                          ),
+                        Row(
+                          children: [
+                            Icon(Icons.help_outline_rounded, color: Colors.amber[300], size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                l10n.confirmTitle,
+                                style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Divider(color: Colors.white.withValues(alpha: 0.16), height: 1),
-                    const SizedBox(height: 14),
-                    Text(
-                      question,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
+                        const SizedBox(height: 8),
+                        Divider(color: Colors.white.withValues(alpha: 0.16), height: 1),
+                        const SizedBox(height: 12),
+                        if (recentMessages.isNotEmpty)
+                          DialogRecentMessagesBox(
+                            messages: recentMessages,
+                            onTapHistory: onShowMsgHistory,
+                            isKeyboardVisible: bottomInset > 0,
+                          ),
+                        Text(
+                          question,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
                     if (isYesNo)
                       Wrap(
                         spacing: 12,
@@ -190,6 +206,11 @@ class YnOverlay extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 }
+
+
+

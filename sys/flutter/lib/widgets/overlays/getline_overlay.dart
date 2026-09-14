@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/ext_cmd_entry.dart';
+import 'dialog_recent_messages_box.dart';
 
 class GetLineOverlay extends StatefulWidget {
   final String prompt;
@@ -11,6 +12,7 @@ class GetLineOverlay extends StatefulWidget {
   final VoidCallback onShowMsgHistory;
   final double bottomInset;
   final bool Function(String prompt) isCallOrNamePrompt;
+  final List<String> recentMessages;
 
   const GetLineOverlay({
     super.key,
@@ -21,6 +23,7 @@ class GetLineOverlay extends StatefulWidget {
     required this.onShowMsgHistory,
     required this.bottomInset,
     required this.isCallOrNamePrompt,
+    this.recentMessages = const [],
   });
 
   @override
@@ -102,6 +105,12 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                     const SizedBox(height: 8),
                     Divider(color: Colors.white.withValues(alpha: 0.16), height: 1),
                     const SizedBox(height: 12),
+                    if (widget.recentMessages.isNotEmpty)
+                      DialogRecentMessagesBox(
+                        messages: widget.recentMessages,
+                        onTapHistory: _handleShowHistory,
+                        isKeyboardVisible: widget.bottomInset > 0,
+                      ),
                     TextField(
                       controller: widget.inputController,
                       focusNode: _inputFocusNode,
