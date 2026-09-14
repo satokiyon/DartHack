@@ -144,24 +144,21 @@ NetHack はテキスト（ASCII文字）だけでなく、美しいグラフィ�
 * 相対パスで指定する場合、実行ファイル（`NetHack.exe` / `NetHackW.exe`）と同じフォルダに置くのが確実です。
 * サブフォルダに置く場合は `OPTIONS=tile_file:tiles/your_tiles.bmp` のように相対パスで指定できます。
 
-#### Linux (X11 GUI) でのタイルセット変更手順
-Linux版 (X11 GUI) でグラフィックタイル表示を利用する場合のカスタム手順です。
+#### Linux版 (X11 GUI) 設定手順
+Linux版 (X11 GUI) でも、Windows版と同様に好みのタイルセット画像（XPM形式等）を `.nethackrc` で柔軟に指定できます。
 
-1. **タイル画像ファイル (`x11tiles`)**:
-   X11 ポートで標準で読み込まれるタイル画像ファイル名は **`x11tiles`** (XPM形式) です。
-   ※ `.nethackrc` の `OPTIONS=tile_file:ファイル名` や `NetHack.ad` の `NetHack.tile_file: ファイル名` で別のファイル名を指定することも可能です。
-2. **タイルセット画像の変更手順**:
-   お好みの XPM 画像を用意し、ファイル名を `x11tiles` に変更して実行ディレクトリ（解凍したフォルダ内）の既存 `x11tiles` に上書き・置換するか、任意の名前で配置して `tile_file` に指定します。
-3. **タイルサイズ（幅・高さ）の指定**:
-   Windows版と同様に、`.nethackrc` の `OPTIONS=tile_width:32,tile_height:32` または X11 リソース（`NetHack.ad` の `NetHack.tile_width` / `NetHack.tile_height`）で 1 タイルのピクセルサイズ（例: 32x32 なら `32`）を指定できます。
-   ※ 省略（未指定）した場合は、タイル画像全体のサイズから自動判定されます。
-4. **設定ファイル (`.nethackrc`) 例**:
+1. 好みのタイルセット（XPM形式等）を用意し、実行ディレクトリ（解凍したフォルダ内）に配置します。
+2. `.nethackrc` を開き、以下の例のように設定を追記または修正します。
    ```ini
    OPTIONS=windowtype:X11
    OPTIONS=map_mode:tiles
+   OPTIONS=tile_file:x11tiles_32.xpm
    OPTIONS=tile_width:32
    OPTIONS=tile_height:32
    ```
+   * `tile_file`: 使用するタイル画像ファイル名（またはパス）を指定します（省略時は既定の `x11tiles`）。
+   * `tile_width` / `tile_height`: 1タイルのピクセルサイズ（例: 32x32 なら `32`）を指定します（省略時は画像サイズから自動判定）。
+   * X11 リソース（`NetHack.ad` / `~/.Xresources` の `NetHack.tile_file`, `NetHack.tile_width`, `NetHack.tile_height`）での指定も可能です。
 
 ---
 

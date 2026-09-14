@@ -172,7 +172,7 @@ XAPPLRESDIR=./playground ./playground/nethack -wX11
 OPTIONS=windowtype:X11
 ```
 
-※ リリースパッケージでは同封の `./nethackW` スクリプトで起動できます。X11 版のタイルセットはファイル名が `x11tiles` 固定で、タイルの画像サイズは自動判定されます。
+※ リリースパッケージでは同封の `./nethackW` スクリプトで起動できます。X11 版のタイルセットはデフォルトで `x11tiles` が読み込まれますが、`.nethackrc` の `OPTIONS=tile_file:ファイル名,tile_width:32,tile_height:32` や `NetHack.ad` リソースで任意のファイル名およびタイルサイズ（幅・高さ）を指定できます（未指定時は画像サイズから自動判定）。
 ※ 日本語入力（`#名前` `#願い` 等の getlin ダイアログ）を使用する場合は、事前に fcitx5 を起動してください（下記「fcitx5 の設定と起動」）。
 
 ##### (d) fcitx5 の設定と起動（X11 版で日本語入力する場合）
@@ -763,10 +763,10 @@ GitHub上の Releases ページから新規リリースを作成し、ビルド�
 
 WSL (Linux) 環境上の NetHack X11 ポート (`windowtype:X11`) において、タイル画像が未探索マスや一部グラフィックで崩れる問題、および生成される `x11tiles` 画像が途中で読み込み中断を起こす問題についての技術注釈です。
 
-* **タイル解像度の設定ファイル対応と自動判定フォールバック (`win/X11/winmap.c`, `win/X11/winX.c`, `include/winX.h`, `win/X11/NetHack.ad`)**:
-  - Windows版と同様に、`.nethackrc` の `OPTIONS=tile_width:W,tile_height:H` および X11 リソース（`NetHack.tile_width` / `NetHack.tile_height`）での 1 タイルのピクセルサイズ明示指定に対応。
+* **タイルファイル指定および解像度の設定ファイル対応と自動判定フォールバック (`win/X11/winmap.c`, `win/X11/winX.c`, `include/winX.h`, `win/X11/NetHack.ad`)**:
+  - 従来はファイル名が `x11tiles` 固定で解像度は画像からの自動計算のみだったが、Windows版と同様に `.nethackrc` の `OPTIONS=tile_file:...,tile_width:W,tile_height:H` および X11 リソース（`NetHack.tile_file`, `NetHack.tile_width` / `NetHack.tile_height`）での柔軟なファイル指定および 1 タイルのピクセルサイズ明示指定に対応。
   - 要求サイズが指定されている場合は、画像の幅・高さの割り切れチェックおよび総タイル数チェック（`total_tiles_used`）を行い、不一致時は警告を出してテキストモードにフォールバック。
-  - 省略（未指定）時は、従来の画像幅からの自動判定（`tile_width = image_width / TILES_PER_ROW`, `tile_height = tile_width`）をフォールバックとして継続サポート。
+  - 省略（未指定）時は、既定のファイル名（`x11tiles`）および従来の画像幅からの自動判定（`tile_width = image_width / TILES_PER_ROW`, `tile_height = tile_width`）をフォールバックとして継続サポート。
 * **`tile2x11` における XPM 色記号文字コード破壊の修正 (`win/X11/tile2x11.c`)**:
   - 単純な `(char)(i + '0')` による文字コード加算では、色数増加時に `"` (ダブルクォーテーション) 等の制御文字が混入して libXpm で構文エラーを起こし、画像ロードが途中で打ち切られていた。安全な ASCII キャラクターマップ (`xpm_chars[]`) を導入してエスケープ破綻を保護した。
 * **`convert_tiles` ポインタ移動計算の「絶対座標計算方式」への変更 (`win/X11/tile2x11.c`)**:
