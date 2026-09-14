@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1781973060 2026/06/20 16:31:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.464 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -3978,10 +3978,10 @@ wizterrainwish(struct _readobjnam_data *d)
         if ((t = maketrap(x, y, trap)) != 0) {
             trap = t->ttyp;
             tname = trapname(trap, TRUE);
-            pline("%s%s.", An(tname),
+            pline("%s%s.", tname,
                   (trap != MAGIC_PORTAL) ? "" : "（行き先不明）");
         } else {
-            pline("%sの生成に失敗した.", an(tname));
+            pline("%sの生成に失敗した.", tname);
         }
         return &hands_obj;
     }

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
 /* NetHack 5.0	dothrow.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.318 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -933,7 +933,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
             (void) drown();
             return FALSE;
         } else if (!Is_waterlevel(&u.uz) && !stopping_short) {
-            Norep("%sの上を移動した.", an(is_moat(x, y) ? "堀" : "水たまり"));
+            Norep("%sの上を移動した.", is_moat(x, y) ? "堀" : "水たまり");
         }
     } else if (is_lava(x, y) && !stopping_short) {
         Norep("溶岩の上を移動した.");

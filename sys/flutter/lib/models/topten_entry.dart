@@ -1249,6 +1249,92 @@ String _capitalizeFirst(String text) {
   return text[0].toUpperCase() + text.substring(1);
 }
 
+String _translateMultiReason(String rawReason) {
+  var reason = rawReason.trim();
+  if (reason.endsWith('.')) {
+    reason = reason.substring(0, reason.length - 1).trim();
+  }
+
+  const reasonMap = {
+    'dragging an iron ball': '鉄球を引きずっていた',
+    'digesting something': '何かを消化していた',
+    'gazing into a mirror': '鏡をのぞき込んでいた',
+    'jumping around': '跳び回っていた',
+    'stuck in a spider web': '蜘蛛の巣に絡まっていた',
+    'disrobing': '服を脱いでいた',
+    'dressing up': '着替えていた',
+    'moving through the air': '空中を移動していた',
+    'pretending to be a pile of gold': '金貨の山のふりをしていた',
+    'feigning a pile of gold coins': '金貨の山のふりをしていた',
+    'unconscious from rotten food': '腐った食べ物で意識を失っていた',
+    'fainted from lack of food': '食料不足で気絶していた',
+    'fainting from hunger': '飢えで気絶していた',
+    'vomiting': '吐いていた',
+    'opening a container': '容器を開けていた',
+    'tipping a container': '容器を傾けていた',
+    'looking into a magic 8-ball': 'マジック8ボールを覗き込んでいた',
+    'looking into a crystal ball': '水晶玉を覗き込んでいた',
+    'toyed with by fate': '運命に翻弄されていた',
+    'paralyzed by fear': '恐怖で身動きできなかった',
+    'being scared stiff': '恐怖で身動きできなかった',
+    'being frightened to death': '恐怖で死にかけていた',
+    'sleeping off a magical draught': '魔法の薬で眠っていた',
+    'reading a book': '本を読んでいた',
+    'taking off clothes': '服を脱いでいた',
+    'praying': '祈っていた',
+    'trying to turn the monsters': 'モンスターを退散させようとしていた',
+    'being terrified of a demon': '悪魔におびえていた',
+    'being terrified of a ghost': '幽霊におびえていた',
+    'scared by rattling': 'ガタガタいう音に驚いていた',
+    'frozen by a potion': 'ポーションで凍りついていた',
+    'getting stoned': '石化していた',
+    'fumbling': 'もたついていた',
+    'sleeping': '眠っていた',
+    'hiding from thunderstorm': '雷雨を避けて隠れていた',
+    'paralyzed by a monster': 'モンスターに麻痺させられていた',
+    'frozen by a monster\'s gaze': 'モンスターの視線で凍りついていた',
+    'frozen by a monster': 'モンスターに凍りつかされていた',
+    'exhaustion': '疲労困憊していた',
+    'elementary physics': '物理法則に翻弄されていた',
+    'brainlessness': '脳を失っていた',
+    'starvation': '飢えに苦しんでいた',
+    'system shock': 'システムショック状態だった',
+    'alchemic blast': '錬金術の爆発に巻き込まれていた',
+    'helpless': '無力状態',
+  };
+
+  final lower = reason.toLowerCase();
+  for (final entry in reasonMap.entries) {
+    if (lower == entry.key.toLowerCase()) {
+      return entry.value;
+    }
+  }
+
+  if (reason.startsWith('paralyzed by ')) {
+    final who = _stripEnglishArticle(reason.substring(13));
+    final whoTr = _translateMonsterOrItemName(who);
+    return '$whoTrに麻痺させられていた';
+  }
+  if (reason.startsWith('frozen by ')) {
+    var who = _stripEnglishArticle(reason.substring(10));
+    if (who.endsWith(' gaze')) {
+      var base = who.substring(0, who.length - 5).trim();
+      if (base.endsWith("'s")) {
+        base = base.substring(0, base.length - 2).trim();
+      } else if (base.endsWith("'")) {
+        base = base.substring(0, base.length - 1).trim();
+      }
+      final whoTr = _translateMonsterOrItemName(base);
+      return '$whoTrの視線で凍りついていた';
+    } else {
+      final whoTr = _translateMonsterOrItemName(who);
+      return '$whoTrに凍りつかされていた';
+    }
+  }
+
+  return _translateMonsterOrItemName(reason);
+}
+
 String _translateDeathText(String death, bool isJp) {
   if (death.isEmpty) return death;
   if (!isJp) {
@@ -1283,6 +1369,14 @@ String _translateDeathText(String death, bool isJp) {
     mainDeath = mainDeath.replaceAll(' (with a fake Amulet)', '');
   }
 
+  String whileSuffix = '';
+  final whileIdx = mainDeath.indexOf(', while ');
+  if (whileIdx != -1) {
+    final rawWhile = mainDeath.substring(whileIdx + 8).trim();
+    mainDeath = mainDeath.substring(0, whileIdx).trim();
+    whileSuffix = '（${_translateMultiReason(rawWhile)}）';
+  }
+
   int cutIdx = -1;
   final parenIdx = mainDeath.lastIndexOf(' (');
   final jpParenIdx = mainDeath.lastIndexOf('（');
@@ -1299,7 +1393,7 @@ String _translateDeathText(String death, bool isJp) {
     mainDeath = mainDeath.substring(0, mainDeath.length - 1).trim();
   }
 
-  final translatedMain = '${_translateDeathTextInternal(mainDeath, isJp)}$itemSuffix';
+  final translatedMain = '${_translateDeathTextInternal(mainDeath, isJp)}$whileSuffix$itemSuffix';
 
   var result = translatedMain;
   if (locSuffix.isNotEmpty) {
