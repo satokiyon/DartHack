@@ -70,10 +70,12 @@ class SoundManager {
   final List<_PlayerEntry> _pool = [];
   AudioPlayer? _floorBgmPlayer;
   String? _currentFloorBgm;
+  String? _lastFloorBgm;
   AudioPlayer? _roomBgmPlayer;
   String? _currentRoomBgm;
   AudioPlayer? _ambiencePlayer;
   String? _currentAmbience;
+  String? _lastAmbience;
 
   final Set<String> _availableSounds = {};
   bool _isInitialized = false;
@@ -89,12 +91,18 @@ class SoundManager {
   double _ambienceVolume = 0.6;
   double _voiceVolume = 0.8;
   bool _muted = false;
+  bool _bgmEnabled = true;
+  bool _seEnabled = true;
+  bool _ambienceEnabled = true;
 
   double get seVolume => _seVolume;
   double get bgmVolume => _bgmVolume;
   double get ambienceVolume => _ambienceVolume;
   double get voiceVolume => _voiceVolume;
   bool get isMuted => _muted;
+  bool get bgmEnabled => _bgmEnabled;
+  bool get seEnabled => _seEnabled;
+  bool get ambienceEnabled => _ambienceEnabled;
 
   /// 現在再生中のBGMファイル名（ルームBGMが再生中ならそれを、それ以外はフロアBGM）
   String? get currentBgm => _currentRoomBgm ?? _currentFloorBgm;
@@ -112,6 +120,9 @@ class SoundManager {
       _ambienceVolume = prefs.getDouble('sound_ambience_volume') ?? 0.6;
       _voiceVolume = prefs.getDouble('sound_voice_volume') ?? 0.8;
       _muted = prefs.getBool('sound_muted') ?? false;
+      _bgmEnabled = prefs.getBool('sound_bgm_enabled') ?? true;
+      _seEnabled = prefs.getBool('sound_se_enabled') ?? true;
+      _ambienceEnabled = prefs.getBool('sound_ambience_enabled') ?? true;
 
       // アセットマニフェストから利用可能な音声一覧をインデックス化
       final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
@@ -174,21 +185,21 @@ class SoundManager {
     switch (category) {
       case SoundCategory.se:
       case SoundCategory.achievement:
-        _playSe(filename, volume);
+        if (_seEnabled) _playSe(filename, volume);
         break;
       case SoundCategory.heroMusic:
-        _playInstrument(filename, text, volume, loopOrFlag != 0);
+        if (_seEnabled) _playInstrument(filename, text, volume, loopOrFlag != 0);
         break;
       case SoundCategory.bgm:
-        _playBgm(filename, volume, loopOrFlag);
+        if (_bgmEnabled) _playBgm(filename, volume, loopOrFlag);
         break;
       case SoundCategory.ambience:
         if (_terrainAmbienceFiles.contains(filename)) {
           // 2.2 地形・天候環境音（フロアBGMと同時に再生・距離減衰あり）
-          _playAmbience(filename, volume, loopOrFlag);
+          if (_ambienceEnabled) _playAmbience(filename, volume, loopOrFlag);
         } else {
           // 2.3 特別な部屋・施設・テーマ部屋（フロアBGMとクロスフェードするルームBGM）
-          _playBgm(filename, volume, loopOrFlag);
+          if (_bgmEnabled) _playBgm(filename, volume, loopOrFlag);
         }
         break;
       case SoundCategory.voice:
@@ -199,7 +210,7 @@ class SoundManager {
 
   /// 効果音の再生
   Future<void> _playSe(String filename, int cVolume) async {
-    if (filename.isEmpty || !hasSound(filename)) return;
+    if (!_seEnabled || filename.isEmpty || !hasSound(filename) || _pool.isEmpty) return;
 
     // 同一サウンドの重複上限チェック (最大3音)
     int sameCount = 0;
@@ -336,6 +347,7 @@ class SoundManager {
         }
 
         _currentFloorBgm = filename;
+        _lastFloorBgm = filename;
         await _floorBgmPlayer?.setReleaseMode(ReleaseMode.loop);
         await _floorBgmPlayer?.setVolume(0.0);
         await _floorBgmPlayer?.play(AssetSource('sounds/$filename'));
@@ -436,6 +448,7 @@ class SoundManager {
 
     try {
       _currentAmbience = filename;
+      _lastAmbience = filename;
       await _ambiencePlayer?.setVolume(finalVolume);
       await _ambiencePlayer?.setReleaseMode(ReleaseMode.loop);
       await _ambiencePlayer?.play(AssetSource('sounds/$filename'));
@@ -464,40 +477,129 @@ class SoundManager {
     await prefs.setBool('sound_muted', mute);
     if (mute) {
       await stopAll();
+    } else {
+      // ミュート解除時、直前のフロアBGM・環境音を自動復帰
+      if (_bgmEnabled && _currentFloorBgm == null && _lastFloorBgm != null) {
+        unawaited(_playBgm(_lastFloorBgm!, 0, 1));
+      }
+      if (_ambienceEnabled && _currentAmbience == null && _lastAmbience != null) {
+        unawaited(_playAmbience(_lastAmbience!, 0, 1));
+      }
     }
   }
 
-  Future<void> setSeVolume(double vol) async {
+  /// スライダー操作中のリアルタイム音量反映（ディスクI/Oなし）
+  void updateSeVolume(double vol) {
     _seVolume = vol.clamp(0.0, 1.0);
+  }
+
+  /// スライダー操作完了時等の永続化付きSE音量設定
+  Future<void> setSeVolume(double vol) async {
+    updateSeVolume(vol);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('sound_se_volume', _seVolume);
   }
 
-  Future<void> setBgmVolume(double vol) async {
+  /// スライダー操作中のリアルタイム音量反映（ディスクI/Oなし）
+  void updateBgmVolume(double vol) {
     _bgmVolume = vol.clamp(0.0, 1.0);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('sound_bgm_volume', _bgmVolume);
     if (_floorBgmPlayer != null && _floorBgmPlayer!.state == PlayerState.playing) {
-      await _floorBgmPlayer!.setVolume(_bgmVolume);
+      _floorBgmPlayer!.setVolume(_bgmVolume);
     }
     if (_roomBgmPlayer != null && _roomBgmPlayer!.state == PlayerState.playing) {
-      await _roomBgmPlayer!.setVolume(_bgmVolume);
+      _roomBgmPlayer!.setVolume(_bgmVolume);
     }
   }
 
-  Future<void> setAmbienceVolume(double vol) async {
+  /// スライダー操作完了時等の永続化付きBGM音量設定
+  Future<void> setBgmVolume(double vol) async {
+    updateBgmVolume(vol);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('sound_bgm_volume', _bgmVolume);
+  }
+
+  /// スライダー操作中のリアルタイム音量反映（ディスクI/Oなし）
+  void updateAmbienceVolume(double vol) {
     _ambienceVolume = vol.clamp(0.0, 1.0);
+    if (_ambiencePlayer != null && _ambiencePlayer!.state == PlayerState.playing) {
+      _ambiencePlayer!.setVolume(_ambienceVolume);
+    }
+  }
+
+  /// スライダー操作完了時等の永続化付き環境音量設定
+  Future<void> setAmbienceVolume(double vol) async {
+    updateAmbienceVolume(vol);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('sound_ambience_volume', _ambienceVolume);
-    if (_ambiencePlayer != null && _ambiencePlayer!.state == PlayerState.playing) {
-      await _ambiencePlayer!.setVolume(_ambienceVolume);
+  }
+
+  Future<void> setBgmEnabled(bool enabled) async {
+    _bgmEnabled = enabled;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('sound_bgm_enabled', enabled);
+    if (!enabled) {
+      await stopBgm();
+    } else if (!_muted && _currentFloorBgm == null && _lastFloorBgm != null) {
+      // BGM再有効化時、直前のフロアBGMを自動再開
+      unawaited(_playBgm(_lastFloorBgm!, 0, 1));
     }
   }
 
-  Future<void> setVoiceVolume(double vol) async {
-    _voiceVolume = vol.clamp(0.0, 1.0);
+  Future<void> setSeEnabled(bool enabled) async {
+    _seEnabled = enabled;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('sound_voice_volume', _voiceVolume);
+    await prefs.setBool('sound_se_enabled', enabled);
+  }
+
+  Future<void> setAmbienceEnabled(bool enabled) async {
+    _ambienceEnabled = enabled;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('sound_ambience_enabled', enabled);
+    if (!enabled) {
+      await stopAmbience();
+    } else if (!_muted && _currentAmbience == null && _lastAmbience != null) {
+      // 環境音再有効化時、直前の環境音を自動再開
+      unawaited(_playAmbience(_lastAmbience!, 0, 1));
+    }
+  }
+
+  /// SharedPreferences から設定を一括同期
+  Future<void> syncFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final muted = prefs.getBool('sound_muted') ?? false;
+    final bgmEnabled = prefs.getBool('sound_bgm_enabled') ?? true;
+    final seEnabled = prefs.getBool('sound_se_enabled') ?? true;
+    final ambEnabled = prefs.getBool('sound_ambience_enabled') ?? true;
+    final bgmVol = prefs.getDouble('sound_bgm_volume') ?? 0.5;
+    final seVol = prefs.getDouble('sound_se_volume') ?? 0.8;
+    final ambVol = prefs.getDouble('sound_ambience_volume') ?? 0.6;
+
+    await setMuted(muted);
+    await setBgmEnabled(bgmEnabled);
+    await setSeEnabled(seEnabled);
+    await setAmbienceEnabled(ambEnabled);
+    await setBgmVolume(bgmVol);
+    await setSeVolume(seVol);
+    await setAmbienceVolume(ambVol);
+  }
+
+  /// 設定画面等でのSEプレビュー再生（seEnabledがONの時、または設定テスト用）
+  Future<void> playPreviewSe() async {
+    if (_muted || !_seEnabled || _seVolume <= 0.0) return;
+    // 存在する代表的なSEをプレビュー再生（優先順位順）
+    final candidateFiles = [
+      'se_pickup.ogg',
+      'se_bell.ogg',
+      'click.ogg',
+      'se_coin.ogg',
+      'se_door_open.ogg',
+    ];
+    for (final filename in candidateFiles) {
+      if (hasSound(filename)) {
+        await _playSe(filename, 100);
+        return;
+      }
+    }
   }
 
   /// アプリバックグラウンド移行時の一時停止
@@ -523,14 +625,19 @@ class SoundManager {
   /// アプリフォアグラウンド復帰時の再開
   Future<void> resumeFromBackground() async {
     try {
-      if (_floorWasPlayingBeforeBackground && _floorBgmPlayer != null) {
-        await _floorBgmPlayer?.resume();
+      // ミュート中やカテゴリ無効化中は再開しない
+      if (!_muted && _bgmEnabled) {
+        if (_floorWasPlayingBeforeBackground && _floorBgmPlayer != null) {
+          await _floorBgmPlayer?.resume();
+        }
+        if (_roomWasPlayingBeforeBackground && _roomBgmPlayer != null) {
+          await _roomBgmPlayer?.resume();
+        }
       }
-      if (_roomWasPlayingBeforeBackground && _roomBgmPlayer != null) {
-        await _roomBgmPlayer?.resume();
-      }
-      if (_ambienceWasPlayingBeforeBackground && _ambiencePlayer != null) {
-        await _ambiencePlayer?.resume();
+      if (!_muted && _ambienceEnabled) {
+        if (_ambienceWasPlayingBeforeBackground && _ambiencePlayer != null) {
+          await _ambiencePlayer?.resume();
+        }
       }
     } catch (_) {} finally {
       _floorWasPlayingBeforeBackground = false;
@@ -575,5 +682,13 @@ class SoundManager {
   @visibleForTesting
   void setInitializedForTest(bool value) {
     _isInitialized = value;
+  }
+
+  /// テスト用: 各カテゴリ有効状態の設定
+  @visibleForTesting
+  void setEnabledForTest({bool? bgm, bool? se, bool? ambience}) {
+    if (bgm != null) _bgmEnabled = bgm;
+    if (se != null) _seEnabled = se;
+    if (ambience != null) _ambienceEnabled = ambience;
   }
 }

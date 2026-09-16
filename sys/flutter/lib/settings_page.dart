@@ -14,6 +14,7 @@ import 'utils/scale_clamp.dart';
 import 'widgets/shortcut_edit_dialog.dart';
 import 'l10n/app_localizations.dart';
 import 'main.dart';
+import 'services/sound_manager.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -60,6 +61,15 @@ class _SettingsPageState extends State<SettingsPage> {
   String _mapTapTravelMode = 'always';
   bool _autosaveEnabled = true;
   int _autosaveInterval = 50;
+
+  // サウンド設定
+  bool _soundMasterEnabled = true;
+  bool _soundBgmEnabled = true;
+  double _soundBgmVolume = 0.5;
+  bool _soundSeEnabled = true;
+  double _soundSeVolume = 0.8;
+  bool _soundAmbienceEnabled = true;
+  double _soundAmbienceVolume = 0.6;
 
   // defaults.nh 連動ゲームオプション
   int _optTutorialMode = 0;
@@ -260,6 +270,15 @@ class _SettingsPageState extends State<SettingsPage> {
       _msgOpacity = prefs.getDouble('msg_opacity') ?? 0.40;
       _msgFontSize = prefs.getDouble('msg_font_size') ?? 13.0;
 
+      // サウンド設定のロード
+      _soundMasterEnabled = !(prefs.getBool('sound_muted') ?? false);
+      _soundBgmEnabled = prefs.getBool('sound_bgm_enabled') ?? true;
+      _soundBgmVolume = prefs.getDouble('sound_bgm_volume') ?? 0.5;
+      _soundSeEnabled = prefs.getBool('sound_se_enabled') ?? true;
+      _soundSeVolume = prefs.getDouble('sound_se_volume') ?? 0.8;
+      _soundAmbienceEnabled = prefs.getBool('sound_ambience_enabled') ?? true;
+      _soundAmbienceVolume = prefs.getDouble('sound_ambience_volume') ?? 0.6;
+
       // ゲームオプション (defaults.nh 連動) のロード
       _optTutorialMode = prefs.getInt('nh_opt_tutorial_mode') ?? 0;
       _optAutopickup = prefs.getBool('nh_opt_autopickup') ?? false;
@@ -440,28 +459,38 @@ class _SettingsPageState extends State<SettingsPage> {
       final Map<String, dynamic> settingsMap = jsonDecode(data.text!);
       final prefs = await SharedPreferences.getInstance();
       
+      const doubleKeys = {
+        'pad_opacity',
+        'dpad_scale',
+        'shortcut_pad_scale',
+        'cmd_panel_scale',
+        'msg_opacity',
+        'msg_font_size',
+        'sound_bgm_volume',
+        'sound_se_volume',
+        'sound_ambience_volume',
+        'sound_voice_volume',
+      };
+
       for (final entry in settingsMap.entries) {
         final key = entry.key;
         final value = entry.value;
         if (value is bool) {
           await prefs.setBool(key, value);
+        } else if (doubleKeys.contains(key) && value is num) {
+          await prefs.setDouble(key, value.toDouble());
         } else if (value is double) {
           await prefs.setDouble(key, value);
         } else if (value is int) {
-          if (key == 'pad_opacity' ||
-              key == 'dpad_scale' ||
-              key == 'shortcut_pad_scale' ||
-              key == 'cmd_panel_scale') {
-            await prefs.setDouble(key, value.toDouble());
-          } else {
-            await prefs.setInt(key, value);
-          }
+          await prefs.setInt(key, value);
         } else if (value is String) {
           await prefs.setString(key, value);
         }
       }
 
       await _loadAllSettings();
+      await SoundManager.instance.syncFromPrefs();
+
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1152,6 +1181,149 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  /// サウンド設定セクション（BGM・SE・環境音のON/OFFおよび音量調整）
+  Widget _buildSoundSection() {
+    final l10n = AppLocalizations.of(context)!;
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: Icon(
+          _soundMasterEnabled ? Icons.volume_up : Icons.volume_off,
+          color: _soundMasterEnabled ? Colors.amberAccent : Colors.grey,
+        ),
+        title: Text(l10n.secSoundTitle),
+        subtitle: Text(l10n.secSoundSub),
+        children: _withDividers([
+          // マスター（全体）ON/OFF スイッチ
+          SwitchListTile(
+            secondary: Icon(
+              _soundMasterEnabled ? Icons.volume_up : Icons.volume_off,
+              color: _soundMasterEnabled ? Colors.amberAccent : Colors.grey,
+            ),
+            title: Text(l10n.soundMaster),
+            subtitle: Text(l10n.soundMasterSub),
+            value: _soundMasterEnabled,
+            onChanged: (val) {
+              setState(() => _soundMasterEnabled = val);
+              SoundManager.instance.setMuted(!val);
+            },
+          ),
+          // BGM 個別ON/OFF スイッチ
+          SwitchListTile(
+            secondary: const Icon(Icons.music_note, color: Colors.tealAccent),
+            title: Text(l10n.soundBgm),
+            value: _soundBgmEnabled,
+            onChanged: _soundMasterEnabled
+                ? (val) {
+                    setState(() => _soundBgmEnabled = val);
+                    SoundManager.instance.setBgmEnabled(val);
+                  }
+                : null,
+          ),
+          // BGM 音量スライダー
+          _buildVolumeSliderTile(
+            title: l10n.soundBgmVolume,
+            enabled: _soundMasterEnabled && _soundBgmEnabled,
+            volume: _soundBgmVolume,
+            onChanged: (val) {
+              setState(() => _soundBgmVolume = val);
+              SoundManager.instance.updateBgmVolume(val);
+            },
+            onChangeEnd: (val) {
+              SoundManager.instance.setBgmVolume(val);
+            },
+          ),
+          // 効果音(SE) 個別ON/OFF スイッチ
+          SwitchListTile(
+            secondary: const Icon(Icons.touch_app, color: Colors.orangeAccent),
+            title: Text(l10n.soundSe),
+            value: _soundSeEnabled,
+            onChanged: _soundMasterEnabled
+                ? (val) {
+                    setState(() => _soundSeEnabled = val);
+                    SoundManager.instance.setSeEnabled(val);
+                  }
+                : null,
+          ),
+          // 効果音(SE) 音量スライダー
+          _buildVolumeSliderTile(
+            title: l10n.soundSeVolume,
+            enabled: _soundMasterEnabled && _soundSeEnabled,
+            volume: _soundSeVolume,
+            onChanged: (val) {
+              setState(() => _soundSeVolume = val);
+              SoundManager.instance.updateSeVolume(val);
+            },
+            onChangeEnd: (val) {
+              SoundManager.instance.setSeVolume(val);
+              SoundManager.instance.playPreviewSe();
+            },
+          ),
+          // 環境音 個別ON/OFF スイッチ
+          SwitchListTile(
+            secondary: const Icon(Icons.waves, color: Colors.lightBlueAccent),
+            title: Text(l10n.soundAmbience),
+            value: _soundAmbienceEnabled,
+            onChanged: _soundMasterEnabled
+                ? (val) {
+                    setState(() => _soundAmbienceEnabled = val);
+                    SoundManager.instance.setAmbienceEnabled(val);
+                  }
+                : null,
+          ),
+          // 環境音 音量スライダー
+          _buildVolumeSliderTile(
+            title: l10n.soundAmbienceVolume,
+            enabled: _soundMasterEnabled && _soundAmbienceEnabled,
+            volume: _soundAmbienceVolume,
+            onChanged: (val) {
+              setState(() => _soundAmbienceVolume = val);
+              SoundManager.instance.updateAmbienceVolume(val);
+            },
+            onChangeEnd: (val) {
+              SoundManager.instance.setAmbienceVolume(val);
+            },
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _buildVolumeSliderTile({
+    required String title,
+    required bool enabled,
+    required double volume,
+    required ValueChanged<double> onChanged,
+    ValueChanged<double>? onChangeEnd,
+  }) {
+    final int percent = (volume * 100).round();
+    return ListTile(
+      enabled: enabled,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: TextStyle(color: enabled ? Colors.white : Colors.white38)),
+          Text(
+            '$percent%',
+            style: TextStyle(
+              fontSize: 13,
+              color: enabled ? Colors.amberAccent : Colors.white38,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+      subtitle: Slider(
+        value: enabled ? volume : 0.0,
+        min: 0.0,
+        max: 1.0,
+        divisions: 20,
+        label: '$percent%',
+        onChanged: enabled ? onChanged : null,
+        onChangeEnd: enabled ? onChangeEnd : null,
+      ),
+    );
+  }
+
   Widget _buildKeyActionSection() {
     final l10n = AppLocalizations.of(context)!;
     final volActions = {
@@ -1349,6 +1521,14 @@ class _SettingsPageState extends State<SettingsPage> {
         await prefs.remove(key);
       }
     }
+
+    await SoundManager.instance.setMuted(false);
+    await SoundManager.instance.setBgmEnabled(true);
+    await SoundManager.instance.setSeEnabled(true);
+    await SoundManager.instance.setAmbienceEnabled(true);
+    await SoundManager.instance.setBgmVolume(0.5);
+    await SoundManager.instance.setSeVolume(0.8);
+    await SoundManager.instance.setAmbienceVolume(0.6);
 
     await _loadAllSettings();
     _syncNativeKeySettings();
@@ -1878,6 +2058,7 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildTilesetSection(), //タイルセット設定
           _buildScreenModeSection(), //イマーシブ・ステータス表示モード・
           _buildMessageSection(),  // メッセージ設定
+          _buildSoundSection(),    // サウンド設定
           const Divider(height: 1),   //区切り線
           _buildUILayoutSection(), // UI配置カスタマイズ
           _buildControllerSection(), //コントローラー設定

@@ -1075,4 +1075,34 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get searchAnotherKey => '他のキーを調べる';
+
+  @override
+  String get secSoundTitle => 'サウンド設定';
+
+  @override
+  String get secSoundSub => 'BGM、効果音、環境音のON/OFFおよび音量を設定します';
+
+  @override
+  String get soundMaster => 'サウンド全体';
+
+  @override
+  String get soundMasterSub => 'すべての音声出力を有効または無効にします';
+
+  @override
+  String get soundBgm => 'BGM';
+
+  @override
+  String get soundBgmVolume => 'BGM音量';
+
+  @override
+  String get soundSe => '効果音 (SE)';
+
+  @override
+  String get soundSeVolume => '効果音量';
+
+  @override
+  String get soundAmbience => '環境音';
+
+  @override
+  String get soundAmbienceVolume => '環境音量';
 }

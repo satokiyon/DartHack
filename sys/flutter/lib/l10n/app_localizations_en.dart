@@ -1095,4 +1095,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchAnotherKey => 'Check another key';
+
+  @override
+  String get secSoundTitle => 'Sound Settings';
+
+  @override
+  String get secSoundSub =>
+      'Configure BGM, sound effects, ambience, and volume levels';
+
+  @override
+  String get soundMaster => 'Master Sound';
+
+  @override
+  String get soundMasterSub => 'Enable or disable all sound output';
+
+  @override
+  String get soundBgm => 'BGM';
+
+  @override
+  String get soundBgmVolume => 'BGM Volume';
+
+  @override
+  String get soundSe => 'Sound Effects (SE)';
+
+  @override
+  String get soundSeVolume => 'SE Volume';
+
+  @override
+  String get soundAmbience => 'Ambience';
+
+  @override
+  String get soundAmbienceVolume => 'Ambience Volume';
 }

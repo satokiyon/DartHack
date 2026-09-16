@@ -364,5 +364,17 @@
   "anyKeyPromptSubtitle": "Type a key to get info, or select below:",
   "anyKeyPlaceholder": "Type a key...",
   "searchAnotherKey": "Check another key",
-  "close": "Close"
+  "close": "Close",
+
+  "secSoundTitle": "Sound Settings",
+  "secSoundSub": "Configure BGM, sound effects, ambience, and volume levels",
+  "soundMaster": "Master Sound",
+  "soundMasterSub": "Enable or disable all sound output",
+  "soundBgm": "BGM",
+  "soundBgmVolume": "BGM Volume",
+  "soundSe": "Sound Effects (SE)",
+  "soundSeVolume": "SE Volume",
+  "soundAmbience": "Ambience",
+  "soundAmbienceVolume": "Ambience Volume"
 }
+

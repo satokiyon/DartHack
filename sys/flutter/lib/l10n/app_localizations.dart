@@ -2149,6 +2149,66 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'他のキーを調べる'**
   String get searchAnotherKey;
+
+  /// No description provided for @secSoundTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'サウンド設定'**
+  String get secSoundTitle;
+
+  /// No description provided for @secSoundSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'BGM、効果音、環境音のON/OFFおよび音量を設定します'**
+  String get secSoundSub;
+
+  /// No description provided for @soundMaster.
+  ///
+  /// In ja, this message translates to:
+  /// **'サウンド全体'**
+  String get soundMaster;
+
+  /// No description provided for @soundMasterSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべての音声出力を有効または無効にします'**
+  String get soundMasterSub;
+
+  /// No description provided for @soundBgm.
+  ///
+  /// In ja, this message translates to:
+  /// **'BGM'**
+  String get soundBgm;
+
+  /// No description provided for @soundBgmVolume.
+  ///
+  /// In ja, this message translates to:
+  /// **'BGM音量'**
+  String get soundBgmVolume;
+
+  /// No description provided for @soundSe.
+  ///
+  /// In ja, this message translates to:
+  /// **'効果音 (SE)'**
+  String get soundSe;
+
+  /// No description provided for @soundSeVolume.
+  ///
+  /// In ja, this message translates to:
+  /// **'効果音量'**
+  String get soundSeVolume;
+
+  /// No description provided for @soundAmbience.
+  ///
+  /// In ja, this message translates to:
+  /// **'環境音'**
+  String get soundAmbience;
+
+  /// No description provided for @soundAmbienceVolume.
+  ///
+  /// In ja, this message translates to:
+  /// **'環境音量'**
+  String get soundAmbienceVolume;
 }
 
 class _AppLocalizationsDelegate

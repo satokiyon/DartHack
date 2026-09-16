@@ -268,5 +268,133 @@ void main() {
       expect(manager.currentRoomBgm, isNull);
       expect(manager.currentBgm, 'amb_dungeon.ogg');
     });
+
+    test('Category enabled flags toggle properly and persist', () async {
+      final manager = SoundManager.instance;
+      // 初期値はすべて true
+      expect(manager.bgmEnabled, isTrue);
+      expect(manager.seEnabled, isTrue);
+      expect(manager.ambienceEnabled, isTrue);
+
+      await manager.setBgmEnabled(false);
+      expect(manager.bgmEnabled, isFalse);
+
+      await manager.setSeEnabled(false);
+      expect(manager.seEnabled, isFalse);
+
+      await manager.setAmbienceEnabled(false);
+      expect(manager.ambienceEnabled, isFalse);
+
+      // SharedPreferences の永続化確認
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getBool('sound_bgm_enabled'), isFalse);
+      expect(prefs.getBool('sound_se_enabled'), isFalse);
+      expect(prefs.getBool('sound_ambience_enabled'), isFalse);
+
+      // 復元
+      await manager.setBgmEnabled(true);
+      await manager.setSeEnabled(true);
+      await manager.setAmbienceEnabled(true);
+      expect(manager.bgmEnabled, isTrue);
+      expect(manager.seEnabled, isTrue);
+      expect(manager.ambienceEnabled, isTrue);
+    });
+
+    test('BGM is not played when bgmEnabled is false', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true);
+      manager.registerAvailableSound('amb_dungeon.ogg');
+
+      await manager.setBgmEnabled(false);
+      manager.handleSoundEvent({
+        'category': 4,
+        'filename': 'amb_dungeon.ogg',
+        'text': '',
+        'volume': 100,
+        'loopOrFlag': 1,
+      });
+
+      // bgmEnabled が false のため再生されない
+      expect(manager.currentFloorBgm, isNull);
+
+      // 有効化後に再生
+      await manager.setBgmEnabled(true);
+      manager.handleSoundEvent({
+        'category': 4,
+        'filename': 'amb_dungeon.ogg',
+        'text': '',
+        'volume': 100,
+        'loopOrFlag': 1,
+      });
+      expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
+    });
+
+    test('playPreviewSe executes without error and skips when volume is 0', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true);
+      manager.registerAvailableSound('se_pickup.ogg');
+
+      await manager.setSeVolume(0.8);
+      expect(() async => await manager.playPreviewSe(), returnsNormally);
+
+      await manager.setSeVolume(0.0);
+      expect(() async => await manager.playPreviewSe(), returnsNormally);
+    });
+
+    test('BGM auto-restores when re-enabled or unmuted if last floor BGM exists', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true);
+      manager.registerAvailableSound('amb_dungeon.ogg');
+
+      // 1. フロアBGM再生
+      manager.handleSoundEvent({
+        'category': 4,
+        'filename': 'amb_dungeon.ogg',
+        'text': '',
+        'volume': 100,
+        'loopOrFlag': 1,
+      });
+      expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
+
+      // 2. BGM無効化 -> 停止
+      await manager.setBgmEnabled(false);
+      expect(manager.currentFloorBgm, isNull);
+
+      // 3. BGM再有効化 -> 直前の amb_dungeon.ogg が自動復元される
+      await manager.setBgmEnabled(true);
+      expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
+
+      // 4. 全体ミュート -> 停止
+      await manager.setMuted(true);
+      expect(manager.currentFloorBgm, isNull);
+
+      // 5. ミュート解除 -> 自動復元される
+      await manager.setMuted(false);
+      expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
+    });
+
+    test('syncFromPrefs synchronizes memory state with SharedPreferences', () async {
+      final manager = SoundManager.instance;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('sound_muted', true);
+      await prefs.setBool('sound_bgm_enabled', false);
+      await prefs.setDouble('sound_bgm_volume', 0.25);
+      await prefs.setDouble('sound_se_volume', 0.4);
+
+      await manager.syncFromPrefs();
+
+      expect(manager.isMuted, isTrue);
+      expect(manager.bgmEnabled, isFalse);
+      expect(manager.bgmVolume, 0.25);
+      expect(manager.seVolume, 0.4);
+
+      // 元に戻す
+      await manager.setMuted(false);
+      await manager.setBgmEnabled(true);
+      await manager.setBgmVolume(0.5);
+      await manager.setSeVolume(0.8);
+    });
   });
 }
+
+

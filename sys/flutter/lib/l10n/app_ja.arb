@@ -364,5 +364,17 @@
   "anyKeyPromptSubtitle": "調べたいキーを入力するか、下から選択してください:",
   "anyKeyPlaceholder": "キーを入力...",
   "searchAnotherKey": "他のキーを調べる",
-  "close": "閉じる"
+  "close": "閉じる",
+
+  "secSoundTitle": "サウンド設定",
+  "secSoundSub": "BGM、効果音、環境音のON/OFFおよび音量を設定します",
+  "soundMaster": "サウンド全体",
+  "soundMasterSub": "すべての音声出力を有効または無効にします",
+  "soundBgm": "BGM",
+  "soundBgmVolume": "BGM音量",
+  "soundSe": "効果音 (SE)",
+  "soundSeVolume": "効果音量",
+  "soundAmbience": "環境音",
+  "soundAmbienceVolume": "環境音量"
 }
+
