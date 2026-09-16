@@ -198,7 +198,8 @@ SoundAchievement(0, sa2_xpleveldown, level);
         || defined(SND_LIB_OPENAL) || defined(SND_LIB_SDL_MIXER) \
         || defined(SND_LIB_MINIAUDIO) || defined(SND_LIB_FMOD) \
         || defined(SND_LIB_SOUND_ESCCODES) || defined(SND_LIB_VISSOUND) \
-        || defined(SND_LIB_WINDSOUND) || defined(SND_LIB_MACSOUND)
+        || defined(SND_LIB_WINDSOUND) || defined(SND_LIB_MACSOUND) \
+        || defined(SND_LIB_ANDROIDSOUND)
 
 /* 他ファイル用の条件分岐ショートカット */
 #define SND_LIB_INTEGRATED

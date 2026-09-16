@@ -39,6 +39,7 @@ dependencies:
   shared_preferences: ^2.2.0
   google_mobile_ads: ^9.0.0
   scrollable_positioned_list: ^0.3.8
+  audioplayers: ^6.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -72,6 +73,7 @@ flutter:
     - assets/tiles/
     - assets/images/
     - assets/icon/
+    - assets/sounds/
 
 flutter_launcher_icons:
   android: "ic_launcher"

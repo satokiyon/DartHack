@@ -111,18 +111,200 @@ void lock_mouse_cursor(boolean lock UNUSED) {
 void load_usersound(const char *filename UNUSED) {
 }
 
+/* サウンドカテゴリ (Flutter / Dart 共通定義) */
+enum sound_category {
+    SOUND_CAT_SE = 1,
+    SOUND_CAT_HEROMUSIC = 2,
+    SOUND_CAT_ACHIEVEMENT = 3,
+    SOUND_CAT_BGM = 4,
+    SOUND_CAT_VOICE = 5,
+};
+
+typedef void (*DartSoundEventCallback)(
+    int category,
+    const char *filename,
+    const char *text,
+    int volume,
+    int loopOrFlag
+);
+static DartSoundEventCallback g_sound_event_cb = NULL;
+
+/* FFI 用非同期 Use-After-Free 防止リングバッファ (最低256面) */
+#define SOUND_BUF_COUNT 256
+#define SOUND_BUF_LEN 512
+static char g_sound_buf[SOUND_BUF_COUNT][SOUND_BUF_LEN];
+static volatile int g_sound_buf_idx = 0;
+
+static const char* sound_buffer_copy(const char *str) {
+    if (!str) return "";
+    int idx = __sync_fetch_and_add(&g_sound_buf_idx, 1) & (SOUND_BUF_COUNT - 1);
+    char *buf = g_sound_buf[idx];
+    strncpy(buf, str, SOUND_BUF_LEN - 1);
+    buf[SOUND_BUF_LEN - 1] = '\0';
+    return buf;
+}
+
+extern char *get_sound_effect_filename(int32_t seidint, char *buf, size_t bufsz, int32_t approach);
+
+static void androidsound_init_nhsound(void) {
+    debuglog("androidsound_init_nhsound called");
+}
+
+static void androidsound_exit_nhsound(const char *reason) {
+    debuglog("androidsound_exit_nhsound: %s", reason ? reason : "");
+}
+
+static void androidsound_soundeffect(char *desc UNUSED, int32_t seid, int32_t volume) {
+    if (!g_sound_event_cb) return;
+    char ogg_name[128];
+    char base_buf[128];
+    char *base = get_sound_effect_filename(seid, base_buf, sizeof(base_buf), sff_base_only);
+    if (base && *base) {
+        snprintf(ogg_name, sizeof(ogg_name), "%s.ogg", base);
+    } else {
+        snprintf(ogg_name, sizeof(ogg_name), "se_%d.ogg", (int)seid);
+    }
+    const char *safe_filename = sound_buffer_copy(ogg_name);
+    g_sound_event_cb(SOUND_CAT_SE, safe_filename, "", volume, 0);
+}
+
+static void androidsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume) {
+    if (!g_sound_event_cb || !str) return;
+    char resourcename[128] = {0};
+    int is_single_file = 0;
+
+    switch(instrument) {
+        case ins_flute:
+            strcpy(resourcename, "sound_Wooden_Flute");
+            break;
+        case ins_pan_flute:
+            strcpy(resourcename, "sound_Magic_Flute");
+            break;
+        case ins_english_horn:
+            strcpy(resourcename, "sound_Tooled_Horn");
+            break;
+        case ins_french_horn:
+            strcpy(resourcename, "sound_Frost_Horn.ogg");
+            is_single_file = 1;
+            break;
+        case ins_baritone_sax:
+            strcpy(resourcename, "sound_Fire_Horn.ogg");
+            is_single_file = 1;
+            break;
+        case ins_trumpet:
+            strcpy(resourcename, "sound_Bugle");
+            break;
+        case ins_orchestral_harp:
+            strcpy(resourcename, "sound_Wooden_Harp");
+            break;
+        case ins_cello:
+            strcpy(resourcename, "sound_Magic_Harp");
+            break;
+        case ins_tinkle_bell:
+            strcpy(resourcename, "sound_Bell.ogg");
+            is_single_file = 1;
+            break;
+        case ins_taiko_drum:
+            strcpy(resourcename, "sound_Drum_Of_Earthquake.ogg");
+            is_single_file = 1;
+            break;
+        case ins_melodic_tom:
+            strcpy(resourcename, "sound_Leather_Drum.ogg");
+            is_single_file = 1;
+            break;
+        default:
+            strcpy(resourcename, "sound_Wooden_Flute");
+            break;
+    }
+
+    const char *safe_filename = sound_buffer_copy(resourcename);
+    const char *safe_notes = sound_buffer_copy(is_single_file ? "" : str);
+    g_sound_event_cb(SOUND_CAT_HEROMUSIC, safe_filename, safe_notes, volume, is_single_file);
+}
+
+static void androidsound_sound_achievement(schar arg1, schar arg2, int32_t avals UNUSED) {
+    if (!g_sound_event_cb) return;
+    char fname[64] = {0};
+    if (arg2 == sa2_splashscreen) {
+        strcpy(fname, "sa2_splashscreen.ogg");
+    } else if (arg2 == sa2_newgame_nosplash) {
+        strcpy(fname, "sa2_newgame_nosplash.ogg");
+    } else if (arg2 == sa2_xplevelup) {
+        strcpy(fname, "sa2_xplevelup.ogg");
+    } else if (arg2 == sa2_xpleveldown) {
+        strcpy(fname, "sa2_xpleveldown.ogg");
+    } else if (arg1 > 0) {
+        static const char *const ach_names[] = {
+            "", "ach_bell.ogg", "ach_hell.ogg", "ach_cndl.ogg", "ach_book.ogg",
+            "ach_invk.ogg", "ach_amul.ogg", "ach_endg.ogg", "ach_astr.ogg",
+            "ach_uwin.ogg", "ach_mine_prize.ogg", "ach_soko_prize.ogg", "ach_medu.ogg",
+            "ach_blnd.ogg", "ach_nude.ogg", "ach_mine.ogg", "ach_town.ogg",
+            "ach_shop.ogg", "ach_tmpl.ogg", "ach_orcl.ogg", "ach_novl.ogg",
+            "ach_soko.ogg", "ach_bgrm.ogg"
+        };
+        if (arg1 >= 1 && arg1 < (schar)(sizeof(ach_names)/sizeof(ach_names[0])) && ach_names[arg1][0]) {
+            strcpy(fname, ach_names[arg1]);
+        } else if (arg1 == 31) {
+            strcpy(fname, "ach_tune.ogg");
+        } else {
+            snprintf(fname, sizeof(fname), "ach_%d.ogg", (int)arg1);
+        }
+    } else {
+        strcpy(fname, "sa2_generic.ogg");
+    }
+
+    const char *safe_filename = sound_buffer_copy(fname);
+    g_sound_event_cb(SOUND_CAT_ACHIEVEMENT, safe_filename, "", 100, 0);
+}
+
+static void androidsound_verbal(char *text, int32_t gender UNUSED, int32_t tone UNUSED, int32_t vol, int32_t moreinfo) {
+    if (!g_sound_event_cb) return;
+    const char *fname = "voice_mon_generic.ogg";
+    if (moreinfo == voice_deity) {
+        fname = "voice_deity.ogg";
+    } else if (moreinfo == voice_oracle) {
+        fname = "voice_oracle.ogg";
+    } else if (moreinfo == voice_talking_artifact) {
+        fname = "voice_talking_artifact.ogg";
+    } else if (moreinfo == voice_throne) {
+        fname = "voice_throne.ogg";
+    } else if (moreinfo == voice_death) {
+        fname = "voice_death.ogg";
+    }
+
+    const char *safe_filename = sound_buffer_copy(fname);
+    const char *safe_text = sound_buffer_copy(text ? text : "");
+    g_sound_event_cb(SOUND_CAT_VOICE, safe_filename, safe_text, vol, moreinfo);
+}
+
+static void androidsound_ambience(int32_t ambience_action, int32_t ambienceid, int32_t proximity) {
+    if (!g_sound_event_cb) return;
+    char fname[64];
+    snprintf(fname, sizeof(fname), "bgm_%d.ogg", (int)ambienceid);
+    const char *safe_filename = sound_buffer_copy(fname);
+    g_sound_event_cb(SOUND_CAT_BGM, safe_filename, "", proximity, ambience_action);
+}
+
+static void androidsound_play_usersound(char *filename, int32_t volume, int32_t idx UNUSED) {
+    if (!g_sound_event_cb || !filename) return;
+    const char *safe_filename = sound_buffer_copy(filename);
+    g_sound_event_cb(SOUND_CAT_SE, safe_filename, "", volume, 0);
+}
+
 struct sound_procs androidsound_procs = {
     "androidsound",
-    soundlib_nosound,
-    0L,
-    (void (*)(void)) 0,
-    (void (*)(const char *)) 0,
-    (void (*)(schar, schar, int32_t)) 0,
-    (void (*)(char *, int32_t, int32_t)) 0,
-    (void (*)(int32_t, const char *, int32_t)) 0,
-    (void (*)(char *, int32_t, int32_t)) 0,
-    (void (*)(int32_t, int32_t, int32_t)) 0,
-    (void (*)(char *, int32_t, int32_t, int32_t, int32_t)) 0,
+    soundlib_androidsound,
+    SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_HEROMUSIC
+        | SOUND_TRIGGER_ACHIEVEMENTS | SOUND_TRIGGER_SOUNDEFFECTS
+        | SOUND_TRIGGER_AMBIENCE | SOUND_TRIGGER_VERBAL,
+    androidsound_init_nhsound,
+    androidsound_exit_nhsound,
+    androidsound_sound_achievement,
+    androidsound_soundeffect,
+    androidsound_hero_playnotes,
+    androidsound_play_usersound,
+    androidsound_ambience,
+    androidsound_verbal,
 };
 
 static struct window_procs flutter_procs = {
@@ -403,6 +585,7 @@ typedef struct {
     DartCliparoundCallback cliparound_cb;
     DartPutMixedWithTileCallback putmixed_cb;
     DartNewLevelRestCallback newlevel_rest_cb;
+    DartSoundEventCallback sound_event_cb;
 } FlutterCallbacksStruct;
 
 void RegisterFlutterCallbacksStruct(const FlutterCallbacksStruct *cbs) {
@@ -427,6 +610,7 @@ void RegisterFlutterCallbacksStruct(const FlutterCallbacksStruct *cbs) {
     g_cliparound_cb = cbs->cliparound_cb;
     g_putmixed_cb = cbs->putmixed_cb;
     g_new_level_rest_cb = cbs->newlevel_rest_cb;
+    g_sound_event_cb = cbs->sound_event_cb;
     __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "All Flutter callbacks registered successfully via struct!");
 }
 
@@ -811,6 +995,9 @@ static void flutter_init_nhwindows(int* argc, char** argv) {
     debuglog("flutter_init_nhwindows called");
     iflags.window_inited = TRUE;
     iflags.menu_tab_sep = TRUE;
+    iflags.sounds = TRUE;
+    iflags.voices = TRUE;
+    gc.chosen_soundlib = soundlib_androidsound;
     sysopt.check_save_uid = 0;
 }
 

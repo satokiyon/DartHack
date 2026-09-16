@@ -51,7 +51,15 @@ typedef TriggerAutosaveDart = void Function();
 typedef SetAutosaveSettingsFunc = Void Function(Int32 enabled, Int32 intervalTurns);
 typedef SetAutosaveSettingsDart = void Function(int enabled, int intervalTurns);
 
-// ★19個の引数による ARM64 スタック破綻を回避する構造体定義
+typedef DartSoundEventCallback = Void Function(
+  Int32 category,
+  Pointer<Utf8> filename,
+  Pointer<Utf8> text,
+  Int32 volume,
+  Int32 loopOrFlag,
+);
+
+// ★21個の引数による ARM64 スタック破綻を回避する構造体定義
 final class FlutterCallbacksStruct extends Struct {
   external Pointer<NativeFunction<CreateWindowCallback>> createCb;
   external Pointer<NativeFunction<ClearWindowCallback>> clearCb;
@@ -73,6 +81,7 @@ final class FlutterCallbacksStruct extends Struct {
   external Pointer<NativeFunction<CliparoundCallback>> cliparoundCb;
   external Pointer<NativeFunction<PutMixedWithTileCallback>> putMixedCb;
   external Pointer<NativeFunction<NewLevelRestCallback>> newLevelRestCb;
+  external Pointer<NativeFunction<DartSoundEventCallback>> soundEventCb;
 }
 
 typedef RegisterCallbacksStructFunc = Void Function(Pointer<FlutterCallbacksStruct> cbs);

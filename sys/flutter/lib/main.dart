@@ -43,11 +43,12 @@ import 'widgets/overlays/text_overlay.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/start_screen.dart';
 import 'screens/end_screen.dart';
-
+import 'services/sound_manager.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   unawaited(MobileAds.instance.initialize());
+  unawaited(SoundManager.instance.initialize());
   runApp(const MyApp());
 }
 
@@ -1455,6 +1456,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           _addLog("number_pad mode: $state");
         } else if (type == 'new_level_rest') {
           unawaited(_showNewLevelRestDialog());
+        } else if (type == 'sound_event') {
+          SoundManager.instance.handleSoundEvent(message);
         } else if (type == 'startMenu') {
           _screen.startMenu(message['winId']);
         } else if (type == 'game_exit') {

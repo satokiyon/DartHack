@@ -62,6 +62,9 @@ class NetHackWorker {
     // 新階層リワード用 NativeCallable
     late final NativeCallable<NewLevelRestCallback> newLevelRestCallable;
 
+    // 効果音・サウンド再生用 NativeCallable
+    late final NativeCallable<DartSoundEventCallback> soundEventCallable;
+
     void wlog(String text) {
       print("[WorkerLog Direct] $text");
       uiSendPort.send({'type': 'worker_log', 'text': text});
@@ -297,6 +300,25 @@ class NetHackWorker {
       });
     });
 
+    soundEventCallable = NativeCallable<DartSoundEventCallback>.listener((
+      int category,
+      Pointer<Utf8> filenamePtr,
+      Pointer<Utf8> textPtr,
+      int volume,
+      int loopOrFlag,
+    ) {
+      final filename = filenamePtr != nullptr ? _utf8DecodeLossy(filenamePtr) : '';
+      final text = textPtr != nullptr ? _utf8DecodeLossy(textPtr) : '';
+      uiSendPort.send({
+        'type': 'sound_event',
+        'category': category,
+        'filename': filename,
+        'text': text,
+        'volume': volume,
+        'loopOrFlag': loopOrFlag,
+      });
+    });
+
     wlog("Sending ready message to UI Isolate...");
     uiSendPort.send({'type': 'ready', 'sendPort': receivePort.sendPort});
     wlog("uiSendPort.send ready completed.");
@@ -336,6 +358,7 @@ class NetHackWorker {
             structPtr.ref.cliparoundCb = cliparoundCallable.nativeFunction;
             structPtr.ref.putMixedCb = putMixedCallable.nativeFunction;
             structPtr.ref.newLevelRestCb = newLevelRestCallable.nativeFunction;
+            structPtr.ref.soundEventCb = soundEventCallable.nativeFunction;
 
             wlog("Calling ffi.registerCallbacksStruct...");
             ffi.registerCallbacksStruct(structPtr);
