@@ -13,7 +13,6 @@ import 'utils/defaults_helper.dart';
 import 'utils/scale_clamp.dart';
 import 'widgets/shortcut_edit_dialog.dart';
 import 'l10n/app_localizations.dart';
-import 'main.dart';
 import 'services/sound_manager.dart';
 
 
@@ -586,35 +585,6 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(l10n.secStatusTitle),
         subtitle: Text(l10n.secStatusSub),
         children: _withDividers([
-          ListTile(
-            title: Text(l10n.displayLanguage),
-            subtitle: Text(l10n.displayLanguageSub),
-            trailing: DropdownButton<String>(
-              value: _selectedLanguage,
-              items: [
-                DropdownMenuItem(value: 'ja', child: Text(l10n.japanese)),
-                DropdownMenuItem(value: 'en', child: Text(l10n.english)),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _selectedLanguage = val);
-                  _saveSetting('selected_language', val);
-                  _extCommands = [];
-                  _loadExtCmds();
-                  if (mounted) {
-                    MyApp.of(context)?.setLocale(val);
-                  }
-                }
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-            child: Text(
-              l10n.coreLangNote,
-              style: const TextStyle(fontSize: 12, color: Colors.amberAccent),
-            ),
-          ),
           ListTile(
             title: Text(l10n.screenMode),
             trailing: DropdownButton<int>(

@@ -117,15 +117,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get secStatusSub => 'ゲーム画面のステータス領域の表示を切替えます';
 
   @override
-  String get displayLanguage => '表示言語 / Language';
-
-  @override
-  String get displayLanguageSub => 'アプリ・ゲームコアの表示言語を切替えます';
-
-  @override
-  String get coreLangNote => '※ゲームコアの言語切替は次回ゲーム開始時に反映されます';
-
-  @override
   String get screenMode => '画面モード選択';
 
   @override

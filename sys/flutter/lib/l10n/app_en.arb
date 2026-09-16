@@ -39,9 +39,6 @@
 
   "secStatusTitle": "Status Display Settings",
   "secStatusSub": "Configure status bar display on game screen",
-  "displayLanguage": "Display Language / Language",
-  "displayLanguageSub": "Switch display language for app and game core",
-  "coreLangNote": "*Game core language changes take effect on next game start",
   "screenMode": "Screen Mode",
   "screenModeNormal": "Normal",
   "screenModeImmersive": "Immersive",

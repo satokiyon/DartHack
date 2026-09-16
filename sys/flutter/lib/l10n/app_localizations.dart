@@ -314,24 +314,6 @@ abstract class AppLocalizations {
   /// **'ゲーム画面のステータス領域の表示を切替えます'**
   String get secStatusSub;
 
-  /// No description provided for @displayLanguage.
-  ///
-  /// In ja, this message translates to:
-  /// **'表示言語 / Language'**
-  String get displayLanguage;
-
-  /// No description provided for @displayLanguageSub.
-  ///
-  /// In ja, this message translates to:
-  /// **'アプリ・ゲームコアの表示言語を切替えます'**
-  String get displayLanguageSub;
-
-  /// No description provided for @coreLangNote.
-  ///
-  /// In ja, this message translates to:
-  /// **'※ゲームコアの言語切替は次回ゲーム開始時に反映されます'**
-  String get coreLangNote;
-
   /// No description provided for @screenMode.
   ///
   /// In ja, this message translates to:

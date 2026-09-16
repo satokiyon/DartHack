@@ -39,10 +39,8 @@
 
   "secStatusTitle": "ステータス表示設定",
   "secStatusSub": "ゲーム画面のステータス領域の表示を切替えます",
-  "displayLanguage": "表示言語 / Language",
-  "displayLanguageSub": "アプリ・ゲームコアの表示言語を切替えます",
-  "coreLangNote": "※ゲームコアの言語切替は次回ゲーム開始時に反映されます",
   "screenMode": "画面モード選択",
+
   "screenModeNormal": "通常",
   "screenModeImmersive": "イマーシブ",
   "statusDisplayMode": "ステータス領域表示モード",

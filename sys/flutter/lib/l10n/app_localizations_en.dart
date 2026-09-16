@@ -118,17 +118,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get secStatusSub => 'Configure status bar display on game screen';
 
   @override
-  String get displayLanguage => 'Display Language / Language';
-
-  @override
-  String get displayLanguageSub =>
-      'Switch display language for app and game core';
-
-  @override
-  String get coreLangNote =>
-      '*Game core language changes take effect on next game start';
-
-  @override
   String get screenMode => 'Screen Mode';
 
   @override
