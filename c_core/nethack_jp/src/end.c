@@ -1172,6 +1172,7 @@ really_done(int how)
      *  The game is now over...
      */
     program_state.gameover = 1;
+    SoundAmbience(ambience_begin, amb_gameover, 0);
     /* in case of a subsequent panic(), there's no point trying to save */
     program_state.something_worth_saving = 0;
 #ifdef HANGUPHANDLING

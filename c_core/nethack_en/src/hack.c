@@ -3630,8 +3630,56 @@ check_special_room(boolean newlev)
 
     move_update(newlev);
 
-    if (*u.ushops0)
+    if (*u.ushops0) {
         u_left_shop(u.ushops_left, newlev);
+        if (*u.ushops_left)
+            SoundAmbience(ambience_end, amb_in_a_shop, 0);
+    }
+
+    /* Exit detection and sound triggers for special rooms (zoo, court, barracks, etc.) */
+    if (*u.urooms0) {
+        for (ptr = u.urooms0; *ptr; ptr++) {
+            if (!strchr(u.urooms, *ptr)) {
+                int rno = *ptr - ROOMOFFSET;
+                int rt = (rno >= 0 && rno < SIZE(svr.rooms)) ?
+                    (svr.rooms[rno].orig_rtype ? svr.rooms[rno].orig_rtype : svr.rooms[rno].rtype) : OROOM;
+                switch (rt) {
+                case ZOO:
+                    SoundAmbience(ambience_end, amb_in_a_zoo, 0);
+                    break;
+                case SWAMP:
+                    SoundAmbience(ambience_end, amb_swamp, 0);
+                    break;
+                case COURT:
+                    SoundAmbience(ambience_end, amb_in_a_court, 0);
+                    break;
+                case MORGUE:
+                    SoundAmbience(ambience_end, amb_in_cemetery, 0);
+                    break;
+                case BEEHIVE:
+                    SoundAmbience(ambience_end, amb_in_a_beehive, 0);
+                    break;
+                case COCKNEST:
+                    SoundAmbience(ambience_end, amb_in_a_cockatrice_nest, 0);
+                    break;
+                case ANTHOLE:
+                    SoundAmbience(ambience_end, amb_inside_anthole, 0);
+                    break;
+                case BARRACKS:
+                    SoundAmbience(ambience_end, amb_in_a_barracks, 0);
+                    break;
+                case DELPHI:
+                    SoundAmbience(ambience_end, amb_approaching_oracle, 0);
+                    break;
+                case TEMPLE:
+                    SoundAmbience(ambience_end, amb_inside_temple, 0);
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    }
 
     /*
      * Check for attaining 'entered Mine Town' achievement.
@@ -3655,8 +3703,10 @@ check_special_room(boolean newlev)
         return; /* no entrance messages necessary */
 
     /* Did we just enter a shop? */
-    if (*u.ushops_entered)
+    if (*u.ushops_entered) {
         u_entered_shop(u.ushops_entered);
+        SoundAmbience(ambience_begin, amb_in_a_shop, 0);
+    }
 
     for (ptr = &u.uentered[0]; *ptr; ptr++) {
         int roomno = *ptr - ROOMOFFSET, rt = svr.rooms[roomno].rtype;
@@ -3668,13 +3718,16 @@ check_special_room(boolean newlev)
          * but everything else gives a message only the first time */
         switch (rt) {
         case ZOO:
+            SoundAmbience(ambience_begin, amb_in_a_zoo, 0);
             pline("Welcome to David's treasure zoo!");
             break;
         case SWAMP:
+            SoundAmbience(ambience_begin, amb_swamp, 0);
             pline("It %s rather %s down here.", Blind ? "feels" : "looks",
                   Blind ? "humid" : "muddy");
             break;
         case COURT:
+            SoundAmbience(ambience_begin, amb_in_a_court, 0);
             You("enter an opulent%s room!",
                 /* the throne room in Sam quest home level lacks a throne */
                 !furniture_present(THRONE, roomno) ? "" : " throne");
@@ -3683,6 +3736,7 @@ check_special_room(boolean newlev)
             You("enter a leprechaun hall!");
             break;
         case MORGUE:
+            SoundAmbience(ambience_begin, amb_in_cemetery, 0);
             if (midnight()) {
                 const char *run = u_locomotion("Run");
 
@@ -3691,15 +3745,19 @@ check_special_room(boolean newlev)
                 You("have an uncanny feeling...");
             break;
         case BEEHIVE:
+            SoundAmbience(ambience_begin, amb_in_a_beehive, 0);
             You("enter a giant beehive!");
             break;
         case COCKNEST:
+            SoundAmbience(ambience_begin, amb_in_a_cockatrice_nest, 0);
             You("enter a disgusting nest!");
             break;
         case ANTHOLE:
+            SoundAmbience(ambience_begin, amb_inside_anthole, 0);
             You("enter an anthole!");
             break;
         case BARRACKS:
+            SoundAmbience(ambience_begin, amb_in_a_barracks, 0);
             if (monstinroom(&mons[PM_SOLDIER], roomno)
                 || monstinroom(&mons[PM_SERGEANT], roomno)
                 || monstinroom(&mons[PM_LIEUTENANT], roomno)
@@ -3711,6 +3769,7 @@ check_special_room(boolean newlev)
         case DELPHI: {
             struct monst *oracle = monstinroom(&mons[PM_ORACLE], roomno);
 
+            SoundAmbience(ambience_begin, amb_approaching_oracle, 0);
             if (oracle) {
                 SetVoice(oracle, 0, 80, 0);
                 if (!oracle->mpeaceful)
@@ -3723,6 +3782,7 @@ check_special_room(boolean newlev)
             break;
         }
         case TEMPLE:
+            SoundAmbience(ambience_begin, amb_inside_temple, 0);
             intemple(roomno + ROOMOFFSET);
             FALLTHROUGH;
         /*FALLTHRU*/

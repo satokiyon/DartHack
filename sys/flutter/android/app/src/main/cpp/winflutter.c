@@ -118,6 +118,7 @@ enum sound_category {
     SOUND_CAT_ACHIEVEMENT = 3,
     SOUND_CAT_BGM = 4,
     SOUND_CAT_VOICE = 5,
+    SOUND_CAT_AMBIENCE = 6,
 };
 
 typedef void (*DartSoundEventCallback)(
@@ -279,10 +280,98 @@ static void androidsound_verbal(char *text, int32_t gender UNUSED, int32_t tone 
 
 static void androidsound_ambience(int32_t ambience_action, int32_t ambienceid, int32_t proximity) {
     if (!g_sound_event_cb) return;
-    char fname[64];
-    snprintf(fname, sizeof(fname), "bgm_%d.ogg", (int)ambienceid);
+
+    const char *fname = "";
+    int category = SOUND_CAT_BGM;
+
+    switch (ambienceid) {
+    /* フロア・ダンジョンBGM (SOUND_CAT_BGM) */
+    case amb_dungeon: fname = "amb_dungeon.ogg"; break;
+    case amb_mines: fname = "amb_mines.ogg"; break;
+    case amb_sokoban: fname = "amb_sokoban.ogg"; break;
+    case amb_town: fname = "amb_town.ogg"; break;
+    case amb_quest: fname = "amb_quest.ogg"; break;
+    case amb_gehennom: fname = "amb_gehennom.ogg"; break;
+    case amb_vlad: fname = "amb_vlad.ogg"; break;
+    case amb_wizard_tower: fname = "amb_wizard_tower.ogg"; break;
+    case amb_astral: fname = "amb_astral.ogg"; break;
+    case amb_ludios: fname = "amb_ludios.ogg"; break;
+    case amb_tutorial: fname = "amb_tutorial.ogg"; break;
+    case amb_oracle: fname = "amb_oracle.ogg"; break;
+    case amb_rogue: fname = "amb_rogue.ogg"; break;
+    case amb_bigroom: fname = "amb_bigroom.ogg"; break;
+    case amb_medusa: fname = "amb_medusa.ogg"; break;
+    case amb_castle: fname = "amb_castle.ogg"; break;
+    case amb_minend: fname = "amb_minend.ogg"; break;
+    case amb_sokoend: fname = "amb_sokoend.ogg"; break;
+    case amb_quest_nemesis: fname = "amb_quest_nemesis.ogg"; break;
+    case amb_valley: fname = "amb_valley.ogg"; break;
+    case amb_juiblex: fname = "amb_juiblex.ogg"; break;
+    case amb_baalzebub: fname = "amb_baalzebub.ogg"; break;
+    case amb_asmodeus: fname = "amb_asmodeus.ogg"; break;
+    case amb_orcus: fname = "amb_orcus.ogg"; break;
+    case amb_fakewiz: fname = "amb_fakewiz.ogg"; break;
+    case amb_sanctum: fname = "amb_sanctum.ogg"; break;
+    case amb_plane_earth: fname = "amb_plane_earth.ogg"; break;
+    case amb_plane_air: fname = "amb_plane_air.ogg"; break;
+    case amb_plane_fire: fname = "amb_plane_fire.ogg"; break;
+    case amb_plane_water: fname = "amb_plane_water.ogg"; break;
+    case amb_ascension: fname = "amb_ascension.ogg"; break;
+    case amb_title: fname = "amb_title.ogg"; break;
+    case amb_gameover: fname = "amb_gameover.ogg"; break;
+
+    /* 地形・天候環境音 (SOUND_CAT_AMBIENCE) */
+    case amb_water: fname = "amb_water.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_lava: fname = "amb_lava.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_wind: fname = "amb_wind.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_rain: fname = "amb_rain.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_swamp: fname = "amb_swamp.ogg"; category = SOUND_CAT_AMBIENCE; break;
+
+    /* 部屋・施設環境音・ルームBGM (SOUND_CAT_AMBIENCE) */
+    case amb_in_a_shop: fname = "amb_in_a_shop.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_inside_temple: fname = "amb_inside_temple.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_inside_vault: fname = "amb_inside_vault.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_approaching_oracle: fname = "amb_approaching_oracle.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_in_a_court: fname = "amb_in_a_court.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_in_a_barracks: fname = "amb_in_a_barracks.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_in_a_zoo: fname = "amb_in_a_zoo.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_in_a_beehive: fname = "amb_in_a_beehive.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_inside_anthole: fname = "amb_inside_anthole.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_in_cemetery: fname = "amb_in_cemetery.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_in_a_cockatrice_nest: fname = "amb_in_a_cockatrice_nest.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_in_a_lemure_pit: fname = "amb_in_a_lemure_pit.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_in_a_migot_nest: fname = "amb_in_a_migot_nest.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_in_a_black_market: fname = "amb_in_a_black_market.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_inside_morgue: fname = "amb_inside_morgue.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_inside_armory: fname = "amb_inside_armory.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_inside_pool: fname = "amb_inside_pool.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_inside_garden: fname = "amb_inside_garden.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_inside_library: fname = "amb_inside_library.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_inside_nymph_garden: fname = "amb_inside_nymph_garden.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_theme_boulder_room: fname = "amb_theme_boulder_room.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_theme_trap_room: fname = "amb_theme_trap_room.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_theme_buried_treasure: fname = "amb_theme_buried_treasure.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_theme_buried_zombies: fname = "amb_theme_buried_zombies.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_theme_massacre: fname = "amb_theme_massacre.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_theme_statuary: fname = "amb_theme_statuary.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_theme_light_source: fname = "amb_theme_light_source.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_theme_temple_of_the_gods: fname = "amb_theme_temple_of_the_gods.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_theme_ghost_adventurer: fname = "amb_theme_ghost_adventurer.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_theme_storeroom: fname = "amb_theme_storeroom.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_theme_teleport_hub: fname = "amb_theme_teleport_hub.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_theme_mausoleum: fname = "amb_theme_mausoleum.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_theme_pillars: fname = "amb_theme_pillars.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_theme_fake_delphi: fname = "amb_theme_fake_delphi.ogg"; category = SOUND_CAT_AMBIENCE; break;
+
+    default:
+        fname = "";
+        break;
+    }
+
+    if (!*fname) return;
+
     const char *safe_filename = sound_buffer_copy(fname);
-    g_sound_event_cb(SOUND_CAT_BGM, safe_filename, "", proximity, ambience_action);
+    g_sound_event_cb(category, safe_filename, "", proximity, ambience_action);
 }
 
 static void androidsound_play_usersound(char *filename, int32_t volume, int32_t idx UNUSED) {

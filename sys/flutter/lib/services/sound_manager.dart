@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,7 +10,8 @@ enum SoundCategory {
   heroMusic(2),
   achievement(3),
   bgm(4),
-  voice(5);
+  voice(5),
+  ambience(6);
 
   final int value;
   const SoundCategory(this.value);
@@ -41,22 +43,63 @@ class SoundManager {
   static const int _maxSameSoundInstances = 3;
   static const String _soundAssetPrefix = 'assets/sounds/';
 
+  /// 2.1 ダンジョン分岐および固定特殊階層（フロア全体BGM）の定義セット
+  static const Set<String> _floorBgmFiles = {
+    // 2.1.1 主要分岐
+    'amb_dungeon.ogg', 'amb_mines.ogg', 'amb_sokoban.ogg', 'amb_quest.ogg',
+    'amb_gehennom.ogg', 'amb_vlad.ogg', 'amb_ludios.ogg', 'amb_tutorial.ogg',
+    // 2.1.2 運命の大迷宮の特殊階層
+    'amb_oracle.ogg', 'amb_rogue.ogg', 'amb_bigroom.ogg', 'amb_medusa.ogg', 'amb_castle.ogg',
+    // 2.1.3 各分岐ダンジョンの特殊階層
+    'amb_town.ogg', 'amb_minend.ogg', 'amb_sokoend.ogg', 'amb_quest_nemesis.ogg',
+    // 2.1.4 ゲヘナ・悪魔階層
+    'amb_valley.ogg', 'amb_juiblex.ogg', 'amb_baalzebub.ogg', 'amb_asmodeus.ogg',
+    'amb_orcus.ogg', 'amb_wizard_tower.ogg', 'amb_fakewiz.ogg', 'amb_sanctum.ogg',
+    // 2.1.5 精霊界
+    'amb_plane_earth.ogg', 'amb_plane_air.ogg', 'amb_plane_fire.ogg',
+    'amb_plane_water.ogg', 'amb_astral.ogg',
+    // 2.1.6 システム・特殊
+    'amb_title.ogg', 'amb_gameover.ogg', 'amb_ascension.ogg',
+  };
+
+  /// 2.2 地形・天候環境音のセット（フロアBGMと同時に再生）
+  static const Set<String> _terrainAmbienceFiles = {
+    'amb_water.ogg', 'amb_lava.ogg', 'amb_wind.ogg', 'amb_rain.ogg', 'amb_swamp.ogg',
+  };
+
   final List<_PlayerEntry> _pool = [];
-  AudioPlayer? _bgmPlayer;
-  String? _currentBgm;
+  AudioPlayer? _floorBgmPlayer;
+  String? _currentFloorBgm;
+  AudioPlayer? _roomBgmPlayer;
+  String? _currentRoomBgm;
+  AudioPlayer? _ambiencePlayer;
+  String? _currentAmbience;
 
   final Set<String> _availableSounds = {};
   bool _isInitialized = false;
 
+  int _floorFadeGen = 0;
+  int _roomFadeGen = 0;
+  bool _floorWasPlayingBeforeBackground = false;
+  bool _roomWasPlayingBeforeBackground = false;
+  bool _ambienceWasPlayingBeforeBackground = false;
+
   double _seVolume = 0.8;
   double _bgmVolume = 0.5;
+  double _ambienceVolume = 0.6;
   double _voiceVolume = 0.8;
   bool _muted = false;
 
   double get seVolume => _seVolume;
   double get bgmVolume => _bgmVolume;
+  double get ambienceVolume => _ambienceVolume;
   double get voiceVolume => _voiceVolume;
   bool get isMuted => _muted;
+
+  /// 現在再生中のBGMファイル名（ルームBGMが再生中ならそれを、それ以外はフロアBGM）
+  String? get currentBgm => _currentRoomBgm ?? _currentFloorBgm;
+  String? get currentFloorBgm => _currentFloorBgm;
+  String? get currentRoomBgm => _currentRoomBgm;
 
   /// 初期化: アセット一覧のスキャンとプレイヤーのプール生成
   Future<void> initialize() async {
@@ -66,6 +109,7 @@ class SoundManager {
       final prefs = await SharedPreferences.getInstance();
       _seVolume = prefs.getDouble('sound_se_volume') ?? 0.8;
       _bgmVolume = prefs.getDouble('sound_bgm_volume') ?? 0.5;
+      _ambienceVolume = prefs.getDouble('sound_ambience_volume') ?? 0.6;
       _voiceVolume = prefs.getDouble('sound_voice_volume') ?? 0.8;
       _muted = prefs.getBool('sound_muted') ?? false;
 
@@ -93,9 +137,17 @@ class SoundManager {
         _pool.add(entry);
       }
 
-      // BGMプレイヤー
-      _bgmPlayer = AudioPlayer();
-      await _bgmPlayer!.setReleaseMode(ReleaseMode.loop);
+      // フロアBGMプレイヤー
+      _floorBgmPlayer = AudioPlayer();
+      await _floorBgmPlayer!.setReleaseMode(ReleaseMode.loop);
+
+      // ルームBGMプレイヤー
+      _roomBgmPlayer = AudioPlayer();
+      await _roomBgmPlayer!.setReleaseMode(ReleaseMode.loop);
+
+      // 環境音（アンビエンス）プレイヤー
+      _ambiencePlayer = AudioPlayer();
+      await _ambiencePlayer!.setReleaseMode(ReleaseMode.loop);
 
       _isInitialized = true;
     } catch (_) {
@@ -128,7 +180,16 @@ class SoundManager {
         _playInstrument(filename, text, volume, loopOrFlag != 0);
         break;
       case SoundCategory.bgm:
-        _playBgm(filename, volume, loopOrFlag != 0);
+        _playBgm(filename, volume, loopOrFlag);
+        break;
+      case SoundCategory.ambience:
+        if (_terrainAmbienceFiles.contains(filename)) {
+          // 2.2 地形・天候環境音（フロアBGMと同時に再生・距離減衰あり）
+          _playAmbience(filename, volume, loopOrFlag);
+        } else {
+          // 2.3 特別な部屋・施設・テーマ部屋（フロアBGMとクロスフェードするルームBGM）
+          _playBgm(filename, volume, loopOrFlag);
+        }
         break;
       case SoundCategory.voice:
         _playVoice(filename, text, volume);
@@ -203,32 +264,188 @@ class SoundManager {
     }
   }
 
-  /// BGMの再生
-  Future<void> _playBgm(String filename, int cVolume, bool loop) async {
-    if (filename.isEmpty || !hasSound(filename)) {
-      if (filename.isEmpty) {
+  /// フェードアウト処理 (pauseInsteadOfStop == true の場合は pause)
+  Future<void> _fadeOut(AudioPlayer? player, double baseVolume, {bool pauseInsteadOfStop = false, bool isRoomPlayer = false}) async {
+    if (player == null || (player.state != PlayerState.playing)) return;
+    final int gen = isRoomPlayer ? ++_roomFadeGen : ++_floorFadeGen;
+    try {
+      for (int i = 5; i >= 1; i--) {
+        if ((isRoomPlayer ? _roomFadeGen : _floorFadeGen) != gen) return;
+        await player.setVolume(baseVolume * (i / 6.0));
+        await Future.delayed(const Duration(milliseconds: 50));
+      }
+      if ((isRoomPlayer ? _roomFadeGen : _floorFadeGen) != gen) return;
+      if (pauseInsteadOfStop) {
+        await player.pause();
+      } else {
+        await player.stop();
+      }
+    } catch (_) {}
+  }
+
+  /// フェードイン処理
+  Future<void> _fadeIn(AudioPlayer? player, double targetVolume, {bool isRoomPlayer = false}) async {
+    if (player == null) return;
+    final int gen = isRoomPlayer ? ++_roomFadeGen : ++_floorFadeGen;
+    try {
+      await player.setVolume(0.0);
+      for (int i = 1; i <= 6; i++) {
+        if ((isRoomPlayer ? _roomFadeGen : _floorFadeGen) != gen) return;
+        await Future.delayed(const Duration(milliseconds: 50));
+        if ((isRoomPlayer ? _roomFadeGen : _floorFadeGen) != gen) return;
+        await player.setVolume(targetVolume * (i / 6.0));
+      }
+    } catch (_) {}
+  }
+
+  /// BGMの再生制御（action: 0=nothing, 1=begin, 2=end, 3=update）
+  Future<void> _playBgm(String filename, int proximity, int action) async {
+    if (filename.isEmpty) return;
+
+    final isFloorBgm = _floorBgmFiles.contains(filename);
+
+    if (isFloorBgm) {
+      // --- フロア全体のBGM ---
+      if (action == 2) {
         await stopBgm();
+        return;
+      }
+
+      if (!hasSound(filename)) {
+        if (_currentFloorBgm != null && action == 1) {
+          await stopBgm();
+        }
+        return;
+      }
+
+      // 同一フロアBGMが既に再生中の場合は継続再生
+      if (_currentFloorBgm == filename && _floorBgmPlayer?.state == PlayerState.playing) {
+        return;
+      }
+
+      try {
+        // ルームBGMが鳴っていれば停止
+        if (_roomBgmPlayer?.state == PlayerState.playing) {
+          await _fadeOut(_roomBgmPlayer, _bgmVolume, isRoomPlayer: true);
+          _currentRoomBgm = null;
+        }
+
+        // 旧フロアBGMをフェードアウト停止
+        if (_floorBgmPlayer?.state == PlayerState.playing) {
+          await _fadeOut(_floorBgmPlayer, _bgmVolume, isRoomPlayer: false);
+        }
+
+        _currentFloorBgm = filename;
+        await _floorBgmPlayer?.setReleaseMode(ReleaseMode.loop);
+        await _floorBgmPlayer?.setVolume(0.0);
+        await _floorBgmPlayer?.play(AssetSource('sounds/$filename'));
+        unawaited(_fadeIn(_floorBgmPlayer, _bgmVolume, isRoomPlayer: false));
+      } catch (_) {}
+    } else {
+      // --- 2.3 特別な部屋・テーマ部屋（ルームBGM） ---
+      if (action == 1) {
+        // 部屋進入時
+        if (!hasSound(filename)) {
+          // 【重要】ルームBGMファイルが無い場合はフロアBGMを止めずにそのまま継続再生
+          return;
+        }
+
+        if (_currentRoomBgm == filename && _roomBgmPlayer?.state == PlayerState.playing) {
+          return;
+        }
+
+        try {
+          // フロアBGMをフェードアウトして一時停止（pause）
+          if (_floorBgmPlayer?.state == PlayerState.playing) {
+            await _fadeOut(_floorBgmPlayer, _bgmVolume, pauseInsteadOfStop: true, isRoomPlayer: false);
+          }
+
+          _currentRoomBgm = filename;
+          await _roomBgmPlayer?.setReleaseMode(ReleaseMode.loop);
+          await _roomBgmPlayer?.setVolume(0.0);
+          await _roomBgmPlayer?.play(AssetSource('sounds/$filename'));
+          unawaited(_fadeIn(_roomBgmPlayer, _bgmVolume, isRoomPlayer: true));
+        } catch (_) {}
+      } else if (action == 2) {
+        // 部屋退出時
+        if (_currentRoomBgm == filename) {
+          // 実際にルームBGMが再生されていた場合のみフェードアウト停止し、フロアBGMへ復帰
+          _currentRoomBgm = null;
+          try {
+            await _fadeOut(_roomBgmPlayer, _bgmVolume, isRoomPlayer: true);
+
+            if (_currentFloorBgm != null && hasSound(_currentFloorBgm!)) {
+              await _floorBgmPlayer?.resume();
+              unawaited(_fadeIn(_floorBgmPlayer, _bgmVolume, isRoomPlayer: false));
+            }
+          } catch (_) {}
+        } else {
+          // ファイルが無くて再生されていなかった場合はフロアBGMを継続（何もしない）
+        }
+      }
+    }
+  }
+
+  Future<void> stopBgm() async {
+    _currentRoomBgm = null;
+    _currentFloorBgm = null;
+    try {
+      if (_roomBgmPlayer != null && _roomBgmPlayer!.state == PlayerState.playing) {
+        await _fadeOut(_roomBgmPlayer, _bgmVolume, isRoomPlayer: true);
+      }
+      if (_floorBgmPlayer != null && _floorBgmPlayer!.state == PlayerState.playing) {
+        await _fadeOut(_floorBgmPlayer, _bgmVolume, isRoomPlayer: false);
+      }
+    } catch (_) {}
+  }
+
+  /// 環境音（アンビエンス）の再生制御
+  Future<void> _playAmbience(String filename, int proximity, int action) async {
+    if (action == 2 || filename.isEmpty) {
+      await stopAmbience();
+      return;
+    }
+
+    if (!hasSound(filename)) {
+      if (_currentAmbience != null && action == 1) {
+        await stopAmbience();
       }
       return;
     }
 
-    if (_currentBgm == filename && _bgmPlayer?.state == PlayerState.playing) {
+    // 距離に応じた音量スケーリング (proximity == 0 は減衰なし)
+    double distanceFactor = 1.0;
+    if (proximity > 0) {
+      distanceFactor = (1.0 - (proximity * 0.08)).clamp(0.1, 1.0);
+    }
+    final finalVolume = (_ambienceVolume * distanceFactor).clamp(0.0, 1.0);
+
+    if (action == 3) {
+      // ambience_update: 音量更新
+      try {
+        await _ambiencePlayer?.setVolume(finalVolume);
+      } catch (_) {}
+      return;
+    }
+
+    // ambience_begin: 同一環境音が既に再生中の場合は音量更新のみ
+    if (_currentAmbience == filename && _ambiencePlayer?.state == PlayerState.playing) {
+      await _ambiencePlayer?.setVolume(finalVolume);
       return;
     }
 
     try {
-      _currentBgm = filename;
-      final finalVolume = (_bgmVolume * (cVolume / 100.0)).clamp(0.0, 1.0);
-      await _bgmPlayer?.setVolume(finalVolume);
-      await _bgmPlayer?.setReleaseMode(loop ? ReleaseMode.loop : ReleaseMode.stop);
-      await _bgmPlayer?.play(AssetSource('sounds/$filename'));
+      _currentAmbience = filename;
+      await _ambiencePlayer?.setVolume(finalVolume);
+      await _ambiencePlayer?.setReleaseMode(ReleaseMode.loop);
+      await _ambiencePlayer?.play(AssetSource('sounds/$filename'));
     } catch (_) {}
   }
 
-  Future<void> stopBgm() async {
+  Future<void> stopAmbience() async {
     try {
-      await _bgmPlayer?.stop();
-      _currentBgm = null;
+      await _ambiencePlayer?.stop();
+      _currentAmbience = null;
     } catch (_) {}
   }
 
@@ -260,8 +477,20 @@ class SoundManager {
     _bgmVolume = vol.clamp(0.0, 1.0);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('sound_bgm_volume', _bgmVolume);
-    if (_bgmPlayer != null && _bgmPlayer!.state == PlayerState.playing) {
-      await _bgmPlayer!.setVolume(_bgmVolume);
+    if (_floorBgmPlayer != null && _floorBgmPlayer!.state == PlayerState.playing) {
+      await _floorBgmPlayer!.setVolume(_bgmVolume);
+    }
+    if (_roomBgmPlayer != null && _roomBgmPlayer!.state == PlayerState.playing) {
+      await _roomBgmPlayer!.setVolume(_bgmVolume);
+    }
+  }
+
+  Future<void> setAmbienceVolume(double vol) async {
+    _ambienceVolume = vol.clamp(0.0, 1.0);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('sound_ambience_volume', _ambienceVolume);
+    if (_ambiencePlayer != null && _ambiencePlayer!.state == PlayerState.playing) {
+      await _ambiencePlayer!.setVolume(_ambienceVolume);
     }
   }
 
@@ -269,6 +498,45 @@ class SoundManager {
     _voiceVolume = vol.clamp(0.0, 1.0);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('sound_voice_volume', _voiceVolume);
+  }
+
+  /// アプリバックグラウンド移行時の一時停止
+  Future<void> pauseForBackground() async {
+    try {
+      _floorWasPlayingBeforeBackground = (_floorBgmPlayer?.state == PlayerState.playing);
+      if (_floorWasPlayingBeforeBackground) {
+        await _floorBgmPlayer?.pause();
+      }
+
+      _roomWasPlayingBeforeBackground = (_roomBgmPlayer?.state == PlayerState.playing);
+      if (_roomWasPlayingBeforeBackground) {
+        await _roomBgmPlayer?.pause();
+      }
+
+      _ambienceWasPlayingBeforeBackground = (_ambiencePlayer?.state == PlayerState.playing);
+      if (_ambienceWasPlayingBeforeBackground) {
+        await _ambiencePlayer?.pause();
+      }
+    } catch (_) {}
+  }
+
+  /// アプリフォアグラウンド復帰時の再開
+  Future<void> resumeFromBackground() async {
+    try {
+      if (_floorWasPlayingBeforeBackground && _floorBgmPlayer != null) {
+        await _floorBgmPlayer?.resume();
+      }
+      if (_roomWasPlayingBeforeBackground && _roomBgmPlayer != null) {
+        await _roomBgmPlayer?.resume();
+      }
+      if (_ambienceWasPlayingBeforeBackground && _ambiencePlayer != null) {
+        await _ambiencePlayer?.resume();
+      }
+    } catch (_) {} finally {
+      _floorWasPlayingBeforeBackground = false;
+      _roomWasPlayingBeforeBackground = false;
+      _ambienceWasPlayingBeforeBackground = false;
+    }
   }
 
   Future<void> stopAll() async {
@@ -280,6 +548,7 @@ class SoundManager {
       } catch (_) {}
     }
     await stopBgm();
+    await stopAmbience();
   }
 
   void dispose() {
@@ -287,8 +556,24 @@ class SoundManager {
       entry.player.dispose();
     }
     _pool.clear();
-    _bgmPlayer?.dispose();
-    _bgmPlayer = null;
+    _floorBgmPlayer?.dispose();
+    _floorBgmPlayer = null;
+    _roomBgmPlayer?.dispose();
+    _roomBgmPlayer = null;
+    _ambiencePlayer?.dispose();
+    _ambiencePlayer = null;
     _isInitialized = false;
+  }
+
+  /// テスト用: サウンド利用可能状態の登録
+  @visibleForTesting
+  void registerAvailableSound(String filename) {
+    _availableSounds.add(filename);
+  }
+
+  /// テスト用: 初期化状態の設定
+  @visibleForTesting
+  void setInitializedForTest(bool value) {
+    _isInitialized = value;
   }
 }

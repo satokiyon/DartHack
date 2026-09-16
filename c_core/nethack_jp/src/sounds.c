@@ -2361,5 +2361,99 @@ sound_speak(const char *text SPEECHONLY)
 #endif
 }
 
+/* 階層遷移・開始・復元時のBGM自動判定・更新 */
+void
+update_level_ambience(void)
+{
+    int32_t amb_id = amb_dungeon;
+
+    /* 1. エンドゲーム（精霊界・アストラル界） */
+    if (In_endgame(&u.uz)) {
+        if (Is_astralevel(&u.uz))
+            amb_id = amb_astral;
+        else if (Is_waterlevel(&u.uz))
+            amb_id = amb_plane_water;
+        else if (Is_firelevel(&u.uz))
+            amb_id = amb_plane_fire;
+        else if (Is_airlevel(&u.uz))
+            amb_id = amb_plane_air;
+        else if (Is_earthlevel(&u.uz))
+            amb_id = amb_plane_earth;
+        else
+            amb_id = amb_astral;
+    }
+    /* 2. ゲヘナ内の特殊階層 */
+    else if (In_hell(&u.uz)) {
+        if (Is_sanctum(&u.uz))
+            amb_id = amb_sanctum;
+        else if (On_W_tower_level(&u.uz) || Is_wiz1_level(&u.uz) ||
+                 Is_wiz2_level(&u.uz) || Is_wiz3_level(&u.uz))
+            amb_id = amb_wizard_tower;
+        else if (Is_portal_level(&u.uz))
+            amb_id = amb_fakewiz;
+        else if (Is_juiblex_level(&u.uz))
+            amb_id = amb_juiblex;
+        else if (Is_asmo_level(&u.uz))
+            amb_id = amb_asmodeus;
+        else if (Is_baal_level(&u.uz))
+            amb_id = amb_baalzebub;
+        else if (Is_valley(&u.uz))
+            amb_id = amb_valley;
+        else if (In_V_tower(&u.uz))
+            amb_id = amb_vlad;
+        else
+            amb_id = amb_gehennom;
+    }
+    /* 3. クエスト */
+    else if (In_quest(&u.uz)) {
+        if (Is_nemesis(&u.uz))
+            amb_id = amb_quest_nemesis;
+        else
+            amb_id = amb_quest;
+    }
+    /* 4. ノームの鉱山 */
+    else if (In_mines(&u.uz)) {
+        if (Is_mineend_level(&u.uz))
+            amb_id = amb_minend;
+        else if (svl.level.flags.has_town)
+            amb_id = amb_town;
+        else
+            amb_id = amb_mines;
+    }
+    /* 5. 倉庫番 */
+    else if (In_sokoban(&u.uz)) {
+        if (Is_sokoend_level(&u.uz))
+            amb_id = amb_sokoend;
+        else
+            amb_id = amb_sokoban;
+    }
+    /* 6. ルーディオス砦 */
+    else if (Is_knox(&u.uz)) {
+        amb_id = amb_ludios;
+    }
+    /* 7. チュートリアル */
+    else if (In_tutorial(&u.uz)) {
+        amb_id = amb_tutorial;
+    }
+    /* 8. 運命の大迷宮内の固定特殊階層 */
+    else if (Is_stronghold(&u.uz)) {
+        amb_id = amb_castle;
+    } else if (Is_medusa_level(&u.uz)) {
+        amb_id = amb_medusa;
+    } else if (Is_bigroom(&u.uz)) {
+        amb_id = amb_bigroom;
+    } else if (Is_rogue_level(&u.uz)) {
+        amb_id = amb_rogue;
+    } else if (Is_oracle_level(&u.uz)) {
+        amb_id = amb_oracle;
+    }
+    /* 9. 運命の大迷宮（通常階層） */
+    else {
+        amb_id = amb_dungeon;
+    }
+
+    SoundAmbience(ambience_begin, amb_id, 0);
+}
+
 /*sounds.c*/
 

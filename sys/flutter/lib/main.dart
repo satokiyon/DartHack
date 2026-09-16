@@ -983,6 +983,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      SoundManager.instance.pauseForBackground();
+    } else if (state == AppLifecycleState.resumed) {
+      SoundManager.instance.resumeFromBackground();
+    }
   }
 
   Future<void> _sendAutosaveSettingsToWorker() async {

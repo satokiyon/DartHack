@@ -2006,6 +2006,7 @@ goto_level(
 
     (void) pickup(1);
     do_autosave();
+    update_level_ambience();
     return;
 }
 

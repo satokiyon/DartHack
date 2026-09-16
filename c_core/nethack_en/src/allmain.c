@@ -708,6 +708,7 @@ init_sound_disp_gamewindows(void)
     int menu_behavior = MENU_BEHAVE_STANDARD;
 
     activate_chosen_soundlib();
+    SoundAmbience(ambience_begin, amb_title, 0);
 
     if (iflags.wc_splash_screen && !flags.randomall) {
         SoundAchievement(0, sa2_splashscreen, 0);
@@ -969,6 +970,34 @@ welcome(boolean new_game) /* false => restoring an old game */
         hellish_smoke_mesg();
         /* remind player of the level annotation, like in goto_level() */
         print_level_annotation();
+    }
+    update_level_ambience();
+    if (!new_game) {
+        /* Restore room BGM immediately if hero is inside a special room upon game restore */
+        int roomno;
+        int rt;
+        if (*u.ushops) {
+            SoundAmbience(ambience_begin, amb_in_a_shop, 0);
+        } else if (*u.urooms) {
+            roomno = *u.urooms - ROOMOFFSET;
+            if (roomno >= 0 && roomno < SIZE(svr.rooms)) {
+                rt = svr.rooms[roomno].orig_rtype ? svr.rooms[roomno].orig_rtype : svr.rooms[roomno].rtype;
+                switch (rt) {
+                case ZOO: SoundAmbience(ambience_begin, amb_in_a_zoo, 0); break;
+                case SWAMP: SoundAmbience(ambience_begin, amb_swamp, 0); break;
+                case COURT: SoundAmbience(ambience_begin, amb_in_a_court, 0); break;
+                case MORGUE: SoundAmbience(ambience_begin, amb_in_cemetery, 0); break;
+                case BEEHIVE: SoundAmbience(ambience_begin, amb_in_a_beehive, 0); break;
+                case COCKNEST: SoundAmbience(ambience_begin, amb_in_a_cockatrice_nest, 0); break;
+                case ANTHOLE: SoundAmbience(ambience_begin, amb_inside_anthole, 0); break;
+                case BARRACKS: SoundAmbience(ambience_begin, amb_in_a_barracks, 0); break;
+                case DELPHI: SoundAmbience(ambience_begin, amb_approaching_oracle, 0); break;
+                case TEMPLE: SoundAmbience(ambience_begin, amb_inside_temple, 0); break;
+                case VAULT: SoundAmbience(ambience_begin, amb_inside_vault, 0); break;
+                default: break;
+                }
+            }
+        }
     }
 }
 

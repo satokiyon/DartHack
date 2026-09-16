@@ -158,6 +158,83 @@ enum ambience_actions {
 
 enum ambiences {
     amb_noambience,
+    /* フロア・ダンジョンBGM */
+    amb_dungeon,
+    amb_mines,
+    amb_sokoban,
+    amb_town,
+    amb_quest,
+    amb_gehennom,
+    amb_vlad,
+    amb_wizard_tower,
+    amb_astral,
+    amb_ludios,
+    amb_tutorial,
+    amb_oracle,
+    amb_rogue,
+    amb_bigroom,
+    amb_medusa,
+    amb_castle,
+    amb_minend,
+    amb_sokoend,
+    amb_quest_nemesis,
+    amb_valley,
+    amb_juiblex,
+    amb_baalzebub,
+    amb_asmodeus,
+    amb_orcus,
+    amb_fakewiz,
+    amb_sanctum,
+    amb_plane_earth,
+    amb_plane_air,
+    amb_plane_fire,
+    amb_plane_water,
+    amb_ascension,
+    /* 地形・天候環境音 */
+    amb_water,
+    amb_lava,
+    amb_wind,
+    amb_rain,
+    amb_swamp,
+    /* 部屋・施設環境音・ルームBGM */
+    amb_in_a_shop,
+    amb_inside_temple,
+    amb_inside_vault,
+    amb_approaching_oracle,
+    amb_in_a_court,
+    amb_in_a_barracks,
+    amb_in_a_zoo,
+    amb_in_a_beehive,
+    amb_inside_anthole,
+    amb_in_cemetery,
+    amb_in_a_cockatrice_nest,
+    amb_in_a_lemure_pit,
+    amb_in_a_migot_nest,
+    amb_in_a_black_market,
+    amb_inside_morgue,
+    amb_inside_armory,
+    amb_inside_pool,
+    amb_inside_garden,
+    amb_inside_library,
+    amb_inside_nymph_garden,
+    amb_theme_boulder_room,
+    amb_theme_trap_room,
+    amb_theme_buried_treasure,
+    amb_theme_buried_zombies,
+    amb_theme_massacre,
+    amb_theme_statuary,
+    amb_theme_light_source,
+    amb_theme_temple_of_the_gods,
+    amb_theme_ghost_adventurer,
+    amb_theme_storeroom,
+    amb_theme_teleport_hub,
+    amb_theme_mausoleum,
+    amb_theme_pillars,
+    amb_theme_fake_delphi,
+    /* タイトル・ゲームオーバー */
+    amb_title,
+    amb_gameover,
+    number_of_ambiences
 };
 
 enum voice_moreinfo {
@@ -231,6 +308,13 @@ SoundAchievement(0, sa2_xpleveldown, level);
         if (iflags.sounds && !Deaf && soundprocs.sound_hero_playnotes        \
             && ((soundprocs.sound_triggers & SOUND_TRIGGER_HEROMUSIC) != 0)) \
             (*soundprocs.sound_hero_playnotes)((instrument), (str), (vol));  \
+    } while(0)
+
+#define SoundAmbience(action, amb_id, proximity) \
+    do {                                                                      \
+        if (iflags.sounds && soundprocs.sound_ambience                        \
+            && ((soundprocs.sound_triggers & SOUND_TRIGGER_AMBIENCE) != 0))   \
+            (*soundprocs.sound_ambience)((action), (amb_id), (proximity));     \
     } while(0)
 
 /* プレイヤー視点であり、ヒーロー視点ではない; Deaf 抑制なし */

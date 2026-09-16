@@ -327,9 +327,14 @@ invault(void)
     int vgdeathcount;
 
     if (!vaultroom) {
+        if (u.uinvault > 0)
+            SoundAmbience(ambience_end, amb_inside_vault, 0);
         u.uinvault = 0;
         return;
     }
+    if (u.uinvault == 0)
+        SoundAmbience(ambience_begin, amb_inside_vault, 0);
+
     /* after a couple of guards don't come back from their trips to
        the vault, future guards become more reluctant to turn up (even
        if summoned via whistle) */
