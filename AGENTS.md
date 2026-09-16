@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-16. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-16. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -930,5 +930,33 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
 7. **セーブデータ後方互換性の維持原則（非シリアライズ）**:
    - BGMや環境音のイベントID・状態は、セーブファイルへ直接保存（シリアライズ）せず、すべて C コアから移植層への実行時イベント（Runtime Event）として通知してください。
    - これにより、`critical_sizes` やセーブファイルのバイナリフォーマットに一切手を加えず、過去バージョンのセーブデータとの100%完全な互換性を維持します。
+
+8. **BGM/環境音再有効化時およびミュート解除時の直前トラック自動復元原則**:
+   - BGMや環境音をOFF（または全体ミュート）にした際、内部でトラック名を破棄（`null`クリア）せず、直前のフロアBGM名（`_lastFloorBgm`）および環境音名（`_lastAmbience`）を記憶・保持してください。
+   - ユーザーがスイッチを再度ONに戻した際、または全体ミュートを解除した瞬間に、直前のフロアBGM/環境音を自動的にフェードイン再開させる設計を徹底してください。「ONに戻したのに次の階層まで無音のまま」というUXの違和感を完全に防止します。
+
+9. **バックグラウンド復帰時のミュート・無効化状態の二重検証原則**:
+   - `resumeFromBackground()` において、バックグラウンド移行前に再生中だったフラグ（`_floorWasPlayingBeforeBackground` 等）のみで安易に再開してはなりません。
+   - 必ず現在の設定状態（`!_muted && _bgmEnabled`、環境音は `!_muted && _ambienceEnabled`）を判定し、ミュート中やカテゴリ無効化中である場合は再開を確実にスキップするガードを実装してください。
+
+## 36. 設定画面（SettingsPage）および SharedPreferences における型安全・パフォーマンス原則
+
+1. **JSON設定インポート時における浮動小数点数（double）の型昇格ガード原則（クラッシュ防止）**:
+   - **現象とリスク**:
+     Flutter の `jsonDecode` では、`1.0` や `0.0` などの浮動小数点数が `1` や `0`（`int` 型）としてパースされることがあります。これをそのまま `prefs.setInt(key, value)` で保存してしまうと、次回起動時や設定ロード時に `prefs.getDouble(key)` を呼び出した瞬間に `TypeError: int is not a subtype of double` 例外が発生し、アプリが起動不能（致命的クラッシュ）に陥ります。
+   - **対策**:
+     設定のインポート処理（`_importSettings` 等）では、double 型として管理されている設定キー（音量、不透明度、スケール、フォントサイズ等）の一覧（`doubleKeys`）を定義し、該当キーの値が `num`（`int` を含む数値）である場合は、必ず `prefs.setDouble(key, value.toDouble())` で明示的に型昇格させて保存する安全弁を徹底してください。
+
+2. **スライダー操作におけるリアルタイム音量反映とディスク永続化（onChangeEnd）の分離原則**:
+   - **現象とリスク**:
+     スライダーのドラッグ中、`Slider.onChanged` は毎秒数十回（60fps）発生します。ここで毎回 `SharedPreferences` へのディスク書き込み（`setDouble` 等）を発行すると、不要なI/Oタスクが非同期キューに滞留し、ストレージ負荷、バッテリー消費、UIのカクつき（ジャンク）を引き起こします。
+   - **対策**:
+     - `onChanged`: メモリ上の状態更新および再生中プレイヤーの音量更新（`updateBgmVolume` 等）のみを行い、リアルタイムで滑らかな音量追従とパーセンテージ表示を実現する。
+     - `onChangeEnd`: ユーザーが指を離した完了イベントでのみ、`setBgmVolume` 等による `SharedPreferences` へのディスク永続化やテストプレビュー音の再生を実行する。
+     この責務分離により、完全な操作レスポンスと省電力・安全なディスク永続化を両立させてください。
+
+3. **空コレクションに対する `reduce` の例外防止原則**:
+   - `_pool.reduce((a, b) => ...)` などのコレクション集約メソッドを呼ぶ際は、テスト環境や初期化前などでリストが空の場合に `Bad state: No element` 例外が発生するのを防ぐため、必ず事前に `if (_pool.isEmpty) return;` などの空判定ガードを徹底してください。
+
 
 
