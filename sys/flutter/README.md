@@ -71,7 +71,11 @@ sys/flutter/
 │
 ├── doc/                         # 各種設計・仕様書
 │   ├── ambience_specs.md        # BGM・環境音・特別部屋BGM仕様書
+│   ├── sound_macros_list.md     # 全274音のサウンドマスター仕様書
 │   └── voice_speech_specs.md    # 音声合成・セリフ演出仕様書
+│
+├── tools/                       # 開発支援・アセット作成ツール
+│   └── sound_curator/           # 効果音収集・作成支援ローカルWebツール
 │
 ├── android/                     # Android プロジェクト設定 (Gradle / CMake)
 ├── ios/                         # iOS Runner (Xcode プロジェクト)
@@ -170,8 +174,52 @@ DartHack では、NetHack 5.0 のサウンドトリガー仕様に準拠した�
 
 ### 3. 音源ファイルの配置方法と仕様書
 - 音源ファイル（`.ogg` 形式）は `sys/flutter/assets/sounds/` 配下に配置します。
+- 全274音のイベントID、対応ファイル名、Cコア呼び出し行対照表は [`doc/sound_macros_list.md`](doc/sound_macros_list.md) を参照してください。
 - 詳細なBGM・環境音のイベントID、対応ファイル名、部屋一覧、判定ロジックについては [`doc/ambience_specs.md`](doc/ambience_specs.md) を参照してください。
 - 音声合成・セリフイベントの仕様については [`doc/voice_speech_specs.md`](doc/voice_speech_specs.md) を参照してください。
+
+---
+
+## 🛠️ サウンドキュレーター（効果音収集・作成支援ツール）
+
+Cコアの全効果音・楽器音・音声イベント仕様（[`doc/sound_macros_list.md`](doc/sound_macros_list.md)）に定義されている **全 274 種のサウンドアセット** を、効率よく・高品質かつ狙い通りに収集・作成・管理するためのローカルWebワークスペース（`sys/flutter/tools/sound_curator/`）です。
+
+### 1. 主な機能と特徴
+- **全274音の進捗ダッシュボード**:
+  - リアルタイム進捗率（パーセンテージ）表示、未設定/確定済フィルタ、カテゴリ別フィルタ（効果音/実績/楽器/声音）、インクリメンタル検索。
+- **ワンクリック外部検索支援（全 13 サイト対応）**:
+  - 各カード内に色分けされたコンパクトバッジが常時表示され、ワンクリックで最適な日本語/英語キーワードがセットされた検索ページを開きます。
+  - **🇯🇵 国内サイト (8件)**: 効果音ラボ、On-Jin ～音人～、OtoLogic、効果音辞典、Springin' Sound Stock、魔王魂、ポケットサウンド、甘茶の音楽工房
+  - **🌐 海外・オープン素材 (5件)**: Pixabay、SoundDino、Freesound.org、ZapSplat、OpenGameArt.org
+- **ドラッグ＆ドロップ登録 & 自動正規化 (`ffmpeg`)**:
+  - ダウンロードした音声ファイル（WAV/MP3/OGG等）をカードにドロップするだけで即時取り込み。
+  - ファイル名から出典サイト・ライセンス規約を自動判別し、`ffmpeg` により **先頭無音ミリ秒カット**、**EBU R128 (-14 LUFS / True Peak -1.0dBFS) 正規化**、**Ogg Opus (48kHz) エンコード** を一括実行して `assets/sounds/` に配置。
+- **楽器音 47 種の完全自動生成**:
+  - オープンSoundFont（`FluidR3 GM`）と `FluidSynth` を用いた自動サンプリング（`generate_instruments.py`）により、フルート・角笛・ラッパ・ハープ等の A〜G 各音階（42種）および固定楽器音（5種）をミリ秒単位の正確なピッチで自動生成済み。
+- **ライセンス一覧（`attributions.txt`）の自動生成**:
+  - 採否と同時に、作者・出典URL・ライセンス規約が `sys/flutter/assets/sounds/attributions.txt` に本家フォーマット準拠で自動記録。
+
+### 2. ツールの起動方法
+
+#### PowerShell スクリプト（推奨）
+```powershell
+powershell -ExecutionPolicy Bypass -File sys/flutter/tools/sound_curator/run_curator.ps1
+```
+ローカルWebサーバーが立ち上がり、既定のWebブラウザで `http://localhost:8765` が自動的に開きます。
+
+#### 手動起動
+```powershell
+python sys/flutter/tools/sound_curator/server.py
+```
+ブラウザで `http://localhost:8765` にアクセスしてください（終了時は `Ctrl + C`）。
+※外部 pip パッケージのインストールは不要（Python 標準ライブラリで動作）です。
+
+### 3. 使用方法・キュレーションワークフロー
+1. ブラウザで画面を開き、上部の **「⏳ 未設定のみ」** フィルタを選択します。
+2. 収集したい効果音カードの検索バッジ（例: **［効果音ラボ］**、**［Pixabay］**、**［Freesound］** 等）をクリックして目的の音源をダウンロードします。
+3. ダウンロードした音声ファイルをカードの「📥 ドロップゾーン」にドラッグ＆ドロップします。
+4. モーダルで出典サイトやライセンス（自動推定されます）を確認し、**「正規化 & 確定 (Opus変換)」** ボタンをクリックします。
+5. 自動的に Opus 変換され、確定済みカードに切り替わり、試聴プレイヤーで仕上がりを確認できます。
 
 ---
 

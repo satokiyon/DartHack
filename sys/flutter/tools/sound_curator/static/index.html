@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DartHack サウンドキュレーター (全274音)</title>
+  <style>
+    :root {
+      --bg-main: #12141a;
+      --bg-card: #1c202a;
+      --bg-card-hover: #242936;
+      --border-color: #2e3446;
+      --text-main: #f0f3f8;
+      --text-muted: #8b949e;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
+      --accent-orange: #f59e0b;
+      --accent-purple: #8b5cf6;
+      --accent-red: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      padding-bottom: 60px;
+    }
+    header {
+      background: #181c26;
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .header-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    h1 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .stats-badge {
+      background: #252d3d;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      border: 1px solid var(--border-color);
+    }
+    .stats-badge strong { color: var(--accent-green); }
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #252d3d;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .controls-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-btn {
+      background: #252d3d;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover { color: var(--text-main); border-color: var(--accent-blue); }
+    .filter-btn.active {
+      background: var(--accent-blue);
+      color: #fff;
+      border-color: var(--accent-blue);
+      font-weight: 600;
+    }
+    .search-input {
+      flex: 1;
+      min-width: 240px;
+      padding: 7px 12px;
+      background: #11141d;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-main);
+      font-size: 13px;
+    }
+    .search-input:focus { outline: none; border-color: var(--accent-blue); }
+
+    main {
+      max-width: 1400px;
+      margin: 24px auto;
+      padding: 0 24px;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+      gap: 16px;
+    }
+    .sound-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform 0.15s, border-color 0.15s;
+      position: relative;
+    }
+    .sound-card:hover {
+      border-color: #3f475c;
+      transform: translateY(-2px);
+    }
+    .sound-card.ready {
+      border-left: 4px solid var(--accent-green);
+    }
+    .sound-card.pending {
+      border-left: 4px solid var(--accent-orange);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      word-break: break-all;
+    }
+    .status-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-tag.ready { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .status-tag.pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+
+    .card-desc {
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.4;
+      background: #141720;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid #232836;
+    }
+    .card-caller {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+    .audio-player-box {
+      background: #151822;
+      border-radius: 6px;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    audio {
+      width: 100%;
+      height: 36px;
+      outline: none;
+    }
+    .meta-info {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .meta-info a { color: var(--accent-blue); text-decoration: none; }
+    .meta-info a:hover { text-decoration: underline; }
+
+    /* 13サイト用コンパクトタグバッジ群 */
+    .search-badges-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .badge-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px;
+    }
+    .badge-group-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-right: 2px;
+      user-select: none;
+    }
+    .btn-badge {
+      font-size: 11px;
+      padding: 3px 7px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    /* 国内サイトカラー */
+    .badge-lab { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
+    .badge-lab:hover { background: #f59e0b; color: #000; }
+    .badge-onjin { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
+    .badge-onjin:hover { background: #ef4444; color: #fff; }
+    .badge-otologic { background: rgba(234, 88, 12, 0.15); color: #fb923c; border-color: rgba(234, 88, 12, 0.3); }
+    .badge-otologic:hover { background: #ea580c; color: #fff; }
+    .badge-dict { background: rgba(217, 119, 6, 0.15); color: #fcd34d; border-color: rgba(217, 119, 6, 0.3); }
+    .badge-dict:hover { background: #d97706; color: #000; }
+    .badge-springin { background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3); }
+    .badge-springin:hover { background: #10b981; color: #000; }
+    .badge-maou { background: rgba(168, 85, 247, 0.15); color: #c084fc; border-color: rgba(168, 85, 247, 0.3); }
+    .badge-maou:hover { background: #a855f7; color: #fff; }
+    .badge-pocket { background: rgba(236, 72, 153, 0.15); color: #f472b6; border-color: rgba(236, 72, 153, 0.3); }
+    .badge-pocket:hover { background: #ec4899; color: #fff; }
+    .badge-amacha { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-color: rgba(139, 92, 246, 0.3); }
+    .badge-amacha:hover { background: #8b5cf6; color: #fff; }
+
+    /* 海外サイトカラー */
+    .badge-pixabay { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border-color: rgba(6, 182, 212, 0.3); }
+    .badge-pixabay:hover { background: #06b6d4; color: #000; }
+    .badge-sounddino { background: rgba(14, 165, 233, 0.15); color: #38bdf8; border-color: rgba(14, 165, 233, 0.3); }
+    .badge-sounddino:hover { background: #0ea5e9; color: #000; }
+    .badge-freesound { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3); }
+    .badge-freesound:hover { background: #3b82f6; color: #fff; }
+    .badge-zapsplat { background: rgba(99, 102, 241, 0.15); color: #818cf8; border-color: rgba(99, 102, 241, 0.3); }
+    .badge-zapsplat:hover { background: #6366f1; color: #fff; }
+    .badge-oga { background: rgba(5, 150, 105, 0.15); color: #6ee7b7; border-color: rgba(5, 150, 105, 0.3); }
+    .badge-oga:hover { background: #059669; color: #fff; }
+
+    /* ドロップゾーン */
+    .drop-zone {
+      border: 2px dashed #374151;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      background: #151822;
+      transition: all 0.2s;
+    }
+    .drop-zone.dragover {
+      border-color: var(--accent-blue);
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--text-main);
+    }
+    .btn-delete {
+      background: transparent;
+      border: 1px solid #4b5563;
+      color: var(--text-muted);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      align-self: flex-end;
+    }
+    .btn-delete:hover { border-color: var(--accent-red); color: var(--accent-red); }
+
+    /* モーダル */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-backdrop.active { display: flex; }
+    .modal {
+      background: #1c202a;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 520px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    .modal h2 { font-size: 18px; color: #fff; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+    .form-group input, .form-group select {
+      background: #12141a;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: 13px;
+    }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent-blue); }
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .btn-cancel {
+      background: #252d3d;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn-submit {
+      background: var(--accent-blue);
+      border: none;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-submit:hover { background: #2563eb; }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-title-row">
+        <h1>🎮 DartHack サウンドキュレーター</h1>
+        <div class="stats-badge" id="statsBadge">
+          進捗: <strong id="statsReadyCount">0</strong> / <span id="statsTotalCount">274</span> 完了 (<span id="statsPercent">0</span>%)
+        </div>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="controls-row">
+        <button class="filter-btn active" data-filter="all">すべて</button>
+        <button class="filter-btn" data-filter="pending">⏳ 未設定のみ</button>
+        <button class="filter-btn" data-filter="ready">✅ 確定済のみ</button>
+        <span style="color: #4b5563;">|</span>
+        <button class="filter-btn" data-cat="effect">効果音 (197)</button>
+        <button class="filter-btn" data-cat="achievement">実績 (23)</button>
+        <button class="filter-btn" data-cat="instrument">楽器 (47)</button>
+        <button class="filter-btn" data-cat="voice">声音 (7)</button>
+        <input type="text" class="search-input" id="searchInput" placeholder="サウンド名・説明文で検索...">
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="card-grid" id="cardGrid">
+      <!-- カードが動的に生成されます -->
+    </div>
+  </main>
+
+  <!-- 音源確定モーダル -->
+  <div class="modal-backdrop" id="uploadModal">
+    <div class="modal">
+      <h2 id="modalTitle">音源の確定と正規化</h2>
+      <div class="form-group">
+        <label>対象サウンド</label>
+        <input type="text" id="modalFilename" readonly style="opacity: 0.7;">
+      </div>
+      <div class="form-group">
+        <label>選択されたファイル</label>
+        <input type="text" id="modalSelectedFileName" readonly style="opacity: 0.7;">
+      </div>
+      <div class="form-group">
+        <label>出典サイト</label>
+        <select id="modalSourceSite">
+          <optgroup label="国内サイト">
+            <option value="効果音ラボ">効果音ラボ</option>
+            <option value="On-Jin ～音人～">On-Jin ～音人～</option>
+            <option value="OtoLogic">OtoLogic</option>
+            <option value="効果音辞典">効果音辞典</option>
+            <option value="Springin' Sound Stock">Springin' Sound Stock</option>
+            <option value="魔王魂">魔王魂</option>
+            <option value="ポケットサウンド">ポケットサウンド</option>
+            <option value="甘茶の音楽工房">甘茶の音楽工房</option>
+          </optgroup>
+          <optgroup label="海外・オープン素材">
+            <option value="Pixabay">Pixabay</option>
+            <option value="SoundDino">SoundDino</option>
+            <option value="Freesound.org">Freesound.org</option>
+            <option value="ZapSplat">ZapSplat</option>
+            <option value="OpenGameArt.org">OpenGameArt.org</option>
+            <option value="Kenney">Kenney (CC0)</option>
+            <option value="FluidR3 GM (FluidSynth)">FluidR3 GM (SoundFont)</option>
+          </optgroup>
+          <option value="自作 / その他">自作 / その他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>作者名 / クレジット表記</label>
+        <input type="text" id="modalAuthor" placeholder="例: 効果音ラボ / OtoLogic / 作者名">
+      </div>
+      <div class="form-group">
+        <label>出典元URL</label>
+        <input type="text" id="modalSourceUrl" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label>ライセンス / 利用規約</label>
+        <select id="modalLicense">
+          <option value="効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）">効果音ラボ利用規約</option>
+          <option value="Pixabay Content License（商用可・ゲーム組込可・クレジット不要）">Pixabay Content License</option>
+          <option value="SoundDino Royalty-Free（商用可・クレジット不要）">SoundDino Royalty-Free</option>
+          <option value="On-Jin利用規約（商用可・ゲーム組込可・クレジット表記）">On-Jin利用規約（クレジット表記）</option>
+          <option value="OtoLogic利用規約（CC BY 4.0 / クレジット表記）">OtoLogic利用規約 (CC BY 4.0)</option>
+          <option value="効果音辞典利用規約（商用可・クレジット不要）">効果音辞典利用規約</option>
+          <option value="Springin'利用規約（商用可・クレジット不要）">Springin'利用規約</option>
+          <option value="魔王魂利用規約（商用可・クレジット表記）">魔王魂利用規約</option>
+          <option value="ポケットサウンド利用規約（商用可・クレジット表記）">ポケットサウンド利用規約</option>
+          <option value="甘茶の音楽工房利用規約（商用可・ゲーム組込可・クレジット任意）">甘茶の音楽工房利用規約</option>
+          <option value="ZapSplat Standard License（商用可・クレジット表記）">ZapSplat Standard License</option>
+          <option value="CC0 (Public Domain)">CC0 (Public Domain)</option>
+          <option value="CC-BY 4.0">CC-BY 4.0</option>
+          <option value="CC-BY 3.0">CC-BY 3.0</option>
+          <option value="MIT">MIT</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>備考 (任意)</label>
+        <input type="text" id="modalNotes" placeholder="例: 爆発音を短くカット、Audacity等で加工">
+      </div>
+      <div class="modal-buttons">
+        <button class="btn-cancel" id="btnModalCancel">キャンセル</button>
+        <button class="btn-submit" id="btnModalSubmit">正規化 & 確定 (Opus変換)</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

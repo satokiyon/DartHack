@@ -1,0 +1,2468 @@
+[
+  {
+    "no": 1,
+    "filename": "se_air_crackles.ogg",
+    "id": "se_air_crackles",
+    "description": "空気がパチパチと鳴る音（エレメンタルや魔法の気配）",
+    "caller": "mcastu.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 2,
+    "filename": "se_alarm.ogg",
+    "id": "se_alarm",
+    "description": "警報・アラーム音（金庫室アラームやトラップ作動時）",
+    "caller": "do.c, shk.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 3,
+    "filename": "se_angry_drone.ogg",
+    "id": "se_angry_drone",
+    "description": "怒った蜂・昆虫の羽音（蜂の巣部屋）",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 4,
+    "filename": "se_angry_snakes.ogg",
+    "id": "se_angry_snakes",
+    "description": "威嚇するヘビ群のシューシュー音（ヘビ複数の攻撃）",
+    "caller": "mthrowu.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 5,
+    "filename": "se_angry_voice.ogg",
+    "id": "se_angry_voice",
+    "description": "怒れる声（神や店主の立腹・叫び）",
+    "caller": "shk.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 6,
+    "filename": "se_applause.ogg",
+    "id": "se_applause",
+    "description": "拍手喝采（闘技場や成功イベント）",
+    "caller": "mon.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 7,
+    "filename": "se_avian_screak.ogg",
+    "id": "se_avian_screak",
+    "description": "鳥類・怪鳥の甲高い叫び声",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 8,
+    "filename": "se_bang_weapon_side.ogg",
+    "id": "se_bang_weapon_side",
+    "description": "武器の柄で壁を叩く音（壁の素材調査時）",
+    "caller": "dig.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 9,
+    "filename": "se_bars_clink.ogg",
+    "id": "se_bars_clink",
+    "description": "鉄格子がカチャリと軽く鳴る音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 10,
+    "filename": "se_bars_clonk.ogg",
+    "id": "se_bars_clonk",
+    "description": "鉄格子への重い金属衝突音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 11,
+    "filename": "se_bars_flapp.ogg",
+    "id": "se_bars_flapp",
+    "description": "鉄格子のバタバタという揺れ音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 12,
+    "filename": "se_bars_whang.ogg",
+    "id": "se_bars_whang",
+    "description": "鉄格子への激しい衝撃音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 13,
+    "filename": "se_bars_whap.ogg",
+    "id": "se_bars_whap",
+    "description": "鉄格子への打撃・ビシッという音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 14,
+    "filename": "se_bees.ogg",
+    "id": "se_bees",
+    "description": "蜂の群体がブンブン群がる羽音",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 15,
+    "filename": "se_blast.ogg",
+    "id": "se_blast",
+    "description": "爆発・爆風音（魔法爆発・罠爆発）",
+    "caller": "explode.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 16,
+    "filename": "se_board_squeak.ogg",
+    "id": "se_board_squeak",
+    "description": "床板がギシッときしむ音（きしみ床トラップ）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 17,
+    "filename": "se_board_squeaks_loudly.ogg",
+    "id": "se_board_squeaks_loudly",
+    "description": "床板がギシギシと大きくきしむ音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 18,
+    "filename": "se_boing.ogg",
+    "id": "se_boing",
+    "description": "ビヨーンと跳ねる音（ゴムや跳躍）",
+    "caller": "muse.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 19,
+    "filename": "se_bolt_of_lightning.ogg",
+    "id": "se_bolt_of_lightning",
+    "description": "ビリビリと落雷・雷撃が走る音",
+    "caller": "mcastu.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 20,
+    "filename": "se_bone_rattle.ogg",
+    "id": "se_bone_rattle",
+    "description": "骨がカタカタと鳴る音（スケルトンやアンデッド）",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 21,
+    "filename": "se_boomerang_klonk.ogg",
+    "id": "se_boomerang_klonk",
+    "description": "ブーメランが何かに当たって跳ね返る音",
+    "caller": "zap.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 22,
+    "filename": "se_boulder_drop.ogg",
+    "id": "se_boulder_drop",
+    "description": "巨石がドスンと落ちる音（階段や穴への落下）",
+    "caller": "do.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 23,
+    "filename": "se_bovine_bellow.ogg",
+    "id": "se_bovine_bellow",
+    "description": "牛・ウシの低い唸り声",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 24,
+    "filename": "se_bovine_moo.ogg",
+    "id": "se_bovine_moo",
+    "description": "牛のモーという鳴き声",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 25,
+    "filename": "se_bubble_rising.ogg",
+    "id": "se_bubble_rising",
+    "description": "水中からポコポコと泡が湧き立つ音",
+    "caller": "fountain.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 26,
+    "filename": "se_bugle_playing_reveille.ogg",
+    "id": "se_bugle_playing_reveille",
+    "description": "ラッパで起床ラッパを演奏する音",
+    "caller": "muse.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 27,
+    "filename": "se_buzz.ogg",
+    "id": "se_buzz",
+    "description": "ブーンという低周波の羽音・電気音",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 28,
+    "filename": "se_canine_bark.ogg",
+    "id": "se_canine_bark",
+    "description": "犬・狼のワンワンという吠え声",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 29,
+    "filename": "se_canine_growl.ogg",
+    "id": "se_canine_growl",
+    "description": "犬・狼のウーンという唸り声",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 30,
+    "filename": "se_canine_howl.ogg",
+    "id": "se_canine_howl",
+    "description": "犬・狼の遠吠え（アオーンという声）",
+    "caller": "were.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 31,
+    "filename": "se_canine_whine.ogg",
+    "id": "se_canine_whine",
+    "description": "犬のクーン・キュンという甘え声",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 32,
+    "filename": "se_canine_yelp.ogg",
+    "id": "se_canine_yelp",
+    "description": "犬のキャンという痛みの悲鳴",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 33,
+    "filename": "se_canine_yip.ogg",
+    "id": "se_canine_yip",
+    "description": "犬の甲高いキュッという鳴き声",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 34,
+    "filename": "se_canine_yowl.ogg",
+    "id": "se_canine_yowl",
+    "description": "犬の長く引き伸ばした吠え声",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 35,
+    "filename": "se_chain_shatters.ogg",
+    "id": "se_chain_shatters",
+    "description": "鎖がバキッと砕け散る音（魔法爆発等で）",
+    "caller": "explode.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 36,
+    "filename": "se_chains_rattling_gears_turning.ogg",
+    "id": "se_chains_rattling_gears_turning",
+    "description": "鎖がジャラジャラ鳴りながらギアが回る音（跳ね橋の可動）",
+    "caller": "dbridge.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 37,
+    "filename": "se_chant.ogg",
+    "id": "se_chant",
+    "description": "呪文の詠唱・宗教的な賛歌の声",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 38,
+    "filename": "se_chirp.ogg",
+    "id": "se_chirp",
+    "description": "小鳥・小動物のちゅんちゅんという鳴き声",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 39,
+    "filename": "se_clanging_sound.ogg",
+    "id": "se_clanging_sound",
+    "description": "金属がカンカンと大きく鳴り響く音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 40,
+    "filename": "se_clank.ogg",
+    "id": "se_clank",
+    "description": "カンという短い金属衝突音",
+    "caller": "worn.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 41,
+    "filename": "se_clanking_pipe.ogg",
+    "id": "se_clanking_pipe",
+    "description": "配管がカンカンと響く音（噴水の配管操作）",
+    "caller": "fountain.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 42,
+    "filename": "se_clash.ogg",
+    "id": "se_clash",
+    "description": "武器同士が激しくぶつかり合う金属音",
+    "caller": "dig.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 43,
+    "filename": "se_cockatrice_hiss.ogg",
+    "id": "se_cockatrice_hiss",
+    "description": "コカトリスの石化の威嚇音",
+    "caller": "uhitm.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 44,
+    "filename": "se_cough.ogg",
+    "id": "se_cough",
+    "description": "ゲホゲホと咳き込む声（毒・粉塵吸入）",
+    "caller": "mthrowu.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 45,
+    "filename": "se_courtly_conversation.ogg",
+    "id": "se_courtly_conversation",
+    "description": "宮廷部屋のにぎやかな会話音（謁見室）",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 46,
+    "filename": "se_cracking_sound.ogg",
+    "id": "se_cracking_sound",
+    "description": "パキッとひびが入る音（防具・呪いの解除等）",
+    "caller": "worn.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 47,
+    "filename": "se_crackling.ogg",
+    "id": "se_crackling",
+    "description": "パチパチとはじける音（炎・電気）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 48,
+    "filename": "se_crackling_of_hellfire.ogg",
+    "id": "se_crackling_of_hellfire",
+    "description": "地獄の業火がメラメラと燃えさかる音（呪われた道具）",
+    "caller": "apply.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 49,
+    "filename": "se_crash.ogg",
+    "id": "se_crash",
+    "description": "ドカンと激しく崩壊・衝突する音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 50,
+    "filename": "se_crash_door.ogg",
+    "id": "se_crash_door",
+    "description": "ドアがドカンと破壊される音（強制突破）",
+    "caller": "dokick.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 51,
+    "filename": "se_crash_something_broke.ogg",
+    "id": "se_crash_something_broke",
+    "description": "何かがガシャンと割れて壊れる音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 52,
+    "filename": "se_crash_throne_destroyed.ogg",
+    "id": "se_crash_throne_destroyed",
+    "description": "玉座が蹴り倒されて粉々に砕ける大音響",
+    "caller": "dokick.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 53,
+    "filename": "se_crash_through_floor.ogg",
+    "id": "se_crash_through_floor",
+    "description": "床を突き破って落とし穴に落ちる音",
+    "caller": "muse.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 54,
+    "filename": "se_crashed_ceiling.ogg",
+    "id": "se_crashed_ceiling",
+    "description": "天井が崩落してガラガラ落ちる音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 55,
+    "filename": "se_crashing_boulder.ogg",
+    "id": "se_crashing_boulder",
+    "description": "巨石がドカドカと激しく転がり激突する音",
+    "caller": "do.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 56,
+    "filename": "se_crashing_rock.ogg",
+    "id": "se_crashing_rock",
+    "description": "岩石がガラガラと崩れ落ちる音（掘削・崩壊）",
+    "caller": "dig.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 57,
+    "filename": "se_crashing_sound.ogg",
+    "id": "se_crashing_sound",
+    "description": "激しい衝突・破壊音（ドアや施錠装置の破壊）",
+    "caller": "lock.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 58,
+    "filename": "se_croc_bellow.ogg",
+    "id": "se_croc_bellow",
+    "description": "ワニの低く響く咆哮",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 59,
+    "filename": "se_crumbling_sound.ogg",
+    "id": "se_crumbling_sound",
+    "description": "砂岩や壁がボロボロと崩れる音（魔法・掘削）",
+    "caller": "zap.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 60,
+    "filename": "se_crunching_sound.ogg",
+    "id": "se_crunching_sound",
+    "description": "バリバリと硬いものを噛み砕く音（捕食・踏み砕き）",
+    "caller": "mon.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 61,
+    "filename": "se_crushing_sound.ogg",
+    "id": "se_crushing_sound",
+    "description": "メキメキと挟まれて押し潰される音（跳ね橋）",
+    "caller": "dbridge.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 62,
+    "filename": "se_deafening_roar_atmospheric.ogg",
+    "id": "se_deafening_roar_atmospheric",
+    "description": "耳をつんざく轟音（強力な罠・爆発の雰囲気）",
+    "caller": "trap.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 63,
+    "filename": "se_destroy_web.ogg",
+    "id": "se_destroy_web",
+    "description": "クモの巣をビリっと破り払う音",
+    "caller": "ball.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 64,
+    "filename": "se_distant_thunder.ogg",
+    "id": "se_distant_thunder",
+    "description": "遠くに聞こえる雷鳴（嵐・スクロール効果）",
+    "caller": "mon.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 65,
+    "filename": "se_divine_music.ogg",
+    "id": "se_divine_music",
+    "description": "神聖な天上の音楽（神への祈り成功時）",
+    "caller": "pray.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 66,
+    "filename": "se_door_crash_open.ogg",
+    "id": "se_door_crash_open",
+    "description": "ドアがドカンと蹴り開けられる音（モンスターの侵入）",
+    "caller": "monmove.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 67,
+    "filename": "se_door_open.ogg",
+    "id": "se_door_open",
+    "description": "ドアがギィッと開く音（通常の開扉）",
+    "caller": "monmove.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 68,
+    "filename": "se_door_unlock_and_open.ogg",
+    "id": "se_door_unlock_and_open",
+    "description": "鍵がカチャリと解錠されてドアが開く音",
+    "caller": "monmove.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 69,
+    "filename": "se_drain_noises.ogg",
+    "id": "se_drain_noises",
+    "description": "排水口がゴボゴボと鳴る音（排水溝近く）",
+    "caller": "do.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 70,
+    "filename": "se_dry_throat_rattle.ogg",
+    "id": "se_dry_throat_rattle",
+    "description": "乾燥した喉がガラガラ鳴る音（モンスターの息）",
+    "caller": "mthrowu.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 71,
+    "filename": "se_egg_cracking.ogg",
+    "id": "se_egg_cracking",
+    "description": "卵の殻がパキッと割れる音（蹴った時）",
+    "caller": "dokick.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 72,
+    "filename": "se_egg_splatting.ogg",
+    "id": "se_egg_splatting",
+    "description": "卵がグシャッと踏み潰れる音",
+    "caller": "dokick.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 73,
+    "filename": "se_elephant_trumpet.ogg",
+    "id": "se_elephant_trumpet",
+    "description": "象のパオーンという高らかな鳴き声",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 74,
+    "filename": "se_equine_neigh.ogg",
+    "id": "se_equine_neigh",
+    "description": "馬のヒヒーンという高いいななき",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 75,
+    "filename": "se_equine_whicker.ogg",
+    "id": "se_equine_whicker",
+    "description": "馬の低く柔らかいいななき",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 76,
+    "filename": "se_equine_whinny.ogg",
+    "id": "se_equine_whinny",
+    "description": "馬の短いいななき声",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 77,
+    "filename": "se_explosion.ogg",
+    "id": "se_explosion",
+    "description": "大爆発音（錠前爆発・爆破罠）",
+    "caller": "lock.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 78,
+    "filename": "se_faint_chime.ogg",
+    "id": "se_faint_chime",
+    "description": "かすかなチリンというチャイムの音（魔法感知）",
+    "caller": "spell.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 79,
+    "filename": "se_faint_sloshing.ogg",
+    "id": "se_faint_sloshing",
+    "description": "かすかな水が揺れる音（アイテム生成時）",
+    "caller": "mkobj.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 80,
+    "filename": "se_faint_splashing.ogg",
+    "id": "se_faint_splashing",
+    "description": "かすかな水しぶき音（ホイールへの接触）",
+    "caller": "apply.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 81,
+    "filename": "se_feline_meow.ogg",
+    "id": "se_feline_meow",
+    "description": "猫のニャーという鳴き声",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 82,
+    "filename": "se_feline_mew.ogg",
+    "id": "se_feline_mew",
+    "description": "子猫のミューという細い鳴き声",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 83,
+    "filename": "se_feline_purr.ogg",
+    "id": "se_feline_purr",
+    "description": "猫のゴロゴロと喉を鳴らす音",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 84,
+    "filename": "se_feline_yelp.ogg",
+    "id": "se_feline_yelp",
+    "description": "猫のギャッという悲鳴",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 85,
+    "filename": "se_feline_yip.ogg",
+    "id": "se_feline_yip",
+    "description": "猫の甲高いキーという鳴き声",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 86,
+    "filename": "se_feline_yowl.ogg",
+    "id": "se_feline_yowl",
+    "description": "猫のウウウという低い唸り声",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 87,
+    "filename": "se_furious_bubbling.ogg",
+    "id": "se_furious_bubbling",
+    "description": "液体が激しくボコボコと泡立つ音（噴水の呪い）",
+    "caller": "fountain.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 88,
+    "filename": "se_gear_turn.ogg",
+    "id": "se_gear_turn",
+    "description": "歯車がカチリと一段回る音（機構の動作）",
+    "caller": "music.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 89,
+    "filename": "se_gears_turning_chains_rattling.ogg",
+    "id": "se_gears_turning_chains_rattling",
+    "description": "歯車が回り鎖が引き上げられる音（跳ね橋の引き上げ）",
+    "caller": "dbridge.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 90,
+    "filename": "se_glass_crashing.ogg",
+    "id": "se_glass_crashing",
+    "description": "ガラスが激しくバリーンと割れる音",
+    "caller": "dokick.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 91,
+    "filename": "se_glass_shattering.ogg",
+    "id": "se_glass_shattering",
+    "description": "ガラス瓶が粉々にパリーンと砕け散る音",
+    "caller": "dokick.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 92,
+    "filename": "se_groan.ogg",
+    "id": "se_groan",
+    "description": "ウゥーといううめき声（モンスターや地形）",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 93,
+    "filename": "se_groans_and_moans.ogg",
+    "id": "se_groans_and_moans",
+    "description": "呻きとうめき声（アンデッドの気配・死体部屋）",
+    "caller": "do.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 94,
+    "filename": "se_growl.ogg",
+    "id": "se_growl",
+    "description": "ウーンという低い唸り声",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 95,
+    "filename": "se_grunt.ogg",
+    "id": "se_grunt",
+    "description": "フンと鼻を鳴らす短い声",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 96,
+    "filename": "se_guards_footsteps.ogg",
+    "id": "se_guards_footsteps",
+    "description": "警備員の重い足音が近づく音（金庫室侵入）",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 97,
+    "filename": "se_gurgle.ogg",
+    "id": "se_gurgle",
+    "description": "ゴボゴボと湧き立つ液体の音（モンスターの声）",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 98,
+    "filename": "se_gushing_sound.ogg",
+    "id": "se_gushing_sound",
+    "description": "ドバーッと液体や水が噴き出す音（配管破壊）",
+    "caller": "dokick.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 99,
+    "filename": "se_heart_beat.ogg",
+    "id": "se_heart_beat",
+    "description": "トックン、トックンという心臓の鼓動音（聴診器使用）",
+    "caller": "apply.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 100,
+    "filename": "se_hiss.ogg",
+    "id": "se_hiss",
+    "description": "シュッというヘビや蒸気の威嚇音",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 101,
+    "filename": "se_hollow_sound.ogg",
+    "id": "se_hollow_sound",
+    "description": "コンコンと中が空洞に響く音（壁や箱の確認）",
+    "caller": "apply.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 102,
+    "filename": "se_horn_being_played.ogg",
+    "id": "se_horn_being_played",
+    "description": "角笛がブォーンと響き渡る音（演奏効果）",
+    "caller": "muse.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 103,
+    "filename": "se_iron_ball_dragging_you.ogg",
+    "id": "se_iron_ball_dragging_you",
+    "description": "重い鉄球をズルズルと引きずられる音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 104,
+    "filename": "se_iron_ball_hits_you.ogg",
+    "id": "se_iron_ball_hits_you",
+    "description": "鉄球がドスンと身体に激突する音",
+    "caller": "ball.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 105,
+    "filename": "se_item_tumble_downwards.ogg",
+    "id": "se_item_tumble_downwards",
+    "description": "アイテムが下層にカラカラ落ちていく音",
+    "caller": "do.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 106,
+    "filename": "se_jabberwock_burble.ogg",
+    "id": "se_jabberwock_burble",
+    "description": "ジャバウォックのブツブツという不気味な声",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 107,
+    "filename": "se_kaablamm_of_mine.ogg",
+    "id": "se_kaablamm_of_mine",
+    "description": "地雷がカーブラムと大爆発する音",
+    "caller": "trap.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 108,
+    "filename": "se_kaboom.ogg",
+    "id": "se_kaboom",
+    "description": "ドカーンという爆発音",
+    "caller": "trap.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 109,
+    "filename": "se_kaboom_boom_boom.ogg",
+    "id": "se_kaboom_boom_boom",
+    "description": "ドカン、ドドーンという連続大爆発音",
+    "caller": "timeout.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 110,
+    "filename": "se_kaboom_door_explodes.ogg",
+    "id": "se_kaboom_door_explodes",
+    "description": "ドアの罠がドカンと爆発する音",
+    "caller": "lock.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 111,
+    "filename": "se_kadoom_boulder_falls_in.ogg",
+    "id": "se_kadoom_boulder_falls_in",
+    "description": "巨石がカドームと穴に落ちる轟音",
+    "caller": "dig.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 112,
+    "filename": "se_kerplunk_boulder_gone.ogg",
+    "id": "se_kerplunk_boulder_gone",
+    "description": "巨石が水中や穴をカポーンと塞ぐ音",
+    "caller": "hack.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 113,
+    "filename": "se_kick_door_it_crashes_open.ogg",
+    "id": "se_kick_door_it_crashes_open",
+    "description": "蹴りによりドアがドカンと開く音",
+    "caller": "dokick.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 114,
+    "filename": "se_kick_door_it_shatters.ogg",
+    "id": "se_kick_door_it_shatters",
+    "description": "蹴りによりドアが粉々にバリーンと砕ける音",
+    "caller": "dokick.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 115,
+    "filename": "se_klick.ogg",
+    "id": "se_klick",
+    "description": "カチッという小さな金属の作動音（解錠・機構）",
+    "caller": "lock.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 116,
+    "filename": "se_klunk.ogg",
+    "id": "se_klunk",
+    "description": "ゴトンという重い鈍い衝突音",
+    "caller": "lock.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 117,
+    "filename": "se_klunk_pipe.ogg",
+    "id": "se_klunk_pipe",
+    "description": "配管をゴトンと叩く衝撃音",
+    "caller": "dokick.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 118,
+    "filename": "se_laughter.ogg",
+    "id": "se_laughter",
+    "description": "ハハハという笑い声（モンスターや魔法使用時）",
+    "caller": "sounds.c, uhitm.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 119,
+    "filename": "se_lid_slams_open_falls_shut.ogg",
+    "id": "se_lid_slams_open_falls_shut",
+    "description": "箱の蓋がガタンと開き、ズンと閉まる音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 120,
+    "filename": "se_loud_click.ogg",
+    "id": "se_loud_click",
+    "description": "カチャンという大きな機構の作動音（罠発動）",
+    "caller": "trap.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 121,
+    "filename": "se_loud_crash.ogg",
+    "id": "se_loud_crash",
+    "description": "大音響の衝突・崩壊音",
+    "caller": "dbridge.c, trap.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 122,
+    "filename": "se_loud_pop.ogg",
+    "id": "se_loud_pop",
+    "description": "ポーンと弾けて破裂する音（泡・爆発）",
+    "caller": "fountain.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 123,
+    "filename": "se_loud_splash.ogg",
+    "id": "se_loud_splash",
+    "description": "ドバシャーンという大きな水しぶき音",
+    "caller": "dbridge.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 124,
+    "filename": "se_low_buzzing.ogg",
+    "id": "se_low_buzzing",
+    "description": "ブーンという低く響く羽音（蜂の巣・虫）",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 125,
+    "filename": "se_low_hum.ogg",
+    "id": "se_low_hum",
+    "description": "ブーンというハム・機械音（罠の予兆）",
+    "caller": "trap.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 126,
+    "filename": "se_maniacal_laughter.ogg",
+    "id": "se_maniacal_laughter",
+    "description": "ケタケタという狂気的な高笑い（巻物読後等）",
+    "caller": "read.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 127,
+    "filename": "se_masticating_sound.ogg",
+    "id": "se_masticating_sound",
+    "description": "クチャクチャと何かを噛む咀嚼音",
+    "caller": "mon.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 128,
+    "filename": "se_mon_chugging_potion.ogg",
+    "id": "se_mon_chugging_potion",
+    "description": "モンスターがポーションをゴクゴクと飲む音",
+    "caller": "muse.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 129,
+    "filename": "se_monster_behind_boulder.ogg",
+    "id": "se_monster_behind_boulder",
+    "description": "岩陰に隠れるモンスターの気配・物音",
+    "caller": "hack.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 130,
+    "filename": "se_mutter_imprecations.ogg",
+    "id": "se_mutter_imprecations",
+    "description": "呪いの言葉をブツブツと呟く声（店主の怒り）",
+    "caller": "shk.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 131,
+    "filename": "se_mutter_incantation.ogg",
+    "id": "se_mutter_incantation",
+    "description": "呪文をブツブツと唱える声",
+    "caller": "shk.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 132,
+    "filename": "se_orc_grunt.ogg",
+    "id": "se_orc_grunt",
+    "description": "オークのグアッという低い唸り声",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 133,
+    "filename": "se_paranoid_confirmation.ogg",
+    "id": "se_paranoid_confirmation",
+    "description": "ソワソワした確認の囁き声",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 134,
+    "filename": "se_potion_crash_and_break.ogg",
+    "id": "se_potion_crash_and_break",
+    "description": "ポーション瓶がガシャンと割れ液体が散る音",
+    "caller": "potion.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 135,
+    "filename": "se_ring_in_drain.ogg",
+    "id": "se_ring_in_drain",
+    "description": "指輪が排水口にコロコロと転がり落ちる音",
+    "caller": "do.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 136,
+    "filename": "se_ripping_sound.ogg",
+    "id": "se_ripping_sound",
+    "description": "ビリビリと布・紙が破れる音（装備破壊等）",
+    "caller": "worn.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 137,
+    "filename": "se_roar.ogg",
+    "id": "se_roar",
+    "description": "ガオーッという猛獣の咆哮",
+    "caller": "trap.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 138,
+    "filename": "se_rumbling.ogg",
+    "id": "se_rumbling",
+    "description": "ゴゴゴという地鳴り音（罠・地震）",
+    "caller": "trap.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 139,
+    "filename": "se_rumbling_of_earth.ogg",
+    "id": "se_rumbling_of_earth",
+    "description": "ズズズという大地が轟く地鳴り",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 140,
+    "filename": "se_rushing_wind_noise.ogg",
+    "id": "se_rushing_wind_noise",
+    "description": "ヒューという突風が吹き荒れる音",
+    "caller": "mhitu.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 141,
+    "filename": "se_rustling_paper.ogg",
+    "id": "se_rustling_paper",
+    "description": "カサカサと紙・巻物が擦れ合う音",
+    "caller": "apply.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 142,
+    "filename": "se_sad_wailing.ogg",
+    "id": "se_sad_wailing",
+    "description": "ウワーンという悲しげなすすり泣き・哀しみの声",
+    "caller": "read.c, sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 143,
+    "filename": "se_sceptor_pounding.ogg",
+    "id": "se_sceptor_pounding",
+    "description": "笏（しゃく）で床をドンドンと叩く音（宮廷）",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 144,
+    "filename": "se_scratching.ogg",
+    "id": "se_scratching",
+    "description": "カリカリと爪で引っ掻く音（秘密の扉の探索）",
+    "caller": "do.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 145,
+    "filename": "se_scream.ogg",
+    "id": "se_scream",
+    "description": "ギャーッという悲鳴・絶叫（演奏効果等）",
+    "caller": "music.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 146,
+    "filename": "se_screech.ogg",
+    "id": "se_screech",
+    "description": "キーキーという甲高い叫び声",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 147,
+    "filename": "se_sewer_song.ogg",
+    "id": "se_sewer_song",
+    "description": "下水道から聞こえる不気味な歌声（下水道の噴水）",
+    "caller": "fountain.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 148,
+    "filename": "se_sharp_crack.ogg",
+    "id": "se_sharp_crack",
+    "description": "バシッと鋭くひびが走る音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 149,
+    "filename": "se_shriek.ogg",
+    "id": "se_shriek",
+    "description": "ギャーッという鋭い悲鳴（モンスターの声）",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 150,
+    "filename": "se_shrill_whistle.ogg",
+    "id": "se_shrill_whistle",
+    "description": "ピーッと甲高く突き刺さる笛の音（ホイッスル使用）",
+    "caller": "apply.c, mon.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 151,
+    "filename": "se_sinister_laughter.ogg",
+    "id": "se_sinister_laughter",
+    "description": "クックッという不敵・邪悪な笑い声（悪の存在）",
+    "caller": "eat.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 152,
+    "filename": "se_sizzling.ogg",
+    "id": "se_sizzling",
+    "description": "ジュージューと焼ける・溶ける音（酸・炎接触）",
+    "caller": "do.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 153,
+    "filename": "se_slurping_sound.ogg",
+    "id": "se_slurping_sound",
+    "description": "ズルズルとすする音（捕食・液体摂取）",
+    "caller": "mon.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 154,
+    "filename": "se_smashing_and_crushing.ogg",
+    "id": "se_smashing_and_crushing",
+    "description": "ガシャンと叩き潰す音（跳ね橋の可動）",
+    "caller": "dbridge.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 155,
+    "filename": "se_snake_rattle.ogg",
+    "id": "se_snake_rattle",
+    "description": "ガラガラヘビの尾のガラガラと鳴る警告音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 156,
+    "filename": "se_snakes_hissing.ogg",
+    "id": "se_snakes_hissing",
+    "description": "ヘビのシャーという群体の威嚇音",
+    "caller": "fountain.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 157,
+    "filename": "se_snarl.ogg",
+    "id": "se_snarl",
+    "description": "ウーッと牙をむいて低く唸る声",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 158,
+    "filename": "se_soft_click.ogg",
+    "id": "se_soft_click",
+    "description": "カチッとかすかに鳴るいかにも怪しい音（罠感知）",
+    "caller": "trap.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 159,
+    "filename": "se_soft_crackling.ogg",
+    "id": "se_soft_crackling",
+    "description": "パチパチとかすかに燃える音（炎の魔法）",
+    "caller": "zap.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 160,
+    "filename": "se_someone_bowling.ogg",
+    "id": "se_someone_bowling",
+    "description": "ボウリングの球が転がるような音（転がる物体）",
+    "caller": "trap.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 161,
+    "filename": "se_someone_searching.ogg",
+    "id": "se_someone_searching",
+    "description": "ガサゴソと何かを捜索する音（探索中のモンスター）",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 162,
+    "filename": "se_someone_summoning.ogg",
+    "id": "se_someone_summoning",
+    "description": "ウォーという召喚の呪文を唱える声",
+    "caller": "mcastu.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 163,
+    "filename": "se_someone_yells.ogg",
+    "id": "se_someone_yells",
+    "description": "誰かが叫ぶ声（警衛の呼び声・緊急事態）",
+    "caller": "monmove.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 164,
+    "filename": "se_splash.ogg",
+    "id": "se_splash",
+    "description": "バシャッと水が跳ねる音（水中落下・投擲）",
+    "caller": "dbridge.c, do.c, dothrow.c, mthrowu.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 165,
+    "filename": "se_splat_egg.ogg",
+    "id": "se_splat_egg",
+    "description": "卵がぐしゃっと潰れる音（投擲命中）",
+    "caller": "mthrowu.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 166,
+    "filename": "se_splat_from_engulf.ogg",
+    "id": "se_splat_from_engulf",
+    "description": "丸呑みモンスターに消化されグシャッとなる音",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 167,
+    "filename": "se_squawk.ogg",
+    "id": "se_squawk",
+    "description": "ギャーギャーという鳥の鳴き声",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 168,
+    "filename": "se_squeak.ogg",
+    "id": "se_squeak",
+    "description": "チューという動物の高い鳴き声・きしみ音",
+    "caller": "sounds.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 169,
+    "filename": "se_squeak_A.ogg",
+    "id": "se_squeak_A",
+    "description": "皮袋の笛（バグパイプ）チューニング音 — ラ音（A）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 170,
+    "filename": "se_squeak_B.ogg",
+    "id": "se_squeak_B",
+    "description": "皮袋の笛チューニング音 — シ音（B）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 171,
+    "filename": "se_squeak_B_flat.ogg",
+    "id": "se_squeak_B_flat",
+    "description": "皮袋の笛チューニング音 — シ♭音（B♭）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 172,
+    "filename": "se_squeak_C.ogg",
+    "id": "se_squeak_C",
+    "description": "皮袋の笛チューニング音 — ド音（C）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 173,
+    "filename": "se_squeak_D.ogg",
+    "id": "se_squeak_D",
+    "description": "皮袋の笛チューニング音 — レ音（D）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 174,
+    "filename": "se_squeak_D_flat.ogg",
+    "id": "se_squeak_D_flat",
+    "description": "皮袋の笛チューニング音 — レ♭音（D♭）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 175,
+    "filename": "se_squeak_E.ogg",
+    "id": "se_squeak_E",
+    "description": "皮袋の笛チューニング音 — ミ音（E）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 176,
+    "filename": "se_squeak_E_flat.ogg",
+    "id": "se_squeak_E_flat",
+    "description": "皮袋の笛チューニング音 — ミ♭音（E♭）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 177,
+    "filename": "se_squeak_F.ogg",
+    "id": "se_squeak_F",
+    "description": "皮袋の笛チューニング音 — ファ音（F）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 178,
+    "filename": "se_squeak_F_sharp.ogg",
+    "id": "se_squeak_F_sharp",
+    "description": "皮袋の笛チューニング音 — ファ♯音（F♯）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 179,
+    "filename": "se_squeak_G.ogg",
+    "id": "se_squeak_G",
+    "description": "皮袋の笛チューニング音 — ソ音（G）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 180,
+    "filename": "se_squeak_G_sharp.ogg",
+    "id": "se_squeak_G_sharp",
+    "description": "皮袋の笛チューニング音 — ソ♯音（G♯）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 181,
+    "filename": "se_squeal.ogg",
+    "id": "se_squeal",
+    "description": "キーッという甲高い叫び声・きしみ",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 182,
+    "filename": "se_squelch.ogg",
+    "id": "se_squelch",
+    "description": "グチャッという湿った踏みつけ音",
+    "caller": "sit.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 183,
+    "filename": "se_stone_breaking.ogg",
+    "id": "se_stone_breaking",
+    "description": "バキッと石が割れる音（岩石魔法・爆発）",
+    "caller": "explode.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 184,
+    "filename": "se_stone_crumbling.ogg",
+    "id": "se_stone_crumbling",
+    "description": "ガラガラと石が崩れ落ちる音",
+    "caller": "explode.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 185,
+    "filename": "se_swoosh.ogg",
+    "id": "se_swoosh",
+    "description": "ヒュッと素早く風を切る音（飛道具・魔法）",
+    "caller": "lock.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 186,
+    "filename": "se_sword_blade_rings.ogg",
+    "id": "se_sword_blade_rings",
+    "description": "剣の刃がシャリーンと鳴る音（法具の認識）",
+    "caller": "apply.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 187,
+    "filename": "se_thud.ogg",
+    "id": "se_thud",
+    "description": "ドスンという重い着地・衝突音",
+    "caller": "worn.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 188,
+    "filename": "se_thump.ogg",
+    "id": "se_thump",
+    "description": "ドンという鈍い衝突音",
+    "caller": "music.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 189,
+    "filename": "se_thunderclap.ogg",
+    "id": "se_thunderclap",
+    "description": "ドカーンと轟く雷鳴（祈り・神罰）",
+    "caller": "pray.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 190,
+    "filename": "se_tumbler_click.ogg",
+    "id": "se_tumbler_click",
+    "description": "鍵穴のタンブラーがハマってカチッと鳴る音",
+    "caller": "music.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 191,
+    "filename": "se_typing_noise.ogg",
+    "id": "se_typing_noise",
+    "description": "カタカタとタイプライターを打つような音（占術使用）",
+    "caller": "apply.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 192,
+    "filename": "se_wail.ogg",
+    "id": "se_wail",
+    "description": "ウオーッと泣き叫ぶ声（アンデッドや呪い）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 193,
+    "filename": "se_wailing_of_the_banshee.ogg",
+    "id": "se_wailing_of_the_banshee",
+    "description": "バンシーの死を予告する絶叫（バンシーの遭遇）",
+    "caller": "hack.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 194,
+    "filename": "se_wall_of_force.ogg",
+    "id": "se_wall_of_force",
+    "description": "ズズーンと重く響く力場・バリア音（魔法壁）",
+    "caller": "apply.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 195,
+    "filename": "se_yelp.ogg",
+    "id": "se_yelp",
+    "description": "キャンという短い悲鳴",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 196,
+    "filename": "se_zap.ogg",
+    "id": "se_zap",
+    "description": "ビビッという魔法・電撃の発射音",
+    "caller": "muse.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 197,
+    "filename": "se_zap_then_explosion.ogg",
+    "id": "se_zap_then_explosion",
+    "description": "ビビッからドカンという魔法爆発音",
+    "caller": "muse.c",
+    "category": "effect",
+    "sub_category": "Soundeffect"
+  },
+  {
+    "no": 1,
+    "filename": "sa2_splashscreen.ogg",
+    "id": "sa2_splashscreen",
+    "description": "タイトル・スプラッシュ画面が表示される時の音",
+    "caller": "allmain.c",
+    "category": "achievement",
+    "sub_category": "SystemEvent"
+  },
+  {
+    "no": 2,
+    "filename": "sa2_newgame_nosplash.ogg",
+    "id": "sa2_newgame_nosplash",
+    "description": "スプラッシュなしで新規ゲームを開始する時の音",
+    "caller": "allmain.c",
+    "category": "achievement",
+    "sub_category": "SystemEvent"
+  },
+  {
+    "no": 3,
+    "filename": "sa2_xplevelup.ogg",
+    "id": "sa2_xplevelup",
+    "description": "経験値レベルがアップした時のファンファーレ音",
+    "caller": "exper.c",
+    "category": "achievement",
+    "sub_category": "SystemEvent"
+  },
+  {
+    "no": 4,
+    "filename": "sa2_xpleveldown.ogg",
+    "id": "sa2_xpleveldown",
+    "description": "経験値レベルがダウンした時の音（ドレイン等）",
+    "caller": "exper.c",
+    "category": "achievement",
+    "sub_category": "SystemEvent"
+  },
+  {
+    "no": 1,
+    "filename": "ach_bell.ogg",
+    "id": "ACH_BELL (achidx=1)",
+    "description": "「開封の鐘」を入手した時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 2,
+    "filename": "ach_hell.ogg",
+    "id": "ACH_HELL (achidx=2)",
+    "description": "ゲヘナ（地獄）に入った時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 3,
+    "filename": "ach_cndl.ogg",
+    "id": "ACH_CNDL (achidx=3)",
+    "description": "「召喚の燭台」を入手した時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 4,
+    "filename": "ach_book.ogg",
+    "id": "ACH_BOOK (achidx=4)",
+    "description": "「死者の書」を入手した時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 5,
+    "filename": "ach_invk.ogg",
+    "id": "ACH_INVK (achidx=5)",
+    "description": "聖域へのアクセスのため召喚を行った時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 6,
+    "filename": "ach_amul.ogg",
+    "id": "ACH_AMUL (achidx=6)",
+    "description": "「ヨェンダーのアミュレット」を入手した時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 7,
+    "filename": "ach_endg.ogg",
+    "id": "ACH_ENDG (achidx=7)",
+    "description": "エンドゲームに突入した時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 8,
+    "filename": "ach_astr.ogg",
+    "id": "ACH_ASTR (achidx=8)",
+    "description": "アストラル界に足を踏み入れた時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 9,
+    "filename": "ach_uwin.ogg",
+    "id": "ACH_UWIN (achidx=9)",
+    "description": "ゲームを昇天クリアした時のクリア音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 10,
+    "filename": "ach_mine_prize.ogg",
+    "id": "ACH_MINE_PRIZE (achidx=10)",
+    "description": "坑道の終点のラッキーストーンを入手した時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 11,
+    "filename": "ach_soko_prize.ogg",
+    "id": "ACH_SOKO_PRIZE (achidx=11)",
+    "description": "倉庫番のバッグまたはアミュレットを入手した時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 12,
+    "filename": "ach_medu.ogg",
+    "id": "ACH_MEDU (achidx=12)",
+    "description": "メデューサを倒した時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 13,
+    "filename": "ach_mine.ogg",
+    "id": "ACH_MINE (achidx=15)",
+    "description": "ノーム坑道に入った時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 14,
+    "filename": "ach_town.ogg",
+    "id": "ACH_TOWN (achidx=16)",
+    "description": "坑道の町（マインタウン）に到達した時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 15,
+    "filename": "ach_shop.ogg",
+    "id": "ACH_SHOP (achidx=17)",
+    "description": "店に入った時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 16,
+    "filename": "ach_tmpl.ogg",
+    "id": "ACH_TMPL (achidx=18)",
+    "description": "寺院に入った時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 17,
+    "filename": "ach_orcl.ogg",
+    "id": "ACH_ORCL (achidx=19)",
+    "description": "神託の神官（オラクル）に相談した時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 18,
+    "filename": "ach_soko.ogg",
+    "id": "ACH_SOKO (achidx=21)",
+    "description": "倉庫番（ソコバン）に入った時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 19,
+    "filename": "ach_tune.ogg",
+    "id": "ACH_TUNE (achidx=31)",
+    "description": "城の跳ね橋の演奏チューンを発見した時の実績音",
+    "caller": "insight.c",
+    "category": "achievement",
+    "sub_category": "GameAchievement"
+  },
+  {
+    "no": 1,
+    "filename": "sound_Wooden_Flute_A.ogg",
+    "id": "ins_flute` / A音",
+    "description": "木製フルートの演奏音（蛇を魅了する効果）（A音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 2,
+    "filename": "sound_Wooden_Flute_B.ogg",
+    "id": "ins_flute` / B音",
+    "description": "木製フルートの演奏音（蛇を魅了する効果）（B音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 3,
+    "filename": "sound_Wooden_Flute_C.ogg",
+    "id": "ins_flute` / C音",
+    "description": "木製フルートの演奏音（蛇を魅了する効果）（C音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 4,
+    "filename": "sound_Wooden_Flute_D.ogg",
+    "id": "ins_flute` / D音",
+    "description": "木製フルートの演奏音（蛇を魅了する効果）（D音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 5,
+    "filename": "sound_Wooden_Flute_E.ogg",
+    "id": "ins_flute` / E音",
+    "description": "木製フルートの演奏音（蛇を魅了する効果）（E音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 6,
+    "filename": "sound_Wooden_Flute_F.ogg",
+    "id": "ins_flute` / F音",
+    "description": "木製フルートの演奏音（蛇を魅了する効果）（F音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 7,
+    "filename": "sound_Wooden_Flute_G.ogg",
+    "id": "ins_flute` / G音",
+    "description": "木製フルートの演奏音（蛇を魅了する効果）（G音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 8,
+    "filename": "sound_Magic_Flute_A.ogg",
+    "id": "ins_pan_flute` / A音",
+    "description": "魔法のフルートの演奏音（モンスターを眠らせる）（A音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 9,
+    "filename": "sound_Magic_Flute_B.ogg",
+    "id": "ins_pan_flute` / B音",
+    "description": "魔法のフルートの演奏音（モンスターを眠らせる）（B音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 10,
+    "filename": "sound_Magic_Flute_C.ogg",
+    "id": "ins_pan_flute` / C音",
+    "description": "魔法のフルートの演奏音（モンスターを眠らせる）（C音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 11,
+    "filename": "sound_Magic_Flute_D.ogg",
+    "id": "ins_pan_flute` / D音",
+    "description": "魔法のフルートの演奏音（モンスターを眠らせる）（D音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 12,
+    "filename": "sound_Magic_Flute_E.ogg",
+    "id": "ins_pan_flute` / E音",
+    "description": "魔法のフルートの演奏音（モンスターを眠らせる）（E音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 13,
+    "filename": "sound_Magic_Flute_F.ogg",
+    "id": "ins_pan_flute` / F音",
+    "description": "魔法のフルートの演奏音（モンスターを眠らせる）（F音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 14,
+    "filename": "sound_Magic_Flute_G.ogg",
+    "id": "ins_pan_flute` / G音",
+    "description": "魔法のフルートの演奏音（モンスターを眠らせる）（G音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 15,
+    "filename": "sound_Tooled_Horn_A.ogg",
+    "id": "ins_english_horn` / A音",
+    "description": "彫刻された角笛の演奏音（モンスターを起こす）（A音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 16,
+    "filename": "sound_Tooled_Horn_B.ogg",
+    "id": "ins_english_horn` / B音",
+    "description": "彫刻された角笛の演奏音（モンスターを起こす）（B音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 17,
+    "filename": "sound_Tooled_Horn_C.ogg",
+    "id": "ins_english_horn` / C音",
+    "description": "彫刻された角笛の演奏音（モンスターを起こす）（C音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 18,
+    "filename": "sound_Tooled_Horn_D.ogg",
+    "id": "ins_english_horn` / D音",
+    "description": "彫刻された角笛の演奏音（モンスターを起こす）（D音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 19,
+    "filename": "sound_Tooled_Horn_E.ogg",
+    "id": "ins_english_horn` / E音",
+    "description": "彫刻された角笛の演奏音（モンスターを起こす）（E音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 20,
+    "filename": "sound_Tooled_Horn_F.ogg",
+    "id": "ins_english_horn` / F音",
+    "description": "彫刻された角笛の演奏音（モンスターを起こす）（F音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 21,
+    "filename": "sound_Tooled_Horn_G.ogg",
+    "id": "ins_english_horn` / G音",
+    "description": "彫刻された角笛の演奏音（モンスターを起こす）（G音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 22,
+    "filename": "sound_Bugle_A.ogg",
+    "id": "ins_trumpet` / A音",
+    "description": "ラッパの演奏音（兵士を起こす）（A音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 23,
+    "filename": "sound_Bugle_B.ogg",
+    "id": "ins_trumpet` / B音",
+    "description": "ラッパの演奏音（兵士を起こす）（B音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 24,
+    "filename": "sound_Bugle_C.ogg",
+    "id": "ins_trumpet` / C音",
+    "description": "ラッパの演奏音（兵士を起こす）（C音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 25,
+    "filename": "sound_Bugle_D.ogg",
+    "id": "ins_trumpet` / D音",
+    "description": "ラッパの演奏音（兵士を起こす）（D音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 26,
+    "filename": "sound_Bugle_E.ogg",
+    "id": "ins_trumpet` / E音",
+    "description": "ラッパの演奏音（兵士を起こす）（E音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 27,
+    "filename": "sound_Bugle_F.ogg",
+    "id": "ins_trumpet` / F音",
+    "description": "ラッパの演奏音（兵士を起こす）（F音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 28,
+    "filename": "sound_Bugle_G.ogg",
+    "id": "ins_trumpet` / G音",
+    "description": "ラッパの演奏音（兵士を起こす）（G音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 29,
+    "filename": "sound_Wooden_Harp_A.ogg",
+    "id": "ins_orchestral_harp` / A音",
+    "description": "木製ハープの演奏音（ニンフを魅了する）（A音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 30,
+    "filename": "sound_Wooden_Harp_B.ogg",
+    "id": "ins_orchestral_harp` / B音",
+    "description": "木製ハープの演奏音（ニンフを魅了する）（B音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 31,
+    "filename": "sound_Wooden_Harp_C.ogg",
+    "id": "ins_orchestral_harp` / C音",
+    "description": "木製ハープの演奏音（ニンフを魅了する）（C音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 32,
+    "filename": "sound_Wooden_Harp_D.ogg",
+    "id": "ins_orchestral_harp` / D音",
+    "description": "木製ハープの演奏音（ニンフを魅了する）（D音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 33,
+    "filename": "sound_Wooden_Harp_E.ogg",
+    "id": "ins_orchestral_harp` / E音",
+    "description": "木製ハープの演奏音（ニンフを魅了する）（E音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 34,
+    "filename": "sound_Wooden_Harp_F.ogg",
+    "id": "ins_orchestral_harp` / F音",
+    "description": "木製ハープの演奏音（ニンフを魅了する）（F音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 35,
+    "filename": "sound_Wooden_Harp_G.ogg",
+    "id": "ins_orchestral_harp` / G音",
+    "description": "木製ハープの演奏音（ニンフを魅了する）（G音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 36,
+    "filename": "sound_Magic_Harp_A.ogg",
+    "id": "ins_cello` / A音",
+    "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（A音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 37,
+    "filename": "sound_Magic_Harp_B.ogg",
+    "id": "ins_cello` / B音",
+    "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（B音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 38,
+    "filename": "sound_Magic_Harp_C.ogg",
+    "id": "ins_cello` / C音",
+    "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（C音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 39,
+    "filename": "sound_Magic_Harp_D.ogg",
+    "id": "ins_cello` / D音",
+    "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（D音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 40,
+    "filename": "sound_Magic_Harp_E.ogg",
+    "id": "ins_cello` / E音",
+    "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（E音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 41,
+    "filename": "sound_Magic_Harp_F.ogg",
+    "id": "ins_cello` / F音",
+    "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（F音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 42,
+    "filename": "sound_Magic_Harp_G.ogg",
+    "id": "ins_cello` / G音",
+    "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（G音）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "VariablePitch"
+  },
+  {
+    "no": 43,
+    "filename": "sound_Frost_Horn.ogg",
+    "id": "ins_french_horn",
+    "description": "凍結の角笛の演奏音（冷気の魔法効果）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "FixedPitch"
+  },
+  {
+    "no": 44,
+    "filename": "sound_Fire_Horn.ogg",
+    "id": "ins_baritone_sax",
+    "description": "火炎の角笛の演奏音（炎の魔法効果）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "FixedPitch"
+  },
+  {
+    "no": 45,
+    "filename": "sound_Bell.ogg",
+    "id": "ins_tinkle_bell",
+    "description": "ベル・鈴の演奏音（鐘の識別）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "FixedPitch"
+  },
+  {
+    "no": 46,
+    "filename": "sound_Drum_Of_Earthquake.ogg",
+    "id": "ins_taiko_drum",
+    "description": "地震の太鼓の演奏音（ランダムな落とし穴を生成）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "FixedPitch"
+  },
+  {
+    "no": 47,
+    "filename": "sound_Leather_Drum.ogg",
+    "id": "ins_melodic_tom",
+    "description": "革製太鼓の演奏音（周囲のモンスターを起こす）",
+    "caller": "apply.c, music.c",
+    "category": "instrument",
+    "sub_category": "FixedPitch"
+  },
+  {
+    "no": 1,
+    "filename": "voice_deity.ogg",
+    "id": "voice_deity",
+    "description": "神（アライメント神）の声・天からの啓示（祈り応答・神罰・神恩寵）",
+    "caller": "pray.c, minion.c, read.c, teleport.c",
+    "category": "voice",
+    "sub_category": "SetVoice"
+  },
+  {
+    "no": 2,
+    "filename": "voice_oracle.ogg",
+    "id": "voice_oracle",
+    "description": "神託の神官（オラクル）の神秘的な囁き声",
+    "caller": "rumors.c",
+    "category": "voice",
+    "sub_category": "SetVoice"
+  },
+  {
+    "no": 3,
+    "filename": "voice_talking_artifact.ogg",
+    "id": "voice_talking_artifact",
+    "description": "意志を持つアーティファクトの発話音",
+    "caller": "artifact.c",
+    "category": "voice",
+    "sub_category": "SetVoice"
+  },
+  {
+    "no": 4,
+    "filename": "voice_throne.ogg",
+    "id": "voice_throne",
+    "description": "玉座に座った時に聞こえる声（魔法の玉座からの啓示）",
+    "caller": "sit.c",
+    "category": "voice",
+    "sub_category": "SetVoice"
+  },
+  {
+    "no": 5,
+    "filename": "voice_death.ogg",
+    "id": "voice_death",
+    "description": "死神・死の声（死の女神への降伏場面）",
+    "caller": "sounds.c",
+    "category": "voice",
+    "sub_category": "SetVoice"
+  },
+  {
+    "no": 6,
+    "filename": "voice_shopkeeper.ogg",
+    "id": "voice_shopkeeper",
+    "description": "店主の挨拶・売買交渉・怒りの掛け声",
+    "caller": "apply.c, shk.c",
+    "category": "voice",
+    "sub_category": "SetVoice"
+  },
+  {
+    "no": 7,
+    "filename": "voice_mon_generic.ogg",
+    "id": "voice (moreinfo=0)",
+    "description": "モンスターおよびNPCの一般的な会話・鳴き声",
+    "caller": "sounds.c, vault.c, priest.c, その他多数",
+    "category": "voice",
+    "sub_category": "SetVoice"
+  }
+]

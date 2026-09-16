@@ -1,0 +1,409 @@
+// static/app.js
+let soundList = [];
+let currentFilter = 'all';
+let currentCategory = 'all';
+let searchQuery = '';
+
+let activeTargetItem = null;
+let activeSelectedFile = null;
+
+// キーワード抽出ヘルパー
+function extractKeywords(desc, id) {
+  // 括弧内を除去
+  let cleanDesc = desc.replace(/（.*?）/g, '').replace(/\(.*?\)/g, '').trim();
+  // 「〜の音」「〜する音」などを整理
+  cleanDesc = cleanDesc.replace(/の音$/, '').replace(/する音$/, '').replace(/音$/, '').trim();
+
+  // 英語IDから英単語を抽出 (se_door_open -> door open)
+  let cleanId = id.replace(/^(se_|sound_|ach_|sa2_|voice_)/, '').replace(/_/g, ' ');
+
+  return {
+    ja: cleanDesc || desc,
+    en: cleanId
+  };
+}
+
+// 13サイトの外部検索URL生成
+function getSearchUrls(item) {
+  const kw = extractKeywords(item.description, item.id);
+  const qJa = encodeURIComponent(kw.ja);
+  const qEn = encodeURIComponent(kw.en);
+
+  return {
+    // 国内サイト (日本語検索)
+    lab: `https://soundeffect-lab.info/?s=${qJa}`,
+    onjin: `https://www.google.com/search?q=site:on-jin.com+${qJa}`,
+    otologic: `https://otologic.jp/free/se/search?keyword=${qJa}`,
+    dict: `https://sounddictionary.info/?s=${qJa}`,
+    springin: `https://soundstock.springin.info/?s=${qJa}`,
+    maou: `https://maou.audio/?s=${qJa}`,
+    pocket: `https://pocket-se.info/?s=${qJa}`,
+    amacha: `https://amachamusic.chagasi.com/`,
+
+    // 海外・オープン素材サイト (英語検索)
+    pixabay: `https://pixabay.com/sound-effects/search/${qEn}/`,
+    sounddino: `https://sounddino.com/search/?q=${qEn}`,
+    freesound: `https://freesound.org/search/?q=${qEn}&f=license:%22Creative+Commons+0%22+OR+license:%22Attribution%22`,
+    zapsplat: `https://www.zapsplat.com/?s=${qEn}&post_type=music&sound-effect-category-id=`,
+    oga: `https://opengameart.org/art-search-advanced?keys=${qEn}&title=&field_art_tags_tid_op=and&name=&sort_by=score&sort_order=DESC&items_per_page=24&Collection=`
+  };
+}
+
+async function loadData() {
+  try {
+    const [soundsRes, statsRes] = await Promise.all([
+      fetch('/api/sounds'),
+      fetch('/api/stats')
+    ]);
+    soundList = await soundsRes.json();
+    const stats = await statsRes.json();
+    updateStats(stats);
+    renderCards();
+  } catch (err) {
+    console.error('Failed to load data:', err);
+  }
+}
+
+function updateStats(stats) {
+  document.getElementById('statsReadyCount').textContent = stats.ready;
+  document.getElementById('statsTotalCount').textContent = stats.total;
+  document.getElementById('statsPercent').textContent = stats.percent;
+  document.getElementById('progressBar').style.width = `${stats.percent}%`;
+}
+
+function renderCards() {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = '';
+
+  const filtered = soundList.filter(item => {
+    // 状態フィルタ
+    if (currentFilter === 'ready' && item.status !== 'ready') return false;
+    if (currentFilter === 'pending' && item.status !== 'pending') return false;
+
+    // カテゴリフィルタ
+    if (currentCategory !== 'all' && item.category !== currentCategory) return false;
+
+    // 検索クエリ
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const matchName = item.filename.toLowerCase().includes(q);
+      const matchId = item.id.toLowerCase().includes(q);
+      const matchDesc = item.description.toLowerCase().includes(q);
+      const matchCaller = (item.caller || '').toLowerCase().includes(q);
+      if (!matchName && !matchId && !matchDesc && !matchCaller) return false;
+    }
+
+    return true;
+  });
+
+  filtered.forEach(item => {
+    const card = document.createElement('div');
+    card.className = `sound-card ${item.status}`;
+
+    const isReady = item.status === 'ready';
+    const urls = getSearchUrls(item);
+
+    let bodyHtml = '';
+    if (isReady) {
+      bodyHtml = `
+        <div class="audio-player-box">
+          <audio controls preload="none" src="/sounds/${encodeURIComponent(item.filename)}?t=${Date.now()}"></audio>
+        </div>
+        <div class="meta-info">
+          出典: <strong>${escapeHtml(item.source_site || '不明')}</strong> |
+          作者: <strong>${escapeHtml(item.author || '不明')}</strong> |
+          ライセンス: <strong>${escapeHtml(item.license || '不明')}</strong>
+          ${item.source_url ? `<br>URL: <a href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener">リンク</a>` : ''}
+          ${item.notes ? `<br>備考: ${escapeHtml(item.notes)}` : ''}
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <button class="btn-badge badge-lab" onclick="openUploadModalFor('${escapeJs(item.id)}')">🔄 上書き更新</button>
+          <button class="btn-delete" onclick="deleteSound('${escapeJs(item.id)}')">🗑 割り当て解除</button>
+        </div>
+      `;
+    } else {
+      bodyHtml = `
+        <div class="search-badges-container">
+          <!-- 国内サイト (8件) -->
+          <div class="badge-group">
+            <span class="badge-group-label">🇯🇵国内:</span>
+            <a class="btn-badge badge-lab" href="${urls.lab}" target="_blank" rel="noopener" title="効果音ラボ (商用フリー・クレジット不要)">効果音ラボ</a>
+            <a class="btn-badge badge-onjin" href="${urls.onjin}" target="_blank" rel="noopener" title="On-Jin ～音人～ (老舗ゲーム効果音)">音人</a>
+            <a class="btn-badge badge-otologic" href="${urls.otologic}" target="_blank" rel="noopener" title="OtoLogic (高品質・CC BY 4.0)">OtoLogic</a>
+            <a class="btn-badge badge-dict" href="${urls.dict}" target="_blank" rel="noopener" title="効果音辞典 (完全フリー)">効果音辞典</a>
+            <a class="btn-badge badge-springin" href="${urls.springin}" target="_blank" rel="noopener" title="Springin' Sound Stock">Springin'</a>
+            <a class="btn-badge badge-maou" href="${urls.maou}" target="_blank" rel="noopener" title="魔王魂 (RPG戦闘・魔法)">魔王魂</a>
+            <a class="btn-badge badge-pocket" href="${urls.pocket}" target="_blank" rel="noopener" title="ポケットサウンド">ポケットSE</a>
+            <a class="btn-badge badge-amacha" href="${urls.amacha}" target="_blank" rel="noopener" title="甘茶の音楽工房 (ジングル・実績)">甘茶</a>
+          </div>
+
+          <!-- 海外・オープン素材 (5件) -->
+          <div class="badge-group">
+            <span class="badge-group-label">🌐海外:</span>
+            <a class="btn-badge badge-pixabay" href="${urls.pixabay}" target="_blank" rel="noopener" title="Pixabay (膨大・高品質・クレジット不要)">Pixabay</a>
+            <a class="btn-badge badge-sounddino" href="${urls.sounddino}" target="_blank" rel="noopener" title="SoundDino (ロイヤリティフリー)">SoundDino</a>
+            <a class="btn-badge badge-freesound" href="${urls.freesound}" target="_blank" rel="noopener" title="Freesound (CC0/CC-BY)">Freesound</a>
+            <a class="btn-badge badge-zapsplat" href="${urls.zapsplat}" target="_blank" rel="noopener" title="ZapSplat (世界最大級10万音)">ZapSplat</a>
+            <a class="btn-badge badge-oga" href="${urls.oga}" target="_blank" rel="noopener" title="OpenGameArt (ゲーム用オープン素材)">OpenGameArt</a>
+          </div>
+        </div>
+        <div class="drop-zone" id="dropZone_${item.id}">
+          📥 音声ファイル（WAV/MP3/OGG）をここにドロップ<br>またはクリックして選択
+        </div>
+      `;
+    }
+
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="card-title">${escapeHtml(item.filename)}</div>
+        <span class="status-tag ${item.status}">${isReady ? '確定済' : '未設定'}</span>
+      </div>
+      <div class="card-desc">${escapeHtml(item.description)}</div>
+      <div class="card-caller">呼び出し: ${escapeHtml(item.caller || '-')} (ID: ${escapeHtml(item.id)})</div>
+      ${bodyHtml}
+    `;
+
+    grid.appendChild(card);
+
+    // ドロップゾーンのイベント設定
+    if (!isReady) {
+      const dropZone = card.querySelector(`#dropZone_${CSS.escape(item.id)}`);
+      if (dropZone) {
+        setupDropZone(dropZone, item);
+      }
+    }
+  });
+}
+
+function setupDropZone(dropZone, item) {
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.add('dragover');
+    }, false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.remove('dragover');
+    }, false);
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files.length > 0) {
+      handleFileSelected(item, files[0]);
+    }
+  });
+
+  dropZone.addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'audio/*';
+    input.onchange = (e) => {
+      if (e.target.files.length > 0) {
+        handleFileSelected(item, e.target.files[0]);
+      }
+    };
+    input.click();
+  });
+}
+
+function handleFileSelected(item, file) {
+  activeTargetItem = item;
+  activeSelectedFile = file;
+
+  document.getElementById('modalTitle').textContent = `音源の確定: ${item.filename}`;
+  document.getElementById('modalFilename').value = `${item.filename} (${item.description})`;
+  document.getElementById('modalSelectedFileName').value = `${file.name} (${Math.round(file.size / 1024)} KB)`;
+
+  // 自動推定
+  const siteSelect = document.getElementById('modalSourceSite');
+  const licenseSelect = document.getElementById('modalLicense');
+  const authorInput = document.getElementById('modalAuthor');
+  const urlInput = document.getElementById('modalSourceUrl');
+
+  const fn = file.name.toLowerCase();
+
+  if (fn.includes('soundeffect-lab') || fn.includes('効果音ラボ')) {
+    siteSelect.value = '効果音ラボ';
+    licenseSelect.value = '効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）';
+    authorInput.value = '効果音ラボ';
+    urlInput.value = 'https://soundeffect-lab.info/';
+  } else if (fn.includes('pixabay')) {
+    siteSelect.value = 'Pixabay';
+    licenseSelect.value = 'Pixabay Content License（商用可・ゲーム組込可・クレジット不要）';
+    authorInput.value = 'Pixabay Creator';
+    urlInput.value = 'https://pixabay.com/sound-effects/';
+  } else if (fn.includes('sounddino')) {
+    siteSelect.value = 'SoundDino';
+    licenseSelect.value = 'SoundDino Royalty-Free（商用可・クレジット不要）';
+    authorInput.value = 'SoundDino';
+    urlInput.value = 'https://sounddino.com/';
+  } else if (fn.includes('on-jin') || fn.includes('onjin') || fn.includes('音人')) {
+    siteSelect.value = 'On-Jin ～音人～';
+    licenseSelect.value = 'On-Jin利用規約（商用可・ゲーム組込可・クレジット表記）';
+    authorInput.value = 'On-Jin ～音人～';
+    urlInput.value = 'https://on-jin.com/';
+  } else if (fn.includes('otologic')) {
+    siteSelect.value = 'OtoLogic';
+    licenseSelect.value = 'OtoLogic利用規約（CC BY 4.0 / クレジット表記）';
+    authorInput.value = 'OtoLogic';
+    urlInput.value = 'https://otologic.jp/';
+  } else if (fn.includes('sounddictionary') || fn.includes('効果音辞典')) {
+    siteSelect.value = '効果音辞典';
+    licenseSelect.value = '効果音辞典利用規約（商用可・クレジット不要）';
+    authorInput.value = '効果音辞典';
+    urlInput.value = 'https://sounddictionary.info/';
+  } else if (fn.includes('springin')) {
+    siteSelect.value = 'Springin\' Sound Stock';
+    licenseSelect.value = 'Springin\'利用規約（商用可・クレジット不要）';
+    authorInput.value = 'Springin\' Sound Stock';
+    urlInput.value = 'https://soundstock.springin.info/';
+  } else if (fn.includes('maoudamashii') || fn.includes('maou') || fn.includes('魔王魂')) {
+    siteSelect.value = '魔王魂';
+    licenseSelect.value = '魔王魂利用規約（商用可・クレジット表記）';
+    authorInput.value = '魔王魂';
+    urlInput.value = 'https://maou.audio/';
+  } else if (fn.includes('pocket')) {
+    siteSelect.value = 'ポケットサウンド';
+    licenseSelect.value = 'ポケットサウンド利用規約（商用可・クレジット表記）';
+    authorInput.value = 'ポケットサウンド';
+    urlInput.value = 'https://pocket-se.info/';
+  } else if (fn.includes('amacha') || fn.includes('甘茶')) {
+    siteSelect.value = '甘茶の音楽工房';
+    licenseSelect.value = '甘茶の音楽工房利用規約（商用可・ゲーム組込可・クレジット任意）';
+    authorInput.value = '甘茶の音楽工房';
+    urlInput.value = 'https://amachamusic.chagasi.com/';
+  } else if (fn.includes('zapsplat')) {
+    siteSelect.value = 'ZapSplat';
+    licenseSelect.value = 'ZapSplat Standard License（商用可・クレジット表記）';
+    authorInput.value = 'ZapSplat';
+    urlInput.value = 'https://www.zapsplat.com/';
+  } else if (fn.includes('freesound') || /^\d+__/.test(fn)) {
+    siteSelect.value = 'Freesound.org';
+    licenseSelect.value = 'CC-BY 4.0';
+    authorInput.value = '';
+    urlInput.value = 'https://freesound.org/';
+  }
+
+  document.getElementById('uploadModal').classList.add('active');
+}
+
+function openUploadModalFor(id) {
+  const item = soundList.find(x => x.id === id);
+  if (!item) return;
+
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'audio/*';
+  input.onchange = (e) => {
+    if (e.target.files.length > 0) {
+      handleFileSelected(item, e.target.files[0]);
+    }
+  };
+  input.click();
+}
+
+document.getElementById('btnModalCancel').addEventListener('click', () => {
+  document.getElementById('uploadModal').classList.remove('active');
+  activeTargetItem = null;
+  activeSelectedFile = null;
+});
+
+document.getElementById('btnModalSubmit').addEventListener('click', async () => {
+  if (!activeTargetItem || !activeSelectedFile) return;
+
+  const btn = document.getElementById('btnModalSubmit');
+  btn.disabled = true;
+  btn.textContent = '正規化 & Opus変換中...';
+
+  const formData = new FormData();
+  formData.append('id', activeTargetItem.id);
+  formData.append('source_site', document.getElementById('modalSourceSite').value);
+  formData.append('author', document.getElementById('modalAuthor').value);
+  formData.append('source_url', document.getElementById('modalSourceUrl').value);
+  formData.append('license', document.getElementById('modalLicense').value);
+  formData.append('notes', document.getElementById('modalNotes').value);
+  formData.append('file', activeSelectedFile);
+
+  try {
+    const res = await fetch('/api/upload_and_assign', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('uploadModal').classList.remove('active');
+      await loadData();
+    } else {
+      alert('エラー: ' + (data.error || 'アップロードに失敗しました'));
+    }
+  } catch (e) {
+    alert('通信エラー: ' + e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '正規化 & 確定 (Opus変換)';
+  }
+});
+
+async function deleteSound(id) {
+  if (!confirm(`サウンド ${id} の割り当てを解除しますか？`)) return;
+
+  try {
+    const res = await fetch('/api/delete_assign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+    const data = await res.json();
+    if (data.success) {
+      await loadData();
+    }
+  } catch (e) {
+    alert('解除エラー: ' + e);
+  }
+}
+
+// フィルタ・検索イベントリスナー
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.filter) {
+      document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+    } else if (btn.dataset.cat) {
+      const isAlready = btn.classList.contains('active');
+      document.querySelectorAll('.filter-btn[data-cat]').forEach(b => b.classList.remove('active'));
+      if (!isAlready) {
+        btn.classList.add('active');
+        currentCategory = btn.dataset.cat;
+      } else {
+        currentCategory = 'all';
+      }
+    }
+    renderCards();
+  });
+});
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  searchQuery = e.target.value.trim();
+  renderCards();
+});
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function escapeJs(str) {
+  if (!str) return '';
+  return str.replace(/'/g, "\\'");
+}
+
+// 初期ロード
+loadData();

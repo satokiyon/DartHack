@@ -106,7 +106,7 @@ sys/amiga/regex/
 NetHackJP.code-workspace
 tmp/
 scratch/
-tools/
+/tools/
 .agent/
 
 # Generated Windows nmake stamp files

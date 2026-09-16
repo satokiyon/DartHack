@@ -1,0 +1,3 @@
+# sound_curator 一時・バイナリファイル除外
+bin/
+temp/
