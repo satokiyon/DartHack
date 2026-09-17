@@ -1912,11 +1912,11 @@
     "caller": "muse.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "効果音ラボ",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://soundeffect-lab.info/",
+    "license": "効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）",
     "notes": ""
   },
   {
@@ -2992,11 +2992,11 @@
     "caller": "exper.c",
     "category": "achievement",
     "sub_category": "SystemEvent",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "効果音ラボ",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://soundeffect-lab.info/",
+    "license": "効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）",
     "notes": ""
   },
   {

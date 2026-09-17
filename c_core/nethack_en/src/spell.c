@@ -1396,6 +1396,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
 
     u.uen -= energy;
     disp.botl = TRUE;
+    nh_sound_spell_cast(&gy.youmonst, spell_otyp);
     exercise(A_WIS, TRUE);
     /* pseudo is a temporary "false" object containing the spell stats */
     pseudo = mksobj(force ? spell : spellid(spell), FALSE, FALSE);

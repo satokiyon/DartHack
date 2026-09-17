@@ -810,6 +810,8 @@ mcast_spell(struct monst *mtmp, int dmg, int spellnum)
         return;
     }
 
+    nh_sound_spell_cast(mtmp, spellnum);
+
     switch (spellnum) {
     case MCAST_DEATH_TOUCH:
         mcast_death_touch(mtmp);

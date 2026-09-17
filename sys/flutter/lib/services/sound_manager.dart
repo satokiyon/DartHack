@@ -41,7 +41,24 @@ class SoundManager {
 
   static const int _maxConcurrentPlayers = 12;
   static const int _maxSameSoundInstances = 3;
+  static const int _seCooldownMs = 60;
+  static const int _microDelayThresholdMs = 25; // 同一フレーム内の二連撃判定閾値
+  static const int _microDelayIntervalMs = 35;  // 二連撃のディレイ時間
+  static const int _ambientCombatThrottleWindowMs = 100; // 環境戦闘SEスロットル窓
+  static const int _maxAmbientCombatSePerWindow = 2;     // 窓あたりの最大環境戦闘SE数
   static const String _soundAssetPrefix = 'assets/sounds/';
+
+  /// 重要・警告効果音（戦闘SEより優先して発音を保証）
+  static const Set<String> _criticalSoundEffects = {
+    'se_alarm.ogg',
+    'se_wailing_of_the_banshee.ogg',
+    'se_thunderclap.ogg',
+    'se_glass_break.ogg',
+    'se_crash.ogg',
+    'se_trap_door_explodes.ogg',
+    'se_flee_screaming.ogg',
+    'se_potion_crash_and_break.ogg',
+  };
 
   /// 2.1 ダンジョン分岐および固定特殊階層（フロア全体BGM）の定義セット
   static const Set<String> _floorBgmFiles = {
@@ -78,6 +95,9 @@ class SoundManager {
   String? _lastAmbience;
 
   final Set<String> _availableSounds = {};
+  final Map<String, DateTime> _lastPlayTimeBySound = {};
+  final Set<String> _pendingDoubleStrikes = {};
+  final List<DateTime> _ambientCombatSePlayTimes = [];
   bool _isInitialized = false;
 
   int _floorFadeGen = 0;
@@ -184,8 +204,11 @@ class SoundManager {
 
     switch (category) {
       case SoundCategory.se:
+        final isCrit = _criticalSoundEffects.contains(filename);
+        if (_seEnabled) _playSe(filename, volume, isCritical: isCrit);
+        break;
       case SoundCategory.achievement:
-        if (_seEnabled) _playSe(filename, volume);
+        if (_seEnabled) _playSe(filename, volume, isCritical: true);
         break;
       case SoundCategory.heroMusic:
         if (_seEnabled) _playInstrument(filename, text, volume, loopOrFlag != 0);
@@ -208,9 +231,55 @@ class SoundManager {
     }
   }
 
-  /// 効果音の再生
-  Future<void> _playSe(String filename, int cVolume) async {
+  /// 効果音の再生（スロットル判定、二連撃マイクロディレイ、デバウンス制御）
+  Future<void> _playSe(String filename, int cVolume, {bool isCritical = false}) async {
     if (!_seEnabled || filename.isEmpty || !hasSound(filename) || _pool.isEmpty) return;
+
+    final now = DateTime.now();
+    final isCombatSe = filename.startsWith('se_combat_') || filename.startsWith('se_mon_');
+    final isAmbientCombat = isCombatSe && cVolume < 100;
+
+    // 1. 環境戦闘SEスロットル機構（第三者同士の戦闘で密集時の音響飽和防止）
+    if (isAmbientCombat) {
+      _ambientCombatSePlayTimes.removeWhere(
+        (t) => now.difference(t).inMilliseconds >= _ambientCombatThrottleWindowMs,
+      );
+      if (_ambientCombatSePlayTimes.length >= _maxAmbientCombatSePerWindow) {
+        return; // 100ms枠内の環境戦闘SE上限に達したためスキップ
+      }
+    }
+
+    // 2. 二連撃マイクロディレイ & デバウンス制御
+    final lastPlay = _lastPlayTimeBySound[filename];
+    if (lastPlay != null) {
+      final diffMs = now.difference(lastPlay).inMilliseconds;
+      if (diffMs < _seCooldownMs) {
+        // 同一フレーム（0〜25ms以内）の二連撃（二刀流やモンスター爪×2）であり、まだ保留中でなければディレイ再生
+        if (diffMs < _microDelayThresholdMs && !_pendingDoubleStrikes.contains(filename)) {
+          _pendingDoubleStrikes.add(filename);
+          Future.delayed(const Duration(milliseconds: _microDelayIntervalMs), () {
+            _pendingDoubleStrikes.remove(filename);
+            _executePlaySe(filename, cVolume, isCritical: isCritical);
+          });
+        }
+        return; // 1発目のデバウンスとしてはここでリターン
+      }
+    }
+
+    await _executePlaySe(filename, cVolume, isCritical: isCritical);
+  }
+
+  /// 効果音の実再生処理（優先度判定・空きプレイヤー取得・再生）
+  Future<void> _executePlaySe(String filename, int cVolume, {bool isCritical = false}) async {
+    if (!_seEnabled || _pool.isEmpty) return;
+
+    final now = DateTime.now();
+    _lastPlayTimeBySound[filename] = now;
+
+    final isCombatSe = filename.startsWith('se_combat_') || filename.startsWith('se_mon_');
+    if (isCombatSe && cVolume < 100) {
+      _ambientCombatSePlayTimes.add(now);
+    }
 
     // 同一サウンドの重複上限チェック (最大3音)
     int sameCount = 0;
@@ -223,7 +292,7 @@ class SoundManager {
       return; // 同一音が密集しすぎているためスキップ
     }
 
-    // 空きプレイヤーの取得（無ければ最も古いプレイヤーを再利用）
+    // 空きプレイヤーの取得
     _PlayerEntry? targetEntry;
     for (final entry in _pool) {
       if (!entry.isPlaying) {
@@ -232,8 +301,18 @@ class SoundManager {
       }
     }
 
+    // 空きがない場合の再利用（重要音は戦闘SEプレイヤーを優先的にプリエンプト）
     if (targetEntry == null) {
-      targetEntry = _pool.reduce((a, b) => a.lastPlayTime.isBefore(b.lastPlayTime) ? a : b);
+      if (isCritical) {
+        for (final entry in _pool) {
+          final cur = entry.currentSound ?? '';
+          if (cur.startsWith('se_combat_') || cur.startsWith('se_mon_')) {
+            targetEntry = entry;
+            break;
+          }
+        }
+      }
+      targetEntry ??= _pool.reduce((a, b) => a.lastPlayTime.isBefore(b.lastPlayTime) ? a : b);
       try {
         await targetEntry.player.stop();
       } catch (_) {}
@@ -241,7 +320,7 @@ class SoundManager {
 
     targetEntry.isPlaying = true;
     targetEntry.currentSound = filename;
-    targetEntry.lastPlayTime = DateTime.now();
+    targetEntry.lastPlayTime = now;
 
     final finalVolume = (_seVolume * (cVolume / 100.0)).clamp(0.0, 1.0);
     try {
@@ -669,6 +748,9 @@ class SoundManager {
     _roomBgmPlayer = null;
     _ambiencePlayer?.dispose();
     _ambiencePlayer = null;
+    _lastPlayTimeBySound.clear();
+    _pendingDoubleStrikes.clear();
+    _ambientCombatSePlayTimes.clear();
     _isInitialized = false;
   }
 

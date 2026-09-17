@@ -2322,4 +2322,250 @@ update_level_ambience(void)
     SoundAmbience(ambience_begin, amb_id, 0);
 }
 
+/*
+ * 戦闘効果音 共通ヘルパー関数群 (Combat Sound Helper Functions)
+ */
+
+/* 攻撃者・防御者に基づく音量算出（盲目セーフ・気配察知） */
+int
+nh_sound_combat_vol(struct monst *magr, struct monst *mdef)
+{
+    int ax, ay, d;
+
+    /* 主人公が関与している戦闘は盲目状態でも触覚・聴覚で直接知覚できるため常時100 */
+    if (magr == &gy.youmonst || mdef == &gy.youmonst)
+        return 100;
+
+    /* モンスター同士の戦闘で、少なくとも一方が視認できれば 70 */
+    if (!Blind && ((magr && canspotmon(magr)) || (mdef && canspotmon(mdef))))
+        return 70;
+
+    /* 不可視（暗闇・壁越し・透明・盲目等）でも周囲の戦闘気配として知覚
+     * 至近距離（距離2マス以内）なら盲目でも耳元で激しい戦闘として知覚 (70)
+     * 近傍（BOLT_LIM 8マス以内）なら気配として知覚 (40)
+     * それ以遠はフロア全体の騒音化を防ぐため無音 (0) */
+    ax = magr ? magr->mx : (mdef ? mdef->mx : 0);
+    ay = magr ? magr->my : (mdef ? mdef->my : 0);
+    if (ax > 0 && ay > 0) {
+        d = distmin(u.ux, u.uy, ax, ay);
+        if (d <= 2)
+            return 70; /* 耳元の至近距離戦闘 */
+        if (d <= BOLT_LIM)
+            return 40; /* 気配察知 */
+    }
+
+    return 0; /* 遠すぎて聞こえない */
+}
+
+/* 近接攻撃命中音 */
+void
+nh_sound_melee_hit(struct monst *magr, struct monst *mdef, struct obj *weapon, int aatyp)
+{
+    int vol = nh_sound_combat_vol(magr, mdef);
+    int seid = se_combat_hit_blunt;
+
+    if (vol <= 0)
+        return;
+
+    if (weapon) {
+        if (weapon->oclass == WEAPON_CLASS || weapon->oclass == TOOL_CLASS) {
+            int dir = objects[weapon->otyp].oc_dir;
+            if (dir & SLASH)
+                seid = se_combat_hit_slash;
+            else if (dir & PIERCE)
+                seid = se_combat_hit_pierce;
+            else if (dir & WHACK)
+                seid = se_combat_hit_blunt;
+            else
+                seid = se_combat_hit_blunt;
+        } else {
+            /* 武器以外のアイテムによる殴打 */
+            seid = se_combat_hit_blunt;
+        }
+    } else {
+        /* 素手攻撃 */
+        seid = se_combat_hit_unarmed;
+    }
+
+    Soundeffect(seid, vol);
+}
+
+/* 近接攻撃空振り音 */
+void
+nh_sound_melee_miss(struct monst *magr, struct monst *mdef, struct attack *mattk)
+{
+    int vol = nh_sound_combat_vol(magr, mdef);
+    if (vol <= 0)
+        return;
+
+    Soundeffect(se_combat_miss, vol);
+}
+
+/* 射撃音（発射具から発射された時） */
+void
+nh_sound_shoot(struct monst *magr, struct obj *launcher, struct obj *ammo)
+{
+    int vol = nh_sound_combat_vol(magr, (struct monst *) 0);
+    int seid = se_combat_shoot_bow;
+
+    if (vol <= 0)
+        return;
+
+    if (launcher) {
+        switch (objects[launcher->otyp].oc_skill) {
+        case P_CROSSBOW:
+            seid = se_combat_shoot_crossbow;
+            break;
+        case P_SLING:
+            seid = se_combat_shoot_sling;
+            break;
+        case P_BOW:
+        default:
+            seid = se_combat_shoot_bow;
+            break;
+        }
+    } else {
+        seid = se_combat_throw;
+    }
+
+    Soundeffect(seid, vol);
+}
+
+/* 投擲音（手で投げた時） */
+void
+nh_sound_throw(struct monst *magr, struct obj *obj)
+{
+    int vol = nh_sound_combat_vol(magr, (struct monst *) 0);
+    int seid = se_combat_throw;
+
+    if (vol <= 0 || !obj)
+        return;
+
+    if (is_art(obj, ART_MJOLLNIR))
+        seid = se_combat_throw_mjollnir;
+    else if (objects[obj->otyp].oc_skill == P_BOOMERANG)
+        seid = se_combat_throw_boomerang;
+    else
+        seid = se_combat_throw;
+
+    Soundeffect(seid, vol);
+}
+
+/* 投擲物・矢弾の着弾音（命中または外れ） */
+void
+nh_sound_missile_hit(struct monst *mon, struct obj *obj, boolean hit)
+{
+    int vol = nh_sound_combat_vol((struct monst *) 0, mon);
+    int seid;
+
+    if (vol <= 0)
+        return;
+
+    if (hit) {
+        if (obj && (obj->oclass == WEAPON_CLASS || obj->oclass == TOOL_CLASS)) {
+            int dir = objects[obj->otyp].oc_dir;
+            if (dir & SLASH)
+                seid = se_combat_hit_slash;
+            else if (dir & PIERCE)
+                seid = se_combat_hit_pierce;
+            else
+                seid = se_combat_hit_blunt;
+        } else {
+            seid = se_combat_hit_blunt;
+        }
+    } else {
+        /* 外れて壁や床に当たった音 */
+        seid = se_combat_miss_thud;
+    }
+
+    Soundeffect(seid, vol);
+}
+
+/* モンスター固有攻撃命中音 */
+void
+nh_sound_mon_attack(struct monst *magr, struct monst *mdef, struct attack *mattk, boolean hit)
+{
+    int vol = nh_sound_combat_vol(magr, mdef);
+    int seid = se_mon_claw;
+
+    if (vol <= 0)
+        return;
+
+    if (!hit) {
+        Soundeffect(se_combat_miss, vol);
+        return;
+    }
+
+    if (!mattk) {
+        Soundeffect(se_mon_claw, vol);
+        return;
+    }
+
+    switch (mattk->aatyp) {
+    case AT_CLAW:
+        seid = se_mon_claw;
+        break;
+    case AT_BITE:
+        seid = se_mon_bite;
+        break;
+    case AT_KICK:
+        seid = se_mon_kick;
+        break;
+    case AT_BUTT:
+        seid = se_mon_butt;
+        break;
+    case AT_TUCH:
+        seid = se_mon_touch;
+        break;
+    case AT_STNG:
+        seid = se_mon_sting;
+        break;
+    case AT_HUGS:
+        seid = se_mon_hug;
+        break;
+    case AT_SPIT:
+        seid = se_mon_spit;
+        break;
+    case AT_ENGL:
+        seid = se_mon_engulf;
+        break;
+    case AT_BREA:
+        seid = se_mon_breath;
+        break;
+    case AT_GAZE:
+        seid = se_mon_gaze;
+        break;
+    case AT_TENT:
+        seid = se_mon_tentacle;
+        break;
+    default:
+        seid = se_mon_claw;
+        break;
+    }
+
+    Soundeffect(seid, vol);
+}
+
+/* 呪文詠唱音 */
+void
+nh_sound_spell_cast(struct monst *magr, int spell_id)
+{
+    int vol = nh_sound_combat_vol(magr, (struct monst *) 0);
+    if (vol <= 0)
+        return;
+
+    Soundeffect(se_combat_spell_cast, vol);
+}
+
+/* 杖発動音 */
+void
+nh_sound_wand_zap(struct monst *magr, struct obj *wand)
+{
+    int vol = nh_sound_combat_vol(magr, (struct monst *) 0);
+    if (vol <= 0)
+        return;
+
+    Soundeffect(se_combat_wand_zap, vol);
+}
+
 /*sounds.c*/

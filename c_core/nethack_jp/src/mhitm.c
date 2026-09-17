@@ -99,6 +99,8 @@ missmm(
     struct monst *mdef, /* defender */
     struct attack *mattk) /* attack and damage types */
 {
+    nh_sound_melee_miss(magr, mdef, mattk);
+
     pre_mm_attack(magr, mdef);
 
     if (gv.vis) {
@@ -525,6 +527,7 @@ mattackm(
 
         case AT_GAZE:
             strike = 0;
+            nh_sound_mon_attack(magr, mdef, mattk, TRUE);
             res[i] = gazemm(magr, mdef, mattk);
             break;
 
@@ -572,16 +575,18 @@ mattackm(
         case AT_BREA:
         case AT_SPIT:
             /*
-             * Ranged attacks aren't allowed at point blank range.
-             *
-             * That impacts pet use of ranged attacks.  It's rather arbitrary
-             * but various parts of the code assume it to be the case, not to
-             * mention a part of player tactics when fighting dragons.
-             */
+              * Ranged attacks aren't allowed at point blank range.
+              *
+              * That impacts pet use of ranged attacks.  It's rather arbitrary
+              * but various parts of the code assume it to be the case, not to
+              * mention a part of player tactics when fighting dragons.
+              */
             if (!monnear(magr, mdef->mx, mdef->my)) {
-                int mmtmp = ((mattk->aatyp == AT_BREA)
-                             ? breamm(magr, mattk, mdef)
-                             : spitmm(magr, mattk, mdef));
+                int mmtmp;
+                nh_sound_mon_attack(magr, mdef, mattk, TRUE);
+                mmtmp = ((mattk->aatyp == AT_BREA)
+                         ? breamm(magr, mattk, mdef)
+                         : spitmm(magr, mattk, mdef));
 
                 strike = (mmtmp == M_ATTK_MISS) ? 0 : 1;
                 /* We don't really know if we hit or not; pretend we did. */
@@ -684,6 +689,12 @@ hitmm(
                          && objects[mwep->otyp].oc_material == SILVER);
 
     pre_mm_attack(magr, mdef);
+
+    if (weaponhit) {
+        nh_sound_melee_hit(magr, mdef, mwep, mattk->aatyp);
+    } else {
+        nh_sound_mon_attack(magr, mdef, mattk, TRUE);
+    }
 
     compat = !magr->mcan ? could_seduce(magr, mdef, mattk) : 0;
     if (!compat && shade_miss(magr, mdef, mwep, FALSE, gv.vis))
@@ -880,6 +891,8 @@ gulpmm(
 
     if (!engulf_target(magr, mdef))
         return M_ATTK_MISS;
+
+    nh_sound_mon_attack(magr, mdef, mattk, TRUE);
 
     if (gv.vis) {
           char magr_name[BUFSZ], mdef_name[BUFSZ];

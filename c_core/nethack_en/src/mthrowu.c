@@ -104,6 +104,7 @@ thitu(
     is_acid = (obj && obj->otyp == ACID_VENOM);
 
     if (u.uac + tlev <= (dieroll = rnd(20))) {
+        nh_sound_missile_hit(&gy.youmonst, obj, FALSE);
         ++gm.mesg_given;
         if (Blind || !flags.verbose) {
             pline("It misses.");
@@ -115,6 +116,7 @@ thitu(
             You("are almost hit by %s.", onm);
         return 0;
     } else {
+        nh_sound_missile_hit(&gy.youmonst, obj, TRUE);
         if (Blind || !flags.verbose)
             You("are hit%s", exclam(dam));
         else
@@ -296,6 +298,11 @@ monshoot(struct monst *mtmp, struct obj *otmp, struct obj *mwep)
         gm.m_shot.o = STRANGE_OBJECT; /* don't give multishot feedback */
     }
     gm.m_shot.n = multishot;
+    if (ammo_and_launcher(otmp, mwep)) {
+        nh_sound_shoot(mtmp, mwep, otmp);
+    } else {
+        nh_sound_throw(mtmp, otmp);
+    }
     for (gm.m_shot.i = 1; gm.m_shot.i <= gm.m_shot.n; gm.m_shot.i++) {
         m_throw(mtmp, mtmp->mx, mtmp->my, sgn(gt.tbx), sgn(gt.tby), dm, otmp);
         /* conceptually all N missiles are in flight at once, but

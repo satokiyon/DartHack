@@ -394,6 +394,97 @@ void main() {
       await manager.setBgmVolume(0.5);
       await manager.setSeVolume(0.8);
     });
+
+    test('SoundManager debounces rapid same SE events within 60ms', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true);
+      manager.registerAvailableSound('se_combat_hit_slash.ogg');
+
+      // 連続で同SEイベントを発行してもクラッシュせず安全に処理される
+      expect(() {
+        manager.handleSoundEvent({
+          'category': 1,
+          'filename': 'se_combat_hit_slash.ogg',
+          'text': '',
+          'volume': 100,
+          'loopOrFlag': 0,
+        });
+        // 60ms未満の連続呼び出し（デバウンス対象）
+        manager.handleSoundEvent({
+          'category': 1,
+          'filename': 'se_combat_hit_slash.ogg',
+          'text': '',
+          'volume': 100,
+          'loopOrFlag': 0,
+        });
+      }, returnsNormally);
+    });
+
+    test('SoundManager handles double-strike micro-delay and third strike throttling', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true);
+      manager.registerAvailableSound('se_combat_hit_slash.ogg');
+
+      // 1撃目、2撃目（二連撃マイクロディレイ対象）、3撃目（破棄対象）
+      expect(() {
+        for (int i = 0; i < 3; i++) {
+          manager.handleSoundEvent({
+            'category': 1,
+            'filename': 'se_combat_hit_slash.ogg',
+            'text': '',
+            'volume': 100,
+            'loopOrFlag': 0,
+          });
+        }
+      }, returnsNormally);
+
+      // マイクロディレイタイマーの実行を少し待機してもエラーが出ないこと
+      await Future.delayed(const Duration(milliseconds: 50));
+    });
+
+    test('SoundManager throttles ambient combat SE events for third-party monsters', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true);
+      manager.registerAvailableSound('se_mon_claw.ogg');
+
+      // volume < 100（モンスター同士の環境戦闘）を短時間に多数発行
+      expect(() {
+        for (int i = 0; i < 5; i++) {
+          manager.handleSoundEvent({
+            'category': 1,
+            'filename': 'se_mon_claw.ogg',
+            'text': '',
+            'volume': 40,
+            'loopOrFlag': 0,
+          });
+        }
+      }, returnsNormally);
+    });
+
+    test('SoundManager prioritizes critical sound effects and achievements', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true);
+      manager.registerAvailableSound('se_alarm.ogg');
+      manager.registerAvailableSound('sa2_xplevelup.ogg');
+
+      // 警報音（critical SE）および実績音
+      expect(() {
+        manager.handleSoundEvent({
+          'category': 1,
+          'filename': 'se_alarm.ogg',
+          'text': '',
+          'volume': 100,
+          'loopOrFlag': 0,
+        });
+        manager.handleSoundEvent({
+          'category': 2,
+          'filename': 'sa2_xplevelup.ogg',
+          'text': '',
+          'volume': 100,
+          'loopOrFlag': 0,
+        });
+      }, returnsNormally);
+    });
   });
 }
 

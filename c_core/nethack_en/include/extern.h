@@ -3067,6 +3067,16 @@ extern void set_voice(struct monst *, int32_t, int32_t, int32_t) NO_NNARGS;
 extern void sound_speak(const char *) NO_NNARGS;
 extern void update_level_ambience(void);
 extern enum soundlib_ids soundlib_id_from_opt(char *);
+/* Combat sound helper functions */
+extern int nh_sound_combat_vol(struct monst *, struct monst *);
+extern void nh_sound_melee_hit(struct monst *, struct monst *, struct obj *, int);
+extern void nh_sound_melee_miss(struct monst *, struct monst *, struct attack *);
+extern void nh_sound_shoot(struct monst *, struct obj *, struct obj *);
+extern void nh_sound_throw(struct monst *, struct obj *);
+extern void nh_sound_missile_hit(struct monst *, struct obj *, boolean);
+extern void nh_sound_mon_attack(struct monst *, struct monst *, struct attack *, boolean);
+extern void nh_sound_spell_cast(struct monst *, int);
+extern void nh_sound_wand_zap(struct monst *, struct obj *);
 
 /* ### sp_lev.c ### */
 

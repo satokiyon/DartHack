@@ -623,6 +623,11 @@ known_hitum(
         /* we hit the monster; be careful: it might die or
            be knocked into a different location */
         gn.notonhead = (mon->mx != gb.bhitpos.x || mon->my != gb.bhitpos.y);
+        if (uattk && uattk->aatyp != AT_WEAP && uattk->aatyp != AT_CLAW) {
+            nh_sound_mon_attack(&gy.youmonst, mon, uattk, TRUE);
+        } else {
+            nh_sound_melee_hit(&gy.youmonst, mon, weapon, uattk ? uattk->aatyp : 0);
+        }
         malive = hmon(mon, weapon, HMON_MELEE, dieroll);
         if (malive) {
             /* monster still alive */
@@ -829,6 +834,8 @@ hmon(struct monst *mon,
 
     anger_guards = (mon->mpeaceful
                     && (mon->ispriest || mon->isshk || is_watch(mon->data)));
+    if (thrown != HMON_MELEE)
+        nh_sound_missile_hit(mon, obj, TRUE);
     result = hmon_hitmon(mon, obj, thrown, dieroll);
     if (mon->ispriest && !rn2(2))
         ghod_hitsu(mon);
@@ -5204,6 +5211,8 @@ missum(
     struct attack *mattk,
     boolean wouldhavehit)
 {
+    nh_sound_melee_miss(&gy.youmonst, mdef, mattk);
+
     if (wouldhavehit) /* monk is missing due to penalty for wearing suit */
         Your("鎧がかなり動きを妨げた...");
 

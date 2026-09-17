@@ -84,6 +84,8 @@ hitmsg(struct monst *mtmp, struct attack *mattk)
 staticfn void
 missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
 {
+    nh_sound_melee_miss(mtmp, &gy.youmonst, mattk);
+
     gh.hitmsg_mid = 0;
     gh.hitmsg_prev = NULL;
 
@@ -177,6 +179,8 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
 {
     int compat;
     const char *Monst_name; /* Monnam(), deferred until after early returns */
+
+    nh_sound_melee_miss(mtmp, &gy.youmonst, mattk);
     /* expected reasons for wildmiss() */
     boolean unotseen = (!mtmp->mcansee || (Invis && !perceives(mtmp->data))),
             unotthere = (Displaced != 0), usubmerged = (Underwater != 0);
@@ -832,8 +836,10 @@ mattacku(struct monst *mtmp)
         case AT_GAZE: /* can affect you either ranged or not */
             /* Medusa gaze already operated through m_respond in
                dochug(); don't gaze more than once per round. */
-            if (mdat != &mons[PM_MEDUSA])
+            if (mdat != &mons[PM_MEDUSA]) {
+                nh_sound_mon_attack(mtmp, &gy.youmonst, mattk, TRUE);
                 sum[i] = gazemu(mtmp, mattk);
+            }
             break;
 
         case AT_EXPL: /* automatic hit if next to, and aimed at you */
@@ -871,13 +877,17 @@ mattacku(struct monst *mtmp)
             }
             break;
         case AT_BREA:
-            if (range2)
+            if (range2) {
+                nh_sound_mon_attack(mtmp, &gy.youmonst, mattk, TRUE);
                 sum[i] = breamu(mtmp, mattk);
+            }
             /* Note: breamu takes care of displacement */
             break;
         case AT_SPIT:
-            if (range2)
+            if (range2) {
+                nh_sound_mon_attack(mtmp, &gy.youmonst, mattk, TRUE);
                 sum[i] = spitmu(mtmp, mattk);
+            }
             /* Note: spitmu takes care of displacement */
             break;
         case AT_WEAP:
@@ -1155,6 +1165,12 @@ hitmu(struct monst *mtmp, struct attack *mattk)
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
 
+    if (mattk->aatyp == AT_WEAP) {
+        nh_sound_melee_hit(mtmp, &gy.youmonst, MON_WEP(mtmp), mattk->aatyp);
+    } else {
+        nh_sound_mon_attack(mtmp, &gy.youmonst, mattk, TRUE);
+    }
+
     /*  If the monster is undetected & hits you, you should know where
      *  the attack came from.
      */
@@ -1294,6 +1310,8 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
     struct obj *otmp2, *nextobj;
     int i;
     boolean physical_damage = FALSE;
+
+    nh_sound_mon_attack(mtmp, &gy.youmonst, mattk, TRUE);
 
     if (!u.uswallow) { /* swallows you */
         int omx = mtmp->mx, omy = mtmp->my;

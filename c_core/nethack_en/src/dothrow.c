@@ -248,9 +248,13 @@ throw_obj(struct obj *obj, int shotlimit)
     }
 
     wep_mask = obj->owornmask;
-    oldslot = 0;
     gm.m_shot.o = obj->otyp;
     gm.m_shot.n = multishot;
+    if (gm.m_shot.s) {
+        nh_sound_shoot(&gy.youmonst, uwep, obj);
+    } else {
+        nh_sound_throw(&gy.youmonst, obj);
+    }
     for (gm.m_shot.i = 1; gm.m_shot.i <= gm.m_shot.n; gm.m_shot.i++) {
         twoweap = u.twoweap;
         assert(obj != NULL); /* m_shot.i <= m_shot.n guarantees this */
@@ -2008,6 +2012,8 @@ tmiss(struct obj *obj, struct monst *mon, boolean maybe_wakeup)
 {
     const char *missile = mshot_xname(obj);
 
+    nh_sound_missile_hit(mon, obj, FALSE);
+
     /* If the target can't be seen or doesn't look like a valid target,
        avoid "the arrow misses it," or worse, "the arrows misses the mimic."
        An attentive player will still notice that this is different from
@@ -2687,6 +2693,7 @@ breakmsg(struct obj *obj, boolean in_view)
         FALLTHROUGH;
     /*FALLTHRU*/
     case POT_WATER: /* really, all potions */
+        Soundeffect(se_potion_crash_and_break, in_view ? 80 : 60);
         if (!in_view)
             You_hear("%s shatter!", something);
         else

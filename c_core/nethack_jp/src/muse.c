@@ -174,6 +174,8 @@ mzapwand(
         impossible("Mon zapping wand with %d charges?", otmp->spe);
         return;
     }
+
+    nh_sound_wand_zap(mtmp, otmp);
     if (!canseemon(mtmp)) {
         int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
                        ? (BOLT_LIM + 1) : (BOLT_LIM - 3);

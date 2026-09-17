@@ -2684,6 +2684,7 @@ dozap(void)
          * useup -> obfree -> dealloc_obj -> free(obj)
          */
         gc.current_wand = obj;
+        nh_sound_wand_zap(&gy.youmonst, obj);
         weffects(obj);
         obj = gc.current_wand;
         gc.current_wand = 0;
