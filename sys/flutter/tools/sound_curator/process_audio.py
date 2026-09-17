@@ -42,11 +42,13 @@ def normalize_and_convert(
     is_stereo: bool = False,
     bitrate: str = "64k",
     start_offset: Optional[float] = None,
-    duration: Optional[float] = None
+    duration: Optional[float] = None,
+    highpass_cutoff: Optional[int] = None
 ) -> bool:
     """
     音源を正規化・Opus変換して出力する。
     - 先頭無音の自動除去 (silenceremove)
+    - 不要低域ハイパスフィルター (highpass)
     - EBU R128 ラウドネス正規化 (loudnorm)
     - Ogg Opus (48kHz) 出力
     """
@@ -55,11 +57,12 @@ def normalize_and_convert(
     # フィルタチェインの構築
     filters = []
 
-    # 1. 開始オフセット/長さの指定がある場合
-    # (ffmpeg の -ss / -t で指定可能)
-
-    # 2. 先頭の無音トリミング (しきい値 -50dB、10ms以上の無音をカット)
+    # 1. 先頭の無音トリミング (しきい値 -50dB、10ms以上の無音をカット)
     filters.append("silenceremove=start_periods=1:start_duration=0.01:start_threshold=-50dB")
+
+    # 2. ハイパスフィルター（小型スピーカーでの音割れ・低域濁り防止）
+    if highpass_cutoff is not None and highpass_cutoff > 0:
+        filters.append(f"highpass=f={highpass_cutoff}")
 
     # 3. EBU R128 ラウドネス正規化
     filters.append(f"loudnorm=I={target_lufs}:TP={true_peak}:LRA=11")

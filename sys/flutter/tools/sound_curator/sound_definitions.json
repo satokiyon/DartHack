@@ -6,7 +6,10 @@
     "description": "空気がパチパチと鳴る音（エレメンタルや魔法の気配）",
     "caller": "mcastu.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 2,
@@ -15,7 +18,10 @@
     "description": "警報・アラーム音（金庫室アラームやトラップ作動時）",
     "caller": "do.c, shk.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 3,
@@ -24,7 +30,10 @@
     "description": "怒った蜂・昆虫の羽音（蜂の巣部屋）",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 4,
@@ -33,7 +42,10 @@
     "description": "威嚇するヘビ群のシューシュー音（ヘビ複数の攻撃）",
     "caller": "mthrowu.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 5,
@@ -42,7 +54,10 @@
     "description": "怒れる声（神や店主の立腹・叫び）",
     "caller": "shk.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 6,
@@ -51,7 +66,10 @@
     "description": "拍手喝采（闘技場や成功イベント）",
     "caller": "mon.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 7,
@@ -60,7 +78,10 @@
     "description": "鳥類・怪鳥の甲高い叫び声",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 8,
@@ -69,7 +90,10 @@
     "description": "武器の柄で壁を叩く音（壁の素材調査時）",
     "caller": "dig.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 9,
@@ -78,7 +102,10 @@
     "description": "鉄格子がカチャリと軽く鳴る音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 10,
@@ -87,7 +114,10 @@
     "description": "鉄格子への重い金属衝突音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 11,
@@ -96,7 +126,10 @@
     "description": "鉄格子のバタバタという揺れ音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 12,
@@ -105,7 +138,10 @@
     "description": "鉄格子への激しい衝撃音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 13,
@@ -114,7 +150,10 @@
     "description": "鉄格子への打撃・ビシッという音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 14,
@@ -123,7 +162,10 @@
     "description": "蜂の群体がブンブン群がる羽音",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 15,
@@ -132,7 +174,10 @@
     "description": "爆発・爆風音（魔法爆発・罠爆発）",
     "caller": "explode.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 16,
@@ -141,7 +186,10 @@
     "description": "床板がギシッときしむ音（きしみ床トラップ）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 17,
@@ -150,7 +198,10 @@
     "description": "床板がギシギシと大きくきしむ音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 18,
@@ -159,7 +210,10 @@
     "description": "ビヨーンと跳ねる音（ゴムや跳躍）",
     "caller": "muse.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 19,
@@ -168,7 +222,10 @@
     "description": "ビリビリと落雷・雷撃が走る音",
     "caller": "mcastu.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 20,
@@ -177,7 +234,10 @@
     "description": "骨がカタカタと鳴る音（スケルトンやアンデッド）",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 21,
@@ -186,7 +246,10 @@
     "description": "ブーメランが何かに当たって跳ね返る音",
     "caller": "zap.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 22,
@@ -195,7 +258,10 @@
     "description": "巨石がドスンと落ちる音（階段や穴への落下）",
     "caller": "do.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 23,
@@ -204,7 +270,10 @@
     "description": "牛・ウシの低い唸り声",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 24,
@@ -213,7 +282,10 @@
     "description": "牛のモーという鳴き声",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 25,
@@ -222,7 +294,10 @@
     "description": "水中からポコポコと泡が湧き立つ音",
     "caller": "fountain.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 26,
@@ -231,7 +306,10 @@
     "description": "ラッパで起床ラッパを演奏する音",
     "caller": "muse.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 27,
@@ -240,7 +318,10 @@
     "description": "ブーンという低周波の羽音・電気音",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 28,
@@ -249,7 +330,10 @@
     "description": "犬・狼のワンワンという吠え声",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 29,
@@ -258,7 +342,10 @@
     "description": "犬・狼のウーンという唸り声",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 30,
@@ -267,7 +354,10 @@
     "description": "犬・狼の遠吠え（アオーンという声）",
     "caller": "were.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 31,
@@ -276,7 +366,10 @@
     "description": "犬のクーン・キュンという甘え声",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 32,
@@ -285,7 +378,10 @@
     "description": "犬のキャンという痛みの悲鳴",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 33,
@@ -294,7 +390,10 @@
     "description": "犬の甲高いキュッという鳴き声",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 34,
@@ -303,7 +402,10 @@
     "description": "犬の長く引き伸ばした吠え声",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 35,
@@ -312,7 +414,10 @@
     "description": "鎖がバキッと砕け散る音（魔法爆発等で）",
     "caller": "explode.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 36,
@@ -321,7 +426,10 @@
     "description": "鎖がジャラジャラ鳴りながらギアが回る音（跳ね橋の可動）",
     "caller": "dbridge.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 37,
@@ -330,7 +438,10 @@
     "description": "呪文の詠唱・宗教的な賛歌の声",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 38,
@@ -339,7 +450,10 @@
     "description": "小鳥・小動物のちゅんちゅんという鳴き声",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 39,
@@ -348,7 +462,10 @@
     "description": "金属がカンカンと大きく鳴り響く音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 40,
@@ -357,7 +474,10 @@
     "description": "カンという短い金属衝突音",
     "caller": "worn.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 41,
@@ -366,7 +486,10 @@
     "description": "配管がカンカンと響く音（噴水の配管操作）",
     "caller": "fountain.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 42,
@@ -375,7 +498,10 @@
     "description": "武器同士が激しくぶつかり合う金属音",
     "caller": "dig.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 43,
@@ -384,7 +510,10 @@
     "description": "コカトリスの石化の威嚇音",
     "caller": "uhitm.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 44,
@@ -393,7 +522,10 @@
     "description": "ゲホゲホと咳き込む声（毒・粉塵吸入）",
     "caller": "mthrowu.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 45,
@@ -402,7 +534,10 @@
     "description": "宮廷部屋のにぎやかな会話音（謁見室）",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 46,
@@ -411,7 +546,10 @@
     "description": "パキッとひびが入る音（防具・呪いの解除等）",
     "caller": "worn.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 47,
@@ -420,7 +558,10 @@
     "description": "パチパチとはじける音（炎・電気）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 48,
@@ -429,7 +570,10 @@
     "description": "地獄の業火がメラメラと燃えさかる音（呪われた道具）",
     "caller": "apply.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 49,
@@ -438,7 +582,10 @@
     "description": "ドカンと激しく崩壊・衝突する音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 50,
@@ -447,7 +594,10 @@
     "description": "ドアがドカンと破壊される音（強制突破）",
     "caller": "dokick.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 51,
@@ -456,7 +606,10 @@
     "description": "何かがガシャンと割れて壊れる音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 52,
@@ -465,7 +618,10 @@
     "description": "玉座が蹴り倒されて粉々に砕ける大音響",
     "caller": "dokick.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 53,
@@ -474,7 +630,10 @@
     "description": "床を突き破って落とし穴に落ちる音",
     "caller": "muse.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 54,
@@ -483,7 +642,10 @@
     "description": "天井が崩落してガラガラ落ちる音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 55,
@@ -492,7 +654,10 @@
     "description": "巨石がドカドカと激しく転がり激突する音",
     "caller": "do.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 56,
@@ -501,7 +666,10 @@
     "description": "岩石がガラガラと崩れ落ちる音（掘削・崩壊）",
     "caller": "dig.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 57,
@@ -510,7 +678,10 @@
     "description": "激しい衝突・破壊音（ドアや施錠装置の破壊）",
     "caller": "lock.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 58,
@@ -519,7 +690,10 @@
     "description": "ワニの低く響く咆哮",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 59,
@@ -528,7 +702,10 @@
     "description": "砂岩や壁がボロボロと崩れる音（魔法・掘削）",
     "caller": "zap.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 60,
@@ -537,7 +714,10 @@
     "description": "バリバリと硬いものを噛み砕く音（捕食・踏み砕き）",
     "caller": "mon.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 61,
@@ -546,7 +726,10 @@
     "description": "メキメキと挟まれて押し潰される音（跳ね橋）",
     "caller": "dbridge.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 62,
@@ -555,7 +738,10 @@
     "description": "耳をつんざく轟音（強力な罠・爆発の雰囲気）",
     "caller": "trap.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 63,
@@ -564,7 +750,10 @@
     "description": "クモの巣をビリっと破り払う音",
     "caller": "ball.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 64,
@@ -573,7 +762,10 @@
     "description": "遠くに聞こえる雷鳴（嵐・スクロール効果）",
     "caller": "mon.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 65,
@@ -582,7 +774,10 @@
     "description": "神聖な天上の音楽（神への祈り成功時）",
     "caller": "pray.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 66,
@@ -591,7 +786,10 @@
     "description": "ドアがドカンと蹴り開けられる音（モンスターの侵入）",
     "caller": "monmove.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 67,
@@ -600,7 +798,10 @@
     "description": "ドアがギィッと開く音（通常の開扉）",
     "caller": "monmove.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 68,
@@ -609,7 +810,10 @@
     "description": "鍵がカチャリと解錠されてドアが開く音",
     "caller": "monmove.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 69,
@@ -618,7 +822,10 @@
     "description": "排水口がゴボゴボと鳴る音（排水溝近く）",
     "caller": "do.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 70,
@@ -627,7 +834,10 @@
     "description": "乾燥した喉がガラガラ鳴る音（モンスターの息）",
     "caller": "mthrowu.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 71,
@@ -636,7 +846,10 @@
     "description": "卵の殻がパキッと割れる音（蹴った時）",
     "caller": "dokick.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 72,
@@ -645,7 +858,10 @@
     "description": "卵がグシャッと踏み潰れる音",
     "caller": "dokick.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 73,
@@ -654,7 +870,10 @@
     "description": "象のパオーンという高らかな鳴き声",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 74,
@@ -663,7 +882,10 @@
     "description": "馬のヒヒーンという高いいななき",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 75,
@@ -672,7 +894,10 @@
     "description": "馬の低く柔らかいいななき",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 76,
@@ -681,7 +906,10 @@
     "description": "馬の短いいななき声",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 77,
@@ -690,7 +918,10 @@
     "description": "大爆発音（錠前爆発・爆破罠）",
     "caller": "lock.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 78,
@@ -699,7 +930,10 @@
     "description": "かすかなチリンというチャイムの音（魔法感知）",
     "caller": "spell.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 79,
@@ -708,7 +942,10 @@
     "description": "かすかな水が揺れる音（アイテム生成時）",
     "caller": "mkobj.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 80,
@@ -717,7 +954,10 @@
     "description": "かすかな水しぶき音（ホイールへの接触）",
     "caller": "apply.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 81,
@@ -726,7 +966,10 @@
     "description": "猫のニャーという鳴き声",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 82,
@@ -735,7 +978,10 @@
     "description": "子猫のミューという細い鳴き声",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 83,
@@ -744,7 +990,10 @@
     "description": "猫のゴロゴロと喉を鳴らす音",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 84,
@@ -753,7 +1002,10 @@
     "description": "猫のギャッという悲鳴",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 85,
@@ -762,7 +1014,10 @@
     "description": "猫の甲高いキーという鳴き声",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 86,
@@ -771,7 +1026,10 @@
     "description": "猫のウウウという低い唸り声",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 87,
@@ -780,7 +1038,10 @@
     "description": "液体が激しくボコボコと泡立つ音（噴水の呪い）",
     "caller": "fountain.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 88,
@@ -789,7 +1050,10 @@
     "description": "歯車がカチリと一段回る音（機構の動作）",
     "caller": "music.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 89,
@@ -798,7 +1062,10 @@
     "description": "歯車が回り鎖が引き上げられる音（跳ね橋の引き上げ）",
     "caller": "dbridge.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 90,
@@ -807,7 +1074,10 @@
     "description": "ガラスが激しくバリーンと割れる音",
     "caller": "dokick.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 91,
@@ -816,7 +1086,10 @@
     "description": "ガラス瓶が粉々にパリーンと砕け散る音",
     "caller": "dokick.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 92,
@@ -825,7 +1098,10 @@
     "description": "ウゥーといううめき声（モンスターや地形）",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 93,
@@ -834,7 +1110,10 @@
     "description": "呻きとうめき声（アンデッドの気配・死体部屋）",
     "caller": "do.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 94,
@@ -843,7 +1122,10 @@
     "description": "ウーンという低い唸り声",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 95,
@@ -852,7 +1134,10 @@
     "description": "フンと鼻を鳴らす短い声",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 96,
@@ -861,7 +1146,10 @@
     "description": "警備員の重い足音が近づく音（金庫室侵入）",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 97,
@@ -870,7 +1158,10 @@
     "description": "ゴボゴボと湧き立つ液体の音（モンスターの声）",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 98,
@@ -879,7 +1170,10 @@
     "description": "ドバーッと液体や水が噴き出す音（配管破壊）",
     "caller": "dokick.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 99,
@@ -888,7 +1182,10 @@
     "description": "トックン、トックンという心臓の鼓動音（聴診器使用）",
     "caller": "apply.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 100,
@@ -897,7 +1194,10 @@
     "description": "シュッというヘビや蒸気の威嚇音",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 101,
@@ -906,7 +1206,10 @@
     "description": "コンコンと中が空洞に響く音（壁や箱の確認）",
     "caller": "apply.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 102,
@@ -915,7 +1218,10 @@
     "description": "角笛がブォーンと響き渡る音（演奏効果）",
     "caller": "muse.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 103,
@@ -924,7 +1230,10 @@
     "description": "重い鉄球をズルズルと引きずられる音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 104,
@@ -933,7 +1242,10 @@
     "description": "鉄球がドスンと身体に激突する音",
     "caller": "ball.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 105,
@@ -942,7 +1254,10 @@
     "description": "アイテムが下層にカラカラ落ちていく音",
     "caller": "do.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 106,
@@ -951,7 +1266,10 @@
     "description": "ジャバウォックのブツブツという不気味な声",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 107,
@@ -960,7 +1278,10 @@
     "description": "地雷がカーブラムと大爆発する音",
     "caller": "trap.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 108,
@@ -969,7 +1290,10 @@
     "description": "ドカーンという爆発音",
     "caller": "trap.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 109,
@@ -978,7 +1302,10 @@
     "description": "ドカン、ドドーンという連続大爆発音",
     "caller": "timeout.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 110,
@@ -987,7 +1314,10 @@
     "description": "ドアの罠がドカンと爆発する音",
     "caller": "lock.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 111,
@@ -996,7 +1326,10 @@
     "description": "巨石がカドームと穴に落ちる轟音",
     "caller": "dig.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 112,
@@ -1005,7 +1338,10 @@
     "description": "巨石が水中や穴をカポーンと塞ぐ音",
     "caller": "hack.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 113,
@@ -1014,7 +1350,10 @@
     "description": "蹴りによりドアがドカンと開く音",
     "caller": "dokick.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 114,
@@ -1023,7 +1362,10 @@
     "description": "蹴りによりドアが粉々にバリーンと砕ける音",
     "caller": "dokick.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 115,
@@ -1032,7 +1374,10 @@
     "description": "カチッという小さな金属の作動音（解錠・機構）",
     "caller": "lock.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 116,
@@ -1041,7 +1386,10 @@
     "description": "ゴトンという重い鈍い衝突音",
     "caller": "lock.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 117,
@@ -1050,7 +1398,10 @@
     "description": "配管をゴトンと叩く衝撃音",
     "caller": "dokick.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 118,
@@ -1059,7 +1410,10 @@
     "description": "ハハハという笑い声（モンスターや魔法使用時）",
     "caller": "sounds.c, uhitm.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 119,
@@ -1068,7 +1422,10 @@
     "description": "箱の蓋がガタンと開き、ズンと閉まる音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 120,
@@ -1077,7 +1434,10 @@
     "description": "カチャンという大きな機構の作動音（罠発動）",
     "caller": "trap.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 121,
@@ -1086,7 +1446,10 @@
     "description": "大音響の衝突・崩壊音",
     "caller": "dbridge.c, trap.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 122,
@@ -1095,7 +1458,10 @@
     "description": "ポーンと弾けて破裂する音（泡・爆発）",
     "caller": "fountain.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 123,
@@ -1104,7 +1470,10 @@
     "description": "ドバシャーンという大きな水しぶき音",
     "caller": "dbridge.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 124,
@@ -1113,7 +1482,10 @@
     "description": "ブーンという低く響く羽音（蜂の巣・虫）",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 125,
@@ -1122,7 +1494,10 @@
     "description": "ブーンというハム・機械音（罠の予兆）",
     "caller": "trap.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 126,
@@ -1131,7 +1506,10 @@
     "description": "ケタケタという狂気的な高笑い（巻物読後等）",
     "caller": "read.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 127,
@@ -1140,7 +1518,10 @@
     "description": "クチャクチャと何かを噛む咀嚼音",
     "caller": "mon.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 128,
@@ -1149,7 +1530,10 @@
     "description": "モンスターがポーションをゴクゴクと飲む音",
     "caller": "muse.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 129,
@@ -1158,7 +1542,10 @@
     "description": "岩陰に隠れるモンスターの気配・物音",
     "caller": "hack.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 130,
@@ -1167,7 +1554,10 @@
     "description": "呪いの言葉をブツブツと呟く声（店主の怒り）",
     "caller": "shk.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 131,
@@ -1176,7 +1566,10 @@
     "description": "呪文をブツブツと唱える声",
     "caller": "shk.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 132,
@@ -1185,7 +1578,10 @@
     "description": "オークのグアッという低い唸り声",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 133,
@@ -1194,7 +1590,10 @@
     "description": "ソワソワした確認の囁き声",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 134,
@@ -1203,7 +1602,10 @@
     "description": "ポーション瓶がガシャンと割れ液体が散る音",
     "caller": "potion.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 135,
@@ -1212,7 +1614,10 @@
     "description": "指輪が排水口にコロコロと転がり落ちる音",
     "caller": "do.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 136,
@@ -1221,7 +1626,10 @@
     "description": "ビリビリと布・紙が破れる音（装備破壊等）",
     "caller": "worn.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 137,
@@ -1230,7 +1638,10 @@
     "description": "ガオーッという猛獣の咆哮",
     "caller": "trap.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 138,
@@ -1239,7 +1650,10 @@
     "description": "ゴゴゴという地鳴り音（罠・地震）",
     "caller": "trap.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 139,
@@ -1248,7 +1662,10 @@
     "description": "ズズズという大地が轟く地鳴り",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 140,
@@ -1257,7 +1674,10 @@
     "description": "ヒューという突風が吹き荒れる音",
     "caller": "mhitu.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 141,
@@ -1266,7 +1686,10 @@
     "description": "カサカサと紙・巻物が擦れ合う音",
     "caller": "apply.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 142,
@@ -1275,7 +1698,10 @@
     "description": "ウワーンという悲しげなすすり泣き・哀しみの声",
     "caller": "read.c, sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 143,
@@ -1284,7 +1710,10 @@
     "description": "笏（しゃく）で床をドンドンと叩く音（宮廷）",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 144,
@@ -1293,7 +1722,10 @@
     "description": "カリカリと爪で引っ掻く音（秘密の扉の探索）",
     "caller": "do.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 145,
@@ -1302,7 +1734,10 @@
     "description": "ギャーッという悲鳴・絶叫（演奏効果等）",
     "caller": "music.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 146,
@@ -1311,7 +1746,10 @@
     "description": "キーキーという甲高い叫び声",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 147,
@@ -1320,7 +1758,10 @@
     "description": "下水道から聞こえる不気味な歌声（下水道の噴水）",
     "caller": "fountain.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 148,
@@ -1329,7 +1770,10 @@
     "description": "バシッと鋭くひびが走る音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 149,
@@ -1338,7 +1782,10 @@
     "description": "ギャーッという鋭い悲鳴（モンスターの声）",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 150,
@@ -1347,7 +1794,10 @@
     "description": "ピーッと甲高く突き刺さる笛の音（ホイッスル使用）",
     "caller": "apply.c, mon.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 151,
@@ -1356,7 +1806,10 @@
     "description": "クックッという不敵・邪悪な笑い声（悪の存在）",
     "caller": "eat.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 152,
@@ -1365,7 +1818,10 @@
     "description": "ジュージューと焼ける・溶ける音（酸・炎接触）",
     "caller": "do.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 153,
@@ -1374,7 +1830,10 @@
     "description": "ズルズルとすする音（捕食・液体摂取）",
     "caller": "mon.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 154,
@@ -1383,7 +1842,10 @@
     "description": "ガシャンと叩き潰す音（跳ね橋の可動）",
     "caller": "dbridge.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 155,
@@ -1392,7 +1854,10 @@
     "description": "ガラガラヘビの尾のガラガラと鳴る警告音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 156,
@@ -1401,7 +1866,10 @@
     "description": "ヘビのシャーという群体の威嚇音",
     "caller": "fountain.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 157,
@@ -1410,7 +1878,10 @@
     "description": "ウーッと牙をむいて低く唸る声",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 158,
@@ -1419,7 +1890,10 @@
     "description": "カチッとかすかに鳴るいかにも怪しい音（罠感知）",
     "caller": "trap.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 159,
@@ -1428,7 +1902,10 @@
     "description": "パチパチとかすかに燃える音（炎の魔法）",
     "caller": "zap.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 160,
@@ -1437,7 +1914,10 @@
     "description": "ボウリングの球が転がるような音（転がる物体）",
     "caller": "trap.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 161,
@@ -1446,7 +1926,10 @@
     "description": "ガサゴソと何かを捜索する音（探索中のモンスター）",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 162,
@@ -1455,7 +1938,10 @@
     "description": "ウォーという召喚の呪文を唱える声",
     "caller": "mcastu.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 163,
@@ -1464,7 +1950,10 @@
     "description": "誰かが叫ぶ声（警衛の呼び声・緊急事態）",
     "caller": "monmove.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 164,
@@ -1473,7 +1962,10 @@
     "description": "バシャッと水が跳ねる音（水中落下・投擲）",
     "caller": "dbridge.c, do.c, dothrow.c, mthrowu.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 165,
@@ -1482,7 +1974,10 @@
     "description": "卵がぐしゃっと潰れる音（投擲命中）",
     "caller": "mthrowu.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 166,
@@ -1491,7 +1986,10 @@
     "description": "丸呑みモンスターに消化されグシャッとなる音",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 167,
@@ -1500,7 +1998,10 @@
     "description": "ギャーギャーという鳥の鳴き声",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 168,
@@ -1509,7 +2010,10 @@
     "description": "チューという動物の高い鳴き声・きしみ音",
     "caller": "sounds.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 169,
@@ -1518,7 +2022,10 @@
     "description": "皮袋の笛（バグパイプ）チューニング音 — ラ音（A）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 170,
@@ -1527,7 +2034,10 @@
     "description": "皮袋の笛チューニング音 — シ音（B）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 171,
@@ -1536,7 +2046,10 @@
     "description": "皮袋の笛チューニング音 — シ♭音（B♭）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 172,
@@ -1545,7 +2058,10 @@
     "description": "皮袋の笛チューニング音 — ド音（C）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 173,
@@ -1554,7 +2070,10 @@
     "description": "皮袋の笛チューニング音 — レ音（D）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 174,
@@ -1563,7 +2082,10 @@
     "description": "皮袋の笛チューニング音 — レ♭音（D♭）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 175,
@@ -1572,7 +2094,10 @@
     "description": "皮袋の笛チューニング音 — ミ音（E）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 176,
@@ -1581,7 +2106,10 @@
     "description": "皮袋の笛チューニング音 — ミ♭音（E♭）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 177,
@@ -1590,7 +2118,10 @@
     "description": "皮袋の笛チューニング音 — ファ音（F）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 178,
@@ -1599,7 +2130,10 @@
     "description": "皮袋の笛チューニング音 — ファ♯音（F♯）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 179,
@@ -1608,7 +2142,10 @@
     "description": "皮袋の笛チューニング音 — ソ音（G）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 180,
@@ -1617,7 +2154,10 @@
     "description": "皮袋の笛チューニング音 — ソ♯音（G♯）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 181,
@@ -1626,7 +2166,10 @@
     "description": "キーッという甲高い叫び声・きしみ",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 182,
@@ -1635,7 +2178,10 @@
     "description": "グチャッという湿った踏みつけ音",
     "caller": "sit.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 183,
@@ -1644,7 +2190,10 @@
     "description": "バキッと石が割れる音（岩石魔法・爆発）",
     "caller": "explode.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 184,
@@ -1653,7 +2202,10 @@
     "description": "ガラガラと石が崩れ落ちる音",
     "caller": "explode.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 185,
@@ -1662,7 +2214,10 @@
     "description": "ヒュッと素早く風を切る音（飛道具・魔法）",
     "caller": "lock.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 186,
@@ -1671,7 +2226,10 @@
     "description": "剣の刃がシャリーンと鳴る音（法具の認識）",
     "caller": "apply.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 187,
@@ -1680,7 +2238,10 @@
     "description": "ドスンという重い着地・衝突音",
     "caller": "worn.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 188,
@@ -1689,7 +2250,10 @@
     "description": "ドンという鈍い衝突音",
     "caller": "music.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 189,
@@ -1698,7 +2262,10 @@
     "description": "ドカーンと轟く雷鳴（祈り・神罰）",
     "caller": "pray.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 190,
@@ -1707,7 +2274,10 @@
     "description": "鍵穴のタンブラーがハマってカチッと鳴る音",
     "caller": "music.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 191,
@@ -1716,7 +2286,10 @@
     "description": "カタカタとタイプライターを打つような音（占術使用）",
     "caller": "apply.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 192,
@@ -1725,7 +2298,10 @@
     "description": "ウオーッと泣き叫ぶ声（アンデッドや呪い）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 193,
@@ -1734,7 +2310,10 @@
     "description": "バンシーの死を予告する絶叫（バンシーの遭遇）",
     "caller": "hack.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 194,
@@ -1743,7 +2322,10 @@
     "description": "ズズーンと重く響く力場・バリア音（魔法壁）",
     "caller": "apply.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 195,
@@ -1752,7 +2334,10 @@
     "description": "キャンという短い悲鳴",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 196,
@@ -1761,7 +2346,10 @@
     "description": "ビビッという魔法・電撃の発射音",
     "caller": "muse.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 197,
@@ -1770,7 +2358,322 @@
     "description": "ビビッからドカンという魔法爆発音",
     "caller": "muse.c",
     "category": "effect",
-    "sub_category": "Soundeffect"
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
+  },
+  {
+    "no": 198,
+    "filename": "se_combat_hit_slash.ogg",
+    "id": "se_combat_hit_slash",
+    "description": "刃物・刀剣・斧による斬撃ヒット音",
+    "caller": "uhitm.c, mhitu.c, mhitm.c, dothrow.c",
+    "category": "combat",
+    "sub_category": "melee",
+    "sub_category_ja": "近接（斬撃）",
+    "keywords_ja": "斬撃 剣 刀 斧 攻撃",
+    "keywords_en": "sword slash blade cut hit attack"
+  },
+  {
+    "no": 199,
+    "filename": "se_combat_hit_blunt.ogg",
+    "id": "se_combat_hit_blunt",
+    "description": "鈍器・棍棒・石・打撃武器によるヒット音",
+    "caller": "uhitm.c, mhitu.c, mhitm.c, dothrow.c",
+    "category": "combat",
+    "sub_category": "melee",
+    "sub_category_ja": "近接（打撃）",
+    "keywords_ja": "打撃 鈍器 メイス 棍棒 殴る",
+    "keywords_en": "blunt hit mace club strike punch smack"
+  },
+  {
+    "no": 200,
+    "filename": "se_combat_hit_pierce.ogg",
+    "id": "se_combat_hit_pierce",
+    "description": "槍・刺突武器・矢弾による貫通ヒット音",
+    "caller": "uhitm.c, mhitu.c, mhitm.c, dothrow.c",
+    "category": "combat",
+    "sub_category": "melee",
+    "sub_category_ja": "近接（刺突）",
+    "keywords_ja": "刺突 槍 突き 短剣 刺す",
+    "keywords_en": "pierce spear stab thrust dagger jab"
+  },
+  {
+    "no": 201,
+    "filename": "se_combat_hit_unarmed.ogg",
+    "id": "se_combat_hit_unarmed",
+    "description": "素手格闘・パンチ・キックによる打撃ヒット音",
+    "caller": "uhitm.c, mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "melee",
+    "sub_category_ja": "近接（素手/格闘）",
+    "keywords_ja": "素手 格闘 パンチ キック 殴打",
+    "keywords_en": "punch fist kick unarmed melee hit combat"
+  },
+  {
+    "no": 202,
+    "filename": "se_combat_miss.ogg",
+    "id": "se_combat_miss",
+    "description": "攻撃の空振り音（風切り音）",
+    "caller": "uhitm.c, mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "melee",
+    "sub_category_ja": "近接（空振り）",
+    "keywords_ja": "風切り音 空振り 武器 振る ヒュッ",
+    "keywords_en": "whoosh swing miss weapon swoosh air"
+  },
+  {
+    "no": 203,
+    "filename": "se_combat_shoot_bow.ogg",
+    "id": "se_combat_shoot_bow",
+    "description": "弓矢の発射音（弦を弾く音）",
+    "caller": "dothrow.c, mthrowu.c",
+    "category": "combat",
+    "sub_category": "ranged",
+    "sub_category_ja": "遠隔（弓発射）",
+    "keywords_ja": "弓 矢 発射 射撃 弦 ビュン",
+    "keywords_en": "bow arrow shoot release arrow shot"
+  },
+  {
+    "no": 204,
+    "filename": "se_combat_shoot_crossbow.ogg",
+    "id": "se_combat_shoot_crossbow",
+    "description": "クロスボウの発射音（バネ解放音）",
+    "caller": "dothrow.c, mthrowu.c",
+    "category": "combat",
+    "sub_category": "ranged",
+    "sub_category_ja": "遠隔（クロスボウ）",
+    "keywords_ja": "クロスボウ ボウガン 発射 カシュッ 機械",
+    "keywords_en": "crossbow bolt shoot mechanical trigger launch"
+  },
+  {
+    "no": 205,
+    "filename": "se_combat_shoot_sling.ogg",
+    "id": "se_combat_shoot_sling",
+    "description": "スリング（投石器）の旋回・射出音",
+    "caller": "dothrow.c, mthrowu.c",
+    "category": "combat",
+    "sub_category": "ranged",
+    "sub_category_ja": "遠隔（スリング）",
+    "keywords_ja": "スリング 投石器 投石 ヒュルッ 旋回",
+    "keywords_en": "sling stone sling throw shot whirl bullet"
+  },
+  {
+    "no": 206,
+    "filename": "se_combat_throw.ogg",
+    "id": "se_combat_throw",
+    "description": "手投げによる投擲音",
+    "caller": "dothrow.c, mthrowu.c",
+    "category": "combat",
+    "sub_category": "ranged",
+    "sub_category_ja": "遠隔（一般投擲）",
+    "keywords_ja": "投擲 投げる 物 手投げ ビュッ",
+    "keywords_en": "throw toss weapon throw object whoosh"
+  },
+  {
+    "no": 207,
+    "filename": "se_combat_throw_boomerang.ogg",
+    "id": "se_combat_throw_boomerang",
+    "description": "ブーメランの旋回投擲音",
+    "caller": "dothrow.c",
+    "category": "combat",
+    "sub_category": "ranged",
+    "sub_category_ja": "遠隔（ブーメラン）",
+    "keywords_ja": "ブーメラン 投擲 回転 風切り ヒュンヒュン",
+    "keywords_en": "boomerang throw spinning whirr swoosh"
+  },
+  {
+    "no": 208,
+    "filename": "se_combat_throw_mjollnir.ogg",
+    "id": "se_combat_throw_mjollnir",
+    "description": "ミョルニルの電撃を帯びた豪快な投擲音",
+    "caller": "dothrow.c",
+    "category": "combat",
+    "sub_category": "ranged",
+    "sub_category_ja": "遠隔（ミョルニル）",
+    "keywords_ja": "ハンマー 投擲 雷 電撃 豪快 神聖",
+    "keywords_en": "hammer throw lightning thunder heavy strike"
+  },
+  {
+    "no": 209,
+    "filename": "se_combat_miss_thud.ogg",
+    "id": "se_combat_miss_thud",
+    "description": "飛翔体が外れて壁や床に激突する音",
+    "caller": "dothrow.c, mthrowu.c",
+    "category": "combat",
+    "sub_category": "ranged",
+    "sub_category_ja": "遠隔（外れ衝突）",
+    "keywords_ja": "衝突 矢 壁 床 落ちる バシッ コツッ",
+    "keywords_en": "thud arrow hit wall impact ground miss bounce"
+  },
+  {
+    "no": 210,
+    "filename": "se_combat_spell_cast.ogg",
+    "id": "se_combat_spell_cast",
+    "description": "呪文の詠唱・魔法発動音",
+    "caller": "spell.c, mcastu.c",
+    "category": "combat",
+    "sub_category": "magic",
+    "sub_category_ja": "魔法（呪文詠唱）",
+    "keywords_ja": "呪文 魔法 詠唱 発動 魔力 キィン",
+    "keywords_en": "magic spell cast aura arcane energy"
+  },
+  {
+    "no": 211,
+    "filename": "se_combat_wand_zap.ogg",
+    "id": "se_combat_wand_zap",
+    "description": "杖を振った際の発動音",
+    "caller": "zap.c, muse.c",
+    "category": "combat",
+    "sub_category": "magic",
+    "sub_category_ja": "魔法（杖発動）",
+    "keywords_ja": "杖 ワンド 発射 光線 ビビッ ピシュッ",
+    "keywords_en": "magic wand zap beam ray laser spark"
+  },
+  {
+    "no": 212,
+    "filename": "se_mon_claw.ogg",
+    "id": "se_mon_claw",
+    "description": "モンスターの爪による引き裂き音",
+    "caller": "mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "monster",
+    "sub_category_ja": "モンスター（爪）",
+    "keywords_ja": "モンスター 爪 ひっかき 引き裂き シャッ 獣",
+    "keywords_en": "monster claw slash scratch beast beastly"
+  },
+  {
+    "no": 213,
+    "filename": "se_mon_bite.ogg",
+    "id": "se_mon_bite",
+    "description": "モンスターの噛みつき音",
+    "caller": "mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "monster",
+    "sub_category_ja": "モンスター（噛みつき）",
+    "keywords_ja": "噛む 噛みつき 牙 ガブッ モンスター 肉",
+    "keywords_en": "monster bite chomp beast teeth jaws crunch"
+  },
+  {
+    "no": 214,
+    "filename": "se_mon_sting.ogg",
+    "id": "se_mon_sting",
+    "description": "モンスターの毒針・刺突音",
+    "caller": "mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "monster",
+    "sub_category_ja": "モンスター（毒針）",
+    "keywords_ja": "毒針 刺す チクッ サソリ 蜂 針",
+    "keywords_en": "sting stinger insect scorpion wasp prick pierce"
+  },
+  {
+    "no": 215,
+    "filename": "se_mon_butt.ogg",
+    "id": "se_mon_butt",
+    "description": "モンスターの角・頭突き衝突音",
+    "caller": "mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "monster",
+    "sub_category_ja": "モンスター（角/頭突き）",
+    "keywords_ja": "頭突き 角 突進 ゴスッ 雄牛 衝突",
+    "keywords_en": "headbutt horn ram blunt bash charge bull"
+  },
+  {
+    "no": 216,
+    "filename": "se_mon_touch.ogg",
+    "id": "se_mon_touch",
+    "description": "モンスターの接触・麻痺音",
+    "caller": "mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "monster",
+    "sub_category_ja": "モンスター（接触/麻痺）",
+    "keywords_ja": "霊体 触れる 接触 麻痺 不気味 ゾクッ ゴースト",
+    "keywords_en": "ghostly touch paralyze eerie chill phantom undead"
+  },
+  {
+    "no": 217,
+    "filename": "se_mon_tentacle.ogg",
+    "id": "se_mon_tentacle",
+    "description": "触手による攻撃・絡みつき音",
+    "caller": "mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "monster",
+    "sub_category_ja": "モンスター（触手）",
+    "keywords_ja": "触手 ヌチャッ 絡みつき クラーケン 吸血",
+    "keywords_en": "tentacle squish slimy whip suction monster"
+  },
+  {
+    "no": 218,
+    "filename": "se_mon_kick.ogg",
+    "id": "se_mon_kick",
+    "description": "モンスターの蹴り・踏みつけ音",
+    "caller": "mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "monster",
+    "sub_category_ja": "モンスター（蹴り/蹄）",
+    "keywords_ja": "蹴り 蹄 ドカッ 馬 キック 踏みつけ",
+    "keywords_en": "hoof kick horse beast stomp donkey heavy"
+  },
+  {
+    "no": 219,
+    "filename": "se_mon_hug.ogg",
+    "id": "se_mon_hug",
+    "description": "締めつけ・怪力による抱き締め音",
+    "caller": "mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "monster",
+    "sub_category_ja": "モンスター（締めつけ）",
+    "keywords_ja": "締め付け 抱き締め 怪力 圧迫 メキッ ギシッ クマ",
+    "keywords_en": "bear hug crush squeeze constrict squeeze bone"
+  },
+  {
+    "no": 220,
+    "filename": "se_mon_gaze.ogg",
+    "id": "se_mon_gaze",
+    "description": "凝視・魔眼による視線攻撃音",
+    "caller": "mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "monster",
+    "sub_category_ja": "モンスター（視線/凝視）",
+    "keywords_ja": "視線 凝視 魔眼 石化 キィーーン 催眠",
+    "keywords_en": "evil gaze stare petrify eye psychic hypnosis"
+  },
+  {
+    "no": 221,
+    "filename": "se_mon_engulf.ogg",
+    "id": "se_mon_engulf",
+    "description": "丸呑み・呑み込み音",
+    "caller": "mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "monster",
+    "sub_category_ja": "モンスター（丸呑み）",
+    "keywords_ja": "丸呑み 呑み込み ゴクッ スライム 捕食",
+    "keywords_en": "engulf swallow gulp digest slime stomach absorb"
+  },
+  {
+    "no": 222,
+    "filename": "se_mon_breath.ogg",
+    "id": "se_mon_breath",
+    "description": "ドラゴン等のブレス放出音",
+    "caller": "mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "monster",
+    "sub_category_ja": "モンスター（ブレス）",
+    "keywords_ja": "ドラゴン ブレス 息吹 ゴォォッ 火炎 咆哮 炎",
+    "keywords_en": "dragon breath roar fire blast exhale flame"
+  },
+  {
+    "no": 223,
+    "filename": "se_mon_spit.ogg",
+    "id": "se_mon_spit",
+    "description": "毒液・酸の吐出音",
+    "caller": "mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "monster",
+    "sub_category_ja": "モンスター（吐出/毒液）",
+    "keywords_ja": "毒液 酸 吐く 唾 飛沫 ピュッ ジュッ コブラ",
+    "keywords_en": "spit acid venom liquid squirt snake hiss"
   },
   {
     "no": 1,
@@ -1779,7 +2682,10 @@
     "description": "タイトル・スプラッシュ画面が表示される時の音",
     "caller": "allmain.c",
     "category": "achievement",
-    "sub_category": "SystemEvent"
+    "sub_category": "SystemEvent",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 2,
@@ -1788,7 +2694,10 @@
     "description": "スプラッシュなしで新規ゲームを開始する時の音",
     "caller": "allmain.c",
     "category": "achievement",
-    "sub_category": "SystemEvent"
+    "sub_category": "SystemEvent",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 3,
@@ -1797,7 +2706,10 @@
     "description": "経験値レベルがアップした時のファンファーレ音",
     "caller": "exper.c",
     "category": "achievement",
-    "sub_category": "SystemEvent"
+    "sub_category": "SystemEvent",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 4,
@@ -1806,7 +2718,10 @@
     "description": "経験値レベルがダウンした時の音（ドレイン等）",
     "caller": "exper.c",
     "category": "achievement",
-    "sub_category": "SystemEvent"
+    "sub_category": "SystemEvent",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 1,
@@ -1815,7 +2730,10 @@
     "description": "「開封の鐘」を入手した時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 2,
@@ -1824,7 +2742,10 @@
     "description": "ゲヘナ（地獄）に入った時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 3,
@@ -1833,7 +2754,10 @@
     "description": "「召喚の燭台」を入手した時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 4,
@@ -1842,7 +2766,10 @@
     "description": "「死者の書」を入手した時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 5,
@@ -1851,7 +2778,10 @@
     "description": "聖域へのアクセスのため召喚を行った時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 6,
@@ -1860,7 +2790,10 @@
     "description": "「ヨェンダーのアミュレット」を入手した時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 7,
@@ -1869,7 +2802,10 @@
     "description": "エンドゲームに突入した時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 8,
@@ -1878,7 +2814,10 @@
     "description": "アストラル界に足を踏み入れた時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 9,
@@ -1887,7 +2826,10 @@
     "description": "ゲームを昇天クリアした時のクリア音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 10,
@@ -1896,7 +2838,10 @@
     "description": "坑道の終点のラッキーストーンを入手した時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 11,
@@ -1905,7 +2850,10 @@
     "description": "倉庫番のバッグまたはアミュレットを入手した時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 12,
@@ -1914,7 +2862,10 @@
     "description": "メデューサを倒した時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 13,
@@ -1923,7 +2874,10 @@
     "description": "ノーム坑道に入った時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 14,
@@ -1932,7 +2886,10 @@
     "description": "坑道の町（マインタウン）に到達した時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 15,
@@ -1941,7 +2898,10 @@
     "description": "店に入った時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 16,
@@ -1950,7 +2910,10 @@
     "description": "寺院に入った時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 17,
@@ -1959,7 +2922,10 @@
     "description": "神託の神官（オラクル）に相談した時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 18,
@@ -1968,7 +2934,10 @@
     "description": "倉庫番（ソコバン）に入った時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 19,
@@ -1977,7 +2946,10 @@
     "description": "城の跳ね橋の演奏チューンを発見した時の実績音",
     "caller": "insight.c",
     "category": "achievement",
-    "sub_category": "GameAchievement"
+    "sub_category": "GameAchievement",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 1,
@@ -1986,7 +2958,10 @@
     "description": "木製フルートの演奏音（蛇を魅了する効果）（A音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 2,
@@ -1995,7 +2970,10 @@
     "description": "木製フルートの演奏音（蛇を魅了する効果）（B音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 3,
@@ -2004,7 +2982,10 @@
     "description": "木製フルートの演奏音（蛇を魅了する効果）（C音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 4,
@@ -2013,7 +2994,10 @@
     "description": "木製フルートの演奏音（蛇を魅了する効果）（D音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 5,
@@ -2022,7 +3006,10 @@
     "description": "木製フルートの演奏音（蛇を魅了する効果）（E音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 6,
@@ -2031,7 +3018,10 @@
     "description": "木製フルートの演奏音（蛇を魅了する効果）（F音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 7,
@@ -2040,7 +3030,10 @@
     "description": "木製フルートの演奏音（蛇を魅了する効果）（G音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 8,
@@ -2049,7 +3042,10 @@
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（A音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 9,
@@ -2058,7 +3054,10 @@
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（B音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 10,
@@ -2067,7 +3066,10 @@
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（C音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 11,
@@ -2076,7 +3078,10 @@
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（D音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 12,
@@ -2085,7 +3090,10 @@
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（E音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 13,
@@ -2094,7 +3102,10 @@
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（F音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 14,
@@ -2103,7 +3114,10 @@
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（G音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 15,
@@ -2112,7 +3126,10 @@
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（A音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 16,
@@ -2121,7 +3138,10 @@
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（B音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 17,
@@ -2130,7 +3150,10 @@
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（C音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 18,
@@ -2139,7 +3162,10 @@
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（D音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 19,
@@ -2148,7 +3174,10 @@
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（E音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 20,
@@ -2157,7 +3186,10 @@
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（F音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 21,
@@ -2166,7 +3198,10 @@
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（G音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 22,
@@ -2175,7 +3210,10 @@
     "description": "ラッパの演奏音（兵士を起こす）（A音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 23,
@@ -2184,7 +3222,10 @@
     "description": "ラッパの演奏音（兵士を起こす）（B音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 24,
@@ -2193,7 +3234,10 @@
     "description": "ラッパの演奏音（兵士を起こす）（C音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 25,
@@ -2202,7 +3246,10 @@
     "description": "ラッパの演奏音（兵士を起こす）（D音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 26,
@@ -2211,7 +3258,10 @@
     "description": "ラッパの演奏音（兵士を起こす）（E音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 27,
@@ -2220,7 +3270,10 @@
     "description": "ラッパの演奏音（兵士を起こす）（F音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 28,
@@ -2229,7 +3282,10 @@
     "description": "ラッパの演奏音（兵士を起こす）（G音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 29,
@@ -2238,7 +3294,10 @@
     "description": "木製ハープの演奏音（ニンフを魅了する）（A音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 30,
@@ -2247,7 +3306,10 @@
     "description": "木製ハープの演奏音（ニンフを魅了する）（B音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 31,
@@ -2256,7 +3318,10 @@
     "description": "木製ハープの演奏音（ニンフを魅了する）（C音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 32,
@@ -2265,7 +3330,10 @@
     "description": "木製ハープの演奏音（ニンフを魅了する）（D音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 33,
@@ -2274,7 +3342,10 @@
     "description": "木製ハープの演奏音（ニンフを魅了する）（E音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 34,
@@ -2283,7 +3354,10 @@
     "description": "木製ハープの演奏音（ニンフを魅了する）（F音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 35,
@@ -2292,7 +3366,10 @@
     "description": "木製ハープの演奏音（ニンフを魅了する）（G音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 36,
@@ -2301,7 +3378,10 @@
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（A音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 37,
@@ -2310,7 +3390,10 @@
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（B音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 38,
@@ -2319,7 +3402,10 @@
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（C音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 39,
@@ -2328,7 +3414,10 @@
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（D音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 40,
@@ -2337,7 +3426,10 @@
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（E音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 41,
@@ -2346,7 +3438,10 @@
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（F音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 42,
@@ -2355,7 +3450,10 @@
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（G音）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "VariablePitch"
+    "sub_category": "VariablePitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 43,
@@ -2364,7 +3462,10 @@
     "description": "凍結の角笛の演奏音（冷気の魔法効果）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "FixedPitch"
+    "sub_category": "FixedPitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 44,
@@ -2373,7 +3474,10 @@
     "description": "火炎の角笛の演奏音（炎の魔法効果）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "FixedPitch"
+    "sub_category": "FixedPitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 45,
@@ -2382,7 +3486,10 @@
     "description": "ベル・鈴の演奏音（鐘の識別）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "FixedPitch"
+    "sub_category": "FixedPitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 46,
@@ -2391,7 +3498,10 @@
     "description": "地震の太鼓の演奏音（ランダムな落とし穴を生成）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "FixedPitch"
+    "sub_category": "FixedPitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 47,
@@ -2400,7 +3510,10 @@
     "description": "革製太鼓の演奏音（周囲のモンスターを起こす）",
     "caller": "apply.c, music.c",
     "category": "instrument",
-    "sub_category": "FixedPitch"
+    "sub_category": "FixedPitch",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 1,
@@ -2409,7 +3522,10 @@
     "description": "神（アライメント神）の声・天からの啓示（祈り応答・神罰・神恩寵）",
     "caller": "pray.c, minion.c, read.c, teleport.c",
     "category": "voice",
-    "sub_category": "SetVoice"
+    "sub_category": "SetVoice",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 2,
@@ -2418,7 +3534,10 @@
     "description": "神託の神官（オラクル）の神秘的な囁き声",
     "caller": "rumors.c",
     "category": "voice",
-    "sub_category": "SetVoice"
+    "sub_category": "SetVoice",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 3,
@@ -2427,7 +3546,10 @@
     "description": "意志を持つアーティファクトの発話音",
     "caller": "artifact.c",
     "category": "voice",
-    "sub_category": "SetVoice"
+    "sub_category": "SetVoice",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 4,
@@ -2436,7 +3558,10 @@
     "description": "玉座に座った時に聞こえる声（魔法の玉座からの啓示）",
     "caller": "sit.c",
     "category": "voice",
-    "sub_category": "SetVoice"
+    "sub_category": "SetVoice",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 5,
@@ -2445,7 +3570,10 @@
     "description": "死神・死の声（死の女神への降伏場面）",
     "caller": "sounds.c",
     "category": "voice",
-    "sub_category": "SetVoice"
+    "sub_category": "SetVoice",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 6,
@@ -2454,7 +3582,10 @@
     "description": "店主の挨拶・売買交渉・怒りの掛け声",
     "caller": "apply.c, shk.c",
     "category": "voice",
-    "sub_category": "SetVoice"
+    "sub_category": "SetVoice",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 7,
@@ -2463,6 +3594,9 @@
     "description": "モンスターおよびNPCの一般的な会話・鳴き声",
     "caller": "sounds.c, vault.c, priest.c, その他多数",
     "category": "voice",
-    "sub_category": "SetVoice"
+    "sub_category": "SetVoice",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
   }
 ]

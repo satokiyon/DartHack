@@ -2,13 +2,32 @@
 let soundList = [];
 let currentFilter = 'all';
 let currentCategory = 'all';
+let currentCombatSub = 'all';
 let searchQuery = '';
 
 let activeTargetItem = null;
 let activeSelectedFile = null;
 
+// URLクエリパラメータの初期解析 (?category=combat 等)
+const urlParams = new URLSearchParams(window.location.search);
+const initialCategoryParam = urlParams.get('category');
+if (initialCategoryParam) {
+  currentCategory = initialCategoryParam;
+}
+
 // キーワード抽出ヘルパー
-function extractKeywords(desc, id) {
+function extractKeywords(item) {
+  // アイテム固有の特化キーワードが定義されていれば最優先
+  if (item.keywords_ja || item.keywords_en) {
+    return {
+      ja: item.keywords_ja || item.description,
+      en: item.keywords_en || item.id.replace(/^(se_|sound_|ach_|sa2_|voice_)/, '').replace(/_/g, ' ')
+    };
+  }
+
+  const desc = item.description || '';
+  const id = item.id || '';
+
   // 括弧内を除去
   let cleanDesc = desc.replace(/（.*?）/g, '').replace(/\(.*?\)/g, '').trim();
   // 「〜の音」「〜する音」などを整理
@@ -25,7 +44,7 @@ function extractKeywords(desc, id) {
 
 // 13サイトの外部検索URL生成
 function getSearchUrls(item) {
-  const kw = extractKeywords(item.description, item.id);
+  const kw = extractKeywords(item);
   const qJa = encodeURIComponent(kw.ja);
   const qEn = encodeURIComponent(kw.en);
 
@@ -83,6 +102,9 @@ function renderCards() {
     // カテゴリフィルタ
     if (currentCategory !== 'all' && item.category !== currentCategory) return false;
 
+    // 戦闘サブカテゴリフィルタ
+    if (currentCategory === 'combat' && currentCombatSub !== 'all' && item.sub_category !== currentCombatSub) return false;
+
     // 検索クエリ
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -90,7 +112,9 @@ function renderCards() {
       const matchId = item.id.toLowerCase().includes(q);
       const matchDesc = item.description.toLowerCase().includes(q);
       const matchCaller = (item.caller || '').toLowerCase().includes(q);
-      if (!matchName && !matchId && !matchDesc && !matchCaller) return false;
+      const matchKwJa = (item.keywords_ja || '').toLowerCase().includes(q);
+      const matchKwEn = (item.keywords_en || '').toLowerCase().includes(q);
+      if (!matchName && !matchId && !matchDesc && !matchCaller && !matchKwJa && !matchKwEn) return false;
     }
 
     return true;
@@ -102,6 +126,32 @@ function renderCards() {
 
     const isReady = item.status === 'ready';
     const urls = getSearchUrls(item);
+
+    // サブカテゴリバッジ
+    let subcatBadge = '';
+    if (item.sub_category) {
+      const subNames = {
+        melee: '🗡️ 近接',
+        ranged: '🏹 遠隔',
+        magic: '✨ 魔法',
+        monster: '🐾 モンスター'
+      };
+      const label = subNames[item.sub_category] || item.sub_category;
+      subcatBadge = `<span class="subcat-tag ${escapeHtml(item.sub_category)}">${escapeHtml(label)}</span>`;
+    }
+
+    // 特化検索キーワード表示
+    let keywordHintHtml = '';
+    if (item.keywords_ja || item.keywords_en) {
+      keywordHintHtml = `
+        <div class="keywords-hint">
+          <span>🔍 推奨検索語:</span>
+          <strong>${escapeHtml(item.keywords_ja || '')}</strong>
+          <span style="color:#64748b;">/</span>
+          <span>${escapeHtml(item.keywords_en || '')}</span>
+        </div>
+      `;
+    }
 
     let bodyHtml = '';
     if (isReady) {
@@ -155,10 +205,14 @@ function renderCards() {
 
     card.innerHTML = `
       <div class="card-header">
-        <div class="card-title">${escapeHtml(item.filename)}</div>
+        <div style="display:flex; align-items:center; flex-wrap:wrap;">
+          <div class="card-title">${escapeHtml(item.filename)}</div>
+          ${subcatBadge}
+        </div>
         <span class="status-tag ${item.status}">${isReady ? '確定済' : '未設定'}</span>
       </div>
       <div class="card-desc">${escapeHtml(item.description)}</div>
+      ${keywordHintHtml}
       <div class="card-caller">呼び出し: ${escapeHtml(item.caller || '-')} (ID: ${escapeHtml(item.id)})</div>
       ${bodyHtml}
     `;
@@ -369,8 +423,16 @@ async function deleteSound(id) {
   }
 }
 
+// 戦闘サブコントロールバーの表示/非表示同期
+function updateCombatSubControlsVisibility() {
+  const subControls = document.getElementById('combatSubControls');
+  if (subControls) {
+    subControls.style.display = (currentCategory === 'combat') ? 'flex' : 'none';
+  }
+}
+
 // フィルタ・検索イベントリスナー
-document.querySelectorAll('.filter-btn').forEach(btn => {
+document.querySelectorAll('.filter-btn[data-filter], .filter-btn[data-cat]').forEach(btn => {
   btn.addEventListener('click', () => {
     if (btn.dataset.filter) {
       document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
@@ -385,7 +447,18 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
       } else {
         currentCategory = 'all';
       }
+      updateCombatSubControlsVisibility();
     }
+    renderCards();
+  });
+});
+
+// 戦闘サブカテゴリ切り替えボタン
+document.querySelectorAll('.subcat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.subcat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCombatSub = btn.dataset.combatSub || 'all';
     renderCards();
   });
 });
@@ -405,5 +478,16 @@ function escapeJs(str) {
   return str.replace(/'/g, "\\'");
 }
 
+// URLパラメータによる初期アクティブボタン状態の復元
+if (initialCategoryParam) {
+  const targetCatBtn = document.querySelector(`.filter-btn[data-cat="${initialCategoryParam}"]`);
+  if (targetCatBtn) {
+    document.querySelectorAll('.filter-btn[data-cat]').forEach(b => b.classList.remove('active'));
+    targetCatBtn.classList.add('active');
+  }
+}
+updateCombatSubControlsVisibility();
+
 // 初期ロード
 loadData();
+

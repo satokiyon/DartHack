@@ -235,11 +235,11 @@ Cコアの `include/seffects.h` に定義されている 223 種の効果音 ID 
 | 216 | `se_mon_touch.ogg` | `se_mon_touch` | モンスターの接触・麻痺音 | mhitu.c, mhitm.c |
 | 217 | `se_mon_tentacle.ogg` | `se_mon_tentacle` | 触手による攻撃・絡みつき音 | mhitu.c, mhitm.c |
 | 218 | `se_mon_kick.ogg` | `se_mon_kick` | モンスターの蹴り・踏みつけ音 | mhitu.c, mhitm.c |
-| 219 | `se_mon_crush.ogg` | `se_mon_crush` | 押し潰し・怪力による圧殺音 | mhitu.c, mhitm.c |
+| 219 | `se_mon_hug.ogg` | `se_mon_hug` | 締めつけ・怪力による抱き締め音 | mhitu.c, mhitm.c |
 | 220 | `se_mon_gaze.ogg` | `se_mon_gaze` | 凝視・魔眼による視線攻撃音 | mhitu.c, mhitm.c |
-| 221 | `se_mon_breath.ogg` | `se_mon_breath` | ドラゴン等のブレス放出音 | mhitu.c, mhitm.c |
-| 222 | `se_mon_spit.ogg` | `se_mon_spit` | 毒液・酸の吐出音 | mhitu.c, mhitm.c |
-| 223 | `se_mon_gulp.ogg` | `se_mon_gulp` | 丸呑み・呑み込み音 | mhitu.c, mhitm.c |
+| 221 | `se_mon_engulf.ogg` | `se_mon_engulf` | 丸呑み・呑み込み音 | mhitu.c, mhitm.c |
+| 222 | `se_mon_breath.ogg` | `se_mon_breath` | ドラゴン等のブレス放出音 | mhitu.c, mhitm.c |
+| 223 | `se_mon_spit.ogg` | `se_mon_spit` | 毒液・酸の吐出音 | mhitu.c, mhitm.c |
 
 > **詳細仕様**: 各戦闘アクション効果音の詳細な判定ロジック、音量制御（不可視40%気配察知）、および素材制作指針は [combat_sound_specification.md](combat_sound_specification.md) を参照してください。
 

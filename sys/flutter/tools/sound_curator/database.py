@@ -17,36 +17,49 @@ SOUNDS_DIR = CUR_DIR.parent.parent / "assets" / "sounds"
 ATTRIBUTIONS_PATH = SOUNDS_DIR / "attributions.txt"
 
 def load_or_init_database() -> List[Dict[str, Any]]:
-    """データベースを読み込む。存在しない場合は definitions から初期化する"""
+    """データベースを読み込む。新定義があれば既存の入力状態を保持しつつ自動統合する"""
+    definitions = json.loads(DEFINITIONS_PATH.read_text(encoding="utf-8"))
+    existing_map = {}
     if DATABASE_PATH.exists():
         try:
-            return json.loads(DATABASE_PATH.read_text(encoding="utf-8"))
+            existing_db = json.loads(DATABASE_PATH.read_text(encoding="utf-8"))
+            existing_map = {item["filename"]: item for item in existing_db}
         except Exception:
             pass
 
-    definitions = json.loads(DEFINITIONS_PATH.read_text(encoding="utf-8"))
     db = []
-
     for item in definitions:
         filename = item["filename"]
         target_ogg = SOUNDS_DIR / filename
         is_ready = target_ogg.exists() and target_ogg.stat().st_size > 0
 
-        record = {
-            "no": item["no"],
-            "filename": filename,
-            "id": item["id"],
-            "description": item["description"],
-            "caller": item["caller"],
-            "category": item["category"],
-            "sub_category": item["sub_category"],
-            "status": "ready" if is_ready else "pending",
-            "source_site": "FluidR3 GM (FluidSynth)" if is_ready and item["category"] == "instrument" else "",
-            "author": "Frank Wen" if is_ready and item["category"] == "instrument" else "",
-            "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2" if is_ready and item["category"] == "instrument" else "",
-            "license": "MIT / GPL" if is_ready and item["category"] == "instrument" else "",
-            "notes": "SoundFont auto-sampled note" if is_ready and item["category"] == "instrument" else ""
-        }
+        if filename in existing_map:
+            record = existing_map[filename]
+            # 新しいメタデータをマージ（カテゴリ、サブカテゴリ、キーワード等）
+            for k in ["no", "id", "description", "caller", "category", "sub_category", "sub_category_ja", "keywords_ja", "keywords_en"]:
+                if k in item:
+                    record[k] = item[k]
+            if is_ready and record.get("status") != "ready":
+                record["status"] = "ready"
+        else:
+            record = {
+                "no": item["no"],
+                "filename": filename,
+                "id": item["id"],
+                "description": item["description"],
+                "caller": item["caller"],
+                "category": item["category"],
+                "sub_category": item.get("sub_category", ""),
+                "sub_category_ja": item.get("sub_category_ja", ""),
+                "keywords_ja": item.get("keywords_ja", ""),
+                "keywords_en": item.get("keywords_en", ""),
+                "status": "ready" if is_ready else "pending",
+                "source_site": "FluidR3 GM (FluidSynth)" if is_ready and item["category"] == "instrument" else "",
+                "author": "Frank Wen" if is_ready and item["category"] == "instrument" else "",
+                "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2" if is_ready and item["category"] == "instrument" else "",
+                "license": "MIT / GPL" if is_ready and item["category"] == "instrument" else "",
+                "notes": "SoundFont auto-sampled note" if is_ready and item["category"] == "instrument" else ""
+            }
         db.append(record)
 
     save_database(db)
