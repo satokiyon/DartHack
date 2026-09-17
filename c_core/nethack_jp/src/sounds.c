@@ -2490,31 +2490,57 @@ nh_sound_combat_vol(struct monst *magr, struct monst *mdef)
     return 0; /* 遠すぎて聞こえない */
 }
 
+/* 近接武器・アイテムヒット効果音IDを解決する（近接専用）
+ * weapon: 使用した武器・アイテム（NULLなし前提）
+ * 戻り値: 対応する se_xxx ID
+ */
+static int
+nh_sound_weapon_hit_seid(struct obj *weapon)
+{
+    /* 1. 鉄球・鎖（oclass で判定） */
+    if (weapon->oclass == BALL_CLASS || weapon->oclass == CHAIN_CLASS)
+        return se_combat_hit_ironball;
+    /* 2. 盾（近接時シールドバッシュ） */
+    if (is_shield(weapon))
+        return se_combat_hit_shield;
+    /* 3. 死体 */
+    if (weapon->otyp == CORPSE)
+        return se_combat_hit_corpse;
+    /* 4. つるはし・マトック */
+    if (is_pick(weapon))
+        return se_combat_hit_pick;
+    /* 5. 杖・ロッド */
+    if (weapon->oclass == WAND_CLASS)
+        return se_combat_hit_wand;
+    /* 6. 鞭・濡れタオル */
+    if (objects[weapon->otyp].oc_skill == P_WHIP || is_wet_towel(weapon))
+        return se_combat_hit_whip;
+    /* 7. 通常武器・武器ツールのoc_dir（SLASH/PIERCE/WHACK）*/
+    if (weapon->oclass == WEAPON_CLASS || weapon->oclass == TOOL_CLASS) {
+        int dir = objects[weapon->otyp].oc_dir;
+        if (dir & SLASH)
+            return se_combat_hit_slash;
+        if (dir & PIERCE)
+            return se_combat_hit_pierce;
+        if (dir & WHACK)
+            return se_combat_hit_blunt; /* WHACK専用 */
+    }
+    /* 8. 上記いずれにも該当しない場合（本・巻物・薬・食料・宝石等）*/
+    return se_combat_hit_other;
+}
+
 /* 近接攻撃命中音 */
 void
 nh_sound_melee_hit(struct monst *magr, struct monst *mdef, struct obj *weapon, int aatyp)
 {
     int vol = nh_sound_combat_vol(magr, mdef);
-    int seid = se_combat_hit_blunt;
+    int seid;
 
     if (vol <= 0)
         return;
 
     if (weapon) {
-        if (weapon->oclass == WEAPON_CLASS || weapon->oclass == TOOL_CLASS) {
-            int dir = objects[weapon->otyp].oc_dir;
-            if (dir & SLASH)
-                seid = se_combat_hit_slash;
-            else if (dir & PIERCE)
-                seid = se_combat_hit_pierce;
-            else if (dir & WHACK)
-                seid = se_combat_hit_blunt;
-            else
-                seid = se_combat_hit_blunt;
-        } else {
-            /* 武器以外のアイテムによる殴打 */
-            seid = se_combat_hit_blunt;
-        }
+        seid = nh_sound_weapon_hit_seid(weapon);
     } else {
         /* 素手攻撃 */
         seid = se_combat_hit_unarmed;
@@ -2604,7 +2630,7 @@ nh_sound_missile_hit(struct monst *mon, struct obj *obj, boolean hit)
             else
                 seid = se_combat_hit_blunt;
         } else {
-            seid = se_combat_hit_blunt;
+            seid = se_combat_hit_other;
         }
     } else {
         /* 外れて壁や床に当たった音 */

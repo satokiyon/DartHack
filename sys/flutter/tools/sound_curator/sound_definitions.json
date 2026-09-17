@@ -2413,6 +2413,90 @@
   },
   {
     "no": 202,
+    "filename": "se_combat_hit_whip.ogg",
+    "id": "se_combat_hit_whip",
+    "description": "鞭・濡れたタオルによる攻撃命中音",
+    "caller": "uhitm.c, mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "melee",
+    "sub_category_ja": "近接（鞭/しなり）",
+    "keywords_ja": "鞭 ムチ ピシッ 打撃 しなり",
+    "keywords_en": "whip hit lash crack strike leather whip"
+  },
+  {
+    "no": 203,
+    "filename": "se_combat_hit_ironball.ogg",
+    "id": "se_combat_hit_ironball",
+    "description": "鉄球・鉄鎖による重金属・鎖衝突音",
+    "caller": "uhitm.c, mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "melee",
+    "sub_category_ja": "近接（鉄球/鎖）",
+    "keywords_ja": "鉄球 鎖 ガシャン 重金属 衝撃",
+    "keywords_en": "iron ball chain heavy metal impact bash"
+  },
+  {
+    "no": 204,
+    "filename": "se_combat_hit_shield.ogg",
+    "id": "se_combat_hit_shield",
+    "description": "盾による重い防具シールドバッシュ音（近接限定）",
+    "caller": "uhitm.c, mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "melee",
+    "sub_category_ja": "近接（盾バッシュ）",
+    "keywords_ja": "シールド 盾 防具 バッシュ ガゴン 打撃",
+    "keywords_en": "shield bash metal shield heavy block hit"
+  },
+  {
+    "no": 205,
+    "filename": "se_combat_hit_corpse.ogg",
+    "id": "se_combat_hit_corpse",
+    "description": "死体・肉塊武器による生体打撃音",
+    "caller": "uhitm.c, mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "melee",
+    "sub_category_ja": "近接（死体/肉塊）",
+    "keywords_ja": "肉片 死体 ボコッ グチャ 生体 肉塊",
+    "keywords_en": "corpse flesh meat smack squish blunt hit"
+  },
+  {
+    "no": 206,
+    "filename": "se_combat_hit_pick.ogg",
+    "id": "se_combat_hit_pick",
+    "description": "つるはし・マトックによる硬質な採掘具打撃音",
+    "caller": "uhitm.c, mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "melee",
+    "sub_category_ja": "近接（採掘具）",
+    "keywords_ja": "つるはし マトック 採掘 ピッケル 岩石 キーン",
+    "keywords_en": "pickaxe mattock mining pick stone hit clink"
+  },
+  {
+    "no": 207,
+    "filename": "se_combat_hit_wand.ogg",
+    "id": "se_combat_hit_wand",
+    "description": "杖・ロッドによる硬く乾いた小打撃音",
+    "caller": "uhitm.c, mhitu.c, mhitm.c",
+    "category": "combat",
+    "sub_category": "melee",
+    "sub_category_ja": "近接（杖/ロッド）",
+    "keywords_ja": "杖 ロッド 細い棒 コツッ カチッ 物理",
+    "keywords_en": "wand staff light tap click stick hit"
+  },
+  {
+    "no": 208,
+    "filename": "se_combat_hit_other.ogg",
+    "id": "se_combat_hit_other",
+    "description": "未分類アイテム（本・巻物・薬・食料・宝石等）全般の汎用フォールバック打撃音",
+    "caller": "uhitm.c, mhitu.c, mhitm.c, dothrow.c, mthrowu.c",
+    "category": "combat",
+    "sub_category": "melee",
+    "sub_category_ja": "近接/汎用（その他）",
+    "keywords_ja": "物 打撃 ポンッ バシッ 雑多 アイテム",
+    "keywords_en": "item hit generic smack object blunt light"
+  },
+  {
+    "no": 209,
     "filename": "se_combat_miss.ogg",
     "id": "se_combat_miss",
     "description": "攻撃の空振り音（風切り音）",
@@ -2424,7 +2508,7 @@
     "keywords_en": "whoosh swing miss weapon swoosh air"
   },
   {
-    "no": 203,
+    "no": 210,
     "filename": "se_combat_shoot_bow.ogg",
     "id": "se_combat_shoot_bow",
     "description": "弓矢の発射音（弦を弾く音）",
@@ -2436,7 +2520,7 @@
     "keywords_en": "bow arrow shoot release arrow shot"
   },
   {
-    "no": 204,
+    "no": 211,
     "filename": "se_combat_shoot_crossbow.ogg",
     "id": "se_combat_shoot_crossbow",
     "description": "クロスボウの発射音（バネ解放音）",
@@ -2448,7 +2532,7 @@
     "keywords_en": "crossbow bolt shoot mechanical trigger launch"
   },
   {
-    "no": 205,
+    "no": 212,
     "filename": "se_combat_shoot_sling.ogg",
     "id": "se_combat_shoot_sling",
     "description": "スリング（投石器）の旋回・射出音",
@@ -2460,7 +2544,7 @@
     "keywords_en": "sling stone sling throw shot whirl bullet"
   },
   {
-    "no": 206,
+    "no": 213,
     "filename": "se_combat_throw.ogg",
     "id": "se_combat_throw",
     "description": "手投げによる投擲音",
@@ -2472,7 +2556,7 @@
     "keywords_en": "throw toss weapon throw object whoosh"
   },
   {
-    "no": 207,
+    "no": 214,
     "filename": "se_combat_throw_boomerang.ogg",
     "id": "se_combat_throw_boomerang",
     "description": "ブーメランの旋回投擲音",
@@ -2484,7 +2568,7 @@
     "keywords_en": "boomerang throw spinning whirr swoosh"
   },
   {
-    "no": 208,
+    "no": 215,
     "filename": "se_combat_throw_mjollnir.ogg",
     "id": "se_combat_throw_mjollnir",
     "description": "ミョルニルの電撃を帯びた豪快な投擲音",
@@ -2496,7 +2580,7 @@
     "keywords_en": "hammer throw lightning thunder heavy strike"
   },
   {
-    "no": 209,
+    "no": 216,
     "filename": "se_combat_miss_thud.ogg",
     "id": "se_combat_miss_thud",
     "description": "飛翔体が外れて壁や床に激突する音",
@@ -2508,7 +2592,7 @@
     "keywords_en": "thud arrow hit wall impact ground miss bounce"
   },
   {
-    "no": 210,
+    "no": 217,
     "filename": "se_combat_spell_cast.ogg",
     "id": "se_combat_spell_cast",
     "description": "呪文の詠唱・魔法発動音",
@@ -2520,7 +2604,7 @@
     "keywords_en": "magic spell cast aura arcane energy"
   },
   {
-    "no": 211,
+    "no": 218,
     "filename": "se_combat_wand_zap.ogg",
     "id": "se_combat_wand_zap",
     "description": "杖を振った際の発動音",
@@ -2532,7 +2616,7 @@
     "keywords_en": "magic wand zap beam ray laser spark"
   },
   {
-    "no": 212,
+    "no": 219,
     "filename": "se_mon_claw.ogg",
     "id": "se_mon_claw",
     "description": "モンスターの爪による引き裂き音",
@@ -2544,7 +2628,7 @@
     "keywords_en": "monster claw slash scratch beast beastly"
   },
   {
-    "no": 213,
+    "no": 220,
     "filename": "se_mon_bite.ogg",
     "id": "se_mon_bite",
     "description": "モンスターの噛みつき音",
@@ -2556,7 +2640,7 @@
     "keywords_en": "monster bite chomp beast teeth jaws crunch"
   },
   {
-    "no": 214,
+    "no": 221,
     "filename": "se_mon_sting.ogg",
     "id": "se_mon_sting",
     "description": "モンスターの毒針・刺突音",
@@ -2568,7 +2652,7 @@
     "keywords_en": "sting stinger insect scorpion wasp prick pierce"
   },
   {
-    "no": 215,
+    "no": 222,
     "filename": "se_mon_butt.ogg",
     "id": "se_mon_butt",
     "description": "モンスターの角・頭突き衝突音",
@@ -2580,7 +2664,7 @@
     "keywords_en": "headbutt horn ram blunt bash charge bull"
   },
   {
-    "no": 216,
+    "no": 223,
     "filename": "se_mon_touch.ogg",
     "id": "se_mon_touch",
     "description": "モンスターの接触・麻痺音",
@@ -2592,7 +2676,7 @@
     "keywords_en": "ghostly touch paralyze eerie chill phantom undead"
   },
   {
-    "no": 217,
+    "no": 224,
     "filename": "se_mon_tentacle.ogg",
     "id": "se_mon_tentacle",
     "description": "触手による攻撃・絡みつき音",
@@ -2604,7 +2688,7 @@
     "keywords_en": "tentacle squish slimy whip suction monster"
   },
   {
-    "no": 218,
+    "no": 225,
     "filename": "se_mon_kick.ogg",
     "id": "se_mon_kick",
     "description": "モンスターの蹴り・踏みつけ音",
@@ -2616,7 +2700,7 @@
     "keywords_en": "hoof kick horse beast stomp donkey heavy"
   },
   {
-    "no": 219,
+    "no": 226,
     "filename": "se_mon_hug.ogg",
     "id": "se_mon_hug",
     "description": "締めつけ・怪力による抱き締め音",
@@ -2628,7 +2712,7 @@
     "keywords_en": "bear hug crush squeeze constrict squeeze bone"
   },
   {
-    "no": 220,
+    "no": 227,
     "filename": "se_mon_gaze.ogg",
     "id": "se_mon_gaze",
     "description": "凝視・魔眼による視線攻撃音",
@@ -2640,7 +2724,7 @@
     "keywords_en": "evil gaze stare petrify eye psychic hypnosis"
   },
   {
-    "no": 221,
+    "no": 228,
     "filename": "se_mon_engulf.ogg",
     "id": "se_mon_engulf",
     "description": "丸呑み・呑み込み音",
@@ -2652,7 +2736,7 @@
     "keywords_en": "engulf swallow gulp digest slime stomach absorb"
   },
   {
-    "no": 222,
+    "no": 229,
     "filename": "se_mon_breath.ogg",
     "id": "se_mon_breath",
     "description": "ドラゴン等のブレス放出音",
@@ -2664,7 +2748,7 @@
     "keywords_en": "dragon breath roar fire blast exhale flame"
   },
   {
-    "no": 223,
+    "no": 230,
     "filename": "se_mon_spit.ogg",
     "id": "se_mon_spit",
     "description": "毒液・酸の吐出音",

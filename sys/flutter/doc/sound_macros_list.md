@@ -4,16 +4,16 @@
 DartHack（Flutter/FFI環境）で再生する **全 `.ogg` (Opus) 音声ファイルのマスターチェックリスト**、および **Cコアソースコード内の全 330 箇所呼び出し対照表** で構成されています。
 
 > **戦闘アクション効果音の詳細仕様書**:
-> 2026-09に追加された戦闘系効果音（No.198〜223：近接、遠隔、呪文、杖、モンスター固有攻撃12種など計26種）の音量制御、不可視40%気配察知、生データ属性自動判定、Multishot集約、60msデバウンス制御、および音響素材制作ガイドラインの詳細は、専用仕様書 [combat_sound_specification.md](combat_sound_specification.md) を参照してください。
+> 2026-09に追加された戦闘系効果音（No.198〜230：近接、遠隔、呪文、杖、モンスター固有攻撃12種、特徴的アイテム・フォールバック音など計33種）の音量制御、不可視40%気配察知、生データ属性自動判定、Multishot集約、60msデバウンス制御、および音響素材制作ガイドラインの詳細は、専用仕様書 [combat_sound_specification.md](combat_sound_specification.md) を参照してください。
 
-> **改訂履歴**: 2026-09-16 初版作成。初版レビューに基づき修正。2026-09-17 戦闘アクション効果音 26種（No.198〜223）追加および専用仕様書リンク新設。
+> **改訂履歴**: 2026-09-16 初版作成。初版レビューに基づき修正。2026-09-17 戦闘アクション効果音 33種（No.198〜230、鞭・鉄球・盾・死体・つるはし・杖・その他フォールバック追加）対応および専用仕様書リンク新設。
 
 ---
 
 ## 第1部: 音声ファイル マスター管理表（全音源チェックリスト）
 
 ### 1-A. 効果音 (`Soundeffect`) — se_*.ogg 一覧
-Cコアの `include/seffects.h` に定義されている 223 種の効果音 ID の全一覧です（戦闘アクション効果音 26種を含む）。
+Cコアの `include/seffects.h` に定義されている 230 種の効果音 ID の全一覧です（戦闘アクション効果音 33種を含む）。
 
 | No. | 音声ファイル名 (.ogg) | サウンドID | 日本語イベント説明 | 呼び出し元Cファイル |
 | :--- | :--- | :--- | :--- | :--- |
@@ -218,28 +218,35 @@ Cコアの `include/seffects.h` に定義されている 223 種の効果音 ID 
 | 199 | `se_combat_hit_blunt.ogg` | `se_combat_hit_blunt` | 鈍器・棍棒・石・打撃武器によるヒット音 | uhitm.c, mhitu.c, mhitm.c, dothrow.c |
 | 200 | `se_combat_hit_pierce.ogg` | `se_combat_hit_pierce` | 槍・刺突武器・矢弾による貫通ヒット音 | uhitm.c, mhitu.c, mhitm.c, dothrow.c |
 | 201 | `se_combat_hit_unarmed.ogg` | `se_combat_hit_unarmed` | 素手格闘・パンチ・キックによる打撃ヒット音 | uhitm.c, mhitu.c, mhitm.c |
-| 202 | `se_combat_miss.ogg` | `se_combat_miss` | 攻撃の空振り音（風切り音） | uhitm.c, mhitu.c, mhitm.c |
-| 203 | `se_combat_shoot_bow.ogg` | `se_combat_shoot_bow` | 弓矢の発射音（弦を弾く音） | dothrow.c, mthrowu.c |
-| 204 | `se_combat_shoot_crossbow.ogg` | `se_combat_shoot_crossbow` | クロスボウの発射音（バネ解放音） | dothrow.c, mthrowu.c |
-| 205 | `se_combat_shoot_sling.ogg` | `se_combat_shoot_sling` | スリング（投石器）の旋回・射出音 | dothrow.c, mthrowu.c |
-| 206 | `se_combat_throw.ogg` | `se_combat_throw` | 手投げによる投擲音 | dothrow.c, mthrowu.c |
-| 207 | `se_combat_throw_boomerang.ogg` | `se_combat_throw_boomerang` | ブーメランの旋回投擲音 | dothrow.c |
-| 208 | `se_combat_throw_mjollnir.ogg` | `se_combat_throw_mjollnir` | ミョルニルの電撃を帯びた豪快な投擲音 | dothrow.c |
-| 209 | `se_combat_miss_thud.ogg` | `se_combat_miss_thud` | 飛翔体が外れて壁や床に激突する音 | dothrow.c, mthrowu.c |
-| 210 | `se_combat_spell_cast.ogg` | `se_combat_spell_cast` | 呪文の詠唱・魔法発動音 | spell.c, mcastu.c |
-| 211 | `se_combat_wand_zap.ogg` | `se_combat_wand_zap` | 杖を振った際の発動音 | zap.c, muse.c |
-| 212 | `se_mon_claw.ogg` | `se_mon_claw` | モンスターの爪による引き裂き音 | mhitu.c, mhitm.c |
-| 213 | `se_mon_bite.ogg` | `se_mon_bite` | モンスターの噛みつき音 | mhitu.c, mhitm.c |
-| 214 | `se_mon_sting.ogg` | `se_mon_sting` | モンスターの毒針・刺突音 | mhitu.c, mhitm.c |
-| 215 | `se_mon_butt.ogg` | `se_mon_butt` | モンスターの角・頭突き衝突音 | mhitu.c, mhitm.c |
-| 216 | `se_mon_touch.ogg` | `se_mon_touch` | モンスターの接触・麻痺音 | mhitu.c, mhitm.c |
-| 217 | `se_mon_tentacle.ogg` | `se_mon_tentacle` | 触手による攻撃・絡みつき音 | mhitu.c, mhitm.c |
-| 218 | `se_mon_kick.ogg` | `se_mon_kick` | モンスターの蹴り・踏みつけ音 | mhitu.c, mhitm.c |
-| 219 | `se_mon_hug.ogg` | `se_mon_hug` | 締めつけ・怪力による抱き締め音 | mhitu.c, mhitm.c |
-| 220 | `se_mon_gaze.ogg` | `se_mon_gaze` | 凝視・魔眼による視線攻撃音 | mhitu.c, mhitm.c |
-| 221 | `se_mon_engulf.ogg` | `se_mon_engulf` | 丸呑み・呑み込み音 | mhitu.c, mhitm.c |
-| 222 | `se_mon_breath.ogg` | `se_mon_breath` | ドラゴン等のブレス放出音 | mhitu.c, mhitm.c |
-| 223 | `se_mon_spit.ogg` | `se_mon_spit` | 毒液・酸の吐出音 | mhitu.c, mhitm.c |
+| 202 | `se_combat_hit_whip.ogg` | `se_combat_hit_whip` | 鞭・濡れたタオルによる攻撃命中音 | uhitm.c, mhitu.c, mhitm.c |
+| 203 | `se_combat_hit_ironball.ogg` | `se_combat_hit_ironball` | 鉄球・鉄鎖による重金属・鎖衝突音 | uhitm.c, mhitu.c, mhitm.c |
+| 204 | `se_combat_hit_shield.ogg` | `se_combat_hit_shield` | 盾による重い防具シールドバッシュ音（近接限定） | uhitm.c, mhitu.c, mhitm.c |
+| 205 | `se_combat_hit_corpse.ogg` | `se_combat_hit_corpse` | 死体・肉塊武器による生体打撃音 | uhitm.c, mhitu.c, mhitm.c |
+| 206 | `se_combat_hit_pick.ogg` | `se_combat_hit_pick` | つるはし・マトックによる硬質な採掘具打撃音 | uhitm.c, mhitu.c, mhitm.c |
+| 207 | `se_combat_hit_wand.ogg` | `se_combat_hit_wand` | 杖・ロッドによる硬く乾いた小打撃音 | uhitm.c, mhitu.c, mhitm.c |
+| 208 | `se_combat_hit_other.ogg` | `se_combat_hit_other` | 未分類アイテム（本・巻物・薬・食料・宝石等）全般の汎用フォールバック打撃音 | uhitm.c, mhitu.c, mhitm.c, dothrow.c, mthrowu.c |
+| 209 | `se_combat_miss.ogg` | `se_combat_miss` | 攻撃の空振り音（風切り音） | uhitm.c, mhitu.c, mhitm.c |
+| 210 | `se_combat_shoot_bow.ogg` | `se_combat_shoot_bow` | 弓矢の発射音（弦を弾く音） | dothrow.c, mthrowu.c |
+| 211 | `se_combat_shoot_crossbow.ogg` | `se_combat_shoot_crossbow` | クロスボウの発射音（バネ解放音） | dothrow.c, mthrowu.c |
+| 212 | `se_combat_shoot_sling.ogg` | `se_combat_shoot_sling` | スリング（投石器）の旋回・射出音 | dothrow.c, mthrowu.c |
+| 213 | `se_combat_throw.ogg` | `se_combat_throw` | 手投げによる投擲音 | dothrow.c, mthrowu.c |
+| 214 | `se_combat_throw_boomerang.ogg` | `se_combat_throw_boomerang` | ブーメランの旋回投擲音 | dothrow.c |
+| 215 | `se_combat_throw_mjollnir.ogg` | `se_combat_throw_mjollnir` | ミョルニルの電撃を帯びた豪快な投擲音 | dothrow.c |
+| 216 | `se_combat_miss_thud.ogg` | `se_combat_miss_thud` | 飛翔体が外れて壁や床に激突する音 | dothrow.c, mthrowu.c |
+| 217 | `se_combat_spell_cast.ogg` | `se_combat_spell_cast` | 呪文の詠唱・魔法発動音 | spell.c, mcastu.c |
+| 218 | `se_combat_wand_zap.ogg` | `se_combat_wand_zap` | 杖を振った際の発動音 | zap.c, muse.c |
+| 219 | `se_mon_claw.ogg` | `se_mon_claw` | モンスターの爪による引き裂き音 | mhitu.c, mhitm.c |
+| 220 | `se_mon_bite.ogg` | `se_mon_bite` | モンスターの噛みつき音 | mhitu.c, mhitm.c |
+| 221 | `se_mon_sting.ogg` | `se_mon_sting` | モンスターの毒針・刺突音 | mhitu.c, mhitm.c |
+| 222 | `se_mon_butt.ogg` | `se_mon_butt` | モンスターの角・頭突き衝突音 | mhitu.c, mhitm.c |
+| 223 | `se_mon_touch.ogg` | `se_mon_touch` | モンスターの接触・麻痺音 | mhitu.c, mhitm.c |
+| 224 | `se_mon_tentacle.ogg` | `se_mon_tentacle` | 触手による攻撃・絡みつき音 | mhitu.c, mhitm.c |
+| 225 | `se_mon_kick.ogg` | `se_mon_kick` | モンスターの蹴り・踏みつけ音 | mhitu.c, mhitm.c |
+| 226 | `se_mon_hug.ogg` | `se_mon_hug` | 締めつけ・怪力による抱き締め音 | mhitu.c, mhitm.c |
+| 227 | `se_mon_gaze.ogg` | `se_mon_gaze` | 凝視・魔眼による視線攻撃音 | mhitu.c, mhitm.c |
+| 228 | `se_mon_engulf.ogg` | `se_mon_engulf` | 丸呑み・呑み込み音 | mhitu.c, mhitm.c |
+| 229 | `se_mon_breath.ogg` | `se_mon_breath` | ドラゴン等のブレス放出音 | mhitu.c, mhitm.c |
+| 230 | `se_mon_spit.ogg` | `se_mon_spit` | 毒液・酸の吐出音 | mhitu.c, mhitm.c |
 
 > **詳細仕様**: 各戦闘アクション効果音の詳細な判定ロジック、音量制御（不可視40%気配察知）、および素材制作指針は [combat_sound_specification.md](combat_sound_specification.md) を参照してください。
 

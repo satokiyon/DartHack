@@ -32,6 +32,48 @@ COMBAT_METADATA = {
         "keywords_ja": "素手 格闘 パンチ キック 殴打",
         "keywords_en": "punch fist kick unarmed melee hit combat",
     },
+    "se_combat_hit_whip.ogg": {
+        "sub_category": "melee",
+        "sub_category_ja": "近接（鞭/しなり）",
+        "keywords_ja": "鞭 ムチ ピシッ 打撃 しなり",
+        "keywords_en": "whip hit lash crack strike leather whip",
+    },
+    "se_combat_hit_ironball.ogg": {
+        "sub_category": "melee",
+        "sub_category_ja": "近接（鉄球/鎖）",
+        "keywords_ja": "鉄球 鎖 ガシャン 重金属 衝撃",
+        "keywords_en": "iron ball chain heavy metal impact bash",
+    },
+    "se_combat_hit_shield.ogg": {
+        "sub_category": "melee",
+        "sub_category_ja": "近接（盾バッシュ）",
+        "keywords_ja": "シールド 盾 防具 バッシュ ガゴン 打撃",
+        "keywords_en": "shield bash metal shield heavy block hit",
+    },
+    "se_combat_hit_corpse.ogg": {
+        "sub_category": "melee",
+        "sub_category_ja": "近接（死体/肉塊）",
+        "keywords_ja": "肉片 死体 ボコッ グチャ 生体 肉塊",
+        "keywords_en": "corpse flesh meat smack squish blunt hit",
+    },
+    "se_combat_hit_pick.ogg": {
+        "sub_category": "melee",
+        "sub_category_ja": "近接（採掘具）",
+        "keywords_ja": "つるはし マトック 採掘 ピッケル 岩石 キーン",
+        "keywords_en": "pickaxe mattock mining pick stone hit clink",
+    },
+    "se_combat_hit_wand.ogg": {
+        "sub_category": "melee",
+        "sub_category_ja": "近接（杖/ロッド）",
+        "keywords_ja": "杖 ロッド 細い棒 コツッ カチッ 物理",
+        "keywords_en": "wand staff light tap click stick hit",
+    },
+    "se_combat_hit_other.ogg": {
+        "sub_category": "melee",
+        "sub_category_ja": "近接/汎用（その他）",
+        "keywords_ja": "物 打撃 ポンッ バシッ 雑多 アイテム",
+        "keywords_en": "item hit generic smack object blunt light",
+    },
     "se_combat_miss.ogg": {
         "sub_category": "melee",
         "sub_category_ja": "近接（空振り）",
