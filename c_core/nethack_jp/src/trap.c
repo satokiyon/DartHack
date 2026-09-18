@@ -1233,6 +1233,7 @@ trapeffect_arrow_trap(
         }
         trap->once = 1;
         seetrap(trap);
+        Soundeffect(se_combat_shoot_bow, 70);
         pline("矢が飛び出してきた!");
         otmp = t_missile(ARROW, trap);
         dam = dmgval(otmp, &gy.youmonst);
@@ -1264,8 +1265,10 @@ trapeffect_arrow_trap(
         }
         trap->once = 1;
         otmp = t_missile(ARROW, trap);
-        if (in_sight)
+        if (in_sight) {
+            Soundeffect(se_combat_shoot_bow, 50);
             seetrap(trap);
+        }
         if (thitm(8, mtmp, otmp, 0, FALSE))
             trapkilled = TRUE;
 
@@ -1296,6 +1299,7 @@ trapeffect_dart_trap(
         }
         trap->once = 1;
         seetrap(trap);
+        Soundeffect(se_swoosh, 60);
         pline("小さな吹き矢が飛び出してきた!");
         otmp = t_missile(DART, trap);
         if (!rn2(6))
@@ -1308,7 +1312,7 @@ trapeffect_dart_trap(
                 if (otmp->opoisoned)
                     poisoned("dart", A_CON, "little dart",
                              /* if damage triggered life-saving,
-                                poison is limited to attrib loss */
+                                 poison is limited to attrib loss */
                              (u.umortality > oldumort) ? 0 : 10, TRUE);
                 obfree(otmp, (struct obj *) 0);
             }
@@ -1337,8 +1341,10 @@ trapeffect_dart_trap(
         otmp = t_missile(DART, trap);
         if (!rn2(6))
             otmp->opoisoned = 1;
-        if (in_sight)
+        if (in_sight) {
+            Soundeffect(se_swoosh, 40);
             seetrap(trap);
+        }
         if (thitm(7, mtmp, otmp, 0, FALSE))
             trapkilled = TRUE;
 
@@ -1368,6 +1374,7 @@ trapeffect_rocktrap(
 
             trap->once = 1;
             feeltrap(trap);
+            Soundeffect(se_crashing_rock, 80);
             otmp = t_missile(ROCK, trap);
             place_object(otmp, u.ux, u.uy);
 
@@ -1416,8 +1423,10 @@ trapeffect_rocktrap(
         }
         trap->once = 1;
         otmp = t_missile(ROCK, trap);
-        if (in_sight)
+        if (in_sight) {
+            Soundeffect(se_crashing_rock, 60);
             seetrap(trap);
+        }
         if (thitm(0, mtmp, otmp, d(2, 6), FALSE))
             trapkilled = TRUE;
 
@@ -1530,6 +1539,7 @@ trapeffect_bear_trap(
             pline("熊罠はあなたを傷つけることなく頭上で閉じた.");
             return Trap_Effect_Finished;
         }
+        Soundeffect(se_bear_trap, 80);
         set_utrap((unsigned) rn1(4, 4), TT_BEARTRAP);
         if (u.usteed) {
             pline("熊罠が%sの%sを挟んだ!",
@@ -1557,6 +1567,7 @@ trapeffect_bear_trap(
             && !is_whirly(mptr) && !unsolid(mptr)) {
             mtmp->mtrapped = 1;
             if (in_sight) {
+                    Soundeffect(se_bear_trap, 60);
                     pline_mon(mtmp,
                         "%sは%s熊罠にかかった!", l_monnam(mtmp),
                       a_your[trap->madeby_u]);
@@ -1593,6 +1604,7 @@ trapeffect_slp_gas_trap(
 {
     if (mtmp == &gy.youmonst) {
         seetrap(trap);
+        Soundeffect(se_hiss, 70);
         if (Sleep_resistance || breathless(gy.youmonst.data)) {
             You("眠気を誘うガスに包まれた!");
             monstseesu(M_SEEN_SLEEP);
@@ -1608,6 +1620,7 @@ trapeffect_slp_gas_trap(
         if (!resists_sleep(mtmp) && !breathless(mtmp->data)
             && !helpless(mtmp)) {
             if (sleep_monst(mtmp, rnd(25), -1) && in_sight) {
+                Soundeffect(se_hiss, 50);
                 pline_mon(mtmp,
                           "%sは突然眠り込んだ!", l_monnam(mtmp));
                 seetrap(trap);
@@ -1627,6 +1640,7 @@ trapeffect_rust_trap(
 
     if (mtmp == &gy.youmonst) {
         seetrap(trap);
+        Soundeffect(se_gushing_sound, 80);
 
         /* Unlike monsters, traps cannot aim their rust attacks at
          * you, so instead of looping through and taking either the
@@ -1684,8 +1698,10 @@ trapeffect_rust_trap(
         struct permonst *mptr = mtmp->data;
         struct obj *target;
 
-        if (in_sight)
+        if (in_sight) {
+            Soundeffect(se_gushing_sound, 60);
             seetrap(trap);
+        }
         switch (rn2(5)) {
         case 0:
             if (in_sight)
@@ -1760,6 +1776,7 @@ trapeffect_fire_trap(
 {
     if (mtmp == &gy.youmonst) {
         seetrap(trap);
+        Soundeffect(se_blast, 80);
         dofiretrap((struct obj *) 0);
     } else {
         coordxy tx = trap->tx, ty = trap->ty;
@@ -1769,11 +1786,12 @@ trapeffect_fire_trap(
         struct permonst *mptr = mtmp->data;
         int orig_dmg = d(2, 4);
 
-        if (in_sight)
+        if (in_sight) {
+            Soundeffect(se_blast, 60);
             pline_mon(mtmp,
                  "%sが%sの足元の%sから噴き出した!", tower_of_flame,
                   l_monnam(mtmp), surface(mtmp->mx, mtmp->my));
-        else if (see_it) { /* evidently `mtmp' is invisible */
+        } else if (see_it) { /* evidently `mtmp' is invisible */
             set_msg_xy(mtmp->mx, mtmp->my);
             You_see("%sが%sから噴き出すのが見える!", tower_of_flame,
                     surface(mtmp->mx, mtmp->my));
@@ -1945,6 +1963,7 @@ trapeffect_pit(
          * show "you were trapped in a pit" during disclosure's display
          * of enlightenment, but hero is dying *before* becoming trapped.
          */
+        Soundeffect(se_thud, 75);
         set_utrap((unsigned) rn1(6, 2), TT_PIT);
         if (!steedintrap(trap, (struct obj *) 0)) {
             if (relevant_spikes) {
@@ -1969,7 +1988,7 @@ trapeffect_pit(
                              ? "stepping on poison spikes"
                              : "fall onto poison spikes",
                              /* if damage triggered life-saving,
-                                poison is limited to attrib loss */
+                                 poison is limited to attrib loss */
                              (u.umortality > oldumort) ? 0 : 8, FALSE);
             } else {
                 /* plunging flyers take spike damage but not pit damage */
@@ -2017,6 +2036,7 @@ trapeffect_pit(
         if (!passes_walls(mptr))
             mtmp->mtrapped = 1;
         if (in_sight) {
+            Soundeffect(se_thud, 55);
             pline_mon(mtmp,
                      "%sは%s%s落とし穴へ落ちた!", l_monnam(mtmp), fallverb,
                      a_your[trap->madeby_u]);
@@ -2050,6 +2070,7 @@ trapeffect_hole(
                        trapname(trap->ttyp, TRUE));
             return Trap_Effect_Finished; /* don't activate it after all */
         }
+        Soundeffect(se_thud, 75);
         fall_through(TRUE, (trflags & TOOKPLUNGE));
     } else {
         int tt = trap->ttyp;
@@ -2102,10 +2123,13 @@ trapeffect_telep_trap(
 {
     if (mtmp == &gy.youmonst) {
         seetrap(trap);
+        Soundeffect(se_teleport, 80);
         tele_trap(trap);
     } else {
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
 
+        if (in_sight)
+            Soundeffect(se_teleport, 60);
         mtele_trap(mtmp, trap, in_sight);
         return Trap_Moved_Mon;
     }
@@ -2120,11 +2144,14 @@ trapeffect_level_telep(
 {
     if (mtmp == &gy.youmonst) {
         seetrap(trap);
+        Soundeffect(se_teleport, 80);
         level_tele_trap(trap, trflags);
     } else {
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
         boolean forcetrap = ((trflags & FORCETRAP) != 0);
 
+        if (in_sight)
+            Soundeffect(se_teleport, 60);
         return mlevel_tele_trap(mtmp, trap, forcetrap, in_sight);
     }
     return Trap_Effect_Finished;
@@ -2309,6 +2336,7 @@ trapeffect_statue_trap(
     unsigned int trflags UNUSED)
 {
     if (mtmp == &gy.youmonst) {
+        Soundeffect(se_stone_crumbling, 75);
         (void) activate_statue_trap(trap, u.ux, u.uy, FALSE);
     } else {
         /* monsters don't trigger statue traps */
@@ -2361,6 +2389,7 @@ trapeffect_anti_magic(
             /* no message if a monster does this, it isn't visible enough */
             if (mtmp == &gy.youmonst) {
                 seetrap(trap);
+                Soundeffect(se_mana_drain, 80);
                 pline("鈍重なオーラが%sを包んだ.", xname(shoes));
                 costly_alteration(shoes, COST_DECHNT);
             }
@@ -2375,6 +2404,7 @@ trapeffect_anti_magic(
         boolean exclaim_it = FALSE;
 
         seetrap(trap);
+        Soundeffect(se_mana_drain, 80);
         if (Antimagic) {
             struct obj *otmp;
             int dmgval2 = rnd(4), hp = Upolyd ? u.mh : u.uhp;
@@ -2493,6 +2523,7 @@ trapeffect_poly_trap(
             steed_article = ARTICLE_NONE;
 
         seetrap(trap);
+        Soundeffect(se_polymorph, 80);
         if (viasitting)
             Strcpy(verbbuf, "作動させた"); /* follows "You sit down." */
         else if (u.usteed)
@@ -2543,6 +2574,8 @@ trapeffect_poly_trap(
         } else if (resists_magm(mtmp)) {
             shieldeff_mon(mtmp);
         } else if (!resist(mtmp, WAND_CLASS, 0, NOTELL)) {
+            if (in_sight)
+                Soundeffect(se_polymorph, 60);
             (void) newcham(mtmp, (struct permonst *) 0, NC_SHOW_MSG);
             if (in_sight)
                 seetrap(trap);

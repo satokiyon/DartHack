@@ -33,6 +33,9 @@ SF2_EFFECT_FILES = {
     "se_horn_being_played.ogg",
     "se_shrill_whistle.ogg",
     "se_magic_whistle.ogg",
+}
+
+NETHACK_OFFICIAL_FILES = {
     "se_squeak_A.ogg",
     "se_squeak_B.ogg",
     "se_squeak_B_flat.ogg",
@@ -64,6 +67,7 @@ def load_or_init_database() -> List[Dict[str, Any]]:
         target_ogg = SOUNDS_DIR / filename
         is_ready = target_ogg.exists() and target_ogg.stat().st_size > 0
         is_sf2 = (item["category"] == "instrument") or (filename in SF2_EFFECT_FILES)
+        is_official = filename in NETHACK_OFFICIAL_FILES
 
         if filename in existing_map:
             record = existing_map[filename]
@@ -73,13 +77,38 @@ def load_or_init_database() -> List[Dict[str, Any]]:
                     record[k] = item[k]
             if is_ready:
                 record["status"] = "ready"
-                if is_sf2 and not record.get("source_site"):
+                if is_official:
+                    record["source_site"] = "NetHack Official Win32 Audio Set"
+                    record["author"] = "NetHack DevTeam"
+                    record["source_url"] = "https://www.nethack.org/"
+                    record["license"] = "NetHack General Public License (NGPL)"
+                    record["notes"] = "Official squeaky board trap pitch samples (converted from se_squeak_*.wav)"
+                elif is_sf2 and not record.get("source_site"):
                     record["source_site"] = "FluidR3 GM (FluidSynth)"
                     record["author"] = "Frank Wen"
                     record["source_url"] = "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2"
                     record["license"] = "MIT / GPL"
                     record["notes"] = "SoundFont auto-sampled instrument/effect"
         else:
+            if is_ready and is_official:
+                site = "NetHack Official Win32 Audio Set"
+                author = "NetHack DevTeam"
+                url = "https://www.nethack.org/"
+                license_str = "NetHack General Public License (NGPL)"
+                notes = "Official squeaky board trap pitch samples (converted from se_squeak_*.wav)"
+            elif is_ready and is_sf2:
+                site = "FluidR3 GM (FluidSynth)"
+                author = "Frank Wen"
+                url = "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2"
+                license_str = "MIT / GPL"
+                notes = "SoundFont auto-sampled instrument/effect"
+            else:
+                site = ""
+                author = ""
+                url = ""
+                license_str = ""
+                notes = ""
+
             record = {
                 "no": item["no"],
                 "filename": filename,
@@ -92,11 +121,11 @@ def load_or_init_database() -> List[Dict[str, Any]]:
                 "keywords_ja": item.get("keywords_ja", ""),
                 "keywords_en": item.get("keywords_en", ""),
                 "status": "ready" if is_ready else "pending",
-                "source_site": "FluidR3 GM (FluidSynth)" if is_ready and is_sf2 else "",
-                "author": "Frank Wen" if is_ready and is_sf2 else "",
-                "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2" if is_ready and is_sf2 else "",
-                "license": "MIT / GPL" if is_ready and is_sf2 else "",
-                "notes": "SoundFont auto-sampled instrument/effect" if is_ready and is_sf2 else ""
+                "source_site": site,
+                "author": author,
+                "source_url": url,
+                "license": license_str,
+                "notes": notes
             }
         db.append(record)
 
