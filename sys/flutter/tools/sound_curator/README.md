@@ -81,3 +81,45 @@ python sys/flutter/tools/sound_curator/server.py
 6. ダウンロードしたファイルをカードの「📥 ドロップゾーン」にドラッグ＆ドロップ。
 7. モーダルで「出典サイト」「作者」「URL」「ライセンス」を確認し、**「正規化 & 確定 (Opus変換)」** ボタンをクリック。
 8. 自動的にオーディオプロファイル（戦闘音なら -16 LUFS / 80Hz HPF / 先頭トリム）が適用されて Opus 変換され、試聴プレイヤーで仕上がりを確認できます。
+
+---
+
+## 🔊 音量バランス検査 & 自動適正化ツール (check_volumes)
+
+全音源の音量・音圧が均一で揃っているかを瞬時に診断し、過小音量や頭打ち（0dBクリッピング）を自動適正化できます。
+
+### 1. Web UI（サウンドキュレーター）からのワンクリック操作
+1. キュレーター画面上部のヘッダーにある **［🔊 音量診断］** ボタンをクリック。
+2. 全音源のピーク音量（`max_volume`）、実効音量（`mean_volume`）、再生時間が一括スキャンされ、各カード内に測定バッジ（`[OK]`, `[WARN]`, `[ERROR]`, `[CLIP]`）が表示されます。
+3. 問題のある音源は **［🔧 適正化 (Fix)］** ボタンで個別修復できるほか、ヘッダーに現れる **［⚠️ 要修正音源を一括適正化］** ボタンで全自動修復（無音トリム＋コンプレッション＋ピーク -1.5 dBFS 正規化）が可能です。
+
+### 2. コマンドライン（CLI）からの実行
+
+#### PowerShell ラッパー経由:
+```powershell
+# 全音源の音量レポートを表示
+powershell -ExecutionPolicy Bypass -File sys/flutter/tools/sound_curator/check_volumes.ps1
+
+# 問題（WARN/ERROR/CLIP）のある音源のみ表示
+powershell -ExecutionPolicy Bypass -File sys/flutter/tools/sound_curator/check_volumes.ps1 -WarnOnly
+
+# 問題のある音源を一括自動修復（ピーク -1.5 dBFS にリノーマライズ）
+powershell -ExecutionPolicy Bypass -File sys/flutter/tools/sound_curator/check_volumes.ps1 -Fix
+
+# 特定のファイルのみ検査・修復
+powershell -ExecutionPolicy Bypass -File sys/flutter/tools/sound_curator/check_volumes.ps1 -Target se_combat_hit_pick.ogg -Fix
+```
+
+#### Python 直接実行:
+```powershell
+python sys/flutter/tools/sound_curator/check_volumes.py --warn-only
+python sys/flutter/tools/sound_curator/check_volumes.py --fix
+python sys/flutter/tools/sound_curator/check_volumes.py --target se_combat_hit_corpse.ogg --fix
+```
+
+### 3. 判定基準と適正化ルール (ルール38準拠)
+- **OK**: ピーク `-0.5 〜 -4.0 dBFS`、平均 `-14.0 〜 -24.0 dBFS`（最適バランス）
+- **CLIP**: ピーク `0.0 dBFS`（0dB頭打ち、音割れリスク）
+- **WARN**: ピーク `< -5.0 dBFS` または 平均 `< -25.0 dBFS`（過小音量）
+- **ERROR**: ピーク `< -12.0 dBFS` または 平均 `< -35.0 dBFS`（ほぼ無音・不良音源）
+- **自動適正化内容**: `silenceremove`（不要無音カット）＋ `acompressor`（軽度のアタック・リリース補正）＋ `volume`（ピーク -1.5 dBFS リノーマライズ）。短音に対する `loudnorm` 単独適用の誤作動を恒久防止。

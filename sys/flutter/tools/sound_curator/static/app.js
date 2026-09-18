@@ -5,6 +5,10 @@ let currentCategory = 'all';
 let currentCombatSub = 'all';
 let searchQuery = '';
 
+let volumeDataMap = {};
+let currentVolFilter = 'all';
+let isAuditing = false;
+
 let activeTargetItem = null;
 let activeSelectedFile = null;
 
@@ -105,6 +109,17 @@ function renderCards() {
     // 戦闘サブカテゴリフィルタ
     if (currentCategory === 'combat' && currentCombatSub !== 'all' && item.sub_category !== currentCombatSub) return false;
 
+    // 音量診断フィルタ
+    if (currentVolFilter !== 'all') {
+      const vol = volumeDataMap[item.filename];
+      if (!vol) return false;
+      if (currentVolFilter === 'issues' && !['WARN', 'ERROR', 'CLIP'].includes(vol.status)) return false;
+      if (currentVolFilter === 'ok' && vol.status !== 'OK') return false;
+      if (currentVolFilter === 'warn' && vol.status !== 'WARN') return false;
+      if (currentVolFilter === 'error' && vol.status !== 'ERROR') return false;
+      if (currentVolFilter === 'clip' && vol.status !== 'CLIP') return false;
+    }
+
     // 検索クエリ
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -153,12 +168,39 @@ function renderCards() {
       `;
     }
 
+    // 音量診断情報表示
+    let volBoxHtml = '';
+    const volInfo = volumeDataMap[item.filename];
+    if (isReady && volInfo) {
+      const needsFix = ['WARN', 'ERROR', 'CLIP'].includes(volInfo.status);
+      const fixBtnHtml = `
+        <button class="btn-fix" onclick="fixVolume('${escapeJs(item.filename)}')">
+          🔧 適正化 (Fix)
+        </button>
+      `;
+      volBoxHtml = `
+        <div class="vol-box">
+          <div class="vol-header">
+            <span class="vol-badge ${escapeHtml(volInfo.status)}">${escapeHtml(volInfo.status)}</span>
+            <span style="color: var(--text-muted);">${escapeHtml(volInfo.message || '')}</span>
+            ${fixBtnHtml}
+          </div>
+          <div class="vol-details">
+            <span>ピーク: <strong>${volInfo.max_volume.toFixed(1)} dBFS</strong></span>
+            <span>平均: <strong>${volInfo.mean_volume.toFixed(1)} dBFS</strong></span>
+            <span>長さ: <strong>${volInfo.duration.toFixed(2)}s</strong></span>
+          </div>
+        </div>
+      `;
+    }
+
     let bodyHtml = '';
     if (isReady) {
       bodyHtml = `
         <div class="audio-player-box">
-          <audio controls preload="none" src="/sounds/${encodeURIComponent(item.filename)}?t=${Date.now()}"></audio>
+          <audio controls preload="none" id="audio_${escapeHtml(item.id)}" src="/sounds/${encodeURIComponent(item.filename)}?t=${Date.now()}"></audio>
         </div>
+        ${volBoxHtml}
         <div class="meta-info">
           出典: <strong>${escapeHtml(item.source_site || '不明')}</strong> |
           作者: <strong>${escapeHtml(item.author || '不明')}</strong> |
@@ -478,6 +520,161 @@ function escapeJs(str) {
   return str.replace(/'/g, "\\'");
 }
 
+// 音量診断・適正化ハンドラ
+async function runVolumeAudit() {
+  const btn = document.getElementById('btnAuditVolumes');
+  if (!btn) return;
+  const origText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ 診断中...';
+
+  try {
+    const res = await fetch('/api/volume_check');
+    const data = await res.json();
+    
+    // volumeDataMap に保存
+    volumeDataMap = {};
+    for (const item of (data.results || [])) {
+      volumeDataMap[item.filename] = item;
+    }
+
+    const counts = data.counts || { OK: 0, WARN: 0, ERROR: 0, CLIP: 0 };
+    const issueCount = (counts.WARN || 0) + (counts.ERROR || 0) + (counts.CLIP || 0);
+
+    // カウント表示の更新
+    document.getElementById('volOkCount').textContent = counts.OK || 0;
+    document.getElementById('volWarnCount').textContent = counts.WARN || 0;
+    document.getElementById('volErrorCount').textContent = counts.ERROR || 0;
+    document.getElementById('volClipCount').textContent = counts.CLIP || 0;
+    document.getElementById('volIssueCount').textContent = issueCount;
+
+    // コントロール行の表示
+    const volControls = document.getElementById('volumeControls');
+    if (volControls) volControls.style.display = 'flex';
+
+    const fixAllBtn = document.getElementById('btnFixAllVolumes');
+    if (fixAllBtn) {
+      fixAllBtn.style.display = issueCount > 0 ? 'inline-block' : 'none';
+    }
+
+    renderCards();
+  } catch (err) {
+    alert('音量診断に失敗しました: ' + err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = origText;
+  }
+}
+
+async function fixVolume(filename) {
+  if (!confirm(`${filename} の音量を適正化（無音トリム＋コンプレッション＋ピーク -1.5 dBFS）しますか？`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/volume_fix', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target: filename })
+    });
+    const data = await res.json();
+    if (data.success && data.results && data.results.length > 0) {
+      const updated = data.results[0];
+      volumeDataMap[filename] = updated;
+
+      // カウントの再集計
+      updateVolumeCountsFromMap();
+
+      renderCards();
+
+      // オーディオタグのキャッシュバスター更新
+      setTimeout(() => {
+        const item = soundList.find(x => x.filename === filename);
+        if (item) {
+          const audioElem = document.getElementById(`audio_${item.id}`);
+          if (audioElem) {
+            audioElem.src = `/sounds/${encodeURIComponent(item.filename)}?t=${Date.now()}`;
+          }
+        }
+      }, 100);
+    } else {
+      alert('音量適正化に失敗しました: ' + (data.error || '不明なエラー'));
+    }
+  } catch (err) {
+    alert('通信エラー: ' + err);
+  }
+}
+
+async function fixAllProblemVolumes() {
+  if (!confirm('検出された要修正音源（WARN, ERROR, CLIP）を一括で適正化（ピーク -1.5 dBFS）しますか？\n※処理には数秒〜数十秒かかる場合があります。')) {
+    return;
+  }
+
+  const btn = document.getElementById('btnFixAllVolumes');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ 一括適正化中...';
+  }
+
+  try {
+    const res = await fetch('/api/volume_fix', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target: 'warn_or_error' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      for (const r of (data.results || [])) {
+        volumeDataMap[r.filename] = r;
+      }
+      updateVolumeCountsFromMap();
+      renderCards();
+      alert(`完了しました！ ${data.fixed_count} 件の音源を適正化しました。`);
+    } else {
+      alert('一括適正化に失敗しました: ' + (data.error || '不明なエラー'));
+    }
+  } catch (err) {
+    alert('通信エラー: ' + err);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '⚠️ 要修正音源を一括適正化';
+    }
+  }
+}
+
+function updateVolumeCountsFromMap() {
+  let ok = 0, warn = 0, err = 0, clip = 0;
+  for (const k in volumeDataMap) {
+    const st = volumeDataMap[k].status;
+    if (st === 'OK') ok++;
+    else if (st === 'WARN') warn++;
+    else if (st === 'ERROR') err++;
+    else if (st === 'CLIP') clip++;
+  }
+  const issues = warn + err + clip;
+  document.getElementById('volOkCount').textContent = ok;
+  document.getElementById('volWarnCount').textContent = warn;
+  document.getElementById('volErrorCount').textContent = err;
+  document.getElementById('volClipCount').textContent = clip;
+  document.getElementById('volIssueCount').textContent = issues;
+
+  const fixAllBtn = document.getElementById('btnFixAllVolumes');
+  if (fixAllBtn) {
+    fixAllBtn.style.display = issues > 0 ? 'inline-block' : 'none';
+  }
+}
+
+// 音量フィルタ切り替えボタン
+document.querySelectorAll('.vol-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.vol-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentVolFilter = btn.dataset.volFilter || 'all';
+    renderCards();
+  });
+});
+
 // URLパラメータによる初期アクティブボタン状態の復元
 if (initialCategoryParam) {
   const targetCatBtn = document.querySelector(`.filter-btn[data-cat="${initialCategoryParam}"]`);
@@ -490,4 +687,5 @@ updateCombatSubControlsVisibility();
 
 // 初期ロード
 loadData();
+
 

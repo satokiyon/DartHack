@@ -221,6 +221,18 @@ python sys/flutter/tools/sound_curator/server.py
 4. モーダルで出典サイトやライセンス（自動推定されます）を確認し、**「正規化 & 確定 (Opus変換)」** ボタンをクリックします。
 5. 自動的に Opus 変換され、確定済みカードに切り替わり、試聴プレイヤーで仕上がりを確認できます。
 
+### 4. 音量バランス検査・自動適正化ツール (check_volumes)
+全音源の音量・音圧バランスが適正かを常時チェックし、過小音量や頭打ち（音割れ）を一括修復できます。
+
+```powershell
+# PowerShell スクリプト（問題のある音源のみ表示）
+powershell -ExecutionPolicy Bypass -File sys/flutter/tools/sound_curator/check_volumes.ps1 -WarnOnly
+
+# 問題のある音源を一括自動修復（ピーク -1.5 dBFS に適正化）
+powershell -ExecutionPolicy Bypass -File sys/flutter/tools/sound_curator/check_volumes.ps1 -Fix
+```
+※Web UI（サウンドキュレーター）の画面上部にある **［🔊 音量診断］** ボタンからも、全音源の測定およびワンクリック修復が可能です。
+
 ---
 
 ## 🔄 c_core 配下（Cコアソース）の管理と取り込み方法

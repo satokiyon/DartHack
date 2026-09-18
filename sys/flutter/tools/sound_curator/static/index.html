@@ -327,6 +327,76 @@
     }
     .btn-delete:hover { border-color: var(--accent-red); color: var(--accent-red); }
 
+    /* 音量診断バッジとボタン */
+    .vol-box {
+      background: #151922;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+    }
+    .vol-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .vol-badge {
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-size: 10px;
+    }
+    .vol-badge.OK { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .vol-badge.WARN { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .vol-badge.ERROR { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .vol-badge.CLIP { background: rgba(249, 115, 22, 0.2); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.4); }
+    .vol-details {
+      color: var(--text-muted);
+      display: flex;
+      gap: 12px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    .btn-fix {
+      background: #2563eb;
+      border: none;
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    .btn-fix:hover { background: #1d4ed8; }
+    .btn-audit {
+      background: #1e293b;
+      border: 1px solid #3b82f6;
+      color: #60a5fa;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-audit:hover { background: #2563eb; color: #fff; }
+    .btn-fix-all {
+      background: #d97706;
+      border: none;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-fix-all:hover { background: #b45309; }
+
     /* モーダル */
     .modal-backdrop {
       display: none;
@@ -412,6 +482,9 @@
         <button class="filter-btn" data-cat="instrument">楽器 (47)</button>
         <button class="filter-btn" data-cat="voice">声音 (7)</button>
         <input type="text" class="search-input" id="searchInput" placeholder="サウンド名・説明文で検索...">
+        <span style="color: #4b5563;">|</span>
+        <button class="btn-audit" id="btnAuditVolumes" onclick="runVolumeAudit()">🔊 音量診断</button>
+        <button class="btn-fix-all" id="btnFixAllVolumes" onclick="fixAllProblemVolumes()" style="display: none;">⚠️ 要修正音源を一括適正化</button>
       </div>
       <!-- 戦闘サブカテゴリ行（戦闘カテゴリ選択時に展開） -->
       <div class="controls-row combat-sub-controls" id="combatSubControls" style="display: none;">
@@ -421,6 +494,16 @@
         <button class="filter-btn subcat-btn" data-combat-sub="ranged">🏹 遠隔・投擲 (7)</button>
         <button class="filter-btn subcat-btn" data-combat-sub="magic">✨ 魔法攻撃 (2)</button>
         <button class="filter-btn subcat-btn" data-combat-sub="monster">🐾 モンスター固有 (12)</button>
+      </div>
+      <!-- 音量診断フィルター行（診断実行時に展開） -->
+      <div class="controls-row volume-controls" id="volumeControls" style="display: none;">
+        <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">🔊 音量診断:</span>
+        <button class="filter-btn vol-filter-btn active" data-vol-filter="all">全音源</button>
+        <button class="filter-btn vol-filter-btn" data-vol-filter="issues" style="color: #fbbf24;">⚠️ 要修正 (<span id="volIssueCount">0</span>)</button>
+        <button class="filter-btn vol-filter-btn" data-vol-filter="ok" style="color: #34d399;">✅ 適正 (<span id="volOkCount">0</span>)</button>
+        <button class="filter-btn vol-filter-btn" data-vol-filter="warn" style="color: #fbbf24;">WARN (<span id="volWarnCount">0</span>)</button>
+        <button class="filter-btn vol-filter-btn" data-vol-filter="error" style="color: #f87171;">ERROR (<span id="volErrorCount">0</span>)</button>
+        <button class="filter-btn vol-filter-btn" data-vol-filter="clip" style="color: #fb923c;">CLIP (<span id="volClipCount">0</span>)</button>
       </div>
     </div>
   </header>

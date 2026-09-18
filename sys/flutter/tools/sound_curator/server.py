@@ -17,6 +17,7 @@ from pathlib import Path
 
 from database import load_or_init_database, save_database, generate_attributions, SOUNDS_DIR
 from process_audio import normalize_and_convert
+from check_volumes import check_all_volumes, fix_volume, measure_volume, resolve_sounds_dir
 
 CUR_DIR = Path(__file__).resolve().parent
 STATIC_DIR = CUR_DIR / "static"
@@ -76,6 +77,8 @@ class CuratorHTTPRequestHandler(BaseHTTPRequestHandler):
                 "percent": round((ready / total * 100) if total > 0 else 0, 1),
                 "by_category": by_category
             })
+        elif path == "/api/volume_check":
+            self.handle_volume_check(parsed)
         else:
             self.send_error(404, "File not found")
 
@@ -87,8 +90,79 @@ class CuratorHTTPRequestHandler(BaseHTTPRequestHandler):
             self.handle_upload_and_assign()
         elif path == "/api/delete_assign":
             self.handle_delete_assign()
+        elif path == "/api/volume_fix":
+            self.handle_volume_fix()
         else:
             self.send_error(404, "Endpoint not found")
+
+    def handle_volume_check(self, parsed):
+        """全音源または指定音源の音量測定結果を返す"""
+        query_params = urllib.parse.parse_qs(parsed.query)
+        target = query_params.get("target", [None])[0]
+
+        sounds_dir = resolve_sounds_dir()
+        results = check_all_volumes(
+            sounds_dir=sounds_dir,
+            warn_only=False,
+            auto_fix=False,
+            as_json=False,
+            target_file=target
+        )
+
+        counts = {"OK": 0, "CLIP": 0, "WARN": 0, "ERROR": 0}
+        for r in results:
+            st = r.get("status", "ERROR")
+            counts[st] = counts.get(st, 0) + 1
+
+        self.send_json({
+            "total": len(results),
+            "counts": counts,
+            "results": results
+        })
+
+    def handle_volume_fix(self):
+        """音量適正化を実行する"""
+        try:
+            length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(length)
+            req = json.loads(body.decode("utf-8")) if length > 0 else {}
+        except Exception:
+            self.send_json({"error": "Invalid JSON"}, status=400)
+            return
+
+        target = req.get("target", "all")
+        sounds_dir = resolve_sounds_dir()
+
+        fixed_results = []
+        if target == "all" or target == "warn_or_error":
+            # 問題のある音源を一括適正化
+            all_res = check_all_volumes(sounds_dir=sounds_dir)
+            for r in all_res:
+                if r["status"] in ("WARN", "ERROR", "CLIP"):
+                    fpath = Path(r["path"])
+                    if fix_volume(fpath):
+                        new_info = measure_volume(fpath)
+                        new_info["fixed"] = True
+                        fixed_results.append(new_info)
+        else:
+            # 個別指定
+            fpath = sounds_dir / target
+            if not fpath.exists():
+                fpath = sounds_dir / f"{target}.ogg"
+            if fpath.exists():
+                if fix_volume(fpath):
+                    new_info = measure_volume(fpath)
+                    new_info["fixed"] = True
+                    fixed_results.append(new_info)
+            else:
+                self.send_json({"error": f"File not found: {target}"}, status=404)
+                return
+
+        self.send_json({
+            "success": True,
+            "fixed_count": len(fixed_results),
+            "results": fixed_results
+        })
 
     def send_json(self, data, status=200):
         body = json.dumps(data, ensure_ascii=False).encode("utf-8")
