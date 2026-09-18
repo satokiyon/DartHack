@@ -138,6 +138,7 @@
     seffect(loud_splash),
     seffect(low_buzzing),
     seffect(low_hum),
+    seffect(magic_whistle),
     seffect(maniacal_laughter),
     seffect(masticating_sound),
     seffect(mon_chugging_potion),

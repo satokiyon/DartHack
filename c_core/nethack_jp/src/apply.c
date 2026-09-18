@@ -515,7 +515,7 @@ use_magic_whistle(struct obj *obj)
                         Hallucination ? "普通の"
             : (Underwater && !Deaf) ? "奇妙に甲高い"
               : "奇妙な");
-        Soundeffect(se_shrill_whistle, 80);
+        Soundeffect(se_magic_whistle, 80);
         magic_whistled(obj);
     }
 }

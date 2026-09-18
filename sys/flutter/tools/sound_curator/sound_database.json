@@ -745,11 +745,11 @@
     "caller": "dig.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "効果音ラボ",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://soundeffect-lab.info/",
+    "license": "効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）",
     "notes": "",
     "sub_category_ja": "",
     "keywords_ja": "",
@@ -1825,12 +1825,12 @@
     "caller": "muse.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
-    "notes": "",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
@@ -2251,6 +2251,24 @@
   },
   {
     "no": 126,
+    "filename": "se_magic_whistle.ogg",
+    "id": "se_magic_whistle",
+    "description": "魔法の笛の澄んだ神秘的な音（ペットを呼び寄せる）",
+    "caller": "apply.c",
+    "category": "effect",
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": "",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect"
+  },
+  {
+    "no": 127,
     "filename": "se_maniacal_laughter.ogg",
     "id": "se_maniacal_laughter",
     "description": "ケタケタという狂気的な高笑い（巻物読後等）",
@@ -2268,7 +2286,7 @@
     "keywords_en": ""
   },
   {
-    "no": 127,
+    "no": 128,
     "filename": "se_masticating_sound.ogg",
     "id": "se_masticating_sound",
     "description": "クチャクチャと何かを噛む咀嚼音",
@@ -2286,7 +2304,7 @@
     "keywords_en": ""
   },
   {
-    "no": 128,
+    "no": 129,
     "filename": "se_mon_chugging_potion.ogg",
     "id": "se_mon_chugging_potion",
     "description": "モンスターがポーションをゴクゴクと飲む音",
@@ -2304,7 +2322,7 @@
     "keywords_en": ""
   },
   {
-    "no": 129,
+    "no": 130,
     "filename": "se_monster_behind_boulder.ogg",
     "id": "se_monster_behind_boulder",
     "description": "岩陰に隠れるモンスターの気配・物音",
@@ -2322,7 +2340,7 @@
     "keywords_en": ""
   },
   {
-    "no": 130,
+    "no": 131,
     "filename": "se_mutter_imprecations.ogg",
     "id": "se_mutter_imprecations",
     "description": "呪いの言葉をブツブツと呟く声（店主の怒り）",
@@ -2340,7 +2358,7 @@
     "keywords_en": ""
   },
   {
-    "no": 131,
+    "no": 132,
     "filename": "se_mutter_incantation.ogg",
     "id": "se_mutter_incantation",
     "description": "呪文をブツブツと唱える声",
@@ -2358,7 +2376,7 @@
     "keywords_en": ""
   },
   {
-    "no": 132,
+    "no": 133,
     "filename": "se_orc_grunt.ogg",
     "id": "se_orc_grunt",
     "description": "オークのグアッという低い唸り声",
@@ -2376,7 +2394,7 @@
     "keywords_en": ""
   },
   {
-    "no": 133,
+    "no": 134,
     "filename": "se_paranoid_confirmation.ogg",
     "id": "se_paranoid_confirmation",
     "description": "ソワソワした確認の囁き声",
@@ -2394,7 +2412,7 @@
     "keywords_en": ""
   },
   {
-    "no": 134,
+    "no": 135,
     "filename": "se_potion_crash_and_break.ogg",
     "id": "se_potion_crash_and_break",
     "description": "ポーション瓶がガシャンと割れ液体が散る音",
@@ -2412,7 +2430,7 @@
     "keywords_en": ""
   },
   {
-    "no": 135,
+    "no": 136,
     "filename": "se_ring_in_drain.ogg",
     "id": "se_ring_in_drain",
     "description": "指輪が排水口にコロコロと転がり落ちる音",
@@ -2430,7 +2448,7 @@
     "keywords_en": ""
   },
   {
-    "no": 136,
+    "no": 137,
     "filename": "se_ripping_sound.ogg",
     "id": "se_ripping_sound",
     "description": "ビリビリと布・紙が破れる音（装備破壊等）",
@@ -2448,7 +2466,7 @@
     "keywords_en": ""
   },
   {
-    "no": 137,
+    "no": 138,
     "filename": "se_roar.ogg",
     "id": "se_roar",
     "description": "ガオーッという猛獣の咆哮",
@@ -2466,7 +2484,7 @@
     "keywords_en": ""
   },
   {
-    "no": 138,
+    "no": 139,
     "filename": "se_rumbling.ogg",
     "id": "se_rumbling",
     "description": "ゴゴゴという地鳴り音（罠・地震）",
@@ -2484,7 +2502,7 @@
     "keywords_en": ""
   },
   {
-    "no": 139,
+    "no": 140,
     "filename": "se_rumbling_of_earth.ogg",
     "id": "se_rumbling_of_earth",
     "description": "ズズズという大地が轟く地鳴り",
@@ -2502,7 +2520,7 @@
     "keywords_en": ""
   },
   {
-    "no": 140,
+    "no": 141,
     "filename": "se_rushing_wind_noise.ogg",
     "id": "se_rushing_wind_noise",
     "description": "ヒューという突風が吹き荒れる音",
@@ -2520,7 +2538,7 @@
     "keywords_en": ""
   },
   {
-    "no": 141,
+    "no": 142,
     "filename": "se_rustling_paper.ogg",
     "id": "se_rustling_paper",
     "description": "カサカサと紙・巻物が擦れ合う音",
@@ -2538,7 +2556,7 @@
     "keywords_en": ""
   },
   {
-    "no": 142,
+    "no": 143,
     "filename": "se_sad_wailing.ogg",
     "id": "se_sad_wailing",
     "description": "ウワーンという悲しげなすすり泣き・哀しみの声",
@@ -2556,7 +2574,7 @@
     "keywords_en": ""
   },
   {
-    "no": 143,
+    "no": 144,
     "filename": "se_sceptor_pounding.ogg",
     "id": "se_sceptor_pounding",
     "description": "笏（しゃく）で床をドンドンと叩く音（宮廷）",
@@ -2574,7 +2592,7 @@
     "keywords_en": ""
   },
   {
-    "no": 144,
+    "no": 145,
     "filename": "se_scratching.ogg",
     "id": "se_scratching",
     "description": "カリカリと爪で引っ掻く音（秘密の扉の探索）",
@@ -2592,7 +2610,7 @@
     "keywords_en": ""
   },
   {
-    "no": 145,
+    "no": 146,
     "filename": "se_scream.ogg",
     "id": "se_scream",
     "description": "ギャーッという悲鳴・絶叫（演奏効果等）",
@@ -2610,7 +2628,7 @@
     "keywords_en": ""
   },
   {
-    "no": 146,
+    "no": 147,
     "filename": "se_screech.ogg",
     "id": "se_screech",
     "description": "キーキーという甲高い叫び声",
@@ -2628,7 +2646,7 @@
     "keywords_en": ""
   },
   {
-    "no": 147,
+    "no": 148,
     "filename": "se_sewer_song.ogg",
     "id": "se_sewer_song",
     "description": "下水道から聞こえる不気味な歌声（下水道の噴水）",
@@ -2646,7 +2664,7 @@
     "keywords_en": ""
   },
   {
-    "no": 148,
+    "no": 149,
     "filename": "se_sharp_crack.ogg",
     "id": "se_sharp_crack",
     "description": "バシッと鋭くひびが走る音",
@@ -2664,7 +2682,7 @@
     "keywords_en": ""
   },
   {
-    "no": 149,
+    "no": 150,
     "filename": "se_shriek.ogg",
     "id": "se_shriek",
     "description": "ギャーッという鋭い悲鳴（モンスターの声）",
@@ -2682,25 +2700,25 @@
     "keywords_en": ""
   },
   {
-    "no": 150,
+    "no": 151,
     "filename": "se_shrill_whistle.ogg",
     "id": "se_shrill_whistle",
     "description": "ピーッと甲高く突き刺さる笛の音（ホイッスル使用）",
     "caller": "apply.c, mon.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
-    "notes": "",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
   },
   {
-    "no": 151,
+    "no": 152,
     "filename": "se_sinister_laughter.ogg",
     "id": "se_sinister_laughter",
     "description": "クックッという不敵・邪悪な笑い声（悪の存在）",
@@ -2718,7 +2736,7 @@
     "keywords_en": ""
   },
   {
-    "no": 152,
+    "no": 153,
     "filename": "se_sizzling.ogg",
     "id": "se_sizzling",
     "description": "ジュージューと焼ける・溶ける音（酸・炎接触）",
@@ -2736,7 +2754,7 @@
     "keywords_en": ""
   },
   {
-    "no": 153,
+    "no": 154,
     "filename": "se_slurping_sound.ogg",
     "id": "se_slurping_sound",
     "description": "ズルズルとすする音（捕食・液体摂取）",
@@ -2754,7 +2772,7 @@
     "keywords_en": ""
   },
   {
-    "no": 154,
+    "no": 155,
     "filename": "se_smashing_and_crushing.ogg",
     "id": "se_smashing_and_crushing",
     "description": "ガシャンと叩き潰す音（跳ね橋の可動）",
@@ -2772,7 +2790,7 @@
     "keywords_en": ""
   },
   {
-    "no": 155,
+    "no": 156,
     "filename": "se_snake_rattle.ogg",
     "id": "se_snake_rattle",
     "description": "ガラガラヘビの尾のガラガラと鳴る警告音",
@@ -2790,7 +2808,7 @@
     "keywords_en": ""
   },
   {
-    "no": 156,
+    "no": 157,
     "filename": "se_snakes_hissing.ogg",
     "id": "se_snakes_hissing",
     "description": "ヘビのシャーという群体の威嚇音",
@@ -2808,7 +2826,7 @@
     "keywords_en": ""
   },
   {
-    "no": 157,
+    "no": 158,
     "filename": "se_snarl.ogg",
     "id": "se_snarl",
     "description": "ウーッと牙をむいて低く唸る声",
@@ -2826,7 +2844,7 @@
     "keywords_en": ""
   },
   {
-    "no": 158,
+    "no": 159,
     "filename": "se_soft_click.ogg",
     "id": "se_soft_click",
     "description": "カチッとかすかに鳴るいかにも怪しい音（罠感知）",
@@ -2844,7 +2862,7 @@
     "keywords_en": ""
   },
   {
-    "no": 159,
+    "no": 160,
     "filename": "se_soft_crackling.ogg",
     "id": "se_soft_crackling",
     "description": "パチパチとかすかに燃える音（炎の魔法）",
@@ -2862,7 +2880,7 @@
     "keywords_en": ""
   },
   {
-    "no": 160,
+    "no": 161,
     "filename": "se_someone_bowling.ogg",
     "id": "se_someone_bowling",
     "description": "ボウリングの球が転がるような音（転がる物体）",
@@ -2880,7 +2898,7 @@
     "keywords_en": ""
   },
   {
-    "no": 161,
+    "no": 162,
     "filename": "se_someone_searching.ogg",
     "id": "se_someone_searching",
     "description": "ガサゴソと何かを捜索する音（探索中のモンスター）",
@@ -2898,7 +2916,7 @@
     "keywords_en": ""
   },
   {
-    "no": 162,
+    "no": 163,
     "filename": "se_someone_summoning.ogg",
     "id": "se_someone_summoning",
     "description": "ウォーという召喚の呪文を唱える声",
@@ -2916,7 +2934,7 @@
     "keywords_en": ""
   },
   {
-    "no": 163,
+    "no": 164,
     "filename": "se_someone_yells.ogg",
     "id": "se_someone_yells",
     "description": "誰かが叫ぶ声（警衛の呼び声・緊急事態）",
@@ -2934,7 +2952,7 @@
     "keywords_en": ""
   },
   {
-    "no": 164,
+    "no": 165,
     "filename": "se_splash.ogg",
     "id": "se_splash",
     "description": "バシャッと水が跳ねる音（水中落下・投擲）",
@@ -2952,7 +2970,7 @@
     "keywords_en": ""
   },
   {
-    "no": 165,
+    "no": 166,
     "filename": "se_splat_egg.ogg",
     "id": "se_splat_egg",
     "description": "卵がぐしゃっと潰れる音（投擲命中）",
@@ -2970,7 +2988,7 @@
     "keywords_en": ""
   },
   {
-    "no": 166,
+    "no": 167,
     "filename": "se_splat_from_engulf.ogg",
     "id": "se_splat_from_engulf",
     "description": "丸呑みモンスターに消化されグシャッとなる音",
@@ -2988,7 +3006,7 @@
     "keywords_en": ""
   },
   {
-    "no": 167,
+    "no": 168,
     "filename": "se_squawk.ogg",
     "id": "se_squawk",
     "description": "ギャーギャーという鳥の鳴き声",
@@ -3006,7 +3024,7 @@
     "keywords_en": ""
   },
   {
-    "no": 168,
+    "no": 169,
     "filename": "se_squeak.ogg",
     "id": "se_squeak",
     "description": "チューという動物の高い鳴き声・きしみ音",
@@ -3024,223 +3042,223 @@
     "keywords_en": ""
   },
   {
-    "no": 169,
+    "no": 170,
     "filename": "se_squeak_A.ogg",
     "id": "se_squeak_A",
     "description": "皮袋の笛（バグパイプ）チューニング音 — ラ音（A）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
-    "notes": "",
-    "sub_category_ja": "",
-    "keywords_ja": "",
-    "keywords_en": ""
-  },
-  {
-    "no": 170,
-    "filename": "se_squeak_B.ogg",
-    "id": "se_squeak_B",
-    "description": "皮袋の笛チューニング音 — シ音（B）",
-    "caller": "予備（直接呼び出しなし）",
-    "category": "effect",
-    "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
-    "notes": "",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
   },
   {
     "no": 171,
-    "filename": "se_squeak_B_flat.ogg",
-    "id": "se_squeak_B_flat",
-    "description": "皮袋の笛チューニング音 — シ♭音（B♭）",
+    "filename": "se_squeak_B.ogg",
+    "id": "se_squeak_B",
+    "description": "皮袋の笛チューニング音 — シ音（B）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
-    "notes": "",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
   },
   {
     "no": 172,
-    "filename": "se_squeak_C.ogg",
-    "id": "se_squeak_C",
-    "description": "皮袋の笛チューニング音 — ド音（C）",
+    "filename": "se_squeak_B_flat.ogg",
+    "id": "se_squeak_B_flat",
+    "description": "皮袋の笛チューニング音 — シ♭音（B♭）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
-    "notes": "",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
   },
   {
     "no": 173,
-    "filename": "se_squeak_D.ogg",
-    "id": "se_squeak_D",
-    "description": "皮袋の笛チューニング音 — レ音（D）",
+    "filename": "se_squeak_C.ogg",
+    "id": "se_squeak_C",
+    "description": "皮袋の笛チューニング音 — ド音（C）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
-    "notes": "",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
   },
   {
     "no": 174,
-    "filename": "se_squeak_D_flat.ogg",
-    "id": "se_squeak_D_flat",
-    "description": "皮袋の笛チューニング音 — レ♭音（D♭）",
+    "filename": "se_squeak_D.ogg",
+    "id": "se_squeak_D",
+    "description": "皮袋の笛チューニング音 — レ音（D）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
-    "notes": "",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
   },
   {
     "no": 175,
-    "filename": "se_squeak_E.ogg",
-    "id": "se_squeak_E",
-    "description": "皮袋の笛チューニング音 — ミ音（E）",
+    "filename": "se_squeak_D_flat.ogg",
+    "id": "se_squeak_D_flat",
+    "description": "皮袋の笛チューニング音 — レ♭音（D♭）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
-    "notes": "",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
   },
   {
     "no": 176,
-    "filename": "se_squeak_E_flat.ogg",
-    "id": "se_squeak_E_flat",
-    "description": "皮袋の笛チューニング音 — ミ♭音（E♭）",
+    "filename": "se_squeak_E.ogg",
+    "id": "se_squeak_E",
+    "description": "皮袋の笛チューニング音 — ミ音（E）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
-    "notes": "",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
   },
   {
     "no": 177,
-    "filename": "se_squeak_F.ogg",
-    "id": "se_squeak_F",
-    "description": "皮袋の笛チューニング音 — ファ音（F）",
+    "filename": "se_squeak_E_flat.ogg",
+    "id": "se_squeak_E_flat",
+    "description": "皮袋の笛チューニング音 — ミ♭音（E♭）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
-    "notes": "",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
   },
   {
     "no": 178,
-    "filename": "se_squeak_F_sharp.ogg",
-    "id": "se_squeak_F_sharp",
-    "description": "皮袋の笛チューニング音 — ファ♯音（F♯）",
+    "filename": "se_squeak_F.ogg",
+    "id": "se_squeak_F",
+    "description": "皮袋の笛チューニング音 — ファ音（F）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
-    "notes": "",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
   },
   {
     "no": 179,
-    "filename": "se_squeak_G.ogg",
-    "id": "se_squeak_G",
-    "description": "皮袋の笛チューニング音 — ソ音（G）",
+    "filename": "se_squeak_F_sharp.ogg",
+    "id": "se_squeak_F_sharp",
+    "description": "皮袋の笛チューニング音 — ファ♯音（F♯）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
-    "notes": "",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
   },
   {
     "no": 180,
-    "filename": "se_squeak_G_sharp.ogg",
-    "id": "se_squeak_G_sharp",
-    "description": "皮袋の笛チューニング音 — ソ♯音（G♯）",
+    "filename": "se_squeak_G.ogg",
+    "id": "se_squeak_G",
+    "description": "皮袋の笛チューニング音 — ソ音（G）",
     "caller": "予備（直接呼び出しなし）",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
-    "notes": "",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
   },
   {
     "no": 181,
+    "filename": "se_squeak_G_sharp.ogg",
+    "id": "se_squeak_G_sharp",
+    "description": "皮袋の笛チューニング音 — ソ♯音（G♯）",
+    "caller": "予備（直接呼び出しなし）",
+    "category": "effect",
+    "sub_category": "Soundeffect",
+    "status": "ready",
+    "source_site": "FluidR3 GM (FluidSynth)",
+    "author": "Frank Wen",
+    "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2",
+    "license": "MIT / GPL",
+    "notes": "SoundFont auto-sampled instrument/effect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
+  },
+  {
+    "no": 182,
     "filename": "se_squeal.ogg",
     "id": "se_squeal",
     "description": "キーッという甲高い叫び声・きしみ",
@@ -3258,7 +3276,7 @@
     "keywords_en": ""
   },
   {
-    "no": 182,
+    "no": 183,
     "filename": "se_squelch.ogg",
     "id": "se_squelch",
     "description": "グチャッという湿った踏みつけ音",
@@ -3276,7 +3294,7 @@
     "keywords_en": ""
   },
   {
-    "no": 183,
+    "no": 184,
     "filename": "se_stone_breaking.ogg",
     "id": "se_stone_breaking",
     "description": "バキッと石が割れる音（岩石魔法・爆発）",
@@ -3294,7 +3312,7 @@
     "keywords_en": ""
   },
   {
-    "no": 184,
+    "no": 185,
     "filename": "se_stone_crumbling.ogg",
     "id": "se_stone_crumbling",
     "description": "ガラガラと石が崩れ落ちる音",
@@ -3312,7 +3330,7 @@
     "keywords_en": ""
   },
   {
-    "no": 185,
+    "no": 186,
     "filename": "se_swoosh.ogg",
     "id": "se_swoosh",
     "description": "ヒュッと素早く風を切る音（飛道具・魔法）",
@@ -3330,7 +3348,7 @@
     "keywords_en": ""
   },
   {
-    "no": 186,
+    "no": 187,
     "filename": "se_sword_blade_rings.ogg",
     "id": "se_sword_blade_rings",
     "description": "剣の刃がシャリーンと鳴る音（法具の認識）",
@@ -3348,7 +3366,7 @@
     "keywords_en": ""
   },
   {
-    "no": 187,
+    "no": 188,
     "filename": "se_thud.ogg",
     "id": "se_thud",
     "description": "ドスンという重い着地・衝突音",
@@ -3366,7 +3384,7 @@
     "keywords_en": ""
   },
   {
-    "no": 188,
+    "no": 189,
     "filename": "se_thump.ogg",
     "id": "se_thump",
     "description": "ドンという鈍い衝突音",
@@ -3384,7 +3402,7 @@
     "keywords_en": ""
   },
   {
-    "no": 189,
+    "no": 190,
     "filename": "se_thunderclap.ogg",
     "id": "se_thunderclap",
     "description": "ドカーンと轟く雷鳴（祈り・神罰）",
@@ -3402,7 +3420,7 @@
     "keywords_en": ""
   },
   {
-    "no": 190,
+    "no": 191,
     "filename": "se_tumbler_click.ogg",
     "id": "se_tumbler_click",
     "description": "鍵穴のタンブラーがハマってカチッと鳴る音",
@@ -3420,7 +3438,7 @@
     "keywords_en": ""
   },
   {
-    "no": 191,
+    "no": 192,
     "filename": "se_typing_noise.ogg",
     "id": "se_typing_noise",
     "description": "カタカタとタイプライターを打つような音（占術使用）",
@@ -3438,7 +3456,7 @@
     "keywords_en": ""
   },
   {
-    "no": 192,
+    "no": 193,
     "filename": "se_wail.ogg",
     "id": "se_wail",
     "description": "ウオーッと泣き叫ぶ声（アンデッドや呪い）",
@@ -3456,7 +3474,7 @@
     "keywords_en": ""
   },
   {
-    "no": 193,
+    "no": 194,
     "filename": "se_wailing_of_the_banshee.ogg",
     "id": "se_wailing_of_the_banshee",
     "description": "バンシーの死を予告する絶叫（バンシーの遭遇）",
@@ -3474,7 +3492,7 @@
     "keywords_en": ""
   },
   {
-    "no": 194,
+    "no": 195,
     "filename": "se_wall_of_force.ogg",
     "id": "se_wall_of_force",
     "description": "ズズーンと重く響く力場・バリア音（魔法壁）",
@@ -3492,7 +3510,7 @@
     "keywords_en": ""
   },
   {
-    "no": 195,
+    "no": 196,
     "filename": "se_yelp.ogg",
     "id": "se_yelp",
     "description": "キャンという短い悲鳴",
@@ -3510,7 +3528,7 @@
     "keywords_en": ""
   },
   {
-    "no": 196,
+    "no": 197,
     "filename": "se_zap.ogg",
     "id": "se_zap",
     "description": "ビビッという魔法・電撃の発射音",
@@ -3528,7 +3546,7 @@
     "keywords_en": ""
   },
   {
-    "no": 197,
+    "no": 198,
     "filename": "se_zap_then_explosion.ogg",
     "id": "se_zap_then_explosion",
     "description": "ビビッからドカンという魔法爆発音",
@@ -3546,7 +3564,7 @@
     "keywords_en": ""
   },
   {
-    "no": 198,
+    "no": 199,
     "filename": "se_combat_hit_slash.ogg",
     "id": "se_combat_hit_slash",
     "description": "刃物・刀剣・斧による斬撃ヒット音",
@@ -3556,15 +3574,15 @@
     "sub_category_ja": "近接（斬撃）",
     "keywords_ja": "斬撃 剣 刀 斧 攻撃",
     "keywords_en": "sword slash blade cut hit attack",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "効果音ラボ",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://soundeffect-lab.info/",
+    "license": "効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）",
     "notes": ""
   },
   {
-    "no": 199,
+    "no": 200,
     "filename": "se_combat_hit_blunt.ogg",
     "id": "se_combat_hit_blunt",
     "description": "鈍器・棍棒・石・打撃武器によるヒット音",
@@ -3574,15 +3592,15 @@
     "sub_category_ja": "近接（打撃）",
     "keywords_ja": "打撃 鈍器 メイス 棍棒 殴る",
     "keywords_en": "blunt hit mace club strike punch smack",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "効果音ラボ",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://soundeffect-lab.info/",
+    "license": "効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）",
     "notes": ""
   },
   {
-    "no": 200,
+    "no": 201,
     "filename": "se_combat_hit_pierce.ogg",
     "id": "se_combat_hit_pierce",
     "description": "槍・刺突武器・矢弾による貫通ヒット音",
@@ -3592,15 +3610,15 @@
     "sub_category_ja": "近接（刺突）",
     "keywords_ja": "刺突 槍 突き 短剣 刺す",
     "keywords_en": "pierce spear stab thrust dagger jab",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "効果音ラボ",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://soundeffect-lab.info/",
+    "license": "効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）",
     "notes": ""
   },
   {
-    "no": 201,
+    "no": 202,
     "filename": "se_combat_hit_unarmed.ogg",
     "id": "se_combat_hit_unarmed",
     "description": "素手格闘・パンチ・キックによる打撃ヒット音",
@@ -3618,7 +3636,7 @@
     "notes": ""
   },
   {
-    "no": 202,
+    "no": 203,
     "filename": "se_combat_hit_whip.ogg",
     "id": "se_combat_hit_whip",
     "description": "鞭・濡れたタオルによる攻撃命中音",
@@ -3636,7 +3654,7 @@
     "notes": ""
   },
   {
-    "no": 203,
+    "no": 204,
     "filename": "se_combat_hit_ironball.ogg",
     "id": "se_combat_hit_ironball",
     "description": "鉄球・鉄鎖による重金属・鎖衝突音",
@@ -3654,7 +3672,7 @@
     "notes": ""
   },
   {
-    "no": 204,
+    "no": 205,
     "filename": "se_combat_hit_shield.ogg",
     "id": "se_combat_hit_shield",
     "description": "盾による重い防具シールドバッシュ音（近接限定）",
@@ -3664,15 +3682,15 @@
     "sub_category_ja": "近接（盾バッシュ）",
     "keywords_ja": "シールド 盾 防具 バッシュ ガゴン 打撃",
     "keywords_en": "shield bash metal shield heavy block hit",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "効果音ラボ",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://soundeffect-lab.info/",
+    "license": "効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）",
     "notes": ""
   },
   {
-    "no": 205,
+    "no": 206,
     "filename": "se_combat_hit_corpse.ogg",
     "id": "se_combat_hit_corpse",
     "description": "死体・肉塊武器による生体打撃音",
@@ -3682,15 +3700,15 @@
     "sub_category_ja": "近接（死体/肉塊）",
     "keywords_ja": "肉片 死体 ボコッ グチャ 生体 肉塊",
     "keywords_en": "corpse flesh meat smack squish blunt hit",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "効果音ラボ",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://soundeffect-lab.info/",
+    "license": "効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）",
     "notes": ""
   },
   {
-    "no": 206,
+    "no": 207,
     "filename": "se_combat_hit_pick.ogg",
     "id": "se_combat_hit_pick",
     "description": "つるはし・マトックによる硬質な採掘具打撃音",
@@ -3700,15 +3718,15 @@
     "sub_category_ja": "近接（採掘具）",
     "keywords_ja": "つるはし マトック 採掘 ピッケル 岩石 キーン",
     "keywords_en": "pickaxe mattock mining pick stone hit clink",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "効果音ラボ",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://soundeffect-lab.info/",
+    "license": "効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）",
     "notes": ""
   },
   {
-    "no": 207,
+    "no": 208,
     "filename": "se_combat_hit_wand.ogg",
     "id": "se_combat_hit_wand",
     "description": "杖・ロッドによる硬く乾いた小打撃音",
@@ -3718,15 +3736,15 @@
     "sub_category_ja": "近接（杖/ロッド）",
     "keywords_ja": "杖 ロッド 細い棒 コツッ カチッ 物理",
     "keywords_en": "wand staff light tap click stick hit",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "効果音ラボ",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://soundeffect-lab.info/",
+    "license": "効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）",
     "notes": ""
   },
   {
-    "no": 208,
+    "no": 209,
     "filename": "se_combat_hit_other.ogg",
     "id": "se_combat_hit_other",
     "description": "未分類アイテム（本・巻物・薬・食料・宝石等）全般の汎用フォールバック打撃音",
@@ -3736,15 +3754,15 @@
     "sub_category_ja": "近接/汎用（その他）",
     "keywords_ja": "物 打撃 ポンッ バシッ 雑多 アイテム",
     "keywords_en": "item hit generic smack object blunt light",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "効果音ラボ",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://soundeffect-lab.info/",
+    "license": "効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）",
     "notes": ""
   },
   {
-    "no": 209,
+    "no": 210,
     "filename": "se_combat_miss.ogg",
     "id": "se_combat_miss",
     "description": "攻撃の空振り音（風切り音）",
@@ -3754,15 +3772,15 @@
     "sub_category_ja": "近接（空振り）",
     "keywords_ja": "風切り音 空振り 武器 振る ヒュッ",
     "keywords_en": "whoosh swing miss weapon swoosh air",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "効果音ラボ",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://soundeffect-lab.info/",
+    "license": "効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）",
     "notes": ""
   },
   {
-    "no": 210,
+    "no": 211,
     "filename": "se_combat_shoot_bow.ogg",
     "id": "se_combat_shoot_bow",
     "description": "弓矢の発射音（弦を弾く音）",
@@ -3772,15 +3790,15 @@
     "sub_category_ja": "遠隔（弓発射）",
     "keywords_ja": "弓 矢 発射 射撃 弦 ビュン",
     "keywords_en": "bow arrow shoot release arrow shot",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "効果音ラボ",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://soundeffect-lab.info/",
+    "license": "効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）",
     "notes": ""
   },
   {
-    "no": 211,
+    "no": 212,
     "filename": "se_combat_shoot_crossbow.ogg",
     "id": "se_combat_shoot_crossbow",
     "description": "クロスボウの発射音（バネ解放音）",
@@ -3798,7 +3816,7 @@
     "notes": ""
   },
   {
-    "no": 212,
+    "no": 213,
     "filename": "se_combat_shoot_sling.ogg",
     "id": "se_combat_shoot_sling",
     "description": "スリング（投石器）の旋回・射出音",
@@ -3816,7 +3834,7 @@
     "notes": ""
   },
   {
-    "no": 213,
+    "no": 214,
     "filename": "se_combat_throw.ogg",
     "id": "se_combat_throw",
     "description": "手投げによる投擲音",
@@ -3834,7 +3852,7 @@
     "notes": ""
   },
   {
-    "no": 214,
+    "no": 215,
     "filename": "se_combat_throw_boomerang.ogg",
     "id": "se_combat_throw_boomerang",
     "description": "ブーメランの旋回投擲音",
@@ -3852,7 +3870,7 @@
     "notes": ""
   },
   {
-    "no": 215,
+    "no": 216,
     "filename": "se_combat_throw_mjollnir.ogg",
     "id": "se_combat_throw_mjollnir",
     "description": "ミョルニルの電撃を帯びた豪快な投擲音",
@@ -3870,7 +3888,7 @@
     "notes": ""
   },
   {
-    "no": 216,
+    "no": 217,
     "filename": "se_combat_miss_thud.ogg",
     "id": "se_combat_miss_thud",
     "description": "飛翔体が外れて壁や床に激突する音",
@@ -3888,7 +3906,7 @@
     "notes": ""
   },
   {
-    "no": 217,
+    "no": 218,
     "filename": "se_combat_spell_cast.ogg",
     "id": "se_combat_spell_cast",
     "description": "呪文の詠唱・魔法発動音",
@@ -3906,7 +3924,7 @@
     "notes": ""
   },
   {
-    "no": 218,
+    "no": 219,
     "filename": "se_combat_wand_zap.ogg",
     "id": "se_combat_wand_zap",
     "description": "杖を振った際の発動音",
@@ -3924,7 +3942,7 @@
     "notes": ""
   },
   {
-    "no": 219,
+    "no": 220,
     "filename": "se_mon_claw.ogg",
     "id": "se_mon_claw",
     "description": "モンスターの爪による引き裂き音",
@@ -3942,7 +3960,7 @@
     "notes": ""
   },
   {
-    "no": 220,
+    "no": 221,
     "filename": "se_mon_bite.ogg",
     "id": "se_mon_bite",
     "description": "モンスターの噛みつき音",
@@ -3960,7 +3978,7 @@
     "notes": ""
   },
   {
-    "no": 221,
+    "no": 222,
     "filename": "se_mon_sting.ogg",
     "id": "se_mon_sting",
     "description": "モンスターの毒針・刺突音",
@@ -3978,7 +3996,7 @@
     "notes": ""
   },
   {
-    "no": 222,
+    "no": 223,
     "filename": "se_mon_butt.ogg",
     "id": "se_mon_butt",
     "description": "モンスターの角・頭突き衝突音",
@@ -3996,7 +4014,7 @@
     "notes": ""
   },
   {
-    "no": 223,
+    "no": 224,
     "filename": "se_mon_touch.ogg",
     "id": "se_mon_touch",
     "description": "モンスターの接触・麻痺音",
@@ -4014,7 +4032,7 @@
     "notes": ""
   },
   {
-    "no": 224,
+    "no": 225,
     "filename": "se_mon_tentacle.ogg",
     "id": "se_mon_tentacle",
     "description": "触手による攻撃・絡みつき音",
@@ -4032,7 +4050,7 @@
     "notes": ""
   },
   {
-    "no": 225,
+    "no": 226,
     "filename": "se_mon_kick.ogg",
     "id": "se_mon_kick",
     "description": "モンスターの蹴り・踏みつけ音",
@@ -4042,15 +4060,15 @@
     "sub_category_ja": "モンスター（蹴り/蹄）",
     "keywords_ja": "蹴り 蹄 ドカッ 馬 キック 踏みつけ",
     "keywords_en": "hoof kick horse beast stomp donkey heavy",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "効果音ラボ",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://soundeffect-lab.info/",
+    "license": "効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）",
     "notes": ""
   },
   {
-    "no": 226,
+    "no": 227,
     "filename": "se_mon_hug.ogg",
     "id": "se_mon_hug",
     "description": "締めつけ・怪力による抱き締め音",
@@ -4068,7 +4086,7 @@
     "notes": ""
   },
   {
-    "no": 227,
+    "no": 228,
     "filename": "se_mon_gaze.ogg",
     "id": "se_mon_gaze",
     "description": "凝視・魔眼による視線攻撃音",
@@ -4086,7 +4104,7 @@
     "notes": ""
   },
   {
-    "no": 228,
+    "no": 229,
     "filename": "se_mon_engulf.ogg",
     "id": "se_mon_engulf",
     "description": "丸呑み・呑み込み音",
@@ -4104,7 +4122,7 @@
     "notes": ""
   },
   {
-    "no": 229,
+    "no": 230,
     "filename": "se_mon_breath.ogg",
     "id": "se_mon_breath",
     "description": "ドラゴン等のブレス放出音",
@@ -4122,7 +4140,7 @@
     "notes": ""
   },
   {
-    "no": 230,
+    "no": 231,
     "filename": "se_mon_spit.ogg",
     "id": "se_mon_spit",
     "description": "毒液・酸の吐出音",

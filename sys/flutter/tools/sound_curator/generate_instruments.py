@@ -72,6 +72,61 @@ def write_midi_file(filepath: Path, program: int, note: int, velocity: int = 100
     filepath.parent.mkdir(parents=True, exist_ok=True)
     filepath.write_bytes(header + track)
 
+def write_magic_whistle_midi(filepath: Path):
+    """魔法の笛用：Pan Flute (Ch 0) + Celesta (Ch 1) の重音レイヤーMIDI (Format 0) を生成"""
+    def to_varlen(val: int) -> bytes:
+        buf = []
+        buf.append(val & 0x7F)
+        val >>= 7
+        while val > 0:
+            buf.append((val & 0x7F) | 0x80)
+            val >>= 7
+        buf.reverse()
+        return bytes(buf)
+
+    events = bytearray()
+
+    # Delta-time 0: Ch 0 -> Pan Flute (prog 75), Ch 1 -> Celesta (prog 8)
+    events.extend(to_varlen(0))
+    events.extend(bytes([0xC0, 75]))
+    events.extend(to_varlen(0))
+    events.extend(bytes([0xC1, 8]))
+
+    # Delta-time 0: Pan Flute C6 (84), Celesta C6 (84) 発音
+    events.extend(to_varlen(0))
+    events.extend(bytes([0x90, 84, 105]))
+    events.extend(to_varlen(0))
+    events.extend(bytes([0x91, 84, 110]))
+
+    # Delta-time 30: Celesta G6 (91) 高音キラキラ
+    events.extend(to_varlen(30))
+    events.extend(bytes([0x91, 91, 100]))
+
+    # Delta-time 30: Celesta C7 (96) 最高音キラキラ
+    events.extend(to_varlen(30))
+    events.extend(bytes([0x91, 96, 115]))
+
+    # Delta-time 180: Pan Flute Note Off
+    events.extend(to_varlen(180))
+    events.extend(bytes([0x80, 84, 0]))
+
+    # Delta-time 60: Celesta Notes Off
+    events.extend(to_varlen(60))
+    events.extend(bytes([0x81, 84, 0]))
+    events.extend(to_varlen(0))
+    events.extend(bytes([0x81, 91, 0]))
+    events.extend(to_varlen(0))
+    events.extend(bytes([0x81, 96, 0]))
+
+    # Delta-time 96 ticks: End of Track
+    events.extend(to_varlen(96))
+    events.extend(bytes([0xFF, 0x2F, 0x00]))
+
+    header = struct.pack(">4sIHHH", b"MThd", 6, 0, 1, 96)
+    track = struct.pack(">4sI", b"MTrk", len(events)) + bytes(events)
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    filepath.write_bytes(header + track)
+
 # 2. FluidSynth & SoundFont の準備
 def ensure_fluidsynth() -> Path:
     """Windows用 fluidsynth.exe の存在を確認・ダウンロード"""
@@ -166,6 +221,22 @@ INSTRUMENTS_FIXED = [
     {"filename": "sound_Leather_Drum.ogg", "program": 117, "note": 48, "duration": 300},
 ]
 
+# 革袋の笛（バグパイプ）12半音階チューニング音 (Prog 109: Bagpipe)
+BAGPIPE_SQUEAKS = [
+    {"filename": "se_squeak_A.ogg", "note": 69},
+    {"filename": "se_squeak_B.ogg", "note": 71},
+    {"filename": "se_squeak_B_flat.ogg", "note": 70},
+    {"filename": "se_squeak_C.ogg", "note": 60},
+    {"filename": "se_squeak_D.ogg", "note": 62},
+    {"filename": "se_squeak_D_flat.ogg", "note": 61},
+    {"filename": "se_squeak_E.ogg", "note": 64},
+    {"filename": "se_squeak_E_flat.ogg", "note": 63},
+    {"filename": "se_squeak_F.ogg", "note": 65},
+    {"filename": "se_squeak_F_sharp.ogg", "note": 66},
+    {"filename": "se_squeak_G.ogg", "note": 67},
+    {"filename": "se_squeak_G_sharp.ogg", "note": 68},
+]
+
 def render_midi_to_wav(fluidsynth_exe: Path, sf2_path: Path, mid_path: Path, wav_path: Path):
     """FluidSynth を呼び出して MIDI を WAV にレンダリング"""
     cmd = [
@@ -176,6 +247,72 @@ def render_midi_to_wav(fluidsynth_exe: Path, sf2_path: Path, mid_path: Path, wav
         str(mid_path)
     ]
     subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+
+def generate_effect_instruments():
+    """効果音カテゴリの角笛、通常笛、魔法の笛、革袋の笛（計15ファイル）を生成"""
+    from process_audio import normalize_and_convert
+
+    fluidsynth_exe = ensure_fluidsynth()
+    sf2_path = ensure_soundfont()
+
+    TEMP_DIR.mkdir(parents=True, exist_ok=True)
+    SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
+
+    generated_count = 0
+    print("\n--- 革袋の笛（バグパイプ）12半音階 (se_squeak_*.ogg) のサンプリング開始 ---")
+    for item in BAGPIPE_SQUEAKS:
+        out_filename = item["filename"]
+        note_val = item["note"]
+        mid_file = TEMP_DIR / f"{out_filename}.mid"
+        wav_file = TEMP_DIR / f"{out_filename}.wav"
+        ogg_file = SOUNDS_DIR / out_filename
+
+        # バグパイプ音色 (prog 109)、持続音 (240 ticks)
+        write_midi_file(mid_file, program=109, note=note_val, velocity=105, duration_ticks=240)
+        render_midi_to_wav(fluidsynth_exe, sf2_path, mid_file, wav_file)
+
+        ok = normalize_and_convert(wav_file, ogg_file, target_lufs=-14.0, is_stereo=False)
+        if ok:
+            generated_count += 1
+            print(f"[{generated_count}/15] 生成完了: {out_filename}")
+
+    print("\n--- 角笛 (se_horn_being_played.ogg) のサンプリング開始 ---")
+    horn_file = "se_horn_being_played.ogg"
+    mid_file = TEMP_DIR / f"{horn_file}.mid"
+    wav_file = TEMP_DIR / f"{horn_file}.wav"
+    ogg_file = SOUNDS_DIR / horn_file
+    # French Horn (prog 60), F3 (53), 長めのブォーン音 (350 ticks)
+    write_midi_file(mid_file, program=60, note=53, velocity=115, duration_ticks=350)
+    render_midi_to_wav(fluidsynth_exe, sf2_path, mid_file, wav_file)
+    if normalize_and_convert(wav_file, ogg_file, target_lufs=-14.0, is_stereo=False):
+        generated_count += 1
+        print(f"[{generated_count}/15] 生成完了: {horn_file}")
+
+    print("\n--- 普通のホイッスル (se_shrill_whistle.ogg) のサンプリング開始 ---")
+    whistle_file = "se_shrill_whistle.ogg"
+    mid_file = TEMP_DIR / f"{whistle_file}.mid"
+    wav_file = TEMP_DIR / f"{whistle_file}.wav"
+    ogg_file = SOUNDS_DIR / whistle_file
+    # Whistle (prog 125), C6 (84), 鋭い警笛 (110 ticks)
+    write_midi_file(mid_file, program=125, note=84, velocity=120, duration_ticks=110)
+    render_midi_to_wav(fluidsynth_exe, sf2_path, mid_file, wav_file)
+    if normalize_and_convert(wav_file, ogg_file, target_lufs=-14.0, is_stereo=False):
+        generated_count += 1
+        print(f"[{generated_count}/15] 生成完了: {whistle_file}")
+
+    print("\n--- 魔法のホイッスル (se_magic_whistle.ogg) のサンプリング開始 ---")
+    magic_whistle_file = "se_magic_whistle.ogg"
+    mid_file = TEMP_DIR / f"{magic_whistle_file}.mid"
+    wav_file = TEMP_DIR / f"{magic_whistle_file}.wav"
+    ogg_file = SOUNDS_DIR / magic_whistle_file
+    # Pan Flute (prog 75) + Celesta (prog 8) レイヤー重音
+    write_magic_whistle_midi(mid_file)
+    render_midi_to_wav(fluidsynth_exe, sf2_path, mid_file, wav_file)
+    if normalize_and_convert(wav_file, ogg_file, target_lufs=-14.0, is_stereo=True):
+        generated_count += 1
+        print(f"[{generated_count}/15] 生成完了: {magic_whistle_file}")
+
+    print(f"\n合計 {generated_count} / 15 の効果音カテゴリ楽器・笛音を生成しました！ 出力先: {SOUNDS_DIR}")
 
 def generate_all_instruments():
     from process_audio import normalize_and_convert
@@ -230,4 +367,8 @@ def generate_all_instruments():
     print(f"\n合計 {generated_count} / 47 の楽器音を生成しました！ 出力先: {SOUNDS_DIR}")
 
 if __name__ == "__main__":
-    generate_all_instruments()
+    if "--effects-only" in sys.argv:
+        generate_effect_instruments()
+    else:
+        generate_all_instruments()
+        generate_effect_instruments()

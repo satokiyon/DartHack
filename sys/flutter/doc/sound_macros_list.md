@@ -6,14 +6,14 @@ DartHack（Flutter/FFI環境）で再生する **全 `.ogg` (Opus) 音声ファ�
 > **戦闘アクション効果音の詳細仕様書**:
 > 2026-09に追加された戦闘系効果音（No.198〜230：近接、遠隔、呪文、杖、モンスター固有攻撃12種、特徴的アイテム・フォールバック音など計33種）の音量制御、不可視40%気配察知、生データ属性自動判定、Multishot集約、60msデバウンス制御、および音響素材制作ガイドラインの詳細は、専用仕様書 [combat_sound_specification.md](combat_sound_specification.md) を参照してください。
 
-> **改訂履歴**: 2026-09-16 初版作成。初版レビューに基づき修正。2026-09-17 戦闘アクション効果音 33種（No.198〜230、鞭・鉄球・盾・死体・つるはし・杖・その他フォールバック追加）対応および専用仕様書リンク新設。
+> **改訂履歴**: 2026-09-16 初版作成。初版レビューに基づき修正。2026-09-17 戦闘アクション効果音 33種（No.198〜230）対応。2026-09-18 魔法の笛（se_magic_whistle）新設・通常笛と分離（全231種）。
 
 ---
 
 ## 第1部: 音声ファイル マスター管理表（全音源チェックリスト）
 
 ### 1-A. 効果音 (`Soundeffect`) — se_*.ogg 一覧
-Cコアの `include/seffects.h` に定義されている 230 種の効果音 ID の全一覧です（戦闘アクション効果音 33種を含む）。
+Cコアの `include/seffects.h` に定義されている 231 種の効果音 ID の全一覧です（戦闘アクション効果音 33種を含む）。
 
 | No. | 音声ファイル名 (.ogg) | サウンドID | 日本語イベント説明 | 呼び出し元Cファイル |
 | :--- | :--- | :--- | :--- | :--- |
@@ -142,111 +142,112 @@ Cコアの `include/seffects.h` に定義されている 230 種の効果音 ID 
 | 123 | `se_loud_splash.ogg` | `se_loud_splash` | ドバシャーンという大きな水しぶき音 | dbridge.c |
 | 124 | `se_low_buzzing.ogg` | `se_low_buzzing` | ブーンという低く響く羽音（蜂の巣・虫） | sounds.c |
 | 125 | `se_low_hum.ogg` | `se_low_hum` | ブーンというハム・機械音（罠の予兆） | trap.c |
-| 126 | `se_maniacal_laughter.ogg` | `se_maniacal_laughter` | ケタケタという狂気的な高笑い（巻物読後等） | read.c |
-| 127 | `se_masticating_sound.ogg` | `se_masticating_sound` | クチャクチャと何かを噛む咀嚼音 | mon.c |
-| 128 | `se_mon_chugging_potion.ogg` | `se_mon_chugging_potion` | モンスターがポーションをゴクゴクと飲む音 | muse.c |
-| 129 | `se_monster_behind_boulder.ogg` | `se_monster_behind_boulder` | 岩陰に隠れるモンスターの気配・物音 | hack.c |
-| 130 | `se_mutter_imprecations.ogg` | `se_mutter_imprecations` | 呪いの言葉をブツブツと呟く声（店主の怒り） | shk.c |
-| 131 | `se_mutter_incantation.ogg` | `se_mutter_incantation` | 呪文をブツブツと唱える声 | shk.c |
-| 132 | `se_orc_grunt.ogg` | `se_orc_grunt` | オークのグアッという低い唸り声 | sounds.c |
-| 133 | `se_paranoid_confirmation.ogg` | `se_paranoid_confirmation` | ソワソワした確認の囁き声 | 予備（直接呼び出しなし） |
-| 134 | `se_potion_crash_and_break.ogg` | `se_potion_crash_and_break` | ポーション瓶がガシャンと割れ液体が散る音 | potion.c |
-| 135 | `se_ring_in_drain.ogg` | `se_ring_in_drain` | 指輪が排水口にコロコロと転がり落ちる音 | do.c |
-| 136 | `se_ripping_sound.ogg` | `se_ripping_sound` | ビリビリと布・紙が破れる音（装備破壊等） | worn.c |
-| 137 | `se_roar.ogg` | `se_roar` | ガオーッという猛獣の咆哮 | trap.c |
-| 138 | `se_rumbling.ogg` | `se_rumbling` | ゴゴゴという地鳴り音（罠・地震） | trap.c |
-| 139 | `se_rumbling_of_earth.ogg` | `se_rumbling_of_earth` | ズズズという大地が轟く地鳴り | 予備（直接呼び出しなし） |
-| 140 | `se_rushing_wind_noise.ogg` | `se_rushing_wind_noise` | ヒューという突風が吹き荒れる音 | mhitu.c |
-| 141 | `se_rustling_paper.ogg` | `se_rustling_paper` | カサカサと紙・巻物が擦れ合う音 | apply.c |
-| 142 | `se_sad_wailing.ogg` | `se_sad_wailing` | ウワーンという悲しげなすすり泣き・哀しみの声 | read.c, sounds.c |
-| 143 | `se_sceptor_pounding.ogg` | `se_sceptor_pounding` | 笏（しゃく）で床をドンドンと叩く音（宮廷） | sounds.c |
-| 144 | `se_scratching.ogg` | `se_scratching` | カリカリと爪で引っ掻く音（秘密の扉の探索） | do.c |
-| 145 | `se_scream.ogg` | `se_scream` | ギャーッという悲鳴・絶叫（演奏効果等） | music.c |
-| 146 | `se_screech.ogg` | `se_screech` | キーキーという甲高い叫び声 | 予備（直接呼び出しなし） |
-| 147 | `se_sewer_song.ogg` | `se_sewer_song` | 下水道から聞こえる不気味な歌声（下水道の噴水） | fountain.c |
-| 148 | `se_sharp_crack.ogg` | `se_sharp_crack` | バシッと鋭くひびが走る音 | 予備（直接呼び出しなし） |
-| 149 | `se_shriek.ogg` | `se_shriek` | ギャーッという鋭い悲鳴（モンスターの声） | sounds.c |
-| 150 | `se_shrill_whistle.ogg` | `se_shrill_whistle` | ピーッと甲高く突き刺さる笛の音（ホイッスル使用） | apply.c, mon.c |
-| 151 | `se_sinister_laughter.ogg` | `se_sinister_laughter` | クックッという不敵・邪悪な笑い声（悪の存在） | eat.c |
-| 152 | `se_sizzling.ogg` | `se_sizzling` | ジュージューと焼ける・溶ける音（酸・炎接触） | do.c |
-| 153 | `se_slurping_sound.ogg` | `se_slurping_sound` | ズルズルとすする音（捕食・液体摂取） | mon.c |
-| 154 | `se_smashing_and_crushing.ogg` | `se_smashing_and_crushing` | ガシャンと叩き潰す音（跳ね橋の可動） | dbridge.c |
-| 155 | `se_snake_rattle.ogg` | `se_snake_rattle` | ガラガラヘビの尾のガラガラと鳴る警告音 | 予備（直接呼び出しなし） |
-| 156 | `se_snakes_hissing.ogg` | `se_snakes_hissing` | ヘビのシャーという群体の威嚇音 | fountain.c |
-| 157 | `se_snarl.ogg` | `se_snarl` | ウーッと牙をむいて低く唸る声 | sounds.c |
-| 158 | `se_soft_click.ogg` | `se_soft_click` | カチッとかすかに鳴るいかにも怪しい音（罠感知） | trap.c |
-| 159 | `se_soft_crackling.ogg` | `se_soft_crackling` | パチパチとかすかに燃える音（炎の魔法） | zap.c |
-| 160 | `se_someone_bowling.ogg` | `se_someone_bowling` | ボウリングの球が転がるような音（転がる物体） | trap.c |
-| 161 | `se_someone_searching.ogg` | `se_someone_searching` | ガサゴソと何かを捜索する音（探索中のモンスター） | sounds.c |
-| 162 | `se_someone_summoning.ogg` | `se_someone_summoning` | ウォーという召喚の呪文を唱える声 | mcastu.c |
-| 163 | `se_someone_yells.ogg` | `se_someone_yells` | 誰かが叫ぶ声（警衛の呼び声・緊急事態） | monmove.c |
-| 164 | `se_splash.ogg` | `se_splash` | バシャッと水が跳ねる音（水中落下・投擲） | dbridge.c, do.c, dothrow.c, mthrowu.c |
-| 165 | `se_splat_egg.ogg` | `se_splat_egg` | 卵がぐしゃっと潰れる音（投擲命中） | mthrowu.c |
-| 166 | `se_splat_from_engulf.ogg` | `se_splat_from_engulf` | 丸呑みモンスターに消化されグシャッとなる音 | 予備（直接呼び出しなし） |
-| 167 | `se_squawk.ogg` | `se_squawk` | ギャーギャーという鳥の鳴き声 | sounds.c |
-| 168 | `se_squeak.ogg` | `se_squeak` | チューという動物の高い鳴き声・きしみ音 | sounds.c |
-| 169 | `se_squeak_A.ogg` | `se_squeak_A` | 皮袋の笛（バグパイプ）チューニング音 — ラ音（A） | 予備（直接呼び出しなし） |
-| 170 | `se_squeak_B.ogg` | `se_squeak_B` | 皮袋の笛チューニング音 — シ音（B） | 予備（直接呼び出しなし） |
-| 171 | `se_squeak_B_flat.ogg` | `se_squeak_B_flat` | 皮袋の笛チューニング音 — シ♭音（B♭） | 予備（直接呼び出しなし） |
-| 172 | `se_squeak_C.ogg` | `se_squeak_C` | 皮袋の笛チューニング音 — ド音（C） | 予備（直接呼び出しなし） |
-| 173 | `se_squeak_D.ogg` | `se_squeak_D` | 皮袋の笛チューニング音 — レ音（D） | 予備（直接呼び出しなし） |
-| 174 | `se_squeak_D_flat.ogg` | `se_squeak_D_flat` | 皮袋の笛チューニング音 — レ♭音（D♭） | 予備（直接呼び出しなし） |
-| 175 | `se_squeak_E.ogg` | `se_squeak_E` | 皮袋の笛チューニング音 — ミ音（E） | 予備（直接呼び出しなし） |
-| 176 | `se_squeak_E_flat.ogg` | `se_squeak_E_flat` | 皮袋の笛チューニング音 — ミ♭音（E♭） | 予備（直接呼び出しなし） |
-| 177 | `se_squeak_F.ogg` | `se_squeak_F` | 皮袋の笛チューニング音 — ファ音（F） | 予備（直接呼び出しなし） |
-| 178 | `se_squeak_F_sharp.ogg` | `se_squeak_F_sharp` | 皮袋の笛チューニング音 — ファ♯音（F♯） | 予備（直接呼び出しなし） |
-| 179 | `se_squeak_G.ogg` | `se_squeak_G` | 皮袋の笛チューニング音 — ソ音（G） | 予備（直接呼び出しなし） |
-| 180 | `se_squeak_G_sharp.ogg` | `se_squeak_G_sharp` | 皮袋の笛チューニング音 — ソ♯音（G♯） | 予備（直接呼び出しなし） |
-| 181 | `se_squeal.ogg` | `se_squeal` | キーッという甲高い叫び声・きしみ | 予備（直接呼び出しなし） |
-| 182 | `se_squelch.ogg` | `se_squelch` | グチャッという湿った踏みつけ音 | sit.c |
-| 183 | `se_stone_breaking.ogg` | `se_stone_breaking` | バキッと石が割れる音（岩石魔法・爆発） | explode.c |
-| 184 | `se_stone_crumbling.ogg` | `se_stone_crumbling` | ガラガラと石が崩れ落ちる音 | explode.c |
-| 185 | `se_swoosh.ogg` | `se_swoosh` | ヒュッと素早く風を切る音（飛道具・魔法） | lock.c |
-| 186 | `se_sword_blade_rings.ogg` | `se_sword_blade_rings` | 剣の刃がシャリーンと鳴る音（法具の認識） | apply.c |
-| 187 | `se_thud.ogg` | `se_thud` | ドスンという重い着地・衝突音 | worn.c |
-| 188 | `se_thump.ogg` | `se_thump` | ドンという鈍い衝突音 | music.c |
-| 189 | `se_thunderclap.ogg` | `se_thunderclap` | ドカーンと轟く雷鳴（祈り・神罰） | pray.c |
-| 190 | `se_tumbler_click.ogg` | `se_tumbler_click` | 鍵穴のタンブラーがハマってカチッと鳴る音 | music.c |
-| 191 | `se_typing_noise.ogg` | `se_typing_noise` | カタカタとタイプライターを打つような音（占術使用） | apply.c |
-| 192 | `se_wail.ogg` | `se_wail` | ウオーッと泣き叫ぶ声（アンデッドや呪い） | 予備（直接呼び出しなし） |
-| 193 | `se_wailing_of_the_banshee.ogg` | `se_wailing_of_the_banshee` | バンシーの死を予告する絶叫（バンシーの遭遇） | hack.c |
-| 194 | `se_wall_of_force.ogg` | `se_wall_of_force` | ズズーンと重く響く力場・バリア音（魔法壁） | apply.c |
-| 195 | `se_yelp.ogg` | `se_yelp` | キャンという短い悲鳴 | 予備（直接呼び出しなし） |
-| 196 | `se_zap.ogg` | `se_zap` | ビビッという魔法・電撃の発射音 | muse.c |
-| 197 | `se_zap_then_explosion.ogg` | `se_zap_then_explosion` | ビビッからドカンという魔法爆発音 | muse.c |
-| 198 | `se_combat_hit_slash.ogg` | `se_combat_hit_slash` | 刃物・刀剣・斧による斬撃ヒット音 | uhitm.c, mhitu.c, mhitm.c, dothrow.c |
-| 199 | `se_combat_hit_blunt.ogg` | `se_combat_hit_blunt` | 鈍器・棍棒・石・打撃武器によるヒット音 | uhitm.c, mhitu.c, mhitm.c, dothrow.c |
-| 200 | `se_combat_hit_pierce.ogg` | `se_combat_hit_pierce` | 槍・刺突武器・矢弾による貫通ヒット音 | uhitm.c, mhitu.c, mhitm.c, dothrow.c |
-| 201 | `se_combat_hit_unarmed.ogg` | `se_combat_hit_unarmed` | 素手格闘・パンチ・キックによる打撃ヒット音 | uhitm.c, mhitu.c, mhitm.c |
-| 202 | `se_combat_hit_whip.ogg` | `se_combat_hit_whip` | 鞭・濡れたタオルによる攻撃命中音 | uhitm.c, mhitu.c, mhitm.c |
-| 203 | `se_combat_hit_ironball.ogg` | `se_combat_hit_ironball` | 鉄球・鉄鎖による重金属・鎖衝突音 | uhitm.c, mhitu.c, mhitm.c |
-| 204 | `se_combat_hit_shield.ogg` | `se_combat_hit_shield` | 盾による重い防具シールドバッシュ音（近接限定） | uhitm.c, mhitu.c, mhitm.c |
-| 205 | `se_combat_hit_corpse.ogg` | `se_combat_hit_corpse` | 死体・肉塊武器による生体打撃音 | uhitm.c, mhitu.c, mhitm.c |
-| 206 | `se_combat_hit_pick.ogg` | `se_combat_hit_pick` | つるはし・マトックによる硬質な採掘具打撃音 | uhitm.c, mhitu.c, mhitm.c |
-| 207 | `se_combat_hit_wand.ogg` | `se_combat_hit_wand` | 杖・ロッドによる硬く乾いた小打撃音 | uhitm.c, mhitu.c, mhitm.c |
-| 208 | `se_combat_hit_other.ogg` | `se_combat_hit_other` | 未分類アイテム（本・巻物・薬・食料・宝石等）全般の汎用フォールバック打撃音 | uhitm.c, mhitu.c, mhitm.c, dothrow.c, mthrowu.c |
-| 209 | `se_combat_miss.ogg` | `se_combat_miss` | 攻撃の空振り音（風切り音） | uhitm.c, mhitu.c, mhitm.c |
-| 210 | `se_combat_shoot_bow.ogg` | `se_combat_shoot_bow` | 弓矢の発射音（弦を弾く音） | dothrow.c, mthrowu.c |
-| 211 | `se_combat_shoot_crossbow.ogg` | `se_combat_shoot_crossbow` | クロスボウの発射音（バネ解放音） | dothrow.c, mthrowu.c |
-| 212 | `se_combat_shoot_sling.ogg` | `se_combat_shoot_sling` | スリング（投石器）の旋回・射出音 | dothrow.c, mthrowu.c |
-| 213 | `se_combat_throw.ogg` | `se_combat_throw` | 手投げによる投擲音 | dothrow.c, mthrowu.c |
-| 214 | `se_combat_throw_boomerang.ogg` | `se_combat_throw_boomerang` | ブーメランの旋回投擲音 | dothrow.c |
-| 215 | `se_combat_throw_mjollnir.ogg` | `se_combat_throw_mjollnir` | ミョルニルの電撃を帯びた豪快な投擲音 | dothrow.c |
-| 216 | `se_combat_miss_thud.ogg` | `se_combat_miss_thud` | 飛翔体が外れて壁や床に激突する音 | dothrow.c, mthrowu.c |
-| 217 | `se_combat_spell_cast.ogg` | `se_combat_spell_cast` | 呪文の詠唱・魔法発動音 | spell.c, mcastu.c |
-| 218 | `se_combat_wand_zap.ogg` | `se_combat_wand_zap` | 杖を振った際の発動音 | zap.c, muse.c |
-| 219 | `se_mon_claw.ogg` | `se_mon_claw` | モンスターの爪による引き裂き音 | mhitu.c, mhitm.c |
-| 220 | `se_mon_bite.ogg` | `se_mon_bite` | モンスターの噛みつき音 | mhitu.c, mhitm.c |
-| 221 | `se_mon_sting.ogg` | `se_mon_sting` | モンスターの毒針・刺突音 | mhitu.c, mhitm.c |
-| 222 | `se_mon_butt.ogg` | `se_mon_butt` | モンスターの角・頭突き衝突音 | mhitu.c, mhitm.c |
-| 223 | `se_mon_touch.ogg` | `se_mon_touch` | モンスターの接触・麻痺音 | mhitu.c, mhitm.c |
-| 224 | `se_mon_tentacle.ogg` | `se_mon_tentacle` | 触手による攻撃・絡みつき音 | mhitu.c, mhitm.c |
-| 225 | `se_mon_kick.ogg` | `se_mon_kick` | モンスターの蹴り・踏みつけ音 | mhitu.c, mhitm.c |
-| 226 | `se_mon_hug.ogg` | `se_mon_hug` | 締めつけ・怪力による抱き締め音 | mhitu.c, mhitm.c |
-| 227 | `se_mon_gaze.ogg` | `se_mon_gaze` | 凝視・魔眼による視線攻撃音 | mhitu.c, mhitm.c |
-| 228 | `se_mon_engulf.ogg` | `se_mon_engulf` | 丸呑み・呑み込み音 | mhitu.c, mhitm.c |
-| 229 | `se_mon_breath.ogg` | `se_mon_breath` | ドラゴン等のブレス放出音 | mhitu.c, mhitm.c |
-| 230 | `se_mon_spit.ogg` | `se_mon_spit` | 毒液・酸の吐出音 | mhitu.c, mhitm.c |
+| 126 | `se_magic_whistle.ogg` | `se_magic_whistle` | 魔法の笛の澄んだ神秘的な音（ペットを呼び寄せる） | apply.c |
+| 127 | `se_maniacal_laughter.ogg` | `se_maniacal_laughter` | ケタケタという狂気的な高笑い（巻物読後等） | read.c |
+| 128 | `se_masticating_sound.ogg` | `se_masticating_sound` | クチャクチャと何かを噛む咀嚼音 | mon.c |
+| 129 | `se_mon_chugging_potion.ogg` | `se_mon_chugging_potion` | モンスターがポーションをゴクゴクと飲む音 | muse.c |
+| 130 | `se_monster_behind_boulder.ogg` | `se_monster_behind_boulder` | 岩陰に隠れるモンスターの気配・物音 | hack.c |
+| 131 | `se_mutter_imprecations.ogg` | `se_mutter_imprecations` | 呪いの言葉をブツブツと呟く声（店主の怒り） | shk.c |
+| 132 | `se_mutter_incantation.ogg` | `se_mutter_incantation` | 呪文をブツブツと唱える声 | shk.c |
+| 133 | `se_orc_grunt.ogg` | `se_orc_grunt` | オークのグアッという低い唸り声 | sounds.c |
+| 134 | `se_paranoid_confirmation.ogg` | `se_paranoid_confirmation` | ソワソワした確認の囁き声 | 予備（直接呼び出しなし） |
+| 135 | `se_potion_crash_and_break.ogg` | `se_potion_crash_and_break` | ポーション瓶がガシャンと割れ液体が散る音 | potion.c |
+| 136 | `se_ring_in_drain.ogg` | `se_ring_in_drain` | 指輪が排水口にコロコロと転がり落ちる音 | do.c |
+| 137 | `se_ripping_sound.ogg` | `se_ripping_sound` | ビリビリと布・紙が破れる音（装備破壊等） | worn.c |
+| 138 | `se_roar.ogg` | `se_roar` | ガオーッという猛獣の咆哮 | trap.c |
+| 139 | `se_rumbling.ogg` | `se_rumbling` | ゴゴゴという地鳴り音（罠・地震） | trap.c |
+| 140 | `se_rumbling_of_earth.ogg` | `se_rumbling_of_earth` | ズズズという大地が轟く地鳴り | 予備（直接呼び出しなし） |
+| 141 | `se_rushing_wind_noise.ogg` | `se_rushing_wind_noise` | ヒューという突風が吹き荒れる音 | mhitu.c |
+| 142 | `se_rustling_paper.ogg` | `se_rustling_paper` | カサカサと紙・巻物が擦れ合う音 | apply.c |
+| 143 | `se_sad_wailing.ogg` | `se_sad_wailing` | ウワーンという悲しげなすすり泣き・哀しみの声 | read.c, sounds.c |
+| 144 | `se_sceptor_pounding.ogg` | `se_sceptor_pounding` | 笏（しゃく）で床をドンドンと叩く音（宮廷） | sounds.c |
+| 145 | `se_scratching.ogg` | `se_scratching` | カリカリと爪で引っ掻く音（秘密の扉の探索） | do.c |
+| 146 | `se_scream.ogg` | `se_scream` | ギャーッという悲鳴・絶叫（演奏効果等） | music.c |
+| 147 | `se_screech.ogg` | `se_screech` | キーキーという甲高い叫び声 | 予備（直接呼び出しなし） |
+| 148 | `se_sewer_song.ogg` | `se_sewer_song` | 下水道から聞こえる不気味な歌声（下水道の噴水） | fountain.c |
+| 149 | `se_sharp_crack.ogg` | `se_sharp_crack` | バシッと鋭くひびが走る音 | 予備（直接呼び出しなし） |
+| 150 | `se_shriek.ogg` | `se_shriek` | ギャーッという鋭い悲鳴（モンスターの声） | sounds.c |
+| 151 | `se_shrill_whistle.ogg` | `se_shrill_whistle` | ピーッと甲高く突き刺さる笛の音（ホイッスル使用） | apply.c, mon.c |
+| 152 | `se_sinister_laughter.ogg` | `se_sinister_laughter` | クックッという不敵・邪悪な笑い声（悪の存在） | eat.c |
+| 153 | `se_sizzling.ogg` | `se_sizzling` | ジュージューと焼ける・溶ける音（酸・炎接触） | do.c |
+| 154 | `se_slurping_sound.ogg` | `se_slurping_sound` | ズルズルとすする音（捕食・液体摂取） | mon.c |
+| 155 | `se_smashing_and_crushing.ogg` | `se_smashing_and_crushing` | ガシャンと叩き潰す音（跳ね橋の可動） | dbridge.c |
+| 156 | `se_snake_rattle.ogg` | `se_snake_rattle` | ガラガラヘビの尾のガラガラと鳴る警告音 | 予備（直接呼び出しなし） |
+| 157 | `se_snakes_hissing.ogg` | `se_snakes_hissing` | ヘビのシャーという群体の威嚇音 | fountain.c |
+| 158 | `se_snarl.ogg` | `se_snarl` | ウーッと牙をむいて低く唸る声 | sounds.c |
+| 159 | `se_soft_click.ogg` | `se_soft_click` | カチッとかすかに鳴るいかにも怪しい音（罠感知） | trap.c |
+| 160 | `se_soft_crackling.ogg` | `se_soft_crackling` | パチパチとかすかに燃える音（炎の魔法） | zap.c |
+| 161 | `se_someone_bowling.ogg` | `se_someone_bowling` | ボウリングの球が転がるような音（転がる物体） | trap.c |
+| 162 | `se_someone_searching.ogg` | `se_someone_searching` | ガサゴソと何かを捜索する音（探索中のモンスター） | sounds.c |
+| 163 | `se_someone_summoning.ogg` | `se_someone_summoning` | ウォーという召喚の呪文を唱える声 | mcastu.c |
+| 164 | `se_someone_yells.ogg` | `se_someone_yells` | 誰かが叫ぶ声（警衛の呼び声・緊急事態） | monmove.c |
+| 165 | `se_splash.ogg` | `se_splash` | バシャッと水が跳ねる音（水中落下・投擲） | dbridge.c, do.c, dothrow.c, mthrowu.c |
+| 166 | `se_splat_egg.ogg` | `se_splat_egg` | 卵がぐしゃっと潰れる音（投擲命中） | mthrowu.c |
+| 167 | `se_splat_from_engulf.ogg` | `se_splat_from_engulf` | 丸呑みモンスターに消化されグシャッとなる音 | 予備（直接呼び出しなし） |
+| 168 | `se_squawk.ogg` | `se_squawk` | ギャーギャーという鳥の鳴き声 | sounds.c |
+| 169 | `se_squeak.ogg` | `se_squeak` | チューという動物の高い鳴き声・きしみ音 | sounds.c |
+| 170 | `se_squeak_A.ogg` | `se_squeak_A` | 皮袋の笛（バグパイプ）チューニング音 — ラ音（A） | 予備（直接呼び出しなし） |
+| 171 | `se_squeak_B.ogg` | `se_squeak_B` | 皮袋の笛チューニング音 — シ音（B） | 予備（直接呼び出しなし） |
+| 172 | `se_squeak_B_flat.ogg` | `se_squeak_B_flat` | 皮袋の笛チューニング音 — シ♭音（B♭） | 予備（直接呼び出しなし） |
+| 173 | `se_squeak_C.ogg` | `se_squeak_C` | 皮袋の笛チューニング音 — ド音（C） | 予備（直接呼び出しなし） |
+| 174 | `se_squeak_D.ogg` | `se_squeak_D` | 皮袋の笛チューニング音 — レ音（D） | 予備（直接呼び出しなし） |
+| 175 | `se_squeak_D_flat.ogg` | `se_squeak_D_flat` | 皮袋の笛チューニング音 — レ♭音（D♭） | 予備（直接呼び出しなし） |
+| 176 | `se_squeak_E.ogg` | `se_squeak_E` | 皮袋の笛チューニング音 — ミ音（E） | 予備（直接呼び出しなし） |
+| 177 | `se_squeak_E_flat.ogg` | `se_squeak_E_flat` | 皮袋の笛チューニング音 — ミ♭音（E♭） | 予備（直接呼び出しなし） |
+| 178 | `se_squeak_F.ogg` | `se_squeak_F` | 皮袋の笛チューニング音 — ファ音（F） | 予備（直接呼び出しなし） |
+| 179 | `se_squeak_F_sharp.ogg` | `se_squeak_F_sharp` | 皮袋の笛チューニング音 — ファ♯音（F♯） | 予備（直接呼び出しなし） |
+| 180 | `se_squeak_G.ogg` | `se_squeak_G` | 皮袋の笛チューニング音 — ソ音（G） | 予備（直接呼び出しなし） |
+| 181 | `se_squeak_G_sharp.ogg` | `se_squeak_G_sharp` | 皮袋の笛チューニング音 — ソ♯音（G♯） | 予備（直接呼び出しなし） |
+| 182 | `se_squeal.ogg` | `se_squeal` | キーッという甲高い叫び声・きしみ | 予備（直接呼び出しなし） |
+| 183 | `se_squelch.ogg` | `se_squelch` | グチャッという湿った踏みつけ音 | sit.c |
+| 184 | `se_stone_breaking.ogg` | `se_stone_breaking` | バキッと石が割れる音（岩石魔法・爆発） | explode.c |
+| 185 | `se_stone_crumbling.ogg` | `se_stone_crumbling` | ガラガラと石が崩れ落ちる音 | explode.c |
+| 186 | `se_swoosh.ogg` | `se_swoosh` | ヒュッと素早く風を切る音（飛道具・魔法） | lock.c |
+| 187 | `se_sword_blade_rings.ogg` | `se_sword_blade_rings` | 剣の刃がシャリーンと鳴る音（法具の認識） | apply.c |
+| 188 | `se_thud.ogg` | `se_thud` | ドスンという重い着地・衝突音 | worn.c |
+| 189 | `se_thump.ogg` | `se_thump` | ドンという鈍い衝突音 | music.c |
+| 190 | `se_thunderclap.ogg` | `se_thunderclap` | ドカーンと轟く雷鳴（祈り・神罰） | pray.c |
+| 191 | `se_tumbler_click.ogg` | `se_tumbler_click` | 鍵穴のタンブラーがハマってカチッと鳴る音 | music.c |
+| 192 | `se_typing_noise.ogg` | `se_typing_noise` | カタカタとタイプライターを打つような音（占術使用） | apply.c |
+| 193 | `se_wail.ogg` | `se_wail` | ウオーッと泣き叫ぶ声（アンデッドや呪い） | 予備（直接呼び出しなし） |
+| 194 | `se_wailing_of_the_banshee.ogg` | `se_wailing_of_the_banshee` | バンシーの死を予告する絶叫（バンシーの遭遇） | hack.c |
+| 195 | `se_wall_of_force.ogg` | `se_wall_of_force` | ズズーンと重く響く力場・バリア音（魔法壁） | apply.c |
+| 196 | `se_yelp.ogg` | `se_yelp` | キャンという短い悲鳴 | 予備（直接呼び出しなし） |
+| 197 | `se_zap.ogg` | `se_zap` | ビビッという魔法・電撃の発射音 | muse.c |
+| 198 | `se_zap_then_explosion.ogg` | `se_zap_then_explosion` | ビビッからドカンという魔法爆発音 | muse.c |
+| 199 | `se_combat_hit_slash.ogg` | `se_combat_hit_slash` | 刃物・刀剣・斧による斬撃ヒット音 | uhitm.c, mhitu.c, mhitm.c, dothrow.c |
+| 200 | `se_combat_hit_blunt.ogg` | `se_combat_hit_blunt` | 鈍器・棍棒・石・打撃武器によるヒット音 | uhitm.c, mhitu.c, mhitm.c, dothrow.c |
+| 201 | `se_combat_hit_pierce.ogg` | `se_combat_hit_pierce` | 槍・刺突武器・矢弾による貫通ヒット音 | uhitm.c, mhitu.c, mhitm.c, dothrow.c |
+| 202 | `se_combat_hit_unarmed.ogg` | `se_combat_hit_unarmed` | 素手格闘・パンチ・キックによる打撃ヒット音 | uhitm.c, mhitu.c, mhitm.c |
+| 203 | `se_combat_hit_whip.ogg` | `se_combat_hit_whip` | 鞭・濡れたタオルによる攻撃命中音 | uhitm.c, mhitu.c, mhitm.c |
+| 204 | `se_combat_hit_ironball.ogg` | `se_combat_hit_ironball` | 鉄球・鉄鎖による重金属・鎖衝突音 | uhitm.c, mhitu.c, mhitm.c |
+| 205 | `se_combat_hit_shield.ogg` | `se_combat_hit_shield` | 盾による重い防具シールドバッシュ音（近接限定） | uhitm.c, mhitu.c, mhitm.c |
+| 206 | `se_combat_hit_corpse.ogg` | `se_combat_hit_corpse` | 死体・肉塊武器による生体打撃音 | uhitm.c, mhitu.c, mhitm.c |
+| 207 | `se_combat_hit_pick.ogg` | `se_combat_hit_pick` | つるはし・マトックによる硬質な採掘具打撃音 | uhitm.c, mhitu.c, mhitm.c |
+| 208 | `se_combat_hit_wand.ogg` | `se_combat_hit_wand` | 杖・ロッドによる硬く乾いた小打撃音 | uhitm.c, mhitu.c, mhitm.c |
+| 209 | `se_combat_hit_other.ogg` | `se_combat_hit_other` | 未分類アイテム（本・巻物・薬・食料・宝石等）全般の汎用フォールバック打撃音 | uhitm.c, mhitu.c, mhitm.c, dothrow.c, mthrowu.c |
+| 210 | `se_combat_miss.ogg` | `se_combat_miss` | 攻撃の空振り音（風切り音） | uhitm.c, mhitu.c, mhitm.c |
+| 211 | `se_combat_shoot_bow.ogg` | `se_combat_shoot_bow` | 弓矢の発射音（弦を弾く音） | dothrow.c, mthrowu.c |
+| 212 | `se_combat_shoot_crossbow.ogg` | `se_combat_shoot_crossbow` | クロスボウの発射音（バネ解放音） | dothrow.c, mthrowu.c |
+| 213 | `se_combat_shoot_sling.ogg` | `se_combat_shoot_sling` | スリング（投石器）の旋回・射出音 | dothrow.c, mthrowu.c |
+| 214 | `se_combat_throw.ogg` | `se_combat_throw` | 手投げによる投擲音 | dothrow.c, mthrowu.c |
+| 215 | `se_combat_throw_boomerang.ogg` | `se_combat_throw_boomerang` | ブーメランの旋回投擲音 | dothrow.c |
+| 216 | `se_combat_throw_mjollnir.ogg` | `se_combat_throw_mjollnir` | ミョルニルの電撃を帯びた豪快な投擲音 | dothrow.c |
+| 217 | `se_combat_miss_thud.ogg` | `se_combat_miss_thud` | 飛翔体が外れて壁や床に激突する音 | dothrow.c, mthrowu.c |
+| 218 | `se_combat_spell_cast.ogg` | `se_combat_spell_cast` | 呪文の詠唱・魔法発動音 | spell.c, mcastu.c |
+| 219 | `se_combat_wand_zap.ogg` | `se_combat_wand_zap` | 杖を振った際の発動音 | zap.c, muse.c |
+| 220 | `se_mon_claw.ogg` | `se_mon_claw` | モンスターの爪による引き裂き音 | mhitu.c, mhitm.c |
+| 221 | `se_mon_bite.ogg` | `se_mon_bite` | モンスターの噛みつき音 | mhitu.c, mhitm.c |
+| 222 | `se_mon_sting.ogg` | `se_mon_sting` | モンスターの毒針・刺突音 | mhitu.c, mhitm.c |
+| 223 | `se_mon_butt.ogg` | `se_mon_butt` | モンスターの角・頭突き衝突音 | mhitu.c, mhitm.c |
+| 224 | `se_mon_touch.ogg` | `se_mon_touch` | モンスターの接触・麻痺音 | mhitu.c, mhitm.c |
+| 225 | `se_mon_tentacle.ogg` | `se_mon_tentacle` | 触手による攻撃・絡みつき音 | mhitu.c, mhitm.c |
+| 226 | `se_mon_kick.ogg` | `se_mon_kick` | モンスターの蹴り・踏みつけ音 | mhitu.c, mhitm.c |
+| 227 | `se_mon_hug.ogg` | `se_mon_hug` | 締めつけ・怪力による抱き締め音 | mhitu.c, mhitm.c |
+| 228 | `se_mon_gaze.ogg` | `se_mon_gaze` | 凝視・魔眼による視線攻撃音 | mhitu.c, mhitm.c |
+| 229 | `se_mon_engulf.ogg` | `se_mon_engulf` | 丸呑み・呑み込み音 | mhitu.c, mhitm.c |
+| 230 | `se_mon_breath.ogg` | `se_mon_breath` | ドラゴン等のブレス放出音 | mhitu.c, mhitm.c |
+| 231 | `se_mon_spit.ogg` | `se_mon_spit` | 毒液・酸の吐出音 | mhitu.c, mhitm.c |
 
 > **詳細仕様**: 各戦闘アクション効果音の詳細な判定ロジック、音量制御（不可視40%気配察知）、および素材制作指針は [combat_sound_specification.md](combat_sound_specification.md) を参照してください。
 
@@ -413,7 +414,7 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 | L390 | `Soundeffect` | `se_typing_noise, 100` | `se_typing_noise.ogg` | `Soundeffect(se_typing_noise, 100);` |
 | L460 | `Soundeffect` | `se_hollow_sound, 100` | `se_hollow_sound.ogg` | `Soundeffect(se_hollow_sound, 100);` |
 | L494 | `Soundeffect` | `se_shrill_whistle, 50` | `se_shrill_whistle.ogg` | `Soundeffect(se_shrill_whistle, 50);` |
-| L518 | `Soundeffect` | `se_shrill_whistle, 80` | `se_shrill_whistle.ogg` | `Soundeffect(se_shrill_whistle, 80);` |
+| L518 | `Soundeffect` | `se_magic_whistle, 80` | `se_magic_whistle.ogg` | `Soundeffect(se_magic_whistle, 80);` |
 | L1207 | `Hero_playnotes` | `obj_to_instr(obj` | `sound_[楽器名]_[音符].ogg` | `Hero_playnotes(obj_to_instr(obj), "C", 100);` |
 | L1441 | `SetVoice` | `shkp, 0, 80, 0` | `voice_shopkeeper.ogg または voice_mon_generic.ogg` | `SetVoice(shkp, 0, 80, 0);` |
 | L1599 | `SetVoice` | `shkp, 0, 80, 0` | `voice_shopkeeper.ogg または voice_mon_generic.ogg` | `SetVoice(shkp, 0, 80, 0);` |

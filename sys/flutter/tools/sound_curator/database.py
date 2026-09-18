@@ -29,6 +29,24 @@ def resolve_sounds_dir() -> Path:
 SOUNDS_DIR = resolve_sounds_dir()
 ATTRIBUTIONS_PATH = SOUNDS_DIR / "attributions.txt"
 
+SF2_EFFECT_FILES = {
+    "se_horn_being_played.ogg",
+    "se_shrill_whistle.ogg",
+    "se_magic_whistle.ogg",
+    "se_squeak_A.ogg",
+    "se_squeak_B.ogg",
+    "se_squeak_B_flat.ogg",
+    "se_squeak_C.ogg",
+    "se_squeak_D.ogg",
+    "se_squeak_D_flat.ogg",
+    "se_squeak_E.ogg",
+    "se_squeak_E_flat.ogg",
+    "se_squeak_F.ogg",
+    "se_squeak_F_sharp.ogg",
+    "se_squeak_G.ogg",
+    "se_squeak_G_sharp.ogg",
+}
+
 def load_or_init_database() -> List[Dict[str, Any]]:
     """データベースを読み込む。新定義があれば既存の入力状態を保持しつつ自動統合する"""
     definitions = json.loads(DEFINITIONS_PATH.read_text(encoding="utf-8"))
@@ -45,6 +63,7 @@ def load_or_init_database() -> List[Dict[str, Any]]:
         filename = item["filename"]
         target_ogg = SOUNDS_DIR / filename
         is_ready = target_ogg.exists() and target_ogg.stat().st_size > 0
+        is_sf2 = (item["category"] == "instrument") or (filename in SF2_EFFECT_FILES)
 
         if filename in existing_map:
             record = existing_map[filename]
@@ -52,8 +71,14 @@ def load_or_init_database() -> List[Dict[str, Any]]:
             for k in ["no", "id", "description", "caller", "category", "sub_category", "sub_category_ja", "keywords_ja", "keywords_en"]:
                 if k in item:
                     record[k] = item[k]
-            if is_ready and record.get("status") != "ready":
+            if is_ready:
                 record["status"] = "ready"
+                if is_sf2 and not record.get("source_site"):
+                    record["source_site"] = "FluidR3 GM (FluidSynth)"
+                    record["author"] = "Frank Wen"
+                    record["source_url"] = "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2"
+                    record["license"] = "MIT / GPL"
+                    record["notes"] = "SoundFont auto-sampled instrument/effect"
         else:
             record = {
                 "no": item["no"],
@@ -67,11 +92,11 @@ def load_or_init_database() -> List[Dict[str, Any]]:
                 "keywords_ja": item.get("keywords_ja", ""),
                 "keywords_en": item.get("keywords_en", ""),
                 "status": "ready" if is_ready else "pending",
-                "source_site": "FluidR3 GM (FluidSynth)" if is_ready and item["category"] == "instrument" else "",
-                "author": "Frank Wen" if is_ready and item["category"] == "instrument" else "",
-                "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2" if is_ready and item["category"] == "instrument" else "",
-                "license": "MIT / GPL" if is_ready and item["category"] == "instrument" else "",
-                "notes": "SoundFont auto-sampled note" if is_ready and item["category"] == "instrument" else ""
+                "source_site": "FluidR3 GM (FluidSynth)" if is_ready and is_sf2 else "",
+                "author": "Frank Wen" if is_ready and is_sf2 else "",
+                "source_url": "https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2" if is_ready and is_sf2 else "",
+                "license": "MIT / GPL" if is_ready and is_sf2 else "",
+                "notes": "SoundFont auto-sampled instrument/effect" if is_ready and is_sf2 else ""
             }
         db.append(record)
 
