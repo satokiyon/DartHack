@@ -119,7 +119,12 @@ int NetHackMain(int argc, char** argv)
 
 	gh.hname = argv[0];
 	svh.hackpid = getpid();
-	(void)umask(0777 & ~FCMASK);
+	// Android / Flutter 環境ではプロセス全体で Dart VM / Flutter エンジンと同居するため、
+	// ディレクトリの実行権限 (x) を奪う 0777 & ~FCMASK (0117) ではなく、
+	// Android/POSIX 標準の安全な 0022 (dir: 0755, file: 0644) を設定する。
+	(void)umask(0022);
+	debuglog("fluttermain: umask safely configured to 0022");
+	__android_log_print(ANDROID_LOG_INFO, "DartHack", "[C-Core] fluttermain: umask safely configured to 0022");
 
 	// remove all dangling locks on startup in Flutter mobile environment
 	remove_all_lock_files();

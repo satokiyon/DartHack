@@ -1,8 +1,30 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+/// Androidのキャッシュディレクトリにおける権限エラー（errno=13, EACCES）を回避するための安全なAudioCache
+///
+/// 【技術的背景】
+/// Android OSでは、アプリの再インストール、Scoped Storageの適用、OSによる一時ディレクトリの自動クリーンアップ、
+/// またはネイティブコード（Cコア）による umask や環境変更などによって、
+/// `getTemporaryDirectory()`（`/data/user/0/<pkg>/cache`）配下のサブディレクトリ生成時に
+/// `Permission denied (errno = 13)` が発生する場合があります。
+/// これを防ぐため、常にアプリ専有の書き込み権限が保証されている内部ストレージ
+/// `getApplicationSupportDirectory()` 配下に固定のキャッシュ先（`darthack_sound_cache`）を配置し、
+/// 一時ファイルが起動ごとに無制限に増殖する問題も同時に抑止します。
+class SafeAudioCache extends AudioCache {
+  final String _safeDirPath;
+
+  SafeAudioCache(this._safeDirPath, {super.prefix = 'assets/', String? cacheId})
+      : super(cacheId: cacheId ?? 'darthack_sound_cache');
+
+  @override
+  Future<String> getTempDir() async => _safeDirPath;
+}
 
 /// サウンドカテゴリ（Cコアの sound_category と完全同期）
 enum SoundCategory {
@@ -156,9 +178,40 @@ class SoundManager {
         }
       }
 
+      // 一時キャッシュディレクトリのパーミッション拒否（errno=13）を回避するため、
+      // 確実に書き込み権限のある applicationSupportDirectory 配下に安全な音声キャッシュを設定
+      if (!kIsWeb) {
+        try {
+          final supportDir = await getApplicationSupportDirectory();
+          final safeCacheDir = Directory('${supportDir.path}/audio_cache');
+          // 過去の破損パーミッション（Cコアの旧umask問題でx権限なし等）を自己修復
+          if (await safeCacheDir.exists()) {
+            try {
+              // 疎通確認（配下の探索・アクセス権限テスト）
+              final testDir = Directory('${safeCacheDir.path}/darthack_sound_cache');
+              if (await testDir.exists()) {
+                await testDir.list().drain();
+              }
+            } catch (_) {
+              // 壊れたパーミッションの旧ディレクトリを安全に破棄
+              try {
+                await safeCacheDir.delete(recursive: true);
+              } catch (_) {}
+            }
+          }
+          if (!await safeCacheDir.exists()) {
+            await safeCacheDir.create(recursive: true);
+          }
+          AudioCache.instance = SafeAudioCache(safeCacheDir.path);
+        } catch (e, st) {
+          debugPrint('[SoundMgr] Failed to configure SafeAudioCache: $e\n$st');
+        }
+      }
+
       // SEプレイヤープールを初期化 (最大12個)
       for (int i = 0; i < _maxConcurrentPlayers; i++) {
         final player = AudioPlayer();
+        player.audioCache = AudioCache.instance;
         await player.setReleaseMode(ReleaseMode.stop);
         final entry = _PlayerEntry(player);
         player.onPlayerComplete.listen((_) {
@@ -170,18 +223,22 @@ class SoundManager {
 
       // フロアBGMプレイヤー
       _floorBgmPlayer = AudioPlayer();
+      _floorBgmPlayer!.audioCache = AudioCache.instance;
       await _floorBgmPlayer!.setReleaseMode(ReleaseMode.loop);
 
       // ルームBGMプレイヤー
       _roomBgmPlayer = AudioPlayer();
+      _roomBgmPlayer!.audioCache = AudioCache.instance;
       await _roomBgmPlayer!.setReleaseMode(ReleaseMode.loop);
 
       // 環境音（アンビエンス）プレイヤー
       _ambiencePlayer = AudioPlayer();
+      _ambiencePlayer!.audioCache = AudioCache.instance;
       await _ambiencePlayer!.setReleaseMode(ReleaseMode.loop);
 
       _isInitialized = true;
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('[SoundMgr] Error in initialize(): $e\n$st');
       _isInitialized = true;
     }
   }
@@ -193,14 +250,17 @@ class SoundManager {
 
   /// Cコアからのサウンドイベントをディスパッチ
   void handleSoundEvent(Map<dynamic, dynamic> event) {
-    if (!_isInitialized || _muted) return;
-
     final catVal = event['category'] as int? ?? 1;
-    final category = SoundCategory.fromValue(catVal);
     final filename = event['filename'] as String? ?? '';
     final text = event['text'] as String? ?? '';
     final volume = (event['volume'] as int? ?? 100).clamp(0, 100);
     final loopOrFlag = event['loopOrFlag'] as int? ?? 0;
+
+    if (!_isInitialized || _muted) {
+      return;
+    }
+
+    final category = SoundCategory.fromValue(catVal);
 
     switch (category) {
       case SoundCategory.se:
@@ -233,7 +293,11 @@ class SoundManager {
 
   /// 効果音の再生（スロットル判定、二連撃マイクロディレイ、デバウンス制御）
   Future<void> _playSe(String filename, int cVolume, {bool isCritical = false}) async {
-    if (!_seEnabled || filename.isEmpty || !hasSound(filename) || _pool.isEmpty) return;
+    final has = hasSound(filename);
+
+    if (!_seEnabled || filename.isEmpty || !has || _pool.isEmpty) {
+      return;
+    }
 
     final now = DateTime.now();
     final isCombatSe = filename.startsWith('se_combat_') || filename.startsWith('se_mon_');
@@ -271,7 +335,9 @@ class SoundManager {
 
   /// 効果音の実再生処理（優先度判定・空きプレイヤー取得・再生）
   Future<void> _executePlaySe(String filename, int cVolume, {bool isCritical = false}) async {
-    if (!_seEnabled || _pool.isEmpty) return;
+    if (!_seEnabled || _pool.isEmpty) {
+      return;
+    }
 
     final now = DateTime.now();
     _lastPlayTimeBySound[filename] = now;
@@ -315,7 +381,9 @@ class SoundManager {
       targetEntry ??= _pool.reduce((a, b) => a.lastPlayTime.isBefore(b.lastPlayTime) ? a : b);
       try {
         await targetEntry.player.stop();
-      } catch (_) {}
+      } catch (e, st) {
+        debugPrint('[SoundMgr] Failed to stop preempted player: $e\n$st');
+      }
     }
 
     targetEntry.isPlaying = true;
@@ -326,7 +394,8 @@ class SoundManager {
     try {
       await targetEntry.player.setVolume(finalVolume);
       await targetEntry.player.play(AssetSource('sounds/$filename'));
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('[SoundMgr] ERROR playing sound \'$filename\': $e\n$st');
       targetEntry.isPlaying = false;
       targetEntry.currentSound = null;
     }
@@ -370,7 +439,9 @@ class SoundManager {
       } else {
         await player.stop();
       }
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('[SoundMgr] Error during fadeOut: $e\n$st');
+    }
   }
 
   /// フェードイン処理
@@ -385,7 +456,9 @@ class SoundManager {
         if ((isRoomPlayer ? _roomFadeGen : _floorFadeGen) != gen) return;
         await player.setVolume(targetVolume * (i / 6.0));
       }
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('[SoundMgr] Error during fadeIn: $e\n$st');
+    }
   }
 
   /// BGMの再生制御（action: 0=nothing, 1=begin, 2=end, 3=update）
@@ -431,7 +504,9 @@ class SoundManager {
         await _floorBgmPlayer?.setVolume(0.0);
         await _floorBgmPlayer?.play(AssetSource('sounds/$filename'));
         unawaited(_fadeIn(_floorBgmPlayer, _bgmVolume, isRoomPlayer: false));
-      } catch (_) {}
+      } catch (e, st) {
+        debugPrint('[SoundMgr] ERROR playing floor BGM \'$filename\': $e\n$st');
+      }
     } else {
       // --- 2.3 特別な部屋・テーマ部屋（ルームBGM） ---
       if (action == 1) {
@@ -456,7 +531,9 @@ class SoundManager {
           await _roomBgmPlayer?.setVolume(0.0);
           await _roomBgmPlayer?.play(AssetSource('sounds/$filename'));
           unawaited(_fadeIn(_roomBgmPlayer, _bgmVolume, isRoomPlayer: true));
-        } catch (_) {}
+        } catch (e, st) {
+          debugPrint('[SoundMgr] ERROR playing room BGM \'$filename\': $e\n$st');
+        }
       } else if (action == 2) {
         // 部屋退出時
         if (_currentRoomBgm == filename) {
@@ -469,7 +546,9 @@ class SoundManager {
               await _floorBgmPlayer?.resume();
               unawaited(_fadeIn(_floorBgmPlayer, _bgmVolume, isRoomPlayer: false));
             }
-          } catch (_) {}
+          } catch (e, st) {
+            debugPrint('[SoundMgr] Error restoring floor BGM: $e\n$st');
+          }
         } else {
           // ファイルが無くて再生されていなかった場合はフロアBGMを継続（何もしない）
         }
@@ -487,7 +566,9 @@ class SoundManager {
       if (_floorBgmPlayer != null && _floorBgmPlayer!.state == PlayerState.playing) {
         await _fadeOut(_floorBgmPlayer, _bgmVolume, isRoomPlayer: false);
       }
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('[SoundMgr] Error in stopBgm: $e\n$st');
+    }
   }
 
   /// 環境音（アンビエンス）の再生制御
@@ -515,7 +596,9 @@ class SoundManager {
       // ambience_update: 音量更新
       try {
         await _ambiencePlayer?.setVolume(finalVolume);
-      } catch (_) {}
+      } catch (e, st) {
+        debugPrint('[SoundMgr] Error updating ambience volume: $e\n$st');
+      }
       return;
     }
 
@@ -531,14 +614,18 @@ class SoundManager {
       await _ambiencePlayer?.setVolume(finalVolume);
       await _ambiencePlayer?.setReleaseMode(ReleaseMode.loop);
       await _ambiencePlayer?.play(AssetSource('sounds/$filename'));
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('[SoundMgr] Error playing ambience \'$filename\': $e\n$st');
+    }
   }
 
   Future<void> stopAmbience() async {
     try {
       await _ambiencePlayer?.stop();
       _currentAmbience = null;
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('[SoundMgr] Error stopping ambience: $e\n$st');
+    }
   }
 
   /// 声音・TTS
@@ -698,7 +785,9 @@ class SoundManager {
       if (_ambienceWasPlayingBeforeBackground) {
         await _ambiencePlayer?.pause();
       }
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('[SoundMgr] Error during pauseForBackground: $e\n$st');
+    }
   }
 
   /// アプリフォアグラウンド復帰時の再開
@@ -718,7 +807,9 @@ class SoundManager {
           await _ambiencePlayer?.resume();
         }
       }
-    } catch (_) {} finally {
+    } catch (e, st) {
+      debugPrint('[SoundMgr] Error during resumeFromBackground: $e\n$st');
+    } finally {
       _floorWasPlayingBeforeBackground = false;
       _roomWasPlayingBeforeBackground = false;
       _ambienceWasPlayingBeforeBackground = false;
@@ -731,7 +822,9 @@ class SoundManager {
         await entry.player.stop();
         entry.isPlaying = false;
         entry.currentSound = null;
-      } catch (_) {}
+      } catch (e, st) {
+        debugPrint('[SoundMgr] Error stopping pool player: $e\n$st');
+      }
     }
     await stopBgm();
     await stopAmbience();
@@ -764,6 +857,41 @@ class SoundManager {
   @visibleForTesting
   void setInitializedForTest(bool value) {
     _isInitialized = value;
+  }
+
+  /// テスト用: プレイヤープール情報の取得
+  @visibleForTesting
+  int get poolSize => _pool.length;
+
+  /// テスト用: 現在再生中としてマークされているエントリ数
+  @visibleForTesting
+  int get playingEntryCount => _pool.where((e) => e.isPlaying).length;
+
+  /// テスト用: プレイヤープールのモック・ダミー初期化
+  @visibleForTesting
+  void initPoolForTest(List<AudioPlayer> players) {
+    for (final entry in _pool) {
+      try {
+        entry.player.dispose();
+      } catch (_) {}
+    }
+    _pool.clear();
+    for (final player in players) {
+      final entry = _PlayerEntry(player);
+      player.onPlayerComplete.listen((_) {
+        entry.isPlaying = false;
+        entry.currentSound = null;
+      });
+      _pool.add(entry);
+    }
+  }
+
+  /// テスト用: クールダウンおよびスロットル状態のリセット
+  @visibleForTesting
+  void clearCooldownsForTest() {
+    _lastPlayTimeBySound.clear();
+    _pendingDoubleStrikes.clear();
+    _ambientCombatSePlayTimes.clear();
   }
 
   /// テスト用: 各カテゴリ有効状態の設定

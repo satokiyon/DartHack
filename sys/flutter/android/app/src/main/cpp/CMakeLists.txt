@@ -17,8 +17,11 @@ if(NOT DEFINED BUILD_ID)
 endif()
 
 # Compile flags
+# Trigger full recompile of libnethack.so with umask(0022) fix
+set(UMASK_FIX_VERSION "20260919_umask_0022")
 string(TIMESTAMP FORCE_REBUILD_TS "%Y%m%d%H%M%S")
 add_definitions(
+    -DUMASK_FIX_VERSION="${UMASK_FIX_VERSION}"
     -DANDROID
     -DANDROID_GRAPHICS
     -DTILES_IN_GLYPHMAP

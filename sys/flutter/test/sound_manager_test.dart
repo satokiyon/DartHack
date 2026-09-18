@@ -1,13 +1,89 @@
+import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:darthack/services/sound_manager.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
+
+class FakeAudioPlayer extends AudioPlayer {
+  final _completeController = StreamController<void>.broadcast();
+  PlayerState _fakeState = PlayerState.stopped;
+  double fakeVolume = 1.0;
+  Source? lastSource;
+  int playCount = 0;
+  int stopCount = 0;
+
+  @override
+  Stream<void> get onPlayerComplete => _completeController.stream;
+
+  @override
+  PlayerState get state => _fakeState;
+
+  @override
+  Future<void> setVolume(double volume) async {
+    fakeVolume = volume;
+  }
+
+  @override
+  Future<void> setReleaseMode(ReleaseMode releaseMode) async {}
+
+  @override
+  Future<void> play(
+    Source source, {
+    double? volume,
+    double? balance,
+    AudioContext? ctx,
+    Duration? position,
+    PlayerMode? mode,
+  }) async {
+    playCount++;
+    lastSource = source;
+    _fakeState = PlayerState.playing;
+    if (volume != null) fakeVolume = volume;
+  }
+
+  @override
+  Future<void> stop() async {
+    stopCount++;
+    _fakeState = PlayerState.stopped;
+  }
+
+  @override
+  Future<void> pause() async {
+    _fakeState = PlayerState.paused;
+  }
+
+  @override
+  Future<void> resume() async {
+    _fakeState = PlayerState.playing;
+  }
+
+  @override
+  Future<void> dispose() async {
+    await _completeController.close();
+  }
+
+  void triggerComplete() {
+    _fakeState = PlayerState.completed;
+    _completeController.add(null);
+  }
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      const MethodChannel('xyz.luan/audioplayers.global'),
+      (MethodCall methodCall) async => 1,
+    );
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      const MethodChannel('xyz.luan/audioplayers'),
+      (MethodCall methodCall) async => 1,
+    );
   });
 
   group('SoundManager Tests', () {
@@ -484,6 +560,115 @@ void main() {
           'loopOrFlag': 0,
         });
       }, returnsNormally);
+    });
+
+    test('SafeAudioCache returns configured directory and persistent cacheId', () async {
+      const testPath = '/data/user/0/jp.satokiyo.darthack/files/audio_cache';
+      final cache = SafeAudioCache(testPath);
+      expect(await cache.getTempDir(), testPath);
+      expect(cache.cacheId, 'darthack_sound_cache');
+
+      final customCache = SafeAudioCache(testPath, cacheId: 'custom_cache_id');
+      expect(customCache.cacheId, 'custom_cache_id');
+    });
+
+    test('SE playback with pool executes play and marks entry as playing', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true);
+      manager.registerAvailableSound('se_door_open.ogg');
+
+      final fakePlayer = FakeAudioPlayer();
+      manager.initPoolForTest([fakePlayer]);
+      expect(manager.poolSize, 1);
+      expect(manager.playingEntryCount, 0);
+
+      manager.handleSoundEvent({
+        'category': 1,
+        'filename': 'se_door_open.ogg',
+        'text': '',
+        'volume': 80,
+        'loopOrFlag': 0,
+      });
+
+      // 非同期微小待機
+      await Future.delayed(const Duration(milliseconds: 10));
+
+      expect(fakePlayer.playCount, 1);
+      expect(fakePlayer.state, PlayerState.playing);
+      expect(fakePlayer.lastSource, isA<AssetSource>());
+      expect((fakePlayer.lastSource as AssetSource).path, 'sounds/se_door_open.ogg');
+      expect(manager.playingEntryCount, 1);
+
+      // 再生完了イベントで状態がリセットされること
+      fakePlayer.triggerComplete();
+      await Future.delayed(const Duration(milliseconds: 10));
+      expect(manager.playingEntryCount, 0);
+    });
+
+    test('SE playback enforces max same sound limit (3 instances)', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true);
+      manager.registerAvailableSound('se_pickup.ogg');
+
+      final fakes = List.generate(5, (_) => FakeAudioPlayer());
+      manager.initPoolForTest(fakes);
+
+      // デバウンスをクリアしながら同一音を連続して4回再生要求
+      for (int i = 0; i < 4; i++) {
+        manager.clearCooldownsForTest();
+        manager.handleSoundEvent({
+          'category': 1,
+          'filename': 'se_pickup.ogg',
+          'text': '',
+          'volume': 100,
+          'loopOrFlag': 0,
+        });
+      }
+
+      await Future.delayed(const Duration(milliseconds: 10));
+
+      // 最大3インスタンスまでしか再生されず、4回目はスキップされていること
+      final playedCount = fakes.where((p) => p.playCount > 0).length;
+      expect(playedCount, 3);
+      expect(manager.playingEntryCount, 3);
+    });
+
+    test('Critical SE preempts combat sound entry when pool is full', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true);
+      manager.clearCooldownsForTest();
+      manager.registerAvailableSound('se_combat_hit_slash.ogg');
+      manager.registerAvailableSound('se_alarm.ogg');
+
+      final combatPlayer = FakeAudioPlayer();
+      manager.initPoolForTest([combatPlayer]);
+
+      // 1. 戦闘SEを再生してプールを満杯にする
+      manager.handleSoundEvent({
+        'category': 1,
+        'filename': 'se_combat_hit_slash.ogg',
+        'text': '',
+        'volume': 100,
+        'loopOrFlag': 0,
+      });
+      await Future.delayed(const Duration(milliseconds: 10));
+      expect(combatPlayer.playCount, 1);
+
+      // 2. 満杯の状態で重要SE（se_alarm.ogg）を発火
+      manager.clearCooldownsForTest();
+      manager.handleSoundEvent({
+        'category': 1,
+        'filename': 'se_alarm.ogg',
+        'text': '',
+        'volume': 100,
+        'loopOrFlag': 0,
+      });
+      await Future.delayed(const Duration(milliseconds: 10));
+
+      // 既存のプレイヤーが stop され、se_alarm.ogg で再 play されたこと
+      expect(combatPlayer.stopCount, greaterThanOrEqualTo(1));
+      expect(combatPlayer.playCount, 2);
+      expect((combatPlayer.lastSource as AssetSource).path, 'sounds/se_alarm.ogg');
     });
   });
 }
