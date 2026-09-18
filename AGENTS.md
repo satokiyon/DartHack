@@ -980,5 +980,30 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
    - Windows PowerShell 5.1 環境では、スクリプト内に全角文字（日本語コメントやログメッセージ等）が含まれる場合、BOM なしの UTF-8 で保存すると Shift-JIS (CP932) として解釈され、終端の中括弧 `}` 等の構文解析が破損して `Missing closing '}' in statement block` エラーが発生します。
    - そのため、PowerShell スクリプト（特に `sync_dat_assets.ps1` 等のビルド・同期スクリプト）を新規作成または編集する際は、必ず **UTF-8 with BOM (`[System.Text.UTF8Encoding($true)]`) かつ改行コード CRLF (`\r\n`)** で保存することを徹底してください。
 
+## 38. 効果音アセット（短音・きしみ音・環境音）の変換・音量正規化および音階生成・補完原則
+
+1. **短音効果音に対する ffmpeg `loudnorm` 単独適用の禁止と過度減衰・無音化の防止**:
+   - **現象とリスク**:
+     ffmpeg の `loudnorm`（ITU-R BS.1770 / EBU R128 ラウドネス正規化）は数秒以上の連続した音声（BGMや長文ボイス）を想定しているため、1〜2秒未満の短い効果音（きしみ音、打撃音、足音、クリック音等）や前後に無音区間を含む音源に適用すると、測定アルゴリズムが誤作動を起こして過度なマイナスゲイン（`-20dB 〜 -50dB`）を適用し、実質的な無音化（聴取不能）や極小音量化を引き起こします。
+   - **対策**:
+     短音効果音の変換・正規化時は、必ず先頭・末尾の無音を除去（`silenceremove`）した上で、ピーク正規化（`-1.0 〜 -1.5 dBFS`）を適用してください。
+     ```bash
+     ffmpeg -i input.wav -af "silenceremove=start_periods=1:start_threshold=-40dB,volume=<gain>dB" -c:a libopus -b:a 64k -ar 48000 output.ogg
+     ```
+
+2. **音階バリエーション・不良音源における同質ピッチシフト補完原則**:
+   - **設計方針**:
+     きしみ床板（`se_squeak_*` 12音）や楽器音のように音階・ピッチバリエーションを持つ効果音セットにおいて、元の音源データが録音不良・欠損・無音である場合、別系統のシンセ音や無関係な外部素材から個別調達すると、同一セット内で木材の反響や質感・空気感が浮いてしまいます。
+   - **補完手法**:
+     同一セット内で最もクリアで豊かな近隣音（半音・全音隣の音源）から、`asetrate` / `aresample` によるテープ可変速方式（varispeed）で半音ピッチシフト（例: Dから-1半音でD♭、E♭から+1半音でE）を行って生成してください。これにより、フォルマントや摩擦の音響特性を完全に維持した均一な音階セットを構築できます。
+
+3. **トラップ効果音・新規効果音追加時の日英両コアおよび仕様書・メタデータの完全同期原則**:
+   - Cコアへの新規効果音ID追加（`seffects.h`）およびトラップ発動時の音響処理（`trap.c`）の拡充（トラバサミ、反魔法、ポリモーフ、テレポート等）を行う際は、以下の全レイヤーを同時に更新・同期してください：
+     1) `c_core/nethack_jp/include/seffects.h` および `c_core/nethack_en/include/seffects.h`
+     2) `c_core/nethack_jp/src/trap.c` および `c_core/nethack_en/src/trap.c`
+     3) `sys/flutter/doc/sound_macros_list.md`（効果音一覧表のリナンバリングおよび呼び出し箇所テーブルの更新）
+     4) `sys/flutter/tools/sound_curator/`（`parse_sound_macros.py` による `sound_definitions.json` 再生成、および `database.py` による `sound_database.json` / `attributions.txt` の同期）
+
+
 
 
