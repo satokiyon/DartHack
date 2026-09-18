@@ -258,3 +258,13 @@ void flutter_sound_verbal(const char *text, int32_t gender, int32_t tone, int32_
 3. **安全対策**:
    - プレイヤー操作をブロックしない非同期音声合成・再生。
    - テキストウィンドウの更新タイミングとセリフ音声の自然な同期。
+
+---
+
+## 6. 仕様書一覧・相互参照
+
+- [sound_macros_list.md](sound_macros_list.md): 全313音マスター管理表 & Cコア内全369箇所呼び出し対照表
+- [combat_sound_specification.md](combat_sound_specification.md): 戦闘アクション効果音（33種）詳細仕様書
+- [ambience_specs.md](ambience_specs.md): フロアBGM・特別部屋BGM・環境音詳細仕様書
+- [sound_system_design.md](sound_system_design.md): NetHackサウンド機構とDartHack音響システム設計・確定実装仕様書
+

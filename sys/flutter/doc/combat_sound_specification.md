@@ -22,46 +22,48 @@ NetHack のテキスト中心の戦闘ログ（「〜を攻撃した」「〜は
    弓矢やスリング等の多段射撃において、矢の数だけ発射音が連続爆音化するのを防ぐため、発射音はループ前の「射撃アクション開始時」に 1回のみ鳴らし、着弾音・外れ音は飛翔体ごとに個別再生。
 5. **Flutter 層におけるデバウンス制御（60ms）**:
    連続攻撃や複数モンスターの同一フレーム交戦時に同一SEが多重再生されてクリッピングや音割れを起こすのを防ぐため、同一サウンドIDに対して 60ms の最小発声間隔（クールダウン）を適用。
+6. **プレイヤープール（最大12音同時再生）と重要音プリエンプション**:
+   最大同時12音の循環プレイヤープールおよび同一音最大3インスタンス制限により、激しい乱戦時でも歪みのない音響を実現。プール満杯時に重要アラームや呪文詠唱・実績音が要求された場合は、再生中の通常戦闘打撃音を安全にフェード停止して割り込み再生（プリエンプト）。
 
 ---
 
-## 2. 戦闘効果音 一覧（全33種）
+## 2. 戦闘効果音 一覧（全33種 / sound_macros_list.md No.204〜236）
 
 | No | サウンドID | マクロ名 | 日本語名 | 音のイメージ・概要 | トリガーC関数 (ファイル) | 推奨長さ |
 |:---:|:---|:---|:---|:---|:---|:---:|
-| 198 | `combat_hit_slash` | `se_combat_hit_slash` | 近接攻撃ヒット（斬撃） | 鋭い刃物で切り裂く音（刀、剣、斧） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
-| 199 | `combat_hit_blunt` | `se_combat_hit_blunt` | 近接攻撃ヒット（打撃） | 重い鈍器で叩き潰す鈍い衝撃音（メイス、棍棒、槌） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
-| 200 | `combat_hit_pierce` | `se_combat_hit_pierce` | 近接攻撃ヒット（刺突） | 鋭利な切先が突き刺さる音（槍、短剣、レイピア） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
-| 201 | `combat_hit_unarmed` | `se_combat_hit_unarmed` | 近接攻撃ヒット（素手/格闘） | 肉体同士が衝突する打撃音（パンチ、キック） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.15〜0.3秒 |
-| 202 | `combat_hit_whip` | `se_combat_hit_whip` | 近接攻撃ヒット（鞭/しなり） | 鞭やタオル特有の鋭いしなり・打撃音（牛追い鞭、ゴムホース、濡れたタオル） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
-| 203 | `combat_hit_ironball` | `se_combat_hit_ironball` | 近接攻撃ヒット（鉄球/鎖） | 重金属の重厚な打撃音と鎖の擦れ音（重い鉄球、鉄の鎖） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
-| 204 | `combat_hit_shield` | `se_combat_hit_shield` | 近接攻撃ヒット（盾バッシュ） | 盾による重い防具シールドバッシュ音（近接限定、各種の盾） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
-| 205 | `combat_hit_corpse` | `se_combat_hit_corpse` | 近接攻撃ヒット（死体/肉塊） | 死体や肉塊武器による生々しい生体打撃音（死体） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.35秒 |
-| 206 | `combat_hit_pick` | `se_combat_hit_pick` | 近接攻撃ヒット（採掘具） | つるはしやマトックによる硬質な採掘具打撃音（つるはし、ドワーフのマトック） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
-| 207 | `combat_hit_wand` | `se_combat_hit_wand` | 近接攻撃ヒット（杖/ロッド） | 杖やロッドによる硬く乾いた小打撃音（各種の杖・物理打撃） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.15〜0.3秒 |
-| 208 | `combat_hit_other` | `se_combat_hit_other` | 近接/投擲ヒット（その他/汎用） | 未分類アイテム（本・巻物・薬・食料・宝石等）全般の汎用フォールバック打撃音 | `nh_sound_melee_hit`, `nh_sound_missile_hit` | 0.15〜0.3秒 |
-| 209 | `combat_miss` | `se_combat_miss` | 近接攻撃空振り | 武器や拳が空を切る風切り音（ヒュッ） | `nh_sound_melee_miss` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.3秒 |
-| 210 | `combat_shoot_bow` | `se_combat_shoot_bow` | 弓発射 | 弦が弾かれ矢が放たれる音（ビュン） | `nh_sound_shoot` (`dothrow.c`, `mthrowu.c`) | 0.2〜0.4秒 |
-| 211 | `combat_shoot_crossbow` | `se_combat_shoot_crossbow` | クロスボウ発射 | 機械式トリガー解放とボルト射出音（カシュッ） | `nh_sound_shoot` (`dothrow.c`, `mthrowu.c`) | 0.2〜0.35秒 |
-| 212 | `combat_shoot_sling` | `se_combat_shoot_sling` | スリング発射 | 革紐が風を切り弾丸が飛び出す音（ヒュルッ） | `nh_sound_shoot` (`dothrow.c`, `mthrowu.c`) | 0.2〜0.35秒 |
-| 213 | `combat_throw` | `se_combat_throw` | 一般投擲 | 手から投擲物が投げ放たれる音（サッ、ビュッ） | `nh_sound_throw` (`dothrow.c`, `mthrowu.c`) | 0.2〜0.3秒 |
-| 214 | `combat_throw_boomerang` | `se_combat_throw_boomerang` | ブーメラン投擲 | 特有の風切り回転音（ヒュンヒュン） | `nh_sound_throw` (`dothrow.c`, `mthrowu.c`) | 0.3〜0.5秒 |
-| 215 | `combat_throw_mjollnir` | `se_combat_throw_mjollnir` | ミョルニル投擲 | 雷鳴を帯びた神聖な投擲音（ドシュッ＋放電） | `nh_sound_throw` (`dothrow.c`, `mthrowu.c`) | 0.3〜0.6秒 |
-| 216 | `combat_miss_thud` | `se_combat_miss_thud` | 矢弾・投擲外れ（衝突） | 壁・地面・床に当たって跳ねる鈍い衝突音（コツッ、バシッ） | `tmiss` (`dothrow.c`), `thitu` (`mthrowu.c`) | 0.15〜0.3秒 |
-| 217 | `combat_spell_cast` | `se_combat_spell_cast` | 呪文詠唱 | 魔法行使時の魔力集中・解放音（キィン、ファッ） | `nh_sound_spell_cast` (`spell.c`, `mcastu.c`) | 0.3〜0.6秒 |
-| 218 | `combat_wand_zap` | `se_combat_wand_zap` | 杖発動 | 杖を振って魔法効果光線が放出される音（ピシュッ） | `nh_sound_wand_zap` (`zap.c`, `muse.c`) | 0.25〜0.5秒 |
-| 219 | `mon_claw` | `se_mon_claw` | モンスター攻撃（爪） | 獣や怪物が鋭い爪で引っ掻く音（シャッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.2〜0.35秒 |
-| 220 | `mon_bite` | `se_mon_bite` | モンスター攻撃（噛みつき） | 牙が噛み合わさり肉を食いちぎる音（ガブッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.2〜0.35秒 |
-| 221 | `mon_sting` | `se_mon_sting` | モンスター攻撃（毒針/刺突） | 毒針や尾部が突き刺さる音（チクッ、プスッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.15〜0.3秒 |
-| 222 | `mon_butt` | `se_mon_butt` | モンスター攻撃（角/頭突き） | 硬い角や額で強烈に打ち据える音（ゴスッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.2〜0.35秒 |
-| 223 | `mon_touch` | `se_mon_touch` | モンスター攻撃（接触/麻痺） | 霊体・不定形生物が触れる不気味な音（ゾクッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
-| 224 | `mon_tentacle` | `se_mon_tentacle` | モンスター攻撃（触手/吸血） | 湿り気のある触手が絡みつく音（ヌチャッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.25〜0.45秒 |
-| 225 | `mon_kick` | `se_mon_kick` | モンスター攻撃（蹴り/蹄） | 蹄や強靭な後脚による蹴り飛ばし音（ドカッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.2〜0.35秒 |
-| 226 | `mon_hug` | `se_mon_hug` | モンスター攻撃（締めつけ） | 巨大な腕や怪力で締め上げる音（メキッ、ギシッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.3〜0.5秒 |
-| 227 | `mon_gaze` | `se_mon_gaze` | モンスター攻撃（視線） | 邪眼や凝視による精神・石化攻撃音（キィーーン） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.3〜0.6秒 |
-| 228 | `mon_engulf` | `se_mon_engulf` | モンスター攻撃（丸呑み） | 獲物を一気に呑み込む音（ゴクッ、ドロォ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.3〜0.6秒 |
-| 229 | `mon_breath` | `se_mon_breath` | モンスター攻撃（ブレス） | ドラゴン等の息吹が吹き荒れる轟音（ゴォォッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.4〜0.8秒 |
-| 230 | `mon_spit` | `se_mon_spit` | モンスター攻撃（吐出/毒液） | 酸や毒液を吐きかける飛沫音（ピュッ、ジュッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
+| 204 | `combat_hit_slash` | `se_combat_hit_slash` | 近接攻撃ヒット（斬撃） | 鋭い刃物で切り裂く音（刀、剣、斧） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
+| 205 | `combat_hit_blunt` | `se_combat_hit_blunt` | 近接攻撃ヒット（打撃） | 重い鈍器で叩き潰す鈍い衝撃音（メイス、棍棒、槌） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
+| 206 | `combat_hit_pierce` | `se_combat_hit_pierce` | 近接攻撃ヒット（刺突） | 鋭利な切先が突き刺さる音（槍、短剣、レイピア） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
+| 207 | `combat_hit_unarmed` | `se_combat_hit_unarmed` | 近接攻撃ヒット（素手/格闘） | 肉体同士が衝突する打撃音（パンチ、キック） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.15〜0.3秒 |
+| 208 | `combat_hit_whip` | `se_combat_hit_whip` | 近接攻撃ヒット（鞭/しなり） | 鞭やタオル特有の鋭いしなり・打撃音（牛追い鞭、ゴムホース、濡れたタオル） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
+| 209 | `combat_hit_ironball` | `se_combat_hit_ironball` | 近接攻撃ヒット（鉄球/鎖） | 重金属の重厚な打撃音と鎖の擦れ音（重い鉄球、鉄の鎖） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
+| 210 | `combat_hit_shield` | `se_combat_hit_shield` | 近接攻撃ヒット（盾バッシュ） | 盾による重い防具シールドバッシュ音（近接限定、各種の盾） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
+| 211 | `combat_hit_corpse` | `se_combat_hit_corpse` | 近接攻撃ヒット（死体/肉塊） | 死体や肉塊武器による生々しい生体打撃音（死体） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.35秒 |
+| 212 | `combat_hit_pick` | `se_combat_hit_pick` | 近接攻撃ヒット（採掘具） | つるはしやマトックによる硬質な採掘具打撃音（つるはし、ドワーフのマトック） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
+| 213 | `combat_hit_wand` | `se_combat_hit_wand` | 近接攻撃ヒット（杖/ロッド） | 杖やロッドによる硬く乾いた小打撃音（各種の杖・物理打撃） | `nh_sound_melee_hit` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.15〜0.3秒 |
+| 214 | `combat_hit_other` | `se_combat_hit_other` | 近接/投擲ヒット（その他/汎用） | 未分類アイテム（本・巻物・薬・食料・宝石等）全般の汎用フォールバック打撃音 | `nh_sound_melee_hit`, `nh_sound_missile_hit` | 0.15〜0.3秒 |
+| 215 | `combat_miss` | `se_combat_miss` | 近接攻撃空振り | 武器や拳が空を切る風切り音（ヒュッ） | `nh_sound_melee_miss` (`uhitm.c`, `mhitu.c`, `mhitm.c`) | 0.2〜0.3秒 |
+| 216 | `combat_shoot_bow` | `se_combat_shoot_bow` | 弓発射 | 弦が弾かれ矢が放たれる音（ビュン） | `nh_sound_shoot` (`dothrow.c`, `mthrowu.c`) | 0.2〜0.4秒 |
+| 217 | `combat_shoot_crossbow` | `se_combat_shoot_crossbow` | クロスボウ発射 | 機械式トリガー解放とボルト射出音（カシュッ） | `nh_sound_shoot` (`dothrow.c`, `mthrowu.c`) | 0.2〜0.35秒 |
+| 218 | `combat_shoot_sling` | `se_combat_shoot_sling` | スリング発射 | 革紐が風を切り弾丸が飛び出す音（ヒュルッ） | `nh_sound_shoot` (`dothrow.c`, `mthrowu.c`) | 0.2〜0.35秒 |
+| 219 | `combat_throw` | `se_combat_throw` | 一般投擲 | 手から投擲物が投げ放たれる音（サッ、ビュッ） | `nh_sound_throw` (`dothrow.c`, `mthrowu.c`) | 0.2〜0.3秒 |
+| 220 | `combat_throw_boomerang` | `se_combat_throw_boomerang` | ブーメラン投擲 | 特有の風切り回転音（ヒュンヒュン） | `nh_sound_throw` (`dothrow.c`, `mthrowu.c`) | 0.3〜0.5秒 |
+| 221 | `combat_throw_mjollnir` | `se_combat_throw_mjollnir` | ミョルニル投擲 | 雷鳴を帯びた神聖な投擲音（ドシュッ＋放電） | `nh_sound_throw` (`dothrow.c`, `mthrowu.c`) | 0.3〜0.6秒 |
+| 222 | `combat_miss_thud` | `se_combat_miss_thud` | 矢弾・投擲外れ（衝突） | 壁・地面・床に当たって跳ねる鈍い衝突音（コツッ、バシッ） | `tmiss` (`dothrow.c`), `thitu` (`mthrowu.c`) | 0.15〜0.3秒 |
+| 223 | `combat_spell_cast` | `se_combat_spell_cast` | 呪文詠唱 | 魔法行使時の魔力集中・解放音（キィン、ファッ） | `nh_sound_spell_cast` (`spell.c`, `mcastu.c`) | 0.3〜0.6秒 |
+| 224 | `combat_wand_zap` | `se_combat_wand_zap` | 杖発動 | 杖を振って魔法効果光線が放出される音（ピシュッ） | `nh_sound_wand_zap` (`zap.c`, `muse.c`) | 0.25〜0.5秒 |
+| 225 | `mon_claw` | `se_mon_claw` | モンスター攻撃（爪） | 獣や怪物が鋭い爪で引っ掻く音（シャッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.2〜0.35秒 |
+| 226 | `mon_bite` | `se_mon_bite` | モンスター攻撃（噛みつき） | 牙が噛み合わさり肉を食いちぎる音（ガブッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.2〜0.35秒 |
+| 227 | `mon_sting` | `se_mon_sting` | モンスター攻撃（毒針/刺突） | 毒針や尾部が突き刺さる音（チクッ、プスッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.15〜0.3秒 |
+| 228 | `mon_butt` | `se_mon_butt` | モンスター攻撃（角/頭突き） | 硬い角や額で強烈に打ち据える音（ゴスッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.2〜0.35秒 |
+| 229 | `mon_touch` | `se_mon_touch` | モンスター攻撃（接触/麻痺） | 霊体・不定形生物が触れる不気味な音（ゾクッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
+| 230 | `mon_tentacle` | `se_mon_tentacle` | モンスター攻撃（触手/吸血） | 湿り気のある触手が絡みつく音（ヌチャッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.25〜0.45秒 |
+| 231 | `mon_kick` | `se_mon_kick` | モンスター攻撃（蹴り/蹄） | 蹄や強靭な後脚による蹴り飛ばし音（ドカッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.2〜0.35秒 |
+| 232 | `mon_hug` | `se_mon_hug` | モンスター攻撃（締めつけ） | 巨大な腕や怪力で締め上げる音（メキッ、ギシッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.3〜0.5秒 |
+| 233 | `mon_gaze` | `se_mon_gaze` | モンスター攻撃（視線） | 邪眼や凝視による精神・石化攻撃音（キィーーン） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.3〜0.6秒 |
+| 234 | `mon_engulf` | `se_mon_engulf` | モンスター攻撃（丸呑み） | 獲物を一気に呑み込む音（ゴクッ、ドロォ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.3〜0.6秒 |
+| 235 | `mon_breath` | `se_mon_breath` | モンスター攻撃（ブレス） | ドラゴン等の息吹が吹き荒れる轟音（ゴォォッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.4〜0.8秒 |
+| 236 | `mon_spit` | `se_mon_spit` | モンスター攻撃（吐出/毒液） | 酸や毒液を吐きかける飛沫音（ピュッ、ジュッ） | `nh_sound_mon_attack` (`mhitu.c`, `mhitm.c`) | 0.2〜0.4秒 |
 
 ---
 

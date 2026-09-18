@@ -345,9 +345,10 @@ NetHack 5.0 の C コアでは `sound_ambience` を呼び出すマクロ `SoundA
    }
    ```
 2. **Dart側 (`SoundManager`) の役割分担**:
-   - `_bgmPlayer`: フロアBGMおよび特別な部屋専用BGM（ルームBGM）の排他再生プレイヤー。
+   - `_floorBgmPlayer`: フロア全体の探索BGM（ループ再生）。
+   - `_roomBgmPlayer`: 特別な部屋専用BGM（ルームBGM、ループ再生）。独立2プレイヤーにより中断・再開とファイル欠落時のフォールバックを実現。
    - `_ambiencePlayer`: 地形・天候環境音（水、溶岩、風、雨等）の同時ループ再生プレイヤー。
-   - `_pool`: 効果音（SE）・音声（ボイス）用の8チャンネル独立プレイヤー。
+   - `_sePool`: 効果音（SE）・音声（ボイス）用の最大12音独立プレイヤープール。
 
 ### 4.2 フロアBGMとルームBGMの短時間クロスフェード制御設計
 すべての特別な部屋・テーマ部屋（王座の間、寺院、蜂の巣、動物園、蜘蛛の巣窟等）への進入・退出時は、以下のアルゴリズムで短時間クロスフェードを行う。
@@ -374,3 +375,13 @@ NetHack 5.0 の C コアでは `sound_ambience` を呼び出すマクロ `SoundA
 ### 4.4 安全装置とUX原則
 - 対応する `.ogg` ファイルが存在しない場合は、エラーログを出力せず単に再生をスキップする。
 - プレイヤーの歩行・ターン進行中に音声再生の完了を `await` で待機することは絶対にせず、すべて非同期（`unawaited`）で処理して快適なUXを維持する。
+
+---
+
+## 5. 仕様書一覧・相互参照
+
+- [sound_macros_list.md](sound_macros_list.md): 全313音マスター管理表 & Cコア内全369箇所呼び出し対照表
+- [combat_sound_specification.md](combat_sound_specification.md): 戦闘アクション効果音（33種）詳細仕様書
+- [sound_system_design.md](sound_system_design.md): NetHackサウンド機構とDartHack音響システム設計・確定実装仕様書
+- [voice_speech_specs.md](voice_speech_specs.md): 声音・神託・TTS発話詳細仕様書
+

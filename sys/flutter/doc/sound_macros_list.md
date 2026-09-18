@@ -1,19 +1,19 @@
 # NetHack 5.0 / DartHack サウンドマスター管理仕様書 & 呼び出し一覧
 
 本書は、NetHack 5.0 Cコア（`c_core/nethack_jp`）から呼び出される効果音・音楽・音声の全イベント仕様書です。
-DartHack（Flutter/FFI環境）で再生する **全 `.ogg` (Opus) 音声ファイルのマスターチェックリスト**、および **Cコアソースコード内の全 332 箇所呼び出し対照表** で構成されています。
+DartHack（Flutter/FFI環境）で再生する **全 `.ogg` (Opus) 音声ファイルのマスターチェックリスト（全 313 種）**、および **Cコアソースコード内の全 369 箇所呼び出し対照表** で構成されています。
 
 > **戦闘アクション効果音の詳細仕様書**:
-> 2026-09に追加された戦闘系効果音（No.198〜230：近接、遠隔、呪文、杖、モンスター固有攻撃12種、特徴的アイテム・フォールバック音など計33種）の音量制御、不可視40%気配察知、生データ属性自動判定、Multishot集約、60msデバウンス制御、および音響素材制作ガイドラインの詳細は、専用仕様書 [combat_sound_specification.md](combat_sound_specification.md) を参照してください。
+> 戦闘系効果音（No.204〜236：近接、遠隔、呪文、杖、モンスター固有攻撃12種、特徴的アイテム・フォールバック音など計33種）の音量制御、不可視40%気配察知、生データ属性自動判定、Multishot集約、60msデバウンス制御、および音響素材制作ガイドラインの詳細は、専用仕様書 [combat_sound_specification.md](combat_sound_specification.md) を参照してください。
 
-> **改訂履歴**: 2026-09-16 初版作成。初版レビューに基づき修正。2026-09-17 戦闘アクション効果音 33種（No.198〜230）対応。2026-09-18 魔法の笛（se_magic_whistle）新設・通常笛と分離（全231種）。2026-09-18 ドアを閉める音（se_door_close）新設・開扉音と連動（全232種）。
+> **改訂履歴**: 2026-09-16 初版作成。初版レビューに基づき修正。2026-09-17 戦闘アクション効果音 33種（No.204〜236）対応。2026-09-18 魔法の笛（se_magic_whistle）新設・通常笛と分離。2026-09-18 ドアを閉める音（se_door_close）新設・開扉音と連動。2026-09-19 全313種体系へ完全統一、Cコア呼び出し箇所（全369箇所）同期、Android umask(0022)健全性維持およびプレイヤープール制御を反映。
 
 ---
 
 ## 第1部: 音声ファイル マスター管理表（全音源チェックリスト）
 
 ### 1-A. 効果音 (`Soundeffect`) — se_*.ogg 一覧
-Cコアの `include/seffects.h` に定義されている 236 種の効果音 ID の全一覧です（戦闘アクション効果音 33種を含む）。
+Cコアの `include/seffects.h` に定義されている 236 種の効果音 ID の全一覧です（一般効果音 203種 + 戦闘アクション効果音 33種）。
 
 | No. | 音声ファイル名 (.ogg) | サウンドID | 日本語イベント説明 | 呼び出し元Cファイル |
 | :--- | :--- | :--- | :--- | :--- |
@@ -396,7 +396,7 @@ Cコアから常に固定音符（`"C"` 等）が渡されるため、音階別�
 
 ---
 
-## 第2部: Cコアソースコード内 呼び出し箇所一覧（全 330 箇所）
+## 第2部: Cコアソースコード内 呼び出し箇所一覧（全 369 箇所）
 
 Cコアのソースファイルごとに、どの行でどのサウンドマクロがどのような引数で呼ばれ、どの `.ogg` ファイルに対応するかを示します。
 
@@ -527,11 +527,12 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 
 ---
 
-### `dothrow.c` （計 1 箇所）
+### `dothrow.c` （計 2 箇所）
 
 | 行番号 | マクロ | 引数 / サウンドID | 対応 .ogg ファイル | コードスニペット |
 | :--- | :--- | :--- | :--- | :--- |
-| L1863 | `Soundeffect` | `se_splash, 50` | `se_splash.ogg` | `Soundeffect(se_splash, 50);` |
+| L1867 | `Soundeffect` | `se_splash, 50` | `se_splash.ogg` | `Soundeffect(se_splash, 50);` |
+| L2702 | `Soundeffect` | `se_potion_crash_and_break, in_view ? 80 : 60` | `se_potion_crash_and_break.ogg` | `Soundeffect(se_potion_crash_and_break, in_view ? 80 : 60);` |
 
 ---
 
@@ -901,7 +902,7 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 
 ---
 
-### `sounds.c` （計 44 箇所）
+### `sounds.c` （計 53 箇所）
 
 | 行番号 | マクロ | 引数 / サウンドID | 対応 .ogg ファイル | コードスニペット |
 | :--- | :--- | :--- | :--- | :--- |
@@ -913,7 +914,6 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 | L262 | `Soundeffect` | `se_someone_searching, 30` | `se_someone_searching.ogg` | `Soundeffect(se_someone_searching, 30);` |
 | L271 | `Soundeffect` | `se_guards_footsteps, 30` | `se_guards_footsteps.ogg` | `Soundeffect(se_guards_footsteps, 30);` |
 | L550 | `Soundeffect` | `se, 70` | `se_unknown.ogg` | `Soundeffect(se, 70);  /* Soundeffect() handles Deaf or not Deaf */` |
-| L550 | `Soundeffect` | `` | `se_unknown.ogg` | `Soundeffect(se, 70);  /* Soundeffect() handles Deaf or not Deaf */` |
 | L589 | `Soundeffect` | `se, 50` | `se_unknown.ogg` | `Soundeffect(se, 50);` |
 | L618 | `SetVoice` | `mtmp, 0, 80, 0` | `voice_shopkeeper.ogg または voice_mon_generic.ogg` | `SetVoice(mtmp, 0, 80, 0);` |
 | L955 | `Soundeffect` | `(ptr == &mons[PM_HUMAN_WERERAT]` | `se_unknown.ogg` | `Soundeffect((ptr == &mons[PM_HUMAN_WERERAT]) ? se_scream` |
@@ -949,6 +949,16 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 | L1365 | `SetVoice` | `mtmp, 0, 80, 0` | `voice_shopkeeper.ogg または voice_mon_generic.ogg` | `SetVoice(mtmp, 0, 80, 0);` |
 | L1789 | `Play_usersound` | `snd->filename, snd->volume, snd->idx` | `usersound_custom.ogg` | `Play_usersound(snd->filename, snd->volume, snd->idx);` |
 | L1806 | `Play_usersound` | `snd->filename, snd->volume, snd->idx` | `usersound_custom.ogg` | `Play_usersound(snd->filename, snd->volume, snd->idx);` |
+| L2549 | `Soundeffect` | `seid, vol` | `se_combat_hit_*.ogg` | `Soundeffect(seid, vol); /* nh_sound_melee_hit */` |
+| L2560 | `Soundeffect` | `se_combat_miss, vol` | `se_combat_miss.ogg` | `Soundeffect(se_combat_miss, vol); /* nh_sound_melee_miss */` |
+| L2590 | `Soundeffect` | `seid, vol` | `se_combat_shoot_*.ogg` | `Soundeffect(seid, vol); /* nh_sound_shoot */` |
+| L2610 | `Soundeffect` | `seid, vol` | `se_combat_throw*.ogg` | `Soundeffect(seid, vol); /* nh_sound_throw */` |
+| L2640 | `Soundeffect` | `seid, vol` | `se_combat_hit_other.ogg 等` | `Soundeffect(seid, vol); /* nh_sound_missile_hit */` |
+| L2654 | `Soundeffect` | `se_combat_miss, vol` | `se_combat_miss.ogg` | `Soundeffect(se_combat_miss, vol); /* nh_sound_mon_attack */` |
+| L2659 | `Soundeffect` | `se_mon_claw, vol` | `se_mon_claw.ogg` | `Soundeffect(se_mon_claw, vol); /* nh_sound_mon_attack */` |
+| L2705 | `Soundeffect` | `seid, vol` | `se_mon_*.ogg` | `Soundeffect(seid, vol); /* nh_sound_mon_attack */` |
+| L2716 | `Soundeffect` | `se_combat_spell_cast, vol` | `se_combat_spell_cast.ogg` | `Soundeffect(se_combat_spell_cast, vol); /* nh_sound_spell_cast */` |
+| L2727 | `Soundeffect` | `se_combat_wand_zap, vol` | `se_combat_wand_zap.ogg` | `Soundeffect(se_combat_wand_zap, vol); /* nh_sound_wand_zap */` |
 
 ---
 
@@ -977,7 +987,7 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 
 ---
 
-### `trap.c` （計 38 箇所）
+### `trap.c` （計 40 箇所）
 
 | 行番号 | マクロ | 引数 / サウンドID | 対応 .ogg ファイル | コードスニペット |
 | :--- | :--- | :--- | :--- | :--- |
