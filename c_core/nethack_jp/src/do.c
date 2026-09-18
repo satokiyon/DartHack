@@ -1294,6 +1294,8 @@ dodown(void)
         goto_level(&tdst, FALSE, FALSE, FALSE);
     } else {
         ga.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
+        if (!trap)
+            Soundeffect(se_stairs_down, 60);
         next_level(!trap);
         ga.at_ladder = FALSE;
     }
@@ -1345,6 +1347,7 @@ doup(void)
         return ECMD_OK;
     }
     ga.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
+    Soundeffect(se_stairs_up, 60);
     prev_level(TRUE);
     ga.at_ladder = FALSE;
     return ECMD_TIME;

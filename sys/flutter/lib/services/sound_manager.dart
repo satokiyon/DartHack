@@ -76,6 +76,7 @@ class SoundManager {
     'se_wailing_of_the_banshee.ogg',
     'se_thunderclap.ogg',
     'se_glass_break.ogg',
+    'se_glass_shattering.ogg',
     'se_crash.ogg',
     'se_trap_door_explodes.ogg',
     'se_flee_screaming.ogg',

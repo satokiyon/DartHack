@@ -206,6 +206,24 @@ COMBAT_METADATA = {
         "keywords_ja": "毒液 酸 吐く 唾 飛沫 ピュッ ジュッ コブラ",
         "keywords_en": "spit acid venom liquid squirt snake hiss",
     },
+    "se_kick.ogg": {
+        "sub_category": "action",
+        "sub_category_ja": "アクション（キック）",
+        "keywords_ja": "キック 蹴り 蹴る ドア 宝箱 モンスター ドカッ ボコッ",
+        "keywords_en": "kick hit bash impact blunt attack door chest",
+    },
+    "se_stairs_up.ogg": {
+        "sub_category": "movement",
+        "sub_category_ja": "移動（階段上り）",
+        "keywords_ja": "階段 はしご 上る 登る 足音 ステップ トントン",
+        "keywords_en": "stairs climb up ladder footsteps ascent steps",
+    },
+    "se_stairs_down.ogg": {
+        "sub_category": "movement",
+        "sub_category_ja": "移動（階段下り）",
+        "keywords_ja": "階段 はしご 降りる 下りる 足音 ステップ ドスン",
+        "keywords_en": "stairs climb down ladder footsteps descent steps",
+    },
 }
 
 def parse_sound_macros(md_path: Path) -> list:

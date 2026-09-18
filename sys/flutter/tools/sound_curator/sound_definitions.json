@@ -824,8 +824,8 @@
     "category": "effect",
     "sub_category": "Soundeffect",
     "sub_category_ja": "",
-    "keywords_ja": "ドア 閉める 扉",
-    "keywords_en": "door close shut"
+    "keywords_ja": "",
+    "keywords_en": ""
   },
   {
     "no": 70,
@@ -2833,6 +2833,42 @@
   },
   {
     "no": 237,
+    "filename": "se_kick.ogg",
+    "id": "se_kick",
+    "description": "ドア・宝箱・モンスター・壁などを蹴った時の打撃音",
+    "caller": "dokick.c",
+    "category": "combat",
+    "sub_category": "action",
+    "sub_category_ja": "アクション（キック）",
+    "keywords_ja": "キック 蹴り 蹴る ドア 宝箱 モンスター ドカッ ボコッ",
+    "keywords_en": "kick hit bash impact blunt attack door chest"
+  },
+  {
+    "no": 238,
+    "filename": "se_stairs_up.ogg",
+    "id": "se_stairs_up",
+    "description": "階段やはしごを登るときの効果音",
+    "caller": "do.c",
+    "category": "combat",
+    "sub_category": "movement",
+    "sub_category_ja": "移動（階段上り）",
+    "keywords_ja": "階段 はしご 上る 登る 足音 ステップ トントン",
+    "keywords_en": "stairs climb up ladder footsteps ascent steps"
+  },
+  {
+    "no": 239,
+    "filename": "se_stairs_down.ogg",
+    "id": "se_stairs_down",
+    "description": "階段やはしごを降りるときの効果音",
+    "caller": "do.c",
+    "category": "combat",
+    "sub_category": "movement",
+    "sub_category_ja": "移動（階段下り）",
+    "keywords_ja": "階段 はしご 降りる 下りる 足音 ステップ ドスン",
+    "keywords_en": "stairs climb down ladder footsteps descent steps"
+  },
+  {
+    "no": 1,
     "filename": "sa2_splashscreen.ogg",
     "id": "sa2_splashscreen",
     "description": "タイトル・スプラッシュ画面が表示される時の音",
@@ -2844,7 +2880,7 @@
     "keywords_en": ""
   },
   {
-    "no": 238,
+    "no": 2,
     "filename": "sa2_newgame_nosplash.ogg",
     "id": "sa2_newgame_nosplash",
     "description": "スプラッシュなしで新規ゲームを開始する時の音",
@@ -2856,7 +2892,7 @@
     "keywords_en": ""
   },
   {
-    "no": 239,
+    "no": 3,
     "filename": "sa2_xplevelup.ogg",
     "id": "sa2_xplevelup",
     "description": "経験値レベルがアップした時のファンファーレ音",
@@ -2868,7 +2904,7 @@
     "keywords_en": ""
   },
   {
-    "no": 240,
+    "no": 4,
     "filename": "sa2_xpleveldown.ogg",
     "id": "sa2_xpleveldown",
     "description": "経験値レベルがダウンした時の音（ドレイン等）",
@@ -2880,7 +2916,7 @@
     "keywords_en": ""
   },
   {
-    "no": 241,
+    "no": 1,
     "filename": "ach_bell.ogg",
     "id": "ACH_BELL (achidx=1)",
     "description": "「開封の鐘」を入手した時の実績音",
@@ -2892,7 +2928,7 @@
     "keywords_en": ""
   },
   {
-    "no": 242,
+    "no": 2,
     "filename": "ach_hell.ogg",
     "id": "ACH_HELL (achidx=2)",
     "description": "ゲヘナ（地獄）に入った時の実績音",
@@ -2904,7 +2940,7 @@
     "keywords_en": ""
   },
   {
-    "no": 243,
+    "no": 3,
     "filename": "ach_cndl.ogg",
     "id": "ACH_CNDL (achidx=3)",
     "description": "「召喚の燭台」を入手した時の実績音",
@@ -2916,7 +2952,7 @@
     "keywords_en": ""
   },
   {
-    "no": 244,
+    "no": 4,
     "filename": "ach_book.ogg",
     "id": "ACH_BOOK (achidx=4)",
     "description": "「死者の書」を入手した時の実績音",
@@ -2928,7 +2964,7 @@
     "keywords_en": ""
   },
   {
-    "no": 245,
+    "no": 5,
     "filename": "ach_invk.ogg",
     "id": "ACH_INVK (achidx=5)",
     "description": "聖域へのアクセスのため召喚を行った時の実績音",
@@ -2940,7 +2976,7 @@
     "keywords_en": ""
   },
   {
-    "no": 246,
+    "no": 6,
     "filename": "ach_amul.ogg",
     "id": "ACH_AMUL (achidx=6)",
     "description": "「ヨェンダーのアミュレット」を入手した時の実績音",
@@ -2952,7 +2988,7 @@
     "keywords_en": ""
   },
   {
-    "no": 247,
+    "no": 7,
     "filename": "ach_endg.ogg",
     "id": "ACH_ENDG (achidx=7)",
     "description": "エンドゲームに突入した時の実績音",
@@ -2964,7 +3000,7 @@
     "keywords_en": ""
   },
   {
-    "no": 248,
+    "no": 8,
     "filename": "ach_astr.ogg",
     "id": "ACH_ASTR (achidx=8)",
     "description": "アストラル界に足を踏み入れた時の実績音",
@@ -2976,7 +3012,7 @@
     "keywords_en": ""
   },
   {
-    "no": 249,
+    "no": 9,
     "filename": "ach_uwin.ogg",
     "id": "ACH_UWIN (achidx=9)",
     "description": "ゲームを昇天クリアした時のクリア音",
@@ -2988,7 +3024,7 @@
     "keywords_en": ""
   },
   {
-    "no": 250,
+    "no": 10,
     "filename": "ach_mine_prize.ogg",
     "id": "ACH_MINE_PRIZE (achidx=10)",
     "description": "坑道の終点のラッキーストーンを入手した時の実績音",
@@ -3000,7 +3036,7 @@
     "keywords_en": ""
   },
   {
-    "no": 251,
+    "no": 11,
     "filename": "ach_soko_prize.ogg",
     "id": "ACH_SOKO_PRIZE (achidx=11)",
     "description": "倉庫番のバッグまたはアミュレットを入手した時の実績音",
@@ -3012,7 +3048,7 @@
     "keywords_en": ""
   },
   {
-    "no": 252,
+    "no": 12,
     "filename": "ach_medu.ogg",
     "id": "ACH_MEDU (achidx=12)",
     "description": "メデューサを倒した時の実績音",
@@ -3024,7 +3060,7 @@
     "keywords_en": ""
   },
   {
-    "no": 253,
+    "no": 13,
     "filename": "ach_mine.ogg",
     "id": "ACH_MINE (achidx=15)",
     "description": "ノーム坑道に入った時の実績音",
@@ -3036,7 +3072,7 @@
     "keywords_en": ""
   },
   {
-    "no": 254,
+    "no": 14,
     "filename": "ach_town.ogg",
     "id": "ACH_TOWN (achidx=16)",
     "description": "坑道の町（マインタウン）に到達した時の実績音",
@@ -3048,7 +3084,7 @@
     "keywords_en": ""
   },
   {
-    "no": 255,
+    "no": 15,
     "filename": "ach_shop.ogg",
     "id": "ACH_SHOP (achidx=17)",
     "description": "店に入った時の実績音",
@@ -3060,7 +3096,7 @@
     "keywords_en": ""
   },
   {
-    "no": 256,
+    "no": 16,
     "filename": "ach_tmpl.ogg",
     "id": "ACH_TMPL (achidx=18)",
     "description": "寺院に入った時の実績音",
@@ -3072,7 +3108,7 @@
     "keywords_en": ""
   },
   {
-    "no": 257,
+    "no": 17,
     "filename": "ach_orcl.ogg",
     "id": "ACH_ORCL (achidx=19)",
     "description": "神託の神官（オラクル）に相談した時の実績音",
@@ -3084,7 +3120,7 @@
     "keywords_en": ""
   },
   {
-    "no": 258,
+    "no": 18,
     "filename": "ach_soko.ogg",
     "id": "ACH_SOKO (achidx=21)",
     "description": "倉庫番（ソコバン）に入った時の実績音",
@@ -3096,7 +3132,7 @@
     "keywords_en": ""
   },
   {
-    "no": 259,
+    "no": 19,
     "filename": "ach_tune.ogg",
     "id": "ACH_TUNE (achidx=31)",
     "description": "城の跳ね橋の演奏チューンを発見した時の実績音",
@@ -3108,7 +3144,7 @@
     "keywords_en": ""
   },
   {
-    "no": 260,
+    "no": 1,
     "filename": "sound_Wooden_Flute_A.ogg",
     "id": "ins_flute` / A音",
     "description": "木製フルートの演奏音（蛇を魅了する効果）（A音）",
@@ -3120,7 +3156,7 @@
     "keywords_en": ""
   },
   {
-    "no": 261,
+    "no": 2,
     "filename": "sound_Wooden_Flute_B.ogg",
     "id": "ins_flute` / B音",
     "description": "木製フルートの演奏音（蛇を魅了する効果）（B音）",
@@ -3132,7 +3168,7 @@
     "keywords_en": ""
   },
   {
-    "no": 262,
+    "no": 3,
     "filename": "sound_Wooden_Flute_C.ogg",
     "id": "ins_flute` / C音",
     "description": "木製フルートの演奏音（蛇を魅了する効果）（C音）",
@@ -3144,7 +3180,7 @@
     "keywords_en": ""
   },
   {
-    "no": 263,
+    "no": 4,
     "filename": "sound_Wooden_Flute_D.ogg",
     "id": "ins_flute` / D音",
     "description": "木製フルートの演奏音（蛇を魅了する効果）（D音）",
@@ -3156,7 +3192,7 @@
     "keywords_en": ""
   },
   {
-    "no": 264,
+    "no": 5,
     "filename": "sound_Wooden_Flute_E.ogg",
     "id": "ins_flute` / E音",
     "description": "木製フルートの演奏音（蛇を魅了する効果）（E音）",
@@ -3168,7 +3204,7 @@
     "keywords_en": ""
   },
   {
-    "no": 265,
+    "no": 6,
     "filename": "sound_Wooden_Flute_F.ogg",
     "id": "ins_flute` / F音",
     "description": "木製フルートの演奏音（蛇を魅了する効果）（F音）",
@@ -3180,7 +3216,7 @@
     "keywords_en": ""
   },
   {
-    "no": 266,
+    "no": 7,
     "filename": "sound_Wooden_Flute_G.ogg",
     "id": "ins_flute` / G音",
     "description": "木製フルートの演奏音（蛇を魅了する効果）（G音）",
@@ -3192,7 +3228,7 @@
     "keywords_en": ""
   },
   {
-    "no": 267,
+    "no": 8,
     "filename": "sound_Magic_Flute_A.ogg",
     "id": "ins_pan_flute` / A音",
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（A音）",
@@ -3204,7 +3240,7 @@
     "keywords_en": ""
   },
   {
-    "no": 268,
+    "no": 9,
     "filename": "sound_Magic_Flute_B.ogg",
     "id": "ins_pan_flute` / B音",
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（B音）",
@@ -3216,7 +3252,7 @@
     "keywords_en": ""
   },
   {
-    "no": 269,
+    "no": 10,
     "filename": "sound_Magic_Flute_C.ogg",
     "id": "ins_pan_flute` / C音",
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（C音）",
@@ -3228,7 +3264,7 @@
     "keywords_en": ""
   },
   {
-    "no": 270,
+    "no": 11,
     "filename": "sound_Magic_Flute_D.ogg",
     "id": "ins_pan_flute` / D音",
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（D音）",
@@ -3240,7 +3276,7 @@
     "keywords_en": ""
   },
   {
-    "no": 271,
+    "no": 12,
     "filename": "sound_Magic_Flute_E.ogg",
     "id": "ins_pan_flute` / E音",
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（E音）",
@@ -3252,7 +3288,7 @@
     "keywords_en": ""
   },
   {
-    "no": 272,
+    "no": 13,
     "filename": "sound_Magic_Flute_F.ogg",
     "id": "ins_pan_flute` / F音",
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（F音）",
@@ -3264,7 +3300,7 @@
     "keywords_en": ""
   },
   {
-    "no": 273,
+    "no": 14,
     "filename": "sound_Magic_Flute_G.ogg",
     "id": "ins_pan_flute` / G音",
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（G音）",
@@ -3276,7 +3312,7 @@
     "keywords_en": ""
   },
   {
-    "no": 274,
+    "no": 15,
     "filename": "sound_Tooled_Horn_A.ogg",
     "id": "ins_english_horn` / A音",
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（A音）",
@@ -3288,7 +3324,7 @@
     "keywords_en": ""
   },
   {
-    "no": 275,
+    "no": 16,
     "filename": "sound_Tooled_Horn_B.ogg",
     "id": "ins_english_horn` / B音",
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（B音）",
@@ -3300,7 +3336,7 @@
     "keywords_en": ""
   },
   {
-    "no": 276,
+    "no": 17,
     "filename": "sound_Tooled_Horn_C.ogg",
     "id": "ins_english_horn` / C音",
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（C音）",
@@ -3312,7 +3348,7 @@
     "keywords_en": ""
   },
   {
-    "no": 277,
+    "no": 18,
     "filename": "sound_Tooled_Horn_D.ogg",
     "id": "ins_english_horn` / D音",
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（D音）",
@@ -3324,7 +3360,7 @@
     "keywords_en": ""
   },
   {
-    "no": 278,
+    "no": 19,
     "filename": "sound_Tooled_Horn_E.ogg",
     "id": "ins_english_horn` / E音",
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（E音）",
@@ -3336,7 +3372,7 @@
     "keywords_en": ""
   },
   {
-    "no": 279,
+    "no": 20,
     "filename": "sound_Tooled_Horn_F.ogg",
     "id": "ins_english_horn` / F音",
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（F音）",
@@ -3348,7 +3384,7 @@
     "keywords_en": ""
   },
   {
-    "no": 280,
+    "no": 21,
     "filename": "sound_Tooled_Horn_G.ogg",
     "id": "ins_english_horn` / G音",
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（G音）",
@@ -3360,7 +3396,7 @@
     "keywords_en": ""
   },
   {
-    "no": 281,
+    "no": 22,
     "filename": "sound_Bugle_A.ogg",
     "id": "ins_trumpet` / A音",
     "description": "ラッパの演奏音（兵士を起こす）（A音）",
@@ -3372,7 +3408,7 @@
     "keywords_en": ""
   },
   {
-    "no": 282,
+    "no": 23,
     "filename": "sound_Bugle_B.ogg",
     "id": "ins_trumpet` / B音",
     "description": "ラッパの演奏音（兵士を起こす）（B音）",
@@ -3384,7 +3420,7 @@
     "keywords_en": ""
   },
   {
-    "no": 283,
+    "no": 24,
     "filename": "sound_Bugle_C.ogg",
     "id": "ins_trumpet` / C音",
     "description": "ラッパの演奏音（兵士を起こす）（C音）",
@@ -3396,7 +3432,7 @@
     "keywords_en": ""
   },
   {
-    "no": 284,
+    "no": 25,
     "filename": "sound_Bugle_D.ogg",
     "id": "ins_trumpet` / D音",
     "description": "ラッパの演奏音（兵士を起こす）（D音）",
@@ -3408,7 +3444,7 @@
     "keywords_en": ""
   },
   {
-    "no": 285,
+    "no": 26,
     "filename": "sound_Bugle_E.ogg",
     "id": "ins_trumpet` / E音",
     "description": "ラッパの演奏音（兵士を起こす）（E音）",
@@ -3420,7 +3456,7 @@
     "keywords_en": ""
   },
   {
-    "no": 286,
+    "no": 27,
     "filename": "sound_Bugle_F.ogg",
     "id": "ins_trumpet` / F音",
     "description": "ラッパの演奏音（兵士を起こす）（F音）",
@@ -3432,7 +3468,7 @@
     "keywords_en": ""
   },
   {
-    "no": 287,
+    "no": 28,
     "filename": "sound_Bugle_G.ogg",
     "id": "ins_trumpet` / G音",
     "description": "ラッパの演奏音（兵士を起こす）（G音）",
@@ -3444,7 +3480,7 @@
     "keywords_en": ""
   },
   {
-    "no": 288,
+    "no": 29,
     "filename": "sound_Wooden_Harp_A.ogg",
     "id": "ins_orchestral_harp` / A音",
     "description": "木製ハープの演奏音（ニンフを魅了する）（A音）",
@@ -3456,7 +3492,7 @@
     "keywords_en": ""
   },
   {
-    "no": 289,
+    "no": 30,
     "filename": "sound_Wooden_Harp_B.ogg",
     "id": "ins_orchestral_harp` / B音",
     "description": "木製ハープの演奏音（ニンフを魅了する）（B音）",
@@ -3468,7 +3504,7 @@
     "keywords_en": ""
   },
   {
-    "no": 290,
+    "no": 31,
     "filename": "sound_Wooden_Harp_C.ogg",
     "id": "ins_orchestral_harp` / C音",
     "description": "木製ハープの演奏音（ニンフを魅了する）（C音）",
@@ -3480,7 +3516,7 @@
     "keywords_en": ""
   },
   {
-    "no": 291,
+    "no": 32,
     "filename": "sound_Wooden_Harp_D.ogg",
     "id": "ins_orchestral_harp` / D音",
     "description": "木製ハープの演奏音（ニンフを魅了する）（D音）",
@@ -3492,7 +3528,7 @@
     "keywords_en": ""
   },
   {
-    "no": 292,
+    "no": 33,
     "filename": "sound_Wooden_Harp_E.ogg",
     "id": "ins_orchestral_harp` / E音",
     "description": "木製ハープの演奏音（ニンフを魅了する）（E音）",
@@ -3504,7 +3540,7 @@
     "keywords_en": ""
   },
   {
-    "no": 293,
+    "no": 34,
     "filename": "sound_Wooden_Harp_F.ogg",
     "id": "ins_orchestral_harp` / F音",
     "description": "木製ハープの演奏音（ニンフを魅了する）（F音）",
@@ -3516,7 +3552,7 @@
     "keywords_en": ""
   },
   {
-    "no": 294,
+    "no": 35,
     "filename": "sound_Wooden_Harp_G.ogg",
     "id": "ins_orchestral_harp` / G音",
     "description": "木製ハープの演奏音（ニンフを魅了する）（G音）",
@@ -3528,7 +3564,7 @@
     "keywords_en": ""
   },
   {
-    "no": 295,
+    "no": 36,
     "filename": "sound_Magic_Harp_A.ogg",
     "id": "ins_cello` / A音",
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（A音）",
@@ -3540,7 +3576,7 @@
     "keywords_en": ""
   },
   {
-    "no": 296,
+    "no": 37,
     "filename": "sound_Magic_Harp_B.ogg",
     "id": "ins_cello` / B音",
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（B音）",
@@ -3552,7 +3588,7 @@
     "keywords_en": ""
   },
   {
-    "no": 297,
+    "no": 38,
     "filename": "sound_Magic_Harp_C.ogg",
     "id": "ins_cello` / C音",
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（C音）",
@@ -3564,7 +3600,7 @@
     "keywords_en": ""
   },
   {
-    "no": 298,
+    "no": 39,
     "filename": "sound_Magic_Harp_D.ogg",
     "id": "ins_cello` / D音",
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（D音）",
@@ -3576,7 +3612,7 @@
     "keywords_en": ""
   },
   {
-    "no": 299,
+    "no": 40,
     "filename": "sound_Magic_Harp_E.ogg",
     "id": "ins_cello` / E音",
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（E音）",
@@ -3588,7 +3624,7 @@
     "keywords_en": ""
   },
   {
-    "no": 300,
+    "no": 41,
     "filename": "sound_Magic_Harp_F.ogg",
     "id": "ins_cello` / F音",
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（F音）",
@@ -3600,7 +3636,7 @@
     "keywords_en": ""
   },
   {
-    "no": 301,
+    "no": 42,
     "filename": "sound_Magic_Harp_G.ogg",
     "id": "ins_cello` / G音",
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（G音）",
@@ -3612,7 +3648,7 @@
     "keywords_en": ""
   },
   {
-    "no": 302,
+    "no": 43,
     "filename": "sound_Frost_Horn.ogg",
     "id": "ins_french_horn",
     "description": "凍結の角笛の演奏音（冷気の魔法効果）",
@@ -3624,7 +3660,7 @@
     "keywords_en": ""
   },
   {
-    "no": 303,
+    "no": 44,
     "filename": "sound_Fire_Horn.ogg",
     "id": "ins_baritone_sax",
     "description": "火炎の角笛の演奏音（炎の魔法効果）",
@@ -3636,7 +3672,7 @@
     "keywords_en": ""
   },
   {
-    "no": 304,
+    "no": 45,
     "filename": "sound_Bell.ogg",
     "id": "ins_tinkle_bell",
     "description": "ベル・鈴の演奏音（鐘の識別）",
@@ -3648,7 +3684,7 @@
     "keywords_en": ""
   },
   {
-    "no": 305,
+    "no": 46,
     "filename": "sound_Drum_Of_Earthquake.ogg",
     "id": "ins_taiko_drum",
     "description": "地震の太鼓の演奏音（ランダムな落とし穴を生成）",
@@ -3660,7 +3696,7 @@
     "keywords_en": ""
   },
   {
-    "no": 306,
+    "no": 47,
     "filename": "sound_Leather_Drum.ogg",
     "id": "ins_melodic_tom",
     "description": "革製太鼓の演奏音（周囲のモンスターを起こす）",
@@ -3672,7 +3708,7 @@
     "keywords_en": ""
   },
   {
-    "no": 307,
+    "no": 1,
     "filename": "voice_deity.ogg",
     "id": "voice_deity",
     "description": "神（アライメント神）の声・天からの啓示（祈り応答・神罰・神恩寵）",
@@ -3684,7 +3720,7 @@
     "keywords_en": ""
   },
   {
-    "no": 308,
+    "no": 2,
     "filename": "voice_oracle.ogg",
     "id": "voice_oracle",
     "description": "神託の神官（オラクル）の神秘的な囁き声",
@@ -3696,7 +3732,7 @@
     "keywords_en": ""
   },
   {
-    "no": 309,
+    "no": 3,
     "filename": "voice_talking_artifact.ogg",
     "id": "voice_talking_artifact",
     "description": "意志を持つアーティファクトの発話音",
@@ -3708,7 +3744,7 @@
     "keywords_en": ""
   },
   {
-    "no": 310,
+    "no": 4,
     "filename": "voice_throne.ogg",
     "id": "voice_throne",
     "description": "玉座に座った時に聞こえる声（魔法の玉座からの啓示）",
@@ -3720,7 +3756,7 @@
     "keywords_en": ""
   },
   {
-    "no": 311,
+    "no": 5,
     "filename": "voice_death.ogg",
     "id": "voice_death",
     "description": "死神・死の声（死の女神への降伏場面）",
@@ -3732,7 +3768,7 @@
     "keywords_en": ""
   },
   {
-    "no": 312,
+    "no": 6,
     "filename": "voice_shopkeeper.ogg",
     "id": "voice_shopkeeper",
     "description": "店主の挨拶・売買交渉・怒りの掛け声",
@@ -3744,7 +3780,7 @@
     "keywords_en": ""
   },
   {
-    "no": 313,
+    "no": 7,
     "filename": "voice_mon_generic.ogg",
     "id": "voice (moreinfo=0)",
     "description": "モンスターおよびNPCの一般的な会話・鳴き声",

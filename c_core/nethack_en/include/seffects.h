@@ -249,6 +249,9 @@
     seffect(mon_engulf),
     seffect(mon_breath),
     seffect(mon_spit),
+    seffect(kick),
+    seffect(stairs_up),
+    seffect(stairs_down),
 #undef seffect
 #endif   /* SEFFECTS_ENUM || SEFFECTS_AUTOMAP */
 

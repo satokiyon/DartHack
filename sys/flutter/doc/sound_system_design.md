@@ -61,8 +61,8 @@ Cコアから出力されるサウンドイベントは、以下の6つのトリ
 ## 3. サウンドIDとアセットの対応関係
 
 ### 3.1 効果音ID (`seffects.h`)
-`include/seffects.h` には **236 種類** の効果音ID（`enum sound_effect_entries`）が定義されています（一般効果音 203種 + 戦闘アクション効果音 33種）。
-- 例: `se_door_open` (開扉), `se_door_close` (閉扉), `se_magic_whistle` (魔法の笛), `se_explosion` (爆発), `se_board_squeak` (きしみ床板), `se_combat_hit_slash` (斬撃)
+`include/seffects.h` には **239 種類** の効果音ID（`enum sound_effect_entries`）が定義されています（一般効果音 206種 + 戦闘アクション効果音 33種）。
+- 例: `se_door_open` (開扉), `se_door_close` (閉扉), `se_magic_whistle` (魔法の笛), `se_explosion` (爆発), `se_kick` (キック打撃), `se_stairs_up` / `se_stairs_down` (階段昇降), `se_glass_shattering` (ガラス破砕), `se_combat_hit_slash` (斬撃)
 
 ### 3.2 楽器ID (`sndprocs.h`)
 `enum instruments` には、GM (General MIDI) に準拠した楽器IDが割り当てられています。
@@ -78,7 +78,7 @@ Cコアから出力されるサウンドイベントは、以下の6つのトリ
 ### 3.4 声音 (`voice_*`)
 - 神の声、オラクル、喋るアーティファクト、玉座、死神、店主、汎用NPCの計 **7 ファイル** の `.ogg` が対応。
 
-**全サウンドアセット総数**: 236 + 47 + 23 + 7 = **全 313 種**。
+**全サウンドアセット総数**: 239 + 47 + 23 + 7 = **全 316 種**。
 
 ---
 
@@ -186,10 +186,10 @@ Android / Flutter (FFI) 環境特有のマルチスレッド・同一プロセ�
 
 ## 6. サウンド制作・キュレーションツール連携
 
-全 313 種のサウンドアセットを高品質に収集・管理するため、専用のローカルWebツールを整備しています。
+全 316 種のサウンドアセットを高品質に収集・管理するため、専用のローカルWebツールを整備しています。
 
 ### 6.1 サウンドキュレーター (`tools/sound_curator/`)
-- **Webダッシュボード**: `http://localhost:8765` で動作し、全313音の進捗管理、未設定/確定済フィルタ、インクリメンタル検索を提供。
+- **Webダッシュボード**: `http://localhost:8765` で動作し、全316音の進捗管理、未設定/確定済フィルタ、インクリメンタル検索を提供。
 - **外部音源検索支援**: 国内外13サイト（効果音ラボ、Pixabay、Freesound等）への最適キーワードワンクリック検索。
 - **ドラッグ＆ドロップ自動正規化**: ドロップされた音声ファイルを `ffmpeg` により先頭無音カット、**EBU R128 (-14 LUFS / True Peak -1.0dBFS)** 正規化、Ogg Opus (48kHz) エンコード。
 - **楽器音 47種自動生成**: `FluidR3 GM` SoundFont と `FluidSynth` によるピッチ正確な全音階自動サンプリング。
@@ -216,7 +216,7 @@ powershell -ExecutionPolicy Bypass -File sys/flutter/tools/sound_curator/check_v
 
 ## 8. 仕様書一覧・相互参照
 
-- [sound_macros_list.md](sound_macros_list.md): 全313音マスター管理表 & Cコア内全369箇所呼び出し対照表
+- [sound_macros_list.md](sound_macros_list.md): 全316音マスター管理表 & Cコア内全376箇所呼び出し対照表
 - [combat_sound_specification.md](combat_sound_specification.md): 戦闘アクション効果音（33種）詳細仕様書
 - [ambience_specs.md](ambience_specs.md): フロアBGM・特別部屋BGM・環境音詳細仕様書
 - [voice_speech_specs.md](voice_speech_specs.md): 声音・神託・TTS発話詳細仕様書

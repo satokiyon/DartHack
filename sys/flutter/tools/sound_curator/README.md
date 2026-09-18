@@ -1,13 +1,13 @@
 # NetHack 5.0 / DartHack サウンドキュレーター (Sound Curator)
 
-本ツールは、『[sound_macros_list.md](../../doc/sound_macros_list.md)』および『[combat_sound_specification.md](../../doc/combat_sound_specification.md)』に定義されている **全 307 種類の効果音・戦闘アクション音・実績音・楽器演奏音・声音** を、効率よく・高品質かつ狙い通りに収集・選定・正規化・管理するためのローカルWebワークスペースです。
+本ツールは、『[sound_macros_list.md](../../doc/sound_macros_list.md)』および『[combat_sound_specification.md](../../doc/combat_sound_specification.md)』に定義されている **全 316 種類の効果音・戦闘アクション音・実績音・楽器演奏音・声音** を、効率よく・高品質かつ狙い通りに収集・選定・正規化・管理するためのローカルWebワークスペースです。
 
 ---
 
 ## 主な機能と特徴
 
 1. **進捗ダッシュボード & カテゴリフィルタ**:
-   - 全307音の収集進捗率（パーセンテージ）をリアルタイム表示。
+   - 全316音の収集進捗率（パーセンテージ）をリアルタイム表示。
    - 「未設定のみ」「確定済のみ」「⚔️ 戦闘(33)」「効果音(197)」「実績(23)」「楽器(47)」「声音(7)」による瞬時絞り込み。
    - サウンドIDや日本語説明文、推奨検索キーワードによるインクリメンタル検索。
 2. **⚔️ 戦闘アクション効果音（33種）特化キュレーション & 自動音響処理**:
@@ -57,7 +57,7 @@ powershell -ExecutionPolicy Bypass -File sys/flutter/tools/sound_curator/run_com
 ```
 サーバーが立ち上がり、既定のブラウザで戦闘カテゴリに絞り込んだ画面（`http://localhost:8765/?category=combat`）が自動的に開きます。
 
-### 方法 B: 🎮 総合サウンドキュレーター（全307音）
+### 方法 B: 🎮 総合サウンドキュレーター（全316音）
 ```powershell
 powershell -ExecutionPolicy Bypass -File sys/flutter/tools/sound_curator/run_curator.ps1
 ```

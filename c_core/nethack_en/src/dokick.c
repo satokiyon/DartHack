@@ -208,6 +208,7 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
                 Your("%s %s.", kick_passes_thru, mon_nam(mon));
                 break; /* skip any additional kicks */
             } else if (tmp > kickdieroll) {
+                Soundeffect(se_kick, 50);
                 You("kick %s.", mon_nam(mon));
                 sum = damageum(mon, uattk, specialdmg);
                 (void) passive(mon, uarmf, (sum != M_ATTK_MISS),
@@ -253,6 +254,7 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
     else if (uarm && objects[uarm->otyp].oc_bulky && ACURR(A_DEX) < rnd(25))
         clumsy = TRUE;
  doit:
+    Soundeffect(se_kick, 50);
     You("kick %s.", mon_nam(mon));
     if (!rn2(clumsy ? 3 : 4) && (clumsy || !bigmonst(mon->data))
         && mon->mcansee && !mon->mtrapped && !thick_skinned(mon->data)
@@ -451,7 +453,7 @@ container_impact_dmg(
             if (otmp->otyp == EGG) {
                 Soundeffect(se_egg_cracking, 25);
             } else {
-                Soundeffect(se_glass_shattering, 25);
+                Soundeffect(se_glass_shattering, 50);
             }
             You_hear("a muffled %s.", result);
             if (costly) {
@@ -650,6 +652,7 @@ really_kick_object(coordxy x, coordxy y)
     if (Is_box(gk.kickedobj)) {
         boolean otrp = gk.kickedobj->otrapped;
 
+        Soundeffect(se_kick, 50);
         if (range < 2)
             pline("THUD!");
         container_impact_dmg(gk.kickedobj, x, y);
@@ -684,8 +687,10 @@ really_kick_object(coordxy x, coordxy y)
      * from its current position
      */
     if (range < 2) {
-        if (!Is_box(gk.kickedobj))
+        if (!Is_box(gk.kickedobj)) {
+            Soundeffect(se_kick, 50);
             pline("Thump!");
+        }
         return (!rn2(3) || martial());
     }
 
@@ -883,6 +888,7 @@ kick_ouch(coordxy x, coordxy y, const char *kickobjnam)
     int dmg;
     char buf[BUFSZ];
 
+    Soundeffect(se_kick, 50);
     pline("Ouch!  That hurts!");
     exercise(A_DEX, FALSE);
     exercise(A_STR, FALSE);
@@ -960,6 +966,7 @@ kick_door(coordxy x, coordxy y, int avrg_attrib)
         if (Blind)
             feel_location(x, y); /* we know we hit it */
         exercise(A_STR, TRUE);
+        Soundeffect(se_kick, 50);
         /* note: this used to be unconditional "WHAMMM!!!" but that has a
            fairly strong connotation of noise that a deaf hero shouldn't
            hear; we've kept the extra 'm's and one of the extra '!'s */

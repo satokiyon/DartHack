@@ -1,19 +1,19 @@
 # NetHack 5.0 / DartHack サウンドマスター管理仕様書 & 呼び出し一覧
 
 本書は、NetHack 5.0 Cコア（`c_core/nethack_jp`）から呼び出される効果音・音楽・音声の全イベント仕様書です。
-DartHack（Flutter/FFI環境）で再生する **全 `.ogg` (Opus) 音声ファイルのマスターチェックリスト（全 313 種）**、および **Cコアソースコード内の全 369 箇所呼び出し対照表** で構成されています。
+DartHack（Flutter/FFI環境）で再生する **全 `.ogg` (Opus) 音声ファイルのマスターチェックリスト（全 316 種）**、および **Cコアソースコード内の全 376 箇所呼び出し対照表** で構成されています。
 
 > **戦闘アクション効果音の詳細仕様書**:
 > 戦闘系効果音（No.204〜236：近接、遠隔、呪文、杖、モンスター固有攻撃12種、特徴的アイテム・フォールバック音など計33種）の音量制御、不可視40%気配察知、生データ属性自動判定、Multishot集約、60msデバウンス制御、および音響素材制作ガイドラインの詳細は、専用仕様書 [combat_sound_specification.md](combat_sound_specification.md) を参照してください。
 
-> **改訂履歴**: 2026-09-16 初版作成。初版レビューに基づき修正。2026-09-17 戦闘アクション効果音 33種（No.204〜236）対応。2026-09-18 魔法の笛（se_magic_whistle）新設・通常笛と分離。2026-09-18 ドアを閉める音（se_door_close）新設・開扉音と連動。2026-09-19 全313種体系へ完全統一、Cコア呼び出し箇所（全369箇所）同期、Android umask(0022)健全性維持およびプレイヤープール制御を反映。
+> **改訂履歴**: 2026-09-16 初版作成。初版レビューに基づき修正。2026-09-17 戦闘アクション効果音 33種（No.204〜236）対応。2026-09-18 魔法の笛（se_magic_whistle）新設・通常笛と分離。2026-09-18 ドアを閉める音（se_door_close）新設・開扉音と連動。2026-09-19 全313種体系へ完全統一、Cコア呼び出し箇所（全369箇所）同期、Android umask(0022)健全性維持およびプレイヤープール制御を反映。2026-09-19 階段昇降音（se_stairs_up / se_stairs_down）、キック打撃音（se_kick）新設、ガラス破壊音（se_glass_shattering）音響配備により全316種体系・全376箇所呼び出しへ拡張。
 
 ---
 
 ## 第1部: 音声ファイル マスター管理表（全音源チェックリスト）
 
 ### 1-A. 効果音 (`Soundeffect`) — se_*.ogg 一覧
-Cコアの `include/seffects.h` に定義されている 236 種の効果音 ID の全一覧です（一般効果音 203種 + 戦闘アクション効果音 33種）。
+Cコアの `include/seffects.h` に定義されている 239 種の効果音 ID の全一覧です（一般効果音 206種 + 戦闘アクション効果音 33種）。
 
 | No. | 音声ファイル名 (.ogg) | サウンドID | 日本語イベント説明 | 呼び出し元Cファイル |
 | :--- | :--- | :--- | :--- | :--- |
@@ -253,6 +253,9 @@ Cコアの `include/seffects.h` に定義されている 236 種の効果音 ID 
 | 234 | `se_mon_engulf.ogg` | `se_mon_engulf` | 丸呑み・呑み込み音 | mhitu.c, mhitm.c |
 | 235 | `se_mon_breath.ogg` | `se_mon_breath` | ドラゴン等のブレス放出音 | mhitu.c, mhitm.c |
 | 236 | `se_mon_spit.ogg` | `se_mon_spit` | 毒液・酸の吐出音 | mhitu.c, mhitm.c |
+| 237 | `se_kick.ogg` | `se_kick` | ドア・宝箱・モンスター・壁などを蹴った時の打撃音 | dokick.c |
+| 238 | `se_stairs_up.ogg` | `se_stairs_up` | 階段やはしごを登るときの効果音 | do.c |
+| 239 | `se_stairs_down.ogg` | `se_stairs_down` | 階段やはしごを降りるときの効果音 | do.c |
 
 > **詳細仕様**: 各戦闘アクション効果音の詳細な判定ロジック、音量制御（不可視40%気配察知）、および素材制作指針は [combat_sound_specification.md](combat_sound_specification.md) を参照してください。
 
@@ -478,7 +481,7 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 
 ---
 
-### `do.c` （計 10 箇所）
+### `do.c` （計 12 箇所）
 
 | 行番号 | マクロ | 引数 / サウンドID | 対応 .ogg ファイル | コードスニペット |
 | :--- | :--- | :--- | :--- | :--- |
@@ -489,6 +492,8 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 | L293 | `Soundeffect` | `se_item_tumble_downwards, 50` | `se_item_tumble_downwards.ogg` | `Soundeffect(se_item_tumble_downwards, 50);` |
 | L530 | `Soundeffect` | `se_drain_noises, 50` | `se_drain_noises.ogg` | `Soundeffect(se_drain_noises, 50);` |
 | L643 | `Soundeffect` | `se_ring_in_drain, 50` | `se_ring_in_drain.ogg` | `Soundeffect(se_ring_in_drain, 50);` |
+| L1297 | `Soundeffect` | `se_stairs_down, 60` | `se_stairs_down.ogg` | `Soundeffect(se_stairs_down, 60);` |
+| L1349 | `Soundeffect` | `se_stairs_up, 60` | `se_stairs_up.ogg` | `Soundeffect(se_stairs_up, 60);` |
 | L1876 | `Soundeffect` | `se_groans_and_moans, 25` | `se_groans_and_moans.ogg` | `Soundeffect(se_groans_and_moans, 25);` |
 | L1905 | `Soundeffect` | `se_alarm, 100` | `se_alarm.ogg` | `Soundeffect(se_alarm, 100);` |
 | L2241 | `Soundeffect` | `se_scratching, 50` | `se_scratching.ogg` | `Soundeffect(se_scratching, 50);` |
@@ -503,10 +508,12 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 
 ---
 
-### `dokick.c` （計 17 箇所）
+### `dokick.c` （計 23 箇所）
 
 | 行番号 | マクロ | 引数 / サウンドID | 対応 .ogg ファイル | コードスニペット |
 | :--- | :--- | :--- | :--- | :--- |
+| L212 | `Soundeffect` | `se_kick, 50` | `se_kick.ogg` | `Soundeffect(se_kick, 50);` |
+| L257 | `Soundeffect` | `se_kick, 50` | `se_kick.ogg` | `Soundeffect(se_kick, 50);` |
 | L339 | `SetVoice` | `mtmp, 0, 80, 0` | `voice_shopkeeper.ogg または voice_mon_generic.ogg` | `SetVoice(mtmp, 0, 80, 0);` |
 | L348 | `SetVoice` | `mtmp, 0, 80, 0` | `voice_shopkeeper.ogg または voice_mon_generic.ogg` | `SetVoice(mtmp, 0, 80, 0);` |
 | L360 | `SetVoice` | `mtmp, 0, 80, 0` | `voice_shopkeeper.ogg または voice_mon_generic.ogg` | `SetVoice(mtmp, 0, 80, 0);` |
@@ -514,9 +521,13 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 | L394 | `SetVoice` | `mtmp, 0, 80, 0` | `voice_shopkeeper.ogg または voice_mon_generic.ogg` | `SetVoice(mtmp, 0, 80, 0);` |
 | L397 | `SetVoice` | `mtmp, 0, 80, 0` | `voice_shopkeeper.ogg または voice_mon_generic.ogg` | `SetVoice(mtmp, 0, 80, 0);` |
 | L453 | `Soundeffect` | `se_egg_cracking, 25` | `se_egg_cracking.ogg` | `Soundeffect(se_egg_cracking, 25);` |
-| L455 | `Soundeffect` | `se_glass_shattering, 25` | `se_glass_shattering.ogg` | `Soundeffect(se_glass_shattering, 25);` |
+| L455 | `Soundeffect` | `se_glass_shattering, 50` | `se_glass_shattering.ogg` | `Soundeffect(se_glass_shattering, 50);` |
+| L658 | `Soundeffect` | `se_kick, 50` | `se_kick.ogg` | `Soundeffect(se_kick, 50);` |
+| L693 | `Soundeffect` | `se_kick, 50` | `se_kick.ogg` | `Soundeffect(se_kick, 50);` |
+| L892 | `Soundeffect` | `se_kick, 50` | `se_kick.ogg` | `Soundeffect(se_kick, 50);` |
 | L945 | `Soundeffect` | `se_kick_door_it_shatters, 50` | `se_kick_door_it_shatters.ogg` | `Soundeffect(se_kick_door_it_shatters, 50);` |
 | L950 | `Soundeffect` | `se_kick_door_it_crashes_open, 50` | `se_kick_door_it_crashes_open.ogg` | `Soundeffect(se_kick_door_it_crashes_open, 50);` |
+| L970 | `Soundeffect` | `se_kick, 50` | `se_kick.ogg` | `Soundeffect(se_kick, 50);` |
 | L983 | `Soundeffect` | `se_crash_door, 40` | `se_crash_door.ogg` | `Soundeffect(se_crash_door, 40);` |
 | L1008 | `Soundeffect` | `se_crash_door, 40` | `se_crash_door.ogg` | `Soundeffect(se_crash_door, 40);` |
 | L1030 | `Soundeffect` | `se_crash_throne_destroyed, 60` | `se_crash_throne_destroyed.ogg` | `Soundeffect(se_crash_throne_destroyed, 60);` |
