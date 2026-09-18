@@ -58,7 +58,7 @@ function getSearchUrls(item) {
     onjin: `https://www.google.com/search?q=site:on-jin.com+${qJa}`,
     otologic: `https://otologic.jp/free/se/search?keyword=${qJa}`,
     dict: `https://sounddictionary.info/?s=${qJa}`,
-    springin: `https://soundstock.springin.info/?s=${qJa}`,
+    springin: `https://www.springin.org/sound-stock/`,
     maou: `https://maou.audio/?s=${qJa}`,
     pocket: `https://pocket-se.info/?s=${qJa}`,
     amacha: `https://amachamusic.chagasi.com/`,
@@ -376,7 +376,7 @@ function handleFileSelected(item, file) {
     siteSelect.value = 'Springin\' Sound Stock';
     licenseSelect.value = 'Springin\'利用規約（商用可・クレジット不要）';
     authorInput.value = 'Springin\' Sound Stock';
-    urlInput.value = 'https://soundstock.springin.info/';
+    urlInput.value = 'https://www.springin.org/sound-stock/';
   } else if (fn.includes('maoudamashii') || fn.includes('maou') || fn.includes('魔王魂')) {
     siteSelect.value = '魔王魂';
     licenseSelect.value = '魔王魂利用規約（商用可・クレジット表記）';
@@ -421,6 +421,32 @@ function openUploadModalFor(id) {
   };
   input.click();
 }
+
+document.getElementById('modalSourceSite').addEventListener('change', (e) => {
+  const site = e.target.value;
+  const siteDefaults = {
+    '効果音ラボ': { author: '効果音ラボ', url: 'https://soundeffect-lab.info/', license: '効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）' },
+    'On-Jin ～音人～': { author: 'On-Jin ～音人～', url: 'https://on-jin.com/', license: 'On-Jin利用規約（商用可・ゲーム組込可・クレジット表記）' },
+    'OtoLogic': { author: 'OtoLogic', url: 'https://otologic.jp/', license: 'OtoLogic利用規約（CC BY 4.0 / クレジット表記）' },
+    '効果音辞典': { author: '効果音辞典', url: 'https://sounddictionary.info/', license: '効果音辞典利用規約（商用可・クレジット不要）' },
+    'Springin\' Sound Stock': { author: 'Springin\' Sound Stock', url: 'https://www.springin.org/sound-stock/', license: 'Springin\'利用規約（商用可・クレジット不要）' },
+    '魔王魂': { author: '魔王魂', url: 'https://maou.audio/', license: '魔王魂利用規約（商用可・クレジット表記）' },
+    'ポケットサウンド': { author: 'ポケットサウンド', url: 'https://pocket-se.info/', license: 'ポケットサウンド利用規約（商用可・クレジット表記）' },
+    '甘茶の音楽工房': { author: '甘茶の音楽工房', url: 'https://amachamusic.chagasi.com/', license: '甘茶の音楽工房利用規約（商用可・ゲーム組込可・クレジット任意）' },
+    'Pixabay': { author: 'Pixabay Creator', url: 'https://pixabay.com/sound-effects/', license: 'Pixabay Content License（商用可・ゲーム組込可・クレジット不要）' },
+    'SoundDino': { author: 'SoundDino', url: 'https://sounddino.com/', license: 'SoundDino Royalty-Free（商用可・クレジット不要）' },
+    'Freesound.org': { author: '', url: 'https://freesound.org/', license: 'CC-BY 4.0' },
+    'ZapSplat': { author: 'ZapSplat', url: 'https://www.zapsplat.com/', license: 'ZapSplat Standard License（商用可・クレジット表記）' },
+    'OpenGameArt.org': { author: '', url: 'https://opengameart.org/', license: 'CC0 (Public Domain)' }
+  };
+
+  if (siteDefaults[site]) {
+    const d = siteDefaults[site];
+    document.getElementById('modalAuthor').value = d.author;
+    document.getElementById('modalSourceUrl').value = d.url;
+    document.getElementById('modalLicense').value = d.license;
+  }
+});
 
 document.getElementById('btnModalCancel').addEventListener('click', () => {
   document.getElementById('uploadModal').classList.remove('active');
