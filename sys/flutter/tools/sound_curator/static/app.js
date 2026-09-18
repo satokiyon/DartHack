@@ -530,7 +530,20 @@ async function runVolumeAudit() {
 
   try {
     const res = await fetch('/api/volume_check');
-    const data = await res.json();
+    if (!res.ok) {
+      const text = await res.text();
+      if (res.status === 404) {
+        throw new Error('APIが見つかりません (404)。サウンドキュレーターのローカルサーバー (server.py) を再起動してください。');
+      }
+      throw new Error(`サーバーエラー (HTTP ${res.status}): ${text.slice(0, 150)}`);
+    }
+
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      throw new Error('サーバーからの応答が不正です（JSONではありません）。server.py を再起動してください。');
+    }
     
     // volumeDataMap に保存
     volumeDataMap = {};
@@ -559,7 +572,7 @@ async function runVolumeAudit() {
 
     renderCards();
   } catch (err) {
-    alert('音量診断に失敗しました: ' + err);
+    alert('音量診断に失敗しました:\n' + err.message);
   } finally {
     btn.disabled = false;
     btn.textContent = origText;
@@ -577,6 +590,10 @@ async function fixVolume(filename) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ target: filename })
     });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`サーバーエラー (HTTP ${res.status}): ${text.slice(0, 150)}`);
+    }
     const data = await res.json();
     if (data.success && data.results && data.results.length > 0) {
       const updated = data.results[0];
@@ -601,7 +618,7 @@ async function fixVolume(filename) {
       alert('音量適正化に失敗しました: ' + (data.error || '不明なエラー'));
     }
   } catch (err) {
-    alert('通信エラー: ' + err);
+    alert('通信エラー:\n' + err.message);
   }
 }
 
@@ -622,6 +639,10 @@ async function fixAllProblemVolumes() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ target: 'warn_or_error' })
     });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`サーバーエラー (HTTP ${res.status}): ${text.slice(0, 150)}`);
+    }
     const data = await res.json();
     if (data.success) {
       for (const r of (data.results || [])) {
@@ -634,7 +655,7 @@ async function fixAllProblemVolumes() {
       alert('一括適正化に失敗しました: ' + (data.error || '不明なエラー'));
     }
   } catch (err) {
-    alert('通信エラー: ' + err);
+    alert('通信エラー:\n' + err.message);
   } finally {
     if (btn) {
       btn.disabled = false;

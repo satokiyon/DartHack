@@ -97,28 +97,31 @@ class CuratorHTTPRequestHandler(BaseHTTPRequestHandler):
 
     def handle_volume_check(self, parsed):
         """全音源または指定音源の音量測定結果を返す"""
-        query_params = urllib.parse.parse_qs(parsed.query)
-        target = query_params.get("target", [None])[0]
+        try:
+            query_params = urllib.parse.parse_qs(parsed.query)
+            target = query_params.get("target", [None])[0]
 
-        sounds_dir = resolve_sounds_dir()
-        results = check_all_volumes(
-            sounds_dir=sounds_dir,
-            warn_only=False,
-            auto_fix=False,
-            as_json=False,
-            target_file=target
-        )
+            sounds_dir = resolve_sounds_dir()
+            results = check_all_volumes(
+                sounds_dir=sounds_dir,
+                warn_only=False,
+                auto_fix=False,
+                as_json=False,
+                target_file=target
+            )
 
-        counts = {"OK": 0, "CLIP": 0, "WARN": 0, "ERROR": 0}
-        for r in results:
-            st = r.get("status", "ERROR")
-            counts[st] = counts.get(st, 0) + 1
+            counts = {"OK": 0, "CLIP": 0, "WARN": 0, "ERROR": 0}
+            for r in results:
+                st = r.get("status", "ERROR")
+                counts[st] = counts.get(st, 0) + 1
 
-        self.send_json({
-            "total": len(results),
-            "counts": counts,
-            "results": results
-        })
+            self.send_json({
+                "total": len(results),
+                "counts": counts,
+                "results": results
+            })
+        except Exception as e:
+            self.send_json({"error": f"音量診断エラー: {e}"}, status=500)
 
     def handle_volume_fix(self):
         """音量適正化を実行する"""
