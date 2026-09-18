@@ -38,36 +38,69 @@ def normalize_and_convert(
     input_path: Path,
     output_path: Path,
     target_lufs: float = -14.0,
-    true_peak: float = -1.0,
+    true_peak: float = -1.5,
     is_stereo: bool = False,
     bitrate: str = "64k",
     start_offset: Optional[float] = None,
     duration: Optional[float] = None,
-    highpass_cutoff: Optional[int] = None
+    highpass_cutoff: Optional[int] = None,
+    mode: str = "auto"  # "auto", "sfx" (peak norm + comp), "bgm" (loudnorm)
 ) -> bool:
     """
     音源を正規化・Opus変換して出力する。
-    - 先頭無音の自動除去 (silenceremove)
-    - 不要低域ハイパスフィルター (highpass)
-    - EBU R128 ラウドネス正規化 (loudnorm)
-    - Ogg Opus (48kHz) 出力
+    - 短音効果音（< 3.0s または mode="sfx"）:
+        先頭無音トリミング + 軽コンプレッサー + ピーク正規化 (-1.5 dBFS)
+        ※ 短音に対する loudnorm の過度な誤減衰・無音化を完全に防止する。
+    - 長尺音源（>= 3.0s または mode="bgm"）:
+        先頭無音トリミング + EBU R128 ラウドネス正規化 (loudnorm)
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # フィルタチェインの構築
-    filters = []
+    info = get_audio_info(input_path)
+    file_dur = duration if duration is not None else info.get("duration", 0.0)
 
-    # 1. 先頭の無音トリミング (しきい値 -50dB、10ms以上の無音をカット)
-    filters.append("silenceremove=start_periods=1:start_duration=0.01:start_threshold=-50dB")
+    use_sfx_mode = (mode == "sfx") or (mode == "auto" and file_dur < 3.0)
 
-    # 2. ハイパスフィルター（小型スピーカーでの音割れ・低域濁り防止）
+    base_filters = []
+    # 1. 先頭の無音トリミング
+    base_filters.append("silenceremove=start_periods=1:start_duration=0.01:start_threshold=-45dB")
+
+    # 2. ハイパスフィルター（任意）
     if highpass_cutoff is not None and highpass_cutoff > 0:
-        filters.append(f"highpass=f={highpass_cutoff}")
+        base_filters.append(f"highpass=f={highpass_cutoff}")
 
-    # 3. EBU R128 ラウドネス正規化
-    filters.append(f"loudnorm=I={target_lufs}:TP={true_peak}:LRA=11")
+    if use_sfx_mode:
+        # 短音効果音モード: 軽いコンプレッサーで音圧を整え、ピークを目標値（例: -1.5dB）に正規化
+        # コンプレッサーでアタックを保ちつつ実効音量を補強
+        comp_filter = "acompressor=threshold=-16dB:ratio=2.5:attack=10:release=100:makeup=2dB"
+        detect_filters = base_filters + [comp_filter, "volumedetect"]
+        detect_str = ",".join(detect_filters)
 
-    filter_str = ",".join(filters)
+        cmd_det = ["ffmpeg", "-i", str(input_path)]
+        if start_offset is not None and start_offset > 0:
+            cmd_det.extend(["-ss", f"{start_offset:.3f}"])
+        if duration is not None and duration > 0:
+            cmd_det.extend(["-t", f"{duration:.3f}"])
+        cmd_det.extend(["-af", detect_str, "-f", "null", "-"])
+
+        det_res = subprocess.run(cmd_det, capture_output=True, text=True)
+        max_v = 0.0
+        for l in det_res.stderr.splitlines():
+            if "max_volume" in l:
+                try:
+                    max_v = float(l.split("max_volume:")[1].replace("dB", "").strip())
+                except Exception:
+                    max_v = 0.0
+                break
+
+        # 目標ピーク値 (true_peak) に合わせるゲイン
+        gain = true_peak - max_v
+        final_filters = base_filters + [comp_filter, f"volume={gain:.2f}dB"]
+        filter_str = ",".join(final_filters)
+    else:
+        # 長尺・BGMモード: EBU R128 ラウドネス正規化
+        final_filters = base_filters + [f"loudnorm=I={target_lufs}:TP={true_peak}:LRA=11"]
+        filter_str = ",".join(final_filters)
 
     cmd = ["ffmpeg", "-y"]
 
