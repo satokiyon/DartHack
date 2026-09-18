@@ -903,6 +903,7 @@ doopen_indir(coordxy x, coordxy y)
     /* door is known to be CLOSED */
     if (rnl(20) < (ACURRSTR + ACURR(A_DEX) + ACURR(A_CON)) / 3) {
         set_msg_xy(cc.x, cc.y);
+        Soundeffect(se_door_open, 80);
         pline_The("door opens.");
         if (door->doormask & D_TRAPPED) {
             b_trapped("door", FINGER);
@@ -1037,6 +1038,7 @@ doclose(void)
         }
         if (u.usteed
             || rn2(25) < (ACURRSTR + ACURR(A_DEX) + ACURR(A_CON)) / 3) {
+            Soundeffect(se_door_close, 80);
             pline_The("door closes.");
             door->doormask = D_CLOSED;
             feel_newsym(x, y); /* the hero knows she closed it */

@@ -79,6 +79,7 @@
     seffect(destroy_web),
     seffect(distant_thunder),
     seffect(divine_music),
+    seffect(door_close),
     seffect(door_crash_open),
     seffect(door_open),
     seffect(door_unlock_and_open),

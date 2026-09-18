@@ -92,6 +92,23 @@ function updateStats(stats) {
   document.getElementById('statsTotalCount').textContent = stats.total;
   document.getElementById('statsPercent').textContent = stats.percent;
   document.getElementById('progressBar').style.width = `${stats.percent}%`;
+
+  if (stats.by_category) {
+    const catLabels = {
+      combat: '⚔️ 戦闘',
+      effect: '効果音',
+      achievement: '実績',
+      instrument: '楽器',
+      voice: '声音'
+    };
+    for (const [cat, info] of Object.entries(stats.by_category)) {
+      const btn = document.querySelector(`.filter-btn[data-cat="${cat}"]`);
+      if (btn) {
+        const label = catLabels[cat] || cat;
+        btn.textContent = `${label} (${info.total})`;
+      }
+    }
+  }
 }
 
 function renderCards() {

@@ -808,7 +808,7 @@
     "filename": "se_door_open.ogg",
     "id": "se_door_open",
     "description": "ドアがギィッと開く音（通常の開扉）",
-    "caller": "monmove.c",
+    "caller": "monmove.c, lock.c",
     "category": "effect",
     "sub_category": "Soundeffect",
     "sub_category_ja": "",
@@ -817,6 +817,18 @@
   },
   {
     "no": 69,
+    "filename": "se_door_close.ogg",
+    "id": "se_door_close",
+    "description": "ドアがバタンと閉まる音（通常の閉扉）",
+    "caller": "lock.c",
+    "category": "effect",
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "ドア 閉める 扉",
+    "keywords_en": "door close shut"
+  },
+  {
+    "no": 70,
     "filename": "se_door_unlock_and_open.ogg",
     "id": "se_door_unlock_and_open",
     "description": "鍵がカチャリと解錠されてドアが開く音",
@@ -828,7 +840,7 @@
     "keywords_en": ""
   },
   {
-    "no": 70,
+    "no": 71,
     "filename": "se_drain_noises.ogg",
     "id": "se_drain_noises",
     "description": "排水口がゴボゴボと鳴る音（排水溝近く）",
@@ -840,7 +852,7 @@
     "keywords_en": ""
   },
   {
-    "no": 71,
+    "no": 72,
     "filename": "se_dry_throat_rattle.ogg",
     "id": "se_dry_throat_rattle",
     "description": "乾燥した喉がガラガラ鳴る音（モンスターの息）",
@@ -852,7 +864,7 @@
     "keywords_en": ""
   },
   {
-    "no": 72,
+    "no": 73,
     "filename": "se_egg_cracking.ogg",
     "id": "se_egg_cracking",
     "description": "卵の殻がパキッと割れる音（蹴った時）",
@@ -864,7 +876,7 @@
     "keywords_en": ""
   },
   {
-    "no": 73,
+    "no": 74,
     "filename": "se_egg_splatting.ogg",
     "id": "se_egg_splatting",
     "description": "卵がグシャッと踏み潰れる音",
@@ -876,7 +888,7 @@
     "keywords_en": ""
   },
   {
-    "no": 74,
+    "no": 75,
     "filename": "se_elephant_trumpet.ogg",
     "id": "se_elephant_trumpet",
     "description": "象のパオーンという高らかな鳴き声",
@@ -888,7 +900,7 @@
     "keywords_en": ""
   },
   {
-    "no": 75,
+    "no": 76,
     "filename": "se_equine_neigh.ogg",
     "id": "se_equine_neigh",
     "description": "馬のヒヒーンという高いいななき",
@@ -900,7 +912,7 @@
     "keywords_en": ""
   },
   {
-    "no": 76,
+    "no": 77,
     "filename": "se_equine_whicker.ogg",
     "id": "se_equine_whicker",
     "description": "馬の低く柔らかいいななき",
@@ -912,7 +924,7 @@
     "keywords_en": ""
   },
   {
-    "no": 77,
+    "no": 78,
     "filename": "se_equine_whinny.ogg",
     "id": "se_equine_whinny",
     "description": "馬の短いいななき声",
@@ -924,7 +936,7 @@
     "keywords_en": ""
   },
   {
-    "no": 78,
+    "no": 79,
     "filename": "se_explosion.ogg",
     "id": "se_explosion",
     "description": "大爆発音（錠前爆発・爆破罠）",
@@ -936,7 +948,7 @@
     "keywords_en": ""
   },
   {
-    "no": 79,
+    "no": 80,
     "filename": "se_faint_chime.ogg",
     "id": "se_faint_chime",
     "description": "かすかなチリンというチャイムの音（魔法感知）",
@@ -948,7 +960,7 @@
     "keywords_en": ""
   },
   {
-    "no": 80,
+    "no": 81,
     "filename": "se_faint_sloshing.ogg",
     "id": "se_faint_sloshing",
     "description": "かすかな水が揺れる音（アイテム生成時）",
@@ -960,7 +972,7 @@
     "keywords_en": ""
   },
   {
-    "no": 81,
+    "no": 82,
     "filename": "se_faint_splashing.ogg",
     "id": "se_faint_splashing",
     "description": "かすかな水しぶき音（ホイールへの接触）",
@@ -972,7 +984,7 @@
     "keywords_en": ""
   },
   {
-    "no": 82,
+    "no": 83,
     "filename": "se_feline_meow.ogg",
     "id": "se_feline_meow",
     "description": "猫のニャーという鳴き声",
@@ -984,7 +996,7 @@
     "keywords_en": ""
   },
   {
-    "no": 83,
+    "no": 84,
     "filename": "se_feline_mew.ogg",
     "id": "se_feline_mew",
     "description": "子猫のミューという細い鳴き声",
@@ -996,7 +1008,7 @@
     "keywords_en": ""
   },
   {
-    "no": 84,
+    "no": 85,
     "filename": "se_feline_purr.ogg",
     "id": "se_feline_purr",
     "description": "猫のゴロゴロと喉を鳴らす音",
@@ -1008,7 +1020,7 @@
     "keywords_en": ""
   },
   {
-    "no": 85,
+    "no": 86,
     "filename": "se_feline_yelp.ogg",
     "id": "se_feline_yelp",
     "description": "猫のギャッという悲鳴",
@@ -1020,7 +1032,7 @@
     "keywords_en": ""
   },
   {
-    "no": 86,
+    "no": 87,
     "filename": "se_feline_yip.ogg",
     "id": "se_feline_yip",
     "description": "猫の甲高いキーという鳴き声",
@@ -1032,7 +1044,7 @@
     "keywords_en": ""
   },
   {
-    "no": 87,
+    "no": 88,
     "filename": "se_feline_yowl.ogg",
     "id": "se_feline_yowl",
     "description": "猫のウウウという低い唸り声",
@@ -1044,7 +1056,7 @@
     "keywords_en": ""
   },
   {
-    "no": 88,
+    "no": 89,
     "filename": "se_furious_bubbling.ogg",
     "id": "se_furious_bubbling",
     "description": "液体が激しくボコボコと泡立つ音（噴水の呪い）",
@@ -1056,7 +1068,7 @@
     "keywords_en": ""
   },
   {
-    "no": 89,
+    "no": 90,
     "filename": "se_gear_turn.ogg",
     "id": "se_gear_turn",
     "description": "歯車がカチリと一段回る音（機構の動作）",
@@ -1068,7 +1080,7 @@
     "keywords_en": ""
   },
   {
-    "no": 90,
+    "no": 91,
     "filename": "se_gears_turning_chains_rattling.ogg",
     "id": "se_gears_turning_chains_rattling",
     "description": "歯車が回り鎖が引き上げられる音（跳ね橋の引き上げ）",
@@ -1080,7 +1092,7 @@
     "keywords_en": ""
   },
   {
-    "no": 91,
+    "no": 92,
     "filename": "se_glass_crashing.ogg",
     "id": "se_glass_crashing",
     "description": "ガラスが激しくバリーンと割れる音",
@@ -1092,7 +1104,7 @@
     "keywords_en": ""
   },
   {
-    "no": 92,
+    "no": 93,
     "filename": "se_glass_shattering.ogg",
     "id": "se_glass_shattering",
     "description": "ガラス瓶が粉々にパリーンと砕け散る音",
@@ -1104,7 +1116,7 @@
     "keywords_en": ""
   },
   {
-    "no": 93,
+    "no": 94,
     "filename": "se_groan.ogg",
     "id": "se_groan",
     "description": "ウゥーといううめき声（モンスターや地形）",
@@ -1116,7 +1128,7 @@
     "keywords_en": ""
   },
   {
-    "no": 94,
+    "no": 95,
     "filename": "se_groans_and_moans.ogg",
     "id": "se_groans_and_moans",
     "description": "呻きとうめき声（アンデッドの気配・死体部屋）",
@@ -1128,7 +1140,7 @@
     "keywords_en": ""
   },
   {
-    "no": 95,
+    "no": 96,
     "filename": "se_growl.ogg",
     "id": "se_growl",
     "description": "ウーンという低い唸り声",
@@ -1140,7 +1152,7 @@
     "keywords_en": ""
   },
   {
-    "no": 96,
+    "no": 97,
     "filename": "se_grunt.ogg",
     "id": "se_grunt",
     "description": "フンと鼻を鳴らす短い声",
@@ -1152,7 +1164,7 @@
     "keywords_en": ""
   },
   {
-    "no": 97,
+    "no": 98,
     "filename": "se_guards_footsteps.ogg",
     "id": "se_guards_footsteps",
     "description": "警備員の重い足音が近づく音（金庫室侵入）",
@@ -1164,7 +1176,7 @@
     "keywords_en": ""
   },
   {
-    "no": 98,
+    "no": 99,
     "filename": "se_gurgle.ogg",
     "id": "se_gurgle",
     "description": "ゴボゴボと湧き立つ液体の音（モンスターの声）",
@@ -1176,7 +1188,7 @@
     "keywords_en": ""
   },
   {
-    "no": 99,
+    "no": 100,
     "filename": "se_gushing_sound.ogg",
     "id": "se_gushing_sound",
     "description": "ドバーッと液体や水が噴き出す音（配管破壊）",
@@ -1188,7 +1200,7 @@
     "keywords_en": ""
   },
   {
-    "no": 100,
+    "no": 101,
     "filename": "se_heart_beat.ogg",
     "id": "se_heart_beat",
     "description": "トックン、トックンという心臓の鼓動音（聴診器使用）",
@@ -1200,7 +1212,7 @@
     "keywords_en": ""
   },
   {
-    "no": 101,
+    "no": 102,
     "filename": "se_hiss.ogg",
     "id": "se_hiss",
     "description": "シュッというヘビや蒸気の威嚇音",
@@ -1212,7 +1224,7 @@
     "keywords_en": ""
   },
   {
-    "no": 102,
+    "no": 103,
     "filename": "se_hollow_sound.ogg",
     "id": "se_hollow_sound",
     "description": "コンコンと中が空洞に響く音（壁や箱の確認）",
@@ -1224,7 +1236,7 @@
     "keywords_en": ""
   },
   {
-    "no": 103,
+    "no": 104,
     "filename": "se_horn_being_played.ogg",
     "id": "se_horn_being_played",
     "description": "角笛がブォーンと響き渡る音（演奏効果）",
@@ -1236,7 +1248,7 @@
     "keywords_en": ""
   },
   {
-    "no": 104,
+    "no": 105,
     "filename": "se_iron_ball_dragging_you.ogg",
     "id": "se_iron_ball_dragging_you",
     "description": "重い鉄球をズルズルと引きずられる音",
@@ -1248,7 +1260,7 @@
     "keywords_en": ""
   },
   {
-    "no": 105,
+    "no": 106,
     "filename": "se_iron_ball_hits_you.ogg",
     "id": "se_iron_ball_hits_you",
     "description": "鉄球がドスンと身体に激突する音",
@@ -1260,7 +1272,7 @@
     "keywords_en": ""
   },
   {
-    "no": 106,
+    "no": 107,
     "filename": "se_item_tumble_downwards.ogg",
     "id": "se_item_tumble_downwards",
     "description": "アイテムが下層にカラカラ落ちていく音",
@@ -1272,7 +1284,7 @@
     "keywords_en": ""
   },
   {
-    "no": 107,
+    "no": 108,
     "filename": "se_jabberwock_burble.ogg",
     "id": "se_jabberwock_burble",
     "description": "ジャバウォックのブツブツという不気味な声",
@@ -1284,7 +1296,7 @@
     "keywords_en": ""
   },
   {
-    "no": 108,
+    "no": 109,
     "filename": "se_kaablamm_of_mine.ogg",
     "id": "se_kaablamm_of_mine",
     "description": "地雷がカーブラムと大爆発する音",
@@ -1296,7 +1308,7 @@
     "keywords_en": ""
   },
   {
-    "no": 109,
+    "no": 110,
     "filename": "se_kaboom.ogg",
     "id": "se_kaboom",
     "description": "ドカーンという爆発音",
@@ -1308,7 +1320,7 @@
     "keywords_en": ""
   },
   {
-    "no": 110,
+    "no": 111,
     "filename": "se_kaboom_boom_boom.ogg",
     "id": "se_kaboom_boom_boom",
     "description": "ドカン、ドドーンという連続大爆発音",
@@ -1320,7 +1332,7 @@
     "keywords_en": ""
   },
   {
-    "no": 111,
+    "no": 112,
     "filename": "se_kaboom_door_explodes.ogg",
     "id": "se_kaboom_door_explodes",
     "description": "ドアの罠がドカンと爆発する音",
@@ -1332,7 +1344,7 @@
     "keywords_en": ""
   },
   {
-    "no": 112,
+    "no": 113,
     "filename": "se_kadoom_boulder_falls_in.ogg",
     "id": "se_kadoom_boulder_falls_in",
     "description": "巨石がカドームと穴に落ちる轟音",
@@ -1344,7 +1356,7 @@
     "keywords_en": ""
   },
   {
-    "no": 113,
+    "no": 114,
     "filename": "se_kerplunk_boulder_gone.ogg",
     "id": "se_kerplunk_boulder_gone",
     "description": "巨石が水中や穴をカポーンと塞ぐ音",
@@ -1356,7 +1368,7 @@
     "keywords_en": ""
   },
   {
-    "no": 114,
+    "no": 115,
     "filename": "se_kick_door_it_crashes_open.ogg",
     "id": "se_kick_door_it_crashes_open",
     "description": "蹴りによりドアがドカンと開く音",
@@ -1368,7 +1380,7 @@
     "keywords_en": ""
   },
   {
-    "no": 115,
+    "no": 116,
     "filename": "se_kick_door_it_shatters.ogg",
     "id": "se_kick_door_it_shatters",
     "description": "蹴りによりドアが粉々にバリーンと砕ける音",
@@ -1380,7 +1392,7 @@
     "keywords_en": ""
   },
   {
-    "no": 116,
+    "no": 117,
     "filename": "se_klick.ogg",
     "id": "se_klick",
     "description": "カチッという小さな金属の作動音（解錠・機構）",
@@ -1392,7 +1404,7 @@
     "keywords_en": ""
   },
   {
-    "no": 117,
+    "no": 118,
     "filename": "se_klunk.ogg",
     "id": "se_klunk",
     "description": "ゴトンという重い鈍い衝突音",
@@ -1404,7 +1416,7 @@
     "keywords_en": ""
   },
   {
-    "no": 118,
+    "no": 119,
     "filename": "se_klunk_pipe.ogg",
     "id": "se_klunk_pipe",
     "description": "配管をゴトンと叩く衝撃音",
@@ -1416,7 +1428,7 @@
     "keywords_en": ""
   },
   {
-    "no": 119,
+    "no": 120,
     "filename": "se_laughter.ogg",
     "id": "se_laughter",
     "description": "ハハハという笑い声（モンスターや魔法使用時）",
@@ -1428,7 +1440,7 @@
     "keywords_en": ""
   },
   {
-    "no": 120,
+    "no": 121,
     "filename": "se_lid_slams_open_falls_shut.ogg",
     "id": "se_lid_slams_open_falls_shut",
     "description": "箱の蓋がガタンと開き、ズンと閉まる音",
@@ -1440,7 +1452,7 @@
     "keywords_en": ""
   },
   {
-    "no": 121,
+    "no": 122,
     "filename": "se_loud_click.ogg",
     "id": "se_loud_click",
     "description": "カチャンという大きな機構の作動音（罠発動）",
@@ -1452,7 +1464,7 @@
     "keywords_en": ""
   },
   {
-    "no": 122,
+    "no": 123,
     "filename": "se_loud_crash.ogg",
     "id": "se_loud_crash",
     "description": "大音響の衝突・崩壊音",
@@ -1464,7 +1476,7 @@
     "keywords_en": ""
   },
   {
-    "no": 123,
+    "no": 124,
     "filename": "se_loud_pop.ogg",
     "id": "se_loud_pop",
     "description": "ポーンと弾けて破裂する音（泡・爆発）",
@@ -1476,7 +1488,7 @@
     "keywords_en": ""
   },
   {
-    "no": 124,
+    "no": 125,
     "filename": "se_loud_splash.ogg",
     "id": "se_loud_splash",
     "description": "ドバシャーンという大きな水しぶき音",
@@ -1488,7 +1500,7 @@
     "keywords_en": ""
   },
   {
-    "no": 125,
+    "no": 126,
     "filename": "se_low_buzzing.ogg",
     "id": "se_low_buzzing",
     "description": "ブーンという低く響く羽音（蜂の巣・虫）",
@@ -1500,7 +1512,7 @@
     "keywords_en": ""
   },
   {
-    "no": 126,
+    "no": 127,
     "filename": "se_low_hum.ogg",
     "id": "se_low_hum",
     "description": "ブーンというハム・機械音（罠の予兆）",
@@ -1512,7 +1524,7 @@
     "keywords_en": ""
   },
   {
-    "no": 127,
+    "no": 128,
     "filename": "se_magic_whistle.ogg",
     "id": "se_magic_whistle",
     "description": "魔法の笛の澄んだ神秘的な音（ペットを呼び寄せる）",
@@ -1524,7 +1536,7 @@
     "keywords_en": ""
   },
   {
-    "no": 128,
+    "no": 129,
     "filename": "se_mana_drain.ogg",
     "id": "se_mana_drain",
     "description": "反魔法の罠や魔力吸収によるマナ枯渇音",
@@ -1536,7 +1548,7 @@
     "keywords_en": ""
   },
   {
-    "no": 129,
+    "no": 130,
     "filename": "se_maniacal_laughter.ogg",
     "id": "se_maniacal_laughter",
     "description": "ケタケタという狂気的な高笑い（巻物読後等）",
@@ -1548,7 +1560,7 @@
     "keywords_en": ""
   },
   {
-    "no": 130,
+    "no": 131,
     "filename": "se_masticating_sound.ogg",
     "id": "se_masticating_sound",
     "description": "クチャクチャと何かを噛む咀嚼音",
@@ -1560,7 +1572,7 @@
     "keywords_en": ""
   },
   {
-    "no": 131,
+    "no": 132,
     "filename": "se_monster_behind_boulder.ogg",
     "id": "se_monster_behind_boulder",
     "description": "岩陰に隠れるモンスターの気配・物音",
@@ -1572,7 +1584,7 @@
     "keywords_en": ""
   },
   {
-    "no": 132,
+    "no": 133,
     "filename": "se_mutter_imprecations.ogg",
     "id": "se_mutter_imprecations",
     "description": "呪いの言葉をブツブツと呟く声（店主の怒り）",
@@ -1584,7 +1596,7 @@
     "keywords_en": ""
   },
   {
-    "no": 133,
+    "no": 134,
     "filename": "se_mutter_incantation.ogg",
     "id": "se_mutter_incantation",
     "description": "呪文をブツブツと唱える声",
@@ -1596,7 +1608,7 @@
     "keywords_en": ""
   },
   {
-    "no": 134,
+    "no": 135,
     "filename": "se_orc_grunt.ogg",
     "id": "se_orc_grunt",
     "description": "オークのグアッという低い唸り声",
@@ -1608,7 +1620,7 @@
     "keywords_en": ""
   },
   {
-    "no": 135,
+    "no": 136,
     "filename": "se_paranoid_confirmation.ogg",
     "id": "se_paranoid_confirmation",
     "description": "ソワソワした確認の囁き声",
@@ -1620,7 +1632,7 @@
     "keywords_en": ""
   },
   {
-    "no": 136,
+    "no": 137,
     "filename": "se_polymorph.ogg",
     "id": "se_polymorph",
     "description": "ポリモーフの罠による肉体変化・変身音",
@@ -1632,7 +1644,7 @@
     "keywords_en": ""
   },
   {
-    "no": 137,
+    "no": 138,
     "filename": "se_potion_crash_and_break.ogg",
     "id": "se_potion_crash_and_break",
     "description": "ポーション瓶がガシャンと割れ液体が散る音",
@@ -1644,7 +1656,7 @@
     "keywords_en": ""
   },
   {
-    "no": 138,
+    "no": 139,
     "filename": "se_ring_in_drain.ogg",
     "id": "se_ring_in_drain",
     "description": "指輪が排水口にコロコロと転がり落ちる音",
@@ -1656,7 +1668,7 @@
     "keywords_en": ""
   },
   {
-    "no": 139,
+    "no": 140,
     "filename": "se_ripping_sound.ogg",
     "id": "se_ripping_sound",
     "description": "ビリビリと布・紙が破れる音（装備破壊等）",
@@ -1668,7 +1680,7 @@
     "keywords_en": ""
   },
   {
-    "no": 140,
+    "no": 141,
     "filename": "se_roar.ogg",
     "id": "se_roar",
     "description": "ガオーッという猛獣の咆哮",
@@ -1680,7 +1692,7 @@
     "keywords_en": ""
   },
   {
-    "no": 141,
+    "no": 142,
     "filename": "se_rumbling.ogg",
     "id": "se_rumbling",
     "description": "ゴゴゴという地鳴り音（罠・地震）",
@@ -1692,7 +1704,7 @@
     "keywords_en": ""
   },
   {
-    "no": 142,
+    "no": 143,
     "filename": "se_rumbling_of_earth.ogg",
     "id": "se_rumbling_of_earth",
     "description": "ズズズという大地が轟く地鳴り",
@@ -1704,7 +1716,7 @@
     "keywords_en": ""
   },
   {
-    "no": 143,
+    "no": 144,
     "filename": "se_rushing_wind_noise.ogg",
     "id": "se_rushing_wind_noise",
     "description": "ヒューという突風が吹き荒れる音",
@@ -1716,7 +1728,7 @@
     "keywords_en": ""
   },
   {
-    "no": 144,
+    "no": 145,
     "filename": "se_rustling_paper.ogg",
     "id": "se_rustling_paper",
     "description": "カサカサと紙・巻物が擦れ合う音",
@@ -1728,7 +1740,7 @@
     "keywords_en": ""
   },
   {
-    "no": 145,
+    "no": 146,
     "filename": "se_sad_wailing.ogg",
     "id": "se_sad_wailing",
     "description": "ウワーンという悲しげなすすり泣き・哀しみの声",
@@ -1740,7 +1752,7 @@
     "keywords_en": ""
   },
   {
-    "no": 146,
+    "no": 147,
     "filename": "se_sceptor_pounding.ogg",
     "id": "se_sceptor_pounding",
     "description": "笏（しゃく）で床をドンドンと叩く音（宮廷）",
@@ -1752,7 +1764,7 @@
     "keywords_en": ""
   },
   {
-    "no": 147,
+    "no": 148,
     "filename": "se_scratching.ogg",
     "id": "se_scratching",
     "description": "カリカリと爪で引っ掻く音（秘密の扉の探索）",
@@ -1764,7 +1776,7 @@
     "keywords_en": ""
   },
   {
-    "no": 148,
+    "no": 149,
     "filename": "se_scream.ogg",
     "id": "se_scream",
     "description": "ギャーッという悲鳴・絶叫（演奏効果等）",
@@ -1776,7 +1788,7 @@
     "keywords_en": ""
   },
   {
-    "no": 149,
+    "no": 150,
     "filename": "se_screech.ogg",
     "id": "se_screech",
     "description": "キーキーという甲高い叫び声",
@@ -1788,7 +1800,7 @@
     "keywords_en": ""
   },
   {
-    "no": 150,
+    "no": 151,
     "filename": "se_sewer_song.ogg",
     "id": "se_sewer_song",
     "description": "下水道から聞こえる不気味な歌声（下水道の噴水）",
@@ -1800,7 +1812,7 @@
     "keywords_en": ""
   },
   {
-    "no": 151,
+    "no": 152,
     "filename": "se_sharp_crack.ogg",
     "id": "se_sharp_crack",
     "description": "バシッと鋭くひびが走る音",
@@ -1812,7 +1824,7 @@
     "keywords_en": ""
   },
   {
-    "no": 152,
+    "no": 153,
     "filename": "se_shriek.ogg",
     "id": "se_shriek",
     "description": "ギャーッという鋭い悲鳴（モンスターの声）",
@@ -1824,7 +1836,7 @@
     "keywords_en": ""
   },
   {
-    "no": 153,
+    "no": 154,
     "filename": "se_shrill_whistle.ogg",
     "id": "se_shrill_whistle",
     "description": "ピーッと甲高く突き刺さる笛の音（ホイッスル使用）",
@@ -1836,7 +1848,7 @@
     "keywords_en": ""
   },
   {
-    "no": 154,
+    "no": 155,
     "filename": "se_sinister_laughter.ogg",
     "id": "se_sinister_laughter",
     "description": "クックッという不敵・邪悪な笑い声（悪の存在）",
@@ -1848,7 +1860,7 @@
     "keywords_en": ""
   },
   {
-    "no": 155,
+    "no": 156,
     "filename": "se_sizzling.ogg",
     "id": "se_sizzling",
     "description": "ジュージューと焼ける・溶ける音（酸・炎接触）",
@@ -1860,7 +1872,7 @@
     "keywords_en": ""
   },
   {
-    "no": 156,
+    "no": 157,
     "filename": "se_slurping_sound.ogg",
     "id": "se_slurping_sound",
     "description": "ズルズルとすする音（捕食・液体摂取）",
@@ -1872,7 +1884,7 @@
     "keywords_en": ""
   },
   {
-    "no": 157,
+    "no": 158,
     "filename": "se_smashing_and_crushing.ogg",
     "id": "se_smashing_and_crushing",
     "description": "ガシャンと叩き潰す音（跳ね橋の可動）",
@@ -1884,7 +1896,7 @@
     "keywords_en": ""
   },
   {
-    "no": 158,
+    "no": 159,
     "filename": "se_snake_rattle.ogg",
     "id": "se_snake_rattle",
     "description": "ガラガラヘビの尾のガラガラと鳴る警告音",
@@ -1896,7 +1908,7 @@
     "keywords_en": ""
   },
   {
-    "no": 159,
+    "no": 160,
     "filename": "se_snakes_hissing.ogg",
     "id": "se_snakes_hissing",
     "description": "ヘビのシャーという群体の威嚇音",
@@ -1908,7 +1920,7 @@
     "keywords_en": ""
   },
   {
-    "no": 160,
+    "no": 161,
     "filename": "se_snarl.ogg",
     "id": "se_snarl",
     "description": "ウーッと牙をむいて低く唸る声",
@@ -1920,7 +1932,7 @@
     "keywords_en": ""
   },
   {
-    "no": 161,
+    "no": 162,
     "filename": "se_soft_click.ogg",
     "id": "se_soft_click",
     "description": "カチッとかすかに鳴るいかにも怪しい音（罠感知）",
@@ -1932,7 +1944,7 @@
     "keywords_en": ""
   },
   {
-    "no": 162,
+    "no": 163,
     "filename": "se_soft_crackling.ogg",
     "id": "se_soft_crackling",
     "description": "パチパチとかすかに燃える音（炎の魔法）",
@@ -1944,7 +1956,7 @@
     "keywords_en": ""
   },
   {
-    "no": 163,
+    "no": 164,
     "filename": "se_someone_bowling.ogg",
     "id": "se_someone_bowling",
     "description": "ボウリングの球が転がるような音（転がる物体）",
@@ -1956,7 +1968,7 @@
     "keywords_en": ""
   },
   {
-    "no": 164,
+    "no": 165,
     "filename": "se_someone_searching.ogg",
     "id": "se_someone_searching",
     "description": "ガサゴソと何かを捜索する音（探索中のモンスター）",
@@ -1968,7 +1980,7 @@
     "keywords_en": ""
   },
   {
-    "no": 165,
+    "no": 166,
     "filename": "se_someone_summoning.ogg",
     "id": "se_someone_summoning",
     "description": "ウォーという召喚の呪文を唱える声",
@@ -1980,7 +1992,7 @@
     "keywords_en": ""
   },
   {
-    "no": 166,
+    "no": 167,
     "filename": "se_someone_yells.ogg",
     "id": "se_someone_yells",
     "description": "誰かが叫ぶ声（警衛の呼び声・緊急事態）",
@@ -1992,7 +2004,7 @@
     "keywords_en": ""
   },
   {
-    "no": 167,
+    "no": 168,
     "filename": "se_splash.ogg",
     "id": "se_splash",
     "description": "バシャッと水が跳ねる音（水中落下・投擲）",
@@ -2004,7 +2016,7 @@
     "keywords_en": ""
   },
   {
-    "no": 168,
+    "no": 169,
     "filename": "se_splat_egg.ogg",
     "id": "se_splat_egg",
     "description": "卵がぐしゃっと潰れる音（投擲命中）",
@@ -2016,7 +2028,7 @@
     "keywords_en": ""
   },
   {
-    "no": 169,
+    "no": 170,
     "filename": "se_splat_from_engulf.ogg",
     "id": "se_splat_from_engulf",
     "description": "丸呑みモンスターに消化されグシャッとなる音",
@@ -2028,7 +2040,7 @@
     "keywords_en": ""
   },
   {
-    "no": 170,
+    "no": 171,
     "filename": "se_squawk.ogg",
     "id": "se_squawk",
     "description": "ギャーギャーという鳥の鳴き声",
@@ -2040,7 +2052,7 @@
     "keywords_en": ""
   },
   {
-    "no": 171,
+    "no": 172,
     "filename": "se_squeak.ogg",
     "id": "se_squeak",
     "description": "チューという動物の高い鳴き声・きしみ音",
@@ -2052,7 +2064,7 @@
     "keywords_en": ""
   },
   {
-    "no": 172,
+    "no": 173,
     "filename": "se_squeak_A.ogg",
     "id": "se_squeak_A",
     "description": "きしみ床板の罠を踏んだときのきしみ音 — ラ音（A）",
@@ -2064,7 +2076,7 @@
     "keywords_en": ""
   },
   {
-    "no": 173,
+    "no": 174,
     "filename": "se_squeak_B.ogg",
     "id": "se_squeak_B",
     "description": "きしみ床板の罠を踏んだときのきしみ音 — シ音（B）",
@@ -2076,7 +2088,7 @@
     "keywords_en": ""
   },
   {
-    "no": 174,
+    "no": 175,
     "filename": "se_squeak_B_flat.ogg",
     "id": "se_squeak_B_flat",
     "description": "きしみ床板の罠を踏んだときのきしみ音 — シ♭音（B♭）",
@@ -2088,7 +2100,7 @@
     "keywords_en": ""
   },
   {
-    "no": 175,
+    "no": 176,
     "filename": "se_squeak_C.ogg",
     "id": "se_squeak_C",
     "description": "きしみ床板の罠を踏んだときのきしみ音 — ド音（C）",
@@ -2100,7 +2112,7 @@
     "keywords_en": ""
   },
   {
-    "no": 176,
+    "no": 177,
     "filename": "se_squeak_D.ogg",
     "id": "se_squeak_D",
     "description": "きしみ床板の罠を踏んだときのきしみ音 — レ音（D）",
@@ -2112,7 +2124,7 @@
     "keywords_en": ""
   },
   {
-    "no": 177,
+    "no": 178,
     "filename": "se_squeak_D_flat.ogg",
     "id": "se_squeak_D_flat",
     "description": "きしみ床板の罠を踏んだときのきしみ音 — レ♭音（D♭）",
@@ -2124,7 +2136,7 @@
     "keywords_en": ""
   },
   {
-    "no": 178,
+    "no": 179,
     "filename": "se_squeak_E.ogg",
     "id": "se_squeak_E",
     "description": "きしみ床板の罠を踏んだときのきしみ音 — ミ音（E）",
@@ -2136,7 +2148,7 @@
     "keywords_en": ""
   },
   {
-    "no": 179,
+    "no": 180,
     "filename": "se_squeak_E_flat.ogg",
     "id": "se_squeak_E_flat",
     "description": "きしみ床板の罠を踏んだときのきしみ音 — ミ♭音（E♭）",
@@ -2148,7 +2160,7 @@
     "keywords_en": ""
   },
   {
-    "no": 180,
+    "no": 181,
     "filename": "se_squeak_F.ogg",
     "id": "se_squeak_F",
     "description": "きしみ床板の罠を踏んだときのきしみ音 — ファ音（F）",
@@ -2160,7 +2172,7 @@
     "keywords_en": ""
   },
   {
-    "no": 181,
+    "no": 182,
     "filename": "se_squeak_F_sharp.ogg",
     "id": "se_squeak_F_sharp",
     "description": "きしみ床板の罠を踏んだときのきしみ音 — ファ♯音（F♯）",
@@ -2172,7 +2184,7 @@
     "keywords_en": ""
   },
   {
-    "no": 182,
+    "no": 183,
     "filename": "se_squeak_G.ogg",
     "id": "se_squeak_G",
     "description": "きしみ床板の罠を踏んだときのきしみ音 — ソ音（G）",
@@ -2184,7 +2196,7 @@
     "keywords_en": ""
   },
   {
-    "no": 183,
+    "no": 184,
     "filename": "se_squeak_G_sharp.ogg",
     "id": "se_squeak_G_sharp",
     "description": "きしみ床板の罠を踏んだときのきしみ音 — ソ♯音（G♯）",
@@ -2196,7 +2208,7 @@
     "keywords_en": ""
   },
   {
-    "no": 184,
+    "no": 185,
     "filename": "se_squeal.ogg",
     "id": "se_squeal",
     "description": "キーッという甲高い叫び声・きしみ",
@@ -2208,7 +2220,7 @@
     "keywords_en": ""
   },
   {
-    "no": 185,
+    "no": 186,
     "filename": "se_squelch.ogg",
     "id": "se_squelch",
     "description": "グチャッという湿った踏みつけ音",
@@ -2220,7 +2232,7 @@
     "keywords_en": ""
   },
   {
-    "no": 186,
+    "no": 187,
     "filename": "se_stone_breaking.ogg",
     "id": "se_stone_breaking",
     "description": "バキッと石が割れる音（岩石魔法・爆発）",
@@ -2232,7 +2244,7 @@
     "keywords_en": ""
   },
   {
-    "no": 187,
+    "no": 188,
     "filename": "se_stone_crumbling.ogg",
     "id": "se_stone_crumbling",
     "description": "ガラガラと石が崩れ落ちる音",
@@ -2244,7 +2256,7 @@
     "keywords_en": ""
   },
   {
-    "no": 188,
+    "no": 189,
     "filename": "se_swoosh.ogg",
     "id": "se_swoosh",
     "description": "ヒュッと素早く風を切る音（飛道具・魔法）",
@@ -2256,7 +2268,7 @@
     "keywords_en": ""
   },
   {
-    "no": 189,
+    "no": 190,
     "filename": "se_sword_blade_rings.ogg",
     "id": "se_sword_blade_rings",
     "description": "剣の刃がシャリーンと鳴る音（法具の認識）",
@@ -2268,7 +2280,7 @@
     "keywords_en": ""
   },
   {
-    "no": 190,
+    "no": 191,
     "filename": "se_teleport.ogg",
     "id": "se_teleport",
     "description": "テレポートの罠による空間転移・瞬間移動音",
@@ -2280,7 +2292,7 @@
     "keywords_en": ""
   },
   {
-    "no": 191,
+    "no": 192,
     "filename": "se_thud.ogg",
     "id": "se_thud",
     "description": "ドスンという重い着地・衝突音",
@@ -2292,7 +2304,7 @@
     "keywords_en": ""
   },
   {
-    "no": 192,
+    "no": 193,
     "filename": "se_thump.ogg",
     "id": "se_thump",
     "description": "ドンという鈍い衝突音",
@@ -2304,7 +2316,7 @@
     "keywords_en": ""
   },
   {
-    "no": 193,
+    "no": 194,
     "filename": "se_thunderclap.ogg",
     "id": "se_thunderclap",
     "description": "ドカーンと轟く雷鳴（祈り・神罰）",
@@ -2316,7 +2328,7 @@
     "keywords_en": ""
   },
   {
-    "no": 194,
+    "no": 195,
     "filename": "se_tumbler_click.ogg",
     "id": "se_tumbler_click",
     "description": "鍵穴のタンブラーがハマってカチッと鳴る音",
@@ -2328,7 +2340,7 @@
     "keywords_en": ""
   },
   {
-    "no": 195,
+    "no": 196,
     "filename": "se_typing_noise.ogg",
     "id": "se_typing_noise",
     "description": "カタカタとタイプライターを打つような音（占術使用）",
@@ -2340,7 +2352,7 @@
     "keywords_en": ""
   },
   {
-    "no": 196,
+    "no": 197,
     "filename": "se_wail.ogg",
     "id": "se_wail",
     "description": "ウオーッと泣き叫ぶ声（アンデッドや呪い）",
@@ -2352,7 +2364,7 @@
     "keywords_en": ""
   },
   {
-    "no": 197,
+    "no": 198,
     "filename": "se_wailing_of_the_banshee.ogg",
     "id": "se_wailing_of_the_banshee",
     "description": "バンシーの死を予告する絶叫（バンシーの遭遇）",
@@ -2364,7 +2376,7 @@
     "keywords_en": ""
   },
   {
-    "no": 198,
+    "no": 199,
     "filename": "se_wall_of_force.ogg",
     "id": "se_wall_of_force",
     "description": "ズズーンと重く響く力場・バリア音（魔法壁）",
@@ -2376,7 +2388,7 @@
     "keywords_en": ""
   },
   {
-    "no": 199,
+    "no": 200,
     "filename": "se_yelp.ogg",
     "id": "se_yelp",
     "description": "キャンという短い悲鳴",
@@ -2388,7 +2400,7 @@
     "keywords_en": ""
   },
   {
-    "no": 200,
+    "no": 201,
     "filename": "se_zap.ogg",
     "id": "se_zap",
     "description": "ビビッという魔法・電撃の発射音",
@@ -2400,7 +2412,7 @@
     "keywords_en": ""
   },
   {
-    "no": 201,
+    "no": 202,
     "filename": "se_zap_then_explosion.ogg",
     "id": "se_zap_then_explosion",
     "description": "ビビッからドカンという魔法爆発音",
@@ -2412,7 +2424,7 @@
     "keywords_en": ""
   },
   {
-    "no": 202,
+    "no": 203,
     "filename": "se_mon_chugging_potion.ogg",
     "id": "se_mon_chugging_potion",
     "description": "モンスターがポーションをゴクゴクと飲む音",
@@ -2424,7 +2436,7 @@
     "keywords_en": ""
   },
   {
-    "no": 203,
+    "no": 204,
     "filename": "se_combat_hit_slash.ogg",
     "id": "se_combat_hit_slash",
     "description": "刃物・刀剣・斧による斬撃ヒット音",
@@ -2436,7 +2448,7 @@
     "keywords_en": "sword slash blade cut hit attack"
   },
   {
-    "no": 204,
+    "no": 205,
     "filename": "se_combat_hit_blunt.ogg",
     "id": "se_combat_hit_blunt",
     "description": "鈍器・棍棒・石・打撃武器によるヒット音",
@@ -2448,7 +2460,7 @@
     "keywords_en": "blunt hit mace club strike punch smack"
   },
   {
-    "no": 205,
+    "no": 206,
     "filename": "se_combat_hit_pierce.ogg",
     "id": "se_combat_hit_pierce",
     "description": "槍・刺突武器・矢弾による貫通ヒット音",
@@ -2460,7 +2472,7 @@
     "keywords_en": "pierce spear stab thrust dagger jab"
   },
   {
-    "no": 206,
+    "no": 207,
     "filename": "se_combat_hit_unarmed.ogg",
     "id": "se_combat_hit_unarmed",
     "description": "素手格闘・パンチ・キックによる打撃ヒット音",
@@ -2472,7 +2484,7 @@
     "keywords_en": "punch fist kick unarmed melee hit combat"
   },
   {
-    "no": 207,
+    "no": 208,
     "filename": "se_combat_hit_whip.ogg",
     "id": "se_combat_hit_whip",
     "description": "鞭・濡れたタオルによる攻撃命中音",
@@ -2484,7 +2496,7 @@
     "keywords_en": "whip hit lash crack strike leather whip"
   },
   {
-    "no": 208,
+    "no": 209,
     "filename": "se_combat_hit_ironball.ogg",
     "id": "se_combat_hit_ironball",
     "description": "鉄球・鉄鎖による重金属・鎖衝突音",
@@ -2496,7 +2508,7 @@
     "keywords_en": "iron ball chain heavy metal impact bash"
   },
   {
-    "no": 209,
+    "no": 210,
     "filename": "se_combat_hit_shield.ogg",
     "id": "se_combat_hit_shield",
     "description": "盾による重い防具シールドバッシュ音（近接限定）",
@@ -2508,7 +2520,7 @@
     "keywords_en": "shield bash metal shield heavy block hit"
   },
   {
-    "no": 210,
+    "no": 211,
     "filename": "se_combat_hit_corpse.ogg",
     "id": "se_combat_hit_corpse",
     "description": "死体・肉塊武器による生体打撃音",
@@ -2520,7 +2532,7 @@
     "keywords_en": "corpse flesh meat smack squish blunt hit"
   },
   {
-    "no": 211,
+    "no": 212,
     "filename": "se_combat_hit_pick.ogg",
     "id": "se_combat_hit_pick",
     "description": "つるはし・マトックによる硬質な採掘具打撃音",
@@ -2532,7 +2544,7 @@
     "keywords_en": "pickaxe mattock mining pick stone hit clink"
   },
   {
-    "no": 212,
+    "no": 213,
     "filename": "se_combat_hit_wand.ogg",
     "id": "se_combat_hit_wand",
     "description": "杖・ロッドによる硬く乾いた小打撃音",
@@ -2544,7 +2556,7 @@
     "keywords_en": "wand staff light tap click stick hit"
   },
   {
-    "no": 213,
+    "no": 214,
     "filename": "se_combat_hit_other.ogg",
     "id": "se_combat_hit_other",
     "description": "未分類アイテム（本・巻物・薬・食料・宝石等）全般の汎用フォールバック打撃音",
@@ -2556,7 +2568,7 @@
     "keywords_en": "item hit generic smack object blunt light"
   },
   {
-    "no": 214,
+    "no": 215,
     "filename": "se_combat_miss.ogg",
     "id": "se_combat_miss",
     "description": "攻撃の空振り音（風切り音）",
@@ -2568,7 +2580,7 @@
     "keywords_en": "whoosh swing miss weapon swoosh air"
   },
   {
-    "no": 215,
+    "no": 216,
     "filename": "se_combat_shoot_bow.ogg",
     "id": "se_combat_shoot_bow",
     "description": "弓矢の発射音（弦を弾く音）",
@@ -2580,7 +2592,7 @@
     "keywords_en": "bow arrow shoot release arrow shot"
   },
   {
-    "no": 216,
+    "no": 217,
     "filename": "se_combat_shoot_crossbow.ogg",
     "id": "se_combat_shoot_crossbow",
     "description": "クロスボウの発射音（バネ解放音）",
@@ -2592,7 +2604,7 @@
     "keywords_en": "crossbow bolt shoot mechanical trigger launch"
   },
   {
-    "no": 217,
+    "no": 218,
     "filename": "se_combat_shoot_sling.ogg",
     "id": "se_combat_shoot_sling",
     "description": "スリング（投石器）の旋回・射出音",
@@ -2604,7 +2616,7 @@
     "keywords_en": "sling stone sling throw shot whirl bullet"
   },
   {
-    "no": 218,
+    "no": 219,
     "filename": "se_combat_throw.ogg",
     "id": "se_combat_throw",
     "description": "手投げによる投擲音",
@@ -2616,7 +2628,7 @@
     "keywords_en": "throw toss weapon throw object whoosh"
   },
   {
-    "no": 219,
+    "no": 220,
     "filename": "se_combat_throw_boomerang.ogg",
     "id": "se_combat_throw_boomerang",
     "description": "ブーメランの旋回投擲音",
@@ -2628,7 +2640,7 @@
     "keywords_en": "boomerang throw spinning whirr swoosh"
   },
   {
-    "no": 220,
+    "no": 221,
     "filename": "se_combat_throw_mjollnir.ogg",
     "id": "se_combat_throw_mjollnir",
     "description": "ミョルニルの電撃を帯びた豪快な投擲音",
@@ -2640,7 +2652,7 @@
     "keywords_en": "hammer throw lightning thunder heavy strike"
   },
   {
-    "no": 221,
+    "no": 222,
     "filename": "se_combat_miss_thud.ogg",
     "id": "se_combat_miss_thud",
     "description": "飛翔体が外れて壁や床に激突する音",
@@ -2652,7 +2664,7 @@
     "keywords_en": "thud arrow hit wall impact ground miss bounce"
   },
   {
-    "no": 222,
+    "no": 223,
     "filename": "se_combat_spell_cast.ogg",
     "id": "se_combat_spell_cast",
     "description": "呪文の詠唱・魔法発動音",
@@ -2664,7 +2676,7 @@
     "keywords_en": "magic spell cast aura arcane energy"
   },
   {
-    "no": 223,
+    "no": 224,
     "filename": "se_combat_wand_zap.ogg",
     "id": "se_combat_wand_zap",
     "description": "杖を振った際の発動音",
@@ -2676,7 +2688,7 @@
     "keywords_en": "magic wand zap beam ray laser spark"
   },
   {
-    "no": 224,
+    "no": 225,
     "filename": "se_mon_claw.ogg",
     "id": "se_mon_claw",
     "description": "モンスターの爪による引き裂き音",
@@ -2688,7 +2700,7 @@
     "keywords_en": "monster claw slash scratch beast beastly"
   },
   {
-    "no": 225,
+    "no": 226,
     "filename": "se_mon_bite.ogg",
     "id": "se_mon_bite",
     "description": "モンスターの噛みつき音",
@@ -2700,7 +2712,7 @@
     "keywords_en": "monster bite chomp beast teeth jaws crunch"
   },
   {
-    "no": 226,
+    "no": 227,
     "filename": "se_mon_sting.ogg",
     "id": "se_mon_sting",
     "description": "モンスターの毒針・刺突音",
@@ -2712,7 +2724,7 @@
     "keywords_en": "sting stinger insect scorpion wasp prick pierce"
   },
   {
-    "no": 227,
+    "no": 228,
     "filename": "se_mon_butt.ogg",
     "id": "se_mon_butt",
     "description": "モンスターの角・頭突き衝突音",
@@ -2724,7 +2736,7 @@
     "keywords_en": "headbutt horn ram blunt bash charge bull"
   },
   {
-    "no": 228,
+    "no": 229,
     "filename": "se_mon_touch.ogg",
     "id": "se_mon_touch",
     "description": "モンスターの接触・麻痺音",
@@ -2736,7 +2748,7 @@
     "keywords_en": "ghostly touch paralyze eerie chill phantom undead"
   },
   {
-    "no": 229,
+    "no": 230,
     "filename": "se_mon_tentacle.ogg",
     "id": "se_mon_tentacle",
     "description": "触手による攻撃・絡みつき音",
@@ -2748,7 +2760,7 @@
     "keywords_en": "tentacle squish slimy whip suction monster"
   },
   {
-    "no": 230,
+    "no": 231,
     "filename": "se_mon_kick.ogg",
     "id": "se_mon_kick",
     "description": "モンスターの蹴り・踏みつけ音",
@@ -2760,7 +2772,7 @@
     "keywords_en": "hoof kick horse beast stomp donkey heavy"
   },
   {
-    "no": 231,
+    "no": 232,
     "filename": "se_mon_hug.ogg",
     "id": "se_mon_hug",
     "description": "締めつけ・怪力による抱き締め音",
@@ -2772,7 +2784,7 @@
     "keywords_en": "bear hug crush squeeze constrict squeeze bone"
   },
   {
-    "no": 232,
+    "no": 233,
     "filename": "se_mon_gaze.ogg",
     "id": "se_mon_gaze",
     "description": "凝視・魔眼による視線攻撃音",
@@ -2784,7 +2796,7 @@
     "keywords_en": "evil gaze stare petrify eye psychic hypnosis"
   },
   {
-    "no": 233,
+    "no": 234,
     "filename": "se_mon_engulf.ogg",
     "id": "se_mon_engulf",
     "description": "丸呑み・呑み込み音",
@@ -2796,7 +2808,7 @@
     "keywords_en": "engulf swallow gulp digest slime stomach absorb"
   },
   {
-    "no": 234,
+    "no": 235,
     "filename": "se_mon_breath.ogg",
     "id": "se_mon_breath",
     "description": "ドラゴン等のブレス放出音",
@@ -2808,7 +2820,7 @@
     "keywords_en": "dragon breath roar fire blast exhale flame"
   },
   {
-    "no": 235,
+    "no": 236,
     "filename": "se_mon_spit.ogg",
     "id": "se_mon_spit",
     "description": "毒液・酸の吐出音",
@@ -2820,7 +2832,7 @@
     "keywords_en": "spit acid venom liquid squirt snake hiss"
   },
   {
-    "no": 1,
+    "no": 237,
     "filename": "sa2_splashscreen.ogg",
     "id": "sa2_splashscreen",
     "description": "タイトル・スプラッシュ画面が表示される時の音",
@@ -2832,7 +2844,7 @@
     "keywords_en": ""
   },
   {
-    "no": 2,
+    "no": 238,
     "filename": "sa2_newgame_nosplash.ogg",
     "id": "sa2_newgame_nosplash",
     "description": "スプラッシュなしで新規ゲームを開始する時の音",
@@ -2844,7 +2856,7 @@
     "keywords_en": ""
   },
   {
-    "no": 3,
+    "no": 239,
     "filename": "sa2_xplevelup.ogg",
     "id": "sa2_xplevelup",
     "description": "経験値レベルがアップした時のファンファーレ音",
@@ -2856,7 +2868,7 @@
     "keywords_en": ""
   },
   {
-    "no": 4,
+    "no": 240,
     "filename": "sa2_xpleveldown.ogg",
     "id": "sa2_xpleveldown",
     "description": "経験値レベルがダウンした時の音（ドレイン等）",
@@ -2868,7 +2880,7 @@
     "keywords_en": ""
   },
   {
-    "no": 1,
+    "no": 241,
     "filename": "ach_bell.ogg",
     "id": "ACH_BELL (achidx=1)",
     "description": "「開封の鐘」を入手した時の実績音",
@@ -2880,7 +2892,7 @@
     "keywords_en": ""
   },
   {
-    "no": 2,
+    "no": 242,
     "filename": "ach_hell.ogg",
     "id": "ACH_HELL (achidx=2)",
     "description": "ゲヘナ（地獄）に入った時の実績音",
@@ -2892,7 +2904,7 @@
     "keywords_en": ""
   },
   {
-    "no": 3,
+    "no": 243,
     "filename": "ach_cndl.ogg",
     "id": "ACH_CNDL (achidx=3)",
     "description": "「召喚の燭台」を入手した時の実績音",
@@ -2904,7 +2916,7 @@
     "keywords_en": ""
   },
   {
-    "no": 4,
+    "no": 244,
     "filename": "ach_book.ogg",
     "id": "ACH_BOOK (achidx=4)",
     "description": "「死者の書」を入手した時の実績音",
@@ -2916,7 +2928,7 @@
     "keywords_en": ""
   },
   {
-    "no": 5,
+    "no": 245,
     "filename": "ach_invk.ogg",
     "id": "ACH_INVK (achidx=5)",
     "description": "聖域へのアクセスのため召喚を行った時の実績音",
@@ -2928,7 +2940,7 @@
     "keywords_en": ""
   },
   {
-    "no": 6,
+    "no": 246,
     "filename": "ach_amul.ogg",
     "id": "ACH_AMUL (achidx=6)",
     "description": "「ヨェンダーのアミュレット」を入手した時の実績音",
@@ -2940,7 +2952,7 @@
     "keywords_en": ""
   },
   {
-    "no": 7,
+    "no": 247,
     "filename": "ach_endg.ogg",
     "id": "ACH_ENDG (achidx=7)",
     "description": "エンドゲームに突入した時の実績音",
@@ -2952,7 +2964,7 @@
     "keywords_en": ""
   },
   {
-    "no": 8,
+    "no": 248,
     "filename": "ach_astr.ogg",
     "id": "ACH_ASTR (achidx=8)",
     "description": "アストラル界に足を踏み入れた時の実績音",
@@ -2964,7 +2976,7 @@
     "keywords_en": ""
   },
   {
-    "no": 9,
+    "no": 249,
     "filename": "ach_uwin.ogg",
     "id": "ACH_UWIN (achidx=9)",
     "description": "ゲームを昇天クリアした時のクリア音",
@@ -2976,7 +2988,7 @@
     "keywords_en": ""
   },
   {
-    "no": 10,
+    "no": 250,
     "filename": "ach_mine_prize.ogg",
     "id": "ACH_MINE_PRIZE (achidx=10)",
     "description": "坑道の終点のラッキーストーンを入手した時の実績音",
@@ -2988,7 +3000,7 @@
     "keywords_en": ""
   },
   {
-    "no": 11,
+    "no": 251,
     "filename": "ach_soko_prize.ogg",
     "id": "ACH_SOKO_PRIZE (achidx=11)",
     "description": "倉庫番のバッグまたはアミュレットを入手した時の実績音",
@@ -3000,7 +3012,7 @@
     "keywords_en": ""
   },
   {
-    "no": 12,
+    "no": 252,
     "filename": "ach_medu.ogg",
     "id": "ACH_MEDU (achidx=12)",
     "description": "メデューサを倒した時の実績音",
@@ -3012,7 +3024,7 @@
     "keywords_en": ""
   },
   {
-    "no": 13,
+    "no": 253,
     "filename": "ach_mine.ogg",
     "id": "ACH_MINE (achidx=15)",
     "description": "ノーム坑道に入った時の実績音",
@@ -3024,7 +3036,7 @@
     "keywords_en": ""
   },
   {
-    "no": 14,
+    "no": 254,
     "filename": "ach_town.ogg",
     "id": "ACH_TOWN (achidx=16)",
     "description": "坑道の町（マインタウン）に到達した時の実績音",
@@ -3036,7 +3048,7 @@
     "keywords_en": ""
   },
   {
-    "no": 15,
+    "no": 255,
     "filename": "ach_shop.ogg",
     "id": "ACH_SHOP (achidx=17)",
     "description": "店に入った時の実績音",
@@ -3048,7 +3060,7 @@
     "keywords_en": ""
   },
   {
-    "no": 16,
+    "no": 256,
     "filename": "ach_tmpl.ogg",
     "id": "ACH_TMPL (achidx=18)",
     "description": "寺院に入った時の実績音",
@@ -3060,7 +3072,7 @@
     "keywords_en": ""
   },
   {
-    "no": 17,
+    "no": 257,
     "filename": "ach_orcl.ogg",
     "id": "ACH_ORCL (achidx=19)",
     "description": "神託の神官（オラクル）に相談した時の実績音",
@@ -3072,7 +3084,7 @@
     "keywords_en": ""
   },
   {
-    "no": 18,
+    "no": 258,
     "filename": "ach_soko.ogg",
     "id": "ACH_SOKO (achidx=21)",
     "description": "倉庫番（ソコバン）に入った時の実績音",
@@ -3084,7 +3096,7 @@
     "keywords_en": ""
   },
   {
-    "no": 19,
+    "no": 259,
     "filename": "ach_tune.ogg",
     "id": "ACH_TUNE (achidx=31)",
     "description": "城の跳ね橋の演奏チューンを発見した時の実績音",
@@ -3096,7 +3108,7 @@
     "keywords_en": ""
   },
   {
-    "no": 1,
+    "no": 260,
     "filename": "sound_Wooden_Flute_A.ogg",
     "id": "ins_flute` / A音",
     "description": "木製フルートの演奏音（蛇を魅了する効果）（A音）",
@@ -3108,7 +3120,7 @@
     "keywords_en": ""
   },
   {
-    "no": 2,
+    "no": 261,
     "filename": "sound_Wooden_Flute_B.ogg",
     "id": "ins_flute` / B音",
     "description": "木製フルートの演奏音（蛇を魅了する効果）（B音）",
@@ -3120,7 +3132,7 @@
     "keywords_en": ""
   },
   {
-    "no": 3,
+    "no": 262,
     "filename": "sound_Wooden_Flute_C.ogg",
     "id": "ins_flute` / C音",
     "description": "木製フルートの演奏音（蛇を魅了する効果）（C音）",
@@ -3132,7 +3144,7 @@
     "keywords_en": ""
   },
   {
-    "no": 4,
+    "no": 263,
     "filename": "sound_Wooden_Flute_D.ogg",
     "id": "ins_flute` / D音",
     "description": "木製フルートの演奏音（蛇を魅了する効果）（D音）",
@@ -3144,7 +3156,7 @@
     "keywords_en": ""
   },
   {
-    "no": 5,
+    "no": 264,
     "filename": "sound_Wooden_Flute_E.ogg",
     "id": "ins_flute` / E音",
     "description": "木製フルートの演奏音（蛇を魅了する効果）（E音）",
@@ -3156,7 +3168,7 @@
     "keywords_en": ""
   },
   {
-    "no": 6,
+    "no": 265,
     "filename": "sound_Wooden_Flute_F.ogg",
     "id": "ins_flute` / F音",
     "description": "木製フルートの演奏音（蛇を魅了する効果）（F音）",
@@ -3168,7 +3180,7 @@
     "keywords_en": ""
   },
   {
-    "no": 7,
+    "no": 266,
     "filename": "sound_Wooden_Flute_G.ogg",
     "id": "ins_flute` / G音",
     "description": "木製フルートの演奏音（蛇を魅了する効果）（G音）",
@@ -3180,7 +3192,7 @@
     "keywords_en": ""
   },
   {
-    "no": 8,
+    "no": 267,
     "filename": "sound_Magic_Flute_A.ogg",
     "id": "ins_pan_flute` / A音",
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（A音）",
@@ -3192,7 +3204,7 @@
     "keywords_en": ""
   },
   {
-    "no": 9,
+    "no": 268,
     "filename": "sound_Magic_Flute_B.ogg",
     "id": "ins_pan_flute` / B音",
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（B音）",
@@ -3204,7 +3216,7 @@
     "keywords_en": ""
   },
   {
-    "no": 10,
+    "no": 269,
     "filename": "sound_Magic_Flute_C.ogg",
     "id": "ins_pan_flute` / C音",
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（C音）",
@@ -3216,7 +3228,7 @@
     "keywords_en": ""
   },
   {
-    "no": 11,
+    "no": 270,
     "filename": "sound_Magic_Flute_D.ogg",
     "id": "ins_pan_flute` / D音",
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（D音）",
@@ -3228,7 +3240,7 @@
     "keywords_en": ""
   },
   {
-    "no": 12,
+    "no": 271,
     "filename": "sound_Magic_Flute_E.ogg",
     "id": "ins_pan_flute` / E音",
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（E音）",
@@ -3240,7 +3252,7 @@
     "keywords_en": ""
   },
   {
-    "no": 13,
+    "no": 272,
     "filename": "sound_Magic_Flute_F.ogg",
     "id": "ins_pan_flute` / F音",
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（F音）",
@@ -3252,7 +3264,7 @@
     "keywords_en": ""
   },
   {
-    "no": 14,
+    "no": 273,
     "filename": "sound_Magic_Flute_G.ogg",
     "id": "ins_pan_flute` / G音",
     "description": "魔法のフルートの演奏音（モンスターを眠らせる）（G音）",
@@ -3264,7 +3276,7 @@
     "keywords_en": ""
   },
   {
-    "no": 15,
+    "no": 274,
     "filename": "sound_Tooled_Horn_A.ogg",
     "id": "ins_english_horn` / A音",
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（A音）",
@@ -3276,7 +3288,7 @@
     "keywords_en": ""
   },
   {
-    "no": 16,
+    "no": 275,
     "filename": "sound_Tooled_Horn_B.ogg",
     "id": "ins_english_horn` / B音",
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（B音）",
@@ -3288,7 +3300,7 @@
     "keywords_en": ""
   },
   {
-    "no": 17,
+    "no": 276,
     "filename": "sound_Tooled_Horn_C.ogg",
     "id": "ins_english_horn` / C音",
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（C音）",
@@ -3300,7 +3312,7 @@
     "keywords_en": ""
   },
   {
-    "no": 18,
+    "no": 277,
     "filename": "sound_Tooled_Horn_D.ogg",
     "id": "ins_english_horn` / D音",
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（D音）",
@@ -3312,7 +3324,7 @@
     "keywords_en": ""
   },
   {
-    "no": 19,
+    "no": 278,
     "filename": "sound_Tooled_Horn_E.ogg",
     "id": "ins_english_horn` / E音",
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（E音）",
@@ -3324,7 +3336,7 @@
     "keywords_en": ""
   },
   {
-    "no": 20,
+    "no": 279,
     "filename": "sound_Tooled_Horn_F.ogg",
     "id": "ins_english_horn` / F音",
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（F音）",
@@ -3336,7 +3348,7 @@
     "keywords_en": ""
   },
   {
-    "no": 21,
+    "no": 280,
     "filename": "sound_Tooled_Horn_G.ogg",
     "id": "ins_english_horn` / G音",
     "description": "彫刻された角笛の演奏音（モンスターを起こす）（G音）",
@@ -3348,7 +3360,7 @@
     "keywords_en": ""
   },
   {
-    "no": 22,
+    "no": 281,
     "filename": "sound_Bugle_A.ogg",
     "id": "ins_trumpet` / A音",
     "description": "ラッパの演奏音（兵士を起こす）（A音）",
@@ -3360,7 +3372,7 @@
     "keywords_en": ""
   },
   {
-    "no": 23,
+    "no": 282,
     "filename": "sound_Bugle_B.ogg",
     "id": "ins_trumpet` / B音",
     "description": "ラッパの演奏音（兵士を起こす）（B音）",
@@ -3372,7 +3384,7 @@
     "keywords_en": ""
   },
   {
-    "no": 24,
+    "no": 283,
     "filename": "sound_Bugle_C.ogg",
     "id": "ins_trumpet` / C音",
     "description": "ラッパの演奏音（兵士を起こす）（C音）",
@@ -3384,7 +3396,7 @@
     "keywords_en": ""
   },
   {
-    "no": 25,
+    "no": 284,
     "filename": "sound_Bugle_D.ogg",
     "id": "ins_trumpet` / D音",
     "description": "ラッパの演奏音（兵士を起こす）（D音）",
@@ -3396,7 +3408,7 @@
     "keywords_en": ""
   },
   {
-    "no": 26,
+    "no": 285,
     "filename": "sound_Bugle_E.ogg",
     "id": "ins_trumpet` / E音",
     "description": "ラッパの演奏音（兵士を起こす）（E音）",
@@ -3408,7 +3420,7 @@
     "keywords_en": ""
   },
   {
-    "no": 27,
+    "no": 286,
     "filename": "sound_Bugle_F.ogg",
     "id": "ins_trumpet` / F音",
     "description": "ラッパの演奏音（兵士を起こす）（F音）",
@@ -3420,7 +3432,7 @@
     "keywords_en": ""
   },
   {
-    "no": 28,
+    "no": 287,
     "filename": "sound_Bugle_G.ogg",
     "id": "ins_trumpet` / G音",
     "description": "ラッパの演奏音（兵士を起こす）（G音）",
@@ -3432,7 +3444,7 @@
     "keywords_en": ""
   },
   {
-    "no": 29,
+    "no": 288,
     "filename": "sound_Wooden_Harp_A.ogg",
     "id": "ins_orchestral_harp` / A音",
     "description": "木製ハープの演奏音（ニンフを魅了する）（A音）",
@@ -3444,7 +3456,7 @@
     "keywords_en": ""
   },
   {
-    "no": 30,
+    "no": 289,
     "filename": "sound_Wooden_Harp_B.ogg",
     "id": "ins_orchestral_harp` / B音",
     "description": "木製ハープの演奏音（ニンフを魅了する）（B音）",
@@ -3456,7 +3468,7 @@
     "keywords_en": ""
   },
   {
-    "no": 31,
+    "no": 290,
     "filename": "sound_Wooden_Harp_C.ogg",
     "id": "ins_orchestral_harp` / C音",
     "description": "木製ハープの演奏音（ニンフを魅了する）（C音）",
@@ -3468,7 +3480,7 @@
     "keywords_en": ""
   },
   {
-    "no": 32,
+    "no": 291,
     "filename": "sound_Wooden_Harp_D.ogg",
     "id": "ins_orchestral_harp` / D音",
     "description": "木製ハープの演奏音（ニンフを魅了する）（D音）",
@@ -3480,7 +3492,7 @@
     "keywords_en": ""
   },
   {
-    "no": 33,
+    "no": 292,
     "filename": "sound_Wooden_Harp_E.ogg",
     "id": "ins_orchestral_harp` / E音",
     "description": "木製ハープの演奏音（ニンフを魅了する）（E音）",
@@ -3492,7 +3504,7 @@
     "keywords_en": ""
   },
   {
-    "no": 34,
+    "no": 293,
     "filename": "sound_Wooden_Harp_F.ogg",
     "id": "ins_orchestral_harp` / F音",
     "description": "木製ハープの演奏音（ニンフを魅了する）（F音）",
@@ -3504,7 +3516,7 @@
     "keywords_en": ""
   },
   {
-    "no": 35,
+    "no": 294,
     "filename": "sound_Wooden_Harp_G.ogg",
     "id": "ins_orchestral_harp` / G音",
     "description": "木製ハープの演奏音（ニンフを魅了する）（G音）",
@@ -3516,7 +3528,7 @@
     "keywords_en": ""
   },
   {
-    "no": 36,
+    "no": 295,
     "filename": "sound_Magic_Harp_A.ogg",
     "id": "ins_cello` / A音",
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（A音）",
@@ -3528,7 +3540,7 @@
     "keywords_en": ""
   },
   {
-    "no": 37,
+    "no": 296,
     "filename": "sound_Magic_Harp_B.ogg",
     "id": "ins_cello` / B音",
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（B音）",
@@ -3540,7 +3552,7 @@
     "keywords_en": ""
   },
   {
-    "no": 38,
+    "no": 297,
     "filename": "sound_Magic_Harp_C.ogg",
     "id": "ins_cello` / C音",
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（C音）",
@@ -3552,7 +3564,7 @@
     "keywords_en": ""
   },
   {
-    "no": 39,
+    "no": 298,
     "filename": "sound_Magic_Harp_D.ogg",
     "id": "ins_cello` / D音",
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（D音）",
@@ -3564,7 +3576,7 @@
     "keywords_en": ""
   },
   {
-    "no": 40,
+    "no": 299,
     "filename": "sound_Magic_Harp_E.ogg",
     "id": "ins_cello` / E音",
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（E音）",
@@ -3576,7 +3588,7 @@
     "keywords_en": ""
   },
   {
-    "no": 41,
+    "no": 300,
     "filename": "sound_Magic_Harp_F.ogg",
     "id": "ins_cello` / F音",
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（F音）",
@@ -3588,7 +3600,7 @@
     "keywords_en": ""
   },
   {
-    "no": 42,
+    "no": 301,
     "filename": "sound_Magic_Harp_G.ogg",
     "id": "ins_cello` / G音",
     "description": "魔法のハープの演奏音（視界内モンスターを魅了する）（G音）",
@@ -3600,7 +3612,7 @@
     "keywords_en": ""
   },
   {
-    "no": 43,
+    "no": 302,
     "filename": "sound_Frost_Horn.ogg",
     "id": "ins_french_horn",
     "description": "凍結の角笛の演奏音（冷気の魔法効果）",
@@ -3612,7 +3624,7 @@
     "keywords_en": ""
   },
   {
-    "no": 44,
+    "no": 303,
     "filename": "sound_Fire_Horn.ogg",
     "id": "ins_baritone_sax",
     "description": "火炎の角笛の演奏音（炎の魔法効果）",
@@ -3624,7 +3636,7 @@
     "keywords_en": ""
   },
   {
-    "no": 45,
+    "no": 304,
     "filename": "sound_Bell.ogg",
     "id": "ins_tinkle_bell",
     "description": "ベル・鈴の演奏音（鐘の識別）",
@@ -3636,7 +3648,7 @@
     "keywords_en": ""
   },
   {
-    "no": 46,
+    "no": 305,
     "filename": "sound_Drum_Of_Earthquake.ogg",
     "id": "ins_taiko_drum",
     "description": "地震の太鼓の演奏音（ランダムな落とし穴を生成）",
@@ -3648,7 +3660,7 @@
     "keywords_en": ""
   },
   {
-    "no": 47,
+    "no": 306,
     "filename": "sound_Leather_Drum.ogg",
     "id": "ins_melodic_tom",
     "description": "革製太鼓の演奏音（周囲のモンスターを起こす）",
@@ -3660,7 +3672,7 @@
     "keywords_en": ""
   },
   {
-    "no": 1,
+    "no": 307,
     "filename": "voice_deity.ogg",
     "id": "voice_deity",
     "description": "神（アライメント神）の声・天からの啓示（祈り応答・神罰・神恩寵）",
@@ -3672,7 +3684,7 @@
     "keywords_en": ""
   },
   {
-    "no": 2,
+    "no": 308,
     "filename": "voice_oracle.ogg",
     "id": "voice_oracle",
     "description": "神託の神官（オラクル）の神秘的な囁き声",
@@ -3684,7 +3696,7 @@
     "keywords_en": ""
   },
   {
-    "no": 3,
+    "no": 309,
     "filename": "voice_talking_artifact.ogg",
     "id": "voice_talking_artifact",
     "description": "意志を持つアーティファクトの発話音",
@@ -3696,7 +3708,7 @@
     "keywords_en": ""
   },
   {
-    "no": 4,
+    "no": 310,
     "filename": "voice_throne.ogg",
     "id": "voice_throne",
     "description": "玉座に座った時に聞こえる声（魔法の玉座からの啓示）",
@@ -3708,7 +3720,7 @@
     "keywords_en": ""
   },
   {
-    "no": 5,
+    "no": 311,
     "filename": "voice_death.ogg",
     "id": "voice_death",
     "description": "死神・死の声（死の女神への降伏場面）",
@@ -3720,7 +3732,7 @@
     "keywords_en": ""
   },
   {
-    "no": 6,
+    "no": 312,
     "filename": "voice_shopkeeper.ogg",
     "id": "voice_shopkeeper",
     "description": "店主の挨拶・売買交渉・怒りの掛け声",
@@ -3732,7 +3744,7 @@
     "keywords_en": ""
   },
   {
-    "no": 7,
+    "no": 313,
     "filename": "voice_mon_generic.ogg",
     "id": "voice (moreinfo=0)",
     "description": "モンスターおよびNPCの一般的な会話・鳴き声",
