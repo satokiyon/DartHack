@@ -41,11 +41,11 @@
      - **EBU R128 ラウドネス正規化**（通常SE: -14 LUFS / 戦闘SE: -16 LUFS、True Peak -1.0dBFS）
      - **80Hz ハイパスフィルター**（戦闘SEに自動適用）
      - **Ogg Opus (48kHz)** への高品質・軽量エンコード
-     - 出力先: `sys/flutter/assets/sounds/<filename>.ogg`
+     - 出力先: `DartHack_private/sys/flutter/assets/sounds/<filename>.ogg`（存在時。非存在時は `sys/flutter/assets/sounds/`）
 5. **楽器音 47 種の完全自動サンプリング**:
    - オープンSoundFont（FluidR3 GM）と FluidSynth を用いて、木製フルート・角笛・ラッパ・ハープ等のA〜G音階（計47ファイル）を正確なピッチと音色で一括自動生成済み。
 6. **ライセンス一覧（`attributions.txt`）の自動生成**:
-   - 採否と同時に `sys/flutter/assets/sounds/attributions.txt` に作者、出典URL、ライセンス条件が本家フォーマット準拠で自動記録・更新されます。
+   - 採否と同時に `DartHack_private/sys/flutter/assets/sounds/attributions.txt` に作者、出典URL、ライセンス条件が本家フォーマット準拠で自動記録・更新されます。
 
 ---
 

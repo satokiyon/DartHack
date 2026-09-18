@@ -958,5 +958,27 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
 3. **空コレクションに対する `reduce` の例外防止原則**:
    - `_pool.reduce((a, b) => ...)` などのコレクション集約メソッドを呼ぶ際は、テスト環境や初期化前などでリストが空の場合に `Bad state: No element` 例外が発生するのを防ぐため、必ず事前に `if (_pool.isEmpty) return;` などの空判定ガードを徹底してください。
 
+## 37. バイナリアセット（画像・効果音）のプライベート分離管理とビルド時差分同期アーキテクチャ
+
+1. **再配布防止および野良ビルド防止のためのリポジトリ分離**:
+   - `DartHack` はパブリック（公開）リポジトリであるため、効果音（`.ogg`）や画像（`.png`）などのバイナリアセット実体を直接コミットしてはなりません（ライセンス上の再配布リスクおよび第三者による不正・野良ビルド配布を防止するため）。
+   - **公開リポジトリ (`DartHack`)**:
+     - `sys/flutter/assets/` 配下のバイナリファイルは `.gitignore` で追跡対象外とする。
+     - ディレクトリ構造を維持するために `.gitkeep` のみを Git 管理する。
+   - **非公開リポジトリ (`DartHack_private`)**:
+     - バイナリアセットの実体（`sys/flutter/assets/sounds/`, `sys/flutter/assets/images/` 等）を保管・バージョン管理する。
+
+2. **アセット収集・生成ツールの動的パス解決**:
+   - `sys/flutter/tools/sound_curator/` などのアセット収集・生成・プレビューツールは、保存先および読み込み先のディレクトリを決定する際、プライベートリポジトリ（`DartHack_private`）の存在を最優先で検知して保存・読み込みを行う設計を徹底してください。
+   - プライベートリポジトリが存在しないスタンドアロン環境では、公開リポジトリ側のパスへ安全にフォールバックする動的パス解決（`resolve_sounds_dir()` 等）を実装してください。
+
+3. **ビルド時におけるハッシュ比較（MD5）差分同期とバージョン自動更新**:
+   - アプリのビルド・パッケージング時は、`DartHack_private/build_files/sys/flutter/scripts/sync_dat_assets.ps1` を実行して、画像および音声バイナリを同期します。
+   - 単純なタイムスタンプ比較ではなく、**MD5 ハッシュ比較による正確な差分検知**を行い、変更・追加があった場合のみ `DartHack/sys/flutter/assets/` 側へ上書きコピーし、アセットバージョン（`sys/flutter/assets/ver`）をインクリメントさせてください。差分がない場合は上書きやバージョン更新を行わない冪等性を維持してください。
+
+4. **Windows PowerShell スクリプト（*.ps1）の UTF-8 with BOM & CRLF 保存原則**:
+   - Windows PowerShell 5.1 環境では、スクリプト内に全角文字（日本語コメントやログメッセージ等）が含まれる場合、BOM なしの UTF-8 で保存すると Shift-JIS (CP932) として解釈され、終端の中括弧 `}` 等の構文解析が破損して `Missing closing '}' in statement block` エラーが発生します。
+   - そのため、PowerShell スクリプト（特に `sync_dat_assets.ps1` 等のビルド・同期スクリプト）を新規作成または編集する際は、必ず **UTF-8 with BOM (`[System.Text.UTF8Encoding($true)]`) かつ改行コード CRLF (`\r\n`)** で保存することを徹底してください。
+
 
 

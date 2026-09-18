@@ -17,7 +17,20 @@ from pathlib import Path
 CUR_DIR = Path(__file__).resolve().parent
 BIN_DIR = CUR_DIR / "bin"
 TEMP_DIR = CUR_DIR / "temp"
-SOUNDS_DIR = CUR_DIR.parent.parent / "assets" / "sounds"
+
+def resolve_sounds_dir() -> Path:
+    """音声ファイルの保存先ディレクトリを解決する。
+    DartHack_private が存在すればそちらを優先し、なければ DartHack 側にフォールバックする。
+    """
+    private_sounds = Path(r"C:\Users\satok\DartHack_private\sys\flutter\assets\sounds")
+    if private_sounds.parent.exists():
+        private_sounds.mkdir(parents=True, exist_ok=True)
+        return private_sounds
+    fallback = CUR_DIR.parent.parent / "assets" / "sounds"
+    fallback.mkdir(parents=True, exist_ok=True)
+    return fallback
+
+SOUNDS_DIR = resolve_sounds_dir()
 
 # 1. 簡易 SMF (Standard MIDI File) Format 0 生成関数 (ピュアPython)
 def write_midi_file(filepath: Path, program: int, note: int, velocity: int = 100, duration_ticks: int = 192, division: int = 96):

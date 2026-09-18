@@ -15,13 +15,12 @@ import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 
-from database import load_or_init_database, save_database, generate_attributions
+from database import load_or_init_database, save_database, generate_attributions, SOUNDS_DIR
 from process_audio import normalize_and_convert
 
 CUR_DIR = Path(__file__).resolve().parent
 STATIC_DIR = CUR_DIR / "static"
 TEMP_DIR = CUR_DIR / "temp"
-SOUNDS_DIR = CUR_DIR.parent.parent / "assets" / "sounds"
 
 HOST = "127.0.0.1"
 PORT = 8765

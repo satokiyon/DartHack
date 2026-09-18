@@ -13,7 +13,20 @@ from typing import Dict, List, Any
 CUR_DIR = Path(__file__).resolve().parent
 DEFINITIONS_PATH = CUR_DIR / "sound_definitions.json"
 DATABASE_PATH = CUR_DIR / "sound_database.json"
-SOUNDS_DIR = CUR_DIR.parent.parent / "assets" / "sounds"
+
+def resolve_sounds_dir() -> Path:
+    """音声ファイルの保存先ディレクトリを解決する。
+    DartHack_private が存在すればそちらを優先し、なければ DartHack 側にフォールバックする。
+    """
+    private_sounds = Path(r"C:\Users\satok\DartHack_private\sys\flutter\assets\sounds")
+    if private_sounds.parent.exists():
+        private_sounds.mkdir(parents=True, exist_ok=True)
+        return private_sounds
+    fallback = CUR_DIR.parent.parent / "assets" / "sounds"
+    fallback.mkdir(parents=True, exist_ok=True)
+    return fallback
+
+SOUNDS_DIR = resolve_sounds_dir()
 ATTRIBUTIONS_PATH = SOUNDS_DIR / "attributions.txt"
 
 def load_or_init_database() -> List[Dict[str, Any]]:
