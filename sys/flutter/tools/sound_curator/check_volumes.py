@@ -71,15 +71,16 @@ def measure_volume(ogg_path: Path) -> Dict[str, Any]:
         str(ogg_path)
     ]
     try:
-        p_res = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
-        result["duration"] = float(p_res.stdout.strip())
+        p_res = subprocess.run(probe_cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", check=True)
+        result["duration"] = float((p_res.stdout or "").strip())
     except Exception:
         pass
 
     det_cmd = ["ffmpeg", "-i", str(ogg_path), "-af", "volumedetect", "-f", "null", "-"]
     try:
-        d_res = subprocess.run(det_cmd, capture_output=True, text=True)
-        for line in d_res.stderr.splitlines():
+        d_res = subprocess.run(det_cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        det_stderr = d_res.stderr or ""
+        for line in det_stderr.splitlines():
             if "max_volume:" in line:
                 val = line.split("max_volume:")[1].replace("dB", "").strip()
                 result["max_volume"] = float(val)
@@ -118,9 +119,10 @@ def fix_volume(ogg_path: Path, target_peak: float = TARGET_PEAK_FIX) -> bool:
         detect_chain = f"{base_filter},{comp_filter},volumedetect"
 
         cmd_det = ["ffmpeg", "-i", str(ogg_path), "-af", detect_chain, "-f", "null", "-"]
-        res = subprocess.run(cmd_det, capture_output=True, text=True)
+        res = subprocess.run(cmd_det, capture_output=True, text=True, encoding="utf-8", errors="replace")
         max_v = 0.0
-        for l in res.stderr.splitlines():
+        res_stderr = res.stderr or ""
+        for l in res_stderr.splitlines():
             if "max_volume:" in l:
                 max_v = float(l.split("max_volume:")[1].replace("dB", "").strip())
                 break

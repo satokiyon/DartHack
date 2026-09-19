@@ -21,7 +21,7 @@ def get_audio_info(file_path: Path) -> Dict[str, Any]:
         str(file_path)
     ]
     try:
-        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        res = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", check=True)
         data = json.loads(res.stdout)
         stream = data.get("streams", [{}])[0]
         duration = float(stream.get("duration") or data.get("format", {}).get("duration", 0.0))
@@ -83,9 +83,10 @@ def normalize_and_convert(
             cmd_det.extend(["-t", f"{duration:.3f}"])
         cmd_det.extend(["-af", detect_str, "-f", "null", "-"])
 
-        det_res = subprocess.run(cmd_det, capture_output=True, text=True)
+        det_res = subprocess.run(cmd_det, capture_output=True, text=True, encoding="utf-8", errors="replace")
         max_v = 0.0
-        for l in det_res.stderr.splitlines():
+        det_stderr = det_res.stderr or ""
+        for l in det_stderr.splitlines():
             if "max_volume" in l:
                 try:
                     max_v = float(l.split("max_volume:")[1].replace("dB", "").strip())
@@ -125,10 +126,11 @@ def normalize_and_convert(
     cmd.append(str(output_path))
 
     try:
-        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        res = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", check=True)
         return True
     except subprocess.CalledProcessError as e:
-        print(f"変換エラー ({input_path.name}): {e.stderr}")
+        err_msg = e.stderr or ""
+        print(f"変換エラー ({input_path.name}): {err_msg}")
         return False
 
 if __name__ == "__main__":

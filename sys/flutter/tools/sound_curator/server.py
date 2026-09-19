@@ -222,106 +222,105 @@ class CuratorHTTPRequestHandler(BaseHTTPRequestHandler):
         try:
             length = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(length)
+
+            # 簡易 multipart パーサー
+            parts = body.split(b"--" + boundary)
+            fields = {}
+            file_bytes = None
+            orig_filename = "uploaded_sound"
+
+            for part in parts:
+                if not part or part == b"--\r\n" or part == b"--":
+                    continue
+                if b"\r\n\r\n" not in part:
+                    continue
+
+                header_raw, content_raw = part.split(b"\r\n\r\n", 1)
+                # 末尾の \r\n を除去
+                if content_raw.endswith(b"\r\n"):
+                    content_raw = content_raw[:-2]
+
+                header_text = header_raw.decode("utf-8", errors="ignore")
+                lines = header_text.split("\r\n")
+                disposition = ""
+                for line in lines:
+                    if line.lower().startswith("content-disposition:"):
+                        disposition = line
+
+                if 'filename="' in disposition:
+                    # ファイルパート
+                    orig_filename = disposition.split('filename="')[1].split('"')[0]
+                    file_bytes = content_raw
+                elif 'name="' in disposition:
+                    # テキストフィールド
+                    field_name = disposition.split('name="')[1].split('"')[0]
+                    fields[field_name] = content_raw.decode("utf-8", errors="ignore")
+
+            sound_id = fields.get("id")
+            if not sound_id or not file_bytes:
+                self.send_json({"error": "Missing sound id or file data"}, status=400)
+                return
+
+            db = load_or_init_database()
+            target_item = None
+            for item in db:
+                if item["id"] == sound_id or item["filename"] == sound_id:
+                    target_item = item
+                    break
+
+            if not target_item:
+                self.send_json({"error": f"Sound not found: {sound_id}"}, status=404)
+                return
+
+            # アップロードファイルを一時保存
+            TEMP_DIR.mkdir(parents=True, exist_ok=True)
+            ext = Path(orig_filename).suffix or ".wav"
+            temp_input = TEMP_DIR / f"upload_{target_item['filename']}{ext}"
+            temp_input.write_bytes(file_bytes)
+
+            target_ogg = SOUNDS_DIR / target_item["filename"]
+            is_stereo = fields.get("is_stereo") == "true" or target_item["category"] in ["achievement", "instrument"]
+
+            # 戦闘効果音は -16.0 LUFS & 80Hzハイパスフィルター（スマホ音割れ防止・高頻度再生向け）
+            is_combat = (
+                target_item.get("category") == "combat"
+                or target_item["filename"].startswith("se_combat_")
+                or target_item["filename"].startswith("se_mon_")
+            )
+            target_lufs = -16.0 if is_combat else -14.0
+            highpass_cutoff = 80 if is_combat else None
+
+            # ffmpeg で無音トリム・ハイパス・EBU R128正規化・Opus変換
+            success = normalize_and_convert(
+                temp_input,
+                target_ogg,
+                target_lufs=target_lufs,
+                highpass_cutoff=highpass_cutoff,
+                is_stereo=is_stereo
+            )
+            if not success:
+                self.send_json({"error": "FFmpeg audio processing failed"}, status=500)
+                return
+
+            # データベース更新
+            target_item["status"] = "ready"
+            target_item["source_site"] = fields.get("source_site", "Unknown")
+            target_item["author"] = fields.get("author", "Unknown")
+            target_item["source_url"] = fields.get("source_url", "")
+            target_item["license"] = fields.get("license", "CC0")
+            target_item["notes"] = fields.get("notes", "")
+
+            save_database(db)
+            generate_attributions(db)
+
+            self.send_json({
+                "success": True,
+                "filename": target_item["filename"],
+                "status": "ready",
+                "item": target_item
+            })
         except Exception as e:
-            self.send_json({"error": f"Failed to read body: {e}"}, status=400)
-            return
-
-        # 簡易 multipart パーサー
-        parts = body.split(b"--" + boundary)
-        fields = {}
-        file_bytes = None
-        orig_filename = "uploaded_sound"
-
-        for part in parts:
-            if not part or part == b"--\r\n" or part == b"--":
-                continue
-            if b"\r\n\r\n" not in part:
-                continue
-
-            header_raw, content_raw = part.split(b"\r\n\r\n", 1)
-            # 末尾の \r\n を除去
-            if content_raw.endswith(b"\r\n"):
-                content_raw = content_raw[:-2]
-
-            header_text = header_raw.decode("utf-8", errors="ignore")
-            lines = header_text.split("\r\n")
-            disposition = ""
-            for line in lines:
-                if line.lower().startswith("content-disposition:"):
-                    disposition = line
-
-            if 'filename="' in disposition:
-                # ファイルパート
-                orig_filename = disposition.split('filename="')[1].split('"')[0]
-                file_bytes = content_raw
-            elif 'name="' in disposition:
-                # テキストフィールド
-                field_name = disposition.split('name="')[1].split('"')[0]
-                fields[field_name] = content_raw.decode("utf-8", errors="ignore")
-
-        sound_id = fields.get("id")
-        if not sound_id or not file_bytes:
-            self.send_json({"error": "Missing sound id or file data"}, status=400)
-            return
-
-        db = load_or_init_database()
-        target_item = None
-        for item in db:
-            if item["id"] == sound_id or item["filename"] == sound_id:
-                target_item = item
-                break
-
-        if not target_item:
-            self.send_json({"error": f"Sound not found: {sound_id}"}, status=404)
-            return
-
-        # アップロードファイルを一時保存
-        TEMP_DIR.mkdir(parents=True, exist_ok=True)
-        ext = Path(orig_filename).suffix or ".wav"
-        temp_input = TEMP_DIR / f"upload_{target_item['filename']}{ext}"
-        temp_input.write_bytes(file_bytes)
-
-        target_ogg = SOUNDS_DIR / target_item["filename"]
-        is_stereo = fields.get("is_stereo") == "true" or target_item["category"] in ["achievement", "instrument"]
-
-        # 戦闘効果音は -16.0 LUFS & 80Hzハイパスフィルター（スマホ音割れ防止・高頻度再生向け）
-        is_combat = (
-            target_item.get("category") == "combat"
-            or target_item["filename"].startswith("se_combat_")
-            or target_item["filename"].startswith("se_mon_")
-        )
-        target_lufs = -16.0 if is_combat else -14.0
-        highpass_cutoff = 80 if is_combat else None
-
-        # ffmpeg で無音トリム・ハイパス・EBU R128正規化・Opus変換
-        success = normalize_and_convert(
-            temp_input,
-            target_ogg,
-            target_lufs=target_lufs,
-            highpass_cutoff=highpass_cutoff,
-            is_stereo=is_stereo
-        )
-        if not success:
-            self.send_json({"error": "FFmpeg audio processing failed"}, status=500)
-            return
-
-        # データベース更新
-        target_item["status"] = "ready"
-        target_item["source_site"] = fields.get("source_site", "Unknown")
-        target_item["author"] = fields.get("author", "Unknown")
-        target_item["source_url"] = fields.get("source_url", "")
-        target_item["license"] = fields.get("license", "CC0")
-        target_item["notes"] = fields.get("notes", "")
-
-        save_database(db)
-        generate_attributions(db)
-
-        self.send_json({
-            "success": True,
-            "filename": target_item["filename"],
-            "status": "ready",
-            "item": target_item
-        })
+            self.send_json({"error": f"アップロード処理エラー: {e}"}, status=500)
 
     def handle_delete_assign(self):
         try:
