@@ -138,15 +138,18 @@ struct sound_procs fluttersound_procs = {
 ### 4.3 4系統独立オーディオ制御 (`SoundManager`)
 Flutter 側（`lib/services/sound_manager.dart`）では、音の役割と演出意図に合わせて独立したプレイヤー群を管理しています：
 
-1. **フロアBGM (`_floorBgmPlayer`)**:
+1. **フロアBGM (`_bgmPlayerA` / `_bgmPlayerB`)**:
    - 運命の大迷宮、城、メデューサ、ゲヘナ、精霊界など階層全体の探索BGM（ループ再生）。
+   - **デュアルプレイヤー交互クロスフェード**: A/Bの2台のプレイヤーを交互に切り替え、階段昇降やフロア遷移時に約1.0秒（50ms×20ステップ）かけて滑らかに音量をクロスフェード。
+   - **タイトルBGM自動再生とゲーム開始保留機構**: アプリ起動直後にタイトルBGM（`amb_title.ogg`）を即時再生。キャラメイクやセーブ復元中に届くフロアBGMは保留変数（`_pendingFloorBgm`）に一時退避し、マップ初回表示（`notifyMainGameStarted()`）で保留フロアBGMへのクロスフェードを開始。
 2. **ルームBGM (`_roomBgmPlayer`)**:
    - 店、寺院、宝物庫、動物園、玉座など特別な部屋の専用曲（ループ再生）。
-   - **クロスフェード & フォールバック**: 進入時にフロアBGMを300msでフェードアウト一時停止（`pause`）し、ルームBGMを再生。音源が存在しない場合はフロアBGMをそのまま無音化させずに継続。出入りチャタリングは世代トークン（Generation Token）で音量競合を完全に排除。
+   - **クロスフェード & フォールバック**: 進入時にフロアBGMをフェードアウト停止し、ルームBGMを再生。音源が存在しない場合はフロアBGMをそのまま無音化させずに継続。出入りチャタリングは世代トークン（Generation Token）で音量競合を完全に排除。
+   - **安全なフェード復帰**: 退出時は `resume()` を一切使わず、`play(AssetSource('sounds/$_currentFloorBgm'))` により音量0から安全にフェードイン復帰。
 3. **環境音 (`_ambiencePlayer`)**:
    - 水流、溶岩、暴風、雨などフロアBGMと同時に鳴る環境ループ音（距離減衰対応）。
-4. **効果音プレイヤープール (`_sePool`)**:
-   - ゲームプレイSE・戦闘SE・ファンファーレのワンショット再生。
+4. **効果音プレイヤープール (`_pool`)**:
+   - ゲームプレイSE・戦闘SE・ファンファーレのワンショット再生（最大12音同時再生、`audioFocus: none` により完全並行ミックス）。
 
 ### 4.4 効果音 (SE) プレイヤープールの高度制御仕様
 - **最大12音同時再生プレイヤープール**:
@@ -181,6 +184,25 @@ Android / Flutter (FFI) 環境特有のマルチスレッド・同一プロセ�
 ### 5.3 エラーハンドリングにおける `catch (_)` の禁止と構造化ログの徹底
 - サウンドマネージャーや非同期 I/O において、`catch (_)` による例外の握りつぶしは真の根本原因（`PathAccessException: Exists failed (errno = 13)` 等）を隠蔽して調査を著しく困難にします。
 - 必ず `catch (e, st)` で捕捉し、`debugPrint` で例外名とスタックトレースを明示的に出力する設計を徹底します。
+
+### 5.4 Android AudioFocus 排他競合による BGM 停止と完全ミキシング AudioContext（`audioFocus: none`）による恒久対策
+- **現象とメカニズム**:
+  - `audioplayers` 6.x の `AudioContextAndroid` はデフォルトで `audioFocus: AndroidAudioFocus.gain`（排他オーディオフォーカス取得）となっています。
+  - ゲームプレイ中に効果音（SE）が再生されると、SE プレイヤープール内のいずれかのプレイヤーが `play()` を呼び出します。
+  - SE プレイヤーもデフォルトの `gain` を使用しているため、Android OS の `AudioManager` に対して排他的なフォーカス取得（`AUDIOFOCUS_GAIN`）を要求します。
+  - Android OS は既存の再生元である BGM プレイヤーに対して `AUDIOFOCUS_LOSS`（恒久的フォーカス喪失）を通知します。
+  - ネイティブ層（`audioplayers_android` の `FocusManager.kt` および `WrappedPlayer.kt`）において、`handleFocusResult()` から `onLoss(false)` ハンドラが呼び出され、**BGM プレイヤーが即座に `pause()`（再生停止）** されます。
+  - 一時的なフォーカス喪失（`transient`）ではなく恒久的喪失（`AUDIOFOCUS_LOSS`）として処理されるため、SE 再生完了後も BGM プレイヤーはフォーカスを再取得せず、二度と再開しなくなります。
+- **恒久対策（完全ミキシング設定）**:
+  - ネイティブ層の `FocusManager`（`ModernFocusManager` / `LegacyFocusManager`）は、`audioFocus == AUDIOFOCUS_NONE` の場合に OS への `requestAudioFocus()` 呼出しを完全にスキップする設計になっています。
+  - したがって、SE プレイヤープール（12台）、デュアルフロア BGM プレイヤー（A/B）、ルーム BGM プレイヤー、環境音プレイヤーを含む**すべてのプレイヤーに対して `audioFocus: AndroidAudioFocus.none` を設定**することで、OS へのフォーカス要求を完全スキップし、他のプレイヤーのフォーカスを一切奪わずにアプリ内完全ミキシングを実現できます。
+  - 設定漏れを防止するため、初期化時に `AudioPlayer.global.setAudioContext(...)` で新規生成プレイヤーのデフォルトを `none` に設定しつつ、既に生成された全個別プレイヤーインスタンスに対しても明示的に `player.setAudioContext(...)` を呼ぶ「二重適用」を徹底します。
+- **iOS オーディオセッション（`ambient`）の設計と assert 回避**:
+  - iOS 側では、マナーモード（消音スイッチ）を尊重し、かつ Spotify や YouTube Music 等の外部音楽アプリとも自然に同時再生・共存させるため、`category: AVAudioSessionCategory.ambient` を採用します。
+  - **制約**: `AudioContextIOS` では、`category == ambient` の場合に `options` に `AVAudioSessionOptions.mixWithOthers` を渡すと、プラグイン内部の Dart assert 例外（`'You can set the option mixWithOthers explicitly only if the audio session category is playAndRecord, playback, or multiRoute.'`）でクラッシュします。`ambient` は iOS の仕様上元々他アプリとミックスされるため、`options: const {}`（空セット）を指定します。
+- **audioplayers v6 における `resume()` 完全排除原則**:
+  - audioplayers v6 では、バックグラウンド復帰時や部屋退出時の再開において `resume()` を呼び出すと、プラットフォーム層（Android/iOS）の内部ステート不整合により再生が再開しない問題が発生します。
+  - そのため、コードベース全体で `resume()` の呼び出しを完全排除し、保持しているファイル名（`_currentFloorBgm` 等）を用いて **`play(AssetSource('sounds/...'))` で最初から安全に再開（または音量0からフェードイン復帰）** させる設計を徹底します。
 
 ---
 

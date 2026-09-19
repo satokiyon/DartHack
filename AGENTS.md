@@ -1019,3 +1019,27 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
      3) `sys/flutter/doc/sound_macros_list.md`（効果音一覧表のリナンバリングおよび呼び出し箇所テーブルの更新）
      4) `sys/flutter/tools/sound_curator/`（`parse_sound_macros.py` による `sound_definitions.json` 再生成、および `database.py` による `sound_database.json` / `attributions.txt` の同期）
 
+## Flutter (audioplayers) における Android AudioFocus 排他競合防止と完全ミキシング・ライフサイクル安全原則
+
+1. **Android AudioFocus 排他競合による BGM 停止の防止と完全ミキシング設定（`audioFocus: none`）**:
+   - **現象とメカニズム**:
+     `audioplayers` 6.x の `AudioContextAndroid` はデフォルトで `audioFocus: AndroidAudioFocus.gain`（排他オーディオフォーカス取得）となっています。ゲームプレイ中に効果音（SE）が再生されると、SE プレイヤーが OS に対して排他フォーカスを要求するため、Android OS は既存の BGM プレイヤーへ `AUDIOFOCUS_LOSS` を通知します。これによりネイティブ層（`FocusManager.kt` / `WrappedPlayer.kt`）の `onLoss(false)` がトリガーされ、BGM プレイヤーが即座に `pause()` されて二度と再開しなくなります。
+   - **恒久対策**:
+     - SE プレイヤープール、フロア BGM プレイヤー（A/B）、ルーム BGM プレイヤー、環境音プレイヤーを含む**すべてのプレイヤーインスタンスにおいて、`audioFocus: AndroidAudioFocus.none` を設定・維持**してください。
+     - `AndroidAudioFocus.none` を指定することで、ネイティブ層の `FocusManager` は OS へのフォーカス要求を完全スキップし、他のプレイヤーのフォーカスを一切奪わずにアプリ内での完全並行ミキシングを実現します。
+     - 設定漏れを防止するため、初期化時に `AudioPlayer.global.setAudioContext(...)` で新規プレイヤーのデフォルトを `none` に設定しつつ、既に生成された全個別プレイヤーインスタンスに対しても明示的に `player.setAudioContext(...)` を呼ぶ「二重適用」を徹底してください。
+
+2. **iOS AudioContextIOS の `ambient` 指定時における `mixWithOthers` オプション禁止**:
+   - iOS 側ではマナーモード（消音スイッチ）を尊重し、Spotify 等の外部音楽アプリとも自然に同時再生させるため、`category: AVAudioSessionCategory.ambient` を採用します。
+   - **制約**: `category == ambient` の場合、`options` に `AVAudioSessionOptions.mixWithOthers` を明示指定すると、audioplayers プラグインの内部 assert 例外（`'You can set the option mixWithOthers explicitly only if the audio session category is playAndRecord, playback, or multiRoute.'`）でクラッシュします。
+   - `ambient` 指定時の options には必ず空セット（`options: const {}`）を指定してください。
+
+3. **audioplayers v6 における `resume()` の完全排除と `play(AssetSource)` による安全再開原則**:
+   - audioplayers v6 では、バックグラウンド復帰時や部屋退出時の一時停止復帰において `resume()` を呼び出すと、プラットフォーム層（Android/iOS）の内部ステート不整合により再生が再開しない、または無音のままになる問題が発生します。
+   - そのため、コードベース全体で `resume()` の呼び出しを完全排除し、保持しているファイル名（`_currentFloorBgm` 等）を用いて **`play(AssetSource('sounds/...'))` で最初から安全に再開（または音量0からフェードイン復帰）** させる設計を徹底してください。
+
+4. **ゲーム本編開始前フェーズにおけるフロア BGM 保留機構（保留クロスフェード原則）**:
+   - アプリ起動直後のタイトル画面から `amb_title.ogg` を即時再生させつつ、名前入力・キャラメイク・セーブデータ復元処理中に C コアから届くフロア BGM（`amb_dungeon.ogg` 等）は即時再生せず、保留変数（`_pendingFloorBgm`）に一時退避させてタイトル BGM を維持してください。
+   - マップウィンドウの初回表示（ゲーム本編開始検知: `notifyMainGameStarted()`）が届いた瞬間に、保留されていたフロア BGM へのクロスフェードを開始する設計を徹底してください。
+
+
