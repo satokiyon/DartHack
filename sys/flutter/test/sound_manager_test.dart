@@ -670,6 +670,110 @@ void main() {
       expect(combatPlayer.playCount, 2);
       expect((combatPlayer.lastSource as AssetSource).path, 'sounds/se_alarm.ogg');
     });
+
+    test('Floor BGM is held as pending when main game has not started, keeping title BGM', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true, isMainGameStarted: false);
+      manager.registerAvailableSound('amb_title.ogg');
+      manager.registerAvailableSound('amb_dungeon.ogg');
+
+      // 1. タイトルBGMイベント
+      manager.handleSoundEvent({
+        'category': 4,
+        'filename': 'amb_title.ogg',
+        'text': '',
+        'volume': 100,
+        'loopOrFlag': 1,
+      });
+      expect(manager.currentFloorBgm, 'amb_title.ogg');
+      expect(manager.pendingFloorBgmForTest, isNull);
+
+      // 2. Cコアからの重複タイトルBGMイベント（変化なし）
+      manager.handleSoundEvent({
+        'category': 4,
+        'filename': 'amb_title.ogg',
+        'text': '',
+        'volume': 100,
+        'loopOrFlag': 1,
+      });
+      expect(manager.currentFloorBgm, 'amb_title.ogg');
+
+      // 3. キャラメイク・セーブ復元中に届くフロアBGMイベント（保留される）
+      manager.handleSoundEvent({
+        'category': 4,
+        'filename': 'amb_dungeon.ogg',
+        'text': '',
+        'volume': 100,
+        'loopOrFlag': 1,
+      });
+      // タイトルBGMが鳴り続け、amb_dungeon.ogg が保留されていること
+      expect(manager.currentFloorBgm, 'amb_title.ogg');
+      expect(manager.pendingFloorBgmForTest, 'amb_dungeon.ogg');
+
+      // 4. マップ画面表示（ゲーム本編開始通知）
+      await manager.notifyMainGameStarted();
+      expect(manager.pendingFloorBgmForTest, isNull);
+      expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
+
+      // 5. セッションリセット
+      manager.resetForNewGameSession();
+      expect(manager.pendingFloorBgmForTest, isNull);
+    });
+
+    test('SE playback does not interrupt or stop floor BGM', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true, isMainGameStarted: true);
+      manager.registerAvailableSound('amb_dungeon.ogg');
+      manager.registerAvailableSound('se_combat_hit_slash.ogg');
+
+      // フロアBGM再生
+      manager.handleSoundEvent({
+        'category': 4,
+        'filename': 'amb_dungeon.ogg',
+        'text': '',
+        'volume': 100,
+        'loopOrFlag': 1,
+      });
+      expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
+
+      // 効果音（SE）再生
+      manager.handleSoundEvent({
+        'category': 1,
+        'filename': 'se_combat_hit_slash.ogg',
+        'text': '',
+        'volume': 100,
+        'loopOrFlag': 0,
+      });
+
+      // SEが鳴ってもフロアBGMは継続していること
+      expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
+      expect(manager.currentBgm, 'amb_dungeon.ogg');
+    });
+
+    test('Background pause and resume safely restores floor BGM without resume()', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true, isMainGameStarted: true);
+      manager.registerAvailableSound('amb_dungeon.ogg');
+
+      // フロアBGM再生
+      manager.handleSoundEvent({
+        'category': 4,
+        'filename': 'amb_dungeon.ogg',
+        'text': '',
+        'volume': 100,
+        'loopOrFlag': 1,
+      });
+      expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
+
+      // アプリがバックグラウンドに移行
+      await manager.pauseForBackground();
+
+      // アプリがフォアグラウンドに復帰（playDirectで安全に再開）
+      await manager.resumeFromBackground();
+
+      // フロアBGMが正常に維持・再開されていること
+      expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
+    });
   });
 }
 

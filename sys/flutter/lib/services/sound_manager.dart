@@ -107,10 +107,46 @@ class SoundManager {
     'amb_water.ogg', 'amb_lava.ogg', 'amb_wind.ogg', 'amb_rain.ogg', 'amb_swamp.ogg',
   };
 
+  /// 効果音・環境音用オーディオコンテキスト（完全ミキシング・消音スイッチ尊重）
+  static final AudioContext _defaultAudioContext = AudioContext(
+    android: const AudioContextAndroid(
+      isSpeakerphoneOn: false,
+      stayAwake: false,
+      contentType: AndroidContentType.sonification,
+      usageType: AndroidUsageType.game,
+      audioFocus: AndroidAudioFocus.none,
+    ),
+    iOS: AudioContextIOS(
+      category: AVAudioSessionCategory.ambient,
+      options: const {},
+    ),
+  );
+
+  /// BGM用オーディオコンテキスト（完全ミキシング・消音スイッチ尊重）
+  static final AudioContext _bgmAudioContext = AudioContext(
+    android: const AudioContextAndroid(
+      isSpeakerphoneOn: false,
+      stayAwake: false,
+      contentType: AndroidContentType.music,
+      usageType: AndroidUsageType.game,
+      audioFocus: AndroidAudioFocus.none,
+    ),
+    iOS: AudioContextIOS(
+      category: AVAudioSessionCategory.ambient,
+      options: const {},
+    ),
+  );
+
   final List<_PlayerEntry> _pool = [];
-  AudioPlayer? _floorBgmPlayer;
+  AudioPlayer? _bgmPlayerA;
+  AudioPlayer? _bgmPlayerB;
+  int _activeBgmIndex = 0; // 0: A, 1: B
   String? _currentFloorBgm;
   String? _lastFloorBgm;
+  String? _pendingFloorBgm;
+  bool _isMainGameStarted = false;
+  final List<Map<dynamic, dynamic>> _pendingEvents = [];
+
   AudioPlayer? _roomBgmPlayer;
   String? _currentRoomBgm;
   AudioPlayer? _ambiencePlayer;
@@ -151,6 +187,10 @@ class SoundManager {
   String? get currentBgm => _currentRoomBgm ?? _currentFloorBgm;
   String? get currentFloorBgm => _currentFloorBgm;
   String? get currentRoomBgm => _currentRoomBgm;
+
+  /// デュアルフロアBGMプレイヤーのゲッター
+  AudioPlayer? get _activeFloorPlayer => _activeBgmIndex == 0 ? _bgmPlayerA : _bgmPlayerB;
+  AudioPlayer? get _inactiveFloorPlayer => _activeBgmIndex == 0 ? _bgmPlayerB : _bgmPlayerA;
 
   /// 初期化: アセット一覧のスキャンとプレイヤーのプール生成
   Future<void> initialize() async {
@@ -209,11 +249,23 @@ class SoundManager {
         }
       }
 
+      // アプリ全体のグローバルAudioContextを設定（新規プレイヤーのデフォルト）
+      try {
+        await AudioPlayer.global.setAudioContext(_defaultAudioContext);
+      } catch (e, st) {
+        debugPrint('[SoundMgr] Failed to set global AudioContext: $e\n$st');
+      }
+
       // SEプレイヤープールを初期化 (最大12個)
       for (int i = 0; i < _maxConcurrentPlayers; i++) {
         final player = AudioPlayer();
         player.audioCache = AudioCache.instance;
         await player.setReleaseMode(ReleaseMode.stop);
+        try {
+          await player.setAudioContext(_defaultAudioContext);
+        } catch (e, st) {
+          debugPrint('[SoundMgr] Failed to set AudioContext on pool player $i: $e\n$st');
+        }
         final entry = _PlayerEntry(player);
         player.onPlayerComplete.listen((_) {
           entry.isPlaying = false;
@@ -222,26 +274,98 @@ class SoundManager {
         _pool.add(entry);
       }
 
-      // フロアBGMプレイヤー
-      _floorBgmPlayer = AudioPlayer();
-      _floorBgmPlayer!.audioCache = AudioCache.instance;
-      await _floorBgmPlayer!.setReleaseMode(ReleaseMode.loop);
+      // デュアルフロアBGMプレイヤー (A/B)
+      _bgmPlayerA = AudioPlayer();
+      _bgmPlayerA!.audioCache = AudioCache.instance;
+      await _bgmPlayerA!.setReleaseMode(ReleaseMode.loop);
+      try {
+        await _bgmPlayerA!.setAudioContext(_bgmAudioContext);
+      } catch (e, st) {
+        debugPrint('[SoundMgr] Failed to set AudioContext on _bgmPlayerA: $e\n$st');
+      }
+      _bgmPlayerA!.onPlayerStateChanged.listen((state) {
+        debugPrint('[SoundMgr] BGM Player A state changed: $state (current: $_currentFloorBgm, activeIndex: $_activeBgmIndex)');
+      });
+
+      _bgmPlayerB = AudioPlayer();
+      _bgmPlayerB!.audioCache = AudioCache.instance;
+      await _bgmPlayerB!.setReleaseMode(ReleaseMode.loop);
+      try {
+        await _bgmPlayerB!.setAudioContext(_bgmAudioContext);
+      } catch (e, st) {
+        debugPrint('[SoundMgr] Failed to set AudioContext on _bgmPlayerB: $e\n$st');
+      }
+      _bgmPlayerB!.onPlayerStateChanged.listen((state) {
+        debugPrint('[SoundMgr] BGM Player B state changed: $state (current: $_currentFloorBgm, activeIndex: $_activeBgmIndex)');
+      });
+      _activeBgmIndex = 0;
 
       // ルームBGMプレイヤー
       _roomBgmPlayer = AudioPlayer();
       _roomBgmPlayer!.audioCache = AudioCache.instance;
       await _roomBgmPlayer!.setReleaseMode(ReleaseMode.loop);
+      try {
+        await _roomBgmPlayer!.setAudioContext(_bgmAudioContext);
+      } catch (e, st) {
+        debugPrint('[SoundMgr] Failed to set AudioContext on _roomBgmPlayer: $e\n$st');
+      }
+      _roomBgmPlayer!.onPlayerStateChanged.listen((state) {
+        debugPrint('[SoundMgr] Room BGM Player state changed: $state (current: $_currentRoomBgm)');
+      });
 
       // 環境音（アンビエンス）プレイヤー
       _ambiencePlayer = AudioPlayer();
       _ambiencePlayer!.audioCache = AudioCache.instance;
       await _ambiencePlayer!.setReleaseMode(ReleaseMode.loop);
+      try {
+        await _ambiencePlayer!.setAudioContext(_defaultAudioContext);
+      } catch (e, st) {
+        debugPrint('[SoundMgr] Failed to set AudioContext on _ambiencePlayer: $e\n$st');
+      }
 
       _isInitialized = true;
+
+      // 初期化前に届いていたサウンドイベントをディスパッチ
+      if (_pendingEvents.isNotEmpty) {
+        debugPrint('[SoundMgr] Processing ${_pendingEvents.length} pending events after initialization');
+        final queued = List<Map<dynamic, dynamic>>.from(_pendingEvents);
+        _pendingEvents.clear();
+        for (final ev in queued) {
+          handleSoundEvent(ev);
+        }
+      }
+
+      // ゲーム未開始かつBGM有効時はタイトルBGMを自動再生
+      if (!_isMainGameStarted && _bgmEnabled && !_muted && _currentFloorBgm == null) {
+        debugPrint('[SoundMgr] Auto-playing title BGM on init: amb_title.ogg');
+        unawaited(_playFloorBgmDirect('amb_title.ogg', _bgmVolume));
+      }
     } catch (e, st) {
       debugPrint('[SoundMgr] Error in initialize(): $e\n$st');
       _isInitialized = true;
     }
+  }
+
+  /// ゲーム本編開始（マップ画面初回表示）通知
+  Future<void> notifyMainGameStarted() async {
+    debugPrint('[SoundMgr] notifyMainGameStarted called (pending: $_pendingFloorBgm, current: $_currentFloorBgm)');
+    _isMainGameStarted = true;
+    final targetBgm = _pendingFloorBgm ?? 'amb_dungeon.ogg';
+    _pendingFloorBgm = null;
+
+    if (_bgmEnabled && !_muted && hasSound(targetBgm)) {
+      if (_currentFloorBgm != targetBgm) {
+        debugPrint('[SoundMgr] Crossfading to floor BGM on game start: $targetBgm');
+        unawaited(_crossfadeFloorBgm(targetBgm));
+      }
+    }
+  }
+
+  /// 新しいゲームセッション開始時のリセット
+  void resetForNewGameSession() {
+    debugPrint('[SoundMgr] resetForNewGameSession called');
+    _isMainGameStarted = false;
+    _pendingFloorBgm = null;
   }
 
   /// サウンドファイルがアセットに存在するか確認
@@ -251,15 +375,21 @@ class SoundManager {
 
   /// Cコアからのサウンドイベントをディスパッチ
   void handleSoundEvent(Map<dynamic, dynamic> event) {
+    if (!_isInitialized) {
+      debugPrint('[SoundMgr] Not initialized yet, queuing event: $event');
+      _pendingEvents.add(event);
+      return;
+    }
+
+    if (_muted) {
+      return;
+    }
+
     final catVal = event['category'] as int? ?? 1;
     final filename = event['filename'] as String? ?? '';
     final text = event['text'] as String? ?? '';
     final volume = (event['volume'] as int? ?? 100).clamp(0, 100);
     final loopOrFlag = event['loopOrFlag'] as int? ?? 0;
-
-    if (!_isInitialized || _muted) {
-      return;
-    }
 
     final category = SoundCategory.fromValue(catVal);
 
@@ -392,6 +522,7 @@ class SoundManager {
     targetEntry.lastPlayTime = now;
 
     final finalVolume = (_seVolume * (cVolume / 100.0)).clamp(0.0, 1.0);
+    debugPrint('[SoundMgr] Play SE: $filename (vol: $cVolume, finalVol: $finalVolume)');
     try {
       await targetEntry.player.setVolume(finalVolume);
       await targetEntry.player.play(AssetSource('sounds/$filename'));
@@ -431,7 +562,8 @@ class SoundManager {
     try {
       for (int i = 5; i >= 1; i--) {
         if ((isRoomPlayer ? _roomFadeGen : _floorFadeGen) != gen) return;
-        await player.setVolume(baseVolume * (i / 6.0));
+        final currentBase = (_muted || !_bgmEnabled) ? 0.0 : _bgmVolume;
+        await player.setVolume(currentBase * (i / 6.0));
         await Future.delayed(const Duration(milliseconds: 50));
       }
       if ((isRoomPlayer ? _roomFadeGen : _floorFadeGen) != gen) return;
@@ -439,6 +571,7 @@ class SoundManager {
         await player.pause();
       } else {
         await player.stop();
+        await player.setVolume(0.0);
       }
     } catch (e, st) {
       debugPrint('[SoundMgr] Error during fadeOut: $e\n$st');
@@ -455,10 +588,84 @@ class SoundManager {
         if ((isRoomPlayer ? _roomFadeGen : _floorFadeGen) != gen) return;
         await Future.delayed(const Duration(milliseconds: 50));
         if ((isRoomPlayer ? _roomFadeGen : _floorFadeGen) != gen) return;
-        await player.setVolume(targetVolume * (i / 6.0));
+        final currentBase = (_muted || !_bgmEnabled) ? 0.0 : _bgmVolume;
+        await player.setVolume(currentBase * (i / 6.0));
       }
     } catch (e, st) {
       debugPrint('[SoundMgr] Error during fadeIn: $e\n$st');
+    }
+  }
+
+  /// フロアBGMの直接・即時再生（初期起動時など）
+  Future<void> _playFloorBgmDirect(String filename, double targetVolume) async {
+    if (!hasSound(filename)) return;
+    _currentFloorBgm = filename;
+    _lastFloorBgm = filename;
+    final player = _activeFloorPlayer;
+    if (player == null) return;
+
+    try {
+      await player.setReleaseMode(ReleaseMode.loop);
+      await player.setVolume((_muted || !_bgmEnabled) ? 0.0 : targetVolume);
+      await player.play(AssetSource('sounds/$filename'));
+    } catch (e, st) {
+      debugPrint('[SoundMgr] Error direct playing floor BGM \'$filename\': $e\n$st');
+    }
+  }
+
+  /// 約1.0秒（50ms × 20ステップ）のクロスフェード処理
+  Future<void> _crossfadeFloorBgm(String newFilename) async {
+    if (!hasSound(newFilename)) return;
+
+    final oldPlayer = _activeFloorPlayer;
+    final newPlayer = _inactiveFloorPlayer;
+    final int newIndex = 1 - _activeBgmIndex;
+    final int gen = ++_floorFadeGen;
+
+    try {
+      if (newPlayer != null) {
+        await newPlayer.stop();
+        await newPlayer.setReleaseMode(ReleaseMode.loop);
+        await newPlayer.setVolume(0.0);
+        await newPlayer.play(AssetSource('sounds/$newFilename'));
+      }
+
+      _currentFloorBgm = newFilename;
+      _lastFloorBgm = newFilename;
+      _activeBgmIndex = newIndex;
+
+      const int steps = 20;
+      const int stepIntervalMs = 50;
+
+      for (int i = 1; i <= steps; i++) {
+        if (_floorFadeGen != gen) {
+          // 別のフェード処理が割り込んだため中断
+          return;
+        }
+        await Future.delayed(const Duration(milliseconds: stepIntervalMs));
+        if (_floorFadeGen != gen) return;
+
+        final progress = i / steps;
+        // 動的ベース音量参照
+        final currentBaseVol = (_muted || !_bgmEnabled) ? 0.0 : _bgmVolume;
+        final newVol = (currentBaseVol * progress).clamp(0.0, 1.0);
+        final oldVol = (currentBaseVol * (1.0 - progress)).clamp(0.0, 1.0);
+
+        if (newPlayer != null) {
+          unawaited(newPlayer.setVolume(newVol));
+        }
+        if (oldPlayer != null) {
+          unawaited(oldPlayer.setVolume(oldVol));
+        }
+      }
+
+      // フェードアウト完了後に旧プレイヤーを完全停止
+      if (oldPlayer != null && _floorFadeGen == gen) {
+        await oldPlayer.stop();
+        await oldPlayer.setVolume(0.0);
+      }
+    } catch (e, st) {
+      debugPrint('[SoundMgr] Error during crossfade to \'$newFilename\': $e\n$st');
     }
   }
 
@@ -482,8 +689,27 @@ class SoundManager {
         return;
       }
 
-      // 同一フロアBGMが既に再生中の場合は継続再生
-      if (_currentFloorBgm == filename && _floorBgmPlayer?.state == PlayerState.playing) {
+      // ゲーム本編（マップ画面）がまだ始まっていない場合
+      if (!_isMainGameStarted) {
+        if (filename == 'amb_title.ogg') {
+          // タイトルBGMの要求
+          if (_currentFloorBgm == 'amb_title.ogg' &&
+              _activeFloorPlayer?.state == PlayerState.playing) {
+            // すでにタイトルBGMが鳴っていればそのまま継続
+            return;
+          }
+          await _playFloorBgmDirect('amb_title.ogg', _bgmVolume);
+          return;
+        } else {
+          // ダンジョンBGM等の要求は保留（Pending）し、タイトルBGMを継続
+          debugPrint('[SoundMgr] Main game not started yet. Holding pending floor BGM: $filename');
+          _pendingFloorBgm = filename;
+          return;
+        }
+      }
+
+      // 同一フロアBGMが既にアクティブプレイヤーで再生中の場合は継続再生
+      if (_currentFloorBgm == filename && _activeFloorPlayer?.state == PlayerState.playing) {
         return;
       }
 
@@ -494,17 +720,8 @@ class SoundManager {
           _currentRoomBgm = null;
         }
 
-        // 旧フロアBGMをフェードアウト停止
-        if (_floorBgmPlayer?.state == PlayerState.playing) {
-          await _fadeOut(_floorBgmPlayer, _bgmVolume, isRoomPlayer: false);
-        }
-
-        _currentFloorBgm = filename;
-        _lastFloorBgm = filename;
-        await _floorBgmPlayer?.setReleaseMode(ReleaseMode.loop);
-        await _floorBgmPlayer?.setVolume(0.0);
-        await _floorBgmPlayer?.play(AssetSource('sounds/$filename'));
-        unawaited(_fadeIn(_floorBgmPlayer, _bgmVolume, isRoomPlayer: false));
+        // デュアルプレイヤーで安全にクロスフェード
+        await _crossfadeFloorBgm(filename);
       } catch (e, st) {
         debugPrint('[SoundMgr] ERROR playing floor BGM \'$filename\': $e\n$st');
       }
@@ -522,9 +739,9 @@ class SoundManager {
         }
 
         try {
-          // フロアBGMをフェードアウトして一時停止（pause）
-          if (_floorBgmPlayer?.state == PlayerState.playing) {
-            await _fadeOut(_floorBgmPlayer, _bgmVolume, pauseInsteadOfStop: true, isRoomPlayer: false);
+          // フロアBGMをフェードアウト停止（resume依存を排除するため安全にstop）
+          if (_activeFloorPlayer?.state == PlayerState.playing) {
+            await _fadeOut(_activeFloorPlayer, _bgmVolume, pauseInsteadOfStop: false, isRoomPlayer: false);
           }
 
           _currentRoomBgm = filename;
@@ -543,9 +760,15 @@ class SoundManager {
           try {
             await _fadeOut(_roomBgmPlayer, _bgmVolume, isRoomPlayer: true);
 
+            // resume() は使わず、play(AssetSource) で音量0から安全にフェードイン復帰
             if (_currentFloorBgm != null && hasSound(_currentFloorBgm!)) {
-              await _floorBgmPlayer?.resume();
-              unawaited(_fadeIn(_floorBgmPlayer, _bgmVolume, isRoomPlayer: false));
+              final player = _activeFloorPlayer;
+              if (player != null) {
+                await player.setReleaseMode(ReleaseMode.loop);
+                await player.setVolume(0.0);
+                await player.play(AssetSource('sounds/$_currentFloorBgm'));
+                unawaited(_fadeIn(player, _bgmVolume, isRoomPlayer: false));
+              }
             }
           } catch (e, st) {
             debugPrint('[SoundMgr] Error restoring floor BGM: $e\n$st');
@@ -560,12 +783,17 @@ class SoundManager {
   Future<void> stopBgm() async {
     _currentRoomBgm = null;
     _currentFloorBgm = null;
+    _pendingFloorBgm = null;
+    _floorFadeGen++;
     try {
       if (_roomBgmPlayer != null && _roomBgmPlayer!.state == PlayerState.playing) {
         await _fadeOut(_roomBgmPlayer, _bgmVolume, isRoomPlayer: true);
       }
-      if (_floorBgmPlayer != null && _floorBgmPlayer!.state == PlayerState.playing) {
-        await _fadeOut(_floorBgmPlayer, _bgmVolume, isRoomPlayer: false);
+      if (_bgmPlayerA != null && _bgmPlayerA!.state == PlayerState.playing) {
+        await _fadeOut(_bgmPlayerA, _bgmVolume, isRoomPlayer: false);
+      }
+      if (_bgmPlayerB != null && _bgmPlayerB!.state == PlayerState.playing) {
+        await _fadeOut(_bgmPlayerB, _bgmVolume, isRoomPlayer: false);
       }
     } catch (e, st) {
       debugPrint('[SoundMgr] Error in stopBgm: $e\n$st');
@@ -670,8 +898,11 @@ class SoundManager {
   /// スライダー操作中のリアルタイム音量反映（ディスクI/Oなし）
   void updateBgmVolume(double vol) {
     _bgmVolume = vol.clamp(0.0, 1.0);
-    if (_floorBgmPlayer != null && _floorBgmPlayer!.state == PlayerState.playing) {
-      _floorBgmPlayer!.setVolume(_bgmVolume);
+    if (_bgmPlayerA != null && _bgmPlayerA!.state == PlayerState.playing) {
+      _bgmPlayerA!.setVolume(_bgmVolume);
+    }
+    if (_bgmPlayerB != null && _bgmPlayerB!.state == PlayerState.playing) {
+      _bgmPlayerB!.setVolume(_bgmVolume);
     }
     if (_roomBgmPlayer != null && _roomBgmPlayer!.state == PlayerState.playing) {
       _roomBgmPlayer!.setVolume(_bgmVolume);
@@ -772,9 +1003,9 @@ class SoundManager {
   /// アプリバックグラウンド移行時の一時停止
   Future<void> pauseForBackground() async {
     try {
-      _floorWasPlayingBeforeBackground = (_floorBgmPlayer?.state == PlayerState.playing);
+      _floorWasPlayingBeforeBackground = (_activeFloorPlayer?.state == PlayerState.playing);
       if (_floorWasPlayingBeforeBackground) {
-        await _floorBgmPlayer?.pause();
+        await _activeFloorPlayer?.pause();
       }
 
       _roomWasPlayingBeforeBackground = (_roomBgmPlayer?.state == PlayerState.playing);
@@ -796,16 +1027,27 @@ class SoundManager {
     try {
       // ミュート中やカテゴリ無効化中は再開しない
       if (!_muted && _bgmEnabled) {
-        if (_floorWasPlayingBeforeBackground && _floorBgmPlayer != null) {
-          await _floorBgmPlayer?.resume();
-        }
-        if (_roomWasPlayingBeforeBackground && _roomBgmPlayer != null) {
-          await _roomBgmPlayer?.resume();
+        // ルームBGM再生中だった場合はルームBGMを優先再開
+        if (_roomWasPlayingBeforeBackground && _currentRoomBgm != null && hasSound(_currentRoomBgm!)) {
+          final player = _roomBgmPlayer;
+          if (player != null) {
+            await player.setReleaseMode(ReleaseMode.loop);
+            await player.setVolume(_bgmVolume);
+            await player.play(AssetSource('sounds/$_currentRoomBgm'));
+          }
+        } else if (_floorWasPlayingBeforeBackground && _currentFloorBgm != null && hasSound(_currentFloorBgm!)) {
+          // フロアBGM再生中だった場合はフロアBGMを直接再開（resume()は完全排除）
+          await _playFloorBgmDirect(_currentFloorBgm!, _bgmVolume);
         }
       }
       if (!_muted && _ambienceEnabled) {
-        if (_ambienceWasPlayingBeforeBackground && _ambiencePlayer != null) {
-          await _ambiencePlayer?.resume();
+        if (_ambienceWasPlayingBeforeBackground && _currentAmbience != null && hasSound(_currentAmbience!)) {
+          final player = _ambiencePlayer;
+          if (player != null) {
+            await player.setReleaseMode(ReleaseMode.loop);
+            await player.setVolume(_ambienceVolume);
+            await player.play(AssetSource('sounds/$_currentAmbience'));
+          }
         }
       }
     } catch (e, st) {
@@ -836,8 +1078,10 @@ class SoundManager {
       entry.player.dispose();
     }
     _pool.clear();
-    _floorBgmPlayer?.dispose();
-    _floorBgmPlayer = null;
+    _bgmPlayerA?.dispose();
+    _bgmPlayerA = null;
+    _bgmPlayerB?.dispose();
+    _bgmPlayerB = null;
     _roomBgmPlayer?.dispose();
     _roomBgmPlayer = null;
     _ambiencePlayer?.dispose();
@@ -856,9 +1100,14 @@ class SoundManager {
 
   /// テスト用: 初期化状態の設定
   @visibleForTesting
-  void setInitializedForTest(bool value) {
+  void setInitializedForTest(bool value, {bool isMainGameStarted = true}) {
     _isInitialized = value;
+    _isMainGameStarted = isMainGameStarted;
   }
+
+  /// テスト用: 保留中のフロアBGMの取得
+  @visibleForTesting
+  String? get pendingFloorBgmForTest => _pendingFloorBgm;
 
   /// テスト用: プレイヤープール情報の取得
   @visibleForTesting

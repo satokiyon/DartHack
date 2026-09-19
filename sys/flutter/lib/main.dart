@@ -45,10 +45,10 @@ import 'screens/start_screen.dart';
 import 'screens/end_screen.dart';
 import 'services/sound_manager.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   unawaited(MobileAds.instance.initialize());
-  unawaited(SoundManager.instance.initialize());
+  await SoundManager.instance.initialize();
   runApp(const MyApp());
 }
 
@@ -1254,6 +1254,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     print("[UI] _startGame called! _isGameRunning=$_isGameRunning, assetsPath='$_assetsPath'");
     if (_isGameRunning) return;
 
+    SoundManager.instance.resetForNewGameSession();
+
     setState(() {
       _logs.clear();
       _isGameRunning = true;
@@ -1311,9 +1313,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           _addLog("displayWindow after: textVisible=${_screen.isTextWindowVisible}, menuVisible=${_screen.isMenuWindowVisible}");
           // C側の blocking に基づく
           if (_mapWinId != null && winId == _mapWinId) {
+            final wasStarted = _isMainGameStarted;
             setState(() {
               _isMainGameStarted = true;
             });
+            if (!wasStarted) {
+              _addLog("Main game started! Notifying SoundManager...");
+              SoundManager.instance.notifyMainGameStarted();
+            }
           } else {
             // テキスト/メニューウィンドウの場合も setState を呼んで確実に UI を更新
             setState(() {});

@@ -1019,6 +1019,3 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
      3) `sys/flutter/doc/sound_macros_list.md`（効果音一覧表のリナンバリングおよび呼び出し箇所テーブルの更新）
      4) `sys/flutter/tools/sound_curator/`（`parse_sound_macros.py` による `sound_definitions.json` 再生成、および `database.py` による `sound_database.json` / `attributions.txt` の同期）
 
-
-
-
