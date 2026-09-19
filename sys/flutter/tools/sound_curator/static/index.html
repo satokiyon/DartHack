@@ -175,6 +175,9 @@
     .subcat-tag.ranged { background: rgba(14, 165, 233, 0.2); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.4); }
     .subcat-tag.magic { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
     .subcat-tag.monster { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .subcat-tag.floor { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.4); }
+    .subcat-tag.room { background: rgba(168, 85, 247, 0.2); color: #e879f9; border: 1px solid rgba(168, 85, 247, 0.4); }
+    .subcat-tag.ambience { background: rgba(20, 184, 166, 0.2); color: #5eead4; border: 1px solid rgba(20, 184, 166, 0.4); }
 
     .keywords-hint {
       font-size: 11px;
@@ -189,14 +192,14 @@
     }
     .keywords-hint strong { color: #e2e8f0; }
 
-    .combat-sub-controls {
+    .combat-sub-controls, .bgm-sub-controls {
       background: #1e2433;
       padding: 6px 12px;
       border-radius: 8px;
       border: 1px solid #2e384d;
       align-items: center;
     }
-    .subcat-btn {
+    .subcat-btn, .bgm-subcat-btn {
       font-size: 12px;
       padding: 4px 10px;
     }
@@ -218,16 +221,9 @@
     .audio-player-box {
       background: #151822;
       border-radius: 6px;
-      padding: 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      padding: 4px;
     }
-    audio {
-      width: 100%;
-      height: 36px;
-      outline: none;
-    }
+    .audio-player-box audio { width: 100%; height: 32px; }
     .meta-info {
       font-size: 11px;
       color: var(--text-muted);
@@ -285,6 +281,8 @@
     .badge-pocket:hover { background: #ec4899; color: #fff; }
     .badge-amacha { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-color: rgba(139, 92, 246, 0.3); }
     .badge-amacha:hover { background: #8b5cf6; color: #fff; }
+    .badge-peritune { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.3); }
+    .badge-peritune:hover { background: #10b981; color: #000; }
 
     /* 海外サイトカラー */
     .badge-pixabay { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border-color: rgba(6, 182, 212, 0.3); }
@@ -297,6 +295,12 @@
     .badge-zapsplat:hover { background: #6366f1; color: #fff; }
     .badge-oga { background: rgba(5, 150, 105, 0.15); color: #6ee7b7; border-color: rgba(5, 150, 105, 0.3); }
     .badge-oga:hover { background: #059669; color: #fff; }
+    .badge-itch { background: rgba(250, 92, 92, 0.15); color: #fca5a5; border-color: rgba(250, 92, 92, 0.3); }
+    .badge-itch:hover { background: #fa5c5c; color: #fff; }
+    .badge-fma { background: rgba(45, 212, 191, 0.15); color: #5eead4; border-color: rgba(45, 212, 191, 0.3); }
+    .badge-fma:hover { background: #2dd4bf; color: #000; }
+    .badge-incompetech { background: rgba(234, 179, 8, 0.15); color: #fde047; border-color: rgba(234, 179, 8, 0.3); }
+    .badge-incompetech:hover { background: #eab308; color: #000; }
 
     /* ドロップゾーン */
     .drop-zone {
@@ -465,7 +469,7 @@
       <div class="header-title-row">
         <h1>🎮 DartHack サウンドキュレーター</h1>
         <div class="stats-badge" id="statsBadge">
-          進捗: <strong id="statsReadyCount">0</strong> / <span id="statsTotalCount">316</span> 完了 (<span id="statsPercent">0</span>%)
+          進捗: <strong id="statsReadyCount">0</strong> / <span id="statsTotalCount">388</span> 完了 (<span id="statsPercent">0</span>%)
         </div>
       </div>
       <div class="progress-bar-container">
@@ -476,6 +480,7 @@
         <button class="filter-btn" data-filter="pending">⏳ 未設定のみ</button>
         <button class="filter-btn" data-filter="ready">✅ 確定済のみ</button>
         <span style="color: #4b5563;">|</span>
+        <button class="filter-btn" data-cat="bgm">🎵 BGM (72)</button>
         <button class="filter-btn" data-cat="combat">⚔️ 戦闘 (33)</button>
         <button class="filter-btn" data-cat="effect">効果音 (203)</button>
         <button class="filter-btn" data-cat="achievement">実績 (23)</button>
@@ -485,6 +490,14 @@
         <span style="color: #4b5563;">|</span>
         <button class="btn-audit" id="btnAuditVolumes" onclick="runVolumeAudit()">🔊 音量診断</button>
         <button class="btn-fix-all" id="btnFixAllVolumes" onclick="fixAllProblemVolumes()" style="display: none;">⚠️ 要修正音源を一括適正化</button>
+      </div>
+      <!-- BGMサブカテゴリ行（BGMカテゴリ選択時に展開） -->
+      <div class="controls-row bgm-sub-controls" id="bgmSubControls" style="display: none;">
+        <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">🎵 BGM種別:</span>
+        <button class="filter-btn bgm-subcat-btn active" data-bgm-sub="all">すべて (72)</button>
+        <button class="filter-btn bgm-subcat-btn" data-bgm-sub="floor">🏛️ フロアBGM (32)</button>
+        <button class="filter-btn bgm-subcat-btn" data-bgm-sub="room">🚪 ルームBGM (35)</button>
+        <button class="filter-btn bgm-subcat-btn" data-bgm-sub="ambience">🌊 環境音 (5)</button>
       </div>
       <!-- 戦闘サブカテゴリ行（戦闘カテゴリ選択時に展開） -->
       <div class="controls-row combat-sub-controls" id="combatSubControls" style="display: none;">
@@ -529,22 +542,30 @@
       <div class="form-group">
         <label>出典サイト</label>
         <select id="modalSourceSite">
-          <optgroup label="国内サイト">
+          <optgroup label="BGM / TRPG特化・海外サイト">
+            <option value="itch.io">itch.io (Game Assets / Dungeon Synth)</option>
+            <option value="Free Music Archive">Free Music Archive (FMA)</option>
+            <option value="Incompetech">Incompetech (Kevin MacLeod)</option>
+            <option value="Pixabay Music">Pixabay Music</option>
+            <option value="OpenGameArt.org">OpenGameArt.org (Music)</option>
+            <option value="Freesound.org">Freesound.org (Ambient Loop)</option>
+          </optgroup>
+          <optgroup label="BGM / 国内サイト">
+            <option value="甘茶の音楽工房">甘茶の音楽工房 (中世・ダンジョン)</option>
+            <option value="魔王魂">魔王魂 (RPG・ダンジョン)</option>
+            <option value="PeriTune">PeriTune (ファンタジー・民族)</option>
+          </optgroup>
+          <optgroup label="効果音・国内サイト">
             <option value="効果音ラボ">効果音ラボ</option>
             <option value="On-Jin ～音人～">On-Jin ～音人～</option>
             <option value="OtoLogic">OtoLogic</option>
             <option value="効果音辞典">効果音辞典</option>
             <option value="Springin' Sound Stock">Springin' Sound Stock</option>
-            <option value="魔王魂">魔王魂</option>
             <option value="ポケットサウンド">ポケットサウンド</option>
-            <option value="甘茶の音楽工房">甘茶の音楽工房</option>
           </optgroup>
-          <optgroup label="海外・オープン素材">
-            <option value="Pixabay">Pixabay</option>
+          <optgroup label="効果音・海外サイト">
             <option value="SoundDino">SoundDino</option>
-            <option value="Freesound.org">Freesound.org</option>
             <option value="ZapSplat">ZapSplat</option>
-            <option value="OpenGameArt.org">OpenGameArt.org</option>
             <option value="Kenney">Kenney (CC0)</option>
             <option value="FluidR3 GM (FluidSynth)">FluidR3 GM (SoundFont)</option>
           </optgroup>

@@ -279,7 +279,13 @@ class CuratorHTTPRequestHandler(BaseHTTPRequestHandler):
             temp_input.write_bytes(file_bytes)
 
             target_ogg = SOUNDS_DIR / target_item["filename"]
-            is_stereo = fields.get("is_stereo") == "true" or target_item["category"] in ["achievement", "instrument"]
+
+            is_bgm = (target_item.get("category") == "bgm" or target_item["filename"].startswith("amb_"))
+            is_stereo = (
+                fields.get("is_stereo") == "true"
+                or is_bgm
+                or target_item["category"] in ["achievement", "instrument"]
+            )
 
             # 戦闘効果音は -16.0 LUFS & 80Hzハイパスフィルター（スマホ音割れ防止・高頻度再生向け）
             is_combat = (
@@ -287,8 +293,22 @@ class CuratorHTTPRequestHandler(BaseHTTPRequestHandler):
                 or target_item["filename"].startswith("se_combat_")
                 or target_item["filename"].startswith("se_mon_")
             )
-            target_lufs = -16.0 if is_combat else -14.0
-            highpass_cutoff = 80 if is_combat else None
+
+            if is_bgm:
+                target_lufs = -18.0
+                bitrate = "96k"
+                mode = "bgm"
+                highpass_cutoff = None
+            elif is_combat:
+                target_lufs = -16.0
+                bitrate = "64k"
+                mode = "sfx"
+                highpass_cutoff = 80
+            else:
+                target_lufs = -14.0
+                bitrate = "64k"
+                mode = "auto"
+                highpass_cutoff = None
 
             # ffmpeg で無音トリム・ハイパス・EBU R128正規化・Opus変換
             success = normalize_and_convert(
@@ -296,7 +316,9 @@ class CuratorHTTPRequestHandler(BaseHTTPRequestHandler):
                 target_ogg,
                 target_lufs=target_lufs,
                 highpass_cutoff=highpass_cutoff,
-                is_stereo=is_stereo
+                is_stereo=is_stereo,
+                bitrate=bitrate,
+                mode=mode
             )
             if not success:
                 self.send_json({"error": "FFmpeg audio processing failed"}, status=500)

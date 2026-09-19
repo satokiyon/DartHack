@@ -3,6 +3,7 @@ let soundList = [];
 let currentFilter = 'all';
 let currentCategory = 'all';
 let currentCombatSub = 'all';
+let currentBgmSub = 'all';
 let searchQuery = '';
 
 let volumeDataMap = {};
@@ -12,7 +13,7 @@ let isAuditing = false;
 let activeTargetItem = null;
 let activeSelectedFile = null;
 
-// URLクエリパラメータの初期解析 (?category=combat 等)
+// URLクエリパラメータの初期解析 (?category=combat, ?category=bgm 等)
 const urlParams = new URLSearchParams(window.location.search);
 const initialCategoryParam = urlParams.get('category');
 if (initialCategoryParam) {
@@ -25,7 +26,7 @@ function extractKeywords(item) {
   if (item.keywords_ja || item.keywords_en) {
     return {
       ja: item.keywords_ja || item.description,
-      en: item.keywords_en || item.id.replace(/^(se_|sound_|ach_|sa2_|voice_)/, '').replace(/_/g, ' ')
+      en: item.keywords_en || item.id.replace(/^(se_|sound_|ach_|sa2_|voice_|amb_)/, '').replace(/_/g, ' ')
     };
   }
 
@@ -34,11 +35,11 @@ function extractKeywords(item) {
 
   // 括弧内を除去
   let cleanDesc = desc.replace(/（.*?）/g, '').replace(/\(.*?\)/g, '').trim();
-  // 「〜の音」「〜する音」などを整理
-  cleanDesc = cleanDesc.replace(/の音$/, '').replace(/する音$/, '').replace(/音$/, '').trim();
+  // 「〜の音」「〜する音」「〜のBGM」「〜の音楽」などを整理
+  cleanDesc = cleanDesc.replace(/の(音|BGM|音楽)$/, '').replace(/する音$/, '').replace(/音$/, '').trim();
 
-  // 英語IDから英単語を抽出 (se_door_open -> door open)
-  let cleanId = id.replace(/^(se_|sound_|ach_|sa2_|voice_)/, '').replace(/_/g, ' ');
+  // 英語IDから英単語を抽出 (se_door_open -> door open, amb_dungeon -> dungeon)
+  let cleanId = id.replace(/^(se_|sound_|ach_|sa2_|voice_|amb_)/, '').replace(/_/g, ' ');
 
   return {
     ja: cleanDesc || desc,
@@ -46,12 +47,31 @@ function extractKeywords(item) {
   };
 }
 
-// 13サイトの外部検索URL生成
+// 外部検索URL生成（通常効果音 13サイト / BGM特化 9サイト）
 function getSearchUrls(item) {
   const kw = extractKeywords(item);
   const qJa = encodeURIComponent(kw.ja);
   const qEn = encodeURIComponent(kw.en);
 
+  // BGM・アンビエンス用サイト (9件)
+  if (item.category === 'bgm' || item.filename.startsWith('amb_')) {
+    return {
+      // 国内フリーBGM (3件)
+      amacha: `https://www.google.com/search?q=site:amachamusic.chagasi.com+${qJa}`,
+      maou: `https://maou.audio/category/bgm/?s=${qJa}`,
+      peritune: `https://peritune.com/?s=${qJa}`,
+
+      // 海外・オープン音源 (6件)
+      itch: `https://itch.io/search?q=${qEn}+music`,
+      oga: `https://opengameart.org/art-search-advanced?keys=${qEn}&field_art_type_tid%5B%5D=12`,
+      fma: `https://freemusicarchive.org/search?adv=1&quicksearch=${qEn}`,
+      incompetech: `https://incompetech.com/music/royalty-free/music.html?keywords=${qEn}`,
+      pixabay: `https://pixabay.com/music/search/${qEn}/`,
+      freesound: `https://freesound.org/search/?q=${qEn}+ambient&f=license:%22Creative+Commons+0%22+OR+license:%22Attribution%22`
+    };
+  }
+
+  // 通常効果音用サイト (13件)
   return {
     // 国内サイト (日本語検索)
     lab: `https://soundeffect-lab.info/?s=${qJa}`,
@@ -95,6 +115,7 @@ function updateStats(stats) {
 
   if (stats.by_category) {
     const catLabels = {
+      bgm: '🎵 BGM',
       combat: '⚔️ 戦闘',
       effect: '効果音',
       achievement: '実績',
@@ -125,6 +146,9 @@ function renderCards() {
 
     // 戦闘サブカテゴリフィルタ
     if (currentCategory === 'combat' && currentCombatSub !== 'all' && item.sub_category !== currentCombatSub) return false;
+
+    // BGMサブカテゴリフィルタ
+    if (currentCategory === 'bgm' && currentBgmSub !== 'all' && item.sub_category !== currentBgmSub) return false;
 
     // 音量診断フィルタ
     if (currentVolFilter !== 'all') {
@@ -166,9 +190,12 @@ function renderCards() {
         melee: '🗡️ 近接',
         ranged: '🏹 遠隔',
         magic: '✨ 魔法',
-        monster: '🐾 モンスター'
+        monster: '🐾 モンスター',
+        floor: '🏛️ フロアBGM',
+        room: '🚪 ルームBGM',
+        ambience: '🌊 環境音'
       };
-      const label = subNames[item.sub_category] || item.sub_category;
+      const label = subNames[item.sub_category] || item.sub_category_ja || item.sub_category;
       subcatBadge = `<span class="subcat-tag ${escapeHtml(item.sub_category)}">${escapeHtml(label)}</span>`;
     }
 
@@ -231,8 +258,34 @@ function renderCards() {
         </div>
       `;
     } else {
-      bodyHtml = `
-        <div class="search-badges-container">
+      const isBgmItem = (item.category === 'bgm' || item.filename.startsWith('amb_'));
+      let badgesHtml = '';
+
+      if (isBgmItem) {
+        // BGM特化 9サイト用バッジ群
+        badgesHtml = `
+          <!-- 海外・オープン音源 (6件) -->
+          <div class="badge-group">
+            <span class="badge-group-label">🌐海外:</span>
+            <a class="btn-badge badge-itch" href="${urls.itch}" target="_blank" rel="noopener" title="itch.io (ダンジョンシンセ・ゲームBGM)">itch.io</a>
+            <a class="btn-badge badge-oga" href="${urls.oga}" target="_blank" rel="noopener" title="OpenGameArt (RPG/ファンタジーBGM)">OpenGameArt</a>
+            <a class="btn-badge badge-fma" href="${urls.fma}" target="_blank" rel="noopener" title="Free Music Archive (Dungeon Synth / Dark Ambient)">FMA</a>
+            <a class="btn-badge badge-incompetech" href="${urls.incompetech}" target="_blank" rel="noopener" title="Incompetech (TRPG/D&D定番BGM)">Incompetech</a>
+            <a class="btn-badge badge-pixabay" href="${urls.pixabay}" target="_blank" rel="noopener" title="Pixabay Music (ファンタジー・アンビエント)">Pixabay Music</a>
+            <a class="btn-badge badge-freesound" href="${urls.freesound}" target="_blank" rel="noopener" title="Freesound (アンビエント・ループ)">Freesound</a>
+          </div>
+
+          <!-- 国内フリーBGM (3件) -->
+          <div class="badge-group">
+            <span class="badge-group-label">🇯🇵国内:</span>
+            <a class="btn-badge badge-amacha" href="${urls.amacha}" target="_blank" rel="noopener" title="甘茶の音楽工房 (中世・ファンタジー・ダンジョン)">甘茶</a>
+            <a class="btn-badge badge-maou" href="${urls.maou}" target="_blank" rel="noopener" title="魔王魂 (RPGダンジョン・イベントBGM)">魔王魂</a>
+            <a class="btn-badge badge-peritune" href="${urls.peritune}" target="_blank" rel="noopener" title="PeriTune (ファンタジー・民族・アンビエント)">PeriTune</a>
+          </div>
+        `;
+      } else {
+        // 通常効果音 13サイト用バッジ群
+        badgesHtml = `
           <!-- 国内サイト (8件) -->
           <div class="badge-group">
             <span class="badge-group-label">🇯🇵国内:</span>
@@ -255,6 +308,12 @@ function renderCards() {
             <a class="btn-badge badge-zapsplat" href="${urls.zapsplat}" target="_blank" rel="noopener" title="ZapSplat (世界最大級10万音)">ZapSplat</a>
             <a class="btn-badge badge-oga" href="${urls.oga}" target="_blank" rel="noopener" title="OpenGameArt (ゲーム用オープン素材)">OpenGameArt</a>
           </div>
+        `;
+      }
+
+      bodyHtml = `
+        <div class="search-badges-container">
+          ${badgesHtml}
         </div>
         <div class="drop-zone" id="dropZone_${item.id}">
           📥 音声ファイル（WAV/MP3/OGG）をここにドロップ<br>またはクリックして選択
@@ -508,11 +567,15 @@ async function deleteSound(id) {
   }
 }
 
-// 戦闘サブコントロールバーの表示/非表示同期
-function updateCombatSubControlsVisibility() {
-  const subControls = document.getElementById('combatSubControls');
-  if (subControls) {
-    subControls.style.display = (currentCategory === 'combat') ? 'flex' : 'none';
+// サブコントロールバー（戦闘・BGM）の表示/非表示同期
+function updateSubControlsVisibility() {
+  const combatControls = document.getElementById('combatSubControls');
+  if (combatControls) {
+    combatControls.style.display = (currentCategory === 'combat') ? 'flex' : 'none';
+  }
+  const bgmControls = document.getElementById('bgmSubControls');
+  if (bgmControls) {
+    bgmControls.style.display = (currentCategory === 'bgm') ? 'flex' : 'none';
   }
 }
 
@@ -532,7 +595,7 @@ document.querySelectorAll('.filter-btn[data-filter], .filter-btn[data-cat]').for
       } else {
         currentCategory = 'all';
       }
-      updateCombatSubControlsVisibility();
+      updateSubControlsVisibility();
     }
     renderCards();
   });
@@ -544,6 +607,16 @@ document.querySelectorAll('.subcat-btn').forEach(btn => {
     document.querySelectorAll('.subcat-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentCombatSub = btn.dataset.combatSub || 'all';
+    renderCards();
+  });
+});
+
+// BGMサブカテゴリ切り替えボタン
+document.querySelectorAll('.bgm-subcat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.bgm-subcat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentBgmSub = btn.dataset.bgmSub || 'all';
     renderCards();
   });
 });
@@ -747,7 +820,7 @@ if (initialCategoryParam) {
     targetCatBtn.classList.add('active');
   }
 }
-updateCombatSubControlsVisibility();
+updateSubControlsVisibility();
 
 // 初期ロード
 loadData();

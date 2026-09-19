@@ -49,10 +49,11 @@ def normalize_and_convert(
     """
     音源を正規化・Opus変換して出力する。
     - 短音効果音（< 3.0s または mode="sfx"）:
-        先頭無音トリミング + 軽コンプレッサー + ピーク正規化 (-1.5 dBFS)
+        先頭無音トリミング (-45dB) + 軽コンプレッサー + ピーク正規化 (-1.5 dBFS)
         ※ 短音に対する loudnorm の過度な誤減衰・無音化を完全に防止する。
-    - 長尺音源（>= 3.0s または mode="bgm"）:
-        先頭無音トリミング + EBU R128 ラウドネス正規化 (loudnorm)
+    - 長尺・BGM音源（mode="bgm" または (mode="auto" and >= 3.0s)）:
+        曲頭を壊さないソフト無音処理 (-60dB) + EBU R128 ラウドネス正規化 (loudnorm)
+        ※ BGMモード時はデフォルトで target_lufs=-18.0, is_stereo=True, bitrate="96k" を推奨。
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -60,10 +61,22 @@ def normalize_and_convert(
     file_dur = duration if duration is not None else info.get("duration", 0.0)
 
     use_sfx_mode = (mode == "sfx") or (mode == "auto" and file_dur < 3.0)
+    is_bgm_mode = (mode == "bgm")
+
+    # BGMモード時のパラメータ自動補正（未指定またはデフォルト値の場合）
+    if is_bgm_mode:
+        if target_lufs == -14.0:
+            target_lufs = -18.0
+        if bitrate == "64k":
+            bitrate = "96k"
 
     base_filters = []
     # 1. 先頭の無音トリミング
-    base_filters.append("silenceremove=start_periods=1:start_duration=0.01:start_threshold=-45dB")
+    # BGMの場合は曲頭のフェードインやパッド音を切り落とさないよう -60dB の極めてソフトな閾値で処理
+    if is_bgm_mode:
+        base_filters.append("silenceremove=start_periods=1:start_duration=0.01:start_threshold=-60dB")
+    else:
+        base_filters.append("silenceremove=start_periods=1:start_duration=0.01:start_threshold=-45dB")
 
     # 2. ハイパスフィルター（任意）
     if highpass_cutoff is not None and highpass_cutoff > 0:
