@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-06.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-19.
 NetHack JP README
 
 
@@ -49,7 +49,7 @@ NetHack JP README
 
    - ./nethackW  (GUI版 X11 インターフェース - 黒背景・白文字表示)
 
-   ※ X11 GUI版のタイルセットはファイル名が「x11tiles」固定となっており、タイルの画像サイズは自動判定されます。
+   ※ X11 GUI版のタイルセットはデフォルトファイル名が「x11tiles」です。
    ※ GUI使用時に日本語や墓石の死因が文字化け（豆腐文字表示）する場合は、環境に日本語 CJK フォント（Noto Sans CJK JP 等）をインストールしてください（例: sudo apt install -y fonts-noto-cjk）。
    ※ GUI版で主人公名や各種ダイアログ（#名前、#記念碑、#虐殺 等）の日本語入力を行う場合は、fcitx5 を使用します:
       1. 必要パッケージの導入:
