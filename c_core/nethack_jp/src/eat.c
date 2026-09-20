@@ -3583,6 +3583,7 @@ newuhs(boolean incr)
 
                 /* stop what you're doing, then faint */
                 stop_occupation();
+                Soundeffect(se_hunger, 80);
                 You("空腹のあまり意識を失った.");
                 incr_itimeout(&HDeaf, duration);
                 disp.botl = TRUE;
@@ -3631,6 +3632,8 @@ newuhs(boolean incr)
 
         switch (newhs) {
         case HUNGRY:
+            if (newhs > u.uhs)
+                Soundeffect(se_hunger, 60);
             if (Hallucination) {
                 You(!incr ? "小腹が空いてきた."
                     : "お腹が空いてきた.");
@@ -3644,6 +3647,8 @@ newuhs(boolean incr)
             end_running(TRUE);
             break;
         case WEAK:
+            if (newhs > u.uhs)
+                Soundeffect(se_hunger, 70);
             if (Hallucination)
                 pline(!incr ? "まだ小腹が空いている."
               : "空腹のせいで体がうまく動かない.");

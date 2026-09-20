@@ -253,6 +253,9 @@
     seffect(kick),
     seffect(stairs_up),
     seffect(stairs_down),
+    seffect(debuff),
+    seffect(hunger),
+    seffect(force_lock),
 #undef seffect
 #endif   /* SEFFECTS_ENUM || SEFFECTS_AUTOMAP */
 

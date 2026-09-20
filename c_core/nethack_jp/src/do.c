@@ -2446,8 +2446,10 @@ set_wounded_legs(long side, int timex)
      * Caller is also responsible for adjusting messages.
      */
     disp.botl = TRUE;
-    if (!Wounded_legs)
+    if (!Wounded_legs) {
         ATEMP(A_DEX)--;
+        Soundeffect(se_debuff, 60);
+    }
 
     if (!Wounded_legs || (HWounded_legs & TIMEOUT) < (long) timex)
         set_itimeout(&HWounded_legs, (long) timex);

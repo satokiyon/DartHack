@@ -97,6 +97,8 @@ make_confused(long xtime, boolean talk)
         if (talk)
             You_feel("less %s now.", Hallucination ? "trippy" : "confused");
     }
+    if (xtime && !old)
+        Soundeffect(se_debuff, 60);
     if ((xtime && !old) || (!xtime && old))
         disp.botl = TRUE;
 
@@ -117,6 +119,7 @@ make_stunned(long xtime, boolean talk)
                      Hallucination ? "less wobbly" : "a bit steadier");
     }
     if (xtime && !old) {
+        Soundeffect(se_debuff, 60);
         if (talk) {
             if (u.usteed)
                 You("wobble in the saddle.");
@@ -151,6 +154,7 @@ make_sick(long xtime,
             return;
         if (!old) {
             /* newly sick */
+            Soundeffect(se_debuff, 60);
             You_feel("deathly sick.");
         } else {
             /* already sick */
@@ -202,6 +206,8 @@ make_slimed(long xtime, const char *msg)
 #endif
     set_itimeout(&Slimed, xtime);
     if ((xtime != 0L) ^ (old != 0L)) {
+        if (xtime && !old)
+            Soundeffect(se_debuff, 60);
         disp.botl = TRUE;
         if (msg)
             pline("%s", msg);
@@ -229,6 +235,8 @@ make_stoned(long xtime, const char *msg, int killedby, const char *killername)
 #endif
     set_itimeout(&Stoned, xtime);
     if ((xtime != 0L) ^ (old != 0L)) {
+        if (xtime && !old)
+            Soundeffect(se_debuff, 60);
         disp.botl = TRUE;
         if (msg)
             pline("%s", msg);
@@ -247,6 +255,8 @@ make_vomiting(long xtime, boolean talk)
     if (Unaware)
         talk = FALSE;
 
+    if (xtime && !old)
+        Soundeffect(se_debuff, 60);
     set_itimeout(&Vomiting, xtime);
     disp.botl = TRUE;
     if (!xtime && old)
@@ -298,6 +308,7 @@ make_blinded(long xtime, boolean talk)
     }
 
     if (u_could_see && !can_see_now) { /* losing sight */
+        Soundeffect(se_debuff, 60);
         if (talk) {
             if (Hallucination)
                 pline("Oh, bummer!  Everything is dark!  Help!");
@@ -412,6 +423,8 @@ make_hallucinated(
     }
 
     if (changed) {
+        if (xtime && !old)
+            Soundeffect(se_debuff, 60);
         /* in case we're mimicking an orange (hallucinatory form
            of mimicking gold) update the mimicking's-over message */
         if (!Hallucination)

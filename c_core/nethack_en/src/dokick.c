@@ -658,6 +658,7 @@ really_kick_object(coordxy x, coordxy y)
         container_impact_dmg(gk.kickedobj, x, y);
         if (gk.kickedobj->olocked) {
             if (!rn2(5) || (martial() && !rn2(2))) {
+                Soundeffect(se_crashing_sound, 60);
                 You("break open the lock!");
                 breakchestlock(gk.kickedobj, FALSE);
                 if (otrp)
@@ -666,6 +667,7 @@ really_kick_object(coordxy x, coordxy y)
             }
         } else {
             if (!rn2(3) || (martial() && !rn2(2))) {
+                Soundeffect(se_lid_slams_open_falls_shut, 50);
                 pline_The("lid slams open, then falls shut.");
                 gk.kickedobj->lknown = 1;
                 if (otrp)

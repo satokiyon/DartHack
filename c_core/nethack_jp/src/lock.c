@@ -132,13 +132,17 @@ picklock(void)
             if (*in_rooms(u.ux + u.dx, u.uy + u.dy, SHOPBASE))
                 add_damage(u.ux + u.dx, u.uy + u.dy, SHOP_DOOR_COST);
             newsym(u.ux + u.dx, u.uy + u.dy);
-        } else if (gx.xlock.door->doormask & D_LOCKED)
-            gx.xlock.door->doormask = D_CLOSED;
-        else
-            gx.xlock.door->doormask = D_LOCKED;
+        } else {
+            Soundeffect(se_klick, 50);
+            if (gx.xlock.door->doormask & D_LOCKED)
+                gx.xlock.door->doormask = D_CLOSED;
+            else
+                gx.xlock.door->doormask = D_LOCKED;
+        }
     } else {
         gx.xlock.box->olocked = !gx.xlock.box->olocked;
         gx.xlock.box->lknown = 1;
+        Soundeffect(se_klick, 50);
         if (gx.xlock.box->otrapped)
             (void) chest_trap(gx.xlock.box, FINGER, FALSE);
     }
@@ -152,6 +156,7 @@ breakchestlock(struct obj *box, boolean destroyit)
     if (!destroyit) { /* bill for the box but not for its contents */
         struct obj *hide_contents = box->cobj;
 
+        Soundeffect(se_force_lock, 60);
         box->cobj = 0;
         costly_alteration(box, COST_BRKLCK);
         box->cobj = hide_contents;
@@ -167,6 +172,7 @@ breakchestlock(struct obj *box, boolean destroyit)
                 peaceful_shk = costly && (boolean) shkp->mpeaceful;
         long loss = 0L;
 
+        Soundeffect(se_crashing_sound, 70);
         pline("実際のところ、%sを完全に壊してしまった.", xname(box));
         /* Put the contents on ground at the hero's feet. */
         while ((otmp = box->cobj) != 0) {
