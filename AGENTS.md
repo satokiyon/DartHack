@@ -1042,4 +1042,3 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
    - アプリ起動直後のタイトル画面から `amb_title.ogg` を即時再生させつつ、名前入力・キャラメイク・セーブデータ復元処理中に C コアから届くフロア BGM（`amb_dungeon.ogg` 等）は即時再生せず、保留変数（`_pendingFloorBgm`）に一時退避させてタイトル BGM を維持してください。
    - マップウィンドウの初回表示（ゲーム本編開始検知: `notifyMainGameStarted()`）が届いた瞬間に、保留されていたフロア BGM へのクロスフェードを開始する設計を徹底してください。
 
-
