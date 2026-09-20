@@ -161,9 +161,22 @@ class SoundManager {
 
   int _floorFadeGen = 0;
   int _roomFadeGen = 0;
+  bool _isPausedForBackground = false;
   bool _floorWasPlayingBeforeBackground = false;
   bool _roomWasPlayingBeforeBackground = false;
   bool _ambienceWasPlayingBeforeBackground = false;
+
+  @visibleForTesting
+  bool get isPausedForBackground => _isPausedForBackground;
+
+  @visibleForTesting
+  bool get floorWasPlayingBeforeBackground => _floorWasPlayingBeforeBackground;
+
+  @visibleForTesting
+  bool get roomWasPlayingBeforeBackground => _roomWasPlayingBeforeBackground;
+
+  @visibleForTesting
+  bool get ambienceWasPlayingBeforeBackground => _ambienceWasPlayingBeforeBackground;
 
   double _seVolume = 0.8;
   double _bgmVolume = 0.5;
@@ -1003,20 +1016,40 @@ class SoundManager {
   /// アプリバックグラウンド移行時の一時停止
   Future<void> pauseForBackground() async {
     try {
-      _floorWasPlayingBeforeBackground = (_activeFloorPlayer?.state == PlayerState.playing);
-      if (_floorWasPlayingBeforeBackground) {
+      // 既にバックグラウンド一時停止処理済みの場合は、後続のライフサイクル遷移（inactive -> paused 等）で
+      // 再生中フラグが false で上書きされるのを防ぐため早期リターン
+      if (_isPausedForBackground) {
+        debugPrint(
+            '[SoundMgr] pauseForBackground: already paused for background, ignoring duplicate call');
+        return;
+      }
+      _isPausedForBackground = true;
+
+      // PlayerState.playing のほか、OSの省電力制御等で先行して一時停止されていた場合
+      // （明示的に stopBgm / stopAmbience されておらず有効なサウンド名が存在する場合）も再開対象とする
+      _floorWasPlayingBeforeBackground =
+          (_activeFloorPlayer?.state == PlayerState.playing) ||
+              (_currentFloorBgm != null && hasSound(_currentFloorBgm!));
+      if (_activeFloorPlayer?.state == PlayerState.playing) {
         await _activeFloorPlayer?.pause();
       }
 
-      _roomWasPlayingBeforeBackground = (_roomBgmPlayer?.state == PlayerState.playing);
-      if (_roomWasPlayingBeforeBackground) {
+      _roomWasPlayingBeforeBackground =
+          (_roomBgmPlayer?.state == PlayerState.playing) ||
+              (_currentRoomBgm != null && hasSound(_currentRoomBgm!));
+      if (_roomBgmPlayer?.state == PlayerState.playing) {
         await _roomBgmPlayer?.pause();
       }
 
-      _ambienceWasPlayingBeforeBackground = (_ambiencePlayer?.state == PlayerState.playing);
-      if (_ambienceWasPlayingBeforeBackground) {
+      _ambienceWasPlayingBeforeBackground =
+          (_ambiencePlayer?.state == PlayerState.playing) ||
+              (_currentAmbience != null && hasSound(_currentAmbience!));
+      if (_ambiencePlayer?.state == PlayerState.playing) {
         await _ambiencePlayer?.pause();
       }
+
+      debugPrint(
+          '[SoundMgr] pauseForBackground executed (floor: $_floorWasPlayingBeforeBackground, room: $_roomWasPlayingBeforeBackground, amb: $_ambienceWasPlayingBeforeBackground)');
     } catch (e, st) {
       debugPrint('[SoundMgr] Error during pauseForBackground: $e\n$st');
     }
@@ -1025,23 +1058,37 @@ class SoundManager {
   /// アプリフォアグラウンド復帰時の再開
   Future<void> resumeFromBackground() async {
     try {
+      if (!_isPausedForBackground) {
+        debugPrint(
+            '[SoundMgr] resumeFromBackground: not paused for background, ignoring call');
+        return;
+      }
+      debugPrint(
+          '[SoundMgr] resumeFromBackground executing (floor: $_floorWasPlayingBeforeBackground, room: $_roomWasPlayingBeforeBackground, amb: $_ambienceWasPlayingBeforeBackground)');
+
       // ミュート中やカテゴリ無効化中は再開しない
       if (!_muted && _bgmEnabled) {
         // ルームBGM再生中だった場合はルームBGMを優先再開
-        if (_roomWasPlayingBeforeBackground && _currentRoomBgm != null && hasSound(_currentRoomBgm!)) {
+        if (_roomWasPlayingBeforeBackground &&
+            _currentRoomBgm != null &&
+            hasSound(_currentRoomBgm!)) {
           final player = _roomBgmPlayer;
           if (player != null) {
             await player.setReleaseMode(ReleaseMode.loop);
             await player.setVolume(_bgmVolume);
             await player.play(AssetSource('sounds/$_currentRoomBgm'));
           }
-        } else if (_floorWasPlayingBeforeBackground && _currentFloorBgm != null && hasSound(_currentFloorBgm!)) {
+        } else if (_floorWasPlayingBeforeBackground &&
+            _currentFloorBgm != null &&
+            hasSound(_currentFloorBgm!)) {
           // フロアBGM再生中だった場合はフロアBGMを直接再開（resume()は完全排除）
           await _playFloorBgmDirect(_currentFloorBgm!, _bgmVolume);
         }
       }
       if (!_muted && _ambienceEnabled) {
-        if (_ambienceWasPlayingBeforeBackground && _currentAmbience != null && hasSound(_currentAmbience!)) {
+        if (_ambienceWasPlayingBeforeBackground &&
+            _currentAmbience != null &&
+            hasSound(_currentAmbience!)) {
           final player = _ambiencePlayer;
           if (player != null) {
             await player.setReleaseMode(ReleaseMode.loop);
@@ -1053,6 +1100,7 @@ class SoundManager {
     } catch (e, st) {
       debugPrint('[SoundMgr] Error during resumeFromBackground: $e\n$st');
     } finally {
+      _isPausedForBackground = false;
       _floorWasPlayingBeforeBackground = false;
       _roomWasPlayingBeforeBackground = false;
       _ambienceWasPlayingBeforeBackground = false;
@@ -1060,6 +1108,7 @@ class SoundManager {
   }
 
   Future<void> stopAll() async {
+    _isPausedForBackground = false;
     for (final entry in _pool) {
       try {
         await entry.player.stop();

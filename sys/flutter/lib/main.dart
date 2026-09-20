@@ -983,7 +983,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+    debugPrint('[Lifecycle] AppLifecycleState changed to: $state');
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
       SoundManager.instance.pauseForBackground();
     } else if (state == AppLifecycleState.resumed) {
       SoundManager.instance.resumeFromBackground();

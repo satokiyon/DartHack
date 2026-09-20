@@ -774,6 +774,64 @@ void main() {
       // フロアBGMが正常に維持・再開されていること
       expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
     });
+
+    test('Consecutive pause calls (inactive -> paused) maintain playing state and resume correctly', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true, isMainGameStarted: true);
+      manager.registerAvailableSound('amb_dungeon.ogg');
+
+      // フロアBGM再生
+      manager.handleSoundEvent({
+        'category': 4,
+        'filename': 'amb_dungeon.ogg',
+        'text': '',
+        'volume': 100,
+        'loopOrFlag': 1,
+      });
+      expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
+
+      // 1回目の pause 呼び出し（inactive 相当）
+      await manager.pauseForBackground();
+      expect(manager.isPausedForBackground, isTrue);
+      expect(manager.floorWasPlayingBeforeBackground, isTrue);
+
+      // 2回目の pause 呼び出し（paused 相当: 重複呼び出し）
+      await manager.pauseForBackground();
+      // フラグが false に上書きされず維持されていること
+      expect(manager.isPausedForBackground, isTrue);
+      expect(manager.floorWasPlayingBeforeBackground, isTrue);
+
+      // フォアグラウンド復帰
+      await manager.resumeFromBackground();
+      expect(manager.isPausedForBackground, isFalse);
+      expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
+    });
+
+    test('Resume restores BGM when pre-paused by OS before pauseForBackground', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true, isMainGameStarted: true);
+      manager.registerAvailableSound('amb_title.ogg');
+
+      // タイトルBGM設定
+      manager.handleSoundEvent({
+        'category': 4,
+        'filename': 'amb_title.ogg',
+        'text': '',
+        'volume': 100,
+        'loopOrFlag': 1,
+      });
+      expect(manager.currentFloorBgm, 'amb_title.ogg');
+
+      // pauseForBackground 呼び出し
+      await manager.pauseForBackground();
+      expect(manager.isPausedForBackground, isTrue);
+      expect(manager.floorWasPlayingBeforeBackground, isTrue);
+
+      // 復帰
+      await manager.resumeFromBackground();
+      expect(manager.isPausedForBackground, isFalse);
+      expect(manager.currentFloorBgm, 'amb_title.ogg');
+    });
   });
 }
 
