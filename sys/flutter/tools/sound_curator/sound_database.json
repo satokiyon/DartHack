@@ -907,12 +907,12 @@
     "caller": "dokick.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
+    "status": "ready",
+    "source_site": "DartHack",
+    "author": "DartHack Sound System",
     "source_url": "",
-    "license": "",
-    "notes": "",
+    "license": "CC0",
+    "notes": "隠し扉・隠し通路蹴り開け突破音",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
@@ -943,12 +943,12 @@
     "caller": "dokick.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
+    "status": "ready",
+    "source_site": "DartHack",
+    "author": "DartHack Sound System",
     "source_url": "",
-    "license": "",
-    "notes": "",
+    "license": "CC0",
+    "notes": "玉座蹴り倒し粉砕音",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
@@ -1030,15 +1030,15 @@
     "filename": "se_crashing_sound.ogg",
     "id": "se_crashing_sound",
     "description": "激しい衝突・破壊音（ドアや施錠装置の破壊）",
-    "caller": "lock.c",
+    "caller": "dokick.c, lock.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
+    "status": "ready",
+    "source_site": "DartHack",
+    "author": "DartHack Sound System",
     "source_url": "",
-    "license": "",
-    "notes": "",
+    "license": "CC0",
+    "notes": "宝箱錠前破壊・施錠装置破壊音",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
@@ -1195,11 +1195,11 @@
     "caller": "monmove.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "自作 / その他",
     "author": "",
     "source_url": "",
-    "license": "",
+    "license": "CC0 (Public Domain)",
     "notes": "",
     "sub_category_ja": "",
     "keywords_ja": "",
@@ -1609,11 +1609,11 @@
     "caller": "music.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "Pixabay Music",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://pixabay.com/sound-effects/",
+    "license": "Pixabay Content License（商用可・ゲーム組込可・クレジット不要）",
     "notes": "",
     "sub_category_ja": "",
     "keywords_ja": "",
@@ -1645,11 +1645,11 @@
     "caller": "dokick.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "Pixabay Music",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://pixabay.com/sound-effects/",
+    "license": "Pixabay Content License（商用可・ゲーム組込可・クレジット不要）",
     "notes": "",
     "sub_category_ja": "",
     "keywords_ja": "",
@@ -1663,7 +1663,7 @@
     "caller": "dokick.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "ready",
+    "status": "pending",
     "source_site": "",
     "author": "",
     "source_url": "",
@@ -2052,36 +2052,36 @@
     "keywords_en": ""
   },
   {
-    "no": 115,
+    "no": 240,
     "filename": "se_kick_door_it_crashes_open.ogg",
     "id": "se_kick_door_it_crashes_open",
-    "description": "蹴りによりドアがドカンと開く音",
+    "description": "ドアを蹴って勢いよく開けた時の音",
     "caller": "dokick.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
+    "status": "ready",
+    "source_site": "DartHack",
+    "author": "DartHack Sound System",
     "source_url": "",
-    "license": "",
-    "notes": "",
+    "license": "CC0",
+    "notes": "蹴り衝撃＋急開扉音",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
   },
   {
-    "no": 116,
+    "no": 241,
     "filename": "se_kick_door_it_shatters.ogg",
     "id": "se_kick_door_it_shatters",
-    "description": "蹴りによりドアが粉々にバリーンと砕ける音",
+    "description": "ドアを蹴って完全に粉砕した時の音",
     "caller": "dokick.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
+    "status": "ready",
+    "source_site": "OtoLogic",
+    "author": "OtoLogic",
+    "source_url": "https://otologic.jp/",
+    "license": "OtoLogic利用規約（CC BY 4.0 / クレジット表記）",
     "notes": "",
     "sub_category_ja": "",
     "keywords_ja": "",
@@ -2095,11 +2095,11 @@
     "caller": "lock.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "Pixabay Music",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://pixabay.com/sound-effects/",
+    "license": "Pixabay Content License（商用可・ゲーム組込可・クレジット不要）",
     "notes": "",
     "sub_category_ja": "",
     "keywords_ja": "",
@@ -2164,15 +2164,15 @@
     "filename": "se_lid_slams_open_falls_shut.ogg",
     "id": "se_lid_slams_open_falls_shut",
     "description": "箱の蓋がガタンと開き、ズンと閉まる音",
-    "caller": "予備（直接呼び出しなし）",
+    "caller": "dokick.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
+    "status": "ready",
+    "source_site": "DartHack",
+    "author": "DartHack Sound System",
     "source_url": "",
-    "license": "",
-    "notes": "",
+    "license": "CC0",
+    "notes": "箱ふた跳ね上がり＋バタン閉扉音",
     "sub_category_ja": "",
     "keywords_ja": "",
     "keywords_en": ""
@@ -3499,11 +3499,11 @@
     "caller": "music.c",
     "category": "effect",
     "sub_category": "Soundeffect",
-    "status": "pending",
-    "source_site": "",
+    "status": "ready",
+    "source_site": "Pixabay Music",
     "author": "",
-    "source_url": "",
-    "license": "",
+    "source_url": "https://pixabay.com/sound-effects/",
+    "license": "Pixabay Content License（商用可・ゲーム組込可・クレジット不要）",
     "notes": "",
     "sub_category_ja": "",
     "keywords_ja": "",
@@ -4299,6 +4299,96 @@
     "author": "Howlling-Indicator",
     "source_url": "https://howlingindicator.net/stair/",
     "license": "その他",
+    "notes": ""
+  },
+  {
+    "no": 240,
+    "filename": "se_kick_door_it_crashes_open.ogg",
+    "id": "se_kick_door_it_crashes_open",
+    "description": "ドアを蹴って勢いよく開けた時の音",
+    "caller": "dokick.c",
+    "category": "effect",
+    "sub_category": "Soundeffect",
+    "status": "ready",
+    "source_site": "DartHack",
+    "author": "DartHack Sound System",
+    "source_url": "",
+    "license": "CC0",
+    "notes": "蹴り衝撃＋急開扉音",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
+  },
+  {
+    "no": 241,
+    "filename": "se_kick_door_it_shatters.ogg",
+    "id": "se_kick_door_it_shatters",
+    "description": "ドアを蹴って完全に粉砕した時の音",
+    "caller": "dokick.c",
+    "category": "effect",
+    "sub_category": "Soundeffect",
+    "status": "ready",
+    "source_site": "OtoLogic",
+    "author": "OtoLogic",
+    "source_url": "https://otologic.jp/",
+    "license": "OtoLogic利用規約（CC BY 4.0 / クレジット表記）",
+    "notes": "",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
+  },
+  {
+    "no": 242,
+    "filename": "se_debuff.ogg",
+    "id": "se_debuff",
+    "description": "状態異常（デバフ）を受けた時のトーンダウン下降音",
+    "caller": "potion.c, do.c",
+    "category": "effect",
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": "",
+    "status": "ready",
+    "source_site": "",
+    "author": "",
+    "source_url": "",
+    "license": "",
+    "notes": ""
+  },
+  {
+    "no": 243,
+    "filename": "se_hunger.ogg",
+    "id": "se_hunger",
+    "description": "空腹状態（Hungry, Weak, Fainting）悪化時のお腹の音",
+    "caller": "eat.c",
+    "category": "effect",
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": "",
+    "status": "ready",
+    "source_site": "",
+    "author": "",
+    "source_url": "",
+    "license": "",
+    "notes": ""
+  },
+  {
+    "no": 244,
+    "filename": "se_force_lock.ogg",
+    "id": "se_force_lock",
+    "description": "箱の鍵を無理やりこじ開けた時の力強い破断音",
+    "caller": "lock.c",
+    "category": "effect",
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": "",
+    "status": "ready",
+    "source_site": "Pixabay Music",
+    "author": "",
+    "source_url": "https://pixabay.com/sound-effects/",
+    "license": "Pixabay Content License（商用可・ゲーム組込可・クレジット不要）",
     "notes": ""
   },
   {
@@ -5659,11 +5749,11 @@
     "caller": "apply.c, shk.c",
     "category": "voice",
     "sub_category": "SetVoice",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
+    "status": "ready",
+    "source_site": "OtoLogic",
+    "author": "OtoLogic",
+    "source_url": "https://otologic.jp/",
+    "license": "OtoLogic利用規約（CC BY 4.0 / クレジット表記）",
     "notes": "",
     "sub_category_ja": "",
     "keywords_ja": "",
@@ -5688,7 +5778,7 @@
     "keywords_en": ""
   },
   {
-    "no": 317,
+    "no": 322,
     "filename": "amb_dungeon.ogg",
     "id": "amb_dungeon",
     "description": "運命の大迷宮（通常フロア）の環境BGM。暗く湿った地下迷宮の反響音。",
@@ -5699,14 +5789,14 @@
     "keywords_ja": "ダンジョン 地下迷宮 アンビエント ダンジョンシンセ 暗闇",
     "keywords_en": "dungeon synth dark underground cavern dungeon ambient",
     "status": "ready",
-    "source_site": "OpenGameArt.org",
-    "author": "",
-    "source_url": "https://opengameart.org/",
-    "license": "CC0 (Public Domain)",
+    "source_site": "自作 / その他",
+    "author": "Gemini　Music",
+    "source_url": "https://gemini.google.com/",
+    "license": "その他",
     "notes": ""
   },
   {
-    "no": 318,
+    "no": 323,
     "filename": "amb_mines.ogg",
     "id": "amb_mines",
     "description": "ノームの鉱山の環境BGM。ツルハシの遠い打撃音や岩盤の軋み。",
@@ -5716,15 +5806,15 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "鉱山 洞窟 地下 ドワーフ つるはし 岩盤",
     "keywords_en": "dwarven mines cavern underground rock mining ambient",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
+    "status": "ready",
+    "source_site": "自作 / その他",
+    "author": "Alexander Nakarada",
+    "source_url": "https://creatorchords.com/",
+    "license": "CC-BY 4.0",
     "notes": ""
   },
   {
-    "no": 319,
+    "no": 324,
     "filename": "amb_sokoban.ogg",
     "id": "amb_sokoban",
     "description": "倉庫番の環境BGM。パズルに集中できる静かで整然とした旋律。",
@@ -5734,15 +5824,15 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "倉庫番 パズル 思考 穏やか 静寂 神秘",
     "keywords_en": "puzzle peaceful calm ambient fantasy thinking mystery",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
+    "status": "ready",
+    "source_site": "Pixabay Music",
+    "author": "nojisuma",
+    "source_url": "https://pixabay.com/music/",
+    "license": "Pixabay Content License（商用可・ゲーム組込可・クレジット不要）",
     "notes": ""
   },
   {
-    "no": 320,
+    "no": 325,
     "filename": "amb_quest.ogg",
     "id": "amb_quest",
     "description": "クエスト階層の環境BGM。各職業の試練にふさわしい緊張感ある音楽。",
@@ -5752,15 +5842,15 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "クエスト 試練 冒険 ファンタジー 緊張 英雄",
     "keywords_en": "quest adventure epic tension fantasy trial synth",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
+    "status": "ready",
+    "source_site": "自作 / その他",
+    "author": "Alexander Nakarada",
+    "source_url": "https://creatorchords.com/",
+    "license": "CC-BY 4.0",
     "notes": ""
   },
   {
-    "no": 321,
+    "no": 326,
     "filename": "amb_gehennom.ogg",
     "id": "amb_gehennom",
     "description": "ゲヘナ（地獄）の環境BGM。低く重苦しい唸り音、業火の気配。",
@@ -5778,7 +5868,7 @@
     "notes": ""
   },
   {
-    "no": 322,
+    "no": 327,
     "filename": "amb_vlad.ogg",
     "id": "amb_vlad",
     "description": "ヴラドの塔の環境BGM。ゴシック調の冷徹で不気味な旋律。",
@@ -5796,7 +5886,7 @@
     "notes": ""
   },
   {
-    "no": 323,
+    "no": 328,
     "filename": "amb_ludios.ogg",
     "id": "amb_ludios",
     "description": "ルーディオス砦（Fort Ludios）のBGM。金塊と富に満ちた豪華な要塞の音楽。",
@@ -5814,7 +5904,7 @@
     "notes": ""
   },
   {
-    "no": 324,
+    "no": 329,
     "filename": "amb_tutorial.ogg",
     "id": "amb_tutorial",
     "description": "チュートリアル階層のBGM。初心者向けの穏やかで教導的な旋律。",
@@ -5824,15 +5914,15 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "チュートリアル 初心者 穏やか 旅立ち 平穏 アコースティック",
     "keywords_en": "tutorial beginner calm gentle acoustic adventure pleasant",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
+    "status": "ready",
+    "source_site": "Pixabay Music",
+    "author": " Kaden_Cook",
+    "source_url": "https://pixabay.com/music/",
+    "license": "Pixabay Content License（商用可・ゲーム組込可・クレジット不要）",
     "notes": ""
   },
   {
-    "no": 325,
+    "no": 330,
     "filename": "amb_oracle.ogg",
     "id": "amb_oracle",
     "description": "デルフィの神託所フロア（oracle）。全域に漂う神託の静寂と神秘的な気配。",
@@ -5850,7 +5940,7 @@
     "notes": ""
   },
   {
-    "no": 326,
+    "no": 331,
     "filename": "amb_rogue.ogg",
     "id": "amb_rogue",
     "description": "ローグ階層（rogue）。初代Rogueを彷彿とさせるレトロな8bitチップチューン調の旋律。",
@@ -5868,7 +5958,7 @@
     "notes": ""
   },
   {
-    "no": 327,
+    "no": 332,
     "filename": "amb_bigroom.ogg",
     "id": "amb_bigroom",
     "description": "大部屋階層（bigrm）。見渡す限りの広大な空間に反響する不穏な風音。",
@@ -5886,7 +5976,7 @@
     "notes": ""
   },
   {
-    "no": 328,
+    "no": 333,
     "filename": "amb_medusa.ogg",
     "id": "amb_medusa",
     "description": "メデューサの島（medusa）。水に閉ざされた孤島、石化の恐怖を煽る緊迫した旋律。",
@@ -5904,7 +5994,7 @@
     "notes": ""
   },
   {
-    "no": 329,
+    "no": 334,
     "filename": "amb_castle.ogg",
     "id": "amb_castle",
     "description": "城・要塞（castle / Stronghold）。跳ね橋、堀、ドラゴンの護衛が待ち受ける壮大かつ重厚な城塞BGM。",
@@ -5922,7 +6012,7 @@
     "notes": ""
   },
   {
-    "no": 330,
+    "no": 335,
     "filename": "amb_town.ogg",
     "id": "amb_town",
     "description": "ミナタウン（鉱山町 / minetn）。活気のある市場、寺院、居住区の喧騒。",
@@ -5932,15 +6022,15 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "町 市場 酒場 活気 賑やか 中世 街",
     "keywords_en": "town village tavern market medieval folk lively",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
+    "status": "ready",
+    "source_site": "自作 / その他",
+    "author": "Alexander Nakarada",
+    "source_url": "https://creatorchords.com/",
+    "license": "CC-BY 4.0",
     "notes": ""
   },
   {
-    "no": 331,
+    "no": 336,
     "filename": "amb_minend.ogg",
     "id": "amb_minend",
     "description": "鉱山最下層（minend）。鉱脈の最深部、眩い宝石の輝きと危険なモンスターの気配。",
@@ -5950,15 +6040,15 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "鉱山最深部 宝石 輝き 危険 深層 洞窟",
     "keywords_en": "deep mines crystal gem dangerous cavern synth ambient",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
+    "status": "ready",
+    "source_site": "自作 / その他",
+    "author": "Gemini　Music",
+    "source_url": "https://gemini.google.com/",
+    "license": "その他",
     "notes": ""
   },
   {
-    "no": 332,
+    "no": 337,
     "filename": "amb_sokoend.ogg",
     "id": "amb_sokoend",
     "description": "倉庫番最上階（soko4）。難関パズルを突破した達成感と賞品部屋の清々しい旋律。",
@@ -5976,7 +6066,7 @@
     "notes": ""
   },
   {
-    "no": 333,
+    "no": 338,
     "filename": "amb_quest_nemesis.ogg",
     "id": "amb_quest_nemesis",
     "description": "クエスト宿敵の階層（x-goal）。アーティファクトを奪還するためのボス決戦BGM。",
@@ -5986,15 +6076,15 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "ボス決戦 宿敵 最終決戦 激闘 オーケストラ 壮絶",
     "keywords_en": "boss battle nemesis epic combat dark orchestral showdown",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
+    "status": "ready",
+    "source_site": "自作 / その他",
+    "author": "Alexander Nakarada",
+    "source_url": "https://creatorchords.com/",
+    "license": "CC-BY 4.0",
     "notes": ""
   },
   {
-    "no": 334,
+    "no": 339,
     "filename": "amb_valley.ogg",
     "id": "amb_valley",
     "description": "死の谷（valley）。ゲヘナの入口に広がるアンデッドの墓場。荒涼とした絶望の旋律。",
@@ -6012,7 +6102,7 @@
     "notes": ""
   },
   {
-    "no": 335,
+    "no": 340,
     "filename": "amb_juiblex.ogg",
     "id": "amb_juiblex",
     "description": "ジュピレクスの沼地（juiblex）。毒泥とスライムに覆われた腐敗と溶解の不気味な旋律。",
@@ -6030,7 +6120,7 @@
     "notes": ""
   },
   {
-    "no": 336,
+    "no": 341,
     "filename": "amb_baalzebub.ogg",
     "id": "amb_baalzebub",
     "description": "ベルゼブブの住居（baalz）。蝿の王が支配する沼と不快な羽音の混じる悪魔的音楽。",
@@ -6048,7 +6138,7 @@
     "notes": ""
   },
   {
-    "no": 337,
+    "no": 342,
     "filename": "amb_asmodeus.ogg",
     "id": "amb_asmodeus",
     "description": "アスモデウスの宮殿（asmodeus）。地獄の高位貴族にふさわしい威厳と邪悪に満ちた旋律。",
@@ -6066,7 +6156,7 @@
     "notes": ""
   },
   {
-    "no": 338,
+    "no": 343,
     "filename": "amb_orcus.ogg",
     "id": "amb_orcus",
     "description": "オルクスの町（orcus）。死霊の王オルクスが支配する廃墟の町。",
@@ -6084,7 +6174,7 @@
     "notes": ""
   },
   {
-    "no": 339,
+    "no": 344,
     "filename": "amb_wizard_tower.ogg",
     "id": "amb_wizard_tower",
     "description": "イェンダーの魔法使いの塔（wizard1〜wizard3）。神秘的かつ狂気じみた実験棟の旋律。",
@@ -6102,7 +6192,7 @@
     "notes": ""
   },
   {
-    "no": 340,
+    "no": 345,
     "filename": "amb_fakewiz.ogg",
     "id": "amb_fakewiz",
     "description": "偽の魔法使いの塔（fakewiz1, fakewiz2）。本物と酷似しつつも何かが欠落した不穏な音楽。",
@@ -6120,7 +6210,7 @@
     "notes": ""
   },
   {
-    "no": 341,
+    "no": 346,
     "filename": "amb_sanctum.ogg",
     "id": "amb_sanctum",
     "description": "モロクの聖所（sanctum）。モロクの高司祭が魔除けを守る最深聖域。冒涜的かつ荘厳な大聖堂の旋律。",
@@ -6130,15 +6220,15 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "モロク 聖所 聖域 大聖堂 冒涜 祭壇 終末",
     "keywords_en": "sanctum moloch cathedral dark chant profane high priest doom",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
+    "status": "ready",
+    "source_site": "Pixabay Music",
+    "author": " VifotoFreeSounds",
+    "source_url": "https://pixabay.com/music/",
+    "license": "Pixabay Content License（商用可・ゲーム組込可・クレジット不要）",
     "notes": ""
   },
   {
-    "no": 342,
+    "no": 347,
     "filename": "amb_plane_earth.ogg",
     "id": "amb_plane_earth",
     "description": "土の精霊界（earth）。迷路のような固い岩盤を掘り進む重低音の響き。",
@@ -6156,7 +6246,7 @@
     "notes": ""
   },
   {
-    "no": 343,
+    "no": 348,
     "filename": "amb_plane_air.ogg",
     "id": "amb_plane_air",
     "description": "風の精霊界（air）。吹きすさぶ暴風と雷雲が渦巻く疾風の音楽。",
@@ -6166,15 +6256,15 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "風の精霊界 暴風 疾風 雷雲 嵐 浮遊 空",
     "keywords_en": "plane of air storm whirlwind tempest thunder sky elemental",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
+    "status": "ready",
+    "source_site": "自作 / その他",
+    "author": "Alexander Nakarada",
+    "source_url": "https://creatorchords.com/",
+    "license": "CC-BY 4.0",
     "notes": ""
   },
   {
-    "no": 344,
+    "no": 349,
     "filename": "amb_plane_fire.ogg",
     "id": "amb_plane_fire",
     "description": "火の精霊界（fire）。煮えたぎる灼熱の業火と紅蓮の旋律。",
@@ -6192,7 +6282,7 @@
     "notes": ""
   },
   {
-    "no": 345,
+    "no": 350,
     "filename": "amb_plane_water.ogg",
     "id": "amb_plane_water",
     "description": "水の精霊界（water）。漂う気泡と水中を彷徨う深海のような幻想的BGM。",
@@ -6210,7 +6300,7 @@
     "notes": ""
   },
   {
-    "no": 346,
+    "no": 351,
     "filename": "amb_astral.ogg",
     "id": "amb_astral",
     "description": "アストラル界（astral）。3つの祭壇と黙示録の騎士たちが待ち受ける神聖かつ超越的な最終決戦BGM。",
@@ -6220,15 +6310,15 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "アストラル界 昇天 最終決戦 神聖 黙示録 祭壇 壮大",
     "keywords_en": "astral plane celestial final battle epic sacred transcendence choir",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
+    "status": "ready",
+    "source_site": "自作 / その他",
+    "author": "Alexander Nakarada",
+    "source_url": "https://creatorchords.com/",
+    "license": "CC-BY 4.0",
     "notes": ""
   },
   {
-    "no": 347,
+    "no": 352,
     "filename": "amb_title.ogg",
     "id": "amb_title",
     "description": "タイトル画面BGM。冒険の旅立ちを予感させるオープニングテーマ。",
@@ -6239,14 +6329,14 @@
     "keywords_ja": "タイトル オープニング 冒険 旅立ち ファンタジー メインテーマ",
     "keywords_en": "title theme opening adventure fantasy prologue heroic synth",
     "status": "ready",
-    "source_site": "魔王魂",
-    "author": "魔王魂",
-    "source_url": "https://maou.audio/",
-    "license": "魔王魂利用規約（商用可・クレジット表記）",
+    "source_site": "自作 / その他",
+    "author": "Alexander Nakarada",
+    "source_url": "https://creatorchords.com/",
+    "license": "CC-BY 4.0",
     "notes": ""
   },
   {
-    "no": 348,
+    "no": 353,
     "filename": "amb_gameover.ogg",
     "id": "amb_gameover",
     "description": "ゲームオーバー・昇天BGM。戦いを終えた冒険者に捧げる鎮魂曲（または勝利の讃歌）。",
@@ -6257,14 +6347,14 @@
     "keywords_ja": "ゲームオーバー 墓標 鎮魂曲 レクイエム 哀愁 昇天",
     "keywords_en": "game over requiem death sad tombstone memorial mournful",
     "status": "ready",
-    "source_site": "魔王魂",
-    "author": "魔王魂",
-    "source_url": "https://maou.audio/",
-    "license": "魔王魂利用規約（商用可・クレジット表記）",
+    "source_site": "PeriTune",
+    "author": "",
+    "source_url": "https://peritune.com/blog/2019/11/10/pray_organ2/",
+    "license": "CC-BY 4.0",
     "notes": ""
   },
   {
-    "no": 349,
+    "no": 354,
     "filename": "amb_water.ogg",
     "id": "amb_water",
     "description": "水辺・噴水の環境音。水が湧き出る音、せせらぎ。",
@@ -6282,7 +6372,7 @@
     "notes": ""
   },
   {
-    "no": 350,
+    "no": 355,
     "filename": "amb_lava.ogg",
     "id": "amb_lava",
     "description": "溶岩地帯・火の精霊界の環境音。マグマの煮えたぎるボコボコという音。",
@@ -6300,7 +6390,7 @@
     "notes": ""
   },
   {
-    "no": 351,
+    "no": 356,
     "filename": "amb_wind.ogg",
     "id": "amb_wind",
     "description": "風の精霊界・吹き抜け通路の環境音。吹きすさぶ突風の轟音。",
@@ -6318,7 +6408,7 @@
     "notes": ""
   },
   {
-    "no": 352,
+    "no": 357,
     "filename": "amb_rain.ogg",
     "id": "amb_rain",
     "description": "雨天・天井からの水滴の環境音。絶え間ない滴りと湿気。",
@@ -6336,7 +6426,7 @@
     "notes": ""
   },
   {
-    "no": 353,
+    "no": 358,
     "filename": "amb_swamp.ogg",
     "id": "amb_swamp",
     "description": "沼地・ジュピレクス階層の環境音。腐敗した泥の気泡音、毒気の泡立ち。",
@@ -6354,7 +6444,7 @@
     "notes": ""
   },
   {
-    "no": 354,
+    "no": 359,
     "filename": "amb_in_a_shop.ogg",
     "id": "amb_in_a_shop",
     "description": "店内の音楽。店主の気配、小銭の触れ合う音、陳列棚のざわめき。",
@@ -6372,7 +6462,7 @@
     "notes": ""
   },
   {
-    "no": 355,
+    "no": 360,
     "filename": "amb_inside_temple.ogg",
     "id": "amb_inside_temple",
     "description": "寺院内の音楽。荘厳なチャント（聖歌）、パイプオルガンの残響、鈴の音。",
@@ -6390,7 +6480,7 @@
     "notes": ""
   },
   {
-    "no": 356,
+    "no": 361,
     "filename": "amb_inside_vault.ogg",
     "id": "amb_inside_vault",
     "description": "金庫室の音楽・環境音。密閉された石壁の完全な静寂と金貨の山。",
@@ -6408,7 +6498,7 @@
     "notes": ""
   },
   {
-    "no": 357,
+    "no": 362,
     "filename": "amb_approaching_oracle.ogg",
     "id": "amb_approaching_oracle",
     "description": "デルフィの神託所。瞑想を誘う神秘的な波動、澄んだチャイム音。",
@@ -6418,7 +6508,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "神託所 預言者 瞑想 チャイム 神秘 澄んだ音",
     "keywords_en": "oracle mystic meditation bells chime sacred ethereal",
-    "status": "pending",
+    "status": "ready",
     "source_site": "",
     "author": "",
     "source_url": "",
@@ -6426,7 +6516,7 @@
     "notes": ""
   },
   {
-    "no": 358,
+    "no": 363,
     "filename": "amb_in_a_court.ogg",
     "id": "amb_in_a_court",
     "description": "王座の間（宮廷）。優雅な宮廷音楽、トランペットのファンファーレ、貴族のざわめき。",
@@ -6444,7 +6534,7 @@
     "notes": ""
   },
   {
-    "no": 359,
+    "no": 364,
     "filename": "amb_in_a_barracks.ogg",
     "id": "amb_in_a_barracks",
     "description": "兵舎の音楽。兵士たちの軍靴の行進音、武器や鎧の擦れる音。",
@@ -6462,7 +6552,7 @@
     "notes": ""
   },
   {
-    "no": 360,
+    "no": 365,
     "filename": "amb_in_a_zoo.ogg",
     "id": "amb_in_a_zoo",
     "description": "動物園（モンスター部屋）。様々な野獣の唸り声、咆哮、檻の軋み。",
@@ -6480,7 +6570,7 @@
     "notes": ""
   },
   {
-    "no": 361,
+    "no": 366,
     "filename": "amb_in_a_beehive.ogg",
     "id": "amb_in_a_beehive",
     "description": "蜂の巣の部屋。無数の巨大蜂が飛び交うブーンという不穏な羽音の調べ。",
@@ -6498,7 +6588,7 @@
     "notes": ""
   },
   {
-    "no": 362,
+    "no": 367,
     "filename": "amb_inside_anthole.ogg",
     "id": "amb_inside_anthole",
     "description": "蟻塚の部屋。無数の巨大蟻が壁を這い回るカサカサという足音の調べ。",
@@ -6516,7 +6606,7 @@
     "notes": ""
   },
   {
-    "no": 363,
+    "no": 368,
     "filename": "amb_inside_leprehall.ogg",
     "id": "amb_inside_leprehall",
     "description": "レプラコーンの広間。陽気で小気味よいアイリッシュジグ、硬貨を数える音、いたずらっぽい忍び笑い。",
@@ -6534,7 +6624,7 @@
     "notes": ""
   },
   {
-    "no": 364,
+    "no": 369,
     "filename": "amb_in_a_morgue.ogg",
     "id": "amb_in_a_morgue",
     "description": "死体置き場。冷え切った空気、腐臭、死霊の囁き、石棺のきしみ。",
@@ -6552,7 +6642,7 @@
     "notes": ""
   },
   {
-    "no": 365,
+    "no": 370,
     "filename": "amb_in_cemetery.ogg",
     "id": "amb_in_cemetery",
     "description": "墓地（死者の部屋）。夜風のうめき声、墓石の陰から聞こえる微かな怨嗟。",
@@ -6570,7 +6660,7 @@
     "notes": ""
   },
   {
-    "no": 366,
+    "no": 371,
     "filename": "amb_in_a_cockatrice_nest.ogg",
     "id": "amb_in_a_cockatrice_nest",
     "description": "コカトリスの巣。石化の気配、乾燥した鱗の擦れる不気味な旋律。",
@@ -6588,7 +6678,7 @@
     "notes": ""
   },
   {
-    "no": 367,
+    "no": 372,
     "filename": "amb_in_a_lemure_pit.ogg",
     "id": "amb_in_a_lemure_pit",
     "description": "レムレースの穴。地獄の亡者たちの絶え間ない苦痛の呻きと叫びの旋律。",
@@ -6606,7 +6696,7 @@
     "notes": ""
   },
   {
-    "no": 368,
+    "no": 373,
     "filename": "amb_in_a_migot_nest.ogg",
     "id": "amb_in_a_migot_nest",
     "description": "ミ＝ゴの巣。異形の羽音、理解不能な宇宙的テレパシーノイズ。",
@@ -6616,15 +6706,15 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "ミゴ クトゥルフ 異形 宇宙的 狂気 羽音 ノイズ",
     "keywords_en": "mi-go lovecraftian cosmic horror alien hive weird drone",
-    "status": "pending",
-    "source_site": "",
-    "author": "",
-    "source_url": "",
-    "license": "",
+    "status": "ready",
+    "source_site": "Pixabay Music",
+    "author": " Composiia",
+    "source_url": "https://pixabay.com/music/",
+    "license": "Pixabay Content License（商用可・ゲーム組込可・クレジット不要）",
     "notes": ""
   },
   {
-    "no": 369,
+    "no": 374,
     "filename": "amb_in_a_black_market.ogg",
     "id": "amb_in_a_black_market",
     "description": "闇市の音楽。怪しげな密売人たちの囁き、違法取引の喧騒。",
@@ -6642,7 +6732,7 @@
     "notes": ""
   },
   {
-    "no": 370,
+    "no": 375,
     "filename": "amb_in_swamp_room.ogg",
     "id": "amb_in_swamp_room",
     "description": "沼地部屋の音楽。淀んだ泥水のぬかるみ、不穏な泡立ちと湿地帯の気配。",
@@ -6660,7 +6750,7 @@
     "notes": ""
   },
   {
-    "no": 371,
+    "no": 376,
     "filename": "amb_theme_nymph_garden.ogg",
     "id": "amb_theme_nymph_garden",
     "description": "ニンフの園（Garden）。魅惑的で穏やかな竪琴の調べ、妖精の寝息やささやき、噴水のせせらぎ。",
@@ -6678,7 +6768,7 @@
     "notes": ""
   },
   {
-    "no": 372,
+    "no": 377,
     "filename": "amb_theme_spider_nest.ogg",
     "id": "amb_theme_spider_nest",
     "description": "蜘蛛の巣窟（Spider nest）。無数の蜘蛛が糸を張り巡らせる音、壁を這い回る不気味なカサカサ音。",
@@ -6696,7 +6786,7 @@
     "notes": ""
   },
   {
-    "no": 373,
+    "no": 378,
     "filename": "amb_theme_ice_room.ogg",
     "id": "amb_theme_ice_room",
     "description": "氷の部屋（Ice room）。凍てつく寒風の吹きすさぶ音、氷が軋んで割れる音、冷気の残響。",
@@ -6714,7 +6804,7 @@
     "notes": ""
   },
   {
-    "no": 374,
+    "no": 379,
     "filename": "amb_theme_cloud_room.ogg",
     "id": "amb_theme_cloud_room",
     "description": "雲・霧の部屋（Cloud room）。濃霧が立ち込める深い静寂、シューと噴き出す蒸気やガス雲の音。",
@@ -6732,7 +6822,7 @@
     "notes": ""
   },
   {
-    "no": 375,
+    "no": 380,
     "filename": "amb_theme_boulder_room.ogg",
     "id": "amb_theme_boulder_room",
     "description": "巨石の部屋（Boulder room）。ゴロゴロと重く転がる巨大岩の地響き、落石の軋み。",
@@ -6750,7 +6840,7 @@
     "notes": ""
   },
   {
-    "no": 376,
+    "no": 381,
     "filename": "amb_theme_trap_room.ogg",
     "id": "amb_theme_trap_room",
     "description": "トラップ部屋（Trap room）。カチリと作動する微かな機械歯車の回転音、張り詰めた緊張感。",
@@ -6768,7 +6858,7 @@
     "notes": ""
   },
   {
-    "no": 377,
+    "no": 382,
     "filename": "amb_theme_buried_treasure.ogg",
     "id": "amb_theme_buried_treasure",
     "description": "埋没財宝の部屋（Buried treasure）。地下深くから漂う金属的な金貨の共鳴、宝箱の鍵が軋む微かな音。",
@@ -6786,7 +6876,7 @@
     "notes": ""
   },
   {
-    "no": 378,
+    "no": 383,
     "filename": "amb_theme_buried_zombies.ogg",
     "id": "amb_theme_buried_zombies",
     "description": "蠢く土葬室（Buried zombies）。土中から聞こえる爪で土を掻き分ける音、蘇生しつつある死者の呻き。",
@@ -6804,7 +6894,7 @@
     "notes": ""
   },
   {
-    "no": 379,
+    "no": 384,
     "filename": "amb_theme_massacre.ogg",
     "id": "amb_theme_massacre",
     "description": "大虐殺跡（Massacre）。血生臭い風音、死霊たちの無念の怨嗟、飛び交うハエの羽音。",
@@ -6822,7 +6912,7 @@
     "notes": ""
   },
   {
-    "no": 380,
+    "no": 385,
     "filename": "amb_theme_statuary.ogg",
     "id": "amb_theme_statuary",
     "description": "彫像展示室（Statuary）。冷徹な石像が並ぶ静けさ、時折石像が視線を向けたかのような石の擦れる音。",
@@ -6840,7 +6930,7 @@
     "notes": ""
   },
   {
-    "no": 381,
+    "no": 386,
     "filename": "amb_theme_light_source.ogg",
     "id": "amb_theme_light_source",
     "description": "暗闇の灯火（Light source）。パチパチと静かに爆ぜる油灯の炎の音、温かな光の気配。",
@@ -6858,7 +6948,7 @@
     "notes": ""
   },
   {
-    "no": 382,
+    "no": 387,
     "filename": "amb_theme_temple_of_the_gods.ogg",
     "id": "amb_theme_temple_of_the_gods",
     "description": "三神の合祀殿（Temple of the gods）。秩序・中立・混沌の相反する聖歌や詠唱が重なり合う神聖かつ不穏な響き。",
@@ -6876,7 +6966,7 @@
     "notes": ""
   },
   {
-    "no": 383,
+    "no": 388,
     "filename": "amb_theme_ghost_adventurer.ogg",
     "id": "amb_theme_ghost_adventurer",
     "description": "冒険者の亡霊（Ghost of an Adventurer）。かつての冒険者の悲哀に満ちたため息、金属鎧の揺れる音。",
@@ -6894,7 +6984,7 @@
     "notes": ""
   },
   {
-    "no": 384,
+    "no": 389,
     "filename": "amb_theme_storeroom.ogg",
     "id": "amb_theme_storeroom",
     "description": "物置部屋・ミミックの罠（Storeroom）。無数の木箱の匂い、ミミックが蠢くわずかなネバネバした擬態音。",
@@ -6912,7 +7002,7 @@
     "notes": ""
   },
   {
-    "no": 385,
+    "no": 390,
     "filename": "amb_theme_teleport_hub.ogg",
     "id": "amb_theme_teleport_hub",
     "description": "テレポート中枢室（Teleportation hub）。空間の歪みが生み出す電子音のようなハム音、次元のさざ波。",
@@ -6930,7 +7020,7 @@
     "notes": ""
   },
   {
-    "no": 386,
+    "no": 391,
     "filename": "amb_theme_mausoleum.ogg",
     "id": "amb_theme_mausoleum",
     "description": "霊廟（Mausoleum）。重い石棺の隙間から漏れる冷たい隙間風、アンデッドの不穏な気配。",
@@ -6948,7 +7038,7 @@
     "notes": ""
   },
   {
-    "no": 387,
+    "no": 392,
     "filename": "amb_theme_pillars.ogg",
     "id": "amb_theme_pillars",
     "description": "列柱の間（Pillars）。整然と立ち並ぶ巨大な柱の陰から反響する足音、厳粛な回廊の響き。",
@@ -6966,7 +7056,7 @@
     "notes": ""
   },
   {
-    "no": 388,
+    "no": 393,
     "filename": "amb_theme_fake_delphi.ogg",
     "id": "amb_theme_fake_delphi",
     "description": "偽神託所（Fake Delphi）。不自然に静まり返った室内、神託所のものとは微かに異なる歪んだチャイム音。",

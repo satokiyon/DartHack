@@ -688,7 +688,7 @@
     "filename": "se_crashing_sound.ogg",
     "id": "se_crashing_sound",
     "description": "激しい衝突・破壊音（ドアや施錠装置の破壊）",
-    "caller": "lock.c",
+    "caller": "dokick.c, lock.c",
     "category": "effect",
     "sub_category": "Soundeffect",
     "sub_category_ja": "",
@@ -1444,7 +1444,7 @@
     "filename": "se_lid_slams_open_falls_shut.ogg",
     "id": "se_lid_slams_open_falls_shut",
     "description": "箱の蓋がガタンと開き、ズンと閉まる音",
-    "caller": "予備（直接呼び出しなし）",
+    "caller": "dokick.c",
     "category": "effect",
     "sub_category": "Soundeffect",
     "sub_category_ja": "",
@@ -2868,6 +2868,66 @@
     "keywords_en": "stairs climb down ladder footsteps descent steps"
   },
   {
+    "no": 240,
+    "filename": "se_kick_door_it_crashes_open.ogg",
+    "id": "se_kick_door_it_crashes_open",
+    "description": "ドアを蹴って勢いよく開けた時の音",
+    "caller": "dokick.c",
+    "category": "effect",
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
+  },
+  {
+    "no": 241,
+    "filename": "se_kick_door_it_shatters.ogg",
+    "id": "se_kick_door_it_shatters",
+    "description": "ドアを蹴って完全に粉砕した時の音",
+    "caller": "dokick.c",
+    "category": "effect",
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
+  },
+  {
+    "no": 242,
+    "filename": "se_debuff.ogg",
+    "id": "se_debuff",
+    "description": "状態異常（デバフ）を受けた時のトーンダウン下降音",
+    "caller": "potion.c, do.c",
+    "category": "effect",
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
+  },
+  {
+    "no": 243,
+    "filename": "se_hunger.ogg",
+    "id": "se_hunger",
+    "description": "空腹状態（Hungry, Weak, Fainting）悪化時のお腹の音",
+    "caller": "eat.c",
+    "category": "effect",
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
+  },
+  {
+    "no": 244,
+    "filename": "se_force_lock.ogg",
+    "id": "se_force_lock",
+    "description": "箱の鍵を無理やりこじ開けた時の力強い破断音",
+    "caller": "lock.c",
+    "category": "effect",
+    "sub_category": "Soundeffect",
+    "sub_category_ja": "",
+    "keywords_ja": "",
+    "keywords_en": ""
+  },
+  {
     "no": 1,
     "filename": "sa2_splashscreen.ogg",
     "id": "sa2_splashscreen",
@@ -3801,7 +3861,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "ダンジョン 地下迷宮 アンビエント ダンジョンシンセ 暗闇",
     "keywords_en": "dungeon synth dark underground cavern dungeon ambient",
-    "no": 317
+    "no": 322
   },
   {
     "filename": "amb_mines.ogg",
@@ -3813,7 +3873,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "鉱山 洞窟 地下 ドワーフ つるはし 岩盤",
     "keywords_en": "dwarven mines cavern underground rock mining ambient",
-    "no": 318
+    "no": 323
   },
   {
     "filename": "amb_sokoban.ogg",
@@ -3825,7 +3885,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "倉庫番 パズル 思考 穏やか 静寂 神秘",
     "keywords_en": "puzzle peaceful calm ambient fantasy thinking mystery",
-    "no": 319
+    "no": 324
   },
   {
     "filename": "amb_quest.ogg",
@@ -3837,7 +3897,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "クエスト 試練 冒険 ファンタジー 緊張 英雄",
     "keywords_en": "quest adventure epic tension fantasy trial synth",
-    "no": 320
+    "no": 325
   },
   {
     "filename": "amb_gehennom.ogg",
@@ -3849,7 +3909,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "地獄 ゲヘナ 冥界 業火 邪悪 ダークアンビエント",
     "keywords_en": "hell gehenna dark ambient inferno underworld abyss evil",
-    "no": 321
+    "no": 326
   },
   {
     "filename": "amb_vlad.ogg",
@@ -3861,7 +3921,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "ヴラド 吸血鬼 ゴシック 城 パイプオルガン 不気味",
     "keywords_en": "vampire gothic horror castle organ dark synth vlad",
-    "no": 322
+    "no": 327
   },
   {
     "filename": "amb_ludios.ogg",
@@ -3873,7 +3933,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "要塞 砦 財宝 金塊 豪華 行進曲",
     "keywords_en": "fortress fortress treasury gold castle royal march",
-    "no": 323
+    "no": 328
   },
   {
     "filename": "amb_tutorial.ogg",
@@ -3885,7 +3945,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "チュートリアル 初心者 穏やか 旅立ち 平穏 アコースティック",
     "keywords_en": "tutorial beginner calm gentle acoustic adventure pleasant",
-    "no": 324
+    "no": 329
   },
   {
     "filename": "amb_oracle.ogg",
@@ -3897,7 +3957,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "神託 預言 神秘 静寂 瞑想 デルフィ",
     "keywords_en": "oracle prophecy mystic ethereal ambient spiritual temple",
-    "no": 325
+    "no": 330
   },
   {
     "filename": "amb_rogue.ogg",
@@ -3909,7 +3969,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "ローグ レトロ 8bit チップチューン ピコピコ ダンジョン",
     "keywords_en": "8bit chiptune retro rogue classic rpg synth",
-    "no": 326
+    "no": 331
   },
   {
     "filename": "amb_bigroom.ogg",
@@ -3921,7 +3981,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "大部屋 広大 反響 虚無 不穏 風音",
     "keywords_en": "vast open chamber ominous echo dark ambient drone",
-    "no": 327
+    "no": 332
   },
   {
     "filename": "amb_medusa.ogg",
@@ -3933,7 +3993,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "メデューサ 孤島 石化 緊迫 毒蛇 恐怖",
     "keywords_en": "medusa snake island dread tension suspense dark",
-    "no": 328
+    "no": 333
   },
   {
     "filename": "amb_castle.ogg",
@@ -3945,7 +4005,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "城 要塞 城塞 壮大 重厚 跳ね橋 ドラゴン",
     "keywords_en": "castle stronghold epic heavy fortress dungeon synth",
-    "no": 329
+    "no": 334
   },
   {
     "filename": "amb_town.ogg",
@@ -3957,7 +4017,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "町 市場 酒場 活気 賑やか 中世 街",
     "keywords_en": "town village tavern market medieval folk lively",
-    "no": 330
+    "no": 335
   },
   {
     "filename": "amb_minend.ogg",
@@ -3969,7 +4029,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "鉱山最深部 宝石 輝き 危険 深層 洞窟",
     "keywords_en": "deep mines crystal gem dangerous cavern synth ambient",
-    "no": 331
+    "no": 336
   },
   {
     "filename": "amb_sokoend.ogg",
@@ -3981,7 +4041,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "達成 清々しい 勝利 宝 報酬 安らぎ",
     "keywords_en": "triumph victory relief peaceful reward serene fantasy",
-    "no": 332
+    "no": 337
   },
   {
     "filename": "amb_quest_nemesis.ogg",
@@ -3993,7 +4053,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "ボス決戦 宿敵 最終決戦 激闘 オーケストラ 壮絶",
     "keywords_en": "boss battle nemesis epic combat dark orchestral showdown",
-    "no": 333
+    "no": 338
   },
   {
     "filename": "amb_valley.ogg",
@@ -4005,7 +4065,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "死の谷 荒涼 絶望 墓場 アンデッド 悲哀",
     "keywords_en": "valley of the dead bleak desolate graveyard undead doom",
-    "no": 334
+    "no": 339
   },
   {
     "filename": "amb_juiblex.ogg",
@@ -4017,7 +4077,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "ジュピレクス スライム 沼 腐敗 溶解 悪魔",
     "keywords_en": "juiblex slime swamp ooze rot toxic acid demon dark",
-    "no": 335
+    "no": 340
   },
   {
     "filename": "amb_baalzebub.ogg",
@@ -4029,7 +4089,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "ベルゼブブ 蝿の王 悪魔 羽音 沼 不快 邪悪",
     "keywords_en": "baalzebub lord of flies demon lord swamp insect evil dark",
-    "no": 336
+    "no": 341
   },
   {
     "filename": "amb_asmodeus.ogg",
@@ -4041,7 +4101,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "アスモデウス 地獄 宮殿 悪魔 威厳 邪悪 貴族",
     "keywords_en": "asmodeus archdevil palace majestic infernal dark royal evil",
-    "no": 337
+    "no": 342
   },
   {
     "filename": "amb_orcus.ogg",
@@ -4053,7 +4113,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "オルクス 死霊の王 廃墟 アンデッド 死霊 亡霊",
     "keywords_en": "orcus undead ruined city necromancy ghost wraith ambient",
-    "no": 338
+    "no": 343
   },
   {
     "filename": "amb_wizard_tower.ogg",
@@ -4065,7 +4125,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "イェンダー 魔法使いの塔 魔術 狂気 実験 迷宮",
     "keywords_en": "wizard tower yendor arcane madness laboratory sorcery synth",
-    "no": 339
+    "no": 344
   },
   {
     "filename": "amb_fakewiz.ogg",
@@ -4077,7 +4137,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "偽魔法使い 塔 偽物 幻影 歪み 不気味 欺瞞",
     "keywords_en": "fake wizard illusion distorted mockery eerie dark synth",
-    "no": 340
+    "no": 345
   },
   {
     "filename": "amb_sanctum.ogg",
@@ -4089,7 +4149,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "モロク 聖所 聖域 大聖堂 冒涜 祭壇 終末",
     "keywords_en": "sanctum moloch cathedral dark chant profane high priest doom",
-    "no": 341
+    "no": 346
   },
   {
     "filename": "amb_plane_earth.ogg",
@@ -4101,7 +4161,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "土の精霊界 大地 岩盤 重低音 ドローン 振動",
     "keywords_en": "plane of earth stone cavern rumble deep bass drone elemental",
-    "no": 342
+    "no": 347
   },
   {
     "filename": "amb_plane_air.ogg",
@@ -4113,7 +4173,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "風の精霊界 暴風 疾風 雷雲 嵐 浮遊 空",
     "keywords_en": "plane of air storm whirlwind tempest thunder sky elemental",
-    "no": 343
+    "no": 348
   },
   {
     "filename": "amb_plane_fire.ogg",
@@ -4125,7 +4185,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "火の精霊界 灼熱 業火 紅蓮 炎 溶岩 激動",
     "keywords_en": "plane of fire inferno blazing flame volcanic heat elemental",
-    "no": 344
+    "no": 349
   },
   {
     "filename": "amb_plane_water.ogg",
@@ -4137,7 +4197,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "水の精霊界 水中 深海 気泡 幻想的 漂流",
     "keywords_en": "plane of water underwater deep ocean bubbles ambient floating",
-    "no": 345
+    "no": 350
   },
   {
     "filename": "amb_astral.ogg",
@@ -4149,7 +4209,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "アストラル界 昇天 最終決戦 神聖 黙示録 祭壇 壮大",
     "keywords_en": "astral plane celestial final battle epic sacred transcendence choir",
-    "no": 346
+    "no": 351
   },
   {
     "filename": "amb_title.ogg",
@@ -4161,7 +4221,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "タイトル オープニング 冒険 旅立ち ファンタジー メインテーマ",
     "keywords_en": "title theme opening adventure fantasy prologue heroic synth",
-    "no": 347
+    "no": 352
   },
   {
     "filename": "amb_gameover.ogg",
@@ -4173,7 +4233,7 @@
     "sub_category_ja": "フロアBGM",
     "keywords_ja": "ゲームオーバー 墓標 鎮魂曲 レクイエム 哀愁 昇天",
     "keywords_en": "game over requiem death sad tombstone memorial mournful",
-    "no": 348
+    "no": 353
   },
   {
     "filename": "amb_water.ogg",
@@ -4185,7 +4245,7 @@
     "sub_category_ja": "環境音",
     "keywords_ja": "水音 せせらぎ 噴水 水流 滴り 川 環境音",
     "keywords_en": "water stream fountain trickle flowing splash water ambient",
-    "no": 349
+    "no": 354
   },
   {
     "filename": "amb_lava.ogg",
@@ -4197,7 +4257,7 @@
     "sub_category_ja": "環境音",
     "keywords_ja": "溶岩 マグマ 煮えたぎる 泡 火口 地熱 環境音",
     "keywords_en": "lava magma bubbling molten boiling volcano heat ambient",
-    "no": 350
+    "no": 355
   },
   {
     "filename": "amb_wind.ogg",
@@ -4209,7 +4269,7 @@
     "sub_category_ja": "環境音",
     "keywords_ja": "風 突風 隙間風 吹きすさぶ 通路 轟音 環境音",
     "keywords_en": "wind howling draft breeze gust blowing storm ambient",
-    "no": 351
+    "no": 356
   },
   {
     "filename": "amb_rain.ogg",
@@ -4221,7 +4281,7 @@
     "sub_category_ja": "環境音",
     "keywords_ja": "雨 水滴 滴り 湿気 洞窟 雨音 環境音",
     "keywords_en": "rain dripping water drops damp cave moisture ambient",
-    "no": 352
+    "no": 357
   },
   {
     "filename": "amb_swamp.ogg",
@@ -4233,7 +4293,7 @@
     "sub_category_ja": "環境音",
     "keywords_ja": "沼地 泥 気泡 湿地 湿原 毒気 泡 環境音",
     "keywords_en": "swamp marsh mud bubbles bog mire slimy ambient",
-    "no": 353
+    "no": 358
   },
   {
     "filename": "amb_in_a_shop.ogg",
@@ -4245,7 +4305,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "商店 店 買い物 商人 酒場 リュート アコースティック",
     "keywords_en": "shop merchant store medieval tavern market acoustic lute",
-    "no": 354
+    "no": 359
   },
   {
     "filename": "amb_inside_temple.ogg",
@@ -4257,7 +4317,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "寺院 聖歌 チャント パイプオルガン 祈り 祭壇 荘厳",
     "keywords_en": "temple chant choir organ church sacred holy altar",
-    "no": 355
+    "no": 360
   },
   {
     "filename": "amb_inside_vault.ogg",
@@ -4269,7 +4329,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "金庫室 宝物庫 金貨 静寂 財宝 密室",
     "keywords_en": "vault treasure chamber gold coins secure silence mysterious",
-    "no": 356
+    "no": 361
   },
   {
     "filename": "amb_approaching_oracle.ogg",
@@ -4281,7 +4341,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "神託所 預言者 瞑想 チャイム 神秘 澄んだ音",
     "keywords_en": "oracle mystic meditation bells chime sacred ethereal",
-    "no": 357
+    "no": 362
   },
   {
     "filename": "amb_in_a_court.ogg",
@@ -4293,7 +4353,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "王座 玉座 宮廷 貴族 優雅 チェンバロ ファンファーレ",
     "keywords_en": "throne room royal court palace majestic regal harpsichord",
-    "no": 358
+    "no": 363
   },
   {
     "filename": "amb_in_a_barracks.ogg",
@@ -4305,7 +4365,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "兵舎 兵士 軍隊 行進 太鼓 鎧 武具",
     "keywords_en": "barracks soldiers military march drums garrison armed",
-    "no": 359
+    "no": 364
   },
   {
     "filename": "amb_in_a_zoo.ogg",
@@ -4317,7 +4377,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "動物園 モンスター部屋 野獣 咆哮 檻 不穏",
     "keywords_en": "monster zoo beasts growl cage dungeon creatures chaotic",
-    "no": 360
+    "no": 365
   },
   {
     "filename": "amb_in_a_beehive.ogg",
@@ -4329,7 +4389,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "蜂の巣 蜂 ハチ 羽音 昆虫 ブーン 不気味",
     "keywords_en": "beehive buzzing wasps bees insect swarm hive drone",
-    "no": 361
+    "no": 366
   },
   {
     "filename": "amb_inside_anthole.ogg",
@@ -4341,7 +4401,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "蟻塚 アリ 巨大蟻 這う カサカサ 巣穴 昆虫",
     "keywords_en": "anthole ant colony crawling insect nest chitin swarm",
-    "no": 362
+    "no": 367
   },
   {
     "filename": "amb_inside_leprehall.ogg",
@@ -4353,7 +4413,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "レプラコーン 妖精 アイリッシュ ジグ 陽気 硬貨 軽快",
     "keywords_en": "leprechaun irish jig celtic lively folk whistle playful",
-    "no": 363
+    "no": 368
   },
   {
     "filename": "amb_in_a_morgue.ogg",
@@ -4365,7 +4425,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "死体置き場 遺体 冷気 石棺 死霊 囁き ホラー",
     "keywords_en": "morgue mortuary cold dead sarcophagus horror dark ambient",
-    "no": 364
+    "no": 369
   },
   {
     "filename": "amb_in_cemetery.ogg",
@@ -4377,7 +4437,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "墓地 墓場 墓石 怨嗟 夜風 亡霊 ゴースト",
     "keywords_en": "cemetery graveyard tomb ghostly eerie wind haunted",
-    "no": 365
+    "no": 370
   },
   {
     "filename": "amb_in_a_cockatrice_nest.ogg",
@@ -4389,7 +4449,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "コカトリス 石化 鱗 蛇 巣 不気味 緊張",
     "keywords_en": "cockatrice petrification scales serpent nest dread eerie",
-    "no": 366
+    "no": 371
   },
   {
     "filename": "amb_in_a_lemure_pit.ogg",
@@ -4401,7 +4461,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "レムレース 亡者 苦痛 呻き 叫び 地獄 穴",
     "keywords_en": "lemure pit agony torment wailing souls infernal suffering",
-    "no": 367
+    "no": 372
   },
   {
     "filename": "amb_in_a_migot_nest.ogg",
@@ -4413,7 +4473,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "ミゴ クトゥルフ 異形 宇宙的 狂気 羽音 ノイズ",
     "keywords_en": "mi-go lovecraftian cosmic horror alien hive weird drone",
-    "no": 368
+    "no": 373
   },
   {
     "filename": "amb_in_a_black_market.ogg",
@@ -4425,7 +4485,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "闇市 密売 違法 怪しい 酒場 アングラ 地下市場",
     "keywords_en": "black market smuggler shady underground bazaar stealth",
-    "no": 369
+    "no": 374
   },
   {
     "filename": "amb_in_swamp_room.ogg",
@@ -4437,7 +4497,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "沼地 泥 淀み 湿原 湿地 ぬかるみ 不穏",
     "keywords_en": "swamp room marsh murky bog stagnant water damp",
-    "no": 370
+    "no": 375
   },
   {
     "filename": "amb_theme_nymph_garden.ogg",
@@ -4449,7 +4509,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "ニンフ 妖精 庭園 竪琴 ハープ 魅惑 穏やか",
     "keywords_en": "nymph garden fairy enchanting harp serene fountain magical",
-    "no": 371
+    "no": 376
   },
   {
     "filename": "amb_theme_spider_nest.ogg",
@@ -4461,7 +4521,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "蜘蛛 蜘蛛の巣 巣窟 糸 不気味 這い回る 虫",
     "keywords_en": "spider nest web arachnid crawling creep dark ambient",
-    "no": 372
+    "no": 377
   },
   {
     "filename": "amb_theme_ice_room.ogg",
@@ -4473,7 +4533,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "氷 凍結 冷気 寒風 吹雪 氷窟 クリスタル",
     "keywords_en": "ice room frozen frost cold wind crystal chill ambient",
-    "no": 373
+    "no": 378
   },
   {
     "filename": "amb_theme_cloud_room.ogg",
@@ -4485,7 +4545,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "雲 霧 濃霧 蒸気 静寂 幻想的 浮遊",
     "keywords_en": "cloud room fog mist vapor steam eerie floating ambient",
-    "no": 374
+    "no": 379
   },
   {
     "filename": "amb_theme_boulder_room.ogg",
@@ -4497,7 +4557,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "巨石 岩 地響き 落石 重低音 採石",
     "keywords_en": "boulder stone rocks heavy rumbling cave quarry",
-    "no": 375
+    "no": 380
   },
   {
     "filename": "amb_theme_trap_room.ogg",
@@ -4509,7 +4569,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "トラップ 罠 歯車 機械 緊迫 仕掛け 時計",
     "keywords_en": "trap room mechanical gears clockwork tension suspense stealth",
-    "no": 376
+    "no": 381
   },
   {
     "filename": "amb_theme_buried_treasure.ogg",
@@ -4521,7 +4581,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "埋没財宝 隠し宝 宝箱 金貨 鍵 神秘 輝き",
     "keywords_en": "buried treasure hidden gold chest glittering mystery loot",
-    "no": 377
+    "no": 382
   },
   {
     "filename": "amb_theme_buried_zombies.ogg",
@@ -4533,7 +4593,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "ゾンビ 土葬 死者 蠢く 蘇生 呻き ホラー",
     "keywords_en": "buried zombies undead awakening dirt crawling grave horror",
-    "no": 378
+    "no": 383
   },
   {
     "filename": "amb_theme_massacre.ogg",
@@ -4545,7 +4605,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "虐殺 惨劇 怨嗟 血風 死屍累々 絶望 悲壮",
     "keywords_en": "massacre slaughter battlefield bloodshed sorrow grim dark",
-    "no": 379
+    "no": 384
   },
   {
     "filename": "amb_theme_statuary.ogg",
@@ -4557,7 +4617,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "彫像 石像 像 ギャラリー 静寂 冷徹 視線",
     "keywords_en": "statues statuary museum gallery silent cold stone watchful",
-    "no": 380
+    "no": 385
   },
   {
     "filename": "amb_theme_light_source.ogg",
@@ -4569,7 +4629,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "灯火 ランプ 篝火 温かい 光 炎 安らぎ キャンドル",
     "keywords_en": "light campfire lamp flame candle warmth peaceful cozy",
-    "no": 381
+    "no": 386
   },
   {
     "filename": "amb_theme_temple_of_the_gods.ogg",
@@ -4581,7 +4641,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "合祀殿 三神 神々 聖歌 詠唱 秩序 混沌 荘厳",
     "keywords_en": "pantheon gods temple sacred chant chaos order divine choir",
-    "no": 382
+    "no": 387
   },
   {
     "filename": "amb_theme_ghost_adventurer.ogg",
@@ -4593,7 +4653,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "冒険者の亡霊 亡霊 幽霊 悲哀 ため息 鎧 追憶",
     "keywords_en": "ghost adventurer phantom spirit sorrowful armor regret haunt",
-    "no": 383
+    "no": 388
   },
   {
     "filename": "amb_theme_storeroom.ogg",
@@ -4605,7 +4665,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "物置 木箱 倉庫 ミミック 擬態 罠 潜伏",
     "keywords_en": "storeroom warehouse crates mimic lurk creeping trap",
-    "no": 384
+    "no": 389
   },
   {
     "filename": "amb_theme_teleport_hub.ogg",
@@ -4617,7 +4677,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "テレポート 転移 次元 空間の歪み パルス 電子音 ポータル",
     "keywords_en": "teleport portal dimension warp cosmic pulse sci-fi fantasy",
-    "no": 385
+    "no": 390
   },
   {
     "filename": "amb_theme_mausoleum.ogg",
@@ -4629,7 +4689,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "霊廟 石棺 墓 隙間風 アンデッド 不穏 厳粛",
     "keywords_en": "mausoleum tomb crypt crypts undead chilly stone draft",
-    "no": 386
+    "no": 391
   },
   {
     "filename": "amb_theme_pillars.ogg",
@@ -4641,7 +4701,7 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "列柱 柱 回廊 大広間 反響 厳粛 神殿",
     "keywords_en": "pillars colonnade ancient hall stone columns solemn echo",
-    "no": 387
+    "no": 392
   },
   {
     "filename": "amb_theme_fake_delphi.ogg",
@@ -4653,6 +4713,6 @@
     "sub_category_ja": "ルームBGM",
     "keywords_ja": "偽神託所 偽物 歪み 偽チャイム 偽預言 違和感 不穏",
     "keywords_en": "fake delphi false oracle distorted eerie discordant mystery",
-    "no": 388
+    "no": 393
   }
 ]

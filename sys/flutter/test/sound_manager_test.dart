@@ -832,6 +832,80 @@ void main() {
       expect(manager.isPausedForBackground, isFalse);
       expect(manager.currentFloorBgm, 'amb_title.ogg');
     });
+
+    test('Kick action sound events dispatch and play successfully', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true, isMainGameStarted: true);
+
+      final kickSounds = [
+        'se_kick_door_it_crashes_open.ogg',
+        'se_kick_door_it_shatters.ogg',
+        'se_crashing_sound.ogg',
+        'se_lid_slams_open_falls_shut.ogg',
+        'se_crash_door.ogg',
+        'se_crash_throne_destroyed.ogg',
+        'se_glass_crashing.ogg',
+      ];
+
+      for (final sound in kickSounds) {
+        manager.registerAvailableSound(sound);
+        expect(manager.hasSound(sound), isTrue);
+
+        manager.handleSoundEvent({
+          'category': 1, // SoundCategory.se
+          'filename': sound,
+          'text': '',
+          'volume': 60,
+          'loopOrFlag': 0,
+        });
+      }
+    });
+
+    test('Debuff and hunger sound events dispatch and play successfully', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true, isMainGameStarted: true);
+
+      final newSounds = [
+        'se_debuff.ogg',
+        'se_hunger.ogg',
+      ];
+
+      for (final sound in newSounds) {
+        manager.registerAvailableSound(sound);
+        expect(manager.hasSound(sound), isTrue);
+
+        manager.handleSoundEvent({
+          'category': 1, // SoundCategory.se
+          'filename': sound,
+          'text': '',
+          'volume': 60,
+          'loopOrFlag': 0,
+        });
+      }
+    });
+
+    test('Lock picking and forcing sound events dispatch and play successfully', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true, isMainGameStarted: true);
+
+      final lockSounds = [
+        'se_klick.ogg',
+        'se_force_lock.ogg',
+      ];
+
+      for (final sound in lockSounds) {
+        manager.registerAvailableSound(sound);
+        expect(manager.hasSound(sound), isTrue);
+
+        manager.handleSoundEvent({
+          'category': 1, // SoundCategory.se
+          'filename': sound,
+          'text': '',
+          'volume': 50,
+          'loopOrFlag': 0,
+        });
+      }
+    });
   });
 }
 

@@ -76,7 +76,7 @@ def measure_volume(ogg_path: Path) -> Dict[str, Any]:
     except Exception:
         pass
 
-    det_cmd = ["ffmpeg", "-i", str(ogg_path), "-af", "volumedetect", "-f", "null", "-"]
+    det_cmd = ["ffmpeg", "-i", str(ogg_path), "-vn", "-af", "volumedetect", "-f", "null", "-"]
     try:
         d_res = subprocess.run(det_cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
         det_stderr = d_res.stderr or ""
@@ -94,23 +94,24 @@ def measure_volume(ogg_path: Path) -> Dict[str, Any]:
     max_v = result["max_volume"]
     mean_v = result["mean_volume"]
 
-    if max_v < THRESH_ERROR_PEAK or mean_v < THRESH_ERROR_MEAN:
+    # 判定ロジック
+    if max_v >= THRESH_CLIP_PEAK:
+        result["status"] = "CLIP"
+        result["message"] = f"クリッピングの恐れあり (Peak: {max_v:.1f} dBFS)"
+    elif max_v < THRESH_ERROR_PEAK or mean_v < THRESH_ERROR_MEAN:
         result["status"] = "ERROR"
-        result["message"] = "ほぼ無音・不良音源（過小音量）"
+        result["message"] = f"極小音量 (Peak: {max_v:.1f} dBFS, Mean: {mean_v:.1f} dBFS)"
     elif max_v < THRESH_WARN_PEAK or mean_v < THRESH_WARN_MEAN:
         result["status"] = "WARN"
-        result["message"] = "音量が小さすぎる可能性あり（要確認）"
-    elif max_v >= THRESH_CLIP_PEAK:
-        result["status"] = "CLIP"
-        result["message"] = "0dB頭打ち（音割れリスクあり）"
+        result["message"] = f"やや音量が小さい (Peak: {max_v:.1f} dBFS, Mean: {mean_v:.1f} dBFS)"
     else:
         result["status"] = "OK"
-        result["message"] = "適正音量バランス"
+        result["message"] = f"適正 (Peak: {max_v:.1f} dBFS)"
 
     return result
 
 def fix_volume(ogg_path: Path, target_peak: float = TARGET_PEAK_FIX) -> bool:
-    """音量を適正化（無音トリム＋コンプレッション＋ピーク -1.5 dBFS）して上書きする"""
+    """音量が小さい、またはクリッピングしている音源を適正化する"""
     try:
         temp_out = ogg_path.parent / f"{ogg_path.stem}_temp_fix.ogg"
         
@@ -118,7 +119,7 @@ def fix_volume(ogg_path: Path, target_peak: float = TARGET_PEAK_FIX) -> bool:
         comp_filter = "acompressor=threshold=-15dB:ratio=2.5:attack=5:release=80:makeup=2dB"
         detect_chain = f"{base_filter},{comp_filter},volumedetect"
 
-        cmd_det = ["ffmpeg", "-i", str(ogg_path), "-af", detect_chain, "-f", "null", "-"]
+        cmd_det = ["ffmpeg", "-i", str(ogg_path), "-vn", "-af", detect_chain, "-f", "null", "-"]
         res = subprocess.run(cmd_det, capture_output=True, text=True, encoding="utf-8", errors="replace")
         max_v = 0.0
         res_stderr = res.stderr or ""
@@ -131,7 +132,7 @@ def fix_volume(ogg_path: Path, target_peak: float = TARGET_PEAK_FIX) -> bool:
         final_filter = f"{base_filter},{comp_filter},volume={gain:.2f}dB"
 
         cmd_conv = [
-            "ffmpeg", "-y", "-i", str(ogg_path),
+            "ffmpeg", "-y", "-i", str(ogg_path), "-vn",
             "-af", final_filter,
             "-c:a", "libopus", "-b:a", "64k", "-ar", "48000",
             str(temp_out)

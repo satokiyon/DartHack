@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-19. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-20. -->
 # NetHackサウンド機構とDartHack音響システム設計・確定実装仕様書
 
 本書は、NetHack 5.0のCコアに導入されたサウンドサブシステム（`soundlib`）の仕組みを解説し、それに基づいて **DartHack（Flutter/FFIポート）** で稼働している効果音・音楽・環境音・音声の確定アーキテクチャ、実装仕様、および運用知見を包括的にまとめた技術仕様書です。
@@ -64,11 +64,42 @@ Cコアから出力されるサウンドイベントは、以下の6つのトリ
 `include/seffects.h` には **239 種類** の効果音ID（`enum sound_effect_entries`）が定義されています（一般効果音 206種 + 戦闘アクション効果音 33種）。
 - 例: `se_door_open` (開扉), `se_door_close` (閉扉), `se_magic_whistle` (魔法の笛), `se_explosion` (爆発), `se_kick` (キック打撃), `se_stairs_up` / `se_stairs_down` (階段昇降), `se_glass_shattering` (ガラス破砕), `se_combat_hit_slash` (斬撃)
 
-### 3.2 楽器ID (`sndprocs.h`)
-`enum instruments` には、GM (General MIDI) に準拠した楽器IDが割り当てられています。
-- 音階バリエーションあり（フルート、角笛、ラッパ、ハープ等 6種 × A〜G 7音 = 42ファイル）
-- 固定演奏（火炎の角笛、凍結の角笛、ベル、地震の太鼓、革製太鼓 = 5ファイル）
-- 計 **47 ファイル** の `.ogg` が対応。
+### 3.2 楽器演奏・音楽トリガー (`SOUND_TRIGGER_HEROMUSIC`)
+Cコアの `Hero_playnotes(instrument, str, vol)` マクロ（`include/sndprocs.h`）を通じて呼び出される、プレイヤーやNPCによる楽器演奏・音響発生トリガーです。`iflags.sounds` が有効かつ主人公が難聴（`Deaf`）状態でない場合に発火します。
+
+#### 3.2.1 具体的な使用場面（3系統）
+1. **城（Stronghold）の跳ね橋の合言葉演奏 (`src/music.c: do_play`)**:
+   - 楽器（フルート、角笛、ラッパ、ハープ等）を使用して「どんな旋律を演奏しますか? [5音, A-G]」に対し、城の跳ね橋を開閉するための合言葉（Pass-tune、例: `svt.tune` = `"DEDCA"` など5音）を入力・演奏した場面。
+   - 正しい合言葉で跳ね橋付近で演奏すると跳ね橋が開閉し、実績 `ACH_TUNE`（`sa2_tune`）が達成されます。
+2. **各種楽器の即興演奏と特殊効果 (`src/music.c: do_play`)**:
+   - 楽器を使用した際の即興演奏（`improvisation = improvised_notes(&same_old_song)` による音階列、または固定音）。
+   - 各楽器の固有魔力・効果（睡眠、ヘビ魅了、炎/冷気ビーム、モンスター覚醒/恐怖、兵士召喚、モンスター手なずけ、ニンフ宥め、地震・落とし穴生成）の発動と同時に演奏音が響きます。
+3. **ベル／開運のベル（Bell of Opening）の鳴動 (`src/apply.c: use_bell`)**:
+   - 通常のベルや重要アーティファクト「開運のベル」を鳴らした場面（音階 `"C"`、音量 100）。
+   - 水中や飲み込まれ状態では「音がこもる」、儀式（Invocation）未充填では「音が出ない」等の判定を経て、正常に澄んだ鐘の音が鳴り響きます。
+
+#### 3.2.2 楽器ID (`enum instruments`) と音声アセット対応表（全47音）
+`include/sndprocs.h` では General MIDI (GM) に準拠した楽器IDが割り振られており、音階バリエーション（A〜Gの7音）を持つ **6種** と、固定ワンショットで演奏される **5種** の計 **11種（47ファイル）** の `.ogg` が配備されています。
+
+| 楽器アイテム (NetHack) | Cコア楽器ID (`enum instruments`) | GM MIDI 音色 | 音声リソース名 / ファイル構成 | 演奏形式 |
+| :--- | :--- | :--- | :--- | :--- |
+| 木製フルート (`WOODEN_FLUTE`) | `ins_flute` (74) | Flute | `sound_Wooden_Flute_[A-G].ogg` (7音) | 音階アルペジオ |
+| 魔法のフルート (`MAGIC_FLUTE`) | `ins_pan_flute` (76) | Pan Flute | `sound_Magic_Flute_[A-G].ogg` (7音) | 音階アルペジオ |
+| 角笛 (`TOOLED_HORN`) | `ins_english_horn` (70) | English Horn | `sound_Tooled_Horn_[A-G].ogg` (7音) | 音階アルペジオ |
+| ラッパ (`BUGLE`) | `ins_trumpet` (57) | Trumpet | `sound_Bugle_[A-G].ogg` (7音) | 音階アルペジオ |
+| 木製の竪琴 (`WOODEN_HARP`) | `ins_orchestral_harp` (47) | Orchestral Harp | `sound_Wooden_Harp_[A-G].ogg` (7音) | 音階アルペジオ |
+| 魔法の竪琴 (`MAGIC_HARP`) | `ins_cello` (43) | Cello | `sound_Magic_Harp_[A-G].ogg` (7音) | 音階アルペジオ |
+| 霜の角笛 (`FROST_HORN`) | `ins_french_horn` (61) | French Horn | `sound_Frost_Horn.ogg` (1音) | 固定音 |
+| 火の角笛 (`FIRE_HORN`) | `ins_baritone_sax` (68) | Baritone Sax | `sound_Fire_Horn.ogg` (1音) | 固定音 |
+| ベル / 開運のベル (`BELL[_OF_OPENING]`) | `ins_tinkle_bell` (113) | Tinkle Bell | `sound_Bell.ogg` (1音) | 固定音 |
+| 地震の太鼓 (`DRUM_OF_EARTHQUAKE`) | `ins_taiko_drum` (117) | Taiko Drum | `sound_Drum_Of_Earthquake.ogg` (1音) | 固定音 |
+| 革の太鼓 (`LEATHER_DRUM`) | `ins_melodic_tom` (118) | Melodic Tom | `sound_Leather_Drum.ogg` (1音) | 固定音 |
+
+#### 3.2.3 DartHack でのアルペジオ順次再生制御 (`SoundManager._playInstrument`)
+- **固定音（単一ファイル）**:
+  `winflutter.c` で `is_single_file = 1` が設定され、SEプレイヤープール経由で即時ワンショット再生されます。
+- **音階演奏（メロディ・アルペジオ）**:
+  Cコアから渡された音符文字列（例: `"DEDCA"`）の各音階文字を Flutter UI 側（`sound_manager.dart`）で解析し、各音を **約120ms間隔のマイクロディレイ** を挟んで非同期に順次再生します。これにより、単なる単音の連打ではなく、実際に楽器を爪弾いたり吹き鳴らしているかのような流麗なアルペジオ演奏が再現されます。
 
 ### 3.3 実績・システム音 (`sa2_*` / `ach_*`)
 - システムイベント音: 4種（スプラッシュ画面、新規ゲーム、レベルアップ、レベルダウン）

@@ -1,19 +1,19 @@
 # NetHack 5.0 / DartHack サウンドマスター管理仕様書 & 呼び出し一覧
 
 本書は、NetHack 5.0 Cコア（`c_core/nethack_jp`）から呼び出される効果音・音楽・音声の全イベント仕様書です。
-DartHack（Flutter/FFI環境）で再生する **全 `.ogg` (Opus) 音声ファイルのマスターチェックリスト（全 316 種）**、および **Cコアソースコード内の全 376 箇所呼び出し対照表** で構成されています。
+DartHack（Flutter/FFI環境）で再生する **全 `.ogg` (Opus) 音声ファイルのマスターチェックリスト（全 321 種）**、および **Cコアソースコード内の全 394 箇所呼び出し対照表** で構成されています。
 
 > **戦闘アクション効果音の詳細仕様書**:
 > 戦闘系効果音（No.204〜236：近接、遠隔、呪文、杖、モンスター固有攻撃12種、特徴的アイテム・フォールバック音など計33種）の音量制御、不可視40%気配察知、生データ属性自動判定、Multishot集約、60msデバウンス制御、および音響素材制作ガイドラインの詳細は、専用仕様書 [combat_sound_specification.md](combat_sound_specification.md) を参照してください。
 
-> **改訂履歴**: 2026-09-16 初版作成。初版レビューに基づき修正。2026-09-17 戦闘アクション効果音 33種（No.204〜236）対応。2026-09-18 魔法の笛（se_magic_whistle）新設・通常笛と分離。2026-09-18 ドアを閉める音（se_door_close）新設・開扉音と連動。2026-09-19 全313種体系へ完全統一、Cコア呼び出し箇所（全369箇所）同期、Android umask(0022)健全性維持およびプレイヤープール制御を反映。2026-09-19 階段昇降音（se_stairs_up / se_stairs_down）、キック打撃音（se_kick）新設、ガラス破壊音（se_glass_shattering）音響配備により全316種体系・全376箇所呼び出しへ拡張。
+> **改訂履歴**: 2026-09-16 初版作成。初版レビューに基づき修正。2026-09-17 戦闘アクション効果音 33種（No.204〜236）対応。2026-09-18 魔法の笛（se_magic_whistle）新設・通常笛と分離。2026-09-18 ドアを閉める音（se_door_close）新設・開扉音と連動。2026-09-19 全313種体系へ完全統一、Cコア呼び出し箇所（全369箇所）同期、Android umask(0022)健全性維持およびプレイヤープール制御を反映。2026-09-19 階段昇降音（se_stairs_up / se_stairs_down）、キック打撃音（se_kick）新設、ガラス破壊音（se_glass_shattering）音響配備により全316種体系・全376箇所呼び出しへ拡張。2026-09-20 ドア蹴り開け音（se_kick_door_it_crashes_open / se_kick_door_it_shatters）、宝箱鍵破壊音（se_crashing_sound）、宝箱ふた開閉音（se_lid_slams_open_falls_shut）、隠し扉開扉音（se_crash_door）、玉座破壊音（se_crash_throne_destroyed）の音源配備およびCコア呼び出し同期。2026-09-20 状態異常デバフ音（se_debuff）および空腹音（se_hunger）新設、Cコア呼び出し（全390箇所）および全320種体系へ拡張。2026-09-20 玉座破壊音（se_crash_throne_destroyed）を重厚な木製家具破壊音へ再合成・更新、旧破砕音をガラス激割れ音（se_glass_crashing）へ正式配備。2026-09-20 大箱・宝箱等の解錠・施錠音（se_klick）音源配備およびこじ開け音（se_force_lock）新設、Cコア呼び出し（全394箇所）および全321種体系へ拡張。
 
 ---
 
 ## 第1部: 音声ファイル マスター管理表（全音源チェックリスト）
 
 ### 1-A. 効果音 (`Soundeffect`) — se_*.ogg 一覧
-Cコアの `include/seffects.h` に定義されている 239 種の効果音 ID の全一覧です（一般効果音 206種 + 戦闘アクション効果音 33種）。
+Cコアの `include/seffects.h` に定義されている 244 種の効果音 ID の全一覧です（一般効果音 211種 + 戦闘アクション効果音 33種）。
 
 | No. | 音声ファイル名 (.ogg) | サウンドID | 日本語イベント説明 | 呼び出し元Cファイル |
 | :--- | :--- | :--- | :--- | :--- |
@@ -74,7 +74,7 @@ Cコアの `include/seffects.h` に定義されている 239 種の効果音 ID 
 | 55 | `se_crashed_ceiling.ogg` | `se_crashed_ceiling` | 天井が崩落してガラガラ落ちる音 | 予備（直接呼び出しなし） |
 | 56 | `se_crashing_boulder.ogg` | `se_crashing_boulder` | 巨石がドカドカと激しく転がり激突する音 | do.c |
 | 57 | `se_crashing_rock.ogg` | `se_crashing_rock` | 岩石がガラガラと崩れ落ちる音（掘削・崩壊） | dig.c |
-| 58 | `se_crashing_sound.ogg` | `se_crashing_sound` | 激しい衝突・破壊音（ドアや施錠装置の破壊） | lock.c |
+| 58 | `se_crashing_sound.ogg` | `se_crashing_sound` | 激しい衝突・破壊音（ドアや施錠装置の破壊） | dokick.c, lock.c |
 | 59 | `se_croc_bellow.ogg` | `se_croc_bellow` | ワニの低く響く咆哮 | 予備（直接呼び出しなし） |
 | 60 | `se_crumbling_sound.ogg` | `se_crumbling_sound` | 砂岩や壁がボロボロと崩れる音（魔法・掘削） | zap.c |
 | 61 | `se_crunching_sound.ogg` | `se_crunching_sound` | バリバリと硬いものを噛み砕く音（捕食・踏み砕き） | mon.c |
@@ -137,7 +137,7 @@ Cコアの `include/seffects.h` に定義されている 239 種の効果音 ID 
 | 118 | `se_klunk.ogg` | `se_klunk` | ゴトンという重い鈍い衝突音 | lock.c |
 | 119 | `se_klunk_pipe.ogg` | `se_klunk_pipe` | 配管をゴトンと叩く衝撃音 | dokick.c |
 | 120 | `se_laughter.ogg` | `se_laughter` | ハハハという笑い声（モンスターや魔法使用時） | sounds.c, uhitm.c |
-| 121 | `se_lid_slams_open_falls_shut.ogg` | `se_lid_slams_open_falls_shut` | 箱の蓋がガタンと開き、ズンと閉まる音 | 予備（直接呼び出しなし） |
+| 121 | `se_lid_slams_open_falls_shut.ogg` | `se_lid_slams_open_falls_shut` | 箱の蓋がガタンと開き、ズンと閉まる音 | dokick.c |
 | 122 | `se_loud_click.ogg` | `se_loud_click` | カチャンという大きな機構の作動音（罠発動） | trap.c |
 | 123 | `se_loud_crash.ogg` | `se_loud_crash` | 大音響の衝突・崩壊音 | dbridge.c, trap.c |
 | 124 | `se_loud_pop.ogg` | `se_loud_pop` | ポーンと弾けて破裂する音（泡・爆発） | fountain.c |
@@ -256,6 +256,11 @@ Cコアの `include/seffects.h` に定義されている 239 種の効果音 ID 
 | 237 | `se_kick.ogg` | `se_kick` | ドア・宝箱・モンスター・壁などを蹴った時の打撃音 | dokick.c |
 | 238 | `se_stairs_up.ogg` | `se_stairs_up` | 階段やはしごを登るときの効果音 | do.c |
 | 239 | `se_stairs_down.ogg` | `se_stairs_down` | 階段やはしごを降りるときの効果音 | do.c |
+| 240 | `se_kick_door_it_crashes_open.ogg` | `se_kick_door_it_crashes_open` | ドアを蹴って勢いよく開けた時の音 | dokick.c |
+| 241 | `se_kick_door_it_shatters.ogg` | `se_kick_door_it_shatters` | ドアを蹴って完全に粉砕した時の音 | dokick.c |
+| 242 | `se_debuff.ogg` | `se_debuff` | 状態異常（デバフ）を受けた時のトーンダウン下降音 | potion.c, do.c |
+| 243 | `se_hunger.ogg` | `se_hunger` | 空腹状態（Hungry, Weak, Fainting）悪化時のお腹の音 | eat.c |
+| 244 | `se_force_lock.ogg` | `se_force_lock` | 箱の鍵を無理やりこじ開けた時の力強い破断音 | lock.c |
 
 > **詳細仕様**: 各戦闘アクション効果音の詳細な判定ロジック、音量制御（不可視40%気配察知）、および素材制作指針は [combat_sound_specification.md](combat_sound_specification.md) を参照してください。
 
@@ -481,7 +486,7 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 
 ---
 
-### `do.c` （計 12 箇所）
+### `do.c` （計 13 箇所）
 
 | 行番号 | マクロ | 引数 / サウンドID | 対応 .ogg ファイル | コードスニペット |
 | :--- | :--- | :--- | :--- | :--- |
@@ -497,6 +502,7 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 | L1876 | `Soundeffect` | `se_groans_and_moans, 25` | `se_groans_and_moans.ogg` | `Soundeffect(se_groans_and_moans, 25);` |
 | L1905 | `Soundeffect` | `se_alarm, 100` | `se_alarm.ogg` | `Soundeffect(se_alarm, 100);` |
 | L2241 | `Soundeffect` | `se_scratching, 50` | `se_scratching.ogg` | `Soundeffect(se_scratching, 50);` |
+| L2450 | `Soundeffect` | `se_debuff, 60` | `se_debuff.ogg` | `Soundeffect(se_debuff, 60);` |
 
 ---
 
@@ -508,7 +514,7 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 
 ---
 
-### `dokick.c` （計 23 箇所）
+### `dokick.c` （計 25 箇所）
 
 | 行番号 | マクロ | 引数 / サウンドID | 対応 .ogg ファイル | コードスニペット |
 | :--- | :--- | :--- | :--- | :--- |
@@ -523,6 +529,8 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 | L453 | `Soundeffect` | `se_egg_cracking, 25` | `se_egg_cracking.ogg` | `Soundeffect(se_egg_cracking, 25);` |
 | L455 | `Soundeffect` | `se_glass_shattering, 50` | `se_glass_shattering.ogg` | `Soundeffect(se_glass_shattering, 50);` |
 | L658 | `Soundeffect` | `se_kick, 50` | `se_kick.ogg` | `Soundeffect(se_kick, 50);` |
+| L665 | `Soundeffect` | `se_crashing_sound, 60` | `se_crashing_sound.ogg` | `Soundeffect(se_crashing_sound, 60);` |
+| L673 | `Soundeffect` | `se_lid_slams_open_falls_shut, 50` | `se_lid_slams_open_falls_shut.ogg` | `Soundeffect(se_lid_slams_open_falls_shut, 50);` |
 | L693 | `Soundeffect` | `se_kick, 50` | `se_kick.ogg` | `Soundeffect(se_kick, 50);` |
 | L892 | `Soundeffect` | `se_kick, 50` | `se_kick.ogg` | `Soundeffect(se_kick, 50);` |
 | L945 | `Soundeffect` | `se_kick_door_it_shatters, 50` | `se_kick_door_it_shatters.ogg` | `Soundeffect(se_kick_door_it_shatters, 50);` |
@@ -547,11 +555,14 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 
 ---
 
-### `eat.c` （計 1 箇所）
+### `eat.c` （計 4 箇所）
 
 | 行番号 | マクロ | 引数 / サウンドID | 対応 .ogg ファイル | コードスニペット |
 | :--- | :--- | :--- | :--- | :--- |
 | L2762 | `Soundeffect` | `se_sinister_laughter, 100` | `se_sinister_laughter.ogg` | `Soundeffect(se_sinister_laughter, 100);` |
+| L3586 | `Soundeffect` | `se_hunger, 80` | `se_hunger.ogg` | `Soundeffect(se_hunger, 80);` |
+| L3635 | `Soundeffect` | `se_hunger, 60` | `se_hunger.ogg` | `Soundeffect(se_hunger, 60);` |
+| L3650 | `Soundeffect` | `se_hunger, 70` | `se_hunger.ogg` | `Soundeffect(se_hunger, 70);` |
 
 ---
 
@@ -609,10 +620,14 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 
 ---
 
-### `lock.c` （計 9 箇所）
+### `lock.c` （計 13 箇所）
 
 | 行番号 | マクロ | 引数 / サウンドID | 対応 .ogg ファイル | コードスニペット |
 | :--- | :--- | :--- | :--- | :--- |
+| L136 | `Soundeffect` | `se_klick, 50` | `se_klick.ogg` | `Soundeffect(se_klick, 50);` |
+| L144 | `Soundeffect` | `se_klick, 50` | `se_klick.ogg` | `Soundeffect(se_klick, 50);` |
+| L154 | `Soundeffect` | `se_force_lock, 60` | `se_force_lock.ogg` | `Soundeffect(se_force_lock, 60);` |
+| L168 | `Soundeffect` | `se_crashing_sound, 70` | `se_crashing_sound.ogg` | `Soundeffect(se_crashing_sound, 70);` |
 | L552 | `SetVoice` | `mtmp, 0, 80, 0` | `voice_shopkeeper.ogg または voice_mon_generic.ogg` | `SetVoice(mtmp, 0, 80, 0);` |
 | L893 | `Soundeffect` | `se_door_open, 80` | `se_door_open.ogg` | `Soundeffect(se_door_open, 80);` |
 | L1030 | `Soundeffect` | `se_door_close, 80` | `se_door_close.ogg` | `Soundeffect(se_door_close, 80);` |
@@ -788,10 +803,18 @@ Cコアのソースファイルごとに、どの行でどのサウンドマク�
 
 ---
 
-### `potion.c` （計 3 箇所）
+### `potion.c` （計 11 箇所）
 
 | 行番号 | マクロ | 引数 / サウンドID | 対応 .ogg ファイル | コードスニペット |
 | :--- | :--- | :--- | :--- | :--- |
+| L101 | `Soundeffect` | `se_debuff, 60` | `se_debuff.ogg` | `Soundeffect(se_debuff, 60);` |
+| L123 | `Soundeffect` | `se_debuff, 60` | `se_debuff.ogg` | `Soundeffect(se_debuff, 60);` |
+| L158 | `Soundeffect` | `se_debuff, 60` | `se_debuff.ogg` | `Soundeffect(se_debuff, 60);` |
+| L210 | `Soundeffect` | `se_debuff, 60` | `se_debuff.ogg` | `Soundeffect(se_debuff, 60);` |
+| L239 | `Soundeffect` | `se_debuff, 60` | `se_debuff.ogg` | `Soundeffect(se_debuff, 60);` |
+| L259 | `Soundeffect` | `se_debuff, 60` | `se_debuff.ogg` | `Soundeffect(se_debuff, 60);` |
+| L311 | `Soundeffect` | `se_debuff, 60` | `se_debuff.ogg` | `Soundeffect(se_debuff, 60);` |
+| L421 | `Soundeffect` | `se_debuff, 60` | `se_debuff.ogg` | `Soundeffect(se_debuff, 60);` |
 | L1655 | `Soundeffect` | `se_potion_crash_and_break, 60` | `se_potion_crash_and_break.ogg` | `Soundeffect(se_potion_crash_and_break, 60);` |
 | L1672 | `Soundeffect` | `se_potion_crash_and_break, 60` | `se_potion_crash_and_break.ogg` | `Soundeffect(se_potion_crash_and_break, 60);` |
 | L2831 | `SetVoice` | `mtmp, 0, 80, 0` | `voice_shopkeeper.ogg または voice_mon_generic.ogg` | `SetVoice(mtmp, 0, 80, 0);` |

@@ -89,7 +89,7 @@ def normalize_and_convert(
         detect_filters = base_filters + [comp_filter, "volumedetect"]
         detect_str = ",".join(detect_filters)
 
-        cmd_det = ["ffmpeg", "-i", str(input_path)]
+        cmd_det = ["ffmpeg", "-i", str(input_path), "-vn"]
         if start_offset is not None and start_offset > 0:
             cmd_det.extend(["-ss", f"{start_offset:.3f}"])
         if duration is not None and duration > 0:
@@ -125,6 +125,7 @@ def normalize_and_convert(
         cmd.extend(["-t", f"{duration:.3f}"])
 
     cmd.extend(["-i", str(input_path)])
+    cmd.append("-vn")
     cmd.extend(["-af", filter_str])
     cmd.extend(["-ar", "48000"])
 

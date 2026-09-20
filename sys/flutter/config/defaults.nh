@@ -181,6 +181,9 @@ MENUCOLOR="unpaid" = blue
 ## Keep changes for x number of turns
 OPTIONS=statushilites:10
 
+## Characteristics
+OPTIONS=hilite_status:characteristics/up/green/down/red
+
 ## HP
 OPTIONS=hilite_status:hitpoints/100%/green/<100%/green/<70%/yellow
 OPTIONS=hilite_status:hitpoints/<50%/orange/<30%/red&bold
