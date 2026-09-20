@@ -111,11 +111,15 @@ class _DialogRecentMessagesBoxState extends State<DialogRecentMessagesBox> {
                             ),
                             const Spacer(),
                             if (widget.onTapHistory != null) ...[
-                              Text(
-                                tapHintText,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.white.withValues(alpha: 0.45),
+                              Flexible(
+                                child: Text(
+                                  tapHintText,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.white.withValues(alpha: 0.45),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
                                 ),
                               ),
                               const SizedBox(width: 2),
@@ -131,28 +135,26 @@ class _DialogRecentMessagesBoxState extends State<DialogRecentMessagesBox> {
                         // メッセージ本文エリア（最下部初期表示・スクロール可能）
                         ConstrainedBox(
                           constraints: BoxConstraints(maxHeight: maxHeight),
-                          child: Scrollbar(
+                          child: SingleChildScrollView(
                             controller: _scrollController,
-                            thumbVisibility: widget.messages.length > 2,
-                            child: SingleChildScrollView(
-                              controller: _scrollController,
-                              physics: const BouncingScrollPhysics(),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: widget.messages.map((msg) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 1.5),
-                                    child: Text(
-                                      msg,
-                                      style: const TextStyle(
-                                        fontSize: 12.5,
-                                        height: 1.3,
-                                        color: Colors.white70,
-                                      ),
+                            physics: const BouncingScrollPhysics(),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: widget.messages.map((msg) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 1.5),
+                                  child: Text(
+                                    msg,
+                                    style: const TextStyle(
+                                      fontSize: 12.5,
+                                      height: 1.3,
+                                      color: Colors.white70,
                                     ),
-                                  );
-                                }).toList(),
-                              ),
+                                    softWrap: true,
+                                    overflow: TextOverflow.clip,
+                                  ),
+                                );
+                              }).toList(),
                             ),
                           ),
                         ),
