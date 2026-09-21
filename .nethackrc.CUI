@@ -235,7 +235,11 @@ OPTIONS=windowcolors:status white/trueblack message white/trueblack
 
 
 # Status hilites
-OPTIONS=statushilites
+OPTIONS=statushilites:10
+
+## Characteristics
+OPTIONS=hilite_status:characteristics/up/green/down/red
+
 # HP
 OPTIONS=hitpointbar
 OPTIONS=hilite_status:hitpoints/100%/gray&bold

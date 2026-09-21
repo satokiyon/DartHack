@@ -89,8 +89,11 @@ MENUCOLOR="(エクスカリバー|ストームブリンガー|ミョルニル|�
 MENUCOLOR="未払い" = blue
 
 # *** STATUS HILITES ***
-OPTIONS=statushilites
+OPTIONS=statushilites:10
 OPTIONS=hitpointbar
+
+## Characteristics
+OPTIONS=hilite_status:characteristics/up/green/down/red
 
 # HP
 OPTIONS=hilite_status:hitpoints/100%/gray&bold
