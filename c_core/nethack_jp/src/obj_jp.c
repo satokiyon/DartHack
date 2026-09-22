@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-20. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-22. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -399,7 +399,7 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [TURQUOISE] = "トルコ石",
     [TWO_HANDED_SWORD] = "両手剣",
     [UNICORN_HORN] = "ユニコーンの角",
-    [URUK_HAI_SHIELD] = "ウルク・ハイの盾",
+    [URUK_HAI_SHIELD] = "ウルク＝ハイの盾",
     [VOULGE] = "ヴォウジェ",
     [WAN_CANCELLATION] = "無力化の杖",
     [WAN_COLD] = "吹雪の杖",
