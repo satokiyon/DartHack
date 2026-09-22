@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-22. */
 #include "hack.h"
 
 /*
@@ -118,7 +118,7 @@ static const char *const mon_jp_names[NUMMONS][NUM_MGENDERS] = {
     [PM_ORC] = { 0, 0, "オーク" },
     [PM_HILL_ORC] = { 0, 0, "丘のオーク" },
     [PM_MORDOR_ORC] = { 0, 0, "モルドールのオーク" },
-    [PM_URUK_HAI] = { 0, 0, "ウルク・ハイ" },
+    [PM_URUK_HAI] = { 0, 0, "ウルク＝ハイ" },
     [PM_ORC_CAPTAIN] = { 0, 0, "オークの隊長" },
     [PM_ORC_SHAMAN] = { 0, 0, "オークの呪術師" },
     [PM_ORC_ZOMBIE] = { 0, 0, "オークのゾンビ" },
@@ -182,7 +182,7 @@ static const char *const mon_jp_names[NUMMONS][NUM_MGENDERS] = {
     [PM_ICE_TROLL] = { 0, 0, "氷のトロル" },
     [PM_ROCK_TROLL] = { 0, 0, "岩のトロル" },
     [PM_WATER_TROLL] = { 0, 0, "水のトロル" },
-    [PM_OLOG_HAI] = { 0, 0, "オログハイ" },
+    [PM_OLOG_HAI] = { 0, 0, "オログ＝ハイ" },
     [PM_UMBER_HULK] = { 0, 0, "アンバーハルク" },
     [PM_OGRE] = { 0, 0, "オーガ" },
     [PM_OGRE_LEADER] = { 0, 0, "オーガの首領" },
