@@ -137,7 +137,7 @@ NetHackQtBind::qt_Splash()
         lsplash->setPixmap(pm);
         lsplash->setFixedSize(pm.size());
         //lsplash->setMask(pm.mask());
-        QLabel *capt = new QLabel("Loading...", splash);
+        QLabel *capt = new QLabel("読み込み中...", splash);
         vb->addWidget(capt);
         capt->setAlignment(Qt::AlignCenter);
 

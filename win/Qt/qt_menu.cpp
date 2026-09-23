@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -182,22 +182,22 @@ NetHackQtMenuWindow::NetHackQtMenuWindow(QWidget *parent) :
     table->horizontalHeader()->hide();
     table->verticalHeader()->hide();
 
-    ok=new QPushButton("Ok");
+    ok=new QPushButton("決定");
     connect(ok,SIGNAL(clicked()),this,SLOT(accept()));
 
-    cancel=new QPushButton("Cancel");
+    cancel=new QPushButton("キャンセル");
     connect(cancel,SIGNAL(clicked()),this,SLOT(reject()));
 
-    all=new QPushButton("All");
+    all=new QPushButton("すべて");
     connect(all,SIGNAL(clicked()),this,SLOT(All()));
 
-    none=new QPushButton("None");
+    none=new QPushButton("解除");
     connect(none,SIGNAL(clicked()),this,SLOT(ChooseNone()));
 
-    invert=new QPushButton("Invert");
+    invert=new QPushButton("反転");
     connect(invert,SIGNAL(clicked()),this,SLOT(Invert()));
 
-    search=new QPushButton("Search");
+    search=new QPushButton("検索");
     connect(search,SIGNAL(clicked()),this,SLOT(Search()));
 
     QPoint pos(0,ok->height());
@@ -649,7 +649,7 @@ void NetHackQtMenuWindow::InputCount(char key)
 	countstr += QChar(key);
     }
     if (counting)
-	prompt.setText("Count: " + countstr);
+	prompt.setText("個数: " + countstr);
 }
 
 void NetHackQtMenuWindow::ClearCount(void)

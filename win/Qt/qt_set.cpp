@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -175,7 +176,7 @@ NetHackQtSettings::NetHackQtSettings() :
     int row = 0; // used like X11-style XtSetArg(), ++argc
      QGridLayout *grid = new QGridLayout(this);
     // dialog box label, spans first two rows and all three columns
-    QLabel *settings_label = new QLabel("Qt NetHack Settings\n", this);
+    QLabel *settings_label = new QLabel("Qt NetHack 設定\n", this);
     grid->addWidget(settings_label, row, 0, 2, 3), row += 2; // uses extra row
     settings_label->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
 
@@ -205,7 +206,7 @@ NetHackQtSettings::NetHackQtSettings() :
     grid->addWidget(flabel, row, 0),
         grid->addWidget(&fontsize, row, 1), ++row;
 
-    QPushButton *dismiss = new QPushButton("Dismiss", this);
+    QPushButton *dismiss = new QPushButton("閉じる", this);
     dismiss->setDefault(true);
     grid->addWidget(dismiss, row, 0, 1, 3), ++row;
     grid->setRowStretch(row - 1, 0);

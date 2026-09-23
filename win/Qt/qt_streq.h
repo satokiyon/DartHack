@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -20,8 +21,8 @@ private:
 
 public:
         NetHackQtStringRequestor(QWidget *parent, const char *p,
-                                 const char *cancelstr = "Cancel",
-                                 const char *okaystr = "Okay");
+                                 const char *cancelstr = "キャンセル",
+                                 const char *okaystr = "OK");
         void SetDefault(const char *);
         // maxchar is size of buffer[], minchar is size of line edit widget
         bool Get(char *buffer, int maxchar = 80, int minchar = 20);

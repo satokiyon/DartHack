@@ -202,11 +202,11 @@ char NetHackQtYnDialog::Exec()
                 // use alternate text is needed
                 switch (ch[i].cell()) {
                 case 'y':
-                    button_name = "Yes";
+                    button_name = "はい";
                     making_y = true;
                     break;
                 case 'n':
-                    button_name = "No";
+                    button_name = "いいえ";
                     break;
                 case 'a':
                     // the display of vanquished monsters uses "ynaq" for
@@ -214,9 +214,9 @@ char NetHackQtYnDialog::Exec()
                     // show "sort" instead of "all" and allow player to
                     // type either 'a' or 's' when not clicking on button
                     if (question.contains(QString("vanquished?")))
-                        button_name = "Sort", AltChoice('s', 'a');
+                        button_name = "並べ替え", AltChoice('s', 'a');
                     else
-                        button_name = "All";
+                        button_name = "すべて";
                     break;
                 case 'q':
                     // most 'q' replies are actually for "cancel" but
@@ -225,17 +225,17 @@ char NetHackQtYnDialog::Exec()
                     if (question.left(10) == QString("Dump core?")
                         || (::program_state.gameover
                             && question.left(11) == QString("Do you want")))
-                        button_name = "Quit";
+                        button_name = "終了";
                     else if (is_ynaq)
-                        button_name = "Stop", AltChoice('s', 'q');
+                        button_name = "中断", AltChoice('s', 'q');
                     else
-                        button_name = "Cancel", AltChoice('c', 'q');
+                        button_name = "キャンセル", AltChoice('c', 'q');
                     break;
                 case 'l':
-                    button_name = "Left";
+                    button_name = "左";
                     break;
                 case 'r':
-                    button_name = "Right";
+                    button_name = "右";
                     break;
                 }
             } else {
@@ -306,7 +306,7 @@ char NetHackQtYnDialog::Exec()
         QLabel *lb = 0;
         if (allow_count) {
             // insert Count widget in front of [n], between [y] and [n][a][q]
-            lb = new QLabel("Count:");
+            lb = new QLabel("個数:");
             groupbox->insertWidget(1, lb); // [y] button is item #0, [n] is #1
             le = new QLineEdit();
             groupbox->insertWidget(2, le); // [n] became #2, Count label is #1
