@@ -855,36 +855,34 @@ void NetHackQtStatusWindow::updateStats()
     } else
         vers.hide();
 
-    if (Upolyd) {
-        // NetHackJP: "<monster name>の<name>" and "keep the monster name
-        // untranslated (already Japanese); skip English capitalization
-	buf = nh_qsprintf("%s",
-                          pmname(&mons[u.umonnum],
-                                 ::flags.female ? FEMALE : MALE));
-    }
     QString buf2;
     char buf3[BUFSZ];
     if (Upolyd) {
-        buf2 = nh_qsprintf("%sの%s", buf.toUtf8().constData(),
-                           upstart(strcpy(buf3, svp.plname)));
+        // NetHackJP: "<name> <monster name>" side-by-side; pmname() is
+        // already Japanese, call it directly as C string
+        char mbuf[BUFSZ];
+        str_copy(mbuf, pmname(&mons[u.umonnum],
+                              ::flags.female ? FEMALE : MALE),
+                 sizeof mbuf - 1);
+        buf2 = nh_qsprintf("%s %s", upstart(strcpy(buf3, svp.plname)), mbuf);
     } else {
-        // NetHackJP: "<rank>の<name>" (e.g. "掠奪者のテスト"); the
-        // pre-2026 patches used rank_of() which returns English "the Plunder"
+        // NetHackJP: "<name> <rank>" side-by-side like the tty console
+        // (previous patch used "<rank>の<name>")
         str_copy(buf3, svp.plname, sizeof buf3 - 1);
-        buf2 = nh_qsprintf("%sの%s",
+        buf2 = nh_qsprintf("%s %s",
+                           upstart(buf3),
                            jp_rank_of_for_display(u.ulevel,
                                                   svp.pl_character[0],
-                                                  ::flags.female),
-                           upstart(buf3));
+                                                  ::flags.female));
     }
     name.setLabel(buf2, NetHackQtLabelledIcon::NoNum, u.ulevel);
 
     if (!describe_level(buf3, 0)) {
-	// NetHackJP: main dungeon needs JP "dungeon name:depth"; the
+	// NetHackJP: main dungeon needs JPdungeon name and depth; the
 	// core's describe_level() prints "階層:%d" for the status itself,
 	// so this fallback is only reached on rare ports... show the
 	// dungeon name in Japanese instead of "The Dungeons of Doom, level N"
-	Sprintf(buf3, "%s:%d", jp_dungeon_name_by_dnum(u.uz.dnum),
+	Sprintf(buf3, "%s: 階層%d", jp_dungeon_name_by_dnum(u.uz.dnum),
                 ::depth(&u.uz));
     }
     dlevel.setLabel(buf3);

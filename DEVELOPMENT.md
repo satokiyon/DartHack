@@ -709,8 +709,8 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **背景**:
   Qt6 ステータスウィンドウの名前行が `rank_of()` による英文称号（例: `テスト the Plunder`）を表示しており、ダンジョン階層表示も `describe_level()` の戻り値を誤解した常時フォールバック（`The Dungeons of Doom, level N`）になっていた。
 * **修正内容** (`win/Qt/qt_stat.cpp`):
-  1. 名前行を `jp_rank_of_for_display(u.ulevel, svp.pl_character[0], flags.female)` による「<称号>の<名前>」（例: 掠奪者のテスト）に変更。変身中は「<モンスター名>の<名前>」とする（X11 `winstat.c` と同等の情報源）。
-  2. ダンジョン階層は `jp_dungeon_name_by_dnum(u.uz.dnum)` による「<ダンジョン名>:<深さ>」（例: 運命の大迷宮:3）に変更。クエスト / エンドゲーム / ノックス / チュートリアルはコア `describe_level()` の日本語出力がそのまま使われる。
+  1. 名前行はコンソール (tty) と同じ「<名前> <称号>」の並列形式（例: テスト 乱暴者）にする（初版は「<称号>の<名前>」だったがユーザー確認のフィードバックにより形式変更）。変身中は「<名前> <モンスター名>」。`pmname()` は `const char *` を返すため QString 変換を経由せず C 文字列で結合する。
+  2. ダンジョン階層は `jp_dungeon_name_by_dnum(u.uz.dnum)` による「<ダンジョン名>: 階層<深さ>」（例: 運命の大迷宮: 階層1）。初版の「<ダンジョン名>:3」から、深さの意味を明示する形式へ変更。クエスト / エンドゲーム / ノックス / チュートリアルはコア `describe_level()` の日本語出力がそのまま使われる。
   3. `describe_level()` はメイン地層では常に 0 を返す仕様（botl.c のコメントどおり「ports with more room may expand this」）のため、Qt 独自の日本語フォールバックを用意した。
 * **マーカータグ**: `// NetHackJP: <rank>の<name>` / `// NetHackJP: main dungeon needs JP "dungeon name:depth"`
 * **対応ファイル**: `win/Qt/qt_stat.cpp`
