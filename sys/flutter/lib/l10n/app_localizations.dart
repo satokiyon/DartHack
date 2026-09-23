@@ -1970,6 +1970,30 @@ abstract class AppLocalizations {
   /// **'• @satokiyon\n• with Google Antigravity and Gemini'**
   String get creditsContributorList;
 
+  /// No description provided for @soundCreditsButton.
+  ///
+  /// In ja, this message translates to:
+  /// **'BGM・効果音'**
+  String get soundCreditsButton;
+
+  /// No description provided for @soundCreditsDialogTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'BGM・効果音 クレジット'**
+  String get soundCreditsDialogTitle;
+
+  /// No description provided for @soundCreditsItemsCount.
+  ///
+  /// In ja, this message translates to:
+  /// **'{count}件'**
+  String soundCreditsItemsCount(Object count);
+
+  /// No description provided for @soundCreditsCopiedUrl.
+  ///
+  /// In ja, this message translates to:
+  /// **'URLをクリップボードにコピーしました'**
+  String get soundCreditsCopiedUrl;
+
   /// No description provided for @editDefaultsTitle.
   ///
   /// In ja, this message translates to:

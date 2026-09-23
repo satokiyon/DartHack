@@ -14,6 +14,7 @@ import 'utils/scale_clamp.dart';
 import 'widgets/shortcut_edit_dialog.dart';
 import 'l10n/app_localizations.dart';
 import 'services/sound_manager.dart';
+import 'widgets/sound_credits_dialog.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -1942,6 +1943,20 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(l10n.creditsContributorList),
+                const SizedBox(height: 16),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.music_note, color: Colors.amberAccent, size: 20),
+                  label: Text(
+                    l10n.soundCreditsButton,
+                    style: const TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.amberAccent),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () => SoundCreditsDialog.show(context),
+                ),
               ],
             ),
           ),

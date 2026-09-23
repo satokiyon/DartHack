@@ -332,6 +332,10 @@
   "creditsBody3": "Part of the UI design is inspired by gurrhack's ForkFront.",
   "creditsContributors": "Contributors:",
   "creditsContributorList": "• @satokiyon\n• with Google Antigravity and Gemini",
+  "soundCreditsButton": "BGM & Sound Effects",
+  "soundCreditsDialogTitle": "BGM & Sound Effects Credits",
+  "soundCreditsItemsCount": "{count} items",
+  "soundCreditsCopiedUrl": "URL copied to clipboard",
 
   "editDefaultsTitle": "Edit defaults.nh",
   "saveTooltip": "Save",

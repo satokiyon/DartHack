@@ -980,6 +980,20 @@ class AppLocalizationsJa extends AppLocalizations {
       '• @satokiyon\n• with Google Antigravity and Gemini';
 
   @override
+  String get soundCreditsButton => 'BGM・効果音';
+
+  @override
+  String get soundCreditsDialogTitle => 'BGM・効果音 クレジット';
+
+  @override
+  String soundCreditsItemsCount(Object count) {
+    return '$count件';
+  }
+
+  @override
+  String get soundCreditsCopiedUrl => 'URLをクリップボードにコピーしました';
+
+  @override
   String get editDefaultsTitle => 'defaults.nh を編集';
 
   @override

@@ -333,6 +333,10 @@
   "creditsBody3": "UI デザインの一部は、gurrhack の ForkFront を参考にしています。",
   "creditsContributors": "Contributors:",
   "creditsContributorList": "• @satokiyon\n• with Google Antigravity and Gemini",
+  "soundCreditsButton": "BGM・効果音",
+  "soundCreditsDialogTitle": "BGM・効果音 クレジット",
+  "soundCreditsItemsCount": "{count}件",
+  "soundCreditsCopiedUrl": "URLをクリップボードにコピーしました",
 
   "editDefaultsTitle": "defaults.nh を編集",
   "saveTooltip": "保存",

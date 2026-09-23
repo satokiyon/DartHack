@@ -138,7 +138,7 @@ def save_database(db: List[Dict[str, Any]]):
     DATABASE_PATH.write_text(json.dumps(db, ensure_ascii=False, indent=2), encoding="utf-8")
 
 def generate_attributions(db: List[Dict[str, Any]]):
-    """ready な音源から attributions.txt を生成する"""
+    """ready な外部音源から attributions.txt を生成する（自作音源はクレジット除外）"""
     SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
     lines = [
         "NetHack 5.0 / DartHack Sound Attributions and Credits",
@@ -149,21 +149,81 @@ def generate_attributions(db: List[Dict[str, Any]]):
 
     ready_count = 0
     for item in db:
-        if item["status"] != "ready":
+        if item.get("status") != "ready":
             continue
+
+        src = item.get("source_site", "").strip()
+        url = item.get("source_url", "").strip()
+
+        # 自作音源（外部サイトからの借用でないもの）はクレジット一覧から除外
+        if src in ("自作音源（クレジット対象外）", "DartHack", "自作") or (not src and not url):
+            continue
+
+        # 提供元名が「その他」または空の場合、URLから自動補完
+        if not src or "その他" in src:
+            if "gemini.google.com" in url:
+                src = "Google Gemini (AI生成)"
+            elif "creatorchords.com" in url:
+                src = "CreatorChords"
+            elif "howlingindicator.net" in url:
+                src = "Howling-Indicator"
+            elif "peritune.com" in url:
+                src = "PeriTune"
+            elif "pixabay.com/sound-effects" in url:
+                src = "Pixabay SoundEffect"
+            elif "pixabay.com" in url:
+                src = "Pixabay Music"
+            elif "soundeffect-lab.info" in url:
+                src = "効果音ラボ"
+            else:
+                continue
+
+        if src == "Pixabay" or (src == "Pixabay Music" and "sound-effects" in url):
+            src = "Pixabay SoundEffect"
+
+        author = item.get("author", "").strip()
+        # 作者がPixabay単体の場合は Pixabay SoundEffect に
+        if author == "Pixabay":
+            author = "Pixabay SoundEffect"
+        elif not author or "その他" in author or author == "Unknown":
+            if "gemini" in src.lower() or "gemini" in url.lower():
+                author = "Google Gemini"
+            elif "creatorchords" in src.lower() or "creatorchords" in url.lower():
+                author = "Alexander Nakarada"
+            else:
+                author = src
+
+        license_str = item.get("license", "").strip()
+        if not license_str or "その他" in license_str or license_str == "Unknown":
+            if "gemini" in src.lower() or "gemini" in url.lower():
+                license_str = "Gemini 利用規約"
+            elif "howling" in src.lower() or "howling" in url.lower():
+                license_str = "Howling-Indicator利用規約"
+            elif "creatorchords" in src.lower() or "creatorchords" in url.lower():
+                license_str = "CC-BY 4.0"
+            else:
+                license_str = f"{src} 利用規約"
 
         ready_count += 1
         lines.append(f"File:        {item['filename']}")
-        lines.append(f"Description: {item['description']}")
-        lines.append(f"Source:      {item.get('source_site', 'Unknown')} ({item.get('source_url', 'N/A')})")
-        lines.append(f"Author:      {item.get('author', 'Unknown')}")
-        lines.append(f"License:     {item.get('license', 'Unknown')}")
+        lines.append(f"Description: {item.get('description', '')}")
+        lines.append(f"Source:      {src} ({url})")
+        lines.append(f"Author:      {author}")
+        lines.append(f"License:     {license_str}")
         if item.get("notes"):
             lines.append(f"Notes:       {item['notes']}")
         lines.append("-" * 55)
 
     lines.append(f"\nTotal ready assets documented: {ready_count} / {len(db)}")
-    ATTRIBUTIONS_PATH.write_text("\n".join(lines), encoding="utf-8")
+    content = "\n".join(lines) + "\n"
+
+    # DartHack_private と DartHack 両方の attributions.txt を更新
+    ATTRIBUTIONS_PATH.write_text(content, encoding="utf-8")
+    darthack_public_attr = CUR_DIR.parent.parent / "assets" / "sounds" / "attributions.txt"
+    if darthack_public_attr.resolve() != ATTRIBUTIONS_PATH.resolve():
+        darthack_public_attr.parent.mkdir(parents=True, exist_ok=True)
+        darthack_public_attr.write_text(content, encoding="utf-8")
+
 
 if __name__ == "__main__":
     db = load_or_init_database()

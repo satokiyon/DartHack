@@ -993,6 +993,20 @@ class AppLocalizationsEn extends AppLocalizations {
       '• @satokiyon\n• with Google Antigravity and Gemini';
 
   @override
+  String get soundCreditsButton => 'BGM & Sound Effects';
+
+  @override
+  String get soundCreditsDialogTitle => 'BGM & Sound Effects Credits';
+
+  @override
+  String soundCreditsItemsCount(Object count) {
+    return '$count items';
+  }
+
+  @override
+  String get soundCreditsCopiedUrl => 'URL copied to clipboard';
+
+  @override
   String get editDefaultsTitle => 'Edit defaults.nh';
 
   @override
