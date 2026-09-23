@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	zap.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.596 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -418,7 +418,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
         } else if ((obj = which_armor(mtmp, W_SADDLE)) != 0) {
             char buf[BUFSZ];
 
-            Sprintf(buf, "%s %s", s_suffix(Monnam(mtmp)),
+            Sprintf(buf, "%sの%s", Monnam(mtmp),
                     distant_name(obj, xname));
             if (cansee(mtmp->mx, mtmp->my)) {
                 if (!canspotmon(mtmp))
@@ -5923,7 +5923,7 @@ maybe_destroy_item(
                                      : ((cnt < quan) ? "いくつかの"   /* n of N */
                                             : (quan == 2L) ? "両方の"     /* 2 of 2 */
                                                 : "すべての");             /* N of N */
-            pline("%s%s %s!", mult,
+            pline("%s%s%sは%s!", u_carry ? "あなたの" : "その", mult,
                 xname(obj),
                   destroy_strings[dindx][(cnt > 1L)]);
         }

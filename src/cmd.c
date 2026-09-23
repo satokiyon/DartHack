@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	cmd.c	$NHDT-Date: 1781973043 2026/06/20 16:30:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.772 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -4623,9 +4623,10 @@ there_cmd_menu_next2u(
         Sprintf(buf, "%sと位置を入れ替える", l_monnam(mtmp));
         mcmd_addmenu(win, MCMD_MOVE_DIR, buf), ++K;
 
-        Sprintf(buf, "%s %s",
-            !has_mgivenname(mtmp) ? "名前を付ける" : "名前を変更する",
-                mon_nam(mtmp));
+        if (!has_mgivenname(mtmp))
+            Sprintf(buf, "その%sに名前を付ける", l_monnam(mtmp));
+        else
+            Sprintf(buf, "その%sの名前を変更する", l_monnam(mtmp));
         mcmd_addmenu(win, MCMD_NAME, buf), ++K;
     }
 

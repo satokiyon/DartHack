@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	botl.c	$NHDT-Date: 1781973042 2026/06/20 16:30:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.286 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -639,7 +639,7 @@ static const struct RoleName jp_role_ranks[NUM_ROLES][9] = {
     {
         { "根堀人", 0 }, { "治療師", 0 }, { "遺体処理師", 0 },
         { "創傷処置師", 0 }, { "整骨医", 0 }, { "薬草治療師", 0 },
-        { "治療大師 ", 0 }, { "治療医", 0 }, { "外科医", 0 }
+        { "治療大師", 0 }, { "治療医", 0 }, { "外科医", 0 }
     },
     {
         { "騎士見習い", 0 }, { "従士", 0 }, { "准騎士", 0 },

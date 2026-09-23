@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-05. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -528,6 +528,23 @@ jp_translate_killer_text_for_display(
             Snprintf(outmain, sizeof outmain, "溶岩に座ったことで倒された");
         } else if (!strcmpi(killer, "mildly contaminated potion")) {
             Snprintf(outmain, sizeof outmain, "少し古くなった薬で倒された");
+        } else if (!strcmpi(killer, "boiling potion")
+                   || !strcmpi(killer, "boiling potions")) {
+            Snprintf(outmain, sizeof outmain, "沸騰して爆発した薬で倒された");
+        } else if (!strcmpi(killer, "exploding potion")
+                   || !strcmpi(killer, "exploding potions")) {
+            Snprintf(outmain, sizeof outmain, "引火して爆発した薬で倒された");
+        } else if (!strcmpi(killer, "shattered potion")
+                   || !strcmpi(killer, "shattered potions")) {
+            Snprintf(outmain, sizeof outmain, "凍結して砕け散った薬で倒された");
+        } else if (!strcmpi(killer, "burning scroll")
+                   || !strcmpi(killer, "burning scrolls")) {
+            Snprintf(outmain, sizeof outmain, "燃え上がった巻物で倒された");
+        } else if (!strcmpi(killer, "burning book")) {
+            Snprintf(outmain, sizeof outmain, "燃え上がった魔法書で倒された");
+        } else if (!strcmpi(killer, "exploding glob of slime")
+                   || !strcmpi(killer, "exploding globs of slime")) {
+            Snprintf(outmain, sizeof outmain, "爆発したスライムの塊で倒された");
         } else if (!strcmpi(killer, "contusion from a small passage")) {
             Snprintf(outmain, sizeof outmain, "狭い通路で頭を打ったことで倒された");
         } else if (!strcmpi(killer, "strangulation")) {
@@ -921,6 +938,23 @@ jp_translate_killer_text_for_display(
         Snprintf(outmain, sizeof outmain, "玉座に座った悪影響");
     } else if (!strcmpi(core, "mildly contaminated potion")) {
         Snprintf(outmain, sizeof outmain, "少し古くなった薬");
+    } else if (!strcmpi(core, "boiling potion")
+               || !strcmpi(core, "boiling potions")) {
+        Snprintf(outmain, sizeof outmain, "沸騰して爆発した薬");
+    } else if (!strcmpi(core, "exploding potion")
+               || !strcmpi(core, "exploding potions")) {
+        Snprintf(outmain, sizeof outmain, "引火して爆発した薬");
+    } else if (!strcmpi(core, "shattered potion")
+               || !strcmpi(core, "shattered potions")) {
+        Snprintf(outmain, sizeof outmain, "凍結して砕け散った薬");
+    } else if (!strcmpi(core, "burning scroll")
+               || !strcmpi(core, "burning scrolls")) {
+        Snprintf(outmain, sizeof outmain, "燃え上がった巻物");
+    } else if (!strcmpi(core, "burning book")) {
+        Snprintf(outmain, sizeof outmain, "燃え上がった魔法書");
+    } else if (!strcmpi(core, "exploding glob of slime")
+               || !strcmpi(core, "exploding globs of slime")) {
+        Snprintf(outmain, sizeof outmain, "爆発したスライムの塊");
     } else if (!strcmpi(core, "contusion from a small passage")) {
         Snprintf(outmain, sizeof outmain, "狭い通路で頭を打ったこと");
     } else if (!strcmpi(core, "starvation")) {
