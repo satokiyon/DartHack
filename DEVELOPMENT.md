@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -672,6 +672,22 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
   アップストリーム側で UTF-8 マルチバイト文字に対応した刻字ブレ処理が導入された場合は、マーカータグで囲まれたブロックをアップストリームの実装に置き換える。
 * **アップストリーム追従方針**:
   アップストリームのマルチバイト対応方針（Unicode コードポイント単位処理など）に沿って追従する。
+
+
+### 17. WSL ビルドスクリプト（`build_wsl.sh`）への Qt6 ウィンドウポート有効化オプションの追加
+* **背景**:
+  WSL (Ubuntu) 環境の `build_wsl.sh` は tty / curses / X11 の3ポートをビルドしていたが、Qt6 ポート (`win/Qt/`) を UTF-8 日本語対応させるため、まず Qt6 でビルドを通す経路が必要となった。Qt ポート向けのヒント分岐 (`WANT_WIN_QT` / `WANT_WIN_QT6`) は `sys/unix/hints/linux-jp` に既存しており、スクリプト側で明示的に有効化するだけで Qt6 ポートをビルド可能。
+* **修正内容**:
+  1. `build_wsl.sh` に `--qt` オプションを追加。指定時のみ `WANT_WIN_QT=1 WANT_WIN_QT6=1 WANT_DEFAULT=Qt` を make に追加して Qt6 ポートをビルドする（未指定時は従来どおり tty/curses/X11 のみで既存ビルド挙動は不変）。
+  2. `--qt` 指定時は事前に `pkg-config --exists Qt6Core Qt6Gui Qt6Widgets Qt6Multimedia` で Qt6 開発パッケージの存在を確認し、未導入なら `apt install` 指示とともに終了する。さらに `pkg-config --variable=libexecdir Qt6Core` で解決される `moc` の実行権も確認する。
+  3. Qt6 用データアセット (`nhtiles.bmp` / `nhsplash.xpm` / `rip.xpm`) をビルド後に明示生成する（`make nhtiles.bmp nhsplash.xpm rip.xpm`）。
+  4. `make install` 時も `WANT_WIN_QT=1` 系フラグを付与する必要がある（`VARDATND0` の追加は make 実行時の `ifdef` 評価で行われるため、別途 `make install` を実行すると Qt 用アセットが `playground/` にコピーされない）。この注意点をスクリプトの完了メッセージに出力する。
+* **マーカータグ**:
+  - `# NetHackJP: --qt option to opt-in the Qt6 window port`（Usage コメント）をはじめ、build_wsl.sh 内の NetHackJP マーカーコメント一式
+* **対応ファイル**: `sys/unix/build_wsl.sh`
+* **ビルド検証** (2026-09-23): Ubuntu 26.04 + Qt 6.10.2 + g++ 15.2.0 で `sh sys/unix/build_wsl.sh --qt` および同フラグ付き `make install` が成功。Qt6Widgets/Qt6Multimedia/Qt6Gui/Qt6Core のリンクを確認、`QT_QPA_PLATFORM=xcb ./playground/nethack -wQt` で起動確認済み。
+* **アップストリーム追従手順**:
+  上流 NetHack-5.0 に Qt ビルドを CLI から有効化する仕組みが入った場合、本オプションを取り消して追従する。linux-jp ヒント側の `WANT_WIN_QT` 分岐が上流 `linux.500` 由来であるため、ヒントファイル側の追従競合も併せて確認する。
 
 ---
 
