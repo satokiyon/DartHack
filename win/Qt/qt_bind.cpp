@@ -263,7 +263,11 @@ void NetHackQtBind::qt_askname()
         NetHackQtSavedGameSelector sgsel((const char **) saved);
         ch = sgsel.choose();
         if (ch >= 0)
-            str_copy(svp.plname, saved[ch], SIZE(svp.plname));
+            // NetHackJP: use the JP fork's save header parser (name trim
+            // + role/race/gender/alignment restore) instead of copying the
+            // full "name-role-race-gender-alignment" string into plname[],
+            // which used to start a brand-new game under a new role on reload
+            select_saved_game(saved[ch]);
         // caller needs new lock name even if plname[] hasn't changed
         // because successful get_saved_games() clobbers gs.SAVEF[]
         ::iflags.renameinprogress = TRUE;

@@ -727,6 +727,24 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **マーカータグ**: `// NetHackJP: <rank>の<name>` / `// NetHackJP: main dungeon needs JP "dungeon name:depth"`
 * **対応ファイル**: `win/Qt/qt_stat.cpp`
 * **アップストリーム追従手順**: X11 ポート (`win/X11/winstat.c`) にも同種の英文フォールバック（`the ...`, `, level N`）が残るが Qt スコープ外として残置。上流で称号/階層表示が変わった場合はコアの日本語表示関数を維持したまま追従する。
+
+### 20. Qt ポートのセーブデータ選択と墓石表示の修復（UTF-8 / セーブ復帰）
+* **背景**:
+  Qt6 ポートで以下の問題が発生した。
+  1. セーブデータ選択ダイアログ (`NetHackQtSavedGameSelector`) で保存キャラクターを選ぶと、`"名前-職-種族-性別-属性"` の複合文字列をそのまま `svp.plname[]` に代入していた（`str_copy(svp.plname, saved[ch], ...)`）。`plnamesuffix()` は職/種/性/属性コードとして有効なので全く別の職業（Rogue 等）での新規ゲームが始まり、ステータスの名前欄も複合文字列そのままになる。
+  2. 墓石の死因行 `qt_menu.cpp::NetHackQtTextWindow::UseRIP()` が英文の `formatkiller()`（"killed by ..."）を使っており、折り返しもバイト単位 (`STONE_LINE_LEN` バイト切断) のため UTF-8 日本語（"ノームの..."）を境界途中で切断して文字化けしていた。
+* **修正内容**:
+  1. `win/Qt/qt_bind.cpp::qt_askname()` でセーブデータ選択後に、`select_saved_game(saved[ch])`（コア `role.c` の JP 独自関数。名前のトリム + `flags.initrole/initrace/initgend/initalign` の復元 + プレイモード復元を行う）を呼ぶよう変更（X11 がコア `restore_menu()` 経由で同様に動作するのと整合）。
+  2. `src/rip.c` の UTF-8 表示幅ヘルパー4関数（`rip_utf8_char_width` / `rip_utf8_decode` / `rip_utf8_str_width` / `rip_truncate_utf8_width`）を `static` から extern 化し `include/extern.h` に宣言を追加（Qt とコアで同一ロジックを共有）。`genl_outrip()` の動作は不変。
+  3. `win/Qt/qt_menu.cpp::UseRIP()` を `genl_outrip()` と同じ処理に差し替え: 死因は `jp_formatkiller_for_display()`（日本語「ノームに倒された」等）、名前は `rip_truncate_utf8_width()`、折り返しは UTF-8 文字境界＋東アジア表示幅考慮（最終行は「…」省略）、`rip_line[]` バッファを UTF-8 最悪長（`STONE_LINE_LEN*4+4` バイト）に拡張し再使用時にクリア。
+  4. `win/Qt/qt_stat.cpp` のステータス名前欄も `gp.plnamelen` によるサフィックス除去を追加（旧セーブデータで複合 plname の場合の防御）。
+* **マーカータグ**:
+  - `/* NetHackJP: ... used to start a brand-new game under a new role on reload */`（qt_bind.cpp）
+  - `/* NetHackJP: was formatkiller() ... use the core's Japanese display variant */`（qt_menu.cpp）
+  - `/* NetHackJP: 以下の4つは Qt ポートの墓石描画 ... extern 化 */`（src/rip.c、include/extern.h）
+* **対応ファイル**: `src/rip.c`、`include/extern.h`、`win/Qt/qt_bind.cpp`、`win/Qt/qt_menu.cpp`、`win/Qt/qt_stat.cpp`
+* **アップストリーム追従手順**:
+  上流で Qt のセーブ選択に `restore_menu()` 相当の統一処理が入った場合、本 `qt_bind.cpp` の差分を取り消して追従する。`rip_utf8_*` ヘルパーは上流に同名関数が無いため extern 化を維持する（名前衝突時は `jp_rip_utf8_` 等へリネーム検討）。
 ---
 
 ## 5. ライセンスと NetHack License 2(a) への対応方針

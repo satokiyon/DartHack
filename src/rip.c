@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	rip.c	$NHDT-Date: 1781973064 2026/06/20 16:31:04 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
@@ -73,10 +73,12 @@ static const char *const rip_txt[] = {
 #define DEATH_LINE 8 /* *char[] line # for death description */
 #define YEAR_LINE 12 /* *char[] line # for year */
 
-/* UTF-8 デコードおよび表示幅計算ヘルパー関数 */
+/* UTF-8 デコードおよび表示幅計算ヘルパー関数
+   (NetHackJP: 以下の4つは Qt ポートの墓石描画 (qt_menu.cpp::UseRIP) と
+    UTF-8 サポート処理を共有するため extern 化 (extern.h に宣言)) */
 
 /* 指定された Unicode コードポイントの表示幅（半角=1, 全角=2）を返す */
-static int
+int
 rip_utf8_char_width(unsigned cp)
 {
     if (cp < 0x80)
@@ -92,7 +94,7 @@ rip_utf8_char_width(unsigned cp)
 }
 
 /* UTF-8 のバイト列からコードポイントをデコードして返す。文字バイト数も返す */
-static unsigned
+unsigned
 rip_utf8_decode(const char *s, int *len)
 {
     unsigned char b0 = (unsigned char)s[0];
@@ -120,7 +122,7 @@ rip_utf8_decode(const char *s, int *len)
 }
 
 /* UTF-8 文字列全体の表示幅（カラム数）を計算する */
-static int
+int
 rip_utf8_str_width(const char *str)
 {
     int w = 0;
@@ -137,7 +139,7 @@ rip_utf8_str_width(const char *str)
 }
 
 /* UTF-8 文字列を指定表示幅 max_width に収まるよう文字境界で切り詰める */
-static void
+void
 rip_truncate_utf8_width(char *dst, const char *src, int max_width)
 {
     int current_width = 0;

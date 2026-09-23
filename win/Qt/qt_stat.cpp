@@ -869,6 +869,10 @@ void NetHackQtStatusWindow::updateStats()
         // NetHackJP: "<name> <rank>" side-by-side like the tty console
         // (previous patch used "<rank>の<name>")
         str_copy(buf3, svp.plname, sizeof buf3 - 1);
+        // plname[] may carry a "-role-race-gender-alignment" suffix
+        // (legacy saves); use only the name part (gp.plnamelen)
+        if (gp.plnamelen > 0 && gp.plnamelen < (int) strlen(buf3))
+            buf3[gp.plnamelen] = '\0';
         buf2 = nh_qsprintf("%s %s",
                            upstart(buf3),
                            jp_rank_of_for_display(u.ulevel,
