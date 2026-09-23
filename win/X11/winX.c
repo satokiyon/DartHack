@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	winX.c	$NHDT-Date: 1781973110 2026/06/20 16:31:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2008,7 +2008,9 @@ X11_askname(void)
         return;
     } /* else iflags.wc_player_selection == VIA_PROMPTS */
 
-XtSetArg(args[0], XtNallowShellResize, True);
+    /* NetHackJP: Japanese window title for the name-entry dialog */
+    XtSetArg(args[0], XtNallowShellResize, True);
+    XtSetArg(args[0], XtNtitle, "名前の入力");
 
     popup = XtCreatePopupShell("askname", transientShellWidgetClass, toplevel,
                                args, ONE);
@@ -2021,7 +2023,8 @@ XtSetArg(args[0], XtNallowShellResize, True);
     dialog = CreateXimDialog(popup, nhStr("dialog"), askname_done,
                              (XtCallbackProc) 0);
 
-    XimDialogSetPrompt(dialog, nhStr("What is your name?")); /* set prompt */
+    /* NetHackJP: Japanese prompt and window title */
+    XimDialogSetPrompt(dialog, nhStr("あなたの名前は何ですか?")); /* set prompt */
     XimDialogSetResponse(dialog, svp.plname); /* set default answer */
 
     XtRealizeWidget(popup);

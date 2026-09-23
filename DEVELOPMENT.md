@@ -776,6 +776,8 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
   2. **キー選択互換の維持**: ウィジェット名 (`XtCreateManagedWidget` の第1引数) は英字のまま維持し、`XtNlabel` のみ日本語化した（XIM 仕様どおり ASCII 1バイト選択の従来挙動を保持）。性別切替・ランダム化・setupOthers 経由の職業ラベル更新は `plsel_update_role_labels(g)` ヘルパー（女性形 / 無効名はコア側が処理）で統一。`XawToggleSetCurrent()` はコールバックを発火しないためラベル更新を各所で明示呼び出し。
   3. **make_menu フォールバック経路 (`X11_player_selection_prompts`)**： 選択.choices をコア表示ヘルパーの日本語に変更（職業/種族/性別/属性）。プロンプトも日本語化（「あなたの職業は何ですか?」等）。
   4. 拡張コマンド一覧のタイトルを「拡張コマンド」に変更。
+  5. 選択肢ラベルにキーボード用アルファベットを併記: `jp_plsel_keylabel()` による「<日本語ラベル>(<キー文字>)」形式（例: 剣客(k)、ノーム(h)、男性(m)、秩序(l)）。`jp_plsel_rolekey()` / `jp_plsel_racekey()` は `ps_key()` / `race_key()` と同一アルゴリズム（英文名の頭文字・重複文字は大文字化）でキー文字を算出し、表示とキー操作を常に一致させる。make_menu フォールバック経路の選択肢も同形式（静的バッファ `jp_ps_*_labels`）。「終了(q)」/「ランダム(r)」ボタンも日本語+キー文字。
+  6. 名前入力ダイアログ (`win/X11/winX.c::X11_askname`) のプロンプト `What is your name?`→「あなたの名前は何ですか?」、ウィンドウタイトル→「名前の入力」（作成時に `XtNtitle` 設定）。
 * **マーカータグ**: `/* NetHackJP: Japanese labels */` / `/* NetHackJP: display label in Japanese; widget name stays English ... */` / `/* NetHackJP: refresh every role radio widget's Japanese label ... */` 等。
 * **対応ファイル**: `win/X11/winmisc.c`
 * **検証**: WSL (Ubuntu 26.04) で X11 ビルド成功。`./playground/nethack -wX11` で plsel ダイアログ / prompts 経路の両方の目視確認を行う予定（従来キー操作の互換性も確認）。
