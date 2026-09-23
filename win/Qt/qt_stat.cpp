@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -862,8 +863,9 @@ void NetHackQtStatusWindow::updateStats()
     }
     QString buf2;
     char buf3[BUFSZ];
+    /* NetHackJP: UTF-8 (Japanese rank/monster name), not Latin-1 */
     buf2 = nh_qsprintf("%s the %s", upstart(strcpy(buf3, svp.plname)),
-                       buf.toLatin1().constData());
+                       buf.toUtf8().constData());
     name.setLabel(buf2, NetHackQtLabelledIcon::NoNum, u.ulevel);
 
     if (!describe_level(buf3, 0)) {

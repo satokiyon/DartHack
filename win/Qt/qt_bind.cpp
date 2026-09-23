@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -432,13 +433,15 @@ void NetHackQtBind::qt_curs(winid wid, int x, int y)
 void NetHackQtBind::qt_putstr(winid wid, int attr, const char *text)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
-    window->PutStr(attr,QString::fromLatin1(text));
+    /* NetHackJP: UTF-8 (Japanese) message text, not Latin-1 */
+    window->PutStr(attr,QString::fromUtf8(text));
 }
 
 void NetHackQtBind::qt_putstr(winid wid, int attr, const std::string& text)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
-    window->PutStr(attr,QString::fromLatin1(text.c_str(), text.size()));
+    /* NetHackJP: UTF-8 (Japanese) message text, not Latin-1 */
+    window->PutStr(attr,QString::fromUtf8(text.c_str(), text.size()));
 }
 
 void NetHackQtBind::qt_putstr(winid wid, int attr, const QString& text)
@@ -491,8 +494,9 @@ void NetHackQtBind::qt_add_menu(winid wid, const glyph_info *glyphinfo,
     const char *str, unsigned itemflags)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
+    /* NetHackJP: UTF-8 (Japanese) menu item text, not Latin-1 */
     window->AddMenu(glyphinfo->glyph, identifier, ch, gch, attr, clr,
-            QString::fromLatin1(str),
+            QString::fromUtf8(str),
             itemflags);
 }
 
@@ -840,7 +844,8 @@ char NetHackQtBind::qt_more()
 char NetHackQtBind::qt_yn_function(const char *question_,
                                    const char *choices, char def)
 {
-    QString question(QString::fromLatin1(question_));
+    /* NetHackJP: UTF-8 (Japanese) yn prompt text, not Latin-1 */
+    QString question(QString::fromUtf8(question_));
     QString message;
     char yn_esc_map='\033';
     int result = -1;
@@ -974,10 +979,17 @@ void NetHackQtBind::qt_getlin(const char *prompt, char *line)
     } else if (line[0] == ' ' && !line[1]) {
         Strcpy(q, "SPC");
     } else {
-        /* buf[] has more than enough room to hold one extra visctrl()
-           in case q is at the last viable slot and *p yields "M-^c" */
-        for (char *p = line; *p && q < &buf[BUFSZ - 1]; ++p, q = eos(q))
-            Strcpy(q, visctrl(*p));
+        // NetHackJP: UTF-8 Japanese input - copy multibyte characters
+        // through unchanged; only ASCII characters get visctrl() rendering
+        for (char *p = line; *p && q < &buf[BUFSZ - 1]; ++p) {
+            if ((uchar) *p < 0x80) {
+                Strcpy(q, visctrl(*p));
+                q = eos(q);
+            } else {
+                *q = *p;
+                *++q = '\0';
+            }
+        }
     }
     if (q > &buf[BUFSZ - 1])
         q = &buf[BUFSZ - 1];
@@ -1088,7 +1100,8 @@ void NetHackQtBind::qt_putmsghistory(const char *msg, boolean is_restoring)
 
     if (msg) {
         //raw_printf("msg='%s'", msg);
-        window->PutStr(ATR_NONE, QString::fromLatin1(msg));
+        /* NetHackJP: UTF-8 (Japanese) message text, not Latin-1 */
+        window->PutStr(ATR_NONE, QString::fromUtf8(msg));
 #ifdef DUMPLOG_CORE
         dumplogmsg(msg);
 #endif
@@ -1098,7 +1111,8 @@ void NetHackQtBind::qt_putmsghistory(const char *msg, boolean is_restoring)
             const QString &nxtmsg = msgs_strings->at(i);
             window->PutStr(ATR_NONE, nxtmsg);
 #ifdef DUMPLOG_CORE
-            dumplogmsg(nxtmsg.toLatin1().constData());
+            /* NetHackJP: dumplog stores UTF-8, not Latin-1 */
+            dumplogmsg(nxtmsg.toUtf8().constData());
 #endif
         }
         delete msgs_strings;

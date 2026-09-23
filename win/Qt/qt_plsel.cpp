@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -568,9 +568,10 @@ void NetHackQtPlayerSelector::plnamePlayVsQuit()
 // the line edit widget for the name field has received input
 void NetHackQtPlayerSelector::selectName(const QString& n)
 {
-    // the QByteArray has to outlive name_str; calling constData() on
-    // the temporary returned by toLatin1() leaves it dangling
-    QByteArray name_bytes = n.toLatin1();
+    // NetHackJP: UTF-8 Japanese names (the QByteArray has to outlive
+    // name_str; calling constData() on the temporary would leave it
+    // dangling; was toLatin1() which destroys Japanese characters)
+    QByteArray name_bytes = n.toUtf8();
     const char *name_str = name_bytes.constData();
     // skip any leading spaces
     // (it would be better to set up a validator that rejects leading spaces)

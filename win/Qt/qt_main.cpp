@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -1109,9 +1110,8 @@ void NetHackQtMainWindow::doKeys(const char *cmds)
 
 void NetHackQtMainWindow::doKeys(const QString& k)
 {
-    /* [this should probably be using toLocal8Bit();
-       toAscii() is not offered as an alternative...] */
-    doKeys(k.toLatin1().constData());
+    /* NetHackJP: (was Latin-1; UTF-8 handles any stragglers) */
+    doKeys(k.toUtf8().constData());
 }
 
 // queue up the command name for a function, as if user had typed it

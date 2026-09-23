@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -100,8 +101,9 @@ const char * NetHackQtMessageWindow::GetStr(bool init)
     QListWidgetItem *item = list->item(currgetmsg++);
     if (item) {
         QString str = item->text();
-	if (str.toLatin1().length() < (int) sizeof historybuf) {
-            return strcpy(historybuf, str.toLatin1().constData());
+        /* NetHackJP: UTF-8 (Japanese) message history, not Latin-1 */
+	if (str.toUtf8().length() < (int) sizeof historybuf) {
+            return strcpy(historybuf, str.toUtf8().constData());
             //raw_printf("getstr[%d]='%s'", currgetmsg, result);
 	}
     }

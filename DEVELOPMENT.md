@@ -689,6 +689,21 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **アップストリーム追従手順**:
   上流 NetHack-5.0 に Qt ビルドを CLI から有効化する仕組みが入った場合、本オプションを取り消して追従する。linux-jp ヒント側の `WANT_WIN_QT` 分岐が上流 `linux.500` 由来であるため、ヒントファイル側の追従競合も併せて確認する。
 
+
+### 18. Qt ポートの文字コード変換の UTF-8 化（`fromLatin1`/`toLatin1` の排除）
+* **背景**:
+  Qt ポート (`win/Qt/`) はコアとの `char *` テキスト受け渡しを Latin-1 前提（`QString::fromLatin1` / `QString::toLatin1`）で実装していたため、日本語化されたコアが渡す UTF-8 文字列が文字化けしていた。逆に入力ダイアログ (`QLineEdit`) からコアへ戻す際も `toLatin1()` で日本語が破壊され、getlin / askname / plsel / メニューSearch への日本語入力が不可能だった。
+* **修正内容**:
+  1. `win/Qt/` 内の `QString::fromLatin1` をすべて `QString::fromUtf8` に、`QString::toLatin1` をすべて `QString::toUtf8` に置換した（Qt 5/6 の `QString(const char *)` 暗黙変換はもともと UTF-8 であり、修正対象は明示的 Latin-1 変換箇所のみ）。
+  2. 対象は `qt_bind.cpp`（`qt_putstr` / `qt_add_menu` / `qt_yn_function` / `qt_putmsghistory` + dumplog / `qt_getlin` の入力エコー）、`qt_msg.cpp`（メッセージ履歴 `GetStr`）、`qt_main.cpp`（ツールバー `doKeys`）、`qt_plsel.cpp`（キャラクター名入力）、`qt_stat.cpp`（ステータス肩書ラベル）、`qt_streq.cpp`（getlin プロンプトと入力の往復）、`qt_yndlg.cpp`（yn ダイアログの choices 解析）。
+  3. `qt_getlin` のメッセージウィンドウへの入力エコーは `visctrl()` をバイト単位で適用する実装だったため、UTF-8 マルチバイト文字は ASCII のみ `visctrl()` で描画し、マルチバイト文字列は生バイトのまま通す方式に改修（playground 上の入力確定エコーが「ãã...」等に化ける問題の予防）。
+* **マーカータグ**（各変更箇所に付与）:
+  - `/* NetHackJP: UTF-8 (Japanese) ... text, not Latin-1 */`（QString 変換箇所）
+  - `// NetHackJP: UTF-8 Japanese input - copy multibyte characters through unchanged`（qt_getlin エコー）
+  - `/* NetHackJP: dumplog stores UTF-8, not Latin-1 */`（dumplogmsg 呼び出し）
+* **対応ファイル**: `win/Qt/qt_bind.cpp`、`win/Qt/qt_msg.cpp`、`win/Qt/qt_main.cpp`、`win/Qt/qt_plsel.cpp`、`win/Qt/qt_stat.cpp`、`win/Qt/qt_streq.cpp`、`win/Qt/qt_yndlg.cpp`
+* **アップストリーム追従手順**:
+  上流 NetHack-5.0 の Qt ポート変更で `fromLatin1`/`toLatin1` 箇所に差分が入った場合、Latin-1 から UTF-8 への変換選択（fromUtf8 / toUtf8）を保持したまま移植する。日本語データ入力（`hack.h` 由来の UTF-8 テキスト）を扱う箇所では絶対に Latin-1 を復活させない。
 ---
 
 ## 5. ライセンスと NetHack License 2(a) への対応方針

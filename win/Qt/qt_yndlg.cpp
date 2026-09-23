@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -77,7 +77,8 @@ NetHackQtYnDialog::NetHackQtYnDialog(QWidget *parent, const QString &q,
 
 char NetHackQtYnDialog::Exec()
 {
-    QString ch(QString::fromLatin1(choices));
+    /* NetHackJP: UTF-8, not Latin-1 (choices are ASCII letter sets) */
+    QString ch(QString::fromUtf8(choices));
 //    int ch_per_line=6;
     QString qlabel;
     QString enable;
@@ -136,7 +137,8 @@ char NetHackQtYnDialog::Exec()
 	    // Hmm... they'll have to use a virtual keyboard
 	}
     } else {
-        ch = QString::fromLatin1(choices);
+        /* NetHackJP: UTF-8, not Latin-1 */
+        ch = QString::fromUtf8(choices);
 	qlabel = question.replace(QChar(0x200B), QString(""));
     }
     if (!ch.isNull()) {
@@ -400,7 +402,8 @@ void NetHackQtYnDialog::keyPressEvent(QKeyEvent *event)
         this->done(1);
 
     } else {
-	int where = QString::fromLatin1(choices).indexOf(QChar(keypress));
+        /* NetHackJP: UTF-8, not Latin-1 */
+	int where = QString::fromUtf8(choices).indexOf(QChar(keypress));
 
         if (allow_count && strchr("#0123456789", keypress)) {
             if (keypress == '#') {

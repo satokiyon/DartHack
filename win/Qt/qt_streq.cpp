@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -27,7 +28,8 @@ void centerOnMain(QWidget *);
 NetHackQtStringRequestor::NetHackQtStringRequestor(QWidget *parent,
         const char *p, const char *cancelstr, const char *okaystr) :
     QDialog(parent),
-    prompt(QString::fromLatin1(p),this),
+    /* NetHackJP: UTF-8 (Japanese) getlin prompt, not Latin-1 */
+    prompt(QString::fromUtf8(p),this),
     input(this,"input")
 {
     if (qt_settings)
@@ -102,7 +104,9 @@ bool NetHackQtStringRequestor::Get(char *buffer, int maxchar, int minchar)
     exec();
 
     if (result()) {
-        str_copy(buffer, input.text().toLatin1().constData(), maxchar);
+        /* NetHackJP: return the entered text as UTF-8 (Japanese getlin
+           input), not Latin-1 */
+        str_copy(buffer, input.text().toUtf8().constData(), maxchar);
 	return true;
     } else {
 	return false;
