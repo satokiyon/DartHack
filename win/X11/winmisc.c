@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-03. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	winmisc.c	$NHDT-Date: 1781973109 2026/06/20 16:31:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -138,6 +138,10 @@ xtp2i(XtPointer x)
 }
 
 /* Player Selection ------------------------------------------------------- */
+
+/* NetHackJP: refresh every role radio widget's Japanese label
+   (the core helper picks the feminine name when g == 1) */
+static void plsel_update_role_labels(int);
 /* ARGSUSED */
 static void
 ps_quit(Widget w, XtPointer client_data, XtPointer call_data)
@@ -547,6 +551,9 @@ X11_player_selection_randomize(void)
     XawToggleSetCurrent(plsel_align_radios[0], i2xtp(al + 1));
     XawToggleSetCurrent(plsel_race_radios[0], i2xtp(ra + 1));
     XawToggleSetCurrent(plsel_role_radios[0], i2xtp(ro + 1));
+    /* NetHackJP: programmatic toggle changes don't fire callbacks, so
+       refresh the role labels yourself */
+    plsel_update_role_labels((gend == 1) ? 1 : 0);
     plsel_set_sensitivities(FALSE);
 }
 
@@ -596,6 +603,8 @@ X11_player_selection_setupOthers(void)
         c = valid;
 
     XawToggleSetCurrent(plsel_align_radios[0], i2xtp(c + 1));
+    /* NetHackJP: gender may have changed; refresh the role labels */
+    plsel_update_role_labels((c == 1) ? 1 : 0);
 }
 
 static void
@@ -681,7 +690,7 @@ roletoggleCallback(Widget w, XtPointer client, XtPointer call)
 static void
 gendertoggleCallback(Widget w, XtPointer client, XtPointer call)
 {
-    int i, r = xtp2i(XawToggleGetCurrent(plsel_gend_radios[0])) - 1;
+    int r = xtp2i(XawToggleGetCurrent(plsel_gend_radios[0])) - 1;
 
     nhUse(w);
     nhUse(client);
@@ -689,15 +698,20 @@ gendertoggleCallback(Widget w, XtPointer client, XtPointer call)
 
     plsel_set_play_button(r < 0);
 
-    for (i = 0; roles[i].name.m; i++) {
-        if (roles[i].name.f) {
-            Arg args[2];
+    plsel_update_role_labels((r < 1) ? 0 : 1);
+}
 
-            XtSetArg(args[0], XtNlabel,
-                     (r < 1) ? roles[i].name.m : roles[i].name.f);
-            XtSetValues(plsel_role_radios[i], args, ONE);
-            X11_update_label_if_Xft(plsel_role_radios[i]);
-        }
+static void
+plsel_update_role_labels(int g)
+{
+    int i;
+
+    for (i = 0; roles[i].name.m; i++) {
+        Arg args[2];
+
+        XtSetArg(args[0], XtNlabel, jp_role_name_for_display(i, g));
+        XtSetValues(plsel_role_radios[i], args, ONE);
+        X11_update_label_if_Xft(plsel_role_radios[i]);
     }
 }
 
@@ -773,7 +787,13 @@ X11_create_player_selection_name(Widget form)
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNlabel), "Name"); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNlabel),
+             /* NetHackJP: Japanese labels */
+             "名前"); num_args++;
+
+    XtSetArg(args[num_args], nhStr(XtNtitle),
+             /* NetHackJP: Japanese title */
+             "プレイヤー選択"); num_args++;
     XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
 
     namelabel = XtCreateManagedWidget("name_label",
@@ -905,7 +925,9 @@ X11_player_selection_dialog(void)
     /* race label */
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNlabel), "Race"); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNlabel),
+             /* NetHackJP: Japanese labels */
+             "種族"); num_args++;
     racelabel = XtCreateManagedWidget("race_label",
                                       labelWidgetClass, race_form,
                                       args, num_args);
@@ -945,6 +967,10 @@ X11_player_selection_dialog(void)
                      plsel_race_radios[0]); num_args++;
         }
         XtSetArg(args[num_args], nhStr(XtNradioData), (i + 1)); num_args++;
+        /* NetHackJP: display label in Japanese; widget name stays
+           English so that the ASCII key-select behavior is preserved */
+        XtSetArg(args[num_args], XtNlabel, jp_race_noun_for_display(i));
+        num_args++;
 
         racewidget = XtCreateManagedWidget(races[i].noun,
                                            toggleWidgetClass,
@@ -972,7 +998,9 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNlabel), "Role"); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNlabel),
+             /* NetHackJP: Japanese labels */
+             "職業"); num_args++;
     rolelabel = XtCreateManagedWidget("role_label", labelWidgetClass,
                                       role_form, args, num_args);
     X11_wrap_widget_if_Xft(rolelabel, NHW_MENU);
@@ -1012,6 +1040,11 @@ X11_player_selection_dialog(void)
         }
         XtSetArg(args[num_args], nhStr(XtNradioData), (i + 1)); num_args++;
         XtSetArg(args[num_args], nhStr(XtNresizable), True); num_args++;
+        /* NetHackJP: display label in Japanese; widget name stays
+           English so that key selections keep working; label refreshes
+           with the feminine form via plsel_update_role_labels() */
+        XtSetArg(args[num_args], XtNlabel, jp_role_name_for_display(i, 0));
+        num_args++;
 
         rolewidget = XtCreateManagedWidget(roles[i].name.m, toggleWidgetClass,
                                            role_form2, args, num_args);
@@ -1039,7 +1072,9 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNlabel), "Gender"); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNlabel),
+             /* NetHackJP: Japanese labels */
+             "性別"); num_args++;
     gendlabel = XtCreateManagedWidget("gender_label", labelWidgetClass,
                                       gend_form, args, num_args);
     X11_wrap_widget_if_Xft(gendlabel, NHW_MENU);
@@ -1061,6 +1096,8 @@ X11_player_selection_dialog(void)
     num_args = 0;
     XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
     XtSetArg(args[num_args], nhStr(XtNradioData), 1); num_args++;
+    /* NetHackJP: Japanese labels via the core's display helpers */
+    XtSetArg(args[num_args], XtNlabel, jp_gender_for_display(0)); num_args++;
     plsel_gend_radios[0] = gend_radio_m
         =  XtCreateManagedWidget("Male", toggleWidgetClass,
                                  gend_form2, args, num_args);
@@ -1071,6 +1108,7 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNradioGroup),
              plsel_gend_radios[0]); num_args++;
     XtSetArg(args[num_args], nhStr(XtNradioData), 2); num_args++;
+    XtSetArg(args[num_args], XtNlabel, jp_gender_for_display(1)); num_args++;
     plsel_gend_radios[1] = gend_radio_f
         =  XtCreateManagedWidget("Female", toggleWidgetClass,
                                  gend_form2, args, num_args);
@@ -1101,7 +1139,9 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNlabel), "Alignment"); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNlabel),
+             /* NetHackJP: Japanese labels */
+             "属性"); num_args++;
     alignlabel = XtCreateManagedWidget("align_label", labelWidgetClass,
                                        align_form, args, num_args);
     X11_wrap_widget_if_Xft(alignlabel, NHW_MENU);
@@ -1122,6 +1162,8 @@ X11_player_selection_dialog(void)
     num_args = 0;
     XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
     XtSetArg(args[num_args], nhStr(XtNradioData), 1); num_args++;
+    /* NetHackJP: Japanese labels via the core's display helpers */
+    XtSetArg(args[num_args], XtNlabel, jp_align_for_display(0)); num_args++;
     plsel_align_radios[0] = align_radio_l
         =  XtCreateManagedWidget("Lawful", toggleWidgetClass,
                                  align_form2, args, num_args);
@@ -1132,6 +1174,7 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNradioGroup),
              plsel_align_radios[0]); num_args++;
     XtSetArg(args[num_args], nhStr(XtNradioData), 2); num_args++;
+    XtSetArg(args[num_args], XtNlabel, jp_align_for_display(1)); num_args++;
     plsel_align_radios[1] = align_radio_n
         = XtCreateManagedWidget("Neutral", toggleWidgetClass,
                                 align_form2, args, num_args);
@@ -1142,6 +1185,7 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNradioGroup),
              plsel_align_radios[0]); num_args++;
     XtSetArg(args[num_args], nhStr(XtNradioData), 3); num_args++;
+    XtSetArg(args[num_args], XtNlabel, jp_align_for_display(2)); num_args++;
     plsel_align_radios[2] = align_radio_c
         =  XtCreateManagedWidget("Chaotic", toggleWidgetClass,
                                  align_form2, args, num_args);
@@ -1181,7 +1225,9 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop); num_args++;
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainRight); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNlabel), "Random"); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNlabel),
+             /* NetHackJP: Japanese buttons */
+             "ランダム"); num_args++;
     random_btn = XtCreateManagedWidget("random", commandWidgetClass, btn_form,
                                        args, num_args);
     X11_wrap_widget_if_Xft(random_btn, NHW_MENU);
@@ -1196,7 +1242,9 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNfromVert), random_btn); num_args++;
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainRight); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNlabel), "Play"); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNlabel),
+             /* NetHackJP: Japanese buttons */
+             "開始"); num_args++;
     plsel_btn_play = play_btn
         = XtCreateManagedWidget("play", commandWidgetClass, btn_form,
                                 args, num_args);
@@ -1213,7 +1261,9 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNbottom), XtChainBottom); num_args++;
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainRight); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNlabel), "Quit"); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNlabel),
+             /* NetHackJP: Japanese buttons */
+             "終了"); num_args++;
     quit_btn = XtCreateManagedWidget("quit", commandWidgetClass, btn_form,
                                      args, num_args);
     X11_wrap_widget_if_Xft(quit_btn, NHW_MENU);
@@ -1294,10 +1344,10 @@ X11_player_selection_prompts(void)
                 choices[i] = 0;
                 if (ok_role(i, flags.initrace, flags.initgend,
                             flags.initalign)) {
-                    choices[i] = roles[i].name.m;
-                    if (flags.initgend >= 0 && flags.female
-                        && roles[i].name.f)
-                        choices[i] = roles[i].name.f;
+                    /* NetHackJP: Japanese role name via the core helper */
+                    choices[i] = jp_role_name_for_display(i,
+                                         (flags.initgend >= 0 && flags.female)
+                                         ? 1 : 0);
                     ++availcount;
                 }
             }
@@ -1312,7 +1362,8 @@ X11_player_selection_prompts(void)
             else
                 panic("no available ROLE+race+gender+alignment combinations");
         }
-        Sprintf(qbuf, "Choose your %s Role", s_suffix(plbuf));
+        /* NetHackJP: Japanese prompt (was "Choose your %s Role") */
+        Strcpy(qbuf, "あなたの職業は何ですか?");
         popup =
             make_menu("player_selection", qbuf, player_select_translations,
                       "quit", ps_quit, "random", ps_random, num_roles,
@@ -1366,7 +1417,8 @@ X11_player_selection_prompts(void)
                 choices[i] = 0;
                 if (ok_race(flags.initrole, i, flags.initgend,
                             flags.initalign)) {
-                    choices[i] = races[i].noun;
+                    /* NetHackJP: Japanese race name via the core helper */
+                    choices[i] = jp_race_noun_for_display(i);
                     ++availcount;
                     availindex = i; /* used iff only one */
                 }
@@ -1385,7 +1437,8 @@ X11_player_selection_prompts(void)
             flags.initrace = availindex;
             free((genericptr_t) choices), choices = 0;
         } else {
-            Sprintf(qbuf, "Pick your %s race", s_suffix(plbuf));
+        /* NetHackJP: Japanese prompt (was "Pick your %s race") */
+        Strcpy(qbuf, "あなたの種族は何ですか?");
             popup =
                 make_menu("race_selection", qbuf, race_select_translations,
                           "quit", ps_quit, "random", ps_random, num_races,
@@ -1440,7 +1493,8 @@ X11_player_selection_prompts(void)
                 choices[i] = 0;
                 if (ok_gend(flags.initrole, flags.initrace, i,
                             flags.initalign)) {
-                    choices[i] = genders[i].adj;
+                    /* NetHackJP: Japanese gender via the core helper */
+                    choices[i] = jp_gender_for_display(i);
                     ++availcount;
                     availindex = i; /* used iff only one */
                 }
@@ -1457,7 +1511,8 @@ X11_player_selection_prompts(void)
             flags.initgend = availindex;
             free((genericptr_t) choices), choices = 0;
         } else {
-            Sprintf(qbuf, "Your %s gender?", s_suffix(plbuf));
+            /* NetHackJP: Japanese prompt (was "Your %s gender?") */
+            Strcpy(qbuf, "あなたの性別は何ですか?");
             popup =
                 make_menu("gender_selection", qbuf, gend_select_translations,
                           "quit", ps_quit, "random", ps_random, num_gends,
@@ -1512,7 +1567,8 @@ X11_player_selection_prompts(void)
                 choices[i] = 0;
                 if (ok_align(flags.initrole, flags.initrace, flags.initgend,
                              i)) {
-                    choices[i] = aligns[i].adj;
+                    /* NetHackJP: Japanese alignment via the core helper */
+                    choices[i] = jp_align_for_display(i);
                     ++availcount;
                     availindex = i; /* used iff only one */
                 }
@@ -1527,7 +1583,8 @@ X11_player_selection_prompts(void)
             flags.initalign = availindex;
             free((genericptr_t) choices), choices = 0;
         } else {
-            Sprintf(qbuf, "Your %s alignment?", s_suffix(plbuf));
+            /* NetHackJP: Japanese prompt (was "Your %s alignment?") */
+            Strcpy(qbuf, "あなたの属性は何ですか?");
             popup = make_menu("alignment_selection", qbuf,
                               algn_select_translations, "quit", ps_quit,
                               "random", ps_random, num_algns, choices,
@@ -1997,7 +2054,9 @@ init_extended_commands_popup(void)
     command_indx[i] = -1;
 
     extended_command_popup =
-        make_menu("extended_commands", "Extended Commands",
+        make_menu("extended_commands",
+                  /* NetHackJP: Japanese title */
+                  "拡張コマンド",
                   extended_command_translations, "dismiss", extend_dismiss,
                   "help", extend_help, num_commands, command_list,
                   &extended_commands, extend_select, &extended_command_form);

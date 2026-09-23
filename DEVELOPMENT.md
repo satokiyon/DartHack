@@ -767,6 +767,20 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **検証**: WSL (Ubuntu 26.04) で `build_wsl.sh` による X11 ビルド成功。`./playground/nethack -wX11` でステータスの tty 風 / fancy 風両モードの目視確認を行う予定。
 * **アップストリーム追従手順**:
   上流 NetHack-5.0 の X11 ステータス変更 (update_val) との差分には本節の日本語形式（『名前 <称号>』『ダンジョン名: 階層N』『conditions[] 参照』）を維持したまま移植する。
+
+### 22. X11 ポートのプレイヤー選択 (plsel) ダイアログ・プロンプトの日本語化
+* **背景**:
+  X11 ポートの plsel (`win/X11/winmisc.c`) はラベル / ラジオボタン / コマンドボタンの英語文字列がそのまま表示されていた。日本語 GUI の一貫性のため Qt ポート (§4.18 系列) と同等の日本語化を行った。
+* **修正内容** (`win/X11/winmisc.c`):
+  1. モーダルダイアログ方式 (`X11_player_selection_dialog`)： 明示ラベル (`XtNlabel`) を日本語化（名前/種族/職業/性別/属性、ランダム/開始/終了、タイトル「プレイヤー選択」）。職業・種族・性別・属性のラジオボタンラベルはコア表示ヘルパー（`jp_role_name_for_display()` / `jp_race_noun_for_display()` / `jp_gender_for_display()` / `jp_align_for_display()`）を使用。
+  2. **キー選択互換の維持**: ウィジェット名 (`XtCreateManagedWidget` の第1引数) は英字のまま維持し、`XtNlabel` のみ日本語化した（XIM 仕様どおり ASCII 1バイト選択の従来挙動を保持）。性別切替・ランダム化・setupOthers 経由の職業ラベル更新は `plsel_update_role_labels(g)` ヘルパー（女性形 / 無効名はコア側が処理）で統一。`XawToggleSetCurrent()` はコールバックを発火しないためラベル更新を各所で明示呼び出し。
+  3. **make_menu フォールバック経路 (`X11_player_selection_prompts`)**： 選択.choices をコア表示ヘルパーの日本語に変更（職業/種族/性別/属性）。プロンプトも日本語化（「あなたの職業は何ですか?」等）。
+  4. 拡張コマンド一覧のタイトルを「拡張コマンド」に変更。
+* **マーカータグ**: `/* NetHackJP: Japanese labels */` / `/* NetHackJP: display label in Japanese; widget name stays English ... */` / `/* NetHackJP: refresh every role radio widget's Japanese label ... */` 等。
+* **対応ファイル**: `win/X11/winmisc.c`
+* **検証**: WSL (Ubuntu 26.04) で X11 ビルド成功。`./playground/nethack -wX11` で plsel ダイアログ / prompts 経路の両方の目視確認を行う予定（従来キー操作の互換性も確認）。
+* **アップストリーム追従手順**:
+  上流側で plsel ウィジェット構成が変わった場合、日本語ラベルの割当 (`XtNlabel`) と `plsel_update_role_labels()` の呼び出しポイントを維持したまま移植する。ウィジェット名を日本語に置き換えないこと（ASCII キー選択互換のため）。
 ---
 
 ## 5. ライセンスと NetHack License 2(a) への対応方針
