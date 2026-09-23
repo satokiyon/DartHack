@@ -1986,6 +1986,7 @@ goto_level(
     notice_all_mons(TRUE);
 
     print_level_annotation();
+    update_level_ambience();
     /* give room entrance message, if any */
     check_special_room(FALSE);
     /* deliver objects traveling with player */
@@ -2009,7 +2010,6 @@ goto_level(
 
     (void) pickup(1);
     do_autosave();
-    update_level_ambience();
     return;
 }
 

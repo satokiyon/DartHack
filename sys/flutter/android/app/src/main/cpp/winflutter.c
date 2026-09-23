@@ -331,6 +331,7 @@ static void androidsound_ambience(int32_t ambience_action, int32_t ambienceid, i
     case amb_in_a_shop: fname = "amb_in_a_shop.ogg"; category = SOUND_CAT_AMBIENCE; break;
     case amb_inside_temple: fname = "amb_inside_temple.ogg"; category = SOUND_CAT_AMBIENCE; break;
     case amb_inside_vault: fname = "amb_inside_vault.ogg"; category = SOUND_CAT_AMBIENCE; break;
+    case amb_inside_leprehall: fname = "amb_inside_leprehall.ogg"; category = SOUND_CAT_AMBIENCE; break;
     case amb_approaching_oracle: fname = "amb_approaching_oracle.ogg"; category = SOUND_CAT_AMBIENCE; break;
     case amb_in_a_court: fname = "amb_in_a_court.ogg"; category = SOUND_CAT_AMBIENCE; break;
     case amb_in_a_barracks: fname = "amb_in_a_barracks.ogg"; category = SOUND_CAT_AMBIENCE; break;

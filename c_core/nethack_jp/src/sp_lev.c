@@ -2829,6 +2829,7 @@ build_room(room *r, struct mkroom *mkr)
 #endif
         aroom->needfill = r->needfill;
         aroom->needjoining = r->joined;
+        aroom->orig_rtype = aroom->rtype;
         return aroom;
     }
     return (struct mkroom *) 0;

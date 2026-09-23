@@ -3134,6 +3134,7 @@ extern char *base_soundname_to_filename(char *, char *, size_t, int32_t) NONNULL
 extern void set_voice(struct monst *, int32_t, int32_t, int32_t) NO_NNARGS;
 extern void sound_speak(const char *) NO_NNARGS;
 extern void update_level_ambience(void);
+extern int room_type_to_ambience(int);
 extern enum soundlib_ids soundlib_id_from_opt(char *);
 /* Combat sound helper functions */
 extern int nh_sound_combat_vol(struct monst *, struct monst *);

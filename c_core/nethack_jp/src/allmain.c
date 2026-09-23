@@ -988,20 +988,9 @@ welcome(boolean new_game) /* false => restoring an old game */
             roomno = *u.urooms - ROOMOFFSET;
             if (roomno >= 0 && roomno < SIZE(svr.rooms)) {
                 rt = svr.rooms[roomno].orig_rtype ? svr.rooms[roomno].orig_rtype : svr.rooms[roomno].rtype;
-                switch (rt) {
-                case ZOO: SoundAmbience(ambience_begin, amb_in_a_zoo, 0); break;
-                case SWAMP: SoundAmbience(ambience_begin, amb_swamp, 0); break;
-                case COURT: SoundAmbience(ambience_begin, amb_in_a_court, 0); break;
-                case MORGUE: SoundAmbience(ambience_begin, amb_in_cemetery, 0); break;
-                case BEEHIVE: SoundAmbience(ambience_begin, amb_in_a_beehive, 0); break;
-                case COCKNEST: SoundAmbience(ambience_begin, amb_in_a_cockatrice_nest, 0); break;
-                case ANTHOLE: SoundAmbience(ambience_begin, amb_inside_anthole, 0); break;
-                case BARRACKS: SoundAmbience(ambience_begin, amb_in_a_barracks, 0); break;
-                case DELPHI: SoundAmbience(ambience_begin, amb_approaching_oracle, 0); break;
-                case TEMPLE: SoundAmbience(ambience_begin, amb_inside_temple, 0); break;
-                case VAULT: SoundAmbience(ambience_begin, amb_inside_vault, 0); break;
-                default: break;
-                }
+                int amb = room_type_to_ambience(rt);
+                if (amb)
+                    SoundAmbience(ambience_begin, amb, 0);
             }
         }
     }

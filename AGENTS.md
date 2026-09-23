@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-19. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -38,6 +38,26 @@
    - `DartHack` 内で `c_core/nethack_jp` や `c_core/nethack_en` 配下のファイル（特に `extern.h` や `do_name.c` 等）に独自コード（Flutter/Androidフックやオートセーブ機能等）を追加しているため、`git subtree pull` 時の 3-way merge において本家の新しい関数宣言や定義がマージ競合解消時に消去・ドロップされるリスクがあります。
    - `sync_nethack_jp.ps1` および `sync_nethack_en.ps1` には、マージ実行後に本家の `extern.h` に存在する宣言がローカル側に欠落していないか自動検出する整合性チェック機能が組み込まれています。
    - 同期実行後に警告が表示された場合は、`git diff nethack-jp/main:include/extern.h c_core/nethack_jp/include/extern.h` 等で差分を確認し、消去された本家側の宣言や定義を手動で復元してください。
+
+## NetHack CコアにおけるフロアBGM・特別部屋BGM判定とサブルーム（子部屋）の仕様原則
+
+1. **サブルーム（子部屋/入れ子部屋）の不可視性と親部屋属性**:
+   - `sp_lev`（Luaスクリプト）の `des.room` などにおいて、親部屋の `contents` 内部で入れ子定義された小部屋（例: `oracle.lua` の賢者の祠）は、Cコア内部で独立した部屋ではなく「サブルーム（`gs.subrooms`）」として生成されます。
+   - しかし NetHack の部屋出入り判定（`in_rooms` や `u.urooms`）はメイン部屋配列（`svr.rooms`）しか参照せず、サブルームは親部屋の属性（通常は `OROOM` 普通の部屋）として扱われ、子部屋の `rtype`（例: `DELPHI`）は完全に無視されます。
+   - 特別な部屋としてBGMやイベントを正しく発火させたい場合は、子部屋（サブルーム）に頼らず、**親部屋（包含する外側の大部屋）自身に `rtype` を設定するか、独立した部屋として定義**してください。
+
+2. **`rtype` の初回クリアと `orig_rtype` の参照義務**:
+   - NetHack コアは特別な部屋に入ると初回メッセージを出した後、`svr.rooms[roomno].rtype = OROOM;` とクリアします。
+   - レベル生成処理（`mklev.c: level_finalize_topology()`）により、通常ダンジョン・スペシャルレベルを問わずすべての部屋で `orig_rtype = rtype;` が正しく保存されています。
+   - したがって、部屋BGMや再入室時の判定ロジックでは、クリア済みの `rtype` ではなく、必ず `orig_rt = (svr.rooms[roomno].orig_rtype ? svr.rooms[roomno].orig_rtype : svr.rooms[roomno].rtype);` を参照してください。
+
+3. **部屋環境音の共通マッピング関数集約 (`room_type_to_ambience`)**:
+   - 部屋タイプから環境音IDへの変換は、`hack.c` や `allmain.c` に個別の `switch-case` を重複して書かず、`sounds.c` の共通関数 `room_type_to_ambience(int rtype)` に集約してください。
+   - 新しい部屋タイプやBGMを追加する際も、`sounds.c` のテーブルを1箇所更新するだけで進入・退出・ロード時の全処理に正しく反映される設計を維持してください。
+
+4. **独立ダンジョン分岐（ヴラドの塔等）のフロアBGM判定における `In_hell` ネスト禁止**:
+   - `Vlad's Tower` は `dungeon.lua` において独立したダンジョン分岐（`tower_dnum`）であり、`hellish` フラグを持たないため `In_hell(&u.uz)` は常に `FALSE` となります。
+   - `sounds.c` の `update_level_ambience()` 等において、`In_V_tower` などの独立分岐の判定を `In_hell` ブロックの内側にネストしてはならず、必ず独立した `else if` 分岐として判定してください。
 
 ## Flutter スコアボード・死因表示における Cコアと Flutter UI 間の二重同期ルール
 

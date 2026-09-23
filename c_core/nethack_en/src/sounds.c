@@ -2264,12 +2264,16 @@ update_level_ambience(void)
             amb_id = amb_asmodeus;
         else if (Is_baal_level(&u.uz))
             amb_id = amb_baalzebub;
+        else if (Is_orcus_level(&u.uz))
+            amb_id = amb_orcus;
         else if (Is_valley(&u.uz))
             amb_id = amb_valley;
-        else if (In_V_tower(&u.uz))
-            amb_id = amb_vlad;
         else
             amb_id = amb_gehennom;
+    }
+    /* 3. Vlad's Tower (independent branch) */
+    else if (In_V_tower(&u.uz)) {
+        amb_id = amb_vlad;
     }
     /* 3. Quest branch */
     else if (In_quest(&u.uz)) {
@@ -2320,6 +2324,27 @@ update_level_ambience(void)
     }
 
     SoundAmbience(ambience_begin, amb_id, 0);
+}
+
+/* 特別な部屋タイプ（rtype / orig_rtype）に対応する環境音IDを返す。該当なしは 0 */
+int
+room_type_to_ambience(int rtype)
+{
+    switch (rtype) {
+    case ZOO: return amb_in_a_zoo;
+    case SWAMP: return amb_swamp;
+    case COURT: return amb_in_a_court;
+    case LEPREHALL: return amb_inside_leprehall;
+    case MORGUE: return amb_in_cemetery;
+    case BEEHIVE: return amb_in_a_beehive;
+    case COCKNEST: return amb_in_a_cockatrice_nest;
+    case ANTHOLE: return amb_inside_anthole;
+    case BARRACKS: return amb_in_a_barracks;
+    case DELPHI: return amb_approaching_oracle;
+    case TEMPLE: return amb_inside_temple;
+    case VAULT: return amb_inside_vault;
+    default: return 0;
+    }
 }
 
 /*

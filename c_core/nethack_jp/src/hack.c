@@ -3647,40 +3647,9 @@ check_special_room(boolean newlev)
                 int rno = *ptr - ROOMOFFSET;
                 int rt = (rno >= 0 && rno < SIZE(svr.rooms)) ?
                     (svr.rooms[rno].orig_rtype ? svr.rooms[rno].orig_rtype : svr.rooms[rno].rtype) : OROOM;
-                switch (rt) {
-                case ZOO:
-                    SoundAmbience(ambience_end, amb_in_a_zoo, 0);
-                    break;
-                case SWAMP:
-                    SoundAmbience(ambience_end, amb_swamp, 0);
-                    break;
-                case COURT:
-                    SoundAmbience(ambience_end, amb_in_a_court, 0);
-                    break;
-                case MORGUE:
-                    SoundAmbience(ambience_end, amb_in_cemetery, 0);
-                    break;
-                case BEEHIVE:
-                    SoundAmbience(ambience_end, amb_in_a_beehive, 0);
-                    break;
-                case COCKNEST:
-                    SoundAmbience(ambience_end, amb_in_a_cockatrice_nest, 0);
-                    break;
-                case ANTHOLE:
-                    SoundAmbience(ambience_end, amb_inside_anthole, 0);
-                    break;
-                case BARRACKS:
-                    SoundAmbience(ambience_end, amb_in_a_barracks, 0);
-                    break;
-                case DELPHI:
-                    SoundAmbience(ambience_end, amb_approaching_oracle, 0);
-                    break;
-                case TEMPLE:
-                    SoundAmbience(ambience_end, amb_inside_temple, 0);
-                    break;
-                default:
-                    break;
-                }
+                int amb = room_type_to_ambience(rt);
+                if (amb)
+                    SoundAmbience(ambience_end, amb, 0);
             }
         }
     }
@@ -3713,24 +3682,28 @@ check_special_room(boolean newlev)
     }
 
     for (ptr = &u.uentered[0]; *ptr; ptr++) {
-        int roomno = *ptr - ROOMOFFSET, rt = svr.rooms[roomno].rtype;
+        int roomno = *ptr - ROOMOFFSET;
+        int rt = svr.rooms[roomno].rtype;
+        int orig_rt = (roomno >= 0 && roomno < SIZE(svr.rooms)) ?
+            (svr.rooms[roomno].orig_rtype ? svr.rooms[roomno].orig_rtype : svr.rooms[roomno].rtype) : OROOM;
         boolean msg_given = TRUE;
 
-        /* Did we just enter some other special room? */
-        /* vault.c insists that a vault remain a VAULT,
-         * and temples should remain TEMPLEs,
-         * but everything else gives a message only the first time */
+        /* 特別部屋専用BGMのトリガー（再入室でも確実に発火） */
+        {
+            int amb = room_type_to_ambience(orig_rt);
+            if (amb)
+                SoundAmbience(ambience_begin, amb, 0);
+        }
+
+        /* 部屋の初回到達メッセージ（rt != 0 の初回のみ） */
         switch (rt) {
         case ZOO:
-            SoundAmbience(ambience_begin, amb_in_a_zoo, 0);
             pline("デイビッドのトレジャー動物園へようこそ!");
             break;
         case SWAMP:
-            SoundAmbience(ambience_begin, amb_swamp, 0);
             pline("ここは%s.", Blind ? "じめじめしている感じがした" : "どろどろして見えた");
             break;
         case COURT:
-            SoundAmbience(ambience_begin, amb_in_a_court, 0);
             You("豪華%sな部屋に入った!",
                 /* the throne room in Sam quest home level lacks a throne */
                 !furniture_present(THRONE, roomno) ? "" : "王座");
@@ -3739,26 +3712,21 @@ check_special_room(boolean newlev)
             You("レプラコーンの広間に入った!");
             break;
         case MORGUE:
-            SoundAmbience(ambience_begin, amb_in_cemetery, 0);
             if (midnight()) {
                 pline("逃げろ!  逃げろ!");
             } else
                 You("不思議な感覚を覚えた...");
             break;
         case BEEHIVE:
-            SoundAmbience(ambience_begin, amb_in_a_beehive, 0);
             You("巨大な蜂の巣に入った!");
             break;
         case COCKNEST:
-            SoundAmbience(ambience_begin, amb_in_a_cockatrice_nest, 0);
             You("不気味な巣に入った!");
             break;
         case ANTHOLE:
-            SoundAmbience(ambience_begin, amb_inside_anthole, 0);
             You("アリ塚に入った!");
             break;
         case BARRACKS:
-            SoundAmbience(ambience_begin, amb_in_a_barracks, 0);
             if (monstinroom(&mons[PM_SOLDIER], roomno)
                 || monstinroom(&mons[PM_SERGEANT], roomno)
                 || monstinroom(&mons[PM_LIEUTENANT], roomno)
@@ -3770,7 +3738,6 @@ check_special_room(boolean newlev)
         case DELPHI: {
             struct monst *oracle = monstinroom(&mons[PM_ORACLE], roomno);
 
-            SoundAmbience(ambience_begin, amb_approaching_oracle, 0);
             if (oracle) {
                 SetVoice(oracle, 0, 80, 0);
                 if (!oracle->mpeaceful)
@@ -3783,7 +3750,6 @@ check_special_room(boolean newlev)
             break;
         }
         case TEMPLE:
-            SoundAmbience(ambience_begin, amb_inside_temple, 0);
             intemple(roomno + ROOMOFFSET);
             FALLTHROUGH;
         /*FALLTHRU*/

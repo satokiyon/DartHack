@@ -45,7 +45,7 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
 - **アセット同期スクリプト (`sync_dat_assets.ps1`) のパスと運用原則**:
   アセット同期スクリプトの実体は `DartHack_private` リポジトリ配下の `build_files/sys/flutter/scripts/sync_dat_assets.ps1` です。
   新しいデータファイルや Lua スクリプトを追加・改修した際は、必ず本スクリプト内の `$syncItems` 配列に同期定義を追加し、実行して `sys/flutter/assets/ver` をインクリメントさせてください。
-  なお、Windows PowerShell 上で本スクリプトを編集する際は、改行コードを CRLF (`\r\n`) に保つことで構文エラーを防いでください。
+  なお、Windows PowerShell 上で本スクリプトを編集・保存する際は、改行コードを必ず CRLF (`\r\n`) に保ち、かつ **BOM付き UTF-8 (`utf-8-sig`)** で保存してください。BOM が欠落すると Windows PowerShell 5.1 が Shift-JIS (CP932) としてパースし、日本語コメント（「」など）の直後で波括弧の不整合（MissingEndCurlyBrace 構文エラー）が発生します。
 - **アセットバージョン（ver）のインクリメント**:
   データファイルアセットを変更・追加した際は、上書きインストール時に強制的にアセットコピーがトリガーされるよう、必ず `assets/ver` 内のバージョン値（整数値）をインクリメントしてください。
 - **デフォルト設定ファイル名（`defaults.nh`）と `cfgfiles.c` の Android 整合性**:

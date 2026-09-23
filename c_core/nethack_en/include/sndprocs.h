@@ -199,6 +199,7 @@ enum ambiences {
     amb_in_a_shop,
     amb_inside_temple,
     amb_inside_vault,
+    amb_inside_leprehall,
     amb_approaching_oracle,
     amb_in_a_court,
     amb_in_a_barracks,
