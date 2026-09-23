@@ -806,7 +806,7 @@ void NetHackQtMenuWindow::Search()
         return;
 
     searching = true;
-    NetHackQtStringRequestor requestor(this, "Search for:");
+    NetHackQtStringRequestor requestor(this, "検索する文字列:");
     char line[BUFSZ];
     line[0] = '\0'; /* for EDIT_GETLIN */
     if (requestor.Get(line)) {
@@ -932,8 +932,8 @@ NetHackQtTextWindow::NetHackQtTextWindow(QWidget *parent) :
     use_rip(false),
     str_fixed(false),
     textsearching(false),
-    ok("&Dismiss", this),
-    search("&Search", this),
+    ok("閉じる(&D)", this),
+    search("検索(&S)", this),
     lines(new NetHackQtTextListBox(this)),
     target(""),
     rip(this)
@@ -1165,7 +1165,8 @@ void NetHackQtTextWindow::PutStr(int attr UNUSED, const QString& text)
 void NetHackQtTextWindow::Search()
 {
     textsearching = true;
-    NetHackQtStringRequestor requestor(this, "Search for:", "Done", "Find");
+    /* NetHackJP: Japanese strings for the text-search popup */
+    NetHackQtStringRequestor requestor(this, "検索する文字列:", "閉じる", "検索");
     requestor.SetDefault(target);
     boolean get_a_line = requestor.Get(target, (int) sizeof target);
 
