@@ -94,6 +94,7 @@ WSL または Linux 環境上で、ワンステップ用ビルドスクリプト
   - インストールは `sys/unix/install_wsl.sh`（`--qt` 付き時はビルドと同名フラグで `make install` を実行）。`make install` を手動実行する場合もビルドと同じ `WANT_WIN_QT=1 WANT_WIN_QT6=1` フラグで実行する必要がある（Qt 用データ `nhtiles.bmp` / `nhsplash.xpm` は `VARDATND0` が make 実行時の `ifdef` 評価で `DATNODLB` に追加されるため、フラグ無し install では `playground/` にコピーされない）。
   - `QT_IM_MODULE=fcitx` は getlin / askname / plsel / メニューSearch への Mozc による日本語入力（`fcitx5-frontend-qt6`）に必須。
   - `QT_QPA_PLATFORM=xcb` は WSLg での Qt プラットフォームを X11/xcb に固定する指定（Wayland は対象外）。
+  - CI (`weekly-release.yml`) Linux ジョブは `build_wsl.sh --qt --default=tty` / `install_wsl.sh --qt --default=tty` で tty/curses/X11/Qt 全部入り 1 バイナリを作成し、デフォルトポートは tty のまま。配布 zip 内のランチャーは `nethack` (コンソール) / `nethackX11` (X11 GUI) / `nethackQt` (Qt6 GUI) の3本構成（旧 `nethackW` は廃止）。
 - スクリプト実行により、日本語対応ヒントファイル `sys/unix/hints/linux-jp` が使用され、`src/nethack` に `tty` / `curses`（`ncursesw` による UTF-8 日本語表示対応）/ `X11`（Xft UTF-8 描画 + XIM 日本語入力対応）の **3 インターフェースに対応した実行ファイル**が生成されます（`--qt` 指定時は `Qt`（Qt6 / UTF-8 入出力対応）を含む **4 インターフェース**）。
 - *手動でステップを実行する場合*:
   ```bash
@@ -184,7 +185,7 @@ XAPPLRESDIR=./playground ./playground/nethack -wX11
 OPTIONS=windowtype:X11
 ```
 
-※ リリースパッケージでは同封の `./nethackW` スクリプトで起動できます。X11 版のタイルセットはデフォルトで `x11tiles` が読み込まれますが、`.nethackrc` の `OPTIONS=tile_file:ファイル名,tile_width:32,tile_height:32` や `NetHack.ad` リソースで任意のファイル名およびタイルサイズ（幅・高さ）を指定できます（未指定時は画像サイズから自動判定）。
+※ リリースパッケージでは同封の `./nethackX11` スクリプトで起動できます。X11 版のタイルセットはデフォルトで `x11tiles` が読み込まれますが、`.nethackrc` の `OPTIONS=tile_file:ファイル名,tile_width:32,tile_height:32` や `NetHack.ad` リソースで任意のファイル名およびタイルサイズ（幅・高さ）を指定できます（未指定時は画像サイズから自動判定）。
 ※ 日本語入力（`#名前` `#願い` 等の getlin ダイアログ）を使用する場合は、事前に fcitx5 を起動してください（下記「fcitx5 の設定と起動」）。
 
 ##### (d) fcitx5 の設定と起動（X11 版で日本語入力する場合）

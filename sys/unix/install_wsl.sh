@@ -2,13 +2,15 @@
 #!/bin/sh
 # NetHackJP install script for WSL (Linux)
 # NetHackJP: install counterpart of build_wsl.sh (2026-09-23).
-# Usage: ./sys/unix/install_wsl.sh [--qt]
+# Usage: ./sys/unix/install_wsl.sh [--qt] [--default=<tty|curses|X11|Qt>]
 #   Runs 'make install' with the same WANT_WIN_* flags that were used by
 #   'sys/unix/build_wsl.sh' (optionally - '--qt').  The flags must match
 #   because hints-level VARDATND0 additions (e.g. the Qt port's
 #   nhtiles.bmp / nhsplash.xpm) are evaluated by make at run time, so an
 #   install invoked with different flags would silently skip the Qt data
 #   assets (see DEVELOPMENT.md §2.2 / §4.17).
+#   --default=<port> overrides the default window port (WANT_DEFAULT);
+#   useful for an all-in-one build that still starts in the tty console.
 
 set -e
 
@@ -19,16 +21,21 @@ cd "$REPO_ROOT"
 
 # NetHackJP: parse options the same way build_wsl.sh does
 WANT_QT=0
+WANT_DEFAULT_OVERRIDE=""
 for arg in "$@"; do
     case "$arg" in
         --qt)
             WANT_QT=1
             ;;
+        --default=*)
+            WANT_DEFAULT_OVERRIDE="${arg#--default=}"
+            ;;
         *)
-            echo "Usage: ./sys/unix/install_wsl.sh [--qt]"
-            echo "  --qt  Build-install the Qt6 window port build (same
-flags"
-            echo "        as 'build_wsl.sh --qt')."
+            echo "Usage: ./sys/unix/install_wsl.sh [--qt] [--default=<port>]"
+            echo "  --qt             Same meaning as 'build_wsl.sh --qt'"
+            echo "                   (installs the Qt6 data assets too)."
+            echo "  --default=<port> Override the default window port"
+            echo "                   (tty|curses|X11|Qt)."
             exit 1
             ;;
     esac
@@ -49,6 +56,9 @@ WANT_DEFAULT=tty
 if [ $WANT_QT -eq 1 ]; then
     QTMAKEARGS="WANT_WIN_QT=1 WANT_WIN_QT6=1"
     WANT_DEFAULT=Qt
+fi
+if [ -n "$WANT_DEFAULT_OVERRIDE" ]; then
+    WANT_DEFAULT="$WANT_DEFAULT_OVERRIDE"
 fi
 
 echo "=========================================="

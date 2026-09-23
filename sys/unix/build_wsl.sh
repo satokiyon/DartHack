@@ -2,11 +2,13 @@
 #!/bin/sh
 # NetHackJP build script for WSL (Linux)
 # NetHackJP: --qt option to opt-in the Qt6 window port (2026-09-23).
-# Usage: ./sys/unix/build_wsl.sh [--qt] [hints_file]
+# Usage: ./sys/unix/build_wsl.sh [--qt] [--default=<tty|curses|X11|Qt>] [hints_file]
 #   --qt  Also build the Qt6 window port (requires qt6-base-dev,
 #         qt6-multimedia-dev and qt6-base-dev-tools packages installed)
+#   --default=<port>  Override the default window port (default: tty;
+#         --qt implies Qt unless overridden)
 # Note: this script only builds. Use sys/unix/install_wsl.sh (with the
-# same --qt flag) to run 'make install' into playground/.
+# same --qt / --default flags) to run 'make install' into playground/.
 
 set -e
 
@@ -18,11 +20,15 @@ cd "$REPO_ROOT"
 # NetHackJP: parse options; --qt opts into the Qt6 port, any other
 # argument is treated as the hints file (default: linux-jp).
 WANT_QT=0
+WANT_DEFAULT_OVERRIDE=""
 HINTS=""
 for arg in "$@"; do
     case "$arg" in
         --qt)
             WANT_QT=1
+            ;;
+        --default=*)
+            WANT_DEFAULT_OVERRIDE="${arg#--default=}"
             ;;
         *)
             if [ -z "$HINTS" ]; then
@@ -125,6 +131,9 @@ WANT_DEFAULT=tty
 if [ $WANT_QT -eq 1 ]; then
     QTMAKEARGS="WANT_WIN_QT=1 WANT_WIN_QT6=1"
     WANT_DEFAULT=Qt
+fi
+if [ -n "$WANT_DEFAULT_OVERRIDE" ]; then
+    WANT_DEFAULT="$WANT_DEFAULT_OVERRIDE"
 fi
 
 echo "Starting main build with sequential make (tty, curses & X11 interfaces)..."

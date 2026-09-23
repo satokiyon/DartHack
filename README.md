@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsとUbuntu(WSL)のみ)
@@ -63,17 +63,20 @@ NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.net
 
 3. 必要に応じて実行権限が付与されているか確認・付与してください。
    ```bash
-   chmod +x nethack nethackW nethack.bin
+   chmod +x nethack nethackX11 nethackQt nethack.bin
    ```
 
-4. 次のどちらかのスクリプトを起動してください。
+   ※ GUI で Qt 版（Qt6）を使用する場合は、別途 `fcitx5-frontend-qt6` パッケージ（IM 入力用）と CJK フォント（`fonts-noto-cjk`）の導入を推奨します。
+
+4. 次のいずれかのスクリプトを起動してください。
    * **`./nethack`** （コンソール版 TTY / ncurses）
-   * **`./nethackW`** （GUI版 X11 - 黒背景・白文字表示）
+   * **`./nethackX11`** （GUI版 X11 - 黒背景・白文字表示）
+   * **`./nethackQt`** （GUI版 Qt6 - 日本語入力は `QT_IM_MODULE=fcitx` を自動設定）
 
 ※ GUIモード起動時に日本語や墓石の文字が白四角（豆腐文字）で表示される場合は、環境に日本語 CJK フォントパッケージを導入してください（例: `sudo apt update && sudo apt install -y fonts-noto-cjk`）。
 
 #### Linux X11 GUI 版で fcitx5 / ibus による日本語入力を有効にするには
-WSL / Linux で X11 版（`./nethackW`）を起動し、`#名前` `#記念碑` `#虐殺` 等で日本語を入力する場合、別途 XIM（インプットメソッド）サーバの設定が必要です。
+WSL / Linux で X11 版（`./nethackX11`）を起動し、`#名前` `#記念碑` `#虐殺` 等で日本語を入力する場合、別途 XIM（インプットメソッド）サーバの設定が必要です。
 
 1. **fcitx5 環境**（Ubuntu / Debian 系の現行デフォルト）の場合:
    ```bash
