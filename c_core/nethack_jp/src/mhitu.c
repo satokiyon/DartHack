@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-30. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	mhitu.c	$NHDT-Date: 1781973054 2026/06/20 16:30:54 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.347 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -745,11 +745,11 @@ mattacku(struct monst *mtmp)
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
         if (!youseeit)
-            pline("%s %s!", Something,
+            pline("%s%s!", Something,
                   (likes_gold(mtmp->data)
                    && gy.youmonst.mappearance == GOLD_PIECE)
-                  ? "はあなたを拾おうとした"
-                  : "はあなたを揺り動かした");
+                  ? "があなたを拾おうとした"
+                  : "があなたを揺り動かした");
         else /* see note about m_monnam() above */
             pline("待って、%s！ その%sは実は%s、%sという名だ！", m_monnam(mtmp),
                   mimic_obj_name(&gy.youmonst),
@@ -1784,7 +1784,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             if (is_medusa && Hallucination && !rn2(3))
                 pline("誰かが蛇髪を切ってもらう頃合いらしい.");
             else
-                pline_mon(mtmp, "%s %s.", Monnam(mtmp),
+                pline_mon(mtmp, "%sは%s.", Monnam(mtmp),
                       (is_medusa && mtmp->mcan && !react)
                           ? "それほど醜くは見えない"
                           : "むなしく視線を送った");

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -182,22 +182,22 @@ NetHackQtMenuWindow::NetHackQtMenuWindow(QWidget *parent) :
     table->horizontalHeader()->hide();
     table->verticalHeader()->hide();
 
-    ok=new QPushButton("Ok");
+    ok=new QPushButton("決定");
     connect(ok,SIGNAL(clicked()),this,SLOT(accept()));
 
-    cancel=new QPushButton("Cancel");
+    cancel=new QPushButton("キャンセル");
     connect(cancel,SIGNAL(clicked()),this,SLOT(reject()));
 
-    all=new QPushButton("All");
+    all=new QPushButton("すべて");
     connect(all,SIGNAL(clicked()),this,SLOT(All()));
 
-    none=new QPushButton("None");
+    none=new QPushButton("解除");
     connect(none,SIGNAL(clicked()),this,SLOT(ChooseNone()));
 
-    invert=new QPushButton("Invert");
+    invert=new QPushButton("反転");
     connect(invert,SIGNAL(clicked()),this,SLOT(Invert()));
 
-    search=new QPushButton("Search");
+    search=new QPushButton("検索");
     connect(search,SIGNAL(clicked()),this,SLOT(Search()));
 
     QPoint pos(0,ok->height());
@@ -649,7 +649,7 @@ void NetHackQtMenuWindow::InputCount(char key)
 	countstr += QChar(key);
     }
     if (counting)
-	prompt.setText("Count: " + countstr);
+	prompt.setText("個数: " + countstr);
 }
 
 void NetHackQtMenuWindow::ClearCount(void)
@@ -806,7 +806,7 @@ void NetHackQtMenuWindow::Search()
         return;
 
     searching = true;
-    NetHackQtStringRequestor requestor(this, "Search for:");
+    NetHackQtStringRequestor requestor(this, "検索する文字列:");
     char line[BUFSZ];
     line[0] = '\0'; /* for EDIT_GETLIN */
     if (requestor.Get(line)) {
@@ -932,8 +932,8 @@ NetHackQtTextWindow::NetHackQtTextWindow(QWidget *parent) :
     use_rip(false),
     str_fixed(false),
     textsearching(false),
-    ok("&Dismiss", this),
-    search("&Search", this),
+    ok("閉じる(&D)", this),
+    search("検索(&S)", this),
     lines(new NetHackQtTextListBox(this)),
     target(""),
     rip(this)
@@ -999,8 +999,10 @@ void NetHackQtTextWindow::doDismiss()
 
 void NetHackQtTextWindow::UseRIP(int how, time_t when)
 {
-// Code from X11 windowport
-#define STONE_LINE_LEN 16    /* # chars that fit on one line */
+// Code from X11 windowport, JP-forked for UTF-8 (see genl_outrip in
+// src/rip.c for the width-aware reference implementation)
+#define STONE_LINE_LEN 16    /* # display columns that fit on one line */
+#define STONE_LINE_BYTES (STONE_LINE_LEN * 4 + 4) /* UTF-8 worst case */
 #define NAME_LINE  0	/* line # for player name */
 #define GOLD_LINE  1	/* line # for amount of gold */
 #define DEATH_LINE 2	/* line # for death description */
@@ -1010,19 +1012,27 @@ void NetHackQtTextWindow::UseRIP(int how, time_t when)
     if (!rip_line) {
 	rip_line=new char*[YEAR_LINE+1];
 	for (int i=0; i<YEAR_LINE+1; i++) {
-	    rip_line[i]=new char[STONE_LINE_LEN+1];
+	    rip_line[i]=new char[STONE_LINE_BYTES];
 	}
     }
+    for (int i = 0; i < YEAR_LINE + 1; ++i)
+        memset(rip_line[i], 0, STONE_LINE_BYTES);
 
     /* Follows same algorithm as genl_outrip() */
 
     char buf[BUFSZ];
     char *dpx;
-    int line;
+    int line, seqlen;
 
-    /* Put name on stone */
-    (void) snprintf(rip_line[NAME_LINE], STONE_LINE_LEN + 1,
-                    "%.*s", STONE_LINE_LEN, svp.plname);
+    /* Put name on stone
+       NetHackJP: UTF-8 display-width aware truncation; plname[] may
+       carry a "-role-race-gender-alignment" suffix (legacy saves),
+       so trim it at gp.plnamelen first */
+    char plnm[PL_NSIZ];
+    str_copy(plnm, svp.plname, sizeof plnm - 1);
+    if (gp.plnamelen > 0 && gp.plnamelen < (int) strlen(plnm))
+        plnm[gp.plnamelen] = '\0';
+    rip_truncate_utf8_width(rip_line[NAME_LINE], plnm, STONE_LINE_LEN);
 
     /* Put $ on stone;
        to keep things safe and relatively simple, impose an arbitrary
@@ -1041,33 +1051,116 @@ void NetHackQtTextWindow::UseRIP(int how, time_t when)
         cash = 0;
     if (cash > 999999999L)
         cash = 999999999L;
-    (void) snprintf(rip_line[GOLD_LINE], STONE_LINE_LEN + 1, "%ld Au", cash);
+    (void) snprintf(rip_line[GOLD_LINE], STONE_LINE_BYTES, "%ld Au", cash);
 
-    /* Put together death description */
-    formatkiller(buf, sizeof buf, how, FALSE);
-    //str_copy(buf, killer, SIZE(buf));
+    /* Put together death description
+       NetHackJP: was formatkiller() which yields English "killed by ...";
+       use the core's Japanese display variant instead */
+    jp_formatkiller_for_display(buf, sizeof buf, how, FALSE);
 
-    /* Put death type on stone */
+    /* Put death type on stone; wrap at UTF-8 character boundaries with
+       East Asian display width taken into account (mirrors genl_outrip) */
     for (line = DEATH_LINE, dpx = buf; line < YEAR_LINE; ++line) {
-	char tmpchar;
-	int i, i0 = (int) strlen(dpx);
+	int i0 = 0;
+	int count_width = 0;
+	int byte_idx = 0;
+	int last_space_byte = 0;
+	int last_space_width = 0;
+	boolean is_last_line = (line == YEAR_LINE - 1);
 
-	if (i0 > STONE_LINE_LEN) {
-	    for (i = STONE_LINE_LEN; (i > 0) && (i0 > STONE_LINE_LEN); --i)
-		if (dpx[i] == ' ')
-                    i0 = i;
-	    if (!i)
-                i0 = STONE_LINE_LEN;
+	/* 先頭の余分なスペースをスキップ */
+	while (*dpx == ' ')
+	    dpx++;
+
+	if (*dpx == '\0')
+	    break;
+
+	/* 文字境界と表示幅を考慮しながら、STONE_LINE_LEN に収まる位置を探す */
+	while (dpx[byte_idx] != '\0') {
+	    unsigned cp = rip_utf8_decode(&dpx[byte_idx], &seqlen);
+	    int char_w = rip_utf8_char_width(cp);
+
+	    if (count_width + char_w > STONE_LINE_LEN)
+		break;
+
+	    if (cp == ' ') {
+		last_space_byte = byte_idx + seqlen;
+		last_space_width = count_width + char_w;
+	    }
+
+	    count_width += char_w;
+	    byte_idx += seqlen;
 	}
-	tmpchar = dpx[i0];
+
+	/* 収まる部分の末尾のバイトインデックスを設定 */
+	if (dpx[byte_idx] == '\0') {
+	    i0 = byte_idx;
+	} else if (is_last_line) {
+	    /* 4行目（最終行）でまだ残っている場合: 省略記号を付与 */
+	    const char *ellipsis = "…";
+	    int ellipsis_w = rip_utf8_str_width(ellipsis);
+	    int target_w = STONE_LINE_LEN - ellipsis_w;
+	    int e_byte = 0;
+	    int e_width = 0;
+
+	    while (dpx[e_byte] != '\0') {
+		unsigned cp = rip_utf8_decode(&dpx[e_byte], &seqlen);
+		int char_w = rip_utf8_char_width(cp);
+		if (e_width + char_w > target_w)
+		    break;
+		e_width += char_w;
+		e_byte += seqlen;
+	    }
+	    i0 = e_byte;
+
+	    char linebuf[BUFSZ];
+	    int copylen = (i0 < (int) sizeof linebuf - 8)
+                          ? i0 : (int) sizeof linebuf - 8;
+	    memcpy(linebuf, dpx, copylen);
+	    linebuf[copylen] = '\0';
+	    int rlen = (int) strlen(linebuf);
+	    while (rlen > 0 && linebuf[rlen - 1] == ' ')
+		linebuf[--rlen] = '\0';
+	    strcat(linebuf, ellipsis);
+	    str_copy(rip_line[line], linebuf, STONE_LINE_BYTES - 1);
+	    dpx += strlen(dpx);
+	    continue;
+	} else {
+	    /* 途中で切れる場合 */
+	    if (last_space_byte > 0) {
+		if (last_space_width < 10 && count_width >= 12)
+		    i0 = byte_idx;
+		else
+		    i0 = last_space_byte;
+	    } else {
+		i0 = byte_idx;
+	    }
+	}
+
+	/* 万が一、1文字も入らなかった場合の無限ループ防止 */
+	if (i0 == 0 && dpx[0] != '\0') {
+	    (void) rip_utf8_decode(dpx, &seqlen);
+	    i0 = seqlen;
+	}
+
+	char tmpchar = dpx[i0];
 	dpx[i0] = 0;
-	(void) str_copy(rip_line[line], dpx, STONE_LINE_LEN + 1);
+
+	/* 行末の余分なスペースを除去（RTrim）してからコピー */
+	char linebuf[BUFSZ];
+	str_copy(linebuf, dpx, sizeof linebuf - 1);
+	int rlen = (int) strlen(linebuf);
+	while (rlen > 0 && linebuf[rlen - 1] == ' ')
+	    linebuf[--rlen] = '\0';
+	str_copy(rip_line[line], linebuf, STONE_LINE_BYTES - 1);
+
 	if (tmpchar != ' ') {
 	    dpx[i0] = tmpchar;
-	    dpx= &dpx[i0];
+	    dpx = &dpx[i0];
 	} else {
-            dpx= &dpx[i0 + 1];
-        }
+	    dpx[i0] = tmpchar;
+	    dpx = &dpx[i0 + 1];
+	}
     }
 
     /* Put year on stone;
@@ -1076,7 +1169,7 @@ void NetHackQtTextWindow::UseRIP(int how, time_t when)
        so force a value that it can recognize as fitting within buffer's
        range ("%4d" imposes a minimum number of digits, not a maximum) */
     int year = (int) ((yyyymmdd(when) / 10000L) % 10000L); /* Y10K bug! */
-    (void) snprintf(rip_line[YEAR_LINE], STONE_LINE_LEN + 1, "%4d", year);
+    (void) snprintf(rip_line[YEAR_LINE], STONE_LINE_BYTES, "%4d", year);
 
     rip.setLines(rip_line, YEAR_LINE + 1);
     use_rip = true;
@@ -1165,7 +1258,8 @@ void NetHackQtTextWindow::PutStr(int attr UNUSED, const QString& text)
 void NetHackQtTextWindow::Search()
 {
     textsearching = true;
-    NetHackQtStringRequestor requestor(this, "Search for:", "Done", "Find");
+    /* NetHackJP: Japanese strings for the text-search popup */
+    NetHackQtStringRequestor requestor(this, "検索する文字列:", "閉じる", "検索");
     requestor.SetDefault(target);
     boolean get_a_line = requestor.Get(target, (int) sizeof target);
 

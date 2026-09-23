@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-22. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -594,7 +594,7 @@ const char *const obj_jp_descrs[NUM_OBJECTS + 1] = {
     [POT_RESTORE_ABILITY] = "ピンク色の薬",
     [POT_SEE_INVISIBLE] = "マゼンダ色の薬",
     [POT_SICKNESS] = "発泡している薬",
-    [POT_SLEEPING] = "沸騰している薬",
+    [POT_SLEEPING] = "泡沸している薬",
     [POT_SPEED] = "暗緑色の薬",
     [POT_WATER] = "無色の薬",
     [QUARTERSTAFF] = "棒",

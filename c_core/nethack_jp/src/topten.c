@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-05. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -921,6 +921,160 @@ jp_translate_killer_name_or_monster(const char *in, char *out, unsigned outsz)
     return out;
 }
 
+/* NetHackJP: 死因キー(英語・レコード保存用のまま)と日本語表示の
+   一元管理テーブル。以前は jp_translate_killer_text_for_display() 内の
+   "killed by" 文形と裸形の 2 つの if チェーンに完全一致エントリが散在
+   していたが、1 つの静的テーブルに統合した (動作・訳語は不変). */
+static const struct jp_killer_reason_entry {
+    const char *enkey;  /* 英語キー (strcmpi: 大小文字無視比較) */
+    const char *jp_kb;    /* "killed by <X>" 文形の日本語 (0 は未定義) */
+    const char *jp_core;  /* 裸形死因の日本語       (0 は未定義) */
+} jp_killer_reason_table[] = {
+    { "falling drawbridge", "落下した跳ね橋に倒された", 0 },
+    { "closing drawbridge", "閉じる跳ね橋に倒された", 0 },
+    { "exploding drawbridge", "爆発する跳ね橋に倒された", 0 },
+    { "collapsing drawbridge", "崩れ落ちる跳ね橋に倒された", 0 },
+    { "life drainage", "生命力吸収で倒された", "生命力吸収" },
+    { "gas cloud", "毒ガスの雲に倒された", "毒ガスの雲" },
+    { "wand", "魔法の杖に倒された", 0 },
+    { "scroll of fire", "火炎の巻物に倒された", 0 },
+    { "scroll of genocide", "虐殺の巻物に倒された", 0 },
+    { "potion of acid", "酸の薬に倒された", 0 },
+    { "potion of holy water", "聖水に倒された", 0 },
+    { "potion of unholy water", "不浄な水に倒された", 0 },
+    { "falling rock", "落石に倒された", "落石" },
+    { "falling object", "落下物に倒された", "落下物" },
+    { "grappling hook", "グラップリングフックに倒された", 0 },
+    { "exploding wand", "杖の爆発で倒された", "杖の爆発" },
+    { "exploding ring", "指輪の爆発で倒された", "指輪の爆発" },
+    { "exploding rune", "ルーンの爆発で倒された", "ルーンの爆発" },
+    { "residual undead turning effect", "アンデッド退散の残留効果に倒された", "アンデッド退散の残留効果" },
+    { "system shock", "システムショックで倒された", "システムショック" },
+    { "psychic blast", "精神波の爆破に倒された", "精神波の爆発" },
+    { "exhaustion", "過労で倒された", "過労死" },
+    { "overexertion", "精根尽き果てて倒された", "力尽きたこと" },
+    { "a bad experience sitting on a throne", "玉座に座った悪影響で倒された", "玉座に座った悪影響" },
+    { "bad experience sitting on a throne", "玉座に座った悪影響で倒された", "玉座に座った悪影響" },
+    { "sitting on lava", "溶岩に座ったことで倒された", "溶岩に座ったこと" },
+    { "sitting in lava", "溶岩に座ったことで倒された", "溶岩に座ったこと" },
+    { "mildly contaminated potion", "少し古くなった薬で倒された", "少し古くなった薬" },
+    { "boiling potion", "沸騰して爆発した薬で倒された", "沸騰して爆発した薬" },
+    { "boiling potions", "沸騰して爆発した薬で倒された", "沸騰して爆発した薬" },
+    { "exploding potion", "引火して爆発した薬で倒された", "引火して爆発した薬" },
+    { "exploding potions", "引火して爆発した薬で倒された", "引火して爆発した薬" },
+    { "shattered potion", "凍結して砕け散った薬で倒された", "凍結して砕け散った薬" },
+    { "shattered potions", "凍結して砕け散った薬で倒された", "凍結して砕け散った薬" },
+    { "burning scroll", "燃え上がった巻物で倒された", "燃え上がった巻物" },
+    { "burning scrolls", "燃え上がった巻物で倒された", "燃え上がった巻物" },
+    { "burning book", "燃え上がった魔法書で倒された", "燃え上がった魔法書" },
+    { "exploding glob of slime", "爆発したスライムの塊で倒された", "爆発したスライムの塊" },
+    { "exploding globs of slime", "爆発したスライムの塊で倒された", "爆発したスライムの塊" },
+    { "contusion from a small passage", "狭い通路で頭を打ったことで倒された", "狭い通路で頭を打ったこと" },
+    { "strangulation", "首を絞められて倒された", "首を絞められたこと" },
+    { "suffocation", "窒息して倒された", "窒息" },
+    { "slimicide", "スライム化による死", "スライム化による死" },
+    { "killed while stuck in creature form", 0, "怪物の姿から戻れずに倒れた" },
+    { "unsuccessful polymorph", 0, "へんげの失敗で倒された" },
+    { "self-genocide", 0, "自分自身の虐殺" },
+    { "alchemic blast", "錬金術の爆発で倒された", "錬金術の爆発" },
+    { "starvation", 0, "餓死" },
+    { "brainlessness", "脳の損失で倒された", "脳を失ったこと" },
+    { "elementary physics", "物理法則に倒された", "物理法則" },
+    { "colliding with the ceiling", "天井への激突で倒された", "天井への激突" },
+    { "a grappling hook", 0, "グラップリングフック" },
+    { "jumping out of a bear trap", "熊罠からの脱出で倒された", "熊罠からの脱出失敗" },
+    { "cursed throne", 0, "呪われた玉座" },
+    { "electric chair", 0, "電気椅子" },
+    { "acidic chair", 0, "酸の椅子" },
+    { "acidic corpse", 0, "酸性の死体" },
+    { "acidic glob", 0, "酸性の塊" },
+    { "cadaver", 0, "腐った死体" },
+    { "rotted glob", 0, "腐った塊" },
+    { "rotten lump of royal jelly", 0, "腐ったローヤルゼリー" },
+    { "very rich meal", 0, "豪華すぎる食事" },
+    { "quick snack", 0, "軽いスナック" },
+    { "axing a hard object", "硬いものを斧で叩いたこと", "硬いものを斧で叩いたこと" },
+    { "genocidal confusion", 0, "虐殺による混乱" },
+    { "imperious order", "傲慢な命令で倒された", "傲慢な命令" },
+    { "removing gloves", 0, "手袋を脱いだこと" },
+    { "losing gloves", 0, "手袋を失ったこと" },
+    { "removing boots", 0, "靴を脱いだこと" },
+    { "losing boots", 0, "靴を失ったこと" },
+    { "resistance timing out", "耐性の時間切れで倒された", "石化耐性が切れたこと" },
+    { "committed suicide", "自殺したこと", "自殺" },
+    { "went to heaven prematurely", 0, "早すぎる天国への旅" },
+    { "turned into green slime", 0, "緑のスライムになったこと" },
+    { "killed by petrification", 0, "石化による死" },
+    { "quit while already on Charon's boat", "カロンの船の上での自決", "カロンの舟の上で人生を諦めた" },
+    { "crushed to death underneath a drawbridge", 0, "跳ね橋の下敷きになった" },
+    { "fell from a drawbridge", 0, "跳ね橋から落ちた" },
+    /* DartHack追加死因 */
+    { "arrow", "矢に倒された", 0 },
+    { "little dart", "吹き矢に倒された", 0 },
+    { "dart", "吹き矢に倒された", 0 },
+    { "poisoned needle", "毒針に刺されて倒された", 0 },
+    { "needle", "毒針に刺されて倒された", 0 },
+    { "land mine", "地雷の爆発で倒された", "地雷の爆発" },
+    { "electric shock", "電撃で倒された", "電撃" },
+    { "bear trap", "熊罠で倒された", "熊罠" },
+    { "rolling boulder trap", "転がる大岩の罠に倒された", "転がる大岩の罠" },
+    { "statue trap", "石像の罠に倒された", "石像の罠" },
+    { "spiked pit", "杭のある落とし穴に落ちて倒された", "杭のある落とし穴" },
+    { "pit", "落とし穴に落ちて倒された", "落とし穴" },
+    { "fire trap", "火の罠で焼死した", "火の罠" },
+    { "magic trap", "魔法の罠に倒された", "魔法の罠" },
+    { "anti-magic trap", "反魔法の罠に倒された", "反魔法の罠" },
+    { "polymorph trap", "へんげの罠に倒された", "へんげの罠" },
+    { "rusting away", "錆び崩れて倒された", "錆び崩れたこと" },
+    { "dangerous winds", "危険な突風で倒された", "危険な突風" },
+    { "cloud of poison gas", "毒ガスの雲に倒された", "毒ガスの雲" },
+    { "crunched in the head by an iron ball", "鉄球に頭を打ち砕かれた", 0 },
+    { "iron ball collision", "鉄球との衝突で倒された", "鉄球との衝突" },
+    { "exploding crystal ball", "水晶玉の爆発で倒された", "水晶玉の爆発" },
+    { "falling down a mine shaft", "坑道への落下で倒された", "坑道への落下" },
+    { "unrefrigerated sip of juice", "冷やされていない果汁をすすったこと", 0 },
+    { "sipping boiling water", "煮えたぎる湯をすすったこと", 0 },
+    { "carnivorous bag", "肉食の袋に倒された", 0 },
+    { "magical explosion", "魔法の爆発に倒された", "魔法の爆発" },
+    { "splash of acid", "酸の飛沫に倒された", "酸の飛沫" },
+    { "death field", "死の領域に倒された", "死の領域" },
+    { "disintegration field", "分解領域に倒された", "分解領域" },
+    { "potion of poison", "毒薬に倒された", 0 },
+    { "potion of polymorph", "へんげの薬に倒された", 0 },
+    { "trickery", 0, "不正行為" },
+    { "panic", 0, "パニック" },
+    { "died", 0, "死亡した" },
+    { "ascended", 0, "昇天した" },
+};
+
+#define JPKB_FORM_KILLEDBY 0 /* "killed by <X>" 文形 */
+#define JPKB_FORM_CORE     1 /* 裸形 (文形でない死因) */
+
+/* 静的テーブル jp_killer_reason_table[] の完全一致検索.
+   見つからない、または対象文形が未定義の場合は FALSE を返し、
+   呼出側の従来の if チェーン (動的パターン) にフォールバックする */
+staticfn boolean
+jp_killer_exact_lookup(const char *key, int form, char *out, unsigned outsz)
+{
+    int i, n = (int) (sizeof jp_killer_reason_table
+                  / sizeof jp_killer_reason_table[0]);
+
+    if (!key || !*key)
+        return FALSE;
+    for (i = 0; i < n; ++i) {
+        const struct jp_killer_reason_entry *ep = &jp_killer_reason_table[i];
+        const char *jp = (form == JPKB_FORM_KILLEDBY) ? ep->jp_kb : ep->jp_core;
+
+        if (!strcmpi(key, ep->enkey)) {
+            if (!jp)
+                break; /* キーは存在するがこの文形の訳は未定義 */
+            Snprintf(out, outsz, "%s", jp);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 void
 jp_translate_killer_text_for_display(
     char *out,
@@ -1001,81 +1155,14 @@ jp_translate_killer_text_for_display(
         char expbuf[BUFSZ];
         const char *jpexp = jp_explosion_text_for_display(core + 10, expbuf, sizeof expbuf);
         Snprintf(outmain, sizeof outmain, "%sに巻き込まれた", jpexp);
-    } else if (!strcmpi(core, "crushed to death underneath a drawbridge")) {
-        Snprintf(outmain, sizeof outmain, "跳ね橋の下敷きになった");
-    } else if (!strcmpi(core, "fell from a drawbridge")) {
-        Snprintf(outmain, sizeof outmain, "跳ね橋から落ちた");
+    } else if (jp_killer_exact_lookup(core, JPKB_FORM_CORE, outmain, sizeof outmain)) {
+        ; /* 裸形死因は静的テーブル jp_killer_reason_table で処理した */
     } else if (!strncmpi(core, "killed by ", 10)) {
         const char *killer = skip_english_article(core + 10);
 
-        if (!strcmpi(killer, "falling drawbridge")) {
-            Snprintf(outmain, sizeof outmain, "落下した跳ね橋に倒された");
-        } else if (!strcmpi(killer, "closing drawbridge")) {
-            Snprintf(outmain, sizeof outmain, "閉じる跳ね橋に倒された");
-        } else if (!strcmpi(killer, "exploding drawbridge")) {
-            Snprintf(outmain, sizeof outmain, "爆発する跳ね橋に倒された");
-        } else if (!strcmpi(killer, "collapsing drawbridge")) {
-            Snprintf(outmain, sizeof outmain, "崩れ落ちる跳ね橋に倒された");
-        } else if (!strcmpi(killer, "life drainage")) {
-            Snprintf(outmain, sizeof outmain, "生命力吸収で倒された");
-        } else if (!strcmpi(killer, "gas cloud")) {
-            Snprintf(outmain, sizeof outmain, "毒ガスの雲に倒された");
-        } else if (!strcmpi(killer, "wand")) {
-            Snprintf(outmain, sizeof outmain, "魔法の杖に倒された");
-        } else if (!strcmpi(killer, "scroll of fire")) {
-            Snprintf(outmain, sizeof outmain, "火炎の巻物に倒された");
-        } else if (!strcmpi(killer, "scroll of genocide")) {
-            Snprintf(outmain, sizeof outmain, "虐殺の巻物に倒された");
-        } else if (!strcmpi(killer, "potion of acid")) {
-            Snprintf(outmain, sizeof outmain, "酸の薬に倒された");
-        } else if (!strcmpi(killer, "potion of holy water")) {
-            Snprintf(outmain, sizeof outmain, "聖水に倒された");
-        } else if (!strcmpi(killer, "potion of unholy water")) {
-            Snprintf(outmain, sizeof outmain, "不浄な水に倒された");
-        } else if (!strcmpi(killer, "potion of poison")) {
-            Snprintf(outmain, sizeof outmain, "毒薬に倒された");
-        } else if (!strcmpi(killer, "potion of polymorph")) {
-            Snprintf(outmain, sizeof outmain, "へんげの薬に倒された");
-        } else if (!strcmpi(killer, "scroll of genocide")) {
-            Snprintf(outmain, sizeof outmain, "虐殺の巻物に倒された");
-        } else if (!strcmpi(killer, "elementary physics")) {
-            Snprintf(outmain, sizeof outmain, "物理法則に倒された");
-        } else if (!strcmpi(killer, "colliding with the ceiling")) {
-            Snprintf(outmain, sizeof outmain, "天井への激突で倒された");
-        } else if (!strcmpi(killer, "splash of acid")) {
-            Snprintf(outmain, sizeof outmain, "酸の飛沫に倒された");
-        } else if (!strcmpi(killer, "death field")) {
-            Snprintf(outmain, sizeof outmain, "死の領域に倒された");
-        } else if (!strcmpi(killer, "disintegration field")) {
-            Snprintf(outmain, sizeof outmain, "分解領域に倒された");
-        } else if (!strcmpi(killer, "falling rock")) {
-            Snprintf(outmain, sizeof outmain, "落石に倒された");
-        } else if (!strcmpi(killer, "falling object")) {
-            Snprintf(outmain, sizeof outmain, "落下物に倒された");
-        } else if (!strcmpi(killer, "grappling hook")) {
-            Snprintf(outmain, sizeof outmain, "グラップリングフックに倒された");
-        } else if (!strcmpi(killer, "exploding wand")) {
-            Snprintf(outmain, sizeof outmain, "杖の爆発で倒された");
-        } else if (!strcmpi(killer, "exploding ring")) {
-            Snprintf(outmain, sizeof outmain, "指輪の爆発で倒された");
-        } else if (!strcmpi(killer, "exploding rune")) {
-            Snprintf(outmain, sizeof outmain, "ルーンの爆発で倒された");
-        } else if (!strcmpi(killer, "alchemic blast")) {
-            Snprintf(outmain, sizeof outmain, "錬金術の爆発で倒された");
-        } else if (!strcmpi(killer, "residual undead turning effect")) {
-            Snprintf(outmain, sizeof outmain, "アンデッド退散の残留効果で倒された");
-        } else if (!strcmpi(killer, "system shock")) {
-            Snprintf(outmain, sizeof outmain, "システムショックで倒された");
-        } else if (!strcmpi(killer, "imperious order")) {
-            Snprintf(outmain, sizeof outmain, "傲慢な命令で倒された");
-        } else if (!strcmpi(killer, "resistance timing out")) {
-            Snprintf(outmain, sizeof outmain, "耐性の時間切れで倒された");
-        } else if (!strcmpi(killer, "quit while already on Charon's boat")) {
-            Snprintf(outmain, sizeof outmain, "カロンの船の上での自決");
-        } else if (!strcmpi(killer, "committed suicide")) {
-            Snprintf(outmain, sizeof outmain, "自殺したこと");
-        } else if (!strcmpi(killer, "brainlessness")) {
-            Snprintf(outmain, sizeof outmain, "脳の損失で倒された");
+        if (jp_killer_exact_lookup(killer, JPKB_FORM_KILLEDBY,
+                                   outmain, sizeof outmain)) {
+            ; /* "killed by" 文形も静的テーブルで処理した */
         } else if (strstr(killer, "shot ") && strstr(killer, "self with a death ray")) {
             Snprintf(outmain, sizeof outmain, "死の光線で自分を照射したこと");
         } else if (strstr(killer, "disintegration breath by ")) {
@@ -1093,81 +1180,6 @@ jp_translate_killer_text_for_display(
             } else {
                 Snprintf(outmain, sizeof outmain, "神の冷淡さで倒された");
             }
-        } else if (!strcmpi(killer, "psychic blast")) {
-            Snprintf(outmain, sizeof outmain, "精神波の爆発に倒された");
-        } else if (!strcmpi(killer, "exhaustion")) {
-            Snprintf(outmain, sizeof outmain, "過労で倒された");
-        } else if (!strcmpi(killer, "overexertion")) {
-            Snprintf(outmain, sizeof outmain, "精根尽き果てて倒された");
-        } else if (!strcmpi(killer, "a bad experience sitting on a throne")
-                   || !strcmpi(killer, "bad experience sitting on a throne")) {
-            Snprintf(outmain, sizeof outmain, "玉座に座った悪影響で倒された");
-        } else if (!strcmpi(killer, "sitting on lava") || !strcmpi(killer, "sitting in lava")) {
-            Snprintf(outmain, sizeof outmain, "溶岩に座ったことで倒された");
-        } else if (!strcmpi(killer, "mildly contaminated potion")) {
-            Snprintf(outmain, sizeof outmain, "少し古くなった薬で倒された");
-        } else if (!strcmpi(killer, "contusion from a small passage")) {
-            Snprintf(outmain, sizeof outmain, "狭い通路で頭を打ったことで倒された");
-        } else if (!strcmpi(killer, "cloud of poison gas")) {
-            Snprintf(outmain, sizeof outmain, "毒ガスの雲に倒された");
-        } else if (!strcmpi(killer, "jumping out of a bear trap")) {
-            Snprintf(outmain, sizeof outmain, "熊罠からの脱出で倒された");
-        } else if (!strcmpi(killer, "crunched in the head by an iron ball")) {
-            Snprintf(outmain, sizeof outmain, "鉄球に頭を打ち砕かれた");
-        } else if (!strcmpi(killer, "iron ball collision")) {
-            Snprintf(outmain, sizeof outmain, "鉄球との衝突で倒された");
-        } else if (!strcmpi(killer, "exploding crystal ball")) {
-            Snprintf(outmain, sizeof outmain, "水晶玉の爆発で倒された");
-        } else if (!strcmpi(killer, "axing a hard object")) {
-            Snprintf(outmain, sizeof outmain, "硬いものを斧で叩いたこと");
-        } else if (!strcmpi(killer, "falling down a mine shaft")) {
-            Snprintf(outmain, sizeof outmain, "坑道への落下で倒された");
-        } else if (!strcmpi(killer, "unrefrigerated sip of juice")) {
-            Snprintf(outmain, sizeof outmain, "冷やされていない果汁をすすったこと");
-        } else if (!strcmpi(killer, "sipping boiling water")) {
-            Snprintf(outmain, sizeof outmain, "煮えたぎる湯をすすったこと");
-        } else if (!strcmpi(killer, "carnivorous bag")) {
-            Snprintf(outmain, sizeof outmain, "肉食の袋に倒された");
-        } else if (!strcmpi(killer, "magical explosion")) {
-            Snprintf(outmain, sizeof outmain, "魔法の爆発に倒された");
-        } else if (!strcmpi(killer, "arrow")) {
-            Snprintf(outmain, sizeof outmain, "矢に倒された");
-        } else if (!strcmpi(killer, "little dart") || !strcmpi(killer, "dart")) {
-            Snprintf(outmain, sizeof outmain, "吹き矢に倒された");
-        } else if (!strcmpi(killer, "poisoned needle") || !strcmpi(killer, "needle")) {
-            Snprintf(outmain, sizeof outmain, "毒針に刺されて倒された");
-        } else if (!strcmpi(killer, "land mine")) {
-            Snprintf(outmain, sizeof outmain, "地雷の爆発で倒された");
-        } else if (!strcmpi(killer, "electric shock")) {
-            Snprintf(outmain, sizeof outmain, "電撃で倒された");
-        } else if (!strcmpi(killer, "bear trap")) {
-            Snprintf(outmain, sizeof outmain, "熊罠で倒された");
-        } else if (!strcmpi(killer, "rolling boulder trap")) {
-            Snprintf(outmain, sizeof outmain, "転がる大岩の罠に倒された");
-        } else if (!strcmpi(killer, "statue trap")) {
-            Snprintf(outmain, sizeof outmain, "石像の罠に倒された");
-        } else if (!strcmpi(killer, "spiked pit")) {
-            Snprintf(outmain, sizeof outmain, "杭のある落とし穴に落ちて倒された");
-        } else if (!strcmpi(killer, "pit")) {
-            Snprintf(outmain, sizeof outmain, "落とし穴に落ちて倒された");
-        } else if (!strcmpi(killer, "fire trap")) {
-            Snprintf(outmain, sizeof outmain, "火の罠で焼死した");
-        } else if (!strcmpi(killer, "magic trap")) {
-            Snprintf(outmain, sizeof outmain, "魔法の罠に倒された");
-        } else if (!strcmpi(killer, "anti-magic trap")) {
-            Snprintf(outmain, sizeof outmain, "反魔法の罠に倒された");
-        } else if (!strcmpi(killer, "polymorph trap")) {
-            Snprintf(outmain, sizeof outmain, "へんげの罠に倒された");
-        } else if (!strcmpi(killer, "rusting away")) {
-            Snprintf(outmain, sizeof outmain, "錆び崩れて倒された");
-        } else if (!strcmpi(killer, "dangerous winds")) {
-            Snprintf(outmain, sizeof outmain, "危険な突風で倒された");
-        } else if (!strcmpi(killer, "strangulation")) {
-            Snprintf(outmain, sizeof outmain, "首を絞められて倒された");
-        } else if (!strcmpi(killer, "suffocation")) {
-            Snprintf(outmain, sizeof outmain, "窒息して倒された");
-        } else if (!strcmpi(killer, "slimicide")) {
-            Snprintf(outmain, sizeof outmain, "スライム化による死");
         } else if (!strncmpi(killer, "riding ", 7)) {
             const char *mname = skip_english_article(killer + 7);
             char mbuf[BUFSZ];
@@ -1540,97 +1552,6 @@ jp_translate_killer_text_for_display(
         } else {
             Snprintf(outmain, sizeof outmain, "不健康な姿に戻って倒れた");
         }
-    } else if (!strcmpi(core, "killed while stuck in creature form")) {
-        Snprintf(outmain, sizeof outmain, "怪物の姿から戻れずに倒れた");
-    } else if (!strcmpi(core, "unsuccessful polymorph")) {
-        Snprintf(outmain, sizeof outmain, "へんげの失敗で倒された");
-    } else if (!strcmpi(core, "self-genocide")) {
-        Snprintf(outmain, sizeof outmain, "自分自身の虐殺");
-    } else if (!strcmpi(core, "system shock")) {
-        Snprintf(outmain, sizeof outmain, "システムショック");
-    } else if (!strcmpi(core, "alchemic blast")) {
-        Snprintf(outmain, sizeof outmain, "錬金術の爆発");
-    } else if (!strcmpi(core, "exhaustion")) {
-        Snprintf(outmain, sizeof outmain, "過労死");
-    } else if (!strcmpi(core, "overexertion")) {
-        Snprintf(outmain, sizeof outmain, "力尽きたこと");
-    } else if (!strcmpi(core, "life drainage")) {
-        Snprintf(outmain, sizeof outmain, "生命力吸収");
-    } else if (!strcmpi(core, "a bad experience sitting on a throne")
-               || !strcmpi(core, "bad experience sitting on a throne")) {
-        Snprintf(outmain, sizeof outmain, "玉座に座った悪影響");
-    } else if (!strcmpi(core, "mildly contaminated potion")) {
-        Snprintf(outmain, sizeof outmain, "少し古くなった薬");
-    } else if (!strcmpi(core, "contusion from a small passage")) {
-        Snprintf(outmain, sizeof outmain, "狭い通路で頭を打ったこと");
-    } else if (!strcmpi(core, "starvation")) {
-        Snprintf(outmain, sizeof outmain, "餓死");
-    } else if (!strcmpi(core, "brainlessness")) {
-        Snprintf(outmain, sizeof outmain, "脳を失ったこと");
-    } else if (!strcmpi(core, "elementary physics")) {
-        Snprintf(outmain, sizeof outmain, "物理法則");
-    } else if (!strcmpi(core, "psychic blast")) {
-        Snprintf(outmain, sizeof outmain, "精神波の爆発");
-    } else if (!strcmpi(core, "gas cloud")) {
-        Snprintf(outmain, sizeof outmain, "毒ガスの雲");
-    } else if (!strcmpi(core, "falling rock")) {
-        Snprintf(outmain, sizeof outmain, "落石");
-    } else if (!strcmpi(core, "falling object")) {
-        Snprintf(outmain, sizeof outmain, "落下物");
-    } else if (!strcmpi(core, "colliding with the ceiling")) {
-        Snprintf(outmain, sizeof outmain, "天井への激突");
-    } else if (!strcmpi(core, "a grappling hook")) {
-        Snprintf(outmain, sizeof outmain, "グラップリングフック");
-    } else if (!strcmpi(core, "jumping out of a bear trap")) {
-        Snprintf(outmain, sizeof outmain, "熊罠からの脱出失敗");
-    } else if (!strcmpi(core, "sitting in lava") || !strcmpi(core, "sitting on lava")) {
-        Snprintf(outmain, sizeof outmain, "溶岩に座ったこと");
-    } else if (!strcmpi(core, "cursed throne")) {
-        Snprintf(outmain, sizeof outmain, "呪われた玉座");
-    } else if (!strcmpi(core, "electric chair")) {
-        Snprintf(outmain, sizeof outmain, "電気椅子");
-    } else if (!strcmpi(core, "acidic chair")) {
-        Snprintf(outmain, sizeof outmain, "酸の椅子");
-    } else if (!strcmpi(core, "acidic corpse")) {
-        Snprintf(outmain, sizeof outmain, "酸性の死体");
-    } else if (!strcmpi(core, "acidic glob")) {
-        Snprintf(outmain, sizeof outmain, "酸性の塊");
-    } else if (!strcmpi(core, "cadaver")) {
-        Snprintf(outmain, sizeof outmain, "腐った死体");
-    } else if (!strcmpi(core, "rotted glob")) {
-        Snprintf(outmain, sizeof outmain, "腐った塊");
-    } else if (!strcmpi(core, "rotten lump of royal jelly")) {
-        Snprintf(outmain, sizeof outmain, "腐ったローヤルゼリー");
-    } else if (!strcmpi(core, "very rich meal")) {
-        Snprintf(outmain, sizeof outmain, "豪華すぎる食事");
-    } else if (!strcmpi(core, "quick snack")) {
-        Snprintf(outmain, sizeof outmain, "軽いスナック");
-    } else if (!strcmpi(core, "axing a hard object")) {
-        Snprintf(outmain, sizeof outmain, "硬いものを斧で叩いたこと");
-    } else if (!strcmpi(core, "exploding ring")) {
-        Snprintf(outmain, sizeof outmain, "指輪の爆発");
-    } else if (!strcmpi(core, "exploding wand")) {
-        Snprintf(outmain, sizeof outmain, "杖の爆発");
-    } else if (!strcmpi(core, "exploding rune")) {
-        Snprintf(outmain, sizeof outmain, "ルーンの爆発");
-    } else if (!strcmpi(core, "residual undead turning effect")) {
-        Snprintf(outmain, sizeof outmain, "アンデッド退散の残留効果");
-    } else if (!strcmpi(core, "genocidal confusion")) {
-        Snprintf(outmain, sizeof outmain, "虐殺による混乱");
-    } else if (!strcmpi(core, "imperious order")) {
-        Snprintf(outmain, sizeof outmain, "傲慢な命令");
-    } else if (!strcmpi(core, "removing gloves")) {
-        Snprintf(outmain, sizeof outmain, "手袋を脱いだこと");
-    } else if (!strcmpi(core, "losing gloves")) {
-        Snprintf(outmain, sizeof outmain, "手袋を失ったこと");
-    } else if (!strcmpi(core, "removing boots")) {
-        Snprintf(outmain, sizeof outmain, "靴を脱いだこと");
-    } else if (!strcmpi(core, "losing boots")) {
-        Snprintf(outmain, sizeof outmain, "靴を失ったこと");
-    } else if (!strcmpi(core, "resistance timing out")) {
-        Snprintf(outmain, sizeof outmain, "石化耐性が切れたこと");
-    } else if (!strcmpi(core, "elementary physics")) {
-        Snprintf(outmain, sizeof outmain, "物理法則");
     } else if (!strncmpi(core, "unwisely tried to eat ", 22)) {
         char fbuf[BUFSZ];
         jp_translate_food_or_corpse(fbuf, sizeof fbuf, core + 22);
@@ -1669,22 +1590,6 @@ jp_translate_killer_text_for_display(
             Snprintf(fltxt, sizeof fltxt, "光線");
         }
         Snprintf(outmain, sizeof outmain, "自分自身で%s%s", verb, fltxt);
-    } else if (!strcmpi(core, "committed suicide")) {
-        Snprintf(outmain, sizeof outmain, "自殺");
-    } else if (!strcmpi(core, "went to heaven prematurely")) {
-        Snprintf(outmain, sizeof outmain, "早すぎる天国への旅");
-    } else if (!strcmpi(core, "turned into green slime")) {
-        Snprintf(outmain, sizeof outmain, "緑のスライムになったこと");
-    } else if (!strcmpi(core, "slimicide")) {
-        Snprintf(outmain, sizeof outmain, "スライム化による死");
-    } else if (!strcmpi(core, "killed by petrification")) {
-        Snprintf(outmain, sizeof outmain, "石化による死");
-    } else if (!strcmpi(core, "strangulation")) {
-        Snprintf(outmain, sizeof outmain, "首を絞められたこと");
-    } else if (!strcmpi(core, "suffocation")) {
-        Snprintf(outmain, sizeof outmain, "窒息");
-    } else if (!strcmpi(core, "quit while already on Charon's boat")) {
-        Snprintf(outmain, sizeof outmain, "カロンの舟の上で人生を諦めた");
     } else if (!strncmpi(core, "teleported out of the dungeon and fell to ", 42)) {
         Snprintf(outmain, sizeof outmain, "ダンジョン外へテレポートして落下死した");
     } else if (!strncmp(core, "unwisely ate the body of ", 25)) {

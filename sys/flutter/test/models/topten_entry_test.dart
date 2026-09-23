@@ -423,5 +423,45 @@ void main() {
       expect(entriesJp[0].details[0], contains('幻覚でゆがんだ店主のシガツェに倒された'));
       expect(entriesJp[1].details[0], contains('幻覚でゆがんだ店主のシガツェに倒された'));
     });
+
+    test('アップストリーム新設死因（跳ね橋、沸騰・爆発した薬、燃え上がった巻物、スライム化、窒息、石化死など）の日本語化テスト', () {
+      final inputLines = [
+        ' 順位  点数     名前',
+        '  1      1000  Player 考古学者/ドワーフ/男性/秩序',
+        '                crushed to death underneath a drawbridge (運命の大迷宮 1階). - [30]',
+        '  2       900  Player 考古学者/ドワーフ/男性/秩序',
+        '                fell from a drawbridge (運命の大迷宮 1階). - [30]',
+        '  3       800  Player 考古学者/ドワーフ/男性/秩序',
+        '                killed by boiling potion (運命の大迷宮 1階). - [30]',
+        '  4       700  Player 考古学者/ドワーフ/男性/秩序',
+        '                killed by burning scroll (運命の大迷宮 1階). - [30]',
+        '  5       600  Player 考古学者/ドワーフ/男性/秩序',
+        '                turned into green slime (運命の大迷宮 1階). - [30]',
+        '  6       500  Player 考古学者/ドワーフ/男性/秩序',
+        '                killed by petrification (運命の大迷宮 1階). - [30]',
+        '  7       400  Player 考古学者/ドワーフ/男性/秩序',
+        '                quit while already on Charon\'s boat (運命の大迷宮 1階). - [30]',
+        '  8       300  Player 考古学者/ドワーフ/男性/秩序',
+        '                killed by strangulation (運命の大迷宮 1階). - [30]',
+        '  9       200  Player 考古学者/ドワーフ/男性/秩序',
+        '                killed by suffocation (運命の大迷宮 1階). - [30]',
+        ' 10       100  Player 考古学者/ドワーフ/男性/秩序',
+        '                killed by slimicide (運命の大迷宮 1階). - [30]',
+      ];
+      final attrs = List.filled(inputLines.length, 0);
+      final entries = TopTenEntry.parse(inputLines, attrs, isJp: true);
+
+      expect(entries.length, 10);
+      expect(entries[0].details[0], contains('跳ね橋の下敷きになった'));
+      expect(entries[1].details[0], contains('跳ね橋から落ちた'));
+      expect(entries[2].details[0], contains('沸騰して爆発した薬で倒された'));
+      expect(entries[3].details[0], contains('燃え上がった巻物で倒された'));
+      expect(entries[4].details[0], contains('緑のスライムになったこと'));
+      expect(entries[5].details[0], contains('石化による死'));
+      expect(entries[6].details[0], contains('カロンの舟の上で人生を諦めた'));
+      expect(entries[7].details[0], contains('首を絞められて倒された'));
+      expect(entries[8].details[0], contains('窒息して倒された'));
+      expect(entries[9].details[0], contains('スライム化による死'));
+    });
   });
 }

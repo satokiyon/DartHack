@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-19.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23.
 NetHack JP README
 
 
@@ -40,14 +40,15 @@ NetHack JP README
 2. 展開されたディレクトリに移動し、必要に応じて実行権限が付与されているか確認してください。
 
      cd NetHackJP-5.0.0-*-linux
-     chmod +x nethack nethackW nethack.bin
+    chmod +x nethack nethackX11 nethackQt nethack.bin
 
 
-3. 次のどちらかのスクリプトを起動してください。
+3. 次のいずれかのスクリプトを起動してください。
 
    - ./nethack   (コンソール版 TTY / ncurses インターフェース)
 
-   - ./nethackW  (GUI版 X11 インターフェース - 黒背景・白文字表示)
+    - ./nethackX11  (GUI X11 インターフェース - 黒背景・白文字表示)
+    - ./nethackQt   (GUI Qt6 インターフェース - fcitx5 による日本語入力)
 
    ※ X11 GUI版のタイルセットはデフォルトファイル名が「x11tiles」です。
    ※ GUI使用時に日本語や墓石の死因が文字化け（豆腐文字表示）する場合は、環境に日本語 CJK フォント（Noto Sans CJK JP 等）をインストールしてください（例: sudo apt install -y fonts-noto-cjk）。

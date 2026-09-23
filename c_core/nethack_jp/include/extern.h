@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3385,6 +3385,14 @@ extern void jp_translate_killer_text_for_display(char *, unsigned,
                                                  const char *);
 extern void jp_formatkiller_for_display(char *, unsigned, int,
                                         boolean) NONNULLARG1;
+/* ### rip.c ### */
+/* NetHackJP: UTF-8 display-width helpers shared with the Qt port's
+ * tombstone rendering (win/Qt/qt_menu.cpp::UseRIP) */
+extern int rip_utf8_char_width(unsigned);
+extern unsigned rip_utf8_decode(const char *, int *) NONNULLARG1;
+extern int rip_utf8_str_width(const char *) NONNULLARG1;
+extern void rip_truncate_utf8_width(char *, const char *, int) NONNULLARG1
+        NONNULLARG2;
 extern int observable_depth(d_level *) NONNULLARG1;
 extern void topten(int, time_t);
 extern void prscore(int, char **);

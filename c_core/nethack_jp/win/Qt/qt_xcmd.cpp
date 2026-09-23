@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -139,7 +140,7 @@ interesting_command(unsigned indx, int cmds)
 NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
     QDialog(parent),
     prompt(new QLabel("#", this)),
-    cancel_btn(new QPushButton("Cancel", this)),
+    cancel_btn(new QPushButton("キャンセル", this)),
     byRow(qt_settings->xcmd_by_row),
     set(qt_settings->xcmd_set),
     butoffset(0),
@@ -169,7 +170,7 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
     ctrls->addStretch(0); // Cancel will be left justified, others far right
     // Filter: change the [sub]set of commands that get shown;
     // presently only useful when running in wizard mode
-    QPushButton *filter_btn = new QPushButton("Filter", this);
+    QPushButton *filter_btn = new QPushButton("絞り込み", this);
 #if 0   /* [later] normal vs autocomplete matters regardless of wizard mode */
     if (!WizardMode) { // nothing to filter if not in wizard mode
         filter_btn->setEnabled(false); // gray the [Filter] button out
@@ -185,12 +186,12 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
     butw = std::max(butw, filter_btn->width());
     ctrls->addWidget(filter_btn);
     // Layout: switch from by-column grid to by-row grid or vice versa
-    QPushButton *layout_btn = new QPushButton("Layout", this);
+    QPushButton *layout_btn = new QPushButton("並べ替え", this);
     layout_btn->setMinimumSize(layout_btn->sizeHint());
     butw = std::max(butw, layout_btn->width());
     ctrls->addWidget(layout_btn);
     // Reset: switch filter back to all commands and layout back to by-column
-    QPushButton *reset__btn = new QPushButton("Reset", this);
+    QPushButton *reset__btn = new QPushButton("リセット", this);
     reset__btn->setMinimumSize(reset__btn->sizeHint());
     butw = std::max(butw, reset__btn->width());
     ctrls->addWidget(reset__btn);

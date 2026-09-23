@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-02. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	winstat.c	$NHDT-Date: 1781973110 2026/06/20 16:31:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -145,31 +145,43 @@ static enum statusfields X11_fieldorder_3[][13] = {
       BL_VERS, BL_FLUSH }
 };
 
-/* condition list for tty-style display, roughly in order of importance */
+/* condition list for tty-style display, roughly in order of importance
+   NetHackJP: mask ordering only; the display text comes from the core's
+   Japanese condition names (botl.c conditions[], see jp_condition_text) */
 static struct tt_condinfo {
     unsigned long mask;
-    const char *text;
 } tt_condorder[] = {
-    { BL_MASK_GRAB, "Grabbed!" },
-    { BL_MASK_STONE, "Stone" },
-    { BL_MASK_SLIME, "Slime" },
-    { BL_MASK_STRNGL, "Strngl" },
-    { BL_MASK_FOODPOIS, "FoodPois" },
-    { BL_MASK_TERMILL, "TermIll" },
-    { BL_MASK_INLAVA, "InLava" },
-    { BL_MASK_HELD, "Held" },
-    { BL_MASK_HOLDING, "Holding" },
-    { BL_MASK_BLIND, "Blind" },
-    { BL_MASK_DEAF, "Deaf" },
-    { BL_MASK_STUN, "Stun" },
-    { BL_MASK_CONF, "Conf" },
-    { BL_MASK_HALLU, "Hallu" },
-    { BL_MASK_TRAPPED, "Trapped" },
-    { BL_MASK_TETHERED, "Tethered", },
-    { BL_MASK_LEV, "Lev" },
-    { BL_MASK_FLY, "Fly" },
-    { BL_MASK_RIDE, "Ride" },
+    { BL_MASK_GRAB },
+    { BL_MASK_STONE },
+    { BL_MASK_SLIME },
+    { BL_MASK_STRNGL },
+    { BL_MASK_FOODPOIS },
+    { BL_MASK_TERMILL },
+    { BL_MASK_INLAVA },
+    { BL_MASK_HELD },
+    { BL_MASK_HOLDING },
+    { BL_MASK_BLIND },
+    { BL_MASK_DEAF },
+    { BL_MASK_STUN },
+    { BL_MASK_CONF },
+    { BL_MASK_HALLU },
+    { BL_MASK_TRAPPED },
+    { BL_MASK_TETHERED, },
+    { BL_MASK_LEV },
+    { BL_MASK_FLY },
+    { BL_MASK_RIDE },
 };
+
+/* NetHackJP: look up the core's Japanese condition text (botl.c
+ * conditions[] entries like "石化"/"朦朧"/"飛行") for a BL_MASK bit */
+static const char *
+jp_condition_text(unsigned long mask)
+{
+    for (int i = 0; i < (int) SIZE(conditions); ++i)
+        if ((unsigned long) conditions[i].mask == mask)
+            return conditions[i].text[0];
+    return "";
+}
 
 static const char *const fancy_status_hilite_colors[] = {
     "grey15",
@@ -341,7 +353,7 @@ X11_status_update_tty(
                 fldp->color = NO_COLOR;
                 fldp->attrs = 0;
                 if ((cond & tt_condorder[j].mask) != 0) {
-                    fldp->text = tt_condorder[j].text;
+                    fldp->text = jp_condition_text(tt_condorder[j].mask);
                 } else {
                     fldp->text = NULL;
                 }
@@ -1555,21 +1567,18 @@ update_val(struct X_status_value *attr_rec, long new_value)
 
     if (attr_rec->type == SV_LABEL) {
         if (attr_rec == &shown_stats[F_NAME]) {
-            Strcpy(buf, svp.plname);
-            buf[0] = highc(buf[0]);
-            Strcat(buf, " the ");
+            /* NetHackJP: "<name> <rank>" side-by-side like the tty and
+             * Qt ports; legacy saves may carry a "-role-race-gender-
+             * alignment" suffix, so trim the name at gp.plnamelen */
+            buf[0] = '\0';
+            copynchars(buf, svp.plname, (int) sizeof buf - 1);
+            if (gp.plnamelen > 0 && gp.plnamelen < (int) strlen(buf))
+                buf[gp.plnamelen] = '\0';
+            strcat(buf, " ");
             if (Upolyd) {
-                char mnam[BUFSZ];
-                int k;
-
-                Strcpy(mnam, pmname(&mons[u.umonnum], Ugender));
-                for (k = 0; mnam[k] != '\0'; k++) {
-                    if (k == 0 || mnam[k - 1] == ' ')
-                        mnam[k] = highc(mnam[k]);
-                }
-                Strcat(buf, mnam);
+                strcat(buf, pmname(&mons[u.umonnum], Ugender));
             } else {
-                Strcat(buf,
+                strcat(buf,
                        jp_rank_of_for_display(u.ulevel,
                                               svp.pl_character[0],
                                               flags.female));
@@ -1577,8 +1586,10 @@ update_val(struct X_status_value *attr_rec, long new_value)
 
         } else if (attr_rec == &shown_stats[F_DLEVEL]) {
             if (!describe_level(buf, 0)) {
-                Strcpy(buf, svd.dungeons[u.uz.dnum].dname);
-                Sprintf(eos(buf), ", level %d", depth(&u.uz));
+                /* NetHackJP: e.g. "運命の大迷宮: 階層3"; dpname is
+                 * Japanese via the core's display helper */
+                Strcpy(buf, jp_dungeon_name_by_dnum(u.uz.dnum));
+                Sprintf(eos(buf), ": 階層%d", depth(&u.uz));
             }
         } else if (attr_rec == &shown_stats[F_VERS]) {
             if (flags.showvers)

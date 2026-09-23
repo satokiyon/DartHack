@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	uhitm.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.503 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2551,7 +2551,7 @@ mhitm_ad_fire(
             if (!Blind)
                 /* note: the life-saved case is hypothetical because
                    life-saving doesn't work for golems */
-                pline("%s %s!", Monnam(mdef),
+                pline("%sは%s!", Monnam(mdef),
                              !mlifesaver(mdef) ? "完全に燃え尽きた"
                                                      : "炎に包まれた");
             else
@@ -2610,7 +2610,7 @@ mhitm_ad_fire(
             /* note: the life-saved case is hypothetical because
                life-saving doesn't work for golems */
             if (gv.vis && canseemon(mdef))
-                pline_mon(mdef, "%s %s!", Monnam(mdef),
+                pline_mon(mdef, "%sは%s!", Monnam(mdef),
                              !mlifesaver(mdef) ? "完全に燃え尽きた"
                                                      : "炎に包まれた");
             monkilled(mdef, (char *) 0, AD_FIRE);
@@ -4519,7 +4519,7 @@ mhitm_ad_dgst(
         /* eating a Rider or its corpse is fatal */
         if (is_rider(pd)) {
             if (gv.vis && canseemon(magr))
-                pline_mon(magr, "%s %s!", Monnam(magr),
+                pline_mon(magr, "%sは%s!", Monnam(magr),
                       (pd == &mons[PM_FAMINE])
                           ? "弱々しくげっぷをして、しぼんで倒れた"
                           : (pd == &mons[PM_PESTILENCE])
@@ -6435,7 +6435,7 @@ light_hits_gremlin(struct monst *mon, int dmg)
 {
     if (!Deaf && mdistu(mon) <= 90) {
         /* cry of pain can be heard somewhat farther than the waking radius */
-        pline_mon(mon, "%s %s!", Monnam(mon),
+        pline_mon(mon, "%sは%s!", Monnam(mon),
                   (dmg > mon->mhp / 2) ? "苦痛にもだえた"
                                        : "苦痛の声を上げた");
     } else if (canseemon(mon)) {

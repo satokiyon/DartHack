@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	iactions.c	$NHDT-Date: 1781973051 2026/06/20 16:30:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2026. */
@@ -440,8 +440,8 @@ itemactions(struct obj *otmp)
         boolean shoot = ammo_and_launcher(otmp, uwep);
 
         /* FIXME: see the multi-shot FIXME about "one of" for 't: throw' */
-        Sprintf(buf, "%s %s", shoot ? "射る" : "投げる",
-                (otmp->quan > 1L) ? "これらのうち1つ" : "これ");
+        Sprintf(buf, "%s%s", shoot ? "射る" : "投げる",
+                (otmp->quan > 1L) ? "（これらのうち1つ）" : "（これ）");
         if (shoot) {
             assert(uwep != NULL);
             Sprintf(eos(buf), "（装備中の%sを使用）", simpleonames(uwep));
@@ -562,10 +562,10 @@ itemactions(struct obj *otmp)
          *  volley count and that could randomly yield 1 here and 2..N
          *  while throwing or vice versa.
          */
-        Sprintf(buf, "%s %s%s", shoot ? "射る" : "投げる",
-            (otmp->quan == 1L) ? "このアイテム"
-            : (otmp->otyp == GOLD_PIECE) ? "これら"
-              : "これらのうち1つ",
+        Sprintf(buf, "%s%s%s", shoot ? "射る" : "投げる",
+            (otmp->quan == 1L) ? "（このアイテム）"
+            : (otmp->otyp == GOLD_PIECE) ? "（これら）"
+              : "（これらのうち1つ）",
                 /* if otmp is quivered, we've already listed
                    'f - shoot|throw this item' as a choice;
                    if 't' is duplicating that, say so ('t' and 'f'

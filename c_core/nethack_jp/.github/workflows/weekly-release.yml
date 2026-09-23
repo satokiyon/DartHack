@@ -1,0 +1,193 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23.
+name: Weekly Release
+
+on:
+  schedule:
+    - cron: '0 18 * * FRI' # AM 03:00 JST (Fri 18:00 UTC)
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build NetHack (x64 Release)
+        run: msbuild sys/windows/vs/NetHack.sln /p:Configuration=Release /p:Platform=x64
+
+      - name: Get current date
+        id: date
+        run: |
+          $jst = [TimeZoneInfo]::ConvertTimeBySystemTimeZoneId([DateTime]::UtcNow, 'Tokyo Standard Time')
+          $date = $jst.ToString("yyyyMMdd")
+          echo "DATE_STR=$date" >> $env:GITHUB_ENV
+        shell: powershell
+
+      - name: Prepare package
+        run: |
+          $outDir = "binary/Release/x64"
+          $zipPath = "NetHackJP-5.0.0-${{ env.DATE_STR }}-windows.zip"
+          
+          # Copy Guidebook_JP.txt to the output directory
+          if (Test-Path "Guidebook_JP.txt") {
+            Copy-Item "Guidebook_JP.txt" -Destination "$outDir\"
+          } else {
+            Write-Warning "Guidebook_JP.txt not found!"
+          }
+          
+          # Create ZIP archive
+          Compress-Archive -Path "$outDir\*" -DestinationPath $zipPath
+        shell: powershell
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nethack-windows-zip
+          path: NetHackJP-5.0.0-*-windows.zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential bison flex libncurses-dev uuid-dev pkg-config \
+            libx11-dev libxaw7-dev libxt-dev libxpm-dev libxft-dev libfontconfig1-dev xfonts-utils zip curl \
+            qt6-base-dev qt6-multimedia-dev qt6-base-dev-tools
+
+      # NetHackJP: build with the Qt6 port included (--qt); one all-in-one
+      # binary (tty/curses/X11/Qt) with the tty console as the default
+      # port. Install must use the same flags, which sys/unix/install_wsl.sh
+      # handles (--default=tty matches the build-time default).
+      - name: Build NetHackJP (Linux, tty/curses/X11/Qt)
+        run: |
+          chmod +x sys/unix/build_wsl.sh sys/unix/install_wsl.sh
+          ./sys/unix/build_wsl.sh --qt --default=tty sys/unix/hints/linux-jp
+          ./sys/unix/install_wsl.sh --qt --default=tty
+
+      - name: Prepare package
+        run: |
+          DATE_STR=$(TZ='Asia/Tokyo' date +"%Y%m%d")
+          DIST_DIR="NetHackJP-5.0.0-${DATE_STR}-linux"
+          ZIP_NAME="${DIST_DIR}.zip"
+
+          # Copy installed playground content to distribution directory
+          cp -r playground "${DIST_DIR}"
+
+          # Add Guidebook_JP.txt if exists
+          if [ -f "Guidebook_JP.txt" ]; then
+            cp "Guidebook_JP.txt" "${DIST_DIR}/"
+          fi
+
+          # Create portable launcher scripts:
+          #   nethack     : tty/curses (console)
+          #   nethackX11  : X11 GUI (renamed from nethackW)
+          #   nethackQt   : Qt6 GUI
+          cd "${DIST_DIR}"
+          if [ -f "nethack" ]; then
+            mv nethack nethack.bin
+          fi
+
+          {
+            echo '#!/bin/sh'
+            echo 'SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"'
+            echo 'export HACKDIR="$SCRIPT_DIR"'
+            echo 'export NETHACKDIR="$SCRIPT_DIR"'
+            echo 'export XAPPLRESDIR="$SCRIPT_DIR"'
+            echo 'exec "$SCRIPT_DIR/nethack.bin" "$@"'
+          } > nethack
+
+          {
+            echo '#!/bin/sh'
+            echo 'SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"'
+            echo 'export HACKDIR="$SCRIPT_DIR"'
+            echo 'export NETHACKDIR="$SCRIPT_DIR"'
+            echo 'export XAPPLRESDIR="$SCRIPT_DIR"'
+            echo '[ -z "$XMODIFIERS" ] && export XMODIFIERS="@im=fcitx"'
+            echo 'if ! pgrep -a fcitx5 >/dev/null 2>&1 && ! pgrep -a fcitx >/dev/null 2>&1; then'
+            echo '  echo "注意: fcitx5 が起動していません。GUIダイアログで日本語入力を行う場合は、" >&2'
+            echo '  echo "      事前に \"fcitx5 --disable=wayland,waylandim -d\" を実行してください。" >&2'
+            echo 'fi'
+            echo 'exec "$SCRIPT_DIR/nethack.bin" -wX11 -bg black -fg white -bd white "$@"'
+          } > nethackX11
+
+          {
+            echo '#!/bin/sh'
+            echo 'SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"'
+            echo 'export HACKDIR="$SCRIPT_DIR"'
+            echo 'export NETHACKDIR="$SCRIPT_DIR"'
+            echo 'export XAPPLRESDIR="$SCRIPT_DIR"'
+            echo 'export QT_QPA_PLATFORM=xcb'
+            echo '[ -z "$QT_IM_MODULE" ] && export QT_IM_MODULE="fcitx"'
+            echo '[ -z "$XMODIFIERS" ] && export XMODIFIERS="@im=fcitx"'
+            echo 'if ! pgrep -a fcitx5 >/dev/null 2>&1 && ! pgrep -a fcitx >/dev/null 2>&1; then'
+            echo '  echo "注意: fcitx5 が起動していません。GUIダイアログで日本語入力を行う場合は、" >&2'
+            echo '  echo "      事前に \"fcitx5 --disable=wayland,waylandim -d\" を実行し、" >&2'
+            echo '  echo "      \"sudo apt install fcitx5-frontend-qt6\" が必要な場合もあります。" >&2'
+            echo 'fi'
+            echo 'exec "$SCRIPT_DIR/nethack.bin" -wQt "$@"'
+          } > nethackQt
+
+          chmod +x nethack nethackX11 nethackQt nethack.bin
+          cd ..
+
+          zip -r "${ZIP_NAME}" "${DIST_DIR}"
+
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nethack-linux-zip
+          path: NetHackJP-5.0.0-*-linux.zip
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: [build-windows, build-linux]
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Organize release files
+        run: |
+          mkdir -p release_files
+          find artifacts -type f -name "*.zip" -exec cp {} release_files/ \;
+          ls -la release_files/
+
+      - name: Get current date
+        id: date
+        run: |
+          echo "DATE_STR=$(TZ='Asia/Tokyo' date +"%Y%m%d")" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: NetHackJP-5.0.0-${{ steps.date.outputs.DATE_STR }}
+          name: NetHackJP 5.0.0 Weekly Build (${{ steps.date.outputs.DATE_STR }})
+          body_path: release_readme.txt
+          generate_release_notes: true
+          files: |
+            release_files/*.zip
+            release_readme.txt
+          draft: false
+          prerelease: false
+

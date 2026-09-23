@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	mkobj.c	$NHDT-Date: 1781973055 2026/06/20 16:30:55 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.335 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -1596,10 +1596,8 @@ shrink_glob(
        inside-container-in-invent, and going away when can-see-on-floor */
     if (ininv) {
         if (shrink || gone)
-            pline("%s %s.", globnambuf,
-                  /* globs always have quantity 1 so we don't need otense()
-                     because the verb always references a singular item */
-                  gone ? "dissolves completely" : "shrinks");
+            pline("%sが%s.", globnambuf,
+                  gone ? "完全に溶けた" : "縮んだ");
         updinv = TRUE;
     } else if (contnr) {
         /* when in a container, it might be nested so find outermost one */

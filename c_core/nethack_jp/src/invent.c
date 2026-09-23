@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	invent.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.563 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -5576,7 +5576,7 @@ display_minventory(
         have_any = (have_inv || incl_hero),
         pickings = (dflags & MINV_PICKMASK);
 
-        Sprintf(tmp, "%s %s:", s_suffix(noit_Monnam(mon)),
+        Sprintf(tmp, "%sの%s:", noit_Monnam(mon),
             do_all ? "持ち物" : "武装");
 
     if (do_all ? have_any : (mon->misc_worn_check || MON_WEP(mon))) {

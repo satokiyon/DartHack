@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	zap.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.596 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -418,7 +418,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
         } else if ((obj = which_armor(mtmp, W_SADDLE)) != 0) {
             char buf[BUFSZ];
 
-            Sprintf(buf, "%s %s", s_suffix(Monnam(mtmp)),
+            Sprintf(buf, "%sの%s", Monnam(mtmp),
                     distant_name(obj, xname));
             if (cansee(mtmp->mx, mtmp->my)) {
                 if (!canspotmon(mtmp))
@@ -5820,7 +5820,6 @@ maybe_destroy_item(
 {
     long i, cnt, quan;
     int dmg, xresist, skip, dindx;
-    const char *mult;
     boolean u_carry = (carrier == &gy.youmonst);
     boolean vis = !u_carry && canseemon(carrier);
     boolean chargeit = FALSE;
@@ -5919,13 +5918,29 @@ maybe_destroy_item(
             return 0;
 
         if (u_carry || vis) {
-                        mult = (cnt == 1L) ? ((quan == 1L) ? "" /* 1 of 1 */
-                                                                    : "1つの")        /* 1 of N */
-                                     : ((cnt < quan) ? "いくつかの"   /* n of N */
-                                            : (quan == 2L) ? "両方の"     /* 2 of 2 */
-                                                : "すべての");             /* N of N */
-            pline("%s%s %s!", mult,
-                xname(obj),
+            /* 所有者+アイテム名+数量に応じた助詞で日本語語順に組み立てる
+               ("あなたの水のうち1つは沸騰して爆発した!" 等; NetHackJP) */
+            char subj[BUFSZ];
+            const char *conn;
+
+            /* 所有者: プレイヤー所持は「あなたの」, モンスター所持は
+               「<名前>の」 (mon_nam() は表示用に日本語化済の名前を返す;
+               vis は canseemon(carrier) 経由なので可視確認済み) */
+            if (u_carry)
+                Snprintf(subj, sizeof subj, "あなたの%s", xname(obj));
+            else
+                Snprintf(subj, sizeof subj, "%sの%s", mon_nam(carrier),
+                         xname(obj));
+
+            if (quan == 1L)
+                conn = "は";                /* 1 of 1 */
+            else if (cnt == 1L)
+                conn = "のうち1つは";        /* 1 of N */
+            else if (cnt < quan)
+                conn = "のうちいくつかは";    /* n of N */
+            else
+                conn = (quan == 2L) ? "は両方とも" : "はすべて"; /* N of N */
+            pline("%s%s%s!", subj, conn,
                   destroy_strings[dindx][(cnt > 1L)]);
         }
         if (u_carry) { /* effects that happen only to the player */

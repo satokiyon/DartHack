@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	do_name.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.339 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -1005,14 +1005,18 @@ x_monnam(
             Sprintf(buf, "%sという%s%s", disp_name, adj_save, pm_name);
             name_at_start = (boolean) type_is_pname(mdat);
         } else if (is_mplayer(mdat) && (bp = strstri(name, " the ")) != 0) {
-            /* <name> the <adjective> <invisible> <saddled> <rank> */
+            /* MGIVENNAME は "<given> the <rank>" の形で保存されている.
+               表示は "<形容詞><rank>の<given>" の日本語語順に組み直す
+               (例: "見えない遊牧民のMike"; 保存形式はセーブデータ及び
+                mon.c/多形時のランク除去との互換性のため変更しない) */
             char pbuf[BUFSZ];
 
-            Strcpy(pbuf, name);
-            pbuf[bp - name + 5] = '\0'; /* adjectives right after " the " */
+            pbuf[0] = '\0';
             if (has_adjectives)
-                Strcat(pbuf, buf);
-            Strcat(pbuf, bp + 5); /* append the rest of the name */
+                Strcat(pbuf, buf); /* 見えない/鞍をつけた 等の形容詞 */
+            Strcat(pbuf, bp + 5); /* rank (日本語肩書) */
+            Strcat(pbuf, "の");
+            (void) strncat(eos(pbuf), name, (size_t) (bp - name)); /* given name */
             Strcpy(buf, pbuf);
             article = ARTICLE_NONE;
             name_at_start = TRUE;

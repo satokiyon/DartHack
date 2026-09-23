@@ -1479,6 +1479,59 @@ String _translateDeathTextInternal(String death, bool isJp) {
     'killed while stuck in creature form': 'へんげした姿のまま死亡したこと',
     'scroll of genocide': '虐殺の巻物',
     'deliberately meeting Medusa\'s gaze': '意図的にメドゥーサの視線と目を合わせたこと',
+    'boiling potion': '沸騰して爆発した薬',
+    'boiling potions': '沸騰して爆発した薬',
+    'exploding potion': '引火して爆発した薬',
+    'exploding potions': '引火して爆発した薬',
+    'shattered potion': '凍結して砕け散った薬',
+    'shattered potions': '凍結して砕け散った薬',
+    'burning scroll': '燃え上がった巻物',
+    'burning scrolls': '燃え上がった巻物',
+    'burning book': '燃え上がった魔法書',
+    'exploding glob of slime': '爆発したスライムの塊',
+    'exploding globs of slime': '爆発したスライムの塊',
+    'turned into green slime': '緑のスライムになったこと',
+    'killed by petrification': '石化による死',
+    'quit while already on Charon\'s boat': 'カロンの舟の上で人生を諦めた',
+    'crushed to death underneath a drawbridge': '跳ね橋の下敷きになった',
+    'fell from a drawbridge': '跳ね橋から落ちた',
+    'strangulation': '首を絞められたこと',
+    'suffocation': '窒息',
+    'slimicide': 'スライム化による死',
+    'acidic chair': '酸の椅子',
+    'electric chair': '電気椅子',
+    'acidic corpse': '酸性の死体',
+    'acidic glob': '酸性の塊',
+    'falling down a mine shaft': '坑道への落下',
+    'exploding crystal ball': '水晶玉の爆発',
+    'dangerous winds': '危険な突風',
+    'rusting away': '錆び崩れたこと',
+    'arrow': '矢に倒された',
+    'little dart': '吹き矢に倒された',
+    'dart': '吹き矢に倒された',
+    'poisoned needle': '毒針に刺されて倒された',
+    'needle': '毒針に刺されて倒された',
+    'land mine': '地雷の爆発',
+    'electric shock': '電撃',
+    'bear trap': '熊罠',
+    'rolling boulder trap': '転がる大岩の罠',
+    'statue trap': '石像の罠',
+    'spiked pit': '杭のある落とし穴',
+    'pit': '落とし穴',
+    'fire trap': '火の罠',
+    'magic trap': '魔法の罠',
+    'anti-magic trap': '反魔法の罠',
+    'polymorph trap': 'へんげの罠',
+    'cloud of poison gas': '毒ガスの雲',
+    'magical explosion': '魔法の爆発',
+    'splash of acid': '酸の飛沫',
+    'death field': '死の領域',
+    'disintegration field': '分解領域',
+    'unrefrigerated sip of juice': '冷やされていない果汁をすすったこと',
+    'sipping boiling water': '煮えたぎる湯をすすったこと',
+    'carnivorous bag': '肉食の袋に倒された',
+    'died': '死亡した',
+    'ascended': '昇天した',
   };
 
   if (exactMap.containsKey(death)) {
@@ -1537,6 +1590,21 @@ String _translateDeathTextInternal(String death, bool isJp) {
     if (raw == 'contusion from a small passage' || raw == 'a contusion from a small passage') {
       return '狭い通路で頭を打ったことで倒された';
     }
+    if (raw == 'falling drawbridge') return '落下した跳ね橋に倒された';
+    if (raw == 'closing drawbridge') return '閉じる跳ね橋に倒された';
+    if (raw == 'exploding drawbridge') return '爆発する跳ね橋に倒された';
+    if (raw == 'collapsing drawbridge') return '崩れ落ちる跳ね橋に倒された';
+    if (raw == 'boiling potion' || raw == 'boiling potions') return '沸騰して爆発した薬で倒された';
+    if (raw == 'exploding potion' || raw == 'exploding potions') return '引火して爆発した薬で倒された';
+    if (raw == 'shattered potion' || raw == 'shattered potions') return '凍結して砕け散った薬で倒された';
+    if (raw == 'burning scroll' || raw == 'burning scrolls') return '燃え上がった巻物で倒された';
+    if (raw == 'burning book') return '燃え上がった魔法書で倒された';
+    if (raw == 'exploding glob of slime' || raw == 'exploding globs of slime') return '爆発したスライムの塊で倒された';
+    if (raw == 'strangulation') return '首を絞められて倒された';
+    if (raw == 'suffocation') return '窒息して倒された';
+    if (raw == 'slimicide') return 'スライム化による死';
+    if (raw == 'potion of poison') return '毒薬に倒された';
+    if (raw == 'potion of polymorph') return 'へんげの薬に倒された';
     final tr = _translateMonsterOrItemName(raw);
     return tr.endsWith('倒された') || tr.endsWith('石化した') || tr.endsWith('死んだ') ? tr : '$trに倒された';
   }

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 /* NetHack 5.0	insight.c	$NHDT-Date: 1781973051 2026/06/20 16:30:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2345,7 +2345,7 @@ show_achievements(
             break;
         case ACH_UWIN:
             /* the ultimate achievement... */
-            enlght_out(" あなたは昇天した!");
+            enlght_out("あなたは昇天した!");
             break;
 
         /* rank 0 is the starting condition, not an achievement; 8 is Xp 30 */

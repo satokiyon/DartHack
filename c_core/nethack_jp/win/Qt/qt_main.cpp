@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
@@ -586,25 +587,26 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
         int flags;         // 1 desktop, 2 handheld, 3 either/both
         int (*funct)(void);
     } item[] = {
+        /* NetHackJP: Japanese menu captions (commands are unchanged) */
         { game,    0, 3, (int (*)(void)) 0},
-        { game,    "Extended-commands",  3, doextcmd },
+        { game,    "拡張コマンド",  3, doextcmd },
         { game,    0, 3, (int (*)(void)) 0},
-        { game,    "Version",            3, doversion},
-        { game,    "Compilation",        3, doextversion},
-        { game,    "History",            3, dohistory},
-        { game,    "Redraw",             0, doredraw}, // useless
+        { game,    "バージョン",            3, doversion},
+        { game,    "コンパイルオプション",        3, doextversion},
+        { game,    "履歴",            3, dohistory},
+        { game,    "再描画",             0, doredraw}, // useless
         { game,
 #ifdef MACOS
             /* Qt on OSX would rename "Options" to "Preferences..." and
                move it from intended destination to the application menu;
                the ampersand produces &O which makes Alt+O into a keyboard
                shortcut--except those are disabled by default by Qt on OSX */
-                   "Run-time &" // rely on adjacent string concatenation
+                   "実行時&" // rely on adjacent string concatenation
 #endif
-                   "Options",            3, doset},
-        { game,    "Explore mode",       3, enter_explore_mode},
+                   "オプション",            3, doset},
+        { game,    "探索モード",       3, enter_explore_mode},
         { game,    0, 3, (int (*)(void)) 0},
-        { game,    "Save-and-exit",      3, dosave},
+        { game,    "保存して終了",      3, dosave},
         { game,
 #ifdef MACOS
             /* need something to prevent matching leading "quit" so that it
@@ -612,92 +614,92 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
                make &Q be a keyboard shortcut (but see Options above) */
                    "\177&"
 #endif
-                   "Quit-without-saving", 3, done2},
+                   "保存せずに終了", 3, done2},
 
-        { apparel, "Apparel off",        2, doddoremarm},
-        { apparel, "Remove many",        1, doddoremarm},
+        { apparel, "装飾品を外す",        2, doddoremarm},
+        { apparel, "複数の装備を外す",        1, doddoremarm},
         { apparel, 0, 3, (int (*)(void)) 0},
-        { apparel, "Wield weapon",       3, dowield},
-        { apparel, "Exchange weapons",   3, doswapweapon},
-        { apparel, "Two weapon combat",  3, dotwoweapon},
-        { apparel, "Load quiver",        3, dowieldquiver},
+        { apparel, "武器を持つ",       3, dowield},
+        { apparel, "武器を持ち替える",   3, doswapweapon},
+        { apparel, "二刀流",  3, dotwoweapon},
+        { apparel, "矢筒に納める",        3, dowieldquiver},
         { apparel, 0, 3, (int (*)(void)) 0},
-        { apparel, "Wear armor",         3, dowear},
-        { apparel, "Take off armor",     3, dotakeoff},
+        { apparel, "防具を着る",         3, dowear},
+        { apparel, "防具を脱ぐ",     3, dotakeoff},
         { apparel, 0, 3, (int (*)(void)) 0},
-        { apparel, "Put on accessories", 3, doputon},
-        { apparel, "Remove accessories", 3, doremring},
+        { apparel, "装飾品を付ける", 3, doputon},
+        { apparel, "装飾品を外す", 3, doremring},
 
         /* { act1,      "Again\tCtrl+A",           "\001", 2},
         { act1, 0, 0, 3}, */
-        { act1, "Apply",             3, doapply},
-        { act1, "Chat",              3, dotalk},
-        { act1, "Close door",        3, doclose},
-        { act1, "Down",              3, dodown},
-        { act1, "Drop many",         2, doddrop},
-        { act1, "Drop",              2, dodrop},
-        { act1, "Eat",               2, doeat},
-        { act1, "Engrave",           3, doengrave},
+        { act1, "使う",             3, doapply},
+        { act1, "話す",              3, dotalk},
+        { act1, "扉を閉める",        3, doclose},
+        { act1, "下に降りる",              3, dodown},
+        { act1, "複数を捨てる",         2, doddrop},
+        { act1, "捨てる",              2, dodrop},
+        { act1, "食べる",               2, doeat},
+        { act1, "刻む",           3, doengrave},
         /* { act1,      "Fight\tShift+F",             "F", 3}, */
-        { act1, "Fire from quiver",  2, dofire},
-        { act1, "Force",             3, doforce},
-        { act1, "Jump",              3, dojump},
-        { act2, "Kick",              2, dokick},
-        { act2, "Loot",              3, doloot},
-        { act2, "Open door",         3, doopen},
-        { act2, "Pay",               3, dopay},
+        { act1, "矢筒から射る",  2, dofire},
+        { act1, "こじ開ける",             3, doforce},
+        { act1, "跳ぶ",              3, dojump},
+        { act2, "蹴る",              2, dokick},
+        { act2, "拾い漁る",              3, doloot},
+        { act2, "扉を開ける",         3, doopen},
+        { act2, "支払う",               3, dopay},
         // calling this "Get" was confusing to experienced players
-        { act1, "Pick up (was Get)", 3, dopickup},
-        { act2, "Rest",              2, donull},
-        { act2, "Ride",              3, doride},
-        { act2, "Search",            3, dosearch},
-        { act2, "Sit",               3, dosit},
-        { act2, "Throw",             2, dothrow},
-        { act2, "Untrap",            3, dountrap},
-        { act2, "Up",                3, doup},
-        { act2, "Wipe face",         3, dowipe},
+        { act1, "拾う", 3, dopickup},
+        { act2, "休む",              2, donull},
+        { act2, "騎乗",              3, doride},
+        { act2, "探索",            3, dosearch},
+        { act2, "座る",               3, dosit},
+        { act2, "投げる",             2, dothrow},
+        { act2, "罠を解除",            3, dountrap},
+        { act2, "上に登る",                3, doup},
+        { act2, "顔を拭く",         3, dowipe},
 
-        { magic, "Quaff potion",     3, dodrink},
-        { magic, "Read scroll/book", 3, doread},
-        { magic, "Zap wand",         3, dozap},
-        { magic, "Zap spell",        3, docast},
-        { magic, "Dip",              3, dodip},
-        { magic, "Rub",              3, dorub},
-        { magic, "Invoke",           3, doinvoke},
+        { magic, "薬を飲む",     3, dodrink},
+        { magic, "巻物・書物を読む", 3, doread},
+        { magic, "杖を振る",         3, dozap},
+        { magic, "呪文を唱える",        3, docast},
+        { magic, "浸す",              3, dodip},
+        { magic, "こする",              3, dorub},
+        { magic, "起動する",           3, doinvoke},
         { magic, 0, 3, (int (*)(void)) 0},
-        { magic, "Offer",            3, dosacrifice},
-        { magic, "Pray",             3, dopray},
+        { magic, "捧げる",            3, dosacrifice},
+        { magic, "祈る",             3, dopray},
         { magic, 0, 3, (int (*)(void)) 0},
-        { magic, "Teleport",         3, dotelecmd},
-        { magic, "Monster action",   3, domonability},
-        { magic, "Turn undead",      3, doturn},
+        { magic, "テレポート",         3, dotelecmd},
+        { magic, "モンスターの能力",   3, domonability},
+        { magic, "退散させる",      3, doturn},
 
-        { help,  "Help",             3, dohelp},
+        { help,  "ヘルプ",           3, dohelp},
         { help,  0, 3, (int (*)(void)) 0},
-        { help,  "What is here",     3, dolook},
-        { help,  "What is there",    3, doquickwhatis},
-        { help,  "What is...",       2, dowhatis},
+        { help,  "足元のものを調べる",     3, dolook},
+        { help,  "そこにあるものを調べる",    3, doquickwhatis},
+        { help,  "〜とは",       2, dowhatis},
         { help,  0, 1, (int (*)(void)) 0},
 
-        { info,  "Inventory",        3, ddoinv},
-        { info,  "Attributes (extended status)", 3, doattributes },
-        { info,  "Overview",         3, dooverview },
-        { info,  "Conduct",          3, doconduct},
-        { info,  "Discoveries",      3, dodiscovered},
-        { info,  "List/reorder spells",  3, dovspell},
-        { info,  "Adjust inventory letters", 3, doorganize },
+        { info,  "所持品一覧",        3, ddoinv},
+        { info,  "属性 (拡張ステータス)", 3, doattributes },
+        { info,  "概要",         3, dooverview },
+        { info,  "行状",          3, doconduct},
+        { info,  "発見済み図鑑",      3, dodiscovered},
+        { info,  "呪文一覧・並べ替え",  3, dovspell},
+        { info,  "所持品文字の割り当て", 3, doorganize },
         { info,  0, 3, (int (*)(void)) 0},
-        { info,  "Name object or creature", 3, docallcmd},
-        { info,  "Annotate level",   3, donamelevel },
+        { info,  "モノや生物に名前を付ける", 3, docallcmd},
+        { info,  "フロアに注釈を付ける",   3, donamelevel },
         { info,  0, 3, (int (*)(void)) 0},
-        { info,  "Skills",  3, enhance_weapon_skill},
+        { info,  "技能",  3, enhance_weapon_skill},
 
 	{ 0, 0, 0, (int (*)(void)) 0 }
     };
 
     QAction *actn;
 #ifndef MACOS
-    (void) game->addAction("Qt settings...", this, SLOT(doQtSettings(bool)));
+    (void) game->addAction("Qt 設定...", this, SLOT(doQtSettings(bool)));
 #else
     /* on OSX, put this in the application menu instead of the game menu;
        Qt would change the action name behind our backs; do it explicitly */
@@ -715,12 +717,12 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     actn->setMenuRole(QWidgetAction::QuitRole);
 #endif
 
-    actn = help->addAction("About NetHack-Qt", this, SLOT(doAbout(bool)));
+    actn = help->addAction("NetHack-Qt について", this, SLOT(doAbout(bool)));
 #ifdef MACOS
     actn->setMenuRole(QWidgetAction::AboutRole);
     /* for OSX, the preceding "About" went into the application menu;
        now add another duplicate one to the Help dropdown menu */
-    actn = help->addAction("About NetHack-Qt", this, SLOT(doAbout(bool)));
+    actn = help->addAction("NetHack-Qt について", this, SLOT(doAbout(bool)));
     actn->setMenuRole(QWidgetAction::NoRole);
 #else
     nhUse(actn);
@@ -776,9 +778,9 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	}
     }
 
-    game->setTitle("Game");
+    game->setTitle("ゲーム");
     menubar->addMenu(game);
-    apparel->setTitle("Gear");
+    apparel->setTitle("装備");
     menubar->addMenu(apparel);
 
     if ( qt_compact_mode ) {
@@ -786,28 +788,28 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	menubar->addMenu(act1);
 	act2->setTitle("K-Z");
 	menubar->addMenu(act2);
-	magic->setTitle("Magic");
+	magic->setTitle("魔法");
 	menubar->addMenu(magic);
 	info->setIcon(QIcon(QPixmap(info_xpm)));
-	info->setTitle("Info");
+	info->setTitle("情報");
 	menubar->addMenu(info);
 	//menubar->insertItem(QPixmap(map_xpm), this, SLOT(raiseMap()));
 	//menubar->insertItem(QPixmap(msg_xpm), this, SLOT(raiseMessages()));
 	//menubar->insertItem(QPixmap(stat_xpm), this, SLOT(raiseStatus()));
 	info->addSeparator();
-	info->addAction("Map", this, SLOT(raiseMap()));
-	info->addAction("Messages", this, SLOT(raiseMessages()));
-	info->addAction("Status", this, SLOT(raiseStatus()));
+	info->addAction("マップ", this, SLOT(raiseMap()));
+	info->addAction("メッセージ", this, SLOT(raiseMessages()));
+	info->addAction("ステータス", this, SLOT(raiseStatus()));
     } else {
-	act1->setTitle("Action");
+	act1->setTitle("行動");
 	menubar->addMenu(act1);
-	magic->setTitle("Magic");
+	magic->setTitle("魔法");
 	menubar->addMenu(magic);
-	info->setTitle("Info");
+	info->setTitle("情報");
 	menubar->addMenu(info);
 	menubar->addSeparator();
 #ifndef MACOS
-	help->setTitle("Help");
+	help->setTitle("ヘルプ");
 #else
         // On OSX, an entry in the menubar called "Help" will get an
         // extra action, "Search [______]", inserted as the first entry.
@@ -841,16 +843,16 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     connect(sm, SIGNAL(mapped(const QString&)),
             this, SLOT(doKeys(const QString&)));
 #endif
-    AddToolButton(toolbar, sm, "Again", do_repeat, QPixmap(again_xpm));
+    AddToolButton(toolbar, sm, "繰り返す", do_repeat, QPixmap(again_xpm));
     // this used to be called "Get" which is confusing to experienced players
-    AddToolButton(toolbar, sm, "Pick up", dopickup, QPixmap(pickup_xpm));
-    AddToolButton(toolbar, sm, "Drop", doddrop, QPixmap(drop_xpm));
-    AddToolButton(toolbar, sm, "Kick", dokick, QPixmap(kick_xpm));
-    AddToolButton(toolbar, sm, "Throw", dothrow, QPixmap(throw_xpm));
-    AddToolButton(toolbar, sm, "Fire", dofire, QPixmap(fire_xpm));
-    AddToolButton(toolbar, sm, "Eat", doeat, QPixmap(eat_xpm));
-    AddToolButton(toolbar, sm, "Search", dosearch, QPixmap(search_xpm));
-    AddToolButton(toolbar, sm, "Rest", donull, QPixmap(rest_xpm));
+    AddToolButton(toolbar, sm, "拾う", dopickup, QPixmap(pickup_xpm));
+    AddToolButton(toolbar, sm, "捨てる", doddrop, QPixmap(drop_xpm));
+    AddToolButton(toolbar, sm, "蹴る", dokick, QPixmap(kick_xpm));
+    AddToolButton(toolbar, sm, "投げる", dothrow, QPixmap(throw_xpm));
+    AddToolButton(toolbar, sm, "射る", dofire, QPixmap(fire_xpm));
+    AddToolButton(toolbar, sm, "食べる", doeat, QPixmap(eat_xpm));
+    AddToolButton(toolbar, sm, "探索", dosearch, QPixmap(search_xpm));
+    AddToolButton(toolbar, sm, "休む", donull, QPixmap(rest_xpm));
 
     connect(game, SIGNAL(triggered(QAction *)),
             this, SLOT(doMenuItem(QAction *)));
@@ -1109,9 +1111,8 @@ void NetHackQtMainWindow::doKeys(const char *cmds)
 
 void NetHackQtMainWindow::doKeys(const QString& k)
 {
-    /* [this should probably be using toLocal8Bit();
-       toAscii() is not offered as an alternative...] */
-    doKeys(k.toLatin1().constData());
+    /* NetHackJP: (was Latin-1; UTF-8 handles any stragglers) */
+    doKeys(k.toUtf8().constData());
 }
 
 // queue up the command name for a function, as if user had typed it
