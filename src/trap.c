@@ -4527,10 +4527,10 @@ fire_damage(
         }
         /* Container is burnt up - dump contents out */
         if (in_sight)
-            pline("%sが燃え上がって焼けた.", xname(obj));
+            pline("%sが燃え上がって焼けた!", xname(obj));
         if (Has_contents(obj)) {
             if (in_sight)
-                pline("中身がこぼれ落ちた.");
+                pline("中身がこぼれ落ちた!");
             for (otmp = obj->cobj; otmp; otmp = ncobj) {
                 ncobj = otmp->nobj;
                 obj_extract_self(otmp);
@@ -4553,12 +4553,12 @@ fire_damage(
             return FALSE;
         if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
             if (in_sight)
-                pline("%sから煙が立ちのぼった.", xname(obj));
+                pline("%sから煙が立ちのぼった!", xname(obj));
             return FALSE;
         }
         dindx = (obj->oclass == SCROLL_CLASS) ? 3 : 4;
         if (in_sight)
-            pline("%sは%s.", xname(obj),
+            pline("%sは%s!", xname(obj),
                   destroy_strings[dindx][(obj->quan > 1L)]);
         setnotworn(obj);
         delobj(obj);
@@ -4566,7 +4566,7 @@ fire_damage(
     } else if (obj->oclass == POTION_CLASS) {
         dindx = (obj->otyp != POT_OIL) ? 1 : 2;
         if (in_sight)
-            pline("%sは%s.", xname(obj),
+            pline("%sは%s!", xname(obj),
                   destroy_strings[dindx][(obj->quan > 1L)]);
         setnotworn(obj);
         delobj(obj);
