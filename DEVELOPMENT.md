@@ -753,6 +753,20 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **対応ファイル**: `src/rip.c`、`include/extern.h`、`win/Qt/qt_bind.cpp`、`win/Qt/qt_menu.cpp`、`win/Qt/qt_stat.cpp`
 * **アップストリーム追従手順**:
   上流で Qt のセーブ選択に `restore_menu()` 相当の統一処理が入った場合、本 `qt_bind.cpp` の差分を取り消して追従する。`rip_utf8_*` ヘルパーは上流に同名関数が無いため extern 化を維持する（名前衝突時は `jp_rip_utf8_` 等へリネーム検討）。
+
+### 21. X11 ポートのステータス「名前+称号」「ダンジョン階層」の日本語形式統一
+* **背景**:
+  Qt6 ポートで確定した形式（§4.19：名前行は「<名前> <称号>」並列形式、ダンジョンは「<ダンジョン名>: 階層<深さ>」）を X11 ポートにも適用した。X11 (`win/X11/winstat.c::update_val`) は称号 (`jp_rank_of_for_display`) のみ日本語で形式が「<名前> the <称号>」・階層フォールバックが「<英文ダンジョン名>, level N」のままだった。
+* **修正内容** (`win/X11/winstat.c`):
+  1. `F_NAME`： `highc()` 頭文字大文字化と Upolyd 時の英文語順補正ループを削除し、`copynchars()` による単純結合で「<名前> <称号>」形式に変更（Upolyd 時は「<名前> <日本語モンスター名>`）。Qt と同様に `gp.plnamelen` による複合 plname（"名前-職-種族-性別-属性"）の切り詰めも追加。
+  2. `F_DLEVEL`： `describe_level()` が 0 を返した場合の英文フォールバック（`", level %d"`）を `jp_dungeon_name_by_dnum(u.uz.dnum)` + `" : 階層%d"`（運命の大迷宮: 階層3）に変更。
+  3. tty 風ステータスの条件表示 (`tt_condorder[]`)： 英語ハードコード（"Stone"/"Stun"/"Hallu" 等）を廃止し mask のみ保持、表示テキストはコア `botl.c` の `conditions[]` テーブル（`jp_condition_text()` ヘルパー、`conditions[i].text[0]` 完全形）から取得する一元化。訳語の二重管理を解消。
+  4. `width_string()` の英文は表示幅計算用の内部文字列のため変更なし（属性表示値は既に日本語済み）。
+* **マーカータグ**: `/* NetHackJP: "<name> <rank>" side-by-side ... */` / `/* NetHackJP: e.g. "運命の大迷宮: 階層3" ... */` / `/* NetHackJP: look up the core's Japanese condition text */`
+* **対応ファイル**: `win/X11/winstat.c`
+* **検証**: WSL (Ubuntu 26.04) で `build_wsl.sh` による X11 ビルド成功。`./playground/nethack -wX11` でステータスの tty 風 / fancy 風両モードの目視確認を行う予定。
+* **アップストリーム追従手順**:
+  上流 NetHack-5.0 の X11 ステータス変更 (update_val) との差分には本節の日本語形式（『名前 <称号>』『ダンジョン名: 階層N』『conditions[] 参照』）を維持したまま移植する。
 ---
 
 ## 5. ライセンスと NetHack License 2(a) への対応方針
