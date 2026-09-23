@@ -335,6 +335,8 @@
   "creditsContributorList": "• @satokiyon\n• with Google Antigravity and Gemini",
   "soundCreditsButton": "BGM・効果音",
   "soundCreditsDialogTitle": "BGM・効果音 クレジット",
+  "soundCreditsDialogDesc": "DartHack で使用されているBGM・効果音の提供元およびライセンス一覧です。",
+  "soundCreditsAuthor": "作者: {name}",
   "soundCreditsItemsCount": "{count}件",
   "soundCreditsCopiedUrl": "URLをクリップボードにコピーしました",
 

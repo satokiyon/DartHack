@@ -1982,6 +1982,18 @@ abstract class AppLocalizations {
   /// **'BGM・効果音 クレジット'**
   String get soundCreditsDialogTitle;
 
+  /// No description provided for @soundCreditsDialogDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'DartHack で使用されているBGM・効果音の提供元およびライセンス一覧です。'**
+  String get soundCreditsDialogDesc;
+
+  /// No description provided for @soundCreditsAuthor.
+  ///
+  /// In ja, this message translates to:
+  /// **'作者: {name}'**
+  String soundCreditsAuthor(Object name);
+
   /// No description provided for @soundCreditsItemsCount.
   ///
   /// In ja, this message translates to:

@@ -999,6 +999,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get soundCreditsDialogTitle => 'BGM & Sound Effects Credits';
 
   @override
+  String get soundCreditsDialogDesc =>
+      'List of sources and licenses for BGM and sound effects used in DartHack.';
+
+  @override
+  String soundCreditsAuthor(Object name) {
+    return 'Author: $name';
+  }
+
+  @override
   String soundCreditsItemsCount(Object count) {
     return '$count items';
   }

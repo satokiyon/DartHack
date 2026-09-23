@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:darthack/l10n/app_localizations.dart';
 import 'package:darthack/models/sound_credit_entry.dart';
 
-/// BGM・効果音クレジットを閲覧するための大画面モーダルダイアログ
+/// BGM・効果音クレジットを閲覧するためのモーダルダイアログ
 class SoundCreditsDialog extends StatefulWidget {
   final String? initialText;
 
@@ -23,24 +23,30 @@ class SoundCreditsDialog extends StatefulWidget {
 }
 
 class _SoundCreditsDialogState extends State<SoundCreditsDialog> {
-  late final Future<Map<String, List<SoundCreditEntry>>> _creditsFuture;
+  Future<List<SoundCreditSource>>? _creditsFuture;
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
-    _creditsFuture = _loadSoundCredits();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      final l10n = AppLocalizations.of(context);
+      final isEnglish = l10n?.localeName == 'en';
+      _creditsFuture = _loadSoundCredits(isEnglish: isEnglish);
+      _initialized = true;
+    }
   }
 
-  Future<Map<String, List<SoundCreditEntry>>> _loadSoundCredits() async {
+  Future<List<SoundCreditSource>> _loadSoundCredits({required bool isEnglish}) async {
     if (widget.initialText != null) {
-      return SoundCreditParser.parse(widget.initialText!);
+      return SoundCreditParser.parseSources(widget.initialText!, isEnglish: isEnglish);
     }
     try {
       final text = await rootBundle.loadString('assets/sounds/attributions.txt');
-      return SoundCreditParser.parse(text);
+      return SoundCreditParser.parseSources(text, isEnglish: isEnglish);
     } catch (e) {
       debugPrint('Error loading sound attributions: $e');
-      return {};
+      return [];
     }
   }
 
@@ -58,7 +64,6 @@ class _SoundCreditsDialogState extends State<SoundCreditsDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
 
     return Dialog(
@@ -67,7 +72,7 @@ class _SoundCreditsDialogState extends State<SoundCreditsDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 680,
+          maxWidth: 640,
           maxHeight: size.height * 0.85,
         ),
         child: Column(
@@ -99,9 +104,24 @@ class _SoundCreditsDialogState extends State<SoundCreditsDialog> {
             ),
             const Divider(height: 1, color: Colors.white24),
 
-            // コンテンツ部
+            // 説明文
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  l10n.soundCreditsDialogDesc,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.white.withValues(alpha: 0.75),
+                  ),
+                ),
+              ),
+            ),
+
+            // コンテンツ部（カード一覧）
             Expanded(
-              child: FutureBuilder<Map<String, List<SoundCreditEntry>>>(
+              child: FutureBuilder<List<SoundCreditSource>>(
                 future: _creditsFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -116,35 +136,21 @@ class _SoundCreditsDialogState extends State<SoundCreditsDialog> {
                         padding: const EdgeInsets.all(24.0),
                         child: Text(
                           'クレジット情報を読み込めませんでした。',
-                          style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                         ),
                       ),
                     );
                   }
 
-                  final grouped = snapshot.data!;
-                  final totalCount = grouped.values.fold<int>(0, (sum, list) => sum + list.length);
+                  final sources = snapshot.data!;
 
-                  return ListView(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                        child: Text(
-                          'DartHack で使用されているBGM、効果音、環境音の権利表記およびライセンス一覧です。（計 $totalCount 件）',
-                          style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.7)),
-                        ),
-                      ),
-                      ...grouped.entries.map((group) {
-                        return _buildSourceGroup(
-                          context,
-                          group.key,
-                          group.value,
-                          l10n,
-                          theme,
-                        );
-                      }),
-                    ],
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    itemCount: sources.length,
+                    itemBuilder: (context, index) {
+                      final source = sources[index];
+                      return _buildSourceCard(context, source, l10n);
+                    },
                   );
                 },
               ),
@@ -173,164 +179,116 @@ class _SoundCreditsDialogState extends State<SoundCreditsDialog> {
     );
   }
 
-  Widget _buildSourceGroup(
+  /// 提供元ごとのカードUI
+  Widget _buildSourceCard(
     BuildContext context,
-    String sourceName,
-    List<SoundCreditEntry> entries,
+    SoundCreditSource source,
     AppLocalizations l10n,
-    ThemeData theme,
   ) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+      key: ValueKey<String>('sound_credit_card_${source.sourceName}'),
+      margin: const EdgeInsets.symmetric(vertical: 6),
       color: const Color(0xFF28283E),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      clipBehavior: Clip.antiAlias,
-      child: ExpansionTile(
-        key: ValueKey<String>('sound_credit_group_$sourceName'),
-        leading: const Icon(Icons.library_music_outlined, color: Colors.tealAccent, size: 22),
-        title: Text(
-          sourceName,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),
-        ),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            l10n.soundCreditsItemsCount(entries.length.toString()),
-            style: const TextStyle(fontSize: 12, color: Colors.white70),
-          ),
-        ),
-        children: [
-          Container(
-            color: const Color(0xFF202032),
-            child: Column(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(14.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 提供元タイトル
+            Row(
               children: [
-                for (int i = 0; i < entries.length; i++) ...[
-                  if (i > 0) const Divider(height: 1, color: Colors.white12),
-                  _buildEntryItem(context, entries[i], l10n),
-                ],
+                const Icon(Icons.library_music_outlined, color: Colors.tealAccent, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    source.sourceName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
+            const SizedBox(height: 8),
 
-  Widget _buildEntryItem(
-    BuildContext context,
-    SoundCreditEntry entry,
-    AppLocalizations l10n,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ファイル名 & 用途説明
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(Icons.audio_file, color: Colors.amberAccent, size: 16),
-              const SizedBox(width: 6),
-              Expanded(
+            // 作者名
+            if (source.author.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.only(left: 4),
                 child: Text(
-                  entry.fileName,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
+                  l10n.soundCreditsAuthor(source.author),
+                  style: TextStyle(
                     fontSize: 13,
-                    color: Colors.amberAccent,
-                    fontFamily: 'monospace',
+                    color: Colors.white.withValues(alpha: 0.85),
                   ),
                 ),
               ),
+              const SizedBox(height: 6),
             ],
-          ),
-          if (entry.description.isNotEmpty) ...[
-            const SizedBox(height: 3),
-            Padding(
-              padding: const EdgeInsets.only(left: 22),
-              child: Text(
-                entry.description,
-                style: const TextStyle(fontSize: 13, color: Colors.white),
-              ),
-            ),
-          ],
 
-          const SizedBox(height: 6),
-          Padding(
-            padding: const EdgeInsets.only(left: 22),
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 4,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                if (entry.author.isNotEmpty)
-                  Text(
-                    '作者: ${entry.author}',
-                    style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.75)),
+            // ライセンスバッジ
+            if (source.license.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.only(left: 4),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.teal.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: Colors.tealAccent.withValues(alpha: 0.4), width: 0.8),
                   ),
-                if (entry.license.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.teal.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.tealAccent.withOpacity(0.4), width: 0.8),
+                  child: Text(
+                    source.license,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.tealAccent,
                     ),
-                    child: Text(
-                      entry.license,
-                      style: const TextStyle(fontSize: 11, color: Colors.tealAccent),
-                    ),
-                  ),
-                if (entry.notes.isNotEmpty)
-                  Text(
-                    '(${entry.notes})',
-                    style: TextStyle(fontSize: 11, color: Colors.white.withOpacity(0.55)),
-                  ),
-              ],
-            ),
-          ),
-
-          if (entry.url.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Padding(
-              padding: const EdgeInsets.only(left: 22),
-              child: InkWell(
-                onTap: () => _copyToClipboard(context, entry.url, l10n.soundCreditsCopiedUrl),
-                borderRadius: BorderRadius.circular(4),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.link, size: 14, color: Colors.lightBlueAccent),
-                      const SizedBox(width: 4),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 360),
-                        child: Text(
-                          entry.url,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Colors.lightBlueAccent,
-                            decoration: TextDecoration.underline,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.copy, size: 12, color: Colors.lightBlueAccent),
-                    ],
                   ),
                 ),
               ),
-            ),
+              const SizedBox(height: 8),
+            ],
+
+            // URL（タップでコピー）
+            if (source.url.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(left: 2),
+                child: InkWell(
+                  onTap: () => _copyToClipboard(context, source.url, l10n.soundCreditsCopiedUrl),
+                  borderRadius: BorderRadius.circular(6),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.link, size: 15, color: Colors.lightBlueAccent),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            source.url,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.lightBlueAccent,
+                              decoration: TextDecoration.underline,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Icon(Icons.copy, size: 13, color: Colors.lightBlueAccent),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
           ],
-        ],
+        ),
       ),
     );
   }

@@ -986,6 +986,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get soundCreditsDialogTitle => 'BGM・効果音 クレジット';
 
   @override
+  String get soundCreditsDialogDesc =>
+      'DartHack で使用されているBGM・効果音の提供元およびライセンス一覧です。';
+
+  @override
+  String soundCreditsAuthor(Object name) {
+    return '作者: $name';
+  }
+
+  @override
   String soundCreditsItemsCount(Object count) {
     return '$count件';
   }

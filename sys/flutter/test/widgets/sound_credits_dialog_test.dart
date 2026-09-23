@@ -18,9 +18,10 @@ Author:      Pixabay SoundEffect
 License:     Pixabay Content License（商用可・ゲーム組込可・クレジット不要）
 ''';
 
-  testWidgets('SoundCreditsDialog renders title and close button', (tester) async {
+  testWidgets('SoundCreditsDialog renders title, desc, and close button', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
+        locale: Locale('ja'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
@@ -31,18 +32,20 @@ License:     Pixabay Content License（商用可・ゲーム組込可・クレ�
 
     await tester.pumpAndSettle();
 
-    // タイトルの存在確認
+    // タイトルとアイコン、説明文の存在確認
     expect(find.byIcon(Icons.music_note), findsOneWidget);
     expect(find.byIcon(Icons.close), findsOneWidget);
+    expect(find.text('DartHack で使用されているBGM・効果音の提供元およびライセンス一覧です。'), findsOneWidget);
 
     // 閉じるボタンのタップ
     await tester.tap(find.byIcon(Icons.close));
     await tester.pumpAndSettle();
   });
 
-  testWidgets('SoundCreditsDialog expands group card and renders entries without errors', (tester) async {
+  testWidgets('SoundCreditsDialog renders flat credit cards with source, author, license, and url', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
+        locale: Locale('ja'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
@@ -53,18 +56,25 @@ License:     Pixabay Content License（商用可・ゲーム組込可・クレ�
 
     await tester.pumpAndSettle();
 
-    // ExpansionTile が表示されていることを確認（Springin' Sound Stock と Pixabay SoundEffect）
+    // 提供元カードが表示されていることを確認
     expect(find.text("Springin' Sound Stock"), findsOneWidget);
     expect(find.text('Pixabay SoundEffect'), findsOneWidget);
 
-    // Pixabay SoundEffect カードをタップして展開
-    await tester.tap(find.text('Pixabay SoundEffect'));
-    await tester.pumpAndSettle();
+    // 作者名が表示されていることを確認（Pixabayはコミュニティ集約）
+    expect(find.text("作者: Springin' Sound Stock"), findsOneWidget);
+    expect(find.text('作者: Pixabay コミュニティの各クリエイター'), findsOneWidget);
 
-    // 展開後、ファイル名・説明・URLリンク・アイコンがエラーなく表示されていること
-    expect(find.text('se_gear_turn.ogg'), findsOneWidget);
-    expect(find.text('歯車がカチリと一段回る音'), findsOneWidget);
-    expect(find.byIcon(Icons.audio_file), findsWidgets);
-    expect(find.byIcon(Icons.link), findsWidgets);
+    // 代表URLが表示されていることを確認
+    expect(find.text('https://www.springin.org/sound-stock/'), findsOneWidget);
+    expect(find.text('https://pixabay.com/sound-effects/'), findsOneWidget);
+
+    // 個別曲名・ファイル名は表示されないこと（冗長性排除の確認）
+    expect(find.text('se_gear_turn.ogg'), findsNothing);
+    expect(find.text('se_bars_clonk.ogg'), findsNothing);
+
+    // URLタップでSnackBar（コピー通知）が表示されること
+    await tester.tap(find.text('https://pixabay.com/sound-effects/'));
+    await tester.pump(); // SnackBar アニメーション開始
+    expect(find.text('URLをクリップボードにコピーしました'), findsOneWidget);
   });
 }

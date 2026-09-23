@@ -1,4 +1,43 @@
-/// BGM・効果音クレジット用エントリおよびパーサー
+/// BGM・効果音クレジット用モデルおよびパーサー
+library;
+
+/// BGM・効果音の提供元（サービス・サイト）単位のクレジット情報
+class SoundCreditSource {
+  final String sourceName;
+  final String author;
+  final String license;
+  final String url;
+  final int soundCount;
+
+  const SoundCreditSource({
+    required this.sourceName,
+    required this.author,
+    required this.license,
+    required this.url,
+    this.soundCount = 0,
+  });
+
+  @override
+  String toString() {
+    return 'SoundCreditSource(source: $sourceName, author: $author, license: $license, url: $url)';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SoundCreditSource &&
+          runtimeType == other.runtimeType &&
+          sourceName == other.sourceName &&
+          author == other.author &&
+          license == other.license &&
+          url == other.url;
+
+  @override
+  int get hashCode =>
+      sourceName.hashCode ^ author.hashCode ^ license.hashCode ^ url.hashCode;
+}
+
+/// 個別ファイル用のクレジットエントリ（下位互換性およびパース用）
 class SoundCreditEntry {
   final String fileName;
   final String description;
@@ -24,8 +63,105 @@ class SoundCreditEntry {
   }
 }
 
-/// attributions.txt を解析して提供元ごとにグループ化するパーサー
+/// attributions.txt を解析してクレジット情報を生成するパーサー
 class SoundCreditParser {
+  /// attributions.txt を解析し、提供元・サービス単位に集約した [SoundCreditSource] のリストを返す
+  static List<SoundCreditSource> parseSources(String text, {bool isEnglish = false}) {
+    final grouped = parse(text);
+    final List<SoundCreditSource> sources = [];
+
+    for (final entry in grouped.entries) {
+      final sourceName = entry.key;
+      final entries = entry.value;
+      if (entries.isEmpty) continue;
+
+      // ユニークな作者リストの収集
+      final authors = entries
+          .map((e) => e.author.trim())
+          .where((a) => a.isNotEmpty)
+          .toSet()
+          .toList();
+
+      // 代表作者の決定
+      String author;
+      if (sourceName.contains('Pixabay')) {
+        author = isEnglish ? 'Pixabay Community Creators' : 'Pixabay コミュニティの各クリエイター';
+      } else if (authors.length == 1) {
+        author = authors.first;
+      } else if (authors.isEmpty) {
+        author = sourceName;
+      } else {
+        author = isEnglish ? 'Various Creators' : '各クリエイター';
+      }
+
+      // 代表ライセンスの決定
+      String license = entries.first.license.trim();
+      if (sourceName.contains('Pixabay')) {
+        license = 'Pixabay Content License';
+      } else if (sourceName.contains('PeriTune') || sourceName.contains('CreatorChords')) {
+        license = 'CC-BY 4.0';
+      }
+
+      // 代表URLの正規化（サイトトップまたは代表URL）
+      String url = _getPrimaryUrl(sourceName, entries.first.url);
+
+      sources.add(SoundCreditSource(
+        sourceName: sourceName,
+        author: author,
+        license: license,
+        url: url,
+        soundCount: entries.length,
+      ));
+    }
+
+    // 音源数が多い順にソート（同数の場合は名称昇順）
+    sources.sort((a, b) {
+      final cmp = b.soundCount.compareTo(a.soundCount);
+      if (cmp != 0) return cmp;
+      return a.sourceName.compareTo(b.sourceName);
+    });
+
+    return sources;
+  }
+
+  /// サービス名に応じた代表URLの正規化
+  static String _getPrimaryUrl(String sourceName, String sampleUrl) {
+    if (sourceName == 'Pixabay SoundEffect') {
+      return 'https://pixabay.com/sound-effects/';
+    } else if (sourceName == 'Pixabay Music') {
+      return 'https://pixabay.com/music/';
+    } else if (sourceName == 'PeriTune') {
+      return 'https://peritune.com/';
+    } else if (sourceName == 'CreatorChords') {
+      return 'https://creatorchords.com/';
+    } else if (sourceName == '効果音ラボ') {
+      return 'https://soundeffect-lab.info/';
+    } else if (sourceName == "Springin' Sound Stock") {
+      return 'https://www.springin.org/sound-stock/';
+    } else if (sourceName == 'OtoLogic') {
+      return 'https://otologic.jp/';
+    } else if (sourceName == 'Howling-Indicator') {
+      return 'https://howlingindicator.net/';
+    } else if (sourceName == '効果音辞典') {
+      return 'https://sounddictionary.info/';
+    } else if (sourceName.contains('Gemini')) {
+      return 'https://gemini.google.com/';
+    } else if (sourceName.contains('NetHack')) {
+      return 'https://www.nethack.org/';
+    } else if (sourceName.contains('FluidR3')) {
+      return 'https://raw.githubusercontent.com/urish/cinto/master/media/FluidR3%20GM.sf2';
+    }
+
+    // 一般的なURLのオリジン化
+    if (sampleUrl.isNotEmpty) {
+      final uri = Uri.tryParse(sampleUrl);
+      if (uri != null && uri.hasScheme && uri.host.isNotEmpty) {
+        return '${uri.scheme}://${uri.host}/';
+      }
+    }
+    return sampleUrl;
+  }
+
   /// attributions.txt のテキストを解析し、提供元名ごとにグループ化したマップを返す
   static Map<String, List<SoundCreditEntry>> parse(String text) {
     final Map<String, List<SoundCreditEntry>> grouped = {};
@@ -148,7 +284,7 @@ class SoundCreditParser {
       }
 
       if (line.startsWith('File:')) {
-        commitEntry(); // 新しいブロック開始
+        commitEntry();
         currentFile = line.substring('File:'.length).trim();
       } else if (line.startsWith('Description:')) {
         currentDesc = line.substring('Description:'.length).trim();
@@ -163,9 +299,8 @@ class SoundCreditParser {
       }
     }
 
-    commitEntry(); // 末尾エントリの確定
+    commitEntry();
 
-    // 提供元ごとのソート（件数が多い順にソート）
     final sortedKeys = grouped.keys.toList()
       ..sort((a, b) {
         final cmp = grouped[b]!.length.compareTo(grouped[a]!.length);
