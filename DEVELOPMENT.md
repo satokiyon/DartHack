@@ -64,6 +64,8 @@ sudo apt install fcitx5 fcitx5-frontend-gtk3 fcitx5-modules fcitx5-mozc
 | `libx11-dev` / `libxft-dev` / `libxaw7-dev` 等 | X11 GUI ポート (UTF-8 Xft / Athena Widgets) のビルド・描画ライブラリ |
 | `fonts-noto-cjk` (`Noto Sans CJK JP`) | X11 GUI ポートで日本語・墓石死因の文字化けを防ぐ日本語 CJK フォントパッケージ |
 | `fcitx5` / `fcitx5-mozc` 等 | X11 GUI ポートで getlin / askname ダイアログへの日本語入力（XIM）を行う IM サーバと変換エンジン（§2.2.2 参照） |
+| `qt6-base-dev` / `qt6-multimedia-dev` / `qt6-base-dev-tools` | Qt6 GUI ポートのビルドライブラリ / サウンド機能 / `moc` 等のツール（Ubuntu 26.04 では Qt 6.10.2 系） |
+| `fcitx5-frontend-qt6` | Qt6 GUI ポートの getlin / askname / メニュー Search 等への日本語入力（§2.2 に記載の `QT_IM_MODULE=fcitx` と併用） |
 
 > [!NOTE]
 > `gdb` は **実行時**にも参照されます。`sysconf` の `PANICTRACE_GDB=1` が有効な状態で `gdb` が存在しない場合、クラッシュ時に追加のバックトレース情報が取れないだけでなく、起動に失敗するケースもあります。インストールしておくことを強く推奨します。
@@ -82,7 +84,17 @@ sudo apt install fcitx5 fcitx5-frontend-gtk3 fcitx5-modules fcitx5-mozc
 ### 2.2. Linux / WSL ポートの開発・ビルド (GNU Make / GCC)
 WSL または Linux 環境上で、ワンステップ用ビルドスクリプトを実行して Makefile の生成とビルドを一括で行うことができます。
 - **実行スクリプト**: `sh sys/unix/build_wsl.sh`
-- スクリプト実行により、日本語対応ヒントファイル `sys/unix/hints/linux-jp` が使用され、`src/nethack` に `tty` / `curses`（`ncursesw` による UTF-8 日本語表示対応）/ `X11`（Xft UTF-8 描画 + XIM 日本語入力対応）の **3 インターフェースに対応した実行ファイル**が生成されます。
+- **Qt6 ポートを追加でビルドする場合**: 同一スクリプトに `--qt` を渡すこと（`WANT_WIN_QT=1 WANT_WIN_QT6=1 WANT_DEFAULT=Qt` が付与される）。Qt6 開発パッケージ (`qt6-base-dev` / `qt6-multimedia-dev` / `qt6-base-dev-tools`) が必要で、事前に pkg-config と `moc` の存在が確認される。ヒントファイル `sys/unix/hints/linux-jp` の既存 Qt 分岐を流用するため、ヒント自体の編集は不要。
+- *Qt ビルドの実行例*:
+  ```bash
+  sh sys/unix/build_wsl.sh --qt
+  make WANT_WIN_CURSES=1 WANT_WIN_TTY=1 WANT_WIN_X11=1 WANT_WIN_QT=1 WANT_WIN_QT6=1 WANT_DEFAULT=Qt install
+  QT_IM_MODULE=fcitx QT_QPA_PLATFORM=xcb ./playground/nethack -wQt
+  ```
+  - `make install` もビルドと同じ `WANT_WIN_QT=1 WANT_WIN_QT6=1` フラグで実行する必要がある（Qt 用データ `nhtiles.bmp` / `nhsplash.xpm` は `VARDATND0` が make 実行時の `ifdef` 評価で `DATNODLB` に追加されるため、フラグ無し install では `playground/` にコピーされない）。
+  - `QT_IM_MODULE=fcitx` は getlin / askname / plsel / メニューSearch への Mozc による日本語入力（`fcitx5-frontend-qt6`）に必須。
+  - `QT_QPA_PLATFORM=xcb` は WSLg での Qt プラットフォームを X11/xcb に固定する指定（Wayland は対象外）。
+- スクリプト実行により、日本語対応ヒントファイル `sys/unix/hints/linux-jp` が使用され、`src/nethack` に `tty` / `curses`（`ncursesw` による UTF-8 日本語表示対応）/ `X11`（Xft UTF-8 描画 + XIM 日本語入力対応）の **3 インターフェースに対応した実行ファイル**が生成されます（`--qt` 指定時は `Qt`（Qt6 / UTF-8 入出力対応）を含む **4 インターフェース**）。
 - *手動でステップを実行する場合*:
   ```bash
   sh sys/unix/setup.sh sys/unix/hints/linux-jp

@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -266,6 +266,27 @@ Linux/WSL 環境の X11 ウィンドウポート（`win/X11/`）で fcitx5 / ibu
    - 既存 `OPTIONS=mouse_support` と同パターン（`src/options.c::optfn_use_xim` で `iflags.wc_use_xim` を 0/1 に設定）。
    - デフォルト値（on）は `src/options.c::initoptions_init()` で `.nethackrc` パース前に設定されるため、ユーザの `OPTIONS=use_xim:off` は上書きされることなく正しく反映される。
    - `win/X11/winxim.c::xim_init` で `iflags.wc_use_xim == 0` の場合は `XOpenIM` をスキップして完全に ASCII のみ動作（fcitx5 不在時と同じ経路）。
+
+## Qt ポートにおける UTF-8 日本語入出力対応 (WSL / Ubuntu)
+
+Qt6 ポート（`win/Qt/`）は Qt 6（Ubuntu 26.04 / Qt 6.10.2 系、`sys/unix/build_wsl.sh --qt` でビルド）において UTF-8 日本語入出力に対応している。編集・保守の際は以下の方針を徹底すること。
+
+1. **文字コード変換の徹底（`fromLatin1` / `toLatin1` 禁止）**:
+   - `win/Qt/` 内では、コアから渡される `char *` テキストは UTF-8 である。新規に `QString::fromLatin1` / `QString::toLatin1` を書かないこと。UTF-8 で変換する（既存修正は `/* NetHackJP: UTF-8 ... not Latin-1 */` マーカー付き。`DEVELOPMENT.md §4.18` 参照）。
+   - Qt の `QString(const char *)` 暗黙変換と `QString::asprintf / vasprintf`（`nh_qsprintf`）の `%s` は UTF-8 として扱われるため、明示的な変換は `fromUtf8` / `toUtf8` を使用する。
+   - `QLineEdit` 系ダイアログ（getlin / askname / plsel / メニューSearch 等）からコアへ戻す際は必ず `toUtf8()` で char バッファへ（`qt_streq.cpp::Get`、`qt_plsel.cpp::selectName`）。
+
+2. **日本語入力の範囲（X11 ポートと同じ線引き）**:
+   - QLineEdit 系ダイアログ（getlin / askname / plsel / メニューSearch / 拡張コマンド検索）は `QT_IM_MODULE=fcitx` + `fcitx5-frontend-qt6` で日本語入力可（Qt 標準のインプットコンテキスト。X11 のような自前 XIM インフラは不要）。
+   - マップ画面の直接キー入力（`NetHackQtBind::notify()` → `keybuffer` → `qt_nhgetch()`）、メニューのキー選択、yn プロンプトは **ASCII のみ（1バイト=1コマンド、仕様）**。`notify()` / `keyValue()` は非 ASCII を破棄する設計で、これをマルチバイト対応に変更しないこと。
+
+3. **日本語化済み静的文字列の維持**:
+   - メニューバー / メニュー項目 / ツールバー / ステータスラベル（筋・器・耐・知・賢・魅、体力・魔力・防御(AC)・Lv・金貨・ターン・得点・属性）/ 状態表示（石化・朦朧等）/ ダイアログボタンは「Qt ポートの GUI 静的文字列の日本語化」コミットで日本語化済み。上流マージ時は日本語ラベルを保持し、新規追加の英語ラベルは日本語化してから取り込む。
+   - ステータスの「名前 + 称号」は `jp_rank_of_for_display()` による「<名前> <称号>」形式、ダンジョン表示は `jp_dungeon_name_by_dnum()` による「<ダンジョン名>: 階層<深さ>」形式（`DEVELOPMENT.md §4.19`）。他ポートと同様、コア側の日本語表示関数を経由し、Qt コード内で英語文字列を再構築しないこと。
+
+4. **ビルド/実行**:
+   - `sh sys/unix/build_wsl.sh --qt` と `make ... WANT_WIN_QT=1 WANT_WIN_QT6=1 WANT_DEFAULT=Qt install`（フラグ付き）でビルドとインストール（手順は `DEVELOPMENT.md` §2.2）。
+   - 起動は `QT_IM_MODULE=fcitx QT_QPA_PLATFORM=xcb ./playground/nethack -wQt`。Wayland は対象外。
 
 ## タイル定義データファイルおよび X11 タイル画像の表示・生成方針
 
