@@ -5,6 +5,8 @@
 # Usage: ./sys/unix/build_wsl.sh [--qt] [hints_file]
 #   --qt  Also build the Qt6 window port (requires qt6-base-dev,
 #         qt6-multimedia-dev and qt6-base-dev-tools packages installed)
+# Note: this script only builds. Use sys/unix/install_wsl.sh (with the
+# same --qt flag) to run 'make install' into playground/.
 
 set -e
 
@@ -145,16 +147,14 @@ else
     echo "All 'tty', 'curses' and 'X11' window ports are included."
 fi
 echo ""
-echo "Next step: Run 'make install' to install into playground/."
+echo "Next step: Install into playground/ with sys/unix/install_wsl.sh"
+echo "(it runs 'make install' with the same WANT_WIN_* flags as this build;)"
+echo "or run 'make install' by hand with the same flags)."
 echo "Then execute: ./playground/nethack (or ./playground/nethack -wX11 for X11 GUI)"
 if [ $WANT_QT -eq 1 ]; then
     # NetHackJP: the hints add the Qt data assets (nhtiles.bmp, nhsplash.xpm,
     # rip.xpm) to VARDATND0 at make parse time, so 'make install' must be
     # invoked with the same WANT_WIN_QT flags as the build.
-    echo "IMPORTANT: use the same flags for install so the Qt data assets"
-    echo "           (nhtiles.bmp, nhsplash.xpm) get installed into playground/:"
-    echo "  make WANT_WIN_CURSES=1 WANT_WIN_TTY=1 WANT_WIN_X11=1 \\"
-    echo "       WANT_WIN_QT=1 WANT_WIN_QT6=1 WANT_DEFAULT=Qt install"
     echo "For the Qt6 GUI: QT_QPA_PLATFORM=xcb ./playground/nethack -wQt"
 fi
 echo ""

@@ -88,10 +88,10 @@ WSL または Linux 環境上で、ワンステップ用ビルドスクリプト
 - *Qt ビルドの実行例*:
   ```bash
   sh sys/unix/build_wsl.sh --qt
-  make WANT_WIN_CURSES=1 WANT_WIN_TTY=1 WANT_WIN_X11=1 WANT_WIN_QT=1 WANT_WIN_QT6=1 WANT_DEFAULT=Qt install
+  sh sys/unix/install_wsl.sh --qt
   QT_IM_MODULE=fcitx QT_QPA_PLATFORM=xcb ./playground/nethack -wQt
   ```
-  - `make install` もビルドと同じ `WANT_WIN_QT=1 WANT_WIN_QT6=1` フラグで実行する必要がある（Qt 用データ `nhtiles.bmp` / `nhsplash.xpm` は `VARDATND0` が make 実行時の `ifdef` 評価で `DATNODLB` に追加されるため、フラグ無し install では `playground/` にコピーされない）。
+  - インストールは `sys/unix/install_wsl.sh`（`--qt` 付き時はビルドと同名フラグで `make install` を実行）。`make install` を手動実行する場合もビルドと同じ `WANT_WIN_QT=1 WANT_WIN_QT6=1` フラグで実行する必要がある（Qt 用データ `nhtiles.bmp` / `nhsplash.xpm` は `VARDATND0` が make 実行時の `ifdef` 評価で `DATNODLB` に追加されるため、フラグ無し install では `playground/` にコピーされない）。
   - `QT_IM_MODULE=fcitx` は getlin / askname / plsel / メニューSearch への Mozc による日本語入力（`fcitx5-frontend-qt6`）に必須。
   - `QT_QPA_PLATFORM=xcb` は WSLg での Qt プラットフォームを X11/xcb に固定する指定（Wayland は対象外）。
 - スクリプト実行により、日本語対応ヒントファイル `sys/unix/hints/linux-jp` が使用され、`src/nethack` に `tty` / `curses`（`ncursesw` による UTF-8 日本語表示対応）/ `X11`（Xft UTF-8 描画 + XIM 日本語入力対応）の **3 インターフェースに対応した実行ファイル**が生成されます（`--qt` 指定時は `Qt`（Qt6 / UTF-8 入出力対応）を含む **4 インターフェース**）。
@@ -702,6 +702,7 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
   2. `--qt` 指定時は事前に `pkg-config --exists Qt6Core Qt6Gui Qt6Widgets Qt6Multimedia` で Qt6 開発パッケージの存在を確認し、未導入なら `apt install` 指示とともに終了する。さらに `pkg-config --variable=libexecdir Qt6Core` で解決される `moc` の実行権も確認する。
   3. Qt6 用データアセット (`nhtiles.bmp` / `nhsplash.xpm` / `rip.xpm`) をビルド後に明示生成する（`make nhtiles.bmp nhsplash.xpm rip.xpm`）。
   4. `make install` 時も `WANT_WIN_QT=1` 系フラグを付与する必要がある（`VARDATND0` の追加は make 実行時の `ifdef` 評価で行われるため、別途 `make install` を実行すると Qt 用アセットが `playground/` にコピーされない）。この注意点をスクリプトの完了メッセージに出力する。
+  5. 2026-09-23 追加: `sys/unix/install_wsl.sh` を新設（`--qt` を同じ意味で解釈し、ビルドと同一の `WANT_WIN_*` フラグで `make install` を実行する）。`build_wsl.sh` はビルド専用に位置づけ。フラグ無し / `--qt` 付きの両経路で `playground/` のアセット配置を確認済み。
 * **マーカータグ**:
   - `# NetHackJP: --qt option to opt-in the Qt6 window port`（Usage コメント）をはじめ、build_wsl.sh 内の NetHackJP マーカーコメント一式
 * **対応ファイル**: `sys/unix/build_wsl.sh`
