@@ -856,21 +856,36 @@ void NetHackQtStatusWindow::updateStats()
         vers.hide();
 
     if (Upolyd) {
-	buf = nh_capitalize_words(pmname(&mons[u.umonnum],
-                                  ::flags.female ? FEMALE : MALE));
-    } else {
-	buf = rank_of(u.ulevel, svp.pl_character[0], ::flags.female);
+        // NetHackJP: "<monster name>の<name>" and "keep the monster name
+        // untranslated (already Japanese); skip English capitalization
+	buf = nh_qsprintf("%s",
+                          pmname(&mons[u.umonnum],
+                                 ::flags.female ? FEMALE : MALE));
     }
     QString buf2;
     char buf3[BUFSZ];
-    /* NetHackJP: UTF-8 (Japanese rank/monster name), not Latin-1 */
-    buf2 = nh_qsprintf("%s the %s", upstart(strcpy(buf3, svp.plname)),
-                       buf.toUtf8().constData());
+    if (Upolyd) {
+        buf2 = nh_qsprintf("%sの%s", buf.toUtf8().constData(),
+                           upstart(strcpy(buf3, svp.plname)));
+    } else {
+        // NetHackJP: "<rank>の<name>" (e.g. "掠奪者のテスト"); the
+        // pre-2026 patches used rank_of() which returns English "the Plunder"
+        str_copy(buf3, svp.plname, sizeof buf3 - 1);
+        buf2 = nh_qsprintf("%sの%s",
+                           jp_rank_of_for_display(u.ulevel,
+                                                  svp.pl_character[0],
+                                                  ::flags.female),
+                           upstart(buf3));
+    }
     name.setLabel(buf2, NetHackQtLabelledIcon::NoNum, u.ulevel);
 
     if (!describe_level(buf3, 0)) {
-	Sprintf(buf3, "%s, level %d",
-                svd.dungeons[u.uz.dnum].dname, ::depth(&u.uz));
+	// NetHackJP: main dungeon needs JP "dungeon name:depth"; the
+	// core's describe_level() prints "階層:%d" for the status itself,
+	// so this fallback is only reached on rare ports... show the
+	// dungeon name in Japanese instead of "The Dungeons of Doom, level N"
+	Sprintf(buf3, "%s:%d", jp_dungeon_name_by_dnum(u.uz.dnum),
+                ::depth(&u.uz));
     }
     dlevel.setLabel(buf3);
 

@@ -704,6 +704,17 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **対応ファイル**: `win/Qt/qt_bind.cpp`、`win/Qt/qt_msg.cpp`、`win/Qt/qt_main.cpp`、`win/Qt/qt_plsel.cpp`、`win/Qt/qt_stat.cpp`、`win/Qt/qt_streq.cpp`、`win/Qt/qt_yndlg.cpp`
 * **アップストリーム追従手順**:
   上流 NetHack-5.0 の Qt ポート変更で `fromLatin1`/`toLatin1` 箇所に差分が入った場合、Latin-1 から UTF-8 への変換選択（fromUtf8 / toUtf8）を保持したまま移植する。日本語データ入力（`hack.h` 由来の UTF-8 テキスト）を扱う箇所では絶対に Latin-1 を復活させない。
+
+### 19. Qt ポートのステータス「名前+称号」行およびダンジョン階層表示の日本語化
+* **背景**:
+  Qt6 ステータスウィンドウの名前行が `rank_of()` による英文称号（例: `テスト the Plunder`）を表示しており、ダンジョン階層表示も `describe_level()` の戻り値を誤解した常時フォールバック（`The Dungeons of Doom, level N`）になっていた。
+* **修正内容** (`win/Qt/qt_stat.cpp`):
+  1. 名前行を `jp_rank_of_for_display(u.ulevel, svp.pl_character[0], flags.female)` による「<称号>の<名前>」（例: 掠奪者のテスト）に変更。変身中は「<モンスター名>の<名前>」とする（X11 `winstat.c` と同等の情報源）。
+  2. ダンジョン階層は `jp_dungeon_name_by_dnum(u.uz.dnum)` による「<ダンジョン名>:<深さ>」（例: 運命の大迷宮:3）に変更。クエスト / エンドゲーム / ノックス / チュートリアルはコア `describe_level()` の日本語出力がそのまま使われる。
+  3. `describe_level()` はメイン地層では常に 0 を返す仕様（botl.c のコメントどおり「ports with more room may expand this」）のため、Qt 独自の日本語フォールバックを用意した。
+* **マーカータグ**: `// NetHackJP: <rank>の<name>` / `// NetHackJP: main dungeon needs JP "dungeon name:depth"`
+* **対応ファイル**: `win/Qt/qt_stat.cpp`
+* **アップストリーム追従手順**: X11 ポート (`win/X11/winstat.c`) にも同種の英文フォールバック（`the ...`, `, level N`）が残るが Qt スコープ外として残置。上流で称号/階層表示が変わった場合はコアの日本語表示関数を維持したまま追従する。
 ---
 
 ## 5. ライセンスと NetHack License 2(a) への対応方針
