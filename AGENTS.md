@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -1061,4 +1061,25 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
 4. **ゲーム本編開始前フェーズにおけるフロア BGM 保留機構（保留クロスフェード原則）**:
    - アプリ起動直後のタイトル画面から `amb_title.ogg` を即時再生させつつ、名前入力・キャラメイク・セーブデータ復元処理中に C コアから届くフロア BGM（`amb_dungeon.ogg` 等）は即時再生せず、保留変数（`_pendingFloorBgm`）に一時退避させてタイトル BGM を維持してください。
    - マップウィンドウの初回表示（ゲーム本編開始検知: `notifyMainGameStarted()`）が届いた瞬間に、保留されていたフロア BGM へのクロスフェードを開始する設計を徹底してください。
+
+## 39. Flutter UI における ExpansionTile / PageStorage の型キャスト競合防止とクレジット表示原則
+
+1. **`ExpansionTile` での `PageStorageKey` 使用禁止と `ScrollPosition` の型キャスト競合（灰色クラッシュ）の防止**:
+   - **現象とメカニズム**:
+     - `ExpansionTile` に `PageStorageKey`（または `PageStorage` を共有するキー）を指定すると、開閉状態（`bool`）が `PageStorage` に保存されます。
+     - その子ウィジェットや展開領域内に `ListView` などのスクロール可能ウィジェットが存在すると、`ScrollPosition.restoreScrollOffset` がその値をスクロール位置（本来 `double` を期待）として読み出そうとします。
+     - これにより `type 'bool' is not a subtype of type 'double?' in type cast` 例外が発生し、Flutter のリリースビルドでは展開領域全体が灰色（Grey Screen of Death）として描画され、内容が表示されなくなります。
+   - **対策**:
+     - `ExpansionTile` のキーには `PageStorageKey` ではなく、純粋な値比較を行う `ValueKey<String>` を使用してください。
+     - 展開領域の子要素には、無制限の高さ制約やスクロール位置復元の競合を引き起こす `ListView` を直接入れ子にせず、`Column` を使用するか、スクロールが必要な場合は `PageStorage` を分離してください。
+
+2. **BGM・効果音等のクレジット表示における集約・冗長性排除原則**:
+   - **設計方針**:
+     - 多数（数百件）に及ぶ音声アセットのクレジット表示において、個別ファイル名や個別用途をすべて列挙するアコーディオン構造はモバイル実機での閲覧・操作性が著しく低下します。
+     - 主要ライセンス（CC-BY 4.0、Pixabay Content License、商用フリー規約等）は「提供元」「作者」「ライセンス名」「元サイト（代表URL）」の表示によって要件を満たすため、個別楽曲名の列挙は不要です。
+     - Pixabayのように同一サービス内に多数のクリエイターが存在する場合は、「Pixabay コミュニティの各クリエイター」等の統合表記にしてサービス単位に集約してください。
+     - これにより、全10〜15件程度のフラットで視認性の高いカード一覧UIを構築し、軽量で直感的なUXを提供してください。
+
+3. **Flutter ウィジェットテストにおける日本語ロケール指定の徹底**:
+   - `MaterialApp` を用いたウィジェットテストでローカライズテキスト（日本語）の表示やボタン文言を検証する際は、テスト環境のデフォルトロケールが英語（`en`）となるため、必ず `MaterialApp(locale: const Locale('ja'), ...)` を明示的に指定してテストを実行してください。指定を怠ると、日本語文言の検索（`find.text(...)`）が一致せずテスト失敗（`Found 0 widgets`）の原因となります。
 
