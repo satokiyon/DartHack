@@ -299,7 +299,10 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(dropped_nopick, Behavior, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.nopick_dropped, Term_False,
             "ドロップアイテムを自動的に拾わない")
+    /* DartHack: dumplog is only present in instance_flags on Android. */
+#ifdef ANDROID
     NHOPTB(dumplog, General, 0, opt_in, set_in_game, On, Yes, No, No, NoAlias, &iflags.dumplog, Term_False, "（Android専用）ダンプログを出力する")
+#endif
     NHOPTC(dungeon, Advanced, MAXDCHARS + 1,opt_in, set_in_config,
                 No, Yes, No, No, NoAlias,
                 "ダンジョンマップ描画に使用するシンボルのリスト")
