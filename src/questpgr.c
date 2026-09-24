@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. */
 /* NetHack 5.0	questpgr.c	$NHDT-Date: 1704043695 2023/12/31 17:28:15 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.87 $ */
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -370,7 +370,7 @@ convert_arg(char c)
                                      flags.female);
         break;
     case 's':
-        str = (flags.female) ? "姉妹" : "兄弟";
+        str = "同胞";
         break;
     case 'S':
         str = (flags.female) ? "娘" : "息子";
@@ -833,4 +833,3 @@ deliver_splev_message(void)
 #undef QTEXT_FILE
 
 /*questpgr.c*/
-

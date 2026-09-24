@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. */
 /* NetHack 5.0	quest.c	$NHDT-Date: 1781973063 2026/06/20 16:31:03 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.48 $ */
 /*      Copyright 1991, M. Stephenson             */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -158,13 +158,14 @@ is_pure(boolean talk)
 
     if (wizard && talk) {
         if (u.ualign.type != original_alignment) {
-            You("今は%sで、元は%s.", align_str(u.ualign.type),
-                align_str(original_alignment));
+            pline("現在の属性は%s、元の属性は%s.",
+                  align_str(u.ualign.type),
+                  align_str(original_alignment));
         } else if (u.ualignbase[A_CURRENT] != original_alignment) {
-            You("改宗していた.");
+            You("改宗している.");
         } else if (u.ualign.record < MIN_QUEST_ALIGN) {
-            You("現在%dで必要値は%d.", u.ualign.record,
-                MIN_QUEST_ALIGN);
+            pline("アライメント値は%d（必要値は%d）.",
+                  u.ualign.record, MIN_QUEST_ALIGN);
             if (yn_function("アライメント値を調整しますか？ [y|n]", (char *) 0, 'y', TRUE) == 'y')
                 u.ualign.record = MIN_QUEST_ALIGN;
         }
@@ -241,10 +242,9 @@ finish_quest(struct obj *obj) /* quest artifact or thrown unique item or faux
         if (obj->otyp == AMULET_OF_YENDOR) {
             qt_pager("hasamulet");
         } else if (obj->otyp == FAKE_AMULET_OF_YENDOR) {
-            verbalize(
-      "Sorry to say, this is a mere imitation of the true Amulet of Yendor.");
+            verbalize("残念だが、これは本物のイェンダーの魔除けではなく、ただの偽物だ.");
         } else {
-            verbalize("ああ、%sを見つけたのか。", the(xname(obj)));
+            verbalize("ああ、%sを見つけたのか.", xname(obj));
         }
         return;
     }

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.645 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -99,7 +99,7 @@ static const char *const jp_trap_names[TRAPNUM] = {
     [TRAPDOOR] = "落とし戸",
     [TELEP_TRAP] = "テレポートの罠",
     [LEVEL_TELEP] = "階層テレポートの罠",
-    [MAGIC_PORTAL] = "魔法の門",
+    [MAGIC_PORTAL] = "魔法のポータル",
     [WEB] = "クモの巣",
     [STATUE_TRAP] = "石像の罠",
     [MAGIC_TRAP] = "魔法の罠",
@@ -7260,7 +7260,6 @@ trap_sanity_check(void)
 }
 
 /*trap.c*/
-
 
 
 
