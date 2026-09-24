@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. */
 /* NetHack 5.0  makedefs.c  $NHDT-Date: 1702948590 2023/12/19 01:16:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
@@ -40,18 +40,9 @@
 
 #ifdef MD_USE_TMPFILE_S
 #include <errno.h>
-staticfn ATTRNORETURN static void makedefs_exit(int how);
-staticfn const char * oldfunctionality(char sought);
-staticfn char * name_file(const char *template, const char *tag);
-staticfn FILE * getfp(const char *template, const char *tag, const char *mode, int flg);
-staticfn struct grep_var * grepsearch(const char *name);
-staticfn char * do_grep_control(char *buf);
-staticfn char * padline(char *line, unsigned padlength);
-staticfn char * fgetline(FILE *fd);
-staticfn char * macronamelimit(char *name, int pref);
-staticfn char * tmpdup(const char *str);
 #endif
 
+/* NetHackJP: NOSTATICFN makes staticfn empty; keep prototypes with static linkage below. */
 #define Fprintf (void) fprintf
 #define Fclose (void) fclose
 #define Unlink (void) unlink
@@ -2499,4 +2490,3 @@ struct attribs attrmax, attrmin;
 #endif /* STRICT_REF_DEF */
 
 /*makedefs.c*/
-

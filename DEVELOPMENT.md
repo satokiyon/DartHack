@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -490,12 +490,14 @@ GitHub CodeQL によるコードスキャン警告（Critical）を修正する�
      - `src/mon_jp.c`, `src/objnam.c`, `src/nhlua.c`, `src/options.c`, `src/jp_data_lookup.c`, `src/pager.c`, `src/polyself.c`, `src/rip.c`, `src/shknam.c`, `src/topten.c`, `src/mondata.c` 内のモジュール内限定独自ヘルパー関数（`jp_*` 等）に `static` 宣言を明示。`include/extern.h` に `flutter_putmixed_with_tile` のプロトタイプを追加。
   4. **型属性修復とシャドウイング防止 (`-Wdiscarded-qualifiers`, `-Wshadow`)**:
      - `src/botl.c` の `const char *beh_disp` 導入、および `src/mondata.c`, `src/objnam.c`, `src/pager.c` のローカル変数リネーム（`g_idx`, `g_glyph`, `local_genders`）。
+  5. **`util/makedefs.c` の MSVC C4211 警告解消**: `MD_USE_TMPFILE_S` 用の早期プロトタイプは、`NOSTATICFN` 環境で `staticfn` が空展開され、後段の `static` 宣言・定義とリンケージが衝突していた。後段に既存プロトタイプがあり、先行利用がないことを確認して重複プロトタイプを削除し、内部関数の `static` リンケージを維持する。
 
 * **アップストリーム追従・マージ判定手順**:
   1. **`tparm()` プロトタイプ**: アップストリーム側で可変長引数プロトタイプへの変更や `ncurses` ヘッダー利用への切り替えが入った場合は、本修正を取り消してアップストリームの実装に追従してください。
   2. **日本語固有関数 (`jp_*`) の `static` 宣言**: 日本語化固有のヘルパー関数に関する変更であるため、アップストリームマージ時もモジュール内閉塞（`static` 宣言）を維持してください。
   3. **固定バッファ拡大 (`BUFSZ` / `BUFSZ * 2`)**: 日本語 UTF-8 表示に必要なバッファ長確保（全角文字のバイト数膨張対応）であるため、アップストリームのコードと競合した場合は、バッファサイズ拡大を維持する形で競合を解決してください。
   4. **型修復・シャドウイング対策**: アップストリームで同等の型修正や変数名変更が入っている場合はアップストリームの表記に追従し、入っていない場合は型安全性維持のため本修正を保持してください。
+  5. **`makedefs.c` の関数プロトタイプ**: `MD_USE_TMPFILE_S` ブロック内の重複する早期プロトタイプを再導入しないでください。必要な宣言は各関数の既存宣言箇所に置き、`staticfn` と `static` のリンケージを一致させてください。
 
 ### 7. TTY 環境における `DEF_PAGER` の `_jp` ヘルプファイル優先検索と DLB フォールバック
 Linux/UNIX 環境の TTY モード（`wintty.c`）において、`DEF_PAGER`（外部ページャー `more`/`less` 等）使用時に日本語ファイル（`help_jp` 等）が優先オープンされるようにし、実ファイルがない場合は `dlb_fopen`（内部画面表示）に自動フォールバックする機能を追加しました。
