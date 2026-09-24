@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. */
 /* NetHack 5.0	dungeon.c	$NHDT-Date: 1781973047 2026/06/20 16:30:47 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.239 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2196,13 +2196,69 @@ unplaced_floater(struct dungeon *dptr)
     return FALSE;
 }
 
+/* NetHackJP: force connect Fort Ludios when teleporting to it */
+void
+force_connect_knox(void)
+{
+    d_level *source;
+    branch *br;
+    d_level cand;
+    int min_lev = 11;
+    int max_lev = depth(&medusa_level) - 1;
+    int lev;
+    int candidates[30];
+    int cand_count = 0;
+
+    br = dungeon_branch("Fort Ludios");
+    if (!br)
+        return;
+
+    if (on_level(&knox_level, &br->end1))
+        source = &br->end2;
+    else
+        source = &br->end1;
+
+    /* すでに配置済みなら何もしない */
+    if (source->dnum < svn.n_dgns)
+        return;
+
+    cand.dnum = oracle_level.dnum;
+    if (max_lev < min_lev)
+        max_lev = min_lev;
+
+    /* 11階〜メデューサ階の間で、他のブランチがなく、クエスト入口でもない階を探す */
+    for (lev = min_lev; lev <= max_lev; lev++) {
+        cand.dlevel = lev;
+        if (!Is_branchlev(&cand)) {
+            branch *qbr = dungeon_branch("The Quest");
+            if (qbr && on_level(&cand, &qbr->end1))
+                continue;
+            if (cand_count < (int) SIZE(candidates))
+                candidates[cand_count++] = lev;
+        }
+    }
+
+    if (cand_count > 0) {
+        cand.dlevel = candidates[rn2(cand_count)];
+    } else {
+        cand.dlevel = min_lev;
+    }
+
+    *source = cand;
+    insert_branch(br, TRUE);
+}
+
 staticfn boolean
 unreachable_level(d_level *lvl_p, boolean unplaced)
 {
     s_level *dummy;
 
-    if (unplaced)
+    if (unplaced) {
+        /* NetHackJP: Allow wizard to select unplaced Fort Ludios in ^V menu */
+        if (wizard && on_level(lvl_p, &knox_level))
+            return FALSE;
         return TRUE;
+    }
     if (In_endgame(&u.uz) && !In_endgame(lvl_p))
         return TRUE;
     if ((dummy = find_level("dummy")) != 0 && on_level(lvl_p, &dummy->dlevel))

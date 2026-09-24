@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. */
 /* NetHack 5.0	teleport.c	$NHDT-Date: 1781973069 2026/06/20 16:31:09 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.246 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1233,6 +1233,9 @@ level_tele(void)
 
                 newlevel.dnum = destdnum;
                 newlevel.dlevel = destlev;
+                /* NetHackJP: フォートノックスへのテレポート時、未配置ならメインダンジョンへ安全に接続 */
+                if (on_level(&newlevel, &knox_level))
+                    force_connect_knox();
                 if (In_endgame(&newlevel) && !In_endgame(&u.uz)) {
                     struct obj *amu;
 
@@ -1426,6 +1429,9 @@ level_tele(void)
             return;
         }
     }
+    /* NetHackJP: フォートノックスへの移動時、未配置なら安全に接続する */
+    if (on_level(&newlevel, &knox_level))
+        force_connect_knox();
 
     schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0,
                   flags.verbose ? "あなたは別の階に実体化した!"
