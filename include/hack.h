@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. */
 /* NetHack 5.0	hack.h	$NHDT-Date: 1781973080 2026/06/20 16:31:20 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.299 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
@@ -1575,8 +1575,11 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 
 #define DEVTEAM_EMAIL "darthack823@gmail.com"
 #define DEVTEAM_URL "https://satokiyon.github.io/nethackjp-site/"
+
+#ifndef __cplusplus
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 #include "nhlua.h"
+#endif
 #endif
 
 #if !defined(RECOVER_C)
