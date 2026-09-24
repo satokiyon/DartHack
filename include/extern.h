@@ -938,6 +938,8 @@ extern boolean Invocation_lev(d_level *) NONNULLARG1;
 extern xint16 level_difficulty(void);
 extern schar lev_by_name(const char *);
 extern schar print_dungeon(boolean, schar *, xint16 *);
+/* NetHackJP: force connect Fort Ludios when teleporting to it */
+extern void force_connect_knox(void);
 extern void print_level_annotation(void);
 extern int donamelevel(void);
 extern void free_exclusions(void);

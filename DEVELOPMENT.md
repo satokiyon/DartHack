@@ -785,8 +785,23 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **マーカータグ**: `/* NetHackJP: Japanese labels */` / `/* NetHackJP: display label in Japanese; widget name stays English ... */` / `/* NetHackJP: refresh every role radio widget's Japanese label ... */` 等。
 * **対応ファイル**: `win/X11/winmisc.c`
 * **検証**: WSL (Ubuntu 26.04) で X11 ビルド成功。`./playground/nethack -wX11` で plsel ダイアログ / prompts 経路の両方の目視確認を行う予定（従来キー操作の互換性も確認）。
+### 23. Wizardモードにおける未配置フォートノックス砦への階層テレポート選択許可と安全な自動配置
+* **背景**:
+  Wizard（デバッグ）モードにおいて、階層テレポートコマンド `^V` を実行し、`?` を入力して表示されるダンジョン一覧メニューにおいて、フォートノックス砦（Fort Ludios）が一覧に表示されているにもかかわらず選択できない（セレクタ記号が付かない）問題がありました。
+  これはフォートノックスがメインダンジョンにポータル出現する前は未配置（unplaced floater）として扱われ、`unreachable_level()` が一律 `TRUE` を返していたためです。
+  しかし、単に選択可能にするだけでは、フォートノックス内に生成される脱出ポータルの戻り先ダンジョン番号が無効値（`svn.n_dgns`）のままとなり、脱出ポータルを踏んだ際に配列境界外アクセスでクラッシュする潜在バグがありました。
+* **修正内容**:
+  1. `src/dungeon.c`: `unreachable_level()` において、Wizardモードかつ目的地が `knox_level` の場合は未配置でも到達可能（`cannotreach = FALSE`）と判定し、メニューで選択できるように変更。
+  2. `src/dungeon.c` / `include/extern.h`: `force_connect_knox(void)` を新設。未配置の状態でフォートノックスへテレポートする際、メインダンジョンの正規出現範囲（11階〜メデューサ階）で空いている階層をランダムに決定し、フォートノックスのブランチ入口として正式に接続・配置（`insert_branch`）する処理を実装。
+  3. `src/teleport.c`: `level_tele()` のメニュー選択完了時およびテレポート実行直前に、目的地が `knox_level` であれば `force_connect_knox()` を呼び出して事前に接続を完了させる安全ガードを追加。
+* **マーカータグ**:
+  - `/* NetHackJP: Allow wizard to select unplaced Fort Ludios in ^V menu */` (`src/dungeon.c`)
+  - `/* NetHackJP: force connect Fort Ludios when teleporting to it */` (`src/dungeon.c`, `include/extern.h`)
+  - `/* NetHackJP: フォートノックスへのテレポート時、未配置ならメインダンジョンへ安全に接続 */` (`src/teleport.c`)
+  - `/* NetHackJP: フォートノックスへの移動時、未配置なら安全に接続する */` (`src/teleport.c`)
+* **対応ファイル**: `include/extern.h`, `src/dungeon.c`, `src/teleport.c`
 * **アップストリーム追従手順**:
-  上流側で plsel ウィジェット構成が変わった場合、日本語ラベルの割当 (`XtNlabel`) と `plsel_update_role_labels()` の呼び出しポイントを維持したまま移植する。ウィジェット名を日本語に置き換えないこと（ASCII キー選択互換のため）。
+  上流 NetHack-5.0 で `unreachable_level` や浮動ブランチのテレポート制御が改修された場合は、本マーカータグのブロックを確認し、フォートノックスへの到達性と安全接続処理を維持した状態で競合解決を行ってください。
 ---
 
 ## 5. ライセンスと NetHack License 2(a) への対応方針
