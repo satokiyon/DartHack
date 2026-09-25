@@ -15,6 +15,7 @@ import 'nethack_shortcut_pad.dart';
 import 'nethack_ffi.dart';
 import 'settings_page.dart';
 import 'utils/defaults_helper.dart';
+import 'utils/nethack_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'amount_selector_dialog.dart';
 import 'utils/scale_clamp.dart';
@@ -95,7 +96,7 @@ class MyAppState extends State<MyApp> {
       locale: Locale(_localeStr),
       theme: ThemeData.dark(useMaterial3: true).copyWith(
         colorScheme: const ColorScheme.dark(
-          primary: Colors.deepPurple,
+          primary: Color(0xFFCE93D8), // ラベンダーパープル: 黒背景で極めて高い視認性 (コントラスト比 約 8.1:1)
           secondary: Colors.amber,
         ),
         highlightColor: Colors.white.withValues(alpha: 0.25),
@@ -111,7 +112,9 @@ class MyAppState extends State<MyApp> {
           ),
         ),
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom().copyWith(
+          style: TextButton.styleFrom(
+            foregroundColor: const Color(0xFFCE93D8),
+          ).copyWith(
             overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
               if (states.contains(WidgetState.pressed)) {
                 return Colors.white.withValues(alpha: 0.25);
@@ -3185,29 +3188,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   );
 }
 
-  // DartHackカラーテーブル
-  Color _getNhColor(int colorIndex) {
-    switch (colorIndex) {
-      case 0: return Colors.black; // CLR_BLACK
-      case 1: return Colors.red; // CLR_RED
-      case 2: return Colors.green; // CLR_GREEN
-      case 3: return const Color(0xFF8B4513); // CLR_BROWN (サドルブラウン等)
-      case 4: return Colors.blue; // CLR_BLUE
-      case 5: return Colors.purple; // CLR_MAGENTA
-      case 6: return Colors.cyan; // CLR_CYAN
-      case 7: return Colors.grey; // CLR_GRAY
-      case 8: return Colors.white70; // CLR_NO_COLOR
-      case 9: return Colors.orange; // CLR_ORANGE
-      case 10: return Colors.lightGreen; // CLR_BRIGHT_GREEN
-      case 11: return Colors.yellow; // CLR_YELLOW
-      case 12: return Colors.lightBlue; // CLR_BRIGHT_BLUE
-      case 13: return Colors.pinkAccent; // CLR_BRIGHT_MAGENTA
-      case 14: return Colors.cyanAccent; // CLR_BRIGHT_CYAN
-      case 15: return Colors.white; // CLR_WHITE
-      default: return Colors.white;
-    }
-  }
-
   // ステータス行の \CXXXXXXXX と \c マークアップパース処理
   TextSpan _parseStatusLine(String line) {
     // 1. まず、金貨のエスケープ \G が残っていれば $: に置換する (フォールバック)
@@ -3234,7 +3214,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       } else {
         final hexStr = match.group(1)!;
         final colorIndex = int.tryParse(hexStr, radix: 16) ?? 15;
-        currentColor = _getNhColor(colorIndex);
+        currentColor = NethackColors.getNhColor(colorIndex);
       }
       
       lastIndex = match.end;
