@@ -117,8 +117,10 @@ class _SettingsPageState extends State<SettingsPage> {
   // ショートカット設定 (0～8)
   final List<String> _shortcuts = List.filled(9, "");
   final List<String> _defaultShortcuts = [
-    'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', r'\\e'
+    'i', '/', ',', '#therecmdmenu', '#herecmdmenu', '#chat', 'e', '^a', r'\e'
   ];
+
+  String _buttonDisplayMode = 'label';
 
   String _getShortcutButtonLabel(AppLocalizations l10n, int index) {
     final positions = [
@@ -300,20 +302,23 @@ class _SettingsPageState extends State<SettingsPage> {
       }
 
       _showPanelNames = prefs.getBool('show_panel_names') ?? true;
+      _buttonDisplayMode = prefs.getString('button_display_mode') ?? 'label';
 
       // コマンドパネル情報のロード
-      final int panelCount = prefs.getInt('panel_count') ?? 1;
+      final bool hasSavedPanels = prefs.containsKey('panel_count');
+      final int panelCount = prefs.getInt('panel_count') ?? NetHackCmdPanel.defaultPanels.length;
       _panels.clear();
-      final p0Name = prefs.getString('pName_0') ?? "標準パネル";
-      final p0CmdsStr = prefs.getString('pCmdString_0') ?? "標準"; // 後続処理の初期値に合わせる
-      _panels.add({
-        'name': p0Name,
-        'cmds': p0CmdsStr == "標準" ? "[Kbd] # 20s . : ; , e d r z Z q t f w x i E Q P R W T o ^d ^p a A ^t D F p ^x ^o ?" : p0CmdsStr,
-      });
 
-      for (int i = 1; i < panelCount; i++) {
-        final name = prefs.getString('pName_$i') ?? "パネル ${i + 1}";
-        final cmdsStr = prefs.getString('pCmdString_$i') ?? "";
+      for (int i = 0; i < panelCount; i++) {
+        String defaultName = "パネル ${i + 1}";
+        String defaultCmds = "";
+        if (i < NetHackCmdPanel.defaultPanels.length) {
+          defaultName = NetHackCmdPanel.defaultPanels[i]['nameJp']!;
+          defaultCmds = NetHackCmdPanel.defaultPanels[i]['cmds']!;
+        }
+
+        final name = prefs.getString('pName_$i') ?? defaultName;
+        final cmdsStr = prefs.getString('pCmdString_$i') ?? (hasSavedPanels && i >= NetHackCmdPanel.defaultPanels.length ? "" : defaultCmds);
         _panels.add({
           'name': name,
           'cmds': cmdsStr,
@@ -789,6 +794,23 @@ class _SettingsPageState extends State<SettingsPage> {
                 if (val != null) {
                   setState(() => _controllerMode = val);
                   _saveSetting('controller_mode', val);
+                }
+              },
+            ),
+          ),
+          ListTile(
+            title: Text(l10n.buttonDisplayModeTitle),
+            subtitle: Text(l10n.buttonDisplayModeSub),
+            trailing: DropdownButton<String>(
+              value: _buttonDisplayMode,
+              items: [
+                DropdownMenuItem(value: 'label', child: Text(l10n.btnDisplayModeLabel)),
+                DropdownMenuItem(value: 'cmd', child: Text(l10n.btnDisplayModeCmd)),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _buttonDisplayMode = val);
+                  _saveSetting('button_display_mode', val);
                 }
               },
             ),
@@ -1392,7 +1414,11 @@ class _SettingsPageState extends State<SettingsPage> {
               final raw = _shortcuts[index];
               final parsed = CmdItem.parseCmds(raw);
               final item = parsed.isNotEmpty ? parsed.first : CmdItem(command: raw);
-              final displayStr = item.displayLabel;
+              final isJa = Localizations.localeOf(context).languageCode == 'ja';
+              final displayStr = item.getEffectiveLabel(
+                showLabel: _buttonDisplayMode == 'label',
+                langCode: isJa ? 'ja' : 'en',
+              );
               return ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[900],
@@ -1417,7 +1443,48 @@ class _SettingsPageState extends State<SettingsPage> {
               );
             },
           ),
+          Padding(
+            padding: const EdgeInsets.only(right: 12, bottom: 8),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                icon: const Icon(Icons.refresh, size: 18, color: Colors.orangeAccent),
+                label: Text(l10n.resetAllShortcuts, style: const TextStyle(color: Colors.orangeAccent)),
+                onPressed: _showResetShortcutsConfirmDialog,
+              ),
+            ),
+          ),
         ]),
+      ),
+    );
+  }
+
+  void _showResetShortcutsConfirmDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.resetAllShortcutsConfirmTitle),
+        content: Text(l10n.resetAllShortcutsConfirmMsg),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final prefs = await SharedPreferences.getInstance();
+              for (int i = 0; i < 9; i++) {
+                await prefs.remove('shortcut_btn_$i');
+                _shortcuts[i] = _defaultShortcuts[i];
+              }
+              setState(() {});
+            },
+            child: Text(l10n.confirm),
+          ),
+        ],
       ),
     );
   }
@@ -1969,8 +2036,20 @@ class _SettingsPageState extends State<SettingsPage> {
     final l10n = AppLocalizations.of(context);
     final isJp = Localizations.localeOf(context).languageCode == 'ja';
     if (index == 0) {
-      if (rawName.isEmpty || rawName == "標準パネル" || rawName == "Default Panel") {
-        return l10n?.defaultPanelName ?? (isJp ? "標準パネル" : "Default Panel");
+      if (rawName.isEmpty || rawName == "標準" || rawName == "標準パネル" || rawName == "Default" || rawName == "Default Panel") {
+        return l10n?.panelNameDefault ?? (isJp ? "標準" : "Default");
+      }
+    } else if (index == 1) {
+      if (rawName.isEmpty || rawName == "戦闘" || rawName == "Combat") {
+        return l10n?.panelNameCombat ?? (isJp ? "戦闘" : "Combat");
+      }
+    } else if (index == 2) {
+      if (rawName.isEmpty || rawName == "道具" || rawName == "Items") {
+        return l10n?.panelNameItems ?? (isJp ? "道具" : "Items");
+      }
+    } else if (index == 3) {
+      if (rawName.isEmpty || rawName == "情報" || rawName == "Info") {
+        return l10n?.panelNameInfo ?? (isJp ? "情報" : "Info");
       }
     } else {
       final defaultJp = "パネル ${index + 1}";
@@ -2070,10 +2149,44 @@ class _SettingsPageState extends State<SettingsPage> {
       await prefs.setString('pCmdString_$i', _panels[i]['cmds']);
     }
     // 古い定義を消去
-    for (int i = _panels.length; i < 10; i++) {
+    for (int i = _panels.length; i < 20; i++) {
       await prefs.remove('pName_$i');
       await prefs.remove('pCmdString_$i');
     }
+  }
+
+  void _showResetPanelsConfirmDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.resetAllPanelsConfirmTitle),
+        content: Text(l10n.resetAllPanelsConfirmMsg),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              setState(() {
+                _panels.clear();
+                for (final dp in NetHackCmdPanel.defaultPanels) {
+                  _panels.add({
+                    'name': dp['name'] ?? '',
+                    'cmds': dp['cmds'] ?? '',
+                  });
+                }
+              });
+              await _savePanels();
+            },
+            child: Text(l10n.confirm),
+          ),
+        ],
+      ),
+    );
   }
 
   void _appendCmdToController(TextEditingController controller, String cmdToAppend) {
@@ -2232,9 +2345,23 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.add, color: Colors.green),
-            title: Text(l10n.addNewPanel),
+            leading: Icon(
+              Icons.add,
+              color: _panels.length < 7 ? Colors.green : Colors.grey,
+            ),
+            title: Text(
+              '${l10n.addNewPanel} (${_panels.length}/7)',
+              style: TextStyle(
+                color: _panels.length < 7 ? null : Colors.grey,
+              ),
+            ),
             onTap: () {
+              if (_panels.length >= 7) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.maxPanelsReached)),
+                );
+                return;
+              }
               setState(() {
                 _panels.add({
                   'name': l10n.panelNName((_panels.length + 1).toString()),
@@ -2243,6 +2370,17 @@ class _SettingsPageState extends State<SettingsPage> {
               });
               _savePanels();
             },
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 12, bottom: 8),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                icon: const Icon(Icons.refresh, size: 18, color: Colors.orangeAccent),
+                label: Text(l10n.resetAllPanels, style: const TextStyle(color: Colors.orangeAccent)),
+                onPressed: _showResetPanelsConfirmDialog,
+              ),
+            ),
           ),
         ]),
       ),

@@ -736,12 +736,67 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cmdListHelper => 'Enter commands separated by spaces';
 
   @override
-  String get defaultPanelName => 'Default Panel';
+  String get defaultPanelName => 'Default';
+
+  @override
+  String get panelNameDefault => 'Default';
+
+  @override
+  String get panelNameCombat => 'Combat';
+
+  @override
+  String get panelNameItems => 'Items';
+
+  @override
+  String get panelNameInfo => 'Info';
 
   @override
   String panelNName(Object index) {
     return 'Panel $index';
   }
+
+  @override
+  String get buttonDisplayModeTitle => 'Button Display Mode';
+
+  @override
+  String get buttonDisplayModeSub =>
+      'Configure display text for command panels and shortcuts';
+
+  @override
+  String get btnDisplayModeLabel => 'Show Labels';
+
+  @override
+  String get btnDisplayModeCmd => 'Show Commands';
+
+  @override
+  String get maxPanelsReached => 'Maximum of 7 command panels reached';
+
+  @override
+  String get resetAllPanels => 'Reset Panels to Default';
+
+  @override
+  String get resetAllPanelsConfirmTitle => 'Reset Command Panels';
+
+  @override
+  String get resetAllPanelsConfirmMsg =>
+      'Reset all command panels to the default configuration (4 specialized panels)? Your current customizations will be lost.';
+
+  @override
+  String get resetAllShortcuts => 'Reset Shortcuts to Default';
+
+  @override
+  String get resetAllShortcutsConfirmTitle => 'Reset Shortcuts';
+
+  @override
+  String get resetAllShortcutsConfirmMsg =>
+      'Reset all shortcuts to the default configuration (9 frequent buttons)? Your current customizations will be lost.';
+
+  @override
+  String get btnLabelHelperDefault =>
+      'Leave empty to use default label or command name';
+
+  @override
+  String get btnLabelHelperCommand => 'Leave empty to use command name';
 
   @override
   String get secGameRulesTitle => 'Game Rules & Options (defaults.nh)';

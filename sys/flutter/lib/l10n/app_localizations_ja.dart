@@ -729,12 +729,65 @@ class AppLocalizationsJa extends AppLocalizations {
   String get cmdListHelper => 'スペース区切りでコマンドを入力してください';
 
   @override
-  String get defaultPanelName => '標準パネル';
+  String get defaultPanelName => '標準';
+
+  @override
+  String get panelNameDefault => '標準';
+
+  @override
+  String get panelNameCombat => '戦闘';
+
+  @override
+  String get panelNameItems => '道具';
+
+  @override
+  String get panelNameInfo => '情報';
 
   @override
   String panelNName(Object index) {
     return 'パネル $index';
   }
+
+  @override
+  String get buttonDisplayModeTitle => 'ボタン表示形式';
+
+  @override
+  String get buttonDisplayModeSub => 'コマンドパネルおよびショートカットの表示文字を設定します';
+
+  @override
+  String get btnDisplayModeLabel => 'ラベルを表示';
+
+  @override
+  String get btnDisplayModeCmd => 'コマンドをそのまま表示';
+
+  @override
+  String get maxPanelsReached => 'コマンドパネルは最大7つまで作成できます';
+
+  @override
+  String get resetAllPanels => 'パネル設定をデフォルトに戻す';
+
+  @override
+  String get resetAllPanelsConfirmTitle => 'パネル設定のリセット';
+
+  @override
+  String get resetAllPanelsConfirmMsg =>
+      'すべてのコマンドパネルを初期設定（4種類の特化パネル）に戻しますか？現在のカスタマイズは失われます。';
+
+  @override
+  String get resetAllShortcuts => 'ショートカットをデフォルトに戻す';
+
+  @override
+  String get resetAllShortcutsConfirmTitle => 'ショートカットのリセット';
+
+  @override
+  String get resetAllShortcutsConfirmMsg =>
+      'すべてのショートカットボタンを初期設定（9個の頻出ボタン）に戻しますか？現在のカスタマイズは失われます。';
+
+  @override
+  String get btnLabelHelperDefault => '空にすると既定のラベル（未定義時はコマンド名）が表示されます';
+
+  @override
+  String get btnLabelHelperCommand => '空にするとコマンド名がそのまま表示されます';
 
   @override
   String get secGameRulesTitle => 'ゲームルール・プレイ設定 (defaults.nh)';

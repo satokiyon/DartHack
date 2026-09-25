@@ -1499,14 +1499,116 @@ abstract class AppLocalizations {
   /// No description provided for @defaultPanelName.
   ///
   /// In ja, this message translates to:
-  /// **'標準パネル'**
+  /// **'標準'**
   String get defaultPanelName;
+
+  /// No description provided for @panelNameDefault.
+  ///
+  /// In ja, this message translates to:
+  /// **'標準'**
+  String get panelNameDefault;
+
+  /// No description provided for @panelNameCombat.
+  ///
+  /// In ja, this message translates to:
+  /// **'戦闘'**
+  String get panelNameCombat;
+
+  /// No description provided for @panelNameItems.
+  ///
+  /// In ja, this message translates to:
+  /// **'道具'**
+  String get panelNameItems;
+
+  /// No description provided for @panelNameInfo.
+  ///
+  /// In ja, this message translates to:
+  /// **'情報'**
+  String get panelNameInfo;
 
   /// No description provided for @panelNName.
   ///
   /// In ja, this message translates to:
   /// **'パネル {index}'**
   String panelNName(Object index);
+
+  /// No description provided for @buttonDisplayModeTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'ボタン表示形式'**
+  String get buttonDisplayModeTitle;
+
+  /// No description provided for @buttonDisplayModeSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'コマンドパネルおよびショートカットの表示文字を設定します'**
+  String get buttonDisplayModeSub;
+
+  /// No description provided for @btnDisplayModeLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'ラベルを表示'**
+  String get btnDisplayModeLabel;
+
+  /// No description provided for @btnDisplayModeCmd.
+  ///
+  /// In ja, this message translates to:
+  /// **'コマンドをそのまま表示'**
+  String get btnDisplayModeCmd;
+
+  /// No description provided for @maxPanelsReached.
+  ///
+  /// In ja, this message translates to:
+  /// **'コマンドパネルは最大7つまで作成できます'**
+  String get maxPanelsReached;
+
+  /// No description provided for @resetAllPanels.
+  ///
+  /// In ja, this message translates to:
+  /// **'パネル設定をデフォルトに戻す'**
+  String get resetAllPanels;
+
+  /// No description provided for @resetAllPanelsConfirmTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'パネル設定のリセット'**
+  String get resetAllPanelsConfirmTitle;
+
+  /// No description provided for @resetAllPanelsConfirmMsg.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべてのコマンドパネルを初期設定（4種類の特化パネル）に戻しますか？現在のカスタマイズは失われます。'**
+  String get resetAllPanelsConfirmMsg;
+
+  /// No description provided for @resetAllShortcuts.
+  ///
+  /// In ja, this message translates to:
+  /// **'ショートカットをデフォルトに戻す'**
+  String get resetAllShortcuts;
+
+  /// No description provided for @resetAllShortcutsConfirmTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'ショートカットのリセット'**
+  String get resetAllShortcutsConfirmTitle;
+
+  /// No description provided for @resetAllShortcutsConfirmMsg.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべてのショートカットボタンを初期設定（9個の頻出ボタン）に戻しますか？現在のカスタマイズは失われます。'**
+  String get resetAllShortcutsConfirmMsg;
+
+  /// No description provided for @btnLabelHelperDefault.
+  ///
+  /// In ja, this message translates to:
+  /// **'空にすると既定のラベル（未定義時はコマンド名）が表示されます'**
+  String get btnLabelHelperDefault;
+
+  /// No description provided for @btnLabelHelperCommand.
+  ///
+  /// In ja, this message translates to:
+  /// **'空にするとコマンド名がそのまま表示されます'**
+  String get btnLabelHelperCommand;
 
   /// No description provided for @secGameRulesTitle.
   ///

@@ -15,6 +15,21 @@ class CmdItem {
     if (command == r'\e' || command == '\x1b' || command == '^[') return 'Esc';
     return command;
   }
+
+  String getEffectiveLabel({required bool showLabel, required String langCode}) {
+    if (label.isNotEmpty) return label;
+    if (command == r'\n' || command == r'\r' || command == '\n' || command == '\r') return 'Enter';
+    if (command == r'\s' || command == ' ') return 'Space';
+    if (command == r'\e' || command == '\x1b' || command == '^[') return 'Esc';
+
+    if (showLabel) {
+      final dict = NetHackCmdPanel.commandLabelDictionary[command];
+      if (dict != null) {
+        return dict[langCode] ?? dict['en'] ?? command;
+      }
+    }
+    return command;
+  }
   bool get hasLabel => label.isNotEmpty;
 
   static String escape(String str) {
@@ -35,7 +50,14 @@ class CmdItem {
         sb.write(char);
         esc = false;
       } else if (char == '\\') {
-        esc = true;
+        if (i + 1 < cmds.length) {
+          final nextChar = cmds[i + 1];
+          if (nextChar == '\\' || nextChar == '|' || nextChar == ' ') {
+            esc = true;
+            continue;
+          }
+        }
+        sb.write(char);
       } else if (char == '|') {
         parts.add(sb.toString());
         sb = StringBuffer();
@@ -107,6 +129,225 @@ class NetHackCmdPanel extends StatefulWidget {
     this.onExpandedChanged,
   });
 
+  static const int maxPanelCount = 7;
+
+  static const List<Map<String, String>> defaultPanels = [
+    {
+      'nameJp': '標準',
+      'nameEn': 'Default',
+      'cmds': r'[Kbd] # 20s . : ; d q t f x a E ^p ^t D p M-p M-o M-w',
+    },
+    {
+      'nameJp': '戦闘',
+      'nameEn': 'Combat',
+      'cmds': r't f Q r z Z + ^d x X w a W P R T A M-e M-t \e M-m M-i',
+    },
+    {
+      'nameJp': '道具',
+      'nameEn': 'Items',
+      'cmds': r'i a , d D M-l q r M-d C M-r M-T *',
+    },
+    {
+      'nameJp': '情報',
+      'nameEn': 'Info',
+      'cmds': r'? & / ; : ^x + \\ v M-e M-C ^p ^o M-A #terrain O M-V M-g',
+    },
+  ];
+
+  static const Map<String, Map<String, String>> commandLabelDictionary = {
+    'i': {'ja': '持ち物', 'en': 'Inv'},
+    'a': {'ja': '使用', 'en': 'Apply'},
+    ',': {'ja': '拾う', 'en': 'Pick'},
+    'd': {'ja': '置く', 'en': 'Drop'},
+    'D': {'ja': '複数置', 'en': 'DropT'},
+    'q': {'ja': '飲む', 'en': 'Quaff'},
+    'r': {'ja': '読む', 'en': 'Read'},
+    'e': {'ja': '食べる', 'en': 'Eat'},
+    'w': {'ja': '構える', 'en': 'Wield'},
+    'x': {'ja': '持ち替', 'en': 'Swap'},
+    'X': {'ja': '二刀流', 'en': 'TwoWep'},
+    't': {'ja': '投げる', 'en': 'Throw'},
+    'f': {'ja': '射撃', 'en': 'Fire'},
+    'Q': {'ja': '矢筒', 'en': 'Quiver'},
+    'z': {'ja': '杖', 'en': 'Zap'},
+    'Z': {'ja': '詠唱', 'en': 'Cast'},
+    '+': {'ja': '呪文', 'en': 'Spells'},
+    'W': {'ja': '着る', 'en': 'Wear'},
+    'T': {'ja': '脱ぐ', 'en': 'Takeoff'},
+    'A': {'ja': '全脱', 'en': 'TakeAll'},
+    'P': {'ja': 'はめる', 'en': 'Puton'},
+    'R': {'ja': '外す', 'en': 'Remove'},
+    'E': {'ja': '彫る', 'en': 'Engr'},
+    'C': {'ja': '名付け', 'en': 'Name'},
+    'o': {'ja': '開ける', 'en': 'Open'},
+    'c': {'ja': '閉める', 'en': 'Close'},
+    's': {'ja': '捜索', 'en': 'Search'},
+    '<': {'ja': '上る', 'en': 'Up'},
+    '>': {'ja': '下りる', 'en': 'Down'},
+    '.': {'ja': '待機', 'en': 'Wait'},
+    '20s': {'ja': '20探索', 'en': '20Srch'},
+    '_': {'ja': '移動', 'en': 'Travel'},
+    '?': {'ja': 'ヘルプ', 'en': 'Help'},
+    '/': {'ja': '記号', 'en': 'WhatIs'},
+    ';': {'ja': 'カーソル', 'en': 'Look'},
+    ':': {'ja': '足元', 'en': 'Here'},
+    '&': {'ja': '説明', 'en': 'WhatDo'},
+    r'\': {'ja': '発見品', 'en': 'Discov'},
+    'v': {'ja': '実績', 'en': 'Chron'},
+    '#chronicle': {'ja': '実績', 'en': 'Chron'},
+    'O': {'ja': '設定', 'en': 'Option'},
+    'S': {'ja': 'セーブ', 'en': 'Save'},
+    'p': {'ja': '支払う', 'en': 'Pay'},
+    'F': {'ja': '強制攻撃', 'en': 'Fight'},
+    '*': {'ja': '装備一覧', 'en': 'SeeAll'},
+    '^': {'ja': '罠確認', 'en': 'Trap'},
+    '^a': {'ja': '再実行', 'en': 'Again'},
+    '^d': {'ja': '蹴る', 'en': 'Kick'},
+    '^t': {'ja': 'テレポ', 'en': 'Tele'},
+    '^p': {'ja': '履歴', 'en': 'Prev'},
+    '^x': {'ja': '属性', 'en': 'Attrib'},
+    '^o': {'ja': '迷宮概要', 'en': 'Overvw'},
+    '#overview': {'ja': '迷宮概要', 'en': 'Overvw'},
+    'M-e': {'ja': '強化', 'en': 'Enhan'},
+    'M-t': {'ja': '退散', 'en': 'Turn'},
+    'M-m': {'ja': '怪物能力', 'en': 'Monst'},
+    'M-i': {'ja': '発動', 'en': 'Invoke'},
+    'M-l': {'ja': 'あさる', 'en': 'Loot'},
+    'M-d': {'ja': '浸す', 'en': 'Dip'},
+    'M-r': {'ja': 'こする', 'en': 'Rub'},
+    'M-T': {'ja': '空にする', 'en': 'Tip'},
+    'M-p': {'ja': '祈る', 'en': 'Pray'},
+    'M-o': {'ja': '捧げる', 'en': 'Offer'},
+    'M-j': {'ja': '跳ぶ', 'en': 'Jump'},
+    'M-u': {'ja': '罠解除', 'en': 'Untrap'},
+    'M-R': {'ja': '乗る', 'en': 'Ride'},
+    'M-A': {'ja': '注釈', 'en': 'Annot'},
+    'M-s': {'ja': '座る', 'en': 'Sit'},
+    'M-f': {'ja': 'こじ開', 'en': 'Force'},
+    'M-C': {'ja': '禁忌', 'en': 'Cond'},
+    'M-V': {'ja': '討伐', 'en': 'Vanq'},
+    'M-g': {'ja': '虐殺', 'en': 'Geno'},
+    'M-w': {'ja': '拭く', 'en': 'Wipe'},
+    'M-c': {'ja': '会話', 'en': 'Chat'},
+    '#chat': {'ja': '会話', 'en': 'Chat'},
+    '#terrain': {'ja': '地形', 'en': 'Terrain'},
+    '#therecmdmenu': {'ja': 'そこ', 'en': 'There'},
+    '#herecmdmenu': {'ja': 'ここ', 'en': 'Here'},
+    r'\e': {'ja': 'Esc', 'en': 'Esc'},
+    r'\n': {'ja': 'Enter', 'en': 'Enter'},
+    r'\s': {'ja': 'Space', 'en': 'Space'},
+    r'\b': {'ja': 'BS', 'en': 'BS'},
+    '[': {'ja': '鎧一覧', 'en': 'Armors'},
+    '=': {'ja': '指輪一覧', 'en': 'Rings'},
+    '(': {'ja': '道具一覧', 'en': 'Tools'},
+    ')': {'ja': '武器一覧', 'en': 'Weapons'},
+    '"': {'ja': '護符一覧', 'en': 'Amulet'},
+    r'$': {'ja': '所持金', 'en': 'Gold'},
+    'I': {'ja': '種別所持', 'en': 'TypeInv'},
+    '@': {'ja': '自動拾い', 'en': 'AutoPick'},
+    'V': {'ja': '版詳細', 'en': 'VerInfo'},
+    'M-a': {'ja': '整理', 'en': 'Adjust'},
+    'M-n': {'ja': '名付け', 'en': 'Name'},
+    'M-X': {'ja': '探索Mode', 'en': 'Explore'},
+    'M-v': {'ja': '版情報', 'en': 'Version'},
+    'M-?': {'ja': 'コマンド', 'en': 'CmdList'},
+    '^r': {'ja': '再描画', 'en': 'Redraw'},
+    '^_': {'ja': '再移動', 'en': 'ReTravel'},
+    'm': {'ja': 'メニュー', 'en': 'ReqMenu'},
+    'G': {'ja': '走る', 'en': 'Run'},
+    'g': {'ja': '急ぐ', 'en': 'Rush'},
+    '|': {'ja': '所持スク', 'en': 'PermInv'},
+    '`': {'ja': '既知種別', 'en': 'KwnClass'},
+    '#adjust': {'ja': '整理', 'en': 'Adjust'},
+    '#annotate': {'ja': '注釈', 'en': 'Annot'},
+    '#apply': {'ja': '使用', 'en': 'Apply'},
+    '#attributes': {'ja': '属性', 'en': 'Attrib'},
+    '#autopickup': {'ja': '自動拾い', 'en': 'AutoPick'},
+    '#call': {'ja': '名付け', 'en': 'Name'},
+    '#name': {'ja': '名付け', 'en': 'Name'},
+    '#cast': {'ja': '詠唱', 'en': 'Cast'},
+    '#close': {'ja': '閉める', 'en': 'Close'},
+    '#conduct': {'ja': '禁忌', 'en': 'Cond'},
+    '#dip': {'ja': '浸す', 'en': 'Dip'},
+    '#down': {'ja': '下りる', 'en': 'Down'},
+    '#drop': {'ja': '置く', 'en': 'Drop'},
+    '#droptype': {'ja': '複数置', 'en': 'DropT'},
+    '#eat': {'ja': '食べる', 'en': 'Eat'},
+    '#engrave': {'ja': '彫る', 'en': 'Engr'},
+    '#enhance': {'ja': '強化', 'en': 'Enhan'},
+    '#exploremode': {'ja': '探索Mode', 'en': 'Explore'},
+    '#fight': {'ja': '強制攻撃', 'en': 'Fight'},
+    '#fire': {'ja': '射撃', 'en': 'Fire'},
+    '#force': {'ja': 'こじ開', 'en': 'Force'},
+    '#genocided': {'ja': '虐殺', 'en': 'Geno'},
+    '#glance': {'ja': 'カーソル', 'en': 'Look'},
+    '#help': {'ja': 'ヘルプ', 'en': 'Help'},
+    '#history': {'ja': '歴史', 'en': 'History'},
+    '#inventory': {'ja': '持ち物', 'en': 'Inv'},
+    '#inventtype': {'ja': '種別所持', 'en': 'TypeInv'},
+    '#invoke': {'ja': '発動', 'en': 'Invoke'},
+    '#jump': {'ja': '跳ぶ', 'en': 'Jump'},
+    '#kick': {'ja': '蹴る', 'en': 'Kick'},
+    '#known': {'ja': '発見品', 'en': 'Discov'},
+    '#knownclass': {'ja': '既知種別', 'en': 'KwnClass'},
+    '#look': {'ja': '足元', 'en': 'Here'},
+    '#lookaround': {'ja': '周囲', 'en': 'Around'},
+    '#loot': {'ja': 'あさる', 'en': 'Loot'},
+    '#monster': {'ja': '怪物能力', 'en': 'Monst'},
+    '#offer': {'ja': '捧げる', 'en': 'Offer'},
+    '#open': {'ja': '開ける', 'en': 'Open'},
+    '#options': {'ja': '設定', 'en': 'Option'},
+    '#pay': {'ja': '支払う', 'en': 'Pay'},
+    '#perminv': {'ja': '所持スク', 'en': 'PermInv'},
+    '#pickup': {'ja': '拾う', 'en': 'Pick'},
+    '#pray': {'ja': '祈る', 'en': 'Pray'},
+    '#prevmsg': {'ja': '履歴', 'en': 'Prev'},
+    '#puton': {'ja': 'はめる', 'en': 'Puton'},
+    '#quaff': {'ja': '飲む', 'en': 'Quaff'},
+    '#quit': {'ja': '終了', 'en': 'Quit'},
+    '#quiver': {'ja': '矢筒', 'en': 'Quiver'},
+    '#read': {'ja': '読む', 'en': 'Read'},
+    '#redraw': {'ja': '再描画', 'en': 'Redraw'},
+    '#remove': {'ja': '外す', 'en': 'Remove'},
+    '#repeat': {'ja': '再実行', 'en': 'Again'},
+    '#reqmenu': {'ja': 'メニュー', 'en': 'ReqMenu'},
+    '#ride': {'ja': '乗る', 'en': 'Ride'},
+    '#rub': {'ja': 'こする', 'en': 'Rub'},
+    '#save': {'ja': 'セーブ', 'en': 'Save'},
+    '#search': {'ja': '捜索', 'en': 'Search'},
+    '#seeall': {'ja': '装備一覧', 'en': 'SeeAll'},
+    '#seeamulet': {'ja': '護符一覧', 'en': 'Amulet'},
+    '#seearmor': {'ja': '鎧一覧', 'en': 'Armors'},
+    '#seerings': {'ja': '指輪一覧', 'en': 'Rings'},
+    '#seetools': {'ja': '道具一覧', 'en': 'Tools'},
+    '#seeweapon': {'ja': '武器一覧', 'en': 'Weapons'},
+    '#showgold': {'ja': '所持金', 'en': 'Gold'},
+    '#showspells': {'ja': '呪文', 'en': 'Spells'},
+    '#showtrap': {'ja': '罠確認', 'en': 'Trap'},
+    '#sit': {'ja': '座る', 'en': 'Sit'},
+    '#swap': {'ja': '持ち替', 'en': 'Swap'},
+    '#takeoff': {'ja': '脱ぐ', 'en': 'Takeoff'},
+    '#takeoffall': {'ja': '全脱', 'en': 'TakeAll'},
+    '#teleport': {'ja': 'テレポ', 'en': 'Tele'},
+    '#throw': {'ja': '投げる', 'en': 'Throw'},
+    '#tip': {'ja': '空にする', 'en': 'Tip'},
+    '#travel': {'ja': '移動', 'en': 'Travel'},
+    '#turn': {'ja': '退散', 'en': 'Turn'},
+    '#twoweapon': {'ja': '二刀流', 'en': 'TwoWep'},
+    '#untrap': {'ja': '罠解除', 'en': 'Untrap'},
+    '#up': {'ja': '上る', 'en': 'Up'},
+    '#vanquished': {'ja': '討伐', 'en': 'Vanq'},
+    '#version': {'ja': '版情報', 'en': 'Version'},
+    '#versionshort': {'ja': '版詳細', 'en': 'VerInfo'},
+    '#wait': {'ja': '待機', 'en': 'Wait'},
+    '#wear': {'ja': '着る', 'en': 'Wear'},
+    '#whatdoes': {'ja': '説明', 'en': 'WhatDo'},
+    '#whatis': {'ja': '記号', 'en': 'WhatIs'},
+    '#wield': {'ja': '構える', 'en': 'Wield'},
+    '#wipe': {'ja': '拭く', 'en': 'Wipe'},
+    '#zap': {'ja': '杖', 'en': 'Zap'},
+  };
+
   @override
   State<NetHackCmdPanel> createState() => _NetHackCmdPanelState();
 }
@@ -129,12 +370,6 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
       widget.onExpandedChanged?.call(value);
     }
   }
-
-  static const List<String> defaultCmdsStr = [
-    '[Kbd]', '#', '20s', '.', ':', ';', ',', 'e', 'd', 'r', 'z', 'Z', 'q',
-    't', 'f', 'w', 'x', 'i', 'E', 'Q', 'P', 'R', 'W', 'T', 'o', '^d', '^p',
-    'a', 'A', '^t', 'D', 'F', 'p', '^x', '^o', '?'
-  ];
 
   static const List<Map<String, String>> fallbackExtCmdsEn = [
     {'command': '#adjust', 'description': 'Adjust item letter'},
@@ -218,6 +453,8 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
     {'command': '#wipe', 'description': '顔を拭く'},
   ];
 
+  String _buttonDisplayMode = 'label';
+
   @override
   void initState() {
     super.initState();
@@ -226,20 +463,22 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
 
   Future<void> _loadPanels() async {
     final prefs = await SharedPreferences.getInstance();
-    final int count = prefs.getInt('panel_count') ?? 1;
+    _buttonDisplayMode = prefs.getString('button_display_mode') ?? 'label';
+    final bool hasSavedPanels = prefs.containsKey('panel_count');
+    final int count = prefs.getInt('panel_count') ?? NetHackCmdPanel.defaultPanels.length;
 
     _panels.clear();
 
-    final p0Name = prefs.getString('pName_0') ?? "標準パネル";
-    final p0CmdsStr = prefs.getString('pCmdString_0') ?? defaultCmdsStr.join(' ');
-    _panels.add({
-      'name': p0Name,
-      'cmds': CmdItem.parseCmds(p0CmdsStr),
-    });
+    for (int i = 0; i < count; i++) {
+      String defaultName = "パネル ${i + 1}";
+      String defaultCmds = "";
+      if (i < NetHackCmdPanel.defaultPanels.length) {
+        defaultName = NetHackCmdPanel.defaultPanels[i]['nameJp']!;
+        defaultCmds = NetHackCmdPanel.defaultPanels[i]['cmds']!;
+      }
 
-    for (int i = 1; i < count; i++) {
-      final name = prefs.getString('pName_$i') ?? "パネル ${i + 1}";
-      final cmdsStr = prefs.getString('pCmdString_$i') ?? "";
+      final name = prefs.getString('pName_$i') ?? defaultName;
+      final cmdsStr = prefs.getString('pCmdString_$i') ?? (hasSavedPanels && i >= NetHackCmdPanel.defaultPanels.length ? "" : defaultCmds);
       _panels.add({
         'name': name,
         'cmds': CmdItem.parseCmds(cmdsStr),
@@ -261,11 +500,10 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
 
   Future<void> _resetPanelToDefault(int panelIndex) async {
     final prefs = await SharedPreferences.getInstance();
-    if (panelIndex == 0) {
-      await prefs.remove('pCmdString_0');
-      _panels[0]['cmds'] = CmdItem.parseCmds(defaultCmdsStr.join(' '));
+    await prefs.remove('pCmdString_$panelIndex');
+    if (panelIndex >= 0 && panelIndex < NetHackCmdPanel.defaultPanels.length) {
+      _panels[panelIndex]['cmds'] = CmdItem.parseCmds(NetHackCmdPanel.defaultPanels[panelIndex]['cmds']!);
     } else {
-      await prefs.remove('pCmdString_$panelIndex');
       _panels[panelIndex]['cmds'] = <CmdItem>[];
     }
     setState(() {});
@@ -280,16 +518,27 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   }
 
   String _getPanelDisplayName(int index, String rawName, AppLocalizations? l10n, bool isJp) {
-    if (index == 0) {
-      if (rawName.isEmpty || rawName == "標準パネル" || rawName == "Default Panel") {
-        return l10n?.defaultPanelName ?? (isJp ? "標準パネル" : "Default Panel");
+    if (index >= 0 && index < NetHackCmdPanel.defaultPanels.length) {
+      final def = NetHackCmdPanel.defaultPanels[index];
+      final defJp = def['nameJp']!;
+      final defEn = def['nameEn']!;
+      if (rawName.isEmpty || rawName == defJp || rawName == defEn || (index == 0 && (rawName == "標準パネル" || rawName == "Default Panel"))) {
+        switch (index) {
+          case 0:
+            return l10n?.panelNameDefault ?? (isJp ? "標準" : "Default");
+          case 1:
+            return l10n?.panelNameCombat ?? (isJp ? "戦闘" : "Combat");
+          case 2:
+            return l10n?.panelNameItems ?? (isJp ? "道具" : "Items");
+          case 3:
+            return l10n?.panelNameInfo ?? (isJp ? "情報" : "Info");
+        }
       }
-    } else {
-      final defaultJp = "パネル ${index + 1}";
-      final defaultEn = "Panel ${index + 1}";
-      if (rawName.isEmpty || rawName == defaultJp || rawName == defaultEn) {
-        return l10n?.panelNName(index + 1) ?? (isJp ? defaultJp : defaultEn);
-      }
+    }
+    final defaultJp = "パネル ${index + 1}";
+    final defaultEn = "Panel ${index + 1}";
+    if (rawName.isEmpty || rawName == defaultJp || rawName == defaultEn) {
+      return l10n?.panelNName(index + 1) ?? (isJp ? defaultJp : defaultEn);
     }
     return rawName;
   }
@@ -565,9 +814,18 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
         ? (Colors.deepPurple[900] ?? const Color(0xFF311B92))
         : (Colors.grey[900] ?? const Color(0xFF212121));
     final textColor = isKbdToggle ? Colors.amber : Colors.white70;
+
+    final langCode = Localizations.localeOf(context).languageCode;
     final displayLabel = isKbdToggle
         ? (widget.isKeyboardMode ? '[pad]' : '[kbd]')
-        : item.displayLabel;
+        : item.getEffectiveLabel(
+            showLabel: _buttonDisplayMode == 'label',
+            langCode: langCode,
+          );
+
+    final int labelLength = displayLabel.length;
+    final double horizontalPadding = labelLength > 1 ? 5.5 : 7.0;
+    final double fontSize = labelLength >= 3 ? 10.0 : (labelLength == 2 ? 11.0 : 12.0);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 1.5, vertical: 3),
@@ -579,14 +837,14 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
           onLongPress: () => _showButtonCustomizeDialog(panelIndex, itemIndex, item),
           borderRadius: BorderRadius.circular(4),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             alignment: Alignment.center,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 34),
+            constraints: const BoxConstraints(minWidth: 30, minHeight: 34),
             child: Text(
               displayLabel,
               style: TextStyle(
                 color: textColor,
-                fontSize: 12,
+                fontSize: fontSize,
                 fontWeight: (item.hasLabel || isKbdToggle) ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -610,6 +868,11 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
       if (charCode >= 97 && charCode <= 122) {
         final ctrlCode = charCode - 96;
         widget.onRawKeyCode(ctrlCode);
+      } else if (charCode >= 65 && charCode <= 90) {
+        final ctrlCode = charCode - 64;
+        widget.onRawKeyCode(ctrlCode);
+      } else {
+        widget.onKeyPress(cmd);
       }
     } else {
       widget.onKeyPress(cmd);
@@ -777,6 +1040,9 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
     final l10n = AppLocalizations.of(context);
     final isJp = Localizations.localeOf(context).languageCode == 'ja';
     final controller = TextEditingController(text: item.label);
+    final helperText = (_buttonDisplayMode == 'label')
+        ? (l10n?.btnLabelHelperDefault ?? (isJp ? "空にすると既定のラベル（未定義時はコマンド名）が表示されます" : "Leave empty to use default label or command name"))
+        : (l10n?.btnLabelHelperCommand ?? (isJp ? "空にするとコマンド名がそのまま表示されます" : "Leave empty to use command name"));
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -791,7 +1057,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
                 controller: controller,
                 decoration: InputDecoration(
                   hintText: isJp ? "例: 食べる, 道具, #整理" : "e.g. Eat, Tools, #adjust",
-                  helperText: isJp ? "空にするとコマンド名がそのまま表示されます" : "Leave empty to use command name",
+                  helperText: helperText,
                 ),
                 autofocus: true,
               ),

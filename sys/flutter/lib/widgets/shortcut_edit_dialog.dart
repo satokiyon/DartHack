@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
 import '../models/ext_cmd_entry.dart';
 import '../nethack_cmd_panel.dart';
+import '../nethack_shortcut_pad.dart';
 
 void showShortcutEditDialog({
   required BuildContext context,
@@ -38,9 +39,11 @@ void showShortcutEditDialog({
   final shortcutName = isJp ? shortcutLabelsJp[index] : shortcutLabelsEn[index];
 
   SharedPreferences.getInstance().then((prefs) {
-    final defaultShortcuts = [
-      'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', r'\\e'
-    ];
+    final defaultShortcuts = NetHackShortcutPad.defaultShortcuts;
+    final buttonDisplayMode = prefs.getString('button_display_mode') ?? 'label';
+    final helperText = (buttonDisplayMode == 'label')
+        ? (l10n.btnLabelHelperDefault)
+        : (l10n.btnLabelHelperCommand);
     final currentVal = prefs.getString('shortcut_btn_$index') ?? defaultShortcuts[index];
     final parsed = CmdItem.parseCmds(currentVal);
     final currentCmdItem = parsed.isNotEmpty ? parsed.first : CmdItem(command: currentVal);
@@ -203,7 +206,7 @@ void showShortcutEditDialog({
               decoration: InputDecoration(
                 labelText: isJp ? "表示ラベル (任意)" : "Custom Label (optional)",
                 hintText: isJp ? "例: 道具, 地形, #メニュー" : "e.g. Items, Terrain, Menu",
-                helperText: isJp ? "空にするとコマンド名がそのまま表示されます" : "Leave empty to use command name",
+                helperText: helperText,
               ),
             ),
           ],

@@ -2924,7 +2924,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   },
                   extCmdList: _extCmdList.map((e) => {'command': e.command, 'description': e.description}).toList(),
                   onKeyPress: (key) => _sendKeysToC(key),
-                  onRawKeyCode: (code) => _sendFfiKey(code, "^${String.fromCharCode(code + 96)}"),
+                  onRawKeyCode: (code) => _sendFfiKey(
+                    code,
+                    (code >= 1 && code <= 26) ? "^${String.fromCharCode(code + 96)}" : "Raw($code)",
+                  ),
                   onPanelHeightChanged: (height) {
                     if ((_cmdPanelHeight - height).abs() < 0.1) {
                       return;

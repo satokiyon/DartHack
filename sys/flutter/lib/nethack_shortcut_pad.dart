@@ -10,6 +10,10 @@ class NetHackShortcutPad extends StatefulWidget {
 
   final double opacity;
 
+  static const List<String> defaultShortcuts = [
+    'i', '/', ',', '#therecmdmenu', '#herecmdmenu', '#chat', 'e', '^a', r'\e'
+  ];
+
   const NetHackShortcutPad({
     super.key,
     required this.onKeyPress,
@@ -25,9 +29,7 @@ class NetHackShortcutPad extends StatefulWidget {
 
 class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
   final List<CmdItem> _shortcuts = List.filled(9, const CmdItem(command: ""));
-  final List<String> _defaultShortcuts = [
-    'i', '/', '#terrain', '#therecmdmenu', '#herecmdmenu', '#chat', '#chronicle', '#overview', r'\\e'
-  ];
+  String _buttonDisplayMode = 'label';
   bool _isLoading = true;
 
   @override
@@ -38,9 +40,10 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
 
   Future<void> _loadShortcuts() async {
     final prefs = await SharedPreferences.getInstance();
+    _buttonDisplayMode = prefs.getString('button_display_mode') ?? 'label';
     setState(() {
       for (int i = 0; i < 9; i++) {
-        final raw = prefs.getString('shortcut_btn_$i') ?? _defaultShortcuts[i];
+        final raw = prefs.getString('shortcut_btn_$i') ?? NetHackShortcutPad.defaultShortcuts[i];
         final parsed = CmdItem.parseCmds(raw);
         _shortcuts[i] = parsed.isNotEmpty ? parsed.first : CmdItem(command: raw);
       }
@@ -87,6 +90,14 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
       return const SizedBox.shrink();
     }
 
+    final langCode = Localizations.localeOf(context).languageCode;
+    final displayLabel = item.getEffectiveLabel(
+      showLabel: _buttonDisplayMode == 'label',
+      langCode: langCode,
+    );
+    final int labelLength = displayLabel.length;
+    final double fontSize = labelLength >= 3 ? 9.5 : (labelLength == 2 ? 10.5 : 12.0);
+
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF1E1E1E).withValues(alpha: widget.opacity),
@@ -104,11 +115,12 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
           },
           child: Container(
             alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 2),
             child: Text(
-              item.displayLabel,
+              displayLabel,
               style: TextStyle(
                 color: Colors.white70,
-                fontSize: 11,
+                fontSize: fontSize,
                 fontWeight: item.hasLabel ? FontWeight.bold : FontWeight.normal,
               ),
               textAlign: TextAlign.center,
@@ -124,6 +136,15 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
   void _handleMacroPress(String shortcut) {
     if (shortcut.startsWith('#')) {
       widget.onShortcut(shortcut.length > 1 ? '$shortcut\n' : shortcut);
+    } else if (shortcut.startsWith('^') && shortcut.length == 2) {
+      final charCode = shortcut.codeUnitAt(1);
+      if (charCode >= 97 && charCode <= 122) {
+        widget.onRawKeyCode(charCode - 96);
+      } else if (charCode >= 65 && charCode <= 90) {
+        widget.onRawKeyCode(charCode - 64);
+      } else {
+        widget.onKeyPress(shortcut);
+      }
     } else {
       widget.onKeyPress(shortcut);
     }
