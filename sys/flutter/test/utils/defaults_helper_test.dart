@@ -132,4 +132,48 @@ MENUCOLOR=red=dragon
 
     expect(prefs.getInt('nh_opt_tutorial_mode'), equals(0));
   });
+
+  test('autopickup のデフォルト有効 (true) および未設定時のフォールバック検証', () async {
+    final initialContent = 'OPTIONS=autopickup\n';
+    final file = File(testFilePath);
+    await file.writeAsString(initialContent);
+
+    SharedPreferences.setMockInitialValues({});
+
+    final helper = DefaultsHelper();
+    await helper.syncFromFileToPrefs(testFilePath);
+    final prefs = await SharedPreferences.getInstance();
+
+    // defaults.nh に OPTIONS=autopickup がある場合は true
+    expect(prefs.getBool('nh_opt_autopickup'), isTrue);
+
+    // defaults.nh に autopickup が記述されていない場合でも未設定時は true が補完される
+    await file.writeAsString('OPTIONS=number_pad:0\n');
+    SharedPreferences.setMockInitialValues({});
+    await helper.syncFromFileToPrefs(testFilePath);
+    final prefsAfterEmpty = await SharedPreferences.getInstance();
+    expect(prefsAfterEmpty.getBool('nh_opt_autopickup'), isTrue);
+  });
+
+  test('autopickup を OFF に変更・保存した際に OFF が維持されることの検証', () async {
+    final initialContent = 'OPTIONS=autopickup\n';
+    final file = File(testFilePath);
+    await file.writeAsString(initialContent);
+
+    SharedPreferences.setMockInitialValues({
+      'nh_opt_autopickup': false,
+    });
+
+    final helper = DefaultsHelper();
+    await helper.syncFromPrefsToFile(testFilePath);
+
+    final savedContent = await file.readAsString();
+    expect(savedContent.contains('OPTIONS=!autopickup'), isTrue);
+
+    // syncFromFileToPrefs で再読み込みしても false が維持される
+    await helper.syncFromFileToPrefs(testFilePath);
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getBool('nh_opt_autopickup'), isFalse);
+  });
 }
+

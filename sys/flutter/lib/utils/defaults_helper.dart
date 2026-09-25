@@ -386,10 +386,14 @@ class DefaultsHelper {
       await prefs.setInt('nh_opt_tutorial_mode', 0);
     }
 
-    // 自動拾い (autopickup)
+    // 自動拾い (autopickup): デフォルト ON (true)
     final autopickupVal = getOption('autopickup');
     if (autopickupVal != null) {
       await prefs.setBool('nh_opt_autopickup', autopickupVal.toLowerCase() == 'true');
+    } else {
+      if (!prefs.containsKey('nh_opt_autopickup')) {
+        await prefs.setBool('nh_opt_autopickup', true);
+      }
     }
 
     // 自動拾い種別 (pickup_types)
@@ -480,7 +484,7 @@ class DefaultsHelper {
       setOption('tutorial', 'ask');
     }
     if (prefs.containsKey('nh_opt_autopickup')) {
-      setBoolOption('autopickup', prefs.getBool('nh_opt_autopickup') ?? false);
+      setBoolOption('autopickup', prefs.getBool('nh_opt_autopickup') ?? true);
     }
     if (prefs.containsKey('nh_opt_pickup_types')) {
       final pTypes = prefs.getString('nh_opt_pickup_types') ?? '';

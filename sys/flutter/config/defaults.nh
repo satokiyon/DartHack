@@ -39,8 +39,9 @@ OPTIONS=scores:10 top/2 around/own
 OPTIONS=!cmdassist
 #OPTIONS=nolegacy,noverbose
 
-#OPTIONS=autopickup,pickup_types:$"=/!?+
-OPTIONS=!autopickup
+OPTIONS=autopickup
+OPTIONS=pickup_types:$"=/!?+
+
 OPTIONS=number_pad:0
 
 OPTIONS=lit_corridor,showexp,time,toptenwin
@@ -185,13 +186,20 @@ OPTIONS=statushilites:10
 OPTIONS=hilite_status:characteristics/up/green/down/red
 
 ## HP
-OPTIONS=hilite_status:hitpoints/100%/green/<100%/green/<70%/yellow
-OPTIONS=hilite_status:hitpoints/<50%/orange/<30%/red&bold
-OPTIONS=hilite_status:hitpoints/<15%/red&inverse
+OPTIONS=hitpointbar
+OPTIONS=hilite_status:hitpoints/100%/white&bold
+OPTIONS=hilite_status:hitpoints/<100%/brightgreen&bold
+OPTIONS=hilite_status:hitpoints/<66%/yellow&bold
+OPTIONS=hilite_status:hitpoints/<50%/orange&bold
+OPTIONS=hilite_status:hitpoints/<33%/red&bold
+OPTIONS=hilite_status:hitpoints/<15%/red&inverse&bold
 
 ## Power
-OPTIONS=hilite_status:power/100%/green/<100%/green/<70%/yellow
-OPTIONS=hilite_status:power/<50%/orange/<30%/red&bold
+OPTIONS=hilite_status:power/100%/white&bold
+OPTIONS=hilite_status:power/<100%/green&normal
+OPTIONS=hilite_status:power/<66%/yellow&normal
+OPTIONS=hilite_status:power/<50%/orange&normal
+OPTIONS=hilite_status:power/<33%/red&bold
 
 ## Conditions
 OPTIONS=hilite_status:condition/major_troubles/red&bold&inverse

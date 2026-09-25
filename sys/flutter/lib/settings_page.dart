@@ -73,7 +73,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   // defaults.nh 連動ゲームオプション
   int _optTutorialMode = 0;
-  bool _optAutopickup = false;
+  bool _optAutopickup = true;
   String _optPickupTypes = r'$"=/!?+';
   bool _optTime = true;
   bool _optShowexp = true;
@@ -283,7 +283,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
       // ゲームオプション (defaults.nh 連動) のロード
       _optTutorialMode = prefs.getInt('nh_opt_tutorial_mode') ?? 0;
-      _optAutopickup = prefs.getBool('nh_opt_autopickup') ?? false;
+      _optAutopickup = prefs.getBool('nh_opt_autopickup') ?? true;
       _optPickupTypes = prefs.getString('nh_opt_pickup_types') ?? r'$"=/!?+';
       _optTime = prefs.getBool('nh_opt_time') ?? true;
       _optShowexp = prefs.getBool('nh_opt_showexp') ?? true;
