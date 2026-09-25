@@ -247,8 +247,8 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                                       ? null
                                       : () => widget.onSubmit(widget.inputController.text),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.teal[500],
-                                    disabledBackgroundColor: Colors.teal[500]?.withValues(alpha: 0.3),
+                                    backgroundColor: const Color(0xFF004D40), // 深いダークティール (ラベンダー文字とのコントラスト比 約 6.5:1)
+                                    disabledBackgroundColor: const Color(0xFF004D40).withValues(alpha: 0.3),
                                   ),
                                   child: Text(l10n.confirm),
                                 );

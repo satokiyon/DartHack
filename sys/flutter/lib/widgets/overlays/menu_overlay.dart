@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import '../../nethack_screen.dart';
 import '../../utils/dialog_header_helper.dart';
+import '../../utils/nethack_colors.dart';
 import '../menu_item_tile_painter.dart';
 
 class MenuOverlay extends StatefulWidget {
@@ -58,28 +59,6 @@ class _MenuOverlayState extends State<MenuOverlay> {
   void dispose() {
     _filterController.dispose();
     super.dispose();
-  }
-
-  Color _getNhColor(int colorIndex) {
-    switch (colorIndex) {
-      case 0: return Colors.black;
-      case 1: return Colors.red;
-      case 2: return Colors.green;
-      case 3: return const Color(0xFF8B4513);
-      case 4: return Colors.blue;
-      case 5: return Colors.purple;
-      case 6: return Colors.cyan;
-      case 7: return Colors.grey;
-      case 8: return Colors.white70;
-      case 9: return Colors.orange;
-      case 10: return Colors.lightGreen;
-      case 11: return Colors.yellow;
-      case 12: return Colors.lightBlue;
-      case 13: return Colors.pinkAccent;
-      case 14: return Colors.cyanAccent;
-      case 15: return Colors.white;
-      default: return Colors.white;
-    }
   }
 
   int _parseMaxCount(String text) {
@@ -429,7 +408,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
 
                             Color itemColor = Colors.white;
                             if (!isExtCmdMenu && item.color >= 0 && item.color < 16) {
-                              itemColor = _getNhColor(item.color);
+                              itemColor = NethackColors.getNhColor(item.color);
                             }
 
                             if (isPlain) {
@@ -660,6 +639,9 @@ class _MenuOverlayState extends State<MenuOverlay> {
                             });
                             widget.onMultiSelect(cleanCounts);
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF004D40), // 深いダークティール (決定ボタンとして際立たせる)
+                          ),
                           child: const Text("OK"),
                         ),
                       ],

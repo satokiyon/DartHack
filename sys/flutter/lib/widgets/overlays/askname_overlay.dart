@@ -244,7 +244,10 @@ class _AskNameOverlayState extends State<AskNameOverlay> {
                             onPressed: isAskNameOverflow
                                 ? null
                                 : () => widget.onSubmit(_selectedPlayMode, widget.nameController.text),
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.teal[500]),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF004D40), // 深いダークティール (ラベンダー文字とのコントラスト比 約 6.5:1)
+                              disabledBackgroundColor: const Color(0xFF004D40).withValues(alpha: 0.3),
+                            ),
                             child: Text(l10n.startGame),
                           ),
                         ],
