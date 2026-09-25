@@ -78,6 +78,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _optTime = true;
   bool _optShowexp = true;
   bool _optPriceQuotes = true;
+  bool _optHitpointbar = true;
   bool _optHiliteStatus = true;
   bool _optMenucolor = true;
   String _optName = '';
@@ -288,6 +289,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _optTime = prefs.getBool('nh_opt_time') ?? true;
       _optShowexp = prefs.getBool('nh_opt_showexp') ?? true;
       _optPriceQuotes = prefs.getBool('nh_opt_price_quotes') ?? true;
+      _optHitpointbar = prefs.getBool('nh_opt_hitpointbar') ?? true;
       _optHiliteStatus = prefs.getBool('nh_opt_hilite_status') ?? true;
       _optMenucolor = prefs.getBool('nh_opt_menucolor') ?? true;
       _optName = prefs.getString('nh_opt_name') ?? '';
@@ -1931,6 +1933,15 @@ class _SettingsPageState extends State<SettingsPage> {
             onChanged: (val) {
               setState(() => _optPriceQuotes = val);
               _saveGameOption('nh_opt_price_quotes', val);
+            },
+          ),
+          SwitchListTile(
+            title: Text(l10n.optHitpointbar),
+            subtitle: Text(l10n.hitpointbarSub),
+            value: _optHitpointbar,
+            onChanged: (val) {
+              setState(() => _optHitpointbar = val);
+              _saveGameOption('nh_opt_hitpointbar', val);
             },
           ),
           SwitchListTile(

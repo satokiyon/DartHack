@@ -271,6 +271,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get optPriceQuotes => 'Price Quotes (price_quotes)';
 
   @override
+  String get optHitpointbar => 'Hitpoint Bar (hitpointbar)';
+
+  @override
   String get optHiliteStatus => 'Highlight Status (hilite_status)';
 
   @override
@@ -871,6 +874,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get priceQuotesSub =>
       'Display price information on unidentified items';
+
+  @override
+  String get hitpointbarSub =>
+      'Displays a gauge showing current HP percentage behind the character name and role';
 
   @override
   String get hiliteStatusSub => 'Highlight HP and status changes with colors';

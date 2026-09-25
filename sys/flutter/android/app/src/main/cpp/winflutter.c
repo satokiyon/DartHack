@@ -2336,6 +2336,8 @@ static void HijackWindowProcs(void) {
 static char flutter_status_vals[MAXBLSTATS][256];
 static int flutter_status_colors[MAXBLSTATS];
 static unsigned long *flutter_cond_hilites = NULL;
+static int flutter_hp_percent = 100;
+static int flutter_hp_color = CLR_WHITE;
 
 extern void genl_status_init(void);
 extern void genl_status_finish(void);
@@ -2380,6 +2382,19 @@ static void append_status_field(char* buf, int idx, int* is_first) {
         }
         
         if (!*val) return;
+        
+        // hitpointbar 有効時の BL_TITLE（名前・職業）を HPバーマークアップとして出力
+        if (idx == BL_TITLE && iflags.wc2_hitpointbar) {
+            char markup[512];
+            int hp_color = flutter_hp_color & 0xFF;
+            int hp_pct = flutter_hp_percent;
+            if (hp_pct < 0) hp_pct = 0;
+            if (hp_pct > 100) hp_pct = 100;
+            snprintf(markup, sizeof(markup), "\\B%08X,%03d:%s\\b", hp_color, hp_pct, val);
+            strcat(buf, markup);
+            *is_first = 0;
+            return;
+        }
         
         int color = flutter_status_colors[idx] & 0xFF;
         if (color == NO_COLOR || color == CLR_WHITE) {
@@ -2443,6 +2458,10 @@ static void flutter_status_update(int idx, genericptr_t ptr, int chg, int percen
     if (idx == BL_FLUSH) {
         flutter_status_flush();
     } else if (idx >= 0 && idx < MAXBLSTATS) {
+        if (idx == BL_HP) {
+            flutter_hp_percent = percent;
+            flutter_hp_color = color;
+        }
         if (idx == BL_CONDITION) {
             long *condptr = (long *) ptr;
             long cond = condptr ? *condptr : 0L;

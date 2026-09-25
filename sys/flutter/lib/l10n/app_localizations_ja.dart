@@ -270,6 +270,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get optPriceQuotes => '鑑定価格表示 (price_quotes)';
 
   @override
+  String get optHitpointbar => 'HPバー表示 (hitpointbar)';
+
+  @override
   String get optHiliteStatus => 'ステータス強調 (hilite_status)';
 
   @override
@@ -859,6 +862,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get priceQuotesSub => '未識別オブジェクトに記憶済み価格情報を表示します';
+
+  @override
+  String get hitpointbarSub => '名前と職業の背景に現在のHP残量ゲージを表示します';
 
   @override
   String get hiliteStatusSub => 'HPや各種状態変化を色付きでハイライト表示します';

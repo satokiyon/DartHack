@@ -3188,53 +3188,126 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   );
 }
 
-  // ステータス行の \CXXXXXXXX と \c マークアップパース処理
-  TextSpan _parseStatusLine(String line) {
-    // 1. まず、金貨のエスケープ \G が残っていれば $: に置換する (フォールバック)
-    var processedLine = line.replaceAll(RegExp(r'\\G([0-9a-fA-F]{8}):?'), '\$:');
-    
-    // 2. \\CXXXXXXXX と \\c のマークアップをパースして TextSpan を構築
-    final spans = <InlineSpan>[];
-    final regex = RegExp(r'\\C([0-9a-fA-F]{8})|\\c');
-    
-    int lastIndex = 0;
-    Color currentColor = Colors.white;
-    
-    for (final match in regex.allMatches(processedLine)) {
-      if (match.start > lastIndex) {
-        spans.add(TextSpan(
-          text: processedLine.substring(lastIndex, match.start),
-          style: TextStyle(color: currentColor),
-        ));
-      }
-      
-      final matchedText = match.group(0);
-      if (matchedText == '\\c') {
-        currentColor = Colors.white;
-      } else {
-        final hexStr = match.group(1)!;
-        final colorIndex = int.tryParse(hexStr, radix: 16) ?? 15;
-        currentColor = NethackColors.getNhColor(colorIndex);
-      }
-      
-      lastIndex = match.end;
-    }
-    
-    if (lastIndex < processedLine.length) {
+  // ステータス行のマークアップパース処理
+  TextSpan _parseStatusLine(String line) => parseStatusLine(line);
+}
+
+/// HPバーのクリッピング領域を計算する CustomClipper
+class HpBarClipper extends CustomClipper<Rect> {
+  final double fraction;
+  const HpBarClipper(this.fraction);
+
+  @override
+  Rect getClip(Size size) {
+    return Rect.fromLTWH(0, 0, size.width * fraction, size.height);
+  }
+
+  @override
+  bool shouldReclip(HpBarClipper oldClipper) => oldClipper.fraction != fraction;
+}
+
+/// ステータス行の \CXXXXXXXX, \c, \BXXXXXXXX,PPP:...\b マークアップパース処理
+TextSpan parseStatusLine(String line) {
+  // 1. まず、金貨のエスケープ \G が残っていれば $: に置換する (フォールバック)
+  var processedLine = line.replaceAll(RegExp(r'\\G([0-9a-fA-F]{8}):?'), '\$:');
+  
+  // 2. マークアップをパースして TextSpan を構築
+  // \BXXXXXXXX,PPP:...\b (HPバー) または \CXXXXXXXX (文字色) または \c (リセット)
+  final spans = <InlineSpan>[];
+  final regex = RegExp(r'\\B([0-9a-fA-F]{8}),([0-9]{1,3}):(.*?)\\b|\\C([0-9a-fA-F]{8})|\\c');
+  
+  int lastIndex = 0;
+  Color currentColor = Colors.white;
+  
+  for (final match in regex.allMatches(processedLine)) {
+    if (match.start > lastIndex) {
       spans.add(TextSpan(
-        text: processedLine.substring(lastIndex),
+        text: processedLine.substring(lastIndex, match.start),
         style: TextStyle(color: currentColor),
       ));
     }
     
-    return TextSpan(
-      style: const TextStyle(
-        fontFamily: 'monospace',
-        fontSize: 13,
-      ),
-      children: spans,
-    );
+    final matchedText = match.group(0);
+    if (matchedText == '\\c') {
+      currentColor = Colors.white;
+    } else if (match.group(1) != null && match.group(2) != null && match.group(3) != null) {
+      // HPバーマークアップ: \B<color8>,<percent3>:<titleText>\b
+      final hexStr = match.group(1)!;
+      final percent = (int.tryParse(match.group(2)!) ?? 100).clamp(0, 100);
+      final titleText = match.group(3)!;
+      final colorIndex = int.tryParse(hexStr, radix: 16) ?? 15;
+      final barColor = NethackColors.getNhColor(colorIndex);
+
+      spans.add(
+        WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 100),
+            child: Stack(
+              children: [
+                // 1. ベースレイヤー: 黒背景 + 通常白文字
+                Container(
+                  color: Colors.black,
+                  child: Text(
+                    titleText,
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 13,
+                      height: 1.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                // 2. クリップレイヤー: HP% 幅だけクリッピング + バー色背景 + 反転黒文字
+                if (percent > 0)
+                  Positioned.fill(
+                    child: ClipRect(
+                      clipper: HpBarClipper(percent / 100.0),
+                      child: Container(
+                        color: barColor,
+                        child: Text(
+                          titleText,
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 13,
+                            height: 1.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } else if (match.group(4) != null) {
+      // 通常の \CXXXXXXXX 文字色マークアップ
+      final hexStr = match.group(4)!;
+      final colorIndex = int.tryParse(hexStr, radix: 16) ?? 15;
+      currentColor = NethackColors.getNhColor(colorIndex);
+    }
+    
+    lastIndex = match.end;
   }
+  
+  if (lastIndex < processedLine.length) {
+    spans.add(TextSpan(
+      text: processedLine.substring(lastIndex),
+      style: TextStyle(color: currentColor),
+    ));
+  }
+  
+  return TextSpan(
+    style: const TextStyle(
+      fontFamily: 'monospace',
+      fontSize: 13,
+    ),
+    children: spans,
+  );
 }
 
 

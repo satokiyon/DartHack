@@ -19,6 +19,7 @@ class DefaultsHelper {
     'catname',
     'horsename',
     'fruit',
+    'hitpointbar',
     'hilite_status',
     'menucolor',
     'number_pad',
@@ -422,6 +423,16 @@ class DefaultsHelper {
       await prefs.setBool('nh_opt_price_quotes', priceQuotesVal.toLowerCase() == 'true');
     }
 
+    // HPバー表示 (hitpointbar): defaults.nh に指定があれば優先、なければデフォルト ON (true)
+    final hitpointbarVal = getOption('hitpointbar');
+    if (hitpointbarVal != null) {
+      await prefs.setBool('nh_opt_hitpointbar', hitpointbarVal.toLowerCase() == 'true');
+    } else {
+      if (!prefs.containsKey('nh_opt_hitpointbar')) {
+        await prefs.setBool('nh_opt_hitpointbar', true);
+      }
+    }
+
     // ステータスハイライト (hilite_status): デフォルト ON (true)
     final hiliteStatusVal = getOption('hilite_status');
     if (hiliteStatusVal != null) {
@@ -501,6 +512,9 @@ class DefaultsHelper {
     }
     if (prefs.containsKey('nh_opt_price_quotes')) {
       setBoolOption('price_quotes', prefs.getBool('nh_opt_price_quotes') ?? true);
+    }
+    if (prefs.containsKey('nh_opt_hitpointbar')) {
+      setBoolOption('hitpointbar', prefs.getBool('nh_opt_hitpointbar') ?? true);
     }
     if (prefs.containsKey('nh_opt_hilite_status')) {
       setBoolOption('hilite_status', prefs.getBool('nh_opt_hilite_status') ?? true);

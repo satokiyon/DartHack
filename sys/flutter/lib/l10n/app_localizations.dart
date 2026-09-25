@@ -620,6 +620,12 @@ abstract class AppLocalizations {
   /// **'鑑定価格表示 (price_quotes)'**
   String get optPriceQuotes;
 
+  /// No description provided for @optHitpointbar.
+  ///
+  /// In ja, this message translates to:
+  /// **'HPバー表示 (hitpointbar)'**
+  String get optHitpointbar;
+
   /// No description provided for @optHiliteStatus.
   ///
   /// In ja, this message translates to:
@@ -1747,6 +1753,12 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'未識別オブジェクトに記憶済み価格情報を表示します'**
   String get priceQuotesSub;
+
+  /// No description provided for @hitpointbarSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'名前と職業の背景に現在のHP残量ゲージを表示します'**
+  String get hitpointbarSub;
 
   /// No description provided for @hiliteStatusSub.
   ///
