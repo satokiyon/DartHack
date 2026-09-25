@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -1082,4 +1082,25 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
 
 3. **Flutter ウィジェットテストにおける日本語ロケール指定の徹底**:
    - `MaterialApp` を用いたウィジェットテストでローカライズテキスト（日本語）の表示やボタン文言を検証する際は、テスト環境のデフォルトロケールが英語（`en`）となるため、必ず `MaterialApp(locale: const Locale('ja'), ...)` を明示的に指定してテストを実行してください。指定を怠ると、日本語文言の検索（`find.text(...)`）が一致せずテスト失敗（`Found 0 widgets`）の原因となります。
+
+## 40. Flutter UI テーマ・アクションボタン配色と NetHack 16色パレットの視認性・コントラスト維持原則
+
+1. **UI テーマカラーと NetHack コアカラー（16色パレット）のレイヤー分離と二重性**:
+   - 「UI の文字色や配色」に関する要望・不具合を扱う際は、以下の2つの独立したレイヤーが存在することを常に意識してください：
+     1) **NetHack ゲーム内 16色パレット (`NethackColors` / `winflutter.c: palette[CLR_MAX]`)**:
+        - メイン画面のステータス行、ASCII マップシンボル、インベントリ項目の色。
+        - 変更時は必ず Flutter 側の `NethackColors` と C コア側の `winflutter.c` の両方を完全同期させる。
+     2) **Flutter アプリ UI テーマ (`ThemeData.dark` / `ColorScheme.dark`)**:
+        - 各種ダイアログのアクションボタン（`TextButton`）、フォーカス枠線、カーソル、スイッチ等の文字・アクセント色。
+   - どちらか一方の調整にとどまらず、両方のレイヤーで黒背景上の十分な視認性が確保されているかを常に点検してください。
+
+2. **テーマの `primary` 変更時における既存ボタン背景色とのコントラスト連動検証原則**:
+   - Material 3 において、`TextButton` や明示的な `foregroundColor` を持たない `ElevatedButton` の文字色には、`ThemeData.colorScheme.primary` がデフォルトで適用されます。
+   - そのため、テーマの `primary` を高明度色（例: ラベンダーパープル `const Color(0xFFCE93D8)`）に変更した場合、既存のウィジェットで明るい背景（`Colors.teal[500]` や `Colors.blue[500]` 等）が設定されているボタンが存在すると、「明るい背景 × 明るい文字」となってコントラストが破綻します（コントラスト比 約 1.4:1）。
+   - **設計原則**:
+     - アクションボタンや決定ボタンの背景色には、明るい原色・中間色を安易に使わず、文字色とのコントラスト比を必ず計算（最低でも WCAG AA 基準の 4.5:1 以上、推奨 6.0:1 以上）してください。
+     - 緑系の決定ボタンには深いダークティール（`const Color(0xFF004D40)` / `Colors.teal[900]`）を採用するなど、背景色を十分に暗く沈めてラベンダー文字（#CE93D8）を際立たせる設計を徹底してください。
+
+3. **同種アクションボタン（決定・OK・開始）の横断的整合性**:
+   - 名前入力画面（`askname_overlay.dart` の「ゲーム開始」）、一行入力画面（`getline_overlay.dart` の「決定」）、メニュー画面（`menu_overlay.dart` の「OK」）など、同一の「確定・決定」の役割を持つボタンのスタイルを変更する際は、一部の画面のみを個別修正せず、関連するすべてのダイアログ・オーバーレイを横断的に調査し、統一された配色（例: `const Color(0xFF004D40)`）を適用してください。
 
