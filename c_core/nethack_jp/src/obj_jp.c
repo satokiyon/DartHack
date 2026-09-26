@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -1077,8 +1077,22 @@ static const struct jnh_wish_alias jnh_wish_aliases[] = {
     { "呪いを解く", "解呪" },
     { "鎧強化", "鎧に魔法をかける" },
     { "武器強化", "武器に魔法をかける" },
-    { "テレポート", "瞬間移動" },
+    { "防具破壊", "鎧を破壊する" },
+    { "鎧破壊", "鎧を破壊する" },
+    { "怪物混乱", "怪物を混乱させる" },
+    { "モンスター混乱", "怪物を混乱させる" },
+    { "怪物作成", "怪物を作る" },
     { "怪物創造", "怪物を作る" },
+    { "モンスター作成", "怪物を作る" },
+    { "金貨探知", "金貨を探す" },
+    { "金貨検知", "金貨を探す" },
+    { "食料探知", "食料を探す" },
+    { "食料検知", "食料を探す" },
+    { "地図作成", "地図" },
+    { "マジックマッピング", "地図" },
+    { "怪物怯え", "怪物を怯えさせる" },
+    { "怪物退散", "怪物を怯えさせる" },
+    { "テレポート", "瞬間移動" },
     { "飼いならし", "怪物を飼いならす" },
 
     /* 指輪 (接尾辞「指輪」を除いた実体名のみでマッピング) */
@@ -1166,5 +1180,156 @@ jnh_normalize_wish(const char *u_str, char *out_buf, size_t outsz)
     }
 }
 
+/* 接尾辞を取り除くヘルパー（魔法のマーカー・書き込み用） */
+static void
+strip_item_suffixes(char *buf)
+{
+    static const char *const suffixes[] = {
+        "の巻物", "の魔法書", "の呪文書", "の書", "の本",
+        "巻物", "魔法書", "呪文書",
+        (const char *) 0
+    };
+    int len = (int) strlen(buf);
+    int i;
 
+    for (i = 0; suffixes[i]; i++) {
+        int slen = (int) strlen(suffixes[i]);
+        if (len >= slen && !strcmp(buf + len - slen, suffixes[i])) {
+            buf[len - slen] = '\0';
+            len -= slen;
+            break;
+        }
+    }
+}
 
+/* 「の」や空白を除去するヘルパー */
+static void
+strip_jp_noise(char *buf)
+{
+    char *p;
+    int guard = 0;
+
+    while (guard++ < BUFSZ && (p = strstr(buf, "の")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+    guard = 0;
+    while (guard++ < BUFSZ && (p = strchr(buf, ' ')) != 0) {
+        memmove(p, p + 1, strlen(p + 1) + 1);
+    }
+    guard = 0;
+    while (guard++ < BUFSZ && (p = strstr(buf, "　")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+}
+
+/*
+ * 魔法のマーカーでの書き込み用アイテム照合関数
+ * input: プレイヤーが入力した文字列
+ * otyp: 対象アイテムの otyp (SCR_* または SPE_*)
+ * is_descr: 外見（ラベル名等）でのマッチングだった場合に TRUE がセットされる
+ * 戻り値: マッチすれば TRUE、しなければ FALSE
+ */
+boolean
+jp_write_match_item(const char *input, int otyp, boolean *is_descr)
+{
+    char norm_input[BUFSZ] = {0};
+    char core_input[BUFSZ] = {0};
+    char clean_input[BUFSZ] = {0};
+    const char *jp_name, *jp_descr;
+
+    if (!input || !*input || otyp < 0 || otyp >= NUM_OBJECTS)
+        return FALSE;
+
+    if (is_descr)
+        *is_descr = FALSE;
+
+    /* 1. JNetHackエイリアスやドラゴン名の正規化 */
+    jnh_normalize_wish(input, norm_input, sizeof(norm_input));
+
+    /* 入力のコア名（接尾辞除去） */
+    strncpy(core_input, norm_input, sizeof(core_input) - 1);
+    core_input[sizeof(core_input) - 1] = '\0';
+    strip_item_suffixes(core_input);
+
+    /* 入力のクリーン名（「の」やスペース除去） */
+    strncpy(clean_input, core_input, sizeof(clean_input) - 1);
+    clean_input[sizeof(clean_input) - 1] = '\0';
+    strip_jp_noise(clean_input);
+
+    /* 2. 正式名称（by_name）との照合 */
+    jp_name = jp_item_name(otyp);
+    if (jp_name && *jp_name) {
+        char core_target[BUFSZ] = {0};
+        char clean_target[BUFSZ] = {0};
+
+        /* 完全一致 */
+        if (!strcmpi(norm_input, jp_name))
+            return TRUE;
+
+        /* 定義側のコア名抽出 */
+        strncpy(core_target, jp_name, sizeof(core_target) - 1);
+        core_target[sizeof(core_target) - 1] = '\0';
+        strip_item_suffixes(core_target);
+
+        /* コア名同士の一致（例: "識別" == "識別"） */
+        if (*core_input && !strcmpi(core_input, core_target))
+            return TRUE;
+
+        /* ノイズ除去後の一致（例: "怪物を混乱させる" など） */
+        strncpy(clean_target, core_target, sizeof(clean_target) - 1);
+        clean_target[sizeof(clean_target) - 1] = '\0';
+        strip_jp_noise(clean_target);
+        if (*clean_input && !strcmpi(clean_input, clean_target))
+            return TRUE;
+    }
+
+    /* 3. 外見説明（by_descr）との照合 */
+    jp_descr = jp_item_descr(otyp);
+    if (jp_descr && *jp_descr) {
+        const char *p1, *p2;
+
+        /* 外見完全一致 */
+        if (!strcmpi(norm_input, jp_descr)) {
+            if (is_descr)
+                *is_descr = TRUE;
+            return TRUE;
+        }
+
+        /* 巻物のラベル名抽出（「...」と書かれた巻物） */
+        p1 = strstr(jp_descr, "「");
+        p2 = strstr(jp_descr, "」");
+        if (p1 && p2 && p2 > p1) {
+            char label[BUFSZ] = {0};
+            char bracket_label[BUFSZ] = {0};
+            size_t l_len = (size_t) (p2 - (p1 + strlen("「")));
+
+            if (l_len < sizeof(label)) {
+                memcpy(label, p1 + strlen("「"), l_len);
+                label[l_len] = '\0';
+                Snprintf(bracket_label, sizeof(bracket_label), "「%s」", label);
+
+                /* ラベル名一致（括弧なし、括弧あり、または接尾辞除去後の一致） */
+                if (!strcmpi(norm_input, label) || !strcmpi(norm_input, bracket_label)
+                    || (*core_input && !strcmpi(core_input, label))) {
+                    if (is_descr)
+                        *is_descr = TRUE;
+                    return TRUE;
+                }
+            }
+        } else {
+            /* 魔法書等の外見（例: "青銅の魔法書" -> "青銅"） */
+            char descr_core[BUFSZ] = {0};
+            strncpy(descr_core, jp_descr, sizeof(descr_core) - 1);
+            descr_core[sizeof(descr_core) - 1] = '\0';
+            strip_item_suffixes(descr_core);
+
+            if (*core_input && *descr_core && !strcmpi(core_input, descr_core)) {
+                if (is_descr)
+                    *is_descr = TRUE;
+                return TRUE;
+            }
+        }
+    }
+
+    return FALSE;
+}

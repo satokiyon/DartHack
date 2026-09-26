@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
 /* NetHack 5.0	potion.c	$NHDT-Date: 1781973062 2026/06/20 16:31:02 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.288 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -2278,7 +2278,7 @@ int
 dodip(void)
 {
     struct obj *potion, *obj;
-    char qbuf[QBUFSZ], obuf[QBUFSZ];
+    char qbuf[BUFSZ], obuf[BUFSZ];
     uchar here = levl[u.ux][u.uy].typ;
     boolean is_hands, at_pool = is_pool(u.ux, u.uy),
             at_fountain = IS_FOUNTAIN(here), at_sink = IS_SINK(here),
@@ -2370,8 +2370,10 @@ dodip(void)
     }
 
     /* "What do you want to dip <the object> into? [xyz or ?*] " */
-    Snprintf(qbuf, sizeof qbuf, "%sを何に浸す",
-             flags.verbose ? obuf : "それ");
+    if (flags.verbose)
+        Snprintf(qbuf, sizeof qbuf, "%sを何に浸しますか?", obuf);
+    else
+        Strcpy(qbuf, "何に浸しますか?");
     potion = getobj(qbuf, drink_ok, GETOBJ_NOFLAGS);
     if (!potion)
         return ECMD_CANCEL;
@@ -2386,7 +2388,7 @@ int
 dip_into(void)
 {
     struct obj *obj, *potion;
-    char qbuf[QBUFSZ];
+    char qbuf[BUFSZ];
 
     if (!cmdq_peek(CQ_CANNED)) {
         impossible("dip_into: where is potion?");
@@ -2401,7 +2403,7 @@ dip_into(void)
         return ECMD_CANCEL;
 
     /* "What do you want to dip into <the potion>? [abc or ?*] " */
-    Snprintf(qbuf, sizeof qbuf, "%s%sに浸す",
+    Snprintf(qbuf, sizeof qbuf, "%s%sに何を浸しますか?",
              is_plural(potion) ? "そのうちの1つの" : "", thesimpleoname(potion));
     obj = getobj(qbuf, dip_ok, GETOBJ_PROMPT);
     if (!obj)

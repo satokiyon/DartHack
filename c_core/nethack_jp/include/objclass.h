@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
 /* NetHack 5.0	objclass.h	$NHDT-Date: 1781973084 2026/06/20 16:31:24 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -198,6 +198,7 @@ extern const char *jp_oclass_name(int oclass);
 extern const char *jp_artiname(int artinum);
 extern int jp_artiname_to_num(const char *name);
 extern void jnh_normalize_wish(const char *u_str, char *out_buf, size_t outsz);
+extern boolean jp_write_match_item(const char *input, int otyp, boolean *is_descr);
 
 #define OBJ_NAME(obj) (obj_descr[(obj).oc_name_idx].oc_name)
 #define OBJ_DESCR(obj) (obj_descr[(obj).oc_descr_idx].oc_descr)

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
 /* NetHack 5.0	write.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.54 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -169,6 +169,25 @@ dowrite(struct obj *pen)
             by_descr = TRUE;
             goto found;
         }
+
+        /* NetHackJP: 日本語名および日本語外見説明との照合 */
+        {
+            boolean jp_is_descr = FALSE;
+            if (jp_write_match_item(nm, i, &jp_is_descr)) {
+                if (jp_is_descr) {
+                    by_descr = TRUE;
+                    goto found;
+                } else {
+                    if (objects[i].oc_name_known
+                        || paper->oclass == SPBOOK_CLASS) {
+                        goto found;
+                    } else {
+                        real = deferred = i;
+                        break;
+                    }
+                }
+            }
+        }
     }
     /* second loop: look for match with user-assigned name */
     /* we will get here if 'nm' isn't a real scroll name/descr, or is the name
@@ -205,7 +224,7 @@ dowrite(struct obj *pen)
         goto found;
     }
 
-    There("にはそのような%sはない!", typeword);
+    There("はそのような%sはない!", typeword);
     return ECMD_TIME;
  found:
 
