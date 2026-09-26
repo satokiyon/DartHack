@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
 /* NetHack 5.0	sounds.c	$NHDT-Date: 1781973067 2026/06/20 16:31:07 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.172 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -880,7 +880,7 @@ domonnoise(struct monst *mtmp)
         boolean nightchild = (Upolyd && (u.umonnum == PM_WOLF
                                          || u.umonnum == PM_WINTER_WOLF
                                          || u.umonnum == PM_WINTER_WOLF_CUB));
-        const char *racenoun = jp_race_noun_for_display(Race_switch);
+        const char *racenoun = jp_current_race_noun();
 
         if (mtmp->mtame) {
             if (kindred) {
@@ -937,7 +937,7 @@ domonnoise(struct monst *mtmp)
                     Sprintf(verbuf, vampmsg[vampindex],
                             Upolyd ? jp_pmname(&mons[u.umonnum],
                                                flags.female ? FEMALE : MALE)
-                                   : racenoun);
+                                   : (racenoun ? racenoun : "<種族>"));
                     verbl_msg = verbuf;
                 } else if (vampindex > 1) {
                     if (vampindex >= 0 && vampindex < SIZE(vampmsg))

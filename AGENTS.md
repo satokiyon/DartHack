@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -54,7 +54,7 @@
    - 職業名、肩書、種族名などのプレイヤー情報は、イベント履歴（livelog）や画面に表示される通常メッセージ（`pline` 等での出力）において、英語の文字列（`gu.urole.name.m` など）をそのまま出力して英語交じりになるのを防ぐため、必ず以下の表示用日本語化関数を経由させてください。
      - 職業名: `jp_role_name_for_display(flags.initrole, gender)`
      - 肩書: `jp_rank_of_for_display(u.ulevel, Role_switch, gender)`
-     - 種族名: `jp_race_noun_for_display(Race_switch)`
+     - 種族名: プレイヤー自身の種族名詞は `jp_current_race_noun()`、種族インデックス（`flags.initrace` 等）からは `jp_race_noun_for_display(raceidx)`
 
 5. **可変引数マクロのフォーマットと引数の完全一致確認**:
    - `pline()`, `You()`, `pline_The()`, `impossible()` などの可変引数マクロを日本語化・修正する際は、フォーマット文字列内の指定子（`%s`, `%c`, `%d`等）と、渡す実引数の個数および型が完全に一致していることを必ず確認してください。

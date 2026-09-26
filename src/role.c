@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
 /* NetHack 5.0	role.c	$NHDT-Date: 1781973065 2026/06/20 16:31:05 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -706,6 +706,8 @@ staticfn int randrole_filtered(void);
 staticfn char *promptsep(char *, int);
 staticfn int role_gendercount(int);
 staticfn int race_alignmentcount(int);
+const char *jp_current_race_noun(void);
+const char *jp_current_race_adj(void);
 const char *jp_role_name_for_display(int, int);
 const char *jp_race_noun_for_display(int);
 const char *jp_race_adj_for_display(int);
@@ -773,6 +775,17 @@ get_race_index_from_current(void)
             return i;
     }
     return -1;
+}
+
+const char *
+jp_current_race_noun(void)
+{
+    if (gu.urace.mnum >= LOW_PM && gu.urace.mnum < NUMMONS) {
+        const char *pmname = jp_pmname_from_idx(gu.urace.mnum, NEUTRAL);
+        if (pmname && *pmname)
+            return pmname;
+    }
+    return (const char *) 0;
 }
 
 const char *

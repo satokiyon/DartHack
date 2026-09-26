@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
 /* NetHack 5.0	eat.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.354 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1340,6 +1340,7 @@ cpostfx(int pm)
         tmp += 20;
         if (gy.youmonst.data->mlet != S_MIMIC && !Unchanging) {
             char buf[BUFSZ];
+            const char *racename = jp_current_race_noun();
             const char *tempshape = !Hallucination ? "金貨の山"
                                                    : "オレンジ";
 
@@ -1358,7 +1359,7 @@ cpostfx(int pm)
                        ? "皮をむかれるのが急に怖くなり、再び%sの姿に戻った!"
                        : "やはり%sの姿に戻るほうがよいと思った.",
                     Upolyd ? jp_pmname(gy.youmonst.data, Ugender)
-                              : jp_race_noun_for_display(Race_switch));
+                           : (racename ? racename : "元"));
             ge.eatmbuf = dupstr(buf);
             gn.nomovemsg = ge.eatmbuf;
             ga.afternmv = eatmdone;
