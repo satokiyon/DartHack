@@ -3,21 +3,31 @@
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsとUbuntu(WSL)のみ)
 
+## スクリーンショット
 <figure>
-   <figcaption>GUI版 Nevanda_5.0.0_32x32タイル使用</figcaption>
+   <figcaption>Windows GUI版 Nevanda_5.0.0_32x32タイル使用</figcaption>
    <img width="1209" height="787" alt="2026-06-14_16h55_40" src="https://github.com/user-attachments/assets/021ab227-be59-469c-8243-099f6c57c640" />
 </figure>
 
 <figure>
-   <figurecaption>コンソール版。`OPTIONS=windowtype:curses,align_message:right`指定</figurecaption>
+   <figurecaption>Windows curses版。`OPTIONS=windowtype:curses,align_message:right`指定</figurecaption>
    <img width="1283" height="588" alt="2026-06-04_20h10_10" src="https://github.com/user-attachments/assets/58e277fb-4abd-46e6-a839-d7538497a446" />
 </figure>
 
 <figure>
-     <figurecaption>コンソール版</figurecaption>   
-     <img width="1058" height="607" alt="2026-06-02_05h25_26" src="https://github.com/user-attachments/assets/ab664586-d185-4a1c-b23e-6807ec676d9a" />
+   <figurecaption>Windows tty版</figurecaption>   
+   <img width="1058" height="607" alt="2026-06-02_05h25_26" src="https://github.com/user-attachments/assets/ab664586-d185-4a1c-b23e-6807ec676d9a" />
 </figure>
 
+<figure>
+   <figurecaption>Linux X11版 デフォルトタイル使用</figurecaption>
+   <img width="1282" height="891" alt="2026-09-26_13h23_52" src="https://github.com/user-attachments/assets/68a5623f-e3b9-461c-b1c7-d6313dc67773" />
+</figure>
+
+<figure>
+   <figurecaption>Linux Qt版 PixeHackタイル使用</figurecaption>
+   <img width="1311" height="780" alt="2026-09-26_13h13_20" src="https://github.com/user-attachments/assets/50857768-a79b-4f10-9aeb-87f458424fb5" />
+</figure>
 ---
 
 ## 🎮 プレイヤー向け情報（ゲームの始め方）

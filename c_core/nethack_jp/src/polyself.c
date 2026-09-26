@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
 /* NetHack 5.0	polyself.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -341,6 +341,7 @@ staticfn void
 newman(void)
 {
     int i, oldlvl, newlvl, oldgend, newgend, hpmax, enmax;
+    const char *racename;
 
     oldlvl = u.ulevel;
     newlvl = oldlvl + rn1(5, -2);     /* new = old + {-2,-1,0,+1,+2} */
@@ -437,15 +438,16 @@ newman(void)
         }
     }
     newuhs(FALSE);
+    racename = jp_current_race_noun();
     polyman("あなたは新たな%sになった気分だ!",
-            jp_race_noun_for_display(Race_switch));
+            racename ? racename : "<種族>");
 
     newgend = poly_gender();
     /* note: newman() bypasses achievements for new ranks attained and
        doesn't log "new <form>" when that isn't accompanied by level change */
     if (newlvl != oldlvl)
         livelog_printf(LL_MINORAC, "新たな%sとして経験値レベル %d になった",
-                       jp_race_noun_for_display(Race_switch), newlvl);
+                       racename ? racename : "<種族>", newlvl);
     else
         livelog_newform(TRUE, oldgend, newgend);
 
@@ -1383,8 +1385,12 @@ rehumanize(void)
 
     if (emits_light(gy.youmonst.data))
         del_light_source(LS_MONSTER, monst_to_any(&gy.youmonst));
-    polyman("あなたは%sの姿に戻った!",
-            jp_race_noun_for_display(Race_switch));
+    {
+        const char *racename = jp_current_race_noun();
+
+        polyman("あなたは%sの姿に戻った!",
+                racename ? racename : "元");
+    }
 
     if (u.uhp < 1) {
         /* can only happen if some bit of code reduces u.uhp

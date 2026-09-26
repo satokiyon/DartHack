@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
 /* NetHack 5.0	insight.c	$NHDT-Date: 1781973051 2026/06/20 16:30:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -238,9 +238,9 @@ enlght_halfdmg(int category, int final)
         category_name = "不明";
         break;
     }
-    Sprintf(buf, "%s%sダメージ",
-            (final || wizard) ? "半減した" : "軽減された",
-            category_name);
+    Sprintf(buf, "受ける%sダメージを%s",
+            category_name,
+            (final || wizard) ? "半減する" : "軽減する");
     enl_msg(You_, "", "", buf, from_what(category));
 }
 
@@ -1006,13 +1006,13 @@ status_enlightenment(int mode, int final)
     /* internal troubles, mostly in the order that prayer ranks them */
     if (Stoned) {
         if (final && (Stoned & I_SPECIAL))
-            enlght_out(" 石化した。");
+            enlght_out("石化した。");
         else
             you_are("石化しつつある", "");
     }
     if (Slimed) {
         if (final && (Slimed & I_SPECIAL))
-            enlght_out(" スライム化した。");
+            enlght_out("スライム化した。");
         else
             you_are("スライム化しつつある", "");
     }
@@ -1413,7 +1413,7 @@ weapon_insight(int final)
                    (no 'also's or extra 'with's for case 5); when primary
                    and secondary use the same skill, only cases 1 and 3 are
                    possible because 'a2' gets forced to False above */
-                Strcpy(sfx, " 強化可能なスキル: ");
+                Strcpy(sfx, "強化可能なスキル: ");
                 if (a1)
                     Strcat(sfx, jp_skill_name_for_display(wtype));
                 if (a2) {
@@ -1457,7 +1457,7 @@ attributes_enlightenment(
     int final)
 {
     static NEARDATA const char
-        if_surroundings_permitted[] = " if surroundings permitted";
+        if_surroundings_permitted[] = "（周囲の状況が許せば）";
     int ltmp, armpro, warnspecies;
     char buf[BUFSZ];
 
@@ -1492,18 +1492,18 @@ attributes_enlightenment(
         you_are("魔法から守られている", from_what(ANTIMAGIC));
     if (Fire_resistance)
         you_are("火への耐性がある", from_what(FIRE_RES));
-    item_resistance_message(AD_FIRE, " 火から守られている", final);
+    item_resistance_message(AD_FIRE, "火から守られている", final);
     if (Cold_resistance)
         you_are("冷気への耐性がある", from_what(COLD_RES));
-    item_resistance_message(AD_COLD, " 冷気から守られている", final);
+    item_resistance_message(AD_COLD, "冷気から守られている", final);
     if (Sleep_resistance)
         you_are("睡眠への耐性がある", from_what(SLEEP_RES));
     if (Disint_resistance)
         you_are("分解への耐性がある", from_what(DISINT_RES));
-    item_resistance_message(AD_DISN, " 分解から守られている", final);
+    item_resistance_message(AD_DISN, "分解から守られている", final);
     if (Shock_resistance)
         you_are("電撃への耐性がある", from_what(SHOCK_RES));
-    item_resistance_message(AD_ELEC, " 電撃から守られている",
+    item_resistance_message(AD_ELEC, "電撃から守られている",
                             final);
     if (Poison_resistance)
         you_are("毒への耐性がある", from_what(POISON_RES));
@@ -1513,7 +1513,7 @@ attributes_enlightenment(
                 "酸への耐性がある");
         you_are(buf, from_what(ACID_RES));
     }
-    item_resistance_message(AD_ACID, " 酸から守られている", final);
+    item_resistance_message(AD_ACID, "酸から守られている", final);
     if (Drain_resistance)
         you_are("レベル吸収への耐性がある", from_what(DRAIN_RES));
     if (Sick_resistance)
@@ -1597,12 +1597,12 @@ attributes_enlightenment(
         you_are(buf, "");
     }
     if (u.umconf) { /* 'u.umconf' is a counter rather than a timeout */
-        Strcpy(buf, " 攻撃した怪物を混乱させる");
+        Strcpy(buf, "攻撃した怪物を混乱させる");
         if (wizard && !final) {
             if (u.umconf == 1)
-                Strcat(buf, " （次の1撃のみ）");
+                Strcat(buf, "（次の1撃のみ）");
             else /* u.umconf > 1 */
-                Sprintf(eos(buf), " （次の%u撃）", u.umconf);
+                Sprintf(eos(buf), "（次の%u撃）", u.umconf);
         }
         enl_msg(You_, "", "", buf, "");
     }
@@ -1788,17 +1788,17 @@ attributes_enlightenment(
 
         *cast_adj = '\0';
         if (suit) /* omit "wearing" to shorten the text */
-            Sprintf(cast_adj, " 金属製防具で詠唱が鈍る%s",
+            Sprintf(cast_adj, "金属製防具で詠唱が鈍る%s",
                     robe ? "（ローブで軽減）" : "");
         else if (robe)
-            Strcpy(cast_adj, " ローブで詠唱が安定する");
+            Strcpy(cast_adj, "ローブで詠唱が安定する");
 
         if (*cast_adj)
             enl_msg("呪文詠唱", "は", "は", cast_adj, "");
     }
     /* polymorph and other shape change */
     if (Protection_from_shape_changers)
-        you_are("変身能力者から守られている",
+        you_are("怪物によるへんげから守られている",
                 from_what(PROT_FROM_SHAPE_CHANGERS));
     if (Unchanging) {
         const char *what = 0;
@@ -2186,8 +2186,8 @@ show_conduct(int final)
             pastverb = "";
             Strcpy(buf, "倉庫番の特別ルールを1つも破っていない");
         } else {
-            Strcpy(buf, "倉庫番の特別ルール違反回数 ");
-            Strcat(buf, N_times(u.uconduct.sokocheat, bufN));
+            Sprintf(buf, "倉庫番の特別ルールを%s破った",
+                    N_times(u.uconduct.sokocheat, bufN));
         }
         enl_msg(You_, presentverb, pastverb, buf, "");
     }
@@ -2359,7 +2359,7 @@ show_achievements(
             break;
 
         default:
-            Sprintf(buf, " [想定外の達成事項 #%d]", achidx);
+            Sprintf(buf, "[想定外の達成事項 #%d]", achidx);
             enlght_out(buf);
             break;
         } /* switch */
