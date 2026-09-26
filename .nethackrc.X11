@@ -15,6 +15,12 @@ OPTIONS=windowtype:X11
 # OPTIONS=align_status:right
 OPTIONS=symset:Enhanced2,roguesymset:RogueEpyx
 
+OPTIONS=map_mode:tiles,scroll_margin:10
+OPTIONS=tile_file:PixelHack500_32x32.xpm
+OPTIONS=tile_width:32
+OPTIONS=tile_height:32
+OPTIONS=tiled_map
+
 # General options
 OPTIONS=time,showexp,number_pad:0,lit_corridor,mouse_support:1
 OPTIONS=force_invmenu
