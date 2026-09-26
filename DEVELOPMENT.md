@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -802,6 +802,22 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **対応ファイル**: `include/extern.h`, `src/dungeon.c`, `src/teleport.c`
 * **アップストリーム追従手順**:
   上流 NetHack-5.0 で `unreachable_level` や浮動ブランチのテレポート制御が改修された場合は、本マーカータグのブロックを確認し、フォートノックスへの到達性と安全接続処理を維持した状態で競合解決を行ってください。
+
+### 24. makedefs および sftags における fgetline() バッファ拡張オフセットバグ修正
+* **背景**:
+  `util/makedefs.c` および `util/sftags.c` の `fgetline()` において、1行が初期バッファサイズ（`makedefs` では 144 バイト、`sftags` では 256 バイト）を超える場合、バッファを拡張して次のチャンクを読み込むオフセット計算 `c + len - inc` にバグがありました。1 回目の `fgets` が末尾に置いた `\0` が残ったまま後ろに追記されるため、`strchr(c, '\n')` が 1 回目の `\0` で探索を終了して改行を永久に見つけられず、ファイルを終端（EOF）まで一気に読み飛ばして対象行を 143 バイトで強制切断し、かつ後続の行（`epitaph.txt` では 23 行目〜437 行目の全 415 行）をすべて消失させていました。
+  また、切断された行の末尾でマルチバイト文字（UTF-8）のバイト列が分断され、墓石の碑文を読んだ際に文字化け（`ü`）が発生していました。
+  本バグはアップストリーム（本家 NetHack-5.0）にも全く同一のコードが存在しますが、英語原文では 1 行が 143 バイトを超えることがなかったため顕在化しなかった「休眠バグ（dormant bug）」でした。
+* **修正内容**:
+  1. `util/makedefs.c`: `fgetline()` において読み込み済み文字数 `curlen` を保持し、`fgets(c + curlen, (int) (len - curlen), fd)` で追記読み込みを行い、`strchr(ret, '\n')` で新しく読み込んだチャンク内の改行を判定するように修正。
+  2. `util/makedefs.c`: `do_rnd_access_file()` の暗号化バッファ `xbuf` を行長に応じて動的に確保（`alloc(strlen(line) + 1)`）し、将来 256 バイトを超える行が渡された際のスタックオーバーフローを防止。
+  3. `util/sftags.c`: `fgetline()` にも同様に `curlen` ベースの追記読み込みと新チャンク内の改行判定を適用。
+* **マーカータグ**:
+  - `/* NetHackJP: fix fgetline buffer expansion bug (and upstream dormant bug) */` (`util/makedefs.c`, `util/sftags.c`)
+  - `/* NetHackJP: dynamically allocate xbuf to prevent overflow on long lines */` (`util/makedefs.c`)
+* **対応ファイル**: `util/makedefs.c`, `util/sftags.c`
+* **アップストリーム追従手順**:
+  本修正はアップストリーム（本家 NetHack）に存在する潜在バグの先行修正です。アップストリームで `fgetline()` のバッファ拡張処理が修正された場合は、本マーカータグのブロックを確認し、関数のインターフェース互換性を維持したままアップストリーム版の実装に追従してください。
 ---
 
 ## 5. ライセンスと NetHack License 2(a) への対応方針

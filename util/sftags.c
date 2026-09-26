@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
 /* NetHack 3.6	sftags.c	$Date$ $Revision$	          */
 /* Copyright (c) Michael Allison, 2025                            */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1891,31 +1891,35 @@ bfsize(const char *str)
  * character. Returns a pointer to the heap-allocated string, or a
  * null pointer if no characters were read.
  */
+/* NetHackJP: fix fgetline buffer expansion bug (and upstream dormant bug) */
 static char *
 fgetline(FILE *fd)
 {
     static const int inc = 256;
     int len = inc;
-    char *c = malloc(len), *ret, *loc, *avoidleak;
+    size_t curlen = 0;
+    char *c = malloc(len), *ret, *avoidleak;
 
     if (!c) {
         fprintf(stderr, "Memory issue\n");
         quit();
     }
+    *c = '\0';
     for (;;) {
-        loc = c + len - inc;
-        if (!loc) {
-            quit();
-        }
-        ret = fgets(loc, inc, fd);
+        ret = fgets(c + curlen, len - (int) curlen, fd);
         if (!ret) {
-            free(c);
-            c = NULL;
+            if (feof(fd) && curlen > 0) {
+                /* done with whatever was read */
+            } else {
+                free(c);
+                c = NULL;
+            }
             break;
-        } else if (strchr(c, '\n')) {
+        } else if (strchr(ret, '\n')) {
             /* normal case: we have a full line */
             break;
         }
+        curlen += strlen(ret);
         len += inc;
         avoidleak = c;
         c = realloc(c, len);

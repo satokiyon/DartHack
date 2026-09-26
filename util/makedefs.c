@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
 /* NetHack 5.0  makedefs.c  $NHDT-Date: 1702948590 2023/12/19 01:16:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
@@ -1152,8 +1152,13 @@ do_rnd_access_file(
 
     while ((line = fgetline(ifp)) != 0) {
         if (line[0] != '#' && line[0] != '\n') {
+            /* NetHackJP: dynamically allocate xbuf to prevent overflow on long lines */
+            char *xline;
+
             (void) padline(line, padlength);
-            (void) fputs(xcrypt(line, xbuf), ofp);
+            xline = (char *) alloc(strlen(line) + 1);
+            (void) fputs(xcrypt(line, xline), ofp);
+            free((genericptr_t) xline);
         }
         free((genericptr_t) line);
     }
@@ -1698,43 +1703,41 @@ do_oracles_for(const char *oracle_file)
  * 5.0: redone to use nethack's alloc() rather than libc's malloc()
  * and realloc().
  */
+/* NetHackJP: fix fgetline buffer expansion bug (and upstream dormant bug) */
 static char *
 fgetline(FILE *fd)
 {
     static const int inc = (BUFSZ / 2) + 16; /* fgets() wants signed int */
     unsigned len = (unsigned) inc, newlen; /* alloc() wants unsigned int */
+    size_t curlen = 0;
     char *c = (char *) alloc(len), *cprime, *ret;
 
     *c = '\0';
     for (;;) {
-        ret = fgets(c + len - inc, inc, fd);
+        ret = fgets(c + curlen, (int) (len - curlen), fd);
         if (!ret) {
             /* don't just assume ret==Null indicates an error; last line
                might lack terminating newline; if previous fgets() read it,
                instead of returning we would have expanded the buffer and
                tried for more, then got Null due to end of file having
                already been reached */
-            if (feof(fd) && *c && strlen(c) < len) {
+            if (feof(fd) && curlen > 0 && curlen < len) {
                 Strcat(c, "\n"); /* append missing newline */
             } else {
                 free((genericptr_t) c), c = NULL;
             }
             break; /* either with or without added newline, we're done */
-        } else if (strchr(c, '\n')) {
+        } else if (strchr(ret, '\n')) {
             /* normal case: we have a full line */
             break;
         }
-        /* didn't fit in c[0..len-1]; expand buffer and read some more
-           [this was much simpler (and possibly slightly more efficient)
-           with realloc() but less safe because return values from malloc()
-           and realloc() were not being checked for Null, and efficiency is
-           a red herring because growing the buffer will be extremely rare] */
+        /* didn't fit in c[0..len-1]; expand buffer and read some more */
+        curlen += strlen(ret);
         newlen = len + (unsigned) inc;
         cprime = (char *) alloc(newlen);
-        (void) memcpy(cprime, c, len);
+        (void) memcpy(cprime, c, curlen + 1);
         free((genericptr_t) c);
         c = cprime;
-        *(c + len) = '\0';
         len = newlen;
     }
 
