@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.645 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -4676,9 +4676,9 @@ acid_damage(struct obj *obj)
             ) {
             if (!Blind) {
                 if (victim == &gy.youmonst)
-                    Your("%sが消えた.", cxname(obj));
+                    Your("%sの文字が薄れて白紙になった.", cxname(obj));
                 else if (vismon)
-                    pline("%sの%sが消えた.", Monnam(victim),
+                    pline("%sの%sの文字が薄れて白紙になった.", Monnam(victim),
                           cxname(obj));
             }
         }
@@ -4817,7 +4817,7 @@ water_damage(
 #endif
            ) return 0;
         if (in_invent)
-            Your("%sが消えた.", ostr);
+            Your("%sの文字が薄れて白紙になった.", ostr);
 
         obj->otyp = SCR_BLANK_PAPER;
         obj->dknown = 0;
@@ -4841,7 +4841,7 @@ water_damage(
             return 0;
         }
         if (in_invent)
-            Your("%sが消えた.", ostr);
+            Your("%sの文字が薄れて白紙になった.", ostr);
 
         obj->otyp = SPE_BLANK_PAPER;
         /* same re-init as over-reading or polymorph; matters if it gets

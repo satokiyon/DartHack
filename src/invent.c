@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
 /* NetHack 5.0	invent.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.563 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -11,53 +11,10 @@ staticfn char *loot_xname(struct obj *);
 staticfn int invletter_value(char);
 staticfn int QSORTCALLBACK sortloot_cmp(const genericptr, const genericptr);
 staticfn const char *drop_english_article(const char *);
-staticfn const char *action_prompt_verb_jp(const char *);
 staticfn const char *action_label_jp(const char *);
 staticfn const char *action_prompt_jp(const char *);
 staticfn const char *action_missing_jp(const char *);
 staticfn const char *inv_class_name_core(char, boolean);
-
-staticfn const char *
-action_prompt_verb_jp(const char *word)
-{
-    if (!strcmp(word, "name") || !strcmp(word, "call")) return "名付け";
-    if (!strcmp(word, "identify")) return "識別";
-    if (!strcmp(word, "adjust")) return "整理";
-    if (!strcmp(word, "split")) return "分割";
-    if (!strcmp(word, "drop")) return "落とし";
-    if (!strcmp(word, "open")) return "開け";
-    if (!strcmp(word, "sacrifice")) return "捧げ";
-    if (!strcmp(word, "put in")) return "入れ";
-    if (!strcmp(word, "take out")) return "取り出し";
-    if (!strcmp(word, "wear") || !strcmp(word, "put on")) return "装着";
-    if (!strcmp(word, "remove") || !strcmp(word, "take off")) return "取り外し";
-    if (!strcmp(word, "wield")) return "装備";
-    if (!strcmp(word, "ready")) return "準備";
-    if (!strcmp(word, "write with") || !strcmp(word, "write on")) return "書き";
-    if (!strcmp(word, "read")) return "読み";
-    if (!strcmp(word, "zap")) return "使用";
-    if (!strcmp(word, "invoke")) return "発動";
-    if (!strcmp(word, "charge")) return "充填";
-    if (!strcmp(word, "rub") || !strcmp(word, "rub the royal jelly on")) return "こすり";
-    if (!strcmp(word, "grease")) return "油塗り";
-    if (!strcmp(word, "disarm")) return "解除";
-    if (!strcmp(word, "eat")) return "食べ";
-    if (!strcmp(word, "drink") || !strcmp(word, "quaff")) return "飲み";
-    if (!strcmp(word, "dip")) return "浸し";
-    if (!strcmp(word, "destroy")) return "破壊";
-    if (!strcmp(word, "throw")) return "投擲";
-    if (!strcmp(word, "apply")) return "使用";
-    if (!strcmp(word, "loot")) return "あさり";
-    if (!strcmp(word, "stash")) return "隠し";
-    if (!strcmp(word, "tip")) return "ひっくり返し";
-    if (!strcmp(word, "fire")) return "射撃";
-    if (!strcmp(word, "travel")) return "移動";
-    if (!strcmp(word, "kick")) return "蹴り";
-    if (!strcmp(word, "glance")) return "見回し";
-    if (!strcmp(word, "search")) return "探索";
-    if (!strcmp(word, "pickup")) return "拾い上げ";
-    return "実行";
-}
 
 staticfn const char *
 action_label_jp(const char *word)
@@ -104,22 +61,63 @@ action_label_jp(const char *word)
 staticfn const char *
 action_prompt_jp(const char *word)
 {
+    /* 動的プロンプト（すでに文になっている場合） */
+    if (strchr(word, '?') || strstr(word, "？")) return word;
+
+    /* 静的動詞キー */
+    if (!strcmp(word, "write on")) return "何に書きますか?";
     if (!strcmp(word, "write with")) return "何を使って書きますか?";
+    if (!strcmp(word, "dip")) return "何を浸しますか?";
+    if (!strcmp(word, "tin")) return "何を缶詰にしますか?";
+    if (!strcmp(word, "drop")) return "何を落としますか?";
+    if (!strcmp(word, "eat")) return "何を食べますか?";
+    if (!strcmp(word, "drink") || !strcmp(word, "quaff")) return "何を飲みますか?";
+    if (!strcmp(word, "open")) return "何を開けますか?";
+    if (!strcmp(word, "read")) return "何を読みますか?";
+    if (!strcmp(word, "take off") || !strcmp(word, "remove")) return "何を取り外しますか?";
+    if (!strcmp(word, "put on") || !strcmp(word, "wear")) return "何を装着しますか?";
+    if (!strcmp(word, "put in")) return "何を入れますか?";
+    if (!strcmp(word, "take out")) return "何を取り出しますか?";
+    if (!strcmp(word, "wield")) return "何を装備しますか?";
+    if (!strcmp(word, "ready")) return "何を準備しますか?";
+    if (!strcmp(word, "throw")) return "何を投げますか?";
+    if (!strcmp(word, "kick")) return "何を蹴りますか?";
+    if (!strcmp(word, "loot")) return "何をあさりますか?";
+    if (!strcmp(word, "stash")) return "何を隠しますか?";
+    if (!strcmp(word, "tip")) return "何をひっくり返しますか?";
+    if (!strcmp(word, "rub")) return "何をこすりますか?";
+    if (!strcmp(word, "rub the royal jelly on")) return "何にロイヤルゼリーを塗りますか?";
     if (!strcmp(word, "grease")) return "何に油を塗りますか?";
     if (!strcmp(word, "disarm")) return "何を使って解除しますか?";
     if (!strcmp(word, "apply")) return "何を使いますか?";
-    return (const char *) 0;
+    if (!strcmp(word, "zap")) return "何を使いますか?";
+    if (!strcmp(word, "invoke")) return "何を発動しますか?";
+    if (!strcmp(word, "charge")) return "何を充填しますか?";
+    if (!strcmp(word, "destroy")) return "何を破壊しますか?";
+    if (!strcmp(word, "sacrifice") || !strcmp(word, "offer")) return "何を捧げますか?";
+    if (!strcmp(word, "name") || !strcmp(word, "call")) return "何に名前を付けますか?";
+    if (!strcmp(word, "identify")) return "何を識別しますか?";
+    if (!strcmp(word, "adjust")) return "何を整理しますか?";
+    if (!strcmp(word, "split")) return "何を分割しますか?";
+    if (!strcmp(word, "fire")) return "何を射撃しますか?";
+    if (!strcmp(word, "pickup")) return "何を拾い上げますか?";
+    if (!strcmp(word, "search")) return "何を探索しますか?";
+    if (!strcmp(word, "glance")) return "何を見回しますか?";
+    if (!strcmp(word, "travel")) return "どこへ移動しますか?";
+    return "どれを選択しますか?";
 }
 
 staticfn const char *
 action_missing_jp(const char *word)
 {
-    if (!strcmp(word, "write with")) return "書くための";
+    if (strstr(word, "浸す")) return "浸すための";
+    if (strstr(word, "こすり")) return "こすりつけるための";
+    if (!strcmp(word, "write on") || !strcmp(word, "write with")) return "書くための";
+    if (!strcmp(word, "tin")) return "缶詰にするための";
     if (!strcmp(word, "grease")) return "油を塗るための";
     if (!strcmp(word, "disarm")) return "解除に使う";
-    if (!strcmp(word, "apply")) return "使うための";
-    if (!strcmp(word, "sacrifice")) return "捧げるための";
-    if (!strcmp(word, "offer")) return "捧げるための";
+    if (!strcmp(word, "apply") || !strcmp(word, "zap")) return "使うための";
+    if (!strcmp(word, "sacrifice") || !strcmp(word, "offer")) return "捧げるための";
     if (!strcmp(word, "eat")) return "食べるための";
     if (!strcmp(word, "drink") || !strcmp(word, "quaff")) return "飲むための";
     if (!strcmp(word, "read")) return "読むための";
@@ -129,7 +127,6 @@ action_missing_jp(const char *word)
     if (!strcmp(word, "dip")) return "浸すための";
     if (!strcmp(word, "throw")) return "投げるための";
     if (!strcmp(word, "kick")) return "蹴るための";
-    if (!strcmp(word, "zap")) return "使うための";
     if (!strcmp(word, "invoke")) return "発動するための";
     if (!strcmp(word, "charge")) return "充填するための";
     if (!strcmp(word, "rub") || !strcmp(word, "rub the royal jelly on")) return "こするための";
@@ -138,7 +135,15 @@ action_missing_jp(const char *word)
     if (!strcmp(word, "tip")) return "ひっくり返すための";
     if (!strcmp(word, "fire")) return "射撃するための";
     if (!strcmp(word, "travel")) return "移動するための";
-    return word;
+    if (!strcmp(word, "name") || !strcmp(word, "call")) return "名付けるための";
+    if (!strcmp(word, "identify")) return "識別するための";
+    if (!strcmp(word, "adjust")) return "整理するための";
+    if (!strcmp(word, "split")) return "分割するための";
+    if (!strcmp(word, "open")) return "開けるための";
+    if (!strcmp(word, "destroy")) return "破壊するための";
+    if (!strcmp(word, "pickup")) return "拾い上げるための";
+    if (!strcmp(word, "search")) return "探索するための";
+    return "選択するための";
 }
 
 staticfn const char *
@@ -1901,7 +1906,7 @@ getobj(
 {
     struct obj *otmp;
     char ilet = 0;
-    char buf[BUFSZ], qbuf[QBUFSZ];
+    char buf[BUFSZ], qbuf[BUFSZ];
     char lets[BUFSZ], altlets[BUFSZ];
     int suggested = 0;
     char *bp = buf, *ap = altlets;
@@ -2065,10 +2070,7 @@ getobj(
         {
             const char *prompt = action_prompt_jp(word);
 
-            if (prompt)
-                Sprintf(qbuf, "%s", prompt);
-            else
-                Sprintf(qbuf, "何を%sしますか?", action_prompt_verb_jp(word));
+            Sprintf(qbuf, "%s", prompt ? prompt : "どれを選択しますか?");
         }
         if (gi.in_doagain) {
             ilet = readchar();
@@ -2116,7 +2118,7 @@ getobj(
         if (ilet == '?' || ilet == '*') {
             char *allowed_choices = (ilet == '?') ? lets : (char *) 0;
             long ctmp = 0L;
-            char menuquery[QBUFSZ];
+            char menuquery[BUFSZ];
             char *handsbuf = (char *) 0;
 
             if (ilet == '?' && !*lets && *altlets)
@@ -2126,11 +2128,8 @@ getobj(
             if (iflags.force_invmenu) {
                 const char *prompt = action_prompt_jp(word);
 
-                if (prompt)
-                    Snprintf(menuquery, sizeof menuquery, "%s", prompt);
-                else
-                    Snprintf(menuquery, sizeof menuquery,
-                             "何を%sしますか?", action_prompt_verb_jp(word));
+                Snprintf(menuquery, sizeof menuquery, "%s",
+                         prompt ? prompt : "どれを選択しますか?");
             }
             if (!allowed_choices || *allowed_choices == HANDS_SYM
                 || *buf == HANDS_SYM)
@@ -2369,7 +2368,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
     int oletct, iletct, unpaid, oc_of_sym;
     char sym, *ip, olets[MAXOCLASSES + 6], ilets[MAXOCLASSES + 11];
     char extra_removeables[3 + 1]; /* uwep,uswapwep,uquiver */
-    char buf[BUFSZ] = DUMMY, qbuf[QBUFSZ];
+    char buf[BUFSZ] = DUMMY, qbuf[BUFSZ];
 
     if (!gi.invent) {
         You("%sものを何も持っていない.", action_missing_jp(word));
@@ -2417,8 +2416,10 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
     ilets[iletct] = '\0';
 
     for (;;) {
-        Sprintf(qbuf, "何を%sしますか? [%s]",
-            action_prompt_verb_jp(word), ilets);
+        const char *prompt = action_prompt_jp(word);
+
+        Sprintf(qbuf, "%s [%s]",
+                prompt ? prompt : "どれを選択しますか?", ilets);
         getlin(qbuf, buf);
         if (buf[0] == '\033')
             return 0;
