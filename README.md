@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsとUbuntu(WSL)のみ)
@@ -119,8 +119,18 @@ Windows版およびLinux(X11)版では、ゲーム内での日本語入力・表
 * 階層ごとのメモ
 * 「願い（wishing）」の指定
 * 「虐殺（genocide）」の指定
+* 魔法のマーカーでの書き込み（巻物・呪文書）
 * データベースの検索
 * その他いろいろ
+
+#### 主な日英入力例
+
+| 機能 | 日本語入力の例 | 英語入力の例 | 補足 |
+| :--- | :--- | :--- | :--- |
+| **願い**<br>(Wishing) | `祝福された+2虐殺の巻物`<br>`耐毒の魔除け`<br>`スピードブーツ`<br>`グレーター・デーモンの死体`<br>`7個の魔法のマーカ` | `blessed +2 scroll of genocide`<br>`amulet versus poison`<br>`speed boots`<br>`corpse of greater demon`<br>`7 magic markers` | 祝福・呪い、強化値、個数、状態（死体・缶詰・像など）を含めて指定できます。「鑑定」や「スピードの靴」等のJNetHack慣用句も認識します。 |
+| **虐殺**<br>(Genocide) | `マスター・リッチ`<br>`銀色ドラゴン`<br>`マインド・フレイヤ`<br>`L`<br>`none` または `nothing` | `master lich`<br>`silver dragon`<br>`mind flayer`<br>`L`<br>`none` または `nothing` | モンスターの種族名やシンボル文字（クラス記号）を指定します。`none` や `nothing`、空入力等で虐殺を拒否（不虐殺の誓いを維持）できます。 |
+| **魔法のマーカー**<br>(Writing: 巻物) | `識別` または `識別の巻物`<br>`解呪` または `解呪の巻物`<br>`虐殺` または `虐殺の巻物`<br>`鑑定`（JNetHack互換）<br>`コンテキスト・スイッチ`（外見ラベル） | `identify` または `scroll of identify`<br>`remove curse`<br>`genocide`<br>`ELBIB YLOH`（外見ラベル） | 白紙の巻物に対して使用します。正式名（「識別」等）だけでなく、未識別時のラベル名やプレイヤーが付けた名前（call名）でも書き込めます。 |
+| **魔法のマーカー**<br>(Writing: 呪文書) | `識別` または `識別の呪文書`<br>`火の玉` または `火の玉の魔法書`<br>`連鎖雷撃` | `identify` または `spellbook of identify`<br>`fireball`<br>`chain lightning` | 白紙の魔法書に対して使用します。「呪文書」「魔法書」のどちらの表記でも認識します（※呪文書は識別済みの名前でのみ書き込み可能です）。 |
 
 ---
 
