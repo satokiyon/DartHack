@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-28. */
 /* NetHack 5.0	explode.c	$NHDT-Date: 1781973049 2026/06/20 16:30:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.128 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -7,7 +7,7 @@
 
 staticfn int explosionmask(struct monst *, uchar, char) NONNULLARG1;
 staticfn void engulfer_explosion_msg(uchar, char);
-staticfn const char *jp_explosion_text_for_display(const char *, char *, size_t);
+const char *jp_explosion_text_for_display(const char *, char *, size_t);
 staticfn void jp_set_explosion_killer_name(char *, size_t, const char *);
 
 /* Note: Arrays are column first, while the screen is row first */
@@ -181,7 +181,7 @@ engulfer_explosion_msg(uchar adtyp, char olet)
     }
 }
 
-staticfn const char *
+const char *
 jp_explosion_text_for_display(const char *in, char *out, size_t outsz)
 {
     const char *pos;

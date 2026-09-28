@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-28. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1084,6 +1084,7 @@ extern void splatter_burning_oil(coordxy, coordxy, boolean);
 extern void explode_oil(struct obj *, coordxy, coordxy) NONNULLARG1;
 extern int adtyp_to_expltype(const int);
 extern void mon_explodes(struct monst *, struct attack *) NONNULLPTRS;
+extern const char *jp_explosion_text_for_display(const char *, char *, size_t);
 
 /* ### extralev.c ### */
 
@@ -3076,6 +3077,7 @@ extern char *Shknam(struct monst *) NONNULLARG1;
 extern char *shkname(struct monst *) NONNULLARG1;
 extern boolean shkname_is_pname(struct monst *) NONNULLARG1;
 extern const char *jp_shkname_for_display(struct monst *) NONNULLARG1;
+extern const char *jp_shkname_from_str(const char *);
 extern const char *jp_shoptype_name_for_display(int);
 extern boolean is_izchak(struct monst *, boolean) NONNULLARG1;
 
@@ -3367,6 +3369,7 @@ extern void timer_sanity_check(void);
 
 /* ### topten.c ### */
 
+extern const char *skip_english_article(const char *);
 extern void formatkiller(char *, unsigned, int, boolean) NONNULLARG1;
 extern void jp_translate_killer_text_for_display(char *, unsigned,
                                                  const char *);
