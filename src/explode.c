@@ -181,15 +181,79 @@ engulfer_explosion_msg(uchar adtyp, char olet)
     }
 }
 
+staticfn const char *
+jp_skip_english_article(const char *s)
+{
+    if (!s)
+        return "";
+    if (!strncmpi(s, "an ", 3))
+        return s + 3;
+    if (!strncmpi(s, "a ", 2))
+        return s + 2;
+    if (!strncmpi(s, "the ", 4))
+        return s + 4;
+    return s;
+}
+
+staticfn const char *
+jp_translate_explosion_noun(const char *noun, char *out, size_t outsz)
+{
+    const char *mname;
+    int mndx, gend, otyp;
+
+    if (!noun || !*noun)
+        return "爆発";
+
+    mname = jp_skip_english_article(noun);
+
+    /* モンスター名検索 */
+    mndx = name_to_mon(mname, &gend);
+    if (mndx >= LOW_PM && mndx < NUMMONS) {
+        return jp_pmname_from_idx(mndx, 0);
+    }
+
+    /* オブジェクト（アイテム）名検索 */
+    otyp = name_to_otyp(mname);
+    if (otyp >= 0 && otyp < NUM_OBJECTS) {
+        return jp_item_name(otyp);
+    }
+
+    /* 既知の英語爆発名フォールバック */
+    if (!strcmpi(mname, "explosion"))
+        return "爆発";
+    if (!strcmpi(mname, "magical blast"))
+        return "魔法の爆発";
+    if (!strcmpi(mname, "burning oil"))
+        return "燃える油";
+    if (!strcmpi(mname, "tower of flame"))
+        return "火柱";
+    if (!strcmpi(mname, "fireball"))
+        return "火の玉";
+    if (!strcmpi(mname, "ball of cold"))
+        return "冷気の玉";
+    if (!strcmpi(mname, "death field"))
+        return "死の領域";
+    if (!strcmpi(mname, "disintegration field"))
+        return "分解領域";
+    if (!strcmpi(mname, "ball of lightning"))
+        return "電撃の玉";
+    if (!strcmpi(mname, "poison gas cloud"))
+        return "毒ガス雲";
+    if (!strcmpi(mname, "splash of acid"))
+        return "酸の飛沫";
+
+    /* 未対応の場合 */
+    return mname;
+}
+
 const char *
 jp_explosion_text_for_display(const char *in, char *out, size_t outsz)
 {
     const char *pos;
     size_t n;
+    char nounbuf[BUFSZ];
 
-    if (!in)
-        return "爆発";
-    if (!*in)
+    if (!in || !*in)
         return "爆発";
     if (!strcmpi(in, "explosion"))
         return "爆発";
@@ -217,34 +281,54 @@ jp_explosion_text_for_display(const char *in, char *out, size_t outsz)
     pos = strstri(in, "'s explosion");
     if (pos) {
         n = (size_t) (pos - in);
-        if (n >= outsz)
-            n = outsz - 1;
-        memcpy(out, in, n);
-        out[n] = '\0';
-        Snprintf(eos(out), outsz - strlen(out), "の爆発");
+        if (n >= sizeof nounbuf)
+            n = sizeof nounbuf - 1;
+        memcpy(nounbuf, in, n);
+        nounbuf[n] = '\0';
+        const char *jpnoun = jp_translate_explosion_noun(nounbuf, out, outsz);
+        Snprintf(out, outsz, "%sの爆発", jpnoun);
         return out;
     }
 
     pos = strstri(in, "s' explosion");
     if (pos) {
         n = (size_t) (pos - in);
-        if (n >= outsz)
-            n = outsz - 1;
-        memcpy(out, in, n);
-        out[n] = '\0';
-        Snprintf(eos(out), outsz - strlen(out), "の爆発");
+        if (n >= sizeof nounbuf)
+            n = sizeof nounbuf - 1;
+        memcpy(nounbuf, in, n);
+        nounbuf[n] = '\0';
+        const char *jpnoun = jp_translate_explosion_noun(nounbuf, out, outsz);
+        Snprintf(out, outsz, "%sの爆発", jpnoun);
         return out;
     }
 
     pos = strstri(in, " explosion");
     if (pos) {
         n = (size_t) (pos - in);
-        if (n >= outsz)
-            n = outsz - 1;
-        memcpy(out, in, n);
-        out[n] = '\0';
-        Snprintf(eos(out), outsz - strlen(out), "の爆発");
+        if (n >= sizeof nounbuf)
+            n = sizeof nounbuf - 1;
+        memcpy(nounbuf, in, n);
+        nounbuf[n] = '\0';
+        const char *jpnoun = jp_translate_explosion_noun(nounbuf, out, outsz);
+        Snprintf(out, outsz, "%sの爆発", jpnoun);
         return out;
+    }
+
+    /* サフィックスがない場合でも、モンスター名やアイテム名であれば「～の爆発」にする */
+    {
+        const char *mname = jp_skip_english_article(in);
+        int mndx, gend, otyp;
+
+        mndx = name_to_mon(mname, &gend);
+        if (mndx >= LOW_PM && mndx < NUMMONS) {
+            Snprintf(out, outsz, "%sの爆発", jp_pmname_from_idx(mndx, 0));
+            return out;
+        }
+        otyp = name_to_otyp(mname);
+        if (otyp >= 0 && otyp < NUM_OBJECTS) {
+            Snprintf(out, outsz, "%sの爆発", jp_item_name(otyp));
+            return out;
+        }
     }
 
     return in;
@@ -738,41 +822,25 @@ explode(
                 rehumanize();
             } else {
                 if (olet == MON_EXPLODE) {
-                    if (generic) {
-                        /* explosion was unseen; str=="explosion", */
-                        /* svk.killer.name=="胞子ガスの爆発" など。 */
-                        if (!strcmp(str, "explosion"))
-                            jp_set_explosion_killer_name(svk.killer.name,
-                                                         sizeof svk.killer.name,
-                                                         str);
-                    } else if (str != svk.killer.name && str != hallu_buf) {
-                        jp_set_explosion_killer_name(svk.killer.name,
-                                                     sizeof svk.killer.name,
-                                                     str);
-                    }
+                    if (generic) /* explosion was unseen; str=="explosion", */
+                        ; /* svk.killer.name=="gas spore's explosion". */
+                    else if (str != svk.killer.name && str != hallu_buf)
+                        Strcpy(svk.killer.name, str);
                     svk.killer.format = KILLED_BY_AN;
                 } else if (olet == TRAP_EXPLODE) {
-                    const char *dispstr = jp_explosion_text_for_display(
-                        str, disp_buf, sizeof disp_buf);
-
                     svk.killer.format = NO_KILLER_PREFIX;
                     Snprintf(svk.killer.name, sizeof svk.killer.name,
-                             "%sに巻き込まれた", dispstr);
+                             "caught in a %s", str);
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
-                    const char *dispstr = jp_explosion_text_for_display(
-                        str, disp_buf, sizeof disp_buf);
-
                     svk.killer.format = NO_KILLER_PREFIX;
                     Snprintf(svk.killer.name, sizeof svk.killer.name,
-                             "自分の%sに巻き込まれた", dispstr);
+                             "caught in own %s", str);
                 } else {
                     svk.killer.format = (!strcmpi(str, "tower of flame")
                                      || !strcmpi(str, "fireball"))
                                         ? KILLED_BY_AN
                                         : KILLED_BY;
-                    jp_set_explosion_killer_name(svk.killer.name,
-                                                 sizeof svk.killer.name,
-                                                 str);
+                    Strcpy(svk.killer.name, str);
                 }
                 if (iflags.last_msg == PLNMSG_CAUGHT_IN_EXPLOSION
                     || iflags.last_msg == PLNMSG_TOWER_OF_FLAME) /*seffects()*/
@@ -1166,8 +1234,8 @@ mon_explodes(
 
     /* This might end up killing you, too; you never know...
      * also, it is used in explode() messages */
-        Sprintf(svk.killer.name, "%sの爆発",
-            jp_pmname(mon->data, Mgender(mon)));
+        Sprintf(svk.killer.name, "%s explosion",
+            pmname(mon->data, Mgender(mon)));
     svk.killer.format = KILLED_BY_AN;
 
     explode(mon->mx, mon->my, type, dmg, MON_EXPLODE,
