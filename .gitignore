@@ -122,6 +122,7 @@ scratch/
 !/docs/emoji_support_investigation.md
 !/docs/wizloadlua_guide.md
 !/docs/plan_fix_save_filename_consistency.md
+!/docs/death_reasons_architecture.md
 
 
 #logfiles

@@ -71,6 +71,16 @@ Flutter ポートにおけるハイスコア・スコアボード表示には、
 - スコアボード表示、死因テキスト（`trickery` → 不正行為、`panic` → パニック等）、ダンジョン名（`dnum 0` → 運命の大迷宮、`dnum 1` → ゲヘナ等）、エンドゲーム階層名（`dlev -5` → アストラル界、`dlev -4` → 水の精霊界等）の翻訳や表示ロジックを修正・追加する際は、**必ず Cコア側 (`topten.c` / `dungeon.c`) と Flutter UI 側 (`topten_entry.dart`) の両方のコードを同時に修正・同期させてください**。
 - どちらか一方のみを修正した場合、異なる表示画面で英語の露出やダンジョン名の表記不一致（例: 「メインダンジョン」等への退化）が発生します。
 
+## 死因内部キーの英語正規化と表示時動的翻訳に関する設計差分・仕様原則
+
+1. **アップストリーム英語キー保持と表示時動的翻訳原則**:
+   - NetHackJP 従来の実装では各 C コード（`trap.c`, `potion.c`, `read.c` 等）で直接日本語文字列（「落石」「酸の薬」等）をハードコードして `losehp()` や `svk.killer.name` に渡していました。
+   - DartHack ではアップストリーム本来の**英語キー（`"falling rock"`, `"potion of acid"` 等）のまま内部データを保持・正規化**し、墓石（`rip.c`）やスコアボード（`topten.c`）の**表示時に `jp_killer_reason_table` 等で動的に日本語へ翻訳**する堅牢なアーキテクチャを採用しています。
+   - 詳細なファイル別差分一覧や移行ガイドラインについては、[docs/death_reasons_architecture.md](file:///c:/Users/satok/DartHack/docs/death_reasons_architecture.md) を参照してください。
+
+2. **Git Subtree 同期時のコンフリクト抑制**:
+   - 将来 NetHackJP 側で罠やアイテム死因などの英語キー化を進める際は、上記ドキュメントの一覧表に基づき DartHack の英語キー定義と同期させることで、Git Subtree 同期時のマージコンフリクトを最小限に抑える設計を徹底してください。
+
 ## Flutter UI TopTen (TextOverlay / TopTenEntry) のバイリンガル判定とパース原則
 
 1. **ヘッダー行のバイリンガル検知**:
