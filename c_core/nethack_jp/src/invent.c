@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-28. */
 /* NetHack 5.0	invent.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.563 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -4555,7 +4555,7 @@ feel_cockatrice(struct obj *otmp, boolean force_touch)
         else
             pline("%sに触れることは致命的な誤りだ...", kbuf);
         /* normalize body shape here; hand, not jp_body_part(HAND) */
-        Sprintf(kbuf, "%sに素手で触れた", killer_xname(otmp));
+        Sprintf(kbuf, "touching %s bare-handed", killer_xname(otmp));
         /* will call polymon() for the poly_when_stoned() case */
         instapetrify(kbuf);
     }

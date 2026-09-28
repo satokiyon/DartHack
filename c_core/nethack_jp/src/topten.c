@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-28. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1045,6 +1045,9 @@ static const struct jp_killer_reason_entry {
     { "panic", 0, "パニック" },
     { "died", 0, "死亡した" },
     { "ascended", 0, "昇天した" },
+    { "his own player", "プレイヤー自身の手で倒された", 0 },
+    { "her own player", "プレイヤー自身の手で倒された", 0 },
+    { "its own player", "プレイヤー自身の手で倒された", 0 },
 };
 
 #define JPKB_FORM_KILLEDBY 0 /* "killed by <X>" 文形 */
@@ -1073,6 +1076,52 @@ jp_killer_exact_lookup(const char *key, int form, char *out, unsigned outsz)
         }
     }
     return FALSE;
+}
+
+staticfn boolean
+jp_translate_self_inflicted(char *outmain, unsigned outsz, const char *str)
+{
+    char verb[BUFSZ];
+    char fltxt[BUFSZ];
+
+    if (!str || (!strstr(str, " by himself") && !strstr(str, " by herself")
+                 && !strstr(str, " by itself")))
+        return FALSE;
+
+    fltxt[0] = '\0';
+    verb[0] = '\0';
+    if (strstr(str, "zapped")) {
+        Snprintf(verb, sizeof verb, "放った");
+    } else if (strstr(str, "breathed")) {
+        Snprintf(verb, sizeof verb, "吐いた");
+    } else {
+        Snprintf(verb, sizeof verb, "引き起こした");
+    }
+    if (strstr(str, "disintegration")) {
+        Snprintf(fltxt, sizeof fltxt, "分解ブレス");
+        Snprintf(verb, sizeof verb, "吐いた");
+    } else if (strstr(str, "magic missile")) {
+        Snprintf(fltxt, sizeof fltxt, "魔法の矢");
+        Snprintf(verb, sizeof verb, "放った");
+    } else if (strstr(str, "fire")) {
+        Snprintf(fltxt, sizeof fltxt, "火炎");
+    } else if (strstr(str, "frost")) {
+        Snprintf(fltxt, sizeof fltxt, "冷気");
+    } else if (strstr(str, "sleep")) {
+        Snprintf(fltxt, sizeof fltxt, "睡眠ガス");
+    } else if (strstr(str, "death")) {
+        Snprintf(fltxt, sizeof fltxt, "死の光線");
+    } else if (strstr(str, "lightning")) {
+        Snprintf(fltxt, sizeof fltxt, "稲妻");
+    } else if (strstr(str, "poison gas")) {
+        Snprintf(fltxt, sizeof fltxt, "毒ガス");
+    } else if (strstr(str, "acid")) {
+        Snprintf(fltxt, sizeof fltxt, "酸");
+    } else {
+        Snprintf(fltxt, sizeof fltxt, "光線");
+    }
+    Snprintf(outmain, outsz, "自分自身で%s%sで倒された", verb, fltxt);
+    return TRUE;
 }
 
 void
@@ -1308,7 +1357,11 @@ jp_translate_killer_text_for_display(
             jp_translate_killer_name_or_monster(killer, kbuf, sizeof kbuf);
 
             char *p;
-            if ((p = strstr(kbuf, "に触れたこと")) != 0 && p[12] == '\0') {
+            if (jp_translate_self_inflicted(outmain, sizeof outmain, killer)) {
+                ; /* 自分自身で放った魔法の矢／ブレス等で倒された */
+            } else if (strstr(killer, "own player")) {
+                Snprintf(outmain, sizeof outmain, "プレイヤー自身の手で倒された");
+            } else if ((p = strstr(kbuf, "に触れたこと")) != 0 && p[12] == '\0') {
                 /* 「～に触れたことに倒された」を「～に触れたことで倒された」に改善 */
                 Snprintf(outmain, sizeof outmain, "%sで倒された", kbuf);
             } else if (strstr(kbuf, "倒された") || strstr(kbuf, "石化した") || strstr(kbuf, "死んだ") || strstr(kbuf, "失敗") || strstr(kbuf, "食べたこと") || strstr(kbuf, "試食") || strstr(kbuf, "挟まれた") || strstr(kbuf, "卵")) {
@@ -1330,8 +1383,15 @@ jp_translate_killer_text_for_display(
         jp_translate_food_or_corpse(buf, sizeof buf, what);
         Snprintf(outmain, sizeof outmain, "%sで毒に侵された", buf);
     } else if (!strncmpi(core, "died of ", 8)) {
-        Snprintf(outmain, sizeof outmain, "%sで死亡した",
-                 skip_english_article(core + 8));
+        const char *cause = skip_english_article(core + 8);
+
+        if (!strcmpi(cause, "starvation")) {
+            Snprintf(outmain, sizeof outmain, "餓死した");
+        } else if (!strcmpi(cause, "exhaustion")) {
+            Snprintf(outmain, sizeof outmain, "過労で死亡した");
+        } else {
+            Snprintf(outmain, sizeof outmain, "%s", core);
+        }
     } else if (!strncmpi(core, "unwisely drank from ", 20)) {
         const char *what = skip_english_article(core + 20);
         const char *place_jp = "水場";
@@ -1475,9 +1535,55 @@ jp_translate_killer_text_for_display(
             jp_translate_food_or_corpse(fbuf, sizeof fbuf, what + 13);
             Snprintf(outmain, sizeof outmain, "%sにぶつかったことで石化した", fbuf);
         } else if (!strncmp(what, "being hit by ", 13)) {
+            const char *tgt = skip_english_article(what + 13);
+            boolean hurtling = FALSE;
+            if (!strncmpi(tgt, "hurtling ", 9)) {
+                hurtling = TRUE;
+                tgt = skip_english_article(tgt + 9);
+            }
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, tgt);
+            if (hurtling) {
+                Snprintf(outmain, sizeof outmain, "飛んできた%sに当たったことで石化した", fbuf);
+            } else {
+                Snprintf(outmain, sizeof outmain, "%sに当たったことで石化した", fbuf);
+            }
+        } else if (!strncmp(what, "touching ", 9)) {
+            char mbuf[BUFSZ];
+            boolean bare = FALSE;
+            Snprintf(mbuf, sizeof mbuf, "%s", what + 9);
+            char *p = strstr(mbuf, " bare-handed");
+            if (p) {
+                bare = TRUE;
+                *p = '\0';
+            }
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, mbuf);
+            if (bare) {
+                Snprintf(outmain, sizeof outmain, "素手で%sに触れたことで石化した", fbuf);
+            } else {
+                Snprintf(outmain, sizeof outmain, "%sに触れたことで石化した", fbuf);
+            }
+        } else if (strstr(what, "に素手で触れた")) {
+            char mbuf[BUFSZ];
+            Snprintf(mbuf, sizeof mbuf, "%s", what);
+            char *p = strstr(mbuf, "に素手で触れた");
+            if (p) *p = '\0';
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, mbuf);
+            Snprintf(outmain, sizeof outmain, "素手で%sに触れたことで石化した", fbuf);
+        } else if (!strncmp(what, "hiding under ", 13)) {
             char fbuf[BUFSZ];
             jp_translate_food_or_corpse(fbuf, sizeof fbuf, what + 13);
-            Snprintf(outmain, sizeof outmain, "%sに当たったことで石化した", fbuf);
+            Snprintf(outmain, sizeof outmain, "%sの下に隠れたことで石化した", fbuf);
+        } else if (!strncmp(what, "trying to help ", 15)) {
+            char mbuf[BUFSZ];
+            Snprintf(mbuf, sizeof mbuf, "%s", what + 15);
+            char *p = strstr(mbuf, " out of a pit");
+            if (p) *p = '\0';
+            char fbuf[BUFSZ];
+            jp_translate_food_or_corpse(fbuf, sizeof fbuf, mbuf);
+            Snprintf(outmain, sizeof outmain, "落とし穴から%sを助け出そうとしたことで石化した", fbuf);
         } else if (!strncmp(what, "attempting to saddle ", 21)) {
             char fbuf[BUFSZ];
             jp_translate_food_or_corpse(fbuf, sizeof fbuf, what + 21);
@@ -1558,38 +1664,8 @@ jp_translate_killer_text_for_display(
         Snprintf(outmain, sizeof outmain, "無謀にも%sを食べようとした", fbuf);
     } else if (!strncmpi(core, "shot ", 5) && strstr(core, "self with a death ray")) {
         Snprintf(outmain, sizeof outmain, "死の光線を自分自身に撃った");
-    } else if (strstr(core, " by himself") || strstr(core, " by herself") || strstr(core, " by itself")) {
-        char verb[BUFSZ];
-        char fltxt[BUFSZ];
-        fltxt[0] = '\0';
-        verb[0] = '\0';
-        if (strstr(core, "zapped")) {
-            Snprintf(verb, sizeof verb, "放った");
-        } else if (strstr(core, "breathed")) {
-            Snprintf(verb, sizeof verb, "吐いた");
-        } else {
-            Snprintf(verb, sizeof verb, "引き起こした");
-        }
-        if (strstr(core, "magic missile")) {
-            Snprintf(fltxt, sizeof fltxt, "魔法の矢");
-        } else if (strstr(core, "fire")) {
-            Snprintf(fltxt, sizeof fltxt, "火炎");
-        } else if (strstr(core, "frost")) {
-            Snprintf(fltxt, sizeof fltxt, "冷気");
-        } else if (strstr(core, "sleep")) {
-            Snprintf(fltxt, sizeof fltxt, "睡眠ガス");
-        } else if (strstr(core, "death")) {
-            Snprintf(fltxt, sizeof fltxt, "死の光線");
-        } else if (strstr(core, "lightning")) {
-            Snprintf(fltxt, sizeof fltxt, "稲妻");
-        } else if (strstr(core, "poison gas")) {
-            Snprintf(fltxt, sizeof fltxt, "毒ガス");
-        } else if (strstr(core, "acid")) {
-            Snprintf(fltxt, sizeof fltxt, "酸");
-        } else {
-            Snprintf(fltxt, sizeof fltxt, "光線");
-        }
-        Snprintf(outmain, sizeof outmain, "自分自身で%s%s", verb, fltxt);
+    } else if (jp_translate_self_inflicted(outmain, sizeof outmain, core)) {
+        ; /* 自分自身で放った魔法の矢／ブレス等で倒された */
     } else if (!strncmpi(core, "teleported out of the dungeon and fell to ", 42)) {
         Snprintf(outmain, sizeof outmain, "ダンジョン外へテレポートして落下死した");
     } else if (!strncmp(core, "unwisely ate the body of ", 25)) {
