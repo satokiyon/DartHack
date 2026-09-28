@@ -1058,6 +1058,7 @@ String _translateMonsterOrItemName(String raw) {
     'pit fiend': '穴の悪霊',
     'pit viper': 'マムシ',
     'plains centaur': '草原のケンタウロス',
+    'pet': 'ペット',
     'pony': 'ポニー',
     'priest': '僧侶',
     'priestess': '僧侶',
@@ -2074,6 +2075,50 @@ String _translateDeathText(String death, bool isJp) {
   return result;
 }
 
+String? _translateSelfInflicted(String str) {
+  if (!str.contains(' by himself') &&
+      !str.contains(' by herself') &&
+      !str.contains(' by itself')) {
+    return null;
+  }
+
+  String verb;
+  if (str.contains('zapped')) {
+    verb = '放った';
+  } else if (str.contains('breathed')) {
+    verb = '吐いた';
+  } else {
+    verb = '引き起こした';
+  }
+
+  String fltxt;
+  if (str.contains('disintegration')) {
+    fltxt = '分解ブレス';
+    verb = '吐いた';
+  } else if (str.contains('magic missile')) {
+    fltxt = '魔法の矢';
+    verb = '放った';
+  } else if (str.contains('fire')) {
+    fltxt = '火炎';
+  } else if (str.contains('frost')) {
+    fltxt = '冷気';
+  } else if (str.contains('sleep')) {
+    fltxt = '睡眠ガス';
+  } else if (str.contains('death')) {
+    fltxt = '死の光線';
+  } else if (str.contains('lightning')) {
+    fltxt = '稲妻';
+  } else if (str.contains('poison gas')) {
+    fltxt = '毒ガス';
+  } else if (str.contains('acid')) {
+    fltxt = '酸';
+  } else {
+    fltxt = '光線';
+  }
+
+  return '自分自身で$verb$fltxtで倒された';
+}
+
 String _translateDeathTextInternal(String death, bool isJp) {
   const exactMap = {
     'quit': '中断した',
@@ -2190,6 +2235,9 @@ String _translateDeathTextInternal(String death, bool isJp) {
     'carnivorous bag': '肉食の袋に倒された',
     'died': '死亡した',
     'ascended': '昇天した',
+    'his own player': 'プレイヤー自身の手で倒された',
+    'her own player': 'プレイヤー自身の手で倒された',
+    'its own player': 'プレイヤー自身の手で倒された',
   };
 
   if (exactMap.containsKey(death)) {
@@ -2263,6 +2311,9 @@ String _translateDeathTextInternal(String death, bool isJp) {
     if (raw == 'slimicide') return 'スライム化による死';
     if (raw == 'potion of poison') return '毒薬に倒された';
     if (raw == 'potion of polymorph') return 'へんげの薬に倒された';
+    if (raw.contains('own player')) return 'プレイヤー自身の手で倒された';
+    final self = _translateSelfInflicted(raw);
+    if (self != null) return self;
     final tr = _translateMonsterOrItemName(raw);
     return tr.endsWith('倒された') || tr.endsWith('石化した') || tr.endsWith('死んだ') ? tr : '$trに倒された';
   }
@@ -2270,6 +2321,66 @@ String _translateDeathTextInternal(String death, bool isJp) {
     final raw = death.substring(13);
     if (raw == "deliberately meeting Medusa's gaze") {
       return '意図的にメドゥーサの視線と目を合わせたことで石化した';
+    }
+    if (raw.startsWith('touching ') && raw.endsWith(' bare-handed')) {
+      final item = raw.substring(9, raw.length - 12);
+      final tr = _translateMonsterOrItemName(item);
+      return '素手で$trに触れたことで石化した';
+    }
+    if (raw.startsWith('touching ')) {
+      final item = raw.substring(9);
+      final tr = _translateMonsterOrItemName(item);
+      return '$trに触れたことで石化した';
+    }
+    if (raw.contains('に素手で触れた')) {
+      final item = raw.replaceAll('に素手で触れた', '').trim();
+      final tr = _translateMonsterOrItemName(item);
+      return '素手で$trに触れたことで石化した';
+    }
+    if (raw.startsWith('being hit by hurtling ')) {
+      final item = raw.substring(22);
+      final tr = _translateMonsterOrItemName(item);
+      return '飛んできた$trに当たったことで石化した';
+    }
+    if (raw.startsWith('being hit by ')) {
+      final item = raw.substring(13);
+      final tr = _translateMonsterOrItemName(item);
+      return '$trに当たったことで石化した';
+    }
+    if (raw.startsWith('hiding under ')) {
+      final item = raw.substring(13);
+      final tr = _translateMonsterOrItemName(item);
+      return '$trの下に隠れたことで石化した';
+    }
+    if (raw.startsWith('trying to help ') && raw.endsWith(' out of a pit')) {
+      final item = raw.substring(15, raw.length - 13);
+      final tr = _translateMonsterOrItemName(item);
+      return '落とし穴から$trを助け出そうとしたことで石化した';
+    }
+    if (raw.startsWith('attempting to saddle ')) {
+      final item = raw.substring(21);
+      final tr = _translateMonsterOrItemName(item);
+      return '$trに鞍を付けようとして石化した';
+    }
+    if (raw.startsWith('attempting to ride ')) {
+      final item = raw.substring(19);
+      final tr = _translateMonsterOrItemName(item);
+      return '$trに乗ろうとして石化した';
+    }
+    if (raw.startsWith('swallowing ') && raw.endsWith(' whole')) {
+      final item = raw.substring(11, raw.length - 6);
+      final tr = _translateMonsterOrItemName(item);
+      return '$trを丸のみして石化した';
+    }
+    if (raw.startsWith('engulfing ')) {
+      final item = raw.substring(10);
+      final tr = _translateMonsterOrItemName(item);
+      return '$trを包み込んで石化した';
+    }
+    if (raw.startsWith('enclosing ')) {
+      final item = raw.substring(10);
+      final tr = _translateMonsterOrItemName(item);
+      return '$trを閉じ込めて石化した';
     }
     final tr = _translateMonsterOrItemName(raw);
     return tr.endsWith('石化した') ? tr : '$trによる石化';
@@ -2287,7 +2398,13 @@ String _translateDeathTextInternal(String death, bool isJp) {
     return '$trで毒に侵された';
   }
   if (death.startsWith('died of ')) {
-    final tr = _translateMonsterOrItemName(death.substring(8));
+    final cause = death.substring(8).trim();
+    if (cause.toLowerCase() == 'starvation') {
+      return '餓死した';
+    } else if (cause.toLowerCase() == 'exhaustion') {
+      return '過労で死亡した';
+    }
+    final tr = _translateMonsterOrItemName(cause);
     return '$trで死亡した';
   }
   if (death.startsWith('drowned in ')) {
@@ -2325,6 +2442,21 @@ String _translateDeathTextInternal(String death, bool isJp) {
     final tr = _translateMonsterOrItemName(item);
     return '素手で$trを装備したことで石化した';
   }
+  if (death.startsWith('touching ') && death.endsWith(' bare-handed')) {
+    final item = death.substring(9, death.length - 12);
+    final tr = _translateMonsterOrItemName(item);
+    return '素手で$trに触れたことで石化した';
+  }
+  if (death.startsWith('touching ')) {
+    final item = death.substring(9);
+    final tr = _translateMonsterOrItemName(item);
+    return '$trに触れたことで石化した';
+  }
+  if (death.contains('に素手で触れた')) {
+    final item = death.replaceAll('に素手で触れた', '').trim();
+    final tr = _translateMonsterOrItemName(item);
+    return '素手で$trに触れたことで石化した';
+  }
   if (death.startsWith('caught in own ')) {
     final tr = _translateMonsterOrItemName(death.substring(14));
     return '自分の$trの爆発に巻き込まれた';
@@ -2340,6 +2472,11 @@ String _translateDeathTextInternal(String death, bool isJp) {
   if (death.startsWith('caught in ')) {
     final tr = _translateMonsterOrItemName(death.substring(10));
     return '$trの爆発に巻き込まれた';
+  }
+
+  final selfInflicted = _translateSelfInflicted(death);
+  if (selfInflicted != null) {
+    return selfInflicted;
   }
 
   if (death == 'committed suicide') {

@@ -463,5 +463,45 @@ void main() {
       expect(entries[8].details[0], contains('窒息して倒された'));
       expect(entries[9].details[0], contains('スライム化による死'));
     });
+
+    test('NetHackJP同期死因（餓死、過労、プレイヤー自身、自己誤射、素手触診石化など）の日本語化テスト', () {
+      final inputLines = [
+        '順位      点数  名前                                                   HP[最大]',
+        '  1      1000  Player 考古学者/ドワーフ/男性/秩序',
+        '                died of starvation (運命の大迷宮 1階). - [30]',
+        '  2       900  Player 考古学者/ドワーフ/男性/秩序',
+        '                died of exhaustion (運命の大迷宮 1階). - [30]',
+        '  3       800  Player 考古学者/ドワーフ/男性/秩序',
+        '                his own player (運命の大迷宮 1階). - [30]',
+        '  4       700  Player 考古学者/ドワーフ/男性/秩序',
+        '                killed by his own player (運命の大迷宮 1階). - [30]',
+        '  5       600  Player 考古学者/ドワーフ/男性/秩序',
+        '                disintegration breath by himself (運命の大迷宮 1階). - [30]',
+        '  6       500  Player 考古学者/ドワーフ/男性/秩序',
+        '                petrified by touching cockatrice bare-handed (運命の大迷宮 1階). - [30]',
+        '  7       400  Player 考古学者/ドワーフ/男性/秩序',
+        '                petrified by being hit by hurtling cockatrice corpse (運命の大迷宮 1階). - [30]',
+        '  8       300  Player 考古学者/ドワーフ/男性/秩序',
+        '                petrified by hiding under cockatrice corpse (運命の大迷宮 1階). - [30]',
+        '  9       200  Player 考古学者/ドワーフ/男性/秩序',
+        '                petrified by trying to help pet out of a pit (運命の大迷宮 1階). - [30]',
+        ' 10       100  Player 考古学者/ドワーフ/男性/秩序',
+        '                unwisely drank from fountain (運命の大迷宮 1階). - [30]',
+      ];
+      final attrs = List.filled(inputLines.length, 0);
+      final entries = TopTenEntry.parse(inputLines, attrs, isJp: true);
+
+      expect(entries.length, 10);
+      expect(entries[0].details[0], contains('餓死した'));
+      expect(entries[1].details[0], contains('過労で死亡した'));
+      expect(entries[2].details[0], contains('プレイヤー自身の手で倒された'));
+      expect(entries[3].details[0], contains('プレイヤー自身の手で倒された'));
+      expect(entries[4].details[0], contains('自分自身で吐いた分解ブレスで倒された'));
+      expect(entries[5].details[0], contains('素手でコカトリスに触れたことで石化した'));
+      expect(entries[6].details[0], contains('飛んできたコカトリスの死体に当たったことで石化した'));
+      expect(entries[7].details[0], contains('コカトリスの死体の下に隠れたことで石化した'));
+      expect(entries[8].details[0], contains('落とし穴からペットを助け出そうとしたことで石化した'));
+      expect(entries[9].details[0], contains('泉から飲んだ不心得'));
+    });
   });
 }
