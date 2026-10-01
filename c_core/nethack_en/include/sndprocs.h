@@ -40,6 +40,9 @@ enum soundlib_ids {
 #ifdef SND_LIB_ANDROIDSOUND
     soundlib_androidsound,
 #endif
+#ifdef SND_LIB_MAC68KSOUND
+    soundlib_mac68ksound,
+#endif
     soundlib_notused
 };
 
@@ -276,7 +279,8 @@ SoundAchievement(0, sa2_xpleveldown, level);
         || defined(SND_LIB_MINIAUDIO) || defined(SND_LIB_FMOD) \
         || defined(SND_LIB_SOUND_ESCCODES) || defined(SND_LIB_VISSOUND) \
         || defined(SND_LIB_WINDSOUND) || defined(SND_LIB_MACSOUND) \
-        || defined(SND_LIB_ANDROIDSOUND)
+        || defined(SND_LIB_ANDROIDSOUND) \
+        || defined(SND_LIB_MAC68KSOUND)
 
 /* shortcut for conditional code in other files */
 #define SND_LIB_INTEGRATED
