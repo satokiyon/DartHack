@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	sndprocs.h	$NHDT-Date: 1781973088 2026/06/20 16:31:28 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.28 $ */
 /* Copyright (c) Michael Allison, 2022                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -37,6 +37,9 @@ enum soundlib_ids {
 #endif
 #ifdef SND_LIB_QTSOUND
     soundlib_qtsound,
+#endif
+#ifdef SND_LIB_MAC68KSOUND
+    soundlib_mac68ksound,
 #endif
     soundlib_notused
 };
@@ -195,7 +198,8 @@ SoundAchievement(0, sa2_xpleveldown, level);
         || defined(SND_LIB_OPENAL) || defined(SND_LIB_SDL_MIXER) \
         || defined(SND_LIB_MINIAUDIO) || defined(SND_LIB_FMOD) \
         || defined(SND_LIB_SOUND_ESCCODES) || defined(SND_LIB_VISSOUND) \
-        || defined(SND_LIB_WINDSOUND) || defined(SND_LIB_MACSOUND)
+        || defined(SND_LIB_WINDSOUND) || defined(SND_LIB_MACSOUND) \
+        || defined(SND_LIB_MAC68KSOUND)
 
 /* 他ファイル用の条件分岐ショートカット */
 #define SND_LIB_INTEGRATED

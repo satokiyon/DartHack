@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
 Building NetHack using the Visual Studio nmake from the command line
 
 Prerequisite Requirements:
@@ -60,7 +60,7 @@ architectures have evolved and you can now choose whether to build
 a 32-bit x86 version, or a 64-bit x64 version.  The default Makefile
 is set up for a 32-bit x86 version, but that's only because it will
 run on the most number of existing Windows environments. Change it if you
-want. Be aware that NetHack's save files and bones files in the 5.0.0
+want. Be aware that NetHack's save files and bones files in the 5.0.1
 release have not yet evolved enough to allow them to interchange between
 the 32-bit version and the 64-bit version (or between different platforms).
 That may change in future.

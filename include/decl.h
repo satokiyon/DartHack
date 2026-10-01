@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0  decl.h  $NHDT-Date: 1781973078 2026/06/20 16:31:18 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.408 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
@@ -182,6 +182,8 @@ struct instance_globals_a {
         when more than one stack of potions of acid explode while processing
         a chain of objects, use alternate phrasing after the first message */
     struct h2o_ctx acid_ctx;
+
+    long articulo_mortis;
 
     boolean havestate;
 };

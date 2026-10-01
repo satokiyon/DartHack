@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-22. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	windows.c	$NHDT-Date: 1781973074 2026/06/20 16:31:14 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.147 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -22,7 +22,8 @@ extern void win_X11_init(int);
 extern struct window_procs Qt_procs;
 #endif
 #ifdef GEM_GRAPHICS
-/*#include "wingem.h"*/
+extern struct window_procs Gem_procs;
+extern void win_Gem_init(int);
 #endif
 #ifdef MAC68K
 extern struct window_procs mac_procs;
@@ -1194,7 +1195,7 @@ dump_fmtstr(
                 else
                     Strcpy(tmpbuf, "{current date+time}");
                 break;
-            case 'v': /* version, eg. "5.0.0,-0" */
+            case 'v': /* version, eg. "5.0.1,-0" */
                 Sprintf(tmpbuf, "%s", version_string(verbuf, sizeof verbuf));
                 break;
             case 'u': /* UID */

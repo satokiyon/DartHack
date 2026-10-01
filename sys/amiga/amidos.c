@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 3.6	amidos.c	$NHDT-Date: 1432512796 2015/05/25 00:13:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* Copyright (c) Olaf Seibert, Nijmegen, The Netherlands, 1988,1990.    */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1991,1992,1993,1996.  */
@@ -121,7 +122,7 @@ freediskspace(char *path)
 
         strncpy(fileName, path, sizeof(fileName) - 1);
         fileName[31] = 0;
-        if (colon = strchr(fileName, ':'))
+        if ((colon = strchr(fileName, ':')) != NULL)
             colon[1] = '\0';
         else
             fileName[0] = '\0';
@@ -129,7 +130,7 @@ freediskspace(char *path)
     {
         BPTR fileLock;
         infoData = (struct InfoData *) alloc(sizeof(struct InfoData));
-        if (fileLock = Lock(fileName, SHARED_LOCK)) {
+        if ((fileLock = Lock(fileName, SHARED_LOCK)) != 0) {
             if (Info(fileLock, infoData)) {
                 /* We got a kind of DOS volume, since we can Lock it. */
                 /* Calculate number of blocks available for new file */
@@ -166,7 +167,7 @@ filesize(char *file)
 
     fileInfoBlock =
         (struct FileInfoBlock *) alloc(sizeof(struct FileInfoBlock));
-    if (fileLock = Lock(file, SHARED_LOCK)) {
+    if ((fileLock = Lock(file, SHARED_LOCK)) != 0) {
         if (Examine(fileLock, fileInfoBlock)) {
             size = fileInfoBlock->fib_Size;
         }
@@ -186,7 +187,7 @@ saveDiskPrompt(int start)
     BPTR fileLock;
     if (sysflags.asksavedisk) {
         /* Don't prompt if you can find the save file */
-        if (fileLock = Lock(gs.SAVEF, SHARED_LOCK)) {
+        if ((fileLock = Lock(gs.SAVEF, SHARED_LOCK)) != 0) {
             UnLock(fileLock);
 #if defined(TTY_GRAPHICS)
             if (windowprocs.win_init_nhwindows
@@ -240,7 +241,7 @@ record_exists(void)
 {
     FILE *file;
 
-    if (file = fopenp(RECORD, "r")) {
+    if ((file = fopenp(RECORD, "r")) != NULL) {
         fclose(file);
         return TRUE;
     }
@@ -304,9 +305,9 @@ fopenp(const char *name, const char *mode)
     if (strlen(name) >= BUFSIZ)
         return (NULL);
     strcpy(buf, name);
-    if (theLock = Lock(buf, SHARED_LOCK)) {
+    if ((theLock = Lock(buf, SHARED_LOCK)) != 0) {
         UnLock(theLock);
-        if (fp = fopen(buf, mode))
+        if ((fp = fopen(buf, mode)) != NULL)
             return fp;
     }
     pp = PATH;
@@ -325,9 +326,9 @@ fopenp(const char *name, const char *mode)
         if (bp + strlen(name) > buf + BUFSIZ - 1)
             return (NULL);
         strcpy(bp, name);
-        if (theLock = Lock(buf, SHARED_LOCK)) {
+        if ((theLock = Lock(buf, SHARED_LOCK)) != 0) {
             UnLock(theLock);
-            if (fp = fopen(buf, mode))
+            if ((fp = fopen(buf, mode)) != NULL)
                 return fp;
         }
         if (*pp)
@@ -372,7 +373,7 @@ chdir(
          */
         BPTR newDir;
 
-        if (newDir = Lock((char *) dir, SHARED_LOCK)) {
+        if ((newDir = Lock((char *) dir, SHARED_LOCK)) != 0) {
             if (OrgDirLock == NO_LOCK) {
                 OrgDirLock = CurrentDir(newDir);
             } else {

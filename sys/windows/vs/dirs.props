@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. -->
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
     <LUA_VERSION>5.4.8</LUA_VERSION>
@@ -28,7 +29,7 @@
     <IntDir>$(ObjDir)</IntDir>
     <WinCursDir>$(RootDir)win\curses\</WinCursDir>
     <SubmodulesDir>$(RootDir)submodules\</SubmodulesDir>
-    <LuaDir>$(LibDir)lua-$(LUA_VERSION)\src\</LuaDir>
+    <LuaDir>$(RootDir)nhlua\lua\src\</LuaDir>
     <SftagsDir>$(RootDir)\sys\windows\vs\sftags\</SftagsDir>
     <SfctoolDir>$(RootDir)\sys\windows\vs\sfctool\</SfctoolDir>
     <PackageBin>$(RootDir)binary\$(Configuration)\$(Platform)</PackageBin>

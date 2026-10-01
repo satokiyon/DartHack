@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	pcsys.c	$NHDT-Date: 1596498283 2020/08/03 23:44:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.42 $ */
 /*      Copyright (c) 2012 by Michael Allison              */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -164,6 +164,7 @@ getreturn(const char *str)
     return;
 }
 
+#ifndef CROSS_TO_ATARI /* sys/share/pcmain.c provides its own */
 void msmsg
 VA_DECL(const char *, fmt)
 {
@@ -178,6 +179,7 @@ VA_DECL(const char *, fmt)
     VA_END();
     return;
 }
+#endif
 
 /*
  * Follow the PATH, trying to fopen the file.

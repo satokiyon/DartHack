@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-03. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	winprocs.h	$NHDT-Date: 1781973091 2026/06/20 16:31:31 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) David Cohrs, 1992                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -17,8 +17,14 @@ enum wp_ids { wp_tty = 1, wp_X11, wp_Qt, wp_mswin, wp_curses,
 #if defined(AMIGA)
               wp_amii, wp_amiv,
 #endif
+#ifdef MAC68K
+              wp_mac,
+#endif
+#if defined(GEM_GRAPHICS)
+              wp_Gem,
+#endif
 #ifdef OUTDATED_STUFF
-              wp_mac, wp_Gem, wp_Gnome,
+              wp_Gnome,
 #endif
               wp_trace  // XXX do we need this?  should chainin/out get an id? TBD
 };

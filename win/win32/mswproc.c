@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	mswproc.c	$NHDT-Date: 1781973107 2026/06/20 16:31:47 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.208 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2418,47 +2418,69 @@ logDebug(const char *fmt, ...)
 #endif
 
 /* Reading and writing settings from the registry. */
-#define CATEGORYKEY TEXT("Software")
-#define COMPANYKEY TEXT("NetHack")
-#define PRODUCTKEY TEXT("NetHack 5.0.0")
-#define SETTINGSKEY TEXT("Settings")
-#define MAINSHOWSTATEKEY TEXT("MainShowState")
-#define MAINMINXKEY TEXT("MainMinX")
-#define MAINMINYKEY TEXT("MainMinY")
-#define MAINMAXXKEY TEXT("MainMaxX")
-#define MAINMAXYKEY TEXT("MainMaxY")
-#define MAINLEFTKEY TEXT("MainLeft")
-#define MAINRIGHTKEY TEXT("MainRight")
-#define MAINTOPKEY TEXT("MainTop")
-#define MAINBOTTOMKEY TEXT("MainBottom")
-#define MAINAUTOLAYOUT TEXT("AutoLayout")
-#define MAPLEFT TEXT("MapLeft")
-#define MAPRIGHT TEXT("MapRight")
-#define MAPTOP TEXT("MapTop")
-#define MAPBOTTOM TEXT("MapBottom")
-#define MSGLEFT TEXT("MsgLeft")
-#define MSGRIGHT TEXT("MsgRight")
-#define MSGTOP TEXT("MsgTop")
-#define MSGBOTTOM TEXT("MsgBottom")
-#define STATUSLEFT TEXT("StatusLeft")
-#define STATUSRIGHT TEXT("StatusRight")
-#define STATUSTOP TEXT("StatusTop")
-#define STATUSBOTTOM TEXT("StatusBottom")
-#define MENULEFT TEXT("MenuLeft")
-#define MENURIGHT TEXT("MenuRight")
-#define MENUTOP TEXT("MenuTop")
-#define MENUBOTTOM TEXT("MenuBottom")
-#define TEXTLEFT TEXT("TextLeft")
-#define TEXTRIGHT TEXT("TextRight")
-#define TEXTTOP TEXT("TextTop")
-#define TEXTBOTTOM TEXT("TextBottom")
-#define INVENTLEFT TEXT("InventLeft")
-#define INVENTRIGHT TEXT("InventRight")
-#define INVENTTOP TEXT("InventTop")
-#define INVENTBOTTOM TEXT("InventBottom")
+/* Reading and writing settings from the registry. */
+/* レジストリキーはすべてASCII英数字のため、UNICODEビルドでもアップストリーム準拠のANSI版APIを使用する */
+#ifdef RegOpenKeyEx
+#undef RegOpenKeyEx
+#define RegOpenKeyEx RegOpenKeyExA
+#endif
+#ifdef RegQueryValueEx
+#undef RegQueryValueEx
+#define RegQueryValueEx RegQueryValueExA
+#endif
+#ifdef RegCreateKeyEx
+#undef RegCreateKeyEx
+#define RegCreateKeyEx RegCreateKeyExA
+#endif
+#ifdef RegSetValueEx
+#undef RegSetValueEx
+#define RegSetValueEx RegSetValueExA
+#endif
+#ifdef RegDeleteKey
+#undef RegDeleteKey
+#define RegDeleteKey RegDeleteKeyA
+#endif
+#define CATEGORYKEY "Software"
+#define COMPANYKEY "NetHack"
+#define PRODUCTKEY "NetHack 5.0.1"
+#define SETTINGSKEY "Settings"
+#define MAINSHOWSTATEKEY "MainShowState"
+#define MAINMINXKEY "MainMinX"
+#define MAINMINYKEY "MainMinY"
+#define MAINMAXXKEY "MainMaxX"
+#define MAINMAXYKEY "MainMaxY"
+#define MAINLEFTKEY "MainLeft"
+#define MAINRIGHTKEY "MainRight"
+#define MAINTOPKEY "MainTop"
+#define MAINBOTTOMKEY "MainBottom"
+#define MAINAUTOLAYOUT "AutoLayout"
+#define MAPLEFT "MapLeft"
+#define MAPRIGHT "MapRight"
+#define MAPTOP "MapTop"
+#define MAPBOTTOM "MapBottom"
+#define MSGLEFT "MsgLeft"
+#define MSGRIGHT "MsgRight"
+#define MSGTOP "MsgTop"
+#define MSGBOTTOM "MsgBottom"
+#define STATUSLEFT "StatusLeft"
+#define STATUSRIGHT "StatusRight"
+#define STATUSTOP "StatusTop"
+#define STATUSBOTTOM "StatusBottom"
+#define MENULEFT "MenuLeft"
+#define MENURIGHT "MenuRight"
+#define MENUTOP "MenuTop"
+#define MENUBOTTOM "MenuBottom"
+#define TEXTLEFT "TextLeft"
+#define TEXTRIGHT "TextRight"
+#define TEXTTOP "TextTop"
+#define TEXTBOTTOM "TextBottom"
+#define INVENTLEFT "InventLeft"
+#define INVENTRIGHT "InventRight"
+#define INVENTTOP "InventTop"
+#define INVENTBOTTOM "InventBottom"
 
 /* #define all the subkeys here */
-#define INTFKEY TEXT("Interface")
+#define INTFKEY "Interface"
 
 void
 mswin_read_reg(void)
@@ -2466,7 +2488,7 @@ mswin_read_reg(void)
     HKEY key;
     DWORD size;
     DWORD safe_buf;
-    TCHAR keystring[MAX_PATH];
+    char keystring[MAX_PATH];
     int i;
     COLORREF default_mapcolors[CLR_MAX] = {
         RGB(0x55, 0x55, 0x55), /* CLR_BLACK */
@@ -2487,8 +2509,8 @@ mswin_read_reg(void)
         RGB(0xFF, 0xFF, 0xFF)  /* CLR_WHITE */
     };
 
-    _stprintf(keystring, TEXT("%s\\%s\\%s\\%s"), CATEGORYKEY, COMPANYKEY,
-              PRODUCTKEY, SETTINGSKEY);
+    sprintf(keystring, "%s\\%s\\%s\\%s", CATEGORYKEY, COMPANYKEY, PRODUCTKEY,
+            SETTINGSKEY);
 
     /* Set the defaults here. The very first time the app is started, nothing
        is
@@ -2553,10 +2575,9 @@ mswin_read_reg(void)
 
     for (i = 0; i < CLR_MAX; i++) {
         COLORREF cl;
-        TCHAR mapcolorkey[64];
-        _stprintf(mapcolorkey, TEXT("MapColor%02d"), i);
-        if (RegQueryValueEx(key, mapcolorkey, NULL, NULL, (BYTE *)&cl, &size)
-            == ERROR_SUCCESS)
+        char mapcolorkey[64];
+        sprintf(mapcolorkey, "MapColor%02d", i);
+        if (RegQueryValueEx(key, mapcolorkey, NULL, NULL, (BYTE *)&cl, &size) == ERROR_SUCCESS)
             GetNHApp()->regMapColors[i] = cl;
     }
 
@@ -2581,11 +2602,11 @@ mswin_write_reg(void)
     int i;
 
     if (GetNHApp()->saveRegistrySettings) {
-        TCHAR keystring[MAX_PATH];
+        char keystring[MAX_PATH];
         DWORD safe_buf;
 
-        _stprintf(keystring, TEXT("%s\\%s\\%s\\%s"), CATEGORYKEY, COMPANYKEY,
-                  PRODUCTKEY, SETTINGSKEY);
+        sprintf(keystring, "%s\\%s\\%s\\%s", CATEGORYKEY, COMPANYKEY,
+                PRODUCTKEY, SETTINGSKEY);
 
         if (RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_WRITE, &key)
             != ERROR_SUCCESS) {
@@ -2642,10 +2663,9 @@ mswin_write_reg(void)
 
         for (i = 0; i < CLR_MAX; i++) {
             COLORREF cl = GetNHApp()->regMapColors[i];
-            TCHAR mapcolorkey[64];
-            _stprintf(mapcolorkey, TEXT("MapColor%02d"), i);
-            RegSetValueEx(key, mapcolorkey, 0, REG_DWORD, (BYTE *)&cl,
-                          sizeof(DWORD));
+            char mapcolorkey[64];
+            sprintf(mapcolorkey, "MapColor%02d", i);
+            RegSetValueEx(key, mapcolorkey, 0, REG_DWORD, (BYTE *)&cl, sizeof(DWORD));
         }
 
         RegCloseKey(key);
@@ -2655,21 +2675,20 @@ mswin_write_reg(void)
 void
 mswin_destroy_reg(void)
 {
-    TCHAR keystring[MAX_PATH];
+    char keystring[MAX_PATH];
     HKEY key;
     DWORD nrsubkeys;
 
     /* Delete keys one by one, as NT does not delete trees */
-    _stprintf(keystring, TEXT("%s\\%s\\%s\\%s"), CATEGORYKEY, COMPANYKEY,
-              PRODUCTKEY, SETTINGSKEY);
+    sprintf(keystring, "%s\\%s\\%s\\%s", CATEGORYKEY, COMPANYKEY, PRODUCTKEY,
+            SETTINGSKEY);
     RegDeleteKey(HKEY_CURRENT_USER, keystring);
-    _stprintf(keystring, TEXT("%s\\%s\\%s"), CATEGORYKEY, COMPANYKEY,
-              PRODUCTKEY);
+    sprintf(keystring, "%s\\%s\\%s", CATEGORYKEY, COMPANYKEY, PRODUCTKEY);
     RegDeleteKey(HKEY_CURRENT_USER, keystring);
     /* The company key will also contain information about newer versions
        of nethack (e.g. a subkey called NetHack 4.0), so only delete that
        if it's empty now. */
-    _stprintf(keystring, TEXT("%s\\%s"), CATEGORYKEY, COMPANYKEY);
+    sprintf(keystring, "%s\\%s", CATEGORYKEY, COMPANYKEY);
     /* If we cannot open it, we probably cannot delete it either... Just
        go on and see what happens. */
     RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_READ, &key);

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	glyphs.c	TODO: add NHDT branch/date/revision tags */
 /* Copyright (c) Michael Allison, 2021. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -578,6 +578,14 @@ empty_glyphname_hash_indices(void)
     glyphname_hash_indices_ptr = (struct glyphname_hash_index_entry_t *) 0;
     glyphname_hash_indices_count = 0;
 }
+
+
+
+
+
+
+
+
 
 staticfn int
 find_glyph_in_hashtable(const char *id)

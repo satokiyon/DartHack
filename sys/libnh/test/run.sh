@@ -1,3 +1,4 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
 #!/bin/bash -x
 
 if [ x$1 == "xlib" ]; then
@@ -6,7 +7,7 @@ if [ x$1 == "xlib" ]; then
         make spotless
     fi
     cd sys/unix
-    ./setup.sh hints/macOS.500
+    ./setup.sh hints/macOS.501
     cd ../..
     make WANT_LIBNH=1
 fi
@@ -25,7 +26,7 @@ if [ x$1 == "xwasm" ]; then
         make spotless
     fi
     cd sys/unix
-    ./setup.sh hints/macOS.500
+    ./setup.sh hints/macOS.501
     cd ../..
     make CROSS_TO_WASM=1
 fi
@@ -38,7 +39,7 @@ if [ x$1 == "xbin" ]; then
     echo Doing bin...
     make spotless
     cd sys/unix
-    ./setup.sh hints/macOS.500
+    ./setup.sh hints/macOS.501
     cd ../..
     make
 fi

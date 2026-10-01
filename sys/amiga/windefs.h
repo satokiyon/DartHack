@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 3.6	windefs.h	$NHDT-Date: 1432512795 2015/05/25 00:13:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -64,9 +65,6 @@
 #define VATTR 0    /* Video attribute is in this slot */
 #define SEL_ITEM 1 /* If this is a select item, slot is 1 else 0 */
 #define SOFF 2     /* The string starts here.  */
-
-#undef NULL
-#define NULL 0L
 
 /*
  * Versions we need of various libraries.  We can't use LIBRARY_VERSION

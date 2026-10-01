@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	save.c	$NHDT-Date: 1781973065 2026/06/20 16:31:05 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.263 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -98,6 +98,9 @@ dosave0(void)
        when punished, make sure ball and chain are placed too */
     done_object_cleanup(); /* maybe force some items onto map */
 
+    /* ensure SAVEF is set; pcmain sets it at startup but the player
+       name may have changed since then (strstrplay, strstrstrplay) */
+    set_savefile_name(TRUE);
     if (!program_state.something_worth_saving || !gs.SAVEF[0])
         goto done;
 
@@ -553,7 +556,7 @@ savelev_core(NHFILE *nhfp, xint8 lev)
     Sfo_dest_area(nhfp, &svd.dndest, "lev-dndest");
     save_adjust_levelflags(timestamp);
     Sfo_levelflags(nhfp, &svl.level.flags, "lev-level_flags");
-    rest_adjust_levelflags(svm.moves - timestamp);
+    rest_adjust_levelflags(svm.moves - timestamp, FALSE);
 
     Sfo_int(nhfp, &svd.doors_alloc, "lev-doors_alloc");
     /* don't rely on underlying write() behavior to write
