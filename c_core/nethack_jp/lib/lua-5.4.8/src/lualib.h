@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /*
 ** $Id: lualib.h $
 ** Lua standard libraries

@@ -1,3 +1,4 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
 #!/bin/bash
 
 if [ ! -z "${TF_BUILD}" ]; then

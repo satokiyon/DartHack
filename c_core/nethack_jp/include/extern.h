@@ -2694,6 +2694,7 @@ extern void qt_pager(const char *);
 extern struct permonst *qt_montype(void);
 extern void deliver_splev_message(void);
 extern const char *jp_rank_of_for_display(int, short, boolean);
+extern void free_questpager(void);
 
 /* ### random.c ### */
 

@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /*
 ** $Id: lopcodes.h $
 ** Opcodes for Lua virtual machine

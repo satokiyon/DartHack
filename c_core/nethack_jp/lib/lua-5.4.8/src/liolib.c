@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /*
 ** $Id: liolib.c $
 ** Standard I/O (and system) library

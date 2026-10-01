@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /*
 ** $Id: ldebug.h $
 ** Auxiliary functions from Debug Interface module

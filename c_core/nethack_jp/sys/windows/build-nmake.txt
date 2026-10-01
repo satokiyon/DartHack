@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-23.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
 Building NetHack using the Visual Studio nmake from the command line
 
 Prerequisite Requirements:

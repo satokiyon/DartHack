@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-09.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
 
 
 

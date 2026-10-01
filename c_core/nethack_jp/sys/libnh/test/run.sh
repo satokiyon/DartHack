@@ -1,3 +1,4 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
 #!/bin/bash -x
 
 if [ x$1 == "xlib" ]; then

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 3.6	amiconf.h	$NHDT-Date: 1432512775 2015/05/25 00:12:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1990, 1991, 1992, 1993.
  */
@@ -7,11 +7,7 @@
 #ifndef AMICONF_H
 #define AMICONF_H
 
-#undef abs /* avoid using macro form of abs */
-#undef min /* this gets redefined */
-#undef max /* this gets redefined */
-
-#include <time.h> /* 使用前に time_t を定義させる! */
+#include <time.h> /* get time_t defined before use! */
 
 #include <stdlib.h>
 #include <string.h>
@@ -20,7 +16,11 @@
 #include <clib/dos_protos.h>
 #include <proto/dos.h>
 
-#define MICRO /* 一部インクルードを許可するため定義必須 */
+#undef abs /* avoid using macro form of abs */
+#undef min /* this gets redefined */
+#undef max /* this gets redefined */
+
+#define MICRO /* must be defined to allow some inclusions */
 
 #define NOCWD_ASSUMPTIONS /* HACKDIR, LEVELDIR, SAVEDIR, BONESDIR, DATADIR, \
                              SCOREDIR, LOCKDIR, CONFIGDIR, TROUBLEDIR に \

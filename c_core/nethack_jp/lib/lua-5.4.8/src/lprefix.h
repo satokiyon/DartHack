@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /*
 ** $Id: lprefix.h $
 ** Definitions for Lua code that must come before any other header file

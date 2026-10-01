@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /*
 ** $Id: luac.c $
 ** Lua compiler (saves bytecodes to files; also lists bytecodes)

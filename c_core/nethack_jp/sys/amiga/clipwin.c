@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 static USHORT Palette[] = {
     0x0AAA, /* color #0 */
     0x0000, /* color #1 */

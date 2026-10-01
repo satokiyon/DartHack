@@ -30,7 +30,8 @@ core
 .*.swp
 
 # We generate makefiles by shell script
-Makefile
+**/Makefile
+!nhlua/**/Makefile
 
 # Win32-specific ignores
 Debug/
@@ -61,7 +62,7 @@ make.prefs
 win/win32/vs/obj/*
 # Win32-specific ignores end
 .DS_Store
-# ms-dos
+# ms-dos 
 # resulting zip
 NH*DOS.ZIP
 # 8.3 versions
@@ -137,3 +138,6 @@ GEMINI.md
 .github/context-mode/
 .github/hooks/
 .vscode/
+
+
+__pycache__/

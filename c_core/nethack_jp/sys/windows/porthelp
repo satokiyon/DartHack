@@ -1,8 +1,7 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-25.
-        NetHack 5.0 向け Microsoft Windows 固有ヘルプ
-        Copyright (c) NetHack PC Development Team 1993-2025.
+        Microsoft Windows specific help file for NetHack 5.0
+        Copyright (c) NetHack PC Development Team 1993-2026.
         NetHack may be freely distributed.  See license for details.
-                   (最終改訂: 2025年8月19日)
+                   (Last Revision: June 20, 2026)
 
 このファイルでは、Windows 版 NetHack に固有の仕様を説明します。
 

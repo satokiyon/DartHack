@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 SHORT Col_BorderVectors1[] = { 0, 0, 59, 0, 59, 12, 0, 12, 0, 0 };
 struct Border Col_Border1 = {
     -1, -1,             /* XY origin relative to container TopLeft */

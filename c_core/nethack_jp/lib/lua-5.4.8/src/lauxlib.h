@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /*
 ** $Id: lauxlib.h $
 ** Auxiliary functions for building Lua libraries
