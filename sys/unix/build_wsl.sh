@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
 #!/bin/sh
 # NetHackJP build script for WSL (Linux)
 # NetHackJP: --qt option to opt-in the Qt6 window port (2026-09-23).
@@ -115,14 +115,11 @@ else
     echo "XIM support: DISABLED (HAVE_XIM not set; check linux-jp hints)"
 fi
 
-# NetHackJP: Fetch Lua sources if not already present
-if [ ! -f "lib/lua-5.4.8/src/lua.h" ]; then
-    echo "Fetching Lua 5.4.8 prerequisites..."
-    make fetch-lua || make fetch-lua NOCHKSUM=1
+# NetHack 5.0.1 incorporates Lua directly in tree under nhlua/lua/src/
+if [ ! -f "nhlua/lua/src/lua.h" ]; then
+    echo "Error: Lua sources not found in nhlua/lua/src/."
+    exit 1
 fi
-
-echo "Building prerequisites (lua_support)..."
-make lua_support
 
 # NetHackJP: add the Qt6 port to the make invocation only when --qt was
 # given, so the existing tty/curses/X11 build stays untouched by default.

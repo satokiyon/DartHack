@@ -10,7 +10,7 @@
 #-PRE xxxx
 
 WHICH_OS=Linux
-HINTSVERSION := 500
+HINTSVERSION := 501
 
 ifdef MAKEFILE_TOP
 LUA_VERSION=5.4.8
@@ -36,7 +36,7 @@ CURSPKG = ncursesw
 WINTTYLIB := $(shell pkg-config --libs ncursesw 2>/dev/null || pkg-config --libs ncurses 2>/dev/null || echo "-lncursesw")
 WINLIB = $(WINTTYLIB)
 
-#-INCLUDE multiw-1.500
+#-INCLUDE multiw-1.501
 
 # Window ports options for NetHackJP
 WANT_WIN_TTY=1
@@ -44,8 +44,8 @@ WANT_WIN_CURSES=1
 WANT_WIN_X11=1
 WANT_DEFAULT=tty
 
-#-INCLUDE dirs-perms.500
-#-INCLUDE linuxdistro.500
+#-INCLUDE dirs-perms.501
+#-INCLUDE linuxdistro.501
 
 ifndef LIBXPM
 LIBXPM= -L/opt/X11/lib -lXpm
@@ -56,9 +56,9 @@ GAMEGRP  = games
 
 USE_NOSTATICFN = 0
 
-#-INCLUDE cross-pre1.500
+#-INCLUDE cross-pre1.501
 
-#-INCLUDE multiw-2.500
+#-INCLUDE multiw-2.501
 
 ifdef WANT_WIN_QT6
 CPLUSPLUS_NEED20=1
@@ -66,7 +66,7 @@ ADDITIONAL_NO_WARN_GPPCCX=-Wno-sfinae-incomplete
 ADDITIONAL_NO_WARN_CLANGCCX=-Wno-c++26-extensions
 endif
 
-#-INCLUDE compiler.500
+#-INCLUDE compiler.501
 
 # NetHack sources control & UTF-8 Japanese support
 NHCFLAGS+=-DDLB
@@ -94,7 +94,7 @@ endif
 endif
 endif
 
-#-INCLUDE multisnd1-pre.500
+#-INCLUDE multisnd1-pre.501
 
 ifeq "$(CCISCLANG)" "1"
 else
@@ -152,7 +152,7 @@ endif
 endif
 
 # Window ports options (Uncomment desired GUI interfaces if needed)
-# WANT_WIN_X11=1 (Enabled above multiw-2.500)
+# WANT_WIN_X11=1 (Enabled above multiw-2.501)
 # WANT_WIN_QT=1
 
 ifdef WANT_WIN_X11
@@ -259,15 +259,15 @@ CHOWN=true
 CHGRP=true
 MANDIR=/usr/share/man/man6
 
-#-INCLUDE cross-pre2.500
-#-INCLUDE gbdates-pre.500
-#-INCLUDE multisnd2-pre.500
-#-INCLUDE response.500
+#-INCLUDE cross-pre2.501
+#-INCLUDE gbdates-pre.501
+#-INCLUDE multisnd2-pre.501
+#-INCLUDE response.501
 
 #-POST
 
-#-INCLUDE gbdates-post.500
-#-INCLUDE multisnd-post.500
+#-INCLUDE gbdates-post.501
+#-INCLUDE multisnd-post.501
 
 ifdef MAKEFILE_TOP
 ifeq ($(MAKELEVEL),0)

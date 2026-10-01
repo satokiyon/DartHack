@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	wintty.c	$NHDT-Date: 1781973100 2026/06/20 16:31:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.438 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -238,13 +238,15 @@ static void tty_put_utf8_sequence(char **);
 #define NH_C3_IDEOGRAPH  0x0100U
 
 static unsigned short utf8_char_chartype(const unsigned char *);
-static int win32con_utf8_strlen_cells(const char *);
-static int win32con_putstr_utf8(const char *);
 extern int __stdcall MultiByteToWideChar(unsigned int, unsigned long, 
                                          const char *, int, wchar_t *, int);
 extern int __stdcall GetStringTypeW(unsigned long, const wchar_t *, int,
                                     unsigned short *);
 #endif
+static int tty_utf8_strlen_cells(const char *);
+static int tty_putstr_utf8(const char *);
+#define win32con_utf8_strlen_cells tty_utf8_strlen_cells
+#define win32con_putstr_utf8 tty_putstr_utf8
 #ifndef STATUS_HILITES
 static void tty_putsym(winid, int, int, char);
 #endif
@@ -678,9 +680,7 @@ void
 tty_askname(void)
 {
     static const char who_are_you[] = "お名前は? ";
-#ifdef WIN32CON
     int prompt_cols;
-#endif
     int c = 0, ct = 0, tryct = 0;
     uint8 utf8buf[8];
 
@@ -724,15 +724,15 @@ tty_askname(void)
             /* erase previous prompt (in case of ESC after partial response) */
             tty_curs(BASE_WINDOW, 1, wins[BASE_WINDOW]->cury), cl_end();
         }
-        #ifdef WIN32CON
-            prompt_cols = win32con_putstr_utf8(who_are_you);
-            tty_curs(BASE_WINDOW, prompt_cols + 1, wins[BASE_WINDOW]->cury - 1);
-        #else
-        tty_putstr(BASE_WINDOW, 0, who_are_you);
-        tty_curs(BASE_WINDOW, (int) (sizeof who_are_you),
-                 wins[BASE_WINDOW]->cury - 1);
-        #endif
+        prompt_cols = tty_putstr_utf8(who_are_you);
+        tty_curs(BASE_WINDOW, prompt_cols + 1, wins[BASE_WINDOW]->cury - 1);
         ct = 0;
+#if !defined(WIN32CON)
+        {
+            uint8 mb_buf[8];
+            int mb_len = 0;
+            int mb_expected = 0;
+#endif
         while ((c = tty_nhgetch()) != '\n') {
             if (c == EOF)
                 c = '\033';
@@ -748,14 +748,17 @@ tty_askname(void)
 #endif
             /* some people get confused when their erase char is not ^H */
             if (c == '\b' || c == '\177') {
+#if !defined(WIN32CON)
+                if (mb_len > 0) {
+                    mb_len = 0;
+                    mb_expected = 0;
+                    continue;
+                }
+#endif
                 if (ct) {
                     const char *prevcp = utf8_prev_char_start(svp.plname,
                                                               svp.plname + ct);
-#ifdef WIN32CON
                     int delcols = utf8_char_display_width((const unsigned char *) prevcp);
-#else
-                    int delcols = 1;
-#endif
 
                     if (delcols < 1)
                         delcols = 1;
@@ -774,15 +777,19 @@ tty_askname(void)
                     msmsg("\b \b");
 #endif
 #else
-                    (void) putchar('\b');
-                    (void) putchar(' ');
-                    (void) putchar('\b');
+                    while (delcols-- > 0) {
+                        (void) putchar('\b');
+                        (void) putchar(' ');
+                        (void) putchar('\b');
+                    }
+                    (void) fflush(stdout);
 #endif
                 }
                 continue;
             }
 #if defined(UNIX) || defined(VMS)
-            if (c != '-' && c != '@')
+            /* NetHackJP: Allow UTF-8 multibyte characters (c & 0x80) in plname */
+            if (mb_len == 0 && (c & 0x80) == 0 && c != '-' && c != '@')
                 if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z')
                     /* reject leading digit but allow digits elsewhere
                        (avoids ambiguity when character name gets
@@ -806,12 +813,53 @@ tty_askname(void)
                 }
 #else
                 /* NetHackJP: POSIX / Linux: tgetch() returns raw bytes of incoming UTF-8
-                 * stream one byte at a time. Do not pass c >= 0x80 through
-                 * unicodeval_to_utf8str() to avoid double-encoding. */
-                utf8buf[0] = (uint8) c;
-                utf8buf[1] = '\0';
-                inbytes = (const char *) utf8buf;
-                inlen = 1;
+                 * stream one byte at a time. Buffer multibyte sequences until complete
+                 * before echoing to avoid terminal replacement characters (U+FFFD). */
+                if (mb_len == 0) {
+                    if ((c & 0x80) == 0) {
+                        utf8buf[0] = (uint8) c;
+                        utf8buf[1] = '\0';
+                        inbytes = (const char *) utf8buf;
+                        inlen = 1;
+                    } else if ((c & 0xE0) == 0xC0) {
+                        mb_buf[0] = (uint8) c;
+                        mb_len = 1;
+                        mb_expected = 2;
+                        continue;
+                    } else if ((c & 0xF0) == 0xE0) {
+                        mb_buf[0] = (uint8) c;
+                        mb_len = 1;
+                        mb_expected = 3;
+                        continue;
+                    } else if ((c & 0xF8) == 0xF0) {
+                        mb_buf[0] = (uint8) c;
+                        mb_len = 1;
+                        mb_expected = 4;
+                        continue;
+                    } else {
+                        /* 予期しない孤立バイトは無視 */
+                        continue;
+                    }
+                } else {
+                    /* 後続バイト待ち */
+                    if ((c & 0xC0) == 0x80) {
+                        mb_buf[mb_len++] = (uint8) c;
+                        if (mb_len == mb_expected) {
+                            mb_buf[mb_len] = '\0';
+                            inbytes = (const char *) mb_buf;
+                            inlen = mb_len;
+                            mb_len = 0;
+                            mb_expected = 0;
+                        } else {
+                            continue; /* まだバイトが揃っていないので次を待つ */
+                        }
+                    } else {
+                        /* 不正なシーケンス: 組み立てを破棄 */
+                        mb_len = 0;
+                        mb_expected = 0;
+                        continue;
+                    }
+                }
 #endif
 
                 if (!inbytes)
@@ -829,7 +877,7 @@ tty_askname(void)
 #ifdef WIN32CON
                 /* WIN32CON needs UTF-8 aware drawing here; raw stdio output
                  * can degrade multibyte input to '?' depending on code page. */
-                (void) win32con_putstr_utf8(inbytes);
+                (void) tty_putstr_utf8(inbytes);
 #elif defined(MICRO)
 #if defined(MSDOS)
                 if (iflags.grmode) {
@@ -839,6 +887,7 @@ tty_askname(void)
                     msmsg("%s", inbytes);
 #else
                 (void) fputs(inbytes, stdout);
+                (void) fflush(stdout);
 #endif
                 memcpy((genericptr_t) &svp.plname[ct], (genericptr_t) inbytes,
                        (size_t) inlen);
@@ -846,6 +895,9 @@ tty_askname(void)
                 svp.plname[ct] = '\0';
             }
         }
+#if !defined(WIN32CON)
+        }
+#endif
         svp.plname[ct] = 0;
     } while (ct == 0 && c != '\n' && c != '\r');
 
@@ -1277,12 +1329,7 @@ dmore(
              (int) ttyDisplay->cury);
     if (flags.standout)
         standoutbeg();
-#ifdef WIN32CON
-    (void) win32con_putstr_utf8(prompt);
-#else
-    xputs(prompt);
-    ttyDisplay->curx += strlen(prompt);
-#endif
+    (void) tty_putstr_utf8(prompt);
     if (flags.standout)
         standoutend();
 
@@ -1722,11 +1769,7 @@ process_menu_window(winid window, struct WinDesc *cw)
             dmore(cw, resp);
         } else {
             /* just put the cursor back... */
-            int morestr_cols = (int) strlen(cw->morestr);
-
-#ifdef WIN32CON
-            morestr_cols = win32con_utf8_strlen_cells(cw->morestr);
-#endif
+            int morestr_cols = tty_utf8_strlen_cells(cw->morestr);
             tty_curs(window, morestr_cols + 2, page_lines);
             xwaitforspace(resp);
         }
@@ -4120,10 +4163,8 @@ utf8_char_display_width(const unsigned char *utf8str)
 
 #endif /* WIN32CON vs POSIX */
 
-#ifdef WIN32CON
-
 static int
-win32con_utf8_strlen_cells(const char *str)
+tty_utf8_strlen_cells(const char *str)
 {
     const unsigned char *cp = (const unsigned char *) str;
     int total = 0;
@@ -4151,7 +4192,7 @@ win32con_utf8_strlen_cells(const char *str)
 }
 
 static int
-win32con_putstr_utf8(const char *str)
+tty_putstr_utf8(const char *str)
 {
     const unsigned char *cp = (const unsigned char *) str;
     int total = 0;
@@ -4189,7 +4230,6 @@ win32con_putstr_utf8(const char *str)
     }
     return total;
 }
-#endif
 
 void
 g_putch(int in_ch)
@@ -5041,48 +5081,35 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 static int
 status_text_cells(const char *text)
 {
-#ifdef WIN32CON
-    if (windowprocs.wincap2 & WC2_U_UTF8STR)
-        return win32con_utf8_strlen_cells(text);
-#endif
-    return (int) strlen(text);
+    if (!text)
+        return 0;
+    return tty_utf8_strlen_cells(text);
 }
 
 /* return byte index where [0..cells] display cells end, without splitting
-   a UTF-8 sequence when console UTF-8 output is active */
+   a UTF-8 sequence */
 static int
 status_byte_index_for_cells(const char *text, int cells)
 {
     int used = 0, byteidx = 0;
+    const unsigned char *cp = (const unsigned char *) text;
 
     if (!text || cells <= 0)
         return 0;
 
-#ifdef WIN32CON
-    if (windowprocs.wincap2 & WC2_U_UTF8STR) {
-        const unsigned char *cp = (const unsigned char *) text;
+    while (cp[byteidx] != '\0') {
+        const unsigned char *uchp = &cp[byteidx];
+        int ulen = 1, w = 1;
 
-        while (cp[byteidx] != '\0') {
-            const unsigned char *uchp = &cp[byteidx];
-            int ulen = 1, w = 1;
-
-            if (*uchp >= 0x80U) {
-                ulen = utf8_sequence_len(uchp);
-                if (ulen > 1)
-                    w = utf8_char_display_width(uchp);
-            }
-            if (used + w > cells)
-                break;
-            used += w;
-            byteidx += ulen;
+        if (*uchp >= 0x80U) {
+            ulen = utf8_sequence_len(uchp);
+            if (ulen > 1)
+                w = utf8_char_display_width(uchp);
         }
-        return byteidx;
-    }
-#endif
-
-    while (text[byteidx] != '\0' && used < cells) {
-        ++byteidx;
-        ++used;
+        if (used + w > cells)
+            break;
+        used += w;
+        byteidx += ulen;
     }
     return byteidx;
 }
@@ -5426,7 +5453,7 @@ status_sanity_check(void)
 static void
 tty_putstatusfield(const char *text, int x, int y)
 {
-    int i, n, ncols, nrows, lth = 0;
+    int ncols, nrows;
     struct WinDesc *cw = 0;
 
     if (WIN_STATUS == WIN_ERR
@@ -5435,34 +5462,19 @@ tty_putstatusfield(const char *text, int x, int y)
 
     ncols = cw->cols;
     nrows = cw->maxrow;
-    lth = status_text_cells(text);
 
     print_vt_code2(AVTC_SELECT_WINDOW, NHW_STATUS);
 
     if (x < ncols && y < nrows) {
         if (x != cw->curx || y != cw->cury)
             tty_curs(NHW_STATUS, x, y);
-        for (i = 0; i < lth; ++i) {
-            n = i + x;
-            if (n < ncols && *text) {
-#ifdef WIN32CON
-                if (windowprocs.wincap2 & WC2_U_UTF8STR) {
-                    int drawn = win32con_putstr_utf8(text);
-                    int col;
+        {
+            int drawn = tty_putstr_utf8(text);
+            int col;
 
-                    cw->curx += drawn;
-                    for (col = 0; col < drawn && (x + col - 1) < ncols;
-                         ++col)
-                        cw->data[y][x + col - 1] = '#';
-                    break;
-                }
-#endif
-                (void) putchar(*text);
-                ttyDisplay->curx++;
-                cw->curx++;
-                cw->data[y][n - 1] = *text;
-                text++;
-            }
+            cw->curx += drawn;
+            for (col = 0; col < drawn && (x + col - 1) < ncols; ++col)
+                cw->data[y][x + col - 1] = '#';
         }
     }
 #if 0

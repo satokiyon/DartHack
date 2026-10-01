@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	shk.c	$NHDT-Date: 1781973066 2026/06/20 16:31:06 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.323 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1091,7 +1091,14 @@ shop_keeper(char rmno)
             return (struct monst *) 0;
         }
     } else {
-        if (!level_status.shkready) {
+        /* NetHackJP / Upstream bugfix:
+         * Only flag an untrustworthy null shkp if this is actually a shop room
+         * (rmno >= ROOMOFFSET && svr.rooms[rmno - ROOMOFFSET].rtype >= SHOPBASE).
+         * Outside of shops or in non-shop rooms, a null shkp is completely normal.
+         */
+        if (!level_status.shkready
+            && rmno >= ROOMOFFSET
+            && svr.rooms[rmno - ROOMOFFSET].rtype >= SHOPBASE) {
             int hmm UNUSED = 1;
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED \
      && NH_DEVEL_STATUS != NH_STATUS_POSTRELEASE)
@@ -1116,6 +1123,9 @@ find_objowner(
                            * they shouldn't be modified */
 {
     struct monst *shkp, *deflt_shkp = 0;
+
+    if (!level_status.shkready)
+        return (struct monst *) 0;
 
     if (obj->where == OBJ_ONBILL) {
         /* used up item; bill obj coordinates are useless and so are x,y */
@@ -5368,7 +5378,7 @@ costly_spot(coordxy x, coordxy y)
     struct monst *shkp;
     struct eshk *eshkp;
 
-    if (!svl.level.flags.has_shop)
+    if (!level_status.shkready || !svl.level.flags.has_shop)
         return FALSE;
     shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
     if (!shkp || !inhishop(shkp))

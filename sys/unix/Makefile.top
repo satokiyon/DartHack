@@ -126,7 +126,7 @@ LUABASELIB ?= libnhlua.a
 LUALIB ?= $(LUATOP)/$(LUABASELIB)
 LUALIBBUILT ?= $(LUATOP)/libnhlua.a
 
-ALLDEP = $(PRECHECK) lua_support $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
+ALLDEP = $(PRECHECK) $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
 
 # first target is also the default target for 'make' without any arguments
 all:    $(ALLDEP)
