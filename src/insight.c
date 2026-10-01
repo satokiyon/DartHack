@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	insight.c	$NHDT-Date: 1781973051 2026/06/20 16:30:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1570,7 +1570,7 @@ attributes_enlightenment(
     warnspecies =  svc.context.warntype.speciesidx;
     if (Warn_of_mon && ismnum(warnspecies)) {
         Sprintf(buf, "%sの気配を察知できる",
-                makeplural(mons[warnspecies].pmnames[NEUTRAL]));
+                jp_pmname(&mons[warnspecies], NEUTRAL));
         you_are(buf, from_what(WARN_OF_MON));
     }
     if (Undead_warning)

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	end.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.349 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1334,8 +1334,8 @@ really_done(int how)
             was_already_grave = IS_GRAVE(levl[u.ux][u.uy].typ);
 
         corpse = mk_named_object(CORPSE, &mons[mnum], u.ux, u.uy, svp.plname);
-        Sprintf(pbuf, "%s, ", svp.plname);
-        formatkiller(eos(pbuf), sizeof pbuf - Strlen(pbuf), how, TRUE);
+        Sprintf(pbuf, "%s、", svp.plname);
+        jp_formatkiller_for_display(eos(pbuf), sizeof pbuf - Strlen(pbuf), how, TRUE);
         make_grave(u.ux, u.uy, pbuf);
         if (IS_GRAVE(levl[u.ux][u.uy].typ) && !was_already_grave)
             levl[u.ux][u.uy].emptygrave = 1; /* corpse isn't buried */

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	vault.c	$NHDT-Date: 1781973072 2026/06/20 16:31:12 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -441,17 +441,15 @@ invault(void)
             } while (otmp);
             /* You_hear() will handle Deaf/!Deaf */
             if (!Blind) {
-                You_see("%sが砕けるのを見た.",
-                        (bcnt == 1) ? an(bname) : makeplural(bname));
+                You_see("%sが砕けるのを見た.", bname);
             } else {
-                You_hear("%sが砕ける音が聞こえた.",
-                         (bcnt == 1) ? an(bname) : makeplural(bname));
+                You_hear("%sが砕ける音が聞こえた.", bname);
             }
         }
         spotted = canspotmon(guard);
         if (spotted) {
             pline("突然、宝物庫の%sの一人が入ってきた!",
-                  makeplural(jp_pmname(guard->data, Mgender(guard))));
+                  jp_pmname(guard->data, Mgender(guard)));
             newsym(guard->mx, guard->my);
         } else {
             pline("誰かが宝物庫に入ってきた.");

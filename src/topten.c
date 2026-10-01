@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1048,6 +1048,8 @@ static const struct jp_killer_reason_entry {
     { "his own player", "プレイヤー自身の手で倒された", 0 },
     { "her own player", "プレイヤー自身の手で倒された", 0 },
     { "its own player", "プレイヤー自身の手で倒された", 0 },
+    { "sitting on an iron spike", "鉄の刺の上に座ったことで倒された", "鉄の刺の上に座ったこと" },
+    { "riding accident", "落馬事故で倒された", "落馬事故" },
 };
 
 #define JPKB_FORM_KILLEDBY 0 /* "killed by <X>" 文形 */
@@ -1820,6 +1822,56 @@ jp_formatkiller_for_display(
 
     formatkiller(tmp, sizeof tmp, how, incl_helpless);
     jp_translate_killer_text_for_display(buf, siz, tmp);
+}
+
+/* 墓石に刻まれたテキストの表示用動的翻訳（英語で記録された墓石の日本語化） */
+void
+jp_headstone_text_for_display(char *out, size_t outsz, const char *in)
+{
+    const char *comma;
+    static const char *const patterns[] = {
+        "killed by ", "choked on ", "poisoned by ", "died of ",
+        "drowned in ", "burned by ", "dissolved in ", "crushed to death by ",
+        "petrified by ", "turned to slime by ",
+        (char *) 0
+    };
+    int i;
+    boolean matched = FALSE;
+
+    if (!out || outsz == 0)
+        return;
+    if (!in || !*in) {
+        *out = '\0';
+        return;
+    }
+
+    comma = strstr(in, ", ");
+    if (comma) {
+        const char *reason = comma + 2;
+        for (i = 0; patterns[i]; ++i) {
+            if (!strncmpi(reason, patterns[i], strlen(patterns[i]))) {
+                matched = TRUE;
+                break;
+            }
+        }
+        if (matched) {
+            char namebuf[BUFSZ], transbuf[BUFSZ];
+            size_t namelen = (size_t) (comma - in);
+
+            if (namelen >= sizeof(namebuf))
+                namelen = sizeof(namebuf) - 1;
+            (void) strncpy(namebuf, in, namelen);
+            namebuf[namelen] = '\0';
+
+            jp_translate_killer_text_for_display(transbuf, sizeof transbuf, reason);
+            Snprintf(out, outsz, "%s、%s", namebuf, transbuf);
+            return;
+        }
+    }
+
+    /* 該当パターンがなければそのままコピー */
+    (void) strncpy(out, in, outsz - 1);
+    out[outsz - 1] = '\0';
 }
 
 staticfn int

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	uhitm.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.503 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1204,7 +1204,7 @@ hmon_hitmon_misc_obj(
             /*learn_egg_type(obj->corpsenm);*/
             pline("%sに%sの卵をぶつけた!",
                 l_monnam(mon),
-                obj->known ? mons[obj->corpsenm].pmnames[NEUTRAL]
+                obj->known ? jp_pmname(&mons[obj->corpsenm], NEUTRAL)
                          : "石化");
             obj->known = 1; /* (not much point...) */
             useup_eggs(obj);
@@ -1220,7 +1220,7 @@ hmon_hitmon_misc_obj(
             enum monnums mnum = obj->corpsenm;
             const char *eggp =
                 (ismnum(mnum) && obj->known)
-                    ? mons[mnum].pmnames[NEUTRAL]
+                    ? jp_pmname(&mons[mnum], NEUTRAL)
                     : "普通";
 
             You("%sに%sの卵をぶつけた.", l_monnam(mon), eggp);
@@ -4047,7 +4047,7 @@ mhitm_ad_phys(
                     mhm->damage = 1;
                     pline_mon(magr, "%sは%sの死体であなたを殴った.",
                               Monnam(magr),
-                              mons[otmp->corpsenm].pmnames[NEUTRAL]);
+                              jp_pmname(&mons[otmp->corpsenm], NEUTRAL));
                     if (!Stoned) {
                         if (do_stone_u(magr)) {
                             mhm->hitflags = M_ATTK_HIT;

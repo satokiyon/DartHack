@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	eat.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.354 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -726,21 +726,21 @@ eating_conducts(struct permonst *pd)
 
     if (!u.uconduct.food++) {
         livelog_printf(LL_CONDUCT, "初めて食事をした - %s",
-                       pd->pmnames[NEUTRAL]);
+                       jp_pmname(pd, NEUTRAL));
         ll_conduct++;
     }
     if (!vegan(pd)) {
         if (!u.uconduct.unvegan++ && !ll_conduct) {
             livelog_printf(LL_CONDUCT,
                            "初めて動物性食品（%s）を口にした",
-                           pd->pmnames[NEUTRAL]);
+                           jp_pmname(pd, NEUTRAL));
             ll_conduct++;
         }
     }
     if (!vegetarian(pd)) {
         if (!u.uconduct.unvegetarian && !ll_conduct)
             livelog_printf(LL_CONDUCT, "初めて肉（%s）を口にした",
-                           pd->pmnames[NEUTRAL]);
+                           jp_pmname(pd, NEUTRAL));
         violated_vegetarian();
     }
 }
@@ -967,7 +967,7 @@ cprefx(int pm)
         /* cannibals are allowed to eat domestic animals without penalty */
         if (!CANNIBAL_ALLOWED()) {
             You_feel("%sを食べたのはまずかったと感じた.",
-                     mons[pm].pmnames[NEUTRAL]);
+                     jp_pmname(&mons[pm], NEUTRAL));
             HAggravate_monster |= FROMOUTSIDE;
         }
         break;
@@ -1684,7 +1684,7 @@ staticfn void
 consume_tin(const char *mesg)
 {
     const char *what;
-    int which, mnum, r, nutamt;
+    int mnum, r, nutamt;
     /* if you've eaten tin itself, chance to not eat contents gets bypassed */
     boolean always_eat = metallivorous(gy.youmonst.data);
     struct obj *tin = svc.context.tin.tin;
@@ -1717,24 +1717,14 @@ consume_tin(const char *mesg)
             return;
         }
 
-        which = 0; /* 0=>plural, 1=>as-is, 2=>"the" prefix */
         if ((mnum == PM_COCKATRICE || mnum == PM_CHICKATRICE)
             && (Stone_resistance || Hallucination)) {
-            what = "chicken";
-            which = 1; /* suppress pluralization */
+            what = "チキン";
         } else if (Hallucination) {
             what = rndmonnam(NULL);
         } else {
-            what = mons[mnum].pmnames[NEUTRAL];
-            if (the_unique_pm(&mons[mnum]))
-                which = 2;
-            else if (type_is_pname(&mons[mnum]))
-                which = 1;
+            what = jp_pmname(&mons[mnum], NEUTRAL);
         }
-        if (which == 0)
-            what = makeplural(what);
-        else if (which == 2)
-            what = the(what);
 
         if (!always_eat) {
             pline("%sのような匂いがした.", what);
