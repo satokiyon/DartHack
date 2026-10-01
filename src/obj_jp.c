@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -647,7 +647,7 @@ const char *const obj_jp_descrs[NUM_OBJECTS + 1] = {
     [SC14] = "「チリ・トテ・チン」と書かれた巻物",
     [SC15] = "「ネクロノミコン」と書かれた巻物",
     [SC16] = "「スピンロック」と書かれた巻物",
-    [SC17] = "「オンカカカ・ミサンマエイ・ソワカ」と書かれた巻物",
+    [SC17] = "「オンカカカ・ビサンマエイ・ソワカ」と書かれた巻物",
     [SC18] = "「マビノギオン」と書かれた巻物",
     [SC19] = "「テケレッツノ・パア」と書かれた巻物",
     [SC20] = "「アジャラカ・モクレン」と書かれた巻物",
