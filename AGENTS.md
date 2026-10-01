@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -80,6 +80,28 @@ Flutter ポートにおけるハイスコア・スコアボード表示には、
 
 2. **Git Subtree 同期時のコンフリクト抑制**:
    - 将来 NetHackJP 側で罠やアイテム死因などの英語キー化を進める際は、上記ドキュメントの一覧表に基づき DartHack の英語キー定義と同期させることで、Git Subtree 同期時のマージコンフリクトを最小限に抑える設計を徹底してください。
+
+3. **墓石表示の二重保護原則（生成時直接刻印と読取・遠見時動的翻訳）**:
+   - 墓石テキストにおける英語露出（`"killed by ..."`）を防ぐため、以下の二重保護を適用してください。
+     1. **生成時刻印**: 墓石生成時（`src/end.c`）は、`jp_formatkiller_for_display` を直接使用して最初から完全な日本語テキスト（例: `システムショックで死んだ`）を墓石に刻印する。
+     2. **読取・遠見時動的翻訳**: 過去セーブデータや英語 bones からロードされた墓石テキストに対しては、読取時（`src/engrave.c: read_engr_at`）および遠見時（`src/pager.c: add_quoted_engraving`）に `jp_headstone_text_for_display` を経由させて動的に日本語化する。
+
+## NetHackJP Cコアにおける言語判定分岐の全廃原則
+
+1. **Cコア内多言語分岐の禁止**:
+   - `NetHackJP`（`c_core/nethack_jp`）は日本語版専用コアです。
+   - `DartHack` においても、日本語モード時は `c_core/nethack_jp`、英語モード時は `c_core/nethack_en` と C コア自体が別々にビルド・切り替えられます。
+   - したがって、NetHackJP の C ソースコード内で `g_language_is_jp` などの言語判定分岐やマクロ、英語フォールバックロジックを追加してはなりません。メッセージ生成やフォーマット処理は、多言語分岐を挟まずに直接自然な日本語処理を記述してください。
+
+## 日本語メッセージ生成における英語文法関数（makeplural / an / the）の排除と動的日本語化原則
+
+1. **英語文法関数の適用禁止**:
+   - 日本語モンスター名（`jp_pmname`）や日本語名詞（「大岩」「果物名」など）に対して、英語文法用の `makeplural()`, `an()`, `the()`, `s_suffix()` などを呼び出してはなりません。
+   - 日本語名詞に対して `makeplural()` を呼び出すと末尾に "s" や "es" が付着して「オークsへの警告」「大岩s」のような壊れた表示になります。日本語メッセージ構築時はこれらの英語文法関数を完全に排除してください。
+
+2. **動的メッセージにおけるモンスター名・名詞の日本語化徹底**:
+   - 缶詰を開けたときの匂いや味（`src/eat.c`）、死体投げ・死体殴打（`src/uhitm.c`, `src/mthrowu.c`）、警告メッセージ（`src/timeout.c`）、気配察知（`src/insight.c`）、遠見・墓石（`src/engrave.c`, `src/pager.c`）など、名詞が動的に埋め込まれるメッセージでは、アップストリームの `m_monnam`, `pmname`, `mons` から直接英語名や複数形化された文字列を取得してはなりません。
+   - 必ず `jp_pmname` / `jp_pmname_from_idx` などの日本語化関数を経由させて取得し、特殊な味・匂い表現（例: 「チキン」等）についても適切な日本語表現にマッピングしてください。
 
 ## Flutter UI TopTen (TextOverlay / TopTenEntry) のバイリンガル判定とパース原則
 
