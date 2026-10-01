@@ -44,10 +44,6 @@ set(NETHACK_OS_SOURCES
     "winflutter.c"
 )
 
-# Lua 5.4 Sources (Exclude lua.c, luac.c, and onelua.c)
-file(GLOB LUA_SOURCES "${LUAROOT}/*.c")
-list(FILTER LUA_SOURCES EXCLUDE REGEX ".*/(lua|luac|onelua)\\.c$")
-
 # Helper function to configure target safely with file existence checks
 function(configure_nethack_target TARGET_NAME CORE_ROOT EXTRA_SOURCES IS_JP_TARGET)
     set(POTENTIAL_CORE_SOURCES
@@ -195,11 +191,16 @@ function(configure_nethack_target TARGET_NAME CORE_ROOT EXTRA_SOURCES IS_JP_TARG
         endif()
     endforeach()
 
+    # 各コア内蔵の nhlua/lua/src (Lua 5.5) を使用
+    set(CORE_LUAROOT "${CORE_ROOT}/nhlua/lua/src")
+    file(GLOB CORE_LUA_SOURCES "${CORE_LUAROOT}/*.c")
+    list(FILTER CORE_LUA_SOURCES EXCLUDE REGEX ".*/(lua|luac|onelua)\\.c$")
+
     add_library(${TARGET_NAME} SHARED
         ${RESOLVED_CORE_SOURCES}
         ${EXTRA_SOURCES}
         ${NETHACK_OS_SOURCES}
-        ${LUA_SOURCES}
+        ${CORE_LUA_SOURCES}
     )
 
     if(${IS_JP_TARGET})
@@ -208,7 +209,7 @@ function(configure_nethack_target TARGET_NAME CORE_ROOT EXTRA_SOURCES IS_JP_TARG
 
     target_include_directories(${TARGET_NAME} PRIVATE
         "${CORE_ROOT}/include"
-        "${LUAROOT}"
+        "${CORE_LUAROOT}"
         "${PDCURSESROOT}"
         "${PDCURSESMODROOT}"
     )
