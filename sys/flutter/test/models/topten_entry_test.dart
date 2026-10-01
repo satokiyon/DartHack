@@ -503,5 +503,33 @@ void main() {
       expect(entries[8].details[0], contains('落とし穴からペットを助け出そうとしたことで石化した'));
       expect(entries[9].details[0], contains('泉から飲んだ不心得'));
     });
+
+    test('新規同期死因（システムショック、鉄の刺の上に座ったこと、落馬事故）の日本語化テスト', () {
+      final inputLines = [
+        '順位      点数  名前                                                   HP[最大]',
+        '  1      1000  Player 考古学者/ドワーフ/男性/秩序',
+        '                system shock (運命の大迷宮 1階). - [30]',
+        '  2       900  Player 考古学者/ドワーフ/男性/秩序',
+        '                killed by a system shock (運命の大迷宮 1階). - [30]',
+        '  3       800  Player 考古学者/ドワーフ/男性/秩序',
+        '                sitting on an iron spike (運命の大迷宮 1階). - [30]',
+        '  4       700  Player 考古学者/ドワーフ/男性/秩序',
+        '                killed by sitting on an iron spike (運命の大迷宮 1階). - [30]',
+        '  5       600  Player 考古学者/ドワーフ/男性/秩序',
+        '                riding accident (運命の大迷宮 1階). - [30]',
+        '  6       500  Player 考古学者/ドワーフ/男性/秩序',
+        '                killed by a riding accident (運命の大迷宮 1階). - [30]',
+      ];
+      final attrs = List.filled(inputLines.length, 0);
+      final entries = TopTenEntry.parse(inputLines, attrs, isJp: true);
+
+      expect(entries.length, 6);
+      expect(entries[0].details[0], contains('システムショック'));
+      expect(entries[1].details[0], contains('システムショックで倒された'));
+      expect(entries[2].details[0], contains('鉄の刺の上に座ったこと'));
+      expect(entries[3].details[0], contains('鉄の刺の上に座ったことで倒された'));
+      expect(entries[4].details[0], contains('落馬事故'));
+      expect(entries[5].details[0], contains('落馬事故で倒された'));
+    });
   });
 }

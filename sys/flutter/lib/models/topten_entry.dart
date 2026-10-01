@@ -2238,6 +2238,8 @@ String _translateDeathTextInternal(String death, bool isJp) {
     'his own player': 'プレイヤー自身の手で倒された',
     'her own player': 'プレイヤー自身の手で倒された',
     'its own player': 'プレイヤー自身の手で倒された',
+    'sitting on an iron spike': '鉄の刺の上に座ったこと',
+    'riding accident': '落馬事故',
   };
 
   if (exactMap.containsKey(death)) {
@@ -2272,16 +2274,24 @@ String _translateDeathTextInternal(String death, bool isJp) {
     if (raw == 'bad experience sitting on a throne') return '玉座に座った悪影響で倒された';
     if (raw == 'mildly contaminated potion') return '少し古くなった薬で倒された';
     if (raw == 'contusion from a small passage') return '狭い通路で頭を打ったことで倒された';
+    if (raw == 'system shock') return 'システムショックで倒された';
+    if (raw == 'riding accident') return '落馬事故で倒された';
     final tr = _translateMonsterOrItemName(raw);
     return tr.endsWith('倒された') || tr.endsWith('石化した') || tr.endsWith('死んだ') ? tr : '$trに倒された';
   }
   if (death.startsWith('killed by an ')) {
     final raw = death.substring(13);
+    if (raw == 'iron spike' || raw == 'sitting on an iron spike') {
+      return '鉄の刺の上に座ったことで倒された';
+    }
     final tr = _translateMonsterOrItemName(raw);
     return tr.endsWith('倒された') || tr.endsWith('石化した') || tr.endsWith('死んだ') ? tr : '$trに倒された';
   }
   if (death.startsWith('killed by ')) {
     final raw = death.substring(10);
+    if (raw == 'system shock' || raw == 'a system shock') return 'システムショックで倒された';
+    if (raw == 'riding accident' || raw == 'a riding accident') return '落馬事故で倒された';
+    if (raw == 'sitting on an iron spike') return '鉄の刺の上に座ったことで倒された';
     if (raw == 'overexertion') return '精根尽き果てて倒された';
     if (raw == 'life drainage') return '生命力吸収で倒された';
     if (raw == 'a bad experience sitting on a throne' || raw == 'bad experience sitting on a throne') {
