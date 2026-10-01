@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	steed.c	$NHDT-Date: 1781973068 2026/06/20 16:31:08 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -615,7 +615,7 @@ dismount_steed(
         if (!have_spot)
             have_spot = landing_spot(&cc, reason, 1);
         if (!ulev && !ufly) {
-            losehp(Maybe_Half_Phys(rn1(10, 10)), "落馬事故",
+            losehp(Maybe_Half_Phys(rn1(10, 10)), "riding accident",
                    KILLED_BY_AN);
             set_wounded_legs(BOTH_SIDES, (int) HWounded_legs + rn1(5, 5));
             repair_leg_damage = FALSE;

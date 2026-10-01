@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	mthrowu.c	$NHDT-Date: 1781973057 2026/06/20 16:30:57 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
@@ -415,7 +415,7 @@ ohitmon(
         if (vis) {
             if (otmp->otyp == EGG) {
                 pline("べちゃ！ %sが%sの卵の直撃を食らった！", l_monnam(mtmp),
-                      otmp->known ? mons[otmp->corpsenm].pmnames[NEUTRAL]
+                      otmp->known ? jp_pmname(&mons[otmp->corpsenm], NEUTRAL)
                                   : "何か");
             } else {
                 char how[BUFSZ];

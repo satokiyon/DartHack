@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	fountain.c	$NHDT-Date: 1781973050 2026/06/20 16:30:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.121 $ */
 /*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -44,7 +44,7 @@ dowatersnakes(void)
     if (!(svm.mvitals[PM_WATER_MOCCASIN].mvflags & G_GONE)) {
         if (!Blind) {
             pline("%sが絶え間なくあふれ出した!",
-                  Hallucination ? makeplural(rndmonnam(NULL)) : "蛇");
+                  Hallucination ? rndmonnam(NULL) : "蛇");
         } else {
             Soundeffect(se_snakes_hissing, 75);
             You_hear("%sがシューシュー鳴くのが聞こえる!", something);

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	zap.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.596 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -2620,7 +2620,7 @@ backfire(struct obj *otmp)
     otmp->in_use = TRUE; /* in case losehp() is fatal */
     pline("%sが突然爆発した!", The(xname(otmp)));
     dmg = d(otmp->spe + 2, 6);
-    losehp(Maybe_Half_Phys(dmg), "爆発した杖", KILLED_BY_AN);
+    losehp(Maybe_Half_Phys(dmg), "exploding wand", KILLED_BY_AN);
     useupall(otmp);
 }
 
@@ -3326,7 +3326,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
             pline("岩が%sから崩れ、あなたの%sに落ちた",
                   ceiling(x, y), jp_body_part(HEAD));
             dmg = rnd(hard_helmet(uarmh) ? 2 : 6);
-            losehp(Maybe_Half_Phys(dmg), "落石", KILLED_BY_AN);
+            losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
             if ((otmp = mksobj_at(ROCK, x, y, FALSE, FALSE)) != 0) {
                 (void) xname(otmp); /* set dknown, maybe bknown */
                 stackobj(otmp);

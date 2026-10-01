@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	engrave.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -460,7 +460,7 @@ read_engr_at(coordxy x, coordxy y)
         }
 
         if (sensed) {
-            char *et, buf[BUFSZ];
+            char *et, buf[BUFSZ], dispbuf[BUFSZ];
             const char *endpunct;
             int maxelen = (int) (sizeof buf
                                  /* sizeof "literal" counts terminating \0 */
@@ -475,6 +475,11 @@ read_engr_at(coordxy x, coordxy y)
                 elen = maxelen;
             } else {
                 et = ep->engr_txt[actual_text];
+            }
+            if (ep->engr_type == HEADSTONE) {
+                jp_headstone_text_for_display(dispbuf, sizeof dispbuf, et);
+                et = dispbuf;
+                elen = (int) strlen(et);
             }
             endpunct = "";
             if (elen < 2

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	pager.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.302 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -896,7 +896,7 @@ look_at_monster(
                                               : jp_pmname(mtmp->data,
                                                        Mgender(mtmp)));
 
-                        Sprintf(eos(monbuf), "%sへの警告", makeplural(whom));
+                        Sprintf(eos(monbuf), "%sへの警告", whom);
                 }
                 how_seen &= ~MONSEEN_WARNMON;
                 if (how_seen)
@@ -2034,11 +2034,17 @@ add_quoted_engraving(
     if (!floorengr && !headstone && !force)
         return FALSE;
 
-    if (ep->eread)
-        Snprintf(temp_buf, sizeof temp_buf, " (%s: \"%s\")",
-                 headstone ? "墓碑銘" : "記憶している文",
-                 ep->engr_txt[remembered_text]);
-    else
+    if (ep->eread) {
+        if (headstone) {
+            char transbuf[BUFSZ];
+            jp_headstone_text_for_display(transbuf, sizeof transbuf,
+                                          ep->engr_txt[remembered_text]);
+            Snprintf(temp_buf, sizeof temp_buf, " (墓碑銘: \"%s\")", transbuf);
+        } else {
+            Snprintf(temp_buf, sizeof temp_buf, " (記憶している文: \"%s\")",
+                     ep->engr_txt[remembered_text]);
+        }
+    } else
         Snprintf(temp_buf, sizeof temp_buf, " (%sは未読)",
                  headstone ? "墓石" : "刻印");
 

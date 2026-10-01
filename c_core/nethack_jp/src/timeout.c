@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
 /* NetHack 5.0	timeout.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.212 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -864,7 +864,7 @@ nh_timeout(void)
                     svc.context.warntype.speciesidx = NON_PM;
                     if (wptr)
                         You("もう%sへの警告を受けなくなった.",
-                            makeplural(wptr->pmnames[NEUTRAL]));
+                            jp_pmname(wptr, NEUTRAL));
                 }
                 break;
             case PASSES_WALLS:
