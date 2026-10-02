@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02.
 -- NetHack Tourist Tou-strt.lua	$NHDT-Date: 1781994875 2026/06/20 22:34:35 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991,92 by M. Stephenson, P. Winner
@@ -22,9 +22,9 @@ des.map([[
 .............}}.........|.|----S-|--S---|S----------S-|---S--|------|...|...
 ..............}}}.......|...............................................|...
 ................}}}.....----S------++--S----------S----------S-----------...
-..................}}...........    ..    ...................................
+..................}}...........   ....   ...................................
 ......-------......}}}}........}}}}..}}}}..}}}}..}}}}.......................
-......|.....|.......}}}}}}..}}}}   ..   }}}}..}}}}..}}}.....................
+......|.....|.......}}}}}}..}}}}  ....  }}}}..}}}}..}}}.....................
 ......|.....+...........}}}}}}........................}}}..}}}}..}}}..}}}...
 ......|.....|...........................................}}}}..}}}..}}}}.}}}}
 ......-------...............................................................
@@ -115,14 +115,24 @@ des.monster("guide", 57, 03)
 des.monster("guide", 62, 04)
 des.monster("guide", 66, 04)
 -- path guards
-des.monster("watchman", 35, 08)
-des.monster("watchman", 36, 08)
+des.monster({"watchman", 35, 08, name="Sergeant Colon", male=1})
+des.monster({"watchman", 36, 08, name="Corporal Nobbs", male=1})
 -- river monsters
 des.monster("giant eel", 62, 12)
 des.monster("piranha", 47, 10)
 des.monster("piranha", 29, 11)
 des.monster("kraken", 34, 09)
 des.monster("kraken", 37, 09)
+-- a few more Discworld NPCs for flavour
+des.monster({"barbarian", peaceful=1, name="Bravd", male=1, keep_default_invent=false})
+des.monster({"rogue", peaceful=1, name="the Weasel", male=1, keep_default_invent=false})
+des.monster({"werewolf", peaceful=1, name="Angua", female=1})
+des.monster({"rock troll", peaceful=1, name="Detritus", male=1})
+-- the Brass Bridge is lined with statues of 'hippos'
+des.object({id="statue", montype="wumpus" x=34,y=8, historic=1, contents=0})
+des.object({id="statue", montype="wumpus" x=37,y=8, historic=1, contents=0})
+des.object({id="statue", montype="wumpus" x=34,y=10, historic=1, contents=0})
+des.object({id="statue", montype="wumpus" x=37,y=10, historic=1, contents=0})
 -- Random traps
 des.trap()
 des.trap()

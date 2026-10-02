@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02.
 #!/bin/sh
 # NetHack 5.0	run-hatari.sh	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
 # Copyright (c) Ingo Paschke, 2026.
@@ -31,7 +31,7 @@ set -eu
 HD_DIR="$(cd "$(dirname "$0")" && pwd)"
 [ -f "$HD_DIR/nethack.prg" ] || {
     echo "nethack.prg not found in $HD_DIR" >&2
-    echo "Place this script next to nethack.prg (extracted NH500ST.ZIP)." >&2
+    echo "Place this script next to nethack.prg (extracted NH501ST.ZIP)." >&2
     exit 1
 }
 

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02. */
 /* NetHack 5.0	macmenu.c	$NHDT-Date: 1432512797 2015/05/25 00:13:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
 /*      Copyright (c) Macintosh NetHack Port Team, 1993.          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -678,8 +678,9 @@ mac_askname(void)
 
     GetDialogItem(askdialog, RSRC_ASK_NAME, &type, &handle, &rect);
     GetDialogItemText(handle, str);
-    if (str[0] > PL_NSIZ - 1)
-        str[0] = PL_NSIZ - 1;
+    /* file names hold at most MAC_FNAME_PLMAX characters of the name */
+    if (str[0] > MAC_FNAME_PLMAX)
+        str[0] = MAC_FNAME_PLMAX;
     P2C(str, svp.plname);
 
     for (i = RSRC_ASK_ROLE; i <= RSRC_ASK_MODE; i++) {
