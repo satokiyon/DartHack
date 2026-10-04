@@ -36,6 +36,28 @@ class MenuItemData {
     required this.color,
     required this.tile,
   });
+
+  MenuItemData copyWith({
+    int? ident,
+    int? accelerator,
+    int? groupacc,
+    int? attr,
+    String? text,
+    int? preselected,
+    int? color,
+    int? tile,
+  }) {
+    return MenuItemData(
+      ident: ident ?? this.ident,
+      accelerator: accelerator ?? this.accelerator,
+      groupacc: groupacc ?? this.groupacc,
+      attr: attr ?? this.attr,
+      text: text ?? this.text,
+      preselected: preselected ?? this.preselected,
+      color: color ?? this.color,
+      tile: tile ?? this.tile,
+    );
+  }
 }
 
 class NetHackScreen extends ChangeNotifier {
@@ -429,6 +451,22 @@ class NetHackScreen extends ChangeNotifier {
 
   void endMenu(int winId, String prompt) {
     _menuPrompt = prompt;
+    final isEnhanceMenu = prompt.contains("スキル") || prompt.toLowerCase().contains("skill");
+    if (isEnhanceMenu) {
+      int nextAccelCode = 0x61; // 'a'
+      for (int i = 0; i < _menuItems.length; i++) {
+        final item = _menuItems[i];
+        if (item.ident != 0 && item.ident != 4294967294 && item.accelerator == 0) {
+          if (nextAccelCode <= 0x7A) {
+            _menuItems[i] = item.copyWith(accelerator: nextAccelCode);
+            nextAccelCode++;
+          } else if (nextAccelCode <= 0x7A + 26) {
+            _menuItems[i] = item.copyWith(accelerator: 0x41 + (nextAccelCode - 0x7B));
+            nextAccelCode++;
+          }
+        }
+      }
+    }
     notifyListeners();
   }
 

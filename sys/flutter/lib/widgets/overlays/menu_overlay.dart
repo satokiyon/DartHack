@@ -257,6 +257,8 @@ class _MenuOverlayState extends State<MenuOverlay> {
     final l10n = AppLocalizations.of(context);
     final isExtCmdMenu = widget.menuPrompt.contains("拡張コマンド") ||
         widget.menuPrompt.toLowerCase().contains("extended");
+    final isEnhanceMenu = widget.menuPrompt.contains("スキル") ||
+        widget.menuPrompt.toLowerCase().contains("skill");
     final isMultiSelectMenu = !isExtCmdMenu && widget.menuHow > 1;
     final extCmdQuery = _filterQuery.trim().toLowerCase();
 
@@ -274,7 +276,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
         final descriptionText = (tabIndex >= 0 ? text.substring(tabIndex + 1) : "").trim().toLowerCase();
         return commandText.contains(extCmdQuery) || descriptionText.contains(extCmdQuery);
       }
-      return !text.startsWith('#') && !text.startsWith('?');
+      return true;
     }).toList();
 
     int minLeadingSpaces = 999;
@@ -541,6 +543,92 @@ class _MenuOverlayState extends State<MenuOverlay> {
                                             )
                                           : null,
                                       onTap: () => widget.onSingleSelect(item.ident),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+
+                            if (isEnhanceMenu && isSelectable) {
+                              final hasTab = commandText.contains('\t');
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 2.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(6.0),
+                                    border: Border.all(
+                                      color: Colors.amber.withValues(alpha: 0.35),
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: ListTile(
+                                      dense: true,
+                                      contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                                      horizontalTitleGap: 8,
+                                      leading: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          _buildMenuItemTile(item.tile),
+                                          if (isPrintableAccel) ...[
+                                            const SizedBox(width: 4),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                              decoration: BoxDecoration(
+                                                color: Colors.amber.withValues(alpha: 0.25),
+                                                borderRadius: BorderRadius.circular(4),
+                                                border: Border.all(
+                                                  color: Colors.amber.withValues(alpha: 0.6),
+                                                  width: 1,
+                                                ),
+                                              ),
+                                              child: Text(
+                                                String.fromCharCode(item.accelerator),
+                                                style: const TextStyle(
+                                                  color: Color(0xFFFFD54F),
+                                                  fontFamily: 'monospace',
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                      title: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          hasTab
+                                              ? _buildTabSeparatedRow(
+                                                  commandText,
+                                                  const TextStyle(
+                                                    color: Color(0xFFFFE082),
+                                                    fontFamily: 'monospace',
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                )
+                                              : Text(
+                                                  commandText,
+                                                  style: const TextStyle(
+                                                    color: Color(0xFFFFE082),
+                                                    fontFamily: 'monospace',
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                        ],
+                                      ),
+                                      trailing: const Icon(
+                                        Icons.upgrade_rounded,
+                                        color: Color(0xFFFFD54F),
+                                        size: 22,
+                                      ),
+                                      onTap: () => widget.onSingleSelect(item.ident),
+                                      onLongPress: () => widget.onItemLongPress(item),
                                     ),
                                   ),
                                 ),
