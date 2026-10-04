@@ -1076,12 +1076,20 @@ shop_keeper(char rmno)
             return (struct monst *) 0;
         }
     } else {
-        if (!level_status.shkready) {
+        /* NetHackJP / Upstream bugfix:
+         * Only flag an untrustworthy null shkp if this is actually a shop room
+         * (rmno >= ROOMOFFSET && svr.rooms[rmno - ROOMOFFSET].rtype >= SHOPBASE).
+         * Outside of shops or in non-shop rooms, a null shkp is completely normal.
+         */
+        if (!level_status.shkready
+            && rmno >= ROOMOFFSET
+            && svr.rooms[rmno - ROOMOFFSET].rtype >= SHOPBASE) {
             int hmm UNUSED = 1;
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED \
      && NH_DEVEL_STATUS != NH_STATUS_POSTRELEASE)
-            impossible("untrustworthy null shkp; level_status.shkready"
-                        " is FALSE (%d, %d, %d, %d)",
+            if (wizard)
+                impossible("debug: untrustworthy null shkp; level_status.shkready"
+                           " is FALSE (%d, %d, %d, %d)",
                         level_status.making, level_status.loading,
                         level_status.shkready, level_status.ready);
 #endif
