@@ -1178,4 +1178,53 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get soundAmbienceVolume => '環境音量';
+
+  @override
+  String get secHardModeTitle => 'ハードモード・縛りプレイ設定 (defaults.nh)';
+
+  @override
+  String get secHardModeSub => '各種制限を課した上級者向けの挑戦プレイ設定（※反映には新規ゲームの開始が必要です）';
+
+  @override
+  String get optBlindTitle => '全盲縛り (blind)';
+
+  @override
+  String get optBlindSub => '生まれつき目が見えない状態で開始します';
+
+  @override
+  String get optNudistTitle => '裸族縛り (nudist)';
+
+  @override
+  String get optNudistSub => '防具を持たずに開始し、防具を一切装備しません';
+
+  @override
+  String get optDeafTitle => '聾唖縛り (deaf)';
+
+  @override
+  String get optDeafSub => '生まれつき耳が聞こえない状態で開始します';
+
+  @override
+  String get optPauperTitle => '一文無し縛り (pauper)';
+
+  @override
+  String get optPauperSub => '初期アイテム・呪文・所持金一切なしで開始します（防具なしを含む）';
+
+  @override
+  String get optNoBonesTitle => '骨塚禁止 (自力攻略)';
+
+  @override
+  String get optNoBonesSub => '過去の冒険者の遺産・骨塚の生成を無効化し完全自力で攻略します';
+
+  @override
+  String get resetHardModeTitle => '縛り設定をすべて解除 (初期化)';
+
+  @override
+  String get resetHardModeConfirmTitle => '縛りプレイ設定のリセット';
+
+  @override
+  String get resetHardModeConfirmMsg =>
+      'すべての縛りプレイ（ハードモード）設定を解除して通常状態（すべてOFF）に戻しますか？';
+
+  @override
+  String get resetHardModeSuccess => '縛りプレイ設定をすべて解除しました。';
 }

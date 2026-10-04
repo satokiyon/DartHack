@@ -398,6 +398,23 @@
   "soundSe": "効果音 (SE)",
   "soundSeVolume": "効果音量",
   "soundAmbience": "環境音",
-  "soundAmbienceVolume": "環境音量"
+  "soundAmbienceVolume": "環境音量",
+
+  "secHardModeTitle": "ハードモード・縛りプレイ設定 (defaults.nh)",
+  "secHardModeSub": "各種制限を課した上級者向けの挑戦プレイ設定（※反映には新規ゲームの開始が必要です）",
+  "optBlindTitle": "全盲縛り (blind)",
+  "optBlindSub": "生まれつき目が見えない状態で開始します",
+  "optNudistTitle": "裸族縛り (nudist)",
+  "optNudistSub": "防具を持たずに開始し、防具を一切装備しません",
+  "optDeafTitle": "聾唖縛り (deaf)",
+  "optDeafSub": "生まれつき耳が聞こえない状態で開始します",
+  "optPauperTitle": "一文無し縛り (pauper)",
+  "optPauperSub": "初期アイテム・呪文・所持金一切なしで開始します（防具なしを含む）",
+  "optNoBonesTitle": "骨塚禁止 (自力攻略)",
+  "optNoBonesSub": "過去の冒険者の遺産・骨塚の生成を無効化し完全自力で攻略します",
+  "resetHardModeTitle": "縛り設定をすべて解除 (初期化)",
+  "resetHardModeConfirmTitle": "縛りプレイ設定のリセット",
+  "resetHardModeConfirmMsg": "すべての縛りプレイ（ハードモード）設定を解除して通常状態（すべてOFF）に戻しますか？",
+  "resetHardModeSuccess": "縛りプレイ設定をすべて解除しました。"
 }
 

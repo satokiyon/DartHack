@@ -175,5 +175,86 @@ MENUCOLOR=red=dragon
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getBool('nh_opt_autopickup'), isFalse);
   });
+
+  test('ハードモードオプションのデフォルト値（未指定時はすべてOFF・通常プレイ）の検証', () async {
+    final initialContent = 'OPTIONS=autopickup\n';
+    final file = File(testFilePath);
+    await file.writeAsString(initialContent);
+
+    SharedPreferences.setMockInitialValues({});
+
+    final helper = DefaultsHelper();
+    await helper.syncFromFileToPrefs(testFilePath);
+    final prefs = await SharedPreferences.getInstance();
+
+    expect(prefs.getBool('nh_opt_blind'), isFalse);
+    expect(prefs.getBool('nh_opt_nudist'), isFalse);
+    expect(prefs.getBool('nh_opt_deaf'), isFalse);
+    expect(prefs.getBool('nh_opt_pauper'), isFalse);
+    expect(prefs.getBool('nh_opt_bones'), isTrue); // bones許可（禁止ではない）
+  });
+
+  test('defaults.nh からのハードモードオプションのパース検証', () async {
+    final initialContent = '''
+OPTIONS=blind, nudist, deaf, pauper
+OPTIONS=!bones
+''';
+    final file = File(testFilePath);
+    await file.writeAsString(initialContent);
+
+    SharedPreferences.setMockInitialValues({});
+
+    final helper = DefaultsHelper();
+    await helper.syncFromFileToPrefs(testFilePath);
+    final prefs = await SharedPreferences.getInstance();
+
+    expect(prefs.getBool('nh_opt_blind'), isTrue);
+    expect(prefs.getBool('nh_opt_nudist'), isTrue);
+    expect(prefs.getBool('nh_opt_deaf'), isTrue);
+    expect(prefs.getBool('nh_opt_pauper'), isTrue);
+    expect(prefs.getBool('nh_opt_bones'), isFalse); // !bones -> bones=false
+  });
+
+  test('SharedPreferences から defaults.nh へのハードモード保存と初期化リセットの検証', () async {
+    final initialContent = 'OPTIONS=autopickup\n';
+    final file = File(testFilePath);
+    await file.writeAsString(initialContent);
+
+    // 1. ハードモードを有効化して保存
+    SharedPreferences.setMockInitialValues({
+      'nh_opt_blind': true,
+      'nh_opt_nudist': true,
+      'nh_opt_deaf': true,
+      'nh_opt_pauper': true,
+      'nh_opt_bones': false, // 骨塚禁止
+    });
+
+    final helper = DefaultsHelper();
+    await helper.syncFromPrefsToFile(testFilePath);
+
+    var savedContent = await file.readAsString();
+    expect(savedContent.contains('blind'), isTrue);
+    expect(savedContent.contains('nudist'), isTrue);
+    expect(savedContent.contains('deaf'), isTrue);
+    expect(savedContent.contains('pauper'), isTrue);
+    expect(savedContent.contains('!bones'), isTrue);
+
+    // 2. リセット（すべて通常プレイに戻す）
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('nh_opt_blind', false);
+    await prefs.setBool('nh_opt_nudist', false);
+    await prefs.setBool('nh_opt_deaf', false);
+    await prefs.setBool('nh_opt_pauper', false);
+    await prefs.setBool('nh_opt_bones', true);
+
+    await helper.syncFromPrefsToFile(testFilePath);
+
+    savedContent = await file.readAsString();
+    expect(savedContent.contains('!blind'), isTrue);
+    expect(savedContent.contains('!nudist'), isTrue);
+    expect(savedContent.contains('!deaf'), isTrue);
+    expect(savedContent.contains('!pauper'), isTrue);
+    expect(savedContent.contains('bones') && !savedContent.contains('!bones'), isTrue);
+  });
 }
 

@@ -2341,6 +2341,102 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'環境音量'**
   String get soundAmbienceVolume;
+
+  /// No description provided for @secHardModeTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'ハードモード・縛りプレイ設定 (defaults.nh)'**
+  String get secHardModeTitle;
+
+  /// No description provided for @secHardModeSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'各種制限を課した上級者向けの挑戦プレイ設定（※反映には新規ゲームの開始が必要です）'**
+  String get secHardModeSub;
+
+  /// No description provided for @optBlindTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'全盲縛り (blind)'**
+  String get optBlindTitle;
+
+  /// No description provided for @optBlindSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'生まれつき目が見えない状態で開始します'**
+  String get optBlindSub;
+
+  /// No description provided for @optNudistTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'裸族縛り (nudist)'**
+  String get optNudistTitle;
+
+  /// No description provided for @optNudistSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'防具を持たずに開始し、防具を一切装備しません'**
+  String get optNudistSub;
+
+  /// No description provided for @optDeafTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'聾唖縛り (deaf)'**
+  String get optDeafTitle;
+
+  /// No description provided for @optDeafSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'生まれつき耳が聞こえない状態で開始します'**
+  String get optDeafSub;
+
+  /// No description provided for @optPauperTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'一文無し縛り (pauper)'**
+  String get optPauperTitle;
+
+  /// No description provided for @optPauperSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'初期アイテム・呪文・所持金一切なしで開始します（防具なしを含む）'**
+  String get optPauperSub;
+
+  /// No description provided for @optNoBonesTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'骨塚禁止 (自力攻略)'**
+  String get optNoBonesTitle;
+
+  /// No description provided for @optNoBonesSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'過去の冒険者の遺産・骨塚の生成を無効化し完全自力で攻略します'**
+  String get optNoBonesSub;
+
+  /// No description provided for @resetHardModeTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'縛り設定をすべて解除 (初期化)'**
+  String get resetHardModeTitle;
+
+  /// No description provided for @resetHardModeConfirmTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'縛りプレイ設定のリセット'**
+  String get resetHardModeConfirmTitle;
+
+  /// No description provided for @resetHardModeConfirmMsg.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべての縛りプレイ（ハードモード）設定を解除して通常状態（すべてOFF）に戻しますか？'**
+  String get resetHardModeConfirmMsg;
+
+  /// No description provided for @resetHardModeSuccess.
+  ///
+  /// In ja, this message translates to:
+  /// **'縛りプレイ設定をすべて解除しました。'**
+  String get resetHardModeSuccess;
 }
 
 class _AppLocalizationsDelegate

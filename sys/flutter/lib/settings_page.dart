@@ -88,6 +88,13 @@ class _SettingsPageState extends State<SettingsPage> {
   String _optFruit = '';
   int _optNumberPad = 0;
 
+  // ハードモード・縛りプレイオプション (defaults.nh 連動)
+  bool _optBlind = false;
+  bool _optNudist = false;
+  bool _optDeaf = false;
+  bool _optPauper = false;
+  bool _optBones = true; // true = 骨塚あり（通常）, false = 骨塚禁止
+
   Map<String, String> _getItemTypeSymbols(AppLocalizations l10n) => {
     '\$': l10n.itemGold,
     '"': l10n.itemAmulet,
@@ -298,6 +305,11 @@ class _SettingsPageState extends State<SettingsPage> {
       _optHorsename = prefs.getString('nh_opt_horsename') ?? '';
       _optFruit = prefs.getString('nh_opt_fruit') ?? '';
       _optNumberPad = prefs.getInt('nh_opt_number_pad') ?? 0;
+      _optBlind = prefs.getBool('nh_opt_blind') ?? false;
+      _optNudist = prefs.getBool('nh_opt_nudist') ?? false;
+      _optDeaf = prefs.getBool('nh_opt_deaf') ?? false;
+      _optPauper = prefs.getBool('nh_opt_pauper') ?? false;
+      _optBones = prefs.getBool('nh_opt_bones') ?? true;
 
       for (int i = 0; i < 9; i++) {
         _shortcuts[i] = prefs.getString('shortcut_btn_$i') ?? _defaultShortcuts[i];
@@ -1992,6 +2004,136 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  Widget _buildHardModeSection() {
+    final l10n = AppLocalizations.of(context)!;
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.dangerous, color: Colors.deepOrangeAccent),
+        title: Text(l10n.secHardModeTitle),
+        subtitle: Text(l10n.secHardModeSub),
+        children: _withDividers([
+          SwitchListTile(
+            title: Text(l10n.optBlindTitle),
+            subtitle: Text(l10n.optBlindSub),
+            value: _optBlind,
+            onChanged: (val) {
+              setState(() => _optBlind = val);
+              _saveGameOption('nh_opt_blind', val);
+            },
+          ),
+          SwitchListTile(
+            title: Text(l10n.optNudistTitle),
+            subtitle: Text(l10n.optNudistSub),
+            value: _optNudist,
+            onChanged: (val) {
+              setState(() {
+                _optNudist = val;
+                // 裸族をOFFにした場合、裸族を内包する一文無しも自動的にOFF
+                if (!val && _optPauper) {
+                  _optPauper = false;
+                  _saveGameOption('nh_opt_pauper', false);
+                }
+              });
+              _saveGameOption('nh_opt_nudist', val);
+            },
+          ),
+          SwitchListTile(
+            title: Text(l10n.optDeafTitle),
+            subtitle: Text(l10n.optDeafSub),
+            value: _optDeaf,
+            onChanged: (val) {
+              setState(() => _optDeaf = val);
+              _saveGameOption('nh_opt_deaf', val);
+            },
+          ),
+          SwitchListTile(
+            title: Text(l10n.optPauperTitle),
+            subtitle: Text(l10n.optPauperSub),
+            value: _optPauper,
+            onChanged: (val) {
+              setState(() {
+                _optPauper = val;
+                // 一文無しをONにした場合、防具なしの裸族も自動的にON
+                if (val && !_optNudist) {
+                  _optNudist = true;
+                  _saveGameOption('nh_opt_nudist', true);
+                }
+              });
+              _saveGameOption('nh_opt_pauper', val);
+            },
+          ),
+          SwitchListTile(
+            title: Text(l10n.optNoBonesTitle),
+            subtitle: Text(l10n.optNoBonesSub),
+            value: !_optBones, // bonesがfalseのときに骨塚禁止ON
+            onChanged: (val) {
+              setState(() => _optBones = !val);
+              _saveGameOption('nh_opt_bones', !val);
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.restore, color: Colors.orangeAccent),
+                label: Text(l10n.resetHardModeTitle, style: const TextStyle(color: Colors.orangeAccent)),
+                onPressed: _resetHardModeSettings,
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Future<void> _resetHardModeSettings() async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.resetHardModeConfirmTitle),
+        content: Text(l10n.resetHardModeConfirmMsg),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.btnCancel),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.btnResetConfirm, style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    setState(() {
+      _optBlind = false;
+      _optNudist = false;
+      _optDeaf = false;
+      _optPauper = false;
+      _optBones = true;
+    });
+
+    await _saveSetting('nh_opt_blind', false);
+    await _saveSetting('nh_opt_nudist', false);
+    await _saveSetting('nh_opt_deaf', false);
+    await _saveSetting('nh_opt_pauper', false);
+    await _saveSetting('nh_opt_bones', true);
+
+    final defaultsHelper = DefaultsHelper();
+    await defaultsHelper.syncFromPrefsToFile(widget.defaultsFilePath);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.resetHardModeSuccess)),
+      );
+    }
+  }
+
   Widget _buildCreditsSection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
@@ -2143,6 +2285,7 @@ class _SettingsPageState extends State<SettingsPage> {
           const Divider(height: 1),   //区切り線
           _buildAutosaveSection(), // 自動セーブ設定
           _buildGameRulesSection(), //ゲームルール・プレイ設定
+          _buildHardModeSection(), // ハードモード・縛りプレイ設定
           _buildAdvancedSection(), // 高度な設定
           _buildOtherSection(), // その他の設定
           const Divider(height: 1),   //区切り線

@@ -397,6 +397,23 @@
   "soundSe": "Sound Effects (SE)",
   "soundSeVolume": "SE Volume",
   "soundAmbience": "Ambience",
-  "soundAmbienceVolume": "Ambience Volume"
+  "soundAmbienceVolume": "Ambience Volume",
+
+  "secHardModeTitle": "Hard Mode & Challenge Settings (defaults.nh)",
+  "secHardModeSub": "Advanced challenges imposing extra restrictions (Requires new game)",
+  "optBlindTitle": "Blindness Challenge (blind)",
+  "optBlindSub": "Permanently blind from birth",
+  "optNudistTitle": "Nudist Challenge (nudist)",
+  "optNudistSub": "Start without armor and never wear any armor",
+  "optDeafTitle": "Deafness Challenge (deaf)",
+  "optDeafSub": "Permanently deaf from birth",
+  "optPauperTitle": "Pauper Challenge (pauper)",
+  "optPauperSub": "Start with zero items, gold, or spells (implies nudist)",
+  "optNoBonesTitle": "Disable Bones (!bones)",
+  "optNoBonesSub": "Disallow loading bones files from previous adventurers",
+  "resetHardModeTitle": "Reset All Challenge Settings",
+  "resetHardModeConfirmTitle": "Reset Challenge Settings",
+  "resetHardModeConfirmMsg": "Are you sure you want to disable all challenge options and reset to default (all OFF)?",
+  "resetHardModeSuccess": "All challenge options disabled and reset to defaults."
 }
 

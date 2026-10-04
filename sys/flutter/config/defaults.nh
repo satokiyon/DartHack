@@ -50,6 +50,13 @@ OPTIONS=symset:IBMGraphics_2,runmode:walk
 OPTIONS=boulder:0
 #OPTIONS=!force_invmenu
 
+# *** Hard mode / Challenge options (defaults: all OFF) ***
+#OPTIONS=blind
+#OPTIONS=nudist
+#OPTIONS=deaf
+#OPTIONS=pauper
+#OPTIONS=!bones
+
 # Change ghost symbol to X
 #SYMBOLS=S_ghost:X
 

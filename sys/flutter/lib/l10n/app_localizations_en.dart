@@ -1200,4 +1200,57 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get soundAmbienceVolume => 'Ambience Volume';
+
+  @override
+  String get secHardModeTitle => 'Hard Mode & Challenge Settings (defaults.nh)';
+
+  @override
+  String get secHardModeSub =>
+      'Advanced challenges imposing extra restrictions (Requires new game)';
+
+  @override
+  String get optBlindTitle => 'Blindness Challenge (blind)';
+
+  @override
+  String get optBlindSub => 'Permanently blind from birth';
+
+  @override
+  String get optNudistTitle => 'Nudist Challenge (nudist)';
+
+  @override
+  String get optNudistSub => 'Start without armor and never wear any armor';
+
+  @override
+  String get optDeafTitle => 'Deafness Challenge (deaf)';
+
+  @override
+  String get optDeafSub => 'Permanently deaf from birth';
+
+  @override
+  String get optPauperTitle => 'Pauper Challenge (pauper)';
+
+  @override
+  String get optPauperSub =>
+      'Start with zero items, gold, or spells (implies nudist)';
+
+  @override
+  String get optNoBonesTitle => 'Disable Bones (!bones)';
+
+  @override
+  String get optNoBonesSub =>
+      'Disallow loading bones files from previous adventurers';
+
+  @override
+  String get resetHardModeTitle => 'Reset All Challenge Settings';
+
+  @override
+  String get resetHardModeConfirmTitle => 'Reset Challenge Settings';
+
+  @override
+  String get resetHardModeConfirmMsg =>
+      'Are you sure you want to disable all challenge options and reset to default (all OFF)?';
+
+  @override
+  String get resetHardModeSuccess =>
+      'All challenge options disabled and reset to defaults.';
 }

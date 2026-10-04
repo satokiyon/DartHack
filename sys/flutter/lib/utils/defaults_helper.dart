@@ -23,6 +23,11 @@ class DefaultsHelper {
     'hilite_status',
     'menucolor',
     'number_pad',
+    'blind',
+    'nudist',
+    'deaf',
+    'pauper',
+    'bones',
   };
 
   static const String managedHeaderComment = '# *** Managed Options by Settings ***';
@@ -479,6 +484,28 @@ class DefaultsHelper {
         await prefs.setInt('nh_opt_number_pad', 0);
       }
     }
+
+    // ハードモード・縛りプレイ設定 (デフォルト: blind, nudist, deaf, pauper は false、bones は true)
+    final blindVal = getOption('blind');
+    await prefs.setBool('nh_opt_blind', blindVal?.toLowerCase() == 'true');
+
+    final nudistVal = getOption('nudist');
+    await prefs.setBool('nh_opt_nudist', nudistVal?.toLowerCase() == 'true');
+
+    final deafVal = getOption('deaf');
+    await prefs.setBool('nh_opt_deaf', deafVal?.toLowerCase() == 'true');
+
+    final pauperVal = getOption('pauper');
+    await prefs.setBool('nh_opt_pauper', pauperVal?.toLowerCase() == 'true');
+
+    final bonesVal = getOption('bones');
+    if (bonesVal != null) {
+      await prefs.setBool('nh_opt_bones', bonesVal.toLowerCase() == 'true');
+    } else {
+      if (!prefs.containsKey('nh_opt_bones')) {
+        await prefs.setBool('nh_opt_bones', true);
+      }
+    }
   }
 
   /// SharedPreferences の現在値を defaults.nh ファイルに反映保存する
@@ -542,6 +569,23 @@ class DefaultsHelper {
       setOption('number_pad', (prefs.getInt('nh_opt_number_pad') ?? 0).toString());
     }
 
+    // ハードモード・縛りプレイ設定
+    if (prefs.containsKey('nh_opt_blind')) {
+      setBoolOption('blind', prefs.getBool('nh_opt_blind') ?? false);
+    }
+    if (prefs.containsKey('nh_opt_nudist')) {
+      setBoolOption('nudist', prefs.getBool('nh_opt_nudist') ?? false);
+    }
+    if (prefs.containsKey('nh_opt_deaf')) {
+      setBoolOption('deaf', prefs.getBool('nh_opt_deaf') ?? false);
+    }
+    if (prefs.containsKey('nh_opt_pauper')) {
+      setBoolOption('pauper', prefs.getBool('nh_opt_pauper') ?? false);
+    }
+    if (prefs.containsKey('nh_opt_bones')) {
+      setBoolOption('bones', prefs.getBool('nh_opt_bones') ?? true);
+    }
+
     await saveToFile(filePath);
   }
 
@@ -587,6 +631,12 @@ class DefaultsHelper {
             await prefs.setBool(prefKey, bVal);
           }
           debugPrint("DefaultsHelper: Added new option '$prefKey' = $defaultVal");
+        } else if (optKey == 'bones') {
+          await prefs.setBool(prefKey, true);
+          debugPrint("DefaultsHelper: Added default option '$prefKey' = true");
+        } else if (optKey == 'blind' || optKey == 'nudist' || optKey == 'deaf' || optKey == 'pauper') {
+          await prefs.setBool(prefKey, false);
+          debugPrint("DefaultsHelper: Added default option '$prefKey' = false");
         }
       } else {
         // 既存設定の検証と範囲外値のフォールバック
