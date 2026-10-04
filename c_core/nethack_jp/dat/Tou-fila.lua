@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02.
 -- NetHack Tourist Tou-fila.lua	$NHDT-Date: 1781994874 2026/06/20 22:34:34 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.3 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991,92 by M. Stephenson, P. Winner
@@ -34,3 +34,13 @@ des.monster({ id = "soldier", peaceful = 0 })
 des.monster({ id = "soldier", peaceful = 0 })
 des.monster({ class = "H", peaceful = 0 })
 des.monster({ class = "C", peaceful = 0 })
+-- Ankh-Morpork citizens
+des.monster({ id = "dwarf", peaceful = 1})
+if percent(50) then
+	des.monster({ id = "dwarf", peaceful = 1})
+	des.monster({ id = "dwarf", peaceful = 1})
+end;
+if percent(50) then
+	des.monster({ id = "rock troll", peaceful = 1})
+	des.monster({ id = "rock troll", peaceful = 1})
+end;

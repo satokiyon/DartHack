@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02. -->
 # Building NetHack for Classic Mac OS (68k / PowerPC)
 
 Cross-compiled with the [Retro68](https://github.com/autc04/Retro68) GCC
@@ -76,8 +76,7 @@ build-PPC, skip-Carbon:
 ## Configure (once)
 
     cd NetHack
-    sys/unix/setup.sh sys/unix/hints/linux.500
-    make fetch-lua
+    sys/unix/setup.sh sys/unix/hints/linux.501
 
 ## Build and package
 

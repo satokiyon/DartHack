@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02. */
 /* NetHack 5.0	macwin.h	$NHDT-Date: 1596498543 2020/08/03 23:49:03 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kevin Hugo, 2003. */
@@ -210,6 +210,7 @@ extern void C2P(const char *c, unsigned char *p);
 extern void mac_fsspec(FSSpec *spec, short vol, long dir,
                        ConstStr255Param name);
 extern void P2C(const unsigned char *p, char *c);
+extern void mac_init_savedir(void);
 
 /* P_STRING_CONV (compile-time Pascal string from a C literal) lives in
    maccompat.h, included above, so standalone tools (mrecover.c) and

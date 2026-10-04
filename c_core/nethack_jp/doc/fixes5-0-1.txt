@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02.
 NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.36 $ $NHDT-Date: 1781062909 2026/06/09 19:41:49 $
 	
 General Fixes and Modified Features
@@ -275,6 +275,9 @@ NetHack Community Patches (or Variation) Included
 NCURSES_CFLAGS was being ignored when using hints/linux.500 with only
 	WANT_WIN_TTY=1 and not WANT_WIN_CURSES=1  (pr #1522 by torakoya)
 added a hints file netbsd.500 for NetBSD (pr #1519 by SirWumpus)
+rewrite of the Tourist quest text for more Pratchetty feel
+	(pr #1596 by robindouglasjohnson)
+
 
 
 Code Cleanup and Reorganization

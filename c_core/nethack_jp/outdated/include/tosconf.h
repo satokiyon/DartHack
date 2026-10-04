@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02. */
 /* NetHack 3.6	tosconf.h	$NHDT-Date: 1432512782 2015/05/25 00:13:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
@@ -37,13 +37,21 @@
 /* configurable options */
 #define MFLOPPY   /* floppy support		*/
 #define RANDOM    /* improved random numbers	*/
-#define SHELL     /* allow spawning of shell	*/
-#define TERMLIB   /* use termcap			*/
-#define MAIL      /* enable the fake maildemon */
 #ifdef MINT
+#define SHELL   /* allow spawning of shell (requires system(3))	*/
 #define SUSPEND /* allow suspending the game	*/
 #endif
+#ifndef NO_TERMS
+#define TERMLIB   /* use termcap			*/
+#endif
+#define MAIL      /* enable the fake maildemon */
 #define SFSTRUCT_BUFFERING /* buffered stdio writes for structlevel files */
+
+/* Skip the ~9600-entry glyph-id prefill on slow m68k Atari hosts;
+   the shipped nethack.cnf doesn't reference any G_glyph names, so
+   a lazy lookup on first use is cheaper than the up-front fill.
+*/
+#define DISABLE_GLYPHID_CACHE_PREFILL
 
 #ifndef TERMLIB
 #define ANSI_DEFAULT /* use vt52 by default		*/

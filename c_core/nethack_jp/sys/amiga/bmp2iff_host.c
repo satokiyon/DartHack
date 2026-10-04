@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02. */
 /*
  * bmp2iff_host.c - Convert a BMP to Amiga BMAP IFF.
  * Copyright (c) 2026 by Ingo Paschke.
@@ -18,7 +19,9 @@
 #define TILE_X 16
 #define TILE_Y 16
 
-#pragma pack(push,1)
+/* Header fields are decoded one at a time by the read_*le() helpers,
+   never read as a block, so these need no packing; packing would make
+   the pointers passed to those helpers misaligned. */
 typedef struct {
     uint16_t bfType;
     uint32_t bfSize;
@@ -35,7 +38,6 @@ typedef struct {
     int32_t  biXPelsPerMeter, biYPelsPerMeter;
     uint32_t biClrUsed, biClrImportant;
 } BMPINFOHEADER;
-#pragma pack(pop)
 
 typedef struct {
     uint8_t r, g, b;

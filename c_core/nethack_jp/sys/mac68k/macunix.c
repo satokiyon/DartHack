@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02. */
 /* NetHack 5.0	macunix.c	$NHDT-Date: 1432512797 2015/05/25 00:13:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
@@ -31,7 +31,9 @@ getlock(void)
     int fd;
     int pid = getpid(); /* always 1 on classic Mac OS */
 
-    Sprintf(gl.lock, "%d%s", getuid(), svp.plname);
+    /* regularize: a ':' in the name would make an HFS partial path */
+    Sprintf(gl.lock, "%d%.*s", getuid(), MAC_FNAME_PLMAX, svp.plname);
+    regularize(gl.lock);
     set_levelfile_name(gl.lock, 0);
 
     if ((fd = open(gl.lock, O_RDWR | O_EXCL | O_CREAT, LEVL_TYPE)) == -1) {

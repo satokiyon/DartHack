@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02.
 -- NetHack Tourist Tou-loca.lua	$NHDT-Date: 1781994874 2026/06/20 22:34:34 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991,92 by M. Stephenson, P. Winner
@@ -152,3 +152,38 @@ des.monster("giant spider")
 des.monster("giant spider")
 des.monster("s")
 des.monster("s")
+-- Selection of Discworld NPCs
+if percent(10) then
+	des.monster({id="wizard", name="Rincewind", male=1, peaceful=1, keep_default_invent=false})
+end
+if percent(10) then
+	des.monster({id="barbarian", name="Cohen", male=1, peaceful=1, keep_default_invent=false})
+end
+if percent(10) then
+	des.monster({id="barbarian", name="Hrun", male=1, peaceful=1, keep_default_invent=false})
+end
+if percent(10) then
+	des.monster({id="wizard", name="Ridcully", male=1, peaceful=1, keep_default_invent=false})
+end=
+if percent(10) then
+	des.monster({id="wizard", name="the Bursar", male=1, peaceful=1, keep_default_invent=false})
+end
+if percent(10) then
+	des.monster({id="priest", name="Mightily Oats", male=1, peaceful=1, keep_default_invent=false})
+end
+if percent(10) then
+	des.monster({id="watch captain", name="Vimes", male=1, peaceful=1})
+end
+if percent(10) then
+	des.monster({id="dwarf", name="Cheery", female=1, peaceful=1, keep_default_invent=false}) -- no pick-axe
+end
+if percent(10) then
+	des.monster({id="clay golem", name="Dorfl", male=1, peaceful=1, keep_default_invent=false})
+end
+if percent(10) then
+	des.monster({id="clay golem", name="Gladys", female=1, peaceful=1, keep_default_invent=false})
+end
+
+
+
+

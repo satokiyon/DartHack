@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02. */
 /* NetHack 5.0	mac68kconf.h	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kevin Hugo, 2004. */
@@ -117,6 +117,18 @@ extern int macunlink(const char *);
                                builds keep working; only their Finder icon
                                binding goes stale) */
 #define TEXT_CREATOR 'ttxt' /* Something the user can actually edit */
+
+/* Save files live in their own folder next to the application so a
+   player name can never select an installed file (license, record, the
+   application itself, ...).  macfile.c routes names ending in
+   SAVE_EXTENSION or MAC_ERRSAVE_EXT there; Recover finds the folder the
+   same way. */
+#define MAC_SAVEDIR "Saves"
+#define SAVE_EXTENSION ".sav"
+#define MAC_ERRSAVE_EXT ".err"
+/* Longest player name used in file names: "<name>.sav" and the level
+   files "1<name>.NN" must fit the 31-character HFS limit. */
+#define MAC_FNAME_PLMAX 27
 
 /*
  * Define PORT_HELP to be the name of the port-specfic help file.
