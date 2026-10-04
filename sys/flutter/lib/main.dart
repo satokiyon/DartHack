@@ -45,6 +45,7 @@ import 'l10n/app_localizations.dart';
 import 'screens/start_screen.dart';
 import 'screens/end_screen.dart';
 import 'services/sound_manager.dart';
+import 'input/hardware_key_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -274,14 +275,28 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       }
     });
     _focusNode.addListener(() {
-      if (!_focusNode.hasFocus && _isGameRunning && _waitingForInput && !_isKeyboardVisible) {
-        _focusNode.requestFocus();
+      if (!_focusNode.hasFocus) {
+        _ensureGameFocus();
       }
     });
     _loadPreferences().then((_) {
       _applyScreenMode(_screenMode);
       _initAssets();
     });
+  }
+
+  /// 物理キーボード用のゲーム画面フォーカスを安全に確保・復帰する
+  void _ensureGameFocus() {
+    if (!_isGameRunning) return;
+    // テキスト入力中のオーバーレイがある場合は、TextField のフォーカスを奪わない
+    if (_isGetLineVisible || _isAskNameVisible || _isAnyKeyVisible) return;
+    if (_screen.isMenuWindowVisible && isExtCmdMenuPrompt(_screen.menuPrompt)) return;
+    // 最前面のルートでない場合（設定画面などの別画面表示中）は奪わない
+    if (mounted && (ModalRoute.of(context)?.isCurrent ?? true)) {
+      if (!_focusNode.hasFocus) {
+        _focusNode.requestFocus();
+      }
+    }
   }
 
   Future<void> _loadPreferences() async {
@@ -771,8 +786,92 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     return _screen.isMenuWindowVisible ||
         _screen.isTextWindowVisible ||
         _isYnVisible ||
+        _isAnyKeyVisible ||
         _isGetLineVisible ||
         _isAskNameVisible;
+  }
+
+  /// 現在のUI状態に応じたキー入力コンテキスト
+  KeyInputContext get _currentKeyInputContext {
+    if (!_isGameRunning) return KeyInputContext.inactive;
+    if (_isGetLineVisible || _isAskNameVisible || _isAnyKeyVisible) {
+      return KeyInputContext.textInputOverlay;
+    }
+    if (_isYnVisible) return KeyInputContext.yn;
+    if (_screen.isTextWindowVisible) return KeyInputContext.textWindow;
+    if (_screen.isMenuWindowVisible) {
+      if (isExtCmdMenuPrompt(_screen.menuPrompt)) {
+        return KeyInputContext.extCmdMenu;
+      }
+      return KeyInputContext.menu;
+    }
+    if (_waitingForInput) return KeyInputContext.game;
+    return KeyInputContext.inactive;
+  }
+
+  /// ルートの Focus ウィジェットから呼び出される物理キーイベントハンドラ
+  KeyEventResult _onHardwareKey(FocusNode node, KeyEvent event) {
+    final context = _currentKeyInputContext;
+    final isShift = HardwareKeyboard.instance.isShiftPressed;
+    final isCtrl = HardwareKeyboard.instance.isControlPressed;
+    final isAlt = HardwareKeyboard.instance.isAltPressed;
+
+    final action = HardwareKeyRouter.route(
+      event: event,
+      context: context,
+      numberPadMode: _numberPadMode,
+      ynChoices: _ynChoices,
+      ynDefault: _ynDefault,
+      isShiftPressed: isShift,
+      isControlPressed: isCtrl,
+      isAltPressed: isAlt,
+    );
+
+    switch (action) {
+      case SendKey(:final code, :final label):
+        if (_isGetLineVisible && code == 27) {
+          _sendGetLineResult(null);
+          return KeyEventResult.handled;
+        }
+        if (_isAskNameVisible && code == 27) {
+          _sendAskNameResult(null);
+          return KeyEventResult.handled;
+        }
+        if (_isAnyKeyVisible && code == 27) {
+          _closeAnyKeyOverlay();
+          return KeyEventResult.handled;
+        }
+        if (_screen.isMenuWindowVisible && code == 27) {
+          _sendMenuSelection(-1);
+          return KeyEventResult.handled;
+        }
+        if (_waitingForInput) {
+          _sendFfiKey(code, label);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case SendYn(:final code):
+        _sendYnResult(code);
+        return KeyEventResult.handled;
+
+      case DismissText():
+        _sendFfiKey(32, "Space");
+        return KeyEventResult.handled;
+
+      case MenuAccelerator(:final code):
+        if (_screen.isMenuWindowVisible) {
+          _sendFfiKey(code, "MenuAcc($code)");
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case IgnoreKey():
+        return KeyEventResult.ignored;
+
+      case SwallowKey():
+        return KeyEventResult.handled;
+    }
   }
 
   bool get _shouldShowController {
@@ -858,7 +957,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   void _handleAmountSelection(MenuItemData item, int amount) {
     if (amount <= 0) return;
-    final isMultiSelectMenu = !_screen.menuPrompt.contains("拡張コマンド") && _screen.menuHow > 1;
+    final isMultiSelectMenu = !isExtCmdMenuPrompt(_screen.menuPrompt) && _screen.menuHow > 1;
     if (isMultiSelectMenu) {
       setState(() {
         _menuSelectedCounts[item.ident] = amount;
@@ -943,6 +1042,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       _isAnyKeyVisible = false;
       _anyKeyDescription = null;
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
   }
 
   void _sendGetLineResult(String? result) {
@@ -953,6 +1053,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     setState(() {
       _isGetLineVisible = false;
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
   }
 
   void _sendAskNameResult(String? result) {
@@ -964,6 +1065,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     setState(() {
       _isAskNameVisible = false;
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
     if (result != null && result.isNotEmpty) {
       SharedPreferences.getInstance().then((prefs) {
         prefs.setString("lastUsername", result);
@@ -1398,9 +1500,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               }
             });
           }
-          if (!_isKeyboardVisible) {
-            _focusNode.requestFocus();
-          }
+          _ensureGameFocus();
           _triggerCenterOnPlayer();
         } else if (type == 'yn_function') {
           final question = (message['question'] as String?) ?? '';
@@ -1930,6 +2030,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
     // メニュー表示中は、メニューショートカットキー判定を行う
     if (_screen.isMenuWindowVisible) {
+      // 拡張コマンドメニューの場合はアクセラレータ即決を行わない（検索フィルターに委ねる）
+      if (isExtCmdMenuPrompt(_screen.menuPrompt)) {
+        if (code == 27) {
+          _sendMenuSelection(-1);
+        }
+        return;
+      }
+
       final isMultiSelectMenu = _screen.menuHow > 1;
       if (isMultiSelectMenu) {
         if (code == 27) {
@@ -2182,6 +2290,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
     _screen.clearMenu();
     _menuSelectedCounts = <int, int>{};
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
   }
 
   void _sendMenuSelections(Map<int, int> selections) {
@@ -2205,6 +2314,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
     _screen.clearMenu();
     _menuSelectedCounts = <int, int>{};
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
   }
 
   void _toggleMenuSelection(int ident) {
@@ -2302,6 +2412,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       _anyKeyDescription = null;
       _anyKeyPendingCode = null;
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
   }
 
   Widget _buildAnyKeyOverlay() {
@@ -2406,6 +2517,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     _lastMapTapDownDetails = details;
                   },
                   onTap: () {
+                    _ensureGameFocus();
                     if (_lastMapTapDownDetails != null) {
                       _handleMapTap(_lastMapTapDownDetails!);
                     }
@@ -3126,33 +3238,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           ),
         ) : null,
       body: SafeArea(
-        child: KeyboardListener(
+        child: Focus(
           focusNode: _focusNode,
           autofocus: true,
-          onKeyEvent: (KeyEvent event) {
-            if (!_isGameRunning || !_waitingForInput) return;
-            if (event is KeyDownEvent) {
-              final char = event.character;
-              if (char != null && char.isNotEmpty) {
-                final code = char.codeUnitAt(0);
-                _sendFfiKey(code, char);
-              } else {
-                int? code;
-                String? name;
-                if (event.logicalKey == LogicalKeyboardKey.arrowUp) { code = 107; name = "k"; }
-                else if (event.logicalKey == LogicalKeyboardKey.arrowDown) { code = 106; name = "j"; }
-                else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) { code = 104; name = "h"; }
-                else if (event.logicalKey == LogicalKeyboardKey.arrowRight) { code = 108; name = "l"; }
-                else if (event.logicalKey == LogicalKeyboardKey.enter) { code = 10; name = "Enter"; }
-                else if (event.logicalKey == LogicalKeyboardKey.escape) { code = 27; name = "ESC"; }
-                else if (event.logicalKey == LogicalKeyboardKey.space) { code = 32; name = "Space"; }
-                
-                if (code != null) {
-                  _sendFfiKey(code, name ?? "");
-                }
-              }
-            }
-          },
+          onKeyEvent: _onHardwareKey,
           child: Stack(
             children: [
               _isGameRunning

@@ -1166,3 +1166,31 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
      - **スロット/経験値不足 (`could_advance`)**: Cコアが文字列に `"  * "` を付与する。
      - **最大レベル到達 (`peaked_skill`)**: Cコアが文字列に `"  # "` を付与する。
    - これら 3 状態の記号や行が後続のUIフィルター等で欠落・除外されないよう厳格に維持してください。
+
+
+## 43. Flutter 物理キーボード対応・フォーカス管理およびメタキー（Alt+英字）の仕様原則
+
+1. **モバイルタップ最優先と C コア非破壊原則（過剰実装の抑止）**:
+   - Android におけるタッチ・タップ操作（画面上の仮想パッド、コントローラ、ダイアログ操作等）のコードや挙動は絶対に改変・破壊してはならない。
+   - C コア（`winflutter.c` を含む）は変更せず、Flutter/Dart 側の純粋関数ルーター（`HardwareKeyRouter`）で解決し、NetHack 本家および NetHackJP との Git Subtree 同期互換性を維持する。
+   - 独自のキーバインド設定画面や複雑なカスタムUIなどの過剰な実装（YAGNI 違反）を避け、NetHack 標準のキー体系に自然に準拠させる。
+
+2. **`Focus.onKeyEvent` によるフォーカス流出遮断と安全な再フォーカス**:
+   - `KeyboardListener` 単体ではイベントを消費できず、Flutter 標準ショートカット（矢印、Tab、Space 等）へキーが流出して画面要素にフォーカスが奪われるため、ルートでは `Focus(onKeyEvent: _onHardwareKey)` を使用して処理済みキーは必ず `KeyEventResult.handled` を返す。
+   - 再フォーカス（`_ensureGameFocus`）は、テキスト入力用オーバーレイ（GetLine, AskName, AnyKey, 拡張コマンド検索欄）が存在しない安全なタイミングに限定して実行し、TextField からフォーカスを奪い返さない。
+   - テキスト入力中は `KeyEventResult.ignored` を返して OS / IME に確実に文字を届ける。
+
+3. **拡張コマンドメニューにおけるアクセラレータ即決抑止と優先順解決**:
+   - 拡張コマンドメニュー表示中は、タイピング（例: `#loot` の `l`）がメニューショートカット（`l = invoke`）として暴発するのを防ぐため、1文字アクセラレータ即決を完全に抑止する。
+   - 検索欄の `onSubmitted`（Enter）では、「完全一致 > コマンド名前方一致 > コマンド名部分一致 > 説明文一致」の優先度で候補を自動決定・実行する。
+
+4. **NetHack メタキー（`0x80 | charCode`）と OS（Windows/Android）共存原則**:
+   - NetHack C コア仕様（`#define M(c) (0x80 | (c))`）に準拠し、ゲーム本編中に限り以下を FFI 経由で直接送信する。
+     - `Alt + a〜z`: `0x80 | 'a'〜'z'`（例: `Alt+l` → `#loot`, `Alt+c` → `#chat`）
+     - `Alt + Shift + a〜z`: `0x80 | 'A'〜'Z'`（例: `Alt+Shift+c` → `#conduct`, `Alt+Shift+a` → `#annotate`）
+     - `Alt + 2`: `0x80 | '2'` (`#twoweapon`: 二刀流切り替え)
+     - `Alt + ?`: `0x80 | '?'` (`#?`: 拡張コマンド一覧)
+   - Windows において Alt キー単体押下でウィンドウメニューにフォーカスが吸われるのを防ぐため、ゲーム本編中の Alt 単体押下（`altLeft`, `altRight`）は `SwallowKey`（`handled` で消費）として安全に処理する。
+   - `Alt + F4`（終了）や `Alt + Tab`（切替）などのシステム予約キーは `IgnoreKey`（`ignored`）として OS にそのまま透過させる。
+   - OS や IME による文字コード化け（ウムラウトや null）を防ぐため、`character` ではなく `logicalKey` から直接ベース文字を特定してコードを解決する。
+   - テキスト入力中や通常メニュー中ではメタキー変換を無効化し、通常の入力を優先する。

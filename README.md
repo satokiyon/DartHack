@@ -5,7 +5,7 @@
 
 <img width="1280" height="720" alt="Screenshot_20260730-002828" src="https://github.com/user-attachments/assets/70b5b321-d7f2-4e4d-a021-55cd6794b17d" />
 
-DartHack は、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/) 5.0 日本語版を **Flutter / Dart** 上で動作させるための非公式移植プロジェクトです。
+DartHack は、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/) 5.0 日本語版/英語版を **Flutter / Dart** で作成したUIで動作させるための非公式移植プロジェクトです。
 
 スマートフォン（Android）や PC 等で快適にプレイできるよう、タッチ操作に対応した仮想方向パッド、ショートカットキーパッド、拡張コマンドパネル、個数選択ダイアログなど、モバイルに最適化した UI を備えています。
 
@@ -17,6 +17,7 @@ DartHack は、ローグライクゲームの金字塔 [NetHack](https://www.net
 Android 端末でプレイするには、以下の Google Play ストアからダウンロードしてインストールしてください。
 
 👉 **[Google Play で DartHack をダウンロード](https://play.google.com/store/apps/details?id=jp.satokiyo.darthack)**
+👉 **[DartHack操作マニュアル](https://satokiyon.github.io/darthack-site/manual.html)**
 
 ---
 
@@ -25,7 +26,7 @@ Android 端末でプレイするには、以下の Google Play ストアから�
 Flutter FFI による C コアとの連携アーキテクチャ、ディレクトリ構造等の詳細については、以下のドキュメントを参照してください。
 
 * **[sys/flutter/README.md](sys/flutter/README.md)** - Flutter 移植版のビルド・アーキテクチャ・フォルダ構成
-* **[DEVELOPMENT.md](DEVELOPMENT.md)** - 日本語化方針・開発全般に関する情報
+
 
 ---
 

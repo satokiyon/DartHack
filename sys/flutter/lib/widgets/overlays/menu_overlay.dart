@@ -5,6 +5,7 @@ import '../../nethack_screen.dart';
 import '../../utils/dialog_header_helper.dart';
 import '../../utils/nethack_colors.dart';
 import '../menu_item_tile_painter.dart';
+import '../../input/hardware_key_router.dart';
 
 class MenuOverlay extends StatefulWidget {
   final String menuPrompt;
@@ -100,6 +101,71 @@ class _MenuOverlayState extends State<MenuOverlay> {
         }
       }
     });
+  }
+
+  /// 拡張コマンド検索時の Enter 決定処理（優先度: 完全一致 > 前方一致 > 部分一致 > 説明文一致）
+  void _submitExtCmd(List<MenuItemData> filteredItems) {
+    final query = _filterQuery.trim().toLowerCase();
+    final selectableItems = filteredItems
+        .where((i) => i.ident > 0 && i.ident != 4294967294 && !_isMenuCategoryItem(i))
+        .toList();
+
+    if (selectableItems.isEmpty) {
+      // 候補がなく「(すべて表示)」項目がある場合はそれを選択して全コマンドを展開
+      for (final item in widget.menuItems) {
+        if (item.text.contains('(すべて表示)') || item.text.contains('(all)')) {
+          if (item.ident > 0) {
+            widget.onSingleSelect(item.ident);
+          }
+          return;
+        }
+      }
+      return;
+    }
+
+    if (query.isEmpty) {
+      widget.onSingleSelect(selectableItems.first.ident);
+      return;
+    }
+
+    // 優先度 1: 完全一致
+    for (final item in selectableItems) {
+      final text = item.text.trim();
+      final tabIdx = text.indexOf('\t');
+      var cmd = (tabIdx >= 0 ? text.substring(0, tabIdx) : text).trim().toLowerCase();
+      if (cmd.startsWith('#')) cmd = cmd.substring(1).trim();
+      if (cmd == query) {
+        widget.onSingleSelect(item.ident);
+        return;
+      }
+    }
+
+    // 優先度 2: 前方一致
+    for (final item in selectableItems) {
+      final text = item.text.trim();
+      final tabIdx = text.indexOf('\t');
+      var cmd = (tabIdx >= 0 ? text.substring(0, tabIdx) : text).trim().toLowerCase();
+      if (cmd.startsWith('#')) cmd = cmd.substring(1).trim();
+      if (cmd.startsWith(query)) {
+        widget.onSingleSelect(item.ident);
+        return;
+      }
+    }
+
+    // 優先度 3: 部分一致
+    for (final item in selectableItems) {
+      final text = item.text.trim();
+      final tabIdx = text.indexOf('\t');
+      var cmd = (tabIdx >= 0 ? text.substring(0, tabIdx) : text).trim().toLowerCase();
+      if (cmd.startsWith('#')) cmd = cmd.substring(1).trim();
+      if (cmd.contains(query)) {
+        widget.onSingleSelect(item.ident);
+        return;
+      }
+    }
+
+    // 優先度 4: 説明文一致 または 先頭項目
+    widget.onSingleSelect(selectableItems.first.ident);
   }
 
   Widget _buildMenuItemTile(int tile) {
@@ -255,8 +321,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final isExtCmdMenu = widget.menuPrompt.contains("拡張コマンド") ||
-        widget.menuPrompt.toLowerCase().contains("extended");
+    final isExtCmdMenu = isExtCmdMenuPrompt(widget.menuPrompt);
     final isEnhanceMenu = widget.menuPrompt.contains("スキル") ||
         widget.menuPrompt.toLowerCase().contains("skill");
     final isMultiSelectMenu = !isExtCmdMenu && widget.menuHow > 1;
@@ -342,6 +407,8 @@ class _MenuOverlayState extends State<MenuOverlay> {
                   TextField(
                     controller: _filterController,
                     autofocus: true,
+                    textInputAction: TextInputAction.go,
+                    onSubmitted: (_) => _submitExtCmd(filteredItems),
                     decoration: InputDecoration(
                       hintText: l10n?.filterCmds ?? '拡張コマンドを検索...',
                       prefixIcon: const Icon(Icons.search, size: 18),
