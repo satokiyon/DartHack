@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.645 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -162,21 +162,21 @@ burnarmor(struct monst *victim)
             }
             item = hitting_u ? uarmu : which_armor(victim, W_ARMU);
             if (item)
-                (void) burn_dmg(item, "シャツ");
+                (void) burn_dmg(item, shirt_simple_name(item));
             return TRUE;
         case 2:
             item = hitting_u ? uarms : which_armor(victim, W_ARMS);
-            if (!burn_dmg(item, "木製の盾"))
+            if (!burn_dmg(item, shield_simple_name(item)))
                 continue;
             break;
         case 3:
             item = hitting_u ? uarmg : which_armor(victim, W_ARMG);
-            if (!burn_dmg(item, "手袋"))
+            if (!burn_dmg(item, gloves_simple_name(item)))
                 continue;
             break;
         case 4:
             item = hitting_u ? uarmf : which_armor(victim, W_ARMF);
-            if (!burn_dmg(item, "ブーツ"))
+            if (!burn_dmg(item, boots_simple_name(item)))
                 continue;
             break;
         }
@@ -185,6 +185,35 @@ burnarmor(struct monst *victim)
 #undef burn_dmg
 
     return FALSE;
+}
+
+/* 侵食対象のアイテム名を自然な日本語に変換する */
+staticfn const char *
+jp_erodename(struct obj *otmp, const char *ostr)
+{
+    if (!ostr)
+        return otmp ? cxname(otmp) : "それ";
+    if (!strcmpi(ostr, "gloves"))
+        return otmp ? gloves_simple_name(otmp) : "手袋";
+    if (!strcmpi(ostr, "metal boots") || !strcmpi(ostr, "boots") || !strcmpi(ostr, "shoes"))
+        return otmp ? boots_simple_name(otmp) : "ブーツ";
+    if (!strcmpi(ostr, "armor") || !strcmpi(ostr, "suit"))
+        return otmp ? suit_simple_name(otmp) : "鎧";
+    if (!strcmpi(ostr, "cloak"))
+        return cloak_simple_name(otmp);
+    if (!strcmpi(ostr, "helmet") || !strcmpi(ostr, "helm") || !strcmpi(ostr, "hat"))
+        return otmp ? helm_simple_name(otmp) : "かぶと";
+    if (!strcmpi(ostr, "shield"))
+        return otmp ? shield_simple_name(otmp) : "盾";
+    if (!strcmpi(ostr, "shirt"))
+        return otmp ? shirt_simple_name(otmp) : "シャツ";
+    /* 英字で始まる文字列なら日本語名にフォールバック */
+    if ((unsigned char) ostr[0] < 0x80 && otmp) {
+        if (otmp->oclass == ARMOR_CLASS)
+            return armor_simple_name(otmp);
+        return cxname(otmp);
+    }
+    return ostr;
 }
 
 /* Generic erode-item function.
@@ -214,9 +243,12 @@ erode_obj(
             uvictim, vismon, visobj;
     int erosion, cost_type;
     struct monst *victim;
+    char whose[BUFSZ];
 
     if (!otmp)
         return ER_NOTHING;
+
+    ostr = jp_erodename(otmp, ostr);
 
     victim = carried(otmp) ? &gy.youmonst
              : mcarried(otmp) ? otmp->ocarry
@@ -227,6 +259,13 @@ erode_obj(
     visobj = (!victim && cansee(gb.bhitpos.x, gb.bhitpos.y)
               && (!is_pool(gb.bhitpos.x, gb.bhitpos.y)
                   || (next2u(gb.bhitpos.x,gb.bhitpos.y) && Underwater)));
+
+    if (uvictim)
+        Strcpy(whose, "あなたの");
+    else if (vismon)
+        Sprintf(whose, "%sの", Monnam(victim));
+    else
+        Strcpy(whose, "その");
 
     switch (type) {
     case ERODE_BURN:
@@ -265,11 +304,6 @@ erode_obj(
     }
     erosion = is_primary ? otmp->oeroded : otmp->oeroded2;
 
-    if (!ostr)
-        ostr = cxname(otmp);
-    /* 'visobj' messages insert "the"; probably ought to switch to the() */
-    if (visobj && !(uvictim || vismon) && !strncmpi(ostr, "the ", 4))
-        ostr += 4;
 
     if (check_grease && otmp->greased) {
         grease_protect(otmp, ostr, victim);
@@ -279,17 +313,13 @@ erode_obj(
     } else if (!vulnerable || (otmp->oerodeproof && otmp->rknown)) {
         if (flags.verbose && print && (uvictim || vismon))
             pline("%s%sは%sの影響を受けなかった.",
-                uvictim ? "あなたの" : s_suffix(Monnam(victim)),
-                ostr, bythe[type]);
+                  whose, ostr, bythe[type]);
         return ER_NOTHING;
     } else if (otmp->oerodeproof || (otmp->blessed && !rnl(4))) {
         if (flags.verbose && (print || otmp->oerodeproof)
             && (uvictim || vismon || visobj))
                         pline("いかにも、%s%sは%sの影響を受けなかった.",
-                                    uvictim ? "あなたの"
-                                    : !vismon ? "その" /* visobj */
-                                        : s_suffix(mon_nam(victim)),
-                                    ostr, bythe[type]);
+                              whose, ostr, bythe[type]);
         /* We assume here that if the object is protected because it
          * is blessed, it still shows some minor signs of wear, and
          * the hero can distinguish this from an object that is
@@ -309,10 +339,7 @@ erode_obj(
 
         if (uvictim || vismon || visobj)
                         pline("%s%sが%s%s!",
-                                    uvictim ? "あなたの"
-                                    : !vismon ? "その" /* visobj */
-                                        : s_suffix(Monnam(victim)),
-                                    ostr, adverb, action[type]);
+                              whose, ostr, adverb, action[type]);
 
         if (ef_flags & EF_PAY)
             costly_alteration(otmp, cost_type);
@@ -336,10 +363,7 @@ erode_obj(
             else
                 Sprintf(actbuf, "砕け散った");
             pline("%s%sが%s!",
-                  uvictim ? "あなたの"
-                  : !vismon ? "その" /* visobj */
-                    : s_suffix(Monnam(victim)),
-                  ostr, actbuf);
+                  whose, ostr, actbuf);
         }
         if (ef_flags & EF_PAY)
             costly_alteration(otmp, cost_type);
@@ -374,8 +398,7 @@ erode_obj(
                      ostr, msg[type], Blind ? "感じた" : "見えた");
             else if (vismon || visobj)
                 pline("%s%sはすっかり%sように見えた.",
-                      !vismon ? "その" : s_suffix(Monnam(victim)),
-                      ostr, msg[type]);
+                      whose, ostr, msg[type]);
         }
         return ER_NOTHING;
     }
@@ -393,6 +416,7 @@ grease_protect(
     static const char txt[] = "グリースの膜で守られた!";
     boolean vismon = victim && (victim != &gy.youmonst) && canseemon(victim);
 
+    ostr = jp_erodename(otmp, ostr);
     if (ostr) {
         if (victim == &gy.youmonst)
             Your("%sは%s", ostr, txt);
@@ -1360,7 +1384,7 @@ trapeffect_rocktrap(
     if (mtmp == &gy.youmonst) {
         if (trap->once && trap->tseen && !rn2(15)) {
             pline("%sの落とし戸が開いたが、何も落ちてこなかった!",
-                  the(ceiling(u.ux, u.uy)));
+                  ceiling(u.ux, u.uy));
             deltrap(trap);
             newsym(u.ux, u.uy);
         } else {
@@ -1378,7 +1402,7 @@ trapeffect_rocktrap(
                    rock, but not when wearing a helmet */
                 if (passes_rocks(gy.youmonst.data)) {
                     pline("残念ながら、%sをつけている.",
-                          an(helm_simple_name(uarmh))); /* helm or hat */
+                          helm_simple_name(uarmh)); /* helm or hat */
                     dmg = 2;
                 } else if (hard_helmet(uarmh)) {
                     pline("幸い、硬い兜をかぶっていた.");
@@ -1533,7 +1557,7 @@ trapeffect_bear_trap(
         set_utrap((unsigned) rn1(4, 4), TT_BEARTRAP);
         if (u.usteed) {
             pline("熊罠が%sの%sを挟んだ!",
-                s_suffix(mon_nam(u.usteed)), jp_mbodypart(u.usteed, FOOT));
+                mon_nam(u.usteed), jp_mbodypart(u.usteed, FOOT));
             if (thitm(0, u.usteed, (struct obj *) 0, dmg, FALSE))
                 reset_utrap(TRUE); /* steed died, hero not trapped */
         } else {
@@ -1640,7 +1664,7 @@ trapeffect_rust_trap(
             break;
         case 1:
             pline("%sあなたの左%sを打った!", A_gush_of_water_hits, jp_body_part(ARM));
-            if (water_damage(uarms, "盾", TRUE) != ER_NOTHING)
+            if (water_damage(uarms, shield_simple_name(uarms), TRUE) != ER_NOTHING)
                 break;
             if (u.twoweap || (uwep && bimanual(uwep)))
                 (void) water_damage(u.twoweap ? uswapwep : uwep, 0, TRUE);
@@ -1666,7 +1690,7 @@ trapeffect_rust_trap(
             else if (uarm)
                 (void) water_damage(uarm, suit_simple_name(uarm), TRUE);
             else if (uarmu)
-                (void) water_damage(uarmu, "シャツ", TRUE);
+                (void) water_damage(uarmu, shirt_simple_name(uarmu), TRUE);
         }
         update_inventory();
 
@@ -1701,7 +1725,7 @@ trapeffect_rust_trap(
                       "%s%sの左%sを打った!", A_gush_of_water_hits,
                       mon_nam(mtmp), jp_mbodypart(mtmp, ARM));
             target = which_armor(mtmp, W_ARMS);
-            if (water_damage(target, "盾", TRUE) != ER_NOTHING)
+            if (water_damage(target, shield_simple_name(target), TRUE) != ER_NOTHING)
                 break;
             target = MON_WEP(mtmp);
             if (target && bimanual(target))
@@ -1732,7 +1756,7 @@ trapeffect_rust_trap(
                 (void) water_damage(target, suit_simple_name(target),
                                     TRUE);
             else if ((target = which_armor(mtmp, W_ARMU)) != 0)
-                (void) water_damage(target, "シャツ", TRUE);
+                (void) water_damage(target, shirt_simple_name(target), TRUE);
         }
 
         if (completelyrusts(mptr)) {
@@ -2766,19 +2790,7 @@ trapeffect_vibrating_square(
         if (see_it && !Blind) {
             seetrap(trap); /* before messages */
             if (in_sight) {
-                char buf[BUFSZ], *p, *monnm = mon_nam(mtmp);
-
-                if (nolimbs(mtmp->data) || m_in_air(mtmp)) {
-                    /* just "beneath <mon>" */
-                    Strcpy(buf, monnm);
-                } else {
-                    Strcpy(buf, s_suffix(monnm));
-                    p = eos(strcat(buf, " "));
-                    Strcpy(p, jp_mbodypart_plural(mtmp, FOOT));
-                    /* avoid "beneath 'rear paws'" or 'rear hooves' */
-                    (void) strsubst(p, "rear ", "");
-                }
-                You_see("%sの足元で奇妙な振動が起きたのを見た.", buf);
+                You_see("%sの足元で奇妙な振動が起きたのを見た.", mon_nam(mtmp));
             } else {
                 /* notice something (hearing uses a larger threshold
                    for 'nearby') */
@@ -4280,15 +4292,17 @@ dofiretrap(
 
     if ((box && !carried(box)) ? is_pool(box->ox, box->oy) : Underwater) {
         pline("%sから大量の熱い泡が噴き出した!",
-              the(box ? xname(box) : surface(u.ux, u.uy)));
+              box ? xname(box) : surface(u.ux, u.uy));
         if (Fire_resistance)
             You("無傷だった.");
         else
             losehp(rnd(3), "熱湯", KILLED_BY);
         return;
     }
-    pline("%sが%sから%s!", tower_of_flame, box ? "噴き上がり" : "噴き出し",
-          the(box ? xname(box) : surface(u.ux, u.uy)));
+    pline("%sから%sが%s!",
+          box ? xname(box) : surface(u.ux, u.uy),
+          tower_of_flame,
+          box ? "噴き上がった" : "噴き出した");
     if (Fire_resistance) {
         shieldeff(u.ux, u.uy);
         monstseesu(M_SEEN_FIRE);
@@ -4757,8 +4771,7 @@ water_damage(
     if (splash_lit(obj))
         return ER_DAMAGED;
 
-    if (!ostr)
-        ostr = cxname(obj);
+    ostr = jp_erodename(obj, ostr);
 
     if (obj->otyp == CAN_OF_GREASE && obj->spe > 0) {
         return ER_NOTHING;
@@ -5775,15 +5788,15 @@ help_monster_out(
     if (touch_petrifies(mtmp->data) && !uarmg && !Stone_resistance) {
         const char *mtmp_pmname = mon_pmname(mtmp);
 
-        You("素手の%sで罠にかかった%sをつかんだ.",
-            mtmp_pmname, jp_body_part_plural(HAND));
+        You("素手で罠にかかった%sをつかんだ.", mtmp_pmname);
 
         if (poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM)) {
             display_nhwindow(WIN_MESSAGE, FALSE);
         } else {
             char kbuf[BUFSZ];
 
-            Sprintf(kbuf, "trying to help %s out of a pit", an(mtmp_pmname));
+            Sprintf(kbuf, "trying to help %s out of a pit",
+                    an(pmname(mtmp->data, Mgender(mtmp))));
             instapetrify(kbuf);
             return 1;
         }
@@ -5949,7 +5962,7 @@ untrap(
     } else if (!deal_with_floor_trap) {
         *the_trap = '\0';
         if (ttmp)
-            Strcat(the_trap, an(trapdescr));
+            Strcat(the_trap, trapdescr);
         if (ttmp && boxcnt)
             Strcat(the_trap, "と");
         if (boxcnt)
@@ -5965,7 +5978,7 @@ untrap(
     } else { /* deal_with_floor_trap */
 
         if (ttmp) {
-            Strcpy(the_trap, the(trapdescr));
+            Strcpy(the_trap, trapdescr);
             if (boxcnt) {
                 if (is_pit(ttmp->ttyp)) {
                     You_cant("%s%sには手出ししにくい.", the_trap,
@@ -5977,7 +5990,7 @@ untrap(
                     Snprintf(qbuf, sizeof(qbuf),
                              "ここには%sと%sがある.%sを%sしますか?",
                              (boxcnt == 1) ? "容器" : "複数の容器",
-                             an(trapdescr),
+                             trapdescr,
                              the_trap,
                              (ttmp->ttyp == WEB) ? "除去" : "解除");
                     switch (ynq(qbuf)) {
@@ -6734,9 +6747,19 @@ b_trapped(const char *item, int bodypart)
 {
     int lvl = level_difficulty(),
         dmg = rnd(5 + (lvl < 5 ? lvl : 2 + lvl / 2));
+    const char *j_item = item;
+
+    if (!item)
+        j_item = "それ";
+    else if (!strcmpi(item, "door") || !strcmp(item, "扉"))
+        j_item = "扉";
+    else if (!strcmpi(item, "secret door"))
+        j_item = "隠し扉";
+    else if (!strcmpi(item, "tin") || !strcmp(item, "缶詰"))
+        j_item = "缶詰";
 
     Soundeffect(se_kaboom, 80);
-    pline("ドカーン!!  %sにはブービートラップが仕掛けられていた!", The(item));
+    pline("ドカーン!!  %sにはブービートラップが仕掛けられていた!", j_item);
     wake_nearby(FALSE);
     losehp(Maybe_Half_Phys(dmg), "爆発", KILLED_BY_AN);
     exercise(A_STR, FALSE);

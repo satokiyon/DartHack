@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. */
 /* NetHack 5.0	zap.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.596 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1222,7 +1222,7 @@ unturn_dead(struct monst *mon)
                     pline("%s%sが突然%s%s%s%s!", owner, corpse,
                       nonliving(mtmp2->data) ? "再起動した" : "動き出した",
                       different_type ? " (" : "",
-                        different_type ? an(mon_pmname(mtmp2)) : "",
+                        different_type ? mon_pmname(mtmp2) : "",
                         different_type ? ")" : "");
             else if (canseemon(mtmp2))
                 pline("%sが突然現れた!", Amonnam(mtmp2));
@@ -5738,7 +5738,7 @@ inventory_resistance_check(int dmgtyp)
 char *
 item_what(int dmgtyp)
 {
-    static char whatbuf[50];
+    static char whatbuf[BUFSZ];
     const char *what = 0;
     int prop = adtyp_to_prop(dmgtyp);
     long xtrinsic = u.uprops[prop].extrinsic;
@@ -5765,7 +5765,7 @@ item_what(int dmgtyp)
             what = simpleonames((xtrinsic & W_AMUL) ? uamul : ublindf);
         } else if (xtrinsic & W_RING) {
             if ((xtrinsic & W_RING) == W_RING) /* both */
-                what = "rings";
+                what = "指輪";
             else
                 what = simpleonames((xtrinsic & W_RINGL) ? uleft : uright);
         } else if (xtrinsic & W_WEP) {
@@ -5773,8 +5773,8 @@ item_what(int dmgtyp)
         }
         /* format the output to be ready for enl_msg() to append it to
            "Your items {are,were} protected against <damage-type>" */
-        if (what) /* strlen(what) will be less than 30 */
-            Sprintf(whatbuf, " by your %.40s", what);
+        if (what)
+            Sprintf(whatbuf, "（あなたの%sによる）", what);
     }
     return whatbuf;
 }
