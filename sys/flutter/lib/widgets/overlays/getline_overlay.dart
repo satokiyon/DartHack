@@ -34,6 +34,8 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
   late TextEditingController _extCmdFilterController;
   late List<ExtCmdEntry> _filteredExtCmds;
   late FocusNode _inputFocusNode;
+  late FocusNode _filterFocusNode;
+  late ScrollController _listScrollController;
 
   @override
   void initState() {
@@ -41,13 +43,40 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
     _extCmdFilterController = TextEditingController();
     _filteredExtCmds = List.from(widget.extCmdList);
     _inputFocusNode = FocusNode();
+    _filterFocusNode = FocusNode();
+    _listScrollController = ScrollController();
   }
 
   @override
   void dispose() {
+    _listScrollController.dispose();
+    _filterFocusNode.dispose();
     _extCmdFilterController.dispose();
     _inputFocusNode.dispose();
     super.dispose();
+  }
+
+  void _handleFilterSubmit(String query) {
+    final q = query.trim().toLowerCase();
+    if (q.isEmpty) return;
+    // 1. 完全一致があるか検索
+    for (final entry in _filteredExtCmds) {
+      var cmd = entry.command.trim().toLowerCase();
+      if (cmd.startsWith('#')) cmd = cmd.substring(1).trim();
+      if (cmd == q) {
+        widget.inputController.text = entry.command;
+        widget.onSubmit(entry.command);
+        return;
+      }
+    }
+    // 2. 候補が1件だけに絞り込まれているならそれを実行
+    if (_filteredExtCmds.length == 1) {
+      final cmd = _filteredExtCmds.first.command;
+      widget.inputController.text = cmd;
+      widget.onSubmit(cmd);
+      return;
+    }
+    // 3. 複数候補が残っている場合は危険コマンド誤爆防止のため即実行しない
   }
 
   void _handleShowHistory() {
@@ -55,7 +84,11 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
     // 履歴パネルから復帰した際に入力フィールドへのフォーカスを自動復元
     Future.microtask(() {
       if (mounted) {
-        _inputFocusNode.requestFocus();
+        if (widget.extCmdList.isNotEmpty) {
+          _filterFocusNode.requestFocus();
+        } else {
+          _inputFocusNode.requestFocus();
+        }
       }
     });
   }
@@ -114,7 +147,7 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                     TextField(
                       controller: widget.inputController,
                       focusNode: _inputFocusNode,
-                      autofocus: true,
+                      autofocus: !isExtCmd,
                       decoration: InputDecoration(
                         hintText: l10n.enterText,
                         filled: true,
@@ -151,6 +184,9 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                       const SizedBox(height: 4),
                       TextField(
                         controller: _extCmdFilterController,
+                        focusNode: _filterFocusNode,
+                        autofocus: isExtCmd,
+                        onSubmitted: _handleFilterSubmit,
                         decoration: InputDecoration(
                           hintText: l10n.filterCmds,
                           prefixIcon: const Icon(Icons.search, size: 18),
@@ -182,6 +218,7 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                             color: Colors.black.withValues(alpha: 0.2),
                           ),
                           child: ListView.builder(
+                            controller: _listScrollController,
                             shrinkWrap: true,
                             itemCount: _filteredExtCmds.length,
                             itemBuilder: (context, index) {

@@ -110,7 +110,7 @@ void main() {
     });
 
     test('YN Prompt handling', () {
-      // 'y'
+      // 'y' in 'yn'
       final yEvent = const KeyDownEvent(
         physicalKey: PhysicalKeyboardKey.keyY,
         logicalKey: LogicalKeyboardKey.keyY,
@@ -120,6 +120,12 @@ void main() {
       expect(
         HardwareKeyRouter.route(event: yEvent, context: KeyInputContext.yn, ynChoices: 'yn'),
         equals(const SendYn(121)),
+      );
+
+      // 'y' in 'YN' (実在ケース 'Y' 89 に正規化)
+      expect(
+        HardwareKeyRouter.route(event: yEvent, context: KeyInputContext.yn, ynChoices: 'YN'),
+        equals(const SendYn(89)),
       );
 
       // 'a' in 'ynaq'
@@ -132,6 +138,12 @@ void main() {
       expect(
         HardwareKeyRouter.route(event: aEvent, context: KeyInputContext.yn, ynChoices: 'ynaq'),
         equals(const SendYn(97)),
+      );
+
+      // 'a' in 'yn' (無効なキーは SwallowKey)
+      expect(
+        HardwareKeyRouter.route(event: aEvent, context: KeyInputContext.yn, ynChoices: 'yn'),
+        equals(const SwallowKey()),
       );
 
       // ESC -> 27
@@ -188,7 +200,8 @@ void main() {
       );
     });
 
-    test('Regular menu should swallow arrows and numpads to avoid accidental selection', () {
+    test('Regular menu should handle scroll, submit, cancel, and accelerators', () {
+      // 矢印キー下 -> MenuScroll(1)
       final downEvent = const KeyDownEvent(
         physicalKey: PhysicalKeyboardKey.arrowDown,
         logicalKey: LogicalKeyboardKey.arrowDown,
@@ -196,7 +209,74 @@ void main() {
       );
       expect(
         HardwareKeyRouter.route(event: downEvent, context: KeyInputContext.menu),
-        equals(const SwallowKey()),
+        equals(const MenuScroll(1)),
+      );
+
+      // 矢印キー上 -> MenuScroll(-1)
+      final upEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.arrowUp,
+        logicalKey: LogicalKeyboardKey.arrowUp,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: upEvent, context: KeyInputContext.menu),
+        equals(const MenuScroll(-1)),
+      );
+
+      // Space -> MenuScroll(1) (メニュー画面では下スクロール)
+      final spaceEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.space,
+        logicalKey: LogicalKeyboardKey.space,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: spaceEvent, context: KeyInputContext.menu),
+        equals(const MenuScroll(1)),
+      );
+
+      // Enter -> MenuSubmit()
+      final enterEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.enter,
+        logicalKey: LogicalKeyboardKey.enter,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: enterEvent, context: KeyInputContext.menu),
+        equals(const MenuSubmit()),
+      );
+
+      // PageDown / PageUp
+      final pageDownEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.pageDown,
+        logicalKey: LogicalKeyboardKey.pageDown,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: pageDownEvent, context: KeyInputContext.menu),
+        equals(const MenuPage(1)),
+      );
+
+      // > / < キー
+      final gtEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.period,
+        logicalKey: LogicalKeyboardKey.greater,
+        character: '>',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: gtEvent, context: KeyInputContext.menu),
+        equals(const MenuPage(1)),
+      );
+
+      // ESC -> MenuCancel()
+      final escEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.escape,
+        logicalKey: LogicalKeyboardKey.escape,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: escEvent, context: KeyInputContext.menu),
+        equals(const MenuCancel()),
       );
 
       // 通常文字 'a' は MenuAccelerator(97)
@@ -210,9 +290,22 @@ void main() {
         HardwareKeyRouter.route(event: aEvent, context: KeyInputContext.menu),
         equals(const MenuAccelerator(97)),
       );
+
+      // 大文字 'A' は MenuAccelerator(65) (大文字小文字を厳密区別)
+      final bigAEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.keyA,
+        logicalKey: LogicalKeyboardKey.keyA,
+        character: 'A',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: bigAEvent, context: KeyInputContext.menu),
+        equals(const MenuAccelerator(65)),
+      );
     });
 
-    test('Text window should dismiss on Space, Enter, or ESC', () {
+    test('Text window should handle Space (TextSpaceAction), Shift+Space, PageUp/Down, arrows, and dismiss', () {
+      // Space -> TextSpaceAction()
       final spaceEvent = const KeyDownEvent(
         physicalKey: PhysicalKeyboardKey.space,
         logicalKey: LogicalKeyboardKey.space,
@@ -220,9 +313,59 @@ void main() {
       );
       expect(
         HardwareKeyRouter.route(event: spaceEvent, context: KeyInputContext.textWindow),
+        equals(const TextSpaceAction()),
+      );
+
+      // Shift + Space -> TextPage(-1)
+      expect(
+        HardwareKeyRouter.route(event: spaceEvent, context: KeyInputContext.textWindow, isShiftPressed: true),
+        equals(const TextPage(-1)),
+      );
+
+      // 矢印キー下 -> TextScroll(1)
+      final downEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.arrowDown,
+        logicalKey: LogicalKeyboardKey.arrowDown,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: downEvent, context: KeyInputContext.textWindow),
+        equals(const TextScroll(1)),
+      );
+
+      // 矢印キー上 -> TextScroll(-1)
+      final upEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.arrowUp,
+        logicalKey: LogicalKeyboardKey.arrowUp,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: upEvent, context: KeyInputContext.textWindow),
+        equals(const TextScroll(-1)),
+      );
+
+      // Enter / ESC -> DismissText()
+      final enterEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.enter,
+        logicalKey: LogicalKeyboardKey.enter,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: enterEvent, context: KeyInputContext.textWindow),
         equals(const DismissText()),
       );
 
+      final escEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.escape,
+        logicalKey: LogicalKeyboardKey.escape,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: escEvent, context: KeyInputContext.textWindow),
+        equals(const DismissText()),
+      );
+
+      // 無効な通常文字 -> SwallowKey()
       final otherEvent = const KeyDownEvent(
         physicalKey: PhysicalKeyboardKey.keyA,
         logicalKey: LogicalKeyboardKey.keyA,

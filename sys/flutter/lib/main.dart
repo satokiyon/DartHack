@@ -203,6 +203,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final TextEditingController _extCmdMenuFilterController = TextEditingController();
   String _extCmdMenuFilter = "";
   Map<int, int> _menuSelectedCounts = <int, int>{};
+  final GlobalKey<TextOverlayState> _textOverlayKey = GlobalKey<TextOverlayState>();
+  final GlobalKey<MenuOverlayState> _menuOverlayKey = GlobalKey<MenuOverlayState>();
 
   // 詳細な操作設定（shared_preferences用）
   double _padOpacity = 0.8;
@@ -856,12 +858,78 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         return KeyEventResult.handled;
 
       case DismissText():
-        _sendFfiKey(32, "Space");
+        if (_screen.isTextWindowVisible) {
+          _sendFfiKey(32, "Space");
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case TextSpaceAction():
+        if (_screen.isTextWindowVisible) {
+          _textOverlayKey.currentState?.handleSpace();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case TextScroll(:final direction):
+        if (_screen.isTextWindowVisible) {
+          _textOverlayKey.currentState?.scroll(direction);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case TextPage(:final direction):
+        if (_screen.isTextWindowVisible) {
+          _textOverlayKey.currentState?.pageScroll(direction);
+          return KeyEventResult.handled;
+        }
         return KeyEventResult.handled;
 
       case MenuAccelerator(:final code):
         if (_screen.isMenuWindowVisible) {
-          _sendFfiKey(code, "MenuAcc($code)");
+          final item = _screen.menuItems.cast<MenuItemData?>().firstWhere(
+                (i) => i != null && i.accelerator == code && i.ident != 0 && i.ident != 4294967294,
+                orElse: () => null,
+              );
+          if (item != null) {
+            if (_screen.menuHow == 1 /* PICK_ONE */) {
+              _sendMenuSelection(item.ident);
+            } else {
+              _toggleMenuSelection(item.ident);
+              _menuOverlayKey.currentState?.toggleSelectionById(item.ident);
+            }
+          }
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case MenuSubmit():
+        if (_screen.isMenuWindowVisible) {
+          if (_screen.menuHow != 1 /* PICK_ANY */) {
+            final counts = _menuOverlayKey.currentState?.selectedCounts ?? _menuSelectedCounts;
+            _sendMenuSelections(counts);
+          }
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case MenuCancel():
+        if (_screen.isMenuWindowVisible) {
+          _sendMenuSelection(-1);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case MenuScroll(:final direction):
+        if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.scroll(direction);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case MenuPage(:final direction):
+        if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.pageScroll(direction);
           return KeyEventResult.handled;
         }
         return KeyEventResult.handled;
@@ -2338,6 +2406,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Widget _buildMenuOverlay() {
     return MenuOverlay(
+      key: _menuOverlayKey,
       menuPrompt: _screen.menuPrompt,
       menuItems: _screen.menuItems,
       menuHow: _screen.menuHow,
@@ -2777,6 +2846,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Widget _buildTextOverlay() {
     return TextOverlay(
+      key: _textOverlayKey,
       textLines: _screen.textLines,
       textAttrs: _screen.textAttrs,
       textTiles: _screen.textTiles,

@@ -1194,3 +1194,34 @@ Flutter 版（`C:\Users\satok\DartHack\sys\flutter\`）では、ユーザーの�
    - `Alt + F4`（終了）や `Alt + Tab`（切替）などのシステム予約キーは `IgnoreKey`（`ignored`）として OS にそのまま透過させる。
    - OS や IME による文字コード化け（ウムラウトや null）を防ぐため、`character` ではなく `logicalKey` から直接ベース文字を特定してコードを解決する。
    - テキスト入力中や通常メニュー中ではメタキー変換を無効化し、通常の入力を優先する。
+
+## 44. Flutter UI / PC環境におけるキー入力ルーティングと NetHack 操作仕様原則
+
+PC（Google Play Games 等）や物理キーボード操作環境におけるキー入力処理、および Cコア（FFI）と Flutter UI の連携においては、以下の仕様原則を厳守してください。
+
+1. **`yn_function()` のキー無効化と文字コードケース正規化原則**:
+   - **現象と制約**: NetHack Cコア（`src/cmd.c`）は、ウィンドウシステムから渡されたキー文字が選択肢（`resp` / `choices`）に含まれない場合、`impossible("yn_function() returned '%s'; using '%s' instead")` を出力して強制フォールバックします。また、Cコア側の判定（`strchr(resp, res)`）はケースセンシティブです。
+   - **対策**:
+     - `HardwareKeyRouter._routeYn()` において、ESC、既定値（Enter/Space）、および `choices`（ESC以降を含む）に含まれる有効文字以外のキーはすべて `SwallowKey`（無視）として破棄し、不正な文字を Cコアへ送信してはなりません。
+     - 大文字・小文字を同一視してマッチングした場合は、入力された文字コードではなく、**必ず `choices` 側に実在するケースの文字コード（大文字なら大文字、小文字なら小文字）に正規化して Cコアへ返送**してください。
+
+2. **メニュー選択における FFI 同期と Flutter UI 選択ディスパッチ原則**:
+   - **現象と制約**: NetHack Cコアのメニュー選択（`winflutter.c: flutter_select_menu`）は、通常のキー入力（`nhgetch`）ではなく、`g_selected_menu_count == -2` の同期待機ループで待機しています。そのため、メニュー表示中にキーボードのプレフィクスキーを押して `sendKeyToC` / `_sendFfiKey` を呼んでも、Cコアには届かず無視されます。
+   - **対策**:
+     - メニュー（宝箱、持ち物等）のプレフィクスキー（A, a, b, c 等、大文字小文字厳密区別）が押された際は、Flutter UI 側で `_screen.menuItems` をスキャンしてアイテムID（`ident`）を特定してください。
+     - **単一選択（PICK_ONE）**: `_sendMenuSelection(item.ident)` を呼び出して即時決定・送信する。
+     - **複数選択（PICK_ANY）**: `_toggleMenuSelection(item.ident)` および UI ステートのトグルを実行する。
+     - **複数選択の確定送信**: 誤確定を防ぐため、確定送信は **Enter キー**（`MenuSubmit`）または **決定ボタン** に限定してください。
+     - **メニューでの Space キー**: 誤確定事故を防止しつつ NetHack 伝統のスクロール癖に対応するため、Space キーは **下スクロール（`MenuScroll(1)`）** として動作させてください。
+
+3. **テキスト画面（`TextOverlay`）における NetHack 伝統の Space スクロール＆クローズ原則**:
+   - **仕様**: ヘルプ（`?`）、ガイドブック、ダンプログなどのテキスト表示ウィンドウ（`TextOverlay`）では、NetHack 伝統の `--More--` プロンプトの挙動を厳格に適用してください。
+     - **Space キー**: 下にスクロール余地がある間（`offset < maxScrollExtent - 5.0`）は **1ページ下へスクロール** し、最下部までスクロールした後は **ウィンドウを閉じる（`onDismiss`）**。
+     - **Shift+Space / PageUp / `<`**: 1ページ上へスクロール。
+     - **PageDown / `>`**: 1ページ下へスクロール（最下部でも閉じない）。
+     - **上下矢印キー（↑ / ↓）**: 1行単位（約 40px）で行スクロール。
+     - **Enter / ESC キー**: どのスクロール位置からでも **即座に閉じる（`DismissText`）**。
+
+4. **拡張コマンド（`#`）の自動フォーカスと危険コマンド誤爆防止原則**:
+   - **仕様**: `#` を押した拡張コマンド一覧（`GetLineOverlay`）では、検索用 TextField に自動フォーカス（`autofocus: true`）を当てて即座に検索可能にしてください。
+   - **誤爆防止**: NetHack には神に祈る（`pray`）や自殺（`quit`）などの不可逆な危険コマンドが存在するため、検索欄での Enter 決定は **「コマンド名が完全一致」または「候補が1件に絞り込まれている」場合のみ即時実行** し、複数候補が残る曖昧な入力状態では Enter キーで即実行しない安全ガードを徹底してください。

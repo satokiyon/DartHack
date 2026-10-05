@@ -40,13 +40,14 @@ class MenuOverlay extends StatefulWidget {
   });
 
   @override
-  State<MenuOverlay> createState() => _MenuOverlayState();
+  State<MenuOverlay> createState() => MenuOverlayState();
 }
 
-class _MenuOverlayState extends State<MenuOverlay> {
+class MenuOverlayState extends State<MenuOverlay> {
   late TextEditingController _filterController;
   late String _filterQuery;
   late Map<int, int> _selectedCounts;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
@@ -54,13 +55,49 @@ class _MenuOverlayState extends State<MenuOverlay> {
     _filterQuery = widget.initialSearchQuery;
     _filterController = TextEditingController(text: _filterQuery);
     _selectedCounts = Map<int, int>.from(widget.initialSelectedCounts);
+    _scrollController = ScrollController();
   }
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _filterController.dispose();
     super.dispose();
   }
+
+  /// 矢印キー（↑ / ↓）による行スクロール
+  void scroll(int direction) {
+    if (!_scrollController.hasClients) return;
+    const step = 40.0;
+    final nextOffset = (_scrollController.offset + direction * step)
+        .clamp(0.0, _scrollController.position.maxScrollExtent);
+    _scrollController.animateTo(
+      nextOffset,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeOut,
+    );
+  }
+
+  /// PageUp / PageDown / Space / < / > によるページ送り
+  void pageScroll(int direction) {
+    if (!_scrollController.hasClients) return;
+    final viewport = _scrollController.position.viewportDimension;
+    final step = viewport > 0 ? viewport * 0.85 : 320.0;
+    final nextOffset = (_scrollController.offset + direction * step)
+        .clamp(0.0, _scrollController.position.maxScrollExtent);
+    _scrollController.animateTo(
+      nextOffset,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+    );
+  }
+
+  /// 外部（キー入力等）からの選択トグル
+  void toggleSelectionById(int ident) {
+    _toggleSelection(ident);
+  }
+
+  Map<int, int> get selectedCounts => _selectedCounts;
 
   int _parseMaxCount(String text) {
     final match = RegExp(r'(\d+)').firstMatch(text);
@@ -437,6 +474,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         final listView = ListView.builder(
+                          controller: _scrollController,
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                           itemCount: filteredItems.length,
                           itemBuilder: (context, index) {

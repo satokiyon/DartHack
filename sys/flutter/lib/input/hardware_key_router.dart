@@ -108,6 +108,128 @@ class MenuAccelerator extends KeyAction {
   int get hashCode => code.hashCode;
 }
 
+/// メニューのスクロール（1: 下、-1: 上）
+class MenuScroll extends KeyAction {
+  final int direction;
+  const MenuScroll(this.direction);
+
+  @override
+  String toString() => 'MenuScroll($direction)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MenuScroll &&
+          runtimeType == other.runtimeType &&
+          direction == other.direction;
+
+  @override
+  int get hashCode => direction.hashCode;
+}
+
+/// メニューのページ送り（1: 次、-1: 前）
+class MenuPage extends KeyAction {
+  final int direction;
+  const MenuPage(this.direction);
+
+  @override
+  String toString() => 'MenuPage($direction)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MenuPage &&
+          runtimeType == other.runtimeType &&
+          direction == other.direction;
+
+  @override
+  int get hashCode => direction.hashCode;
+}
+
+/// 複数選択メニューの確定（Enter）
+class MenuSubmit extends KeyAction {
+  const MenuSubmit();
+
+  @override
+  String toString() => 'MenuSubmit()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is MenuSubmit;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// メニューのキャンセル（ESC）
+class MenuCancel extends KeyAction {
+  const MenuCancel();
+
+  @override
+  String toString() => 'MenuCancel()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is MenuCancel;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// テキスト画面での Space キー（スクロール余地ありなら下スクロール、最下部なら閉じる）
+class TextSpaceAction extends KeyAction {
+  const TextSpaceAction();
+
+  @override
+  String toString() => 'TextSpaceAction()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is TextSpaceAction;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// テキスト画面の行スクロール（1: 下、-1: 上）
+class TextScroll extends KeyAction {
+  final int direction;
+  const TextScroll(this.direction);
+
+  @override
+  String toString() => 'TextScroll($direction)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TextScroll &&
+          runtimeType == other.runtimeType &&
+          direction == other.direction;
+
+  @override
+  int get hashCode => direction.hashCode;
+}
+
+/// テキスト画面のページ送り（1: 次、-1: 前）
+class TextPage extends KeyAction {
+  final int direction;
+  const TextPage(this.direction);
+
+  @override
+  String toString() => 'TextPage($direction)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TextPage &&
+          runtimeType == other.runtimeType &&
+          direction == other.direction;
+
+  @override
+  int get hashCode => direction.hashCode;
+}
+
+
 /// キーイベントを無視し、Flutter Widget ツリー / TextField / IME にそのまま渡す (KeyEventResult.ignored)
 class IgnoreKey extends KeyAction {
   const IgnoreKey();
@@ -189,12 +311,34 @@ class HardwareKeyRouter {
 
     // 3. テキスト画面表示中（ダンプログ、TopTen、ガイドブック等）
     if (context == KeyInputContext.textWindow) {
-      if (event.logicalKey == LogicalKeyboardKey.space ||
-          event.logicalKey == LogicalKeyboardKey.enter ||
+      if (event.logicalKey == LogicalKeyboardKey.space) {
+        return isShiftPressed ? const TextPage(-1) : const TextSpaceAction();
+      }
+      if (event.logicalKey == LogicalKeyboardKey.pageDown) {
+        return const TextPage(1);
+      }
+      if (event.logicalKey == LogicalKeyboardKey.pageUp) {
+        return const TextPage(-1);
+      }
+      if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+        return const TextScroll(1);
+      }
+      if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+        return const TextScroll(-1);
+      }
+      if (event.logicalKey == LogicalKeyboardKey.enter ||
           event.logicalKey == LogicalKeyboardKey.numpadEnter ||
           event.logicalKey == LogicalKeyboardKey.escape) {
         return const DismissText();
       }
+
+      String? char = event.character;
+      if (char != null && char.isNotEmpty) {
+        char = normalizeCharacter(char);
+        if (char == '>') return const TextPage(1);
+        if (char == '<') return const TextPage(-1);
+      }
+
       return const SwallowKey();
     }
 
@@ -244,12 +388,8 @@ class HardwareKeyRouter {
       return const SwallowKey();
     }
 
-    // 有効な選択肢文字列のパース（ESC より前の部分）
-    String rawChoices = choices;
-    final escIdx = rawChoices.indexOf('\x1b');
-    if (escIdx >= 0) {
-      rawChoices = rawChoices.substring(0, escIdx);
-    }
+    // 有効な選択肢文字列のパース（ESC文字 \x1b を除去）
+    final cleanChoices = choices.replaceAll('\x1b', '');
 
     // 入力された文字の抽出
     String? char = event.character;
@@ -258,14 +398,21 @@ class HardwareKeyRouter {
     }
 
     if (char != null && char.isNotEmpty) {
-      final code = char.codeUnitAt(0);
       final lowerChar = char.toLowerCase();
 
-      // rawChoices に含まれているか判定
-      if (rawChoices.isNotEmpty) {
-        for (int i = 0; i < rawChoices.length; i++) {
-          final c = rawChoices[i];
-          if (c == char || c.toLowerCase() == lowerChar) {
+      // cleanChoices に含まれているか判定（完全一致優先、次いでケース非依存で実在文字コードに正規化）
+      if (cleanChoices.isNotEmpty) {
+        // 1. 完全一致
+        for (int i = 0; i < cleanChoices.length; i++) {
+          final c = cleanChoices[i];
+          if (c == char) {
+            return SendYn(c.codeUnitAt(0));
+          }
+        }
+        // 2. 大文字小文字同一視（choices 側の実在ケースに正規化して C コアに返す）
+        for (int i = 0; i < cleanChoices.length; i++) {
+          final c = cleanChoices[i];
+          if (c.toLowerCase() == lowerChar) {
             return SendYn(c.codeUnitAt(0));
           }
         }
@@ -276,8 +423,8 @@ class HardwareKeyRouter {
         if (lowerChar == 'q') return const SendYn(113); // 'q'
       }
 
-      // 明示的な一致がない場合はコードそのまま送信（NetHack Cコアの判定に委ねる）
-      return SendYn(code);
+      // 期待する選択肢に含まれないキーは無視（Swallow）
+      return const SwallowKey();
     }
 
     return const SwallowKey();
@@ -286,20 +433,31 @@ class HardwareKeyRouter {
   /// 通常メニューのキー判定
   static KeyAction _routeMenu(KeyEvent event) {
     if (event.logicalKey == LogicalKeyboardKey.escape) {
-      return const MenuAccelerator(27);
-    }
-    if (event.logicalKey == LogicalKeyboardKey.space) {
-      return const MenuAccelerator(32);
+      return const MenuCancel();
     }
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter) {
-      return const MenuAccelerator(10);
+      return const MenuSubmit();
+    }
+    // Space はメニュー画面では「下スクロール」
+    if (event.logicalKey == LogicalKeyboardKey.space) {
+      return const MenuScroll(1);
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      return const MenuScroll(1);
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      return const MenuScroll(-1);
+    }
+    if (event.logicalKey == LogicalKeyboardKey.pageDown) {
+      return const MenuPage(1);
+    }
+    if (event.logicalKey == LogicalKeyboardKey.pageUp) {
+      return const MenuPage(-1);
     }
 
-    // 矢印キーやテンキーはアクセラレータ誤選択を防ぐため抑止
-    if (event.logicalKey == LogicalKeyboardKey.arrowUp ||
-        event.logicalKey == LogicalKeyboardKey.arrowDown ||
-        event.logicalKey == LogicalKeyboardKey.arrowLeft ||
+    // テンキーや左右矢印キーはアクセラレータ誤選択を防ぐため抑止
+    if (event.logicalKey == LogicalKeyboardKey.arrowLeft ||
         event.logicalKey == LogicalKeyboardKey.arrowRight ||
         _isNumpadKey(event.logicalKey)) {
       return const SwallowKey();
@@ -308,6 +466,9 @@ class HardwareKeyRouter {
     String? char = event.character;
     if (char != null && char.isNotEmpty) {
       char = normalizeCharacter(char);
+      if (char == '>') return const MenuPage(1);
+      if (char == '<') return const MenuPage(-1);
+      // アクセラレータは大文字小文字を厳密に区別して渡す
       return MenuAccelerator(char.codeUnitAt(0));
     }
 

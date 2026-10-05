@@ -9,7 +9,7 @@ import '../tombstone_widget.dart';
 import '../topten_widget.dart';
 import '../menu_item_tile_painter.dart';
 
-class TextOverlay extends StatelessWidget {
+class TextOverlay extends StatefulWidget {
   final List<String> textLines;
   final List<int> textAttrs;
   final List<int> textTiles;
@@ -41,8 +41,72 @@ class TextOverlay extends StatelessWidget {
     required this.tileHeight,
   });
 
+  @override
+  State<TextOverlay> createState() => TextOverlayState();
+}
+
+class TextOverlayState extends State<TextOverlay> {
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// Space キー処理: スクロール余地があれば1ページ下へ、最下部に達していれば閉じる
+  void handleSpace() {
+    if (_scrollController.hasClients &&
+        _scrollController.offset < _scrollController.position.maxScrollExtent - 5.0) {
+      final viewport = _scrollController.position.viewportDimension;
+      final step = viewport > 0 ? viewport * 0.85 : 320.0;
+      final nextOffset = (_scrollController.offset + step)
+          .clamp(0.0, _scrollController.position.maxScrollExtent);
+      _scrollController.animateTo(
+        nextOffset,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOut,
+      );
+    } else {
+      widget.onDismiss();
+    }
+  }
+
+  /// 矢印キー（↑ / ↓）による行スクロール
+  void scroll(int direction) {
+    if (!_scrollController.hasClients) return;
+    const step = 40.0;
+    final nextOffset = (_scrollController.offset + direction * step)
+        .clamp(0.0, _scrollController.position.maxScrollExtent);
+    _scrollController.animateTo(
+      nextOffset,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeOut,
+    );
+  }
+
+  /// PageUp / PageDown / < / > によるページ送り
+  void pageScroll(int direction) {
+    if (!_scrollController.hasClients) return;
+    final viewport = _scrollController.position.viewportDimension;
+    final step = viewport > 0 ? viewport * 0.85 : 320.0;
+    final nextOffset = (_scrollController.offset + direction * step)
+        .clamp(0.0, _scrollController.position.maxScrollExtent);
+    _scrollController.animateTo(
+      nextOffset,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+    );
+  }
+
   Widget _buildMenuItemTile(int tile) {
-    if (!useTiles || tileImage == null || tile < 0) {
+    if (!widget.useTiles || widget.tileImage == null || tile < 0) {
       return const SizedBox(width: 24, height: 24);
     }
     return SizedBox(
@@ -50,16 +114,14 @@ class TextOverlay extends StatelessWidget {
       height: 24,
       child: CustomPaint(
         painter: MenuItemTilePainter(
-          image: tileImage!,
+          image: widget.tileImage!,
           tileIndex: tile,
-          tileWidth: tileWidth,
-          tileHeight: tileHeight,
+          tileWidth: widget.tileWidth,
+          tileHeight: widget.tileHeight,
         ),
       ),
     );
   }
-
-
 
   String _adjustTextIndent(String rawText, int minLeadingSpaces) {
     if (minLeadingSpaces <= 0) return rawText.trimRight();
@@ -77,7 +139,7 @@ class TextOverlay extends StatelessWidget {
     return Positioned.fill(
       child: Container(
         color: Colors.black.withValues(alpha: 0.92),
-        padding: EdgeInsets.fromLTRB(16, 16, 16, bottomInset),
+        padding: EdgeInsets.fromLTRB(16, 16, 16, widget.bottomInset),
         child: Card(
           margin: EdgeInsets.zero,
           color: const Color(0xFF12161D),
@@ -93,27 +155,27 @@ class TextOverlay extends StatelessWidget {
               children: [
                 Expanded(
                   child: () {
-                    final isTombstone = textLines.length >= 13 &&
-                        ((textLines.any((line) => line.contains('REST')) &&
-                            textLines.any((line) => line.contains('PEACE'))) ||
-                        textLines.any((line) => line.contains('REST    \\')));
+                    final isTombstone = widget.textLines.length >= 13 &&
+                        ((widget.textLines.any((line) => line.contains('REST')) &&
+                            widget.textLines.any((line) => line.contains('PEACE'))) ||
+                        widget.textLines.any((line) => line.contains('REST    \\')));
 
                     if (isTombstone) {
-                      if (tombstoneDisplayMode == 0) {
-                        final data = TombstoneData.parse(textLines);
+                      if (widget.tombstoneDisplayMode == 0) {
+                        final data = TombstoneData.parse(widget.textLines);
                         return UniversalTombstoneWidget(
                           mode: TombstoneDisplayMode.image,
                           data: data,
-                          lines: textLines,
+                          lines: widget.textLines,
                         );
                       }
                       return UniversalTombstoneWidget(
                         mode: TombstoneDisplayMode.text,
-                        lines: textLines,
+                        lines: widget.textLines,
                       );
                     }
 
-                    final isTopTen = textLines.any((line) {
+                    final isTopTen = widget.textLines.any((line) {
                       final l = line.toLowerCase();
                       return (line.contains('順位') && line.contains('点数') && line.contains('名前')) ||
                           (l.contains('no') && l.contains('points') && l.contains('name'));
@@ -121,22 +183,22 @@ class TextOverlay extends StatelessWidget {
 
                     if (isTopTen) {
                       final isJp = Localizations.localeOf(context).languageCode == 'ja';
-                      final data = TopTenEntry.parse(textLines, textAttrs, isJp: isJp);
+                      final data = TopTenEntry.parse(widget.textLines, widget.textAttrs, isJp: isJp);
                       return TopTenWidget(entries: data, isJp: isJp);
                     }
 
-                    final hasAnyTile = useTiles && tileImage != null && textTiles.any((t) => t >= 0);
+                    final hasAnyTile = widget.useTiles && widget.tileImage != null && widget.textTiles.any((t) => t >= 0);
 
                     bool shouldReformat = false;
 
                     // 1. Cコアからの明示的なプレーンテキスト種別フラグ判定
                     // PLAIN_TEXT_QUEST = 2 (クエスト文章), PLAIN_TEXT_DATABASE = 3 (データベース検索結果)
-                    if (plainType == 2 || plainType == 3) {
+                    if (widget.plainType == 2 || widget.plainType == 3) {
                       shouldReformat = true;
                     } else {
                       // 2. 先頭10行のスキャンによるオプトイン判定 (小説、歴史、ライセンスのみ)
-                      for (int i = 0; i < textLines.length && i < 10; i++) {
-                        final l = textLines[i].trim();
+                      for (int i = 0; i < widget.textLines.length && i < 10; i++) {
+                        final l = widget.textLines[i].trim();
 
                         // 小説 (tribute / tribute_jp)
                         if (l.contains('Terry Pratchett') ||
@@ -160,8 +222,8 @@ class TextOverlay extends StatelessWidget {
                     }
 
                     final displayLines = shouldReformat
-                        ? TextFormatter.reformatLines(textLines)
-                        : textLines;
+                        ? TextFormatter.reformatLines(widget.textLines)
+                        : widget.textLines;
 
                     int minLeadingSpaces = 999;
                     for (final line in displayLines) {
@@ -188,6 +250,7 @@ class TextOverlay extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       child: ListView.builder(
+                        controller: _scrollController,
                         padding: EdgeInsets.zero,
                         itemCount: displayLines.length,
                         itemBuilder: (context, index) {
@@ -210,8 +273,8 @@ class TextOverlay extends StatelessWidget {
                           }
 
                           final displayLine = _adjustTextIndent(line, minLeadingSpaces);
-                          final tile = (index < textTiles.length)
-                              ? textTiles[index]
+                          final tile = (index < widget.textTiles.length)
+                              ? widget.textTiles[index]
                               : -1;
 
                           return Padding(
@@ -250,7 +313,7 @@ class TextOverlay extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton.icon(
-                        onPressed: onShowMsgHistory,
+                        onPressed: widget.onShowMsgHistory,
                         icon: const Icon(Icons.history_rounded, size: 16),
                         label: Text(l10n?.history ?? 'History'),
                         style: ElevatedButton.styleFrom(
@@ -261,7 +324,7 @@ class TextOverlay extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       ElevatedButton(
-                        onPressed: onDismiss,
+                        onPressed: widget.onDismiss,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.teal[500],
                           foregroundColor: Colors.white,
