@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsとUbuntu(WSL)のみ)
@@ -46,7 +46,7 @@ NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.net
 
 ※参考 : [NetHack 5.0.0 Windows Port](https://nethack.org/v500/ports/download-win.html)
 
-1. ダウンロードしたZIPファイル（`NetHackJP-5.0.0-*-windows.zip`）をすべて展開してください。
+1. ダウンロードしたZIPファイル（`NetHackJP-5.0.1-*-windows.zip`）をすべて展開してください。
    （※ZIPファイルの中にファイルがある状態で実行ファイルを起動しないでください）
 
 2. 必要であれば、ご自身の環境に合わせてNetHackの設定ファイルを編集してください。
@@ -63,12 +63,12 @@ NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.net
 
 #### Linux版 NetHackJP起動手順
 
-1. [GitHubのReleasesページ](https://github.com/satokiyon/NetHackJP/releases) から最新の `NetHackJP-5.0.0-*-linux.zip` をダウンロードしてください。
+1. [GitHubのReleasesページ](https://github.com/satokiyon/NetHackJP/releases) から最新の `NetHackJP-5.0.1-*-linux.zip` をダウンロードしてください。
 
 2. ターミナルでZIPファイルを解凍し、展開されたフォルダへ移動します。
    ```bash
-   unzip NetHackJP-5.0.0-*-linux.zip
-   cd NetHackJP-5.0.0-*-linux
+   unzip NetHackJP-5.0.1-*-linux.zip
+   cd NetHackJP-5.0.1-*-linux
    ```
 
 3. 必要に応じて実行権限が付与されているか確認・付与してください。

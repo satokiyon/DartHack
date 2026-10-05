@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05.
 name: Weekly Release
 
 on:
@@ -33,7 +33,7 @@ jobs:
       - name: Prepare package
         run: |
           $outDir = "binary/Release/x64"
-          $zipPath = "NetHackJP-5.0.0-${{ env.DATE_STR }}-windows.zip"
+          $zipPath = "NetHackJP-5.0.1-${{ env.DATE_STR }}-windows.zip"
           
           # Copy Guidebook_JP.txt to the output directory
           if (Test-Path "Guidebook_JP.txt") {
@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nethack-windows-zip
-          path: NetHackJP-5.0.0-*-windows.zip
+          path: NetHackJP-5.0.1-*-windows.zip
 
   build-linux:
     runs-on: ubuntu-latest
@@ -81,7 +81,7 @@ jobs:
       - name: Prepare package
         run: |
           DATE_STR=$(TZ='Asia/Tokyo' date +"%Y%m%d")
-          DIST_DIR="NetHackJP-5.0.0-${DATE_STR}-linux"
+          DIST_DIR="NetHackJP-5.0.1-${DATE_STR}-linux"
           ZIP_NAME="${DIST_DIR}.zip"
 
           # Copy installed playground content to distribution directory
@@ -150,7 +150,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nethack-linux-zip
-          path: NetHackJP-5.0.0-*-linux.zip
+          path: NetHackJP-5.0.1-*-linux.zip
 
   create-release:
     runs-on: ubuntu-latest
@@ -181,8 +181,8 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: NetHackJP-5.0.0-${{ steps.date.outputs.DATE_STR }}
-          name: NetHackJP 5.0.0 Weekly Build (${{ steps.date.outputs.DATE_STR }})
+          tag_name: NetHackJP-5.0.1-${{ steps.date.outputs.DATE_STR }}
+          name: NetHackJP 5.0.1 Weekly Build (${{ steps.date.outputs.DATE_STR }})
           body_path: release_readme.txt
           generate_release_notes: true
           files: |

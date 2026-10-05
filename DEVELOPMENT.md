@@ -887,10 +887,10 @@ git fetch --all
 
 ### タグの作成とプッシュ
 リリース用コミットが `main` ブランチにプッシュされた後、リリース用タグを作成してプッシュします。
-- タグ命名規則: `NetHackJP-[Version]-[Date]` (例: `NetHackJP-5.0.0-20260629`)
+- タグ命名規則: `NetHackJP-[Version]-[Date]` (例: `NetHackJP-5.0.1-20261005`)
 ```bash
-git tag NetHackJP-5.0.0-20260629
-git push origin NetHackJP-5.0.0-20260629
+git tag NetHackJP-5.0.1-20261005
+git push origin NetHackJP-5.0.1-20261005
 ```
 
 ### GitHub Release の作成

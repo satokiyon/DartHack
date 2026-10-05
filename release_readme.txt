@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05.
 NetHack JP README
 
 
@@ -34,12 +34,12 @@ NetHack JP README
 
 1. ダウンロードしたzipファイルをすべて展開してください。
    
-     unzip NetHackJP-5.0.0-*-linux.zip
+     unzip NetHackJP-5.0.1-*-linux.zip
 
 
 2. 展開されたディレクトリに移動し、必要に応じて実行権限が付与されているか確認してください。
 
-     cd NetHackJP-5.0.0-*-linux
+     cd NetHackJP-5.0.1-*-linux
     chmod +x nethack nethackX11 nethackQt nethack.bin
 
 
