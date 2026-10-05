@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10.2)
-project(nethack VERSION 5.0.0 LANGUAGES C)
+project(nethack VERSION 5.0.1 LANGUAGES C)
 
 get_filename_component(NHSROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../.." ABSOLUTE)
 set(JPROOT "${NHSROOT}/c_core/nethack_jp")
