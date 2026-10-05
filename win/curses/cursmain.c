@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-20. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmain.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -1323,7 +1323,8 @@ curses_change_color(int color, long rgb, int reverse UNUSED)
     r = (rgb >> 16) & 0xFF;
     g = (rgb >> 8) & 0xFF;
     b = rgb & 0xFF;
-    init_color(color % 16, r * 4, g * 4, b * 4);
+    /* init_color() takes components in the range 0..1000 */
+    init_color(color % 16, r * 1000 / 255, g * 1000 / 255, b * 1000 / 255);
 }
 
 static char *

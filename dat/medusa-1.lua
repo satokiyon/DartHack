@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05.
 -- NetHack medusa medusa-1.lua	$NHDT-Date: 1781994882 2026/06/20 22:34:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1990, 1991 by M. Stephenson
@@ -105,7 +105,7 @@ des.monster({ id = "Medusa", x=36,y=10, asleep=1 })
 des.monster("giant eel",11,06)
 des.monster("giant eel",23,13)
 des.monster("giant eel",29,02)
-des.monster("jellyfish",02,03)
+des.monster("jellyfish",02,02)
 des.monster("jellyfish",00,08)
 des.monster("jellyfish",04,18)
 des.monster("water troll",51,03)

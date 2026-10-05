@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-20. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. */
 /* NetHack 5.0 wincurs.h */
 /* Copyright (c) Karl Garrison, 2010. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -48,6 +48,17 @@ extern WINDOW *activemenu;         /* curses window for menu requesting a
 #endif
 #ifndef A_ITALIC
 #define A_ITALIC A_UNDERLINE
+#endif
+
+/* COLOR_PAIR() and PAIR_NUMBER() only carry 8 bits of pair number;
+   the wide-character API can address the pairs above 255 that
+   256-color mode allocates */
+#if (defined(NCURSES_VERSION) && defined(NCURSES_WIDECHAR) && NCURSES_WIDECHAR) \
+    || defined(PDC_WIDE) || defined(CURSES_UNICODE)
+#define CURSES_WIDE_PAIRS
+#ifndef CCHARW_MAX
+#define CCHARW_MAX 5
+#endif
 #endif
 
 typedef enum orient_type

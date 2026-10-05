@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -421,21 +421,15 @@ Linux/WSL や Android (Bionic libc) 環境において、Windows 側でチェッ
 * **アップストリーム追従手順**:
   - アップストリーム側で CRLF の取扱い向上や `utf8_text_wrap_index` の全 tty ポート対応、あるいは tty ディスプレイライブラリの UTF-8 行頭文字処理が入った場合は、本変更箇所のマーカータグを確認し追従または整理を行う。
 
-### 6. curses メッセージウィンドウの UTF-8 ワイド文字カラーペア取得修復
-ncursesw (Linux/WSL ワイド文字 curses) 環境において、`windowtype:curses` でターン経過時に過去メッセージがアンハイライト（ボールド解除）される際、古いメッセージの文字色が緑・紫・黄色・オレンジ等にランダム化けする現象を防止するための独自修復です。
+### 6. curses メッセージウィンドウの UTF-8 ワイド文字カラーペア取得修復（アップストリーム 5.0.1 にて統合・追従完了）
+ncursesw (Linux/WSL ワイド文字 curses) や PDCursesMod (Windows) 環境において、`windowtype:curses` でターン経過時に過去メッセージがアンハイライト（ボールド解除）される際、古いメッセージの文字色が緑・紫・黄色・オレンジ等にランダム化けする現象を防止するための修復です。
 
-* **マーカータグ**: `/* NetHackJP: Wide-character (UTF-8) color pair extraction fix */`
 * **背景**:
   - `win/curses/cursmesg.c` の `curses_clear_unhighlight_message_window()` 内で、1バイト ASCII 用関数 `mvwinch` と `PAIR_NUMBER` マクロを使って画面セルの既存カラーペアを取得していた。
-  - ncursesw 環境で全角漢字・ひらがな等（3バイト UTF-8）のセルに対して `mvwinch` を使うと、文字コードビットが `PAIR_NUMBER` が抽出するカラーペア番号領域に混入し、不正なカラーペア番号（緑、紫、黄色等）として計算され文字色が化けていた。
-  - ワイド文字用 API (`mvwin_wch` および `getcchar`) を利用してワイド文字セルから正確にカラーペア番号を取得するように修復した。
-* **対象ファイル**:
-  - **`win/curses/cursmesg.c`**: `curses_clear_unhighlight_message_window()` 内で `NCURSES_WIDECHAR` / `CURSES_UNICODE` 条件分岐を追加し、`mvwin_wch` / `getcchar` を用いてカラーペアを取得・再設定するよう修正。
-* **アップストリーム追従手順**:
-  - アップストリームで ncursesw のワイド文字セルに対する `mvwin_wch` / `getcchar` を用いたアンハイライト修復、あるいは `curses_clear_unhighlight_message_window` のリファクタリングが入った場合は本変更を取り消して追従する。
-     タイルを添える」 という仕様自体は Android/Flutter ポートの
-     ユーザ体験に直結するため、 アップストリームが同等の機能を
-     入れても問題なければ本独自実装は削除して良い (動作は同等のため)。
+  - ワイド文字セルに対して `mvwinch` を使うと文字コードビットが `PAIR_NUMBER` が抽出するカラーペア番号領域に混入し、不正なカラーペア番号として計算され文字色が化けていた。
+* **アップストリーム追従と対応**:
+  - アップストリーム 5.0.1 (コミット `d649a0a68`) にて `CURSES_WIDE_PAIRS` マクロおよび `mvwin_wch` / `getcchar` によるワイド文字カラーペア取得が本家に導入された。
+  - これに伴い、NetHackJP では `include/wincurs.h` にて `CURSES_WIDE_PAIRS` の有効化条件を `NCURSES_WIDECHAR` だけでなく `PDC_WIDE` および `CURSES_UNICODE`（PDCursesMod や Linux/WSL UTF-8 環境）にも拡張し、`win/curses/cursmesg.c` はアップストリーム実装に統合・追従した。
 
 ### 5. 日本語メッセージ内の複数形 "s" (plur) の排除と日本語化
 日本語メッセージが表示される箇所において、英語の複数形接尾辞 `"s"`（`plur()` マクロ）がそのまま表示されてしまう翻訳バグや、英語の単語がそのまま出力されてしまっていた箇所を修正しました。

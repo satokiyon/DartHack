@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-20. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursinit.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -302,30 +302,29 @@ curses_create_main_windows(void)
 static int pairs_used = 0;
 static int colors_used = 0;
 
-/* create a new color */
+/* create a new color; returns -1 if that isn't possible */
 int
 curses_init_rgb(int r, int g, int b)
 {
     if (!can_change_color())
-        return 0;
+        return -1;
 
-    if (colors_used < COLORS - 1) {
-        colors_used++;
-        init_color(colors_used, r*4, g*4, b*4);
-        return colors_used;
-    }
-    return 0;
+    /* init_color() takes components in the range 0..1000 */
+    if (colors_used < COLORS - 1
+        && init_color(colors_used + 1, r * 1000 / 255, g * 1000 / 255,
+                      b * 1000 / 255) == OK)
+        return ++colors_used;
+    return -1;
 }
 
-/* create a new foreground/background combination */
+/* create a new foreground/background combination; returns the default
+   pair 0 if that isn't possible */
 int
 curses_init_pair(int fg, int bg)
 {
-    if (pairs_used < COLOR_PAIRS - 1) {
-        pairs_used++;
-        init_pair(pairs_used, fg, bg);
-        return pairs_used;
-    }
+    if (pairs_used < COLOR_PAIRS - 1
+        && init_pair(pairs_used + 1, fg, bg) == OK)
+        return ++pairs_used;
     return 0;
 }
 

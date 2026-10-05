@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1781973060 2026/06/20 16:31:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.464 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -3672,6 +3672,7 @@ static const struct alt_spellings {
     { "iron ball", HEAVY_IRON_BALL },
     { "lantern", BRASS_LANTERN },
     { "mattock", DWARVISH_MATTOCK },
+    { "amulet of flight", AMULET_OF_FLYING },
     { "amulet of poison resistance", AMULET_VERSUS_POISON },
     { "amulet of protection", AMULET_OF_GUARDING },
     { "amulet of telepathy", AMULET_OF_ESP },
