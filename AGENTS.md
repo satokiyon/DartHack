@@ -1225,7 +1225,6 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
    - **仕様**: `#` を押した拡張コマンド一覧（`GetLineOverlay`）では、検索用 TextField に自動フォーカス（`autofocus: true`）を当てて即座に検索可能にしてください。
    - **誤爆防止**: NetHack には神に祈る（`pray`）や自殺（`quit`）などの不可逆な危険コマンドが存在するため、検索欄での Enter 決定は **「コマンド名が完全一致」または「候補が1件に絞り込まれている」場合のみ即時実行** し、複数候補が残る曖昧な入力状態では Enter キーで即実行しない安全ガードを徹底してください。
 
-
 ## 45. サウンドアセット管理・シームレスループ化およびキュレーター同期の仕様原則
 
 1. **サウンドアセットの配置先と DartHack_private 優先原則**:
@@ -1241,7 +1240,6 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
 3. **サウンドキュレーター登録およびクレジット一覧（attributions.txt）同期義務**:
    - 音声ファイルを新規追加、または既存音源から別名複製した際は、必ずサウンドキュレーター（`sys/flutter/tools/sound_curator/sound_database.json`）のステータスを `ready` に更新し、出典元サイト、作者、ライセンス情報を正しく記録してください。
    - データベース更新後は `database.py` の `generate_attributions()` を呼び出し、`DartHack_private` および `DartHack` 両方の `sys/flutter/assets/sounds/attributions.txt` に最新のクレジット・ライセンス情報を必ず同期・反映させてください。
-
 
 ## 46. Flutter UI アイテム個数選択（長押しスライダー）における状態同期とCコア連携仕様
 
