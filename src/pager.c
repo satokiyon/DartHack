@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-07. */
 /* NetHack 5.0	pager.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.302 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -3133,6 +3133,8 @@ dowhatdoes(void)
 #if defined(UNIX) || defined(VMS)
     intron(); /* reenables ^C */
 #endif
+    if (q == '\0' || q == '\033')
+        return ECMD_OK;
     reslt = dowhatdoes_core(q, bufr);
     if (reslt) {
         char *p = strchr(reslt, '\n'); /* 'm' prefix has two lines of output */
