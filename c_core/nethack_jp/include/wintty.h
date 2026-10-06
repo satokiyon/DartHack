@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-06. */
 /* NetHack 5.0	wintty.h	$NHDT-Date: 1781973092 2026/06/20 16:31:32 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) David Cohrs, 1991,1992                           */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -234,6 +234,7 @@ extern void g_pututf8(uint8 *);
 #endif /* ENHANCED_SYMBOLS */
 extern void erase_tty_screen(void);
 extern void win_tty_init(int);
+extern int tty_utf8_char_width(const unsigned char *);
 
 /* tty interface */
 extern void tty_init_nhwindows(int *, char **);

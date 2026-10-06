@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. */
 /* NetHack 5.0	dothrow.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.318 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1397,7 +1397,7 @@ toss_up(struct obj *obj, boolean hitsroof)
                         pline("幸運にも、頑丈なかぶとを着けていた.");
                     else
                         pline("あいにく、%sを着けていた.",
-                              an(helm_simple_name(uarmh))); /* helm or hat */
+                              helm_simple_name(uarmh)); /* helm or hat */
                 }
 
             /* helmet definitely protects you when it blocks petrification */
@@ -2754,7 +2754,7 @@ throw_gold(struct obj *obj)
             /* some self damage? */
             if (uarmh)
                 pline("幸運にも、%sを着けていた!",
-                      an(helm_simple_name(uarmh)));
+                      helm_simple_name(uarmh));
         }
         gb.bhitpos.x = u.ux;
         gb.bhitpos.y = u.uy;

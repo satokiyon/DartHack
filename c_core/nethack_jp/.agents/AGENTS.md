@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-06. -->
 # NetHackJP 開発ルール
 
 ## イベント履歴（livelog）および画面メッセージの日本語表示方針
@@ -113,7 +113,27 @@
    - **TTY ステータス表示における表示セル幅計算と `#ifdef WIN32CON` 依存の排除**:
      - ステータス行（`status_fit_title_cells`、`status_text_cells`、`status_byte_index_for_cells`、`tty_putstatusfield`）における表示セル幅の計算、マルチバイト境界の判定、およびセル幅分のカーソル送り処理を、`WIN32CON`（Windowsコンソール）限定のコードパスにしてはなりません。
      - POSIX/Linux TTY においても `strlen()`（バイト数）による切り詰めや 1 バイトごとのインクリメントにフォールバックさせず、共通の UTF-8 セル幅計算・描画関数（`tty_utf8_strlen_cells`、`tty_putstr_utf8`）を一元的に利用し、マルチバイト文字の途中で切断されて置換文字  (U+FFFD) が発生したり、画面バッファ `cw->data` と表示位置がずれるのを完全に防止してください。
-   - **バックスペース消去幅のロケール非依存 Unicode 直接判定**: POSIX 環境の消去幅計算関数 (`getlin_utf8_char_display_width`) において `mbrtowc` / `wcwidth` 等の C ライブラリ関数を使用しないでください。プログラムの実行時ロケールが "C" 等の場合に UTF-8 変換エラーとなり全角文字でも 1 幅 (半角) にフォールバックして消去残りが生じます。必ず `getlin_utf8_to_codepoint` で取得した Unicode コードポイントに基づく East Asian Width 判定（ひらがな・カタカナ・漢字・全角英数記号・絵文字 `0x1F000`〜`0x1FFFF` 等）を用いて、常に正しく全角 2 セル幅を取得して消去してください。
+    - **全角パディング描画時の端末物理カーソル同期**:
+      - `tty_putstatusfield()` で全角文字の後続セル（パディング `#`）を書き込む際、ウィンドウ論理カーソル `cw->curx` のみを進めると端末物理カーソル `ttyDisplay->curx` との間にずれが生じ、差分描画時に後続フィールドが先行文字に上書きされる原因となります。必ず `ttyDisplay->curx += drawn;` を併せて実行し、物理カーソルを同期させてください。
+    - **共通文字幅判定関数（`tty_utf8_char_width`）への一本化とロケール非依存 East Asian Width 判定**:
+      - 文字幅（セル幅）判定処理を `getline.c` と `wintty.c` で個別に重複実装せず、`include/wintty.h` で宣言した共通関数 `tty_utf8_char_width(utf8str)` に一本化してください。
+      - POSIX/WSL 環境下では `mbrtowc` / `wcwidth` 等の C ライブラリ関数を使用しないでください。プログラム実行時ロケールが "C" 等の場合に全角文字が 1 セル幅（半角）にフォールバックし、バックスペース消去残りやステータス行の X 座標過小計算（後続フィールドが手前に詰まって先行文字に重なる不具合）を引き起こします。必ず Unicode コードポイントに基づく East Asian Width 判定（全角英数・記号、ひらがな、カタカナ、漢字、絵文字等）を用いて、常に正確なセル幅（全角2幅、半角1幅）を返してください。
+
+## ステータス行（botl.c）のフィールド表示フォーマット方針
+
+1. **所持金（`BL_GOLD`）の簡潔表記**:
+   - `src/botl.c` の `initblstats` における `BL_GOLD` のフォーマットは `" %s"` とし、`$:0` 形式で表示してください。「金貨:%s」のように冗長な日本語接頭辞を付加すると画面上で「金貨:$:0」となり情報密度が低下するため、本家 NetHack 同様の簡潔な表記を維持してください。
+
+## WSL / Linux 環境における動作検証・テスト方針
+
+1. **検証対象バイナリのパス指定（`./playground/nethack`）**:
+   - WSL / Linux 環境でビルド後の動作確認やテストを実行する際は、ビルド成果物がインストールされた `./playground/nethack` を対象としてください（未インストールの `./src/nethack` を実行してはなりません）。
+
+2. **GDB 情報収集結果のファイル保存**:
+   - GDB 等を用いて内部変数や構造体の検証・情報収集を行う際は、標準出力に流すだけでなく、必ず結果をログファイル（例: `playground/gdb_status_*.txt`）に保存して追跡可能にしてください。
+
+3. **PTY（疑似端末）を介したバッチ実行**:
+   - TTY モードの NetHack は標準入力が端末でないと `Inappropriate ioctl for device`（`You must play from a terminal`）で即座に終了します。非対話スクリプト（Python 等）から自動実行・画面キャプチャを行う際は、パイプ直接接続ではなく `pty.openpty()` 等による疑似端末を経由させて実行してください。
 
 ## タイル定義データファイルおよび X11 タイル画像の表示・生成方針
 

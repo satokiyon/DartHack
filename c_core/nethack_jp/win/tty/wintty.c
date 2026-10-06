@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-06. */
 /* NetHack 5.0	wintty.c	$NHDT-Date: 1781973100 2026/06/20 16:31:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.438 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4085,8 +4085,8 @@ utf8_char_chartype(const unsigned char *utf8str)
 }
 
 /* NetHackJP: OS-specific utf8_char_display_width for Windows API */
-static int
-utf8_char_display_width(const unsigned char *utf8str)
+int
+tty_utf8_char_width(const unsigned char *utf8str)
 {
     unsigned short chartype = utf8_char_chartype(utf8str);
     wchar_t wch[2] = { 0, 0 };
@@ -4130,38 +4130,100 @@ utf8_char_display_width(const unsigned char *utf8str)
 
 #else /* POSIX / Linux / Android NDK */
 
-#include <wchar.h>
-
-/* NetHackJP: OS-specific utf8_char_display_width using POSIX mbrtowc & wcwidth */
-static int
-utf8_char_display_width(const unsigned char *utf8str)
+static unsigned long
+tty_utf8_to_codepoint(const unsigned char *utf8str, int *ulen_out)
 {
-    wchar_t wc = 0;
-    mbstate_t ps;
-    size_t res;
-    int ulen;
-    int w;
+    unsigned char c = utf8str[0];
+    unsigned long cp = 0;
+    int len = 1;
+
+    if ((c & 0x80U) == 0) {
+        cp = c;
+        len = 1;
+    } else if ((c & 0xE0U) == 0xC0U && (utf8str[1] & 0xC0U) == 0x80U) {
+        cp = ((c & 0x1FU) << 6) | (utf8str[1] & 0x3FU);
+        len = 2;
+    } else if ((c & 0xF0U) == 0xE0U && (utf8str[1] & 0xC0U) == 0x80U
+               && (utf8str[2] & 0xC0U) == 0x80U) {
+        cp = ((c & 0x0FU) << 12) | ((utf8str[1] & 0x3FU) << 6) | (utf8str[2] & 0x3FU);
+        len = 3;
+    } else if ((c & 0xF8U) == 0xF0U && (utf8str[1] & 0xC0U) == 0x80U
+               && (utf8str[2] & 0xC0U) == 0x80U
+               && (utf8str[3] & 0xC0U) == 0x80U) {
+        cp = ((c & 0x07U) << 18) | ((utf8str[1] & 0x3FU) << 12)
+             | ((utf8str[2] & 0x3FU) << 6) | (utf8str[3] & 0x3FU);
+        len = 4;
+    } else {
+        cp = c;
+        len = 1;
+    }
+    if (ulen_out)
+        *ulen_out = len;
+    return cp;
+}
+
+/* NetHackJP: ロケール非依存の Unicode コードポイント直接判定 (East Asian Width) */
+int
+tty_utf8_char_width(const unsigned char *utf8str)
+{
+    int ulen = 1;
+    unsigned long cp;
 
     if (!utf8str || *utf8str == '\0')
         return 0;
     if (*utf8str < 0x80U)
         return 1;
 
-    ulen = utf8_sequence_len(utf8str);
-    (void) memset(&ps, 0, sizeof(ps));
-    res = mbrtowc(&wc, (const char *) utf8str, (size_t) ulen, &ps);
-    if (res == (size_t) -1 || res == (size_t) -2) {
-        return 1;
-    }
+    cp = tty_utf8_to_codepoint(utf8str, &ulen);
+    if (cp == 0)
+        return 0;
 
-    w = wcwidth(wc);
-    if (w < 0) {
+    /* Combining characters (non-spacing) */
+    if ((cp >= 0x0300UL && cp <= 0x036FUL) || (cp >= 0x20D0UL && cp <= 0x20FFUL)
+        || (cp >= 0xFE20UL && cp <= 0xFE2FUL))
+        return 0;
+
+    /* Fullwidth CJK, Japanese Ideographs / Kana / Symbols & Emoji */
+    if ((cp >= 0x1100UL && cp <= 0x11FFUL)
+        || (cp >= 0x2600UL && cp <= 0x27BFUL)  /* Misc Symbols & Dingbats (⚔️, ❄️, ☀️ etc) */
+        || (cp >= 0x2E80UL && cp <= 0x2EFFUL)
+        || (cp >= 0x3000UL && cp <= 0x303FUL)  /* CJK Symbols and Punctuation (全角記号・句読点) */
+        || (cp >= 0x3040UL && cp <= 0x309FUL)  /* Hiragana */
+        || (cp >= 0x30A0UL && cp <= 0x30FFUL)  /* Katakana */
+        || (cp >= 0x3100UL && cp <= 0x312FUL)
+        || (cp >= 0x3130UL && cp <= 0x318FUL)
+        || (cp >= 0x3190UL && cp <= 0x319FUL)
+        || (cp >= 0x3200UL && cp <= 0x32FFUL)
+        || (cp >= 0x3300UL && cp <= 0x33FFUL)
+        || (cp >= 0x3400UL && cp <= 0x4DBFUL)
+        || (cp >= 0x4E00UL && cp <= 0x9FFFUL)  /* CJK Unified Ideographs (漢字) */
+        || (cp >= 0xA000UL && cp <= 0xA48FUL)
+        || (cp >= 0xA490UL && cp <= 0xA4CFUL)
+        || (cp >= 0xAC00UL && cp <= 0xD7A3UL)
+        || (cp >= 0xF900UL && cp <= 0xFAFFUL)
+        || (cp >= 0xFE10UL && cp <= 0xFE1FUL)
+        || (cp >= 0xFE30UL && cp <= 0xFE4FUL)
+        || (cp >= 0xFF01UL && cp <= 0xFF60UL)  /* Fullwidth ASCII / Punctuation (全角英数・記号) */
+        || (cp >= 0xFFE0UL && cp <= 0xFFE6UL)
+        || (cp >= 0x1F000UL && cp <= 0x1FFFFUL) /* Emoji & Pictographs (🐱, 🐉, 🗡️, 😀 etc) */
+        || (cp >= 0x20000UL && cp <= 0x2FA1FUL))
+        return 2;
+
+    /* Halfwidth Katakana */
+    if (cp >= 0xFF61UL && cp <= 0xFF9FUL)
         return 1;
-    }
-    return w;
+
+    return 1;
 }
 
 #endif /* WIN32CON vs POSIX */
+
+static int
+utf8_char_display_width(const unsigned char *utf8str)
+{
+    return tty_utf8_char_width(utf8str);
+}
+
 
 static int
 tty_utf8_strlen_cells(const char *str)
@@ -5473,6 +5535,7 @@ tty_putstatusfield(const char *text, int x, int y)
             int col;
 
             cw->curx += drawn;
+            ttyDisplay->curx += drawn;
             for (col = 0; col < drawn && (x + col - 1) < ncols; ++col)
                 cw->data[y][x + col - 1] = '#';
         }

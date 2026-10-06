@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-06. */
 /* NetHack 5.0	mhitu.c	$NHDT-Date: 1781973054 2026/06/20 16:30:54 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.347 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -675,7 +675,7 @@ mattacku(struct monst *mtmp)
         } else {
             /* surface hider */
             if (!youseeit) {
-                pline("あなたが掠んでいる場所に移取ゅうとした.");
+                pline("何かがあなたが隠れている場所に移動しようとした.");
             } else {
                 /* Ugly kludge for eggs.  The message is phrased so as
                  * to be directed at the monster, not the player,
@@ -707,9 +707,9 @@ mattacku(struct monst *mtmp)
                         pline(
                           "待って、%s! その%sの下に%s(%s)が隠れている!",
                               m_monnam(mtmp),
+                              doname(svl.level.objects[u.ux][u.uy]),
                               jp_pmname(gy.youmonst.data, Ugender),
-                              svp.plname,
-                              doname(svl.level.objects[u.ux][u.uy]));
+                              svp.plname);
                     if (obj)
                         obj->spe = save_spe;
                 } else
@@ -1006,7 +1006,7 @@ mattacku(struct monst *mtmp)
         if (sum[i] == M_ATTK_HIT) { /* successful attack */
             if (u.usleep && u.usleep < svm.moves && !rn2(10)) {
                 gm.multi = -1;
-                gn.nomovemsg = "The combat suddenly awakens you.";
+                gn.nomovemsg = "戦闘の衝撃で突然目が覚めた!";
             }
         }
         if ((sum[i] & M_ATTK_AGR_DIED))
@@ -1236,13 +1236,13 @@ hitmu(struct monst *mtmp, struct attack *mattk)
                 if (Blind && !obj->dknown)
                     what = something;
                 else if (is_pool(mtmp->mx, mtmp->my) && !Underwater)
-                    what = "the water";
+                    what = "水";
                 else
                     what = doname(obj);
 
                 Strcpy(Amonbuf, Amonnam(mtmp));
                 /* mtmp might be invisible with hero unable to see same */
-                if (!strcmp(Amonbuf, "It")) /* note: not strcmpi() */
+                if (!strcmp(Amonbuf, "It") || !strcmp(Amonbuf, "それ")) /* note: not strcmpi() */
                     Strcpy(Amonbuf, Something);
                 pline("%sは%sの下に隠れていた!", Amonbuf, what);
             }
@@ -1417,9 +1417,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
 
         i = number_leashed();
         if (i > 0) {
-            const char *s = (i > 1) ? "leashes" : "leash";
-
-            pline_The("%sがはじけて外れた.", s);
+            pline(i > 1 ? "リードがいくつもはじけて外れた." : "リードがはじけて外れた.");
             unleash_all();
         }
 
@@ -1740,12 +1738,12 @@ int
 gazemu(struct monst *mtmp, struct attack *mattk)
 {
     static const char *const reactions[] = {
-        "混乱したよう",          /* [0] */
+        "混乱している",          /* [0] */
         "朦朧としている",        /* [1] */
         "当惑している", "目を回している", /* [2,3] */
-        "いら立っている", "熱っぽい",      /* [4,5] */
-        "眠そう",                /* [6] */
-        "鈍っている",            /* [7] */
+        "いら立っている", "熱っぽくなっている",      /* [4,5] */
+        "眠そうにしている",      /* [6] */
+        "動きが鈍っている",      /* [7] */
     };
     int react = -1;
     boolean is_medusa, reflectable,
@@ -2094,7 +2092,7 @@ doseduce(struct monst *mon)
             if (ring->owornmask && uarmg) {
                 /* don't take off worn ring if gloves are in the way */
                 if (!tried_gloves++)
-                    mayberem(mon, Who, uarmg, "gloves");
+                    mayberem(mon, Who, uarmg, "手袋");
                 if (uarmg)
                     continue; /* next ring might not be worn */
             }
@@ -2102,7 +2100,7 @@ doseduce(struct monst *mon)
             if (!Deaf && rn2(20) < ACURR(A_CHA)) {
                 (void) safe_qbuf(qbuf, "\"その",
                                  "は素敵ね。もらっていい?\"", ring,
-                                 xname, simpleonames, "ring");
+                                 xname, simpleonames, "指輪");
                 makeknown(RIN_ADORNMENT);
                 SetVoice(mon, 0, 80, 0);
                 if (y_n(qbuf) == 'n')
@@ -2125,7 +2123,7 @@ doseduce(struct monst *mon)
             if (uarmg) {
                 /* don't put on ring if gloves are in the way */
                 if (!tried_gloves++)
-                    mayberem(mon, Who, uarmg, "gloves");
+                    mayberem(mon, Who, uarmg, "手袋");
                 if (uarmg)
                     break; /* no point trying further rings */
             }
@@ -2133,7 +2131,7 @@ doseduce(struct monst *mon)
             if (!Deaf && rn2(20) < ACURR(A_CHA)) {
                 (void) safe_qbuf(qbuf, "\"その",
                                 "は素敵ね。私のために身に着けてくれる?\"",
-                                 ring, xname, simpleonames, "ring");
+                                 ring, xname, simpleonames, "指輪");
                 makeknown(RIN_ADORNMENT);
                 SetVoice(mon, 0, 80, 0);
                 if (y_n(qbuf) == 'n')
