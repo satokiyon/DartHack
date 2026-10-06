@@ -1675,6 +1675,7 @@ String _translateMonsterOrItemName(String raw) {
     'ruby': 'ルビー',
     'runesword': 'ルーンの剣',
     'rust trap': '錆の罠',
+    'rusting away': '錆び崩れ',
     // S
     'sack': '袋',
     'saddle': '鞍',
@@ -2004,6 +2005,12 @@ String _translateDeathText(String death, bool isJp) {
     if (d.contains('透明な')) {
       d = d.replaceAll('透明な', 'invisible ');
     }
+    if (d.contains('錆び崩れて倒された')) {
+      d = d.replaceAll('錆び崩れて倒された', 'killed by rusting away');
+    }
+    if (d.contains('錆び崩れたこと') || d.contains('錆び崩れ')) {
+      d = d.replaceAll('錆び崩れたこと', 'rusting away').replaceAll('錆び崩れ', 'rusting away');
+    }
     if (d.startsWith('escaped')) {
       return 'Escaped${d.substring(7)}';
     }
@@ -2209,6 +2216,9 @@ String _translateDeathTextInternal(String death, bool isJp) {
     'exploding crystal ball': '水晶玉の爆発',
     'dangerous winds': '危険な突風',
     'rusting away': '錆び崩れたこと',
+    'killed by rusting away': '錆び崩れて倒された',
+    'killed by 錆び崩れ': '錆び崩れて倒された',
+    '錆び崩れ': '錆び崩れたこと',
     'arrow': '矢に倒された',
     'little dart': '吹き矢に倒された',
     'dart': '吹き矢に倒された',
@@ -2289,6 +2299,7 @@ String _translateDeathTextInternal(String death, bool isJp) {
   }
   if (death.startsWith('killed by ')) {
     final raw = death.substring(10);
+    if (raw == 'rusting away' || raw == '錆び崩れ') return '錆び崩れて倒された';
     if (raw == 'system shock' || raw == 'a system shock') return 'システムショックで倒された';
     if (raw == 'riding accident' || raw == 'a riding accident') return '落馬事故で倒された';
     if (raw == 'sitting on an iron spike') return '鉄の刺の上に座ったことで倒された';

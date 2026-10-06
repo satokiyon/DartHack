@@ -38,7 +38,7 @@ DartHack では、アップストリーム本来の英語キーを出力する�
 | :--- | :--- | :--- | :--- | :--- |
 | `src/trap.c` | 落石トラップ | `"落石"` | `"falling rock"` | 落石 |
 | `src/trap.c` | トラバサミ | `"トラバサミ"` | `"bear trap"` | トラバサミ |
-| `src/trap.c` | 錆び落ち | `"錆び落ち"` | `"rusting away"` | 錆び落ち |
+| `src/trap.c` | 鉄ゴーレムの錆び崩れ | `"錆び崩れ"` | `"rusting away"` | 錆び崩れて倒された / 錆び崩れたこと |
 | `src/trap.c` | 魔法の爆発 | `"魔法の爆発"` | `"magical explosion"` | 魔法の爆発 |
 | `src/trap.c` | 反魔法の爆縮 | `"魔法の収縮"` | `"anti-magic implosion"` | 反魔法の爆縮 |
 | `src/trap.c` | 地雷 | `"地雷"` | `"land mine"` | 地雷 |

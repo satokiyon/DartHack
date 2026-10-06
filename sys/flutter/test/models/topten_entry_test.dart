@@ -531,5 +531,58 @@ void main() {
       expect(entries[4].details[0], contains('落馬事故'));
       expect(entries[5].details[0], contains('落馬事故で倒された'));
     });
+
+    test('鉄ゴーレムの錆び崩れ（rusting away）の日本語化・英語化および二重同期テスト', () {
+      final inputLinesJp = [
+        '順位      点数  名前                                                   HP[最大]',
+        '  1      1000  Player 洞窟人/ノーム/男性/中立',
+        '                killed by rusting away (運命の大迷宮 5階). - [30]',
+        '  2       900  Player 洞窟人/ノーム/男性/中立',
+        '                rusting away (運命の大迷宮 5階). - [30]',
+        '  3       800  Player 洞窟人/ノーム/男性/中立',
+        '                killed by 錆び崩れ (運命の大迷宮 5階). - [30]',
+      ];
+      final attrsJp = List.filled(inputLinesJp.length, 0);
+      final entriesJp = TopTenEntry.parse(inputLinesJp, attrsJp, isJp: true);
+
+      expect(entriesJp.length, 3);
+      expect(entriesJp[0].details[0], contains('錆び崩れて倒された'));
+      expect(entriesJp[1].details[0], contains('錆び崩れたこと'));
+      expect(entriesJp[2].details[0], contains('錆び崩れて倒された'));
+
+      final inputLinesEn = [
+        ' No  Points     Name',
+        '  1      1000  Player-Cav-Gno-Mal-Neu died in The Dungeons of Doom on level 5.',
+        '                killed by rusting away. - [30]',
+        '  2       900  Player-Cav-Gno-Mal-Neu died in The Dungeons of Doom on level 5.',
+        '                rusting away. - [30]',
+        '  3       800  Player-Cav-Gno-Mal-Neu died in The Dungeons of Doom on level 5.',
+        '                killed by 錆び崩れ. - [30]',
+      ];
+      final attrsEn = List.filled(inputLinesEn.length, 0);
+      final entriesEn = TopTenEntry.parse(inputLinesEn, attrsEn, isJp: false);
+
+      expect(entriesEn.length, 3);
+      expect(entriesEn[0].details[0].toLowerCase(), contains('killed by rusting away.'));
+      expect(entriesEn[1].details[0].toLowerCase(), contains('rusting away.'));
+      expect(entriesEn[2].details[0].toLowerCase(), contains('killed by rusting away.'));
+
+      // record ファイルからのパース検証
+      final tempDir = Directory.systemTemp.createTempSync('record_rust_test_');
+      final recordFile = File('${tempDir.path}/record');
+      final recLine1 = '5.0.0 5000 0 5 5 0 30 1 20261006 20261001 1000 Cav Gno Mal Neu hero, killed by rusting away';
+      final recLine2 = '5.0.0 4000 0 5 5 0 30 1 20261006 20261001 1000 Cav Gno Mal Neu hero2, rusting away';
+      recordFile.writeAsStringSync('$recLine1\n$recLine2\n');
+
+      final recEntriesJp = parseRecordFile(recordFile.path, isJp: true);
+      expect(recEntriesJp.length, 2);
+      expect(recEntriesJp[0].details[0], contains('錆び崩れて倒された'));
+      expect(recEntriesJp[1].details[0], contains('錆び崩れたこと'));
+
+      final recEntriesEn = parseRecordFile(recordFile.path, isJp: false);
+      expect(recEntriesEn.length, 2);
+      expect(recEntriesEn[0].details[0], contains('Killed by rusting away'));
+      expect(recEntriesEn[1].details[0], contains('Rusting away'));
+    });
   });
 }
