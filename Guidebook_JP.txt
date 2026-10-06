@@ -1,10 +1,10 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-04.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-06.
                          脅威の迷宮へのガイド
                         (NetHackガイドブック)
 
 
                        オリジナル版 - Eric S. Raymond
-     (NetHack 5.0.0用に Mike Stephenson その他によって編集・拡張)
+     (NetHack 5.0.1用に Mike Stephenson と協力者たちによって編集・拡張された)
 
                                   2026年7月4日
 
