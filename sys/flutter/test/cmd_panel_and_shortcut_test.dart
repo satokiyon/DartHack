@@ -192,7 +192,7 @@ void main() {
         '#eat': ('食べる', 'Eat'),
         '#loot': ('あさる', 'Loot'),
         '#dip': ('浸す', 'Dip'),
-        '#enhance': ('強化', 'Enhan'),
+        '#enhance': ('スキル', 'Enhan'),
         '#cast': ('詠唱', 'Cast'),
         '#open': ('開ける', 'Open'),
         '#force': ('こじ開', 'Force'),
