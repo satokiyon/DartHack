@@ -19,6 +19,7 @@ import 'utils/nethack_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'amount_selector_dialog.dart';
 import 'utils/scale_clamp.dart';
+import 'utils/item_count_parser.dart';
 import 'dart:ffi' hide Size;
 import 'dart:convert';
 import 'package:ffi/ffi.dart';
@@ -998,16 +999,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
   }
 
-  int _parseMaxCount(String text) {
-    final match = RegExp(r'(\d+)').firstMatch(text);
-    if (match != null) {
-      final val = int.tryParse(match.group(1)!);
-      if (val != null && val > 0) {
-        return val;
-      }
-    }
-    return 1;
-  }
+  int _parseMaxCount(String text) => ItemCountParser.parseMaxCount(text);
 
   String _cleanItemText(String text) {
     final trimmed = text.trim();
@@ -1030,6 +1022,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       setState(() {
         _menuSelectedCounts[item.ident] = amount;
       });
+      _menuOverlayKey.currentState?.setSelectedCount(item.ident, amount);
     } else {
       _sendMenuSelection(item.ident, amount);
     }
@@ -1037,6 +1030,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Future<void> _onMenuItemLongPress(MenuItemData item) async {
     if (item.ident == 0) return;
+    if (!ItemCountParser.isQuantitySelectionAllowed(_screen.menuPrompt, _screen.menuHow)) {
+      final isMultiSelectMenu = !isExtCmdMenuPrompt(_screen.menuPrompt) && _screen.menuHow > 1;
+      if (isMultiSelectMenu) {
+        _toggleMenuSelection(item.ident);
+      } else {
+        _sendMenuSelection(item.ident);
+      }
+      return;
+    }
     final maxCount = _parseMaxCount(item.text);
     if (maxCount <= 1) return;
 

@@ -10,6 +10,20 @@ staticfn int item_reading_classification(struct obj *, char *);
 staticfn void ia_addmenu(winid, int, char, const char *);
 staticfn void itemactions_pushkeys(struct obj *, int);
 
+static long s_iactions_count = 0L;
+
+void
+set_itemactions_count(long count)
+{
+    s_iactions_count = count;
+}
+
+long
+get_itemactions_count(void)
+{
+    return s_iactions_count;
+}
+
 enum item_action_actions {
     IA_NONE          = 0,
     IA_UNWIELD, /* hack for 'w-' */
@@ -162,6 +176,8 @@ itemactions_pushkeys(struct obj *otmp, int act)
            be dipped second, also ignores floor features such as
            fountain/sink so we don't need to force m-prefix here */
         cmdq_add_ec(CQ_CANNED, dip_into);
+        if (s_iactions_count > 0 && s_iactions_count < otmp->quan)
+            cmdq_add_int(CQ_CANNED, s_iactions_count);
         cmdq_add_key(CQ_CANNED, otmp->invlet);
         break;
     case IA_NAME_OBJ:
@@ -172,6 +188,8 @@ itemactions_pushkeys(struct obj *otmp, int act)
         break;
     case IA_DROP_OBJ:
         cmdq_add_ec(CQ_CANNED, dodrop);
+        if (s_iactions_count > 0 && s_iactions_count < otmp->quan)
+            cmdq_add_int(CQ_CANNED, s_iactions_count);
         cmdq_add_key(CQ_CANNED, otmp->invlet);
         break;
     case IA_EAT_OBJ:
@@ -213,6 +231,8 @@ itemactions_pushkeys(struct obj *otmp, int act)
         break;
     case IA_QUIVER_OBJ:
         cmdq_add_ec(CQ_CANNED, dowieldquiver);
+        if (s_iactions_count > 0 && s_iactions_count < otmp->quan)
+            cmdq_add_int(CQ_CANNED, s_iactions_count);
         cmdq_add_key(CQ_CANNED, otmp->invlet);
         break;
     case IA_READ_OBJ:
@@ -715,6 +735,7 @@ itemactions(struct obj *otmp)
         itemactions_pushkeys(otmp, act);
     }
     destroy_nhwindow(win);
+    s_iactions_count = 0L;
 
     /* finish the 'i' command:  no time elapses and cancelling without
        selecting an action doesn't matter */

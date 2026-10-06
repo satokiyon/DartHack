@@ -1241,3 +1241,17 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
 3. **サウンドキュレーター登録およびクレジット一覧（attributions.txt）同期義務**:
    - 音声ファイルを新規追加、または既存音源から別名複製した際は、必ずサウンドキュレーター（`sys/flutter/tools/sound_curator/sound_database.json`）のステータスを `ready` に更新し、出典元サイト、作者、ライセンス情報を正しく記録してください。
    - データベース更新後は `database.py` の `generate_attributions()` を呼び出し、`DartHack_private` および `DartHack` 両方の `sys/flutter/assets/sounds/attributions.txt` に最新のクレジット・ライセンス情報を必ず同期・反映させてください。
+
+
+## 46. Flutter UI アイテム個数選択（長押しスライダー）における状態同期とCコア連携仕様
+
+1. **アイテムスタック数量の抽出規則（エンチャント誤認防止）**:
+   - アイテム名文字列からスタック個数をパースする際は、行頭のアクセラレータ記号（`"a - "` 等）を除去した上で、**行頭が符号なし整数で始まる場合のみ（`r'^\s*(\d+)'`）**を数量として抽出してください。
+   - `"+1 短剣"` や `"-1 兜"` のようなエンチャント符号付きアイテムの数値をスタック数量と誤認してはなりません（単数は常に `1` と判定）。
+
+2. **Flutter MenuOverlay と親ウィジェット間の状態完全同期**:
+   - メニューダイアログ（`MenuOverlay`）は、親から渡される選択個数マップ（`initialSelectedCounts`）とローカル状態（`_selectedCounts`）の乖離を防ぐため、必ず `didUpdateWidget` による即時同期を実装してください。
+   - スライダーによる個数指定完了時は、対象アイテムを自動的に選択状態（チェックON）にし、OK ボタン押下時に最新の `_selectedCounts` が確実に C コアへ送信される設計を徹底してください。
+
+3. **持ち物一覧（"i"）から後続アクションへの個数引き継ぎ**:
+   - 持ち物一覧からアイテムを選んで別のアクション（置く、投げる、矢筒、浸す等）を実行する機能では、C コア側で選択個数を一時保持（`set_itemactions_count`）し、各アクションのキー発行時に `s_iactions_count > 0 && s_iactions_count < otmp->quan` であれば `cmdq_add_int(CQ_CANNED, s_iactions_count)` をコマンドキューへプッシュして個数を引き継いでください。

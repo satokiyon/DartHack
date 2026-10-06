@@ -1285,6 +1285,8 @@ extern boolean pmatchz(const char *, const char *) NONNULLPTRS;
 /* ### iactions.c ### */
 
 extern int itemactions(struct obj *otmp) NONNULLARG1;
+extern void set_itemactions_count(long);
+extern long get_itemactions_count(void);
 
 /* ### insight.c ### */
 
@@ -1369,6 +1371,7 @@ extern void prinv(const char *, struct obj *, long) NONNULLARG2;
 extern char *xprname(struct obj *, const char *, char, boolean, long, long);
 extern int ddoinv(void);
 extern char display_inventory(const char *, boolean);
+extern char display_inventory_ext(const char *, boolean, long *);
 extern int display_binventory(coordxy, coordxy, boolean);
 extern struct obj *display_cinventory(struct obj *) NONNULLARG1;
 extern struct obj *display_minventory(struct monst *, int, char *) NONNULLARG1;

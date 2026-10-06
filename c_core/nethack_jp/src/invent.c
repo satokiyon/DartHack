@@ -3159,6 +3159,8 @@ RESTORE_WARNING_FORMAT_NONLITERAL
    order to preform context-sensitive item action on it; always returns 'ok';
    invent subsets specified by the ')', '[', '(', '=', '"', or '*' commands
    when they're invoked with the 'm' prefix (or without it for '*') */
+char display_inventory_ext(const char *, boolean, long *);
+
 staticfn int
 dispinv_with_action(
     char *lets,                 /* list of invlet values to include */
@@ -3168,6 +3170,7 @@ dispinv_with_action(
     struct obj *otmp, *nextobj;
     const char *save_accessories = 0;
     char c, save_sortloot = 0;
+    long picked_cnt = 0L;
     unsigned len = lets ? (unsigned) strlen(lets) : 0U;
     boolean menumode = (len != 1 || iflags.menu_requested) ? TRUE : FALSE,
             save_force_invmenu = iflags.force_invmenu;
@@ -3182,7 +3185,7 @@ dispinv_with_action(
     }
     iflags.force_invmenu = FALSE;
 
-    c = display_inventory(lets, menumode);
+    c = display_inventory_ext(lets, menumode, &picked_cnt);
 
     if (use_inuse_ordering) {
         flags.sortloot = save_sortloot;
@@ -3193,8 +3196,10 @@ dispinv_with_action(
     if (c && c != '\033') {
         for (otmp = gi.invent; otmp; otmp = nextobj) {
             nextobj = otmp->nobj;
-            if (otmp->invlet == c)
+            if (otmp->invlet == c) {
+                set_itemactions_count(picked_cnt);
                 return itemactions(otmp);
+            }
         }
     }
     return ECMD_OK;
@@ -3629,7 +3634,7 @@ display_pickinv(
  * was selected.
  */
 char
-display_inventory(const char *lets, boolean want_reply)
+display_inventory_ext(const char *lets, boolean want_reply, long *out_cnt)
 {
     struct _cmd_queue *cmdq = cmdq_pop();
 
@@ -3653,7 +3658,13 @@ display_inventory(const char *lets, boolean want_reply)
         return '\0';
     }
     return display_pickinv(lets, (char *) 0, (char *) 0,
-                           FALSE, want_reply, (long *) 0);
+                           FALSE, want_reply, out_cnt);
+}
+
+char
+display_inventory(const char *lets, boolean want_reply)
+{
+    return display_inventory_ext(lets, want_reply, (long *) 0);
 }
 
 void

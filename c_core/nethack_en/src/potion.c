@@ -2289,7 +2289,8 @@ dodip(void)
             at_here = (!iflags.menu_requested
                        && (at_pool || at_fountain || at_sink));
 
-    obj = getobj("dip", at_here ? dip_hands_ok : dip_ok, GETOBJ_PROMPT);
+    obj = getobj("dip", at_here ? dip_hands_ok : dip_ok,
+                 GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
     if (!obj)
         return ECMD_CANCEL;
     if (inaccessible_equipment(obj, "dip", FALSE))
@@ -2409,7 +2410,7 @@ dip_into(void)
     /* "What do you want to dip into <the potion>? [abc or ?*] " */
     Snprintf(qbuf, sizeof qbuf, "dip into %s%s",
              is_plural(potion) ? "one of " : "", thesimpleoname(potion));
-    obj = getobj(qbuf, dip_ok, GETOBJ_PROMPT);
+    obj = getobj(qbuf, dip_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
     if (!obj)
         return ECMD_CANCEL;
     if (inaccessible_equipment(obj, "dip", FALSE))

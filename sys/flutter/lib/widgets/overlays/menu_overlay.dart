@@ -6,6 +6,7 @@ import '../../utils/dialog_header_helper.dart';
 import '../../utils/nethack_colors.dart';
 import '../menu_item_tile_painter.dart';
 import '../../input/hardware_key_router.dart';
+import '../../utils/item_count_parser.dart';
 
 class MenuOverlay extends StatefulWidget {
   final String menuPrompt;
@@ -59,6 +60,14 @@ class MenuOverlayState extends State<MenuOverlay> {
   }
 
   @override
+  void didUpdateWidget(covariant MenuOverlay oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialSelectedCounts != oldWidget.initialSelectedCounts) {
+      _selectedCounts = Map<int, int>.from(widget.initialSelectedCounts);
+    }
+  }
+
+  @override
   void dispose() {
     _scrollController.dispose();
     _filterController.dispose();
@@ -97,17 +106,32 @@ class MenuOverlayState extends State<MenuOverlay> {
     _toggleSelection(ident);
   }
 
+  /// 外部（ダイアログ等）からの特定アイテムの選択個数更新
+  void setSelectedCount(int ident, int count) {
+    setState(() {
+      if (count > 0) {
+        _selectedCounts[ident] = count;
+      } else {
+        _selectedCounts.remove(ident);
+      }
+    });
+  }
+
   Map<int, int> get selectedCounts => _selectedCounts;
 
-  int _parseMaxCount(String text) {
-    final match = RegExp(r'(\d+)').firstMatch(text);
-    if (match != null) {
-      final val = int.tryParse(match.group(1)!);
-      if (val != null && val > 0) {
-        return val;
+  int _parseMaxCount(String text) => ItemCountParser.parseMaxCount(text);
+
+  void _handleItemLongPress(MenuItemData item) {
+    if (!ItemCountParser.isQuantitySelectionAllowed(widget.menuPrompt, widget.menuHow)) {
+      // 個数指定が無効な画面ではガードし、通常の選択（またはトグル）として扱う
+      if (widget.menuHow > 1) {
+        _toggleSelection(item.ident);
+      } else {
+        widget.onSingleSelect(item.ident);
       }
+      return;
     }
-    return 1;
+    widget.onItemLongPress(item);
   }
 
   bool _isMenuDividerText(String text) {
@@ -606,7 +630,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                                           ),
                                         ),
                                   onTap: () => _toggleSelection(item.ident),
-                                  onLongPress: () => widget.onItemLongPress(item),
+                                  onLongPress: () => _handleItemLongPress(item),
                                 ),
                               );
                             }
@@ -733,7 +757,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                                         size: 22,
                                       ),
                                       onTap: () => widget.onSingleSelect(item.ident),
-                                      onLongPress: () => widget.onItemLongPress(item),
+                                      onLongPress: () => _handleItemLongPress(item),
                                     ),
                                   ),
                                 ),
@@ -775,7 +799,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                                   ],
                                 ),
                                 onTap: () => widget.onSingleSelect(item.ident),
-                                onLongPress: () => widget.onItemLongPress(item),
+                                onLongPress: () => _handleItemLongPress(item),
                               ),
                             );
                           },
