@@ -3109,6 +3109,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   },
                   extCmdList: _extCmdList.map((e) => {'command': e.command, 'description': e.description}).toList(),
                   onKeyPress: (key) => _sendKeysToC(key),
+                  onShortcut: (cmd) => _sendShortcutToC(cmd),
                   onRawKeyCode: (code) => _sendFfiKey(
                     code,
                     (code >= 1 && code <= 26) ? "^${String.fromCharCode(code + 96)}" : "Raw($code)",

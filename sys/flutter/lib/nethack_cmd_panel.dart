@@ -861,7 +861,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
       if (widget.onShortcut != null) {
         widget.onShortcut!(cmd.length > 1 && !cmd.endsWith('\n') ? '$cmd\n' : cmd);
       } else {
-        widget.onKeyPress(cmd);
+        widget.onKeyPress(cmd.length > 1 && !cmd.endsWith('\n') ? '$cmd\n' : cmd);
       }
     } else if (cmd.startsWith('^') && cmd.length == 2) {
       final charCode = cmd.codeUnitAt(1);

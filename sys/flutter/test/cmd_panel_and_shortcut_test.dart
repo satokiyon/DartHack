@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:darthack/l10n/app_localizations.dart';
 import 'package:darthack/nethack_cmd_panel.dart';
 import 'package:darthack/nethack_shortcut_pad.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -274,6 +275,67 @@ void main() {
       // 英語
       expect(l10nEn.btnLabelHelperDefault, 'Leave empty to use default label or command name');
       expect(l10nEn.btnLabelHelperCommand, 'Leave empty to use command name');
+    });
+
+    testWidgets('NetHackCmdPanel から #terrain 等の拡張コマンド実行時に onShortcut または onKeyPress へ改行付きで送信されること', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      String? sentShortcut;
+      String? sentKey;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: Scaffold(
+            body: NetHackCmdPanel(
+              isExpanded: true,
+              onKeyPress: (key) => sentKey = key,
+              onRawKeyCode: (_) {},
+              onShortcut: (cmd) => sentShortcut = cmd,
+              onToggleMode: () {},
+            ),
+          ),
+        ),
+      );
+      // 非同期ロード待ち
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      final terrainFinder = find.text('地形');
+      expect(terrainFinder, findsWidgets);
+      await tester.tap(terrainFinder.first);
+      await tester.pump();
+      expect(sentShortcut, '#terrain\n');
+
+      // onShortcut が null の場合でも onKeyPress に改行付きで送られること
+      sentShortcut = null;
+      sentKey = null;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: Scaffold(
+            body: NetHackCmdPanel(
+              isExpanded: true,
+              onKeyPress: (key) => sentKey = key,
+              onRawKeyCode: (_) {},
+              onShortcut: null,
+              onToggleMode: () {},
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      final terrainFinder2 = find.text('地形');
+      expect(terrainFinder2, findsWidgets);
+      await tester.tap(terrainFinder2.first);
+      await tester.pump();
+      expect(sentKey, '#terrain\n');
     });
   });
 }

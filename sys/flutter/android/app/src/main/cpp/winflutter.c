@@ -948,6 +948,10 @@ void SendKeysToFlutter(const int* keys, int len) {
         enqueued++;
     }
     debuglog("C core received %d keys via SendKeysToFlutter (total queued=%d)", enqueued, g_key_count);
+    if (enqueued > 1 && keys[0] == '#') {
+        g_pending_extcmd_mode = 1;
+        debuglog("SendKeysToFlutter: extcmd detected (len=%d, first='#'), set g_pending_extcmd_mode=1", enqueued);
+    }
 }
 
 void SendShortcutToFlutter(const int* keys, int len) {
