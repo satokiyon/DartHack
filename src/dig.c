@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-06. */
 /* NetHack 5.0	dig.c	$NHDT-Date: 1781973044 2026/06/20 16:30:44 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.236 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
@@ -1216,7 +1216,7 @@ use_pick_axe2(struct obj *obj)
                 /* (maybe `move_into_trap()' would be better) */
                 nomul(-d(2, 2));
                 gm.multi_reason = "stuck in a spider web";
-                gn.nomovemsg = "You pull free.";
+                gn.nomovemsg = "あなたはもがいて抜け出した.";
             } else if (lev->typ == IRONBARS) {
                 pline("ガラン!");
                 wake_nearby(FALSE);

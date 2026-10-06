@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-06. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.645 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1698,7 +1698,7 @@ trapeffect_rust_trap(
             int dam = u.mhmax;
 
             You("錆に覆われた!");
-            losehp(Maybe_Half_Phys(dam), "錆び崩れ", KILLED_BY);
+            losehp(Maybe_Half_Phys(dam), "rusting away", KILLED_BY);
         } else if (u.umonnum == PM_GREMLIN && rn2(3)) {
             (void) split_mon(&gy.youmonst, (struct monst *) 0);
         }
@@ -5144,7 +5144,7 @@ drown(void)
         i = Maybe_Half_Phys(d(2, 6));
         if (u.mhmax > i)
             u.mhmax -= i;
-        losehp(i, "錆び崩れ", KILLED_BY);
+        losehp(i, "rusting away", KILLED_BY);
     }
     if (inpool_ok)
         return FALSE;
@@ -6844,7 +6844,11 @@ unconscious(void)
             || (gn.nomovemsg
                 && (!strncmp(gn.nomovemsg, "You awake", 9)
                     || !strncmp(gn.nomovemsg, "You regain con", 14)
-                    || !strncmp(gn.nomovemsg, "You are consci", 14))));
+                    || !strncmp(gn.nomovemsg, "You are consci", 14)
+                    || !strcmp(gn.nomovemsg, "意識を取り戻した.")
+                    || !strcmp(gn.nomovemsg, "頭痛とともに目を覚ました.")
+                    || !strcmp(gn.nomovemsg, "あなたは目を覚ました.")
+                    || !strcmp(gn.nomovemsg, "戦闘の衝撃で突然目が覚めた!"))));
 }
 
 static const char lava_killer[] = "molten lava";
