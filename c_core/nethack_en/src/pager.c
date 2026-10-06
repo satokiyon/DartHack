@@ -2740,6 +2740,8 @@ dowhatdoes(void)
 #if defined(UNIX) || defined(VMS)
     intron(); /* reenables ^C */
 #endif
+    if (q == '\0' || q == '\033')
+        return ECMD_OK;
     reslt = dowhatdoes_core(q, bufr);
     if (reslt) {
         char *p = strchr(reslt, '\n'); /* 'm' prefix has two lines of output */
