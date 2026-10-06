@@ -16,6 +16,9 @@ if ($remotes -notcontains "nethack-jp") {
 Write-Host "===> NetHackJP の最新コミット情報を取得中 (git fetch nethack-jp)..." -ForegroundColor Cyan
 git fetch nethack-jp
 
+# git subtree pull の ensure_clean 判定向けに stat キャッシュをリフレッシュ
+git update-index -q --refresh
+
 Write-Host "===> c_core/nethack_jp に NetHackJP ($Branch ブランチ) の更新をマージ中 (git subtree pull)..." -ForegroundColor Cyan
 git subtree pull --prefix=c_core/nethack_jp nethack-jp $Branch
 
