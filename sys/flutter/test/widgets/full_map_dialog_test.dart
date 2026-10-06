@@ -119,4 +119,66 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(Dialog), findsNothing);
   });
+
+  testWidgets('maxScaleが30.0に設定され、ダブルタップでズームイン・リセットが行えること', (tester) async {
+    final screen = NetHackScreen();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ja'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  showFullMapDialog(
+                    context: context,
+                    screen: screen,
+                    useTiles: false,
+                    tileImage: null,
+                    tileWidth: 16,
+                    tileHeight: 16,
+                  );
+                },
+                child: const Text('Open'),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    // ダイアログを開く
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+
+    // InteractiveViewer の maxScale が 30.0 であること
+    final viewer = tester.widget<InteractiveViewer>(find.byType(InteractiveViewer));
+    expect(viewer.maxScale, 30.0);
+
+    // 初期状態のスケール確認（1.0）
+    final controller = viewer.transformationController!;
+    expect(controller.value.getMaxScaleOnAxis(), closeTo(1.0, 0.01));
+
+    // 全体表示中にマップ領域をダブルタップ -> 約6倍にズームイン
+    final mapCenter = tester.getCenter(find.byType(InteractiveViewer));
+    await tester.tapAt(mapCenter);
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tapAt(mapCenter);
+    await tester.pumpAndSettle();
+
+    // 拡大されたことを確認（scale > 1.05、約6倍）
+    expect(controller.value.getMaxScaleOnAxis(), closeTo(6.0, 0.5));
+
+    // 拡大状態で再度ダブルタップ -> 全体表示（1.0）にリセット
+    await tester.tapAt(mapCenter);
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tapAt(mapCenter);
+    await tester.pumpAndSettle();
+
+    // スケールが初期状態（1.0）にリセットされたことを確認
+    expect(controller.value.getMaxScaleOnAxis(), closeTo(1.0, 0.01));
+  });
 }
