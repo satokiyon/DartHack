@@ -3672,6 +3672,7 @@ static const struct alt_spellings {
     { "iron ball", HEAVY_IRON_BALL },
     { "lantern", BRASS_LANTERN },
     { "mattock", DWARVISH_MATTOCK },
+    { "amulet of flight", AMULET_OF_FLYING },
     { "amulet of poison resistance", AMULET_VERSUS_POISON },
     { "amulet of protection", AMULET_OF_GUARDING },
     { "amulet of telepathy", AMULET_OF_ESP },
@@ -3682,6 +3683,8 @@ static const struct alt_spellings {
     { "silver shield", SHIELD_OF_REFLECTION },
     { "potion of sleep", POT_SLEEPING },
     { "scroll of recharging", SCR_CHARGING },
+    { "scroll of identification", SCR_IDENTIFY },
+    { "spellbook of identification", SPE_IDENTIFY },
     { "recharging", SCR_CHARGING },
     { "stone", ROCK },
     { "camera", EXPENSIVE_CAMERA },
@@ -3703,6 +3706,9 @@ static const struct alt_spellings {
     { "grapple", GRAPPLING_HOOK },
     { "protection from shape shifters", RIN_PROTECTION_FROM_SHAPE_CHAN },
     { "accuracy", RIN_INCREASE_ACCURACY },
+    { "ring of constitution", RIN_GAIN_CONSTITUTION },
+    { "ring of strength", RIN_GAIN_STRENGTH },
+    { "ring of damage", RIN_INCREASE_DAMAGE },
     /* if we ever add other sizes, move this to o_ranges[] with "bag" */
     { "box", LARGE_BOX },
     /* normally we wouldn't have to worry about unnecessary <space>, but
