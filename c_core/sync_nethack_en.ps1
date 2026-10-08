@@ -1,4 +1,4 @@
-# NetHack 本家リポジトリから c_core/nethack_en へ Git Subtree で更新を取り込むスクリプト
+﻿# NetHack 本家リポジトリから c_core/nethack_en へ Git Subtree で更新を取り込むスクリプト
 param (
     [string]$Branch = "NetHack-5.0"
 )
