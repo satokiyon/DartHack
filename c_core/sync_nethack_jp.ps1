@@ -1,4 +1,4 @@
-﻿# NetHackJP 本家リポジトリから c_core/nethack_jp へ Git Subtree で更新を取り込むスクリプト
+# NetHackJP 本家リポジトリから c_core/nethack_jp へ Git Subtree で更新を取り込むスクリプト
 param (
     [string]$Branch = "main"
 )
