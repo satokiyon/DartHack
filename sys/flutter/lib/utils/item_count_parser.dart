@@ -17,6 +17,12 @@ class ItemCountParser {
       trimmed = trimmed.substring(accMatch.end).trim();
     }
 
+    // 店の商品価格プレフィックス（例: "27 Zm, ", "150 zm , ", "50 zorkmids, " 等）を除去
+    final priceMatch = RegExp(r'^\d+\s*(?:zm|zorkmids?|金貨)\s*,\s*', caseSensitive: false).firstMatch(trimmed);
+    if (priceMatch != null) {
+      trimmed = trimmed.substring(priceMatch.end).trim();
+    }
+
     // プレフィックス除去後の先頭が符号なし整数で始まる場合のみ数量として抽出
     final countMatch = RegExp(r'^(\d+)').firstMatch(trimmed);
     if (countMatch != null) {

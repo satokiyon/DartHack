@@ -371,6 +371,12 @@
   "defaultsEditNotice": "*Editing defaults.nh requires starting a new game to take effect",
   "enterOptionHint": "Enter options here...",
   "selectedCountLabel": " ({selectedCount} selected / {maxCount})",
+  "@selectedCountLabel": {
+    "placeholders": {
+      "selectedCount": {},
+      "maxCount": {}
+    }
+  },
 
   "resetAppSettingsTitle": "Reset UI & Control Settings",
   "resetAppSettingsSub": "Reset UI layout, pads, message lines, and key bindings to default",

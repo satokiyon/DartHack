@@ -2196,7 +2196,7 @@ abstract class AppLocalizations {
   ///
   /// In ja, this message translates to:
   /// **' ({selectedCount}個選択中 / {maxCount})'**
-  String selectedCountLabel(Object maxCount, Object selectedCount);
+  String selectedCountLabel(Object selectedCount, Object maxCount);
 
   /// No description provided for @resetAppSettingsTitle.
   ///

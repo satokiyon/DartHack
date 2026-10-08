@@ -31,6 +31,21 @@ void main() {
       expect(ItemCountParser.parseMaxCount('c - a +2 arrow'), 1);
       expect(ItemCountParser.parseMaxCount('an uncursed -1 ring'), 1);
     });
+
+    test('店の商品（Zm価格プレフィックス付き）の数量パース', () {
+      // 単数アイテム: 価格を数量と誤認せず1を返す
+      expect(ItemCountParser.parseMaxCount('27 Zm , ルビー色の薬'), 1);
+      expect(ItemCountParser.parseMaxCount('a - 27 Zm, ルビー色の薬'), 1);
+      expect(ItemCountParser.parseMaxCount('b - 150 zm, 呪われていない兜'), 1);
+      expect(ItemCountParser.parseMaxCount('50 zorkmids, a +1 dagger'), 1);
+      expect(ItemCountParser.parseMaxCount('100 金貨, つるはし'), 1);
+
+      // スタックアイテム: 価格プレフィックス後のスタック数量を正しく抽出する
+      expect(ItemCountParser.parseMaxCount('27 Zm, 3個のルビー色の薬'), 3);
+      expect(ItemCountParser.parseMaxCount('a - 150 Zm, 10本の矢'), 10);
+      expect(ItemCountParser.parseMaxCount('b - 200 zm, 4 rations of food'), 4);
+      expect(ItemCountParser.parseMaxCount('50 zorkmids, 15 uncursed rocks'), 15);
+    });
   });
 
   group('ItemCountParser.isQuantitySelectionAllowed Tests', () {
