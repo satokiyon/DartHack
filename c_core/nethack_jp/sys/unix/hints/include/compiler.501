@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# NetHack 5.0  compiler.500 $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-5.0 $
+# NetHack 5.0  compiler $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-5.0 $
 
 # compiler flags:  CCFLAGS is used to construct a value for CFLAGS with
 #	various -I, -D, and -W settings appended below;
@@ -11,6 +11,12 @@ CCFLAGS = -g
 #	Note: this is not the usual 'CFLAGS' which is used in default
 #	rules for compiling C code; specifying a value for that on the
 #	'make' command line should be avoided.
+
+# Be able to find the Lua includes
+CCFLAGS += -I../nhlua/lua/src
+ifdef CPLUSPLUS_NEEDED
+CCXXFLAGS = -g -I../include
+endif
 
 #If you want to force use of one particular set of compilers, do it
 #here, ahead of the detection, so that the detection will match your
@@ -128,12 +134,16 @@ endif
 ifeq "$(CLANGGTEQ22)" "1"
 NO_WARN_DISCARDED_QUALIFIERS=-Wno-incompatible-pointer-types-discards-qualifiers
 endif
+ifdef WANT_WIN_X11
+# X11 header file keysymdef.h triggers [-Wnewline-eof] warnings
+COMPILERX11CFLAGS+=-Wno-newline-eof
+endif  # WANT_WIN_X11
 # none
 endif  # clang-specific ends here
 
 ifdef MAKEFILE_SRC
 ifdef CPLUSPLUS_NEEDED
-CCXXFLAGS = -g -I../include
+CCXXFLAGS = -g -I../include -I../nhlua/lua/src
 CCXXFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
         -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CCXXFLAGS+=-pedantic
@@ -273,5 +283,5 @@ ifneq "$(HAVECSTD)" ""
 CSTD = -std=$(HAVECSTD)
 endif
 
-#end of compiler.500
+#end of compiler
 #------------------------------------------------------------------------------

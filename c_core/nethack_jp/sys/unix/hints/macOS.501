@@ -1,4 +1,4 @@
-# NetHack 5.0  macOS.500 $NHDT-Date: 1693359574 2023/08/30 01:39:34 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.138 $
+# NetHack 5.0  macOS hints $NHDT-Date: 1693359574 2023/08/30 01:39:34 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.138 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -18,10 +18,9 @@
 #
 
 WHICH_OS=macOS
-HINTSVERSION := 500
+HINTSVERSION := 501
 
 ifdef MAKEFILE_TOP
-LUA_VERSION=5.4.8
 ifeq ($(MAKELEVEL),0)
 PRECHECK+=checkmakefiles
 # all files included from this hints file get listed
@@ -37,11 +36,11 @@ endif
 endif
 
 # note: '#-INCLUDE' is not just a comment; multiw-1 contains sections 1 to 2
-#-INCLUDE multiw-1.500
+#-INCLUDE multiw-1.501
 
 # note: '#-INCLUDE' is not just a comment
-#        it pulls in the contents of dirs-perms.500
-#-INCLUDE dirs-perms.500
+#        it pulls in the contents of dirs-perms.501
+#-INCLUDE dirs-perms.501
 
 ifneq "$(USEMACPORTS)" "1"
 HAVE_HOMEBREW := $(shell expr `which -s brew; echo $$?` = 0)
@@ -63,23 +62,23 @@ endif
 # you're reading this in Makefile augmented by hints, that may not be true).
 #
 
-#-INCLUDE cross-pre1.500
+#-INCLUDE cross-pre1.501
 
-#-INCLUDE multiw-2.500
+#-INCLUDE multiw-2.501
 
-# compiler.500 contains compiler detection and adjustments common
+# compiler.501 contains compiler detection and adjustments common
 # to both linux and macOS
 
-#-INCLUDE compiler.500
+#-INCLUDE compiler.501
 
 ifdef WANT_WIN_QT
 ifeq "$(HAVE_HOMEBREW)" "1"
 ifdef WANT_WIN_QT5
 # Qt5 installed via homebrew
-QTDIR :=$(shell brew --prefix)/opt/qt@5
+QTDIR :=$(shell brew --prefix)/opt/qt5
 endif   # WANT_WIN_QT5
 ifdef WANT_WIN_QT6
-QTDIR :=$(shell brew --prefix)/opt/qt@6
+QTDIR :=$(shell brew --prefix)/opt/qt6
 endif   # WANT_WIN_QT6
 endif   # HAVE_HOMEBREW
 ifndef QTDIR
@@ -102,10 +101,10 @@ CCXXFLAGS +=-Wno-c++20-attribute-extensions
 endif
 endif
 
-# misc.500 must come after compiler.500
+# misc.501 must come after compiler.501
 # and after QTDIR is defined
 
-#-INCLUDE misc.500
+#-INCLUDE misc.501
 
 # manpages directory
 MANDIR=/usr/local/share/man/man6
@@ -240,11 +239,11 @@ endif
 endif  #MAKEFILE_SRC
 
 #
-#-INCLUDE multisnd1-pre.500
+#-INCLUDE multisnd1-pre.501
 #
 
 # although not currently doing anything for macOS, this is
-# kept in for consistency with layout of linux.500
+# kept in for consistency with layout of linux.501
 ifeq "$(CCISCLANG)" "1"
 # clang-specific starts
 # clang-specific ends
@@ -254,15 +253,15 @@ else
 # gcc-specific ends
 endif
 
-# WINCFLAGS set from multiw-2.500
-# SNDCFLAGS set from multisnd-pre.500
+# WINCFLAGS set from multiw-2.501
+# SNDCFLAGS set from multisnd-pre.501
 CFLAGS+= $(PKGCFLAGS) $(WINCFLAGS)
 CFLAGS+= $(SNDCFLAGS)
 CFLAGS+= $(NHCFLAGS)
 CFLAGS+= $(LIBCFLAGS)
 
-# WINCFLAGS set from multiw-2.500
-# SNDCFLAGS set from multisnd-pre.500
+# WINCFLAGS set from multiw-2.501
+# SNDCFLAGS set from multisnd-pre.501
 CCXXFLAGS+= $(WINCFLAGS)
 CCXXFLAGS+= $(SNDCFLAGS)
 CCXXFLAGS+= $(NHCFLAGS)
@@ -277,20 +276,33 @@ HINTOBJ=$(CHAINOBJ)
 endif # WANT_WIN_CHAIN
 
 ifdef WANT_WIN_X11
+USE_XFT=1
 USE_XPM=1
+USE_PNG=1
 WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 VARDATND0 += x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
+ifndef CROSSCOMPILE
 GENTILEOFILE = $(SRCDIR)/tile.o
+endif
 # -x: if built without dodlb, some versions of mkfontdir think *.lev are fonts
 POSTINSTALL += bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; ( cd $(HACKDIR); mkfontdir -x .lev );
 # separate from CFLAGS so that we don't pass it to every file
-X11CFLAGS = -I/opt/X11/include
+X11CFLAGS = -I/opt/X11/include $(COMPILERX11CFLAGS)
 # avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
 X11CFLAGS += -Wno-variadic-macros
+ifdef USE_XFT
+CFLAGS += -DUSE_XFT
+X11CFLAGS += $(shell pkg-config --cflags xft fontconfig freetype2)
+WINX11LIB += $(shell pkg-config --libs xft fontconfig freetype2)
+endif
 ifdef USE_XPM
 CFLAGS += -DUSE_XPM
 WINX11LIB += -lXpm
 VARDATND0 += rip.xpm
+endif
+ifdef USE_PNG
+CFLAGS += -DUSE_PNG
+WINX11LIB += -lpng
 endif
 WINLIB += $(WINX11LIB)
 LFLAGS += -L/opt/X11/lib
@@ -298,6 +310,9 @@ endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
 LINK = $(CXX)
+ifndef CROSSCOMPILE
+GENTILEOFILE = $(SRCDIR)/tile.o
+endif
 ifdef WANT_WIN_QT5
 # Qt5 requires C++11
 QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig \
@@ -363,7 +378,7 @@ endif
 endif  # WANT_LIBNH
 
 # Lua
-# when building liblua.a, avoid warning that use of tmpnam() should be
+# when building libnhlua.a, avoid warning that use of tmpnam() should be
 # replaced by mkstemp(); the lua code doesn't use nethack's config.h so
 # this needs to be passed via make rather than defined in unixconf.h
 ifdef GITSUBMODULES
@@ -442,16 +457,16 @@ SYSCONFENSURE = (if ! test -f $(INSTDIR)/sysconf ; then \
 # Install.Qt mentions a patch for macos - it's not there (it seems to be in the Qt binary
 # package under the docs directory).
 #
-#-INCLUDE cross-pre2.500
+#-INCLUDE cross-pre2.501
 #
 #
-#-INCLUDE gbdates-pre.500
+#-INCLUDE gbdates-pre.501
 #
 #
-#-INCLUDE multisnd2-pre.500
+#-INCLUDE multisnd2-pre.501
 #
 #
-#-INCLUDE response.500
+#-INCLUDE response.501
 #
 
 ifdef MAKEFILE_TOP
@@ -521,10 +536,10 @@ endif   # MAKEFILE_SRC
 #-POST
 
 #
-#-INCLUDE gbdates-post.500
+#-INCLUDE gbdates-post.501
 #
 #
-#-INCLUDE multisnd-post.500
+#-INCLUDE multisnd-post.501
 #
 
 ifdef MAKEFILE_TOP
@@ -545,7 +560,7 @@ ifdef WANT_LIBNH
 # Build libnh.a by merging the engine objects, the shim windowport,
 # date.o (separate from $(HOBJ) per Makefile.src), hacklib.a, and Lua's
 # static archive.  Use libtool -static rather than ar so hacklib.a and
-# liblua-$(LUA_VERSION).a have their members merged in -- ar would archive
+# libnhlua.a have their members merged in -- ar would archive
 # them as opaque .a members and macOS ld can't dereference those.
 # Depending on $(LUALIB) triggers the lua_support build (which generates
 # include/nhlua.h); without it, $(HOBJ) won't compile.
@@ -655,9 +670,9 @@ $(BUNDLE_INFOPLIST):
 	@echo '<key>CFBundleName</key>' >>$@
 	@echo '<string>$(BUNDLE_NAME)</string>' >>$@
 	@echo '<key>CFBundleVersion</key>' >>$@
-	@echo '<string>NetHack 5.0.0b73</string>' >>$@
+	@echo '<string>NetHack 5.0.1b73</string>' >>$@
 	@echo '<key>CFBundleShortVersionString</key>' >>$@
-	@echo '<string>NetHack 5.0.0</string>' >>$@
+	@echo '<string>NetHack 5.0.1</string>' >>$@
 	@echo '<key>NSHumanReadableCopyright</key>' >>$@
 	@echo '<string>©By Stichting Mathematisch Centrum and M. Stephenson 1985-2026</string>' >>$@
 	@echo '<key>LSApplicationCategoryType</key>' >>$@
@@ -696,7 +711,7 @@ endif   # WANT_BUNDLE
 # --- end of bundle ---
 #
 #
-#-INCLUDE cross-post.500
+#-INCLUDE cross-post.501
 #
 
 ifdef MAKEFILE_TOP
