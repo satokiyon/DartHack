@@ -19,8 +19,8 @@ git fetch nethack-en
 # git subtree pull の ensure_clean 判定向けに stat キャッシュをリフレッシュ
 git update-index -q --refresh
 
-Write-Host "===> c_core/nethack_en に NetHack ($Branch ブランチ) の更新をマージ中 (git subtree pull)..." -ForegroundColor Cyan
-git subtree pull --prefix=c_core/nethack_en nethack-en $Branch
+Write-Host "===> c_core/nethack_en に NetHack ($Branch ブランチ) の更新をマージ中 (git subtree pull --squash)..." -ForegroundColor Cyan
+git subtree pull --prefix=c_core/nethack_en --squash nethack-en $Branch
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "===> 正常に NetHack 本家の更新を取り込みました！" -ForegroundColor Green

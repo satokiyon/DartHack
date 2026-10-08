@@ -31,13 +31,18 @@
    - 手動で同期を行う場合:
      ```powershell
      git fetch nethack-en
-     git subtree pull --prefix=c_core/nethack_en nethack-en NetHack-5.0
+     git subtree pull --prefix=c_core/nethack_en --squash nethack-en NetHack-5.0
      ```
 
 4. **Git Subtree 同期時のマージコンフリクト・本家宣言消去の防止策**:
    - `DartHack` 内で `c_core/nethack_jp` や `c_core/nethack_en` 配下のファイル（特に `extern.h` や `do_name.c` 等）に独自コード（Flutter/Androidフックやオートセーブ機能等）を追加しているため、`git subtree pull` 時の 3-way merge において本家の新しい関数宣言や定義がマージ競合解消時に消去・ドロップされるリスクがあります。
    - `sync_nethack_jp.ps1` および `sync_nethack_en.ps1` には、マージ実行後に本家の `extern.h` に存在する宣言がローカル側に欠落していないか自動検出する整合性チェック機能が組み込まれています。
    - 同期実行後に警告が表示された場合は、`git diff nethack-jp/main:include/extern.h c_core/nethack_jp/include/extern.h` 等で差分を確認し、消去された本家側の宣言や定義を手動で復元してください。
+
+5. **Git Subtree 同期における `--squash` 必須化原則（Merge Base 混信・変更脱落の防止）**:
+   - `c_core/nethack_jp`（NetHackJP）と `c_core/nethack_en`（NetHack本家）は同一リポジトリ・コミットオブジェクトを共有しています。
+   - `--squash` を付けずに `git subtree pull` を実行すると、外部リモートのコミットグラフが DartHack のブランチに直接接続され、Git の 3-way merge において本家の共通コミットが Merge-Base（共通祖先）として誤認識されます。その結果、本家から NetHackJP にマージされた修正（バグ修正やドキュメント等）が「すでに共有済み（新規変更なし）」と誤認されて `c_core/nethack_jp` への反映から脱落する重大なバグが発生します。
+   - したがって、両サブツリーの同期（`sync_nethack_jp.ps1` および `sync_nethack_en.ps1`）では**必ず `--squash` オプションを指定して同期してください**。これにより外部コミットグラフが直接接続されず、独立した合成コミットとして安全にマージされます。
 
 ## NetHack CコアにおけるフロアBGM・特別部屋BGM判定とサブルーム（子部屋）の仕様原則
 
