@@ -1,0 +1,52 @@
+デバッグモード クイックリファレンス:
+
+^E  ==  近くの隠し扉と罠を探知
+^F  ==  フロア全体をマップ化（罠と隠し通路は表示、隠し扉は非表示）
+^G  ==  名前または種別でモンスター生成
+^I  ==  所持品をすべて識別
+^T  ==  同一階層内テレポート
+^V  ==  階層間テレポート（'?' で特別行き先メニュー）
+^W  ==  アイテム・罠・限定的な地形を対象に願いを実行
+^X  ==  状態・能力値・特性を表示（拡張啓蒙）
+
+#debugfuzzer    == ゲームを自動操縦で実行（失敗まで継続）;
+                   impossible 警告を panic に昇格
+#levelchange    == 主人公の経験レベルを設定
+#lightsources   == 移動する光源を表示
+#migratemons    == 移動中モンスターを表示; [Opt] 条件次第で生成も可能
+#panic          == panic テスト（警告: 現在のゲームは終了）
+#polyself       == 自己変身
+#stats          == メモリ統計を表示
+#terrain        == 現在階層を表示（通常プレイより多機能）
+#timeout        == タイムアウトキューと主人公の時限内在能力を確認
+#vision         == 視界配列を表示
+#wizborn        == モンスター出生/死亡/虐殺/絶滅統計を表示
+#wizcast        == 任意の呪文を詠唱
+#wizdispmacros  == [Opt] 内部表示分類を検査
+#wizfliplevel   == 現在階層を転置
+#wizintrinsic   == 選択した内在能力のタイムアウトを設定
+#wizkill        == モンスターを除去
+#wizloaddes     == 特別階層記述 lua スクリプトを読み込んで実行
+#wizloadlua     == lua スクリプトを読み込んで実行
+#wizmakemap     == 現在階層を再生成
+#wizmondiff     == [Opt] モンスター難易度評価の不一致を検査
+#wizobjprobs    == [Opt] アイテム生成確率の実値を表示
+#wizrumorcheck  == rumor インデックスを検証; 併せてランダムな
+                   彫刻・墓碑銘・幻覚モンスターの先頭/次点/末尾を表示
+#wizseenv       == マップ位置ごとの seen vector を表示
+#wizsmell       == モンスターを嗅ぐ
+#wiztelekinesis == 念動力でモンスターを押しやる
+#wizwhere       == すべての特別階層の配置を表示
+#wmode          == 壁モードを表示
+
+Options:
+debug_hunger    == 主人公の空腹を無効化
+debug_mongen    == ランダムモンスター生成を無効化
+debug_overwrite_stairs
+                == 階段を他の地形で置換可能にする
+monpolycontrol  == モンスター変身時に毎回新形態を選択
+sanity_check    == 各ターン前にモンスター・物体・地図を健全性検査
+wizweight       == 物体説明に重量情報を追加
+
+[Opt] = ビルド時設定により条件付きで利用可能
+

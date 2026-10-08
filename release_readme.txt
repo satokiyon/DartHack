@@ -1,0 +1,76 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05.
+NetHack JP README
+
+
+参考 : https://nethack.org/v500/ports/download-win.html
+
+----
+
+# Windows版 NetHack起動手順
+
+1. ダウンロードしたzipファイルをすべて展開してください。
+   (zipファイルの中にある状態で実行ファイルを起動しないでください)
+
+
+2. 次のどちらかのファイルを起動してください。
+
+   - NetHack.exe  (コンソール版)
+
+   - NetHackW.exe (GUI版)
+
+
+3. 必要であれば、ご自身の環境に合わせてNetHackの設定ファイルを編集してください。
+   NetHackに関連するフォルダの場所と名前は、次のコマンドで確認できます。
+   
+     NetHack.exe --showpath
+
+   設定は「.nethackrc」を編集してください。一度NetHackを起動すると
+   nethackrc.template からコピーして自動作成されます。
+   作成された %USERPROFILE%\NetHackJP\.nethackrc を編集してください。
+
+----
+
+# Linux版 NetHack起動手順
+
+1. ダウンロードしたzipファイルをすべて展開してください。
+   
+     unzip NetHackJP-5.0.1-*-linux.zip
+
+
+2. 展開されたディレクトリに移動し、必要に応じて実行権限が付与されているか確認してください。
+
+     cd NetHackJP-5.0.1-*-linux
+    chmod +x nethack nethackX11 nethackQt nethack.bin
+
+
+3. 次のいずれかのスクリプトを起動してください。
+
+   - ./nethack   (コンソール版 TTY / ncurses インターフェース)
+
+    - ./nethackX11  (GUI X11 インターフェース - 黒背景・白文字表示)
+    - ./nethackQt   (GUI Qt6 インターフェース - fcitx5 による日本語入力)
+
+   ※ X11 GUI版のタイルセットはデフォルトファイル名が「x11tiles」です。
+   ※ GUI使用時に日本語や墓石の死因が文字化け（豆腐文字表示）する場合は、環境に日本語 CJK フォント（Noto Sans CJK JP 等）をインストールしてください（例: sudo apt install -y fonts-noto-cjk）。
+   ※ GUI版で主人公名や各種ダイアログ（#名前、#記念碑、#虐殺 等）の日本語入力を行う場合は、fcitx5 を使用します:
+      1. 必要パッケージの導入:
+         sudo apt update && sudo apt install -y fcitx5 fcitx5-modules fcitx5-mozc fonts-noto-cjk
+      2. fcitx5 の起動（WSL環境では以下のコマンドでバックグラウンド起動）:
+         fcitx5 --disable=wayland,waylandim -d
+      3. ダイアログ入力欄で「Ctrl+Space」を押すことで、Mozc による日本語入力モードに切り替わります。
+
+
+4. 必要であれば、ご自身の環境に合わせてNetHackの設定ファイルを編集してください。
+   NetHackに関連するフォルダの場所と名前は、次のコマンドで確認できます。
+
+     ./nethack --showpath
+
+   設定は「.nethackrc」を編集してください。一度NetHackを起動すると
+   nethackrc.template からコピーして自動作成されます。
+   作成された $HOME/.nethackrc を編集してください。
+
+----
+     
+設定ファイルに指定できるオプションや、ゲーム内容に関する説明は、Guidebook_JP.txtを参照してください。
+
+Android版をプレイしたい場合はGoogle PlayのDartHackのページ( https://play.google.com/store/apps/details?id=jp.satokiyo.darthack )からインストールしてください。

@@ -1,0 +1,15 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* gr_rect.h */
+/*
+ * $NHDT-Date: 1432512809 2015/05/25 00:13:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.4 $
+ */
+#include <e_gem.h>
+/********** structs **********/
+typedef struct {
+    GRECT *rects;
+    int max, used;
+} dirty_rect;
+/********* functions ************/
+dirty_rect *new_dirty_rect(int size);
+int add_dirty_rect(dirty_rect *dr, GRECT *area);
+int get_dirty_rect(dirty_rect *dr, GRECT *area);

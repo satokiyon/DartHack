@@ -1,0 +1,94 @@
+# NetHack 5.0  engrave.txt       $NHDT-Date: 1596498240 2020/08/03 23:44:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $
+# Copyright (c) 2015 by Pasi Kallinen
+# NetHack may be freely redistributed.  See license for details.
+# Random engravings on the floor
+#
+Elbereth
+# trap engravings
+ヴラドここにあり
+ad aerarium
+
+# take-offs and other famous engravings
+Owlbreath
+Galadriel
+キルロイここにあり
+フロドは生きている
+
+# Journey to the Center of the Earth
+A.S. ->
+<- A.S.
+# Adventure
+それを階段の上には運べない
+# Inferno
+ここに入る者は一切の希望を捨てよ.
+# Prisoner
+ようこそ
+# God's Final Message to His Creation (from "So Long, and Thanks for All
+# the Fish" by Douglas Adams):
+ご不便をおかけして申し訳ない.
+# Thriller
+また来週の水曜日に会おう
+# Smokey Stover
+公証人ソジャック
+
+楽しみたいなら 8?7-5309 に電話しろ
+# Various zoos around the world
+動物に餌を与えないでくれ.
+# A palindrome
+エデンの淑女よ、私はアダムだ.
+# Siskel & Ebert
+大絶賛!
+# The First C Program
+Hello,　world!
+^?MAIL
+# AOL
+メールが届いていた!
+^.
+# Clueless
+まさか!
+# 200x incarnation of Dr.Who
+悪い狼
+
+# Gang tag
+アオーン!  イェンダーの狼男たちだ!
+
+# Strategy and pun
+ここで掘って勝利をつかめ
+
+# Pompeii
+ガイウス・ユリウス・プリミゲニウスここにあり.  なぜ遅れた?
+
+# Helpful guiding
+こっちへ行くな
+左へ進め --->
+<--- 右へ進め
+X が目印だ
+X <--- あなたはここにいる.
+ここにはドラゴンがいる
+今セーブして、宿題をしろ!
+ここには穴があった.  いまはもうない.
+振動する正方形
+ここは落とし穴だ!
+ここは探しているダンジョンではない.
+気をつけろ、その扉の向こうには死の杖を持ったノームがいた!
+
+# Misc fun
+このマスは意図的に空白にしてある.
+
+# Viking graffiti
+ヘアムンド・ハードアックスがこのルーンを刻んだ
+
+# Advertising
+明かりは要るか?  ミネタウンのイツァク照明店へようこそ!
+アストラル界の蛇たち - 近日、あなたの近くのダンジョンで公開
+あなたはこの場所の100万人目の来訪者だ!  願いの杖を受け取るまで200ターン待ってくれ.
+
+# DnD
+警告、爆発するルーンだ!
+
+# "Whispers Underground" Ben Aaronovitch
+この文字が読めるなら、あなたはオタクなだけでなく、おそらく死んでいる.
+
+# Portal
+ケーキは嘘だ
+
