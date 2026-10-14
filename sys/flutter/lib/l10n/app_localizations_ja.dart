@@ -1062,6 +1062,17 @@ class AppLocalizationsJa extends AppLocalizations {
   String get soundCreditsCopiedUrl => 'URLをクリップボードにコピーしました';
 
   @override
+  String soundCreditsBgmList(Object count) {
+    return '使用BGM一覧 ($count曲)';
+  }
+
+  @override
+  String get soundCreditsPlay => '再生';
+
+  @override
+  String get soundCreditsStop => '停止';
+
+  @override
   String get editDefaultsTitle => 'defaults.nh を編集';
 
   @override

@@ -358,6 +358,9 @@
   "soundCreditsAuthor": "作者: {name}",
   "soundCreditsItemsCount": "{count}件",
   "soundCreditsCopiedUrl": "URLをクリップボードにコピーしました",
+  "soundCreditsBgmList": "使用BGM一覧 ({count}曲)",
+  "soundCreditsPlay": "再生",
+  "soundCreditsStop": "停止",
 
   "editDefaultsTitle": "defaults.nh を編集",
   "saveTooltip": "保存",

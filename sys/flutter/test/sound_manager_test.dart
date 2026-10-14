@@ -906,6 +906,114 @@ void main() {
         });
       }
     });
+
+    test('BGM preview starts, stops, and safely restores previous floor BGM', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true, isMainGameStarted: true);
+
+      final fakePreviewPlayer = FakeAudioPlayer();
+      manager.initPreviewPlayerForTest(fakePreviewPlayer);
+
+      manager.registerAvailableSound('amb_dungeon.ogg');
+      manager.registerAvailableSound('amb_mines.ogg');
+
+      // 本編フロアBGMを再生
+      manager.handleSoundEvent({
+        'category': 4, // bgm
+        'filename': 'amb_dungeon.ogg',
+        'volume': 100,
+        'loopOrFlag': 1,
+      });
+
+      // プレビュー開始
+      await manager.startPreviewBgm('amb_mines.ogg');
+      expect(manager.currentPreviewBgm, 'amb_mines.ogg');
+      expect(manager.previewBgmNotifier.value, 'amb_mines.ogg');
+      expect(fakePreviewPlayer.playCount, 1);
+      expect(fakePreviewPlayer.state, PlayerState.playing);
+
+      // プレビュー停止 & 本編復帰
+      await manager.stopPreviewBgm(restorePrevious: true);
+      expect(manager.currentPreviewBgm, isNull);
+      expect(manager.previewBgmNotifier.value, isNull);
+      expect(fakePreviewPlayer.stopCount, 1);
+    });
+
+    test('BGM preview switching tracks stops previous preview and keeps main BGM stopped', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true, isMainGameStarted: true);
+
+      final fakePreviewPlayer = FakeAudioPlayer();
+      manager.initPreviewPlayerForTest(fakePreviewPlayer);
+
+      manager.registerAvailableSound('amb_dungeon.ogg');
+      manager.registerAvailableSound('amb_mines.ogg');
+      manager.registerAvailableSound('amb_oracle.ogg');
+
+      // 本編フロアBGMを再生
+      manager.handleSoundEvent({
+        'category': 4, // bgm
+        'filename': 'amb_dungeon.ogg',
+        'volume': 100,
+        'loopOrFlag': 1,
+      });
+
+      // 1曲目プレビュー（ダンジョン）
+      await manager.startPreviewBgm('amb_dungeon.ogg');
+      expect(manager.currentPreviewBgm, 'amb_dungeon.ogg');
+      expect(fakePreviewPlayer.playCount, 1);
+
+      // 2曲目プレビュー（鉱山）へ即時切り替え
+      await manager.startPreviewBgm('amb_mines.ogg');
+      expect(manager.currentPreviewBgm, 'amb_mines.ogg');
+      expect(fakePreviewPlayer.playCount, 2);
+      expect(fakePreviewPlayer.state, PlayerState.playing);
+
+      // ダイアログ内での停止（restorePrevious: false）
+      await manager.stopPreviewBgm(restorePrevious: false);
+      expect(manager.currentPreviewBgm, isNull);
+
+      // ダイアログを閉じた時（restorePrevious: true）にのみ本編BGMへ復帰
+      await manager.stopPreviewBgm(restorePrevious: true);
+      expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
+    });
+
+    test('Lifecycle pause and resume during BGM preview does not restart main floor BGM', () async {
+      final manager = SoundManager.instance;
+      manager.setInitializedForTest(true, isMainGameStarted: true);
+
+      final fakePreviewPlayer = FakeAudioPlayer();
+      manager.initPreviewPlayerForTest(fakePreviewPlayer);
+
+      manager.registerAvailableSound('amb_dungeon.ogg');
+      manager.registerAvailableSound('amb_mines.ogg');
+
+      // 本編フロアBGMを再生
+      manager.handleSoundEvent({
+        'category': 4,
+        'filename': 'amb_dungeon.ogg',
+        'volume': 100,
+        'loopOrFlag': 1,
+      });
+
+      // プレビュー開始
+      await manager.startPreviewBgm('amb_mines.ogg');
+      expect(manager.currentPreviewBgm, 'amb_mines.ogg');
+
+      // アプリがバックグラウンドへ移行
+      await manager.pauseForBackground();
+      expect(fakePreviewPlayer.state, PlayerState.paused);
+
+      // アプリがフォアグラウンドへ復帰
+      await manager.resumeFromBackground();
+      // プレビューが再開され、本編BGMは勝手に鳴らないこと
+      expect(fakePreviewPlayer.state, PlayerState.playing);
+      expect(manager.currentPreviewBgm, 'amb_mines.ogg');
+
+      // クレジット画面を閉じる
+      await manager.stopPreviewBgm(restorePrevious: true);
+      expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
+    });
   });
 }
 

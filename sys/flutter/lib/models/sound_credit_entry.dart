@@ -8,6 +8,7 @@ class SoundCreditSource {
   final String license;
   final String url;
   final int soundCount;
+  final List<SoundCreditEntry> bgmEntries;
 
   const SoundCreditSource({
     required this.sourceName,
@@ -15,11 +16,12 @@ class SoundCreditSource {
     required this.license,
     required this.url,
     this.soundCount = 0,
+    this.bgmEntries = const [],
   });
 
   @override
   String toString() {
-    return 'SoundCreditSource(source: $sourceName, author: $author, license: $license, url: $url)';
+    return 'SoundCreditSource(source: $sourceName, author: $author, license: $license, url: $url, bgmCount: ${bgmEntries.length})';
   }
 
   @override
@@ -105,12 +107,26 @@ class SoundCreditParser {
       // 代表URLの正規化（サイトトップまたは代表URL）
       String url = _getPrimaryUrl(sourceName, entries.first.url);
 
+      // BGMエントリの抽出（amb_*.ogg かつ環境音除外）
+      final bgmEntries = entries.where((e) {
+        final name = e.fileName.trim();
+        return name.startsWith('amb_') && !terrainAmbienceFiles.contains(name);
+      }).toList();
+
+      // BGM一覧をフロア名・部屋名順でソート
+      bgmEntries.sort((a, b) {
+        final titleA = getBgmTitle(a.fileName, isEnglish: isEnglish, description: a.description);
+        final titleB = getBgmTitle(b.fileName, isEnglish: isEnglish, description: b.description);
+        return titleA.compareTo(titleB);
+      });
+
       sources.add(SoundCreditSource(
         sourceName: sourceName,
         author: author,
         license: license,
         url: url,
         soundCount: entries.length,
+        bgmEntries: bgmEntries,
       ));
     }
 
@@ -122,6 +138,109 @@ class SoundCreditParser {
     });
 
     return sources;
+  }
+
+  /// 除外対象の地形・天候環境音
+  static const Set<String> terrainAmbienceFiles = {
+    'amb_water.ogg',
+    'amb_lava.ogg',
+    'amb_wind.ogg',
+    'amb_rain.ogg',
+    'amb_swamp.ogg',
+  };
+
+  /// BGMファイル名に対応するフロア名・部屋名（日本語・英語）
+  static const Map<String, (String ja, String en)> bgmFloorAndRoomTitles = {
+    'amb_title.ogg': ('タイトル', 'Title Screen'),
+    'amb_gameover.ogg': ('ゲームオーバー', 'Game Over'),
+    'amb_dungeon.ogg': ('運命の大迷宮', 'The Dungeons of Doom'),
+    'amb_mines.ogg': ('ノーム鉱山', 'The Gnomish Mines'),
+    'amb_sokoban.ogg': ('倉庫番', 'Sokoban'),
+    'amb_town.ogg': ('鉱山街', 'Minetown'),
+    'amb_quest.ogg': ('クエスト', 'The Quest'),
+    'amb_gehennom.ogg': ('ゲヘナ', 'Gehennom'),
+    'amb_vlad.ogg': ('ヴラドの塔', "Vlad's Tower"),
+    'amb_wizard_tower.ogg': ('イェンダーの魔法の塔', "The Wizard's Tower"),
+    'amb_astral.ogg': ('アストラル界', 'The Astral Plane'),
+    'amb_ludios.ogg': ('狂えるクロイソスの財宝庫', 'Fort Ludios'),
+    'amb_tutorial.ogg': ('チュートリアル', 'Tutorial'),
+    'amb_oracle.ogg': ('神託所', 'The Oracle'),
+    'amb_rogue.ogg': ('ローグ階', 'The Rogue Level'),
+    'amb_bigroom.ogg': ('大部屋', 'The Big Room'),
+    'amb_medusa.ogg': ('メドゥーサの島', "Medusa's Island"),
+    'amb_castle.ogg': ('城', 'The Castle'),
+    'amb_minend.ogg': ('鉱山最下層', "Mine's End"),
+    'amb_sokoend.ogg': ('倉庫番最上階', 'Sokoban Top Level'),
+    'amb_quest_nemesis.ogg': ('クエスト宿敵の階', 'Quest Nemesis Lair'),
+    'amb_valley.ogg': ('死者の谷', 'Valley of the Dead'),
+    'amb_juiblex.ogg': ('ジュイブレクスの沼', "Juiblex's Swamp"),
+    'amb_baalzebub.ogg': ('バアルゼブルの棲家', "Baalzebub's Lair"),
+    'amb_asmodeus.ogg': ('アスモデウスの宮殿', "Asmodeus' Palace"),
+    'amb_orcus.ogg': ('オルクスの町', "Orcus' Town"),
+    'amb_fakewiz.ogg': ('偽魔法使いの塔', "Fake Wizard's Tower"),
+    'amb_sanctum.ogg': ('鮮血の聖所', "Moloch's Sanctum"),
+    'amb_plane_earth.ogg': ('土の精霊界', 'Plane of Earth'),
+    'amb_plane_air.ogg': ('風の精霊界', 'Plane of Air'),
+    'amb_plane_fire.ogg': ('火の精霊界', 'Plane of Fire'),
+    'amb_plane_water.ogg': ('水の精霊界', 'Plane of Water'),
+    'amb_ascension.ogg': ('昇天', 'Ascension'),
+    // 部屋BGM・テーマ部屋BGM
+    'amb_in_a_shop.ogg': ('店', 'Shop'),
+    'amb_inside_temple.ogg': ('寺院', 'Temple'),
+    'amb_inside_vault.ogg': ('金庫室', 'Vault'),
+    'amb_inside_leprehall.ogg': ('レプラコーンの広間', 'Leprechaun Hall'),
+    'amb_approaching_oracle.ogg': ('デルフィの神託所', 'Delphi Oracle Room'),
+    'amb_in_a_court.ogg': ('玉座の間', 'Throne Room'),
+    'amb_in_a_barracks.ogg': ('兵舎', 'Barracks'),
+    'amb_in_a_zoo.ogg': ('モンスター動物園', 'Monster Zoo'),
+    'amb_in_a_beehive.ogg': ('蜂の巣', 'Beehive'),
+    'amb_inside_anthole.ogg': ('アリの巣', 'Ant Hole'),
+    'amb_in_cemetery.ogg': ('墓地', 'Graveyard'),
+    'amb_in_a_cockatrice_nest.ogg': ('コカトリスの巣', 'Cockatrice Nest'),
+    'amb_in_a_lemure_pit.ogg': ('レムレースの穴', 'Lemure Pit'),
+    'amb_in_a_migot_nest.ogg': ('ミ＝ゴの巣', 'Mi-Go Nest'),
+    'amb_in_a_black_market.ogg': ('闇市場', 'Black Market'),
+    'amb_inside_morgue.ogg': ('死体安置所', 'Morgue'),
+    'amb_inside_armory.ogg': ('武器庫', 'Armory'),
+    'amb_inside_pool.ogg': ('泉・水泳場', 'Pool Room'),
+    'amb_inside_garden.ogg': ('庭園', 'Garden'),
+    'amb_inside_library.ogg': ('図書館', 'Library'),
+    'amb_inside_nymph_garden.ogg': ('ニンフの園', 'Nymph Garden'),
+    'amb_theme_boulder_room.ogg': ('巨石の部屋', 'Boulder Room'),
+    'amb_theme_trap_room.ogg': ('トラップの部屋', 'Trap Room'),
+    'amb_theme_buried_treasure.ogg': ('埋没財宝の部屋', 'Buried Treasure Room'),
+    'amb_theme_buried_zombies.ogg': ('蠢く土葬室', 'Buried Zombies Room'),
+    'amb_theme_massacre.ogg': ('大虐殺跡', 'Massacre Site'),
+    'amb_theme_statuary.ogg': ('彫像展示室', 'Statuary'),
+    'amb_theme_light_source.ogg': ('暗闇の灯火', 'Light Source Room'),
+    'amb_theme_temple_of_the_gods.ogg': ('三神の合祀殿', 'Temple of the Gods'),
+    'amb_theme_ghost_adventurer.ogg': ('冒険者の亡霊', 'Ghost of an Adventurer Room'),
+    'amb_theme_storeroom.ogg': ('物置部屋', 'Storeroom'),
+    'amb_theme_teleport_hub.ogg': ('テレポート中枢室', 'Teleportation Hub'),
+    'amb_theme_mausoleum.ogg': ('霊廟', 'Mausoleum'),
+    'amb_theme_pillars.ogg': ('列柱の間', 'Pillars Room'),
+    'amb_theme_fake_delphi.ogg': ('偽神託所', 'Fake Delphi'),
+  };
+
+  /// BGMファイル名に対応するフロア名・部屋名を取得する
+  static String getBgmTitle(String fileName, {bool isEnglish = false, String description = ''}) {
+    final cleanName = fileName.trim();
+    final entry = bgmFloorAndRoomTitles[cleanName];
+    if (entry != null) {
+      return isEnglish ? entry.$2 : entry.$1;
+    }
+    // マップにない場合のフォールバック: Description の先頭から抽出
+    if (description.isNotEmpty) {
+      final parenMatch = RegExp(r'^(.*?)[（\(](.*?)[）\)]').firstMatch(description);
+      if (parenMatch != null) {
+        return isEnglish ? parenMatch.group(2)!.trim() : parenMatch.group(1)!.trim();
+      }
+      final periodIdx = description.indexOf('。');
+      if (periodIdx != -1) {
+        return description.substring(0, periodIdx).trim();
+      }
+    }
+    return cleanName;
   }
 
   /// サービス名に応じた代表URLの正規化

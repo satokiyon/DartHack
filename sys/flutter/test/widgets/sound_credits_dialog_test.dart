@@ -77,4 +77,50 @@ License:     Pixabay Content License（商用可・ゲーム組込可・クレ�
     await tester.pump(); // SnackBar アニメーション開始
     expect(find.text('URLをクリップボードにコピーしました'), findsOneWidget);
   });
+
+  testWidgets('SoundCreditsDialog displays BGM accordion and triggers BGM preview on tap', (tester) async {
+    const sampleWithBgm = '''
+File:        amb_dungeon.ogg
+Description: メインダンジョンの探索曲
+Source:      PeriTune (https://peritune.com/)
+Author:      Seiko
+License:     CC-BY 4.0
+-------------------------------------------------------
+File:        se_coin.ogg
+Description: コインの音
+Source:      効果音ラボ (https://soundeffect-lab.info/)
+Author:      効果音ラボ
+License:     効果音ラボ利用規約
+''';
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        locale: Locale('ja'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: SoundCreditsDialog(initialText: sampleWithBgm),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // PeriTune カード内に使用BGM一覧アコーディオンが表示されること
+    expect(find.text('使用BGM一覧 (1曲)'), findsOneWidget);
+
+    // 効果音ラボカードにはBGM一覧が表示されないこと
+    expect(find.byKey(const ValueKey<String>('bgm_expansion_効果音ラボ')), findsNothing);
+
+    // アコーディオンを展開
+    await tester.tap(find.text('使用BGM一覧 (1曲)'));
+    await tester.pumpAndSettle();
+
+    // フロア名・部屋名（「運命の大迷宮」）とファイル名が表示されること
+    expect(find.text('運命の大迷宮'), findsOneWidget);
+    expect(find.textContaining('amb_dungeon.ogg'), findsOneWidget);
+
+    // 再生アイコンが表示されること
+    expect(find.byIcon(Icons.play_circle_outline), findsOneWidget);
+  });
 }

@@ -369,7 +369,7 @@ class NetHackFfi {
           .lookup<NativeFunction<SetAutosaveSettingsFunc>>('flutter_set_autosave_settings')
           .asFunction<SetAutosaveSettingsDart>();
     } catch (e) {
-      setAutosaveSettings = (_, __) {};
+      setAutosaveSettings = (_, _) {};
     }
 
     try {

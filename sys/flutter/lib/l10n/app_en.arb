@@ -357,6 +357,9 @@
   "soundCreditsAuthor": "Author: {name}",
   "soundCreditsItemsCount": "{count} items",
   "soundCreditsCopiedUrl": "URL copied to clipboard",
+  "soundCreditsBgmList": "BGM Tracks ({count})",
+  "soundCreditsPlay": "Play",
+  "soundCreditsStop": "Stop",
 
   "editDefaultsTitle": "Edit defaults.nh",
   "saveTooltip": "Save",

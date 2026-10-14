@@ -1078,6 +1078,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get soundCreditsCopiedUrl => 'URL copied to clipboard';
 
   @override
+  String soundCreditsBgmList(Object count) {
+    return 'BGM Tracks ($count)';
+  }
+
+  @override
+  String get soundCreditsPlay => 'Play';
+
+  @override
+  String get soundCreditsStop => 'Stop';
+
+  @override
   String get editDefaultsTitle => 'Edit defaults.nh';
 
   @override

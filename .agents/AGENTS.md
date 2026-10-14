@@ -1,4 +1,4 @@
-﻿<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. -->
 # NetHackJP Android 開発・ビルドに関する追加ルール
 
 NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下の制約とトラブルシューティング知識を遵守してください。
@@ -84,11 +84,14 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
   2. 文字コードの混在（CP437、UTF-8、EUC-JP等）による文字化けを防ぐため、文字列を FFI に渡す前に C 側（`convert_cp437_to_utf8`）で自動的に正しい UTF-8 文字列へリアルタイムに変換して渡す設計を徹底してください。
   3. Dart 側でも、フォーマットの不整合によるクラッシュを防ぐため、`allowMalformed: true` を指定した損失あり UTF-8 デコード（`_utf8DecodeLossy`）を防御層として実装してください。
 
-## 12. Flutter ListTile と ColoredBox のアサーション例外の回避
+## 12. Flutter ListTile と Material のアサーション例外回避および装飾原則
 - **現象**:
-  Flutter の `ListTile` はスプラッシュやインク効果を描画するために `Material` の祖先ウィジェットを必要とするため、`ColoredBox` や背景色を持った `Container` などの直下でそのまま使用すると「ListTile background color or ink splashes may be invisible」アサーション例外で落ちます。
+  1. Flutter の `ListTile` はスプラッシュやインク効果を描画するために `Material` の祖先ウィジェットを必要とするため、`ColoredBox` や背景色を持った `Container` などの直下でそのまま使用すると「ListTile background color or ink splashes may be invisible」アサーション例外で落ちます。
+  2. また、`Material` ウィジェットで角丸や外枠を設定する際、`shape: RoundedRectangleBorder(borderRadius: ...)` と `borderRadius: ...` 引数を同時に指定すると、`assert(!(shape != null && borderRadius != null))` に抵触して赤画面クラッシュが発生します。
 - **対策**:
-  メニュー選択オーバーレイ等で `ListTile` を使用する場合は、必ず `ListTile` を `Material(color: Colors.transparent)` でラップする設計を徹底してください。
+  1. メニュー選択オーバーレイ等で背景色を持たない `ListTile` を使用する場合は、必ず `ListTile` を `Material(color: Colors.transparent)` でラップする設計を徹底してください。
+  2. 背景色や枠線・角丸を付与したタップ可能なタイルUIを構築する際は、`shape` または `borderRadius` のいずれか一方のみを指定し、直接 `Material(color: ..., shape: RoundedRectangleBorder(...), child: ListTile(...))` で囲むパターンを標準としてください。
+
 
 ## 13. Flutter InteractiveViewer によるスクロールロック回避とズーム率維持の原則
 - **巨大キャンバス化によるスクロールロック無効化**:
@@ -300,3 +303,15 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
 4. **Windows PowerShell スクリプト（*.ps1）の UTF-8 with BOM & CRLF 保存原則**:
    - Windows PowerShell 5.1 環境では、スクリプト内に全角文字（日本語コメントやログメッセージ等）が含まれる場合、BOM なしの UTF-8 で保存すると Shift-JIS (CP932) として解釈され、終端の中括弧 `}` 等の構文解析が破損して `Missing closing '}' in statement block` エラーが発生します。
    - そのため、PowerShell スクリプト（特に `sync_dat_assets.ps1` 等のビルド・同期スクリプト）を新規作成または編集する際は、必ず **UTF-8 with BOM (`[System.Text.UTF8Encoding($true)]`) かつ改行コード CRLF (`\r\n`)** で保存することを徹底してください。
+
+## 47. Flutter BGMプレビュー試聴におけるライフサイクル排他制御とダイアログ内無音停止原則
+
+1. **ライフサイクル復帰におけるプレビュー排他制御と本編BGM誤爆防止**:
+   - クレジット画面やサウンドテスト等のモーダルダイアログで BGM プレビュー（試聴）を行っている最中、通知バー引き下げやタスク切り替えによってアプリのライフサイクルが `inactive` → `resumed` へ遷移した際、`SoundManager.resumeFromBackground()` が本編フロアBGMを誤って再開してプレビュー音源と二重再生される不具合を防止する必要があります。
+   - `SoundManager` においてプレビュー試聴中（`_currentPreviewBgm != null`）の場合、`pauseForBackground()` 時に本編BGM（フロア／部屋／環境音）の再開フラグを立てず、プレビュープレイヤー専用の再開フラグ（`_previewWasPlayingBeforeBackground`）のみを記録してください。
+   - `resumeFromBackground()` 時もプレビューがアクティブであった場合は、本編BGMの再開処理を完全にスキップし、プレビュープレイヤーのみを再開する排他制御を徹底してください。
+
+2. **ダイアログ内操作とダイアログ終了時の責務分離（無音停止原則）**:
+   - ダイアログ内での停止操作（停止ボタン押下、再生中タイルの再タップ、別曲への切り替え）では、`stopPreviewBgm(restorePrevious: false)` による「無音停止」を徹底してください。
+   - 本編BGMの中断復帰（`stopPreviewBgm(restorePrevious: true)`）は、ダイアログの `dispose()`（破棄時）に厳密に一元化し、ダイアログ表示中に意図せず本編BGMが鳴り出す事故を防止してください。
+

@@ -48,7 +48,7 @@ void main() {
 
     test('半角と全角が混在した場合も正確に100バイト以内に収まる', () {
       // 'あ' * 33 (99バイト) + 'a' (1バイト) = 100バイト
-      final mixedText = ('あ' * 33) + 'a' + 'あ'; // 103バイト
+      final mixedText = '${'あ' * 33}aあ'; // 103バイト
       final oldValue = TextEditingValue.empty;
       final newValue = TextEditingValue(
         text: mixedText,
@@ -56,7 +56,7 @@ void main() {
       );
 
       final result = formatter.formatEditUpdate(oldValue, newValue);
-      expect(result.text, equals(('あ' * 33) + 'a'));
+      expect(result.text, equals('${'あ' * 33}a'));
       expect(utf8.encode(result.text).length, equals(100));
     });
   });

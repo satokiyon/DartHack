@@ -69,6 +69,42 @@ License:     CC-BY 4.0
       }
     });
 
+    test('parseSources で BGM が正しく抽出され、環境音は除外される', () {
+      final sources = SoundCreditParser.parseSources(sampleText);
+      final periTune = sources.firstWhere((s) => s.sourceName == 'PeriTune');
+      expect(periTune.bgmEntries.length, 1);
+      expect(periTune.bgmEntries.first.fileName, 'amb_dungeon.ogg');
+
+      final gemini = sources.firstWhere((s) => s.sourceName == 'Google Gemini (AI生成)');
+      expect(gemini.bgmEntries.length, 1);
+      expect(gemini.bgmEntries.first.fileName, 'amb_theme_fake_delphi.ogg');
+
+      // 効果音のみの提供元は bgmEntries が空であること
+      final soundLab = sources.firstWhere((s) => s.sourceName == '効果音ラボ');
+      expect(soundLab.bgmEntries, isEmpty);
+    });
+
+    test('getBgmTitle による日本語・英語のフロア名・部屋名の取得が正しく動作する', () {
+      expect(SoundCreditParser.getBgmTitle('amb_dungeon.ogg'), '運命の大迷宮');
+      expect(SoundCreditParser.getBgmTitle('amb_dungeon.ogg', isEnglish: true), 'The Dungeons of Doom');
+
+      expect(SoundCreditParser.getBgmTitle('amb_oracle.ogg'), '神託所');
+      expect(SoundCreditParser.getBgmTitle('amb_oracle.ogg', isEnglish: true), 'The Oracle');
+
+      expect(SoundCreditParser.getBgmTitle('amb_theme_statuary.ogg'), '彫像展示室');
+      expect(SoundCreditParser.getBgmTitle('amb_theme_statuary.ogg', isEnglish: true), 'Statuary');
+
+      // 未知のBGMファイルの場合は Description からフォールバック抽出
+      expect(
+        SoundCreditParser.getBgmTitle('amb_unknown.ogg', description: '秘密の地下室（Secret Basement）。不穏な足音。'),
+        '秘密の地下室',
+      );
+      expect(
+        SoundCreditParser.getBgmTitle('amb_unknown.ogg', isEnglish: true, description: '秘密の地下室（Secret Basement）。不穏な足音。'),
+        'Secret Basement',
+      );
+    });
+
     test('実ファイル assets/sounds/attributions.txt からの集約カード一覧生成で「その他」が存在しない', () {
       final file = File('assets/sounds/attributions.txt');
       if (!file.existsSync()) {
@@ -89,6 +125,12 @@ License:     CC-BY 4.0
         expect(s.license, isNot('Unknown'));
         expect(s.url, isNotEmpty);
         expect(s.url.startsWith('http'), isTrue);
+
+        // 各BGMエントリに環境音が含まれていないこと
+        for (final bgm in s.bgmEntries) {
+          expect(SoundCreditParser.terrainAmbienceFiles.contains(bgm.fileName), isFalse);
+          expect(bgm.fileName.startsWith('amb_'), isTrue);
+        }
       }
     });
   });

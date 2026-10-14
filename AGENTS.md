@@ -1257,3 +1257,25 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
 
 3. **持ち物一覧（"i"）から後続アクションへの個数引き継ぎ**:
    - 持ち物一覧からアイテムを選んで別のアクション（置く、投げる、矢筒、浸す等）を実行する機能では、C コア側で選択個数を一時保持（`set_itemactions_count`）し、各アクションのキー発行時に `s_iactions_count > 0 && s_iactions_count < otmp->quan` であれば `cmdq_add_int(CQ_CANNED, s_iactions_count)` をコマンドキューへプッシュして個数を引き継いでください。
+
+## 47. Flutter BGMプレビュー試聴におけるライフサイクル排他制御とダイアログ内無音停止原則
+
+1. **ライフサイクル復帰におけるプレビュー排他制御と本編BGM誤爆防止**:
+   - クレジット画面やサウンドテスト等のモーダルダイアログで BGM プレビュー（試聴）を行っている最中、通知バー引き下げやタスク切り替えによってアプリのライフサイクルが `inactive` → `resumed` へ遷移した際、`SoundManager.resumeFromBackground()` が本編フロアBGMを誤って再開してプレビュー音源と二重再生される不具合を防止する必要があります。
+   - `SoundManager` においてプレビュー試聴中（`_currentPreviewBgm != null`）の場合、`pauseForBackground()` 時に本編BGM（フロア／部屋／環境音）の再開フラグを立てず、プレビュープレイヤー専用の再開フラグ（`_previewWasPlayingBeforeBackground`）のみを記録してください。
+   - `resumeFromBackground()` 時もプレビューがアクティブであった場合は、本編BGMの再開処理を完全にスキップし、プレビュープレイヤーのみを再開する排他制御を徹底してください。
+
+2. **ダイアログ内操作とダイアログ終了時の責務分離（無音停止原則）**:
+   - ダイアログ内での停止操作（停止ボタン押下、再生中タイルの再タップ、別曲への切り替え）では、`stopPreviewBgm(restorePrevious: false)` による「無音停止」を徹底してください。
+   - 本編BGMの中断復帰（`stopPreviewBgm(restorePrevious: true)`）は、ダイアログの `dispose()`（破棄時）に厳密に一元化し、ダイアログ表示中に意図せず本編BGMが鳴り出す事故を防止してください。
+
+## 48. Flutter Material ウィジェットにおける shape / borderRadius 相互排他と ListTile 装飾原則
+
+1. **`shape` と `borderRadius` の同時指定禁止（アサーション例外防止）**:
+   - `Material` ウィジェットで角丸や外枠を設定する際、`shape: RoundedRectangleBorder(borderRadius: ...)` と `borderRadius: ...` 引数を同時に渡すと、Flutter フレームワーク内部の `assert(!(shape != null && borderRadius != null))` に抵触して赤画面クラッシュが発生します。
+   - 角丸や枠線を指定する場合は、`shape` または `borderRadius` のいずれか一方のみを指定してください（`shape: RoundedRectangleBorder(...)` を使用する場合は `borderRadius` 引数を絶対に渡さない）。
+
+2. **`ListTile` の装飾とインク効果の完全両立**:
+   - `ListTile` に背景色や枠線・角丸を付与する場合、外側に `Container(decoration: ...)` を配置するとインク効果（タップ時の波紋）が背面に隠れたり、祖先に `Material` がないことによるアサーション例外を誘発します。
+   - 背景色・枠線・角丸を伴うタップ可能なタイルUIを構築する際は、直接 `Material(color: ..., shape: RoundedRectangleBorder(...), child: ListTile(...))` でラップするパターンを標準としてください。
+

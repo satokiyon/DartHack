@@ -2120,6 +2120,24 @@ abstract class AppLocalizations {
   /// **'URLをクリップボードにコピーしました'**
   String get soundCreditsCopiedUrl;
 
+  /// No description provided for @soundCreditsBgmList.
+  ///
+  /// In ja, this message translates to:
+  /// **'使用BGM一覧 ({count}曲)'**
+  String soundCreditsBgmList(Object count);
+
+  /// No description provided for @soundCreditsPlay.
+  ///
+  /// In ja, this message translates to:
+  /// **'再生'**
+  String get soundCreditsPlay;
+
+  /// No description provided for @soundCreditsStop.
+  ///
+  /// In ja, this message translates to:
+  /// **'停止'**
+  String get soundCreditsStop;
+
   /// No description provided for @editDefaultsTitle.
   ///
   /// In ja, this message translates to:

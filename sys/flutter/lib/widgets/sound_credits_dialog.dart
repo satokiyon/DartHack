@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:darthack/l10n/app_localizations.dart';
 import 'package:darthack/models/sound_credit_entry.dart';
+import 'package:darthack/services/sound_manager.dart';
 
 /// BGM・効果音クレジットを閲覧するためのモーダルダイアログ
 class SoundCreditsDialog extends StatefulWidget {
@@ -25,16 +26,24 @@ class SoundCreditsDialog extends StatefulWidget {
 class _SoundCreditsDialogState extends State<SoundCreditsDialog> {
   Future<List<SoundCreditSource>>? _creditsFuture;
   bool _initialized = false;
+  bool _isEnglish = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
       final l10n = AppLocalizations.of(context);
-      final isEnglish = l10n?.localeName == 'en';
-      _creditsFuture = _loadSoundCredits(isEnglish: isEnglish);
+      _isEnglish = l10n?.localeName == 'en';
+      _creditsFuture = _loadSoundCredits(isEnglish: _isEnglish);
       _initialized = true;
     }
+  }
+
+  @override
+  void dispose() {
+    // ダイアログを閉じる際にBGM試聴を停止し、本編BGMへ安全に復帰
+    SoundManager.instance.stopPreviewBgm(restorePrevious: true);
+    super.dispose();
   }
 
   Future<List<SoundCreditSource>> _loadSoundCredits({required bool isEnglish}) async {
@@ -287,9 +296,148 @@ class _SoundCreditsDialogState extends State<SoundCreditsDialog> {
                   ),
                 ),
               ),
+
+            // 使用BGM一覧アコーディオン（BGMが存在する場合のみ表示）
+            if (source.bgmEntries.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Theme(
+                data: Theme.of(context).copyWith(
+                  dividerColor: Colors.transparent,
+                ),
+                child: Material(
+                  color: const Color(0xFF1F1F32),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.08),
+                    ),
+                  ),
+                  child: ExpansionTile(
+                    key: ValueKey<String>('bgm_expansion_${source.sourceName}'),
+                    tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                    childrenPadding: const EdgeInsets.only(bottom: 6),
+                    dense: true,
+                    leading: const Icon(Icons.music_note, color: Colors.amberAccent, size: 20),
+                    title: Text(
+                      l10n.soundCreditsBgmList(source.bgmEntries.length),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    iconColor: Colors.amberAccent,
+                    collapsedIconColor: Colors.white54,
+                    children: source.bgmEntries.map((bgm) {
+                      return _buildBgmTile(context, bgm, _isEnglish, l10n);
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
+    );
+  }
+
+  /// 個別BGMの試聴タイルUI
+  Widget _buildBgmTile(
+    BuildContext context,
+    SoundCreditEntry entry,
+    bool isEnglish,
+    AppLocalizations l10n,
+  ) {
+    final title = SoundCreditParser.getBgmTitle(
+      entry.fileName,
+      isEnglish: isEnglish,
+      description: entry.description,
+    );
+
+    return ValueListenableBuilder<String?>(
+      valueListenable: SoundManager.instance.previewBgmNotifier,
+      builder: (context, playingBgm, _) {
+        final isPlaying = playingBgm == entry.fileName;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          child: Material(
+            color: isPlaying
+                ? Colors.amber.withValues(alpha: 0.15)
+                : Colors.white.withValues(alpha: 0.04),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6),
+              side: BorderSide(
+                color: isPlaying
+                    ? Colors.amberAccent.withValues(alpha: 0.6)
+                    : Colors.white.withValues(alpha: 0.05),
+                width: isPlaying ? 1.2 : 0.6,
+              ),
+            ),
+            child: ListTile(
+              dense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+              leading: Icon(
+                isPlaying ? Icons.stop_circle : Icons.play_circle_outline,
+                color: isPlaying ? Colors.amberAccent : Colors.tealAccent,
+                size: 28,
+              ),
+              title: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: isPlaying ? Colors.amberAccent : Colors.white,
+                      ),
+                    ),
+                  ),
+                  if (isPlaying) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.amberAccent.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        l10n.soundCreditsPlay,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.amberAccent,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(
+                  entry.fileName + (entry.description.isNotEmpty ? '  •  ${entry.description}' : ''),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.white.withValues(alpha: 0.65),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              onTap: () {
+                if (isPlaying) {
+                  // ダイアログ内での停止時は本編BGMを復帰させず無音停止
+                  SoundManager.instance.stopPreviewBgm(restorePrevious: false);
+                } else {
+                  SoundManager.instance.startPreviewBgm(entry.fileName);
+                }
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }

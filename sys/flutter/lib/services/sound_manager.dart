@@ -153,6 +153,15 @@ class SoundManager {
   String? _currentAmbience;
   String? _lastAmbience;
 
+  AudioPlayer? _previewPlayer;
+  String? _currentPreviewBgm;
+  String? _savedFloorBgmBeforePreview;
+  String? _savedRoomBgmBeforePreview;
+  bool _floorWasPlayingBeforePreview = false;
+  bool _roomWasPlayingBeforePreview = false;
+  bool _previewWasPlayingBeforeBackground = false;
+  final ValueNotifier<String?> previewBgmNotifier = ValueNotifier<String?>(null);
+
   final Set<String> _availableSounds = {};
   final Map<String, DateTime> _lastPlayTimeBySound = {};
   final Set<String> _pendingDoubleStrikes = {};
@@ -200,6 +209,9 @@ class SoundManager {
   String? get currentBgm => _currentRoomBgm ?? _currentFloorBgm;
   String? get currentFloorBgm => _currentFloorBgm;
   String? get currentRoomBgm => _currentRoomBgm;
+
+  /// 現在試聴（プレビュー）再生中のBGMファイル名
+  String? get currentPreviewBgm => _currentPreviewBgm;
 
   /// デュアルフロアBGMプレイヤーのゲッター
   AudioPlayer? get _activeFloorPlayer => _activeBgmIndex == 0 ? _bgmPlayerA : _bgmPlayerB;
@@ -334,6 +346,16 @@ class SoundManager {
         await _ambiencePlayer!.setAudioContext(_defaultAudioContext);
       } catch (e, st) {
         debugPrint('[SoundMgr] Failed to set AudioContext on _ambiencePlayer: $e\n$st');
+      }
+
+      // プレビュー試聴用BGMプレイヤー
+      _previewPlayer = AudioPlayer();
+      _previewPlayer!.audioCache = AudioCache.instance;
+      await _previewPlayer!.setReleaseMode(ReleaseMode.loop);
+      try {
+        await _previewPlayer!.setAudioContext(_bgmAudioContext);
+      } catch (e, st) {
+        debugPrint('[SoundMgr] Failed to set AudioContext on _previewPlayer: $e\n$st');
       }
 
       _isInitialized = true;
@@ -813,6 +835,94 @@ class SoundManager {
     }
   }
 
+  /// サウンドクレジット等でのBGM試聴（プレビュー）開始
+  Future<void> startPreviewBgm(String filename) async {
+    if (filename.isEmpty || !hasSound(filename)) return;
+
+    // 同一曲が既に試聴再生中なら何もしない
+    if (_currentPreviewBgm == filename && _previewPlayer?.state == PlayerState.playing) {
+      return;
+    }
+
+    try {
+      // 初めてプレビューを開始する場合（未退避の場合）、本編のBGM再生状態を退避
+      if (_savedFloorBgmBeforePreview == null && _savedRoomBgmBeforePreview == null) {
+        _savedFloorBgmBeforePreview = _currentFloorBgm;
+        _savedRoomBgmBeforePreview = _currentRoomBgm;
+        _floorWasPlayingBeforePreview = (_bgmPlayerA?.state == PlayerState.playing) ||
+            (_bgmPlayerB?.state == PlayerState.playing) ||
+            (_currentFloorBgm != null && hasSound(_currentFloorBgm!));
+        _roomWasPlayingBeforePreview = (_roomBgmPlayer?.state == PlayerState.playing) ||
+            (_currentRoomBgm != null && hasSound(_currentRoomBgm!));
+      }
+
+      // 【重要】曲切り替え時も含め、本編の全BGMプレイヤーを確実に完全停止
+      if (_bgmPlayerA?.state == PlayerState.playing) {
+        await _bgmPlayerA?.stop();
+      }
+      if (_bgmPlayerB?.state == PlayerState.playing) {
+        await _bgmPlayerB?.stop();
+      }
+      if (_roomBgmPlayer?.state == PlayerState.playing) {
+        await _roomBgmPlayer?.stop();
+      }
+
+      // 既存のプレビュー再生を一旦停止
+      if (_previewPlayer?.state == PlayerState.playing) {
+        await _previewPlayer?.stop();
+      }
+
+      _currentPreviewBgm = filename;
+      previewBgmNotifier.value = filename;
+
+      if (_previewPlayer != null) {
+        await _previewPlayer!.setReleaseMode(ReleaseMode.loop);
+        await _previewPlayer!.setVolume((_muted || !_bgmEnabled) ? 0.0 : _bgmVolume);
+        await _previewPlayer!.play(AssetSource('sounds/$filename'));
+      }
+    } catch (e, st) {
+      debugPrint('[SoundMgr] Error starting preview BGM \'$filename\': $e\n$st');
+    }
+  }
+
+  /// BGM試聴（プレビュー）停止および本編BGMへの復帰
+  Future<void> stopPreviewBgm({bool restorePrevious = true}) async {
+    try {
+      if (_previewPlayer != null && _previewPlayer!.state == PlayerState.playing) {
+        await _previewPlayer!.stop();
+      }
+      _currentPreviewBgm = null;
+      previewBgmNotifier.value = null;
+
+      if (restorePrevious && !_muted && _bgmEnabled) {
+        if (_roomWasPlayingBeforePreview &&
+            _savedRoomBgmBeforePreview != null &&
+            hasSound(_savedRoomBgmBeforePreview!)) {
+          final player = _roomBgmPlayer;
+          if (player != null) {
+            _currentRoomBgm = _savedRoomBgmBeforePreview;
+            await player.setReleaseMode(ReleaseMode.loop);
+            await player.setVolume(_bgmVolume);
+            await player.play(AssetSource('sounds/$_savedRoomBgmBeforePreview'));
+          }
+        } else if (_floorWasPlayingBeforePreview &&
+            _savedFloorBgmBeforePreview != null &&
+            hasSound(_savedFloorBgmBeforePreview!)) {
+          await _playFloorBgmDirect(_savedFloorBgmBeforePreview!, _bgmVolume);
+        }
+      }
+    } catch (e, st) {
+      debugPrint('[SoundMgr] Error stopping preview BGM: $e\n$st');
+    } finally {
+      if (restorePrevious) {
+        _savedFloorBgmBeforePreview = null;
+        _savedRoomBgmBeforePreview = null;
+        _floorWasPlayingBeforePreview = false;
+        _roomWasPlayingBeforePreview = false;
+      }
+    }
+  }
+
   /// 環境音（アンビエンス）の再生制御
   Future<void> _playAmbience(String filename, int proximity, int action) async {
     if (action == 2 || filename.isEmpty) {
@@ -920,6 +1030,9 @@ class SoundManager {
     if (_roomBgmPlayer != null && _roomBgmPlayer!.state == PlayerState.playing) {
       _roomBgmPlayer!.setVolume(_bgmVolume);
     }
+    if (_previewPlayer != null && _previewPlayer!.state == PlayerState.playing) {
+      _previewPlayer!.setVolume(_bgmVolume);
+    }
   }
 
   /// スライダー操作完了時等の永続化付きBGM音量設定
@@ -1025,20 +1138,31 @@ class SoundManager {
       }
       _isPausedForBackground = true;
 
-      // PlayerState.playing のほか、OSの省電力制御等で先行して一時停止されていた場合
-      // （明示的に stopBgm / stopAmbience されておらず有効なサウンド名が存在する場合）も再開対象とする
-      _floorWasPlayingBeforeBackground =
-          (_activeFloorPlayer?.state == PlayerState.playing) ||
-              (_currentFloorBgm != null && hasSound(_currentFloorBgm!));
-      if (_activeFloorPlayer?.state == PlayerState.playing) {
-        await _activeFloorPlayer?.pause();
-      }
+      // プレビュー試聴中の場合のハンドリング（本編BGMは誤爆させない）
+      if (_currentPreviewBgm != null) {
+        _previewWasPlayingBeforeBackground = (_previewPlayer?.state == PlayerState.playing);
+        if (_previewPlayer?.state == PlayerState.playing) {
+          await _previewPlayer?.pause();
+        }
+        _floorWasPlayingBeforeBackground = false;
+        _roomWasPlayingBeforeBackground = false;
+      } else {
+        _previewWasPlayingBeforeBackground = false;
+        // PlayerState.playing のほか、OSの省電力制御等で先行して一時停止されていた場合
+        // （明示的に stopBgm / stopAmbience されておらず有効なサウンド名が存在する場合）も再開対象とする
+        _floorWasPlayingBeforeBackground =
+            (_activeFloorPlayer?.state == PlayerState.playing) ||
+                (_currentFloorBgm != null && hasSound(_currentFloorBgm!));
+        if (_activeFloorPlayer?.state == PlayerState.playing) {
+          await _activeFloorPlayer?.pause();
+        }
 
-      _roomWasPlayingBeforeBackground =
-          (_roomBgmPlayer?.state == PlayerState.playing) ||
-              (_currentRoomBgm != null && hasSound(_currentRoomBgm!));
-      if (_roomBgmPlayer?.state == PlayerState.playing) {
-        await _roomBgmPlayer?.pause();
+        _roomWasPlayingBeforeBackground =
+            (_roomBgmPlayer?.state == PlayerState.playing) ||
+                (_currentRoomBgm != null && hasSound(_currentRoomBgm!));
+        if (_roomBgmPlayer?.state == PlayerState.playing) {
+          await _roomBgmPlayer?.pause();
+        }
       }
 
       _ambienceWasPlayingBeforeBackground =
@@ -1049,7 +1173,7 @@ class SoundManager {
       }
 
       debugPrint(
-          '[SoundMgr] pauseForBackground executed (floor: $_floorWasPlayingBeforeBackground, room: $_roomWasPlayingBeforeBackground, amb: $_ambienceWasPlayingBeforeBackground)');
+          '[SoundMgr] pauseForBackground executed (floor: $_floorWasPlayingBeforeBackground, room: $_roomWasPlayingBeforeBackground, amb: $_ambienceWasPlayingBeforeBackground, preview: $_previewWasPlayingBeforeBackground)');
     } catch (e, st) {
       debugPrint('[SoundMgr] Error during pauseForBackground: $e\n$st');
     }
@@ -1064,25 +1188,37 @@ class SoundManager {
         return;
       }
       debugPrint(
-          '[SoundMgr] resumeFromBackground executing (floor: $_floorWasPlayingBeforeBackground, room: $_roomWasPlayingBeforeBackground, amb: $_ambienceWasPlayingBeforeBackground)');
+          '[SoundMgr] resumeFromBackground executing (floor: $_floorWasPlayingBeforeBackground, room: $_roomWasPlayingBeforeBackground, amb: $_ambienceWasPlayingBeforeBackground, preview: $_previewWasPlayingBeforeBackground)');
 
       // ミュート中やカテゴリ無効化中は再開しない
       if (!_muted && _bgmEnabled) {
-        // ルームBGM再生中だった場合はルームBGMを優先再開
-        if (_roomWasPlayingBeforeBackground &&
-            _currentRoomBgm != null &&
-            hasSound(_currentRoomBgm!)) {
-          final player = _roomBgmPlayer;
+        if (_previewWasPlayingBeforeBackground &&
+            _currentPreviewBgm != null &&
+            hasSound(_currentPreviewBgm!)) {
+          // プレビュー試聴中だった場合はプレビュープレイヤーのみ再開（本編BGMは絶対に鳴らさない）
+          final player = _previewPlayer;
           if (player != null) {
             await player.setReleaseMode(ReleaseMode.loop);
             await player.setVolume(_bgmVolume);
-            await player.play(AssetSource('sounds/$_currentRoomBgm'));
+            await player.play(AssetSource('sounds/$_currentPreviewBgm'));
           }
-        } else if (_floorWasPlayingBeforeBackground &&
-            _currentFloorBgm != null &&
-            hasSound(_currentFloorBgm!)) {
-          // フロアBGM再生中だった場合はフロアBGMを直接再開（resume()は完全排除）
-          await _playFloorBgmDirect(_currentFloorBgm!, _bgmVolume);
+        } else if (_currentPreviewBgm == null) {
+          // プレビュー試聴中でない通常時のみ本編BGMを復帰
+          if (_roomWasPlayingBeforeBackground &&
+              _currentRoomBgm != null &&
+              hasSound(_currentRoomBgm!)) {
+            final player = _roomBgmPlayer;
+            if (player != null) {
+              await player.setReleaseMode(ReleaseMode.loop);
+              await player.setVolume(_bgmVolume);
+              await player.play(AssetSource('sounds/$_currentRoomBgm'));
+            }
+          } else if (_floorWasPlayingBeforeBackground &&
+              _currentFloorBgm != null &&
+              hasSound(_currentFloorBgm!)) {
+            // フロアBGM再生中だった場合はフロアBGMを直接再開（resume()は完全排除）
+            await _playFloorBgmDirect(_currentFloorBgm!, _bgmVolume);
+          }
         }
       }
       if (!_muted && _ambienceEnabled) {
@@ -1104,6 +1240,7 @@ class SoundManager {
       _floorWasPlayingBeforeBackground = false;
       _roomWasPlayingBeforeBackground = false;
       _ambienceWasPlayingBeforeBackground = false;
+      _previewWasPlayingBeforeBackground = false;
     }
   }
 
@@ -1120,6 +1257,7 @@ class SoundManager {
     }
     await stopBgm();
     await stopAmbience();
+    await stopPreviewBgm(restorePrevious: false);
   }
 
   void dispose() {
@@ -1135,10 +1273,21 @@ class SoundManager {
     _roomBgmPlayer = null;
     _ambiencePlayer?.dispose();
     _ambiencePlayer = null;
+    _previewPlayer?.dispose();
+    _previewPlayer = null;
+    _currentPreviewBgm = null;
+    previewBgmNotifier.value = null;
     _lastPlayTimeBySound.clear();
     _pendingDoubleStrikes.clear();
     _ambientCombatSePlayTimes.clear();
     _isInitialized = false;
+  }
+
+  /// テスト用: プレビュープレイヤーのモック設定
+  @visibleForTesting
+  void initPreviewPlayerForTest(AudioPlayer player) {
+    _previewPlayer?.dispose();
+    _previewPlayer = player;
   }
 
   /// テスト用: サウンド利用可能状態の登録
