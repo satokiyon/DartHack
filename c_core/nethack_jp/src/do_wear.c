@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14. */
 /* NetHack 5.0	do_wear.c	$NHDT-Date: 1781973047 2026/06/20 16:30:47 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.212 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1851,7 +1851,7 @@ dotakeoff(void)
             pline_The("%sはあなたの皮膚と一体化した!",
                       uskin->otyp >= GRAY_DRAGON_SCALES
                           ? "ドラゴンの鱗"
-                          : "ドラゴンスケイルメイル");
+                          : "ドラゴンの鱗鎧");
         else
             pline("防具も装身具も身に着けていない.");
         return ECMD_OK;

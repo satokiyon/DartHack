@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14. */
 /* NetHack 5.0	vmsconf.h	$NHDT-Date: 1781973090 2026/06/20 16:31:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -18,7 +18,7 @@
  *   extra room for patching longer values into an existing executable.
  */
 #define Local_WIZARD "NHWIZARD\0\0\0\0"
-#define Local_HACKDIR "DISK$USERS:[GAMES.NETHACK.3_7_X.PLAY]\0\0\0\0\0\0\0\0"
+#define Local_HACKDIR "DISK$USERS:[GAMES.NETHACK.PLAY]\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
 /*
  * This section cleans up the stuff done in config.h so that it

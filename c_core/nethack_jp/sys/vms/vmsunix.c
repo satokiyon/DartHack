@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14. */
 /* NetHack 5.0	vmsunix.c	$NHDT-Date: 1685522050 2023/05/31 08:34:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -630,7 +631,7 @@ vms_get_saved_games(
             if (filename[l - 1] != ' ')
                 break;
         filename[l] = '\0';
-        if ((charname = plname_from_file(filename, FALSE)) != 0)
+        if ((charname = plname_from_file(filename, FALSE, 0)) != 0)
             savefile(charname, count++, &asize, outarray);
     }
     (void) lib$find_file_end(&context);

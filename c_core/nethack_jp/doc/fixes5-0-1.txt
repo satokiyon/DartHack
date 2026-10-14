@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14.
 NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.36 $ $NHDT-Date: 1781062909 2026/06/09 19:41:49 $
 	
 General Fixes and Modified Features
@@ -80,6 +80,20 @@ stethoscope applied to one monster disguised as another (double-trouble Wizard)
 	064523e162f8e30bdb76186a854b9d8958f3b340)
 mon_offmap() and place_monster() needed to operate on the same mstate bits
 food_disappears() needed to include a tin check
+cmdstr[] buffer was not being initialized in handler_rebind_keys_add()
+don't catch thrown objects while asleep
+don't refer to pet as "Your pet" until after the taming process has finished
+checkpoint fixes (pr #1660 by k21971)
+upon return to a level, catch up on remaining nutrition value by the same
+	percentage as the catch up for the weight
+after polymorph or revival from corpse, monsters were not interacting with
+	the terrain until that monster's next move
+fix undead corpses (zombies, etc.) now being edible
+alias rings of constitution, strength, and damage, spellbook/scroll of
+	identification, amulet of flight
+pets left on another level no longer have their hunger postponed by the
+	time spent away
+make probing reveal egg type in inventory
 
 
 Platform- and/or Interface-Specific Fixes

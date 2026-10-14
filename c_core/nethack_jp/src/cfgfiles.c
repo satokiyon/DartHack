@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14. */
 /* NetHack 5.0	cfgfiles.c	$NHDT-Date: 1781973042 2026/06/20 16:30:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -2020,7 +2020,7 @@ disregard_this_config_statement(int statement_idx)
 }
 
 void
-clear_ignore_errors_on_unmatched(void)
+clear_ignore_errors_on_unmatch(void)
 {
     ignore_errors_on_unmatched = FALSE;
 }
@@ -2051,7 +2051,7 @@ rcfile_interface_options(void)
     heed_all_options();
     disregard_this_option(opt_windowtype);
     disregard_this_option(opt_soundlib);
-    clear_ignore_errors_on_unmatched();
+    clear_ignore_errors_on_unmatch();
     ignore_statement_errors = FALSE;
 }
 
@@ -2067,7 +2067,7 @@ rcfile_only_this_option(enum opt heeded_option)
     rcfile();
     heed_all_config_statements();
     heed_all_options();
-    clear_ignore_errors_on_unmatched();
+    clear_ignore_errors_on_unmatch();
     ignore_statement_errors = FALSE;
 }
 
@@ -2083,7 +2083,7 @@ rcfile_only_this_statement(int statementid)
     rcfile();
     heed_all_config_statements();
     heed_all_options();
-    clear_ignore_errors_on_unmatched();
+    clear_ignore_errors_on_unmatch();
     ignore_statement_errors = FALSE;
 }
 
@@ -2117,7 +2117,7 @@ portable_sysconf_only_this_statement(int statementid)
             config_error_done();
             heed_all_config_statements();
             heed_all_options();
-            clear_ignore_errors_on_unmatched();
+            clear_ignore_errors_on_unmatch();
             ignore_statement_errors = FALSE;
             if (sysopt.portable_device_paths) {
                 Snprintf(portable_device_path, sizeof portable_device_path,
@@ -2187,7 +2187,7 @@ rcfile_only_some_mswin_options(void)
     rcfile();
     heed_all_config_statements();
     heed_all_options();
-    clear_ignore_errors_on_unmatched();
+    clear_ignore_errors_on_unmatch();
     ignore_statement_errors = FALSE;
 }
 #endif /* MSWIN_GRAPHICS */

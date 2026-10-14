@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-06.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14.
                          脅威の迷宮へのガイド
                         (NetHackガイドブック)
 
@@ -2455,7 +2455,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-1
 
           以下は、各鎧が提供するACの値のリストです。
 
-               1 : ドラゴン鱗鎧
+               1 : ドラゴンの鱗鎧
 
                3 : 鋼鉄の鎧、水晶の鎧
 
@@ -2465,7 +2465,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-1
 
                6 : 鱗の鎧、オークの鎖かたびら
 
-               7 : 鉄環の鎧、鋲付き革鎧、ドラゴン鱗
+               7 : 鉄環の鎧、鋲付き革鎧、ドラゴンの鱗
                
                8 : 革鎧、オークの鉄環の鎧
                

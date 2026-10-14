@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -40,13 +40,13 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [BELL] = "ベル",
     [BELL_OF_OPENING] = "開放の鐘",
     [BILL_GUISARME] = "ビル・ギザルム",
-    [BLACK_DRAGON_SCALE_MAIL] = "黒色ドラゴン鱗鎧",
-    [BLACK_DRAGON_SCALES] = "黒色ドラゴン鱗",
+    [BLACK_DRAGON_SCALE_MAIL] = "黒色ドラゴンの鱗鎧",
+    [BLACK_DRAGON_SCALES] = "黒色ドラゴンの鱗",
     [BLACK_OPAL] = "黒オパール",
     [BLINDFOLD] = "目隠し",
     [BLINDING_VENOM] = "目潰しの毒液",
-    [BLUE_DRAGON_SCALE_MAIL] = "青色ドラゴン鱗鎧",
-    [BLUE_DRAGON_SCALES] = "青色ドラゴン鱗",
+    [BLUE_DRAGON_SCALE_MAIL] = "青色ドラゴンの鱗鎧",
+    [BLUE_DRAGON_SCALES] = "青色ドラゴンの鱗",
     [BOOMERANG] = "ブーメラン",
     [BOULDER] = "巨大な岩",
     [BOW] = "弓",
@@ -131,14 +131,14 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [GLOB_OF_BROWN_PUDDING] = "茶色プリンの塊",
     [GLOB_OF_GRAY_OOZE] = "灰色ウーズの塊",
     [GLOB_OF_GREEN_SLIME] = "緑スライムの塊",
-    [GOLD_DRAGON_SCALE_MAIL] = "金色ドラゴン鱗鎧",
-    [GOLD_DRAGON_SCALES] = "金色ドラゴン鱗",
+    [GOLD_DRAGON_SCALE_MAIL] = "金色ドラゴンの鱗鎧",
+    [GOLD_DRAGON_SCALES] = "金色ドラゴンの鱗",
     [GOLD_PIECE] = "金貨",
     [GRAPPLING_HOOK] = "ひっかけ棒",
-    [GRAY_DRAGON_SCALE_MAIL] = "灰色ドラゴン鱗鎧",
-    [GRAY_DRAGON_SCALES] = "灰色ドラゴン鱗",
-    [GREEN_DRAGON_SCALE_MAIL] = "緑色ドラゴン鱗鎧",
-    [GREEN_DRAGON_SCALES] = "緑色ドラゴン鱗",
+    [GRAY_DRAGON_SCALE_MAIL] = "灰色ドラゴンの鱗鎧",
+    [GRAY_DRAGON_SCALES] = "灰色ドラゴンの鱗",
+    [GREEN_DRAGON_SCALE_MAIL] = "緑色ドラゴンの鱗鎧",
+    [GREEN_DRAGON_SCALES] = "緑色ドラゴンの鱗",
     [GUISARME] = "ギザルム",
     [HALBERD] = "ハルバード",
     [HAWAIIAN_SHIRT] = "アロハシャツ",
@@ -203,8 +203,8 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [OILSKIN_SACK] = "防水袋",
     [OPAL] = "オパール",
     [ORANGE] = "オレンジ",
-    [ORANGE_DRAGON_SCALE_MAIL] = "橙色ドラゴン鱗鎧",
-    [ORANGE_DRAGON_SCALES] = "橙色ドラゴン鱗",
+    [ORANGE_DRAGON_SCALE_MAIL] = "橙色ドラゴンの鱗鎧",
+    [ORANGE_DRAGON_SCALES] = "橙色ドラゴンの鱗",
     [ORCISH_ARROW] = "オークの矢",
     [ORCISH_BOW] = "オークの弓",
     [ORCISH_CHAIN_MAIL] = "オークの鎖かたびら",
@@ -248,8 +248,8 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [POT_WATER] = "水",
     [QUARTERSTAFF] = "六尺棒",
     [RANSEUR] = "ランサー",
-    [RED_DRAGON_SCALE_MAIL] = "赤色ドラゴン鱗鎧",
-    [RED_DRAGON_SCALES] = "赤色ドラゴン鱗",
+    [RED_DRAGON_SCALE_MAIL] = "赤色ドラゴンの鱗鎧",
+    [RED_DRAGON_SCALES] = "赤色ドラゴンの鱗",
     [RIN_ADORNMENT] = "飾りの指輪",
     [RIN_AGGRAVATE_MONSTER] = "反感の指輪",
     [RIN_COLD_RESISTANCE] = "耐冷の指輪",
@@ -320,8 +320,8 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [SHURIKEN] = "手裏剣",
     [SILVER_ARROW] = "銀の矢",
     [SILVER_DAGGER] = "銀の短剣",
-    [SILVER_DRAGON_SCALE_MAIL] = "銀色ドラゴン鱗鎧",
-    [SILVER_DRAGON_SCALES] = "銀色ドラゴン鱗",
+    [SILVER_DRAGON_SCALE_MAIL] = "銀色ドラゴンの鱗鎧",
+    [SILVER_DRAGON_SCALES] = "銀色ドラゴンの鱗",
     [SILVER_MACE] = "銀のメイス",
     [SILVER_SABER] = "銀のサーベル",
     [SILVER_SPEAR] = "銀の槍",
@@ -429,8 +429,8 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [WAR_HAMMER] = "ウォーハンマー",
     [WATER_WALKING_BOOTS] = "水上歩行の靴",
     [WAX_CANDLE] = "蜜蝋のろうそく",
-    [WHITE_DRAGON_SCALE_MAIL] = "白色ドラゴン鱗鎧",
-    [WHITE_DRAGON_SCALES] = "白色ドラゴン鱗",
+    [WHITE_DRAGON_SCALE_MAIL] = "白色ドラゴンの鱗鎧",
+    [WHITE_DRAGON_SCALES] = "白色ドラゴンの鱗",
     [WOODEN_FLUTE] = "木のフルート",
     [WOODEN_HARP] = "木の竪琴",
     [WORM_TOOTH] = "ワームの歯",
@@ -444,8 +444,8 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [WORTHLESS_YELLOW_GLASS] = "黄色のガラス",
     [WORTHLESS_YELLOWBROWN_GLASS] = "茶褐色のガラス",
     [YA] = "竹矢",
-    [YELLOW_DRAGON_SCALE_MAIL] = "黄色ドラゴン鱗鎧",
-    [YELLOW_DRAGON_SCALES] = "黄色ドラゴン鱗",
+    [YELLOW_DRAGON_SCALE_MAIL] = "黄色ドラゴンの鱗鎧",
+    [YELLOW_DRAGON_SCALES] = "黄色ドラゴンの鱗",
     [YUMI] = "和弓",
 };
 
@@ -1165,13 +1165,14 @@ jnh_normalize_wish(const char *u_str, char *out_buf, size_t outsz)
         char dragon_buf[256] = {0};
         strncpy(dragon_buf, out_buf, sizeof(dragon_buf) - 1);
         dragon_buf[sizeof(dragon_buf) - 1] = '\0';
-        str_replace(dragon_buf, sizeof(dragon_buf), "ドラゴンの", "ドラゴン");
         str_replace(dragon_buf, sizeof(dragon_buf), "白ドラゴン", "白色ドラゴン");
         str_replace(dragon_buf, sizeof(dragon_buf), "オレンジドラゴン", "橙色ドラゴン");
         str_replace(dragon_buf, sizeof(dragon_buf), "黒ドラゴン", "黒色ドラゴン");
         str_replace(dragon_buf, sizeof(dragon_buf), "青ドラゴン", "青色ドラゴン");
         str_replace(dragon_buf, sizeof(dragon_buf), "緑ドラゴン", "緑色ドラゴン");
         str_replace(dragon_buf, sizeof(dragon_buf), "黄ドラゴン", "黄色ドラゴン");
+        str_replace(dragon_buf, sizeof(dragon_buf), "ドラゴン鱗鎧", "ドラゴンの鱗鎧");
+        str_replace(dragon_buf, sizeof(dragon_buf), "ドラゴン鱗", "ドラゴンの鱗");
 
         if (strcmp(dragon_buf, out_buf) != 0) {
             strncpy(out_buf, dragon_buf, outsz - 1);
