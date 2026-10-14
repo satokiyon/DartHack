@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14. */
 /* NetHack 5.0	zap.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.596 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -615,7 +615,7 @@ probe_objchain(struct obj *otmp)
             otmp->lknown = 1;
             if (!SchroedingersBox(otmp))
                 otmp->cknown = 1;
-        } else if (otmp->otyp == TIN)
+        } else if (otmp->otyp == TIN || otmp->otyp == EGG)
             otmp->known = 1;
     }
 }

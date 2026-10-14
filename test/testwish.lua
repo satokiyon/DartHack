@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14.
 
 local wishtest_objects = {
    ["a rock"] = { otyp_name = "rock", quan = 1, oclass = "*" },
@@ -87,7 +87,9 @@ local wishtest_objects = {
    ["5個の+3で祝福された銀の短剣"] = { otyp_name = "silver dagger", blessed = 1, cursed = 0, spe = 3, quan = 5 },
    ["空で施錠された大箱"] = { otyp_name = "large box", is_container = 1, has_contents = 0, olocked = 1 },
    ["聖水の薬"] = { otyp_name = "water", oclass = "!", blessed = 1, cursed = 0 },
+   ["呪われた防錆の+2灰色ドラゴンの鱗鎧"] = { otyp_name = "gray dragon scale mail", oclass = "[", blessed = 0, cursed = 1, spe = 2, oerodeproof = 1 },
    ["呪われた防錆の+2灰色ドラゴン鱗鎧"] = { otyp_name = "gray dragon scale mail", oclass = "[", blessed = 0, cursed = 1, spe = 2, oerodeproof = 1 },
+   ["+1黄色ドラゴンの鱗"] = { otyp_name = "yellow dragon scales", oclass = "[", spe = 1 },
    ["+1黄色ドラゴン鱗"] = { otyp_name = "yellow dragon scales", oclass = "[", spe = 1 },
    ["10個のりんご"] = { otyp_name = "apple", quan = 10 },
    ["5枚の白紙の巻物"] = { otyp_name = "blank paper", quan = 5 },

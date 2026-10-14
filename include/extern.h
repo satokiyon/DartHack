@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -352,7 +352,7 @@ extern void disregard_all_config_statements(void);
 extern void heed_this_config_statement(int);
 extern void disregard_this_config_statement(int);
 extern boolean config_unmatched_ignored(void);
-extern void clear_ignore_errors_on_unmatched(void);
+extern void clear_ignore_errors_on_unmatch(void);
 extern void set_ignore_errors_on_unmatched(void);
 extern void rcfile_only_this_statement(int);
 #ifdef WIN32
