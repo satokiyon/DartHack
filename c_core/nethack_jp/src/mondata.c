@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15. */
 /* NetHack 5.0	mondata.c	$NHDT-Date: 1781973056 2026/06/20 16:30:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.148 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -934,6 +934,38 @@ jp_name_to_monplus(const char *str, size_t slen, int *len_p, int *gender_p)
             break;
     }
 
+    if (best_pm == NON_PM) {
+        static const struct {
+            const char *alias;
+            int pm_val;
+        } role_aliases[] = {
+            { "僧侶", PM_CLERIC },
+            { "そうりょ", PM_CLERIC },
+            { "プリースト", PM_CLERIC },
+            { "修道士", PM_MONK },
+            { "しゅうどうし", PM_MONK },
+            { "モンク", PM_MONK },
+            { "ローグ", PM_ROGUE },
+            { (const char *) 0, NON_PM }
+        };
+        int a_idx;
+
+        for (a_idx = 0; role_aliases[a_idx].alias; ++a_idx) {
+            int nlen = (int) strlen(role_aliases[a_idx].alias);
+
+            if (!strncmpi(str, role_aliases[a_idx].alias, nlen)) {
+                if ((size_t) nlen == slen
+                    || (slen > (size_t) nlen
+                        && (str[nlen] == ' ' || str[nlen] == '\''))) {
+                    best_pm = role_aliases[a_idx].pm_val;
+                    best_len = nlen;
+                    best_gend = NEUTRAL;
+                    break;
+                }
+            }
+        }
+    }
+
     if (best_pm != NON_PM) {
         if (len_p)
             *len_p = best_len;
@@ -1161,11 +1193,51 @@ name_to_monplus(
     return mntmp;
 }
 
+/* 全角英数・記号（UTF-8: U+FF01〜U+FF5E）および全角スペース（U+3000）を半角ASCIIに変換する */
+void
+jp_normalize_zenkaku(char *str)
+{
+    unsigned char *p = (unsigned char *) str;
+    char *q = str;
+
+    if (!str)
+        return;
+
+    while (*p) {
+        /* 3バイトUTF-8の境界保護: p[1] と p[2] が存在することを確認 */
+        if (p[1] != '\0' && p[2] != '\0') {
+            /* 全角スペース U+3000 (0xE3 0x80 0x80) */
+            if (p[0] == 0xE3 && p[1] == 0x80 && p[2] == 0x80) {
+                *q++ = ' ';
+                p += 3;
+                continue;
+            }
+            /* 全角！〜／ U+FF01〜U+FF0F (0xEF 0xBC 0x81〜0x8F) => '!'〜'/' (0x21〜0x2F)
+             * 全角０〜９ U+FF10〜U+FF19 (0xEF 0xBC 0x90〜0x99) => '0'〜'9' (0x30〜0x39)
+             * 全角：〜＠ U+FF1A〜U+FF20 (0xEF 0xBC 0x9A〜0xBF) => ':'〜'@' (0x3A〜0x5F) */
+            else if (p[0] == 0xEF && p[1] == 0xBC && (p[2] >= 0x81 && p[2] <= 0xBF)) {
+                *q++ = (char) (p[2] - 0x60);
+                p += 3;
+                continue;
+            }
+            /* 全角｀〜～ U+FF40〜U+FF5E (0xEF 0xBD 0x80〜0x9E) => '`'〜'~' (0x60〜0x7E) */
+            else if (p[0] == 0xEF && p[1] == 0xBD && (p[2] >= 0x80 && p[2] <= 0x9E)) {
+                *q++ = (char) (p[2] - 0x20);
+                p += 3;
+                continue;
+            }
+        }
+        *q++ = (char) *p++;
+    }
+    *q = '\0';
+}
+
 /* monster class from user input; used for genocide and controlled polymorph;
    returns 0 rather than MAXMCLASSES if no match is found */
 int
 name_to_monclass(const char *in_str, int * mndx_p)
 {
+    char zbuf[BUFSZ];
     /* Single letters are matched against def_monsyms[].sym; words
        or phrases are first matched against def_monsyms[].explain
        to check class description; if not found there, then against
@@ -1202,7 +1274,14 @@ name_to_monclass(const char *in_str, int * mndx_p)
     if (!in_str || !in_str[0]) {
         /* empty input */
         return 0;
-    } else if (!in_str[1]) {
+    }
+
+    /* 全角英数・記号の半角化正規化 */
+    Strcpy(zbuf, in_str);
+    jp_normalize_zenkaku(zbuf);
+    in_str = zbuf;
+
+    if (!in_str[1]) {
         /* single character */
         i = def_char_to_monclass(*in_str);
         if (i == S_MIMIC_DEF) { /* ']' -> 'm' */
@@ -1218,6 +1297,50 @@ name_to_monclass(const char *in_str, int * mndx_p)
         /* multiple characters */
         if (!strcmpi(in_str, "long")) /* not enough to match "long worm" */
             return 0; /* avoid false whole-word match with "long worm tail" */
+
+        /* check for Japanese monster class aliases */
+        {
+            static const struct {
+                const char *name;
+                int class;
+            } jp_class_aliases[] = {
+                { "犬", S_DOG },
+                { "イヌ", S_DOG },
+                { "いぬ", S_DOG },
+                { "犬類", S_DOG },
+                { "イヌ科", S_DOG },
+                { "猫", S_FELINE },
+                { "ネコ", S_FELINE },
+                { "ねこ", S_FELINE },
+                { "ネコ科", S_FELINE },
+                { "ドラゴン", S_DRAGON },
+                { "竜", S_DRAGON },
+                { "悪魔", S_DEMON },
+                { "デーモン", S_DEMON },
+                { "蟻", S_ANT },
+                { "アリ", S_ANT },
+                { "あり", S_ANT },
+                { "人間", S_HUMAN },
+                { "エルフ", S_HUMAN },
+                { "巨人", S_GIANT },
+                { "水棲", S_EEL },
+                { "海の怪物", S_EEL },
+                { "魚", S_EEL },
+                { "蜘蛛", S_SPIDER },
+                { "クモ", S_SPIDER },
+                { "くも", S_SPIDER },
+                { "目玉", S_EYE },
+                { (const char *) 0, 0 }
+            };
+            int c_idx;
+
+            for (c_idx = 0; jp_class_aliases[c_idx].name; c_idx++) {
+                if (!strcmpi(in_str, jp_class_aliases[c_idx].name)) {
+                    return jp_class_aliases[c_idx].class;
+                }
+            }
+        }
+
         in_str = makesingular(in_str);
         /* check for special cases */
         for (i = 0; falsematch[i]; i++)

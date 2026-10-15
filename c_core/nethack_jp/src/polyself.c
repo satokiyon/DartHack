@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15. */
 /* NetHack 5.0	polyself.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -518,6 +518,7 @@ polyself(int psflags)
             mntmp = NON_PM;
             getlin("どの種類のモンスターになりますか? [名前を入力してください]", buf);
             (void) mungspaces(buf);
+            jp_normalize_zenkaku(buf);
             if (*buf == '\033') {
                 /* user is cancelling controlled poly */
                 if (forcecontrol) { /* wizard mode #polyself */
@@ -526,7 +527,8 @@ polyself(int psflags)
                 }
                 Strcpy(buf, "*"); /* resort to random */
             }
-            if (!strcmp(buf, "*") || !strcmp(buf, "random")) {
+            if (!strcmp(buf, "*") || !strcmp(buf, "random")
+                || !strcmp(buf, "ランダム")) {
                 /* explicitly requesting random result */
                 tryct = 0; /* will skip thats_enough_tries */
                 continue;  /* end do-while(--tryct > 0) loop */

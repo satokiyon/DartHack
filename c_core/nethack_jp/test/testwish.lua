@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15.
 
 local wishtest_objects = {
    ["a rock"] = { otyp_name = "rock", quan = 1, oclass = "*" },
@@ -109,6 +109,25 @@ local wishtest_objects = {
    ["オレンジドラゴンの鱗"] = { otyp_name = "orange dragon scales", oclass = "[" },
    ["白ドラゴンの鱗鎧"] = { otyp_name = "white dragon scale mail", oclass = "[" },
    ["なし"] = { NO_OBJ = 1 },
+   -- 今回対応した修飾語・特殊名詞・大分類・サブレンジのテストケース
+   ["祝福された油の塗られた固定された+2灰色ドラゴンの鱗鎧"] = { otyp_name = "gray dragon scale mail", oclass = "[", blessed = 1, spe = 2, greased = 1, oerodeproof = 1 },
+   ["祝福された油まみれの固定された+2灰色ドラゴン鱗鎧"] = { otyp_name = "gray dragon scale mail", oclass = "[", blessed = 1, spe = 2, greased = 1, oerodeproof = 1 },
+   ["祝福された油塗り耐火の+2灰色ドラゴンの鱗鎧"] = { otyp_name = "gray dragon scale mail", oclass = "[", blessed = 1, spe = 2, greased = 1, oerodeproof = 1 },
+   ["油まみれの兜"] = { oclass = "[", greased = 1 },
+   ["毒の塗られた矢"] = { otyp_name = "arrow", opoisoned = 1 },
+   ["5000枚の金貨"] = { otyp_name = "gold piece", quan = 5000, oclass = "$" },
+   ["点灯したランプ"] = { otyp_name = "oil lamp", lamplit = 1 },
+   ["ランプ(点灯)"] = { otyp_name = "oil lamp", lamplit = 1 },
+   ["薄められた水の薬"] = { otyp_name = "water", oclass = "!", odiluted = 1 },
+   ["白紙の巻物"] = { otyp_name = "blank paper", oclass = "?" },
+   ["白紙の魔法書"] = { otyp_name = "blank paper", oclass = "+" },
+   ["ほうれん草"] = { otyp_name = "tin", oclass = "%", corpsenm = -1, spe = 1 },
+   ["油のポーション"] = { otyp_name = "oil", oclass = "!" },
+   ["回復の薬"] = { otyp_name = "healing", oclass = "!" },
+   ["巻物"] = { oclass = "?" },
+   ["防具"] = { oclass = "[" },
+   ["兜"] = { oclass = "[" },
+   ["剣"] = { oclass = ")" },
 };
 
 for str, tbl in pairs(wishtest_objects) do

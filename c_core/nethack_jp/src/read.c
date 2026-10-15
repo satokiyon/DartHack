@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15. */
 /* NetHack 5.0	read.c	$NHDT-Date: 1782083451 2026/06/21 18:10:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.334 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2870,6 +2870,7 @@ do_class_genocide(void)
                        ? "記号かクラスを表す名前、または'?'を入力してください"
                        : "'?'で以前の虐殺を確認できます");
         getlin(promptbuf, buf);
+        jp_normalize_zenkaku(buf);
         (void) mungspaces(buf);
         /* avoid 'that does not represent any monster' for empty input */
         if (!*buf) {
@@ -2880,7 +2881,8 @@ do_class_genocide(void)
         }
         /* choosing "none" preserves genocideless conduct */
         if (*buf == '\033' || !strcmpi(buf, "none")
-            || !strcmpi(buf, "'none'") || !strcmpi(buf, "nothing")) {
+            || !strcmpi(buf, "'none'") || !strcmpi(buf, "nothing")
+            || !strcmp(buf, "なし") || !strcmp(buf, "無し")) {
             livelog_printf(LL_GENOCIDE,
                            "怪物クラスの虐殺を行うのを拒否した");
             return;
@@ -3072,6 +3074,7 @@ do_genocide(
                            ? "モンスターの種類名、または'?'を入力してください"
                            : "'?'で以前の虐殺を確認できます");
             getlin(promptbuf, buf);
+            jp_normalize_zenkaku(buf);
             (void) mungspaces(buf);
             /* avoid 'such creatures do not exist' for empty input */
             if (!*buf) {
@@ -3082,7 +3085,8 @@ do_genocide(
             }
             /* choosing "none" preserves genocideless conduct */
             if (*buf == '\033' || !strcmpi(buf, "none")
-                || !strcmpi(buf, "'none'") || !strcmpi(buf, "nothing")) {
+                || !strcmpi(buf, "'none'") || !strcmpi(buf, "nothing")
+                || !strcmp(buf, "なし") || !strcmp(buf, "無し")) {
                 /* ... but no free pass if cursed */
                 if (!(how & REALLY) && (ptr = rndmonst()) != 0)
                     break; /* remaining checks don't apply */

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -188,7 +188,7 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [MAGIC_FLUTE] = "魔法のフルート",
     [MAGIC_HARP] = "魔法の竪琴",
     [MAGIC_LAMP] = "魔法のランプ",
-    [MAGIC_MARKER] = "魔法のマーカ",
+    [MAGIC_MARKER] = "魔法のマーカー",
     [MAGIC_WHISTLE] = "魔法の笛",
     [MEAT_RING] = "肉の輪",
     [MEAT_STICK] = "肉の串",
@@ -1118,7 +1118,7 @@ static const struct jnh_wish_alias jnh_wish_aliases[] = {
     { "万能鍵", "万能鍵" },
     { "鍵開け器具", "鍵開け器具" },
     { "クレジットカード", "クレジットカード" },
-    { "魔法のマーカー", "魔法のマーカ" },
+    { "魔法のマーカ", "魔法のマーカー" },
     { "缶詰作成キット", "缶詰作成道具" },
 
     /* アーティファクト */
@@ -1223,6 +1223,18 @@ strip_jp_noise(char *buf)
     }
 }
 
+/* 中黒（U+30FB: 0xE3 0x83 0xBB）を除去するヘルパー */
+static void
+strip_nakaguro(char *buf)
+{
+    char *p;
+    int guard = 0;
+
+    while (guard++ < BUFSZ && (p = strstr(buf, "・")) != 0) {
+        memmove(p, p + 3, strlen(p + 3) + 1);
+    }
+}
+
 /*
  * 魔法のマーカーでの書き込み用アイテム照合関数
  * input: プレイヤーが入力した文字列
@@ -1315,6 +1327,24 @@ jp_write_match_item(const char *input, int otyp, boolean *is_descr)
                     if (is_descr)
                         *is_descr = TRUE;
                     return TRUE;
+                }
+
+                /* 中黒（・）を除去したラベル名同士の一致（例: コケツマロビツ == コケツ・マロビツ） */
+                {
+                    char label_nonaka[BUFSZ] = {0};
+                    char input_nonaka[BUFSZ] = {0};
+
+                    Strcpy(label_nonaka, label);
+                    strip_nakaguro(label_nonaka);
+                    Strcpy(input_nonaka, *core_input ? core_input : norm_input);
+                    strip_nakaguro(input_nonaka);
+
+                    if (*input_nonaka && *label_nonaka
+                        && !strcmpi(input_nonaka, label_nonaka)) {
+                        if (is_descr)
+                            *is_descr = TRUE;
+                        return TRUE;
+                    }
                 }
             }
         } else {

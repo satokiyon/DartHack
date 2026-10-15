@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15. */
 /* NetHack 5.0	objnam.c	$NHDT-Date: 1781973060 2026/06/20 16:31:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.464 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -59,6 +59,7 @@ staticfn void set_wallprop_from_str(char *) NONNULLARG1;
 staticfn struct obj *wizterrainwish(struct _readobjnam_data *);
 staticfn void dbterrainmesg(const char *, coordxy, coordxy) NONNULLARG1;
 staticfn void readobjnam_init(char *, struct _readobjnam_data *);
+staticfn boolean match_prefix_list(const char *, const char *const *, int *);
 staticfn int readobjnam_preparse(struct _readobjnam_data *);
 staticfn void readobjnam_parse_charges(struct _readobjnam_data *);
 static int jp_name_to_mon(const char *, int *);
@@ -4375,6 +4376,94 @@ readobjnam_init(char *bp, struct _readobjnam_data *d)
     (void) memset(d->fruitbuf, '\0', sizeof d->fruitbuf);
 }
 
+static const char *const jp_greased_prefixes[] = {
+    "油の塗られた", "油を塗られた", "油が塗られた", "油で塗られた",
+    "油まみれの", "油まみれ", "油塗りの", "油塗り",
+    "油脂塗りの", "油脂塗り", "油脂の塗られた", "油脂を塗られた", 0
+};
+static const char *const jp_poisoned_prefixes[] = {
+    "毒の塗られた", "毒を塗られた", "毒が塗られた", "毒で塗られた",
+    "毒塗りの", "毒塗り", "毒入りの", "毒入り", 0
+};
+static const char *const jp_diluted_prefixes[] = {
+    "薄められた", "薄めた", "薄い", 0
+};
+static const char *const jp_lit_prefixes[] = {
+    "火のついた", "燃えている", "点灯した", "点灯の", "点灯", 0
+};
+static const char *const jp_unlit_prefixes[] = {
+    "火の消えた", "消灯した", "消灯の", "消灯", "消えた", 0
+};
+static const char *const jp_wet_prefixes[] = {
+    "濡れている", "濡れた", 0
+};
+static const char *const jp_moist_prefixes[] = {
+    "湿っている", "湿った", 0
+};
+static const char *const jp_unlabeled_prefixes[] = {
+    "ブランクの", "白紙の", "白紙", "無地の", "無地", 0
+};
+static const char *const jp_very_prefixes[] = {
+    "とても", "ひどく", 0
+};
+static const char *const jp_thoroughly_prefixes[] = {
+    "完全に", "すっかり", 0
+};
+static const char *const jp_eroded_prefixes[] = {
+    "ひび割れた", "錆びた", "焼けた", 0
+};
+static const char *const jp_eroded2_prefixes[] = {
+    "腐食した", "腐った", 0
+};
+static const char *const jp_halfeaten_prefixes[] = {
+    "一部食べられた", "食べかけの", "食べかけ", 0
+};
+static const char *const jp_historic_prefixes[] = {
+    "由緒ある", "歴史的な", "歴史的", 0
+};
+static const char *const jp_small_prefixes[] = {
+    "小さな", "小さい", 0
+};
+static const char *const jp_medium_prefixes[] = {
+    "中くらいの", "中程度の", 0
+};
+static const char *const jp_large_prefixes[] = {
+    "巨大な", "大きな", "大きい", 0
+};
+static const char *const jp_real_prefixes[] = {
+    "本物の", "本物", "真の", 0
+};
+static const char *const jp_fake_prefixes[] = {
+    "偽物の", "偽物", "偽の", 0
+};
+static const char *const jp_female_prefixes[] = {
+    "女性の", "メスの", "雌の", "メス", "雌", 0
+};
+static const char *const jp_male_prefixes[] = {
+    "男性の", "オスの", "雄の", "オス", "雄", 0
+};
+static const char *const jp_neuter_prefixes[] = {
+    "中性の", "無性の", 0
+};
+
+staticfn boolean
+match_prefix_list(const char *bp, const char *const *list, int *len_p)
+{
+    int i;
+
+    for (i = 0; list[i]; ++i) {
+        int plen = (int) strlen(list[i]);
+
+        if (!strncmpi(bp, list[i], plen)) {
+            if (bp[plen] == ' ')
+                plen++;
+            *len_p = plen;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 /* return 1 if d->bp is empty or contains only various qualifiers like
    "blessed", "rustproof", and so on, or 0 if anything else is present */
 staticfn int
@@ -4515,16 +4604,21 @@ readobjnam_preparse(struct _readobjnam_data *d)
                    || !strncmpi(d->bp, "固定", l = (int) strlen("固定"))) {
             d->erodeproof = 1;
         } else if (!strncmpi(d->bp, "lit ", l = 4)
-                   || !strncmpi(d->bp, "burning ", l = 8)) {
+                   || !strncmpi(d->bp, "burning ", l = 8)
+                   || match_prefix_list(d->bp, jp_lit_prefixes, &l)) {
             d->islit = 1;
         } else if (!strncmpi(d->bp, "unlit ", l = 6)
-                   || !strncmpi(d->bp, "extinguished ", l = 13)) {
+                   || !strncmpi(d->bp, "extinguished ", l = 13)
+                   || match_prefix_list(d->bp, jp_unlit_prefixes, &l)) {
             d->islit = 0;
 
         /* "wet" and "moist" are only applicable for towels */
         } else if (!strncmpi(d->bp, "moist ", l = 6)
-                   || !strncmpi(d->bp, "wet ", l = 4)) {
-            if (!strncmpi(d->bp, "wet ", 4))
+                   || !strncmpi(d->bp, "wet ", l = 4)
+                   || match_prefix_list(d->bp, jp_wet_prefixes, &l)
+                   || match_prefix_list(d->bp, jp_moist_prefixes, &l)) {
+            if (!strncmpi(d->bp, "wet ", 4)
+                || match_prefix_list(d->bp, jp_wet_prefixes, &l))
                 d->wetness = 3 + rn2(3); /* 3..5 */
             else
                 d->wetness = rnd(2); /* 1..2 */
@@ -4532,9 +4626,11 @@ readobjnam_preparse(struct _readobjnam_data *d)
         /* "unlabeled" and "blank" are synonymous */
         } else if (!strncmpi(d->bp, "unlabeled ", l = 10)
                    || !strncmpi(d->bp, "unlabelled ", l = 11)
-                   || !strncmpi(d->bp, "blank ", l = 6)) {
+                   || !strncmpi(d->bp, "blank ", l = 6)
+                   || match_prefix_list(d->bp, jp_unlabeled_prefixes, &l)) {
             d->unlabeled = 1;
-        } else if (!strncmpi(d->bp, "poisoned ", l = 9)) {
+        } else if (!strncmpi(d->bp, "poisoned ", l = 9)
+                   || match_prefix_list(d->bp, jp_poisoned_prefixes, &l)) {
             d->ispoisoned = 1;
 
         /* "trapped" recognized but not honored outside wizard mode */
@@ -4596,32 +4692,40 @@ readobjnam_preparse(struct _readobjnam_data *d)
                       even though they're separate in struct rm */
                    || !strncmpi(d->bp, "disturbed ", l = 10)) {
             d->looted = 1;
-        } else if (!strncmpi(d->bp, "greased ", l = 8)) {
+        } else if (!strncmpi(d->bp, "greased ", l = 8)
+                   || match_prefix_list(d->bp, jp_greased_prefixes, &l)) {
             d->isgreased = 1;
         } else if (!strncmpi(d->bp, "zombifying ", l = 11)) {
             d->zombify = TRUE;
-        } else if (!strncmpi(d->bp, "very ", l = 5)) {
+        } else if (!strncmpi(d->bp, "very ", l = 5)
+                   || match_prefix_list(d->bp, jp_very_prefixes, &l)) {
             /* very rusted very heavy iron ball */
             d->very = 1;
-        } else if (!strncmpi(d->bp, "thoroughly ", l = 11)) {
+        } else if (!strncmpi(d->bp, "thoroughly ", l = 11)
+                   || match_prefix_list(d->bp, jp_thoroughly_prefixes, &l)) {
             d->very = 2;
         } else if (!strncmpi(d->bp, "rusty ", l = 6)
                    || !strncmpi(d->bp, "rusted ", l = 7)
                    || !strncmpi(d->bp, "burnt ", l = 6)
                    || !strncmpi(d->bp, "burned ", l = 7)
-                   || !strncmpi(d->bp, "cracked ", l = 8)) {
+                   || !strncmpi(d->bp, "cracked ", l = 8)
+                   || match_prefix_list(d->bp, jp_eroded_prefixes, &l)) {
             d->eroded = 1 + d->very;
             d->very = 0;
         } else if (!strncmpi(d->bp, "corroded ", l = 9)
-                   || !strncmpi(d->bp, "rotted ", l = 7)) {
+                   || !strncmpi(d->bp, "rotted ", l = 7)
+                   || match_prefix_list(d->bp, jp_eroded2_prefixes, &l)) {
             d->eroded2 = 1 + d->very;
             d->very = 0;
         } else if (!strncmpi(d->bp, "partly eaten ", l = 13)
-                   || !strncmpi(d->bp, "partially eaten ", l = 16)) {
+                   || !strncmpi(d->bp, "partially eaten ", l = 16)
+                   || match_prefix_list(d->bp, jp_halfeaten_prefixes, &l)) {
             d->halfeaten = 1;
-        } else if (!strncmpi(d->bp, "historic ", l = 9)) {
+        } else if (!strncmpi(d->bp, "historic ", l = 9)
+                   || match_prefix_list(d->bp, jp_historic_prefixes, &l)) {
             d->ishistoric = 1;
-        } else if (!strncmpi(d->bp, "diluted ", l = 8)) {
+        } else if (!strncmpi(d->bp, "diluted ", l = 8)
+                   || match_prefix_list(d->bp, jp_diluted_prefixes, &l)) {
             d->isdiluted = 1;
         } else if (!strncmpi(d->bp, "empty ", l = 6)
                    || !strncmpi(d->bp, "空の ", l = (int) strlen("空の "))
@@ -4631,51 +4735,61 @@ readobjnam_preparse(struct _readobjnam_data *d)
                    || !strncmpi(d->bp, "空 ", l = (int) strlen("空 "))
                    || !strncmpi(d->bp, "空", l = (int) strlen("空"))) {
             d->contents = TIN_EMPTY;
-        } else if (!strncmpi(d->bp, "small ", l = 6)) { /* glob sizes */
+        } else if (!strncmpi(d->bp, "small ", l = 6)
+                   || match_prefix_list(d->bp, jp_small_prefixes, &l)) { /* glob sizes */
             /* "small" might be part of monster name (mimic, if wishing
                for its corpse) rather than prefix for glob size; when
                used for globs, it might be either "small glob of <foo>" or
                "small <foo> glob" and user might add 's' even though plural
                doesn't accomplish anything because globs don't stack */
-            if (strncmpi(d->bp + l, "glob", 4) && !strstri(d->bp + l, " glob"))
+            if (strncmpi(d->bp + l, "glob", 4) && !strstri(d->bp + l, " glob")
+                && strncmpi(d->bp + l, "凝固物", 9) && !strstri(d->bp + l, "凝固物"))
                 break;
             d->gsize = 1;
-        } else if (!strncmpi(d->bp, "medium ", l = 7)) {
+        } else if (!strncmpi(d->bp, "medium ", l = 7)
+                   || match_prefix_list(d->bp, jp_medium_prefixes, &l)) {
             /* 5.0: in 3.6, "medium" was only used during wishing and the
                mid-size glob had no adjective when formatted, but as of
                5.0, "medium" has become an explicit part of the name for
                combined globs of at least 5 individual ones (owt >= 100)
                and less than 15 (owt < 300) */
             d->gsize = 2;
-        } else if (!strncmpi(d->bp, "large ", l = 6)) {
+        } else if (!strncmpi(d->bp, "large ", l = 6)
+                   || match_prefix_list(d->bp, jp_large_prefixes, &l)) {
             /* "large" might be part of monster name (dog, cat, kobold,
                mimic) or object name (box, round shield) rather than
                prefix for glob size */
-            if (strncmpi(d->bp + l, "glob", 4) && !strstri(d->bp + l, " glob"))
+            if (strncmpi(d->bp + l, "glob", 4) && !strstri(d->bp + l, " glob")
+                && strncmpi(d->bp + l, "凝固物", 9) && !strstri(d->bp + l, "凝固物"))
                 break;
             /* "very large " had "very " peeled off on previous iteration */
             d->gsize = (d->very != 1) ? 3 : 4;
-        } else if (!strncmpi(d->bp, "real ", l = 5)) {
+        } else if (!strncmpi(d->bp, "real ", l = 5)
+                   || match_prefix_list(d->bp, jp_real_prefixes, &l)) {
             /* accept "real Amulet of Yendor" with "blessed" or "cursed"
                or useless "erodeproof" before or after "real" ... */
             d->real = 1; /* don't negate 'fake' here; "real fake amulet" and
                        * "fake real amulet" will both yield fake amulet
                        * (so will "real amulet" outside of wizard mode) */
-        } else if (!strncmpi(d->bp, "fake ", l = 5)) {
+        } else if (!strncmpi(d->bp, "fake ", l = 5)
+                   || match_prefix_list(d->bp, jp_fake_prefixes, &l)) {
             /* ... and "fake Amulet of Yendor" likewise */
             d->fake = 1, d->real = 0;
             /* ['real' isn't actually needed (unless we someday add
                "real gem" for random non-glass, non-stone)] */
-        } else if (!strncmpi(d->bp, "female ", l = 7)) {
+        } else if (!strncmpi(d->bp, "female ", l = 7)
+                   || match_prefix_list(d->bp, jp_female_prefixes, &l)) {
             d->mgend = FEMALE;
             /* if after "corpse/statue/figurine of", remove from string */
             if (save_bp)
                 strsubst(d->bp, "female ", ""), l = 0;
-        } else if (!strncmpi(d->bp, "male ", l = 5)) {
+        } else if (!strncmpi(d->bp, "male ", l = 5)
+                   || match_prefix_list(d->bp, jp_male_prefixes, &l)) {
             d->mgend = MALE;
             if (save_bp)
                 strsubst(d->bp, "male ", ""), l = 0;
-        } else if (!strncmpi(d->bp, "neuter ", l = 7)) {
+        } else if (!strncmpi(d->bp, "neuter ", l = 7)
+                   || match_prefix_list(d->bp, jp_neuter_prefixes, &l)) {
             d->mgend = NEUTRAL;
             if (save_bp)
                 strsubst(d->bp, "neuter ", ""), l = 0;
@@ -4721,6 +4835,12 @@ readobjnam_parse_charges(struct _readobjnam_data *d)
         if (!strncmpi(d->p, "lit)", 4)) {
             d->islit = 1;
             d->p += 4 - 1; /* point at ')' */
+        } else if (!strncmpi(d->p, "点灯)", (int) strlen("点灯)"))) {
+            d->islit = 1;
+            d->p += (int) strlen("点灯)") - 1; /* point at ')' */
+        } else if (!strncmpi(d->p, "燃えている)", (int) strlen("燃えている)"))) {
+            d->islit = 1;
+            d->p += (int) strlen("燃えている)") - 1; /* point at ')' */
         } else {
             d->spe = atoi(d->p);
             while (digit(*d->p))
@@ -5430,11 +5550,16 @@ readobjnam_postparse1(struct _readobjnam_data *d)
             return 3;
         }
     }
-    if (d->unlabeled && !BSTRCMPI(d->bp, d->p - 6, "scroll")) {
+    if (d->unlabeled
+        && (!BSTRCMPI(d->bp, d->p - 6, "scroll")
+            || !strcmpi(d->bp, "巻物") || !strcmpi(d->bp, "まきもの"))) {
         d->typ = SCR_BLANK_PAPER;
         return 2; /*goto typfnd;*/
     }
-    if (d->unlabeled && !BSTRCMPI(d->bp, d->p - 9, "spellbook")) {
+    if (d->unlabeled
+        && (!BSTRCMPI(d->bp, d->p - 9, "spellbook")
+            || !strcmpi(d->bp, "魔法書") || !strcmpi(d->bp, "まほうしょ")
+            || !strcmpi(d->bp, "呪文書"))) {
         d->typ = SPE_BLANK_PAPER;
         return 2; /*goto typfnd;*/
     }
@@ -5452,7 +5577,11 @@ readobjnam_postparse1(struct _readobjnam_data *d)
     if (!BSTRCMPI(d->bp, d->p - 10, "gold piece")
         || !BSTRCMPI(d->bp, d->p - 7, "zorkmid")
         || !strcmpi(d->bp, "gold") || !strcmpi(d->bp, "money")
-        || !strcmpi(d->bp, "coin") || *d->bp == GOLD_SYM) {
+        || !strcmpi(d->bp, "coin") || *d->bp == GOLD_SYM
+        || !strcmpi(d->bp, "金貨") || !strcmpi(d->bp, "きんか")
+        || !strcmpi(d->bp, "ゴールド") || !strcmpi(d->bp, "お金")
+        || !strcmpi(d->bp, "金") || !strcmpi(d->bp, "コイン")
+        || !strcmpi(d->bp, "ゾークミッド")) {
         if (d->cnt > 5000 && !wizard)
             d->cnt = 5000;
         else if (d->cnt < 1)
@@ -5538,6 +5667,34 @@ readobjnam_postparse1(struct _readobjnam_data *d)
             }
         }
 
+    /* 日本語大分類カテゴリ単体指定（完全一致） */
+    {
+        static const struct {
+            const char *name;
+            char oclass;
+        } jp_category_wishes[] = {
+            { "杖", WAND_CLASS }, { "ワンド", WAND_CLASS },
+            { "指輪", RING_CLASS }, { "リング", RING_CLASS },
+            { "薬", POTION_CLASS }, { "ポーション", POTION_CLASS },
+            { "巻物", SCROLL_CLASS }, { "スクロール", SCROLL_CLASS },
+            { "宝石", GEM_CLASS }, { "ジェム", GEM_CLASS },
+            { "魔除け", AMULET_CLASS }, { "魔よけ", AMULET_CLASS }, { "アミュレット", AMULET_CLASS },
+            { "魔法書", SPBOOK_CLASS }, { "呪文書", SPBOOK_CLASS },
+            { "武器", WEAPON_CLASS },
+            { "防具", ARMOR_CLASS }, { "鎧", ARMOR_CLASS },
+            { "道具", TOOL_CLASS }, { "ツール", TOOL_CLASS },
+            { "食料", FOOD_CLASS }, { "食べ物", FOOD_CLASS },
+            { 0, 0 }
+        };
+        int ci;
+        for (ci = 0; jp_category_wishes[ci].name; ++ci) {
+            if (!strcmpi(d->bp, jp_category_wishes[ci].name)) {
+                d->oclass = jp_category_wishes[ci].oclass;
+                return 4; /* goto any; */
+            }
+        }
+    }
+
     /* Wishing in wizard mode can create traps and furniture.
      * Part I:  distinguish between trap and object for the two
      * types of traps which have corresponding objects:  bear trap
@@ -5592,6 +5749,55 @@ readobjnam_postparse2(struct _readobjnam_data *d)
             d->typ = rnd_class(o_ranges[i].f_o_range, o_ranges[i].l_o_range);
             return 2; /*goto typfnd;*/
         }
+    {
+        static const struct {
+            const char *name;
+            short f_o_range, l_o_range;
+        } jp_o_ranges[] = {
+            { "袋", SACK, BAG_OF_TRICKS },
+            { "バッグ", SACK, BAG_OF_TRICKS },
+            { "ランプ", OIL_LAMP, MAGIC_LAMP },
+            { "ロウソク", TALLOW_CANDLE, WAX_CANDLE },
+            { "ろうそく", TALLOW_CANDLE, WAX_CANDLE },
+            { "キャンドル", TALLOW_CANDLE, WAX_CANDLE },
+            { "角笛", TOOLED_HORN, HORN_OF_PLENTY },
+            { "ホルン", TOOLED_HORN, HORN_OF_PLENTY },
+            { "盾", SMALL_SHIELD, SHIELD_OF_REFLECTION },
+            { "シールド", SMALL_SHIELD, SHIELD_OF_REFLECTION },
+            { "帽子", FEDORA, DUNCE_CAP },
+            { "ハット", FEDORA, DUNCE_CAP },
+            { "兜", ELVEN_LEATHER_HELM, HELM_OF_TELEPATHY },
+            { "ヘルメット", ELVEN_LEATHER_HELM, HELM_OF_TELEPATHY },
+            { "手袋", LEATHER_GLOVES, GAUNTLETS_OF_DEXTERITY },
+            { "小手", LEATHER_GLOVES, GAUNTLETS_OF_DEXTERITY },
+            { "グローブ", LEATHER_GLOVES, GAUNTLETS_OF_DEXTERITY },
+            { "ガントレット", LEATHER_GLOVES, GAUNTLETS_OF_DEXTERITY },
+            { "靴", LOW_BOOTS, LEVITATION_BOOTS },
+            { "ブーツ", LOW_BOOTS, LEVITATION_BOOTS },
+            { "短靴", LOW_BOOTS, IRON_SHOES },
+            { "シューズ", LOW_BOOTS, IRON_SHOES },
+            { "クローク", MUMMY_WRAPPING, CLOAK_OF_DISPLACEMENT },
+            { "マント", MUMMY_WRAPPING, CLOAK_OF_DISPLACEMENT },
+            { "外套", MUMMY_WRAPPING, CLOAK_OF_DISPLACEMENT },
+            { "シャツ", HAWAIIAN_SHIRT, T_SHIRT },
+            { "ドラゴンの鱗", GRAY_DRAGON_SCALES, YELLOW_DRAGON_SCALES },
+            { "ドラゴン鱗", GRAY_DRAGON_SCALES, YELLOW_DRAGON_SCALES },
+            { "ドラゴンの鱗鎧", GRAY_DRAGON_SCALE_MAIL, YELLOW_DRAGON_SCALE_MAIL },
+            { "ドラゴン鱗鎧", GRAY_DRAGON_SCALE_MAIL, YELLOW_DRAGON_SCALE_MAIL },
+            { "剣", SHORT_SWORD, KATANA },
+            { "刀", SHORT_SWORD, KATANA },
+            { "毒液", BLINDING_VENOM, ACID_VENOM },
+            { "灰色の石", LUCKSTONE, FLINT },
+            { "灰色石", LUCKSTONE, FLINT },
+            { 0, 0, 0 }
+        };
+        for (i = 0; jp_o_ranges[i].name; i++) {
+            if (!strcmpi(d->bp, jp_o_ranges[i].name)) {
+                d->typ = rnd_class(jp_o_ranges[i].f_o_range, jp_o_ranges[i].l_o_range);
+                return 2; /*goto typfnd;*/
+            }
+        }
+    }
 
     if (!BSTRCMPI(d->bp, d->p - 6, " stone")
         || !BSTRCMPI(d->bp, d->p - 4, " gem")) {
@@ -5698,7 +5904,9 @@ readobjnam_postparse3(struct _readobjnam_data *d)
         Strcat(d->bp, " mail");
         return 6; /*goto retry;*/
     }
-    if (!strcmpi(d->bp, "spinach")) {
+    if (!strcmpi(d->bp, "spinach")
+        || !strcmpi(d->bp, "ほうれん草") || !strcmpi(d->bp, "ほうれんそう")
+        || !strcmpi(d->bp, "ホウレンソウ")) {
         d->contents = TIN_SPINACH;
         d->typ = TIN;
         return 2; /*goto typfnd;*/
@@ -5901,10 +6109,14 @@ readobjnam(char *bp, struct obj *no_wish)
     }
 
     if (!d.oclass && !d.typ) {
-        if (!strncmpi(d.bp, "polearm", 7)) {
+        if (!strncmpi(d.bp, "polearm", 7)
+            || !strcmpi(d.bp, "長柄の武器") || !strcmpi(d.bp, "長柄武器")
+            || !strcmpi(d.bp, "ポールアーム")) {
             d.typ = rnd_otyp_by_wpnskill(P_POLEARMS);
             goto typfnd;
-        } else if (!strncmpi(d.bp, "hammer", 6)) {
+        } else if (!strncmpi(d.bp, "hammer", 6)
+                   || !strcmpi(d.bp, "金槌") || !strcmpi(d.bp, "かなづち")
+                   || !strcmpi(d.bp, "ハンマー")) {
             d.typ = rnd_otyp_by_wpnskill(P_HAMMER);
             goto typfnd;
         }
