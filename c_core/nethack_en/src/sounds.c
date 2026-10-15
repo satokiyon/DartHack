@@ -838,19 +838,25 @@ domonnoise(struct monst *mtmp)
         break;
     case MS_BARK:
         if (flags.moonphase == FULL_MOON && night()) {
+            Soundeffect(se_canine_howl, 80);
             pline_msg = "howls.";
         } else if (mtmp->mpeaceful) {
             if (mtmp->mtame
                 && (mtmp->mconf || mtmp->mflee || mtmp->mtrapped
-                    || svm.moves > EDOG(mtmp)->hungrytime || mtmp->mtame < 5))
+                    || svm.moves > EDOG(mtmp)->hungrytime || mtmp->mtame < 5)) {
+                Soundeffect(se_canine_whine, 60);
                 pline_msg = "whines.";
-            else if (mtmp->mtame && EDOG(mtmp)->hungrytime > svm.moves + 1000)
+            } else if (mtmp->mtame && EDOG(mtmp)->hungrytime > svm.moves + 1000) {
+                Soundeffect(se_canine_yip, 60);
                 pline_msg = "yips.";
-            else {
-                if (ptr != &mons[PM_DINGO]) /* dingos do not actually bark */
+            } else {
+                if (ptr != &mons[PM_DINGO]) { /* dingos do not actually bark */
+                    Soundeffect(se_canine_bark, 60);
                     pline_msg = "barks.";
+                }
             }
         } else {
+            Soundeffect(se_canine_growl, 80);
             pline_msg = "growls.";
         }
         break;
@@ -911,15 +917,21 @@ domonnoise(struct monst *mtmp)
         pline_msg = "grunts.";
         break;
     case MS_NEIGH:
-        if (mtmp->mtame < 5) {
+        if (mtmp->mtame) {
+            if (mtmp->mconf || mtmp->mflee || mtmp->mtrapped
+                || mtmp->mtame < 5) {
+                Soundeffect(se_equine_neigh, 60);
+                pline_msg = "neighs.";
+            } else if (svm.moves > EDOG(mtmp)->hungrytime) {
+                Soundeffect(se_equine_whinny, 60);
+                pline_msg = "whinnies.";
+            } else {
+                Soundeffect(se_equine_whicker, 60);
+                pline_msg = "whickers.";
+            }
+        } else {
             Soundeffect(se_equine_neigh, 60);
             pline_msg = "neighs.";
-        } else if (svm.moves > EDOG(mtmp)->hungrytime) {
-            Soundeffect(se_equine_whinny, 60);
-            pline_msg = "whinnies.";
-        } else {
-            Soundeffect(se_equine_whicker, 60);
-            pline_msg = "whickers.";
         }
         break;
     case MS_MOO:
@@ -1310,6 +1322,13 @@ dochat(void)
     }
 
     if (u.dx == 0 && u.dy == 0) {
+        if (u.usteed) {
+            if (helpless(u.usteed)) {
+                pline("%s seems not to notice you.", Monnam(u.usteed));
+                return ECMD_TIME;
+            } else
+                return domonnoise(u.usteed);
+        }
         /*
          * Let's not include this.
          * It raises all sorts of questions: can you wear
@@ -1451,7 +1470,7 @@ tiphat(void)
     You("briefly doff your %s.", helm_simple_name(uarmh));
 
     if (!u.dx && !u.dy) {
-        if (u.usteed && u.dz > 0) {
+        if (u.usteed && u.dz >= 0) {
             if (helpless(u.usteed))
                 pline("%s doesn't notice.", Monnam(u.usteed));
             else

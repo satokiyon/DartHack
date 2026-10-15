@@ -45,12 +45,12 @@ Cコアの `include/seffects.h` に定義されている 244 種の効果音 ID 
 | 26 | `se_bubble_rising.ogg` | `se_bubble_rising` | 水中からポコポコと泡が湧き立つ音 | fountain.c |
 | 27 | `se_bugle_playing_reveille.ogg` | `se_bugle_playing_reveille` | ラッパで起床ラッパを演奏する音 | muse.c |
 | 28 | `se_buzz.ogg` | `se_buzz` | ブーンという低周波の羽音・電気音 | sounds.c |
-| 29 | `se_canine_bark.ogg` | `se_canine_bark` | 犬・狼のワンワンという吠え声 | 予備（直接呼び出しなし） |
-| 30 | `se_canine_growl.ogg` | `se_canine_growl` | 犬・狼のウーンという唸り声 | 予備（直接呼び出しなし） |
-| 31 | `se_canine_howl.ogg` | `se_canine_howl` | 犬・狼の遠吠え（アオーンという声） | were.c |
-| 32 | `se_canine_whine.ogg` | `se_canine_whine` | 犬のクーン・キュンという甘え声 | 予備（直接呼び出しなし） |
-| 33 | `se_canine_yelp.ogg` | `se_canine_yelp` | 犬のキャンという痛みの悲鳴 | 予備（直接呼び出しなし） |
-| 34 | `se_canine_yip.ogg` | `se_canine_yip` | 犬の甲高いキュッという鳴き声 | 予備（直接呼び出しなし） |
+| 29 | `se_canine_bark.ogg` | `se_canine_bark` | 犬・狼のワンワンという吠え声 | sounds.c |
+| 30 | `se_canine_growl.ogg` | `se_canine_growl` | 犬・狼のウーンという唸り声 | sounds.c |
+| 31 | `se_canine_howl.ogg` | `se_canine_howl` | 犬・狼の遠吠え（アオーンという声） | were.c, sounds.c |
+| 32 | `se_canine_whine.ogg` | `se_canine_whine` | 犬のクーン・キュンという甘え声 | sounds.c |
+| 33 | `se_canine_yelp.ogg` | `se_canine_yelp` | 犬のキャンという痛みの悲鳴 | sounds.c |
+| 34 | `se_canine_yip.ogg` | `se_canine_yip` | 犬の甲高いキュッという鳴き声 | sounds.c |
 | 35 | `se_canine_yowl.ogg` | `se_canine_yowl` | 犬の長く引き伸ばした吠え声 | 予備（直接呼び出しなし） |
 | 36 | `se_chain_shatters.ogg` | `se_chain_shatters` | 鎖がバキッと砕け散る音（魔法爆発等で） | explode.c |
 | 37 | `se_chains_rattling_gears_turning.ogg` | `se_chains_rattling_gears_turning` | 鎖がジャラジャラ鳴りながらギアが回る音（跳ね橋の可動） | dbridge.c |
