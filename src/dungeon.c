@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15. */
 /* NetHack 5.0	dungeon.c	$NHDT-Date: 1781973047 2026/06/20 16:30:47 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.239 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2120,6 +2120,78 @@ lev_by_name(const char *nam)
         dlev = mseen->lev;
     } else {
         /* no matching annotation, check whether they used a name we know */
+        char zbuf[BUFSZ];
+
+        Strcpy(zbuf, nam);
+        jp_normalize_zenkaku(zbuf);
+        nam = zbuf;
+
+        /* ゲーム内階層名（#chronicle / #overview等）および特殊階層の日本語・英語マッピング */
+        {
+            static const struct {
+                const char *jp_name;
+                const char *en_key;
+            } jp_level_map[] = {
+                /* ブランチ */
+                { "ノームの鉱山", "The Gnomish Mines" },
+                { "ノーム鉱山", "The Gnomish Mines" },
+                { "鉱山", "The Gnomish Mines" },
+                { "運命の大迷宮", "The Dungeons of Doom" },
+                { "大迷宮", "The Dungeons of Doom" },
+                { "倉庫番", "Sokoban" },
+                { "ソコバン", "Sokoban" },
+                { "クエスト", "The Quest" },
+                { "ローディオス砦", "Fort Ludios" },
+                { "フォート・ノックス", "Fort Ludios" },
+                { "フォートノックス", "Fort Ludios" },
+                { "ノックス", "Fort Ludios" },
+                { "ゲヘナ", "gehennom" },
+                { "精霊界", "The Elemental Planes" },
+
+                /* メインダンジョン・鉱山の特殊階層 */
+                { "神託所", "oracle" },
+                { "デルフィ", "oracle" },
+                { "デルファイ", "oracle" },
+                { "ビッグルーム", "bigrm" },
+                { "bigroom", "bigrm" },
+                { "メデューサの島", "medusa" },
+                { "メデューサ", "medusa" },
+                { "ローグ階", "rogue" },
+                { "ローグ", "rogue" },
+                { "迷宮の城", "castle" },
+                { "城", "castle" },
+                { "鉱山街", "minetn" },
+                { "minetown", "minetn" },
+                { "鉱山の最下層", "minend" },
+                { "鉱山最下層", "minend" },
+                { "mine's end", "minend" },
+
+                /* ゲヘナ・悪魔の霊廟 */
+                { "死の谷", "valley" },
+                { "モーロックの聖域", "sanctum" },
+                { "聖域", "sanctum" },
+                { "魔法使いの塔", "wizard1" },
+                { "wizard's tower", "wizard1" },
+                { "アスモデウスの霊廟", "asmodeus" },
+                { "アスモデウス", "asmodeus" },
+                { "ベルゼブブの霊廟", "baalz" },
+                { "ベルゼブブ", "baalz" },
+                { "baalzebub", "baalz" },
+                { "ジョウビレックスの沼", "juiblex" },
+                { "ジョウビレックス", "juiblex" },
+                { "オルクスの町", "orcus" },
+                { "オルクス", "orcus" },
+                { (const char *) 0, (const char *) 0 }
+            };
+            int m_idx;
+
+            for (m_idx = 0; jp_level_map[m_idx].jp_name; ++m_idx) {
+                if (!strcmpi(nam, jp_level_map[m_idx].jp_name)) {
+                    nam = jp_level_map[m_idx].en_key;
+                    break;
+                }
+            }
+        }
 
         /* allow strings like "the oracle level" to find "oracle" */
         if (!strncmpi(nam, "the ", 4))
@@ -3613,7 +3685,7 @@ jp_special_level_name(const char *proto)
     if (!strcmpi(proto, "oracle")) return "神託所";
     if (!strcmpi(proto, "knox")) return "フォート・ノックス";
     if (!strcmpi(proto, "asmodeus")) return "アスモデウスの霊廟";
-    if (!strcmpi(proto, "baalz")) return "バアルゼブブの霊廟";
+    if (!strcmpi(proto, "baalz")) return "ベルゼブブの霊廟";
     if (!strcmpi(proto, "juiblex")) return "ジョウビレックスの沼";
     if (!strcmpi(proto, "orcus")) return "オルクスの町";
     if (!strcmpi(proto, "astral")) return "アストラル界";

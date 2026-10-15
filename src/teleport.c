@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15. */
 /* NetHack 5.0	teleport.c	$NHDT-Date: 1781973069 2026/06/20 16:31:09 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.246 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1212,6 +1212,7 @@ level_tele(void)
                             the previous input was invalid so don't use it
                             as getlin()'s preloaded default answer */
             getlin(qbuf, buf);
+            jp_normalize_zenkaku(buf);
             if (!strcmp(buf, "*")) {
                 goto random_levtport;
             } else if (Confusion && rnl(5)) {

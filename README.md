@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsとUbuntu(WSL)のみ)
@@ -278,6 +278,7 @@ OPTIONS=align_status:right,msw_stat_cols:15
 * [NetHack-wasm-webUI](https://github.com/e3sh/Nethack-wasm-webUI): ブラウザでプレイできる。日本語はリアルタイムに翻訳(変換)して表示している。
 * [NetHack-brass](https://github.com/youkan700/NetHack-brass): 3.4.3ベースを日本語化してさらにいろいろ改造したもの
 * [NetHack-cn](https://nethack-cn.github.io/): NetHack中国語版
+* [DartHack](https://github.com/satokiyon/DartHack): Android向け日本語アプリ
 * …他にあれば追記する
 
 ----
@@ -286,13 +287,15 @@ OPTIONS=align_status:right,msw_stat_cols:15
 * [hackaholic](https://nethack.go5.jp/): 通称「墓堀」
 * [NetHack Wiki](https://nethackwiki.com/wiki/Main_Page)
 * [NetHack Spoilers](https://davidbau.github.io/nethack-companion/spoilers/)
-
+* [NetHack Spoilers日本語訳](https://satokiyon.github.io/nethack-companion-jp/spoilers/index.ja.html)
 ----
 
 ## NetHack派生プロジェクト
 * [NetHack学習環境(NLE)](https://github.com/NetHack-LE/nle): NetHackを強化学習対象とするためのインターフェース
 * [nethack-mcp](https://github.com/NiJingzhe/nethack-mcp): 生成AIがNetHackをプレイするためのMCPサーバ
 * [NetHack-electron](https://github.com/horvay/NetHack): electronでリッチなUIを実装
+* [BALROG](https://balrogai.com/): LLMとVLMの長期タスクの性能をNetHackでベンチマークするプロジェクト
+* [NetHackers](https://nethackers.dunnolab.ai/): NetHack 3.6.6を昇天できるボットを作ろうというプロジェクト
 * …他にも見つけたら追記する
 
 ----

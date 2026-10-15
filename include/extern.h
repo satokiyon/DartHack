@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1933,6 +1933,7 @@ extern boolean same_race(struct permonst *, struct permonst *) NONNULLARG12;
 extern int name_to_mon(const char *, int *) NONNULLARG1;
 extern int name_to_monplus(const char *, const char **, int *) NONNULLARG1;
 extern int name_to_monclass(const char *, int *);
+extern void jp_normalize_zenkaku(char *);
 extern int gender(struct monst *) NONNULLARG1;
 extern int pronoun_gender(struct monst *, unsigned) NONNULLARG1;
 extern boolean levl_follower(struct monst *) NONNULLARG1;
