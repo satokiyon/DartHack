@@ -36,6 +36,7 @@ import 'widgets/msg_history_dialog.dart';
 import 'widgets/shortcut_edit_dialog.dart';
 import 'widgets/game_drawer.dart';
 import 'widgets/guidebook_dialog.dart';
+import 'widgets/spoiler_dialog.dart';
 import 'widgets/overlays/menu_overlay.dart';
 import 'widgets/overlays/yn_overlay.dart';
 import 'widgets/overlays/any_key_overlay.dart';
@@ -505,6 +506,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       onQuit: () => _sendShortcutToC("#quit\n"),
       onShowScoreboard: _showScoreboardDialog,
       onShowGuidebook: () => GuidebookDialog.show(context),
+      onShowSpoilers: () => SpoilerDialog.show(context),
       onShowHelp: () => _sendFfiKey('?'.codeUnitAt(0), "?"),
       onDatabaseSearch: _triggerDatabaseSearch,
       onOpenOptions: () => _sendFfiKey('O'.codeUnitAt(0), "O"),

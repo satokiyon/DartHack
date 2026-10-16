@@ -1281,4 +1281,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tilesetTapToCopy => 'Tap to copy URL';
+
+  @override
+  String get spoilersTooltip => 'Spoilers (Strategy Guide)';
+
+  @override
+  String get readSpoilers => 'Read Spoilers';
+
+  @override
+  String get spoilersTitle => 'NetHack Spoilers';
+
+  @override
+  String get searchSpoilersHint => 'Search Spoilers...';
+
+  @override
+  String get creditsSpoilersTitle =>
+      'NetHack Spoilers: A Traveler\'s Companion to the Mazes of Menace';
+
+  @override
+  String get creditsSpoilersDesc => 'Compiled by David Bau';
+
+  @override
+  String get creditsSpoilersLicense => 'CC BY-SA 4.0';
+
+  @override
+  String get creditsSpoilersCopiedUrl => 'Spoiler URL copied to clipboard';
+
+  @override
+  String tocTitle(int count) {
+    return 'Table of Contents ($count items)';
+  }
+
+  @override
+  String get tocFilterHint => 'Filter Table of Contents...';
+
+  @override
+  String get tocFilterAll => 'All';
+
+  @override
+  String get tocFilterChaptersOnly => 'Chapters Only';
+
+  @override
+  String get tocCurrentLocation => 'Current';
+
+  @override
+  String failedToLoadSpoilers(String error) {
+    return 'Failed to load Spoilers: $error';
+  }
 }

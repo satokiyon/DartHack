@@ -435,6 +435,31 @@
   },
   "tilesetUrlCopied": "URLをクリップボードにコピーしました",
   "tilesetCurrentSelected": "選択中",
-  "tilesetTapToCopy": "タップしてURLをコピー"
+  "tilesetTapToCopy": "タップしてURLをコピー",
+
+  "spoilersTooltip": "スポイラー (攻略情報)",
+  "readSpoilers": "スポイラーを読む",
+  "spoilersTitle": "NetHack スポイラー",
+  "searchSpoilersHint": "スポイラー内を検索...",
+  "creditsSpoilersTitle": "NetHack Spoilers: A Traveler's Companion to the Mazes of Menace",
+  "creditsSpoilersDesc": "原著: David Bau / 日本語翻訳・監修: NetHackJP Project",
+  "creditsSpoilersLicense": "CC BY-SA 4.0",
+  "creditsSpoilersCopiedUrl": "スポイラーのURLをクリップボードにコピーしました",
+  "tocTitle": "目次 ({count}項目)",
+  "@tocTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "tocFilterHint": "目次を絞り込み...",
+  "tocFilterAll": "すべて",
+  "tocFilterChaptersOnly": "章のみ",
+  "tocCurrentLocation": "現在地",
+  "failedToLoadSpoilers": "スポイラーの読み込みに失敗しました: {error}",
+  "@failedToLoadSpoilers": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  }
 }
 

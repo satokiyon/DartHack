@@ -9,6 +9,7 @@ class GameDrawerContent extends StatelessWidget {
   final VoidCallback onQuit;
   final VoidCallback onShowScoreboard;
   final VoidCallback onShowGuidebook;
+  final VoidCallback onShowSpoilers;
   final VoidCallback onShowHelp;
   final VoidCallback onDatabaseSearch;
   final VoidCallback onOpenOptions;
@@ -25,6 +26,7 @@ class GameDrawerContent extends StatelessWidget {
     required this.onQuit,
     required this.onShowScoreboard,
     required this.onShowGuidebook,
+    required this.onShowSpoilers,
     required this.onShowHelp,
     required this.onDatabaseSearch,
     required this.onOpenOptions,
@@ -93,6 +95,14 @@ class GameDrawerContent extends StatelessWidget {
           onTap: () {
             onClose();
             onShowGuidebook();
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.auto_stories, color: Colors.amberAccent),
+          title: Text(l10n.readSpoilers, style: const TextStyle(color: Colors.white)),
+          onTap: () {
+            onClose();
+            onShowSpoilers();
           },
         ),
         if (isGameRunning) ...[

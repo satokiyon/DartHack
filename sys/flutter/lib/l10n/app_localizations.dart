@@ -2485,6 +2485,90 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'タップしてURLをコピー'**
   String get tilesetTapToCopy;
+
+  /// No description provided for @spoilersTooltip.
+  ///
+  /// In ja, this message translates to:
+  /// **'スポイラー (攻略情報)'**
+  String get spoilersTooltip;
+
+  /// No description provided for @readSpoilers.
+  ///
+  /// In ja, this message translates to:
+  /// **'スポイラーを読む'**
+  String get readSpoilers;
+
+  /// No description provided for @spoilersTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'NetHack スポイラー'**
+  String get spoilersTitle;
+
+  /// No description provided for @searchSpoilersHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'スポイラー内を検索...'**
+  String get searchSpoilersHint;
+
+  /// No description provided for @creditsSpoilersTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'NetHack Spoilers: A Traveler\'s Companion to the Mazes of Menace'**
+  String get creditsSpoilersTitle;
+
+  /// No description provided for @creditsSpoilersDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'原著: David Bau / 日本語翻訳・監修: NetHackJP Project'**
+  String get creditsSpoilersDesc;
+
+  /// No description provided for @creditsSpoilersLicense.
+  ///
+  /// In ja, this message translates to:
+  /// **'CC BY-SA 4.0'**
+  String get creditsSpoilersLicense;
+
+  /// No description provided for @creditsSpoilersCopiedUrl.
+  ///
+  /// In ja, this message translates to:
+  /// **'スポイラーのURLをクリップボードにコピーしました'**
+  String get creditsSpoilersCopiedUrl;
+
+  /// No description provided for @tocTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'目次 ({count}項目)'**
+  String tocTitle(int count);
+
+  /// No description provided for @tocFilterHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'目次を絞り込み...'**
+  String get tocFilterHint;
+
+  /// No description provided for @tocFilterAll.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべて'**
+  String get tocFilterAll;
+
+  /// No description provided for @tocFilterChaptersOnly.
+  ///
+  /// In ja, this message translates to:
+  /// **'章のみ'**
+  String get tocFilterChaptersOnly;
+
+  /// No description provided for @tocCurrentLocation.
+  ///
+  /// In ja, this message translates to:
+  /// **'現在地'**
+  String get tocCurrentLocation;
+
+  /// No description provided for @failedToLoadSpoilers.
+  ///
+  /// In ja, this message translates to:
+  /// **'スポイラーの読み込みに失敗しました: {error}'**
+  String failedToLoadSpoilers(String error);
 }
 
 class _AppLocalizationsDelegate

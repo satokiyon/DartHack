@@ -434,6 +434,31 @@
   },
   "tilesetUrlCopied": "URL copied to clipboard",
   "tilesetCurrentSelected": "Selected",
-  "tilesetTapToCopy": "Tap to copy URL"
+  "tilesetTapToCopy": "Tap to copy URL",
+
+  "spoilersTooltip": "Spoilers (Strategy Guide)",
+  "readSpoilers": "Read Spoilers",
+  "spoilersTitle": "NetHack Spoilers",
+  "searchSpoilersHint": "Search Spoilers...",
+  "creditsSpoilersTitle": "NetHack Spoilers: A Traveler's Companion to the Mazes of Menace",
+  "creditsSpoilersDesc": "Compiled by David Bau",
+  "creditsSpoilersLicense": "CC BY-SA 4.0",
+  "creditsSpoilersCopiedUrl": "Spoiler URL copied to clipboard",
+  "tocTitle": "Table of Contents ({count} items)",
+  "@tocTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "tocFilterHint": "Filter Table of Contents...",
+  "tocFilterAll": "All",
+  "tocFilterChaptersOnly": "Chapters Only",
+  "tocCurrentLocation": "Current",
+  "failedToLoadSpoilers": "Failed to load Spoilers: {error}",
+  "@failedToLoadSpoilers": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  }
 }
 

@@ -1255,4 +1255,52 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get tilesetTapToCopy => 'タップしてURLをコピー';
+
+  @override
+  String get spoilersTooltip => 'スポイラー (攻略情報)';
+
+  @override
+  String get readSpoilers => 'スポイラーを読む';
+
+  @override
+  String get spoilersTitle => 'NetHack スポイラー';
+
+  @override
+  String get searchSpoilersHint => 'スポイラー内を検索...';
+
+  @override
+  String get creditsSpoilersTitle =>
+      'NetHack Spoilers: A Traveler\'s Companion to the Mazes of Menace';
+
+  @override
+  String get creditsSpoilersDesc =>
+      '原著: David Bau / 日本語翻訳・監修: NetHackJP Project';
+
+  @override
+  String get creditsSpoilersLicense => 'CC BY-SA 4.0';
+
+  @override
+  String get creditsSpoilersCopiedUrl => 'スポイラーのURLをクリップボードにコピーしました';
+
+  @override
+  String tocTitle(int count) {
+    return '目次 ($count項目)';
+  }
+
+  @override
+  String get tocFilterHint => '目次を絞り込み...';
+
+  @override
+  String get tocFilterAll => 'すべて';
+
+  @override
+  String get tocFilterChaptersOnly => '章のみ';
+
+  @override
+  String get tocCurrentLocation => '現在地';
+
+  @override
+  String failedToLoadSpoilers(String error) {
+    return 'スポイラーの読み込みに失敗しました: $error';
+  }
 }

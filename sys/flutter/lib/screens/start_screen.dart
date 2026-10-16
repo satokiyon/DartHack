@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/guidebook_dialog.dart';
+import '../widgets/spoiler_dialog.dart';
 
 class StartScreen extends StatelessWidget {
   final bool assetsReady;
@@ -118,14 +119,29 @@ class StartScreen extends StatelessWidget {
           Positioned(
             top: 16,
             left: 24,
-            child: IconButton(
-              icon: const Icon(Icons.menu_book, color: Colors.white70, size: 28),
-              onPressed: () => GuidebookDialog.show(context),
-              tooltip: l10n.guidebookTooltip,
-              style: IconButton.styleFrom(
-                backgroundColor: Colors.black38,
-                padding: const EdgeInsets.all(8),
-              ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.menu_book, color: Colors.white70, size: 28),
+                  onPressed: () => GuidebookDialog.show(context),
+                  tooltip: l10n.guidebookTooltip,
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.black38,
+                    padding: const EdgeInsets.all(8),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                IconButton(
+                  icon: const Icon(Icons.auto_stories, color: Colors.amberAccent, size: 28),
+                  onPressed: () => SpoilerDialog.show(context),
+                  tooltip: l10n.spoilersTooltip,
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.black38,
+                    padding: const EdgeInsets.all(8),
+                  ),
+                ),
+              ],
             ),
           ),
           Positioned(
@@ -239,14 +255,29 @@ class StartScreen extends StatelessWidget {
           Positioned(
             top: 16,
             left: 24,
-            child: IconButton(
-              icon: const Icon(Icons.menu_book, color: Colors.white70, size: 28),
-              onPressed: () => GuidebookDialog.show(context),
-              tooltip: l10n.guidebookTooltip,
-              style: IconButton.styleFrom(
-                backgroundColor: Colors.black38,
-                padding: const EdgeInsets.all(8),
-              ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.menu_book, color: Colors.white70, size: 28),
+                  onPressed: () => GuidebookDialog.show(context),
+                  tooltip: l10n.guidebookTooltip,
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.black38,
+                    padding: const EdgeInsets.all(8),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                IconButton(
+                  icon: const Icon(Icons.auto_stories, color: Colors.amberAccent, size: 28),
+                  onPressed: () => SpoilerDialog.show(context),
+                  tooltip: l10n.spoilersTooltip,
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.black38,
+                    padding: const EdgeInsets.all(8),
+                  ),
+                ),
+              ],
             ),
           ),
           Positioned(

@@ -2174,6 +2174,68 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(l10n.creditsContributorList),
+                const Divider(color: Colors.white24, height: 28),
+                Text(
+                  l10n.creditsSpoilersTitle,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.amberAccent),
+                ),
+                const SizedBox(height: 4),
+                Text(l10n.creditsSpoilersDesc, style: const TextStyle(fontSize: 13, color: Colors.white70)),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.teal.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: Colors.tealAccent.withValues(alpha: 0.4), width: 0.8),
+                  ),
+                  child: Text(
+                    l10n.creditsSpoilersLicense,
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Colors.tealAccent),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(6),
+                    onTap: () {
+                      const url = 'https://davidbau.github.io/nethack-companion/spoilers/';
+                      Clipboard.setData(const ClipboardData(text: url));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.creditsSpoilersCopiedUrl)),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              'https://davidbau.github.io/nethack-companion/spoilers/',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.lightBlue.shade300,
+                                decoration: TextDecoration.underline,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Tooltip(
+                            message: l10n.tilesetTapToCopy,
+                            child: Icon(
+                              Icons.copy_rounded,
+                              size: 16,
+                              color: Colors.lightBlue.shade300,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 16),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.music_note, color: Colors.amberAccent, size: 20),
