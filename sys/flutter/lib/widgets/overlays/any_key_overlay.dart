@@ -322,7 +322,9 @@ class _AnyKeyOverlayState extends State<AnyKeyOverlay> {
           alignment: WrapAlignment.center,
           children: [
             FilterChip(
-              label: Text(_isShiftActive ? 'Shift (大文字) [ON]' : 'Shift (大文字)'),
+              label: Text(_isShiftActive
+                  ? (isJapanese ? 'Shift (大文字) [ON]' : 'Shift (Caps) [ON]')
+                  : (isJapanese ? 'Shift (大文字)' : 'Shift (Caps)')),
               selected: _isShiftActive,
               selectedColor: Colors.amber.shade700,
               checkmarkColor: Colors.black,
@@ -336,7 +338,9 @@ class _AnyKeyOverlayState extends State<AnyKeyOverlay> {
               },
             ),
             FilterChip(
-              label: Text(_isCtrlActive ? 'Ctrl (^キー) [ON]' : 'Ctrl (^キー)'),
+              label: Text(_isCtrlActive
+                  ? (isJapanese ? 'Ctrl (^キー) [ON]' : 'Ctrl (^) [ON]')
+                  : (isJapanese ? 'Ctrl (^キー)' : 'Ctrl (^)')),
               selected: _isCtrlActive,
               selectedColor: Colors.teal.shade600,
               checkmarkColor: Colors.white,
@@ -371,7 +375,12 @@ class _AnyKeyOverlayState extends State<AnyKeyOverlay> {
 
   /// クイック文字入力キーパッド (画面タップ用)
   Widget _buildQuickKeyPad(bool isJapanese) {
-    const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+    // QWERTY 配列 (3行)
+    const qwertyRows = [
+      ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+      ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+      ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+    ];
     // NetHack 全 32 種印刷可能記号
     const symbols = [
       '?', '#', '&', '!', '/', ':', ';', '@', '.', ',', '\$', '^', '*', '<', '>', '_',
@@ -422,33 +431,44 @@ class _AnyKeyOverlayState extends State<AnyKeyOverlay> {
           ),
           const SizedBox(height: 8),
 
-          // 文字モード
+          // 文字モード (QWERTY 3行配列)
           if (!_showSymbolsPad)
-            Wrap(
-              spacing: 4,
-              runSpacing: 4,
-              alignment: WrapAlignment.center,
-              children: letters.map((ch) {
-                final displayChar = _isShiftActive ? ch.toUpperCase() : ch;
-                return InkWell(
-                  onTap: () => _sendCode(ch.codeUnitAt(0)),
-                  borderRadius: BorderRadius.circular(4),
-                  child: Container(
-                    width: 28,
-                    height: 32,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF263238),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.blueGrey.shade700),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                children: qwertyRows.map((row) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: row.map((ch) {
+                        final displayChar = _isShiftActive ? ch.toUpperCase() : ch;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                          child: InkWell(
+                            onTap: () => _sendCode(ch.codeUnitAt(0)),
+                            borderRadius: BorderRadius.circular(4),
+                            child: Container(
+                              width: 28,
+                              height: 32,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF263238),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: Colors.blueGrey.shade700),
+                              ),
+                              child: Text(
+                                displayChar,
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
-                    child: Text(
-                      displayChar,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-                    ),
-                  ),
-                );
-              }).toList(),
+                  );
+                }).toList(),
+              ),
             ),
 
           // 記号モード (全 32 種)
