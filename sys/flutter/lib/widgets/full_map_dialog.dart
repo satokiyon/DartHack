@@ -11,6 +11,7 @@ void showFullMapDialog({
   required ui.Image? tileImage,
   required int tileWidth,
   required int tileHeight,
+  bool isTransparentTileset = false,
 }) {
   final l10n = AppLocalizations.of(context)!;
   showDialog(
@@ -31,6 +32,7 @@ void showFullMapDialog({
           tileImage: tileImage,
           tileWidth: tileWidth,
           tileHeight: tileHeight,
+          isTransparentTileset: isTransparentTileset,
           l10n: l10n,
         ),
       );
@@ -44,6 +46,7 @@ class _FullMapDialogContent extends StatefulWidget {
   final ui.Image? tileImage;
   final int tileWidth;
   final int tileHeight;
+  final bool isTransparentTileset;
   final AppLocalizations l10n;
 
   const _FullMapDialogContent({
@@ -52,6 +55,7 @@ class _FullMapDialogContent extends StatefulWidget {
     required this.tileImage,
     required this.tileWidth,
     required this.tileHeight,
+    this.isTransparentTileset = false,
     required this.l10n,
   });
 
@@ -151,6 +155,7 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
                     tileWidth: widget.tileWidth,
                     tileHeight: widget.tileHeight,
                     useTiles: widget.useTiles,
+                    isTransparentTileset: widget.isTransparentTileset,
                   ),
                 ),
               ),

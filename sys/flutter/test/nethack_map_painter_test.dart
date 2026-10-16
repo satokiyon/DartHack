@@ -81,4 +81,42 @@ void main() {
     picture.dispose();
     dummyImg.dispose();
   });
+
+  test('NetHackMapPainter supports 2-layer rendering for transparent tileset with bktile', () async {
+    final screen = NetHackScreen();
+
+    // 背景床(200)の上にモンスター(100)
+    screen.printGlyph(3, 5, 5, 100, 'd'.codeUnitAt(0), 0xFFFFFF, 0, 200);
+
+    // 背景と前景が同じ(地形そのもの)
+    screen.printGlyph(3, 6, 5, 200, '.'.codeUnitAt(0), 0xFFFFFF, 0, 200);
+
+    // bktile なし (-1)
+    screen.printGlyph(3, 7, 5, 101, 'd'.codeUnitAt(0), 0xFFFFFF, 0, -1);
+
+    // 64x64 のダミー tileImage を作成
+    final recorderImg = ui.PictureRecorder();
+    final canvasImg = Canvas(recorderImg);
+    canvasImg.drawRect(const Rect.fromLTWH(0, 0, 64, 64), Paint()..color = Colors.green);
+    final dummyImg = await recorderImg.endRecording().toImage(64, 64);
+
+    final painter = NetHackMapPainter(
+      screen: screen,
+      tileImage: dummyImg,
+      tileWidth: 32,
+      tileHeight: 32,
+      useTiles: true,
+      isTransparentTileset: true,
+    );
+
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    const size = Size(800, 600);
+
+    expect(() => painter.paint(canvas, size), returnsNormally);
+    final picture = recorder.endRecording();
+    picture.dispose();
+    dummyImg.dispose();
+  });
 }
+

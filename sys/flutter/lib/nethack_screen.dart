@@ -4,16 +4,18 @@ class GlyphData {
   final String char;
   final int color;
   final int tile;
+  final int bktile;
   final int special;
 
   GlyphData({
     required this.char,
     required this.color,
     required this.tile,
+    this.bktile = -1,
     required this.special,
   });
 
-  factory GlyphData.empty() => GlyphData(char: ' ', color: 0, tile: -1, special: 0);
+  factory GlyphData.empty() => GlyphData(char: ' ', color: 0, tile: -1, bktile: -1, special: 0);
 }
 
 class MenuItemData {
@@ -396,7 +398,7 @@ class NetHackScreen extends ChangeNotifier {
     }
   }
 
-  void printGlyph(int winId, int x, int y, int tile, int ch, int color, int special) {
+  void printGlyph(int winId, int x, int y, int tile, int ch, int color, int special, [int bktile = -1]) {
     final type = _winTypes[winId];
     if ((type == nhwMap || winId == 3 /* WIN_MAP */) && x >= 0 && x < mapCols && y >= 0 && y < mapRows) {
       final charStr = String.fromCharCode(ch);
@@ -404,6 +406,7 @@ class NetHackScreen extends ChangeNotifier {
         char: charStr.isNotEmpty ? charStr : ' ',
         color: color,
         tile: tile,
+        bktile: bktile,
         special: special,
       );
       notifyListeners();

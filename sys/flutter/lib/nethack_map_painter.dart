@@ -8,6 +8,7 @@ class NetHackMapPainter extends CustomPainter {
   final int tileWidth;
   final int tileHeight;
   final bool useTiles;
+  final bool isTransparentTileset;
 
   NetHackMapPainter({
     required this.screen,
@@ -15,6 +16,7 @@ class NetHackMapPainter extends CustomPainter {
     required this.tileWidth,
     required this.tileHeight,
     required this.useTiles,
+    this.isTransparentTileset = false,
   }) : super(repaint: screen);
 
   @override
@@ -55,6 +57,32 @@ class NetHackMapPainter extends CustomPainter {
           final cellTop = offsetY + y * cellH;
 
           if (glyph.tile >= 0) {
+            final destRect = Rect.fromLTWH(
+              cellLeft,
+              cellTop,
+              cellW,
+              cellH,
+            );
+
+            // 1. 背景地形タイルの描画（透過タイルセット選択時、かつ有効な背景タイルが存在する場合）
+            if (isTransparentTileset && glyph.bktile >= 0 && glyph.bktile != glyph.tile) {
+              final bgRow = glyph.bktile ~/ cols;
+              final bgCol = glyph.bktile % cols;
+              final bgSrcRect = Rect.fromLTWH(
+                (bgCol * tileWidth).toDouble(),
+                (bgRow * tileHeight).toDouble(),
+                tileWidth.toDouble(),
+                tileHeight.toDouble(),
+              );
+              canvas.drawImageRect(
+                tileImage!,
+                bgSrcRect,
+                destRect,
+                Paint()..isAntiAlias = false,
+              );
+            }
+
+            // 2. 前面タイルの描画（アルファブレンド合成）
             final iRow = glyph.tile ~/ cols;
             final iCol = glyph.tile % cols;
 
@@ -63,13 +91,6 @@ class NetHackMapPainter extends CustomPainter {
               (iRow * tileHeight).toDouble(),
               tileWidth.toDouble(),
               tileHeight.toDouble(),
-            );
-
-            final destRect = Rect.fromLTWH(
-              cellLeft,
-              cellTop,
-              cellW,
-              cellH,
             );
 
             canvas.drawImageRect(
@@ -277,6 +298,7 @@ class NetHackMapPainter extends CustomPainter {
     return oldDelegate.screen != screen ||
            oldDelegate.tileImage != tileImage ||
            oldDelegate.useTiles != useTiles ||
+           oldDelegate.isTransparentTileset != isTransparentTileset ||
            oldDelegate.tileWidth != tileWidth ||
            oldDelegate.tileHeight != tileHeight;
   }

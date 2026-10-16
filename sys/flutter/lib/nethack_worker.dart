@@ -128,7 +128,7 @@ class NetHackWorker {
       });
     });
 
-    glyphCallable = NativeCallable<PrintGlyphCallback>.listener((int winId, int x, int y, int tile, int ch, int color, int special) {
+    glyphCallable = NativeCallable<PrintGlyphCallback>.listener((int winId, int x, int y, int tile, int ch, int color, int special, int bktile) {
       uiSendPort.send({
         'type': 'printGlyph',
         'winId': winId,
@@ -138,6 +138,7 @@ class NetHackWorker {
         'ch': ch,
         'color': color,
         'special': special,
+        'bktile': bktile,
       });
     });
 

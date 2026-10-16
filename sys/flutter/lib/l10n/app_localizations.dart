@@ -407,13 +407,13 @@ abstract class AppLocalizations {
   /// No description provided for @layoutPattern1.
   ///
   /// In ja, this message translates to:
-  /// **'パターン1 (左右分割)'**
+  /// **'パターン1'**
   String get layoutPattern1;
 
   /// No description provided for @layoutPattern2.
   ///
   /// In ja, this message translates to:
-  /// **'パターン2 (中央統合)'**
+  /// **'パターン2'**
   String get layoutPattern2;
 
   /// No description provided for @swapPadSide.

@@ -454,7 +454,7 @@ typedef void (*DartDisplayWindowCallback)(int winId, int blocking, int isPlain);
 typedef void (*DartDestroyWindowCallback)(int winId);
 typedef void (*DartCursCallback)(int winId, int x, int y);
 typedef void (*DartPutStrCallback)(int winId, int attr, const char* str);
-typedef void (*DartPrintGlyphCallback)(int winId, int x, int y, int tile, int ch, int color, int special);
+typedef void (*DartPrintGlyphCallback)(int winId, int x, int y, int tile, int ch, int color, int special, int bktile);
 typedef void (*DartNotifyInputCallback)(int requestId);
 typedef void (*DartStartMenuCallback)(int winId);
 typedef void (*DartAddMenuCallback)(int winId, long ident, int accelerator, int groupacc, int attr, const char* str, int preselected, int color, int tile);
@@ -1938,6 +1938,7 @@ static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_inf
     (void)bkglyphinfo;
     int tile = glyphinfo->gm.tileidx;
     unsigned int special = glyphinfo->gm.glyphflags;
+    int bktile = -1;
 
     /* defaults.nh および #options の hilite_pet / hilite_pile 設定に連動 */
     if (!iflags.hilite_pet) {
@@ -1954,8 +1955,26 @@ static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_inf
         ch = cp437_to_unicode[ch];
     }
 
+    /* 
+     * back_to_glyph(x, y) による純粋な背景地形タイルの算出
+     * 暗闇/未探索（MG_UNEXPL または 視界外探知）でない場合、正確な背景地形グリフを取得する。
+     */
+    if (isok(x, y)) {
+        boolean is_unexplored = (glyphinfo->gm.glyphflags & MG_UNEXPL) != 0;
+        boolean is_detected_only = (glyphinfo->gm.glyphflags & MG_DETECT) != 0 && !cansee(x, y) && levl[x][y].seenv == 0;
+
+        if (!is_unexplored && !is_detected_only) {
+            int bkglyph = back_to_glyph(x, y);
+            if (bkglyph != NO_GLYPH && bkglyph != GLYPH_UNEXPLORED) {
+                glyph_info bk_gi;
+                map_glyphinfo(x, y, bkglyph, 0, &bk_gi);
+                bktile = bk_gi.gm.tileidx;
+            }
+        }
+    }
+
     if (g_print_glyph_cb) {
-        g_print_glyph_cb((int)wid, (int)x, (int)y, tile, ch, color, (int)special);
+        g_print_glyph_cb((int)wid, (int)x, (int)y, tile, ch, color, (int)special, bktile);
     }
 }
 

@@ -782,6 +782,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       tileImage: _tileImage,
       tileWidth: _tileWidth,
       tileHeight: _tileHeight,
+      isTransparentTileset: _selectedTileset.startsWith('kevintam'),
     );
   }
 
@@ -1551,6 +1552,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             message['ch'],
             message['color'],
             message['special'],
+            (message['bktile'] as int?) ?? -1,
           );
         } else if (type == 'cliparound') {
           // C 側からプレイヤー位置 (u.ux, u.uy) を受信。
@@ -2600,6 +2602,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       tileWidth: _tileWidth,
                       tileHeight: _tileHeight,
                       useTiles: _useTiles,
+                      isTransparentTileset: _selectedTileset.startsWith('kevintam'),
                     ),
                   ),
                 ),
