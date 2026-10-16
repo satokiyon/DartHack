@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-22. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-17. */
 #include "hack.h"
 
 /*
@@ -187,7 +187,7 @@ static const char *const mon_jp_names[NUMMONS][NUM_MGENDERS] = {
     [PM_OGRE] = { 0, 0, "オーガ" },
     [PM_OGRE_LEADER] = { 0, 0, "オーガの首領" },
     [PM_OGRE_TYRANT] = { 0, 0, "オーガの暴君" },
-    [PM_DISPLACER_BEAST] = { 0, 0, "ディスプレイサービースト" },
+    [PM_DISPLACER_BEAST] = { 0, 0, "幻影の獣" },
     [PM_GHOST] = { 0, 0, "幽霊" },
     [PM_MEDUSA] = { 0, 0, "メデューサ" },
     [PM_WIZARD_OF_YENDOR] = { 0, 0, "イェンダーの魔法使い" },
