@@ -162,10 +162,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get layoutPattern => 'レイアウトパターン';
 
   @override
-  String get layoutPattern1 => 'パターン1 (左右分割)';
+  String get layoutPattern1 => 'パターン1';
 
   @override
-  String get layoutPattern2 => 'パターン2 (中央統合)';
+  String get layoutPattern2 => 'パターン2';
 
   @override
   String get swapPadSide => 'パッドの左右反転';

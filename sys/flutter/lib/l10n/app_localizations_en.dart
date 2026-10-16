@@ -163,10 +163,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get layoutPattern => 'Layout Pattern';
 
   @override
-  String get layoutPattern1 => 'Pattern 1 (Split Left/Right)';
+  String get layoutPattern1 => 'Pattern 1';
 
   @override
-  String get layoutPattern2 => 'Pattern 2 (Combined Center)';
+  String get layoutPattern2 => 'Pattern 2';
 
   @override
   String get swapPadSide => 'Swap Left/Right Pads';
