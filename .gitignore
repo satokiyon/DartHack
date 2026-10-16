@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-31.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-16.
 # CVS default ignores begin
 tags
 TAGS
@@ -98,7 +98,6 @@ bundle/*
 *.user
 util/*.lib
 util/*.exp
-submodules/CHKSUMS.tmp
 sys/amiga/regex/
 
 # Local workspace and scratch files
@@ -108,7 +107,6 @@ scratch/
 tools/
 .agent/
 submodules/*
-!submodules/CHKSUMS
 playground/
 sys/lib/
 
