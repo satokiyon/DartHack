@@ -119,7 +119,7 @@ class StartScreen extends StatelessWidget {
           Positioned(
             top: 16,
             left: 24,
-            child: Column(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
@@ -131,7 +131,7 @@ class StartScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(width: 10),
                 IconButton(
                   icon: const Icon(Icons.auto_stories, color: Colors.amberAccent, size: 28),
                   onPressed: () => SpoilerDialog.show(context),
@@ -255,7 +255,7 @@ class StartScreen extends StatelessWidget {
           Positioned(
             top: 16,
             left: 24,
-            child: Column(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
@@ -267,7 +267,7 @@ class StartScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(width: 10),
                 IconButton(
                   icon: const Icon(Icons.auto_stories, color: Colors.amberAccent, size: 28),
                   onPressed: () => SpoilerDialog.show(context),
