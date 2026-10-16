@@ -1,0 +1,41 @@
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-16.
+Third-Party Notices
+===================
+
+This repository uses the following third-party components.
+Submodule and imported component contents are kept as upstream-origin code and are not modified in this repository.
+When redistributing source or binaries, confirm license obligations at the
+exact pinned commit or version listed below.
+
+1) Lua
+------
+
+- Path: nhlua/lua
+- Upstream: https://github.com/lua/lua.git
+- Version: 5.4.8 (integrated into NetHack 5.0 tree)
+- License reference in tree: nhlua/lua/src/lua.h (copyright and permission
+   notice block near end of file)
+- Practical note: include the copyright/permission notice text when
+   redistributing substantial portions, per the upstream notice.
+
+2) PDCursesMod
+--------------
+
+- Path: submodules/pdcursesmod
+- Upstream: https://github.com/Bill-Gray/PDCursesMod.git
+- Pinned commit: 6cd9c16900fef82754923c718fab7fe85f761bb6
+- License/distribution reference in tree: submodules/pdcursesmod/README.md,
+   sections "Legal Stuff" and "Distribution Status"
+- Practical note: core is described as public domain, but parts are under
+   other licenses. Some build helper files (for example config.guess/config.sub)
+   are noted as GPL in upstream README.
+
+Release Checklist (Recommended)
+-------------------------------
+
+- Run: git submodule update --init --recursive
+- Keep this notice file in sync with pinned submodule commits.
+- Before each release, verify whether submodule updates changed license terms.
+- If distributing binaries, include required third-party notices in release
+   artifacts and accompanying documentation.
+

@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-16. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -390,10 +390,9 @@ Qt6 ポート（`win/Qt/`）は Qt 6（Ubuntu 26.04 / Qt 6.10.2 系、`sys/unix/
    - フォント変換ツール `bdftopcf` は独立パッケージとしては存在しないため、**`xfonts-utils`** を指定してください（`bdftopcf` および `mkfontdir` が内包されています）。
    - ncurses 開発パッケージは Ubuntu 24.04 では `libncurses-dev` を指定してください。
 
-2. **NetHack Unix ビルドにおける Lua ソース取得と submodules/CHKSUMS の保持**:
-   - NetHack の Unix ビルドシステムは `lib/lua-5.4.8/` をリポジトリに内包しておらず、`make fetch-lua` によるダウンロードが必要です。
-   - `make fetch-lua` は `submodules/CHKSUMS` を用いて SHA-256 チェックサムを検証します。`.gitignore` で `submodules/*` を除外する場合でも、必ず **`!submodules/CHKSUMS`** を指定してチェックサム定義ファイルを Git の追跡対象に維持してください。
-   - ビルドスクリプト（`sys/unix/build_wsl.sh` 等）では、ネットワークや環境の差異に備え、`make fetch-lua || make fetch-lua NOCHKSUM=1` のようにチェックサムスキップのフォールバックを設けてください。
+2. **NetHack 5.0 における Lua ソースの内包（nhlua/lua）と submodules 整理**:
+   - NetHack 5.0 より、Lua はリポジトリ内ツリー（`nhlua/lua/src/`）に直接内包されており、過去の `make fetch-lua` や `submodules/CHKSUMS` によるチェックサム検証、外部ダウンロードは不要となりました。
+   - submodule としてはモダンな UTF-8 端末・グラフィック表示に対応した `submodules/pdcursesmod` のみを使用し、不要となった `submodules/lua` や `submodules/pdcurses` は submodule 定義から除外されています。
 
 3. **GitHub Actions ワークフロー内のスクリプト生成における YAML インデント保護**:
    - `run: |` ブロック内でシェルスクリプトファイルを生成する際、ヒアドキュメント（`cat << 'EOF'`）の本文を行頭（1桁目）から記述すると、YAML パーサーがトップレベルのキーと誤認して `ScannerError`（ワークフロー構文エラー）を引き起こします。
