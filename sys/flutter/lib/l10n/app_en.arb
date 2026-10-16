@@ -423,6 +423,17 @@
   "resetHardModeTitle": "Reset All Challenge Settings",
   "resetHardModeConfirmTitle": "Reset Challenge Settings",
   "resetHardModeConfirmMsg": "Are you sure you want to disable all challenge options and reset to default (all OFF)?",
-  "resetHardModeSuccess": "All challenge options disabled and reset to defaults."
+  "resetHardModeSuccess": "All challenge options disabled and reset to defaults.",
+
+  "tilesetSelectionTitle": "Select Tileset",
+  "tilesetAuthorLabel": "Author: {author}",
+  "@tilesetAuthorLabel": {
+    "placeholders": {
+      "author": { "type": "String" }
+    }
+  },
+  "tilesetUrlCopied": "URL copied to clipboard",
+  "tilesetCurrentSelected": "Selected",
+  "tilesetTapToCopy": "Tap to copy URL"
 }
 

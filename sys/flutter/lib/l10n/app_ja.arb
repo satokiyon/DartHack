@@ -424,6 +424,17 @@
   "resetHardModeTitle": "縛り設定をすべて解除 (初期化)",
   "resetHardModeConfirmTitle": "縛りプレイ設定のリセット",
   "resetHardModeConfirmMsg": "すべての縛りプレイ（ハードモード）設定を解除して通常状態（すべてOFF）に戻しますか？",
-  "resetHardModeSuccess": "縛りプレイ設定をすべて解除しました。"
+  "resetHardModeSuccess": "縛りプレイ設定をすべて解除しました。",
+
+  "tilesetSelectionTitle": "タイルセットの選択",
+  "tilesetAuthorLabel": "作者: {author}",
+  "@tilesetAuthorLabel": {
+    "placeholders": {
+      "author": { "type": "String" }
+    }
+  },
+  "tilesetUrlCopied": "URLをクリップボードにコピーしました",
+  "tilesetCurrentSelected": "選択中",
+  "tilesetTapToCopy": "タップしてURLをコピー"
 }
 

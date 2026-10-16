@@ -2455,6 +2455,36 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'縛りプレイ設定をすべて解除しました。'**
   String get resetHardModeSuccess;
+
+  /// No description provided for @tilesetSelectionTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'タイルセットの選択'**
+  String get tilesetSelectionTitle;
+
+  /// No description provided for @tilesetAuthorLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'作者: {author}'**
+  String tilesetAuthorLabel(String author);
+
+  /// No description provided for @tilesetUrlCopied.
+  ///
+  /// In ja, this message translates to:
+  /// **'URLをクリップボードにコピーしました'**
+  String get tilesetUrlCopied;
+
+  /// No description provided for @tilesetCurrentSelected.
+  ///
+  /// In ja, this message translates to:
+  /// **'選択中'**
+  String get tilesetCurrentSelected;
+
+  /// No description provided for @tilesetTapToCopy.
+  ///
+  /// In ja, this message translates to:
+  /// **'タップしてURLをコピー'**
+  String get tilesetTapToCopy;
 }
 
 class _AppLocalizationsDelegate

@@ -1264,4 +1264,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get resetHardModeSuccess =>
       'All challenge options disabled and reset to defaults.';
+
+  @override
+  String get tilesetSelectionTitle => 'Select Tileset';
+
+  @override
+  String tilesetAuthorLabel(String author) {
+    return 'Author: $author';
+  }
+
+  @override
+  String get tilesetUrlCopied => 'URL copied to clipboard';
+
+  @override
+  String get tilesetCurrentSelected => 'Selected';
+
+  @override
+  String get tilesetTapToCopy => 'Tap to copy URL';
 }

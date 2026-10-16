@@ -15,6 +15,8 @@ import 'widgets/shortcut_edit_dialog.dart';
 import 'l10n/app_localizations.dart';
 import 'services/sound_manager.dart';
 import 'widgets/sound_credits_dialog.dart';
+import 'models/tileset_info.dart';
+import 'tileset_selection_page.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -659,25 +661,32 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           if (_useTiles)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              key: const ValueKey("tileset_dropdown"),
-              child: DropdownButtonFormField<String>(
-                decoration: InputDecoration(labelText: l10n.tilesetSelect),
-                initialValue: _selectedTileset,
-                items: const [
-                  DropdownMenuItem(value: 'nevanda_32x32', child: Text('Nevanda (32x32)')),
-                  DropdownMenuItem(value: 'pixelhack_32x32', child: Text('PixelHack (32x32)')),
-                  DropdownMenuItem(value: 'zeldhack_32x32', child: Text('ZeldHack (32x32)')),
-                  DropdownMenuItem(value: 'abigaba_32x32', child: Text('Abigaba (32x32)')),
-                  DropdownMenuItem(value: 'kevintamtiles_64x64', child: Text('KevinTam (64x64)')),
-                  DropdownMenuItem(value: 'default_16x16', child: Text('Default (16x16)')),
-                  DropdownMenuItem(value: 'geoduck_15x25', child: Text('Geoduck (15x25)')),
-                ],
-                onChanged: (val) {
-                  if (val != null) {
-                    setState(() => _selectedTileset = val);
-                    _saveSetting('selected_tileset', val);
+            Material(
+              color: Colors.transparent,
+              child: ListTile(
+                title: Text(l10n.tilesetSelect),
+                subtitle: Text(
+                  '${TilesetInfo.findById(_selectedTileset).displayName} (${l10n.tilesetAuthorLabel(TilesetInfo.findById(_selectedTileset).author)})',
+                  style: const TextStyle(fontSize: 13, color: Colors.white70),
+                ),
+                trailing: const Icon(Icons.chevron_right, color: Colors.white70),
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TilesetSelectionPage(
+                        currentTileset: _selectedTileset,
+                        onTilesetSelected: (val) {
+                          setState(() => _selectedTileset = val);
+                        },
+                      ),
+                    ),
+                  );
+                  // 画面から戻った際に最新の SharedPreferences から再取得して同期
+                  final prefs = await SharedPreferences.getInstance();
+                  final savedTileset = prefs.getString('selected_tileset') ?? _selectedTileset;
+                  if (mounted && savedTileset != _selectedTileset) {
+                    setState(() => _selectedTileset = savedTileset);
                   }
                 },
               ),

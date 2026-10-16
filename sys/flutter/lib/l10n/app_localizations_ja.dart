@@ -1238,4 +1238,21 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get resetHardModeSuccess => '縛りプレイ設定をすべて解除しました。';
+
+  @override
+  String get tilesetSelectionTitle => 'タイルセットの選択';
+
+  @override
+  String tilesetAuthorLabel(String author) {
+    return '作者: $author';
+  }
+
+  @override
+  String get tilesetUrlCopied => 'URLをクリップボードにコピーしました';
+
+  @override
+  String get tilesetCurrentSelected => '選択中';
+
+  @override
+  String get tilesetTapToCopy => 'タップしてURLをコピー';
 }
