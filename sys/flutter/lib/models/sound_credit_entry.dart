@@ -97,12 +97,12 @@ class SoundCreditParser {
       }
 
       // 代表ライセンスの決定
-      String license = entries.first.license.trim();
-      if (sourceName.contains('Pixabay')) {
-        license = 'Pixabay Content License';
-      } else if (sourceName.contains('PeriTune') || sourceName.contains('CreatorChords')) {
-        license = 'CC-BY 4.0';
-      }
+      final rawLicense = entries.first.license.trim();
+      final license = formatLicense(
+        rawLicense,
+        isEnglish: isEnglish,
+        sourceName: sourceName,
+      );
 
       // 代表URLの正規化（サイトトップまたは代表URL）
       String url = _getPrimaryUrl(sourceName, entries.first.url);
@@ -201,11 +201,13 @@ class SoundCreditParser {
     'amb_in_a_migot_nest.ogg': ('ミ＝ゴの巣', 'Mi-Go Nest'),
     'amb_in_a_black_market.ogg': ('闇市場', 'Black Market'),
     'amb_inside_morgue.ogg': ('死体安置所', 'Morgue'),
+    'amb_in_a_morgue.ogg': ('死体安置所', 'Morgue'),
     'amb_inside_armory.ogg': ('武器庫', 'Armory'),
     'amb_inside_pool.ogg': ('泉・水泳場', 'Pool Room'),
     'amb_inside_garden.ogg': ('庭園', 'Garden'),
     'amb_inside_library.ogg': ('図書館', 'Library'),
     'amb_inside_nymph_garden.ogg': ('ニンフの園', 'Nymph Garden'),
+    'amb_theme_nymph_garden.ogg': ('ニンフの園', 'Nymph Garden'),
     'amb_theme_boulder_room.ogg': ('巨石の部屋', 'Boulder Room'),
     'amb_theme_trap_room.ogg': ('トラップの部屋', 'Trap Room'),
     'amb_theme_buried_treasure.ogg': ('埋没財宝の部屋', 'Buried Treasure Room'),
@@ -220,7 +222,69 @@ class SoundCreditParser {
     'amb_theme_mausoleum.ogg': ('霊廟', 'Mausoleum'),
     'amb_theme_pillars.ogg': ('列柱の間', 'Pillars Room'),
     'amb_theme_fake_delphi.ogg': ('偽神託所', 'Fake Delphi'),
+    'amb_in_swamp_room.ogg': ('沼地部屋', 'Swamp Room'),
+    'amb_theme_spider_nest.ogg': ('蜘蛛の巣窟', 'Spider Nest'),
+    'amb_theme_ice_room.ogg': ('氷の部屋', 'Ice Room'),
+    'amb_theme_cloud_room.ogg': ('雲・霧の部屋', 'Cloud Room'),
   };
+
+  /// ライセンス表記を言語設定（日本語 / 英語）に合わせてフォーマットする
+  static String formatLicense(
+    String rawLicense, {
+    required bool isEnglish,
+    String sourceName = '',
+  }) {
+    final trimmed = rawLicense.trim();
+    if (trimmed.isEmpty) return '';
+
+    // Pixabay
+    if (sourceName.contains('Pixabay') || trimmed.contains('Pixabay')) {
+      return 'Pixabay Content License';
+    }
+
+    // CC-BY / PeriTune / CreatorChords
+    if (sourceName.contains('PeriTune') ||
+        sourceName.contains('CreatorChords') ||
+        trimmed.startsWith('CC-BY') ||
+        trimmed.startsWith('CC BY')) {
+      return 'CC-BY 4.0';
+    }
+
+    // 英語モード時の多言語化処理
+    if (isEnglish) {
+      if (trimmed.contains('OtoLogic')) {
+        return 'OtoLogic Terms of Service (CC BY 4.0)';
+      }
+      if (trimmed.contains('Gemini')) {
+        return 'Gemini Terms of Service';
+      }
+      if (trimmed.contains('Howling')) {
+        return 'Howling-Indicator Terms of Service';
+      }
+      if (trimmed.contains('Springin')) {
+        return "Springin' Terms of Service";
+      }
+      if (trimmed.contains('効果音ラボ')) {
+        return '効果音ラボ Terms of Service';
+      }
+      if (trimmed.contains('効果音辞典')) {
+        return '効果音辞典 Terms of Service';
+      }
+      if (trimmed.contains('利用規約')) {
+        // 一般的な "X利用規約" -> "X Terms of Service"
+        final base = trimmed
+            .replaceAll(RegExp(r'[（\(].*?[）\)]'), '')
+            .replaceAll('利用規約', '')
+            .trim();
+        return base.isNotEmpty ? '$base Terms of Service' : 'Terms of Service';
+      }
+      // その他日本語の括弧表記（商用可・...）が含まれていれば除去
+      return trimmed.replaceAll(RegExp(r'[（\(][^a-zA-Z0-9]*?[）\)]'), '').trim();
+    }
+
+    // 日本語モード時
+    return trimmed;
+  }
 
   /// BGMファイル名に対応するフロア名・部屋名を取得する
   static String getBgmTitle(String fileName, {bool isEnglish = false, String description = ''}) {

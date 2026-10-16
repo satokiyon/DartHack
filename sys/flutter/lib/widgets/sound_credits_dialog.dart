@@ -144,7 +144,7 @@ class _SoundCreditsDialogState extends State<SoundCreditsDialog> {
                       child: Padding(
                         padding: const EdgeInsets.all(24.0),
                         child: Text(
-                          'クレジット情報を読み込めませんでした。',
+                          _isEnglish ? 'Failed to load credits.' : 'クレジット情報を読み込めませんでした。',
                           style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                         ),
                       ),
@@ -417,12 +417,12 @@ class _SoundCreditsDialogState extends State<SoundCreditsDialog> {
               subtitle: Padding(
                 padding: const EdgeInsets.only(top: 2),
                 child: Text(
-                  entry.fileName + (entry.description.isNotEmpty ? '  •  ${entry.description}' : ''),
+                  entry.fileName,
                   style: TextStyle(
                     fontSize: 11,
                     color: Colors.white.withValues(alpha: 0.65),
                   ),
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

@@ -116,11 +116,59 @@ License:     効果音ラボ利用規約
     await tester.tap(find.text('使用BGM一覧 (1曲)'));
     await tester.pumpAndSettle();
 
-    // フロア名・部屋名（「運命の大迷宮」）とファイル名が表示されること
+    // フロア名・部屋名（「運命の大迷宮」）とファイル名が表示され、曲の説明文は削除されていること
     expect(find.text('運命の大迷宮'), findsOneWidget);
-    expect(find.textContaining('amb_dungeon.ogg'), findsOneWidget);
+    expect(find.text('amb_dungeon.ogg'), findsOneWidget);
+    expect(find.textContaining('メインダンジョンの探索曲'), findsNothing);
 
     // 再生アイコンが表示されること
     expect(find.byIcon(Icons.play_circle_outline), findsOneWidget);
+  });
+
+  testWidgets('SoundCreditsDialog renders in English mode with English licenses and titles', (tester) async {
+    const sampleEnglish = '''
+File:        amb_dungeon.ogg
+Description: メインダンジョンの探索曲
+Source:      PeriTune (https://peritune.com/)
+Author:      Seiko
+License:     CC-BY 4.0
+-------------------------------------------------------
+File:        se_coin.ogg
+Description: コインの音
+Source:      効果音ラボ (https://soundeffect-lab.info/)
+Author:      効果音ラボ
+License:     効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）
+''';
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        locale: Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: SoundCreditsDialog(initialText: sampleEnglish),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // 英語ヘッダー・説明文
+    expect(find.text('BGM & Sound Effects Credits'), findsOneWidget);
+    expect(find.text('List of sources and licenses for BGM and sound effects used in DartHack.'), findsOneWidget);
+
+    // 英語ライセンス表示（効果音ラボ Terms of Service）
+    expect(find.text('効果音ラボ Terms of Service'), findsOneWidget);
+    expect(find.text('CC-BY 4.0'), findsOneWidget);
+
+    // BGMアコーディオンを展開
+    expect(find.text('BGM Tracks (1)'), findsOneWidget);
+    await tester.tap(find.text('BGM Tracks (1)'));
+    await tester.pumpAndSettle();
+
+    // 英語BGMタイトルとファイル名が表示され、日本語説明文は非表示
+    expect(find.text('The Dungeons of Doom'), findsOneWidget);
+    expect(find.text('amb_dungeon.ogg'), findsOneWidget);
+    expect(find.textContaining('メインダンジョン'), findsNothing);
   });
 }

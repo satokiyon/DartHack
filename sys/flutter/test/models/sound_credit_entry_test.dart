@@ -103,6 +103,49 @@ License:     CC-BY 4.0
         SoundCreditParser.getBgmTitle('amb_unknown.ogg', isEnglish: true, description: '秘密の地下室（Secret Basement）。不穏な足音。'),
         'Secret Basement',
       );
+
+      // 追加登録されたBGMの検証
+      expect(SoundCreditParser.getBgmTitle('amb_in_a_morgue.ogg'), '死体安置所');
+      expect(SoundCreditParser.getBgmTitle('amb_in_a_morgue.ogg', isEnglish: true), 'Morgue');
+      expect(SoundCreditParser.getBgmTitle('amb_in_swamp_room.ogg'), '沼地部屋');
+      expect(SoundCreditParser.getBgmTitle('amb_in_swamp_room.ogg', isEnglish: true), 'Swamp Room');
+      expect(SoundCreditParser.getBgmTitle('amb_theme_spider_nest.ogg'), '蜘蛛の巣窟');
+      expect(SoundCreditParser.getBgmTitle('amb_theme_spider_nest.ogg', isEnglish: true), 'Spider Nest');
+    });
+
+    test('formatLicense による言語別ライセンス表記の変換が正しく動作する', () {
+      // 共通（Pixabay / CC-BY / NGPL / MIT）
+      expect(SoundCreditParser.formatLicense('Pixabay Content License（商用可）', isEnglish: false, sourceName: 'Pixabay Music'), 'Pixabay Content License');
+      expect(SoundCreditParser.formatLicense('Pixabay Content License（商用可）', isEnglish: true, sourceName: 'Pixabay Music'), 'Pixabay Content License');
+      expect(SoundCreditParser.formatLicense('CC-BY 4.0', isEnglish: false), 'CC-BY 4.0');
+      expect(SoundCreditParser.formatLicense('CC-BY 4.0', isEnglish: true), 'CC-BY 4.0');
+
+      // 日本語モード: 原文を維持
+      expect(SoundCreditParser.formatLicense('効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）', isEnglish: false), '効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）');
+      expect(SoundCreditParser.formatLicense("Springin'利用規約（商用可・クレジット不要）", isEnglish: false), "Springin'利用規約（商用可・クレジット不要）");
+      expect(SoundCreditParser.formatLicense('OtoLogic利用規約（CC BY 4.0 / クレジット表記）', isEnglish: false), 'OtoLogic利用規約（CC BY 4.0 / クレジット表記）');
+      expect(SoundCreditParser.formatLicense('Gemini 利用規約', isEnglish: false), 'Gemini 利用規約');
+
+      // 英語モード: 英語表記に変換（サイト名は維持）
+      expect(SoundCreditParser.formatLicense('効果音ラボ利用規約（商用可・ゲーム組込可・クレジット任意）', isEnglish: true), '効果音ラボ Terms of Service');
+      expect(SoundCreditParser.formatLicense("Springin'利用規約（商用可・クレジット不要）", isEnglish: true), "Springin' Terms of Service");
+      expect(SoundCreditParser.formatLicense('OtoLogic利用規約（CC BY 4.0 / クレジット表記）', isEnglish: true), 'OtoLogic Terms of Service (CC BY 4.0)');
+      expect(SoundCreditParser.formatLicense('Gemini 利用規約', isEnglish: true), 'Gemini Terms of Service');
+      expect(SoundCreditParser.formatLicense('Howling-Indicator利用規約', isEnglish: true), 'Howling-Indicator Terms of Service');
+      expect(SoundCreditParser.formatLicense('効果音辞典利用規約（商用可・クレジット不要）', isEnglish: true), '効果音辞典 Terms of Service');
+    });
+
+    test('parseSources で isEnglish: true の場合ライセンスと作者が英語化される', () {
+      final sources = SoundCreditParser.parseSources(sampleText, isEnglish: true);
+
+      final soundLab = sources.firstWhere((s) => s.sourceName == '効果音ラボ');
+      expect(soundLab.license, '効果音ラボ Terms of Service');
+
+      final springin = sources.firstWhere((s) => s.sourceName == "Springin' Sound Stock");
+      expect(springin.license, "Springin' Terms of Service");
+
+      final gemini = sources.firstWhere((s) => s.sourceName == 'Google Gemini (AI生成)');
+      expect(gemini.license, 'Gemini Terms of Service');
     });
 
     test('実ファイル assets/sounds/attributions.txt からの集約カード一覧生成で「その他」が存在しない', () {
