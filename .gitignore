@@ -123,6 +123,7 @@ scratch/
 !/docs/wizloadlua_guide.md
 !/docs/plan_fix_save_filename_consistency.md
 !/docs/death_reasons_architecture.md
+!/docs/transparent_tiles_architecture.md
 
 
 #logfiles

@@ -91,6 +91,18 @@ Flutter ポートにおけるハイスコア・スコアボード表示には、
      1. **生成時刻印**: 墓石生成時（`src/end.c`）は、`jp_formatkiller_for_display` を直接使用して最初から完全な日本語テキスト（例: `システムショックで死んだ`）を墓石に刻印する。
      2. **読取・遠見時動的翻訳**: 過去セーブデータや英語 bones からロードされた墓石テキストに対しては、読取時（`src/engrave.c: read_engr_at`）および遠見時（`src/pager.c: add_quoted_engraving`）に `jp_headstone_text_for_display` を経由させて動的に日本語化する。
 
+## 透過タイルセットにおける背景地形2層描画と `back_to_glyph` 活用原則
+
+1. **正確な背景地形算出 (`back_to_glyph(x, y)`) の採用**:
+   - KevinTam などの透過 WebP/PNG タイルセットでモンスターやアイテムの背景に地形を重ねて描画する際は、Cコア標準の `iflags.use_background_glyph` や `get_bkglyph_and_framecolor()`（部屋の床を除外する既知の不具合あり）を使用せず、必ず `src/display.c: back_to_glyph(x, y)` を使用してください。
+   - `back_to_glyph` は部屋の床、通路、階段、祭壇、開閉ドア、水、溶岩等を 100% 正確に返し、壁破壊やドア開閉などの動的地形変化にも自動追従します。
+
+2. **未探索マスおよび視界外探知モンスターの暗闇維持（ネタバレ防止）**:
+   - 未探索マス（`special & MG_UNEXPL`）や、テレパシー・超感覚などで探知された視界外モンスター（`(special & MG_DETECT) && !cansee(x, y) && levl[x][y].seenv == 0`）では、背景タイル ID を無効値（`bktile = -1`）として扱い、暗闇（黒背景）を維持してマップ形状のネタバレを防止してください。
+
+3. **他ポートへの移植および詳細仕様**:
+   - Windows GUI、Linux SDL、Web などの他ウィンドウポートへ移植する際の詳細なコード例やアーキテクチャについては、[docs/transparent_tiles_architecture.md](file:///c:/Users/satok/DartHack/docs/transparent_tiles_architecture.md) を参照してください。
+
 ## NetHackJP Cコアにおける言語判定分岐の全廃原則
 
 1. **Cコア内多言語分岐の禁止**:
