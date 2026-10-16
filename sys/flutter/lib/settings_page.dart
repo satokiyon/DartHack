@@ -669,6 +669,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   DropdownMenuItem(value: 'nevanda_32x32', child: Text('Nevanda (32x32)')),
                   DropdownMenuItem(value: 'pixelhack_32x32', child: Text('PixelHack (32x32)')),
                   DropdownMenuItem(value: 'zeldhack_32x32', child: Text('ZeldHack (32x32)')),
+                  DropdownMenuItem(value: 'abigaba_32x32', child: Text('Abigaba (32x32)')),
+                  DropdownMenuItem(value: 'kevintamtiles_64x64', child: Text('KevinTam (64x64)')),
                   DropdownMenuItem(value: 'default_16x16', child: Text('Default (16x16)')),
                   DropdownMenuItem(value: 'geoduck_15x25', child: Text('Geoduck (15x25)')),
                 ],
