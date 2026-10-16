@@ -1,5 +1,6 @@
 # Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-28.
 sys/flutter/setup.sh text eol=lf
+*.ps1 text eol=crlf
 
 # Merge strategy for documentation files
 AGENTS.md merge=ours
