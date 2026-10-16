@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-16. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-17. -->
 # NetHack 5.0 日本語化非公式プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsとUbuntu(WSL)のみ)
@@ -25,7 +25,7 @@ NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.net
 </figure>
 
 <figure>
-   <figurecaption>Linux Qt版 PixeHackタイル使用</figurecaption>
+   <figurecaption>Linux Qt版 PixelHackタイル使用</figurecaption>
    <img width="1311" height="780" alt="2026-09-26_13h13_20" src="https://github.com/user-attachments/assets/50857768-a79b-4f10-9aeb-87f458424fb5" />
 </figure>
 ---
@@ -137,7 +137,7 @@ Windows版およびLinux(X11)版では、ゲーム内での日本語入力・表
 
 | 機能 | 日本語入力の例 | 英語入力の例 | 補足 |
 | :--- | :--- | :--- | :--- |
-| **願い**<br>(Wishing) | `祝福された+2虐殺の巻物`<br>`耐毒の魔除け`<br>`スピードブーツ`<br>`グレーター・デーモンの死体`<br>`7個の魔法のマーカ` | `blessed +2 scroll of genocide`<br>`amulet versus poison`<br>`speed boots`<br>`corpse of greater demon`<br>`7 magic markers` | 祝福・呪い、強化値、個数、状態（死体・缶詰・像など）を含めて指定できます。「鑑定」や「スピードの靴」等のJNetHack慣用句も認識します。 |
+| **願い**<br>(Wishing) | `祝福された+2灰色ドラゴンの鱗鎧`<br>`耐毒の魔除け`<br>`スピードブーツ`<br>`グレーター・デーモンの死体`<br>`7個の魔法のマーカ` | `blessed +2 gray dragon scale mail`<br>`amulet versus poison`<br>`speed boots`<br>`corpse of greater demon`<br>`7 magic markers` | 祝福・呪い、強化値、個数、状態（死体・缶詰・像など）を含めて指定できます。「鑑定」や「スピードの靴」等のJNetHack慣用句も認識します。 |
 | **虐殺**<br>(Genocide) | `マスター・リッチ`<br>`銀色ドラゴン`<br>`マインド・フレイヤ`<br>`L`<br>`none` または `nothing` | `master lich`<br>`silver dragon`<br>`mind flayer`<br>`L`<br>`none` または `nothing` | モンスターの種族名やシンボル文字（クラス記号）を指定します。`none` や `nothing`、空入力等で虐殺を拒否（不虐殺の誓いを維持）できます。 |
 | **魔法のマーカー**<br>(Writing: 巻物) | `識別` または `識別の巻物`<br>`解呪` または `解呪の巻物`<br>`虐殺` または `虐殺の巻物`<br>`鑑定`（JNetHack互換）<br>`コンテキスト・スイッチ`（外見ラベル） | `identify` または `scroll of identify`<br>`remove curse`<br>`genocide`<br>`ELBIB YLOH`（外見ラベル） | 白紙の巻物に対して使用します。正式名（「識別」等）だけでなく、未識別時のラベル名やプレイヤーが付けた名前（call名）でも書き込めます。 |
 | **魔法のマーカー**<br>(Writing: 呪文書) | `識別` または `識別の呪文書`<br>`火の玉` または `火の玉の魔法書`<br>`連鎖雷撃` | `identify` または `spellbook of identify`<br>`fireball`<br>`chain lightning` | 白紙の魔法書に対して使用します。「呪文書」「魔法書」のどちらの表記でも認識します（※呪文書は識別済みの名前でのみ書き込み可能です）。 |
@@ -290,7 +290,7 @@ OPTIONS=align_status:right,msw_stat_cols:15
 * [hackaholic](https://nethack.go5.jp/): 通称「墓堀」
 * [NetHack Wiki](https://nethackwiki.com/wiki/Main_Page)
 * [NetHack Spoilers](https://davidbau.github.io/nethack-companion/spoilers/)
-* [NetHack Spoilers日本語訳](https://satokiyon.github.io/nethack-companion-jp/spoilers/index.ja.html)
+* [NetHack Spoilers日本語訳](https://satokiyon.github.io/nethack-companion-jp/spoilers/index.jp.html)
 * ...他にも見つけたら追記する
 ----
 

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-17. */
 /* NetHack 5.0	mondata.c	$NHDT-Date: 1781973056 2026/06/20 16:30:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.148 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -946,6 +946,12 @@ jp_name_to_monplus(const char *str, size_t slen, int *len_p, int *gender_p)
             { "しゅうどうし", PM_MONK },
             { "モンク", PM_MONK },
             { "ローグ", PM_ROGUE },
+            { "ディスプレイサービースト", PM_DISPLACER_BEAST },
+            { "でぃすぷれいさーびーすと", PM_DISPLACER_BEAST },
+            { "位相獣", PM_DISPLACER_BEAST },
+            { "いそうけもの", PM_DISPLACER_BEAST },
+            { "いそうじゅう", PM_DISPLACER_BEAST },
+            { "げんえいのけもの", PM_DISPLACER_BEAST },
             { (const char *) 0, NON_PM }
         };
         int a_idx;

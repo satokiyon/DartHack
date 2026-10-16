@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-31. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-17. */
 /* NetHack 5.0	jp_data_lookup.c */
 /* Japanese aliases for data.base lookup.
  * Keep data.base keys in English and only map player input for lookup.
@@ -666,10 +666,13 @@ static const struct jp_data_lookup_alias jp_data_lookup_aliases[] = {
     { "でぃすぱてる", "dispater" },
     { "でぃすぺいたー", "dispater" },
     { "でぃすぺーた", "dispater" },
+    { "げんえいのけもの", "displacer beast" },
     { "いそうけもの", "displacer beast" },
+    { "いそうじゅう", "displacer beast" },
     { "でぃすぷれいさー", "displacer beast" },
     { "でぃすぷれいさーびーすと", "displacer beast" },
     { "位相獣", "displacer beast" },
+    { "幻影の獣", "displacer beast" },
     { "じん", "djinn" },
     { "せいれい", "djinn" },
     { "でぃじん", "djinn" },

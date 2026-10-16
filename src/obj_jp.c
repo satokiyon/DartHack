@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-17. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -1134,6 +1134,14 @@ static const struct jnh_wish_alias jnh_wish_aliases[] = {
     { "かみつき丸", "オークリスト" },
     { "かみつきまる", "オークリスト" },
     { "オルクリスト", "オークリスト" },
+
+    /* モンスター別名・旧表記 */
+    { "ディスプレイサービースト", "幻影の獣" },
+    { "でぃすぷれいさーびーすと", "幻影の獣" },
+    { "位相獣", "幻影の獣" },
+    { "いそうけもの", "幻影の獣" },
+    { "いそうじゅう", "幻影の獣" },
+    { "げんえいのけもの", "幻影の獣" },
 
     { (const char *)0, (const char *)0 }
 };
