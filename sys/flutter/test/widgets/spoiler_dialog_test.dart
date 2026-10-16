@@ -21,7 +21,7 @@ NetHack は古典的なローグライクゲームです。詳細は[ダンジ�
 Elbereth
 ```
 
-![ダンジョン全景マップ](spoiler_dmap_jp.png)
+![ダンジョン全景マップ](spoiler_dmap_jp.webp)
 
 ---
 

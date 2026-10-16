@@ -775,7 +775,7 @@ Once you have it, you climb back up through the **Elemental
 Planes** to the **Astral Plane**, where your god awaits your
 offering.
 
-![Branches extend left and right of the main trunk. Pearls indicate approximate dungeon levels. ★ marks the three Invocation items.](asset:assets/images/spoiler_dmap_en.png)
+![Branches extend left and right of the main trunk. Pearls indicate approximate dungeon levels. ★ marks the three Invocation items.](asset:assets/images/spoiler_dmap_en.webp)
 
 #### The Map Symbols {#the-map-symbols}
 
@@ -3901,7 +3901,7 @@ games are the item classes themselves (a `!` is always a potion, a
 `?` is always a scroll) and the prices, which turn out to be the
 single most powerful identification tool you have.
 
-![The identification flowchart: cheapest method first, scroll of identify last.](asset:assets/images/spoiler_flowchart_en.png)
+![The identification flowchart: cheapest method first, scroll of identify last.](asset:assets/images/spoiler_flowchart_en.webp)
 
 #### Blessed, Uncursed, Cursed (BUC) {#blessed-uncursed-cursed-buc}
 
