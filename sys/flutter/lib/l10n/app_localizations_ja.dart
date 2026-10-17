@@ -1026,7 +1026,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get creditsBody2 =>
-      '本アプリは NetHack General Public License (NGPL) に基づき配布されています。  ソースコードは以下にて公開しています：https://github.com/satokiyon/DartHack';
+      '本アプリは NetHack General Public License (NGPL) に基づき配布されています。';
+
+  @override
+  String get creditsSourceCode => 'ソースコード公開先:';
+
+  @override
+  String get creditsCopiedUrl => 'URLをクリップボードにコピーしました';
 
   @override
   String get creditsBody3 => 'UI デザインの一部は、gurrhack の ForkFront を参考にしています。';
@@ -1273,11 +1279,16 @@ class AppLocalizationsJa extends AppLocalizations {
       'NetHack Spoilers: A Traveler\'s Companion to the Mazes of Menace';
 
   @override
-  String get creditsSpoilersDesc =>
-      '原著: David Bau / 日本語翻訳・監修: NetHackJP Project';
+  String get creditsSpoilersDesc => '原著: David Bau / 日本語翻訳・監修: @satokiyon';
 
   @override
   String get creditsSpoilersLicense => 'CC BY-SA 4.0';
+
+  @override
+  String get creditsSpoilersEnLabel => '英語版:';
+
+  @override
+  String get creditsSpoilersJaLabel => '日本語版:';
 
   @override
   String get creditsSpoilersCopiedUrl => 'スポイラーのURLをクリップボードにコピーしました';

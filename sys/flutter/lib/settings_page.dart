@@ -2145,6 +2145,65 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  Widget _buildUrlCopyRow({
+    String? label,
+    required String url,
+    required String copiedMessage,
+    required String tooltipMessage,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(6),
+        onTap: () {
+          Clipboard.setData(ClipboardData(text: url));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(copiedMessage)),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (label != null && label.isNotEmpty) ...[
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(width: 6),
+              ],
+              Flexible(
+                child: Text(
+                  url,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.lightBlue.shade300,
+                    decoration: TextDecoration.underline,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Tooltip(
+                message: tooltipMessage,
+                child: Icon(
+                  Icons.copy_rounded,
+                  size: 16,
+                  color: Colors.lightBlue.shade300,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildCreditsSection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
@@ -2165,6 +2224,24 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(l10n.creditsBody1),
                 const SizedBox(height: 8),
                 Text(l10n.creditsBody2),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.creditsSourceCode,
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white70),
+                ),
+                const SizedBox(height: 4),
+                _buildUrlCopyRow(
+                  label: "DartHack:",
+                  url: "https://github.com/satokiyon/DartHack",
+                  copiedMessage: l10n.creditsCopiedUrl,
+                  tooltipMessage: l10n.tilesetTapToCopy,
+                ),
+                _buildUrlCopyRow(
+                  label: "NetHackJP:",
+                  url: "https://github.com/satokiyon/NetHackJP",
+                  copiedMessage: l10n.creditsCopiedUrl,
+                  tooltipMessage: l10n.tilesetTapToCopy,
+                ),
                 const SizedBox(height: 8),
                 Text(l10n.creditsBody3),
                 const SizedBox(height: 12),
@@ -2195,46 +2272,17 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(6),
-                    onTap: () {
-                      const url = 'https://davidbau.github.io/nethack-companion/spoilers/';
-                      Clipboard.setData(const ClipboardData(text: url));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.creditsSpoilersCopiedUrl)),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              'https://davidbau.github.io/nethack-companion/spoilers/',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.lightBlue.shade300,
-                                decoration: TextDecoration.underline,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Tooltip(
-                            message: l10n.tilesetTapToCopy,
-                            child: Icon(
-                              Icons.copy_rounded,
-                              size: 16,
-                              color: Colors.lightBlue.shade300,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                _buildUrlCopyRow(
+                  label: l10n.creditsSpoilersEnLabel,
+                  url: 'https://davidbau.github.io/nethack-companion/spoilers/',
+                  copiedMessage: l10n.creditsSpoilersCopiedUrl,
+                  tooltipMessage: l10n.tilesetTapToCopy,
+                ),
+                _buildUrlCopyRow(
+                  label: l10n.creditsSpoilersJaLabel,
+                  url: 'https://satokiyon.github.io/nethack-companion-jp/spoilers/index.jp.html',
+                  copiedMessage: l10n.creditsSpoilersCopiedUrl,
+                  tooltipMessage: l10n.tilesetTapToCopy,
                 ),
                 const SizedBox(height: 16),
                 OutlinedButton.icon(

@@ -1041,7 +1041,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get creditsBody2 =>
-      'Distributed under the NetHack General Public License (NGPL). Source code available at: https://github.com/satokiyon/DartHack';
+      'Distributed under the NetHack General Public License (NGPL).';
+
+  @override
+  String get creditsSourceCode => 'Source code available at:';
+
+  @override
+  String get creditsCopiedUrl => 'URL copied to clipboard';
 
   @override
   String get creditsBody3 =>
@@ -1303,6 +1309,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get creditsSpoilersLicense => 'CC BY-SA 4.0';
+
+  @override
+  String get creditsSpoilersEnLabel => 'English:';
+
+  @override
+  String get creditsSpoilersJaLabel => 'Japanese:';
 
   @override
   String get creditsSpoilersCopiedUrl => 'Spoiler URL copied to clipboard';

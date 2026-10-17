@@ -2063,8 +2063,20 @@ abstract class AppLocalizations {
   /// No description provided for @creditsBody2.
   ///
   /// In ja, this message translates to:
-  /// **'本アプリは NetHack General Public License (NGPL) に基づき配布されています。  ソースコードは以下にて公開しています：https://github.com/satokiyon/DartHack'**
+  /// **'本アプリは NetHack General Public License (NGPL) に基づき配布されています。'**
   String get creditsBody2;
+
+  /// No description provided for @creditsSourceCode.
+  ///
+  /// In ja, this message translates to:
+  /// **'ソースコード公開先:'**
+  String get creditsSourceCode;
+
+  /// No description provided for @creditsCopiedUrl.
+  ///
+  /// In ja, this message translates to:
+  /// **'URLをクリップボードにコピーしました'**
+  String get creditsCopiedUrl;
 
   /// No description provided for @creditsBody3.
   ///
@@ -2519,7 +2531,7 @@ abstract class AppLocalizations {
   /// No description provided for @creditsSpoilersDesc.
   ///
   /// In ja, this message translates to:
-  /// **'原著: David Bau / 日本語翻訳・監修: NetHackJP Project'**
+  /// **'原著: David Bau / 日本語翻訳・監修: @satokiyon'**
   String get creditsSpoilersDesc;
 
   /// No description provided for @creditsSpoilersLicense.
@@ -2527,6 +2539,18 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'CC BY-SA 4.0'**
   String get creditsSpoilersLicense;
+
+  /// No description provided for @creditsSpoilersEnLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'英語版:'**
+  String get creditsSpoilersEnLabel;
+
+  /// No description provided for @creditsSpoilersJaLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'日本語版:'**
+  String get creditsSpoilersJaLabel;
 
   /// No description provided for @creditsSpoilersCopiedUrl.
   ///

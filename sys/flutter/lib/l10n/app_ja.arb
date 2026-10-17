@@ -348,7 +348,9 @@
 
   "secCreditsTitle": "クレジット",
   "creditsBody1": "DartHack は、NetHack をベースとしつつ、Flutter/Dart によって再構築したモバイル版です。本アプリはオリジナルの NetHack をゲームコアとして使用していますが、NetHack 開発チーム（The NetHack DevTeam）とは一切関係ありません。",
-  "creditsBody2": "本アプリは NetHack General Public License (NGPL) に基づき配布されています。  ソースコードは以下にて公開しています：https://github.com/satokiyon/DartHack",
+  "creditsBody2": "本アプリは NetHack General Public License (NGPL) に基づき配布されています。",
+  "creditsSourceCode": "ソースコード公開先:",
+  "creditsCopiedUrl": "URLをクリップボードにコピーしました",
   "creditsBody3": "UI デザインの一部は、gurrhack の ForkFront を参考にしています。",
   "creditsContributors": "Contributors:",
   "creditsContributorList": "• @satokiyon\n• with Google Antigravity and Gemini",
@@ -442,8 +444,10 @@
   "spoilersTitle": "NetHack スポイラー",
   "searchSpoilersHint": "スポイラー内を検索...",
   "creditsSpoilersTitle": "NetHack Spoilers: A Traveler's Companion to the Mazes of Menace",
-  "creditsSpoilersDesc": "原著: David Bau / 日本語翻訳・監修: NetHackJP Project",
+  "creditsSpoilersDesc": "原著: David Bau / 日本語翻訳・監修: @satokiyon",
   "creditsSpoilersLicense": "CC BY-SA 4.0",
+  "creditsSpoilersEnLabel": "英語版:",
+  "creditsSpoilersJaLabel": "日本語版:",
   "creditsSpoilersCopiedUrl": "スポイラーのURLをクリップボードにコピーしました",
   "tocTitle": "目次 ({count}項目)",
   "@tocTitle": {

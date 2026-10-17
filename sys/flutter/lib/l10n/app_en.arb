@@ -347,7 +347,9 @@
 
   "secCreditsTitle": "Credits",
   "creditsBody1": "DartHack is a mobile port rebuilt with Flutter/Dart, based on NetHack. This application uses the original NetHack game core, but is not affiliated with The NetHack DevTeam.",
-  "creditsBody2": "Distributed under the NetHack General Public License (NGPL). Source code available at: https://github.com/satokiyon/DartHack",
+  "creditsBody2": "Distributed under the NetHack General Public License (NGPL).",
+  "creditsSourceCode": "Source code available at:",
+  "creditsCopiedUrl": "URL copied to clipboard",
   "creditsBody3": "Part of the UI design is inspired by gurrhack's ForkFront.",
   "creditsContributors": "Contributors:",
   "creditsContributorList": "• @satokiyon\n• with Google Antigravity and Gemini",
@@ -443,6 +445,8 @@
   "creditsSpoilersTitle": "NetHack Spoilers: A Traveler's Companion to the Mazes of Menace",
   "creditsSpoilersDesc": "Compiled by David Bau",
   "creditsSpoilersLicense": "CC BY-SA 4.0",
+  "creditsSpoilersEnLabel": "English:",
+  "creditsSpoilersJaLabel": "Japanese:",
   "creditsSpoilersCopiedUrl": "Spoiler URL copied to clipboard",
   "tocTitle": "Table of Contents ({count} items)",
   "@tocTitle": {
