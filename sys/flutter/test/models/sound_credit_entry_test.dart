@@ -176,5 +176,34 @@ License:     CC-BY 4.0
         }
       }
     });
+    test('実ファイルから amb_gehennom, amb_rogue, amb_minend が Google Gemini の BGM として正しく抽出される', () {
+      final file = File('assets/sounds/attributions.txt');
+      if (!file.existsSync()) return;
+
+      final content = file.readAsStringSync();
+      final sources = SoundCreditParser.parseSources(content);
+
+      final gemini = sources.firstWhere((s) => s.sourceName == 'Google Gemini (AI生成)');
+      expect(gemini.author, 'Google Gemini');
+      expect(gemini.license, 'Gemini 利用規約');
+
+      final geminiBgmFiles = gemini.bgmEntries.map((b) => b.fileName).toSet();
+      expect(geminiBgmFiles.contains('amb_gehennom.ogg'), isTrue);
+      expect(geminiBgmFiles.contains('amb_rogue.ogg'), isTrue);
+      expect(geminiBgmFiles.contains('amb_minend.ogg'), isTrue);
+
+      // フロア名・部屋名の確認
+      expect(SoundCreditParser.getBgmTitle('amb_gehennom.ogg'), 'ゲヘナ');
+      expect(SoundCreditParser.getBgmTitle('amb_gehennom.ogg', isEnglish: true), 'Gehennom');
+      expect(SoundCreditParser.getBgmTitle('amb_rogue.ogg'), 'ローグ階');
+      expect(SoundCreditParser.getBgmTitle('amb_rogue.ogg', isEnglish: true), 'The Rogue Level');
+      expect(SoundCreditParser.getBgmTitle('amb_minend.ogg'), '鉱山最下層');
+      expect(SoundCreditParser.getBgmTitle('amb_minend.ogg', isEnglish: true), "Mine's End");
+
+      // Pixabay Music に amb_gehennom.ogg が含まれていないことの確認
+      final pixabay = sources.firstWhere((s) => s.sourceName == 'Pixabay Music');
+      final pixabayBgmFiles = pixabay.bgmEntries.map((b) => b.fileName).toSet();
+      expect(pixabayBgmFiles.contains('amb_gehennom.ogg'), isFalse);
+    });
   });
 }

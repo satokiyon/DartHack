@@ -171,4 +171,59 @@ License:     効果音ラボ利用規約（商用可・ゲーム組込可・ク�
     expect(find.text('amb_dungeon.ogg'), findsOneWidget);
     expect(find.textContaining('メインダンジョン'), findsNothing);
   });
+
+  testWidgets('SoundCreditsDialog renders updated BGM entries for Gehennom, Rogue Level, and Mines End', (tester) async {
+    const sampleUpdatedBgms = '''
+File:        amb_gehennom.ogg
+Description: ゲヘナ（地獄）の環境BGM。
+Source:      Google Gemini (AI生成) (https://gemini.google.com/)
+Author:      Gemini Music
+License:     Gemini 利用規約
+-------------------------------------------------------
+File:        amb_rogue.ogg
+Description: ローグ階層（rogue）。
+Source:      Google Gemini (AI生成) (https://gemini.google.com/)
+Author:      Gemini Music
+License:     Gemini 利用規約
+-------------------------------------------------------
+File:        amb_minend.ogg
+Description: 鉱山最下層（minend）。
+Source:      Google Gemini (AI生成) (https://gemini.google.com/)
+Author:      Gemini Music
+License:     Gemini 利用規約
+''';
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        locale: Locale('ja'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: SoundCreditsDialog(initialText: sampleUpdatedBgms),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Google Gemini (AI生成) カードが表示されること
+    expect(find.text('Google Gemini (AI生成)'), findsOneWidget);
+    expect(find.text('作者: Google Gemini'), findsOneWidget);
+    expect(find.text('Gemini 利用規約'), findsOneWidget);
+
+    // BGMアコーディオンを展開
+    expect(find.text('使用BGM一覧 (3曲)'), findsOneWidget);
+    await tester.tap(find.text('使用BGM一覧 (3曲)'));
+    await tester.pumpAndSettle();
+
+    // 3曲のタイトルとファイル名が表示されること
+    expect(find.text('ゲヘナ'), findsOneWidget);
+    expect(find.text('amb_gehennom.ogg'), findsOneWidget);
+
+    expect(find.text('ローグ階'), findsOneWidget);
+    expect(find.text('amb_rogue.ogg'), findsOneWidget);
+
+    expect(find.text('鉱山最下層'), findsOneWidget);
+    expect(find.text('amb_minend.ogg'), findsOneWidget);
+  });
 }

@@ -88,6 +88,8 @@ class SoundCreditParser {
       String author;
       if (sourceName.contains('Pixabay')) {
         author = isEnglish ? 'Pixabay Community Creators' : 'Pixabay コミュニティの各クリエイター';
+      } else if (sourceName.contains('Gemini')) {
+        author = 'Google Gemini';
       } else if (authors.length == 1) {
         author = authors.first;
       } else if (authors.isEmpty) {
