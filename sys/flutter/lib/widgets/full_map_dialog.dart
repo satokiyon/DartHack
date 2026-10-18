@@ -108,8 +108,8 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
       final x = -position.dx * (targetScale - 1);
       final y = -position.dy * (targetScale - 1);
       endMatrix = Matrix4.identity()
-        ..translate(x, y)
-        ..scale(targetScale);
+        ..translateByDouble(x, y, 0.0, 1.0)
+        ..scaleByDouble(targetScale, targetScale, 1.0, 1.0);
     }
 
     _animation = Matrix4Tween(

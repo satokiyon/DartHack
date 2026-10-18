@@ -1291,3 +1291,21 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
    - `ListTile` に背景色や枠線・角丸を付与する場合、外側に `Container(decoration: ...)` を配置するとインク効果（タップ時の波紋）が背面に隠れたり、祖先に `Material` がないことによるアサーション例外を誘発します。
    - 背景色・枠線・角丸を伴うタップ可能なタイルUIを構築する際は、直接 `Material(color: ..., shape: RoundedRectangleBorder(...), child: ListTile(...))` でラップするパターンを標準としてください。
 
+## 49. SharedPreferences の JNI/R8 保護・互換性維持およびリワード広告の「1セッション1応答」契約原則
+
+1. **`shared_preferences_android`（Pigeon JNI 版）と `package:jni` の R8 / ProGuard 保護**:
+   - `shared_preferences_android 2.5.0` 以降は Pigeon JNI（`package:jni`）に移行しており、Dart 側から JNI 文字列リフレクション（`JClass.forName` / `*FieldId` / `*MethodId`）で `io.flutter.plugins.sharedpreferences.**` および Kotlin 標準ライブラリのコルーチン関連メンバー（`kotlin.Result`、`kotlin.Result$Failure` のフィールドと `<init>(Throwable)`、`IntrinsicsKt.getCOROUTINE_SUSPENDED`、`CoroutineSingletons`、`kotlin.Unit.INSTANCE`、`Continuation.resumeWith`）を参照します。
+   - 同パッケージは `consumerProguardFiles` を同梱していないため、`sys/flutter/android/app/proguard-rules.pro` にてこれらを必ず保護してください。`jni` パッケージをアップグレードした際は、`jni/lib/src/kotlin.dart` の参照先と `proguard-rules.pro` の定義が一致しているか必ず点検してください。
+
+2. **将来の `SharedPreferencesAsync` / `SharedPreferencesWithCache` 移行時における設定消失防止（DataStore 非互換への対処）**:
+   - 現在 DartHack は従来の `SharedPreferences.getInstance()`（Android では `FlutterSharedPreferences.xml`、キー接頭辞 `flutter.`）を使用しています。
+   - 将来 `SharedPreferencesAsync` または `SharedPreferencesWithCache` へ移行する際、Android のデフォルトバックエンドは Jetpack DataStore（別ファイル）に切り替わるため、**オプション指定なしで単純置換すると既存ユーザーの全設定が消失（初期値化）**します。
+   - 移行時は必ず `SharedPreferencesAsyncAndroidOptions(backend: SharedPreferencesAndroidBackendLibrary.SharedPreferences)` を指定して従来の `SharedPreferences` バックエンドを維持するか、`migrateLegacySharedPreferencesToSharedPreferencesAsyncIfNecessary` による移行処理を実装し、実機での上書きインストール試験を行ってください。
+
+3. **リワード広告（`RewardedAdManager`）と C コア間の「1セッション1応答」契約**:
+   - 階段昇降時のリワード広告において、呼び出し側（`main.dart`）は `onUserEarnedReward(amount)` または `onAdClosed(false)` のいずれかで C コアへ `new_level_rest_result` を送信します。
+   - `RewardedAdManager.showRewardedAd` は 1 回の表示要求につき「報酬通知」または「`onAdClosed(false)`」が**合計でちょうど 1 回**だけ発火する契約を厳守してください。
+   - 応答待ちセッション進行中に重複要求が来た場合は、`onAdClosed(false)` を返さず無視してください（ここで `onAdClosed(false)` を返すと、進行中セッションの完了通知と合わせて C コアへ 2 回結果が送信され、後続の階段イベント状態が破綻します）。
+   - また、ネイティブ広告 SDK のコールバックが返らない場合に C コアが永久待機（ハング）するのを防ぐため、ロード段階には必ず監視タイマー（タイムアウト時の `onAdClosed(false)` 発火と遅延到着広告の `dispose`）を設けてください。
+
+

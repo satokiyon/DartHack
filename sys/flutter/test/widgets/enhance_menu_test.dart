@@ -66,14 +66,15 @@ void main() {
       ];
 
       // menu_overlay のフィルターロジックの再現検証
-      bool isExtCmdMenu = false;
-      final filteredItems = menuItems.where((item) {
+      bool shouldIncludeItem(MenuItemData item, {required bool isExtCmd}) {
         final text = item.text.trim();
-        if (isExtCmdMenu) {
+        if (isExtCmd) {
           if (text == '#' || text == '?') return false;
         }
         return true;
-      }).toList();
+      }
+
+      final filteredItems = menuItems.where((item) => shouldIncludeItem(item, isExtCmd: false)).toList();
 
       expect(filteredItems.length, equals(2));
       expect(filteredItems[0].text, contains('dagger'));

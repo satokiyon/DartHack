@@ -23,7 +23,6 @@ import 'utils/item_count_parser.dart';
 import 'dart:ffi' hide Size;
 import 'dart:convert';
 import 'package:ffi/ffi.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'widgets/exit_highlight_dialog.dart';
 import 'utils/rewarded_ad_manager.dart';
 
@@ -51,7 +50,7 @@ import 'input/hardware_key_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  unawaited(MobileAds.instance.initialize());
+  unawaited(RewardedAdManager.initializeAndPreload());
   await SoundManager.instance.initialize();
   runApp(const MyApp());
 }
