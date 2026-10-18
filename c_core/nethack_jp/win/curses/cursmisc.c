@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 5.0 cursmisc.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -48,9 +48,7 @@ curses_getch(void)
         while (1) {
             ch = getch();
             if (ch == ERR && !done_a_checkpoint) {
-#ifdef INSURANCE
-                save_currentstate();
-#endif /* INSURANCE */
+                do_idlecheckpoint();
                 done_a_checkpoint = TRUE;
                 timeout(-1);
                 timeoutset = FALSE;

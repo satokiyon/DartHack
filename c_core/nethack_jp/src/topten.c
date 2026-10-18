@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1206,6 +1206,10 @@ jp_translate_killer_text_for_display(
         char expbuf[BUFSZ];
         const char *jpexp = jp_explosion_text_for_display(core + 10, expbuf, sizeof expbuf);
         Snprintf(outmain, sizeof outmain, "%sに巻き込まれた", jpexp);
+    } else if (!strncmpi(core, "explosion of ", 13)) {
+        char expbuf[BUFSZ];
+        const char *jpexp = jp_explosion_text_for_display(core, expbuf, sizeof expbuf);
+        Snprintf(outmain, sizeof outmain, "%s", jpexp);
     } else if (jp_killer_exact_lookup(core, JPKB_FORM_CORE, outmain, sizeof outmain)) {
         ; /* 裸形死因は静的テーブル jp_killer_reason_table で処理した */
     } else if (!strncmpi(core, "killed by ", 10)) {
@@ -1214,6 +1218,14 @@ jp_translate_killer_text_for_display(
         if (jp_killer_exact_lookup(killer, JPKB_FORM_KILLEDBY,
                                    outmain, sizeof outmain)) {
             ; /* "killed by" 文形も静的テーブルで処理した */
+        } else if (!strncmpi(killer, "explosion of ", 13)) {
+            char expbuf[BUFSZ];
+            const char *jpexp = jp_explosion_text_for_display(killer, expbuf, sizeof expbuf);
+            Snprintf(outmain, sizeof outmain, "%sに倒された", jpexp);
+        } else if (strstri(killer, "'s explosion") || strstri(killer, "s' explosion")) {
+            char expbuf[BUFSZ];
+            const char *jpexp = jp_explosion_text_for_display(killer, expbuf, sizeof expbuf);
+            Snprintf(outmain, sizeof outmain, "%sに倒された", jpexp);
         } else if (strstr(killer, "shot ") && strstr(killer, "self with a death ray")) {
             Snprintf(outmain, sizeof outmain, "死の光線で自分を照射したこと");
         } else if (strstr(killer, "disintegration breath by ")) {

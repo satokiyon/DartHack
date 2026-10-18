@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19. */
 /* NetHack 5.0	do.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.411 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -1380,7 +1380,18 @@ currentlevel_rewrite(void)
     return nhfp;
 }
 
+void
+do_idlecheckpoint(void)
+{
+    program_state.in_idlecheckpoint = 1;
 #ifdef INSURANCE
+    save_currentstate();
+#endif /* INSURANCE */
+    program_state.in_idlecheckpoint = 0;
+}
+
+#ifdef INSURANCE
+
 void
 save_currentstate(void)
 {

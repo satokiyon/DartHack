@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19. */
 /* NetHack 5.0	hack.h	$NHDT-Date: 1781973080 2026/06/20 16:31:20 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.299 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
@@ -805,6 +805,7 @@ struct sinfo {
     int in_role_selection;      /* role/race/&c selection menus in progress */
     int in_getlin;              /* inside interface getlin routine */
     int in_sanity_check;        /* for impossible() during sanity checking */
+    int in_idlecheckpoint;      /* an input timeout has triggered idlecheckpoint */
     int config_error_ready;     /* config_error_add is ready, available */
     int beyond_savefile_load;   /* set when past savefile loading */
     int savefile_completed;     /* savefile has completed writing */

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-28. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19. */
 /* NetHack 5.0	explode.c	$NHDT-Date: 1781973049 2026/06/20 16:30:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.128 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -277,6 +277,30 @@ jp_explosion_text_for_display(const char *in, char *out, size_t outsz)
         return "毒ガス雲";
     if (!strcmpi(in, "splash of acid"))
         return "酸の飛沫";
+    if (!strncmpi(in, "explosion of ", 13)) {
+        const char *morphed = strstr(in + 13, " morphed into ");
+        if (morphed) {
+            char m1_buf[BUFSZ], m2_buf[BUFSZ];
+            size_t m1_len = (size_t) (morphed - (in + 13));
+            if (m1_len >= sizeof m1_buf)
+                m1_len = sizeof m1_buf - 1;
+            memcpy(m1_buf, in + 13, m1_len);
+            m1_buf[m1_len] = '\0';
+            Snprintf(m2_buf, sizeof m2_buf, "%s", morphed + 14);
+
+            char m1_name[BUFSZ];
+            const char *m1_jp = jp_translate_explosion_noun(m1_buf, m1_name, sizeof m1_name);
+            if (m1_jp != m1_name)
+                Snprintf(m1_name, sizeof m1_name, "%s", m1_jp);
+            char m2_name[BUFSZ];
+            const char *m2_jp = jp_translate_explosion_noun(m2_buf, m2_name, sizeof m2_name);
+            if (m2_jp != m2_name)
+                Snprintf(m2_name, sizeof m2_name, "%s", m2_jp);
+
+            Snprintf(out, outsz, "%sに変身した%sの爆発", m2_name, m1_name);
+            return out;
+        }
+    }
 
     pos = strstri(in, "'s explosion");
     if (pos) {
@@ -373,14 +397,15 @@ explode(
     int i, j, k, damu = dam;
     boolean starting = 1;
     boolean visible, any_shield;
-    int uhurt = 0; /* 0=unhurt, 1=items damaged, 2=you and items damaged */
-    const char *str = (const char *) 0;
+    int uhurt = 0, /* 0=unhurt, 1=items damaged, 2=you and items damaged */
+        do_hallu = 0;
+    const char *str = (const char *) 0, *unmorphed_str = (const char *) 0;
     struct monst *mtmp, *mdef = 0;
     uchar adtyp;
     int explmask[3][3]; /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
     coordxy xx, yy;
     boolean shopdamage = FALSE, generic = FALSE,
-            do_hallu = FALSE, inside_engulfer, grabbed, grabbing;
+            inside_engulfer, grabbed, grabbing;
     coord grabxy;
     char hallu_buf[BUFSZ], killr_buf[BUFSZ], disp_buf[BUFSZ];
     short exploding_wand_typ = 0;
@@ -465,10 +490,24 @@ explode(
         /* when explode() is called recursively, svk.killer.name might change
            so retain a copy of the current value for this explosion */
         str = strcpy(killr_buf, svk.killer.name);
-        do_hallu = (Hallucination
-                    && (strstri(str, "'s explosion")
-                        || strstri(str, "s' explosion")
-                        || strstri(str, "の爆発")));
+        unmorphed_str = strstr(str, "morphed into an ");
+        if (unmorphed_str) {
+            unmorphed_str += 16;
+        } else {
+            unmorphed_str = strstr(str, "morphed into a ");
+            if (unmorphed_str)
+                unmorphed_str += 15;
+        }
+
+        if (Hallucination) {
+            do_hallu = ((strstri(str, "'s explosion")
+                         || strstri(str, "s' explosion")
+                         || strstri(str, "の爆発")))
+                           ? 1
+                       : (strstr(str, "explosion of an ")) ? 2
+                       : (strstr(str, "explosion of a "))  ? 3
+                                                           : 0;
+        }
     }
     if (type == PHYS_EXPL_TYPE) {
         /* currently only gas spores */
@@ -670,8 +709,9 @@ explode(
                 if (engulfing_u(mtmp)) {
                     engulfer_explosion_msg(adtyp, olet);
                 } else if (cansee(xx, yy)) {
+                    const char *target_str = unmorphed_str ? unmorphed_str : str;
                     const char *dispstr =
-                        jp_explosion_text_for_display(str, disp_buf,
+                        jp_explosion_text_for_display(target_str, disp_buf,
                                                       sizeof disp_buf);
 
                     if (mtmp->m_ap_type)
@@ -703,8 +743,9 @@ explode(
                     int mdam = dam;
 
                     if (resist(mtmp, olet, 0, FALSE)) {
+                        const char *target_str = unmorphed_str ? unmorphed_str : str;
                         const char *dispstr =
-                            jp_explosion_text_for_display(str, disp_buf,
+                            jp_explosion_text_for_display(target_str, disp_buf,
                                                           sizeof disp_buf);
 
                         /* inside_engulfer: <xx,yy> == <u.ux,u.uy> */
@@ -776,7 +817,8 @@ explode(
                 } while (*hallu_buf != lowc(*hallu_buf));
                 str = hallu_buf;
             }
-            dispstr = jp_explosion_text_for_display(str, disp_buf,
+            const char *target_str = unmorphed_str ? unmorphed_str : str;
+            dispstr = jp_explosion_text_for_display(target_str, disp_buf,
                                                     sizeof disp_buf);
             You("%sに巻き込まれた!", dispstr);
             iflags.last_msg = PLNMSG_CAUGHT_IN_EXPLOSION;
@@ -1199,8 +1241,9 @@ mon_explodes(
     struct monst *mon,
     struct attack *mattk)
 {
-    int dmg;
-    int type;
+    int dmg, type, recent_altform = NON_PM;
+
+
     if (mattk->damn) {
         dmg = d((int) mattk->damn, (int) mattk->damd);
     }
@@ -1225,6 +1268,9 @@ mon_explodes(
         return;
     }
 
+    if (mon->cham != NON_PM && is_shapeshifter(&mons[mon->cham])) {
+        recent_altform = monsndx(mon->data);
+    }
     /* Kill it now so it won't appear to be caught in its own explosion.
      * Must check to see if already dead - which happens if this is called
      * from an AT_BOOM attack upon death. */
@@ -1234,8 +1280,14 @@ mon_explodes(
 
     /* This might end up killing you, too; you never know...
      * also, it is used in explode() messages */
+    if (recent_altform != NON_PM && is_shapeshifter(mon->data)) {
+        Sprintf(svk.killer.name, "explosion of %s morphed into %s",
+                an(pmname(mon->data, Mgender(mon))),
+                an(pmname(&mons[recent_altform], Mgender(mon))));
+    } else {
         Sprintf(svk.killer.name, "%s explosion",
-            pmname(mon->data, Mgender(mon)));
+                s_suffix(pmname(mon->data, Mgender(mon))));
+    }
     svk.killer.format = KILLED_BY_AN;
 
     explode(mon->mx, mon->my, type, dmg, MON_EXPLODE,
