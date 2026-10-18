@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -694,6 +694,7 @@ extern int dowipe(void);
 extern void legs_in_no_shape(const char *, boolean) NONNULLARG1;
 extern void set_wounded_legs(long, int);
 extern void heal_legs(int);
+extern void do_idlecheckpoint(void);
 
 /* ### do_name.c ### */
 

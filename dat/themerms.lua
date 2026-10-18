@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-29.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19.
 -- NetHack themerms.lua	$NHDT-Date: 1781994889 2026/06/20 22:34:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.43 $
 --	Copyright (c) 2020 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
@@ -278,6 +278,20 @@ themeroom_fills = {
          end
       end,
    },
+
+   {
+      name = "Meat",
+      contents = function(rm)
+         local meats = { "meatball", "meatball", "meat stick", "enormous meatball" };
+         local i = d(5, 5);
+         while (i > 0) do
+            local meatidx = math.random(#meats);
+            des.object({ id = meats[meatidx] });
+            i = i - meatidx;
+         end
+      end,
+   },
+
 };
 
 themerooms = {

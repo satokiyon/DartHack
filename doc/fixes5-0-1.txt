@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19.
 NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.36 $ $NHDT-Date: 1781062909 2026/06/09 19:41:49 $
 	
 General Fixes and Modified Features
@@ -96,6 +96,8 @@ pets left on another level no longer have their hunger postponed by the
 make probing reveal egg type in inventory
 prevent monster spawning in Fort Ludios treasure vaults
 fix level gain maxhp change when polymorphed
+make #wizlevelteleport accept special level proto name
+add meat theme room
 
 
 Platform- and/or Interface-Specific Fixes
