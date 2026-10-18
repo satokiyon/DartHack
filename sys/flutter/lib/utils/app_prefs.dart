@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+// ignore: depend_on_referenced_packages
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+// ignore: depend_on_referenced_packages
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 /// SharedPreferencesWithCache (内部は SharedPreferencesAsync / Jetpack DataStore) を
@@ -50,14 +52,6 @@ class AppPrefs {
     _initCompleter = completer;
 
     try {
-      // テスト環境などでプラットフォームインスタンスが未設定の場合の自動初期化
-      try {
-        SharedPreferencesAsyncPlatform.instance;
-      } catch (_) {
-        SharedPreferencesAsyncPlatform.instance =
-            InMemorySharedPreferencesAsync.empty();
-      }
-
       final asyncPrefs = SharedPreferencesAsync();
 
       // 初回マイグレーション判定（DataStore に完了フラグが立っているか確認）

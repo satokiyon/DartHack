@@ -1302,7 +1302,10 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
    - **旧バージョンからの自動マイグレーション**: 初回起動時に `__datastore_migration_v1_completed__` フラグを検査し、未完了の場合は旧 `SharedPreferences`（XML）から全型を型安全に DataStore へコピーした上で完了フラグを書き込みます。例外安全性を担保するため、DataStore への永続化とフラグ書き込みの両方が正常に完了した直後のみ旧 XML 側を `legacyPrefs.clear()` で完全消去します。
    - **新規インストールでの安全稼働**: 新規端末（旧 XML が空）でも初回起動時にマイグレーション判定を通過して完了フラグが記録され、2回目以降の起動も含めて設定が確実に保持されます。
    - **システムキーの多重保護**: アプリ設定画面の「設定リセット」や「JSON エクスポート/インポート」において、移行完了フラグ `__datastore_migration_v1_completed__` やアセット管理キー（`verDat`, `datadir`, `cCoreBuildId`）が誤って消去・上書きされないよう、`AppPrefs.isSystemKey(key)` による除外ガード（`key.startsWith('__')` および既知システムキー保護）を徹底してください。
-   - **テスト時のモック初期化**: 単体テスト・Widget テストでは `AppPrefs.setMockInitialValues` を使用してください。このメソッドは内部で `InMemorySharedPreferencesAsync` のモックプラットフォームを自動構成するため、実機・テスト環境を問わず決定論的に動作します。
+   - **本番コード（`getInstance()`）におけるプラットフォーム自動初期化・インメモリ実装混入の禁止（AOT スナップショットクラッシュ防止）**:
+     本番コードの `getInstance()` 内で `SharedPreferencesAsyncPlatform.instance` の有無を判定して `InMemorySharedPreferencesAsync.empty()` を代入するようなフォールバックハックを絶対に記述してはなりません。
+     Flutter の Release AOT ビルド（`gen_snapshot.exe`）において、クローズドワールド型推論（TFA）中に Android 向け Pigeon JNI 実装と InMemory 実装の型階層が同一スコープで解決不能となり、Windows 上で `gen_snapshot.exe` がスタックバッファオーバーラン（0xC0000409）およびアクセス違反（0xC0000005）を引き起こしてクラッシュします。
+     テスト用プラットフォームの設定は、必ず `@visibleForTesting` な `setMockInitialValues` または各テストファイルの `setUp` 内のみに厳密に隔離してください。
    - **詳細仕様とガイドライン**: 移行の背景、クラス構造、テスト設計、および将来の設定追加・スキーマ変更手順については、[docs/datastore_migration_architecture.md](file:///c:/Users/satok/DartHack/docs/datastore_migration_architecture.md) を参照してください。
 
 3. **リワード広告（`RewardedAdManager`）と C コア間の「1セッション1応答」契約**:
