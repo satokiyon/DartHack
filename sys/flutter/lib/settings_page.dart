@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'utils/app_prefs.dart';
 import 'defaults_editor.dart';
 import 'models/ext_cmd_entry.dart';
@@ -34,6 +35,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  String _appVersion = '';
   bool _useTiles = true;
   String _selectedLanguage = 'ja';
   String _selectedTileset = 'pixelhack_32x32';
@@ -215,11 +217,27 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
 
+  Future<void> _loadAppVersion() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (!mounted) return;
+      final version = info.version;
+      final build = info.buildNumber;
+      final fullVersion = build.isNotEmpty ? 'v$version+$build' : 'v$version';
+      setState(() {
+        _appVersion = fullVersion;
+      });
+    } catch (e) {
+      debugPrint("アプリバージョン情報の取得エラー: $e");
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _loadAllSettings();
     _loadExtCmds();
+    _loadAppVersion();
   }
 
   Future<void> _loadAllSettings() async {
@@ -2221,9 +2239,9 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "DartHack",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.amberAccent),
+                Text(
+                  _appVersion.isNotEmpty ? "DartHack $_appVersion" : "DartHack",
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.amberAccent),
                 ),
                 const SizedBox(height: 8),
                 Text(l10n.creditsBody1),

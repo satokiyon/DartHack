@@ -40,6 +40,7 @@ dependencies:
   google_mobile_ads: ^9.1.0
   scrollable_positioned_list: ^0.3.8
   audioplayers: ^6.8.1
+  package_info_plus: ^10.2.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
