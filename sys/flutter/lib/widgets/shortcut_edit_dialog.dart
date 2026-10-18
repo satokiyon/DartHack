@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/app_prefs.dart';
 import '../l10n/app_localizations.dart';
 import '../models/ext_cmd_entry.dart';
 import '../nethack_cmd_panel.dart';
@@ -38,7 +38,7 @@ void showShortcutEditDialog({
   ];
   final shortcutName = isJp ? shortcutLabelsJp[index] : shortcutLabelsEn[index];
 
-  SharedPreferences.getInstance().then((prefs) {
+  AppPrefs.getInstance().then((prefs) {
     final defaultShortcuts = NetHackShortcutPad.defaultShortcuts;
     final buttonDisplayMode = prefs.getString('button_display_mode') ?? 'label';
     final helperText = (buttonDisplayMode == 'label')

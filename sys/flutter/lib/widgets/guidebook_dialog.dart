@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/app_prefs.dart';
 
 import '../utils/text_formatter.dart';
 
@@ -168,7 +168,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
         content = widget.initialContent!;
         isJp = widget.initialIsJp ?? true;
       } else {
-        final prefs = await SharedPreferences.getInstance();
+        final prefs = await AppPrefs.getInstance();
         final lang = prefs.getString('selected_language') ?? 'ja';
         isJp = widget.initialIsJp ?? (lang == 'ja');
 

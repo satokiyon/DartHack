@@ -1297,10 +1297,13 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
    - `shared_preferences_android 2.5.0` 以降は Pigeon JNI（`package:jni`）に移行しており、Dart 側から JNI 文字列リフレクション（`JClass.forName` / `*FieldId` / `*MethodId`）で `io.flutter.plugins.sharedpreferences.**` および Kotlin 標準ライブラリのコルーチン関連メンバー（`kotlin.Result`、`kotlin.Result$Failure` のフィールドと `<init>(Throwable)`、`IntrinsicsKt.getCOROUTINE_SUSPENDED`、`CoroutineSingletons`、`kotlin.Unit.INSTANCE`、`Continuation.resumeWith`）を参照します。
    - 同パッケージは `consumerProguardFiles` を同梱していないため、`sys/flutter/android/app/proguard-rules.pro` にてこれらを必ず保護してください。`jni` パッケージをアップグレードした際は、`jni/lib/src/kotlin.dart` の参照先と `proguard-rules.pro` の定義が一致しているか必ず点検してください。
 
-2. **将来の `SharedPreferencesAsync` / `SharedPreferencesWithCache` 移行時における設定消失防止（DataStore 非互換への対処）**:
-   - 現在 DartHack は従来の `SharedPreferences.getInstance()`（Android では `FlutterSharedPreferences.xml`、キー接頭辞 `flutter.`）を使用しています。
-   - 将来 `SharedPreferencesAsync` または `SharedPreferencesWithCache` へ移行する際、Android のデフォルトバックエンドは Jetpack DataStore（別ファイル）に切り替わるため、**オプション指定なしで単純置換すると既存ユーザーの全設定が消失（初期値化）**します。
-   - 移行時は必ず `SharedPreferencesAsyncAndroidOptions(backend: SharedPreferencesAndroidBackendLibrary.SharedPreferences)` を指定して従来の `SharedPreferences` バックエンドを維持するか、`migrateLegacySharedPreferencesToSharedPreferencesAsyncIfNecessary` による移行処理を実装し、実機での上書きインストール試験を行ってください。
+2. **`AppPrefs`（`SharedPreferencesWithCache` / Jetpack DataStore）運用と自動マイグレーション原則**:
+   - DartHack では `AppPrefs`（`sys/flutter/lib/utils/app_prefs.dart`）を介して `SharedPreferencesWithCache`（内部は `SharedPreferencesAsync` / Android では Jetpack DataStore）を使用します。
+   - **旧バージョンからの自動マイグレーション**: 初回起動時に `__datastore_migration_v1_completed__` フラグを検査し、未完了の場合は旧 `SharedPreferences`（XML）から全型を型安全に DataStore へコピーした上で完了フラグを書き込みます。例外安全性を担保するため、DataStore への永続化とフラグ書き込みの両方が正常に完了した直後のみ旧 XML 側を `legacyPrefs.clear()` で完全消去します。
+   - **新規インストールでの安全稼働**: 新規端末（旧 XML が空）でも初回起動時にマイグレーション判定を通過して完了フラグが記録され、2回目以降の起動も含めて設定が確実に保持されます。
+   - **システムキーの多重保護**: アプリ設定画面の「設定リセット」や「JSON エクスポート/インポート」において、移行完了フラグ `__datastore_migration_v1_completed__` やアセット管理キー（`verDat`, `datadir`, `cCoreBuildId`）が誤って消去・上書きされないよう、`AppPrefs.isSystemKey(key)` による除外ガード（`key.startsWith('__')` および既知システムキー保護）を徹底してください。
+   - **テスト時のモック初期化**: 単体テスト・Widget テストでは `AppPrefs.setMockInitialValues` を使用してください。このメソッドは内部で `InMemorySharedPreferencesAsync` のモックプラットフォームを自動構成するため、実機・テスト環境を問わず決定論的に動作します。
+   - **詳細仕様とガイドライン**: 移行の背景、クラス構造、テスト設計、および将来の設定追加・スキーマ変更手順については、[docs/datastore_migration_architecture.md](file:///c:/Users/satok/DartHack/docs/datastore_migration_architecture.md) を参照してください。
 
 3. **リワード広告（`RewardedAdManager`）と C コア間の「1セッション1応答」契約**:
    - 階段昇降時のリワード広告において、呼び出し側（`main.dart`）は `onUserEarnedReward(amount)` または `onAdClosed(false)` のいずれかで C コアへ `new_level_rest_result` を送信します。

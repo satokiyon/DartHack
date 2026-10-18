@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:darthack/utils/app_prefs.dart';
 import 'package:darthack/utils/defaults_helper.dart';
 
 void main() {
@@ -12,7 +12,7 @@ void main() {
   setUp(() async {
     tempDir = await Directory.systemTemp.createTemp('defaults_helper_test_');
     testFilePath = '${tempDir.path}/defaults.nh';
-    SharedPreferences.setMockInitialValues({});
+    await AppPrefs.setMockInitialValues({});
   });
 
   tearDown(() async {
@@ -66,12 +66,12 @@ OPTIONS=autopickup, number_pad:1
     expect(reloadHelper.getOption('name'), equals('satok'));
   });
 
-  test('SharedPreferences からの同期 (syncFromPrefsToFile) での空文字列削除検証', () async {
+  test('AppPrefs からの同期 (syncFromPrefsToFile) での空文字列削除検証', () async {
     final initialContent = 'OPTIONS=dogname:Rex\n';
     final file = File(testFilePath);
     await file.writeAsString(initialContent);
 
-    SharedPreferences.setMockInitialValues({
+    await AppPrefs.setMockInitialValues({
       'nh_opt_dogname': '',
     });
 
@@ -90,7 +90,7 @@ MENUCOLOR=red=dragon
     final file = File(testFilePath);
     await file.writeAsString(initialContent);
 
-    SharedPreferences.setMockInitialValues({
+    await AppPrefs.setMockInitialValues({
       'nh_opt_hilite_status': false,
       'nh_opt_menucolor': false,
     });
@@ -103,9 +103,9 @@ MENUCOLOR=red=dragon
     expect(savedContent.contains('#OPTIONS=hilite_status:true') || savedContent.contains('# OPTIONS=hilite_status:true'), isTrue);
     expect(savedContent.contains('#MENUCOLOR=red=dragon') || savedContent.contains('# MENUCOLOR=red=dragon'), isTrue);
 
-    // syncFromFileToPrefs を実行して SharedPreferences が false のまま維持されるか検証
+    // syncFromFileToPrefs を実行して AppPrefs が false のまま維持されるか検証
     await helper.syncFromFileToPrefs(testFilePath);
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
 
     expect(prefs.getBool('nh_opt_hilite_status'), isFalse);
     expect(prefs.getBool('nh_opt_menucolor'), isFalse);
@@ -116,7 +116,7 @@ MENUCOLOR=red=dragon
     final file = File(testFilePath);
     await file.writeAsString(initialContent);
 
-    SharedPreferences.setMockInitialValues({
+    await AppPrefs.setMockInitialValues({
       'nh_opt_tutorial_mode': 0, // 毎回確認 (ask)
     });
 
@@ -128,7 +128,7 @@ MENUCOLOR=red=dragon
 
     // syncFromFileToPrefs を実行して 0 (ask) が維持されることを検証
     await helper.syncFromFileToPrefs(testFilePath);
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
 
     expect(prefs.getInt('nh_opt_tutorial_mode'), equals(0));
   });
@@ -138,20 +138,20 @@ MENUCOLOR=red=dragon
     final file = File(testFilePath);
     await file.writeAsString(initialContent);
 
-    SharedPreferences.setMockInitialValues({});
+    await AppPrefs.setMockInitialValues({});
 
     final helper = DefaultsHelper();
     await helper.syncFromFileToPrefs(testFilePath);
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
 
     // defaults.nh に OPTIONS=autopickup がある場合は true
     expect(prefs.getBool('nh_opt_autopickup'), isTrue);
 
     // defaults.nh に autopickup が記述されていない場合でも未設定時は true が補完される
     await file.writeAsString('OPTIONS=number_pad:0\n');
-    SharedPreferences.setMockInitialValues({});
+    await AppPrefs.setMockInitialValues({});
     await helper.syncFromFileToPrefs(testFilePath);
-    final prefsAfterEmpty = await SharedPreferences.getInstance();
+    final prefsAfterEmpty = await AppPrefs.getInstance();
     expect(prefsAfterEmpty.getBool('nh_opt_autopickup'), isTrue);
   });
 
@@ -160,7 +160,7 @@ MENUCOLOR=red=dragon
     final file = File(testFilePath);
     await file.writeAsString(initialContent);
 
-    SharedPreferences.setMockInitialValues({
+    await AppPrefs.setMockInitialValues({
       'nh_opt_autopickup': false,
     });
 
@@ -172,7 +172,7 @@ MENUCOLOR=red=dragon
 
     // syncFromFileToPrefs で再読み込みしても false が維持される
     await helper.syncFromFileToPrefs(testFilePath);
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     expect(prefs.getBool('nh_opt_autopickup'), isFalse);
   });
 
@@ -181,11 +181,11 @@ MENUCOLOR=red=dragon
     final file = File(testFilePath);
     await file.writeAsString(initialContent);
 
-    SharedPreferences.setMockInitialValues({});
+    await AppPrefs.setMockInitialValues({});
 
     final helper = DefaultsHelper();
     await helper.syncFromFileToPrefs(testFilePath);
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
 
     expect(prefs.getBool('nh_opt_blind'), isFalse);
     expect(prefs.getBool('nh_opt_nudist'), isFalse);
@@ -202,11 +202,11 @@ OPTIONS=!bones
     final file = File(testFilePath);
     await file.writeAsString(initialContent);
 
-    SharedPreferences.setMockInitialValues({});
+    await AppPrefs.setMockInitialValues({});
 
     final helper = DefaultsHelper();
     await helper.syncFromFileToPrefs(testFilePath);
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
 
     expect(prefs.getBool('nh_opt_blind'), isTrue);
     expect(prefs.getBool('nh_opt_nudist'), isTrue);
@@ -215,13 +215,13 @@ OPTIONS=!bones
     expect(prefs.getBool('nh_opt_bones'), isFalse); // !bones -> bones=false
   });
 
-  test('SharedPreferences から defaults.nh へのハードモード保存と初期化リセットの検証', () async {
+  test('AppPrefs から defaults.nh へのハードモード保存と初期化リセットの検証', () async {
     final initialContent = 'OPTIONS=autopickup\n';
     final file = File(testFilePath);
     await file.writeAsString(initialContent);
 
     // 1. ハードモードを有効化して保存
-    SharedPreferences.setMockInitialValues({
+    await AppPrefs.setMockInitialValues({
       'nh_opt_blind': true,
       'nh_opt_nudist': true,
       'nh_opt_deaf': true,
@@ -240,7 +240,7 @@ OPTIONS=!bones
     expect(savedContent.contains('!bones'), isTrue);
 
     // 2. リセット（すべて通常プレイに戻す）
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     await prefs.setBool('nh_opt_blind', false);
     await prefs.setBool('nh_opt_nudist', false);
     await prefs.setBool('nh_opt_deaf', false);
@@ -257,4 +257,3 @@ OPTIONS=!bones
     expect(savedContent.contains('bones') && !savedContent.contains('!bones'), isTrue);
   });
 }
-

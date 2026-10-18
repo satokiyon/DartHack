@@ -16,7 +16,7 @@ import 'nethack_ffi.dart';
 import 'settings_page.dart';
 import 'utils/defaults_helper.dart';
 import 'utils/nethack_colors.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'utils/app_prefs.dart';
 import 'amount_selector_dialog.dart';
 import 'utils/scale_clamp.dart';
 import 'utils/item_count_parser.dart';
@@ -50,6 +50,7 @@ import 'input/hardware_key_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await AppPrefs.getInstance();
   unawaited(RewardedAdManager.initializeAndPreload());
   await SoundManager.instance.initialize();
   runApp(const MyApp());
@@ -75,7 +76,7 @@ class MyAppState extends State<MyApp> {
   }
 
   Future<void> _loadLocale() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     setState(() {
       _localeStr = prefs.getString('selected_language') ?? 'ja';
     });
@@ -303,7 +304,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _loadPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     final newTileset = prefs.getString('selected_tileset') ?? 'pixelhack_32x32';
     final tilesetChanged = newTileset != _selectedTileset;
     setState(() {
@@ -368,7 +369,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Future<void> _changeLanguage(String lang) async {
     if (lang != 'ja' && lang != 'en') return;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     await prefs.setString('selected_language', lang);
     setState(() {
       _selectedLanguage = lang;
@@ -1139,7 +1140,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
     WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
     if (result != null && result.isNotEmpty) {
-      SharedPreferences.getInstance().then((prefs) {
+      AppPrefs.getInstance().then((prefs) {
         prefs.setString("lastUsername", result);
       });
     }
@@ -1171,7 +1172,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _sendAutosaveSettingsToWorker() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     final enabled = prefs.getBool('autosave_enabled') ?? true;
     final interval = prefs.getInt('autosave_interval') ?? 50;
     _workerSendPort?.send({
@@ -1920,7 +1921,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _saveDPadModePrefs() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     await prefs.setString('dpad_move_mode', _moveModeName(_dPadMoveMode));
     await prefs.setString(
       'dpad_enabled_move_modes',
@@ -3109,7 +3110,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       setState(() {
                         _isCmdPanelExpanded = expanded;
                       });
-                      final prefs = await SharedPreferences.getInstance();
+                      final prefs = await AppPrefs.getInstance();
                       await prefs.setBool('cmd_panel_expanded', expanded);
                     }
                   },

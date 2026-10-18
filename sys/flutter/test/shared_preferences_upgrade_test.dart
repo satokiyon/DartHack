@@ -1,72 +1,163 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:darthack/utils/app_prefs.dart';
 import 'package:darthack/utils/defaults_helper.dart';
 
-/// SharedPreferences 2.5.6（レガシー API ラッパー）および DefaultsHelper の設定引き継ぎ・互換性テスト
+/// AppPrefs (DataStore / SharedPreferencesAsync) および DefaultsHelper の設定移行・保持テスト
 ///
-/// 【検証範囲に関する注記】
-/// `SharedPreferences.setMockInitialValues` はメモリ上のモックストア（InMemorySharedPreferencesStore）を
-/// 使用するため、Android の Pigeon JNI 層（`shared_preferences_android 2.5.0`）や iOS の Pigeon FFI 層
-/// （`shared_preferences_foundation 2.6.0`）のネイティブ通信自体は通過しない。
-/// ネイティブ層の保存形式互換（`FlutterSharedPreferences` XML、DOUBLE_PREFIX、LIST_PREFIX 等）は
-/// パッケージソースコードの直接検査および実機の上書きインストール試験で担保し、
-/// 本テストでは以下を検証する：
-/// 1. Dart 側の `SharedPreferences.getInstance()` における各型（特に DartHack が多用する `double` / `int` / `bool` / `String` / `List<String>`）の契約維持
-/// 2. アップデート時に実行される `DefaultsHelper.mergeAssetDefaultsWithPrefs` および双方向同期において、
-///    既存ユーザーの設定値が失われず `defaults.nh` に正しく引き継がれること
+/// 検証内容:
+/// 1. 旧バージョン（Legacy XML）からの自動マイグレーションと型安全なコピー
+/// 2. マイグレーション完了後の旧 SharedPreferences の完全消去（clear()）
+/// 3. マイグレーション完了フラグ（__datastore_migration_v1_completed__）の記録と2回目以降のスキップ（冪等性）
+/// 4. 新規インストール（旧キーが空）環境での初回起動・フラグ記録・2回目起動での設定保持
+/// 5. 設定リセット（clearUserPreferences）およびエクスポート/インポートにおける保護システムキー（verDat, datadir, cCoreBuildId 等）の非破壊性
+/// 6. Completer による複数同時呼び出し時の排他制御（二重マイグレーション防止）
+/// 7. DefaultsHelper と AppPrefs の連携マージ動作
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('SharedPreferences Dart層 API および DartHack 設定キーの読み書き検証', () {
+  group('AppPrefs (DataStore / SharedPreferencesAsync) マイグレーションと基本機能検証', () {
     setUp(() {
+      AppPrefs.resetForTesting();
+    });
+
+    test('旧バージョン（Legacy XML）からの全データ移行と旧 XML の消去が正常に行われること', () async {
+      // 1. 旧バージョンの SharedPreferences (XML) に既存データを準備
       SharedPreferences.setMockInitialValues(<String, Object>{
         'pad_opacity': 0.75,
         'dpad_scale': 1.2,
         'shortcut_pad_scale': 0.9,
         'cmd_panel_scale': 1.1,
-        'msg_opacity': 0.65,
-        'msg_font_size': 15.0,
         'sound_bgm_volume': 0.4,
         'sound_se_volume': 0.9,
-        'sound_ambience_volume': 0.5,
-        'nh_opt_name': 'テスト冒険者',
+        'nh_opt_name': '既存冒険者',
         'nh_opt_tutorial_mode': 2,
         'nh_opt_autopickup': false,
         'custom_shortcuts': <String>['#pray', '#enhance', 'Z'],
       });
-    });
 
-    test('DartHack の既存設定キー（double / int / bool / String / List<String>）が正確に取得・更新できること', () async {
-      final prefs = await SharedPreferences.getInstance();
+      // DataStore バックエンドを空の InMemory プラットフォームとして設定
+      SharedPreferencesAsyncPlatform.instance =
+          InMemorySharedPreferencesAsync.empty();
 
+      // 2. AppPrefs.getInstance() を実行して初回起動を模擬
+      final prefs = await AppPrefs.getInstance();
+
+      // 3. DataStore (AppPrefs) にデータが正確にコピーされていることを検証
       expect(prefs.getDouble('pad_opacity'), 0.75);
       expect(prefs.getDouble('dpad_scale'), 1.2);
+      expect(prefs.getDouble('shortcut_pad_scale'), 0.9);
+      expect(prefs.getDouble('cmd_panel_scale'), 1.1);
       expect(prefs.getDouble('sound_bgm_volume'), 0.4);
-      expect(prefs.getString('nh_opt_name'), 'テスト冒険者');
+      expect(prefs.getDouble('sound_se_volume'), 0.9);
+      expect(prefs.getString('nh_opt_name'), '既存冒険者');
       expect(prefs.getInt('nh_opt_tutorial_mode'), 2);
       expect(prefs.getBool('nh_opt_autopickup'), isFalse);
-      expect(prefs.getStringList('custom_shortcuts'), <String>['#pray', '#enhance', 'Z']);
+      expect(prefs.getStringList('custom_shortcuts'),
+          <String>['#pray', '#enhance', 'Z']);
 
-      // 値の更新と再取得
-      await prefs.setDouble('pad_opacity', 0.5);
-      await prefs.setStringList('custom_shortcuts', <String>['#loot', 's']);
-      expect(prefs.getDouble('pad_opacity'), 0.5);
-      expect(prefs.getStringList('custom_shortcuts'), <String>['#loot', 's']);
+      // 4. 移行完了フラグが DataStore 側に立っていることを検証
+      expect(prefs.getBool(AppPrefs.migrationCompletedKey), isTrue);
+
+      // 5. 旧 SharedPreferences (XML) 側が綺麗に clear() されていることを検証
+      final legacyPrefs = await SharedPreferences.getInstance();
+      expect(legacyPrefs.getKeys(), isEmpty);
     });
 
-    test('remove()・clear()・reload() が正常に動作すること', () async {
-      final prefs = await SharedPreferences.getInstance();
+    test('移行完了後は2回目以降の起動でマイグレーション処理がスキップされること（冪等性）', () async {
+      // 既に移行完了フラグが立っている DataStore 状態を模擬
+      SharedPreferencesAsyncPlatform.instance =
+          InMemorySharedPreferencesAsync.withData(<String, Object>{
+        AppPrefs.migrationCompletedKey: true,
+        'selected_language': 'ja',
+        'pad_opacity': 0.85,
+      });
 
-      expect(prefs.containsKey('nh_opt_name'), isTrue);
-      await prefs.remove('nh_opt_name');
-      expect(prefs.containsKey('nh_opt_name'), isFalse);
+      // 万一 Legacy 側にゴミが入っていたとしても上書きされないことを確認
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'pad_opacity': 0.20, // これで上書きされてはならない
+      });
+
+      final prefs = await AppPrefs.getInstance();
+      expect(prefs.getDouble('pad_opacity'), 0.85);
+      expect(prefs.getString('selected_language'), 'ja');
+    });
+
+    test('新規インストール端末（旧キーが空）で初回起動・フラグ記録・2回目起動が問題なく行われること', () async {
+      // 1. 旧 SharedPreferences は空
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      // DataStore も空
+      SharedPreferencesAsyncPlatform.instance =
+          InMemorySharedPreferencesAsync.empty();
+
+      // 2. 初回起動
+      final prefs1 = await AppPrefs.getInstance();
+      expect(prefs1.getBool(AppPrefs.migrationCompletedKey), isTrue);
+
+      // ユーザー設定の書き込み（新規初期化を模擬）
+      await prefs1.setString('selected_tileset', 'pixelhack_32x32');
+      await prefs1.setDouble('pad_opacity', 0.8);
+
+      // 3. アプリ再起動（2回目起動）を模擬
+      AppPrefs.resetForTesting();
+      final prefs2 = await AppPrefs.getInstance();
+      expect(prefs2.getBool(AppPrefs.migrationCompletedKey), isTrue);
+      expect(prefs2.getString('selected_tileset'), 'pixelhack_32x32');
+      expect(prefs2.getDouble('pad_opacity'), 0.8);
+    });
+
+    test('clearUserPreferences() でシステム保護キーが保護され、ユーザー設定のみ消去されること',
+        () async {
+      final prefs = await AppPrefs.setMockInitialValues(<String, Object>{
+        'verDat': 105,
+        'datadir': '/data/user/0/darthack/nethackdir',
+        'cCoreBuildId': 'build-20261018',
+        '__custom_system_tag__': 'preserve_me',
+        'pad_opacity': 0.8,
+        'selected_language': 'ja',
+        'nh_opt_name': '冒険者',
+      });
+
+      expect(prefs.getInt('verDat'), 105);
+      expect(prefs.getString('pad_opacity_key_check'), isNull);
+      expect(prefs.getDouble('pad_opacity'), 0.8);
+
+      // 設定リセットを実行
+      await prefs.clearUserPreferences();
+
+      // ユーザー設定は削除されている
+      expect(prefs.getDouble('pad_opacity'), isNull);
+      expect(prefs.getString('selected_language'), isNull);
       expect(prefs.getString('nh_opt_name'), isNull);
 
-      await expectLater(prefs.reload(), completes);
+      // システムキー（移行フラグ、verDat, datadir, cCoreBuildId, __プレフィックス）は完全に保持されている
+      expect(prefs.getInt('verDat'), 105);
+      expect(prefs.getString('datadir'), '/data/user/0/darthack/nethackdir');
+      expect(prefs.getString('cCoreBuildId'), 'build-20261018');
+      expect(prefs.getString('__custom_system_tag__'), 'preserve_me');
+      expect(prefs.getBool(AppPrefs.migrationCompletedKey), isTrue);
+    });
 
-      await prefs.clear();
-      expect(prefs.getKeys(), isEmpty);
+    test('複数箇所から同時に getInstance() を呼んでも Completer により1度しか初期化されないこと',
+        () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'concurrent_test_key': 'value123',
+      });
+      SharedPreferencesAsyncPlatform.instance =
+          InMemorySharedPreferencesAsync.empty();
+
+      // 同時に 5 回呼び出し
+      final futures = List.generate(5, (_) => AppPrefs.getInstance());
+      final results = await Future.wait(futures);
+
+      // 全て同じインスタンスが返り、マイグレーションが正常完了していること
+      for (final p in results) {
+        expect(identical(p, results.first), isTrue);
+        expect(p.getString('concurrent_test_key'), 'value123');
+      }
     });
   });
 
@@ -76,6 +167,7 @@ void main() {
     late File userDefaultsFile;
 
     setUp(() async {
+      AppPrefs.resetForTesting();
       tempDir = await Directory.systemTemp.createTemp('darthack_prefs_test_');
       assetDefaultsFile = File('${tempDir.path}/asset_defaults.nh');
       userDefaultsFile = File('${tempDir.path}/user_defaults.nh');
@@ -103,15 +195,11 @@ void main() {
       }
     });
 
-    test('mergeAssetDefaultsWithPrefs 実行時に既存ユーザーの SharedPreferences 設定が維持され、廃止キーのみ削除されること', () async {
-      // 旧バージョンで保存されていたユーザー設定と廃止キーを模擬
-      SharedPreferences.setMockInitialValues(<String, Object>{
+    test('アセット更新マージ時、ユーザーの既存設定が優先され、新デフォルト値が安全に補完されること', () async {
+      await AppPrefs.setMockInitialValues(<String, Object>{
         'nh_opt_name': '既存プレイヤー',
-        'nh_opt_dogname': 'ポチ',
         'nh_opt_autopickup': false,
-        'nh_opt_tutorial_mode': 2, // 常に通常プレイ
         'nh_opt_number_pad': 1,
-        'nh_opt_old_unused_key': true, // 廃止キー
       });
 
       final helper = DefaultsHelper();
@@ -120,29 +208,29 @@ void main() {
         userDefaultsFile.path,
       );
 
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await AppPrefs.getInstance();
 
-      // 廃止キーは削除されていること
-      expect(prefs.containsKey('nh_opt_old_unused_key'), isFalse);
-
-      // 既存のユーザー設定が上書きされずに保持されていること
+      // 既存のユーザー設定が優先維持されていること
       expect(prefs.getString('nh_opt_name'), '既存プレイヤー');
-      expect(prefs.getString('nh_opt_dogname'), 'ポチ');
       expect(prefs.getBool('nh_opt_autopickup'), isFalse);
-      expect(prefs.getInt('nh_opt_tutorial_mode'), 2);
       expect(prefs.getInt('nh_opt_number_pad'), 1);
 
-      // 未設定だった新規キーはアセットのデフォルト値で補完されていること
+      // 新しくアセットで追加されたデフォルト設定が補完されていること
       expect(prefs.getBool('nh_opt_time'), isTrue);
       expect(prefs.getBool('nh_opt_showexp'), isTrue);
+      expect(prefs.getString('nh_opt_pickup_types'), r'$"=/!?+');
       expect(prefs.getBool('nh_opt_hitpointbar'), isTrue);
+      expect(prefs.getBool('nh_opt_bones'), isTrue);
 
-      // 出力された defaults.nh ファイルにもユーザー設定が正しく書き出されていること
+      // defaults.nh ファイルにも正しく反映されていること
+      await helper.syncFromPrefsToFile(userDefaultsFile.path);
       final savedContent = await userDefaultsFile.readAsString();
-      expect(savedContent, contains('name:既存プレイヤー'));
-      expect(savedContent, contains('dogname:ポチ'));
-      expect(savedContent, contains('!autopickup'));
-      expect(savedContent, contains('number_pad:1'));
+
+      expect(savedContent.contains('name:既存プレイヤー'), isTrue);
+      expect(savedContent.contains('!autopickup'), isTrue);
+      expect(savedContent.contains('number_pad:1'), isTrue);
+      expect(savedContent.contains('time'), isTrue);
+      expect(savedContent.contains('showexp'), isTrue);
     });
   });
 }

@@ -3,7 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/app_prefs.dart';
 
 import '../l10n/app_localizations.dart';
 import 'guidebook_dialog.dart';
@@ -198,7 +198,7 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
         return;
       }
 
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await AppPrefs.getInstance();
       final lang = prefs.getString('selected_language') ?? 'ja';
       final isJp = widget.initialIsJp ?? (lang == 'ja');
 

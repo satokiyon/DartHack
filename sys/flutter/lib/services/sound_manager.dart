@@ -4,7 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/app_prefs.dart';
 
 /// Androidのキャッシュディレクトリにおける権限エラー（errno=13, EACCES）を回避するための安全なAudioCache
 ///
@@ -222,7 +222,7 @@ class SoundManager {
     if (_isInitialized) return;
 
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await AppPrefs.getInstance();
       _seVolume = prefs.getDouble('sound_se_volume') ?? 0.8;
       _bgmVolume = prefs.getDouble('sound_bgm_volume') ?? 0.5;
       _ambienceVolume = prefs.getDouble('sound_ambience_volume') ?? 0.6;
@@ -991,7 +991,7 @@ class SoundManager {
   // 設定変更
   Future<void> setMuted(bool mute) async {
     _muted = mute;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     await prefs.setBool('sound_muted', mute);
     if (mute) {
       await stopAll();
@@ -1014,7 +1014,7 @@ class SoundManager {
   /// スライダー操作完了時等の永続化付きSE音量設定
   Future<void> setSeVolume(double vol) async {
     updateSeVolume(vol);
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     await prefs.setDouble('sound_se_volume', _seVolume);
   }
 
@@ -1038,7 +1038,7 @@ class SoundManager {
   /// スライダー操作完了時等の永続化付きBGM音量設定
   Future<void> setBgmVolume(double vol) async {
     updateBgmVolume(vol);
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     await prefs.setDouble('sound_bgm_volume', _bgmVolume);
   }
 
@@ -1053,13 +1053,13 @@ class SoundManager {
   /// スライダー操作完了時等の永続化付き環境音量設定
   Future<void> setAmbienceVolume(double vol) async {
     updateAmbienceVolume(vol);
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     await prefs.setDouble('sound_ambience_volume', _ambienceVolume);
   }
 
   Future<void> setBgmEnabled(bool enabled) async {
     _bgmEnabled = enabled;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     await prefs.setBool('sound_bgm_enabled', enabled);
     if (!enabled) {
       await stopBgm();
@@ -1071,13 +1071,13 @@ class SoundManager {
 
   Future<void> setSeEnabled(bool enabled) async {
     _seEnabled = enabled;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     await prefs.setBool('sound_se_enabled', enabled);
   }
 
   Future<void> setAmbienceEnabled(bool enabled) async {
     _ambienceEnabled = enabled;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     await prefs.setBool('sound_ambience_enabled', enabled);
     if (!enabled) {
       await stopAmbience();
@@ -1089,7 +1089,7 @@ class SoundManager {
 
   /// SharedPreferences から設定を一括同期
   Future<void> syncFromPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     final muted = prefs.getBool('sound_muted') ?? false;
     final bgmEnabled = prefs.getBool('sound_bgm_enabled') ?? true;
     final seEnabled = prefs.getBool('sound_se_enabled') ?? true;

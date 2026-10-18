@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'utils/app_prefs.dart';
 import 'utils/defaults_helper.dart';
 
 class NetHackAssets {
@@ -58,7 +58,7 @@ class NetHackAssets {
     final int assetVer = int.tryParse(assetVerStr) ?? 0;
 
     // 2. 展開済みのバージョンおよびビルドIDを取得
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     final int deployedVer = prefs.getInt(_verKey) ?? -1;
     final String deployedBuildId = prefs.getString(_buildIdKey) ?? "";
 

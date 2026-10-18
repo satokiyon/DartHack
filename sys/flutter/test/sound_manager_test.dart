@@ -3,7 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:darthack/services/sound_manager.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:darthack/utils/app_prefs.dart';
 
 class FakeAudioPlayer extends AudioPlayer {
   final _completeController = StreamController<void>.broadcast();
@@ -72,8 +72,8 @@ class FakeAudioPlayer extends AudioPlayer {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() {
-    SharedPreferences.setMockInitialValues({});
+  setUp(() async {
+    await AppPrefs.setMockInitialValues({});
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
       const MethodChannel('xyz.luan/audioplayers.global'),
@@ -362,7 +362,7 @@ void main() {
       expect(manager.ambienceEnabled, isFalse);
 
       // SharedPreferences の永続化確認
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await AppPrefs.getInstance();
       expect(prefs.getBool('sound_bgm_enabled'), isFalse);
       expect(prefs.getBool('sound_se_enabled'), isFalse);
       expect(prefs.getBool('sound_ambience_enabled'), isFalse);
@@ -451,7 +451,7 @@ void main() {
 
     test('syncFromPrefs synchronizes memory state with SharedPreferences', () async {
       final manager = SoundManager.instance;
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await AppPrefs.getInstance();
       await prefs.setBool('sound_muted', true);
       await prefs.setBool('sound_bgm_enabled', false);
       await prefs.setDouble('sound_bgm_volume', 0.25);

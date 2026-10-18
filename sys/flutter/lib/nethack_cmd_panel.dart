@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'utils/app_prefs.dart';
 import 'l10n/app_localizations.dart';
 
 class CmdItem {
@@ -462,7 +462,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   }
 
   Future<void> _loadPanels() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     _buttonDisplayMode = prefs.getString('button_display_mode') ?? 'label';
     final bool hasSavedPanels = prefs.containsKey('panel_count');
     final int count = prefs.getInt('panel_count') ?? NetHackCmdPanel.defaultPanels.length;
@@ -491,7 +491,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   }
 
   Future<void> _savePanel(int panelIndex) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     final cmds = _panels[panelIndex]['cmds'] as List<CmdItem>;
     final serialized = CmdItem.serializeCmds(cmds);
     await prefs.setString('pCmdString_$panelIndex', serialized);
@@ -499,7 +499,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
   }
 
   Future<void> _resetPanelToDefault(int panelIndex) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     await prefs.remove('pCmdString_$panelIndex');
     if (panelIndex >= 0 && panelIndex < NetHackCmdPanel.defaultPanels.length) {
       _panels[panelIndex]['cmds'] = CmdItem.parseCmds(NetHackCmdPanel.defaultPanels[panelIndex]['cmds']!);

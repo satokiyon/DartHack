@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'utils/app_prefs.dart';
 import 'defaults_editor.dart';
 import 'models/ext_cmd_entry.dart';
 import 'nethack_cmd_panel.dart';
@@ -226,7 +226,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final defaultsHelper = DefaultsHelper();
     await defaultsHelper.syncFromFileToPrefs(widget.defaultsFilePath);
 
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     setState(() {
       _useTiles = prefs.getBool('use_tiles') ?? true;
       _selectedLanguage = prefs.getString('selected_language') ?? 'ja';
@@ -403,7 +403,7 @@ class _SettingsPageState extends State<SettingsPage> {
     });
 
     // 個別キーとパターン番号を SharedPreferences に一括保存
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     await prefs.setInt('layout_pattern', pattern);
     for (final entry in def.entries) {
       if (entry.key == 'dpad_position') {
@@ -417,7 +417,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _saveSetting<T>(String key, T value) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     if (value is bool) {
       await prefs.setBool(key, value);
     } else if (value is double) {
@@ -450,11 +450,13 @@ class _SettingsPageState extends State<SettingsPage> {
   // クリップボードへエクスポート
   Future<void> _exportSettings() async {
     final l10n = AppLocalizations.of(context)!;
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     final keys = prefs.getKeys();
     final Map<String, dynamic> settingsMap = {};
     for (final key in keys) {
-      settingsMap[key] = prefs.get(key);
+      if (!AppPrefs.isSystemKey(key)) {
+        settingsMap[key] = prefs.get(key);
+      }
     }
 
     final jsonStr = const JsonEncoder.withIndent('  ').convert(settingsMap);
@@ -478,7 +480,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     try {
       final Map<String, dynamic> settingsMap = jsonDecode(data.text!);
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await AppPrefs.getInstance();
       
       const doubleKeys = {
         'pad_opacity',
@@ -495,6 +497,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
       for (final entry in settingsMap.entries) {
         final key = entry.key;
+        if (AppPrefs.isSystemKey(key)) {
+          continue;
+        }
         final value = entry.value;
         if (value is bool) {
           await prefs.setBool(key, value);
@@ -554,7 +559,7 @@ class _SettingsPageState extends State<SettingsPage> {
       index: index,
       extCmdList: extCmdEntries,
       onSaved: () async {
-        final prefs = await SharedPreferences.getInstance();
+        final prefs = await AppPrefs.getInstance();
         setState(() {
           _shortcuts[index] = prefs.getString('shortcut_btn_$index') ?? _defaultShortcuts[index];
         });
@@ -683,7 +688,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   );
                   // 画面から戻った際に最新の SharedPreferences から再取得して同期
-                  final prefs = await SharedPreferences.getInstance();
+                  final prefs = await AppPrefs.getInstance();
                   final savedTileset = prefs.getString('selected_tileset') ?? _selectedTileset;
                   if (mounted && savedTileset != _selectedTileset) {
                     setState(() => _selectedTileset = savedTileset);
@@ -1500,7 +1505,7 @@ class _SettingsPageState extends State<SettingsPage> {
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () async {
               Navigator.pop(ctx);
-              final prefs = await SharedPreferences.getInstance();
+              final prefs = await AppPrefs.getInstance();
               for (int i = 0; i < 9; i++) {
                 await prefs.remove('shortcut_btn_$i');
                 _shortcuts[i] = _defaultShortcuts[i];
@@ -1577,10 +1582,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
     if (confirm != true) return;
 
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     final keys = prefs.getKeys().toList();
     for (final key in keys) {
-      if (!key.startsWith('nh_opt_')) {
+      if (!key.startsWith('nh_opt_') && !AppPrefs.isSystemKey(key)) {
         await prefs.remove(key);
       }
     }
@@ -2417,7 +2422,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
   Future<void> _savePanels() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     await prefs.setInt('panel_count', _panels.length);
     for (int i = 0; i < _panels.length; i++) {
       await prefs.setString('pName_$i', _panels[i]['name']);

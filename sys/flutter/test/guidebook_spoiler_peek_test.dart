@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:darthack/utils/app_prefs.dart';
 import 'package:darthack/widgets/guidebook_dialog.dart';
 import 'package:darthack/widgets/spoiler_dialog.dart';
 import 'package:darthack/l10n/app_localizations.dart';
 
 void main() {
-  setUp(() {
-    SharedPreferences.setMockInitialValues({'selected_language': 'ja'});
+  setUp(() async {
+    await AppPrefs.setMockInitialValues({'selected_language': 'ja'});
     GuidebookDialog.resetSavedScrollPosition();
     SpoilerDialog.resetSavedScrollPosition();
   });

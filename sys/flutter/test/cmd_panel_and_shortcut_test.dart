@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:darthack/l10n/app_localizations.dart';
 import 'package:darthack/nethack_cmd_panel.dart';
 import 'package:darthack/nethack_shortcut_pad.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:darthack/utils/app_prefs.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -278,7 +278,7 @@ void main() {
     });
 
     testWidgets('NetHackCmdPanel から #terrain 等の拡張コマンド実行時に onShortcut または onKeyPress へ改行付きで送信されること', (tester) async {
-      SharedPreferences.setMockInitialValues({});
+      await AppPrefs.setMockInitialValues({});
       String? sentShortcut;
       String? sentKey;
 

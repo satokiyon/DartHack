@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'utils/app_prefs.dart';
 import 'nethack_cmd_panel.dart';
 
 class NetHackShortcutPad extends StatefulWidget {
@@ -39,7 +39,7 @@ class _NetHackShortcutPadState extends State<NetHackShortcutPad> {
   }
 
   Future<void> _loadShortcuts() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     _buttonDisplayMode = prefs.getString('button_display_mode') ?? 'label';
     setState(() {
       for (int i = 0; i < 9; i++) {

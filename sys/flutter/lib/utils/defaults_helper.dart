@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'app_prefs.dart';
 
 /// NetHack の defaults.nh ファイルおよび SharedPreferences との連動を管理するヘルパークラス
 class DefaultsHelper {
@@ -378,7 +378,7 @@ class DefaultsHelper {
   /// SharedPreferences と defaults.nh 間の同期
   Future<void> syncFromFileToPrefs(String filePath) async {
     await loadFromFile(filePath);
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
 
     // チュートリアル確認 (0: 毎回確認, 1: 常に開始, 2: 常に通常プレイ)
     final tutorialVal = getOption('tutorial');
@@ -511,7 +511,7 @@ class DefaultsHelper {
   /// SharedPreferences の現在値を defaults.nh ファイルに反映保存する
   Future<void> syncFromPrefsToFile(String filePath) async {
     await loadFromFile(filePath);
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
 
     final tutorialMode = prefs.getInt('nh_opt_tutorial_mode') ?? 0;
     if (tutorialMode == 1) {
@@ -595,7 +595,7 @@ class DefaultsHelper {
   /// - 無効値: デフォルト値にフォールバック
   /// - 有効な既存設定: そのまま優先維持
   Future<void> mergeAssetDefaultsWithPrefs(String assetFilePath, String targetFilePath) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
 
     // 1. アセット側の最新 defaults.nh を読込
     await loadFromFile(assetFilePath);

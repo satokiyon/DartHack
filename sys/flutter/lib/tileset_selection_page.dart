@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'utils/app_prefs.dart';
 import 'l10n/app_localizations.dart';
 import 'models/tileset_info.dart';
 
@@ -33,7 +33,7 @@ class _TilesetSelectionPageState extends State<TilesetSelectionPage> {
     setState(() {
       _selectedTileset = tilesetId;
     });
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppPrefs.getInstance();
     await prefs.setString('selected_tileset', tilesetId);
     widget.onTilesetSelected?.call(tilesetId);
   }
