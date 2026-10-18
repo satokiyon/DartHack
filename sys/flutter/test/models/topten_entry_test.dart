@@ -584,5 +584,63 @@ void main() {
       expect(recEntriesEn[0].details[0], contains('Killed by rusting away'));
       expect(recEntriesEn[1].details[0], contains('Rusting away'));
     });
+
+    test('変身シェイプシフター爆発死因およびモンスター爆発死因の日本語化テスト', () {
+      // 1. 変身シェイプシフター爆発死因
+      expect(
+        translateDeathReason('killed by an explosion of a chameleon morphed into a gas spore', isJp: true),
+        'カメレオンが変身した包子ガスの爆発に倒された',
+      );
+      expect(
+        translateDeathReason('explosion of a chameleon morphed into a gas spore', isJp: true),
+        'カメレオンが変身した包子ガスの爆発に倒された',
+      );
+      expect(
+        translateDeathReason('killed by an explosion of an ochre jelly morphed into a gas spore', isJp: true),
+        '黄土色ゼリーが変身した包子ガスの爆発に倒された',
+      );
+      expect(
+        translateDeathReason('caught in an explosion of a chameleon morphed into a gas spore', isJp: true),
+        'カメレオンが変身した包子ガスの爆発に巻き込まれた',
+      );
+
+      // 2. 通常モンスター爆発死因
+      expect(
+        translateDeathReason('killed by a gas spore\'s explosion', isJp: true),
+        '包子ガスの爆発に倒された',
+      );
+      expect(
+        translateDeathReason('gas spore\'s explosion', isJp: true),
+        '包子ガスの爆発に倒された',
+      );
+      expect(
+        translateDeathReason('killed by an energy vortex\'s explosion', isJp: true),
+        'エネルギーの渦の爆発に倒された',
+      );
+      expect(
+        translateDeathReason('caught in a gas spore\'s explosion', isJp: true),
+        '包子ガスの爆発に巻き込まれた',
+      );
+
+      // 3. record ファイルからのパース検証
+      final tempDir = Directory.systemTemp.createTempSync('record_explosion_test_');
+      final recordFile = File('${tempDir.path}/record');
+      final recLine1 = '5.0.0 5000 0 5 5 0 30 1 20261019 20261019 1000 Cav Gno Mal Neu hero1, killed by an explosion of a chameleon morphed into a gas spore';
+      final recLine2 = '5.0.0 4000 0 5 5 0 30 1 20261019 20261019 1000 Cav Gno Mal Neu hero2, killed by a gas spore\'s explosion';
+      final recLine3 = '5.0.0 3000 0 5 5 0 30 1 20261019 20261019 1000 Cav Gno Mal Neu hero3, gas spore\'s explosion';
+      recordFile.writeAsStringSync('$recLine1\n$recLine2\n$recLine3\n');
+
+      final recEntriesJp = parseRecordFile(recordFile.path, isJp: true);
+      expect(recEntriesJp.length, 3);
+      expect(recEntriesJp[0].details[0], contains('カメレオンが変身した包子ガスの爆発に倒された'));
+      expect(recEntriesJp[1].details[0], contains('包子ガスの爆発に倒された'));
+      expect(recEntriesJp[2].details[0], contains('包子ガスの爆発に倒された'));
+
+      final recEntriesEn = parseRecordFile(recordFile.path, isJp: false);
+      expect(recEntriesEn.length, 3);
+      expect(recEntriesEn[0].details[0], contains('Killed by an explosion of a chameleon morphed into a gas spore'));
+      expect(recEntriesEn[1].details[0], contains('Killed by a gas spore\'s explosion'));
+      expect(recEntriesEn[2].details[0], contains('Gas spore\'s explosion'));
+    });
   });
 }

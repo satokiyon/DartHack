@@ -1995,6 +1995,9 @@ String _translateMultiReason(String rawReason) {
   return _translateMonsterOrItemName(reason);
 }
 
+/// 死因文字列を言語設定（isJp）に応じて翻訳する公開関数
+String translateDeathReason(String death, {bool isJp = true}) => _translateDeathText(death, isJp);
+
 String _translateDeathText(String death, bool isJp) {
   if (death.isEmpty) return death;
   if (!isJp) {
@@ -2277,6 +2280,63 @@ String _translateDeathTextInternal(String death, bool isJp) {
     return '脱出した';
   }
   if (death.startsWith('ascended')) return '昇天した';
+
+  // シェイプシフター変身爆発死因 (e.g., "killed by an explosion of a chameleon morphed into a gas spore")
+  if (death.contains(' morphed into ') && death.contains('explosion of ')) {
+    final expIdx = death.indexOf('explosion of ');
+    final afterExp = death.substring(expIdx + 13);
+    final morphIdx = afterExp.indexOf(' morphed into ');
+    if (morphIdx != -1) {
+      final m1 = afterExp.substring(0, morphIdx).trim();
+      final m2 = afterExp.substring(morphIdx + 14).trim();
+      final trM1 = _translateMonsterOrItemName(m1);
+      final trM2 = _translateMonsterOrItemName(m2);
+      if (death.startsWith('caught in ')) {
+        return '$trM1が変身した$trM2の爆発に巻き込まれた';
+      }
+      return '$trM1が変身した$trM2の爆発に倒された';
+    }
+  }
+
+  // モンスター爆発死因 (e.g., "killed by a gas spore's explosion", "gas spore's explosion")
+  if (death.contains("'s explosion") || death.contains("s' explosion")) {
+    var raw = death;
+    for (final prefix in [
+      'killed by an ',
+      'killed by a ',
+      'killed by ',
+      'caught in an ',
+      'caught in a ',
+      'caught in ',
+    ]) {
+      if (raw.startsWith(prefix)) {
+        raw = raw.substring(prefix.length);
+        break;
+      }
+    }
+    final pos1 = raw.indexOf("'s explosion");
+    final pos2 = raw.indexOf("s' explosion");
+    final targetPos = (pos1 != -1) ? pos1 : pos2;
+    if (targetPos != -1) {
+      final mon = raw.substring(0, targetPos).trim();
+      final trMon = _translateMonsterOrItemName(mon);
+      if (death.startsWith('caught in ')) {
+        return '$trMonの爆発に巻き込まれた';
+      }
+      return '$trMonの爆発に倒された';
+    }
+  }
+
+  // explosion of 単体パターン (e.g., "explosion of a gas spore")
+  if (death.contains('explosion of ')) {
+    final expIdx = death.indexOf('explosion of ');
+    final target = death.substring(expIdx + 13).trim();
+    final trTarget = _translateMonsterOrItemName(target);
+    if (death.startsWith('caught in ')) {
+      return '$trTargetの爆発に巻き込まれた';
+    }
+    return '$trTargetの爆発に倒された';
+  }
 
   if (death.startsWith('killed by a ')) {
     final raw = death.substring(12);

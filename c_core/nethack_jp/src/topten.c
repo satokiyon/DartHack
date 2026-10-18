@@ -1210,6 +1210,10 @@ jp_translate_killer_text_for_display(
         char expbuf[BUFSZ];
         const char *jpexp = jp_explosion_text_for_display(core, expbuf, sizeof expbuf);
         Snprintf(outmain, sizeof outmain, "%s", jpexp);
+    } else if (strstri(core, "'s explosion") || strstri(core, "s' explosion")) {
+        char expbuf[BUFSZ];
+        const char *jpexp = jp_explosion_text_for_display(core, expbuf, sizeof expbuf);
+        Snprintf(outmain, sizeof outmain, "%s", jpexp);
     } else if (jp_killer_exact_lookup(core, JPKB_FORM_CORE, outmain, sizeof outmain)) {
         ; /* 裸形死因は静的テーブル jp_killer_reason_table で処理した */
     } else if (!strncmpi(core, "killed by ", 10)) {
