@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -18,10 +19,24 @@ class SpoilerDialog extends StatefulWidget {
     this.initialIsJp,
   });
 
+  static int _savedScrollIndex = 0;
+  static double _savedScrollAlignment = 0.0;
+  static bool? _savedIsJp;
+  static int _savedBlockCount = 0;
+
+  @visibleForTesting
+  static void resetSavedScrollPosition() {
+    _savedScrollIndex = 0;
+    _savedScrollAlignment = 0.0;
+    _savedIsJp = null;
+    _savedBlockCount = 0;
+  }
+
   static Future<void> show(BuildContext context) {
     return showDialog(
       context: context,
       barrierDismissible: true,
+      barrierColor: Colors.transparent,
       builder: (context) => const SpoilerDialog(),
     );
   }
@@ -91,17 +106,88 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
   int? _highlightedBlockIndex;
   Timer? _flashTimer;
 
+  // 一時透過（覗き見）制御用状態
+  bool _isHoldPeeking = false;
+  bool _isTapPeeking = false;
+
+  bool get _isPeeking => _isHoldPeeking || _isTapPeeking;
+
   @override
   void initState() {
     super.initState();
+    _itemPositionsListener.itemPositions.addListener(_onItemPositionsChanged);
     _loadSpoilers();
   }
 
   @override
   void dispose() {
+    _itemPositionsListener.itemPositions.removeListener(_onItemPositionsChanged);
     _flashTimer?.cancel();
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _onItemPositionsChanged() {
+    if (_isLoading || _blocks.isEmpty) return;
+    final positions = _itemPositionsListener.itemPositions.value;
+    if (positions.isEmpty) return;
+
+    ItemPosition? topItem;
+    for (final pos in positions) {
+      if (pos.itemTrailingEdge > 0) {
+        if (topItem == null || pos.index < topItem.index) {
+          topItem = pos;
+        }
+      }
+    }
+    topItem ??= positions.reduce((a, b) => a.index < b.index ? a : b);
+
+    SpoilerDialog._savedScrollIndex = topItem.index;
+    SpoilerDialog._savedScrollAlignment = topItem.itemLeadingEdge;
+    SpoilerDialog._savedIsJp = _isJp;
+    SpoilerDialog._savedBlockCount = _blocks.length;
+  }
+
+  Widget _buildHoldPeekDetector({
+    required Widget child,
+    HitTestBehavior behavior = HitTestBehavior.deferToChild,
+  }) {
+    return RawGestureDetector(
+      behavior: behavior,
+      gestures: {
+        LongPressGestureRecognizer:
+            GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
+          () => LongPressGestureRecognizer(
+            duration: const Duration(milliseconds: 350),
+          ),
+          (instance) {
+            instance
+              ..onLongPressStart = (_) {
+                if (_isTapPeeking) return;
+                FocusManager.instance.primaryFocus?.unfocus();
+                setState(() {
+                  _isHoldPeeking = true;
+                });
+              }
+              ..onLongPressEnd = (_) {
+                if (_isHoldPeeking && mounted) {
+                  setState(() {
+                    _isHoldPeeking = false;
+                  });
+                }
+              }
+              ..onLongPressCancel = () {
+                if (_isHoldPeeking && mounted) {
+                  setState(() {
+                    _isHoldPeeking = false;
+                  });
+                }
+              };
+          },
+        ),
+      },
+      child: child,
+    );
   }
 
   Future<void> _loadSpoilers() async {
@@ -763,6 +849,7 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
             alignment: PlaceholderAlignment.middle,
             child: InkWell(
               onTap: () {
+                if (_isPeeking) return;
                 if (lHref.startsWith('#')) {
                   _jumpToAnchor(lHref);
                 } else if (lHref.contains('guidebook')) {
@@ -983,7 +1070,10 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
             children: [
               InkWell(
                 borderRadius: BorderRadius.circular(8),
-                onTap: () => _showImageZoomDialog(block.imagePath, block.imageCaption),
+                onTap: () {
+                  if (_isPeeking) return;
+                  _showImageZoomDialog(block.imagePath, block.imageCaption);
+                },
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
@@ -1048,152 +1138,297 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
     final dialogHeight = screenSize.height * 0.92;
     final l10n = AppLocalizations.of(context);
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      child: Container(
-        width: dialogWidth,
-        height: dialogHeight,
-        decoration: BoxDecoration(
-          color: const Color(0xFF12161F),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.amberAccent.withValues(alpha: 0.4), width: 1.5),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black87,
-              blurRadius: 16,
-              spreadRadius: 4,
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            // ヘッダーバー
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: const BoxDecoration(
-                color: Color(0xFF1E2430),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.auto_stories, color: Colors.amberAccent, size: 22),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      l10n?.spoilersTitle ?? 'NetHack Spoilers',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  if (_sections.isNotEmpty)
-                    IconButton(
-                      icon: const Icon(Icons.toc, color: Colors.amberAccent, size: 24),
-                      onPressed: _showTOCModal,
-                      tooltip: _isJp ? '目次を開く' : 'Open Table of Contents',
-                      padding: const EdgeInsets.all(6),
-                      constraints: const BoxConstraints(),
-                    ),
-                  const SizedBox(width: 4),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white70, size: 22),
-                    onPressed: () => Navigator.pop(context),
-                    tooltip: l10n?.close ?? 'Close',
-                    padding: const EdgeInsets.all(6),
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-            ),
+    final canRestoreScroll = SpoilerDialog._savedIsJp == _isJp &&
+        SpoilerDialog._savedBlockCount == _blocks.length &&
+        _blocks.isNotEmpty;
+    final initialIndex = canRestoreScroll
+        ? SpoilerDialog._savedScrollIndex.clamp(0, _blocks.length - 1)
+        : 0;
+    final initialAlign =
+        canRestoreScroll ? SpoilerDialog._savedScrollAlignment : 0.0;
 
-            // 検索バー
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              color: const Color(0xFF181E29),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      style: const TextStyle(color: Colors.white, fontSize: 13),
-                      decoration: InputDecoration(
-                        hintText: l10n?.searchSpoilersHint ?? 'Search Spoilers...',
-                        hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
-                        prefixIcon: const Icon(Icons.search, color: Colors.white54, size: 18),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear, color: Colors.white54, size: 16),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  _onSearchChanged('');
-                                },
-                              )
-                            : null,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        isDense: true,
-                        filled: true,
-                        fillColor: const Color(0xFF242C3D),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      onChanged: _onSearchChanged,
-                    ),
-                  ),
-                  if (_searchResults.isNotEmpty) ...[
-                    const SizedBox(width: 6),
-                    Text(
-                      '${_currentSearchMatchIndex + 1}/${_searchResults.length}',
-                      style: const TextStyle(color: Colors.amberAccent, fontSize: 11),
-                    ),
-                    const SizedBox(width: 2),
-                    IconButton(
-                      icon: const Icon(Icons.keyboard_arrow_up, color: Colors.white70, size: 20),
-                      onPressed: () => _navigateSearchMatch(-1),
-                      tooltip: _isJp ? '前の一致' : 'Previous match',
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white70, size: 20),
-                      onPressed: () => _navigateSearchMatch(1),
-                      tooltip: _isJp ? '次の一致' : 'Next match',
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+    return Stack(
+      children: [
+        // 背景暗幕（バリア）：透過中は透明になり、タップ透過維持中は画面のどこをタップしても復帰する
+        Positioned.fill(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              if (_isTapPeeking) {
+                setState(() {
+                  _isTapPeeking = false;
+                });
+              } else {
+                Navigator.pop(context);
+              }
+            },
+            child: AnimatedOpacity(
+              opacity: _isPeeking ? 0.0 : 1.0,
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              child: Container(color: Colors.black54),
+            ),
+          ),
+        ),
+        // ダイアログ本体
+        IgnorePointer(
+          ignoring: _isTapPeeking,
+          child: AnimatedOpacity(
+            opacity: _isPeeking ? 0.0 : 1.0,
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            child: Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              child: Container(
+                width: dialogWidth,
+                height: dialogHeight,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF12161F),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                      color: Colors.amberAccent.withValues(alpha: 0.4),
+                      width: 1.5),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black87,
+                      blurRadius: 16,
+                      spreadRadius: 4,
                     ),
                   ],
-                ],
+                ),
+                child: Column(
+                  children: [
+                    // ヘッダーバー
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF1E2430),
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(14)),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _buildHoldPeekDetector(
+                              behavior: HitTestBehavior.opaque,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.auto_stories,
+                                      color: Colors.amberAccent, size: 22),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      l10n?.spoilersTitle ?? 'NetHack Spoilers',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          _buildHoldPeekDetector(
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.visibility_outlined,
+                                color: Colors.amberAccent,
+                                size: 22,
+                              ),
+                              onPressed: () {
+                                if (_isHoldPeeking) return;
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                setState(() {
+                                  _isTapPeeking = true;
+                                });
+                              },
+                              tooltip: _isJp
+                                  ? 'ゲーム画面を確認（タップで維持 / 長押しで一時透過）'
+                                  : 'Peek at game screen (Tap to hold / Long-press to peek)',
+                              padding: const EdgeInsets.all(6),
+                              constraints: const BoxConstraints(),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          if (_sections.isNotEmpty) ...[
+                            IconButton(
+                              icon: const Icon(Icons.toc,
+                                  color: Colors.amberAccent, size: 24),
+                              onPressed: _showTOCModal,
+                              tooltip: _isJp
+                                  ? '目次を開く'
+                                  : 'Open Table of Contents',
+                              padding: const EdgeInsets.all(6),
+                              constraints: const BoxConstraints(),
+                            ),
+                            const SizedBox(width: 4),
+                          ],
+                          IconButton(
+                            icon: const Icon(Icons.close,
+                                color: Colors.white70, size: 22),
+                            onPressed: () => Navigator.pop(context),
+                            tooltip: l10n?.close ?? 'Close',
+                            padding: const EdgeInsets.all(6),
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // 検索バー
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      color: const Color(0xFF181E29),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 13),
+                              decoration: InputDecoration(
+                                hintText: l10n?.searchSpoilersHint ??
+                                    'Search Spoilers...',
+                                hintStyle: const TextStyle(
+                                    color: Colors.white38, fontSize: 13),
+                                prefixIcon: const Icon(Icons.search,
+                                    color: Colors.white54, size: 18),
+                                suffixIcon: _searchController.text.isNotEmpty
+                                    ? IconButton(
+                                        icon: const Icon(Icons.clear,
+                                            color: Colors.white54, size: 16),
+                                        onPressed: () {
+                                          _searchController.clear();
+                                          _onSearchChanged('');
+                                        },
+                                      )
+                                    : null,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 6),
+                                isDense: true,
+                                filled: true,
+                                fillColor: const Color(0xFF242C3D),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              onChanged: _onSearchChanged,
+                            ),
+                          ),
+                          if (_searchResults.isNotEmpty) ...[
+                            const SizedBox(width: 6),
+                            Text(
+                              '${_currentSearchMatchIndex + 1}/${_searchResults.length}',
+                              style: const TextStyle(
+                                  color: Colors.amberAccent, fontSize: 11),
+                            ),
+                            const SizedBox(width: 2),
+                            IconButton(
+                              icon: const Icon(Icons.keyboard_arrow_up,
+                                  color: Colors.white70, size: 20),
+                              onPressed: () => _navigateSearchMatch(-1),
+                              tooltip: _isJp ? '前の一致' : 'Previous match',
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.keyboard_arrow_down,
+                                  color: Colors.white70, size: 20),
+                              onPressed: () => _navigateSearchMatch(1),
+                              tooltip: _isJp ? '次の一致' : 'Next match',
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+
+                    const Divider(color: Colors.white12, height: 1),
+
+                    // 本文表示エリア
+                    Expanded(
+                      child: _isLoading
+                          ? const Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.amberAccent),
+                              ),
+                            )
+                          : _buildHoldPeekDetector(
+                              behavior: HitTestBehavior.translucent,
+                              child: ScrollablePositionedList.builder(
+                                itemScrollController: _itemScrollController,
+                                itemPositionsListener: _itemPositionsListener,
+                                initialScrollIndex: initialIndex,
+                                initialAlignment: initialAlign,
+                                padding: const EdgeInsets.all(16),
+                                itemCount: _blocks.length,
+                                itemBuilder: (context, index) {
+                                    return _buildBlockWidget(
+                                        index, _blocks[index]);
+                                  },
+                                ),
+                              ),
+                      ),
+                  ],
+                ),
               ),
             ),
-
-            const Divider(color: Colors.white12, height: 1),
-
-            // 本文表示エリア
-            Expanded(
-              child: _isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.amberAccent),
-                      ),
-                    )
-                  : ScrollablePositionedList.builder(
-                      itemScrollController: _itemScrollController,
-                      itemPositionsListener: _itemPositionsListener,
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _blocks.length,
-                      itemBuilder: (context, index) {
-                        return _buildBlockWidget(index, _blocks[index]);
-                      },
-                    ),
-            ),
-          ],
+          ),
         ),
-      ),
+        // タップ透過維持中のみ画面上部に表示する復帰案内バッジ
+        if (_isTapPeeking)
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 12,
+            left: 0,
+            right: 0,
+            child: IgnorePointer(
+              child: Center(
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.75),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Colors.amberAccent.withValues(alpha: 0.6),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.visibility,
+                        color: Colors.amberAccent,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _isJp ? 'タップして戻る' : 'Tap to return',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.none,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
