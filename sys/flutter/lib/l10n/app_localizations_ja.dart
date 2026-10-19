@@ -1022,7 +1022,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get creditsBody1 =>
-      'DartHack は、NetHack をベースとしつつ、Flutter/Dart によって再構築したモバイル版です。本アプリはオリジナルの NetHack をゲームコアとして使用していますが、NetHack 開発チーム（The NetHack DevTeam）とは一切関係ありません。';
+      'DartHack は、NetHack のユーザーインターフェースをFlutter/Dart によって実装し、モバイルデバイス向けに遊びやすくしたものです。本アプリはオリジナルの NetHack をゲームコアとして使用していますが、NetHack 開発チーム（The NetHack DevTeam）とは一切関係ありません。';
 
   @override
   String get creditsBody2 =>
@@ -1279,7 +1279,8 @@ class AppLocalizationsJa extends AppLocalizations {
       'NetHack Spoilers: A Traveler\'s Companion to the Mazes of Menace';
 
   @override
-  String get creditsSpoilersDesc => '原著: David Bau / 日本語翻訳・監修: @satokiyon';
+  String get creditsSpoilersDesc =>
+      '原著: David Bau / 日本語翻訳: Google Gemini / 監修: @satokiyon';
 
   @override
   String get creditsSpoilersLicense => 'CC BY-SA 4.0';

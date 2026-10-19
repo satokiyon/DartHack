@@ -1037,7 +1037,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get creditsBody1 =>
-      'DartHack is a mobile port rebuilt with Flutter/Dart, based on NetHack. This application uses the original NetHack game core, but is not affiliated with The NetHack DevTeam.';
+      'DartHack is a Flutter/Dart implementation of NetHack\'s user interface, designed to provide a better gameplay experience on mobile devices. This application uses the original NetHack game core, but is not affiliated with The NetHack DevTeam.';
 
   @override
   String get creditsBody2 =>
