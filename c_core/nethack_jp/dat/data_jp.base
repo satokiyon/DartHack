@@ -5879,16 +5879,27 @@ speleologist
 collector
 curator
 	考古学者ランク
+
 	  称号            レベル
+
 	鉱員              1 to 2
+
 	労働者            3 to 5
+
 	調査者            6 to 9
+
 	発掘者           10 to 13
+
 	掘削者           14 to 17
+
 	探検者           18 to 21
+
 	洞窟学者         22 to 25
+
 	収集家           26 to 29
+
 	館長                30
+
 bar* ranks
 barbarian
 plunder?*
@@ -5901,16 +5912,27 @@ slayer
 chieftain*
 conquer*
 	野蛮人ランク
+
 	  称号            レベル
+
 	乱暴者            1 to 2
+
 	略奪者            3 to 5
+
 	悪漢              6 to 9
+
 	山賊             10 to 13
+
 	侵略者           14 to 17
+
 	強盗             18 to 21
+
 	殺戮者           22 to 25
+
 	首領             26 to 29
+
 	征服者              30
+
 cav* ranks
 caveman
 cavewoman
@@ -5925,16 +5947,27 @@ nomad
 rover
 pioneer
 	洞窟人ランク
+
 	  称号            レベル
+
 	穴居人            1 to 2
+
 	原住民            3 to 5
+
 	放浪者            6 to 9
+
 	浮浪者           10 to 13
+
 	旅行者           14 to 17
+
 	放遊者           18 to 21
+
 	遊牧民           22 to 25
+
 	漂泊民           26 to 29
+
 	先駆者              30
+
 hea* ranks
 healer
 rhizotomist
@@ -5948,16 +5981,27 @@ magistra
 physician
 chirurgeon
 	治療師ランク
+
 	  称号            レベル
+
 	根堀人            1 to 2
+
 	治療師            3 to 5
+
 	遺体処理師,       6 to 9
+
 	創傷処置師       10 to 13
+
 	整骨医           14 to 17
+
 	薬草治療師       18 to 21
+
 	治療大師         22 to 25
+
 	治療医           26 to 29
+
 	外科医              30
+
 kni* ranks
 knight
 gallant
@@ -5971,19 +6015,27 @@ seignieur
 dame
 paladin
 	騎士ランク
+
 	  称号            レベル
+
 	騎士見習い        1 to 2
+
 	従士              3 to 5
+
 	准騎士            6 to 9
+
 	下級騎士         10 to 13
-	騎士,
-	 女騎士          14 to 17
+
+	騎士,女騎士      14 to 17
+
 	旗手騎士         18 to 21
-	高位騎士,
-	 高位女騎士      22 to 25
-	騎士長,
-	 女騎士長        26 to 29
+
+	高位騎士,高位女騎士  22 to 25
+
+	騎士長,女騎士長  26 to 29
+
 	聖騎士              30
+
 mon* ranks
 monk
 candidate
@@ -5996,16 +6048,27 @@ student of winds
 student of fire
 master
 	武闘家ランク
+
 	  称号            レベル
+
 	入門希望者        1 to 2
+
 	初心修行者        3 to 5
+
 	修行僧            6 to 9
+
 	土の使い手       10 to 13
+
 	水の使い手       14 to 17
+
 	金の使い手       18 to 21
+
 	木の達人         22 to 25
+
 	火の達人         26 to 29
+
 	免許皆伝            30
+
 pri* ranks
 priest*
 aspirant
@@ -6018,19 +6081,27 @@ lama
 ?atriarch
 high priest*
 	司祭ランク
+
 	  称号            レベル
-	修道者,
-	 修道女           1 to 2
+
+	修道者,修道女      1 to 2
+
 	侍者              3 to 5
+
 	侍祭              6 to 9
-	僧侶,
-	 尼僧            10 to 13
+
+	僧侶,尼僧        10 to 13
+
 	助任司祭         14 to 17
-	聖者,
-	 聖女            18 to 21
+
+	聖者,聖女        18 to 21
+
 	司教             22 to 25
+
 	大司教           26 to 29
+
 	大僧上              30
+
 ran* ranks
 ranger
 tenderfoot
@@ -6043,16 +6114,27 @@ archer
 sharpshooter
 marks*man
 	レンジャーランク
+
 	  称号            レベル
+
 	新米              1 to 2
+
 	見張り            3 to 5
+
 	先導              6 to 9
+
 	偵察             10 to 13
+
 	斥候             14 to 17
+
 	弩兵             18 to 21
+
 	射撃手           22 to 25
+
 	熟練射手         26 to 29
+
 	名射手              30
+
 rog* ranks
 rogue
 footpad
@@ -6065,16 +6147,27 @@ filcher
 mags*man
 thief
 	盗賊ランク
+
 	  称号            レベル
+
 	追いはぎ          1 to 2
+
 	ひったくり        3 to 5
+
 	スリ              6 to 9
+
 	ごろつき         10 to 13
+
 	こそどろ         14 to 17
+
 	空巣             18 to 21
+
 	泥棒             22 to 25
+
 	強盗             26 to 29
+
 	大泥棒              30
+
 sam* ranks
 samurai
 hatamoto
@@ -6088,19 +6181,27 @@ daimyo
 kuge
 shogun
 	侍ランク
+
 	  称号            レベル
+
 	旗本              1 to 2
+
 	浪人              3 to 5
-	忍者,
-	 くノ一           6 to 9
+
+	忍者,くノ一        6 to 9
+
 	城主             10 to 13
+
 	領主             14 to 17
+
 	領主             18 to 21
-	大名,
-	 腰元            22 to 25
+
+	大名,腰元         22 to 25
+	
 	老中             26 to 29
-	将軍,
-	 御台所               30
+
+	将軍,御台所          30
+
 tou* ranks
 tourist
 rambler
@@ -6113,17 +6214,27 @@ voyager
 explorer
 adventurer
 	観光客ランク
+
 	  称号            レベル
-	プー太郎,
-	 プー子           1 to 2
+
+	プー太郎,プー子    1 to 2
+
 	観光客            3 to 5
+
 	周遊旅行者        6 to 9
+
 	遍歴者           10 to 13
+
 	旅行者           14 to 17
+
 	旅人             18 to 21
+
 	航海者           22 to 25
+
 	探検家           26 to 29
+
 	冒険者              30
+
 val* ranks
 valkyrie
 stripling
@@ -6138,18 +6249,27 @@ champion
 lord
 lady
 	ワルキューレランク
+
 	  称号            レベル
+
 	若き盾乙女        1 to 2
+
 	散兵乙女          3 to 5
+
 	闘士乙女          6 to 9
+
 	武装乙女         10 to 13
+
 	戦乙女           14 to 17
+
 	剣客乙女         18 to 21
-	英雄,
-	 女英雄          22 to 25
+
+	英雄,女英雄      22 to 25
+
 	勇者             26 to 29
-	盾の勇者,
-	 盾の姫勇者         30
+
+	盾の勇者,盾の姫勇者  30
+
 wiz* ranks
 wizard
 evoker
@@ -6163,16 +6283,27 @@ sorceress
 necromancer
 mage
 	魔法使いランク
+
 	  称号            レベル
+
 	手品師            1 to 2
+
 	奇術師            3 to 5
+
 	占い師            6 to 9
+
 	霊感師           10 to 13
+
 	召喚師           14 to 17
+
 	妖術師           18 to 21
+
 	魔術師           22 to 25
+
 	魔法使い         26 to 29
+
 	大魔法使い          30
+
 ##
 # list the titles for all the Discworld novels (3.6 tribute);
 # the extra leading spaces are intentional--tty displays the whole list
@@ -6183,47 +6314,90 @@ novel
 paperback book
 discworld novel*
 	  ディスクワールド小説一覧
+
 	    サー・テリー・プラチェット 著
+
 	  魔法の色彩
+
 	  奇天烈な光
+
 	  男女平等の儀式
+
 	  死神の徒弟
+
 	  ソーサリー
+
 	  三人の魔女
+
 	  ピラミッド
+
 	  衛兵！衛兵！
+
 	  エリック
+
 	  ムービング・ピクチャーズ
+
 	  死神と刈り入れ人
+
 	  旅する魔女たち
+
 	  小さな神々
+
 	  妖精王と女王
+
 	  男たち、武器を取れ
+
 	  ソウル・ミュージック
+
 	  面白い時代
+
 	  仮面劇
+
 	  粘土の足
+
 	  ホグファザー
+
 	  狂信的愛国主義
+
 	  最後の宿命大陸
+
 	  喉首を掻き切れ
+
 	  第５のゾウ
+
 	  真実
+
 	  時の盗賊
+
 	  最後の英雄
+
 	  天才猫モーリスとその仲間たち
+
 	  夜警
+
 	  ちっちゃな自由人
+
 	  怪物連隊
+
 	  空いっぱいの帽子
+
 	  郵便事業、始めました
+
 	  サッド！
+
 	  冬の鍛冶屋
+
 	  株と金と郵便局
+
 	  見えざる大学のフットボール
+
 	  真夜中を身にまとって
+
 	  スナッフ
+
 	  蒸気を上げろ
+
 	  羊飼いの王冠
+	  
 #
 

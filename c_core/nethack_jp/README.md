@@ -1,7 +1,7 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-17. -->
-# NetHack 5.0 日本語化非公式プロジェクト
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19. -->
+# NetHack 5.0 (非公式)日本語化プロジェクト
 
-NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsとUbuntu(WSL)のみ)
+NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsとLinuxのみ)
 
 ## スクリーンショット
 <figure>
@@ -127,7 +127,7 @@ Windows版およびLinux(X11)版では、ゲーム内での日本語入力・表
 * 主人公キャラの名前
 * アイテムやモンスターへの命名（名前付け）
 * 階層ごとのメモ
-* 「願い（wishing）」の指定
+* 「願い（wish）」の指定
 * 「虐殺（genocide）」の指定
 * 魔法のマーカーでの書き込み（巻物・呪文書）
 * データベースの検索
@@ -138,9 +138,9 @@ Windows版およびLinux(X11)版では、ゲーム内での日本語入力・表
 | 機能 | 日本語入力の例 | 英語入力の例 | 補足 |
 | :--- | :--- | :--- | :--- |
 | **願い**<br>(Wishing) | `祝福された+2灰色ドラゴンの鱗鎧`<br>`耐毒の魔除け`<br>`スピードブーツ`<br>`グレーター・デーモンの死体`<br>`7個の魔法のマーカ` | `blessed +2 gray dragon scale mail`<br>`amulet versus poison`<br>`speed boots`<br>`corpse of greater demon`<br>`7 magic markers` | 祝福・呪い、強化値、個数、状態（死体・缶詰・像など）を含めて指定できます。「鑑定」や「スピードの靴」等のJNetHack慣用句も認識します。 |
-| **虐殺**<br>(Genocide) | `マスター・リッチ`<br>`銀色ドラゴン`<br>`マインド・フレイヤ`<br>`L`<br>`none` または `nothing` | `master lich`<br>`silver dragon`<br>`mind flayer`<br>`L`<br>`none` または `nothing` | モンスターの種族名やシンボル文字（クラス記号）を指定します。`none` や `nothing`、空入力等で虐殺を拒否（不虐殺の誓いを維持）できます。 |
+| **虐殺**<br>(Genocide) | `マスター・リッチ`<br>`銀色ドラゴン`<br>`マインド・フレア`<br>`L`<br>`none` または `nothing` | `master lich`<br>`silver dragon`<br>`mind flayer`<br>`L`<br>`none` または `nothing` | モンスターの種族名やシンボル文字（クラス記号）を指定します。`none` や `nothing`、空入力等で虐殺を拒否（不虐殺の誓いを維持）できます。 |
 | **魔法のマーカー**<br>(Writing: 巻物) | `識別` または `識別の巻物`<br>`解呪` または `解呪の巻物`<br>`虐殺` または `虐殺の巻物`<br>`鑑定`（JNetHack互換）<br>`コンテキスト・スイッチ`（外見ラベル） | `identify` または `scroll of identify`<br>`remove curse`<br>`genocide`<br>`ELBIB YLOH`（外見ラベル） | 白紙の巻物に対して使用します。正式名（「識別」等）だけでなく、未識別時のラベル名やプレイヤーが付けた名前（call名）でも書き込めます。 |
-| **魔法のマーカー**<br>(Writing: 呪文書) | `識別` または `識別の呪文書`<br>`火の玉` または `火の玉の魔法書`<br>`連鎖雷撃` | `identify` または `spellbook of identify`<br>`fireball`<br>`chain lightning` | 白紙の魔法書に対して使用します。「呪文書」「魔法書」のどちらの表記でも認識します（※呪文書は識別済みの名前でのみ書き込み可能です）。 |
+| **魔法のマーカー**<br>(Writing: 巻物、魔法書) | `識別` または `識別の巻物`<br>`火の玉` または `火の玉の魔法書`<br>`連鎖雷撃` | `identify` または `scroll of identify`<br>`fireball`<br>`chain lightning` | 白紙の巻物に対して使用します。本は「呪文書」「魔法書」のどちらの表記でも認識します（※魔法書は識別済みの名前でのみ書き込み可能です）。 |
 
 ---
 
@@ -277,10 +277,11 @@ OPTIONS=align_status:right,msw_stat_cols:15
 
 ## 他の翻訳プロジェクト
 * [JNetHack](https://github.com/jnethack): 言わずと知れたNetHack日本語版の偉大なる総本山
-* [NetHack-wasm-webUI](https://github.com/e3sh/Nethack-wasm-webUI): ブラウザでプレイできる。日本語はリアルタイムに翻訳(変換)して表示している。
+* [NetHack-wasm-webUI](https://github.com/e3sh/Nethack-wasm-webUI): ブラウザでプレイできる。日本語はリアルタイムに翻訳(辞書変換)して表示している。
 * [NetHack-brass](https://github.com/youkan700/NetHack-brass): 3.4.3ベースを日本語化してさらにいろいろ改造したもの
 * [NetHack-cn](https://nethack-cn.github.io/): NetHack中国語版
 * [nethack-ru](https://github.com/Skadga/nethack-ru): NetHackロシア語版
+* [Nethack500_Lubuntu2604](https://github.com/HackTechDev/Nethack500_Lubuntu2604): NetHackフランス語版
 * [DartHack](https://github.com/satokiyon/DartHack): Android向け日本語アプリ
 * …他にも見つけたら追記する
 
