@@ -347,7 +347,7 @@
   "importErrorMsg": "インポートに失敗しました。無効なJSONフォーマットです。\n{error}",
 
   "secCreditsTitle": "クレジット",
-  "creditsBody1": "DartHack は、NetHack をベースとしつつ、Flutter/Dart によって再構築したモバイル版です。本アプリはオリジナルの NetHack をゲームコアとして使用していますが、NetHack 開発チーム（The NetHack DevTeam）とは一切関係ありません。",
+  "creditsBody1": "DartHack は、NetHack のユーザーインターフェースをFlutter/Dart によって実装し、モバイルデバイス向けに遊びやすくしたものです。本アプリはオリジナルの NetHack をゲームコアとして使用していますが、NetHack 開発チーム（The NetHack DevTeam）とは一切関係ありません。",
   "creditsBody2": "本アプリは NetHack General Public License (NGPL) に基づき配布されています。",
   "creditsSourceCode": "ソースコード公開先:",
   "creditsCopiedUrl": "URLをクリップボードにコピーしました",

@@ -346,7 +346,7 @@
   "importErrorMsg": "Import failed. Invalid JSON format.\n{error}",
 
   "secCreditsTitle": "Credits",
-  "creditsBody1": "DartHack is a mobile port rebuilt with Flutter/Dart, based on NetHack. This application uses the original NetHack game core, but is not affiliated with The NetHack DevTeam.",
+  "creditsBody1": "DartHack is a Flutter/Dart implementation of NetHack's user interface, designed to provide a better gameplay experience on mobile devices. This application uses the original NetHack game core, but is not affiliated with The NetHack DevTeam.",
   "creditsBody2": "Distributed under the NetHack General Public License (NGPL).",
   "creditsSourceCode": "Source code available at:",
   "creditsCopiedUrl": "URL copied to clipboard",
