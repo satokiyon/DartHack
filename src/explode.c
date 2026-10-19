@@ -297,7 +297,7 @@ jp_explosion_text_for_display(const char *in, char *out, size_t outsz)
             if (m2_jp != m2_name)
                 Snprintf(m2_name, sizeof m2_name, "%s", m2_jp);
 
-            Snprintf(out, outsz, "%sに変身した%sの爆発", m2_name, m1_name);
+            Snprintf(out, outsz, "%sが変身した%sの爆発", m1_name, m2_name);
             return out;
         }
     }
