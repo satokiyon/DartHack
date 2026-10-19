@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-22. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-20. */
 /* NetHack 5.0	rumors.c	$NHDT-Date: 1781973065 2026/06/20 16:31:05 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.93 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -69,8 +69,8 @@ unpadline(char *line)
 {
     char *p = eos(line);
 
-    /* remove newline if still present; caller should have stripped it */
-    if (p > line && p[-1] == '\n')
+    /* remove newline/CR if still present; caller should have stripped it */
+    while (p > line && (p[-1] == '\n' || p[-1] == '\r'))
         --p;
 
     /* remove padding */
@@ -505,8 +505,14 @@ get_rnd_line(
         (void) dlb_fseek(fh, startpos, SEEK_SET);
         (void) dlb_fgets(buf, bufsiz, fh);
     }
-    if ((newl = strchr(buf, '\n')) != 0)
+    if ((newl = strchr(buf, '\n')) != 0) {
+        if (newl > buf && *(newl - 1) == '\r')
+            *(newl - 1) = '\0';
+        else
+            *newl = '\0';
+    } else if ((newl = strchr(buf, '\r')) != 0) {
         *newl = '\0';
+    }
     /* decrypt line; make sure that our intermediate buffer is big enough */
     xbufp = (strlen(buf) <= sizeof xbuf - 1) ? &xbuf[0]
             : (char *) alloc((unsigned) strlen(buf) + 1);
@@ -906,8 +912,14 @@ init_CapMons(void)
                gender and/or to distinguish an individual from a type
                (code is a single punctuation character when present) */
             while (dlb_fgets(hline, sizeof hline, bogonfile)) {
-                if ((endp = strchr(hline, '\n')) != 0)
-                    *endp = '\0'; /* strip newline */
+                if ((endp = strchr(hline, '\n')) != 0) {
+                    if (endp > hline && *(endp - 1) == '\r')
+                        *(endp - 1) = '\0';
+                    else
+                        *endp = '\0'; /* strip newline */
+                } else if ((endp = strchr(hline, '\r')) != 0) {
+                    *endp = '\0';
+                }
                 (void) xcrypt(hline, xbuf);
                 unpadline(xbuf);
 
