@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-20. */
 /* NetHack 5.0	write.c	$NHDT-Date: 1781973075 2026/06/20 16:31:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.54 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -423,26 +423,11 @@ dowrite(struct obj *pen)
 staticfn char *
 new_book_description(int booktype, char *outbuf)
 {
-    /* subset of description strings from objects.c; if it grows
-       much, we may need to add a new flag field to objects[] instead */
-    static const char *const compositions[] = {
-        "parchment",
-        "vellum",
-        "cloth",
-#if 0
-        "canvas", "hardcover", /* not used */
-        "papyrus", /* not applicable--can't be produced via writing */
-#endif /*0*/
-        0
-    };
-    const char *descr, *const *comp_p;
+    const char *descr = jp_item_descr(booktype);
 
-    descr = OBJ_DESCR(objects[booktype]);
-    for (comp_p = compositions; *comp_p; ++comp_p)
-        if (!strcmpi(descr, *comp_p))
-            break;
-
-    Sprintf(outbuf, "%s%s", *comp_p ? "into " : "", descr);
+    if (!descr || !*descr)
+        descr = "新しい魔法書";
+    Strcpy(outbuf, descr);
     return outbuf;
 }
 

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-20. */
 /* NetHack 5.0	sounds.c	$NHDT-Date: 1781973067 2026/06/20 16:31:07 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.172 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -165,14 +165,13 @@ temple_priest_sound(struct monst *mtmp)
                 continue;
             break; /* msg is acceptable */
         } while (++trycount < 50);
-        while (!letter(*msg))
+        while (*msg == '*' || *msg == '#')
             ++msg; /* skip control flags */
         if (strchr(msg, '%')) {
             DISABLE_WARNING_FORMAT_NONLITERAL
             You_hear(msg, jp_gname_for_display(halu_gname(EPRI(mtmp)->shralign)));
             RESTORE_WARNING_FORMAT_NONLITERAL
-        }
- else
+        } else
             You_hear1(msg);
         return TRUE;
     }
@@ -231,7 +230,7 @@ dosounds(void)
     }
     if (svl.level.flags.has_swamp && !rn2(200)) {
         static const char *const swamp_msg[3] = {
-            "蚊の羽音を聞いた.", "腐った匂いがした!", /* so it's a smell...*/
+            "蚊の羽音を聞いた.", "腐った匂いを嗅いだ!", /* so it's a smell...*/
             "ドナルドダックの声を聞いた!",
         };
         You1(swamp_msg[rn2(2) + hallu]);
@@ -958,7 +957,7 @@ domonnoise(struct monst *mtmp)
             wake_nearto(mtmp->mx, mtmp->my, 11 * 11);
         } else {
             pline_msg =
-                "聞き取れないほど小さな声でつぶやいた。辛うじて\"moon\"だけが聞き取れた.";
+                "聞き取れないほど小さな声でつぶやいた。辛うじて「月」とだけ聞き取れた.";
         }
         break;
     case MS_BARK:
@@ -1152,7 +1151,7 @@ domonnoise(struct monst *mtmp)
                 pline_msg = "羊肉ばかりの食事に文句を言った.";
                 break;
             default:
-                pline_msg = "「Fee Fie Foe Foo!」と叫んで高笑いした.";
+                pline_msg = "「フィー、ファイ、フォー、フー！」と叫んで高笑いした.";
                 wake_nearto(mtmp->mx, mtmp->my, 7 * 7);
                 break;
             }
@@ -1230,7 +1229,7 @@ domonnoise(struct monst *mtmp)
                 break;
             case PM_ARCHEOLOGIST:
                 pline_msg =
-                "雑誌\"Spelunker Today\"の最近の記事について語った.";
+                    "『スペランカー・トゥデイ』誌の最近の記事について語った.";
                 break;
             case PM_TOURIST:
                 verbl_msg = "アロハ。";
@@ -1352,9 +1351,9 @@ domonnoise(struct monst *mtmp)
         /* end of tribute addition */
 
         } else if (ms_Death && !rn2(10)) {
-            pline_msg = "『Sandman #8』を熱心に読んでいる.";
+            pline_msg = "コミック『サンドマン』第8号を熱心に読んでいる.";
         } else
-            verbl_msg = "自分をWarだとでも思っているのか?";
+            verbl_msg = "自分をウォーだとでも思っているのか?";
         break;
     } /* case MS_RIDER */
     } /* switch */
@@ -1664,7 +1663,7 @@ tiphat(void)
             }
         } else if (vismon && humanoid(mtmp->data)) {
             static const char *const reaction[3] = {
-                "悪態をつく", "無礼な身ぶりをする", "侮辱的な身ぶりをする",
+                "悪態をついた", "無礼な身ぶりをした", "侮辱的な身ぶりをした",
             };
             int which = !Deaf ? rn2(3) : rn1(2, 1),
                 twice = (Deaf || which > 0 || rn2(3)) ? 0 : rn1(2, 1);
