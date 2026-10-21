@@ -134,7 +134,7 @@
 #define HACKDIR "\\nethack"
 #endif
 
-#ifdef ANDROID
+#if defined(ANDROID) || defined(FLUTTER_PORT)
 #ifndef ANDROID_GRAPHICS
 #define ANDROID_GRAPHICS
 #endif
@@ -410,7 +410,7 @@
  *
  */
 
-#if defined(UNIX) && !defined(ZLIB_COMP) && !defined(COMPRESS) && !defined(ANDROID)
+#if defined(UNIX) && !defined(ZLIB_COMP) && !defined(COMPRESS) && !defined(ANDROID) && !defined(FLUTTER_PORT)
 /* path and file name extension for compression program */
 #define COMPRESS "/usr/bin/compress" /* Lempel-Ziv compression */
 #define COMPRESS_EXTENSION ".Z"      /* compress's extension */

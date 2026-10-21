@@ -1260,7 +1260,7 @@ dump_open_log(time_t now)
     if (!sysopt.dumplogfile)
         return;
     fname = dump_fmtstr(sysopt.dumplogfile, buf, TRUE);
-#elif defined(ANDROID)
+#elif defined(ANDROID) || defined(FLUTTER_PORT)
 	if(iflags.dumplog)
     {
         char buf_[BUFSZ];
@@ -1571,7 +1571,7 @@ genl_putmixed(winid window, int attr, const char *str)
  *
  * 詳細とアップストリーム追従手順は DEVELOPMENT.md §4.4 を参照。
  */
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(FLUTTER_PORT)
 void
 flutter_putmixed_with_tile(winid window, int attr, int tile, const char *str)
 {

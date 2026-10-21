@@ -1,3 +1,4 @@
+import '../config/ad_config.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -32,6 +33,11 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
   void initState() {
     super.initState();
     _selectedHighlights = [];
+
+    if (!AdConfig.isMobilePlatform) {
+      _isHighlightReady = true;
+      return;
+    }
 
     _animTimer = Timer.periodic(const Duration(milliseconds: 300), (timer) {
       if (mounted && !_isHighlightReady) {

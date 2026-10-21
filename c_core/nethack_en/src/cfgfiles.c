@@ -131,13 +131,13 @@ static boolean ignore_errors_on_unmatched = FALSE,
 #endif
 
 static const char *default_configfile =
-#if defined(UNIX) && !defined(ANDROID)
+#if defined(UNIX) && !defined(ANDROID) && !defined(FLUTTER_PORT)
     ".nethackrc";
 #else
 #if defined(MAC68K) || defined(__BEOS__)
     "NetHack Defaults";
 #else
-#if defined(MSDOS) || defined(WIN32) || defined(ANDROID)
+#if defined(MSDOS) || defined(WIN32) || defined(ANDROID) || defined(FLUTTER_PORT)
     CONFIG_FILE;
 #else
     "NetHack.cnf";
@@ -283,7 +283,7 @@ fopen_config_file(const char *filename, int src)
     }
     /* fall through to standard names */
 
-#if defined(MICRO) || defined(MAC68K) || defined(__BEOS__) || defined(WIN32) || defined(ANDROID)
+#if defined(MICRO) || defined(MAC68K) || defined(__BEOS__) || defined(WIN32) || defined(ANDROID) || defined(FLUTTER_PORT)
     set_configfile_name(fqname(default_configfile, CONFIGPREFIX, 0));
     if ((fp = fopen(configfile, "r")) != (FILE *) 0) {
         return fp;

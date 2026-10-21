@@ -7,6 +7,12 @@
 #ifndef CONFIG1_H
 #define CONFIG1_H
 
+#if defined(FLUTTER_WIN32) || defined(FLUTTER_PORT)
+# ifdef WIN32
+#  undef WIN32
+# endif
+#endif
+
 /*
  * MS DOS - compilers
  *
@@ -127,7 +133,7 @@
 #endif
 #endif
 
-#if defined(_WIN32) && !defined(WIN32)
+#if defined(_WIN32) && !defined(WIN32) && !defined(FLUTTER_WIN32)
 #define WIN32
 #endif
 

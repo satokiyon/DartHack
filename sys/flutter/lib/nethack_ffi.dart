@@ -17,7 +17,7 @@ typedef NotifyInputCallback = Void Function(Int32 requestId);
 typedef StartMenuCallback = Void Function(Int32 winId);
 typedef AddMenuCallback = Void Function(
   Int32 winId,
-  Int64 ident,
+  IntPtr ident,
   Int32 accelerator,
   Int32 groupacc,
   Int32 attr,
@@ -136,7 +136,7 @@ typedef SendKeyFunc = Void Function(Int32 key);
 typedef SendKeyDart = void Function(int key);
 
 // メニュー選択結果送信
-typedef SendMenuSelectionFunc = Void Function(Int64 ident, Int64 count);
+typedef SendMenuSelectionFunc = Void Function(IntPtr ident, Long count);
 typedef SendMenuSelectionDart = void Function(int ident, int count);
 
 typedef SendMenuSelectionsFunc = Void Function(Pointer<Utf8> csv);
@@ -232,8 +232,10 @@ class NetHackFfi {
     final effectiveLang = langCode ?? NetHackCoreLoader.currentLanguage;
     try {
       _lib = NetHackCoreLoader.loadCore(langCode: effectiveLang);
-    } catch (_) {
-      // Fallback for debug / desktop dummy
+      debugPrint('[NetHackFfi] Successfully loaded C-core library for $effectiveLang');
+    } catch (e, st) {
+      debugPrint('[NetHackFfi] Failed to load core for $effectiveLang: $e\n$st');
+      debugPrint('[NetHackFfi] Falling back to nethack_dummy.dll');
       _lib = DynamicLibrary.open('nethack_dummy.dll');
     }
 

@@ -52,4 +52,6 @@ setup.sh
 scripts/
 android/.kotlin/
 AGENTS.md
-
+cmake/
+windows/CMakeLists.txt
+android/app/src/main/cpp/CMakeLists.txt

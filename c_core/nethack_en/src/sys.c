@@ -96,7 +96,7 @@ sys_early_init(void)
 #endif
     sysopt.crashreporturl = NULL;
 
-#if defined(ANDROID) || defined(AND_GUI)
+#if defined(ANDROID) || defined(AND_GUI) || defined(FLUTTER_PORT)
     sysopt.check_save_uid = 0;
 #else
     sysopt.check_save_uid = 1;

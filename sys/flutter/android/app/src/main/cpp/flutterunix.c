@@ -1,3 +1,4 @@
+#include "flutter_compat.h"
 #include "hack.h"
 
 extern void debuglog(const char *fmt, ...);
@@ -154,7 +155,31 @@ void linux_mapoff(void) {}
 void win_tty_init(void) {}
 int dosh(void) { return 0; }
 
-#ifndef NETHACK_JP
-boolean recover_savefile(void) { return FALSE; }
-#endif
 
+
+
+#ifdef FLUTTER_WIN32
+void getioctls(void) {}
+void setioctls(void) {}
+void getwindowsz(void) {}
+
+ATTRNORETURN void error(const char *s, ...) {
+    va_list ap;
+    char buf[BUFSZ];
+    va_start(ap, s);
+    vsnprintf(buf, sizeof(buf), s, ap);
+    va_end(ap);
+    debuglog("NetHack error: %s", buf);
+    extern void nethack_exit(int code);
+    nethack_exit(1);
+    abort();
+}
+
+int dosuspend(void) { return 0; }
+int fork(void) { return -1; }
+int setgid(int gid) { (void)gid; return -1; }
+int getgid(void) { return 0; }
+int setuid(int uid) { (void)uid; return -1; }
+FILE *popen(const char *command, const char *mode) { (void)command; (void)mode; return NULL; }
+int pclose(FILE *stream) { (void)stream; return -1; }
+#endif

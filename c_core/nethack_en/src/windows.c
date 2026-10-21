@@ -43,6 +43,9 @@ extern struct window_procs Gnome_procs;
 #ifdef MSWIN_GRAPHICS
 extern struct window_procs mswin_procs;
 #endif
+#if defined(ANDROID_GRAPHICS) || defined(FLUTTER_PORT)
+extern struct window_procs and_procs;
+#endif
 #ifdef SHIM_GRAPHICS
 extern struct window_procs shim_procs;
 #endif
@@ -129,6 +132,9 @@ static struct win_choices {
 #endif
 #ifdef MSWIN_GRAPHICS
     { &mswin_procs, 0 CHAINR(0) },
+#endif
+#if defined(ANDROID_GRAPHICS) || defined(FLUTTER_PORT)
+    { &and_procs, 0 CHAINR(0) },
 #endif
 #ifdef SHIM_GRAPHICS
     { &shim_procs, 0 CHAINR(0) },
@@ -1902,7 +1908,7 @@ getlin(const char *query, char *bufp)
     program_state.in_getlin = 0;
 }
 
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(FLUTTER_PORT)
 void
 flutter_putmixed_with_tile(winid window, int attr, int tile, const char *str)
 {

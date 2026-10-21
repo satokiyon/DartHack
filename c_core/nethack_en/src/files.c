@@ -67,7 +67,7 @@ const
 #endif
 #endif
 
-#if defined(UNIX) && defined(SELECTSAVED)
+#if defined(UNIX) && defined(SELECTSAVED) && !defined(FLUTTER_WIN32)
 #include <sys/types.h>
 #include <dirent.h>
 #endif
@@ -1420,7 +1420,7 @@ plname_from_file(
     return result; /* file's plname[]+playmode value */
 }
 
-#ifdef ANDROID
+#if defined(ANDROID) || defined(FLUTTER_PORT)
 int filter_running(const struct dirent* entry)
 {
     return *entry->d_name && entry->d_name[strlen(entry->d_name)-1] == '0';
@@ -1552,7 +1552,7 @@ get_saved_games(void)
             wait_synch();
     }
 #endif /* WIN32 */
-#if defined(UNIX) && !defined(ANDROID)
+#if defined(UNIX) && !defined(ANDROID) && !defined(FLUTTER_PORT)
     /* posixly correct version */
     int myuid = getuid();
     DIR *dir;
@@ -1592,7 +1592,7 @@ get_saved_games(void)
         }
     }
 #endif /* UNIX */
-#ifdef ANDROID
+#if defined(ANDROID) || defined(FLUTTER_PORT)
     int myuid=getuid();
     struct dirent **namelist;
     struct dirent **namelist2;
@@ -1616,6 +1616,7 @@ get_saved_games(void)
                 }
                 
                 /* 旧バージョンの .gz 残存ファイルの自動マイグレーション／クリーンアップ */
+                #if (defined(ZLIB_COMP) || defined(ANDROID)) && !defined(FLUTTER_WIN32)
                 if (name_len > 3 && strcmp(name + name_len - 3, ".gz") == 0) {
                     char gz_path[BUFSZ];
                     char uncomp_path[BUFSZ];
@@ -1646,6 +1647,7 @@ get_saved_games(void)
                         }
                     }
                 }
+#endif
 
                 char filename[BUFSZ];
                 char* r;
@@ -1935,7 +1937,7 @@ docompress_file(const char *filename, boolean uncomp)
 void
 nh_compress(const char *filename UNUSED_if_not_COMPRESS)
 {
-#if defined(ANDROID)
+#if defined(ANDROID) || defined(FLUTTER_PORT)
     /* Android / Flutter ポートではセーブファイルを非圧縮のまま管理し、
        get_saved_games() 等での連続解凍・再圧縮によるファイル競合や消去・破損を防ぐ */
     return;
@@ -1950,7 +1952,7 @@ nh_compress(const char *filename UNUSED_if_not_COMPRESS)
 void
 nh_uncompress(const char *filename UNUSED_if_not_COMPRESS)
 {
-#if defined(ANDROID)
+#if defined(ANDROID) || defined(FLUTTER_PORT)
     /* 旧バージョンの .gz ファイルがディスクに残っている場合のみ1回解凍して復元 */
 #if defined(ZLIB_COMP)
     char cfn[256];
@@ -2459,7 +2461,7 @@ lock_file(const char *filename, int whichprefix,
     while (fcntl(lockfd, F_SETLK, &sflock) == -1) {
 #else
 #ifdef NO_FILE_LINKS
-    while ((lockfd = open(lockname, O_RDWR | O_CREAT | O_EXCL, 0666)) == -1) {
+    while ((lockfd = open(lockname, O_RDWR | O_CREAT | O_EXCL, FCMASK)) == -1) {
 #else
     while (link(filename, lockname) == -1) {
 #endif
@@ -3231,7 +3233,7 @@ recover_savefile(void)
         }
     }
 
-#ifdef ANDROID
+#if defined(ANDROID) || defined(FLUTTER_PORT)
 	/* if the new savefile isn't compressed
 	 * it will be overwritten when the old
 	 * savefile is restored in restore_saved_game()

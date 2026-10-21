@@ -2,21 +2,33 @@
  * Flutter / Dart Port Entry Point & OS Initialization
  */
 
+#include "flutter_compat.h"
 #include "hack.h"
 #include "dlb.h"
 #include <setjmp.h>
 
 #include <errno.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <pwd.h>
 #ifndef O_RDONLY
 #include <fcntl.h>
 #endif
 
-#include <android/log.h>
 #define LOG_TAG "NetHackFlutter"
+#ifdef FLUTTER_ANDROID
 #define debuglog(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#elif defined(FLUTTER_WIN32)
+static void win32_debuglog(const char *fmt, ...) {
+    char buf[2048];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+    OutputDebugStringA(buf);
+    OutputDebugStringA("\n");
+}
+#define debuglog(...) win32_debuglog(__VA_ARGS__)
+#else
+#define debuglog(...) do {} while(0)
+#endif
 
 extern int g_language_is_jp;
 
@@ -33,7 +45,7 @@ extern struct passwd *getpwnam(const char *);
 extern int eraseoldlocks(void);
 extern boolean getlock_failed(void);
 
-staticfn boolean whoami(void);
+boolean whoami(void);
 staticfn void process_options(int, char **);
 staticfn void wd_message(void);
 
@@ -92,9 +104,34 @@ void remove_all_lock_files(void)
 #endif
 }
 
+#ifdef exit
+#undef exit
+#endif
+#ifdef nethack_exit
+#undef nethack_exit
+#endif
 void nethack_exit(int code)
 {
 	longjmp(env, code);
+}
+
+static void backup_savefile(const char *src_path) {
+    char dst_path[BUFSZ];
+    snprintf(dst_path, sizeof(dst_path), "%s.bak", src_path);
+    FILE *in = fopen(src_path, "rb");
+    if (!in) return;
+    FILE *out = fopen(dst_path, "wb");
+    if (!out) {
+        fclose(in);
+        return;
+    }
+    char buf[4096];
+    size_t n;
+    while ((n = fread(buf, 1, sizeof(buf), in)) > 0) {
+        fwrite(buf, 1, n, out);
+    }
+    fclose(in);
+    fclose(out);
 }
 
 int NetHackMain(int argc, char** argv)
@@ -119,12 +156,19 @@ int NetHackMain(int argc, char** argv)
 
 	gh.hname = argv[0];
 	svh.hackpid = getpid();
+#ifdef FLUTTER_WIN32
+	_set_fmode(_O_BINARY);
+	debuglog("fluttermain: _set_fmode(_O_BINARY) configured");
+#else
 	// Android / Flutter 環境ではプロセス全体で Dart VM / Flutter エンジンと同居するため、
 	// ディレクトリの実行権限 (x) を奪う 0777 & ~FCMASK (0117) ではなく、
 	// Android/POSIX 標準の安全な 0022 (dir: 0755, file: 0644) を設定する。
 	(void)umask(0022);
 	debuglog("fluttermain: umask safely configured to 0022");
+#ifdef FLUTTER_ANDROID
 	__android_log_print(ANDROID_LOG_INFO, "DartHack", "[C-Core] fluttermain: umask safely configured to 0022");
+#endif
+#endif
 
 	// remove all dangling locks on startup in Flutter mobile environment
 	remove_all_lock_files();
@@ -236,17 +280,6 @@ int NetHackMain(int argc, char** argv)
 #ifdef WIZARD
 			boolean remember_wiz_mode = wizard;
 #endif
-			int fq_save_fd = open(fq_save, O_RDONLY);
-			size_t fq_save_length = 0;
-			char *fq_save_contents = MAP_FAILED;
-			if (fq_save_fd != -1) {
-				struct stat sb;
-				if (fstat(fq_save_fd, &sb) >= 0) {
-					fq_save_length = sb.st_size;
-					fq_save_contents = mmap(NULL, fq_save_length, PROT_READ, MAP_PRIVATE, fq_save_fd, 0);
-				}
-			}
-
 			if (ge.early_raw_messages)
 				raw_print(g_language_is_jp ? "セーブファイルを復元中..." : "Restoring save file...");
 			else
@@ -255,8 +288,6 @@ int NetHackMain(int argc, char** argv)
 
 			if (!dorecover(nhfp)) {
 				debuglog("ERROR: dorecover failed for %s. Cleaning up and exiting...", fq_save);
-				if (fq_save_contents != MAP_FAILED) munmap(fq_save_contents, fq_save_length);
-				if (fq_save_fd != -1) close(fq_save_fd);
 				(void) delete_savefile();
 				(void) eraseoldlocks();
 				unlock_file(HLOCK);
@@ -265,31 +296,7 @@ int NetHackMain(int argc, char** argv)
 				return 0;
 			}
 
-			if (fq_save_contents != MAP_FAILED) {
-				char *fq_save_backup = (char *)alloc(strlen(fq_save) + 4 + 1);
-				if (fq_save_backup) {
-					Sprintf(fq_save_backup, "%s.bak", fq_save);
-					int fq_save_backup_fd = creat(fq_save_backup, FCMASK);
-					if (fq_save_backup_fd != -1) {
-						size_t written_total = 0;
-						while (written_total < fq_save_length) {
-							ssize_t written_just_now = write(fq_save_backup_fd, fq_save_contents + written_total, fq_save_length - written_total);
-							if (written_just_now < 0) {
-								if (errno == EINTR) continue;
-								break;
-							} else if (written_just_now == 0) {
-								break;
-							} else {
-								written_total += written_just_now;
-							}
-						}
-						close(fq_save_backup_fd);
-					}
-					free(fq_save_backup);
-				}
-				munmap(fq_save_contents, fq_save_length);
-			}
-			if (fq_save_fd != -1) close(fq_save_fd);
+			backup_savefile(fq_save);
 
 			resuming = TRUE;
 #ifdef WIZARD
@@ -421,7 +428,7 @@ exit:
 }
 #endif
 
-staticfn boolean whoami(void)
+boolean whoami(void)
 {
 	register char *s;
 

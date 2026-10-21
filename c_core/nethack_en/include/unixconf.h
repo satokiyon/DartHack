@@ -243,6 +243,16 @@
 #define USE_FCNTL
 #endif
 
+#ifdef FLUTTER_WIN32
+# undef POSIX_TYPES
+# undef USE_FCNTL
+# ifndef NO_FILE_LINKS
+#  define NO_FILE_LINKS
+#  undef FCMASK
+#  define FCMASK (_S_IREAD | _S_IWRITE)
+# endif
+#endif
+
 /*
  * The remainder of the file should not need to be changed.
  */

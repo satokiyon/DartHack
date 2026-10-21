@@ -95,7 +95,7 @@ extern int dozap(void);              /**/
 extern int doorganize(void);         /**/
 #endif /* DUMB */
 
-#ifdef ANDROID
+#if defined(ANDROID) || defined(FLUTTER_PORT)
 extern void quit_possible(void);
 #endif
 
@@ -3672,7 +3672,7 @@ rhack(int key)
     if (!key || key == (char) 0377
         || key == gc.Cmd.spkeys[NHKF_ESC]) {
         if (key == gc.Cmd.spkeys[NHKF_ESC]) {
-#ifdef ANDROID
+#if defined(ANDROID) || defined(FLUTTER_PORT)
             quit_possible();
 #endif
             /* don't perform next sanity check if player typed ESC for

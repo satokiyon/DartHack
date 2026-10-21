@@ -598,7 +598,7 @@ savebones(int how, time_t when, struct obj *corpse)
        gender and alignment reflect final values rather than what the
        character started out as, same as topten and logfile entries */
     Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s",
-#ifdef ANDROID
+#if defined(ANDROID) || defined(FLUTTER_PORT)
             wizard ? "wizard" : svp.plname,
 #else
             svp.plname,

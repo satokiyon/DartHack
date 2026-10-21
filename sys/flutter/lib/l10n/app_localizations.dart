@@ -2093,7 +2093,7 @@ abstract class AppLocalizations {
   /// No description provided for @creditsContributorList.
   ///
   /// In ja, this message translates to:
-  /// **'• @satokiyon\n• with Google Antigravity and Gemini'**
+  /// **'• @satokiyon\n• assisted by Gemini via Google Antigravity'**
   String get creditsContributorList;
 
   /// No description provided for @soundCreditsButton.

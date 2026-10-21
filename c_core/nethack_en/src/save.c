@@ -104,14 +104,14 @@ dosave0(void)
         goto done;
 
     fq_save = fqname(gs.SAVEF, SAVEPREFIX, 1); /* level files take 0 */
-#if !defined(NO_SIGNAL) && !defined(ANDROID)
+#if !defined(NO_SIGNAL) && !defined(ANDROID) && !defined(FLUTTER_PORT)
 #if defined(UNIX) || defined(VMS)
     sethanguphandler((void (*)(int) ) SIG_IGN);
 #endif
     (void) signal(SIGINT, SIG_IGN);
 #endif
 
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(FLUTTER_PORT)
     HUP if (iflags.window_inited) {
         nh_uncompress(fq_save);
         nhfp = open_savefile();

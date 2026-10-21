@@ -7264,10 +7264,14 @@ initoptions(void)
 
     /* Carry out options that got deferred from early_options safely */
     boolean safe_deferred = FALSE;
+#if defined(__GNUC__) || defined(__clang__)
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
     safe_deferred = gd.deferred_showpaths;
+#if defined(__GNUC__) || defined(__clang__)
     #pragma GCC diagnostic pop
+#endif
 
     if (safe_deferred) {
         do_deferred_showpaths(0);  /* does not return */

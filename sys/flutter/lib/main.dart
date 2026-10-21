@@ -1,3 +1,4 @@
+import 'config/ad_config.dart';
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:io';
@@ -1328,6 +1329,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Future<void> _showNewLevelRestDialog() async {
     if (!mounted) return;
+    if (!AdConfig.isMobilePlatform) {
+      _workerSendPort?.send({
+        'type': 'new_level_rest_result',
+        'rewardAmount': 0,
+      });
+      return;
+    }
 
     final isJp = (_selectedLanguage == 'ja');
 

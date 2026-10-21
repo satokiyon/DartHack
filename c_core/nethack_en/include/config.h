@@ -129,6 +129,19 @@
 #define HACKDIR "\\nethack"
 #endif
 
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+#ifndef ANDROID_GRAPHICS
+#define ANDROID_GRAPHICS
+#endif
+#ifdef TTY_GRAPHICS
+#undef TTY_GRAPHICS
+#endif
+#ifdef DEFAULT_WINDOW_SYS
+#undef DEFAULT_WINDOW_SYS
+#endif
+#define DEFAULT_WINDOW_SYS "and"
+#endif
+
 #ifdef TTY_GRAPHICS
 #ifndef DEFAULT_WINDOW_SYS
 #define DEFAULT_WINDOW_SYS "tty"
@@ -385,7 +398,7 @@
  *
  */
 
-#if defined(UNIX) && !defined(ZLIB_COMP) && !defined(COMPRESS)
+#if defined(UNIX) && !defined(ZLIB_COMP) && !defined(COMPRESS) && !defined(ANDROID) && !defined(FLUTTER_PORT)
 /* path and file name extension for compression program */
 #define COMPRESS "/usr/bin/compress" /* Lempel-Ziv compression */
 #define COMPRESS_EXTENSION ".Z"      /* compress's extension */

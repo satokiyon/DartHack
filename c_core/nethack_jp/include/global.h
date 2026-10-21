@@ -175,7 +175,7 @@ typedef uchar nhsym;
 
 #include "warnings.h"
 
-#ifdef ANDROID
+#if defined(ANDROID) || defined(FLUTTER_PORT)
 #include "androidconf.h"
 #endif
 
@@ -458,7 +458,7 @@ extern struct nomakedefs_s nomakedefs;
 #define PANICTRACE_LIBC
 #endif
 #ifdef UNIX
-#if !defined(CROSS_TO_WASM) /* no popen in WASM */
+#if !defined(CROSS_TO_WASM) && !defined(FLUTTER_PORT) /* no popen in WASM or Flutter port */
 #define PANICTRACE_GDB
 #endif
 #ifdef CROSS_TO_WASM

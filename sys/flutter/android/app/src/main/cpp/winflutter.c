@@ -1,23 +1,39 @@
+#include "flutter_compat.h"
+#include <stdint.h>
 #include "hack.h"
 #include "func_tab.h"   /* for extended commands */
 #include "dlb.h"
-#include <unistd.h>
-#include <pthread.h>
 #include <stdarg.h>
 #include <errno.h>
-#include <android/log.h>
 
 #define LOG_TAG "NetHackFlutter"
 
+#ifdef FLUTTER_ANDROID
+#include <android/log.h>
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#else
+#define LOGI(...) debuglog(__VA_ARGS__)
+#define LOGD(...) debuglog(__VA_ARGS__)
+#define LOGE(...) debuglog(__VA_ARGS__)
+#endif
+
 typedef void (*DartLogCallback)(const char* msg);
 static DartLogCallback g_dart_log_cb = NULL;
+#if defined(FLUTTER_WIN32) && defined(NETHACK_JP)
+extern int g_language_is_jp;
+#elif defined(NETHACK_JP)
 int g_language_is_jp = 1;
+#else
+int g_language_is_jp = 0;
+#endif
 
-__attribute__((visibility("default"))) void RegisterDartLogCallback(DartLogCallback cb) {
+NH_EXPORT void RegisterDartLogCallback(DartLogCallback cb) {
     g_dart_log_cb = cb;
 }
 
-__attribute__((visibility("default"))) void flutter_set_language_mode(int is_jp) {
+NH_EXPORT void flutter_set_language_mode(int is_jp) {
     g_language_is_jp = is_jp ? 1 : 0;
 }
 
@@ -36,7 +52,12 @@ void debuglog(const char *fmt, ...) {
     vsnprintf(buf, LOG_BUF_SIZE, fmt, args);
     va_end(args);
 
-    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "%s", buf);
+#ifdef FLUTTER_ANDROID
+    LOGD("%s", buf);
+#elif defined(FLUTTER_WIN32)
+    OutputDebugStringA(buf);
+    OutputDebugStringA("\n");
+#endif
     if (g_dart_log_cb) {
         g_dart_log_cb(buf);
     }
@@ -457,7 +478,7 @@ typedef void (*DartPutStrCallback)(int winId, int attr, const char* str);
 typedef void (*DartPrintGlyphCallback)(int winId, int x, int y, int tile, int ch, int color, int special, int bktile);
 typedef void (*DartNotifyInputCallback)(int requestId);
 typedef void (*DartStartMenuCallback)(int winId);
-typedef void (*DartAddMenuCallback)(int winId, long ident, int accelerator, int groupacc, int attr, const char* str, int preselected, int color, int tile);
+typedef void (*DartAddMenuCallback)(int winId, intptr_t ident, int accelerator, int groupacc, int attr, const char* str, int preselected, int color, int tile);
 typedef void (*DartEndMenuCallback)(int winId, const char* prompt);
 typedef void (*DartSelectMenuCallback)(int winId, int how);
 typedef void (*DartYnFunctionCallback)(const char* question, const char* choices, int def);
@@ -507,7 +528,7 @@ static char g_askname_result[256] = {0};
 static volatile int g_askname_done = 0;
 static int g_askname_mode = 0;
 
-void SendAskNameResultToC(const char* result, int mode) {
+NH_EXPORT void SendAskNameResultToC(const char* result, int mode) {
     g_askname_mode = mode;
     if (result) {
         strncpy(g_askname_result, result, sizeof(g_askname_result) - 1);
@@ -523,7 +544,7 @@ void SendAskNameResultToC(const char* result, int mode) {
 static volatile int g_input_request_id = 0;
 static volatile int g_last_received_key = 0;
 static volatile int g_key_available = 0;
-static volatile long g_selected_menu_item = -2; // -2: 未選択, -1: キャンセル
+static volatile intptr_t g_selected_menu_item = -2; // -2: 未選択, -1: キャンセル
 static volatile int g_exit_notified = 0;
 
 #define FLUTTER_MAX_SELECTED_MENU 512
@@ -559,7 +580,7 @@ static volatile int g_pending_poscmd_y = 0;
 static volatile int g_pending_poscmd_mod = 1;
 static volatile int g_pending_poscmd = 0;
 static volatile int g_selected_menu_count = -2; // -2: 待機, -1: キャンセル, 0以上: 件数
-static long g_selected_menu_items[FLUTTER_MAX_SELECTED_MENU] = {0};
+static intptr_t g_selected_menu_items[FLUTTER_MAX_SELECTED_MENU] = {0};
 static long g_selected_menu_counts[FLUTTER_MAX_SELECTED_MENU] = {0};
 
 #define FLUTTER_MSG_HISTORY_MAX 64
@@ -678,7 +699,7 @@ typedef struct {
     DartSoundEventCallback sound_event_cb;
 } FlutterCallbacksStruct;
 
-void RegisterFlutterCallbacksStruct(const FlutterCallbacksStruct *cbs) {
+NH_EXPORT void RegisterFlutterCallbacksStruct(const FlutterCallbacksStruct *cbs) {
     if (!cbs) return;
     g_create_window_cb = cbs->create_cb;
     g_clear_window_cb = cbs->clear_cb;
@@ -701,11 +722,11 @@ void RegisterFlutterCallbacksStruct(const FlutterCallbacksStruct *cbs) {
     g_putmixed_cb = cbs->putmixed_cb;
     g_new_level_rest_cb = cbs->newlevel_rest_cb;
     g_sound_event_cb = cbs->sound_event_cb;
-    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "All Flutter callbacks registered successfully via struct!");
+    LOGD("All Flutter callbacks registered successfully via struct!");
 }
 
 // 後方互換用
-void RegisterFlutterCallbacks(
+NH_EXPORT void RegisterFlutterCallbacks(
     DartCreateWindowCallback create_cb,
     DartClearWindowCallback clear_cb,
     DartDisplayWindowCallback display_cb,
@@ -750,13 +771,13 @@ void RegisterFlutterCallbacks(
 }
 
 // Dart 側から結果を受け取る関数
-void SendYnResultToC(int result) {
+NH_EXPORT void SendYnResultToC(int result) {
     g_yn_result = (char)result;
     g_yn_done = 1;
     debuglog("C core received YN result: %d (%c)", result, g_yn_result);
 }
 
-void SendGetLineResultToC(const char* result) {
+NH_EXPORT void SendGetLineResultToC(const char* result) {
     if (result) {
         strncpy(g_getline_result, result, sizeof(g_getline_result) - 1);
         g_getline_result[sizeof(g_getline_result) - 1] = '\0';
@@ -771,12 +792,12 @@ void SendGetLineResultToC(const char* result) {
 static volatile int g_new_level_rest_done = 0;
 static volatile int g_new_level_rest_reward_amount = 0;
 
-void RegisterNewLevelRestCallback(DartNewLevelRestCallback cb) {
+NH_EXPORT void RegisterNewLevelRestCallback(DartNewLevelRestCallback cb) {
     g_new_level_rest_cb = cb;
     debuglog("NewLevelRestCallback registered.");
 }
 
-void SendNewLevelRestResultToC(int reward_amount) {
+NH_EXPORT void SendNewLevelRestResultToC(int reward_amount) {
     g_new_level_rest_reward_amount = reward_amount;
     g_new_level_rest_done = 1;
     debuglog("C core received NewLevelRest result: %d", reward_amount);
@@ -803,6 +824,9 @@ static void flutter_apply_ad_reward(int amount) {
 }
 
 void flutter_check_new_level_rest(void) {
+#ifdef FLUTTER_WIN32
+    return;
+#else
     if (!g_new_level_rest_cb) return;
 
     g_new_level_rest_done = 0;
@@ -817,6 +841,7 @@ void flutter_check_new_level_rest(void) {
     if (g_new_level_rest_reward_amount > 0) {
         flutter_apply_ad_reward(g_new_level_rest_reward_amount);
     }
+#endif
 }
 
 
@@ -871,7 +896,7 @@ static void flutter_putmsghistory(const char *msg, boolean restoring) {
 }
 
 // 拡張コマンド一覧の取得
-const char* GetExtCmdsFlutter(void) {
+NH_EXPORT const char* GetExtCmdsFlutter(void) {
     static char buf[16384] = {0};
     size_t used = 0;
     int i;
@@ -916,13 +941,13 @@ const char* GetExtCmdsFlutter(void) {
 }
 
 // Dart 側からキー入力を受け取る関数
-void SendKeyToFlutter(int key) {
+NH_EXPORT void SendKeyToFlutter(int key) {
     g_last_received_key = key;
     g_key_available = 1;
     debuglog("C core received key: %d", key);
 }
 
-void SendKeysToFlutter(const int* keys, int len) {
+NH_EXPORT void SendKeysToFlutter(const int* keys, int len) {
     if (!keys || len <= 0) return;
 
     if (program_state.input_state != commandInp && len > 1 && keys[0] == '#') {
@@ -954,7 +979,7 @@ void SendKeysToFlutter(const int* keys, int len) {
     }
 }
 
-void SendShortcutToFlutter(const int* keys, int len) {
+NH_EXPORT void SendShortcutToFlutter(const int* keys, int len) {
     if (!keys || len <= 0) return;
 
     if (program_state.input_state != commandInp && len > 1 && keys[0] == '#') {
@@ -993,7 +1018,7 @@ void SetExtMenuFlutter(int enable) {
 
 // Dart 側から PosCmd (座標クリック) を受け取る関数。
 // マップタップ時の herecmdmenu/therecmdmenu 連動のために使用。
-void SendPosCmdToFlutter(int x, int y, int mod) {
+NH_EXPORT void SendPosCmdToFlutter(int x, int y, int mod) {
     if (g_poscmd_count >= FLUTTER_MAX_POSCMD) {
         debuglog("SendPosCmdToFlutter: queue full, dropping pos_cmd x=%d y=%d mod=%d", x, y, mod);
         return;
@@ -1007,7 +1032,7 @@ void SendPosCmdToFlutter(int x, int y, int mod) {
 }
 
 // Dart 側からメニュー選択結果を受け取る関数
-void SendMenuSelection(long ident, long count) {
+NH_EXPORT void SendMenuSelection(intptr_t ident, long count) {
     g_selected_menu_item = ident;
     if (ident == -1) {
         g_selected_menu_count = -1;
@@ -1016,10 +1041,10 @@ void SendMenuSelection(long ident, long count) {
         g_selected_menu_counts[0] = count;
         g_selected_menu_count = 1;
     }
-    debuglog("C core received menu selection: %ld (count=%ld)", ident, count);
+    debuglog("C core received menu selection: %zd (count=%ld)", (ssize_t)ident, count);
 }
 
-void SendMenuSelectionsToC(const char* csv) {
+NH_EXPORT void SendMenuSelectionsToC(const char* csv) {
     int count = 0;
     const char* p = csv;
 
@@ -1031,7 +1056,7 @@ void SendMenuSelectionsToC(const char* csv) {
 
     while (*p && count < FLUTTER_MAX_SELECTED_MENU) {
         char* endptr;
-        long v;
+        intptr_t v;
 
         while (*p == ',' || *p == ' ' || *p == '\t') {
             ++p;
@@ -1040,7 +1065,7 @@ void SendMenuSelectionsToC(const char* csv) {
             break;
         }
 
-        v = strtoll(p, &endptr, 10);
+        v = (intptr_t)strtoll(p, &endptr, 10);
         if (endptr == p) {
             while (*p && *p != ',') {
                 ++p;
@@ -1073,11 +1098,11 @@ void SendMenuSelectionsToC(const char* csv) {
 }
 
 // カウンタ取得関数
-int GetFlutterInputRequestId(void) {
+NH_EXPORT int GetFlutterInputRequestId(void) {
     return g_input_request_id;
 }
 
-int GetIsGameOver(void) {
+NH_EXPORT int GetIsGameOver(void) {
     return program_state.gameover ? 1 : 0;
 }
 
@@ -1995,8 +2020,13 @@ static void flutter_add_menu(winid wid, const glyph_info *glyphinfo, const anyth
     
     if (g_add_menu_cb && str) {
         char* conv = convert_cp437_to_utf8(str);
-        bool is_negative_a_int = ident && ((ident->a_ulong & 0xFFFFFFFF00000000ULL) == 0) && (((int)ident->a_int) < 0);
-        long menu_ident = ident ? (is_negative_a_int ? (long)(int)ident->a_int : ident->a_long) : 0L;
+        intptr_t menu_ident = 0;
+        if (ident) {
+            memcpy(&menu_ident, ident, sizeof(void *));
+            if ((sizeof(void *) == 8) && ((menu_ident & 0xFFFFFFFF00000000ULL) == 0) && (((int)ident->a_int) < 0)) {
+                menu_ident = (intptr_t)(int)ident->a_int;
+            }
+        }
         g_add_menu_cb(
             (int)wid,
             menu_ident,
@@ -2055,7 +2085,7 @@ static int flutter_select_menu(winid wid, int how, menu_item **selected) {
     *selected = (menu_item*)alloc(sizeof(menu_item) * g_selected_menu_count);
     for (int i = 0; i < g_selected_menu_count; ++i) {
         (*selected)[i].item = cg.zeroany;
-        (*selected)[i].item.a_long = g_selected_menu_items[i];
+        memcpy(&((*selected)[i].item), &g_selected_menu_items[i], sizeof(void *));
         (*selected)[i].count = g_selected_menu_counts[i];
     }
 
@@ -2278,7 +2308,7 @@ extern void genl_status_update(int, genericptr_t, int, int, int, unsigned long *
 
 // windowprocs を Flutter 用にセットアップする関数
 static void HijackWindowProcs(void) {
-    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "HijackWindowProcs 1.1");
+    LOGD("HijackWindowProcs 1.1");
 
     flutter_procs.win_init_nhwindows = flutter_init_nhwindows;
     flutter_procs.win_player_selection = flutter_player_selection;
@@ -2294,7 +2324,7 @@ static void HijackWindowProcs(void) {
     flutter_procs.win_curs = flutter_curs;
     flutter_procs.win_putstr = flutter_putstr;
 
-    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "HijackWindowProcs 1.2");
+    LOGD("HijackWindowProcs 1.2");
 
     flutter_procs.win_putmixed = genl_putmixed;
     flutter_procs.win_raw_print = flutter_raw_print;
@@ -2311,7 +2341,7 @@ static void HijackWindowProcs(void) {
     flutter_procs.win_delay_output = flutter_delay_output;
     flutter_procs.win_print_glyph = flutter_print_glyph;
 
-    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "HijackWindowProcs 1.3");
+    LOGD("HijackWindowProcs 1.3");
 
     // プレイヤー位置を Dart 側へ通知 (マップタップの #herecmdmenu 連動で使用)
     flutter_procs.win_cliparound = flutter_cliparound;
@@ -2328,7 +2358,7 @@ static void HijackWindowProcs(void) {
     flutter_procs.win_outrip = genl_outrip;
     flutter_procs.win_preference_update = genl_preference_update;
 
-    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "HijackWindowProcs 1.4 (Status handlers)");
+    LOGD("HijackWindowProcs 1.4 (Status handlers)");
 
     // ステータス表示用のハンドラを Flutter 専用実装 (ハイライト対応) に設定
     flutter_procs.win_status_init = genl_status_init;
@@ -2351,7 +2381,7 @@ static void HijackWindowProcs(void) {
     windowprocs = flutter_procs;
     iflags.windowtype_locked = TRUE;
     
-    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "flutter_procs setup completed! windowtype_locked set to TRUE.");
+    LOGD("flutter_procs setup completed! windowtype_locked set to TRUE.");
 }
 
 // NetHackステータスハイライト用 static 変数とハンドラ実装
@@ -2521,12 +2551,80 @@ struct StartArgs {
     char username[256];
 };
 
+#ifdef FLUTTER_WIN32
+static unsigned __stdcall NetHackThreadFuncWin32(void* arg) {
+    struct StartArgs* args = (struct StartArgs*)arg;
+    LOGD("NetHack Thread Function is RUNNING! Chdir to: %s", args->path);
+
+    wchar_t wpath[MAX_PATH];
+    if (MultiByteToWideChar(CP_UTF8, 0, args->path, -1, wpath, MAX_PATH) > 0) {
+        if (_wchdir(wpath) != 0) {
+            LOGE("_wchdir failed in thread! errno=%d", errno);
+        }
+    } else {
+        if (chdir(args->path) != 0) {
+            LOGE("chdir failed in thread! errno=%d", errno);
+        }
+    }
+
+    // sysconf ファイルを毎回最新の完全正当内容で確実に更新・展開
+    FILE* f_syscf = fopen("sysconf", "w");
+    if (f_syscf) {
+        fputs("# NetHack 5.0 System Configuration File\n"
+              "WIZARDS=*\n"
+              "EXPLORERS=*\n"
+              "SHELLERS=*\n"
+              "SUPPORT=https://satokiyon.github.io/darthack-site/\n"
+              "MAXPLAYERS=25\n"
+              "PERSMAX=10\n"
+              "POINTSMIN=1\n"
+              "PERS_IS_UID=0\n"
+              "ENTRYMAX=100\n"
+              "MAX_REROLL_RATE=10\n"
+              "SEDUCE=1\n"
+              "HIDEUSAGE=0\n", f_syscf);
+        fclose(f_syscf);
+        LOGD("sysconf file updated to latest valid content at: sysconf");
+    }
+
+    // perm ファイルが存在しなければ自動作成して getlock() での Fatal 終了を完全防止
+    FILE* f_perm = fopen("perm", "r");
+    if (!f_perm) {
+        f_perm = fopen("perm", "w");
+        if (f_perm) {
+            fputs("# NetHack 5.0 Permanent Locks File\n", f_perm);
+            fclose(f_perm);
+            LOGD("perm file created at: perm");
+        }
+    } else {
+        fclose(f_perm);
+    }
+
+    HijackWindowProcs();
+
+    char* params[2];
+    params[0] = "nethack";
+    params[1] = NULL;
+
+    LOGD("Calling NetHackMain... (initial svp.plname='%s')", svp.plname);
+    extern int NetHackMain(int argc, char** argv);
+    NetHackMain(1, params);
+
+    debuglog("NetHackMain exited.");
+    if (g_exit_cb && !g_exit_notified) {
+        g_exit_notified = 1;
+        g_exit_cb("");
+    }
+    free(args);
+    return 0;
+}
+#else
 static void* NetHackThreadFunc(void* arg) {
     struct StartArgs* args = (struct StartArgs*)arg;
-    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "NetHack Thread Function is RUNNING! Chdir to: %s", args->path);
+    LOGD("NetHack Thread Function is RUNNING! Chdir to: %s", args->path);
 
     if (chdir(args->path) != 0) {
-        __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "chdir failed in thread! errno=%d", errno);
+        LOGE("chdir failed in thread! errno=%d", errno);
     }
 
     // sysconf ファイルを毎回最新の完全正当内容で確実に更新・展開
@@ -2548,7 +2646,7 @@ static void* NetHackThreadFunc(void* arg) {
               "SEDUCE=1\n"
               "HIDEUSAGE=0\n", f_syscf);
         fclose(f_syscf);
-        __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "sysconf file updated to latest valid content at: %s", syscf_path);
+        LOGD("sysconf file updated to latest valid content at: %s", syscf_path);
     }
 
     // perm ファイルが存在しなければ自動作成して getlock() での Fatal 終了を完全防止
@@ -2560,7 +2658,7 @@ static void* NetHackThreadFunc(void* arg) {
         if (f_perm) {
             fputs("# NetHack 5.0 Permanent Locks File\n", f_perm);
             fclose(f_perm);
-            __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "perm file created at: %s", perm_path);
+            LOGD("perm file created at: %s", perm_path);
         }
     } else {
         fclose(f_perm);
@@ -2572,7 +2670,7 @@ static void* NetHackThreadFunc(void* arg) {
     params[0] = "nethack";
     params[1] = NULL;
 
-    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "Calling NetHackMain... (initial svp.plname='%s')", svp.plname);
+    LOGD("Calling NetHackMain... (initial svp.plname='%s')", svp.plname);
     extern int NetHackMain(int argc, char** argv);
     NetHackMain(1, params);
 
@@ -2584,20 +2682,31 @@ static void* NetHackThreadFunc(void* arg) {
     free(args);
     return NULL;
 }
+#endif
 
-void StartNetHackFlutter(const char* path, const char* username) {
-    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "StartNetHackFlutter: path=%s, user=%s", path, username);
+NH_EXPORT void StartNetHackFlutter(const char* path, const char* username) {
+    LOGD("StartNetHackFlutter: path=%s, user=%s", path, username);
 
     g_exit_notified = 0;
 
     struct StartArgs* args = malloc(sizeof(struct StartArgs));
     if (!args) {
-        __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "Failed to malloc StartArgs!");
+        LOGE("Failed to malloc StartArgs!");
         return;
     }
     strncpy(args->path, path, sizeof(args->path) - 1);
     strncpy(args->username, username, sizeof(args->username) - 1);
 
+#ifdef FLUTTER_WIN32
+    uintptr_t handle = _beginthreadex(NULL, 8 * 1024 * 1024, NetHackThreadFuncWin32, args, 0, NULL);
+    if (handle == 0) {
+        LOGE("Failed to create NetHack thread via _beginthreadex!");
+        free(args);
+    } else {
+        CloseHandle((HANDLE)handle);
+        LOGD("NetHack thread spawned successfully with 8MB stack (Win32).");
+    }
+#else
     pthread_t thread;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
@@ -2608,17 +2717,18 @@ void StartNetHackFlutter(const char* path, const char* username) {
     pthread_attr_destroy(&attr);
 
     if (rc != 0) {
-        __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "Failed to create NetHack thread! rc=%d", rc);
+        LOGE("Failed to create NetHack thread! rc=%d", rc);
         free(args);
     } else {
         pthread_detach(thread);
-        __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "NetHack thread spawned successfully with 8MB stack.");
+        LOGD("NetHack thread spawned successfully with 8MB stack.");
     }
+#endif
 }
 
 extern void prscore(int argc, char **argv);
 
-const char* GetTopTenTextFlutter(void) {
+NH_EXPORT const char* GetTopTenTextFlutter(void) {
     g_topten_capture_buf[0] = '\0';
 
     winid old_toptenwin = gt.toptenwin;
@@ -2636,7 +2746,7 @@ const char* GetTopTenTextFlutter(void) {
     return g_topten_capture_buf;
 }
 
-__attribute__((visibility("default"))) void TriggerDatabaseSearchFlutter(void) {
+NH_EXPORT void TriggerDatabaseSearchFlutter(void) {
     extern void cmdq_add_key(int q, char key);
     cmdq_add_key(0 /* CQ_CANNED */, '?');
     int key = '/';
@@ -2647,21 +2757,21 @@ __attribute__((visibility("default"))) void TriggerDatabaseSearchFlutter(void) {
 #define NETHACK_BUILD_ID "unknown_build"
 #endif
 
-const char* flutter_get_build_id(void) {
+NH_EXPORT const char* flutter_get_build_id(void) {
     return NETHACK_BUILD_ID;
 }
 
-__attribute__((visibility("default"))) void flutter_trigger_autosave(void) {
+NH_EXPORT void flutter_trigger_autosave(void) {
     /* No-op: Background autosave has been disabled to prevent file corruption during OS process kill. */
 }
 
-__attribute__((visibility("default"))) void flutter_set_autosave_settings(int enabled, int interval_turns) {
+NH_EXPORT void flutter_set_autosave_settings(int enabled, int interval_turns) {
     g_autosave_enabled = enabled;
     g_autosave_interval = interval_turns;
     debuglog("flutter_set_autosave_settings: enabled=%d, interval=%d", enabled, interval_turns);
 }
 
-__attribute__((visibility("default"))) void flutter_lookup_key_description(int code) {
+NH_EXPORT void flutter_lookup_key_description(int code) {
     dowhatdoes_key((char)code);
 }
 

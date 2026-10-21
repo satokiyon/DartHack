@@ -1058,7 +1058,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get creditsContributorList =>
-      '• @satokiyon\n• with Google Antigravity and Gemini';
+      '• @satokiyon\n• assisted by Gemini via Google Antigravity';
 
   @override
   String get soundCreditsButton => 'BGM & Sound Effects';

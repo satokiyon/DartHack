@@ -849,12 +849,12 @@ getpos(coord *ccp, boolean force, const char *goal)
     }
     cx = gg.getposx = ccp->x;
     cy = gg.getposy = ccp->y;
-#if defined(CLIPPING) && !defined(ANDROID)
+#if defined(CLIPPING) && !defined(ANDROID) && !defined(FLUTTER_PORT)
     cliparound(cx, cy);
 #endif
     curs(WIN_MAP, cx, cy);
     flush_screen(0);
-#if defined(MAC68K) || defined(ANDROID)
+#if defined(MAC68K) || defined(ANDROID) || defined(FLUTTER_PORT)
     lock_mouse_cursor(TRUE);
 #endif
     lock_mouse_buttons(TRUE);
@@ -1159,7 +1159,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         flush_screen(0);
     }
  exitgetpos:
-#if defined(MAC68K) || defined(ANDROID)
+#if defined(MAC68K) || defined(ANDROID) || defined(FLUTTER_PORT)
     lock_mouse_cursor(FALSE);
 #endif
     lock_mouse_buttons(FALSE);

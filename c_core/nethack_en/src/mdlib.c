@@ -381,6 +381,9 @@ bannerc_string(char *outbuf, size_t bufsz, const char *build_date)
 
 #ifndef HAS_NO_MKSTEMP
 #ifdef _MSC_VER
+#include <fcntl.h>
+#include <io.h>
+#include <sys/stat.h>
 int
 mkstemp(char *template)
 {

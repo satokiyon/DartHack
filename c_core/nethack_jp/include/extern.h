@@ -1493,7 +1493,7 @@ extern boolean stumble_on_door_mimic(coordxy, coordxy);
 extern int doopen_indir(coordxy, coordxy);
 extern int doclose(void);
 
-#ifdef ANDROID
+#if defined(ANDROID) || defined(FLUTTER_PORT)
 extern void lock_mouse_cursor(boolean);
 #endif
 

@@ -1,0 +1,66 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-26. */
+/*	SCCS Id: @(#)androidconf.h	3.4	2011/03/31	*/
+/* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1990, 1991, 1992, 1993. */
+/* NetHack may be freely redistributed.  See license for details. */
+
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+#ifndef ANDROIDCONF_H
+#define ANDROIDCONF_H
+
+#ifdef FLUTTER_WIN32
+#include "flutter_compat.h"
+#endif
+
+/* NetHack 5.0 では error は Fatal エラー処理関数(noreturn)として extern.h で定義されているため、
+   debuglog への置換マクロを廃止し -Winvalid-noreturn 警告を防止する */
+//#define error debuglog
+
+#define NO_FILE_LINKS /* if no hard links */
+#define LOCKDIR "." /* where to put locks */ 
+//#define HOLD_LOCKFILE_OPEN	/* Keep an exclusive lock on the .0 file */
+#define SELF_RECOVER		/* Allow the game itself to recover from an aborted game */ 
+
+#ifdef getchar
+#  undef getchar
+#endif
+#define getchar nhgetch
+#undef tgetch
+#define tgetch nhgetch
+//#define getuid() 1
+
+#undef SHELL				/* we do not support the '!' command */
+
+#ifdef DUMPLOG
+#undef DUMPLOG_FILE
+#define DUMPLOG_FILE        "%n.%d.dumplog.txt"
+#endif
+
+#define CONFIG_FILE "defaults.nh"
+
+#ifdef FLUTTER_WIN32
+#undef MAIL
+#endif
+//#undef DEF_PAGER
+#undef DEF_MAILREADER
+
+#define ASCIIGRAPH
+#define TEXT_TOMBSTONE
+
+#define NO_SIGNAL
+
+#define SELECTSAVED
+
+#define USER_SOUNDS
+
+#define CHANGE_COLOR
+
+#undef CRASHREPORT
+
+#if defined(FLUTTER_WIN32) || defined(FLUTTER_PORT)
+# ifdef WIN32
+#  undef WIN32
+# endif
+#endif
+
+# endif /* ANDROIDCONF_H */
+#endif /* ANDROID or FLUTTER_PORT */

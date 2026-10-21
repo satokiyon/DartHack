@@ -321,6 +321,9 @@ Flutter ポートにおけるハイスコア・スコアボード表示には、
 4. **Flutter Android 環境でのビルド方針**:
    - Flutter Android環境向けのビルドを行う際は、`DartHack_private` 内の `android_build.ps1` を実行してください。
 
+5. **Flutter Windows デスクトップ環境でのビルド方針**:
+   - Flutter Windowsデスクトップ向けのビルドを行う際は、`DartHack_private` 内の `windows_build.ps1` を実行してください。成果物一式（EXE, DLL, data/）は `DartHack_private/dist/windows/<Mode>/` に集約され、配布用 ZIP アーカイブ（`darthack-windows-<mode>.zip`）が自動生成されます。
+
 5. **Android / Flutter版における日本語・英語版データファイルの配置と優先ロード方針**:
    - AndroidおよびFlutterポートでは、データファイル群（`data`, `rumors`, `oracles`, `quest.lua`, `bogusmon`, `engrave`, `epitaph`, `tut-1.lua` 等）を個別のファイルとして `assets/nethackdir/` にパッケージングし、アプリ起動時に端末のストレージ（データディレクトリ）にコピーして読み込みます。
    - 英語版（`data`, `oracles`, `rumors`, `quest.lua`, `bogusmon` 等）と日本語版（`data_jp`, `oracles_jp`, `rumors_jp`, `quest_jp.lua`, `bogusmon_jp` 等）の両方のファイルを `assets/nethackdir/` に同梱します。
@@ -500,6 +503,9 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
 4. **Flutter Android 環境でのビルド方針**:
    - Flutter Android環境向けのビルドを行う際は、`DartHack_private` 内の `android_build.ps1` を実行してください。
 
+5. **Flutter Windows デスクトップ環境でのビルド方針**:
+   - Flutter Windowsデスクトップ向けのビルドを行う際は、`DartHack_private` 内の `windows_build.ps1` を実行してください。成果物一式（EXE, DLL, data/）は `DartHack_private/dist/windows/<Mode>/` に集約され、配布用 ZIP アーカイブ（`darthack-windows-<mode>.zip`）が自動生成されます。
+
 5. **Android / Flutter版における日本語・英語版データファイルの配置と優先ロード方針**:
    - AndroidおよびFlutterポートでは、データファイル群（`data`, `rumors`, `oracles`, `quest.lua`, `bogusmon`, `engrave`, `epitaph`, `tut-1.lua` 等）を個別のファイルとして `assets/nethackdir/` にパッケージングし、アプリ起動時に端末のストレージ（データディレクトリ）にコピーして読み込みます。
    - 英語版（`data`, `oracles`, `rumors`, `quest.lua`, `bogusmon` 等）と日本語版（`data_jp`, `oracles_jp`, `rumors_jp`, `quest_jp.lua`, `bogusmon_jp` 等）の両方のファイルを `assets/nethackdir/` に同梱します。
@@ -627,14 +633,11 @@ NetHack Cコア（バックグラウンドスレッド）と Flutter/Dart UI（�
     - タイルサイズを単一の `tileSize` (int) で保持して正方形前提で切り出し座標（`iRow * tileSize`）を計算すると、非正方形タイル選択時に表示が崩れます。
     - UI層および各 Painter クラス（`NetHackMapPainter` 等）では、必ず `tileWidth` と `tileHeight` を独立して保持し、アセット名から `RegExp(r'(\d+)x(\d+)')` 等で幅と高さを動的にパースして正確な `srcRect` (切り出し領域) を算出してください。
 
-12. **Gradle / Kotlin 関連警告に対する gradle.properties 設定の維持**:
+12. **AGP 9 / Kotlin 関連および JDK (JBR) に対する gradle.properties 設定方針**:
     - **現象と制約**:
-      Android Gradle Plugin (AGP) 9.0 以降への移行に伴い、`org.jetbrains.kotlin.android` プラグイン非推奨の警告が出力される場合がありますが、これを解消するために `gradle.properties` から `android.newDsl=false` や `android.builtInKotlin=false` を削除してはなりません。
-    - **影響**:
-      - `android.newDsl=false` を削除すると、Flutter Gradle Plugin 側が DSL 非互換により `ClassCastException` でクラッシュします。
-      - `android.builtInKotlin=false` を削除すると、外部依存モジュール（例：`:jni` プラグイン）が古い Kotlin プラグインの適用チェックにより `IllegalStateException` をスローしてビルドが失敗します。
-    - **対策**:
-      ビルド成功を維持するため、これらの警告は一時的に許容し、両方のフラグを `gradle.properties` に残したまま維持してください。
+      - `android.newDsl=false`: Flutter Gradle Plugin の DSL 互換性維持に必須です（削除すると `ClassCastException` でクラッシュします）。
+      - `android.builtInKotlin=true`: `shared_preferences_android` 2.4.24 以降（2.5.x）は AGP 9 の Built-in Kotlin に移行しており、自前の `build.gradle.kts` で Kotlin プラグイン（`org.jetbrains.kotlin.android`）を apply しません。`android.builtInKotlin=false` のままだと `SharedPreferencesPlugin.kt` がコンパイルされず、`GeneratedPluginRegistrant.java` で「シンボルを見つけられません: クラス SharedPreferencesPlugin」エラーが発生します。そのため必ず `android.builtInKotlin=true` を設定してください。
+      - `org.gradle.java.home`: システムの環境変数 `JAVA_HOME` が Java 26 などの早期アクセス／最新 JDK を指している場合、Android SDK の `jlink` (`JdkImageTransform`) がモジュール仕様の厳格化により失敗し、`:jni:compileReleaseJavaWithJavac` 等でビルドがクラッシュします。そのため、Android Studio 同梱の安定した JBR (`C:/Program Files/Android/Android Studio/jbr`) を `gradle.properties` の `org.gradle.java.home` に明示してビルド JVM を固定してください。
 
 12. **メッセージ表示・履歴バッファとキー誤爆防止の設計**:
     - **一時バッファと永続履歴バッファの分離**: Cコア側の `clearWindow(WIN_MESSAGE)` はターン毎に呼ばれて表示内容をクリアするため、UIで現在表示するバッファ（`_messages`）のみをクリアし、過去ログを保持するバッファ（`_messageHistory`）はクリアしない設計にしてください。`_messageHistory` はゲーム開始時や再開時の `createWindow(WIN_MESSAGE)` のタイミングでのみリセットします。
@@ -1315,3 +1318,35 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
    - また、ネイティブ広告 SDK のコールバックが返らない場合に C コアが永久待機（ハング）するのを防ぐため、ロード段階には必ず監視タイマー（タイムアウト時の `onAdClosed(false)` 発火と遅延到着広告の `dispose`）を設けてください。
 
 
+
+## 50. Flutter Windows ポートにおける UCRT 互換・POSIX 抑止・多言語フラグ原則
+
+1. **MSVC UCRT `pmode` デバッグアサーション（`open.cpp:164`）の二重防御原則**:
+   - **現象とメカニズム**:
+     MSVC の Universal C Runtime (UCRT) は、低水準ファイル作成関数（`_open`, `_creat`）の第 3 引数 `pmode` に対して、Debug ビルド時に `_VALIDATE_RETURN((pmode & (~(_S_IREAD | _S_IWRITE))) == 0, EINVAL, -1)` の厳密なパラメータ検証を行います。
+     NetHack C コア標準の Unix 権限（`getlock()` の `0666` や `unixconf.h` の `FCMASK = 0660`）にはグループ/その他権限ビットが含まれるため、Windows Debug 版で実行すると名前入力直後等にアサーション失敗でプロセスがクラッシュします（Release 版では検証が無効化されるため潜在化します）。
+   - **対策と二重防御設計**:
+     - **第 1 防御（ランタイム自動サニタイズ）**: `sys/flutter/android/app/src/main/cpp/flutter_compat.h` 内で `open` および `creat` を Windows 専用ラッパー（`flutter_win32_open` / `flutter_win32_creat`）へリダイレクトし、`pmode` を `_S_IREAD | _S_IWRITE`（0600）に自動マスクして `_wopen` / `_wcreat` を呼び出してください。これにより UTF-8 日本語パス対応も同時に保証されます。
+     - **第 2 防御（定数定義の正規化）**: `unixconf.h` において `#ifdef FLUTTER_WIN32` 時に `FCMASK` を `(_S_IREAD | _S_IWRITE)` として再定義し、`files.c` のハードコードされた `0666` も `FCMASK` に置換してください。
+     - **Android への完全非干渉**: これらのラッパーおよび定数置換は `#ifdef FLUTTER_WIN32` で厳密にガードし、Android (`FLUTTER_ANDROID`) 側のパーミッションや動作に一切干渉させないでください。
+
+2. **Windows / Flutter ポートにおける不要外部プロセス・POSIX 機能の完全抑止**:
+   - **`COMPRESS`（外部プロセス圧縮）の抑止**: `c_core/.../include/config.h` において、`&& !defined(FLUTTER_PORT)` を追加して `/usr/bin/compress` の定義を抑止してください。これにより Windows 上で存在しない `fork()`, `setgid()`, `getgid()`, `setuid()` の呼び出しコード（`docompress_file`）が完全に除外され、未定義関数警告（C4013）を防止します。
+   - **`PANICTRACE_GDB`（gdb 起動）の抑止**: `c_core/.../include/global.h` において、`&& !defined(FLUTTER_PORT)` を追加して `PANICTRACE_GDB` を除外してください。これにより Windows 上で存在しない `popen()` / `pclose()` の呼び出しが除外されます。
+   - **コンパイラプラグマのガード**: `options.c` などの `#pragma GCC` は、`#if defined(__GNUC__) || defined(__clang__)` で囲み、MSVC（cl.exe）での C4068 警告（不明な pragma）を防止してください。
+
+3. **多プラットフォーム・多言語コアにおける言語フラグ（`g_language_is_jp`）の実体宣言原則**:
+   - `c_core/nethack_jp/src/decl.c` は `#ifndef ANDROID` で囲まれているため、Android 環境では `decl.c` に実体が存在せず、Windows 環境では `decl.c` が実体を保持します。一方、英語コア（`nethack_en`）には `decl.c` に本フラグが存在しません。
+   - したがって、移植層（`winflutter.c`）では以下のプリプロセッサ分岐を厳守し、プラットフォーム × ターゲットの全組み合わせで未定義（LNK2001/ld.lld）や二重定義（LNK2005）を完全に防止してください：
+     ```c
+     #if defined(FLUTTER_WIN32) && defined(NETHACK_JP)
+     extern int g_language_is_jp; // Windows + 日本語コア: decl.c の実体を extern 参照
+     #elif defined(NETHACK_JP)
+     int g_language_is_jp = 1;    // Android + 日本語コア: decl.c が #ifndef ANDROID のため本層で実体定義
+     #else
+     int g_language_is_jp = 0;    // 英語コア (共通): decl.c に存在しないため本層で実体定義
+     #endif
+     ```
+
+4. **プライベートビルドシステムと CMake インクルードパスの絶対パス化原則**:
+   - `CMakeLists.txt`（`sys/flutter/android/app/src/main/cpp/CMakeLists.txt` 等）から共有設定（`nethack_core.cmake`）をインクルードする際は、相対パス（`../../../../cmake/...`）の階層計算ミスによるビルド破損を防止するため、確定済みのプロジェクトルート変数 `${NHSROOT}` を使用した絶対パス指定（`include("${NHSROOT}/sys/flutter/cmake/nethack_core.cmake")`）を徹底してください。

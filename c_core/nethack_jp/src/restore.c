@@ -541,7 +541,7 @@ ghostfruit(struct obj *otmp)
 }
 #endif /* !SFCTOOL */
 
-#ifdef ANDROID
+#if defined(ANDROID) || defined(FLUTTER_PORT)
 #define SYSOPT_CHECK_SAVE_UID FALSE
 #else
 #ifdef SYSCF

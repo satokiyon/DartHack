@@ -3,9 +3,13 @@
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1990, 1991, 1992, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifdef ANDROID
+#if defined(ANDROID) || defined(FLUTTER_PORT)
 #ifndef ANDROIDCONF_H
 #define ANDROIDCONF_H
+
+#ifdef FLUTTER_WIN32
+#include "flutter_compat.h"
+#endif
 
 /* NetHack 5.0 では error は Fatal エラー処理関数(noreturn)として extern.h で定義されているため、
    debuglog への置換マクロを廃止し -Winvalid-noreturn 警告を防止する */
@@ -33,11 +37,14 @@
 
 #define CONFIG_FILE "defaults.nh"
 
-//#undef MAIL
+#ifdef FLUTTER_WIN32
+#undef MAIL
+#endif
 //#undef DEF_PAGER
 #undef DEF_MAILREADER
 
 #define ASCIIGRAPH
+#define TEXT_TOMBSTONE
 
 #define NO_SIGNAL
 
@@ -49,5 +56,11 @@
 
 #undef CRASHREPORT
 
+#if defined(FLUTTER_WIN32) || defined(FLUTTER_PORT)
+# ifdef WIN32
+#  undef WIN32
+# endif
+#endif
+
 # endif /* ANDROIDCONF_H */
-#endif /* ANDROID */
+#endif /* ANDROID or FLUTTER_PORT */
