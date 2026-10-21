@@ -403,9 +403,32 @@ class SoundManager {
     _pendingFloorBgm = null;
   }
 
-  /// サウンドファイルがアセットに存在するか確認
+  /// テスト用プラットフォームオーバーライド
+  @visibleForTesting
+  static bool? debugOverrideIsWindows;
+
+  /// Windows 等で .ogg が再生不能な環境向けに、同名の .mp3 があれば優先解決するヘルパー
+  @visibleForTesting
+  String resolveSoundPath(String filename) {
+    final isWin = debugOverrideIsWindows ?? (!kIsWeb && Platform.isWindows);
+    if (isWin && filename.endsWith('.ogg')) {
+      final mp3Name = '${filename.substring(0, filename.length - 4)}.mp3';
+      if (_availableSounds.contains(mp3Name)) {
+        return mp3Name;
+      }
+    }
+    return filename;
+  }
+
+  /// サウンドファイルがアセットに存在するか確認（Windows環境の .mp3 も透過的に検知）
   bool hasSound(String filename) {
-    return _availableSounds.contains(filename);
+    if (_availableSounds.contains(filename)) return true;
+    final isWin = debugOverrideIsWindows ?? (!kIsWeb && Platform.isWindows);
+    if (isWin && filename.endsWith('.ogg')) {
+      final mp3Name = '${filename.substring(0, filename.length - 4)}.mp3';
+      return _availableSounds.contains(mp3Name);
+    }
+    return false;
   }
 
   /// Cコアからのサウンドイベントをディスパッチ
@@ -560,7 +583,7 @@ class SoundManager {
     debugPrint('[SoundMgr] Play SE: $filename (vol: $cVolume, finalVol: $finalVolume)');
     try {
       await targetEntry.player.setVolume(finalVolume);
-      await targetEntry.player.play(AssetSource('sounds/$filename'));
+      await targetEntry.player.play(AssetSource('sounds/${resolveSoundPath(filename)}'));
     } catch (e, st) {
       debugPrint('[SoundMgr] ERROR playing sound \'$filename\': $e\n$st');
       targetEntry.isPlaying = false;
@@ -642,7 +665,7 @@ class SoundManager {
     try {
       await player.setReleaseMode(ReleaseMode.loop);
       await player.setVolume((_muted || !_bgmEnabled) ? 0.0 : targetVolume);
-      await player.play(AssetSource('sounds/$filename'));
+      await player.play(AssetSource('sounds/${resolveSoundPath(filename)}'));
     } catch (e, st) {
       debugPrint('[SoundMgr] Error direct playing floor BGM \'$filename\': $e\n$st');
     }
@@ -662,7 +685,7 @@ class SoundManager {
         await newPlayer.stop();
         await newPlayer.setReleaseMode(ReleaseMode.loop);
         await newPlayer.setVolume(0.0);
-        await newPlayer.play(AssetSource('sounds/$newFilename'));
+        await newPlayer.play(AssetSource('sounds/${resolveSoundPath(newFilename)}'));
       }
 
       _currentFloorBgm = newFilename;
@@ -782,7 +805,7 @@ class SoundManager {
           _currentRoomBgm = filename;
           await _roomBgmPlayer?.setReleaseMode(ReleaseMode.loop);
           await _roomBgmPlayer?.setVolume(0.0);
-          await _roomBgmPlayer?.play(AssetSource('sounds/$filename'));
+          await _roomBgmPlayer?.play(AssetSource('sounds/${resolveSoundPath(filename)}'));
           unawaited(_fadeIn(_roomBgmPlayer, _bgmVolume, isRoomPlayer: true));
         } catch (e, st) {
           debugPrint('[SoundMgr] ERROR playing room BGM \'$filename\': $e\n$st');
@@ -801,7 +824,7 @@ class SoundManager {
               if (player != null) {
                 await player.setReleaseMode(ReleaseMode.loop);
                 await player.setVolume(0.0);
-                await player.play(AssetSource('sounds/$_currentFloorBgm'));
+                await player.play(AssetSource('sounds/${resolveSoundPath(_currentFloorBgm!)}'));
                 unawaited(_fadeIn(player, _bgmVolume, isRoomPlayer: false));
               }
             }
@@ -878,7 +901,7 @@ class SoundManager {
       if (_previewPlayer != null) {
         await _previewPlayer!.setReleaseMode(ReleaseMode.loop);
         await _previewPlayer!.setVolume((_muted || !_bgmEnabled) ? 0.0 : _bgmVolume);
-        await _previewPlayer!.play(AssetSource('sounds/$filename'));
+        await _previewPlayer!.play(AssetSource('sounds/${resolveSoundPath(filename)}'));
       }
     } catch (e, st) {
       debugPrint('[SoundMgr] Error starting preview BGM \'$filename\': $e\n$st');
@@ -903,7 +926,7 @@ class SoundManager {
             _currentRoomBgm = _savedRoomBgmBeforePreview;
             await player.setReleaseMode(ReleaseMode.loop);
             await player.setVolume(_bgmVolume);
-            await player.play(AssetSource('sounds/$_savedRoomBgmBeforePreview'));
+            await player.play(AssetSource('sounds/${resolveSoundPath(_savedRoomBgmBeforePreview!)}'));
           }
         } else if (_floorWasPlayingBeforePreview &&
             _savedFloorBgmBeforePreview != null &&
@@ -965,7 +988,7 @@ class SoundManager {
       _lastAmbience = filename;
       await _ambiencePlayer?.setVolume(finalVolume);
       await _ambiencePlayer?.setReleaseMode(ReleaseMode.loop);
-      await _ambiencePlayer?.play(AssetSource('sounds/$filename'));
+      await _ambiencePlayer?.play(AssetSource('sounds/${resolveSoundPath(filename)}'));
     } catch (e, st) {
       debugPrint('[SoundMgr] Error playing ambience \'$filename\': $e\n$st');
     }
@@ -1200,7 +1223,7 @@ class SoundManager {
           if (player != null) {
             await player.setReleaseMode(ReleaseMode.loop);
             await player.setVolume(_bgmVolume);
-            await player.play(AssetSource('sounds/$_currentPreviewBgm'));
+            await player.play(AssetSource('sounds/${resolveSoundPath(_currentPreviewBgm!)}'));
           }
         } else if (_currentPreviewBgm == null) {
           // プレビュー試聴中でない通常時のみ本編BGMを復帰
@@ -1211,7 +1234,7 @@ class SoundManager {
             if (player != null) {
               await player.setReleaseMode(ReleaseMode.loop);
               await player.setVolume(_bgmVolume);
-              await player.play(AssetSource('sounds/$_currentRoomBgm'));
+              await player.play(AssetSource('sounds/${resolveSoundPath(_currentRoomBgm!)}'));
             }
           } else if (_floorWasPlayingBeforeBackground &&
               _currentFloorBgm != null &&
@@ -1229,7 +1252,7 @@ class SoundManager {
           if (player != null) {
             await player.setReleaseMode(ReleaseMode.loop);
             await player.setVolume(_ambienceVolume);
-            await player.play(AssetSource('sounds/$_currentAmbience'));
+            await player.play(AssetSource('sounds/${resolveSoundPath(_currentAmbience!)}'));
           }
         }
       }

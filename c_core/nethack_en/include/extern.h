@@ -2412,7 +2412,7 @@ extern const char *get_portable_device(void);
 #endif
 
 /* ### pcsys.c, windsys.c ### */
-#if defined(MICRO) || defined(WIN32)
+#if defined(MICRO) || defined(WIN32) || defined(FLUTTER_PORT)
 ATTRNORETURN extern void nethack_exit(int) NORETURN;
 #else
 #define nethack_exit exit

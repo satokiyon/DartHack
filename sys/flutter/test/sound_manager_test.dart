@@ -1014,6 +1014,31 @@ void main() {
       await manager.stopPreviewBgm(restorePrevious: true);
       expect(manager.currentFloorBgm, 'amb_dungeon.ogg');
     });
+
+    test('Windows platform transparent MP3 resolution test', () {
+      final manager = SoundManager.instance;
+
+      try {
+        // 非Windowsモード (Android等)
+        SoundManager.debugOverrideIsWindows = false;
+        expect(manager.resolveSoundPath('amb_dungeon.ogg'), 'amb_dungeon.ogg');
+
+        // Windowsモード
+        SoundManager.debugOverrideIsWindows = true;
+        // アセット内に amb_dungeon.mp3 が存在する場合、.mp3 に解決されること
+        final resolved = manager.resolveSoundPath('amb_dungeon.ogg');
+        if (manager.hasSound('amb_dungeon.mp3')) {
+          expect(resolved, 'amb_dungeon.mp3');
+          expect(manager.hasSound('amb_dungeon.ogg'), isTrue);
+        }
+
+        // 存在しない架空のファイルは .ogg のままで hasSound も false
+        expect(manager.resolveSoundPath('non_existent_sound_12345.ogg'), 'non_existent_sound_12345.ogg');
+        expect(manager.hasSound('non_existent_sound_12345.ogg'), isFalse);
+      } finally {
+        SoundManager.debugOverrideIsWindows = null;
+      }
+    });
   });
 }
 
