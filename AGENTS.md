@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -1350,3 +1350,18 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
 
 4. **プライベートビルドシステムと CMake インクルードパスの絶対パス化原則**:
    - `CMakeLists.txt`（`sys/flutter/android/app/src/main/cpp/CMakeLists.txt` 等）から共有設定（`nethack_core.cmake`）をインクルードする際は、相対パス（`../../../../cmake/...`）の階層計算ミスによるビルド破損を防止するため、確定済みのプロジェクトルート変数 `${NHSROOT}` を使用した絶対パス指定（`include("${NHSROOT}/sys/flutter/cmake/nethack_core.cmake")`）を徹底してください。
+
+## 51. Flutter スポイラー・ガイド Markdown (`companion.md`) のパラグラフ単位改行とアセット同期原則
+
+1. **モバイル可変画面幅を考慮したパラグラフ単位改行原則（ハードラップの排除）**:
+   - `sys/flutter/books/` 配下の Markdown（`companion.md`, `companion.jp.md` 等）は、モバイル端末等の多様な画面幅で自然に折り返されるよう、70〜80文字ごとのハードラップ（固定文字数での強制改行）を行わず、「パラグラフ単位（1段落1行）」で改行・管理してください。
+   - 引用ブロック（`>`）や箇条書き・番号付きリスト項目（`1. `, `- `）も項目ごとに1行に連結し、不自然な行送りや行途切れを防止してください。
+   - 通常テキスト行の中に数字＋ピリオド（例: `past Dlvl 20.`）が含まれている場合、直前の文末ピリオドの有無等を確認し、誤って番号付きリストとして分割しないよう注意してください。
+
+2. **コードブロック（アスキーアート）およびテーブルのレイアウト完全保護原則**:
+   - コードブロック（```` ... ````）に含まれるアスキーアート、ダンジョンマップ、等幅テキストは、改行・インデント・空白を1文字も変更せず 100% 完全保護してください。
+   - テーブル（`| ... |`）についても改行位置を維持し、セル内改行等で複数行に分割された行がある場合は、1行の完全なテーブル行（`| col1 | col2 |`）として結合・保護し、Flutter のテーブルパーサー（`_buildTableWidget`）で崩れず正しく描画されるよう設計してください。
+
+3. **原本（`books/`）とアセット（`assets/`）の二重管理とバージョンインクリメント原則**:
+   - `sys/flutter/books/` 配下の原本を更新した際は、必ずアプリ実行時に参照される `sys/flutter/assets/nethackdir/` 配下のアセットファイル（`companion.md`, `companion.jp.md` 等）にも内容を完全同期させてください。
+   - アセット同期後は、必ず `sys/flutter/assets/ver` 内のバージョン値（整数値）をインクリメントし、端末側での上書きインストール時にキャッシュ無効化・強制再配置を保証してください。
