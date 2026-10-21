@@ -16,6 +16,7 @@ class MenuOverlay extends StatefulWidget {
   final String initialSearchQuery;
   final Function(int ident) onSingleSelect;
   final Function(Map<int, int> selectedCounts) onMultiSelect;
+  final Function(Map<int, int> selectedCounts)? onSelectionChanged;
   final Function(MenuItemData item) onItemLongPress;
   final double bottomInset;
   final bool useTiles;
@@ -32,6 +33,7 @@ class MenuOverlay extends StatefulWidget {
     required this.initialSearchQuery,
     required this.onSingleSelect,
     required this.onMultiSelect,
+    this.onSelectionChanged,
     required this.onItemLongPress,
     required this.bottomInset,
     required this.useTiles,
@@ -147,21 +149,99 @@ class MenuOverlayState extends State<MenuOverlay> {
     return DialogHeaderHelper.isDialogTitleHeader(item.text);
   }
 
+  /// query_category 画面における純粋なアイテムカテゴリ (武器、防具、巻物、薬など) かどうかを判定
+  /// Cコアのアイテムクラス定数 (1: ILLOBJ_CLASS ～ 17: VENOM_CLASS) に合致し、
+  /// 65以上のASCII文字コード (A: 自動選択, B: 祝福, C: 呪い, P: 直前取得, U: 未呪い, X: 状態不明, u: 未払い 等) を除外
+  bool _isPureItemCategoryItem(MenuItemData item) {
+    if (item.ident <= 0 || item.ident == 4294967294 || _isMenuCategoryItem(item)) {
+      return false;
+    }
+    if (item.ident >= 65) {
+      return false;
+    }
+    return true;
+  }
+
   void _toggleSelection(int ident) {
     if (ident == 0 || ident == 4294967294) return;
     setState(() {
-      if (_selectedCounts.containsKey(ident)) {
-        _selectedCounts.remove(ident);
+      final isAllTypesItem = ident == -2;
+      final hasAllTypesInMenu = widget.menuItems.any((i) => i.ident == -2);
+
+      if (isAllTypesItem) {
+        final isCurrentlySelected = _selectedCounts.containsKey(-2);
+        if (!isCurrentlySelected) {
+          // 「a - 全種類」が選択されたら、純粋なアイテムカテゴリのみすべてにチェックを入れる
+          _selectedCounts[-2] = 1;
+          for (final item in widget.menuItems) {
+            if (_isPureItemCategoryItem(item)) {
+              _selectedCounts[item.ident] = _parseMaxCount(item.text);
+            }
+          }
+        } else {
+          // 「a - 全種類」が解除されたら、純粋なカテゴリのみ解除（メタ項目のチェック状態は保持）
+          _selectedCounts.remove(-2);
+          for (final item in widget.menuItems) {
+            if (_isPureItemCategoryItem(item)) {
+              _selectedCounts.remove(item.ident);
+            }
+          }
+        }
       } else {
-        try {
-          final item = widget.menuItems.firstWhere((i) => i.ident == ident);
-          final maxCount = _parseMaxCount(item.text);
-          _selectedCounts[ident] = maxCount;
-        } catch (_) {
-          _selectedCounts[ident] = 1;
+        if (_selectedCounts.containsKey(ident)) {
+          _selectedCounts.remove(ident);
+        } else {
+          try {
+            final item = widget.menuItems.firstWhere((i) => i.ident == ident);
+            final maxCount = _parseMaxCount(item.text);
+            _selectedCounts[ident] = maxCount;
+          } catch (_) {
+            _selectedCounts[ident] = 1;
+          }
+        }
+
+        // 個別カテゴリの選択状態に応じて「a - 全種類」(-2) のチェックを連動
+        if (hasAllTypesInMenu) {
+          final pureCategoryItems = widget.menuItems
+              .where((i) => _isPureItemCategoryItem(i))
+              .toList();
+          if (pureCategoryItems.isNotEmpty) {
+            final allCategorySelected = pureCategoryItems
+                .every((i) => _selectedCounts.containsKey(i.ident));
+            if (allCategorySelected) {
+              _selectedCounts[-2] = 1;
+            } else {
+              _selectedCounts.remove(-2);
+            }
+          }
         }
       }
+      widget.onSelectionChanged?.call(_selectedCounts);
     });
+  }
+
+  /// 複数選択メニューの確定送信処理
+  void submit() {
+    final cleanCounts = <int, int>{};
+    _selectedCounts.forEach((ident, count) {
+      if (ident != 0 && ident != 4294967294) {
+        cleanCounts[ident] = count;
+      }
+    });
+
+    // query_category メニュー（ident == -2 が存在）において、
+    // 'A' (ident == 65) のみが選択され、他のカテゴリが1つも選択されていない場合、
+    // Cコアで「関連するアイテムが選択されなかった」とリジェクトされるのを防ぐため、
+    // 自動的に 'a' (全種類: -2) も補完して送信する。
+    final hasAllTypesItem = widget.menuItems.any((i) => i.ident == -2);
+    if (hasAllTypesItem && cleanCounts.containsKey(65)) {
+      final hasOtherSelection = cleanCounts.keys.any((id) => id != 65);
+      if (!hasOtherSelection) {
+        cleanCounts[-2] = 1;
+      }
+    }
+
+    widget.onMultiSelect(cleanCounts);
   }
 
   /// 拡張コマンド検索時の Enter 決定処理（優先度: 完全一致 > 前方一致 > 部分一致 > 説明文一致）
@@ -503,7 +583,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                           itemCount: filteredItems.length,
                           itemBuilder: (context, index) {
                             final item = filteredItems[index];
-                            final isSelectable = item.ident != 0 && item.ident != 4294967294 && !_isMenuCategoryItem(item);
+                            final isSelectable = widget.menuHow > 0 && item.ident != 0 && item.ident != 4294967294 && !_isMenuCategoryItem(item);
                             final isCategory = _isMenuCategoryItem(item);
                             final isDivider = !isSelectable && _isMenuDividerText(item.text);
                             final isPlain = !isSelectable && !isCategory && !isDivider;
@@ -828,13 +908,25 @@ class MenuOverlayState extends State<MenuOverlay> {
                         ElevatedButton(
                           onPressed: () {
                             setState(() {
-                              _selectedCounts = <int, int>{};
-                              for (final item in filteredItems) {
-                                if (item.ident != 0 && item.ident != 4294967294 && !_isMenuCategoryItem(item)) {
-                                  _selectedCounts[item.ident] = _parseMaxCount(item.text);
+                              final hasAllTypesInMenu = filteredItems.any((i) => i.ident == -2);
+                              if (hasAllTypesInMenu) {
+                                // query_category 画面では、メタ項目(A, B, C等)を除外して純粋カテゴリと -2 のみ選択
+                                _selectedCounts[-2] = 1;
+                                for (final item in filteredItems) {
+                                  if (_isPureItemCategoryItem(item)) {
+                                    _selectedCounts[item.ident] = _parseMaxCount(item.text);
+                                  }
+                                }
+                              } else {
+                                _selectedCounts = <int, int>{};
+                                for (final item in filteredItems) {
+                                  if (item.ident != 0 && item.ident != 4294967294 && !_isMenuCategoryItem(item)) {
+                                    _selectedCounts[item.ident] = _parseMaxCount(item.text);
+                                  }
                                 }
                               }
                             });
+                            widget.onSelectionChanged?.call(_selectedCounts);
                           },
                           child: Text(AppLocalizations.of(context)!.selectAll),
                         ),
@@ -843,19 +935,12 @@ class MenuOverlayState extends State<MenuOverlay> {
                             setState(() {
                               _selectedCounts.clear();
                             });
+                            widget.onSelectionChanged?.call(_selectedCounts);
                           },
                           child: Text(AppLocalizations.of(context)!.deselectAll),
                         ),
                         ElevatedButton(
-                          onPressed: () {
-                            final cleanCounts = <int, int>{};
-                            _selectedCounts.forEach((ident, count) {
-                              if (ident != 0 && ident != 4294967294) {
-                                cleanCounts[ident] = count;
-                              }
-                            });
-                            widget.onMultiSelect(cleanCounts);
-                          },
+                          onPressed: submit,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF004D40), // 深いダークティール (決定ボタンとして際立たせる)
                           ),

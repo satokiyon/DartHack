@@ -3877,6 +3877,7 @@ extern char *encglyph(int);
 extern int decode_glyph(const char *str, int *glyph_ptr) NONNULLPTRS;
 extern char *decode_mixed(char *, const char *) NONNULLARG1;
 extern void genl_putmixed(winid, int, const char *) NONNULLARG3;
+extern void flutter_putmixed_with_tile(winid, int, int, const char *);
 extern void genl_display_file(const char *, boolean) NONNULLARG1;
 extern boolean menuitem_invert_test(int, unsigned, boolean);
 extern const char *mixed_to_glyphinfo(const char *str,

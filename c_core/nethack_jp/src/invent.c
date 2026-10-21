@@ -4502,20 +4502,25 @@ look_here(
                   : (picked_some ? "ここにある他のもの:" : "ここにあるもの:"));
         putstr(tmpwin, 0, buf);
         for (; otmp; otmp = otmp->nexthere) {
+            /* NetHackJP: putmixed with tile for look here items */
+            int tmpglyph = obj_to_glyph(otmp, rn2_on_display_rng);
+            glyph_info tmpglyphinfo;
+            map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
+
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
                 felt_cockatrice = TRUE;
                 Sprintf(buf, "  %s...",
                         drop_english_article(
                             (puzzling_count) ? doname_with_cgender(otmp)
                                              : doname(otmp)));
-                putstr(tmpwin, 0, buf);
+                flutter_putmixed_with_tile(tmpwin, 0, tmpglyphinfo.gm.tileidx, buf);
                 break;
             }
             Sprintf(buf, "  %s",
                     drop_english_article(
                         (puzzling_count) ? doname_with_price_and_cgender(otmp)
                                          : doname_with_price(otmp)));
-            putstr(tmpwin, 0, buf);
+            flutter_putmixed_with_tile(tmpwin, 0, tmpglyphinfo.gm.tileidx, buf);
         }
         display_nhwindow(tmpwin, TRUE);
         destroy_nhwindow(tmpwin);

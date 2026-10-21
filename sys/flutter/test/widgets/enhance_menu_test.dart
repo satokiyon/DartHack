@@ -18,6 +18,7 @@ void main() {
 
       // 日本語のプロンプトで endMenu を呼び出し
       screen.endMenu(1, '習熟させるスキルを選んでください:');
+      screen.selectMenu(1, 1 /* PICK_ONE */);
 
       // 1つ目のスキルアップ可能項目に 'a' (0x61) が割り当てられていること
       expect(screen.menuItems[0].accelerator, equals(0x61)); // 'a'
@@ -46,6 +47,7 @@ void main() {
 
       // 英語のプロンプトで endMenu を呼び出し
       screen.endMenu(1, 'Pick a skill to advance:');
+      screen.selectMenu(1, 1 /* PICK_ONE */);
 
       // 1つ目のスキルアップ可能項目に 'a' (0x61) が割り当てられていること
       expect(screen.menuItems[0].accelerator, equals(0x61)); // 'a'

@@ -1642,6 +1642,11 @@ container_contents(
                     sortedcobj = sortloot(&box->cobj, sortflags, FALSE,
                                           (boolean (*)(OBJ_P)) 0);
                     for (srtc = sortedcobj; (obj = srtc->obj) != 0; ++srtc) {
+                        /* NetHackJP: putmixed with tile for container contents */
+                        int tmpglyph = obj_to_glyph(obj, rn2_on_display_rng);
+                        glyph_info tmpglyphinfo;
+                        map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
+
                         if (identified) {
                             discover_object(obj->otyp, TRUE, TRUE, FALSE);
                             obj->dknown = 1; /* observe_object unnecessary */
@@ -1650,12 +1655,24 @@ container_contents(
                                 obj->cknown = obj->lknown = 1;
                         }
                         Strcpy(&buf[2], doname_with_price(obj));
-                        putstr(tmpwin, 0, buf);
+                        if (dumping) {
+                            putstr(tmpwin, 0, buf);
+                        } else {
+                            flutter_putmixed_with_tile(tmpwin, 0, tmpglyphinfo.gm.tileidx, buf);
+                        }
                     }
                     unsortloot(&sortedcobj);
                 } else if (cat) {
+                    /* NetHackJP: putmixed with tile for Schroedinger's Cat */
+                    int tmpglyph = monnum_to_glyph(PM_HOUSECAT, 0);
+                    glyph_info tmpglyphinfo;
+                    map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
                     Strcpy(&buf[2], "Schroedinger's cat!");
-                    putstr(tmpwin, 0, buf);
+                    if (dumping) {
+                        putstr(tmpwin, 0, buf);
+                    } else {
+                        flutter_putmixed_with_tile(tmpwin, 0, tmpglyphinfo.gm.tileidx, buf);
+                    }
                 }
                 if (dumping)
                     putstr(0, 0, "");

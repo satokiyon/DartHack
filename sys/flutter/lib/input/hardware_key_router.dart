@@ -354,7 +354,7 @@ class HardwareKeyRouter {
 
     // 5. 通常メニュー表示中（インベントリ、ドロップなど）
     if (context == KeyInputContext.menu) {
-      return _routeMenu(event);
+      return _routeMenu(event, isShiftPressed: isShiftPressed);
     }
 
     // 6. ゲーム本編
@@ -430,16 +430,39 @@ class HardwareKeyRouter {
     return const SwallowKey();
   }
 
+  static String? _charFromLogicalKey(LogicalKeyboardKey key, bool isShiftPressed) {
+    if (key == LogicalKeyboardKey.keyA) return isShiftPressed ? 'A' : 'a';
+    if (key == LogicalKeyboardKey.keyB) return isShiftPressed ? 'B' : 'b';
+    if (key == LogicalKeyboardKey.keyC) return isShiftPressed ? 'C' : 'c';
+    if (key == LogicalKeyboardKey.keyD) return isShiftPressed ? 'D' : 'd';
+    if (key == LogicalKeyboardKey.keyE) return isShiftPressed ? 'E' : 'e';
+    if (key == LogicalKeyboardKey.keyF) return isShiftPressed ? 'F' : 'f';
+    if (key == LogicalKeyboardKey.keyG) return isShiftPressed ? 'G' : 'g';
+    if (key == LogicalKeyboardKey.keyH) return isShiftPressed ? 'H' : 'h';
+    if (key == LogicalKeyboardKey.keyI) return isShiftPressed ? 'I' : 'i';
+    if (key == LogicalKeyboardKey.keyJ) return isShiftPressed ? 'J' : 'j';
+    if (key == LogicalKeyboardKey.keyK) return isShiftPressed ? 'K' : 'k';
+    if (key == LogicalKeyboardKey.keyL) return isShiftPressed ? 'L' : 'l';
+    if (key == LogicalKeyboardKey.keyM) return isShiftPressed ? 'M' : 'm';
+    if (key == LogicalKeyboardKey.keyN) return isShiftPressed ? 'N' : 'n';
+    if (key == LogicalKeyboardKey.keyO) return isShiftPressed ? 'O' : 'o';
+    if (key == LogicalKeyboardKey.keyP) return isShiftPressed ? 'P' : 'p';
+    if (key == LogicalKeyboardKey.keyQ) return isShiftPressed ? 'Q' : 'q';
+    if (key == LogicalKeyboardKey.keyR) return isShiftPressed ? 'R' : 'r';
+    if (key == LogicalKeyboardKey.keyS) return isShiftPressed ? 'S' : 's';
+    if (key == LogicalKeyboardKey.keyT) return isShiftPressed ? 'T' : 't';
+    if (key == LogicalKeyboardKey.keyU) return isShiftPressed ? 'U' : 'u';
+    if (key == LogicalKeyboardKey.keyV) return isShiftPressed ? 'V' : 'v';
+    if (key == LogicalKeyboardKey.keyW) return isShiftPressed ? 'W' : 'w';
+    if (key == LogicalKeyboardKey.keyX) return isShiftPressed ? 'X' : 'x';
+    if (key == LogicalKeyboardKey.keyY) return isShiftPressed ? 'Y' : 'y';
+    if (key == LogicalKeyboardKey.keyZ) return isShiftPressed ? 'Z' : 'z';
+    return null;
+  }
+
   /// 通常メニューのキー判定
-  static KeyAction _routeMenu(KeyEvent event) {
-    if (event.logicalKey == LogicalKeyboardKey.escape) {
-      return const MenuCancel();
-    }
-    if (event.logicalKey == LogicalKeyboardKey.enter ||
-        event.logicalKey == LogicalKeyboardKey.numpadEnter) {
-      return const MenuSubmit();
-    }
-    // Space はメニュー画面では「下スクロール」
+  static KeyAction _routeMenu(KeyEvent event, {required bool isShiftPressed}) {
+    // スクロール操作（Space, 矢印上下, PageUp/Down）は長押し連続スクロール（KeyRepeatEvent）を許可
     if (event.logicalKey == LogicalKeyboardKey.space) {
       return const MenuScroll(1);
     }
@@ -456,6 +479,19 @@ class HardwareKeyRouter {
       return const MenuPage(-1);
     }
 
+    // スクロール以外の決定・キャンセル・アクセラレータ選択は、長押しトグル誤爆防止のため KeyDownEvent のみ処理
+    if (event is! KeyDownEvent) {
+      return const SwallowKey();
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      return const MenuCancel();
+    }
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+      return const MenuSubmit();
+    }
+
     // テンキーや左右矢印キーはアクセラレータ誤選択を防ぐため抑止
     if (event.logicalKey == LogicalKeyboardKey.arrowLeft ||
         event.logicalKey == LogicalKeyboardKey.arrowRight ||
@@ -466,6 +502,12 @@ class HardwareKeyRouter {
     String? char = event.character;
     if (char != null && char.isNotEmpty) {
       char = normalizeCharacter(char);
+    } else {
+      // IME 有効時など event.character が空の場合のフォールバック
+      char = _charFromLogicalKey(event.logicalKey, isShiftPressed);
+    }
+
+    if (char != null && char.isNotEmpty) {
       if (char == '>') return const MenuPage(1);
       if (char == '<') return const MenuPage(-1);
       // アクセラレータは大文字小文字を厳密に区別して渡す

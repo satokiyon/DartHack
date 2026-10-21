@@ -302,6 +302,53 @@ void main() {
         HardwareKeyRouter.route(event: bigAEvent, context: KeyInputContext.menu),
         equals(const MenuAccelerator(65)),
       );
+
+      // IME有効時などで character が空の場合の logicalKey フォールバック ('a' / 'A')
+      final nullCharAEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.keyA,
+        logicalKey: LogicalKeyboardKey.keyA,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: nullCharAEvent, context: KeyInputContext.menu),
+        equals(const MenuAccelerator(97)), // 'a'
+      );
+      expect(
+        HardwareKeyRouter.route(event: nullCharAEvent, context: KeyInputContext.menu, isShiftPressed: true),
+        equals(const MenuAccelerator(65)), // 'A'
+      );
+
+      // KeyRepeatEvent: スクロールキーは許可、アクセラレータや決定は SwallowKey
+      final repeatScrollEvent = const KeyRepeatEvent(
+        physicalKey: PhysicalKeyboardKey.arrowDown,
+        logicalKey: LogicalKeyboardKey.arrowDown,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: repeatScrollEvent, context: KeyInputContext.menu),
+        equals(const MenuScroll(1)),
+      );
+
+      final repeatAccelEvent = const KeyRepeatEvent(
+        physicalKey: PhysicalKeyboardKey.keyA,
+        logicalKey: LogicalKeyboardKey.keyA,
+        character: 'a',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: repeatAccelEvent, context: KeyInputContext.menu),
+        equals(const SwallowKey()),
+      );
+
+      final repeatEnterEvent = const KeyRepeatEvent(
+        physicalKey: PhysicalKeyboardKey.enter,
+        logicalKey: LogicalKeyboardKey.enter,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: repeatEnterEvent, context: KeyInputContext.menu),
+        equals(const SwallowKey()),
+      );
     });
 
     test('Text window should handle Space (TextSpaceAction), Shift+Space, PageUp/Down, arrows, and dismiss', () {

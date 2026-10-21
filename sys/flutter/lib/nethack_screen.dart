@@ -454,22 +454,6 @@ class NetHackScreen extends ChangeNotifier {
 
   void endMenu(int winId, String prompt) {
     _menuPrompt = prompt;
-    final isEnhanceMenu = prompt.contains("スキル") || prompt.toLowerCase().contains("skill");
-    if (isEnhanceMenu) {
-      int nextAccelCode = 0x61; // 'a'
-      for (int i = 0; i < _menuItems.length; i++) {
-        final item = _menuItems[i];
-        if (item.ident != 0 && item.ident != 4294967294 && item.accelerator == 0) {
-          if (nextAccelCode <= 0x7A) {
-            _menuItems[i] = item.copyWith(accelerator: nextAccelCode);
-            nextAccelCode++;
-          } else if (nextAccelCode <= 0x7A + 26) {
-            _menuItems[i] = item.copyWith(accelerator: 0x41 + (nextAccelCode - 0x7B));
-            nextAccelCode++;
-          }
-        }
-      }
-    }
     notifyListeners();
   }
 
@@ -477,6 +461,41 @@ class NetHackScreen extends ChangeNotifier {
     _isMenuWindowVisible = true;
     _menuHow = how;
     _activeMenuWinId = winId;
+
+    final isExtCmd = _menuPrompt.contains('拡張コマンド') ||
+        _menuPrompt.toLowerCase().contains('extended') ||
+        _menuPrompt.trimLeft().startsWith('#');
+
+    // PICK_ONE (1) または PICK_ANY (2) の選択メニューでは、
+    // アクセラレータ未指定 (0) の選択可能項目に 'a'..'z', 'A'..'Z' を自動採番する。
+    // PICK_NONE (0: 閲覧専用メニュー) では採番しない。
+    if (how > 0 && !isExtCmd) {
+      final usedAccels = <int>{};
+      for (final item in _menuItems) {
+        if (item.accelerator != 0) {
+          usedAccels.add(item.accelerator);
+        }
+      }
+
+      const accelPool = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      int poolIdx = 0;
+      for (int i = 0; i < _menuItems.length; i++) {
+        final item = _menuItems[i];
+        if (item.ident != 0 && item.ident != 4294967294 && item.accelerator == 0) {
+          while (poolIdx < accelPool.length &&
+              usedAccels.contains(accelPool.codeUnitAt(poolIdx))) {
+            poolIdx++;
+          }
+          if (poolIdx < accelPool.length) {
+            final code = accelPool.codeUnitAt(poolIdx);
+            _menuItems[i] = item.copyWith(accelerator: code);
+            usedAccels.add(code);
+            poolIdx++;
+          }
+        }
+      }
+    }
+
     notifyListeners();
   }
 

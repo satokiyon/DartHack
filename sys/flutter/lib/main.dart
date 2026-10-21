@@ -298,7 +298,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     if (_screen.isMenuWindowVisible && isExtCmdMenuPrompt(_screen.menuPrompt)) return;
     // 最前面のルートでない場合（設定画面などの別画面表示中）は奪わない
     if (mounted && (ModalRoute.of(context)?.isCurrent ?? true)) {
-      if (!_focusNode.hasFocus) {
+      if (!_focusNode.hasPrimaryFocus) {
         _focusNode.requestFocus();
       }
     }
@@ -892,6 +892,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
       case MenuAccelerator(:final code):
         if (_screen.isMenuWindowVisible) {
+          if (_screen.menuHow == 0 /* PICK_NONE */) {
+            return KeyEventResult.handled;
+          }
           final item = _screen.menuItems.cast<MenuItemData?>().firstWhere(
                 (i) => i != null && i.accelerator == code && i.ident != 0 && i.ident != 4294967294,
                 orElse: () => null,
@@ -900,7 +903,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             if (_screen.menuHow == 1 /* PICK_ONE */) {
               _sendMenuSelection(item.ident);
             } else {
-              _toggleMenuSelection(item.ident);
               _menuOverlayKey.currentState?.toggleSelectionById(item.ident);
             }
           }
@@ -910,9 +912,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
       case MenuSubmit():
         if (_screen.isMenuWindowVisible) {
-          if (_screen.menuHow != 1 /* PICK_ANY */) {
-            final counts = _menuOverlayKey.currentState?.selectedCounts ?? _menuSelectedCounts;
-            _sendMenuSelections(counts);
+          if (_screen.menuHow == 0 /* PICK_NONE */) {
+            _sendMenuSelection(-1);
+          } else if (_screen.menuHow != 1 /* PICK_ANY */) {
+            if (_menuOverlayKey.currentState != null) {
+              _menuOverlayKey.currentState!.submit();
+            } else {
+              _sendMenuSelections(_menuSelectedCounts);
+            }
           }
           return KeyEventResult.handled;
         }
@@ -1697,6 +1704,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             }
           });
           _triggerCenterOnPlayer();
+          WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
         } else if (type == 'error') {
           _addLog("ERROR: ${message['message']}");
           _stopGame();
@@ -2120,6 +2128,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         return;
       }
 
+      if (_screen.menuHow == 0 /* PICK_NONE */) {
+        if (code == 32 || code == 10 || code == 13 || code == 27) {
+          _sendMenuSelection(-1);
+        }
+        return;
+      }
+
       final isMultiSelectMenu = _screen.menuHow > 1;
       if (isMultiSelectMenu) {
         if (code == 27) {
@@ -2127,24 +2142,29 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           return;
         }
         if (code == 10 || code == 13) {
-          _sendMenuSelections(_menuSelectedCounts);
+          if (_menuOverlayKey.currentState != null) {
+            _menuOverlayKey.currentState!.submit();
+          } else {
+            _sendMenuSelections(_menuSelectedCounts);
+          }
           return;
         }
         for (final item in _screen.menuItems) {
-          if (item.ident != 0 && item.accelerator != 0 && item.accelerator == code) {
-            _toggleMenuSelection(item.ident);
+          if (item.ident != 0 && item.ident != 4294967294 && item.accelerator != 0 && item.accelerator == code) {
+            _menuOverlayKey.currentState?.toggleSelectionById(item.ident);
             return;
           }
         }
         return;
       }
 
-      if (code == 32 || code == 10 || code == 13 || code == 27) {
+      // PICK_ONE
+      if (code == 27) {
         _sendMenuSelection(-1);
         return;
       }
       for (final item in _screen.menuItems) {
-        if (item.accelerator != 0 && item.accelerator == code) {
+        if (item.ident != 0 && item.ident != 4294967294 && item.accelerator != 0 && item.accelerator == code) {
           _sendMenuSelection(item.ident);
           return;
         }
@@ -2178,7 +2198,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   void _sendKeysToC(String command) {
     if (!_waitingForInput) return;
-    if (_screen.isMenuWindowVisible) return;
+    if (_screen.isMenuWindowVisible) {
+      // 仮想キーボードからの入力: 単一文字ならメニューアクセラレータキー判定へ転送
+      if (command.length == 1) {
+        _sendFfiKey(command.codeUnitAt(0), command);
+      }
+      return;
+    }
     if (_screen.isTextWindowVisible) return;
     if (_isYnVisible) return;
     if (_isGetLineVisible) return;
@@ -2426,6 +2452,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       menuHow: _screen.menuHow,
       initialSelectedCounts: _menuSelectedCounts,
       initialSearchQuery: _extCmdMenuFilter,
+      onSelectionChanged: (counts) => setState(() => _menuSelectedCounts = counts),
       onSingleSelect: (ident) => _sendMenuSelection(ident),
       onMultiSelect: (counts) => _sendMenuSelections(counts),
       onItemLongPress: (item) => _onMenuItemLongPress(item),
