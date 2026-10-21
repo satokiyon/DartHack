@@ -1365,3 +1365,27 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
 3. **原本（`books/`）とアセット（`assets/`）の二重管理とバージョンインクリメント原則**:
    - `sys/flutter/books/` 配下の原本を更新した際は、必ずアプリ実行時に参照される `sys/flutter/assets/nethackdir/` 配下のアセットファイル（`companion.md`, `companion.jp.md` 等）にも内容を完全同期させてください。
    - アセット同期後は、必ず `sys/flutter/assets/ver` 内のバージョン値（整数値）をインクリメントし、端末側での上書きインストール時にキャッシュ無効化・強制再配置を保証してください。
+
+## 52. プラットフォーム別音源フォーマット分離とパッケージ最適化原則（Windows: MP3 / Android: OGG）
+
+1. **プラットフォーム別音源フォーマットの選定と二重バンドルの禁止**:
+   - **Windows ポート**: Windows Media Foundation における OGG コーデック不足による無音バグを回避するため、全音源（BGM・SE 263ファイル）を **MP3（`.mp3`）** に統一して同梱する。
+   - **Android ポート**: ファイルサイズの軽量化および OS 標準の安定した再生を確保するため、全音源を **OGG（`.ogg`）** に統一して同梱する。
+   - **二重バンドルの禁止**: 両フォーマットを同時にパッケージに同梱するとアプリ容量が約 150〜200MB 肥大化するため、ビルド対象プラットフォームに不要な音源フォーマットはパッケージから 100% 完全に除外・クレンジングする。
+
+2. **アセット同期スクリプト (`sync_dat_assets.ps1`) のフォーマット指定と自動クレンジング**:
+   - `Sync-AudioAssets` による同期処理に `-AudioFormat <All | OggOnly | Mp3Only>` を設け、同期先作業ツリー（`sys/flutter/assets/sounds/`）内の不要な形式ファイル（`Mp3Only` 時の `.ogg`、`OggOnly` 時の `.mp3`）を自動検知して削除する。
+   - ファイルの追加・更新・削除が発生した場合は `$global:updatedCount++` してアセットバージョン（`assets/ver`）を自動インクリメントし、端末・クライアント側でのキャッシュ無効化・強制再配置を保証する。
+
+3. **ビルドスクリプトにおけるキャッシュクリアと整合性アサーション検証**:
+   - **Android (`android_build.ps1`)**:
+     - ビルド前に Gradle の中間アセットキャッシュ（`build/app/intermediates/merged_assets`, `build/app/intermediates/assets`）をクリアして、前ビルドの不要フォーマット混入を完全に防止する。
+     - ビルド完了後、生成された成果物（APK/AAB）の内部 ZIP エントリをインメモリ走査し、「OGG が 263 個以上、MP3 が 0 個（`mp3Count == 0`）」であることを検証する。
+   - **Windows (`windows_build.ps1`)**:
+     - 出力先パッケージ（`data/flutter_assets/assets/sounds`）において、「MP3 が 263 個以上、OGG が 0 個（`oggCount == 0`）」であることを検証する。
+   - いずれのビルドでも、不要フォーマットが 1 件でも混入している、または必要音源が欠落している場合は即座に `Write-Error` を出してビルドを失敗（`exit 1`）させる。
+
+4. **PowerShell Strict モード安全と変数展開の構文原則**:
+   - **0件配列カウントの安全化**: `Set-StrictMode -Version Latest` が有効な場合、`Get-ChildItem` で一致するファイルが 0 件のときは `$null` が返り、`($null).Count` で例外 `PropertyNotFoundStrict` が発生する。ファイル件数を取得・検査する際は、必ず `@(Get-ChildItem ...).Count` と配列にキャストして評価する。
+   - **記号隣接時の変数展開**: 文字列展開内で変数名の直後にコロン等の記号が続く場合（例: `Write-Host "in ${Target}: ..."`）、PowerShell のドライブ修飾子誤認（`$Target:` ドライブ）を防ぐため、必ず `${Target}` と波括弧で変数を囲む。
+
