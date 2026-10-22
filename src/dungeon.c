@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-21. */
 /* NetHack 5.0	dungeon.c	$NHDT-Date: 1781973047 2026/06/20 16:30:47 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.239 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2101,6 +2101,166 @@ level_difficulty(void)
      || (u.uz.dnum == medusa_level.dnum         \
          && dlev.dnum == valley_level.dnum))
 
+/* ゲーム内階層名（#chronicle / #overview等）および特殊階層の日本語・英語マッピング */
+static const struct {
+    const char *jp_name;
+    const char *en_key;
+} jp_level_map[] = {
+    /* ブランチ */
+    { "ノームの鉱山", "The Gnomish Mines" },
+    { "ノーム鉱山", "The Gnomish Mines" },
+    { "鉱山", "The Gnomish Mines" },
+    { "gnomish mines", "The Gnomish Mines" },
+    { "mines", "The Gnomish Mines" },
+    { "運命の大迷宮", "The Dungeons of Doom" },
+    { "大迷宮", "The Dungeons of Doom" },
+    { "dungeons of doom", "The Dungeons of Doom" },
+    { "倉庫番", "Sokoban" },
+    { "ソコバン", "Sokoban" },
+    { "sokoban", "Sokoban" },
+    { "クエスト", "The Quest" },
+    { "quest", "The Quest" },
+    { "ローディオス砦", "Fort Ludios" },
+    { "フォートローディオス", "Fort Ludios" },
+    { "フォート・ローディオス", "Fort Ludios" },
+    { "フォート・ノックス", "Fort Ludios" },
+    { "フォートノックス", "Fort Ludios" },
+    { "ノックス", "Fort Ludios" },
+    { "fort ludios", "Fort Ludios" },
+    { "ludios", "Fort Ludios" },
+    { "fort knox", "Fort Ludios" },
+    { "knox", "Fort Ludios" },
+    { "ヴラド侯の塔", "Vlad's Tower" },
+    { "ヴラドの塔", "Vlad's Tower" },
+    { "ヴラド塔", "Vlad's Tower" },
+    { "ヴラド", "Vlad's Tower" },
+    { "vlad's tower", "Vlad's Tower" },
+    { "vlad", "Vlad's Tower" },
+    { "ゲヘナ", "gehennom" },
+    { "gehennom", "gehennom" },
+    { "hell", "gehennom" },
+    { "精霊界", "The Elemental Planes" },
+    { "elemental planes", "The Elemental Planes" },
+    { "planes", "The Elemental Planes" },
+    { "チュートリアル", "The Tutorial" },
+    { "チュートリアルダンジョン", "The Tutorial" },
+    { "tutorial", "The Tutorial" },
+
+    /* メインダンジョン・鉱山の特殊階層 */
+    { "神託所", "oracle" },
+    { "デルフィ", "oracle" },
+    { "デルファイ", "oracle" },
+    { "オラクル", "oracle" },
+    { "oracle", "oracle" },
+    { "delphi", "oracle" },
+    { "ビッグルーム", "bigrm" },
+    { "bigroom", "bigrm" },
+    { "bigrm", "bigrm" },
+    { "メデューサの島", "medusa" },
+    { "メデューサ", "medusa" },
+    { "medusa's island", "medusa" },
+    { "medusa", "medusa" },
+    { "ローグ階", "rogue" },
+    { "ローグ", "rogue" },
+    { "rogue level", "rogue" },
+    { "rogue", "rogue" },
+    { "迷宮の城", "castle" },
+    { "城", "castle" },
+    { "castle", "castle" },
+    { "stronghold", "castle" },
+    { "鉱山街", "minetn" },
+    { "鉱山町", "minetn" },
+    { "minetown", "minetn" },
+    { "mine town", "minetn" },
+    { "minetn", "minetn" },
+    { "鉱山の最下層", "minend" },
+    { "鉱山最下層", "minend" },
+    { "mine's end", "minend" },
+    { "minend", "minend" },
+
+    /* ゲヘナ・悪魔の霊廟 */
+    { "死の谷", "valley" },
+    { "valley of the dead", "valley" },
+    { "valley", "valley" },
+    { "モーロックの聖域", "sanctum" },
+    { "聖域", "sanctum" },
+    { "モーロック", "sanctum" },
+    { "moloch's sanctum", "sanctum" },
+    { "sanctum", "sanctum" },
+    { "魔法使いの塔", "wizard1" },
+    { "イェンダーの塔", "wizard1" },
+    { "イェンダー", "wizard1" },
+    { "wizard's tower", "wizard1" },
+    { "wizard", "wizard1" },
+    { "wizard1", "wizard1" },
+    { "偽りの塔", "fakewiz1" },
+    { "偽の塔", "fakewiz1" },
+    { "fakewiz", "fakewiz1" },
+    { "fake tower", "fakewiz1" },
+    { "fakewiz1", "fakewiz1" },
+    { "アスモデウスの霊廟", "asmodeus" },
+    { "アスモデウス", "asmodeus" },
+    { "asmodeus", "asmodeus" },
+    { "ベルゼブブの霊廟", "baalz" },
+    { "ベルゼブブ", "baalz" },
+    { "baalzebub", "baalz" },
+    { "baalz", "baalz" },
+    { "ジョウビレックスの沼", "juiblex" },
+    { "ジョウビレックス", "juiblex" },
+    { "juiblex", "juiblex" },
+    { "オルクスの町", "orcus" },
+    { "オルクス", "orcus" },
+    { "orcus", "orcus" },
+
+    /* 精霊界（エンドゲーム各界層：ウィザードモード直接ジャンプ等） */
+    { "アストラル界", "astral" },
+    { "アストラル", "astral" },
+    { "アストラル界層", "astral" },
+    { "astral plane", "astral" },
+    { "astral", "astral" },
+    { "水の界", "water" },
+    { "水の精霊界", "water" },
+    { "水のエレメンタルプレーン", "water" },
+    { "plane of water", "water" },
+    { "water", "water" },
+    { "火の界", "fire" },
+    { "火の精霊界", "fire" },
+    { "火のエレメンタルプレーン", "fire" },
+    { "plane of fire", "fire" },
+    { "fire", "fire" },
+    { "空の界", "air" },
+    { "風の界", "air" },
+    { "空の精霊界", "air" },
+    { "風の精霊界", "air" },
+    { "風のエレメンタルプレーン", "air" },
+    { "plane of air", "air" },
+    { "air", "air" },
+    { "地の界", "earth" },
+    { "土の界", "earth" },
+    { "地の精霊界", "earth" },
+    { "土の精霊界", "earth" },
+    { "地のエレメンタルプレーン", "earth" },
+    { "plane of earth", "earth" },
+    { "earth", "earth" },
+    { (const char *) 0, (const char *) 0 }
+};
+
+const char *
+jp_level_name_to_en(const char *nam)
+{
+    int m_idx;
+
+    if (!nam || !*nam)
+        return nam;
+
+    for (m_idx = 0; jp_level_map[m_idx].jp_name; ++m_idx) {
+        if (!strcmpi(nam, jp_level_map[m_idx].jp_name)) {
+            return jp_level_map[m_idx].en_key;
+        }
+    }
+    return nam;
+}
+
 /* Take one word and try to match it to a level.
  * Recognized levels are as shown by print_dungeon().
  */
@@ -2124,74 +2284,7 @@ lev_by_name(const char *nam)
 
         Strcpy(zbuf, nam);
         jp_normalize_zenkaku(zbuf);
-        nam = zbuf;
-
-        /* ゲーム内階層名（#chronicle / #overview等）および特殊階層の日本語・英語マッピング */
-        {
-            static const struct {
-                const char *jp_name;
-                const char *en_key;
-            } jp_level_map[] = {
-                /* ブランチ */
-                { "ノームの鉱山", "The Gnomish Mines" },
-                { "ノーム鉱山", "The Gnomish Mines" },
-                { "鉱山", "The Gnomish Mines" },
-                { "運命の大迷宮", "The Dungeons of Doom" },
-                { "大迷宮", "The Dungeons of Doom" },
-                { "倉庫番", "Sokoban" },
-                { "ソコバン", "Sokoban" },
-                { "クエスト", "The Quest" },
-                { "ローディオス砦", "Fort Ludios" },
-                { "フォート・ノックス", "Fort Ludios" },
-                { "フォートノックス", "Fort Ludios" },
-                { "ノックス", "Fort Ludios" },
-                { "ゲヘナ", "gehennom" },
-                { "精霊界", "The Elemental Planes" },
-
-                /* メインダンジョン・鉱山の特殊階層 */
-                { "神託所", "oracle" },
-                { "デルフィ", "oracle" },
-                { "デルファイ", "oracle" },
-                { "ビッグルーム", "bigrm" },
-                { "bigroom", "bigrm" },
-                { "メデューサの島", "medusa" },
-                { "メデューサ", "medusa" },
-                { "ローグ階", "rogue" },
-                { "ローグ", "rogue" },
-                { "迷宮の城", "castle" },
-                { "城", "castle" },
-                { "鉱山街", "minetn" },
-                { "minetown", "minetn" },
-                { "鉱山の最下層", "minend" },
-                { "鉱山最下層", "minend" },
-                { "mine's end", "minend" },
-
-                /* ゲヘナ・悪魔の霊廟 */
-                { "死の谷", "valley" },
-                { "モーロックの聖域", "sanctum" },
-                { "聖域", "sanctum" },
-                { "魔法使いの塔", "wizard1" },
-                { "wizard's tower", "wizard1" },
-                { "アスモデウスの霊廟", "asmodeus" },
-                { "アスモデウス", "asmodeus" },
-                { "ベルゼブブの霊廟", "baalz" },
-                { "ベルゼブブ", "baalz" },
-                { "baalzebub", "baalz" },
-                { "ジョウビレックスの沼", "juiblex" },
-                { "ジョウビレックス", "juiblex" },
-                { "オルクスの町", "orcus" },
-                { "オルクス", "orcus" },
-                { (const char *) 0, (const char *) 0 }
-            };
-            int m_idx;
-
-            for (m_idx = 0; jp_level_map[m_idx].jp_name; ++m_idx) {
-                if (!strcmpi(nam, jp_level_map[m_idx].jp_name)) {
-                    nam = jp_level_map[m_idx].en_key;
-                    break;
-                }
-            }
-        }
+        nam = jp_level_name_to_en(zbuf);
 
         /* allow strings like "the oracle level" to find "oracle" */
         if (!strncmpi(nam, "the ", 4))

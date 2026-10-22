@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-21. */
 /* NetHack 5.0	extern.h	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1558 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -938,6 +938,7 @@ extern unsigned int induced_align(int);
 extern boolean Invocation_lev(d_level *) NONNULLARG1;
 extern xint16 level_difficulty(void);
 extern schar lev_by_name(const char *);
+extern const char *jp_level_name_to_en(const char *);
 extern schar print_dungeon(boolean, schar *, xint16 *);
 /* NetHackJP: force connect Fort Ludios when teleporting to it */
 extern void force_connect_knox(void);

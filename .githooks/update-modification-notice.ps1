@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-21.
 param(
     [string]$Date = (Get-Date -Format 'yyyy-MM-dd')
 )
@@ -26,7 +26,7 @@ $excludePathRegexes = @(
 $textExtensions = @(
     '.c', '.h', '.cc', '.cpp', '.cxx', '.hpp', '.hh',
     '.lua', '.md', '.markdown', '.xml', '.vcxproj', '.props', '.targets',
-    '.rc', '.yml', '.yaml', '.nmake', '.txt', '.sh', '.ps1', '.py', '.pl'
+    '.rc', '.yml', '.yaml', '.nmake', '.sh', '.ps1', '.py', '.pl'
 )
 
 function Get-NoticePrefix {
@@ -58,7 +58,6 @@ function Get-NoticePrefix {
         '.ps1' { return "# $noticeBody" }
         '.py' { return "# $noticeBody" }
         '.pl' { return "# $noticeBody" }
-        '.txt' { return "NOTICE: $noticeBody" }
     }
 
     if (($Extension -eq '') -and ($RelPath -match '^\.githooks/' -or $RelPath -match '^DEVEL/hooksdir/')) {
@@ -77,6 +76,11 @@ function Should-SkipPath {
     param([Parameter(Mandatory = $true)][string]$RelPath)
 
     $ext = [System.IO.Path]::GetExtension($RelPath).ToLowerInvariant()
+
+    # .txt はスキップ
+    if ($ext -eq '.txt') {
+        return $true
+    }
 
     # dat 配下は原則除外だが、Lua は自動更新対象に含める
     if ($RelPath -match '^dat/' -and $ext -ne '.lua') {

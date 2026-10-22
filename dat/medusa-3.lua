@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22.
 -- NetHack medusa medusa-3.lua	$NHDT-Date: 1781994883 2026/06/20 22:34:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.10 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1990, 1991 by M. Stephenson
@@ -81,7 +81,7 @@ des.feature("fountain", othloc);
 --
 -- same spot as Medusa plus downstairs
 des.object({ id="statue", coord=medloc, buc="uncursed",
-                      montype="knight", historic=1, male=1,name="Perseus",
+                      montype="knight", historic=1, male=1,name="ペルセウス",
                       contents = function()
                          if percent(75) then
                             des.object({ id = "shield of reflection", buc="cursed", spe=0 })

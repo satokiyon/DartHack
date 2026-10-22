@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22.
 -- NetHack Wizard Wiz-goal.lua	$NHDT-Date: 1781994876 2026/06/20 22:34:36 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.3 $
 --	Copyright (c) 1992 by David Cohrs
 -- NetHack may be freely redistributed.  See license for details.
@@ -123,9 +123,9 @@ des.monster("vampire bat")
 des.monster("vampire bat")
 des.monster({ class = "i",random, peaceful = 0 })
 -- Captive Monsters in the dungeon
-des.monster({ id = "rogue", x=35, y=06, peaceful=1, name="Pug" })
+des.monster({ id = "rogue", x=35, y=06, peaceful=1, name="パグ" })
 des.monster({ id = "owlbear", x=47, y=06, peaceful=1, asleep=1 })
-des.monster({ id = "wizard", x=32, y=11, peaceful=1, asleep=1, name="Newt" })
+des.monster({ id = "wizard", x=32, y=11, peaceful=1, asleep=1, name="ニュート" })
 des.monster({ id = "Grey-elf", x=44, y=11, peaceful=1 })
 des.monster({ id = "hill giant", x=47, y=11, peaceful=1, asleep=1 })
 des.monster({ id = "gnomish wizard", x=38, y=06, peaceful=1 })
