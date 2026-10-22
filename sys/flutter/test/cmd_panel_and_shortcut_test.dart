@@ -337,5 +337,98 @@ void main() {
       await tester.pump();
       expect(sentKey, '#terrain\n');
     });
+
+    testWidgets('NetHackCmdPanel 境界バーのタップによる展開・折りたたみ検証', (WidgetTester tester) async {
+      bool? isExpandedState;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: Scaffold(
+            body: NetHackCmdPanel(
+              position: 'bottom',
+              onKeyPress: (_) {},
+              onRawKeyCode: (_) {},
+              onShortcut: (_) {},
+              onToggleMode: () {},
+              onExpandedChanged: (expanded) {
+                isExpandedState = expanded;
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      // 折りたたみ時は「タップまたはスワイプで全パネルを表示」が表示されていること
+      final openBarFinder = find.text('タップまたはスワイプで全パネルを表示');
+      expect(openBarFinder, findsOneWidget);
+
+      // バーをタップして全パネルを展開
+      await tester.tap(openBarFinder);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 250));
+
+      expect(isExpandedState, isTrue);
+
+      // 展開後は「タップまたはスワイプでパネルを閉じる」が表示されていること
+      final closeBarFinder = find.text('タップまたはスワイプでパネルを閉じる');
+      expect(closeBarFinder, findsOneWidget);
+
+      // 再度タップして閉じる
+      await tester.tap(closeBarFinder);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 250));
+
+      expect(isExpandedState, isFalse);
+    });
+
+    testWidgets('NetHackCmdPanel 垂直配置（left）境界バーのタップによる展開・折りたたみ検証', (WidgetTester tester) async {
+      bool? isExpandedState;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: Scaffold(
+            body: NetHackCmdPanel(
+              position: 'left',
+              isVertical: true,
+              onKeyPress: (_) {},
+              onRawKeyCode: (_) {},
+              onShortcut: (_) {},
+              onToggleMode: () {},
+              onExpandedChanged: (expanded) {
+                isExpandedState = expanded;
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      final openBarFinder = find.text('タップまたはスワイプで展開');
+      expect(openBarFinder, findsOneWidget);
+
+      await tester.tap(openBarFinder);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 250));
+
+      expect(isExpandedState, isTrue);
+
+      final closeBarFinder = find.text('← タップまたはスワイプで閉じる');
+      expect(closeBarFinder, findsOneWidget);
+
+      await tester.tap(closeBarFinder);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 250));
+
+      expect(isExpandedState, isFalse);
+    });
   });
 }

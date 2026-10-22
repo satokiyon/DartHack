@@ -599,16 +599,28 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
           ),
           child: Column(
             children: [
-              Container(
-                height: 20,
-                width: double.infinity,
+              Material(
                 color: (Colors.grey[900] ?? const Color(0xFF212121)).withValues(alpha: widget.opacity),
-                alignment: Alignment.center,
-                child: Text(
-                  widget.position == 'left'
-                      ? (_effectiveIsExpanded ? (isJp ? "← 閉じる" : "← Close") : (isJp ? "内側(→)スワイプで展開" : "Swipe right to expand"))
-                      : (_effectiveIsExpanded ? (isJp ? "閉じる →" : "Close →") : (isJp ? "内側(←)スワイプで展開" : "Swipe left to expand")),
-                  style: const TextStyle(color: Colors.white60, fontSize: 9, fontWeight: FontWeight.bold),
+                child: InkWell(
+                  onTap: _panels.length > 1 ? () => _setExpanded(!_effectiveIsExpanded) : null,
+                  mouseCursor: _panels.length > 1 ? SystemMouseCursors.click : MouseCursor.defer,
+                  child: Container(
+                    height: 20,
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    child: Text(
+                      _panels.length > 1
+                          ? (widget.position == 'left'
+                              ? (_effectiveIsExpanded
+                                  ? (isJp ? "← タップまたはスワイプで閉じる" : "← Tap or swipe to close")
+                                  : (isJp ? "タップまたはスワイプで展開" : "Tap or swipe to expand"))
+                              : (_effectiveIsExpanded
+                                  ? (isJp ? "タップまたはスワイプで閉じる →" : "Tap or swipe to close →")
+                                  : (isJp ? "タップまたはスワイプで展開" : "Tap or swipe to expand")))
+                          : _getPanelDisplayName(0, _panels.first['name'], l10n, isJp),
+                      style: const TextStyle(color: Colors.white60, fontSize: 9, fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
               ),
               Expanded(
@@ -702,32 +714,38 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
         ),
         child: Column(
           children: [
-            Container(
-              height: headerHeight,
-              width: double.infinity,
+            Material(
               color: (Colors.grey[900] ?? const Color(0xFF212121)).withValues(alpha: widget.opacity),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (_panels.length > 1) ...[
-                    Icon(
-                      _effectiveIsExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up,
-                      color: Colors.white60,
-                      size: 14,
-                    ),
-                    const SizedBox(width: 4),
-                  ],
-                  Text(
-                    _effectiveIsExpanded
-                        ? (isJp ? "パネルを閉じる" : "Close Panel")
-                        : (_panels.length > 1
-                            ? (widget.position == 'top'
-                                ? (isJp ? "下へスワイプして全パネルを表示" : "Swipe down to show all panels")
-                                : (isJp ? "上へスワイプして全パネルを表示" : "Swipe up to show all panels"))
-                            : _getPanelDisplayName(0, _panels.first['name'], l10n, isJp)),
-                    style: const TextStyle(color: Colors.white60, fontSize: 9, fontWeight: FontWeight.bold),
+              child: InkWell(
+                onTap: _panels.length > 1 ? () => _setExpanded(!_effectiveIsExpanded) : null,
+                mouseCursor: _panels.length > 1 ? SystemMouseCursors.click : MouseCursor.defer,
+                child: SizedBox(
+                  height: headerHeight,
+                  width: double.infinity,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (_panels.length > 1) ...[
+                        Icon(
+                          widget.position == 'top'
+                              ? (_effectiveIsExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down)
+                              : (_effectiveIsExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up),
+                          color: Colors.white60,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 4),
+                      ],
+                      Text(
+                        _effectiveIsExpanded
+                            ? (isJp ? "タップまたはスワイプでパネルを閉じる" : "Tap or swipe to close panel")
+                            : (_panels.length > 1
+                                ? (isJp ? "タップまたはスワイプで全パネルを表示" : "Tap or swipe to show all panels")
+                                : _getPanelDisplayName(0, _panels.first['name'], l10n, isJp)),
+                        style: const TextStyle(color: Colors.white60, fontSize: 9, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
             Expanded(
