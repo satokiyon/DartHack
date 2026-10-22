@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22.
 -- NetHack Tourist Tou-loca.lua	$NHDT-Date: 1781994874 2026/06/20 22:34:34 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991,92 by M. Stephenson, P. Winner
@@ -154,34 +154,34 @@ des.monster("s")
 des.monster("s")
 -- Selection of Discworld NPCs
 if percent(10) then
-	des.monster({id="wizard", name="Rincewind", male=1, peaceful=1, keep_default_invent=false})
+	des.monster({id="wizard", name="リンスウィンド", male=1, peaceful=1, keep_default_invent=false})
 end
 if percent(10) then
-	des.monster({id="barbarian", name="Cohen", male=1, peaceful=1, keep_default_invent=false})
+	des.monster({id="barbarian", name="コウエン", male=1, peaceful=1, keep_default_invent=false})
 end
 if percent(10) then
-	des.monster({id="barbarian", name="Hrun", male=1, peaceful=1, keep_default_invent=false})
+	des.monster({id="barbarian", name="フルン", male=1, peaceful=1, keep_default_invent=false})
 end
 if percent(10) then
-	des.monster({id="wizard", name="Ridcully", male=1, peaceful=1, keep_default_invent=false})
-end=
-if percent(10) then
-	des.monster({id="wizard", name="the Bursar", male=1, peaceful=1, keep_default_invent=false})
+	des.monster({id="wizard", name="リドゥクリー", male=1, peaceful=1, keep_default_invent=false})
 end
 if percent(10) then
-	des.monster({id="priest", name="Mightily Oats", male=1, peaceful=1, keep_default_invent=false})
+	des.monster({id="wizard", name="会計係", male=1, peaceful=1, keep_default_invent=false})
 end
 if percent(10) then
-	des.monster({id="watch captain", name="Vimes", male=1, peaceful=1})
+	des.monster({id="priest", name="マイティリー・オーツ", male=1, peaceful=1, keep_default_invent=false})
 end
 if percent(10) then
-	des.monster({id="dwarf", name="Cheery", female=1, peaceful=1, keep_default_invent=false}) -- no pick-axe
+	des.monster({id="watch captain", name="ヴァイムズ", male=1, peaceful=1})
 end
 if percent(10) then
-	des.monster({id="clay golem", name="Dorfl", male=1, peaceful=1, keep_default_invent=false})
+	des.monster({id="dwarf", name="チーリィ", female=1, peaceful=1, keep_default_invent=false}) -- no pick-axe
 end
 if percent(10) then
-	des.monster({id="clay golem", name="Gladys", female=1, peaceful=1, keep_default_invent=false})
+	des.monster({id="clay golem", name="ドルフ", male=1, peaceful=1, keep_default_invent=false})
+end
+if percent(10) then
+	des.monster({id="clay golem", name="グラディス", female=1, peaceful=1, keep_default_invent=false})
 end
 
 

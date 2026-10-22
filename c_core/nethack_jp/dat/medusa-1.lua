@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22.
 -- NetHack medusa medusa-1.lua	$NHDT-Date: 1781994882 2026/06/20 22:34:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1990, 1991 by M. Stephenson
@@ -59,7 +59,7 @@ des.levregion({ region = {01,00,79,20}, exclude = {30,06,46,13}, type = "branch"
 des.non_diggable(selection.area(30,06,46,13))
 -- Objects
 des.object({ id = "statue", x=36,y=10, buc="uncursed",
-             montype="knight", historic=1, male = 1, name="Perseus",
+             montype="knight", historic=1, male = 1, name="ペルセウス",
              contents = function()
                 if percent(75) then
                    des.object({ id = "shield of reflection", buc="cursed", spe=0 })

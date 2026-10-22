@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22. */
 /* NetHack 5.0	lock.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -109,7 +109,7 @@ picklock(void)
                 alreadyunlocked = !(gx.xlock.door->doormask & D_LOCKED);
             } else {
                 gx.xlock.box->otrapped = 0;
-                gx.xlock.box->tknown = 0;
+                gx.xlock.box->tknown = 1; /* known not trapped */
                 what = (gx.xlock.box->otyp == CHEST) ? "宝箱" : "箱";
                 alreadyunlocked = !gx.xlock.box->olocked;
             }

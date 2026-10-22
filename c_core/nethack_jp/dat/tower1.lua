@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22.
 -- NetHack tower tower1.lua	$NHDT-Date: 1781994889 2026/06/20 22:34:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.7 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 -- NetHack may be freely redistributed.  See license for details.
@@ -41,7 +41,7 @@ des.monster("V",niches[3])
 local Vgenod = nh.is_genocided("vampire");
 local Vnames = { nil, nil, nil };
 if (not Vgenod) then
-   Vnames = { "Madame", "Marquise", "Countess" };
+   Vnames = { "マダム", "侯爵夫人", "伯爵夫人" };
 end
 des.monster({ id="vampire lady", coord=niches[4], name=Vnames[1], waiting=1 })
 des.monster({ id="vampire lady", coord=niches[5], name=Vnames[2], waiting=1 })

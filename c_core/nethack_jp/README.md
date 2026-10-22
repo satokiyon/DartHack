@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-21. -->
 # NetHack 5.0 (非公式)日本語化プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsとLinuxのみ)
@@ -137,10 +137,10 @@ Windows版およびLinux(X11)版では、ゲーム内での日本語入力・表
 
 | 機能 | 日本語入力の例 | 英語入力の例 | 補足 |
 | :--- | :--- | :--- | :--- |
-| **願い**<br>(Wishing) | `祝福された+2灰色ドラゴンの鱗鎧`<br>`耐毒の魔除け`<br>`スピードブーツ`<br>`グレーター・デーモンの死体`<br>`7個の魔法のマーカ` | `blessed +2 gray dragon scale mail`<br>`amulet versus poison`<br>`speed boots`<br>`corpse of greater demon`<br>`7 magic markers` | 祝福・呪い、強化値、個数、状態（死体・缶詰・像など）を含めて指定できます。「鑑定」や「スピードの靴」等のJNetHack慣用句も認識します。 |
+| **願い**<br>(Wish) | `祝福された+2灰色ドラゴンの鱗鎧`<br>`耐毒の魔除け`<br>`スピードブーツ`<br>`グレーター・デーモンの死体`<br>`7個の魔法のマーカ` | `blessed +2 gray dragon scale mail`<br>`amulet versus poison`<br>`speed boots`<br>`corpse of greater demon`<br>`7 magic markers` | 祝福・呪い、強化値、個数、状態（死体・缶詰・像など）を含めて指定できます。「鑑定」や「スピードの靴」等のJNetHack慣用句も認識します。 |
 | **虐殺**<br>(Genocide) | `マスター・リッチ`<br>`銀色ドラゴン`<br>`マインド・フレア`<br>`L`<br>`none` または `nothing` | `master lich`<br>`silver dragon`<br>`mind flayer`<br>`L`<br>`none` または `nothing` | モンスターの種族名やシンボル文字（クラス記号）を指定します。`none` や `nothing`、空入力等で虐殺を拒否（不虐殺の誓いを維持）できます。 |
-| **魔法のマーカー**<br>(Writing: 巻物) | `識別` または `識別の巻物`<br>`解呪` または `解呪の巻物`<br>`虐殺` または `虐殺の巻物`<br>`鑑定`（JNetHack互換）<br>`コンテキスト・スイッチ`（外見ラベル） | `identify` または `scroll of identify`<br>`remove curse`<br>`genocide`<br>`ELBIB YLOH`（外見ラベル） | 白紙の巻物に対して使用します。正式名（「識別」等）だけでなく、未識別時のラベル名やプレイヤーが付けた名前（call名）でも書き込めます。 |
-| **魔法のマーカー**<br>(Writing: 巻物、魔法書) | `識別` または `識別の巻物`<br>`火の玉` または `火の玉の魔法書`<br>`連鎖雷撃` | `identify` または `scroll of identify`<br>`fireball`<br>`chain lightning` | 白紙の巻物に対して使用します。本は「呪文書」「魔法書」のどちらの表記でも認識します（※魔法書は識別済みの名前でのみ書き込み可能です）。 |
+| **魔法のマーカー**<br>(Write: 巻物、魔法書) | `識別` または `識別の巻物`<br>`解呪` または `解呪の巻物`<br>`虐殺` または `虐殺の巻物`<br>`鑑定`（JNetHack互換）<br>`コンテキスト・スイッチ`（外見ラベル） | `identify` または `scroll of identify`<br>`remove curse`<br>`genocide`<br>`ELBIB YLOH`（外見ラベル） | 白紙の巻物や魔法書に対して使用します。正式名（「識別」等）だけでなく、未識別時のラベル名やプレイヤーが付けた名前（call名）でも書き込めます。本は「呪文書」「魔法書」のどちらの表記でも認識します（※魔法書は識別済みの名前でのみ書き込み可能です）。 |
+
 
 ---
 
@@ -301,6 +301,11 @@ OPTIONS=align_status:right,msw_stat_cols:15
 * [BALROG](https://balrogai.com/): LLMとVLMの長期タスクの性能をNetHackでベンチマークするプロジェクト
 * [NetHackers](https://nethackers.dunnolab.ai/): NetHack 3.6.6を昇天できるボットを作ろうというプロジェクト
 * …他にも見つけたら追記する
+
+## その他の面白そうなNetHack
+* [NetHack-3D](https://github.com/JamesIV4/nethack-3d): リッチなUIの2D/3Dだけでなく1人称視点でもNetHackが遊べる。VRデバイス(Meta Quest)でも遊べる。
+* [VoxHack](https://github.com/MrEveryDay98/VoxHack): マインクラフト風のボクセルワールドを探検するような感覚でNetHackが遊べる。
+* [NetHack Tiles Client](https://github.com/statico/nethack-tiles-client): 公開サーバやローカルサーバにssh接続してタイルセットでNetHackを遊べるクライアント。
 
 ----
 

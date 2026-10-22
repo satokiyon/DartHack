@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22.
 -- NetHack medusa medusa-2.lua	$NHDT-Date: 1781994882 2026/06/20 22:34:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1990, 1991 by M. Stephenson
@@ -54,7 +54,7 @@ des.non_diggable(selection.area(01,02,06,17))
 des.non_diggable(selection.area(60,02,73,17))
 -- Objects
 des.object({ id = "statue", x=68,y=10,buc="uncursed",
-                      montype="knight", historic=1, male=1,name="Perseus",
+                      montype="knight", historic=1, male=1,name="ペルセウス",
                       contents = function()
                          if percent(25) then
                             des.object({ id = "shield of reflection", buc="cursed", spe=0 })

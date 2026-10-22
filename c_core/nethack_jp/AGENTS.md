@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-16. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-21. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -278,6 +278,14 @@ GitHub Actions等で実行される CodeQL のコードスキャン警告（Code
 
 1. **所持金（`BL_GOLD`）の簡潔表記**:
    - `src/botl.c` の `initblstats` における `BL_GOLD` のフォーマットは `" %s"` とし、`$:0` 形式で表示してください。「金貨:%s」のように冗長な日本語接頭辞を付加すると画面上で「金貨:$:0」となり情報密度が低下するため、本家 NetHack 同様の簡潔な表記を維持してください。
+
+## ビルドおよびテスト方針
+
+1. **Windows 環境でのビルドテスト**:
+   - ビルドテストを行う際は、`sys\windows\vs\build_one.bat` を実行してください。
+
+2. **WSL (Linux) 環境でのビルドテスト**:
+   - WSL 上でビルドテストを行う際は、Ubuntu-26.04 ディストリビューションにて `/mnt/c/Users/satok/NetHackJP/sys/unix/build_wsl.sh --qt` を使用してビルドしてください。
 
 ## WSL / Linux 環境における動作検証・テスト方針
 
