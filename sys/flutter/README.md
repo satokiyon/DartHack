@@ -1,5 +1,5 @@
 <!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22. -->
-# DartHack (Flutter 移植版)
+# DartHack : 開発者向けドキュメント
 
 NetHack 5.0 (日本語版 / 英語版) に **Flutter / Dart** でUIを実装するためのプロジェクトです。
 
@@ -91,6 +91,14 @@ sys/flutter/
 │   ├── sound_macros_list.md     # 全316音のサウンドマスター仕様書
 │   ├── sound_system_design.md   # 音響システム設計・確定実装仕様書
 │   └── voice_speech_specs.md    # 音声合成・セリフ演出仕様書
+│
+├── books/                       # スポイラー(攻略情報)原本 (Markdown)
+│   ├── en/                      # 英語版 (companion.md)
+│   └── jp/                      # 日本語版 (companion.jp.md)
+│
+├── config/                      # NetHack 設定ファイル原本
+│   ├── defaults.nh              # 起動オプション定義 (defaults.nh)
+│   └── sysconf                  # システム設定 (sysconf)
 │
 ├── tools/                       # 開発支援・アセット作成ツール
 │   └── sound_curator/           # 効果音収集・作成支援ローカルWebツール
