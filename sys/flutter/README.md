@@ -1,42 +1,52 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-19. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22. -->
 # DartHack (Flutter 移植版)
 
-NetHack 5.0 (日本語版 / 英語版) を **Flutter / Dart** 上で動作させるための移植プロジェクトです。
+NetHack 5.0 (日本語版 / 英語版) に **Flutter / Dart** でUIを実装するためのプロジェクトです。
 
 - ゲーム本体（C コア）は `c_core/nethack_jp`（日本語版）および `c_core/nethack_en`（英語版）を **Git Subtree** として配置・管理しており、アプリ内で動的に言語を切り替えてプレイ可能です。
 - 画面表示・キー入力・メニュー・ダイアログ等は **Flutter UI（Dart）** で行い、C コアとは **Dart FFI** で双方向通信します。
-- モバイル（Android / iOS）およびデスクトップ等で一貫した FFI 経路を用いて動作するよう設計されています。
+- モバイル（Android）およびデスクトップ（Windows）で一貫した FFI 経路を用いて動作するよう設計されています。
 
 ---
 
 ## ✨ 主な取り込み機能・特徴
 
 1. **日本語版 / 英語版の二言語切り替え**:
-   - `c_core` 配下に配置された 2 系統の C コアソース (`nethack_jp` / `nethack_en`) およびアセットデータ (`assets/nethackdir/` 配下の `_jp` 優先ロード) により、設定画面から日本語・英語を切り替えてプレイ可能です。
+   - `c_core` 配下の 2 系統の C コアソース (`nethack_jp` / `nethack_en`) およびアセットデータ (`assets/nethackdir/` 配下の `jp/`, `en/`, `common/`) により、設定画面から日本語・英語をシームレスに切り替えてプレイ可能です。
 
-2. **カード型 UI & 日英バイリンガル対応 (墓石・ハイスコア)**:
+2. **マルチプラットフォーム対応 (Android / Windows)**:
+   - スマートフォン（Android）でのタッチ・ジェスチャー操作に加え、PC（Windows デスクトップ）環境にもネイティブ対応。UCRT 互換・堅牢なセーブ終了処理を備え、環境を問わず安定動作します。
+
+3. **多彩なタイルセット選択 & 透過2層描画**:
+   - 伝統的な 16x16 タイルに加え、Nevanda (32x32)、PixelHack (32x32)、Geoduck (15x25) など複数のタイルセットを動的に切り替え可能。
+   - 透過タイルセット使用時は C コアの `back_to_glyph` と連動し、背景地形とキャラクター/アイテムを重ね合わせた自然な2層描画を実現しています。
+
+4. **ゲーム内スポイラー & ガイド機能**:
+   - ゲームプレイ中にいつでもモンスターやアイテム、ルール等の詳細な知識を閲覧できるスポイラーダイアログ (`SpoilerDialog`) およびガイドブックビューアを搭載。閲覧専用画面でのタイル表示やキー操作にも対応しています。
+
+5. **ハードウェアキーボード & 物理操作最適化**:
+   - `HardwareKeyRouter` により、テンキーや矢印キーによる8方向移動、各種アクションショートカット、拡張コマンドの直接入力など、PC や外部キーボード接続時の快適な打鍵操作をフルサポート。
+
+6. **モバイル最適化 UI & スムーズなマップ操作**:
+   - **マップ移動**: 巨大キャンバス `InteractiveViewer` 設計により、極端なズーム時やマップ端でも主人公の位置を画面中央やや上方 (35% 位置) に確実センタリングし、ズーム倍率を保持。
+   - **操作補助**: 仮想方向パッド (D-Pad)、境界バーのタップ/クリックで開閉可能な拡張コマンドパネル、ショートカットキーパッド、仮想キーボードを搭載。
+   - **各種ダイアログ**: 個数選択ダイアログ (`AmountSelectorDialog`)、メッセージ履歴 (`MsgHistoryDialog`)、直近メッセージボックス、`defaults.nh` (起動オプション) エディタ。
+
+7. **カード型 UI & 日英バイリンガル対応 (墓石・ハイスコア)**:
    - ゲームオーバー・クリア時のハイスコア (`TopTenWidget`) や墓石 (`TombstoneWidget`) をカード形式でレイアウト。
    - 英語プロフィール (`Name-Role-Race-Gend-Align`) の自動分解・整形、日本語/英語双方のヘッダー検知、マルチ行エントリーの安全なパースに対応。
 
-3. **FFI メモリ安全 & 高速マルチスレッド通信**:
+8. **FFI メモリ安全 & 高速マルチスレッド通信**:
    - Dart Worker Isolate との通信において 256 面以上の静的リングバッファを使用し、UTF-8 文字列の非同期 Use-After-Free (領域外参照) や文字化けを防止。
    - C 側での CP437 から UTF-8 へのリアルタイム変換および Dart 側の安全なデコード層。
 
-4. **オートセーブ & 状態・視界保護**:
-   - オートセーブ (`do_autosave`) 実行時の視界マップ (`viz_array`) 自動全復元および画面同期。
+9. **オートセーブ & 状態・視界保護**:
+   - オートセーブ (`do_autosave`) 実行時の視界マップ (`viz_array`) 自動全復元 (`vision_recalc(0)`) および画面同期。
    - セーブデータへの乗馬・巻きつき ID (`m_id`) の確実な保持、セーブプレフィックスの自動クレンジング。
 
-5. **モバイル最適化 UI & スムーズなマップ操作**:
-   - **マップ移動**: 巨大キャンバス `InteractiveViewer` 設計により、極端なズーム時やマップ端でも主人公の位置を画面中心よりやや上方 (35% 位置) に確実センタリング。ズーム倍率を保持。
-   - **各種ダイアログ**: 個数選択ダイアログ (`AmountSelectorDialog`)、`defaults.nh` (起動オプション) エディタ、全体マップダイアログ、メッセージ履歴ダイアログ、ガイドブックダイアログ。
-   - **操作補助**: 仮想方向パッド (D-Pad)、拡張コマンドパネル、ショートカットキーパッド、仮想キーボード。
-
-6. **リッチな音響システム (BGM / 効果音 / 環境音 / 音声)**:
-   - 全ダンジョン分岐・特殊階層（城、メデューサ、聖所、精霊界など計31種）および特別部屋（店、寺院、動物園など計35種）のBGM再生に対応。
-   - デュアルフロアBGMプレイヤー（A/B交互クロスフェード）によるシームレスな階層遷移、およびルームBGMとの相互クロスフェード再生。
-   - アプリ起動時のタイトルBGM即時再生と、ゲーム本編開始検知（マップ表示）時の保留フロアBGMへのシームレスなクロスフェード移行機構。
-   - 完全ミキシング `AudioContext`（Android: `audioFocus: none` / iOS: `ambient`）の二重適用により、SE再生時のBGM停止を根絶し、Spotify 等の外部音楽アプリとの完全共存を実現。
-   - 出入りチャタリング防止（世代トークンによる音量競合排除）、アプリバックグラウンド移行時の自動一時停止と `resume()` を排除した安全な音源再開、セーブデータ再開時の部屋BGM即時復元。
+10. **リッチな音響システム (BGM / 効果音 / 環境音 / 音声)**:
+    - 全フロア・特別部屋（計60種以上）のBGM再生、デュアルプレイヤーによるA/Bクロスフェード。
+    - 完全ミキシング `AudioContext`（Android: `audioFocus: none` / iOS: `ambient`）により、SE再生時のBGM停止を根絶し、Spotify 等の外部音楽アプリと完全共存。
 
 ---
 
@@ -51,7 +61,7 @@ sys/flutter/
 │   ├── nethack_screen.dart      # 画面バッファ（テキスト / マップ / ステータス / メニュー）
 │   ├── nethack_map_painter.dart # タイルマップ描画 (CustomPainter)
 │   ├── nethack_dpad.dart        # 仮想方向パッド
-│   ├── nethack_cmd_panel.dart   # 拡張コマンドパネル
+│   ├── nethack_cmd_panel.dart   # 拡張コマンドパネル（開閉バー対応）
 │   ├── nethack_shortcut_pad.dart# ショートカットキーパッド
 │   ├── nethack_keyboard.dart    # 仮想キーボード
 │   ├── nethack_assets.dart      # アセット・フォント・タイルセット管理
@@ -59,22 +69,26 @@ sys/flutter/
 │   ├── amount_selector_dialog.dart # 個数選択ダイアログ
 │   ├── defaults_editor.dart     # NetHack 起動オプション編集
 │   ├── settings_page.dart       # 設定画面
+│   ├── tileset_selection_page.dart # タイルセット選択・プレビュー画面
+│   ├── input/                   # 入力ルーティング
+│   │   └── hardware_key_router.dart # 物理キーボード・テンキー入力制御
 │   ├── config/                  # 各種設定・定数
 │   ├── l10n/                    # 多言語化リソース (ARB ファイル & 生成コード)
-│   │   ├── app_ja.arb           # 日本語リソース
-│   │   ├── app_en.arb           # 英語リソース
-│   │   └── app_localizations*.dart
-│   ├── models/                  # データモデル (TopTenEntry, TombstoneData 等)
+│   ├── models/                  # データモデル (TilesetInfo, TopTenEntry, TombstoneData 等)
 │   ├── screens/                 # 各種画面コンポーネント (start_screen, end_screen 等)
 │   ├── services/                # バックエンドサービス (sound_manager.dart 等)
-│   │   └── sound_manager.dart   # 音響再生・2プレイヤー制御・ライフサイクル管理
-│   ├── widgets/                 # 再利用可能な UI ウィジェット (overlays, TopTenWidget 等)
+│   ├── widgets/                 # 再利用可能な UI ウィジェット
+│   │   ├── overlays/            # Cコア対話用オーバーレイ (メニュー, Y/N, 一行入力等)
+│   │   ├── spoiler_dialog.dart  # ゲーム内スポイラー・解説ダイアログ
+│   │   ├── sound_credits_dialog.dart # 音響クレジット表示ダイアログ
+│   │   ├── topten_widget.dart   # ハイスコアカード表示
+│   │   └── tombstone_widget.dart# 墓石カード表示
 │   └── utils/                   # ユーティリティ関数
 │
-├── doc/                         # 各種設計・仕様書
+├── doc/                         # 各種設計・音響仕様書
 │   ├── ambience_specs.md        # BGM・環境音・特別部屋BGM仕様書
 │   ├── combat_sound_specification.md # 戦闘アクション効果音仕様書
-│   ├── sound_macros_list.md     # 全313音のサウンドマスター仕様書
+│   ├── sound_macros_list.md     # 全316音のサウンドマスター仕様書
 │   ├── sound_system_design.md   # 音響システム設計・確定実装仕様書
 │   └── voice_speech_specs.md    # 音声合成・セリフ演出仕様書
 │
@@ -82,20 +96,22 @@ sys/flutter/
 │   └── sound_curator/           # 効果音収集・作成支援ローカルWebツール
 │
 ├── android/                     # Android プロジェクト設定 (Gradle / CMake)
+├── windows/                     # Windows ランナー (C++ / CMake)
 ├── ios/                         # iOS Runner (Xcode プロジェクト)
-├── windows/                     # Windows ランナー
 ├── dummy/                       # FFI 検証用スタブ実装
-│   └── libnethack_dummy.c
 │
 ├── assets/                      # アプリに同梱する静的アセット
 │   ├── ver                      # アセットバージョン番号（更新時に要インクリメント）
-│   ├── nethackdir/              # NetHack データファイル一式 (日本語/英語同梱)
-│   ├── sounds/                  # 効果音・BGM・環境音 (OGG ファイル配置場所)
-│   ├── tiles/                   # タイルセット (16x16, Geoduck, Nevanda, PixelHack 等)
-│   └── fonts/                   # フォントファイル
+│   ├── nethackdir/              # NetHack データファイル一式
+│   │   ├── common/              # 日英共通データ (ダンジョン定義 Lua 等)
+│   │   ├── en/                  # 英語版データ (data, oracles, rumors 等)
+│   │   └── jp/                  # 日本語版データ (data_jp, oracles_jp 等)
+│   ├── sounds/                  # 効果音・BGM・環境音 (OGG/Opus ファイル配置場所)
+│   ├── tiles/                   # タイルセット (16x16, Nevanda, PixelHack, Geoduck 等)
+│   ├── images/                  # 背景・演出用画像
+│   └── icon/                    # アプリアイコン
 │
 ├── pubspec.yaml                 # Flutter パッケージ設定
-├── pubspec.lock
 ├── l10n.yaml                    # 多言語化 (l10n) 設定
 ├── analysis_options.yaml        # Lint 設定
 └── README.md                    # 本ドキュメント
@@ -111,8 +127,10 @@ sys/flutter/
 │                                                              │
 │  MyHomePage ─┐                                               │
 │              ├─→ NetHackScreen (画面バッファ)                  │
-│              ├─→ NetHackMapPainter (タイル描画)                │
+│              ├─→ NetHackMapPainter (タイル描画 / 2層描画)       │
+│              ├─→ HardwareKeyRouter (物理キーボード入力)        │
 │              ├─→ DPad / CmdPanel / SoftKeyboard              │
+│              ├─→ SoundManager (音響・BGMクロスフェード制御)    │
 │              └─→ NetHackFfi  (Dart FFI)                      │
 │                       │                                      │
 └───────────────────────┼──────────────────────────────────────┘
@@ -155,104 +173,47 @@ sys/flutter/
 
 DartHack では、NetHack 5.0 のサウンドトリガー仕様に準拠した本格的な音響システム（`lib/services/sound_manager.dart`）を搭載しています。C コアから FFI 経由で発行されるイベントを Worker Isolate が受信し、Flutter 側でリアルタイムかつ低遅延に再生します。
 
-### 1. サウンドカテゴリと階層構造
+### サウンドカテゴリ概要
 
 | カテゴリ | C コア定数 | 再生方式 | 主な役割・用途 |
 | :--- | :--- | :--- | :--- |
-| **フロアBGM** | `SOUND_CAT_BGM` | ループ再生（デュアル `_bgmPlayerA` / `_bgmPlayerB`） | 運命の大迷宮、城、メデューサの島、ノームの鉱山、ゲヘナ、精霊界など階層全体の探索曲（全31曲）。A/B交互の1.0秒クロスフェード。 |
-| **ルームBGM** | `SOUND_CAT_AMBIENCE` | ループ再生（`_roomBgmPlayer`） | 店、寺院、宝物庫、動物園、兵舎、王座などの特別部屋に入った際にフロアBGMとクロスフェードする専用曲（全35種）。 |
-| **地形・天候環境音** | `SOUND_CAT_AMBIENCE` | ループ再生（`_ambiencePlayer`） | 水流、溶岩、暴風、雨、沼地などフロアBGMと同時に鳴る環境音（距離減衰あり）。 |
-| **効果音 (SE)** | `SOUND_CAT_SE` | ワンショット（最大12重和音プール） | 攻撃、呪文詠唱、罠作動、アイテム使用、ドア開閉などのゲームプレイSE。最大同時12音プール、60msデバウンス、同一音最大3インスタンス制限、重要音プリエンプション制御。 |
+| **フロアBGM** | `SOUND_CAT_BGM` | ループ再生（デュアル交互） | ダンジョン各階層の探索曲（全31曲）。A/Bプレイヤー交互の1.0秒クロスフェード。 |
+| **ルームBGM** | `SOUND_CAT_AMBIENCE` | ループ再生 | 店、寺院、動物園などの特別部屋（全35種）。フロアBGMと相互クロスフェード。 |
+| **地形・環境音** | `SOUND_CAT_AMBIENCE` | ループ再生 | 水流、溶岩、暴風などフロアBGMと同時に鳴る環境音。 |
+| **効果音 (SE)** | `SOUND_CAT_SE` | ワンショット（最大12音プール） | 攻撃、呪文、罠、アイテム等のゲームプレイSE。デバウンス・プリエンプション制御。 |
 | **楽器演奏** | `SOUND_CAT_HEROMUSIC` | シーケンス再生 | 魔法の笛、角笛、ハープ、ドラムなどの音階シーケンス演奏。 |
-| **実績・ファンファーレ** | `SOUND_CAT_ACHIEVEMENT` | ワンショット | レベルアップ、実績達成、ゲーム開始/再開ファンファーレ。 |
-| **音声・セリフ (Voice)** | `SOUND_CAT_VOICE` | ワンショット / TTS | デルフィの神託、神の声、喋るアーティファクト、死因アナウンス等のセリフ演出。 |
+| **ファンファーレ** | `SOUND_CAT_ACHIEVEMENT` | ワンショット | レベルアップ、実績達成、ゲーム開始/再開ファンファーレ。 |
+| **音声・セリフ** | `SOUND_CAT_VOICE` | ワンショット / TTS | 神託、神の声、喋るアーティファクト等のセリフ演出。 |
 
-### 2. デュアルフロアBGM構成とフォールバック・クロスフェード
-フロアBGM（A/B交互2系統）とルームBGMには独立した `AudioPlayer` インスタンスを割り当てており、高いUX品質を実現しています：
-- **シームレスな一時停止と再開**: 特別部屋に入るとフロアBGMをフェードアウト停止し、ルームBGMをフェードイン再生します。部屋を出るとルームBGMをフェードアウト停止し、フロアBGMが `resume()` に依存せず `play(AssetSource)` により音量0から安全にフェードイン復帰します。
-- **階層遷移クロスフェード**: 階段昇降やワープ時、デュアルフロアBGMプレイヤー（A/B）が交互に約1.0秒（50ms×20ステップ）かけて滑らかに音量をクロスフェードします。
-- **タイトルBGM自動再生とゲーム開始保留機構**: アプリ起動直後にタイトルBGM（`amb_title.ogg`）を即時再生し、セーブデータ選択やキャラメイク中に届くフロアBGMは一時退避（保留）されます。マップ初回表示（ゲーム本編開始）を検知した瞬間に、タイトルBGMから保留フロアBGMへのクロスフェードが自動開始されます。
-- **ファイル欠落時のフォールバック**: 特別部屋のBGM音源（`.ogg`）がまだ配置されていない場合、**フロアBGMを止めずにそのまま途切れず継続再生**します（無音化や不要なフェードを防止）。
-- **出入りチャタリング防止**: ドアの境界を素早く行き来した際、世代トークン（Generation Token）により古い非同期フェードループを即座に破棄し、音量競合（Volume Fighting）を完全に防ぎます。
-- **テレポート・ワープ対応**: テレポートや落とし穴（穴落ち・レベルテレポート）で突然部屋から通路へワープした場合も、C コアの `check_special_room()` が旧部屋の退出を検知して即座にフロアBGMへ復帰します。
-- **ライフサイクル連動**: アプリがバックグラウンドに回った際（画面ロックや着信含む）は自動で全音声を一時停止し、フォアグラウンド復帰時に元々鳴っていた音楽を `resume()` を使わず安全に頭出し再開します。
-- **セーブデータ互換性**: 音響情報はセーブファイルへ直接保存せず、すべて実行時イベントとして動作するため、過去バージョンのセーブデータとの100%完全な後方互換性を保持しています。
+### 音響アーキテクチャの主要な特徴
+- **デュアルフロアBGMとクロスフェード**: 階層移動時の A/B 交互クロスフェード、特別部屋への進入/退出時のスムーズな音量減衰・復帰。
+- **完全ミキシング (AudioFocus)**: Android（`audioFocus: none`）、iOS（`ambient`）、Windows で最適化し、SE 再生時の BGM 途切れを根絶。Spotify や YouTube Music などの外部アプリとの完全共存を実現。
+- **多重再生最適化**: 最大12音同時再生プール、60ms デバウンス、同一音多重制限（最大3音）、二連撃マイクロディレイ（35ms）。
+- **ライフサイクル連携**: バックグラウンド移行時の自動一時停止と安全な音源復帰。
 
-### 3. 効果音 (SE) プレイヤープールと最適化
-効果音の多重再生と快適な演出のため、以下の制御機構を搭載しています：
-- **最大12音同時再生プレイヤープール**: 同時に最大12個の独立した `AudioPlayer` インスタンスを循環管理し、激しい乱戦時でも音が途切れないリッチな音響体験を提供します。
-- **同一音多重制限（最大3インスタンス）**: 連続ヒットや同時発生時でも、同一のサウンドファイルが4つ以上重なって爆音化・歪みが発生するのを防ぎます。
-- **短時間デバウンス（60ms）**: 60ms 以内の極短時間に同一SEが多重発行された場合は自動で間引き、クリアな音質を維持します。
-- **二連撃マイクロディレイキュー（35ms）**: 二刀流攻撃やモンスターの2連撃（爪×2等）で同一SEが短時間に連続要求された際、2撃目を約35ms遅延させて再生（リアルな連撃感を演出）。
-- **重要音のプリエンプション（割り込み再生）**: プールが満杯の際に実績音や重要アラーム、魔法発動音などの優先度が高いSEが要求された場合、再生中の通常戦闘SEを安全にフェード停止して割り込み再生します。
-
-### 4. 完全ミキシング（AudioFocus）と外部音楽アプリ共存
-- **Android AudioFocus 排他競合の根絶**: 全プレイヤー（SEプール・フロアBGM A/B・ルームBGM・環境音）に `audioFocus: AndroidAudioFocus.none` を二重適用（グローバル＆個別）し、SE 再生時に Android OS が BGM プレイヤーへ `AUDIOFOCUS_LOSS`（再生停止）を送出する競合を解消しています。
-- **iOS オーディオセッション最適化**: `category: AVAudioSessionCategory.ambient` を指定し、マナーモード（消音スイッチ）を尊重しつつ、プラグイン内での assert 例外を回避。
-- **外部音楽アプリとの完全共存**: プレイヤーが Spotify や YouTube Music 等の音楽やポッドキャストを再生しながらでも、ゲームの BGM/SE と同時に途切れることなくプレイ可能です。
-
-### 5. 音源ファイルの配置方法と仕様書
-- 音源ファイル（`.ogg` 形式）は `sys/flutter/assets/sounds/` 配下に配置します。
-- 全316音（一般効果音206種、戦闘アクション効果音33種、実績・システム音23種、楽器演奏音47種、声音7種）のイベントID、対応ファイル名、Cコア呼び出し行対照表は [`doc/sound_macros_list.md`](doc/sound_macros_list.md) を参照してください。
-- 戦闘アクション効果音の詳細仕様・判定ロジックについては [`doc/combat_sound_specification.md`](doc/combat_sound_specification.md) を参照してください。
-- 詳細なBGM・環境音のイベントID、対応ファイル名、部屋一覧、判定ロジックについては [`doc/ambience_specs.md`](doc/ambience_specs.md) を参照してください。
-- 音声合成・セリフイベントの仕様については [`doc/voice_speech_specs.md`](doc/voice_speech_specs.md) を参照してください。
-- 音響システム全体の詳細アーキテクチャ・FFI連携仕様については [`doc/sound_system_design.md`](doc/sound_system_design.md) を参照してください。
+※詳細なイベントID一覧、対照表、アーキテクチャ設計については [`doc/`](doc/) 配下の仕様書を参照してください：
+- サウンドマスター対照表: [`doc/sound_macros_list.md`](doc/sound_macros_list.md)
+- BGM・環境音仕様: [`doc/ambience_specs.md`](doc/ambience_specs.md)
+- 戦闘効果音仕様: [`doc/combat_sound_specification.md`](doc/combat_sound_specification.md)
+- 音響システム詳細設計: [`doc/sound_system_design.md`](doc/sound_system_design.md)
 
 ---
 
 ## 🛠️ サウンドキュレーター（効果音収集・作成支援ツール）
 
-Cコアの全効果音・戦闘音・楽器音・音声イベント仕様（[`doc/sound_macros_list.md`](doc/sound_macros_list.md)）に定義されている **全 316 種のサウンドアセット** を、効率よく・高品質かつ狙い通りに収集・作成・管理するためのローカルWebワークスペース（`sys/flutter/tools/sound_curator/`）です。
+C コアに定義された全サウンドアセットを効率よく収集・作成・管理するためのローカル Web ワークスペース（`sys/flutter/tools/sound_curator/`）です。
 
-### 1. 主な機能と特徴
-- **全316音の進捗ダッシュボード**:
-  - リアルタイム進捗率（パーセンテージ）表示、未設定/確定済フィルタ、カテゴリ別フィルタ（効果音/戦闘/実績/楽器/声音）、インクリメンタル検索。
-- **ワンクリック外部検索支援（全 13 サイト対応）**:
-  - 各カード内に色分けされたコンパクトバッジが常時表示され、ワンクリックで最適な日本語/英語キーワードがセットされた検索ページを開きます。
-  - **🇯🇵 国内サイト (8件)**: 効果音ラボ、On-Jin ～音人～、OtoLogic、効果音辞典、Springin' Sound Stock、魔王魂、ポケットサウンド、甘茶の音楽工房
-  - **🌐 海外・オープン素材 (5件)**: Pixabay、SoundDino、Freesound.org、ZapSplat、OpenGameArt.org
-- **ドラッグ＆ドロップ登録 & 自動正規化 (`ffmpeg`)**:
-  - ダウンロードした音声ファイル（WAV/MP3/OGG等）をカードにドロップするだけで即時取り込み。
-  - ファイル名から出典サイト・ライセンス規約を自動判別し、`ffmpeg` により **先頭無音ミリ秒カット**、**EBU R128 (-14 LUFS / True Peak -1.0dBFS) 正規化**、**Ogg Opus (48kHz) エンコード** を一括実行して `assets/sounds/` に配置。
-- **楽器音 47 種の完全自動生成**:
-  - オープンSoundFont（`FluidR3 GM`）と `FluidSynth` を用いた自動サンプリング（`generate_instruments.py`）により、フルート・角笛・ラッパ・ハープ等の A〜G 各音階（42種）および固定楽器音（5種）をミリ秒単位の正確なピッチで自動生成済み。
-- **ライセンス一覧（`attributions.txt`）の自動生成**:
-  - 採否と同時に、作者・出典URL・ライセンス規約が `sys/flutter/assets/sounds/attributions.txt` に本家フォーマット準拠で自動記録。
+- **進捗ダッシュボード**: 全音源の収集進捗率、未設定/確定済フィルタ、インクリメンタル検索。
+- **外部検索支援**: 国内外 13 のフリー音源サイトへのワンクリック検索バッジ。
+- **ドラッグ＆ドロップ自動正規化**: 音声ファイルをドロップするだけで、`ffmpeg` により無音カット、EBU R128 (-14 LUFS) 正規化、Opus (48kHz) エンコードを一括実行。
+- **楽器音の自動生成**: SoundFont (`FluidR3 GM`) と `FluidSynth` による音階サンプルの自動生成。
+- **ライセンス自動記録**: 採否と同時に `attributions.txt` へ出典・規約を自動記録。
 
-### 2. ツールの起動方法
-
-#### PowerShell スクリプト（推奨）
+#### 起動方法
 ```powershell
 powershell -ExecutionPolicy Bypass -File sys/flutter/tools/sound_curator/run_curator.ps1
 ```
-ローカルWebサーバーが立ち上がり、既定のWebブラウザで `http://localhost:8765` が自動的に開きます。
-
-#### 手動起動
-```powershell
-python sys/flutter/tools/sound_curator/server.py
-```
-ブラウザで `http://localhost:8765` にアクセスしてください（終了時は `Ctrl + C`）。
-※外部 pip パッケージのインストールは不要（Python 標準ライブラリで動作）です。
-
-### 3. 使用方法・キュレーションワークフロー
-1. ブラウザで画面を開き、上部の **「⏳ 未設定のみ」** フィルタを選択します。
-2. 収集したい効果音カードの検索バッジ（例: **［効果音ラボ］**、**［Pixabay］**、**［Freesound］** 等）をクリックして目的の音源をダウンロードします。
-3. ダウンロードした音声ファイルをカードの「📥 ドロップゾーン」にドラッグ＆ドロップします。
-4. モーダルで出典サイトやライセンス（自動推定されます）を確認し、**「正規化 & 確定 (Opus変換)」** ボタンをクリックします。
-5. 自動的に Opus 変換され、確定済みカードに切り替わり、試聴プレイヤーで仕上がりを確認できます。
-
-### 4. 音量バランス検査・自動適正化ツール (check_volumes)
-全音源の音量・音圧バランスが適正かを常時チェックし、過小音量や頭打ち（音割れ）を一括修復できます。
-
-```powershell
-# PowerShell スクリプト（問題のある音源のみ表示）
-powershell -ExecutionPolicy Bypass -File sys/flutter/tools/sound_curator/check_volumes.ps1 -WarnOnly
-
-# 問題のある音源を一括自動修復（ピーク -1.5 dBFS に適正化）
-powershell -ExecutionPolicy Bypass -File sys/flutter/tools/sound_curator/check_volumes.ps1 -Fix
-```
-※Web UI（サウンドキュレーター）の画面上部にある **［🔊 音量診断］** ボタンからも、全音源の測定およびワンクリック修復が可能です。
+※ブラウザで `http://localhost:8765` が自動的に開きます。音量バランス検査には `check_volumes.ps1` を利用可能です。
 
 ---
 
@@ -260,72 +221,26 @@ powershell -ExecutionPolicy Bypass -File sys/flutter/tools/sound_curator/check_v
 
 `c_core/nethack_jp` および `c_core/nethack_en` は DartHack 独自の拡張・修正（UTF-8化、FFI互換処理、自動バイリンガル切替など）を含むため、`git submodule` ではなく **Git Subtree** 方式で管理されています。
 
-### 1. NetHackJP 本家更新の取り込み (`c_core/nethack_jp`)
-
-NetHackJP 本家リポジトリ (`https://github.com/satokiyon/NetHackJP.git`) の最新変更を取り込む場合：
-
-#### PowerShell スクリプトを使用する場合 (推奨)
+### 1. NetHackJP 本家更新の同期 (`c_core/nethack_jp`)
 ```powershell
 powershell -ExecutionPolicy Bypass -File c_core/sync_nethack_jp.ps1
 ```
-※ 特定のブランチを指定する場合:
-```powershell
-powershell -ExecutionPolicy Bypass -File c_core/sync_nethack_jp.ps1 -Branch main
-```
 
-#### 手動コマンドで同期する場合
-```powershell
-# 1. リモートの追加 (初回のみ)
-git remote add nethack-jp https://github.com/satokiyon/NetHackJP.git
-
-# 2. 最新情報の取得
-git fetch nethack-jp
-
-# 3. c_core/nethack_jp にSubtreeマージ
-git subtree pull --prefix=c_core/nethack_jp nethack-jp main
-```
-
----
-
-### 2. NetHack 本家更新の取り込み (`c_core/nethack_en`)
-
-NetHack 本家リポジトリ (`https://github.com/NetHack/NetHack.git`) の最新変更を取り込む場合：
-
-#### PowerShell スクリプトを使用する場合 (推奨)
+### 2. NetHack 本家更新の同期 (`c_core/nethack_en`)
 ```powershell
 powershell -ExecutionPolicy Bypass -File c_core/sync_nethack_en.ps1
 ```
-※ 特定のブランチを指定する場合:
-```powershell
-powershell -ExecutionPolicy Bypass -File c_core/sync_nethack_en.ps1 -Branch NetHack-5.0
-```
 
-#### 手動コマンドで同期する場合
-```powershell
-# 1. リモートの追加 (初回のみ)
-git remote add nethack-en https://github.com/NetHack/NetHack.git
-
-# 2. 最新情報の取得
-git fetch nethack-en
-
-# 3. c_core/nethack_en にSubtreeマージ
-git subtree pull --prefix=c_core/nethack_en nethack-en NetHack-5.0
-```
-
----
-
-### 3. C コア同期後の注意事項
-
-1. **整合性チェックと宣言失効の復元**:
-   - スクリプト内にて本家 `extern.h` などの関数宣言ドロップがないか自動検証されます。警告が表示された場合は `git diff` 等で解消してください。
-2. **データアセットの同期とバージョンインクリメント**:
-   - データファイル（`data`, `rumors`, `oracles`, `quest.lua` 等）に変更が入った場合は、`sys/flutter/assets/nethackdir/` にアセットを同期し、**`sys/flutter/assets/ver` の整数値をインクリメント (+1)** してください。
+> [!IMPORTANT]
+> **`--squash` 必須化原則**:
+> `c_core/nethack_jp` と `c_core/nethack_en` は同一リポジトリ・コミットオブジェクトを共有しています。Git の 3-way merge における Merge-Base 混信や変更脱落を防止するため、同期スクリプトでは必ず `--squash` を指定して同期しています。
+> データファイルに変更が入った場合は、`sys/flutter/assets/ver` のバージョン番号をインクリメント (+1) してください。
 
 ---
 
 ## 🧪 Flutter / Dart コードの検証手順
 
-開発・コード変更時の Dart および Flutter UI 側の構文チェック・静的解析・テスト検証には以下の標準コマンドを使用します（※検証にあたって `build_one.bat` は使用しません）。
+開発・コード変更時の Dart および Flutter UI 側の構文チェック・静的解析・テスト検証には以下の標準コマンドを使用します。
 
 ### 1. 静的解析 (Lint チェック)
 
@@ -335,7 +250,7 @@ flutter analyze
 ```
 エラーや警告が出力されないことを確認してください。
 
-### 2. 単体テスト・統合テスト
+### 2. 単体テスト・ウィジェットテスト
 
 ```bash
 cd sys/flutter
@@ -343,7 +258,6 @@ flutter test
 ```
 すべてのテストケースがパスすることを確認してください。
 
-※野良ビルド（不正なパッケージ配布）を防止する観点から、アプリパッケージ（`apk`, `aab` 等）のビルドコマンド・ビルド手順については本ドキュメントには記載していません。
 
 ---
 

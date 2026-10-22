@@ -1,11 +1,11 @@
 <!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-30. -->
-# DartHack (NetHack 5.0 日本語 Flutter 移植版)
+# DartHack (NetHack 5.0 日本語 Flutterポート)
 
 <img width="1024" height="500" alt="darthack_feature_graphicl" src="https://github.com/user-attachments/assets/71d548b2-4c4b-4c89-8a05-fa9ec6acb8ec" />
 
 <img width="1280" height="720" alt="Screenshot_20260730-002828" src="https://github.com/user-attachments/assets/70b5b321-d7f2-4e4d-a021-55cd6794b17d" />
 
-DartHack は、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/) 5.0 日本語版/英語版を **Flutter / Dart** で作成したUIで動作させるための非公式移植プロジェクトです。
+DartHack は、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/) 5.0 日本語版/英語版に **Flutter / Dart** で作成したモダンなUIを実装する(非公式)プロジェクトです。
 
 スマートフォン（Android）や PC 等で快適にプレイできるよう、タッチ操作に対応した仮想方向パッド、ショートカットキーパッド、拡張コマンドパネル、個数選択ダイアログなど、モバイルに最適化した UI を備えています。
 
@@ -42,6 +42,14 @@ Flutter FFI による C コアとの連携アーキテクチャ、ディレク�
 
 ---
 
+# リンク
+
+* [NetHack](https://github.com/NetHack/NetHack)
+* [NetHackJP](https://github.com/satokiyon/NetHackJP)
+
+
+---
+
 ## ⚖️ ライセンス
 
 本リポジトリは、オリジナルの NetHack 同様、NetHack General Public License に準じます。
@@ -49,3 +57,4 @@ Flutter FFI による C コアとの連携アーキテクチャ、ディレク�
 
 * ライセンス本文: [dat/license](dat/license)
 * サブモジュール等の第三者コンポーネント: [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES)
+
