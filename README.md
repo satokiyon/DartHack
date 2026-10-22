@@ -1,5 +1,5 @@
 <!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-30. -->
-# DartHack (NetHack 5.0 日本語 Flutterポート)
+# DartHack : NetHack 5.0 Flutterポート(日本語/英語対応)
 
 <img width="1024" height="500" alt="darthack_feature_graphicl" src="https://github.com/user-attachments/assets/71d548b2-4c4b-4c89-8a05-fa9ec6acb8ec" />
 
@@ -9,6 +9,7 @@ DartHack は、ローグライクゲームの金字塔 [NetHack](https://www.net
 
 スマートフォン（Android）や PC 等で快適にプレイできるよう、タッチ操作に対応した仮想方向パッド、ショートカットキーパッド、拡張コマンドパネル、個数選択ダイアログなど、モバイルに最適化した UI を備えています。
 
+日本語版には[NetHackJP](https://github.com/satokiyon/NetHackJP)を、英語版には[NetHack](https://github.com/NetHack/NetHack)を、それぞれ改変して使用しています。
 
 ---
 
@@ -39,14 +40,6 @@ Flutter FFI による C コアとの連携アーキテクチャ、ディレク�
 [![Sponsor satokiyon](https://img.shields.io/badge/Sponsor-satokiyon-EA4AAA?style=flat-square&logo=github-sponsors&logoColor=white)](https://github.com/sponsors/satokiyon)
 
 ※開発活動への支援は上記のボタンや本リポジトリの「Sponsor」ボタンから行えます。
-
----
-
-# リンク
-
-* [NetHack](https://github.com/NetHack/NetHack)
-* [NetHackJP](https://github.com/satokiyon/NetHackJP)
-
 
 ---
 
