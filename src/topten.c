@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23. */
 /* NetHack 5.0	topten.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -982,7 +982,7 @@ static const struct jp_killer_reason_entry {
     { "elementary physics", "物理法則に倒された", "物理法則" },
     { "colliding with the ceiling", "天井への激突で倒された", "天井への激突" },
     { "a grappling hook", 0, "グラップリングフック" },
-    { "jumping out of a bear trap", "熊罠からの脱出で倒された", "熊罠からの脱出失敗" },
+    { "jumping out of a bear trap", "トラバサミからの脱出で倒された", "トラバサミからの脱出失敗" },
     { "cursed throne", 0, "呪われた玉座" },
     { "electric chair", 0, "電気椅子" },
     { "acidic chair", 0, "酸の椅子" },
@@ -1016,7 +1016,7 @@ static const struct jp_killer_reason_entry {
     { "needle", "毒針に刺されて倒された", 0 },
     { "land mine", "地雷の爆発で倒された", "地雷の爆発" },
     { "electric shock", "電撃で倒された", "電撃" },
-    { "bear trap", "熊罠で倒された", "熊罠" },
+    { "bear trap", "トラバサミで倒された", "トラバサミ" },
     { "rolling boulder trap", "転がる大岩の罠に倒された", "転がる大岩の罠" },
     { "statue trap", "石像の罠に倒された", "石像の罠" },
     { "spiked pit", "杭のある落とし穴に落ちて倒された", "杭のある落とし穴" },

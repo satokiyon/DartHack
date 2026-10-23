@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.645 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -87,7 +87,7 @@ static const char *const jp_trap_names[TRAPNUM] = {
     [DART_TRAP] = "吹き矢の罠",
     [ROCKTRAP] = "落石の罠",
     [SQKY_BOARD] = "きしみ床板の罠",
-    [BEAR_TRAP] = "熊罠",
+    [BEAR_TRAP] = "トラバサミ",
     [LANDMINE] = "地雷",
     [ROLLING_BOULDER_TRAP] = "転がる巨大岩の罠",
     [SLP_GAS_TRAP] = "睡眠ガスの罠",
@@ -1547,28 +1547,28 @@ trapeffect_bear_trap(
         feeltrap(trap);
         if (amorphous(gy.youmonst.data) || is_whirly(gy.youmonst.data)
             || unsolid(gy.youmonst.data)) {
-            pline("熊罠はあなたを傷つけることなくすり抜けた.");
+            pline("トラバサミはあなたを傷つけることなくすり抜けた.");
             return Trap_Effect_Finished;
         }
         if (!u.usteed && gy.youmonst.data->msize <= MZ_SMALL) {
-            pline("熊罠はあなたを傷つけることなく頭上で閉じた.");
+            pline("トラバサミはあなたを傷つけることなく頭上で閉じた.");
             return Trap_Effect_Finished;
         }
         set_utrap((unsigned) rn1(4, 4), TT_BEARTRAP);
         if (u.usteed) {
-            pline("熊罠が%sの%sを挟んだ!",
+            pline("トラバサミが%sの%sを挟んだ!",
                 mon_nam(u.usteed), jp_mbodypart(u.usteed, FOOT));
             if (thitm(0, u.usteed, (struct obj *) 0, dmg, FALSE))
                 reset_utrap(TRUE); /* steed died, hero not trapped */
         } else {
-            pline("熊罠があなたの%sを挟んだ!", jp_body_part(FOOT));
+            pline("トラバサミがあなたの%sを挟んだ!", jp_body_part(FOOT));
             if (u.umonnum == PM_OWLBEAR || u.umonnum == PM_BUGBEAR)
                 You("怒ってうなった!");
             if (wearing_iron_shoes(mtmp))
                 pline("%sはあなたの脚を守ってくれた.", xname(uarmf));
             else {
                 set_wounded_legs(rn2(2) ? RIGHT_SIDE : LEFT_SIDE, rn1(10, 10));
-                losehp(Maybe_Half_Phys(dmg), "熊罠", KILLED_BY_AN);
+                losehp(Maybe_Half_Phys(dmg), "トラバサミ", KILLED_BY_AN);
             }
         }
         exercise(A_DEX, FALSE);
@@ -1582,7 +1582,7 @@ trapeffect_bear_trap(
             mtmp->mtrapped = 1;
             if (in_sight) {
                     pline_mon(mtmp,
-                        "%sは%s熊罠にかかった!", l_monnam(mtmp),
+                        "%sは%sトラバサミにかかった!", l_monnam(mtmp),
                       a_your[trap->madeby_u]);
                 seetrap(trap);
             } else {
@@ -1595,7 +1595,7 @@ trapeffect_bear_trap(
         } else if (forcetrap) {
             if (in_sight) {
                 pline_mon(mtmp,
-                      "%sは%s熊罠をかわした!", l_monnam(mtmp),
+                      "%sは%sトラバサミをかわした!", l_monnam(mtmp),
                       a_your[trap->madeby_u]);
                 seetrap(trap);
             }
@@ -3809,7 +3809,7 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
         } else if (metallivorous(mptr)) {
             if (trap->ttyp == BEAR_TRAP) {
                 if (canseemon(mtmp))
-                    pline_mon(mtmp, "%sは熊罠を食べた!",
+                    pline_mon(mtmp, "%sはトラバサミを食べた!",
                               l_monnam(mtmp));
                 deltrap(trap);
                 mtmp->meating = 5;
@@ -5620,11 +5620,11 @@ disarm_holdingtrap(struct trap *ttmp)
     if ((mtmp = m_at(ttmp->tx, ttmp->ty)) != 0) {
         mtmp->mtrapped = 0;
         Snprintf(trapbuf, sizeof trapbuf, "%s%s", which,
-                 (ttmp->ttyp == BEAR_TRAP) ? "熊罠" : "クモの巣");
+                 (ttmp->ttyp == BEAR_TRAP) ? "トラバサミ" : "クモの巣");
         You("%sを%sから助け出した.", l_monnam(mtmp), trapbuf);
         reward_untrap(ttmp, mtmp);
     } else if (ttmp->ttyp == BEAR_TRAP) {
-        You("%s熊罠を解除した.", which);
+        You("%sトラバサミを解除した.", which);
         cnv_trap_obj(BEARTRAP, 1, ttmp, FALSE);
     } else if (ttmp->ttyp == WEB) {
         struct obj *wep = (uwep && is_blade(uwep)) ? uwep
@@ -5879,7 +5879,7 @@ untrap_box(
     boolean confused)
 {
     if (box->tknown && !box->otrapped) {
-        You("know %s is not trapped.", the(xname(box)));
+        You("その%sには罠がないことを知っている.", xname(box));
         return;
     }
 

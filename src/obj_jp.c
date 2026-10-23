@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -35,7 +35,7 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [BANDED_MAIL] = "帯金の鎧",
     [BARDICHE] = "バーディック",
     [BATTLE_AXE] = "戦斧",
-    [BEARTRAP] = "熊の罠",
+    [BEARTRAP] = "トラバサミ",
     [BEC_DE_CORBIN] = "ベック・ド・コルバン",
     [BELL] = "ベル",
     [BELL_OF_OPENING] = "開放の鐘",

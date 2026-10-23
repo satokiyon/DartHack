@@ -77,7 +77,7 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-0
 %sで叩き壊し始めた.
 %sで放射音が聞こえる.
 %sで放射音と爆発音が聞こえる.
-%sで熊罠を破壊した.
+%sでトラバサミを破壊した.
 %sで自分を叩いてしまった.
 %sで角笛の音が聞こえる.
 %sという音が聞こえる.

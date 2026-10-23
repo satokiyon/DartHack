@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23. */
 /* NetHack 5.0	eat.c	$NHDT-Date: 1781973048 2026/06/20 16:30:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.354 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -3765,7 +3765,7 @@ floorfood(
             /* If not already stuck in the trap, perhaps there should
                be a chance to becoming trapped?  Probably not, because
                then the trap would just get eaten on the _next_ turn... */
-            Sprintf(qbuf, "ここに熊罠がある (%s); 食べますか?",
+            Sprintf(qbuf, "ここにトラバサミがある (%s); 食べますか?",
                     u_in_beartrap ? "これに捕まっている" : "セットされている");
             if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y') {
                 struct obj *beartrap;
@@ -3774,7 +3774,7 @@ floorfood(
                 if (u_in_beartrap)
                     reset_utrap(TRUE);
                 beartrap = mksobj(BEARTRAP, TRUE, FALSE);
-                Sprintf(qbuf,"なんとか熊罠を%sしただけだった.",
+                Sprintf(qbuf,"なんとかトラバサミを%sしただけだった.",
                         u_in_beartrap ? "外して脱出" : "解除");
                 if (check_capacity(qbuf) && beartrap) {
                     obj_extract_self(beartrap);

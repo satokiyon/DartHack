@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23. */
 /* NetHack 5.0	apply.c	$NHDT-Date: 1781973040 2026/06/20 16:30:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.482 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2059,8 +2059,8 @@ jump(int magic) /* 0=Physical, otherwise skill level */
             switch (u.utraptype) {
             case TT_BEARTRAP:
                 side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
-                You("熊罠を引き裂いて脱出した!  痛い!");
-                losehp(Maybe_Half_Phys(rnd(10)), "熊罠からの脱出",
+                You("トラバサミを引き裂いて脱出した!  痛い!");
+                losehp(Maybe_Half_Phys(rnd(10)), "トラバサミからの脱出",
                        KILLED_BY_AN);
                 set_wounded_legs(side, rn1(1000, 500));
                 break;

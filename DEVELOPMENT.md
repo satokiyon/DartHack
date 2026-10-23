@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -313,6 +313,24 @@ XAPPLRESDIR=./playground ./playground/nethack -wX11  # X11 GUI インターフ�
 * **WSL ディストロは `-d` で明示指定**: `wsl.exe` 実行時、既定ディストロが `podman-machine` (Fedora) 等に変わっている場合があるため、`wsl.exe -d Ubuntu-26.04` のようにディストロを明示指定するのが確実。
 * **PowerShell 経由の `wsl.exe` 呼び出しでは複雑なコマンドをスクリプト化**: PowerShell は `$?`（PS 変数）や `$(...)` を自身で展開するため、`wsl.exe` に複雑なワンライナーを直接渡すと意図しない展開が起きる。複雑なコマンドは `.sh` ファイルに書き出してから `wsl.exe -d <distro> -- bash ./script.sh` のように実行するのが信頼できる。
 * **ライブラリの文字コード仕様の仮定は小さなテストで実証**: エンコーディングの扱い（例: Qt6 の `QString(const char *)` 暗黙変換や `QString::asprintf` の `%s` が UTF-8 として処理されること）は、ドキュメントや推測に頼らず最小のテストプログラムで日本語文字列の出力を実証してから全面置換に進むと手戻りを防げる。
+
+### ガイドブックの翻訳方針と保守手順（2026年10月）
+NetHack の公式解説書であるガイドブック（`Guidebook`）は、従来の端末閲覧に適した等幅テキスト版（`Guidebook_JP.txt`）と、スマートフォンや Web ブラウザでのレスポンシブ閲覧に最適化した Markdown 版（`Guidebook_JP.md`）の双方を `Guidebook/` ディレクトリで運用・保守しています。
+
+* **翻訳方針と詳細手順**:
+  * 用語統一規則（公式対訳 `src/mon_jp.c` や `glossary_references/` との一致）、直訳調・不自然語尾の排除、アスキーアートの WebP 画像化ルール、テーブル化・オプション構造化などの詳細は、[docs/guidebook-translation-guide-ja.md](docs/guidebook-translation-guide-ja.md) を参照してください。
+* **スクリプトによる自動生成**:
+  * `doc/Guidebook.txt`（英語原本）および `Guidebook/Guidebook_JP.txt`（日本語原本）から、以下のスクリプトを用いて Markdown ファイルや WebP 画像を自動生成・検証できます。
+    ```bash
+    # アスキーアート画像（Guidebook/images/fig*.webp）の生成
+    python docs/scripts/generate_guidebook_images.py
+
+    # 日英両方の Markdown（Guidebook.md / Guidebook_JP.md）の生成
+    python docs/scripts/build_markdown_guidebook.py
+    ```
+* **配布パッケージ同梱**:
+  * GitHub Actions（`.github/workflows/weekly-release.yml`）により、週次ビルド時に `Guidebook/` フォルダ一式（TXT, MD, WebP 画像）が自動的に配布 ZIP パッケージに同梱されます。
+
 
 ---
 
