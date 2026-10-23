@@ -2,7 +2,7 @@
 
 NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24.
 
-A Guide to the Mazes of Menace (Guidebook for NetHack)
+**A Guide to the Mazes of Menace (Guidebook for NetHack)**
 
 Original version - Eric S. Raymond (Edited and expanded for NetHack 5.0.1 by Mike Stephenson and others)
 
@@ -10,27 +10,14 @@ July 4, 2026
 
 ## 1 Introduction
 
-Recently, you have begun to find yourself unfulfilled and distant in your daily occupation.  Strange dreams  of  prospecting,  stealing, crusading,  and combat have haunted you in your sleep for many months, but you aren't sure of the reason.  You wonder  whether  you  have  in
+Recently, you have begun to find yourself unfulfilled and distant in your daily occupation.  Strange dreams  of  prospecting,  stealing, crusading,  and combat have haunted you in your sleep for many months, but you aren't sure of the reason.  You wonder  whether  you  have  in fact  been  having  those dreams all your life, and somehow managed to forget about them until now.  Some nights you awaken suddenly and  cry out,  terrified  at the vivid recollection of the strange and powerful creatures that seem to be lurking behind every corner of  the  dungeon in  your dream.  Could these details haunting your dreams be real?  As each night passes, you feel the desire to enter the mysterious caverns near  the ruins grow stronger.  Each morning, however, you quickly put the idea out of your head as you recall the tales of those who entered the  caverns before you and did not return.  Eventually you can resist the yearning to seek out the fantastic place in your dreams no longer. After  all,  when  other adventurers came back this way after spending time in the caverns, they usually seemed better  off  than  when  they passed  through  the first time.  And who was to say that all of those who did not return had not just kept going?
 
-- `fact` : been  having  those dreams all your life, and somehow managed to forget about them until now.  Some nights you awaken suddenly and  cry out,  terrified  at the vivid recollection of the strange and powerful creatures that seem to be lurking behind every corner of  the  dungeon
-- `in` : your dream.  Could these details haunting your dreams be real?  As each night passes, you feel the desire to enter the mysterious caverns
-- `near` : the ruins grow stronger.  Each morning, however, you quickly put the idea out of your head as you recall the tales of those who entered
-- `the` : caverns before you and did not return.  Eventually you can resist the yearning to seek out the fantastic place in your dreams no longer.
-- `After` : all,  when  other adventurers came back this way after spending time in the caverns, they usually seemed better  off  than  when  they
-- `passed` : through  the first time.  And who was to say that all of those who did not return had not just kept going?
-Asking around, you hear about a bauble, called the Amulet of Yen-
+Asking around, you hear about a bauble, called the Amulet of Yendor  by  some, which, if you can find it, will bring you great wealth. One legend you were told even mentioned that the  one  who  finds  the amulet will be granted immortality by the gods.  The amulet is rumored to be somewhere beyond the Valley of Gehennom, deep within  the  Mazes of  Menace.   Upon  hearing  the legends, you immediately realize that there is some profound and undiscovered reason that you are to descend into  the  caverns and seek out that amulet of which they spoke.  Even if the rumors of the amulet's powers are untrue, you decide  that  you should  at  least  be able to sell the tales of your adventures to the local minstrels for a tidy sum, especially if you encounter any of the terrifying  and  magical  creatures of your dreams along the way.  You spend one last night fortifying yourself at the  local  inn,  becoming more  and  more  depressed as you watch the odds of your success being posted on the inn's walls getting lower and lower.
 
-- `dor` : by  some, which, if you can find it, will bring you great wealth. One legend you were told even mentioned that the  one  who  finds  the amulet will be granted immortality by the gods.  The amulet is rumored to be somewhere beyond the Valley of Gehennom, deep within  the  Mazes
-- `of` : Menace.   Upon  hearing  the legends, you immediately realize that there is some profound and undiscovered reason that you are to descend
-- `into` : the  caverns and seek out that amulet of which they spoke.  Even if the rumors of the amulet's powers are untrue, you decide  that  you
-- `should` : at  least  be able to sell the tales of your adventures to the local minstrels for a tidy sum, especially if you encounter any of the
-- `terrifying` : and  magical  creatures of your dreams along the way.  You spend one last night fortifying yourself at the  local  inn,  becoming
-- `more` : and  more  depressed as you watch the odds of your success being posted on the inn's walls getting lower and lower.
 In the morning you awake, collect your belongings,  and  set  off for the dungeon.  After several days of uneventful travel, you see the
 
-ancient ruins that mark the entrance to the Mazes of  Menace.   It  is
+ancient ruins that mark the entrance to the Mazes of  Menace.   It  is late  at  night,  so you make camp at the entrance and spend the night sleeping under the open skies.  In the morning, you gather your  gear, eat what may be your last meal outside, and enter the dungeon....
 
-- `late` : at  night,  so you make camp at the entrance and spend the night sleeping under the open skies.  In the morning, you gather your  gear, eat what may be your last meal outside, and enter the dungeon....
 ## 2 What is going on here?
 
 You  have  just begun a game of NetHack.  Your goal is to grab as much treasure as you can, retrieve the Amulet of  Yendor,  and  escape the Mazes of Menace alive.
@@ -124,10 +111,8 @@ The bottom two (or three) lines of  the  screen  contain  several cryptic  piece
 
 ## 1 shows the traditional two-line status area below the map.  Figure  2
 
-shows just the status area, when the statuslines:3 option has been set (not all interfaces support this option).  If any status line  becomes
+shows just the status area, when the statuslines:3 option has been set (not all interfaces support this option).  If any status line  becomes wider  than the screen, you might not see all of it due to truncation. When the numbers grow bigger and multiple conditions are present,  the two-line  format  will  run  out  of room on the second line, but statuslines:2 is the default because a basic 24-line terminal isn't  tall enough for the third line.
 
-- `wider` : than the screen, you might not see all of it due to truncation. When the numbers grow bigger and multiple conditions are present,  the
-- `two-line` : format  will  run  out  of room on the second line, but statuslines:2 is the default because a basic 24-line terminal isn't  tall enough for the third line.
 Here are explanations of what the various status items mean:
 
 Title Your character's name and professional ranking (based on role and experience level, see below).
@@ -174,9 +159,8 @@ Movement modifiers: Lev (levitating), Fly  (flying),  Ride  (riding).
 
 Other conditions and modifiers exist, but there isn't enough room to display them with the other status fields.
 
-The #attributes command (default key ^X) will show all current  status
+The #attributes command (default key ^X) will show all current  status information  in unabbreviated format.  It also shows other information which might be included on the status lines if those had more room.
 
-- `information` : in unabbreviated format.  It also shows other information which might be included on the status lines if those had more room.
 ### 3.2 The message line (top)
 
 The top line of the screen is reserved for messages that describe

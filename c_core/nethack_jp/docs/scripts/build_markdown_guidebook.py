@@ -129,6 +129,7 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
         out.append("# A Guide to the Mazes of Menace (Guidebook)\n\n")
 
     i = 0
+    in_sec1_intro = False
     in_sec2_roles = False
     in_sec3_1_status = False
     in_sec9_options = False
@@ -159,14 +160,31 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
             i += 1
             continue
 
+        # 1.5 表紙タイトルブロックの修飾（太字化）
+        if ("脅威の迷宮へのガイド" in line or "A Guide to the Mazes of Menace" in line) and i < 30:
+            flush_para()
+            title_parts = [s]
+            i += 1
+            while i < n and lines[i].strip() and not lines[i].strip().startswith(("オリジナル版", "Original version")):
+                title_parts.append(lines[i].strip())
+                i += 1
+            full_title = " ".join(title_parts)
+            out.append(f"**{full_title}**\n\n")
+            continue
+
         # 2. セクション見出しの判定
         m_sec = re.match(r'^(?:     )?([1-9]\d*(?:\.\d+)*)\.?\s+(.+)$', line)
         if m_sec:
             num = m_sec.group(1)
             title = m_sec.group(2).strip()
             
-            # 見出し誤判定の除外
-            if not (len(title) > 80 or title.startswith(('is', 'are', 'was', 'were', 'for', 'to', 'that', 'with', 'の', 'は', 'が', 'を', 'に'))):
+            # 見出し誤判定の除外（「はじめに」は誤除外しない）
+            is_invalid_title = (
+                len(title) > 80 or
+                title.startswith(('is ', 'are ', 'was ', 'were ', 'for ', 'to ', 'that ', 'with ')) or
+                (title.startswith(('の', 'は', 'が', 'を', 'に')) and not title.startswith(('はじめに', 'はじめに ')))
+            )
+            if not is_invalid_title:
                 flush_para()
                 dots = num.count('.')
                 if dots == 0:
@@ -179,6 +197,7 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
                 clean_title = convert_roff_quotes(title)
                 out.append(f"{hashes} {num} {clean_title}\n\n")
 
+                in_sec1_intro = (num == "1")
                 in_sec2_roles = (num == "2")
                 in_sec3_1_status = (num == "3.1")
                 in_sec9_options = (num == "9.4")
@@ -603,7 +622,7 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
 
         # 11. コマンドキー定義リスト: "- `key` : 説明"
         m_cmd = re.match(r'^(?:     )?([a-zA-Z0-9\?\/\<\>\,\.\;\:\'\"\[\]\{\}\\\|\`\~\!\@\$\%\^\&\*\(\)\_\+\-\=\#\^][a-zA-Z0-9\-\^\?]*)\s{2,}(.+)$', line)
-        if m_cmd and not in_sec9_options and not in_sec9_5_options and not in_sec9_6_options and not in_sec9_7_options and not in_sec9_10_keys and not in_sec3_1_status and not in_sec2_roles:
+        if m_cmd and not in_sec9_options and not in_sec9_5_options and not in_sec9_6_options and not in_sec9_7_options and not in_sec9_10_keys and not in_sec3_1_status and not in_sec2_roles and not in_sec1_intro:
             cmd_key = m_cmd.group(1).strip()
             first_desc = m_cmd.group(2).strip()
             
