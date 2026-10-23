@@ -1308,7 +1308,34 @@ There  are  several  other challenges tracked by the game.  It is possible to el
 
 End  of  game  disclosure  will also display various achievements representing progress toward ultimate  ascension,  if  any  have  been attained.   They  aren't  directly  related to conduct but are grouped with it because they fall into the same category of "bragging  rights" and  to  limit the number of questions during disclosure.  Listed here roughly in order of difficulty and not necessarily  in  the  order  in which you might accomplish them.
 
-Rank         -  Attained rank title Rank. Shop         -  Entered a shop. Temple       -  Entered a temple. Mines        -  Entered the Gnomish Mines. Town         -  Entered Mine Town. Oracle       -  Consulted the Oracle of Delphi. Novel        -  Read a passage from a Discworld Novel. Sokoban      -  Entered Sokoban. Big Room     -  Entered the Big Room. Soko-Prize   -  Explored  to  the  top  of Sokoban and found a special item there. Mines' End   -  Explored to the bottom of  the  Gnomish  Mines and found a special item there. Medusa       -  Defeated Medusa. Tune         -  Discovered  the  tune that can be used to open and close the drawbridge on the Castle level. Bell         -  Acquired the Bell of Opening. Gehennom     -  Entered Gehennom. Candle       -  Acquired the Candelabrum of Invocation. Book         -  Acquired the Book of the Dead. Invocation   -  Gained  access  to  the  bottommost  level  of Gehennom. Amulet       -  Acquired the fabled Amulet of Yendor. Endgame      -  Reached the Elemental Planes. Astral       -  Reached the Astral Plane level. Blind        -  Blind from birth. Deaf         -  Deaf from birth. Nudist       -  Never wore any armor. Pauper       -  Started out with no possessions. Ascended     -  Delivered the Amulet to its final destination.
+| Achievement | Description |
+|:---|:---|
+| **Rank** | Attained rank title Rank. |
+| **Shop** | Entered a shop. |
+| **Temple** | Entered a temple. |
+| **Mines** | Entered the Gnomish Mines. |
+| **Town** | Entered Mine Town. |
+| **Oracle** | Consulted the Oracle of Delphi. |
+| **Novel** | Read a passage from a Discworld Novel. |
+| **Sokoban** | Entered Sokoban. |
+| **Big Room** | Entered the Big Room. |
+| **Soko-Prize** | Explored  to  the  top  of Sokoban and found a special item there. |
+| **Mines' End** | Explored to the bottom of  the  Gnomish  Mines and found a special item there. |
+| **Medusa** | Defeated Medusa. |
+| **Tune** | Discovered  the  tune that can be used to open and close the drawbridge on the Castle level. |
+| **Bell** | Acquired the Bell of Opening. |
+| **Gehennom** | Entered Gehennom. |
+| **Candle** | Acquired the Candelabrum of Invocation. |
+| **Book** | Acquired the Book of the Dead. |
+| **Invocation** | Gained  access  to  the  bottommost  level  of Gehennom. |
+| **Amulet** | Acquired the fabled Amulet of Yendor. |
+| **Endgame** | Reached the Elemental Planes. |
+| **Astral** | Reached the Astral Plane level. |
+| **Blind** | Blind from birth. |
+| **Deaf** | Deaf from birth. |
+| **Nudist** | Never wore any armor. |
+| **Pauper** | Started out with no possessions. |
+| **Ascended** | Delivered the Amulet to its final destination. |
 
 Notes:
 
@@ -1348,94 +1375,134 @@ On MS-DOS, it is "defaults.nh" in the same folder as nethack.exe.
 
 Any  line  in the configuration file starting with `#` is treated as a comment and ignored.  Empty lines are ignored.
 
-Any line beginning with `[` and ending in `]` is a section marker
-
-- `(the` : closing  `]` can be followed by whitespace and then an arbitrary comment beginning with `#`).  The text between the square brackets  is
-the  section  name.   Section  markers  are  only valid after a CHOOSE directive and their names are case-insensitive.  Lines after a section marker  belong  to  that  section up until another section starts or a marker without a name is encountered or the file ends.   Lines  within sections  are ignored unless a CHOOSE directive has selected that section.
+Any line beginning with `[` and ending in `]` is a section marker (the  closing  `]` can be followed by whitespace and then an arbitrary comment beginning with `#`).  The text between the square brackets  is the  section  name.   Section  markers  are  only valid after a CHOOSE directive and their names are case-insensitive.  Lines after a section marker  belong  to  that  section up until another section starts or a marker without a name is encountered or the file ends.   Lines  within sections  are ignored unless a CHOOSE directive has selected that section.
 
 You can use different configuration directives in the file,  some of  which  can be used multiple times.  In general, the directives are written in capital letters, followed by an equals  sign,  followed  by settings particular to that directive.
 
 Here is a list of allowed directives:
 
-OPTIONS There are two types of options, boolean and compound options.  Boolean options toggle a setting on or off, while compound options  take more  diverse  values.   Prefix a boolean option with "no" or `!` to turn it off.  For compound options, the option name  and  value  are separated  by  a colon.  Some options are persistent, and apply only to new games.  You can specify multiple OPTIONS directives, and multiple  options  separated  by  commas in a single OPTIONS directive. (Comma separated options are processed from right to left.)
+- **OPTIONS**
 
-Example:
+  There are two types of options, boolean and compound options.  Boolean options toggle a setting on or off, while compound options  take more  diverse  values.   Prefix a boolean option with "no" or `!` to turn it off.  For compound options, the option name  and  value  are separated  by  a colon.  Some options are persistent, and apply only to new games.  You can specify multiple OPTIONS directives, and multiple  options  separated  by  commas in a single OPTIONS directive. (Comma separated options are processed from right to left.)
 
-OPTIONS=dogname:Fido OPTIONS=!legacy,autopickup,pickup_types:$"=/!?+
+  Example:
 
-HACKDIR [not available on Unix] Default location of files NetHack needs. On Windows HACKDIR defaults to  the  location of the NetHack.exe or NetHackw.exe file so setting HACKDIR to override that is not usually necessary or recommended.
+  ```text
+  OPTIONS=dogname:Fido
+  OPTIONS=!legacy,autopickup,pickup_types:$"=/!?+
+  ```
 
-LEVELDIR [not available on Unix] The location that in-progress level files are  stored.  Defaults  to HACKDIR, must be writable.
+- **HACKDIR** [not available on Unix]
 
-SAVEDIR [not available on Unix]
+  Default location of files NetHack needs. On Windows HACKDIR defaults to  the  location of the NetHack.exe or NetHackw.exe file so setting HACKDIR to override that is not usually necessary or recommended.
 
-The  location  where saved games are kept. Defaults to HACKDIR, must be writable.
+- **LEVELDIR** [not available on Unix]
 
-BONESDIR [not available on Unix] The location that bones files are kept. Defaults to HACKDIR, must be writable.
+  The location that in-progress level files are  stored.  Defaults  to HACKDIR, must be writable.
 
-LOCKDIR [not available on Unix] The location that file synchronization locks are stored. Defaults to HACKDIR, must be writable.
+- **SAVEDIR** [not available on Unix]
 
-TROUBLEDIR [not available on Unix] The location that a record of game aborts  and  self-diagnosed  game problems is kept. Defaults to HACKDIR, must be writable.
+  The  location  where saved games are kept. Defaults to HACKDIR, must be writable.
 
-AUTOCOMPLETE Enable  or  disable an extended command autocompletion.  Autocompletion has no effect for the X11 windowport.  You can specify multiple autocompletions.   To  enable autocompletion, list the extended command.  Prefix the command with "!" to disable the autocompletion for that command.
+- **BONESDIR** [not available on Unix]
 
-Example:
+  The location that bones files are kept. Defaults to HACKDIR, must be writable.
 
-AUTOCOMPLETE=zap,!annotate
+- **LOCKDIR** [not available on Unix]
 
-AUTOPICKUP_EXCEPTION Set  exceptions  to  the  pickup_types option.  See the "Configuring Autopickup Exceptions" section.
+  The location that file synchronization locks are stored. Defaults to HACKDIR, must be writable.
 
-BINDINGS Change the key bindings of some  special  keys,  menu  accelerators, extended commands, or mouse buttons.  You can specify multiple bindings.  Format is key followed by the command, separated by a  colon. See the "Changing Key Bindings" section for more information.
+- **TROUBLEDIR** [not available on Unix]
 
-Example:
+  The location that a record of game aborts  and  self-diagnosed  game problems is kept. Defaults to HACKDIR, must be writable.
 
-```text
-BIND=^X:getpos.autodescribe
-```
+- **AUTOCOMPLETE**
 
-CHOOSE Chooses at random one of the comma-separated parameters as an active section name.  Lines in other sections are ignored.
+  Enable  or  disable an extended command autocompletion.  Autocompletion has no effect for the X11 windowport.  You can specify multiple autocompletions.   To  enable autocompletion, list the extended command.  Prefix the command with "!" to disable the autocompletion for that command.
 
-Example:
+  Example:
 
-OPTIONS=color CHOOSE=char A,char B [char A]
+  ```text
+  AUTOCOMPLETE=zap,!annotate
+  ```
 
-```text
-OPTIONS=role:arc,race:dwa,align:law,gender:fem
-[char B]
-OPTIONS=role:wiz,race:elf,align:cha,gender:mal
-[] #end of CHOOSE
-OPTIONS=!rest_on_space
-```
+- **AUTOPICKUP_EXCEPTION**
 
-If [] is present, the preceding section is closed and no new section begins;  whatever follows will be common to all sections.  Otherwise the last section extends to the end of the options file.
+  Set  exceptions  to  the  pickup_types option.  See the "Configuring Autopickup Exceptions" section.
 
-MENUCOLOR Highlight menu lines with different colors.   See  the  "Configuring Menu Colors" section.
+- **BINDINGS**
 
-MSGTYPE Change the way messages are shown in the top line.  See the "Configuring Message Types" section.
+  Change the key bindings of some  special  keys,  menu  accelerators, extended commands, or mouse buttons.  You can specify multiple bindings.  Format is key followed by the command, separated by a  colon. See the "Changing Key Bindings" section for more information.
 
-ROGUESYMBOLS Custom symbols for the rogue level's symbol set.  See SYMBOLS below.
+  Example:
 
-SOUND Define a sound mapping.  See the "Configuring User Sounds" section.
+  ```text
+  BIND=^X:getpos.autodescribe
+  ```
 
-SOUNDDIR Define the directory that contains the sound files.  See  the  "Configuring User Sounds" section.
+- **CHOOSE**
 
-SYMBOLS Override  one or more symbols in the symbol set used for all dungeon levels except for the  special  rogue  level.   See  the  "Modifying NetHack Symbols" section.
+  Chooses at random one of the comma-separated parameters as an active section name.  Lines in other sections are ignored.
 
-Example:
+  Example:
 
-# replace small punctuation (tick marks) with digits SYMBOLS=S_golem:7
+  ```text
+  OPTIONS=color
+  CHOOSE=char A,char B
+  [char A]
+  OPTIONS=role:arc,race:dwa,align:law,gender:fem
+  [char B]
+  OPTIONS=role:wiz,race:elf,align:cha,gender:mal
+  [] #end of CHOOSE
+  OPTIONS=!rest_on_space
+  ```
 
-WIZKIT Debug mode only:  extra items to add to initial inventory.  Value is the name of a text file containing a list of  item  names,  one  per line,  up  to a maximum of 128 lines.  Each line is processed by the function that handles wishing.  Entries are added to the  wish  history; see the wizwish-command.
+  If [] is present, the preceding section is closed and no new section begins;  whatever follows will be common to all sections.  Otherwise the last section extends to the end of the options file.
 
-Example:
+- **MENUCOLOR**
 
-```text
-WIZKIT=~/wizkit.txt
-```
+  Highlight menu lines with different colors.   See  the  "Configuring Menu Colors" section.
 
-Here is an example of configuration file contents:
+- **MSGTYPE**
 
-# Set your character's role, race, gender, and alignment.
+  Change the way messages are shown in the top line.  See the "Configuring Message Types" section.
+
+- **ROGUESYMBOLS**
+
+  Custom symbols for the rogue level's symbol set.  See SYMBOLS below.
+
+- **SOUND**
+
+  Define a sound mapping.  See the "Configuring User Sounds" section.
+
+- **SOUNDDIR**
+
+  Define the directory that contains the sound files.  See  the  "Configuring User Sounds" section.
+
+- **SYMBOLS**
+
+  Override  one or more symbols in the symbol set used for all dungeon levels except for the  special  rogue  level.   See  the  "Modifying NetHack Symbols" section.
+
+  Example:
+
+  ```text
+  # replace small punctuation (tick marks) with digits
+  SYMBOLS=S_golem:7
+  ```
+
+- **WIZKIT**
+
+  Debug mode only:  extra items to add to initial inventory.  Value is the name of a text file containing a list of  item  names,  one  per line,  up  to a maximum of 128 lines.  Each line is processed by the function that handles wishing.  Entries are added to the  wish  history; see the wizwish-command.
+
+  Example:
+
+  ```text
+  WIZKIT=~/wizkit.txt
+  ```
+
+  Here is an example of configuration file contents:
+
+  # Set your character's role, race, gender, and alignment.
 
 ```text
 OPTIONS=role:Valkyrie, race:Human, gender:female, align:lawful

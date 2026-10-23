@@ -85,7 +85,7 @@ MENUCOLOR="能力獲得の薬" = blue
 MENUCOLOR="識別の巻物" = brown
 MENUCOLOR="解呪の巻物" = brown
 MENUCOLOR="死者の書" = orange
-MENUCOLOR="開放の鐘" = orange
+MENUCOLOR="開放のベル" = orange
 MENUCOLOR="ろうそく" = orange
 
 # アーティファクト

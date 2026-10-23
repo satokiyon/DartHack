@@ -132,6 +132,8 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
     in_sec1_intro = False
     in_sec2_roles = False
     in_sec3_1_status = False
+    in_sec8_1_achievements = False
+    in_sec9_2_config = False
     in_sec9_options = False
     in_sec9_5_options = False
     in_sec9_6_options = False
@@ -201,6 +203,8 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
                 in_sec1_intro = (num == "1")
                 in_sec2_roles = (num == "2")
                 in_sec3_1_status = (num == "3.1")
+                in_sec8_1_achievements = (num == "8.1")
+                in_sec9_2_config = (num == "9.2")
                 in_sec9_options = (num == "9.4")
                 in_sec9_5_options = (num == "9.5")
                 in_sec9_6_options = (num == "9.6")
@@ -287,7 +291,7 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
             continue
 
         # 6. セクション 7.5: 防具AC表のテーブル化
-        if ("ドラゴン・スケイル・メイル" in line and "1" in line) or ("Dragon scale mail" in line and "1" in line):
+        if ("ドラゴンの鱗鎧" in line and "1" in line) or ("ドラゴン・スケイル・メイル" in line and "1" in line) or ("Dragon scale mail" in line and "1" in line):
             flush_para()
             armor_lines = []
             while i < n:
@@ -320,7 +324,12 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
                 m_ac = re.search(r'^(.*?)\s+(\d+)$', als)
                 if m_ac:
                     cur_armor_name.append(m_ac.group(1).strip())
-                    name = convert_roff_quotes(" ".join(cur_armor_name))
+                    if lang == "jp":
+                        raw_name = "".join(cur_armor_name)
+                        raw_name = re.sub(r'、\s+', '、', raw_name)
+                        name = convert_roff_quotes(raw_name)
+                    else:
+                        name = convert_roff_quotes(" ".join(cur_armor_name))
                     ac = m_ac.group(2)
                     out.append(f"| {name} | {ac} |\n")
                     cur_armor_name = []
@@ -328,6 +337,154 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
                     cur_armor_name.append(als)
             out.append("\n")
             continue
+
+        # 6.5 セクション 8.1: 実績一覧のテーブル化
+        if in_sec8_1_achievements and ("階級 (Rank)" in line or re.match(r'^\s*Rank\s+-', line)):
+            flush_para()
+            achieve_lines = []
+            while i < n:
+                if not lines[i].strip():
+                    if i + 1 < n and (lines[i+1].strip().startswith(("注：", "Notes:")) or lines[i+1].strip().startswith("9.")):
+                        break
+                    achieve_lines.append(lines[i])
+                    i += 1
+                    continue
+                if lines[i].strip().startswith(("注：", "Notes:")) or lines[i].strip().startswith("9."):
+                    break
+                achieve_lines.append(lines[i])
+                i += 1
+            
+            # テーブルヘッダー
+            if lang == "jp":
+                out.append("| 実績 | 説明 |\n|:---|:---|\n")
+            else:
+                out.append("| Achievement | Description |\n|:---|:---|\n")
+            
+            p_ach = re.compile(r'^\s{5,}(.+?)(?:\s+-\s+|(?<=\))-\s*)(.*)$')
+            items = []
+            cur_key = None
+            cur_desc_parts = []
+            
+            for al in achieve_lines:
+                als = al.rstrip()
+                if not als.strip():
+                    continue
+                m_ach = p_ach.match(als)
+                if m_ach:
+                    if cur_key:
+                        items.append((cur_key, cur_desc_parts))
+                    cur_key = m_ach.group(1).strip()
+                    cur_desc_parts = [m_ach.group(2).strip()]
+                else:
+                    if cur_desc_parts:
+                        cur_desc_parts.append(als.strip())
+            
+            if cur_key:
+                items.append((cur_key, cur_desc_parts))
+            
+            for key, desc_parts in items:
+                desc = join_para(desc_parts, lang)
+                out.append(f"| **{key}** | {desc} |\n")
+            out.append("\n")
+            continue
+
+        # 6.6 セクション 9.2: 設定ファイルの使用（ディレクティブ太字リスト化および例のコードブロック化）
+        if in_sec9_2_config:
+            # 1. 末尾の全体設定ファイル例
+            if "以下は、設定ファイルの内容の例です" in line or "Here is an example of the contents of a configuration file" in line:
+                flush_para()
+                lead_text = "以下は、設定ファイルの内容の例です。" if lang == "jp" else "Here is an example of the contents of a configuration file."
+                out.append(f"{lead_text}\n\n")
+                i += 1
+                example_lines = []
+                while i < n:
+                    if lines[i].startswith("     9.3") or lines[i].startswith("     10."):
+                        break
+                    example_lines.append(lines[i].rstrip())
+                    i += 1
+                while example_lines and not example_lines[0].strip():
+                    example_lines.pop(0)
+                while example_lines and not example_lines[-1].strip():
+                    example_lines.pop()
+                if example_lines:
+                    out.append("```text\n")
+                    for el in example_lines:
+                        out.append(el.strip() + "\n")
+                    out.append("```\n\n")
+                continue
+
+            # 2. ディレクティブ項目の検出
+            m_dir = re.match(r'^(?:     )?(OPTIONS|HACKDIR|LEVELDIR|SAVEDIR|BONESDIR|LOCKDIR|TROUBLEDIR|AUTOCOMPLETE|AUTOPICKUP_EXCEPTION|BINDINGS|CHOOSE|MENUCOLOR|MSGTYPE|ROGUESYMBOLS|SOUNDDIR|SOUND|SYMBOLS|WIZKIT)\b(?:\s+(\[.*?\]))?$', line)
+            if m_dir:
+                flush_para()
+                d_name = m_dir.group(1)
+                d_note = f" {m_dir.group(2)}" if m_dir.group(2) else ""
+                # 次の行が単独の [not available on Unix] などの注釈の場合
+                if i + 1 < n and re.match(r'^\s*\[(.*?)\]$', lines[i+1]):
+                    d_note = f" {lines[i+1].strip()}"
+                    i += 1
+                out.append(f"- **{d_name}**{d_note}\n\n")
+                i += 1
+                
+                # ディレクティブ配下の段落と例を処理
+                cur_block_lines = []
+                in_example = False
+                example_block = []
+                
+                while i < n:
+                    # 次のディレクティブ、末尾例、またはセクション終了の判定
+                    if (re.match(r'^(?:     )?(OPTIONS|HACKDIR|LEVELDIR|SAVEDIR|BONESDIR|LOCKDIR|TROUBLEDIR|AUTOCOMPLETE|AUTOPICKUP_EXCEPTION|BINDINGS|CHOOSE|MENUCOLOR|MSGTYPE|ROGUESYMBOLS|SOUNDDIR|SOUND|SYMBOLS|WIZKIT)\b', lines[i]) or
+                        "以下は、設定ファイルの内容の例です" in lines[i] or
+                        "Here is an example of the contents of a configuration file" in lines[i] or
+                        lines[i].startswith("     9.3") or lines[i].startswith("     10.")):
+                        break
+                    
+                    cur_s = lines[i].strip()
+                    
+                    if not cur_s:
+                        if example_block:
+                            out.append("  ```text\n")
+                            for eb in example_block:
+                                out.append(f"  {eb}\n")
+                            out.append("  ```\n\n")
+                            example_block = []
+                            in_example = False
+                        elif cur_block_lines:
+                            p_text = join_para(cur_block_lines, lang)
+                            out.append(f"  {p_text}\n\n")
+                            cur_block_lines = []
+                        i += 1
+                        continue
+                    
+                    # 「例：」または「Example:」の判定
+                    if cur_s in ("例：", "例:", "Example:", "Examples:"):
+                        if cur_block_lines:
+                            p_text = join_para(cur_block_lines, lang)
+                            out.append(f"  {p_text}\n\n")
+                            cur_block_lines = []
+                        ex_label = "例：" if lang == "jp" else "Example:"
+                        out.append(f"  {ex_label}\n\n")
+                        in_example = True
+                        example_block = []
+                        i += 1
+                        continue
+                    
+                    if in_example:
+                        example_block.append(cur_s)
+                    else:
+                        cur_block_lines.append(cur_s)
+                    i += 1
+                
+                if example_block:
+                    out.append("  ```text\n")
+                    for eb in example_block:
+                        out.append(f"  {eb}\n")
+                    out.append("  ```\n\n")
+                elif cur_block_lines:
+                    p_text = join_para(cur_block_lines, lang)
+                    out.append(f"  {p_text}\n\n")
+                
+                continue
 
         # 7. セクション 9.15: 記号表のテーブル化
         if "-----------------------------------------------------------------" in line and i > 0 and ("S_air" in lines[i+1] if i+1 < n else False):
@@ -655,7 +812,7 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
 
         # 11. コマンドキー定義リスト: "- `key` : 説明"
         m_cmd = re.match(r'^(?:     )?([a-zA-Z0-9\?\/\<\>\,\.\;\:\'\"\[\]\{\}\\\|\`\~\!\@\$\%\^\&\*\(\)\_\+\-\=\#\^][a-zA-Z0-9\-\^\?]*)\s{2,}(.+)$', line)
-        if m_cmd and not in_sec9_options and not in_sec9_5_options and not in_sec9_6_options and not in_sec9_7_options and not in_sec9_10_keys and not in_sec3_1_status and not in_sec2_roles and not in_sec1_intro:
+        if m_cmd and not in_sec9_options and not in_sec9_5_options and not in_sec9_6_options and not in_sec9_7_options and not in_sec9_10_keys and not in_sec9_2_config and not in_sec8_1_achievements and not in_sec3_1_status and not in_sec2_roles and not in_sec1_intro:
             cmd_key = m_cmd.group(1).strip()
             first_desc = m_cmd.group(2).strip()
             

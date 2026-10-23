@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24. -->
 # quest.lua 翻訳用語集・実務知見
 
 この文書は `quest.lua` および関連するテキストの翻訳に使用する用語集と、特有の実務知見をまとめたものです。基本方針については [docs/translation-instructions-ja.md](translation-instructions-ja.md) を参照してください。
@@ -10,7 +10,7 @@
 - Marduk: マルドゥク
 - Gehennom: ゲヘナ
 - Astral Plane: アストラル界
-- Bell of Opening: 開門のベル
+- Bell of Opening: 開放のベル
 - Caduceus: カドゥケウス
 - Ransmannsby: 盗賊ギルド会館
 

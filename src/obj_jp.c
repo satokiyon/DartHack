@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24. */
 #include "hack.h"
 #include "artifact.h"
 
@@ -38,7 +38,7 @@ const char *const obj_jp_names[NUM_OBJECTS + 1] = {
     [BEARTRAP] = "トラバサミ",
     [BEC_DE_CORBIN] = "ベック・ド・コルバン",
     [BELL] = "ベル",
-    [BELL_OF_OPENING] = "開放の鐘",
+    [BELL_OF_OPENING] = "開放のベル",
     [BILL_GUISARME] = "ビル・ギザルム",
     [BLACK_DRAGON_SCALE_MAIL] = "黒色ドラゴンの鱗鎧",
     [BLACK_DRAGON_SCALES] = "黒色ドラゴンの鱗",
@@ -478,7 +478,7 @@ const char *const obj_jp_descrs[NUM_OBJECTS + 1] = {
     [BARDICHE] = "長いまさかり",
     [BATTLE_AXE] = "両刃の斧",
     [BEC_DE_CORBIN] = "くちばし付き長斧",
-    [BELL_OF_OPENING] = "銀の鐘",
+    [BELL_OF_OPENING] = "銀のベル",
     [BILL_GUISARME] = "鈎付き長斧",
     [BLACK_OPAL] = "黒い石",
     [BLINDING_VENOM] = "毒液の飛沫",

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24. */
 /* NetHack 5.0	insight.c	$NHDT-Date: 1781973051 2026/06/20 16:30:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -56,9 +56,9 @@ struct ll_achieve_msg {
 /* take care to keep them in sync! */
 static struct ll_achieve_msg achieve_msg [] = {
     { 0, "" }, /* actual achievements are numbered from 1 */
-    { LL_ACHIEVE, "開門のベルを入手した" },
+    { LL_ACHIEVE, "開放のベルを入手した" },
     { LL_ACHIEVE, "ゲヘナに入った" },
-    { LL_ACHIEVE, "招魂の燭台を入手した" },
+    { LL_ACHIEVE, "祈りの燭台を入手した" },
     { LL_ACHIEVE, "死者の書を入手した" },
     { LL_ACHIEVE, "儀式を行った" },
     { LL_ACHIEVE, "イェンダーの魔除けを入手した" },
@@ -2294,8 +2294,8 @@ show_achievements(
             enl_msg(You_,
                     "",
                     "",
-                    u.uhave.bell ? "開門のベルを持っている"
-                                 : "開門のベルを手に取ったことがある", "");
+                    u.uhave.bell ? "開放のベルを持っている"
+                                 : "開放のベルを手に取ったことがある", "");
             break;
         case ACH_HELL:
             enl_msg(You_, "", "", "ゲヘナへ足を踏み入れた", "");
@@ -2304,8 +2304,8 @@ show_achievements(
             enl_msg(You_,
                     "",
                     "",
-                    u.uhave.menorah ? "招魂の燭台を持っている"
-                           : "招魂の燭台を手に取ったことがある", "");
+                    u.uhave.menorah ? "祈りの燭台を持っている"
+                           : "祈りの燭台を手に取ったことがある", "");
             break;
         case ACH_BOOK:
             enl_msg(You_,

@@ -2195,8 +2195,8 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-1
           名前があり、限定的な特殊能力を持つユニークなアイテムが3つありま
      すが、これらはアーティファクトには分類されません。それぞれが特定の
      モンスターに守られており、ゲームの後半で使用するために3つすべてを
-     集める必要があります。それらは「開門のベル（Bell of Opening）」、
-     「死者の書（Book of the Dead）」、および「祈祷の燭台（Candelabrum 
+     集める必要があります。それらは「開放のベル（Bell of Opening）」、
+     「死者の書（Book of the Dead）」、および「祈りの燭台（Candelabrum 
      of Invocation）」です。未識別の状態での対応する説明は、「銀のベル」、
      「パピルスの魔法書」、および「燭台」です。
 
@@ -2732,9 +2732,9 @@ NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-1
          メドゥーサ (Medusa)- メドゥーサを倒した。
          旋律 (Tune)        - 城の階層にある跳ね橋を開閉するために
                               使える旋律を発見した。
-         ベル (Bell)        - 開門のベルを獲得した。
+         ベル (Bell)        - 開放のベルを獲得した。
          ゲヘナ (Gehennom)  - ゲヘナに入った。
-         燭台 (Candle)      - 祈祷の燭台を獲得した。
+         燭台 (Candle)      - 祈りの燭台を獲得した。
          書物 (Book)        - 死者の書を獲得した。
          祈祷 (Invocation)  - ゲヘナの最下層への道を開いた。
          魔除け (Amulet)    - イェンダーの魔除けを獲得した。
