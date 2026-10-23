@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24.
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -129,13 +129,13 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
         out.append("# A Guide to the Mazes of Menace (Guidebook)\n\n")
 
     i = 0
+    in_sec2_roles = False
+    in_sec3_1_status = False
     in_sec9_options = False
     in_sec9_5_options = False
     in_sec9_6_options = False
     in_sec9_7_options = False
     in_sec9_10_keys = False
-    in_sec9_17_blind = False
-    in_sec9_18_sysconf = False
     in_sec9_17_blind = False
     in_sec9_18_sysconf = False
 
@@ -179,13 +179,13 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
                 clean_title = convert_roff_quotes(title)
                 out.append(f"{hashes} {num} {clean_title}\n\n")
 
+                in_sec2_roles = (num == "2")
+                in_sec3_1_status = (num == "3.1")
                 in_sec9_options = (num == "9.4")
                 in_sec9_5_options = (num == "9.5")
                 in_sec9_6_options = (num == "9.6")
                 in_sec9_7_options = (num == "9.7")
                 in_sec9_10_keys = (num == "9.10")
-                in_sec9_17_blind = (num == "9.17")
-                in_sec9_18_sysconf = (num == "9.18")
                 in_sec9_17_blind = (num == "9.17")
                 in_sec9_18_sysconf = (num == "9.18")
 
@@ -195,10 +195,10 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
         # 3. 図1のアスキーアート（画面レイアウト）
         if "+-------" in line and any("The bat bites!" in lines[k] for k in range(i, min(i+5, n))):
             flush_para()
-            aa_lines = [lines[i].rstrip()]
+            aa_lines = [lines[i].strip()]
             i += 1
             while i < n:
-                aa_lines.append(lines[i].rstrip())
+                aa_lines.append(lines[i].strip())
                 if "+-------" in lines[i] and len(aa_lines) >= 3:
                     i += 1
                     break
@@ -215,10 +215,10 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
         # 4. 図2のアスキーアート（ステータス行）
         if "+-------" in line and any("Player the Rambler" in lines[k] or "Dlvl:1" in lines[k] for k in range(i, min(i+5, n))):
             flush_para()
-            aa_lines = [lines[i].rstrip()]
+            aa_lines = [lines[i].strip()]
             i += 1
             while i < n:
-                aa_lines.append(lines[i].rstrip())
+                aa_lines.append(lines[i].strip())
                 if "+-------" in lines[i] and len(aa_lines) >= 3:
                     i += 1
                     break
@@ -235,11 +235,8 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
         # 5. 図3のアスキーアート（移動キー配置図）
         if "+-------" in line and any(("y  k  u" in lines[k] or "Figure-3" in lines[k] or "図3" in lines[k]) for k in range(i, min(i+15, n))):
             flush_para()
-            aa_lines = [lines[i].rstrip()]
-            i += 1
             while i < n:
-                aa_lines.append(lines[i].rstrip())
-                if "+-------" in lines[i] and len(aa_lines) >= 3:
+                if "+-------" in lines[i] and ("Figure-3" in lines[i] or "図3" in lines[i]):
                     i += 1
                     break
                 i += 1
@@ -248,8 +245,25 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
             summary_text = "テキスト版（アスキーアート）を表示" if lang == "jp" else "Show text version (ASCII art)"
             out.append(f"![{fig_title}](images/fig3.webp)\n\n")
             out.append(f"<details>\n<summary>{summary_text}</summary>\n\n```text\n")
-            out.extend([l + "\n" for l in aa_lines])
-            out.append("```\n</details>\n\n")
+            if lang == "jp":
+                fig3_aa = """+------------------------------------------+
+|     y  k  u                7  8  9       |
+|      \\ | /                  \\ | /        |
+|     h- . -l                4- . -6       |
+|      / | \\                  / | \\        |
+|     b  j  n                1  2  3       |
+| (number_pad オフ)     (number_pad オン)  |
++-------------------図3--------------------+"""
+            else:
+                fig3_aa = """+------------------------------------------+
+|     y  k  u                7  8  9       |
+|      \\ | /                  \\ | /        |
+|     h- . -l                4- . -6       |
+|      / | \\                  / | \\        |
+|     b  j  n                1  2  3       |
+| (number_pad off)      (number_pad on)    |
++-----------------Figure-3-----------------+"""
+            out.append(fig3_aa + "\n```\n</details>\n\n")
             continue
 
         # 6. セクション 7.5: 防具AC表のテーブル化
@@ -378,6 +392,154 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
             out.append("\n")
             continue
 
+        # 8.5 セクション 2 職業および種族のリスト化
+        if in_sec2_roles:
+            m_role_jp = re.match(r'^\s*(考古学者|蛮族|洞窟人|治療師|騎士|武闘家|司祭|レンジャー|盗賊|侍|観光客|ワルキューレ|魔法使い|ドワーフ|エルフ|ノーム|人間|オーク)（([^）]+)）(?:は|、|\s)(.*)$', line)
+            if m_role_jp:
+                flush_para()
+                jp_name = m_role_jp.group(1)
+                en_name = m_role_jp.group(2)
+                rest = m_role_jp.group(3).strip()
+                if rest.startswith(('は、', 'は ', 'は')):
+                    rest = re.sub(r'^は[、\s]?', '', rest)
+                role_lines = [rest] if rest else []
+                i += 1
+                while i < n:
+                    if not lines[i].strip():
+                        break
+                    role_lines.append(lines[i].strip())
+                    i += 1
+                desc = join_para(role_lines, lang="jp")
+                out.append(f"- **{jp_name}（{en_name}）** : {desc}\n")
+                continue
+
+            m_role_en = re.match(r'^\s*(Archeologists?|Barbarians?|Cavem[ae]n(?: and Cavewomen)?|Healers?|Knights?|Monks?|Priests?(?: and Priestesses)?|Rangers?|Rogues?|Samurai|Tourists?|Valkyries?|Wizards?|Dwarves|Elves|Gnomes|Humans?|Orcs)\b(?:\s+(.*))?$', line)
+            if m_role_en:
+                flush_para()
+                raw_name = m_role_en.group(1).strip()
+                rest = m_role_en.group(2).strip() if m_role_en.group(2) else ""
+                role_map = {
+                    "Archeologists": "Archeologist", "Barbarians": "Barbarian",
+                    "Cavemen and Cavewomen": "Caveman / Cavewoman", "Healers": "Healer",
+                    "Knights": "Knight", "Monks": "Monk",
+                    "Priests and Priestesses": "Priest / Priestess", "Rangers": "Ranger",
+                    "Rogues": "Rogue", "Samurai": "Samurai", "Tourists": "Tourist",
+                    "Valkyries": "Valkyrie", "Wizards": "Wizard",
+                    "Dwarves": "Dwarf", "Elves": "Elf", "Gnomes": "Gnome",
+                    "Humans": "Human", "Orcs": "Orc"
+                }
+                role_label = role_map.get(raw_name, raw_name)
+                role_lines = [rest] if rest else []
+                i += 1
+                while i < n:
+                    if not lines[i].strip():
+                        break
+                    role_lines.append(lines[i].strip())
+                    i += 1
+                desc = join_para(role_lines, lang="en")
+                out.append(f"- **{role_label}** : {desc}\n")
+                continue
+
+        # 8.6 セクション 3.1 ステータス項目のリスト化
+        if in_sec3_1_status:
+            # 状態（Status）の親項目判定
+            if line.strip() in ("状態（Status）", "Status"):
+                flush_para()
+                label = "状態（Status）" if lang == "jp" else "Status"
+                out.append(f"- **{label}** :\n")
+                i += 1
+                continue
+
+            # 状態（Status）のサブ項目判定（日本語）
+            m_sub_jp = re.match(r'^\s*(空腹度|荷重|致命的な状態|致命的でない状態|移動修正)（([^）]+)）:\s*(.*)$', line)
+            if m_sub_jp:
+                flush_para()
+                sub_jp = m_sub_jp.group(1)
+                sub_en = m_sub_jp.group(2)
+                sub_rest = m_sub_jp.group(3).strip()
+                sub_lines = [sub_rest] if sub_rest else []
+                i += 1
+                while i < n:
+                    if not lines[i].strip():
+                        break
+                    if re.match(r'^\s*(?:空腹度|荷重|致命的な状態|致命的でない状態|移動修正)（', lines[i]):
+                        break
+                    sub_lines.append(lines[i].strip())
+                    i += 1
+                sub_desc = join_para(sub_lines, lang="jp")
+                out.append(f"  - **{sub_jp}（{sub_en}）** : {sub_desc}\n")
+                continue
+
+            # 状態（Status）のサブ項目判定（英語）
+            m_sub_en = re.match(r'^\s*(Hunger|Encumbrance|Fatal conditions|Non-fatal conditions|Movement modifiers):\s*(.*)$', line)
+            if m_sub_en:
+                flush_para()
+                sub_label = m_sub_en.group(1).strip()
+                sub_rest = m_sub_en.group(2).strip()
+                sub_lines = [sub_rest] if sub_rest else []
+                i += 1
+                while i < n:
+                    if not lines[i].strip():
+                        break
+                    if re.match(r'^\s*(?:Hunger|Encumbrance|Fatal conditions|Non-fatal conditions|Movement modifiers):', lines[i]):
+                        break
+                    sub_lines.append(lines[i].strip())
+                    i += 1
+                sub_desc = join_para(sub_lines, lang="en")
+                out.append(f"  - **{sub_label}** : {sub_desc}\n")
+                continue
+
+            # 一般ステータス項目（日本語）
+            m_stat_jp = re.match(r'^\s*(名前|筋力|器用さ|耐久力|知力|賢明さ|魅力|属性|ダンジョン階層|ゴールド|ヒットポイント|魔力|アーマークラス|経験|時間)（([^）]+)）(?:\s+(.*))?$', line)
+            if m_stat_jp:
+                flush_para()
+                stat_jp = m_stat_jp.group(1)
+                stat_en = m_stat_jp.group(2)
+                stat_rest = m_stat_jp.group(3).strip() if m_stat_jp.group(3) else ""
+                stat_lines = [stat_rest] if stat_rest else []
+                i += 1
+                while i < n:
+                    if not lines[i].strip():
+                        break
+                    stat_lines.append(lines[i].strip())
+                    i += 1
+                stat_desc = join_para(stat_lines, lang="jp")
+                out.append(f"- **{stat_jp}（{stat_en}）** : {stat_desc}\n")
+                continue
+
+            # 一般ステータス項目（英語）
+            m_stat_en = re.match(r'^\s*(Title|Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma|Alignment|Dungeon Level|Gold|Hit Points|Power|Armor Class|Experience|Time)(?:\s+(.*))?$', line)
+            if m_stat_en and not line.strip().startswith(('Title:', 'Strength:', 'Status lines')):
+                flush_para()
+                stat_label = m_stat_en.group(1)
+                stat_rest = m_stat_en.group(2).strip() if m_stat_en.group(2) else ""
+                stat_lines = [stat_rest] if stat_rest else []
+                i += 1
+                while i < n:
+                    if not lines[i].strip():
+                        break
+                    stat_lines.append(lines[i].strip())
+                    i += 1
+                stat_desc = join_para(stat_lines, lang="en")
+                out.append(f"- **{stat_label}** : {stat_desc}\n")
+                continue
+
+            # #attributes コマンドの整形
+            if "#attributes" in line:
+                flush_para()
+                attr_lines = [line.strip()]
+                i += 1
+                while i < n:
+                    if not lines[i].strip():
+                        break
+                    attr_lines.append(lines[i].strip())
+                    i += 1
+                attr_desc = join_para(attr_lines, lang)
+                attr_desc = attr_desc.replace("#attributes", "`#attributes`")
+                attr_desc = attr_desc.replace("^X", "`^X`")
+                out.append(f"{attr_desc}\n\n")
+                continue
+
         # 9. コードブロックの整形（設定例、コマンド構文、定義）
         m_code_start = (
             re.match(r'^\s*(autopickup_exception="[^"]*")', line) or
@@ -441,7 +603,7 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
 
         # 11. コマンドキー定義リスト: "- `key` : 説明"
         m_cmd = re.match(r'^(?:     )?([a-zA-Z0-9\?\/\<\>\,\.\;\:\'\"\[\]\{\}\\\|\`\~\!\@\$\%\^\&\*\(\)\_\+\-\=\#\^][a-zA-Z0-9\-\^\?]*)\s{2,}(.+)$', line)
-        if m_cmd and not in_sec9_options and not in_sec9_5_options and not in_sec9_6_options and not in_sec9_7_options and not in_sec9_10_keys:
+        if m_cmd and not in_sec9_options and not in_sec9_5_options and not in_sec9_6_options and not in_sec9_7_options and not in_sec9_10_keys and not in_sec3_1_status and not in_sec2_roles:
             cmd_key = m_cmd.group(1).strip()
             first_desc = m_cmd.group(2).strip()
             
