@@ -363,6 +363,175 @@ void main() {
         1.0,
       );
     });
+
+    testWidgets('ガイドブックのMarkdown要素（見出し・画像・details折りたたみ・テーブル・検索）が正しくレンダリングされる', (tester) async {
+      const sampleMarkdown = '''
+# NetHack 5.0 ガイドブック
+
+## 1. はじめに (Introduction)
+冒険者への最初のメッセージです。
+
+![図1: 画面レイアウトサンプル](images/fig1.webp)
+
+<details>
+<summary>テキスト版（アスキーアート）を表示</summary>
+
+```text
++-----------------------+
+| Sample ASCII Art      |
++-----------------------+
+```
+</details>
+
+### 1.1 基本操作
+コマンド一覧の表です。
+
+| コマンド | 説明 |
+| --- | --- |
+| h | 左移動 |
+| j | 下移動 |
+
+終わり。
+''';
+
+      await tester.pumpWidget(
+        buildTestApp(
+          const GuidebookDialog(
+            initialContent: sampleMarkdown,
+            initialIsJp: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // 見出しの表示確認
+      expect(find.text('NetHack 5.0 ガイドブック'), findsOneWidget);
+      expect(find.text('1. はじめに (Introduction)'), findsOneWidget);
+
+      // キャプションの表示確認
+      expect(find.text('図1: 画面レイアウトサンプル'), findsOneWidget);
+
+      // details 折りたたみサマリーの表示確認
+      expect(find.text('テキスト版（アスキーアート）を表示'), findsOneWidget);
+
+      // 検索機能のテスト（「コマンド」を検索してテーブルブロックへ自動スクロール）
+      await tester.enterText(find.byType(TextField).first, 'コマンド');
+      await tester.pumpAndSettle();
+      expect(find.textContaining('/'), findsWidgets);
+
+      // スクロール先でテーブルのヘッダー・セル確認
+      expect(find.text('説明'), findsOneWidget);
+      expect(find.text('左移動'), findsOneWidget);
+
+      // 目次モーダルのオープンと項目確認
+      await tester.tap(find.byIcon(Icons.toc));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('目次'), findsWidgets);
+      expect(find.text('1. はじめに (Introduction)'), findsWidgets);
+
+      // 目次を閉じる
+      await tester.tap(find.byIcon(Icons.close).last);
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('NetHack特有の#コマンド行（#? や # SYMBOLS）が含まれていても無限ループせず高速描画される', (tester) async {
+      const sampleNetHackMarkdown = '''
+# コマンド一覧
+
+## 拡張コマンド
+以下は拡張コマンドです。
+
+  #? ヘルプメニュー：利用可能な拡張コマンドのリストを取得します。
+  #loot 容器を漁る、または隣接するモンスターの鞍を外します。
+  # SYMBOLS=S_golem:7
+
+正常終了。
+''';
+
+      await tester.pumpWidget(
+        buildTestApp(
+          const GuidebookDialog(
+            initialContent: sampleNetHackMarkdown,
+            initialIsJp: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('拡張コマンド'), findsOneWidget);
+      expect(find.textContaining('#? ヘルプメニュー'), findsOneWidget);
+      expect(find.textContaining('#loot 容器を漁る'), findsOneWidget);
+    });
+
+    testWidgets('インラインコード（`*` や `` ` ``）およびセル内パイプ（`|`）を含むテーブルが例外なく正確に描画される', (tester) async {
+      const backtickMarkdown = '''
+# バッククォートとアスタリスクのテスト
+
+この例では、`*` も表示されており、予期しないものを使いたい場合に、リストにないアイテムを選択できることを示しています。`*` と入力すると次のプロンプトが出ます。
+
+インベントリ内には、キー `*` や `` ` ``（特定のクラスの既知の発見済みアイテム一覧を表示）があります。
+
+### 9.15 NetHackの記号の変更
+| デフォルトの記号 | 名前 | 説明 |
+|---|---|---|
+| `|` | S_vwall | 垂直な壁 |
+| `-` | S_hwall | 水平な壁 |
+| `|` | S_grave | 墓 |
+| `\\|` | S_pipe | パイプエスケープ |
+''';
+
+      await tester.pumpWidget(
+        buildTestApp(
+          const GuidebookDialog(
+            initialContent: backtickMarkdown,
+            initialIsJp: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // 各インラインコードスパンが Text ウィジェットとして正しく抽出・描画されていること
+      expect(find.text('*'), findsWidgets);
+      expect(find.text('`'), findsOneWidget);
+      expect(find.text('|'), findsNWidgets(2)); // テーブル内の `|` セル
+
+      // 説明文の通常テキストも正常に表示されていること
+      expect(find.text('S_vwall'), findsOneWidget);
+      expect(find.text('S_grave'), findsOneWidget);
+      expect(find.text('垂直な壁'), findsOneWidget);
+      expect(find.text('墓'), findsOneWidget);
+
+      // DataTable が 1 個描画されており、アサーション例外なく行が表示されていること
+      expect(find.byType(DataTable), findsOneWidget);
+    });
+
+    testWidgets('SpoilerDialog でもダブルバッククォートやセル内パイプテーブルが例外なく正確に描画される', (tester) async {
+      const sampleSpoilerTable = '''
+# スポイラーテーブルテスト
+
+キー `` ` `` で発見済みアイテムを表示します。
+
+| 記号 | 名前 | 概要 |
+|---|---|---|
+| `|` | wall | 壁 |
+| `.` | floor | 床 |
+''';
+
+      await tester.pumpWidget(
+        buildTestApp(
+          SpoilerDialog(
+            initialMarkdown: sampleSpoilerTable,
+            initialIsJp: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('`'), findsOneWidget);
+      expect(find.text('|'), findsOneWidget);
+      expect(find.text('wall'), findsOneWidget);
+      expect(find.byType(DataTable), findsOneWidget);
+    });
   });
 }
 

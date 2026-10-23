@@ -2,7 +2,7 @@
 
 NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23.
 
-A Guide to the Mazes of Menace (Guidebook for NetHack)
+**A Guide to the Mazes of Menace (Guidebook for NetHack)**
 
 Original version - Eric S. Raymond (Edited and expanded for NetHack 5.0.1 by Mike Stephenson and others)
 

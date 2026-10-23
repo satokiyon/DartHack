@@ -234,6 +234,56 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
     }
   }
 
+  List<String> _parseTableRow(String row) {
+    var inner = row.trim();
+    if (inner.startsWith('|')) inner = inner.substring(1);
+    if (inner.endsWith('|')) inner = inner.substring(0, inner.length - 1);
+
+    final cells = <String>[];
+    final current = StringBuffer();
+    int i = 0;
+
+    while (i < inner.length) {
+      // エスケープされたパイプ \| の保護
+      if (inner[i] == '\\' && i + 1 < inner.length && inner[i + 1] == '|') {
+        current.write('|');
+        i += 2;
+        continue;
+      }
+
+      // インラインコード (`|` や `` ` `` 等) に含まれるパイプを保護
+      if (inner[i] == '`') {
+        int tickCount = 0;
+        while (i + tickCount < inner.length && inner[i + tickCount] == '`') {
+          tickCount++;
+        }
+        final delimiter = '`' * tickCount;
+        current.write(delimiter);
+        i += tickCount;
+
+        final closeIdx = inner.indexOf(delimiter, i);
+        if (closeIdx != -1) {
+          current.write(inner.substring(i, closeIdx + tickCount));
+          i = closeIdx + tickCount;
+        }
+        continue;
+      }
+
+      if (inner[i] == '|') {
+        cells.add(current.toString().trim());
+        current.clear();
+        i++;
+        continue;
+      }
+
+      current.write(inner[i]);
+      i++;
+    }
+    cells.add(current.toString().trim());
+
+    return cells;
+  }
+
   void _parseMarkdown(String content, bool isJp) {
     final lines = content.split('\n');
     final blocks = <_SpoilerBlock>[];
@@ -338,12 +388,7 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
         }
 
         if (tableLines.length >= 2) {
-          List<String> parseRow(String r) {
-            final inner = r.substring(1, r.length - 1);
-            return inner.split('|').map((c) => c.trim()).toList();
-          }
-
-          final headers = parseRow(tableLines[0]);
+          final headers = _parseTableRow(tableLines[0]);
           final rows = <List<String>>[];
 
           // 2行目がセパレータ (|---|---|...) か確認
@@ -351,7 +396,7 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
           final startIndex = hasSeparator ? 2 : 1;
 
           for (int r = startIndex; r < tableLines.length; r++) {
-            rows.add(parseRow(tableLines[r]));
+            rows.add(_parseTableRow(tableLines[r]));
           }
 
           final rawText = tableLines.join(' ');
@@ -793,6 +838,29 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
     );
   }
 
+  WidgetSpan _buildCodeSpan(String codeText, double fontSize) {
+    return WidgetSpan(
+      alignment: PlaceholderAlignment.middle,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+        margin: const EdgeInsets.symmetric(horizontal: 2),
+        decoration: BoxDecoration(
+          color: const Color(0xFF242C3D),
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: Colors.white12, width: 0.8),
+        ),
+        child: Text(
+          codeText,
+          style: TextStyle(
+            fontFamily: 'monospace',
+            fontSize: fontSize * 0.92,
+            color: Colors.cyanAccent.shade100,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildRichText(String text, {double fontSize = 13.5, Color? defaultColor, FontWeight? fontWeight}) {
     final spans = <InlineSpan>[];
     final color = defaultColor ?? Colors.white.withValues(alpha: 0.88);
@@ -800,8 +868,8 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
     // [text]{#id} を検出して text のみを表示
     String processed = text.replaceAllMapped(RegExp(r'\[(.*?)\]\{#[a-zA-Z0-9_.-]+\}'), (m) => m.group(1)!);
 
-    // Markdown の簡易インラインパーサー (太字 **...**, 等幅 `...`, リンク [...](...), 斜体 *...*)
-    final tokenRegex = RegExp(r'(\*\*.*?\*\*|`.*?`|\[.*?\]\(.*?\)|(?<!\*)\*[^*]+?\*(?!\*))');
+    // Markdown のインラインパーサー (太字 **...**, ダブルバッククォート ``...``, 等幅 `...`, リンク [...](...))
+    final tokenRegex = RegExp(r'(\*\*.*?\*\*|``.+?``|`[^`\r\n]+`|\[.*?\]\(.*?\))');
     int lastEnd = 0;
 
     for (final match in tokenRegex.allMatches(processed)) {
@@ -813,32 +881,20 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
       }
 
       final token = match.group(0)!;
-      if (token.startsWith('**') && token.endsWith('**')) {
+      if (token.startsWith('**') && token.endsWith('**') && token.length >= 4) {
         spans.add(TextSpan(
           text: token.substring(2, token.length - 2),
           style: TextStyle(color: Colors.amber.shade200, fontSize: fontSize, fontWeight: FontWeight.bold, height: 1.45),
         ));
-      } else if (token.startsWith('`') && token.endsWith('`')) {
-        spans.add(WidgetSpan(
-          alignment: PlaceholderAlignment.middle,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-            margin: const EdgeInsets.symmetric(horizontal: 2),
-            decoration: BoxDecoration(
-              color: const Color(0xFF242C3D),
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: Colors.white12, width: 0.8),
-            ),
-            child: Text(
-              token.substring(1, token.length - 1),
-              style: TextStyle(
-                fontFamily: 'monospace',
-                fontSize: fontSize * 0.92,
-                color: Colors.cyanAccent.shade100,
-              ),
-            ),
-          ),
-        ));
+      } else if (token.startsWith('``') && token.endsWith('``') && token.length >= 4) {
+        var inner = token.substring(2, token.length - 2);
+        if (inner.startsWith(' ') && inner.endsWith(' ') && inner.length >= 2) {
+          inner = inner.substring(1, inner.length - 1);
+        }
+        spans.add(_buildCodeSpan(inner, fontSize));
+      } else if (token.startsWith('`') && token.endsWith('`') && token.length >= 2) {
+        final inner = token.substring(1, token.length - 1);
+        spans.add(_buildCodeSpan(inner, fontSize));
       } else if (token.startsWith('[') && token.contains('](') && token.endsWith(')')) {
         final linkTextMatch = RegExp(r'^\[(.*?)\]\((.*?)\)$').firstMatch(token);
         if (linkTextMatch != null) {
@@ -871,11 +927,6 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
             ),
           ));
         }
-      } else if (token.startsWith('*') && token.endsWith('*')) {
-        spans.add(TextSpan(
-          text: token.substring(1, token.length - 1),
-          style: TextStyle(color: color, fontSize: fontSize, fontStyle: FontStyle.italic, height: 1.45),
-        ));
       }
 
       lastEnd = match.end;
@@ -888,14 +939,26 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
       ));
     }
 
-    return RichText(
-      text: TextSpan(children: spans),
+    return Text.rich(
+      TextSpan(children: spans),
     );
   }
 
   Widget _buildTableWidget(_SpoilerBlock block) {
     final headers = block.tableHeaders;
     final rows = block.tableRows;
+    final columnCount = headers.length;
+
+    // DataTable アサーション例外 (!rows.any((row) => row.cells.length != columns.length)) を恒久防御
+    final safeRows = rows.map((r) {
+      final paddedCells = List<String>.from(r);
+      if (paddedCells.length < columnCount) {
+        paddedCells.addAll(List.filled(columnCount - paddedCells.length, ''));
+      } else if (paddedCells.length > columnCount) {
+        paddedCells.removeRange(columnCount, paddedCells.length);
+      }
+      return paddedCells;
+    }).toList();
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -925,7 +988,7 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
                 label: _buildRichText(h, fontSize: 12.5, defaultColor: Colors.amberAccent, fontWeight: FontWeight.bold),
               );
             }).toList(),
-            rows: rows.asMap().entries.map((entry) {
+            rows: safeRows.asMap().entries.map((entry) {
               final rIdx = entry.key;
               final rowCells = entry.value;
               final isEven = rIdx % 2 == 0;
