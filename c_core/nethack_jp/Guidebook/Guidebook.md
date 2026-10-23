@@ -1,6 +1,6 @@
 # A Guide to the Mazes of Menace (Guidebook)
 
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24.
 
 **A Guide to the Mazes of Menace (Guidebook for NetHack)**
 
@@ -111,21 +111,21 @@ In order to understand what is going on  in  NetHack,  first  you
 <summary>Show text version (ASCII art)</summary>
 
 ```text
-        +---------------------------------------------------------------+
-        |The bat bites!                                                 |
-        |                                                               |
-        |    ------                                                     |
-        |    |....|    ----------                                       |
-        |    |.<..|####...@...$.|                                       |
-        |    |....-#   |...B....+                                       |
-        |    |....|    |.d......|                                       |
-        |    ------    -------|--                                       |
-        |                                                               |
-        |                                                               |
-        |                                                               |
-        |Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15 Neutral |
-        |Dlvl:1 $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:752 Hungry Conf |
-        +---------------------------Figure-1----------------------------+
++---------------------------------------------------------------+
+|The bat bites!                                                 |
+|                                                               |
+|    ------                                                     |
+|    |....|    ----------                                       |
+|    |.<..|####...@...$.|                                       |
+|    |....-#   |...B....+                                       |
+|    |....|    |.d......|                                       |
+|    ------    -------|--                                       |
+|                                                               |
+|                                                               |
+|                                                               |
+|Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15 Neutral |
+|Dlvl:1 $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:752 Hungry Conf |
++---------------------------Figure-1----------------------------+
 ```
 </details>
 
@@ -135,70 +135,46 @@ In order to understand what is going on  in  NetHack,  first  you
 <summary>Show text version (ASCII art)</summary>
 
 ```text
-        +---------------------------------------------------------------+
-        |Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15         |
-        |Neutral $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 Hungry           |
-        |Dlvl:1 T:752                                  Conf             |
-        +---------------------------Figure-2----------------------------+
++---------------------------------------------------------------+
+|Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15         |
+|Neutral $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 Hungry           |
+|Dlvl:1 T:752                                  Conf             |
++---------------------------Figure-2----------------------------+
 ```
 </details>
 
 ### 3.1 The status lines (bottom)
 
-The bottom two (or three) lines of  the  screen  contain  several
+The bottom two (or three) lines of the screen contain several cryptic pieces of information describing your current status. Figure 1 shows the traditional two-line status area below the map. Figure 2 shows just the status area, when the statuslines:3 option has been set (not all interfaces support this option). If any status line becomes wider than the screen, you might not see all of it due to truncation. When the numbers grow bigger and multiple conditions are present, the two-line format will run out of room on the second line, but statuslines:2 is the default because a basic 24-line terminal isn't tall enough for the third line.
 
-- `cryptic` : pieces of information describing your current status.  Figure 1 shows the traditional two-line status area below the map.  Figure  2 shows just the status area, when the statuslines:3 option has been set (not all interfaces support this option).  If any status line  becomes
-- `wider` : than the screen, you might not see all of it due to truncation. When the numbers grow bigger and multiple conditions are present,  the
-- `two-line` : format  will  run  out  of room on the second line, but statuslines:2 is the default because a basic 24-line terminal isn't  tall enough for the third line.
 Here are explanations of what the various status items mean:
 
-Title Your character's name and professional ranking (based on role and experience level, see below).
-
-Strength A measure of your character's strength; one  of  your  six  basic attributes.   A  human character's attributes can range from 3 to 18 inclusive; non-humans may exceed  these  limits  (occasionally you may get super-strengths of the form 18/xx, and magic can also cause attributes to exceed the normal limits).  The  higher  your strength,  the  stronger  you are.  Strength affects how successfully you perform physical tasks, how much damage you do in  combat, and how much loot you can carry.
-
-Dexterity Dexterity  affects your chances to hit in combat, to avoid traps, and do other tasks requiring agility or manipulation of objects.
-
-Constitution Constitution affects your ability to recover  from  injuries  and other  strains  on your stamina.  When strength is low or modest, constitution also affects how much you can  carry.   With  sufficiently high strength, the contribution to carrying capacity from your constitution no longer matters.
-
-Intelligence Intelligence affects your ability to cast spells and read  spellbooks.
-
-Wisdom Wisdom  comes  from  your  practical  experience (especially when dealing with magic).  It affects your magical energy.
-
-Charisma Charisma affects how certain creatures react toward you.  In particular, it can affect the prices shopkeepers offer you.
-
-Alignment Lawful,  Neutral, or Chaotic.  Often, Lawful is taken as good and Chaotic as evil, but legal and ethical do  not  always  coincide. Your  alignment  influences  how other monsters react toward you. Monsters of a like alignment are more likely  to  be  non-aggressive,  while those of an opposing alignment are more likely to be seriously offended at your presence.
-
-Dungeon Level How deep you are in the dungeon.  You start at level one and  the number  increases as you go deeper into the dungeon.  Some levels are special, and are identified by a name and not a number.   The Amulet of Yendor is reputed to be somewhere beneath the twentieth level.
-
-Gold The number of gold pieces you are openly  carrying.   Gold  which you have concealed in containers is not counted.
-
-Hit Points Your  current  and  maximum  hit points.  Hit points indicate how much damage you can take before you die.  The more you get hit in a  fight, the lower they get.  You can regain hit points by resting, or by using certain magical items or spells.  The number  in parentheses is the maximum number your hit points can reach.
-
-Power Spell  points.   This tells you how much mystic energy (mana) you have available for spell casting.  Again, resting will regenerate the amount available.
-
-Armor Class A  measure  of  how  effectively  your  armor  stops  blows  from unfriendly creatures.  The lower this number is, the more  effective  the  armor;  it  is  quite  possible to have negative armor class.  See the Armor subsection of Objects for more information.
-
-Experience Your current experience level.  If the showexp option is set,  it will be followed by a slash and experience points.  As you adventure, you gain experience points.  At  certain  experience  point totals,  you  gain an experience level.  The more experienced you are, the better you fight and withstand magical attacks.  (By the time  your level reaches double digits, the usefulness of showing the points with it has dropped significantly.  You  can  use  the `O`  command  to  turn  showexp off to avoid using up the limited status line space.)
-
-Time The number of turns elapsed so far, displayed  if  you  have  the
-
-time option set.
-
-Status Hunger:  your  current  hunger  status.  Values are Satiated, Not Hungry (or Normal), Hungry, Weak, and Fainting.  Not  shown  when Normal.
-
-Encumbrance:  an  indication of how what you are carrying affects your  ability  to  move.   Values  are  Unencumbered,   Burdened, Stressed,  Strained,  Overtaxed,  and Overloaded.  Not shown when Unencumbered.
-
-Fatal conditions: Stone (aka Petrifying, turning to stone), Slime (turning  into  green  slime), Strngl (being strangled), FoodPois (suffering from acute food poisoning), TermIll (suffering from  a terminal illness).
-
-Non-fatal  conditions: Blind (can't see), Deaf (can't hear), Stun (stunned), Conf (confused), Hallu (hallucinating).
-
-Movement modifiers: Lev (levitating), Fly  (flying),  Ride  (riding).
+- **Title** : Your character's name and professional ranking (based on role and experience level, see below).
+- **Strength** : A measure of your character's strength; one of your six basic attributes. A human character's attributes can range from 3 to 18 inclusive; non-humans may exceed these limits (occasionally you may get super-strengths of the form 18/xx, and magic can also cause attributes to exceed the normal limits). The higher your strength, the stronger you are. Strength affects how successfully you perform physical tasks, how much damage you do in combat, and how much loot you can carry.
+- **Dexterity** : Dexterity affects your chances to hit in combat, to avoid traps, and do other tasks requiring agility or manipulation of objects.
+- **Constitution** : Constitution affects your ability to recover from injuries and other strains on your stamina. When strength is low or modest, constitution also affects how much you can carry. With sufficiently high strength, the contribution to carrying capacity from your constitution no longer matters.
+- **Intelligence** : Intelligence affects your ability to cast spells and read spellbooks.
+- **Wisdom** : Wisdom comes from your practical experience (especially when dealing with magic). It affects your magical energy.
+- **Charisma** : Charisma affects how certain creatures react toward you. In particular, it can affect the prices shopkeepers offer you.
+- **Alignment** : Lawful, Neutral, or Chaotic. Often, Lawful is taken as good and Chaotic as evil, but legal and ethical do not always coincide. Your alignment influences how other monsters react toward you. Monsters of a like alignment are more likely to be non-aggressive, while those of an opposing alignment are more likely to be seriously offended at your presence.
+- **Dungeon Level** : How deep you are in the dungeon. You start at level one and the number increases as you go deeper into the dungeon. Some levels are special, and are identified by a name and not a number. The Amulet of Yendor is reputed to be somewhere beneath the twentieth level.
+- **Gold** : The number of gold pieces you are openly carrying. Gold which you have concealed in containers is not counted.
+- **Hit Points** : Your current and maximum hit points. Hit points indicate how much damage you can take before you die. The more you get hit in a fight, the lower they get. You can regain hit points by resting, or by using certain magical items or spells. The number in parentheses is the maximum number your hit points can reach.
+- **Power** : Spell points. This tells you how much mystic energy (mana) you have available for spell casting. Again, resting will regenerate the amount available.
+- **Armor Class** : A measure of how effectively your armor stops blows from unfriendly creatures. The lower this number is, the more effective the armor; it is quite possible to have negative armor class. See the Armor subsection of Objects for more information.
+- **Experience** : Your current experience level. If the showexp option is set, it will be followed by a slash and experience points. As you adventure, you gain experience points. At certain experience point totals, you gain an experience level. The more experienced you are, the better you fight and withstand magical attacks. (By the time your level reaches double digits, the usefulness of showing the points with it has dropped significantly. You can use the `O` command to turn showexp off to avoid using up the limited status line space.)
+- **Time** : The number of turns elapsed so far, displayed if you have the time option set.
+- **Status** :
+  - **Hunger** : your current hunger status. Values are Satiated, Not Hungry (or Normal), Hungry, Weak, and Fainting. Not shown when Normal.
+  - **Encumbrance** : an indication of how what you are carrying affects your ability to move. Values are Unencumbered, Burdened, Stressed, Strained, Overtaxed, and Overloaded. Not shown when Unencumbered.
+  - **Fatal conditions** : Stone (aka Petrifying, turning to stone), Slime (turning into green slime), Strngl (being strangled), FoodPois (suffering from acute food poisoning), TermIll (suffering from a terminal illness).
+  - **Non-fatal conditions** : Blind (can't see), Deaf (can't hear), Stun (stunned), Conf (confused), Hallu (hallucinating).
+  - **Movement modifiers** : Lev (levitating), Fly (flying), Ride (riding).
 
 Other conditions and modifiers exist, but there isn't enough room to display them with the other status fields.
 
-The #attributes command (default key ^X) will show all current  status
+The `#attributes` command (default key `^X`) will show all current status information in unabbreviated format. It also shows other information which might be included on the status lines if those had more room.
 
-- `information` : in unabbreviated format.  It also shows other information which might be included on the status lines if those had more room.
 ### 3.2 The message line (top)
 
 The top line of the screen is reserved for messages that describe
