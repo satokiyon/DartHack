@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-05.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23.
 name: Weekly Release
 
 on:
@@ -35,11 +35,11 @@ jobs:
           $outDir = "binary/Release/x64"
           $zipPath = "NetHackJP-5.0.1-${{ env.DATE_STR }}-windows.zip"
           
-          # Copy Guidebook_JP.txt to the output directory
-          if (Test-Path "Guidebook_JP.txt") {
-            Copy-Item "Guidebook_JP.txt" -Destination "$outDir\"
+          # Copy Guidebook directory to the output directory
+          if (Test-Path "Guidebook") {
+            Copy-Item -Recurse "Guidebook" -Destination "$outDir\"
           } else {
-            Write-Warning "Guidebook_JP.txt not found!"
+            Write-Warning "Guidebook directory not found!"
           }
           
           # Create ZIP archive
@@ -87,9 +87,9 @@ jobs:
           # Copy installed playground content to distribution directory
           cp -r playground "${DIST_DIR}"
 
-          # Add Guidebook_JP.txt if exists
-          if [ -f "Guidebook_JP.txt" ]; then
-            cp "Guidebook_JP.txt" "${DIST_DIR}/"
+          # Add Guidebook directory if exists
+          if [ -d "Guidebook" ]; then
+            cp -r "Guidebook" "${DIST_DIR}/"
           fi
 
           # Create portable launcher scripts:

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-17. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23. */
 #include "hack.h"
 
 /*
@@ -78,7 +78,7 @@ static const char *const mon_jp_names[NUMMONS][NUM_MGENDERS] = {
     [PM_TRAPPER] = { 0, 0, "トラッパー" },
     [PM_PONY] = { 0, 0, "仔馬" },
     [PM_HORSE] = { 0, 0, "馬" },
-    [PM_WARHORSE] = { 0, 0, "戦闘用の馬" },
+    [PM_WARHORSE] = { 0, 0, "軍馬" },
     [PM_FOG_CLOUD] = { 0, 0, "霧の雲" },
     [PM_DUST_VORTEX] = { 0, 0, "ほこりの渦" },
     [PM_ICE_VORTEX] = { 0, 0, "氷の渦" },
