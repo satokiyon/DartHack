@@ -172,8 +172,8 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
             out.append(f"**{full_title}**\n\n")
             continue
 
-        # 2. セクション見出しの判定
-        m_sec = re.match(r'^(?:     )?([1-9]\d*(?:\.\d+)*)\.?\s+(.+)$', line)
+        # 2. セクション見出しの判定（番号の直後にピリオドを必須として誤判定を防止）
+        m_sec = re.match(r'^(?:     )?([1-9]\d*(?:\.\d+)*)\.\s+(.+)$', line)
         if m_sec:
             num = m_sec.group(1)
             title = m_sec.group(2).strip()
@@ -181,7 +181,8 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
             # 見出し誤判定の除外（「はじめに」は誤除外しない）
             is_invalid_title = (
                 len(title) > 80 or
-                title.startswith(('is ', 'are ', 'was ', 'were ', 'for ', 'to ', 'that ', 'with ')) or
+                title[0].islower() or
+                title.startswith(('is ', 'are ', 'was ', 'were ', 'for ', 'to ', 'that ', 'with ', 'shows ')) or
                 (title.startswith(('の', 'は', 'が', 'を', 'に')) and not title.startswith(('はじめに', 'はじめに ')))
             )
             if not is_invalid_title:
@@ -480,6 +481,13 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
                 i += 1
                 while i < n:
                     if not lines[i].strip():
+                        # 改ページ等で空行の後に小文字行が続くかチェック
+                        k = i
+                        while k < n and not lines[k].strip():
+                            k += 1
+                        if k < n and (lines[k].strip()[0].islower() or (sub_lines and sub_lines[-1].endswith('-'))):
+                            i = k
+                            continue
                         break
                     if re.match(r'^\s*(?:空腹度|荷重|致命的な状態|致命的でない状態|移動修正)（', lines[i]):
                         break
@@ -487,25 +495,36 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
                     i += 1
                 sub_desc = join_para(sub_lines, lang="jp")
                 out.append(f"  - **{sub_jp}（{sub_en}）** : {sub_desc}\n")
+                if "移動修正" in sub_jp:
+                    out.append("\n")
                 continue
 
             # 状態（Status）のサブ項目判定（英語）
-            m_sub_en = re.match(r'^\s*(Hunger|Encumbrance|Fatal conditions|Non-fatal conditions|Movement modifiers):\s*(.*)$', line)
+            m_sub_en = re.match(r'^\s*(Hunger|Encumbrance|Fatal\s+conditions|Non-fatal\s+conditions|Movement\s+modifiers):\s*(.*)$', line)
             if m_sub_en:
                 flush_para()
-                sub_label = m_sub_en.group(1).strip()
+                sub_label = re.sub(r'\s+', ' ', m_sub_en.group(1).strip())
                 sub_rest = m_sub_en.group(2).strip()
                 sub_lines = [sub_rest] if sub_rest else []
                 i += 1
                 while i < n:
                     if not lines[i].strip():
+                        # 改ページ等で空行の後に小文字行が続くかチェック
+                        k = i
+                        while k < n and not lines[k].strip():
+                            k += 1
+                        if k < n and (lines[k].strip()[0].islower() or (sub_lines and sub_lines[-1].endswith('-'))):
+                            i = k
+                            continue
                         break
-                    if re.match(r'^\s*(?:Hunger|Encumbrance|Fatal conditions|Non-fatal conditions|Movement modifiers):', lines[i]):
+                    if re.match(r'^\s*(?:Hunger|Encumbrance|Fatal\s+conditions|Non-fatal\s+conditions|Movement\s+modifiers):', lines[i]):
                         break
                     sub_lines.append(lines[i].strip())
                     i += 1
                 sub_desc = join_para(sub_lines, lang="en")
                 out.append(f"  - **{sub_label}** : {sub_desc}\n")
+                if "Movement" in sub_label:
+                    out.append("\n")
                 continue
 
             # 一般ステータス項目（日本語）
@@ -519,6 +538,13 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
                 i += 1
                 while i < n:
                     if not lines[i].strip():
+                        # 改ページ等で空行の後に小文字行が続くかチェック
+                        k = i
+                        while k < n and not lines[k].strip():
+                            k += 1
+                        if k < n and (lines[k].strip()[0].islower() or (stat_lines and stat_lines[-1].endswith('-'))):
+                            i = k
+                            continue
                         break
                     stat_lines.append(lines[i].strip())
                     i += 1
@@ -536,6 +562,13 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
                 i += 1
                 while i < n:
                     if not lines[i].strip():
+                        # 改ページ等で空行の後に小文字行が続くかチェック
+                        k = i
+                        while k < n and not lines[k].strip():
+                            k += 1
+                        if k < n and (lines[k].strip()[0].islower() or (stat_lines and stat_lines[-1].endswith('-'))):
+                            i = k
+                            continue
                         break
                     stat_lines.append(lines[i].strip())
                     i += 1
@@ -626,8 +659,13 @@ def parse_guidebook(src_path, dst_path, lang="jp"):
             cmd_key = m_cmd.group(1).strip()
             first_desc = m_cmd.group(2).strip()
             
-            # 見出し行や通常文の誤判定防止
-            if not (len(cmd_key) > 15 or cmd_key in ["NetHack", "OPTIONS", "The", "For", "In", "When", "If", "However", "See", "This", "These"]):
+            # 見出し行や通常文の誤判定防止（英字2文字以上の単語は Del を除きコマンドキーではない）
+            is_invalid_cmd = (
+                len(cmd_key) > 15 or
+                (cmd_key.isalpha() and len(cmd_key) >= 2 and cmd_key != "Del") or
+                cmd_key in ["NetHack", "OPTIONS", "The", "For", "In", "When", "If", "However", "See", "This", "These", "On"]
+            )
+            if not is_invalid_cmd:
                 flush_para()
                 cmd_desc_lines = [first_desc]
                 i += 1

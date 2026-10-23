@@ -1,4 +1,4 @@
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24.
 
                          脅威の迷宮へのガイド
                         (NetHackガイドブック)

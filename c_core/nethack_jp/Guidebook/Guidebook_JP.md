@@ -121,6 +121,7 @@ NetHackで何が起きているかを理解するためには、まずNetHackが
   - **致命的な状態（Fatal conditions）** : 石化（Stone: 石化しつつある）、スライム（Slime: 緑のスライムに変わりつつある）、絞殺（Strngl: 首を絞められている）、食中毒（FoodPois: 急性の食中毒に苦しんでいる）、末期症状（TermIll: 不治の病に苦しんでいる）。
   - **致命的でない状態（Non-fatal conditions）** : 盲目（Blind: 目が見えない）、難聴（Deaf: 耳が聞こえない）、朦朧（Stun: 朦朧状態）、混乱（Conf: 混乱状態）、幻覚（Hallu: 幻覚状態）。
   - **移動修正（Movement modifiers）** : 浮遊（Lev: 浮遊中）、飛行（Fly: 飛行中）、騎乗（Ride: 騎乗中）。
+
 他にも状態や修正は存在しますが、他のステータス項目と一緒に表示 する十分なスペースがありません。
 
 `#attributes` コマンド（デフォルトキー ``^X``）を使用すると、すべての現在のステータス情報を略語なしの形式で表示できます。また、ステータス 行にもっとスペースがあれば含まれていたであろう他の情報も表示されます。
@@ -2293,7 +2294,8 @@ BIND=v:loot
 
 一般に、メッセージの種類を記述するための設定ファイルのエントリは以下のようになります： MSGTYPE=type "pattern"
 
-- `type` : - メッセージをどのように表示すべきか pattern - 一致させるパターン
+type    - メッセージをどのように表示すべきか pattern - 一致させるパターン
+
 パターンは正規表現である必要があります。
 
 許可されている type は以下の通りです：
@@ -2919,9 +2921,7 @@ Michael Allison、 David Cohrs、 Alex Kompel、 Dion Nicolaas、および Yitzh
 
 Ron Van Iwaarden は、ここ数回のリリースにおける OS/2 版 NetHack の唯一のメンテナでした。残念ながら、 Ron の最後の OS/2 マシンは2006年初頭に動かなくなりました。長年 OS/2 上で NetHack を存続させてくれた Ron に多大なる感謝を捧げます。
 
-Janne Salmijarvi と Teemu Suikki は、 Janne Salmijarvi が
-
-#### 3.3.1 用に復活させた後、 Amiga 版 3.4 を維持および拡張しました。
+Janne Salmijarvi と Teemu Suikki は、 Janne Salmijarvi が 3.3.1 用に復活させた後、 Amiga 版 3.4 を維持および拡張しました。
 
 Christian "Marvin" Bressler は、 3.3.1 用に復活させた後、 Atari 版 3.4 を維持しました。
 
@@ -2947,11 +2947,7 @@ Pat Rankin は、限られたアクセス環境にありながらも NetHack 3.6
 
 Ray Chason は 3.6 用に MS-DOS ポートを復活させ、必要なアップデートをコミュニティ全体に提供しました。
 
-2018年4月後半、 3.6.0 に対する数百件のバグ修正といくつかの新機能がまとめられ、 NetHack 3.6.1 としてリリースされました。
-
-#### 3.6.1 リリース時の NetHack 開発チームは、 Warwick Allison、
-
-Michael Allison、 Ken Arromdee、 David Cohrs、 Jessie Collet、 Pasi Kallinen、 Ken Lorber、 Dean Luick、 Patric Mueller、 Pat Rankin、 Derek S. Ray、 Alex Smith、 Mike Stephenson、 Janet Walz、および Paul Winner で構成されていました。
+2018年4月後半、 3.6.0 に対する数百件のバグ修正といくつかの新機能がまとめられ、 NetHack 3.6.1 としてリリースされました。 3.6.1 リリース時の NetHack 開発チームは、 Warwick Allison、 Michael Allison、 Ken Arromdee、 David Cohrs、 Jessie Collet、 Pasi Kallinen、 Ken Lorber、 Dean Luick、 Patric Mueller、 Pat Rankin、 Derek S. Ray、 Alex Smith、 Mike Stephenson、 Janet Walz、および Paul Winner で構成されていました。
 
 2019年5月初旬、さらに 320 件のバグ修正といくつかの拡張、および採用された curses ウィンドウポートを含む 3.6.2 がリリースされました。
 
