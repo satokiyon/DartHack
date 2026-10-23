@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-06.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24.
 -- NetHack quest.lua	$NHDT-Date: 1781994887 2026/06/20 22:34:47 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
 -- Copyright (c) 2021 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
@@ -98,7 +98,7 @@ questtext = {
 容認することも受け入れることもできない.
 
 ここを立ち去れ.  お前が再び%Hに足を踏み入れることはない.
-お前の求めるものは今や永遠に失われた. 開門のベルなしでは,
+お前の求めるものは今や永遠に失われた. 開放のベルなしでは,
 魔除けを持つ者のいる場所へ入ることは決してかなわないからだ.
 
 さあ行け!  お前をこの地から追放する."]],

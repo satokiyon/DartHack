@@ -105,7 +105,7 @@ MENUCOLOR="能力獲得の薬" = brightblue
 MENUCOLOR="識別の巻物" = yellow
 MENUCOLOR="解呪の巻物" = yellow
 MENUCOLOR="死者の書" = orange
-MENUCOLOR="開放の鐘" = orange
+MENUCOLOR="開放のベル" = orange
 MENUCOLOR="ろうそく" = orange
 
 # アーティファクト（既知の主要なもの）
@@ -340,7 +340,7 @@ SOUND=MESG "(再び)?レベル [0-9]+ になった！|経験を積んだ気が�
 SOUND=MESG "(さようなら|ごきげんよう|アロハ) level [0-9]+\." "sa2_xpleveldown.wav" 100
  
 # ベル
- SOUND=MESG "(ベル|開門のベル)を鳴らした\." "sound_Bell.wav" 100
+ SOUND=MESG "(ベル|開放のベル)を鳴らした\." "sound_Bell.wav" 100
  
 # 地震の太鼓
 SOUND=MESG "重く雷鳴のような轟きを響かせた!|周囲の.*が揺れている!" "sound_Drum_Of_Earthquake.wav" 100

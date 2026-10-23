@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24. */
 /* NetHack 5.0	jp_data_lookup.c */
 /* Japanese aliases for data.base lookup.
  * Keep data.base keys in English and only map player input for lookup.
@@ -285,9 +285,9 @@ static const struct jp_data_lookup_alias jp_data_lookup_aliases[] = {
     { "かね", "bell" },
     { "べる", "bell" },
     { "鐘", "bell" },
-    { "かいほうのかね", "bell of opening" },
+    { "かいほうのべる", "bell of opening" },
     { "べるおぶおーぷにんぐ", "bell of opening" },
-    { "開放の鐘", "bell of opening" },
+    { "開放のベル", "bell of opening" },
     { "こうやりおの", "bill-guisarme" },
     { "びるぎざーむ", "bill-guisarme" },
     { "鉤槍斧", "bill-guisarme" },
