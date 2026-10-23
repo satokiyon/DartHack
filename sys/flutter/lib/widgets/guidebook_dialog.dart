@@ -249,17 +249,23 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     }
   }
 
-  /// 画像パスの自動解決
-  /// - `images/fig1.webp` -> `assets/images/guidebook/fig1.webp`
-  /// - `asset:assets/...` -> `assets/...`
-  /// - `fig1.webp` -> `assets/images/guidebook/fig1.webp`
+  /// 画像パスの解決（すべて assets/images/guidebook/ 配下に一元解決）
   String _resolveImagePath(String rawPath) {
     var p = rawPath.trim();
     if (p.startsWith('asset:')) {
       p = p.substring(6).trim();
     }
+    if (p.startsWith('./')) {
+      p = p.substring(2).trim();
+    }
     if (p.startsWith('images/')) {
       return 'assets/images/guidebook/${p.substring(7)}';
+    }
+    if (p.startsWith('assets/images/guidebook/')) {
+      return p;
+    }
+    if (p.startsWith('assets/images/')) {
+      return 'assets/images/guidebook/${p.substring(14)}';
     }
     if (p.startsWith('assets/')) {
       return p;
@@ -1740,8 +1746,8 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
   }
 }
 
-/// ガイドブック用画像ローダー（パスの自動解決とフォールバック機能付き）
-class _GuidebookImageWidget extends StatefulWidget {
+/// ガイドブック用画像ウィジェット（AssetBundle から直接読込、失敗時は代替画像を表示）
+class _GuidebookImageWidget extends StatelessWidget {
   final String imagePath;
   final BoxFit fit;
 
@@ -1751,45 +1757,11 @@ class _GuidebookImageWidget extends StatefulWidget {
   });
 
   @override
-  State<_GuidebookImageWidget> createState() => _GuidebookImageWidgetState();
-}
-
-class _GuidebookImageWidgetState extends State<_GuidebookImageWidget> {
-  int _attempt = 0;
-
-  List<String> get _candidates {
-    final list = <String>[widget.imagePath];
-    // assets/images/guidebook/figX.webp -> assets/images/figX.webp
-    if (widget.imagePath.contains('/guidebook/')) {
-      list.add(widget.imagePath.replaceFirst('/guidebook/', '/'));
-    }
-    // assets/images/figX.webp -> assets/images/guidebook/figX.webp
-    else if (widget.imagePath.startsWith('assets/images/')) {
-      final fname = widget.imagePath.substring('assets/images/'.length);
-      list.add('assets/images/guidebook/$fname');
-    }
-    return list;
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final candidates = _candidates;
-    final currentPath = candidates[_attempt.clamp(0, candidates.length - 1)];
-
     return Image.asset(
-      currentPath,
-      fit: widget.fit,
+      imagePath,
+      fit: fit,
       errorBuilder: (context, error, stackTrace) {
-        if (_attempt + 1 < candidates.length) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              setState(() {
-                _attempt++;
-              });
-            }
-          });
-          return const SizedBox.shrink();
-        }
         return Container(
           padding: const EdgeInsets.all(24),
           color: const Color(0xFF161B22),
@@ -1800,7 +1772,7 @@ class _GuidebookImageWidgetState extends State<_GuidebookImageWidget> {
               const Icon(Icons.broken_image, color: Colors.white38, size: 36),
               const SizedBox(height: 6),
               Text(
-                '画像を読み込めませんでした: ${widget.imagePath}',
+                '画像を読み込めませんでした: $imagePath',
                 style: const TextStyle(color: Colors.white38, fontSize: 11),
                 textAlign: TextAlign.center,
               ),

@@ -73,6 +73,7 @@ flutter:
     - assets/nethackdir/jp/
     - assets/tiles/
     - assets/images/
+    - assets/images/guidebook/
     - assets/icon/
     - assets/sounds/
 

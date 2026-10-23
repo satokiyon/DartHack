@@ -1,8 +1,11 @@
 # NetHack スポイラー {#nethack-spoilers}
 
-*脅威の迷宮への旅人の手引き (A Traveler's Companion to the Mazes of Menace)*
+**脅威の迷宮への旅人の手引き (A Traveler's Companion to the Mazes of Menace)**
 
-*誰かがあなたを助けてくれているような気がする。(You feel like someone is helping you.)*
+
+**誰かがあなたを助けてくれているような気がする。(You feel like someone is helping you.)**
+
+---
 
 NetHack は、現在も活発に開発・保守が続けられている最古のコンピュータゲームの一つであり、そのコードは40年以上にわたって継続的に開発されています。そのルーツは、Michael Toy と Glenn Wichman が『ダンジョンズ＆ドラゴンズ』に着想を得て1980年に開発したゲーム『Rogue』にまで遡ります。『Rogue』では、ダンジョンはランダムに生成され、通常のテキスト文字で描かれていました。プレイヤーの主人公は `@`、モンスターはアルファベットの文字で表され、死は絶対（パーマデス）でした。Ken Arnold が開発した curses ライブラリ上に構築され、バークレーの BSD Unix に同梱されて世界中に広まった『Rogue』は、当時の大学キャンパスで最も人気のあるゲームとなり、「ローグライク (roguelike)」と呼ばれる一連の同系ゲームジャンルを生み出すきっかけとなりました。
 

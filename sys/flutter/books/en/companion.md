@@ -1,8 +1,23 @@
 # NetHack Spoilers
 
-*A Traveler's Companion to the Mazes of Menace*
+**A Traveler's Companion to the Mazes of Menace**
 
-*You feel like someone is helping you.*
+
+**You feel like someone is helping you.**
+
+---
+
+NetHack is among the oldest computer games still actively maintained, its code in continuous development for more than four decades. Its roots trace back to Rogue, a 1980 computer game by Michael Toy and Glenn Wichman that was inspired by Dungeons and Dragons. In Rogue, the dungeon was randomly generated and drawn with ordinary text characters. Your hero was an `@`, the monsters were letters, and death was permanent. Built on Ken Arnold's curses library and carried across the world inside Berkeley's BSD Unix, Rogue became the most popular game on the college campuses of its day, inspiring a whole genre of similar games called "roguelikes."
+
+NetHack got its start when Jay Fenlason, a high school junior at Lincoln-Sudbury Regional High School in Massachusetts, wanted his own custom version of Rogue. Since Rogue's source code was closely guarded to discourage cheating, he had to start from scratch. His school ran a Unix minicomputer kept alive by its own students, and there, with his classmates Kenny Woodland, Mike Thome, and Jon Payne, he built Hack, a game with monsters that had names, wands that shot beams, and a dungeon that remembered each floor you left behind. His teacher Brian Harvey sent it out on a USENIX tape in 1982, with Jay's note in the README calling it "my first semester programming project" and giving his home phone number.
+
+Hack might have ended there, but because its source code was open, it was passed freely from one programmer to the next. In 1984 Andries Brouwer, a mathematician in the Netherlands, rewrote it substantially and posted Hack 1.0 to Usenet for anyone to take. He added the player roles, the pet that follows you down the stairs, and the shopkeepers. Copies and variants then multiplied across the early Internet faster than any one author could follow.
+
+In 1987, Mike Stephenson gathered those scattered versions back together, and with Izchak Miller, Janet Walz, and a widening circle of volunteers, merged them into a single game. They named it NetHack, after the network that had made the collaboration possible, and called themselves the DevTeam. They are still at it. **Version 5.0 was released in May 2026.** Over forty years, the DevTeam has grown NetHack into the most unforgivingly intricate and emblematic roguelike, with a thriving culture of fun and community beyond the game itself. Much of that culture took shape on the rec.games.roguelike.nethack newsgroup in the 1990s and thrives today at the NetHack Wiki, the r/nethack forum, the game's Discord and IRC channels, and public servers like nethack.alt.org and hardfought.org. This guide stands on their work.
+
+One of the wonderful things about NetHack is that it is so rich, so intricate, that the game is not spoiled by spoilers. The more you know its secrets, the more interesting the game becomes. And so in that spirit, we hope this new collection of 5.0 spoilers helps bring the joy of NetHack to a new generation of players.
+
+Welcome to NetHack!
 
 ---
 

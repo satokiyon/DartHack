@@ -72,24 +72,36 @@ def format_markdown(content: str) -> str:
     print_only_pattern = r':::\s*print-only.*?:::'
     content = re.sub(print_only_pattern, '', content, flags=re.DOTALL)
 
-    # 6. その他の ```{=latex} ... ``` ブロックの除去
+    # 6. 冒頭の NetHack 歴史エッセイ（```{=latex} ... ```）の Markdown 化救出
+    def latex_intro_repl(m):
+        body = m.group(1)
+        # LaTeX 特有記法を Markdown へ変換
+        body = body.replace(r"\texttt{@}", "`@`")
+        body = re.sub(r"\\textbf\{([^}]+)\}", r"**\1**", body)
+        body = body.replace("``", '"').replace("''", '"')
+        return "\n\n" + body.strip() + "\n\n"
+
+    intro_pattern = r"```\{=latex\}\n(NetHack is among the oldest.*?)```"
+    content = re.sub(intro_pattern, latex_intro_repl, content, flags=re.DOTALL)
+
+    # 7. その他の ```{=latex} ... ``` ブロックの除去
     latex_block_pattern = r'```{=latex}.*?```'
     content = re.sub(latex_block_pattern, '', content, flags=re.DOTALL)
 
-    # 7. その他の ```{=html} ... ``` ブロックの除去
+    # 8. その他の ```{=html} ... ``` ブロックの除去
     html_block_pattern = r'```{=html}.*?```'
     content = re.sub(html_block_pattern, '', content, flags=re.DOTALL)
 
-    # 8. <aside> ... </aside> の除去
+    # 9. <aside> ... </aside> の除去
     aside_pattern = r'<aside.*?</aside>'
     content = re.sub(aside_pattern, '', content, flags=re.DOTALL)
 
-    # 9. インライン latex 構文の除去（例: `\newline`{=latex} や {=latex}）
+    # 10. インライン latex 構文の除去（例: `\newline`{=latex} や {=latex}）
     content = re.sub(r'<br>`\\newline`\{=latex\}', '', content)
     content = re.sub(r'`\\newline`\{=latex\}', '', content)
     content = re.sub(r'\{=latex\}', '', content)
 
-    # 10. HTMLコメント <!-- ... --> の除去
+    # 11. HTMLコメント <!-- ... --> の除去
     comment_pattern = r'<!--.*?-->'
     content = re.sub(comment_pattern, '', content, flags=re.DOTALL)
 
