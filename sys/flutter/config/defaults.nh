@@ -138,8 +138,9 @@ MENUCOLOR="無力化の杖" = brightblue
 MENUCOLOR="識別の巻物" = yellow
 MENUCOLOR="解呪の巻物" = yellow
 MENUCOLOR="死者の書" = orange
-MENUCOLOR="開放の鐘" = orange
+MENUCOLOR="開放のベル" = orange
 MENUCOLOR="ろうそく" = orange
+MENUCOLOR="祈りの燭台" = orange
 
 # アーティファクト（既知の主要なもの）
 MENUCOLOR="(エクスカリバー|ストームブリンガー|ミョルニル|マジックベイン|フロストブランド|ファイアブランド|グレイスワンダー|ヴォーパルブレード)" = brightmagenta&bold
@@ -175,6 +176,8 @@ MENUCOLOR="scroll of remove curse" = yellow
 MENUCOLOR="Book of the Dead" = orange
 MENUCOLOR="Bell of Opening" = orange
 MENUCOLOR="candle" = orange
+MENUCOLOR="Candelabrum of Invocation" = orange
+
 
 # Artifacts
 MENUCOLOR="(Excalibur|Stormbringer|Mjollnir|Magicbane|Frost Brand|Fire Brand|Grayswandir|Vorpal Blade)" = brightmagenta&bold
