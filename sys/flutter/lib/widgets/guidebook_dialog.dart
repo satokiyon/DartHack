@@ -166,7 +166,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
         LongPressGestureRecognizer:
             GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
           () => LongPressGestureRecognizer(
-            duration: const Duration(milliseconds: 350),
+            duration: const Duration(milliseconds: 800),
           ),
           (instance) {
             instance

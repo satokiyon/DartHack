@@ -91,10 +91,19 @@ void main() {
         matching: find.byType(AnimatedOpacity),
       );
 
-      // 本文のリンクテキスト上でポインタを押下して400ms保持
+      // 本文のリンクテキスト上でポインタを押下
       final linkPos = tester.getCenter(find.text('セクション30へ').first);
       final gesture = await tester.startGesture(linkPos);
-      await tester.pump(const Duration(milliseconds: 400));
+
+      // 500ms 時点（800ms 未満）ではまだ透明化しない
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(
+        tester.widget<AnimatedOpacity>(dialogOpacityFinder.first).opacity,
+        1.0,
+      );
+
+      // さらに 350ms 経過（合計 850ms > 800ms）で透明化する
+      await tester.pump(const Duration(milliseconds: 350));
 
       // 長押し中は不透明度 0.0 になり、かつタップ維持用バッジは出ない
       expect(
@@ -139,7 +148,7 @@ void main() {
       });
       final plainTextPos = tester.getCenter(plainTextFinder.first);
       final gesture = await tester.startGesture(plainTextPos);
-      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pump(const Duration(milliseconds: 850));
 
       // 期待通り透明化する
       expect(
@@ -175,15 +184,13 @@ void main() {
 
       final initialPos = tester.getTopLeft(find.text('セクション 0'));
 
-      // 1. 本文テキストを押下し、100ms ごとに 3px ずつ微小移動（合計 9px <= 18px）
+      // 1. 本文テキストを押下し、100ms ごとに 2px ずつ微小移動（合計 10px <= 18px）
       final gesture = await tester.startGesture(tester.getCenter(find.text('セクション 0')));
-      await tester.pump(const Duration(milliseconds: 100));
-      await gesture.moveBy(const Offset(0, 3));
-      await tester.pump(const Duration(milliseconds: 100));
-      await gesture.moveBy(const Offset(0, 3));
-      await tester.pump(const Duration(milliseconds: 100));
-      await gesture.moveBy(const Offset(0, 3));
-      await tester.pump(const Duration(milliseconds: 100)); // 合計 400ms
+      for (int i = 0; i < 5; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+        await gesture.moveBy(const Offset(0, 2));
+      }
+      await tester.pump(const Duration(milliseconds: 400)); // 合計 900ms (> 800ms)
 
       // スクロールせず元の位置のまま透明化している
       expect(tester.getTopLeft(find.text('セクション 0')), initialPos);
@@ -225,7 +232,7 @@ void main() {
       // 1. 検索バーの TextField を長押ししても透明化しない
       final searchFieldPos = tester.getCenter(find.byType(TextField));
       final searchGesture = await tester.startGesture(searchFieldPos);
-      await tester.pump(const Duration(milliseconds: 450));
+      await tester.pump(const Duration(milliseconds: 900));
       expect(
         tester.widget<AnimatedOpacity>(dialogOpacityFinder.first).opacity,
         1.0,
@@ -238,7 +245,7 @@ void main() {
       final scrollGesture = await tester.startGesture(bodyPos);
       await tester.pump(const Duration(milliseconds: 100));
       await scrollGesture.moveBy(const Offset(0, -150));
-      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pump(const Duration(milliseconds: 850));
       expect(
         tester.widget<AnimatedOpacity>(dialogOpacityFinder.first).opacity,
         1.0,
@@ -336,7 +343,7 @@ void main() {
       // ヘッダータイトルの長押しで一時透過し、離すと復帰
       final titlePos = tester.getCenter(find.text('NetHack ガイドブック'));
       final holdGesture = await tester.startGesture(titlePos);
-      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pump(const Duration(milliseconds: 850));
       expect(
         tester.widget<AnimatedOpacity>(dialogOpacityFinder.first).opacity,
         0.0,
@@ -351,7 +358,7 @@ void main() {
       // 本文行の長押しで一時透過し、離すと復帰
       final bodyTextPos = tester.getCenter(find.textContaining('ガイドブックの本文テスト行 0 です。'));
       final bodyHoldGesture = await tester.startGesture(bodyTextPos);
-      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pump(const Duration(milliseconds: 850));
       expect(
         tester.widget<AnimatedOpacity>(dialogOpacityFinder.first).opacity,
         0.0,
