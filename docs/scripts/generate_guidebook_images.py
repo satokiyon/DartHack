@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24.
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -30,7 +30,7 @@ def get_monospace_font(font_size=16):
                 continue
     return ImageFont.load_default()
 
-def render_ascii_to_image(ascii_lines, output_path, font_size=16, padding=20):
+def render_ascii_to_image(ascii_lines, output_path, font_size=16, padding=10):
     font = get_monospace_font(font_size)
     
     # 1文字あたりのセルサイズを計測
@@ -75,30 +75,21 @@ def main():
 |                                                               |
 |    ------                                                     |
 |    |....|    ----------                                       |
-|    |....+####+........|                                       |
-|    |...<|    |...@....|                                       |
-|    |....|    |...B....|                                       |
-|    ------    ----------                                       |
+|    |.<..|####...@...$.|                                       |
+|    |....-#   |...B....+                                       |
+|    |....|    |.d......|                                       |
+|    ------    -------|--                                       |
 |                                                               |
 |                                                               |
 |                                                               |
-|                                                               |
-|                                                               |
-|                                                               |
-|                                                               |
-|                                                               |
-|                                                               |
-|                                                               |
-|                                                               |
-|                                                               |
-|                                                               |
-|                                                               |
-|Dlvl:1  $:0  HP:12(12) Pw:1(1) AC:10 Exp:1                     |
+|Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15 Neutral |
+|Dlvl:1 $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:752 Hungry Conf |
 +---------------------------------------------------------------+"""
 
     fig2_text = """+---------------------------------------------------------------+
-|                                                               |
-|Dlvl:1  $:0  HP:12(12) Pw:1(1) AC:10 Exp:1                     |
+|Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15         |
+|Neutral $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 Hungry           |
+|Dlvl:1 T:752                                  Conf             |
 +---------------------------------------------------------------+"""
 
     fig3_text = """+------------------------------------------+

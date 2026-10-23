@@ -1568,7 +1568,7 @@ trapeffect_bear_trap(
                 pline("%sはあなたの脚を守ってくれた.", xname(uarmf));
             else {
                 set_wounded_legs(rn2(2) ? RIGHT_SIDE : LEFT_SIDE, rn1(10, 10));
-                losehp(Maybe_Half_Phys(dmg), "トラバサミ", KILLED_BY_AN);
+                losehp(Maybe_Half_Phys(dmg), "bear trap", KILLED_BY_AN);
             }
         }
         exercise(A_DEX, FALSE);
