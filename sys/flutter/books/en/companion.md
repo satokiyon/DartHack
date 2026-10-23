@@ -3,7 +3,7 @@
 **A Traveler's Companion to the Mazes of Menace**
 
 
-**You feel like someone is helping you.**
+You feel like someone is helping you.
 
 ---
 
