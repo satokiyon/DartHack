@@ -22,7 +22,7 @@ NetHack 5.0 (日本語版 / 英語版) に **Flutter / Dart** でUIを実装す�
    - 透過タイルセット使用時は C コアの `back_to_glyph` と連動し、背景地形とキャラクター/アイテムを重ね合わせた自然な2層描画を実現しています。
 
 4. **ゲーム内スポイラー & ガイド機能**:
-   - ゲームプレイ中にいつでもモンスターやアイテム、ルール等の詳細な知識を閲覧できるスポイラーダイアログ (`SpoilerDialog`) およびガイドブックビューアを搭載。閲覧専用画面でのタイル表示やキー操作にも対応しています。
+   - ゲームプレイ中にいつでもモンスターやアイテム、ルール等の詳細な知識を閲覧できるスポイラーダイアログ (`SpoilerDialog`) およびガイドブックビューアを搭載。閲覧専用画面でのタイル表示やキー操作にも対応しています。原本（`companion.md` / `companion.jp.md`）の更新・同期手順については [`doc/spoiler_update_guide.md`](doc/spoiler_update_guide.md) を参照してください。
 
 5. **ハードウェアキーボード & 物理操作最適化**:
    - `HardwareKeyRouter` により、テンキーや矢印キーによる8方向移動、各種アクションショートカット、拡張コマンドの直接入力など、PC や外部キーボード接続時の快適な打鍵操作をフルサポート。
@@ -90,11 +90,17 @@ sys/flutter/
 │   ├── combat_sound_specification.md # 戦闘アクション効果音仕様書
 │   ├── sound_macros_list.md     # 全316音のサウンドマスター仕様書
 │   ├── sound_system_design.md   # 音響システム設計・確定実装仕様書
+│   ├── spoiler_update_guide.md  # スポイラー更新手順書・仕様
 │   └── voice_speech_specs.md    # 音声合成・セリフ演出仕様書
 │
 ├── books/                       # スポイラー(攻略情報)原本 (Markdown)
 │   ├── en/                      # 英語版 (companion.md)
 │   └── jp/                      # 日本語版 (companion.jp.md)
+│
+├── scripts/                     # 開発・アセット保守スクリプト
+│   ├── convert_images_to_webp.py# 画像アセット WebP 変換
+│   ├── update_companion_jp.py   # 日本語版スポイラー更新・整形・アセット同期
+│   └── update_companion_en.py   # 英語版スポイラー更新・整形・アセット同期
 │
 ├── config/                      # NetHack 設定ファイル原本
 │   ├── defaults.nh              # 起動オプション定義 (defaults.nh)
@@ -199,11 +205,12 @@ DartHack では、NetHack 5.0 のサウンドトリガー仕様に準拠した�
 - **多重再生最適化**: 最大12音同時再生プール、60ms デバウンス、同一音多重制限（最大3音）、二連撃マイクロディレイ（35ms）。
 - **ライフサイクル連携**: バックグラウンド移行時の自動一時停止と安全な音源復帰。
 
-※詳細なイベントID一覧、対照表、アーキテクチャ設計については [`doc/`](doc/) 配下の仕様書を参照してください：
+※詳細なイベントID一覧、対照表、アーキテクチャ設計、更新手順については [`doc/`](doc/) 配下の仕様書を参照してください：
 - サウンドマスター対照表: [`doc/sound_macros_list.md`](doc/sound_macros_list.md)
 - BGM・環境音仕様: [`doc/ambience_specs.md`](doc/ambience_specs.md)
 - 戦闘効果音仕様: [`doc/combat_sound_specification.md`](doc/combat_sound_specification.md)
 - 音響システム詳細設計: [`doc/sound_system_design.md`](doc/sound_system_design.md)
+- スポイラー更新手順書: [`doc/spoiler_update_guide.md`](doc/spoiler_update_guide.md)
 
 ---
 
