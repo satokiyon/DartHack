@@ -125,6 +125,7 @@ scratch/
 !/docs/death_reasons_architecture.md
 !/docs/transparent_tiles_architecture.md
 !/docs/datastore_migration_architecture.md
+!/docs/spoiler_markdown_pipeline_guide.md
 
 
 #logfiles

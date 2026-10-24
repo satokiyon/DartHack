@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:darthack/widgets/spoiler_dialog.dart';
 
 void main() {
   test('Verify companion.jp.md parses cleanly in SpoilerDialog', () {
@@ -24,6 +23,26 @@ void main() {
     expect(content.contains('変身(へんげ)'), isTrue);
     expect(content.contains('さまよう目'), isTrue);
     expect(content.contains('水のニンフ'), isTrue);
+
+    // 内部アンカーリンクの解決検証
+    final linkMatches = RegExp(r'\]\(#([a-zA-Z0-9_.-]+)\)').allMatches(content);
+    final linkTargets = linkMatches.map((m) => m.group(1)!).toSet();
+    expect(linkTargets.length, greaterThan(150));
+
+    final anchorMatches = RegExp(r'\{#([a-zA-Z0-9_.-]+)').allMatches(content);
+    final availableAnchors = anchorMatches.map((m) => m.group(1)!).toSet();
+
+    for (final target in linkTargets) {
+      expect(
+        availableAnchors.contains(target),
+        isTrue,
+        reason: 'Anchor link "#$target" must exist in companion.jp.md',
+      );
+    }
+
+    // 特定アンカーが存在することを確認
+    expect(availableAnchors.contains('the-gnomish-mines'), isTrue);
+    expect(availableAnchors.contains('delayed-deaths'), isTrue);
   });
 }
 

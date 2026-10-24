@@ -39,6 +39,22 @@ def find_default_source():
     return None
 
 
+def slugify(text: str) -> str:
+    # インラインコード `...` を内部テキストに
+    t = re.sub(r'`([^`]+)`', r'\1', text)
+    # リンク [text](...) を text に
+    t = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', t)
+    # 装飾 (*, _, ~) を除去
+    t = re.sub(r'[*_~]', '', t)
+    # 英数字・スペース・ハイフン以外を除去
+    t = re.sub(r'[^a-zA-Z0-9\s-]', '', t).strip().lower()
+    # 空白・アンダースコアをハイフンに
+    t = re.sub(r'[\s_]+', '-', t)
+    # 連続ハイフンを単一に
+    t = re.sub(r'-+', '-', t)
+    return t
+
+
 def format_markdown(content: str) -> str:
     # 1. 改行コードの統一 (\r\n -> \n)
     content = content.replace('\r\n', '\n')
@@ -158,6 +174,14 @@ def format_markdown(content: str) -> str:
             flush_paragraph()
             if out_lines and out_lines[-1] != "":
                 out_lines.append("")
+            heading_m = re.match(r'^(#{1,5})\s+(.+)$', trimmed)
+            if heading_m:
+                hashes = heading_m.group(1)
+                title = heading_m.group(2).strip()
+                if not re.search(r'\{#([a-zA-Z0-9_.-]+)[^}]*\}\s*$', title):
+                    slug = slugify(title)
+                    if slug:
+                        trimmed = f"{hashes} {title} {{#{slug}}}"
             out_lines.append(trimmed)
             out_lines.append("")
             i += 1

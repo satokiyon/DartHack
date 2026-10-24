@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:darthack/widgets/spoiler_dialog.dart';
 
 void main() {
   test('Verify companion.md parses cleanly in SpoilerDialog', () {
@@ -24,6 +23,27 @@ void main() {
     expect(content.contains('blessed greased fixed +2 gray dragon scale mail'), isTrue);
     expect(content.contains('floating eye'), isTrue);
     expect(content.contains('water nymph'), isTrue);
+
+    // 内部アンカーリンクの解決検証
+    final linkMatches = RegExp(r'\]\(#([a-zA-Z0-9_.-]+)\)').allMatches(content);
+    final linkTargets = linkMatches.map((m) => m.group(1)!).toSet();
+    expect(linkTargets.length, greaterThan(150));
+
+    // 全てのリンク先アンカーが本文中に {#anchor} として存在することを確認
+    final anchorMatches = RegExp(r'\{#([a-zA-Z0-9_.-]+)').allMatches(content);
+    final availableAnchors = anchorMatches.map((m) => m.group(1)!).toSet();
+
+    for (final target in linkTargets) {
+      expect(
+        availableAnchors.contains(target),
+        isTrue,
+        reason: 'Anchor link "#$target" must exist in companion.md',
+      );
+    }
+
+    // ユーザー報告の特定アンカーが存在することを確認
+    expect(availableAnchors.contains('the-gnomish-mines'), isTrue);
+    expect(availableAnchors.contains('delayed-deaths'), isTrue);
   });
 }
 

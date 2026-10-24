@@ -38,6 +38,21 @@ def find_default_source():
     return None
 
 
+def slugify(text: str) -> str:
+    # 括弧内の英語表記があれば優先抽出: 例 "ノームの鉱山 (The Gnomish Mines)" -> "The Gnomish Mines"
+    en_paren_match = re.search(r'\(([A-Za-z0-9\s`_-]+)\)', text)
+    if en_paren_match and re.search(r'[A-Za-z]', en_paren_match.group(1)):
+        text = en_paren_match.group(1)
+
+    t = re.sub(r'`([^`]+)`', r'\1', text)
+    t = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', t)
+    t = re.sub(r'[*_~]', '', t)
+    t = re.sub(r'[^a-zA-Z0-9\s-]', '', t).strip().lower()
+    t = re.sub(r'[\s_]+', '-', t)
+    t = re.sub(r'-+', '-', t)
+    return t
+
+
 def format_markdown(content: str) -> str:
     # 1. 改行コードの統一 (\r\n -> \n)
     content = content.replace('\r\n', '\n')
@@ -160,6 +175,14 @@ def format_markdown(content: str) -> str:
             flush_paragraph()
             if out_lines and out_lines[-1] != "":
                 out_lines.append("")
+            heading_m = re.match(r'^(#{1,5})\s+(.+)$', trimmed)
+            if heading_m:
+                hashes = heading_m.group(1)
+                title = heading_m.group(2).strip()
+                if not re.search(r'\{#([a-zA-Z0-9_.-]+)[^}]*\}\s*$', title):
+                    slug = slugify(title)
+                    if slug:
+                        trimmed = f"{hashes} {title} {{#{slug}}}"
             out_lines.append(trimmed)
             out_lines.append("")
             i += 1

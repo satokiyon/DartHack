@@ -470,6 +470,19 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
           anchorMap[anchorId] = blockIndex;
         }
 
+        // 自動スラグも補完登録（未登録の場合）
+        final autoSlug = _generateSlug(titleRaw);
+        if (autoSlug.isNotEmpty) {
+          if (!anchorMap.containsKey(autoSlug)) {
+            anchorMap[autoSlug] = blockIndex;
+          }
+          if (autoSlug.startsWith('the-') && !anchorMap.containsKey(autoSlug.substring(4))) {
+            anchorMap[autoSlug.substring(4)] = blockIndex;
+          } else if (!autoSlug.startsWith('the-') && !anchorMap.containsKey('the-$autoSlug')) {
+            anchorMap['the-$autoSlug'] = blockIndex;
+          }
+        }
+
         sections.add(_GuidebookSection(
           blockIndex: blockIndex,
           title: titleRaw,
@@ -611,16 +624,43 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     });
   }
 
+  /// GFM / Pandoc 準拠のスラグ生成（見出しからアンカーIDを自動解決）
+  String _generateSlug(String text) {
+    // 括弧内の英語表記があれば優先抽出: 例 "ノームの鉱山 (The Gnomish Mines)" -> "The Gnomish Mines"
+    final enMatch = RegExp(r'\(([A-Za-z0-9\s`_-]+)\)').firstMatch(text);
+    var t = (enMatch != null && RegExp(r'[A-Za-z]').hasMatch(enMatch.group(1)!))
+        ? enMatch.group(1)!
+        : text;
+
+    t = t.replaceAll(RegExp(r'`([^`]+)`'), r'$1');
+    t = t.replaceAll(RegExp(r'\[([^\]]+)\]\([^\)]+\)'), r'$1');
+    t = t.replaceAll(RegExp(r'[*_~]'), '');
+    t = t.replaceAll(RegExp(r'[^a-zA-Z0-9\s-]'), '').trim().toLowerCase();
+    t = t.replaceAll(RegExp(r'[\s_]+'), '-');
+    t = t.replaceAll(RegExp(r'-+'), '-');
+    return t;
+  }
+
   void _jumpToAnchor(String anchor) {
     final cleanAnchor = anchor.startsWith('#') ? anchor.substring(1) : anchor;
     final blockIdx = _anchorMap[cleanAnchor];
     if (blockIdx != null) {
       _jumpToBlock(blockIdx);
     } else {
+      // 見出しのテキスト正規化・部分一致検索でフォールバック
+      final normalizedAnchor = cleanAnchor.replaceAll('-', ' ').toLowerCase().trim();
+      final slugFromAnchor = _generateSlug(cleanAnchor);
+
       for (int i = 0; i < _sections.length; i++) {
         final s = _sections[i];
+        final sectionSlug = _generateSlug(s.title);
+        final normalizedTitle = s.title.replaceAll(RegExp(r'[^a-zA-Z0-9\s]'), ' ').toLowerCase().trim();
+
         if (s.anchorId == cleanAnchor ||
-            s.title.toLowerCase().contains(cleanAnchor.toLowerCase())) {
+            (sectionSlug.isNotEmpty && sectionSlug == slugFromAnchor) ||
+            normalizedTitle == normalizedAnchor ||
+            normalizedTitle.contains(normalizedAnchor) ||
+            normalizedAnchor.contains(normalizedTitle)) {
           _jumpToBlock(s.blockIndex);
           return;
         }

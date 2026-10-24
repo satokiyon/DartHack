@@ -22,7 +22,7 @@ NetHack 5.0 (日本語版 / 英語版) に **Flutter / Dart** でUIを実装す�
    - 透過タイルセット使用時は C コアの `back_to_glyph` と連動し、背景地形とキャラクター/アイテムを重ね合わせた自然な2層描画を実現しています。
 
 4. **ゲーム内スポイラー & ガイド機能**:
-   - ゲームプレイ中にいつでもモンスターやアイテム、ルール等の詳細な知識を閲覧できるスポイラーダイアログ (`SpoilerDialog`) およびガイドブックビューアを搭載。閲覧専用画面でのタイル表示やキー操作にも対応しています。原本（`companion.md` / `companion.jp.md`）の更新・同期手順については [`doc/spoiler_update_guide.md`](doc/spoiler_update_guide.md) を参照してください。
+   - ゲームプレイ中にいつでもモンスターやアイテム、ルール等の詳細な知識を閲覧できるスポイラーダイアログ (`SpoilerDialog`) およびガイドブックビューアを搭載。閲覧専用画面でのタイル表示やキー操作にも対応しています。原本（`companion.md` / `companion.jp.md`）の更新・同期手順については [`doc/spoiler_update_guide.md`](doc/spoiler_update_guide.md) およびルート設計書 [`docs/spoiler_markdown_pipeline_guide.md`](../../docs/spoiler_markdown_pipeline_guide.md) を参照してください。
 
 5. **ハードウェアキーボード & 物理操作最適化**:
    - `HardwareKeyRouter` により、テンキーや矢印キーによる8方向移動、各種アクションショートカット、拡張コマンドの直接入力など、PC や外部キーボード接続時の快適な打鍵操作をフルサポート。

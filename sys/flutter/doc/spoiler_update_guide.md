@@ -1,7 +1,10 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24. -->
 # NetHack 5.0 スポイラー（攻略手引書）更新手順書
 
 本ドキュメントでは、DartHack のゲーム内スポイラービューア（`SpoilerDialog`）で使用される攻略情報（`companion.md` / `companion.jp.md`）を、原本リポジトリから取り込んで整形・同期する手順および仕様について解説します。
+
+> [!NOTE]
+> スポイラー Markdown の整形処理方針、アンカーリンク自動解決の技術的詳細、および包括的なパイプライン設計については、ルート設計書 [docs/spoiler_markdown_pipeline_guide.md](../../../docs/spoiler_markdown_pipeline_guide.md) を参照してください。
 
 ---
 
