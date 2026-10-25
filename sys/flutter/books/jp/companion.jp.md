@@ -1,6 +1,6 @@
 # NetHack スポイラー {#nethack-spoilers}
 
-*脅威の迷宮への旅人の手引き (A Traveler's Companion to the Mazes of Menace)*
+**脅威の迷宮への旅人の手引き (A Traveler's Companion to the Mazes of Menace)**\
 
 誰かがあなたを助けてくれているような気がする。(You feel like someone is helping you.)
 
