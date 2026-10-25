@@ -37,15 +37,17 @@ void main() {
       expect(manager.mapAsciiScale, 1.0);
     });
 
-    test('内蔵フォント 5 種が利用可能リストに含まれ、日英表示名が正しく取得できる', () async {
+    test('内蔵フォント 6 種が利用可能リストに含まれ、日英表示名が正しく取得できる', () async {
       final manager = FontManager.instance;
       await manager.init(prefs: mockPrefs, customFontsDir: tempDir);
 
       final available = manager.availableFonts;
+      expect(available.length, equals(6));
       expect(available.any((f) => f.id == 'system'), isTrue);
       expect(available.any((f) => f.id == 'Terminus'), isTrue);
       expect(available.any((f) => f.id == 'Unscii-8'), isTrue);
-      expect(available.any((f) => f.id == 'Unscii-16'), isTrue);
+      expect(available.any((f) => f.id == 'IBMVGA9x16'), isTrue);
+      expect(available.any((f) => f.id == 'NotoSansMonoCJKjp'), isTrue);
       expect(available.any((f) => f.id == 'MisakiGothic'), isTrue);
 
       final sys = available.firstWhere((f) => f.id == 'system');
@@ -60,13 +62,30 @@ void main() {
       expect(unscii8.getDisplayName(true), equals('Unscii 8x8 (レトロPC)'));
       expect(unscii8.getDisplayName(false), equals('Unscii 8x8 (Retro PC)'));
 
-      final unscii16 = available.firstWhere((f) => f.id == 'Unscii-16');
-      expect(unscii16.getDisplayName(true), equals('Unscii 16x16 (高精細レトロ)'));
-      expect(unscii16.getDisplayName(false), equals('Unscii 16x16 (Hi-Res Retro)'));
+      final ibmVga = available.firstWhere((f) => f.id == 'IBMVGA9x16');
+      expect(ibmVga.getDisplayName(true), equals('IBM VGA 9x16 (クラシックPC)'));
+      expect(ibmVga.getDisplayName(false), equals('IBM VGA 9x16 (Classic PC)'));
+
+      final notoMono = available.firstWhere((f) => f.id == 'NotoSansMonoCJKjp');
+      expect(notoMono.getDisplayName(true), equals('Noto Sans Mono CJK JP (高品位日本語)'));
+      expect(notoMono.getDisplayName(false), equals('Noto Sans Mono CJK JP'));
 
       final misaki = available.firstWhere((f) => f.id == 'MisakiGothic');
       expect(misaki.getDisplayName(true), equals('美咲ゴシック (日本語レトロ)'));
       expect(misaki.getDisplayName(false), equals('Misaki Gothic (Retro Pixel JP)'));
+    });
+
+    test('削除された旧フォント ID (Unscii-16) が保存されていた場合は安全にデフォルトへマイグレーションされる', () async {
+      await mockPrefs.setString(FontManager.prefFontMap, 'Unscii-16');
+      await mockPrefs.setString(FontManager.prefFontMessage, 'Unscii-16');
+
+      final manager = FontManager.instance;
+      await manager.init(prefs: mockPrefs, customFontsDir: tempDir);
+
+      expect(manager.getSelectedFont(FontTarget.map).id, equals('Terminus'));
+      expect(manager.getSelectedFont(FontTarget.message).id, equals('system'));
+      expect(mockPrefs.getString(FontManager.prefFontMap), equals('Terminus'));
+      expect(mockPrefs.getString(FontManager.prefFontMessage), equals('system'));
     });
   });
 
@@ -92,13 +111,13 @@ void main() {
       final manager = FontManager.instance;
       await manager.init(prefs: mockPrefs, customFontsDir: tempDir);
 
-      await manager.setAllFonts('Unscii-16');
+      await manager.setAllFonts('IBMVGA9x16');
 
       for (final target in FontTarget.values) {
-        expect(manager.getSelectedFont(target).id, 'Unscii-16');
+        expect(manager.getSelectedFont(target).id, 'IBMVGA9x16');
       }
-      expect(mockPrefs.getString(FontManager.prefFontMap), 'Unscii-16');
-      expect(mockPrefs.getString(FontManager.prefFontUi), 'Unscii-16');
+      expect(mockPrefs.getString(FontManager.prefFontMap), 'IBMVGA9x16');
+      expect(mockPrefs.getString(FontManager.prefFontUi), 'IBMVGA9x16');
     });
   });
 

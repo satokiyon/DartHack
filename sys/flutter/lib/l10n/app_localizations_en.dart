@@ -136,7 +136,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statusModeVariable => 'Variable Height';
 
   @override
-  String get secTilesetTitle => 'Tileset Settings';
+  String get secTilesetTitle => 'Tileset & Symbol Settings';
 
   @override
   String get useTiles => 'Use Tile Graphics';
@@ -1363,23 +1363,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fontAllLabel => 'Apply Font to All';
 
   @override
-  String get fontMapLabel => 'Map Font (font_map)';
+  String get fontMapLabel => 'Map Font';
 
   @override
   String get fontMapDesc =>
       'Used for ASCII map rendering when tiles are OFF (no Japanese fallback to prevent layout corruption)';
 
   @override
-  String get fontMsgLabel => 'Message Font (font_message)';
+  String get fontMsgLabel => 'Message Font';
 
   @override
-  String get fontStatusLabel => 'Status Font (font_status)';
+  String get fontStatusLabel => 'Status Font';
 
   @override
-  String get fontMenuLabel => 'Menu & Text Font (font_menu)';
+  String get fontMenuLabel => 'Menu & Text Font';
 
   @override
-  String get fontUiLabel => 'UI & Controller Font (font_ui)';
+  String get fontUiLabel => 'UI & Controller Font';
 
   @override
   String get fontAsciiScale => 'ASCII Map Scale';

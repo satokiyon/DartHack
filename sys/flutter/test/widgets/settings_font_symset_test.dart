@@ -35,6 +35,7 @@ void main() {
     await defaultsFile.writeAsString('OPTIONS=symset:IBMGraphics_2,runmode:walk\n');
 
     mockPrefs = await AppPrefs.setMockInitialValues({
+      'use_tiles': true,
       'nh_opt_symset': 'IBMGraphics_2',
       'nh_opt_roguesymset': 'Default',
     });
@@ -64,16 +65,16 @@ void main() {
     );
   }
 
-  testWidgets('SettingsPage にシンボルセット設定およびフォント設定が表示されること', (tester) async {
+  testWidgets('SettingsPage にタイル／シンボル設定およびフォント設定が表示されること', (tester) async {
     await tester.pumpWidget(createSettingsApp());
     await tester.pump(const Duration(milliseconds: 500));
 
     // セクションタイトルの存在確認
-    expect(find.text('シンボルセット設定 (symset)'), findsOneWidget);
+    expect(find.text('タイル／シンボル設定'), findsOneWidget);
     expect(find.text('フォント設定'), findsOneWidget);
   });
 
-  testWidgets('シンボルセットセクションを展開して symset / roguesymset を変更・保存できること', (tester) async {
+  testWidgets('タイル／シンボル設定でタイル表示をOFFにすると symset / roguesymset が表示され変更・保存できること', (tester) async {
     tester.view.physicalSize = const Size(800, 1200);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -82,17 +83,33 @@ void main() {
     await tester.pumpWidget(createSettingsApp());
     await tester.pump(const Duration(milliseconds: 500));
 
-    // シンボルセットセクションを展開
-    final symsetSectionTitle = find.text('シンボルセット設定 (symset)');
-    await tester.ensureVisible(symsetSectionTitle);
-    await tester.tap(symsetSectionTitle);
-    await tester.pump(const Duration(milliseconds: 500));
+    // タイル／シンボル設定セクションを展開
+    final sectionTitle = find.text('タイル／シンボル設定');
+    await tester.scrollUntilVisible(sectionTitle, 200);
+    await tester.ensureVisible(sectionTitle);
+    await tester.tap(sectionTitle);
+    await tester.pumpAndSettle();
 
-    expect(find.text('通常階層シンボルセット (symset)'), findsOneWidget);
+    // タイル表示を使用がONの間はシンボルセットは非表示
+    expect(find.text('通常階層シンボルセット (symset)'), findsNothing);
+
+    // 「タイル表示を使用」スイッチをタップしてOFFにする
+    final useTilesSwitch = find.widgetWithText(SwitchListTile, 'タイル表示を使用');
+    await tester.scrollUntilVisible(useTilesSwitch, 200);
+    await tester.ensureVisible(useTilesSwitch);
+    await tester.tap(useTilesSwitch);
+    await tester.pumpAndSettle();
+
+    // OFFになったことでシンボルセット設定が表示される
+    final symsetTitle = find.text('通常階層シンボルセット (symset)');
+    await tester.scrollUntilVisible(symsetTitle, 200);
+    await tester.ensureVisible(symsetTitle);
+    expect(symsetTitle, findsOneWidget);
     expect(find.text('ローグ階層シンボルセット (roguesymset)'), findsOneWidget);
 
     // ドロップダウンで通常 symset を変更
     final symsetFinder = find.widgetWithText(ListTile, '通常階層シンボルセット (symset)');
+    await tester.scrollUntilVisible(symsetFinder, 200);
     await tester.ensureVisible(symsetFinder);
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -136,7 +153,7 @@ void main() {
     await tester.pumpWidget(createSettingsApp());
     await tester.pump(const Duration(milliseconds: 500));
 
-    // フォント設定セクションをスクロールして見つけて展開
+    // フォント設定セクションを展開
     final fontSectionFinder = find.text('フォント設定');
     await tester.scrollUntilVisible(fontSectionFinder, 200);
     await tester.ensureVisible(fontSectionFinder);
@@ -144,7 +161,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text('一括フォント変更'), findsOneWidget);
-    expect(find.text('マップフォント (font_map)'), findsOneWidget);
+    expect(find.text('マップフォント'), findsOneWidget);
     expect(find.text('アスキーマップ表示倍率'), findsOneWidget);
 
     // 一括変更ドロップダウンをタップ
@@ -192,7 +209,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text('Apply Font to All'), findsOneWidget);
-    expect(find.text('Map Font (font_map)'), findsOneWidget);
+    expect(find.text('Map Font'), findsOneWidget);
 
     // 一括変更ドロップダウンをタップ
     final allTileFinder = find.widgetWithText(ListTile, 'Apply Font to All');
@@ -212,7 +229,72 @@ void main() {
     expect(find.text('System Default (Monospace)'), findsWidgets);
     expect(find.text('Terminus TTF (Classic ASCII)'), findsWidgets);
     expect(find.text('Unscii 8x8 (Retro PC)'), findsWidgets);
-    expect(find.text('Unscii 16x16 (Hi-Res Retro)'), findsWidgets);
+    expect(find.text('IBM VGA 9x16 (Classic PC)'), findsWidgets);
+    expect(find.text('Noto Sans Mono CJK JP'), findsWidgets);
     expect(find.text('Misaki Gothic (Retro Pixel JP)'), findsWidgets);
+  });
+
+  testWidgets('スマホ縦画面 (幅 < 600px) でプルダウン項目が上下配置になり正常に選択できること', (tester) async {
+    // 典型的なスマホ縦画面サイズ (幅 380px)
+    tester.view.physicalSize = const Size(380, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await mockPrefs.setString('selected_language', 'ja');
+
+    await tester.pumpWidget(createSettingsApp());
+    await tester.pump(const Duration(milliseconds: 500));
+
+    // タイル／シンボル設定セクションを展開
+    final symsetSectionTitle = find.text('タイル／シンボル設定');
+    await tester.scrollUntilVisible(symsetSectionTitle, 200);
+    await tester.ensureVisible(symsetSectionTitle);
+    await tester.tap(symsetSectionTitle);
+    await tester.pumpAndSettle();
+
+    // 「タイル表示を使用」をタップしてOFFにする
+    final useTilesSwitch = find.widgetWithText(SwitchListTile, 'タイル表示を使用');
+    await tester.scrollUntilVisible(useTilesSwitch, 200);
+    await tester.ensureVisible(useTilesSwitch);
+    await tester.tap(useTilesSwitch);
+    await tester.pumpAndSettle();
+
+    // タイトルと説明文が表示されていること
+    final titleFinder = find.text('通常階層シンボルセット (symset)');
+    await tester.scrollUntilVisible(titleFinder, 200);
+    await tester.ensureVisible(titleFinder);
+    expect(titleFinder, findsOneWidget);
+    expect(find.text('アスキー描画時に壁・床・道具等を描画するシンボル定義セットです。'), findsOneWidget);
+
+    // スマホ縦画面では上下配置 (Column) として描画されていることを検証
+    final columnFinder = find.ancestor(
+      of: titleFinder,
+      matching: find.byType(Column),
+    ).first;
+    expect(columnFinder, findsOneWidget);
+
+    // ドロップダウンに表示されている現在の選択値テキスト ('IBMGraphics_2') を特定
+    final currentSymsetText = find.descendant(
+      of: columnFinder,
+      matching: find.text('IBMGraphics_2'),
+    );
+    expect(currentSymsetText, findsOneWidget);
+
+    // スクロールして画面中央に表示
+    await Scrollable.ensureVisible(tester.element(currentSymsetText), alignment: 0.5);
+    await tester.pumpAndSettle();
+
+    await tester.tap(currentSymsetText);
+    await tester.pump(const Duration(milliseconds: 500));
+
+    // メニューから 'Enhanced1' を選択
+    final itemFinder = find.text('Enhanced1').last;
+    expect(itemFinder, findsOneWidget);
+    await tester.tap(itemFinder);
+    await tester.pump(const Duration(milliseconds: 500));
+
+    // Prefs に正しく保存されたことを検証
+    expect(mockPrefs.getString('nh_opt_symset'), 'Enhanced1');
   });
 }

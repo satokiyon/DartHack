@@ -353,7 +353,7 @@ abstract class AppLocalizations {
   /// No description provided for @secTilesetTitle.
   ///
   /// In ja, this message translates to:
-  /// **'タイルセット設定'**
+  /// **'タイル／シンボル設定'**
   String get secTilesetTitle;
 
   /// No description provided for @useTiles.
@@ -2639,7 +2639,7 @@ abstract class AppLocalizations {
   /// No description provided for @fontMapLabel.
   ///
   /// In ja, this message translates to:
-  /// **'マップフォント (font_map)'**
+  /// **'マップフォント'**
   String get fontMapLabel;
 
   /// No description provided for @fontMapDesc.
@@ -2651,25 +2651,25 @@ abstract class AppLocalizations {
   /// No description provided for @fontMsgLabel.
   ///
   /// In ja, this message translates to:
-  /// **'メッセージフォント (font_message)'**
+  /// **'メッセージフォント'**
   String get fontMsgLabel;
 
   /// No description provided for @fontStatusLabel.
   ///
   /// In ja, this message translates to:
-  /// **'ステータスフォント (font_status)'**
+  /// **'ステータスフォント'**
   String get fontStatusLabel;
 
   /// No description provided for @fontMenuLabel.
   ///
   /// In ja, this message translates to:
-  /// **'メニュー＆テキストフォント (font_menu)'**
+  /// **'メニュー＆テキストフォント'**
   String get fontMenuLabel;
 
   /// No description provided for @fontUiLabel.
   ///
   /// In ja, this message translates to:
-  /// **'UI＆コントローラフォント (font_ui)'**
+  /// **'UI＆コントローラフォント'**
   String get fontUiLabel;
 
   /// No description provided for @fontAsciiScale.

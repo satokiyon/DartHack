@@ -108,10 +108,17 @@ class FontManager extends ChangeNotifier {
       isBuiltIn: true,
     ),
     FontItem(
-      id: 'Unscii-16',
-      displayName: 'Unscii 16x16 (高精細レトロ)',
-      displayNameEn: 'Unscii 16x16 (Hi-Res Retro)',
-      fontFamily: 'Unscii-16',
+      id: 'IBMVGA9x16',
+      displayName: 'IBM VGA 9x16 (クラシックPC)',
+      displayNameEn: 'IBM VGA 9x16 (Classic PC)',
+      fontFamily: 'IBMVGA9x16',
+      isBuiltIn: true,
+    ),
+    FontItem(
+      id: 'NotoSansMonoCJKjp',
+      displayName: 'Noto Sans Mono CJK JP (高品位日本語)',
+      displayNameEn: 'Noto Sans Mono CJK JP',
+      fontFamily: 'NotoSansMonoCJKjp',
       isBuiltIn: true,
     ),
     FontItem(
@@ -202,6 +209,18 @@ class FontManager extends ChangeNotifier {
 
     // 外部フォントディレクトリを走査して動的登録
     await _loadCustomFontsFromStorage();
+
+    // 削除されたフォント (例: 'Unscii-16') や存在しないフォント ID が保存されていた場合の安全な自動マイグレーション
+    final validIds = availableFonts.map((f) => f.id).toSet();
+    for (final target in FontTarget.values) {
+      final currentId = _selectedFontIds[target];
+      if (currentId == null || !validIds.contains(currentId)) {
+        final fallbackId = (target == FontTarget.map) ? 'Terminus' : 'system';
+        _selectedFontIds[target] = fallbackId;
+        final prefKey = _getPrefKeyForTarget(target);
+        await _prefs!.setString(prefKey, fallbackId);
+      }
+    }
 
     _isInitialized = true;
     notifyListeners();

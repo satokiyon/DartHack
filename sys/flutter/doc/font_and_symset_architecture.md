@@ -1,6 +1,6 @@
 # フォント設定およびシンボルセット (symset / roguesymset) アーキテクチャ設計書
 
-本ドキュメントは、DartHack（NetHack 5.0 Flutter ポート）における **フォントカスタマイズ機能**、**アスキー描画シンボルセット（`OPTIONS=symset` / `roguesymset`）連携**、**外部フォントの安全なインポートと構造バリデーション**、および **マップセルサイズ・描画パイプラインの最適化** に関する包括的な技術仕様・設計書です。
+本ドキュメントは、DartHack（NetHack 5.0 Flutter ポート）における **フォントカスタマイズ機能**、**アスキー描画シンボルセット（`OPTIONS=symset` / `roguesymset`）連携**、**外部フォントの安全なインポートと構造バリデーション**、**マップセルサイズ・描画パイプラインの最適化**、および **設定画面（SettingsPage）のレスポンシブ・連動表示アーキテクチャ** に関する包括的な技術仕様・設計書です。
 
 ---
 
@@ -12,6 +12,7 @@
    - 3.1 [5系統の用途別ターゲット分離と一括設定](#31-5系統の用途別ターゲット分離と一括設定)
    - 3.2 [マップ描画における日本語フォールバック完全排除原則](#32-マップ描画における日本語フォールバック完全排除原則)
    - 3.3 [セルサイズ4箇所完全一元化とアスペクト比自動計測](#33-セルサイズ4箇所完全一元化とアスペクト比自動計測)
+   - 3.4 [設定画面のレスポンシブ設計とタイル／シンボル連動表示](#34-設定画面のレスポンシブ設計とタイルシンボル連動表示)
 4. [セキュリティとバイナリ構造検証 (FontValidator)](#4-セキュリティとバイナリ構造検証-fontvalidator)
    - 4.1 [防御脅威モデル](#41-防御脅威モデル)
    - 4.2 [SFNT / TTC テーブルディレクトリ構造検証](#42-sfnt--ttc-テーブルディレクトリ構造検証)
@@ -26,7 +27,11 @@
    - 6.3 [アスキーマップ表示倍率スライダー連動](#63-アスキーマップ表示倍率スライダー連動)
 7. [シンボルセット (OPTIONS=symset / roguesymset) 連携仕様](#7-シンボルセット-optionssymset--roguesymset-連携仕様)
    - 7.1 [DefaultsHelper における複合行インプレース置換と保護](#71-defaultshelper-における複合行インプレース置換と保護)
-   - 7.2 [Cコア winflutter.c における待機ループ即時反映](#72-cコア-winflutterc-における待機ループ即時反映)
+   - 7.2 [Cコア winflutter.c / utf8map.c における待機ループ即時反映と Unicode 連携](#72-cコア-winflutterc--utf8mapc-における待機ループ即時反映と-unicode-連携)
+     - 7.2.1 [Enhanced2 / Enhanced1 の UTF-8 グリフ直接取得フォールバック](#721-enhanced2--enhanced1-の-utf-8-グリフ直接取得フォールバック)
+     - 7.2.2 [画面バッファ全破棄 (clear_glyph_buffer) と即時再描画](#722-画面バッファ全破棄-clear_glyph_buffer-と即時再描画)
+     - 7.2.3 [utf8map.c における SEGV クラッシュ防止ガード (details_end)](#723-utf8mapc-における-segv-クラッシュ防止ガード-details_end)
+   - 7.3 [設定画面で選択可能なシンボルセット一覧](#73-設定画面で選択可能なシンボルセット一覧)
 8. [フォントの追加手順](#8-フォントの追加手順)
    - 8.1 [【開発者向け】プロジェクトへの新規内蔵フォント追加手順](#81-開発者向けプロジェクトへの新規内蔵フォント追加手順)
    - 8.2 [【ユーザー向け】設定画面からの外部フォントインポート手順](#82-ユーザー向け設定画面からの外部フォントインポート手順)
@@ -34,6 +39,7 @@
 9. [開発上の注意点とトラブルシューティング](#9-開発上の注意点とトラブルシューティング)
    - 9.1 [Windows FakeAsync テスト環境における runAsync 必須ルール](#91-windows-fakeasync-テスト環境における-runasync-必須ルール)
    - 9.2 [Cコア 40バイト文字列オプション制限と SharedPreferences 専管化](#92-cコア-40バイト文字列オプション制限と-sharedpreferences-専管化)
+   - 9.3 [winflutter.c における glyphmap 外部宣言 (extern) 必須ルール](#93-winflutterc-における-glyphmap-外部宣言-extern-必須ルール)
 
 ---
 
@@ -44,11 +50,12 @@ DartHack では従来、固定のフォントファミリーと固定のシン�
 
 1. **フォントの固定化**: タイル表示を OFF にした際のアスキーマップ描画やメッセージ、UI 各部でフォントを変更できず、クラシックなレトロ PC 調やビットマップフォントを楽しめない。
 2. **シンボルセット変更の制約**: `defaults.nh` 内の `OPTIONS=symset` や `OPTIONS=roguesymset`（ローグ階層専用）を設定画面から直感的に変更できず、変更時にもアプリ再起動が必要であった。
-3. **複合設定行の破壊リスク**: 既存端末に配布済みの `OPTIONS=symset:IBMGraphics_2,runmode:walk` などの複合行を単純に置換すると、同一行にある他の必須オプション（`runmode:walk`）が欠落するリスクがあった。
-4. **東アジア曖昧幅全角文字によるマップグリッド崩れ**: マップ描画で日本語フォントへのフォールバックが走ると、欧文記号（罫線文字やハイフン、引用符等）が全角扱いとなり、マップのマス目（80x21）が大きく乱れる。
-5. **外部フォントのセキュリティリスク**: ユーザーが所有する任意のフォントファイル（`.ttf`, `.otf`, `.ttc`, `.woff`）を読み込む際、偽装ファイルや悪意あるバイナリによるクラッシュ・メモリ破壊を防御する必要があった。
+3. **設定画面における機能の分散**: タイル表示とシンボルセットが別々のセクションに分かれており、タイル表示が ON（シンボルが無関係な状態）でもシンボルセット設定が表示されていた。
+4. **複合設定行の破壊リスク**: 既存端末に配布済みの `OPTIONS=symset:IBMGraphics_2,runmode:walk` などの複合行を単純に置換すると、同一行にある他の必須オプション（`runmode:walk`）が欠落するリスクがあった。
+5. **東アジア曖昧幅全角文字によるマップグリッド崩れ**: マップ描画で日本語フォントへのフォールバックが走ると、欧文記号（罫線文字やハイフン、引用符等）が全角扱いとなり、マップのマス目（80x21）が大きく乱れる。
+6. **外部フォントのセキュリティリスク**: ユーザーが所有する任意のフォントファイル（`.ttf`, `.otf`, `.ttc`, `.woff`）を読み込む際、偽装ファイルや悪意あるバイナリによるクラッシュ・メモリ破壊を防御する必要があった。
 
-これらを根本解決するため、**「安全なフォント検証・インポート基盤」「用途別5系統フォント管理」「日本語フォールバック排除型高速マップ描画」「Cコア連携型シンボルセット即時反映」** を備えた統合アーキテクチャを構築しました。
+これらを根本解決するため、**「安全なフォント検証・インポート基盤」「用途別5系統フォント管理」「日本語フォールバック排除型高速マップ描画」「Cコア連携型シンボルセット即時反映」「タイル／シンボル連動UI」** を備えた統合アーキテクチャを構築しました。
 
 ---
 
@@ -57,7 +64,7 @@ DartHack では従来、固定のフォントファミリーと固定のシン�
 ```mermaid
 flowchart TD
     subgraph UI_Layer["Flutter UI レイヤー"]
-        SP["設定画面 (SettingsPage)"]
+        SP["設定画面 (SettingsPage)\n【タイル／シンボル設定・フォント設定】"]
         NMP["マップ描画 (NetHackMapPainter)"]
         Theme["アプリ全体 Theme / 各種ダイアログ"]
     end
@@ -77,8 +84,9 @@ flowchart TD
 
     subgraph Core_Layer["NetHack Cコア層"]
         FFI["Dart FFI (NetHackFfi)"]
-        WF["winflutter.c (RequestSymsetChangeFlutter)"]
-        C_Core["Cコア待機ループ (flutter_nhgetch)"]
+        WF["winflutter.c\nRequestSymsetChangeFlutter\nUTF-8 グリフ直接フォールバック"]
+        UTF["utf8map.c\nUnicode シンボルマッピングテーブル\n(details_end ガード保護)"]
+        C_Core["Cコア待機ループ (flutter_nhgetch)\nclear_glyph_buffer / docrt / flush_screen"]
     end
 
     %% UI to Service
@@ -97,6 +105,7 @@ flowchart TD
 
     %% FFI to C-Core
     FFI -->|"C関数呼出し"| WF
+    WF -->|"シンボル再パース"| UTF
     WF -->|"スレッドセーフ通知"| C_Core
 ```
 
@@ -107,16 +116,17 @@ flowchart TD
 ### 3.1 5系統の用途別ターゲット分離と一括設定
 
 フォント設定は、画面要素の視認性と特性に応じて **5系統（+一括設定）** に分離して管理されます。
+設定画面の各項目ラベルからは、内部キー名（`font_xxx`）を排除し、ユーザーフレンドリーな自然な表記に統一されています。
 
-| ターゲット (`FontTarget`) | SharedPreferences キー | 主な適用箇所 | 特性・推奨 |
-| :--- | :--- | :--- | :--- |
-| **マップ (`map`)** | `font_map` | `NetHackMapPainter` (アスキーマップ), 全体マップ | **等幅フォント必須**。日本語フォールバック一切なし |
-| **メッセージ (`message`)** | `font_message` | 画面上部直近メッセージ、メッセージ履歴 (`MsgHistoryDialog`) | 欧文・日本語の可読性重視（日本語フォールバックあり） |
-| **ステータス (`status`)** | `font_status` | 画面上部/下部ステータス行（HP、階層、ゴールド等） | 数値やバーの等幅性が望ましい（日本語フォールバックあり） |
-| **メニュー＆テキスト (`menuText`)** | `font_menu_text` | メニュー (`MenuOverlay`), テキスト (`TextOverlay`), 墓石, スポイラー | 本文が美しく整列するフォント（日本語フォールバックあり） |
-| **UI＆コントローラ (`ui`)** | `font_ui` | アプリ全体テーマ、ボタン、D-Pad、コマンドパネル、設定画面 | 視認性が高くモダンなフォント（日本語フォールバックあり） |
+| ターゲット (`FontTarget`) | SharedPreferences キー | 設定画面ラベル (日本語 / 英語) | 主な適用箇所 | 特性・推奨 |
+| :--- | :--- | :--- | :--- | :--- |
+| **マップ (`map`)** | `font_map` | マップフォント / Map Font | `NetHackMapPainter` (アスキーマップ), 全体マップ | **等幅フォント必須**。日本語フォールバック一切なし |
+| **メッセージ (`message`)** | `font_message` | メッセージフォント / Message Font | 画面上部直近メッセージ、メッセージ履歴 (`MsgHistoryDialog`) | 欧文・日本語の可読性重視（日本語フォールバックあり） |
+| **ステータス (`status`)** | `font_status` | ステータスフォント / Status Font | 画面上部/下部ステータス行（HP、階層、ゴールド等） | 数値やバーの等幅性が望ましい（日本語フォールバックあり） |
+| **メニュー＆テキスト (`menuText`)** | `font_menu_text` | メニュー＆テキストフォント / Menu & Text Font | メニュー (`MenuOverlay`), テキスト (`TextOverlay`), 墓石, スポイラー | 本文が美しく整列するフォント（日本語フォールバックあり） |
+| **UI＆コントローラ (`ui`)** | `font_ui` | UI＆コントローラフォント / UI & Controller Font | アプリ全体テーマ、ボタン、D-Pad、コマンドパネル、設定画面 | 視認性が高くモダンなフォント（日本語フォールバックあり） |
 
-- **一括変更機能**: 設定画面の「一括フォント変更」ドロップダウンを操作すると、全5系統が一括で同一フォントに更新されます。
+- **一括変更機能**: 設定画面の「一括フォント変更」（`Apply Font to All`）ドロップダウンを操作すると、全5系統が一括で同一フォントに更新されます。
 
 ### 3.2 マップ描画における日本語フォールバック完全排除原則
 
@@ -133,7 +143,7 @@ NetHack のダンジョンマップ（80列×21行）には、壁（`|`, `-`）�
 
 ### 3.3 セルサイズ4箇所完全一元化とアスペクト比自動計測
 
-フォントによって、半角文字の縦横比（アスペクト比 $W/H$）は大きく異なります（例: `Terminus` は約 0.50、`Unscii-8` は 1.00 の正方形、`Unscii-16` は 0.50）。
+フォントによって、半角文字の縦横比（アスペクト比 $W/H$）は大きく異なります（例: `Terminus` や `IBMVGA9x16` は約 0.50〜0.56、`Unscii-8` は 1.00 の正方形、`NotoSansMonoCJKjp` は約 0.50）。
 もしマップ描画とカメラ追従・タップ判定で異なるセルサイズが用いられると、「画面中央センタリングがズレる」「タップしたマスと実際に移動する座標が食い違う」という致命的な不具合が発生します。
 
 そのため、[`FontManager`](file:///c:/Users/satok/DartHack/sys/flutter/lib/services/font_manager.dart) の `getMapCellSize` 関数を設け、アプリ内の **以下の4箇所すべてで同一のセルサイズ計算を一元適用** しています：
@@ -142,6 +152,18 @@ NetHack のダンジョンマップ（80列×21行）には、壁（`|`, `-`）�
 2. **主人公カメラ追従**: [`main.dart:1200`](file:///c:/Users/satok/DartHack/sys/flutter/lib/main.dart) 付近の `InteractiveViewer` 自動センタリング計算
 3. **マップタップ移動逆算**: [`main.dart:2320`](file:///c:/Users/satok/DartHack/sys/flutter/lib/main.dart) 付近のスクリーン座標 $\to$ マップ座標 $(x, y)$ 変換
 4. **全体マップダイアログ**: [`widgets/full_map_dialog.dart:128`](file:///c:/Users/satok/DartHack/sys/flutter/lib/widgets/full_map_dialog.dart) のミニマップ縮小描画
+
+### 3.4 設定画面のレスポンシブ設計とタイル／シンボル連動表示
+
+設定画面（[`settings_page.dart`](file:///c:/Users/satok/DartHack/sys/flutter/lib/settings_page.dart)）では、UX 向上とレイアウト破綻防止のために以下の設計を導入しています：
+
+1. **「タイル／シンボル設定」のインライン連動表示**:
+   - 従来独立していた「シンボルセット設定」カードを廃止し、「タイル／シンボル設定」（`secTilesetTitle`）カード内に統合。
+   - **タイル表示を使用: ON 時**: タイルセット選択メニューを表示し、アスキー用シンボルセット項目は**非表示**（不要な設定項目の削減）。
+   - **タイル表示を使用: OFF 時**: その直下に「通常階層シンボルセット」および「ローグ階層シンボルセット」がインラインで**自動展開**。
+2. **レスポンシブ・ドロップダウン（`_buildDropdownSettingTile`）**:
+   - スマホ縦画面（画面幅 `< 600px`）では、横並び配置によるラベル折り返しやドロップダウン幅の圧迫を防ぐため、**タイトル・説明文の下に全幅の角丸プルダウンを配置する上下レイアウト（Column）** に自動切り替え。
+   - タブレットや横画面（画面幅 `>= 600px`）では、従来通り左右配置（ListTile）でゆったりと表示。
 
 ---
 
@@ -203,14 +225,15 @@ flowchart TD
 
 ### 5.1 内蔵フォント一覧と特性
 
-アプリに初期同梱されているフォントは以下の通りです：
+アプリに初期同梱されているフォントは以下の通りです（レトロPC調、高品質日本語、王道VGA等を用途に合わせて厳選）：
 
 | フォント ID | 表示名 (日本語 / 英語) | 特徴・アスペクト比 | ライセンス |
 | :--- | :--- | :--- | :--- |
 | `system` | システム標準 (等幅) / System Default (Monospace) | デバイス標準の等幅フォント（Roboto Mono / Menlo / Consolas 等） | OS 依存 |
 | `Terminus` | Terminus TTF (アスキー定番) / Terminus TTF (Classic ASCII) | アスペクト比約 0.50。NetHack 伝統の鮮明なビットマップ調等幅 | SIL OFL 1.1 |
 | `Unscii-8` | Unscii 8x8 (レトロPC) / Unscii 8x8 (Retro PC) | アスペクト比 1.00（正方形セル）。C64 やファミコンを思わせるレトロ調 | Public Domain |
-| `Unscii-16` | Unscii 16x16 (高精細レトロ) / Unscii 16x16 (Hi-Res Retro) | アスペクト比 0.50。縦長で情報量の多いクラシックスタイル | Public Domain |
+| `IBMVGA9x16` | IBM VGA 9x16 (クラシックPC) / IBM VGA 9x16 (Classic PC) | アスペクト比 0.56 (9x16)。DOS時代の王道VGAテキスト画面を忠実再現 | CC BY-SA 4.0 (int10h) |
+| `NotoSansMonoCJKjp` | Noto Sans Mono CJK JP / Noto Sans Mono CJK JP | Google公式の高品質な等幅日本語フォント。英数・漢字のバランスが抜群 | SIL OFL 1.1 |
 | `MisakiGothic`| 美咲ゴシック (日本語レトロ) / Misaki Gothic (Retro Pixel JP) | 8x8 ドットの超小型日本語ビットマップフォント。日本語UIに完全対応 | フリー (自由利用) |
 
 ### 5.2 動的フォントロードとサンドボックス永続化
@@ -237,35 +260,12 @@ flowchart TD
 
 マップ画面は毎秒最大数十回、80列×21行（＝最大1680文字）のグリフを描画します。毎文字ごとに `TextPainter` をインスタンス化して `layout()` を実行すると、顕著なフレームドロップが発生します。
 
-これを解決するため、以下のキーを用いた **LRU キャッシュ（上限 512件）** を実装しています：
-
-```dart
-class _TextPainterKey {
-  final int charCode;
-  final int colorValue;
-  final String? fontFamily;
-  final double cellHeight;
-  ...
-}
-```
-
-同一文字・色・フォント・サイズの描画要求はキャッシュから即座に取り出され、描画負荷が 90% 以上削減されます。
+これを解決するため、文字コード・色・フォント・セル高を複合キーとした **LRU キャッシュ（上限 512件）** を実装しています。同一文字・色・フォント・サイズの描画要求はキャッシュから即座に取り出され、描画負荷が 90% 以上削減されます。
 
 ### 6.2 StrutStyle による等幅・行間固定
 
 フォントによっては、特定の記号（`@`, `#`, `%` 等）で baseline や行の高さが微妙に変動し、縦方向や横方向の罫線が不揃いになる現象（ラインの滲みや隙間）が発生します。
-これを防ぐため、`TextPainter` に以下の **`StrutStyle`** を強制適用しています：
-
-```dart
-strutStyle: StrutStyle(
-  fontFamily: fontFamily,
-  fontSize: cellH,
-  height: 1.0,
-  forceStrutHeight: true,
-)
-```
-
-これにより、すべての文字グリフが強制的に同一の行高・矩形枠内に収まり、完全に整列したアスキーマップが描画されます。
+これを防ぐため、`TextPainter` に `StrutStyle(height: 1.0, forceStrutHeight: true)` を強制適用し、すべての文字グリフが強制的に同一の行高・矩形枠内に収まり、完全に整列したアスキーマップが描画されます。
 
 ### 6.3 アスキーマップ表示倍率スライダー連動
 
@@ -276,7 +276,7 @@ strutStyle: StrutStyle(
 
 ## 7. シンボルセット (OPTIONS=symset / roguesymset) 連携仕様
 
-アスキーマップ描画で使用する記号体系（壁を `|` `-` で描くか、DEC / IBM の太線・細線罫線で描くかなど）は、NetHack 本来のオプションである `OPTIONS=symset`（通常ダンジョン階層用）および `OPTIONS=roguesymset`（ローグレベル専用）によって定義されます。
+アスキーマップ描画で使用する記号体系（壁を `|` `-` で描くか、DEC / IBM の太線・細線罫線で描くか、Unicode 二重線で描くかなど）は、NetHack 本来のオプションである `OPTIONS=symset`（通常ダンジョン階層用）および `OPTIONS=roguesymset`（ローグレベル専用）によって定義されます。
 
 ### 7.1 DefaultsHelper における複合行インプレース置換と保護
 
@@ -285,29 +285,36 @@ strutStyle: StrutStyle(
 ```text
 OPTIONS=symset:IBMGraphics_2,runmode:walk
 ```
-もし `symset` の変更時に行全体を `OPTIONS=symset:Unicode Graphics` で上書きしてしまうと、末尾の `runmode:walk`（移動モード設定）が失われてしまいます。
+もし `symset` の変更時に行全体を `OPTIONS=symset:Enhanced1` で上書きしてしまうと、末尾の `runmode:walk`（移動モード設定）が失われてしまいます。
 
 #### 実装解決策
 [`defaults_helper.dart`](file:///c:/Users/satok/DartHack/sys/flutter/lib/utils/defaults_helper.dart) の `saveToFile` において、`OPTIONS=` 行内のカンマ区切りトークン走査時に：
-1. `symset` キーのみをインプレース置換する（`symset:Unicode Graphics`）。
+1. `symset` キーのみをインプレース置換する（`symset:Enhanced1`）。
 2. 同一行に存在する他のキー（`runmode:walk` 等）は **そのまま保持** して再結合する。
 3. レガシー記法（`OPTIONS=DECgraphics` や `OPTIONS=IBMgraphics`）も `symset` として安全に正規化更新する。
 
-### 7.2 Cコア winflutter.c における待機ループ即時反映
+### 7.2 Cコア winflutter.c / utf8map.c における待機ループ即時反映と Unicode 連携
 
-#### Cコアとスレッドセーフ通信
-設定画面でシンボルセットが変更された際、アプリを再起動することなくプレイ中の画面に即座に反映させるため、Cコア側（[`winflutter.c`](file:///c:/Users/satok/DartHack/sys/flutter/android/app/src/main/cpp/winflutter.c)）に以下の即時反映フックを追加しました：
+設定画面でシンボルセットが変更された際、アプリを再起動することなくプレイ中の画面に即座に反映させるため、Cコア側（[`winflutter.c`](file:///c:/Users/satok/DartHack/sys/flutter/android/app/src/main/cpp/winflutter.c) および [`utf8map.c`](file:///c:/Users/satok/DartHack/c_core/nethack_en/src/utf8map.c)）に以下の連携処理を実装しています：
 
-1. **`RequestSymsetChangeFlutter(const char *name, int isRogue)`**:
-   Dart FFI から呼び出されると、リクエストされたシンボルセット名が Cコアの静的バッファに安全に保存され、フラグが立ちます。
-2. **待機ループ (`flutter_nhgetch`) での反映**:
-   Cコアスレッドがキー入力待ち（`flutter_nhgetch`）に入っている安全なタイミングで、`parsesymbols(buf)` を実行してシンボルテーブルを再構築します。
-3. **DEC罫線・Unicode glyph 対応**:
-   シンボルセット変更に伴い、`H_DEC` や `H_UTF8` などのマッピングモードを自動再判定し、`newsym` / `docrt()` をトリガーして即座に画面全体を再描画します。
+#### 7.2.1 Enhanced2 / Enhanced1 の UTF-8 グリフ直接取得フォールバック
+- `Enhanced2` や `Enhanced1` を選択した際、NetHack 5.0 のシンボルハンドラは Unicode 文字列（UTF-8）を `glyphmap[glyph].u` に保持します。
+- 一部の内部経路（`mapglyph`）において `glyphinfo->gm.u` が NULL のまま渡されるケースが存在するため、[`winflutter.c: flutter_print_glyph`](file:///c:/Users/satok/DartHack/sys/flutter/android/app/src/main/cpp/winflutter.c#L2090) では、`glyphinfo->gm.u` が NULL の場合にグローバル配列 `glyphmap[glyph].u` を直接参照するフォールバックを実装しました。
+- これにより、`Enhanced2` の二重線（`║`, `═`, `╔`, `╗`）や `Enhanced1` の一重線（`│`, `─`）が欠落せず、Flutter 側へ確実に UTF-8 文字列として渡されます。
+
+#### 7.2.2 画面バッファ全破棄 (clear_glyph_buffer) と即時再描画
+- シンボルセット変更直後に画面が真っ黒になる（操作するまで描画されない）現象を防ぐため、`apply_symset_internal` 内で以下を順序正しく実行します：
+  1. `clear_glyph_buffer()`: 画面差分更新バッファを強制破棄し、次回描画時に全マスを新規差分として認識させる。
+  2. `docrt()`: 画面全体のグリフを新しいシンボルセットで再計算。
+  3. `flush_screen(1)`: 計算された全画面グリフを Flutter 側へ即時フラッシュ転送。
+
+#### 7.2.3 utf8map.c における SEGV クラッシュ防止ガード (details_end)
+- アップストリームの [`utf8map.c: add_custom_urep_entry`](file:///c:/Users/satok/DartHack/c_core/nethack_en/src/utf8map.c#L371) において、Unicode 表現の詳細情報ポインタ `entry->details_end` が初期化されておらず、NULL ポインタを参照して `SIGSEGV (SEGV_MAPERR fault addr 0x18)` でアプリがクラッシュする問題が存在していました。
+- `details_end` が NULL の場合は安全に終端を探索・初期化するガードを追加し、`Enhanced2` や `Enhanced1` への切り替え時におけるクラッシュを完全に防御しました。
 
 ### 7.3 設定画面で選択可能なシンボルセット一覧
 
-NetHack 5.0 Cコアの `dat/symbols` に基づき、設定画面から以下のシンボルセットを選択できます：
+NetHack 5.0 Cコアの `dat/symbols` に基づき、設定画面から以下のシンボルセットを選択できます（存在しない未定義シンボルセットはプルダウンから除外）：
 
 #### 通常ダンジョン階層用 (`OPTIONS=symset`)
 | シンボルセット名 | 描画体系・特徴 | 備考 |
@@ -316,10 +323,9 @@ NetHack 5.0 Cコアの `dat/symbols` に基づき、設定画面から以下の�
 | `IBMGraphics_1` | CP437 細線罫線グラフィックス | MS-DOS / PC互換機スタイル |
 | `IBMGraphics_2` | CP437 二重線・太線罫線グラフィックス | デフォルト推奨設定（高視認性） |
 | `DECgraphics` | DEC VT100 / curses 端末用罫線 | UNIX端末互換 |
-| `MACgraphics` | クラシック Macintosh 端末用シンボル | Mac OS 互換 |
-| `Unicode Graphics` | 基本 Unicode 罫線グラフィックス | モダンな端末向け標準 Unicode |
-| `Enhanced1` | **Unicode 1重線罫線 ＋ 24-bit フルカラー** | 保守的 Unicode セット。ゲヘナ赤壁やノックス青緑壁など色鮮やかに描画 |
-| `Enhanced2` | **Unicode 2重線罫線 ＋ 24-bit フルカラー** | 先進的 Unicode セット。壁が二重線（`║` `═` `╔` `╗` 等）で重厚に描画 |
+| `MACgraphics` | クラシック Macintosh 端末用シンボル | Mac OS 互換（二重線壁） |
+| `Enhanced1` | **Unicode 1重線罫線 ＋ 24-bit フルカラー** | 保守的 Unicode セット（壁: 1重線 `│` `─`）。ゲヘナ赤壁やノックス青緑壁など色鮮やかに描画 |
+| `Enhanced2` | **Unicode 2重線罫線 ＋ 24-bit フルカラー** | 先進的 Unicode セット（壁: 2重線 `║` `═` `╔` `╗` 等）で重厚に描画 |
 
 #### ローグ階層用 (`OPTIONS=roguesymset`)
 | シンボルセット名 | 描画体系・特徴 |
@@ -377,11 +383,11 @@ FontInfo(
 
 1. アプリを起動し、右上の歯車アイコン等から **「設定画面（詳細設定）」** を開きます。
 2. **「フォント設定」** セクションを展開します。
-3. **「端末からフォントファイルを追加」** ボタンをタップします。
+3. **「外部フォントを追加」** ボタンをタップします。
 4. システム標準のファイルピッカーが開くので、使用したいフォントファイル（`.ttf`, `.otf`, `.ttc`, `.woff`）を選択します。
 5. ファイルの安全性（SFNT テーブルディレクトリ構造）が自動検証され、合格するとアプリ内に安全にコピー保存されます。
 6. 各ターゲット（マップ、メッセージ、ステータス、メニュー、UI）のドロップダウン、または「一括フォント変更」に、追加したフォントが即座に表示され、選択できるようになります。
-7. 不要になったフォントは、**「追加済みフォントの管理・削除」** ボタンからいつでも安全に削除できます。
+7. 不要になったフォントは、**「外部フォントの管理・削除」** ボタンからいつでも安全に削除できます。
 
 ---
 
@@ -389,9 +395,9 @@ FontInfo(
 
 | 用途 | 推奨フォントの条件 | おすすめのフォント例 |
 | :--- | :--- | :--- |
-| **マップ (`font_map`)** | **正真正銘の等幅フォント（Monospace）** であること。ASCII 記号（特に罫線や記号）が全角化せず、半角幅で揃っていること。 | `Terminus`, `Unscii-8`, `Unscii-16`, `ProggyClean`, `Courier New` |
-| **メッセージ / ステータス** | 欧文・数字が読みやすく、かつ日本語フォールバックと調和すること。 | `Roboto Mono`, `JetBrains Mono`, `Hack`, `美咲ゴシック` |
-| **メニュー / テキスト** | 長文を読んだ際に疲れにくく、文字間が整っていること。 | `Noto Sans Mono`, `M+ 1m`, `Source Han Code JP` |
+| **マップ (`font_map`)** | **正真正銘の等幅フォント（Monospace）** であること。ASCII 記号（特に罫線や記号）が全角化せず、半角幅で揃っていること。 | `Terminus`, `IBMVGA9x16`, `NotoSansMonoCJKjp`, `Unscii-8`, `ProggyClean`, `Courier New` |
+| **メッセージ / ステータス** | 欧文・数字が読みやすく、かつ日本語フォールバックと調和すること。 | `NotoSansMonoCJKjp`, `Roboto Mono`, `JetBrains Mono`, `Hack`, `美咲ゴシック` |
+| **メニュー / テキスト** | 長文を読んだ際に疲れにくく、文字間が整っていること。 | `NotoSansMonoCJKjp`, `Noto Sans Mono`, `M+ 1m`, `Source Han Code JP` |
 
 ---
 
@@ -416,7 +422,7 @@ await tester.runAsync(() async {
   await helper.syncFromPrefsToFile(defaultsFile.path);
   savedContent = await defaultsFile.readAsString();
 });
-expect(savedContent, contains('symset:Unicode Graphics'));
+expect(savedContent, contains('symset:Enhanced2'));
 ```
 
 ### 9.2 Cコア 40バイト文字列オプション制限と SharedPreferences 専管化
@@ -426,3 +432,7 @@ NetHack Cコアの `OPTIONS=` パーサー（`src/options.c`）における文�
 
 そのため、フォント設定値（`font_map`, `font_message` 等）は Cコアの `defaults.nh` には書き出さず、**Flutter 側の `SharedPreferences`（`AppPrefs`）専管データとして完全に分離管理** しています。これにより Cコアのメモリ安全性を担保し、長大なフォント名やパスであっても安全に保持・運用できます。
 
+### 9.3 winflutter.c における glyphmap 外部宣言 (extern) 必須ルール
+
+NetHack コアのグリフ管理配列 `glyph_map glyphmap[MAX_GLYPH]` は `display.c` 等で実体が定義されていますが、共通ヘッダー `extern.h` には含まれていません。
+移植層（`winflutter.c`）から `glyphmap` を参照して UTF-8 グリフを直接取得する際は、必ずファイル先頭付近に `extern glyph_map glyphmap[MAX_GLYPH];` を宣言してください。これが欠落すると、Android NDK (Clang) 等のネイティブビルド時に `use of undeclared identifier 'glyphmap'` エラーでコンパイルが停止します。

@@ -448,6 +448,7 @@ static char* flutter_getmsghistory(boolean init);
 static void flutter_putmsghistory(const char *msg, boolean restoring);
 static void flutter_save_message(const char* msg);
 extern void genl_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, unsigned long *colormasks);
+extern glyph_map glyphmap[MAX_GLYPH];
 
 static const unsigned short cp437_to_unicode[256] = {
     0x00A0, 0x263A, 0x263B, 0x2665, 0x2666, 0x2663, 0x2660, 0x2022, 0x25D8, 0x25CB, 0x25D9, 0x2660, 0x2661, 0x266A, 0x266B, 0x2609,
@@ -1736,8 +1737,9 @@ static void apply_symset_internal(const char *target_symset, int is_rogue) {
     } else if (!is_rogue) {
         assign_graphics(PRIMARYSET);
     }
-    apply_customizations(which_set, (do_custom_symbols | do_custom_colors));
     reset_glyphmap(gm_symchange);
+    apply_customizations(which_set, (do_custom_symbols | do_custom_colors));
+    clear_glyph_buffer();
     reglyph_darkroom();
 }
 
@@ -1761,6 +1763,7 @@ static void check_and_apply_pending_symset(void) {
 
     if (did_change && iflags.window_inited && WIN_MAP != WIN_ERR) {
         docrt();
+        flush_screen(1);
     }
 }
 
@@ -2086,8 +2089,12 @@ static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_inf
 
     int ch = glyphinfo->ttychar;
 #ifdef ENHANCED_SYMBOLS
-    if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u && glyphinfo->gm.u->utf8str) {
-        ch = (int) glyphinfo->gm.u->utf32ch;
+    struct unicode_representation *u_rep = glyphinfo->gm.u;
+    if (!u_rep && SYMHANDLING(H_UTF8) && glyphinfo->glyph >= 0 && glyphinfo->glyph < MAX_GLYPH) {
+        u_rep = glyphmap[glyphinfo->glyph].u;
+    }
+    if (SYMHANDLING(H_UTF8) && u_rep && u_rep->utf8str) {
+        ch = (int) u_rep->utf32ch;
     } else
 #endif
     if ((SYMHANDLING(H_DEC) || SYMHANDLING(H_CURS)) && (ch & 0x80) != 0) {

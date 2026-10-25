@@ -201,6 +201,7 @@ add_custom_urep_entry(
     } else {
         gdc->details_end->next = newdetails;
     }
+    gdc->details_end = newdetails;
     gdc->count++;
     return 1;
 }

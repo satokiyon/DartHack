@@ -628,6 +628,90 @@ class _SettingsPageState extends State<SettingsPage> {
     return result;
   }
 
+  /// プルダウン設定項目の共通ビルダー
+  /// スマホ縦画面（幅 < 600px）では上下配置（タイトル・説明文の下に全幅角丸プルダウン）、
+  /// ワイド画面（幅 >= 600px）では左右配置に切り替えるレスポンシブ設計
+  Widget _buildDropdownSettingTile<T>({
+    required String title,
+    String? description,
+    Widget? leading,
+    required T? value,
+    required List<DropdownMenuItem<T>> items,
+    required ValueChanged<T?> onChanged,
+    String? hintText,
+  }) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isNarrow = screenWidth < 600;
+
+    final dropdownWidget = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
+      decoration: BoxDecoration(
+        color: const Color(0xFF262638),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white24, width: 1.0),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<T>(
+          value: value,
+          isExpanded: true,
+          hint: hintText != null
+              ? Text(hintText, style: const TextStyle(fontSize: 13, color: Colors.white70))
+              : null,
+          dropdownColor: const Color(0xFF1E1E2C),
+          style: const TextStyle(fontSize: 13, color: Colors.white),
+          icon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
+          items: items,
+          onChanged: onChanged,
+        ),
+      ),
+    );
+
+    if (isNarrow) {
+      // スマホ縦画面: 上下配置
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                if (leading != null) ...[leading, const SizedBox(width: 12)],
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+            if (description != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                description,
+                style: const TextStyle(fontSize: 12, color: Colors.white60, height: 1.4),
+              ),
+            ],
+            const SizedBox(height: 8),
+            dropdownWidget,
+          ],
+        ),
+      );
+    } else {
+      // ワイド画面: 左右配置
+      return ListTile(
+        leading: leading,
+        title: Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+        subtitle: description != null
+            ? Text(description, style: const TextStyle(fontSize: 12, color: Colors.white60, height: 1.3))
+            : null,
+        trailing: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 320),
+          child: dropdownWidget,
+        ),
+      );
+    }
+  }
+
   Widget _buildScreenModeSection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
@@ -636,37 +720,33 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(l10n.secStatusTitle),
         subtitle: Text(l10n.secStatusSub),
         children: _withDividers([
-          ListTile(
-            title: Text(l10n.screenMode),
-            trailing: DropdownButton<int>(
-              value: _screenMode,
-              items: [
-                DropdownMenuItem(value: 0, child: Text(l10n.screenModeNormal)),
-                DropdownMenuItem(value: 1, child: Text(l10n.screenModeImmersive)),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _screenMode = val);
-                  _saveSetting('screen_mode', val);
-                }
-              },
-            ),
+          _buildDropdownSettingTile<int>(
+            title: l10n.screenMode,
+            value: _screenMode,
+            items: [
+              DropdownMenuItem(value: 0, child: Text(l10n.screenModeNormal)),
+              DropdownMenuItem(value: 1, child: Text(l10n.screenModeImmersive)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _screenMode = val);
+                _saveSetting('screen_mode', val);
+              }
+            },
           ),
-          ListTile(
-            title: Text(l10n.statusDisplayMode),
-            trailing: DropdownButton<int>(
-              value: _statusDisplayMode,
-              items: [
-                DropdownMenuItem(value: 0, child: Text(l10n.statusModeAuto)),
-                DropdownMenuItem(value: 1, child: Text(l10n.statusModeVariable)),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _statusDisplayMode = val);
-                  _saveSetting('status_display_mode', val);
-                }
-              },
-            ),
+          _buildDropdownSettingTile<int>(
+            title: l10n.statusDisplayMode,
+            value: _statusDisplayMode,
+            items: [
+              DropdownMenuItem(value: 0, child: Text(l10n.statusModeAuto)),
+              DropdownMenuItem(value: 1, child: Text(l10n.statusModeVariable)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _statusDisplayMode = val);
+                _saveSetting('status_display_mode', val);
+              }
+            },
           ), 
         ]),
       ),
@@ -680,7 +760,6 @@ class _SettingsPageState extends State<SettingsPage> {
     'IBMGraphics_2',
     'DECgraphics',
     'MACgraphics',
-    'Unicode Graphics',
     'Enhanced1',
     'Enhanced2',
   ];
@@ -691,90 +770,6 @@ class _SettingsPageState extends State<SettingsPage> {
     'RogueEpyx',
     'RogueUnicode',
   ];
-
-  /// シンボルセット設定セクション (symset / roguesymset)
-  Widget _buildSymsetSection() {
-    final l10n = AppLocalizations.of(context)!;
-    final isEn = _selectedLanguage == 'en';
-
-    return _buildSectionCard(
-      ExpansionTile(
-        leading: const Icon(Icons.font_download_outlined, color: Colors.cyanAccent),
-        title: Text(l10n.secSymsetTitle),
-        subtitle: Text(l10n.secSymsetSub, style: const TextStyle(fontSize: 12, color: Colors.white60)),
-        children: _withDividers([
-          // 1. 通常階層 symset
-          Material(
-            color: Colors.transparent,
-            child: ListTile(
-              title: Text(l10n.symsetLabel),
-              subtitle: Text(
-                isEn
-                    ? 'Symbol characters used for dungeon floors, walls, and items in ASCII mode.'
-                    : 'アスキー描画時に壁・床・道具等を描画するシンボル定義セットです。',
-                style: const TextStyle(fontSize: 12, color: Colors.white60),
-              ),
-              trailing: DropdownButton<String>(
-                value: _availableSymsets.contains(_selectedSymset) ? _selectedSymset : 'Default',
-                dropdownColor: const Color(0xFF1E1E2C),
-                underline: const SizedBox(),
-                items: _availableSymsets.map((s) {
-                  return DropdownMenuItem<String>(
-                    value: s,
-                    child: Text(s, style: const TextStyle(fontSize: 14)),
-                  );
-                }).toList(),
-                onChanged: (val) async {
-                  if (val != null) {
-                    setState(() => _selectedSymset = val);
-                    await _saveGameOption('nh_opt_symset', val);
-                    try {
-                      final ffi = NetHackFfi(_selectedLanguage);
-                      ffi.requestSymsetChange(val, isRogue: false);
-                    } catch (_) {}
-                  }
-                },
-              ),
-            ),
-          ),
-          // 2. ローグ階層 roguesymset
-          Material(
-            color: Colors.transparent,
-            child: ListTile(
-              title: Text(l10n.roguesymsetLabel),
-              subtitle: Text(
-                isEn
-                    ? 'Symbol characters used specifically in Rogue levels.'
-                    : 'ローグ階層専用のアスキーシンボル定義セットです。',
-                style: const TextStyle(fontSize: 12, color: Colors.white60),
-              ),
-              trailing: DropdownButton<String>(
-                value: _availableRogueSymsets.contains(_selectedRogueSymset) ? _selectedRogueSymset : 'Default',
-                dropdownColor: const Color(0xFF1E1E2C),
-                underline: const SizedBox(),
-                items: _availableRogueSymsets.map((s) {
-                  return DropdownMenuItem<String>(
-                    value: s,
-                    child: Text(s, style: const TextStyle(fontSize: 14)),
-                  );
-                }).toList(),
-                onChanged: (val) async {
-                  if (val != null) {
-                    setState(() => _selectedRogueSymset = val);
-                    await _saveGameOption('nh_opt_roguesymset', val);
-                    try {
-                      final ffi = NetHackFfi(_selectedLanguage);
-                      ffi.requestSymsetChange(val, isRogue: true);
-                    } catch (_) {}
-                  }
-                },
-              ),
-            ),
-          ),
-        ]),
-      ),
-    );
-  }
 
   /// フォント設定セクション
   Widget _buildFontSection() {
@@ -790,34 +785,25 @@ class _SettingsPageState extends State<SettingsPage> {
         subtitle: Text(l10n.secFontSub, style: const TextStyle(fontSize: 12, color: Colors.white60)),
         children: _withDividers([
           // 一括フォント変更
-          Material(
-            color: Colors.transparent,
-            child: ListTile(
-              title: Text(l10n.fontAllLabel, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.amberAccent)),
-              subtitle: Text(
-                isEn
-                    ? 'Apply the selected font to all 5 UI and map components at once.'
-                    : 'マップ、メッセージ、ステータス、メニュー、UIの全5系統に同じフォントを一括適用します。',
-                style: const TextStyle(fontSize: 12, color: Colors.white60),
-              ),
-              trailing: DropdownButton<String>(
-                hint: Text(isEn ? 'Select Font' : 'フォント選択', style: const TextStyle(fontSize: 13, color: Colors.white70)),
-                dropdownColor: const Color(0xFF1E1E2C),
-                underline: const SizedBox(),
-                items: availableFonts.map((f) {
-                  return DropdownMenuItem<String>(
-                    value: f.id,
-                    child: Text(f.getDisplayName(!isEn), style: const TextStyle(fontSize: 13)),
-                  );
-                }).toList(),
-                onChanged: (val) {
-                  if (val != null) {
-                    setState(() {});
-                    fontMgr.setAllFonts(val);
-                  }
-                },
-              ),
-            ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.fontAllLabel,
+            description: isEn
+                ? 'Apply the selected font to all 5 UI and map components at once.'
+                : 'マップ、メッセージ、ステータス、メニュー、UIの全5系統に同じフォントを一括適用します。',
+            value: null,
+            hintText: isEn ? 'Select Font' : 'フォント選択',
+            items: availableFonts.map((f) {
+              return DropdownMenuItem<String>(
+                value: f.id,
+                child: Text(f.getDisplayName(!isEn), style: const TextStyle(fontSize: 13)),
+              );
+            }).toList(),
+            onChanged: (val) {
+              if (val != null) {
+                setState(() {});
+                fontMgr.setAllFonts(val);
+              }
+            },
           ),
           // 1. マップフォント
           _buildFontTargetTile(
@@ -910,31 +896,22 @@ class _SettingsPageState extends State<SettingsPage> {
     final currentFont = fontMgr.getSelectedFont(target);
     final availableFonts = fontMgr.availableFonts;
 
-    return Material(
-      color: Colors.transparent,
-      child: ListTile(
-        title: Text(title),
-        subtitle: description != null
-            ? Text(description, style: const TextStyle(fontSize: 12, color: Colors.white60))
-            : null,
-        trailing: DropdownButton<String>(
-          value: availableFonts.any((f) => f.id == currentFont.id) ? currentFont.id : 'system',
-          dropdownColor: const Color(0xFF1E1E2C),
-          underline: const SizedBox(),
-          items: availableFonts.map((f) {
-            return DropdownMenuItem<String>(
-              value: f.id,
-              child: Text(f.getDisplayName(!isEn), style: const TextStyle(fontSize: 13)),
-            );
-          }).toList(),
-          onChanged: (val) {
-            if (val != null) {
-              setState(() {});
-              fontMgr.setFont(target, val);
-            }
-          },
-        ),
-      ),
+    return _buildDropdownSettingTile<String>(
+      title: title,
+      description: description,
+      value: availableFonts.any((f) => f.id == currentFont.id) ? currentFont.id : 'system',
+      items: availableFonts.map((f) {
+        return DropdownMenuItem<String>(
+          value: f.id,
+          child: Text(f.getDisplayName(!isEn), style: const TextStyle(fontSize: 13)),
+        );
+      }).toList(),
+      onChanged: (val) {
+        if (val != null) {
+          setState(() {});
+          fontMgr.setFont(target, val);
+        }
+      },
     );
   }
 
@@ -1063,6 +1040,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildTilesetSection() {
     final l10n = AppLocalizations.of(context)!;
+    final isEn = _selectedLanguage == 'en';
     return _buildSectionCard(
       ExpansionTile(
         leading: const Icon(Icons.palette, color: Colors.deepPurpleAccent),
@@ -1108,6 +1086,56 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
               ),
             ),
+          if (!_useTiles) ...[
+            // 1. 通常階層 symset
+            _buildDropdownSettingTile<String>(
+              title: l10n.symsetLabel,
+              description: isEn
+                  ? 'Symbol characters used for dungeon floors, walls, and items in ASCII mode.'
+                  : 'アスキー描画時に壁・床・道具等を描画するシンボル定義セットです。',
+              value: _availableSymsets.contains(_selectedSymset) ? _selectedSymset : 'Default',
+              items: _availableSymsets.map((s) {
+                return DropdownMenuItem<String>(
+                  value: s,
+                  child: Text(s, style: const TextStyle(fontSize: 14)),
+                );
+              }).toList(),
+              onChanged: (val) async {
+                if (val != null) {
+                  setState(() => _selectedSymset = val);
+                  await _saveGameOption('nh_opt_symset', val);
+                  try {
+                    final ffi = NetHackFfi(_selectedLanguage);
+                    ffi.requestSymsetChange(val, isRogue: false);
+                  } catch (_) {}
+                }
+              },
+            ),
+            // 2. ローグ階層 roguesymset
+            _buildDropdownSettingTile<String>(
+              title: l10n.roguesymsetLabel,
+              description: isEn
+                  ? 'Symbol characters used specifically in Rogue levels.'
+                  : 'ローグ階層専用のアスキーシンボル定義セットです。',
+              value: _availableRogueSymsets.contains(_selectedRogueSymset) ? _selectedRogueSymset : 'Default',
+              items: _availableRogueSymsets.map((s) {
+                return DropdownMenuItem<String>(
+                  value: s,
+                  child: Text(s, style: const TextStyle(fontSize: 14)),
+                );
+              }).toList(),
+              onChanged: (val) async {
+                if (val != null) {
+                  setState(() => _selectedRogueSymset = val);
+                  await _saveGameOption('nh_opt_roguesymset', val);
+                  try {
+                    final ffi = NetHackFfi(_selectedLanguage);
+                    ffi.requestSymsetChange(val, isRogue: true);
+                  } catch (_) {}
+                }
+              },
+            ),
+          ],
         ]),
       ),
     );
@@ -1168,49 +1196,41 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           // メニューボタン・地図ボタンの配置設定（個別設定として残す）
-          ListTile(
-            title: Text(l10n.menuButtonPos),
-            trailing: DropdownButton<String>(
-              value: _menuButtonPosition,
-              dropdownColor: Colors.grey[900],
-              style: const TextStyle(color: Colors.white),
-              items: [
-                DropdownMenuItem(value: 'top_left', child: Text(l10n.posTopLeft, style: const TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'top_right', child: Text(l10n.posTopRight, style: const TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'left_edge', child: Text(l10n.posLeftEdge, style: const TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'right_edge', child: Text(l10n.posRightEdge, style: const TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'bottom_left', child: Text(l10n.posBottomLeft, style: const TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'bottom_right', child: Text(l10n.posBottomRight, style: const TextStyle(color: Colors.white))),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _menuButtonPosition = val);
-                  _saveSetting('menu_button_position', val);
-                }
-              },
-            ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.menuButtonPos,
+            value: _menuButtonPosition,
+            items: [
+              DropdownMenuItem(value: 'top_left', child: Text(l10n.posTopLeft)),
+              DropdownMenuItem(value: 'top_right', child: Text(l10n.posTopRight)),
+              DropdownMenuItem(value: 'left_edge', child: Text(l10n.posLeftEdge)),
+              DropdownMenuItem(value: 'right_edge', child: Text(l10n.posRightEdge)),
+              DropdownMenuItem(value: 'bottom_left', child: Text(l10n.posBottomLeft)),
+              DropdownMenuItem(value: 'bottom_right', child: Text(l10n.posBottomRight)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _menuButtonPosition = val);
+                _saveSetting('menu_button_position', val);
+              }
+            },
           ),
-          ListTile(
-            title: Text(l10n.mapButtonPos),
-            trailing: DropdownButton<String>(
-              value: _mapButtonPosition,
-              dropdownColor: Colors.grey[900],
-              style: const TextStyle(color: Colors.white),
-              items: [
-                DropdownMenuItem(value: 'top_left', child: Text(l10n.posTopLeft, style: const TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'top_right', child: Text(l10n.posTopRight, style: const TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'left_edge', child: Text(l10n.posLeftEdge, style: const TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'right_edge', child: Text(l10n.posRightEdge, style: const TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'bottom_left', child: Text(l10n.posBottomLeft, style: const TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'bottom_right', child: Text(l10n.posBottomRight, style: const TextStyle(color: Colors.white))),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _mapButtonPosition = val);
-                  _saveSetting('map_button_position', val);
-                }
-              },
-            ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.mapButtonPos,
+            value: _mapButtonPosition,
+            items: [
+              DropdownMenuItem(value: 'top_left', child: Text(l10n.posTopLeft)),
+              DropdownMenuItem(value: 'top_right', child: Text(l10n.posTopRight)),
+              DropdownMenuItem(value: 'left_edge', child: Text(l10n.posLeftEdge)),
+              DropdownMenuItem(value: 'right_edge', child: Text(l10n.posRightEdge)),
+              DropdownMenuItem(value: 'bottom_left', child: Text(l10n.posBottomLeft)),
+              DropdownMenuItem(value: 'bottom_right', child: Text(l10n.posBottomRight)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _mapButtonPosition = val);
+                _saveSetting('map_button_position', val);
+              }
+            },
           ),
         ]),
       ),
@@ -1224,38 +1244,34 @@ class _SettingsPageState extends State<SettingsPage> {
         leading: const Icon(Icons.gamepad, color: Colors.amber),
         title: Text(l10n.secControllerTitle),
         children: _withDividers([
-          ListTile(
-            title: Text(l10n.controllerMode),
-            trailing: DropdownButton<String>(
-              value: _controllerMode,
-              items: [
-                DropdownMenuItem(value: 'pad', child: Text(l10n.modePad)),
-                DropdownMenuItem(value: 'keyboard', child: Text(l10n.modeKeyboard)),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _controllerMode = val);
-                  _saveSetting('controller_mode', val);
-                }
-              },
-            ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.controllerMode,
+            value: _controllerMode,
+            items: [
+              DropdownMenuItem(value: 'pad', child: Text(l10n.modePad)),
+              DropdownMenuItem(value: 'keyboard', child: Text(l10n.modeKeyboard)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _controllerMode = val);
+                _saveSetting('controller_mode', val);
+              }
+            },
           ),
-          ListTile(
-            title: Text(l10n.buttonDisplayModeTitle),
-            subtitle: Text(l10n.buttonDisplayModeSub),
-            trailing: DropdownButton<String>(
-              value: _buttonDisplayMode,
-              items: [
-                DropdownMenuItem(value: 'label', child: Text(l10n.btnDisplayModeLabel)),
-                DropdownMenuItem(value: 'cmd', child: Text(l10n.btnDisplayModeCmd)),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _buttonDisplayMode = val);
-                  _saveSetting('button_display_mode', val);
-                }
-              },
-            ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.buttonDisplayModeTitle,
+            description: l10n.buttonDisplayModeSub,
+            value: _buttonDisplayMode,
+            items: [
+              DropdownMenuItem(value: 'label', child: Text(l10n.btnDisplayModeLabel)),
+              DropdownMenuItem(value: 'cmd', child: Text(l10n.btnDisplayModeCmd)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _buttonDisplayMode = val);
+                _saveSetting('button_display_mode', val);
+              }
+            },
           ),
           ListTile(
             title: Text(l10n.padOpacityTitle),
@@ -1295,42 +1311,38 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
-          ListTile(
-            title: Text(l10n.dpadLongPressTitle),
-            trailing: DropdownButton<String>(
-              value: _dpadLongPressMoveMode,
-              items: [
-                DropdownMenuItem(value: 'NORMAL', child: Text(l10n.dpadModeNormal)),
-                DropdownMenuItem(value: 'UPPER', child: Text(l10n.dpadModeUpper)),
-                DropdownMenuItem(value: 'G_LOWER', child: Text(l10n.dpadModeGLower)),
-                DropdownMenuItem(value: 'G_UPPER', child: Text(l10n.dpadModeGUpper)),
-                DropdownMenuItem(value: 'CTRL', child: Text(l10n.dpadModeCtrl)),
-                DropdownMenuItem(value: 'M_CMD', child: Text(l10n.dpadModeMCmd)),
-                DropdownMenuItem(value: 'F_CMD', child: Text(l10n.dpadModeFCmd)),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _dpadLongPressMoveMode = val);
-                  _saveSetting('dpad_long_press_move_mode', val);
-                }
-              },
-            ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.dpadLongPressTitle,
+            value: _dpadLongPressMoveMode,
+            items: [
+              DropdownMenuItem(value: 'NORMAL', child: Text(l10n.dpadModeNormal)),
+              DropdownMenuItem(value: 'UPPER', child: Text(l10n.dpadModeUpper)),
+              DropdownMenuItem(value: 'G_LOWER', child: Text(l10n.dpadModeGLower)),
+              DropdownMenuItem(value: 'G_UPPER', child: Text(l10n.dpadModeGUpper)),
+              DropdownMenuItem(value: 'CTRL', child: Text(l10n.dpadModeCtrl)),
+              DropdownMenuItem(value: 'M_CMD', child: Text(l10n.dpadModeMCmd)),
+              DropdownMenuItem(value: 'F_CMD', child: Text(l10n.dpadModeFCmd)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _dpadLongPressMoveMode = val);
+                _saveSetting('dpad_long_press_move_mode', val);
+              }
+            },
           ),
-          ListTile(
-            title: Text(l10n.mapTapTravelTitle),
-            trailing: DropdownButton<String>(
-              value: _mapTapTravelMode,
-              items: [
-                DropdownMenuItem(value: 'always', child: Text(l10n.mapTapAlways)),
-                DropdownMenuItem(value: 'after_scroll', child: Text(l10n.mapTapAfterScroll)),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _mapTapTravelMode = val);
-                  _saveSetting('map_tap_travel_mode', val);
-                }
-              },
-            ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.mapTapTravelTitle,
+            value: _mapTapTravelMode,
+            items: [
+              DropdownMenuItem(value: 'always', child: Text(l10n.mapTapAlways)),
+              DropdownMenuItem(value: 'after_scroll', child: Text(l10n.mapTapAfterScroll)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _mapTapTravelMode = val);
+                _saveSetting('map_tap_travel_mode', val);
+              }
+            },
           ),
           ListTile(
             title: Text(l10n.shortcutPadScaleTitle),
@@ -1380,25 +1392,21 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
-          ListTile(
-            title: Text(l10n.drawerPosTitle),
-            trailing: DropdownButton<String>(
-              value: _drawerPosition,
-              dropdownColor: Colors.grey[900],
-              style: const TextStyle(color: Colors.white),
-              items: [
-                DropdownMenuItem(value: 'left', child: Text(l10n.posLeft, style: const TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'right', child: Text(l10n.posRight, style: const TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'top', child: Text(l10n.posTop, style: const TextStyle(color: Colors.white))),
-                DropdownMenuItem(value: 'bottom', child: Text(l10n.posBottom, style: const TextStyle(color: Colors.white))),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _drawerPosition = val);
-                  _saveSetting('drawer_position', val);
-                }
-              },
-            ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.drawerPosTitle,
+            value: _drawerPosition,
+            items: [
+              DropdownMenuItem(value: 'left', child: Text(l10n.posLeft)),
+              DropdownMenuItem(value: 'right', child: Text(l10n.posRight)),
+              DropdownMenuItem(value: 'top', child: Text(l10n.posTop)),
+              DropdownMenuItem(value: 'bottom', child: Text(l10n.posBottom)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _drawerPosition = val);
+                _saveSetting('drawer_position', val);
+              }
+            },
           ),
         ]),
       ),
@@ -1786,47 +1794,41 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(l10n.secKeyTitle),
         subtitle: Text(l10n.secKeySub),
         children: _withDividers([
-          ListTile(
-            title: Text(l10n.keyVolUpTitle),
-            trailing: DropdownButton<int>(
-              value: _volupAction,
-              items: volActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _volupAction = val);
-                  _saveSetting('key_volup_action', val);
-                  _syncNativeKeySettings();
-                }
-              },
-            ),
+          _buildDropdownSettingTile<int>(
+            title: l10n.keyVolUpTitle,
+            value: _volupAction,
+            items: volActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _volupAction = val);
+                _saveSetting('key_volup_action', val);
+                _syncNativeKeySettings();
+              }
+            },
           ),
-          ListTile(
-            title: Text(l10n.keyVolDownTitle),
-            trailing: DropdownButton<int>(
-              value: _voldownAction,
-              items: volActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _voldownAction = val);
-                  _saveSetting('key_voldown_action', val);
-                  _syncNativeKeySettings();
-                }
-              },
-            ),
+          _buildDropdownSettingTile<int>(
+            title: l10n.keyVolDownTitle,
+            value: _voldownAction,
+            items: volActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _voldownAction = val);
+                _saveSetting('key_voldown_action', val);
+                _syncNativeKeySettings();
+              }
+            },
           ),
-          ListTile(
-            title: Text(l10n.keyBackTitle),
-            trailing: DropdownButton<int>(
-              value: _backAction,
-              items: backActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _backAction = val);
-                  _saveSetting('key_back_action', val);
-                  _syncNativeKeySettings();
-                }
-              },
-            ),
+          _buildDropdownSettingTile<int>(
+            title: l10n.keyBackTitle,
+            value: _backAction,
+            items: backActions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _backAction = val);
+                _saveSetting('key_back_action', val);
+                _syncNativeKeySettings();
+              }
+            },
           ),
         ]),
       ),
@@ -1938,21 +1940,19 @@ class _SettingsPageState extends State<SettingsPage> {
         leading: const Icon(Icons.more_horiz, color: Colors.lightBlueAccent),
         title: Text(l10n.secOtherTitle),
         children: _withDividers([
-          ListTile(
-            title: Text(l10n.tombstoneModeTitle),
-            trailing: DropdownButton<int>(
-              value: _tombstoneDisplayMode,
-              items: [
-                DropdownMenuItem(value: 0, child: Text(l10n.tombstoneModeImage)),
-                DropdownMenuItem(value: 1, child: Text(l10n.tombstoneModeText)),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _tombstoneDisplayMode = val);
-                  _saveSetting('tombstone_display_mode', val);
-                }
-              },
-            ),
+          _buildDropdownSettingTile<int>(
+            title: l10n.tombstoneModeTitle,
+            value: _tombstoneDisplayMode,
+            items: [
+              DropdownMenuItem(value: 0, child: Text(l10n.tombstoneModeImage)),
+              DropdownMenuItem(value: 1, child: Text(l10n.tombstoneModeText)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _tombstoneDisplayMode = val);
+                _saveSetting('tombstone_display_mode', val);
+              }
+            },
           ),
           ListTile(
             leading: const Icon(Icons.restore, color: Colors.orangeAccent),
@@ -2277,44 +2277,40 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(l10n.secGameRulesTitle),
         subtitle: Text(l10n.secGameRulesSub),
         children: _withDividers([
-          ListTile(
-            title: Text(l10n.tutorialModeTitle),
-            subtitle: Text(l10n.tutorialModeSub),
-            trailing: DropdownButton<int>(
-              value: _optTutorialMode,
-              items: [
-                DropdownMenuItem(value: 0, child: Text(l10n.tutorialAsk)),
-                DropdownMenuItem(value: 1, child: Text(l10n.tutorialAlways)),
-                DropdownMenuItem(value: 2, child: Text(l10n.tutorialNever)),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _optTutorialMode = val);
-                  _saveGameOption('nh_opt_tutorial_mode', val);
-                }
-              },
-            ),
+          _buildDropdownSettingTile<int>(
+            title: l10n.tutorialModeTitle,
+            description: l10n.tutorialModeSub,
+            value: _optTutorialMode,
+            items: [
+              DropdownMenuItem(value: 0, child: Text(l10n.tutorialAsk)),
+              DropdownMenuItem(value: 1, child: Text(l10n.tutorialAlways)),
+              DropdownMenuItem(value: 2, child: Text(l10n.tutorialNever)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _optTutorialMode = val);
+                _saveGameOption('nh_opt_tutorial_mode', val);
+              }
+            },
           ),
-          ListTile(
-            title: Text(l10n.numberPadTitle),
-            subtitle: Text(l10n.numberPadSub),
-            trailing: DropdownButton<int>(
-              value: _optNumberPad,
-              items: [
-                DropdownMenuItem(value: 0, child: Text(l10n.numPadOff)),
-                DropdownMenuItem(value: 1, child: Text(l10n.numPadStandard)),
-                DropdownMenuItem(value: 2, child: Text(l10n.numPadPCHack)),
-                DropdownMenuItem(value: 3, child: Text(l10n.numPadPhone)),
-                DropdownMenuItem(value: 4, child: Text(l10n.numPadPhonePCHack)),
-                DropdownMenuItem(value: -1, child: Text(l10n.numPadGerman)),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() => _optNumberPad = val);
-                  _saveGameOption('nh_opt_number_pad', val);
-                }
-              },
-            ),
+          _buildDropdownSettingTile<int>(
+            title: l10n.numberPadTitle,
+            description: l10n.numberPadSub,
+            value: _optNumberPad,
+            items: [
+              DropdownMenuItem(value: 0, child: Text(l10n.numPadOff)),
+              DropdownMenuItem(value: 1, child: Text(l10n.numPadStandard)),
+              DropdownMenuItem(value: 2, child: Text(l10n.numPadPCHack)),
+              DropdownMenuItem(value: 3, child: Text(l10n.numPadPhone)),
+              DropdownMenuItem(value: 4, child: Text(l10n.numPadPhonePCHack)),
+              DropdownMenuItem(value: -1, child: Text(l10n.numPadGerman)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _optNumberPad = val);
+                _saveGameOption('nh_opt_number_pad', val);
+              }
+            },
           ),
           SwitchListTile(
             title: Text(l10n.optAutopickup),
@@ -2810,8 +2806,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       body: ListView(
         children: [
-          _buildTilesetSection(), //タイルセット設定
-          _buildSymsetSection(), //シンボルセット設定
+          _buildTilesetSection(), //タイル／シンボル設定
           _buildFontSection(), //フォント設定
           _buildScreenModeSection(), //イマーシブ・ステータス表示モード・
           _buildMessageSection(),  // メッセージ設定

@@ -135,7 +135,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get statusModeVariable => '領域の可変高さ';
 
   @override
-  String get secTilesetTitle => 'タイルセット設定';
+  String get secTilesetTitle => 'タイル／シンボル設定';
 
   @override
   String get useTiles => 'タイル表示を使用';
@@ -1338,23 +1338,23 @@ class AppLocalizationsJa extends AppLocalizations {
   String get fontAllLabel => '一括フォント変更';
 
   @override
-  String get fontMapLabel => 'マップフォント (font_map)';
+  String get fontMapLabel => 'マップフォント';
 
   @override
   String get fontMapDesc =>
       'タイル表示をOFFにした際のアスキーマップ描画に使用されます（※全角記号混入防止のため日本語フォールバックなし）';
 
   @override
-  String get fontMsgLabel => 'メッセージフォント (font_message)';
+  String get fontMsgLabel => 'メッセージフォント';
 
   @override
-  String get fontStatusLabel => 'ステータスフォント (font_status)';
+  String get fontStatusLabel => 'ステータスフォント';
 
   @override
-  String get fontMenuLabel => 'メニュー＆テキストフォント (font_menu)';
+  String get fontMenuLabel => 'メニュー＆テキストフォント';
 
   @override
-  String get fontUiLabel => 'UI＆コントローラフォント (font_ui)';
+  String get fontUiLabel => 'UI＆コントローラフォント';
 
   @override
   String get fontAsciiScale => 'アスキーマップ表示倍率';
