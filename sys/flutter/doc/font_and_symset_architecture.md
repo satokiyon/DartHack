@@ -205,13 +205,13 @@ flowchart TD
 
 アプリに初期同梱されているフォントは以下の通りです：
 
-| フォント ID | 表示名 | 特徴・アスペクト比 | ライセンス |
+| フォント ID | 表示名 (日本語 / 英語) | 特徴・アスペクト比 | ライセンス |
 | :--- | :--- | :--- | :--- |
-| `System` | システム標準 (Default) | デバイス標準の等幅フォント（Roboto Mono / Menlo / Consolas 等） | OS 依存 |
-| `Terminus` | Terminus (クラシック等幅) | アスペクト比約 0.50。NetHack 伝統の鮮明なビットマップ調等幅 | SIL OFL 1.1 |
-| `Unscii-8` | Unscii 8x8 (レトロPC) | アスペクト比 1.00（正方形セル）。C64 やファミコンを思わせるレトロ調 | Public Domain |
-| `Unscii-16` | Unscii 8x16 (スリムレトロ) | アスペクト比 0.50。縦長で情報量の多いクラシックスタイル | Public Domain |
-| `MisakiGothic`| 美咲ゴシック (日本語8x8) | 8x8 ドットの超小型日本語ビットマップフォント。日本語UIに完全対応 | フリー (自由利用) |
+| `system` | システム標準 (等幅) / System Default (Monospace) | デバイス標準の等幅フォント（Roboto Mono / Menlo / Consolas 等） | OS 依存 |
+| `Terminus` | Terminus TTF (アスキー定番) / Terminus TTF (Classic ASCII) | アスペクト比約 0.50。NetHack 伝統の鮮明なビットマップ調等幅 | SIL OFL 1.1 |
+| `Unscii-8` | Unscii 8x8 (レトロPC) / Unscii 8x8 (Retro PC) | アスペクト比 1.00（正方形セル）。C64 やファミコンを思わせるレトロ調 | Public Domain |
+| `Unscii-16` | Unscii 16x16 (高精細レトロ) / Unscii 16x16 (Hi-Res Retro) | アスペクト比 0.50。縦長で情報量の多いクラシックスタイル | Public Domain |
+| `MisakiGothic`| 美咲ゴシック (日本語レトロ) / Misaki Gothic (Retro Pixel JP) | 8x8 ドットの超小型日本語ビットマップフォント。日本語UIに完全対応 | フリー (自由利用) |
 
 ### 5.2 動的フォントロードとサンドボックス永続化
 
@@ -304,6 +304,30 @@ OPTIONS=symset:IBMGraphics_2,runmode:walk
    Cコアスレッドがキー入力待ち（`flutter_nhgetch`）に入っている安全なタイミングで、`parsesymbols(buf)` を実行してシンボルテーブルを再構築します。
 3. **DEC罫線・Unicode glyph 対応**:
    シンボルセット変更に伴い、`H_DEC` や `H_UTF8` などのマッピングモードを自動再判定し、`newsym` / `docrt()` をトリガーして即座に画面全体を再描画します。
+
+### 7.3 設定画面で選択可能なシンボルセット一覧
+
+NetHack 5.0 Cコアの `dat/symbols` に基づき、設定画面から以下のシンボルセットを選択できます：
+
+#### 通常ダンジョン階層用 (`OPTIONS=symset`)
+| シンボルセット名 | 描画体系・特徴 | 備考 |
+| :--- | :--- | :--- |
+| `Default` | ASCII 標準（`\|`, `-`, `+`, `.` 等） | 全フォントで文字化けなく確実に描画可能 |
+| `IBMGraphics_1` | CP437 細線罫線グラフィックス | MS-DOS / PC互換機スタイル |
+| `IBMGraphics_2` | CP437 二重線・太線罫線グラフィックス | デフォルト推奨設定（高視認性） |
+| `DECgraphics` | DEC VT100 / curses 端末用罫線 | UNIX端末互換 |
+| `MACgraphics` | クラシック Macintosh 端末用シンボル | Mac OS 互換 |
+| `Unicode Graphics` | 基本 Unicode 罫線グラフィックス | モダンな端末向け標準 Unicode |
+| `Enhanced1` | **Unicode 1重線罫線 ＋ 24-bit フルカラー** | 保守的 Unicode セット。ゲヘナ赤壁やノックス青緑壁など色鮮やかに描画 |
+| `Enhanced2` | **Unicode 2重線罫線 ＋ 24-bit フルカラー** | 先進的 Unicode セット。壁が二重線（`║` `═` `╔` `╗` 等）で重厚に描画 |
+
+#### ローグ階層用 (`OPTIONS=roguesymset`)
+| シンボルセット名 | 描画体系・特徴 |
+| :--- | :--- |
+| `Default` | オリジナル Rogue スタイル（英数字主体のクラシック表示） |
+| `RogueIBM` | IBM PC 版 Rogue 互換シンボル |
+| `RogueEpyx` | Epyx 版 Rogue 互換シンボル（デフォルト推奨） |
+| `RogueUnicode` | Unicode 罫線を用いたモダンなローグ階層表示 |
 
 ---
 

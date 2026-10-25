@@ -37,7 +37,7 @@ void main() {
       expect(manager.mapAsciiScale, 1.0);
     });
 
-    test('内蔵フォント 5 種が利用可能リストに含まれる', () async {
+    test('内蔵フォント 5 種が利用可能リストに含まれ、日英表示名が正しく取得できる', () async {
       final manager = FontManager.instance;
       await manager.init(prefs: mockPrefs, customFontsDir: tempDir);
 
@@ -47,6 +47,26 @@ void main() {
       expect(available.any((f) => f.id == 'Unscii-8'), isTrue);
       expect(available.any((f) => f.id == 'Unscii-16'), isTrue);
       expect(available.any((f) => f.id == 'MisakiGothic'), isTrue);
+
+      final sys = available.firstWhere((f) => f.id == 'system');
+      expect(sys.getDisplayName(true), equals('システム標準 (等幅)'));
+      expect(sys.getDisplayName(false), equals('System Default (Monospace)'));
+
+      final terminus = available.firstWhere((f) => f.id == 'Terminus');
+      expect(terminus.getDisplayName(true), equals('Terminus TTF (アスキー定番)'));
+      expect(terminus.getDisplayName(false), equals('Terminus TTF (Classic ASCII)'));
+
+      final unscii8 = available.firstWhere((f) => f.id == 'Unscii-8');
+      expect(unscii8.getDisplayName(true), equals('Unscii 8x8 (レトロPC)'));
+      expect(unscii8.getDisplayName(false), equals('Unscii 8x8 (Retro PC)'));
+
+      final unscii16 = available.firstWhere((f) => f.id == 'Unscii-16');
+      expect(unscii16.getDisplayName(true), equals('Unscii 16x16 (高精細レトロ)'));
+      expect(unscii16.getDisplayName(false), equals('Unscii 16x16 (Hi-Res Retro)'));
+
+      final misaki = available.firstWhere((f) => f.id == 'MisakiGothic');
+      expect(misaki.getDisplayName(true), equals('美咲ゴシック (日本語レトロ)'));
+      expect(misaki.getDisplayName(false), equals('Misaki Gothic (Retro Pixel JP)'));
     });
   });
 

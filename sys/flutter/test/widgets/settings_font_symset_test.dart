@@ -50,11 +50,11 @@ void main() {
     } catch (_) {}
   });
 
-  Widget createSettingsApp() {
+  Widget createSettingsApp({Locale locale = const Locale('ja')}) {
     return MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('ja'),
+      locale: locale,
       home: Scaffold(
         body: SettingsPage(
           defaultsFilePath: defaultsFile.path,
@@ -105,12 +105,16 @@ void main() {
     await tester.tap(currentSymsetText);
     await tester.pump(const Duration(milliseconds: 500));
 
-    final itemFinder = find.text('Unicode Graphics').last;
+    // ドロップダウンアイテムに Enhanced1 と Enhanced2 が含まれることを検証
+    expect(find.text('Enhanced1'), findsWidgets);
+    expect(find.text('Enhanced2'), findsWidgets);
+
+    final itemFinder = find.text('Enhanced1').last;
     await tester.tap(itemFinder);
     await tester.pump(const Duration(milliseconds: 500));
 
     // Prefs への即時反映を検証
-    expect(mockPrefs.getString('nh_opt_symset'), 'Unicode Graphics');
+    expect(mockPrefs.getString('nh_opt_symset'), 'Enhanced1');
 
     // DefaultsHelper による defaults.nh への書き込みと runmode:walk の保護を検証 (runAsync 内で実 I/O を実行)
     String savedContent = '';
@@ -119,7 +123,7 @@ void main() {
       await helper.syncFromPrefsToFile(defaultsFile.path);
       savedContent = await defaultsFile.readAsString();
     });
-    expect(savedContent, contains('symset:Unicode Graphics'));
+    expect(savedContent, contains('symset:Enhanced1'));
     expect(savedContent, contains('runmode:walk')); // 既存オプション保護
   });
 
@@ -166,5 +170,49 @@ void main() {
     for (final target in FontTarget.values) {
       expect(FontManager.instance.getSelectedFont(target).id, 'Unscii-8');
     }
+  });
+
+  testWidgets('英語モード時にフォント設定の選択肢が英語表示されること', (tester) async {
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await mockPrefs.setString('selected_language', 'en');
+
+    // 英語ロケールでアプリを構築
+    await tester.pumpWidget(createSettingsApp(locale: const Locale('en')));
+    await tester.pump(const Duration(milliseconds: 500));
+
+    // フォント設定セクション (Font Settings) をスクロールして展開
+    final fontSectionFinder = find.text('Font Settings');
+    await tester.scrollUntilVisible(fontSectionFinder, 200);
+    await tester.ensureVisible(fontSectionFinder);
+    await tester.tap(fontSectionFinder);
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text('Apply Font to All'), findsOneWidget);
+    expect(find.text('Map Font (font_map)'), findsOneWidget);
+
+    // 一括変更ドロップダウンをタップ
+    final allTileFinder = find.widgetWithText(ListTile, 'Apply Font to All');
+    await tester.ensureVisible(allTileFinder);
+    await tester.pump(const Duration(milliseconds: 300));
+
+    final hintText = find.descendant(
+      of: allTileFinder,
+      matching: find.text('Select Font'),
+    );
+    expect(hintText, findsOneWidget);
+
+    await tester.tap(hintText, warnIfMissed: false);
+    await tester.pump(const Duration(milliseconds: 500));
+
+    // ドロップダウンアイテムが英語表記になっていること
+    expect(find.text('System Default (Monospace)'), findsWidgets);
+    expect(find.text('Terminus TTF (Classic ASCII)'), findsWidgets);
+    expect(find.text('Unscii 8x8 (Retro PC)'), findsWidgets);
+    expect(find.text('Unscii 16x16 (Hi-Res Retro)'), findsWidgets);
+    expect(find.text('Misaki Gothic (Retro Pixel JP)'), findsWidgets);
   });
 }

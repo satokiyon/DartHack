@@ -29,8 +29,11 @@ class FontItem {
   /// 一意の識別子 ('system', 'Terminus', '`custom_<uuid>`' 等)
   final String id;
 
-  /// 画面表示用ラベル ('システム標準等幅', 'Terminus TTF', 等)
+  /// 画面表示用ラベル ('システム標準 (等幅)', 'Terminus TTF (アスキー定番)', 等)
   final String displayName;
+
+  /// 英語モード時の画面表示用ラベル ('System Default (Monospace)', 等)
+  final String? displayNameEn;
 
   /// Flutter で使用する fontFamily 名
   final String? fontFamily;
@@ -44,10 +47,17 @@ class FontItem {
   const FontItem({
     required this.id,
     required this.displayName,
+    this.displayNameEn,
     this.fontFamily,
     this.isBuiltIn = true,
     this.localFilePath,
   });
+
+  /// 言語に応じた表示ラベルを取得（isJp が false の場合は displayNameEn を優先）
+  String getDisplayName(bool isJp) {
+    if (isJp) return displayName;
+    return displayNameEn ?? displayName;
+  }
 
   @override
   bool operator ==(Object other) =>
@@ -79,30 +89,35 @@ class FontManager extends ChangeNotifier {
     FontItem(
       id: 'system',
       displayName: 'システム標準 (等幅)',
+      displayNameEn: 'System Default (Monospace)',
       fontFamily: 'monospace',
       isBuiltIn: true,
     ),
     FontItem(
       id: 'Terminus',
       displayName: 'Terminus TTF (アスキー定番)',
+      displayNameEn: 'Terminus TTF (Classic ASCII)',
       fontFamily: 'Terminus',
       isBuiltIn: true,
     ),
     FontItem(
       id: 'Unscii-8',
       displayName: 'Unscii 8x8 (レトロPC)',
+      displayNameEn: 'Unscii 8x8 (Retro PC)',
       fontFamily: 'Unscii-8',
       isBuiltIn: true,
     ),
     FontItem(
       id: 'Unscii-16',
       displayName: 'Unscii 16x16 (高精細レトロ)',
+      displayNameEn: 'Unscii 16x16 (Hi-Res Retro)',
       fontFamily: 'Unscii-16',
       isBuiltIn: true,
     ),
     FontItem(
       id: 'MisakiGothic',
       displayName: '美咲ゴシック (日本語レトロ)',
+      displayNameEn: 'Misaki Gothic (Retro Pixel JP)',
       fontFamily: 'MisakiGothic',
       isBuiltIn: true,
     ),

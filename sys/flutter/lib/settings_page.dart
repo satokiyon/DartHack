@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'package:ffi/ffi.dart';
@@ -681,6 +681,8 @@ class _SettingsPageState extends State<SettingsPage> {
     'DECgraphics',
     'MACgraphics',
     'Unicode Graphics',
+    'Enhanced1',
+    'Enhanced2',
   ];
 
   static const List<String> _availableRogueSymsets = [
@@ -777,6 +779,7 @@ class _SettingsPageState extends State<SettingsPage> {
   /// フォント設定セクション
   Widget _buildFontSection() {
     final l10n = AppLocalizations.of(context)!;
+    final isEn = _selectedLanguage == 'en' || l10n.localeName.startsWith('en');
     final fontMgr = FontManager.instance;
     final availableFonts = fontMgr.availableFonts;
 
@@ -792,19 +795,19 @@ class _SettingsPageState extends State<SettingsPage> {
             child: ListTile(
               title: Text(l10n.fontAllLabel, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.amberAccent)),
               subtitle: Text(
-                _selectedLanguage == 'en'
+                isEn
                     ? 'Apply the selected font to all 5 UI and map components at once.'
                     : 'マップ、メッセージ、ステータス、メニュー、UIの全5系統に同じフォントを一括適用します。',
                 style: const TextStyle(fontSize: 12, color: Colors.white60),
               ),
               trailing: DropdownButton<String>(
-                hint: Text(_selectedLanguage == 'en' ? 'Select Font' : 'フォント選択', style: const TextStyle(fontSize: 13, color: Colors.white70)),
+                hint: Text(isEn ? 'Select Font' : 'フォント選択', style: const TextStyle(fontSize: 13, color: Colors.white70)),
                 dropdownColor: const Color(0xFF1E1E2C),
                 underline: const SizedBox(),
                 items: availableFonts.map((f) {
                   return DropdownMenuItem<String>(
                     value: f.id,
-                    child: Text(f.displayName, style: const TextStyle(fontSize: 13)),
+                    child: Text(f.getDisplayName(!isEn), style: const TextStyle(fontSize: 13)),
                   );
                 }).toList(),
                 onChanged: (val) {
@@ -901,6 +904,8 @@ class _SettingsPageState extends State<SettingsPage> {
     required String title,
     String? description,
   }) {
+    final l10n = AppLocalizations.of(context)!;
+    final isEn = _selectedLanguage == 'en' || l10n.localeName.startsWith('en');
     final fontMgr = FontManager.instance;
     final currentFont = fontMgr.getSelectedFont(target);
     final availableFonts = fontMgr.availableFonts;
@@ -919,7 +924,7 @@ class _SettingsPageState extends State<SettingsPage> {
           items: availableFonts.map((f) {
             return DropdownMenuItem<String>(
               value: f.id,
-              child: Text(f.displayName, style: const TextStyle(fontSize: 13)),
+              child: Text(f.getDisplayName(!isEn), style: const TextStyle(fontSize: 13)),
             );
           }).toList(),
           onChanged: (val) {
@@ -1012,7 +1017,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       itemBuilder: (context, index) {
                         final item = customFonts[index];
                         return ListTile(
-                          title: Text(item.displayName),
+                          title: Text(item.getDisplayName(_selectedLanguage != 'en')),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete, color: Colors.redAccent),
                             onPressed: () async {
@@ -1020,7 +1025,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 context: context,
                                 builder: (c) => AlertDialog(
                                   title: Text(l10n.confirmTitle),
-                                  content: Text(l10n.fontDeleteConfirm(item.displayName)),
+                                  content: Text(l10n.fontDeleteConfirm(item.getDisplayName(_selectedLanguage != 'en'))),
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.pop(c, false),

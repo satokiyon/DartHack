@@ -348,6 +348,8 @@ class DefaultsHelper {
     final pendingLines = <String>[];
     _options.forEach((key, val) {
       if (handledKeys.contains(key)) return;
+      // symset および roguesymset は後続の専用ブロックで一括制御するため汎用ループからは除外
+      if (key == 'symset' || key == 'roguesymset') return;
 
       if (key == 'tutorial' || key == 'tutorial_mode') {
         if (val == 'always_tutorial' || val == 'true') {
@@ -372,9 +374,14 @@ class DefaultsHelper {
     if (!handledKeys.contains('symset')) {
       final targetSymset = _options['symset'] ?? 'IBMGraphics_2';
       pendingLines.add('OPTIONS=symset:$targetSymset');
+      handledKeys.add('symset');
     }
     if (!handledKeys.contains('roguesymset') && _options.containsKey('roguesymset')) {
-      pendingLines.add('OPTIONS=roguesymset:${_options['roguesymset']}');
+      final targetRogue = _options['roguesymset']!;
+      if (targetRogue.trim().isNotEmpty) {
+        pendingLines.add('OPTIONS=roguesymset:${targetRogue.trim()}');
+        handledKeys.add('roguesymset');
+      }
     }
 
     if (pendingLines.isNotEmpty) {

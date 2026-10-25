@@ -288,7 +288,7 @@ OPTIONS=boulder:0
     expect(savedContent.contains('OPTIONS=boulder:0'), isTrue);
   });
 
-  test('OPTIONS=roguesymset の保存および defaults.nh 反映の検証', () async {
+  test('OPTIONS=roguesymset の保存および defaults.nh 反映の検証 (重複出力防止)', () async {
     final initialContent = 'OPTIONS=symset:IBMGraphics_2\n';
     final file = File(testFilePath);
     await file.writeAsString(initialContent);
@@ -298,12 +298,21 @@ OPTIONS=boulder:0
     helper.setOption('roguesymset', 'RogueIBM');
     await helper.saveToFile(testFilePath);
 
-    final savedContent = await file.readAsString();
+    var savedContent = await file.readAsString();
     expect(savedContent.contains('roguesymset:RogueIBM'), isTrue);
+    // 重複出力 (compound option specified multiple times: roguesymset) が起きていないこと（出現回数1回）
+    final matches = RegExp(r'roguesymset:').allMatches(savedContent);
+    expect(matches.length, equals(1));
 
+    // さらに再度読み込んで連続保存しても重複が増殖しないことを検証
     final reloadHelper = DefaultsHelper();
     await reloadHelper.loadFromFile(testFilePath);
     expect(reloadHelper.getOption('roguesymset'), equals('RogueIBM'));
+    await reloadHelper.saveToFile(testFilePath);
+
+    savedContent = await file.readAsString();
+    final matchesAfterSecondSave = RegExp(r'roguesymset:').allMatches(savedContent);
+    expect(matchesAfterSecondSave.length, equals(1));
   });
 
   test('レガシー記法 OPTIONS=DECgraphics / IBMgraphics のパースと正規化保存の検証', () async {
