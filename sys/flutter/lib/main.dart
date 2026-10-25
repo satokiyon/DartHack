@@ -47,6 +47,7 @@ import 'l10n/app_localizations.dart';
 import 'screens/start_screen.dart';
 import 'screens/end_screen.dart';
 import 'services/sound_manager.dart';
+import 'services/font_manager.dart';
 import 'input/hardware_key_router.dart';
 
 void main() async {
@@ -54,6 +55,7 @@ void main() async {
   await AppPrefs.getInstance();
   unawaited(RewardedAdManager.initializeAndPreload());
   await SoundManager.instance.initialize();
+  await FontManager.instance.init();
   runApp(const MyApp());
 }
 
@@ -93,13 +95,20 @@ class MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'DartHack',
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: Locale(_localeStr),
-      theme: ThemeData.dark(useMaterial3: true).copyWith(
-        colorScheme: const ColorScheme.dark(
+    return ListenableBuilder(
+      listenable: FontManager.instance,
+      builder: (context, _) {
+        final uiFont = FontManager.instance.getSelectedFont(FontTarget.ui);
+        return MaterialApp(
+          title: 'DartHack',
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: Locale(_localeStr),
+          theme: ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.dark,
+            fontFamily: uiFont.fontFamily,
+            colorScheme: const ColorScheme.dark(
           primary: Color(0xFFCE93D8), // ラベンダーパープル: 黒背景で極めて高い視認性 (コントラスト比 約 8.1:1)
           secondary: Colors.amber,
         ),
@@ -129,6 +138,8 @@ class MyAppState extends State<MyApp> {
         ),
       ),
       home: const MyHomePage(),
+        );
+      },
     );
   }
 }
@@ -1193,8 +1204,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void _centerOnPlayer(Size viewportSize) {
     if (!_isGameRunning) return;
 
-    final cellWidth = _useTiles ? 32.0 : 9.0;
-    final cellHeight = _useTiles ? 32.0 : 16.0;
+    final cellSize = FontManager.instance.getMapCellSize(useTiles: _useTiles);
+    final cellWidth = cellSize.width;
+    final cellHeight = cellSize.height;
 
     final cursorX = _screen.cursorX;
     final cursorY = _screen.cursorY;
@@ -2315,8 +2327,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   // マップ座標 (SizedBox 4000x3000 ローカル) を 0-based タイル座標に変換する。
   // NetHackMapPainter.paint() と同じ計算式を共有する。
   ({int tileX, int tileY, bool inMap})? _mapLocalToTile(Offset localPosition) {
-    final cellW = _useTiles ? 32.0 : 9.0;
-    final cellH = _useTiles ? 32.0 : 16.0;
+    final cellSize = FontManager.instance.getMapCellSize(useTiles: _useTiles);
+    final cellW = cellSize.width;
+    final cellH = cellSize.height;
     const canvasW = 4000.0;
     const canvasH = 3000.0;
     final mapWidth = NetHackScreen.mapCols * cellW;
@@ -2640,6 +2653,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       tileHeight: _tileHeight,
                       useTiles: _useTiles,
                       isTransparentTileset: _selectedTileset.startsWith('kevintam'),
+                      fontId: FontManager.instance.getSelectedFont(FontTarget.map).id,
                     ),
                   ),
                 ),
@@ -2975,9 +2989,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       },
                       child: Text(
                         line.replaceAll('\r', '').replaceAll('\n', ' '),
-                        style: TextStyle(
+                        style: FontManager.instance.getStyle(
+                          FontTarget.message,
                           color: color,
-                          fontFamily: 'monospace',
                           fontSize: _msgFontSize,
                           fontWeight: (isMoreLine || isToplineLine)
                               ? FontWeight.bold
@@ -3452,8 +3466,8 @@ TextSpan parseStatusLine(String line) {
                   color: Colors.black,
                   child: Text(
                     titleText,
-                    style: const TextStyle(
-                      fontFamily: 'monospace',
+                    style: FontManager.instance.getStyle(
+                      FontTarget.status,
                       fontSize: 13,
                       height: 1.0,
                       fontWeight: FontWeight.bold,
@@ -3470,8 +3484,8 @@ TextSpan parseStatusLine(String line) {
                         color: barColor,
                         child: Text(
                           titleText,
-                          style: const TextStyle(
-                            fontFamily: 'monospace',
+                          style: FontManager.instance.getStyle(
+                            FontTarget.status,
                             fontSize: 13,
                             height: 1.0,
                             fontWeight: FontWeight.bold,
@@ -3504,8 +3518,8 @@ TextSpan parseStatusLine(String line) {
   }
   
   return TextSpan(
-    style: const TextStyle(
-      fontFamily: 'monospace',
+    style: FontManager.instance.getStyle(
+      FontTarget.status,
       fontSize: 13,
     ),
     children: spans,

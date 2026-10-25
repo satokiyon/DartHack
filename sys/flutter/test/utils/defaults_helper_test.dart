@@ -256,4 +256,105 @@ OPTIONS=!bones
     expect(savedContent.contains('!pauper'), isTrue);
     expect(savedContent.contains('bones') && !savedContent.contains('!bones'), isTrue);
   });
+
+  test('OPTIONS=symset:IBMGraphics_2,runmode:walk の複合行における symset インプレース更新と runmode:walk 保護の検証', () async {
+    final initialContent = '''
+OPTIONS=lit_corridor,showexp,time,toptenwin
+OPTIONS=pile_limit:2,hilite_pile,hilite_pet
+OPTIONS=symset:IBMGraphics_2,runmode:walk
+OPTIONS=boulder:0
+''';
+    final file = File(testFilePath);
+    await file.writeAsString(initialContent);
+
+    // 1. ロードして symset がパースされていることを確認
+    final helper = DefaultsHelper();
+    await helper.loadFromFile(testFilePath);
+    expect(helper.getOption('symset'), equals('IBMGraphics_2'));
+
+    // 2. symset を Enhanced1 に変更して保存
+    helper.setOption('symset', 'Enhanced1');
+    await helper.saveToFile(testFilePath);
+
+    final savedContent = await file.readAsString();
+
+    // symset が Enhanced1 に更新され、runmode:walk がそのまま同一行に残っていることを検証
+    expect(savedContent.contains('symset:Enhanced1'), isTrue);
+    expect(savedContent.contains('runmode:walk'), isTrue);
+    expect(savedContent.contains('symset:IBMGraphics_2'), isFalse);
+    expect(savedContent.contains('OPTIONS=symset:Enhanced1, runmode:walk'), isTrue);
+
+    // 他の行も健全に維持されていることを確認
+    expect(savedContent.contains('OPTIONS=boulder:0'), isTrue);
+  });
+
+  test('OPTIONS=roguesymset の保存および defaults.nh 反映の検証', () async {
+    final initialContent = 'OPTIONS=symset:IBMGraphics_2\n';
+    final file = File(testFilePath);
+    await file.writeAsString(initialContent);
+
+    final helper = DefaultsHelper();
+    await helper.loadFromFile(testFilePath);
+    helper.setOption('roguesymset', 'RogueIBM');
+    await helper.saveToFile(testFilePath);
+
+    final savedContent = await file.readAsString();
+    expect(savedContent.contains('roguesymset:RogueIBM'), isTrue);
+
+    final reloadHelper = DefaultsHelper();
+    await reloadHelper.loadFromFile(testFilePath);
+    expect(reloadHelper.getOption('roguesymset'), equals('RogueIBM'));
+  });
+
+  test('レガシー記法 OPTIONS=DECgraphics / IBMgraphics のパースと正規化保存の検証', () async {
+    final initialContent = 'OPTIONS=DECgraphics,autopickup\n';
+    final file = File(testFilePath);
+    await file.writeAsString(initialContent);
+
+    final helper = DefaultsHelper();
+    await helper.loadFromFile(testFilePath);
+    expect(helper.getOption('symset'), equals('DECgraphics'));
+
+    // 新しい symset:Enhanced2 に更新して保存
+    helper.setOption('symset', 'Enhanced2');
+    await helper.saveToFile(testFilePath);
+
+    final savedContent = await file.readAsString();
+    expect(savedContent.contains('symset:Enhanced2'), isTrue);
+    expect(savedContent.contains('DECgraphics'), isFalse);
+    expect(savedContent.contains('autopickup'), isTrue);
+  });
+
+  test('mergeAssetDefaultsWithPrefs における symset / roguesymset の文字列型保護マイグレーション検証', () async {
+    final assetFilePath = '${tempDir.path}/asset_defaults.nh';
+    final assetFile = File(assetFilePath);
+    await assetFile.writeAsString('''
+OPTIONS=symset:IBMGraphics_2,runmode:walk
+OPTIONS=roguesymset:RogueEpyx
+''');
+
+    final targetFile = File(testFilePath);
+    await targetFile.writeAsString('''
+OPTIONS=name:MyHero
+OPTIONS=symset:Enhanced1,runmode:walk
+''');
+
+    await AppPrefs.setMockInitialValues({
+      'nh_opt_symset': 'Enhanced1',
+    });
+
+    final helper = DefaultsHelper();
+    await helper.mergeAssetDefaultsWithPrefs(assetFilePath, testFilePath);
+
+    final prefs = await AppPrefs.getInstance();
+    // 既存設定が文字列型として維持され、bool に化けていないこと
+    expect(prefs.getString('nh_opt_symset'), equals('Enhanced1'));
+    // アセットの新規キー roguesymset が文字列型として補完されていること
+    expect(prefs.getString('nh_opt_roguesymset'), equals('RogueEpyx'));
+
+    // ターゲットファイルの複合行が壊れずに維持されていること
+    final savedContent = await targetFile.readAsString();
+    expect(savedContent.contains('symset:Enhanced1'), isTrue);
+    expect(savedContent.contains('runmode:walk'), isTrue);
+  });
 }

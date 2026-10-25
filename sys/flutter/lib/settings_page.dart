@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'package:ffi/ffi.dart';
@@ -18,6 +18,8 @@ import 'services/sound_manager.dart';
 import 'widgets/sound_credits_dialog.dart';
 import 'models/tileset_info.dart';
 import 'tileset_selection_page.dart';
+import 'package:file_picker/file_picker.dart';
+import 'services/font_manager.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -39,6 +41,8 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _useTiles = true;
   String _selectedLanguage = 'ja';
   String _selectedTileset = 'pixelhack_32x32';
+  String _selectedSymset = 'IBMGraphics_2';
+  String _selectedRogueSymset = 'Default';
   String _controllerMode = 'pad';
   int _statusDisplayMode = 0;
   int _tombstoneDisplayMode = 0; // 0: 画像+文字オーバーレイ, 1: Cコア出力そのまま(テキスト)
@@ -249,6 +253,8 @@ class _SettingsPageState extends State<SettingsPage> {
       _useTiles = prefs.getBool('use_tiles') ?? true;
       _selectedLanguage = prefs.getString('selected_language') ?? 'ja';
       _selectedTileset = prefs.getString('selected_tileset') ?? 'pixelhack_32x32';
+      _selectedSymset = prefs.getString('nh_opt_symset') ?? 'IBMGraphics_2';
+      _selectedRogueSymset = prefs.getString('nh_opt_roguesymset') ?? 'Default';
       _controllerMode = prefs.getString('controller_mode') ?? 'pad';
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
       final tombstoneModeRaw = prefs.getInt('tombstone_display_mode');
@@ -663,6 +669,389 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ), 
         ]),
+      ),
+    );
+  }
+
+  /// シンボルセット選択肢
+  static const List<String> _availableSymsets = [
+    'Default',
+    'IBMGraphics_1',
+    'IBMGraphics_2',
+    'DECgraphics',
+    'MACgraphics',
+    'Unicode Graphics',
+  ];
+
+  static const List<String> _availableRogueSymsets = [
+    'Default',
+    'RogueIBM',
+    'RogueEpyx',
+    'RogueUnicode',
+  ];
+
+  /// シンボルセット設定セクション (symset / roguesymset)
+  Widget _buildSymsetSection() {
+    final l10n = AppLocalizations.of(context)!;
+    final isEn = _selectedLanguage == 'en';
+
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.font_download_outlined, color: Colors.cyanAccent),
+        title: Text(l10n.secSymsetTitle),
+        subtitle: Text(l10n.secSymsetSub, style: const TextStyle(fontSize: 12, color: Colors.white60)),
+        children: _withDividers([
+          // 1. 通常階層 symset
+          Material(
+            color: Colors.transparent,
+            child: ListTile(
+              title: Text(l10n.symsetLabel),
+              subtitle: Text(
+                isEn
+                    ? 'Symbol characters used for dungeon floors, walls, and items in ASCII mode.'
+                    : 'アスキー描画時に壁・床・道具等を描画するシンボル定義セットです。',
+                style: const TextStyle(fontSize: 12, color: Colors.white60),
+              ),
+              trailing: DropdownButton<String>(
+                value: _availableSymsets.contains(_selectedSymset) ? _selectedSymset : 'Default',
+                dropdownColor: const Color(0xFF1E1E2C),
+                underline: const SizedBox(),
+                items: _availableSymsets.map((s) {
+                  return DropdownMenuItem<String>(
+                    value: s,
+                    child: Text(s, style: const TextStyle(fontSize: 14)),
+                  );
+                }).toList(),
+                onChanged: (val) async {
+                  if (val != null) {
+                    setState(() => _selectedSymset = val);
+                    await _saveGameOption('nh_opt_symset', val);
+                    try {
+                      final ffi = NetHackFfi(_selectedLanguage);
+                      ffi.requestSymsetChange(val, isRogue: false);
+                    } catch (_) {}
+                  }
+                },
+              ),
+            ),
+          ),
+          // 2. ローグ階層 roguesymset
+          Material(
+            color: Colors.transparent,
+            child: ListTile(
+              title: Text(l10n.roguesymsetLabel),
+              subtitle: Text(
+                isEn
+                    ? 'Symbol characters used specifically in Rogue levels.'
+                    : 'ローグ階層専用のアスキーシンボル定義セットです。',
+                style: const TextStyle(fontSize: 12, color: Colors.white60),
+              ),
+              trailing: DropdownButton<String>(
+                value: _availableRogueSymsets.contains(_selectedRogueSymset) ? _selectedRogueSymset : 'Default',
+                dropdownColor: const Color(0xFF1E1E2C),
+                underline: const SizedBox(),
+                items: _availableRogueSymsets.map((s) {
+                  return DropdownMenuItem<String>(
+                    value: s,
+                    child: Text(s, style: const TextStyle(fontSize: 14)),
+                  );
+                }).toList(),
+                onChanged: (val) async {
+                  if (val != null) {
+                    setState(() => _selectedRogueSymset = val);
+                    await _saveGameOption('nh_opt_roguesymset', val);
+                    try {
+                      final ffi = NetHackFfi(_selectedLanguage);
+                      ffi.requestSymsetChange(val, isRogue: true);
+                    } catch (_) {}
+                  }
+                },
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  /// フォント設定セクション
+  Widget _buildFontSection() {
+    final l10n = AppLocalizations.of(context)!;
+    final fontMgr = FontManager.instance;
+    final availableFonts = fontMgr.availableFonts;
+
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.text_fields_rounded, color: Colors.orangeAccent),
+        title: Text(l10n.secFontTitle),
+        subtitle: Text(l10n.secFontSub, style: const TextStyle(fontSize: 12, color: Colors.white60)),
+        children: _withDividers([
+          // 一括フォント変更
+          Material(
+            color: Colors.transparent,
+            child: ListTile(
+              title: Text(l10n.fontAllLabel, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.amberAccent)),
+              subtitle: Text(
+                _selectedLanguage == 'en'
+                    ? 'Apply the selected font to all 5 UI and map components at once.'
+                    : 'マップ、メッセージ、ステータス、メニュー、UIの全5系統に同じフォントを一括適用します。',
+                style: const TextStyle(fontSize: 12, color: Colors.white60),
+              ),
+              trailing: DropdownButton<String>(
+                hint: Text(_selectedLanguage == 'en' ? 'Select Font' : 'フォント選択', style: const TextStyle(fontSize: 13, color: Colors.white70)),
+                dropdownColor: const Color(0xFF1E1E2C),
+                underline: const SizedBox(),
+                items: availableFonts.map((f) {
+                  return DropdownMenuItem<String>(
+                    value: f.id,
+                    child: Text(f.displayName, style: const TextStyle(fontSize: 13)),
+                  );
+                }).toList(),
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() {});
+                    fontMgr.setAllFonts(val);
+                  }
+                },
+              ),
+            ),
+          ),
+          // 1. マップフォント
+          _buildFontTargetTile(
+            target: FontTarget.map,
+            title: l10n.fontMapLabel,
+            description: l10n.fontMapDesc,
+          ),
+          // 2. メッセージフォント
+          _buildFontTargetTile(
+            target: FontTarget.message,
+            title: l10n.fontMsgLabel,
+          ),
+          // 3. ステータスフォント
+          _buildFontTargetTile(
+            target: FontTarget.status,
+            title: l10n.fontStatusLabel,
+          ),
+          // 4. メニュー＆テキストフォント
+          _buildFontTargetTile(
+            target: FontTarget.menu,
+            title: l10n.fontMenuLabel,
+          ),
+          // 5. UIフォント
+          _buildFontTargetTile(
+            target: FontTarget.ui,
+            title: l10n.fontUiLabel,
+          ),
+          // アスキーマップ倍率スライダー
+          ListTile(
+            title: Text(l10n.fontAsciiScale),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${fontMgr.mapAsciiScale.toStringAsFixed(1)}x',
+                  style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold),
+                ),
+                Slider(
+                  value: fontMgr.mapAsciiScale,
+                  min: 1.0,
+                  max: 2.5,
+                  divisions: 15,
+                  label: '${fontMgr.mapAsciiScale.toStringAsFixed(1)}x',
+                  onChanged: (val) {
+                    setState(() {});
+                    fontMgr.setMapAsciiScale(val);
+                  },
+                ),
+              ],
+            ),
+          ),
+          // 外部フォント追加ボタン
+          Material(
+            color: Colors.transparent,
+            child: ListTile(
+              leading: const Icon(Icons.file_upload_outlined, color: Colors.lightGreenAccent),
+              title: Text(l10n.fontAddCustom),
+              subtitle: Text(
+                _selectedLanguage == 'en'
+                    ? 'Import your own TTF, OTF, TTC, or WOFF font files securely.'
+                    : 'お持ちのフォントファイル (.ttf / .otf / .ttc / .woff) を安全に読み込んで追加します。',
+                style: const TextStyle(fontSize: 12, color: Colors.white60),
+              ),
+              onTap: () => _pickAndImportCustomFont(l10n),
+            ),
+          ),
+          // 追加済み外部フォント管理ダイアログボタン
+          if (availableFonts.any((f) => !f.isBuiltIn))
+            Material(
+              color: Colors.transparent,
+              child: ListTile(
+                leading: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                title: Text(l10n.fontDeleteCustom),
+                onTap: () => _showManageCustomFontsDialog(l10n),
+              ),
+            ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _buildFontTargetTile({
+    required FontTarget target,
+    required String title,
+    String? description,
+  }) {
+    final fontMgr = FontManager.instance;
+    final currentFont = fontMgr.getSelectedFont(target);
+    final availableFonts = fontMgr.availableFonts;
+
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        title: Text(title),
+        subtitle: description != null
+            ? Text(description, style: const TextStyle(fontSize: 12, color: Colors.white60))
+            : null,
+        trailing: DropdownButton<String>(
+          value: availableFonts.any((f) => f.id == currentFont.id) ? currentFont.id : 'system',
+          dropdownColor: const Color(0xFF1E1E2C),
+          underline: const SizedBox(),
+          items: availableFonts.map((f) {
+            return DropdownMenuItem<String>(
+              value: f.id,
+              child: Text(f.displayName, style: const TextStyle(fontSize: 13)),
+            );
+          }).toList(),
+          onChanged: (val) {
+            if (val != null) {
+              setState(() {});
+              fontMgr.setFont(target, val);
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickAndImportCustomFont(AppLocalizations l10n) async {
+    try {
+      final result = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['ttf', 'otf', 'ttc', 'woff'],
+      );
+
+      if (result.isEmpty) return;
+
+      final file = result.first;
+      final bytes = await file.readAsBytes();
+
+      if (bytes.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('ファイルデータの読み込みに失敗しました')),
+          );
+        }
+        return;
+      }
+
+      final validation = await FontManager.instance.importCustomFont(bytes, file.name);
+      if (!mounted) return;
+
+      if (validation.isValid) {
+        setState(() {});
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.fontImportSuccess(file.name))),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (dialogCtx) => AlertDialog(
+            title: Row(
+              children: const [
+                Icon(Icons.error_outline, color: Colors.redAccent),
+                SizedBox(width: 8),
+                Text('フォント検証エラー'),
+              ],
+            ),
+            content: Text(l10n.fontImportFailed(validation.errorMessage ?? '不明なエラー')),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogCtx),
+                child: Text(l10n.confirm),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('エラー: $e')),
+        );
+      }
+    }
+  }
+
+  void _showManageCustomFontsDialog(AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final fontMgr = FontManager.instance;
+          final customFonts = fontMgr.availableFonts.where((f) => !f.isBuiltIn).toList();
+
+          return AlertDialog(
+            title: Text(l10n.fontDeleteCustom),
+            content: customFonts.isEmpty
+                ? Text(l10n.fontNoCustomFonts)
+                : SizedBox(
+                    width: double.maxFinite,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: customFonts.length,
+                      itemBuilder: (context, index) {
+                        final item = customFonts[index];
+                        return ListTile(
+                          title: Text(item.displayName),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.redAccent),
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (c) => AlertDialog(
+                                  title: Text(l10n.confirmTitle),
+                                  content: Text(l10n.fontDeleteConfirm(item.displayName)),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(c, false),
+                                      child: Text(l10n.cancel),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(c, true),
+                                      child: Text(l10n.confirm),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirm == true) {
+                                await fontMgr.deleteCustomFont(item.id);
+                                setDialogState(() {});
+                                setState(() {});
+                              }
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogCtx),
+                child: Text(l10n.confirm),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -2417,6 +2806,8 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ListView(
         children: [
           _buildTilesetSection(), //タイルセット設定
+          _buildSymsetSection(), //シンボルセット設定
+          _buildFontSection(), //フォント設定
           _buildScreenModeSection(), //イマーシブ・ステータス表示モード・
           _buildMessageSection(),  // メッセージ設定
           _buildSoundSection(),    // サウンド設定

@@ -5,6 +5,7 @@ import '../../nethack_screen.dart';
 import '../../utils/dialog_header_helper.dart';
 import '../../utils/nethack_colors.dart';
 import '../menu_item_tile_painter.dart';
+import '../../services/font_manager.dart';
 import '../../input/hardware_key_router.dart';
 import '../../utils/item_count_parser.dart';
 
@@ -326,7 +327,6 @@ class MenuOverlayState extends State<MenuOverlay> {
       ),
     );
   }
-
   Widget _buildTabSeparatedRow(
     String text,
     TextStyle baseStyle, {
@@ -435,9 +435,10 @@ class MenuOverlayState extends State<MenuOverlay> {
           Expanded(
             child: _buildTabSeparatedRow(
               text,
-              const TextStyle(
+              TextStyle(
                 color: Color(0xFFFFD54F),
-                fontFamily: 'monospace',
+                fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
+                fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
               ),
@@ -636,7 +637,8 @@ class MenuOverlayState extends State<MenuOverlay> {
                                               commandText,
                                               TextStyle(
                                                 color: itemColor,
-                                                fontFamily: 'monospace',
+                                                fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
+                fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w700,
                                               ),
@@ -646,7 +648,8 @@ class MenuOverlayState extends State<MenuOverlay> {
                                               "$accLabel$commandText",
                                               style: TextStyle(
                                                 color: itemColor,
-                                                fontFamily: 'monospace',
+                                                fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
+                fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w700,
                                               ),
@@ -693,7 +696,8 @@ class MenuOverlayState extends State<MenuOverlay> {
                                           commandText,
                                           TextStyle(
                                             color: checked ? Colors.tealAccent[400] : itemColor,
-                                            fontFamily: 'monospace',
+                                            fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
+                fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                             fontSize: 14,
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -704,7 +708,8 @@ class MenuOverlayState extends State<MenuOverlay> {
                                           "$accLabel$commandText$countLabel",
                                           style: TextStyle(
                                             color: checked ? Colors.tealAccent[400] : itemColor,
-                                            fontFamily: 'monospace',
+                                            fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
+                fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                             fontSize: 14,
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -736,7 +741,8 @@ class MenuOverlayState extends State<MenuOverlay> {
                                         "$accLabel$commandText",
                                         style: TextStyle(
                                           color: itemColor,
-                                          fontFamily: 'monospace',
+                                          fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
+                fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                           fontSize: 14,
                                           fontWeight: FontWeight.w700,
                                         ),
@@ -744,9 +750,10 @@ class MenuOverlayState extends State<MenuOverlay> {
                                       subtitle: descriptionText.isNotEmpty
                                           ? Text(
                                               descriptionText,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 color: Colors.white70,
-                                                fontFamily: 'monospace',
+                                                fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
+                fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                                 fontSize: 12,
                                               ),
                                             )
@@ -795,9 +802,10 @@ class MenuOverlayState extends State<MenuOverlay> {
                                               ),
                                               child: Text(
                                                 String.fromCharCode(item.accelerator),
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   color: Color(0xFFFFD54F),
-                                                  fontFamily: 'monospace',
+                                                  fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
+                fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -813,18 +821,20 @@ class MenuOverlayState extends State<MenuOverlay> {
                                           hasTab
                                               ? _buildTabSeparatedRow(
                                                   commandText,
-                                                  const TextStyle(
+                                                  TextStyle(
                                                     color: Color(0xFFFFE082),
-                                                    fontFamily: 'monospace',
+                                                    fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
+                fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.w700,
                                                   ),
                                                 )
                                               : Text(
                                                   commandText,
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     color: Color(0xFFFFE082),
-                                                    fontFamily: 'monospace',
+                                                    fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
+                fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.w700,
                                                   ),
@@ -861,7 +871,8 @@ class MenuOverlayState extends State<MenuOverlay> {
                                             commandText,
                                             TextStyle(
                                               color: itemColor,
-                                              fontFamily: 'monospace',
+                                              fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
+                fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w700,
                                             ),
@@ -871,7 +882,8 @@ class MenuOverlayState extends State<MenuOverlay> {
                                             "$accLabel$commandText",
                                             style: TextStyle(
                                               color: itemColor,
-                                              fontFamily: 'monospace',
+                                              fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
+                fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w700,
                                             ),

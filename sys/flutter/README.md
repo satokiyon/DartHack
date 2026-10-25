@@ -48,6 +48,11 @@ NetHack 5.0 (日本語版 / 英語版) に **Flutter / Dart** でUIを実装す�
     - 全フロア・特別部屋（計60種以上）のBGM再生、デュアルプレイヤーによるA/Bクロスフェード。
     - 完全ミキシング `AudioContext`（Android: `audioFocus: none` / iOS: `ambient`）により、SE再生時のBGM停止を根絶し、Spotify 等の外部音楽アプリと完全共存。
 
+11. **フォントカスタマイズ & アスキーシンボルセット (symset) 連携**:
+    - 設定画面からマップ、メッセージ、ステータス、メニュー、テキスト、UI の各系統ごとにフォントを自由に変更可能。
+    - アスキーマップ描画（タイルOFF時）における日本語フォールバック完全排除による高速描画、表示倍率スライダー連動、および `OPTIONS=symset` / `roguesymset` の設定画面連動と C コア即時反映に対応。
+    - 外部フォントファイル（TTF/OTF/WOFF/TTC）の安全なインポート（マジックナンバー・テーブル境界・サイズ上限の厳格な検証）を搭載。詳細は [`doc/font_and_symset_architecture.md`](doc/font_and_symset_architecture.md) を参照してください。
+
 ---
 
 ## 📁 フォルダ構成
@@ -88,6 +93,7 @@ sys/flutter/
 ├── doc/                         # 各種設計・音響仕様書
 │   ├── ambience_specs.md        # BGM・環境音・特別部屋BGM仕様書
 │   ├── combat_sound_specification.md # 戦闘アクション効果音仕様書
+│   ├── font_and_symset_architecture.md # フォント設定・symsetアーキテクチャ設計書
 │   ├── sound_macros_list.md     # 全316音のサウンドマスター仕様書
 │   ├── sound_system_design.md   # 音響システム設計・確定実装仕様書
 │   ├── spoiler_update_guide.md  # スポイラー更新手順書・仕様

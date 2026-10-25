@@ -28,6 +28,8 @@ class DefaultsHelper {
     'deaf',
     'pauper',
     'bones',
+    'symset',
+    'roguesymset',
   };
 
   static const String managedHeaderComment = '# *** Managed Options by Settings ***';
@@ -108,6 +110,10 @@ class DefaultsHelper {
         key = token.substring(1).trim();
         isBool = true;
         boolVal = false;
+      } else if (token == 'DECgraphics' || token == 'IBMgraphics') {
+        key = 'symset';
+        val = token;
+        isBool = false;
       } else {
         key = token.trim();
         isBool = true;
@@ -309,7 +315,13 @@ class DefaultsHelper {
           } else if (t == 'DECgraphics' || t == 'IBMgraphics' || key == 'symset') {
             handledKeys.add('symset');
             lineModified = true;
-            updatedTokens.add('symset:IBMGraphics_2');
+            final targetSymset = _options['symset'] ?? 'IBMGraphics_2';
+            updatedTokens.add('symset:$targetSymset');
+          } else if (key == 'roguesymset') {
+            handledKeys.add('roguesymset');
+            lineModified = true;
+            final targetRogue = _options['roguesymset'] ?? 'RogueEpyx';
+            updatedTokens.add('roguesymset:$targetRogue');
           } else {
             updatedTokens.add(t);
           }
@@ -358,7 +370,11 @@ class DefaultsHelper {
     });
 
     if (!handledKeys.contains('symset')) {
-      pendingLines.add('OPTIONS=symset:IBMGraphics_2');
+      final targetSymset = _options['symset'] ?? 'IBMGraphics_2';
+      pendingLines.add('OPTIONS=symset:$targetSymset');
+    }
+    if (!handledKeys.contains('roguesymset') && _options.containsKey('roguesymset')) {
+      pendingLines.add('OPTIONS=roguesymset:${_options['roguesymset']}');
     }
 
     if (pendingLines.isNotEmpty) {
@@ -506,6 +522,21 @@ class DefaultsHelper {
         await prefs.setBool('nh_opt_bones', true);
       }
     }
+
+    // シンボルセット設定 (symset / roguesymset)
+    final symsetVal = getOption('symset');
+    if (symsetVal != null && symsetVal.isNotEmpty) {
+      await prefs.setString('nh_opt_symset', symsetVal);
+    } else if (!prefs.containsKey('nh_opt_symset')) {
+      await prefs.setString('nh_opt_symset', 'IBMGraphics_2');
+    }
+
+    final roguesymsetVal = getOption('roguesymset');
+    if (roguesymsetVal != null && roguesymsetVal.isNotEmpty) {
+      await prefs.setString('nh_opt_roguesymset', roguesymsetVal);
+    } else if (!prefs.containsKey('nh_opt_roguesymset')) {
+      await prefs.setString('nh_opt_roguesymset', 'RogueEpyx');
+    }
   }
 
   /// SharedPreferences の現在値を defaults.nh ファイルに反映保存する
@@ -586,6 +617,15 @@ class DefaultsHelper {
       setBoolOption('bones', prefs.getBool('nh_opt_bones') ?? true);
     }
 
+    final prefSymset = prefs.getString('nh_opt_symset');
+    if (prefSymset != null && prefSymset.isNotEmpty) {
+      setOption('symset', prefSymset);
+    }
+    final prefRogue = prefs.getString('nh_opt_roguesymset');
+    if (prefRogue != null && prefRogue.isNotEmpty) {
+      setOption('roguesymset', prefRogue);
+    }
+
     await saveToFile(filePath);
   }
 
@@ -624,7 +664,7 @@ class DefaultsHelper {
           if (optKey == 'number_pad' || optKey == 'tutorial_mode') {
             final int iVal = int.tryParse(defaultVal) ?? 0;
             await prefs.setInt(prefKey, iVal);
-          } else if (optKey == 'name' || optKey == 'pickup_types' || optKey == 'dogname' || optKey == 'catname' || optKey == 'horsename' || optKey == 'fruit') {
+          } else if (optKey == 'name' || optKey == 'pickup_types' || optKey == 'dogname' || optKey == 'catname' || optKey == 'horsename' || optKey == 'fruit' || optKey == 'symset' || optKey == 'roguesymset') {
             await prefs.setString(prefKey, defaultVal);
           } else {
             final bool bVal = defaultVal.toLowerCase() == 'true';
@@ -658,6 +698,16 @@ class DefaultsHelper {
             final defaultPickup = assetDefaultVal ?? r'$"=/!?+';
             await prefs.setString(prefKey, defaultPickup);
             debugPrint("DefaultsHelper: Invalid pickup_types '$currentVal' reset to '$defaultPickup'");
+          }
+        } else if (optKey == 'symset') {
+          final currentVal = prefs.getString(prefKey);
+          if (currentVal == null || currentVal.isEmpty) {
+            await prefs.setString(prefKey, assetDefaultVal ?? 'IBMGraphics_2');
+          }
+        } else if (optKey == 'roguesymset') {
+          final currentVal = prefs.getString(prefKey);
+          if (currentVal == null || currentVal.isEmpty) {
+            await prefs.setString(prefKey, assetDefaultVal ?? 'RogueEpyx');
           }
         }
       }

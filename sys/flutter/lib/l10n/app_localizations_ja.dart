@@ -1315,4 +1315,71 @@ class AppLocalizationsJa extends AppLocalizations {
   String failedToLoadSpoilers(String error) {
     return 'スポイラーの読み込みに失敗しました: $error';
   }
+
+  @override
+  String get secSymsetTitle => 'シンボルセット設定 (symset)';
+
+  @override
+  String get secSymsetSub => 'アスキーマップ描画時のシンボルセットを選択します';
+
+  @override
+  String get symsetLabel => '通常階層シンボルセット (symset)';
+
+  @override
+  String get roguesymsetLabel => 'ローグ階層シンボルセット (roguesymset)';
+
+  @override
+  String get secFontTitle => 'フォント設定';
+
+  @override
+  String get secFontSub => '画面各部およびアスキーマップに使用するフォントを設定します';
+
+  @override
+  String get fontAllLabel => '一括フォント変更';
+
+  @override
+  String get fontMapLabel => 'マップフォント (font_map)';
+
+  @override
+  String get fontMapDesc =>
+      'タイル表示をOFFにした際のアスキーマップ描画に使用されます（※全角記号混入防止のため日本語フォールバックなし）';
+
+  @override
+  String get fontMsgLabel => 'メッセージフォント (font_message)';
+
+  @override
+  String get fontStatusLabel => 'ステータスフォント (font_status)';
+
+  @override
+  String get fontMenuLabel => 'メニュー＆テキストフォント (font_menu)';
+
+  @override
+  String get fontUiLabel => 'UI＆コントローラフォント (font_ui)';
+
+  @override
+  String get fontAsciiScale => 'アスキーマップ表示倍率';
+
+  @override
+  String get fontAddCustom => '外部フォントを追加 (.ttf / .otf / .woff)';
+
+  @override
+  String get fontDeleteCustom => '外部フォントの管理・削除';
+
+  @override
+  String fontImportSuccess(String name) {
+    return 'フォント「$name」をインポートしました';
+  }
+
+  @override
+  String fontImportFailed(String error) {
+    return 'フォントのインポートに失敗しました: $error';
+  }
+
+  @override
+  String fontDeleteConfirm(String name) {
+    return 'フォント「$name」を削除しますか？';
+  }
+
+  @override
+  String get fontNoCustomFonts => '追加された外部フォントはありません';
 }

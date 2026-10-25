@@ -422,7 +422,7 @@ static struct window_procs flutter_procs = {
     "flutter",
     (enum wp_ids) 0,
     WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN,
-    WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_SUPPRESS_HIST,
+    WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_SUPPRESS_HIST | WC2_U_UTF8STR | WC2_EXTRACOLORS,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 };
 
@@ -1688,11 +1688,88 @@ static void check_and_perform_autosave(void) {
     }
 }
 
+static char g_pending_symset[BUFSZ] = {0};
+static volatile int g_symset_change_requested = 0;
+static char g_pending_roguesymset[BUFSZ] = {0};
+static volatile int g_roguesymset_change_requested = 0;
+
+NH_EXPORT void RequestSymsetChangeFlutter(const char *symset_name, int is_rogue) {
+    if (!symset_name) return;
+    if (is_rogue) {
+        strncpy(g_pending_roguesymset, symset_name, sizeof(g_pending_roguesymset) - 1);
+        g_pending_roguesymset[sizeof(g_pending_roguesymset) - 1] = '\0';
+        g_roguesymset_change_requested = 1;
+        debuglog("RequestSymsetChangeFlutter: queued roguesymset '%s'", g_pending_roguesymset);
+    } else {
+        strncpy(g_pending_symset, symset_name, sizeof(g_pending_symset) - 1);
+        g_pending_symset[sizeof(g_pending_symset) - 1] = '\0';
+        g_symset_change_requested = 1;
+        debuglog("RequestSymsetChangeFlutter: queued symset '%s'", g_pending_symset);
+    }
+}
+
+static void apply_symset_internal(const char *target_symset, int is_rogue) {
+    int which_set = is_rogue ? ROGUESET : PRIMARYSET;
+    clear_symsetentry(which_set, TRUE);
+    if (is_rogue) {
+        init_rogue_symbols();
+    } else {
+        init_primary_symbols();
+    }
+
+    if (target_symset && *target_symset && strcmpi(target_symset, "default") != 0) {
+        gs.symset[which_set].name = dupstr(target_symset);
+        if (!glyphname_hash_indices_loaded()) {
+            populate_glyphname_hash_indices();
+        }
+        if (!read_sym_file(which_set)) {
+            clear_symsetentry(which_set, TRUE);
+        }
+        if (glyphname_hash_indices_loaded()) {
+            empty_glyphname_hash_indices();
+        }
+    }
+
+    switch_symbols(TRUE);
+    if (Is_rogue_level(&u.uz)) {
+        if (is_rogue) assign_graphics(ROGUESET);
+    } else if (!is_rogue) {
+        assign_graphics(PRIMARYSET);
+    }
+    apply_customizations(which_set, (do_custom_symbols | do_custom_colors));
+    reset_glyphmap(gm_symchange);
+    reglyph_darkroom();
+}
+
+static void check_and_apply_pending_symset(void) {
+    if (!program_state.something_worth_saving || program_state.gameover)
+        return;
+
+    int did_change = 0;
+    if (g_symset_change_requested) {
+        g_symset_change_requested = 0;
+        debuglog("check_and_apply_pending_symset: applying symset '%s'", g_pending_symset);
+        apply_symset_internal(g_pending_symset, 0);
+        did_change = 1;
+    }
+    if (g_roguesymset_change_requested) {
+        g_roguesymset_change_requested = 0;
+        debuglog("check_and_apply_pending_symset: applying roguesymset '%s'", g_pending_roguesymset);
+        apply_symset_internal(g_pending_roguesymset, 1);
+        did_change = 1;
+    }
+
+    if (did_change && iflags.window_inited && WIN_MAP != WIN_ERR) {
+        docrt();
+    }
+}
+
 // ユーザー入力待ち (キー取得)
 static int flutter_nhgetch(void) {
     debuglog("flutter_nhgetch called. Waiting for key...");
 
     check_and_perform_autosave();
+    check_and_apply_pending_symset();
 
     if (g_poscmd_count > 0) {
         PosCmdEntry cmd = g_poscmd_queue[g_poscmd_head];
@@ -1754,6 +1831,7 @@ static int flutter_nhgetch(void) {
 
     while (!g_key_available) {
         check_and_perform_autosave();
+        check_and_apply_pending_symset();
         if (g_poscmd_count > 0) {
             PosCmdEntry cmd = g_poscmd_queue[g_poscmd_head];
             g_poscmd_head = (g_poscmd_head + 1) % FLUTTER_MAX_POSCMD;
@@ -1959,6 +2037,26 @@ static void flutter_getlin(const char* prompt, char* buf) {
     strcpy(buf, g_getline_result);
 }
 
+/* winX.c 準拠の DEC VT100 / curses 罫線文字 (0x80..0xFF) から Unicode への変換テーブル */
+static const unsigned short decgraphics_to_unicode[128] = {
+    0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007,
+    0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F,
+    0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017,
+    0x0018, 0x0019, 0x001A, 0x001B, 0x001C, 0x001D, 0x001E, 0x001F,
+    0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027,
+    0x0028, 0x0029, 0x002A, 0x002B, 0x002C, 0x002D, 0x002E, 0x002F,
+    0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037,
+    0x0038, 0x0039, 0x003A, 0x003B, 0x003C, 0x003D, 0x003E, 0x003F,
+    0x0040, 0x0041, 0x0042, 0x0043, 0x0044, 0x0045, 0x0046, 0x0047,
+    0x0048, 0x0049, 0x004A, 0x004B, 0x004C, 0x004D, 0x004E, 0x004F,
+    0x0050, 0x0051, 0x0052, 0x0053, 0x0054, 0x0055, 0x0056, 0x0057,
+    0x0058, 0x0059, 0x005A, 0x005B, 0x005C, 0x005D, 0x005E, 0x005F,
+    0x2666, 0x2592, 0x0062, 0x0063, 0x0064, 0x0065, 0x00B0, 0x00B1,
+    0x2591, 0x00A4, 0x2518, 0x2510, 0x250C, 0x2514, 0x253C, 0x23BA,
+    0x23BB, 0x2500, 0x23BC, 0x23BD, 0x251C, 0x2524, 0x2534, 0x252C,
+    0x2502, 0x2264, 0x2265, 0x03C0, 0x2260, 0x00A3, 0x00B7, 0x007F
+};
+
 static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_info* glyphinfo, const glyph_info* bkglyphinfo) {
     (void)bkglyphinfo;
     int tile = glyphinfo->gm.tileidx;
@@ -1973,10 +2071,28 @@ static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_inf
         special &= ~MG_OBJPILE;
     }
 
-    int color = nhcolor_to_RGB(glyphinfo->gm.sym.color);
+    int color;
+    if (glyphinfo->gm.customcolor != 0) {
+        uint32 custom = glyphinfo->gm.customcolor;
+        if ((custom & NH_BASIC_COLOR) != 0) {
+            color = nhcolor_to_RGB(COLORVAL(custom));
+        } else {
+            /* 24-bit RGB (RRGGBB) */
+            color = (int) (COLORVAL(custom) | 0xFF000000);
+        }
+    } else {
+        color = nhcolor_to_RGB(glyphinfo->gm.sym.color);
+    }
 
     int ch = glyphinfo->ttychar;
-    if (ch >= 0 && ch < 256) {
+#ifdef ENHANCED_SYMBOLS
+    if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u && glyphinfo->gm.u->utf8str) {
+        ch = (int) glyphinfo->gm.u->utf32ch;
+    } else
+#endif
+    if ((SYMHANDLING(H_DEC) || SYMHANDLING(H_CURS)) && (ch & 0x80) != 0) {
+        ch = (int) decgraphics_to_unicode[ch & 0x7F];
+    } else if (ch >= 0 && ch < 256) {
         ch = cp437_to_unicode[ch];
     }
 

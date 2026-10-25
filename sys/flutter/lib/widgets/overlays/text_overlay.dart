@@ -8,6 +8,7 @@ import '../../models/topten_entry.dart';
 import '../tombstone_widget.dart';
 import '../topten_widget.dart';
 import '../menu_item_tile_painter.dart';
+import '../../services/font_manager.dart';
 
 class TextOverlay extends StatefulWidget {
   final List<String> textLines;
@@ -289,9 +290,9 @@ class TextOverlayState extends State<TextOverlay> {
                                 Expanded(
                                   child: Text(
                                     displayLine,
-                                    style: const TextStyle(
+                                    style: FontManager.instance.getStyle(
+                                      FontTarget.menu,
                                       color: Colors.white,
-                                      fontFamily: 'monospace',
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
                                       height: 1.35,

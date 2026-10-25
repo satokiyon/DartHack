@@ -463,6 +463,40 @@
     "placeholders": {
       "error": { "type": "String" }
     }
-  }
+  },
+  "secSymsetTitle": "Symbol Set Settings (symset)",
+  "secSymsetSub": "Select symbol sets for ASCII map rendering",
+  "symsetLabel": "Dungeon Symbol Set (symset)",
+  "roguesymsetLabel": "Rogue Level Symbol Set (roguesymset)",
+  "secFontTitle": "Font Settings",
+  "secFontSub": "Configure fonts for UI components and ASCII map",
+  "fontAllLabel": "Apply Font to All",
+  "fontMapLabel": "Map Font (font_map)",
+  "fontMapDesc": "Used for ASCII map rendering when tiles are OFF (no Japanese fallback to prevent layout corruption)",
+  "fontMsgLabel": "Message Font (font_message)",
+  "fontStatusLabel": "Status Font (font_status)",
+  "fontMenuLabel": "Menu & Text Font (font_menu)",
+  "fontUiLabel": "UI & Controller Font (font_ui)",
+  "fontAsciiScale": "ASCII Map Scale",
+  "fontAddCustom": "Add Custom Font (.ttf / .otf / .woff)",
+  "fontDeleteCustom": "Manage Custom Fonts",
+  "fontImportSuccess": "Successfully imported font \"{name}\"",
+  "@fontImportSuccess": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "fontImportFailed": "Failed to import font: {error}",
+  "@fontImportFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "fontDeleteConfirm": "Are you sure you want to delete font \"{name}\"?",
+  "@fontDeleteConfirm": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "fontNoCustomFonts": "No custom fonts added yet"
 }
-

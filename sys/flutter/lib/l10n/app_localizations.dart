@@ -2593,6 +2593,126 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'スポイラーの読み込みに失敗しました: {error}'**
   String failedToLoadSpoilers(String error);
+
+  /// No description provided for @secSymsetTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'シンボルセット設定 (symset)'**
+  String get secSymsetTitle;
+
+  /// No description provided for @secSymsetSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'アスキーマップ描画時のシンボルセットを選択します'**
+  String get secSymsetSub;
+
+  /// No description provided for @symsetLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'通常階層シンボルセット (symset)'**
+  String get symsetLabel;
+
+  /// No description provided for @roguesymsetLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'ローグ階層シンボルセット (roguesymset)'**
+  String get roguesymsetLabel;
+
+  /// No description provided for @secFontTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'フォント設定'**
+  String get secFontTitle;
+
+  /// No description provided for @secFontSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'画面各部およびアスキーマップに使用するフォントを設定します'**
+  String get secFontSub;
+
+  /// No description provided for @fontAllLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'一括フォント変更'**
+  String get fontAllLabel;
+
+  /// No description provided for @fontMapLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'マップフォント (font_map)'**
+  String get fontMapLabel;
+
+  /// No description provided for @fontMapDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'タイル表示をOFFにした際のアスキーマップ描画に使用されます（※全角記号混入防止のため日本語フォールバックなし）'**
+  String get fontMapDesc;
+
+  /// No description provided for @fontMsgLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'メッセージフォント (font_message)'**
+  String get fontMsgLabel;
+
+  /// No description provided for @fontStatusLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'ステータスフォント (font_status)'**
+  String get fontStatusLabel;
+
+  /// No description provided for @fontMenuLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'メニュー＆テキストフォント (font_menu)'**
+  String get fontMenuLabel;
+
+  /// No description provided for @fontUiLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'UI＆コントローラフォント (font_ui)'**
+  String get fontUiLabel;
+
+  /// No description provided for @fontAsciiScale.
+  ///
+  /// In ja, this message translates to:
+  /// **'アスキーマップ表示倍率'**
+  String get fontAsciiScale;
+
+  /// No description provided for @fontAddCustom.
+  ///
+  /// In ja, this message translates to:
+  /// **'外部フォントを追加 (.ttf / .otf / .woff)'**
+  String get fontAddCustom;
+
+  /// No description provided for @fontDeleteCustom.
+  ///
+  /// In ja, this message translates to:
+  /// **'外部フォントの管理・削除'**
+  String get fontDeleteCustom;
+
+  /// No description provided for @fontImportSuccess.
+  ///
+  /// In ja, this message translates to:
+  /// **'フォント「{name}」をインポートしました'**
+  String fontImportSuccess(String name);
+
+  /// No description provided for @fontImportFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'フォントのインポートに失敗しました: {error}'**
+  String fontImportFailed(String error);
+
+  /// No description provided for @fontDeleteConfirm.
+  ///
+  /// In ja, this message translates to:
+  /// **'フォント「{name}」を削除しますか？'**
+  String fontDeleteConfirm(String name);
+
+  /// No description provided for @fontNoCustomFonts.
+  ///
+  /// In ja, this message translates to:
+  /// **'追加された外部フォントはありません'**
+  String get fontNoCustomFonts;
 }
 
 class _AppLocalizationsDelegate

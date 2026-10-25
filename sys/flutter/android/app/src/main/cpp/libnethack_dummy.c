@@ -101,6 +101,12 @@ DLL_EXPORT void SendMenuSelection(long ident) {
 DLL_EXPORT void SendMenuSelectionsToC(const char* csv) {
     (void)csv;
 }
+DLL_EXPORT void RequestSymsetChangeFlutter(const char *symset_name, int is_rogue) {
+    (void)symset_name;
+    (void)is_rogue;
+}
+    (void)csv;
+}
 
 DLL_EXPORT void SendAskNameResultToC(const char* result, int mode) {
     (void)result;

@@ -40,6 +40,7 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
   audioplayers: ^6.8.1
   package_info_plus: ^10.2.2
+  file_picker: ^13.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -76,6 +77,23 @@ flutter:
     - assets/images/guidebook/
     - assets/icon/
     - assets/sounds/
+    - assets/fonts/
+
+  fonts:
+    - family: Terminus
+      fonts:
+        - asset: assets/fonts/TerminusTTF-Regular.ttf
+        - asset: assets/fonts/TerminusTTF-Bold.ttf
+          weight: 700
+    - family: Unscii-8
+      fonts:
+        - asset: assets/fonts/unscii-8.ttf
+    - family: Unscii-16
+      fonts:
+        - asset: assets/fonts/unscii-16.ttf
+    - family: MisakiGothic
+      fonts:
+        - asset: assets/fonts/misaki_gothic.ttf
 
 flutter_launcher_icons:
   android: "ic_launcher"

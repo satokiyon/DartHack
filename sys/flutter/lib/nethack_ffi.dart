@@ -199,6 +199,9 @@ typedef SetLanguageModeDart = void Function(int isJp);
 typedef LookupKeyDescriptionFunc = Void Function(Int32 code);
 typedef LookupKeyDescriptionDart = void Function(int code);
 
+typedef RequestSymsetChangeFunc = Void Function(Pointer<Utf8> symsetName, Int32 isRogue);
+typedef RequestSymsetChangeDart = void Function(Pointer<Utf8> symsetName, int isRogue);
+
 class NetHackFfi {
   late DynamicLibrary _lib;
 
@@ -227,6 +230,7 @@ class NetHackFfi {
   late final TriggerAutosaveDart triggerAutosave;
   late final SetAutosaveSettingsDart setAutosaveSettings;
   late final LookupKeyDescriptionDart lookupKeyDescription;
+  late final RequestSymsetChangeDart requestSymsetChangeNative;
 
   NetHackFfi([String? langCode]) {
     final effectiveLang = langCode ?? NetHackCoreLoader.currentLanguage;
@@ -380,6 +384,27 @@ class NetHackFfi {
           .asFunction<LookupKeyDescriptionDart>();
     } catch (e) {
       lookupKeyDescription = (_) {};
+    }
+
+    try {
+      requestSymsetChangeNative = _lib
+          .lookup<NativeFunction<RequestSymsetChangeFunc>>('RequestSymsetChangeFlutter')
+          .asFunction<RequestSymsetChangeDart>();
+    } catch (e) {
+      requestSymsetChangeNative = (_, _) {};
+    }
+  }
+
+  void requestSymsetChange(String symset, {bool isRogue = false}) {
+    try {
+      final ptr = symset.toNativeUtf8();
+      try {
+        requestSymsetChangeNative(ptr, isRogue ? 1 : 0);
+      } finally {
+        calloc.free(ptr);
+      }
+    } catch (e) {
+      debugPrint("Warning: Failed to request symset change: $e");
     }
   }
 

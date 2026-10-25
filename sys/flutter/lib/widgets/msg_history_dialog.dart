@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
+import '../services/font_manager.dart';
 
 void showMsgHistoryPanel({
   required BuildContext context,
@@ -83,9 +84,9 @@ void showMsgHistoryPanel({
                               padding: const EdgeInsets.symmetric(vertical: 2),
                               child: Text(
                                 line,
-                                style: TextStyle(
+                                style: FontManager.instance.getStyle(
+                                  FontTarget.message,
                                   color: color,
-                                  fontFamily: 'monospace',
                                   fontSize: msgFontSize,
                                 ),
                               ),

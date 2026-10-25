@@ -1340,4 +1340,71 @@ class AppLocalizationsEn extends AppLocalizations {
   String failedToLoadSpoilers(String error) {
     return 'Failed to load Spoilers: $error';
   }
+
+  @override
+  String get secSymsetTitle => 'Symbol Set Settings (symset)';
+
+  @override
+  String get secSymsetSub => 'Select symbol sets for ASCII map rendering';
+
+  @override
+  String get symsetLabel => 'Dungeon Symbol Set (symset)';
+
+  @override
+  String get roguesymsetLabel => 'Rogue Level Symbol Set (roguesymset)';
+
+  @override
+  String get secFontTitle => 'Font Settings';
+
+  @override
+  String get secFontSub => 'Configure fonts for UI components and ASCII map';
+
+  @override
+  String get fontAllLabel => 'Apply Font to All';
+
+  @override
+  String get fontMapLabel => 'Map Font (font_map)';
+
+  @override
+  String get fontMapDesc =>
+      'Used for ASCII map rendering when tiles are OFF (no Japanese fallback to prevent layout corruption)';
+
+  @override
+  String get fontMsgLabel => 'Message Font (font_message)';
+
+  @override
+  String get fontStatusLabel => 'Status Font (font_status)';
+
+  @override
+  String get fontMenuLabel => 'Menu & Text Font (font_menu)';
+
+  @override
+  String get fontUiLabel => 'UI & Controller Font (font_ui)';
+
+  @override
+  String get fontAsciiScale => 'ASCII Map Scale';
+
+  @override
+  String get fontAddCustom => 'Add Custom Font (.ttf / .otf / .woff)';
+
+  @override
+  String get fontDeleteCustom => 'Manage Custom Fonts';
+
+  @override
+  String fontImportSuccess(String name) {
+    return 'Successfully imported font \"$name\"';
+  }
+
+  @override
+  String fontImportFailed(String error) {
+    return 'Failed to import font: $error';
+  }
+
+  @override
+  String fontDeleteConfirm(String name) {
+    return 'Are you sure you want to delete font \"$name\"?';
+  }
+
+  @override
+  String get fontNoCustomFonts => 'No custom fonts added yet';
 }

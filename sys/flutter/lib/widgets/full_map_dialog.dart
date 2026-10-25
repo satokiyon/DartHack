@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../nethack_screen.dart';
 import '../nethack_map_painter.dart';
+import '../services/font_manager.dart';
 
 void showFullMapDialog({
   required BuildContext context,
@@ -125,8 +126,9 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
 
   @override
   Widget build(BuildContext context) {
-    final cellW = widget.useTiles ? 32.0 : 9.0;
-    final cellH = widget.useTiles ? 32.0 : 16.0;
+    final cellSize = FontManager.instance.getMapCellSize(useTiles: widget.useTiles);
+    final cellW = cellSize.width;
+    final cellH = cellSize.height;
     final mapWidth = NetHackScreen.mapCols * cellW;
     final mapHeight = NetHackScreen.mapRows * cellH;
 
@@ -156,6 +158,7 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
                     tileHeight: widget.tileHeight,
                     useTiles: widget.useTiles,
                     isTransparentTileset: widget.isTransparentTileset,
+                    fontId: FontManager.instance.getSelectedFont(FontTarget.map).id,
                   ),
                 ),
               ),

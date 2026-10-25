@@ -464,6 +464,40 @@
     "placeholders": {
       "error": { "type": "String" }
     }
-  }
+  },
+  "secSymsetTitle": "シンボルセット設定 (symset)",
+  "secSymsetSub": "アスキーマップ描画時のシンボルセットを選択します",
+  "symsetLabel": "通常階層シンボルセット (symset)",
+  "roguesymsetLabel": "ローグ階層シンボルセット (roguesymset)",
+  "secFontTitle": "フォント設定",
+  "secFontSub": "画面各部およびアスキーマップに使用するフォントを設定します",
+  "fontAllLabel": "一括フォント変更",
+  "fontMapLabel": "マップフォント (font_map)",
+  "fontMapDesc": "タイル表示をOFFにした際のアスキーマップ描画に使用されます（※全角記号混入防止のため日本語フォールバックなし）",
+  "fontMsgLabel": "メッセージフォント (font_message)",
+  "fontStatusLabel": "ステータスフォント (font_status)",
+  "fontMenuLabel": "メニュー＆テキストフォント (font_menu)",
+  "fontUiLabel": "UI＆コントローラフォント (font_ui)",
+  "fontAsciiScale": "アスキーマップ表示倍率",
+  "fontAddCustom": "外部フォントを追加 (.ttf / .otf / .woff)",
+  "fontDeleteCustom": "外部フォントの管理・削除",
+  "fontImportSuccess": "フォント「{name}」をインポートしました",
+  "@fontImportSuccess": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "fontImportFailed": "フォントのインポートに失敗しました: {error}",
+  "@fontImportFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "fontDeleteConfirm": "フォント「{name}」を削除しますか？",
+  "@fontDeleteConfirm": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "fontNoCustomFonts": "追加された外部フォントはありません"
 }
-

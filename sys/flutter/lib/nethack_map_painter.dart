@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 import 'nethack_screen.dart';
+import 'services/font_manager.dart';
 
 class NetHackMapPainter extends CustomPainter {
   final NetHackScreen screen;
@@ -9,6 +10,7 @@ class NetHackMapPainter extends CustomPainter {
   final int tileHeight;
   final bool useTiles;
   final bool isTransparentTileset;
+  final String? fontId;
 
   NetHackMapPainter({
     required this.screen,
@@ -17,12 +19,17 @@ class NetHackMapPainter extends CustomPainter {
     required this.tileHeight,
     required this.useTiles,
     this.isTransparentTileset = false,
+    this.fontId,
   }) : super(repaint: screen);
+
+  /// アスキーマップ描画用 TextPainter のインメモリキャッシュ (アスキー文字と色ごとの再生成オーバーヘッド削減)
+  static final Map<String, TextPainter> _textPainterCache = {};
 
   @override
   void paint(Canvas canvas, Size size) {
-    final cellW = useTiles ? 32.0 : 9.0;
-    final cellH = useTiles ? 32.0 : 16.0;
+    final cellSize = FontManager.instance.getMapCellSize(useTiles: useTiles);
+    final cellW = cellSize.width;
+    final cellH = cellSize.height;
 
     final mapWidth = NetHackScreen.mapCols * cellW;
     final mapHeight = NetHackScreen.mapRows * cellH;
@@ -271,19 +278,34 @@ class NetHackMapPainter extends CustomPainter {
       textColor = colorVal != 0 ? Color(colorVal | 0xFF000000) : Colors.white;
     }
 
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: char,
-        style: TextStyle(
-          color: textColor,
+    final activeFontId = fontId ?? FontManager.instance.getSelectedFont(FontTarget.map).id;
+    final cacheKey = '$char|${textColor.toARGB32()}|$isPet|$cellH|$activeFontId';
+
+    var textPainter = _textPainterCache[cacheKey];
+    if (textPainter == null) {
+      final textStyle = FontManager.instance.getStyle(
+        FontTarget.map,
+        fontSize: cellH * 0.95,
+        color: textColor,
+        fontWeight: FontWeight.normal,
+      );
+      textPainter = TextPainter(
+        text: TextSpan(text: char, style: textStyle),
+        strutStyle: StrutStyle(
           fontSize: cellH * 0.95,
-          fontWeight: FontWeight.bold,
-          fontFamily: 'Courier',
+          height: 1.0,
+          forceStrutHeight: true,
         ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+
+      if (_textPainterCache.length >= 512) {
+        _textPainterCache.clear();
+      }
+      _textPainterCache[cacheKey] = textPainter;
+    }
+
     textPainter.paint(
       canvas,
       Offset(
@@ -300,6 +322,7 @@ class NetHackMapPainter extends CustomPainter {
            oldDelegate.useTiles != useTiles ||
            oldDelegate.isTransparentTileset != isTransparentTileset ||
            oldDelegate.tileWidth != tileWidth ||
-           oldDelegate.tileHeight != tileHeight;
+           oldDelegate.tileHeight != tileHeight ||
+           oldDelegate.fontId != fontId;
   }
 }
