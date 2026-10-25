@@ -27,7 +27,11 @@ class NetHackMapPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final cellSize = FontManager.instance.getMapCellSize(useTiles: useTiles);
+    final cellSize = FontManager.instance.getMapCellSize(
+      useTiles: useTiles,
+      tileWidth: tileWidth,
+      tileHeight: tileHeight,
+    );
     final cellW = cellSize.width;
     final cellH = cellSize.height;
 

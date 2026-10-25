@@ -2713,6 +2713,66 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'追加された外部フォントはありません'**
   String get fontNoCustomFonts;
+
+  /// No description provided for @tilesetAddCustom.
+  ///
+  /// In ja, this message translates to:
+  /// **'外部タイルセットを追加 (.png / .webp / .bmp)'**
+  String get tilesetAddCustom;
+
+  /// No description provided for @tilesetDeleteCustom.
+  ///
+  /// In ja, this message translates to:
+  /// **'外部タイルセットの管理・削除'**
+  String get tilesetDeleteCustom;
+
+  /// No description provided for @tilesetImportSuccess.
+  ///
+  /// In ja, this message translates to:
+  /// **'タイルセット「{name}」({size}) をインポートしました'**
+  String tilesetImportSuccess(String name, String size);
+
+  /// No description provided for @tilesetImportFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'タイルセットのインポートに失敗しました: {error}'**
+  String tilesetImportFailed(String error);
+
+  /// No description provided for @tilesetDeleteConfirm.
+  ///
+  /// In ja, this message translates to:
+  /// **'タイルセット「{name}」を削除しますか？'**
+  String tilesetDeleteConfirm(String name);
+
+  /// No description provided for @tilesetNoCustomTilesets.
+  ///
+  /// In ja, this message translates to:
+  /// **'追加された外部タイルセットはありません'**
+  String get tilesetNoCustomTilesets;
+
+  /// No description provided for @tilesetCustomBadge.
+  ///
+  /// In ja, this message translates to:
+  /// **'カスタム'**
+  String get tilesetCustomBadge;
+
+  /// No description provided for @tilesetSizeLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'サイズ: {width}x{height}'**
+  String tilesetSizeLabel(int width, int height);
+
+  /// No description provided for @tilesetAspectLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'比率: {aspect}'**
+  String tilesetAspectLabel(String aspect);
+
+  /// No description provided for @delete.
+  ///
+  /// In ja, this message translates to:
+  /// **'削除'**
+  String get delete;
 }
 
 class _AppLocalizationsDelegate

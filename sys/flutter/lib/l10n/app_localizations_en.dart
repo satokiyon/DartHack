@@ -1407,4 +1407,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fontNoCustomFonts => 'No custom fonts added yet';
+
+  @override
+  String get tilesetAddCustom => 'Add Custom Tileset (.png / .webp / .bmp)';
+
+  @override
+  String get tilesetDeleteCustom => 'Manage Custom Tilesets';
+
+  @override
+  String tilesetImportSuccess(String name, String size) {
+    return 'Successfully imported tileset \"$name\" ($size)';
+  }
+
+  @override
+  String tilesetImportFailed(String error) {
+    return 'Failed to import tileset: $error';
+  }
+
+  @override
+  String tilesetDeleteConfirm(String name) {
+    return 'Are you sure you want to delete tileset \"$name\"?';
+  }
+
+  @override
+  String get tilesetNoCustomTilesets => 'No custom tilesets added yet';
+
+  @override
+  String get tilesetCustomBadge => 'Custom';
+
+  @override
+  String tilesetSizeLabel(int width, int height) {
+    return 'Size: ${width}x$height';
+  }
+
+  @override
+  String tilesetAspectLabel(String aspect) {
+    return 'Aspect: $aspect';
+  }
+
+  @override
+  String get delete => 'Delete';
 }

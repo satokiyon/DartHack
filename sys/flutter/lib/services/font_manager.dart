@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import '../utils/app_prefs.dart';
 import 'font_validator.dart';
+import 'tileset_manager.dart';
 
 /// フォント設定の対象コンポーネント（5系統）
 enum FontTarget {
@@ -480,11 +481,24 @@ class FontManager extends ChangeNotifier {
 
   /// マップセルサイズの一元算出
   ///
-  /// タイルモード時は 32x32（固定）。
+  /// タイルモード時は、タイルセットの実測アスペクト比に基づいて動的に縦横セルサイズを計算します。
   /// アスキーモード時は、フォントの実測アスペクト比と倍率設定に基づいて
   /// 縦横のセルサイズを動的に計算します。
-  Size getMapCellSize({required bool useTiles, double? customScale}) {
+  Size getMapCellSize({
+    required bool useTiles,
+    double? customScale,
+    int? tileWidth,
+    int? tileHeight,
+    String? tilesetId,
+  }) {
     if (useTiles) {
+      if (tilesetId != null) {
+        return TilesetManager.instance.getMapCellSize(tilesetId: tilesetId);
+      }
+      if (tileWidth != null && tileHeight != null && tileHeight > 0) {
+        final ratio = tileWidth / tileHeight;
+        return Size(32.0 * ratio, 32.0);
+      }
       return const Size(32.0, 32.0);
     }
     final scale = customScale ?? _mapAsciiScale;

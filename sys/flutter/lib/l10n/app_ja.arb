@@ -499,5 +499,42 @@
       "name": { "type": "String" }
     }
   },
-  "fontNoCustomFonts": "追加された外部フォントはありません"
+  "fontNoCustomFonts": "追加された外部フォントはありません",
+  "tilesetAddCustom": "外部タイルセットを追加 (.png / .webp / .bmp)",
+  "tilesetDeleteCustom": "外部タイルセットの管理・削除",
+  "tilesetImportSuccess": "タイルセット「{name}」({size}) をインポートしました",
+  "@tilesetImportSuccess": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "size": { "type": "String" }
+    }
+  },
+  "tilesetImportFailed": "タイルセットのインポートに失敗しました: {error}",
+  "@tilesetImportFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "tilesetDeleteConfirm": "タイルセット「{name}」を削除しますか？",
+  "@tilesetDeleteConfirm": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "tilesetNoCustomTilesets": "追加された外部タイルセットはありません",
+  "tilesetCustomBadge": "カスタム",
+  "tilesetSizeLabel": "サイズ: {width}x{height}",
+  "@tilesetSizeLabel": {
+    "placeholders": {
+      "width": { "type": "int" },
+      "height": { "type": "int" }
+    }
+  },
+  "tilesetAspectLabel": "比率: {aspect}",
+  "@tilesetAspectLabel": {
+    "placeholders": {
+      "aspect": { "type": "String" }
+    }
+  },
+  "delete": "削除"
 }

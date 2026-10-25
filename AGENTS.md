@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-26. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -102,6 +102,21 @@ Flutter ポートにおけるハイスコア・スコアボード表示には、
 
 3. **他ポートへの移植および詳細仕様**:
    - Windows GUI、Linux SDL、Web などの他ウィンドウポートへ移植する際の詳細なコード例やアーキテクチャについては、[docs/transparent_tiles_architecture.md](file:///c:/Users/satok/DartHack/docs/transparent_tiles_architecture.md) を参照してください。
+
+## NetHack タイルセット標準仕様（横40列）バリデーションと非正方形タイルセットのアスペクト比連動原則
+
+1. **NetHack スプライトシート標準仕様（横40列）のバリデーション徹底**:
+   - NetHack の標準タイルスプライトシートは、解像度（16x16, 32x32, 64x64, 15x25等）に関わらず **1行あたり40枚（40列構成: `width % 40 == 0`）** を厳格な仕様としています。
+   - 外部画像（PNG, WebP, BMP）をカスタムタイルセットとしてインポートする際は、`width % 40 == 0` および行数範囲（20〜85行）を厳密に検証し、`tileWidth = width ~/ 40` として算定してください。
+   - タイル高さ（`tileHeight`）はファイル名（`(\d+)x(\d+)`）を優先し、無い場合は正方形検証および既知行数（58行、60行等）からの自動判定を行ってください。
+
+2. **非正方形タイルセットにおける固定セルサイズの禁止とアスペクト比連動**:
+   - `Geoduck (15x25)` 等の非正方形タイルセットにおいて、マップ描画セルサイズを `32.0 x 32.0` 正方形で固定してはなりません。正方形で固定するとタイルが引き伸ばされて歪み、マップ全体の中央配置（`offsetX`, `offsetY`）、カメラ追従センタリング（`_centerOnPlayer`）、マップタップ座標変換（`_mapLocalToTile`）、全体マップ（`FullMapDialog`）の全てに座標ズレが生じます。
+   - タイルモード時のセルサイズ算出は、必ず `TilesetManager.instance.getMapCellSize` または `FontManager.instance.getMapCellSize` を経由し、基準高さ（32.0）に対してタイルのアスペクト比（`tileWidth / tileHeight`）を乗じた `cellW = baseHeight * (tileWidth / tileHeight)`, `cellH = baseHeight` を動的に適用してください。
+
+3. **カスタムタイルセットのストレージ保存と安全なフォールバック**:
+   - デバイスからインポートしたカスタムタイル画像は、一時ディレクトリではなく `getApplicationDocumentsDirectory()/custom_tiles/` に確実に永続化し、`SharedPreferences`（`custom_tilesets_json`）でメタデータを管理してください。
+   - 選択中のカスタムタイルが削除された場合は、必ず標準のデフォルトタイルセット（`pixelhack_32x32`）へ安全に復帰させ、未初期化やヌル参照によるクラッシュを防止してください。
 
 ## NetHackJP Cコアにおける言語判定分岐の全廃原則
 

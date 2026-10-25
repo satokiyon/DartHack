@@ -16,10 +16,10 @@ import 'widgets/shortcut_edit_dialog.dart';
 import 'l10n/app_localizations.dart';
 import 'services/sound_manager.dart';
 import 'widgets/sound_credits_dialog.dart';
-import 'models/tileset_info.dart';
 import 'tileset_selection_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'services/font_manager.dart';
+import 'services/tileset_manager.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -1038,6 +1038,145 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  Future<void> _pickAndImportCustomTileset(AppLocalizations l10n) async {
+    try {
+      final result = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['png', 'webp', 'bmp'],
+      );
+
+      if (result.isEmpty) return;
+
+      final file = result.first;
+      final bytes = await file.readAsBytes();
+
+      if (bytes.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.tilesetImportFailed('画像データを読み込めませんでした'))),
+          );
+        }
+        return;
+      }
+
+      final validation = await TilesetManager.instance.importCustomTileset(bytes, file.name);
+      if (!mounted) return;
+
+      if (validation.isValid) {
+        final sizeStr = '${validation.tileWidth}x${validation.tileHeight}';
+        final newlyAdded = TilesetManager.instance.customTilesets.lastOrNull;
+        if (newlyAdded != null) {
+          setState(() => _selectedTileset = newlyAdded.id);
+          _saveSetting('selected_tileset', newlyAdded.id);
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.tilesetImportSuccess(file.name, sizeStr)),
+            backgroundColor: Colors.teal.shade700,
+          ),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (dialogCtx) => AlertDialog(
+            title: Row(
+              children: const [
+                Icon(Icons.error_outline, color: Colors.amberAccent),
+                SizedBox(width: 8),
+                Text('タイルセット検証エラー'),
+              ],
+            ),
+            content: Text(
+              validation.errorMessage ?? '不明なバリデーションエラーが発生しました',
+              style: const TextStyle(height: 1.4),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogCtx),
+                child: Text(l10n.confirm),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.tilesetImportFailed(e.toString()))),
+        );
+      }
+    }
+  }
+
+  void _showManageCustomTilesetsDialog(AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final tilesetMgr = TilesetManager.instance;
+          final customTilesets = tilesetMgr.customTilesets;
+
+          return AlertDialog(
+            title: Text(l10n.tilesetDeleteCustom),
+            content: customTilesets.isEmpty
+                ? Text(l10n.tilesetNoCustomTilesets)
+                : SizedBox(
+                    width: double.maxFinite,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: customTilesets.length,
+                      itemBuilder: (context, index) {
+                        final item = customTilesets[index];
+                        return ListTile(
+                          title: Text(item.displayName),
+                          subtitle: Text('${item.tileWidth}x${item.tileHeight}'),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.redAccent),
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (c) => AlertDialog(
+                                  title: Text(l10n.confirmTitle),
+                                  content: Text(l10n.tilesetDeleteConfirm(item.displayName)),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(c, false),
+                                      child: Text(l10n.cancel),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(c, true),
+                                      child: Text(l10n.confirm),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirm == true) {
+                                await tilesetMgr.deleteCustomTileset(item.id);
+                                if (_selectedTileset == item.id) {
+                                  _selectedTileset = TilesetManager.defaultTilesetId;
+                                  _saveSetting('selected_tileset', _selectedTileset);
+                                }
+                                setDialogState(() {});
+                                setState(() {});
+                              }
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogCtx),
+                child: Text(l10n.confirm),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildTilesetSection() {
     final l10n = AppLocalizations.of(context)!;
     final isEn = _selectedLanguage == 'en';
@@ -1055,13 +1194,13 @@ class _SettingsPageState extends State<SettingsPage> {
               _saveSetting('use_tiles', val);
             },
           ),
-          if (_useTiles)
+          if (_useTiles) ...[
             Material(
               color: Colors.transparent,
               child: ListTile(
                 title: Text(l10n.tilesetSelect),
                 subtitle: Text(
-                  '${TilesetInfo.findById(_selectedTileset).displayName} (${l10n.tilesetAuthorLabel(TilesetInfo.findById(_selectedTileset).author)})',
+                  '${TilesetManager.instance.getTilesetById(_selectedTileset).displayName} (${l10n.tilesetAuthorLabel(TilesetManager.instance.getTilesetById(_selectedTileset).author)})',
                   style: const TextStyle(fontSize: 13, color: Colors.white70),
                 ),
                 trailing: const Icon(Icons.chevron_right, color: Colors.white70),
@@ -1086,6 +1225,30 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
               ),
             ),
+            Material(
+              color: Colors.transparent,
+              child: ListTile(
+                leading: const Icon(Icons.add_photo_alternate_outlined, color: Colors.cyanAccent),
+                title: Text(l10n.tilesetAddCustom),
+                subtitle: Text(
+                  isEn
+                      ? 'Import custom NetHack tileset images (.png / .webp / .bmp).'
+                      : 'デバイス上の画像ファイル (.png / .webp / .bmp) をタイルセットとして追加します。',
+                  style: const TextStyle(fontSize: 12, color: Colors.white60),
+                ),
+                onTap: () => _pickAndImportCustomTileset(l10n),
+              ),
+            ),
+            if (TilesetManager.instance.customTilesets.isNotEmpty)
+              Material(
+                color: Colors.transparent,
+                child: ListTile(
+                  leading: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                  title: Text(l10n.tilesetDeleteCustom),
+                  onTap: () => _showManageCustomTilesetsDialog(l10n),
+                ),
+              ),
+          ],
           if (!_useTiles) ...[
             // 1. 通常階層 symset
             _buildDropdownSettingTile<String>(

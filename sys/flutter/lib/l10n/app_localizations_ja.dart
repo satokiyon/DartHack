@@ -1382,4 +1382,44 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get fontNoCustomFonts => '追加された外部フォントはありません';
+
+  @override
+  String get tilesetAddCustom => '外部タイルセットを追加 (.png / .webp / .bmp)';
+
+  @override
+  String get tilesetDeleteCustom => '外部タイルセットの管理・削除';
+
+  @override
+  String tilesetImportSuccess(String name, String size) {
+    return 'タイルセット「$name」($size) をインポートしました';
+  }
+
+  @override
+  String tilesetImportFailed(String error) {
+    return 'タイルセットのインポートに失敗しました: $error';
+  }
+
+  @override
+  String tilesetDeleteConfirm(String name) {
+    return 'タイルセット「$name」を削除しますか？';
+  }
+
+  @override
+  String get tilesetNoCustomTilesets => '追加された外部タイルセットはありません';
+
+  @override
+  String get tilesetCustomBadge => 'カスタム';
+
+  @override
+  String tilesetSizeLabel(int width, int height) {
+    return 'サイズ: ${width}x$height';
+  }
+
+  @override
+  String tilesetAspectLabel(String aspect) {
+    return '比率: $aspect';
+  }
+
+  @override
+  String get delete => '削除';
 }

@@ -963,7 +963,11 @@ dorecover(NHFILE *nhfp)
         (void) delete_savefile();
     if (Is_rogue_level(&u.uz))
         assign_graphics(ROGUESET);
+    else
+        assign_graphics(PRIMARYSET);
     reset_glyphmap(gm_levelchange);
+    apply_customizations(gc.currentgraphics,
+                         (do_custom_symbols | do_custom_colors));
     max_rank_sz(); /* to recompute gm.mrank_sz (botl.c) */
 
     if ((uball && !uchain) || (uchain && !uball)) {

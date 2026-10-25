@@ -126,7 +126,11 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
 
   @override
   Widget build(BuildContext context) {
-    final cellSize = FontManager.instance.getMapCellSize(useTiles: widget.useTiles);
+    final cellSize = FontManager.instance.getMapCellSize(
+      useTiles: widget.useTiles,
+      tileWidth: widget.tileWidth,
+      tileHeight: widget.tileHeight,
+    );
     final cellW = cellSize.width;
     final cellH = cellSize.height;
     final mapWidth = NetHackScreen.mapCols * cellW;

@@ -48,6 +48,7 @@ import 'screens/start_screen.dart';
 import 'screens/end_screen.dart';
 import 'services/sound_manager.dart';
 import 'services/font_manager.dart';
+import 'services/tileset_manager.dart';
 import 'input/hardware_key_router.dart';
 
 void main() async {
@@ -56,6 +57,7 @@ void main() async {
   unawaited(RewardedAdManager.initializeAndPreload());
   await SoundManager.instance.initialize();
   await FontManager.instance.init();
+  await TilesetManager.instance.init();
   runApp(const MyApp());
 }
 
@@ -1204,7 +1206,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void _centerOnPlayer(Size viewportSize) {
     if (!_isGameRunning) return;
 
-    final cellSize = FontManager.instance.getMapCellSize(useTiles: _useTiles);
+    final cellSize = FontManager.instance.getMapCellSize(
+      useTiles: _useTiles,
+      tileWidth: _tileWidth,
+      tileHeight: _tileHeight,
+    );
     final cellWidth = cellSize.width;
     final cellHeight = cellSize.height;
 
@@ -1291,19 +1297,29 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Future<void> _loadTileset(String tilesetName) async {
     _addLog("Loading tileset: $tilesetName...");
     try {
-      int width = 32;
-      int height = 32;
-      final match = RegExp(r'(\d+)x(\d+)').firstMatch(tilesetName);
-      if (match != null) {
-        width = int.parse(match.group(1)!);
-        height = int.parse(match.group(2)!);
-      }
+      final info = TilesetManager.instance.getTilesetById(tilesetName);
+      int width = info.tileWidth;
+      int height = info.tileHeight;
+
       ui.Image img;
-      try {
-        img = await _loadTileImageFromAsset('assets/tiles/$tilesetName.webp');
-      } catch (_) {
-        img = await _loadTileImageFromAsset('assets/tiles/$tilesetName.png');
+      if (!info.isBuiltIn && info.localFilePath != null) {
+        final file = File(info.localFilePath!);
+        if (await file.exists()) {
+          final bytes = await file.readAsBytes();
+          final codec = await ui.instantiateImageCodec(bytes);
+          final frame = await codec.getNextFrame();
+          img = frame.image;
+        } else {
+          throw Exception("Custom tileset file not found: ${info.localFilePath}");
+        }
+      } else {
+        try {
+          img = await _loadTileImageFromAsset('assets/tiles/$tilesetName.webp');
+        } catch (_) {
+          img = await _loadTileImageFromAsset('assets/tiles/$tilesetName.png');
+        }
       }
+
       setState(() {
         _tileImage = img;
         _tileWidth = width;
@@ -2327,7 +2343,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   // マップ座標 (SizedBox 4000x3000 ローカル) を 0-based タイル座標に変換する。
   // NetHackMapPainter.paint() と同じ計算式を共有する。
   ({int tileX, int tileY, bool inMap})? _mapLocalToTile(Offset localPosition) {
-    final cellSize = FontManager.instance.getMapCellSize(useTiles: _useTiles);
+    final cellSize = FontManager.instance.getMapCellSize(
+      useTiles: _useTiles,
+      tileWidth: _tileWidth,
+      tileHeight: _tileHeight,
+    );
     final cellW = cellSize.width;
     final cellH = cellSize.height;
     const canvasW = 4000.0;

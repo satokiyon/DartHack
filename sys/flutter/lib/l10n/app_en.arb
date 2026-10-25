@@ -498,5 +498,42 @@
       "name": { "type": "String" }
     }
   },
-  "fontNoCustomFonts": "No custom fonts added yet"
+  "fontNoCustomFonts": "No custom fonts added yet",
+  "tilesetAddCustom": "Add Custom Tileset (.png / .webp / .bmp)",
+  "tilesetDeleteCustom": "Manage Custom Tilesets",
+  "tilesetImportSuccess": "Successfully imported tileset \"{name}\" ({size})",
+  "@tilesetImportSuccess": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "size": { "type": "String" }
+    }
+  },
+  "tilesetImportFailed": "Failed to import tileset: {error}",
+  "@tilesetImportFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "tilesetDeleteConfirm": "Are you sure you want to delete tileset \"{name}\"?",
+  "@tilesetDeleteConfirm": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "tilesetNoCustomTilesets": "No custom tilesets added yet",
+  "tilesetCustomBadge": "Custom",
+  "tilesetSizeLabel": "Size: {width}x{height}",
+  "@tilesetSizeLabel": {
+    "placeholders": {
+      "width": { "type": "int" },
+      "height": { "type": "int" }
+    }
+  },
+  "tilesetAspectLabel": "Aspect: {aspect}",
+  "@tilesetAspectLabel": {
+    "placeholders": {
+      "aspect": { "type": "String" }
+    }
+  },
+  "delete": "Delete"
 }
