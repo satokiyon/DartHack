@@ -9,6 +9,7 @@ class TilesetInfo {
   final String assetPath;
   final bool isBuiltIn;
   final String? localFilePath;
+  final bool isTransparent;
 
   const TilesetInfo({
     required this.id,
@@ -20,6 +21,7 @@ class TilesetInfo {
     required this.assetPath,
     this.isBuiltIn = true,
     this.localFilePath,
+    this.isTransparent = false,
   });
 
   /// アスペクト比 (tileWidth / tileHeight)
@@ -37,6 +39,7 @@ class TilesetInfo {
       'assetPath': assetPath,
       'isBuiltIn': isBuiltIn,
       'localFilePath': localFilePath,
+      'isTransparent': isTransparent,
     };
   }
 
@@ -52,6 +55,7 @@ class TilesetInfo {
       assetPath: json['assetPath'] as String? ?? '',
       isBuiltIn: json['isBuiltIn'] as bool? ?? false,
       localFilePath: json['localFilePath'] as String?,
+      isTransparent: json['isTransparent'] as bool? ?? false,
     );
   }
 
@@ -106,6 +110,7 @@ class TilesetInfo {
       url: 'https://github.com/glorat/nethack-cocoa',
       assetPath: 'assets/tiles/kevintamtiles_64x64.webp',
       isBuiltIn: true,
+      isTransparent: true,
     ),
     TilesetInfo(
       id: 'abigaba_32x32',

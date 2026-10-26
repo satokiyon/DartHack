@@ -68,20 +68,56 @@ class TilesetManager extends ChangeNotifier {
 
       final list = jsonDecode(jsonStr) as List<dynamic>;
       _customTilesets.clear();
+      bool needsResave = false;
 
       for (final item in list) {
         try {
-          final info = TilesetInfo.fromJson(item as Map<String, dynamic>);
+          final map = item as Map<String, dynamic>;
+          var info = TilesetInfo.fromJson(map);
           // 実ファイルが存在するか検証（存在しない孤立レコードはスキップ）
           if (info.localFilePath != null) {
             final file = File(info.localFilePath!);
             if (await file.exists()) {
+              // 既存データで透過情報が未保持の場合、画像から自動判定して補完
+              if (!map.containsKey('isTransparent')) {
+                try {
+                  final bytes = await file.readAsBytes();
+                  final valResult = await TilesetValidator.validate(bytes, fileName: file.path);
+                  final isTrans = valResult.isValid
+                      ? valResult.isTransparent
+                      : await TilesetValidator.detectTransparency(
+                          bytes,
+                          tileWidth: info.tileWidth,
+                          tileHeight: info.tileHeight,
+                          rows: 60,
+                        );
+                  info = TilesetInfo(
+                    id: info.id,
+                    displayName: info.displayName,
+                    tileWidth: info.tileWidth,
+                    tileHeight: info.tileHeight,
+                    author: info.author,
+                    url: info.url,
+                    assetPath: info.assetPath,
+                    isBuiltIn: info.isBuiltIn,
+                    localFilePath: info.localFilePath,
+                    isTransparent: isTrans,
+                  );
+                  needsResave = true;
+                } catch (e) {
+                  debugPrint('[TilesetManager] 既存タイルの透過マイグレーションスキップ: $e');
+                }
+              }
               _customTilesets.add(info);
             }
           }
         } catch (e) {
           debugPrint('[TilesetManager] タイルセットメタデータ復元エラー: $e');
         }
+      }
+
+      if (needsResave) {
+        await _saveCustomTilesetsToPrefs();
       }
     } catch (e) {
       debugPrint('[TilesetManager] カスタムタイルセット読み込みエラー: $e');
@@ -175,6 +211,7 @@ class TilesetManager extends ChangeNotifier {
       assetPath: '',
       isBuiltIn: false,
       localFilePath: targetFile.path,
+      isTransparent: validation.isTransparent,
     );
 
     _customTilesets.add(newTileset);

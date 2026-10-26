@@ -798,7 +798,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       tileImage: _tileImage,
       tileWidth: _tileWidth,
       tileHeight: _tileHeight,
-      isTransparentTileset: _selectedTileset.startsWith('kevintam'),
+      isTransparentTileset: TilesetManager.instance.getTilesetById(_selectedTileset).isTransparent,
     );
   }
 
@@ -2672,7 +2672,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       tileWidth: _tileWidth,
                       tileHeight: _tileHeight,
                       useTiles: _useTiles,
-                      isTransparentTileset: _selectedTileset.startsWith('kevintam'),
+                      isTransparentTileset:
+                          TilesetManager.instance.getTilesetById(_selectedTileset).isTransparent,
                       fontId: FontManager.instance.getSelectedFont(FontTarget.map).id,
                     ),
                   ),

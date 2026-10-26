@@ -12,6 +12,7 @@ class TilesetValidationResult {
   final int? rows;
   final int? cols;
   final String? formatDescription;
+  final bool isTransparent;
 
   const TilesetValidationResult.success({
     required this.imageWidth,
@@ -21,6 +22,7 @@ class TilesetValidationResult {
     required this.rows,
     required this.cols,
     required this.formatDescription,
+    this.isTransparent = false,
   })  : isValid = true,
         errorMessage = null;
 
@@ -32,7 +34,8 @@ class TilesetValidationResult {
         tileHeight = null,
         rows = null,
         cols = null,
-        formatDescription = null;
+        formatDescription = null,
+        isTransparent = false;
 
   /// アスペクト比 (tileWidth / tileHeight)
   double? get aspectRatio {
@@ -61,6 +64,86 @@ class TilesetValidator {
     '.webp',
     '.bmp',
   };
+
+  /// バイト配列から透過タイルセットかどうかを判定する
+  static Future<bool> detectTransparency(
+    Uint8List bytes, {
+    required int tileWidth,
+    required int tileHeight,
+    required int rows,
+    int cols = standardCols,
+  }) async {
+    try {
+      final codec = await ui.instantiateImageCodec(bytes);
+      final frame = await codec.getNextFrame();
+      final image = frame.image;
+      return await detectImageTransparency(
+        image,
+        tileWidth: tileWidth,
+        tileHeight: tileHeight,
+        rows: rows,
+        cols: cols,
+      );
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// ui.Image から直接透過（モンスター・アイテム領域サンプリング）判定を行う
+  static Future<bool> detectImageTransparency(
+    ui.Image image, {
+    required int tileWidth,
+    required int tileHeight,
+    required int rows,
+    int cols = standardCols,
+  }) async {
+    try {
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+      if (byteData == null) return false;
+
+      final imgW = image.width;
+      final imgH = image.height;
+
+      // NetHackのモンスター・アイテム配置領域（全体の25%〜75%行付近）
+      final startRow = (rows * 0.25).toInt();
+      final endRow = (rows * 0.75).toInt();
+
+      int transparentPixelsCount = 0;
+
+      // 中央の行から間引きサンプリング
+      for (int r = startRow; r < endRow; r += 2) {
+        for (int c = 2; c < cols; c += 5) {
+          final tileX = c * tileWidth;
+          final tileY = r * tileHeight;
+
+          final stepX = (tileWidth > 16) ? 2 : 1;
+          final stepY = (tileHeight > 16) ? 2 : 1;
+
+          for (int dy = 0; dy < tileHeight; dy += stepY) {
+            for (int dx = 0; dx < tileWidth; dx += stepX) {
+              final px = tileX + dx;
+              final py = tileY + dy;
+              if (px < imgW && py < imgH) {
+                final offset = (py * imgW + px) * 4 + 3;
+                if (offset < byteData.lengthInBytes) {
+                  final alpha = byteData.getUint8(offset);
+                  if (alpha < 250) {
+                    transparentPixelsCount++;
+                    if (transparentPixelsCount >= 10) {
+                      return true;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
 
   /// ファイルパスから拡張子を検証
   static bool hasSupportedExtension(String filePath) {
@@ -151,6 +234,7 @@ class TilesetValidator {
     int imgW = 0;
     int imgH = 0;
     String format = 'Unknown';
+    ui.Image? decodedImage;
 
     final headerInfo = parseImageHeader(bytes);
     if (headerInfo != null) {
@@ -161,8 +245,9 @@ class TilesetValidator {
       try {
         final codec = await ui.instantiateImageCodec(bytes);
         final frame = await codec.getNextFrame();
-        imgW = frame.image.width;
-        imgH = frame.image.height;
+        decodedImage = frame.image;
+        imgW = decodedImage.width;
+        imgH = decodedImage.height;
         format = 'ImageCodec';
       } catch (e) {
         return const TilesetValidationResult.failure('対応していない画像形式か、破損した画像ファイルです (PNG/WebP/BMP のみ対応)');
@@ -254,6 +339,23 @@ class TilesetValidator {
       );
     }
 
+    // 透過（アルファチャンネル）の自動判定
+    bool isTransparent = false;
+    try {
+      if (decodedImage == null) {
+        final codec = await ui.instantiateImageCodec(bytes);
+        final frame = await codec.getNextFrame();
+        decodedImage = frame.image;
+      }
+      isTransparent = await detectImageTransparency(
+        decodedImage,
+        tileWidth: detectedTileW,
+        tileHeight: resolvedTileH,
+        rows: finalRows,
+        cols: standardCols,
+      );
+    } catch (_) {}
+
     return TilesetValidationResult.success(
       imageWidth: imgW,
       imageHeight: imgH,
@@ -262,6 +364,7 @@ class TilesetValidator {
       rows: finalRows,
       cols: standardCols,
       formatDescription: format,
+      isTransparent: isTransparent,
     );
   }
 }

@@ -84,5 +84,31 @@ void main() {
       expect(result.isValid, false);
       expect(result.errorMessage, contains('ファイルサイズが小さすぎます'));
     });
+
+    test('Correctly identifies transparent tileset (kevintamtiles_64x64.webp)', () async {
+      File file = File('assets/tiles/kevintamtiles_64x64.webp');
+      if (!await file.exists()) {
+        file = File('sys/flutter/assets/tiles/kevintamtiles_64x64.webp');
+      }
+      if (await file.exists()) {
+        final bytes = await file.readAsBytes();
+        final result = await TilesetValidator.validate(bytes, fileName: 'kevintamtiles_64x64.webp');
+        expect(result.isValid, true);
+        expect(result.isTransparent, true);
+      }
+    });
+
+    test('Correctly identifies opaque tileset (pixelhack_32x32.webp)', () async {
+      File file = File('assets/tiles/pixelhack_32x32.webp');
+      if (!await file.exists()) {
+        file = File('sys/flutter/assets/tiles/pixelhack_32x32.webp');
+      }
+      if (await file.exists()) {
+        final bytes = await file.readAsBytes();
+        final result = await TilesetValidator.validate(bytes, fileName: 'pixelhack_32x32.webp');
+        expect(result.isValid, true);
+        expect(result.isTransparent, false);
+      }
+    });
   });
 }

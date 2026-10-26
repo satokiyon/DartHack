@@ -25,6 +25,7 @@ void main() {
         assetPath: '',
         isBuiltIn: false,
         localFilePath: '/path/to/custom.png',
+        isTransparent: true,
       );
 
       final json = custom.toJson();
@@ -36,7 +37,27 @@ void main() {
       expect(restored.tileHeight, 48);
       expect(restored.isBuiltIn, false);
       expect(restored.localFilePath, '/path/to/custom.png');
+      expect(restored.isTransparent, true);
       expect(restored.aspectRatio, closeTo(32.0 / 48.0, 0.001));
+
+      // 既存データの互換性（isTransparent キーが存在しない場合は false）
+      final legacyJson = {
+        'id': 'legacy_tile',
+        'displayName': 'Legacy Tile',
+        'tileWidth': 32,
+        'tileHeight': 32,
+        'author': 'User',
+      };
+      final fromLegacy = TilesetInfo.fromJson(legacyJson);
+      expect(fromLegacy.isTransparent, false);
+    });
+
+    test('Built-in kevintam is transparent, pixelhack is not', () {
+      final kevin = TilesetInfo.findById('kevintamtiles_64x64');
+      expect(kevin.isTransparent, true);
+
+      final pixel = TilesetInfo.findById('pixelhack_32x32');
+      expect(pixel.isTransparent, false);
     });
 
     test('getMapCellSize correctly scales non-square tiles', () {
