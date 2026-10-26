@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-26. */
 /* NetHack 5.0	cfgfiles.c	$NHDT-Date: 1781973042 2026/06/20 16:30:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -1636,9 +1636,7 @@ config_error_done(void)
               *config_error_data->source ? config_error_data->source
                                          : configfile, n);
 
-        if (!go.opt_initial) {
-            wait_synch();
-        }
+        wait_synch();
     }
     config_error_data = tmp->next;
     free((genericptr_t) tmp);

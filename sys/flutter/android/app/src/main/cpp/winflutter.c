@@ -2400,12 +2400,24 @@ static int flutter_get_ext_cmd(void) {
 
 static void flutter_get_nh_event(void) {}
 static void flutter_mark_synch(void) {}
-static char g_last_config_error_msg[1024] = {0};
+static char g_last_config_error_msg[4096] = {0};
 
 void set_flutter_config_error_msg(const char* msg) {
-    if (msg) {
-        strncpy(g_last_config_error_msg, msg, sizeof(g_last_config_error_msg) - 1);
-        g_last_config_error_msg[sizeof(g_last_config_error_msg) - 1] = '\0';
+    if (msg && *msg) {
+        if (g_last_config_error_msg[0] != '\0') {
+            size_t cur_len = strlen(g_last_config_error_msg);
+            size_t max_len = sizeof(g_last_config_error_msg) - 1;
+            if (cur_len + 1 < max_len) {
+                strncat(g_last_config_error_msg, "\n", max_len - cur_len);
+                cur_len++;
+            }
+            if (cur_len < max_len) {
+                strncat(g_last_config_error_msg, msg, max_len - cur_len);
+            }
+        } else {
+            strncpy(g_last_config_error_msg, msg, sizeof(g_last_config_error_msg) - 1);
+            g_last_config_error_msg[sizeof(g_last_config_error_msg) - 1] = '\0';
+        }
     }
 }
 
