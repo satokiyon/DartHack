@@ -52,6 +52,7 @@ class MenuOverlayState extends State<MenuOverlay> {
   late String _filterQuery;
   late Map<int, int> _selectedCounts;
   late ScrollController _scrollController;
+  late ScrollController _horizontalScrollController;
 
   @override
   void initState() {
@@ -60,6 +61,7 @@ class MenuOverlayState extends State<MenuOverlay> {
     _filterController = TextEditingController(text: _filterQuery);
     _selectedCounts = Map<int, int>.from(widget.initialSelectedCounts);
     _scrollController = ScrollController();
+    _horizontalScrollController = ScrollController();
   }
 
   @override
@@ -72,6 +74,7 @@ class MenuOverlayState extends State<MenuOverlay> {
 
   @override
   void dispose() {
+    _horizontalScrollController.dispose();
     _scrollController.dispose();
     _filterController.dispose();
     super.dispose();
@@ -347,8 +350,18 @@ class MenuOverlayState extends State<MenuOverlay> {
     final List<double> colWidths;
     final List<TextAlign> colAligns;
 
-    if (parts.length == 5) {
-      colWidths = [0, 50, 45, 55, 45];
+    if (parts.length == 6) {
+      colWidths = [0, 50, 75, 60, 85, 70];
+      colAligns = [
+        TextAlign.left,
+        TextAlign.right,
+        TextAlign.left,
+        TextAlign.right,
+        TextAlign.right,
+        TextAlign.right,
+      ];
+    } else if (parts.length == 5) {
+      colWidths = [0, 50, 75, 60, 85];
       colAligns = [
         TextAlign.left,
         TextAlign.right,
@@ -502,6 +515,25 @@ class MenuOverlayState extends State<MenuOverlay> {
     if (minLeadingSpaces == 999) minLeadingSpaces = 0;
 
     final hasTabMenu = filteredItems.any((item) => item.text.contains('\t'));
+    int maxTabParts = 0;
+    if (hasTabMenu) {
+      for (final item in filteredItems) {
+        if (item.text.contains('\t')) {
+          final count = item.text.split('\t').length;
+          if (count > maxTabParts) maxTabParts = count;
+        }
+      }
+    }
+    final double targetMinWidth;
+    if (maxTabParts >= 6) {
+      targetMinWidth = 700.0;
+    } else if (maxTabParts == 5) {
+      targetMinWidth = 600.0;
+    } else if (maxTabParts >= 3) {
+      targetMinWidth = 500.0;
+    } else {
+      targetMinWidth = 480.0;
+    }
 
     return Positioned.fill(
       child: Container(
@@ -897,11 +929,18 @@ class MenuOverlayState extends State<MenuOverlay> {
                           },
                         );
                         return hasTabMenu
-                            ? SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: SizedBox(
-                                  width: constraints.maxWidth > 480 ? constraints.maxWidth : 480,
-                                  child: listView,
+                            ? Scrollbar(
+                                controller: _horizontalScrollController,
+                                thumbVisibility: true,
+                                child: SingleChildScrollView(
+                                  controller: _horizontalScrollController,
+                                  scrollDirection: Axis.horizontal,
+                                  child: SizedBox(
+                                    width: constraints.maxWidth > targetMinWidth
+                                        ? constraints.maxWidth
+                                        : targetMinWidth,
+                                    child: listView,
+                                  ),
                                 ),
                               )
                             : listView;
