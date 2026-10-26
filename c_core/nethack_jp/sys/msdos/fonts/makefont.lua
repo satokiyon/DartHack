@@ -1,5 +1,5 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12.
 #!/usr/bin/env lua
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-26.
 --   Copyright (c) 2016, 2022 Ray Chason
 --   NetHack may be freely redistributed.  See license for details.
 

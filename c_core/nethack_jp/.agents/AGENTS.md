@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-21. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-26. -->
 # NetHackJP 開発ルール
 
 ## イベント履歴（livelog）および画面メッセージの日本語表示方針
@@ -176,6 +176,61 @@
 
 5. **アイテム名・モンスター名の表記更新時における願いエイリアス（後方互換性）の二重保証**:
    - 長音表記の変更（例: 「魔法のマーカ」➔「魔法のマーカー」）や定訳の現代化を行う際は、表示用配列（`obj_jp_names` や `mon_jp_name`）を変更するだけでなく、プレイヤーが過去の習慣や旧表記で入力しても願い（Wishing）が確実に通るよう、`src/obj_jp.c` の願いエイリアステーブル（`jnh_wish_aliases[]`）に旧表記から新表記へのマッピング（例: `{ "魔法のマーカ", "魔法のマーカー" }`）を必ず追加してください。
+
+## TTY UI（Windows CON / POSIX）における文字出力の抽象化（g_putch / g_pututf8）徹底方針
+
+1. **生の `putchar()` / `fputs(..., stdout)` による直接出力の禁止**:
+   - `win/tty/`（特に `wintty.c` のテキストウィンドウ、メニュー、ステータス、マップ等の描画処理）において、標準 C の `putchar()` や `fputs(..., stdout)` を直接呼び出して文字を出力してはなりません。
+   - Windows コンソール（`WIN32CON`）環境では、初期状態（`.nethackrc` なし）のコードページが CP437 のまま動作するため、生出力された UTF-8 バイト列は CP437 文字として解釈されて完全に文字化けします。また、`consoletty.c` の仮想バックバッファ管理もバイパスされてしまいます。
+
+2. **プラットフォーム共通の出力抽象化関数への一本化**:
+   - 1文字または文字シーケンスを出力する際は、必ず以下の抽象化関数を経由してください：
+     - ASCII 文字（`< 0x80`）: `g_putch((int) c)`
+     - マルチバイト UTF-8 文字列（`>= 0x80`）: 1 文字分のバイト列をバッファリングした上で `g_pututf8(utf8seq)`
+   - `g_putch()` および `g_pututf8()` は、Windows（`WIN32CON`）ではバックバッファ経由で `MultiByteToWideChar` ➔ `WriteConsoleW` によるコードページ非依存のワイド文字出力を行い、POSIX/Linux では安全に端末へ出力されるため、全環境でコードページの有無に関わらず文字化けを防ぐことができます。
+
+3. **メニュー・テキスト表示処理におけるプラットフォーム二重分岐の排除**:
+   - `process_menu_window()` や `process_text_window()` において、描画ループを `#ifdef WIN32CON` で分岐させて非 WIN32CON 側に `putchar(*cp)` のような古いバイト単位処理を残してはなりません。全環境共通で正確なセル幅計算＋`g_putch` / `g_pututf8` の統一ループを使用してください。
+
+## Lua スクリプト・データファイル（*.lua）の構文保護および更新ルール
+
+1. **実行可能スクリプトにおける Shebang（`#!`）最優先配置の原則**:
+   - スクリプトとして直接実行される Lua ファイル（`sys/msdos/fonts/makefont.lua` 等）において、1行目に NetHackJP の更新ヘッダーコメント（`-- Modified by...`）を挿入してはなりません。
+   - Lua パーサー（Lua 5.4）は **1行目冒頭が `#` である場合のみ** shebang を行コメントとしてスキップする仕様となっており、2行目以降に `#` が押し出されると `unexpected symbol near '#'` 構文エラーを発生させます。
+   - したがって、shebang を持つファイルでは必ず `#!/usr/bin/env lua` などの shebang を 1 行目に維持し、更新ヘッダーコメントは 2 行目に配置してください。
+
+2. **Lua ダンジョン定義（`dat/*.lua`）編集・翻訳時のテーブル構文破壊防止**:
+   - `des.monster({...})` や `des.object({...})` などのテーブル引数を編集・日本語化する際、要素の区切りカンマ（`,`）の脱落に注意してください（例: `montype="wumpus" x=34` ➔ `'}' expected near 'x'`）。
+   - アップストリーム（NetHack 本家）側での改稿・追加コミット時にも構文エラー（カンマ抜け、タイポ等）が混入している場合があります。
+   - NetHack コアは Lua ファイルの読み込み失敗時にエラーを出力しつつ迷路（maze）階層生成等に静かにフォールバックするため、構文エラーを見落としやすい特性があります。Lua ファイルを編集・マージした際は、必ず構文検証を実行してください。
+
+3. **リポジトリ内全 Lua ファイルの構文自動検証手順**:
+   - Lua ファイルの変更・マージ時は、WSL 環境の `liblua5.4.so` や Python を利用して全 Lua ファイルのパーステストを一括実行し、エラー 0 件であることを確認してください。
+   - 実行ワンライナー:
+     ```bash
+     wsl -d Ubuntu-26.04 -- python3 -c "
+     import ctypes, glob, os, sys
+     lua = ctypes.CDLL('liblua5.4.so')
+     lua.luaL_newstate.restype = ctypes.c_void_p
+     lua.luaL_loadfilex.restype = ctypes.c_int
+     lua.luaL_loadfilex.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
+     L = lua.luaL_newstate()
+     errors = []
+     for root, _, files in os.walk('/mnt/c/Users/satok/NetHackJP'):
+         if '.git' in root: continue
+         for f in files:
+             if f.endswith('.lua'):
+                 p = os.path.join(root, f)
+                 if lua.luaL_loadfilex(L, p.encode('utf-8'), None) != 0:
+                     errors.append(p)
+     if errors:
+         print(f'Lua syntax errors found in: {errors}')
+         sys.exit(1)
+     print('All lua files valid.')
+     "
+     ```
+
+
 
 
 
