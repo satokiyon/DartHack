@@ -1114,6 +1114,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get soundCreditsStop => 'Stop';
 
   @override
+  String get fontCreditsButton => 'Fonts';
+
+  @override
+  String get fontCreditsDialogTitle => 'Font Licenses & Credits';
+
+  @override
+  String get fontCreditsDialogDesc =>
+      'List of authors and licenses for fonts bundled with DartHack.';
+
+  @override
+  String fontCreditsAuthor(String name) {
+    return 'Author / Copyright: $name';
+  }
+
+  @override
+  String fontCreditsLicense(String license) {
+    return 'License: $license';
+  }
+
+  @override
+  String get fontCreditsCopiedUrl => 'URL copied to clipboard';
+
+  @override
   String get editDefaultsTitle => 'Edit defaults.nh';
 
   @override

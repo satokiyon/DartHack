@@ -16,6 +16,7 @@ import 'widgets/shortcut_edit_dialog.dart';
 import 'l10n/app_localizations.dart';
 import 'services/sound_manager.dart';
 import 'widgets/sound_credits_dialog.dart';
+import 'widgets/font_credits_dialog.dart';
 import 'tileset_selection_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'services/font_manager.dart';
@@ -2886,18 +2887,37 @@ class _SettingsPageState extends State<SettingsPage> {
                   tooltipMessage: l10n.tilesetTapToCopy,
                 ),
                 const SizedBox(height: 16),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.music_note, color: Colors.amberAccent, size: 20),
-                  label: Text(
-                    l10n.soundCreditsButton,
-                    style: const TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.amberAccent),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  onPressed: () => SoundCreditsDialog.show(context),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: [
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.music_note, color: Colors.amberAccent, size: 20),
+                      label: Text(
+                        l10n.soundCreditsButton,
+                        style: const TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.amberAccent),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      onPressed: () => SoundCreditsDialog.show(context),
+                    ),
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.text_fields_rounded, color: Colors.amberAccent, size: 20),
+                      label: Text(
+                        l10n.fontCreditsButton,
+                        style: const TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.amberAccent),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      onPressed: () => FontCreditsDialog.show(context),
+                    ),
+                  ],
                 ),
               ],
             ),

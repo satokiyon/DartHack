@@ -369,6 +369,23 @@
   "soundCreditsPlay": "Play",
   "soundCreditsStop": "Stop",
 
+  "fontCreditsButton": "Fonts",
+  "fontCreditsDialogTitle": "Font Licenses & Credits",
+  "fontCreditsDialogDesc": "List of authors and licenses for fonts bundled with DartHack.",
+  "fontCreditsAuthor": "Author / Copyright: {name}",
+  "@fontCreditsAuthor": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "fontCreditsLicense": "License: {license}",
+  "@fontCreditsLicense": {
+    "placeholders": {
+      "license": { "type": "String" }
+    }
+  },
+  "fontCreditsCopiedUrl": "URL copied to clipboard",
+
   "editDefaultsTitle": "Edit defaults.nh",
   "saveTooltip": "Save",
   "defaultsSaved": "defaults.nh saved.",

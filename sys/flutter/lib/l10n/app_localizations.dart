@@ -2186,6 +2186,42 @@ abstract class AppLocalizations {
   /// **'停止'**
   String get soundCreditsStop;
 
+  /// No description provided for @fontCreditsButton.
+  ///
+  /// In ja, this message translates to:
+  /// **'フォント'**
+  String get fontCreditsButton;
+
+  /// No description provided for @fontCreditsDialogTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'フォント ライセンス・クレジット'**
+  String get fontCreditsDialogTitle;
+
+  /// No description provided for @fontCreditsDialogDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'DartHack に同梱されているフォントの著作者およびライセンス一覧です。'**
+  String get fontCreditsDialogDesc;
+
+  /// No description provided for @fontCreditsAuthor.
+  ///
+  /// In ja, this message translates to:
+  /// **'作者 / 著作権: {name}'**
+  String fontCreditsAuthor(String name);
+
+  /// No description provided for @fontCreditsLicense.
+  ///
+  /// In ja, this message translates to:
+  /// **'ライセンス: {license}'**
+  String fontCreditsLicense(String license);
+
+  /// No description provided for @fontCreditsCopiedUrl.
+  ///
+  /// In ja, this message translates to:
+  /// **'URLをクリップボードにコピーしました'**
+  String get fontCreditsCopiedUrl;
+
   /// No description provided for @editDefaultsTitle.
   ///
   /// In ja, this message translates to:

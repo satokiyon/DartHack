@@ -85,6 +85,70 @@ class FontManager extends ChangeNotifier {
   static const String prefFontUi = 'pref_font_ui';
   static const String prefMapAsciiScale = 'pref_map_ascii_scale';
 
+  static bool _licensesRegistered = false;
+
+  /// Flutter 標準の LicenseRegistry に同梱フォントのライセンス情報を登録
+  static void registerFontLicenses() {
+    if (_licensesRegistered) return;
+    _licensesRegistered = true;
+
+    LicenseRegistry.addLicense(() async* {
+      yield const LicenseEntryWithLineBreaks(
+        ['Noto Sans Mono CJK JP'],
+        '''SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+Copyright (c) 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+http://scripts.sil.org/OFL''',
+      );
+
+      yield const LicenseEntryWithLineBreaks(
+        ['Terminus (TTF)'],
+        '''SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+Copyright (c) 2020 Dimitar Toshkov Zhekov
+Copyright (c) 2023 Tilman Blumenbach
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+http://scripts.sil.org/OFL''',
+      );
+
+      yield const LicenseEntryWithLineBreaks(
+        ['PxPlus IBM VGA 9x16'],
+        '''Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+The Ultimate Oldschool PC Font Pack
+Outline (vector) version Copyright (c) 2020 VileR (int10h.org)
+
+You are free to:
+- Share — copy and redistribute the material in any medium or format
+- Adapt — remix, transform, and build upon the material for any purpose, even commercially.
+Under the terms of Attribution and ShareAlike.
+https://creativecommons.org/licenses/by-sa/4.0/''',
+      );
+
+      yield const LicenseEntryWithLineBreaks(
+        ['美咲ゴシック (Misaki Gothic)'],
+        '''美咲フォント (Misaki Font)
+Copyright (C) 2002-2021 門真 なむ (Num Kadoma) / Little Limit (https://littlelimit.net/)
+
+これらのフォントはフリー（自由な）ソフトウエアです。
+あらゆる改変の有無に関わらず、また商業的な利用であっても、自由にご利用、複製、再配布することができますが、全て無保証とさせていただきます。''',
+      );
+
+      yield const LicenseEntryWithLineBreaks(
+        ['Unscii 8x8'],
+        '''Unscii (unscii-8)
+Copyright (c) Ville-Matias Heikkilä (Viznut) (http://pelulamu.net/unscii/)
+
+Dedicated to the Public Domain under CC0 1.0 Universal (CC0 1.0) Public Domain Dedication.
+To the extent possible under law, the author(s) have dedicated all copyright and related
+and neighboring rights to this software to the public domain worldwide.
+http://creativecommons.org/publicdomain/zero/1.0/''',
+      );
+    });
+  }
+
   /// 内蔵フォント一覧
   static const List<FontItem> builtInFonts = [
     FontItem(
@@ -182,6 +246,7 @@ class FontManager extends ChangeNotifier {
 
   /// 初期化処理（Prefs ロード、外部フォント走査・動的登録）
   Future<void> init({AppPrefs? prefs, Directory? customFontsDir}) async {
+    registerFontLicenses();
     _prefs = prefs ?? await AppPrefs.getInstance();
 
     if (customFontsDir != null) {

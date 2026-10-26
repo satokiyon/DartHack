@@ -1097,6 +1097,28 @@ class AppLocalizationsJa extends AppLocalizations {
   String get soundCreditsStop => '停止';
 
   @override
+  String get fontCreditsButton => 'フォント';
+
+  @override
+  String get fontCreditsDialogTitle => 'フォント ライセンス・クレジット';
+
+  @override
+  String get fontCreditsDialogDesc => 'DartHack に同梱されているフォントの著作者およびライセンス一覧です。';
+
+  @override
+  String fontCreditsAuthor(String name) {
+    return '作者 / 著作権: $name';
+  }
+
+  @override
+  String fontCreditsLicense(String license) {
+    return 'ライセンス: $license';
+  }
+
+  @override
+  String get fontCreditsCopiedUrl => 'URLをクリップボードにコピーしました';
+
+  @override
   String get editDefaultsTitle => 'defaults.nh を編集';
 
   @override

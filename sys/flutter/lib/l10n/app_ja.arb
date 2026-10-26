@@ -370,6 +370,23 @@
   "soundCreditsPlay": "再生",
   "soundCreditsStop": "停止",
 
+  "fontCreditsButton": "フォント",
+  "fontCreditsDialogTitle": "フォント ライセンス・クレジット",
+  "fontCreditsDialogDesc": "DartHack に同梱されているフォントの著作者およびライセンス一覧です。",
+  "fontCreditsAuthor": "作者 / 著作権: {name}",
+  "@fontCreditsAuthor": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "fontCreditsLicense": "ライセンス: {license}",
+  "@fontCreditsLicense": {
+    "placeholders": {
+      "license": { "type": "String" }
+    }
+  },
+  "fontCreditsCopiedUrl": "URLをクリップボードにコピーしました",
+
   "editDefaultsTitle": "defaults.nh を編集",
   "saveTooltip": "保存",
   "defaultsSaved": "defaults.nh を保存しました。",
