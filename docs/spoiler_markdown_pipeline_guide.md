@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-27. -->
 # NetHack 5.0 スポイラー Markdown 整形・同期パイプライン仕様書
 
 本ドキュメントでは、NetHack 5.0 総合攻略手引書『A Traveler's Companion to the Mazes of Menace』（英語版および日本語版）の Markdown 原本（`companion.md` / `companion.jp.md`）を、アップストリームリポジトリ（`nethack-companion-jp` および `davidbau/nethack-companion`）から取り込んで DartHack 用に整形・同期・検証するための技術仕様、アーキテクチャ、処理方針、および運用手順について詳細に解説します。
@@ -96,9 +96,18 @@ flowchart TD
 
 ### 2.4 Pandoc / LaTeX / HTML 特有構文のクレンジング
 - ````{=latex} ... ````、````{=html} ... ````、`<aside> ... </aside>`、`::: ...` などの Pandoc div / raw ブロックを除去します。
+- **生 HTML・JavaScript・価格識別ツールバーの完全除去**:
+  - Web 版スポイラー専用の動的価格計算スクリプト（`<script> ... </script>`）および価格識別ツールバー（`<div class="price-id-toolbar"></div>`）を完全に除去します。
+  - アプリ内には存在しない Web ツールバー機能に言及した本文説明文（「魅力 / 売却 / 観光客 / 激怒ツールバーを使用して〜」等）を除去します。
+  - 杖一覧テーブル直後にある `<small>...</small>` タグを除去し、注記テキストを Markdown イタリック（`*...*`）に変換します。
+- **テーブルセル内 `<br>` の改行化と不要タグ防御**:
+  - Markdown テーブル仕様に基づき、セル内の改行として使われている `<br>` は Markdown 内に維持し、Flutter ビューア（`SpoilerDialog`）の `_buildRichText` 側で `\n` に変換して正しく 2 行表示（英語／日本語訳）に整形します。
+  - 同時に `SpoilerDialog` 側で未知・残存 HTML タグ（`<small>`, `<div>`, `<span>` 等）の防御的サニタイズを実施します。
 - HTML コメント（`<!-- ... -->`）や PDF ダウンロード案内を除去します。
 - 冒頭の HTML タイトル・名言ブロックは Markdown のイタリック（`*...*`）に変換します。
 - ガイドブック参照リンクは DartHack 内の正式名称「脅威の迷宮へのガイド (Guide to the Mazes of Menace)」に統一します。
+- **整形後バリデーションの義務化**:
+  - 整形処理完了後、`price-id-toolbar`, `<script`, `<div`, `<button`, `<small` 等の禁止残骸が存在しないか自動検証（`validate_markdown`）し、残存時はパイプラインをエラー停止させます。
 
 ---
 

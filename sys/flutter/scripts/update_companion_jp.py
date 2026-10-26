@@ -97,20 +97,35 @@ def format_markdown(content: str) -> str:
     html_block_pattern = r'```{=html}.*?```'
     content = re.sub(html_block_pattern, '', content, flags=re.DOTALL)
 
-    # 9. <aside> ... </aside> の除去（PDFダウンロードリンク等）
+    # 9. 生の <script> ... </script> ブロックの除去（価格計算スクリプト等）
+    script_pattern = r'<script\b[^>]*>.*?</script>'
+    content = re.sub(script_pattern, '', content, flags=re.DOTALL | re.IGNORECASE)
+
+    # 10. 生の価格識別ツールバー (<div class="price-id-toolbar"></div>) の除去
+    toolbar_div_pattern = r'<div\s+class=["\']price-id-toolbar["\'][^>]*>\s*</div>'
+    content = re.sub(toolbar_div_pattern, '', content, flags=re.IGNORECASE)
+
+    # 11. <aside> ... </aside> の除去（PDFダウンロードリンク等）
     aside_pattern = r'<aside.*?</aside>'
     content = re.sub(aside_pattern, '', content, flags=re.DOTALL)
 
-    # 10. インライン latex 構文の除去（例: `\newline`{=latex} や {=latex}）
+    # 12. <small>...</small> のタグ除去（注記テキストはイタリック化）
+    content = re.sub(r'<small>(.*?)</small>', r'*\1*', content, flags=re.DOTALL | re.IGNORECASE)
+
+    # 13. アプリ内では存在しないツールバー機能に言及した本文記述の除去
+    toolbar_mention_pattern = r'[^\n]*魅力\s*/\s*売却\s*/\s*観光客\s*/\s*激怒ツールバーを使用して[^\n]*\n?'
+    content = re.sub(toolbar_mention_pattern, '', content)
+
+    # 14. インライン latex 構文の除去（例: `\newline`{=latex} や {=latex}）
     content = re.sub(r'<br>`\\newline`\{=latex\}', '', content)
     content = re.sub(r'`\\newline`\{=latex\}', '', content)
     content = re.sub(r'\{=latex\}', '', content)
 
-    # 11. HTMLコメント <!-- ... --> の除去
+    # 15. HTMLコメント <!-- ... --> の除去
     comment_pattern = r'<!--.*?-->'
     content = re.sub(comment_pattern, '', content, flags=re.DOTALL)
 
-    # 12. Pandoc div 構文（::: dense-table, ::: web-only, ::: など）の除去
+    # 16. Pandoc div 構文（::: dense-table, ::: web-only, ::: など）の除去
     lines = content.split('\n')
     filtered_lines = []
     for line in lines:
@@ -290,6 +305,30 @@ def format_markdown(content: str) -> str:
     return '\n'.join(final_lines).strip() + '\n'
 
 
+def validate_markdown(content: str) -> None:
+    """整形後の Markdown に禁止された非Markdownゴミデータが残存していないか検証します。"""
+    forbidden_patterns = [
+        (r'price-id-toolbar', '価格ツールバーの識別子 (price-id-toolbar)'),
+        (r'<script\b', '<script> タグ'),
+        (r'</script>', '</script> タグ'),
+        (r'<div\b', '<div> タグ'),
+        (r'<button\b', '<button> タグ'),
+        (r'<small\b', '<small> タグ'),
+        (r'魅力\s*/\s*売却\s*/\s*観光客', 'ツールバー言及文'),
+    ]
+
+    errors = []
+    for pattern, name in forbidden_patterns:
+        matches = re.findall(pattern, content, flags=re.IGNORECASE)
+        if matches:
+            errors.append(f"禁止された残骸が検出されました: {name} ({len(matches)}件)")
+
+    if errors:
+        for err in errors:
+            print(f"Validation Error: {err}", file=sys.stderr)
+        raise ValueError(f"Markdown validation failed with {len(errors)} error(s).")
+
+
 def main():
     parser = argparse.ArgumentParser(description='Update and format companion.jp.md for DartHack')
     parser.add_argument('--source', '-s', type=str, default=None,
@@ -311,6 +350,9 @@ def main():
 
     print("Formatting markdown according to AGENTS.md rule 51...")
     formatted = format_markdown(raw_content)
+
+    print("Validating formatted markdown for forbidden HTML/script artifacts...")
+    validate_markdown(formatted)
 
     print(f"Writing books copy: {TARGET_BOOKS}")
     os.makedirs(os.path.dirname(TARGET_BOOKS), exist_ok=True)

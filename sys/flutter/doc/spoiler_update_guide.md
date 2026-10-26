@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-27. -->
 # NetHack 5.0 スポイラー（攻略手引書）更新手順書
 
 本ドキュメントでは、DartHack のゲーム内スポイラービューア（`SpoilerDialog`）で使用される攻略情報（`companion.md` / `companion.jp.md`）を、原本リポジトリから取り込んで整形・同期する手順および仕様について解説します。
@@ -67,10 +67,14 @@ flowchart TD
 3. **インライン SVG マップ・フローチャートの WebP 化**:
    - 原本に含まれる `<!-- DMAP-BEGIN -->` 〜 `<!-- DMAP-END -->`（SVGマップ）は、Flutter の画像アセット `![...](asset:assets/images/spoiler_dmap_*.webp)` に置換します。
    - `<!-- FLOWCHART-BEGIN -->` 〜 `<!-- FLOWCHART-END -->`（SVGフローチャート）は、`![...](asset:assets/images/spoiler_flowchart_*.webp)` に置換します。
-4. **LaTeX・Pandoc 特有構文のクレンジング**:
+4. **LaTeX・Pandoc・生HTML特有構文のクレンジング**:
    - ````{=latex} ... ````、````{=html} ... ````、`<aside> ... </aside>`、`::: ...` ブロック、および印刷専用の LaTeX 索引（`::: print-only`）を除去します。
+   - **生 HTML・JavaScript・価格識別ツールバーの完全除去**: Web版固有の `<script> ... </script>`、`<div class="price-id-toolbar"></div>`、存在しないツールバーに言及した本文説明文を完全に除去します。
+   - **<small> タグの解除**: 杖注記の `<small>...</small>` タグを除去し、注記テキストを Markdown イタリック（`*...*`）に変換します。
+   - **テーブル内 <br> の改行化**: セル内改行の `<br>` は Markdown 構造として維持し、Flutter ビューア（`SpoilerDialog`）側で `\n` に変換して正しく2行表示させます。
    - 冒頭のタイトル・名言 HTML は、イタリック Markdown（`*...*`）に変換します。
    - HTML コメント（`<!-- ... -->`）を除去します。
+   - **整形後バリデーション**: `validate_markdown()` により、禁止残骸が 0 件であることを自動検証します。
 
 ---
 

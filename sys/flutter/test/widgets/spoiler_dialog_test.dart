@@ -87,5 +87,42 @@ Elbereth
     // 検索クリア後は「1/1」が消えていること
     expect(find.text('1/1'), findsNothing);
   });
+
+  testWidgets('SpoilerDialog converts <br> to newline and sanitizes unwanted HTML tags', (tester) async {
+    const testBrMarkdown = '''
+# テスト {#test}
+
+| メッセージ | 意味 |
+| --- | --- |
+| *"You feel feverish."*<br>（熱っぽい。） | ワーベア等の感染症 |
+
+<small>注記：これはテストです。</small>
+''';
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        locale: Locale('ja'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: SpoilerDialog(
+            initialMarkdown: testBrMarkdown,
+            initialIsJp: true,
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // <br> が \n に置換されて表示されていること（生 "<br>" はテキスト内に露出しない）
+    expect(find.textContaining('<br>'), findsNothing);
+    expect(find.textContaining('*"You feel feverish."*\n（熱っぽい。）', findRichText: true), findsOneWidget);
+
+    // <small> タグがサニタイズされ、タグそのものは露出しないこと
+    expect(find.textContaining('<small>'), findsNothing);
+    expect(find.textContaining('</small>'), findsNothing);
+    expect(find.textContaining('注記：これはテストです。', findRichText: true), findsOneWidget);
+  });
 }
 

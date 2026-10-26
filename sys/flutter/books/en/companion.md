@@ -1,10 +1,8 @@
 # NetHack Spoilers {#nethack-spoilers}
 
-**A Traveler's Companion to the Mazes of Menace**
+*A Traveler's Companion to the Mazes of Menace*
 
-You feel like someone is helping you.
-
----
+*You feel like someone is helping you.*
 
 NetHack is among the oldest computer games still actively maintained, its code in continuous development for more than four decades. Its roots trace back to Rogue, a 1980 computer game by Michael Toy and Glenn Wichman that was inspired by Dungeons and Dragons. In Rogue, the dungeon was randomly generated and drawn with ordinary text characters. Your hero was an `@`, the monsters were letters, and death was permanent. Built on Ken Arnold's curses library and carried across the world inside Berkeley's BSD Unix, Rogue became the most popular game on the college campuses of its day, inspiring a whole genre of similar games called "roguelikes."
 
@@ -1800,8 +1798,6 @@ The price tables for each item class follow.
 |   200 | amnesia, create monster, earth, taming                                                                            |
 |   300 | charging, genocide, punishment, stinking cloud                                                                    |
 
-<div class="price-id-toolbar"></div>
-
 The $100 group is crowded, so its quote seldom settles an identity. A $20 scroll is identify. The $60 group contains blank paper and enchant weapon; $80 means enchant armor or remove curse. Those narrow groups are good places to spend a use-test once BUC is known.
 
 A *single* scroll sealed in a one-square niche with no door—sometimes behind iron bars—is a scroll of teleportation. It is there so that a creature teleported into the niche can leave.
@@ -1809,8 +1805,6 @@ A *single* scroll sealed in a one-square niche with no door—sometimes behind i
 ##### Spellbook Prices {#spellbook-prices}
 
 Spellbooks price at 100 × the spell's level, which makes reading risk easy to gauge: a $700 book is level 7 and will probably explode in the hands of anyone who isn't a careful Wizard.
-
-<div class="price-id-toolbar"></div>
 
 | Price | Level | Spellbooks                                                                                                                  |
 | ----- | ----- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -1821,8 +1815,6 @@ Spellbooks price at 100 × the spell's level, which makes reading risk easy to g
 |   500 | 5     | charm monster, dig, magic mapping                                                                                           |
 |   600 | 6     | create familiar, polymorph, teleport away, turn undead                                                                      |
 |   700 | 7     | cancellation, finger of death                                                                                               |
-
-<div class="price-id-toolbar"></div>
 
 ##### Potion Prices {#potion-prices}
 
@@ -1836,8 +1828,6 @@ Spellbooks price at 100 × the spell's level, which makes reading risk easy to g
 |   250 | acid, oil                                                                   |
 |   300 | gain ability, gain level, paralysis                                         |
 
-<div class="price-id-toolbar"></div>
-
 Healing sits alone at $20, uniquely identifiable from the price tag. Water is always the "clear" potion, so if you see "clear potion" you know what it is without even checking the price. The $50 group is tricky because sickness and [see invisible](#senses-and-perception) are in there together (one very good, one very bad). The $200 group is packed with excellent potions.
 
 ##### Ring Prices {#ring-prices}
@@ -1848,8 +1838,6 @@ Healing sits alone at $20, uniquely identifiable from the price tag. Water is al
 |   150 | aggravate monster, cold resistance, gain constitution, gain strength, increase accuracy, increase damage, invisibility, poison resistance, see invisible, shock resistance |
 |   200 | fire resistance, free action, levitation, regeneration, searching, slow digestion, teleportation                                                                           |
 |   300 | conflict, polymorph, polymorph control, teleport control                                                                                                                   |
-
-<div class="price-id-toolbar"></div>
 
 Only four rings cost $300, and three of them are excellent: conflict, [polymorph control](#special-and-utility), and [teleport control](#movement-and-spatial-behavior). The fourth is polymorph, which usually generates cursed.
 
@@ -1863,29 +1851,11 @@ Only four rings cost $300, and three of them are excellent: conflict, [polymorph
 |   200 | cancellation, create monster, polymorph, teleportation                                                                                                         |
 |   500 | death, wishing                                                                                                                                                 |
 
-<div class="price-id-toolbar"></div>
-
 If a wand costs $500, you are having a very good day.
 
 ##### Amulet Prices {#amulet-prices}
 
 All amulets have a base price of $150 except the cheap Amulet of Yendor imitations ($0). Price won't ID them; you'll need other methods.
-
-<script> document.addEventListener('DOMContentLoaded', function() { var toolbars = document.querySelectorAll('.price-id-toolbar'); if (!toolbars.length) return; var CHA_BUY = { 'lt5':    [2, 1], '6to7':   [3, 2], '8to10':  [4, 3], '11to15': [1, 1], '16to17': [3, 4], '18':     [2, 3], 'ge19':   [1, 2] }; var state = {cha: '11to15', sell: false, touristy: false, angry: false};
-
-// Populate each toolbar with the same compact button set. // Cha bracket on the left, then independent toggles: Sell, Tourist, Dunce. var btnHTML = '<span class="price-id-label">Cha</span>' + '<button data-group="cha" data-val="lt5">≤5</button>' + '<button data-group="cha" data-val="6to7">6-7</button>' + '<button data-group="cha" data-val="8to10">8-10</button>' + '<button data-group="cha" data-val="11to15">11-15</button>' + '<button data-group="cha" data-val="16to17">16-17</button>' + '<button data-group="cha" data-val="18">18</button>' + '<button data-group="cha" data-val="ge19">≥19</button>' + '<span class="price-id-sep">·</span>' + '<button data-group="toggle" data-val="sell">Sell</button>' + '<button data-group="toggle" data-val="touristy">Tourist</button>' + '<button data-group="toggle" data-val="angry">Angry</button>'; toolbars.forEach(function(tb) { tb.innerHTML = btnHTML; tb.classList.add('price-id-widget'); });
-
-function adj(base, m, d) { var n = base * m; if (d > 1) n = Math.floor((n * 10 / d + 5) / 10); return Math.max(1, n); } function computeBuy(base, surcharge) { // Replicates shk.c get_cost. Default Cha 11-15 no penalty: buy = base. var m = 1, d = 1; var cha = CHA_BUY[state.cha]; m *= cha[0]; d *= cha[1]; if (state.touristy) { m *= 4; d *= 3; } if (surcharge) { m *= 4; d *= 3; } var n = adj(base, m, d); // Angry-shopkeeper surcharge: added AFTER mult/div in shk.c:2986 // (tmp + (tmp + 2) / 3, ~+33%). Stacks with Tourist. Buy-side only. if (state.angry) n = n + Math.floor((n + 2) / 3); return n; } function computeSell(base, unfamiliar) { // Replicates shk.c set_cost. Default no penalty: sell = base / 2. var m = 1, d = 1; if (state.touristy) d *= 3; else d *= 2; if (unfamiliar) { m *= 3; d *= 4; } return adj(base, m, d); } function pair(n1, n2) { return n1 === n2 ? '' + n1 : n1 + '<span class="pi-alt"> / ' + n2 + '</span>'; }
-
-// Find every table whose first column header is "Price". Stash the base // price (which is what shows initially, since default state quotes buy = // base) on each row's price cell. We also tolerate "Sell" as a header // (e.g. after a previous render). var priceTables = []; document.querySelectorAll('table').forEach(function(t) { var hdrs = t.querySelectorAll('thead th'); if (!hdrs.length) return; if (!/^(Price|Sell)$/i.test(hdrs[0].textContent.trim())) return; hdrs[0].classList.add('pi-col'); t.querySelectorAll('tbody tr').forEach(function(tr) { var firstTd = tr.querySelector('td'); if (!firstTd) return; var m = firstTd.textContent.trim().match(/^\$?(\d+)/); if (!m) return; if (!firstTd.dataset.basePrice) firstTd.dataset.basePrice = m[1]; firstTd.classList.add('pi-price', 'pi-col'); }); priceTables.push(t); });
-
-function renderTables() { priceTables.forEach(function(t) { var hdr = t.querySelector('thead th.pi-col'); if (hdr) hdr.textContent = state.sell ? 'Sell' : 'Price'; t.querySelectorAll('td.pi-price').forEach(function(td) { var base = parseInt(td.dataset.basePrice, 10); if (state.sell) { td.innerHTML = pair(computeSell(base, false), computeSell(base, true)); } else { td.innerHTML = pair(computeBuy(base, false), computeBuy(base, true)); } }); }); }
-
-function syncToolbars() { toolbars.forEach(function(tb) { tb.querySelectorAll('button[data-group="cha"]').forEach(function(b) { b.classList.toggle('active', b.dataset.val === state.cha); }); tb.querySelectorAll('button[data-group="toggle"]').forEach(function(b) { b.classList.toggle('active', !!state[b.dataset.val]); }); }); }
-
-toolbars.forEach(function(tb) { tb.addEventListener('click', function(ev) { var btn = ev.target.closest('button'); if (!btn) return; var g = btn.dataset.group, v = btn.dataset.val; if (g === 'cha') state.cha = v; else state[v] = !state[v]; syncToolbars(); renderTables(); }); });
-
-syncToolbars(); renderTables(); }); </script>
 
 #### The Engrave Test (Wands) {#the-engrave-test-wands}
 
@@ -1950,8 +1920,6 @@ Prices do not shuffle. They separate the safe boots and cloaks from the cursed o
 |    50 | Cloaks   | cloak of protection or displacement                              |
 |    60 | Cloaks   | cloak of invisibility or magic resistance                        |
 
-<div class="price-id-toolbar"></div>
-
 A $30 pair of boots is the warning sign: both candidates are usually generated cursed. A $50 pair is desirable. A $60 cloak is either invisibility or magic resistance. Price cannot separate $8 elven boots from kicking boots, or the three kinds of $50 gauntlets; after a BUC test, wear them and watch the messages.
 
 #### Gray Stones: Four Stones, One Lucky {#gray-stones-four-stones-one-lucky}
@@ -1963,8 +1931,6 @@ Gray stones range from a luckstone worth carrying all game to a loadstone you ca
 |     1 | flint **or** loadstone | flint is sling ammunition; loadstone weighs 500 units, usually cursed, and won't drop once carried. Use the kick test (loadstones don't scoot). |
 |    45 | touchstone           | Identifies gems when rubbed. Very useful.  |
 |    60 | luckstone            | Preserves luck. Essential.                 |
-
-<div class="price-id-toolbar"></div>
 
 Here's how to tell them apart:
 
@@ -2329,8 +2295,6 @@ A wand's blessed-uncursed-cursed status doesn't change what it does when it work
 
 Unlike scroll and potion prices, wand prices alone rarely pin down a specific wand. A $150 wand is one of thirteen possibilities. The **engrave-test result** in the rightmost column is far more useful: most wands reveal themselves in one zap. See [The Engrave Test (Wands)](#the-engrave-test-wands) for the procedure and [Resolving Ambiguous Engrave Results](#resolving-ambiguous-engrave-results) for the few shared results.
 
-<div class="price-id-toolbar"></div>
-
 | Price | Wand | Type | Charges when found | Engrave-test result |
 | --- | --- | --- | --- | --- |
 |   100 | Light                                       | None  | 11–15 | room lights up         |
@@ -2359,9 +2323,7 @@ Unlike scroll and potion prices, wand prices alone rarely pin down a specific wa
 |   500 | [Death](#wand-death)                        | RAY   | 4–8  | bugs stop moving ²     |
 |   500 | [Wishing](#wand-wishing)                    | None  | 1  | prompts for a wish     |
 
-<small>¹ Shared by cancellation, make-invisible, and teleportation. ² Shared by sleep and death.</small>
-
-<div class="price-id-toolbar"></div>
+*¹ Shared by cancellation, make-invisible, and teleportation. ² Shared by sleep and death.*
 
 #### Key Wands {#key-wands}
 
@@ -2445,8 +2407,6 @@ You can wear two rings (one on each hand) and one amulet (around your neck). Put
 
 #### The Ring Table {#the-ring-table}
 
-<div class="price-id-toolbar"></div>
-
 | Price | Ring                           | Notes                          |
 | ----- | ------------------------------ | ------------------------------ |
 |   100 | Adornment                      | +CHA, chargeable               |
@@ -2477,8 +2437,6 @@ You can wear two rings (one on each hand) and one amulet (around your neck). Put
 |   300 | Polymorph                      | Random polymorphs (auto-curse) |
 |   300 | Polymorph control              | Choose polymorph form          |
 |   300 | [Teleport control](#ring-teleport-control) | Choose teleport destination |
-
-<div class="price-id-toolbar"></div>
 
 Rings marked "auto-curse" generate cursed 90% of the time, and a cursed ring can't be removed until you uncurse it.
 
@@ -4540,11 +4498,7 @@ Once you know what a gem is, its type determines its base price. Every gem weigh
 
 Every real gem, with its base value. An ordinary sale offer starts at about half that figure, before Charisma and other modifiers.
 
-Use the Cha/Sell/Tourist/Angry toolbar to see how the modifiers shift things.
-
 The Mohs column is real-world mineral hardness on the Mohs scale (talc 1, diamond 10), and the game uses it in two places. Gems of Mohs 8 or higher count as **"hard"**, and hard gems do two things softer gems and glass can't: they can be used as a stylus to *engrave* [Elbereth](#elbereth) and other messages permanently into the dungeon floor (instead of the temporary dust scratch a finger or soft gem leaves). If a thrown gem hits, a hard gem survives two times in three; a softer gem or piece of glass survives one time in three. Hardness doesn't affect touchstoning: every gem can be identified by a blessed touchstone regardless.
-
-<div class="price-id-toolbar"></div>
 
 | Price | Gem                   | Color           | Mohs | Notes                          |
 |------:|-----------------------|-----------------|-----:|--------------------------------|
@@ -4571,8 +4525,6 @@ The Mohs column is real-world mineral hardness on the Mohs scale (talc 1, diamon
 |   200 | Obsidian              | black           |    6 |                                |
 |   200 | Agate                 | orange          |    6 |                                |
 |     0 | (worthless glass)     | any color       |    5 | sells for 3–8 zm unidentified  |
-
-<div class="price-id-toolbar"></div>
 
 The decision is rarely "carry or drop"; it's "if I'm slot-pressed and have to thin the heap, which colors do I drop first." Black opals, emeralds, and rubies are usually keepers; agate and obsidian first to go.
 

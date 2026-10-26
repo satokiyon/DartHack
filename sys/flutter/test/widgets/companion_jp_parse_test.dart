@@ -43,6 +43,15 @@ void main() {
     // 特定アンカーが存在することを確認
     expect(availableAnchors.contains('the-gnomish-mines'), isTrue);
     expect(availableAnchors.contains('delayed-deaths'), isTrue);
+
+    // 非Markdown残骸（HTMLタグ・スクリプト・ツールバー等）が存在しないことを検証
+    expect(content.contains('price-id-toolbar'), isFalse, reason: 'price-id-toolbar must not exist');
+    expect(content.contains('<script'), isFalse, reason: '<script> must not exist');
+    expect(content.contains('</script>'), isFalse, reason: '</script> must not exist');
+    expect(content.contains('<div'), isFalse, reason: '<div> must not exist');
+    expect(content.contains('<button'), isFalse, reason: '<button> must not exist');
+    expect(content.contains('<small'), isFalse, reason: '<small> must not exist');
+    expect(content.contains('魅力 / 売却 / 観光客 / 激怒ツールバー'), isFalse, reason: 'Toolbar mention must not exist');
   });
 }
 

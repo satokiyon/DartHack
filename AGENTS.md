@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-26. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-27. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -1386,6 +1386,15 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
 3. **原本（`books/`）とアセット（`assets/`）の二重管理とバージョンインクリメント原則**:
    - `sys/flutter/books/` 配下の原本を更新した際は、必ずアプリ実行時に参照される `sys/flutter/assets/nethackdir/` 配下のアセットファイル（`companion.md`, `companion.jp.md` 等）にも内容を完全同期させてください。
    - アセット同期後は、必ず `sys/flutter/assets/ver` 内のバージョン値（整数値）をインクリメントし、端末側での上書きインストール時にキャッシュ無効化・強制再配置を保証してください。
+
+4. **アップストリーム直書き生 HTML / JavaScript / ツールバー残骸の完全除去とバリデーション原則**:
+   - アップストリーム（原本）に Web 向けとして直書きされたインライン JavaScript（`<script> ... </script>`）や価格識別ツールバー（`<div class="price-id-toolbar"></div>`）、`<small>...</small>` タグ、およびアプリ内には存在しない Web ツールバー機能に言及した本文記述は、整形パイプライン（`update_companion_*.py`）において 100% 完全に除去・クレンジングしてください。
+   - スポイラー更新スクリプトのファイル書き出し前には必ず `validate_markdown()` を実行し、禁止残骸（`price-id-toolbar`, `<script`, `<div`, `<button`, `<small`, ツールバー言及文等）が 0 件であることを自動検証し、万が一残存した場合はパイプラインをエラー終了させて不完全なファイル生成を防止してください。
+   - テストコード（`companion_jp_parse_test.dart` / `en_parse_test.dart`）においても、これらの非 Markdown 残骸が存在しないことを回帰テストとして永続的に検証してください。
+
+5. **テーブルセル内 `<br>` の改行化とビューア側の防御的サニタイズ原則**:
+   - Markdown テーブル仕様に基づき、セル内の改行として標準的に使用される `<br>` / `<br/>` は Markdown 構造として維持し、Flutter ビューア（`SpoilerDialog: _buildRichText`）側で `\n` に変換して正しく複数行（英語メッセージと日本語訳等）に折り返して表示させてください。
+   - 同時に Flutter ビューア側でも、未知・残存する不要な HTML タグ（`<small>`, `<div>`, `<span>` 等）を防御的にサニタイズ除去するフォールバック処理を実装し、画面崩れやタグ文字の露出を防止してください。
 
 ## 52. プラットフォーム別音源フォーマット分離とパッケージ最適化原則（Windows: MP3 / Android: OGG）
 

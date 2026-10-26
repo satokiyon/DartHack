@@ -905,8 +905,14 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
     final spans = <InlineSpan>[];
     final color = defaultColor ?? Colors.white.withValues(alpha: 0.88);
 
+    // テーブルセル内等の <br> / <br/> を改行 (\n) に変換
+    String processed = text.replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n');
+
+    // 未知または残存する不要な HTML タグ (<small>, </small>, <div> 等) を防御的にサニタイズ除去
+    processed = processed.replaceAll(RegExp(r'</?(?:small|div|span|button|p)\b[^>]*>', caseSensitive: false), '');
+
     // [text]{#id} を検出して text のみを表示
-    String processed = text.replaceAllMapped(RegExp(r'\[(.*?)\]\{#[a-zA-Z0-9_.-]+\}'), (m) => m.group(1)!);
+    processed = processed.replaceAllMapped(RegExp(r'\[(.*?)\]\{#[a-zA-Z0-9_.-]+\}'), (m) => m.group(1)!);
 
     // Markdown のインラインパーサー (太字 **...**, ダブルバッククォート ``...``, 等幅 `...`, リンク [...](...))
     final tokenRegex = RegExp(r'(\*\*.*?\*\*|``.+?``|`[^`\r\n]+`|\[.*?\]\(.*?\))');

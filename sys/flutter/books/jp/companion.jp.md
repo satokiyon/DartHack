@@ -1,10 +1,8 @@
 # NetHack スポイラー {#nethack-spoilers}
 
-**脅威の迷宮への旅人の手引き (A Traveler's Companion to the Mazes of Menace)**\
+*脅威の迷宮への旅人の手引き (A Traveler's Companion to the Mazes of Menace)*
 
-誰かがあなたを助けてくれているような気がする。(You feel like someone is helping you.)
-
----
+*誰かがあなたを助けてくれているような気がする。(You feel like someone is helping you.)*
 
 NetHack は、現在も活発に開発・保守が続けられている最古のコンピュータゲームの一つであり、そのコードは40年以上にわたって継続的に開発されています。そのルーツは、Michael Toy と Glenn Wichman が『ダンジョンズ＆ドラゴンズ』に着想を得て1980年に開発したゲーム『Rogue』にまで遡ります。『Rogue』では、ダンジョンはランダムに生成され、通常のテキスト文字で描かれていました。プレイヤーの主人公は `@`、モンスターはアルファベットの文字で表され、死は絶対（パーマデス）でした。Ken Arnold が開発した curses ライブラリ上に構築され、バークレーの BSD Unix に同梱されて世界中に広まった『Rogue』は、当時の大学キャンパスで最も人気のあるゲームとなり、「ローグライク (roguelike)」と呼ばれる一連の同系ゲームジャンルを生み出すきっかけとなりました。
 
@@ -1811,8 +1809,6 @@ BUCの状態は、それぞれのアイテムに固有の変化をもたらし�
 |  200 | 記憶喪失の巻物 (amnesia), 怪物を作る巻物 (create monster), 大地の巻物 (earth), 怪物を飼いならす巻物 (taming) |
 |  300 | 充填の巻物 (charging), 虐殺の巻物 (genocide), 処罰の巻物 (punishment), 悪臭雲の巻物 (stinking cloud) |
 
-<div class="price-id-toolbar"></div>
-
 100ゴールドのグループは該当アイテムが多いため、価格だけでは正体を確定できません。一方、20ゴールドの巻物は「識別の巻物」で確定します。60ゴールドのグループには「白紙の巻物」と「武器に魔法をかける巻物」しかなく、80ゴールドは「鎧に魔法をかける巻物」か「解呪の巻物」の2択です。これらの候補が絞られているグループは、BUCが判明した後に実際に読んで試す（使用テスト）のに最適な候補となります。
 
 扉のない1マスだけの狭い小部屋（時には鉄格子の奥）に密閉された **たった1枚の巻物** は、「瞬間移動の巻物」です。小部屋の中にテレポートして閉じ込められた生物が脱出できるように置かれています。
@@ -1820,8 +1816,6 @@ BUCの状態は、それぞれのアイテムに固有の変化をもたらし�
 ##### 魔法書の価格 (Spellbook Prices) {#spellbook-prices}
 
 魔法書の価格は、呪文のレベル × 100ゴールドに設定されています。そのため、読む際のリスクを容易に見極めることができます：700ゴールドの魔法書はレベル7の呪文であり、慎重な魔法使い以外の者が読めば十中八九その手の中で大爆発を起こします。
-
-<div class="price-id-toolbar"></div>
 
 | 価格 | レベル | 魔法書の種類 |
 | ---: | :---: | --- |
@@ -1832,8 +1826,6 @@ BUCの状態は、それぞれのアイテムに固有の変化をもたらし�
 |  500 | 5 | 怪物魅了 (charm monster), 穴掘り (dig), 地図化 (magic mapping) |
 |  600 | 6 | 使い魔創造 (create familiar), 変化 (polymorph), テレポート (teleport away), アンデッド退散 (turn undead) |
 |  700 | 7 | 無力化 (cancellation), 死の指 (finger of death) |
-
-<div class="price-id-toolbar"></div>
 
 ##### 薬の価格 (Potion Prices) {#potion-prices}
 
@@ -1847,8 +1839,6 @@ BUCの状態は、それぞれのアイテムに固有の変化をもたらし�
 |  250 | 酸の薬 (acid), 油の薬 (oil) |
 |  300 | 能力獲得の薬 (gain ability), レベルアップの薬 (gain level), 麻痺の薬 (paralysis) |
 
-<div class="price-id-toolbar"></div>
-
 回復の薬は20ゴールドに単独で属しているため、値札を見るだけで一意に特定できます。また、水は常に「透明な薬」の外見を持つため、価格を確認するまでもなく正体が分かります。50ゴールドのグループは要注意です。「病気の薬」と「[可視の薬](#senses-and-perception)」が同居しているためです（一方は極めて有害、もう一方は極めて有益）。200ゴールドのグループには優秀な薬がぎっしり詰まっています。
 
 ##### 指輪の価格 (Ring Prices) {#ring-prices}
@@ -1859,8 +1849,6 @@ BUCの状態は、それぞれのアイテムに固有の変化をもたらし�
 |  150 | 反感の指輪 (aggravate monster), 耐冷の指輪 (cold resistance), 体力の指輪 (gain constitution), 強さの指輪 (gain strength), 命中の指輪 (increase accuracy), 攻撃の指輪 (increase damage), 透明の指輪 (invisibility), 耐毒の指輪 (poison resistance), 可視の指輪 (see invisible), 耐電の指輪 (shock resistance) |
 |  200 | 耐炎の指輪 (fire resistance), 自由行動の指輪 (free action), 浮遊の指輪 (levitation), 回復の指輪 (regeneration), 探索の指輪 (searching), 消化不良の指輪 (slow digestion), 瞬間移動の指輪 (teleportation) |
 |  300 | 争いの指輪 (conflict), へんげの指輪 (polymorph), へんげ制御の指輪 (polymorph control), 瞬間移動制御の指輪 (teleport control) |
-
-<div class="price-id-toolbar"></div>
 
 300ゴールドの指輪は4種類しかなく、そのうち3種類は極めて優秀です：争いの指輪、[へんげ制御の指輪](#special-and-utility)、そして[瞬間移動制御の指輪](#movement-and-spatial-behavior) です。残る4つ目はへんげの指輪であり、通常は呪われた状態で生成されます。
 
@@ -1874,29 +1862,11 @@ BUCの状態は、それぞれのアイテムに固有の変化をもたらし�
 |  200 | 無力化の杖 (cancellation), 怪物を造る杖 (create monster), へんげの杖 (polymorph), 瞬間移動の杖 (teleportation) |
 |  500 | 死の杖 (death), 願いの杖 (wishing) |
 
-<div class="price-id-toolbar"></div>
-
 もし500ゴールドの杖を見つけたら、今日は最高にツイている日です。
 
 ##### 魔除けの価格 (Amulet Prices) {#amulet-prices}
 
 安物のイェンダーの魔除けのイミテーション（0ゴールド）を除き、すべての魔除けの基本価格は **150ゴールド** で統一されています。そのため、価格から魔除けの正体を識別することはできません。他の識別手段を用いる必要があります。
-
-<script>document.addEventListener('DOMContentLoaded', function() {var toolbars = document.querySelectorAll('.price-id-toolbar'); if (!toolbars.length) return; var CHA_BUY = {'lt5':    [2, 1],'6to7':   [3, 2],'8to10':  [4, 3],'11to15': [1, 1],'16to17': [3, 4],'18':     [2, 3],'ge19':   [1, 2]}; var state = {cha: '11to15', sell: false, touristy: false, angry: false};
-
-// Populate each toolbar with the same compact button set.// Cha bracket on the left, then independent toggles: Sell, Tourist, Dunce. var btnHTML ='<span class="price-id-label">魅力</span>' +'<button data-group="cha" data-val="lt5">≤5</button>' +'<button data-group="cha" data-val="6to7">6-7</button>' +'<button data-group="cha" data-val="8to10">8-10</button>' +'<button data-group="cha" data-val="11to15">11-15</button>' +'<button data-group="cha" data-val="16to17">16-17</button>' +'<button data-group="cha" data-val="18">18</button>' +'<button data-group="cha" data-val="ge19">≥19</button>' +'<span class="price-id-sep">·</span>' +'<button data-group="toggle" data-val="sell">売却</button>' +'<button data-group="toggle" data-val="touristy">カモ</button>' +'<button data-group="toggle" data-val="angry">怒り</button>'; toolbars.forEach(function(tb) {tb.innerHTML = btnHTML; tb.classList.add('price-id-widget');});
-
-function adj(base, m, d) {var n = base * m; if (d > 1) n = Math.floor((n * 10 / d + 5) / 10); return Math.max(1, n);} function computeBuy(base, surcharge) {// Replicates shk.c get_cost. Default Cha 11-15 no penalty: buy = base. var m = 1, d = 1; var cha = CHA_BUY[state.cha]; m *= cha[0]; d *= cha[1]; if (state.touristy) { m *= 4; d *= 3; } if (surcharge) { m *= 4; d *= 3; } var n = adj(base, m, d);// Angry-shopkeeper surcharge: added AFTER mult/div in shk.c:2986// (tmp + (tmp + 2) / 3, ~+33%). Stacks with Tourist. Buy-side only. if (state.angry) n = n + Math.floor((n + 2) / 3); return n;} function computeSell(base, unfamiliar) {// Replicates shk.c set_cost. Default no penalty: sell = base / 2. var m = 1, d = 1; if (state.touristy) d *= 3; else d *= 2; if (unfamiliar) { m *= 3; d *= 4; } return adj(base, m, d);} function pair(n1, n2) {return n1 === n2? '' + n1: n1 + '<span class="pi-alt"> / ' + n2 + '</span>';}
-
-// Find every table whose first column header is "Price" or "価格". Stash the base// price (which is what shows initially, since default state quotes buy =// base) on each row's price cell. We also tolerate "Sell" or "売却" as a header// (e.g. after a previous render). var priceTables = []; document.querySelectorAll('table').forEach(function(t) {var hdrs = t.querySelectorAll('thead th'); if (!hdrs.length) return; if (!/^(Price|Sell|価格|売却)$/i.test(hdrs[0].textContent.trim())) return; hdrs[0].classList.add('pi-col'); t.querySelectorAll('tbody tr').forEach(function(tr) {var firstTd = tr.querySelector('td'); if (!firstTd) return; var m = firstTd.textContent.trim().match(/^\$?(\d+)/); if (!m) return; if (!firstTd.dataset.basePrice) firstTd.dataset.basePrice = m[1]; firstTd.classList.add('pi-price', 'pi-col');}); priceTables.push(t);});
-
-function renderTables() {priceTables.forEach(function(t) {var hdr = t.querySelector('thead th.pi-col'); if (hdr) hdr.textContent = state.sell ? '売却' : '価格'; t.querySelectorAll('td.pi-price').forEach(function(td) {var base = parseInt(td.dataset.basePrice, 10); if (state.sell) {td.innerHTML = pair(computeSell(base, false), computeSell(base, true));} else {td.innerHTML = pair(computeBuy(base, false), computeBuy(base, true));}});});}
-
-function syncToolbars() {toolbars.forEach(function(tb) {tb.querySelectorAll('button[data-group="cha"]').forEach(function(b) {b.classList.toggle('active', b.dataset.val === state.cha);}); tb.querySelectorAll('button[data-group="toggle"]').forEach(function(b) {b.classList.toggle('active', !!state[b.dataset.val]);});});}
-
-toolbars.forEach(function(tb) {tb.addEventListener('click', function(ev) {var btn = ev.target.closest('button'); if (!btn) return; var g = btn.dataset.group, v = btn.dataset.val; if (g === 'cha') state.cha = v; else state[v] = !state[v]; syncToolbars(); renderTables();});});
-
-syncToolbars(); renderTables();});</script>
 
 #### 杖の試し書きテスト (The Engrave Test (Wands)) {#the-engrave-test-wands}
 
@@ -1961,8 +1931,6 @@ syncToolbars(); renderTables();});</script>
 |   50 | クローク | 守りのクローク (protection), 幻影のクローク (displacement) |
 |   60 | クローク | 透明のクローク (invisibility), 魔法を防ぐクローク (magic resistance) |
 
-<div class="price-id-toolbar"></div>
-
 30ゴールドの靴は危険信号です。どちらの候補も通常呪われて生成されます。50ゴールドの靴はどれも当たりです。60ゴールドのクロークは透明か耐魔の2択です。価格だけでは8ゴールドのエルフの靴と蹴り挙げ靴、あるいは50ゴールドの3種類の小手を区別できません。BUCをテストした上で実際に装備し、表示されるメッセージを観察してください。
 
 #### 灰色石：4つの石、幸運は1つ (Gray Stones: Four Stones, One Lucky) {#gray-stones-four-stones-one-lucky}
@@ -1974,8 +1942,6 @@ syncToolbars(); renderTables();});</script>
 |    1 | 火打ち石 (flint) **または** 重し (loadstone) | 火打ち石はスリング用の弾薬です。重しは重量が500ユニットもあり、通常呪われており、一度拾うと捨てられなくなります。蹴りテストを行ってください（重しは滑りません）。 |
 |   45 | 試金石 (touchstone) | 宝石を擦り付けると正体を識別できます。極めて有用です。 |
 |   60 | 幸せの石 (luckstone) | 幸運値を維持します。ゲームクリアに必須の至宝です。 |
-
-<div class="price-id-toolbar"></div>
 
 見分けるための手順は以下の通りです：
 
@@ -2327,8 +2293,6 @@ syncToolbars(); renderTables();});</script>
 
 各杖の基本スペックと試し書き結果を示します。未識別の杖を絞り込むための価格については [杖の価格](#wand-prices) を参照してください。右端の列にある **試し書きテスト結果** は極めて実用的であり、大半の杖は1回埃に文字を刻むだけでその正体を看破できます。具体的な手順については [杖の試し書きテスト](#the-engrave-test-wands) を、少数の重複するメッセージの判別法については [曖昧な試し書き結果の解決法](#resolving-ambiguous-engrave-results) を参照してください。
 
-<div class="price-id-toolbar"></div>
-
 | 価格 | 杖の名称 | タイプ | 発見時チャージ数 | 試し書きテスト結果 |
 | ---: | --- | :---: | :---: | --- |
 |  100 | 灯りの杖 (Light) | 無指向性 | 11–15 | 部屋が明るくなる |
@@ -2357,9 +2321,7 @@ syncToolbars(); renderTables();});</script>
 |  500 | [死の杖 (Death)](#wand-death) | 光線 | 4–8 | 虫の動きが完全に止まる ² |
 |  500 | [願いの杖 (Wishing)](#wand-wishing) | 無指向性 | 1 | 「何を願いますか？」と尋ねられる |
 
-<small>¹ 無力化、透明化、瞬間移動で共通。<br>² 眠りと死で共通。</small>
-
-<div class="price-id-toolbar"></div>
+*¹ 無力化、透明化、瞬間移動で共通。<br>² 眠りと死で共通。*
 
 #### 主要な杖 (Key Wands) {#key-wands}
 
@@ -2441,8 +2403,6 @@ syncToolbars(); renderTables();});</script>
 
 #### 指輪の一覧表 (The Ring Table) {#the-ring-table}
 
-<div class="price-id-toolbar"></div>
-
 | 価格 | 指輪の名称 | 備考 |
 | ---: | --- | --- |
 |  100 | 飾りの指輪 (Adornment) | 魅力（CHA）増大、充填可能 |
@@ -2473,8 +2433,6 @@ syncToolbars(); renderTables();});</script>
 |  300 | へんげの指輪 (Polymorph) | ランダムに変身（生成時90%呪い） |
 |  300 | へんげ制御の指輪 (Polymorph control) | 変身先のモンスターを自由に選択 |
 |  300 | [瞬間移動制御の指輪 (Teleport control)](#ring-teleport-control) | テレポート時の着地先を自由に指定 |
-
-<div class="price-id-toolbar"></div>
 
 「生成時90%呪い」と記載された指輪は、生成された時点で約90%の確率で呪われており、呪いを解くまで手から外すことができなくなります。
 
@@ -4527,11 +4485,7 @@ NetHack 5.0 では、さらに6つの追跡コンダクトが追加されまし�
 
 以下にすべての本物の宝石の基本価格を掲載します。通常の売却時の買取提示額は、魅力補正や各種修正が入る前の段階で、基本価格のおよそ半分から始まります。
 
-魅力 / 売却 / 観光客 / 激怒ツールバーを使用して、各種補正による価格変動を確認できます。
-
 「モース」列は、現実の鉱物硬度（滑石 1、ダイヤモンド 10）を表すモース硬度であり、ゲーム内でも2つの重要な判定に使われます。モース硬度 8 以上の宝石は **「硬い (hard)」** とみなされ、柔らかい宝石やガラス玉には不可能な2つの特性を持ちます：床に [エルベレス](#elbereth) などの文字を刻む際、指先や柔らかい宝石のような一時的な埃の落書きではなく、**永久的な刻み文字** として刻み込むスタイラス（鉄筆）として機能します。また、投げた宝石が命中した際、硬い宝石なら 3回中2回 は壊れずに残ります（柔らかい宝石やガラス玉は 3回中1回 しか残りません）。なお硬度は試金石による識別には影響せず、あらゆる宝石が祝福された試金石で識別可能です。
-
-<div class="price-id-toolbar"></div>
 
 | 基本価格 | 宝石名 | 色 | モース硬度 | 特記事項 |
 |------:|-----------------------|-----------------|-----:|--------------------------------|
@@ -4558,8 +4512,6 @@ NetHack 5.0 では、さらに6つの追跡コンダクトが追加されまし�
 |   200 | 黒燿石 (obsidian) | 黒色 |    6 | |
 |   200 | めのう (agate) | 橙色 |    6 | |
 |     0 | (模造宝石 / ガラス玉) | 任意の色 |    5 | 未識別時は 3〜8 zm で売却 |
-
-<div class="price-id-toolbar"></div>
 
 持ち歩くか捨てるかの判断は、「所持枠が逼迫した際、どの色から優先して間引くか」という点に集約されます。ブラックオパール、エメラルド、ルビーは常に確保すべきであり、瑪瑙や黒曜石は真っ先に捨てる候補となります。
 
