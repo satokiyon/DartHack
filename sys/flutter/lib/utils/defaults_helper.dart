@@ -32,6 +32,25 @@ class DefaultsHelper {
     'roguesymset',
   };
 
+  /// NetHack 5.0 symbols で定義されている有効な通常階層用シンボルセット名
+  static const Set<String> validSymsets = {
+    'Default',
+    'IBMGraphics_1',
+    'IBMGraphics_2',
+    'DECgraphics',
+    'MACgraphics',
+    'Enhanced1',
+    'Enhanced2',
+  };
+
+  /// NetHack 5.0 symbols で定義されている有効なローグ階層用シンボルセット名 (Restrictions: rogue)
+  static const Set<String> validRogueSymsets = {
+    'Default',
+    'RogueIBM',
+    'RogueEpyx',
+    'RogueWindows',
+  };
+
   static const String managedHeaderComment = '# *** Managed Options by Settings ***';
 
   /// defaults.nh 内の管理対象オプション保持用マップ
@@ -315,12 +334,18 @@ class DefaultsHelper {
           } else if (t == 'DECgraphics' || t == 'IBMgraphics' || key == 'symset') {
             handledKeys.add('symset');
             lineModified = true;
-            final targetSymset = _options['symset'] ?? 'IBMGraphics_2';
+            var targetSymset = _options['symset'] ?? 'IBMGraphics_2';
+            if (!validSymsets.contains(targetSymset)) {
+              targetSymset = 'IBMGraphics_2';
+            }
             updatedTokens.add('symset:$targetSymset');
           } else if (key == 'roguesymset') {
             handledKeys.add('roguesymset');
             lineModified = true;
-            final targetRogue = _options['roguesymset'] ?? 'RogueEpyx';
+            var targetRogue = _options['roguesymset'] ?? 'Default';
+            if (!validRogueSymsets.contains(targetRogue)) {
+              targetRogue = 'Default';
+            }
             updatedTokens.add('roguesymset:$targetRogue');
           } else {
             updatedTokens.add(t);
@@ -372,14 +397,20 @@ class DefaultsHelper {
     });
 
     if (!handledKeys.contains('symset')) {
-      final targetSymset = _options['symset'] ?? 'IBMGraphics_2';
+      var targetSymset = _options['symset'] ?? 'IBMGraphics_2';
+      if (!validSymsets.contains(targetSymset)) {
+        targetSymset = 'IBMGraphics_2';
+      }
       pendingLines.add('OPTIONS=symset:$targetSymset');
       handledKeys.add('symset');
     }
     if (!handledKeys.contains('roguesymset') && _options.containsKey('roguesymset')) {
-      final targetRogue = _options['roguesymset']!;
-      if (targetRogue.trim().isNotEmpty) {
-        pendingLines.add('OPTIONS=roguesymset:${targetRogue.trim()}');
+      var targetRogue = _options['roguesymset']!.trim();
+      if (!validRogueSymsets.contains(targetRogue)) {
+        targetRogue = 'Default';
+      }
+      if (targetRogue.isNotEmpty) {
+        pendingLines.add('OPTIONS=roguesymset:$targetRogue');
         handledKeys.add('roguesymset');
       }
     }
@@ -626,11 +657,21 @@ class DefaultsHelper {
 
     final prefSymset = prefs.getString('nh_opt_symset');
     if (prefSymset != null && prefSymset.isNotEmpty) {
-      setOption('symset', prefSymset);
+      if (validSymsets.contains(prefSymset)) {
+        setOption('symset', prefSymset);
+      } else {
+        setOption('symset', 'IBMGraphics_2');
+        await prefs.setString('nh_opt_symset', 'IBMGraphics_2');
+      }
     }
     final prefRogue = prefs.getString('nh_opt_roguesymset');
     if (prefRogue != null && prefRogue.isNotEmpty) {
-      setOption('roguesymset', prefRogue);
+      if (validRogueSymsets.contains(prefRogue)) {
+        setOption('roguesymset', prefRogue);
+      } else {
+        setOption('roguesymset', 'Default');
+        await prefs.setString('nh_opt_roguesymset', 'Default');
+      }
     }
 
     await saveToFile(filePath);
@@ -708,13 +749,13 @@ class DefaultsHelper {
           }
         } else if (optKey == 'symset') {
           final currentVal = prefs.getString(prefKey);
-          if (currentVal == null || currentVal.isEmpty) {
-            await prefs.setString(prefKey, assetDefaultVal ?? 'IBMGraphics_2');
+          if (currentVal == null || currentVal.isEmpty || !validSymsets.contains(currentVal)) {
+            await prefs.setString(prefKey, (assetDefaultVal != null && validSymsets.contains(assetDefaultVal)) ? assetDefaultVal : 'IBMGraphics_2');
           }
         } else if (optKey == 'roguesymset') {
           final currentVal = prefs.getString(prefKey);
-          if (currentVal == null || currentVal.isEmpty) {
-            await prefs.setString(prefKey, assetDefaultVal ?? 'RogueEpyx');
+          if (currentVal == null || currentVal.isEmpty || !validRogueSymsets.contains(currentVal)) {
+            await prefs.setString(prefKey, (assetDefaultVal != null && validRogueSymsets.contains(assetDefaultVal)) ? assetDefaultVal : 'Default');
           }
         }
       }

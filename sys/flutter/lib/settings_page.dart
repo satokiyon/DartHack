@@ -254,7 +254,13 @@ class _SettingsPageState extends State<SettingsPage> {
       _selectedLanguage = prefs.getString('selected_language') ?? 'ja';
       _selectedTileset = prefs.getString('selected_tileset') ?? 'pixelhack_32x32';
       _selectedSymset = prefs.getString('nh_opt_symset') ?? 'IBMGraphics_2';
+      if (!_availableSymsets.contains(_selectedSymset)) {
+        _selectedSymset = 'IBMGraphics_2';
+      }
       _selectedRogueSymset = prefs.getString('nh_opt_roguesymset') ?? 'Default';
+      if (!_availableRogueSymsets.contains(_selectedRogueSymset)) {
+        _selectedRogueSymset = 'Default';
+      }
       _controllerMode = prefs.getString('controller_mode') ?? 'pad';
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
       final tombstoneModeRaw = prefs.getInt('tombstone_display_mode');
@@ -768,7 +774,7 @@ class _SettingsPageState extends State<SettingsPage> {
     'Default',
     'RogueIBM',
     'RogueEpyx',
-    'RogueUnicode',
+    'RogueWindows',
   ];
 
   /// フォント設定セクション

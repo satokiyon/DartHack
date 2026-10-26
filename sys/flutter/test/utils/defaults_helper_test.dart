@@ -366,4 +366,29 @@ OPTIONS=symset:Enhanced1,runmode:walk
     expect(savedContent.contains('symset:Enhanced1'), isTrue);
     expect(savedContent.contains('runmode:walk'), isTrue);
   });
+
+  test('無効な roguesymset (RogueUnicode 等) が Default に安全にサニタイズ・修復されることの検証', () async {
+    final initialContent = '''
+OPTIONS=name:satok
+OPTIONS=roguesymset:RogueUnicode
+''';
+    final file = File(testFilePath);
+    await file.writeAsString(initialContent);
+
+    await AppPrefs.setMockInitialValues({
+      'nh_opt_roguesymset': 'RogueUnicode',
+    });
+
+    final helper = DefaultsHelper();
+    await helper.syncFromPrefsToFile(testFilePath);
+
+    final savedContent = await file.readAsString();
+    // RogueUnicode が消去され、安全な Default に修復されていること
+    expect(savedContent.contains('RogueUnicode'), isFalse);
+    expect(savedContent.contains('roguesymset:Default'), isTrue);
+
+    // AppPrefs 側も Default に修復されていること
+    final prefs = await AppPrefs.getInstance();
+    expect(prefs.getString('nh_opt_roguesymset'), equals('Default'));
+  });
 }

@@ -32,6 +32,8 @@
      - 7.2.2 [画面バッファ全破棄 (clear_glyph_buffer) と即時再描画](#722-画面バッファ全破棄-clear_glyph_buffer-と即時再描画)
      - 7.2.3 [utf8map.c における SEGV クラッシュ防止ガード (details_end)](#723-utf8mapc-における-segv-クラッシュ防止ガード-details_end)
    - 7.3 [設定画面で選択可能なシンボルセット一覧](#73-設定画面で選択可能なシンボルセット一覧)
+   - 7.4 [セーブデータ復元 (restore.c: dorecover) における symset 再バインド原則](#74-セーブデータ復元-restorec-dorecover-における-symset-再バインド原則)
+   - 7.5 [通常階層と特殊ダンジョン（ノームの鉱山の街等）における壁・地形シンボルの構造的差異](#75-通常階層と特殊ダンジョンノームの鉱山の街等における壁地形シンボルの構造的差異)
 8. [フォントの追加手順](#8-フォントの追加手順)
    - 8.1 [【開発者向け】プロジェクトへの新規内蔵フォント追加手順](#81-開発者向けプロジェクトへの新規内蔵フォント追加手順)
    - 8.2 [【ユーザー向け】設定画面からの外部フォントインポート手順](#82-ユーザー向け設定画面からの外部フォントインポート手順)
@@ -40,6 +42,8 @@
    - 9.1 [Windows FakeAsync テスト環境における runAsync 必須ルール](#91-windows-fakeasync-テスト環境における-runasync-必須ルール)
    - 9.2 [Cコア 40バイト文字列オプション制限と SharedPreferences 専管化](#92-cコア-40バイト文字列オプション制限と-sharedpreferences-専管化)
    - 9.3 [winflutter.c における glyphmap 外部宣言 (extern) 必須ルール](#93-winflutterc-における-glyphmap-外部宣言-extern-必須ルール)
+   - 9.4 [セーブデータ復元時のマップ配列上書き禁止（ネタバレ・Fog of War 破壊防止）原則](#94-セーブデータ復元時のマップ配列上書き禁止ネタバレfog-of-war-破壊防止原則)
+   - 9.5 [日英両 Cコア (nethack_jp / nethack_en) における restore.c 同期原則](#95-日英両-cコア-nethack_jp--nethack_en-における-restorec-同期原則)
 
 ---
 
@@ -333,7 +337,49 @@ NetHack 5.0 Cコアの `dat/symbols` に基づき、設定画面から以下の�
 | `Default` | オリジナル Rogue スタイル（英数字主体のクラシック表示） |
 | `RogueIBM` | IBM PC 版 Rogue 互換シンボル |
 | `RogueEpyx` | Epyx 版 Rogue 互換シンボル（デフォルト推奨） |
-| `RogueUnicode` | Unicode 罫線を用いたモダンなローグ階層表示 |
+| `RogueWindows` | MS-Windows コンソール用 Rogue 互換シンボル |
+
+### 7.4 セーブデータ復元 (restore.c: dorecover) における symset 再バインド原則
+
+#### 課題と現象
+`OPTIONS=symset:Enhanced2` に設定した状態で「新規ゲーム」を開始すると、壁は期待通り二重線（`║`, `═`, `╔` 等）で美しく描画されます。しかし、**過去のセーブデータをロード（復元）すると、壁が一重のアスキー文字（`|`, `-`）にフォールバックして描画される** 現象が発生していました。
+
+#### 原因の深層分析
+1. **新規ゲーム時の処理パス (`allmain.c: newgame()`)**:
+   - 起動時の `initoptions_finish()` において、`apply_customizations(gc.currentgraphics, ...)` が呼び出される。
+   - その後、新規レベル生成（`mklev()`）から画面初期描画（`docrt()`）へ進むため、`glyphmap` の UTF-8 グリフ定義が正常に有効化される。
+2. **セーブデータロード時の処理パス (`restore.c: dorecover()`)**:
+   - セーブデータを展開して階層データをロードした後、ローグレベルか否かの判定（`if (Is_rogue_level(&u.uz)) assign_graphics(ROGUESET);`）と `reset_glyphmap(gm_levelchange);` が実行される。
+   - しかし、**通常階層用の `assign_graphics(PRIMARYSET);` がスキップ** され、かつ **`apply_customizations()` が一度も呼ばれないまま画面描画 (`docrt()`) に遷移していた**。
+   - この結果、`glyphmap[glyph].u` に Unicode 文字列がバインドされず、内部でデフォルトのアスキー文字（一重線）へフォールバックしていた。
+
+#### 実装解決策
+[`restore.c: dorecover()`](file:///c:/Users/satok/DartHack/c_core/nethack_jp/src/restore.c#L960-L974) において、ローグレベル判定に `else` 節を追加して通常階層用の `assign_graphics(PRIMARYSET)` を確実に呼び出し、直後に `apply_customizations()` を明示的に実行する設計を導入しました：
+
+```c
+    if (Is_rogue_level(&u.uz))
+        assign_graphics(ROGUESET);
+    else
+        assign_graphics(PRIMARYSET);
+    reset_glyphmap(gm_levelchange);
+    apply_customizations(gc.currentgraphics,
+                         (do_custom_symbols | do_custom_colors));
+    max_rank_sz(); /* to recompute gm.mrank_sz (botl.c) */
+```
+
+NetHack のマップ配列（`levl[x][y].glyph`）に記録されている値は、シンボルセットに依存しない静的整数値（不変インデックス）です。そのため、セーブファイルのバイナリ構造には一切手を触れず、メモリ上の `glyphmap`（表示定義）を最新のシンボルセットへ再バインドするだけで、既存セーブデータであっても完全かつ安全に二重線壁や最新地形シンボルが即時反映されます。
+
+### 7.5 通常階層と特殊ダンジョン（ノームの鉱山の街等）における壁・地形シンボルの構造的差異
+
+NetHack において、ダンジョンの種類や階層仕様によって壁や地形の描画体系は大きく異なります。
+
+1. **運命の大迷宮（通常ダンジョン）**:
+   - 矩形の部屋（`ROOM`）と直線通路（`CORR`）で構成され、部屋の境界は `HWALL`（水平壁）、`VWALL`（垂直壁）、`TLCORNER`（左上角）、`TRCORNER`（右上角）、`CRWALL`（交差壁）などの **正規の「壁（Walls）」** で構築されます。
+   - `Enhanced2` ではこれらすべてが二重線（`═`, `║`, `╔`, `╗`, `╬` 等）にマッピングされるため、部屋全体が整然とした二重線で描画されます。
+2. **ノームの鉱山（The Gnomish Mines）および鉱山の街（Minetown）**:
+   - ダンジョン生成仕様が `style="mines"` / `minefill` による「不規則な掘削洞窟（Cavern）」として生成されます。
+   - 洞窟の輪郭（外壁・未掘削領域）は、NetHack の内部データとしては壁ではなく **「岩盤（`STONE`）」** や通路（`CORR`）です。
+   - さらに、鉱山の街には 7種類のバリアント（`minetn-1.lua` 〜 `minetn-7.lua`）が存在し、バリケードとして鉄格子（`iron bars` / `S_bars`）が多用されている階層や、自動壁整形（`wallification`）が局所的に制限されている階層があり、通常の迷宮のような整形式の二重線部屋とは異なる風情の描画になります。
 
 ---
 
@@ -436,3 +482,19 @@ NetHack Cコアの `OPTIONS=` パーサー（`src/options.c`）における文�
 
 NetHack コアのグリフ管理配列 `glyph_map glyphmap[MAX_GLYPH]` は `display.c` 等で実体が定義されていますが、共通ヘッダー `extern.h` には含まれていません。
 移植層（`winflutter.c`）から `glyphmap` を参照して UTF-8 グリフを直接取得する際は、必ずファイル先頭付近に `extern glyph_map glyphmap[MAX_GLYPH];` を宣言してください。これが欠落すると、Android NDK (Clang) 等のネイティブビルド時に `use of undeclared identifier 'glyphmap'` エラーでコンパイルが停止します。
+
+### 9.4 セーブデータ復元時のマップ配列上書き禁止（ネタバレ・Fog of War 破壊防止）原則
+
+セーブデータ復元時に最新のシンボルセットを反映させる手段として、「マップ全域の `levl[x][y].glyph` を現在の真の地形（`typ`）から `back_to_glyph(x, y)` で再計算して強制上書きする」というアプローチが考えられますが、**これは絶対に採用してはなりません**。
+
+- **理由**:
+  1. プレイヤーが未訪問・視界外のエリアで、モンスターが掘削した壁や破壊したドアなどの動的地形変化は、プレイヤーが再訪して直接視認するまで過去の記憶グリフ（Fog of War / 戦場の霧）が維持されるべき仕様です。
+  2. `back_to_glyph(x, y)` で全マスを強制上書きすると、未訪問エリアの最新の真の地形が地図上に露出してしまい、**重大なネタバレ（情報漏洩）** を引き起こします。
+- **正解**:
+  `levl[x][y].glyph` には一切触れず、不変のグリフ番号に対する表示定義（`glyphmap[glyph].u`）のみを `assign_graphics()` および `apply_customizations()` で最新シンボルセットへ再バインドしてください。これにより、戦場の霧（Fog of War）を完全に保護しながら最新の見た目を反映できます。
+
+### 9.5 日英両 Cコア (nethack_jp / nethack_en) における restore.c 同期原則
+
+DartHack では、日本語モード時は `c_core/nethack_jp`、英語モード時は `c_core/nethack_en` と C コア自体が別々にビルド・切り替えられます。
+セーブデータ復元処理（`restore.c: dorecover()`）の `assign_graphics` / `apply_customizations` 呼び出し修正は、**必ず `c_core/nethack_jp/src/restore.c` と `c_core/nethack_en/src/restore.c` の両方に同時に適用・維持** してください。
+片方のみに適用した場合、他方の言語モードでセーブデータをロードした際に再びシンボルセットがフォールバックする非対称バグが発生します。
