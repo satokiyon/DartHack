@@ -838,6 +838,24 @@ class AppLocalizationsJa extends AppLocalizations {
   String get numPadGerman => '-1: ドイツ語配列';
 
   @override
+  String get runmodeTitle => '走行時マップ更新 (runmode)';
+
+  @override
+  String get runmodeSub => '長距離移動や走行時のマップ画面更新頻度を設定します';
+
+  @override
+  String get runmodeWalk => '歩く (walk: 毎歩更新)';
+
+  @override
+  String get runmodeRun => '走る (run: 7歩ごと)';
+
+  @override
+  String get runmodeCrawl => '這う (crawl: 低速)';
+
+  @override
+  String get runmodeTeleport => 'テレポート (teleport: 完了時のみ)';
+
+  @override
   String get autopickupSub => '足元のアイテムを自動的に拾います';
 
   @override

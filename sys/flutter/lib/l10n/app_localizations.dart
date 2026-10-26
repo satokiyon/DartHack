@@ -1706,6 +1706,42 @@ abstract class AppLocalizations {
   /// **'-1: ドイツ語配列'**
   String get numPadGerman;
 
+  /// No description provided for @runmodeTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'走行時マップ更新 (runmode)'**
+  String get runmodeTitle;
+
+  /// No description provided for @runmodeSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'長距離移動や走行時のマップ画面更新頻度を設定します'**
+  String get runmodeSub;
+
+  /// No description provided for @runmodeWalk.
+  ///
+  /// In ja, this message translates to:
+  /// **'歩く (walk: 毎歩更新)'**
+  String get runmodeWalk;
+
+  /// No description provided for @runmodeRun.
+  ///
+  /// In ja, this message translates to:
+  /// **'走る (run: 7歩ごと)'**
+  String get runmodeRun;
+
+  /// No description provided for @runmodeCrawl.
+  ///
+  /// In ja, this message translates to:
+  /// **'這う (crawl: 低速)'**
+  String get runmodeCrawl;
+
+  /// No description provided for @runmodeTeleport.
+  ///
+  /// In ja, this message translates to:
+  /// **'テレポート (teleport: 完了時のみ)'**
+  String get runmodeTeleport;
+
   /// No description provided for @autopickupSub.
   ///
   /// In ja, this message translates to:

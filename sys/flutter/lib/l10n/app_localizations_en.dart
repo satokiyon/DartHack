@@ -848,6 +848,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get numPadGerman => '-1: German Layout';
 
   @override
+  String get runmodeTitle => 'Run Mode (runmode)';
+
+  @override
+  String get runmodeSub =>
+      'Controls map update frequency during running or multi-step travel';
+
+  @override
+  String get runmodeWalk => 'walk (every step)';
+
+  @override
+  String get runmodeRun => 'run (every 7 steps)';
+
+  @override
+  String get runmodeCrawl => 'crawl (slow step)';
+
+  @override
+  String get runmodeTeleport => 'teleport (at destination)';
+
+  @override
   String get autopickupSub => 'Automatically pick up items underfoot';
 
   @override

@@ -95,6 +95,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String _optHorsename = '';
   String _optFruit = '';
   int _optNumberPad = 0;
+  String _optRunmode = 'walk';
 
   // ハードモード・縛りプレイオプション (defaults.nh 連動)
   bool _optBlind = false;
@@ -337,6 +338,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _optHorsename = prefs.getString('nh_opt_horsename') ?? '';
       _optFruit = prefs.getString('nh_opt_fruit') ?? '';
       _optNumberPad = prefs.getInt('nh_opt_number_pad') ?? 0;
+      _optRunmode = prefs.getString('nh_opt_runmode') ?? 'walk';
       _optBlind = prefs.getBool('nh_opt_blind') ?? false;
       _optNudist = prefs.getBool('nh_opt_nudist') ?? false;
       _optDeaf = prefs.getBool('nh_opt_deaf') ?? false;
@@ -2478,6 +2480,23 @@ class _SettingsPageState extends State<SettingsPage> {
               if (val != null) {
                 setState(() => _optNumberPad = val);
                 _saveGameOption('nh_opt_number_pad', val);
+              }
+            },
+          ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.runmodeTitle,
+            description: l10n.runmodeSub,
+            value: _optRunmode,
+            items: [
+              DropdownMenuItem(value: 'walk', child: Text(l10n.runmodeWalk)),
+              DropdownMenuItem(value: 'run', child: Text(l10n.runmodeRun)),
+              DropdownMenuItem(value: 'crawl', child: Text(l10n.runmodeCrawl)),
+              DropdownMenuItem(value: 'teleport', child: Text(l10n.runmodeTeleport)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _optRunmode = val);
+                _saveGameOption('nh_opt_runmode', val);
               }
             },
           ),

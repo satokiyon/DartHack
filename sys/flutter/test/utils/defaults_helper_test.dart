@@ -391,4 +391,45 @@ OPTIONS=roguesymset:RogueUnicode
     final prefs = await AppPrefs.getInstance();
     expect(prefs.getString('nh_opt_roguesymset'), equals('Default'));
   });
+
+  test('OPTIONS=runmode のパース、AppPrefs同期、および複合行でのインプレース更新の検証', () async {
+    final initialContent = '''
+OPTIONS=symset:IBMGraphics_2,runmode:walk
+OPTIONS=boulder:0
+''';
+    final file = File(testFilePath);
+    await file.writeAsString(initialContent);
+
+    await AppPrefs.setMockInitialValues({});
+
+    final helper = DefaultsHelper();
+    await helper.syncFromFileToPrefs(testFilePath);
+    final prefs = await AppPrefs.getInstance();
+
+    // 1. defaults.nh から walk が読み込まれること
+    expect(prefs.getString('nh_opt_runmode'), equals('walk'));
+
+    // 2. run に変更して defaults.nh に反映
+    await prefs.setString('nh_opt_runmode', 'run');
+    await helper.syncFromPrefsToFile(testFilePath);
+
+    var savedContent = await file.readAsString();
+    expect(savedContent.contains('OPTIONS=symset:IBMGraphics_2, runmode:run'), isTrue);
+    expect(savedContent.contains('runmode:walk'), isFalse);
+
+    // 3. teleport に変更
+    await prefs.setString('nh_opt_runmode', 'teleport');
+    await helper.syncFromPrefsToFile(testFilePath);
+
+    savedContent = await file.readAsString();
+    expect(savedContent.contains('OPTIONS=symset:IBMGraphics_2, runmode:teleport'), isTrue);
+
+    // 4. 不正な値が入った場合のサニタイズ（walk へのフォールバック）
+    await prefs.setString('nh_opt_runmode', 'invalid_mode');
+    await helper.syncFromPrefsToFile(testFilePath);
+
+    savedContent = await file.readAsString();
+    expect(savedContent.contains('OPTIONS=symset:IBMGraphics_2, runmode:walk'), isTrue);
+    expect(prefs.getString('nh_opt_runmode'), equals('walk'));
+  });
 }

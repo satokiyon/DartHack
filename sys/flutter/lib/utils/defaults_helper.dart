@@ -30,6 +30,7 @@ class DefaultsHelper {
     'bones',
     'symset',
     'roguesymset',
+    'runmode',
   };
 
   /// NetHack 5.0 symbols で定義されている有効な通常階層用シンボルセット名
@@ -575,6 +576,14 @@ class DefaultsHelper {
     } else if (!prefs.containsKey('nh_opt_roguesymset')) {
       await prefs.setString('nh_opt_roguesymset', 'RogueEpyx');
     }
+
+    // 走行時マップ更新 (runmode): デフォルト walk
+    final runmodeVal = getOption('runmode');
+    if (runmodeVal != null && runmodeVal.isNotEmpty) {
+      await prefs.setString('nh_opt_runmode', runmodeVal);
+    } else if (!prefs.containsKey('nh_opt_runmode')) {
+      await prefs.setString('nh_opt_runmode', 'walk');
+    }
   }
 
   /// SharedPreferences の現在値を defaults.nh ファイルに反映保存する
@@ -674,6 +683,17 @@ class DefaultsHelper {
       }
     }
 
+    final prefRunmode = prefs.getString('nh_opt_runmode');
+    if (prefRunmode != null && prefRunmode.isNotEmpty) {
+      const validRunmodes = {'walk', 'run', 'crawl', 'teleport'};
+      if (validRunmodes.contains(prefRunmode)) {
+        setOption('runmode', prefRunmode);
+      } else {
+        setOption('runmode', 'walk');
+        await prefs.setString('nh_opt_runmode', 'walk');
+      }
+    }
+
     await saveToFile(filePath);
   }
 
@@ -712,13 +732,16 @@ class DefaultsHelper {
           if (optKey == 'number_pad' || optKey == 'tutorial_mode') {
             final int iVal = int.tryParse(defaultVal) ?? 0;
             await prefs.setInt(prefKey, iVal);
-          } else if (optKey == 'name' || optKey == 'pickup_types' || optKey == 'dogname' || optKey == 'catname' || optKey == 'horsename' || optKey == 'fruit' || optKey == 'symset' || optKey == 'roguesymset') {
+          } else if (optKey == 'name' || optKey == 'pickup_types' || optKey == 'dogname' || optKey == 'catname' || optKey == 'horsename' || optKey == 'fruit' || optKey == 'symset' || optKey == 'roguesymset' || optKey == 'runmode') {
             await prefs.setString(prefKey, defaultVal);
           } else {
             final bool bVal = defaultVal.toLowerCase() == 'true';
             await prefs.setBool(prefKey, bVal);
           }
           debugPrint("DefaultsHelper: Added new option '$prefKey' = $defaultVal");
+        } else if (optKey == 'runmode') {
+          await prefs.setString(prefKey, 'walk');
+          debugPrint("DefaultsHelper: Added default option '$prefKey' = walk");
         } else if (optKey == 'bones') {
           await prefs.setBool(prefKey, true);
           debugPrint("DefaultsHelper: Added default option '$prefKey' = true");
@@ -756,6 +779,12 @@ class DefaultsHelper {
           final currentVal = prefs.getString(prefKey);
           if (currentVal == null || currentVal.isEmpty || !validRogueSymsets.contains(currentVal)) {
             await prefs.setString(prefKey, (assetDefaultVal != null && validRogueSymsets.contains(assetDefaultVal)) ? assetDefaultVal : 'Default');
+          }
+        } else if (optKey == 'runmode') {
+          final currentVal = prefs.getString(prefKey);
+          const validRunmodes = {'walk', 'run', 'crawl', 'teleport'};
+          if (currentVal == null || !validRunmodes.contains(currentVal)) {
+            await prefs.setString(prefKey, (assetDefaultVal != null && validRunmodes.contains(assetDefaultVal)) ? assetDefaultVal : 'walk');
           }
         }
       }
