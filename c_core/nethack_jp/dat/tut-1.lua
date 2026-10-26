@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-19.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-27.
 
 local tut_ctrl_key = nil;
 local tut_alt_key = nil;
@@ -303,6 +303,7 @@ des.trap({ type = "magic portal", coord = { 66,2 }, seen = true });
 -- squeezing through small gaps
 
 des.engraving({ coord = { 69,12 }, type = "burn", text = "通れない? 荷物を持ちすぎている.", degrade = false });
+des.engraving({ coord = { 70,13 }, type = "burn", text = "一度に複数のアイテムを落とすには '" .. tut_key("droptype") .. "' を使う", degrade = false });
 
 -- try to squeeze over boulders, find a trap door
 
