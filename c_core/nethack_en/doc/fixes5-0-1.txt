@@ -98,6 +98,8 @@ fix level gain maxhp change when polymorphed
 make #wizlevelteleport accept special level proto name
 add meat theme room
 fix tknown handling for boxes known not to be trapped
+change the monk quest locate level
+fix travel using up turns trying to displace pet that cannot move
 
 
 Platform- and/or Interface-Specific Fixes
@@ -307,6 +309,9 @@ NetHack Community Patches (or Variation) Included
 NCURSES_CFLAGS was being ignored when using hints/linux.500 with only
 	WANT_WIN_TTY=1 and not WANT_WIN_CURSES=1  (pr #1522 by torakoya)
 added a hints file netbsd.500 for NetBSD (pr #1519 by SirWumpus)
+rewrite of the Tourist quest text for more Pratchetty feel
+	(pr #1596 by robindouglasjohnson)
+
 
 
 Code Cleanup and Reorganization
