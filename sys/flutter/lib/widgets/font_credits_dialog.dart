@@ -50,7 +50,7 @@ class FontCreditsData {
     FontCreditEntry(
       id: 'Terminus',
       name: 'Terminus (TTF)',
-      fileName: 'TerminusTTF-Regular.ttf, TerminusTTF-Bold.ttf',
+      fileName: 'TerminusTTF-Regular.ttf',
       author: 'Copyright (C) 2020 Dimitar Toshkov Zhekov / TTF版: Copyright (C) 2023 Tilman Blumenbach',
       authorEn: 'Copyright (C) 2020 Dimitar Toshkov Zhekov / TTF version: Copyright (C) 2023 Tilman Blumenbach',
       license: 'SIL Open Font License 1.1',

@@ -60,42 +60,42 @@ void main() {
 
       final items = [
         MenuItemData(
-          glyph: 0,
           ident: 0,
           accelerator: 0,
-          groupAccel: 0,
+          groupacc: 0,
           attr: 1, // Heading
           text: '呪文名\tレベル\t系統\t失敗率\t記憶',
+          preselected: 0,
           color: 0,
           tile: -1,
         ),
         MenuItemData(
-          glyph: 0,
           ident: 1,
           accelerator: 97, // 'a'
-          groupAccel: 0,
+          groupacc: 0,
           attr: 0,
           text: 'テレポート\t1\t脱出\t 0%\t100%',
+          preselected: 0,
           color: 0,
           tile: -1,
         ),
         MenuItemData(
-          glyph: 0,
           ident: 2,
           accelerator: 98, // 'b'
-          groupAccel: 0,
+          groupacc: 0,
           attr: 0,
           text: 'モンスター探知\t1\t予言\t 0%\t76%-100%',
+          preselected: 0,
           color: 0,
           tile: -1,
         ),
         MenuItemData(
-          glyph: 0,
           ident: 3,
           accelerator: 99, // 'c'
-          groupAccel: 0,
+          groupacc: 0,
           attr: 0,
           text: '致命傷治癒\t2\t治癒\t 5%\t(消失)',
+          preselected: 0,
           color: 0,
           tile: -1,
         ),
@@ -133,22 +133,22 @@ void main() {
 
       final items = [
         MenuItemData(
-          glyph: 0,
           ident: 0,
           accelerator: 0,
-          groupAccel: 0,
+          groupacc: 0,
           attr: 1, // Heading
           text: '呪文名\tレベル\t系統\t失敗率\t記憶\tターン',
+          preselected: 0,
           color: 0,
           tile: -1,
         ),
         MenuItemData(
-          glyph: 0,
           ident: 1,
           accelerator: 97, // 'a'
-          groupAccel: 0,
+          groupacc: 0,
           attr: 0,
           text: '使い魔召喚\t3\t念術\t10%\t91%-100%\t20000',
+          preselected: 0,
           color: 0,
           tile: -1,
         ),

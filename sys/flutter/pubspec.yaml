@@ -83,8 +83,6 @@ flutter:
     - family: Terminus
       fonts:
         - asset: assets/fonts/TerminusTTF-Regular.ttf
-        - asset: assets/fonts/TerminusTTF-Bold.ttf
-          weight: 700
     - family: Unscii-8
       fonts:
         - asset: assets/fonts/unscii-8.ttf
