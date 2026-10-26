@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-06. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-26. */
 /* NetHack 5.0	wintty.c	$NHDT-Date: 1781973100 2026/06/20 16:31:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.438 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1351,7 +1351,7 @@ set_item_state(
     term_start_attr(item->attr);
     if (item->color != NO_COLOR)
         term_start_color(item->color);
-    (void) putchar(ch);
+    g_putch(ch);
     ttyDisplay->curx++;
     if (item->color != NO_COLOR)
         term_end_color();
@@ -1619,34 +1619,6 @@ process_menu_window(winid window, struct WinDesc *cw)
                      * this.
                      */
                     for (n = 0, cp = curr->str;
-#ifndef WIN32CON
-                         *cp
-                            && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
-                         cp++, n++) {
-                        if (n == attr_n && (color != NO_COLOR
-                                            || attr != ATR_NONE))
-                            toggle_menu_attr(TRUE, color, attr);
-                        if (n == 2 && curr->identifier.a_void != 0
-                            && curr->selected) {
-                            char c = (curr->count == -1L) ? '*' : '#';
-
-                            /* all selected: '*' vs count selected: '#' */
-                            (void) putchar(c);
-                        } else if (n == 2 && curr->identifier.a_void != 0
-                                   && show_obj_syms
-                                   && curr->glyphinfo.glyph != NO_GLYPH) {
-                            int gcolor = curr->glyphinfo.gm.sym.color;
-
-                            /* tty_print_glyph could be used, but is overkill
-                               and requires referencing the cursor location */
-                            toggle_menu_attr(TRUE, gcolor, ATR_NONE);
-                            (void) putchar(curr->glyphinfo.ttychar);
-                            toggle_menu_attr(FALSE, gcolor, ATR_NONE);
-                        } else {
-                            (void) putchar(*cp);
-                        }
-                    } /* for *cp */
-#else  /* WIN32CON */
                          *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
                          n++) {
                         if (n == attr_n && (color != NO_COLOR
@@ -1691,11 +1663,15 @@ process_menu_window(winid window, struct WinDesc *cw)
                                     for (k = 0; k < ulen && k < 7; ++k)
                                         utf8seq[k] = (uint8) cp[k];
                                     utf8seq[k] = '\0';
+#if defined(WIN32CON)
                                     if (!_isatty(_fileno(stdout)))
                                         (void) fwrite(utf8seq, 1,
                                                       (size_t) ulen, stdout);
                                     else
                                         g_pututf8(utf8seq);
+#else
+                                    g_pututf8(utf8seq);
+#endif
                                     cp += ulen;
                                     ttyDisplay->curx += width;
                                 } else {
@@ -1706,7 +1682,6 @@ process_menu_window(winid window, struct WinDesc *cw)
                             }
                         }
                     } /* for *cp */
-#endif /* WIN32CON */
                     if (n > attr_n && (color != NO_COLOR || attr != ATR_NONE))
                         toggle_menu_attr(FALSE, color, attr);
                 } /* if npages > 0 */
@@ -2024,7 +1999,7 @@ process_text_window(winid window, struct WinDesc *cw)
         if (cw->data[i]) {
             attr = cw->data[i][0] - 1;
             if (cw->offx) {
-                (void) putchar(' ');
+                g_putch(' ');
                 ++ttyDisplay->curx;
             }
             term_start_attr(attr);
@@ -2483,20 +2458,25 @@ tty_put_utf8_sequence(char **cpp)
         return;
 
     if (*cp < 0x80U) {
-        (void) putchar(*cp);
+        g_putch((int) *cp);
         ttyDisplay->curx++;
         (*cpp)++;
     } else {
         int ulen = utf8_sequence_len(cp);
         if (ulen > 1) {
             int width = utf8_char_display_width(cp);
+            uint8 utf8seq[8];
             int k;
-            for (k = 0; k < ulen && (*cpp)[k]; ++k)
-                (void) putchar((*cpp)[k]);
+
+            for (k = 0; k < ulen && k < 7 && (*cpp)[k]; ++k)
+                utf8seq[k] = (uint8) (*cpp)[k];
+            utf8seq[k] = '\0';
+            g_pututf8(utf8seq);
             *cpp += ulen;
             ttyDisplay->curx += width;
         } else {
-            (void) putchar(*cp);
+            g_putch((int) *cp);
+            end_glyphout();
             ttyDisplay->curx++;
             (*cpp)++;
         }
@@ -2632,7 +2612,7 @@ tty_putstr(winid window, int attr, const char *str)
         tty_curs(window, cw->curx + 1, cw->cury);
         term_start_attr(attr);
         while (*str && (int) ttyDisplay->curx < (int) ttyDisplay->cols - 1) {
-            (void) putchar(*str);
+            g_putch((int) (unsigned char) *str);
             str++;
             ttyDisplay->curx++;
         }
@@ -2649,7 +2629,7 @@ tty_putstr(winid window, int attr, const char *str)
                 cw->cury++;
                 tty_curs(window, cw->curx + 1, cw->cury);
             }
-            (void) putchar(*str);
+            g_putch((int) (unsigned char) *str);
             str++;
             ttyDisplay->curx++;
         }
@@ -3656,7 +3636,7 @@ ttyinv_render(winid window, struct WinDesc *cw)
                 } else {
                     if (col != cw->curx || row != cw->cury)
                         tty_curs(window, col + 1, row);
-                    (void) putchar(cell->content.ttychar);
+                    g_putch(cell->content.ttychar);
                     ttyDisplay->curx++;
                     cw->curx++;
                 }
@@ -3764,7 +3744,7 @@ tty_refresh_inventory(int start, int stop, int y)
                 end_glyphout();
             if (col != cw->curx || row != cw->cury)
                 tty_curs(window, col + 1, row);
-            (void) putchar(cell->content.ttychar);
+            g_putch(cell->content.ttychar);
             ttyDisplay->curx++;
             cw->curx++;
         }

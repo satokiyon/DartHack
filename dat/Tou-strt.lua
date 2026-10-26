@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-26.
 -- NetHack Tourist Tou-strt.lua	$NHDT-Date: 1781994875 2026/06/20 22:34:35 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991,92 by M. Stephenson, P. Winner
@@ -129,10 +129,10 @@ des.monster({"rogue", peaceful=1, name="イタチ", male=1, keep_default_invent=
 des.monster({"werewolf", peaceful=1, name="アングア", female=1})
 des.monster({"rock troll", peaceful=1, name="デトリタス", male=1})
 -- the Brass Bridge is lined with statues of 'hippos'
-des.object({id="statue", montype="wumpus" x=34,y=8, historic=1, contents=0})
-des.object({id="statue", montype="wumpus" x=37,y=8, historic=1, contents=0})
-des.object({id="statue", montype="wumpus" x=34,y=10, historic=1, contents=0})
-des.object({id="statue", montype="wumpus" x=37,y=10, historic=1, contents=0})
+des.object({id="statue", montype="wumpus", x=34, y=8, historic=1, contents=0})
+des.object({id="statue", montype="wumpus", x=37, y=8, historic=1, contents=0})
+des.object({id="statue", montype="wumpus", x=34, y=10, historic=1, contents=0})
+des.object({id="statue", montype="wumpus", x=37, y=10, historic=1, contents=0})
 -- Random traps
 des.trap()
 des.trap()
