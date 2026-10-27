@@ -234,14 +234,8 @@ class NetHackFfi {
 
   NetHackFfi([String? langCode]) {
     final effectiveLang = langCode ?? NetHackCoreLoader.currentLanguage;
-    try {
-      _lib = NetHackCoreLoader.loadCore(langCode: effectiveLang);
-      debugPrint('[NetHackFfi] Successfully loaded C-core library for $effectiveLang');
-    } catch (e, st) {
-      debugPrint('[NetHackFfi] Failed to load core for $effectiveLang: $e\n$st');
-      debugPrint('[NetHackFfi] Falling back to nethack_dummy.dll');
-      _lib = DynamicLibrary.open('nethack_dummy.dll');
-    }
+    _lib = NetHackCoreLoader.loadCore(langCode: effectiveLang);
+    debugPrint('[NetHackFfi] Successfully loaded C-core library for $effectiveLang');
 
     try {
       registerNewLevelRest = _lib

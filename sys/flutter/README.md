@@ -118,7 +118,6 @@ sys/flutter/
 ├── android/                     # Android プロジェクト設定 (Gradle / CMake)
 ├── windows/                     # Windows ランナー (C++ / CMake)
 ├── ios/                         # iOS Runner (Xcode プロジェクト)
-├── dummy/                       # FFI 検証用スタブ実装
 │
 ├── assets/                      # アプリに同梱する静的アセット
 │   ├── ver                      # アセットバージョン番号（更新時に要インクリメント）

@@ -14,6 +14,7 @@ import 'nethack_cmd_panel.dart';
 import 'nethack_keyboard.dart';
 import 'nethack_shortcut_pad.dart';
 import 'nethack_ffi.dart';
+import 'nethack_core_loader.dart';
 import 'settings_page.dart';
 import 'utils/defaults_helper.dart';
 import 'utils/nethack_colors.dart';
@@ -1338,6 +1339,84 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
   }
 
+  Future<void> _showCoreLoadErrorDialog(String libraryName, String errorDetails) async {
+    if (!mounted) return;
+    final isJp = (_selectedLanguage == 'ja');
+    final title = isJp ? 'コア読込エラー' : 'Core Load Error';
+    final msg = isJp
+        ? 'NetHack コアライブラリ ($libraryName) の読み込みに失敗したため、ゲームを開始できません。'
+        : 'Failed to load NetHack core library ($libraryName). Cannot start the game.';
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[950],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: Colors.redAccent, width: 1.5),
+          ),
+          title: Row(
+            children: [
+              const Icon(Icons.error_outline, color: Colors.redAccent, size: 28),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: [
+                Text(
+                  msg,
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+                if (errorDetails.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: Text(
+                      errorDetails,
+                      style: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 11,
+                        color: Colors.redAccent,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.redAccent.withOpacity(0.3),
+              ),
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _showExitDialogAndTerminate(String message) async {
     if (!mounted || _exitDialogShown) return;
     _exitDialogShown = true;
@@ -1478,6 +1557,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     print("[UI] _startGame called! _isGameRunning=$_isGameRunning, assetsPath='$_assetsPath'");
     if (_isGameRunning) return;
 
+    // Cコアのロード可能性を事前検証（ロード失敗時はゲーム開始を阻止）
+    try {
+      NetHackCoreLoader.loadCore(langCode: _selectedLanguage);
+    } catch (e) {
+      debugPrint("[UI] Failed to load NetHack core library for '$_selectedLanguage': $e");
+      final libName = NetHackCoreLoader.getLibraryName(langCode: _selectedLanguage);
+      await _showCoreLoadErrorDialog(libName, e.toString());
+      return;
+    }
+
     SoundManager.instance.resetForNewGameSession();
 
     setState(() {
@@ -1508,6 +1597,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         } else if (type == 'worker_error') {
           print("[UI WORKER ERROR] ${message['error']}\n${message['stack']}");
           _addLog("Worker Exception: ${message['error']}");
+          if (mounted) {
+            setState(() {
+              _isGameRunning = false;
+              _isMainGameStarted = false;
+            });
+            final libName = NetHackCoreLoader.getLibraryName(langCode: _selectedLanguage);
+            _showCoreLoadErrorDialog(libName, message['error']?.toString() ?? 'Unknown core error');
+          }
         } else if (type == 'ready') {
           _workerSendPort = message['sendPort'];
           _addLog("Worker Isolate Ready. Starting Game...");
