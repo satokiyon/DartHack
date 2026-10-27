@@ -19,6 +19,7 @@ void main() {
     expect(content.contains('asset:assets/images/spoiler_flowchart_en.webp'), isTrue);
 
     // 重要な構文・用語の確認
+    expect(content.contains('**A Traveler\'s Companion to the Mazes of Menace**'), isTrue);
     expect(content.contains('NetHack is among the oldest computer games still actively maintained'), isTrue);
     expect(content.contains('blessed greased fixed +2 gray dragon scale mail'), isTrue);
     expect(content.contains('floating eye'), isTrue);

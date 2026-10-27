@@ -19,6 +19,7 @@ void main() {
     expect(content.contains('asset:assets/images/spoiler_flowchart_jp.webp'), isTrue);
 
     // 重要な定訳の確認
+    expect(content.contains('**脅威の迷宮への旅人の手引き (A Traveler\'s Companion to the Mazes of Menace)**'), isTrue);
     expect(content.contains('祝福された 油が塗られた 錆びない +2 灰色ドラゴンの鱗鎧'), isTrue);
     expect(content.contains('変身(へんげ)'), isTrue);
     expect(content.contains('さまよう目'), isTrue);

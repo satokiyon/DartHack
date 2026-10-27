@@ -1090,13 +1090,19 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     final spans = <InlineSpan>[];
     final color = defaultColor ?? Colors.white.withValues(alpha: 0.88);
 
+    // テーブルセル内等の <br> / <br/> を改行 (\n) に変換
+    String processed = text.replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n');
+
+    // 未知または残存する不要な HTML タグ (<small>, </small>, <div> 等) を防御的にサニタイズ除去
+    processed = processed.replaceAll(RegExp(r'</?(?:small|div|span|button|p)\b[^>]*>', caseSensitive: false), '');
+
     // [text]{#id} を検出して text のみを表示
-    String processed = text.replaceAllMapped(
+    processed = processed.replaceAllMapped(
         RegExp(r'\[(.*?)\]\{#[a-zA-Z0-9_.-]+\}'), (m) => m.group(1)!);
 
-    // Markdown のインラインパーサー (太字 **...**, ダブルバッククォート ``...``, 等幅 `...`, リンク [...](...))
+    // Markdown のインラインパーサー (太字 **...**, イタリック *...*, ダブルバッククォート ``...``, 等幅 `...`, リンク [...](...))
     final tokenRegex =
-        RegExp(r'(\*\*.*?\*\*|``.+?``|`[^`\r\n]+`|\[.*?\]\(.*?\))');
+        RegExp(r'(\*\*.*?\*\*|(?<!\*)\*[^*\r\n]+?\*(?!\*)|``.+?``|`[^`\r\n]+`|\[.*?\]\(.*?\))');
     int lastEnd = 0;
 
     for (final match in tokenRegex.allMatches(processed)) {
@@ -1120,6 +1126,17 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
               height: 1.45),
+        ));
+      } else if (token.startsWith('*') && token.endsWith('*') && token.length >= 2) {
+        spans.add(TextSpan(
+          text: token.substring(1, token.length - 1),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: fontSize,
+            fontStyle: FontStyle.italic,
+            fontWeight: fontWeight,
+            height: 1.45,
+          ),
         ));
       } else if (token.startsWith('``') &&
           token.endsWith('``') &&

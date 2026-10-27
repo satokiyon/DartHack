@@ -914,8 +914,8 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
     // [text]{#id} を検出して text のみを表示
     processed = processed.replaceAllMapped(RegExp(r'\[(.*?)\]\{#[a-zA-Z0-9_.-]+\}'), (m) => m.group(1)!);
 
-    // Markdown のインラインパーサー (太字 **...**, ダブルバッククォート ``...``, 等幅 `...`, リンク [...](...))
-    final tokenRegex = RegExp(r'(\*\*.*?\*\*|``.+?``|`[^`\r\n]+`|\[.*?\]\(.*?\))');
+    // Markdown のインラインパーサー (太字 **...**, イタリック *...*, ダブルバッククォート ``...``, 等幅 `...`, リンク [...](...))
+    final tokenRegex = RegExp(r'(\*\*.*?\*\*|(?<!\*)\*[^*\r\n]+?\*(?!\*)|``.+?``|`[^`\r\n]+`|\[.*?\]\(.*?\))');
     int lastEnd = 0;
 
     for (final match in tokenRegex.allMatches(processed)) {
@@ -931,6 +931,17 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
         spans.add(TextSpan(
           text: token.substring(2, token.length - 2),
           style: TextStyle(color: Colors.amber.shade200, fontSize: fontSize, fontWeight: FontWeight.bold, height: 1.45),
+        ));
+      } else if (token.startsWith('*') && token.endsWith('*') && token.length >= 2) {
+        spans.add(TextSpan(
+          text: token.substring(1, token.length - 1),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: fontSize,
+            fontStyle: FontStyle.italic,
+            fontWeight: fontWeight,
+            height: 1.45,
+          ),
         ));
       } else if (token.startsWith('``') && token.endsWith('``') && token.length >= 4) {
         var inner = token.substring(2, token.length - 2);

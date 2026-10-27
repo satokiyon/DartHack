@@ -104,7 +104,7 @@ flowchart TD
   - Markdown テーブル仕様に基づき、セル内の改行として使われている `<br>` は Markdown 内に維持し、Flutter ビューア（`SpoilerDialog`）の `_buildRichText` 側で `\n` に変換して正しく 2 行表示（英語／日本語訳）に整形します。
   - 同時に `SpoilerDialog` 側で未知・残存 HTML タグ（`<small>`, `<div>`, `<span>` 等）の防御的サニタイズを実施します。
 - HTML コメント（`<!-- ... -->`）や PDF ダウンロード案内を除去します。
-- 冒頭の HTML タイトル・名言ブロックは Markdown のイタリック（`*...*`）に変換します。
+- 冒頭のサブタイトルは太字（`**...**`）、名言ブロックはイタリック（`*...*`）に変換します。
 - ガイドブック参照リンクは DartHack 内の正式名称「脅威の迷宮へのガイド (Guide to the Mazes of Menace)」に統一します。
 - **整形後バリデーションの義務化**:
   - 整形処理完了後、`price-id-toolbar`, `<script`, `<div`, `<button`, `<small` 等の禁止残骸が存在しないか自動検証（`validate_markdown`）し、残存時はパイプラインをエラー停止させます。

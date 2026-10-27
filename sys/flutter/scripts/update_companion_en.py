@@ -59,12 +59,12 @@ def format_markdown(content: str) -> str:
     # 1. 改行コードの統一 (\r\n -> \n)
     content = content.replace('\r\n', '\n')
 
-    # 2. 冒頭の raw html タイトル・名言をイタリックに変換
+    # 2. 冒頭の raw html タイトルを太字、名言をイタリックに変換
     title_pattern = r'```{=html}\s*<p style="text-align: center; font-size: 1.25em; margin: 0.2em 0 1.4em;">(.*?)</p>\s*```'
     def replace_sub_title(m):
         raw = m.group(1)
         clean = re.sub(r'<[^>]+>', '', raw)
-        return f"*{clean}*"
+        return f"**{clean}**"
     content = re.sub(title_pattern, replace_sub_title, content, flags=re.DOTALL)
 
     quote_pattern = r'```{=html}\s*<p style="text-align: center; font-style: italic; margin: 1.5em 0;">(.*?)</p>\s*```'

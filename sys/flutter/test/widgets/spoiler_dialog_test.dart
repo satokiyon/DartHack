@@ -117,12 +117,45 @@ Elbereth
 
     // <br> が \n に置換されて表示されていること（生 "<br>" はテキスト内に露出しない）
     expect(find.textContaining('<br>'), findsNothing);
-    expect(find.textContaining('*"You feel feverish."*\n（熱っぽい。）', findRichText: true), findsOneWidget);
+    expect(find.textContaining('"You feel feverish."\n（熱っぽい。）', findRichText: true), findsOneWidget);
 
     // <small> タグがサニタイズされ、タグそのものは露出しないこと
     expect(find.textContaining('<small>'), findsNothing);
     expect(find.textContaining('</small>'), findsNothing);
     expect(find.textContaining('注記：これはテストです。', findRichText: true), findsOneWidget);
+  });
+
+  testWidgets('SpoilerDialog parses *italic* and **bold** correctly without exposing asterisks', (tester) async {
+    const testItalicMarkdown = '''
+# スタイル検証 {#style-test}
+
+**脅威の迷宮への旅人の手引き (A Traveler's Companion to the Mazes of Menace)**
+
+これは *斜体テスト (Italic Test)* であり、こちらは **太字強調 (Bold Text)** です。
+''';
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        locale: Locale('ja'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: SpoilerDialog(
+            initialMarkdown: testItalicMarkdown,
+            initialIsJp: true,
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // アスタリスク文字が除去され、装飾テキストとして描画されていること
+    expect(find.textContaining('*斜体テスト'), findsNothing);
+    expect(find.textContaining('**太字強調'), findsNothing);
+    expect(find.textContaining('斜体テスト (Italic Test)', findRichText: true), findsOneWidget);
+    expect(find.textContaining('太字強調 (Bold Text)', findRichText: true), findsOneWidget);
+    expect(find.textContaining('脅威の迷宮への旅人の手引き (A Traveler\'s Companion to the Mazes of Menace)', findRichText: true), findsOneWidget);
   });
 }
 

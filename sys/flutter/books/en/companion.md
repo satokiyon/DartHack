@@ -1,6 +1,6 @@
 # NetHack Spoilers {#nethack-spoilers}
 
-*A Traveler's Companion to the Mazes of Menace*
+**A Traveler's Companion to the Mazes of Menace**
 
 *You feel like someone is helping you.*
 
