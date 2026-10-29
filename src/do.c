@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-27. */
 /* NetHack 5.0	do.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.411 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -504,23 +504,23 @@ dosinkring(struct obj *obj)
     obj->in_use = TRUE;  /* block free identification via interrupt */
     switch (obj->otyp) { /* effects that can be noticed without eyes */
     case RIN_SEARCHING:
-        You("シンクに失くしたと思った%sがそこにあった!", xname(obj));
+        You("シンクの中で%sを失くしたと思っていたが、ほら、そこにあった!", xname(obj));
         goto giveback;
     case RIN_SLOW_DIGESTION:
-        pline_The("指輪は噴き出してきた!");
+        pline_The("指輪は逆流して吐き出された!");
  giveback:
         obj->in_use = FALSE;
         dropx(obj);
         trycall(obj);
         return;
     case RIN_LEVITATION:
-        pline_The("シンクは一瞬上下に揺れた.");
+        pline_The("シンクは一瞬上に向かって震えた.");
         break;
     case RIN_POISON_RESISTANCE:
-        You("腐った%sの臭いがした.", fruitname(FALSE));
+        You("腐った%sの悪臭を嗅いだ.", fruitname(FALSE));
         break;
     case RIN_AGGRAVATE_MONSTER:
-        pline("何匹かの%sがシンクの周りをぶんぶん飛び回った。",
+        pline("何匹かの%sがシンクの周りをぶんぶん飛び回った.",
               Hallucination ? rndmonnam(NULL) : "ハエ");
         break;
     case RIN_SHOCK_RESISTANCE:
@@ -528,30 +528,30 @@ dosinkring(struct obj *obj)
         break;
     case RIN_CONFLICT:
         Soundeffect(se_drain_noises, 50);
-        You_hear("排水溝から大きな音が聞こえた.");
+        You_hear("排水溝から大きな破裂音が聞こえた.");
         break;
     case RIN_SUSTAIN_ABILITY: /* KMH */
-        pline_The("%sの流れが止まった.", hliquid("water"));
+        pline_The("%sの流れが一定になったようだ.", hliquid("water"));
         break;
     case RIN_GAIN_STRENGTH:
-        pline_The("%sの流れが%sになった.",
+        pline_The("%sの流れが%sなったようだ.",
                   hliquid("water"),
                   (obj->spe < 0) ? "弱く" : "強く");
         break;
     case RIN_GAIN_CONSTITUTION:
-        pline_The("%sの流れが%sになった.",
+        pline_The("%sの流量が%sなったようだ.",
                   hliquid("water"),
-                  (obj->spe < 0) ? "不安定に" : "安定して");
+                  (obj->spe < 0) ? "少なく" : "多く");
         break;
     case RIN_INCREASE_ACCURACY: /* KMH */
-        pline_The("%sの流れが%s.",
+        pline_The("%sの流れが排水溝%s",
                   hliquid("water"),
-                  (obj->spe < 0) ? "的を外れた" : "的に当たった");
+                  (obj->spe < 0) ? "から外れた." : "に命中した.");
         break;
     case RIN_INCREASE_DAMAGE:
-        pline_The("%sの勢いが%sになった.",
+        pline_The("%sの水圧が%sなったようだ.",
                   hliquid("water"),
-                  (obj->spe < 0) ? "弱く" : "強く");
+                  (obj->spe < 0) ? "低く" : "高く");
         break;
     case RIN_HUNGER:
         ideed = FALSE;
@@ -560,7 +560,7 @@ dosinkring(struct obj *obj)
             if (otmp != uball && otmp != uchain
                 && !obj_resists(otmp, 1, 99)) {
                 if (!Blind) {
-                    pline("突然%sがシンクから飛び出した!", doname(otmp));
+                    pline("突然%sがシンクから消え去った!", doname(otmp));
                     ideed = TRUE;
                 }
                 delobj(otmp);
@@ -598,10 +598,10 @@ dosinkring(struct obj *obj)
             pline_The("シンクがすっかり元どおりになった.");
             break;
         case RIN_INVISIBILITY:
-            You("シンクには何も起こらなかった.");
+            You("シンクに何も変化が起きないのを見た.");
             break;
         case RIN_FREE_ACTION:
-            You_see("指輪がそのまま排水溝へ滑り落ちた!");
+            You_see("指輪がそのまま排水溝へ滑り落ちていくのを見た!");
             break;
         case RIN_SEE_INVISIBLE:
             You_see("シンクの中に%sが見えた.",
@@ -611,13 +611,13 @@ dosinkring(struct obj *obj)
             pline_The("シンクが一瞬床に溶け込んだように見えた.");
             break;
         case RIN_FIRE_RESISTANCE:
-            pline_The("熱湯の蛇口が一瞬まぶしく光った.");
+            pline_The("熱い%sの蛇口が一瞬まぶしく光った.", hliquid("water"));
             break;
         case RIN_COLD_RESISTANCE:
-            pline_The("冷水の蛇口が一瞬まぶしく光った.");
+            pline_The("冷たい%sの蛇口が一瞬まぶしく光った.", hliquid("water"));
             break;
         case RIN_PROTECTION_FROM_SHAPE_CHAN:
-            pline_The("シンクはどう見ても噴水ではない.");
+            pline_The("シンクはどう見ても噴水には見えない.");
             break;
         case RIN_PROTECTION:
             pline_The("シンクが一瞬%sに光った.",
@@ -631,7 +631,7 @@ dosinkring(struct obj *obj)
             break;
         case RIN_POLYMORPH_CONTROL:
             pline_The(
-                "一瞬シンクが定期的に噴き上がる間欠泉のように見えた.");
+                "シンクが一瞬、定期的に噴き上がる間欠泉のように見えた.");
             break;
         default:
             break;
@@ -641,10 +641,10 @@ dosinkring(struct obj *obj)
         trycall(obj);
     } else if (!nosink) {
         Soundeffect(se_ring_in_drain, 50);
-        You_hear("指輪が排水溝を下っていく音が聞こえた.");
+        You_hear("指輪が排水管を跳ねながら落ちていく音が聞こえた.");
     }
     if (!rn2(20) && !nosink) {
-        pline_The("シンクが水を吐き出して%sを残した.", doname(obj));
+        pline_The("シンクが逆流し、%sが残された.", doname(obj));
         obj->in_use = FALSE;
         dropx(obj);
     } else if (!rn2(5)) {
