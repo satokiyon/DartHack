@@ -512,6 +512,50 @@ void main() {
       expect(find.byType(DataTable), findsOneWidget);
     });
 
+    testWidgets('文中のアスタリスク記号 [a-zA-Z ?*] が斜体や太字として誤修飾されず平文として表示される', (tester) async {
+      const asteriskMarkdown = '''
+# 質問プロンプトの例
+
+例えば、一般的な質問として「何を使いたいですか？ [a-zA-Z ?*]」 という形式があり、持ち歩いているアイテムを選択するよう求められます。ここで、「a-zA-Z」は選択可能なアイテムの所持品記号です。`?` と入力すると、所持品リストが表示され、各文字が何を指しているかを確認できます。この例では、`*` も表示されており、予期しないものを使いたい場合に、リストにないアイテムを選択できることを示しています。`*` と入力すると全所持品が
+''';
+
+      await tester.pumpWidget(
+        buildTestApp(
+          const GuidebookDialog(
+            initialContent: asteriskMarkdown,
+            initialIsJp: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final richTextFinder = find.byWidgetPredicate((widget) {
+        if (widget is RichText) {
+          final plainText = widget.text.toPlainText();
+          return plainText.contains('[a-zA-Z ?*]') && plainText.contains('この例では、');
+        }
+        return false;
+      });
+
+      expect(richTextFinder, findsOneWidget);
+
+      final richText = tester.widget<RichText>(richTextFinder);
+      final textSpan = richText.text as TextSpan;
+
+      void verifyNoItalic(InlineSpan span) {
+        if (span is TextSpan) {
+          expect(span.style?.fontStyle, isNot(FontStyle.italic));
+          if (span.children != null) {
+            for (final child in span.children!) {
+              verifyNoItalic(child);
+            }
+          }
+        }
+      }
+
+      verifyNoItalic(textSpan);
+    });
+
     testWidgets('SpoilerDialog でもダブルバッククォートやセル内パイプテーブルが例外なく正確に描画される', (tester) async {
       const sampleSpoilerTable = '''
 # スポイラーテーブルテスト

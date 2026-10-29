@@ -1,4 +1,4 @@
-// NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23.
+// NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-30.
 import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -1100,9 +1100,11 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     processed = processed.replaceAllMapped(
         RegExp(r'\[(.*?)\]\{#[a-zA-Z0-9_.-]+\}'), (m) => m.group(1)!);
 
-    // Markdown のインラインパーサー (太字 **...**, イタリック *...*, ダブルバッククォート ``...``, 等幅 `...`, リンク [...](...))
+    // Markdown のインラインパーサー (コードスパン ``...`` / `...`, 太字 **...**, リンク [...](...))
+    // ガイドブック中では単一の '*' はアイテム選択記号やワイルドカードなど本文中の記号として多用されるため、
+    // 斜体（イタリック）修飾としては扱わず、通常の文字としてそのまま描画する。
     final tokenRegex =
-        RegExp(r'(\*\*.*?\*\*|(?<!\*)\*[^*\r\n]+?\*(?!\*)|``.+?``|`[^`\r\n]+`|\[.*?\]\(.*?\))');
+        RegExp(r'(``.+?``|`[^`\r\n]+`|\*\*.*?\*\*|\[.*?\]\(.*?\))');
     int lastEnd = 0;
 
     for (final match in tokenRegex.allMatches(processed)) {
@@ -1118,27 +1120,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
       }
 
       final token = match.group(0)!;
-      if (token.startsWith('**') && token.endsWith('**') && token.length >= 4) {
-        spans.add(TextSpan(
-          text: token.substring(2, token.length - 2),
-          style: TextStyle(
-              color: Colors.amber.shade200,
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              height: 1.45),
-        ));
-      } else if (token.startsWith('*') && token.endsWith('*') && token.length >= 2) {
-        spans.add(TextSpan(
-          text: token.substring(1, token.length - 1),
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: fontSize,
-            fontStyle: FontStyle.italic,
-            fontWeight: fontWeight,
-            height: 1.45,
-          ),
-        ));
-      } else if (token.startsWith('``') &&
+      if (token.startsWith('``') &&
           token.endsWith('``') &&
           token.length >= 4) {
         var inner = token.substring(2, token.length - 2);
@@ -1151,6 +1133,15 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
           token.length >= 2) {
         final inner = token.substring(1, token.length - 1);
         spans.add(_buildCodeSpan(inner, fontSize));
+      } else if (token.startsWith('**') && token.endsWith('**') && token.length >= 4) {
+        spans.add(TextSpan(
+          text: token.substring(2, token.length - 2),
+          style: TextStyle(
+              color: Colors.amber.shade200,
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              height: 1.45),
+        ));
       } else if (token.startsWith('[') &&
           token.contains('](') &&
           token.endsWith(')')) {
