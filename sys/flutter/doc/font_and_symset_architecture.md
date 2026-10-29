@@ -147,7 +147,7 @@ NetHack のダンジョンマップ（80列×21行）には、壁（`|`, `-`）�
 
 ### 3.3 セルサイズ4箇所完全一元化とアスペクト比自動計測
 
-フォントによって、半角文字の縦横比（アスペクト比 $W/H$）は大きく異なります（例: `Terminus` や `IBMVGA9x16` は約 0.50〜0.56、`Unscii-8` は 1.00 の正方形、`NotoSansMonoCJKjp` は約 0.50）。
+フォントによって、半角文字の縦横比（アスペクト比 $W/H$）は大きく異なります（例: `Terminus` や `IBMVGA9x16` は約 0.50〜0.56、`Unscii-8` や `Square` は 1.00 の正方形、`PixelMplus12` は約 0.50）。
 もしマップ描画とカメラ追従・タップ判定で異なるセルサイズが用いられると、「画面中央センタリングがズレる」「タップしたマスと実際に移動する座標が食い違う」という致命的な不具合が発生します。
 
 そのため、[`FontManager`](file:///c:/Users/satok/DartHack/sys/flutter/lib/services/font_manager.dart) の `getMapCellSize` 関数を設け、アプリ内の **以下の4箇所すべてで同一のセルサイズ計算を一元適用** しています：
@@ -237,7 +237,8 @@ flowchart TD
 | `Terminus` | Terminus TTF (アスキー定番) / Terminus TTF (Classic ASCII) | アスペクト比約 0.50。NetHack 伝統の鮮明なビットマップ調等幅 | SIL OFL 1.1 |
 | `Unscii-8` | Unscii 8x8 (レトロPC) / Unscii 8x8 (Retro PC) | アスペクト比 1.00（正方形セル）。C64 やファミコンを思わせるレトロ調 | Public Domain |
 | `IBMVGA9x16` | IBM VGA 9x16 (クラシックPC) / IBM VGA 9x16 (Classic PC) | アスペクト比 0.56 (9x16)。DOS時代の王道VGAテキスト画面を忠実再現 | CC BY-SA 4.0 (int10h) |
-| `NotoSansMonoCJKjp` | Noto Sans Mono CJK JP / Noto Sans Mono CJK JP | Google公式の高品質な等幅日本語フォント。英数・漢字のバランスが抜群 | SIL OFL 1.1 |
+| `Square` | Square(正方形セル) / Square (Square Cell) | アスペクト比 1.00（正方形セル）。ローグライク専用設計の等幅フォント | CC BY 3.0 |
+| `PixelMplus12` | PixelMPlus12(ファミコン風日本語) / PixelMplus12 (8-bit Pixel JP) | アスペクト比約 0.50。8bitゲーム機調のビットマップ風日本語フォント | M+ FONT LICENSE |
 | `MisakiGothic`| 美咲ゴシック (日本語レトロ) / Misaki Gothic (Retro Pixel JP) | 8x8 ドットの超小型日本語ビットマップフォント。日本語UIに完全対応 | フリー (自由利用) |
 
 ### 5.2 動的フォントロードとサンドボックス永続化
@@ -441,9 +442,9 @@ FontInfo(
 
 | 用途 | 推奨フォントの条件 | おすすめのフォント例 |
 | :--- | :--- | :--- |
-| **マップ (`font_map`)** | **正真正銘の等幅フォント（Monospace）** であること。ASCII 記号（特に罫線や記号）が全角化せず、半角幅で揃っていること。 | `Terminus`, `IBMVGA9x16`, `NotoSansMonoCJKjp`, `Unscii-8`, `ProggyClean`, `Courier New` |
-| **メッセージ / ステータス** | 欧文・数字が読みやすく、かつ日本語フォールバックと調和すること。 | `NotoSansMonoCJKjp`, `Roboto Mono`, `JetBrains Mono`, `Hack`, `美咲ゴシック` |
-| **メニュー / テキスト** | 長文を読んだ際に疲れにくく、文字間が整っていること。 | `NotoSansMonoCJKjp`, `Noto Sans Mono`, `M+ 1m`, `Source Han Code JP` |
+| **マップ (`font_map`)** | **正真正銘の等幅フォント（Monospace）** であること。ASCII 記号（特に罫線や記号）が全角化せず、半角幅で揃っていること。 | `Terminus`, `Square`, `IBMVGA9x16`, `Unscii-8`, `ProggyClean`, `Courier New` |
+| **メッセージ / ステータス** | 欧文・数字が読みやすく、かつ日本語フォールバックと調和すること。 | `PixelMplus12`, `Roboto Mono`, `JetBrains Mono`, `Hack`, `美咲ゴシック` |
+| **メニュー / テキスト** | 長文を読んだ際に疲れにくく、文字間が整っていること。 | `PixelMplus12`, `Noto Sans Mono`, `M+ 1m`, `Source Han Code JP` |
 
 ---
 

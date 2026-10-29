@@ -37,17 +37,18 @@ void main() {
       expect(manager.mapAsciiScale, 1.0);
     });
 
-    test('内蔵フォント 6 種が利用可能リストに含まれ、日英表示名が正しく取得できる', () async {
+    test('内蔵フォント 7 種が利用可能リストに含まれ、日英表示名が正しく取得できる', () async {
       final manager = FontManager.instance;
       await manager.init(prefs: mockPrefs, customFontsDir: tempDir);
 
       final available = manager.availableFonts;
-      expect(available.length, equals(6));
+      expect(available.length, equals(7));
       expect(available.any((f) => f.id == 'system'), isTrue);
       expect(available.any((f) => f.id == 'Terminus'), isTrue);
       expect(available.any((f) => f.id == 'Unscii-8'), isTrue);
       expect(available.any((f) => f.id == 'IBMVGA9x16'), isTrue);
-      expect(available.any((f) => f.id == 'NotoSansMonoCJKjp'), isTrue);
+      expect(available.any((f) => f.id == 'Square'), isTrue);
+      expect(available.any((f) => f.id == 'PixelMplus12'), isTrue);
       expect(available.any((f) => f.id == 'MisakiGothic'), isTrue);
 
       final sys = available.firstWhere((f) => f.id == 'system');
@@ -66,17 +67,21 @@ void main() {
       expect(ibmVga.getDisplayName(true), equals('IBM VGA 9x16 (クラシックPC)'));
       expect(ibmVga.getDisplayName(false), equals('IBM VGA 9x16 (Classic PC)'));
 
-      final notoMono = available.firstWhere((f) => f.id == 'NotoSansMonoCJKjp');
-      expect(notoMono.getDisplayName(true), equals('Noto Sans Mono CJK JP (高品位日本語)'));
-      expect(notoMono.getDisplayName(false), equals('Noto Sans Mono CJK JP'));
+      final square = available.firstWhere((f) => f.id == 'Square');
+      expect(square.getDisplayName(true), equals('Square(正方形セル)'));
+      expect(square.getDisplayName(false), equals('Square (Square Cell)'));
+
+      final pixelMplus = available.firstWhere((f) => f.id == 'PixelMplus12');
+      expect(pixelMplus.getDisplayName(true), equals('PixelMPlus12(ファミコン風日本語)'));
+      expect(pixelMplus.getDisplayName(false), equals('PixelMplus12 (8-bit Pixel JP)'));
 
       final misaki = available.firstWhere((f) => f.id == 'MisakiGothic');
       expect(misaki.getDisplayName(true), equals('美咲ゴシック (日本語レトロ)'));
       expect(misaki.getDisplayName(false), equals('Misaki Gothic (Retro Pixel JP)'));
     });
 
-    test('削除された旧フォント ID (Unscii-16) が保存されていた場合は安全にデフォルトへマイグレーションされる', () async {
-      await mockPrefs.setString(FontManager.prefFontMap, 'Unscii-16');
+    test('削除された旧フォント ID (NotoSansMonoCJKjp, Unscii-16) が保存されていた場合は安全にデフォルトへマイグレーションされる', () async {
+      await mockPrefs.setString(FontManager.prefFontMap, 'NotoSansMonoCJKjp');
       await mockPrefs.setString(FontManager.prefFontMessage, 'Unscii-16');
 
       final manager = FontManager.instance;
@@ -204,6 +209,32 @@ void main() {
 
       expect(result.isValid, isFalse);
       expect(manager.availableFonts.any((f) => f.id == 'custom_bad_font'), isFalse);
+    });
+
+    test('外部フォントとして登録・選択したフォントは次回起動時もデフォルトへ強制マイグレーションされず維持される', () async {
+      final manager = FontManager.instance;
+      await manager.init(prefs: mockPrefs, customFontsDir: tempDir);
+
+      final validFontBytes = createDummySfnt();
+      final result = await manager.importCustomFont(validFontBytes, 'NotoSansMonoCJKjp-Regular.otf');
+      expect(result.isValid, isTrue);
+
+      const customFontId = 'custom_NotoSansMonoCJKjp-Regular';
+      expect(manager.availableFonts.any((f) => f.id == customFontId), isTrue);
+
+      // メッセージフォントに設定
+      await manager.setFont(FontTarget.message, customFontId);
+      expect(manager.getSelectedFont(FontTarget.message).id, equals(customFontId));
+      expect(mockPrefs.getString(FontManager.prefFontMessage), equals(customFontId));
+
+      // アプリ再起動をシミュレート (resetForTesting して再 init)
+      FontManager.resetForTesting();
+      final newManager = FontManager.instance;
+      await newManager.init(prefs: mockPrefs, customFontsDir: tempDir);
+
+      // 強制マイグレーションされず、外部フォントが維持されていること
+      expect(newManager.getSelectedFont(FontTarget.message).id, equals(customFontId));
+      expect(mockPrefs.getString(FontManager.prefFontMessage), equals(customFontId));
     });
   });
 }

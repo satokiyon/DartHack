@@ -35,17 +35,30 @@ class FontCreditEntry {
 class FontCreditsData {
   static const List<FontCreditEntry> entries = [
     FontCreditEntry(
-      id: 'NotoSansMonoCJKjp',
-      name: 'Noto Sans Mono CJK JP',
-      fileName: 'NotoSansMonoCJKjp-Regular.otf',
-      author: '© 2014-2021 Adobe (西塚涼子 氏, Paul D. Hunt 氏, Sandoll Communications 他)',
-      authorEn: '© 2014-2021 Adobe (Ryoko Nishizuka, Paul D. Hunt, Sandoll Communications, et al.)',
-      license: 'SIL Open Font License 1.1',
-      shortLicense: 'SIL OFL 1.1',
+      id: 'PixelMplus12',
+      name: 'PixelMplus12',
+      fileName: 'PixelMplus12-Regular.ttf',
+      author: 'itouhiro (いとうひろき 氏) / M+ FONTS PROJECT / 門真 なむ 氏',
+      authorEn: 'itouhiro / M+ FONTS PROJECT / Num Kadoma',
+      license: 'M+ FONT LICENSE',
+      shortLicense: 'M+ LICENSE',
       licenseColor: Color(0xFF26A69A), // Teal
-      url: 'https://github.com/notofonts/noto-cjk',
-      descriptionJa: 'Google と Adobe が共同開発した高品位な等幅日本語フォントです。JIS第1〜第4水準の漢字やラテン文字に対応しています。',
-      descriptionEn: 'High-quality monospace Japanese font co-developed by Google and Adobe, supporting JIS Level 1-4 Kanji and Latin characters.',
+      url: 'https://github.com/itouhiro/PixelMplus',
+      descriptionJa: '8bitゲーム機のビットマップフォントを再現したTrueTypeアウトラインフォントです。JIS第1・第2水準漢字に対応しています。',
+      descriptionEn: 'TrueType outline font recreating 8-bit retro console bitmap fonts. Supports JIS Level 1 and 2 Kanji.',
+    ),
+    FontCreditEntry(
+      id: 'Square',
+      name: 'Square',
+      fileName: 'square.ttf',
+      author: 'Wouter van Oortmerssen (Aardappel)',
+      authorEn: 'Wouter van Oortmerssen (Aardappel)',
+      license: 'Creative Commons Attribution 3.0 Unported (CC BY 3.0)',
+      shortLicense: 'CC BY 3.0',
+      licenseColor: Color(0xFF42A5F5), // Blue
+      url: 'https://strlen.com/square/',
+      descriptionJa: 'ローグライクやグリッド描画のために特別に設計された1:1正方形セルの等幅フォントです。ダンジョンマップの正方形マス描画に最適です。',
+      descriptionEn: 'Monospace font designed specifically for roguelikes with a 1:1 square aspect ratio. Optimal for square dungeon map display.',
     ),
     FontCreditEntry(
       id: 'Terminus',

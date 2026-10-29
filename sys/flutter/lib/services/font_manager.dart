@@ -94,13 +94,29 @@ class FontManager extends ChangeNotifier {
 
     LicenseRegistry.addLicense(() async* {
       yield const LicenseEntryWithLineBreaks(
-        ['Noto Sans Mono CJK JP'],
-        '''SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
-Copyright (c) 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+        ['PixelMplus12'],
+        '''M+ FONT LICENSE
+Copyright (C) 2013-2015 itouhiro
+Copyright (C) 2002-2015 M+ FONTS PROJECT
+Copyright (C) 2002-2021 門真 なむ (Num Kadoma)
 
-This Font Software is licensed under the SIL Open Font License, Version 1.1.
-This license is copied below, and is also available with a FAQ at:
-http://scripts.sil.org/OFL''',
+These fonts are free software.
+Unlimited permission is granted to use, copy, and distribute them, with
+or without modifications, either commercially and noncommercially.
+THESE FONTS ARE PROVIDED "AS IS" WITHOUT WARRANTY.''',
+      );
+
+      yield const LicenseEntryWithLineBreaks(
+        ['Square'],
+        '''Creative Commons Attribution 3.0 Unported (CC BY 3.0)
+Square Font
+Copyright (c) 2011-2015 Wouter van Oortmerssen (Aardappel) (https://strlen.com/square/)
+
+You are free to:
+- Share — copy and redistribute the material in any medium or format
+- Adapt — remix, transform, and build upon the material for any purpose, even commercially.
+Under the terms of Attribution (CC BY 3.0).
+https://creativecommons.org/licenses/by/3.0/''',
       );
 
       yield const LicenseEntryWithLineBreaks(
@@ -180,10 +196,17 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
       isBuiltIn: true,
     ),
     FontItem(
-      id: 'NotoSansMonoCJKjp',
-      displayName: 'Noto Sans Mono CJK JP (高品位日本語)',
-      displayNameEn: 'Noto Sans Mono CJK JP',
-      fontFamily: 'NotoSansMonoCJKjp',
+      id: 'Square',
+      displayName: 'Square(正方形セル)',
+      displayNameEn: 'Square (Square Cell)',
+      fontFamily: 'Square',
+      isBuiltIn: true,
+    ),
+    FontItem(
+      id: 'PixelMplus12',
+      displayName: 'PixelMPlus12(ファミコン風日本語)',
+      displayNameEn: 'PixelMplus12 (8-bit Pixel JP)',
+      fontFamily: 'PixelMplus12',
       isBuiltIn: true,
     ),
     FontItem(

@@ -26,7 +26,7 @@ void main() {
     );
   }
 
-  testWidgets('FontCreditsDialog が正常に描画され、5種類の同梱フォント情報が表示されること (日本語)', (tester) async {
+  testWidgets('FontCreditsDialog が正常に描画され、6種類の同梱フォント情報が表示されること (日本語)', (tester) async {
     tester.view.physicalSize = const Size(800, 1600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
@@ -39,15 +39,18 @@ void main() {
     expect(find.text('フォント ライセンス・クレジット'), findsOneWidget);
     expect(find.text('DartHack に同梱されているフォントの著作者およびライセンス一覧です。'), findsOneWidget);
 
-    // 5種類のフォント名が表示されていること
-    expect(find.text('Noto Sans Mono CJK JP'), findsOneWidget);
+    // 6種類のフォント名が表示されていること
+    expect(find.text('PixelMplus12'), findsOneWidget);
+    expect(find.text('Square'), findsOneWidget);
     expect(find.text('Terminus (TTF)'), findsOneWidget);
     expect(find.text('PxPlus IBM VGA 9x16'), findsOneWidget);
     expect(find.text('美咲ゴシック (Misaki Gothic)'), findsOneWidget);
     expect(find.text('Unscii 8x8'), findsOneWidget);
 
     // ライセンス名が表示されていること
-    expect(find.text('ライセンス: SIL Open Font License 1.1'), findsNWidgets(2)); // Noto & Terminus
+    expect(find.text('ライセンス: M+ FONT LICENSE'), findsOneWidget);
+    expect(find.text('ライセンス: Creative Commons Attribution 3.0 Unported (CC BY 3.0)'), findsOneWidget);
+    expect(find.text('ライセンス: SIL Open Font License 1.1'), findsOneWidget); // Terminus
     expect(find.text('ライセンス: Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)'), findsOneWidget);
     expect(find.text('ライセンス: 自由利用 (フリーソフトウェア)'), findsOneWidget);
     expect(find.text('ライセンス: Public Domain (CC0 1.0 Universal)'), findsOneWidget);
@@ -86,8 +89,8 @@ void main() {
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
 
-    // Noto CJK の URL をタップ
-    final urlFinder = find.text('https://github.com/notofonts/noto-cjk');
+    // PixelMplus の URL をタップ
+    final urlFinder = find.text('https://github.com/itouhiro/PixelMplus');
     expect(urlFinder, findsOneWidget);
     await tester.tap(urlFinder);
     await tester.pump(); // SnackBar アニメーション開始
@@ -104,7 +107,8 @@ void main() {
     }
 
     final packages = licenses.expand((l) => l.packages).toSet();
-    expect(packages.contains('Noto Sans Mono CJK JP'), isTrue);
+    expect(packages.contains('PixelMplus12'), isTrue);
+    expect(packages.contains('Square'), isTrue);
     expect(packages.contains('Terminus (TTF)'), isTrue);
     expect(packages.contains('PxPlus IBM VGA 9x16'), isTrue);
     expect(packages.contains('美咲ゴシック (Misaki Gothic)'), isTrue);
