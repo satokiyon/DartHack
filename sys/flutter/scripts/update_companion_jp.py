@@ -69,7 +69,7 @@ def format_markdown(content: str) -> str:
     def replace_quote(m):
         raw = m.group(1)
         clean = re.sub(r'<[^>]+>', '', raw)
-        return f"*{clean}*"
+        return f"*{clean}*\n\n---"
     content = re.sub(quote_pattern, replace_quote, content, flags=re.DOTALL)
 
     # 3. ガイドブック表記の同期（DartHackでは「脅威の迷宮へのガイド」）
