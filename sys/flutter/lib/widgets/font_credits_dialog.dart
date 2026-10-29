@@ -44,8 +44,8 @@ class FontCreditsData {
       shortLicense: 'M+ LICENSE',
       licenseColor: Color(0xFF26A69A), // Teal
       url: 'https://github.com/itouhiro/PixelMplus',
-      descriptionJa: '8bitゲーム機のビットマップフォントを再現したTrueTypeアウトラインフォントです。JIS第1・第2水準漢字に対応しています。',
-      descriptionEn: 'TrueType outline font recreating 8-bit retro console bitmap fonts. Supports JIS Level 1 and 2 Kanji.',
+      descriptionJa: 'ピクセル風のビットマップフォントを再現したTrueTypeアウトラインフォントです。JIS第1・第2水準漢字に対応しています。',
+      descriptionEn: 'TrueType outline font designed with a pixel/bitmap aesthetic. Supports JIS Level 1 and 2 Kanji.',
     ),
     FontCreditEntry(
       id: 'Terminus',

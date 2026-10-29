@@ -237,7 +237,7 @@ flowchart TD
 | `Terminus` | Terminus TTF (アスキー定番) / Terminus TTF (Classic ASCII) | アスペクト比約 0.50。NetHack 伝統の鮮明なビットマップ調等幅 | SIL OFL 1.1 |
 | `Unscii-8` | Unscii 8x8 (レトロPC) / Unscii 8x8 (Retro PC) | アスペクト比 1.00（正方形セル）。C64 やファミコンを思わせるレトロ調 | Public Domain |
 | `IBMVGA9x16` | IBM VGA 9x16 (クラシックPC) / IBM VGA 9x16 (Classic PC) | アスペクト比 0.56 (9x16)。DOS時代の王道VGAテキスト画面を忠実再現 | CC BY-SA 4.0 (int10h) |
-| `PixelMplus12` | PixelMPlus12(ファミコン風日本語) / PixelMplus12 (8-bit Pixel JP) | アスペクト比約 0.50。8bitゲーム機調のビットマップ風日本語フォント | M+ FONT LICENSE |
+| `PixelMplus12` | PixelMPlus12(ピクセル風日本語) / PixelMplus12 (Pixel Style JP) | アスペクト比約 0.50。ピクセル調のビットマップ風日本語フォント | M+ FONT LICENSE |
 | `MisakiGothic`| 美咲ゴシック (日本語レトロ) / Misaki Gothic (Retro Pixel JP) | 8x8 ドットの超小型日本語ビットマップフォント。日本語UIに完全対応 | フリー (自由利用) |
 
 ### 5.2 動的フォントロードとサンドボックス永続化
