@@ -26,7 +26,7 @@ void main() {
     );
   }
 
-  testWidgets('FontCreditsDialog が正常に描画され、6種類の同梱フォント情報が表示されること (日本語)', (tester) async {
+  testWidgets('FontCreditsDialog が正常に描画され、5種類の同梱フォント情報が表示されること (日本語)', (tester) async {
     tester.view.physicalSize = const Size(800, 1600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
@@ -39,9 +39,8 @@ void main() {
     expect(find.text('フォント ライセンス・クレジット'), findsOneWidget);
     expect(find.text('DartHack に同梱されているフォントの著作者およびライセンス一覧です。'), findsOneWidget);
 
-    // 6種類のフォント名が表示されていること
+    // 5種類のフォント名が表示されていること
     expect(find.text('PixelMplus12'), findsOneWidget);
-    expect(find.text('Square'), findsOneWidget);
     expect(find.text('Terminus (TTF)'), findsOneWidget);
     expect(find.text('PxPlus IBM VGA 9x16'), findsOneWidget);
     expect(find.text('美咲ゴシック (Misaki Gothic)'), findsOneWidget);
@@ -49,7 +48,6 @@ void main() {
 
     // ライセンス名が表示されていること
     expect(find.text('ライセンス: M+ FONT LICENSE'), findsOneWidget);
-    expect(find.text('ライセンス: Creative Commons Attribution 3.0 Unported (CC BY 3.0)'), findsOneWidget);
     expect(find.text('ライセンス: SIL Open Font License 1.1'), findsOneWidget); // Terminus
     expect(find.text('ライセンス: Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)'), findsOneWidget);
     expect(find.text('ライセンス: 自由利用 (フリーソフトウェア)'), findsOneWidget);
@@ -108,7 +106,6 @@ void main() {
 
     final packages = licenses.expand((l) => l.packages).toSet();
     expect(packages.contains('PixelMplus12'), isTrue);
-    expect(packages.contains('Square'), isTrue);
     expect(packages.contains('Terminus (TTF)'), isTrue);
     expect(packages.contains('PxPlus IBM VGA 9x16'), isTrue);
     expect(packages.contains('美咲ゴシック (Misaki Gothic)'), isTrue);

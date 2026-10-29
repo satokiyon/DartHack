@@ -92,9 +92,6 @@ flutter:
     - family: PixelMplus12
       fonts:
         - asset: assets/fonts/PixelMplus12-Regular.ttf
-    - family: Square
-      fonts:
-        - asset: assets/fonts/square.ttf
     - family: MisakiGothic
       fonts:
         - asset: assets/fonts/misaki_gothic.ttf

@@ -37,17 +37,16 @@ void main() {
       expect(manager.mapAsciiScale, 1.0);
     });
 
-    test('内蔵フォント 7 種が利用可能リストに含まれ、日英表示名が正しく取得できる', () async {
+    test('内蔵フォント 6 種が利用可能リストに含まれ、日英表示名が正しく取得できる', () async {
       final manager = FontManager.instance;
       await manager.init(prefs: mockPrefs, customFontsDir: tempDir);
 
       final available = manager.availableFonts;
-      expect(available.length, equals(7));
+      expect(available.length, equals(6));
       expect(available.any((f) => f.id == 'system'), isTrue);
       expect(available.any((f) => f.id == 'Terminus'), isTrue);
       expect(available.any((f) => f.id == 'Unscii-8'), isTrue);
       expect(available.any((f) => f.id == 'IBMVGA9x16'), isTrue);
-      expect(available.any((f) => f.id == 'Square'), isTrue);
       expect(available.any((f) => f.id == 'PixelMplus12'), isTrue);
       expect(available.any((f) => f.id == 'MisakiGothic'), isTrue);
 
@@ -67,10 +66,6 @@ void main() {
       expect(ibmVga.getDisplayName(true), equals('IBM VGA 9x16 (クラシックPC)'));
       expect(ibmVga.getDisplayName(false), equals('IBM VGA 9x16 (Classic PC)'));
 
-      final square = available.firstWhere((f) => f.id == 'Square');
-      expect(square.getDisplayName(true), equals('Square(正方形セル)'));
-      expect(square.getDisplayName(false), equals('Square (Square Cell)'));
-
       final pixelMplus = available.firstWhere((f) => f.id == 'PixelMplus12');
       expect(pixelMplus.getDisplayName(true), equals('PixelMPlus12(ファミコン風日本語)'));
       expect(pixelMplus.getDisplayName(false), equals('PixelMplus12 (8-bit Pixel JP)'));
@@ -80,9 +75,9 @@ void main() {
       expect(misaki.getDisplayName(false), equals('Misaki Gothic (Retro Pixel JP)'));
     });
 
-    test('削除された旧フォント ID (NotoSansMonoCJKjp, Unscii-16) が保存されていた場合は安全にデフォルトへマイグレーションされる', () async {
-      await mockPrefs.setString(FontManager.prefFontMap, 'NotoSansMonoCJKjp');
-      await mockPrefs.setString(FontManager.prefFontMessage, 'Unscii-16');
+    test('削除された旧フォント ID (NotoSansMonoCJKjp, Square, Unscii-16) が保存されていた場合は安全にデフォルトへマイグレーションされる', () async {
+      await mockPrefs.setString(FontManager.prefFontMap, 'Square');
+      await mockPrefs.setString(FontManager.prefFontMessage, 'NotoSansMonoCJKjp');
 
       final manager = FontManager.instance;
       await manager.init(prefs: mockPrefs, customFontsDir: tempDir);

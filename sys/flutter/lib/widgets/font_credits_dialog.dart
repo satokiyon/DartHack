@@ -48,19 +48,6 @@ class FontCreditsData {
       descriptionEn: 'TrueType outline font recreating 8-bit retro console bitmap fonts. Supports JIS Level 1 and 2 Kanji.',
     ),
     FontCreditEntry(
-      id: 'Square',
-      name: 'Square',
-      fileName: 'square.ttf',
-      author: 'Wouter van Oortmerssen (Aardappel)',
-      authorEn: 'Wouter van Oortmerssen (Aardappel)',
-      license: 'Creative Commons Attribution 3.0 Unported (CC BY 3.0)',
-      shortLicense: 'CC BY 3.0',
-      licenseColor: Color(0xFF42A5F5), // Blue
-      url: 'https://strlen.com/square/',
-      descriptionJa: 'ローグライクやグリッド描画のために特別に設計された1:1正方形セルの等幅フォントです。ダンジョンマップの正方形マス描画に最適です。',
-      descriptionEn: 'Monospace font designed specifically for roguelikes with a 1:1 square aspect ratio. Optimal for square dungeon map display.',
-    ),
-    FontCreditEntry(
       id: 'Terminus',
       name: 'Terminus (TTF)',
       fileName: 'TerminusTTF-Regular.ttf',

@@ -230,7 +230,6 @@ void main() {
     expect(find.text('Terminus TTF (Classic ASCII)'), findsWidgets);
     expect(find.text('Unscii 8x8 (Retro PC)'), findsWidgets);
     expect(find.text('IBM VGA 9x16 (Classic PC)'), findsWidgets);
-    expect(find.text('Square (Square Cell)'), findsWidgets);
     expect(find.text('PixelMplus12 (8-bit Pixel JP)'), findsWidgets);
     expect(find.text('Misaki Gothic (Retro Pixel JP)'), findsWidgets);
   });

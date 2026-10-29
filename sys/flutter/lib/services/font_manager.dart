@@ -107,19 +107,6 @@ THESE FONTS ARE PROVIDED "AS IS" WITHOUT WARRANTY.''',
       );
 
       yield const LicenseEntryWithLineBreaks(
-        ['Square'],
-        '''Creative Commons Attribution 3.0 Unported (CC BY 3.0)
-Square Font
-Copyright (c) 2011-2015 Wouter van Oortmerssen (Aardappel) (https://strlen.com/square/)
-
-You are free to:
-- Share — copy and redistribute the material in any medium or format
-- Adapt — remix, transform, and build upon the material for any purpose, even commercially.
-Under the terms of Attribution (CC BY 3.0).
-https://creativecommons.org/licenses/by/3.0/''',
-      );
-
-      yield const LicenseEntryWithLineBreaks(
         ['Terminus (TTF)'],
         '''SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
 Copyright (c) 2020 Dimitar Toshkov Zhekov
@@ -193,13 +180,6 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
       displayName: 'IBM VGA 9x16 (クラシックPC)',
       displayNameEn: 'IBM VGA 9x16 (Classic PC)',
       fontFamily: 'IBMVGA9x16',
-      isBuiltIn: true,
-    ),
-    FontItem(
-      id: 'Square',
-      displayName: 'Square(正方形セル)',
-      displayNameEn: 'Square (Square Cell)',
-      fontFamily: 'Square',
       isBuiltIn: true,
     ),
     FontItem(
