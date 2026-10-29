@@ -35,9 +35,9 @@ class FontCreditEntry {
 class FontCreditsData {
   static const List<FontCreditEntry> entries = [
     FontCreditEntry(
-      id: 'PixelMplus12',
-      name: 'PixelMplus12',
-      fileName: 'PixelMplus12-Regular.ttf',
+      id: 'PixelMplus10',
+      name: 'PixelMplus10',
+      fileName: 'PixelMplus10-Regular.ttf',
       author: 'itouhiro (いとうひろき 氏) / M+ FONTS PROJECT / 門真 なむ 氏',
       authorEn: 'itouhiro / M+ FONTS PROJECT / Num Kadoma',
       license: 'M+ FONT LICENSE',

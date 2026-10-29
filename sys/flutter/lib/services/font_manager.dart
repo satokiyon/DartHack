@@ -94,7 +94,7 @@ class FontManager extends ChangeNotifier {
 
     LicenseRegistry.addLicense(() async* {
       yield const LicenseEntryWithLineBreaks(
-        ['PixelMplus12'],
+        ['PixelMplus10'],
         '''M+ FONT LICENSE
 Copyright (C) 2013-2015 itouhiro
 Copyright (C) 2002-2015 M+ FONTS PROJECT
@@ -183,10 +183,10 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
       isBuiltIn: true,
     ),
     FontItem(
-      id: 'PixelMplus12',
-      displayName: 'PixelMPlus12(ピクセル風日本語)',
-      displayNameEn: 'PixelMplus12 (Pixel Style JP)',
-      fontFamily: 'PixelMplus12',
+      id: 'PixelMplus10',
+      displayName: 'PixelMPlus10(ピクセル風日本語)',
+      displayNameEn: 'PixelMplus10 (Pixel Style JP)',
+      fontFamily: 'PixelMplus10',
       isBuiltIn: true,
     ),
     FontItem(

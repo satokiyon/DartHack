@@ -47,7 +47,7 @@ void main() {
       expect(available.any((f) => f.id == 'Terminus'), isTrue);
       expect(available.any((f) => f.id == 'Unscii-8'), isTrue);
       expect(available.any((f) => f.id == 'IBMVGA9x16'), isTrue);
-      expect(available.any((f) => f.id == 'PixelMplus12'), isTrue);
+      expect(available.any((f) => f.id == 'PixelMplus10'), isTrue);
       expect(available.any((f) => f.id == 'MisakiGothic'), isTrue);
 
       final sys = available.firstWhere((f) => f.id == 'system');
@@ -66,9 +66,9 @@ void main() {
       expect(ibmVga.getDisplayName(true), equals('IBM VGA 9x16 (クラシックPC)'));
       expect(ibmVga.getDisplayName(false), equals('IBM VGA 9x16 (Classic PC)'));
 
-      final pixelMplus = available.firstWhere((f) => f.id == 'PixelMplus12');
-      expect(pixelMplus.getDisplayName(true), equals('PixelMPlus12(ピクセル風日本語)'));
-      expect(pixelMplus.getDisplayName(false), equals('PixelMplus12 (Pixel Style JP)'));
+      final pixelMplus = available.firstWhere((f) => f.id == 'PixelMplus10');
+      expect(pixelMplus.getDisplayName(true), equals('PixelMPlus10(ピクセル風日本語)'));
+      expect(pixelMplus.getDisplayName(false), equals('PixelMplus10 (Pixel Style JP)'));
 
       final misaki = available.firstWhere((f) => f.id == 'MisakiGothic');
       expect(misaki.getDisplayName(true), equals('美咲ゴシック (日本語レトロ)'));

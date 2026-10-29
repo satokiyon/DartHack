@@ -89,9 +89,9 @@ flutter:
     - family: IBMVGA9x16
       fonts:
         - asset: assets/fonts/PxPlus_IBM_VGA_9x16.ttf
-    - family: PixelMplus12
+    - family: PixelMplus10
       fonts:
-        - asset: assets/fonts/PixelMplus12-Regular.ttf
+        - asset: assets/fonts/PixelMplus10-Regular.ttf
     - family: MisakiGothic
       fonts:
         - asset: assets/fonts/misaki_gothic.ttf

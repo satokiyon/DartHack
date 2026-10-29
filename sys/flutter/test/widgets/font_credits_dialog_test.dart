@@ -40,7 +40,7 @@ void main() {
     expect(find.text('DartHack に同梱されているフォントの著作者およびライセンス一覧です。'), findsOneWidget);
 
     // 5種類のフォント名が表示されていること
-    expect(find.text('PixelMplus12'), findsOneWidget);
+    expect(find.text('PixelMplus10'), findsOneWidget);
     expect(find.text('Terminus (TTF)'), findsOneWidget);
     expect(find.text('PxPlus IBM VGA 9x16'), findsOneWidget);
     expect(find.text('美咲ゴシック (Misaki Gothic)'), findsOneWidget);
@@ -105,7 +105,7 @@ void main() {
     }
 
     final packages = licenses.expand((l) => l.packages).toSet();
-    expect(packages.contains('PixelMplus12'), isTrue);
+    expect(packages.contains('PixelMplus10'), isTrue);
     expect(packages.contains('Terminus (TTF)'), isTrue);
     expect(packages.contains('PxPlus IBM VGA 9x16'), isTrue);
     expect(packages.contains('美咲ゴシック (Misaki Gothic)'), isTrue);
