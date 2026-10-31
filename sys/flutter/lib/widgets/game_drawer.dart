@@ -143,7 +143,7 @@ class GameDrawerContent extends StatelessWidget {
           ),
         ],
         ListTile(
-          leading: Icon(isKeyboardVisible ? Icons.keyboard_hide : Icons.keyboard, color: Colors.blueAccent),
+          leading: Icon(isKeyboardVisible ? Icons.videogame_asset_off : Icons.videogame_asset, color: Colors.blueAccent),
           title: Text(isKeyboardVisible ? l10n.hideKeyboard : l10n.showKeyboard, style: const TextStyle(color: Colors.white)),
           onTap: () {
             onClose();

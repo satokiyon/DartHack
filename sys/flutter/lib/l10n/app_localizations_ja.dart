@@ -102,10 +102,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get showFullMap => '階層の全体地図を表示';
 
   @override
-  String get hideKeyboard => '仮想キーボードを非表示';
+  String get hideKeyboard => '操作ボタンを非表示';
 
   @override
-  String get showKeyboard => '仮想キーボードを表示';
+  String get showKeyboard => '操作ボタンを表示';
 
   @override
   String get openSettings => 'ゲーム設定を開く';

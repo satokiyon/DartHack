@@ -287,13 +287,13 @@ abstract class AppLocalizations {
   /// No description provided for @hideKeyboard.
   ///
   /// In ja, this message translates to:
-  /// **'仮想キーボードを非表示'**
+  /// **'操作ボタンを非表示'**
   String get hideKeyboard;
 
   /// No description provided for @showKeyboard.
   ///
   /// In ja, this message translates to:
-  /// **'仮想キーボードを表示'**
+  /// **'操作ボタンを表示'**
   String get showKeyboard;
 
   /// No description provided for @openSettings.

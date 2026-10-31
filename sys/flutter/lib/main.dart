@@ -527,10 +527,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       onOpenOptions: () => _sendFfiKey('O'.codeUnitAt(0), "O"),
       onShowFullMap: _showFullMapDialog,
       onToggleKeyboard: () {
+        final newVisible = !_isKeyboardVisible;
         setState(() {
-          _isKeyboardVisible = !_isKeyboardVisible;
+          _isKeyboardVisible = newVisible;
         });
-        if (!_isKeyboardVisible) {
+        unawaited(() async {
+          final prefs = await AppPrefs.getInstance();
+          await prefs.setBool('keyboard_visible', newVisible);
+        }());
+        if (!newVisible) {
           _focusNode.requestFocus();
         }
       },
@@ -597,16 +602,18 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final statusLeftShift = (_statusPosition == 'left') ? _statusWidth : 0.0;
     final statusRightShift = (_statusPosition == 'right') ? _statusWidth : 0.0;
 
-    final cmdTopShift = (_cmdPanelPosition == 'top') ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
-    final cmdBottomShift = (_cmdPanelPosition == 'bottom') ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
-    final cmdLeftShift = (_cmdPanelPosition == 'left') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
-    final cmdRightShift = (_cmdPanelPosition == 'right') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
+    final isControllerVisible = _shouldShowController;
+
+    final cmdTopShift = (isControllerVisible && _cmdPanelPosition == 'top') ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
+    final cmdBottomShift = (isControllerVisible && _cmdPanelPosition == 'bottom') ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
+    final cmdLeftShift = (isControllerVisible && _cmdPanelPosition == 'left') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
+    final cmdRightShift = (isControllerVisible && _cmdPanelPosition == 'right') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
 
     // SafeAreaのbottom（ナビゲーションバー等）
     final safeBottom = mediaQuery.padding.bottom;
 
-    double dpadShift(String pos) => (_dpadPosition == pos) ? (150.0 * _dpadEffectiveScale + 8.0) : 0.0;
-    double scShift(String pos) => (_shortcutPosition == pos) ? (150.0 * _shortcutPadEffectiveScale + 8.0) : 0.0;
+    double dpadShift(String pos) => (isControllerVisible && _controllerMode != ControllerMode.keyboard && _dpadPosition == pos) ? (150.0 * _dpadEffectiveScale + 8.0) : 0.0;
+    double scShift(String pos) => (isControllerVisible && _controllerMode != ControllerMode.keyboard && _shortcutPosition == pos) ? (150.0 * _shortcutPadEffectiveScale + 8.0) : 0.0;
 
     // メッセージ領域の高さ見積もり（フォントサイズ・行数+1行分・コンテナPadding・マージンから正確に算出）
     final estimatedMsgHeight = (_msgFontSize * 1.35 + 2.0) * (_msgLineCount + 1) + 14.0;
@@ -701,16 +708,18 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final statusLeftShift = (_statusPosition == 'left') ? _statusWidth : 0.0;
     final statusRightShift = (_statusPosition == 'right') ? _statusWidth : 0.0;
 
-    final cmdTopShift = (_cmdPanelPosition == 'top') ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
-    final cmdBottomShift = (_cmdPanelPosition == 'bottom') ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
-    final cmdLeftShift = (_cmdPanelPosition == 'left') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
-    final cmdRightShift = (_cmdPanelPosition == 'right') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
+    final isControllerVisible = _shouldShowController;
+
+    final cmdTopShift = (isControllerVisible && _cmdPanelPosition == 'top') ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
+    final cmdBottomShift = (isControllerVisible && _cmdPanelPosition == 'bottom') ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
+    final cmdLeftShift = (isControllerVisible && _cmdPanelPosition == 'left') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
+    final cmdRightShift = (isControllerVisible && _cmdPanelPosition == 'right') ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
 
     // SafeAreaのbottom（ナビゲーションバー等）
     final safeBottom = mediaQuery.padding.bottom;
 
-    double dpadShift(String pos) => (_dpadPosition == pos) ? (150.0 * _dpadEffectiveScale + 8.0) : 0.0;
-    double scShift(String pos) => (_shortcutPosition == pos) ? (150.0 * _shortcutPadEffectiveScale + 8.0) : 0.0;
+    double dpadShift(String pos) => (isControllerVisible && _controllerMode != ControllerMode.keyboard && _dpadPosition == pos) ? (150.0 * _dpadEffectiveScale + 8.0) : 0.0;
+    double scShift(String pos) => (isControllerVisible && _controllerMode != ControllerMode.keyboard && _shortcutPosition == pos) ? (150.0 * _shortcutPadEffectiveScale + 8.0) : 0.0;
     // メニューボタンが同じコーナーにある場合のみシフト
     double menuShift(String pos) => (_menuButtonPosition == pos) ? 48.0 : 0.0;
 
@@ -3209,31 +3218,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       scRight = statusRightOffset + sideMargin + (_cmdPanelPosition == 'right' ? cmdPanelRightOffset : 0.0);
     }
 
-    // メッセージ領域 オフセット計算
-    double? msgTop, msgBottom, msgLeft, msgRight;
-    if (_msgPosition == 'bottom') {
-      msgBottom = statusBottomOffset + (_cmdPanelPosition == 'bottom' ? cmdPanelScaledHeight : 0.0) +
-          (_dpadPosition.startsWith('bottom') ? (150.0 * _dpadEffectiveScale) : 0.0) + 12.0;
-      msgLeft = statusLeftOffset;
-      msgRight = statusRightOffset;
-    } else if (_msgPosition == 'top') {
-      msgTop = statusTopOffset + padTopPadding + (_cmdPanelPosition == 'top' ? cmdPanelTopOffset : 0.0);
-      msgLeft = statusLeftOffset;
-      msgRight = statusRightOffset;
-    } else {
-      if (_msgPosition.startsWith('top')) {
-        msgTop = statusTopOffset + padTopPadding + (_cmdPanelPosition == 'top' ? cmdPanelTopOffset : 0.0);
-      } else {
-        msgBottom = statusBottomOffset + padTopPadding + (_cmdPanelPosition == 'bottom' ? cmdPanelScaledHeight : 0.0);
-      }
-
-      if (_msgPosition.endsWith('left')) {
-        msgLeft = statusLeftOffset + sideMargin + (_cmdPanelPosition == 'left' ? cmdPanelLeftOffset : 0.0);
-      } else {
-        msgRight = statusRightOffset + sideMargin + (_cmdPanelPosition == 'right' ? cmdPanelRightOffset : 0.0);
-      }
-    }
-
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -3403,15 +3387,79 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             ),
           ),
         ],
-        // 5. メッセージ領域
-        Positioned(
-          top: msgTop,
-          bottom: msgBottom,
-          left: msgLeft,
-          right: msgRight,
-          child: _buildMessageWidget(),
-        ),
       ],
+    );
+  }
+
+  bool get _shouldShowMessage {
+    return _isGameRunning && !_hasAnyActiveOverlay;
+  }
+
+  Widget _buildMessageOverlay() {
+    if (!_shouldShowMessage) {
+      return const SizedBox.shrink();
+    }
+
+    final statusTopOffset = (_statusPosition == 'top') ? _statusHeight : 0.0;
+    final statusBottomOffset = (_statusPosition == 'bottom') ? _statusHeight : 0.0;
+    final statusLeftOffset = (_statusPosition == 'left') ? _statusWidth : 0.0;
+    final statusRightOffset = (_statusPosition == 'right') ? _statusWidth : 0.0;
+
+    final isControllerVisible = _shouldShowController;
+
+    final cmdPanelScaledHeight = isControllerVisible ? (_cmdPanelHeight * _cmdPanelEffectiveScale) : 0.0;
+    final cmdPanelScaledWidth = isControllerVisible ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
+    const padTopPadding = 6.0;
+    const sideMargin = 8.0;
+
+    // オフセット算出用
+    double cmdPanelTopOffset = 0.0;
+    double cmdPanelLeftOffset = 0.0;
+    double cmdPanelRightOffset = 0.0;
+
+    if (_cmdPanelPosition == 'top') {
+      cmdPanelTopOffset = cmdPanelScaledHeight;
+    } else if (_cmdPanelPosition == 'left') {
+      cmdPanelLeftOffset = cmdPanelScaledWidth;
+    } else if (_cmdPanelPosition == 'right') {
+      cmdPanelRightOffset = cmdPanelScaledWidth;
+    }
+
+    final dpadShift = (isControllerVisible && _controllerMode != ControllerMode.keyboard && _dpadPosition.startsWith('bottom'))
+        ? (150.0 * _dpadEffectiveScale)
+        : 0.0;
+
+    // メッセージ領域 オフセット計算
+    double? msgTop, msgBottom, msgLeft, msgRight;
+    if (_msgPosition == 'bottom') {
+      msgBottom = statusBottomOffset + (_cmdPanelPosition == 'bottom' ? cmdPanelScaledHeight : 0.0) +
+          dpadShift + 12.0;
+      msgLeft = statusLeftOffset;
+      msgRight = statusRightOffset;
+    } else if (_msgPosition == 'top') {
+      msgTop = statusTopOffset + padTopPadding + (_cmdPanelPosition == 'top' ? cmdPanelTopOffset : 0.0);
+      msgLeft = statusLeftOffset;
+      msgRight = statusRightOffset;
+    } else {
+      if (_msgPosition.startsWith('top')) {
+        msgTop = statusTopOffset + padTopPadding + (_cmdPanelPosition == 'top' ? cmdPanelTopOffset : 0.0);
+      } else {
+        msgBottom = statusBottomOffset + padTopPadding + (_cmdPanelPosition == 'bottom' ? cmdPanelScaledHeight : 0.0);
+      }
+
+      if (_msgPosition.endsWith('left')) {
+        msgLeft = statusLeftOffset + sideMargin + (_cmdPanelPosition == 'left' ? cmdPanelLeftOffset : 0.0);
+      } else {
+        msgRight = statusRightOffset + sideMargin + (_cmdPanelPosition == 'right' ? cmdPanelRightOffset : 0.0);
+      }
+    }
+
+    return Positioned(
+      top: msgTop,
+      bottom: msgBottom,
+      left: msgLeft,
+      right: msgRight,
+      child: _buildMessageWidget(),
     );
   }
 
@@ -3499,6 +3547,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     )
                   : (_isGameFinished ? _buildEndScreen() : _buildStartScreen()),
               _buildControllerOverlay(),
+              _buildMessageOverlay(),
               if (_isGameRunning && _isMainGameStarted) ...[
                 _buildMenuButton(),
                 _buildMapButton(),

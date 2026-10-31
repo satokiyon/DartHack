@@ -33,8 +33,8 @@
   "dbSearch": "データベース検索 ( /? )",
   "gameOptions": "オプション設定 ( O )",
   "showFullMap": "階層の全体地図を表示",
-  "hideKeyboard": "仮想キーボードを非表示",
-  "showKeyboard": "仮想キーボードを表示",
+  "hideKeyboard": "操作ボタンを非表示",
+  "showKeyboard": "操作ボタンを表示",
   "openSettings": "ゲーム設定を開く",
 
   "secStatusTitle": "ステータス表示設定",

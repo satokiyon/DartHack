@@ -103,10 +103,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get showFullMap => 'Show Full Level Map';
 
   @override
-  String get hideKeyboard => 'Hide Virtual Keyboard';
+  String get hideKeyboard => 'Hide Controls';
 
   @override
-  String get showKeyboard => 'Show Virtual Keyboard';
+  String get showKeyboard => 'Show Controls';
 
   @override
   String get openSettings => 'Open Game Settings';
