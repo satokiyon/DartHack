@@ -495,6 +495,44 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapButtonPos => '半透明地図ボタンの配置位置';
 
   @override
+  String get hideWithControlsGroupTitle => '操作ボタン非表示時の連動設定';
+
+  @override
+  String get hideWithControlsGroupDesc => '操作ボタンを非表示にした際、同時に非表示にするUI要素を選択します';
+
+  @override
+  String get hideMsgWithControlsTitle => 'メッセージ領域を合わせて非表示';
+
+  @override
+  String get hideMsgWithControlsDesc => '操作ボタン非表示時にメッセージ表示領域も非表示にします';
+
+  @override
+  String get hideMapBtnWithControlsTitle => '全体マップボタンを合わせて非表示';
+
+  @override
+  String get hideMapBtnWithControlsDesc => '操作ボタン非表示時に全体マップボタンも非表示にします';
+
+  @override
+  String get hideMenuBtnWithControlsTitle => 'メニューボタンを合わせて非表示';
+
+  @override
+  String get hideMenuBtnWithControlsDesc => '操作ボタン非表示時に半透明メニューボタンも非表示にします';
+
+  @override
+  String get hideMenuBtnNotice =>
+      '注意: メニューボタンを非表示にしても、画面端からのスワイプ（または戻るボタン/ジェスチャー）でいつでもドロワーメニューを開くことができます。';
+
+  @override
+  String get hideMenuBtnConfirmTitle => 'メニューボタンの非表示について';
+
+  @override
+  String get hideMenuBtnConfirmMsg =>
+      'メニューボタンを非表示にすると画面上からボタンが消えます。\nドロワーメニューを開くには、画面端からのスワイプ操作を行うか、端末の「戻る」ボタン（Backジェスチャー）を押したときに表示されるダイアログの「メニューを開く」を使用してください。\n\nこの設定を有効にしますか？';
+
+  @override
+  String get openMenu => 'メニューを開く';
+
+  @override
   String get posTopLeft => '左上';
 
   @override

@@ -1052,6 +1052,78 @@ abstract class AppLocalizations {
   /// **'半透明地図ボタンの配置位置'**
   String get mapButtonPos;
 
+  /// No description provided for @hideWithControlsGroupTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'操作ボタン非表示時の連動設定'**
+  String get hideWithControlsGroupTitle;
+
+  /// No description provided for @hideWithControlsGroupDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'操作ボタンを非表示にした際、同時に非表示にするUI要素を選択します'**
+  String get hideWithControlsGroupDesc;
+
+  /// No description provided for @hideMsgWithControlsTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'メッセージ領域を合わせて非表示'**
+  String get hideMsgWithControlsTitle;
+
+  /// No description provided for @hideMsgWithControlsDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'操作ボタン非表示時にメッセージ表示領域も非表示にします'**
+  String get hideMsgWithControlsDesc;
+
+  /// No description provided for @hideMapBtnWithControlsTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'全体マップボタンを合わせて非表示'**
+  String get hideMapBtnWithControlsTitle;
+
+  /// No description provided for @hideMapBtnWithControlsDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'操作ボタン非表示時に全体マップボタンも非表示にします'**
+  String get hideMapBtnWithControlsDesc;
+
+  /// No description provided for @hideMenuBtnWithControlsTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'メニューボタンを合わせて非表示'**
+  String get hideMenuBtnWithControlsTitle;
+
+  /// No description provided for @hideMenuBtnWithControlsDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'操作ボタン非表示時に半透明メニューボタンも非表示にします'**
+  String get hideMenuBtnWithControlsDesc;
+
+  /// No description provided for @hideMenuBtnNotice.
+  ///
+  /// In ja, this message translates to:
+  /// **'注意: メニューボタンを非表示にしても、画面端からのスワイプ（または戻るボタン/ジェスチャー）でいつでもドロワーメニューを開くことができます。'**
+  String get hideMenuBtnNotice;
+
+  /// No description provided for @hideMenuBtnConfirmTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'メニューボタンの非表示について'**
+  String get hideMenuBtnConfirmTitle;
+
+  /// No description provided for @hideMenuBtnConfirmMsg.
+  ///
+  /// In ja, this message translates to:
+  /// **'メニューボタンを非表示にすると画面上からボタンが消えます。\nドロワーメニューを開くには、画面端からのスワイプ操作を行うか、端末の「戻る」ボタン（Backジェスチャー）を押したときに表示されるダイアログの「メニューを開く」を使用してください。\n\nこの設定を有効にしますか？'**
+  String get hideMenuBtnConfirmMsg;
+
+  /// No description provided for @openMenu.
+  ///
+  /// In ja, this message translates to:
+  /// **'メニューを開く'**
+  String get openMenu;
+
   /// No description provided for @posTopLeft.
   ///
   /// In ja, this message translates to:

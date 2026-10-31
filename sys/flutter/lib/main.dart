@@ -239,6 +239,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   String _menuButtonPosition = 'top_left';
   bool _showMapButton = true;
   String _mapButtonPosition = 'bottom_right';
+  bool _hideMsgWithControls = false;
+  bool _hideMapBtnWithControls = false;
+  bool _hideMenuBtnWithControls = false;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String _dpadPosition = 'bottom_left';
   String _shortcutPosition = 'bottom_right';
   String _msgPosition = 'top';
@@ -340,6 +344,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       _menuButtonPosition = prefs.getString('menu_button_position') ?? 'bottom_left';
       _showMapButton = prefs.getBool('show_map_button') ?? true;
       _mapButtonPosition = prefs.getString('map_button_position') ?? 'bottom_right';
+      _hideMsgWithControls = prefs.getBool('hide_msg_with_controls') ?? false;
+      _hideMapBtnWithControls = prefs.getBool('hide_map_btn_with_controls') ?? false;
+      _hideMenuBtnWithControls = prefs.getBool('hide_menu_btn_with_controls') ?? false;
       _dpadPosition = prefs.getString('dpad_position') ?? 'bottom_left';
       _shortcutPosition = prefs.getString('shortcut_position') ?? 'bottom_right';
       _msgPosition = prefs.getString('msg_position') ?? 'top';
@@ -485,11 +492,19 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
   }
 
-  void _openMenu(BuildContext context) {
+  void _openMenu([BuildContext? context]) {
     if (_drawerPosition == 'left') {
-      Scaffold.of(context).openDrawer();
+      if (_scaffoldKey.currentState != null) {
+        _scaffoldKey.currentState!.openDrawer();
+      } else if (context != null) {
+        Scaffold.of(context).openDrawer();
+      }
     } else if (_drawerPosition == 'right') {
-      Scaffold.of(context).openEndDrawer();
+      if (_scaffoldKey.currentState != null) {
+        _scaffoldKey.currentState!.openEndDrawer();
+      } else if (context != null) {
+        Scaffold.of(context).openEndDrawer();
+      }
     } else if (_drawerPosition == 'top') {
       setState(() {
         _isTopDrawerOpen = true;
@@ -591,6 +606,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
 
   Widget _buildMenuButton() {
+    if (!_isKeyboardVisible && _hideMenuBtnWithControls) {
+      return const SizedBox.shrink();
+    }
+
     double? top;
     double? bottom;
     double? left;
@@ -694,6 +713,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Widget _buildMapButton() {
     if (!_showMapButton || !_isMainGameStarted || !_isGameRunning) {
+      return const SizedBox.shrink();
+    }
+    if (!_isKeyboardVisible && _hideMapBtnWithControls) {
       return const SizedBox.shrink();
     }
 
@@ -3392,7 +3414,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   bool get _shouldShowMessage {
-    return _isGameRunning && !_hasAnyActiveOverlay;
+    if (!_isGameRunning || _hasAnyActiveOverlay) return false;
+    if (!_isKeyboardVisible && _hideMsgWithControls) return false;
+    return true;
   }
 
   Widget _buildMessageOverlay() {
@@ -3486,7 +3510,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         if (didPop) return;
         if (_isGameRunning && _isMainGameStarted) {
           final isJp = (_selectedLanguage == 'ja');
-          final bool? exitConfirmed = await showDialog<bool>(
+          final action = await showDialog<String>(
             context: context,
             builder: (context) => AlertDialog(
               backgroundColor: Colors.grey[900],
@@ -3499,24 +3523,33 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
+                  onPressed: () => Navigator.of(context).pop('cancel'),
                   child: Text(isJp ? "キャンセル" : "Cancel", style: const TextStyle(color: Colors.blueAccent)),
                 ),
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
+                  onPressed: () => Navigator.of(context).pop('menu'),
+                  child: Text(isJp ? "メニューを開く" : "Open Menu", style: const TextStyle(color: Colors.amberAccent)),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop('quit'),
                   child: Text(isJp ? "終了する" : "Quit", style: const TextStyle(color: Colors.redAccent)),
                 ),
               ],
             ),
           );
-          if (exitConfirmed == true) {
+          if (action == 'quit') {
             _stopGame();
+          } else if (action == 'menu') {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _openMenu(context);
+            });
           }
         } else {
           _stopGame();
         }
       },
       child: Scaffold(
+        key: _scaffoldKey,
         drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2,
         drawer: _isMainGameStarted && _drawerPosition == 'left' ? Drawer(
           child: Container(

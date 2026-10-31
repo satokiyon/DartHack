@@ -57,6 +57,9 @@ class _SettingsPageState extends State<SettingsPage> {
   // ignore: unused_field
   bool _showMapButton = true;
   String _mapButtonPosition = 'bottom_right';
+  bool _hideMsgWithControls = false;
+  bool _hideMapBtnWithControls = false;
+  bool _hideMenuBtnWithControls = false;
   String _dpadPosition = 'bottom_left';
   String _shortcutPosition = 'bottom_right';
   String _msgPosition = 'bottom';
@@ -277,6 +280,9 @@ class _SettingsPageState extends State<SettingsPage> {
       _menuButtonPosition = prefs.getString('menu_button_position') ?? 'bottom_left';
       _showMapButton = prefs.getBool('show_map_button') ?? true;
       _mapButtonPosition = prefs.getString('map_button_position') ?? 'bottom_right';
+      _hideMsgWithControls = prefs.getBool('hide_msg_with_controls') ?? false;
+      _hideMapBtnWithControls = prefs.getBool('hide_map_btn_with_controls') ?? false;
+      _hideMenuBtnWithControls = prefs.getBool('hide_menu_btn_with_controls') ?? false;
       _dpadPosition = prefs.getString('dpad_position') ?? 'bottom_left';
       _shortcutPosition = prefs.getString('shortcut_position') ?? 'bottom_right';
       _msgPosition = prefs.getString('msg_position') ?? 'top';
@@ -1404,9 +1410,108 @@ class _SettingsPageState extends State<SettingsPage> {
               }
             },
           ),
+          // 操作ボタン非表示時の連動設定サブグループ
+          Padding(
+            padding: const EdgeInsets.only(top: 14.0, bottom: 4.0, left: 16.0, right: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.hideWithControlsGroupTitle,
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.cyanAccent),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  l10n.hideWithControlsGroupDesc,
+                  style: const TextStyle(fontSize: 12, color: Colors.white70),
+                ),
+              ],
+            ),
+          ),
+          SwitchListTile(
+            title: Text(l10n.hideMsgWithControlsTitle),
+            subtitle: Text(l10n.hideMsgWithControlsDesc),
+            value: _hideMsgWithControls,
+            onChanged: (val) {
+              setState(() => _hideMsgWithControls = val);
+              _saveSetting('hide_msg_with_controls', val);
+            },
+          ),
+          SwitchListTile(
+            title: Text(l10n.hideMapBtnWithControlsTitle),
+            subtitle: Text(l10n.hideMapBtnWithControlsDesc),
+            value: _hideMapBtnWithControls,
+            onChanged: (val) {
+              setState(() => _hideMapBtnWithControls = val);
+              _saveSetting('hide_map_btn_with_controls', val);
+            },
+          ),
+          SwitchListTile(
+            title: Text(l10n.hideMenuBtnWithControlsTitle),
+            subtitle: Text(l10n.hideMenuBtnWithControlsDesc),
+            value: _hideMenuBtnWithControls,
+            onChanged: (val) async {
+              if (val) {
+                final confirmed = await _showHideMenuConfirmDialog();
+                if (!confirmed) return;
+              }
+              setState(() => _hideMenuBtnWithControls = val);
+              _saveSetting('hide_menu_btn_with_controls', val);
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+            child: Container(
+              padding: const EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                color: Colors.amber.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.info_outline, color: Colors.amber, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l10n.hideMenuBtnNotice,
+                      style: const TextStyle(fontSize: 12, color: Colors.amberAccent),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ]),
       ),
     );
+  }
+
+  Future<bool> _showHideMenuConfirmDialog() async {
+    final l10n = AppLocalizations.of(context)!;
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: Text(l10n.hideMenuBtnConfirmTitle, style: const TextStyle(color: Colors.white)),
+        content: Text(
+          l10n.hideMenuBtnConfirmMsg,
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.confirm, style: const TextStyle(color: Colors.amberAccent)),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
   }
 
   Widget _buildControllerSection() {

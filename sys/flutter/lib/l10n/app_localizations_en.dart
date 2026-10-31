@@ -500,6 +500,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapButtonPos => 'Translucent Map Button Position';
 
   @override
+  String get hideWithControlsGroupTitle => 'Hide With Controls Settings';
+
+  @override
+  String get hideWithControlsGroupDesc =>
+      'Select UI elements to also hide when controls are hidden';
+
+  @override
+  String get hideMsgWithControlsTitle => 'Hide Message Area';
+
+  @override
+  String get hideMsgWithControlsDesc =>
+      'Also hide the message area when controls are hidden';
+
+  @override
+  String get hideMapBtnWithControlsTitle => 'Hide Full Map Button';
+
+  @override
+  String get hideMapBtnWithControlsDesc =>
+      'Also hide the full map button when controls are hidden';
+
+  @override
+  String get hideMenuBtnWithControlsTitle => 'Hide Menu Button';
+
+  @override
+  String get hideMenuBtnWithControlsDesc =>
+      'Also hide the semi-transparent menu button when controls are hidden';
+
+  @override
+  String get hideMenuBtnNotice =>
+      'Note: Even if the menu button is hidden, you can always open the drawer menu by swiping from the screen edge or using the Back gesture/button.';
+
+  @override
+  String get hideMenuBtnConfirmTitle => 'About Hiding Menu Button';
+
+  @override
+  String get hideMenuBtnConfirmMsg =>
+      'Hiding the menu button removes it from the screen.\nTo open the drawer menu, swipe from the screen edge or tap \'Open Menu\' in the Back gesture dialog.\n\nEnable this setting?';
+
+  @override
+  String get openMenu => 'Open Menu';
+
+  @override
   String get posTopLeft => 'Top Left';
 
   @override
