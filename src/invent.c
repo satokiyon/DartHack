@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-02. */
 /* NetHack 5.0	invent.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.563 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -5385,7 +5385,7 @@ doorganize_core(struct obj *obj)
                 pline1(Never_mind);
             return ECMD_OK;
         } else if (let == GOLD_SYM && obj->oclass != COIN_CLASS) {
-            pline("'%c' スロットへ移せるのは金貨だけだった.",
+            pline("'%c' スロットへ移せるのは金貨だけだ.",
                   GOLD_SYM);
             ever_mind = TRUE;
             goto noadjust;
@@ -5397,7 +5397,7 @@ doorganize_core(struct obj *obj)
             break; /* got one */
         if (trycnt == 5)
             goto noadjust;
-        pline("インベントリのスロット文字を選んでほしい."); /* else try again */
+        pline("インベントリのスロット文字を選んでください."); /* else try again */
     }
 
     collect = (let == obj->invlet);
@@ -5470,7 +5470,7 @@ doorganize_core(struct obj *obj)
                 } else if (inv_cnt(FALSE) >= invlet_basic) {
                     (void) merged(&splitting, &obj); /* undo split */
                     /* "knapsack cannot accommodate any more items" */
-                    Your("荷物袋はいっぱいだった.");
+                    Your("荷物袋はいっぱいだ.");
                     return ECMD_OK;
                 } else {
                     bumped = otmp;
