@@ -27,6 +27,7 @@ import 'dart:convert';
 import 'package:ffi/ffi.dart';
 import 'widgets/exit_highlight_dialog.dart';
 import 'utils/rewarded_ad_manager.dart';
+import 'utils/yn_choice_parser.dart';
 
 import 'models/game_enums.dart';
 import 'models/ext_cmd_entry.dart';
@@ -873,6 +874,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       context: context,
       numberPadMode: _numberPadMode,
       ynChoices: _ynChoices,
+      ynQuestion: _ynQuestion,
       ynDefault: _ynDefault,
       isShiftPressed: isShift,
       isControlPressed: isCtrl,
@@ -1169,6 +1171,31 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       _anyKeyDescription = null;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
+  }
+
+  void _sendYnTextResult(String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return;
+
+    final parsed = YnChoiceParser.parse(
+      question: _ynQuestion,
+      choices: _ynChoices,
+      defaultChoice: _ynDefault,
+    );
+
+    if (parsed.type == YnPromptType.countInput) {
+      // 数量分割: 1文字目を yn_result で送信し、2文字目以降と Enter (10) をキーキューに連続供給して get_count を自動確定
+      final firstCode = trimmed.codeUnitAt(0);
+      final remaining = trimmed.substring(1);
+      _sendYnResult(firstCode);
+      _workerSendPort?.send({
+        'type': 'keys',
+        'keys': [...remaining.codeUnits, 10],
+      });
+    } else {
+      // 通常のスロット文字または記号選択
+      _sendYnResult(trimmed.codeUnitAt(0));
+    }
   }
 
   void _sendGetLineResult(String? result) {
@@ -2645,6 +2672,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       choices: _ynChoices,
       defaultChoice: _ynDefault,
       onSelect: (choiceCode) => _sendYnResult(choiceCode),
+      onSelectText: _sendYnTextResult,
       onShowMsgHistory: _showMsgHistoryPanel,
       bottomInset: _dialogBottomInset(context),
       recentMessages: recentMsgs,

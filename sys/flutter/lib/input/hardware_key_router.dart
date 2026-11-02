@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import '../utils/yn_choice_parser.dart';
 
 /// 拡張コマンドメニューのプロンプトかどうかを判定する共通関数
 bool isExtCmdMenuPrompt(String prompt) {
@@ -281,6 +282,7 @@ class HardwareKeyRouter {
     required KeyInputContext context,
     int numberPadMode = 0,
     String ynChoices = '',
+    String ynQuestion = '',
     int ynDefault = 0,
     bool isShiftPressed = false,
     bool isControlPressed = false,
@@ -306,7 +308,13 @@ class HardwareKeyRouter {
 
     // 2. YN プロンプト表示中
     if (context == KeyInputContext.yn) {
-      return _routeYn(event, ynChoices, ynDefault);
+      return _routeYn(
+        event,
+        ynChoices,
+        ynDefault,
+        question: ynQuestion,
+        isShiftPressed: isShiftPressed,
+      );
     }
 
     // 3. テキスト画面表示中（ダンプログ、TopTen、ガイドブック等）
@@ -372,7 +380,13 @@ class HardwareKeyRouter {
   }
 
   /// YN プロンプトのキー判定
-  static KeyAction _routeYn(KeyEvent event, String choices, int defaultChoice) {
+  static KeyAction _routeYn(
+    KeyEvent event,
+    String choices,
+    int defaultChoice, {
+    String question = '',
+    bool isShiftPressed = false,
+  }) {
     // ESC は常にキャンセル (27)
     if (event.logicalKey == LogicalKeyboardKey.escape) {
       return const SendYn(27);
@@ -388,46 +402,63 @@ class HardwareKeyRouter {
       return const SwallowKey();
     }
 
-    // 有効な選択肢文字列のパース（ESC文字 \x1b を除去）
-    final cleanChoices = choices.replaceAll('\x1b', '');
-
     // 入力された文字の抽出
     String? char = event.character;
     if (char != null && char.isNotEmpty) {
       char = normalizeCharacter(char);
+    } else {
+      char = _charFromLogicalKey(event.logicalKey, isShiftPressed);
     }
 
-    if (char != null && char.isNotEmpty) {
-      final lowerChar = char.toLowerCase();
+    if (char == null || char.isEmpty) {
+      return const SwallowKey();
+    }
 
-      // cleanChoices に含まれているか判定（完全一致優先、次いでケース非依存で実在文字コードに正規化）
-      if (cleanChoices.isNotEmpty) {
+    final parsed = YnChoiceParser.parse(
+      question: question,
+      choices: choices,
+      defaultChoice: defaultChoice,
+    );
+
+    switch (parsed.type) {
+      case YnPromptType.countInput:
+        if (parsed.validKeyChars.contains(char)) {
+          return SendYn(char.codeUnitAt(0));
+        }
+        return const SwallowKey();
+
+      case YnPromptType.slotSelect:
+        final code = char.codeUnitAt(0);
+        final isLetter = (code >= 65 && code <= 90) || (code >= 97 && code <= 122);
+        if (isLetter || char == '?' || char == '*' || char == '\$' || char == '#') {
+          return SendYn(code);
+        }
+        return const SwallowKey();
+
+      case YnPromptType.symbolDetect:
+      case YnPromptType.genericChar:
+        final code = char.codeUnitAt(0);
+        if (code >= 32 && code <= 126) {
+          return SendYn(code);
+        }
+        return const SwallowKey();
+
+      case YnPromptType.yesNo:
+        final lowerChar = char.toLowerCase();
         // 1. 完全一致
-        for (int i = 0; i < cleanChoices.length; i++) {
-          final c = cleanChoices[i];
+        for (final c in parsed.quickChoices) {
           if (c == char) {
             return SendYn(c.codeUnitAt(0));
           }
         }
-        // 2. 大文字小文字同一視（choices 側の実在ケースに正規化して C コアに返す）
-        for (int i = 0; i < cleanChoices.length; i++) {
-          final c = cleanChoices[i];
+        // 2. 大文字小文字同一視
+        for (final c in parsed.quickChoices) {
           if (c.toLowerCase() == lowerChar) {
             return SendYn(c.codeUnitAt(0));
           }
         }
-      } else {
-        // choices が明示されていない標準 YN の場合
-        if (lowerChar == 'y') return const SendYn(121); // 'y'
-        if (lowerChar == 'n') return const SendYn(110); // 'n'
-        if (lowerChar == 'q') return const SendYn(113); // 'q'
-      }
-
-      // 期待する選択肢に含まれないキーは無視（Swallow）
-      return const SwallowKey();
+        return const SwallowKey();
     }
-
-    return const SwallowKey();
   }
 
   static String? _charFromLogicalKey(LogicalKeyboardKey key, bool isShiftPressed) {
@@ -457,6 +488,25 @@ class HardwareKeyRouter {
     if (key == LogicalKeyboardKey.keyX) return isShiftPressed ? 'X' : 'x';
     if (key == LogicalKeyboardKey.keyY) return isShiftPressed ? 'Y' : 'y';
     if (key == LogicalKeyboardKey.keyZ) return isShiftPressed ? 'Z' : 'z';
+
+    // 数字キー
+    if (key == LogicalKeyboardKey.digit0 || key == LogicalKeyboardKey.numpad0) return '0';
+    if (key == LogicalKeyboardKey.digit1 || key == LogicalKeyboardKey.numpad1) return isShiftPressed ? '!' : '1';
+    if (key == LogicalKeyboardKey.digit2 || key == LogicalKeyboardKey.numpad2) return isShiftPressed ? '"' : '2';
+    if (key == LogicalKeyboardKey.digit3 || key == LogicalKeyboardKey.numpad3) return isShiftPressed ? '#' : '3';
+    if (key == LogicalKeyboardKey.digit4 || key == LogicalKeyboardKey.numpad4) return isShiftPressed ? '\$' : '4';
+    if (key == LogicalKeyboardKey.digit5 || key == LogicalKeyboardKey.numpad5) return isShiftPressed ? '%' : '5';
+    if (key == LogicalKeyboardKey.digit6 || key == LogicalKeyboardKey.numpad6) return isShiftPressed ? '&' : '6';
+    if (key == LogicalKeyboardKey.digit7 || key == LogicalKeyboardKey.numpad7) return isShiftPressed ? '\'' : '7';
+    if (key == LogicalKeyboardKey.digit8 || key == LogicalKeyboardKey.numpad8) return isShiftPressed ? '(' : '8';
+    if (key == LogicalKeyboardKey.digit9 || key == LogicalKeyboardKey.numpad9) return isShiftPressed ? ')' : '9';
+
+    // 記号キー
+    if (key == LogicalKeyboardKey.slash) return isShiftPressed ? '?' : '/';
+    if (key == LogicalKeyboardKey.question) return '?';
+    if (key == LogicalKeyboardKey.asterisk) return '*';
+    if (key == LogicalKeyboardKey.numpadMultiply) return '*';
+    if (key == LogicalKeyboardKey.numpadDivide) return '/';
     return null;
   }
 

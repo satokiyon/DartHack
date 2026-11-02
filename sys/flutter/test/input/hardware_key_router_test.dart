@@ -175,6 +175,109 @@ void main() {
       );
     });
 
+    test('YN mode with special prompts (#adjust, split, symbol detect, charFromLogicalKey)', () {
+      // 1. #adjust スロット選択: 'c', '?', ESC
+      final cEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.keyC,
+        logicalKey: LogicalKeyboardKey.keyC,
+        character: 'c',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: cEvent,
+          context: KeyInputContext.yn,
+          ynChoices: '',
+          ynQuestion: 'スロット文字を調整 移動先はどこにしますか [c-z]?',
+        ),
+        equals(const SendYn(99)), // 'c'
+      );
+
+      final qmarkEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.slash,
+        logicalKey: LogicalKeyboardKey.slash,
+        character: '?',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: qmarkEvent,
+          context: KeyInputContext.yn,
+          ynChoices: '',
+          ynQuestion: 'スロット文字を調整 移動先はどこにしますか [c-z]?',
+        ),
+        equals(const SendYn(63)), // '?'
+      );
+
+      // 2. スタック分割: '5' (数字)
+      final fiveEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.digit5,
+        logicalKey: LogicalKeyboardKey.digit5,
+        character: '5',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: fiveEvent,
+          context: KeyInputContext.yn,
+          ynChoices: '',
+          ynQuestion: 'いくつ分けますか?',
+        ),
+        equals(const SendYn(53)), // '5'
+      );
+
+      // 3. 水晶玉探知: '$' (記号)
+      final dollarEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.digit4,
+        logicalKey: LogicalKeyboardKey.dollar,
+        character: '\$',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: dollarEvent,
+          context: KeyInputContext.yn,
+          ynChoices: '',
+          ynQuestion: '何をお探しですか?',
+        ),
+        equals(const SendYn(36)), // '$'
+      );
+
+      // 4. キャラメイクおまかせ: 'a' キー
+      final aEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.keyA,
+        logicalKey: LogicalKeyboardKey.keyA,
+        character: 'a',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: aEvent,
+          context: KeyInputContext.yn,
+          ynChoices: '',
+          ynQuestion: "Shall I pick a character's race, role, gender and alignment for you? [ynaq]",
+        ),
+        equals(const SendYn(97)), // 'a'
+      );
+
+      // 5. character が null の場合のフォールバック (IME有効時など)
+      final noCharC = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.keyC,
+        logicalKey: LogicalKeyboardKey.keyC,
+        character: null,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: noCharC,
+          context: KeyInputContext.yn,
+          ynChoices: '',
+          ynQuestion: 'スロット文字を調整 移動先はどこにしますか [c-z]?',
+        ),
+        equals(const SendYn(99)), // 'c'
+      );
+    });
+
     test('extCmdMenu should ignore characters so TextField can consume them', () {
       final lEvent = const KeyDownEvent(
         physicalKey: PhysicalKeyboardKey.keyL,
