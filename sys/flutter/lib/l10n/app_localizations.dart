@@ -305,7 +305,7 @@ abstract class AppLocalizations {
   /// No description provided for @secStatusTitle.
   ///
   /// In ja, this message translates to:
-  /// **'ステータス表示設定'**
+  /// **'ステータス領域設定'**
   String get secStatusTitle;
 
   /// No description provided for @secStatusSub.
@@ -313,6 +313,18 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'ゲーム画面のステータス領域の表示を切替えます'**
   String get secStatusSub;
+
+  /// No description provided for @secScreenTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'画面表示設定'**
+  String get secScreenTitle;
+
+  /// No description provided for @secScreenSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'画面モードやカメラ追従方法を設定します'**
+  String get secScreenSub;
 
   /// No description provided for @screenMode.
   ///
@@ -2917,6 +2929,96 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'削除'**
   String get delete;
+
+  /// No description provided for @cameraFollowMode.
+  ///
+  /// In ja, this message translates to:
+  /// **'カメラ追従モード'**
+  String get cameraFollowMode;
+
+  /// No description provided for @cameraModeCenter.
+  ///
+  /// In ja, this message translates to:
+  /// **'常時センタリング (主人公追従)'**
+  String get cameraModeCenter;
+
+  /// No description provided for @cameraModeFixed.
+  ///
+  /// In ja, this message translates to:
+  /// **'マップ固定 (PC版スタイル・端スクロール)'**
+  String get cameraModeFixed;
+
+  /// No description provided for @scrollMargin.
+  ///
+  /// In ja, this message translates to:
+  /// **'スクロールマージン'**
+  String get scrollMargin;
+
+  /// No description provided for @scrollMarginDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'画面端からこのマス数に近づくとスクロール'**
+  String get scrollMarginDesc;
+
+  /// No description provided for @scrollAmount.
+  ///
+  /// In ja, this message translates to:
+  /// **'スクロール量'**
+  String get scrollAmount;
+
+  /// No description provided for @scrollAmountDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'端に達したときに追加でスクロールするマス数'**
+  String get scrollAmountDesc;
+
+  /// No description provided for @cameraScrollOnlyFixed.
+  ///
+  /// In ja, this message translates to:
+  /// **'※マップ固定モード選択時のみ有効'**
+  String get cameraScrollOnlyFixed;
+
+  /// No description provided for @msgInsetMode.
+  ///
+  /// In ja, this message translates to:
+  /// **'メッセージ余白の確保'**
+  String get msgInsetMode;
+
+  /// No description provided for @msgInsetModeDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'メッセージ領域分の余白をマップ端から確保し、主人公の潜り込みを防ぎます'**
+  String get msgInsetModeDesc;
+
+  /// No description provided for @msgInsetModeAuto.
+  ///
+  /// In ja, this message translates to:
+  /// **'縦長画面でON (推奨)'**
+  String get msgInsetModeAuto;
+
+  /// No description provided for @msgInsetModeAlwaysOn.
+  ///
+  /// In ja, this message translates to:
+  /// **'常にON'**
+  String get msgInsetModeAlwaysOn;
+
+  /// No description provided for @msgInsetModeAlwaysOff.
+  ///
+  /// In ja, this message translates to:
+  /// **'常にOFF'**
+  String get msgInsetModeAlwaysOff;
+
+  /// No description provided for @msgAvoidFlip.
+  ///
+  /// In ja, this message translates to:
+  /// **'メッセージ位置の自動反転'**
+  String get msgAvoidFlip;
+
+  /// No description provided for @msgAvoidFlipDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'主人公と重なった際に反対側へ自動で退避します'**
+  String get msgAvoidFlipDesc;
 }
 
 class _AppLocalizationsDelegate

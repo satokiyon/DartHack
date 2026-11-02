@@ -111,10 +111,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get openSettings => 'ゲーム設定を開く';
 
   @override
-  String get secStatusTitle => 'ステータス表示設定';
+  String get secStatusTitle => 'ステータス領域設定';
 
   @override
   String get secStatusSub => 'ゲーム画面のステータス領域の表示を切替えます';
+
+  @override
+  String get secScreenTitle => '画面表示設定';
+
+  @override
+  String get secScreenSub => '画面モードやカメラ追従方法を設定します';
 
   @override
   String get screenMode => '画面モード選択';
@@ -1500,4 +1506,49 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get delete => '削除';
+
+  @override
+  String get cameraFollowMode => 'カメラ追従モード';
+
+  @override
+  String get cameraModeCenter => '常時センタリング (主人公追従)';
+
+  @override
+  String get cameraModeFixed => 'マップ固定 (PC版スタイル・端スクロール)';
+
+  @override
+  String get scrollMargin => 'スクロールマージン';
+
+  @override
+  String get scrollMarginDesc => '画面端からこのマス数に近づくとスクロール';
+
+  @override
+  String get scrollAmount => 'スクロール量';
+
+  @override
+  String get scrollAmountDesc => '端に達したときに追加でスクロールするマス数';
+
+  @override
+  String get cameraScrollOnlyFixed => '※マップ固定モード選択時のみ有効';
+
+  @override
+  String get msgInsetMode => 'メッセージ余白の確保';
+
+  @override
+  String get msgInsetModeDesc => 'メッセージ領域分の余白をマップ端から確保し、主人公の潜り込みを防ぎます';
+
+  @override
+  String get msgInsetModeAuto => '縦長画面でON (推奨)';
+
+  @override
+  String get msgInsetModeAlwaysOn => '常にON';
+
+  @override
+  String get msgInsetModeAlwaysOff => '常にOFF';
+
+  @override
+  String get msgAvoidFlip => 'メッセージ位置の自動反転';
+
+  @override
+  String get msgAvoidFlipDesc => '主人公と重なった際に反対側へ自動で退避します';
 }

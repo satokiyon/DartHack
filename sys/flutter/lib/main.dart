@@ -2,6 +2,7 @@ import 'config/ad_config.dart';
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,6 +20,7 @@ import 'settings_page.dart';
 import 'utils/defaults_helper.dart';
 import 'utils/nethack_colors.dart';
 import 'utils/app_prefs.dart';
+import 'utils/map_camera.dart';
 import 'amount_selector_dialog.dart';
 import 'utils/scale_clamp.dart';
 import 'utils/item_count_parser.dart';
@@ -194,6 +196,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late TransformationController _transformationController;
   double _currentScale = 1.0; // ピンチズームで設定された現在のズーム率を保持する状態変数
   TapDownDetails? _lastMapTapDownDetails; // マップタップ時の座標一時保持用
+  String _cameraFollowMode = 'center'; // 'center': 常時センタリング, 'fixed': マップ固定・端スクロール
+  int _scrollMargin = 3;
+  int _scrollAmount = 3;
+  int _cameraFocusX = -1; // フォーカスセル座標 (0..79)
+  int _cameraFocusY = -1; // フォーカスセル座標 (0..20)
+  bool _forceCameraReposition = true; // 強制再配置フラグ
+  Size _lastMapViewportSize = Size.zero;
+  String _mapFixedMsgInsetMode = 'auto'; // 'auto' | 'always_on' | 'always_off'
+  bool _mapFixedMsgAvoidFlip = true; // メッセージ位置の自動反転
+  String? _dynamicMsgPositionOverride; // 動的反転による一時的な配置オーバーライド
 
   // --- 新規同期ダイアログ用状態変数 ---
   bool _isYnVisible = false;
@@ -366,6 +378,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       final savedLongPressMoveModeName = prefs.getString('dpad_long_press_move_mode') ?? 'G_UPPER';
       _dPadLongPressMoveMode = _parseMoveMode(savedLongPressMoveModeName);
       _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'always';
+      _cameraFollowMode = prefs.getString('camera_follow_mode') ?? 'center';
+      _scrollMargin = prefs.getInt('scroll_margin') ?? 3;
+      _scrollAmount = prefs.getInt('scroll_amount') ?? 3;
+      _mapFixedMsgInsetMode = prefs.getString('map_fixed_msg_inset_mode') ?? 'auto';
+      _mapFixedMsgAvoidFlip = prefs.getBool('map_fixed_msg_avoid_flip') ?? true;
+      if (_cameraFollowMode == 'center' && _currentScale < 0.5) {
+        _currentScale = 0.5;
+      }
+      _forceCameraReposition = true;
 
       // 物理キーのロード
       _volupAction = prefs.getInt('key_volup_action') ?? 0;
@@ -554,6 +575,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         if (!newVisible) {
           _focusNode.requestFocus();
         }
+        _triggerCameraUpdate(force: true);
       },
       onShowSettings: _showSettingsDialog,
     );
@@ -1302,16 +1324,290 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     _isMapScrolledOrZoomed = false;
   }
 
-  void _triggerCenterOnPlayer() {
+  /// 操作盤（D-Pad、ショートカット、コマンドパネル）およびメッセージ領域の重なりを除外した
+  /// 実効的なマップ描画矩形（実効ビューポート）を算出する。
+  Rect _computeEffectiveMapViewport(Size viewportSize) {
+    final isLandscape = viewportSize.width > viewportSize.height;
+
+    double insetTop = 0.0;
+    double insetBottom = 0.0;
+    double insetLeft = 0.0;
+    double insetRight = 0.0;
+
+    final hasController = _shouldShowController && _controllerMode != ControllerMode.keyboard;
+
+    if (hasController) {
+      // コマンドパネルのシフト
+      final cmdSize = _cmdPanelHeight * _cmdPanelEffectiveScale;
+      if (_cmdPanelPosition == 'top') {
+        insetTop = math.max(insetTop, cmdSize);
+      } else if (_cmdPanelPosition == 'bottom') {
+        insetBottom = math.max(insetBottom, cmdSize);
+      } else if (_cmdPanelPosition == 'left') {
+        insetLeft = math.max(insetLeft, 130.0 * _cmdPanelEffectiveScale);
+      } else if (_cmdPanelPosition == 'right') {
+        insetRight = math.max(insetRight, 130.0 * _cmdPanelEffectiveScale);
+      }
+
+      // 四隅のパッド・ショートカットのサイズ
+      final dpadW = 150.0 * _dpadEffectiveScale + 8.0;
+      final scW = 150.0 * _shortcutPadEffectiveScale + 8.0;
+      final cornerPadW = math.max(dpadW, scW);
+
+      if (isLandscape) {
+        // 横長画面: 四隅のパッドは左右のインセットとして考慮
+        if (_dpadPosition.endsWith('left') || _shortcutPosition.endsWith('left')) {
+          insetLeft = math.max(insetLeft, cornerPadW);
+        }
+        if (_dpadPosition.endsWith('right') || _shortcutPosition.endsWith('right')) {
+          insetRight = math.max(insetRight, cornerPadW);
+        }
+      } else {
+        // 縦長画面: 下部・上部のインセットとして考慮
+        if (_dpadPosition.startsWith('bottom') || _shortcutPosition.startsWith('bottom')) {
+          insetBottom = math.max(insetBottom, cornerPadW);
+        }
+        if (_dpadPosition.startsWith('top') || _shortcutPosition.startsWith('top')) {
+          insetTop = math.max(insetTop, cornerPadW);
+        }
+      }
+    }
+
+    // メッセージ表示領域分の余白確保（機能1）
+    final applyMsgInset = _cameraFollowMode == 'fixed' && (
+      _mapFixedMsgInsetMode == 'always_on' ||
+      (_mapFixedMsgInsetMode == 'auto' && !isLandscape)
+    );
+    if (applyMsgInset) {
+      final estimatedMsgHeight = (_msgFontSize * 1.35 + 2.0) * (_msgLineCount + 1) + 14.0;
+      if (_msgPosition.startsWith('bottom')) {
+        insetBottom += estimatedMsgHeight;
+      } else {
+        insetTop += estimatedMsgHeight;
+      }
+    }
+
+    final effW = math.max(100.0, viewportSize.width - insetLeft - insetRight);
+    final effH = math.max(100.0, viewportSize.height - insetTop - insetBottom);
+
+    return Rect.fromLTWH(insetLeft, insetTop, effW, effH);
+  }
+
+  /// マップ固定モードにおいて、主人公とメッセージボックスが重なった際に
+  /// メッセージ配置を動的に反転（横画面: 左右、縦画面: 上下）させる処理。
+  void _updateDynamicMessagePosition(Size viewportSize) {
+    if (!_isMainGameStarted || !_isGameRunning) return;
+    if (_cameraFollowMode != 'fixed' || !_mapFixedMsgAvoidFlip) {
+      if (_dynamicMsgPositionOverride != null) {
+        setState(() => _dynamicMsgPositionOverride = null);
+      }
+      return;
+    }
+
+    final isLandscape = viewportSize.width > viewportSize.height;
+    final isMsgInsetApplied = (
+      _mapFixedMsgInsetMode == 'always_on' ||
+      (_mapFixedMsgInsetMode == 'auto' && !isLandscape)
+    );
+
+    // 余白確保が有効な場合（縦長画面での auto、または always_on）は、
+    // 最初から領域分離されて主人公と重ならないため動的反転は行わない
+    if (isMsgInsetApplied) {
+      if (_dynamicMsgPositionOverride != null) {
+        setState(() => _dynamicMsgPositionOverride = null);
+      }
+      return;
+    }
+
+    // メッセージが現在非表示、または空の場合は反転不要
+    final hasMessages = _screen.isMoreActive ||
+        (_screen.topline != null && _screen.topline!.trim().isNotEmpty) ||
+        _screen.messageHistory.isNotEmpty;
+    if (!_shouldShowMessage || !hasMessages) {
+      if (_dynamicMsgPositionOverride != null) {
+        setState(() => _dynamicMsgPositionOverride = null);
+      }
+      return;
+    }
+
+    // 主人公の画面座標 (heroScreenX, heroScreenY) を算出
+    final cellSize = FontManager.instance.getMapCellSize(
+      useTiles: _useTiles,
+      tileWidth: _tileWidth,
+      tileHeight: _tileHeight,
+    );
+    final focusX = (_cameraFocusX >= 0) ? _cameraFocusX : _screen.cursorX;
+    final focusY = (_cameraFocusY >= 0) ? _cameraFocusY : _screen.cursorY;
+    final mapWidth = 80 * cellSize.width;
+    final mapHeight = 21 * cellSize.height;
+    final mapOffsetX = (4000.0 - mapWidth) / 2.0;
+    final mapOffsetY = (3000.0 - mapHeight) / 2.0;
+
+    final currentMatrix = _transformationController.value;
+    final tx = currentMatrix.storage[12];
+    final ty = currentMatrix.storage[13];
+
+    final heroScreenX = (mapOffsetX + focusX * cellSize.width + cellSize.width / 2.0) * _currentScale + tx;
+    final heroScreenY = (mapOffsetY + focusY * cellSize.height + cellSize.height / 2.0) * _currentScale + ty;
+    final heroTileW = cellSize.width * _currentScale;
+    final heroTileH = cellSize.height * _currentScale;
+    final heroRect = Rect.fromCenter(
+      center: Offset(heroScreenX, heroScreenY),
+      width: heroTileW,
+      height: heroTileH,
+    );
+
+    // メッセージの推定行数と推定寸法
+    final int lineCount = math.min(
+      _msgLineCount,
+      _screen.messageHistory.length + (_screen.topline != null ? 1 : 0) + (_screen.isMoreActive ? 1 : 0),
+    );
+    final msgHeight = (_msgFontSize * 1.35 + 2.0) * math.max(1, lineCount) + 12.0;
+
+    int maxChars = 20;
+    for (final m in _screen.messageHistory.take(_msgLineCount)) {
+      if (m.length > maxChars) maxChars = m.length;
+    }
+    if (_screen.topline != null && _screen.topline!.length > maxChars) {
+      maxChars = _screen.topline!.length;
+    }
+    final screenW = viewportSize.width;
+    final screenH = viewportSize.height;
+
+    // 可変幅（最大幅は画面幅の65%）
+    final double msgWidth = math.min(screenW * 0.65, math.max(160.0, maxChars * _msgFontSize * 0.9 + 24.0));
+    final currentPos = _dynamicMsgPositionOverride ?? _msgPosition;
+
+    if (isLandscape) {
+      // 横長画面: 左右反転
+      final isCurrentlyRight = currentPos.endsWith('right');
+      final topY = 8.0 + ((_statusPosition == 'top') ? _statusHeight : 0.0);
+
+      final leftRect = Rect.fromLTWH(8.0, topY, msgWidth, msgHeight);
+      final rightRect = Rect.fromLTWH(screenW - msgWidth - 8.0, topY, msgWidth, msgHeight);
+
+      final currentRect = isCurrentlyRight ? rightRect : leftRect;
+      final oppositeRect = isCurrentlyRight ? leftRect : rightRect;
+
+      if (currentRect.overlaps(heroRect)) {
+        if (!oppositeRect.overlaps(heroRect)) {
+          final newPos = isCurrentlyRight ? 'top_left' : 'top_right';
+          if (_dynamicMsgPositionOverride != newPos) {
+            setState(() => _dynamicMsgPositionOverride = newPos);
+          }
+        }
+      }
+    } else {
+      // 縦長画面（余白確保OFF時）: 上下反転
+      final isCurrentlyBottom = currentPos.startsWith('bottom');
+      final dpadHeight = (150.0 * _dpadEffectiveScale + 8.0);
+
+      final topRect = Rect.fromLTWH(8.0, 8.0 + ((_statusPosition == 'top') ? _statusHeight : 0.0), screenW - 16.0, msgHeight);
+      final bottomRect = Rect.fromLTWH(8.0, screenH - msgHeight - dpadHeight - 8.0, screenW - 16.0, msgHeight);
+
+      final currentRect = isCurrentlyBottom ? bottomRect : topRect;
+      final oppositeRect = isCurrentlyBottom ? topRect : bottomRect;
+
+      if (currentRect.overlaps(heroRect)) {
+        if (!oppositeRect.overlaps(heroRect)) {
+          final newPos = isCurrentlyBottom ? 'top' : 'bottom';
+          if (_dynamicMsgPositionOverride != newPos) {
+            setState(() => _dynamicMsgPositionOverride = newPos);
+          }
+        }
+      }
+    }
+  }
+
+  /// マップ固定モード（Fixed Map Mode）のカメラ配置および端スクロール処理。
+  void _applyFixedCamera(Size viewportSize) {
+    if (!_isGameRunning) return;
+    _updateDynamicMessagePosition(viewportSize);
+
+    final cellSize = FontManager.instance.getMapCellSize(
+      useTiles: _useTiles,
+      tileWidth: _tileWidth,
+      tileHeight: _tileHeight,
+    );
+    final cellWidth = cellSize.width;
+    final cellHeight = cellSize.height;
+
+    // フォーカス対象セル (0..79, 0..20)
+    final focusX = (_cameraFocusX >= 0) ? _cameraFocusX : _screen.cursorX;
+    final focusY = (_cameraFocusY >= 0) ? _cameraFocusY : _screen.cursorY;
+
+    // 巨大キャンバス (4000x3000) 内でのマップサイズとオフセット
+    const mapCellsX = 80;
+    const mapCellsY = 21;
+    final mapWidth = mapCellsX * cellWidth;
+    final mapHeight = mapCellsY * cellHeight;
+    final mapOffsetX = (4000.0 - mapWidth) / 2.0;
+    final mapOffsetY = (3000.0 - mapHeight) / 2.0;
+
+    final effectiveViewport = _computeEffectiveMapViewport(viewportSize);
+
+    final currentMatrix = _transformationController.value;
+    final currentTx = currentMatrix.storage[12];
+    final currentTy = currentMatrix.storage[13];
+
+    final newTx = MapCamera.computeAxis(
+      viewStart: effectiveViewport.left,
+      viewSize: effectiveViewport.width,
+      mapStart: mapOffsetX,
+      mapCells: mapCellsX,
+      cell: cellWidth,
+      scale: _currentScale,
+      focus: focusX,
+      currentT: currentTx,
+      margin: _scrollMargin,
+      amount: _scrollAmount,
+      force: _forceCameraReposition,
+    );
+
+    final newTy = MapCamera.computeAxis(
+      viewStart: effectiveViewport.top,
+      viewSize: effectiveViewport.height,
+      mapStart: mapOffsetY,
+      mapCells: mapCellsY,
+      cell: cellHeight,
+      scale: _currentScale,
+      focus: focusY,
+      currentT: currentTy,
+      margin: _scrollMargin,
+      amount: _scrollAmount,
+      force: _forceCameraReposition,
+    );
+
+    _transformationController.value = Matrix4(
+      _currentScale, 0.0, 0.0, 0.0, // column 1
+      0.0, _currentScale, 0.0, 0.0, // column 2
+      0.0, 0.0, 1.0, 0.0,          // column 3
+      newTx, newTy, 0.0, 1.0,      // column 4
+    );
+
+    _isMapScrolledOrZoomed = false;
+    _forceCameraReposition = false;
+  }
+
+  void _triggerCameraUpdate({bool force = false}) {
+    if (force) {
+      _forceCameraReposition = true;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         final renderBox = _mapViewportKey.currentContext?.findRenderObject() as RenderBox?;
         if (renderBox != null) {
-          _centerOnPlayer(renderBox.size);
+          if (_cameraFollowMode == 'fixed') {
+            _applyFixedCamera(renderBox.size);
+          } else {
+            _centerOnPlayer(renderBox.size);
+          }
         }
       }
     });
   }
+
+  void _triggerCenterOnPlayer() => _triggerCameraUpdate();
 
   Future<void> _initAssets() async {
     _addLog("Initializing game assets...");
@@ -1462,7 +1758,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             TextButton(
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
-                backgroundColor: Colors.redAccent.withOpacity(0.3),
+                backgroundColor: Colors.redAccent.withValues(alpha: 0.3),
               ),
               child: const Text('OK'),
               onPressed: () {
@@ -1680,7 +1976,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             _messageWinId = message['winId'];
           }
         } else if (type == 'clearWindow') {
-          _screen.clearWindow(message['winId']);
+          final winId = message['winId'] as int;
+          _screen.clearWindow(winId);
+          if (winId == _mapWinId || winId == 3) {
+            _forceCameraReposition = true;
+          }
         } else if (type == 'displayWindow') {
           final winId = message['winId'] as int;
           final blocking = (message['blocking'] as int? ?? 0) != 0;
@@ -1708,7 +2008,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           _addLog("destroyWindow: winId=${message['winId']}");
           _screen.destroyWindow(message['winId']);
         } else if (type == 'curs') {
-          _screen.setCursor(message['winId'], message['x'], message['y']);
+          final winId = message['winId'] as int;
+          final x = message['x'] as int;
+          final y = message['y'] as int;
+          _screen.setCursor(winId, x, y);
+          if (winId == _mapWinId || winId == 3) {
+            _cameraFocusX = x;
+            _cameraFocusY = y;
+            _triggerCameraUpdate();
+          }
         } else if (type == 'putstr') {
           final text = (message['text'] as String?) ?? '';
           _screen.putString(message['winId'], message['attr'], text);
@@ -1757,8 +2065,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         } else if (type == 'cliparound') {
           // C 側からプレイヤー位置 (u.ux, u.uy) を受信。
           // マップの主人公タップ → #herecmdmenu 起動の判定に使用する。
-          _screen.setPlayerPos(message['playerX'], message['playerY']);
-          _triggerCenterOnPlayer();
+          final playerX = (message['playerX'] as int?) ?? 0;
+          final playerY = (message['playerY'] as int?) ?? 0;
+          _screen.setPlayerPos(playerX, playerY);
+          final focusXRaw = (message['x'] as int?) ?? (playerX + 1);
+          final focusYRaw = (message['y'] as int?) ?? playerY;
+          _cameraFocusX = (focusXRaw > 0) ? (focusXRaw - 1) : playerX;
+          _cameraFocusY = focusYRaw;
+          _triggerCameraUpdate();
         } else if (type == 'request_input') {
           setState(() {
             _waitingForInput = true;
@@ -1773,7 +2087,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             });
           }
           _ensureGameFocus();
-          _triggerCenterOnPlayer();
+          _triggerCameraUpdate();
         } else if (type == 'yn_function') {
           final question = (message['question'] as String?) ?? '';
           final choices = (message['choices'] as String?) ?? '';
@@ -2786,57 +3100,90 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
 
 
+  double _getEffectiveMinScale(Size viewportSize) {
+    if (_cameraFollowMode != 'fixed') {
+      return 0.5;
+    }
+    final cellSize = FontManager.instance.getMapCellSize(
+      useTiles: _useTiles,
+      tileWidth: _tileWidth,
+      tileHeight: _tileHeight,
+    );
+    final fit = MapCamera.fitScale(
+      viewportSize: viewportSize,
+      mapWidth: 80 * cellSize.width,
+      mapHeight: 21 * cellSize.height,
+    );
+    return math.min(0.5, math.max(0.05, fit));
+  }
+
   Widget _buildGameScreen() {
     return ListenableBuilder(
       listenable: _screen,
       builder: (context, _) {
-        final mapWidget = Container(
-          key: _mapViewportKey,
-          color: Colors.black,
-          child: InteractiveViewer(
-            transformationController: _transformationController,
-            boundaryMargin: const EdgeInsets.all(2000.0),
-            constrained: false,
-            maxScale: 6.0,
-            minScale: 0.5,
-            onInteractionStart: (details) {
-              _isMapScrolledOrZoomed = true;
-            },
-            onInteractionUpdate: (details) {
-              _currentScale = _transformationController.value.getMaxScaleOnAxis();
-              _isMapScrolledOrZoomed = true;
-            },
-            child: Center(
-              child: SizedBox(
-                width: 4000.0,
-                height: 3000.0,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTapDown: (details) {
-                    _lastMapTapDownDetails = details;
-                  },
-                  onTap: () {
-                    _ensureGameFocus();
-                    if (_lastMapTapDownDetails != null) {
-                      _handleMapTap(_lastMapTapDownDetails!);
-                    }
-                  },
-                  child: CustomPaint(
-                    painter: NetHackMapPainter(
-                      screen: _screen,
-                      tileImage: _tileImage,
-                      tileWidth: _tileWidth,
-                      tileHeight: _tileHeight,
-                      useTiles: _useTiles,
-                      isTransparentTileset:
-                          TilesetManager.instance.getTilesetById(_selectedTileset).isTransparent,
-                      fontId: FontManager.instance.getSelectedFont(FontTarget.map).id,
+        final mapWidget = LayoutBuilder(
+          builder: (context, constraints) {
+            final viewportSize = Size(constraints.maxWidth, constraints.maxHeight);
+            if ((_lastMapViewportSize.width - viewportSize.width).abs() > 1.0 ||
+                (_lastMapViewportSize.height - viewportSize.height).abs() > 1.0) {
+              _lastMapViewportSize = viewportSize;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted && _isGameRunning) {
+                  _triggerCameraUpdate(force: true);
+                }
+              });
+            }
+            final effectiveMinScale = _getEffectiveMinScale(viewportSize);
+
+            return Container(
+              key: _mapViewportKey,
+              color: Colors.black,
+              child: InteractiveViewer(
+                transformationController: _transformationController,
+                boundaryMargin: const EdgeInsets.all(2000.0),
+                constrained: false,
+                maxScale: 6.0,
+                minScale: effectiveMinScale,
+                onInteractionStart: (details) {
+                  _isMapScrolledOrZoomed = true;
+                },
+                onInteractionUpdate: (details) {
+                  _currentScale = _transformationController.value.getMaxScaleOnAxis();
+                  _isMapScrolledOrZoomed = true;
+                },
+                child: Center(
+                  child: SizedBox(
+                    width: 4000.0,
+                    height: 3000.0,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onTapDown: (details) {
+                        _lastMapTapDownDetails = details;
+                      },
+                      onTap: () {
+                        _ensureGameFocus();
+                        if (_lastMapTapDownDetails != null) {
+                          _handleMapTap(_lastMapTapDownDetails!);
+                        }
+                      },
+                      child: CustomPaint(
+                        painter: NetHackMapPainter(
+                          screen: _screen,
+                          tileImage: _tileImage,
+                          tileWidth: _tileWidth,
+                          tileHeight: _tileHeight,
+                          useTiles: _useTiles,
+                          isTransparentTileset:
+                              TilesetManager.instance.getTilesetById(_selectedTileset).isTransparent,
+                          fontId: FontManager.instance.getSelectedFont(FontTarget.map).id,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         );
 
         final horizontalStatusWidget = LayoutBuilder(
@@ -3072,6 +3419,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         if (_isGameRunning) {
           _applyScreenMode(_screenMode);
           _sendAutosaveSettingsToWorker();
+          _triggerCameraUpdate(force: true);
         }
       });
     });
@@ -3123,10 +3471,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         if (displayedLines.isEmpty) return const SizedBox.shrink();
 
         final screenWidth = MediaQuery.of(context).size.width;
-        final double maxWidth = screenWidth - 16.0;
+        final screenHeight = MediaQuery.of(context).size.height;
+        final isLandscape = screenWidth > screenHeight;
+        final effectivePos = _dynamicMsgPositionOverride ?? _msgPosition;
+        final double maxWidth = isLandscape ? (screenWidth * 0.65) : (screenWidth - 16.0);
 
         return Align(
-          alignment: _getAlignment(_msgPosition),
+          alignment: _getAlignment(effectivePos),
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: maxWidth),
             child: Container(
@@ -3481,25 +3832,27 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         ? (150.0 * _dpadEffectiveScale)
         : 0.0;
 
+    final effectivePos = _dynamicMsgPositionOverride ?? _msgPosition;
+
     // メッセージ領域 オフセット計算
     double? msgTop, msgBottom, msgLeft, msgRight;
-    if (_msgPosition == 'bottom') {
+    if (effectivePos == 'bottom') {
       msgBottom = statusBottomOffset + (_cmdPanelPosition == 'bottom' ? cmdPanelScaledHeight : 0.0) +
           dpadShift + 12.0;
       msgLeft = statusLeftOffset;
       msgRight = statusRightOffset;
-    } else if (_msgPosition == 'top') {
+    } else if (effectivePos == 'top') {
       msgTop = statusTopOffset + padTopPadding + (_cmdPanelPosition == 'top' ? cmdPanelTopOffset : 0.0);
       msgLeft = statusLeftOffset;
       msgRight = statusRightOffset;
     } else {
-      if (_msgPosition.startsWith('top')) {
+      if (effectivePos.startsWith('top')) {
         msgTop = statusTopOffset + padTopPadding + (_cmdPanelPosition == 'top' ? cmdPanelTopOffset : 0.0);
       } else {
         msgBottom = statusBottomOffset + padTopPadding + (_cmdPanelPosition == 'bottom' ? cmdPanelScaledHeight : 0.0);
       }
 
-      if (_msgPosition.endsWith('left')) {
+      if (effectivePos.endsWith('left')) {
         msgLeft = statusLeftOffset + sideMargin + (_cmdPanelPosition == 'left' ? cmdPanelLeftOffset : 0.0);
       } else {
         msgRight = statusRightOffset + sideMargin + (_cmdPanelPosition == 'right' ? cmdPanelRightOffset : 0.0);

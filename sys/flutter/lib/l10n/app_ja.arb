@@ -37,8 +37,10 @@
   "showKeyboard": "操作ボタンを表示",
   "openSettings": "ゲーム設定を開く",
 
-  "secStatusTitle": "ステータス表示設定",
+  "secStatusTitle": "ステータス領域設定",
   "secStatusSub": "ゲーム画面のステータス領域の表示を切替えます",
+  "secScreenTitle": "画面表示設定",
+  "secScreenSub": "画面モードやカメラ追従方法を設定します",
   "screenMode": "画面モード選択",
 
   "screenModeNormal": "通常",
@@ -571,5 +573,20 @@
       "aspect": { "type": "String" }
     }
   },
-  "delete": "削除"
+  "delete": "削除",
+  "cameraFollowMode": "カメラ追従モード",
+  "cameraModeCenter": "常時センタリング (主人公追従)",
+  "cameraModeFixed": "マップ固定 (PC版スタイル・端スクロール)",
+  "scrollMargin": "スクロールマージン",
+  "scrollMarginDesc": "画面端からこのマス数に近づくとスクロール",
+  "scrollAmount": "スクロール量",
+  "scrollAmountDesc": "端に達したときに追加でスクロールするマス数",
+  "cameraScrollOnlyFixed": "※マップ固定モード選択時のみ有効",
+  "msgInsetMode": "メッセージ余白の確保",
+  "msgInsetModeDesc": "メッセージ領域分の余白をマップ端から確保し、主人公の潜り込みを防ぎます",
+  "msgInsetModeAuto": "縦長画面でON (推奨)",
+  "msgInsetModeAlwaysOn": "常にON",
+  "msgInsetModeAlwaysOff": "常にOFF",
+  "msgAvoidFlip": "メッセージ位置の自動反転",
+  "msgAvoidFlipDesc": "主人公と重なった際に反対側へ自動で退避します"
 }

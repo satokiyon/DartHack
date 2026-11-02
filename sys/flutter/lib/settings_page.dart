@@ -71,6 +71,11 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _swapPadSide = false; // 移動パッドとショートカットパッドの左右反転
   String _dpadLongPressMoveMode = 'G_UPPER';
   String _mapTapTravelMode = 'always';
+  String _cameraFollowMode = 'center';
+  int _scrollMargin = 3;
+  int _scrollAmount = 3;
+  String _mapFixedMsgInsetMode = 'auto';
+  bool _mapFixedMsgAvoidFlip = true;
   bool _autosaveEnabled = true;
   int _autosaveInterval = 50;
 
@@ -272,6 +277,11 @@ class _SettingsPageState extends State<SettingsPage> {
       _tombstoneDisplayMode = (tombstoneModeRaw == 1) ? 1 : 0;
       final screenModeRaw = prefs.getInt('screen_mode');
       _screenMode = (screenModeRaw == 1) ? 1 : 0;
+      _cameraFollowMode = prefs.getString('camera_follow_mode') ?? 'center';
+      _scrollMargin = prefs.getInt('scroll_margin') ?? 3;
+      _scrollAmount = prefs.getInt('scroll_amount') ?? 3;
+      _mapFixedMsgInsetMode = prefs.getString('map_fixed_msg_inset_mode') ?? 'auto';
+      _mapFixedMsgAvoidFlip = prefs.getBool('map_fixed_msg_avoid_flip') ?? true;
       _padOpacity = prefs.getDouble('pad_opacity') ?? 0.8;
       _dpadScale = prefs.getDouble('dpad_scale') ?? 1.0;
       _shortcutPadScale = prefs.getDouble('shortcut_pad_scale') ?? 1.0;
@@ -727,13 +737,13 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  Widget _buildScreenModeSection() {
+  Widget _buildScreenDisplaySection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
       ExpansionTile(
-        leading: const Icon(Icons.crop_landscape, color: Colors.greenAccent),
-        title: Text(l10n.secStatusTitle),
-        subtitle: Text(l10n.secStatusSub),
+        leading: const Icon(Icons.fullscreen, color: Colors.greenAccent),
+        title: Text(l10n.secScreenTitle),
+        subtitle: Text(l10n.secScreenSub),
         children: _withDividers([
           _buildDropdownSettingTile<int>(
             title: l10n.screenMode,
@@ -749,6 +759,137 @@ class _SettingsPageState extends State<SettingsPage> {
               }
             },
           ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.cameraFollowMode,
+            value: _cameraFollowMode,
+            items: [
+              DropdownMenuItem(value: 'center', child: Text(l10n.cameraModeCenter)),
+              DropdownMenuItem(value: 'fixed', child: Text(l10n.cameraModeFixed)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _cameraFollowMode = val);
+                _saveSetting('camera_follow_mode', val);
+              }
+            },
+          ),
+          ListTile(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(l10n.scrollMargin),
+                Text('$_scrollMargin', style: const TextStyle(fontSize: 14, color: Colors.white70)),
+              ],
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Slider(
+                  value: _scrollMargin.toDouble(),
+                  min: 1.0,
+                  max: 10.0,
+                  divisions: 9,
+                  label: '$_scrollMargin',
+                  onChanged: _cameraFollowMode == 'fixed'
+                      ? (val) {
+                          final intVal = val.round();
+                          setState(() => _scrollMargin = intVal);
+                          _saveSetting('scroll_margin', intVal);
+                        }
+                      : null,
+                ),
+                Text(
+                  _cameraFollowMode == 'fixed' ? l10n.scrollMarginDesc : l10n.cameraScrollOnlyFixed,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: _cameraFollowMode == 'fixed' ? Colors.white60 : Colors.white38,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(l10n.scrollAmount),
+                Text('$_scrollAmount', style: const TextStyle(fontSize: 14, color: Colors.white70)),
+              ],
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Slider(
+                  value: _scrollAmount.toDouble(),
+                  min: 1.0,
+                  max: 10.0,
+                  divisions: 9,
+                  label: '$_scrollAmount',
+                  onChanged: _cameraFollowMode == 'fixed'
+                      ? (val) {
+                          final intVal = val.round();
+                          setState(() => _scrollAmount = intVal);
+                          _saveSetting('scroll_amount', intVal);
+                        }
+                      : null,
+                ),
+                Text(
+                  _cameraFollowMode == 'fixed' ? l10n.scrollAmountDesc : l10n.cameraScrollOnlyFixed,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: _cameraFollowMode == 'fixed' ? Colors.white60 : Colors.white38,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.msgInsetMode,
+            description: _cameraFollowMode == 'fixed' ? l10n.msgInsetModeDesc : l10n.cameraScrollOnlyFixed,
+            value: _mapFixedMsgInsetMode,
+            items: [
+              DropdownMenuItem(value: 'auto', child: Text(l10n.msgInsetModeAuto)),
+              DropdownMenuItem(value: 'always_on', child: Text(l10n.msgInsetModeAlwaysOn)),
+              DropdownMenuItem(value: 'always_off', child: Text(l10n.msgInsetModeAlwaysOff)),
+            ],
+            onChanged: (val) {
+              if (_cameraFollowMode == 'fixed' && val != null) {
+                setState(() => _mapFixedMsgInsetMode = val);
+                _saveSetting('map_fixed_msg_inset_mode', val);
+              }
+            },
+          ),
+          SwitchListTile(
+            title: Text(l10n.msgAvoidFlip),
+            subtitle: Text(
+              _cameraFollowMode == 'fixed' ? l10n.msgAvoidFlipDesc : l10n.cameraScrollOnlyFixed,
+              style: TextStyle(
+                fontSize: 12,
+                color: _cameraFollowMode == 'fixed' ? Colors.white60 : Colors.white38,
+              ),
+            ),
+            value: _mapFixedMsgAvoidFlip,
+            onChanged: _cameraFollowMode == 'fixed'
+                ? (val) {
+                    setState(() => _mapFixedMsgAvoidFlip = val);
+                    _saveSetting('map_fixed_msg_avoid_flip', val);
+                  }
+                : null,
+          ), 
+        ]),
+      ),
+    );
+  }
+
+  /// ステータス領域設定セクション（独立項目）
+  Widget _buildStatusSection() {
+    final l10n = AppLocalizations.of(context)!;
+    return _buildSectionCard(
+      ExpansionTile(
+        leading: const Icon(Icons.view_headline, color: Colors.amberAccent),
+        title: Text(l10n.secStatusTitle),
+        subtitle: Text(l10n.secStatusSub),
+        children: _withDividers([
           _buildDropdownSettingTile<int>(
             title: l10n.statusDisplayMode,
             value: _statusDisplayMode,
@@ -762,7 +903,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 _saveSetting('status_display_mode', val);
               }
             },
-          ), 
+          ),
         ]),
       ),
     );
@@ -3121,8 +3262,9 @@ class _SettingsPageState extends State<SettingsPage> {
         children: [
           _buildTilesetSection(), //タイル／シンボル設定
           _buildFontSection(), //フォント設定
-          _buildScreenModeSection(), //イマーシブ・ステータス表示モード・
-          _buildMessageSection(),  // メッセージ設定
+          _buildScreenDisplaySection(), // 画面表示設定（画面モード・カメラ追従）
+          _buildStatusSection(), // ステータス領域設定
+          _buildMessageSection(),  // メッセージ領域設定
           _buildSoundSection(),    // サウンド設定
           const Divider(height: 1),   //区切り線
           _buildUILayoutSection(), // UI配置カスタマイズ

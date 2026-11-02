@@ -112,10 +112,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openSettings => 'Open Game Settings';
 
   @override
-  String get secStatusTitle => 'Status Display Settings';
+  String get secStatusTitle => 'Status Area Settings';
 
   @override
   String get secStatusSub => 'Configure status bar display on game screen';
+
+  @override
+  String get secScreenTitle => 'Screen Display Settings';
+
+  @override
+  String get secScreenSub => 'Configure screen mode and camera follow settings';
 
   @override
   String get screenMode => 'Screen Mode';
@@ -1531,4 +1537,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get delete => 'Delete';
+
+  @override
+  String get cameraFollowMode => 'Camera follow mode';
+
+  @override
+  String get cameraModeCenter => 'Always center on hero';
+
+  @override
+  String get cameraModeFixed => 'Fixed map (PC style, edge scroll)';
+
+  @override
+  String get scrollMargin => 'Scroll margin';
+
+  @override
+  String get scrollMarginDesc => 'Scroll when this many cells from the edge';
+
+  @override
+  String get scrollAmount => 'Scroll amount';
+
+  @override
+  String get scrollAmountDesc => 'Extra cells to scroll at the margin';
+
+  @override
+  String get cameraScrollOnlyFixed => 'Effective in fixed map mode only';
+
+  @override
+  String get msgInsetMode => 'Message Area Inset';
+
+  @override
+  String get msgInsetModeDesc =>
+      'Reserve message area as map edge inset to prevent hero overlap';
+
+  @override
+  String get msgInsetModeAuto => 'ON in Portrait (Recommended)';
+
+  @override
+  String get msgInsetModeAlwaysOn => 'Always ON';
+
+  @override
+  String get msgInsetModeAlwaysOff => 'Always OFF';
+
+  @override
+  String get msgAvoidFlip => 'Auto-flip Message Position';
+
+  @override
+  String get msgAvoidFlipDesc =>
+      'Automatically move message to opposite side when overlapping hero';
 }

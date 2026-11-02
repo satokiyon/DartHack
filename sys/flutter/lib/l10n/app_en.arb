@@ -37,8 +37,10 @@
   "showKeyboard": "Show Controls",
   "openSettings": "Open Game Settings",
 
-  "secStatusTitle": "Status Display Settings",
+  "secStatusTitle": "Status Area Settings",
   "secStatusSub": "Configure status bar display on game screen",
+  "secScreenTitle": "Screen Display Settings",
+  "secScreenSub": "Configure screen mode and camera follow settings",
   "screenMode": "Screen Mode",
   "screenModeNormal": "Normal",
   "screenModeImmersive": "Immersive",
@@ -570,5 +572,20 @@
       "aspect": { "type": "String" }
     }
   },
-  "delete": "Delete"
+  "delete": "Delete",
+  "cameraFollowMode": "Camera follow mode",
+  "cameraModeCenter": "Always center on hero",
+  "cameraModeFixed": "Fixed map (PC style, edge scroll)",
+  "scrollMargin": "Scroll margin",
+  "scrollMarginDesc": "Scroll when this many cells from the edge",
+  "scrollAmount": "Scroll amount",
+  "scrollAmountDesc": "Extra cells to scroll at the margin",
+  "cameraScrollOnlyFixed": "Effective in fixed map mode only",
+  "msgInsetMode": "Message Area Inset",
+  "msgInsetModeDesc": "Reserve message area as map edge inset to prevent hero overlap",
+  "msgInsetModeAuto": "ON in Portrait (Recommended)",
+  "msgInsetModeAlwaysOn": "Always ON",
+  "msgInsetModeAlwaysOff": "Always OFF",
+  "msgAvoidFlip": "Auto-flip Message Position",
+  "msgAvoidFlipDesc": "Automatically move message to opposite side when overlapping hero"
 }
