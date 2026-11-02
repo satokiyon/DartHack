@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-02.
 -- NetHack quest.lua	$NHDT-Date: 1781994887 2026/06/20 22:34:47 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
 -- Copyright (c) 2021 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
@@ -2349,7 +2349,7 @@ questtext = {
          synopsis = "[%iへ入り, %nから%oを取り戻せ.]",
          output = "text",
          text = [["そうだとも, 前回会って以来, 君は立派な%cになったね.
-		 
+
 "悲しいことに, ここ%Hの情勢はあまり芳しくないんだ. 新しい
 %ntが任命されてね, 他の街の指導者たちとの親睦ディナーを主催したんだよ.
 その入口で, 彼の手下の一人が私の財布を預かってくれると申し出てくれたんだ.
@@ -2367,7 +2367,7 @@ questtext = {
 "私たちは%nがカードを持っており, %iに立てこもっていると見ている.
 %oの力を得て, 盗賊どもはかつてなく図に乗っているんだ.
 市民はおびえ, 観光客数は激減してしまった. 誰かが%iへ乗り込み,
-%cが一人もいなくなる前にカードを取り戻さねばならない！
+%cpが一人もいなくなる前にカードを取り戻さねばならない！
 
 "さあ, %p, ちょっとした『寄り道』の準備はいいかい？"]],
       },
@@ -2575,7 +2575,7 @@ questtext = {
       },
       othertime = {
          text = [[あなたは%Hに戻ってきた. あまりにも活気がなく,
-もうすぐここには%cが一人もいなくなるのではないかと感じられた.]],
+もうすぐここには%cpが一人もいなくなるのではないかと感じられた.]],
       },
       posthanks = {
          text = [["見違えたよ, %p！ ツアーの話をたっぷり聞かせてくれ.
