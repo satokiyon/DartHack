@@ -654,6 +654,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     // SafeAreaのbottom（ナビゲーションバー等）
     final safeBottom = mediaQuery.padding.bottom;
 
+    const keyboardHeight = 176.0;
+    final isKeyboardMode = isControllerVisible && _controllerMode == ControllerMode.keyboard;
+    final isKeyboardAtBottom = isKeyboardMode && (_layoutPattern == 1 || _cmdPanelPosition != 'top');
+    final isKeyboardAtTop = isKeyboardMode && (_layoutPattern == 2 || _cmdPanelPosition == 'top');
+    final keyboardBottomShift = isKeyboardAtBottom ? (keyboardHeight + 8.0) : 0.0;
+    final keyboardTopShift = isKeyboardAtTop ? (keyboardHeight + 8.0) : 0.0;
+
     double dpadShift(String pos) => (isControllerVisible && _controllerMode != ControllerMode.keyboard && _dpadPosition == pos) ? (150.0 * _dpadEffectiveScale + 8.0) : 0.0;
     double scShift(String pos) => (isControllerVisible && _controllerMode != ControllerMode.keyboard && _shortcutPosition == pos) ? (150.0 * _shortcutPadEffectiveScale + 8.0) : 0.0;
 
@@ -678,33 +685,35 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
     switch (_menuButtonPosition) {
       case 'top_left':
-        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_left') + scShift('top_left')
+        top = 8.0 + statusTopShift + cmdTopShift + keyboardTopShift + dpadShift('top_left') + scShift('top_left')
             + msgTopShift('top_left');
         left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'top_right':
-        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_right') + scShift('top_right')
+        top = 8.0 + statusTopShift + cmdTopShift + keyboardTopShift + dpadShift('top_right') + scShift('top_right')
             + msgTopShift('top_right');
         right = 8.0 + statusRightShift + cmdRightShift;
         break;
       case 'left_edge':
-        top = mediaQuery.size.height * 0.4;
+        final baseTop = mediaQuery.size.height * 0.4;
+        top = isKeyboardAtTop ? math.max(baseTop, statusTopShift + cmdTopShift + keyboardTopShift) : baseTop;
         left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'right_edge':
-        top = mediaQuery.size.height * 0.4;
+        final baseTop = mediaQuery.size.height * 0.4;
+        top = isKeyboardAtTop ? math.max(baseTop, statusTopShift + cmdTopShift + keyboardTopShift) : baseTop;
         right = 8.0 + statusRightShift + cmdRightShift;
         break;
       case 'bottom_left':
         // _dialogBottomInset は使用しない（二重加算バグを防ぐため）
-        // safeBottom + ステータス + コマンドパネル + 同コーナーのDPad/Shortcut + メッセージを積む
-        bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift
+        // safeBottom + ステータス + コマンドパネル + キーボード + 同コーナーのDPad/Shortcut + メッセージを積む
+        bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift + keyboardBottomShift
                + dpadShift('bottom_left') + scShift('bottom_left')
                + msgBottomShift('bottom_left');
         left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'bottom_right':
-        bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift
+        bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift + keyboardBottomShift
                + dpadShift('bottom_right') + scShift('bottom_right')
                + msgBottomShift('bottom_right');
         right = 8.0 + statusRightShift + cmdRightShift;
@@ -763,6 +772,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     // SafeAreaのbottom（ナビゲーションバー等）
     final safeBottom = mediaQuery.padding.bottom;
 
+    const keyboardHeight = 176.0;
+    final isKeyboardMode = isControllerVisible && _controllerMode == ControllerMode.keyboard;
+    final isKeyboardAtBottom = isKeyboardMode && (_layoutPattern == 1 || _cmdPanelPosition != 'top');
+    final isKeyboardAtTop = isKeyboardMode && (_layoutPattern == 2 || _cmdPanelPosition == 'top');
+    final keyboardBottomShift = isKeyboardAtBottom ? (keyboardHeight + 8.0) : 0.0;
+    final keyboardTopShift = isKeyboardAtTop ? (keyboardHeight + 8.0) : 0.0;
+
     double dpadShift(String pos) => (isControllerVisible && _controllerMode != ControllerMode.keyboard && _dpadPosition == pos) ? (150.0 * _dpadEffectiveScale + 8.0) : 0.0;
     double scShift(String pos) => (isControllerVisible && _controllerMode != ControllerMode.keyboard && _shortcutPosition == pos) ? (150.0 * _shortcutPadEffectiveScale + 8.0) : 0.0;
     // メニューボタンが同じコーナーにある場合のみシフト
@@ -789,32 +805,38 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
     switch (_mapButtonPosition) {
       case 'top_left':
-        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_left') + scShift('top_left')
+        top = 8.0 + statusTopShift + cmdTopShift + keyboardTopShift + dpadShift('top_left') + scShift('top_left')
             + msgTopShift('top_left') + menuShift('top_left');
         left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'top_right':
-        top = 8.0 + statusTopShift + cmdTopShift + dpadShift('top_right') + scShift('top_right')
+        top = 8.0 + statusTopShift + cmdTopShift + keyboardTopShift + dpadShift('top_right') + scShift('top_right')
             + msgTopShift('top_right') + menuShift('top_right');
         right = 8.0 + statusRightShift + cmdRightShift;
         break;
       case 'left_edge':
-        top = mediaQuery.size.height * 0.4 + menuShift('left_edge');
+        final baseTop = mediaQuery.size.height * 0.4 + menuShift('left_edge');
+        top = isKeyboardAtTop
+            ? math.max(baseTop, statusTopShift + cmdTopShift + keyboardTopShift + menuShift('left_edge'))
+            : baseTop;
         left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'right_edge':
-        top = mediaQuery.size.height * 0.4 + menuShift('right_edge');
+        final baseTop = mediaQuery.size.height * 0.4 + menuShift('right_edge');
+        top = isKeyboardAtTop
+            ? math.max(baseTop, statusTopShift + cmdTopShift + keyboardTopShift + menuShift('right_edge'))
+            : baseTop;
         right = 8.0 + statusRightShift + cmdRightShift;
         break;
       case 'bottom_left':
         // _dialogBottomInset は使用しない（二重加算バグを防ぐため）
-        bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift
+        bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift + keyboardBottomShift
                + dpadShift('bottom_left') + scShift('bottom_left')
                + msgBottomShift('bottom_left') + menuShift('bottom_left');
         left = 8.0 + statusLeftShift + cmdLeftShift;
         break;
       case 'bottom_right':
-        bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift
+        bottom = 8.0 + safeBottom + statusBottomShift + cmdBottomShift + keyboardBottomShift
                + dpadShift('bottom_right') + scShift('bottom_right')
                + msgBottomShift('bottom_right') + menuShift('bottom_right');
         right = 8.0 + statusRightShift + cmdRightShift;
