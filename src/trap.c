@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-02. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-03. */
 /* NetHack 5.0	trap.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.645 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -6364,7 +6364,7 @@ chest_trap(
     boolean disarm)
 {
     struct obj *otmp = obj, *otmp2;
-    char buf[80];
+    char buf[BUFSZ];
     const char *msg;
     coord cc;
 
@@ -6429,7 +6429,7 @@ chest_trap(
                        && *in_rooms(ox, oy, SHOPBASE) == *u.ushops);
 
             pline("%sが爆発した!", xname(obj));
-            Sprintf(buf, "exploding %s", xname(obj));
+            Snprintf(buf, sizeof buf, "exploding %s", xname(obj));
 
             if (costly)
                 loss += stolen_value(obj, ox, oy, (boolean) shkp->mpeaceful,
