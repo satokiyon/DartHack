@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-25. */
-/* NetHack 5.0	mhmenu.c	$NHDT-Date: 1781973104 2026/06/20 16:31:44 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.96 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 mhmenu.c 1970/01/01_00:00:00 NetHack-5.0:1.100 $ */
 /* Copyright (c) Alex Kompel, 2002                                */
 /* NetHack may be freely redistributed.  See license for details. */
 

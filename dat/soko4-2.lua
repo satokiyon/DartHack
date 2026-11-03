@@ -1,5 +1,5 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
--- NetHack sokoban soko4-2.lua	$NHDT-Date: 1781994889 2026/06/20 22:34:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.6 $
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04.
+-- $NHDT-Header: NetHack 5.0 soko4-2.lua 2026/06/20_22:35:38 NetHack-5.0:1.8 $
 --	Copyright (c) 1998-1999 by Kevin Hugo
 -- NetHack may be freely redistributed.  See license for details.
 --

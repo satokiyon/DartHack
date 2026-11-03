@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
-/* NetHack 5.0	wc_chainout.c	$NHDT-Date: 1781973094 2026/06/20 16:31:34 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.29 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 wc_chainout.c 2026/06/20_22:26:43 NetHack-5.0:1.31 $ */
 /* Copyright (c) Kenneth Lorber, 2012                             */
 /* NetHack may be freely redistributed.  See license for details. */
 

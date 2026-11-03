@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-12. */
-/* NetHack 5.0	sfbase.c.template $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 sfbase.c 2026/06/10_19:52:13 NetHack-5.0:1.19 $ */
 /* Copyright (c) Michael Allison, 2025. */
 /* NetHack may be freely redistributed.  See license for details. */
 

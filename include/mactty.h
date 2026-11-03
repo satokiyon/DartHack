@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
-/* NetHack 5.0	mactty.h	$NHDT-Date: 1596498543 2020/08/03 23:49:03 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.14 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 mactty.h 2026/09/30_14:47:34 NetHack-5.0:1.21 $ */
 /* Copyright (c) Jon W{tte 1993.                                        */
 /* NetHack may be freely redistributed.  See license for details.       */
 

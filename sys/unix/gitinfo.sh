@@ -1,5 +1,6 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04.
 #!/bin/sh
-# NetHack 5.0  gitinfo.sh	$NHDT-Date: 1596498289 2020/08/03 23:44:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.3 $
+# $NHDT-Header: NetHack 5.0 gitinfo.sh 2026/04/26_14:41:11 NetHack-5.0:1.7 $
 # Copyright (c) 2018 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 

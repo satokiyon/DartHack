@@ -1,5 +1,5 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21.
--- NetHack Priest Pri-strt.lua	$NHDT-Date: 1781994870 2026/06/20 22:34:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.6 $
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04.
+-- $NHDT-Header: NetHack 5.0 Pri-strt.lua 2026/06/20_22:35:38 NetHack-5.0:1.8 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991-2 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.

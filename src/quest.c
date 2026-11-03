@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-24. */
-/* NetHack 5.0	quest.c	$NHDT-Date: 1781973063 2026/06/20 16:31:03 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.48 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 quest.c 2026/06/20_22:26:43 NetHack-5.0:1.50 $ */
 /*      Copyright 1991, M. Stephenson             */
 /* NetHack may be freely redistributed.  See license for details. */
 

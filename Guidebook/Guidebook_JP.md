@@ -1,12 +1,12 @@
 # NetHack 5.0 ガイドブック (NetHack Guidebook)
 
-NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24.
+NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04.
 
 **脅威の迷宮へのガイド (NetHackガイドブック)**
 
 オリジナル版 - Eric S. Raymond (NetHack 5.0.1用に Mike Stephenson と協力者たちによって編集・拡張された)
 
-2026年7月4日
+2026年9月25日
 
 ## 1 はじめに (Introduction)
 

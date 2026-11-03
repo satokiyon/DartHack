@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-14. */
-/* NetHack 5.0	vmsunix.c	$NHDT-Date: 1685522050 2023/05/31 08:34:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.31 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 vmsunix.c 2026/10/10_01:02:03 NetHack-5.0:1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */

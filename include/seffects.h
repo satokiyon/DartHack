@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
-/* NetHack 5.0	seffects.h	$NHDT-Date: 1781973087 2026/06/20 16:31:27 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.7 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 seffects.h 2026/06/20_22:26:43 NetHack-5.0:1.9 $ */
 /* Copyright (c) Michael Allison, 2023                                */
 /* NetHack may be freely redistributed.  See license for details. */
 

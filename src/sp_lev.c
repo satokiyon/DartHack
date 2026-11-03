@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-27. */
-/* NetHack 5.0	sp_lev.c	$NHDT-Date: 1778778225 2026/05/14 17:03:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.387 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 sp_lev.c 2026/10/18_12:54:26 NetHack-5.0:1.391 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 

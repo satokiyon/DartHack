@@ -1,5 +1,6 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
-/* NetHack 5.0	tos.c	$NHDT-Date: 1501979358 2017/08/06 00:29:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.8 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 tos.c 2026/09/30_14:47:34 NetHack-5.0:1.18 $ */
+/* Copyright (c) Ingo Paschke, 2026 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
