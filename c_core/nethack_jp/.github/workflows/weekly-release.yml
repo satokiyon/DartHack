@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-03.
 name: Weekly Release
 
 on:
@@ -40,6 +40,15 @@ jobs:
             Copy-Item -Recurse "Guidebook" -Destination "$outDir\"
           } else {
             Write-Warning "Guidebook directory not found!"
+          }
+
+          # Ensure tiles.bmp is included in the package
+          if (-not (Test-Path "$outDir\tiles.bmp")) {
+            if (Test-Path "win/win32/tiles.bmp") {
+              Copy-Item "win/win32/tiles.bmp" -Destination "$outDir\"
+            } else {
+              Write-Warning "tiles.bmp not found in win/win32!"
+            }
           }
           
           # Create ZIP archive

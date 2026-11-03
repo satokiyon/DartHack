@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-03. */
 /* NetHack 5.0	lock.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -476,11 +476,9 @@ pick_lock(
                 } else if (autounlock
                           && (flags.autounlock & AUTOUNLOCK_APPLY_KEY) != 0) {
                     c = 'q';
-                    if (pick != &dummypick) {
-                        Sprintf(qbuf, "%sで解錠しますか?",
-                                ansimpleoname(pick));
-                        c = ynq(qbuf);
-                    }
+                    if (pick != &dummypick)
+                        c = ynq(safe_qbuf(qbuf, "", "で解錠しますか?", pick,
+                                          yname, ysimple_name, "それ"));
                     if (c != 'y')
                         return PICKLOCK_DID_NOTHING;
                 } else {
@@ -614,11 +612,16 @@ pick_lock(
                 return PICKLOCK_LEARNED_SOMETHING;
             }
 
-                Sprintf(qbuf, "%s%sしますか?",
-                    autounlock ? ansimpleoname(pick) : "この扉を",
-                    (door->doormask & D_LOCKED)
-                        ? (autounlock ? "で解錠" : "解錠")
-                        : (autounlock ? "で施錠" : "施錠"));
+            if (autounlock) {
+                /* 長い鍵名は収まるように短縮される */
+                (void) safe_qbuf(qbuf, "",
+                                 (door->doormask & D_LOCKED) ? "で解錠しますか?"
+                                                             : "で施錠しますか?",
+                                 pick, yname, ysimple_name, "それ");
+            } else {
+                Sprintf(qbuf, "この扉を%sしますか?",
+                        (door->doormask & D_LOCKED) ? "解錠" : "施錠");
+            }
             c = ynq(qbuf);
             if (c != 'y')
                 return PICKLOCK_DID_NOTHING;

@@ -1,5 +1,6 @@
 # Build-generated stuff that we don't want
 *.bmp
+!tiles.bmp
 *.ico
 *.db
 record

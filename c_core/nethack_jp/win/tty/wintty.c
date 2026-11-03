@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-26. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-03. */
 /* NetHack 5.0	wintty.c	$NHDT-Date: 1781973100 2026/06/20 16:31:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.438 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -572,6 +572,7 @@ tty_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
     ttyDisplay->inmore = ttyDisplay->inread = ttyDisplay->intr = 0;
     ttyDisplay->dismiss_more = 0;
     ttyDisplay->color = NO_COLOR;
+    ttyDisplay->framecolor = NO_COLOR;
     ttyDisplay->attrs = 0;
     ttyDisplay->topl_utf8 = 0;
     ttyDisplay->mixed = 0;
