@@ -596,6 +596,5 @@
   "optAdFeatureNewLevelRestSub": "新しい階層到達時に広告視聴で休息するか確認します",
   "optAdFeatureExitHighlightTitle": "ゲーム終了時のハイライト表示",
   "optAdFeatureExitHighlightSub": "ゲーム終了時に今回の冒険のハイライトを表示します",
-  "adFeatureSupportDesc": "本アプリは広告非表示でも快適にプレイいただけます。もし開発を応援していただける場合は、チップ支援をいただけますと幸いです。",
   "gameEndDialogTitle": "ゲーム終了"
 }

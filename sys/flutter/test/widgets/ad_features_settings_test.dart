@@ -53,7 +53,7 @@ void main() {
     );
   }
 
-  testWidgets('「その他の設定」に広告付き機能設定と支援リンクが表示され、トグル操作できること', (tester) async {
+  testWidgets('「その他の設定」に墓表示モードアイコンおよび広告付き機能設定が表示され、トグル操作できること', (tester) async {
     tester.view.physicalSize = const Size(800, 3000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
@@ -70,11 +70,17 @@ void main() {
     await tester.tap(otherTile);
     await tester.pumpAndSettle();
 
+    // 墓表示モードと先頭アイコン (Icons.history_edu) の存在確認
+    expect(find.text('死亡時の墓表示モード'), findsOneWidget);
+    expect(find.byIcon(Icons.history_edu), findsOneWidget);
+
     // タイトルと各スイッチの存在確認
     expect(find.text('広告付き機能の利用'), findsOneWidget);
     expect(find.text('新階層到達時のHP/Pw回復確認'), findsOneWidget);
     expect(find.text('ゲーム終了時のハイライト表示'), findsOneWidget);
-    expect(find.text('本アプリは広告非表示でも快適にプレイいただけます。もし開発を応援していただける場合は、チップ支援をいただけますと幸いです。'), findsOneWidget);
+
+    // その他の設定内にはチップ支援テキストが存在しないこと
+    expect(find.text('本アプリは広告非表示でも快適にプレイいただけます。もし開発を応援していただける場合は、チップ支援をいただけますと幸いです。'), findsNothing);
 
     // デフォルトでONになっていること
     final parentSwitch = find.widgetWithText(SwitchListTile, '広告付き機能の利用');

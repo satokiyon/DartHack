@@ -1611,9 +1611,5 @@ class AppLocalizationsEn extends AppLocalizations {
       'Display run highlights with banner ad when the game ends';
 
   @override
-  String get adFeatureSupportDesc =>
-      'DartHack can be enjoyed with ads turned off. If you would like to support development, tips are greatly appreciated via the links below.';
-
-  @override
   String get gameEndDialogTitle => 'Game Over';
 }

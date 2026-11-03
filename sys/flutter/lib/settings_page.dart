@@ -2365,6 +2365,7 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(l10n.secOtherTitle),
         children: _withDividers([
           _buildDropdownSettingTile<int>(
+            leading: const Icon(Icons.history_edu, color: Colors.tealAccent),
             title: l10n.tombstoneModeTitle,
             value: _tombstoneDisplayMode,
             items: [
@@ -2438,36 +2439,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   : null,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.adFeatureSupportDesc,
-                  style: const TextStyle(fontSize: 12, color: Colors.white70, height: 1.4),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.creditsSupport,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.amberAccent),
-                ),
-                const SizedBox(height: 4),
-                _buildUrlCopyRow(
-                  label: "Ko-fi:",
-                  url: "https://ko-fi.com/satokiyon",
-                  copiedMessage: l10n.creditsCopiedUrl,
-                  tooltipMessage: l10n.tilesetTapToCopy,
-                ),
-                _buildUrlCopyRow(
-                  label: "GitHub Sponsors:",
-                  url: "https://github.com/sponsors/satokiyon",
-                  copiedMessage: l10n.creditsCopiedUrl,
-                  tooltipMessage: l10n.tilesetTapToCopy,
-                ),
-              ],
-            ),
-          ),
+
           ListTile(
             leading: const Icon(Icons.restore, color: Colors.orangeAccent),
             title: Text(l10n.resetAppSettingsTitle),

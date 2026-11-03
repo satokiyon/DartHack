@@ -3062,12 +3062,6 @@ abstract class AppLocalizations {
   /// **'ゲーム終了時に今回の冒険のハイライトを表示します'**
   String get optAdFeatureExitHighlightSub;
 
-  /// No description provided for @adFeatureSupportDesc.
-  ///
-  /// In ja, this message translates to:
-  /// **'本アプリは広告非表示でも快適にプレイいただけます。もし開発を応援していただける場合は、チップ支援をいただけますと幸いです。'**
-  String get adFeatureSupportDesc;
-
   /// No description provided for @gameEndDialogTitle.
   ///
   /// In ja, this message translates to:

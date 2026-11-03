@@ -1574,9 +1574,5 @@ class AppLocalizationsJa extends AppLocalizations {
   String get optAdFeatureExitHighlightSub => 'ゲーム終了時に今回の冒険のハイライトを表示します';
 
   @override
-  String get adFeatureSupportDesc =>
-      '本アプリは広告非表示でも快適にプレイいただけます。もし開発を応援していただける場合は、チップ支援をいただけますと幸いです。';
-
-  @override
   String get gameEndDialogTitle => 'ゲーム終了';
 }
