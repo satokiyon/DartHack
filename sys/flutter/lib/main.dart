@@ -1363,7 +1363,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     _isMapScrolledOrZoomed = false;
   }
 
-  /// 操作盤（D-Pad、ショートカット、コマンドパネル）およびメッセージ領域の重なりを除外した
+  /// 操作盤（D-Pad、ショートカット、コマンドパネル、キーボード）およびメッセージ領域の重なりを除外した
   /// 実効的なマップ描画矩形（実効ビューポート）を算出する。
   Rect _computeEffectiveMapViewport(Size viewportSize) {
     final isLandscape = viewportSize.width > viewportSize.height;
@@ -1373,41 +1373,90 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     double insetLeft = 0.0;
     double insetRight = 0.0;
 
-    final hasController = _shouldShowController && _controllerMode != ControllerMode.keyboard;
+    if (_shouldShowController) {
+      final cmdPanelScaledHeight = _cmdPanelHeight * _cmdPanelEffectiveScale;
+      final cmdPanelScaledWidth = 130.0 * _cmdPanelEffectiveScale;
 
-    if (hasController) {
-      // コマンドパネルのシフト
-      final cmdSize = _cmdPanelHeight * _cmdPanelEffectiveScale;
-      if (_cmdPanelPosition == 'top') {
-        insetTop = math.max(insetTop, cmdSize);
-      } else if (_cmdPanelPosition == 'bottom') {
-        insetBottom = math.max(insetBottom, cmdSize);
-      } else if (_cmdPanelPosition == 'left') {
-        insetLeft = math.max(insetLeft, 130.0 * _cmdPanelEffectiveScale);
-      } else if (_cmdPanelPosition == 'right') {
-        insetRight = math.max(insetRight, 130.0 * _cmdPanelEffectiveScale);
-      }
-
-      // 四隅のパッド・ショートカットのサイズ
-      final dpadW = 150.0 * _dpadEffectiveScale + 8.0;
-      final scW = 150.0 * _shortcutPadEffectiveScale + 8.0;
-      final cornerPadW = math.max(dpadW, scW);
-
-      if (isLandscape) {
-        // 横長画面: 四隅のパッドは左右のインセットとして考慮
-        if (_dpadPosition.endsWith('left') || _shortcutPosition.endsWith('left')) {
-          insetLeft = math.max(insetLeft, cornerPadW);
-        }
-        if (_dpadPosition.endsWith('right') || _shortcutPosition.endsWith('right')) {
-          insetRight = math.max(insetRight, cornerPadW);
+      if (_controllerMode == ControllerMode.keyboard) {
+        // キーボードモード (ソフトウェアキーボード: 高さ230px)
+        const kbdHeight = 230.0;
+        if (_cmdPanelPosition == 'top') {
+          insetTop = cmdPanelScaledHeight;
+          insetBottom = kbdHeight;
+        } else {
+          // コマンドパネルとキーボードの両方が下部
+          insetBottom = cmdPanelScaledHeight + kbdHeight;
         }
       } else {
-        // 縦長画面: 下部・上部のインセットとして考慮
-        if (_dpadPosition.startsWith('bottom') || _shortcutPosition.startsWith('bottom')) {
-          insetBottom = math.max(insetBottom, cornerPadW);
-        }
-        if (_dpadPosition.startsWith('top') || _shortcutPosition.startsWith('top')) {
-          insetTop = math.max(insetTop, cornerPadW);
+        // パッドモード (D-Pad, ショートカットパッド, コマンドパネル)
+        final dpadW = 150.0 * _dpadEffectiveScale + 8.0;
+        final dpadH = 150.0 * _dpadEffectiveScale + 6.0;
+        final scW = 150.0 * _shortcutPadEffectiveScale + 8.0;
+        final scH = 150.0 * _shortcutPadEffectiveScale + 6.0;
+
+        if (isLandscape) {
+          // 横長画面
+          if (_cmdPanelPosition == 'top') {
+            insetTop = math.max(insetTop, cmdPanelScaledHeight);
+          } else if (_cmdPanelPosition == 'bottom') {
+            insetBottom = math.max(insetBottom, cmdPanelScaledHeight);
+          }
+
+          double padLeft = 0.0;
+          if (_dpadPosition.endsWith('left')) padLeft = math.max(padLeft, dpadW);
+          if (_shortcutPosition.endsWith('left')) padLeft = math.max(padLeft, scW);
+
+          double padRight = 0.0;
+          if (_dpadPosition.endsWith('right')) padRight = math.max(padRight, dpadW);
+          if (_shortcutPosition.endsWith('right')) padRight = math.max(padRight, scW);
+
+          if (_cmdPanelPosition == 'left') {
+            insetLeft = cmdPanelScaledWidth + padLeft;
+            insetRight = padRight;
+          } else if (_cmdPanelPosition == 'right') {
+            insetLeft = padLeft;
+            insetRight = cmdPanelScaledWidth + padRight;
+          } else {
+            insetLeft = padLeft;
+            insetRight = padRight;
+          }
+        } else {
+          // 縦長画面
+          final isCmdBottom = _cmdPanelPosition == 'bottom';
+          final isCmdTop = _cmdPanelPosition == 'top';
+
+          double padTop = 0.0;
+          if (_dpadPosition.startsWith('top')) padTop = math.max(padTop, dpadH);
+          if (_shortcutPosition.startsWith('top')) padTop = math.max(padTop, scH);
+
+          double padBottom = 0.0;
+          if (_dpadPosition.startsWith('bottom')) padBottom = math.max(padBottom, dpadH);
+          if (_shortcutPosition.startsWith('bottom')) padBottom = math.max(padBottom, scH);
+
+          // 下部にコマンドパネルとパッドが重なる場合（標準配置）
+          if (isCmdBottom && padBottom > 0.0) {
+            insetBottom = cmdPanelScaledHeight + 6.0 + padBottom;
+          } else if (isCmdBottom) {
+            insetBottom = cmdPanelScaledHeight;
+          } else if (padBottom > 0.0) {
+            insetBottom = padBottom;
+          }
+
+          // 上部にコマンドパネルとパッドが重なる場合
+          if (isCmdTop && padTop > 0.0) {
+            insetTop = cmdPanelScaledHeight + 6.0 + padTop;
+          } else if (isCmdTop) {
+            insetTop = cmdPanelScaledHeight;
+          } else if (padTop > 0.0) {
+            insetTop = padTop;
+          }
+
+          // 左右配置のコマンドパネル
+          if (_cmdPanelPosition == 'left') {
+            insetLeft = math.max(insetLeft, cmdPanelScaledWidth);
+          } else if (_cmdPanelPosition == 'right') {
+            insetRight = math.max(insetRight, cmdPanelScaledWidth);
+          }
         }
       }
     }

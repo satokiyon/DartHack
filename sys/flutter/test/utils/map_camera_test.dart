@@ -179,6 +179,40 @@ void main() {
       // min は 0.3125
       expect(scale, closeTo(0.3125, 0.001));
     });
+
+    test('縦長画面で下部インセット（コントローラー）がある場合、最下端の主人公が実効ビューポート下端に正しくスクロールする', () {
+      const mapCellsY = 21;
+      const cellH = 28.0;
+      const mapStartY = (3000.0 - mapCellsY * cellH) / 2.0; // 3000 - 588 = 2412 / 2 = 1206.0
+      const viewStart = 100.0; // 上部メッセージ領域インセット
+      const viewSize = 490.0;  // 画面高820 - 上部100 - 下部コントローラー230 = 490px
+      const scale = 1.0;
+      // マップ全高 588px > viewSize 490px なのでスクロール対象
+
+      // 最下端 (focusY = 20) に主人公がいる場合
+      final t = MapCamera.computeAxis(
+        viewStart: viewStart,
+        viewSize: viewSize,
+        mapStart: mapStartY,
+        mapCells: mapCellsY,
+        cell: cellH,
+        scale: scale,
+        focus: 20,
+        currentT: 0.0,
+        margin: 3,
+        amount: 3,
+        force: true,
+      );
+
+      // screenY = (mapStartY + focusY * cellH) * scale + t
+      final heroScreenY = (mapStartY + 20 * cellH) * scale + t;
+
+      // 主人公セルの下端 (heroScreenY + cellH) は実効ビューポート下端 (viewStart + viewSize = 590.0) を超えない
+      expect(heroScreenY + cellH, closeTo(viewStart + viewSize, 0.001));
+      // 主人公は実効ビューポート内 (100.0 .. 590.0) に収まっている
+      expect(heroScreenY, greaterThanOrEqualTo(viewStart));
+      expect(heroScreenY + cellH, lessThanOrEqualTo(viewStart + viewSize));
+    });
   });
 }
 
