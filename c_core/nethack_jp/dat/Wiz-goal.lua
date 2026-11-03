@@ -1,5 +1,5 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22.
--- NetHack Wizard Wiz-goal.lua	$NHDT-Date: 1781994876 2026/06/20 22:34:36 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.3 $
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04.
+-- $NHDT-Header: NetHack 5.0 Wiz-goal.lua 2026/06/20_22:35:38 NetHack-5.0:1.5 $
 --	Copyright (c) 1992 by David Cohrs
 -- NetHack may be freely redistributed.  See license for details.
 --

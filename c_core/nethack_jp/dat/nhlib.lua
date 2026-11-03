@@ -1,4 +1,5 @@
--- NetHack nhlib.lua	$NHDT-Date: 1781994886 2026/06/20 22:34:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.20 $
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04.
+-- $NHDT-Header: NetHack 5.0 nhlib.lua 2026/06/20_22:35:38 NetHack-5.0:1.22 $
 --	Copyright (c) 2021 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
 -- compatibility shim
@@ -221,7 +222,7 @@ local tutorial_events = {
          if (u.uhunger < 148) then
             local o = obj.new("blessed food ration");
             o:placeobj(u.ux, u.uy);
-            nh.pline("お腹が空いてきたようだ。何か食べないと餓死にしてしまうぞ。", true);
+            nh.pline("お腹が空いてきたようだ。何か食べないと飢え死にしてしまうぞ。", true);
             nh.pline("食べ物は '" .. nh.eckey("eat") .. "' で食べることができる。", true);
             return true;
          end

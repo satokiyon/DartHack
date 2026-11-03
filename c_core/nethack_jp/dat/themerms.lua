@@ -1,5 +1,5 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19.
--- NetHack themerms.lua	$NHDT-Date: 1781994889 2026/06/20 22:34:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.43 $
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04.
+-- $NHDT-Header: NetHack 5.0 themerms.lua 1970/01/01_00:00:00 NetHack-5.0:1.47 $
 --	Copyright (c) 2020 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
 --

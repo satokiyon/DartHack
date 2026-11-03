@@ -1,4 +1,5 @@
--- NetHack core nhcore.lua	$NHDT-Date: 1781994886 2026/06/20 22:34:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04.
+-- $NHDT-Header: NetHack 5.0 nhcore.lua 2026/06/20_22:35:38 NetHack-5.0:1.7 $
 --	Copyright (c) 2021 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
 -- This file contains lua code used by NetHack core.
@@ -98,7 +99,7 @@ function mk_dgl_extrainfo()
             extrai:close();
         else
             -- failed to open the file.
-            nh.pline("Failed to open dgl extrainfo file: " .. err);
+            nh.pline("dgl extrainfo ファイルを開けなかった: " .. err);
         end
         prev_dgl_extrainfo = u.moves;
     end
@@ -110,7 +111,7 @@ function show_getpos_tip()
 ヒント: 周囲を見回す、またはマップ上の位置を選ぶ
 
 現在は "farlook" モードです。移動キーで動くのは、
-あなたのキャラクターではなくカーソルです。ゲーム内時間は進みません。
+あなたのキャラクターではなくカーソルです。ゲーム内時間も進みません。
 このモードでは、マップを見回したり、位置を選択したりできます。
 
 このモードでは、ESC を押すと通常のゲームモードへ戻ります。
@@ -141,4 +142,5 @@ nhcore = {
     enter_tutorial = tutorial_enter,
     leave_tutorial = tutorial_leave,
 };
+
 

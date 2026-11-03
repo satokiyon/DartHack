@@ -1,4 +1,5 @@
--- NetHack endgame astral.lua	$NHDT-Date: 1781994877 2026/06/20 22:34:37 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.9 $
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04.
+-- $NHDT-Header: NetHack 5.0 astral.lua 2026/06/20_22:35:38 NetHack-5.0:1.11 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992,1993 by Izchak Miller, David Cohrs,
 --                      and Timo Hakulinen
@@ -9,7 +10,7 @@ des.level_init({ style = "solidfill", fg = " " });
 des.level_flags("mazelevel", "noteleport", "hardfloor", "nommap", "shortsighted", "solidify")
 des.message("アストラル界に到着した!")
 des.message("ここには%dの至高の神殿がある.")
-des.message("ただならぬ警戒感、殺意、そして興奮の気配を感じる!")
+des.message("ただならぬ警戒感、敵意、そして興奮の気配を感じる!")
 des.map([[
                               ---------------                              
                               |.............|                              

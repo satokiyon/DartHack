@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
 /*
  * Copyright (c) 1983 Regents of the University of California.
  * All rights reserved.
@@ -46,7 +47,7 @@
  * Modified 09 Apr 2026 to change mode variable from (int) to (unsigned int)
  * to match prototype of sscanf %o.
  *
- * $NHDT-Date: 1775744389 2026/04/09 14:19:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.21 $
+ * $NHDT-Header: NetHack 5.0 uudecode.c 2026/04/26_14:47:48 NetHack-5.0:1.24 $
  */
 
 #ifndef lint

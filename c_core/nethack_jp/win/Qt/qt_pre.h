@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-21. */
-/* NetHack 5.0	qt_pre.h	$NHDT-Date: 1781973096 2026/06/20 16:31:36 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.10 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 qt_pre.h 2026/06/20_22:26:43 NetHack-5.0:1.12 $ */
 
 /*
  * qt_pre.h -- undefine some nethack macros which conflict with Qt headers.

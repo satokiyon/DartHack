@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-26. */
-/* NetHack 5.0	cfgfiles.c	$NHDT-Date: 1781973042 2026/06/20 16:30:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.23 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 cfgfiles.c 2026/10/10_01:02:03 NetHack-5.0:1.30 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,7 +9,6 @@
 #include "hack.h"
 #include "dlb.h"
 #include <errno.h>
-
 
 #if (!defined(MAC68K) && !defined(O_WRONLY) && !defined(AZTEC_C)) \
     || defined(USE_FCNTL)
@@ -1635,11 +1634,10 @@ config_error_done(void)
         pline("\n%sに%d個のエラーがありました。\n",
               *config_error_data->source ? config_error_data->source
                                          : configfile, n);
-
         wait_synch();
     }
     config_error_data = tmp->next;
-    free((genericptr_t) tmp);
+    free(tmp);
     program_state.config_error_ready = (config_error_data != 0);
     return n;
 }
@@ -1873,6 +1871,22 @@ parse_conf_file(FILE *fp, boolean (*proc)(char *arg))
     free_config_sections();
 
     while (fgets(parser.inbuf, parser.inbufsz, fp)) {
+#ifdef MAC68K
+        /* Classic Mac text files use CR line endings; fgets() only
+           stops at LF, so a CR-only file is read as one long line.
+           Convert the first bare CR to LF so parse_conf_buf sees it
+           as a line ending, then seek back so the rest is re-read. */
+        if (!strchr(parser.inbuf, '\n')) {
+            char *cr = strchr(parser.inbuf, '\r');
+            if (cr) {
+                long remaining = (long) strlen(cr + 1);
+                *cr = '\n';
+                *(cr + 1) = '\0';
+                if (remaining > 0)
+                    fseek(fp, -remaining, SEEK_CUR);
+            }
+        }
+#endif
         parse_conf_buf(&parser, proc);
         if (parser.pbreak)
             break;
@@ -1917,7 +1931,6 @@ vconfig_error_add(const char *str, va_list the_args)
 void
 rcfile(void)
 {
-    debuglog("rcfile() ENTERED!");
     char *opts = 0, *xtraopts = 0;
     const char *envname, *namesrc, *nameval;
 
@@ -1966,11 +1979,8 @@ rcfile(void)
     }
 
     config_error_init(TRUE, nameval, nameval ? CONFIG_ERROR_SECURE : FALSE);
-    debuglog("FACT 15: rcfile calling read_config_file(defaults.nh)...");
-    boolean rc_ok = read_config_file(nameval, set_in_config);
-    debuglog("FACT 16: read_config_file(defaults.nh) returned %d. Calling config_error_done...", rc_ok);
+    (void) read_config_file(nameval, set_in_config);
     config_error_done();
-    debuglog("FACT 17: rcfile config_error_done completed.");
     if (xtraopts) {
         /* NETHACKOPTIONS is present and not a file name */
         go.opt_phase = environ_opt;
@@ -1981,7 +1991,6 @@ rcfile(void)
 
     if (gc.cmdline_rcfile)
         free((genericptr_t) gc.cmdline_rcfile), gc.cmdline_rcfile = 0;
-    debuglog("rcfile() COMPLETED SUCCESSFULLY!");
     /*[end of nethackrc handling]*/
 }
 

@@ -1,4 +1,5 @@
--- NetHack endgame earth.lua	$NHDT-Date: 1781994881 2026/06/20 22:34:41 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.2 $
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04.
+-- $NHDT-Header: NetHack 5.0 earth.lua 2026/06/20_22:35:38 NetHack-5.0:1.4 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992,1993 by Izchak Miller, David Cohrs,
 --                      and Timo Hakulinen
@@ -14,7 +15,7 @@ des.level_init({ style = "solidfill", fg = " " });
 
 des.level_flags("mazelevel", "noteleport", "hardfloor", "shortsighted")
 
-des.message("よくぞ来た、宿命の者よ!")
+des.message("よくやった、定命の者よ!")
 des.message("だが、汝は最後の試練に立ち向かわねばならぬ...")
 des.message("汝の価値を証明するか、さもなくば滅びよ!")
 

@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-06. */
-/* NetHack 5.0	windsound.c	$NHDT-Date: $  $NHDT-Branch: $NHDT-Revision: $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 windsound.c 2026/04/26_13:29:50 NetHack-5.0:1.18 $ */
 /* Copyright (c) Michael Allison, 2022                                */
 /* NetHack may be freely redistributed.  See license for details. */
 

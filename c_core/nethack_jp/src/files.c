@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02. */
-/* NetHack 5.0	files.c	$NHDT-Date: 1781973049 2026/06/20 16:30:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.448 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 files.c 1970/01/01_00:00:00 NetHack-5.0:1.456 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1474,12 +1474,17 @@ plname_from_file(
         if ((sfstatus = validate(nhfp, filename,
                                 without_wait_synch_per_file,
                                 additional_utd_flags)) == SF_UPTODATE) {
+            int plnres = 0;
+
             /* room for "name+role+race+gend+algn X" where the space before
                X is actually NUL and X is playmode: one of '-', 'X', or 'D' */
             ln = (unsigned) PL_NSIZ_PLUS;
             result = memset((genericptr_t) alloc(ln), '\0', ln);
-            get_plname_from_file(nhfp, result, (size_t) ln, FALSE);
-            if (result) {
+            plnres = get_plname_from_file(nhfp, result, (size_t) ln, FALSE);
+            if (plnres < 0) {
+                if (result)
+                    free((genericptr_t) result), result = 0;
+            } else if (result) {
                 char mode = result[PL_NSIZ_PLUS - 1];
                 char *first_dash = strchr(result, '-');
                 if (first_dash) *first_dash = '\0';

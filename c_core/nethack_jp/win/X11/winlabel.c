@@ -1,8 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
-/* NetHackJP: add X11_label_string_width() so wingetlin.c can measure
- * the response field's text and enforce a minimum input-field width
- * (DEVELOPMENT.md §4.12). */
-/* NetHack 5.0	winlabel.c	$NHDT-Date: 1781973110 2026/06/20 16:31:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.50 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 winlabel.c 1970/01/01_00:00:00 NetHack-5.0:1.14 $ */
 /* Copyright (c) Ray Chason, 2026                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

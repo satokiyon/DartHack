@@ -1,7 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
-/*
- * $NHDT-Date: 1432512809 2015/05/25 00:13:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $
- */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 load_img.c 2026/09/30_14:47:34 NetHack-5.0:1.10 $ */
 #define __TCC_COMPAT__
 #include <stdio.h>
 #include <string.h>

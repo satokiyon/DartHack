@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-31. */
-/* NetHack 5.0	tradstdc.h	$NHDT-Date: 1781973090 2026/06/20 16:31:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.71 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 tradstdc.h 2026/06/20_22:26:43 NetHack-5.0:1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -442,7 +442,7 @@ typedef genericptr genericptr_t; /* (void *) または (char *) */
 #endif  /* __GNUC__ greater than or equal to 5 */
 #if (!defined(__linux__) && !defined(MACOS)) || defined(GCC_URWARN)
  /* disable gcc's __attribute__((__warn_unused_result__)) since explicitly
-    discarding the result by casting to (void) is not accepted as a 'use' */
+   discarding the result by casting to (void) is not accepted as a 'use' */
 #define __warn_unused_result__ /*empty*/
 #define warn_unused_result /*empty*/
 #endif  /* GCC_URWARN || !__linux || !MACOS */
@@ -580,3 +580,4 @@ extern char *rindex(const char *s, int c) __attribute__ ((unavailable));
 
 
 #endif /* TRADSTDC_H */
+

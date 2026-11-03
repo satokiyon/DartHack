@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
 /*
  * Copyright (c) 1983 Regents of the University of California.
  * All rights reserved.
@@ -33,7 +34,7 @@
  *      - cast result of pointer subtraction to long since ptrdiff_t could
  *      be bigger than that and trigger warnings when assigning to long
  *
- * $NHDT-Date: 1432512787 2015/05/25 00:13:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $
+ * $NHDT-Header
  */
 
 #include "hack.h"

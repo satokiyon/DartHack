@@ -1,7 +1,9 @@
-/* NetHack 5.0	vmstty.c	$NHDT-Date: 1596498309 2020/08/03 23:45:09 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.21 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 vmstty.c 2026/04/26_14:47:48 NetHack-5.0:1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
+
 /* tty.c - (VMS) version */
 
 #define NEED_VARARGS

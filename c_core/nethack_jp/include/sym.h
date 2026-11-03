@@ -1,4 +1,5 @@
-/* NetHack	5.0	sym.h	$NHDT-Date: $ $NHDT-Branch: $ $NHDT-Revision: $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* $NHDT-Header: NetHack 5.0 sym.h 2026/04/26_17:21:18 NetHack-5.0:1.16 $ */
 /*      Copyright (c) 2016 by Pasi Kallinen              */
 /* NetHack may be freely redistributed.  See license for details. */
 
