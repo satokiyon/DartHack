@@ -265,50 +265,50 @@ class YnChoiceParser {
           lowerQ.contains('creatures vanquished') ||
           lowerQ.contains('genocided') ||
           lowerQ.contains('extinct')) {
-        return isJapanese ? '[a] 並び順を指定' : '[a] Sort order';
+        return isJapanese ? 'a:並び順を指定' : 'a: Sort order';
       }
 
       // (2) キャラメイクおまかせ
       if (question.contains('おまかせで') ||
           question.contains('キャラクターの種族') ||
           lowerQ.contains('shall i pick')) {
-        return isJapanese ? '[a] すべておまかせ' : '[a] Pick all';
+        return isJapanese ? 'a:すべておまかせ' : 'a: Pick all';
       }
 
       // (3) アイテム連続処理または汎用 All
-      return isJapanese ? '[a] すべて' : '[a] All';
+      return isJapanese ? 'a:すべて' : 'a: All';
     }
 
     // 2. 'y', 'n', 'N', 'q' の基本キー
     if (keyChar == 'y') {
-      return isJapanese ? '[y] はい' : '[y] Yes';
+      return isJapanese ? 'y:はい' : 'y: Yes';
     }
     if (keyChar == 'n') {
-      return isJapanese ? '[n] いいえ' : '[n] No';
+      return isJapanese ? 'n:いいえ' : 'n: No';
     }
     if (keyChar == 'N') {
-      return isJapanese ? '[N] 全ていいえ' : '[N] No to all';
+      return isJapanese ? 'N:全ていいえ' : 'N: No to all';
     }
     if (keyChar == 'q') {
-      return isJapanese ? '[q] 中断' : '[q] Quit';
+      return isJapanese ? 'q:中断' : 'q: Quit';
     }
 
     // 3. 特殊な2択プロンプト
     if (keyChar == 'h' && (question.contains('隠れる') || lowerQ.contains('hide'))) {
-      return isJapanese ? '[h] 隠れる' : '[h] Hide';
+      return isJapanese ? 'h:隠れる' : 'h: Hide';
     }
     if (keyChar == 's' && (question.contains('クモの巣') || lowerQ.contains('spin web'))) {
-      return isJapanese ? '[s] クモの巣' : '[s] Spin web';
+      return isJapanese ? 's:クモの巣' : 's: Spin web';
     }
     if (keyChar == 'r' && (question.contains('指') || lowerQ.contains('ring') || lowerQ.contains('hand'))) {
-      return isJapanese ? '[r] 右' : '[r] Right';
+      return isJapanese ? 'r:右' : 'r: Right';
     }
     if (keyChar == 'l' && (question.contains('指') || lowerQ.contains('ring') || lowerQ.contains('hand'))) {
-      return isJapanese ? '[l] 左' : '[l] Left';
+      return isJapanese ? 'l:左' : 'l: Left';
     }
 
     // 4. それ以外の汎用文字
-    return '[$keyChar]';
+    return keyChar;
   }
 }
 

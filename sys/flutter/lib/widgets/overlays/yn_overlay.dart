@@ -226,7 +226,7 @@ class YnOverlayState extends State<YnOverlay> {
         ElevatedButton(
           onPressed: () => widget.onSelect(27), // ESC
           style: ElevatedButton.styleFrom(backgroundColor: Colors.black54, foregroundColor: Colors.white70),
-          child: Text('[ESC] ${l10n.cancel}'),
+          child: Text(isJp ? 'Esc:${l10n.cancel}' : 'Esc: ${l10n.cancel}'),
         ),
         ElevatedButton.icon(
           onPressed: widget.onShowMsgHistory,
