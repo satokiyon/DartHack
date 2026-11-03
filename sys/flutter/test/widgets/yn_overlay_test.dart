@@ -78,7 +78,7 @@ void main() {
       expect(find.text('? 使用中スロット'), findsOneWidget);
     });
 
-    testWidgets('スタック分割プロンプトで数字チップと数量テキスト入力が動作すること', (tester) async {
+    testWidgets('スタック分割プロンプトでテンキー操作（複数桁・削除・クリア・決定）と数量テキスト入力が動作すること', (tester) async {
       String? submittedText;
       await tester.pumpWidget(
         buildTestWidget(
@@ -89,17 +89,42 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // 数字チップ '5' をタップ
-      expect(find.text('5'), findsOneWidget);
+      // 数字チップ '2' をタップ -> 即確定せず入力欄に '2' が入る
+      expect(find.text('2'), findsOneWidget);
+      await tester.tap(find.text('2'));
+      await tester.pumpAndSettle();
+      expect(submittedText, isNull);
+      expect(find.widgetWithText(TextField, '2'), findsOneWidget);
+
+      // 数字チップ '0' をタップ -> '20' になる
+      expect(find.text('0'), findsOneWidget);
+      await tester.tap(find.text('0'));
+      await tester.pumpAndSettle();
+      expect(submittedText, isNull);
+      expect(find.widgetWithText(TextField, '20'), findsOneWidget);
+
+      // '⌫' (削除) ボタンをタップ -> '2' に戻る
+      await tester.tap(find.byIcon(Icons.backspace_outlined));
+      await tester.pumpAndSettle();
+      expect(find.widgetWithText(TextField, '2'), findsOneWidget);
+
+      // '5' をタップ -> '25' になる
       await tester.tap(find.text('5'));
       await tester.pumpAndSettle();
-      expect(submittedText, equals('5'));
+      expect(find.widgetWithText(TextField, '25'), findsOneWidget);
 
-      // テキスト欄に '15' と入力して「決定」をタップ
-      await tester.enterText(find.byType(TextField), '15');
+      // 「決定」をタップ -> '25' で確定
       await tester.tap(find.text('決定'));
       await tester.pumpAndSettle();
-      expect(submittedText, equals('15'));
+      expect(submittedText, equals('25'));
+
+      // 'C' (クリア) ボタンの検証
+      await tester.tap(find.text('9'));
+      await tester.pumpAndSettle();
+      expect(find.widgetWithText(TextField, '9'), findsOneWidget);
+      await tester.tap(find.text('C'));
+      await tester.pumpAndSettle();
+      expect(find.widgetWithText(TextField, ''), findsOneWidget);
     });
 
     testWidgets('水晶玉探知プロンプトで主要記号チップが表示されること', (tester) async {

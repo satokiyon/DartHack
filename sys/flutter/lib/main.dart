@@ -235,6 +235,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Map<int, int> _menuSelectedCounts = <int, int>{};
   final GlobalKey<TextOverlayState> _textOverlayKey = GlobalKey<TextOverlayState>();
   final GlobalKey<MenuOverlayState> _menuOverlayKey = GlobalKey<MenuOverlayState>();
+  final GlobalKey<YnOverlayState> _ynOverlayKey = GlobalKey<YnOverlayState>();
 
   // 詳細な操作設定（shared_preferences用）
   double _padOpacity = 0.8;
@@ -951,6 +952,22 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
       case SendYn(:final code):
         _sendYnResult(code);
+        return KeyEventResult.handled;
+
+      case YnAppendChar(:final char):
+        _ynOverlayKey.currentState?.appendText(char);
+        return KeyEventResult.handled;
+
+      case YnBackspace():
+        _ynOverlayKey.currentState?.deleteChar();
+        return KeyEventResult.handled;
+
+      case YnClear():
+        _ynOverlayKey.currentState?.clearText();
+        return KeyEventResult.handled;
+
+      case YnSubmit():
+        _ynOverlayKey.currentState?.submit();
         return KeyEventResult.handled;
 
       case DismissText():
@@ -3052,6 +3069,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           )
         : const <String>[];
     return YnOverlay(
+      key: _ynOverlayKey,
       question: _ynQuestion,
       choices: _ynChoices,
       defaultChoice: _ynDefault,

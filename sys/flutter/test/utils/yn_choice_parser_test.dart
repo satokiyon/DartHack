@@ -47,7 +47,7 @@ void main() {
         choices: '',
       );
       expect(parsed.type, YnPromptType.countInput);
-      expect(parsed.quickChoices, ['1', '2', '3', '4', '5', '6', '7', '8', '9']);
+      expect(parsed.quickChoices, ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']);
       expect(parsed.validKeyChars.contains('5'), isTrue);
       expect(parsed.allowsFreeInput, isTrue);
     });
@@ -100,7 +100,7 @@ void main() {
         choices: '',
       );
       expect(parsed.type, YnPromptType.countInput);
-      expect(parsed.quickChoices, ['1', '2', '3', '4', '5', '6', '7', '8', '9']);
+      expect(parsed.quickChoices, ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']);
       expect(parsed.validKeyChars.contains('7'), isTrue);
     });
 

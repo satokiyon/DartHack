@@ -209,7 +209,7 @@ void main() {
         equals(const SendYn(63)), // '?'
       );
 
-      // 2. スタック分割: '5' (数字)
+      // 2. スタック分割: '5' (数字追記) / Backspace (削除) / Enter (確定)
       final fiveEvent = const KeyDownEvent(
         physicalKey: PhysicalKeyboardKey.digit5,
         logicalKey: LogicalKeyboardKey.digit5,
@@ -223,7 +223,37 @@ void main() {
           ynChoices: '',
           ynQuestion: 'いくつ分けますか?',
         ),
-        equals(const SendYn(53)), // '5'
+        equals(const YnAppendChar('5')),
+      );
+
+      final bsEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.backspace,
+        logicalKey: LogicalKeyboardKey.backspace,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: bsEvent,
+          context: KeyInputContext.yn,
+          ynChoices: '',
+          ynQuestion: 'いくつ分けますか?',
+        ),
+        equals(const YnBackspace()),
+      );
+
+      final enterCountEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.enter,
+        logicalKey: LogicalKeyboardKey.enter,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: enterCountEvent,
+          context: KeyInputContext.yn,
+          ynChoices: '',
+          ynQuestion: 'いくつ分けますか?',
+        ),
+        equals(const YnSubmit()),
       );
 
       // 3. 水晶玉探知: '$' (記号)

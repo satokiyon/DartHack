@@ -261,6 +261,68 @@ class SwallowKey extends KeyAction {
   int get hashCode => runtimeType.hashCode;
 }
 
+/// YN 数量入力のテキスト追記アクション
+class YnAppendChar extends KeyAction {
+  final String char;
+  const YnAppendChar(this.char);
+
+  @override
+  String toString() => 'YnAppendChar("$char")';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is YnAppendChar && runtimeType == other.runtimeType && char == other.char;
+
+  @override
+  int get hashCode => char.hashCode;
+}
+
+/// YN 数量入力の1文字削除アクション (Backspace)
+class YnBackspace extends KeyAction {
+  const YnBackspace();
+
+  @override
+  String toString() => 'YnBackspace()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is YnBackspace;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// YN 数量入力の全消去アクション (Clear)
+class YnClear extends KeyAction {
+  const YnClear();
+
+  @override
+  String toString() => 'YnClear()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is YnClear;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// YN 数量入力の確定アクション (Enter)
+class YnSubmit extends KeyAction {
+  const YnSubmit();
+
+  @override
+  String toString() => 'YnSubmit()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is YnSubmit;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
 /// 物理キーボード入力を解析し、適切なアクションに振り分けるルーター
 class HardwareKeyRouter {
   /// 全角英数を半角英数に変換（日本語IMEがONになっているPC対策）
@@ -392,6 +454,38 @@ class HardwareKeyRouter {
       return const SendYn(27);
     }
 
+    final parsed = YnChoiceParser.parse(
+      question: question,
+      choices: choices,
+      defaultChoice: defaultChoice,
+    );
+
+    // 数量入力 (いくつ分けますか? 等): 複数桁入力・BS・Enter・Delete をサポート
+    if (parsed.type == YnPromptType.countInput) {
+      if (event.logicalKey == LogicalKeyboardKey.enter ||
+          event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+        return const YnSubmit();
+      }
+      if (event.logicalKey == LogicalKeyboardKey.backspace) {
+        return const YnBackspace();
+      }
+      if (event.logicalKey == LogicalKeyboardKey.delete) {
+        return const YnClear();
+      }
+
+      String? char = event.character;
+      if (char != null && char.isNotEmpty) {
+        char = normalizeCharacter(char);
+      } else {
+        char = _charFromLogicalKey(event.logicalKey, isShiftPressed);
+      }
+
+      if (char != null && parsed.validKeyChars.contains(char)) {
+        return YnAppendChar(char);
+      }
+      return const SwallowKey();
+    }
+
     // Enter または Space: 既定値があればそれを送信、なければ誤爆防止のため何もしない (Swallow)
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter ||
@@ -414,17 +508,9 @@ class HardwareKeyRouter {
       return const SwallowKey();
     }
 
-    final parsed = YnChoiceParser.parse(
-      question: question,
-      choices: choices,
-      defaultChoice: defaultChoice,
-    );
-
     switch (parsed.type) {
       case YnPromptType.countInput:
-        if (parsed.validKeyChars.contains(char)) {
-          return SendYn(char.codeUnitAt(0));
-        }
+        // 上記の countInput ブロックで処理済み
         return const SwallowKey();
 
       case YnPromptType.slotSelect:
