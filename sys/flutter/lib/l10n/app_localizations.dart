@@ -2216,6 +2216,12 @@ abstract class AppLocalizations {
   /// **'• @satokiyon\n• assisted by Gemini via Google Antigravity'**
   String get creditsContributorList;
 
+  /// No description provided for @creditsSupport.
+  ///
+  /// In ja, this message translates to:
+  /// **'開発者を支援:'**
+  String get creditsSupport;
+
   /// No description provided for @soundCreditsButton.
   ///
   /// In ja, this message translates to:
@@ -3019,6 +3025,54 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'主人公と重なった際に反対側へ自動で退避します'**
   String get msgAvoidFlipDesc;
+
+  /// No description provided for @optAdFeaturesTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'広告付き機能の利用'**
+  String get optAdFeaturesTitle;
+
+  /// No description provided for @optAdFeaturesSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'広告を含む追加機能の有効/無効を切り替えます'**
+  String get optAdFeaturesSub;
+
+  /// No description provided for @optAdFeatureNewLevelRestTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'新階層到達時のHP/Pw回復確認'**
+  String get optAdFeatureNewLevelRestTitle;
+
+  /// No description provided for @optAdFeatureNewLevelRestSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'新しい階層到達時に広告視聴で休息するか確認します'**
+  String get optAdFeatureNewLevelRestSub;
+
+  /// No description provided for @optAdFeatureExitHighlightTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'ゲーム終了時のハイライト表示'**
+  String get optAdFeatureExitHighlightTitle;
+
+  /// No description provided for @optAdFeatureExitHighlightSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'ゲーム終了時に今回の冒険のハイライトを表示します'**
+  String get optAdFeatureExitHighlightSub;
+
+  /// No description provided for @adFeatureSupportDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'本アプリは広告非表示でも快適にプレイいただけます。もし開発を応援していただける場合は、チップ支援をいただけますと幸いです。'**
+  String get adFeatureSupportDesc;
+
+  /// No description provided for @gameEndDialogTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'ゲーム終了'**
+  String get gameEndDialogTitle;
 }
 
 class _AppLocalizationsDelegate

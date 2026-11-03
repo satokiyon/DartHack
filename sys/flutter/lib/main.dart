@@ -1801,16 +1801,52 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final defaultMsg = isJp ? 'また会いましょう...' : 'See you again...';
     final dialogMessage = message.trim().isEmpty ? defaultMsg : message.trim();
 
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return ExitHighlightDialog(
-          dialogMessage: dialogMessage,
-          messageHistory: List<String>.from(_screen.messageHistory),
-        );
-      },
-    );
+    final prefs = await AppPrefs.getInstance();
+    final adFeaturesEnabled = prefs.getBool('ad_features_enabled') ?? true;
+    final exitHighlightEnabled = prefs.getBool('ad_feature_exit_highlight') ?? true;
+
+    if (adFeaturesEnabled && exitHighlightEnabled) {
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return ExitHighlightDialog(
+            dialogMessage: dialogMessage,
+            messageHistory: List<String>.from(_screen.messageHistory),
+          );
+        },
+      );
+    } else {
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) {
+          return AlertDialog(
+            backgroundColor: Colors.grey[950],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Row(
+              children: [
+                const Icon(Icons.info_outline, color: Colors.amber),
+                const SizedBox(width: 8),
+                Text(isJp ? 'ゲーム終了' : 'Game Over'),
+              ],
+            ),
+            content: Text(
+              dialogMessage,
+              style: const TextStyle(fontSize: 14, height: 1.4),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
 
     if (mounted) {
       _stopGame();
@@ -1820,6 +1856,18 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Future<void> _showNewLevelRestDialog() async {
     if (!mounted) return;
     if (!AdConfig.isMobilePlatform) {
+      _workerSendPort?.send({
+        'type': 'new_level_rest_result',
+        'rewardAmount': 0,
+      });
+      return;
+    }
+
+    final prefs = await AppPrefs.getInstance();
+    final adFeaturesEnabled = prefs.getBool('ad_features_enabled') ?? true;
+    final newLevelRestEnabled = prefs.getBool('ad_feature_new_level_rest') ?? true;
+
+    if (!adFeaturesEnabled || !newLevelRestEnabled) {
       _workerSendPort?.send({
         'type': 'new_level_rest_result',
         'rewardAmount': 0,

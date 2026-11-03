@@ -1128,6 +1128,9 @@ class AppLocalizationsEn extends AppLocalizations {
       '• @satokiyon\n• assisted by Gemini via Google Antigravity';
 
   @override
+  String get creditsSupport => 'Support the Developer:';
+
+  @override
   String get soundCreditsButton => 'BGM & Sound Effects';
 
   @override
@@ -1584,4 +1587,33 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get msgAvoidFlipDesc =>
       'Automatically move message to opposite side when overlapping hero';
+
+  @override
+  String get optAdFeaturesTitle => 'Ad-Supported Features';
+
+  @override
+  String get optAdFeaturesSub =>
+      'Enable or disable additional ad-supported features';
+
+  @override
+  String get optAdFeatureNewLevelRestTitle =>
+      'Confirm HP/PW restore on new floor';
+
+  @override
+  String get optAdFeatureNewLevelRestSub =>
+      'Prompt to rest by watching an ad upon reaching a new floor';
+
+  @override
+  String get optAdFeatureExitHighlightTitle => 'Show highlights on game end';
+
+  @override
+  String get optAdFeatureExitHighlightSub =>
+      'Display run highlights with banner ad when the game ends';
+
+  @override
+  String get adFeatureSupportDesc =>
+      'DartHack can be enjoyed with ads turned off. If you would like to support development, tips are greatly appreciated via the links below.';
+
+  @override
+  String get gameEndDialogTitle => 'Game Over';
 }

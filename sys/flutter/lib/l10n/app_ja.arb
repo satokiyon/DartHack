@@ -374,6 +374,7 @@
   "creditsBody3": "UI デザインの一部は、gurrhack の ForkFront を参考にしています。",
   "creditsContributors": "Contributors:",
   "creditsContributorList": "• @satokiyon\n• assisted by Gemini via Google Antigravity",
+  "creditsSupport": "開発者を支援:",
   "soundCreditsButton": "BGM・効果音",
   "soundCreditsDialogTitle": "BGM・効果音 クレジット",
   "soundCreditsDialogDesc": "DartHack で使用されているBGM・効果音の提供元およびライセンス一覧です。",
@@ -588,5 +589,13 @@
   "msgInsetModeAlwaysOn": "常にON",
   "msgInsetModeAlwaysOff": "常にOFF",
   "msgAvoidFlip": "メッセージ位置の自動反転",
-  "msgAvoidFlipDesc": "主人公と重なった際に反対側へ自動で退避します"
+  "msgAvoidFlipDesc": "主人公と重なった際に反対側へ自動で退避します",
+  "optAdFeaturesTitle": "広告付き機能の利用",
+  "optAdFeaturesSub": "広告を含む追加機能の有効/無効を切り替えます",
+  "optAdFeatureNewLevelRestTitle": "新階層到達時のHP/Pw回復確認",
+  "optAdFeatureNewLevelRestSub": "新しい階層到達時に広告視聴で休息するか確認します",
+  "optAdFeatureExitHighlightTitle": "ゲーム終了時のハイライト表示",
+  "optAdFeatureExitHighlightSub": "ゲーム終了時に今回の冒険のハイライトを表示します",
+  "adFeatureSupportDesc": "本アプリは広告非表示でも快適にプレイいただけます。もし開発を応援していただける場合は、チップ支援をいただけますと幸いです。",
+  "gameEndDialogTitle": "ゲーム終了"
 }

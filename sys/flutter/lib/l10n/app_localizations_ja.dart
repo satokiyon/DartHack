@@ -1107,6 +1107,9 @@ class AppLocalizationsJa extends AppLocalizations {
       '• @satokiyon\n• assisted by Gemini via Google Antigravity';
 
   @override
+  String get creditsSupport => '開発者を支援:';
+
+  @override
   String get soundCreditsButton => 'BGM・効果音';
 
   @override
@@ -1551,4 +1554,29 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get msgAvoidFlipDesc => '主人公と重なった際に反対側へ自動で退避します';
+
+  @override
+  String get optAdFeaturesTitle => '広告付き機能の利用';
+
+  @override
+  String get optAdFeaturesSub => '広告を含む追加機能の有効/無効を切り替えます';
+
+  @override
+  String get optAdFeatureNewLevelRestTitle => '新階層到達時のHP/Pw回復確認';
+
+  @override
+  String get optAdFeatureNewLevelRestSub => '新しい階層到達時に広告視聴で休息するか確認します';
+
+  @override
+  String get optAdFeatureExitHighlightTitle => 'ゲーム終了時のハイライト表示';
+
+  @override
+  String get optAdFeatureExitHighlightSub => 'ゲーム終了時に今回の冒険のハイライトを表示します';
+
+  @override
+  String get adFeatureSupportDesc =>
+      '本アプリは広告非表示でも快適にプレイいただけます。もし開発を応援していただける場合は、チップ支援をいただけますと幸いです。';
+
+  @override
+  String get gameEndDialogTitle => 'ゲーム終了';
 }

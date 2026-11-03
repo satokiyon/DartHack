@@ -47,6 +47,9 @@ class _SettingsPageState extends State<SettingsPage> {
   String _controllerMode = 'pad';
   int _statusDisplayMode = 0;
   int _tombstoneDisplayMode = 0; // 0: 画像+文字オーバーレイ, 1: Cコア出力そのまま(テキスト)
+  bool _adFeaturesEnabled = true;
+  bool _adFeatureNewLevelRest = true;
+  bool _adFeatureExitHighlight = true;
   int _screenMode = 0; // 0: 通常, 1: イマーシブ
   double _padOpacity = 0.8;
   double _dpadScale = 1.0;
@@ -275,6 +278,9 @@ class _SettingsPageState extends State<SettingsPage> {
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
       final tombstoneModeRaw = prefs.getInt('tombstone_display_mode');
       _tombstoneDisplayMode = (tombstoneModeRaw == 1) ? 1 : 0;
+      _adFeaturesEnabled = prefs.getBool('ad_features_enabled') ?? true;
+      _adFeatureNewLevelRest = prefs.getBool('ad_feature_new_level_rest') ?? true;
+      _adFeatureExitHighlight = prefs.getBool('ad_feature_exit_highlight') ?? true;
       final screenModeRaw = prefs.getInt('screen_mode');
       _screenMode = (screenModeRaw == 1) ? 1 : 0;
       _cameraFollowMode = prefs.getString('camera_follow_mode') ?? 'center';
@@ -2372,6 +2378,96 @@ class _SettingsPageState extends State<SettingsPage> {
               }
             },
           ),
+          SwitchListTile(
+            secondary: const Icon(Icons.campaign_outlined, color: Colors.amberAccent),
+            title: Text(l10n.optAdFeaturesTitle),
+            subtitle: Text(l10n.optAdFeaturesSub),
+            value: _adFeaturesEnabled,
+            onChanged: (val) {
+              setState(() => _adFeaturesEnabled = val);
+              _saveSetting('ad_features_enabled', val);
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 24.0),
+            child: SwitchListTile(
+              title: Text(
+                l10n.optAdFeatureNewLevelRestTitle,
+                style: TextStyle(
+                  color: _adFeaturesEnabled ? null : Colors.white38,
+                ),
+              ),
+              subtitle: Text(
+                l10n.optAdFeatureNewLevelRestSub,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: _adFeaturesEnabled ? Colors.white60 : Colors.white38,
+                ),
+              ),
+              value: _adFeatureNewLevelRest,
+              onChanged: _adFeaturesEnabled
+                  ? (val) {
+                      setState(() => _adFeatureNewLevelRest = val);
+                      _saveSetting('ad_feature_new_level_rest', val);
+                    }
+                  : null,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 24.0),
+            child: SwitchListTile(
+              title: Text(
+                l10n.optAdFeatureExitHighlightTitle,
+                style: TextStyle(
+                  color: _adFeaturesEnabled ? null : Colors.white38,
+                ),
+              ),
+              subtitle: Text(
+                l10n.optAdFeatureExitHighlightSub,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: _adFeaturesEnabled ? Colors.white60 : Colors.white38,
+                ),
+              ),
+              value: _adFeatureExitHighlight,
+              onChanged: _adFeaturesEnabled
+                  ? (val) {
+                      setState(() => _adFeatureExitHighlight = val);
+                      _saveSetting('ad_feature_exit_highlight', val);
+                    }
+                  : null,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.adFeatureSupportDesc,
+                  style: const TextStyle(fontSize: 12, color: Colors.white70, height: 1.4),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.creditsSupport,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.amberAccent),
+                ),
+                const SizedBox(height: 4),
+                _buildUrlCopyRow(
+                  label: "Ko-fi:",
+                  url: "https://ko-fi.com/satokiyon",
+                  copiedMessage: l10n.creditsCopiedUrl,
+                  tooltipMessage: l10n.tilesetTapToCopy,
+                ),
+                _buildUrlCopyRow(
+                  label: "GitHub Sponsors:",
+                  url: "https://github.com/sponsors/satokiyon",
+                  copiedMessage: l10n.creditsCopiedUrl,
+                  tooltipMessage: l10n.tilesetTapToCopy,
+                ),
+              ],
+            ),
+          ),
           ListTile(
             leading: const Icon(Icons.restore, color: Colors.orangeAccent),
             title: Text(l10n.resetAppSettingsTitle),
@@ -3099,6 +3195,24 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(l10n.creditsContributorList),
+                const SizedBox(height: 12),
+                Text(
+                  l10n.creditsSupport,
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white70),
+                ),
+                const SizedBox(height: 4),
+                _buildUrlCopyRow(
+                  label: "Ko-fi:",
+                  url: "https://ko-fi.com/satokiyon",
+                  copiedMessage: l10n.creditsCopiedUrl,
+                  tooltipMessage: l10n.tilesetTapToCopy,
+                ),
+                _buildUrlCopyRow(
+                  label: "GitHub Sponsors:",
+                  url: "https://github.com/sponsors/satokiyon",
+                  copiedMessage: l10n.creditsCopiedUrl,
+                  tooltipMessage: l10n.tilesetTapToCopy,
+                ),
                 const Divider(color: Colors.white24, height: 28),
                 Text(
                   l10n.creditsSpoilersTitle,

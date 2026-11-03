@@ -373,6 +373,7 @@
   "creditsBody3": "Part of the UI design is inspired by gurrhack's ForkFront.",
   "creditsContributors": "Contributors:",
   "creditsContributorList": "• @satokiyon\n• assisted by Gemini via Google Antigravity",
+  "creditsSupport": "Support the Developer:",
   "soundCreditsButton": "BGM & Sound Effects",
   "soundCreditsDialogTitle": "BGM & Sound Effects Credits",
   "soundCreditsDialogDesc": "List of sources and licenses for BGM and sound effects used in DartHack.",
@@ -587,5 +588,13 @@
   "msgInsetModeAlwaysOn": "Always ON",
   "msgInsetModeAlwaysOff": "Always OFF",
   "msgAvoidFlip": "Auto-flip Message Position",
-  "msgAvoidFlipDesc": "Automatically move message to opposite side when overlapping hero"
+  "msgAvoidFlipDesc": "Automatically move message to opposite side when overlapping hero",
+  "optAdFeaturesTitle": "Ad-Supported Features",
+  "optAdFeaturesSub": "Enable or disable additional ad-supported features",
+  "optAdFeatureNewLevelRestTitle": "Confirm HP/PW restore on new floor",
+  "optAdFeatureNewLevelRestSub": "Prompt to rest by watching an ad upon reaching a new floor",
+  "optAdFeatureExitHighlightTitle": "Show highlights on game end",
+  "optAdFeatureExitHighlightSub": "Display run highlights with banner ad when the game ends",
+  "adFeatureSupportDesc": "DartHack can be enjoyed with ads turned off. If you would like to support development, tips are greatly appreciated via the links below.",
+  "gameEndDialogTitle": "Game Over"
 }
