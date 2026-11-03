@@ -1,4 +1,4 @@
-/* NetHack 5.0	mrecover.c	$NHDT-Date: 1432512798 2015/05/25 00:13:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
+/* $NHDT-Header: NetHack 5.0 mrecover.c 1970/01/01_00:00:00 NetHack-5.0:1.17 $ */
 /*      Copyright (c) David Hairston, 1993.                       */
 /* NetHack may be freely redistributed.  See license for details. */
 

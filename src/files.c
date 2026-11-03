@@ -1,4 +1,4 @@
-/* NetHack 5.0	files.c	$NHDT-Date: 1781973049 2026/06/20 16:30:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.448 $ */
+/* $NHDT-Header: NetHack 5.0 files.c 1970/01/01_00:00:00 NetHack-5.0:1.456 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1385,7 +1385,7 @@ plname_from_file(
                X is actually NUL and X is playmode: one of '-', 'X', or 'D' */
             ln = (unsigned) PL_NSIZ_PLUS;
             result = memset((genericptr_t) alloc(ln), '\0', ln);
-            get_plname_from_file(nhfp, result, FALSE);
+            get_plname_from_file(nhfp, result, (size_t) ln, FALSE);
         }
         close_nhfile(nhfp);
     }
