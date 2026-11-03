@@ -75,9 +75,9 @@ void main() {
       final itemChronicle = const CmdItem(command: '#chronicle');
       expect(itemChronicle.getEffectiveLabel(showLabel: true, langCode: 'ja'), '実績');
 
-      // #therecmdmenu -> 'そこ'
+      // #therecmdmenu -> 'となり'
       final itemThere = const CmdItem(command: '#therecmdmenu');
-      expect(itemThere.getEffectiveLabel(showLabel: true, langCode: 'ja'), 'そこ');
+      expect(itemThere.getEffectiveLabel(showLabel: true, langCode: 'ja'), 'となり');
 
       // #herecmdmenu -> 'ここ'
       final itemHere = const CmdItem(command: '#herecmdmenu');
