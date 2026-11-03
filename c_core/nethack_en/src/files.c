@@ -1391,12 +1391,17 @@ plname_from_file(
         if ((sfstatus = validate(nhfp, filename,
                                 without_wait_synch_per_file,
                                 additional_utd_flags)) == SF_UPTODATE) {
+            int plnres = 0;
+
             /* room for "name+role+race+gend+algn X" where the space before
                X is actually NUL and X is playmode: one of '-', 'X', or 'D' */
             ln = (unsigned) PL_NSIZ_PLUS;
             result = memset((genericptr_t) alloc(ln), '\0', ln);
-            get_plname_from_file(nhfp, result, (size_t) ln, FALSE);
-            if (result) {
+            plnres = get_plname_from_file(nhfp, result, (size_t) ln, FALSE);
+            if (plnres < 0) {
+                if (result)
+                    free((genericptr_t) result), result = 0;
+            } else if (result) {
                 char mode = result[PL_NSIZ_PLUS - 1];
                 char *first_dash = strchr(result, '-');
                 if (first_dash) *first_dash = '\0';
