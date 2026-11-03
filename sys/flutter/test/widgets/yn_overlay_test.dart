@@ -36,7 +36,7 @@ void main() {
   }
 
   group('YnOverlay Widget Tests', () {
-    testWidgets('標準 YN プロンプトで Yes / No ボタンが表示されタップできること', (tester) async {
+    testWidgets('標準 YN プロンプトで [y] はい / [n] いいえ ボタンが表示されタップできること', (tester) async {
       int? selected;
       await tester.pumpWidget(
         buildTestWidget(
@@ -46,13 +46,58 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Yes'), findsOneWidget);
-      expect(find.text('No'), findsOneWidget);
+      expect(find.text('[y] はい'), findsOneWidget);
+      expect(find.text('[n] いいえ'), findsOneWidget);
 
-      await tester.tap(find.text('Yes'));
+      await tester.tap(find.text('[y] はい'));
       await tester.pumpAndSettle();
 
       expect(selected, equals('y'.codeUnitAt(0)));
+    });
+
+    testWidgets('討伐怪物一覧プロンプトで [a] 並び順を指定 ボタンが表示されタップできること', (tester) async {
+      int? selected;
+      await tester.pumpWidget(
+        buildTestWidget(
+          question: '倒した怪物の一覧を表示しますか?',
+          choices: 'ynaq',
+          onSelect: (code) => selected = code,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('[y] はい'), findsOneWidget);
+      expect(find.text('[n] いいえ'), findsOneWidget);
+      expect(find.text('[a] 並び順を指定'), findsOneWidget);
+      expect(find.text('[q] 中断'), findsOneWidget);
+
+      await tester.tap(find.text('[a] 並び順を指定'));
+      await tester.pumpAndSettle();
+
+      expect(selected, equals('a'.codeUnitAt(0)));
+    });
+
+    testWidgets('英語モードで [y] Yes / [n] No / [a] Sort order が表示されること', (tester) async {
+      int? selected;
+      await tester.pumpWidget(
+        buildTestWidget(
+          question: 'Do you want an account of creatures vanquished?',
+          choices: 'ynaq',
+          locale: const Locale('en'),
+          onSelect: (code) => selected = code,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('[y] Yes'), findsOneWidget);
+      expect(find.text('[n] No'), findsOneWidget);
+      expect(find.text('[a] Sort order'), findsOneWidget);
+      expect(find.text('[q] Quit'), findsOneWidget);
+
+      await tester.tap(find.text('[a] Sort order'));
+      await tester.pumpAndSettle();
+
+      expect(selected, equals('a'.codeUnitAt(0)));
     });
 
     testWidgets('#adjust スロット選択でチップと?ボタンが表示されタップできること', (tester) async {

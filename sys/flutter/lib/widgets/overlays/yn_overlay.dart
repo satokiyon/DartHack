@@ -199,65 +199,34 @@ class YnOverlayState extends State<YnOverlay> {
   }
 
   Widget _buildYesNoButtons(BuildContext context, ParsedYnPrompt parsed, AppLocalizations l10n) {
+    final isJp = Localizations.localeOf(context).languageCode == 'ja';
+
     return Wrap(
       spacing: 12,
       runSpacing: 12,
       alignment: WrapAlignment.center,
       children: [
-        if (parsed.quickChoices.contains('y'))
+        for (final ch in parsed.quickChoices)
           ElevatedButton(
-            onPressed: () => widget.onSelect('y'.codeUnitAt(0)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: (parsed.defaultChoice == 'y'.codeUnitAt(0)) ? Colors.teal[500] : Colors.blueGrey[800],
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Yes'),
-          ),
-        if (parsed.quickChoices.contains('n'))
-          ElevatedButton(
-            onPressed: () => widget.onSelect('n'.codeUnitAt(0)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: (parsed.defaultChoice == 'n'.codeUnitAt(0)) ? Colors.teal[500] : Colors.blueGrey[800],
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('No'),
-          ),
-        if (parsed.quickChoices.contains('a'))
-          ElevatedButton(
-            onPressed: () => widget.onSelect('a'.codeUnitAt(0)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueGrey[800],
-              foregroundColor: Colors.amber[200],
-            ),
-            child: Text(Localizations.localeOf(context).languageCode == 'ja' ? 'All / おまかせ' : 'All'),
-          ),
-        if (parsed.quickChoices.contains('q'))
-          ElevatedButton(
-            onPressed: () => widget.onSelect('q'.codeUnitAt(0)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: (parsed.defaultChoice == 'q'.codeUnitAt(0)) ? Colors.teal[500] : Colors.blueGrey[800],
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Quit'),
-          ),
-        // y, n, a, q 以外の選択肢がある場合 (例: 'h', 's' や 'r', 'l')
-        ...parsed.quickChoices
-            .where((ch) => !['y', 'n', 'a', 'q'].contains(ch))
-            .map((ch) {
-          final isDefault = ch.codeUnitAt(0) == parsed.defaultChoice;
-          return ElevatedButton(
             onPressed: () => widget.onSelect(ch.codeUnitAt(0)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: isDefault ? Colors.teal[500] : Colors.blueGrey[800],
-              foregroundColor: Colors.white,
+              backgroundColor: (ch.codeUnitAt(0) == parsed.defaultChoice)
+                  ? Colors.teal[500]
+                  : Colors.blueGrey[800],
+              foregroundColor: ch == 'a' ? Colors.amber[200] : Colors.white,
             ),
-            child: Text(ch),
-          );
-        }),
+            child: Text(
+              YnChoiceParser.resolveButtonLabel(
+                ch,
+                question: widget.question,
+                isJapanese: isJp,
+              ),
+            ),
+          ),
         ElevatedButton(
           onPressed: () => widget.onSelect(27), // ESC
           style: ElevatedButton.styleFrom(backgroundColor: Colors.black54, foregroundColor: Colors.white70),
-          child: Text(l10n.cancel),
+          child: Text('[ESC] ${l10n.cancel}'),
         ),
         ElevatedButton.icon(
           onPressed: widget.onShowMsgHistory,
