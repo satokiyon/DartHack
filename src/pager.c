@@ -44,6 +44,7 @@ staticfn void look_at_monster(char *, char *, struct monst *,
 staticfn struct permonst *lookat(coordxy, coordxy, char *, char *) NONNULLPTRS;
 staticfn boolean checkfile(char *, struct permonst *, unsigned,
                                                             char *) NO_NNARGS;
+staticfn void obj_to_data_key(struct obj *, char *, size_t);
 staticfn void jp_translate_screen_desc(char *) NONNULLARG1;
 staticfn int add_cmap_descr(int, int, int, int, coord,
                           const char *, const char *,
@@ -1151,6 +1152,91 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
     return (pm && !Hallucination) ? pm : (struct permonst *) 0;
 }
 
+/*
+ * 持ち物やアイテムオブジェクトから data_jp (data.base) 照合用の英語キーを取得する。
+ * NetHackJP では data_jp の見出し語キーが英語（ワイルドカード含む）で保持されているため、
+ * 日本語名ではなくオブジェクト本来の英語属性から照合キーを導出する。
+ */
+staticfn void
+obj_to_data_key(struct obj *otmp, char *out, size_t outsz)
+{
+    if (!otmp || !out || outsz == 0)
+        return;
+
+    out[0] = '\0';
+
+    /* 1. アーティファクト名（判明している場合） */
+    if (otmp->oartifact) {
+        const char *art = artiname(otmp->oartifact);
+        if (art && *art) {
+            (void) strncpy(out, art, outsz - 1);
+            out[outsz - 1] = '\0';
+            return;
+        }
+    }
+
+    /* 2. 死体・像・人形（モンスター種別の英語名） */
+    if (otmp->otyp == CORPSE || otmp->otyp == STATUE || otmp->otyp == FIGURINE) {
+        if (otmp->corpsenm >= LOW_PM && otmp->corpsenm < NUMMONS) {
+            const char *mnam = mons[otmp->corpsenm].pmnames[NEUTRAL];
+            if (mnam && *mnam) {
+                (void) strncpy(out, mnam, outsz - 1);
+                out[outsz - 1] = '\0';
+                return;
+            }
+        }
+        if (otmp->otyp == CORPSE) {
+            (void) strncpy(out, "corpse", outsz - 1);
+            out[outsz - 1] = '\0';
+            return;
+        }
+    }
+
+    /* 3. 識別済みまたは名前既知の場合: OBJ_NAME */
+    if (objects[otmp->otyp].oc_name_known || otmp->known) {
+        const char *onam = OBJ_NAME(objects[otmp->otyp]);
+        if (onam && *onam) {
+            (void) strncpy(out, onam, outsz - 1);
+            out[outsz - 1] = '\0';
+            return;
+        }
+    }
+
+    /* 4. 未識別の場合:
+     * 薬・巻物・杖・魔法書・指輪・魔除けなどの消費系・魔法道具はカテゴリ全般名、
+     * 武具やその他は OBJ_DESCR（外観英語名、例: "runed broadsword"）を使用し、
+     * なければ OBJ_NAME にフォールバックする。
+     */
+    switch (objects[otmp->otyp].oc_class) {
+    case POTION_CLASS:
+        (void) strncpy(out, "potion", outsz - 1);
+        break;
+    case SCROLL_CLASS:
+        (void) strncpy(out, "scroll", outsz - 1);
+        break;
+    case WAND_CLASS:
+        (void) strncpy(out, "wand", outsz - 1);
+        break;
+    case SPBOOK_CLASS:
+        (void) strncpy(out, "spellbook", outsz - 1);
+        break;
+    case RING_CLASS:
+        (void) strncpy(out, "ring", outsz - 1);
+        break;
+    case AMULET_CLASS:
+        (void) strncpy(out, "amulet", outsz - 1);
+        break;
+    default:
+        if (OBJ_DESCR(objects[otmp->otyp]) && *OBJ_DESCR(objects[otmp->otyp])) {
+            (void) strncpy(out, OBJ_DESCR(objects[otmp->otyp]), outsz - 1);
+        } else if (OBJ_NAME(objects[otmp->otyp]) && *OBJ_NAME(objects[otmp->otyp])) {
+            (void) strncpy(out, OBJ_NAME(objects[otmp->otyp]), outsz - 1);
+        }
+        break;
+    }
+    out[outsz - 1] = '\0';
+}
+
 /* used to decide whether the context-sensitive inventory action menu for
    item 'otmp' should include the "/ - look up this item" choice */
 boolean
@@ -1158,8 +1244,11 @@ ia_checkfile(struct obj *otmp)
 {
     char itemnam[BUFSZ];
 
-    /* singular() of xname() of otmp is what "/i" looks up */
-    Strcpy(itemnam, singular(otmp, xname));
+    /* singular() of xname() of otmp is what "/i" looks up in English core;
+       in NetHackJP, obj_to_data_key() yields the English lookup key */
+    obj_to_data_key(otmp, itemnam, sizeof itemnam);
+    if (!*itemnam)
+        return FALSE;
     return checkfile(itemnam, (struct permonst *) 0,
                      chkfilIaCheck | chkfilDontAsk, (char *) 0);
 }
@@ -1469,7 +1558,7 @@ checkfile(
                     display_nhwindow(datawin, FALSE);
                     destroy_nhwindow(datawin), datawin = WIN_ERR;
                 }
-            } else if (user_typed_name && pass == 0 && !pass1found_in_file) {
+            } else if ((user_typed_name || ia_checking) && pass == 0 && !pass1found_in_file) {
                 char jp_lookup_key[BUFSZ];
 
                 if (jp_data_lookup_key_from_japanese(inp,
@@ -1483,7 +1572,8 @@ checkfile(
                     res = TRUE;
                     goto checkfile_done;
                 }
-                pline("それらについての情報は見つからなかった.");
+                if (user_typed_name)
+                    pline("それらについての情報は見つからなかった.");
             }
         }
     }
@@ -2207,7 +2297,7 @@ do_look(int mode, coord *click_cc)
             *out_str = '\0';
             for (invobj = gi.invent; invobj; invobj = invobj->nobj)
                 if (invobj->invlet == invlet) {
-                    Strcpy(out_str, singular(invobj, xname));
+                    obj_to_data_key(invobj, out_str, sizeof out_str);
                     break;
                 }
             if (*out_str)
