@@ -1,3 +1,7 @@
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS 1
+#endif
+#include <inttypes.h>
 /* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
 /* $NHDT-Header: NetHack 5.0 sfbase.c 2026/06/10_19:52:13 NetHack-5.0:1.19 $ */
 /* Copyright (c) Michael Allison, 2025. */

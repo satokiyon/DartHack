@@ -33,6 +33,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS 1
+#endif
+#include <stdint.h>
+#include <inttypes.h>
 
 #ifdef WIN32
 #undef WIN32

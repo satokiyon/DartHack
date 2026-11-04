@@ -53,6 +53,18 @@
 #endif
 #endif  /* claims to be C99 */
 
+#if defined(_MSC_VER) && _MSC_VER >= 1800
+#if !defined(HAS_STDINT_H)
+#define HAS_STDINT_H
+#endif
+#if !defined(HAS_INTTYPES_H)
+#define HAS_INTTYPES_H
+#endif
+#if !defined(__STDC_FORMAT_MACROS)
+#define __STDC_FORMAT_MACROS 1
+#endif
+#endif  /* _MSC_VER >= 1800 */
+
 #endif /*?__DECC*/
 
 #ifdef HAS_STDINT_H
