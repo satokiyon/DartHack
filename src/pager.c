@@ -1160,81 +1160,78 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
 staticfn void
 obj_to_data_key(struct obj *otmp, char *out, size_t outsz)
 {
+    int otyp;
+    boolean nn, dknown;
+    const char *actualn, *dn;
+
     if (!otmp || !out || outsz == 0)
         return;
-
     out[0] = '\0';
 
-    /* 1. アーティファクト名（判明している場合） */
-    if (otmp->oartifact) {
-        const char *art = artiname(otmp->oartifact);
-        if (art && *art) {
-            (void) strncpy(out, art, outsz - 1);
-            out[outsz - 1] = '\0';
-            return;
-        }
-    }
+    otyp = otmp->otyp;
+    nn = (objects[otyp].oc_name_known != 0);
+    dknown = (otmp->dknown != 0);
+    actualn = OBJ_NAME(objects[otyp]);
+    dn = OBJ_DESCR(objects[otyp]);
+    if (!dn)
+        dn = actualn;
 
-    /* 2. 死体・像・人形（モンスター種別の英語名） */
-    if (otmp->otyp == CORPSE || otmp->otyp == STATUE || otmp->otyp == FIGURINE) {
-        if (otmp->corpsenm >= LOW_PM && otmp->corpsenm < NUMMONS) {
-            const char *mnam = mons[otmp->corpsenm].pmnames[NEUTRAL];
-            if (mnam && *mnam) {
-                (void) strncpy(out, mnam, outsz - 1);
-                out[outsz - 1] = '\0';
-                return;
-            }
-        }
-        if (otmp->otyp == CORPSE) {
-            (void) strncpy(out, "corpse", outsz - 1);
-            out[outsz - 1] = '\0';
-            return;
-        }
-    }
-
-    /* 3. 識別済みまたは名前既知の場合: OBJ_NAME */
-    if (objects[otmp->otyp].oc_name_known || otmp->known) {
-        const char *onam = OBJ_NAME(objects[otmp->otyp]);
-        if (onam && *onam) {
-            (void) strncpy(out, onam, outsz - 1);
-            out[outsz - 1] = '\0';
-            return;
-        }
-    }
-
-    /* 4. 未識別の場合:
-     * 薬・巻物・杖・魔法書・指輪・魔除けなどの消費系・魔法道具はカテゴリ全般名、
-     * 武具やその他は OBJ_DESCR（外観英語名、例: "runed broadsword"）を使用し、
-     * なければ OBJ_NAME にフォールバックする。
-     */
-    switch (objects[otmp->otyp].oc_class) {
+    switch (otmp->oclass) {
     case POTION_CLASS:
-        (void) strncpy(out, "potion", outsz - 1);
+        Snprintf(out, outsz, (dknown && nn) ? "potion of %s" : "potion",
+                 actualn);
         break;
     case SCROLL_CLASS:
-        (void) strncpy(out, "scroll", outsz - 1);
+        Snprintf(out, outsz, (dknown && nn) ? "scroll of %s" : "scroll",
+                 actualn);
         break;
     case WAND_CLASS:
-        (void) strncpy(out, "wand", outsz - 1);
+        Snprintf(out, outsz, (dknown && nn) ? "wand of %s" : "wand",
+                 actualn);
         break;
     case SPBOOK_CLASS:
-        (void) strncpy(out, "spellbook", outsz - 1);
+        if (otyp == SPE_NOVEL)
+            Snprintf(out, outsz, !dknown ? "book" : nn ? "%s" : "%s book",
+                     nn ? actualn : dn);
+        else if (otyp == SPE_BOOK_OF_THE_DEAD && dknown && nn)
+            Snprintf(out, outsz, "%s", actualn);
+        else
+            Snprintf(out, outsz,
+                     (dknown && nn) ? "spellbook of %s" : "spellbook",
+                     actualn);
         break;
     case RING_CLASS:
-        (void) strncpy(out, "ring", outsz - 1);
+        Snprintf(out, outsz, (dknown && nn) ? "ring of %s" : "ring",
+                 actualn);
         break;
     case AMULET_CLASS:
-        (void) strncpy(out, "amulet", outsz - 1);
+        if (!dknown)
+            Snprintf(out, outsz, "amulet");
+        else if (otyp == AMULET_OF_YENDOR || otyp == FAKE_AMULET_OF_YENDOR)
+            Snprintf(out, outsz, "%s", otmp->known ? actualn : dn);
+        else
+            Snprintf(out, outsz, "%s", nn ? actualn : "amulet");
+        break;
+    case GEM_CLASS:
+        if (dknown && nn)
+            Snprintf(out, outsz, "%s", actualn);
+        else
+            Snprintf(out, outsz, "%s",
+                     (objects[otyp].oc_material == MINERAL) ? "stone" : "gem");
         break;
     default:
-        if (OBJ_DESCR(objects[otmp->otyp]) && *OBJ_DESCR(objects[otmp->otyp])) {
-            (void) strncpy(out, OBJ_DESCR(objects[otmp->otyp]), outsz - 1);
-        } else if (OBJ_NAME(objects[otmp->otyp]) && *OBJ_NAME(objects[otmp->otyp])) {
-            (void) strncpy(out, OBJ_NAME(objects[otmp->otyp]), outsz - 1);
-        }
+        Snprintf(out, outsz, "%s", (nn || !dknown) ? actualn : dn);
         break;
     }
-    out[outsz - 1] = '\0';
+
+    if (otmp->oartifact && dknown) {
+        const char *art = artiname(otmp->oartifact);
+        if (art && *art) {
+            size_t len = strlen(out);
+            if (len + 7 + strlen(art) < outsz)
+                Snprintf(out + len, outsz - len, " named %s", art);
+        }
+    }
 }
 
 /* used to decide whether the context-sensitive inventory action menu for
@@ -1558,7 +1555,7 @@ checkfile(
                     display_nhwindow(datawin, FALSE);
                     destroy_nhwindow(datawin), datawin = WIN_ERR;
                 }
-            } else if ((user_typed_name || ia_checking) && pass == 0 && !pass1found_in_file) {
+            } else if (user_typed_name && pass == 0 && !pass1found_in_file) {
                 char jp_lookup_key[BUFSZ];
 
                 if (jp_data_lookup_key_from_japanese(inp,
