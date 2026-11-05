@@ -501,6 +501,86 @@ void main() {
       expect(selectedIdent, equals(11));
     });
 
+    testWidgets('MenuOverlay extended command menu scrolls correctly when navigating with arrow keys', (tester) async {
+      final menuKey = GlobalKey<MenuOverlayState>();
+      int? selectedIdent;
+
+      // 20件の拡張コマンドを用意
+      final items = List.generate(20, (i) {
+        return MenuItemData(
+          ident: i + 1,
+          accelerator: 97 + (i % 26),
+          groupacc: 0,
+          attr: 0,
+          text: '#cmd$i\tDescription for command $i',
+          preselected: 0,
+          color: 0,
+          tile: -1,
+        );
+      });
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: SizedBox(
+              height: 300, // ビューポートを300pxに制限
+              child: Stack(
+                children: [
+                  MenuOverlay(
+                    key: menuKey,
+                    menuPrompt: '拡張コマンド一覧',
+                    menuItems: items,
+                    menuHow: 1, // PICK_ONE
+                    initialSelectedCounts: const {},
+                    initialSearchQuery: '',
+                    bottomInset: 0,
+                    useTiles: false,
+                    tileImage: null,
+                    tileWidth: 32,
+                    tileHeight: 32,
+                    onSingleSelect: (val) => selectedIdent = val,
+                    onMultiSelect: (_) {},
+                    onItemLongPress: (_) {},
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final state = menuKey.currentState!;
+      // 初期状態: offset は 0
+      final scrollController = tester.widget<ListView>(find.byType(ListView)).controller!;
+      expect(scrollController.offset, equals(0.0));
+
+      // 10回下キーを押下して 10番目の項目へ進める
+      for (int i = 0; i < 10; i++) {
+        state.moveExtCmdCandidate(1);
+        await tester.pumpAndSettle();
+      }
+
+      // スクロールオフセットが正しく下へ移動していること
+      expect(scrollController.offset, greaterThan(200.0));
+
+      // さらに最後まで下キーを押下
+      for (int i = 0; i < 15; i++) {
+        state.moveExtCmdCandidate(1);
+        await tester.pumpAndSettle();
+      }
+
+      // 末尾項目までスクロールされていること
+      expect(scrollController.offset, greaterThan(800.0));
+
+      // Enter 決定で末尾項目 (ident: 20) が正しく確定されること
+      state.submitExtCmdSelection();
+      await tester.pumpAndSettle();
+      expect(selectedIdent, equals(20));
+    });
+
     testWidgets('MenuOverlay multiple selection menu supports Tab key focus cycling across action buttons', (tester) async {
       final menuKey = GlobalKey<MenuOverlayState>();
       int? singleSelectedIdent;

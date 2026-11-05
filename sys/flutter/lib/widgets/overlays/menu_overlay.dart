@@ -448,7 +448,8 @@ class MenuOverlayState extends State<MenuOverlay> {
 
   /// 拡張コマンド候補の上下移動
   void moveExtCmdCandidate(int delta) {
-    final selectable = _getSelectableExtCmdItems(_getFilteredItems());
+    final filteredItems = _getFilteredItems();
+    final selectable = _getSelectableExtCmdItems(filteredItems);
     if (selectable.isEmpty) return;
     setState(() {
       if (_selectedExtCmdIndex == null) {
@@ -459,20 +460,34 @@ class MenuOverlayState extends State<MenuOverlay> {
       }
     });
     if (_scrollController.hasClients && _selectedExtCmdIndex != null) {
-      const itemHeight = 56.0;
-      final targetOffset = _selectedExtCmdIndex! * itemHeight;
+      final selectedItem = selectable[_selectedExtCmdIndex!];
+      final itemIndexInFiltered = filteredItems.indexOf(selectedItem);
+      final index = itemIndexInFiltered >= 0 ? itemIndexInFiltered : _selectedExtCmdIndex!;
+
+      // 1項目の推定高さ: ListTile(dense, 2 lines) + vertical padding(8) + border ≈ 76.0px
+      const estimatedItemHeight = 76.0;
+      // 画面端から約1行分の余裕を持たせるセーフマージン
+      const scrollMargin = 76.0;
+
+      final itemTop = 6.0 + index * estimatedItemHeight;
+      final itemBottom = itemTop + estimatedItemHeight;
       final currentOffset = _scrollController.offset;
       final viewportHeight = _scrollController.position.viewportDimension;
       final maxScroll = _scrollController.position.maxScrollExtent;
-      if (targetOffset < currentOffset) {
+
+      if (itemTop - scrollMargin < currentOffset) {
+        // 画面上端に近づいた場合は上にスクロール
+        final targetOffset = (itemTop - scrollMargin).clamp(0.0, maxScroll);
         _scrollController.animateTo(
-          targetOffset.clamp(0.0, maxScroll),
+          targetOffset,
           duration: const Duration(milliseconds: 100),
           curve: Curves.easeOut,
         );
-      } else if (targetOffset + itemHeight > currentOffset + viewportHeight) {
+      } else if (itemBottom + scrollMargin > currentOffset + viewportHeight) {
+        // 画面下端に近づいた場合は下にスクロール
+        final targetOffset = (itemBottom + scrollMargin - viewportHeight).clamp(0.0, maxScroll);
         _scrollController.animateTo(
-          (targetOffset + itemHeight - viewportHeight).clamp(0.0, maxScroll),
+          targetOffset,
           duration: const Duration(milliseconds: 100),
           curve: Curves.easeOut,
         );

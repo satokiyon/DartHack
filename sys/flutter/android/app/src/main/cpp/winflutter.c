@@ -2393,7 +2393,7 @@ static int flutter_get_ext_cmd(void) {
         return do_ext_cmd_text_flutter();
     }
     if (iflags.extmenu) {
-        return flutter_do_ext_cmd_menu(FALSE);
+        return flutter_do_ext_cmd_menu(TRUE);
     }
     return do_ext_cmd_text_flutter();
 }
