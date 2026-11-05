@@ -938,5 +938,102 @@ void main() {
         equals(const TextOverlayTab(forward: false)),
       );
     });
+
+    test('Menu and textWindow should support jump to edge (^, |, Home, End) and selection keys (., -, @)', () {
+      // 1. Menu selection keys
+      final dotEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.period,
+        logicalKey: LogicalKeyboardKey.period,
+        character: '.',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: dotEvent, context: KeyInputContext.menu),
+        equals(const MenuSelectAll()),
+      );
+
+      final minusEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.minus,
+        logicalKey: LogicalKeyboardKey.minus,
+        character: '-',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: minusEvent, context: KeyInputContext.menu),
+        equals(const MenuDeselectAll()),
+      );
+
+      final atEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.bracketLeft,
+        logicalKey: LogicalKeyboardKey.at,
+        character: '@',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: atEvent, context: KeyInputContext.menu),
+        equals(const MenuInvertAll()),
+      );
+
+      // 2. Menu jump edge keys (^, |, Home, End)
+      final caretEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.digit6,
+        logicalKey: LogicalKeyboardKey.caret,
+        character: '^',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: caretEvent, context: KeyInputContext.menu),
+        equals(const MenuJumpEdge(true)),
+      );
+
+      final barEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.backslash,
+        logicalKey: LogicalKeyboardKey.bar,
+        character: '|',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: barEvent, context: KeyInputContext.menu),
+        equals(const MenuJumpEdge(false)),
+      );
+
+      final homeEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.home,
+        logicalKey: LogicalKeyboardKey.home,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: homeEvent, context: KeyInputContext.menu),
+        equals(const MenuJumpEdge(true)),
+      );
+
+      final endEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.end,
+        logicalKey: LogicalKeyboardKey.end,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: endEvent, context: KeyInputContext.menu),
+        equals(const MenuJumpEdge(false)),
+      );
+
+      // 3. Text window jump edge keys (^, |, Home, End)
+      expect(
+        HardwareKeyRouter.route(event: caretEvent, context: KeyInputContext.textWindow),
+        equals(const TextJumpEdge(true)),
+      );
+      expect(
+        HardwareKeyRouter.route(event: barEvent, context: KeyInputContext.textWindow),
+        equals(const TextJumpEdge(false)),
+      );
+      expect(
+        HardwareKeyRouter.route(event: homeEvent, context: KeyInputContext.textWindow),
+        equals(const TextJumpEdge(true)),
+      );
+      expect(
+        HardwareKeyRouter.route(event: endEvent, context: KeyInputContext.textWindow),
+        equals(const TextJumpEdge(false)),
+      );
+    });
   });
 }

@@ -1104,6 +1104,41 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         }
         return KeyEventResult.handled;
 
+      case TextJumpEdge(:final toTop):
+        if (_screen.isTextWindowVisible) {
+          _textOverlayKey.currentState?.jumpToEdge(toTop);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case MenuSelectAll():
+        if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.handleSelectAll();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case MenuDeselectAll():
+        if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.handleDeselectAll();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case MenuInvertAll():
+        if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.handleInvertAll();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case MenuJumpEdge(:final toTop):
+        if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.jumpToEdge(toTop);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
       case MenuAccelerator(:final code):
         if (_screen.isMenuWindowVisible) {
           if (_screen.menuHow == 0 /* PICK_NONE */) {

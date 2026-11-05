@@ -26,6 +26,7 @@ NetHack 5.0 (日本語版 / 英語版) に **Flutter / Dart** でUIを実装す�
 
 5. **ハードウェアキーボード & 物理操作最適化**:
    - `HardwareKeyRouter` により、テンキーや矢印キーによる8方向移動、各種アクションショートカット、拡張コマンドの直接入力など、PC や外部キーボード接続時の快適な打鍵操作をフルサポート。
+   - モバイルでの不要な IME 自動表示を抑止する「フォーカスレス入力原則」、Tab キーによる「完全フォーカス循環」、複数選択の一括操作（`.` 全選択、`-` 選択解除、`@` 選択反転）、先頭/末尾ジャンプ（`^` / `|` / `Home` / `End`）など、徹底した物理操作対応を実装。詳細は [`doc/hardware_keyboard_guide.md`](doc/hardware_keyboard_guide.md) を参照してください。
 
 6. **モバイル最適化 UI & スムーズなマップ操作**:
    - **マップ移動**: 巨大キャンバス `InteractiveViewer` 設計により、極端なズーム時やマップ端でも主人公の位置を画面中央やや上方 (35% 位置) に確実センタリングし、ズーム倍率を保持。
@@ -94,6 +95,7 @@ sys/flutter/
 │   ├── ambience_specs.md        # BGM・環境音・特別部屋BGM仕様書
 │   ├── combat_sound_specification.md # 戦闘アクション効果音仕様書
 │   ├── font_and_symset_architecture.md # フォント設定・symsetアーキテクチャ設計書
+│   ├── hardware_keyboard_guide.md # 物理キーボード操作・設計ガイド
 │   ├── sound_macros_list.md     # 全316音のサウンドマスター仕様書
 │   ├── sound_system_design.md   # 音響システム設計・確定実装仕様書
 │   ├── spoiler_update_guide.md  # スポイラー更新手順書・仕様

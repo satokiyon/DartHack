@@ -106,6 +106,17 @@ class TextOverlayState extends State<TextOverlay> {
     );
   }
 
+  /// 一覧の先頭 (toTop = true) または末尾 (toTop = false) にジャンプ
+  void jumpToEdge(bool toTop) {
+    if (!_scrollController.hasClients) return;
+    final targetOffset = toTop ? 0.0 : _scrollController.position.maxScrollExtent;
+    _scrollController.animateTo(
+      targetOffset,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+    );
+  }
+
   Widget _buildMenuItemTile(int tile) {
     if (!widget.useTiles || widget.tileImage == null || tile < 0) {
       return const SizedBox(width: 24, height: 24);

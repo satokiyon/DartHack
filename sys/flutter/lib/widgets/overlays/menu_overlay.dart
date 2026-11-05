@@ -14,6 +14,7 @@ enum MenuFocusTarget {
   none,
   selectAll,
   deselectAll,
+  invertAll,
   confirm,
   cancel,
 }
@@ -119,6 +120,17 @@ class MenuOverlayState extends State<MenuOverlay> {
         .clamp(0.0, _scrollController.position.maxScrollExtent);
     _scrollController.animateTo(
       nextOffset,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+    );
+  }
+
+  /// 一覧の先頭 (toTop = true) または末尾 (toTop = false) にジャンプ
+  void jumpToEdge(bool toTop) {
+    if (!_scrollController.hasClients) return;
+    final targetOffset = toTop ? 0.0 : _scrollController.position.maxScrollExtent;
+    _scrollController.animateTo(
+      targetOffset,
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeOut,
     );
@@ -276,6 +288,10 @@ class MenuOverlayState extends State<MenuOverlay> {
       _handleDeselectAll();
       return;
     }
+    if (_currentFocusTarget == MenuFocusTarget.invertAll) {
+      _handleInvertAll();
+      return;
+    }
 
     final cleanCounts = <int, int>{};
     _selectedCounts.forEach((ident, count) {
@@ -314,6 +330,7 @@ class MenuOverlayState extends State<MenuOverlay> {
       if (isMulti) ...[
         MenuFocusTarget.selectAll,
         MenuFocusTarget.deselectAll,
+        MenuFocusTarget.invertAll,
         MenuFocusTarget.confirm,
       ],
       MenuFocusTarget.cancel,
@@ -329,6 +346,15 @@ class MenuOverlayState extends State<MenuOverlay> {
       _currentFocusTarget = targets[nextIndex];
     });
   }
+
+  /// 外部または物理キー（. キー）からの全選択
+  void handleSelectAll() => _handleSelectAll();
+
+  /// 外部または物理キー（- キー）からの全解除
+  void handleDeselectAll() => _handleDeselectAll();
+
+  /// 外部または物理キー（@ キー）からの全反転
+  void handleInvertAll() => _handleInvertAll();
 
   void _handleSelectAll() {
     final filteredItems = _getFilteredItems();
@@ -357,6 +383,44 @@ class MenuOverlayState extends State<MenuOverlay> {
   void _handleDeselectAll() {
     setState(() {
       _selectedCounts.clear();
+    });
+    widget.onSelectionChanged?.call(_selectedCounts);
+  }
+
+  void _handleInvertAll() {
+    final filteredItems = _getFilteredItems();
+    setState(() {
+      final hasAllTypesInMenu = filteredItems.any((i) => i.ident == -2);
+      if (hasAllTypesInMenu) {
+        // query_category 画面では純粋カテゴリを反転し、連動して -2 を更新
+        for (final item in filteredItems) {
+          if (_isPureItemCategoryItem(item)) {
+            if (_selectedCounts.containsKey(item.ident)) {
+              _selectedCounts.remove(item.ident);
+            } else {
+              _selectedCounts[item.ident] = _parseMaxCount(item.text);
+            }
+          }
+        }
+        final allCategorySelected = filteredItems
+            .where((i) => _isPureItemCategoryItem(i))
+            .every((i) => _selectedCounts.containsKey(i.ident));
+        if (allCategorySelected) {
+          _selectedCounts[-2] = 1;
+        } else {
+          _selectedCounts.remove(-2);
+        }
+      } else {
+        for (final item in filteredItems) {
+          if (item.ident != 0 && item.ident != 4294967294 && !_isMenuCategoryItem(item)) {
+            if (_selectedCounts.containsKey(item.ident)) {
+              _selectedCounts.remove(item.ident);
+            } else {
+              _selectedCounts[item.ident] = _parseMaxCount(item.text);
+            }
+          }
+        }
+      }
     });
     widget.onSelectionChanged?.call(_selectedCounts);
   }
@@ -1262,6 +1326,15 @@ class MenuOverlayState extends State<MenuOverlay> {
                                 : null,
                           ),
                           child: Text(AppLocalizations.of(context)!.deselectAll),
+                        ),
+                        ElevatedButton(
+                          onPressed: _handleInvertAll,
+                          style: ElevatedButton.styleFrom(
+                            side: _currentFocusTarget == MenuFocusTarget.invertAll
+                                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                                : null,
+                          ),
+                          child: Text(AppLocalizations.of(context)!.invertAll),
                         ),
                         ElevatedButton(
                           onPressed: submit,

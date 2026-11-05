@@ -917,14 +917,20 @@ abstract class AppLocalizations {
   /// No description provided for @selectAll.
   ///
   /// In ja, this message translates to:
-  /// **'全て選択'**
+  /// **'.:全選択'**
   String get selectAll;
 
   /// No description provided for @deselectAll.
   ///
   /// In ja, this message translates to:
-  /// **'解除'**
+  /// **'-:選択解除'**
   String get deselectAll;
+
+  /// No description provided for @invertAll.
+  ///
+  /// In ja, this message translates to:
+  /// **'@:選択反転'**
+  String get invertAll;
 
   /// No description provided for @howMany.
   ///

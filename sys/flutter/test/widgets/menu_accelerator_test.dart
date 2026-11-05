@@ -521,6 +521,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          locale: const Locale('ja'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
@@ -592,6 +593,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          locale: const Locale('ja'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
@@ -643,12 +645,21 @@ void main() {
       await tester.pump();
       expect(state.selectedCounts.isEmpty, isTrue);
 
-      // 4. Tab 3回目 -> confirm
+      // 4. Tab 3回目 -> invertAll
+      state.cycleFocus(true);
+      await tester.pump();
+      expect(state.currentFocusTarget, equals(MenuFocusTarget.invertAll));
+      // invertAll フォーカス時に submit() すると反転して全選択される
+      state.submit();
+      await tester.pump();
+      expect(state.selectedCounts.length, equals(2));
+
+      // 5. Tab 4回目 -> confirm
       state.cycleFocus(true);
       await tester.pump();
       expect(state.currentFocusTarget, equals(MenuFocusTarget.confirm));
 
-      // 5. Tab 4回目 -> cancel
+      // 6. Tab 5回目 -> cancel
       state.cycleFocus(true);
       await tester.pump();
       expect(state.currentFocusTarget, equals(MenuFocusTarget.cancel));
@@ -657,15 +668,126 @@ void main() {
       await tester.pump();
       expect(singleSelectedIdent, equals(-1));
 
-      // 6. Tab 5回目 -> none (初期状態復帰)
+      // 7. Tab 6回目 -> none (初期状態復帰)
       state.cycleFocus(true);
       await tester.pump();
       expect(state.currentFocusTarget, equals(MenuFocusTarget.none));
 
-      // 7. Shift+Tab (逆順) -> cancel
+      // 8. Shift+Tab (逆順) -> cancel
       state.cycleFocus(false);
       await tester.pump();
       expect(state.currentFocusTarget, equals(MenuFocusTarget.cancel));
+    });
+
+    testWidgets('MenuOverlay multiple selection supports selectAll, deselectAll, invertAll and jumpToEdge', (tester) async {
+      final menuKey = GlobalKey<MenuOverlayState>();
+
+      final items = List.generate(20, (i) {
+        return MenuItemData(
+          ident: i + 1,
+          accelerator: 97 + (i % 26),
+          groupacc: 0,
+          attr: 0,
+          text: 'Item ${i + 1}',
+          preselected: 0,
+          color: 0,
+          tile: -1,
+        );
+      });
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: SizedBox(
+              height: 300,
+              child: Stack(
+                children: [
+                  MenuOverlay(
+                    key: menuKey,
+                    menuPrompt: 'Select items:',
+                    menuItems: items,
+                    menuHow: 2, // PICK_ANY
+                    initialSelectedCounts: const {},
+                    initialSearchQuery: '',
+                    bottomInset: 0,
+                    useTiles: false,
+                    tileImage: null,
+                    tileWidth: 32,
+                    tileHeight: 32,
+                    onSingleSelect: (_) {},
+                    onMultiSelect: (_) {},
+                    onItemLongPress: (_) {},
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final state = menuKey.currentState!;
+
+      // 1. 全選択 (handleSelectAll / . キー相当)
+      state.handleSelectAll();
+      await tester.pump();
+      expect(state.selectedCounts.length, equals(20));
+
+      // 2. 選択反転 (handleInvertAll / @ キー相当) -> 全解除される
+      state.handleInvertAll();
+      await tester.pump();
+      expect(state.selectedCounts.isEmpty, isTrue);
+
+      // 1つだけ手動選択して反転 -> 19個選択になる
+      state.toggleSelectionById(1);
+      await tester.pump();
+      expect(state.selectedCounts.length, equals(1));
+      state.handleInvertAll();
+      await tester.pump();
+      expect(state.selectedCounts.length, equals(19));
+      expect(state.selectedCounts.containsKey(1), isFalse);
+
+      // 3. 選択解除 (handleDeselectAll / - キー相当)
+      state.handleDeselectAll();
+      await tester.pump();
+      expect(state.selectedCounts.isEmpty, isTrue);
+
+      // 4. ボタンのテキスト検証（「.:全選択」「-:選択解除」「@:選択反転」）
+      expect(find.text('.:全選択'), findsOneWidget);
+      expect(find.text('-:選択解除'), findsOneWidget);
+      expect(find.text('@:選択反転'), findsOneWidget);
+
+      // 5. ボタンタップでの動作検証
+      await tester.tap(find.text('.:全選択'));
+      await tester.pump();
+      expect(state.selectedCounts.length, equals(20));
+
+      await tester.tap(find.text('@:選択反転'));
+      await tester.pump();
+      expect(state.selectedCounts.isEmpty, isTrue);
+
+      await tester.tap(find.text('.:全選択'));
+      await tester.pump();
+      expect(state.selectedCounts.length, equals(20));
+
+      await tester.tap(find.text('-:選択解除'));
+      await tester.pump();
+      expect(state.selectedCounts.isEmpty, isTrue);
+
+      // 6. jumpToEdge (先頭 ^ / Home, 末尾 | / End)
+      final scrollController = tester.widget<ListView>(find.byType(ListView)).controller!;
+      expect(scrollController.offset, equals(0.0));
+
+      state.jumpToEdge(false); // 末尾へジャンプ
+      await tester.pumpAndSettle();
+      expect(scrollController.offset, greaterThan(200.0));
+
+      state.jumpToEdge(true); // 先頭へジャンプ
+      await tester.pumpAndSettle();
+      expect(scrollController.offset, equals(0.0));
     });
   });
 }

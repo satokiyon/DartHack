@@ -422,10 +422,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get filterCmds => 'コマンドを絞り込み...';
 
   @override
-  String get selectAll => '全て選択';
+  String get selectAll => '.:全選択';
 
   @override
-  String get deselectAll => '解除';
+  String get deselectAll => '-:選択解除';
+
+  @override
+  String get invertAll => '@:選択反転';
 
   @override
   String get howMany => '個数を選択してください';

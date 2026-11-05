@@ -425,10 +425,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filterCmds => 'Filter commands...';
 
   @override
-  String get selectAll => 'Select all';
+  String get selectAll => '.:Select All';
 
   @override
-  String get deselectAll => 'Deselect all';
+  String get deselectAll => '-:Deselect All';
+
+  @override
+  String get invertAll => '@:Invert All';
 
   @override
   String get howMany => 'How many?';

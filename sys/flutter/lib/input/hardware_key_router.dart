@@ -165,6 +165,70 @@ class MenuSpaceAction extends KeyAction {
   int get hashCode => runtimeType.hashCode;
 }
 
+/// 複数選択メニューの全選択（.）
+class MenuSelectAll extends KeyAction {
+  const MenuSelectAll();
+
+  @override
+  String toString() => 'MenuSelectAll()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is MenuSelectAll;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// 複数選択メニューの選択解除（-）
+class MenuDeselectAll extends KeyAction {
+  const MenuDeselectAll();
+
+  @override
+  String toString() => 'MenuDeselectAll()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is MenuDeselectAll;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// 複数選択メニューの選択反転（@）
+class MenuInvertAll extends KeyAction {
+  const MenuInvertAll();
+
+  @override
+  String toString() => 'MenuInvertAll()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is MenuInvertAll;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// メニュー画面の一覧先頭・末尾ジャンプ（toTop: true=先頭, false=末尾）
+class MenuJumpEdge extends KeyAction {
+  final bool toTop;
+  const MenuJumpEdge(this.toTop);
+
+  @override
+  String toString() => 'MenuJumpEdge(toTop: $toTop)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MenuJumpEdge &&
+          runtimeType == other.runtimeType &&
+          toTop == other.toTop;
+
+  @override
+  int get hashCode => toTop.hashCode;
+}
+
 /// 複数選択メニューの確定（Enter）
 class MenuSubmit extends KeyAction {
   const MenuSubmit();
@@ -246,6 +310,25 @@ class TextPage extends KeyAction {
 
   @override
   int get hashCode => direction.hashCode;
+}
+
+/// テキスト画面の先頭・末尾ジャンプ（toTop: true=先頭, false=末尾）
+class TextJumpEdge extends KeyAction {
+  final bool toTop;
+  const TextJumpEdge(this.toTop);
+
+  @override
+  String toString() => 'TextJumpEdge(toTop: $toTop)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TextJumpEdge &&
+          runtimeType == other.runtimeType &&
+          toTop == other.toTop;
+
+  @override
+  int get hashCode => toTop.hashCode;
 }
 
 
@@ -591,6 +674,12 @@ class HardwareKeyRouter {
       if (event.logicalKey == LogicalKeyboardKey.pageUp) {
         return const TextPage(-1);
       }
+      if (event.logicalKey == LogicalKeyboardKey.home) {
+        return const TextJumpEdge(true);
+      }
+      if (event.logicalKey == LogicalKeyboardKey.end) {
+        return const TextJumpEdge(false);
+      }
       if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
         return const TextScroll(1);
       }
@@ -608,6 +697,8 @@ class HardwareKeyRouter {
         char = normalizeCharacter(char);
         if (char == '>') return const TextPage(1);
         if (char == '<') return const TextPage(-1);
+        if (char == '^') return const TextJumpEdge(true);
+        if (char == '|') return const TextJumpEdge(false);
       }
 
       return const SwallowKey();
@@ -929,6 +1020,12 @@ class HardwareKeyRouter {
     if (event.logicalKey == LogicalKeyboardKey.pageUp) {
       return const MenuPage(-1);
     }
+    if (event.logicalKey == LogicalKeyboardKey.home) {
+      return const MenuJumpEdge(true);
+    }
+    if (event.logicalKey == LogicalKeyboardKey.end) {
+      return const MenuJumpEdge(false);
+    }
 
     // スクロール以外の決定・キャンセル・アクセラレータ選択・Tabフォーカス移動は、長押しトグル誤爆防止のため KeyDownEvent のみ処理
     if (event is! KeyDownEvent) {
@@ -965,6 +1062,11 @@ class HardwareKeyRouter {
     if (char != null && char.isNotEmpty) {
       if (char == '>') return const MenuPage(1);
       if (char == '<') return const MenuPage(-1);
+      if (char == '^') return const MenuJumpEdge(true);
+      if (char == '|') return const MenuJumpEdge(false);
+      if (char == '.') return const MenuSelectAll();
+      if (char == '-') return const MenuDeselectAll();
+      if (char == '@') return const MenuInvertAll();
       // アクセラレータは大文字小文字を厳密に区別して渡す
       return MenuAccelerator(char.codeUnitAt(0));
     }
