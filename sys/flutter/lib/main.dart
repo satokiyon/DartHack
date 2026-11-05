@@ -269,6 +269,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   String _selectedLanguage = 'ja'; // 'ja' または 'en'
   bool _isTopDrawerOpen = false;
   bool _isBottomDrawerOpen = false;
+  MapButtonFocus _mapButtonFocus = MapButtonFocus.none;
   bool _isMainGameStarted = false;
   int? _mapWinId;
   int? _messageWinId;
@@ -325,9 +326,21 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
   }
 
+  /// いずれかのドロワーメニュー（左右・上下）が開いているかどうか
+  bool get _isDrawerOpen {
+    if (_isTopDrawerOpen || _isBottomDrawerOpen) return true;
+    final scaffold = _scaffoldKey.currentState;
+    if (scaffold != null && (scaffold.isDrawerOpen || scaffold.isEndDrawerOpen)) {
+      return true;
+    }
+    return false;
+  }
+
   /// 物理キーボード用のゲーム画面フォーカスを安全に確保・復帰する
   void _ensureGameFocus() {
     if (!_isGameRunning) return;
+    // ドロワーメニュー表示中はフォーカスを奪わない（ドロワー自体のキーボード操作を保護）
+    if (_isDrawerOpen) return;
     // ユーザが入力欄を明示的にタップして EditableText にフォーカスがある場合はフォーカスを奪わない
     if (FocusManager.instance.primaryFocus?.context?.widget is EditableText) {
       return;
@@ -520,6 +533,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   void _openMenu([BuildContext? context]) {
+    _mapButtonFocus = MapButtonFocus.none;
     if (_drawerPosition == 'left') {
       if (_scaffoldKey.currentState != null) {
         _scaffoldKey.currentState!.openDrawer();
@@ -544,14 +558,19 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   void _closeDrawer() {
+    _mapButtonFocus = MapButtonFocus.none;
     if (_drawerPosition == 'left' || _drawerPosition == 'right') {
-      Navigator.of(context).pop();
+      final scaffold = _scaffoldKey.currentState;
+      if (scaffold != null && (scaffold.isDrawerOpen || scaffold.isEndDrawerOpen)) {
+        Navigator.of(context).pop();
+      }
     } else {
       setState(() {
         _isTopDrawerOpen = false;
         _isBottomDrawerOpen = false;
       });
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
   }
 
   Widget _buildDrawerContent() {
@@ -633,8 +652,20 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
 
+  bool get _isMenuButtonVisible {
+    if (!_isMainGameStarted || !_isGameRunning) return false;
+    if (!_isKeyboardVisible && _hideMenuBtnWithControls) return false;
+    return true;
+  }
+
+  bool get _isMapButtonVisible {
+    if (!_showMapButton || !_isMainGameStarted || !_isGameRunning) return false;
+    if (!_isKeyboardVisible && _hideMapBtnWithControls) return false;
+    return true;
+  }
+
   Widget _buildMenuButton() {
-    if (!_isKeyboardVisible && _hideMenuBtnWithControls) {
+    if (!_isMenuButtonVisible) {
       return const SizedBox.shrink();
     }
 
@@ -725,6 +756,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         break;
     }
 
+    final isFocused = _mapButtonFocus == MapButtonFocus.menu;
+
     return Positioned(
       top: top,
       bottom: bottom,
@@ -733,13 +766,35 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       child: Builder(
         builder: (context) {
           return Opacity(
-            opacity: 0.6,
-            child: CircleAvatar(
-              backgroundColor: Colors.black87,
-              radius: 20,
-              child: IconButton(
-                icon: const Icon(Icons.menu, color: Colors.white, size: 20),
-                onPressed: () => _openMenu(context),
+            opacity: isFocused ? 1.0 : 0.6,
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isFocused ? Colors.amberAccent : Colors.transparent,
+                  width: 2.0,
+                ),
+                boxShadow: isFocused
+                    ? [
+                        BoxShadow(
+                          color: Colors.amberAccent.withValues(alpha: 0.6),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ]
+                    : null,
+              ),
+              child: CircleAvatar(
+                backgroundColor: isFocused ? const Color(0xFF2E2612) : Colors.black87,
+                radius: 20,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.menu,
+                    color: isFocused ? Colors.amberAccent : Colors.white,
+                    size: 20,
+                  ),
+                  onPressed: () => _openMenu(context),
+                ),
               ),
             ),
           );
@@ -749,10 +804,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildMapButton() {
-    if (!_showMapButton || !_isMainGameStarted || !_isGameRunning) {
-      return const SizedBox.shrink();
-    }
-    if (!_isKeyboardVisible && _hideMapBtnWithControls) {
+    if (!_isMapButtonVisible) {
       return const SizedBox.shrink();
     }
 
@@ -848,6 +900,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         break;
     }
 
+    final isFocused = _mapButtonFocus == MapButtonFocus.fullMap;
+
     return Positioned(
       top: top,
       bottom: bottom,
@@ -856,14 +910,36 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       child: Builder(
         builder: (context) {
           return Opacity(
-            opacity: 0.6,
-            child: CircleAvatar(
-              backgroundColor: Colors.black87,
-              radius: 20,
-              child: IconButton(
-                tooltip: '階層全体地図',
-                icon: const Icon(Icons.map, color: Colors.white, size: 20),
-                onPressed: _showFullMapDialog,
+            opacity: isFocused ? 1.0 : 0.6,
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isFocused ? Colors.amberAccent : Colors.transparent,
+                  width: 2.0,
+                ),
+                boxShadow: isFocused
+                    ? [
+                        BoxShadow(
+                          color: Colors.amberAccent.withValues(alpha: 0.6),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ]
+                    : null,
+              ),
+              child: CircleAvatar(
+                backgroundColor: isFocused ? const Color(0xFF2E2612) : Colors.black87,
+                radius: 20,
+                child: IconButton(
+                  tooltip: '階層全体地図',
+                  icon: Icon(
+                    Icons.map,
+                    color: isFocused ? Colors.amberAccent : Colors.white,
+                    size: 20,
+                  ),
+                  onPressed: _showFullMapDialog,
+                ),
               ),
             ),
           );
@@ -914,7 +990,31 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   /// ルートの Focus ウィジェットから呼び出される物理キーイベントハンドラ
   KeyEventResult _onHardwareKey(FocusNode node, KeyEvent event) {
-    final context = _currentKeyInputContext;
+    // マップ画面のフローティングボタン（メニュー／全体地図）にフォーカスがある時の事前判定
+    if (_mapButtonFocus != MapButtonFocus.none) {
+      if (event.logicalKey == LogicalKeyboardKey.escape) {
+        setState(() => _mapButtonFocus = MapButtonFocus.none);
+        return KeyEventResult.handled;
+      }
+      if (event.logicalKey == LogicalKeyboardKey.enter ||
+          event.logicalKey == LogicalKeyboardKey.numpadEnter ||
+          event.logicalKey == LogicalKeyboardKey.space) {
+        final focused = _mapButtonFocus;
+        setState(() => _mapButtonFocus = MapButtonFocus.none);
+        if (focused == MapButtonFocus.menu) {
+          _openMenu(this.context);
+        } else if (focused == MapButtonFocus.fullMap) {
+          _showFullMapDialog();
+        }
+        return KeyEventResult.handled;
+      }
+      // Tab 以外のキー（移動キーやコマンドキー等）が押された場合は、ボタンフォーカスを解除してそのまま通常処理へ流す
+      if (event.logicalKey != LogicalKeyboardKey.tab) {
+        setState(() => _mapButtonFocus = MapButtonFocus.none);
+      }
+    }
+
+    final keyInputContext = _currentKeyInputContext;
     final isShift = HardwareKeyboard.instance.isShiftPressed;
     final isCtrl = HardwareKeyboard.instance.isControlPressed;
     final isAlt = HardwareKeyboard.instance.isAltPressed;
@@ -923,7 +1023,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
     final action = HardwareKeyRouter.route(
       event: event,
-      context: context,
+      context: keyInputContext,
       numberPadMode: _numberPadMode,
       ynChoices: _ynChoices,
       ynQuestion: _ynQuestion,
@@ -935,6 +1035,41 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     );
 
     switch (action) {
+      case OpenDrawerMenu():
+        if (_isDrawerOpen) {
+          _closeDrawer();
+        } else {
+          _openMenu(this.context);
+        }
+        return KeyEventResult.handled;
+
+      case GameTab(:final forward):
+        final available = <MapButtonFocus>[
+          if (_isMenuButtonVisible) MapButtonFocus.menu,
+          if (_isMapButtonVisible) MapButtonFocus.fullMap,
+        ];
+        if (available.isEmpty) return KeyEventResult.handled;
+
+        MapButtonFocus nextFocus;
+        if (_mapButtonFocus == MapButtonFocus.none) {
+          nextFocus = forward ? available.first : available.last;
+        } else {
+          final idx = available.indexOf(_mapButtonFocus);
+          if (idx == -1) {
+            nextFocus = forward ? available.first : available.last;
+          } else if (forward) {
+            nextFocus = (idx + 1 < available.length)
+                ? available[idx + 1]
+                : MapButtonFocus.none;
+          } else {
+            nextFocus = (idx > 0)
+                ? available[idx - 1]
+                : MapButtonFocus.none;
+          }
+        }
+        setState(() => _mapButtonFocus = nextFocus);
+        return KeyEventResult.handled;
+
       case SendKey(:final code, :final label):
         if (_isGetLineVisible && code == 27) {
           _sendGetLineResult(null);
@@ -3614,63 +3749,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
     showDialog(
       context: context,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: const Color(0xFF12161D),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-          ),
-          child: Container(
-            width: double.infinity,
-            constraints: const BoxConstraints(maxWidth: 600, maxHeight: 600),
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: entries.isNotEmpty
-                      ? TopTenWidget(entries: entries, isJp: isJp)
-                      : Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.emoji_events_outlined, size: 64, color: Colors.grey),
-                              const SizedBox(height: 16),
-                              Text(
-                                isJp ? 'スコア記録がありません' : 'No score records found',
-                                style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                isJp ? 'ゲームをプレイしてハイスコアを目指しましょう！' : 'Play games to set high scores!',
-                                style: const TextStyle(color: Colors.white38, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ),
-                ),
-                const SizedBox(height: 12),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal[600],
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(isJp ? '閉じる' : 'Close', style: const TextStyle(fontWeight: FontWeight.bold)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (context) => ScoreboardDialog(entries: entries, isJp: isJp),
     );
   }
 

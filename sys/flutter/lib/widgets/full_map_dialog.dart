@@ -67,15 +67,19 @@ class _FullMapDialogContent extends StatefulWidget {
 
 class _FullMapDialogContentState extends State<_FullMapDialogContent>
     with SingleTickerProviderStateMixin {
+  final GlobalKey _viewerKey = GlobalKey();
   late final TransformationController _transformationController;
   late final AnimationController _animationController;
+  late final FocusNode _focusNode;
   Animation<Matrix4>? _animation;
   TapDownDetails? _doubleTapDetails;
+  bool _isCloseButtonFocused = false;
 
   @override
   void initState() {
     super.initState();
     _transformationController = TransformationController();
+    _focusNode = FocusNode();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
@@ -88,12 +92,18 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
 
   @override
   void dispose() {
+    _focusNode.dispose();
     _animationController.dispose();
     _transformationController.dispose();
     super.dispose();
   }
 
   void _onDoubleTap() {
+    _toggleZoom(focalPoint: _doubleTapDetails?.localPosition);
+  }
+
+  /// 画面中心または指定座標を中心に拡大（6倍）と全体表示（等倍）をアニメーショントグル
+  void _toggleZoom({Offset? focalPoint}) {
     if (_animationController.isAnimating) return;
 
     final currentMatrix = _transformationController.value;
@@ -104,11 +114,13 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
       // 拡大中の場合は初期（全体表示）にスムーズにリセット
       endMatrix = Matrix4.identity();
     } else {
-      // 全体表示中の場合はタップ位置を中心に約6倍にズームイン
+      // 全体表示中の場合は指定位置（またはビューポート中心）を中心に約6倍にズームイン
       const targetScale = 6.0;
-      final position = _doubleTapDetails?.localPosition ?? Offset.zero;
-      final x = -position.dx * (targetScale - 1);
-      final y = -position.dy * (targetScale - 1);
+      final RenderBox? box = _viewerKey.currentContext?.findRenderObject() as RenderBox?;
+      final size = box?.size ?? const Size(400, 300);
+      final center = focalPoint ?? Offset(size.width / 2, size.height / 2);
+      final x = -center.dx * (targetScale - 1);
+      final y = -center.dy * (targetScale - 1);
       endMatrix = Matrix4.identity()
         ..translateByDouble(x, y, 0.0, 1.0)
         ..scaleByDouble(targetScale, targetScale, 1.0, 1.0);
@@ -123,6 +135,160 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
     ));
 
     _animationController.forward(from: 0.0);
+  }
+
+  /// ズームを全体表示（等倍）にリセット
+  void _resetZoom() {
+    if (_animationController.isAnimating) return;
+    final currentMatrix = _transformationController.value;
+    if (currentMatrix.isIdentity()) return;
+
+    _animation = Matrix4Tween(
+      begin: currentMatrix,
+      end: Matrix4.identity(),
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutCubic,
+    ));
+    _animationController.forward(from: 0.0);
+  }
+
+  /// ビューポート中心を基準に段階的にズームイン・アウト
+  void _zoomBy(double factor) {
+    if (_animationController.isAnimating) return;
+
+    final currentMatrix = _transformationController.value;
+    final currentScale = currentMatrix.getMaxScaleOnAxis();
+    final targetScale = (currentScale * factor).clamp(0.8, 30.0);
+    if ((targetScale - currentScale).abs() < 0.001) return;
+
+    final effectiveFactor = targetScale / currentScale;
+    final RenderBox? box = _viewerKey.currentContext?.findRenderObject() as RenderBox?;
+    final size = box?.size ?? const Size(400, 300);
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+
+    final tx = currentMatrix.storage[12];
+    final ty = currentMatrix.storage[13];
+    final newTx = cx - effectiveFactor * (cx - tx);
+    final newTy = cy - effectiveFactor * (cy - ty);
+
+    final newMatrix = Matrix4.identity()
+      ..translateByDouble(newTx, newTy, 0.0, 1.0)
+      ..scaleByDouble(targetScale, targetScale, 1.0, 1.0);
+
+    _transformationController.value = newMatrix;
+  }
+
+  /// マップのパン（平行移動）
+  void _panBy(double dx, double dy) {
+    final matrix = _transformationController.value.clone();
+    matrix.translateByDouble(dx, dy, 0.0, 1.0);
+    _transformationController.value = matrix;
+  }
+
+  KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
+    final isDown = event is KeyDownEvent;
+    final isRepeat = event is KeyRepeatEvent;
+    if (!isDown && !isRepeat) return KeyEventResult.ignored;
+
+    final key = event.logicalKey;
+    final isShift = HardwareKeyboard.instance.isShiftPressed;
+    final isCtrl = HardwareKeyboard.instance.isControlPressed;
+
+    // 閉じる: Escape / q / Space
+    if (key == LogicalKeyboardKey.escape ||
+        (key == LogicalKeyboardKey.keyQ && !isCtrl) ||
+        key == LogicalKeyboardKey.space) {
+      if (isDown) Navigator.of(context).pop();
+      return KeyEventResult.handled;
+    }
+
+    // 決定: Enter / NumpadEnter
+    if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
+      if (isDown) Navigator.of(context).pop();
+      return KeyEventResult.handled;
+    }
+
+    // Tab / Shift+Tab: フォーカス循環 (none ↔ closeButton)
+    if (key == LogicalKeyboardKey.tab) {
+      if (isDown) {
+        setState(() {
+          _isCloseButtonFocused = !_isCloseButtonFocused;
+        });
+      }
+      return KeyEventResult.handled;
+    }
+
+    // ズームリセット: 0 / Home
+    if (key == LogicalKeyboardKey.digit0 ||
+        key == LogicalKeyboardKey.numpad0 ||
+        key == LogicalKeyboardKey.home) {
+      if (isDown) _resetZoom();
+      return KeyEventResult.handled;
+    }
+
+    // 拡大トグル: z
+    if (key == LogicalKeyboardKey.keyZ && !isCtrl) {
+      if (isDown) _toggleZoom();
+      return KeyEventResult.handled;
+    }
+
+    // ズームイン: + / = / NumpadAdd
+    if (event.character == '+' ||
+        key == LogicalKeyboardKey.equal ||
+        key == LogicalKeyboardKey.numpadAdd) {
+      _zoomBy(1.25);
+      return KeyEventResult.handled;
+    }
+
+    // ズームアウト: - / NumpadSubtract
+    if (event.character == '-' ||
+        key == LogicalKeyboardKey.minus ||
+        key == LogicalKeyboardKey.numpadSubtract) {
+      _zoomBy(0.8);
+      return KeyEventResult.handled;
+    }
+
+    // パン移動量 (Shiftで2倍高速)
+    final panStep = isShift ? 80.0 : 40.0;
+
+    // パン（平行移動）: 矢印キーおよび Viキー (h, j, k, l, y, u, b, n)
+    if (key == LogicalKeyboardKey.arrowLeft || (key == LogicalKeyboardKey.keyH && !isCtrl)) {
+      _panBy(panStep, 0.0);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowRight || (key == LogicalKeyboardKey.keyL && !isCtrl)) {
+      _panBy(-panStep, 0.0);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowUp || (key == LogicalKeyboardKey.keyK && !isCtrl)) {
+      _panBy(0.0, panStep);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowDown || (key == LogicalKeyboardKey.keyJ && !isCtrl)) {
+      _panBy(0.0, -panStep);
+      return KeyEventResult.handled;
+    }
+    // 斜め Vi キー
+    if (key == LogicalKeyboardKey.keyY && !isCtrl) {
+      _panBy(panStep, panStep);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.keyU && !isCtrl) {
+      _panBy(-panStep, panStep);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.keyB && !isCtrl) {
+      _panBy(panStep, -panStep);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.keyN && !isCtrl) {
+      _panBy(-panStep, -panStep);
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
   }
 
   @override
@@ -146,6 +312,7 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
         onDoubleTapDown: (details) => _doubleTapDetails = details,
         onDoubleTap: _onDoubleTap,
         child: InteractiveViewer(
+          key: _viewerKey,
           transformationController: _transformationController,
           minScale: 0.8,
           maxScale: 30.0,
@@ -188,11 +355,27 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
                 style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 20),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                onPressed: () => Navigator.of(context).pop(),
+              Container(
+                decoration: BoxDecoration(
+                  color: _isCloseButtonFocused
+                      ? Colors.amberAccent.withValues(alpha: 0.25)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: _isCloseButtonFocused ? Colors.amberAccent : Colors.transparent,
+                    width: 1.5,
+                  ),
+                ),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    color: _isCloseButtonFocused ? Colors.amberAccent : Colors.white,
+                    size: 20,
+                  ),
+                  padding: const EdgeInsets.all(4),
+                  constraints: const BoxConstraints(),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
               ),
             ],
           ),
@@ -226,20 +409,9 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
     }
 
     return Focus(
+      focusNode: _focusNode,
       autofocus: true,
-      onKeyEvent: (node, event) {
-        if (event is KeyDownEvent) {
-          final key = event.logicalKey;
-          if (key == LogicalKeyboardKey.escape ||
-              key == LogicalKeyboardKey.space ||
-              key == LogicalKeyboardKey.enter ||
-              key == LogicalKeyboardKey.numpadEnter) {
-            Navigator.of(context).pop();
-            return KeyEventResult.handled;
-          }
-        }
-        return KeyEventResult.ignored;
-      },
+      onKeyEvent: _onKeyEvent,
       child: dialogContent,
     );
   }

@@ -564,6 +564,40 @@ class MenuTab extends KeyAction {
   int get hashCode => forward.hashCode;
 }
 
+/// ゲームマップ画面のフローティングボタン（メニュー、全体地図等）のフォーカス循環（forward: true=次, false=前）
+class GameTab extends KeyAction {
+  final bool forward;
+  const GameTab({this.forward = true});
+
+  @override
+  String toString() => 'GameTab(forward: $forward)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GameTab &&
+          runtimeType == other.runtimeType &&
+          forward == other.forward;
+
+  @override
+  int get hashCode => forward.hashCode;
+}
+
+/// ドロワーメニューを開閉するアクション（F10, ContextMenu, Ctrl+M）
+class OpenDrawerMenu extends KeyAction {
+  const OpenDrawerMenu();
+
+  @override
+  String toString() => 'OpenDrawerMenu()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is OpenDrawerMenu;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
 /// テキスト入力オーバーレイ・拡張コマンドメニューの候補補完アクション (Tab)
 class TextOverlayAutocomplete extends KeyAction {
   const TextOverlayAutocomplete();
@@ -1082,6 +1116,15 @@ class HardwareKeyRouter {
     required bool isControlPressed,
     required bool isAltPressed,
   }) {
+    // 0. ドロワーメニュー起動キー（F10, ContextMenu, Ctrl+M）
+    if (event.logicalKey == LogicalKeyboardKey.f10 ||
+        event.logicalKey == LogicalKeyboardKey.contextMenu ||
+        (isControlPressed && event.logicalKey == LogicalKeyboardKey.keyM)) {
+      return (event is KeyDownEvent)
+          ? const OpenDrawerMenu()
+          : const SwallowKey();
+    }
+
     // A. Alt (Meta) キーとの組み合わせ (M-a〜M-z, M-A〜M-Z, M-2, M-?)
     if (isAltPressed) {
       final metaAction = _getMetaAction(
@@ -1108,7 +1151,7 @@ class HardwareKeyRouter {
       }
     }
 
-    // B. テンキー移動判定（character 判定より優先して評価）
+    // C. テンキー移動判定（character 判定より優先して評価）
     final numpadAction = _getNumpadAction(
       event.logicalKey,
       numberPadMode: numberPadMode,
@@ -1118,7 +1161,7 @@ class HardwareKeyRouter {
       return numpadAction;
     }
 
-    // C. 矢印キー移動判定
+    // D. 矢印キー移動判定
     final arrowAction = _getArrowAction(
       event.logicalKey,
       numberPadMode: numberPadMode,
@@ -1128,7 +1171,7 @@ class HardwareKeyRouter {
       return arrowAction;
     }
 
-    // D. 特殊固定キー
+    // E. 特殊固定キー
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter) {
       return const SendKey(10, 'Enter');
@@ -1140,7 +1183,9 @@ class HardwareKeyRouter {
       return const SendKey(32, 'Space');
     }
     if (event.logicalKey == LogicalKeyboardKey.tab) {
-      return const SendKey(9, 'Tab');
+      return (event is KeyDownEvent)
+          ? GameTab(forward: !isShiftPressed)
+          : const SwallowKey();
     }
 
     // E. 通常文字入力

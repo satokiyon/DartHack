@@ -56,6 +56,12 @@ enum _BlockKind {
   divider,
 }
 
+enum _GuidebookButtonFocus {
+  none,
+  toc,
+  close,
+}
+
 class _GuidebookSection {
   final int blockIndex;
   final String title;
@@ -116,6 +122,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
   // 一時透過（覗き見）制御用状態
   bool _isHoldPeeking = false;
   bool _isTapPeeking = false;
+  _GuidebookButtonFocus _buttonFocus = _GuidebookButtonFocus.none;
 
   bool get _isPeeking => _isHoldPeeking || _isTapPeeking;
 
@@ -634,9 +641,13 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
       return KeyEventResult.ignored;
     }
+    final isDown = event is KeyDownEvent;
     final key = event.logicalKey;
+    final isShift = HardwareKeyboard.instance.isShiftPressed;
+    final isCtrl = HardwareKeyboard.instance.isControlPressed;
+
     if (key == LogicalKeyboardKey.escape) {
-      Navigator.pop(context);
+      if (isDown) Navigator.pop(context);
       return KeyEventResult.handled;
     }
 
@@ -644,36 +655,124 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
         FocusManager.instance.primaryFocus?.context?.widget is EditableText;
     if (isTextFieldFocused) {
       if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
-        _searchNext();
+        if (isDown) _searchNext();
         return KeyEventResult.handled;
       }
       return KeyEventResult.ignored;
     }
 
-    if (key == LogicalKeyboardKey.arrowDown) {
+    // Tab / Shift+Tab によるボタンフォーカス循環 (none ↔ toc ↔ close)
+    if (key == LogicalKeyboardKey.tab) {
+      if (isDown) {
+        setState(() {
+          if (isShift) {
+            switch (_buttonFocus) {
+              case _GuidebookButtonFocus.none:
+                _buttonFocus = _GuidebookButtonFocus.close;
+                break;
+              case _GuidebookButtonFocus.close:
+                _buttonFocus = _sections.isNotEmpty
+                    ? _GuidebookButtonFocus.toc
+                    : _GuidebookButtonFocus.none;
+                break;
+              case _GuidebookButtonFocus.toc:
+                _buttonFocus = _GuidebookButtonFocus.none;
+                break;
+            }
+          } else {
+            switch (_buttonFocus) {
+              case _GuidebookButtonFocus.none:
+                _buttonFocus = _sections.isNotEmpty
+                    ? _GuidebookButtonFocus.toc
+                    : _GuidebookButtonFocus.close;
+                break;
+              case _GuidebookButtonFocus.toc:
+                _buttonFocus = _GuidebookButtonFocus.close;
+                break;
+              case _GuidebookButtonFocus.close:
+                _buttonFocus = _GuidebookButtonFocus.none;
+                break;
+            }
+          }
+        });
+      }
+      return KeyEventResult.handled;
+    }
+
+    // Enter / NumpadEnter: ボタンフォーカス中の決定
+    if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
+      if (isDown) {
+        if (_buttonFocus == _GuidebookButtonFocus.toc) {
+          _showTOCModal();
+          return KeyEventResult.handled;
+        } else if (_buttonFocus == _GuidebookButtonFocus.close) {
+          Navigator.pop(context);
+          return KeyEventResult.handled;
+        }
+      }
+      return KeyEventResult.ignored;
+    }
+
+    // q: 閉じる
+    if (key == LogicalKeyboardKey.keyQ && !isCtrl) {
+      if (isDown) Navigator.pop(context);
+      return KeyEventResult.handled;
+    }
+
+    // t: 目次を開く
+    if (key == LogicalKeyboardKey.keyT && !isCtrl) {
+      if (isDown && _sections.isNotEmpty) {
+        _showTOCModal();
+      }
+      return KeyEventResult.handled;
+    }
+
+    // スクロール操作: ↓ / j (行下スクロール)
+    if (key == LogicalKeyboardKey.arrowDown || (key == LogicalKeyboardKey.keyJ && !isCtrl)) {
       _scrollByBlocks(1);
       return KeyEventResult.handled;
     }
-    if (key == LogicalKeyboardKey.arrowUp) {
+
+    // スクロール操作: ↑ / k (行上スクロール)
+    if (key == LogicalKeyboardKey.arrowUp || (key == LogicalKeyboardKey.keyK && !isCtrl)) {
       _scrollByBlocks(-1);
       return KeyEventResult.handled;
     }
-    if (key == LogicalKeyboardKey.pageDown) {
+
+    // ページ下スクロール: PageDown / >
+    if (key == LogicalKeyboardKey.pageDown || event.character == '>' || (!isShift && key == LogicalKeyboardKey.period)) {
       _scrollByBlocks(6);
       return KeyEventResult.handled;
     }
-    if (key == LogicalKeyboardKey.pageUp) {
+
+    // ページ上スクロール: PageUp / <
+    if (key == LogicalKeyboardKey.pageUp || event.character == '<' || (!isShift && key == LogicalKeyboardKey.comma)) {
       _scrollByBlocks(-6);
       return KeyEventResult.handled;
     }
+
+    // Home / ^: ドキュメント最先頭へ
+    if (key == LogicalKeyboardKey.home || event.character == '^' || key == LogicalKeyboardKey.caret) {
+      if (isDown) _scrollToBlock(0);
+      return KeyEventResult.handled;
+    }
+
+    // End / |: ドキュメント最末尾へ
+    if (key == LogicalKeyboardKey.end || event.character == '|') {
+      if (isDown && _blocks.isNotEmpty) _scrollToBlock(_blocks.length - 1);
+      return KeyEventResult.handled;
+    }
+
+    // Space / Shift+Space: ページスクロール
     if (key == LogicalKeyboardKey.space) {
-      if (HardwareKeyboard.instance.isShiftPressed) {
+      if (isShift) {
         _scrollByBlocks(-6);
       } else {
         _scrollByBlocks(6);
       }
       return KeyEventResult.handled;
     }
+
     return KeyEventResult.ignored;
   }
 
@@ -887,6 +986,10 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     final activeIndex = _getCurrentSectionIndex();
     final l10n = AppLocalizations.of(context);
     final tocScrollController = ScrollController();
+    final filterTextController = TextEditingController();
+    final filterFocusNode = FocusNode();
+    final modalFocusNode = FocusNode();
+    int? focusedTocIndex;
     String filterText = '';
     bool chaptersOnly = false;
 
@@ -911,217 +1014,344 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
               return true;
             }).toList();
 
-            return Container(
-              constraints: BoxConstraints(maxHeight: screenHeight * 0.82),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // ヘッダー部
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.menu_book,
-                                color: Colors.amberAccent, size: 22),
-                            const SizedBox(width: 8),
-                            Text(
-                              l10n?.tocTitle(_sections.length) ??
-                                  '目次 (${_sections.length}件)',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white70),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ],
-                    ),
-                  ),
+            KeyEventResult onModalKeyEvent(FocusNode node, KeyEvent event) {
+              if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+                return KeyEventResult.ignored;
+              }
+              final isDown = event is KeyDownEvent;
+              final key = event.logicalKey;
+              final isCtrl = HardwareKeyboard.instance.isControlPressed;
 
-                  // フィルターバー
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: 38,
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF12161F),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.white24),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.filter_list,
-                                    size: 18, color: Colors.white54),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: TextField(
-                                    style: const TextStyle(
-                                        color: Colors.white, fontSize: 13),
-                                    decoration: InputDecoration(
-                                      hintText: l10n?.tocFilterHint ??
-                                          '目次を絞り込み...',
-                                      hintStyle: const TextStyle(
-                                          color: Colors.white38, fontSize: 13),
-                                      border: InputBorder.none,
-                                      isDense: true,
-                                      contentPadding: EdgeInsets.zero,
-                                    ),
-                                    onChanged: (val) {
-                                      setModalState(() {
-                                        filterText = val;
-                                      });
-                                    },
-                                  ),
+              // Escape: 目次を閉じる
+              if (key == LogicalKeyboardKey.escape) {
+                if (isDown) Navigator.pop(context);
+                return KeyEventResult.handled;
+              }
+
+              // 検索フィールドがフォーカス中の場合
+              if (filterFocusNode.hasFocus) {
+                if (key == LogicalKeyboardKey.arrowDown) {
+                  if (isDown && filteredSections.isNotEmpty) {
+                    filterFocusNode.unfocus();
+                    modalFocusNode.requestFocus();
+                    setModalState(() {
+                      focusedTocIndex = 0;
+                    });
+                  }
+                  return KeyEventResult.handled;
+                }
+                if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
+                  if (isDown && filteredSections.isNotEmpty) {
+                    Navigator.pop(context);
+                    _jumpToBlock(filteredSections[focusedTocIndex ?? 0].blockIndex);
+                  }
+                  return KeyEventResult.handled;
+                }
+                return KeyEventResult.ignored;
+              }
+
+              // ↓ / j: 次の項目へ
+              if (key == LogicalKeyboardKey.arrowDown || (key == LogicalKeyboardKey.keyJ && !isCtrl)) {
+                if (filteredSections.isEmpty) return KeyEventResult.ignored;
+                setModalState(() {
+                  if (focusedTocIndex == null) {
+                    focusedTocIndex = 0;
+                  } else if (focusedTocIndex! < filteredSections.length - 1) {
+                    focusedTocIndex = focusedTocIndex! + 1;
+                  } else {
+                    focusedTocIndex = null;
+                  }
+                });
+                if (focusedTocIndex != null && tocScrollController.hasClients) {
+                  const itemHeight = 44.0;
+                  final targetOffset = (focusedTocIndex! * itemHeight)
+                      .clamp(0.0, tocScrollController.position.maxScrollExtent);
+                  tocScrollController.animateTo(targetOffset,
+                      duration: const Duration(milliseconds: 100), curve: Curves.easeOut);
+                }
+                return KeyEventResult.handled;
+              }
+
+              // ↑ / k: 前の項目へ
+              if (key == LogicalKeyboardKey.arrowUp || (key == LogicalKeyboardKey.keyK && !isCtrl)) {
+                if (filteredSections.isEmpty) return KeyEventResult.ignored;
+                setModalState(() {
+                  if (focusedTocIndex == null) {
+                    focusedTocIndex = filteredSections.length - 1;
+                  } else if (focusedTocIndex! > 0) {
+                    focusedTocIndex = focusedTocIndex! - 1;
+                  } else {
+                    focusedTocIndex = null;
+                  }
+                });
+                if (focusedTocIndex != null && tocScrollController.hasClients) {
+                  const itemHeight = 44.0;
+                  final targetOffset = (focusedTocIndex! * itemHeight)
+                      .clamp(0.0, tocScrollController.position.maxScrollExtent);
+                  tocScrollController.animateTo(targetOffset,
+                      duration: const Duration(milliseconds: 100), curve: Curves.easeOut);
+                }
+                return KeyEventResult.handled;
+              }
+
+              // Enter / NumpadEnter: 選択項目の決定
+              if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
+                if (isDown) {
+                  final idx = focusedTocIndex ?? (filteredSections.isNotEmpty ? 0 : null);
+                  if (idx != null && idx < filteredSections.length) {
+                    Navigator.pop(context);
+                    _jumpToBlock(filteredSections[idx].blockIndex);
+                  }
+                }
+                return KeyEventResult.handled;
+              }
+
+              // 文字キーが押されたら検索フィールドへ自動フォーカス
+              if (event.character != null &&
+                  event.character!.isNotEmpty &&
+                  !isCtrl &&
+                  event.character!.codeUnitAt(0) >= 32) {
+                filterFocusNode.requestFocus();
+                return KeyEventResult.ignored;
+              }
+
+              return KeyEventResult.ignored;
+            }
+
+            return Focus(
+              focusNode: modalFocusNode,
+              autofocus: true,
+              onKeyEvent: onModalKeyEvent,
+              child: Container(
+                constraints: BoxConstraints(maxHeight: screenHeight * 0.82),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // ヘッダー部
+                    Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.menu_book,
+                                  color: Colors.amberAccent, size: 22),
+                              const SizedBox(width: 8),
+                              Text(
+                                l10n?.tocTitle(_sections.length) ??
+                                    '目次 (${_sections.length}件)',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        ChoiceChip(
-                          label: Text(
-                            chaptersOnly
-                                ? (l10n?.tocFilterChaptersOnly ?? '章のみ')
-                                : (l10n?.tocFilterAll ?? 'すべて'),
-                            style: TextStyle(
-                              color: chaptersOnly
-                                  ? Colors.black
-                                  : Colors.white70,
-                              fontSize: 12,
-                              fontWeight: chaptersOnly
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            ),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.white70),
+                            onPressed: () => Navigator.pop(context),
                           ),
-                          selected: chaptersOnly,
-                          selectedColor: Colors.amberAccent,
-                          backgroundColor: const Color(0xFF12161F),
-                          onSelected: (val) {
-                            setModalState(() {
-                              chaptersOnly = val;
-                            });
-                          },
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
 
-                  const Divider(color: Colors.white24, height: 1),
-
-                  // セクション一覧リスト
-                  Expanded(
-                    child: ListView.builder(
-                      controller: tocScrollController,
-                      itemCount: filteredSections.length,
-                      itemBuilder: (context, index) {
-                        final sec = filteredSections[index];
-                        final isActive = _sections.isNotEmpty &&
-                            activeIndex >= 0 &&
-                            activeIndex < _sections.length &&
-                            _sections[activeIndex].blockIndex == sec.blockIndex;
-                        final level = sec.level;
-
-                        double paddingLeft = 16.0;
-                        double fontSize = 14.0;
-                        FontWeight fontWeight = FontWeight.normal;
-                        IconData iconData = Icons.short_text;
-
-                        if (level == 1) {
-                          paddingLeft = 16.0;
-                          fontSize = 15.0;
-                          fontWeight = FontWeight.bold;
-                          iconData = Icons.menu_book;
-                        } else if (level == 2) {
-                          paddingLeft = 16.0;
-                          fontSize = 14.5;
-                          fontWeight = FontWeight.bold;
-                          iconData = Icons.article;
-                        } else if (level == 3) {
-                          paddingLeft = 28.0;
-                          fontSize = 13.5;
-                          fontWeight = FontWeight.w600;
-                          iconData = Icons.subdirectory_arrow_right;
-                        } else {
-                          paddingLeft = 42.0;
-                          fontSize = 12.5;
-                          fontWeight = FontWeight.normal;
-                          iconData = Icons.circle;
-                        }
-
-                        return Material(
-                          color: isActive
-                              ? Colors.amberAccent.withValues(alpha: 0.18)
-                              : Colors.transparent,
-                          child: ListTile(
-                            dense: true,
-                            contentPadding: EdgeInsets.only(
-                                left: paddingLeft, right: 16.0),
-                            leading: Icon(
-                              iconData,
-                              size: level >= 4 ? 8 : 16,
-                              color: isActive
-                                  ? Colors.amberAccent
-                                  : (level <= 2
-                                      ? Colors.white70
-                                      : Colors.white38),
-                            ),
-                            title: Text(
-                              sec.title,
-                              style: TextStyle(
-                                color: isActive
-                                    ? Colors.amberAccent
-                                    : (level <= 2
-                                        ? Colors.white
-                                        : Colors.white70),
-                                fontSize: fontSize,
-                                fontWeight:
-                                    isActive ? FontWeight.bold : fontWeight,
+                    // フィルターバー
+                    Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 38,
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF12161F),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.white24),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.filter_list,
+                                      size: 18, color: Colors.white54),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: TextField(
+                                      controller: filterTextController,
+                                      focusNode: filterFocusNode,
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 13),
+                                      decoration: InputDecoration(
+                                        hintText: l10n?.tocFilterHint ??
+                                            '目次を絞り込み...',
+                                        hintStyle: const TextStyle(
+                                            color: Colors.white38, fontSize: 13),
+                                        border: InputBorder.none,
+                                        isDense: true,
+                                        contentPadding: EdgeInsets.zero,
+                                      ),
+                                      onChanged: (val) {
+                                        setModalState(() {
+                                          filterText = val;
+                                          focusedTocIndex = null;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            trailing: isActive
-                                ? Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.amberAccent
-                                          .withValues(alpha: 0.3),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      l10n?.tocCurrentLocation ?? '現在地',
-                                      style: const TextStyle(
-                                        color: Colors.amberAccent,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  )
-                                : null,
-                            onTap: () {
-                              Navigator.pop(context);
-                              _jumpToBlock(sec.blockIndex);
+                          ),
+                          const SizedBox(width: 8),
+                          ChoiceChip(
+                            label: Text(
+                              chaptersOnly
+                                  ? (l10n?.tocFilterChaptersOnly ?? '章のみ')
+                                  : (l10n?.tocFilterAll ?? 'すべて'),
+                              style: TextStyle(
+                                color: chaptersOnly
+                                    ? Colors.black
+                                    : Colors.white70,
+                                fontSize: 12,
+                                fontWeight: chaptersOnly
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                            selected: chaptersOnly,
+                            selectedColor: Colors.amberAccent,
+                            backgroundColor: const Color(0xFF12161F),
+                            onSelected: (val) {
+                              setModalState(() {
+                                chaptersOnly = val;
+                                focusedTocIndex = null;
+                              });
                             },
                           ),
-                        );
-                      },
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+
+                    const Divider(color: Colors.white24, height: 1),
+
+                    // セクション一覧リスト
+                    Expanded(
+                      child: ListView.builder(
+                        controller: tocScrollController,
+                        itemCount: filteredSections.length,
+                        itemBuilder: (context, index) {
+                          final sec = filteredSections[index];
+                          final isActive = _sections.isNotEmpty &&
+                              activeIndex >= 0 &&
+                              activeIndex < _sections.length &&
+                              _sections[activeIndex].blockIndex == sec.blockIndex;
+                          final isFocused = focusedTocIndex == index;
+                          final level = sec.level;
+
+                          double paddingLeft = 16.0;
+                          double fontSize = 14.0;
+                          FontWeight fontWeight = FontWeight.normal;
+                          IconData iconData = Icons.short_text;
+
+                          if (level == 1) {
+                            paddingLeft = 16.0;
+                            fontSize = 15.0;
+                            fontWeight = FontWeight.bold;
+                            iconData = Icons.menu_book;
+                          } else if (level == 2) {
+                            paddingLeft = 16.0;
+                            fontSize = 14.5;
+                            fontWeight = FontWeight.bold;
+                            iconData = Icons.article;
+                          } else if (level == 3) {
+                            paddingLeft = 28.0;
+                            fontSize = 13.5;
+                            fontWeight = FontWeight.w600;
+                            iconData = Icons.subdirectory_arrow_right;
+                          } else {
+                            paddingLeft = 42.0;
+                            fontSize = 12.5;
+                            fontWeight = FontWeight.normal;
+                            iconData = Icons.circle;
+                          }
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                            child: Material(
+                              color: isFocused
+                                  ? Colors.amberAccent.withValues(alpha: 0.22)
+                                  : (isActive
+                                      ? Colors.amberAccent.withValues(alpha: 0.12)
+                                      : Colors.transparent),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
+                                side: BorderSide(
+                                  color: isFocused ? Colors.amberAccent : Colors.transparent,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: ListTile(
+                                dense: true,
+                                contentPadding: EdgeInsets.only(
+                                    left: paddingLeft, right: 16.0),
+                                leading: Icon(
+                                  iconData,
+                                  size: level >= 4 ? 8 : 16,
+                                  color: (isActive || isFocused)
+                                      ? Colors.amberAccent
+                                      : (level <= 2
+                                          ? Colors.white70
+                                          : Colors.white38),
+                                ),
+                                title: Text(
+                                  sec.title,
+                                  style: TextStyle(
+                                    color: (isActive || isFocused)
+                                        ? Colors.amberAccent
+                                        : (level <= 2
+                                            ? Colors.white
+                                            : Colors.white70),
+                                    fontSize: fontSize,
+                                    fontWeight: (isActive || isFocused)
+                                        ? FontWeight.bold
+                                        : fontWeight,
+                                  ),
+                                ),
+                                trailing: isActive
+                                    ? Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.amberAccent
+                                              .withValues(alpha: 0.3),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          l10n?.tocCurrentLocation ?? '現在地',
+                                          style: const TextStyle(
+                                            color: Colors.amberAccent,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      )
+                                    : null,
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  _jumpToBlock(sec.blockIndex);
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -1693,20 +1923,48 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                           ),
                           // 目次ボタン
                           if (_sections.isNotEmpty) ...[
-                            IconButton(
-                              icon: const Icon(Icons.toc,
-                                  color: Colors.amberAccent, size: 24),
-                              onPressed: _showTOCModal,
-                              tooltip: _isJp
-                                  ? '目次を開く'
-                                  : 'Open Table of Contents',
+                            Container(
+                              decoration: BoxDecoration(
+                                color: _buttonFocus == _GuidebookButtonFocus.toc
+                                    ? Colors.amberAccent.withValues(alpha: 0.25)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: _buttonFocus == _GuidebookButtonFocus.toc
+                                      ? Colors.amberAccent
+                                      : Colors.transparent,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.toc,
+                                    color: Colors.amberAccent, size: 24),
+                                onPressed: _showTOCModal,
+                                tooltip: _isJp
+                                    ? '目次を開く'
+                                    : 'Open Table of Contents',
+                              ),
                             ),
                           ],
-                          IconButton(
-                            icon: const Icon(Icons.close,
-                                color: Colors.white70, size: 22),
-                            onPressed: () => Navigator.pop(context),
-                            tooltip: l10n?.close ?? 'Close',
+                          Container(
+                            decoration: BoxDecoration(
+                              color: _buttonFocus == _GuidebookButtonFocus.close
+                                  ? Colors.amberAccent.withValues(alpha: 0.25)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: _buttonFocus == _GuidebookButtonFocus.close
+                                    ? Colors.amberAccent
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.close,
+                                  color: Colors.white70, size: 22),
+                              onPressed: () => Navigator.pop(context),
+                              tooltip: l10n?.close ?? 'Close',
+                            ),
                           ),
                         ],
                       ),

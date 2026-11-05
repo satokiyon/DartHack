@@ -196,7 +196,7 @@ class TextOverlayState extends State<TextOverlay> {
                     if (isTopTen) {
                       final isJp = Localizations.localeOf(context).languageCode == 'ja';
                       final data = TopTenEntry.parse(widget.textLines, widget.textAttrs, isJp: isJp);
-                      return TopTenWidget(entries: data, isJp: isJp);
+                      return TopTenWidget(entries: data, isJp: isJp, scrollController: _scrollController);
                     }
 
                     final hasAnyTile = widget.useTiles && widget.tileImage != null && widget.textTiles.any((t) => t >= 0);

@@ -38,6 +38,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  final ScrollController _scrollController = ScrollController();
   String _appVersion = '';
   bool _useTiles = true;
   String _selectedLanguage = 'ja';
@@ -254,6 +255,12 @@ class _SettingsPageState extends State<SettingsPage> {
     _loadAllSettings();
     _loadExtCmds();
     _loadAppVersion();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadAllSettings() async {
@@ -3425,39 +3432,114 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  KeyEventResult _onSettingsKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+    final isDown = event is KeyDownEvent;
+    final key = event.logicalKey;
+
+    // Escape: 前の画面へ戻る
+    if (key == LogicalKeyboardKey.escape) {
+      if (isDown) Navigator.maybePop(context);
+      return KeyEventResult.handled;
+    }
+
+    // PageDown
+    if (key == LogicalKeyboardKey.pageDown) {
+      if (_scrollController.hasClients) {
+        final viewport = _scrollController.position.viewportDimension;
+        final step = viewport > 0 ? viewport * 0.85 : 400.0;
+        final next = (_scrollController.offset + step)
+            .clamp(0.0, _scrollController.position.maxScrollExtent);
+        _scrollController.animateTo(next,
+            duration: const Duration(milliseconds: 150), curve: Curves.easeOut);
+      }
+      return KeyEventResult.handled;
+    }
+
+    // PageUp
+    if (key == LogicalKeyboardKey.pageUp) {
+      if (_scrollController.hasClients) {
+        final viewport = _scrollController.position.viewportDimension;
+        final step = viewport > 0 ? viewport * 0.85 : 400.0;
+        final next = (_scrollController.offset - step)
+            .clamp(0.0, _scrollController.position.maxScrollExtent);
+        _scrollController.animateTo(next,
+            duration: const Duration(milliseconds: 150), curve: Curves.easeOut);
+      }
+      return KeyEventResult.handled;
+    }
+
+    // Home: 先頭へ
+    if (key == LogicalKeyboardKey.home) {
+      if (isDown && _scrollController.hasClients) {
+        _scrollController.animateTo(0.0,
+            duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+      }
+      return KeyEventResult.handled;
+    }
+
+    // End: 末尾へ
+    if (key == LogicalKeyboardKey.end) {
+      if (isDown && _scrollController.hasClients) {
+        _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+      }
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      backgroundColor: const Color(0xFF121214),
-      appBar: AppBar(
-        title: Text(l10n.detailedSettings),
-        backgroundColor: const Color(0xFF1A1A1E),
+    final theme = Theme.of(context);
+
+    return Theme(
+      data: theme.copyWith(
+        focusColor: Colors.amberAccent.withValues(alpha: 0.25),
       ),
-      body: ListView(
-        children: [
-          _buildTilesetSection(), //タイル／シンボル設定
-          _buildFontSection(), //フォント設定
-          _buildScreenDisplaySection(), // 画面表示設定（画面モード・カメラ追従）
-          _buildStatusSection(), // ステータス領域設定
-          _buildMessageSection(),  // メッセージ領域設定
-          _buildSoundSection(),    // サウンド設定
-          const Divider(height: 1),   //区切り線
-          _buildUILayoutSection(), // UI配置カスタマイズ
-          _buildControllerSection(), //コントローラー設定
-          _buildShortcutSection(), // ショートカットカスタマイズ
-          _buildCmdPanelSection(), //コマンドパネル編集
-          _buildKeyActionSection(), // 物理キーカスタムアクション
-          const Divider(height: 1),   //区切り線
-          _buildAutosaveSection(), // 自動セーブ設定
-          _buildGameRulesSection(), //ゲームルール・プレイ設定
-          _buildHardModeSection(), // ハードモード・縛りプレイ設定
-          _buildAdvancedSection(), // 高度な設定
-          _buildOtherSection(), // その他の設定
-          const Divider(height: 1),   //区切り線
-          _buildCreditsSection(),  // クレジット
-          const SizedBox(height: 40),
-        ],
+      child: Focus(
+        autofocus: true,
+        onKeyEvent: _onSettingsKeyEvent,
+        child: FocusTraversalGroup(
+          policy: ReadingOrderTraversalPolicy(),
+          child: Scaffold(
+            backgroundColor: const Color(0xFF121214),
+            appBar: AppBar(
+              title: Text(l10n.detailedSettings),
+              backgroundColor: const Color(0xFF1A1A1E),
+            ),
+            body: ListView(
+              controller: _scrollController,
+              children: [
+                _buildTilesetSection(), //タイル／シンボル設定
+                _buildFontSection(), //フォント設定
+                _buildScreenDisplaySection(), // 画面表示設定（画面モード・カメラ追従）
+                _buildStatusSection(), // ステータス領域設定
+                _buildMessageSection(),  // メッセージ領域設定
+                _buildSoundSection(),    // サウンド設定
+                const Divider(height: 1),   //区切り線
+                _buildUILayoutSection(), // UI配置カスタマイズ
+                _buildControllerSection(), //コントローラー設定
+                _buildShortcutSection(), // ショートカットカスタマイズ
+                _buildCmdPanelSection(), //コマンドパネル編集
+                _buildKeyActionSection(), // 物理キーカスタムアクション
+                const Divider(height: 1),   //区切り線
+                _buildAutosaveSection(), // 自動セーブ設定
+                _buildGameRulesSection(), //ゲームルール・プレイ設定
+                _buildHardModeSection(), // ハードモード・縛りプレイ設定
+                _buildAdvancedSection(), // 高度な設定
+                _buildOtherSection(), // その他の設定
+                const Divider(height: 1),   //区切り線
+                _buildCreditsSection(),  // クレジット
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

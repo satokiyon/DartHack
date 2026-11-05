@@ -107,6 +107,53 @@ void main() {
         HardwareKeyRouter.route(event: keyD, context: KeyInputContext.game, isControlPressed: true),
         equals(const SendKey(4, 'Ctrl+D')),
       );
+
+      // Ctrl+M (ドロワー起動)
+      final keyM = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.keyM,
+        logicalKey: LogicalKeyboardKey.keyM,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: keyM, context: KeyInputContext.game, isControlPressed: true),
+        equals(const OpenDrawerMenu()),
+      );
+    });
+
+    test('Game mode Tab and Drawer menu triggers', () {
+      final tabEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.tab,
+        logicalKey: LogicalKeyboardKey.tab,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: tabEvent, context: KeyInputContext.game),
+        equals(const GameTab(forward: true)),
+      );
+      expect(
+        HardwareKeyRouter.route(event: tabEvent, context: KeyInputContext.game, isShiftPressed: true),
+        equals(const GameTab(forward: false)),
+      );
+
+      final f10Event = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.f10,
+        logicalKey: LogicalKeyboardKey.f10,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: f10Event, context: KeyInputContext.game),
+        equals(const OpenDrawerMenu()),
+      );
+
+      final contextMenuEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.contextMenu,
+        logicalKey: LogicalKeyboardKey.contextMenu,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: contextMenuEvent, context: KeyInputContext.game),
+        equals(const OpenDrawerMenu()),
+      );
     });
 
     test('YN Prompt handling', () {

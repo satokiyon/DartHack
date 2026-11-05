@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:darthack/l10n/app_localizations.dart';
 import 'package:darthack/nethack_screen.dart';
@@ -180,5 +181,199 @@ void main() {
 
     // スケールが初期状態（1.0）にリセットされたことを確認
     expect(controller.value.getMaxScaleOnAxis(), closeTo(1.0, 0.01));
+  });
+
+  group('FullMapDialog Keyboard Navigation Tests', () {
+    testWidgets('Tab cycles close button focus, Escape / Space / q / Enter close dialog', (tester) async {
+      final screen = NetHackScreen();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    showFullMapDialog(
+                      context: context,
+                      screen: screen,
+                      useTiles: false,
+                      tileImage: null,
+                      tileWidth: 16,
+                      tileHeight: 16,
+                    );
+                  },
+                  child: const Text('Open'),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      // ダイアログを開く
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsOneWidget);
+
+      // Tabキーを押下 -> 閉じるボタンがハイライト状態になる
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+
+      // もう一度Tabキーを押下 -> noneに戻る
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+
+      // qキーで閉じる
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyQ);
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsNothing);
+
+      // 再度開く
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsOneWidget);
+
+      // Escapeキーで閉じる
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsNothing);
+
+      // 再度開く
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsOneWidget);
+
+      // Spaceキーで閉じる
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsNothing);
+    });
+
+    testWidgets('+ / - zoom in / out, 0 / Home resets zoom, and z toggles zoom', (tester) async {
+      final screen = NetHackScreen();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    showFullMapDialog(
+                      context: context,
+                      screen: screen,
+                      useTiles: false,
+                      tileImage: null,
+                      tileWidth: 16,
+                      tileHeight: 16,
+                    );
+                  },
+                  child: const Text('Open'),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      final viewer = tester.widget<InteractiveViewer>(find.byType(InteractiveViewer));
+      final controller = viewer.transformationController!;
+      expect(controller.value.getMaxScaleOnAxis(), closeTo(1.0, 0.01));
+
+      // + キーでズームイン
+      await tester.sendKeyEvent(LogicalKeyboardKey.equal); // = / +
+      await tester.pumpAndSettle();
+      expect(controller.value.getMaxScaleOnAxis(), greaterThan(1.1));
+
+      // - キーでズームアウト
+      await tester.sendKeyEvent(LogicalKeyboardKey.minus);
+      await tester.pumpAndSettle();
+      expect(controller.value.getMaxScaleOnAxis(), closeTo(1.0, 0.05));
+
+      // 0 キーでリセット
+      await tester.sendKeyEvent(LogicalKeyboardKey.digit0);
+      await tester.pumpAndSettle();
+      expect(controller.value.getMaxScaleOnAxis(), closeTo(1.0, 0.01));
+
+      // z キーでズームイン（約6倍）
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyZ);
+      await tester.pumpAndSettle();
+      expect(controller.value.getMaxScaleOnAxis(), closeTo(6.0, 0.5));
+
+      // z キーでズームリセット（等倍）
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyZ);
+      await tester.pumpAndSettle();
+      expect(controller.value.getMaxScaleOnAxis(), closeTo(1.0, 0.01));
+    });
+
+    testWidgets('Arrow keys and Vi keys pan the map', (tester) async {
+      final screen = NetHackScreen();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    showFullMapDialog(
+                      context: context,
+                      screen: screen,
+                      useTiles: false,
+                      tileImage: null,
+                      tileWidth: 16,
+                      tileHeight: 16,
+                    );
+                  },
+                  child: const Text('Open'),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      final viewer = tester.widget<InteractiveViewer>(find.byType(InteractiveViewer));
+      final controller = viewer.transformationController!;
+
+      final initialTx = controller.value.storage[12];
+      final initialTy = controller.value.storage[13];
+
+      // 矢印キー（左）で右方向へパン
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+      expect(controller.value.storage[12], greaterThan(initialTx));
+
+      // Viキー（l: 右）で左方向へパン
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyL);
+      await tester.pumpAndSettle();
+      expect(controller.value.storage[12], closeTo(initialTx, 0.1));
+
+      // 矢印キー（上）で下方向へパン
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pumpAndSettle();
+      expect(controller.value.storage[13], greaterThan(initialTy));
+
+      // Viキー（j: 下）で上方向へパン
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyJ);
+      await tester.pumpAndSettle();
+      expect(controller.value.storage[13], closeTo(initialTy, 0.1));
+    });
   });
 }
