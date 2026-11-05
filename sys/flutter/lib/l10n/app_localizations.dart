@@ -1229,43 +1229,43 @@ abstract class AppLocalizations {
   /// No description provided for @dpadModeNormal.
   ///
   /// In ja, this message translates to:
-  /// **'標準'**
+  /// **'標準: 1マス移動'**
   String get dpadModeNormal;
 
   /// No description provided for @dpadModeUpper.
   ///
   /// In ja, this message translates to:
-  /// **'大文字'**
+  /// **'大文字: 障害物までダッシュ'**
   String get dpadModeUpper;
 
   /// No description provided for @dpadModeGLower.
   ///
   /// In ja, this message translates to:
-  /// **'g'**
+  /// **'g: 発見まで移動'**
   String get dpadModeGLower;
 
   /// No description provided for @dpadModeGUpper.
   ///
   /// In ja, this message translates to:
-  /// **'G'**
+  /// **'G: 発見まで移動(分岐無視)'**
   String get dpadModeGUpper;
 
   /// No description provided for @dpadModeCtrl.
   ///
   /// In ja, this message translates to:
-  /// **'^(Ctrl)'**
+  /// **'^(Ctrl): 直進(分岐無視)'**
   String get dpadModeCtrl;
 
   /// No description provided for @dpadModeMCmd.
   ///
   /// In ja, this message translates to:
-  /// **'m'**
+  /// **'m: 拾わずに移動'**
   String get dpadModeMCmd;
 
   /// No description provided for @dpadModeFCmd.
   ///
   /// In ja, this message translates to:
-  /// **'F'**
+  /// **'F: 強制攻撃'**
   String get dpadModeFCmd;
 
   /// No description provided for @mapTapTravelTitle.

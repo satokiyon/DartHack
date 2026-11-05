@@ -593,25 +593,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dpadLongPressTitle => 'D-Pad Long Press Move Mode';
 
   @override
-  String get dpadModeNormal => 'Normal';
+  String get dpadModeNormal => 'Normal: 1-step move';
 
   @override
-  String get dpadModeUpper => 'Uppercase';
+  String get dpadModeUpper => 'Uppercase: Dash to obstacle';
 
   @override
-  String get dpadModeGLower => 'g';
+  String get dpadModeGLower => 'g: Move until discovery';
 
   @override
-  String get dpadModeGUpper => 'G';
+  String get dpadModeGUpper => 'G: Move until discovery (ignore forks)';
 
   @override
-  String get dpadModeCtrl => '^(Ctrl)';
+  String get dpadModeCtrl => '^(Ctrl): Straight run (ignore forks)';
 
   @override
-  String get dpadModeMCmd => 'm';
+  String get dpadModeMCmd => 'm: Move without picking items';
 
   @override
-  String get dpadModeFCmd => 'F';
+  String get dpadModeFCmd => 'F: Force fight';
 
   @override
   String get mapTapTravelTitle => 'Map Tap Travel Mode';

@@ -44,7 +44,6 @@ class _SettingsPageState extends State<SettingsPage> {
   String _selectedTileset = 'pixelhack_32x32';
   String _selectedSymset = 'IBMGraphics_2';
   String _selectedRogueSymset = 'Default';
-  String _controllerMode = 'pad';
   int _statusDisplayMode = 0;
   int _tombstoneDisplayMode = 0; // 0: 画像+文字オーバーレイ, 1: Cコア出力そのまま(テキスト)
   bool _adFeaturesEnabled = true;
@@ -274,7 +273,6 @@ class _SettingsPageState extends State<SettingsPage> {
       if (!_availableRogueSymsets.contains(_selectedRogueSymset)) {
         _selectedRogueSymset = 'Default';
       }
-      _controllerMode = prefs.getString('controller_mode') ?? 'pad';
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
       final tombstoneModeRaw = prefs.getInt('tombstone_display_mode');
       _tombstoneDisplayMode = (tombstoneModeRaw == 1) ? 1 : 0;
@@ -1668,20 +1666,6 @@ class _SettingsPageState extends State<SettingsPage> {
         leading: const Icon(Icons.gamepad, color: Colors.amber),
         title: Text(l10n.secControllerTitle),
         children: _withDividers([
-          _buildDropdownSettingTile<String>(
-            title: l10n.controllerMode,
-            value: _controllerMode,
-            items: [
-              DropdownMenuItem(value: 'pad', child: Text(l10n.modePad)),
-              DropdownMenuItem(value: 'keyboard', child: Text(l10n.modeKeyboard)),
-            ],
-            onChanged: (val) {
-              if (val != null) {
-                setState(() => _controllerMode = val);
-                _saveSetting('controller_mode', val);
-              }
-            },
-          ),
           _buildDropdownSettingTile<String>(
             title: l10n.buttonDisplayModeTitle,
             description: l10n.buttonDisplayModeSub,

@@ -584,25 +584,25 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dpadLongPressTitle => '移動パッド長押し時の移動モード';
 
   @override
-  String get dpadModeNormal => '標準';
+  String get dpadModeNormal => '標準: 1マス移動';
 
   @override
-  String get dpadModeUpper => '大文字';
+  String get dpadModeUpper => '大文字: 障害物までダッシュ';
 
   @override
-  String get dpadModeGLower => 'g';
+  String get dpadModeGLower => 'g: 発見まで移動';
 
   @override
-  String get dpadModeGUpper => 'G';
+  String get dpadModeGUpper => 'G: 発見まで移動(分岐無視)';
 
   @override
-  String get dpadModeCtrl => '^(Ctrl)';
+  String get dpadModeCtrl => '^(Ctrl): 直進(分岐無視)';
 
   @override
-  String get dpadModeMCmd => 'm';
+  String get dpadModeMCmd => 'm: 拾わずに移動';
 
   @override
-  String get dpadModeFCmd => 'F';
+  String get dpadModeFCmd => 'F: 強制攻撃';
 
   @override
   String get mapTapTravelTitle => 'マップタップでの自動移動';

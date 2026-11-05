@@ -2749,6 +2749,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     );
   }
 
+  Future<void> _saveControllerModePrefs() async {
+    final prefs = await AppPrefs.getInstance();
+    await prefs.setString(
+      'controller_mode',
+      _controllerMode == ControllerMode.keyboard ? 'keyboard' : 'pad',
+    );
+  }
+
   void _cycleDPadMoveMode() {
     List<DPadMoveMode> modes = _enabledDPadMoveModes.isEmpty
         ? <DPadMoveMode>[DPadMoveMode.normal]
@@ -4001,6 +4009,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           ? ControllerMode.pad
                           : ControllerMode.keyboard;
                     });
+                    unawaited(_saveControllerModePrefs());
                   },
                 ),
               ),
@@ -4026,6 +4035,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 setState(() {
                   _controllerMode = ControllerMode.pad;
                 });
+                unawaited(_saveControllerModePrefs());
               },
             ),
           ),
