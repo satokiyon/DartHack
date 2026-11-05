@@ -443,6 +443,44 @@ class TextOverlayPage extends KeyAction {
   int get hashCode => direction.hashCode;
 }
 
+/// テキスト入力画面・ダイアログのフォーカス循環（forward: true=次, false=前）
+class TextOverlayTab extends KeyAction {
+  final bool forward;
+  const TextOverlayTab({this.forward = true});
+
+  @override
+  String toString() => 'TextOverlayTab(forward: $forward)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TextOverlayTab &&
+          runtimeType == other.runtimeType &&
+          forward == other.forward;
+
+  @override
+  int get hashCode => forward.hashCode;
+}
+
+/// メニュー画面のアクションボタンフォーカス循環（forward: true=次, false=前）
+class MenuTab extends KeyAction {
+  final bool forward;
+  const MenuTab({this.forward = true});
+
+  @override
+  String toString() => 'MenuTab(forward: $forward)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MenuTab &&
+          runtimeType == other.runtimeType &&
+          forward == other.forward;
+
+  @override
+  int get hashCode => forward.hashCode;
+}
+
 /// テキスト入力オーバーレイ・拡張コマンドメニューの候補補完アクション (Tab)
 class TextOverlayAutocomplete extends KeyAction {
   const TextOverlayAutocomplete();
@@ -524,6 +562,7 @@ class HardwareKeyRouter {
         isShiftPressed: isShiftPressed,
         isControlPressed: isControlPressed,
         isAltPressed: isAltPressed,
+        isExtCmdMenu: context == KeyInputContext.extCmdMenu,
       );
     }
 
@@ -600,12 +639,13 @@ class HardwareKeyRouter {
     required bool isShiftPressed,
     required bool isControlPressed,
     required bool isAltPressed,
+    bool isExtCmdMenu = false,
   }) {
     if (event.logicalKey == LogicalKeyboardKey.escape) {
       return const SendKey(27, 'ESC');
     }
 
-    // 上下矢印キー・PageUp/PageDown・Tab キーは候補・履歴選択や補完として処理
+    // 上下矢印キー・PageUp/PageDown・Tab キーは候補・履歴選択やフォーカス移動・補完として処理
     if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
       return const TextOverlayMoveCandidate(-1);
     }
@@ -619,8 +659,13 @@ class HardwareKeyRouter {
       return const TextOverlayPage(1);
     }
     if (event.logicalKey == LogicalKeyboardKey.tab && !isAltPressed) {
+      if (isExtCmdMenu && !isShiftPressed) {
+        return (event is KeyDownEvent)
+            ? const TextOverlayAutocomplete()
+            : const SwallowKey();
+      }
       return (event is KeyDownEvent)
-          ? const TextOverlayAutocomplete()
+          ? TextOverlayTab(forward: !isShiftPressed)
           : const SwallowKey();
     }
 
@@ -674,6 +719,13 @@ class HardwareKeyRouter {
     String question = '',
     bool isShiftPressed = false,
   }) {
+    // Tab / Shift+Tab によるフォーカス循環
+    if (event.logicalKey == LogicalKeyboardKey.tab) {
+      return (event is KeyDownEvent)
+          ? TextOverlayTab(forward: !isShiftPressed)
+          : const SwallowKey();
+    }
+
     // ESC は常にキャンセル (27)
     if (event.logicalKey == LogicalKeyboardKey.escape) {
       return const SendYn(27);
@@ -878,9 +930,13 @@ class HardwareKeyRouter {
       return const MenuPage(-1);
     }
 
-    // スクロール以外の決定・キャンセル・アクセラレータ選択は、長押しトグル誤爆防止のため KeyDownEvent のみ処理
+    // スクロール以外の決定・キャンセル・アクセラレータ選択・Tabフォーカス移動は、長押しトグル誤爆防止のため KeyDownEvent のみ処理
     if (event is! KeyDownEvent) {
       return const SwallowKey();
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.tab) {
+      return MenuTab(forward: !isShiftPressed);
     }
 
     if (event.logicalKey == LogicalKeyboardKey.escape) {

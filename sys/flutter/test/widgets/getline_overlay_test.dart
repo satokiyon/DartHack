@@ -11,6 +11,8 @@ void main() {
     required TextEditingController controller,
     List<ExtCmdEntry> extCmdList = const [],
     required Function(String?) onSubmit,
+    List<String> recentMessages = const [],
+    VoidCallback? onShowHistory,
   }) {
     return MaterialApp(
       locale: const Locale('ja'),
@@ -26,9 +28,10 @@ void main() {
               inputController: controller,
               extCmdList: extCmdList,
               onSubmit: onSubmit,
-              onShowMsgHistory: () {},
+              onShowMsgHistory: onShowHistory ?? () {},
               bottomInset: 0,
               isCallOrNamePrompt: (p) => p.contains('何と呼びますか') || p.contains('注釈'),
+              recentMessages: recentMessages,
             ),
           ],
         ),
@@ -177,6 +180,74 @@ void main() {
       key.currentState!.submit();
       await tester.pump();
       expect(submitted, equals('<*scroll*'));
+    });
+
+    testWidgets('TabキーおよびShift+Tabキーによるフォーカス循環ナビゲーションとEnter決定が正しく動作すること', (tester) async {
+      final key = GlobalKey<GetLineOverlayState>();
+      final controller = TextEditingController(text: 'test entry');
+      String? submitted;
+      bool historyCalled = false;
+
+      await tester.pumpWidget(
+        buildTestWidget(
+          overlayKey: key,
+          prompt: '何か身につけるものを願ってください:',
+          controller: controller,
+          onSubmit: (res) => submitted = res,
+          recentMessages: ['前回のメッセージ1', '前回のメッセージ2'],
+          onShowHistory: () => historyCalled = true,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final state = key.currentState!;
+
+      // 1. 初期状態: フォーカスなし (none)
+      expect(find.byType(TextField), findsOneWidget);
+
+      // 2. Tab 1回目 -> input
+      state.cycleFocus(true);
+      await tester.pump();
+      // TextField にフォーカスが当たる
+
+      // 3. Tab 2回目 -> history
+      state.cycleFocus(true);
+      await tester.pump();
+      // history ボタンフォーカス時に submit() すると onShowHistory が呼ばれる
+      state.submit();
+      expect(historyCalled, isTrue);
+
+      // 4. Tab 3回目 -> cancel
+      state.cycleFocus(true);
+      await tester.pump();
+      // cancel ボタンフォーカス時に submit() すると onSubmit(null) が呼ばれる
+      state.submit();
+      expect(submitted, isNull);
+
+      // 5. Tab 4回目 -> confirm
+      state.cycleFocus(true);
+      await tester.pump();
+      // confirm ボタンフォーカス時に submit() すると onSubmit('test entry') が呼ばれる
+      state.submit();
+      expect(submitted, equals('test entry'));
+
+      // 6. Tab 5回目 -> none (初期状態に復帰)
+      state.cycleFocus(true);
+      await tester.pump();
+
+      // 7. Shift+Tab (逆順) -> confirm に移動
+      state.cycleFocus(false);
+      await tester.pump();
+      submitted = null;
+      state.submit();
+      expect(submitted, equals('test entry'));
+
+      // 8. Shift+Tab -> cancel に移動
+      state.cycleFocus(false);
+      await tester.pump();
+      submitted = 'will be cleared';
+      state.submit();
+      expect(submitted, isNull);
     });
   });
 }

@@ -500,5 +500,92 @@ void main() {
 
       expect(selectedIdent, equals(11));
     });
+
+    testWidgets('MenuOverlay multiple selection menu supports Tab key focus cycling across action buttons', (tester) async {
+      final menuKey = GlobalKey<MenuOverlayState>();
+      int? singleSelectedIdent;
+
+      final items = [
+        MenuItemData(ident: 1, accelerator: 97, groupacc: 0, attr: 0, text: 'Item 1', preselected: 0, color: 0, tile: -1),
+        MenuItemData(ident: 2, accelerator: 98, groupacc: 0, attr: 0, text: 'Item 2', preselected: 0, color: 0, tile: -1),
+      ];
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Stack(
+              children: [
+                MenuOverlay(
+                  key: menuKey,
+                  menuPrompt: 'Select items:',
+                  menuItems: items,
+                  menuHow: 2, // PICK_ANY (複数選択)
+                  initialSelectedCounts: const {},
+                  initialSearchQuery: '',
+                  bottomInset: 0,
+                  useTiles: false,
+                  tileImage: null,
+                  tileWidth: 32,
+                  tileHeight: 32,
+                  onSingleSelect: (val) => singleSelectedIdent = val,
+                  onMultiSelect: (_) {},
+                  onItemLongPress: (_) {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final state = menuKey.currentState!;
+
+      // 1. 初期状態: none
+      expect(state.currentFocusTarget, equals(MenuFocusTarget.none));
+
+      // 2. Tab 1回目 -> selectAll
+      state.cycleFocus(true);
+      await tester.pump();
+      expect(state.currentFocusTarget, equals(MenuFocusTarget.selectAll));
+      // selectAll フォーカス時に submit() すると全選択される
+      state.submit();
+      await tester.pump();
+      expect(state.selectedCounts.length, equals(2));
+
+      // 3. Tab 2回目 -> deselectAll
+      state.cycleFocus(true);
+      await tester.pump();
+      expect(state.currentFocusTarget, equals(MenuFocusTarget.deselectAll));
+      // deselectAll フォーカス時に submit() すると全解除される
+      state.submit();
+      await tester.pump();
+      expect(state.selectedCounts.isEmpty, isTrue);
+
+      // 4. Tab 3回目 -> confirm
+      state.cycleFocus(true);
+      await tester.pump();
+      expect(state.currentFocusTarget, equals(MenuFocusTarget.confirm));
+
+      // 5. Tab 4回目 -> cancel
+      state.cycleFocus(true);
+      await tester.pump();
+      expect(state.currentFocusTarget, equals(MenuFocusTarget.cancel));
+      // cancel フォーカス時に submit() するとキャンセル (-1) が呼ばれる
+      state.submit();
+      await tester.pump();
+      expect(singleSelectedIdent, equals(-1));
+
+      // 6. Tab 5回目 -> none (初期状態復帰)
+      state.cycleFocus(true);
+      await tester.pump();
+      expect(state.currentFocusTarget, equals(MenuFocusTarget.none));
+
+      // 7. Shift+Tab (逆順) -> cancel
+      state.cycleFocus(false);
+      await tester.pump();
+      expect(state.currentFocusTarget, equals(MenuFocusTarget.cancel));
+    });
   });
 }

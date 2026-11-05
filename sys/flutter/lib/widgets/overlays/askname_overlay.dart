@@ -6,6 +6,14 @@ import '../../models/game_enums.dart';
 import '../../utils/utf8_length_limiting_formatter.dart';
 import 'save_data_list_view.dart';
 
+/// AskName オーバーレイでの Tab キーフォーカス対象
+enum AskNameFocusTarget {
+  none,
+  input,
+  cancel,
+  confirm,
+}
+
 class AskNameOverlay extends StatefulWidget {
   final TextEditingController nameController;
   final int maxChars;
@@ -32,6 +40,8 @@ class AskNameOverlayState extends State<AskNameOverlay> {
   late PlayMode _selectedPlayMode;
   String _previousCustomName = "";
   final ScrollController _saveScrollController = ScrollController();
+  final FocusNode _nameFocusNode = FocusNode();
+  AskNameFocusTarget _currentFocusTarget = AskNameFocusTarget.none;
 
   @override
   void initState() {
@@ -41,6 +51,7 @@ class AskNameOverlayState extends State<AskNameOverlay> {
 
   @override
   void dispose() {
+    _nameFocusNode.dispose();
     _saveScrollController.dispose();
     super.dispose();
   }
@@ -90,10 +101,40 @@ class AskNameOverlayState extends State<AskNameOverlay> {
 
   /// 物理キーボードからの決定（Enter用）
   void submit() {
+    if (_currentFocusTarget == AskNameFocusTarget.cancel) {
+      widget.onSubmit(_selectedPlayMode, null);
+      return;
+    }
     final askNameBytes = utf8.encode(widget.nameController.text).length;
     final maxAskNameBytes = widget.maxChars > 0 ? widget.maxChars - 1 : 31;
     if (askNameBytes <= maxAskNameBytes) {
       widget.onSubmit(_selectedPlayMode, widget.nameController.text);
+    }
+  }
+
+  /// Tab キーによるフォーカス循環ナビゲーション
+  void cycleFocus([bool forward = true]) {
+    final targets = const [
+      AskNameFocusTarget.none,
+      AskNameFocusTarget.input,
+      AskNameFocusTarget.cancel,
+      AskNameFocusTarget.confirm,
+    ];
+    final currentIndex = targets.indexOf(_currentFocusTarget);
+    final safeIndex = currentIndex == -1 ? 0 : currentIndex;
+    final nextIndex = forward
+        ? (safeIndex + 1) % targets.length
+        : (safeIndex - 1 + targets.length) % targets.length;
+    final nextTarget = targets[nextIndex];
+
+    setState(() {
+      _currentFocusTarget = nextTarget;
+    });
+
+    if (nextTarget == AskNameFocusTarget.input) {
+      _nameFocusNode.requestFocus();
+    } else {
+      _nameFocusNode.unfocus();
     }
   }
 
@@ -229,6 +270,7 @@ class AskNameOverlayState extends State<AskNameOverlay> {
                         },
                         child: TextField(
                           controller: widget.nameController,
+                          focusNode: _nameFocusNode,
                           autofocus: false,
                           enabled: _selectedPlayMode != PlayMode.wizard,
                           inputFormatters: [Utf8LengthLimitingTextInputFormatter(maxAskNameBytes)],
@@ -352,6 +394,11 @@ class AskNameOverlayState extends State<AskNameOverlay> {
                         children: [
                           TextButton(
                             onPressed: () => widget.onSubmit(_selectedPlayMode, null),
+                            style: TextButton.styleFrom(
+                              side: _currentFocusTarget == AskNameFocusTarget.cancel
+                                  ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                                  : null,
+                            ),
                             child: Text(l10n.cancel),
                           ),
                           const SizedBox(width: 8),
@@ -362,6 +409,9 @@ class AskNameOverlayState extends State<AskNameOverlay> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF004D40), // 深いダークティール (ラベンダー文字とのコントラスト比 約 6.5:1)
                               disabledBackgroundColor: const Color(0xFF004D40).withValues(alpha: 0.3),
+                              side: _currentFocusTarget == AskNameFocusTarget.confirm
+                                  ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                                  : null,
                             ),
                             child: Text(l10n.startGame),
                           ),

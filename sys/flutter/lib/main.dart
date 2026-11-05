@@ -1058,6 +1058,24 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         }
         return KeyEventResult.handled;
 
+      case TextOverlayTab(:final forward):
+        if (_isGetLineVisible) {
+          _getLineOverlayKey.currentState?.cycleFocus(forward);
+        } else if (_isAskNameVisible) {
+          _askNameOverlayKey.currentState?.cycleFocus(forward);
+        } else if (_isYnVisible) {
+          _ynOverlayKey.currentState?.cycleFocus(forward);
+        } else if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.cycleFocus(forward);
+        }
+        return KeyEventResult.handled;
+
+      case MenuTab(:final forward):
+        if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.cycleFocus(forward);
+        }
+        return KeyEventResult.handled;
+
       case DismissText():
         if (_screen.isTextWindowVisible) {
           _sendFfiKey(32, "Space");
@@ -1111,6 +1129,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           if (_screen.menuHow == 0 /* PICK_NONE */) {
             _sendMenuSelection(-1);
           } else if (_screen.menuHow == 1 /* PICK_ONE */) {
+            if (_menuOverlayKey.currentState?.currentFocusTarget == MenuFocusTarget.cancel) {
+              _sendMenuSelection(-1);
+              return KeyEventResult.handled;
+            }
             // PICK_ONE で事前選択項目（autopickup_exception の「x - このメニューを終了」等）がある場合はそれを確定し、無ければ閉じる
             final preselected = _menuSelectedCounts.entries
                 .where((e) => e.key != 0 && e.key != 4294967294)

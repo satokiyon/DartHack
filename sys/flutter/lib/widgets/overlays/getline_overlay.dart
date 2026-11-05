@@ -4,6 +4,15 @@ import '../../l10n/app_localizations.dart';
 import '../../models/ext_cmd_entry.dart';
 import 'dialog_recent_messages_box.dart';
 
+/// GetLine オーバーレイでの Tab キーフォーカス対象
+enum GetLineFocusTarget {
+  none,
+  input,
+  history,
+  cancel,
+  confirm,
+}
+
 class GetLineOverlay extends StatefulWidget {
   final String prompt;
   final TextEditingController inputController;
@@ -37,6 +46,7 @@ class GetLineOverlayState extends State<GetLineOverlay> {
   late FocusNode _filterFocusNode;
   late ScrollController _listScrollController;
   int? _selectedCandidateIndex;
+  GetLineFocusTarget _currentFocusTarget = GetLineFocusTarget.none;
 
   bool get _isExtCmd => widget.extCmdList.isNotEmpty;
   int get _maxBytes => widget.isCallOrNamePrompt(widget.prompt) ? 62 : 100;
@@ -223,8 +233,57 @@ class GetLineOverlayState extends State<GetLineOverlay> {
     _updateFilteredExtCmds(cmd);
   }
 
+  /// Tab キーによるフォーカス循環ナビゲーション
+  void cycleFocus([bool forward = true]) {
+    if (_isExtCmd && forward) {
+      // 候補リストが存在する拡張コマンド画面では Tab は補完専用
+      autocompleteCandidate();
+      return;
+    }
+
+    final targets = <GetLineFocusTarget>[
+      GetLineFocusTarget.none,
+      GetLineFocusTarget.input,
+      if (widget.recentMessages.isNotEmpty) GetLineFocusTarget.history,
+      GetLineFocusTarget.cancel,
+      GetLineFocusTarget.confirm,
+    ];
+
+    final currentIndex = targets.indexOf(_currentFocusTarget);
+    final safeIndex = currentIndex == -1 ? 0 : currentIndex;
+    final nextIndex = forward
+        ? (safeIndex + 1) % targets.length
+        : (safeIndex - 1 + targets.length) % targets.length;
+    final nextTarget = targets[nextIndex];
+
+    setState(() {
+      _currentFocusTarget = nextTarget;
+    });
+
+    if (nextTarget == GetLineFocusTarget.input) {
+      if (_isExtCmd) {
+        _filterFocusNode.requestFocus();
+      } else {
+        _inputFocusNode.requestFocus();
+      }
+    } else {
+      _inputFocusNode.unfocus();
+      _filterFocusNode.unfocus();
+    }
+  }
+
   /// Enter キーによる確定送信処理
   void submit() {
+    // フォーカスが特定ボタンに当たっている場合はそのボタンを実行
+    if (_currentFocusTarget == GetLineFocusTarget.cancel) {
+      widget.onSubmit(null);
+      return;
+    }
+    if (_currentFocusTarget == GetLineFocusTarget.history) {
+      _handleShowHistory();
+      return;
+    }
+
     if (_isExtCmd) {
       if (_selectedCandidateIndex != null &&
           _filteredExtCmds.isNotEmpty &&
@@ -458,6 +517,9 @@ class GetLineOverlayState extends State<GetLineOverlay> {
                             backgroundColor: Colors.blueGrey[900],
                             foregroundColor: Colors.amber[200],
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            side: _currentFocusTarget == GetLineFocusTarget.history
+                                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                                : null,
                           ),
                         ),
                         Row(
@@ -465,6 +527,11 @@ class GetLineOverlayState extends State<GetLineOverlay> {
                           children: [
                             TextButton(
                               onPressed: () => widget.onSubmit(null),
+                              style: TextButton.styleFrom(
+                                side: _currentFocusTarget == GetLineFocusTarget.cancel
+                                    ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                                    : null,
+                              ),
                               child: Text(l10n.cancel),
                             ),
                             const SizedBox(width: 8),
@@ -480,6 +547,9 @@ class GetLineOverlayState extends State<GetLineOverlay> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF004D40), // 深いダークティール (ラベンダー文字とのコントラスト比 約 6.5:1)
                                     disabledBackgroundColor: const Color(0xFF004D40).withValues(alpha: 0.3),
+                                    side: _currentFocusTarget == GetLineFocusTarget.confirm
+                                        ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                                        : null,
                                   ),
                                   child: Text(l10n.confirm),
                                 );

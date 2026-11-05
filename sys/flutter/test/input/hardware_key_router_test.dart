@@ -874,5 +874,69 @@ void main() {
         equals(const IgnoreKey()),
       );
     });
+
+    test('Tab and Shift+Tab should route to TextOverlayTab or MenuTab correctly', () {
+      final tabEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.tab,
+        logicalKey: LogicalKeyboardKey.tab,
+        timeStamp: Duration.zero,
+      );
+
+      // textInputOverlay: Tab -> TextOverlayTab(forward: true), Shift+Tab -> TextOverlayTab(forward: false)
+      expect(
+        HardwareKeyRouter.route(
+          event: tabEvent,
+          context: KeyInputContext.textInputOverlay,
+          isShiftPressed: false,
+        ),
+        equals(const TextOverlayTab(forward: true)),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: tabEvent,
+          context: KeyInputContext.textInputOverlay,
+          isShiftPressed: true,
+        ),
+        equals(const TextOverlayTab(forward: false)),
+      );
+
+      // menu: Tab -> MenuTab(forward: true), Shift+Tab -> MenuTab(forward: false)
+      expect(
+        HardwareKeyRouter.route(
+          event: tabEvent,
+          context: KeyInputContext.menu,
+          isShiftPressed: false,
+        ),
+        equals(const MenuTab(forward: true)),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: tabEvent,
+          context: KeyInputContext.menu,
+          isShiftPressed: true,
+        ),
+        equals(const MenuTab(forward: false)),
+      );
+
+      // yn: Tab -> TextOverlayTab(forward: true), Shift+Tab -> TextOverlayTab(forward: false)
+      expect(
+        HardwareKeyRouter.route(
+          event: tabEvent,
+          context: KeyInputContext.yn,
+          ynChoices: 'ynq',
+          isShiftPressed: false,
+        ),
+        equals(const TextOverlayTab(forward: true)),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: tabEvent,
+          context: KeyInputContext.yn,
+          ynChoices: 'ynq',
+          isShiftPressed: true,
+        ),
+        equals(const TextOverlayTab(forward: false)),
+      );
+    });
   });
 }

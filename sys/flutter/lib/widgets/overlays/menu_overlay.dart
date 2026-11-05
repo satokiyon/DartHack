@@ -9,6 +9,15 @@ import '../../services/font_manager.dart';
 import '../../input/hardware_key_router.dart';
 import '../../utils/item_count_parser.dart';
 
+/// メニュー画面での Tab キーフォーカス対象
+enum MenuFocusTarget {
+  none,
+  selectAll,
+  deselectAll,
+  confirm,
+  cancel,
+}
+
 class MenuOverlay extends StatefulWidget {
   final String menuPrompt;
   final List<MenuItemData> menuItems;
@@ -54,6 +63,9 @@ class MenuOverlayState extends State<MenuOverlay> {
   late ScrollController _scrollController;
   late ScrollController _horizontalScrollController;
   int? _selectedExtCmdIndex;
+  MenuFocusTarget _currentFocusTarget = MenuFocusTarget.none;
+
+  MenuFocusTarget get currentFocusTarget => _currentFocusTarget;
 
   @override
   void initState() {
@@ -252,6 +264,19 @@ class MenuOverlayState extends State<MenuOverlay> {
 
   /// 複数選択メニューの確定送信処理
   void submit() {
+    if (_currentFocusTarget == MenuFocusTarget.cancel) {
+      widget.onSingleSelect(-1);
+      return;
+    }
+    if (_currentFocusTarget == MenuFocusTarget.selectAll) {
+      _handleSelectAll();
+      return;
+    }
+    if (_currentFocusTarget == MenuFocusTarget.deselectAll) {
+      _handleDeselectAll();
+      return;
+    }
+
     final cleanCounts = <int, int>{};
     _selectedCounts.forEach((ident, count) {
       if (ident != 0 && ident != 4294967294) {
@@ -272,6 +297,68 @@ class MenuOverlayState extends State<MenuOverlay> {
     }
 
     widget.onMultiSelect(cleanCounts);
+  }
+
+  /// Tab キーによるアクションボタンのフォーカス循環
+  void cycleFocus([bool forward = true]) {
+    final isExtCmd = isExtCmdMenuPrompt(widget.menuPrompt);
+    if (isExtCmd && forward) {
+      // 拡張コマンドメニュー画面では Tab は補完専用
+      autocompleteExtCmdCandidate();
+      return;
+    }
+
+    final isMulti = widget.menuHow == 2 /* PICK_ANY */;
+    final targets = <MenuFocusTarget>[
+      MenuFocusTarget.none,
+      if (isMulti) ...[
+        MenuFocusTarget.selectAll,
+        MenuFocusTarget.deselectAll,
+        MenuFocusTarget.confirm,
+      ],
+      MenuFocusTarget.cancel,
+    ];
+
+    final currentIndex = targets.indexOf(_currentFocusTarget);
+    final safeIndex = currentIndex == -1 ? 0 : currentIndex;
+    final nextIndex = forward
+        ? (safeIndex + 1) % targets.length
+        : (safeIndex - 1 + targets.length) % targets.length;
+
+    setState(() {
+      _currentFocusTarget = targets[nextIndex];
+    });
+  }
+
+  void _handleSelectAll() {
+    final filteredItems = _getFilteredItems();
+    setState(() {
+      final hasAllTypesInMenu = filteredItems.any((i) => i.ident == -2);
+      if (hasAllTypesInMenu) {
+        // query_category 画面では、メタ項目(A, B, C等)を除外して純粋カテゴリと -2 のみ選択
+        _selectedCounts[-2] = 1;
+        for (final item in filteredItems) {
+          if (_isPureItemCategoryItem(item)) {
+            _selectedCounts[item.ident] = _parseMaxCount(item.text);
+          }
+        }
+      } else {
+        _selectedCounts = <int, int>{};
+        for (final item in filteredItems) {
+          if (item.ident != 0 && item.ident != 4294967294 && !_isMenuCategoryItem(item)) {
+            _selectedCounts[item.ident] = _parseMaxCount(item.text);
+          }
+        }
+      }
+    });
+    widget.onSelectionChanged?.call(_selectedCounts);
+  }
+
+  void _handleDeselectAll() {
+    setState(() {
+      _selectedCounts.clear();
+    });
+    widget.onSelectionChanged?.call(_selectedCounts);
   }
 
   List<MenuItemData> _getFilteredItems() {
@@ -1144,49 +1231,41 @@ class MenuOverlayState extends State<MenuOverlay> {
                     children: [
                       if (isMultiSelectMenu) ...[
                         ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              final hasAllTypesInMenu = filteredItems.any((i) => i.ident == -2);
-                              if (hasAllTypesInMenu) {
-                                // query_category 画面では、メタ項目(A, B, C等)を除外して純粋カテゴリと -2 のみ選択
-                                _selectedCounts[-2] = 1;
-                                for (final item in filteredItems) {
-                                  if (_isPureItemCategoryItem(item)) {
-                                    _selectedCounts[item.ident] = _parseMaxCount(item.text);
-                                  }
-                                }
-                              } else {
-                                _selectedCounts = <int, int>{};
-                                for (final item in filteredItems) {
-                                  if (item.ident != 0 && item.ident != 4294967294 && !_isMenuCategoryItem(item)) {
-                                    _selectedCounts[item.ident] = _parseMaxCount(item.text);
-                                  }
-                                }
-                              }
-                            });
-                            widget.onSelectionChanged?.call(_selectedCounts);
-                          },
+                          onPressed: _handleSelectAll,
+                          style: ElevatedButton.styleFrom(
+                            side: _currentFocusTarget == MenuFocusTarget.selectAll
+                                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                                : null,
+                          ),
                           child: Text(AppLocalizations.of(context)!.selectAll),
                         ),
                         ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedCounts.clear();
-                            });
-                            widget.onSelectionChanged?.call(_selectedCounts);
-                          },
+                          onPressed: _handleDeselectAll,
+                          style: ElevatedButton.styleFrom(
+                            side: _currentFocusTarget == MenuFocusTarget.deselectAll
+                                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                                : null,
+                          ),
                           child: Text(AppLocalizations.of(context)!.deselectAll),
                         ),
                         ElevatedButton(
                           onPressed: submit,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF004D40), // 深いダークティール (決定ボタンとして際立たせる)
+                            side: _currentFocusTarget == MenuFocusTarget.confirm
+                                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                                : null,
                           ),
                           child: const Text("OK"),
                         ),
                       ],
                       ElevatedButton(
                         onPressed: () => widget.onSingleSelect(-1),
+                        style: ElevatedButton.styleFrom(
+                          side: _currentFocusTarget == MenuFocusTarget.cancel
+                              ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                              : null,
+                        ),
                         child: Text(AppLocalizations.of(context)!.cancel),
                       ),
                     ],

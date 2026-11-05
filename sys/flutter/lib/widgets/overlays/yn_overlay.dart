@@ -32,6 +32,7 @@ class YnOverlay extends StatefulWidget {
 class YnOverlayState extends State<YnOverlay> {
   late final TextEditingController _textController;
   late final FocusNode _textFocusNode;
+  String _currentFocusTarget = 'none';
 
   @override
   void initState() {
@@ -97,7 +98,79 @@ class YnOverlayState extends State<YnOverlay> {
 
   /// 外部または決定ボタンからの確定処理
   void submit() {
-    _submitText(_textController.text);
+    if (_currentFocusTarget == 'cancel') {
+      widget.onSelect(27);
+      return;
+    }
+    if (_currentFocusTarget == 'history') {
+      widget.onShowMsgHistory();
+      return;
+    }
+    if (_currentFocusTarget.startsWith('choice:')) {
+      final ch = _currentFocusTarget.substring(7);
+      _handleSingleChoice(ch);
+      return;
+    }
+
+    final parsed = YnChoiceParser.parse(
+      question: widget.question,
+      choices: widget.choices,
+      defaultChoice: widget.defaultChoice,
+    );
+
+    if (parsed.type == YnPromptType.countInput ||
+        _currentFocusTarget == 'confirm' ||
+        _currentFocusTarget == 'input') {
+      _submitText(_textController.text);
+      return;
+    }
+
+    if (widget.defaultChoice != 0) {
+      widget.onSelect(widget.defaultChoice);
+    }
+  }
+
+  /// Tab キーによるフォーカス循環ナビゲーション
+  void cycleFocus([bool forward = true]) {
+    final parsed = YnChoiceParser.parse(
+      question: widget.question,
+      choices: widget.choices,
+      defaultChoice: widget.defaultChoice,
+    );
+
+    final List<String> targets = ['none'];
+    if (parsed.type == YnPromptType.countInput) {
+      targets.add('input');
+      if (widget.recentMessages.isNotEmpty) targets.add('history');
+      targets.add('cancel');
+      targets.add('confirm');
+    } else {
+      for (final ch in parsed.quickChoices) {
+        targets.add('choice:$ch');
+      }
+      if (parsed.allowsFreeInput) {
+        targets.add('input');
+      }
+      targets.add('cancel');
+      if (widget.recentMessages.isNotEmpty) targets.add('history');
+    }
+
+    final currentIndex = targets.indexOf(_currentFocusTarget);
+    final safeIndex = currentIndex == -1 ? 0 : currentIndex;
+    final nextIndex = forward
+        ? (safeIndex + 1) % targets.length
+        : (safeIndex - 1 + targets.length) % targets.length;
+    final nextTarget = targets[nextIndex];
+
+    setState(() {
+      _currentFocusTarget = nextTarget;
+    });
+
+    if (nextTarget == 'input') {
+      _textFocusNode.requestFocus();
+    } else {
+      _textFocusNode.unfocus();
+    }
   }
 
   void _submitText(String raw) {
@@ -214,6 +287,9 @@ class YnOverlayState extends State<YnOverlay> {
                   ? Colors.teal[500]
                   : Colors.blueGrey[800],
               foregroundColor: ch == 'a' ? Colors.amber[200] : Colors.white,
+              side: _currentFocusTarget == 'choice:$ch'
+                  ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                  : null,
             ),
             child: Text(
               YnChoiceParser.resolveButtonLabel(
@@ -225,7 +301,13 @@ class YnOverlayState extends State<YnOverlay> {
           ),
         ElevatedButton(
           onPressed: () => widget.onSelect(27), // ESC
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.black54, foregroundColor: Colors.white70),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.black54,
+            foregroundColor: Colors.white70,
+            side: _currentFocusTarget == 'cancel'
+                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                : null,
+          ),
           child: Text(isJp ? 'Esc:${l10n.cancel}' : 'Esc: ${l10n.cancel}'),
         ),
         ElevatedButton.icon(
@@ -236,6 +318,9 @@ class YnOverlayState extends State<YnOverlay> {
             backgroundColor: Colors.blueGrey[900],
             foregroundColor: Colors.amber[200],
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            side: _currentFocusTarget == 'history'
+                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                : null,
           ),
         ),
       ],
@@ -405,7 +490,9 @@ class YnOverlayState extends State<YnOverlay> {
                   elevation: 2,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+                    side: _currentFocusTarget == 'choice:$ch'
+                        ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                        : BorderSide(color: Colors.white.withValues(alpha: 0.15)),
                   ),
                 ),
                 child: Text(
@@ -459,6 +546,9 @@ class YnOverlayState extends State<YnOverlay> {
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            side: _currentFocusTarget == 'confirm'
+                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                : null,
           ),
           child: Text(Localizations.localeOf(context).languageCode == 'ja' ? '決定' : l10n.ok),
         ),
@@ -490,6 +580,9 @@ class YnOverlayState extends State<YnOverlay> {
             backgroundColor: Colors.black54,
             foregroundColor: Colors.white70,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            side: _currentFocusTarget == 'cancel'
+                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                : null,
           ),
           child: Text(l10n.cancel),
         ),
@@ -501,6 +594,9 @@ class YnOverlayState extends State<YnOverlay> {
             backgroundColor: Colors.blueGrey[900],
             foregroundColor: Colors.amber[200],
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            side: _currentFocusTarget == 'history'
+                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                : null,
           ),
         ),
       ],
