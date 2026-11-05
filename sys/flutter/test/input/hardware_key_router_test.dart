@@ -308,17 +308,67 @@ void main() {
       );
     });
 
-    test('extCmdMenu should ignore characters so TextField can consume them', () {
+    test('extCmdMenu should support focusless typing & navigation when TextField is not focused, and ignore typing when focused', () {
       final lEvent = const KeyDownEvent(
         physicalKey: PhysicalKeyboardKey.keyL,
         logicalKey: LogicalKeyboardKey.keyL,
         character: 'l',
         timeStamp: Duration.zero,
       );
-      // 'l' はアクセラレータ即決されず IgnoreKey となること
+      // フォーカスレス時 (isTextFieldFocused: false) は TextOverlayAppendChar('l')
       expect(
         HardwareKeyRouter.route(event: lEvent, context: KeyInputContext.extCmdMenu),
+        equals(const TextOverlayAppendChar('l')),
+      );
+      // TextField にフォーカスがある時 (isTextFieldFocused: true) は IgnoreKey
+      expect(
+        HardwareKeyRouter.route(
+          event: lEvent,
+          context: KeyInputContext.extCmdMenu,
+          isTextFieldFocused: true,
+        ),
         equals(const IgnoreKey()),
+      );
+
+      // 矢印キー上下 -> TextOverlayMoveCandidate(1 / -1) (フォーカス有無に関わらず動作)
+      final downEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.arrowDown,
+        logicalKey: LogicalKeyboardKey.arrowDown,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: downEvent, context: KeyInputContext.extCmdMenu),
+        equals(const TextOverlayMoveCandidate(1)),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: downEvent,
+          context: KeyInputContext.extCmdMenu,
+          isTextFieldFocused: true,
+        ),
+        equals(const TextOverlayMoveCandidate(1)),
+      );
+
+      // Tab -> TextOverlayAutocomplete()
+      final tabEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.tab,
+        logicalKey: LogicalKeyboardKey.tab,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: tabEvent, context: KeyInputContext.extCmdMenu),
+        equals(const TextOverlayAutocomplete()),
+      );
+
+      // Enter -> TextOverlaySubmit() (フォーカスレス時)
+      final enterEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.enter,
+        logicalKey: LogicalKeyboardKey.enter,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: enterEvent, context: KeyInputContext.extCmdMenu),
+        equals(const TextOverlaySubmit()),
       );
 
       // ESC は SendKey(27, 'ESC')
@@ -356,7 +406,7 @@ void main() {
         equals(const MenuScroll(-1)),
       );
 
-      // Space -> MenuScroll(1) (メニュー画面では下スクロール)
+      // Space -> MenuSpaceAction() (1ページ下スクロール、最下部では決定/閉鎖)
       final spaceEvent = const KeyDownEvent(
         physicalKey: PhysicalKeyboardKey.space,
         logicalKey: LogicalKeyboardKey.space,
@@ -364,7 +414,13 @@ void main() {
       );
       expect(
         HardwareKeyRouter.route(event: spaceEvent, context: KeyInputContext.menu),
-        equals(const MenuScroll(1)),
+        equals(const MenuSpaceAction()),
+      );
+
+      // Shift + Space -> MenuPage(-1) (1ページ上スクロール)
+      expect(
+        HardwareKeyRouter.route(event: spaceEvent, context: KeyInputContext.menu, isShiftPressed: true),
+        equals(const MenuPage(-1)),
       );
 
       // Enter -> MenuSubmit()
@@ -558,16 +614,69 @@ void main() {
       );
     });
 
-    test('textInputOverlay should ignore typing but handle ESC', () {
+    test('textInputOverlay should support focusless typing, backspace, delete, submit, and ignore typing when TextField is focused', () {
       final aEvent = const KeyDownEvent(
         physicalKey: PhysicalKeyboardKey.keyA,
         logicalKey: LogicalKeyboardKey.keyA,
         character: 'a',
         timeStamp: Duration.zero,
       );
+      // フォーカスレス時 (isTextFieldFocused: false) は TextOverlayAppendChar('a')
       expect(
         HardwareKeyRouter.route(event: aEvent, context: KeyInputContext.textInputOverlay),
+        equals(const TextOverlayAppendChar('a')),
+      );
+      // TextField にフォーカスがある時 (isTextFieldFocused: true) は IgnoreKey
+      expect(
+        HardwareKeyRouter.route(
+          event: aEvent,
+          context: KeyInputContext.textInputOverlay,
+          isTextFieldFocused: true,
+        ),
         equals(const IgnoreKey()),
+      );
+
+      // スペース文字の入力（願いの入力 "blessed +2 silver dragon scale mail" 等）
+      final spaceEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.space,
+        logicalKey: LogicalKeyboardKey.space,
+        character: ' ',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: spaceEvent, context: KeyInputContext.textInputOverlay),
+        equals(const TextOverlayAppendChar(' ')),
+      );
+
+      // Backspace / Delete / Enter (フォーカスレス時)
+      final bsEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.backspace,
+        logicalKey: LogicalKeyboardKey.backspace,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: bsEvent, context: KeyInputContext.textInputOverlay),
+        equals(const TextOverlayBackspace()),
+      );
+
+      final delEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.delete,
+        logicalKey: LogicalKeyboardKey.delete,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: delEvent, context: KeyInputContext.textInputOverlay),
+        equals(const TextOverlayClear()),
+      );
+
+      final enterEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.enter,
+        logicalKey: LogicalKeyboardKey.enter,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: enterEvent, context: KeyInputContext.textInputOverlay),
+        equals(const TextOverlaySubmit()),
       );
 
       final escEvent = const KeyDownEvent(
@@ -577,6 +686,29 @@ void main() {
       );
       expect(
         HardwareKeyRouter.route(event: escEvent, context: KeyInputContext.textInputOverlay),
+        equals(const SendKey(27, 'ESC')),
+      );
+    });
+
+    test('anyKeyOverlay should send physical keys directly without focusing TextField', () {
+      final dEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.keyD,
+        logicalKey: LogicalKeyboardKey.keyD,
+        character: 'd',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: dEvent, context: KeyInputContext.anyKeyOverlay),
+        equals(const SendKey(100, 'd')),
+      );
+
+      final escEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.escape,
+        logicalKey: LogicalKeyboardKey.escape,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: escEvent, context: KeyInputContext.anyKeyOverlay),
         equals(const SendKey(27, 'ESC')),
       );
     });

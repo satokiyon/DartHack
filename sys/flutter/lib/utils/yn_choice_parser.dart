@@ -151,11 +151,14 @@ class YnChoiceParser {
     // ブラケット [ ... ] からの範囲抽出
     final bracketMatch = RegExp(r'\[([^\]]+)\]').firstMatch(question);
     final bracketContent = bracketMatch?.group(1) ?? '';
-    final hasRangeNotation = bracketContent.contains('-');
+    final hasRangeNotation = bracketContent.contains('-') ||
+        bracketContent.contains('または') ||
+        RegExp(r'\bor\b', caseSensitive: false).hasMatch(bracketContent) ||
+        bracketContent == '*';
 
     if (isSlotPrompt || hasRangeNotation) {
       final expanded = expandRangeString(bracketContent.isNotEmpty ? bracketContent : rawChoices);
-      final hasHelp = question.contains('?') || bracketContent.contains('?');
+      final hasHelp = question.contains('?') || bracketContent.contains('?') || bracketContent.contains('*');
       return ParsedYnPrompt(
         type: YnPromptType.slotSelect,
         quickChoices: expanded.where((c) => c != '?' && c != '*').toList(),

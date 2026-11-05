@@ -236,6 +236,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final GlobalKey<TextOverlayState> _textOverlayKey = GlobalKey<TextOverlayState>();
   final GlobalKey<MenuOverlayState> _menuOverlayKey = GlobalKey<MenuOverlayState>();
   final GlobalKey<YnOverlayState> _ynOverlayKey = GlobalKey<YnOverlayState>();
+  final GlobalKey<GetLineOverlayState> _getLineOverlayKey = GlobalKey<GetLineOverlayState>();
+  final GlobalKey<AnyKeyOverlayState> _anyKeyOverlayKey = GlobalKey<AnyKeyOverlayState>();
+  final GlobalKey<AskNameOverlayState> _askNameOverlayKey = GlobalKey<AskNameOverlayState>();
 
   // 詳細な操作設定（shared_preferences用）
   double _padOpacity = 0.8;
@@ -325,10 +328,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   /// 物理キーボード用のゲーム画面フォーカスを安全に確保・復帰する
   void _ensureGameFocus() {
     if (!_isGameRunning) return;
-    // テキスト入力中のオーバーレイがある場合は、TextField のフォーカスを奪わない
-    if (_isGetLineVisible || _isAskNameVisible || _isAnyKeyVisible) return;
-    if (_screen.isMenuWindowVisible && isExtCmdMenuPrompt(_screen.menuPrompt)) return;
-    // 最前面のルートでない場合（設定画面などの別画面表示中）は奪わない
+    // ユーザが入力欄を明示的にタップして EditableText にフォーカスがある場合はフォーカスを奪わない
+    if (FocusManager.instance.primaryFocus?.context?.widget is EditableText) {
+      return;
+    }
+    // 最前面のルートでない場合（設定画面やモーダルダイアログ表示中）は奪わない
     if (mounted && (ModalRoute.of(context)?.isCurrent ?? true)) {
       if (!_focusNode.hasPrimaryFocus) {
         _focusNode.requestFocus();
@@ -892,7 +896,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   /// 現在のUI状態に応じたキー入力コンテキスト
   KeyInputContext get _currentKeyInputContext {
     if (!_isGameRunning) return KeyInputContext.inactive;
-    if (_isGetLineVisible || _isAskNameVisible || _isAnyKeyVisible) {
+    if (_isAnyKeyVisible) return KeyInputContext.anyKeyOverlay;
+    if (_isGetLineVisible || _isAskNameVisible) {
       return KeyInputContext.textInputOverlay;
     }
     if (_isYnVisible) return KeyInputContext.yn;
@@ -913,6 +918,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final isShift = HardwareKeyboard.instance.isShiftPressed;
     final isCtrl = HardwareKeyboard.instance.isControlPressed;
     final isAlt = HardwareKeyboard.instance.isAltPressed;
+    final isTextFieldFocused =
+        FocusManager.instance.primaryFocus?.context?.widget is EditableText;
 
     final action = HardwareKeyRouter.route(
       event: event,
@@ -924,6 +931,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       isShiftPressed: isShift,
       isControlPressed: isCtrl,
       isAltPressed: isAlt,
+      isTextFieldFocused: isTextFieldFocused,
     );
 
     switch (action) {
@@ -936,8 +944,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           _sendAskNameResult(null);
           return KeyEventResult.handled;
         }
-        if (_isAnyKeyVisible && code == 27) {
-          _closeAnyKeyOverlay();
+        if (_isAnyKeyVisible) {
+          if (code == 27) {
+            _closeAnyKeyOverlay();
+          } else if (_anyKeyOverlayKey.currentState != null) {
+            _anyKeyOverlayKey.currentState!.handlePhysicalKeyCode(code);
+          } else {
+            _sendAnyKeyLookup(code);
+          }
           return KeyEventResult.handled;
         }
         if (_screen.isMenuWindowVisible && code == 27) {
@@ -968,6 +982,80 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
       case YnSubmit():
         _ynOverlayKey.currentState?.submit();
+        return KeyEventResult.handled;
+
+      case TextOverlayAppendChar(:final char):
+        if (_isGetLineVisible) {
+          _getLineOverlayKey.currentState?.appendText(char);
+        } else if (_isAskNameVisible) {
+          _askNameOverlayKey.currentState?.appendText(char);
+        } else if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.appendFilterText(char);
+        }
+        return KeyEventResult.handled;
+
+      case TextOverlayBackspace():
+        if (_isGetLineVisible) {
+          _getLineOverlayKey.currentState?.deleteChar();
+        } else if (_isAskNameVisible) {
+          _askNameOverlayKey.currentState?.deleteChar();
+        } else if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.deleteFilterChar();
+        }
+        return KeyEventResult.handled;
+
+      case TextOverlayClear():
+        if (_isGetLineVisible) {
+          _getLineOverlayKey.currentState?.clearText();
+        } else if (_isAskNameVisible) {
+          _askNameOverlayKey.currentState?.clearText();
+        } else if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.clearFilterText();
+        }
+        return KeyEventResult.handled;
+
+      case TextOverlaySubmit():
+        if (_isGetLineVisible) {
+          if (_getLineOverlayKey.currentState != null) {
+            _getLineOverlayKey.currentState!.submit();
+          } else {
+            _sendGetLineResult(_getlineController.text);
+          }
+        } else if (_isAskNameVisible) {
+          if (_askNameOverlayKey.currentState != null) {
+            _askNameOverlayKey.currentState!.submit();
+          } else {
+            _sendAskNameResult(_askNameController.text);
+          }
+        } else if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.submitExtCmdSelection();
+        }
+        return KeyEventResult.handled;
+
+      case TextOverlayMoveCandidate(:final delta):
+        if (_isGetLineVisible) {
+          _getLineOverlayKey.currentState?.moveCandidate(delta);
+        } else if (_isAskNameVisible) {
+          _askNameOverlayKey.currentState?.moveSaveSelection(delta);
+        } else if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.moveExtCmdCandidate(delta);
+        }
+        return KeyEventResult.handled;
+
+      case TextOverlayPage(:final direction):
+        if (_isGetLineVisible) {
+          _getLineOverlayKey.currentState?.pageScroll(direction);
+        } else if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.pageScroll(direction);
+        }
+        return KeyEventResult.handled;
+
+      case TextOverlayAutocomplete():
+        if (_isGetLineVisible) {
+          _getLineOverlayKey.currentState?.autocompleteCandidate();
+        } else if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.autocompleteExtCmdCandidate();
+        }
         return KeyEventResult.handled;
 
       case DismissText():
@@ -1022,7 +1110,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         if (_screen.isMenuWindowVisible) {
           if (_screen.menuHow == 0 /* PICK_NONE */) {
             _sendMenuSelection(-1);
-          } else if (_screen.menuHow != 1 /* PICK_ANY */) {
+          } else if (_screen.menuHow == 1 /* PICK_ONE */) {
+            // PICK_ONE で事前選択項目（autopickup_exception の「x - このメニューを終了」等）がある場合はそれを確定し、無ければ閉じる
+            final preselected = _menuSelectedCounts.entries
+                .where((e) => e.key != 0 && e.key != 4294967294)
+                .firstOrNull;
+            if (preselected != null) {
+              _sendMenuSelection(preselected.key, preselected.value);
+            } else {
+              _sendMenuSelection(-1);
+            }
+          } else {
             if (_menuOverlayKey.currentState != null) {
               _menuOverlayKey.currentState!.submit();
             } else {
@@ -1050,6 +1148,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       case MenuPage(:final direction):
         if (_screen.isMenuWindowVisible) {
           _menuOverlayKey.currentState?.pageScroll(direction);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case MenuSpaceAction():
+        if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.handleSpace();
           return KeyEventResult.handled;
         }
         return KeyEventResult.handled;
@@ -1260,9 +1365,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   void _sendGetLineResult(String? result) {
+    // NetHack Cコアの getlin() 仕様に準拠し、キャンセル時 (result == null) は "\x1b" ("\033") を返送する。
+    // これにより階層テレポート (level_tele) や "O" オプション変更 (autopickup_exception 等) での ESC キャンセルが正しく機能する。
     _workerSendPort?.send({
       'type': 'getline_result',
-      'result': result,
+      'result': result ?? '\x1b',
     });
     setState(() {
       _isGetLineVisible = false;
@@ -2140,6 +2247,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             // テキスト/メニューウィンドウの場合も setState を呼んで確実に UI を更新
             setState(() {});
           }
+          WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
         } else if (type == 'destroyWindow') {
           _addLog("destroyWindow: winId=${message['winId']}");
           _screen.destroyWindow(message['winId']);
@@ -2250,6 +2358,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               _isAnyKeyVisible = false;
             });
           }
+          WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
         } else if (type == 'getline') {
           final prompt = message['prompt'] as String;
           final initText = message['initText'] as String;
@@ -2257,7 +2366,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           final isExtCmdPrompt = lowerPrompt.contains("extended command")
               || prompt.contains("拡張コマンド")
               || initText.trimLeft().startsWith('#');
-          _getlineController.text = initText;
+          _getlineController.value = TextEditingValue(
+            text: initText,
+            selection: TextSelection.collapsed(offset: initText.length),
+          );
           if (isExtCmdPrompt) {
             _loadExtCmds();
           } else {
@@ -2267,6 +2379,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             _getlinePrompt = prompt;
             _isGetLineVisible = true;
           });
+          WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
         } else if (type == 'askname') {
           final savesStr = message['saves'] as String;
           final saves = savesStr.isNotEmpty ? savesStr.split(';') : <String>[];
@@ -2279,6 +2392,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             _selectedPlayMode = PlayMode.normal;
             _askNameController.text = defaultName;
           });
+          WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
         } else if (type == 'config_error_alert') {
           final alertMsg = message['message'] as String? ?? '設定ファイルで警告が検出されました。';
           _showConfigErrorAlertDialog(alertMsg);
@@ -3167,6 +3281,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Widget _buildAnyKeyOverlay() {
     return AnyKeyOverlay(
+      key: _anyKeyOverlayKey,
       question: _ynQuestion,
       defaultChoice: _ynDefault,
       descriptionText: _anyKeyDescription,
@@ -3185,6 +3300,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           )
         : const <String>[];
     return GetLineOverlay(
+      key: _getLineOverlayKey,
       prompt: _getlinePrompt,
       inputController: _getlineController,
       extCmdList: _extCmdList,
@@ -3198,6 +3314,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Widget _buildAskNameOverlay() {
     return AskNameOverlay(
+      key: _askNameOverlayKey,
       nameController: _askNameController,
       maxChars: _askNameMaxChars,
       saves: _askNameSaves,

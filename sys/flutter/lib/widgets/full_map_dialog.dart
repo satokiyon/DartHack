@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
 import '../nethack_screen.dart';
 import '../nethack_map_painter.dart';
@@ -224,6 +225,22 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
       );
     }
 
-    return dialogContent;
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent) {
+          final key = event.logicalKey;
+          if (key == LogicalKeyboardKey.escape ||
+              key == LogicalKeyboardKey.space ||
+              key == LogicalKeyboardKey.enter ||
+              key == LogicalKeyboardKey.numpadEnter) {
+            Navigator.of(context).pop();
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
+      child: dialogContent,
+    );
   }
 }

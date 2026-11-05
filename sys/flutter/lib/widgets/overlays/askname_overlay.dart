@@ -25,10 +25,10 @@ class AskNameOverlay extends StatefulWidget {
   });
 
   @override
-  State<AskNameOverlay> createState() => _AskNameOverlayState();
+  State<AskNameOverlay> createState() => AskNameOverlayState();
 }
 
-class _AskNameOverlayState extends State<AskNameOverlay> {
+class AskNameOverlayState extends State<AskNameOverlay> {
   late PlayMode _selectedPlayMode;
   String _previousCustomName = "";
   final ScrollController _saveScrollController = ScrollController();
@@ -43,6 +43,58 @@ class _AskNameOverlayState extends State<AskNameOverlay> {
   void dispose() {
     _saveScrollController.dispose();
     super.dispose();
+  }
+
+  /// 物理キーボードからの文字追記（フォーカスレス入力用）
+  void appendText(String text) {
+    if (_selectedPlayMode == PlayMode.wizard) return;
+    final maxAskNameBytes = widget.maxChars > 0 ? widget.maxChars - 1 : 31;
+    final candidate = widget.nameController.text + text;
+    if (utf8.encode(candidate).length <= maxAskNameBytes) {
+      setState(() {
+        widget.nameController.text = candidate;
+        widget.nameController.selection = TextSelection.collapsed(offset: candidate.length);
+      });
+    }
+  }
+
+  /// 物理キーボードからの末尾1文字削除（BackSpace用）
+  void deleteChar() {
+    if (_selectedPlayMode == PlayMode.wizard) return;
+    final current = widget.nameController.text;
+    if (current.isEmpty) return;
+    final chars = current.characters;
+    final nextText = chars.skipLast(1).toString();
+    setState(() {
+      widget.nameController.text = nextText;
+      widget.nameController.selection = TextSelection.collapsed(offset: nextText.length);
+    });
+  }
+
+  /// 物理キーボードからの入力クリア（Delete用）
+  void clearText() {
+    if (_selectedPlayMode == PlayMode.wizard) return;
+    setState(() {
+      widget.nameController.clear();
+    });
+  }
+
+  /// 物理キーボードからのセーブデータ選択移動（上下矢印用）
+  void moveSaveSelection(int delta) {
+    if (delta > 0) {
+      _handleArrowKey(LogicalKeyboardKey.arrowDown);
+    } else if (delta < 0) {
+      _handleArrowKey(LogicalKeyboardKey.arrowUp);
+    }
+  }
+
+  /// 物理キーボードからの決定（Enter用）
+  void submit() {
+    final askNameBytes = utf8.encode(widget.nameController.text).length;
+    final maxAskNameBytes = widget.maxChars > 0 ? widget.maxChars - 1 : 31;
+    if (askNameBytes <= maxAskNameBytes) {
+      widget.onSubmit(_selectedPlayMode, widget.nameController.text);
+    }
   }
 
   void _selectSaveByIndex(int index) {
@@ -164,6 +216,7 @@ class _AskNameOverlayState extends State<AskNameOverlay> {
                       Divider(color: Colors.white.withValues(alpha: 0.16), height: 1),
                       const SizedBox(height: 12),
                       Focus(
+                        autofocus: true,
                         onKeyEvent: (node, event) {
                           if (event is KeyDownEvent) {
                             if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
@@ -176,7 +229,7 @@ class _AskNameOverlayState extends State<AskNameOverlay> {
                         },
                         child: TextField(
                           controller: widget.nameController,
-                          autofocus: true,
+                          autofocus: false,
                           enabled: _selectedPlayMode != PlayMode.wizard,
                           inputFormatters: [Utf8LengthLimitingTextInputFormatter(maxAskNameBytes)],
                           decoration: InputDecoration(

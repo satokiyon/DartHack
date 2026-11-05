@@ -2,7 +2,7 @@
 import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../utils/app_prefs.dart';
 
@@ -605,6 +605,76 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOutCubic,
     );
+  }
+
+  void _scrollByBlocks(int delta) {
+    if (_blocks.isEmpty || !_itemScrollController.isAttached) return;
+    final positions = _itemPositionsListener.itemPositions.value;
+    if (positions.isEmpty) return;
+
+    ItemPosition? topItem;
+    for (final pos in positions) {
+      if (pos.itemTrailingEdge > 0) {
+        if (topItem == null || pos.index < topItem.index) {
+          topItem = pos;
+        }
+      }
+    }
+    topItem ??= positions.reduce((a, b) => a.index < b.index ? a : b);
+
+    final targetIndex = (topItem.index + delta).clamp(0, _blocks.length - 1);
+    _itemScrollController.scrollTo(
+      index: targetIndex,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+    );
+  }
+
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+    final key = event.logicalKey;
+    if (key == LogicalKeyboardKey.escape) {
+      Navigator.pop(context);
+      return KeyEventResult.handled;
+    }
+
+    final isTextFieldFocused =
+        FocusManager.instance.primaryFocus?.context?.widget is EditableText;
+    if (isTextFieldFocused) {
+      if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
+        _searchNext();
+        return KeyEventResult.handled;
+      }
+      return KeyEventResult.ignored;
+    }
+
+    if (key == LogicalKeyboardKey.arrowDown) {
+      _scrollByBlocks(1);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowUp) {
+      _scrollByBlocks(-1);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.pageDown) {
+      _scrollByBlocks(6);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.pageUp) {
+      _scrollByBlocks(-6);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.space) {
+      if (HardwareKeyboard.instance.isShiftPressed) {
+        _scrollByBlocks(-6);
+      } else {
+        _scrollByBlocks(6);
+      }
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
   }
 
   void _jumpToBlock(int blockIndex) {
@@ -1511,8 +1581,11 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     final initialAlign =
         canRestoreScroll ? GuidebookDialog._savedScrollAlignment : 0.0;
 
-    return Stack(
-      children: [
+    return Focus(
+      autofocus: true,
+      onKeyEvent: _handleKeyEvent,
+      child: Stack(
+        children: [
         // 背景暗幕（バリア）：透過中は透明になり、タップ透過維持中は画面のどこをタップしても復帰する
         Positioned.fill(
           child: GestureDetector(
@@ -1652,6 +1725,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                           Expanded(
                             child: TextField(
                               controller: _searchController,
+                              autofocus: false,
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 13),
                               decoration: InputDecoration(
@@ -1790,6 +1864,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
             ),
           ),
       ],
+    ),
     );
   }
 }

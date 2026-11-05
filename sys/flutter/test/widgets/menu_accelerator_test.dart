@@ -325,5 +325,180 @@ void main() {
       expect(submittedCounts!.containsKey(65), isFalse);
       expect(submittedCounts!.containsKey(85), isFalse);
     });
+
+    testWidgets('MenuOverlay handleSpace closes at bottom when nothing selected and submits in PICK_ANY when selected', (tester) async {
+      final items = [
+        MenuItemData(
+          ident: 101,
+          accelerator: 97, // 'a'
+          groupacc: 0,
+          attr: 0,
+          text: '金の指輪',
+          preselected: 0,
+          color: 0,
+          tile: -1,
+        ),
+        MenuItemData(
+          ident: 102,
+          accelerator: 98, // 'b'
+          groupacc: 0,
+          attr: 0,
+          text: '銀の杖',
+          preselected: 0,
+          color: 0,
+          tile: -1,
+        ),
+      ];
+
+      int? singleSelectResult;
+      Map<int, int>? multiSelectResult;
+      final menuKey = GlobalKey<MenuOverlayState>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('ja', ''), Locale('en', '')],
+          home: Scaffold(
+            body: Stack(
+              children: [
+                MenuOverlay(
+                  key: menuKey,
+                  menuPrompt: '何を落としますか?',
+                  menuItems: items,
+                  menuHow: 2 /* PICK_ANY */,
+                  initialSelectedCounts: const {},
+                  initialSearchQuery: '',
+                  bottomInset: 0.0,
+                  useTiles: false,
+                  tileImage: null,
+                  tileWidth: 32,
+                  tileHeight: 32,
+                  onSingleSelect: (val) => singleSelectResult = val,
+                  onMultiSelect: (counts) => multiSelectResult = counts,
+                  onItemLongPress: (_) {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // 1. 何も選択されていない状態で最下部にて Space を押すとキャンセル (-1) となる
+      menuKey.currentState?.handleSpace();
+      await tester.pumpAndSettle();
+      expect(singleSelectResult, equals(-1));
+      expect(multiSelectResult, isNull);
+
+      // 2. 項目にチェックが入っている状態で最下部にて Space を押すと確定 (submit) となる
+      singleSelectResult = null;
+      menuKey.currentState?.toggleSelectionById(101);
+      await tester.pumpAndSettle();
+      menuKey.currentState?.handleSpace();
+      await tester.pumpAndSettle();
+      expect(singleSelectResult, isNull);
+      expect(multiSelectResult, isNotNull);
+      expect(multiSelectResult![101], equals(1));
+    });
+
+    testWidgets('MenuOverlay extended command menu has autofocus: false and supports focusless filter & arrow navigation', (tester) async {
+      final items = [
+        MenuItemData(
+          ident: 10,
+          accelerator: 97,
+          groupacc: 0,
+          attr: 0,
+          text: 'adjust\t所持品のスロット文字を調整する',
+          preselected: 0,
+          color: 0,
+          tile: -1,
+        ),
+        MenuItemData(
+          ident: 11,
+          accelerator: 98,
+          groupacc: 0,
+          attr: 0,
+          text: 'annotate\t現在の階層に注釈を付ける',
+          preselected: 0,
+          color: 0,
+          tile: -1,
+        ),
+        MenuItemData(
+          ident: 12,
+          accelerator: 99,
+          groupacc: 0,
+          attr: 0,
+          text: 'chat\t隣接する相手と話す',
+          preselected: 0,
+          color: 0,
+          tile: -1,
+        ),
+      ];
+
+      int? selectedIdent;
+      final menuKey = GlobalKey<MenuOverlayState>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('ja', ''), Locale('en', '')],
+          home: Scaffold(
+            body: Stack(
+              children: [
+                MenuOverlay(
+                  key: menuKey,
+                  menuPrompt: '拡張コマンドを選択してください',
+                  menuItems: items,
+                  menuHow: 1 /* PICK_ONE */,
+                  initialSelectedCounts: const {},
+                  initialSearchQuery: '',
+                  bottomInset: 0.0,
+                  useTiles: false,
+                  tileImage: null,
+                  tileWidth: 32,
+                  tileHeight: 32,
+                  onSingleSelect: (val) => selectedIdent = val,
+                  onMultiSelect: (_) {},
+                  onItemLongPress: (_) {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // 検索 TextField の autofocus が false であること（IME自動起動の防止）
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(textField.autofocus, isFalse);
+
+      // 初期状態では未選択（ハイライトなし）であること
+      expect(find.byWidgetPredicate((w) => w is Material && w.color == const Color(0xFF2C2C2C)), findsNWidgets(3));
+
+      // フォーカスレスで 'a' を入力 -> adjust, annotate に絞り込まれ、未選択状態が維持されること
+      menuKey.currentState?.appendFilterText('a');
+      await tester.pumpAndSettle();
+      expect(find.byWidgetPredicate((w) => w is Material && w.color == Colors.teal.withValues(alpha: 0.25)), findsNothing);
+
+      // 下矢印で先頭 (adjust, ident: 10) が選択され、さらにもう一度下矢印で 2番目 (annotate, ident: 11) に移動して Enter 決定
+      menuKey.currentState?.moveExtCmdCandidate(1);
+      await tester.pumpAndSettle();
+      menuKey.currentState?.moveExtCmdCandidate(1);
+      await tester.pumpAndSettle();
+      menuKey.currentState?.submitExtCmdSelection();
+      await tester.pumpAndSettle();
+
+      expect(selectedIdent, equals(11));
+    });
   });
 }

@@ -783,7 +783,7 @@ NH_EXPORT void SendGetLineResultToC(const char* result) {
         strncpy(g_getline_result, result, sizeof(g_getline_result) - 1);
         g_getline_result[sizeof(g_getline_result) - 1] = '\0';
     } else {
-        g_getline_result[0] = '\0';
+        strcpy(g_getline_result, "\033");
     }
     g_getline_done = 1;
     debuglog("C core received GetLine result: %s", g_getline_result);

@@ -10,8 +10,11 @@ bool isExtCmdMenuPrompt(String prompt) {
 
 /// 現在のゲームおよびUIの入力状況
 enum KeyInputContext {
-  /// テキスト入力中（GetLine, AskName, 拡張コマンドメニューの検索窓など）
+  /// テキスト入力中（GetLine, AskName などのオーバーレイ）
   textInputOverlay,
+
+  /// 1文字コマンド説明検索（AnyKeyOverlay: `?` コマンド説明）
+  anyKeyOverlay,
 
   /// [y/n] などの二者択一・多肢確認ダイアログ
   yn,
@@ -145,6 +148,21 @@ class MenuPage extends KeyAction {
 
   @override
   int get hashCode => direction.hashCode;
+}
+
+/// メニュー画面での Space キー（スクロール余地ありなら1ページ下スクロール、最下部なら閉じる／決定）
+class MenuSpaceAction extends KeyAction {
+  const MenuSpaceAction();
+
+  @override
+  String toString() => 'MenuSpaceAction()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is MenuSpaceAction;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
 }
 
 /// 複数選択メニューの確定（Enter）
@@ -323,6 +341,123 @@ class YnSubmit extends KeyAction {
   int get hashCode => runtimeType.hashCode;
 }
 
+/// テキスト入力オーバーレイ（GetLine, AskName, 拡張コマンド検索等）のフォーカスレス文字追記アクション
+class TextOverlayAppendChar extends KeyAction {
+  final String char;
+  const TextOverlayAppendChar(this.char);
+
+  @override
+  String toString() => 'TextOverlayAppendChar("$char")';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TextOverlayAppendChar &&
+          runtimeType == other.runtimeType &&
+          char == other.char;
+
+  @override
+  int get hashCode => char.hashCode;
+}
+
+/// テキスト入力オーバーレイの1文字削除アクション (Backspace)
+class TextOverlayBackspace extends KeyAction {
+  const TextOverlayBackspace();
+
+  @override
+  String toString() => 'TextOverlayBackspace()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is TextOverlayBackspace;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// テキスト入力オーバーレイの全消去アクション (Delete)
+class TextOverlayClear extends KeyAction {
+  const TextOverlayClear();
+
+  @override
+  String toString() => 'TextOverlayClear()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is TextOverlayClear;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// テキスト入力オーバーレイの確定アクション (Enter)
+class TextOverlaySubmit extends KeyAction {
+  const TextOverlaySubmit();
+
+  @override
+  String toString() => 'TextOverlaySubmit()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is TextOverlaySubmit;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// テキスト入力オーバーレイ・拡張コマンドメニューの候補/履歴選択移動 (↑: -1, ↓: 1)
+class TextOverlayMoveCandidate extends KeyAction {
+  final int delta;
+  const TextOverlayMoveCandidate(this.delta);
+
+  @override
+  String toString() => 'TextOverlayMoveCandidate($delta)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TextOverlayMoveCandidate &&
+          runtimeType == other.runtimeType &&
+          delta == other.delta;
+
+  @override
+  int get hashCode => delta.hashCode;
+}
+
+/// テキスト入力オーバーレイ・拡張コマンドメニューのページ送り (PageUp: -1, PageDown: 1)
+class TextOverlayPage extends KeyAction {
+  final int direction;
+  const TextOverlayPage(this.direction);
+
+  @override
+  String toString() => 'TextOverlayPage($direction)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TextOverlayPage &&
+          runtimeType == other.runtimeType &&
+          direction == other.direction;
+
+  @override
+  int get hashCode => direction.hashCode;
+}
+
+/// テキスト入力オーバーレイ・拡張コマンドメニューの候補補完アクション (Tab)
+class TextOverlayAutocomplete extends KeyAction {
+  const TextOverlayAutocomplete();
+
+  @override
+  String toString() => 'TextOverlayAutocomplete()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is TextOverlayAutocomplete;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
 /// 物理キーボード入力を解析し、適切なアクションに振り分けるルーター
 class HardwareKeyRouter {
   /// 全角英数を半角英数に変換（日本語IMEがONになっているPC対策）
@@ -349,6 +484,7 @@ class HardwareKeyRouter {
     bool isShiftPressed = false,
     bool isControlPressed = false,
     bool isAltPressed = false,
+    bool isTextFieldFocused = false,
   }) {
     // KeyDownEvent または KeyRepeatEvent のみを処理（KeyUp は無視）
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
@@ -359,17 +495,43 @@ class HardwareKeyRouter {
       return const IgnoreKey();
     }
 
-    // 1. テキスト入力中（GetLine, AskName 等のオーバーレイ表示中）
-    if (context == KeyInputContext.textInputOverlay) {
+    // 1a. 1文字コマンド説明検索（AnyKeyOverlay: `?` コマンド説明）
+    if (context == KeyInputContext.anyKeyOverlay) {
       if (event.logicalKey == LogicalKeyboardKey.escape) {
         return const SendKey(27, 'ESC');
       }
-      // それ以外のキーはすべて TextField / IME に委ねる
-      return const IgnoreKey();
+      if (isTextFieldFocused) {
+        return const IgnoreKey();
+      }
+      if (event is! KeyDownEvent) {
+        return const SwallowKey();
+      }
+      return _routeGame(
+        event: event,
+        numberPadMode: 0,
+        isShiftPressed: isShiftPressed,
+        isControlPressed: isControlPressed,
+        isAltPressed: isAltPressed,
+      );
+    }
+
+    // 1b. テキスト入力中（GetLine, AskName 等）および拡張コマンドメニュー表示中
+    if (context == KeyInputContext.textInputOverlay ||
+        context == KeyInputContext.extCmdMenu) {
+      return _routeTextInputOrExtCmd(
+        event: event,
+        isTextFieldFocused: isTextFieldFocused,
+        isShiftPressed: isShiftPressed,
+        isControlPressed: isControlPressed,
+        isAltPressed: isAltPressed,
+      );
     }
 
     // 2. YN プロンプト表示中
     if (context == KeyInputContext.yn) {
+      if (isTextFieldFocused && event.logicalKey != LogicalKeyboardKey.escape) {
+        return const IgnoreKey();
+      }
       return _routeYn(
         event,
         ynChoices,
@@ -412,16 +574,6 @@ class HardwareKeyRouter {
       return const SwallowKey();
     }
 
-    // 4. 拡張コマンドメニュー表示中
-    if (context == KeyInputContext.extCmdMenu) {
-      if (event.logicalKey == LogicalKeyboardKey.escape) {
-        return const SendKey(27, 'ESC');
-      }
-      // 拡張コマンドメニューでは、1文字でのアクセラレータ即決を行わず、
-      // 検索フィルター TextField へ文字を入力させるため Ignore を返す
-      return const IgnoreKey();
-    }
-
     // 5. 通常メニュー表示中（インベントリ、ドロップなど）
     if (context == KeyInputContext.menu) {
       return _routeMenu(event, isShiftPressed: isShiftPressed);
@@ -439,6 +591,79 @@ class HardwareKeyRouter {
     }
 
     return const IgnoreKey();
+  }
+
+  /// テキスト入力オーバーレイ（GetLine, AskName 等）および拡張コマンドメニューのキー判定
+  static KeyAction _routeTextInputOrExtCmd({
+    required KeyEvent event,
+    required bool isTextFieldFocused,
+    required bool isShiftPressed,
+    required bool isControlPressed,
+    required bool isAltPressed,
+  }) {
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      return const SendKey(27, 'ESC');
+    }
+
+    // 上下矢印キー・PageUp/PageDown・Tab キーは候補・履歴選択や補完として処理
+    if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      return const TextOverlayMoveCandidate(-1);
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      return const TextOverlayMoveCandidate(1);
+    }
+    if (event.logicalKey == LogicalKeyboardKey.pageUp) {
+      return const TextOverlayPage(-1);
+    }
+    if (event.logicalKey == LogicalKeyboardKey.pageDown) {
+      return const TextOverlayPage(1);
+    }
+    if (event.logicalKey == LogicalKeyboardKey.tab && !isAltPressed) {
+      return (event is KeyDownEvent)
+          ? const TextOverlayAutocomplete()
+          : const SwallowKey();
+    }
+
+    // ユーザーが画面上の TextField を明示的にタップしてフォーカスしている場合は、
+    // 通常の文字入力・変換・Backspace・Enter はすべて TextField / OS IME に委ねる
+    if (isTextFieldFocused) {
+      return const IgnoreKey();
+    }
+
+    // --- 以下は TextField 未フォーカス時（フォーカスレス物理キーボード入力） ---
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+      return (event is KeyDownEvent)
+          ? const TextOverlaySubmit()
+          : const SwallowKey();
+    }
+    if (event.logicalKey == LogicalKeyboardKey.backspace) {
+      return const TextOverlayBackspace();
+    }
+    if (event.logicalKey == LogicalKeyboardKey.delete) {
+      return const TextOverlayClear();
+    }
+
+    // Alt / Ctrl 同時押し時は文字追記を行わず IgnoreKey とする
+    if (isAltPressed || isControlPressed) {
+      return const IgnoreKey();
+    }
+
+    String? char = event.character;
+    if (char != null && char.isNotEmpty) {
+      char = normalizeCharacter(char);
+    } else {
+      char = _charFromLogicalKey(event.logicalKey, isShiftPressed);
+    }
+
+    if (char != null && char.isNotEmpty) {
+      final code = char.codeUnitAt(0);
+      if (code >= 32 && code <= 126) {
+        return TextOverlayAppendChar(char);
+      }
+    }
+
+    return const SwallowKey();
   }
 
   /// YN プロンプトのキー判定
@@ -486,6 +711,11 @@ class HardwareKeyRouter {
       return const SwallowKey();
     }
 
+    // 1文字即決の YN プロンプトでは長押しリピート (KeyRepeatEvent) による連続応答誤爆を防止
+    if (event is! KeyDownEvent) {
+      return const SwallowKey();
+    }
+
     // Enter または Space: 既定値があればそれを送信、なければ誤爆防止のため何もしない (Swallow)
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter ||
@@ -516,7 +746,8 @@ class HardwareKeyRouter {
       case YnPromptType.slotSelect:
         final code = char.codeUnitAt(0);
         final isLetter = (code >= 65 && code <= 90) || (code >= 97 && code <= 122);
-        if (isLetter || char == '?' || char == '*' || char == '\$' || char == '#') {
+        final isDigit = code >= 48 && code <= 57;
+        if (isLetter || isDigit || char == '?' || char == '*' || char == '\$' || char == '#' || char == '-') {
           return SendYn(code);
         }
         return const SwallowKey();
@@ -548,6 +779,7 @@ class HardwareKeyRouter {
   }
 
   static String? _charFromLogicalKey(LogicalKeyboardKey key, bool isShiftPressed) {
+    if (key == LogicalKeyboardKey.space) return ' ';
     if (key == LogicalKeyboardKey.keyA) return isShiftPressed ? 'A' : 'a';
     if (key == LogicalKeyboardKey.keyB) return isShiftPressed ? 'B' : 'b';
     if (key == LogicalKeyboardKey.keyC) return isShiftPressed ? 'C' : 'c';
@@ -587,12 +819,43 @@ class HardwareKeyRouter {
     if (key == LogicalKeyboardKey.digit8 || key == LogicalKeyboardKey.numpad8) return isShiftPressed ? '(' : '8';
     if (key == LogicalKeyboardKey.digit9 || key == LogicalKeyboardKey.numpad9) return isShiftPressed ? ')' : '9';
 
-    // 記号キー
+    // 記号キー（JIS/US配列および直接LogicalKeyboardKeyが飛んでくる環境の両対応）
     if (key == LogicalKeyboardKey.slash) return isShiftPressed ? '?' : '/';
     if (key == LogicalKeyboardKey.question) return '?';
     if (key == LogicalKeyboardKey.asterisk) return '*';
     if (key == LogicalKeyboardKey.numpadMultiply) return '*';
     if (key == LogicalKeyboardKey.numpadDivide) return '/';
+    if (key == LogicalKeyboardKey.minus) return isShiftPressed ? '_' : '-';
+    if (key == LogicalKeyboardKey.numpadSubtract) return '-';
+    if (key == LogicalKeyboardKey.underscore) return '_';
+    if (key == LogicalKeyboardKey.equal) return isShiftPressed ? '+' : '=';
+    if (key == LogicalKeyboardKey.numpadAdd) return '+';
+    if (key == LogicalKeyboardKey.add) return '+';
+    if (key == LogicalKeyboardKey.comma) return isShiftPressed ? '<' : ',';
+    if (key == LogicalKeyboardKey.less) return '<';
+    if (key == LogicalKeyboardKey.period || key == LogicalKeyboardKey.numpadDecimal) return isShiftPressed ? '>' : '.';
+    if (key == LogicalKeyboardKey.greater) return '>';
+    if (key == LogicalKeyboardKey.semicolon) return isShiftPressed ? ':' : ';';
+    if (key == LogicalKeyboardKey.colon) return ':';
+    if (key == LogicalKeyboardKey.quote) return isShiftPressed ? '"' : '\'';
+    if (key == LogicalKeyboardKey.quoteSingle) return '\'';
+    if (key == LogicalKeyboardKey.bracketLeft) return isShiftPressed ? '{' : '[';
+    if (key == LogicalKeyboardKey.braceLeft) return '{';
+    if (key == LogicalKeyboardKey.bracketRight) return isShiftPressed ? '}' : ']';
+    if (key == LogicalKeyboardKey.braceRight) return '}';
+    if (key == LogicalKeyboardKey.backslash) return isShiftPressed ? '|' : '\\';
+    if (key == LogicalKeyboardKey.bar) return '|';
+    if (key == LogicalKeyboardKey.backquote) return isShiftPressed ? '~' : '`';
+    if (key == LogicalKeyboardKey.tilde) return '~';
+    if (key == LogicalKeyboardKey.caret) return '^';
+    if (key == LogicalKeyboardKey.at) return '@';
+    if (key == LogicalKeyboardKey.exclamation) return '!';
+    if (key == LogicalKeyboardKey.numberSign) return '#';
+    if (key == LogicalKeyboardKey.dollar) return '\$';
+    if (key == LogicalKeyboardKey.percent) return '%';
+    if (key == LogicalKeyboardKey.ampersand) return '&';
+    if (key == LogicalKeyboardKey.parenthesisLeft) return '(';
+    if (key == LogicalKeyboardKey.parenthesisRight) return ')';
     return null;
   }
 
@@ -600,7 +863,7 @@ class HardwareKeyRouter {
   static KeyAction _routeMenu(KeyEvent event, {required bool isShiftPressed}) {
     // スクロール操作（Space, 矢印上下, PageUp/Down）は長押し連続スクロール（KeyRepeatEvent）を許可
     if (event.logicalKey == LogicalKeyboardKey.space) {
-      return const MenuScroll(1);
+      return isShiftPressed ? const MenuPage(-1) : const MenuSpaceAction();
     }
     if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
       return const MenuScroll(1);

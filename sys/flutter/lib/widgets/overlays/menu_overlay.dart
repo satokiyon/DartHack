@@ -53,6 +53,7 @@ class MenuOverlayState extends State<MenuOverlay> {
   late Map<int, int> _selectedCounts;
   late ScrollController _scrollController;
   late ScrollController _horizontalScrollController;
+  int? _selectedExtCmdIndex;
 
   @override
   void initState() {
@@ -62,6 +63,7 @@ class MenuOverlayState extends State<MenuOverlay> {
     _selectedCounts = Map<int, int>.from(widget.initialSelectedCounts);
     _scrollController = ScrollController();
     _horizontalScrollController = ScrollController();
+    _selectedExtCmdIndex = null;
   }
 
   @override
@@ -69,6 +71,9 @@ class MenuOverlayState extends State<MenuOverlay> {
     super.didUpdateWidget(oldWidget);
     if (widget.initialSelectedCounts != oldWidget.initialSelectedCounts) {
       _selectedCounts = Map<int, int>.from(widget.initialSelectedCounts);
+    }
+    if (widget.menuItems != oldWidget.menuItems) {
+      _selectedExtCmdIndex = null;
     }
   }
 
@@ -105,6 +110,27 @@ class MenuOverlayState extends State<MenuOverlay> {
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeOut,
     );
+  }
+
+  /// Space キーによる操作（スクロール余地ありなら1ページ下送り、最下部なら選択決定または閉鎖）
+  void handleSpace() {
+    if (_scrollController.hasClients &&
+        _scrollController.offset < _scrollController.position.maxScrollExtent - 5.0) {
+      pageScroll(1);
+      return;
+    }
+
+    final isExtCmdMenu = isExtCmdMenuPrompt(widget.menuPrompt);
+    final isMultiSelectMenu = !isExtCmdMenu && widget.menuHow > 1;
+    final hasValidSelection = _selectedCounts.keys.any(
+      (ident) => ident != 0 && ident != 4294967294,
+    );
+
+    if (isMultiSelectMenu && hasValidSelection) {
+      submit();
+    } else {
+      widget.onSingleSelect(-1);
+    }
   }
 
   /// 外部（キー入力等）からの選択トグル
@@ -248,6 +274,163 @@ class MenuOverlayState extends State<MenuOverlay> {
     widget.onMultiSelect(cleanCounts);
   }
 
+  List<MenuItemData> _getFilteredItems() {
+    final isExtCmdMenu = isExtCmdMenuPrompt(widget.menuPrompt);
+    final extCmdQuery = _filterQuery.trim().toLowerCase();
+    return widget.menuItems.where((item) {
+      final text = item.text.trim();
+      if (isExtCmdMenu) {
+        if (text == "#" || text == "?") {
+          return false;
+        }
+        if (extCmdQuery.isEmpty) {
+          return true;
+        }
+        final tabIndex = text.indexOf('\t');
+        final commandText = (tabIndex >= 0 ? text.substring(0, tabIndex) : text).trim().toLowerCase();
+        final descriptionText = (tabIndex >= 0 ? text.substring(tabIndex + 1) : "").trim().toLowerCase();
+        return commandText.contains(extCmdQuery) || descriptionText.contains(extCmdQuery);
+      }
+      return true;
+    }).toList();
+  }
+
+  List<MenuItemData> _getSelectableExtCmdItems(List<MenuItemData> filteredItems) {
+    return filteredItems
+        .where((i) => i.ident > 0 && i.ident != 4294967294 && !_isMenuCategoryItem(i))
+        .toList();
+  }
+
+  /// 拡張コマンド検索欄へのフォーカスレス文字追記
+  void appendFilterText(String text) {
+    final current = _filterController.text;
+    final selection = _filterController.selection;
+    String newText;
+    int newOffset;
+    if (selection.isValid && selection.start >= 0 && selection.end >= selection.start) {
+      newText = current.replaceRange(selection.start, selection.end, text);
+      newOffset = selection.start + text.length;
+    } else {
+      newText = current + text;
+      newOffset = newText.length;
+    }
+    setState(() {
+      _filterQuery = newText;
+      _selectedExtCmdIndex = null;
+      _filterController.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: newOffset),
+      );
+    });
+  }
+
+  /// 拡張コマンド検索欄の1文字削除 (Backspace)
+  void deleteFilterChar() {
+    final current = _filterController.text;
+    if (current.isEmpty) return;
+    final selection = _filterController.selection;
+    String newText;
+    int newOffset;
+    if (selection.isValid && selection.start >= 0 && selection.end > selection.start) {
+      newText = current.replaceRange(selection.start, selection.end, '');
+      newOffset = selection.start;
+    } else {
+      final offset = (selection.isValid && selection.start > 0) ? selection.start : current.length;
+      if (offset <= 0) return;
+      newText = current.substring(0, offset - 1) + current.substring(offset);
+      newOffset = offset - 1;
+    }
+    setState(() {
+      _filterQuery = newText;
+      _selectedExtCmdIndex = null;
+      _filterController.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: newOffset),
+      );
+    });
+  }
+
+  /// 拡張コマンド検索欄の全消去 (Delete)
+  void clearFilterText() {
+    setState(() {
+      _filterQuery = '';
+      _selectedExtCmdIndex = null;
+      _filterController.clear();
+    });
+  }
+
+  /// 拡張コマンド候補の上下移動
+  void moveExtCmdCandidate(int delta) {
+    final selectable = _getSelectableExtCmdItems(_getFilteredItems());
+    if (selectable.isEmpty) return;
+    setState(() {
+      if (_selectedExtCmdIndex == null) {
+        // 未選択時: 下キー (delta > 0) なら先頭、上キー (delta < 0) なら末尾を選択
+        _selectedExtCmdIndex = delta > 0 ? 0 : selectable.length - 1;
+      } else {
+        _selectedExtCmdIndex = (_selectedExtCmdIndex! + delta).clamp(0, selectable.length - 1);
+      }
+    });
+    if (_scrollController.hasClients && _selectedExtCmdIndex != null) {
+      const itemHeight = 56.0;
+      final targetOffset = _selectedExtCmdIndex! * itemHeight;
+      final currentOffset = _scrollController.offset;
+      final viewportHeight = _scrollController.position.viewportDimension;
+      final maxScroll = _scrollController.position.maxScrollExtent;
+      if (targetOffset < currentOffset) {
+        _scrollController.animateTo(
+          targetOffset.clamp(0.0, maxScroll),
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeOut,
+        );
+      } else if (targetOffset + itemHeight > currentOffset + viewportHeight) {
+        _scrollController.animateTo(
+          (targetOffset + itemHeight - viewportHeight).clamp(0.0, maxScroll),
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeOut,
+        );
+      }
+    }
+  }
+
+  /// Tab キーによる拡張コマンド候補名の補完
+  void autocompleteExtCmdCandidate() {
+    final selectable = _getSelectableExtCmdItems(_getFilteredItems());
+    if (selectable.isEmpty) return;
+    final idx = _selectedExtCmdIndex ?? (selectable.length == 1 ? 0 : null);
+    if (idx == null) return;
+    final targetIdx = idx.clamp(0, selectable.length - 1);
+    final text = selectable[targetIdx].text.trim();
+    final tabIdx = text.indexOf('\t');
+    var cmd = (tabIdx >= 0 ? text.substring(0, tabIdx) : text).trim();
+    if (cmd.startsWith('#')) {
+      cmd = cmd.substring(1).trim();
+    }
+    if (cmd.startsWith('(')) return; // "(すべて表示)" などは補完対象外
+    setState(() {
+      _filterQuery = cmd;
+      _selectedExtCmdIndex = null;
+      _filterController.value = TextEditingValue(
+        text: cmd,
+        selection: TextSelection.collapsed(offset: cmd.length),
+      );
+    });
+  }
+
+  /// Enter キーによる拡張コマンド決定
+  void submitExtCmdSelection() {
+    final filteredItems = _getFilteredItems();
+    final selectable = _getSelectableExtCmdItems(filteredItems);
+    if (_selectedExtCmdIndex != null &&
+        selectable.isNotEmpty &&
+        _selectedExtCmdIndex! >= 0 &&
+        _selectedExtCmdIndex! < selectable.length) {
+      widget.onSingleSelect(selectable[_selectedExtCmdIndex!].ident);
+      return;
+    }
+    _submitExtCmd(filteredItems);
+  }
+
   /// 拡張コマンド検索時の Enter 決定処理（優先度: 完全一致 > 前方一致 > 部分一致 > 説明文一致）
   void _submitExtCmd(List<MenuItemData> filteredItems) {
     final query = _filterQuery.trim().toLowerCase();
@@ -330,6 +513,7 @@ class MenuOverlayState extends State<MenuOverlay> {
       ),
     );
   }
+
   Widget _buildTabSeparatedRow(
     String text,
     TextStyle baseStyle, {
@@ -480,24 +664,16 @@ class MenuOverlayState extends State<MenuOverlay> {
     final isEnhanceMenu = widget.menuPrompt.contains("スキル") ||
         widget.menuPrompt.toLowerCase().contains("skill");
     final isMultiSelectMenu = !isExtCmdMenu && widget.menuHow > 1;
-    final extCmdQuery = _filterQuery.trim().toLowerCase();
 
-    final filteredItems = widget.menuItems.where((item) {
-      final text = item.text.trim();
-      if (isExtCmdMenu) {
-        if (text == "#" || text == "?") {
-          return false;
-        }
-        if (extCmdQuery.isEmpty) {
-          return true;
-        }
-        final tabIndex = text.indexOf('\t');
-        final commandText = (tabIndex >= 0 ? text.substring(0, tabIndex) : text).trim().toLowerCase();
-        final descriptionText = (tabIndex >= 0 ? text.substring(tabIndex + 1) : "").trim().toLowerCase();
-        return commandText.contains(extCmdQuery) || descriptionText.contains(extCmdQuery);
-      }
-      return true;
-    }).toList();
+    final filteredItems = _getFilteredItems();
+    final selectableExtCmds = isExtCmdMenu ? _getSelectableExtCmdItems(filteredItems) : const <MenuItemData>[];
+    final int? highlightedExtCmdIdent = (isExtCmdMenu &&
+            selectableExtCmds.isNotEmpty &&
+            _selectedExtCmdIndex != null &&
+            _selectedExtCmdIndex! >= 0 &&
+            _selectedExtCmdIndex! < selectableExtCmds.length)
+        ? selectableExtCmds[_selectedExtCmdIndex!].ident
+        : null;
 
     int minLeadingSpaces = 999;
     for (final item in filteredItems) {
@@ -580,9 +756,9 @@ class MenuOverlayState extends State<MenuOverlay> {
                 if (isExtCmdMenu) ...[
                   TextField(
                     controller: _filterController,
-                    autofocus: true,
+                    autofocus: false,
                     textInputAction: TextInputAction.go,
-                    onSubmitted: (_) => _submitExtCmd(filteredItems),
+                    onSubmitted: (_) => submitExtCmdSelection(),
                     decoration: InputDecoration(
                       hintText: l10n?.filterCmds ?? '拡張コマンドを検索...',
                       prefixIcon: const Icon(Icons.search, size: 18),
@@ -596,6 +772,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                     onChanged: (val) {
                       setState(() {
                         _filterQuery = val;
+                        _selectedExtCmdIndex = 0;
                       });
                     },
                   ),
@@ -753,15 +930,21 @@ class MenuOverlayState extends State<MenuOverlay> {
                             }
 
                             if (isExtCmdMenu) {
+                              final isHighlighted = highlightedExtCmdIdent != null && item.ident == highlightedExtCmdIdent;
                               return Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 4.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.white12, width: 1.0),
+                                    border: Border.all(
+                                      color: isHighlighted ? Colors.tealAccent : Colors.white12,
+                                      width: isHighlighted ? 1.5 : 1.0,
+                                    ),
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   child: Material(
-                                    color: const Color(0xFF2C2C2C),
+                                    color: isHighlighted
+                                        ? Colors.teal.withValues(alpha: 0.25)
+                                        : const Color(0xFF2C2C2C),
                                     borderRadius: BorderRadius.circular(8.0),
                                     clipBehavior: Clip.antiAlias,
                                     child: ListTile(
@@ -772,7 +955,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                                       title: Text(
                                         "$accLabel$commandText",
                                         style: TextStyle(
-                                          color: itemColor,
+                                          color: isHighlighted ? Colors.amber[200] : itemColor,
                                           fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
                 fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                           fontSize: 14,
@@ -887,8 +1070,12 @@ class MenuOverlayState extends State<MenuOverlay> {
                             }
 
                             final hasTab = commandText.contains('\t');
+                            final isPreselectedSingle = widget.menuHow == 1 && _selectedCounts.containsKey(item.ident);
+                            final effectiveColor = isPreselectedSingle ? (Colors.tealAccent[400] ?? itemColor) : itemColor;
                             return Material(
-                              color: Colors.transparent,
+                              color: isPreselectedSingle
+                                  ? Colors.teal.withValues(alpha: 0.18)
+                                  : Colors.transparent,
                               child: ListTile(
                                 dense: true,
                                 contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
@@ -902,7 +1089,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                                         ? _buildTabSeparatedRow(
                                             commandText,
                                             TextStyle(
-                                              color: itemColor,
+                                              color: effectiveColor,
                                               fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
                 fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                               fontSize: 14,
@@ -913,7 +1100,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                                         : Text(
                                             "$accLabel$commandText",
                                             style: TextStyle(
-                                              color: itemColor,
+                                              color: effectiveColor,
                                               fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
                 fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                               fontSize: 14,

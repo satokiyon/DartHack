@@ -23,10 +23,10 @@ class AnyKeyOverlay extends StatefulWidget {
   });
 
   @override
-  State<AnyKeyOverlay> createState() => _AnyKeyOverlayState();
+  State<AnyKeyOverlay> createState() => AnyKeyOverlayState();
 }
 
-class _AnyKeyOverlayState extends State<AnyKeyOverlay> {
+class AnyKeyOverlayState extends State<AnyKeyOverlay> {
   final TextEditingController _inputController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   int _lastSentCode = 0;
@@ -96,6 +96,11 @@ class _AnyKeyOverlayState extends State<AnyKeyOverlay> {
     _sendCode(char.codeUnitAt(0));
   }
 
+  /// 物理キーボードからのキーコード送信（修飾子トグルを適用して送信）
+  void handlePhysicalKeyCode(int rawCode) {
+    _sendCode(rawCode);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -160,12 +165,12 @@ class _AnyKeyOverlayState extends State<AnyKeyOverlay> {
                         ),
                         const SizedBox(height: 12),
 
-                        // 1文字テキスト入力フィールド (ソフトキーボード用)
+                        // 1文字テキスト入力フィールド (ソフトキーボード用: タップ時のみIME起動)
                         SizedBox(
                           width: 200,
                           child: TextField(
                             controller: _inputController,
-                            autofocus: true,
+                            autofocus: false,
                             textAlign: TextAlign.center,
                             maxLength: 1,
                             style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 20),

@@ -39,6 +39,26 @@ void main() {
       expect(parsed.quickChoices.contains('?'), isFalse);
       expect(parsed.allowsFreeInput, isTrue);
       expect(parsed.hasHelpOption, isTrue);
+
+      // Cコア標準の「(?で使用中の文字を表示)?」形式でも正しくパースされること
+      final parsedCore = YnChoiceParser.parse(
+        question: '何の文字に調整しますか [c-z] (?で使用中の文字を表示)? ',
+        choices: '',
+      );
+      expect(parsedCore.type, YnPromptType.slotSelect);
+      expect(parsedCore.quickChoices.first, 'c');
+      expect(parsedCore.quickChoices.last, 'z');
+      expect(parsedCore.hasHelpOption, isTrue);
+    });
+
+    test('日本語 getobj スロット選択プロンプト ([ab または ?*]) を slotSelect としてパースする', () {
+      final parsed = YnChoiceParser.parse(
+        question: 'どのアイテムを順番を入れ替えますか？ [ab または ?*] ',
+        choices: '',
+      );
+      expect(parsed.type, YnPromptType.slotSelect);
+      expect(parsed.quickChoices, ['a', 'b']);
+      expect(parsed.hasHelpOption, isTrue);
     });
 
     test('分割数量プロンプトを countInput としてパースする', () {

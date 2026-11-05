@@ -2597,77 +2597,129 @@ class _SettingsPageState extends State<SettingsPage> {
             final currentText = controller.text;
             final symbolsMap = _getItemTypeSymbols(l10n);
 
-            return AlertDialog(
-              scrollable: true,
-              insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              title: Text(l10n.pickupTypesDialogTitle),
-              content: SizedBox(
-                width: double.maxFinite,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextField(
-                        controller: controller,
-                        decoration: InputDecoration(
-                          labelText: l10n.directInputLabel,
-                          hintText: l10n.directInputHint,
-                          helperText: l10n.directInputHelper,
-                        ),
-                        onChanged: (val) {
-                          setStateDialog(() {});
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        l10n.toggleFromOptions,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                      ),
-                      const SizedBox(height: 8),
-                      ...symbolsMap.entries.map((entry) {
-                        final char = entry.key;
-                        final label = entry.value;
-                        final isSelected = currentText.contains(char);
+            void submitPickupTypes() {
+              final val = controller.text.trim();
+              setState(() {
+                _optPickupTypes = val;
+              });
+              _saveGameOption('nh_opt_pickup_types', val);
+              Navigator.pop(context);
+            }
 
-                        return CheckboxListTile(
-                          dense: true,
-                          title: Text(label),
-                          value: isSelected,
-                          onChanged: (checked) {
-                            var text = controller.text;
-                            if (checked == true) {
-                              if (!text.contains(char)) {
-                                text += char;
-                              }
-                            } else {
-                              text = text.replaceAll(char, '');
-                            }
-                            controller.text = text;
+            return Focus(
+              autofocus: true,
+              onKeyEvent: (node, event) {
+                if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+                  return KeyEventResult.ignored;
+                }
+                if (event.logicalKey == LogicalKeyboardKey.escape) {
+                  if (event is KeyDownEvent) {
+                    Navigator.pop(context);
+                  }
+                  return KeyEventResult.handled;
+                }
+                final isTextFieldFocused =
+                    FocusManager.instance.primaryFocus?.context?.widget is EditableText;
+                if (isTextFieldFocused) {
+                  return KeyEventResult.ignored;
+                }
+                if (event.logicalKey == LogicalKeyboardKey.enter ||
+                    event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+                  if (event is KeyDownEvent) {
+                    submitPickupTypes();
+                  }
+                  return KeyEventResult.handled;
+                }
+                if (event.logicalKey == LogicalKeyboardKey.backspace) {
+                  if (controller.text.isNotEmpty) {
+                    controller.text = controller.text.substring(0, controller.text.length - 1);
+                    setStateDialog(() {});
+                  }
+                  return KeyEventResult.handled;
+                }
+                if (event.logicalKey == LogicalKeyboardKey.delete) {
+                  controller.clear();
+                  setStateDialog(() {});
+                  return KeyEventResult.handled;
+                }
+                final ch = event.character;
+                if (ch != null && ch.isNotEmpty) {
+                  final code = ch.codeUnitAt(0);
+                  if (code >= 32 && code <= 126) {
+                    controller.text += ch;
+                    setStateDialog(() {});
+                    return KeyEventResult.handled;
+                  }
+                }
+                return KeyEventResult.ignored;
+              },
+              child: AlertDialog(
+                scrollable: true,
+                insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                title: Text(l10n.pickupTypesDialogTitle),
+                content: SizedBox(
+                  width: double.maxFinite,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: controller,
+                          autofocus: false,
+                          decoration: InputDecoration(
+                            labelText: l10n.directInputLabel,
+                            hintText: l10n.directInputHint,
+                            helperText: l10n.directInputHelper,
+                          ),
+                          onChanged: (val) {
                             setStateDialog(() {});
                           },
-                        );
-                      }),
-                    ],
+                          onSubmitted: (_) => submitPickupTypes(),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n.toggleFromOptions,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        const SizedBox(height: 8),
+                        ...symbolsMap.entries.map((entry) {
+                          final char = entry.key;
+                          final label = entry.value;
+                          final isSelected = currentText.contains(char);
+
+                          return CheckboxListTile(
+                            dense: true,
+                            title: Text(label),
+                            value: isSelected,
+                            onChanged: (checked) {
+                              var text = controller.text;
+                              if (checked == true) {
+                                if (!text.contains(char)) {
+                                  text += char;
+                                }
+                              } else {
+                                text = text.replaceAll(char, '');
+                              }
+                              controller.text = text;
+                              setStateDialog(() {});
+                            },
+                          );
+                        }),
+                      ],
+                    ),
                   ),
                 ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(l10n.cancel),
+                  ),
+                  ElevatedButton(
+                    onPressed: submitPickupTypes,
+                    child: Text(l10n.save),
+                  ),
+                ],
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(l10n.cancel),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    final val = controller.text.trim();
-                    setState(() {
-                      _optPickupTypes = val;
-                    });
-                    _saveGameOption('nh_opt_pickup_types', val);
-                    Navigator.pop(context);
-                  },
-                  child: Text(l10n.save),
-                ),
-              ],
             );
           },
         );
@@ -2688,66 +2740,120 @@ class _SettingsPageState extends State<SettingsPage> {
             final bytesCount = utf8.encode(controller.text).length;
             final isOverflow = bytesCount > maxBytes;
 
-            return AlertDialog(
-              scrollable: true,
-              insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              title: Text(title),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: controller,
-                    decoration: InputDecoration(
-                      hintText: l10n.hintEmptyDefault,
-                      counterText: l10n.bytesCount(bytesCount, maxBytes),
-                      counterStyle: TextStyle(
-                        color: isOverflow ? Colors.red : Colors.white70,
-                        fontWeight: isOverflow ? FontWeight.bold : FontWeight.normal,
-                      ),
-                    ),
-                    onChanged: (val) {
+            void submitStringOpt() {
+              if (utf8.encode(controller.text).length > maxBytes) return;
+              final val = controller.text.trim();
+              setState(() {
+                if (prefKey == 'nh_opt_name') _optName = val;
+                if (prefKey == 'nh_opt_dogname') _optDogname = val;
+                if (prefKey == 'nh_opt_catname') _optCatname = val;
+                if (prefKey == 'nh_opt_horsename') _optHorsename = val;
+                if (prefKey == 'nh_opt_fruit') _optFruit = val;
+              });
+              _saveGameOption(prefKey, val);
+              Navigator.pop(context);
+            }
+
+            return Focus(
+              autofocus: true,
+              onKeyEvent: (node, event) {
+                if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+                  return KeyEventResult.ignored;
+                }
+                if (event.logicalKey == LogicalKeyboardKey.escape) {
+                  if (event is KeyDownEvent) {
+                    Navigator.pop(context);
+                  }
+                  return KeyEventResult.handled;
+                }
+                final isTextFieldFocused =
+                    FocusManager.instance.primaryFocus?.context?.widget is EditableText;
+                if (isTextFieldFocused) {
+                  return KeyEventResult.ignored;
+                }
+                if (event.logicalKey == LogicalKeyboardKey.enter ||
+                    event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+                  if (event is KeyDownEvent) {
+                    submitStringOpt();
+                  }
+                  return KeyEventResult.handled;
+                }
+                if (event.logicalKey == LogicalKeyboardKey.backspace) {
+                  if (controller.text.isNotEmpty) {
+                    controller.text = controller.text.substring(0, controller.text.length - 1);
+                    setStateDialog(() {});
+                  }
+                  return KeyEventResult.handled;
+                }
+                if (event.logicalKey == LogicalKeyboardKey.delete) {
+                  controller.clear();
+                  setStateDialog(() {});
+                  return KeyEventResult.handled;
+                }
+                final ch = event.character;
+                if (ch != null && ch.isNotEmpty) {
+                  final code = ch.codeUnitAt(0);
+                  if (code >= 32 && code <= 126) {
+                    final next = controller.text + ch;
+                    if (utf8.encode(next).length <= maxBytes) {
+                      controller.text = next;
                       setStateDialog(() {});
-                    },
-                  ),
-                  if (isOverflow) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      prefKey == 'nh_opt_name'
-                          ? l10n.nameTooLongMaxBytes(maxBytes.toString())
-                          : l10n.textTooLongMaxBytes(maxBytes.toString()),
-                      style: const TextStyle(
-                        color: Colors.redAccent,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                    }
+                    return KeyEventResult.handled;
+                  }
+                }
+                return KeyEventResult.ignored;
+              },
+              child: AlertDialog(
+                scrollable: true,
+                insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                title: Text(title),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: controller,
+                      autofocus: false,
+                      decoration: InputDecoration(
+                        hintText: l10n.hintEmptyDefault,
+                        counterText: l10n.bytesCount(bytesCount, maxBytes),
+                        counterStyle: TextStyle(
+                          color: isOverflow ? Colors.red : Colors.white70,
+                          fontWeight: isOverflow ? FontWeight.bold : FontWeight.normal,
+                        ),
                       ),
+                      onChanged: (val) {
+                        setStateDialog(() {});
+                      },
+                      onSubmitted: (_) => submitStringOpt(),
                     ),
+                    if (isOverflow) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        prefKey == 'nh_opt_name'
+                            ? l10n.nameTooLongMaxBytes(maxBytes.toString())
+                            : l10n.textTooLongMaxBytes(maxBytes.toString()),
+                        style: const TextStyle(
+                          color: Colors.redAccent,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(l10n.cancel),
+                  ),
+                  ElevatedButton(
+                    onPressed: isOverflow ? null : submitStringOpt,
+                    child: Text(l10n.save),
+                  ),
                 ],
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(l10n.cancel),
-                ),
-                ElevatedButton(
-                  onPressed: isOverflow
-                      ? null
-                      : () {
-                          final val = controller.text.trim();
-                          setState(() {
-                            if (prefKey == 'nh_opt_name') _optName = val;
-                            if (prefKey == 'nh_opt_dogname') _optDogname = val;
-                            if (prefKey == 'nh_opt_catname') _optCatname = val;
-                            if (prefKey == 'nh_opt_horsename') _optHorsename = val;
-                            if (prefKey == 'nh_opt_fruit') _optFruit = val;
-                          });
-                          _saveGameOption(prefKey, val);
-                          Navigator.pop(context);
-                        },
-                  child: Text(l10n.save),
-                ),
-              ],
             );
           },
         );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
 import '../services/font_manager.dart';
 
@@ -21,98 +22,166 @@ void showMsgHistoryPanel({
         maxChildSize: 0.9,
         expand: false,
         builder: (_, scrollController) {
-          return Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF12161D),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 8),
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white38,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  child: Row(
-                    children: [
-                      Icon(Icons.history, size: 18, color: Colors.amber[300]),
-                      const SizedBox(width: 8),
-                      Text(
-                        l10n.msgHistoryTitle,
-                        style: const TextStyle(
-                          color: Colors.amber,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        l10n.entriesCount(messages.length),
-                        style: const TextStyle(color: Colors.white54, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(color: Colors.white.withValues(alpha: 0.14), height: 1),
-                Expanded(
-                  child: messages.isEmpty
-                      ? Center(
-                          child: Text(
-                            l10n.noMsgHistory,
-                            style: const TextStyle(color: Colors.white54),
-                          ),
-                        )
-                      : ListView.builder(
-                          controller: scrollController,
-                          reverse: true,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          itemCount: messages.length,
-                          itemBuilder: (_, index) {
-                            final dataIndex = messages.length - 1 - index;
-                            final line = messages[dataIndex];
-                            final ratio = (dataIndex + 1) / messages.length;
-                            final color = Color.lerp(Colors.white38, Colors.white, ratio)!;
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 2),
-                              child: Text(
-                                line,
-                                style: FontManager.instance.getStyle(
-                                  FontTarget.message,
-                                  color: color,
-                                  fontSize: msgFontSize,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16, 8, 16, MediaQuery.of(sheetContext).padding.bottom + 12),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(sheetContext),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white70,
-                        side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(l10n.close),
+          void scrollLines(int direction) {
+            // reverse: true のため、offset 増加 = 古い履歴（上方向）、offset 減少 = 新しい履歴（下方向）
+            if (!scrollController.hasClients) return;
+            const step = 40.0;
+            final nextOffset = (scrollController.offset - direction * step)
+                .clamp(0.0, scrollController.position.maxScrollExtent);
+            scrollController.animateTo(
+              nextOffset,
+              duration: const Duration(milliseconds: 100),
+              curve: Curves.easeOut,
+            );
+          }
+
+          void pageScroll(int direction) {
+            if (!scrollController.hasClients) return;
+            final viewport = scrollController.position.viewportDimension;
+            final step = viewport > 0 ? viewport * 0.85 : 320.0;
+            final nextOffset = (scrollController.offset - direction * step)
+                .clamp(0.0, scrollController.position.maxScrollExtent);
+            scrollController.animateTo(
+              nextOffset,
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.easeOut,
+            );
+          }
+
+          return Focus(
+            autofocus: true,
+            onKeyEvent: (node, event) {
+              if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+                return KeyEventResult.ignored;
+              }
+              final key = event.logicalKey;
+              if (key == LogicalKeyboardKey.escape ||
+                  key == LogicalKeyboardKey.enter ||
+                  key == LogicalKeyboardKey.numpadEnter) {
+                Navigator.pop(sheetContext);
+                return KeyEventResult.handled;
+              }
+              if (key == LogicalKeyboardKey.arrowUp) {
+                scrollLines(-1);
+                return KeyEventResult.handled;
+              }
+              if (key == LogicalKeyboardKey.arrowDown) {
+                scrollLines(1);
+                return KeyEventResult.handled;
+              }
+              if (key == LogicalKeyboardKey.pageUp) {
+                pageScroll(-1);
+                return KeyEventResult.handled;
+              }
+              if (key == LogicalKeyboardKey.pageDown) {
+                pageScroll(1);
+                return KeyEventResult.handled;
+              }
+              if (key == LogicalKeyboardKey.space) {
+                if (HardwareKeyboard.instance.isShiftPressed) {
+                  pageScroll(-1);
+                } else if (scrollController.hasClients && scrollController.offset > 5.0) {
+                  pageScroll(1);
+                } else {
+                  Navigator.pop(sheetContext);
+                }
+                return KeyEventResult.handled;
+              }
+              return KeyEventResult.ignored;
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF12161D),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 8),
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.white38,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: Row(
+                      children: [
+                        Icon(Icons.history, size: 18, color: Colors.amber[300]),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.msgHistoryTitle,
+                          style: const TextStyle(
+                            color: Colors.amber,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          l10n.entriesCount(messages.length),
+                          style: const TextStyle(color: Colors.white54, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(color: Colors.white.withValues(alpha: 0.14), height: 1),
+                  Expanded(
+                    child: messages.isEmpty
+                        ? Center(
+                            child: Text(
+                              l10n.noMsgHistory,
+                              style: const TextStyle(color: Colors.white54),
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: scrollController,
+                            reverse: true,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            itemCount: messages.length,
+                            itemBuilder: (_, index) {
+                              final dataIndex = messages.length - 1 - index;
+                              final line = messages[dataIndex];
+                              final ratio = (dataIndex + 1) / messages.length;
+                              final color = Color.lerp(Colors.white38, Colors.white, ratio)!;
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 2),
+                                child: Text(
+                                  line,
+                                  style: FontManager.instance.getStyle(
+                                    FontTarget.message,
+                                    color: color,
+                                    fontSize: msgFontSize,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16, 8, 16, MediaQuery.of(sheetContext).padding.bottom + 12),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(sheetContext),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white70,
+                          side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(l10n.close),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -331,4 +400,3 @@ List<String> extractRecentContextMessages(
   // 古い行 → 新しい行 の時系列順に戻して返す
   return extracted.reversed.toList();
 }
-

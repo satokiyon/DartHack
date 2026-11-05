@@ -27,15 +27,19 @@ class GetLineOverlay extends StatefulWidget {
   });
 
   @override
-  State<GetLineOverlay> createState() => _GetLineOverlayState();
+  State<GetLineOverlay> createState() => GetLineOverlayState();
 }
 
-class _GetLineOverlayState extends State<GetLineOverlay> {
+class GetLineOverlayState extends State<GetLineOverlay> {
   late TextEditingController _extCmdFilterController;
   late List<ExtCmdEntry> _filteredExtCmds;
   late FocusNode _inputFocusNode;
   late FocusNode _filterFocusNode;
   late ScrollController _listScrollController;
+  int? _selectedCandidateIndex;
+
+  bool get _isExtCmd => widget.extCmdList.isNotEmpty;
+  int get _maxBytes => widget.isCallOrNamePrompt(widget.prompt) ? 62 : 100;
 
   @override
   void initState() {
@@ -45,6 +49,15 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
     _inputFocusNode = FocusNode();
     _filterFocusNode = FocusNode();
     _listScrollController = ScrollController();
+    _selectedCandidateIndex = null;
+  }
+
+  @override
+  void didUpdateWidget(covariant GetLineOverlay oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.extCmdList != oldWidget.extCmdList) {
+      _updateFilteredExtCmds(_extCmdFilterController.text);
+    }
   }
 
   @override
@@ -56,9 +69,196 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
     super.dispose();
   }
 
+  void _updateFilteredExtCmds(String val) {
+    final query = val.toLowerCase();
+    setState(() {
+      _filteredExtCmds = widget.extCmdList.where((entry) {
+        return entry.command.toLowerCase().contains(query) ||
+            entry.description.toLowerCase().contains(query);
+      }).toList();
+      _selectedCandidateIndex = null;
+    });
+  }
+
+  /// フォーカスレス物理キーボードからの文字追記
+  void appendText(String text) {
+    if (_isExtCmd) {
+      final newText = _extCmdFilterController.text + text;
+      _extCmdFilterController.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: newText.length),
+      );
+      _updateFilteredExtCmds(newText);
+      return;
+    }
+
+    final current = widget.inputController.text;
+    final selection = widget.inputController.selection;
+    String newText;
+    int newOffset;
+    if (selection.isValid && selection.start >= 0 && selection.end >= selection.start) {
+      newText = current.replaceRange(selection.start, selection.end, text);
+      newOffset = selection.start + text.length;
+    } else {
+      newText = current + text;
+      newOffset = newText.length;
+    }
+    if (utf8.encode(newText).length <= _maxBytes) {
+      widget.inputController.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: newOffset),
+      );
+    }
+  }
+
+  /// フォーカスレス物理キーボードからの1文字削除 (Backspace)
+  void deleteChar() {
+    final controller = _isExtCmd ? _extCmdFilterController : widget.inputController;
+    final current = controller.text;
+    if (current.isEmpty) return;
+
+    final selection = controller.selection;
+    String newText;
+    int newOffset;
+    if (selection.isValid && selection.start >= 0 && selection.end > selection.start) {
+      newText = current.replaceRange(selection.start, selection.end, '');
+      newOffset = selection.start;
+    } else {
+      final offset = (selection.isValid && selection.start > 0) ? selection.start : current.length;
+      if (offset <= 0) return;
+      newText = current.substring(0, offset - 1) + current.substring(offset);
+      newOffset = offset - 1;
+    }
+    controller.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newOffset),
+    );
+    if (_isExtCmd) {
+      _updateFilteredExtCmds(newText);
+    }
+  }
+
+  /// フォーカスレス物理キーボードからの全消去 (Delete)
+  void clearText() {
+    if (_isExtCmd) {
+      _extCmdFilterController.clear();
+      _updateFilteredExtCmds('');
+    } else {
+      widget.inputController.clear();
+    }
+  }
+
+  /// 拡張コマンド候補の上下移動
+  void moveCandidate(int delta) {
+    if (!_isExtCmd || _filteredExtCmds.isEmpty) return;
+    setState(() {
+      if (_selectedCandidateIndex == null) {
+        // 未選択時: 下キー (delta > 0) なら先頭、上キー (delta < 0) なら末尾を選択
+        _selectedCandidateIndex = delta > 0 ? 0 : _filteredExtCmds.length - 1;
+      } else {
+        _selectedCandidateIndex =
+            (_selectedCandidateIndex! + delta).clamp(0, _filteredExtCmds.length - 1);
+      }
+    });
+    _scrollToSelectedCandidate();
+  }
+
+  void _scrollToSelectedCandidate() {
+    if (!_listScrollController.hasClients || _selectedCandidateIndex == null) return;
+    const itemHeight = 48.0;
+    final targetOffset = _selectedCandidateIndex! * itemHeight;
+    final currentOffset = _listScrollController.offset;
+    final viewportHeight = _listScrollController.position.viewportDimension;
+    final maxScroll = _listScrollController.position.maxScrollExtent;
+
+    if (targetOffset < currentOffset) {
+      _listScrollController.animateTo(
+        targetOffset.clamp(0.0, maxScroll),
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOut,
+      );
+    } else if (targetOffset + itemHeight > currentOffset + viewportHeight) {
+      _listScrollController.animateTo(
+        (targetOffset + itemHeight - viewportHeight).clamp(0.0, maxScroll),
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  /// 拡張コマンド候補リストのページ送り
+  void pageScroll(int direction) {
+    if (!_isExtCmd || !_listScrollController.hasClients) return;
+    final viewport = _listScrollController.position.viewportDimension;
+    final step = viewport > 0 ? viewport * 0.85 : 200.0;
+    final nextOffset = (_listScrollController.offset + direction * step)
+        .clamp(0.0, _listScrollController.position.maxScrollExtent);
+    _listScrollController.animateTo(
+      nextOffset,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+    );
+  }
+
+  /// Tab キーによる候補名の自動補完
+  void autocompleteCandidate() {
+    if (!_isExtCmd || _filteredExtCmds.isEmpty) return;
+    // 候補が選択されている場合はその候補、未選択でも候補が1件のみならそれを補完
+    final idx = _selectedCandidateIndex ?? (_filteredExtCmds.length == 1 ? 0 : null);
+    if (idx == null) return;
+
+    final targetIdx = idx.clamp(0, _filteredExtCmds.length - 1);
+    var cmd = _filteredExtCmds[targetIdx].command.trim();
+    if (cmd.startsWith('#')) {
+      cmd = cmd.substring(1).trim();
+    }
+    _extCmdFilterController.value = TextEditingValue(
+      text: cmd,
+      selection: TextSelection.collapsed(offset: cmd.length),
+    );
+    widget.inputController.value = TextEditingValue(
+      text: _filteredExtCmds[targetIdx].command,
+      selection: TextSelection.collapsed(offset: _filteredExtCmds[targetIdx].command.length),
+    );
+    _updateFilteredExtCmds(cmd);
+  }
+
+  /// Enter キーによる確定送信処理
+  void submit() {
+    if (_isExtCmd) {
+      if (_selectedCandidateIndex != null &&
+          _filteredExtCmds.isNotEmpty &&
+          _selectedCandidateIndex! >= 0 &&
+          _selectedCandidateIndex! < _filteredExtCmds.length) {
+        final cmd = _filteredExtCmds[_selectedCandidateIndex!].command;
+        widget.inputController.text = cmd;
+        widget.onSubmit(cmd);
+        return;
+      }
+      _handleFilterSubmit(_extCmdFilterController.text);
+      return;
+    }
+
+    final val = widget.inputController.text;
+    final byteCount = utf8.encode(val).length;
+    if (byteCount <= _maxBytes) {
+      widget.onSubmit(val);
+    }
+  }
+
   void _handleFilterSubmit(String query) {
     final q = query.trim().toLowerCase();
-    if (q.isEmpty) return;
+    if (q.isEmpty) {
+      if (_selectedCandidateIndex != null && _filteredExtCmds.isNotEmpty) {
+        final idx = _selectedCandidateIndex!.clamp(0, _filteredExtCmds.length - 1);
+        final cmd = _filteredExtCmds[idx].command;
+        widget.inputController.text = cmd;
+        widget.onSubmit(cmd);
+      } else if (widget.inputController.text.trim().isNotEmpty) {
+        widget.onSubmit(widget.inputController.text);
+      }
+      return;
+    }
     // 1. 完全一致があるか検索
     for (final entry in _filteredExtCmds) {
       var cmd = entry.command.trim().toLowerCase();
@@ -69,37 +269,34 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
         return;
       }
     }
-    // 2. 候補が1件だけに絞り込まれているならそれを実行
-    if (_filteredExtCmds.length == 1) {
-      final cmd = _filteredExtCmds.first.command;
+    // 2. 前方一致があるか検索
+    for (final entry in _filteredExtCmds) {
+      var cmd = entry.command.trim().toLowerCase();
+      if (cmd.startsWith('#')) cmd = cmd.substring(1).trim();
+      if (cmd.startsWith(q)) {
+        widget.inputController.text = entry.command;
+        widget.onSubmit(entry.command);
+        return;
+      }
+    }
+    // 3. 候補が絞り込まれており、明示的に選択されているならその候補を実行
+    if (_filteredExtCmds.isNotEmpty && _selectedCandidateIndex != null) {
+      final idx = _selectedCandidateIndex!.clamp(0, _filteredExtCmds.length - 1);
+      final cmd = _filteredExtCmds[idx].command;
       widget.inputController.text = cmd;
       widget.onSubmit(cmd);
-      return;
     }
-    // 3. 複数候補が残っている場合は危険コマンド誤爆防止のため即実行しない
   }
 
   void _handleShowHistory() {
     widget.onShowMsgHistory();
-    // 履歴パネルから復帰した際に入力フィールドへのフォーカスを自動復元
-    Future.microtask(() {
-      if (mounted) {
-        if (widget.extCmdList.isNotEmpty) {
-          _filterFocusNode.requestFocus();
-        } else {
-          _inputFocusNode.requestFocus();
-        }
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isExtCmd = widget.extCmdList.isNotEmpty;
-
-    final isCallOrName = widget.isCallOrNamePrompt(widget.prompt);
-    final maxBytes = isCallOrName ? 62 : 100;
+    final isExtCmd = _isExtCmd;
+    final maxBytes = _maxBytes;
 
     return Positioned.fill(
       child: Container(
@@ -147,7 +344,7 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                     TextField(
                       controller: widget.inputController,
                       focusNode: _inputFocusNode,
-                      autofocus: !isExtCmd,
+                      autofocus: false,
                       decoration: InputDecoration(
                         hintText: l10n.enterText,
                         filled: true,
@@ -185,7 +382,7 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                       TextField(
                         controller: _extCmdFilterController,
                         focusNode: _filterFocusNode,
-                        autofocus: isExtCmd,
+                        autofocus: false,
                         onSubmitted: _handleFilterSubmit,
                         decoration: InputDecoration(
                           hintText: l10n.filterCmds,
@@ -197,17 +394,7 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        onChanged: (val) {
-                          final query = val.toLowerCase();
-                          setState(() {
-                            _filteredExtCmds = widget.extCmdList
-                                .where((entry) {
-                                  return entry.command.toLowerCase().contains(query)
-                                      || entry.description.toLowerCase().contains(query);
-                                })
-                                .toList();
-                          });
-                        },
+                        onChanged: _updateFilteredExtCmds,
                       ),
                       const SizedBox(height: 8),
                       Expanded(
@@ -223,12 +410,19 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                             itemCount: _filteredExtCmds.length,
                             itemBuilder: (context, index) {
                               final entry = _filteredExtCmds[index];
+                              final isHighlighted = index == _selectedCandidateIndex;
                               return Material(
-                                color: Colors.transparent,
+                                color: isHighlighted
+                                    ? Colors.teal.withValues(alpha: 0.25)
+                                    : Colors.transparent,
                                 child: ListTile(
                                   title: Text(
                                     entry.command,
-                                    style: const TextStyle(fontFamily: 'monospace', color: Colors.white),
+                                    style: TextStyle(
+                                      fontFamily: 'monospace',
+                                      color: isHighlighted ? Colors.amber[200] : Colors.white,
+                                      fontWeight: isHighlighted ? FontWeight.bold : FontWeight.normal,
+                                    ),
                                   ),
                                   subtitle: entry.description.isNotEmpty
                                       ? Text(
@@ -282,7 +476,7 @@ class _GetLineOverlayState extends State<GetLineOverlay> {
                                 return ElevatedButton(
                                   onPressed: isOverLimit
                                       ? null
-                                      : () => widget.onSubmit(widget.inputController.text),
+                                      : () => submit(),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF004D40), // 深いダークティール (ラベンダー文字とのコントラスト比 約 6.5:1)
                                     disabledBackgroundColor: const Color(0xFF004D40).withValues(alpha: 0.3),
