@@ -31,6 +31,9 @@ enum KeyInputContext {
   /// ゲーム本編（マップ・コマンド入力待ち）
   game,
 
+  /// タイトル画面（言語選択、開始、設定、ヘルプ等）
+  titleScreen,
+
   /// 非アクティブ（ゲーム停止中、または入力不可状態）
   inactive,
 }
@@ -110,6 +113,40 @@ class MenuAccelerator extends KeyAction {
 
   @override
   int get hashCode => code.hashCode;
+}
+
+/// メニュー表示中の数量プレフィックス数字入力（0〜9）
+class MenuDigit extends KeyAction {
+  final int digit;
+  const MenuDigit(this.digit);
+
+  @override
+  String toString() => 'MenuDigit($digit)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MenuDigit &&
+          runtimeType == other.runtimeType &&
+          digit == other.digit;
+
+  @override
+  int get hashCode => digit.hashCode;
+}
+
+/// メニュー表示中の数量プレフィックス1桁削除（BackSpace）
+class MenuCountBackspace extends KeyAction {
+  const MenuCountBackspace();
+
+  @override
+  String toString() => 'MenuCountBackspace()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is MenuCountBackspace;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
 }
 
 /// メニューのスクロール（1: 下、-1: 上）
@@ -507,6 +544,40 @@ class TextOverlayMoveCandidate extends KeyAction {
   int get hashCode => delta.hashCode;
 }
 
+/// テキスト入力画面での水平操作 (←: -1, →: 1、モード切り替え等)
+class TextOverlayHorizontalMove extends KeyAction {
+  final int direction;
+  const TextOverlayHorizontalMove(this.direction);
+
+  @override
+  String toString() => 'TextOverlayHorizontalMove($direction)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TextOverlayHorizontalMove &&
+          runtimeType == other.runtimeType &&
+          direction == other.direction;
+
+  @override
+  int get hashCode => direction.hashCode;
+}
+
+/// テキスト入力オーバーレイでのスペース操作（フォーカス要素のトグル等）
+class TextOverlaySpace extends KeyAction {
+  const TextOverlaySpace();
+
+  @override
+  String toString() => 'TextOverlaySpace()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is TextOverlaySpace;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
 /// テキスト入力オーバーレイ・拡張コマンドメニューのページ送り (PageUp: -1, PageDown: 1)
 class TextOverlayPage extends KeyAction {
   final int direction;
@@ -598,6 +669,89 @@ class OpenDrawerMenu extends KeyAction {
   int get hashCode => runtimeType.hashCode;
 }
 
+/// タイトル画面でのフォーカス循環 (Tab / Shift+Tab)
+class TitleTab extends KeyAction {
+  final bool forward;
+  const TitleTab({this.forward = true});
+
+  @override
+  String toString() => 'TitleTab(forward: $forward)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TitleTab &&
+          runtimeType == other.runtimeType &&
+          forward == other.forward;
+
+  @override
+  int get hashCode => forward.hashCode;
+}
+
+/// タイトル画面での決定操作 (Enter)
+class TitleSubmit extends KeyAction {
+  const TitleSubmit();
+
+  @override
+  String toString() => 'TitleSubmit()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is TitleSubmit;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// タイトル画面でのスペースキー操作
+class TitleSpaceAction extends KeyAction {
+  const TitleSpaceAction();
+
+  @override
+  String toString() => 'TitleSpaceAction()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is TitleSpaceAction;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// タイトル画面でのキャンセル・フォーカスリセット (ESC)
+class TitleEscape extends KeyAction {
+  const TitleEscape();
+
+  @override
+  String toString() => 'TitleEscape()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is TitleEscape;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// タイトル画面での特定言語選択 (ArrowLeft -> ja, ArrowRight -> en)
+class TitleSelectLanguage extends KeyAction {
+  final String language;
+  const TitleSelectLanguage(this.language);
+
+  @override
+  String toString() => 'TitleSelectLanguage($language)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TitleSelectLanguage &&
+          runtimeType == other.runtimeType &&
+          language == other.language;
+
+  @override
+  int get hashCode => language.hashCode;
+}
+
 /// テキスト入力オーバーレイ・拡張コマンドメニューの候補補完アクション (Tab)
 class TextOverlayAutocomplete extends KeyAction {
   const TextOverlayAutocomplete();
@@ -648,6 +802,11 @@ class HardwareKeyRouter {
 
     if (context == KeyInputContext.inactive) {
       return const IgnoreKey();
+    }
+
+    // 0. タイトル画面
+    if (context == KeyInputContext.titleScreen) {
+      return _routeTitleScreen(event, isShiftPressed: isShiftPressed);
     }
 
     // 1a. 1文字コマンド説明検索（AnyKeyOverlay: `?` コマンド説明）
@@ -803,6 +962,16 @@ class HardwareKeyRouter {
     }
 
     // --- 以下は TextField 未フォーカス時（フォーカスレス物理キーボード入力） ---
+    if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+      return (event is KeyDownEvent)
+          ? const TextOverlayHorizontalMove(-1)
+          : const SwallowKey();
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+      return (event is KeyDownEvent)
+          ? const TextOverlayHorizontalMove(1)
+          : const SwallowKey();
+    }
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter) {
       return (event is KeyDownEvent)
@@ -835,6 +1004,42 @@ class HardwareKeyRouter {
       }
     }
 
+    return const SwallowKey();
+  }
+
+  /// タイトル画面のキー判定
+  static KeyAction _routeTitleScreen(KeyEvent event, {required bool isShiftPressed}) {
+    if (event.logicalKey == LogicalKeyboardKey.tab) {
+      return (event is KeyDownEvent)
+          ? TitleTab(forward: !isShiftPressed)
+          : const SwallowKey();
+    }
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+      return (event is KeyDownEvent)
+          ? const TitleSubmit()
+          : const SwallowKey();
+    }
+    if (event.logicalKey == LogicalKeyboardKey.space) {
+      return (event is KeyDownEvent)
+          ? const TitleSpaceAction()
+          : const SwallowKey();
+    }
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      return (event is KeyDownEvent)
+          ? const TitleEscape()
+          : const SwallowKey();
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+      return (event is KeyDownEvent)
+          ? const TitleSelectLanguage('ja')
+          : const SwallowKey();
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+      return (event is KeyDownEvent)
+          ? const TitleSelectLanguage('en')
+          : const SwallowKey();
+    }
     return const SwallowKey();
   }
 
@@ -1072,16 +1277,32 @@ class HardwareKeyRouter {
     if (event.logicalKey == LogicalKeyboardKey.escape) {
       return const MenuCancel();
     }
+    if (event.logicalKey == LogicalKeyboardKey.backspace) {
+      return const MenuCountBackspace();
+    }
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter) {
       return const MenuSubmit();
     }
 
-    // テンキーや左右矢印キーはアクセラレータ誤選択を防ぐため抑止
+    // テンキーの数字入力（数量指定）
+    final numpadDigit = _digitFromNumpad(event.logicalKey);
+    if (numpadDigit != null) {
+      return MenuDigit(numpadDigit);
+    }
+
+    // 左右矢印キーはアクセラレータ誤選択を防ぐため抑止
     if (event.logicalKey == LogicalKeyboardKey.arrowLeft ||
-        event.logicalKey == LogicalKeyboardKey.arrowRight ||
-        _isNumpadKey(event.logicalKey)) {
+        event.logicalKey == LogicalKeyboardKey.arrowRight) {
       return const SwallowKey();
+    }
+
+    // メインキーの数字入力（Shiftなし時: 数量指定）
+    if (!isShiftPressed) {
+      final digit = _digitFromLogicalKey(event.logicalKey);
+      if (digit != null) {
+        return MenuDigit(digit);
+      }
     }
 
     String? char = event.character;
@@ -1093,6 +1314,14 @@ class HardwareKeyRouter {
     }
 
     if (char != null && char.isNotEmpty) {
+      // 文字が数字 '0'〜'9' の場合も数量指定として処理
+      if (char.length == 1) {
+        final code = char.codeUnitAt(0);
+        if (code >= 48 && code <= 57) {
+          return MenuDigit(code - 48);
+        }
+      }
+
       if (char == '>') return const MenuPage(1);
       if (char == '<') return const MenuPage(-1);
       if (char == '^') return const MenuJumpEdge(true);
@@ -1197,19 +1426,36 @@ class HardwareKeyRouter {
     return const SwallowKey();
   }
 
-  /// テンキーかどうかの判定
-  static bool _isNumpadKey(LogicalKeyboardKey key) {
-    return key == LogicalKeyboardKey.numpad1 ||
-        key == LogicalKeyboardKey.numpad2 ||
-        key == LogicalKeyboardKey.numpad3 ||
-        key == LogicalKeyboardKey.numpad4 ||
-        key == LogicalKeyboardKey.numpad5 ||
-        key == LogicalKeyboardKey.numpad6 ||
-        key == LogicalKeyboardKey.numpad7 ||
-        key == LogicalKeyboardKey.numpad8 ||
-        key == LogicalKeyboardKey.numpad9 ||
-        key == LogicalKeyboardKey.numpad0;
+  /// テンキーからの数字（0〜9）取得
+  static int? _digitFromNumpad(LogicalKeyboardKey key) {
+    if (key == LogicalKeyboardKey.numpad0) return 0;
+    if (key == LogicalKeyboardKey.numpad1) return 1;
+    if (key == LogicalKeyboardKey.numpad2) return 2;
+    if (key == LogicalKeyboardKey.numpad3) return 3;
+    if (key == LogicalKeyboardKey.numpad4) return 4;
+    if (key == LogicalKeyboardKey.numpad5) return 5;
+    if (key == LogicalKeyboardKey.numpad6) return 6;
+    if (key == LogicalKeyboardKey.numpad7) return 7;
+    if (key == LogicalKeyboardKey.numpad8) return 8;
+    if (key == LogicalKeyboardKey.numpad9) return 9;
+    return null;
   }
+
+  /// メインキーボードの数字キー（0〜9）判定
+  static int? _digitFromLogicalKey(LogicalKeyboardKey key) {
+    if (key == LogicalKeyboardKey.digit0) return 0;
+    if (key == LogicalKeyboardKey.digit1) return 1;
+    if (key == LogicalKeyboardKey.digit2) return 2;
+    if (key == LogicalKeyboardKey.digit3) return 3;
+    if (key == LogicalKeyboardKey.digit4) return 4;
+    if (key == LogicalKeyboardKey.digit5) return 5;
+    if (key == LogicalKeyboardKey.digit6) return 6;
+    if (key == LogicalKeyboardKey.digit7) return 7;
+    if (key == LogicalKeyboardKey.digit8) return 8;
+    if (key == LogicalKeyboardKey.digit9) return 9;
+    return null;
+  }
+
 
   /// テンキーのアクション解決
   static KeyAction? _getNumpadAction(

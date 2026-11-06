@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
 
 class GameDrawerContent extends StatefulWidget {
+  final FocusNode? focusNode;
   final bool isGameRunning;
   final bool isKeyboardVisible;
   final VoidCallback onClose;
@@ -17,9 +18,12 @@ class GameDrawerContent extends StatefulWidget {
   final VoidCallback onShowFullMap;
   final VoidCallback onToggleKeyboard;
   final VoidCallback onShowSettings;
+  final bool autofocus;
 
   const GameDrawerContent({
     super.key,
+    this.focusNode,
+    this.autofocus = false,
     required this.isGameRunning,
     required this.isKeyboardVisible,
     required this.onClose,
@@ -55,7 +59,8 @@ class _DrawerItemDef {
 }
 
 class _GameDrawerContentState extends State<GameDrawerContent> {
-  final FocusNode _focusNode = FocusNode();
+  late final FocusNode _focusNode;
+  bool _internalFocusNode = false;
   final ScrollController _scrollController = ScrollController();
   final Map<int, GlobalKey> _itemKeys = {};
   int? _focusedIndex;
@@ -67,16 +72,19 @@ class _GameDrawerContentState extends State<GameDrawerContent> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _focusNode.requestFocus();
-      }
-    });
+    if (widget.focusNode != null) {
+      _focusNode = widget.focusNode!;
+    } else {
+      _focusNode = FocusNode();
+      _internalFocusNode = true;
+    }
   }
 
   @override
   void dispose() {
-    _focusNode.dispose();
+    if (_internalFocusNode) {
+      _focusNode.dispose();
+    }
     _scrollController.dispose();
     super.dispose();
   }
@@ -336,6 +344,13 @@ class _GameDrawerContentState extends State<GameDrawerContent> {
     return KeyEventResult.ignored;
   }
 
+  /// ドロワー展開時にキーボード操作を有効化するためのフォーカス要求
+  void focus() {
+    if (mounted) {
+      _focusNode.requestFocus();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -343,7 +358,7 @@ class _GameDrawerContentState extends State<GameDrawerContent> {
 
     return Focus(
       focusNode: _focusNode,
-      autofocus: true,
+      autofocus: widget.autofocus,
       onKeyEvent: _onKeyEvent,
       child: ListView(
         controller: _scrollController,

@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-27. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-06. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -1451,3 +1451,25 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
    - `query_category` やメニュー関連の単体テスト（WidgetTest 等）を作成する際は、テストモックデータの `MenuItemData.ident` に適当な文字コード（例: 武器に `'A'` = 65 など）を割り当ててはなりません。
    - 必ず C コアの実装（`include/objclass.h` の `WEAPON_CLASS` 等）に準拠し、純粋カテゴリにはアイテムクラス番号（1, 2, ...）、メタ項目には C コアが使用する ASCII コード（`'A'` = 65, `'B'` = 66, `'u'` = 117 等）を正確に割り当ててモックを構築してください。
    - 不正確なモック値を使用すると、メタ項目の誤選択や自動ピックアップ誤爆などの重大なデグレがテストをすり抜ける原因となります。
+
+## 55. Flutter 物理キーボード操作における画面外ウィジェットのフォーカス横取り防止とモーダル排他・復帰原則
+
+1. **画面外常時マウントウィジェット（ドロワー等）の `autofocus: true` 禁止とフォーカス横取り防止**:
+   - 画面外に隠れたドロワーやサイドバーなどのウィジェットが `autofocus: true` を持っていると、常時マウントされている場合に Tab キー等のキー入力を画面外で横取り（`KeyEventResult.handled`）して消費し、前面のダイアログに Tab キーが届かなくなるとともに、Enter で画面外の項目（全体地図やメニュー項目など）が誤爆実行される。
+   - 画面外ウィジェットは `autofocus: false` を原則とし、展開時のみ外部から `FocusNode.requestFocus()` でフォーカスを渡し、閉鎖時に `unfocus()` してルートへ確定復帰させる。また、非展開時は `ExcludeFocus(excluding: ...)` でフォーカスツリーから完全に隔離する。
+
+2. **モーダルダイアログ・オーバーレイ表示時における背景要素の一括 `ExcludeFocus` と `Positioned` 親データ保護原則**:
+   - ダイアログやメニュー、プロンプト等のモーダル・オーバーレイ表示中（`_hasAnyActiveOverlay`）は、ゲーム画面（`Column`）、操作盤（コントローラー）、メッセージ領域、ドロワー（上下・左右）、画面上のフローティングボタン（メニュー/全体マップ）を `ExcludeFocus(excluding: _hasAnyActiveOverlay)` で一括保護し、Tab キーによる背景要素へのフォーカス迷い込みを 100% 遮断する。
+   - **`Positioned` 親データの保護**: `Stack` 内で `Positioned` ウィジェットを扱う際、`Positioned` 自体を `ExcludeFocus` 等で包むと `StackParentData` が無効化されて実行時例外（RenderObject エラー）が発生する。必ず `Positioned` の内部（`child` 直下）で `ExcludeFocus` を適用する。
+
+3. **フラットな仮想フォーカス方式と不要な `FocusScope` の排除**:
+   - ダイアログやオーバーレイのルートに未活性の `FocusScope` を配置してはならない。`FocusScope` は内部で独立したフォーカススコープ境界を形成し、フォーカスツリーの断片化を引き起こして、親のキーハンドラからのフォーカス循環制御（`cycleFocus`）を阻害する。
+   - ダイアログ自身はルートのキーハンドラから `cycleFocus` を直接ディスパッチされる「自前仮想フォーカス方式（アンバー枠表示）」を採用し、不要な `FocusScope` を撤廃してフラットな階層構造を維持する。
+
+4. **Tab 巡回時の入力欄（TextField）本物フォーカス連動と IME 保護原則**:
+   - Tab 巡回で名前や文字列の入力欄（`input`）にフォーカスが当たった際は、日本語 IME（ローマ字かな変換等）の入力やキャレット表示を可能にするため、本物のフォーカス（`_nameFocusNode.requestFocus()`）を付与する。
+   - 入力欄から Tab キーで次の項目へ遷移する際は、`FocusNode.onKeyEvent` で Tab を捕捉して `cycleFocus` を進めると同時に、`unfocus()` を呼んでフォーカスを解除し、Flutter 標準のフォーカストラバーサル（`NextFocusIntent`）が外側へ漏延するのを遮断する。
+
+5. **モーダルダイアログ閉鎖後のルートフォーカス確定復帰とゲーム開始前ガード解除原則**:
+   - `showFullMapDialog` や `showScoreboardDialog`、ガイドブック等の `showDialog` によるモーダルダイアログを閉じた後、ゲーム画面へ確実にキーボード操作を復帰させるため、ダイアログ閉鎖直後（`.then((_) => _ensureGameFocus())`）にルートの `_focusNode.requestFocus()` を呼んでフォーカスを確定復帰させる。
+   - ルートフォーカス確保処理（`_ensureGameFocus`）において、`if (!_isGameRunning) return;` などのゲーム実行中限定ガードを設けてはならず、タイトル画面やキャラクター作成画面などのゲーム開始前フェーズであっても常に安全にルートフォーカスが確保されるようにする。

@@ -3,12 +3,23 @@ import '../l10n/app_localizations.dart';
 import '../widgets/guidebook_dialog.dart';
 import '../widgets/spoiler_dialog.dart';
 
+/// タイトル画面でのキーボードフォーカス対象
+enum TitleScreenFocusTarget {
+  none,
+  language,
+  startGame,
+  settings,
+  guidebook,
+  spoilers,
+}
+
 class StartScreen extends StatelessWidget {
   final bool assetsReady;
   final String selectedLanguage;
   final ValueChanged<String> onLanguageChanged;
   final VoidCallback onStartGame;
   final VoidCallback onShowSettings;
+  final TitleScreenFocusTarget currentFocusTarget;
 
   const StartScreen({
     super.key,
@@ -17,15 +28,29 @@ class StartScreen extends StatelessWidget {
     required this.onLanguageChanged,
     required this.onStartGame,
     required this.onShowSettings,
+    this.currentFocusTarget = TitleScreenFocusTarget.none,
   });
 
   Widget _buildLanguageSelector(BuildContext context) {
     final isJp = (selectedLanguage == 'ja');
+    final isFocused = currentFocusTarget == TitleScreenFocusTarget.language;
     return Container(
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white24, width: 1),
+        border: Border.all(
+          color: isFocused ? Colors.amberAccent : Colors.white24,
+          width: isFocused ? 2.5 : 1.0,
+        ),
+        boxShadow: isFocused
+            ? [
+                BoxShadow(
+                  color: Colors.amberAccent.withValues(alpha: 0.6),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                )
+              ]
+            : null,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Row(
@@ -103,6 +128,148 @@ class StartScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildGuidebookButton(BuildContext context, AppLocalizations l10n) {
+    final isFocused = currentFocusTarget == TitleScreenFocusTarget.guidebook;
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: isFocused ? Border.all(color: Colors.amberAccent, width: 2.5) : null,
+        boxShadow: isFocused
+            ? [
+                BoxShadow(
+                  color: Colors.amberAccent.withValues(alpha: 0.8),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                )
+              ]
+            : null,
+      ),
+      child: IconButton(
+        icon: const Icon(Icons.menu_book, color: Colors.white70, size: 28),
+        onPressed: () => GuidebookDialog.show(context),
+        tooltip: l10n.guidebookTooltip,
+        style: IconButton.styleFrom(
+          backgroundColor: isFocused ? Colors.amberAccent.withValues(alpha: 0.2) : Colors.black38,
+          padding: const EdgeInsets.all(8),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpoilerButton(BuildContext context, AppLocalizations l10n) {
+    final isFocused = currentFocusTarget == TitleScreenFocusTarget.spoilers;
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: isFocused ? Border.all(color: Colors.amberAccent, width: 2.5) : null,
+        boxShadow: isFocused
+            ? [
+                BoxShadow(
+                  color: Colors.amberAccent.withValues(alpha: 0.8),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                )
+              ]
+            : null,
+      ),
+      child: IconButton(
+        icon: const Icon(Icons.auto_stories, color: Colors.amberAccent, size: 28),
+        onPressed: () => SpoilerDialog.show(context),
+        tooltip: l10n.spoilersTooltip,
+        style: IconButton.styleFrom(
+          backgroundColor: isFocused ? Colors.amberAccent.withValues(alpha: 0.2) : Colors.black38,
+          padding: const EdgeInsets.all(8),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsButton(BuildContext context, AppLocalizations l10n) {
+    final isFocused = currentFocusTarget == TitleScreenFocusTarget.settings;
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: isFocused ? Border.all(color: Colors.amberAccent, width: 2.5) : null,
+        boxShadow: isFocused
+            ? [
+                BoxShadow(
+                  color: Colors.amberAccent.withValues(alpha: 0.8),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                )
+              ]
+            : null,
+      ),
+      child: IconButton(
+        icon: const Icon(Icons.settings, color: Colors.white70, size: 28),
+        onPressed: onShowSettings,
+        tooltip: l10n.settingsTooltip,
+        style: IconButton.styleFrom(
+          backgroundColor: isFocused ? Colors.amberAccent.withValues(alpha: 0.2) : Colors.black38,
+          padding: const EdgeInsets.all(8),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStartGameButton(BuildContext context, AppLocalizations l10n) {
+    final isFocused = currentFocusTarget == TitleScreenFocusTarget.startGame;
+    return Container(
+      width: double.infinity,
+      height: 56,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Colors.deepPurple, Colors.indigo],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: isFocused ? Border.all(color: Colors.amberAccent, width: 2.5) : null,
+        boxShadow: isFocused
+            ? [
+                BoxShadow(
+                  color: Colors.amberAccent.withValues(alpha: 0.8),
+                  blurRadius: 16,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : [
+                BoxShadow(
+                  color: Colors.deepPurple.withValues(alpha: 0.5),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onStartGame,
+          borderRadius: BorderRadius.circular(28),
+          child: Center(
+            child: Text(
+              l10n.startAdventure,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                letterSpacing: 1.5,
+                shadows: [
+                  Shadow(
+                    blurRadius: 4,
+                    color: Colors.black38,
+                    offset: Offset(1, 1),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -122,40 +289,16 @@ class StartScreen extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.menu_book, color: Colors.white70, size: 28),
-                  onPressed: () => GuidebookDialog.show(context),
-                  tooltip: l10n.guidebookTooltip,
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.black38,
-                    padding: const EdgeInsets.all(8),
-                  ),
-                ),
+                _buildGuidebookButton(context, l10n),
                 const SizedBox(width: 10),
-                IconButton(
-                  icon: const Icon(Icons.auto_stories, color: Colors.amberAccent, size: 28),
-                  onPressed: () => SpoilerDialog.show(context),
-                  tooltip: l10n.spoilersTooltip,
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.black38,
-                    padding: const EdgeInsets.all(8),
-                  ),
-                ),
+                _buildSpoilerButton(context, l10n),
               ],
             ),
           ),
           Positioned(
             top: 16,
             right: 24,
-            child: IconButton(
-              icon: const Icon(Icons.settings, color: Colors.white70, size: 28),
-              onPressed: onShowSettings,
-              tooltip: l10n.settingsTooltip,
-              style: IconButton.styleFrom(
-                backgroundColor: Colors.black38,
-                padding: const EdgeInsets.all(8),
-              ),
-            ),
+            child: _buildSettingsButton(context, l10n),
           ),
           Positioned(
             top: screenHeight * 0.15,
@@ -200,50 +343,7 @@ class StartScreen extends StatelessWidget {
                     children: [
                       _buildLanguageSelector(context),
                       const SizedBox(height: 16),
-                      Container(
-                        width: double.infinity,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Colors.deepPurple, Colors.indigo],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(28),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.deepPurple.withValues(alpha: 0.5),
-                              blurRadius: 12,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: onStartGame,
-                            borderRadius: BorderRadius.circular(28),
-                            child: Center(
-                              child: Text(
-                                l10n.startAdventure,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  letterSpacing: 1.5,
-                                  shadows: [
-                                    Shadow(
-                                      blurRadius: 4,
-                                      color: Colors.black38,
-                                      offset: Offset(1, 1),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      _buildStartGameButton(context, l10n),
                     ],
                   ),
           ),
@@ -258,40 +358,16 @@ class StartScreen extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.menu_book, color: Colors.white70, size: 28),
-                  onPressed: () => GuidebookDialog.show(context),
-                  tooltip: l10n.guidebookTooltip,
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.black38,
-                    padding: const EdgeInsets.all(8),
-                  ),
-                ),
+                _buildGuidebookButton(context, l10n),
                 const SizedBox(width: 10),
-                IconButton(
-                  icon: const Icon(Icons.auto_stories, color: Colors.amberAccent, size: 28),
-                  onPressed: () => SpoilerDialog.show(context),
-                  tooltip: l10n.spoilersTooltip,
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.black38,
-                    padding: const EdgeInsets.all(8),
-                  ),
-                ),
+                _buildSpoilerButton(context, l10n),
               ],
             ),
           ),
           Positioned(
             top: 16,
             right: 24,
-            child: IconButton(
-              icon: const Icon(Icons.settings, color: Colors.white70, size: 28),
-              onPressed: onShowSettings,
-              tooltip: l10n.settingsTooltip,
-              style: IconButton.styleFrom(
-                backgroundColor: Colors.black38,
-                padding: const EdgeInsets.all(8),
-              ),
-            ),
+            child: _buildSettingsButton(context, l10n),
           ),
           Positioned.fill(
             child: Padding(
@@ -338,50 +414,7 @@ class StartScreen extends StatelessWidget {
                               children: [
                                 _buildLanguageSelector(context),
                                 const SizedBox(height: 16),
-                                Container(
-                                  width: double.infinity,
-                                  height: 56,
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [Colors.deepPurple, Colors.indigo],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    borderRadius: BorderRadius.circular(28),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.deepPurple.withValues(alpha: 0.5),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 6),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: onStartGame,
-                                      borderRadius: BorderRadius.circular(28),
-                                      child: Center(
-                                        child: Text(
-                                          l10n.startAdventure,
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                            letterSpacing: 1.5,
-                                            shadows: [
-                                              Shadow(
-                                                blurRadius: 4,
-                                                color: Colors.black38,
-                                                offset: Offset(1, 1),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                _buildStartGameButton(context, l10n),
                               ],
                             ),
                     ),

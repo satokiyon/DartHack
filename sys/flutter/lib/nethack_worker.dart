@@ -420,7 +420,7 @@ class NetHackWorker {
           ffi.sendPosCmdToC(x, y, mod);
         } else if (type == 'menu_select') {
           final ident = message['ident'] as int;
-          final count = message['count'] as int? ?? 1;
+          final count = message['count'] as int? ?? -1;
           ffi.sendMenuSelection(ident, count);
         } else if (type == 'menu_selects') {
           final selections = message['selections'] as List<dynamic>? ?? const <dynamic>[];

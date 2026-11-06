@@ -10,6 +10,8 @@ import 'save_data_list_view.dart';
 enum AskNameFocusTarget {
   none,
   input,
+  saveList,
+  playMode,
   cancel,
   confirm,
 }
@@ -40,13 +42,48 @@ class AskNameOverlayState extends State<AskNameOverlay> {
   late PlayMode _selectedPlayMode;
   String _previousCustomName = "";
   final ScrollController _saveScrollController = ScrollController();
-  final FocusNode _nameFocusNode = FocusNode();
+  late final FocusNode _nameFocusNode;
   AskNameFocusTarget _currentFocusTarget = AskNameFocusTarget.none;
+  AskNameFocusTarget get currentFocusTarget => _currentFocusTarget;
+  FocusNode get nameFocusNode => _nameFocusNode;
 
   @override
   void initState() {
     super.initState();
     _selectedPlayMode = widget.initialPlayMode;
+
+    _nameFocusNode = FocusNode(
+      onKeyEvent: (node, event) {
+        if (event.logicalKey == LogicalKeyboardKey.tab) {
+          if (event is KeyDownEvent) {
+            final isShift = HardwareKeyboard.instance.isShiftPressed;
+            cycleFocus(!isShift);
+          }
+          return KeyEventResult.handled;
+        }
+        if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+            event.logicalKey == LogicalKeyboardKey.arrowUp) {
+          if (event is KeyDownEvent) {
+            _handleArrowKey(event.logicalKey);
+          }
+          return KeyEventResult.handled;
+        }
+        if (event.logicalKey == LogicalKeyboardKey.escape) {
+          if (event is KeyDownEvent) {
+            widget.onSubmit(_selectedPlayMode, null);
+          }
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+    );
+    _nameFocusNode.addListener(() {
+      if (_nameFocusNode.hasFocus && _currentFocusTarget != AskNameFocusTarget.input) {
+        setState(() {
+          _currentFocusTarget = AskNameFocusTarget.input;
+        });
+      }
+    });
   }
 
   @override
@@ -92,10 +129,57 @@ class AskNameOverlayState extends State<AskNameOverlay> {
 
   /// 物理キーボードからのセーブデータ選択移動（上下矢印用）
   void moveSaveSelection(int delta) {
-    if (delta > 0) {
-      _handleArrowKey(LogicalKeyboardKey.arrowDown);
-    } else if (delta < 0) {
-      _handleArrowKey(LogicalKeyboardKey.arrowUp);
+    if (_currentFocusTarget == AskNameFocusTarget.saveList ||
+        _currentFocusTarget == AskNameFocusTarget.input ||
+        _currentFocusTarget == AskNameFocusTarget.none) {
+      if (delta > 0) {
+        _handleArrowKey(LogicalKeyboardKey.arrowDown);
+      } else if (delta < 0) {
+        _handleArrowKey(LogicalKeyboardKey.arrowUp);
+      }
+    }
+  }
+
+  /// プレイモードの安全な変更
+  void _setPlayMode(PlayMode newMode) {
+    if (_selectedPlayMode == newMode) return;
+    setState(() {
+      if (newMode == PlayMode.wizard) {
+        if (_selectedPlayMode != PlayMode.wizard) {
+          _previousCustomName = widget.nameController.text;
+        }
+        widget.nameController.text = "wizard";
+      } else {
+        if (_selectedPlayMode == PlayMode.wizard) {
+          widget.nameController.text =
+              _previousCustomName.isNotEmpty ? _previousCustomName : "Player";
+        }
+      }
+      _selectedPlayMode = newMode;
+    });
+  }
+
+  /// 物理キーボードからのプレイモード切り替え (←/→/Space)
+  void cyclePlayMode([bool forward = true]) {
+    const modes = [PlayMode.normal, PlayMode.explore, PlayMode.wizard];
+    final currentIdx = modes.indexOf(_selectedPlayMode);
+    final nextIdx = forward
+        ? (currentIdx + 1) % modes.length
+        : (currentIdx - 1 + modes.length) % modes.length;
+    _setPlayMode(modes[nextIdx]);
+  }
+
+  /// 水平キー入力ハンドラ (←: -1, →: 1)
+  void handleHorizontalMove(int direction) {
+    if (_currentFocusTarget == AskNameFocusTarget.playMode) {
+      cyclePlayMode(direction > 0);
+    }
+  }
+
+  /// スペースキー入力ハンドラ
+  void handleSpace() {
+    if (_currentFocusTarget == AskNameFocusTarget.playMode) {
+      cyclePlayMode(true);
     }
   }
 
@@ -103,6 +187,10 @@ class AskNameOverlayState extends State<AskNameOverlay> {
   void submit() {
     if (_currentFocusTarget == AskNameFocusTarget.cancel) {
       widget.onSubmit(_selectedPlayMode, null);
+      return;
+    }
+    if (_currentFocusTarget == AskNameFocusTarget.playMode) {
+      cyclePlayMode(true);
       return;
     }
     final askNameBytes = utf8.encode(widget.nameController.text).length;
@@ -114,9 +202,11 @@ class AskNameOverlayState extends State<AskNameOverlay> {
 
   /// Tab キーによるフォーカス循環ナビゲーション
   void cycleFocus([bool forward = true]) {
-    final targets = const [
+    final targets = [
       AskNameFocusTarget.none,
       AskNameFocusTarget.input,
+      if (widget.saves.isNotEmpty) AskNameFocusTarget.saveList,
+      AskNameFocusTarget.playMode,
       AskNameFocusTarget.cancel,
       AskNameFocusTarget.confirm,
     ];
@@ -131,7 +221,7 @@ class AskNameOverlayState extends State<AskNameOverlay> {
       _currentFocusTarget = nextTarget;
     });
 
-    if (nextTarget == AskNameFocusTarget.input) {
+    if (nextTarget == AskNameFocusTarget.input && _selectedPlayMode != PlayMode.wizard) {
       _nameFocusNode.requestFocus();
     } else {
       _nameFocusNode.unfocus();
@@ -219,11 +309,23 @@ class AskNameOverlayState extends State<AskNameOverlay> {
     final saveListMaxHeight = (availableHeight * 0.25).clamp(80.0, 140.0);
 
     return Positioned.fill(
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.84),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(12, 12, 12, widget.bottomInset),
-          child: Center(
+      child: Focus(
+        autofocus: true,
+        onKeyEvent: (node, event) {
+          if (event is KeyDownEvent) {
+            if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+                event.logicalKey == LogicalKeyboardKey.arrowUp) {
+              _handleArrowKey(event.logicalKey);
+              return KeyEventResult.handled;
+            }
+          }
+          return KeyEventResult.ignored;
+        },
+        child: Container(
+          color: Colors.black.withValues(alpha: 0.84),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(12, 12, 12, widget.bottomInset),
+            child: Center(
             child: Card(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               color: const Color(0xFF141A22),
@@ -256,48 +358,48 @@ class AskNameOverlayState extends State<AskNameOverlay> {
                       const SizedBox(height: 8),
                       Divider(color: Colors.white.withValues(alpha: 0.16), height: 1),
                       const SizedBox(height: 12),
-                      Focus(
-                        autofocus: true,
-                        onKeyEvent: (node, event) {
-                          if (event is KeyDownEvent) {
-                            if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
-                                event.logicalKey == LogicalKeyboardKey.arrowUp) {
-                              _handleArrowKey(event.logicalKey);
-                              return KeyEventResult.handled;
-                            }
-                          }
-                          return KeyEventResult.ignored;
-                        },
-                        child: TextField(
-                          controller: widget.nameController,
-                          focusNode: _nameFocusNode,
-                          autofocus: false,
-                          enabled: _selectedPlayMode != PlayMode.wizard,
-                          inputFormatters: [Utf8LengthLimitingTextInputFormatter(maxAskNameBytes)],
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: _selectedPlayMode == PlayMode.wizard
-                                ? const Color(0xFF1E2530)
-                                : const Color(0xFF0E1117),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                            counterText: l10n.bytesCount(askNameBytes, maxAskNameBytes),
-                            counterStyle: TextStyle(
-                              color: isAskNameOverflow ? Colors.red : Colors.white70,
-                              fontWeight: isAskNameOverflow ? FontWeight.bold : FontWeight.normal,
-                            ),
+                      TextField(
+                        controller: widget.nameController,
+                        focusNode: _nameFocusNode,
+                        autofocus: false,
+                        enabled: _selectedPlayMode != PlayMode.wizard,
+                        inputFormatters: [Utf8LengthLimitingTextInputFormatter(maxAskNameBytes)],
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: _selectedPlayMode == PlayMode.wizard
+                              ? const Color(0xFF1E2530)
+                              : const Color(0xFF0E1117),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: _currentFocusTarget == AskNameFocusTarget.input
+                                ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                                : BorderSide(color: Colors.white.withValues(alpha: 0.12)),
                           ),
-                          onChanged: (val) {
-                            setState(() {});
-                          },
-                          onSubmitted: (val) {
-                            if (!isAskNameOverflow) {
-                              widget.onSubmit(_selectedPlayMode, val);
-                            }
-                          },
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: _currentFocusTarget == AskNameFocusTarget.input
+                                ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                                : BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                            borderSide: BorderSide(color: Colors.amberAccent, width: 2.5),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          counterText: l10n.bytesCount(askNameBytes, maxAskNameBytes),
+                          counterStyle: TextStyle(
+                            color: isAskNameOverflow ? Colors.red : Colors.white70,
+                            fontWeight: isAskNameOverflow ? FontWeight.bold : FontWeight.normal,
+                          ),
                         ),
+                        onChanged: (val) {
+                          setState(() {});
+                        },
+                        onSubmitted: (val) {
+                          if (!isAskNameOverflow) {
+                            widget.onSubmit(_selectedPlayMode, val);
+                          }
+                        },
                       ),
                       if (isAskNameOverflow) ...[
                         const SizedBox(height: 4),
@@ -314,65 +416,86 @@ class AskNameOverlayState extends State<AskNameOverlay> {
                         const SizedBox(height: 8),
                         Text(l10n.savedGames, style: const TextStyle(color: Colors.grey, fontSize: 12)),
                         const SizedBox(height: 6),
-                        SaveDataListView(
-                          saves: widget.saves,
-                          selectedName: (_selectedPlayMode == PlayMode.wizard)
-                              ? _previousCustomName
-                              : widget.nameController.text,
-                          maxHeight: saveListMaxHeight,
-                          scrollController: _saveScrollController,
-                          onSelect: (name) {
-                            if (_selectedPlayMode == PlayMode.wizard) {
-                              _previousCustomName = name;
-                            } else {
-                              widget.nameController.text = name;
-                              _previousCustomName = name;
-                            }
-                            setState(() {});
-                          },
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: _currentFocusTarget == AskNameFocusTarget.saveList
+                                ? Border.all(color: Colors.amberAccent, width: 2.5)
+                                : null,
+                            boxShadow: _currentFocusTarget == AskNameFocusTarget.saveList
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.amberAccent.withValues(alpha: 0.4),
+                                      blurRadius: 8,
+                                      spreadRadius: 1,
+                                    )
+                                  ]
+                                : null,
+                          ),
+                          child: SaveDataListView(
+                            saves: widget.saves,
+                            selectedName: (_selectedPlayMode == PlayMode.wizard)
+                                ? _previousCustomName
+                                : widget.nameController.text,
+                            maxHeight: saveListMaxHeight,
+                            scrollController: _saveScrollController,
+                            onSelect: (name) {
+                              if (_selectedPlayMode == PlayMode.wizard) {
+                                _previousCustomName = name;
+                              } else {
+                                widget.nameController.text = name;
+                                _previousCustomName = name;
+                              }
+                              setState(() {});
+                            },
+                          ),
                         ),
                       ],
                       const SizedBox(height: 12),
                       Text(l10n.playMode, style: const TextStyle(color: Colors.grey, fontSize: 12)),
                       const SizedBox(height: 6),
-                      SegmentedButton<PlayMode>(
-                        segments: [
-                          ButtonSegment<PlayMode>(
-                            value: PlayMode.normal,
-                            label: Text(l10n.playModeNormal, style: const TextStyle(fontSize: 12)),
-                            icon: const Icon(Icons.emoji_events_outlined, size: 15),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          border: _currentFocusTarget == AskNameFocusTarget.playMode
+                              ? Border.all(color: Colors.amberAccent, width: 2.5)
+                              : null,
+                          boxShadow: _currentFocusTarget == AskNameFocusTarget.playMode
+                              ? [
+                                  BoxShadow(
+                                    color: Colors.amberAccent.withValues(alpha: 0.5),
+                                    blurRadius: 8,
+                                    spreadRadius: 1,
+                                  )
+                                ]
+                              : null,
+                        ),
+                        child: SegmentedButton<PlayMode>(
+                          segments: [
+                            ButtonSegment<PlayMode>(
+                              value: PlayMode.normal,
+                              label: Text(l10n.playModeNormal, style: const TextStyle(fontSize: 12)),
+                              icon: const Icon(Icons.emoji_events_outlined, size: 15),
+                            ),
+                            ButtonSegment<PlayMode>(
+                              value: PlayMode.explore,
+                              label: Text(l10n.playModeExplore, style: const TextStyle(fontSize: 12)),
+                              icon: const Icon(Icons.search, size: 15),
+                            ),
+                            ButtonSegment<PlayMode>(
+                              value: PlayMode.wizard,
+                              label: Text(l10n.playModeWizard, style: const TextStyle(fontSize: 12)),
+                              icon: const Icon(Icons.auto_fix_high, size: 15),
+                            ),
+                          ],
+                          selected: {_selectedPlayMode},
+                          onSelectionChanged: (Set<PlayMode> newSelection) {
+                            _setPlayMode(newSelection.first);
+                          },
+                          style: const ButtonStyle(
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            visualDensity: VisualDensity.compact,
                           ),
-                          ButtonSegment<PlayMode>(
-                            value: PlayMode.explore,
-                            label: Text(l10n.playModeExplore, style: const TextStyle(fontSize: 12)),
-                            icon: const Icon(Icons.search, size: 15),
-                          ),
-                          ButtonSegment<PlayMode>(
-                            value: PlayMode.wizard,
-                            label: Text(l10n.playModeWizard, style: const TextStyle(fontSize: 12)),
-                            icon: const Icon(Icons.auto_fix_high, size: 15),
-                          ),
-                        ],
-                        selected: {_selectedPlayMode},
-                        onSelectionChanged: (Set<PlayMode> newSelection) {
-                          final newMode = newSelection.first;
-                          setState(() {
-                            if (newMode == PlayMode.wizard) {
-                              if (_selectedPlayMode != PlayMode.wizard) {
-                                _previousCustomName = widget.nameController.text;
-                              }
-                              widget.nameController.text = "wizard";
-                            } else {
-                              if (_selectedPlayMode == PlayMode.wizard) {
-                                widget.nameController.text = _previousCustomName.isNotEmpty ? _previousCustomName : "Player";
-                              }
-                            }
-                            _selectedPlayMode = newMode;
-                          });
-                        },
-                        style: const ButtonStyle(
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          visualDensity: VisualDensity.compact,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -389,33 +512,36 @@ class AskNameOverlayState extends State<AskNameOverlay> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () => widget.onSubmit(_selectedPlayMode, null),
-                            style: TextButton.styleFrom(
-                              side: _currentFocusTarget == AskNameFocusTarget.cancel
-                                  ? const BorderSide(color: Colors.tealAccent, width: 2.0)
-                                  : null,
+                      ExcludeFocus(
+                        excluding: true,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () => widget.onSubmit(_selectedPlayMode, null),
+                              style: TextButton.styleFrom(
+                                side: _currentFocusTarget == AskNameFocusTarget.cancel
+                                    ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                                    : null,
+                              ),
+                              child: Text(l10n.cancel),
                             ),
-                            child: Text(l10n.cancel),
-                          ),
-                          const SizedBox(width: 8),
-                          ElevatedButton(
-                            onPressed: isAskNameOverflow
-                                ? null
-                                : () => widget.onSubmit(_selectedPlayMode, widget.nameController.text),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF004D40), // 深いダークティール (ラベンダー文字とのコントラスト比 約 6.5:1)
-                              disabledBackgroundColor: const Color(0xFF004D40).withValues(alpha: 0.3),
-                              side: _currentFocusTarget == AskNameFocusTarget.confirm
-                                  ? const BorderSide(color: Colors.tealAccent, width: 2.0)
-                                  : null,
+                            const SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: isAskNameOverflow
+                                  ? null
+                                  : () => widget.onSubmit(_selectedPlayMode, widget.nameController.text),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF004D40), // 深いダークティール (ラベンダー文字とのコントラスト比 約 6.5:1)
+                                disabledBackgroundColor: const Color(0xFF004D40).withValues(alpha: 0.3),
+                                side: _currentFocusTarget == AskNameFocusTarget.confirm
+                                    ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                                    : null,
+                              ),
+                              child: Text(l10n.startGame),
                             ),
-                            child: Text(l10n.startGame),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -424,6 +550,7 @@ class AskNameOverlayState extends State<AskNameOverlay> {
             ),
           ),
         ),
+      ),
       ),
     );
   }

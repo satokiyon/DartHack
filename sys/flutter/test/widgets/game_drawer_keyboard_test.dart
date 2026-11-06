@@ -27,6 +27,7 @@ void main() {
       locale: const Locale('ja'),
       home: Scaffold(
         body: GameDrawerContent(
+          autofocus: true,
           isGameRunning: isGameRunning,
           isKeyboardVisible: isKeyboardVisible,
           onClose: onClose,

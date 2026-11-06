@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/ext_cmd_entry.dart';
 import 'dialog_recent_messages_box.dart';
@@ -47,6 +48,9 @@ class GetLineOverlayState extends State<GetLineOverlay> {
   late ScrollController _listScrollController;
   int? _selectedCandidateIndex;
   GetLineFocusTarget _currentFocusTarget = GetLineFocusTarget.none;
+  GetLineFocusTarget get currentFocusTarget => _currentFocusTarget;
+  FocusNode get inputFocusNode => _inputFocusNode;
+  FocusNode get filterFocusNode => _filterFocusNode;
 
   bool get _isExtCmd => widget.extCmdList.isNotEmpty;
   int get _maxBytes => widget.isCallOrNamePrompt(widget.prompt) ? 62 : 100;
@@ -56,8 +60,70 @@ class GetLineOverlayState extends State<GetLineOverlay> {
     super.initState();
     _extCmdFilterController = TextEditingController();
     _filteredExtCmds = List.from(widget.extCmdList);
-    _inputFocusNode = FocusNode();
-    _filterFocusNode = FocusNode();
+
+    // 物理キーボードで TextField がフォーカスされた際、Flutter 標準の NextFocusIntent による外漏れを遮断し、
+    // 自前の cycleFocus を呼び出すための onKeyEvent を設定
+    _inputFocusNode = FocusNode(
+      onKeyEvent: (node, event) {
+        if (event.logicalKey == LogicalKeyboardKey.tab) {
+          if (event is KeyDownEvent) {
+            final isShift = HardwareKeyboard.instance.isShiftPressed;
+            cycleFocus(!isShift);
+          }
+          return KeyEventResult.handled;
+        }
+        if (event.logicalKey == LogicalKeyboardKey.escape) {
+          if (event is KeyDownEvent) {
+            widget.onSubmit(null);
+          }
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+    );
+    _inputFocusNode.addListener(() {
+      if (_inputFocusNode.hasFocus && _currentFocusTarget != GetLineFocusTarget.input) {
+        setState(() {
+          _currentFocusTarget = GetLineFocusTarget.input;
+        });
+      }
+    });
+
+    _filterFocusNode = FocusNode(
+      onKeyEvent: (node, event) {
+        if (event.logicalKey == LogicalKeyboardKey.tab) {
+          if (event is KeyDownEvent) {
+            final isShift = HardwareKeyboard.instance.isShiftPressed;
+            autocompleteCandidate(true, !isShift);
+          }
+          return KeyEventResult.handled;
+        }
+        if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+          if (event is KeyDownEvent) moveCandidate(1);
+          return KeyEventResult.handled;
+        }
+        if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+          if (event is KeyDownEvent) moveCandidate(-1);
+          return KeyEventResult.handled;
+        }
+        if (event.logicalKey == LogicalKeyboardKey.pageDown) {
+          if (event is KeyDownEvent) pageScroll(1);
+          return KeyEventResult.handled;
+        }
+        if (event.logicalKey == LogicalKeyboardKey.pageUp) {
+          if (event is KeyDownEvent) pageScroll(-1);
+          return KeyEventResult.handled;
+        }
+        if (event.logicalKey == LogicalKeyboardKey.escape) {
+          if (event is KeyDownEvent) {
+            widget.onSubmit(null);
+          }
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+    );
+
     _listScrollController = ScrollController();
     _selectedCandidateIndex = null;
   }
@@ -267,15 +333,11 @@ class GetLineOverlayState extends State<GetLineOverlay> {
     });
 
     if (nextTarget == GetLineFocusTarget.input) {
-      if (_isExtCmd) {
-        _filterFocusNode.requestFocus();
-      } else {
-        _inputFocusNode.requestFocus();
-      }
+      _inputFocusNode.requestFocus();
     } else {
       _inputFocusNode.unfocus();
-      _filterFocusNode.unfocus();
     }
+    _filterFocusNode.unfocus();
   }
 
   /// 先頭の '#' を確実に除去して C コアに送信
@@ -384,11 +446,11 @@ class GetLineOverlayState extends State<GetLineOverlay> {
 
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withValues(alpha: 0.84),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(16, 16, 16, widget.bottomInset),
-          child: Center(
-            child: Card(
+          color: Colors.black.withValues(alpha: 0.84),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, widget.bottomInset),
+            child: Center(
+              child: Card(
               margin: const EdgeInsets.all(16),
               color: const Color(0xFF141A22),
               elevation: 12,
@@ -435,6 +497,19 @@ class GetLineOverlayState extends State<GetLineOverlay> {
                         fillColor: const Color(0xFF0E1117),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
+                          borderSide: _currentFocusTarget == GetLineFocusTarget.input
+                              ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                              : BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: _currentFocusTarget == GetLineFocusTarget.input
+                              ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                              : BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+                        ),
+                        focusedBorder: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                          borderSide: BorderSide(color: Colors.amberAccent, width: 2.5),
                         ),
                         counter: ValueListenableBuilder<TextEditingValue>(
                           valueListenable: widget.inputController,
@@ -528,61 +603,64 @@ class GetLineOverlayState extends State<GetLineOverlay> {
                       ),
                     ],
                     const SizedBox(height: 16),
-                    Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: _handleShowHistory,
-                          icon: const Icon(Icons.history_rounded, size: 16),
-                          label: Text(l10n.history),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueGrey[900],
-                            foregroundColor: Colors.amber[200],
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                            side: _currentFocusTarget == GetLineFocusTarget.history
-                                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
-                                : null,
+                    ExcludeFocus(
+                      excluding: true,
+                      child: Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: _handleShowHistory,
+                            icon: const Icon(Icons.history_rounded, size: 16),
+                            label: Text(l10n.history),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blueGrey[900],
+                              foregroundColor: Colors.amber[200],
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              side: _currentFocusTarget == GetLineFocusTarget.history
+                                  ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                                  : null,
+                            ),
                           ),
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TextButton(
-                              onPressed: () => widget.onSubmit(null),
-                              style: TextButton.styleFrom(
-                                side: _currentFocusTarget == GetLineFocusTarget.cancel
-                                    ? const BorderSide(color: Colors.tealAccent, width: 2.0)
-                                    : null,
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextButton(
+                                onPressed: () => widget.onSubmit(null),
+                                style: TextButton.styleFrom(
+                                  side: _currentFocusTarget == GetLineFocusTarget.cancel
+                                      ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                                      : null,
+                                ),
+                                child: Text(l10n.cancel),
                               ),
-                              child: Text(l10n.cancel),
-                            ),
-                            const SizedBox(width: 8),
-                            ValueListenableBuilder<TextEditingValue>(
-                              valueListenable: widget.inputController,
-                              builder: (context, value, child) {
-                                final byteCount = utf8.encode(value.text).length;
-                                final isOverLimit = byteCount > maxBytes;
-                                return ElevatedButton(
-                                  onPressed: isOverLimit
-                                      ? null
-                                      : () => submit(),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF004D40), // 深いダークティール (ラベンダー文字とのコントラスト比 約 6.5:1)
-                                    disabledBackgroundColor: const Color(0xFF004D40).withValues(alpha: 0.3),
-                                    side: _currentFocusTarget == GetLineFocusTarget.confirm
-                                        ? const BorderSide(color: Colors.tealAccent, width: 2.0)
-                                        : null,
-                                  ),
-                                  child: Text(l10n.confirm),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
+                              const SizedBox(width: 8),
+                              ValueListenableBuilder<TextEditingValue>(
+                                valueListenable: widget.inputController,
+                                builder: (context, value, child) {
+                                  final byteCount = utf8.encode(value.text).length;
+                                  final isOverLimit = byteCount > maxBytes;
+                                  return ElevatedButton(
+                                    onPressed: isOverLimit
+                                        ? null
+                                        : () => submit(),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF004D40), // 深いダークティール (ラベンダー文字とのコントラスト比 約 6.5:1)
+                                      disabledBackgroundColor: const Color(0xFF004D40).withValues(alpha: 0.3),
+                                      side: _currentFocusTarget == GetLineFocusTarget.confirm
+                                          ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                                          : null,
+                                    ),
+                                    child: Text(l10n.confirm),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

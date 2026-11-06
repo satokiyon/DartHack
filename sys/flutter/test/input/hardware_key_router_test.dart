@@ -554,6 +554,40 @@ void main() {
         equals(const MenuAccelerator(65)), // 'A'
       );
 
+      // 数字キー入力: MenuDigit(0..9)
+      final digit1Event = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.digit1,
+        logicalKey: LogicalKeyboardKey.digit1,
+        character: '1',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: digit1Event, context: KeyInputContext.menu),
+        equals(const MenuDigit(1)),
+      );
+
+      // テンキー数字入力: MenuDigit(0..9)
+      final numpad5Event = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.numpad5,
+        logicalKey: LogicalKeyboardKey.numpad5,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: numpad5Event, context: KeyInputContext.menu),
+        equals(const MenuDigit(5)),
+      );
+
+      // BackSpace 入力: MenuCountBackspace()
+      final backspaceEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.backspace,
+        logicalKey: LogicalKeyboardKey.backspace,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: backspaceEvent, context: KeyInputContext.menu),
+        equals(const MenuCountBackspace()),
+      );
+
       // KeyRepeatEvent: スクロールキーは許可、アクセラレータや決定は SwallowKey
       final repeatScrollEvent = const KeyRepeatEvent(
         physicalKey: PhysicalKeyboardKey.arrowDown,

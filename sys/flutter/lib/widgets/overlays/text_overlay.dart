@@ -363,50 +363,53 @@ class TextOverlayState extends State<TextOverlay> {
                 ),
                 const SizedBox(height: 12),
                 Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: widget.onShowMsgHistory,
-                        icon: const Icon(Icons.history_rounded, size: 16),
-                        label: Text(l10n?.history ?? 'History'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _currentFocusTarget == TextOverlayFocusTarget.history
-                              ? Colors.blueGrey[700]
-                              : Colors.blueGrey[900],
-                          foregroundColor: Colors.amber[200],
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          side: _currentFocusTarget == TextOverlayFocusTarget.history
-                              ? const BorderSide(color: Colors.amberAccent, width: 2.5)
-                              : null,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      ElevatedButton(
-                        onPressed: widget.onDismiss,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _currentFocusTarget == TextOverlayFocusTarget.ok
-                              ? Colors.teal[400]
-                              : Colors.teal[500],
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          side: _currentFocusTarget == TextOverlayFocusTarget.ok
-                              ? const BorderSide(color: Colors.amberAccent, width: 2.5)
-                              : null,
-                        ),
-                        child: const Text(
-                          "OK",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                  child: ExcludeFocus(
+                    excluding: true,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: widget.onShowMsgHistory,
+                          icon: const Icon(Icons.history_rounded, size: 16),
+                          label: Text(l10n?.history ?? 'History'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _currentFocusTarget == TextOverlayFocusTarget.history
+                                ? Colors.blueGrey[700]
+                                : Colors.blueGrey[900],
+                            foregroundColor: Colors.amber[200],
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            side: _currentFocusTarget == TextOverlayFocusTarget.history
+                                ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                                : null,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: widget.onDismiss,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _currentFocusTarget == TextOverlayFocusTarget.ok
+                                ? Colors.teal[400]
+                                : Colors.teal[500],
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            side: _currentFocusTarget == TextOverlayFocusTarget.ok
+                                ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                                : null,
+                          ),
+                          child: const Text(
+                            "OK",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

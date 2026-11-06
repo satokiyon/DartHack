@@ -30,6 +30,7 @@ class MenuOverlay extends StatefulWidget {
   final Function(Map<int, int> selectedCounts)? onSelectionChanged;
   final Function(MenuItemData item) onItemLongPress;
   final double bottomInset;
+  final int? pendingCount;
   final bool useTiles;
   final ui.Image? tileImage;
   final int tileWidth;
@@ -47,6 +48,7 @@ class MenuOverlay extends StatefulWidget {
     this.onSelectionChanged,
     required this.onItemLongPress,
     required this.bottomInset,
+    this.pendingCount,
     required this.useTiles,
     required this.tileImage,
     required this.tileWidth,
@@ -912,8 +914,8 @@ class MenuOverlayState extends State<MenuOverlay> {
 
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withValues(alpha: 0.92),
-        padding: EdgeInsets.fromLTRB(16, 16, 16, widget.bottomInset),
+          color: Colors.black.withValues(alpha: 0.92),
+          padding: EdgeInsets.fromLTRB(16, 16, 16, widget.bottomInset),
         child: Card(
           margin: EdgeInsets.zero,
           color: const Color(0xFF12161D),
@@ -927,25 +929,55 @@ class MenuOverlayState extends State<MenuOverlay> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (widget.menuPrompt.isNotEmpty) ...[
+                if (widget.menuPrompt.isNotEmpty || (widget.pendingCount != null && widget.pendingCount! > 0)) ...[
                   Row(
                     children: [
-                      Icon(
-                        isMultiSelectMenu ? Icons.checklist_rounded : Icons.menu_book_rounded,
-                        size: 18,
-                        color: Colors.amber[300],
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          widget.menuPrompt,
-                          style: const TextStyle(
-                            color: Colors.amber,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                      if (widget.menuPrompt.isNotEmpty) ...[
+                        Icon(
+                          isMultiSelectMenu ? Icons.checklist_rounded : Icons.menu_book_rounded,
+                          size: 18,
+                          color: Colors.amber[300],
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            widget.menuPrompt,
+                            style: const TextStyle(
+                              color: Colors.amber,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
-                      ),
+                      ] else ...[
+                        const Spacer(),
+                      ],
+                      if (widget.pendingCount != null && widget.pendingCount! > 0) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.amber, width: 1.5),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.tag, size: 14, color: Colors.amber),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${Localizations.localeOf(context).languageCode == 'ja' ? '数量' : 'Count'}: ${widget.pendingCount}',
+                                style: const TextStyle(
+                                  color: Colors.amber,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -1336,60 +1368,63 @@ class MenuOverlayState extends State<MenuOverlay> {
                 ),
                 const SizedBox(height: 10),
                 Center(
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      if (isMultiSelectMenu) ...[
+                  child: ExcludeFocus(
+                    excluding: true,
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        if (isMultiSelectMenu) ...[
+                          ElevatedButton(
+                            onPressed: _handleSelectAll,
+                            style: ElevatedButton.styleFrom(
+                              side: _currentFocusTarget == MenuFocusTarget.selectAll
+                                  ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                                  : null,
+                            ),
+                            child: Text(AppLocalizations.of(context)!.selectAll),
+                          ),
+                          ElevatedButton(
+                            onPressed: _handleDeselectAll,
+                            style: ElevatedButton.styleFrom(
+                              side: _currentFocusTarget == MenuFocusTarget.deselectAll
+                                  ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                                  : null,
+                            ),
+                            child: Text(AppLocalizations.of(context)!.deselectAll),
+                          ),
+                          ElevatedButton(
+                            onPressed: _handleInvertAll,
+                            style: ElevatedButton.styleFrom(
+                              side: _currentFocusTarget == MenuFocusTarget.invertAll
+                                  ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                                  : null,
+                            ),
+                            child: Text(AppLocalizations.of(context)!.invertAll),
+                          ),
+                          ElevatedButton(
+                            onPressed: submit,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF004D40), // 深いダークティール (決定ボタンとして際立たせる)
+                              side: _currentFocusTarget == MenuFocusTarget.confirm
+                                  ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                                  : null,
+                            ),
+                            child: const Text("OK"),
+                          ),
+                        ],
                         ElevatedButton(
-                          onPressed: _handleSelectAll,
+                          onPressed: () => widget.onSingleSelect(-1),
                           style: ElevatedButton.styleFrom(
-                            side: _currentFocusTarget == MenuFocusTarget.selectAll
-                                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                            side: _currentFocusTarget == MenuFocusTarget.cancel
+                                ? const BorderSide(color: Colors.amberAccent, width: 2.5)
                                 : null,
                           ),
-                          child: Text(AppLocalizations.of(context)!.selectAll),
-                        ),
-                        ElevatedButton(
-                          onPressed: _handleDeselectAll,
-                          style: ElevatedButton.styleFrom(
-                            side: _currentFocusTarget == MenuFocusTarget.deselectAll
-                                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
-                                : null,
-                          ),
-                          child: Text(AppLocalizations.of(context)!.deselectAll),
-                        ),
-                        ElevatedButton(
-                          onPressed: _handleInvertAll,
-                          style: ElevatedButton.styleFrom(
-                            side: _currentFocusTarget == MenuFocusTarget.invertAll
-                                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
-                                : null,
-                          ),
-                          child: Text(AppLocalizations.of(context)!.invertAll),
-                        ),
-                        ElevatedButton(
-                          onPressed: submit,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF004D40), // 深いダークティール (決定ボタンとして際立たせる)
-                            side: _currentFocusTarget == MenuFocusTarget.confirm
-                                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
-                                : null,
-                          ),
-                          child: const Text("OK"),
+                          child: Text(AppLocalizations.of(context)!.cancel),
                         ),
                       ],
-                      ElevatedButton(
-                        onPressed: () => widget.onSingleSelect(-1),
-                        style: ElevatedButton.styleFrom(
-                          side: _currentFocusTarget == MenuFocusTarget.cancel
-                              ? const BorderSide(color: Colors.tealAccent, width: 2.0)
-                              : null,
-                        ),
-                        child: Text(AppLocalizations.of(context)!.cancel),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ],

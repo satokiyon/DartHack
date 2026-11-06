@@ -6,7 +6,7 @@ import '../nethack_screen.dart';
 import '../nethack_map_painter.dart';
 import '../services/font_manager.dart';
 
-void showFullMapDialog({
+Future<void> showFullMapDialog({
   required BuildContext context,
   required NetHackScreen screen,
   required bool useTiles,
@@ -16,7 +16,7 @@ void showFullMapDialog({
   bool isTransparentTileset = false,
 }) {
   final l10n = AppLocalizations.of(context)!;
-  showDialog(
+  return showDialog(
     context: context,
     barrierDismissible: true,
     builder: (context) {

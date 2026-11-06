@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:darthack/l10n/app_localizations.dart';
 import 'package:darthack/widgets/overlays/yn_overlay.dart';
@@ -87,5 +88,41 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(historyOpened, isTrue);
+  });
+
+  testWidgets('数量入力YNプロンプトでTabキーを押すとinputにフォーカス(hasFocus=true)が当たり、Tabで次へ遷移する', (tester) async {
+    final overlayKey = GlobalKey<YnOverlayState>();
+
+    await tester.pumpWidget(buildTestWidget(
+      question: 'いくつ分けますか? [1-10] (10)',
+      choices: '',
+      defaultChoice: 10,
+      onSelect: (_) {},
+      onShowMsgHistory: () {},
+      key: overlayKey,
+    ));
+    await tester.pumpAndSettle();
+
+    // 1. Tab -> input (日本語 IME や数字入力のため本物のフォーカスが当たる)
+    overlayKey.currentState?.cycleFocus(true);
+    await tester.pumpAndSettle();
+    expect(overlayKey.currentState?.currentFocusTarget, equals('input'));
+    expect(overlayKey.currentState?.textFocusNode.hasFocus, isTrue);
+
+    // 2. Tab キーイベント送信で handled され、cancel へ遷移
+    const tabEvent = KeyDownEvent(
+      physicalKey: PhysicalKeyboardKey.tab,
+      logicalKey: LogicalKeyboardKey.tab,
+      timeStamp: Duration.zero,
+    );
+    final handled = overlayKey.currentState?.textFocusNode.onKeyEvent!(
+      overlayKey.currentState!.textFocusNode,
+      tabEvent,
+    );
+    expect(handled, equals(KeyEventResult.handled));
+
+    await tester.pumpAndSettle();
+    expect(overlayKey.currentState?.currentFocusTarget, equals('cancel'));
+    expect(overlayKey.currentState?.textFocusNode.hasFocus, isFalse);
   });
 }
