@@ -2,6 +2,7 @@ import '../config/ad_config.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
 import 'exit_ad_banner.dart';
 
@@ -22,6 +23,7 @@ class ExitHighlightDialog extends StatefulWidget {
 class _ExitHighlightDialogState extends State<ExitHighlightDialog>
     with SingleTickerProviderStateMixin {
   bool _isHighlightReady = false;
+  bool _isOkFocused = false;
   Timer? _timeoutTimer;
   Timer? _animTimer;
   int _animFrame = 0;
@@ -114,114 +116,165 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
     return result;
   }
 
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+
+    final key = event.logicalKey;
+
+    // Space, Enter, NumpadEnter, Escape でダイアログを閉じる
+    if (key == LogicalKeyboardKey.space ||
+        key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter ||
+        key == LogicalKeyboardKey.escape) {
+      Navigator.of(context).pop();
+      return KeyEventResult.handled;
+    }
+
+    // Tab / Shift+Tab で OK ボタンのフォーカス枠をトグル巡回
+    if (key == LogicalKeyboardKey.tab) {
+      setState(() {
+        _isOkFocused = !_isOkFocused;
+      });
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return PopScope(
-      canPop: false,
-      child: AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: Text(
-          l10n.quit,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.dialogMessage,
-                style: const TextStyle(color: Colors.white70, fontSize: 14),
-              ),
-              const SizedBox(height: 16),
-              const Divider(color: Colors.white24),
-              const SizedBox(height: 8),
-
-              Text(
-                l10n.runHighlights,
-                style: const TextStyle(
-                  color: Colors.amberAccent,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+    return Focus(
+      autofocus: true,
+      onKeyEvent: _handleKeyEvent,
+      child: PopScope(
+        canPop: false,
+        child: AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: Text(
+            l10n.quit,
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.dialogMessage,
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
-              ),
-              const SizedBox(height: 8),
+                const SizedBox(height: 16),
+                const Divider(color: Colors.white24),
+                const SizedBox(height: 8),
 
-              if (!_isHighlightReady) ...[
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.black45,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Colors.white12),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(
-                        '[@]',
-                        style: TextStyle(
-                          color: _animFrame % 2 == 0 ? Colors.cyanAccent : Colors.lightBlue,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'monospace',
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          l10n.recallingMemories,
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                    ],
+                Text(
+                  l10n.runHighlights,
+                  style: const TextStyle(
+                    color: Colors.amberAccent,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
                   ),
                 ),
-              ] else ...[
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.black38,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Colors.amberAccent.withValues(alpha: 0.3)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: _selectedHighlights.map((text) {
-                      final isNone = text == l10n.none || text == 'なし';
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 3),
-                        child: Text(
-                          text,
+                const SizedBox(height: 8),
+
+                if (!_isHighlightReady) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.black45,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.white12),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          '[@]',
                           style: TextStyle(
-                            color: isNone ? Colors.grey : Colors.white,
-                            fontSize: 13,
+                            color: _animFrame % 2 == 0 ? Colors.cyanAccent : Colors.lightBlue,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'monospace',
                           ),
                         ),
-                      );
-                    }).toList(),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            l10n.recallingMemories,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                ] else ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.black38,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.amberAccent.withValues(alpha: 0.3)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: _selectedHighlights.map((text) {
+                        final isNone = text == l10n.none || text == 'なし';
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 3),
+                          child: Text(
+                            text,
+                            style: TextStyle(
+                              color: isNone ? Colors.grey : Colors.white,
+                              fontSize: 13,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 16),
+                ExitAdBanner(
+                  onAdLoaded: _completeLoading,
+                  onAdFailedToLoad: _completeLoading,
                 ),
               ],
-
-              const SizedBox(height: 16),
-              ExitAdBanner(
-                onAdLoaded: _completeLoading,
-                onAdFailedToLoad: _completeLoading,
+            ),
+          ),
+          actions: [
+            Container(
+              decoration: _isOkFocused
+                  ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.amberAccent, width: 2),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.amberAccent,
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    )
+                  : null,
+              child: TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  'OK',
+                  style: TextStyle(
+                    color: _isOkFocused ? Colors.amberAccent : Colors.blueAccent,
+                    fontSize: 16,
+                    fontWeight: _isOkFocused ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK', style: TextStyle(color: Colors.blueAccent, fontSize: 16)),
-          ),
-        ],
       ),
     );
   }

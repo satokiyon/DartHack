@@ -28,6 +28,7 @@ import 'dart:ffi' hide Size;
 import 'dart:convert';
 import 'package:ffi/ffi.dart';
 import 'widgets/exit_highlight_dialog.dart';
+import 'widgets/standard_exit_dialog.dart';
 import 'utils/rewarded_ad_manager.dart';
 import 'utils/yn_choice_parser.dart';
 
@@ -2497,29 +2498,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       await showDialog<void>(
         context: context,
         barrierDismissible: false,
-        builder: (dialogContext) {
-          return AlertDialog(
-            backgroundColor: Colors.grey[950],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            title: Row(
-              children: [
-                const Icon(Icons.info_outline, color: Colors.amber),
-                const SizedBox(width: 8),
-                Text(isJp ? 'ゲーム終了' : 'Game Over'),
-              ],
-            ),
-            content: Text(
-              dialogMessage,
-              style: const TextStyle(fontSize: 14, height: 1.4),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: const Text('OK'),
-              ),
-            ],
+        builder: (context) {
+          return StandardExitDialog(
+            dialogMessage: dialogMessage,
+            isJapanese: isJp,
           );
         },
       );

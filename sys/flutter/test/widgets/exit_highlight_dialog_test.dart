@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:darthack/config/ad_config.dart';
 import 'package:darthack/l10n/app_localizations.dart';
@@ -145,6 +146,185 @@ void main() {
       expect(find.textContaining('2. '), findsOneWidget);
       expect(find.textContaining('3. '), findsOneWidget);
       expect(find.textContaining('4. '), findsNothing);
+    });
+
+    testWidgets('初期状態で Space キーを押すとダイアログが閉じること', (tester) async {
+      AdConfig.isAndroidOverride = false;
+      AdConfig.isIOSOverride = false;
+
+      bool closed = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: Builder(
+            builder: (ctx) => Scaffold(
+              body: ElevatedButton(
+                onPressed: () async {
+                  await showDialog<void>(
+                    context: ctx,
+                    builder: (dialogCtx) => const ExitHighlightDialog(
+                      dialogMessage: 'セーブ完了',
+                      messageHistory: [],
+                    ),
+                  );
+                  closed = true;
+                },
+                child: const Text('Open'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+      expect(find.byType(ExitHighlightDialog), findsOneWidget);
+
+      // 初期状態で Space キーを押下
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ExitHighlightDialog), findsNothing);
+      expect(closed, isTrue);
+    });
+
+    testWidgets('初期状態で Enter キーを押すとダイアログが閉じること', (tester) async {
+      AdConfig.isAndroidOverride = false;
+      AdConfig.isIOSOverride = false;
+
+      bool closed = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: Builder(
+            builder: (ctx) => Scaffold(
+              body: ElevatedButton(
+                onPressed: () async {
+                  await showDialog<void>(
+                    context: ctx,
+                    builder: (dialogCtx) => const ExitHighlightDialog(
+                      dialogMessage: '死亡時終了',
+                      messageHistory: [],
+                    ),
+                  );
+                  closed = true;
+                },
+                child: const Text('Open'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+      expect(find.byType(ExitHighlightDialog), findsOneWidget);
+
+      // 初期状態で Enter キーを押下
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ExitHighlightDialog), findsNothing);
+      expect(closed, isTrue);
+    });
+
+    testWidgets('初期状態で Escape キーを押すとダイアログが閉じること', (tester) async {
+      AdConfig.isAndroidOverride = false;
+      AdConfig.isIOSOverride = false;
+
+      bool closed = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: Builder(
+            builder: (ctx) => Scaffold(
+              body: ElevatedButton(
+                onPressed: () async {
+                  await showDialog<void>(
+                    context: ctx,
+                    builder: (dialogCtx) => const ExitHighlightDialog(
+                      dialogMessage: '終了メッセージ',
+                      messageHistory: [],
+                    ),
+                  );
+                  closed = true;
+                },
+                child: const Text('Open'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+      expect(find.byType(ExitHighlightDialog), findsOneWidget);
+
+      // 初期状態で Escape キーを押下
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ExitHighlightDialog), findsNothing);
+      expect(closed, isTrue);
+    });
+
+    testWidgets('Tab キーで OK ボタンにフォーカス枠が当たり、Space/Enter で閉じられること', (tester) async {
+      AdConfig.isAndroidOverride = false;
+      AdConfig.isIOSOverride = false;
+
+      bool closed = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: Builder(
+            builder: (ctx) => Scaffold(
+              body: ElevatedButton(
+                onPressed: () async {
+                  await showDialog<void>(
+                    context: ctx,
+                    builder: (dialogCtx) => const ExitHighlightDialog(
+                      dialogMessage: '終了メッセージ',
+                      messageHistory: [],
+                    ),
+                  );
+                  closed = true;
+                },
+                child: const Text('Open'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+      expect(find.byType(ExitHighlightDialog), findsOneWidget);
+
+      // Tab キーを押すと OK ボタンにフォーカス枠が点灯
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+
+      // OK ボタンの周りの Container に Border が当たっていること
+      final okBtnContainer = tester.widget<Container>(
+        find.ancestor(of: find.text('OK'), matching: find.byType(Container)).first,
+      );
+      final decoration = okBtnContainer.decoration as BoxDecoration?;
+      expect(decoration?.border, isNotNull);
+
+      // フォーカス状態で Enter を押すと閉じる
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ExitHighlightDialog), findsNothing);
+      expect(closed, isTrue);
     });
   });
 }
