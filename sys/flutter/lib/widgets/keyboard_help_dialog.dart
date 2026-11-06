@@ -379,15 +379,11 @@ class _KeyboardHelpDialogState extends State<KeyboardHelpDialog> {
 
       case KeyboardHelpContext.game:
         return [
-          _HelpItem('矢印 / テンキー / hjkl', isJp ? '8方向移動（. で待機）' : '8-direction movement (. to wait)'),
-          _HelpItem('Shift + 移動', isJp ? '障害物に当たるまでダッシュ移動' : 'Run until obstacle'),
-          _HelpItem('Ctrl + 移動', isJp ? '指定方向の探査・移動' : 'Move / search towards direction'),
-          _HelpItem('Ctrl+P', isJp ? '直前のメッセージ履歴を再表示' : 'Show previous message history'),
           _HelpItem('Ctrl+M / F10', isJp ? 'ドロワーメニューを一発起動' : 'Open drawer menu directly'),
           _HelpItem('F9 / Alt-z', isJp ? '階層の全体地図を表示' : 'Show full level map'),
-          _HelpItem('Tab', isJp ? '半透明ボタン（メニュー／全体マップ）のフォーカス' : 'Focus floating buttons'),
-          _HelpItem('#', isJp ? '拡張コマンド一覧を開く' : 'Open extended commands'),
-          _HelpItem('Esc', isJp ? '現在のアクションを中断 / キャンセル' : 'Cancel current action'),
+          _HelpItem('Tab / Shift+Tab', isJp ? '半透明ボタン（メニュー／全体マップ）のフォーカス選択' : 'Focus floating buttons'),
+          _HelpItem('Enter / Space', isJp ? '選択中の半透明ボタンを実行' : 'Execute focused floating button'),
+          _HelpItem('?', isJp ? 'NetHack標準のヘルプ・コマンド一覧を表示' : 'Show standard NetHack help and command list'),
           _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
         ];
 

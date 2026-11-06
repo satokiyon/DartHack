@@ -133,7 +133,7 @@ void main() {
       expect(find.byType(KeyboardHelpDialog), findsNothing);
     });
 
-    testWidgets('game コンテキストで全体地図およびドロワー起動のヘルプが表示されること', (tester) async {
+    testWidgets('game コンテキストでDartHackのUI操作およびNetHack標準ヘルプ導線が表示され、NetHack本来の移動操作等は表示されないこと', (tester) async {
       await tester.pumpWidget(buildTestWidget(
         helpContext: KeyboardHelpContext.game,
       ));
@@ -145,6 +145,13 @@ void main() {
       expect(find.textContaining('F9 / Alt-z'), findsOneWidget);
       expect(find.textContaining('階層の全体地図を表示'), findsOneWidget);
       expect(find.textContaining('Ctrl+M / F10'), findsOneWidget);
+      expect(find.textContaining('Tab / Shift+Tab'), findsOneWidget);
+      expect(find.textContaining('選択中の半透明ボタンを実行'), findsOneWidget);
+      expect(find.textContaining('NetHack標準のヘルプ・コマンド一覧を表示'), findsOneWidget);
+
+      // NetHack 自体の操作（移動、履歴表示等）は表示されないこと
+      expect(find.textContaining('8方向移動'), findsNothing);
+      expect(find.textContaining('メッセージ履歴'), findsNothing);
     });
 
     testWidgets('titleScreen コンテキストでタイトル画面向け操作ヘルプが表示されること', (tester) async {

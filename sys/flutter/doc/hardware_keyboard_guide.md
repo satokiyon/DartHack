@@ -721,6 +721,6 @@ flowchart TD
     - 一行テキスト入力ダイアログにおける Tab 巡回時の `_inputFocusNode.unfocus()` 維持とフォーカスレス入力互換検証。
     - `ExcludeFocus` によるダイアログ外への Flutter 標準フォーカス漏延遮断の検証。
 15. [`test/widgets/keyboard_help_dialog_test.dart`](../test/widgets/keyboard_help_dialog_test.dart):
-    - 画面コンテキスト（`game`, `menu`, `yn`, `guidebook`, `titleScreen`, `settings`）に応じた最適化操作ガイド項目の表示検証。
+    - 画面コンテキスト（`game`, `menu`, `yn`, `guidebook`, `titleScreen`, `settings`）に応じた最適化操作ガイド項目の表示検証（`game` コンテキストでは DartHack 固有 UI 操作および `?` による NetHack 標準ヘルプ導線のみを表示し、NetHack 本来の移動操作等は非表示分離）。
     - 数量指定可能なメニュー（`menuHow >= 1`）のみにおける `0〜9` 数量指定案内の動的表示、および閲覧専用メニュー（`menuHow == 0`）での非表示分離の検証。
     - `F1`、`Alt + h`、`Escape`、閉じるアイコンボタンによるダイアログの安全閉鎖の検証。
