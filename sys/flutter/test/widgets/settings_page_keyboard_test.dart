@@ -338,6 +338,142 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(KeyboardHelpDialog), findsNothing);
     });
+
+    testWidgets('初期状態で下カーソルキーを押した後、さらに下カーソルキーを押すと次のセクションへフォーカスが遷移すること', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsPage), findsOneWidget);
+
+      // 1回目の下キー: 最初のセクション（tileset）へ
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      final focus1 = FocusManager.instance.primaryFocus;
+      expect(focus1, isNotNull);
+
+      // 2回目の下キー: 次のセクション（font）へ遷移すること
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      final focus2 = FocusManager.instance.primaryFocus;
+      expect(focus2, isNotNull);
+      expect(focus2, isNot(equals(focus1)));
+    });
+
+    testWidgets('Tabキーで次のセクションへ順次フォーカスが遷移すること', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsPage), findsOneWidget);
+
+      // 1回目のTab: 最初のセクション（tileset）へ
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      final focus1 = FocusManager.instance.primaryFocus;
+      expect(focus1, isNotNull);
+
+      // 2回目のTab: 次のセクション（font）へ遷移すること
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      final focus2 = FocusManager.instance.primaryFocus;
+      expect(focus2, isNotNull);
+      expect(focus2, isNot(equals(focus1)));
+    });
+
+    testWidgets('セクション見出しにフォーカスがある状態で Enter または Space を押すと展開/折りたたみがトグルされること', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsPage), findsOneWidget);
+
+      // 初期状態で下キー -> tileset セクション見出しへフォーカス
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+
+      // 初期状態ではタイル設定の子要素（タイル表示を使用 スイッチ）は未展開
+      expect(find.text('タイル表示を使用'), findsNothing);
+
+      // Enter キーを押下 -> セクションが展開される
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.text('タイル表示を使用'), findsOneWidget);
+
+      // 再度 Space キーを押下 -> セクションが折りたたまれる
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+      expect(find.text('タイル表示を使用'), findsNothing);
+    });
+
+    testWidgets('スライダーにフォーカスがある時、上下キーでは数値が変更されずフォーカスが脱出すること', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsPage), findsOneWidget);
+
+      // 「フォント設定」を展開
+      await tester.tap(find.text('フォント設定'));
+      await tester.pumpAndSettle();
+
+      // アスキーマップ倍率スライダーを探す
+      final sliderFinder = find.byType(Slider).first;
+      await tester.ensureVisible(sliderFinder);
+      await tester.pumpAndSettle();
+
+      final sliderWidget = tester.widget<Slider>(sliderFinder);
+      final initialVal = sliderWidget.value;
+
+      // Slider の FocusNode を取得してフォーカスを当てる
+      final FocusNode sliderFocus = (tester.state(sliderFinder) as dynamic).focusNode as FocusNode;
+      sliderFocus.requestFocus();
+      await tester.pumpAndSettle();
+      expect(sliderFocus.hasPrimaryFocus, isTrue);
+
+      // 上カーソルキーを押下 -> スライダーの数値は変化せず、フォーカスが脱出すること
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pumpAndSettle();
+      expect(FontManager.instance.mapAsciiScale, equals(initialVal));
+      expect(sliderFocus.hasPrimaryFocus, isFalse);
+    });
+
+    testWidgets('スライダーにフォーカスがある時、左右キーで数値が変更されること', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsPage), findsOneWidget);
+
+      // 「フォント設定」を展開
+      await tester.tap(find.text('フォント設定'));
+      await tester.pumpAndSettle();
+
+      // アスキーマップ倍率スライダーを探す
+      final sliderFinder = find.byType(Slider).first;
+      await tester.ensureVisible(sliderFinder);
+      await tester.pumpAndSettle();
+
+      final sliderWidget = tester.widget<Slider>(sliderFinder);
+      final initialVal = sliderWidget.value;
+
+      // Slider 内部の FocusNode にフォーカスを当てる
+      // Slider の FocusNode を取得してフォーカスを当てる
+      final FocusNode sliderFocus = (tester.state(sliderFinder) as dynamic).focusNode as FocusNode;
+      sliderFocus.requestFocus();
+      await tester.pumpAndSettle();
+      expect(sliderFocus.hasPrimaryFocus, isTrue);
+
+      // 右カーソルキーを押下 -> スライダーの数値が増加すること
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+      expect(FontManager.instance.mapAsciiScale, greaterThan(initialVal));
+    });
   });
 }
 

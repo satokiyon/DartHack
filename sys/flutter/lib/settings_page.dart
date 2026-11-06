@@ -42,8 +42,38 @@ class _SettingsPageState extends State<SettingsPage> {
   final ScrollController _scrollController = ScrollController();
   final FocusNode _rootFocusNode = FocusNode();
   final FocusNode _backButtonFocusNode = FocusNode();
-  final FocusNode _firstItemFocusNode = FocusNode();
-  final FocusNode _lastItemFocusNode = FocusNode();
+  static const List<String> _sectionKeys = [
+    'tileset',
+    'font',
+    'screen',
+    'status',
+    'message',
+    'sound',
+    'uiLayout',
+    'controller',
+    'shortcut',
+    'cmdPanel',
+    'keyAction',
+    'autosave',
+    'gameRules',
+    'hardMode',
+    'advanced',
+    'other',
+    'credits',
+  ];
+  final Map<String, FocusNode> _sectionFocusNodes = {};
+  // ignore: deprecated_member_use
+  final Map<String, ExpansionTileController> _sectionControllers = {};
+
+  FocusNode _getSectionFocusNode(String key) {
+    return _sectionFocusNodes.putIfAbsent(key, () => FocusNode());
+  }
+
+  // ignore: deprecated_member_use
+  ExpansionTileController _getSectionController(String key) {
+    // ignore: deprecated_member_use
+    return _sectionControllers.putIfAbsent(key, () => ExpansionTileController());
+  }
   String _appVersion = '';
   bool _useTiles = true;
   String _selectedLanguage = 'ja';
@@ -267,8 +297,11 @@ class _SettingsPageState extends State<SettingsPage> {
   void dispose() {
     _rootFocusNode.dispose();
     _backButtonFocusNode.dispose();
-    _firstItemFocusNode.dispose();
-    _lastItemFocusNode.dispose();
+    for (final node in _sectionFocusNodes.values) {
+      node.dispose();
+    }
+    _sectionFocusNodes.clear();
+    _sectionControllers.clear();
     _scrollController.dispose();
     super.dispose();
   }
@@ -638,24 +671,52 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildSectionCard(Widget child, {bool isFocused = false}) {
-    return Card(
-      color: const Color(0xFF25262E),
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      elevation: isFocused ? 6 : 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: isFocused
-            ? const BorderSide(color: Colors.amberAccent, width: 2.5)
-            : const BorderSide(color: Colors.white12, width: 1.0),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: ExpansionTileTheme(
-        data: const ExpansionTileThemeData(
-          backgroundColor: Color(0xFF1E1F24),
-          collapsedBackgroundColor: Color(0xFF25262E),
-        ),
-        child: child,
+  Widget _buildSectionCard({
+    required String sectionKey,
+    required Widget child,
+  }) {
+    final focusNode = _getSectionFocusNode(sectionKey);
+    final controller = _getSectionController(sectionKey);
+    return Focus(
+      focusNode: focusNode,
+      onKeyEvent: (node, event) {
+        if (event is! KeyDownEvent) return KeyEventResult.ignored;
+        if (event.logicalKey == LogicalKeyboardKey.enter ||
+            event.logicalKey == LogicalKeyboardKey.numpadEnter ||
+            event.logicalKey == LogicalKeyboardKey.space) {
+          if (controller.isExpanded) {
+            controller.collapse();
+          } else {
+            controller.expand();
+          }
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: AnimatedBuilder(
+        animation: focusNode,
+        builder: (context, _) {
+          final isFocused = focusNode.hasFocus;
+          return Card(
+            color: const Color(0xFF25262E),
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            elevation: isFocused ? 6 : 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: isFocused
+                  ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                  : const BorderSide(color: Colors.white12, width: 1.0),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: ExpansionTileTheme(
+              data: const ExpansionTileThemeData(
+                backgroundColor: Color(0xFF1E1F24),
+                collapsedBackgroundColor: Color(0xFF25262E),
+              ),
+              child: child,
+            ),
+          );
+        },
       ),
     );
   }
@@ -764,7 +825,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildScreenDisplaySection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'screen',
+      child: ExpansionTile(
+        controller: _getSectionController('screen'),
         leading: const Icon(Icons.fullscreen, color: Colors.greenAccent),
         title: Text(l10n.secScreenTitle),
         subtitle: Text(l10n.secScreenSub),
@@ -817,19 +880,21 @@ class _SettingsPageState extends State<SettingsPage> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Slider(
-                  value: _scrollMargin.toDouble(),
-                  min: 1.0,
-                  max: 10.0,
-                  divisions: 9,
-                  label: '$_scrollMargin',
-                  onChanged: _cameraFollowMode == 'fixed'
-                      ? (val) {
-                          final intVal = val.round();
-                          setState(() => _scrollMargin = intVal);
-                          _saveSetting('scroll_margin', intVal);
-                        }
-                      : null,
+                _SettingsSlider(
+                  child: Slider(
+                    value: _scrollMargin.toDouble(),
+                    min: 1.0,
+                    max: 10.0,
+                    divisions: 9,
+                    label: '$_scrollMargin',
+                    onChanged: _cameraFollowMode == 'fixed'
+                        ? (val) {
+                            final intVal = val.round();
+                            setState(() => _scrollMargin = intVal);
+                            _saveSetting('scroll_margin', intVal);
+                          }
+                        : null,
+                  ),
                 ),
                 Text(
                   _cameraFollowMode == 'fixed' ? l10n.scrollMarginDesc : l10n.cameraScrollOnlyFixed,
@@ -852,19 +917,21 @@ class _SettingsPageState extends State<SettingsPage> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Slider(
-                  value: _scrollAmount.toDouble(),
-                  min: 1.0,
-                  max: 10.0,
-                  divisions: 9,
-                  label: '$_scrollAmount',
-                  onChanged: _cameraFollowMode == 'fixed'
-                      ? (val) {
-                          final intVal = val.round();
-                          setState(() => _scrollAmount = intVal);
-                          _saveSetting('scroll_amount', intVal);
-                        }
-                      : null,
+                _SettingsSlider(
+                  child: Slider(
+                    value: _scrollAmount.toDouble(),
+                    min: 1.0,
+                    max: 10.0,
+                    divisions: 9,
+                    label: '$_scrollAmount',
+                    onChanged: _cameraFollowMode == 'fixed'
+                        ? (val) {
+                            final intVal = val.round();
+                            setState(() => _scrollAmount = intVal);
+                            _saveSetting('scroll_amount', intVal);
+                          }
+                        : null,
+                  ),
                 ),
                 Text(
                   _cameraFollowMode == 'fixed' ? l10n.scrollAmountDesc : l10n.cameraScrollOnlyFixed,
@@ -918,7 +985,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildStatusSection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'status',
+      child: ExpansionTile(
+        controller: _getSectionController('status'),
         leading: const Icon(Icons.view_headline, color: Colors.amberAccent),
         title: Text(l10n.secStatusTitle),
         subtitle: Text(l10n.secStatusSub),
@@ -968,7 +1037,9 @@ class _SettingsPageState extends State<SettingsPage> {
     final availableFonts = fontMgr.availableFonts;
 
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'font',
+      child: ExpansionTile(
+        controller: _getSectionController('font'),
         leading: const Icon(Icons.text_fields_rounded, color: Colors.orangeAccent),
         title: Text(l10n.secFontTitle),
         subtitle: Text(l10n.secFontSub, style: const TextStyle(fontSize: 12, color: Colors.white60)),
@@ -1030,16 +1101,18 @@ class _SettingsPageState extends State<SettingsPage> {
                   '${fontMgr.mapAsciiScale.toStringAsFixed(1)}x',
                   style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold),
                 ),
-                Slider(
-                  value: fontMgr.mapAsciiScale,
-                  min: 1.0,
-                  max: 2.5,
-                  divisions: 15,
-                  label: '${fontMgr.mapAsciiScale.toStringAsFixed(1)}x',
-                  onChanged: (val) {
-                    setState(() {});
-                    fontMgr.setMapAsciiScale(val);
-                  },
+                _SettingsSlider(
+                  child: Slider(
+                    value: fontMgr.mapAsciiScale,
+                    min: 1.0,
+                    max: 2.5,
+                    divisions: 15,
+                    label: '${fontMgr.mapAsciiScale.toStringAsFixed(1)}x',
+                    onChanged: (val) {
+                      setState(() {});
+                      fontMgr.setMapAsciiScale(val);
+                    },
+                  ),
                 ),
               ],
             ),
@@ -1369,16 +1442,12 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildTilesetSection() {
     final l10n = AppLocalizations.of(context)!;
     final isEn = _selectedLanguage == 'en';
-    return Focus(
-      focusNode: _firstItemFocusNode,
-      child: AnimatedBuilder(
-        animation: _firstItemFocusNode,
-        builder: (context, child) {
-          final isFocused = _firstItemFocusNode.hasFocus;
-          return _buildSectionCard(
-            ExpansionTile(
-              leading: const Icon(Icons.palette, color: Colors.deepPurpleAccent),
-              title: Text(l10n.secTilesetTitle),
+    return _buildSectionCard(
+      sectionKey: 'tileset',
+      child: ExpansionTile(
+        controller: _getSectionController('tileset'),
+        leading: const Icon(Icons.palette, color: Colors.deepPurpleAccent),
+        title: Text(l10n.secTilesetTitle),
         children: _withDividers([
           SwitchListTile(
             title: Text(l10n.useTiles),
@@ -1496,11 +1565,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ],
         ]),
       ),
-      isFocused: isFocused,
     );
-  },
-),
-);
   }
 
   Widget _buildUILayoutSection() {
@@ -1511,7 +1576,9 @@ class _SettingsPageState extends State<SettingsPage> {
     };
 
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'uiLayout',
+      child: ExpansionTile(
+        controller: _getSectionController('uiLayout'),
         leading: const Icon(Icons.dashboard_customize, color: Colors.cyanAccent),
         title: Text(l10n.secUILayoutTitle),
         subtitle: Text(l10n.secUILayoutSub),
@@ -1701,7 +1768,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildControllerSection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'controller',
+      child: ExpansionTile(
+        controller: _getSectionController('controller'),
         leading: const Icon(Icons.gamepad, color: Colors.amber),
         title: Text(l10n.secControllerTitle),
         children: _withDividers([
@@ -1722,16 +1791,18 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           ListTile(
             title: Text(l10n.padOpacityTitle),
-            subtitle: Slider(
-              value: _padOpacity,
-              min: 0.1,
-              max: 1.0,
-              divisions: 9,
-              label: _padOpacity.toStringAsFixed(1),
-              onChanged: (val) {
-                setState(() => _padOpacity = val);
-                _saveSetting('pad_opacity', val);
-              },
+            subtitle: _SettingsSlider(
+              child: Slider(
+                value: _padOpacity,
+                min: 0.1,
+                max: 1.0,
+                divisions: 9,
+                label: _padOpacity.toStringAsFixed(1),
+                onChanged: (val) {
+                  setState(() => _padOpacity = val);
+                  _saveSetting('pad_opacity', val);
+                },
+              ),
             ),
           ),
           ListTile(
@@ -1739,16 +1810,18 @@ class _SettingsPageState extends State<SettingsPage> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Slider(
-                  value: _dpadScale,
-                  min: 0.6,
-                  max: 1.5,
-                  divisions: 9,
-                  label: _dpadScale.toStringAsFixed(1),
-                  onChanged: (val) {
-                    setState(() => _dpadScale = val);
-                    _saveSetting('dpad_scale', val);
-                  },
+                _SettingsSlider(
+                  child: Slider(
+                    value: _dpadScale,
+                    min: 0.6,
+                    max: 1.5,
+                    divisions: 9,
+                    label: _dpadScale.toStringAsFixed(1),
+                    onChanged: (val) {
+                      setState(() => _dpadScale = val);
+                      _saveSetting('dpad_scale', val);
+                    },
+                  ),
                 ),
                 _buildAppliedScaleLabel(
                   setting: _dpadScale,
@@ -1796,16 +1869,18 @@ class _SettingsPageState extends State<SettingsPage> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Slider(
-                  value: _shortcutPadScale,
-                  min: 0.6,
-                  max: 1.5,
-                  divisions: 9,
-                  label: _shortcutPadScale.toStringAsFixed(1),
-                  onChanged: (val) {
-                    setState(() => _shortcutPadScale = val);
-                    _saveSetting('shortcut_pad_scale', val);
-                  },
+                _SettingsSlider(
+                  child: Slider(
+                    value: _shortcutPadScale,
+                    min: 0.6,
+                    max: 1.5,
+                    divisions: 9,
+                    label: _shortcutPadScale.toStringAsFixed(1),
+                    onChanged: (val) {
+                      setState(() => _shortcutPadScale = val);
+                      _saveSetting('shortcut_pad_scale', val);
+                    },
+                  ),
                 ),
                 _buildAppliedScaleLabel(
                   setting: _shortcutPadScale,
@@ -1820,16 +1895,18 @@ class _SettingsPageState extends State<SettingsPage> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Slider(
-                  value: _cmdPanelScale,
-                  min: 0.6,
-                  max: 1.5,
-                  divisions: 9,
-                  label: _cmdPanelScale.toStringAsFixed(1),
-                  onChanged: (val) {
-                    setState(() => _cmdPanelScale = val);
-                    _saveSetting('cmd_panel_scale', val);
-                  },
+                _SettingsSlider(
+                  child: Slider(
+                    value: _cmdPanelScale,
+                    min: 0.6,
+                    max: 1.5,
+                    divisions: 9,
+                    label: _cmdPanelScale.toStringAsFixed(1),
+                    onChanged: (val) {
+                      setState(() => _cmdPanelScale = val);
+                      _saveSetting('cmd_panel_scale', val);
+                    },
+                  ),
                 ),
                 _buildAppliedScaleLabel(
                   setting: _cmdPanelScale,
@@ -1921,7 +1998,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildMessageSection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'message',
+      child: ExpansionTile(
+        controller: _getSectionController('message'),
         leading: const Icon(Icons.chat_bubble_outline, color: Colors.tealAccent),
         title: Text(l10n.secMsgTitle),
         subtitle: Text(l10n.secMsgSub),
@@ -1932,17 +2011,19 @@ class _SettingsPageState extends State<SettingsPage> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Slider(
-                  value: _msgLineCount.toDouble(),
-                  min: 1,
-                  max: 15,
-                  divisions: 14,
-                  label: '$_msgLineCount',
-                  onChanged: (val) {
-                    final intVal = val.round();
-                    setState(() => _msgLineCount = intVal);
-                    _saveSetting('msg_line_count', intVal);
-                  },
+                _SettingsSlider(
+                  child: Slider(
+                    value: _msgLineCount.toDouble(),
+                    min: 1,
+                    max: 15,
+                    divisions: 14,
+                    label: '$_msgLineCount',
+                    onChanged: (val) {
+                      final intVal = val.round();
+                      setState(() => _msgLineCount = intVal);
+                      _saveSetting('msg_line_count', intVal);
+                    },
+                  ),
                 ),
                 Text(
                   l10n.msgLineCountLabel(_msgLineCount.toString()),
@@ -1957,16 +2038,18 @@ class _SettingsPageState extends State<SettingsPage> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Slider(
-                  value: _msgOpacity,
-                  min: 0.0,
-                  max: 1.0,
-                  divisions: 20,
-                  label: '${(_msgOpacity * 100).round()}%',
-                  onChanged: (val) {
-                    setState(() => _msgOpacity = val);
-                    _saveSetting('msg_opacity', val);
-                  },
+                _SettingsSlider(
+                  child: Slider(
+                    value: _msgOpacity,
+                    min: 0.0,
+                    max: 1.0,
+                    divisions: 20,
+                    label: '${(_msgOpacity * 100).round()}%',
+                    onChanged: (val) {
+                      setState(() => _msgOpacity = val);
+                      _saveSetting('msg_opacity', val);
+                    },
+                  ),
                 ),
                 Text(
                   l10n.msgOpacityLabel((_msgOpacity * 100).round().toString()),
@@ -1981,16 +2064,18 @@ class _SettingsPageState extends State<SettingsPage> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Slider(
-                  value: _msgFontSize,
-                  min: 8.0,
-                  max: 24.0,
-                  divisions: 16,
-                  label: '${_msgFontSize.round()} pt',
-                  onChanged: (val) {
-                    setState(() => _msgFontSize = val);
-                    _saveSetting('msg_font_size', val);
-                  },
+                _SettingsSlider(
+                  child: Slider(
+                    value: _msgFontSize,
+                    min: 8.0,
+                    max: 24.0,
+                    divisions: 16,
+                    label: '${_msgFontSize.round()} pt',
+                    onChanged: (val) {
+                      setState(() => _msgFontSize = val);
+                      _saveSetting('msg_font_size', val);
+                    },
+                  ),
                 ),
                 Text(
                   l10n.msgFontSizeLabel(_msgFontSize.round().toString()),
@@ -2075,7 +2160,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildSoundSection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'sound',
+      child: ExpansionTile(
+        controller: _getSectionController('sound'),
         leading: Icon(
           _soundMasterEnabled ? Icons.volume_up : Icons.volume_off,
           color: _soundMasterEnabled ? Colors.amberAccent : Colors.grey,
@@ -2202,14 +2289,16 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ),
-      subtitle: Slider(
-        value: enabled ? volume : 0.0,
-        min: 0.0,
-        max: 1.0,
-        divisions: 20,
-        label: '$percent%',
-        onChanged: enabled ? onChanged : null,
-        onChangeEnd: enabled ? onChangeEnd : null,
+      subtitle: _SettingsSlider(
+        child: Slider(
+          value: enabled ? volume : 0.0,
+          min: 0.0,
+          max: 1.0,
+          divisions: 20,
+          label: '$percent%',
+          onChanged: enabled ? onChanged : null,
+          onChangeEnd: enabled ? onChangeEnd : null,
+        ),
       ),
     );
   }
@@ -2236,7 +2325,9 @@ class _SettingsPageState extends State<SettingsPage> {
     };
 
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'keyAction',
+      child: ExpansionTile(
+        controller: _getSectionController('keyAction'),
         leading: const Icon(Icons.keyboard, color: Colors.blueAccent),
         title: Text(l10n.secKeyTitle),
         subtitle: Text(l10n.secKeySub),
@@ -2285,7 +2376,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildShortcutSection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'shortcut',
+      child: ExpansionTile(
+        controller: _getSectionController('shortcut'),
         leading: const Icon(Icons.grid_3x3, color: Colors.cyanAccent),
         title: Text(l10n.secShortcutTitle),
         subtitle: Text(l10n.secShortcutSub),
@@ -2383,7 +2476,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildOtherSection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'other',
+      child: ExpansionTile(
+        controller: _getSectionController('other'),
         leading: const Icon(Icons.more_horiz, color: Colors.lightBlueAccent),
         title: Text(l10n.secOtherTitle),
         children: _withDividers([
@@ -2574,7 +2669,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildAdvancedSection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'advanced',
+      child: ExpansionTile(
+        controller: _getSectionController('advanced'),
         leading: const Icon(Icons.tune, color: Colors.orangeAccent),
         title: Text(l10n.secAdvancedTitle),
         children: _withDividers([
@@ -2887,7 +2984,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildGameRulesSection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'gameRules',
+      child: ExpansionTile(
+        controller: _getSectionController('gameRules'),
         leading: const Icon(Icons.sports_esports, color: Colors.tealAccent),
         title: Text(l10n.secGameRulesTitle),
         subtitle: Text(l10n.secGameRulesSub),
@@ -3063,7 +3162,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildHardModeSection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'hardMode',
+      child: ExpansionTile(
+        controller: _getSectionController('hardMode'),
         leading: const Icon(Icons.dangerous, color: Colors.deepOrangeAccent),
         title: Text(l10n.secHardModeTitle),
         subtitle: Text(l10n.secHardModeSub),
@@ -3251,16 +3352,12 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildCreditsSection() {
     final l10n = AppLocalizations.of(context)!;
-    return Focus(
-      focusNode: _lastItemFocusNode,
-      child: AnimatedBuilder(
-        animation: _lastItemFocusNode,
-        builder: (context, child) {
-          final isFocused = _lastItemFocusNode.hasFocus;
-          return _buildSectionCard(
-            ExpansionTile(
-              leading: const Icon(Icons.info_outline, color: Colors.pinkAccent),
-              title: Text(l10n.secCreditsTitle),
+    return _buildSectionCard(
+      sectionKey: 'credits',
+      child: ExpansionTile(
+        controller: _getSectionController('credits'),
+        leading: const Icon(Icons.info_outline, color: Colors.pinkAccent),
+        title: Text(l10n.secCreditsTitle),
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -3391,11 +3488,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ),
-      isFocused: isFocused,
     );
-  },
-),
-);
   }
 
   String _getPanelDisplayName(int index, String rawName) {
@@ -3431,7 +3524,9 @@ class _SettingsPageState extends State<SettingsPage> {
     final isJa = Localizations.localeOf(context).languageCode == 'ja';
 
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'autosave',
+      child: ExpansionTile(
+        controller: _getSectionController('autosave'),
         leading: const Icon(Icons.save, color: Colors.lightBlueAccent),
         initiallyExpanded: false,
         title: Text(isJa ? '自動セーブ' : 'Autosave'),
@@ -3546,34 +3641,43 @@ class _SettingsPageState extends State<SettingsPage> {
       return KeyEventResult.handled;
     }
 
-    // 上下カーソルキー (ArrowDown / ArrowUp)
-    if (key == LogicalKeyboardKey.arrowDown || key == LogicalKeyboardKey.arrowUp) {
+    // Tab キー (Tab / Shift+Tab) および上下カーソルキー (ArrowDown / ArrowUp)
+    final isTab = key == LogicalKeyboardKey.tab;
+    final isDownKey = key == LogicalKeyboardKey.arrowDown;
+    final isUpKey = key == LogicalKeyboardKey.arrowUp;
+
+    if (isTab || isDownKey || isUpKey) {
       if (!isDown) return KeyEventResult.handled;
 
+      final isShift = HardwareKeyboard.instance.isShiftPressed;
+      final isForward = isTab ? !isShift : isDownKey;
+
       final primaryFocus = FocusManager.instance.primaryFocus;
+      final firstNode = _getSectionFocusNode(_sectionKeys.first);
+      final lastNode = _getSectionFocusNode(_sectionKeys.last);
       final isBackFocused = _backButtonFocusNode.hasPrimaryFocus;
-      final isFirstFocused = _firstItemFocusNode.hasPrimaryFocus;
-      final isLastFocused = _lastItemFocusNode.hasPrimaryFocus;
+      final isFirstFocused = firstNode.hasPrimaryFocus;
+      final isLastFocused = lastNode.hasPrimaryFocus;
 
       // 未選択状態: ルートFocusNodeにいるか、まだ具体的なコントロールにフォーカスがない
       final isUnfocused = primaryFocus == null ||
           primaryFocus == _rootFocusNode ||
           primaryFocus.context == null;
 
-      if (key == LogicalKeyboardKey.arrowDown) {
+      if (isForward) {
         if (isUnfocused) {
-          // 下カーソルキーを押した際は一番上の項目が選択され、最上部へスクロール
-          _firstItemFocusNode.requestFocus();
+          // 下カーソルまたは Tab: 一番上の項目が選択され、最上部へスクロール
+          firstNode.requestFocus();
           _scrollToTop();
           return KeyEventResult.handled;
         } else if (isLastFocused) {
-          // 一番下の項目から下へ -> AppBar戻るボタンへループ
+          // 一番下の項目から順方向へ -> AppBar戻るボタンへループ
           _backButtonFocusNode.requestFocus();
           _scrollToTop();
           return KeyEventResult.handled;
         } else if (isBackFocused) {
-          // AppBar戻るボタンから下へ -> 一番上の項目へ
-          _firstItemFocusNode.requestFocus();
+          // AppBar戻るボタンから順方向へ -> 一番上の項目へ
+          firstNode.requestFocus();
           _scrollToTop();
           return KeyEventResult.handled;
         } else {
@@ -3589,20 +3693,20 @@ class _SettingsPageState extends State<SettingsPage> {
           return KeyEventResult.handled;
         }
       } else {
-        // key == LogicalKeyboardKey.arrowUp
+        // 逆方向 (ArrowUp または Shift+Tab)
         if (isUnfocused) {
-          // 上カーソルキーを押した際は一番下の項目が選択され、最下部へスクロール
-          _lastItemFocusNode.requestFocus();
+          // 上カーソルまたは Shift+Tab: 一番下の項目が選択され、最下部へスクロール
+          lastNode.requestFocus();
           _scrollToBottom();
           return KeyEventResult.handled;
         } else if (isFirstFocused) {
-          // 一番上の項目から上へ -> AppBar戻るボタンへ
+          // 一番上の項目から逆方向へ -> AppBar戻るボタンへ
           _backButtonFocusNode.requestFocus();
           _scrollToTop();
           return KeyEventResult.handled;
         } else if (isBackFocused) {
-          // AppBar戻るボタンから上へ -> 一番下の項目へループ
-          _lastItemFocusNode.requestFocus();
+          // AppBar戻るボタンから逆方向へ -> 一番下の項目へループ
+          lastNode.requestFocus();
           _scrollToBottom();
           return KeyEventResult.handled;
         } else {
@@ -3897,7 +4001,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildCmdPanelSection() {
     final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
-      ExpansionTile(
+      sectionKey: 'cmdPanel',
+      child: ExpansionTile(
+        controller: _getSectionController('cmdPanel'),
         leading: const Icon(Icons.dashboard_customize, color: Colors.indigoAccent),
         title: Text(l10n.secCmdPanelTitle),
         subtitle: Text(l10n.secCmdPanelSub),
@@ -3985,6 +4091,38 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
         ]),
+      ),
+    );
+  }
+}
+
+/// 物理キーボードで左右キーで値変更、上下キーでフォーカス移動を行うための Slider ラッパー
+class _SettingsSlider extends StatelessWidget {
+  final Widget child;
+  const _SettingsSlider({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        navigationMode: NavigationMode.directional,
+      ),
+      child: Focus(
+        canRequestFocus: false,
+        skipTraversal: true,
+        onKeyEvent: (node, event) {
+          if (event is! KeyDownEvent) return KeyEventResult.ignored;
+          if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+            FocusManager.instance.primaryFocus?.nextFocus();
+            return KeyEventResult.handled;
+          }
+          if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+            FocusManager.instance.primaryFocus?.previousFocus();
+            return KeyEventResult.handled;
+          }
+          return KeyEventResult.ignored;
+        },
+        child: child,
       ),
     );
   }
