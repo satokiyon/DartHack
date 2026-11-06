@@ -1188,9 +1188,75 @@ void main() {
         equals(const ShowKeyboardHelp()),
       );
 
+      // titleScreen
+      expect(
+        HardwareKeyRouter.route(event: f1Event, context: KeyInputContext.titleScreen),
+        equals(const ShowKeyboardHelp()),
+      );
+
       // textInputOverlay with text field focused -> IgnoreKey
       expect(
         HardwareKeyRouter.route(event: f1Event, context: KeyInputContext.textInputOverlay, isTextFieldFocused: true),
+        equals(const IgnoreKey()),
+      );
+    });
+
+    test('Alt+h (Meta-h) routes to ShowKeyboardHelp across contexts when text field is not focused', () {
+      final altHEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.keyH,
+        logicalKey: LogicalKeyboardKey.keyH,
+        timeStamp: Duration.zero,
+      );
+
+      // game
+      expect(
+        HardwareKeyRouter.route(
+          event: altHEvent,
+          context: KeyInputContext.game,
+          isAltPressed: true,
+        ),
+        equals(const ShowKeyboardHelp()),
+      );
+
+      // titleScreen
+      expect(
+        HardwareKeyRouter.route(
+          event: altHEvent,
+          context: KeyInputContext.titleScreen,
+          isAltPressed: true,
+        ),
+        equals(const ShowKeyboardHelp()),
+      );
+
+      // menu
+      expect(
+        HardwareKeyRouter.route(
+          event: altHEvent,
+          context: KeyInputContext.menu,
+          isAltPressed: true,
+        ),
+        equals(const ShowKeyboardHelp()),
+      );
+
+      // textInputOverlay without text field focused
+      expect(
+        HardwareKeyRouter.route(
+          event: altHEvent,
+          context: KeyInputContext.textInputOverlay,
+          isAltPressed: true,
+          isTextFieldFocused: false,
+        ),
+        equals(const ShowKeyboardHelp()),
+      );
+
+      // textInputOverlay with text field focused -> IgnoreKey
+      expect(
+        HardwareKeyRouter.route(
+          event: altHEvent,
+          context: KeyInputContext.textInputOverlay,
+          isAltPressed: true,
+          isTextFieldFocused: true,
+        ),
         equals(const IgnoreKey()),
       );
     });

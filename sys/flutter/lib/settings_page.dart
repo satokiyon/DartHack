@@ -21,6 +21,7 @@ import 'tileset_selection_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'services/font_manager.dart';
 import 'services/tileset_manager.dart';
+import 'widgets/keyboard_help_dialog.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -3483,6 +3484,21 @@ class _SettingsPageState extends State<SettingsPage> {
     // Escape: 前の画面へ戻る
     if (key == LogicalKeyboardKey.escape) {
       if (isDown) Navigator.maybePop(context);
+      return KeyEventResult.handled;
+    }
+
+    // F1 / Alt-h: 操作ヘルプの表示（物理キーボード表記が有効な場合のみ）
+    final isAlt = HardwareKeyboard.instance.isAltPressed;
+    final isHelpKey = key == LogicalKeyboardKey.f1 ||
+        (isAlt && key == LogicalKeyboardKey.keyH);
+    if (isHelpKey) {
+      if (isDown && _usePhysicalKeyboardNotation) {
+        KeyboardHelpDialog.show(
+          context,
+          helpContext: KeyboardHelpContext.settings,
+          isJapanese: Localizations.localeOf(context).languageCode == 'ja',
+        );
+      }
       return KeyEventResult.handled;
     }
 

@@ -857,16 +857,18 @@ class HardwareKeyRouter {
       return const IgnoreKey();
     }
 
-    // 0. タイトル画面
-    if (context == KeyInputContext.titleScreen) {
-      return _routeTitleScreen(event, isShiftPressed: isShiftPressed);
-    }
-
-    // F1 キー: 操作ヘルプの表示（テキスト入力欄フォーカス時は除外）
-    if (event.logicalKey == LogicalKeyboardKey.f1 && !isTextFieldFocused) {
+    // F1 / Alt-h キー: 操作ヘルプの表示（テキスト入力欄フォーカス時は除外、最優先で判定）
+    final isHelpKey = (event.logicalKey == LogicalKeyboardKey.f1) ||
+        (isAltPressed && event.logicalKey == LogicalKeyboardKey.keyH);
+    if (isHelpKey && !isTextFieldFocused) {
       return (event is KeyDownEvent)
           ? const ShowKeyboardHelp()
           : const SwallowKey();
+    }
+
+    // 0. タイトル画面
+    if (context == KeyInputContext.titleScreen) {
+      return _routeTitleScreen(event, isShiftPressed: isShiftPressed);
     }
 
     // 1a. 1文字コマンド説明検索（AnyKeyOverlay: `?` コマンド説明）

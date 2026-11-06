@@ -114,6 +114,56 @@ void main() {
       expect(find.byType(KeyboardHelpDialog), findsNothing);
     });
 
+    testWidgets('Alt + h キー押下でダイアログが閉じること', (tester) async {
+      await tester.pumpWidget(buildTestWidget(
+        helpContext: KeyboardHelpContext.game,
+      ));
+
+      await tester.tap(find.text('Open Help'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+
+      // Alt + h キーを送信
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyH);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(KeyboardHelpDialog), findsNothing);
+    });
+
+    testWidgets('titleScreen コンテキストでタイトル画面向け操作ヘルプが表示されること', (tester) async {
+      await tester.pumpWidget(buildTestWidget(
+        helpContext: KeyboardHelpContext.titleScreen,
+      ));
+
+      await tester.tap(find.text('Open Help'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+      expect(find.textContaining('Enter'), findsWidgets);
+      expect(find.textContaining('Tab'), findsWidgets);
+      expect(find.textContaining('Esc'), findsWidgets);
+      expect(find.textContaining('冒険を始める'), findsWidgets);
+    });
+
+    testWidgets('settings コンテキストで設定画面向け操作ヘルプが表示されること', (tester) async {
+      await tester.pumpWidget(buildTestWidget(
+        helpContext: KeyboardHelpContext.settings,
+      ));
+
+      await tester.tap(find.text('Open Help'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+      expect(find.textContaining('↓'), findsWidgets);
+      expect(find.textContaining('↑'), findsWidgets);
+      expect(find.textContaining('PgDn'), findsWidgets);
+      expect(find.textContaining('Esc'), findsWidgets);
+      expect(find.textContaining('スクロール'), findsWidgets);
+    });
+
     testWidgets('Escape キー押下でダイアログが閉じること', (tester) async {
       await tester.pumpWidget(buildTestWidget(
         helpContext: KeyboardHelpContext.game,

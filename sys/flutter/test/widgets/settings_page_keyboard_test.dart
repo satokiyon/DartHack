@@ -7,6 +7,7 @@ import 'package:darthack/settings_page.dart';
 import 'package:darthack/services/font_manager.dart';
 import 'package:darthack/utils/app_prefs.dart';
 import 'package:darthack/l10n/app_localizations.dart';
+import 'package:darthack/widgets/keyboard_help_dialog.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -264,6 +265,78 @@ void main() {
 
       expect(find.byType(SettingsPage), findsNothing);
       expect(find.text('Open Settings'), findsOneWidget);
+    });
+
+    testWidgets('use_physical_keyboard_notation が ON の時、F1 または Alt+h で操作ヘルプダイアログが表示されること', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsPage), findsOneWidget);
+
+      // 「画面表示設定」を展開して「物理キーボード用の表記を使用」を確実に ON にする
+      await tester.tap(find.text('画面表示設定'));
+      await tester.pumpAndSettle();
+
+      final switchFinder = find.widgetWithText(SwitchListTile, '物理キーボード用の表記を使用');
+      await tester.ensureVisible(switchFinder);
+      await tester.pumpAndSettle();
+
+      final switchWidget = tester.widget<SwitchListTile>(switchFinder);
+      if (!switchWidget.value) {
+        await tester.tap(switchFinder);
+        await tester.pumpAndSettle();
+      }
+
+      // F1 キーを押下
+      await tester.sendKeyEvent(LogicalKeyboardKey.f1);
+      await tester.pumpAndSettle();
+
+      // KeyboardHelpDialog が開いていること
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+
+      // F1 で閉じる
+      await tester.sendKeyEvent(LogicalKeyboardKey.f1);
+      await tester.pumpAndSettle();
+      expect(find.byType(KeyboardHelpDialog), findsNothing);
+
+      // Alt+h キーを押下
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyH);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+
+      // KeyboardHelpDialog が開いていること
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+
+      // Alt+h で閉じる
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyH);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      expect(find.byType(KeyboardHelpDialog), findsNothing);
+    });
+
+    testWidgets('use_physical_keyboard_notation が OFF の時は F1 や Alt+h を押しても操作ヘルプが表示されないこと', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsPage), findsOneWidget);
+
+      // F1 キーを押下
+      await tester.sendKeyEvent(LogicalKeyboardKey.f1);
+      await tester.pumpAndSettle();
+      expect(find.byType(KeyboardHelpDialog), findsNothing);
+
+      // Alt+h キーを押下
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyH);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      expect(find.byType(KeyboardHelpDialog), findsNothing);
     });
   });
 }

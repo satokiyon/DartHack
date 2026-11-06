@@ -1598,7 +1598,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   void _showKeyboardHelp() {
     KeyboardHelpContext helpContext;
-    if (_screen.isMenuWindowVisible) {
+    if (!_isGameRunning) {
+      helpContext = KeyboardHelpContext.titleScreen;
+    } else if (_screen.isMenuWindowVisible) {
       helpContext = KeyboardHelpContext.menu;
     } else if (_isYnVisible) {
       helpContext = KeyboardHelpContext.yn;

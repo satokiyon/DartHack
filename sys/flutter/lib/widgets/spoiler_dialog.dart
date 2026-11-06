@@ -687,8 +687,11 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
       return KeyEventResult.ignored;
     }
 
-    // F1: 操作ヘルプ
-    if (key == LogicalKeyboardKey.f1) {
+    // F1 / Alt-h: 操作ヘルプ
+    final isAlt = HardwareKeyboard.instance.isAltPressed;
+    final isHelpKey = key == LogicalKeyboardKey.f1 ||
+        (isAlt && key == LogicalKeyboardKey.keyH);
+    if (isHelpKey) {
       if (isDown && _usePhysicalKeyboardNotation) {
         KeyboardHelpDialog.show(
           context,

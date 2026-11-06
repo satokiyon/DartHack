@@ -7,6 +7,8 @@ enum KeyboardHelpContext {
   menu,
   yn,
   guidebook,
+  titleScreen,
+  settings,
 }
 
 /// キーボード操作ヘルプダイアログ
@@ -49,9 +51,12 @@ class KeyboardHelpDialog extends StatelessWidget {
       autofocus: true,
       onKeyEvent: (node, event) {
         if (event is! KeyDownEvent) return KeyEventResult.ignored;
-        // 任意の主要キー（Esc, F1, Enter, Space等）で安全に閉じる
+        final isAlt = HardwareKeyboard.instance.isAltPressed;
+        final isHelpCloseKey = event.logicalKey == LogicalKeyboardKey.f1 ||
+            (isAlt && event.logicalKey == LogicalKeyboardKey.keyH);
+        // 任意の主要キー（Esc, F1, Alt-h, Enter, Space等）で安全に閉じる
         if (event.logicalKey == LogicalKeyboardKey.escape ||
-            event.logicalKey == LogicalKeyboardKey.f1 ||
+            isHelpCloseKey ||
             event.logicalKey == LogicalKeyboardKey.enter ||
             event.logicalKey == LogicalKeyboardKey.numpadEnter ||
             event.logicalKey == LogicalKeyboardKey.space) {
@@ -171,7 +176,7 @@ class KeyboardHelpDialog extends StatelessWidget {
                     ),
                     alignment: Alignment.centerRight,
                     child: Text(
-                      isJapanese ? 'F1 / Esc / Space で閉じる' : 'Press F1 / Esc / Space to close',
+                      isJapanese ? 'F1 / Alt-h / Esc / Space で閉じる' : 'Press F1 / Alt-h / Esc / Space to close',
                       style: const TextStyle(color: Colors.white54, fontSize: 11),
                     ),
                   ),
@@ -265,8 +270,33 @@ class KeyboardHelpDialog extends StatelessWidget {
           _HelpItem('Shift + 移動', isJapanese ? '障害物に当たるまでダッシュ移動' : 'Run until obstacle'),
           _HelpItem('Ctrl + 移動', isJapanese ? 'その方向の扉・罠の探査や移動' : 'Move / search towards direction'),
           _HelpItem('Esc', isJapanese ? '現在のアクションを中断 / キャンセル' : 'Cancel current action'),
-          _HelpItem('Tab', isJapanese ? 'コマンド履歴や拡張メニューの呼び出し' : 'History / extended menu'),
-          _HelpItem('F1', isJapanese ? '操作ヘルプの表示' : 'Show controls help'),
+          _HelpItem('Tab', isJapanese ? '画面ボタン（メニュー／全体マップ）のフォーカス' : 'Focus map buttons'),
+          _HelpItem('Ctrl+M / F10', isJapanese ? 'ドロワーメニューを一発起動' : 'Open drawer menu directly'),
+          _HelpItem('#', isJapanese ? '拡張コマンド一覧を開く' : 'Open extended commands'),
+          _HelpItem('F1 / Alt-h', isJapanese ? '操作ヘルプの表示' : 'Show controls help'),
+        ];
+
+      case KeyboardHelpContext.titleScreen:
+        return [
+          _HelpItem('Enter', isJapanese ? '冒険を始める（フォーカス未選択時も即時実行可能）' : 'Start Adventure (immediate from unfocused)'),
+          _HelpItem('Tab / Shift+Tab', isJapanese ? '言語切替 ↔ 開始 ↔ 設定 ↔ ヘルプボタン等のフォーカス循環' : 'Cycle Language, Start, Settings, Help buttons'),
+          _HelpItem('Space', isJapanese ? '言語切り替え（言語フォーカス時）、または選択ボタンを実行' : 'Toggle language or execute focused button'),
+          _HelpItem('← / →', isJapanese ? '言語を直接選択（←: 日本語, →: English）' : 'Select language (←: Japanese, →: English)'),
+          _HelpItem('Esc', isJapanese ? 'フォーカス枠を解除して初期状態にリセット' : 'Clear focus highlight'),
+          _HelpItem('F1 / Alt-h', isJapanese ? '操作ヘルプの表示' : 'Show controls help'),
+        ];
+
+      case KeyboardHelpContext.settings:
+        return [
+          _HelpItem('↓ (初期状態)', isJapanese ? '一番上の項目（タイル設定）を選択＆最上部へスクロール' : 'Select first setting and scroll to top'),
+          _HelpItem('↑ (初期状態)', isJapanese ? '一番下の項目（クレジット）を選択＆最下部へスクロール' : 'Select last setting and scroll to bottom'),
+          _HelpItem('↑ / ↓', isJapanese ? '項目間の順送り・逆送り移動（端到達時は AppBar 戻るボタン経由で循環ループ）' : 'Move between settings (cycles via Back button)'),
+          _HelpItem('Space / Enter', isJapanese ? 'スイッチのトグル反転・選択肢の決定（戻るボタン時は前画面へ戻る）' : 'Toggle switch / confirm selection / Back'),
+          _HelpItem('Tab / Shift+Tab', isJapanese ? '全設定項目間を標準フォーカス移動' : 'Standard focus traversal'),
+          _HelpItem('PgDn / PgUp', isJapanese ? '1画面分上下スクロール' : 'Page down / up'),
+          _HelpItem('Home / End', isJapanese ? '設定画面の最先頭 / 最末尾へジャンプ' : 'Jump to top / bottom'),
+          _HelpItem('Esc', isJapanese ? '設定を安全に保存して前画面へ戻る' : 'Save settings and return'),
+          _HelpItem('F1 / Alt-h', isJapanese ? '操作ヘルプの表示' : 'Show controls help'),
         ];
     }
   }
