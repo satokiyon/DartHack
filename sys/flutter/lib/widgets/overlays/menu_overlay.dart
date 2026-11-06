@@ -69,6 +69,8 @@ class MenuOverlayState extends State<MenuOverlay> {
   MenuFocusTarget _currentFocusTarget = MenuFocusTarget.none;
 
   MenuFocusTarget get currentFocusTarget => _currentFocusTarget;
+  ScrollController get scrollController => _scrollController;
+  ScrollController get horizontalScrollController => _horizontalScrollController;
 
   @override
   void initState() {
@@ -109,6 +111,36 @@ class MenuOverlayState extends State<MenuOverlay> {
     _scrollController.animateTo(
       nextOffset,
       duration: const Duration(milliseconds: 100),
+      curve: Curves.easeOut,
+    );
+  }
+
+  /// 矢印キー（← / →）による横スクロール
+  void scrollHorizontal(int direction) {
+    if (!_horizontalScrollController.hasClients) return;
+    final maxExtent = _horizontalScrollController.position.maxScrollExtent;
+    if (maxExtent <= 0.0) return;
+
+    const step = 80.0;
+    final nextOffset = (_horizontalScrollController.offset + direction * step)
+        .clamp(0.0, maxExtent);
+    _horizontalScrollController.animateTo(
+      nextOffset,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeOut,
+    );
+  }
+
+  /// 一覧の左端 (toLeft = true) または右端 (toLeft = false) にジャンプ
+  void jumpToHorizontalEdge(bool toLeft) {
+    if (!_horizontalScrollController.hasClients) return;
+    final maxExtent = _horizontalScrollController.position.maxScrollExtent;
+    if (maxExtent <= 0.0) return;
+
+    final targetOffset = toLeft ? 0.0 : maxExtent;
+    _horizontalScrollController.animateTo(
+      targetOffset,
+      duration: const Duration(milliseconds: 150),
       curve: Curves.easeOut,
     );
   }

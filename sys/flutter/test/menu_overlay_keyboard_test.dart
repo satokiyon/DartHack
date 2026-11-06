@@ -117,5 +117,52 @@ void main() {
 
       expect(selectedId, -1);
     });
+
+    testWidgets('scrollHorizontal and jumpToHorizontalEdge scroll horizontal menu smoothly', (tester) async {
+      tester.view.physicalSize = const Size(360, 600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
+      final tabItems = [
+        MenuItemData(
+          ident: 1,
+          accelerator: 'a'.codeUnitAt(0),
+          groupacc: 0,
+          attr: 0,
+          text: 'オプション設定項目A\t現在の値: 有効\t詳細な説明テキスト長い長い説明文その1\t追加フラグ: ON',
+          preselected: 0,
+          color: 7,
+          tile: 0,
+        ),
+      ];
+
+      await tester.pumpWidget(buildTestWidget(
+        items: tabItems,
+        menuHow: 1,
+        onSingleSelect: (_) {},
+      ));
+      await tester.pumpAndSettle();
+
+      final state = tester.state<MenuOverlayState>(find.byType(MenuOverlay));
+      final hController = state.horizontalScrollController;
+      expect(hController.hasClients, isTrue);
+
+      if (hController.position.maxScrollExtent > 0.0) {
+        // scrollHorizontal(1) -> 右へスクロール
+        state.scrollHorizontal(1);
+        await tester.pumpAndSettle();
+        expect(hController.offset, greaterThan(0.0));
+
+        // jumpToHorizontalEdge(false) -> 最右端へジャンプ
+        state.jumpToHorizontalEdge(false);
+        await tester.pumpAndSettle();
+        expect(hController.offset, equals(hController.position.maxScrollExtent));
+
+        // jumpToHorizontalEdge(true) -> 最左端へジャンプ
+        state.jumpToHorizontalEdge(true);
+        await tester.pumpAndSettle();
+        expect(hController.offset, equals(0.0));
+      }
+    });
   });
 }

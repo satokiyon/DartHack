@@ -266,6 +266,44 @@ void main() {
 
       expect(find.byType(SpoilerDialog), findsNothing);
     });
+
+    testWidgets('Guidebook: ArrowLeft/ArrowRight scrolls visible table horizontally, Shift jumps to edge', (tester) async {
+      const tableMarkdown = '''
+## テーブルテスト
+
+| 列1 | 列2 | 列3 | 列4 | 列5 | 列6 | 列7 | 列8 | 列9 | 列10 |
+|---|---|---|---|---|---|---|---|---|---|
+| 非常に長いテキスト1 | 非常に長いテキスト2 | 非常に長いテキスト3 | 非常に長いテキスト4 | 非常に長いテキスト5 | 非常に長いテキスト6 | 非常に長いテキスト7 | 非常に長いテキスト8 | 非常に長いテキスト9 | 非常に長いテキスト10 |
+''';
+
+      await tester.pumpWidget(
+        buildTestApp(
+          const GuidebookDialog(
+            initialContent: tableMarkdown,
+            initialIsJp: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DataTable), findsOneWidget);
+
+      // 右矢印キー押下 -> 右へ横スクロール
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+
+      // Shift + 右矢印キー押下 -> 最右端へジャンプ
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.pumpAndSettle();
+
+      // Shift + 左矢印キー押下 -> 最左端へジャンプ
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.pumpAndSettle();
+    });
   });
 }
 

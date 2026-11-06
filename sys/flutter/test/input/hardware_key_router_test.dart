@@ -453,6 +453,40 @@ void main() {
         equals(const MenuScroll(-1)),
       );
 
+      // 矢印キー左 -> MenuHorizontalScroll(-1)
+      final leftEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.arrowLeft,
+        logicalKey: LogicalKeyboardKey.arrowLeft,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: leftEvent, context: KeyInputContext.menu),
+        equals(const MenuHorizontalScroll(-1)),
+      );
+
+      // 矢印キー右 -> MenuHorizontalScroll(1)
+      final rightEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.arrowRight,
+        logicalKey: LogicalKeyboardKey.arrowRight,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: rightEvent, context: KeyInputContext.menu),
+        equals(const MenuHorizontalScroll(1)),
+      );
+
+      // Shift + 矢印キー左 -> MenuHorizontalJumpEdge(true)
+      expect(
+        HardwareKeyRouter.route(event: leftEvent, context: KeyInputContext.menu, isShiftPressed: true),
+        equals(const MenuHorizontalJumpEdge(true)),
+      );
+
+      // Shift + 矢印キー右 -> MenuHorizontalJumpEdge(false)
+      expect(
+        HardwareKeyRouter.route(event: rightEvent, context: KeyInputContext.menu, isShiftPressed: true),
+        equals(const MenuHorizontalJumpEdge(false)),
+      );
+
       // Space -> MenuSpaceAction() (1ページ下スクロール、最下部では決定/閉鎖)
       final spaceEvent = const KeyDownEvent(
         physicalKey: PhysicalKeyboardKey.space,

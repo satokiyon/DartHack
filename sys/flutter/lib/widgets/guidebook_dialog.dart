@@ -138,6 +138,8 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     _loadGuidebook();
   }
 
+  final Map<int, ScrollController> _horizontalScrollControllers = {};
+
   @override
   void dispose() {
     _mainFocusNode.dispose();
@@ -146,6 +148,10 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
         .removeListener(_onItemPositionsChanged);
     _flashTimer?.cancel();
     _searchController.dispose();
+    for (final controller in _horizontalScrollControllers.values) {
+      controller.dispose();
+    }
+    _horizontalScrollControllers.clear();
     super.dispose();
   }
 
@@ -728,6 +734,48 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     );
   }
 
+  /// 表示中のテーブルや横スクロール可能ブロックの横スクロール
+  void _scrollVisibleHorizontal(int direction) {
+    final positions = _itemPositionsListener.itemPositions.value;
+    if (positions.isEmpty) return;
+    const step = 80.0;
+    for (final pos in positions) {
+      final controller = _horizontalScrollControllers[pos.index];
+      if (controller != null && controller.hasClients) {
+        final maxExtent = controller.position.maxScrollExtent;
+        if (maxExtent > 0.0) {
+          final nextOffset =
+              (controller.offset + direction * step).clamp(0.0, maxExtent);
+          controller.animateTo(
+            nextOffset,
+            duration: const Duration(milliseconds: 100),
+            curve: Curves.easeOut,
+          );
+        }
+      }
+    }
+  }
+
+  /// 表示中のテーブルや横スクロール可能ブロックの最左端/最右端ジャンプ
+  void _jumpVisibleHorizontalEdge(bool toLeft) {
+    final positions = _itemPositionsListener.itemPositions.value;
+    if (positions.isEmpty) return;
+    for (final pos in positions) {
+      final controller = _horizontalScrollControllers[pos.index];
+      if (controller != null && controller.hasClients) {
+        final maxExtent = controller.position.maxScrollExtent;
+        if (maxExtent > 0.0) {
+          final targetOffset = toLeft ? 0.0 : maxExtent;
+          controller.animateTo(
+            targetOffset,
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeOut,
+          );
+        }
+      }
+    }
+  }
+
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
       return KeyEventResult.ignored;
@@ -817,6 +865,17 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     // スクロール操作: ↑ / k (行上スクロール)
     if (key == LogicalKeyboardKey.arrowUp || (key == LogicalKeyboardKey.keyK && !isCtrl)) {
       _scrollByBlocks(-1);
+      return KeyEventResult.handled;
+    }
+
+    // 横スクロール操作: ← / → (および Shift+← / Shift+→ で端ジャンプ)
+    if (key == LogicalKeyboardKey.arrowLeft || key == LogicalKeyboardKey.arrowRight) {
+      final isLeft = key == LogicalKeyboardKey.arrowLeft;
+      if (isShift) {
+        _jumpVisibleHorizontalEdge(isLeft);
+      } else {
+        _scrollVisibleHorizontal(isLeft ? -1 : 1);
+      }
       return KeyEventResult.handled;
     }
 
@@ -1580,7 +1639,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     );
   }
 
-  Widget _buildTableWidget(_GuidebookBlock block) {
+  Widget _buildTableWidget(_GuidebookBlock block, int index) {
     final headers = block.tableHeaders;
     final rows = block.tableRows;
     final columnCount = headers.length;
@@ -1596,6 +1655,9 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
       return paddedCells;
     }).toList();
 
+    final hController = _horizontalScrollControllers.putIfAbsent(
+        index, () => ScrollController());
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
@@ -1605,6 +1667,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
       ),
       clipBehavior: Clip.antiAlias,
       child: SingleChildScrollView(
+        controller: hController,
         scrollDirection: Axis.horizontal,
         child: DataTable(
           headingRowColor:
@@ -1758,6 +1821,8 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
         break;
 
       case _BlockKind.code:
+        final codeController = _horizontalScrollControllers.putIfAbsent(
+            index, () => ScrollController());
         content = Container(
           margin: const EdgeInsets.symmetric(vertical: 8),
           padding: const EdgeInsets.all(12),
@@ -1767,6 +1832,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
             border: Border.all(color: Colors.white12, width: 0.8),
           ),
           child: SingleChildScrollView(
+            controller: codeController,
             scrollDirection: Axis.horizontal,
             child: SelectableText(
               block.rawText,
@@ -1782,7 +1848,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
         break;
 
       case _BlockKind.table:
-        content = _buildTableWidget(block);
+        content = _buildTableWidget(block, index);
         break;
 
       case _BlockKind.details:

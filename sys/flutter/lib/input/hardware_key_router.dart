@@ -168,6 +168,44 @@ class MenuScroll extends KeyAction {
   int get hashCode => direction.hashCode;
 }
 
+/// メニューの横スクロール（1: 右、-1: 左）
+class MenuHorizontalScroll extends KeyAction {
+  final int direction;
+  const MenuHorizontalScroll(this.direction);
+
+  @override
+  String toString() => 'MenuHorizontalScroll($direction)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MenuHorizontalScroll &&
+          runtimeType == other.runtimeType &&
+          direction == other.direction;
+
+  @override
+  int get hashCode => direction.hashCode;
+}
+
+/// メニューの横端ジャンプ（true: 左端、false: 右端）
+class MenuHorizontalJumpEdge extends KeyAction {
+  final bool toLeft;
+  const MenuHorizontalJumpEdge(this.toLeft);
+
+  @override
+  String toString() => 'MenuHorizontalJumpEdge($toLeft)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MenuHorizontalJumpEdge &&
+          runtimeType == other.runtimeType &&
+          toLeft == other.toLeft;
+
+  @override
+  int get hashCode => toLeft.hashCode;
+}
+
 /// メニューのページ送り（1: 次、-1: 前）
 class MenuPage extends KeyAction {
   final int direction;
@@ -1291,10 +1329,14 @@ class HardwareKeyRouter {
       return MenuDigit(numpadDigit);
     }
 
-    // 左右矢印キーはアクセラレータ誤選択を防ぐため抑止
+    // 左右矢印キー: 横スクロール（Shift併用時は最左端/最右端ジャンプ）
     if (event.logicalKey == LogicalKeyboardKey.arrowLeft ||
         event.logicalKey == LogicalKeyboardKey.arrowRight) {
-      return const SwallowKey();
+      final isLeft = event.logicalKey == LogicalKeyboardKey.arrowLeft;
+      if (isShiftPressed) {
+        return MenuHorizontalJumpEdge(isLeft);
+      }
+      return MenuHorizontalScroll(isLeft ? -1 : 1);
     }
 
     // メインキーの数字入力（Shiftなし時: 数量指定）

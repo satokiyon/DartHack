@@ -1546,6 +1546,20 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         }
         return KeyEventResult.handled;
 
+      case MenuHorizontalScroll(:final direction):
+        if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.scrollHorizontal(direction);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case MenuHorizontalJumpEdge(:final toLeft):
+        if (_screen.isMenuWindowVisible) {
+          _menuOverlayKey.currentState?.jumpToHorizontalEdge(toLeft);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
       case MenuPage(:final direction):
         if (_screen.isMenuWindowVisible) {
           final pageItem = _findMenuItemByAccelerator(direction > 0 ? 62 /* '>' */ : 60 /* '<' */);
