@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-06. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-07. -->
 # 物理キーボード操作・設計ガイド (Hardware Keyboard Guide)
 
 NetHack 5.0 (日本語版 / 英語版) の Flutter ポートにおける、**物理キーボード（ハードウェアキーボード）による操作仕様、プレイングテクニック、設計方針、実装アーキテクチャ**を解説する総合ドキュメントです。
@@ -139,6 +139,8 @@ NetHack 伝統のコマンドがすべてそのまま利用可能です。
 - **各ボタンの決定実行**:
   - ガイドブック、スポイラー、設定の各ボタンにフォーカスを合わせて `Enter` または `Space` を押すと、画面をタップした時と同様に各種ダイアログが起動します。
   - `Escape` を押せばいつでもフォーカス枠が解除され、初期状態（`none`）に安全にリセットされます。
+- **操作ヘルプの表示 (`F1` / `Alt + h`)**:
+  - タイトル画面でも、設定の「物理キーボード用の表記を使用」が ON の時に **`F1` または `Alt + h`** を押すと、タイトル画面に特化した操作ガイドカードが表示されます。ヘルプ自体も `F1`、`Alt-h`、`Esc`、`Space`、`Enter` 等で手軽に閉じられます。
 
 #### お名前は？画面・キャラクター作成 (AskNameOverlay)
 主人公の名前入力、既存セーブデータのロード、プレイモード（通常／探索／ウィザード）を選択する画面です。
@@ -322,6 +324,7 @@ Cコアからの一行文字列入力要求ダイアログです。
 | `Space` | 言語切り替え（言語フォーカス時）、またはフォーカス中のボタンを実行 |
 | `←` / `→` | 言語をダイレクト選択（`←`: 日本語, `→`: English） |
 | `Escape` | フォーカス枠を解除して初期状態にリセット |
+| **`F1` / `Alt + h`** | **操作ヘルプ表示（物理キーボード表記ON時）** |
 
 ### お名前は？画面・キャラクター作成 (AskNameOverlay)
 
@@ -438,6 +441,7 @@ Cコアからの一行文字列入力要求ダイアログです。
 | `Home` / `End` | 設定画面の最先頭 / 最末尾へジャンプ |
 | `Tab` / `Shift + Tab` | 各設定項目（スイッチ・選択肢・入力欄）間を標準フォーカス移動 |
 | `Space` / `Enter` | スイッチのトグル反転・選択肢の決定（AppBar 戻るボタン時は前画面へ戻る） |
+| **`F1` / `Alt + h`** | **操作ヘルプ表示（物理キーボード表記ON時）** |
 
 ### メニュー・テキスト入力・プロンプト
 
@@ -585,6 +589,7 @@ flowchart TD
    - `.` / `-` / `@` のメニュー一括操作キー、`^` / `|` / `Home` / `End` の先頭・末尾ジャンプキー。
    - `Tab` / `Shift+Tab` による各画面コンテキストでのフォーカスナビゲーションアクション（YnSubmit、TextOverlayTab、GetLineTab 等）。
    - `Ctrl+M` / `F10` / `ContextMenu` によるドロワー起動ルーティング。
+   - `F1` および `Alt+h` (`Meta-h`) によるタイトル画面を含む全画面操作ヘルプディスパッチ、およびテキスト入力欄フォーカス時の安全な除外検証。
 2. [`test/game_drawer_keyboard_test.dart`](../test/game_drawer_keyboard_test.dart):
    - 初期フォーカス非活性（`none`）、`↓`/`Tab`/`j` および `↑`/`Shift+Tab`/`k` による循環選択。
    - 画面外項目選択時の `Scrollable.ensureVisible` 自動追従スクロール検証。
@@ -614,6 +619,9 @@ flowchart TD
 10. [`test/widgets/settings_page_keyboard_test.dart`](../test/widgets/settings_page_keyboard_test.dart):
     - `Escape` キーによる前画面復帰（保存連携）。
     - `PageDown`/`PageUp`/`Home`/`End` による設定リスト高速スクロール、Tab キーによるコントロール間フォーカス移動の検証。
+    - 初期状態での上下カーソルキー端選択（`↓` でタイル設定、`↑` でクレジット）、および AppBar 戻るボタンを経由した上下ループ移動の検証。
+    - AppBar 戻るボタンフォーカス時の `Enter` / `Space` による安全な設定保存＆前画面復帰の検証。
+    - 「物理キーボード用の表記を使用」が ON の時、`F1` または `Alt+h` で設定画面用操作ヘルプが表示・開閉できること、および OFF 時に表示されないことの検証。
 11. [`test/widgets/getline_overlay_test.dart`](../test/widgets/getline_overlay_test.dart):
     - `autofocus: false` の検証（IME 非表示保護）。
     - フォーカスレス文字入力、Backspace、Enter 決定の検証。
@@ -627,3 +635,7 @@ flowchart TD
 14. [`test/getline_overlay_focus_test.dart`](../test/getline_overlay_focus_test.dart):
     - 一行テキスト入力ダイアログにおける Tab 巡回時の `_inputFocusNode.unfocus()` 維持とフォーカスレス入力互換検証。
     - `ExcludeFocus` によるダイアログ外への Flutter 標準フォーカス漏延遮断の検証。
+15. [`test/widgets/keyboard_help_dialog_test.dart`](../test/widgets/keyboard_help_dialog_test.dart):
+    - 画面コンテキスト（`game`, `menu`, `yn`, `guidebook`, `titleScreen`, `settings`）に応じた最適化操作ガイド項目の表示検証。
+    - 数量指定可能なメニュー（`menuHow >= 1`）のみにおける `0〜9` 数量指定案内の動的表示、および閲覧専用メニュー（`menuHow == 0`）での非表示分離の検証。
+    - `F1`、`Alt + h`、`Escape`、閉じるアイコンボタンによるダイアログの安全閉鎖の検証。

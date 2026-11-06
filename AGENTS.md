@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-06. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-07. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -1473,3 +1473,22 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
 5. **モーダルダイアログ閉鎖後のルートフォーカス確定復帰とゲーム開始前ガード解除原則**:
    - `showFullMapDialog` や `showScoreboardDialog`、ガイドブック等の `showDialog` によるモーダルダイアログを閉じた後、ゲーム画面へ確実にキーボード操作を復帰させるため、ダイアログ閉鎖直後（`.then((_) => _ensureGameFocus())`）にルートの `_focusNode.requestFocus()` を呼んでフォーカスを確定復帰させる。
    - ルートフォーカス確保処理（`_ensureGameFocus`）において、`if (!_isGameRunning) return;` などのゲーム実行中限定ガードを設けてはならず、タイトル画面やキャラクター作成画面などのゲーム開始前フェーズであっても常に安全にルートフォーカスが確保されるようにする。
+
+## 56. Flutter 物理キーボードルーティングにおけるグローバルキー最優先配置と KeyEvent 修飾キーおよび Widget テスト検証原則
+
+1. **`HardwareKeyRouter` におけるグローバル共通キー（F1 / Alt-h / Escape等）の最優先判定原則**:
+   - `KeyInputContext.titleScreen` などの画面コンテキスト個別分岐を、全画面共通キー（操作ヘルプ `F1` / `Alt-h` や緊急キャンセル等）の判定より前に配置してはならない。
+   - 個別コンテキストハンドラの末尾（`SwallowKey()` やデフォルト処理）でキーが早期消費・握りつぶされ、タイトル画面や設定画面でヘルプが表示されなくなる重大な潜在バグの原因となる。
+   - テキスト入力欄フォーカス時（`isTextFieldFocused`）を除き、全画面で共通して発火すべきキーは、各コンテキスト分岐の**前（最優先共通ブロック）**に配置してルーティングしなければならない。
+
+2. **Flutter `KeyEvent` API における修飾キー判定規約（`event.isAltPressed` 廃止と `HardwareKeyboard` 参照義務）**:
+   - Flutter 新 `KeyEvent`（`KeyDownEvent`, `KeyRepeatEvent`, `KeyUpEvent`）には、旧 `RawKeyEvent` に存在した `event.isAltPressed` ゲッターは存在しない。
+   - キーハンドラ内で Alt / Control / Shift などの修飾キー状態を判定する際は、必ず `HardwareKeyboard.instance.isAltPressed` などのシングルトンプロパティ（または `logicalKeysPressed`）を参照すること。
+
+3. **Flutter Widget テストにおけるアコーディオン（ExpansionTile）内コントロールの `ensureVisible` 原則**:
+   - `ExpansionTile`（アコーディオン）内部の子要素（`SwitchListTile` 等）は、親タイルを展開してもビューポート（通常 800x600）の外側に配置される場合がある。
+   - そのまま `tester.tap(finder)` を呼ぶと、RenderBox がビューポート外にはみ出しているため `Offset that would not hit test on the specified widget` 警告やタップミスが発生してテストが失敗する。
+   - アコーディオンやスクロールビュー内の要素をタップ操作する際は、必ず事前に `await tester.ensureVisible(finder); await tester.pumpAndSettle();` を呼び出して画面内に確実にスクロールさせてから操作を行うこと。
+
+4. **数量指定可能メニューにおける操作ヘルプ案内分離原則**:
+   - メニュー画面の操作ヘルプ（`KeyboardHelpDialog`）において、数量指定（`0〜9`）の説明は、実際に数量指定が機能する選択・ドロップメニュー（`menuHow >= 1`）のみに限定して動的に表示し、閲覧専用メニュー（`menuHow == 0`）では表示から除外してプレイヤーの混乱を防止する。
